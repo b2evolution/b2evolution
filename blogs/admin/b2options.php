@@ -65,7 +65,7 @@ if( $action == 'update' )
 			
 			$q = $DB->query( $query );
 			
-			$status_update[] = T_('General settings updated.<br />');
+			$status_update[] = T_('General settings updated.') . '<br />';
 			break;
 
 
@@ -344,7 +344,7 @@ $current_User->check_perm( 'options', 'view', true );
 						?>
 						<tr>
 							<td><?php	$loop_RendererPlugin->name(); ?></td>
-							<td><?php	echo $loop_RendererPlugin->apply; ?></td>
+							<td><?php	echo $loop_RendererPlugin->apply_when; ?></td>
 							<td><?php	$loop_RendererPlugin->short_desc(); ?></td>
 							<td><?php	$loop_RendererPlugin->code(); ?></td>
 						</tr>

@@ -48,7 +48,7 @@ class Renderer extends Plug
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
 
-			switch( $loop_RendererPlugin->apply )
+			switch( $loop_RendererPlugin->apply_when )
 			{
 				case 'stealth':
 				case 'always':
@@ -93,9 +93,10 @@ class Renderer extends Plug
 	 *
 	 * @param string content to render
 	 * @param array renderer codes
+	 * @param string Output format, see {@link format_to_output()}
 	 * @return string rendered content
 	 */
-	function render( & $content, & $renderers )
+	function render( & $content, & $renderers, $format )
 	{
 		$this->init();	// Init if not done yet.
 		
@@ -105,12 +106,12 @@ class Renderer extends Plug
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
 
-			switch( $loop_RendererPlugin->apply )
+			switch( $loop_RendererPlugin->apply_when )
 			{
 				 case 'stealth':
 				 case 'always':
 					// echo 'FORCED';
-					$loop_RendererPlugin->render( $content );
+					$loop_RendererPlugin->render( $content, $format );
 					break;
 				 
 				 case 'opt-out':
@@ -119,14 +120,14 @@ class Renderer extends Plug
 					if( in_array( $loop_RendererPlugin->code, $renderers ) )
 					{	// Option is activated
 						// echo 'OPT';
-						$loop_RendererPlugin->render( $content );
+						$loop_RendererPlugin->render( $content, $format );
 					}
 					// echo 'NO';
 					break;
 									 
 				 case 'never':
 					// echo 'NEVER';
-					continue;	// STOP, don't render, go to next renderer
+					break;	// STOP, don't render, go to next renderer
 			}		
 		}
 

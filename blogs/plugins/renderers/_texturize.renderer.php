@@ -14,7 +14,9 @@ class texturize_Rendererplugin extends RendererPlugin
 	var $code = 'b2WPTxrz';
 	var $name = 'Texturize';
 	var $priority = 90;
-	var $apply = 'opt-in';
+	var $apply_when = 'opt-in';
+	var $apply_to_html = true; 
+	var $apply_to_xml = true; 
 	var $short_desc = 'Smart quotes and more';
 	var $long_desc = 'No description available';
 
@@ -22,9 +24,18 @@ class texturize_Rendererplugin extends RendererPlugin
 	 * Perform rendering
 	 *
 	 * {@internal texturize_Rendererplugin::render(-)}} 
+	 *
+	 * @param string content to render (by reference) / rendered content
+	 * @param string Output format, see {@link format_to_output()}
+	 * @return boolean true if we can render something for the required output format
 	 */
-	function render( & $content )
+	function render( & $content, $format )
 	{
+		if( ! parent::render( $content, $format ) )
+		{	// We cannot render the required format
+			return false;
+		}
+	
 		$output = '';
 		$textarr = preg_split("/(<.*>)/Us", $content, -1, PREG_SPLIT_DELIM_CAPTURE); // capture the tags as well as in between
 		$stop = count($textarr); $next = true; // loop stuff
@@ -68,6 +79,8 @@ class texturize_Rendererplugin extends RendererPlugin
 			$output .= $curl;
 		}
 		$content = $output;
+		
+		return true;
 	}
 }
 

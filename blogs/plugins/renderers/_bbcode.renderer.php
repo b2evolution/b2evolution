@@ -17,7 +17,9 @@ class bbcode_Rendererplugin extends RendererPlugin
 	var $code = 'b2evBBco';
 	var $name = 'BB code';
 	var $priority = 43;
-	var $apply = 'opt-in';
+	var $apply_when = 'opt-in';
+	var $apply_to_html = true; 
+	var $apply_to_xml = true;  // strip the BBcode
 	var $short_desc = 'BB formatting e-g [b]bold[/b]';
 	var $long_desc = 'No description available';
 
@@ -67,10 +69,21 @@ class bbcode_Rendererplugin extends RendererPlugin
 	 * Perform rendering
 	 *
 	 * {@internal BBcode::render(-)}} 
+	 *
+	 * @param string content to render (by reference) / rendered content
+	 * @param string Output format, see {@link format_to_output()}
+	 * @return boolean true if we can render something for the required output format
 	 */
-	function render( & $content )
+	function render( & $content, $format )
 	{
+		if( ! parent::render( $content, $format ) )
+		{	// We cannot render the required format
+			return false;
+		}
+	
 		$content = preg_replace( $this->search, $this->replace, $content );
+		
+		return true;
 	}
 }
 

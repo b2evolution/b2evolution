@@ -17,7 +17,9 @@ class gmcode_Rendererplugin extends RendererPlugin
 	var $code = 'b2evGMco';
 	var $name = 'GM code';
 	var $priority = 41;
-	var $apply = 'opt-out';
+	var $apply_when = 'opt-out';
+	var $apply_to_html = true; 
+	var $apply_to_xml = false; // Leave the GMcode markup
 	var $short_desc = 'GreyMatter style formatting';
 	var $long_desc = 'No description available';
 
@@ -49,10 +51,21 @@ class gmcode_Rendererplugin extends RendererPlugin
 	 * Perform rendering
 	 *
 	 * {@internal gmcode_Rendererplugin::render(-)}} 
+	 *
+	 * @param string content to render (by reference) / rendered content
+	 * @param string Output format, see {@link format_to_output()}
+	 * @return boolean true if we can render something for the required output format
 	 */
-	function render( & $content )
+	function render( & $content, $format )
 	{
+		if( ! parent::render( $content, $format ) )
+		{	// We cannot render the required format
+			return false;
+		}
+	
 		$content = preg_replace( $this->search, $this->replace, $content );
+		
+		return true;
 	}
 }
 

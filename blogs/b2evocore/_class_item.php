@@ -481,7 +481,7 @@ class Item extends DataObject
 
 		// Apply rendering
 		$post_renderers = $Renderer->validate_list( $this->renderers );
-		$output = $Renderer->render( $output, $post_renderers );
+		$output = $Renderer->render( $output, $post_renderers, $format );
 
 		// Character conversions
 		$output = format_to_output( $output, $format );

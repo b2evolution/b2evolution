@@ -15,7 +15,9 @@ class smilies_Rendererplugin extends RendererPlugin
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
 	var $priority = 80;
-	var $apply = 'always';
+	var $apply_when = 'always';
+	var $apply_to_html = true; 
+	var $apply_to_xml = false; // Leave the smilies alone
 	var $short_desc = 'Convert text smilies to icons';
 	var $long_desc = 'No description available';
 
@@ -63,9 +65,18 @@ class smilies_Rendererplugin extends RendererPlugin
 	 * Perform rendering
 	 *
 	 * {@internal smilies_Rendererplugin::render(-)}} 
+	 *
+	 * @param string content to render (by reference) / rendered content
+	 * @param string Output format, see {@link format_to_output()}
+	 * @return boolean true if we can render something for the required output format
 	 */
-	function render( & $content )
-	{	
+	function render( & $content, $format )
+	{
+		if( ! parent::render( $content, $format ) )
+		{	// We cannot render the required format
+			return false;
+		}
+	
 		if( ! isset( $this->search ) )
 		{	// We haven't prepared the smilies yet
 			$this->search = array();
@@ -89,6 +100,8 @@ class smilies_Rendererplugin extends RendererPlugin
 
 		// REPLACE:
 		$content = str_replace( $this->search, $this->replace, $content );
+		
+		return true;
 	}
 }
 

@@ -422,8 +422,8 @@ if( $action != 'editcomment' )
 		while( $loop_RendererPlugin = $Renderer->get_next() )
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
-			if( $loop_RendererPlugin->apply == 'stealth'
-				|| $loop_RendererPlugin->apply == 'never' )
+			if( $loop_RendererPlugin->apply_when == 'stealth'
+				|| $loop_RendererPlugin->apply_when == 'never' )
 			{	// This is not an option.
 				continue;
 			}
@@ -432,7 +432,7 @@ if( $action != 'editcomment' )
 				<input type="checkbox" class="checkbox" name="renderers[]" 
 					value="<?php $loop_RendererPlugin->code() ?>" id="<?php $loop_RendererPlugin->code() ?>"  
 					<?php	
-					switch( $loop_RendererPlugin->apply )
+					switch( $loop_RendererPlugin->apply_when )
 					{
 						case 'always':
 							// echo 'FORCED';

@@ -201,7 +201,9 @@ class textile_Rendererplugin extends RendererPlugin
 	var $code = 'b2DATxtl';
 	var $name = 'Textile';
 	var $priority = 20;
-	var $apply = 'lazy';
+	var $apply_when = 'opt-in';
+	var $apply_to_html = true; 
+	var $apply_to_xml = true; 	// Strip the markup
 	var $short_desc = 'Humane Web Text Generator';
 	var $long_desc = 'No description available';
 
@@ -239,9 +241,18 @@ class textile_Rendererplugin extends RendererPlugin
 		 * Perform rendering
 		 *
 		 * {@internal gmcode_Rendererplugin::render(-)}} 
+		 *
+		 * @param string content to render (by reference) / rendered content
+		 * @param string Output format, see {@link format_to_output()}
+		 * @return boolean true if we can render something for the required output format
 		 */
-		function render( & $content )
+		function render( & $content, $format )
 		{
+			if( ! parent::render( $content, $format ) )
+			{	// We cannot render the required format
+				return false;
+			}
+	
 			// Original optional parameters:
 			$lite = '';
 			// $encode = '';
@@ -290,6 +301,8 @@ class textile_Rendererplugin extends RendererPlugin
 			$content = str_replace("<br />", "<br />\n", $text);
 	
       //	}
+		
+			return true;
     }
 
 // -------------------------------------------------------------
