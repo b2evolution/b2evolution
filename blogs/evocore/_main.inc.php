@@ -285,7 +285,6 @@ if( !empty($login) && !empty($pass) )
 	$pass_md5 = md5( $pass );
 
 	// echo 'Trying to log in right now...';
-
 	header_nocache();
 
 	$Plugins->trigger_event( 'LoginAttempt', array( 'login' => $login, 'pass' => $pass, 'pass_md5' => $pass_md5 ) );
@@ -293,6 +292,8 @@ if( !empty($login) && !empty($pass) )
 	// Check login and password
 	if( !user_pass_ok( $login, $pass_md5, true ) )
 	{ // Login failed
+		$login_debug = 'Login failed';
+
 		$login = '';
 
 		if( $login_required )
@@ -303,6 +304,8 @@ if( !empty($login) && !empty($pass) )
 	}
 	else
 	{ // Login succeeded, set cookies
+		$login_debug = 'Login succeeded, set cookies';
+
 		//echo $login, $pass_is_md5, $user_pass,  $cookie_domain;
 		if( !setcookie( $cookie_user, $login, $cookie_expires, $cookie_path, $cookie_domain ) )
 		{
@@ -321,6 +324,7 @@ elseif( isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
 	 * ---------------------------------------------------------
 	 */
 	// echo 'Was already logged in...';
+	$login_debug = 'Was already logged in...';
 
 	$login = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_user]) : $_COOKIE[$cookie_user]));
 	$pass_md5 = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_pass]) : $_COOKIE[$cookie_pass]));
@@ -343,6 +347,7 @@ elseif( $login_required )
 	 * ---------------------------------------------------------
 	 */
 	// echo ' NOT logged in...';
+	$login_debug = 'NOT logged in...';
 
 	$Messages->add( T_('You must log in!'), 'login_error' );
 }
@@ -424,6 +429,9 @@ require_once( $conf_path.'_icons.php' );
 
 /*
  * $Log$
+ * Revision 1.24  2005/03/07 17:11:25  fplanque
+ * added debug helpers
+ *
  * Revision 1.23  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
