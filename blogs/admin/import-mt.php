@@ -11,12 +11,22 @@
  *
  * TODO:
  *  - list of all posts, editable (overkill?)
+ *  - assign comment_author_ID to comments if user exist?!
+ *
+ * CHANGES:
+ *  0.2:
+ *   - fixed comments/trackbacks (still not thoroughly tested) [thanks to chris]
+ *   - new user password must be confirmed [thanks to chris]
+ *   - we preselect the b2evo default renderers now (especially Auto-P)
+ *   - fixed user mapping from select box
+ *  0.1:
+ *   - first release
  *
  * Credits go to the WordPress team (http://wordpress.org), where I got the basic import-mt.php script with
  * most of the core functions. Thank you!
  *
- * This script was developed and tested with b2evolution 0.9.0.4 (on Sourceforge CVS) and Movable Type 2.661.
- * It should work quite alright with b2evo 0.9.0.3 though.
+ * This script was developed and tested with b2evolution 0.9.0.4 (on Sourceforge CVS) and Movable Type 2.64 and 2.661.
+ * It should work quite alright with b2evo 0.9 though.
  *
  * Feedback is very welcome (http://thequod.de/contact).
  */
@@ -28,7 +38,7 @@
 define('MTEXPORT', '');
 
 
-$output_debug_dump = false;  // set to true to get a lot of <pre>'d var_dumps
+$output_debug_dump = 0;  // set to true to get a lot of <pre>'d var_dumps
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -42,7 +52,7 @@ $output_debug_dump = false;  // set to true to get a lot of <pre>'d var_dumps
 	<a href="http://b2evolution.net"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution"  title="visit b2evolution's website" width="185" height="40" /></a>
 
 	<div id="headinfo">
-	<br /><h2>import Movable Type into b2evolution - v0.1</h2>
+	<br /><h2>import Movable Type into b2evolution - v0.2</h2>
 	</div>
 
 
@@ -132,6 +142,13 @@ switch( $tab ) {
 
 		// get the params
 		param( 'default_password', 'string', 'changeme' );
+		param( 'default_password2', 'string', 'changeme' );
+
+		if( $default_password != $default_password2 )
+		{
+			dieerror( 'The two passwords for new users are not identical.' );
+		}
+
 		param( 'default_userlevel', 'integer', 1 );
 		param( 'default_usergroup', 'integer', $Settings->get('newusers_grp_ID') );
 		param( 'default_convert_breaks', 'integer', 1 );
@@ -183,11 +200,15 @@ switch( $tab ) {
 				<?php
 					// build <select>-template for available users
 					$evousers = $DB->get_results("SELECT * FROM $tableusers ORDER BY ID");
+
 					$user_selecttemplate = '<select name="user_select[]">
 						<option value="#NONE#"> - Select b2evo user.. - </option>';
-					$i = -1;
-					foreach($evousers as $user) {
-						$user_selecttemplate .= '<option value="'.$user->ID.'">'.format_to_output($user->user_login, 'formvalue').'</option>';
+					if( $evousers )
+					{
+						$i = -1;
+						foreach($evousers as $user) {
+							$user_selecttemplate .= '<option value="'.$user->ID.'">'.format_to_output($user->user_login, 'formvalue').'</option>';
+						}
 					}
 					$user_selecttemplate .= '</select>';
 
@@ -201,7 +222,7 @@ switch( $tab ) {
 						printf( $user_selecttemplate."\n" )
 
 						?>
-						<input type="text" value="<?php echo format_to_output($author, 'formvalue') ?>" name="user[]" maxlength="30" class="input" />
+						<input type="text" value="<?php echo format_to_output($author, 'formvalue') ?>" name="user_name[]" maxlength="30" class="input" />
 
 						<span class="notes">(create new)</span>
 						<span title="don't import posts of that user"><input type="checkbox" value="<?php echo $i_user ?>" name="user_ignore[]" /> ignore</span>
@@ -239,6 +260,7 @@ switch( $tab ) {
 				<fieldset><legend>New user defaults</legend>
 					<?php
 					form_text( 'default_password', $default_password, 30, 'Password for new users', 'this will be the password for users created during migration (default "changeme")', 30 , '', 'password' );
+					form_text( 'default_password2', $default_password, 30, 'Confirm password', 'please confirm the password', 30 , '', 'password' );
 					$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' );
 					form_text( 'default_userlevel', 1, 2, T_('Level'), $field_note, 2 );
 					form_select_object( 'default_usergroup', $Settings->get('newusers_grp_ID'), $GroupCache, T_('User group') );
@@ -260,7 +282,7 @@ switch( $tab ) {
 				but only if there is no extended body. Because then we'll use the extended text appended with the more tag in the body.</li>
 			</ul>
 			</div>
-			
+
 			<div class="input">
 				<input class="search" type="submit" value=" Import! " />
 				<input class="search" type="reset" value="reset form" />
@@ -285,7 +307,7 @@ switch( $tab ) {
 			}
 
 			$atleastoneusercreated = false;
-			
+
 			// get POSTed data
 			$catmap_select = array();
 			$catmap_newname = array();
@@ -293,7 +315,7 @@ switch( $tab ) {
 
 			foreach( $_POST['catmap_select'] as $cat )
 			{
-				
+
 				$catmap_select[] = stripslashes(str_replace( array('&quot;', '&#039;', '&lt;', '&gt;'), array('"', "'", '<', '>'), $cat ));
 			}
 			foreach( $_POST['catmap_newname'] as $cat )
@@ -377,12 +399,12 @@ switch( $tab ) {
 			$mt_authors_select = array();
 			$mt_authors = array();
 			$mt_authors_ignore = array();
-			
+
 			// ignored users
 			if( isset($_POST['user_ignore']) )
 				$mt_authors_ignore = $_POST['user_ignore'];
-				
-			foreach( $_POST['user'] as $line )
+
+			foreach( $_POST['user_name'] as $line )
 			{
 				$newname = trim(stripslashes($line));
 				$newname = str_replace( array('&quot;', '&#039;', '&lt;', '&gt;'), array('"', "'", '<', '>'), $newname );
@@ -397,6 +419,7 @@ switch( $tab ) {
 			{
 				$selected = trim( stripslashes($user) );
 				$selected = str_replace( array('&quot;', '&#039;', '&lt;', '&gt;'), array('"', "'", '<', '>'), $selected );
+
 				array_push($mt_authors_select, "$selected");
 			}
 			$count = count( $mt_authors_input );
@@ -404,6 +427,11 @@ switch( $tab ) {
 			{
 				if( $mt_authors_select[$i] != '#NONE#')
 				{ //if no name was selected from the select menu, use the name entered in the form
+					$mt_authors_select[$i] = $DB->get_var("SELECT user_login FROM $tableusers WHERE ID = $mt_authors_select[$i]");
+					if( empty($mt_authors_select[$i]) )
+					{ // the selected user ID could not be retrieved from DB (probably deleted after the select dropdown has been created)
+						array_push($newauthornames,"$mt_authors_input[$i]");
+					}
 					array_push($newauthornames, "$mt_authors_select[$i]");
 				}
 				else
@@ -422,7 +450,7 @@ switch( $tab ) {
 				global $mt_authors_ignore;
 				global $GroupCache;
 				global $atleastoneusercreated;
-				
+
 				$md5pass = md5( $default_password );
 				if( !(in_array($author, $mt_authors)) )
 				{ // a new mt author name is found
@@ -434,7 +462,7 @@ switch( $tab ) {
 						?><span style="color:blue">User ignored!</span><?php
 						return -1;
 					}
-					
+
 					// check if the new author name defined by the user is a pre-existing b2evo user
 					$user_id = $DB->get_var("SELECT ID FROM $tableusers WHERE user_login = '".$DB->escape($newauthornames[$i_user])."'");
 					if( !$user_id )
@@ -445,18 +473,18 @@ switch( $tab ) {
 							/*$DB->query("INSERT INTO $tableusers (user_level, user_login, user_pass, user_nickname) VALUES ('1', '".$DB->escape($author)."', '$md5pass', '".$DB->escape($author)."')"); // if user does not want to change, insert the authorname $author
 							$user_id = $DB->get_var("SELECT ID FROM $tableusers WHERE user_login = '$author'");*/
 						}
-						
+
 						$new_user = new User();
-						$new_user->set('login', $newauthornames[$i_user]); 
-						$new_user->set('nickname', $newauthornames[$i_user]); 
-						$new_user->set('pass', $md5pass); 
-						$new_user->set('level', $default_userlevel); 
+						$new_user->set('login', $newauthornames[$i_user]);
+						$new_user->set('nickname', $newauthornames[$i_user]);
+						$new_user->set('pass', $md5pass);
+						$new_user->set('level', $default_userlevel);
 						$new_user_Group = $GroupCache->get_by_ID( $default_usergroup );
-						$new_user->setGroup( $new_user_Group ); 
-						
+						$new_user->setGroup( $new_user_Group );
+
 						$new_user->dbinsert();
 						$user_id = $new_user->ID;
-						
+
 						?><span class="notes"> [user <?php echo $author ?> created!] </span><?php
 						$atleastoneusercreated = true;
 					}
@@ -466,13 +494,13 @@ switch( $tab ) {
 				{
 					// find the array key for $author in the $mt_authors array
 					$key = array_search($author, $mt_authors);
-					
+
 					if( in_array( $key, $mt_authors_ignore ) )
 					{
 						?><span style="color:blue">User ignored!</span><?php
 						return -1;
 					}
-					
+
 					//use that key to get the value of the author's name from $newauthornames
 					$user_id = $DB->get_var("SELECT ID FROM $tableusers WHERE user_login = '".$DB->escape($newauthornames[$key])."'");
 				}
@@ -627,10 +655,10 @@ switch( $tab ) {
 				else
 				{ // insert post
 					$post_author = checkauthor($post_author);//just so that if a post already exists, new users are not created by checkauthor
-					
+
 					if( $post_author == -1 )
 						continue;  // user ignored
-						
+
 					$post_id =
 						bpost_create( $post_author, $post_title, $post_content,	$post_date, $post_category, $post_extracats,
 													$post_status,	$post_locale,	'' /* $post_trackbacks */, $post_convert_breaks, true /* $pingsdone */,
@@ -672,10 +700,15 @@ switch( $tab ) {
 							// Check if it's already there
 							if( !$DB->get_row("SELECT * FROM $tablecomments WHERE comment_date = '$comment_date' AND comment_content = '$comment_content'") )
 							{
-								$DB->query("INSERT INTO $tablecomments (comment_post_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_approved)
-								VALUES
-								($post_id, '$comment_author', '$comment_email', '$comment_url', '$comment_ip', '$comment_date', '$comment_content', '1')");
-								echo " Comment added.";
+								$DB->query( "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author_ID, comment_author,
+																											comment_author_email, comment_author_url, comment_author_IP,
+																											comment_date, comment_content)
+													VALUES( $post_ID, 'comment', 'NULL', ".$DB->quote($comment_author).",
+																	".$DB->quote($comment_email).",	".$DB->quote($comment_url).",
+																	'".$DB->escape($comment_ip)."', '$comment_date', '".$DB->escape($comment)."' )" );
+								$DB->query( $query );
+
+								echo ' Comment added.';
 							}
 						}
 					}
@@ -720,10 +753,13 @@ switch( $tab ) {
 							// Check if it's already there
 							if (!$DB->get_row("SELECT * FROM $tablecomments WHERE comment_date = '$comment_date' AND comment_content = '$comment_content'"))
 							{
-								$DB->query("INSERT INTO $tablecomments (comment_post_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_approved)
+								$DB->query("INSERT INTO $tablecomments
+								(comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url,
+								comment_author_IP, comment_date, comment_content )
 								VALUES
-								($post_id, '$comment_author', '$comment_email', '$comment_url', '$comment_ip', '$comment_date', '$comment_content', '1')");
-								echo " Comment added.";
+								($post_id, 'trackback', ".$DB->quote($comment_author).", ".$DB->quote($comment_email).", ".$DB->quote($comment_url).",
+								".$DB->quote($comment_ip).", ".$DB->quote($comment_date).", ".$DB->quote($comment_content).", '1')");
+								echo ' Trackback added.';
 							}
 						}
 					}
@@ -952,6 +988,45 @@ function renderer_list()
 		<div>
 			<input type="checkbox" class="checkbox" name="renderers[]"
 				value="<?php $loop_RendererPlugin->code() ?>" id="<?php $loop_RendererPlugin->code() ?>"
+				<?php
+				switch( $loop_RendererPlugin->apply_when )
+				{
+					case 'always':
+						// echo 'FORCED';
+						echo ' checked="checked"';
+						echo ' disabled="disabled"';
+						break;
+
+					case 'opt-out':
+						if( in_array( $loop_RendererPlugin->code, $renderers ) // Option is activated
+							|| in_array( 'default', $renderers ) ) // OR we're asking for default renderer set
+						{
+							// echo 'OPT';
+							echo ' checked="checked"';
+						}
+						// else echo 'NO';
+						break;
+
+					case 'opt-in':
+						if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
+						{
+							// echo 'OPT';
+							echo ' checked="checked"';
+						}
+						// else echo 'NO';
+						break;
+
+					case 'lazy':
+						// cannot select
+						if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
+						{
+							// echo 'OPT';
+							echo ' checked="checked"';
+						}
+						echo ' disabled="disabled"';
+						break;
+				}
+			?>
 			title="<?php	$loop_RendererPlugin->short_desc(); ?>" />
 		<label for="<?php $loop_RendererPlugin->code() ?>" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><strong><?php echo $loop_RendererPlugin->name(); ?></strong></label>
 	</div>
@@ -969,7 +1044,7 @@ function dieerror( $message )
 function debug_dump( $var, $title = '')
 {
 	global $output_debug_dump;
-	
+
 	if( $output_debug_dump )
 	{
 		pre_dump( $var, $title );

@@ -56,7 +56,7 @@
 	</table>
 	</div>
 
-	<div class="statbloc">
+	<div class="statbloc" style="clear:left;">
 	<h3><?php echo T_('Top Indexing Robots') ?>:</h3>
 	<?php refererList(10, 'global', 0, 0, 'robot', 'hit_user_agent', ($blog > 1) ? $blog : '', true, true); ?>
 	<table class="invisible">
