@@ -147,25 +147,23 @@
 <div id=categories>
 
 <h4>Categories&nbsp;:</h4>
-<!-- ---------------------------- START OF CATEGORIES ---------------------------- -->
+<!-- ========== START OF CATEGORIES ========== -->
 <?php form_formstart( $Blog->dget( 'blogurl', 'raw' ) ) ?>
 <?php require( dirname(__FILE__).'/_categories.php' ); ?>
 <input type="submit" value="<?php echo T_('Get selection') ?>" />
 <input type="reset" value="<?php echo T_('Reset form') ?>" />
 </form>
-<!-- ----------------------------- END OF CATEGORIES ----------------------------- -->
+<!-- ========== END OF CATEGORIES ========== -->
 </div>
 
 <h4>Search&nbsp;:</h4>
-<form action=/index.php method=get>
-<div id=searchform>
-<ul>
-	<li><input id="rechercher" size="15" name="s" />
-	<li><input type="submit" value="envoyer" name="submit" /> </li></ul></div>
+<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), '', '', 'get', 'searchform' ) ?>
+	<input id="rechercher" size="15" name="s" />
+	<input type="submit" value="envoyer" name="submit" />
 </form>
 
 
-<form id=switcher action="<?php $Blog->disp( 'blogurl', 'raw' ) ?>" method=get>
+<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), '', '', 'get', 'switcher' ) ?>
 	<fieldset><label for=set><h4><?php echo T_('Choose a skin') ?>&nbsp;:</h4></label>
 	<select id=set name="skin">
 		<?php // ---------------------------------- START OF SKIN LIST ----------------------------------

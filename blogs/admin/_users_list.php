@@ -49,7 +49,7 @@
 			$loop_grp_ID = $row['grp_ID'];
 			
 			if( $loop_prev_grp_ID != $loop_grp_ID )
-			{	// We just entered a new group!
+			{	// ---------- We just entered a new group! ----------
 				?>
 				<tr class="group">
 					<td colspan="7">
@@ -68,14 +68,13 @@
 						<td>
 							<a href="b2users.php?group=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /></a>
 							
-							<a href="b2users.php?action=newgroup&amp;template=<?php echo $loop_grp_ID ?>" title="<?php echo T_('Copy group') ?>"><img src="img/copy.gif" width="13" height="13" class="middle" alt="<?php echo T_('Copy') ?>" title="<?php echo T_('Copy group') ?>" /></a>
+							<a href="b2users.php?action=newgroup&amp;template=<?php echo $loop_grp_ID ?>" title="<?php echo T_('Copy group') ?>"><img src="img/copy.gif" width="13" height="13" class="middle" alt="<?php echo T_('Copy') ?>" title="<?php echo T_('Copy group') ?>" /></a> 
 						<?php
 						if( ($loop_grp_ID != 1) && ($loop_grp_ID != $Settings->get('newusers_grp_ID'))
 								&& !in_array( $loop_grp_ID, $usedgroups ) )
 						{ // delete
 							?>
-							<a href="b2users.php?action=deletegroup&amp;id=<?php echo $loop_grp_ID ?>" title="<?php echo T_('Delete group') ?>">
-							<img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('Delete group') ?>" /></a>
+							<a href="b2users.php?action=deletegroup&amp;id=<?php echo $loop_grp_ID ?>" title="<?php echo T_('Delete group') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('Delete group') ?>" /></a>
 							<?php
 						}
 						echo '</td>';
@@ -137,16 +136,14 @@
 					
 					// edit user
 					echo ' <a href="b2users.php?user=', $loop_User->get('ID'), '"><img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" /></a> ';
-					
+
 					// copy user
 					echo ' <a href="?action=newuser&amp;template='.$loop_User->get('ID').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" /></a> ';
 					
 					if( ($loop_User->ID != 1) && ($loop_User->ID != $current_User->ID) )
 					{ // delete
 						?>
-						<a href="b2users.php?action=deleteuser&id=<?php echo $loop_User->get('ID') ?>" title="<?php echo T_('Delete user') ?>"  onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')">
-						<img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('Delete user') ?>" />
-						</a>
+						<a href="b2users.php?action=deleteuser&id=<?php echo $loop_User->get('ID') ?>" title="<?php echo T_('Delete user') ?>"  onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete */ T_('Del') ?>" title="<?php echo T_('Delete user') ?>" /></a>
 						<?php
 					}
 				}

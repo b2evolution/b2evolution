@@ -263,7 +263,7 @@ switch( $show )
 	</table>
 
 	<h3><?php echo T_('Top referers') ?>:</h3>
-	<?php refererList(30, 'global', 0, 0, "'no'", 'baseDomain', $blog, true); ?>
+	<?php refererList(30,'global',0,0,"'no'",'baseDomain',$blog,true); ?>
 	<table class='invisible'>
 		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
 			<tr>

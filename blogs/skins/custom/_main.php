@@ -79,7 +79,11 @@
 			$Item->categories();
 			echo ', ';
 			$Item->wordcount();
-			echo ' ', T_('words'), ' &nbsp; ';
+			echo ' ', T_('words');
+			echo ', ';
+			$Item->views();
+			echo ' '.T_('views');
+			echo ' &nbsp; ';
 			locale_flag( $Item->locale, 'h10px' );
 		?>
 		</div>
@@ -205,10 +209,10 @@
 	<div class="bSideItem">
 		<h3><?php echo T_('Choose skin') ?></h3>
 		<ul>
-			<?php // ---------------------------------- START OF SKIN LIST ----------------------------------
+			<?php // ------------------------------- START OF SKIN LIST -------------------------------
 			for( skin_list_start(); skin_list_next(); ) { ?>
 				<li><a href="<?php skin_change_url() ?>"><?php skin_list_iteminfo( 'name', 'htmlbody' ) ?></a></li>
-			<?php } // --------------------------------- END OF SKIN LIST --------------------------------- ?>
+			<?php } // ------------------------------ END OF SKIN LIST ------------------------------ ?>
 		</ul>
 	</div>
 

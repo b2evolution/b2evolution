@@ -80,8 +80,6 @@
 				echo ', ';
 				$Item->wordcount();
 				echo ' ', T_('words');
-				$Item->views();
-				echo ' ', T_('views');
 			?>
 			</small>
 		

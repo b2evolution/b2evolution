@@ -10,8 +10,8 @@
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
 
-$b2_version = '0.9.1+CVS-20040523';
-$new_db_version = 8070;				// next time: 8080
+$b2_version = '0.9.1+CVS';
+$new_db_version = 8062;				// next time: 8070
 
 // Investigation for following code by Isaac - http://isaac.beigetower.org/
 if( !isset($_SERVER['REQUEST_URI']) )
@@ -90,7 +90,7 @@ if( $HTTP_USER_AGENT != '' )
 
 	if ($HTTP_USER_AGENT != strip_tags($HTTP_USER_AGENT))
 	{ // then they have tried something funny,
-		// putting HTML or PHP into the HTTP_REFERER
+		// putting HTML or PHP into the HTTP_USER_AGENT
 		debug_log( 'setting vars: '.T_('bad char in User Agent'));
 		$HTTP_USER_AGENT = T_('bad char in User Agent');
 	}
@@ -103,9 +103,6 @@ $is_IE = (($is_macIE) || ($is_winIE));
 // server detection
 $is_Apache	= strpos($HTTP_SERVER_VARS['SERVER_SOFTWARE'], 'Apache') !== false ? 1 : 0;
 $is_IIS		= strpos($HTTP_SERVER_VARS['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false ? 1 : 0;
-
-// let's deactivate quicktags on Lynx, because they don't work there.
-if($is_lynx)	$use_quicktags=0;
 
 
 // the weekdays and the months..
@@ -132,6 +129,22 @@ $weekday_abbrev[4] = NT_('Thu');
 $weekday_abbrev[5] = NT_('Fri');
 // TRANS: abbrev. for Saturday
 $weekday_abbrev[6] = NT_('Sat');
+
+// the weekdays even shorter form (typically 1 letter)
+// TRANS: abbrev. for Sunday
+$weekday_letter[0] = NT_(' S ');
+// TRANS: abbrev. for Monday
+$weekday_letter[1] = NT_(' M ');
+// TRANS: abbrev. for Tuesday
+$weekday_letter[2] = NT_(' T ');
+// TRANS: abbrev. for Wednesday
+$weekday_letter[3] = NT_(' W ');
+// TRANS: abbrev. for Thursday
+$weekday_letter[4] = NT_(' T  ');
+// TRANS: abbrev. for Friday
+$weekday_letter[5] = NT_(' F ');
+// TRANS: abbrev. for Saturday
+$weekday_letter[6] = NT_(' S  ');
 
 // the months
 $month['01'] = NT_('January');

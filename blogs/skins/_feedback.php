@@ -76,7 +76,6 @@
 	<?php
 	if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 	{
-		if( $disp_comments ) 
 	?>
 	
 	<!-- Title for comments, tbs, pbs... -->
@@ -94,7 +93,7 @@
 	while( $Comment = $CommentList->get_next() )
 	{	// Loop through comments:	
 		?>
-		<!-- ---------- START of a COMMENT/TB/PB ---------- -->
+		<!-- ========== START of a COMMENT/TB/PB ========== -->
 		<?php $Comment->anchor() ?>
 		<div class="bComment">
 			<div class="bCommentTitle">
@@ -127,7 +126,7 @@
 				<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
 			</div>
 		</div>
-		<!-- ---------- END of a COMMENT/TB/PB ---------- -->
+		<!-- ========== END of a COMMENT/TB/PB ========== -->
 		<?php
 	} 
 	

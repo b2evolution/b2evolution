@@ -5,17 +5,18 @@
 	 * This file is not meant to be called directly.
 	 * It is meant to be called by an include in the _main.php template.
 	 */
-	if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
-		die("Please, do not access this page directly.");
+	if( substr(basename($_SERVER['SCRIPT_FILENAME']), 0, 1) == '_' )
+		die( 'Please, do not access this page directly.' );
 
 	# You can customize the following as you wish:
-	if(!isset($cat_all)) $cat_all = 'All';	// Set to empty to hide
+	if(!isset($cat_all)) $cat_all = /* TRANS: All categories, skin's categories list */ T_('All');	// Set to empty to hide
 	# global category list delimiters:
 	if(!isset($cat_main_start)) $cat_main_start = '';
 	if(!isset($cat_main_end)) $cat_main_end = '';
 	# Category delimiters:
 	if(!isset($cat_line_start)) $cat_line_start = '<li>';
 	if(!isset($cat_line_end)) $cat_line_end = '</li>';
+	if(!isset($cat_line_checkbox)) $cat_line_checkbox = true;
 	# Category group delimiters:
 	if(!isset($cat_group_start)) $cat_group_start = '<ul>';
 	if(!isset($cat_group_end)) $cat_group_end = '</ul>';
@@ -40,21 +41,27 @@
 	
 	function cat_list_before_each( $cat_ID, $level )
 	{	// callback to display sublist element
-		global $blogfilename, $cat_array, $cat_line_start;
+		global $blogfilename, $cat_array, $cat_line_start, $cat_line_checkbox;
 		$cat = get_the_category_by_ID( $cat_ID );
 		echo $cat_line_start;
-		echo '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'"';
-		if( in_array( $cat_ID, $cat_array ) )
-		{	// This category is in the current selection
-			echo ' checked="checked"';
+		if( $cat_line_checkbox )
+		{
+			echo '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'"';
+			if( in_array( $cat_ID, $cat_array ) )
+			{	// This category is in the current selection
+				echo ' checked="checked"';
+			}
+			echo ' />';
 		}
-		echo ' />';
 		echo '<a href="'.url_add_param( get_bloginfo('blogurl'), 'cat='.$cat_ID ).'">'.format_to_output($cat['cat_name'], 'htmlbody').'</a> <span class="dimmed">('.$cat['cat_postcount'].')</span>';
 		if( in_array( $cat_ID, $cat_array ) )
 		{	// This category is in the current selection
 			echo "*";
 		}
-		echo '</label>';
+		if( $cat_line_checkbox )
+		{
+			echo '</label>';
+		}
 	}
 	
 	function cat_list_after_each( $cat_ID, $level )

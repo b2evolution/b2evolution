@@ -205,7 +205,7 @@
 				while( $Comment = $CommentList->get_next() )
 				{	// Loop through comments:	
 					?>
-					<!-- ---------- START of a COMMENT/TB/PB ---------- -->
+					<!-- ========== START of a COMMENT/TB/PB ========== -->
 					<div class="bComment">
 						<div class="bSmallHead">
 							<?php
@@ -263,14 +263,14 @@
 						</p>
 	
 					</div>
-					<!-- ---------- END of a COMMENT/TB/PB ---------- -->
+					<!-- ========== END of a COMMENT/TB/PB ========== -->
 					<?php //end of the loop, don't delete
 				}
 
 				if( $Item->can_comment() )
 				{ // User can leave a comment
 				?>
-				<!-- ---------- FORM to add a comment ---------- -->
+				<!-- ========== FORM to add a comment ========== -->
 				<h4><?php echo T_('Leave a comment') ?>:</h4>
 
 				<form action="<?php echo $htsrv_url ?>/comment_post.php" method="post" class="bComment">
@@ -310,7 +310,7 @@
 					<div class="clear"></div>
 
 				</form>
-				<!-- ---------- END of FORM to add a comment ---------- -->
+				<!-- ========== END of FORM to add a comment ========== -->
 				<?php
 				} // / can comment
 		} // / comments requested

@@ -233,7 +233,7 @@ function comments_link($file='', $tb=0, $pb=0 )
 	global $id;
 	if( ($file == '') || ($file == '/')	)
 		$file = get_bloginfo('blogurl');
-	echo add_url_param( $file, 'p='. $id. '&amp;c=1' );
+	echo url_add_param( $file, 'p='. $id. '&amp;c=1' );
 	if( $tb == 1 )
 	{	// include trackback // fplanque: added
 		echo '&amp;tb=1';

@@ -138,6 +138,7 @@ function create_b2evo_tables()
 		post_category int(4) NOT NULL default '0',
 		post_autobr tinyint(4) NOT NULL default '1',
 		post_flags SET( 'pingsdone', 'imported'),
+		post_views INT NOT NULL DEFAULT '0',
 		post_karma int(11) NOT NULL default '0',
 		post_wordcount int(11) default NULL,
 		post_comments ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
@@ -639,7 +640,7 @@ This is page 3.
 
 This is page 4.
 
-It is the last page.'), $now, $cat_bg, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
+It is the last page.'), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
 	
 
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -647,7 +648,7 @@ It is the last page.'), $now, $cat_bg, ( $populate_blog_a ? array( $cat_bg , $ca
 
 <!--more--><!--noteaser-->
 
-This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_bg, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
+This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
 	
 
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -655,7 +656,7 @@ This is the extended text. You only see it when you have clicked the "more" link
 
 <!--more-->
 
-This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_bg, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
+This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_b2evo, ( $populate_blog_a ? array( $cat_bg , $cat_b2evo ) : array ( $cat_b2evo ) ) );
 	
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);

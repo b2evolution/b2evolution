@@ -24,6 +24,10 @@ msgstr ""
 #: ../../doc/upgradefrom_b2.src.html:17
 #: ../../doc/upgradefrom_b2evo.src.html:6
 #: ../../doc/upgradefrom_b2evo.src.html:17
+#: ../../doc/upgradefrom_gl.src.html:6
+#: ../../doc/upgradefrom_gl.src.html:17
+#: ../../doc/upgradefrom_mt.src.html:6
+#: ../../doc/upgradefrom_mt.src.html:17
 msgid "b2evo package"
 msgstr ""
 
@@ -32,6 +36,8 @@ msgstr ""
 #: ../../doc/install_new.src.html:18
 #: ../../doc/upgradefrom_b2.src.html:18
 #: ../../doc/upgradefrom_b2evo.src.html:18
+#: ../../doc/upgradefrom_gl.src.html:18
+#: ../../doc/upgradefrom_mt.src.html:18
 msgid "Start page"
 msgstr ""
 
@@ -39,6 +45,8 @@ msgstr ""
 #: ../../doc/install_new.src.html:13
 #: ../../doc/upgradefrom_b2.src.html:13
 #: ../../doc/upgradefrom_b2evo.src.html:13
+#: ../../doc/upgradefrom_gl.src.html:13
+#: ../../doc/upgradefrom_mt.src.html:13
 msgid "b2evolution: official site"
 msgstr ""
 
@@ -46,6 +54,8 @@ msgstr ""
 #: ../../doc/install_new.src.html:14
 #: ../../doc/upgradefrom_b2.src.html:14
 #: ../../doc/upgradefrom_b2evo.src.html:14
+#: ../../doc/upgradefrom_gl.src.html:14
+#: ../../doc/upgradefrom_mt.src.html:14
 msgid "Multilingual multiuser multi-blog engine."
 msgstr ""
 
@@ -53,6 +63,8 @@ msgstr ""
 #: ../../doc/install_new.src.html:15
 #: ../../doc/upgradefrom_b2.src.html:15
 #: ../../doc/upgradefrom_b2evo.src.html:15
+#: ../../doc/upgradefrom_gl.src.html:15
+#: ../../doc/upgradefrom_mt.src.html:15
 msgid "Version"
 msgstr ""
 
@@ -60,6 +72,8 @@ msgstr ""
 #: ../../doc/install_new.src.html:19
 #: ../../doc/upgradefrom_b2.src.html:19
 #: ../../doc/upgradefrom_b2evo.src.html:19
+#: ../../doc/upgradefrom_gl.src.html:19
+#: ../../doc/upgradefrom_mt.src.html:19
 msgid "Install"
 msgstr ""
 
@@ -67,6 +81,8 @@ msgstr ""
 #: ../../doc/install_new.src.html:20
 #: ../../doc/upgradefrom_b2.src.html:20
 #: ../../doc/upgradefrom_b2evo.src.html:20
+#: ../../doc/upgradefrom_gl.src.html:20
+#: ../../doc/upgradefrom_mt.src.html:20
 msgid "Blogs"
 msgstr ""
 
@@ -74,6 +90,8 @@ msgstr ""
 #: ../../doc/install_new.src.html:21
 #: ../../doc/upgradefrom_b2.src.html:21
 #: ../../doc/upgradefrom_b2evo.src.html:21
+#: ../../doc/upgradefrom_gl.src.html:21
+#: ../../doc/upgradefrom_mt.src.html:21
 msgid "Admin"
 msgstr ""
 
@@ -81,6 +99,8 @@ msgstr ""
 #: ../../doc/install_new.src.html:22
 #: ../../doc/upgradefrom_b2.src.html:22
 #: ../../doc/upgradefrom_b2evo.src.html:22
+#: ../../doc/upgradefrom_gl.src.html:22
+#: ../../doc/upgradefrom_mt.src.html:22
 msgid "Online"
 msgstr ""
 
@@ -88,6 +108,8 @@ msgstr ""
 #: ../../doc/install_new.src.html:23
 #: ../../doc/upgradefrom_b2.src.html:23
 #: ../../doc/upgradefrom_b2evo.src.html:23
+#: ../../doc/upgradefrom_gl.src.html:23
+#: ../../doc/upgradefrom_mt.src.html:23
 msgid "Manual"
 msgstr ""
 
@@ -95,6 +117,8 @@ msgstr ""
 #: ../../doc/install_new.src.html:24
 #: ../../doc/upgradefrom_b2.src.html:24
 #: ../../doc/upgradefrom_b2evo.src.html:24
+#: ../../doc/upgradefrom_gl.src.html:24
+#: ../../doc/upgradefrom_mt.src.html:24
 msgid "Support"
 msgstr ""
 
@@ -102,6 +126,8 @@ msgstr ""
 #: ../../doc/install_new.src.html:28
 #: ../../doc/upgradefrom_b2.src.html:28
 #: ../../doc/upgradefrom_b2evo.src.html:28
+#: ../../doc/upgradefrom_gl.src.html:28
+#: ../../doc/upgradefrom_mt.src.html:28
 msgid "Available translations for this page:"
 msgstr ""
 
@@ -149,24 +175,46 @@ msgstr ""
 msgid "upgrading from Cafelog/b2 version 0.6.x"
 msgstr ""
 
-#: ../../index.src.html:45
-#: ../../doc/install_new.src.html:55
-#: ../../doc/upgradefrom_b2.src.html:74
-#: ../../doc/upgradefrom_b2evo.src.html:54
-msgid "official website"
+#: ../../index.src.html:42
+msgid "Movable Type users:"
 msgstr ""
 
-#: ../../index.src.html:46
-#: ../../doc/install_new.src.html:56
-#: ../../doc/upgradefrom_b2.src.html:75
-#: ../../doc/upgradefrom_b2evo.src.html:55
-msgid "GNU GPL license"
+#: ../../index.src.html:42
+msgid "upgrading from Movable Type"
+msgstr ""
+
+#: ../../index.src.html:43
+msgid "GeekLog users:"
+msgstr ""
+
+#: ../../index.src.html:43
+msgid "upgrading from GeekLog"
 msgstr ""
 
 #: ../../index.src.html:47
+#: ../../doc/install_new.src.html:55
+#: ../../doc/upgradefrom_b2.src.html:74
+#: ../../doc/upgradefrom_b2evo.src.html:54
+#: ../../doc/upgradefrom_gl.src.html:40
+#: ../../doc/upgradefrom_mt.src.html:45
+msgid "official website"
+msgstr ""
+
+#: ../../index.src.html:48
+#: ../../doc/install_new.src.html:56
+#: ../../doc/upgradefrom_b2.src.html:75
+#: ../../doc/upgradefrom_b2evo.src.html:55
+#: ../../doc/upgradefrom_gl.src.html:41
+#: ../../doc/upgradefrom_mt.src.html:46
+msgid "GNU GPL license"
+msgstr ""
+
+#: ../../index.src.html:49
 #: ../../doc/install_new.src.html:57
 #: ../../doc/upgradefrom_b2.src.html:76
 #: ../../doc/upgradefrom_b2evo.src.html:56
+#: ../../doc/upgradefrom_gl.src.html:42
+#: ../../doc/upgradefrom_mt.src.html:47
 msgid "contact"
 msgstr ""
 
@@ -181,6 +229,8 @@ msgstr ""
 #: ../../doc/install_new.src.html:34
 #: ../../doc/upgradefrom_b2.src.html:34
 #: ../../doc/upgradefrom_b2evo.src.html:33
+#: ../../doc/upgradefrom_gl.src.html:33
+#: ../../doc/upgradefrom_mt.src.html:33
 msgid "Before you begin, please note that some network features of b2evolution require you to agree our simple <a %s>Terms of service</a>."
 msgstr ""
 
@@ -317,5 +367,48 @@ msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:46
 msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
+msgstr ""
+
+#: ../../doc/upgradefrom_gl.src.html:6
+#: ../../doc/upgradefrom_gl.src.html:32
+msgid "Upgrading from GeekLog"
+msgstr ""
+
+#: ../../doc/upgradefrom_gl.src.html:35
+#: ../../doc/upgradefrom_mt.src.html:37
+msgid "<a %s>Install b2evolution in the regular way.</a>"
+msgstr ""
+
+#: ../../doc/upgradefrom_gl.src.html:36
+msgid "Follow the specific instructions in <a %s>/extras/geeklog/README.txt</a>"
+msgstr ""
+
+#: ../../doc/upgradefrom_mt.src.html:6
+#: ../../doc/upgradefrom_mt.src.html:32
+msgid "Upgrading from Movable Type"
+msgstr ""
+
+#: ../../doc/upgradefrom_mt.src.html:34
+msgid "This procedure has been tested with Movable Type version 2.661 but should also work with other versions. You can't break anything by trying anyway..."
+msgstr ""
+
+#: ../../doc/upgradefrom_mt.src.html:36
+msgid "Use MT's export functionnality to create a .TXT file containing your posts."
+msgstr ""
+
+#: ../../doc/upgradefrom_mt.src.html:38
+msgid "Once b2evo is up and running, copy your .TXT export file into the /blogs/admin folder on your server."
+msgstr ""
+
+#: ../../doc/upgradefrom_mt.src.html:39
+msgid "In the admin, go to the Tools tab and launch the MT migration utility."
+msgstr ""
+
+#: ../../doc/upgradefrom_mt.src.html:40
+msgid "Follow the instructions on screen."
+msgstr ""
+
+#: ../../doc/upgradefrom_mt.src.html:41
+msgid "Import will only take a few seconds/minutes depending on how many posts you import."
 msgstr ""
 

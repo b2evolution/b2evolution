@@ -192,7 +192,7 @@
 
 	<div class="bSideItem">
 		<h3><?php echo T_('Categories') ?></h3>
-		<?php form_formstart( $Blog->disp( 'blogurl', 'raw' ) ) ?>
+		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ) ) ?>
 		<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
 			require( dirname(__FILE__).'/_categories.php' );
 			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>

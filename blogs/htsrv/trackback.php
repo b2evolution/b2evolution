@@ -93,19 +93,22 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 	$authordata = get_userdata($postdata['Author_ID']);
 	if( get_user_info( 'notify', $authordata ) )
 	{	// Author wants to be notified:
+		locale_temp_switch( get_user_info( 'locale', $authordata ) );
 		$recipient = get_user_info( 'email', $authordata );
-		$subject = sprintf( T_('New trackback on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] );
+		$subject = sprintf( T_('New trackback on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] );
+
 		// fplanque added:
 		$comment_blogparams = get_blogparams_by_ID( $blog );
 
-		$notify_message  = sprintf( T_('New trackback on your post #%d "%s"', $default_locale), $comment_post_ID, $postdata['Title'] )."\n";
-		$notify_message .= url_add_param( get_bloginfo('blogurl', $comment_blogparams), "p=$comment_post_ID&tb=1\n\n" );
-		$notify_message .= T_('Website', $default_locale).": $comment_author (IP: $user_ip , $user_domain)\n";
-		$notify_message .= T_('Url', $default_locale).": $comment_author_url\n";
-		$notify_message .= T_('Excerpt', $default_locale).": \n".$original_comment."\n\n";
-		$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
+		$notify_message  = sprintf( T_('New trackback on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] )."\n";
+		$notify_message .= url_add_param( get_bloginfo('blogurl', $comment_blogparams), "p=$comment_post_ID&tb=1\n\n", '&' );
+		$notify_message .= T_('Website').": $comment_author (IP: $user_ip , $user_domain)\n";
+		$notify_message .= T_('Url').": $comment_author_url\n";
+		$notify_message .= T_('Excerpt').": \n".$original_comment."\n\n";
+		$notify_message .= T_('Edit/Delete').': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
 
 		send_mail( $recipient, $subject, $notify_message, $notify_from );
+		locale_restore_previous();
 		
 	}
 

@@ -31,7 +31,7 @@ if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $locale) )
 else
 { // detect language
 	$default_locale = locale_from_httpaccept();
-	#echo 'detected locale: ' . $default_locale. '<br />';
+	// echo 'detected locale: ' . $default_locale. '<br />';
 }
 // Activate default locale:
 locale_activate( $default_locale );
@@ -277,7 +277,7 @@ switch( $action )
 						form_text( 'conf_db_password', $conf_db_password, 16, T_('mySQL Password'), sprintf( T_('Your password to access the database' ) ), 16, '', 'password' );
 						form_text( 'conf_db_name', $conf_db_name, 16, T_('mySQL Database'), sprintf( T_('Name of the database you want to use' ) ), 16 );
 						form_text( 'conf_db_host', $conf_db_host, 16, T_('mySQL Host'), sprintf( T_('You probably won\'t have to change this' ) ), 120 );
-						form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('mySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with that. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
+						form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('mySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
 					?>
 				</fieldset>
 

@@ -27,6 +27,7 @@ class Calendar
 	var $monthstart;
 	var $monthend;
 	var $linktomontharchive;
+	var $navigation;	
 
 	var $tablestart;
 	var $tableend;
@@ -35,6 +36,8 @@ class Calendar
 	var $rowend;
 
 	var $headerdisplay;
+	var $headerrowstart;
+	var $headerrowend;
 	var $headercellstart;
 	var $headercellend;
 
@@ -136,6 +139,8 @@ class Calendar
 		$this->monthformat = 'F Y';
 		$this->linktomontharchive = true;  // month displayed as link to month' archive
 
+		$this->navigation = 'caption';	// Do the nav in the caption
+
 		$this->tablestart = '<table class="bCalendarTable" summary="Monthly calendar with links to each day\'s posts">'."\n";
 		$this->tableend = '</table>';
 
@@ -145,8 +150,13 @@ class Calendar
 		$this->rowstart = '<tr class="bCalendarRow">' . "\n";
 		$this->rowend = "</tr>\n";
 
-		$this->headerdisplay = 1;	// set this to 0 if you don't want to display the "Mon Tue Wed..." header
-		$this->headercellstart = '<th class="bCalendarHeaderCell" abbr="[abbr]">';	// please leave [abbr] there !
+		$this->headerdisplay = 'D';	 // D => 'Fri'; e => 'F', l (lowercase l) => 'Friday'
+		// These codes are twisted because they're the same as for date formats.
+		// set this to 0 or '' if you don't want to display the "Mon Tue Wed..." header
+		
+		$this->headerrowstart = '<thead><tr class="bCalendarRow">' . "\n";
+		$this->headerrowend = "</tr></thead>\n";
+		$this->headercellstart = '<th class="bCalendarHeaderCell" abbr="[abbr]" scope="col" title="[abbr]">';	// please leave [abbr] there !
 		$this->headercellend = "</th>\n";
 
 		$this->cellstart = '<td class="bCalendarCell">';
@@ -205,7 +215,7 @@ class Calendar
 	{
 		global $DB;
 		global $tableposts, $tablepostcats, $tablecategories;
-		global $weekday, $weekday_abbrev, $month, $month_abbrev;
+		global $weekday, $weekday_abbrev, $weekday_letter, $month, $month_abbrev;
 		global $start_of_week;
 		global $Settings;
 
@@ -282,9 +292,9 @@ class Calendar
 			// Create links to previous/next month
 			$previous_month_link = '<a href="'.
 				archive_link( ($this->month > 1) ? $this->year : ($this->year - 1),	($this->month > 1) ? ($this->month - 1) : 12, '', '', false, $file, $params )
-				.'" title="'.T_('previous month').'">&lt;</a>&nbsp;&nbsp;';
+				.'" title="'.T_('previous month').'">&lt;</a>';
 	
-			$next_month_link = '&nbsp;&nbsp;<a href="'.
+			$next_month_link = '<a href="'.
 				archive_link( ($this->month < 12) ? $this->year : ($this->year + 1), ($this->month < 12) ? ($this->month + 1) : 1, '', '', false, $file, $params )
 				.'" title="'.T_('next month').'">&gt;</a>';
 		}
@@ -324,15 +334,24 @@ class Calendar
 
 		echo $this->tablestart;
 
+		// CAPTION :
+
 		if( $this->displaycaption )
 		{	// caption:
 			echo $this->monthstart;
 			
-			echo isset( $previous_year_link ) ? $previous_year_link : '';
+			if( $this->navigation == 'caption' )
+			{	// Link to previous year:
+				echo isset( $previous_year_link ) ? $previous_year_link : '';
+			}
 			
 			if( $this->mode == 'month' )
-			{
-				echo $previous_month_link;
+			{	// MONTH CAPTION:
+
+				if( $this->navigation == 'caption' )
+				{	// Link to previous month:
+					echo $previous_month_link.'&nbsp;&nbsp;';
+				}
 
 				if( $this->linktomontharchive )
 				{	// chosen month with link to archives
@@ -344,28 +363,57 @@ class Calendar
 					echo '</a>';
 				}
 			
-				echo $next_month_link;
+				if( $this->navigation == 'caption' )
+				{	// Link to next month:
+					echo '&nbsp;&nbsp;'.$next_month_link;
+				}
 			}
-			else echo date_i18n('Y', mktime(0, 0, 0, 1, 1, $this->year)); // display year
+			else
+			{	// YEAR CAPTION:
+				echo date_i18n('Y', mktime(0, 0, 0, 1, 1, $this->year)); // display year
+			}
 			
-			echo isset( $next_year_link ) ? $next_year_link : '';
+			if( $this->navigation == 'caption' )
+			{	// Link to next year:
+				echo isset( $next_year_link ) ? $next_year_link : '';
+			}
 			
 			echo $this->monthend;
 		}
 
-		if( $this->headerdisplay && $this->mode == 'month' )
+		// HEADER :
+
+		if( !empty($this->headerdisplay) && ($this->mode == 'month') )
 		{	// Weekdays:
-			echo $this->rowstart;
+			echo $this->headerrowstart;
 
 			for ($i = $start_of_week; $i < ($start_of_week + 7); $i = $i + 1)
 			{
 				echo str_replace('[abbr]', T_($weekday[($i % 7)]), $this->headercellstart);
-				echo T_($weekday_abbrev[($i % 7)]);
+				switch( $this->headerdisplay )
+				{
+					case 'e':
+						// e => 'F'
+						echo T_($weekday_letter[($i % 7)]);
+						break;
+						
+					case 'l':
+						// l (lowercase l) => 'Friday'
+						echo T_($weekday[($i % 7)]);
+						break;
+			
+					default:	// Backward compatibility: any non emty value will display this
+						// D => 'Fri'
+						echo T_($weekday_abbrev[($i % 7)]);
+				}
+
 				echo $this->headercellend;
 			}
 			
-			echo $this->rowend;
+			echo $this->headerrowend;
 		}
+
+		// REAL TABLE DATA :
 
 		echo $this->rowstart;
 
@@ -510,8 +558,25 @@ class Calendar
 			} // loop day by day
 		} // mode == 'month'
 		
-		echo $this->rowend
-				.$this->tableend;
+		echo $this->rowend;
+		
+		if( $this->navigation == 'tfoot' )
+		{	// We want to display navigation in the table footer:
+			// TODO: YEAR MODE support
+			echo "<tfoot>\n";
+			echo "<tr>\n";
+			echo '<td colspan="3" id="prev">';
+			echo $previous_month_link;
+			echo "</td>\n";
+			echo '<td class="pad">&nbsp;</td>'."\n";
+			echo '<td colspan="3" id="next">';
+			echo $next_month_link;
+			echo "</td>\n";
+			echo "</tr>\n";
+			echo "</tfoot>\n";
+		}
+		
+		echo $this->tableend;
 	}  // display(-)
 
 }

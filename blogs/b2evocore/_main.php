@@ -120,7 +120,6 @@ if( $uri_reloaded )
 	debug_log( 'URI-reload!' );
 
 
-
 // Load hacks file if it exists
 @include_once( dirname(__FILE__) . '/../conf/hacks.php' );
 ?>

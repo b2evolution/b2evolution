@@ -31,10 +31,30 @@ param('action', 'string', '' );
 
 // look what translations we have
 $pofiles = glob( $pofilepath.'/*.static.po' );
-$targets = array( DEFAULT_TARGET );
+$targets[ DEFAULT_TARGET ] = '';
+
+// add targets that use same message file
+foreach( $locales as $key => $value )
+{
+	if( substr($value['messages'], 0, 2 ) == substr( $locales[ DEFAULT_TARGET ]['messages'], 0, 2 ) )
+	{
+		$targets[ $key ] = '';
+	}
+}
+
 foreach( $pofiles as $po )
 {
-	$targets[] = basename( $po, '.static.po' );
+	$target = basename( $po, '.static.po' );
+	$targets[ $target ] = $po;
+
+	// add targets that use same message file
+	foreach( $locales as $key => $value ) if( $key != $target )
+	{
+		if( $value['messages'] == $locales[ $target ]['messages'] )
+		{
+			$targets[ $key ] = $po;
+		}
+	}
 }
 
 
@@ -71,7 +91,7 @@ if( isset($argv) )
 Usage: $argv[0] <extract|merge>
 extract: extracts all translatable strings into ".STATIC_POT.".
 merge: creates all static files for which there are .po files in the current directory.
-\n.po files are available for: ".implode(', ', $targets)."
+\ntargets: ".implode(', ', array_keys( $targets ))."
 ";
 		exit;
 	}
@@ -94,7 +114,7 @@ function htmlmenu()
 		<input type="hidden" name="action" value="merge" />
 		<input type="checkbox" value="1" name="highlight_untranslated" '.( ($highlight_untranslated) ? 'checked="checked"' : '' ).' />
 		highlight untranslated strings
-		<br /><br />(available locales/targets: '.implode(', ', $targets).')
+		<br /><br />(targets: '.implode(', ', array_keys( $targets )).')
 		<br /><br /><input type="submit" value="create static files from locales .po files" class="search" />
 	</fieldset>
 	</form>
@@ -104,7 +124,7 @@ function htmlmenu()
 		<legend>extract</legend>
 		<input type="hidden" name="action" value="extract" />
 		';
-		form_info( 'static POT file', STATIC_POT );
+		form_info( 'static POT file', str_replace( '\\', '/', STATIC_POT ) );
 		echo '
 		<input type="submit" value="extract" class="search" />
 	</fieldset>
@@ -431,16 +451,14 @@ switch( $action )
 	break;
 
 	case 'merge':
-		foreach( $targets as $target )
+		foreach( $targets as $target => $targetmessagefile )
 		{ // loop targets/locales
 			log_('<h2 style="margin-bottom:0">TARGET: '.$target.'</h2>');
-			if( $target != DEFAULT_TARGET )
+			if( $targetmessagefile != '' )
 			{ // only translate when not DEFAULT_TARGET
-				$replacesrc = '.'.$target.'.';
+				log_( 'reading .po file: '.basename( $targetmessagefile ) );
 
-				log_( 'reading locale: '.$target );
-
-				$POFile = new POFile($pofilepath.'/'.$target.'.static.po');
+				$POFile = new POFile( $targetmessagefile );
 				$POFile->read();
 
 				// get charset out of .PO file header
@@ -461,12 +479,14 @@ switch( $action )
 				}
 			}
 			else
-			{ // target == DEFAULT_TARGET, so we don't translate
-				$replacesrc = '.';
+			{ // no $targetmessagefile, so we don't translate
 				$charset = DEFAULT_CHARSET;
 				log_( 'building default files');
 				$POFile = new POFile('');
 			}
+			if( $target != DEFAULT_TARGET )
+				$replacesrc = '.'.$target.'.';
+			else $replacesrc = '.';
 
 
 			foreach( $srcfiles as $srcfile )
@@ -487,9 +507,10 @@ switch( $action )
 				locale_activate( $target );  // activate locale to translate locale names
 
 				$list_avail = "\t".'<ul style="margin-left: 2ex;list-style:none;">'."\n";
-				foreach( $targets as $ttarget )
-				{
+				foreach( $targets as $ttarget => $ttargetmessagefile )
+				{ // the link to the static html file for that target message file
 					$linkto = str_replace('.src.', ( $ttarget != DEFAULT_TARGET ) ? ".$ttarget." : '.', basename($srcfile) );
+					
 					$list_avail .=
 					"\t\t".'<li><a href="'.$linkto.'">'.locale_flag($ttarget, 'w16px', 'flag', '', false, $path_to_root.'blogs/img/flags').T_( $locales[$ttarget]['name'] ).'</a></li>'."\n";
 				}
@@ -526,19 +547,20 @@ switch( $action )
 															$text);
 
 
-				if( $target != DEFAULT_TARGET )
+				if( $targetmessagefile != '' )
 				{ // translate everything
 					$text = preg_replace( '/'.TRANSTAG_OPEN.'(.*?)'.TRANSTAG_CLOSE.'/es', '$POFile->translate(stripslashes(\'$1\'))', $text );
 
 					if( strpos( $text, TRANSTAG_OPEN ) !== false )
 					{ // there are still tags.
+						#pre_dump( $text, substr( $text, strpos( $text, TRANSTAG_OPEN ), 30 ) );
 						log_('<span style="color:blue">WARNING: some strings have not been translated!</span>');
 					}
 				}
 
 
 				// handle left TRANSTAGs
-				if( $highlight_untranslated && !($target == DEFAULT_TARGET) )
+				if( $highlight_untranslated && $targetmessagefile != '' )
 				{ // we want to highlight untranslated strings
 					$text = str_replace( array(TRANSTAG_OPEN, TRANSTAG_CLOSE), array('<span style="color:red" title="not translated">', '</span>'), $text );
 				}

@@ -16,6 +16,7 @@
 	# Category delimiters:
 	if(!isset($cat_line_start)) $cat_line_start = '<li>';
 	if(!isset($cat_line_end)) $cat_line_end = '</li>';
+	if(!isset($cat_line_checkbox)) $cat_line_checkbox = true;
 	# Category group delimiters:
 	if(!isset($cat_group_start)) $cat_group_start = '<ul>';
 	if(!isset($cat_group_end)) $cat_group_end = '</ul>';

@@ -125,7 +125,7 @@ if( $item_author_User->notify
 	$Blog = Blog_get_by_ID( $commented_Item->blog_ID );
 	
 	$notify_message  = sprintf( T_('New comment on your post #%d "%s"'), $comment_post_ID, $commented_Item->get('title') )."\n";
-	$notify_message .= $commented_Item->gen_permalink( 'pid' )."\n\n"; // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+	$notify_message .= str_replace('&amp;', '&', $commented_Item->gen_permalink( 'pid' ))."\n\n"; // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 	if( is_logged_in() )
 	{
 		$notify_message .= T_('Author').': '.$current_User->get('preferedname').

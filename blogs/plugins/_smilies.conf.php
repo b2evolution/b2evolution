@@ -18,8 +18,6 @@ $this->smilies_path = $img_url.'/smilies';
 # here's the conversion table, you can modify it if you know what you're doing
 # smilies will be displayed in their order of appearance
 $this->smilies = array(
-										'~`'				=> 'qm_open.gif',
-										'\'~'				=> 'qm_close.gif',
 										'=>'				=> 'icon_arrow.gif',
 								//	':!:'				=> 'icon_exclaim.gif',
 								//	':?:'				=> 'icon_question.gif',

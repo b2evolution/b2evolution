@@ -16,7 +16,7 @@
 
 require_once(dirname(__FILE__).'/../conf/_config.php' );
 
-require_once(dirname(__FILE__).'/../$core_subdir/_main.php' );
+require_once(dirname(__FILE__)."/../$core_subdir/_main.php" );
 
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
@@ -1396,7 +1396,7 @@ function pingback_ping($m)
 							$comment_blogparams = get_blogparams_by_ID( $blog );
 
 							$notify_message	 = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] )."\n";
-							$notify_message .= url_add_param( get_bloginfo('blogurl', $comment_blogparams), "p=$post_ID&pb=1\n\n" );
+							$notify_message .= url_add_param( get_bloginfo('blogurl', $comment_blogparams), "p=$post_ID&pb=1\n\n", '&' );
 							$notify_message .= T_('Website'). ": $original_title\n";
 							$notify_message .= T_('Url'). ": $original_pagelinkedfrom\n";
 							$notify_message .= T_('Excerpt'). ": \n[...] $original_context [...]\n\n";

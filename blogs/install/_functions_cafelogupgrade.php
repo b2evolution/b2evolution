@@ -30,7 +30,7 @@ function upgrade_cafelog_tables()
 	global $DB;
 
 	// Create blogs:
-	create_default_blogs( 'Blog A (Upg)', 'Blog A (Cafelog Upgrade)', T_("This blog holds all your posts upgraded from Cafelog. This blog is named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s"), false );	
+	create_default_blogs( 'Blog A (Upg)', 'Blog A (Cafelog Upgrade)', T_("This blog holds all your posts upgraded from Cafelog. This blog is named '%s'. %s"), false );	
 
 
 	echo 'Copying Cafelog settings... ';

@@ -15,13 +15,13 @@
 		return false;		// Nothing to do here!
 	}
 	
-	$CommentList = & new CommentList( $blog, "'comment'", $show_statuses );
+	$CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'DESC',	'',	20 );
 	
 	$CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No comment yet...').'</p></div>' );
 
 	while( $Comment = $CommentList->get_next() )
 	{	// Loop through comments:	?>
-		<!-- ---------- START of a COMMENT ---------- -->
+		<!-- ========== START of a COMMENT ========== -->
 		<a name="c<?php $Comment->ID() ?>"></a>
 		<div class="bComment">
 			<h3 class="bTitle">
@@ -36,11 +36,11 @@
 				<?php $Comment->content() ?>
 			</div>
 			<div class="bCommentSmallPrint">
-				<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
+				<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment') ?>" class="permalink_right"><img src="<?php imgbase() ?>chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 				<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
 			</div>
 		</div>
-		<!-- ---------- END of a COMMENT ---------- -->
+		<!-- ========== END of a COMMENT ========== -->
 		<?php 
 	}	// End of comment loop.
 ?>

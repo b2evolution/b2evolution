@@ -1,5 +1,6 @@
 # Apache configuration for the blog folder
 
+
 # this will select the default blog template to be displayed
 # if the URL is just .../blogs/
 <IfModule mod_dir.c>
@@ -12,3 +13,6 @@
 <IfModule mod_php4.c>
 	php_flag register_globals off
 </IfModule>
+
+# If you're using Apache 2, you may wish to try this for clean URLs:
+# AcceptPathInfo	On

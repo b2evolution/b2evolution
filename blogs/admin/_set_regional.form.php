@@ -76,8 +76,10 @@ if( !empty($locale) && $action != 'extract' )
 			<?php echo T_('a - "am" or "pm"') ?><br />
 			<?php echo T_('A - "AM" or "PM"') ?><br />
 			<?php echo T_('B - Swatch Internet time') ?><br />
+			<?php echo T_('c - ISO 8601 date (Requires PHP 5); i.e. "2004-02-12T15:19:21+00:00"') ?><br />
 			<?php echo T_('d - day of the month, 2 digits with leading zeros; i.e. "01" to "31"') ?><br />
 			<?php echo T_('D - day of the week, textual, 3 letters; i.e. "Fri"') ?><br />
+			<?php echo T_('e - day of the week, 1 letter; i.e. "F"') ?><br />
 			<?php echo T_('F - month, textual, long; i.e. "January"') ?><br />
 			<?php echo T_('g - hour, 12-hour format without leading zeros; i.e. "1" to "12"') ?><br />
 			<?php echo T_('G - hour, 24-hour format without leading zeros; i.e. "0" to "23"') ?><br />
@@ -91,6 +93,7 @@ if( !empty($locale) && $action != 'extract' )
 			<?php echo T_('m - month; i.e. "01" to "12"') ?><br />
 			<?php echo T_('M - month, textual, 3 letters; i.e. "Jan"') ?><br />
 			<?php echo T_('n - month without leading zeros; i.e. "1" to "12"') ?><br />
+			<?php echo T_('O - Difference to Greenwich time (GMT) in hours; i.e. "+0200"') ?><br />
 			<?php echo T_('r - RFC 822 formatted date; i.e. "Thu, 21 Dec 2000 16:01:07 +0200"') ?><br />
 			<?php echo T_('s - seconds; i.e. "00" to "59"') ?><br />
 			<?php echo T_('S - English ordinal suffix, textual, 2 characters; i.e. "th", "nd"') ?><br />
@@ -98,6 +101,7 @@ if( !empty($locale) && $action != 'extract' )
 			<?php echo T_('T - Timezone setting of this machine; i.e. "MDT"') ?><br />
 			<?php echo T_('U - seconds since the epoch') ?><br />
 			<?php echo T_('w - day of the week, numeric, i.e. "0" (Sunday) to "6" (Saturday)') ?><br />
+			<?php echo T_('W - ISO-8601 week number of year, weeks starting on Monday; i.e. "42"') ?><br />
 			<?php echo T_('Y - year, 4 digits; i.e. "1999"') ?><br />
 			<?php echo T_('y - year, 2 digits; i.e. "99"') ?><br />
 			<?php echo T_('z - day of the year; i.e. "0" to "365"') ?><br />

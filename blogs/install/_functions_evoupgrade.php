@@ -40,8 +40,7 @@ function upgrade_b2evo_tables()
 	{
 		echo 'Upgrading users table... ';
 		$query = "ALTER TABLE $tableusers
-							MODIFY COLUMN user_pass CHAR(32) NOT NULL,
-							ADD COLUMN user_showonline TINYINT(1) NOT NULL DEFAULT '1'";
+							MODIFY COLUMN user_pass CHAR(32) NOT NULL";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
@@ -181,7 +180,6 @@ function upgrade_b2evo_tables()
 		echo 'Upgrading users table... ';
 		$query = "ALTER TABLE $tableusers
 							ADD COLUMN user_notify tinyint(1) NOT NULL default 1,
-							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1,
 							ADD COLUMN user_grp_ID int(4) NOT NULL default 1,
 							MODIFY COLUMN user_idmode varchar(20) NOT NULL DEFAULT 'login',
 							ADD KEY user_grp_ID (user_grp_ID)";
@@ -274,8 +272,16 @@ function upgrade_b2evo_tables()
 			{ // converting the languages we've found
 				$converted = false;
 				echo '&nbsp; Converting lang \''. $lkey. '\' '; // (with IDs: '. implode( ', ', $lIDs ). ').. ';
-				if( strlen($lkey) == 2 )
+
+				if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $lkey) )
+				{ // Already valid
+					echo 'nothing to update, already valid!<br />';
+					continue;
+				}
+
+				if( (strlen($lkey) == 2) && ( substr( $default_locale, 0, 2 ) != $lkey ) )
 				{ // we have an old two letter lang code to convert
+					// and it doesn't match the default locale
 					foreach( $locales as $newlkey => $v )
 					{  // loop given locales
 						if( substr($newlkey, 0, 2) == strtolower($lkey) ) # TODO: check if valid/suitable
@@ -290,15 +296,11 @@ function upgrade_b2evo_tables()
 				}
 				
 				if( !$converted )
-				{ // we have nothing converted yet
-					if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $lkey) )
-					{ // no valid locale in DB, setting default.
-						$DB->query( "UPDATE $table 
-														SET $columnlang = '$default_locale' 
-													WHERE $columnlang = '$lkey'" );
-						echo 'forced to default locale \''. $default_locale. '\'<br />';
-						
-					} else echo 'nothing to update, already valid!<br />';
+				{ // we have nothing converted yet, setting default:
+					$DB->query( "UPDATE $table 
+													SET $columnlang = '$default_locale' 
+												WHERE $columnlang = '$lkey'" );
+					echo 'forced to default locale \''. $default_locale. '\'<br />';
 				}
 			}
 			echo "\n";
@@ -446,8 +448,46 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 	
+		echo "Creating DB schema version checkpoint at 8060... ";
+		// This is because the next operation might timeout!
+		// The checkpoint will allow to restart the script and continue where it stopped
+		$DB->query( "UPDATE $tablesettings 
+										SET set_value = '8060' 
+									WHERE set_name = 'db_version'" );
+		echo "OK.<br />\n";
 	}
 
+	if( $old_db_version < 8062 )
+	{	// --------------------------------------------
+		// upgrade to 0.9.0.4
+		// --------------------------------------------
+		echo "Checking for extra quote escaping in posts... ";
+		$query = "SELECT ID, post_title, post_content
+								FROM $tableposts
+							 WHERE post_title LIKE '%\\\\\\\\\'%'
+							 		OR post_title LIKE '%\\\\\\\\\"%'
+							 		OR post_content LIKE '%\\\\\\\\\'%'
+							 		OR post_content LIKE '%\\\\\\\\\"%' "; 
+		/* FP: the above looks overkill, but mySQL is really full of surprises...
+						tested on 4.0.14-nt */
+		// echo $query;
+		$rows = $DB->get_results( $query, ARRAY_A );
+		if( $DB->num_rows )
+		{
+			echo 'Updating '.$DB->num_rows.' posts... ';
+			foreach( $rows as $row )
+			{
+				// echo '<br />'.$row['post_title'];
+				$query = "UPDATE $tableposts
+									SET post_title = ".$DB->quote( stripslashes( $row['post_title'] ) ).",
+											post_content = ".$DB->quote( stripslashes( $row['post_content'] ) )."
+									WHERE ID = ".$row['ID'];
+				// echo '<br />'.$query;
+				$DB->query( $query );
+			}
+		}
+		echo "OK.<br />\n";
+	}
 
 	if( $old_db_version < 8070 )
 	{	// --------------------------------------------
@@ -456,7 +496,13 @@ function upgrade_b2evo_tables()
 		
 		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE $tableposts
-							ADD post_views INT DEFAULT '0' NOT NULL AFTER post_flags";
+							ADD post_views INT NOT NULL DEFAULT '0' AFTER post_flags";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+		
+		echo 'Upgrading users table... ';
+		$query = "ALTER TABLE $tableusers
+							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1 AFTER user_notify";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 		
@@ -480,9 +526,9 @@ function upgrade_b2evo_tables()
 	}
 	
 	echo "Update DB schema version to $new_db_version... ";
-	#$query = "UPDATE $tablesettings SET db_version = $new_db_version WHERE ID = 1";
-	$query = "UPDATE $tablesettings SET set_value = '$new_db_version' WHERE set_name = 'db_version'";
-	$DB->query( $query );
+	$DB->query( "UPDATE $tablesettings 
+									SET set_value = '$new_db_version' 
+								WHERE set_name = 'db_version'" );
 	echo "OK.<br />\n";
 
 	return true;

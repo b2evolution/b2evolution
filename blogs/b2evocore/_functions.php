@@ -351,7 +351,7 @@ function mysql2date( $dateformatstring, $mysqlstring, $useGM = false )
  */
 function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 {
-	global $month, $month_abbrev, $weekday, $weekday_abbrev;
+	global $month, $month_abbrev, $weekday, $weekday_abbrev, $weekday_letter;
 	global $Settings;
 	
 	$datemonth = date('m', $unixtimestamp);
@@ -376,6 +376,8 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 		$dateformatstring = preg_replace("/([^\\\])l/", '\\1@@@\\l@@@', $dateformatstring);
 		// weekday abbrev:
 		$dateformatstring = preg_replace("/([^\\\])D/", '\\1@@@\\D@@@', $dateformatstring);
+		// weekday letter:
+		$dateformatstring = preg_replace("/([^\\\])e/", '\\1@@@e@@@', $dateformatstring);
 		// month:
 		$dateformatstring = preg_replace("/([^\\\])F/", '\\1@@@\\F@@@', $dateformatstring);
 		// month abbrev:
@@ -391,6 +393,8 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 		$j = str_replace( '@@@l@@@', T_($weekday[$dateweekday]), $j);
 		// weekday abbrev:
 		$j = str_replace( '@@@D@@@', T_($weekday_abbrev[$dateweekday]), $j);
+		// weekday letter:
+		$j = str_replace( '@@@e@@@', T_($weekday_letter[$dateweekday]), $j);
 		// month:
 		$j = str_replace( '@@@F@@@', T_($month[$datemonth]), $j);
 		// month abbrev:
@@ -929,7 +933,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl='' )
 		$set = array( $set );
 
 	$params = array();
-	foreach( $global_param_list as $var => $thisparam )
+	if( isset($global_param_list) ) foreach( $global_param_list as $var => $thisparam )
 	{
 		$type = $thisparam['type'];
 		$defval = $thisparam['default'];
@@ -1243,8 +1247,9 @@ function obhandler( $output )
  *
  * @param string existing url
  * @param string params to add
+ * @param string delimiter to use for more params
  */
-function url_add_param( $url, $param )
+function url_add_param( $url, $param, $moredelim = '&amp;' )
 {
 	if( empty($param) )
 	{
@@ -1253,7 +1258,7 @@ function url_add_param( $url, $param )
 	
 	if( strpos( $url, '?' ) !== false )
 	{	// There are already params in the URL
-		return $url.'&amp;'.$param;
+		return $url.$moredelim.$param;
 	}
 
 	// These are the first params
@@ -1282,7 +1287,9 @@ function url_add_tail( $url, $tail )
 
 
 /**
- * sends a mail, wraps PHP's mail() function
+ * sends a mail, wraps PHP's mail() function.
+ *
+ * $current_locale will be used to set the charset
  *
  * send_mail(-)
  *
@@ -1291,12 +1298,8 @@ function url_add_tail( $url, $tail )
  * @param string the message
  * @param string From address, being added to headers
  * @param array additional headers
- * @param mixed Return-Path. Default is to use From address, set to false to use PHP.INI setting
- * @param string Content-Type. Default is text/plain.
- * @param string Charset, if NULL $current_locale will be used
- * @param boolean add standard headers (X-Mailer)
  */
-function send_mail( $to, $subject, $message, $from = '', $headers = array(), $setreturnpath = true, $contenttype = 'text/plain', $charset = true, $addstandardheaders = true )
+function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 {
 	global $b2_version, $current_locale, $locales;
 	
@@ -1306,13 +1309,8 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array(), $se
 	}
 	
 	// Specify charset and content-type of email
-	$headers[] = 'Content-Type: '.$contenttype.'; charset='
-		.( $charset === true ? $locales[ $current_locale ]['charset'] : $charset );
-	
-	if( $addstandardheaders )
-	{
-		$headers[] = 'X-Mailer: b2evolution '.$b2_version.' - PHP/'.phpversion();
-	}
+	$headers[] = 'Content-Type: text/plain; charset='.$locales[ $current_locale ]['charset'];
+	$headers[] = 'X-Mailer: b2evolution '.$b2_version.' - PHP/'.phpversion();
 	
 	// -- build headers ----
 	if( !empty($from) )
@@ -1331,29 +1329,20 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array(), $se
 	
 	debug_log( "Sending mail from $from to $to - subject $subject." );
 	
-	if( $setreturnpath !== false )
-	{ // we want to set the Return-Path
-		if( $setreturnpath === true )
-		{ // use from-address for Return-Path
-			$returnpath = $from;
-		}
-		else
-		{
-			$returnpath = $setreturnpath;
-		}
-		// use email address only (encapsulated in <>)
-		$returnpath = preg_replace( array('/.*</', '/>.*/'), '', $returnpath);
-		
-		// set Return-Path for Win32
-		@ini_set('sendmail_from', $returnpath);
-		
-		// -f should set Return-Path on sendmail systems
-		return @mail( $to, $subject, $message, $headerstring, "-f$returnpath" );
-	}
-	else
-	{
-		// mail without setting Return-Path
-		return @mail( $to, $subject, $message, $headerstring );
-	}
+	return @mail( $to, $subject, $message, $headerstring );
 }
+
+
+/**
+ * wrapper for quick rendering
+ */
+function render( $string, $renderercode, $format )
+{
+	global $Renderer;
+	
+	$Renderer->init();
+	$Renderer->index_Plugins[ $renderercode ]->render( $string, $format );
+	return $string;
+}
+
 ?>

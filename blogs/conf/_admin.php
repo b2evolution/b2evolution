@@ -25,10 +25,6 @@ $use_preview = 1;
 $use_spellchecker = 1;
 
 
-# Do you want to display buttons to help insettion of HTML tags
-$use_quicktags = 1;     //  1 to enable, 0 to disable
-
-
 # Do you want to be able to link each post to an URL ?
 $use_post_url = 1;			// 1 to enable, 0 to disable
 

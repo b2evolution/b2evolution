@@ -37,17 +37,24 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 	/**
 	 * Display the toolbar
 	 *
-	 * {@internal quicktags_Toolbarplugin::render(-)}}
+	 * {@internal quicktags_Toolbarplugin::render(-)}} 
 	 */
 	function display()
-	{
+	{	
+		global $is_lynx;
+		
+		if($is_lynx)	
+		{	// let's deactivate quicktags on Lynx, because they don't work there.
+			return;
+		}
+
 		?>
 		<script language="JavaScript" type="text/javascript">
-
+		
 		var b2evoButtons = new Array();
 		var b2evoLinks = new Array();
 		var b2evoOpenTags = new Array();
-
+		
 		function b2evoButton(id, display, tagStart, tagEnd, access, tit, open) {
 			this.id = id;							// used to name the toolbar button
 			this.display = display;		// label on button
@@ -57,7 +64,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 			this.tit = tit;						// title
 			this.open = open;					// set to -1 if tag does not need to be closed
 		}
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ins'
 																							,'ins'
 																							,'<ins>'
@@ -65,7 +72,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'i'
 																							,'<?php echo T_('INSerted [Alt-I]') ?>'
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_del'
 																							,'del'
 																							,'<del>'
@@ -73,7 +80,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'d'
 																							,'<?php echo T_('DELeted [Alt-D]') ?>'
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_strong'
 																							,'str'
 																							,'<strong>'
@@ -81,7 +88,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'s'
 																							,'<?php echo T_('STRong [Alt-S]') ?>'
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_em'
 																							,'em'
 																							,'<em>'
@@ -89,7 +96,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'e'
 																							,'<?php echo T_('EMphasis [Alt-E]') ?>'
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_code'
 																							,'code'
 																							,'<code>'
@@ -97,7 +104,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'c'
 																							,'<?php echo T_('CODE [Alt-C]') ?>'
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_par'
 																							,'p'
 																							,'<p>'
@@ -105,7 +112,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'p'
 																							,'<?php echo T_('Paragraph [Alt-P]') ?>'
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ul'
 																							,'ul'
 																							,'<ul>\n'
@@ -113,14 +120,14 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'u'
 																							,'<?php echo T_('Unordered List [Alt-U]') ?>'
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_ol'
 																							,'ol'
 																							,'<ol>\n'
 																							,'</ol>\n\n'
 																							,'o'
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_li'
 																							,'li'
 																							,'	<li>'
@@ -128,7 +135,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'l'
 																							,'<?php echo T_('List Item [Alt-L]') ?>'
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_block'
 																							,'block'
 																							,'<blockquote>'
@@ -136,7 +143,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'b'
 																							,'<?php echo T_('BLOCKQUOTE [Alt-B]') ?>'
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_img'
 																							,'img'
 																							,''
@@ -145,7 +152,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'<?php echo T_('IMaGe [Alt-G]') ?>'
 																							,-1
 																							); // special case
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_link'
 																							,'link'
 																							,''
@@ -153,7 +160,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'a'
 																							,'<?php echo T_('A href [Alt-A]') ?>'
 																							); // special case
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_pre'
 																							,'pre'
 																							,'<pre>'
@@ -161,7 +168,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'r'
 																							,'[Alt-R]'
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_more'
 																							,'!M'
 																							,'<!--more-->'
@@ -170,7 +177,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'<?php echo T_('More [Alt-M]') ?>'
 																							,-1
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_next'
 																							,'!NT'
 																							,'<!--noteaser-->'
@@ -179,7 +186,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'<?php echo T_('no teaser [Alt-T]') ?>'
 																							,-1
 																							);
-
+		
 		b2evoButtons[b2evoButtons.length] = new b2evoButton('b2evo_next'
 																							,'!NP'
 																							,'<!--nextpage-->'
@@ -188,13 +195,13 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 																							,'<?php echo T_('next page [Alt-Q]') ?>'
 																							,-1
 																							);
-
+		
 		function b2evoLink() {
 			this.display = '';
 			this.URL = '';
 			this.newWin = 0;
 		}
-
+		
 		function b2evoShowButton(button, i)
 		{
 			if (button.id == 'b2evo_img')
@@ -210,14 +217,14 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit + '" class="quicktags" onclick="b2evoInsertTag(b2evoCanvas, ' + i + ');" value="' + button.display + '"  />');
 			}
 		}
-
+		
 		function b2evoAddTag(button) {
 			if (b2evoButtons[button].tagEnd != '') {
 				b2evoOpenTags[b2evoOpenTags.length] = button;
 				document.getElementById(b2evoButtons[button].id).value = '/' + document.getElementById(b2evoButtons[button].id).value;
 			}
 		}
-
+		
 		function b2evoRemoveTag(button) {
 			for (i = 0; i < b2evoOpenTags.length; i++) {
 				if (b2evoOpenTags[i] == button) {
@@ -226,7 +233,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 				}
 			}
 		}
-
+		
 		function b2evoCheckOpenTags(button) {
 			var tag = 0;
 			for (i = 0; i < b2evoOpenTags.length; i++) {
@@ -241,14 +248,14 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 				return false; // tag not found
 			}
 		}
-
+		
 		function b2evoCloseAllTags() {
 			var count = b2evoOpenTags.length;
 			for (o = 0; o < count; o++) {
 				b2evoInsertTag(b2evoCanvas, b2evoOpenTags[b2evoOpenTags.length - 1]);
 			}
 		}
-
+		
 		function b2evoToolbar() {
 			document.write('<div>');
 			for (i = 0; i < b2evoButtons.length; i++) {
@@ -257,7 +264,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 			document.write('<input type="button" id="b2evo_close" class="quicktags" onclick="b2evoCloseAllTags();" title="<?php echo T_('Close all tags') ?>" value="X" />');
 			document.write('</div>');
 		}
-
+		
 		// insertion code
 		function b2evoInsertTag(myField, i) {
 			//IE support
@@ -324,7 +331,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 				myField.focus();
 			}
 		}
-
+		
 		function b2evoInsertContent(myField, myValue) {
 			//IE support
 			if (document.selection) {
@@ -348,7 +355,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 				myField.focus();
 			}
 		}
-
+		
 		function b2evoInsertLink(myField, i, defaultValue) {
 			if (!defaultValue) {
 				defaultValue = 'http://';
@@ -364,7 +371,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 				b2evoInsertTag(myField, i);
 			}
 		}
-
+		
 		function b2evoInsertImage(myField) {
 			var myValue = prompt('<?php echo T_('URL') ?>:', 'http://');
 			if (myValue) {
@@ -378,7 +385,7 @@ class quicktags_Toolbarplugin extends ToolbarPlugin
 		}
 		</script>
 		<div><script language="JavaScript" type="text/javascript">b2evoToolbar();</script></div>
-		<?php
+		<?php		
 	}
 }
 

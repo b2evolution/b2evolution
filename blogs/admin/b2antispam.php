@@ -149,7 +149,7 @@ switch( $action )
 								<td><?php echo $row_stats['comment_author'] ?></a></td>
 								<td><?php echo $row_stats['comment_author_url'] ?></td>
 								<td><?php
-								$comment_content = preg_replace("/<br \/>/", '', $row_stats['comment_content']);
+								$comment_content = strip_tags( $row_stats['comment_content'] );
 								if ( strlen($comment_content) > 70 )
 								{
 									// Trail off (truncate and add '...') after 70 chars

@@ -93,7 +93,7 @@
 	while( $Comment = $CommentList->get_next() )
 	{	// Loop through comments:	
 		?>
-		<!-- ---------- START of a COMMENT/TB/PB ---------- -->
+		<!-- ========== START of a COMMENT/TB/PB ========== -->
 		<?php $Comment->anchor() ?>
 		<h5>
 		<?php
@@ -121,7 +121,7 @@
 			<small><?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?></small>
 			<div><?php $Comment->content() ?></div>
 		</blockquote>
-		<!-- ---------- END of a COMMENT/TB/PB ---------- -->
+		<!-- ========== END of a COMMENT/TB/PB ========== -->
 		<?php
 	} 
 	

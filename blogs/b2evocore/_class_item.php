@@ -428,7 +428,7 @@ class Item extends DataObject
 		$more_file = ''
 		)
 	{
-		global $Renderer;
+		global $Renderer, $uri_reloaded;
 		// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
 
 		if( $more_link_text == '#' )
@@ -452,7 +452,16 @@ class Item extends DataObject
 			global $more;
 			$dispmore = $more;
 		}
-
+		
+		if( $dispmore )
+		{ // increment view counter
+			if( !$uri_reloaded )
+			{
+				$this->set_param( 'views', 'number', ($this->views + 1) );
+				$this->dbupdate();  // move to end of method, if we should have more params to be changed someday
+			}
+		}
+		
 		$content = $this->content;
 		$numpages = 1;
 
@@ -915,23 +924,13 @@ class Item extends DataObject
 
 
 	/**
-	 * Template function: Display the number of views to the item, if countviews plugin applies to it
+	 * Template function: Display the number of views to the item
 	 *
 	 * {@internal Item::views(-) }}
-	 * @param string what to display in front of views
-	 * @param string what to display after number of views (default: translated ' views')
 	 */
-	function views( $before = '', $after = '#' )
+	function views()
 	{
-		if( 1 )  // TODO: check if countview plugin applies
-		{
-			echo $before;
-			echo $this->views;
-			if( $after == '#' )
-				echo ' '.T_('views');
-			else
-				echo $after;
-		}
+		echo $this->views;
 	}
 
 }

@@ -559,9 +559,14 @@ function cat_query( )
  */
 function single_cat_title( $prefix = '#', $display = 'htmlbody' )
 {
-	if( $prefix == '#' ) $prefix = ' '.T_('Category').': ';
-
 	global $cat, $cat_array;
+	if( $prefix == '#' )
+	{
+		if( count($cat_array) > 1 )
+			$prefix = ' '.T_('Categories').': ';
+		else $prefix = ' '.T_('Category').': ';
+	}
+
 	if( !empty($cat_array) )
 	{	// We have requested specific categories...
 		$cat_names = array();

@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
-"POT-Creation-Date: 2004-05-18 03:09+0200\n"
-"PO-Revision-Date: 2004-05-19 05:39+0100\n"
+"POT-Creation-Date: 2004-05-28 23:31+0200\n"
+"PO-Revision-Date: 2004-05-29 03:43+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
 "MIME-Version: 1.0\n"
@@ -20,6 +20,7 @@ msgstr "Ausgewählt"
 
 #: ..\..\..\a_noskin.php:158
 #: ..\..\..\multiblogs.php:137
+#: ..\..\..\admin\_edit_form.php:328
 #: ..\..\..\admin\_edit_form.php:329
 #: ..\..\..\admin\_edit_showposts.php:473
 #: ..\..\..\admin\_menutop.php:71
@@ -28,6 +29,8 @@ msgstr "Ausgewählt"
 #: ..\..\..\skins\custom\_main.php:184
 #: ..\..\..\skins\fplanque2002\_main.php:97
 #: ..\..\..\skins\fplanque2002\_main.php:194
+#: ..\..\..\skins\wpc_aubmach\_main.php:109
+#: ..\..\..\skins\wpc_default\_main.php:109
 msgid "Categories"
 msgstr "Kategorien"
 
@@ -43,6 +46,8 @@ msgstr "Kategorien"
 #: ..\..\..\skins\custom\_main.php:92
 #: ..\..\..\skins\fplanque2002\_main.php:94
 #: ..\..\..\skins\fplanque2002\_main.php:109
+#: ..\..\..\skins\wpc_aubmach\_main.php:63
+#: ..\..\..\skins\wpc_default\_main.php:63
 msgid "Permanent link to full entry"
 msgstr "Permanenter Link zum ganzen Eintrag"
 
@@ -52,7 +57,7 @@ msgstr "Permanenter Link zum ganzen Eintrag"
 #: ..\..\..\multiblogs.php:255
 #: ..\..\..\admin\_edit_showposts.php:152
 #: ..\..\..\admin\_edit_showposts.php:252
-#: ..\..\..\skins\_feedback.php:126
+#: ..\..\..\skins\_feedback.php:125
 #: ..\..\..\skins\_lastcomments.php:39
 #: ..\..\..\skins\_linkblog.php:68
 #: ..\..\..\skins\basic\_main.php:97
@@ -109,6 +114,10 @@ msgstr "ein paar Statistiken"
 #: ..\..\..\skins\fplanque2002\_main.php:183
 #: ..\..\..\skins\fplanque2002\_main.php:189
 #: ..\..\..\skins\originalb2\_main.php:155
+#: ..\..\..\skins\wpc_aubmach\_main.php:116
+#: ..\..\..\skins\wpc_aubmach\_main.php:120
+#: ..\..\..\skins\wpc_default\_main.php:116
+#: ..\..\..\skins\wpc_default\_main.php:120
 msgid "Search"
 msgstr "Suche"
 
@@ -146,53 +155,55 @@ msgstr "Auswählen"
 
 #: ..\..\..\a_noskin.php:261
 #: ..\..\..\skins\basic\_main.php:137
-#: ..\..\..\skins\bluesky\_main.php:187
+#: ..\..\..\skins\bluesky\_main.php:185
 #: ..\..\..\skins\custom\_main.php:196
 #: ..\..\..\skins\fplanque2002\_main.php:205
-#: ..\..\..\skins\guadeloupe\_main.php:188
+#: ..\..\..\skins\guadeloupe\_main.php:186
+#: ..\..\..\skins\wpc_aubmach\_main.php:125
+#: ..\..\..\skins\wpc_default\_main.php:125
 msgid "Archives"
 msgstr "Archive"
 
 #: ..\..\..\a_noskin.php:266
 #: ..\..\..\a_noskin.php:288
-#: ..\..\..\skins\bluesky\_main.php:200
-#: ..\..\..\skins\bluesky\_main.php:209
+#: ..\..\..\skins\bluesky\_main.php:198
+#: ..\..\..\skins\bluesky\_main.php:207
 #: ..\..\..\skins\custom\_main.php:201
-#: ..\..\..\skins\custom\_main.php:225
-#: ..\..\..\skins\custom\_main.php:234
+#: ..\..\..\skins\custom\_main.php:224
+#: ..\..\..\skins\custom\_main.php:233
 #: ..\..\..\skins\fplanque2002\_main.php:210
-#: ..\..\..\skins\fplanque2002\_main.php:233
-#: ..\..\..\skins\fplanque2002\_main.php:242
-#: ..\..\..\skins\guadeloupe\_main.php:201
-#: ..\..\..\skins\guadeloupe\_main.php:210
+#: ..\..\..\skins\fplanque2002\_main.php:232
+#: ..\..\..\skins\fplanque2002\_main.php:241
+#: ..\..\..\skins\guadeloupe\_main.php:199
+#: ..\..\..\skins\guadeloupe\_main.php:208
 msgid "more..."
 msgstr "mehr..."
 
 #: ..\..\..\a_noskin.php:273
-#: ..\..\..\skins\custom\_main.php:219
-#: ..\..\..\skins\fplanque2002\_main.php:227
-#: ..\..\..\skins\guadeloupe\_main.php:195
+#: ..\..\..\skins\custom\_main.php:218
+#: ..\..\..\skins\fplanque2002\_main.php:226
+#: ..\..\..\skins\guadeloupe\_main.php:193
 msgid "Recent Referers"
 msgstr "Letzte Referer"
 
 #: ..\..\..\a_noskin.php:282
-#: ..\..\..\skins\custom\_main.php:228
-#: ..\..\..\skins\fplanque2002\_main.php:236
-#: ..\..\..\skins\guadeloupe\_main.php:204
+#: ..\..\..\skins\custom\_main.php:227
+#: ..\..\..\skins\fplanque2002\_main.php:235
+#: ..\..\..\skins\guadeloupe\_main.php:202
 msgid "Top Referers"
 msgstr "Top Referer"
 
 #: ..\..\..\a_noskin.php:301
 #: ..\..\..\skins\babyblues\_main.php:113
-#: ..\..\..\skins\bluesky\_main.php:214
-#: ..\..\..\skins\custom\_main.php:247
-#: ..\..\..\skins\fplanque2002\_main.php:255
-#: ..\..\..\skins\guadeloupe\_main.php:215
+#: ..\..\..\skins\bluesky\_main.php:212
+#: ..\..\..\skins\custom\_main.php:246
+#: ..\..\..\skins\fplanque2002\_main.php:254
+#: ..\..\..\skins\guadeloupe\_main.php:213
 msgid "Misc"
 msgstr "Sonstiges"
 
 #: ..\..\..\a_noskin.php:315
-#: ..\..\..\skins\fplanque2002\_main.php:269
+#: ..\..\..\skins\fplanque2002\_main.php:268
 msgid "Syndicate this blog"
 msgstr "Syndiziere dieses Blog"
 
@@ -623,11 +634,13 @@ msgstr "Eigenschaften für Kategorie:"
 #: ..\..\..\admin\b2categories.php:188
 #: ..\..\..\admin\_edit_form.php:128
 #: ..\..\..\admin\_set_regional.form.php:48
-#: ..\..\..\admin\_set_regional.form.php:155
+#: ..\..\..\admin\_set_regional.form.php:159
 #: ..\..\..\admin\_users_groupform.php:75
 #: ..\..\..\admin\_users_list.php:19
-#: ..\..\..\skins\_feedback.php:170
+#: ..\..\..\skins\_feedback.php:169
 #: ..\..\..\skins\basic\_feedback.php:165
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:176
+#: ..\..\..\skins\wpc_default\_feedback.php:176
 msgid "Name"
 msgstr "Name"
 
@@ -773,51 +786,51 @@ msgstr "Rechtschreibprüfung"
 msgid "Loading Spell Checker. Please wait"
 msgstr "Lade Rechtschreibprüfung. Bitte warten"
 
-#: ..\..\..\admin\b2stats.php:14
+#: ..\..\..\admin\b2stats.php:13
 msgid "View Stats for Blog:"
 msgstr "Betrachte Statistiken für Blog:"
 
-#: ..\..\..\admin\b2stats.php:22
+#: ..\..\..\admin\b2stats.php:21
 #: ..\..\..\b2evocore\_class_dataobjectcache.php:204
 msgid "None"
 msgstr "kein"
 
-#: ..\..\..\admin\b2stats.php:56
+#: ..\..\..\admin\b2stats.php:55
 #, php-format
 msgid "Changing hit #%d type to: %s"
 msgstr "Ändere Hit #%d Typ nach: %s"
 
-#: ..\..\..\admin\b2stats.php:73
+#: ..\..\..\admin\b2stats.php:72
 #, php-format
 msgid "Deleting hit #%d..."
 msgstr "Lösche Hit #%d..."
 
-#: ..\..\..\admin\b2stats.php:90
+#: ..\..\..\admin\b2stats.php:89
 #, php-format
 msgid "Pruning hits for %s..."
 msgstr "Entferne Hits für %s..."
 
-#: ..\..\..\admin\b2stats.php:111
+#: ..\..\..\admin\b2stats.php:110
 msgid "Summary"
 msgstr "Zusammenfassung"
 
-#: ..\..\..\admin\b2stats.php:117
+#: ..\..\..\admin\b2stats.php:116
 msgid "Referers"
 msgstr "Referer"
 
-#: ..\..\..\admin\b2stats.php:123
+#: ..\..\..\admin\b2stats.php:122
 msgid "Refering Searches"
 msgstr "Überweisende Suchen"
 
-#: ..\..\..\admin\b2stats.php:129
+#: ..\..\..\admin\b2stats.php:128
 msgid "Syndication"
 msgstr "Syndikation"
 
-#: ..\..\..\admin\b2stats.php:135
+#: ..\..\..\admin\b2stats.php:134
 msgid "User Agents"
 msgstr "Benutzer-Agenten"
 
-#: ..\..\..\admin\b2stats.php:141
+#: ..\..\..\admin\b2stats.php:140
 msgid "Direct Accesses"
 msgstr "Direkte Zugriffe"
 
@@ -865,8 +878,8 @@ msgstr "Lösche diesen Hit!"
 #: ..\..\..\admin\_blogs_list.php:31
 #: ..\..\..\admin\_blogs_list.php:88
 #: ..\..\..\admin\_cats_list.php:31
-#: ..\..\..\admin\_users_list.php:78
-#: ..\..\..\admin\_users_list.php:148
+#: ..\..\..\admin\_users_list.php:77
+#: ..\..\..\admin\_users_list.php:146
 msgid "Del"
 msgstr "Del"
 
@@ -1345,6 +1358,41 @@ msgstr "Du möchtest eventuell auch statische Seiten generieren oder Deine Blogs 
 msgid "New post"
 msgstr "Neuer Eintrag"
 
+#: ..\..\..\admin\import-mt.php:356
+#: ..\..\..\admin\_users_form.php:199
+msgid "User group"
+msgstr "Benutzergruppe"
+
+#: ..\..\..\admin\import-mt.php:357
+#, php-format
+msgid "See <a %s>online manual</a> for details."
+msgstr "Siehe <a %s>Online-Anleitung</a> für Details."
+
+#: ..\..\..\admin\import-mt.php:358
+#: ..\..\..\admin\_users_form.php:189
+#: ..\..\..\admin\_users_list.php:27
+#: ..\..\..\skins\_profile.php:39
+#: ..\..\..\skins\basic\_profile.php:39
+msgid "Level"
+msgstr "Level"
+
+#: ..\..\..\admin\import-mt.php:397
+#: ..\..\..\admin\_set_regional.form.php:134
+msgid "Default locale"
+msgstr "Standard-Locale"
+
+#: ..\..\..\admin\import-mt.php:1053
+msgid "Select main category in target blog and optionally check additional categories"
+msgstr "Wähle die Hauptkategorie im Ziel-Blog und markiere optional weitere Kategorien"
+
+#: ..\..\..\admin\import-mt.php:1075
+msgid "Select as an additionnal category"
+msgstr "Wähle als zusätzliche Kategorie"
+
+#: ..\..\..\admin\import-mt.php:1086
+msgid "Select as MAIN category"
+msgstr "Wähle als HAUPT-Kategorie"
+
 #: ..\..\..\admin\tools.php:14
 msgid "Tools"
 msgstr "Werkzeuge"
@@ -1389,6 +1437,23 @@ msgstr "Füge diesen Link zu Deinen Favoriten hinzu:"
 #: ..\..\..\admin\tools.php:81
 msgid "b2evo sidebar"
 msgstr "b2evo Sidebar"
+
+#: ..\..\..\admin\tools.php:88
+msgid "Movable Type Import"
+msgstr "Movable Type Import"
+
+#: ..\..\..\admin\tools.php:90
+msgid "Use MT's export functionnality to create a .TXT file containing your posts;"
+msgstr "Benutze MT's Export-Funktion, um eine .TXT-Datei mit deinen Einträgen zu erzeugen;"
+
+#: ..\..\..\admin\tools.php:91
+msgid "Place that file into the /admin folder on your server;"
+msgstr "Stelle diese Datei in den /admin-Ordner auf deinem Server;"
+
+#: ..\..\..\admin\tools.php:92
+#, php-format
+msgid "Follow the insctructions in the <a %s>MT migration utility</a>."
+msgstr "Folge den Anweisungen des <a %s>MT-Migrations-Hilfprogramms</a>."
 
 #: ..\..\..\admin\_blogs_advanced.form.php:18
 msgid "Static file generation"
@@ -1465,12 +1530,12 @@ msgstr "Blog aktualisieren!"
 #: ..\..\..\admin\_set_general.form.php:79
 #: ..\..\..\admin\_set_plugins.form.php:69
 #: ..\..\..\admin\_set_regional.form.php:67
-#: ..\..\..\admin\_set_regional.form.php:241
-#: ..\..\..\admin\_set_regional.form.php:356
+#: ..\..\..\admin\_set_regional.form.php:245
+#: ..\..\..\admin\_set_regional.form.php:360
 #: ..\..\..\admin\_users_form.php:211
 #: ..\..\..\admin\_users_groupform.php:126
 #: ..\..\..\install\index.php:292
-#: ..\..\..\skins\_profile.php:92
+#: ..\..\..\skins\_profile.php:94
 msgid "Reset"
 msgstr "Zurücksetzen"
 
@@ -1523,8 +1588,12 @@ msgid "Other blog through index.php"
 msgstr "Anderes Blog über index.php"
 
 #: ..\..\..\admin\_blogs_general.form.php:41
-msgid "Other blog through stub file"
-msgstr "Anderes Blog durch Stub-Datei"
+msgid "Other blog through stub file (Advanced)"
+msgstr "Anderes Blog durch Stub-Datei (Fortgeschritten)"
+
+#: ..\..\..\admin\_blogs_general.form.php:41
+msgid "You MUST create a stub file for this to work."
+msgstr "Du musst eine Stub-Datei anlegen, damit das funktioniert."
 
 #: ..\..\..\admin\_blogs_general.form.php:42
 msgid "Preferred access type"
@@ -1648,18 +1717,18 @@ msgstr "Statische Datei"
 
 #: ..\..\..\admin\_blogs_list.php:30
 #: ..\..\..\admin\_set_regional.form.php:46
-#: ..\..\..\admin\_set_regional.form.php:153
+#: ..\..\..\admin\_set_regional.form.php:157
 #: ..\..\..\admin\_users_form.php:118
 #: ..\..\..\htsrv\_reg_form.php:42
-#: ..\..\..\skins\_profile.php:68
+#: ..\..\..\skins\_profile.php:70
 msgid "Locale"
 msgstr "Locale"
 
 #: ..\..\..\admin\_blogs_list.php:44
 #: ..\..\..\admin\_users_list.php:56
 #: ..\..\..\admin\_users_list.php:69
-#: ..\..\..\admin\_users_list.php:97
-#: ..\..\..\admin\_users_list.php:139
+#: ..\..\..\admin\_users_list.php:96
+#: ..\..\..\admin\_users_list.php:138
 msgid "Properties"
 msgstr "Eigenschaften"
 
@@ -1702,9 +1771,9 @@ msgstr "Kopiere dieses Blog!"
 #  TRANS: Abbrev. for Copy
 #. TRANS: Abbrev. for Copy
 #: ..\..\..\admin\_blogs_list.php:89
-#: ..\..\..\admin\_set_regional.form.php:234
+#: ..\..\..\admin\_set_regional.form.php:238
 #: ..\..\..\admin\_users_list.php:71
-#: ..\..\..\admin\_users_list.php:142
+#: ..\..\..\admin\_users_list.php:141
 msgid "Copy"
 msgstr "Kopieren"
 
@@ -1764,27 +1833,27 @@ msgid "Edit<br />blog"
 msgstr "Ändere<br />Blog"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:30
-#: ..\..\..\b2evocore\_vars.php:176
+#: ..\..\..\b2evocore\_vars.php:192
 msgid "Published"
 msgstr "Veröffentlicht"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:31
-#: ..\..\..\b2evocore\_vars.php:178
+#: ..\..\..\b2evocore\_vars.php:194
 msgid "Protected"
 msgstr "Geschützt"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:32
-#: ..\..\..\b2evocore\_vars.php:179
+#: ..\..\..\b2evocore\_vars.php:195
 msgid "Private"
 msgstr "Privat"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:33
-#: ..\..\..\b2evocore\_vars.php:180
+#: ..\..\..\b2evocore\_vars.php:196
 msgid "Draft"
 msgstr "Entwurf"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:34
-#: ..\..\..\b2evocore\_vars.php:177
+#: ..\..\..\b2evocore\_vars.php:193
 msgid "Deprecated"
 msgstr "Missbilligt"
 
@@ -1895,8 +1964,8 @@ msgstr "Verweis auf URL"
 #: ..\..\..\htsrv\register.php:118
 #: ..\..\..\htsrv\_reg_complete.php:15
 #: ..\..\..\htsrv\_reg_form.php:37
-#: ..\..\..\skins\_feedback.php:177
-#: ..\..\..\skins\_profile.php:69
+#: ..\..\..\skins\_feedback.php:176
+#: ..\..\..\skins\_profile.php:71
 #: ..\..\..\skins\basic\_feedback.php:170
 #: ..\..\..\skins\basic\_profile.php:71
 msgid "Email"
@@ -1907,15 +1976,17 @@ msgstr "EMail"
 #: ..\..\..\admin\_users_list.php:21
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:357
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:369
-#: ..\..\..\skins\_profile.php:70
+#: ..\..\..\skins\_profile.php:72
 #: ..\..\..\skins\basic\_profile.php:72
 msgid "URL"
 msgstr "URL"
 
 #: ..\..\..\admin\_edit_form.php:161
 #: ..\..\..\admin\_set_general.form.php:48
-#: ..\..\..\skins\_feedback.php:207
+#: ..\..\..\skins\_feedback.php:206
 #: ..\..\..\skins\basic\_feedback.php:199
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:203
+#: ..\..\..\skins\wpc_default\_feedback.php:203
 msgid "Auto-BR"
 msgstr "Auto-BR"
 
@@ -2020,18 +2091,6 @@ msgstr "Entwurf (nicht veröffentlicht!)"
 msgid "Deprecated (Not published!)"
 msgstr "Missbilligt (nicht veröffentlicht!)"
 
-#: ..\..\..\admin\_edit_form.php:333
-msgid "Select main category in target blog and optionally check additional categories"
-msgstr "Wähle die Hauptkategorie im Ziel-Blog und markiere optional weitere Kategorien"
-
-#: ..\..\..\admin\_edit_form.php:354
-msgid "Select as an additionnal category"
-msgstr "Wähle als zusätzliche Kategorie"
-
-#: ..\..\..\admin\_edit_form.php:367
-msgid "Select as MAIN category"
-msgstr "Wähle als HAUPT-Kategorie"
-
 #: ..\..\..\admin\_edit_form.php:395
 msgid "Note: Cross posting among multiple blogs is enabled."
 msgstr "Anmerkung: Quer-Einträge in mehrere Blogs sind möglich."
@@ -2047,14 +2106,16 @@ msgstr "Anmerkung: Quer-Einträge in mehrere Kategorien ist derzeit nicht möglich
 #: ..\..\..\admin\_edit_form.php:418
 #: ..\..\..\skins\_feedback.php:50
 #: ..\..\..\skins\basic\_feedback.php:50
-#: ..\..\..\skins\custom\_main.php:265
-#: ..\..\..\skins\custom\_main.php:270
-#: ..\..\..\skins\custom\_main.php:275
-#: ..\..\..\skins\custom\_main.php:280
-#: ..\..\..\skins\fplanque2002\_main.php:274
-#: ..\..\..\skins\fplanque2002\_main.php:279
-#: ..\..\..\skins\fplanque2002\_main.php:284
-#: ..\..\..\skins\fplanque2002\_main.php:289
+#: ..\..\..\skins\custom\_main.php:264
+#: ..\..\..\skins\custom\_main.php:269
+#: ..\..\..\skins\custom\_main.php:274
+#: ..\..\..\skins\custom\_main.php:279
+#: ..\..\..\skins\fplanque2002\_main.php:273
+#: ..\..\..\skins\fplanque2002\_main.php:278
+#: ..\..\..\skins\fplanque2002\_main.php:283
+#: ..\..\..\skins\fplanque2002\_main.php:288
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:50
+#: ..\..\..\skins\wpc_default\_feedback.php:50
 msgid "Comments"
 msgstr "Kommentare"
 
@@ -2099,35 +2160,45 @@ msgstr "Autor"
 msgid "IP address"
 msgstr "IP Adresse"
 
-#: ..\..\..\admin\_edit_navbar.php:19
+#: ..\..\..\admin\_edit_navbar.php:25
+#, php-format
+msgid "Next %d days"
+msgstr "Nächsten %d Tage"
+
+#: ..\..\..\admin\_edit_navbar.php:26
 #, php-format
 msgid "Previous %d"
 msgstr "Letzten %d"
 
-#: ..\..\..\admin\_edit_navbar.php:27
+#: ..\..\..\admin\_edit_navbar.php:36
+#, php-format
+msgid "Previous %d days"
+msgstr "Vorigen %d Tage"
+
+#: ..\..\..\admin\_edit_navbar.php:37
 #, php-format
 msgid "Next %d"
 msgstr "Nächsten %d"
 
 #. TRANS: x TO y OF z
-#: ..\..\..\admin\_edit_navbar.php:39
+#: ..\..\..\admin\_edit_navbar.php:54
 msgid " to "
 msgstr " bis "
 
 #. TRANS: x TO y OF z
-#: ..\..\..\admin\_edit_navbar.php:41
+#: ..\..\..\admin\_edit_navbar.php:62
 msgid " of "
 msgstr " von "
 
-#: ..\..\..\admin\_edit_navbar.php:47
+#: ..\..\..\admin\_edit_navbar.php:70
 msgid "from the end"
 msgstr "von hinten"
 
-#: ..\..\..\admin\_edit_navbar.php:51
+#: ..\..\..\admin\_edit_navbar.php:74
 msgid "from the start"
 msgstr "von vorne"
 
-#: ..\..\..\admin\_edit_navbar.php:53
+#: ..\..\..\admin\_edit_navbar.php:76
 msgid "OK"
 msgstr "OK"
 
@@ -2220,11 +2291,15 @@ msgstr "%d Pingbacks"
 
 #: ..\..\..\admin\_edit_showposts.php:195
 #: ..\..\..\skins\basic\_feedback.php:61
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:61
+#: ..\..\..\skins\wpc_default\_feedback.php:61
 msgid "Trackbacks"
 msgstr "Trackbacks"
 
 #: ..\..\..\admin\_edit_showposts.php:195
 #: ..\..\..\skins\basic\_feedback.php:66
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:66
+#: ..\..\..\skins\wpc_default\_feedback.php:66
 msgid "Pingbacks"
 msgstr "Pingbacks"
 
@@ -2234,21 +2309,29 @@ msgstr "bisher kein Feedback für diesen Eintrag..."
 
 #: ..\..\..\admin\_edit_showposts.php:234
 #: ..\..\..\skins\basic\_feedback.php:103
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:108
+#: ..\..\..\skins\wpc_default\_feedback.php:108
 msgid "Comment from:"
 msgstr "Kommentar von:"
 
 #: ..\..\..\admin\_edit_showposts.php:238
 #: ..\..\..\skins\basic\_feedback.php:109
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:114
+#: ..\..\..\skins\wpc_default\_feedback.php:114
 msgid "Trackback from:"
 msgstr "Trackback von:"
 
 #: ..\..\..\admin\_edit_showposts.php:242
 #: ..\..\..\skins\basic\_feedback.php:114
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:119
+#: ..\..\..\skins\wpc_default\_feedback.php:119
 msgid "Pingback from:"
 msgstr "Pingback von:"
 
 #: ..\..\..\admin\_edit_showposts.php:252
 #: ..\..\..\skins\_lastcomments.php:39
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:125
+#: ..\..\..\skins\wpc_default\_feedback.php:125
 msgid "Permanent link to this comment"
 msgstr "Permanenter Link zu diesem Kommentar"
 
@@ -2264,19 +2347,25 @@ msgstr ""
 #: ..\..\..\admin\_edit_showposts.php:274
 #: ..\..\..\b2evocore\_class_item.php:694
 #: ..\..\..\b2evocore\_functions_comments.php:205
-#: ..\..\..\skins\_feedback.php:139
+#: ..\..\..\skins\_feedback.php:138
 #: ..\..\..\skins\basic\_feedback.php:133
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:139
+#: ..\..\..\skins\wpc_default\_feedback.php:139
 msgid "Leave a comment"
 msgstr "Hinterlasse einen Kommentar"
 
 #: ..\..\..\admin\_edit_showposts.php:282
-#: ..\..\..\skins\_feedback.php:158
+#: ..\..\..\skins\_feedback.php:157
 #: ..\..\..\skins\basic\_feedback.php:153
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:163
+#: ..\..\..\skins\wpc_default\_feedback.php:163
 msgid "User"
 msgstr "Benutzer"
 
 #: ..\..\..\admin\_edit_showposts.php:285
 #: ..\..\..\skins\basic\_feedback.php:156
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:166
+#: ..\..\..\skins\wpc_default\_feedback.php:166
 msgid "Edit profile"
 msgstr "Editiere Profil"
 
@@ -2287,16 +2376,22 @@ msgstr "Kommentartext"
 
 #: ..\..\..\admin\_edit_showposts.php:292
 #: ..\..\..\skins\basic\_feedback.php:189
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:141
+#: ..\..\..\skins\wpc_default\_feedback.php:141
 msgid "Allowed XHTML tags"
 msgstr "Erlaubte XHTML Tags"
 
 #: ..\..\..\admin\_edit_showposts.php:292
 #: ..\..\..\skins\basic\_feedback.php:190
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:142
+#: ..\..\..\skins\wpc_default\_feedback.php:142
 msgid "URLs, email, AIM and ICQs will be converted automatically."
 msgstr "URLs, EMail, AIM und ICQs werden automatisch konvertiert."
 
 #: ..\..\..\admin\_edit_showposts.php:298
 #: ..\..\..\skins\basic\_feedback.php:195
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:200
+#: ..\..\..\skins\wpc_default\_feedback.php:200
 msgid "Options"
 msgstr "Optionen"
 
@@ -2516,10 +2611,10 @@ msgstr "für Benutzer."
 #: ..\..\..\admin\_set_general.form.php:78
 #: ..\..\..\admin\_set_plugins.form.php:68
 #: ..\..\..\admin\_set_regional.form.php:66
-#: ..\..\..\admin\_set_regional.form.php:355
+#: ..\..\..\admin\_set_regional.form.php:359
 #: ..\..\..\admin\_users_form.php:210
 #: ..\..\..\admin\_users_groupform.php:125
-#: ..\..\..\skins\_profile.php:91
+#: ..\..\..\skins\_profile.php:93
 #: ..\..\..\skins\basic\_profile.php:93
 msgid "Update"
 msgstr "Aktualisieren"
@@ -2542,13 +2637,13 @@ msgid "Toolbar plug-ins"
 msgstr "Toolbar Plugins"
 
 #: ..\..\..\admin\_set_regional.form.php:22
-#: ..\..\..\admin\_set_regional.form.php:340
+#: ..\..\..\admin\_set_regional.form.php:344
 msgid "Create new locale"
 msgstr "Erstelle neue Locale"
 
 #: ..\..\..\admin\_set_regional.form.php:22
-#: ..\..\..\admin\_set_regional.form.php:191
-#: ..\..\..\admin\_set_regional.form.php:236
+#: ..\..\..\admin\_set_regional.form.php:195
+#: ..\..\..\admin\_set_regional.form.php:240
 msgid "Edit locale"
 msgstr "Editiere Locale"
 
@@ -2558,7 +2653,7 @@ msgid "The first two letters should be a <a %s>ISO 639 language code</a>. The la
 msgstr "Die ersten zwei Buchstaben sollten ein <a %s>ISO 639 Sprachcode</a> sein. Die letzten zwei Buchstaben sollten ein <a %s>ISO 3166 Ländercode</a> sein."
 
 #: ..\..\..\admin\_set_regional.form.php:47
-#: ..\..\..\admin\_set_regional.form.php:154
+#: ..\..\..\admin\_set_regional.form.php:158
 msgid "Enabled"
 msgstr "Eingeschaltet"
 
@@ -2571,7 +2666,7 @@ msgid "name of the locale"
 msgstr "Name der Locale"
 
 #: ..\..\..\admin\_set_regional.form.php:50
-#: ..\..\..\admin\_set_regional.form.php:183
+#: ..\..\..\admin\_set_regional.form.php:187
 msgid "Charset"
 msgstr "Zeichensatz"
 
@@ -2593,7 +2688,7 @@ msgid "Time format"
 msgstr "Zeitformat"
 
 #: ..\..\..\admin\_set_regional.form.php:53
-#: ..\..\..\admin\_set_regional.form.php:183
+#: ..\..\..\admin\_set_regional.form.php:187
 msgid "Lang file"
 msgstr "Sprachdatei"
 
@@ -2602,7 +2697,7 @@ msgid "the lang file to use, from the <code>locales</code> subdirectory"
 msgstr "die zu benutzende Sprachdatei, aus dem Unterverzeichnis <code>locales</code>"
 
 #: ..\..\..\admin\_set_regional.form.php:55
-#: ..\..\..\admin\_set_regional.form.php:183
+#: ..\..\..\admin\_set_regional.form.php:187
 msgid "Priority"
 msgstr "Priorität"
 
@@ -2653,115 +2748,130 @@ msgid "B - Swatch Internet time"
 msgstr "B - Swatch Internetzeit"
 
 #: ..\..\..\admin\_set_regional.form.php:79
+msgid "c - ISO 8601 date (Requires PHP 5); i.e. \"2004-02-12T15:19:21+00:00\""
+msgstr "c - ISO 8601 Datum (verlangt PHP 5); d.h. \"2004-02-12T15:19:21+00:00\""
+
+#: ..\..\..\admin\_set_regional.form.php:80
 msgid "d - day of the month, 2 digits with leading zeros; i.e. \"01\" to \"31\""
 msgstr "d - Tag des Monats, 2 Nummern mit führender Null; d.h. \"01\" bis \"31\""
 
-#: ..\..\..\admin\_set_regional.form.php:80
+#: ..\..\..\admin\_set_regional.form.php:81
 msgid "D - day of the week, textual, 3 letters; i.e. \"Fri\""
 msgstr "D - Tag der Woche, als Text, 3 Buchstaben; zB \"Fre\""
 
-#: ..\..\..\admin\_set_regional.form.php:81
+#: ..\..\..\admin\_set_regional.form.php:82
+msgid "e - day of the week, 1 letter; i.e. \"F\""
+msgstr "e - Tag der Woche, 1 Buchstabe; zB \"F\""
+
+#: ..\..\..\admin\_set_regional.form.php:83
 msgid "F - month, textual, long; i.e. \"January\""
 msgstr "F - Monat, textlich, lang; zB \"Januar\""
 
-#: ..\..\..\admin\_set_regional.form.php:82
+#: ..\..\..\admin\_set_regional.form.php:84
 msgid "g - hour, 12-hour format without leading zeros; i.e. \"1\" to \"12\""
 msgstr "g - Stunde, 12-Stunden Format ohne führende Null; d.h. \"1\" bis \"12\""
 
-#: ..\..\..\admin\_set_regional.form.php:83
+#: ..\..\..\admin\_set_regional.form.php:85
 msgid "G - hour, 24-hour format without leading zeros; i.e. \"0\" to \"23\""
 msgstr "G - Stunde, 24-Stunden Format ohne führende Null; d.h. \"0\" bis \"23\""
 
-#: ..\..\..\admin\_set_regional.form.php:84
+#: ..\..\..\admin\_set_regional.form.php:86
 msgid "h - hour, 12-hour format; i.e. \"01\" to \"12\""
 msgstr "h - Stunde, 12-Stunden Format; d.h. \"01\" bis \"12\""
 
-#: ..\..\..\admin\_set_regional.form.php:85
+#: ..\..\..\admin\_set_regional.form.php:87
 msgid "H - hour, 24-hour format; i.e. \"00\" to \"23\""
 msgstr "H - Stunde, 24-Stunden Format; d.h. \"00\" bis \"23\""
 
-#: ..\..\..\admin\_set_regional.form.php:86
+#: ..\..\..\admin\_set_regional.form.php:88
 msgid "i - minutes; i.e. \"00\" to \"59\""
 msgstr "i - Minuten; d.h. \"00\" bis \"59\""
 
-#: ..\..\..\admin\_set_regional.form.php:87
+#: ..\..\..\admin\_set_regional.form.php:89
 msgid "I (capital i) - \"1\" if Daylight Savings Time, \"0\" otherwise."
 msgstr "I (grosses I) - \"1\" falls Sommerzeit, ansonsten \"0\"."
 
-#: ..\..\..\admin\_set_regional.form.php:88
+#: ..\..\..\admin\_set_regional.form.php:90
 msgid "j - day of the month without leading zeros; i.e. \"1\" to \"31\""
 msgstr "j - Tag des Monats ohne führende Null; d.h. \"1\" bis \"31\""
 
-#: ..\..\..\admin\_set_regional.form.php:89
+#: ..\..\..\admin\_set_regional.form.php:91
 msgid "l (lowercase \"L\") - day of the week, textual, long; i.e. \"Friday\""
 msgstr "l (kleines \"L\") - Tag der Woche, textlich, lang; zB \"Freitag\""
 
-#: ..\..\..\admin\_set_regional.form.php:90
+#: ..\..\..\admin\_set_regional.form.php:92
 msgid "L - boolean for whether it is a leap year; i.e. \"0\" or \"1\""
 msgstr "L - Boolean für Schaltjahr; entweder \"0\" oder \"1\""
 
-#: ..\..\..\admin\_set_regional.form.php:91
+#: ..\..\..\admin\_set_regional.form.php:93
 msgid "m - month; i.e. \"01\" to \"12\""
 msgstr "m - Monat; d.h. \"01\" bis \"12\""
 
-#: ..\..\..\admin\_set_regional.form.php:92
+#: ..\..\..\admin\_set_regional.form.php:94
 msgid "M - month, textual, 3 letters; i.e. \"Jan\""
 msgstr "M - Monat, textlich, 3 Buchstaben; zB \"Jan\""
 
-#: ..\..\..\admin\_set_regional.form.php:93
+#: ..\..\..\admin\_set_regional.form.php:95
 msgid "n - month without leading zeros; i.e. \"1\" to \"12\""
 msgstr "n - Monat ohne führende Null; d.h. \"1\" bis \"12\""
 
-#: ..\..\..\admin\_set_regional.form.php:94
+#: ..\..\..\admin\_set_regional.form.php:96
+msgid "O - Difference to Greenwich time (GMT) in hours; i.e. \"+0200\""
+msgstr "O - Unterschied zur Greenwich Zeit (GMT) in Stunden; d.h. \"+0200\""
+
+#: ..\..\..\admin\_set_regional.form.php:97
 msgid "r - RFC 822 formatted date; i.e. \"Thu, 21 Dec 2000 16:01:07 +0200\""
 msgstr "r - RFC 822 formatiertes Datum; zB \"Thu, 21 Dec 2000 16:01:07 +0200\""
 
-#: ..\..\..\admin\_set_regional.form.php:95
+#: ..\..\..\admin\_set_regional.form.php:98
 msgid "s - seconds; i.e. \"00\" to \"59\""
 msgstr "s - Sekunden; d.h. \"00\" bis \"59\""
 
-#: ..\..\..\admin\_set_regional.form.php:96
+#: ..\..\..\admin\_set_regional.form.php:99
 msgid "S - English ordinal suffix, textual, 2 characters; i.e. \"th\", \"nd\""
 msgstr "S - englisches ordinales Suffix, textlich, 2 Buchstaben; zB \"th\", \"nd\""
 
-#: ..\..\..\admin\_set_regional.form.php:97
+#: ..\..\..\admin\_set_regional.form.php:100
 msgid "t - number of days in the given month; i.e. \"28\" to \"31\""
 msgstr "t - Anzahl der Tagen im gegebenen Monat; d.h. \"28\" bis \"31\""
 
-#: ..\..\..\admin\_set_regional.form.php:98
+#: ..\..\..\admin\_set_regional.form.php:101
 msgid "T - Timezone setting of this machine; i.e. \"MDT\""
 msgstr "T - Zeitzoneneinstellung des Computers; zB \"MDT\""
 
-#: ..\..\..\admin\_set_regional.form.php:99
+#: ..\..\..\admin\_set_regional.form.php:102
 msgid "U - seconds since the epoch"
 msgstr "U - Sekunden seit Beginn der UNIX-Epoche (January 1 1970 00:00:00 GMT)"
 
-#: ..\..\..\admin\_set_regional.form.php:100
-#, fuzzy
+#: ..\..\..\admin\_set_regional.form.php:103
 msgid "w - day of the week, numeric, i.e. \"0\" (Sunday) to \"6\" (Saturday)"
 msgstr "w - Tag der Woche, numerisch, d.h. \"0\" (Sonntag) bis \"6\" (Samstag)"
 
-#: ..\..\..\admin\_set_regional.form.php:101
+#: ..\..\..\admin\_set_regional.form.php:104
+msgid "W - ISO-8601 week number of year, weeks starting on Monday; i.e. \"42\""
+msgstr "W - ISO-8601 Wochennummer des Jahres, Wochen starten am Montag; d.h. \"42\""
+
+#: ..\..\..\admin\_set_regional.form.php:105
 msgid "Y - year, 4 digits; i.e. \"1999\""
 msgstr "Y - Jahr, 4 Zahlen; zB \"1999\""
 
-#: ..\..\..\admin\_set_regional.form.php:102
+#: ..\..\..\admin\_set_regional.form.php:106
 msgid "y - year, 2 digits; i.e. \"99\""
 msgstr "y - Jahr, 2 Zahlen; zB \"99\""
 
-#: ..\..\..\admin\_set_regional.form.php:103
+#: ..\..\..\admin\_set_regional.form.php:107
 msgid "z - day of the year; i.e. \"0\" to \"365\""
 msgstr "z - Tag des Jahres; d.h. \"0\" bis \"365\""
 
-#: ..\..\..\admin\_set_regional.form.php:104
+#: ..\..\..\admin\_set_regional.form.php:108
 msgid "Z - timezone offset in seconds (i.e. \"-43200\" to \"43200\"). The offset for timezones west of UTC is always negative, and for those east of UTC is always positive."
 msgstr "Z - Zeitzonen-Offset in Sekunden (d.h. \"-43200\" bis \"43200\"). Der Offset für Zeitzonen westlich von UTC ist immer negatic, und für diejenigen östlich von UTC immer positiv."
 
-#: ..\..\..\admin\_set_regional.form.php:106
+#: ..\..\..\admin\_set_regional.form.php:110
 msgid "isoZ - full ISO 8601 format, equivalent to Y-m-d\\TH:i:s\\Z"
 msgstr "isoZ - volles ISO 8601 Format, äquivalent zu Y-m-d\\TH:i:s\\Z"
 
-#: ..\..\..\admin\_set_regional.form.php:107
+#: ..\..\..\admin\_set_regional.form.php:111
 msgid ""
 "Unrecognized characters in the format string will be printed as-is.<br />\n"
 "\t\t\tYou can escape characters by preceding them with a \\ to print them as-is."
@@ -2769,112 +2879,108 @@ msgstr ""
 "Unerkannte Zeichen in der Format-Zeichenkette werden unübersetzt ausgegeben.<br />\n"
 "\t\t\tDu kannst Zeichen mit \\ escapen, um sie als eigentliche Zeichen auszugeben."
 
-#: ..\..\..\admin\_set_regional.form.php:118
+#: ..\..\..\admin\_set_regional.form.php:122
 msgid "Note: default locale is not enabled."
 msgstr "Anmerkung: Standard-Locale ist nicht eingeschaltet."
 
-#: ..\..\..\admin\_set_regional.form.php:126
+#: ..\..\..\admin\_set_regional.form.php:130
 msgid "Regional settings"
 msgstr "Regionale Einstellungen"
 
-#: ..\..\..\admin\_set_regional.form.php:129
+#: ..\..\..\admin\_set_regional.form.php:133
 msgid "Time difference"
 msgstr "Zeitunterschied"
 
-#: ..\..\..\admin\_set_regional.form.php:129
+#: ..\..\..\admin\_set_regional.form.php:133
 msgid "in hours"
 msgstr "in Stunden"
 
-#: ..\..\..\admin\_set_regional.form.php:129
+#: ..\..\..\admin\_set_regional.form.php:133
 #, php-format
 msgid "If you're not on the timezone of your server. Current server time is: %s."
 msgstr "Falls du nicht in der Zeitzone des Servers bist. Aktuelle Serverzeit ist: %s."
 
-#: ..\..\..\admin\_set_regional.form.php:130
-msgid "Default locale"
-msgstr "Standard-Locale"
-
-#: ..\..\..\admin\_set_regional.form.php:130
+#: ..\..\..\admin\_set_regional.form.php:134
 msgid "Overriden by browser config, user locale or blog locale (in this order)."
 msgstr "Überschrieben von Browser-Einstellungen, Benutzer-Locale oder Blog-Locale (in dieser Reihenfolge)."
 
-#: ..\..\..\admin\_set_regional.form.php:136
+#: ..\..\..\admin\_set_regional.form.php:140
 msgid "Available locales"
 msgstr "Verfügbare Locales"
 
-#: ..\..\..\admin\_set_regional.form.php:141
+#: ..\..\..\admin\_set_regional.form.php:145
 msgid "Hide translation info"
 msgstr "Verstecke Übersetzungs-Infos"
 
-#: ..\..\..\admin\_set_regional.form.php:146
+#: ..\..\..\admin\_set_regional.form.php:150
 msgid "Show translation info"
 msgstr "Zeige Übersetzungs-Infos"
 
-#: ..\..\..\admin\_set_regional.form.php:156
+#: ..\..\..\admin\_set_regional.form.php:160
 msgid "Date fmt"
 msgstr "Datumsformat"
 
-#: ..\..\..\admin\_set_regional.form.php:157
+#: ..\..\..\admin\_set_regional.form.php:161
 msgid "Time fmt"
 msgstr "Zeitformat"
 
-#: ..\..\..\admin\_set_regional.form.php:160
-#: ..\..\..\admin\_set_regional.form.php:236
+#: ..\..\..\admin\_set_regional.form.php:164
+#: ..\..\..\admin\_set_regional.form.php:240
 #: ..\..\..\admin\_users_list.php:31
 msgid "Edit"
 msgstr "Ändern"
 
-#: ..\..\..\admin\_set_regional.form.php:166
+#: ..\..\..\admin\_set_regional.form.php:170
 msgid "Strings"
 msgstr "Zeichenketten"
 
-#: ..\..\..\admin\_set_regional.form.php:167
+#: ..\..\..\admin\_set_regional.form.php:171
 msgid "Translated"
 msgstr "Übersetzt"
 
-#: ..\..\..\admin\_set_regional.form.php:171
-#: ..\..\..\admin\_set_regional.form.php:328
+#: ..\..\..\admin\_set_regional.form.php:175
+#: ..\..\..\admin\_set_regional.form.php:332
 msgid "Extract"
 msgstr "Extrahieren"
 
-#: ..\..\..\admin\_set_regional.form.php:218
+#: ..\..\..\admin\_set_regional.form.php:222
 msgid "up"
 msgstr "hoch"
 
-#: ..\..\..\admin\_set_regional.form.php:218
+#: ..\..\..\admin\_set_regional.form.php:222
 msgid "Move priority up"
 msgstr "Erhöhe Priorität"
 
-#: ..\..\..\admin\_set_regional.form.php:227
+#: ..\..\..\admin\_set_regional.form.php:231
 msgid "down"
 msgstr "runter"
 
-#: ..\..\..\admin\_set_regional.form.php:227
+#: ..\..\..\admin\_set_regional.form.php:231
 msgid "Move priority down"
 msgstr "Verringere Priorität"
 
-#: ..\..\..\admin\_set_regional.form.php:234
+#: ..\..\..\admin\_set_regional.form.php:238
 msgid "Copy locale"
 msgstr "Kopiere Locale"
 
-#: ..\..\..\admin\_set_regional.form.php:241
+#: ..\..\..\admin\_set_regional.form.php:245
 msgid "Reset custom settings"
 msgstr "verwerfe Anpassungen"
 
-#: ..\..\..\admin\_set_regional.form.php:252
+#: ..\..\..\admin\_set_regional.form.php:256
 msgid "No language file..."
 msgstr "Keine Sprachdatei..."
 
-#: ..\..\..\admin\_set_regional.form.php:328
+#: ..\..\..\admin\_set_regional.form.php:332
 msgid "Extract .po file into b2evo-format"
 msgstr "Extrahiere .po-Datei ins b2evo-Format"
 
 #. TRANS: Warning this is a javascript string
-#: ..\..\..\admin\_set_regional.form.php:343
+#: ..\..\..\admin\_set_regional.form.php:347
 msgid "Are you sure you want to reset?"
 msgstr "Bist du sicher, zurücksetzen zu wollen?"
 
-#: ..\..\..\admin\_set_regional.form.php:343
+#: ..\..\..\admin\_set_regional.form.php:347
 msgid "Reset to defaults (delete database table)"
 msgstr "Auf Voreinstellungen zurücksetzen (löscht Datenbank-Tabelle)"
 
@@ -2908,7 +3014,7 @@ msgstr "Profil für:"
 
 #: ..\..\..\admin\_users_form.php:84
 #: ..\..\..\admin\_users_form.php:113
-#: ..\..\..\skins\_profile.php:58
+#: ..\..\..\skins\_profile.php:60
 msgid "Login"
 msgstr "Login"
 
@@ -2916,10 +3022,10 @@ msgstr "Login"
 #: ..\..\..\admin\_users_form.php:101
 #: ..\..\..\admin\_users_form.php:102
 #: ..\..\..\admin\_users_form.php:114
-#: ..\..\..\skins\_profile.php:47
-#: ..\..\..\skins\_profile.php:59
+#: ..\..\..\skins\_profile.php:49
 #: ..\..\..\skins\_profile.php:61
-#: ..\..\..\skins\_profile.php:62
+#: ..\..\..\skins\_profile.php:63
+#: ..\..\..\skins\_profile.php:64
 #: ..\..\..\skins\basic\_profile.php:49
 msgid "First name"
 msgstr "Vorname"
@@ -2928,10 +3034,10 @@ msgstr "Vorname"
 #: ..\..\..\admin\_users_form.php:101
 #: ..\..\..\admin\_users_form.php:102
 #: ..\..\..\admin\_users_form.php:115
-#: ..\..\..\skins\_profile.php:48
-#: ..\..\..\skins\_profile.php:60
-#: ..\..\..\skins\_profile.php:61
+#: ..\..\..\skins\_profile.php:50
 #: ..\..\..\skins\_profile.php:62
+#: ..\..\..\skins\_profile.php:63
+#: ..\..\..\skins\_profile.php:64
 #: ..\..\..\skins\basic\_profile.php:50
 msgid "Last name"
 msgstr "Nachname"
@@ -2939,14 +3045,14 @@ msgstr "Nachname"
 #: ..\..\..\admin\_users_form.php:87
 #: ..\..\..\admin\_users_form.php:116
 #: ..\..\..\admin\_users_list.php:18
-#: ..\..\..\skins\_profile.php:49
-#: ..\..\..\skins\_profile.php:57
+#: ..\..\..\skins\_profile.php:51
+#: ..\..\..\skins\_profile.php:59
 #: ..\..\..\skins\basic\_profile.php:51
 msgid "Nickname"
 msgstr "Nickname"
 
 #: ..\..\..\admin\_users_form.php:92
-#: ..\..\..\skins\_profile.php:53
+#: ..\..\..\skins\_profile.php:55
 #: ..\..\..\skins\basic\_profile.php:55
 msgid "Identity shown"
 msgstr "Angezeigte Identiät"
@@ -2972,7 +3078,7 @@ msgid "Search on ICQ.com"
 msgstr "Suche auf ICQ.com"
 
 #: ..\..\..\admin\_users_form.php:148
-#: ..\..\..\skins\_profile.php:71
+#: ..\..\..\skins\_profile.php:73
 #: ..\..\..\skins\basic\_profile.php:73
 msgid "ICQ"
 msgstr "ICQ"
@@ -2994,7 +3100,7 @@ msgid "YahooIM"
 msgstr "YahooIM"
 
 #: ..\..\..\admin\_users_form.php:163
-#: ..\..\..\skins\_profile.php:76
+#: ..\..\..\skins\_profile.php:78
 #: ..\..\..\skins\basic\_profile.php:78
 msgid "Notifications"
 msgstr "Benachrichtigungen"
@@ -3030,43 +3136,27 @@ msgstr "nein"
 msgid "User rights"
 msgstr "Benutzer-Rechte"
 
-#: ..\..\..\admin\_users_form.php:182
-#, php-format
-msgid "See <a %s>online manual</a> for details."
-msgstr "Siehe <a %s>Online-Anleitung</a> für Details."
-
-#: ..\..\..\admin\_users_form.php:185
-#: ..\..\..\admin\_users_list.php:27
-#: ..\..\..\skins\_profile.php:37
-#: ..\..\..\skins\basic\_profile.php:39
-msgid "Level"
-msgstr "Level"
-
-#: ..\..\..\admin\_users_form.php:194
-msgid "User group"
-msgstr "Benutzergruppe"
-
 #: ..\..\..\admin\_users_form.php:220
 msgid "User information"
 msgstr "Benutzerinformationen"
 
 #: ..\..\..\admin\_users_form.php:222
 #: ..\..\..\admin\_users_list.php:16
-#: ..\..\..\skins\_profile.php:31
+#: ..\..\..\skins\_profile.php:33
 #: ..\..\..\skins\basic\_profile.php:33
 msgid "ID"
 msgstr "ID"
 
 #: ..\..\..\admin\_users_form.php:223
 #: ..\..\..\skins\basic\_profile.php:44
-#: ..\..\..\skins\custom\_main.php:264
-#: ..\..\..\skins\custom\_main.php:269
-#: ..\..\..\skins\custom\_main.php:274
-#: ..\..\..\skins\custom\_main.php:279
-#: ..\..\..\skins\fplanque2002\_main.php:273
-#: ..\..\..\skins\fplanque2002\_main.php:278
-#: ..\..\..\skins\fplanque2002\_main.php:283
-#: ..\..\..\skins\fplanque2002\_main.php:288
+#: ..\..\..\skins\custom\_main.php:263
+#: ..\..\..\skins\custom\_main.php:268
+#: ..\..\..\skins\custom\_main.php:273
+#: ..\..\..\skins\custom\_main.php:278
+#: ..\..\..\skins\fplanque2002\_main.php:272
+#: ..\..\..\skins\fplanque2002\_main.php:277
+#: ..\..\..\skins\fplanque2002\_main.php:282
+#: ..\..\..\skins\fplanque2002\_main.php:287
 msgid "Posts"
 msgstr "Einträge"
 
@@ -3150,7 +3240,7 @@ msgid "View only"
 msgstr "Nur Anzeige"
 
 #: ..\..\..\admin\_users_groupform.php:91
-#: ..\..\..\b2evocore\_functions_hitlogs.php:528
+#: ..\..\..\b2evocore\_functions_hitlogs.php:527
 msgid "Statistics"
 msgstr "Statistiken"
 
@@ -3183,20 +3273,20 @@ msgstr "Kopiere Gruppe"
 msgid "Delete group"
 msgstr "Lösche Gruppe"
 
-#: ..\..\..\admin\_users_list.php:128
+#: ..\..\..\admin\_users_list.php:127
 msgid "decrease user level"
 msgstr "verringere Benutzerlevel"
 
-#: ..\..\..\admin\_users_list.php:133
+#: ..\..\..\admin\_users_list.php:132
 msgid "increase user level"
 msgstr "erhöhe Benutzerlevel"
 
-#: ..\..\..\admin\_users_list.php:147
+#: ..\..\..\admin\_users_list.php:146
 msgid "Delete user"
 msgstr "Lösche Benutzer"
 
 #. TRANS: Warning this is a javascript string
-#: ..\..\..\admin\_users_list.php:147
+#: ..\..\..\admin\_users_list.php:146
 msgid ""
 "Are you sure you want to delete this user?\\n"
 "Warning: all his posts will be deleted too!"
@@ -3204,11 +3294,11 @@ msgstr ""
 "Willst du wirklich diesen Benutzer löschen?\\n"
 "Warnung: alle seine Einträge werden auch gelöscht!!"
 
-#: ..\..\..\admin\_users_list.php:165
+#: ..\..\..\admin\_users_list.php:162
 msgid "New user..."
 msgstr "Neuer Benutzer..."
 
-#: ..\..\..\admin\_users_list.php:167
+#: ..\..\..\admin\_users_list.php:164
 msgid "New group..."
 msgstr "Neue Gruppe..."
 
@@ -3223,34 +3313,34 @@ msgstr "Das Standardskin [%s] für Blog [%s] existiert nicht. Es muss in den <a %
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
 msgstr "FEHLER! Löschen fehlgeschlagen! Du wirst die Datei [%s] von Hand löschen müssen."
 
-#: ..\..\..\b2evocore\_class_calendar.php:178
-#: ..\..\..\b2evocore\_class_calendar.php:183
+#: ..\..\..\b2evocore\_class_calendar.php:186
+#: ..\..\..\b2evocore\_class_calendar.php:191
 #, php-format
 msgid "%d posts"
 msgstr "%d Einträge"
 
-#: ..\..\..\b2evocore\_class_calendar.php:179
-#: ..\..\..\b2evocore\_class_calendar.php:184
+#: ..\..\..\b2evocore\_class_calendar.php:187
+#: ..\..\..\b2evocore\_class_calendar.php:192
 msgid "1 post"
 msgstr "1 Eintrag"
 
-#: ..\..\..\b2evocore\_class_calendar.php:283
+#: ..\..\..\b2evocore\_class_calendar.php:295
 msgid "previous month"
 msgstr "voriger Monat"
 
-#: ..\..\..\b2evocore\_class_calendar.php:287
+#: ..\..\..\b2evocore\_class_calendar.php:299
 msgid "next month"
 msgstr "nächster Monat"
 
-#: ..\..\..\b2evocore\_class_calendar.php:314
+#: ..\..\..\b2evocore\_class_calendar.php:326
 msgid "previous year"
 msgstr "voriges Jahr"
 
-#: ..\..\..\b2evocore\_class_calendar.php:317
+#: ..\..\..\b2evocore\_class_calendar.php:329
 msgid "next year"
 msgstr "nächstes Jahr"
 
-#: ..\..\..\b2evocore\_class_calendar.php:337
+#: ..\..\..\b2evocore\_class_calendar.php:358
 msgid "go to month's archive"
 msgstr "gehe zum Monatsarchiv"
 
@@ -3411,11 +3501,11 @@ msgstr "Pingback (1)"
 msgid "Pingbacks (%d)"
 msgstr "Pingbacks (%d)"
 
-#: ..\..\..\b2evocore\_class_itemlist.php:518
+#: ..\..\..\b2evocore\_class_itemlist.php:523
 msgid "Invalid post, please correct these errors:"
 msgstr "Ungültiger Eintrag, bitte korrigiere diese Fehler:"
 
-#: ..\..\..\b2evocore\_class_itemlist.php:817
+#: ..\..\..\b2evocore\_class_itemlist.php:822
 msgid "Sorry, there is no post to display..."
 msgstr "Sorry, es gibt keinen Beitrag anzuzeigen..."
 
@@ -3594,46 +3684,46 @@ msgstr "Zugriff verweigert!"
 msgid "Oops, MySQL error!"
 msgstr "Oops, MySQL Fehler!"
 
-#: ..\..\..\b2evocore\_functions.php:472
+#: ..\..\..\b2evocore\_functions.php:476
 msgid "go back"
 msgstr "gehe zurück"
 
-#: ..\..\..\b2evocore\_functions.php:504
+#: ..\..\..\b2evocore\_functions.php:508
 msgid "Redirecting you to:"
 msgstr "Du wirst umgeleitet zu:"
 
-#: ..\..\..\b2evocore\_functions.php:506
+#: ..\..\..\b2evocore\_functions.php:510
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr "Falls nichts passiert, klicke <a %s>hier</a>."
 
-#: ..\..\..\b2evocore\_functions.php:584
+#: ..\..\..\b2evocore\_functions.php:588
 msgid "No response!"
 msgstr "Keine Antwort!"
 
-#: ..\..\..\b2evocore\_functions.php:589
+#: ..\..\..\b2evocore\_functions.php:593
 msgid "Remote error"
 msgstr "Entfernter Fehler"
 
-#: ..\..\..\b2evocore\_functions.php:604
-#: ..\..\..\b2evocore\_functions.php:609
+#: ..\..\..\b2evocore\_functions.php:608
+#: ..\..\..\b2evocore\_functions.php:613
 msgid "Response"
 msgstr "Antwort"
 
-#: ..\..\..\b2evocore\_functions.php:845
+#: ..\..\..\b2evocore\_functions.php:849
 #, php-format
 msgid "Parameter %s is required!"
 msgstr "Parameter %s ist erforderlich!"
 
-#: ..\..\..\b2evocore\_functions.php:1057
+#: ..\..\..\b2evocore\_functions.php:1061
 msgid "Invalid URL"
 msgstr "Ungültiger URL"
 
-#: ..\..\..\b2evocore\_functions.php:1063
+#: ..\..\..\b2evocore\_functions.php:1067
 msgid "URI scheme not allowed"
 msgstr "URI Schema nicht erlaubt"
 
-#: ..\..\..\b2evocore\_functions.php:1070
+#: ..\..\..\b2evocore\_functions.php:1074
 msgid "URL not allowed"
 msgstr "URL nicht erlaubt"
 
@@ -3779,11 +3869,11 @@ msgstr "lade verweisende Seite"
 msgid "found current url in page"
 msgstr "derzeitige URL in Seite gefunden"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:450
+#: ..\..\..\b2evocore\_functions_hitlogs.php:449
 msgid "not a query - no params!"
 msgstr "keine Anfrage - keine Parameter!"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:475
+#: ..\..\..\b2evocore\_functions_hitlogs.php:474
 msgid "no query string found"
 msgstr "kein Anfrage-Zeichenkette gefunden"
 
@@ -3949,41 +4039,41 @@ msgstr "Du musst dich einloggen!"
 msgid "Login if you have an account..."
 msgstr "Melde dich an, wenn du einen Account hast..."
 
-#: ..\..\..\b2evocore\_functions_users.php:373
+#: ..\..\..\b2evocore\_functions_users.php:367
 msgid "Register..."
 msgstr "Anmelden..."
 
-#: ..\..\..\b2evocore\_functions_users.php:374
+#: ..\..\..\b2evocore\_functions_users.php:368
 msgid "Register to open an account..."
 msgstr "Registriere dich, um einen Account zu erstellen..."
 
-#: ..\..\..\b2evocore\_functions_users.php:401
+#: ..\..\..\b2evocore\_functions_users.php:389
 #, php-format
 msgid "Logout (%s)"
 msgstr "Logout (%s)"
 
-#: ..\..\..\b2evocore\_functions_users.php:402
+#: ..\..\..\b2evocore\_functions_users.php:390
 msgid "Logout from your account"
 msgstr "Melde dich von deinem Account ab"
 
-#: ..\..\..\b2evocore\_functions_users.php:433
+#: ..\..\..\b2evocore\_functions_users.php:415
 msgid "Admin"
 msgstr "Admin"
 
-#: ..\..\..\b2evocore\_functions_users.php:434
+#: ..\..\..\b2evocore\_functions_users.php:416
 msgid "Go to the back-office"
 msgstr "Gehe zum Back-Office"
 
-#: ..\..\..\b2evocore\_functions_users.php:455
+#: ..\..\..\b2evocore\_functions_users.php:437
 #, php-format
 msgid "Profile (%s)"
 msgstr "Profil (%s)"
 
-#: ..\..\..\b2evocore\_functions_users.php:456
+#: ..\..\..\b2evocore\_functions_users.php:438
 msgid "Edit your profile"
 msgstr "Editiere Dein Profil"
 
-#: ..\..\..\b2evocore\_functions_users.php:482
+#: ..\..\..\b2evocore\_functions_users.php:463
 msgid "User profile"
 msgstr "Benutzerprofil"
 
@@ -4050,124 +4140,166 @@ msgstr "Fr"
 msgid "Sat"
 msgstr "Sa"
 
-#: ..\..\..\b2evocore\_vars.php:134
+#  TRANS: abbrev. for Sunday
+#. TRANS: abbrev. for Sunday
+#: ..\..\..\b2evocore\_vars.php:135
+msgid " S "
+msgstr " S "
+
+#  TRANS: abbrev. for Monday
+#. TRANS: abbrev. for Monday
+#: ..\..\..\b2evocore\_vars.php:137
+msgid " M "
+msgstr " M "
+
+#  TRANS: abbrev. for Tuesday
+#. TRANS: abbrev. for Tuesday
+#: ..\..\..\b2evocore\_vars.php:139
+msgid " T "
+msgstr " D "
+
+#  TRANS: abbrev. for Wednesday
+#. TRANS: abbrev. for Wednesday
+#: ..\..\..\b2evocore\_vars.php:141
+msgid " W "
+msgstr " M "
+
+#  TRANS: abbrev. for Thursday
+#. TRANS: abbrev. for Thursday
+#: ..\..\..\b2evocore\_vars.php:143
+msgid " T  "
+msgstr " D "
+
+#  TRANS: abbrev. for Friday
+#. TRANS: abbrev. for Friday
+#: ..\..\..\b2evocore\_vars.php:145
+msgid " F "
+msgstr " F "
+
+#  TRANS: abbrev. for Saturday
+#. TRANS: abbrev. for Saturday
+#: ..\..\..\b2evocore\_vars.php:147
+msgid " S  "
+msgstr " S "
+
+#: ..\..\..\b2evocore\_vars.php:150
 msgid "January"
 msgstr "Januar"
 
-#: ..\..\..\b2evocore\_vars.php:135
+#: ..\..\..\b2evocore\_vars.php:151
 msgid "February"
 msgstr "Februar"
 
-#: ..\..\..\b2evocore\_vars.php:136
+#: ..\..\..\b2evocore\_vars.php:152
 msgid "March"
 msgstr "März"
 
-#: ..\..\..\b2evocore\_vars.php:137
+#: ..\..\..\b2evocore\_vars.php:153
 msgid "April"
 msgstr "April"
 
 #. TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
-#: ..\..\..\b2evocore\_vars.php:139
+#: ..\..\..\b2evocore\_vars.php:155
 msgid "May "
 msgstr "Mai"
 
-#: ..\..\..\b2evocore\_vars.php:140
+#: ..\..\..\b2evocore\_vars.php:156
 msgid "June"
 msgstr "Juni"
 
-#: ..\..\..\b2evocore\_vars.php:141
+#: ..\..\..\b2evocore\_vars.php:157
 msgid "July"
 msgstr "Juli"
 
-#: ..\..\..\b2evocore\_vars.php:142
+#: ..\..\..\b2evocore\_vars.php:158
 msgid "August"
 msgstr "August"
 
-#: ..\..\..\b2evocore\_vars.php:143
+#: ..\..\..\b2evocore\_vars.php:159
 msgid "September"
 msgstr "September"
 
-#: ..\..\..\b2evocore\_vars.php:144
+#: ..\..\..\b2evocore\_vars.php:160
 msgid "October"
 msgstr "Oktober"
 
-#: ..\..\..\b2evocore\_vars.php:145
+#: ..\..\..\b2evocore\_vars.php:161
 msgid "November"
 msgstr "November"
 
-#: ..\..\..\b2evocore\_vars.php:146
+#: ..\..\..\b2evocore\_vars.php:162
 msgid "December"
 msgstr "Dezember"
 
 #. TRANS: abbrev. for January
-#: ..\..\..\b2evocore\_vars.php:150
+#: ..\..\..\b2evocore\_vars.php:166
 msgid "Jan"
 msgstr "Jan"
 
 #. TRANS: abbrev. for February
-#: ..\..\..\b2evocore\_vars.php:152
+#: ..\..\..\b2evocore\_vars.php:168
 msgid "Feb"
 msgstr "Feb"
 
 #. TRANS: abbrev. for March
-#: ..\..\..\b2evocore\_vars.php:154
+#: ..\..\..\b2evocore\_vars.php:170
 msgid "Mar"
 msgstr "Mär"
 
 #. TRANS: abbrev. for April
-#: ..\..\..\b2evocore\_vars.php:156
+#: ..\..\..\b2evocore\_vars.php:172
 msgid "Apr"
 msgstr "Apr"
 
 #. TRANS: abbrev. for May
-#: ..\..\..\b2evocore\_vars.php:158
+#: ..\..\..\b2evocore\_vars.php:174
 msgid "May"
 msgstr "Mai"
 
 #. TRANS: abbrev. for June
-#: ..\..\..\b2evocore\_vars.php:160
+#: ..\..\..\b2evocore\_vars.php:176
 msgid "Jun"
 msgstr "Jun"
 
 #. TRANS: abbrev. for July
-#: ..\..\..\b2evocore\_vars.php:162
+#: ..\..\..\b2evocore\_vars.php:178
 msgid "Jul"
 msgstr "Jul"
 
 #. TRANS: abbrev. for August
-#: ..\..\..\b2evocore\_vars.php:164
+#: ..\..\..\b2evocore\_vars.php:180
 msgid "Aug"
 msgstr "Aug"
 
 #. TRANS: abbrev. for September
-#: ..\..\..\b2evocore\_vars.php:166
+#: ..\..\..\b2evocore\_vars.php:182
 msgid "Sep"
 msgstr "Sep"
 
 #. TRANS: abbrev. for October
-#: ..\..\..\b2evocore\_vars.php:168
+#: ..\..\..\b2evocore\_vars.php:184
 msgid "Oct"
 msgstr "Okt"
 
 #. TRANS: abbrev. for November
-#: ..\..\..\b2evocore\_vars.php:170
+#: ..\..\..\b2evocore\_vars.php:186
 msgid "Nov"
 msgstr "Nov"
 
 #. TRANS: abbrev. for December
-#: ..\..\..\b2evocore\_vars.php:172
+#: ..\..\..\b2evocore\_vars.php:188
 msgid "Dec"
 msgstr "Dez"
 
-#: ..\..\..\b2evocore\_vars.php:185
+#: ..\..\..\b2evocore\_vars.php:201
 msgid "Local"
 msgstr "Lokal"
 
-#: ..\..\..\b2evocore\_vars.php:186
+#: ..\..\..\b2evocore\_vars.php:202
 msgid "Reported"
 msgstr "Berichtet"
 
-#: ..\..\..\b2evocore\_vars.php:187
+#: ..\..\..\b2evocore\_vars.php:203
 msgid "Central"
 msgstr "Zentral"
 
@@ -4192,42 +4324,66 @@ msgid "English (US)"
 msgstr "Englisch (US)"
 
 #: ..\..\..\conf\_locales.php:72
+msgid "English (CA)"
+msgstr "Englisch (CA)"
+
+#: ..\..\..\conf\_locales.php:79
+msgid "English (AU)"
+msgstr "Englisch (AU)"
+
+#: ..\..\..\conf\_locales.php:86
 msgid "Spanish (ES)"
 msgstr "Spanisch (ES)"
 
-#: ..\..\..\conf\_locales.php:79
+#: ..\..\..\conf\_locales.php:93
 msgid "French (FR)"
 msgstr "Französisch (FR)"
 
-#: ..\..\..\conf\_locales.php:86
+#: ..\..\..\conf\_locales.php:100
+msgid "French (CA)"
+msgstr "Französisch (CA)"
+
+#: ..\..\..\conf\_locales.php:107
+msgid "French (BE)"
+msgstr "Französisch (BE)"
+
+#: ..\..\..\conf\_locales.php:114
 msgid "Italian (IT)"
 msgstr "Italienisch (IT)"
 
-#: ..\..\..\conf\_locales.php:93
+#: ..\..\..\conf\_locales.php:121
 msgid "Japanese (JP)"
 msgstr "Japanisch (JP)"
 
-#: ..\..\..\conf\_locales.php:100
+#: ..\..\..\conf\_locales.php:128
 msgid "Lithuanian (LT)"
 msgstr "Litauisch (LT)"
 
-#: ..\..\..\conf\_locales.php:107
+#: ..\..\..\conf\_locales.php:135
 msgid "Bokm&aring;l (NO)"
 msgstr "Norwegisch (NO)"
 
-#: ..\..\..\conf\_locales.php:114
+#: ..\..\..\conf\_locales.php:142
 msgid "Dutch (NL)"
 msgstr "Holländisch (NL)"
 
-#: ..\..\..\conf\_locales.php:128
+#: ..\..\..\conf\_locales.php:149
+msgid "Dutch (BE)"
+msgstr "Holländisch (BE)"
+
+#: ..\..\..\conf\_locales.php:156
+msgid "Portuguese (BR)"
+msgstr "Portugisisch (BR)"
+
+#: ..\..\..\conf\_locales.php:163
 msgid "Swedish (SE)"
 msgstr "Schwedisch (SE)"
 
-#: ..\..\..\conf\_locales.php:135
+#: ..\..\..\conf\_locales.php:170
 msgid "Simpl. Chinese (CN)"
 msgstr "Vereinf. Chinesisch (CN)"
 
-#: ..\..\..\conf\_locales.php:142
+#: ..\..\..\conf\_locales.php:177
 msgid "Trad. Chinese (TW)"
 msgstr "Trad. Chinesisch (TW)"
 
@@ -4325,7 +4481,7 @@ msgstr "Rohinhalt:"
 #: ..\..\..\htsrv\_lostpass_form.php:22
 #: ..\..\..\htsrv\_reg_complete.php:14
 #: ..\..\..\htsrv\_reg_form.php:23
-#: ..\..\..\skins\_profile.php:28
+#: ..\..\..\skins\_profile.php:30
 #: ..\..\..\skins\basic\_profile.php:30
 msgid "Login:"
 msgstr "Login:"
@@ -4870,8 +5026,8 @@ msgstr "Kontakt"
 
 #: ..\..\..\install\_functions_cafelogupgrade.php:33
 #, php-format
-msgid "This blog holds all your posts upgraded from Cafelog. This blog is named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s"
-msgstr "Dieses Blog enthält alle deine von Cafelog übernommenen Einträge. Dieses Blog hat den Namen '%s' und Index #%d in der Datenbank. Standardmässig wird es durch eine &quot;Stub&quot;-Datei namens '<code>%s</code>' aufgerufen. %s"
+msgid "This blog holds all your posts upgraded from Cafelog. This blog is named '%s'. %s"
+msgstr "Dieses Blog enthält alle deine von Cafelog übernommenen Einträge. Dieses Blog hat den Namen '%s'. %s"
 
 #: ..\..\..\install\_functions_create.php:405
 msgid "This is a sample linkblog entry"
@@ -5327,32 +5483,40 @@ msgid "Trackback address for this post:"
 msgstr "Trackback Adresse für diesen Eintrag:"
 
 #. TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
-#: ..\..\..\skins\_feedback.php:91
+#: ..\..\..\skins\_feedback.php:90
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:91
+#: ..\..\..\skins\wpc_default\_feedback.php:91
 #, php-format
 msgid "No %s for this post yet..."
 msgstr "Bisher keine %s für diesen Eintrag..."
 
-#: ..\..\..\skins\_feedback.php:179
+#: ..\..\..\skins\_feedback.php:178
 msgid "Your email address will <strong>not</strong> be displayed on this site."
 msgstr "Deine EMail-Adresse wird <strong>nicht</strong> angezeigt."
 
-#: ..\..\..\skins\_feedback.php:184
+#: ..\..\..\skins\_feedback.php:183
 msgid "Site/Url"
 msgstr "Seite/URL"
 
-#: ..\..\..\skins\_feedback.php:186
+#: ..\..\..\skins\_feedback.php:185
 msgid "Your URL will be displayed."
 msgstr "Deine URL wird angezeigt."
 
-#: ..\..\..\skins\_feedback.php:207
+#: ..\..\..\skins\_feedback.php:206
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:203
+#: ..\..\..\skins\wpc_default\_feedback.php:203
 msgid "Line breaks become &lt;br /&gt;"
 msgstr "Zeilenumbrüche werden zu &lt;br /&gt;"
 
-#: ..\..\..\skins\_feedback.php:212
+#: ..\..\..\skins\_feedback.php:211
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:208
+#: ..\..\..\skins\wpc_default\_feedback.php:208
 msgid "Remember me"
 msgstr "Erinner mich"
 
-#: ..\..\..\skins\_feedback.php:212
+#: ..\..\..\skins\_feedback.php:211
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:208
+#: ..\..\..\skins\wpc_default\_feedback.php:208
 msgid "(Set cookies for name, email &amp; url)"
 msgstr "(Setze Cookies für Name, EMail &amp; URL)"
 
@@ -5369,18 +5533,20 @@ msgid "Linkblog"
 msgstr "Linkblog"
 
 #: ..\..\..\skins\_linkblog.php:66
+#: ..\..\..\skins\wpc_aubmach\_linkblog.php:64
+#: ..\..\..\skins\wpc_default\_linkblog.php:64
 msgid "more"
 msgstr "mehr"
 
-#: ..\..\..\skins\_profile.php:72
+#: ..\..\..\skins\_profile.php:74
 msgid "AOL I.M."
 msgstr "AOL I.M."
 
-#: ..\..\..\skins\_profile.php:73
+#: ..\..\..\skins\_profile.php:75
 msgid "MSN I.M."
 msgstr "MSN I.M."
 
-#: ..\..\..\skins\_profile.php:74
+#: ..\..\..\skins\_profile.php:76
 msgid "Yahoo I.M."
 msgstr "Yahoo I.M."
 
@@ -5417,23 +5583,112 @@ msgstr "Wörter"
 msgid "Read more..."
 msgstr "Lies mehr..."
 
-#: ..\..\..\skins\bluesky\_main.php:168
-#: ..\..\..\skins\guadeloupe\_main.php:169
+#: ..\..\..\skins\bluesky\_main.php:166
+#: ..\..\..\skins\guadeloupe\_main.php:167
 msgid "Choose a skin"
 msgstr "Wähle ein Skin"
 
 #: ..\..\..\skins\custom\_main.php:206
 #: ..\..\..\skins\fplanque2002\_main.php:214
+#: ..\..\..\skins\wpc_aubmach\_main.php:140
+#: ..\..\..\skins\wpc_default\_main.php:140
 msgid "Choose skin"
 msgstr "Wähle Skin"
 
-#: ..\..\..\skins\fplanque2002\_main.php:292
+#: ..\..\..\skins\fplanque2002\_main.php:291
 msgid "What is RSS?"
 msgstr "Was ist RSS?"
 
 #: ..\..\..\skins\originalb2\_main.php:52
 msgid "Browse all posts by this author"
 msgstr "Zeige alle Einträge dieses Autors"
+
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:80
+#: ..\..\..\skins\wpc_default\_feedback.php:80
+msgid "The <acronym title=\"Uniform Resource Identifier\">URI</acronym> to TrackBack this entry is:"
+msgstr "Der TrackBack-<acronym title=\"Uniform Resource Identifier\">URI</acronym> für diesen Eintrag ist:"
+
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:181
+#: ..\..\..\skins\wpc_default\_feedback.php:181
+msgid "E-mail"
+msgstr "E-Mail"
+
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:194
+#: ..\..\..\skins\wpc_default\_feedback.php:194
+msgid "Your Comment"
+msgstr "Dein Kommentar"
+
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:214
+#: ..\..\..\skins\wpc_default\_feedback.php:214
+msgid "Say It!"
+msgstr "Sag es!"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:64
+#: ..\..\..\skins\wpc_default\_main.php:64
+msgid "Filed under:"
+msgstr "Gespeichert unter:"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:149
+#: ..\..\..\skins\wpc_default\_main.php:149
+msgid "Other"
+msgstr "Sonstiges"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:161
+#: ..\..\..\skins\wpc_default\_main.php:161
+msgid "Meta"
+msgstr "Meta"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:163
+#: ..\..\..\skins\wpc_default\_main.php:163
+msgid "Syndicate this site using RSS"
+msgstr "Syndiziere diese Seite mit RSS"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:163
+#: ..\..\..\skins\wpc_default\_main.php:163
+msgid "<abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
+msgstr "<abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:164
+#: ..\..\..\skins\wpc_default\_main.php:164
+msgid "The latest comments to all posts in RSS"
+msgstr "Die letzten Kommentare zu allen Einträgen per RSS"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:164
+#: ..\..\..\skins\wpc_default\_main.php:164
+msgid "Comments <abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
+msgstr "Kommentar-<abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:165
+#: ..\..\..\skins\wpc_default\_main.php:165
+msgid "This page validates as XHTML 1.0 Transitional"
+msgstr "Diese Seite ist gültiges XHTML 1.0 Transitional"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:165
+#: ..\..\..\skins\wpc_default\_main.php:165
+msgid "Valid <abbr title=\"eXtensible HyperText Markup Language\">XHTML</abbr>"
+msgstr "Gültiges <abbr title=\"eXtensible HyperText Markup Language\">XHTML</abbr>"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:166
+#: ..\..\..\skins\wpc_aubmach\_main.php:176
+#: ..\..\..\skins\wpc_default\_main.php:166
+#: ..\..\..\skins\wpc_default\_main.php:176
+msgid "Powered by b2evolution; multilingual multiuser multi-blog engine."
+msgstr "Powered by b2evolution; Multilinguale Multiuser Multiblog Maschine."
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:177
+#: ..\..\..\skins\wpc_default\_main.php:177
+msgid "This skin features a CSS file originally designed for WordPress (See design credits in style.css)."
+msgstr "Dieses Skin nutzt eine CSS-Datei, die ursprünglich für WordPress entwickelt wurde (siehe Design Credits in style.css)."
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:178
+#: ..\..\..\skins\wpc_default\_main.php:178
+msgid "Original design credits for this skin:"
+msgstr "Ursprüngliche Design Credits für dieses Skin:"
+
+#: ..\..\..\skins\wpc_aubmach\_main.php:179
+#: ..\..\..\skins\wpc_default\_main.php:179
+msgid "In order to ensure maximum compatibility with WP CSS files, most b2evolution features that do not exist in WP are hidden from this generic wpc_* skin."
+msgstr "Um maximale Kompatibilität mit WP CSS Dateien zu gewährleisten, sind die meisten Features, die nicht in WP vorhanden sind, in diesem generischen wpc_* Skin versteckt."
 
 #: ..\..\..\xmlsrv\rdf.php:45
 #: ..\..\..\xmlsrv\rss2.php:34

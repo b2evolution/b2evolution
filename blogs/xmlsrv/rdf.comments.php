@@ -7,7 +7,7 @@
 	$disp = 'comments';				// What we want is the latest comments
 	$show_statuses = array(); // Restrict to published comments
 	require dirname(__FILE__).'/../b2evocore/_blog_main.php' ;
-	$CommentList = & new CommentList( $blog, "'comment'", $show_statuses );
+	$CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'DESC',	'',	20 );
 	header("Content-type: text/xml");
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?".">";
 ?>

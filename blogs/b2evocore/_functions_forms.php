@@ -211,8 +211,10 @@ function form_info_tr( $field_label, $field_info, $field_note = '' )
 
 /**
  * creates a form header and puts GET params of $action into hidden form inputs
+ *
+ * {@internal form_formstart(-)}}
  */
-function form_formstart( $action, $class = '', $name = '', $method = 'get' )
+function form_formstart( $action, $class = '', $name = '', $method = 'get', $id = '' )
 {
 	if( $method == 'get' )
 	{
@@ -227,9 +229,11 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get' )
 	echo '<form action="'.$action.'" method="'.$method.'"';
 	
 	if( !empty($name) ) echo ' name="'.$name.'"';
+	if( !empty($id) ) echo ' id="'.$id.'"';
 	if( !empty($class) ) echo ' class="'.$class.'"';
 	
 	echo '>';
+
 	if( isset($getparams) )
 	{
 		foreach( $getparams as $param)

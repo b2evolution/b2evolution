@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-05-11 20:02+0100\n"
+"PO-Revision-Date: 2004-05-27 00:45+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -21,6 +21,10 @@ msgstr ""
 #: ../../doc/upgradefrom_b2.src.html:17
 #: ../../doc/upgradefrom_b2evo.src.html:6
 #: ../../doc/upgradefrom_b2evo.src.html:17
+#: ../../doc/upgradefrom_gl.src.html:6
+#: ../../doc/upgradefrom_gl.src.html:17
+#: ../../doc/upgradefrom_mt.src.html:6
+#: ../../doc/upgradefrom_mt.src.html:17
 msgid "b2evo package"
 msgstr "b2evo Paket"
 
@@ -28,66 +32,88 @@ msgstr "b2evo Paket"
 #: ../../doc/install_new.src.html:18
 #: ../../doc/upgradefrom_b2.src.html:18
 #: ../../doc/upgradefrom_b2evo.src.html:18
+#: ../../doc/upgradefrom_gl.src.html:18
+#: ../../doc/upgradefrom_mt.src.html:18
 msgid "Start page"
 msgstr "Startseite"
 
 #: ../../index.src.html:13
 #: ../../doc/upgradefrom_b2.src.html:13
 #: ../../doc/upgradefrom_b2evo.src.html:13
+#: ../../doc/upgradefrom_gl.src.html:13
+#: ../../doc/upgradefrom_mt.src.html:13
 msgid "b2evolution: official site"
 msgstr "b2evolution: offizielle Webseite"
 
 #: ../../index.src.html:14
 #: ../../doc/upgradefrom_b2.src.html:14
 #: ../../doc/upgradefrom_b2evo.src.html:14
+#: ../../doc/upgradefrom_gl.src.html:14
+#: ../../doc/upgradefrom_mt.src.html:14
 msgid "Multilingual multiuser multi-blog engine."
 msgstr "Multilinguale Multiuser Multiblog Maschine."
 
 #: ../../index.src.html:15
 #: ../../doc/upgradefrom_b2.src.html:15
 #: ../../doc/upgradefrom_b2evo.src.html:15
+#: ../../doc/upgradefrom_gl.src.html:15
+#: ../../doc/upgradefrom_mt.src.html:15
 msgid "Version"
 msgstr "Version"
 
 #: ../../index.src.html:19
 #: ../../doc/upgradefrom_b2.src.html:19
 #: ../../doc/upgradefrom_b2evo.src.html:19
+#: ../../doc/upgradefrom_gl.src.html:19
+#: ../../doc/upgradefrom_mt.src.html:19
 msgid "Install"
 msgstr "Installation"
 
 #: ../../index.src.html:20
 #: ../../doc/upgradefrom_b2.src.html:20
 #: ../../doc/upgradefrom_b2evo.src.html:20
+#: ../../doc/upgradefrom_gl.src.html:20
+#: ../../doc/upgradefrom_mt.src.html:20
 msgid "Blogs"
 msgstr "Blogs"
 
 #: ../../index.src.html:21
 #: ../../doc/upgradefrom_b2.src.html:21
 #: ../../doc/upgradefrom_b2evo.src.html:21
+#: ../../doc/upgradefrom_gl.src.html:21
+#: ../../doc/upgradefrom_mt.src.html:21
 msgid "Admin"
 msgstr "Admin"
 
 #: ../../index.src.html:22
 #: ../../doc/upgradefrom_b2.src.html:22
 #: ../../doc/upgradefrom_b2evo.src.html:22
+#: ../../doc/upgradefrom_gl.src.html:22
+#: ../../doc/upgradefrom_mt.src.html:22
 msgid "Online"
 msgstr "Online"
 
 #: ../../index.src.html:23
 #: ../../doc/upgradefrom_b2.src.html:23
 #: ../../doc/upgradefrom_b2evo.src.html:23
+#: ../../doc/upgradefrom_gl.src.html:23
+#: ../../doc/upgradefrom_mt.src.html:23
 msgid "Manual"
 msgstr "Anleitung"
 
 #: ../../index.src.html:24
 #: ../../doc/upgradefrom_b2.src.html:24
 #: ../../doc/upgradefrom_b2evo.src.html:24
+#: ../../doc/upgradefrom_gl.src.html:24
+#: ../../doc/upgradefrom_mt.src.html:24
 msgid "Support"
 msgstr "Support"
 
 #: ../../index.src.html:28
 #: ../../doc/upgradefrom_b2.src.html:28
 #: ../../doc/upgradefrom_b2evo.src.html:28
+#: ../../doc/upgradefrom_gl.src.html:28
+#: ../../doc/upgradefrom_mt.src.html:28
 msgid "Available translations for this page:"
 msgstr "Verfügbare Übersetzungen dieser Seite:"
 
@@ -135,21 +161,43 @@ msgstr "Cafelog/b2 Benutzer:"
 msgid "upgrading from Cafelog/b2 version 0.6.x"
 msgstr "upgraden von Cafelog/b2 Version 0.6.x"
 
-#: ../../index.src.html:45
+#: ../../index.src.html:42
+msgid "Movable Type users:"
+msgstr "Movable Type Benutzer:"
+
+#: ../../index.src.html:42
+msgid "upgrading from Movable Type"
+msgstr "Upgraden von Movable Type"
+
+#: ../../index.src.html:43
+msgid "GeekLog users:"
+msgstr "GeekLog Benutzer:"
+
+#: ../../index.src.html:43
+msgid "upgrading from GeekLog"
+msgstr "Upgraden von GeekLog"
+
+#: ../../index.src.html:47
 #: ../../doc/upgradefrom_b2.src.html:74
 #: ../../doc/upgradefrom_b2evo.src.html:54
+#: ../../doc/upgradefrom_gl.src.html:40
+#: ../../doc/upgradefrom_mt.src.html:45
 msgid "official website"
 msgstr "offizielle Webseite"
 
-#: ../../index.src.html:46
+#: ../../index.src.html:48
 #: ../../doc/upgradefrom_b2.src.html:75
 #: ../../doc/upgradefrom_b2evo.src.html:55
+#: ../../doc/upgradefrom_gl.src.html:41
+#: ../../doc/upgradefrom_mt.src.html:46
 msgid "GNU GPL license"
 msgstr "GNU GPL Lizenz"
 
-#: ../../index.src.html:47
+#: ../../index.src.html:49
 #: ../../doc/upgradefrom_b2.src.html:76
 #: ../../doc/upgradefrom_b2evo.src.html:56
+#: ../../doc/upgradefrom_gl.src.html:42
+#: ../../doc/upgradefrom_mt.src.html:47
 msgid "contact"
 msgstr "Kontakt"
 
@@ -163,6 +211,8 @@ msgstr "Installationsanweisungen für neue Benutzer"
 
 #: ../../doc/install_new.src.html:34
 #: ../../doc/upgradefrom_b2evo.src.html:33
+#: ../../doc/upgradefrom_gl.src.html:33
+#: ../../doc/upgradefrom_mt.src.html:33
 msgid "Before you begin, please note that some network features of b2evolution require you to agree our simple <a %s>Terms of service</a>."
 msgstr "Bevor du anfängst beachte bitte, dass einige Netzwerk-Funktionen von b2evolution voraussetzen, dass du den einfachen <a %s>Servicebedingungen</a> zustimmst."
 
@@ -267,9 +317,6 @@ msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading y
 msgstr "Checke das <a %s>Wiki</a> oder die <a %s>Foren</a> für Hinweise, um dein vorhandenes b2-Template (Vorlage) nach b2evolution upzugraden."
 
 #: ../../doc/upgradefrom_b2evo.src.html:6
-msgid "Upgrading from previous b2evolution"
-msgstr "Upgraden von einer älteren b2evolution-Version"
-
 #: ../../doc/upgradefrom_b2evo.src.html:32
 msgid "Upgrading from a previous version of b2evolution"
 msgstr "Upgraden von einer älteren b2evolution-Version"
@@ -298,15 +345,43 @@ msgstr "Starte das Installations-Skript auf deinem Server. Es befindet sich in <
 msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
 msgstr "Jetzt solltest du deine vorherigen Anpassungen wiederherstellen. Wir empfehlen ein diff/merge-Werkzeug wie <a %s>WinMerge</a>. So kannst du einfach deine alten (gesicherten) Dateien mit den neuen vergleichen (sogar ganze Verzeichnisse auf einmal) and entsprechende Anpassungen treffen.<br /><br /> Du kannst auch im <a %s>Wiki</a> oder den <a %s>Foren</a> für Hinweise zum Upgraden spezifischer Dateien von einer bestimmten Version zu einer anderen suchen/fragen."
 
-msgid "English (EU)"
-msgstr "Englisch (EU)"
+#: ../../doc/upgradefrom_gl.src.html:6
+msgid "Upgrading from GeekLog"
+msgstr "Upgraden von Geeklog"
 
-msgid "German (DE)"
-msgstr "Deutsch (DE)"
+#: ../../doc/upgradefrom_gl.src.html:35
+msgid "<a %s>Install b2evolution in the regular way.</a>"
+msgstr "<a %s>Installiere b2evolution normal.</a>"
 
-msgid "French (FR)"
-msgstr "Französisch (FR)"
+#: ../../doc/upgradefrom_gl.src.html:36
+msgid "Follow the specific instructions in <a %s>/extras/geeklog/README.txt</a>"
+msgstr "Folge den Anweisungen in <a %s>/extras/geeklog/README.txt</a>"
 
-msgid "Dutch (NL)"
-msgstr "Holländisch (NL)"
+#: ../../doc/upgradefrom_mt.src.html:6
+msgid "Upgrading from Movable Type"
+msgstr "Upgraden von Movable Type"
+
+#: ../../doc/upgradefrom_mt.src.html:34
+msgid "This procedure has been tested with Movable Type version 2.661 but should also work with other versions. You can't break anything by trying anyway..."
+msgstr "Dieses Verfahren wurde mit Movable Type Version 2.661 getestet, aber sollte auch mit anderen Versionen funktionieren. Du kannst nichts kaputt machen, wenn du es einfach versuchst..."
+
+#: ../../doc/upgradefrom_mt.src.html:36
+msgid "Use MT's export functionnality to create a .TXT file containing your posts."
+msgstr "Benutze MT's Export-Funktion um eine .TXT Datei mit deinen Einträgen zu erstellen."
+
+#: ../../doc/upgradefrom_mt.src.html:38
+msgid "Once b2evo is up and running, copy your .TXT export file into the /blogs/admin folder on your server."
+msgstr "Sobald b2evo läuft, kopiere deine .TXT Export-Datei ins /blogs/admin Verzeichnis auf deinem Server."
+
+#: ../../doc/upgradefrom_mt.src.html:39
+msgid "In the admin, go to the Tools tab and launch the MT migration utility."
+msgstr "Gehe im Adminbereich zum \"Werkzeuge\"-Tab und starte das MT-Migrations Hilfsprogramm."
+
+#: ../../doc/upgradefrom_mt.src.html:40
+msgid "Follow the instructions on screen."
+msgstr "Folge den Anweisungen auf dem Bildschirm."
+
+#: ../../doc/upgradefrom_mt.src.html:41
+msgid "Import will only take a few seconds/minutes depending on how many posts you import."
+msgstr "Das Importieren wird nur ein paar Sekunden/Minuten dauern, je nachdem wie viele Einträge du importierst."
 

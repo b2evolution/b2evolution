@@ -79,7 +79,7 @@ function bpost_create(
 	$query = "INSERT INTO $tablepostcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
 	foreach( $extra_cat_IDs as $extra_cat_ID )
 	{
-		//echo "extracat: $extracat_ID <br />";
+		//echo "extracat: $extra_cat_ID <br />";
 		$query .= "( $post_ID, $extra_cat_ID ),";
 	}
 	$query = substr( $query, 0, strlen( $query ) - 1 );
@@ -223,7 +223,7 @@ function bpost_delete( $post_ID )
 	// delete extracats
 	$query = "DELETE FROM $tablepostcats WHERE postcat_post_ID = $post_ID";
 	if( $DB->query( $query ) === false ) return 0;
-	
+
 	// delete comments
 	$query = "DELETE FROM $tablecomments WHERE comment_post_ID = $post_ID";
 	if( $DB->query( $query ) === false ) return 0;
@@ -244,12 +244,12 @@ function bpost_delete( $post_ID )
 /*
  * get_lastpostdate(-)
  */
-function get_lastpostdate( $blog = 1, $show_statuses = '' )
+function get_lastpostdate( $blog = 1, $show_statuses = array(), $cat = '', $catsel = array() )
 {
 	global $localtimenow, $postdata;
 
 	// echo 'getting last post date';
-	$LastPostList = & new ItemList( $blog, $show_statuses, '', '', '', '', array(), '', 'DESC', '', 1, '','', '', '', '', '', '', 1, 'posts', '', 'now' );
+	$LastPostList = & new ItemList( $blog, $show_statuses, '', '', '', $cat, $catsel, '', 'DESC', 'issue_date', 1, '','', '', '', '', '', '', 1, 'posts', '', 'now' );
 
 	if( $LastItem = $LastPostList->get_item() )
 	{
@@ -640,10 +640,10 @@ function the_link( $before='', $after='', $format = 'htmlbody' )
 
 
 
-/*
- * single_post_title(-)
+/**
+ * {@internal single_post_title(-)}}
  *
- * fplanque: 0.8.3: changed defaults
+ * @todo use cache
  */
 function single_post_title( $prefix = '#', $display = 'htmlhead' )
 {
@@ -651,24 +651,29 @@ function single_post_title( $prefix = '#', $display = 'htmlhead' )
 	
 	$disp_title = '';
 	
-	if( intval( $p ) || (!empty( $title )) )
-	{
-		if( $prefix == '#' ) $prefix = ' '.T_('Post details').': ';
-		$post_data = get_postdata($p);
-		$disp_title = $post_data['Title'];
-	}
+	if( $prefix == '#' ) $prefix = ' '.T_('Post details').': ';
 	
 	if( $preview )
 	{
 		if( $prefix == '#' ) $prefix = ' ';
 		$disp_title = T_('PREVIEW');
 	}
+	elseif( intval($p) )
+	{
+		$Item = Item_get_by_ID( $p );		// TODO: use cache
+		$disp_title = $Item->get('title');
+	}
+	elseif( !empty( $title ) )
+	{
+		$Item = Item_get_by_title( $title ); // TODO: use cache
+		$disp_title = $Item->get('title');
+	}
 	
 	if( !empty( $disp_title ) )
 	{
 		if ($display)
 		{
-			echo format_to_output( $prefix.$disp_title, $display );
+			echo $prefix, format_to_output($disp_title, $display );
 		}
 		else
 		{
@@ -1423,22 +1428,22 @@ function gen_permalink(
 		switch($use_destination)
 		{
 			case 'monthly':
-				$permalink = add_url_param( $file, 'm='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).'#'.$anchor );
+				$permalink = url_add_param( $file, 'm='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).'#'.$anchor );
 				break;
 			case 'weekly':
 				if((!isset($cacheweekly)) || (empty($cacheweekly[$postdata['Date']])))
 				{
 					$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
 				}
-				$permalink = add_url_param( $file, 'm='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].'#'.$anchor );
+				$permalink = url_add_param( $file, 'm='.substr($postdata['Date'],0,4).'&amp;w='.$cacheweekly[$postdata['Date']].'#'.$anchor );
 				break;
 			case 'daily':
-				$permalink = add_url_param( $file, 'm='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).'#'.$anchor );
+				$permalink = url_add_param( $file, 'm='.substr($postdata['Date'],0,4).substr($postdata['Date'],5,2).substr($postdata['Date'],8,2).'#'.$anchor );
 				break;
 			case 'postbypost':
 			case 'single':
 			default:
-				$permalink = add_url_param( $file, 'p='.$id.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1' );
+				$permalink = url_add_param( $file, 'p='.$id.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1' );
 				break;
 		}
 	}
@@ -1499,6 +1504,18 @@ function permalink_single($file='')
 	global $id;
 	if (empty($file)) $file = get_bloginfo('blogurl');
 	echo gen_permalink( $file, $id, 'id', 'single' );
+}
+
+
+/** 
+ * {@internal the_permalink(-) }}
+ *
+ * @deprecated deprecated by {@link $Item::permalink()}
+ */
+function the_permalink()
+{
+	global $Item;
+	$Item->permalink();
 }
 
 

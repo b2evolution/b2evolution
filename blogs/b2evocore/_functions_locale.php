@@ -353,9 +353,10 @@ function locale_options( $default = '' )
 /**
  * Detect language from HTTP_ACCEPT_LANGUAGE
  *
- * {@internal locale_from_httpaccept(-)}}
+ * First matched full locale code in HTTP_ACCEPT_LANGUAGE will win
+ * Otherwise, first locale in table matching a lang code will win
  *
- * @author blueyed
+ * {@internal locale_from_httpaccept(-)}}
  *
  * @return locale made out of HTTP_ACCEPT_LANGUAGE or $default_locale, if no match
  */
@@ -365,33 +366,50 @@ function locale_from_httpaccept()
 	if( isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) )
 	{
 		// echo $_SERVER['HTTP_ACCEPT_LANGUAGE'];
-		// pre_dump($_SERVER['HTTP_ACCEPT_LANGUAGE'], 'http_accept_language');
-		$text = array();
-		// look for each language in turn in the preferences, which we saved in $langs
+		$accept = strtolower( $_SERVER['HTTP_ACCEPT_LANGUAGE'] );
+		// pre_dump($accept, 'http_accept_language');
+		$selected_locale = '';
+		$selected_match_pos = 10000;
+		$selected_full_match = false;
+
 		foreach( $locales as $localekey => $locale )
-		{
+		{	// Check each locale
 			if( ! $locale['enabled'] )
 			{	// We only want to use activated locales
 				continue;
 			}
-			// echo '<br />checking ', $localekey, ' for HTTP_ACCEPT_LANGUAGE ';
-			$checklang = substr($localekey, 0, 2);
-			$pos = strpos( $_SERVER['HTTP_ACCEPT_LANGUAGE'], $checklang );
-			if( $pos !== false )
-			{
-				// echo '*';
-				$text[] = str_pad( $pos, 3, '0', STR_PAD_LEFT ). '-'. $checklang. '-'. $localekey;
+			// echo '<br />searching ', $localekey, ' in HTTP_ACCEPT_LANGUAGE ';
+			if( ($pos = strpos( $accept, strtolower($localekey) )) !== false )
+			{	// We found full locale
+				if( !$selected_full_match || ($pos <= $selected_match_pos) )
+				{	// This is a better choice than what we had before OR EQUIVALENT but with exact locale
+					// echo $localekey.' @ '.$pos.' is better than '.
+					//		$selected_locale.' @ '.$selected_match_pos.'<br />';
+					$selected_locale = $localekey;
+					$selected_match_pos = $pos;
+					$selected_full_match = true;
+				}
+				// else echo $localekey.' @ '.$pos.' is not better than '.
+				//					$selected_locale.' @ '.$selected_match_pos.'<br />';
+			}
+
+			if( !$selected_full_match && ($pos = strpos( $accept, substr($localekey, 0, 2) )) !== false )
+			{	// We have no exact match yet but found lang code match
+				if( $pos < $selected_match_pos )
+				{	// This is a better choice than what we had before
+					// echo $localekey.' @ '.$pos.' is better than '.
+					//		$selected_locale.' @ '.$selected_match_pos.'<br />';
+					$selected_locale = $localekey;
+					$selected_match_pos = $pos;
+				}
+				// else echo $localekey.' @ '.$pos.' is not better than '.
+				//					$selected_locale.' @ '.$selected_match_pos.'<br />';
 			}
 		}
-		if( sizeof($text) != 0 )
+
+		if( !empty($selected_locale) )
 		{
-			sort( $text );
-			// pre_dump( $text );
-			// the preferred locale/language should be in $text[0]
-			if( preg_match('/\d\d\d\-([a-z]{2})\-(.*)/', $text[0], $matches) )
-			{
-				return $matches[2];
-			}
+			return $selected_locale;
 		}
 	}
 	return $default_locale;

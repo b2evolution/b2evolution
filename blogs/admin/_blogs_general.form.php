@@ -38,7 +38,7 @@
 									array( 'index.php', T_('Other blog through index.php'), 
 													$baseurl.'/index.php'.( 
 													($Settings->get('links_extrapath')) ? '/'.$blog_stub : '?blog='.$blog) ),
-									array( 'stub', T_('Other blog through stub file'), $baseurl.'/'.$blog_stub ),
+									array( 'stub', T_('Other blog through stub file (Advanced)'), $baseurl.'/'.$blog_stub.' &nbsp; '.T_('You MUST create a stub file for this to work.') ),
 								), T_('Preferred access type'), true );
 		?>
 		

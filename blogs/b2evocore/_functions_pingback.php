@@ -290,7 +290,7 @@ function pingback_link($file='',$c=0,$tb=0)
 	global $id;
 	if( ($file == '') || ($file == '/')	)
 		$file = get_bloginfo('blogurl');
-	echo add_url_param( $file, 'p='.$id );
+	echo url_add_param( $file, 'p='.$id );
 	if( $c == 1 )
 	{	// include comments // fplanque: added
 		echo '&amp;c=1';

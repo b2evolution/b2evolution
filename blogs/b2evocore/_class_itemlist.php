@@ -46,8 +46,8 @@ class ItemList extends DataObjectList
 
 	var $group_by_cat;
 	
-	var $limitdate_start;
-	var $limitdate_end;
+	var $limitdate_start;     // UNIX timestamp
+	var $limitdate_end;       // UNIX timestamp
 
 	// Used in looping
 	var $row_num;							// Current row
@@ -180,7 +180,7 @@ class ItemList extends DataObjectList
 				$n = '%';
 			if( ($sentence == '1') or ($sentence == 'sentence') )
 			{ // Sentence search
-				$s = trim($s);
+				$s = $DB->escape(trim($s));
 				$search .= '(post_title LIKE \''. $n. $s. $n. '\') OR (post_content LIKE \''. $n. $s. $n.'\')';
 			}
 			else
@@ -199,7 +199,7 @@ class ItemList extends DataObjectList
 				$join = '';
 				for ( $i = 0; $i < count($s_array); $i++)
 				{
-					$search .= ' '. $join. ' ( (post_title LIKE \''. $n. $s_array[$i]. $n. '\') OR (post_content LIKE \''. $n. $s_array[$i]. $n.'\') ) ';
+					$search .= ' '. $join. ' ( (post_title LIKE \''. $n. $DB->escape($s_array[$i]). $n. '\') OR (post_content LIKE \''. $n. $DB->escape($s_array[$i]). $n.'\') ) ';
 					$join = $swords;
 				}
 			}
@@ -338,7 +338,7 @@ class ItemList extends DataObjectList
 		 * ----------------------------------------------------
 		 */
 		if( !empty($poststart) )
-		{ // fp added: when in backoffice: always paged
+		{ // When in backoffice: always paged
 			// echo 'POSTSTART-POSTEND ';
 			if( $postend < $poststart )
 			{
@@ -378,15 +378,16 @@ class ItemList extends DataObjectList
 		{
 			// echo 'PAGED';
 			$pgstrt = '';
-			if ($paged) {
+			if ($paged) 
+			{
 				$pgstrt = (intval($paged) -1) * $posts_per_page. ', ';
 			}
 			$limits = 'LIMIT '. $pgstrt.$posts_per_page;
 		}
-		elseif ($what_to_show == 'days')
+		elseif( $what_to_show == 'days' )
 		{
 			// echo 'LIMIT DAYS ';
-			$lastpostdate = get_lastpostdate( $blog, $show_statuses );
+			$lastpostdate = get_lastpostdate( $blog, $show_statuses, $cat, $catsel );
 			$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
 			$lastpostdate = mysql2date('U',$lastpostdate);
 			$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
@@ -451,7 +452,7 @@ class ItemList extends DataObjectList
 		}
 
 		$this->request .= $where. " ORDER BY post_$orderby $limits";
-		// echo $where;
+		// echo '<br />where=',$where;
 
 		if ($preview)
 		{	// PREVIEW MODE:

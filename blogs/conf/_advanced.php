@@ -1,7 +1,7 @@
 <?php
 /*
  * b2evolution advanced config
- * Version of this file: 0.9
+ * Version of this file: 0.9.1
  *
  * This file includes advanced settings for b2evolution
  */

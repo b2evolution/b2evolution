@@ -61,7 +61,7 @@ function antispam_update_source( $aspm_string, $aspm_source )
  */
 function antispam_delete( $string_ID )
 {
-	global $tableantispam, $querycount;
+	global $tableantispam, $DB;
 
 	$sql = "DELETE FROM $tableantispam 
 					WHERE aspm_ID = $string_ID";
@@ -216,7 +216,7 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
 function b2evonet_poll_abuse( $display = true ) 
 {
 	global $Settings, $baseurl, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
-
+	
 	if( $display )
 	{	
 		echo "<div class=\"panelinfo\">\n";

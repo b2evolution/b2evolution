@@ -62,7 +62,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 			
 			foreach( array( 'default_blog_ID', 'posts_per_page', 'what_to_show', 'archive_mode', 'AutoBR',
 											'newusers_canregister', 'newusers_grp_ID', 'newusers_level',
-											'links_extrapath', 'permalink_type', 'user_minpwdlen') as $param )
+											'links_extrapath', 'permalink_type', 'user_minpwdlen', 'reloadpage_timeout') as $param )
 			{
 				// force type, string parameters must be listed here
 				$ptype = in_array($param, array( 'what_to_show', 'archive_mode', 'permalink_type' ) ) ? 'string' : 'integer';

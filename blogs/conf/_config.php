@@ -1,7 +1,7 @@
 <?php
 /**
  * This is b2evolution's config file
- * Version of this file: 0.9
+ * Version of this file: 0.9.1
  *
  * You need to edit this file to your settings before attempting to install the database!
  *
