@@ -18,3 +18,15 @@ span.NonExistentWikiWord {
 	border-bottom: 1px dotted #ccc;
 }
 
+div.codeblock {
+	background-color: #eee;
+	border: 1px dotted #aaa;
+	margin: 1ex;
+	padding: 1ex;
+	width: 90%;
+	overflow: auto;
+}
+
+div.codeblock pre {
+	margin: 0;
+}

@@ -12,10 +12,11 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /**
- * bpost_create(-)
- *
  * Create a new post
+ *
  * This funtion has to handle all needed DB dependencies!
+ *
+ * {@internal bpost_create(-)}}
  */
 function bpost_create(
 	$author_user_ID,              // Author
@@ -92,11 +93,12 @@ function bpost_create(
 }
 
 
-/*
- * bpost_update(-)
- *
+/**
  * Update a post
+ *
  * This funtion has to handle all needed DB dependencies!
+ *
+ * {@internal bpost_update(-)}}
  */
 function bpost_update(
 	$post_ID,
@@ -173,11 +175,12 @@ function bpost_update(
 	return 1;	// success
 }
 
-/*
- * bpost_update_status(-)
- *
+/**
  * Update a post's status
+ *
  * This funtion has to handle all needed DB dependencies!
+ *
+ * {@internal bpost_update_status(-)}}
  */
 function bpost_update_status(
 	$post_ID,
@@ -204,11 +207,12 @@ function bpost_update_status(
 }
 
 
-/*
- * bpost_delete(-)
- *
+/**
  * Delete a post
+ *
  * This funtion has to handle all needed DB dependencies!
+ *
+ * {@internal bpost_delete(-)}}
  */
 function bpost_delete( $post_ID )
 {
@@ -238,8 +242,8 @@ function bpost_delete( $post_ID )
 
 
 
-/*
- * get_lastpostdate(-)
+/**
+ * {@internal get_lastpostdate(-)}}
  */
 function get_lastpostdate( 
 		$blog = 1, 

@@ -24,8 +24,17 @@ require_once dirname(__FILE__).'/_class_dataobject.php';
  */
 class Blog extends DataObject
 {
+	/**
+	 * Short name for use in navigation menus
+	 */
 	var $shortname;
+	/**
+	 * Complete name
+	 */
 	var $name;
+	/**
+	 * Tagline to be displayed on template
+	 */
 	var $tagline;
 	var $shortdesc;	// description
 	var $longdesc;

@@ -13,13 +13,6 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 require_once dirname(__FILE__).'/../renderer.class.php';
 
-function clean_pre($text) 
-{
-	$text = stripslashes($text);
-	$text = str_replace('<br />', '', $text);
-	return $text;
-}
-
 /**
  * @package plugins
  */
@@ -65,8 +58,34 @@ class auto_p_Rendererplugin extends RendererPlugin
 		{	// We cannot render the required format
 			return false;
 		}
-	
-		$pee = $content . "\n"; // just to make things a little easier, pad the end
+
+		// REPLACE:  But not in code blocks.
+		if( strpos( $content , '<pre>' ) !== false )
+		{ // If there are code tags run this substitution
+			$content_parts = preg_split("/<\/?pre>/", $content);
+			$content = '';
+			for ( $x = 0 ; $x < count( $content_parts ) ; $x++ )
+			{
+				if ( ( $x % 2 ) == 0 )
+				{ // If x is even then it's not code and replace any smiles
+					$content .= $this->autop( $content_parts[$x] );
+				}
+				else
+				{ // If x is odd don't replace smiles. and put code tags back in.
+					$content .= '<pre>' . $content_parts[$x] . '</pre>';
+				}
+			}
+		}
+		else
+		{ // No code blocks, replace on the whole thing
+			$content = $this->autop( $content );
+		}
+		return true;
+	}
+
+	function autop( $pee )
+	{	
+		$pee = $pee. "\n"; // just to make things a little easier, pad the end
 		
 		$pee = preg_replace('|<br />\s*<br />|', "\n\n", $pee);	// Change double BRs to double newlines
 		
@@ -100,11 +119,11 @@ class auto_p_Rendererplugin extends RendererPlugin
 		$pee = preg_replace('!(</?(?:table|thead|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|blockquote|p|h[1-6])[^>]*>)\s*<br />!', "$1", $pee);
 		$pee = preg_replace('!<br />(\s*</?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)>)!', '$1', $pee);
 		
-		$content = preg_replace('!(<pre.*?>)(.*?)</pre>!ise', " stripslashes('$1') .  clean_pre('$2')  . '</pre>' ", $pee);
+		// $content = preg_replace('!(<pre.*? >)(.*?)</pre>!ise', "'$1'.clean_pre('$2').'</pre>' ", $pee);
 		
 		// $content = preg_replace('/&([^#])(?![a-z]{1,8};)/', '&#038;$1', $pee);
 		
-		return true;
+		return $pee;
 	}
 }
 
