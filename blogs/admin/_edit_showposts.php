@@ -1,9 +1,9 @@
 <div class="bPosts">
 	<div class="bPost">
 	<?php
-	require_once (dirname(__FILE__).'/_class_itemlist.php');
-	require_once (dirname(__FILE__).'/_class_calendar.php');
-	require_once (dirname(__FILE__).'/_class_archivelist.php');
+	require_once (dirname(__FILE__).'/'.$b2inc.'/_class_itemlist.php');
+	require_once (dirname(__FILE__).'/'.$b2inc.'/_class_calendar.php');
+	require_once (dirname(__FILE__).'/'.$b2inc.'/_class_archivelist.php');
 
 	
 	set_param( 'blog', 'integer', 2, true );
