@@ -57,7 +57,7 @@ function form_groupstart( $title = '' )
 
 
 /**
- * End an field group. 
+ * End an field group.
  *
  * Fieldset with legend.
  *
@@ -84,7 +84,7 @@ function form_fieldstart( $field_name, $field_label )
 }
 
 /**
- * End an input field. 
+ * End an input field.
  *
  * A field is a fieldset containing a label div and an input div.
  *
@@ -96,7 +96,7 @@ function form_fieldend()
 }
 
 /**
- * Start an info field. 
+ * Start an info field.
  *
  * An info field is a fielset containing a label div and an info div.
  *
@@ -110,7 +110,7 @@ function form_infostart( $field_label )
 }
 
 /**
- * End an info field. 
+ * End an info field.
  *
  * An info field is a fielset containing a label div and an info div.
  *
@@ -199,7 +199,7 @@ function form_text_tr( $field_name, $field_value, $field_size, $field_label, $fi
 
 
 /**
- * Builds a hidden field. 
+ * Builds a hidden field.
  *
  * @deprecated Deprecated by (@see Form::button())
  *
@@ -223,7 +223,7 @@ function form_hidden( $field_name, $field_value, $display = true )
 
 
 /**
- * Build a text area. 
+ * Build a text area.
  *
  * @deprecated Deprecated by (@see Form::textarea())
  *
@@ -254,7 +254,7 @@ function form_textarea( $field_name, $field_value, $field_rows, $field_label,
 
 
 /**
- * Display a select field and populate it with a callback function. 
+ * Display a select field and populate it with a callback function.
  *
  * @deprecated Deprecated by (@see Form::select())
  *
@@ -281,7 +281,10 @@ function form_select(
 		echo ' class="', $field_class,'"';
 	}
 	echo '>';
-	eval( $field_list_callback( $field_value ) );
+
+	// call the callback function:
+	$field_list_callback( $field_value );
+
 	echo '  </select>';
 	echo '  <span class="notes">', $field_note, '</span></div>';
 	echo "</fieldset>\n\n";
@@ -289,7 +292,7 @@ function form_select(
 
 
 /**
- * Display a select field and populate it with a cache object. 
+ * Display a select field and populate it with a cache object.
  *
  * @deprecated Deprecated by (@see Form::select_object())
  *
@@ -326,7 +329,7 @@ function form_select_object(
 
 
 /**
- * Generate set of radio options. 
+ * Generate set of radio options.
  *
  * @deprecated Deprecated by (@see Form::radio())
  *
@@ -380,7 +383,7 @@ function form_radio(
 
 
 /**
- * form_checkbox(-)  
+ * form_checkbox(-)
  *
  * @deprecated Deprecated by (@see Form::checkbox())
  *
@@ -424,7 +427,7 @@ function form_checkbox( $field_name, $field_value, $field_label, $field_note = '
 
 
 /**
- * form_checkbox_tr(-) 
+ * form_checkbox_tr(-)
  *
  * @deprecated Deprecated by (@see Form::checkbox())
  */
@@ -448,7 +451,7 @@ function form_checkbox_tr( $field_name, $field_value, $field_label, $field_note 
 
 
 /*
- * form_info(-) 
+ * form_info(-)
  *
  * @deprecated Deprecated by (@see Form::info())
  */
@@ -467,7 +470,7 @@ function form_info( $field_label, $field_info, $field_note = '' )
 
 
 /*
- * form_info_tr(-) 
+ * form_info_tr(-)
  *
  * @deprecated Deprecated by (@see Form::info())
  */
@@ -484,7 +487,7 @@ function form_info_tr( $field_label, $field_info, $field_note = '' )
 
 
 /**
- * Builds a form header and puts GET params of $action into hidden form inputs 
+ * Builds a form header and puts GET params of $action into hidden form inputs
  *
  * @deprecated Deprecated by (@see Form::begin_form())
  *
@@ -543,6 +546,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/08 01:41:25  blueyed
+ * fixed deprecated form_select()
+ *
  * Revision 1.9  2005/01/13 19:53:50  fplanque
  * Refactoring... mostly by Fabrice... not fully checked :/
  *
