@@ -77,7 +77,7 @@ if( mysql_num_rows($result) )
 	$time_lastcomment = mysql2date("U",$then);
 	$time_newcomment = mysql2date("U",$now);
 	if( ($time_newcomment - $time_lastcomment) < 30)
-		$ok=0;
+		$ok = 0;
 }
 if( !$ok )
 {
@@ -175,6 +175,6 @@ header('Pragma: no-cache');
 
 param( 'redirect_to', 'string' );
 $location = (!empty($redirect_to)) ? $redirect_to : $_SERVER['HTTP_REFERER'];
-header("Refresh:0;url=$location");
+header('Refresh:0;url=' . $location);
 
 ?>

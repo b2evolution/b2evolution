@@ -89,7 +89,7 @@ switch($action)
 		$content = format_to_post($content,$post_autobr,0);
 
 		if( errors_display( T_('Cannot post, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">'.T_('Back to post editing').'</a>]' ) )
+				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' ) )
 		{
 			break;
 		}
@@ -198,7 +198,7 @@ switch($action)
 		$content = format_to_post($content,$post_autobr,0);
 
 		if( errors_display( T_('Cannot update, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">'.T_('Back to post editing').'</a>]' ) )
+				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' ) )
 		{
 			break;
 		}
@@ -364,7 +364,7 @@ switch($action)
 		 */
 		param( 'post', 'integer' );
 		// echo $post;
-		$postdata = get_postdata( $post ) or printf( T_('Oops, no post with this ID!') );
+		$postdata = get_postdata( $post ) or die( T_('Oops, no post with this ID!') );
 		$blog = get_catblog( $postdata['Category'] );
 		get_blogparams();
 
@@ -387,13 +387,10 @@ switch($action)
 			sleep($sleep_after_edit);
 		}
 		echo '<p>', T_('Done.'), "</p>\n";
-		echo '</div><p>'
-		. T_('Deleting Done...') . '<p>';
+		echo '</div><p>' . T_('Deleting Done...') . '</p>';
 
 		$location = 'b2browse.php?blog=' . $blog;
 		break;
-
-
 
 
 	case "editedcomment":
@@ -427,7 +424,7 @@ switch($action)
 		$content = format_to_post($content,$post_autobr,0); // We are faking this NOT to be a comment
 
 		if( errors_display( T_('Cannot update comment, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">'.T_('Back to post editing').'</a>]' ) )
+				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' ) )
 		{
 			break;
 		}
