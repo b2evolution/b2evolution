@@ -202,10 +202,32 @@ class BlogCache extends DataObjectCache
 
 		parent::option_list( $default, $allow_none, 'name' );
 	}
+
+
+	/**
+	 * Returns form option list with cache contents
+	 *
+	 * Load the cache if necessary
+	 *
+	 * {@internal DataObjectCache::option_list_return(-) }}
+	 *
+	 * @param integer selected ID
+	 * @param boolean provide a choice for "none" with ID 0
+	 */
+	function option_list_return( $default = 0, $allow_none = false, $method = 'name_return' )
+	{
+		// We force a full load!
+		$this->load_all();
+
+		return parent::option_list_return( $default, $allow_none, $method );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.8  2005/03/16 19:58:23  fplanque
+ * small AdminUI cleanup tasks
+ *
  * Revision 1.7  2005/03/02 17:07:33  blueyed
  * no message
  *

@@ -44,6 +44,7 @@
  * Includes:
  */
 require dirname(__FILE__).'/_header.php';
+
 $AdminUI->setPath( 'options', param( 'tab', 'string', 'general' ) );
 
 param( 'action', 'string' );
@@ -61,6 +62,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	// clear settings cache
 	$cache_settings = '';
 
+	// TODO: make a separate file for each tab, in replacement of th eglobal b2options.php container
 	switch( $AdminUI->getPath(1) )
 	{
 		case 'general':
@@ -402,11 +404,8 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 // Check permission:
 $current_User->check_perm( 'options', 'view', true );
 
-// fplanque>> I'm not sure this is a good place to call the submenu. It should probaly be displayed within the "page top"
-$AdminUI->dispSubmenu();
 // Begin payload block:
 $AdminUI->dispPayloadBegin();
-
 
 switch( $AdminUI->getPath(1) )
 {
@@ -427,6 +426,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.91  2005/03/16 19:58:14  fplanque
+ * small AdminUI cleanup tasks
+ *
  * Revision 1.90  2005/03/15 19:19:46  fplanque
  * minor, moved/centralized some includes
  *

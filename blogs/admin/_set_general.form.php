@@ -34,7 +34,9 @@ $Form->fieldset_end();
 
 $Form->fieldset( T_('Display options') );
 
-form_select_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'), T_('This blog will be displayed on index.php .'), true );
+$Form->select_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'),
+											T_('This blog will be displayed on index.php .'), true );
+
 
 $Form->radio( 'what_to_show', $Settings->get('what_to_show'),
 							array(  array( 'days', T_('days') ),

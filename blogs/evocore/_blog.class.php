@@ -647,15 +647,37 @@ class Blog extends DataObject
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function name( $format = 'htmlbody' )
+	function name( $format = 'htmlbody', $disp = true )
 	{
-		$this->disp( 'name', $format );
+		if( $disp )
+		{ //the result must be displayed
+			$this->disp( 'name', $format );
+		}
+		else
+		{ //the result must be returned
+			return $this->dget( 'name', $format );
+		}
+	}
+
+
+ 	/**
+	 * Template function: return name of item
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function name_return( $format = 'htmlbody' )
+	{
+		$r = $this->name( $format, false );
+		return $r;
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.16  2005/03/16 19:58:23  fplanque
+ * small AdminUI cleanup tasks
+ *
  * Revision 1.15  2005/03/08 13:24:41  fplanque
  * minor
  *

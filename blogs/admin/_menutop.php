@@ -19,7 +19,11 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	<title><?php echo $AdminUI->getHtmlTitle(); ?></title>
 
 	<?php
+	// AFAICS, This is used for <base> only..
 	echo $AdminUI->getHeadlines();
+
+	// Include links (to CSS...)
+	echo $AdminUI->getHeadlinks();
 	?>
 
 	<script type="text/javascript">
@@ -36,8 +40,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/functions.js"></script>
 
 	<?php
-	// Include links (to CSS...)
-	require dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_head_links.php';
 
 	$Debuglog->add( 'Admin-Path: '.var_export($AdminUI->path, true) );
 

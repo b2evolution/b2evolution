@@ -47,11 +47,8 @@ require( dirname(__FILE__). '/_menutop.php' );
 $current_User->check_perm( 'options', 'view', true );
 
 
-// fplanque>> I'm not sure this is a good place to call the submenu. It should probaly be displayed within the "page top"
-$AdminUI->dispSubmenu();
 // Begin payload block:
 $AdminUI->dispPayloadBegin();
-
 
 // Discover additional plugins:
 $AvailablePlugins = & new Plugins();

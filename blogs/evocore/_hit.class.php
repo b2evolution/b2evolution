@@ -283,8 +283,9 @@ class Hit
 		{
 			if( stristr($this->referer, $lSearchEngine) )
 			{
-				$Debuglog->add( 'detectReferrer(): search engine ('.$engine.')', 'hit' );
+				$Debuglog->add( 'detectReferrer(): search engine ('.$lSearchEngine.')', 'hit' );
 				$this->refererType = 'search';
+				// fplanque>> shouldn't we break the loop here? 
 			}
 		}
 

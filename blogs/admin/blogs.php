@@ -334,8 +334,6 @@ switch($action)
 			$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 		}
 
-		// fplanque>> I'm not sure this is a good place to call the submenu. It should probaly be displayed within the "page top"
-		$AdminUI->dispSubmenu();
 		// Begin payload block:
 		$AdminUI->dispPayloadBegin();
 
@@ -553,6 +551,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.35  2005/03/16 19:58:17  fplanque
+ * small AdminUI cleanup tasks
+ *
  * Revision 1.34  2005/03/15 19:19:46  fplanque
  * minor, moved/centralized some includes
  *

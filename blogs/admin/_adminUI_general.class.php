@@ -336,6 +336,10 @@ class AdminUI_general
 	/**
 	 * Display a submenu (1st sublevel).
 	 *
+	 * Should be called from within the AdminUI class.
+	 *
+	 * @access protected
+	 *
 	 * @param NULL|string|array The path (NULL defaults to first path entry). See {@link getNode()}.
 	 */
 	function dispSubmenu( $path = NULL )
@@ -354,12 +358,12 @@ class AdminUI_general
 
 
 	/**
-	 * Display the end of the payload block
+	 * Display the start of the payload block
 	 */
 	function dispPayloadBegin()
 	{
-		// fp>> In current skins this merged with the SubMenu (tabs)
-		// fp>> I don't understand the templating stuff well enough to implement it right now...
+		// Display submenu (this also opens a div class="panelblock" or class="panelblocktabs")
+		$this->dispSubmenu();
 	}
 
 
@@ -370,8 +374,7 @@ class AdminUI_general
 	 */
 	function dispPayloadEnd()
 	{
-		// fp>> I don't understand the templating stuff well enough to implement it right now...
-		echo "</div>\n";
+		echo "</div>\n";	// class="panelblock*"
 	}
 
 
@@ -479,7 +482,12 @@ class AdminUI_general
 						)
 						|| isset($loop_details['text_noperm']) )
 				{ // If no permission requested or if perm granted or if we have an alt text, display tab:
-					$anchor = '<a href="'.$loop_details['href'].'"';
+					$anchor = '<a href="';
+					if( isset( $loop_details['href'] ) )
+						$anchor .= $loop_details['href'];
+					else
+						$anchor .= eval( $loop_details['href_eval'] );
+					$anchor .= '"';
 					if( isset($loop_details['style']) )
 					{
 						$anchor .= ' style="'.$loop_details['style'].'"';
@@ -743,6 +751,15 @@ class AdminUI_general
 
 
 	/**
+	 * Get links (to CSS files especially).
+	 */
+	function getHeadlinks()
+	{
+		return '';
+	}
+
+
+	/**
 	 *
 	 * @todo Move generation of blog list to this class!
 	 *
@@ -982,6 +999,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.15  2005/03/16 19:58:13  fplanque
+ * small AdminUI cleanup tasks
+ *
  * Revision 1.14  2005/03/16 16:05:09  fplanque
  * $app_footer_text
  *

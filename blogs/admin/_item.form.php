@@ -78,8 +78,6 @@ if( isset($Blog) )
 }
 
 
-// fplanque>> I'm not sure this is a good place to call the submenu. It should probaly be displayed within the "page top"
-$AdminUI->dispSubmenu();
 // Begin payload block:
 $AdminUI->dispPayloadBegin();
 
@@ -335,6 +333,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.19  2005/03/16 19:58:13  fplanque
+ * small AdminUI cleanup tasks
+ *
  * Revision 1.18  2005/03/04 18:40:26  fplanque
  * added Payload display wrappers to admin skin object
  *

@@ -82,6 +82,33 @@ class AdminUI extends AdminUI_general
 
 
 	/**
+	 * Get links (to CSS files especially).
+	 */
+	function getHeadlinks()
+	{
+		global $mode;
+
+		$r ='<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
+				<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
+				<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />';
+
+		if( is_file( dirname(__FILE__).'/custom.css' ) )
+		{
+			$r .= '<link href="custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
+		}
+
+		$r .= '<script type="text/javascript" src="styleswitcher.js"></script>';
+
+		if( $mode == 'sidebar' )
+		{ // Include CSS overrides for sidebar:
+			$r .= '<link href="sidebar.css" rel="stylesheet" type="text/css" />';
+		}
+
+		return $r;
+	}
+
+
+	/**
 	 * GLOBAL HEADER - APP TITLE, LOGOUT, ETC.
 	 *
 	 * @return string

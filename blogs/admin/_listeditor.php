@@ -164,8 +164,6 @@ if( ($action == 'delete') && !$confirm )
 }
 
 
-// fplanque>> I'm not sure this is a good place to call the submenu. It should probaly be displayed within the "page top"
-$AdminUI->dispSubmenu();
 // Begin payload block:
 $AdminUI->dispPayloadBegin();
 
@@ -245,7 +243,8 @@ else
 									 array( 'reset', 'reset', T_('Update'), 'SaveButton' ) ) );
 }
 
-echo '</div>';
+// End payload block:
+$AdminUI->dispPayloadEnd();
 
 /**
  * Display page footer:

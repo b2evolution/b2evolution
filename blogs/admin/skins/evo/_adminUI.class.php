@@ -50,6 +50,25 @@ require_once dirname(__FILE__).'/../'.$adminskins_dirout.'_adminUI_general.class
  */
 class AdminUI extends AdminUI_general
 {
+
+	/**
+	 * Get links (to CSS files especially).
+	 */
+	function getHeadlinks()
+	{
+		global $mode;
+
+		$r ='<link href="blue.css" rel="stylesheet" type="text/css" title="Blue" />';
+
+		if( $mode == 'sidebar' )
+		{ // Include CSS overrides for sidebar:
+			$r .= '<link href="sidebar.css" rel="stylesheet" type="text/css" />';
+		}
+
+		return $r;
+	}
+
+
 	/**
 	 * Get the top of the HTML <body>.
 	 *
