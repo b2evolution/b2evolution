@@ -80,50 +80,9 @@ switch($action)
 		$DB->query( "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 											bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 											bloguser_perm_cats, bloguser_perm_properties )
-									VALUES ( $blog_ID, $current_User->ID, 1, 'published,protected,private,draft,deprecated', 
-																1, 1, 1, 1 )" );
-
-		// Quick hack to create a stub file:
-		if( $blog_siteurl == '' && (1 == 0) )
-		{ // TEMPORARILY DISABLED	
-			echo '<p>', T_('Trying to create stub file'), '</p>';
-			// Determine the edit folder:
-			$current_folder = str_replace( '\\', '/', dirname(__FILE__) );
-			$last_pos = 0;
-			while( $pos = strpos( $current_folder, $admin_subdir, $last_pos ) )
-			{	// make sure we use the last occurrence
-				$edit_folder = substr( $current_folder, 0, $pos-1 );
-				$last_pos = $pos+1;
-			}
-
-			$stub_contents = file( $edit_folder.'/stub.model' );
-			echo '<p>', T_('Loading'), ': ', $edit_folder.'/stub.model', '</p>';
-
-			if( empty( $stub_contents ) )
-			{
-					echo '<p class="error">', T_('Could not load stub model.'), '</p>';
-			}
-			else
-			{
-				$new_stub_file = $edit_folder . '/' . $blog_filename;
-				echo '<p>', T_('Creating'), ': ', $new_stub_file, '...</p>';
-				$f = @fopen( $new_stub_file , "w" );
-				if( $f == false )
-				{
-					echo '<p class="error">', T_('Cannot create!'), '</p>';
-				}
-				else
-				{
-					$found = false;
-					foreach( $stub_contents as $idx => $stub_line )
-					{
-						$stub_line = ereg_replace( '\$blog *= *.+;', '$blog = '.$blog_ID.';', $stub_line );
-						fwrite( $f, $stub_line);
-					}
-					fclose($f);
-				}
-			}
-		}
+									VALUES ( $blog_ID, $current_User->ID, 1,
+													 'published,protected,private,draft,deprecated', 
+														1, 1, 1, 1 )" );
 
 		?>
 		<p><strong><?php 

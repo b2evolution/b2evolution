@@ -4,7 +4,7 @@
  *
  * This file is NOT mandatory. You can delete it if you want.
  * You can also replace the contents of this file with contents similar to the contents
- * of noskin_a.php or multiblogs.php or those of a stub file (see stub.model)
+ * of a_stub.php, a_noskin.php, multiblogs.php, etc.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

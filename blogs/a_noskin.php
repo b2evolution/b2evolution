@@ -1,48 +1,59 @@
 <?php
-	/*
-	 * This is the main template to display a blog without using skins.
-	 *
-	 * Same display using evoSkins: blog_all.php
-	 */
+/**
+ * This file will display a blog, WITHOUT using skins.
+ *
+ * This file will set some display parameters and then display the blog in a template.
+ *
+ * Note: You only need to use this file for advanced use/customization of b2evolution.
+ * Most of the time, calling your blog through index.php with a skin will be enough.
+ * You should try to customize a skin before thrying to use this fle.
+ *
+ * Same display without using skins: a_stub.php
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ */
 
-	# First, select which blog you want to display here!
-	# You can find these numbers in the back-office under the Blogs section.
-	# You can also create new blogs over there.
-	//$blog = 1;		// 1 is for ALL BLOGS
-	$default_to_blog = 1;		// Just set the default but let user override with ?blog=
+# First, select which blog you want to display here!
+# You can find these numbers in the back-office under the Blogs section.
+# You can also create new blogs over there. If you do, you may duplicate this file for the new blog.
+$blog = 2;		// 2 is for "demo blog A" or your upgraded blog (depends on your install)
 
-	# Tell b2evolution you don't want to use evoSkins for this template:
-	$skin = '';
+# Tell b2evolution you don't want to use evoSkins for this template:
+$skin = '';
 
-	# This setting retricts posts to those published, thus hiding drafts.
-	# You should not have to change this.
-	$show_statuses = array();
+# This setting retricts posts to those published, thus hiding drafts.
+# You should not have to change this.
+$show_statuses = array();
 
-	# This is the blog to be used as a linkblog (set to 0 if you don't want to use this feature)
-	$linkblog_blog = 4;
+# This is the blog to be used as a linkblog (set to 0 if you don't want to use this feature)
+$linkblog_blog = 4;
 
-	# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
-	# Example: $linkblog_cat = '4,6,7';
-	$linkblog_cat = '';
+# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
+# Example: $linkblog_cat = '4,6,7';
+$linkblog_cat = '';
 
-	# This is the array if categories to restrict the linkblog to (non recursive)
-	# Example: $linkblog_catsel = array( 4, 6, 7 );
-	$linkblog_catsel = array( );
+# This is the array if categories to restrict the linkblog to (non recursive)
+# Example: $linkblog_catsel = array( 4, 6, 7 );
+$linkblog_catsel = array( );
 
-	# Here you can set a limit before which posts will be ignored
-	# You can use a unix timestamp value or 'now' which will hide all posts in the past
-	$timestamp_min = '';
+# Here you can set a limit before which posts will be ignored
+# You can use a unix timestamp value or 'now' which will hide all posts in the past
+$timestamp_min = '';
 
-	# Here you can set a limit after which posts will be ignored
-	# You can use a unix timestamp value or 'now' which will hide all posts in the future
-	$timestamp_max = 'now';
+# Here you can set a limit after which posts will be ignored
+# You can use a unix timestamp value or 'now' which will hide all posts in the future
+$timestamp_max = 'now';
+
+# Additionnaly, you can set other values (see URL params in the manual)...
+# $order = 'ASC'; // This for example would display the blog in chronological order...
+
+# Let b2evolution handle the query string and load the blog data:
+require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 
 
-	# Let b2evolution handle the query string and load the blog data:
-	require(dirname(__FILE__).'/b2evocore/_blog_main.php');
-
-
-	# Now, below you'll find the main template...
+# Now, below you'll find the main template...
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -143,7 +154,7 @@
 	<div class="bPost" lang="<?php $Item->lang() ?>">
 		<?php $Item->anchor(); ?>
 		<div class="bSmallHead">
-		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
+		<a href="<?php $Item->permalink() ?>" title="Permanent link to full entry"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a>
 		<?php $Item->issue_time();	echo ', ', T_('Categories'), ': ';	$Item->categories() ?>
 		</div>
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
@@ -164,7 +175,6 @@
 		$disp_comments = 1;					// Display the comments if requested
 		$disp_comment_form = 1;			// Display the comments form if comments requested
 		$disp_trackbacks = 1;				// Display the trackbacks if requested
-
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
 		require( get_path('skins').'/_feedback.php');
@@ -259,7 +269,7 @@
 
 	<?php if (! $stats)
 	{ ?>
-<div class="bSideItem">
+	<div class="bSideItem">
 		<h3><?php echo T_('Recent Referers') ?></h3>
 			<?php refererList(5,'global'); ?>
 			<ul>
@@ -277,7 +287,7 @@
 				<?php } // End stat loop ?>
 				<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
 			</ul>
-</div>
+	</div>
 
 	<?php } ?>
 
