@@ -2,11 +2,11 @@
 /**
  * This file implements the blog object
  *
- * @package b2evolution {@link http://b2evolution.net}
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/ }
- *
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ * @package b2evocore
  */
 require_once dirname(__FILE__).'/_class_dataobject.php';
 

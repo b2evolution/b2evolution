@@ -1,5 +1,7 @@
 <?php
-/*
+/**
+ * @deprecated
+ *
  * b2evolution - http://b2evolution.net/
  *
  * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/

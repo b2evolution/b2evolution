@@ -1,17 +1,15 @@
 <?php
- /**
-	* @package pop3
-	*
-	* @copyright (c) 1999-2002 The SquirrelMail Project Team
-	* @copyright (c) 1999 CDI (cdi@thewebmasters.net) All Rights Reserved
-	* Modified by Philippe Mingo 2001 mingo@rotedic.com
-	* An RFC 1939 compliant wrapper class for the POP3 protocol.
-	*
-	* Licensed under the GNU GPL. For full terms see the file COPYING.
-	*
-	* pop3 class
-	*
-	*/
+/**
+ * An RFC 1939 compliant wrapper class for the POP3 protocol.
+ * 
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)1999-2002 The SquirrelMail Project Team
+ * @copyright (c)1999 CDI (cdi@thewebmasters.net) All Rights Reserved
+ *
+ * @package pop3
+ */
 
 class POP3 {
 		var $ERROR			= '';				//	Error string.

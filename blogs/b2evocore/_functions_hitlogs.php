@@ -1,11 +1,13 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * Logging of hits
+ * 
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
- *
- * This file built upon code by N C Young (nathan@ncyoung.com) (http://ncyoung.com/entry/57)
+ * @package b2evocore
+ * @author sThis file built upon code by N C Young (nathan@ncyoung.com) (http://ncyoung.com/entry/57)
  */
 require_once (dirname(__FILE__)."/$core_dirout/$conf_subdir/_stats.php");
 

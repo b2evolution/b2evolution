@@ -1,24 +1,18 @@
 <?php
-
-// fplanque: PLEASE NOTE: this class isn't exactly as reliable as I'd like to.
-// I am doing some transformations.
-
-// ==================================================================
-//  Author: Justin Vincent (justin@visunet.ie)
-//	Web: 	http://php.justinvincent.com
-//	Name: 	ezSQL
-// 	Desc: 	Class to make it very easy to deal with mySQL database connections.
-//
-// !! IMPORTANT !!
-//
-//  Please send me a mail telling me what you think of ezSQL
-//  and what your using it for!! Cheers. [ justin@visunet.ie ]
-//
-
-/*
- * Additions:
+/**
+ * ezSQL - Class to make it very easy to deal with mySQL database connections.
+ *
+ * b2evo Additions:
  * - query log
  * - get_list
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
+ * @author Justin Vincent (justin@visunet.ie), {@link http://php.justinvincent.com}
+ * @todo PLEASE NOTE: this class isn't exactly as reliable as I'd like to. I am doing some transformations. (fplanque)
  */
 
 // ==================================================================

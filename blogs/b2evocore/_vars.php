@@ -1,12 +1,13 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
- *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
- *
+/**
  * This file sets various arrays and variables for use in b2evolution
- * This file built upon code from original b2 - http://cafelog.com/
+ * 
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
+ * @author This file built upon code from original b2 - http://cafelog.com/
  */
 
 $b2_version = '0.8.9+CVS';

@@ -1,13 +1,15 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
- *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
- *
+/**
  * This file initializes everything BUT the blog!
+ *
  * It is useful when you want to do very customized templates!
  * It is also called by more complete initializers.
+ * 
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
  */
 if( isset( $main_init ) )
 {	// Prevent double loading since require_once won't work in all situations

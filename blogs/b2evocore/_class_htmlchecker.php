@@ -1,13 +1,16 @@
 <?php
-/*
-   SafeHtmlChecker - checks HTML against a subset of 
-   elements to ensure safety and XHTML validation.
-   
-   Simon Willison, 23rd Feb 2003
-	 
-	 Modified by Francois PLANQUE (June 2003) for b2evoltion - http://b2evolution.net/
-	 Modified by SAKIYAMA Nobuo (July 2003) : extended DTD and attributes
-*/
+/**
+ * SafeHtmlChecker
+ * 
+ * checks HTML against a subset of elements to ensure safety and XHTML validation.
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
+ * @author Simon Willison, 23rd Feb 2003, modified by fplanque, sakichan
+ */
 class SafeHtmlChecker 
 {
     var $tags;    		// Array showing allowed attributes for tags
