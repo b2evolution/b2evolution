@@ -416,11 +416,14 @@ require( dirname(__FILE__).'/_menutop_end.php' );
 ?>
 <div id="filemanmain">
 <?php
-if( $Fileman->Messages->count( 'all' ) || isset( $message ) )
+if( $Fileman->Messages->count( 'all' ) || isset( $message )
+		|| $Messages->count( 'all' ) )
 {
 	?>
 	<div class="fm_messages">
 	<?php
+	$Messages->display( '', '', true, 'error' );
+	$Messages->display( '', '', true, 'note' );
 	$Fileman->Messages->display( '', '', true, 'error' );
 	$Fileman->Messages->display( '', '', true, 'note' );
 	if( isset($message) )

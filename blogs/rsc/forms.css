@@ -38,6 +38,9 @@ form.fform fieldset fieldset {
 	margin: 2ex;
 	padding: 0;
 }
+form.fform fieldset.submit fieldset {
+	background: transparent;
+}
 form.fform div.label {
 	float: left;
 	width: 24%;
@@ -51,6 +54,7 @@ form.fform div.input {
 }
 form.fform fieldset.submit {
 	border:0;
+	background:transparent;
 	clear:both;
 }
 form.fform fieldset.left60 {

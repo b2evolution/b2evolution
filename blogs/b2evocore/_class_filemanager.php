@@ -14,38 +14,85 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 class FileManager
 {
+	/**
+	 * root directory
+	 * @param string
+	 */
 	var $root;
-	var $cwd;        // current working directory
+	
+	/**
+	 * current working directory
+	 * @param string
+	 */
+	var $cwd;
 
-	var $order = 'size';
-	var $orderasc = '#'; // '#' is default and means ascending for 'name', descending for the rest
 
-
-	// --- going to user options ---
+	/**
+	 * User preference: sort dirs at top
+	 * @var boolean
+	 */
+	var $dirsattop = true;
+	
+	/**
+	 * User preference: show hidden files?
+	 * @var boolean
+	 */
 	var $showhidden = true;
+	
+	// --- going to user options ---
+	var $fulldirsize = false;
 	var $permlikelsl = true; // show permissions like "ls -l" or octal?
 	var $default_chmod_file = 0700;
 	var $default_chmod_dir = 0700;
-	var $dirsattop = true;
-	var $fulldirsize = false;
 
 
-	/** PRIVATE **/
-	var $current_idx = -1;  // represents current entry for looping
+	/* ----- PRIVATE ----- */
+	
+	/**
+	 * the current index of the directory items (looping)
+	 * @var integer
+	 * @private
+	 */
+	var $current_idx = -1;
+
+
+	/**
+	 * order files by what?
+	 * 'name' as default.
+	 * @var string
+	 * @private
+	 */
+	var $order = '#';
+	
+	/**
+	 * files ordered ascending?
+	 * '#' is default and means ascending for 'name', descending for the rest
+	 * @var boolean
+	 * @private
+	 */
+	var $orderasc = '#';
+
+	/**
+	 * relative path
+	 * @var string
+	 * @private
+	 */
+	var $cd = '#';
 
 
 	/**
 	 * Constructor
 	 *
 	 * @param User the current User {@link User}}
-	 * @param string the root dir
+	 * @param string the dir of the Filemanager object
+	 * @param string order files by what? ('#' means 'name')
+	 * @param string 
 	 */
-	function FileManager( $cUser, $url, $dir = '#', $order = 'name', $asc = '#' )
+	function FileManager( $cUser, $url, $cd = '#', $order = '#', $asc = '#' )
 	{
 		global $basepath, $baseurl, $media_subdir, $core_dirout, $admin_subdir, $admin_url;
 
 		$this->Messages = new Log( 'error' );
-
 		$this->user = $cUser;
 
 		$this->order = $order;
@@ -77,13 +124,13 @@ class FileManager
 		$this->root_url = $baseurl.'/'.$media_subdir;
 		$this->debug( $this->root_url, 'root_url' );
 
-		if( $dir == '#' || empty($dir) )
+		if( $cd == '#' || empty($cd) )
 		{
 			$this->cwd = $media_dir;
 		}
 		else
 		{
-			$this->cwd = $this->root.$dir;
+			$this->cwd = $this->root.$cd;
 		}
 		$this->debug( $this->cwd, 'cwd' );
 
@@ -103,6 +150,7 @@ class FileManager
 		else
 		{
 			$this->cwd = $realcwd;
+			$this->cd = $cd;  // remember the change
 		}
 
 		// get the subpath relative to root
@@ -249,21 +297,21 @@ class FileManager
 	 *
 	 * @param string override cd
 	 * @param string override order
-	 * @param string override asc
+	 * @param boolean override asc
 	 */
-	function curl( $cd = '#', $order = '#', $asc = '#' )
+	function curl( $cd = '#', $order = '#', $orderasc = '#' )
 	{
 		$r = $this->url;
 
-		foreach( array('cd', 'order', 'asc') as $check )
+		foreach( array('cd', 'order', 'orderasc') as $check )
 		{
-			if( isset( $_GET[ $check ] ) && $$check == '#' )
-			{
-				$r = url_add_param( $r, $check.'='.$_GET[$check] );
-			}
-			elseif( $$check != '#' )
+			if( $$check != '#' )
 			{
 				$r = url_add_param( $r, $check.'='.$$check );
+			}
+			elseif( $this->$check != '#' )
+			{
+				$r = url_add_param( $r, $check.'='.$this->$check );
 			}
 		}
 
@@ -413,7 +461,7 @@ class FileManager
 	 * @author zilinex at linuxmail dot com {@link www.php.net/manual/en/function.fileperms.php}
 	 * @param string
 	 */
-	function TranslatePerm( $in_Perms )
+	function translatePerm( $in_Perms )
 	{
 		$sP = '';
 
@@ -502,7 +550,9 @@ class FileManager
 				break;
 
 			case 'nicesize':
-				if( ($r = $this->cget('size')) !== false )
+				if( $this->cisdir() )
+					$r = '&lt;dir&gt;';
+				elseif( ($r = $this->cget('size')) !== false )
 					$r = $this->bytesreadable( $r );
 				else
 					$r = '';
