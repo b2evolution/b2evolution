@@ -24,10 +24,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
- * @package plugins
+ * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE.
+ *
+ * @todo Ultimate goal here is to have a reconfigurable admin structure...
  *
  * @version $Id$
  */
@@ -39,9 +41,9 @@ switch( $admin_tab )
 		// Settings screen:
 		$submenu = array(
 			'general' => array( T_('General'), 'b2options.php?tab=general' ),
-			'regional' => array( T_('Regional'), 'b2options.php?tab=regional'.( $notransext ? '&amp;notransext=1' : '' ) ),
-			'files' => array( T_('Files'), 'b2options.php?tab=files' ),
-			'plugins' => array( T_('Plug-ins'), 'b2options.php?tab=plugins'),
+			'regional' => array( T_('Regional'), 'b2options.php?tab=regional'.( (isset($notransext) && $notransext) ? '&amp;notransext=1' : '' ) ),
+			'files' => array( T_('Files'), 'fileset.php' ),
+			'plugins' => array( T_('Plug-ins'), 'plugins.php'),
 			);
 		break;
 
@@ -86,3 +88,5 @@ switch( $admin_tab )
 		</ul>
 	</div>
 </div>
+
+<div class="tabbedpanelblock">

@@ -94,9 +94,6 @@ switch( $action )
 // Display submenu:
 require dirname(__FILE__).'/_submenu.inc.php';
 
-?>
-<div class="tabbedpanelblock">
-<?php
 switch( $tab )
 {
 	case 'summary':
@@ -701,8 +698,8 @@ switch( $tab )
   }
 		break;
 }
-?>
-</div>
-<?php
-require( dirname(__FILE__).'/_footer.php' );
+
+require dirname(__FILE__).'/_sub_end.inc.php';
+
+require dirname(__FILE__).'/_footer.php';
 ?>

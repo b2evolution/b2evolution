@@ -11,7 +11,7 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 
-<form class="fform" name="form" action="b2options.php" method="post">
+<form class="fform" name="form" action="plugins.php" method="post">
 	<input type="hidden" name="action" value="update" />
 	<input type="hidden" name="tab" value="<?php echo $tab; ?>" />
 
@@ -35,7 +35,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			?>
 			<tr>
 				<td class="firstcol"><?php	$loop_Plugin->name(); ?></td>
-				<td><a href="b2options.php?tab=plugins&amp;action=uninstall&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>" title="<?php echo T_('Un-install this plugin!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Un-install this plugin!') ?>" /></a></td>
+				<td><a href="plugins.php?action=uninstall&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>" title="<?php echo T_('Un-install this plugin!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Un-install this plugin!') ?>" /></a></td>
 				<td class="right"><?php	echo $loop_Plugin->priority; ?></td>
 				<td><?php	echo $loop_Plugin->apply_when; ?></td>
 				<td><?php	$loop_Plugin->short_desc(); ?></td>
@@ -69,7 +69,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			?>
 			<tr>
 				<td class="firstcol"><?php	$loop_Plugin->name(); ?></td>
-				<td>[<a href="b2options.php?tab=plugins&amp;action=install&amp;plugin=<?php echo urlencode($loop_Plugin->classname) ?>"><?php
+				<td>[<a href="plugins.php?action=install&amp;plugin=<?php echo urlencode($loop_Plugin->classname) ?>"><?php
 						 echo T_('Install');
 						 if( $registrations = $Plugins->count_regs($loop_Plugin->classname) )
 						 {	// This plugin is already installed

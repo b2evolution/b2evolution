@@ -28,14 +28,8 @@ switch( $tab )
 	case 'general':
 		$admin_pagetitle .= ' :: '. T_('General');
 		break;
-	case 'files':
-		$admin_pagetitle .= ' :: '. T_('Files');
-		break;
 	case 'regional':
 		$admin_pagetitle .= ' :: '. T_('Regional');
-		break;
-	case 'plugins':
-		$admin_pagetitle .= ' :: '. T_('Plug-ins');
 		break;
 }
 
@@ -43,7 +37,7 @@ require( dirname(__FILE__). '/_menutop.php' );
 require( dirname(__FILE__). '/_menutop_end.php' );
 
 
-if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 'extract', 'install', 'uninstall' ))
+if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 'extract' ))
 		|| !empty($prioup) || !empty($priodown) || !empty($delete)
 	)
 { // We have an action to do..
@@ -89,51 +83,6 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 			}
 
 			break;
-
-
-		case 'plugins':
-			// UPDATE plug-ins:
-			switch( $action )
-			{
-				case 'install':
-					// Install plugin:
-					param( 'plugin', 'string', true );
-					echo '<div class="panelinfo">';
-					echo '<h3>Installing '.$plugin.'...</h3>';
-					$Plugins->install( $plugin );
-					echo '</div>';
-					break;
-
-				case 'uninstall':
-					// Uninstall plugin:
-					param( 'plugin_ID', 'int', true );
-					echo '<div class="panelinfo">';
-					echo '<h3>Uninstalling plgin #'.$plugin_ID.'...</h3>';
-					$Plugins->uninstall( $plugin_ID );
-					echo '</div>';
-					break;
-			}
-			break;
-
-
-		case 'files':
-			param( 'upload_enabled', 'integer', 0 );
-			$Settings->set( 'upload_enable', $reloadpage_timeout );
-			param( 'upload_realpath', 'string', true );
-			$Settings->set( 'upload_realpath', $reloadpage_realpath );
-			param( 'upload_url', 'string', true );
-			$Settings->set( 'upload_url', $reloadpage_url );
-
-			param( 'upload_allowedext', 'string', true );
-			$Settings->set( 'upload_allowedext', trim($reloadpage_allowedext) );
-			param( 'upload_maxkb', 'integer', 0 );
-			$Settings->set( 'upload_maxkb', $reloadpage_maxkb );
-
-			#param( 'upload_minlevel', 'integer', true );
-			#$Settings->set( 'upload_minlevel', $reloadpage_minlevel );
-
-			break;
-
 
 		case 'regional':
 		switch( $action )
@@ -364,6 +313,8 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 
 			default:
 				// --- DELETE locale from DB
+				// FP: NOTE: defaulting to a DELETE is a serious weakness
+				// in terms of foolproof design.
 				if( !empty($delete) )
 				{
 					$query = "DELETE FROM T_locales WHERE loc_locale = '$delete'";
@@ -423,8 +374,6 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 			locale_overwritefromDB();
 			break;
 
-
-
 	}
 
 	if( $msg = $Messages->display( '', '', true, 'note', 'panelinfo', '<p>' ) );
@@ -436,33 +385,19 @@ $current_User->check_perm( 'options', 'view', true );
 // Display submenu:
 require dirname(__FILE__).'/_submenu.inc.php';
 
-?>
-	<div class="tabbedpanelblock">
-	<?php
-		switch( $tab )
-		{
-			case 'general':
-				// ---------- GENERAL OPTIONS ----------
-				require_once dirname(__FILE__).'/_set_general.form.php';
-				break;
+switch( $tab )
+{
+	case 'general':
+		// ---------- GENERAL OPTIONS ----------
+		require dirname(__FILE__).'/_set_general.form.php';
+		break;
+	case 'regional':
+		// ---------- REGIONAL OPTIONS ----------
+		require dirname(__FILE__).'/_set_regional.form.php';
+		break;
+}
 
-			case 'files':
-				// ---------- FILE MANAGEMENT OPTIONS ----------
-				require_once dirname(__FILE__).'/_set_files.form.php';
-				break;
+require dirname(__FILE__).'/_sub_end.inc.php';
 
-			case 'regional':
-				// ---------- REGIONAL OPTIONS ----------
-				require_once dirname(__FILE__).'/_set_regional.form.php';
-				break;
-
-			case 'plugins':
-				// ---------- PLUGIN OPTIONS ----------
-				require_once dirname(__FILE__).'/_set_plugins.form.php';
-				break;
-		}
-		?>
-	</div>
-<?php
-	require( dirname(__FILE__). '/_footer.php' );
+require dirname(__FILE__).'/_footer.php';
 ?>

@@ -11,7 +11,7 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 ?>
 
-<form class="fform" name="form" action="b2options.php" method="post">
+<form class="fform" name="form" action="fileset.php" method="post">
 	<input type="hidden" name="action" value="update" />
 	<input type="hidden" name="tab" value="<?php echo $tab; ?>" />
 	

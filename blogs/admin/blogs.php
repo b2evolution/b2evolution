@@ -294,9 +294,6 @@ switch($action)
 		// Display submenu:
 		require dirname(__FILE__).'/_submenu.inc.php';
 
-		?>
-		<div class="tabbedpanelblock">
-		<?php
 		switch( $tab )
 		{
 			case 'general':
@@ -329,7 +326,8 @@ switch($action)
 				require( dirname(__FILE__).'/_blogs_advanced.form.php' );
 				break;
 		}
-		echo '</div>'; // }}}
+		require dirname(__FILE__).'/_sub_end.inc.php';
+		// }}}
 		break;
 
 
