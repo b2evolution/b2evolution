@@ -133,7 +133,7 @@ class UserCache extends DataObjectCache
 		global $DB, $Debuglog;
 
 		static $alreadyLoaded = array();
-
+		// TODO: doesn't $this->cache already fit this purpose??
 		if( isset( $alreadyLoaded[$blog_ID] ) )
 		{
 			$Debuglog->add( "Already loaded <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache" );
@@ -145,8 +145,8 @@ class UserCache extends DataObjectCache
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache" );
 
 		foreach( $DB->get_results( 'SELECT *
-																FROM T_users INNER JOIN T_blogusers ON ID = bloguser_user_ID
-																WHERE bloguser_blog_ID = '.$blog_ID.'
+																	FROM T_users INNER JOIN T_blogusers ON ID = bloguser_user_ID
+																 WHERE bloguser_blog_ID = '.$blog_ID.'
 																	AND bloguser_ismember <> 0' ) as $row )
 		{
 			$this->add( new User( $row ) );
@@ -215,6 +215,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/15 20:05:52  fplanque
+ * no message
+ *
  * Revision 1.10  2005/02/14 21:17:54  blueyed
  * optimized cache handling
  *

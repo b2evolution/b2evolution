@@ -57,7 +57,7 @@ if( $current_User->check_perm( 'users', 'view' ) )
 		}
 		?>
 		<a title="<?php echo T_('Close user profile'); ?>" href="b2users.php"><?php
-			echo getIcon( 'close', 'imgtag', array( 'alt' => 'X', 'title' => T_('Close user profile') ) );
+			echo getIcon( 'close', 'imgtag', array( 'title' => T_('Close user profile') ) );
 			?></a>
 	</div>
 	<?php

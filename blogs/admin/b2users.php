@@ -192,6 +192,10 @@ else switch ($action)
 				$edited_User->dbupdate();
 
 				$Messages->add( T_('User updated.'), 'note' );
+
+				// Commit changes in cache:
+				// not ready: $UserCache->add( $edited_Group );
+				// is this working now?
 			}
 			else
 			{ // Insert user into DB

@@ -58,13 +58,13 @@
  * @version $Id$
  */
 
-if( defined( 'B2_MAIN_INIT' ) )
+if( defined( 'EVO_MAIN_INIT' ) )
 { // Prevent double loading since require_once won't work in all situations
 	// on windows when some subfolders have caps :(
 	// (Check it out on static page generation)
 	return;
 }
-define( 'B2_MAIN_INIT', true );
+define( 'EVO_MAIN_INIT', true );
 
 
 /**
@@ -309,6 +309,9 @@ require_once( $conf_path.'_icons.php' );
 
 /*
  * $Log$
+ * Revision 1.16  2005/02/15 20:05:51  fplanque
+ * no message
+ *
  * Revision 1.15  2005/02/10 23:00:31  blueyed
  * small enhancements
  *

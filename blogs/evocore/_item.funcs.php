@@ -1407,7 +1407,7 @@ function cat_select( $display_info = true )
 			if( ! blog_has_cats( $current_blog_ID ) ) continue;
 			if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
 			$r .= '<h4>'.format_to_output($i_blog->blog_name)."</h4>\n";
-			$r .= '<table class="catselect">'.cat_select_header();
+			$r .= '<table cellspacing="0" class="catselect">'.cat_select_header();
 			$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
 										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
 			$r .= '</table>';
@@ -1452,8 +1452,7 @@ function cat_select_header()
 	global $current_blog_ID, $blog, $allow_cross_posting;
 
 	$r = '<thead><tr><th class="selector catsel_main">'.T_('Main').'</th>';
-
-	if( $allow_cross_posting )
+	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
 	{ // This is current blog or we allow moving posts accross blogs
 		$r .= '<th class="selector catsel_extra">'.T_('Extra').'</th>';
 	}
@@ -1542,6 +1541,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.15  2005/02/15 20:05:49  fplanque
+ * no message
+ *
  * Revision 1.14  2005/02/10 22:57:23  blueyed
  * fixed catselection
  *

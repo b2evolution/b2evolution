@@ -338,53 +338,52 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 param( 'blog', 'integer', 0, true ); // We may need this for the urls
 
 $menu = array(
-	'new' => array( 'text' => T_('Write'),
-									'href' => regenerate_url( '', '', 'b2edit.php' ),
+	'new' => array( 'text'=>T_('Write'),
+									'href'=>'b2edit.php?blog='.$blog,
 									'style'=>'font-weight: bold;' ),
 
-	'edit' => array( 'text'  => T_('Edit'),
-									 'href'  => regenerate_url( '', '', 'b2browse.php' ),
-									 'style' => 'font-weight: bold;' ),
+	'edit' => array( 'text'=>T_('Edit'),
+										'href'=>'b2browse.php?blog='.$blog,
+										'style'=>'font-weight: bold;' ),
 
-	'cats' => array( 'text' => T_('Categories'),
-									 'href' => regenerate_url( '', '', 'b2categories.php' ) ),
+	'cats' => array( 'text'=>T_('Categories'),
+										'href'=>'b2categories.php?blog='.$blog ),
 
+	'blogs' => array( 'text'=>T_('Blogs'),
+										'href'=>'blogs.php' ),
 
-	'blogs' => array( 'text' => T_('Blogs'),
-										'href' => regenerate_url( '', '', 'blogs.php' ) ),
+	'stats' => array( 'text'=>T_('Stats'),
+										'perm_name'=>'stats',
+										'perm_level'=>'view',
+										'href'=>'b2stats.php' ),
 
-	'stats' => array( 'text' => T_('Stats'),
-										'perm_name' => 'stats',
-										'perm_level' => 'view',
-										'href' => regenerate_url( '', '', 'b2stats.php' ) ),
+	'antispam' => array( 'text'=>T_('Antispam'),
+												'perm_name'=>'spamblacklist',
+												'perm_level'=>'view',
+												'href'=>'b2antispam.php' ),
 
-	'antispam' => array( 'text' => T_('Antispam'),
-												'perm_name' => 'spamblacklist',
-												'perm_level' => 'view',
-												'href' => regenerate_url( '', '', 'b2antispam.php' ) ),
+	'templates' => array( 'text'=>T_('Templates'),
+												'perm_name'=>'templates',
+												'perm_level'=>'any',
+												'href'=>'b2template.php' ),
 
-	'templates' => array( 'text' => T_('Templates'),
-												'perm_name' => 'templates',
-												'perm_level' => 'any',
-												'href' => regenerate_url( '', '', 'b2template.php' ) ),
-
-	'users' => array( 'text' => T_('Users'),
-										'perm_name' => 'users',
-										'perm_level' => 'view',
-										'text_noperm' => T_('User Profile'), // displayed if perm not granted
-										'href' => regenerate_url( '', '', 'b2users.php' ) ),
+	'users' => array( 'text'=>T_('Users'),
+										'perm_name'=>'users',
+										'perm_level'=>'view',
+										'text_noperm'=>T_('User Profile'),	// displayed if perm not granted
+										'href'=>'b2users.php' ),
 
 	// TODO: check filemanager permission
-	'files' => array( 'text' => T_('Files'),
-										'href' => regenerate_url( '', '', 'files.php' ) ),
+	'files' => array( 'text'=>T_('Files'),
+										'href'=>'files.php' ),
 
-	'options' => array( 'text' => T_('Settings'),
-											'perm_name' => 'options',
-											'perm_level' => 'view',
-											'href' => regenerate_url( '', '', 'b2options.php' ) ),
+	'options' => array( 'text'=>T_('Settings'),
+											'perm_name'=>'options',
+											'perm_level'=>'view',
+											'href'=>'b2options.php' ),
 
-	'tools' => array( 'text' => T_('Tools'),
-										'href' => regenerate_url( '', '', 'tools.php' ) ),
+	'tools' => array( 'text'=>T_('Tools'),
+										'href'=>'tools.php' ),
 
 	);
 
