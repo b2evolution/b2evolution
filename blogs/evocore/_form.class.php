@@ -122,7 +122,7 @@ class Form extends Widget
 
 			case 'fieldset':
 				$this->formstart = '';
-				$this->title_fmt = '$title$'."\n";
+				$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 				$this->fieldstart = "<fieldset>\n";
 				$this->labelstart = '<div class="label">';
 				$this->labelend = "</div>\n";

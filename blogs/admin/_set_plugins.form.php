@@ -19,7 +19,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			<th></th>
 			<th><?php echo T_('Priority') ?></th>
 			<th><?php echo T_('Apply') ?></th>
-			<th><?php echo T_('Description') ?></th>
+			<th class="lastcol"><?php echo T_('Description') ?></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -33,7 +33,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			<td><a href="plugins.php?action=uninstall&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>" title="<?php echo T_('Un-install this plugin!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Un-install this plugin!') ?>" /></a></td>
 			<td class="right"><?php	echo $loop_Plugin->priority; ?></td>
 			<td><?php	echo $loop_Plugin->apply_when; ?></td>
-			<td><?php	$loop_Plugin->short_desc(); ?></td>
+			<td class="lastcol"><?php	$loop_Plugin->short_desc(); ?></td>
 		</tr>
 		<?php
 		}
@@ -47,7 +47,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		<tr>
 			<th class="firstcol"><?php echo T_('Plug-in') ?></th>
 			<th><?php echo T_('Actions') ?></th>
-			<th><?php echo T_('Description') ?></th>
+			<th class="lastcol"><?php echo T_('Description') ?></th>
 		</tr>
 		<?php
 		$AvailablePlugins->restart();	 // make sure iterator is at start position
@@ -68,7 +68,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 					 }
 					 ?></a>]
 			</td>
-			<td><?php	$loop_Plugin->short_desc(); ?></td>
+			<td class="lastcol"><?php	$loop_Plugin->short_desc(); ?></td>
 		</tr>
 		<?php
 		}

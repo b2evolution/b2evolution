@@ -978,13 +978,13 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 
 		if( in_array( $var, $ignore ) )
 		{ // we don't want to include that one
-			$Debuglog->add( 'regenerate_url(): ignoring '.$var, 'params' );
+			// $Debuglog->add( 'regenerate_url(): ignoring '.$var, 'params' );
 			continue;
 		}
-		else
-		{
-			$Debuglog->add( 'regenerate_url(): recycling '.$var, 'params' );
-		}
+		// else
+		// {
+		//	$Debuglog->add( 'regenerate_url(): recycling '.$var, 'params' );
+		// }
 
 		// Special cases:
 		switch( $var )
@@ -1852,6 +1852,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.60  2005/03/21 18:54:27  fplanque
+ * results/table/form layout refactoring
+ *
  * Revision 1.59  2005/03/15 19:19:48  fplanque
  * minor, moved/centralized some includes
  *
