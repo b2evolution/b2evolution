@@ -35,7 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE.
  *
  * @todo skin compliant header!
  *
@@ -45,8 +45,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<title><?php echo $selectedFile->getName().' :: '.$app_name.' '.T_('Filemanager') ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<title><?php echo $selectedFile->getName().' :: '.$app_name.' '.T_('Filemanager'); ?></title>
 	<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
 	<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
 	<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
