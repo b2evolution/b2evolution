@@ -65,8 +65,6 @@ switch( $action )
 			break;
 		}
 
-		$user_nickname = $login;
-
 		// checking e-mail address:
 		if($email == '')
 		{
@@ -93,7 +91,7 @@ switch( $action )
 		$new_User = & new User();
 		$new_User->set( 'login', $login );
 		$new_User->set( 'pass', md5($pass1) ); // encrypted
-		$new_User->set( 'nickname', $user_nickname );
+		$new_User->set( 'nickname', $login );
 		$new_User->set( 'email', $email );
 		$new_User->set( 'ip', '127.0.0.1' );
 		$new_User->set( 'domain', 'localhost' );

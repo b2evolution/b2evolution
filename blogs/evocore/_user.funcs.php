@@ -60,7 +60,7 @@ require_once dirname(__FILE__). '/_user.class.php';
 function veriflog( $login_required = false )
 {
 	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error;
-	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_nickname, $user_email, $user_url;
+	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_email, $user_url;
 	global $current_User;
 	global $DB, $UserCache;
 
@@ -70,7 +70,6 @@ function veriflog( $login_required = false )
 	$user_pass_md5 = '';
 	$userdata = '';
 	$user_ID = '';
-	$user_nickname = '';
 	$user_email = '';
 	$user_url = '';
 
@@ -169,12 +168,12 @@ function veriflog( $login_required = false )
 	 * Login info is OK, we set the global variables:
 	 */
 	// echo 'LOGGED IN';
-	$userdata	= get_userdatabylogin($user_login);
-	$current_User = $UserCache->get_by_ID( $userdata['ID'] ); // COPY!?
+	// TODO: $UserCache::get_by_login()!
+	$userdata = get_userdatabylogin($user_login);
+	$current_User = $UserCache->get_by_login( $user_login ); // we cannot set a global by reference!!
 	# echo $current_User->disp('login');
 
 	$user_ID = $userdata['ID'];
-	$user_nickname = $userdata['user_nickname'];
 	$user_email	= $userdata['user_email'];
 	$user_url	= $userdata['user_url'];
 
@@ -188,7 +187,7 @@ function veriflog( $login_required = false )
 function logout()
 {
 	global $cookie_user, $cookie_pass, $cookie_expired, $cookie_path, $cookie_domain;
-	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_nickname, $user_email, $user_url;
+	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_email, $user_url;
 
 	// Reset all global variables
 	// Note: unset is bugguy on globals
@@ -196,7 +195,6 @@ function logout()
 	$user_pass_md5 = '';
 	$userdata = '';
 	$user_ID = '';
-	$user_nickname = '';
 	$user_email = '';
 	$user_url = '';
 
@@ -631,6 +629,9 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 
 /*
  * $Log$
+ * Revision 1.7  2004/12/30 23:07:02  blueyed
+ * removed obsolete $user_nickname
+ *
  * Revision 1.6  2004/12/15 20:50:34  fplanque
  * heavy refactoring
  * suppressed $use_cache and $sleep_after_edit
