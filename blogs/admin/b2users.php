@@ -165,8 +165,8 @@ else switch ($action)
 		$edited_User->set( 'notify', $edited_user_notify );
 		param( 'edited_user_showonline', 'integer', 0 );
 		$edited_User->set( 'showonline', $edited_user_showonline );
-		param( 'edited_user_upload_ufolder', 'integer', 0 );
-		$edited_User->set( 'upload_ufolder', $edited_user_upload_ufolder );
+		#param( 'edited_user_upload_ufolder', 'integer', 0 );
+		#$edited_User->set( 'upload_ufolder', $edited_user_upload_ufolder );
 
 		param( 'edited_user_pass1', 'string', true );
 		param( 'edited_user_pass2', 'string', true );

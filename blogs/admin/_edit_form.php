@@ -122,7 +122,7 @@ if ($use_spellchecker)
 	{	// -------------------------- COMMENT HEADER -----------------------
 		?>
 		<input type="hidden" name="comment_ID" value="<?php echo $comment ?>" />
-	
+
 		<?php
 		if( $edited_Comment->author_User === NULL )
 		{ // This is not a member comment
@@ -130,11 +130,11 @@ if ($use_spellchecker)
 			<span class="line">
 			<label for="name"><strong><?php echo T_('Name') ?>:</strong></label><input type="text" name="newcomment_author" size="20" value="<?php echo format_to_edit($commentdata['comment_author']) ?>" id="name" tabindex="1" />
 			</span>
-	
+
 			<span class="line">
 			<label for="email"><strong><?php echo T_('Email') ?>:</strong></label><input type="text" name="newcomment_author_email" size="20" value="<?php echo format_to_edit($commentdata['comment_author_email']) ?>" id="email" tabindex="2" />
 			</span>
-	
+
 			<span class="line">
 			<label for="URL"><strong><?php echo T_('URL') ?>:</strong></label><input type="text" name="newcomment_author_url" size="20" value="<?php echo format_to_edit($commentdata['comment_author_url']) ?>" id="URL" tabindex="3" />
 			</span>
@@ -149,8 +149,8 @@ if ($use_spellchecker)
 	?>
 	</div>
 
-	<?php // ---------------------------- TEXTAREA ------------------------------------- 
-	// Note: the pixel images are here for an IIS layout bug
+	<?php // ---------------------------- TEXTAREA -------------------------------------
+	// Note: the pixel images are here for an IE layout bug
 	?>
 	<div class="edit_area"><img src="img/blank.gif" width="1" height="1" alt="" /><textarea rows="16" cols="40" name="content" id="content" tabindex="4"><?php echo $content ?></textarea><img src="img/blank.gif" width="1" height="1" alt="" /></div>
 	<script type="text/javascript" language="JavaScript">
@@ -196,8 +196,8 @@ if ($use_spellchecker)
 	{ // ------------------------------- UPLOAD ---------------------------------- ?>
 		<input type="button" value="<?php echo T_('Upload a file/image') ?>"
 		onclick="launchupload();" tabindex="12"  />
-		<?php 
-	} 
+		<?php
+	}
 
 	?>
 	</div>
@@ -205,7 +205,7 @@ if ($use_spellchecker)
 
 	<fieldset>
 		<legend><?php echo T_('Advanced properties') ?></legend>
-		
+
 		<?php
 		if( $current_User->check_perm( 'edit_timestamp' ) )
 		{	// ------------------------------------ TIME STAMP -------------------------------------
@@ -244,7 +244,7 @@ if ($use_spellchecker)
 		</span></div>
 		<?php
 		}
-		
+
 		if( $action != 'editcomment' )
 		{ // this is for everything but comment editing
 		?>
@@ -265,7 +265,7 @@ if ($use_spellchecker)
 		<strong><?php echo T_('Auto-BR') ?></strong> <span class="notes"><?php echo T_('This option is deprecated, you should avoid using it.') ?></span></label><br />
 
 	</fieldset>
-			
+
 	<?php
 	if( ($action != 'editcomment') && (get_bloginfo('allowpingbacks') || get_bloginfo('allowtrackbacks')) )
 	{ // this is for everything but comment editing
@@ -277,7 +277,7 @@ if ($use_spellchecker)
 		{ // --------------------------- PINGBACK --------------------------------------
 		?>
 		<div>
-			<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback" 
+			<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback"
 				<?php	if ($post_pingback) { echo ' checked="checked"'; } ?> />
 			<label for="post_pingback"><strong><?php echo T_('Pingback') ?></strong> <span class="notes"><?php echo T_('(Send a pingback to all URLs in this post)') ?></span></label>
 		</div>
@@ -294,7 +294,7 @@ if ($use_spellchecker)
 		}
 		?>
 		</fieldset>
-	<?php			
+	<?php
 	}
 	?>
 
@@ -483,9 +483,9 @@ if( $action != 'editcomment' )
 			}
 			?>
 			<div>
-				<input type="checkbox" class="checkbox" name="renderers[]" 
-					value="<?php $loop_RendererPlugin->code() ?>" id="<?php $loop_RendererPlugin->code() ?>"  
-					<?php	
+				<input type="checkbox" class="checkbox" name="renderers[]"
+					value="<?php $loop_RendererPlugin->code() ?>" id="<?php $loop_RendererPlugin->code() ?>"
+					<?php
 					switch( $loop_RendererPlugin->apply_when )
 					{
 						case 'always':
@@ -493,7 +493,7 @@ if( $action != 'editcomment' )
 							echo ' checked="checked"';
 							echo ' disabled="disabled"';
 							break;
-						 
+
 						case 'opt-out':
 							if( in_array( $loop_RendererPlugin->code, $renderers ) // Option is activated
 								|| in_array( 'default', $renderers ) ) // OR we're asking for default renderer set
@@ -503,7 +503,7 @@ if( $action != 'editcomment' )
 							}
 							// else echo 'NO';
 							break;
-		
+
 						case 'opt-in':
 							if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
 							{
@@ -522,8 +522,8 @@ if( $action != 'editcomment' )
 							}
 							echo ' disabled="disabled"';
 							break;
-					}		
-				?>  
+					}
+				?>
 				title="<?php	$loop_RendererPlugin->short_desc(); ?>" />
 			<label for="<?php $loop_RendererPlugin->code() ?>" title="<?php	$loop_RendererPlugin->short_desc(); ?>"><?php echo $loop_RendererPlugin->name(); ?></label>
 		</div>

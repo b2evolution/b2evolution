@@ -63,7 +63,13 @@ if( $action == '' && $file != '' )
 <head>
 	<title><?php echo $file.'&mdash;'.T_('b2evolution Filemanager') ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<link href="<?php echo $admin_url ?>/admin.css" rel="stylesheet" type="text/css" />
+	<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
+	<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
+	<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
+	<?php if( is_file( dirname(__FILE__).'/custom.css' ) ) { ?>
+	<link href="custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />
+	<?php } ?>
+	<script type="text/javascript" src="styleswitcher.js"></script>
 	<style type="text/css">
 	<!--
 	div.image { text-align:center;clear:both;margin:1ex; }
@@ -126,52 +132,56 @@ if( $action == '' && $file != '' )
 					if( $showlinenrs ) echo ' '.str_pad($linenr+1, $linenr_width, ' ', STR_PAD_LEFT).' ';
 					echo '</span>'.htmlspecialchars( str_replace( "\t", '  ', $line ) );  // TODO: customize tab-width
 				}
+
+				?>
+
+				<script type="text/javascript">
+				<!--
+				showlinenrs = true;
+				toggle_linenrs();
+				function toggle_linenrs()
+				{
+					if( showlinenrs )
+					{
+						var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('show line numbers') ?>');
+						showlinenrs = false;
+						var text = document.createTextNode( '' );
+						for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
+						{
+							if( document.getElementsByTagName("span")[i].hasChildNodes() )
+								document.getElementsByTagName("span")[i].firstChild.data = '';
+							else
+							{
+								document.getElementsByTagName("span")[i].appendChild( text );
+							}
+						}
+					}
+					else
+					{
+						var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('hide line numbers') ?>');
+						showlinenrs = true;
+						for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
+						{
+							var text = String(i+1);
+							var upto = <?php echo $linenr_width ?>-text.length;
+							for( var j=0; j<upto; j++ ){ text = ' '+text; }
+							if( document.getElementsByTagName("span")[i].hasChildNodes() )
+								document.getElementsByTagName("span")[i].firstChild.data = ' '+text+' ';
+							else
+								document.getElementsByTagName("span")[i].appendChild( document.createTextNode( ' '+text+' ' ) );
+						}
+					}
+
+					document.getElementById('togglelinenrs').replaceChild(replace, document.getElementById( 'togglelinenrs' ).firstChild);
+				}
+				-->
+				</script>
+				<?php
+
 			}
 
 			// TODO: stupid thing, document.getElementsByName seems to not work with IE here, so I have to use getElementsByTagName. This could perhaps check for the nodes name though.
 			?></pre>
-
-			<script type="text/javascript">
-			<!--
-			showlinenrs = true;
-			toggle_linenrs();
-			function toggle_linenrs()
-			{
-				if( showlinenrs )
-				{
-					var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('show line numbers') ?>');
-					showlinenrs = false;
-					var text = document.createTextNode( '' );
-					for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
-					{
-						if( document.getElementsByTagName("span")[i].hasChildNodes() )
-							document.getElementsByTagName("span")[i].firstChild.data = '';
-						else
-						{
-							document.getElementsByTagName("span")[i].appendChild( text );
-						}
-					}
-				}
-				else
-				{
-					var replace = document.createTextNode('<?php echo /* This is a Javascript string! */ T_('hide line numbers') ?>');
-					showlinenrs = true;
-					for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
-					{
-						var text = String(i+1);
-						var upto = <?php echo $linenr_width ?>-text.length;
-						for( var j=0; j<upto; j++ ){ text = ' '+text; }
-						if( document.getElementsByTagName("span")[i].hasChildNodes() )
-							document.getElementsByTagName("span")[i].firstChild.data = ' '+text+' ';
-						else
-							document.getElementsByTagName("span")[i].appendChild( document.createTextNode( ' '+text+' ' ) );
-					}
-				}
-
-				document.getElementById('togglelinenrs').replaceChild(replace, document.getElementById( 'togglelinenrs' ).firstChild);
-			}
-			-->
-			</script>
 
 			<?php
 		}

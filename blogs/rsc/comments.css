@@ -1,12 +1,12 @@
-/* 
- * Default comment styles 
+/*
+ * Default comment styles
  * Feel free to override all these styles in your own skins
  */
 
 /* Styles for comments */
 div.bComment, /* Entire comment block */
 form.bComment /* New comment form */
-{ 
+{
 	margin: 1ex 2ex;
 	padding: 0 1ex;
 	border: 1px dotted #999;

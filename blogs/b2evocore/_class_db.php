@@ -26,9 +26,9 @@ define( 'ARRAY_N', 'ARRAY_N', true);
 
 if( ! function_exists( 'mysql_real_escape_string' ) )
 {	// Function only available since PHP 4.3.0
-	function mysql_real_escape_string( $unescaped_string ) 
+	function mysql_real_escape_string( $unescaped_string )
 	{
-		return mysql_escape_string( $unescaped_string ); 
+		return mysql_escape_string( $unescaped_string );
 	}
 }
 
@@ -45,7 +45,7 @@ class DB
 	var $show_errors = true;
 	var $halt_on_error = true;
 	var $error = false;		// no error yet
-	var $num_queries = 0;	
+	var $num_queries = 0;
 	var $last_query = '';		// last query SQL string
 	var $last_error = '';			// last DB error string
 	var $col_info;
@@ -66,7 +66,7 @@ class DB
 	 * Strings that will replace the aliases in queries:
 	 */
 	var $dbreplaces = array();
-	
+
 	/**
 	 * DB Constructor
 	 *
@@ -122,7 +122,7 @@ class DB
 	 */
 	function escape($str)
 	{
-		return mysql_real_escape_string($str);				
+		return mysql_real_escape_string($str);
 	}
 
 	function quote($str)
@@ -130,7 +130,7 @@ class DB
 		if( $str === NULL )
 			return 'NULL';
 		else
-			return "'".mysql_real_escape_string($str)."'";				
+			return "'".mysql_real_escape_string($str)."'";
 	}
 
 	function null($val)
@@ -138,7 +138,7 @@ class DB
 		if( $val === NULL )
 			return 'NULL';
 		else
-			return $val;				
+			return $val;
 	}
 
 	/**
@@ -153,9 +153,9 @@ class DB
 
 		// If no special error string then use mysql default..
 		$this->last_error = empty($str) ? ( mysql_error().'(Errno='.mysql_errno().')' ) : $str;
-		
+
 		// Log this error to the global array..
-		$EZSQL_ERROR[] = array 
+		$EZSQL_ERROR[] = array
 						(
 							"query" => $this->last_query,
 							"error_str"  => $this->last_error
@@ -188,7 +188,7 @@ class DB
 	}
 
 
-	/** 
+	/**
 	 * Basic Query
 	 *
 	 * {@internal DB::query(-) }}
@@ -221,9 +221,9 @@ class DB
 																									'title' => $title,
 																									'sql' => $query,
 																									'rows' => -1 );
-		
+
 		$this->result = @mysql_query($query,$this->dbh);
-			
+
 		// If there is an error then take note of it..
 		if ( mysql_error() )
 		{
@@ -235,16 +235,16 @@ class DB
 		{	// Query was an insert, delete, update, replace:
 
 			// echo 'insert, delete, update, replace';
-		
+
 			$this->rows_affected = mysql_affected_rows();
 			$this->queries[ $this->num_queries - 1 ]['rows'] = $this->rows_affected;
-			
+
 			// Take note of the insert_id
 			if ( preg_match("/^\\s*(insert|replace) /i",$query) )
 			{
-				$this->insert_id = mysql_insert_id($this->dbh);	
+				$this->insert_id = mysql_insert_id($this->dbh);
 			}
-			
+
 			// Return number fo rows affected
 			$return_val = $this->rows_affected;
 		}
@@ -253,15 +253,15 @@ class DB
 
 			// echo 'select';
 
-			// Take note of column info	
+			// Take note of column info
 			$i=0;
 			while ($i < @mysql_num_fields($this->result))
 			{
 				$this->col_info[$i] = @mysql_fetch_field($this->result);
 				$i++;
 			}
-			
-			// Store Query Results	
+
+			// Store Query Results
 			$num_rows=0;
 			while ( $row = @mysql_fetch_object($this->result) )
 			{
@@ -376,7 +376,7 @@ class DB
 	{
 		return implode( ',', $this->get_col( $query, $x=0 ) );
 	}
-	
+
 	/**
 	 * Return the the query as a result set - see docs for more details
 	 */
@@ -565,7 +565,7 @@ class DB
 		$this->debug_called = true;
 	}
 
-	/** 
+	/**
 	 * Displays all queries that have been exectuted
 	 *
 	 * {@internal DB::dump_queries(-) }}
@@ -584,7 +584,7 @@ class DB
 			$sql = str_replace( 'AND ', '<br />&nbsp; AND ', $sql );
 			$sql = str_replace( 'OR ', '<br />&nbsp; OR ', $sql );
 			$sql = str_replace( 'VALUES', '<br />VALUES', $sql );
-			echo $sql;
+			echo htmlspecialchars( $sql );
 			echo '</code><br />';
 			echo 'Rows: ', $query['rows'];
 		}

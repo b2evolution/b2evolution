@@ -1,4 +1,4 @@
-<?php 
+<?php
 	/*
 	 * This is the template that displays the message email form
 	 *
@@ -8,8 +8,8 @@
 	 * For example: /blogs/index.php?p=1&more=1&c=1&tb=1&pb=1
 	 * Note: don't cod ethis URL by hand, use the template functions to generate it!
 	 */
-	if(substr(basename($_SERVER['SCRIPT_FILENAME']),0,1)=='_')
-		die("Please, do not access this page directly.");
+	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+
 
 	/*
 	 * We now call the default message email handler...

@@ -29,6 +29,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	last_comments_title( ' - ', 'htmlhead' );
 	stats_title( ' - ', 'htmlhead' );
 	msgform_title( ' - ', 'htmlhead' );
+	profile_title( ' - ', 'htmlhead' );
 ?>
 </title>
 <base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
@@ -45,7 +46,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 <body>
 <div id="wrapper">
 
-<?php 
+<?php
 	/**
 	 * --------------------------- BLOG LIST INCLUDED HERE -----------------------------
 	 */
@@ -87,7 +88,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			$Item->anchor(); // Anchor for permalinks to refer to
 		?>
 		<div class="bSmallHead">
-		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a>
+		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
 		<?php
 			$Item->issue_time();
 			echo ', ', T_('Categories'), ': ';
@@ -109,15 +110,15 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		</div>
 		<div class="bSmallPrint">
 			<span class="bIcons">
-				<a href="<?php echo msgform_url($Item->Author->ID,$Item->ID); ?>" title="<?php echo T_('E-mail author') ?>"><img src="<?php imgbase(); ?>envelope.gif" height="10" width="13" border="0" class="middle"></a>
-				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="<?php imgbase(); ?>chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a> 
+				<a href="<?php echo msgform_url($Item->Author->ID,$Item->ID); ?>" title="<?php echo T_('E-mail author') ?>"><img src="<?php imgbase(); ?>envelope.gif" height="10" width="13" class="middle" alt="<?php echo T_('EMail') ?>" /></a>
+				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="<?php imgbase(); ?>chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" class="middle" /></a> 
 			</span>
-
-			<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
-			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
-			<?php $Item->feedback_link( 'pingbacks', ' &bull; ' ) // Link to trackbacks ?>
-
-			<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
+			<?php
+				$Item->feedback_link( 'comments' ); // Link to comments
+				$Item->feedback_link( 'trackbacks', ' &bull; ' ); // Link to trackbacks
+				$Item->feedback_link( 'pingbacks', ' &bull; ' ); // Link to trackbacks
+				$Item->edit_link( ' &bull; ' );  // Link to backoffice for editing
+			?>
 
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>
@@ -134,11 +135,13 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			locale_restore_previous();	// Restore previous locale (Blog locale)
 			?>
 	</div>
-<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
+	<?php
+	} // ---------------------------------- END OF POSTS ------------------------------------
+	?>
 
 	<p class="center"><strong>
 		<?php posts_nav_link(); ?>
-		<?php 
+		<?php
 			// previous_post( '<p class="center">%</p>' );
 			// next_post( '<p class="center">%</p>' );
 		?>
@@ -166,6 +169,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			// this includes the profile form if requested
 			require( dirname(__FILE__).'/_profile.php');
 			break;
+
 		case 'msgform':
 			// this includes the email form if requested
 			require( dirname(__FILE__).'/_msgform.php');
@@ -241,8 +245,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			</ul>
 		</div>
 	<?php } ?>
-	
-	<?php if ($disp != 'stats') 
+
+	<?php if ($disp != 'stats')
 	{ ?>
 	<div class="bSideItem">
 		<h3><?php echo T_('Recent Referers') ?></h3>
@@ -318,7 +322,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					<a href="<?php $Blog->disp( 'comments_atom_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
 				</li>
 			</ul>
-			<a href="http://fplanque.net/Blog/devblog/2004/01/10/p456" title="External - English">What is RSS?</a>
+			<a href="http://fplanque.net/Blog/devblog/2004/01/10/p456" title="External - English"><?php echo T_('What is RSS?') ?></a>
 
 	</div>
 <p class="center">powered by<br />
@@ -331,14 +335,14 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 	</p>
 	<div class="center">
 		<a href="http://validator.w3.org/check/referer"><img style="border:0;width:88px;height:31px" src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" class="middle" /></a>
-	
+
 		<a href="http://jigsaw.w3.org/css-validator/"><img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!" class="middle" /></a>
-	
+
 		<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../../img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
-	
+
 		<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="../../img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
 	</div>
-	
+
 	<?php
 		log_hit();	// log the hit on this page
 		debug_info(); // output debug info if requested

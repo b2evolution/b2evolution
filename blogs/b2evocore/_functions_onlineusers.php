@@ -70,7 +70,7 @@ function online_user_display( $before = '', $after = '' )
 		{
 			echo $before;
 			echo $user->get('preferedname');
-			echo ' <a href="', msgform_url($row['sess_user_ID']) , '"><img src="' , imgbase() , 'envelope.gif" height="10" width="13" /></a>';
+			echo ' <a href="', msgform_url($row['sess_user_ID']) , '"><img src="' , imgbase() , 'envelope.gif" height="10" width="13" alt="'.T_('EMail').'" /></a>';
 			echo $after;
 			$users['registered']++;
 		}

@@ -15,7 +15,7 @@
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 	# You can customize the following as you wish:
-	if(!isset($cat_all)) $cat_all = 'All';	// Set to empty to hide
+	if(!isset($cat_all)) $cat_all = T_('All'); // Set to empty to hide
 	# global category list delimiters:
 	if(!isset($cat_main_start)) $cat_main_start = '';
 	if(!isset($cat_main_end)) $cat_main_end = '';

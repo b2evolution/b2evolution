@@ -25,9 +25,14 @@
 
 	// Accept the redirect_to string for the page to visit after the mail is sent, otherwise
 	// default to the referer of the form.
-	if ( empty($redirect_to) ) $redirect_to = $_SERVER['HTTP_REFERER'];
+	if ( empty($redirect_to) )
+	{
+		$redirect_to = isset( $_SERVER['HTTP_REFERER'] )
+										? $_SERVER['HTTP_REFERER']
+										: $baseurl; // TODO: better default!?
+	}
 
-	// Get the name of the reciepeint
+	// Get the name of the recipient
 	if(!empty($recipient_id))
 	{ // If the email is to a registerd user get the email address from the users table
 		$user = get_userdata( $recipient_id );
@@ -38,7 +43,7 @@
 	{ // If the email is to a non user comment poster get the email address from the comments table
 		$sql = 'SELECT comment_author, comment_author_email
 			FROM T_comments
-			WHERE comment_ID = "'.$comment_id'"';
+			WHERE comment_ID = "'.$comment_id.'"';
 		$row = $DB->get_row( $sql );
 		$recipient_name = $row->comment_author;
 	}
@@ -80,24 +85,23 @@
 
 		<fieldset>
 			<div class="label"><label for="to"><?php echo T_('To')?>:</label></div>
- 			<div class="input"><?php echo $recipient_name;?></div>
+			<div class="input"><?php echo $recipient_name;?></div>
 		</fieldset>
 
-		<fieldset>
 		<?php
 			form_text( 'sender_name', $email_author, 40, T_('From'), '', 50, 'bComment' );
 			form_text( 'sender_address', $email_author_address, 40, T_('E-mail Address'), '',50, 'bComment' );
 			form_text( 'subject', $subject, 40, T_('Subject'), '',50, 'bComment' );
-
 		?>
 
 		<fieldset>
 			<div class="label"><label for="message"><?php echo T_('Message')?>:</label></div>
- 			<div class="input"><textarea name="message" id="message" rows="15" cols="25" class="bComment"></textarea></div> 		</fieldset>
+			<div class="input"><textarea name="message" id="message" rows="15" cols="25" class="bComment"></textarea></div>
+		</fieldset>
 		<fieldset>
 			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Send') ?>" class="search" />
- 				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
+				<input type="submit" name="submit" class="submit" value="<?php echo T_('Send') ?>" />
+				<input type="reset" class="reset" value="<?php echo T_('Reset') ?>" />
 			</div>
 		</fieldset>
 

@@ -826,7 +826,7 @@ function remove_magic_quotes( $mixed )
  *
  * @todo add option to override what's already set. DONE.
  */
-function param(	$var, $type = '',	$default = '', $memorize = false, $override = false, $forceset = true )
+function param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
 {
 	global $$var;
 	global $global_param_list;
@@ -1121,7 +1121,7 @@ function debug_info( $force = false )
 
 	if( $debug || $force )
 	{
-		echo '<hr class="clear" /><h2>Debug info</h2>';
+		echo '<hr class="clear" /><h1>Debug info</h1>';
 
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
@@ -1130,10 +1130,10 @@ function debug_info( $force = false )
 
 		if( $Debuglog->count( 'all' ) )
 		{
-			echo '<h3>Debug messages</h3>';
+			echo '<h2>Debug messages</h2>';
 			foreach( $Debuglog->messages( 'all' ) as $level => $messages )
 			{
-				echo '<h2>Level ['.$level.']</h2><ul>';
+				echo '<h3>Level ['.$level.']</h3><ul>';
 				foreach( $messages as $message )
 				{
 					echo '<li>', format_to_output( $message, 'htmlbody' ), '</li>';

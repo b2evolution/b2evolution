@@ -1,5 +1,5 @@
-/* 
- * Default Blog elements styles 
+/**
+ * Default Blog elements styles
  * Feel free to override all these styles in your own skins
  */
 
@@ -17,38 +17,38 @@
 }
 .FigCent240 {
 	width: 240px;
-	color: #FFFFFF;
-	background-color: #000000;
+	color: #fff;
+	background-color: #000;
 	padding: 12px;
 	margin: 0ex auto;
-	border: 1px solid #FFFFFF;
+	border: 1px solid #fff;
 	text-align: center;
 }
 .FigCent320 {
 	width: 320px;
-	color: #FFFFFF;
-	background-color: #000000;
+	color: #fff;
+	background-color: #000;
 	padding: 12px;
 	margin: 0ex auto;
-	border: 1px solid #FFFFFF;
+	border: 1px solid #fff;
 	text-align: center;
 }
-.FigZone img{
+.FigZone img {
 	border: none;
 	margin-bottom: 8px;
 }
 .FigZone a {
-	color: #FFFFFF;
+	color: #fff;
 	text-decoration: none;
 }
 .FigZone a:link {
-	color: #FFFFFF;
+	color: #fff;
 }
 .FigZone a:visited {
-	color: #FFFFFF;
+	color: #fff;
 }
 .FigZone a:active {
-	color: #FFFFFF;
+	color: #fff;
 }
 
 a.permalink_right,
@@ -87,8 +87,8 @@ caption.bCalendarCaption {
 table.bCalendarTable {
 	margin: 0 auto 1em auto;
 	font-size: 77%;
-	border-collapse: separate; 
-	border-spacing: 0px;	
+	border-collapse: separate;
+	border-spacing: 0px;
 }
 tr.bCalendarRow {
 	text-align: center;

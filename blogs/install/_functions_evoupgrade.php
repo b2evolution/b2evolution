@@ -521,7 +521,7 @@ function upgrade_b2evo_tables()
 		echo 'Upgrading users table... ';
 		$query = "ALTER TABLE T_users
 							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1 AFTER user_notify,
-							ADD COLUMN user_upload_ufolder tinyint(1) NOT NULL default 0 AFTER user_showonline";
+							#ADD COLUMN user_upload_ufolder tinyint(1) NOT NULL default 0 AFTER user_showonline";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 

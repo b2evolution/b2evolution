@@ -194,7 +194,7 @@ h2 {
 	margin: 1ex 0 2ex 0;
 }
 
-input.bComment, 
+input.bComment,
 textarea.bComment
 {
 	background-color: #eee;
@@ -203,7 +203,7 @@ textarea.bComment
 	padding: 2px;
 	margin: 0ex;
 }
-select.bComment		/* Used by the profile form */
+select.bComment  /* Used by the profile form */
 {
 	background-color: #eee;
 	border: 1px solid #ccc;
@@ -217,7 +217,7 @@ div.statbloc
 {
 	float: left;
 	width: 44%;
-	margin: 0 0 2ex 1.5ex; 
+	margin: 0 0 2ex 1.5ex;
 	border: 1px solid #78a;
 }
 div.statbloc h3
@@ -247,7 +247,7 @@ input.submit:hover {
 
 /* Styles for sidebar (right) */
 .bSideBar {
-	width: 259px;	
+	width: 259px;
 	float: right;
 	overflow: hidden;
 	/* background: #900; */
@@ -296,7 +296,7 @@ caption.bCalendarCaption {
 }
 table.bCalendarTable {
 	border: solid 1px #ccc;
-	border-collapse: separate; 
+	border-collapse: separate;
 }
 table.bCalendarTable tfoot td {
 	background-color: #eee;

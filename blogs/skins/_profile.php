@@ -32,11 +32,9 @@
 
 		<?php
 			form_info( T_('Login'), $current_User->dget('login'), T_('ID').': '.$current_User->ID );
-
 			form_info( T_('Level'), $current_User->dget('level') );
-
 			form_info( T_('Posts'), $current_User->dget('num_posts') );
-		
+
 			form_text( 'newuser_firstname', get_user_info( 'firstname' ), 40, T_('First name'), '', 50, 'bComment' );
 			form_text( 'newuser_lastname', get_user_info( 'lastname' ), 40, T_('Last name'), '', 50, 'bComment' );
 			form_text( 'newuser_nickname', get_user_info( 'nickname' ), 40, T_('Nickname'), '', 50, 'bComment' );

@@ -49,7 +49,7 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 	/**
 	 * Constructor
 	 *
-	 * {@internal smilies_Toolbarplugin::smilies_Toolbarplugin(-)}} 
+	 * {@internal smilies_Toolbarplugin::smilies_Toolbarplugin(-)}}
 	 */
 	function smilies_Toolbarplugin()
 	{
@@ -63,10 +63,10 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 	/**
 	 * Display the toolbar
 	 *
-	 * {@internal smilies_Toolbarplugin::render(-)}} 
+	 * {@internal smilies_Toolbarplugin::render(-)}}
 	 */
 	function display()
-	{	
+	{
 		if( !$this->display )
 		{	// We don't want to show this toolbar
 			return false;
@@ -84,7 +84,7 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 									'" class="top" onclick="grin(\''. str_replace("'","\'",$smiley). '\');"/> ';
 			}
 		}
-	
+
 		print('<div class="edit_toolbar">'. $grins. '</div>');
 		ob_start();
 		?>
@@ -121,7 +121,7 @@ class smilies_Toolbarplugin extends ToolbarPlugin
 				myField.focus();
 			}
 		}
-		
+
 		</script>
 		<?php
 		$grins = ob_get_contents();

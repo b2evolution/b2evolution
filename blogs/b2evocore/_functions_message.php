@@ -1,7 +1,7 @@
 <?php
 /**
- * Email Messaging Functions 
- * 
+ * Email Messaging Functions
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -50,9 +50,9 @@ function msgform_url( $recipient_id = null , $post_id = null, $comment_id = null
 	global $Blog;
 
 	$url = $Blog->get('msgformurl');
-	if( ! empty($recipient_id) ) $url .= "&recipient_id=$recipient_id";
-	if( ! empty($post_id) )      $url .= "&post_id=$post_id";
-	if( ! empty($comment_id) )   $url .= "&comment_id=$comment_id";
+	if( ! empty($recipient_id) ) $url = url_add_param( $url, 'recipient_id='.$recipient_id );
+	if( ! empty($post_id) )      $url = url_add_param( $url, 'post_id='.$post_id );
+	if( ! empty($comment_id) )   $url = url_add_param( $url, 'comment_id='.$comment_id );
 
 	return $url;
 }

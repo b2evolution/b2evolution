@@ -59,7 +59,7 @@ function create_b2evo_tables()
 		user_idmode varchar(20) NOT NULL DEFAULT 'login',
 		user_notify tinyint(1) NOT NULL default 1,
 		user_showonline tinyint(1) NOT NULL default 1,
-		user_upload_ufolder tinyint(1) NOT NULL default 0,
+		#user_upload_ufolder tinyint(1) NOT NULL default 0,
 		user_grp_ID int(4) NOT NULL default 1,
 		PRIMARY KEY user_ID (ID),
 		UNIQUE user_login (user_login),
