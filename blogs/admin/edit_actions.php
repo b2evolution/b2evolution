@@ -135,7 +135,7 @@ case 'post':
 
 
 
-case "editpost":
+case 'editpost':
 	/*
 	 * --------------------------------------------------------------------
 	 * UPDATE POST 
@@ -247,7 +247,89 @@ case "editpost":
 		}
 	}	
 	
-	echo '<p>', T_('Posting Done...'), '</p>';
+	echo '<p>', T_('Updating done...'), '</p>';
+
+	$location="b2browse.php?blog=$blog";
+	break;
+
+
+case 'publish':
+	/*
+	 * --------------------------------------------------------------------
+	 * PUBLISH POST
+	 */
+	$title = T_('Updating post status...');
+	require(dirname(__FILE__).'/_menutop.php');
+	require(dirname(__FILE__).'/_menutop_end.php');
+	
+	if ($user_level == 0)
+	die ("Cheatin' uh ?");
+
+	param( "post_ID", 'integer', true );
+	$post_status = 'published';
+	$postdata = get_postdata($post_ID) or die(T_('Oops, no post with this ID.'));
+	$blog = get_catblog($postdata['Category']); 
+	$post_title = $postdata['Title'];
+	$post_url = $postdata['Url'];
+	
+	echo "<div class=\"panelinfo\">\n";
+	echo "<h3>Updating post status...</h3>\n";
+
+	// We need to check the previous flags...
+	$post_flags = $postdata['Flags'];
+	if( in_array( 'pingsdone', $post_flags ) )
+	{	// pings have been done before
+		$pingsdone = true;
+	}
+	elseif( $post_status != 'published' )
+	{	// still not publishing
+		$pingsdone = false;
+	}
+	else
+	{	// We'll be pinging now
+		$pingsdone = true;
+	}
+
+	// UPDATE POST IN DB:
+	bpost_update_status( $post_ID, $post_status, $pingsdone ) or mysql_oops($query);
+
+	if (isset($sleep_after_edit) && $sleep_after_edit > 0) 
+	{
+		echo "<p>Sleeping...</p>\n";
+		flush();
+		sleep($sleep_after_edit);
+	}
+	echo '<p>', T_('Done.'), "</p>\n";
+	echo "</div>\n";
+
+	if( $post_status != 'published' )
+	{
+		echo "<div class=\"panelinfo\">\n";
+		echo '<p>', T_('Post not publicly published: skipping trackback, pingback and blog pings...'), "</p>\n";
+		echo "</div>\n";
+	}
+	else
+	{	// We may do some pinging now!
+		$blogparams = get_blogparams_by_ID( $blog );
+
+		// ping ?	
+		if( in_array( 'pingsdone', $post_flags ) )
+		{	// pings have been done before
+			echo "<div class=\"panelinfo\">\n";
+			echo '<p>', T_('Post had already pinged: skipping blog pings...'), "</p>\n";
+			echo "</div>\n";
+		}
+		else
+		{	// We'll ping now
+			pingb2evonet( $blogparams, $post_ID, $post_title);
+			pingWeblogs($blogparams);
+			pingBlogs($blogparams);		
+			pingCafelog($cafelogID, $post_title, $post_ID);
+			pingTechnorati($blogparams);
+		}
+	}	
+	
+	echo '<p>', T_('Updating done...'), '</p>';
 
 	$location="b2browse.php?blog=$blog";
 	break;
@@ -367,8 +449,7 @@ case "editedcomment":
 
 
 default:
-	echo "nothing to do!";
-	$location="b2browse.php?blog=$blog";
+	die( 'Unkown action!' );
 }
 
 if( ! errors() )

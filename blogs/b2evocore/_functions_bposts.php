@@ -157,6 +157,43 @@ function bpost_update(
 	return 1;	// success
 }
 
+/*
+ * bpost_update_status(-)
+ *
+ * Update a post's status
+ * This funtion has to handle all needed DB dependencies!
+ *
+ * fplanque: created
+ */
+function bpost_update_status( 
+	$post_ID,
+	$post_status = 'published',
+	$pingsdone = true )
+{
+	global $tableposts, $tablepostcats, $query, $querycount;
+	global $use_bbcode, $use_gmcode, $use_smartquotes, $use_smilies;
+
+	// Handle the flags:
+	$post_flags = array();
+	if( $pingsdone ) $post_flags[] = 'pingsdone';
+	$post_flags[] = 'html';
+	if( $use_bbcode ) $post_flags[] = 'bbcode';
+	if( $use_gmcode ) $post_flags[] = 'gmcode';
+	if( $use_smartquotes ) $post_flags[] = 'smartquotes';
+	if( $use_smilies ) $post_flags[] = 'smileys';
+
+	$query = "UPDATE $tableposts SET ";
+	$query .= "post_status = '$post_status', ";
+	$query .= "post_flags = '".implode(',',$post_flags)."' ";
+	$query .= "WHERE ID = $post_ID";
+	// echo $query;
+	$querycount++;
+	$result = mysql_query($query);
+	if( !$result ) return 0;
+
+	return 1;	// success
+}
+
 
 /*
  * bpost_delete(-)

@@ -153,7 +153,16 @@
 				<form action="edit_actions.php" method="get" class="inline">
 					<input type="hidden" name="blog" value="<?php echo $blog ?>"><input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" />
 				</form>
-			<?php } ?>
+				<?php
+				if( $postdata['Status'] != 'published' )
+				{
+				?>
+				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="publish"><input type="hidden" name="post_ID" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo T_('Publish!') ?>" class="search" />
+				</form>
+			<?php
+				}
+			} 
+			?>
 				[ <a href="b2browse.php?blog=<?php echo $blog ?>&p=<?php echo $id ?>&c=1"><?php 
 				// TRANS: Link to comments for current post
 				comments_number(T_('no comment'), T_('1 comment'), T_('% comments'));

@@ -42,13 +42,13 @@ if( empty($mode) )
 	<?php
 		param( 'blog', 'integer', $default_to_blog, true );	// We need thos for the urls
 
-		if( $title == T_('New post in blog:') )
+		if( ($title == T_('New post in blog:')) || ($title == T_('Adding new post...')) )
 			echo '<li class="current">';
 		else
 			echo '<li>';
 		echo '<a href="b2edit.php?blog=', $blog, '" style="font-weight: bold;">', T_('New Post'), '</a></li>';
 	
-		if( ($title == T_('Browse blog:')) || ($title == T_('Editing post')) )
+		if( ($title == T_('Browse blog:')) || ($title == T_('Editing post')) || ($title == T_('Updating post...')) || ($title == T_('Updating post status...')) )
 			echo '<li class="current">';
 		else
 			echo '<li>';
