@@ -4,39 +4,52 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<title>b2evolution: Version history</title>
 </head>
+
 <body>
 	<img src="../blogs/img/b2evolution_logo_360.gif" alt="b2evolution" />
 	<p>Only public releases are listed here.</p>
+
 	<h2>0.9.2-CVS</h2>
 	<ul>
-		<li>Email form to contact authors without revealing their email (jeffbearer, blueyed, fplanque)</li>
+		<li>Email form to contact authors without revealing their email address (jeffbearer, blueyed, fplanque)</li>
 		<li>Who's online? (jeffbearer, blueyed, fplanque)</li>
 		<li>Counting number of views for each item (template tag $Item->views()) (jeffbearer, blueyed, fplanque)</li>
-		<li>Improved hit logging (fplanque)</li>
-	  <li>Subpaths now include trailing slashes (that was another odd b2 legacy...) (blueyed, fplanque)</li>
-	  <li>User profile validity checking (fplanque)</li>
-	  <li>Stats enhanced with Flash charts (fplanque)</li>
-	  <li>Paged display in antispam (fplanque)</li>
-	  <li>Wacko markup plugin (fplanque)</li>
-	  <li>WikiLinks plugin (fplanque)</li>
+		<li>Improved hit logging (fplanque)</li> <!-- TODO: hit class / hitlog class / DB refactoring (blueyed) -->
+		<li>Subpaths now include trailing slashes (that was another odd b2 legacy...) (blueyed, fplanque)</li>
+		<li>User profile validity checking (fplanque, blueyed)</li>
+		<li>Stats enhanced with Flash charts (fplanque)</li>
+		<li>Paged display in antispam (fplanque)</li>
+		<li>Wacko markup plugin (fplanque)</li>
+		<li>WikiLinks plugin (fplanque)</li>
+		<li>Lost password: sends a (login-)link to allow password changing instead of new password (blueyed)</li>
+		<li>LDAP authentification plugin (blueyed)</li> <!-- TODO: finish -->
 
-		<li>Multiple domain support (blueyed, fplanque) - needs cookie/admin debugging</li>
+		<li>Multiple domain support (blueyed, fplanque)</li> <!-- TODO: (cookie/admin) Debugging! -->
 
-		<li>&quot;poplog&quot; (change name) plugin (blueyed)</li>
-	  <li>Filemanager (blueyed)</li>
-			<li>New setting in the blog's advanced tab for choosing the comment's policy on a per blog basis. You can now choose if you want to allow comments on a blog, if you want to be able to disable them on each post, or if you don't want any comments at all (gorgeb)
-      <li> Post extensions (fplanque)
-      	<ul>
-      		<li>Extra status</li>
-   		    <li> Post type</li>
-     	    <li>Popup calendar for dates</li>
-     	    <li>Assigned to</li>
-     	    <li>Priority </li>
- 	        <li>Deadline</li>
-     	</ul>
-    <li>Alternative backoffice layout(s) (fplanque)       
-  <li>evocore abstraction (fplanque)
+		<li>&quot;poplog&quot; (change name) plugin (blueyed)</li> <!-- TODO: finish.. could need plugin settings! -->
+		<li>Filemanager (blueyed)</li> <!-- TODO: permissions, file/copy/rename, image handling,  -->
+
+		<li>New setting in the blog's advanced tab for choosing the comment's policy on a per blog basis. You can now choose if you want to allow comments on a blog, if you want to be able to disable them on each post, or if you don't want any comments at all (gorgeb)</li>
+		<li>Blog permissions presets; Member, Editor, Admin (blueyed, fplanque)</li> <!-- TODO: custom mode -->
+
+		<li>Post extensions (fplanque)
+			<ul>
+				<li>Extra status</li>
+				<li>Post type</li>
+				<li>Popup calendar for dates</li>
+				<li>Assigned to</li>
+				<li>Priority</li>
+				<li>Deadline</li>
+			</ul>
+		</li>
+
+		<li>Alternative backoffice layout(s) (fplanque)</li>
+		<li>evocore abstraction (fplanque)</li>
+
+		<li>Day at the start of the week moved to properties of the locales (blueyed)</li>
 	</ul>
+
+
 	<h2>0.9.0.11 "Paris"</h2>
 	<ul>
 		<li>New locales (fi-FI,en-NZ)</li>
@@ -52,16 +65,18 @@
 		<li>Auto pruning of stats after a given # of days ($stats_autoprune) (fplanque)</li>
 		<li>Changed display order in stat summary</li>
 		<li>Updated $blacklList and $search_engines</li>
-	  <li>Minor bug fixes</li>
+		<li>Minor bug fixes</li>
 	</ul>
+
 	<h2>0.9.0.10 &quot;Copenhagen&quot;</h2>
 	<ul>
 		<li>Fixed broken upgrade in &quot;Madrid&quot;</li>
 		<li>Updated locales</li>
 		<li>Allow moving of categories between blogs ( conf/_admin : $allow_moving_chapters = true; )</li>
 		<li>Allow moving of posts between blogs ( conf/_admin : $allow_cross_posting = 3; )</li>
-    <li>Allow redirecting to main blog if post is permalinked through wrong blog ( conf/_advanced : $redirect_to_postblog = true; )</li>
-  </ul>
+		<li>Allow redirecting to main blog if post is permalinked through wrong blog ( conf/_advanced : $redirect_to_postblog = true; )</li>
+	</ul>
+
 	<h2>0.9.0.9 &quot;Madrid&quot;</h2>
 	<ul>
 		<li>Updated locales (Lucas, Walter, Mago, Jun and the others... ;) </li>
@@ -74,6 +89,7 @@
 		<li>Movable Type import script improved</li>
 		<li>Smiley toolbar is disabled by default (to enable it, open /plugins/toolbars/_smilies.toolbar.php and change <code>var $display = false;</code> to <code>var $display = true;</code>)</li>
 	</ul>
+
 	<h2>0.9.0.8 &quot;Oslo&quot;</h2>
 	<ul>
 		<li>Upgrade procedure will fix /' and /&quot; in older comments (fplanque) </li>
@@ -84,6 +100,7 @@
 		<li>bugfixes... (fplanque, blueyed) </li>
 		<li>security fixes (fplanque) </li>
 	</ul>
+
 	<h2>0.9.0.5 &quot;Berlin&quot; </h2>
 	<ul>
 		<li>A load of little bug fixes (blueyed, fplanque) </li>
