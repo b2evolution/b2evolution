@@ -213,7 +213,7 @@ function locale_options( $default = '' )
 	{
 		echo '<option value="'. $this_localekey. '"';
 		if( $this_localekey == $default ) echo ' selected="selected"';
-		echo '>'. T_($this_locale['language']). '</option>';
+		echo '>'. T_($this_locale['name']). '</option>';
 	}
 }
 

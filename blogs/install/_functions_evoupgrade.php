@@ -222,24 +222,22 @@ function upgrade_b2evo_tables()
 		/**
 		 * converts languages in a given table into according locales
 		 *
+		 * blueyed: created
+		 *
 		 * @param string name of the table
 		 * @param string name of the column where lang is stored
 		 * @param string name of the table's ID column
-		 *
-		 * blueyed: created
-		 *
 		 */
 		function convert_lang_to_locale( $table, $columnlang, $columnID )
 		{
 			global $locales, $default_locale;
 			
-			# TODO: check, if 'xx-XX' is suitable
-			if( !preg_match('/[a-z]{2}-[A-Z]{2}/', $default_locale) )
+			if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,4})?/', $default_locale) )
 			{ // we want a valid locale
-				$default_locale = 'en_US';
+				$default_locale = 'en-US';
 			}
 			
-			echo '<br /><strong>Converting languages to locales for '. $table. '..</strong><br />';
+			echo 'Converting langs to locales for '. $table. '...<br />';
 		
 			// query given languages in $table
 			$query = "SELECT $columnID, $columnlang FROM $table";
@@ -255,7 +253,7 @@ function upgrade_b2evo_tables()
 			foreach( $languagestoconvert as $lkey => $lIDs)
 			{ // converting the languages we've found
 				$converted = false;
-				echo 'Converting language \''. $lkey. '\' (with IDs: '. implode( ', ', $lIDs ). ').. ';
+				echo '&nbsp; Converting lang \''. $lkey. '\' '; // (with IDs: '. implode( ', ', $lIDs ). ').. ';
 				if( strlen($lkey) == 2 )
 				{ // we have an old two letter lang code to convert
 					foreach( $locales as $newlkey => $v )
@@ -264,7 +262,7 @@ function upgrade_b2evo_tables()
 						{  // if language matches, update
 							$query = "UPDATE $table SET $columnlang = '$newlkey' WHERE $columnlang = '$lkey'";
 							$converted = mysql_query($query) or mysql_oops( $query );
-							echo 'updated to locale \''. $newlkey. '\'<br />';
+							echo 'to locale \''. $newlkey. '\'<br />';
 							break;
 						}
 					}
@@ -272,8 +270,7 @@ function upgrade_b2evo_tables()
 				
 				if( !$converted )
 				{ // we have nothing converted yet
-					# TODO: check, if 'xx-XX' is suitable
-					if( !preg_match('/[a-z]{2}-[A-Z]{2}/', $lkey) )
+					if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,4})?/', $lkey) )
 					{ // no valid locale in DB, setting default.
 						$query = "UPDATE $table SET $columnlang = '$default_locale' WHERE $columnlang = '$lkey'";
 						$q = mysql_query($query) or mysql_oops( $query );
@@ -292,7 +289,7 @@ function upgrade_b2evo_tables()
 							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
 							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00' 
 										AFTER post_issue_date,
-							CHANGE COLUMN post_lang post_locale varchar(10) NOT NULL default 'en-US'
+							CHANGE COLUMN post_lang post_locale varchar(10) NOT NULL default 'en-US',
 							DROP INDEX post_date,
 							ADD INDEX post_issue_date( post_issue_date ),
 							ADD UNIQUE post_urltitle( post_urltitle )";
@@ -301,7 +298,8 @@ function upgrade_b2evo_tables()
 		MySQL said:
 		You have an error in your SQL syntax. Check the manual that corresponds to your MySQL server version for the right syntax to use near 'DROP INDEX post_date, ADD INDEX post_issue_date( post_i (error 1064)
 		# so I used just this for testing:
-		# $query = "ALTER TABLE $tableposts CHANGE COLUMN post_lang post_locale varchar(10) NOT NULL default 'en-US'";
+		# $query = "ALTER TABLE $tableposts 
+		CHANGE COLUMN post_lang post_locale varchar(10) NOT NULL default 'en-US'";
 		*/
 		$q = mysql_query($query) or mysql_oops( $query );
 		

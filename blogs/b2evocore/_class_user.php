@@ -73,7 +73,7 @@ class User extends DataObject
 			$this->level = 0;
 			$this->notify = 1;
 			// Group for this user:
-			$this->Group = $GroupCache->get_by_ID( 1 );
+			$this->Group = NULL;
 		}
 		else
 		{

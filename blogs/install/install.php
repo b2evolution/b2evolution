@@ -18,7 +18,6 @@ require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_cats.
 require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_bposts.php" );
 require_once (dirname(__FILE__). '/_functions_create.php' );
 
-
 param( 'action', 'string' );
 // explicit set locale
 param('locale', 'string');
@@ -30,7 +29,7 @@ if( $locale == '' )
 }
 else
 {
-	if( preg_match('/[a-z]{2}-[A-Z]{2}/', $locale) )
+	if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,4})?/', $locale) )
 		$default_locale = $locale;
 }
 
@@ -60,61 +59,66 @@ require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
 </div>
 <!-- InstanceBeginEditable name="Main" -->
 
-
-<?php
-
-if( empty($action) )
-{
-	echo '<div style="float:right;border:1px dotted black;padding:1ex;">
-	<h2>Settings</h2>
-	<p>Choose a default locale. Clicking it should directly activate it.</p>
-	
-	<ul style="margin-left: 2ex;list-style:none;" >';
-
-	// present available locales on first screen
-	foreach( $locales as $lkey => $lvalue ){
-		$lflag = substr( $lkey, strpos($lkey, '-') + 1, 2 );
-		
-		echo '<li>';
-		if( $locale == $lkey )
-			echo '<span style="font-size:120%;font-weight:bold;">';	
-		echo ' <a href="?locale='. $lkey. '">';
-		
-		if( is_file(dirname(__FILE__). "/$install_dirout/img/flags/10px/$lflag.gif") )
-		{  // we have a flag for that locale
-			echo '<img src="'. $install_dirout. '/img/flags/10px/'. $lflag. '.gif" width="'
-				. ( ($default_locale == $lkey)? '20' : '15' ) . 'px" alt="'. $lvalue['name']. '" border="0" /> ';
-		}
-		#echo T_($localevalue['language']);
-		echo $lvalue['name'];
-		echo '</a> </li>';
-		
-		if( $default_locale == $lkey ) echo '</span>';	
-	}
-	echo '</ul></div>';
-}
-?>
-
 <h1>Database tables installation</h1>
-<br />
 
-<p>PHP version: <?php echo phpversion(); ?></p>
-<?php
-	list( $version_main, $version_minor ) = explode( '.', phpversion() );
-	if( ($version_main * 100 + $version_minor) < 401 )
-	{
-		die( '<strong>The minimum requirement for this version of b2evolution is PHP Version 4.1.0!</strong>');
-	}
+<div style="float:right;border:1px dotted black;padding:1ex;">
+	<p>PHP version: <?php echo phpversion(); ?> [<a href="phpinfo.php">PHP info</a>]</p>
+	<?php
+		list( $version_main, $version_minor ) = explode( '.', phpversion() );
+		if( ($version_main * 100 + $version_minor) < 401 )
+		{
+			die( '<strong>The minimum requirement for this version of b2evolution is PHP Version 4.1.0!</strong>');
+		}
+	
+	?>
 
-?>
-
-<p>These are your settings from the config file: (If you don't see correct settings here, STOP before going any further, and check your configuration.)</p>
+	<p>These are your settings from the config file:<br />
+ (If you don't see correct settings here, <br />
+STOP before going any further, <br />
+and check your configuration.)</p>
 <pre>
 mySQL Host: <?php echo $dbhost ?> &nbsp;
 mySQL Database: <?php echo $dbname ?> &nbsp;
 mySQL Username: <?php echo $dbusername ?> &nbsp;
 mySQL Password: <?php echo (($dbpassword!='demopass' ? "(Set, but not shown for security reasons)" : "demopass") )?> &nbsp;
 </pre>
+	<?php
+	if( empty($action) )
+	{
+		?>
+		<h2>Language/Locale</h2>
+		<p>Choose a default locale.<br />
+		 Clicking it should directly activate it.</p>
+		
+		<ul style="margin-left: 2ex;list-style:none;" >
+	
+		<?php
+		// present available locales on first screen
+		foreach( $locales as $lkey => $lvalue )
+		{
+			// extract flag name:
+			$lflag = substr( $lkey, strpos($lkey, '-') + 1, 2 );
+			// FP: I will work on flags later
+			
+			echo '<li>';
+			if( $default_locale == $lkey ) echo '<strong>';	
+			echo ' <a href="?locale='. $lkey. '">';
+			
+			if( is_file(dirname(__FILE__). "/$install_dirout/img/flags/10px/$lflag.gif") )
+			{  // we have a flag for that locale
+				echo '<img src="'. $install_dirout. '/img/flags/10px/'. $lflag. '.gif" alt="'. $lvalue['name']. '" border="0" /> ';
+			}
+			#echo T_($localevalue['language']);
+			echo $lvalue['name'];
+			echo '</a>';
+			echo '</li>';
+			
+			if( $default_locale == $lkey ) echo '</strong>';	
+		}
+		echo '</ul>';
+	}
+	?>
+</div>
 
 <?php
 

@@ -151,7 +151,7 @@ function create_b2evo_tables()
 		INDEX post_issue_date( post_issue_date ),
 		INDEX post_category( post_category ),
 		INDEX post_author( post_author ),
-		INDEX post_status( post_status )
+		INDEX post_status( post_status ),
 		UNIQUE post_urltitle( post_urltitle )
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );

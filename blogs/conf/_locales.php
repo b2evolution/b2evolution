@@ -37,12 +37,11 @@ function NT_($string)
 
 
 //{{{ defining the locales:
-#
 # These are default settings. They are used for creating the locales table
 # in the DB and remain as a fallback option afterwards.
-#
+# IMPORTANT: Try to keep the locale names short!!! They take away valuable space on the screen!!
 $locales = array(
-	'cs-CZ' => array(	'name' => NT_('Czech (Czech Republic)'),
+	'cs-CZ' => array(	'name' => NT_('Czech (Czech Rep.)'),
 										'charset' => 'utf-8',
 										'datefmt' => 'd. m. y',
 										'timefmt' => 'H.i:s',
@@ -91,7 +90,7 @@ $locales = array(
 										'messages' => 'ja_JP',
 										'enabled' => 1,
 									),
-	'lt-LT' => array( 'name' => NT_('Lithuanian (Lithuania)'),
+	'lt-LT' => array( 'name' => NT_('Lithuanian (Lith.)'),
 										'charset' => 'Windows-1257',
 										'datefmt' => 'Y-m-d',
 										'timefmt' => 'H:i:s',
@@ -126,14 +125,14 @@ $locales = array(
 										'messages' => 'sv_SE',
 										'enabled' => 1,
 									),
-	'zh-CN' => array( 'name' => NT_('Simplified Chinese (China)'),
+	'zh-CN' => array( 'name' => NT_('Simpl. Chinese (China)'),
 										'charset' => 'gb2312',
 										'datefmt' => 'y-m-d',
 										'timefmt' => 'H:i:s',
 										'messages' => 'zh_CN',
 										'enabled' => 1,
 									),
-	'zh-TW' => array(	'name' => NT_('Traditional Chinese (Taiwan)'),
+	'zh-TW' => array(	'name' => NT_('Trad. Chinese (Taiwan)'),
 										'charset' => 'utf-8',
 										'datefmt' => 'Y-m-d',
 										'timefmt' => 'H:i:s',
