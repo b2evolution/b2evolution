@@ -338,6 +338,12 @@ function make_clickable( $text, $moredelim = '&amp;' )
 
 /***** // Formatting functions *****/
 
+
+function date2mysql( $ts )
+{
+	return date( 'Y-m-d H:i:s', $ts );
+}
+
 /**
  * Convert a MYSQL date to a UNIX timestamp
  */
@@ -1858,6 +1864,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.58  2005/03/14 20:22:20  fplanque
+ * refactoring, some cacheing optimization
+ *
  * Revision 1.57  2005/03/13 18:50:34  blueyed
  * use $servertimenow/$localtimenow
  *

@@ -115,6 +115,8 @@ class ItemList extends DataObjectList
 
 	var $dbcols;
 
+	var $DataObjectCache;
+
 	/**
 	 * Constructor
 	 *
@@ -147,10 +149,7 @@ class ItemList extends DataObjectList
 	 * @param mixed Do not show posts after this timestamp, can be 'now'
 	 * @param string urltitle of post to display
 	 * @param string YearMonth(Day) to start at, '' for first available
-	 * @param string Name of Class for objects within this list
-	 * @param string Name of the DB table
-	 * @param string Prefix of fields in the table
-	 * @param string Name of the ID field (including prefix)
+	 * @param string name of cache to be used
 	 */
 	function ItemList(
 		$blog = 1,                  // Blog to query
@@ -176,18 +175,26 @@ class ItemList extends DataObjectList
 		$timestamp_max = 'now',     // Do not show posts after this timestamp
 		$title = '',                // urltitle of post to display
 		$dstart = '',               // YearMonth(Day) to start at, '' for first available
-		$objType = 'Item',
-		$dbtable = 'T_posts',
-		$dbprefix = 'post_',
-		$dbIDname = 'ID' )
+		$cache_name = '#' )
 	{
 		global $DB, $object_def;
 		global $cache_categories;
 		global $cat_array; // communication with recursive callback funcs
 		global $Settings;
 
+		if( $cache_name == '#' )
+		{	// Let's use the default cache:
+			$cache_name = 'ItemCache';
+		}
+
+		global $$cache_name;
+
+		$this->cache_name = $cache_name;
+		$this->DataObjectCache = & $$cache_name; // By ref!!
+
 		// Call parent constructor:
-		parent::DataObjectList( $dbtable, $dbprefix, $dbIDname, $objType );
+		parent::DataObjectList( $this->DataObjectCache->dbtablename, $this->DataObjectCache->dbprefix,
+														$this->DataObjectCache->dbIDname, $this->DataObjectCache->objtype );
 
 		$this->preview = $preview;
 		$this->blog = $blog;
@@ -226,23 +233,23 @@ class ItemList extends DataObjectList
 		if( $m != '' )
 		{
 			$m = '' . intval($m);
-			$where .= ' AND YEAR('.$dbprefix.'datestart)='.intval(substr($m,0,4));
+			$where .= ' AND YEAR('.$this->dbprefix.'datestart)='.intval(substr($m,0,4));
 			if( strlen($m) > 5 )
-				$where .= ' AND MONTH('.$dbprefix.'datestart)='.intval(substr($m,4,2));
+				$where .= ' AND MONTH('.$this->dbprefix.'datestart)='.intval(substr($m,4,2));
 			if( strlen($m) > 7 )
-				$where .= ' AND DAYOFMONTH('.$dbprefix.'datestart)='.intval(substr($m,6,2));
+				$where .= ' AND DAYOFMONTH('.$this->dbprefix.'datestart)='.intval(substr($m,6,2));
 			if( strlen($m) > 9 )
-				$where .= ' AND HOUR('.$dbprefix.'datestart)='.intval(substr($m,8,2));
+				$where .= ' AND HOUR('.$this->dbprefix.'datestart)='.intval(substr($m,8,2));
 			if( strlen($m) > 11 )
-				$where .= ' AND MINUTE('.$dbprefix.'datestart)='.intval(substr($m,10,2));
+				$where .= ' AND MINUTE('.$this->dbprefix.'datestart)='.intval(substr($m,10,2));
 			if( strlen($m) > 13 )
-				$where .= ' AND SECOND('.$dbprefix.'datestart)='.intval(substr($m,12,2));
+				$where .= ' AND SECOND('.$this->dbprefix.'datestart)='.intval(substr($m,12,2));
 		}
 
 		// If a week number is specified
 		if( !empty($w) && ($w>=0) ) // Note: week # can be 0
 		{
-			$where .= ' AND '.$DB->week( $dbprefix.'datestart', locale_startofweek() ).'='.intval($w);
+			$where .= ' AND '.$DB->week( $this->dbprefix.'datestart', locale_startofweek() ).'='.intval($w);
 		}
 
 		// if a post number is specified, load that post
@@ -274,7 +281,7 @@ class ItemList extends DataObjectList
 			if( ($phrase == '1') or ($phrase == 'sentence') )
 			{ // Sentence search
 				$keywords = $DB->escape(trim($keywords));
-				$search .= '('.$dbprefix.'title LIKE \''. $n. $keywords. $n. '\') OR ('.$dbprefix.'content LIKE \''. $n. $keywords. $n.'\')';
+				$search .= '('.$this->dbprefix.'title LIKE \''. $n. $keywords. $n. '\') OR ('.$this->dbprefix.'content LIKE \''. $n. $keywords. $n.'\')';
 			}
 			else
 			{ // Word search
@@ -292,8 +299,8 @@ class ItemList extends DataObjectList
 				$join = '';
 				for ( $i = 0; $i < count($keyword_array); $i++)
 				{
-					$search .= ' '. $join. ' ( ('.$dbprefix.'title LIKE \''. $n. $DB->escape($keyword_array[$i]). $n. '\')
-																	OR ('.$dbprefix.'content LIKE \''. $n. $DB->escape($keyword_array[$i]). $n.'\') ) ';
+					$search .= ' '. $join. ' ( ('.$this->dbprefix.'title LIKE \''. $n. $DB->escape($keyword_array[$i]). $n. '\')
+																	OR ('.$this->dbprefix.'content LIKE \''. $n. $DB->escape($keyword_array[$i]). $n.'\') ) ';
 					$join = $swords;
 				}
 			}
@@ -389,9 +396,9 @@ class ItemList extends DataObjectList
 				$andor = 'OR';
 			}
 			$author_array = explode(' ', $author);
-			$whichauthor .= ' AND '.$dbprefix.'creator_user_ID '. $eq.' '. $author_array[0];
+			$whichauthor .= ' AND '.$this->dbprefix.'creator_user_ID '. $eq.' '. $author_array[0];
 			for ($i = 1; $i < (count($author_array)); $i = $i + 1) {
-				$whichauthor .= ' '. $andor.' '.$dbprefix.'creator_user_ID '. $eq.' '. $author_array[$i];
+				$whichauthor .= ' '. $andor.' '.$this->dbprefix.'creator_user_ID '. $eq.' '. $author_array[$i];
 			}
 		}
 
@@ -420,7 +427,7 @@ class ItemList extends DataObjectList
 			{
 				for($i = 1; $i < (count($orderby_array)); $i++)
 				{
-					$orderby .= ', '.$dbprefix.$orderby_array[$i]. ' '. $order;
+					$orderby .= ', '.$this->dbprefix.$orderby_array[$i]. ' '. $order;
 				}
 			}
 		}
@@ -437,7 +444,7 @@ class ItemList extends DataObjectList
 			$dstart_mysql = substr($dstart0,0,4).'-'.substr($dstart0,4,2).'-'.substr($dstart0,6,2).' '
 											.substr($dstart0,8,2).':'.substr($dstart0,10,2).':'.substr($dstart0,12,2);
 
-			$where .= ' AND '.$dbprefix.'datestart >= \''.$dstart_mysql.'\'';
+			$where .= ' AND '.$this->dbprefix.'datestart >= \''.$dstart_mysql.'\'';
 		}
 
 
@@ -473,8 +480,8 @@ class ItemList extends DataObjectList
 				$lastpostdate = mysql2timestamp( $lastpostdate );
 				$this->limitdate_end = $lastpostdate - (($poststart -1) * 86400);
 				$this->limitdate_start = $lastpostdate+1 - (($postend) * 86400);
-				$where .= ' AND '.$dbprefix.'datestart >= \''. date( 'Y-m-d H:i:s', $this->limitdate_start )
-									.'\' AND '.$dbprefix.'datestart <= \''. date('Y-m-d H:i:s', $this->limitdate_end) . '\'';
+				$where .= ' AND '.$this->dbprefix.'datestart >= \''. date( 'Y-m-d H:i:s', $this->limitdate_start )
+									.'\' AND '.$this->dbprefix.'datestart <= \''. date('Y-m-d H:i:s', $this->limitdate_end) . '\'';
 			}
 		}
 		elseif( !empty($m) )
@@ -508,7 +515,7 @@ class ItemList extends DataObjectList
 					$lastpostdate = mysql2date('U',$lastpostdate);
 					// go back x days
 					$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($posts_per_page-1) * 86400)));
-					$where .= ' AND '.$dbprefix.'datestart > \''. $otherdate.'\'';
+					$where .= ' AND '.$this->dbprefix.'datestart > \''. $otherdate.'\'';
 				}
 			}
 			else
@@ -517,7 +524,7 @@ class ItemList extends DataObjectList
 				$dstart_ts = mysql2timestamp( $dstart_mysql );
 				// go forward x days
 				$enddate_ts = date('Y-m-d H:i:s', ($dstart_ts + ($posts_per_page * 86400)));
-				$where .= ' AND '.$dbprefix.'datestart < \''. $enddate_ts.'\'';
+				$where .= ' AND '.$this->dbprefix.'datestart < \''. $enddate_ts.'\'';
 			}
 		}
 		else
@@ -529,7 +536,7 @@ class ItemList extends DataObjectList
 		 *	Restrict to the statuses we want to show:
 		 * ----------------------------------------------------
 		 */
-		$where .= ' AND ' . statuses_where_clause( $show_statuses, $dbprefix );
+		$where .= ' AND ' . statuses_where_clause( $show_statuses, $this->dbprefix );
 
 		/*
 		 * ----------------------------------------------------
@@ -545,7 +552,7 @@ class ItemList extends DataObjectList
 		{ // Hide posts before
 			// echo 'hide before '.$timestamp_min;
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
-			$where .= ' AND '.$dbprefix.'datestart >= \''. $date_min.'\'';
+			$where .= ' AND '.$this->dbprefix.'datestart >= \''. $date_min.'\'';
 		}
 
 		if( $timestamp_max == 'now' )
@@ -557,11 +564,11 @@ class ItemList extends DataObjectList
 		{ // Hide posts after
 			// echo 'after';
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
-			$where .= ' AND '.$dbprefix.'datestart <= \''. $date_max.'\'';
+			$where .= ' AND '.$this->dbprefix.'datestart <= \''. $date_max.'\'';
 		}
 
-		$this->sql = 'SELECT DISTINCT '.implode( ', ', $object_def[ $this->objType]['db_cols'] )
-								.' FROM ('.$dbtable.' INNER JOIN T_postcats ON '.$dbIDname.' = postcat_post_ID)
+		$this->sql = 'SELECT DISTINCT '.implode( ', ', $object_def[ $this->objType ]['db_cols'] )
+								.' FROM ('.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 												INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 
 		if( $blog == 1 )
@@ -573,7 +580,7 @@ class ItemList extends DataObjectList
 			$this->sql .= 'WHERE cat_blog_ID = '. $blog;
 		}
 
-		$this->sql .= $where. ' ORDER BY '.$dbprefix.$orderby.' '.$limits;
+		$this->sql .= $where. ' ORDER BY '.$this->dbprefix.$orderby.' '.$limits;
 		// echo '<br />where=',$where;
 
 		if ($preview)
@@ -587,19 +594,29 @@ class ItemList extends DataObjectList
 		$this->result_num_rows = $DB->num_rows;
 		// echo $this->result_num_rows, ' items';
 
-		// Make a list of posts for future queries!
-		// Also make arrays...
+		// Prebuild and cache objects:
 		$this->postIDlist = "";
 		$this->postIDarray = array();
-		foreach( $this->rows as $myrow )
+		$i = 0;
+		foreach( $this->rows as $row )
 		{
-			array_unshift( $this->postIDarray, $myrow->$dbIDname );	// new row at beginning
+			// Prebuild object:
+			$this->Obj[$i] = new $this->objType( $row, $this->dbtablename, $this->dbprefix, $this->dbIDname ); // COPY!!
+
+			// To avoid potential future waste, cache this object:
+			$this->DataObjectCache->add( $this->Obj[$i] );
+
+			// Make a list of posts for future queries!
+			array_unshift( $this->postIDarray, $row->{$this->dbIDname} );	// new row at beginning (fplanque>>why?)
+
+			$i++;
 		}
+
+
 		if( !empty($this->postIDarray) )
 		{
 			$this->postIDlist = implode( ',', $this->postIDarray );
 		}
-		// echo "postlist:". $this->postIDlist;
 
 		// Initialize loop stuff:
 		$this->restart();
@@ -704,7 +721,7 @@ class ItemList extends DataObjectList
 		$LastPostList = & new ItemList( $this->blog, $this->show_statuses, '', '', '', $this->cat, $this->catsel,
 																		 '', 'DESC', 'datestart', 1, '','', '', '', '', '', '', 'posts',
 																		 $this->timestamp_min, $this->timestamp_max, '', '',
-																		 $this->objType, $this->dbtablename, $this->dbprefix, $this->dbIDname );
+																		 $this->cache_name );
 
 		if( $LastItem = $LastPostList->get_item() )
 		{
@@ -839,8 +856,8 @@ class ItemList extends DataObjectList
 		{ // We need to initialize
 			$this->row = & $this->rows[0];
 			$row = $this->row;
-			$this->row_num = 1;
 			$this->get_postdata();
+			$this->row_num = 1;
 		}
 
 		// Memorize main cat
@@ -869,8 +886,8 @@ class ItemList extends DataObjectList
 		$this->row = & $this->rows[$this->row_num];
 		$row = $this->row;
 		// echo '<p>accessing row['. $this->row_num. ']:',$this->row->post_title,'</p>';
-		$this->row_num++;
 		$this->get_postdata();
+		$this->row_num++;
 
 		if( $this->group_by_cat && ($this->main_cat != $this->row->post_main_cat_ID) )
 		{ // Category change
@@ -884,16 +901,19 @@ class ItemList extends DataObjectList
 
 
 	/**
+	 * Init postdata
+	 *
 	 * {@internal ItemList::get_postdata(-)}}
 	 *
-	 * Init postdata
+	 * @todo we might want to move object instanciation upward rigth after the request is executed
+	 *
 	 */
 	function get_postdata()
 	{
 		global $id, $postdata, $day, $page, $pages, $multipage, $more, $numpages;
 		global $pagenow, $current_User;
 
-		$this->last_Item = new $this->objType( $this->row, $this->dbtablename, $this->dbprefix, $this->dbIDname ); // COPY!!
+		$this->last_Item = & $this->Obj[ $this->row_num ];
 
 		$id = $this->last_Item->ID;
 		// echo 'starting ',$current_Item->title;
@@ -993,6 +1013,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.24  2005/03/14 20:22:19  fplanque
+ * refactoring, some cacheing optimization
+ *
  * Revision 1.23  2005/03/10 16:07:20  fplanque
  * cleaned up paging
  * added dstart param

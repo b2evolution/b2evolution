@@ -39,6 +39,8 @@
  *
  * @package evocore
  *
+ * @todo implement CategoryCache based on LinkCache
+ *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
@@ -444,14 +446,10 @@ function cat_load_postcounts( $dbtable_items = 'T_posts', $dbprefix_items = 'pos
 }
 
 
-/*
- * cat_load_postcats_cache(-)
- *
+/**
  * Load cache for category associations with current posts
  *
- * fplanque: created
- *
- * TODO: put this into main post query when MySQL 4.0 commonly available
+ * @todo put this into main post query when MySQL 4.0 commonly available
  */
 function cat_load_postcats_cache()
 {
@@ -822,6 +820,9 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.16  2005/03/14 20:22:19  fplanque
+ * refactoring, some cacheing optimization
+ *
  * Revision 1.15  2005/03/09 14:54:26  fplanque
  * refactored *_title() galore to requested_title()
  *

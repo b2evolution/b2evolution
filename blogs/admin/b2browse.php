@@ -92,11 +92,11 @@ if( $blog )
 	// Get the posts to display:
 	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
 															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
-															$preview, $unit, $timestamp_min, $timestamp_max, '', $dstart,
-															$objType,	$dbtable, $dbprefix, $dbIDname );
+															$preview, $unit, $timestamp_min, $timestamp_max, '', $dstart );
 
 	$posts_per_page = $MainList->posts_per_page;
 	$result_num_rows = $MainList->get_num_rows();
+
 	$postIDlist = & $MainList->postIDlist;
 	$postIDarray = & $MainList->postIDarray;
 

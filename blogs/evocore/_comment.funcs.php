@@ -33,6 +33,8 @@
  *
  * @package evocore
  *
+ * @todo implement CommentCache based on LinkCache
+ *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author cafelog (team)
  * @author blueyed: Daniel HAHLER.
@@ -50,11 +52,12 @@ require_once dirname(__FILE__).'/_comment.class.php';
 /**
  * Generic comments/trackbacks/pingbacks counting
  *
- * {@internal generic_ctp_number(-)}}
+ * @todo check this in a multiblog page...
  *
- * fplanque: added stuff to load all number for this page at ounce
+ * @param
+ * @param string what to count
  */
-function generic_ctp_number($post_id, $mode = 'comments')
+function generic_ctp_number( $post_id, $mode = 'comments' )
 {
 	global $DB, $debug, $postdata, $cache_ctp_number, $preview;
 	if( $preview )
@@ -62,9 +65,9 @@ function generic_ctp_number($post_id, $mode = 'comments')
 		return 0;
 	}
 
-	if( $mode == 'feedbacks' ) $mode ='ctp';
-
-	// fplanque added: load whole cache
+	/*
+	 * Make sure cache is loaded for current display list:
+	 */
 	if( !isset($cache_ctp_number) )
 	{
 		global $postIDlist, $postIDarray;
@@ -101,6 +104,8 @@ function generic_ctp_number($post_id, $mode = 'comments')
 	{
 		echo "cache set";
 	}*/
+
+
 	if( !isset($cache_ctp_number[$post_id]) )
 	{ // this should be extremely rare...
 		// echo "CACHE not set for $post_id";
@@ -133,10 +138,12 @@ function generic_ctp_number($post_id, $mode = 'comments')
 	{
 		$ctp_number = $cache_ctp_number[$post_id];
 	}
-	if (($mode != 'comments') && ($mode != 'trackbacks') && ($mode != 'pingbacks') && ($mode != 'ctp'))
+
+	if( ($mode != 'comments') && ($mode != 'trackbacks') && ($mode != 'pingbacks') )
 	{
 		$mode = 'ctp';
 	}
+
 	return $ctp_number[$mode];
 }
 
@@ -314,6 +321,9 @@ function comment_author_url_basedomain( $disp = true )
 
 /*
  * $Log$
+ * Revision 1.10  2005/03/14 20:22:19  fplanque
+ * refactoring, some cacheing optimization
+ *
  * Revision 1.9  2005/03/09 14:54:26  fplanque
  * refactored *_title() galore to requested_title()
  *

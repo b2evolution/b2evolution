@@ -141,11 +141,20 @@ class CommentList extends DataObjectList
 
 		$this->result = $DB->get_results( $this->request, ARRAY_A );
 
+		// Prebuild and cache objects:
 		if( $this->result_num_rows = $DB->num_rows )
-		{
+		{	// fplanque>> why this test??
+
+			$i = 0;
 			foreach( $this->result as $row )
 			{
-				$this->Obj[] = & new Comment( $row );
+				// Prebuild object:
+				$this->Obj[$i] = new Comment( $row ); // COPY !!??
+
+				// To avoid potential future waste, cache this object:
+				$this->DataObjectCache->add( $this->Obj[$i] );
+
+				$i++;
 			}
 		}
 	}
@@ -173,6 +182,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.6  2005/03/14 20:22:19  fplanque
+ * refactoring, some cacheing optimization
+ *
  * Revision 1.5  2005/03/09 20:29:39  fplanque
  * added 'unit' param to allow choice between displaying x days or x posts
  * deprecated 'paged' mode (ultimately, everything should be pageable)

@@ -50,9 +50,11 @@ class DataObjectList extends Results
 	/**#@+
 	 * @access private
 	 */
+
 	var	$dbtablename;
 	var $dbprefix;
 	var $dbIDname;
+
 	var $posts_per_page = 15;
 
 	/**
@@ -119,6 +121,9 @@ class DataObjectList extends Results
 
 /*
  * $Log$
+ * Revision 1.7  2005/03/14 20:22:19  fplanque
+ * refactoring, some cacheing optimization
+ *
  * Revision 1.6  2005/03/09 20:29:39  fplanque
  * added 'unit' param to allow choice between displaying x days or x posts
  * deprecated 'paged' mode (ultimately, everything should be pageable)

@@ -199,10 +199,13 @@ require_once dirname(__FILE__).'/_archivelist.class.php';
 require_once dirname(__FILE__).'/_dataobjectcache.class.php';
 require_once dirname(__FILE__).'/_element.class.php';
 require_once dirname(__FILE__).'/_usercache.class.php';
+require_once dirname(__FILE__).'/_link.class.php';
+require_once dirname(__FILE__).'/_linkcache.class.php';
 // Object caches init:
 $GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
 $UserCache = & new UserCache();
 $BlogCache = & new BlogCache();
+$LinkCache = & new LinkCache();
 $ItemCache = & new ItemCache();
 
 require_once dirname(__FILE__).'/_calendar.class.php';
@@ -429,6 +432,9 @@ require_once( $conf_path.'_icons.php' );
 
 /*
  * $Log$
+ * Revision 1.25  2005/03/14 20:22:19  fplanque
+ * refactoring, some cacheing optimization
+ *
  * Revision 1.24  2005/03/07 17:11:25  fplanque
  * added debug helpers
  *

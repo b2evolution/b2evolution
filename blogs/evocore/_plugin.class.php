@@ -356,7 +356,7 @@ class Plugin
 	 */
 	function AdminEndHtmlHead( & $params )
 	{
-		return NULL;  // Do nothing by default.
+		return false;		// Do nothing by default.
 	}
 
 
@@ -370,7 +370,7 @@ class Plugin
 	 */
 	function AdminAfterPageFooter( & $params )
 	{
-		return NULL;  // Do nothing by default.
+		return false;		// Do nothing by default.
 	}
 
 
@@ -384,11 +384,11 @@ class Plugin
 	 */
 	function DisplayToolbar( & $params )
 	{
-		return NULL;  // Do nothing by default.
+		return false;		// Do nothing by default.
 	}
 
 
-	/**
+ 	/**
 	 * Event handler: Called when displaying editor buttons.
 	 *
 	 * {@internal Plugin::DisplayEditorButton(-)}}
@@ -398,7 +398,7 @@ class Plugin
 	 */
 	function DisplayEditorButton( & $params )
 	{
-		return NULL;  // Do nothing by default.
+		return false;		// Do nothing by default.
 	}
 
 
@@ -412,9 +412,8 @@ class Plugin
 	 */
 	function DoAction( & $params )
 	{
-		echo T_('No such action!');
-
-		return NULL;  // Do nothing by default.
+	 	echo T_('No such action!');
+		return false;		// Action failed!
 	}
 
 
@@ -478,7 +477,7 @@ class Plugin
 	 */
 	function ToolMenu( & $params )
 	{
-		return NULL;  // Do nothing by default.
+		return false;		// Do nothing by default.
 	}
 
 	/*
@@ -489,8 +488,8 @@ class Plugin
 
 /*
  * $Log$
- * Revision 1.6  2005/03/06 18:16:41  blueyed
- * return NULL by default
+ * Revision 1.7  2005/03/14 20:22:20  fplanque
+ * refactoring, some cacheing optimization
  *
  * Revision 1.5  2005/03/02 18:30:56  fplanque
  * tedious merging... :/

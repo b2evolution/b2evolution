@@ -156,7 +156,7 @@ class DataObjectCache
 	function add( & $Obj )
 	{
 		if( isset($Obj->ID) && $Obj->ID != 0 )
-		{
+		{	// If the object wasn't already cached and is valid:
 			$this->cache[$Obj->ID] = & $Obj;
 			return true;
 		}
@@ -319,6 +319,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.15  2005/03/14 20:22:19  fplanque
+ * refactoring, some cacheing optimization
+ *
  * Revision 1.14  2005/03/02 15:24:29  fplanque
  * allow get_by_ID(NULL) in some situations
  *

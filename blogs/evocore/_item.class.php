@@ -137,6 +137,16 @@ class Item extends DataObject
 
 
 	/**
+	 * Array of Links attached to this item.
+	 *
+	 * NULL when not initialized.
+	 *
+	 * @var array
+	 * @access public
+	 */
+	var $Links = NULL;
+
+	/**
 	 * Constructor
 	 *
 	 * {@internal Item::Item(-)}}
@@ -380,8 +390,6 @@ class Item extends DataObject
 	}
 
 
-	// Template functions {{{
-
 	/**
 	 * Template function: display anchor for permalinks to refer to
 	 *
@@ -456,13 +464,30 @@ class Item extends DataObject
 
 
 	/**
+	 * Template function: get list of assigned user options
+	 *
+	 * {@internal Item::get_assigned_user_options(-)}}
+	 */
+	function get_assigned_user_options()
+	{
+		global $UserCache, $object_def;
+
+		return $UserCache->blog_member_list( $this->blog_ID, $this->AssignedUser->ID,
+							$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
+							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
+							false );
+	}
+
+
+	/**
 	 * Template function: Display the main blog name.
 	 *
+	 * @todo is it possible to use $Item->getBlog()->name() instead? (we can't possibly duplicate all sub-object functions here!!!)
 	 * @param string Output format. See {@link format_to_output()}.
 	 */
 	function blog_name( $format = 'htmlbody' )
 	{
-		$current_Blog =& $this->getBlog();
+		$current_Blog = & $this->getBlog();
 		$current_Blog->name( $format );
 	}
 
@@ -818,6 +843,20 @@ class Item extends DataObject
 
 
 	/**
+	 * Get reference to array of Links
+	 *
+	 * {@internal Item::get_Links(-) }}
+	 */
+	function & get_Links()
+	{
+		// Make sure links are loaded:
+		$this->load_links();
+
+		return $this->Links;
+	}
+
+
+	/**
 	 * Template function: display issue date (datetime) of Item
 	 *
 	 * {@internal Item::issue_date(-) }}
@@ -860,6 +899,36 @@ class Item extends DataObject
 	{
 		$this->disp( 'locale', 'raw' );
 	}
+
+
+	/**
+	 * Template function: display number of links attached to this Item
+	 *
+	 * {@internal Item::linkcount(-) }}
+	 */
+	function linkcount()
+	{
+		// Make sure links are loaded:
+		$this->load_links();
+
+		echo count($this->Links);
+	}
+
+
+	/**
+	 * Load links if they were not loaded yet.
+	 *
+	 * {@internal Item::load_links(-) }}
+	 */
+	function load_links()
+	{
+		if( is_null( $this->Links ) )
+		{	// Links have not been loaded yet:
+			global $LinkCache;
+			$this->Links = & $LinkCache->get_by_item_ID( $this->ID );
+		}
+	}
+
 
 	/**
 	 * Template function: display locale for item
@@ -1572,8 +1641,6 @@ class Item extends DataObject
 		echo $this->views;
 	}
 
-	// Template functions }}}
-
 
 	/**
 	 * Set param value
@@ -1800,22 +1867,6 @@ class Item extends DataObject
 
 
 	/**
-	 * Get list of assigned user options
-	 *
-	 * {@internal Item::get_assigned_user_options(-)}}
-	 */
-	function get_assigned_user_options()
-	{
-		global $UserCache, $object_def;
-
-		return $UserCache->blog_member_list( $this->blog_ID, $this->AssignedUser->ID,
-							$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
-							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
-							false );
-	}
-
-
-	/**
 	 * Get the Blog object for the Item.
 	 *
 	 * @return Blog
@@ -1835,6 +1886,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2005/03/14 20:22:19  fplanque
+ * refactoring, some cacheing optimization
+ *
  * Revision 1.31  2005/03/13 23:56:30  blueyed
  * getBlog() added
  *

@@ -95,7 +95,9 @@ class UserCache extends DataObjectCache
 		if( !isset( $this->cache_login[$login] ) )
 		{
 			global $DB;
-			if( $row = $DB->get_row( 'SELECT * FROM T_users WHERE user_login = "'.$DB->escape($login).'"', 0, 0, 'Get User login' ) )
+			if( $row = $DB->get_row( 'SELECT *
+																	FROM T_users
+																 WHERE user_login = "'.$DB->escape($login).'"', 0, 0, 'Get User login' ) )
 			{
 				$this->add( new User( $row ) );
 			}
@@ -175,6 +177,7 @@ class UserCache extends DataObjectCache
 			return false;
 		}
 
+		// Remember this special load:
 		$this->alreadyCached['blogmembers'][$blog_ID] = true;
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache" );
@@ -182,7 +185,7 @@ class UserCache extends DataObjectCache
 		foreach( $DB->get_results( 'SELECT *
 																	FROM T_users INNER JOIN T_blogusers ON ID = bloguser_user_ID
 																 WHERE bloguser_blog_ID = '.$blog_ID.'
-																	AND bloguser_ismember <> 0' ) as $row )
+																	 AND bloguser_ismember <> 0' ) as $row )
 		{
 			$this->add( new User( $row ) );
 		}
@@ -250,6 +253,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.16  2005/03/14 20:22:20  fplanque
+ * refactoring, some cacheing optimization
+ *
  * Revision 1.15  2005/02/28 09:06:34  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
