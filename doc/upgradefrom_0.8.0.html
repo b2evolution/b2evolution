@@ -3,7 +3,7 @@
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>My b2 evolution: Upgrading from b2evolution version 0.8.0</title>
+<title>My b2 evolution: Upgrading from b2evolution version 0.8.2-RC2</title>
 <!-- InstanceEndEditable --><link href="../blogs/install/b2evo.css" rel="stylesheet" type="text/css" />
  
 <!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
@@ -16,18 +16,20 @@
 <div id="quicklinks">Setup Links: <a href="../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="../blogs/install/install.php">My DB Install</a> &middot; <a href="../blogs/index.php">My Blogs</a> &middot; <a href="../blogs/admin/b2edit.php">My Back-Office</a></div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
-<h2>Upgrading from b2evolution version 0.8.0</h2>
+<h2>Upgrading from b2evolution version 0.8.0 or later (prior to 0.8.6)</h2>
 <p><em>As always, it is very wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new.</em></p>
-<p>Upgrading from version 0.8.0:</p>
+<p>Upgrading from version 0.8.0 or later:</p>
 <ol class="expanded">
-  <li>Backup <strong> all b2evolution files</strong>,<strong> including /conf, skins, blog templates and stubfiles for your blogs</strong>. You should also<strong> backup your database</strong> if you can.</li>
+  <li>Backup <strong> all b2evolution files</strong>,<strong> including /conf, skins, blog templates  and stubfiles for your blogs</strong>. You should also<strong> backup your database</strong> if you can.</li>
   <li>Replace <strong>all b2evolution files</strong>,<strong> including /conf, skins, blog templates and stubfiles </strong> with the new ones; (This is important in order to activate all security fixes!) If you have customized your blog template/skin, please use the provided demo templates/skins until the end of the upgrade process. You'll find instructions on how to upgrade your customized templates/skins at the end of this procedure.</li>
-  <li>Redo your configuration in the /conf folder as you did previously. As always, the only requirement is to edit _config.php. The other config files can be used without modification, however you should have look inside for fine tuning once your new version is running; </li>
+  <li>Redo your configuration in the /conf folder as you did previously. As always, the only requirement is to edit _config.php. The other  config files can be used without modification, however you should have look inside for fine tuning once your new version is running; </li>
   <li>Upload the files to your website, according to the URL you have just configured.</li>
-  <li><strong>Upload the new files to your server</strong>, and then <a href="../blogs/install/install.php">run the database tables upgrade</a> <strong>on your server</strong>! Once your database is upgraded, it will still work with previous version of b2evolution if for some reason you decide to switch back.</li>
+  <li><strong>Upload the new files to your server</strong>, and then <a href="../blogs/install/install.php">run the database tables upgrade</a> <strong>on your server</strong>!</li>
   <li>Test </li>
+  <li>Delete the /install folder from your site.</li>
   <li>Just in case you did not do it before, you may want to check out <a href="http://b2evolution.net/man/install/trickystuff.html">the tricky stuff</a>. (online manual)</li>
-  <li>If you had customized your blog template/skins, please refer to the <a href="http://b2evolution.net/man/install/upgradefrom_0.8.0.html#templates">online manual about upgrading templates/skins from 0.8.0</a>. (online manual)</li>
+  <li>If you had custom skins or templates, follow the <a href="http://b2evolution.net/man/install/upgradefrom_0.8.2.html#templates">online instructions about upgrading them</a>.</li>
+ (online manual)
 </ol>
 <!-- InstanceEndEditable -->
 <div id="rowfooter">

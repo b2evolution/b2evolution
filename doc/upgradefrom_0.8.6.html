@@ -16,14 +16,16 @@
 <div id="quicklinks">Setup Links: <a href="../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="../blogs/install/install.php">My DB Install</a> &middot; <a href="../blogs/index.php">My Blogs</a> &middot; <a href="../blogs/admin/b2edit.php">My Back-Office</a></div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
-<h2>Upgrading from b2evolution version 0.8.6 or later</h2>
+<h2>Upgrading from b2evolution version 0.8.6 or later (prior to 0.8.7)</h2>
 <p><em>As always, it is very wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new.</em></p>
-<p>Upgrading from version 0.8.6 is straightforward:</p>
+<p>Upgrading from version 0.8.6 is easy:</p>
 <ol class="expanded">
-  <li>You can keep your<strong> /conf, skins, blog templates  and stubfiles for your blogs</strong>. However, now may be a good time to back them up ;)</li>
-  <li>Just replace the<strong> b2evolution core files</strong>. That means the following folders: /admin, /b2evocore, /htsrv, /locales, /xmlsrv.</li>
-  <li>Although it is not mandatory, you can also update the _antispam.php, _formatting.php and _locales.php files in the /conf folder.</li>
-  <li>Thats's it.</li>
+  <li>You can keep your<strong> skins, blog templates  and stubfiles for your blogs</strong>. <em>However, now may be a good time to back them up ;)</em></li>
+  <li>Backup your <strong>/conf</strong> folder, copy the new conf files and redo your configuration in the /conf folder as you did previously. As always, the only requirement is to edit _config.php. The other  config files can be used without modification, however you should have look inside for fine tuning once your new version is running. Please note: there is no _antispam.php config file no longer. Antispam processing has been moved to the database.</li>
+  <li>Replace the<strong> b2evolution core files</strong>. That means the following folders: /admin, /b2evocore, /htsrv, /locales, /xmlsrv. You also need to temporarily copy the <strong>/install</strong> folder to your site.</li>
+  <li><strong>Upload the new files to your server</strong>, and then <a href="../blogs/install/install.php">run the database tables upgrade</a> <strong>on your server</strong>! Once your database is upgraded, it will still work with previous version of b2evolution if for some reason you decide to switch back.</li>
+  <li>Test.</li>
+  <li>Delete the /install folder from your site.</li>
 </ol>
 <!-- InstanceEndEditable -->
 <div id="rowfooter">
