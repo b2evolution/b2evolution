@@ -79,12 +79,14 @@ div.panelblocktabs
 	margin-top: 1ex;
 	float:left;
 	width:100%;
-	background: url("img/bg.gif") repeat-x bottom;
+	background: url("img/tabs_bg.gif") repeat-x bottom;
 	font-size:85%;
 	line-height:normal;
 }
 div.tabbedpanelblock {
+	clear: both;
 	border: 1px solid #765;
+	background-color: #fbfaf9;
 	border-top: none;
 	padding: 2ex;
 	margin: 3ex;
@@ -95,12 +97,6 @@ div.loginblock {
 	padding: 2ex;
 	margin: 3ex auto;
 	width: 30em;
-}
-div.paneltopblock {
-	border: 1px solid #CCCCCC;
-	padding: 2ex;
-	margin: 3ex;
-	margin-bottom: 0ex;
 }
 .bPost, .bPostpublished {
 	border: 1px solid #CCCCCC;
@@ -180,6 +176,7 @@ form.inline {
 form.fform fieldset {
 	border: 1px solid #ddd;
 	margin-bottom: 1ex;
+	background-color: #fff;
 }
 form.fform fieldset fieldset {
 	clear: both;
