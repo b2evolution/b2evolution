@@ -17,6 +17,7 @@
  * include config and default functions:
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
+require_once dirname(__FILE__).'/'.$install_dirout.$conf_subdir.'_upgrade.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_log.class.php';
 $Debuglog = new Log( 'note' );
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_misc.funcs.php'; // db funcs

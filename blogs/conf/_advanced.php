@@ -1,9 +1,11 @@
 <?php
 /**
- * This is b2evolution's advanced config file
+ * This file includes advanced settings for b2evolution.
  *
- * This file includes advanced settings for b2evolution
  * Last significant changes to this file: version 0.9.1
+ *
+ * Please NOTE: You should not comment variables out to prevent
+ * URL overrides.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -13,10 +15,23 @@
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-# General params:
-# (these must be forced to prevent URL overrides).
+
+/**
+ * Display debugging informations?
+ * @global boolean Default: false
+ */
 $debug = false;
+
+/**
+ * Display elements that are different on each request (Page processing time, ..)
+ * @global boolean Default: false
+ */
 $obhandler_debug = false;
+
+/**
+ * Demo mode: don't allow changes to the 'demouser' account.
+ * @global boolean Default: false
+ */
 $demo_mode = false;
 
 
@@ -68,19 +83,34 @@ else
 	die( 'Your baseurl ('.$baseurl.') set in _config.php seems invalid. You probably missed the "http://" prefix or the trailing slash. Please correct that.' );
 }
 
-# Short name of this system (will be used for cookies and notification emails)
-# Change this only if you install mutliple b2evolutions on the same website.
-# WARNING: don't play with this or you'll have tons of cookies sent away and your
-# readers surely will complain about it!
-# You can change notification email address alone a few lines below
-$b2evo_name = 'b2evo';		// MUST BE A SINGLE WORD! NO SPACES!!
+/**
+ * Short name of this system (will be used for cookies and notification emails).
+ *
+ * Change this only if you install mutliple b2evolutions on the same website.
+ *
+ * WARNING: don't play with this or you'll have tons of cookies sent away and your
+ * readers surely will complain about it!
+ *
+ * You can change the notification email address alone a few lines below.
+ *
+ * @global string Default: 'b2evo'
+ */
+$app_shortname = 'b2evo'; // MUST BE A SINGLE WORD! NO SPACES!!
 
 
-# default email address for sending notifications (comments, trackbacks, user registrations...)
-# Set a custom address like this:
-# $notify_from = 'b2evolution@your_server.com'; // uncomment this line if you want to customize
-# Alternatively you can use this automated address generation
-$notify_from = $b2evo_name.'@'.$basehost; // comment this line if you want to customize
+/**
+ * Default email address for sending notifications (comments, trackbacks,
+ * user registrations...).
+ *
+ * Set a custom address like this:
+ * <code>$notify_from = 'b2evolution@your_server.com';</code>
+ *
+ * Alternatively you can use this automated address generation:
+ * <code>$notify_from = $app_shortname.'@'.$basehost;</code>
+ *
+ * @global string Default: $app_shortname.'@'.$basehost;
+ */
+$notify_from = $app_shortname.'@'.$basehost;
 
 
 // ** Configuration for htsrv/getmail.php **
@@ -107,13 +137,23 @@ $use_phoneemail = 0;
 $phoneemail_separator = ':::';
 
 
-# When pinging http://blo.gs, use extended ping to RSS?
+/**
+ * When pinging http://blo.gs, use extended ping to RSS?
+ *
+ * @var integer Default: 1
+ */
 $use_rss = 1;
 
-# If a particular post is requested (by id or title) but on the wrong blog,
-# do you want to automatically redirect to the right blog?
-# This is overly usefull if you move posts or categories from one blog to another
-# If this is disabled, the post will be displayed in the wrong blog template.
+/**
+ * If a particular post is requested (by id or title) but on the wrong blog,
+ * do you want to automatically redirect to the right blog?
+ *
+ * This is overly usefull if you move posts or categories from one blog to another
+ *
+ * If this is disabled, the post will be displayed in the wrong blog template.
+ *
+ * @var boolean Default: false
+ */
 $redirect_to_postblog = false;
 
 
@@ -174,7 +214,7 @@ $db_aliases = array(
  * Edit those if you have control over you MySQL server and want a more professional
  * database than what is commonly offered by popular hosting providers.
  *
- * @global $db_table_options
+ * @global string $db_table_options
  */
 // Low ranking MySQL hosting compatibility Default:
 $db_table_options = '';
@@ -191,28 +231,9 @@ $db_table_options = '';
  * Recommended for professional use.
  * Typically requires InnoDB to be set in $db_table_options.
  *
- * @global $db_use_fkeys
+ * @global boolean $db_use_fkeys
  */
 $db_use_fkeys = false;
-
-
-/**#@+
- * Old b2 tables used exclusively by the upgrade mode of the install script
- *
- * You can ignore those if you're not planning to upgrade from an original b2 database.
- */
-$oldtableposts      = 'b2posts';
-$oldtableusers      = 'b2users';
-$oldtablesettings   = 'b2settings';
-$oldtablecategories = 'b2categories';
-$oldtablecomments   = 'b2comments';
-/**#@-*/
-
-/**
- * WordPress table prefix used exclusively by the upgrade script
- * You can ignore this if you're not planning to upgrade from a WordPress database.
- */
-$wp_prefix = 'wp_';
 
 
 // ** Saving bandwidth **
@@ -275,14 +296,16 @@ $use_etags = 0;
  *
  * That means cookies set by this b2evo install won't be seen outside of this path on the domain below
  *
- * @global string $cookie_path
+ * @global string Default: preg_replace( '#https?://[^/]+#', '', $baseurl )
  */
-$cookie_path = preg_replace('#https?://[^/]+#', '', $baseurl );
+$cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
 
 /**
  * Cookie domain.
  *
- * That means cookies set by this b2evo install won't be seen outside of this domain
+ * That means cookies set by this b2evo install won't be seen outside of this domain.
+ *
+ * @global string Default: ($basehost == 'localhost') ? '' : '.'. $basehost;
  */
 $cookie_domain = ($basehost == 'localhost') ? '' : '.'. $basehost;
 //echo 'domain='. $cookie_domain. ' path='. $cookie_path;
@@ -290,12 +313,12 @@ $cookie_domain = ($basehost == 'localhost') ? '' : '.'. $basehost;
 /**#@+
  * Names for cookies.
  */
-$cookie_user  = 'cookie'. $b2evo_name. 'user';
-$cookie_pass  = 'cookie'. $b2evo_name. 'pass';
-$cookie_state = 'cookie'. $b2evo_name. 'state';
-$cookie_name  = 'cookie'. $b2evo_name. 'name';
-$cookie_email = 'cookie'. $b2evo_name. 'email';
-$cookie_url   = 'cookie'. $b2evo_name. 'url';
+$cookie_user  = 'cookie'.$app_shortname.'user';
+$cookie_pass  = 'cookie'.$app_shortname.'pass';
+$cookie_state = 'cookie'.$app_shortname.'state';
+$cookie_name  = 'cookie'.$app_shortname.'name';
+$cookie_email = 'cookie'.$app_shortname.'email';
+$cookie_url   = 'cookie'.$app_shortname.'url';
 /**#@-*/
 
 /**
@@ -303,16 +326,16 @@ $cookie_url   = 'cookie'. $b2evo_name. 'url';
  *
  * Value in seconds, set this to 0 if you wish to use non permanent cookies (erased when browser is closed).
  *
- * @global int $cookie_expires
+ * @global int Default: time() + 31536000; // One year from now
  */
-$cookie_expires = time() + 31536000; // Default: one year from now
+$cookie_expires = time() + 31536000;
 
 /**
  * Expired-time used to erase cookies.
  *
- * @global int $cookie_expired
+ * @global int time() - 86400;    // 24 hours ago
  */
-$cookie_expired = time() - 86400;    // Default: 24 hours ago
+$cookie_expired = time() - 86400;
 
 
 // ** Location of the b2evolution subdirectories **
@@ -323,7 +346,7 @@ $cookie_expired = time() - 86400;    // Default: 24 hours ago
 		($baseurl which is set in _config.php, default is the /blogs/ folder)
 	- Remember you can set the baseurl to your website root (-> _config.php).
 
-	NOTE: ALL PATHS MUST HAVE NO LEADING AND NO TRAILING SLASHES !!!
+	NOTE: All paths must have a trailing slash!
 
 	Example of a possible setting:
 		$admin_subdir = 'backoffice/b2evo/'; // Subdirectory relative to base
@@ -433,6 +456,7 @@ $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 
 /**
  * Regular expression to match image filenames.
+ * @global string Default: '/\.(jpe?g|gif|png|swf)$/i'
  */
 $regexp_images = '/\.(jpe?g|gif|png|swf)$/i';
 
