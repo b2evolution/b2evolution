@@ -16,13 +16,16 @@ require_once( EVODIR.'blogs/evocore/_abstractsettings.class.php' );
  */
 class AbstractSettingsTestCase extends FilemanUnitTestCase
 {
-	function FileTestCase()
+	function AbstractSettingsTestCase()
 	{
-		$this->UnitTestCase( 'AbstractSettings class test' );
+		$this->FilemanUnitTestCase( 'AbstractSettings class test' );
 	}
+
 
 	function setUp()
 	{
+		parent::setup();
+
 		$this->MockDB =& new MockDB($this);
 		$this->TestSettings = new AbstractSettings( 'testtable', array( 'test_name' ), 'test_value' );
 		$this->TestSettings->DB =& $this->MockDB;
@@ -31,6 +34,7 @@ class AbstractSettingsTestCase extends FilemanUnitTestCase
 
 	function tearDown()
 	{
+		parent::tearDown();
 	}
 
 
@@ -58,9 +62,10 @@ class AbstractSettingsTestCase extends FilemanUnitTestCase
 	}
 }
 
+
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
-	$test = new FileTestCase();
+	$test = new AbstractSettingsTestCase();
 	$test->run( new HtmlReporter() );
 	unset( $test );
 }

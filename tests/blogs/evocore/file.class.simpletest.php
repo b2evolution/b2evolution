@@ -11,20 +11,27 @@ require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 require_once( EVODIR.'/blogs/evocore/_file.class.php' );
 
 
+/**
+ *
+ */
 class FileTestCase extends FilemanUnitTestCase
 {
 	function FileTestCase()
 	{
-		$this->UnitTestCase( 'File class test' );
+		$this->FilemanUnitTestCase( 'File class test' );
 	}
+
 
 	function setUp()
 	{
+		parent::setUp();
 	}
 
 
 	function tearDown()
 	{
+		parent::tearDown();
+
 		$this->unlinkTempfiles(); // unlink temp files
 	}
 
