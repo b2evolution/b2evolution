@@ -254,7 +254,7 @@ class ItemList extends DataObjectList
 		// if a post urltitle is specified, load that post
 		if( !empty( $title ) )
 		{
-			$where .= ' AND '.$dbprefix."urltitle = '$title'";
+			$where .= ' AND post_urltitle = '.$DB->quote($title);
 		}
 
 		/*
@@ -954,6 +954,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.15  2005/01/06 19:40:13  fplanque
+ * SQL injection fix
+ *
  * Revision 1.14  2005/01/03 15:17:52  fplanque
  * no message
  *
