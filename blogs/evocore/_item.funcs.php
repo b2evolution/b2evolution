@@ -1380,15 +1380,19 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
 /**
  * Allow recursive category selection
  */
-function cat_select()
+function cat_select( $display_info = true )
 {
 	global $default_main_cat, $allow_cross_posting, $cache_blogs, $cache_categories,
 					$blog, $current_blog_ID, $current_User;
 
-	echo '<div class="extracats">'
-				.'<p class="extracatnote">'
+	$r = '<div class="extracats">';
+
+	if( $display_info )
+	{
+		$r .= '<p class="extracatnote">'
 				.T_('Select main category in target blog and optionally check additional categories')
 				.'</p>';
+	}
 
 	$default_main_cat = 0;
 
@@ -1401,31 +1405,57 @@ function cat_select()
 			$current_blog_ID = $i_blog->blog_ID;
 			if( ! blog_has_cats( $current_blog_ID ) ) continue;
 			if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
-			echo "<h4>".$i_blog->blog_name."</h4>\n";
-			cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
+			$r .= '<h4>'.format_to_output($i_blog->blog_name).'</h4>\n';
+			$r .= '<table cellspacing="0">'.cat_select_header();
+			$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
 										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
+	   	$r .= '</table>';
 		}
 
-    if( $allow_cross_posting >= 3 )
-    {
-      echo '<p class="extracatnote">'.T_('Note: Moving posts across blogs is enabled. Use with caution.').'</p> ';
-    }
-    echo '<p class="extracatnote">'.T_('Note: Cross posting among multiple blogs is enabled.').'</p>';
+		if( $display_info )
+		{
+	    if( $allow_cross_posting >= 3 )
+	    {
+	      $r .= '<p class="extracatnote">'.T_('Note: Moving posts across blogs is enabled. Use with caution.').'</p> ';
+	    }
+	    $r .= '<p class="extracatnote">'.T_('Note: Cross posting among multiple blogs is enabled.').'</p>';
+		}
 	}
 	else
 	{	// BLOG Cross posting is disabled. Current blog only:
 		$current_blog_ID = $blog;
-		cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
+		$r .= '<table cellspacing="0">'.cat_select_header();
+		$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
 									'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
-		echo '<p class="extracatnote">';
-		if( $allow_cross_posting )
-			echo T_('Note: Cross posting among multiple blogs is currently disabled.');
-		else
-			echo T_('Note: Cross posting among multiple categories is currently disabled.');
-		echo '</p>';
+   	$r .= '</table>';
+
+		if( $display_info )
+		{
+			$r .= '<p class="extracatnote">';
+			if( $allow_cross_posting )
+				$r .= T_('Note: Cross posting among multiple blogs is currently disabled.');
+			else
+				$r .= T_('Note: Cross posting among multiple categories is currently disabled.');
+			$r .= '</p>';
+		}
 	}
 
-	echo '</div>';
+	$r .= '</div>';
+
+	return $r;
+}
+
+
+function cat_select_header()
+{
+	global $current_blog_ID, $blog, $allow_cross_posting;
+	$r = '<thead><th class="selector">'.T_('Main').'</th>';
+	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
+	{ // This is current blog or we allow moving posts accross blogs
+		$r .= '<th class="selector">'.T_('Extra').'</th>';
+	}
+	$r .= '<th>'.T_('Category').'</th></thead>';
+	return $r;
 }
 
 /**
@@ -1433,7 +1463,7 @@ function cat_select()
  */
 function cat_select_before_first( $parent_cat_ID, $level )
 {	// callback to start sublist
-	echo "\n<ul>\n";
+	return ''; // "\n<ul>\n";
 }
 
 /**
@@ -1441,17 +1471,9 @@ function cat_select_before_first( $parent_cat_ID, $level )
  */
 function cat_select_before_each( $cat_ID, $level )
 {	// callback to display sublist element
-	global $current_blog_ID, $blog, $cat, $edited_Item, $post_extracats, $default_main_cat, $next_action, $allow_cross_posting;
+	global $current_blog_ID, $blog, $cat, $edited_Item, $post_extracats, $default_main_cat, $next_action, $allow_cross_posting, $cat_select_level;
 	$this_cat = get_the_category_by_ID( $cat_ID );
-	echo '<li>';
-
-	if( $allow_cross_posting )
-	{ // We allow cross posting, display checkbox:
-		echo'<input type="checkbox" name="post_extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'"';
-		if (($cat_ID == $edited_Item->main_cat_ID) or (in_array( $cat_ID, $post_extracats )))
-			echo ' checked="checked"';
-		echo ' />';
-	}
+	$r = '<tr>';
 
 	// Radio for main cat:
 	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
@@ -1460,12 +1482,29 @@ function cat_select_before_each( $cat_ID, $level )
 		{	// Assign default cat for new post
 			$default_main_cat = $cat_ID;
 		}
-		echo ' <input type="radio" name="post_category" class="checkbox" title="', T_('Select as MAIN category'), '" value="',$cat_ID,'"';
+		$r .= '<td class="selector"><input type="radio" name="post_category" class="checkbox" title="'
+					.T_('Select as MAIN category').'" value="'.$cat_ID.	'"';
 		if( ($cat_ID == $edited_Item->main_cat_ID) || ($cat_ID == $default_main_cat))
-			echo ' checked="checked"';
-		echo ' />';
+			$r .= ' checked="checked"';
+		$r .= ' /></td>';
 	}
-	echo ' '.$this_cat['cat_name'];
+	else
+	{	// Don't allow to select this cat as a main cat
+  	$r .= '<td class="selector">&nbsp;</td>';
+	}
+
+	if( $allow_cross_posting )
+	{ // We allow cross posting, display checkbox:
+		$r .= '<td class="selector"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
+					.T_('Select as an additionnal category').'" value="'.$cat_ID.'"';
+		if (($cat_ID == $edited_Item->main_cat_ID) or (in_array( $cat_ID, $post_extracats )))
+			$r .= ' checked="checked"';
+		$r .= ' /></td>';
+	}
+
+	$r .= '<td><span style="padding-left:'.($level-1).'em;">'.$this_cat['cat_name'].'</span></td>';
+
+	return $r;
 }
 
 /**
@@ -1473,7 +1512,7 @@ function cat_select_before_each( $cat_ID, $level )
  */
 function cat_select_after_each( $cat_ID, $level )
 {	// callback after each sublist element
-	echo "</li>\n";
+	return "</td></tr>\n";
 }
 
 /**
@@ -1481,7 +1520,7 @@ function cat_select_after_each( $cat_ID, $level )
  */
 function cat_select_after_last( $parent_cat_ID, $level )
 {	// callback to end sublist
-	echo "</ul>\n";
+	return ''; // "</ul>\n";
 }
 
 
@@ -1489,6 +1528,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.10  2005/01/25 14:41:33  fplanque
+ * changed echo to return in recursive cat list
+ *
  * Revision 1.9  2005/01/20 20:38:58  fplanque
  * refactoring
  *
