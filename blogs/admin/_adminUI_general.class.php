@@ -144,6 +144,60 @@ class AdminUI_general
 
 
 	/**
+	 * Returns the list of available Collections (aka Blogs) to work on.
+	 *
+	 * fplanque>>I'm trying to hack this in and get a feeling of the AdminUI stuff at the same time :/
+	 *
+	 * @todo Use BlogCache(?)
+	 * @todo Use a template (i wanna make an UL/LI/A list structure in newer skins)
+	 *
+	 * @param string name of required permission needed to display the blog in the list
+ 	 * @param string level of required permission needed to display the blog in the list
+	 * @param string Url format string for elements, with %d for blog number.
+	 * @param string Title for "all" button
+	 * @param string URL for "all" button
+	 * @param string onclick attribute format string, with %d for blog number.
+	 * @return string HTML
+	 */
+	function getCollectionList( $permname = 'blog_ismember', $permlevel = 1, $url_format = '?blog=%d',
+															$all_title = NULL, $all_url = '', $onclick = NULL )
+	{
+		global $current_User, $blog;
+
+		$html = '';
+
+		if( !is_null($all_title) )
+		{
+			$html .= '<a href="'.$all_url
+						.'" class="'.( $blog == 0 ? 'CurrentBlog' : 'OtherBlog' ).'">'
+						.$all_title.'</a> ';
+		}
+
+		for( $curr_blog_ID = blog_list_start();
+					$curr_blog_ID != false;
+					$curr_blog_ID = blog_list_next() )
+		{
+			if( ! $current_User->check_perm( $permname, $permlevel, false, $curr_blog_ID ) )
+			{ // Current user doesn't have required permission on this blog...
+				continue;
+			}
+
+			$html .= '<a href="'.sprintf( $url_format, $curr_blog_ID )
+						.'" class="'.( $curr_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'"';
+
+			if( ! is_null($onclick) )
+			{	// We want to include an onclick attribute:
+				$html .= ' onclick="'.sprintf( $onclick, $curr_blog_ID ).'"';
+			}
+
+			$html .= '>'.blog_list_iteminfo( 'shortname', false ).'</a> ';
+		}
+
+		return $html;
+	}
+
+
+	/**
 	 * Get the HTML for the menu entries of a specific path.
 	 *
 	 * @return string

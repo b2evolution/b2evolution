@@ -200,23 +200,12 @@ switch( $action )
 				break;
 		}
 
-	// Blog list
-	$blogListButtons = '<a href="blogs.php" class="'
-			.( 0 == $blog ? 'CurrentBlog' : 'OtherBlog' ).'">'.T_('List').'</a>';
 
-	for( $curr_blog_ID = blog_list_start();
-				$curr_blog_ID != false;
-				$curr_blog_ID = blog_list_next() )
-	{
-		if( ! $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
-		{ // Current user is not allowed to edit this blog...
-			continue;
-		}
 
-		$blogListButtons .= ' <a href="blogs.php?action=edit&amp;blog='.$curr_blog_ID.'&amp;tab='.$AdminUI->getPath(1).'" class="'
-			.( $curr_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'">'
-			.blog_list_iteminfo( 'shortname', false ).'</a>';
-	}
+	// Generate available blogs list:
+	$blogListButtons = $AdminUI->getCollectionList( 'blog_properties', 'edit',
+												'blogs.php?action=edit&amp;blog=%d&amp;tab='.$AdminUI->getPath(1),
+												T_('List'), 'blogs.php' );
 
 }
 
@@ -578,6 +567,9 @@ require( dirname(__FILE__).'/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.31  2005/03/04 20:14:31  fplanque
+ * moved blog list generation to a unique AdminUI method
+ *
  * Revision 1.30  2005/03/04 18:40:27  fplanque
  * added Payload display wrappers to admin skin object
  *

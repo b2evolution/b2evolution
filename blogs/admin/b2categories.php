@@ -21,25 +21,10 @@ param( 'blog', 'integer', 0 );
 
 if( $action != 'addcat' && $action != 'editedcat' )
 { // Blog list
-	$blogListButtons = '';
 
-	for( $curr_blog_ID = blog_list_start();
-				$curr_blog_ID != false;
-				$curr_blog_ID = blog_list_next() )
-	{
-		if( ! $current_User->check_perm( 'blog_cats', '', false, $curr_blog_ID ) )
-		{ // Current user is not allowed to edit cats...
-			continue;
-		}
-		if( $blog == 0 )
-		{ // If no selected blog yet, select this one:
-			$blog = $curr_blog_ID;
-		}
+	// Generate available blogs list:
+	$blogListButtons = $AdminUI->getCollectionList( 'blog_cats', '', $pagenow.'?blog=%d' );
 
-		$blogListButtons .= ' <a href="b2categories.php?blog='.$curr_blog_ID.'" class="'
-			.( $curr_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'">'
-			.blog_list_iteminfo( 'shortname', false ).'</a>';
-	}
 
 	require(dirname(__FILE__) . '/_menutop.php');
 }
