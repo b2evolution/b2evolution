@@ -51,7 +51,7 @@ class FileManager
 	/**
 	 * the current index of the directory items (looping)
 	 * @var integer
-	 * @private
+	 * @access protected
 	 */
 	var $current_idx = -1;
 
@@ -60,7 +60,7 @@ class FileManager
 	 * order files by what?
 	 * 'name' as default.
 	 * @var string
-	 * @private
+	 * @access protected
 	 */
 	var $order = '#';
 	
@@ -68,14 +68,14 @@ class FileManager
 	 * files ordered ascending?
 	 * '#' is default and means ascending for 'name', descending for the rest
 	 * @var boolean
-	 * @private
+	 * @access protected
 	 */
 	var $orderasc = '#';
 
 	/**
 	 * relative path
 	 * @var string
-	 * @private
+	 * @access protected
 	 */
 	var $cd = '#';
 

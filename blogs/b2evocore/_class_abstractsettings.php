@@ -21,24 +21,28 @@ class AbstractSettings
 	/**
 	 * the DB table which stores the settings
 	 * @var string
+	 * @access protected
 	 */
 	var $dbtablename;
 
 	/**
 	 * array with DB cols key names
 	 * @var array of strings
+	 * @access protected
 	 */
 	var $colkeynames = array();
 
 	/**
 	 * DB col name for the value
 	 * @var string
+	 * @access protected
 	 */
 	var $colvaluename;
 
 
 	/**
 	 * the internal cache
+	 * @access protected
 	 */
 	var $cache = false;
 
@@ -87,8 +91,6 @@ class AbstractSettings
 				die( 'Settings keycount not supported' );
 
 		}
-
-		#pre_dump( $this->cache, 'cache' );
 	}
 
 

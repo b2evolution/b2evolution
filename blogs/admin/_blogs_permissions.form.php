@@ -222,7 +222,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		<br />
 	</fieldset>
 
-	<fieldset>
+	<fieldset class="submit">
 		<fieldset>
 			<div class="input">
 				<input type="submit" name="submit" value="<?php echo T_('Update blog!') ?>" class="search" <?php

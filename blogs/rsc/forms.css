@@ -35,8 +35,9 @@ form.fform fieldset {
 form.fform fieldset fieldset {
 	clear: both;
 	border: none;
-	margin: 2ex;
+	margin: 1ex;
 	padding: 0;
+	/* border: 1px solid #000; */
 }
 form.fform fieldset.submit fieldset {
 	background: transparent;

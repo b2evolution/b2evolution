@@ -40,7 +40,7 @@
 		?>
 	</fieldset>
 
-	<fieldset>
+	<fieldset class="submit">
 		<fieldset>
 			<div class="input">
 				<input type="submit" name="submit" value="<?php echo T_('Update blog!') ?>" class="search">

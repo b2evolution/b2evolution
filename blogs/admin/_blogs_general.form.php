@@ -97,7 +97,7 @@
 	
 	</fieldset>
 	
-	<fieldset>
+	<fieldset class="submit">
 		<fieldset>
 			<div class="input">
 				<input type="submit" name="submit" value="<?php echo ($next_action == 'create') ? T_('Create new blog!') : T_('Update blog!') ?>" class="search">
