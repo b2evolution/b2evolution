@@ -40,16 +40,16 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
 # For example, if you machine is called HOMER, do not use http://homer/b2evolution/blogs !
 # Use http://localhost/b2evolution/blogs instead. And log in on localhost too, not homer!
 # If you don't, login cookies will not hold. 
-$baseurl = 'http://localhost:8088/b2evolution/blogs';		// IMPORTANT: NO ENDING SLASH !!!
+$baseurl = 'http://localhost/b2evolution/blogs';		// IMPORTANT: NO ENDING SLASH !!!
 
 
 # Your email. Will be used in severe error messages so that users can contact you. 
 # You will also receive notifications for new user registrations.
-$admin_email = 'blog@fplanque.net';
+$admin_email = 'postmaster@localhost';
 
 
 # Once you have edited this file to your settings, set the following to 1 (one):
-$config_is_done = 1;
+$config_is_done = 0;
 
 
 # IMPORTANT: you will find more parameters in the other files of the /conf folder
@@ -59,10 +59,10 @@ $config_is_done = 1;
 # got your basic installation working. They'll let you customize a lot of things!
 
 # DO NOT EDIT THE FOLLOWING!
-@include_once (dirname(__FILE__)."/_config_TEST.php"); // Put testing conf in there
-require_once (dirname(__FILE__)."/_advanced.php");
-require_once (dirname(__FILE__)."/_locales.php");
-require_once (dirname(__FILE__)."/_formatting.php");
-require_once( dirname(__FILE__) . '/_admin.php' );
-@include_once (dirname(__FILE__)."/_overrides_TEST.php"); // Override for testing in there
+@include_once dirname(__FILE__).'/_config_TEST.php'; // Put testing conf in there
+require_once dirname(__FILE__).'/_advanced.php';
+require_once dirname(__FILE__).'/_locales.php';
+require_once dirname(__FILE__).'/_formatting.php';
+require_once dirname(__FILE__).'/_admin.php';
+@include_once dirname(__FILE__).'/_overrides_TEST.php'; // Override for testing in there
 ?>
