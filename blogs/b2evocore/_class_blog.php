@@ -21,7 +21,7 @@ class Blog extends DataObject
 	/** 
 	 * Constructor
 	 *
-	 * {@internal Blog::Blog(-) }
+	 * {@internal Blog::Blog(-) }}
 	 *
 	 * @param object DB row
 	 */
@@ -50,7 +50,7 @@ class Blog extends DataObject
 	 *		- Posts
 	 *		- Comments
 	 *
-	 * {@internal Blog::dbdelete(-) }
+	 * {@internal Blog::dbdelete(-) }}
 	 *
 	 * @todo unfinished!
 	 */

@@ -17,7 +17,7 @@ param( 'action', 'string' );
 /** 
  * Local use
  *
- * {@internal cats_display_blog_list(-) }
+ * {@internal cats_display_blog_list(-) }}
  *
  * @access private 
  */

@@ -48,7 +48,7 @@ class Group extends DataObject
 	/** 
 	 * Constructor
 	 *
-	 * {@internal Group::Group(-) }
+	 * {@internal Group::Group(-) }}
 	 *
 	 * @param object DB row
 	 */
@@ -87,7 +87,7 @@ class Group extends DataObject
 	/** 
 	 * Set param value
 	 *
-	 * {@internal Group::set(-) }
+	 * {@internal Group::set(-) }}
 	 *
 	 * @param string Parameter name
 	 * @return mixed Parameter value
@@ -108,7 +108,7 @@ class Group extends DataObject
 	/** 
 	 * Check a permission for this group
 	 *
-	 * {@internal Group::check_perm(-) }
+	 * {@internal Group::check_perm(-) }}
 	 *
 	 * @param string Permission name:
 	 *									- templates

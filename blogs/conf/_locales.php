@@ -29,8 +29,8 @@ $languages = array(
 	'pt' => NT_('Portuguese'),
 	'es' => NT_('Spanish'),
 	'sv' => NT_('Swedish'),
-	'zh' => NT_('Traditional Chinese'),
 	'zh' => NT_('Simplified Chinese'),
+//	'zh' => NT_('Traditional Chinese'),
 	);
 
 
@@ -38,6 +38,7 @@ $languages = array(
 # These use an ISO 639 language code, a '_' and an ISO 3166 country code
 # This MUST BE in the list below
 $default_locale = 'en_US';
+
 $default_locale = 'fr_FR';		// for testing :))
 
 

@@ -43,7 +43,7 @@ class DataObject
 	/** 
 	 * Constructor
 	 *
-	 * {@internal DataObject::DataObject(-) }
+	 * {@internal DataObject::DataObject(-) }}
 	 *
 	 * @param string Name of table in database
 	 * @param string Prefix of fields in the table
@@ -59,7 +59,7 @@ class DataObject
 	/** 
 	 * Get a member param by its name
 	 *
-	 * {@internal DataObject::get(-) }
+	 * {@internal DataObject::get(-) }}
 	 *
 	 * @param mixed Name of parameter
 	 * @return mixed Value of parameter
@@ -72,7 +72,7 @@ class DataObject
 	/** 
 	 * Display a member param by its name
 	 *
-	 * {@internal DataObject::disp(-) }
+	 * {@internal DataObject::disp(-) }}
 	 *
 	 * @param mixed Name of parameter
 	 * @param mixed Output format, see {@link format_to_output()}

@@ -336,7 +336,7 @@ $bloggernewpost_doc='Adds a post, blogger-api like';
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_newPost.html}
  *
- * {@internal bloggernewpost(-) }
+ * {@internal bloggernewpost(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
@@ -466,7 +466,7 @@ $bloggereditpost_doc='Edits a post, blogger-api like';
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_editPost.html}
  *
- * {@internal bloggereditpost(-) }
+ * {@internal bloggereditpost(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
@@ -628,7 +628,7 @@ $bloggerdeletepost_doc='Deletes a post, blogger-api like';
  * This API call is not documented on
  * {@link http://www.blogger.com/developers/api/1_docs/}
  *
- * {@internal bloggerdeletepost(-) }
+ * {@internal bloggerdeletepost(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
@@ -713,7 +713,7 @@ $bloggergetusersblogs_doc='returns the user\'s blogs - this is a dummy function,
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_getUsersBlogs.html}
  *
- * {@internal bloggergetusersblogs(-) }
+ * {@internal bloggergetusersblogs(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
@@ -792,7 +792,7 @@ $bloggergetuserinfo_doc='gives the info about a user';
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_getUserInfo.html}
  *
- * {@internal bloggergetuserinfo(-) }
+ * {@internal bloggergetuserinfo(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
@@ -855,7 +855,7 @@ $bloggergetpost_doc='fetches a post, blogger-api like';
  * This API call is not documented on
  * {@link http://www.blogger.com/developers/api/1_docs/}
  *
- * {@internal bloggergetpost(-) }
+ * {@internal bloggergetpost(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
@@ -926,7 +926,7 @@ $bloggergetrecentposts_doc='fetches X most recent posts, blogger-api like';
  * This API call is not documented on
  * {@link http://www.blogger.com/developers/api/1_docs/}
  *
- * {@internal bloggergetrecentposts(-) }
+ * {@internal bloggergetrecentposts(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
@@ -1062,7 +1062,7 @@ $bloggergettemplate_doc='returns the default template file\'s code';
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_getTemplate.html}
  *
- * {@internal bloggergettemplate(-) }
+ * {@internal bloggergettemplate(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 
@@ -1152,7 +1152,7 @@ $bloggersettemplate_doc='saves the default template file\'s code';
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_getTemplate.html}
  *
- * {@internal bloggersettemplate(-) }
+ * {@internal bloggersettemplate(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post. 

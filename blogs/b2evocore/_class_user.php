@@ -180,7 +180,7 @@ class User extends DataObject
 	/** 
 	 * Check permission for this user
 	 *
-	 * {@internal User::check_perm(-) }
+	 * {@internal User::check_perm(-) }}
 	 *
 	 * @param string Permission name, can be one of:
 	 *								- 'upload'
@@ -245,7 +245,7 @@ class User extends DataObject
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()) instead
 	 *
-	 * {@internal User::check_perm_blogusers(-) }
+	 * {@internal User::check_perm_blogusers(-) }}
 	 *
 	 * @see User::check_perm()
 	 * @param string Permission name, can be one of the following:
@@ -348,7 +348,7 @@ class User extends DataObject
 	 * - comments on this users' posts
 	 * - user/blog permissions
 	 *
-	 * {@internal User::dbdelete(-) }
+	 * {@internal User::dbdelete(-) }}
 	 */
 	function dbdelete()
 	{

@@ -144,7 +144,7 @@ function blog_update(
 /** 
  * Update the user permissions for edited blog
  *
- * {@internal blog_update_user_perms(-) }
+ * {@internal blog_update_user_perms(-) }}
  *
  * @param int Blog ID
  */

@@ -28,7 +28,7 @@ if( $use_html_checker ) require_once (dirname(__FILE__).'/_class_htmlchecker.php
 /**
  * Connect to MySQL database
  *
- * {@internal dbconnect(-) }
+ * {@internal dbconnect(-) }}
  */
 function dbconnect()
 {
@@ -45,7 +45,7 @@ function dbconnect()
 /**
  * Report MySQL errors in detail.
  *
- * {@internal mysql_oops(-) }
+ * {@internal mysql_oops(-) }}
  *
  * @param string The query which led to the error
  *
@@ -68,7 +68,7 @@ function mysql_oops($sql_query)
 /** 
  * Format the content for being output
  *
- * {@internal format_to_output(-) }
+ * {@internal format_to_output(-) }}
  *
  * @author fplanque
  * @param string raw text
@@ -976,7 +976,7 @@ function remove_magic_quotes( $mixed )
  * Also forces type.
  * Priority order: POST, GET, COOKIE, DEFAULT.
  *
- * {@internal param(-) }
+ * {@internal param(-) }}
  *
  * @author fplanque
  * @param string Variable to set
@@ -1220,7 +1220,7 @@ function autoquote( & $string )
  * fplanque: 0.8.5: changed return values
  * vegarg: 0.8.6.2: switched to MySQL antispam list
  *
- * {@internal validate_url(-) }
+ * {@internal validate_url(-) }}
  *
  * @param string Url to validate
  * @param array Allowed URI schemes (see /conf/_formatting.php)
