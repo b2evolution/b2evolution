@@ -62,13 +62,20 @@ $app_exit_links = '<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout'
 // Investigation for following code by Isaac - http://isaac.beigetower.org/
 // $debug = true;
 if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
-{	// Warning: on some IIS installs it it set but empty!
-	// Besides, use of explode is not very efficient so other methods are preferred.
+{ // Warning: on some IIS installs it it set but empty!
 	$Debuglog->add( 'Getting ReqURI from REQUEST_URI', 'vars' );
 	$ReqURI = $_SERVER['REQUEST_URI'];
-	// Remove params from reqURI:
-	$ReqPath = explode( '?', $ReqURI, 2 );
-	$ReqPath = $ReqPath[0];
+
+	// Build requested Path without query string:
+	$pos = strpos( $ReqURI, '?' );
+	if( false !== $pos )
+	{
+		$ReqPath = substr( $ReqURI, 0, $pos  );
+	}
+	else
+	{
+		$ReqPath = $ReqURI;
+	}
 }
 elseif( isset($_SERVER['URL']) )
 { // ISAPI
@@ -78,8 +85,18 @@ elseif( isset($_SERVER['URL']) )
 }
 elseif( isset($_SERVER['PATH_INFO']) )
 { // CGI/FastCGI
-	$Debuglog->add( 'Getting ReqPath from PATH_INFO', 'vars' );
-	$ReqPath = $_SERVER['PATH_INFO'];
+	if( isset($_SERVER['SCRIPT_NAME']) )
+	{
+		$Debuglog->add( 'Getting ReqPath from PATH_INFO and SCRIPT_NAME', 'vars' );
+
+		$ReqPath = $_SERVER['SCRIPT_NAME'].$_SERVER['PATH_INFO'];
+	}
+	else
+	{ // does this happen??
+		$Debuglog->add( 'Getting ReqPath from PATH_INFO only!', 'vars' );
+
+		$ReqPath = $_SERVER['PATH_INFO'];
+	}
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['SCRIPT_NAME']) )
@@ -99,12 +116,15 @@ else
 	$ReqPath = false;
 	$ReqURI = false;
 	?>
-	<p><span class="error">Warning: $ReqPath could not be set. Probably an odd IIS problem.</span><br />
+	<p class="error">
+	Warning: $ReqPath could not be set. Probably an odd IIS problem.
+	</p>
+	<p>
 	Go to your <a href="<?php echo $baseurl.$install_subdir ?>phpinfo.php">phpinfo page</a>,
 	look for occurences of <code><?php
 	// take the baseurlroot out..
 	echo preg_replace('#^'.$baseurlroot.'#', '', $baseurl.$install_subdir )
-	?>/phpinfo.php</code> and copy all lines
+	?>phpinfo.php</code> and copy all lines
 	containing this to the <a href="http://forums.b2evolution.net">forum</a>. Also specify what webserver
 	you're running on.
 	<br />
@@ -274,6 +294,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/02 01:41:17  blueyed
+ * improced $ReqUri/$ReqPath building
+ *
  * Revision 1.10  2005/01/21 23:59:11  blueyed
  * forgotten..
  *
