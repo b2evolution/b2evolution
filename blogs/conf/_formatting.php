@@ -509,12 +509,13 @@ $b2_htmltransbis = array(
 );
 $b2_htmltrans = array_merge($b2_htmltrans,$b2_htmltransbis);
 
-#Translation of invalid Unicode references range to valid range
+# Translation of invalid Unicode references range to valid range
+# these are Windows CP1252 specific characters
+# they would look weird on non-Windows browsers
 $b2_htmltranswinuni = array(
 	'&#128;' => '&#8364;', // the Euro sign
-	'&#129;' => '',
-	'&#130;' => '&#8218;', // these are Windows CP1252 specific characters
-	'&#131;' => '&#402;',  // they would look weird on non-Windows browsers
+	'&#130;' => '&#8218;', 
+	'&#131;' => '&#402;',  
 	'&#132;' => '&#8222;',
 	'&#133;' => '&#8230;',
 	'&#134;' => '&#8224;',
@@ -524,10 +525,7 @@ $b2_htmltranswinuni = array(
 	'&#138;' => '&#352;',
 	'&#139;' => '&#8249;',
 	'&#140;' => '&#338;',
-	'&#141;' => '',
 	'&#142;' => '&#382;',
-	'&#143;' => '',
-	'&#144;' => '',
 	'&#145;' => '&#8216;',
 	'&#146;' => '&#8217;',
 	'&#147;' => '&#8220;',
@@ -540,8 +538,7 @@ $b2_htmltranswinuni = array(
 	'&#154;' => '&#353;',
 	'&#155;' => '&#8250;',
 	'&#156;' => '&#339;',
-	'&#157;' => '',
-	'&#158;' => '',
+	'&#158;' => '&#382;',
 	'&#159;' => '&#376;'
 );
 

@@ -65,43 +65,13 @@ elseif(strpos($HTTP_USER_AGENT, 'Nav') !== false || preg_match('/Mozilla\/4\./',
 }
 $is_IE = (($is_macIE) || ($is_winIE));
 
-// browser-specific javascript corrections
-$b2_macIE_correction['in'] = array(
-	'/\%uFFD4/', '/\%uFFD5/', '/\%uFFD2/', '/\%uFFD3/',
-	'/\%uFFA5/', '/\%uFFD0/', '/\%uFFD1/', '/\%uFFBD/',
-	'/\%uFF83%uFFC0/', '/\%uFF83%uFFC1/', '/\%uFF83%uFFC6/', '/\%uFF83%uFFC9/',
-	'/\%uFFB9/', '/\%uFF81%uFF8C/', '/\%uFF81%uFF8D/', '/\%uFF81%uFFDA/',
-	'/\%uFFDB/'
-);
-$b2_macIE_correction['out'] = array(
-	'&lsquo;', '&rsquo;', '&ldquo;', '&rdquo;',
-	'&bull;',  '&ndash;', '&mdash;', '&Omega;',
-	'&beta;',  '&gamma;', '&theta;', '&lambda;',
-	'&pi;',    '&prime;', '&Prime;', '&ang;',
-	'&euro;'
-);
-$b2_gecko_correction['in'] = array(
-	'/\‘/', '/\’/', '/\“/', '/\”/',
-	'/\•/', '/\–/', '/\—/', '/\Ω/',
-	'/\β/',  '/\γ/',  '/\θ/',  '/\λ/',
-	'/\π/',  '/\′/', '/\″/', '/\�/',
-	'/\€/', '/\ /'
-);
-$b2_gecko_correction['out'] = array(
-	'&8216;', '&rsquo;', '&ldquo;', '&rdquo;',
-	'&bull;', '&ndash;', '&mdash;', '&Omega;',
-	'&beta;', '&gamma;', '&theta;', '&lambda;',
-	'&pi;',   '&prime;', '&Prime;', '&ang;',
-	'&euro;', '&#8201;'
-);
 
 // server detection
 $is_Apache	= strpos($HTTP_SERVER_VARS['SERVER_SOFTWARE'], 'Apache') !== false ? 1 : 0;
 $is_IIS		= strpos($HTTP_SERVER_VARS['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false ? 1 : 0;
 
-// let's deactivate quicktags on IE Mac and Lynx, because they don't work there.
-if (($is_macIE) || ($is_lynx))
-	$use_quicktags=0;
+// let's deactivate quicktags on Lynx, because they don't work there.
+if($is_lynx)	$use_quicktags=0;
 
 
 // the weekdays and the months..
