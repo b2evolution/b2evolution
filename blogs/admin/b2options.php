@@ -201,7 +201,8 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				$q = $DB->query($query);
 				
 				// reset default_locale
-				change_setting( 'default_locale', $default_locale );
+				$Settings->set( 'default_locale', $default_locale );
+				$Settings->updateDB();
 				
 				$status_update[] = T_('Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded.');
 				break;

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-12 01:53+0200\n"
+"POT-Creation-Date: 2004-05-12 20:23+0200\n"
 "PO-Revision-Date: 2004-05-11 22:41+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
@@ -20,8 +20,8 @@ msgid "Selected"
 msgstr "Ausgewählt"
 
 #: ..\..\..\a_noskin.php:158 ..\..\..\a_noskin.php:249
-#: ..\..\..\multiblogs.php:137 ..\..\..\admin\_edit_form.php:323
-#: ..\..\..\admin\_edit_showposts.php:456 ..\..\..\admin\_menutop.php:71
+#: ..\..\..\multiblogs.php:137 ..\..\..\admin\_edit_form.php:329
+#: ..\..\..\admin\_edit_showposts.php:473 ..\..\..\admin\_menutop.php:71
 #: ..\..\..\skins\basic\_main.php:78 ..\..\..\skins\custom\_main.php:78
 #: ..\..\..\skins\custom\_main.php:178
 #: ..\..\..\skins\fplanque2002\_main.php:97
@@ -31,7 +31,7 @@ msgstr "Kategorien"
 
 #: ..\..\..\a_noskin.php:172 ..\..\..\multiblogs.php:136
 #: ..\..\..\multiblogs.php:219 ..\..\..\multiblogs.php:255
-#: ..\..\..\summary.php:92 ..\..\..\admin\_edit_showposts.php:149
+#: ..\..\..\summary.php:92 ..\..\..\admin\_edit_showposts.php:152
 #: ..\..\..\skins\_linkblog.php:68 ..\..\..\skins\basic\_main.php:68
 #: ..\..\..\skins\basic\_main.php:97 ..\..\..\skins\custom\_main.php:75
 #: ..\..\..\skins\custom\_main.php:92 ..\..\..\skins\fplanque2002\_main.php:94
@@ -41,8 +41,8 @@ msgstr "Permanenter Link zum ganzen Eintrag"
 
 #: ..\..\..\a_noskin.php:172 ..\..\..\multiblogs.php:136
 #: ..\..\..\multiblogs.php:151 ..\..\..\multiblogs.php:219
-#: ..\..\..\multiblogs.php:255 ..\..\..\admin\_edit_showposts.php:149
-#: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:126
+#: ..\..\..\multiblogs.php:255 ..\..\..\admin\_edit_showposts.php:152
+#: ..\..\..\admin\_edit_showposts.php:252 ..\..\..\skins\_feedback.php:126
 #: ..\..\..\skins\_lastcomments.php:39 ..\..\..\skins\_linkblog.php:68
 #: ..\..\..\skins\basic\_main.php:97 ..\..\..\skins\custom\_main.php:92
 #: ..\..\..\skins\fplanque2002\_main.php:94
@@ -87,8 +87,8 @@ msgid "Some viewing statistics"
 msgstr "ein paar Statistiken"
 
 #: ..\..\..\a_noskin.php:237 ..\..\..\a_noskin.php:243
-#: ..\..\..\admin\_edit_showposts.php:341
-#: ..\..\..\admin\_edit_showposts.php:531 ..\..\..\skins\custom\_main.php:166
+#: ..\..\..\admin\_edit_showposts.php:348
+#: ..\..\..\admin\_edit_showposts.php:548 ..\..\..\skins\custom\_main.php:166
 #: ..\..\..\skins\custom\_main.php:172
 #: ..\..\..\skins\fplanque2002\_main.php:183
 #: ..\..\..\skins\fplanque2002\_main.php:189
@@ -106,7 +106,7 @@ msgstr "Alles"
 msgid "Some Word"
 msgstr "ein Wort"
 
-#: ..\..\..\a_noskin.php:242 ..\..\..\admin\_edit_showposts.php:376
+#: ..\..\..\a_noskin.php:242 ..\..\..\admin\_edit_showposts.php:393
 #: ..\..\..\skins\custom\_main.php:171
 #: ..\..\..\skins\fplanque2002\_main.php:188
 msgid "Entire phrase"
@@ -129,7 +129,7 @@ msgstr "zurücksetzen"
 msgid "Get selection"
 msgstr "Auswählen"
 
-#: ..\..\..\a_noskin.php:261 ..\..\..\admin\_edit_showposts.php:380
+#: ..\..\..\a_noskin.php:261 ..\..\..\admin\_edit_showposts.php:397
 #: ..\..\..\skins\basic\_main.php:137 ..\..\..\skins\bluesky\_main.php:185
 #: ..\..\..\skins\custom\_main.php:190
 #: ..\..\..\skins\fplanque2002\_main.php:207
@@ -495,7 +495,7 @@ msgstr "Erweitert"
 msgid "Updating Blog [%s]..."
 msgstr "Aktualisiere Blog [%s]..."
 
-#: ..\..\..\admin\b2blogs.php:219 ..\..\..\admin\edit_actions.php:211
+#: ..\..\..\admin\b2blogs.php:219 ..\..\..\admin\edit_actions.php:212
 msgid "Cannot update, please correct these errors:"
 msgstr "Kann nicht aktualisieren, bitte berichtige diese Fehler:"
 
@@ -565,9 +565,7 @@ msgstr ""
 msgid "Writing to file [%s]..."
 msgstr "Schreibe in Datei [%s]..."
 
-#: ..\..\..\admin\b2blogs.php:545 ..\..\..\admin\edit_actions.php:118
-#: ..\..\..\admin\edit_actions.php:246 ..\..\..\admin\edit_actions.php:338
-#: ..\..\..\admin\edit_actions.php:402
+#: ..\..\..\admin\b2blogs.php:545 ..\..\..\admin\edit_actions.php:337
 #: ..\..\..\b2evocore\_functions_antispam.php:208
 #: ..\..\..\b2evocore\_functions_antispam.php:321
 #: ..\..\..\b2evocore\_functions_pings.php:54
@@ -670,7 +668,7 @@ msgid "Sorry, you have no permission to edit/view any category's properties."
 msgstr ""
 
 #: ..\..\..\admin\b2edit.php:26 ..\..\..\admin\edit_actions.php:191
-#: ..\..\..\admin\edit_actions.php:292
+#: ..\..\..\admin\edit_actions.php:290
 msgid "Oops, no post with this ID."
 msgstr "Oops, kein Eintrag mit dieser ID."
 
@@ -909,13 +907,13 @@ msgid "-&gt;S"
 msgstr "-&gt;S"
 
 #: ..\..\..\admin\b2stats.php:257 ..\..\..\admin\b2stats.php:271
-#: ..\..\..\admin\_edit_showposts.php:219
+#: ..\..\..\admin\_edit_showposts.php:222
 msgid "Ban this domain!"
 msgstr "Verbiete diese Domain!"
 
 #. TRANS: Abbrev.
 #: ..\..\..\admin\b2stats.php:257 ..\..\..\admin\b2stats.php:271
-#: ..\..\..\admin\_edit_showposts.php:219
+#: ..\..\..\admin\_edit_showposts.php:222
 msgid "Ban"
 msgstr "Verbieten"
 
@@ -1182,7 +1180,7 @@ msgstr "Bilddetails"
 msgid "Size"
 msgstr "Größe"
 
-#: ..\..\..\admin\b2upload.php:224 ..\..\..\admin\_edit_form.php:495
+#: ..\..\..\admin\b2upload.php:224 ..\..\..\admin\_edit_form.php:504
 msgid "Type"
 msgstr "Typ"
 
@@ -1321,88 +1319,103 @@ msgstr "Die Gruppe wurde nicht aktualisiert:"
 msgid "You are not allowed to view other users."
 msgstr "Du darfst nicht andere Benutzer betrachten."
 
-#: ..\..\..\admin\edit_actions.php:50
+#: ..\..\..\admin\edit_actions.php:62
 msgid "Adding new post..."
 msgstr "Neuen Eintrag hinzufügen..."
 
-#: ..\..\..\admin\edit_actions.php:88 ..\..\..\admin\edit_actions.php:205
-#: ..\..\..\admin\edit_actions.php:437 ..\..\..\htsrv\comment_post.php:63
+#: ..\..\..\admin\edit_actions.php:100 ..\..\..\admin\edit_actions.php:205
+#: ..\..\..\admin\edit_actions.php:444 ..\..\..\htsrv\comment_post.php:63
 #: ..\..\..\htsrv\trackback.php:63 ..\..\..\xmlsrv\xmlrpc.php:1368
 msgid "Supplied URL is invalid: "
 msgstr "Angegebene URL ist ungültig:"
 
-#: ..\..\..\admin\edit_actions.php:94 ..\..\..\htsrv\getmail.php:243
+#: ..\..\..\admin\edit_actions.php:107 ..\..\..\htsrv\getmail.php:243
 msgid "Cannot post, please correct these errors:"
 msgstr "Kann nicht gepostet werden, bitte korrigiere diese Fehler:"
 
-#: ..\..\..\admin\edit_actions.php:95 ..\..\..\admin\edit_actions.php:212
-#: ..\..\..\admin\edit_actions.php:442
+#: ..\..\..\admin\edit_actions.php:108 ..\..\..\admin\edit_actions.php:213
+#: ..\..\..\admin\edit_actions.php:449
 msgid "Back to post editing"
 msgstr "Zurück zum Editieren des Eintrags"
 
-#: ..\..\..\admin\edit_actions.php:101
+#: ..\..\..\admin\edit_actions.php:114
 msgid "Recording post..."
 msgstr "Eintrag wird aufgezeichnet..."
 
-#: ..\..\..\admin\edit_actions.php:114 ..\..\..\admin\edit_actions.php:398
+#: ..\..\..\admin\edit_actions.php:127 ..\..\..\admin\edit_actions.php:243
+#: ..\..\..\admin\edit_actions.php:401
 msgid "Sleeping..."
 msgstr "Pausiere..."
 
-#: ..\..\..\admin\edit_actions.php:124 ..\..\..\admin\edit_actions.php:252
-#: ..\..\..\admin\edit_actions.php:344
+#: ..\..\..\admin\edit_actions.php:131
+msgid "Posting Done..."
+msgstr "Eintragung beendet..."
+
+#: ..\..\..\admin\edit_actions.php:137 ..\..\..\admin\edit_actions.php:251
+#: ..\..\..\admin\edit_actions.php:343
 msgid ""
 "Post not publicly published: skipping trackback, pingback and blog pings..."
 msgstr ""
 "Eintrag wird nicht veröffentlicht: überspringe Trackback, Pingback und Pings "
 "zu anderen Blogs..."
 
-#: ..\..\..\admin\edit_actions.php:152
-msgid "Posting Done..."
-msgstr "Eintragung beendet..."
-
-#: ..\..\..\admin\edit_actions.php:165
+#: ..\..\..\admin\edit_actions.php:165 ..\..\..\admin\edit_actions.php:219
 msgid "Updating post..."
 msgstr "Aktualisiere Eintrag..."
 
-#: ..\..\..\admin\edit_actions.php:268 ..\..\..\admin\edit_actions.php:355
+#: ..\..\..\admin\edit_actions.php:267 ..\..\..\admin\edit_actions.php:354
 msgid "Post had already pinged: skipping blog pings..."
 msgstr "Eintrag wurde bereits gepingt: überspringe Pings fürs Blog"
 
-#: ..\..\..\admin\edit_actions.php:280 ..\..\..\admin\edit_actions.php:367
+#: ..\..\..\admin\edit_actions.php:279 ..\..\..\admin\edit_actions.php:366
 msgid "Updating done..."
 msgstr "Aktualisierung beendet..."
 
-#: ..\..\..\admin\edit_actions.php:297
+#: ..\..\..\admin\edit_actions.php:296
 msgid "Updating post status..."
 msgstr "Aktualisiere Eintragsstatus..."
 
-#: ..\..\..\admin\edit_actions.php:380
-msgid "Oops, no post with this ID!"
-msgstr "Oops, kein Eintrag mit dieser ID!"
-
-#: ..\..\..\admin\edit_actions.php:384 ..\..\..\admin\edit_actions.php:392
+#: ..\..\..\admin\edit_actions.php:376 ..\..\..\admin\edit_actions.php:395
 msgid "Deleting post..."
 msgstr "Lösche Eintrag..."
 
-#: ..\..\..\admin\edit_actions.php:405
+#: ..\..\..\admin\edit_actions.php:384
+msgid "Oops, no post with this ID!"
+msgstr "Oops, kein Eintrag mit dieser ID!"
+
+#: ..\..\..\admin\edit_actions.php:406
 msgid "Deleting Done..."
 msgstr "Löschen beendet..."
 
-#: ..\..\..\admin\edit_actions.php:441
+#: ..\..\..\admin\edit_actions.php:410 ..\..\..\b2evocore\_class_pop3.php:105
+#: ..\..\..\b2evocore\_class_pop3.php:117
+#: ..\..\..\b2evocore\_class_pop3.php:160
+#: ..\..\..\b2evocore\_class_pop3.php:295
+#: ..\..\..\b2evocore\_class_pop3.php:349
+#: ..\..\..\b2evocore\_class_pop3.php:360
+#: ..\..\..\b2evocore\_class_pop3.php:408
+#: ..\..\..\b2evocore\_class_pop3.php:441
+#: ..\..\..\b2evocore\_class_pop3.php:474
+#: ..\..\..\b2evocore\_class_pop3.php:573
+#: ..\..\..\b2evocore\_class_pop3.php:596
+msgid "Error"
+msgstr "Fehler"
+
+#: ..\..\..\admin\edit_actions.php:448
 msgid "Cannot update comment, please correct these errors:"
 msgstr "Kommentar kann nicht aktualisiert werden, bitte behebe diese Fehler:"
 
-#: ..\..\..\admin\edit_actions.php:503
+#: ..\..\..\admin\edit_actions.php:501
 msgid "Back to posts!"
 msgstr "Zurück zu den Einträgen!"
 
-#: ..\..\..\admin\edit_actions.php:507
+#: ..\..\..\admin\edit_actions.php:506
 msgid "You may also want to generate static pages or view your blogs..."
 msgstr ""
 "Du möchtest eventuell auch statische Seiten generieren oder Deine Blogs "
 "anschauen..."
 
-#: ..\..\..\admin\edit_actions.php:515
+#: ..\..\..\admin\edit_actions.php:514
 msgid "New post"
 msgstr "Neuer Eintrag"
 
@@ -1535,7 +1548,7 @@ msgstr "Blog aktualisieren!"
 #: ..\..\..\admin\_blogs_advanced.form.php:46
 #: ..\..\..\admin\_blogs_general.form.php:103
 #: ..\..\..\admin\_blogs_permissions.form.php:205
-#: ..\..\..\admin\_edit_showposts.php:532
+#: ..\..\..\admin\_edit_showposts.php:549
 #: ..\..\..\admin\_set_general.form.php:79
 #: ..\..\..\admin\_set_plugins.form.php:69
 #: ..\..\..\admin\_set_regional.form.php:70
@@ -1960,7 +1973,7 @@ msgstr ""
 "Blogs zugeordnet."
 
 #: ..\..\..\admin\_edit_form.php:99
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:362
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:374
 msgid "Title"
 msgstr "Titel"
 
@@ -1983,150 +1996,152 @@ msgstr "EMail"
 
 #: ..\..\..\admin\_edit_form.php:136 ..\..\..\admin\_users_form.php:138
 #: ..\..\..\admin\_users_form.php:140 ..\..\..\admin\_users_list.php:21
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:345
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:357
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:369
 #: ..\..\..\skins\_profile.php:70 ..\..\..\skins\basic\_profile.php:72
 msgid "URL"
 msgstr "URL"
 
-#: ..\..\..\admin\_edit_form.php:160 ..\..\..\admin\_edit_showposts.php:296
+#: ..\..\..\admin\_edit_form.php:161 ..\..\..\admin\_edit_showposts.php:299
 #: ..\..\..\admin\_set_general.form.php:48 ..\..\..\skins\_feedback.php:207
 #: ..\..\..\skins\basic\_feedback.php:199
 msgid "Auto-BR"
 msgstr "Auto-BR"
 
-#: ..\..\..\admin\_edit_form.php:160 ..\..\..\admin\_set_general.form.php:48
+#: ..\..\..\admin\_edit_form.php:161 ..\..\..\admin\_set_general.form.php:48
 msgid "This option is deprecated, you should avoid using it."
 msgstr "Diese Option ist veraltet, du solltest aufhören sie zu nutzen."
 
-#: ..\..\..\admin\_edit_form.php:165
+#: ..\..\..\admin\_edit_form.php:166
 msgid "Preview"
 msgstr "Vorschau"
 
-#: ..\..\..\admin\_edit_form.php:171
+#: ..\..\..\admin\_edit_form.php:172
 msgid "Blog this !"
 msgstr "Blog das !"
 
-#: ..\..\..\admin\_edit_form.php:172
+#: ..\..\..\admin\_edit_form.php:173
 msgid "Edit this !"
 msgstr "Ändere das !"
 
-#: ..\..\..\admin\_edit_form.php:177
+#: ..\..\..\admin\_edit_form.php:178
 msgid "Spellcheck"
 msgstr "Rechtschreibprüfung"
 
-#: ..\..\..\admin\_edit_form.php:183
+#: ..\..\..\admin\_edit_form.php:184
 msgid "Upload a file/image"
 msgstr "Datei/Bild hochladen"
 
-#: ..\..\..\admin\_edit_form.php:188
+#: ..\..\..\admin\_edit_form.php:189
 msgid "Advanced properties"
 msgstr "Erweiterte Eigenschaften"
 
-#: ..\..\..\admin\_edit_form.php:196
+#: ..\..\..\admin\_edit_form.php:197
 msgid "Edit timestamp"
 msgstr "Zeitstempel ändern"
 
-#: ..\..\..\admin\_edit_form.php:231
+#: ..\..\..\admin\_edit_form.php:232
 msgid "URL Title"
 msgstr "URL Titel"
 
-#: ..\..\..\admin\_edit_form.php:233
+#: ..\..\..\admin\_edit_form.php:234
 msgid "(to be used in permalinks)"
 msgstr "(wird für Permalinks verwendet)"
 
-#: ..\..\..\admin\_edit_form.php:245
+#: ..\..\..\admin\_edit_form.php:246
 msgid "Additional actions"
 msgstr "Weitere Aktionen"
 
-#: ..\..\..\admin\_edit_form.php:253
+#: ..\..\..\admin\_edit_form.php:254
 msgid "Pingback"
 msgstr "Pingback"
 
-#: ..\..\..\admin\_edit_form.php:253
+#: ..\..\..\admin\_edit_form.php:254
 msgid "(Send a pingback to all URLs in this post)"
 msgstr "(Sende ein Pingback an alle URLs in diesem Eintrag)"
 
-#: ..\..\..\admin\_edit_form.php:262
+#: ..\..\..\admin\_edit_form.php:263
 msgid "Trackback URLs"
 msgstr "Trackback URLs"
 
-#: ..\..\..\admin\_edit_form.php:262
+#: ..\..\..\admin\_edit_form.php:263
 msgid "(Separate by space)"
 msgstr "(durch Leerzeichen trennen)"
 
-#: ..\..\..\admin\_edit_form.php:283 ..\..\..\admin\_edit_form.php:496
+#: ..\..\..\admin\_edit_form.php:284 ..\..\..\admin\_edit_form.php:505
 #: ..\..\..\admin\_edit_showposts.php:133
 msgid "Status"
 msgstr "Status"
 
-#: ..\..\..\admin\_edit_form.php:289
+#: ..\..\..\admin\_edit_form.php:290
 msgid "The post will be publicly published"
 msgstr "Der Eintrag wird öffentlich veröffentlicht"
 
-#: ..\..\..\admin\_edit_form.php:289 ..\..\..\admin\_edit_showposts.php:354
+#: ..\..\..\admin\_edit_form.php:291 ..\..\..\admin\_edit_showposts.php:364
 msgid "Published (Public)"
 msgstr "Veröffentlicht (öffentlich)"
 
-#: ..\..\..\admin\_edit_form.php:295
+#: ..\..\..\admin\_edit_form.php:297
 msgid "The post will be published but visible only by logged-in blog members"
 msgstr ""
 "Der Eintrag wird veröffentlicht, aber ist nur für eingeloggte Mitglieder "
 "sichtbar"
 
-#: ..\..\..\admin\_edit_form.php:295 ..\..\..\admin\_edit_showposts.php:356
+#: ..\..\..\admin\_edit_form.php:298 ..\..\..\admin\_edit_showposts.php:367
 msgid "Protected (Members only)"
 msgstr "Geschützt (nur Mitglieder)"
 
-#: ..\..\..\admin\_edit_form.php:301
+#: ..\..\..\admin\_edit_form.php:304
 msgid "The post will be published but visible only by yourself"
 msgstr "Der Eintrag wird veröffentlicht, aber ist nur für dich sichtbar."
 
-#: ..\..\..\admin\_edit_form.php:301 ..\..\..\admin\_edit_showposts.php:358
+#: ..\..\..\admin\_edit_form.php:305 ..\..\..\admin\_edit_showposts.php:370
 msgid "Private (You only)"
 msgstr "Privat (nur du)"
 
-#: ..\..\..\admin\_edit_form.php:307 ..\..\..\admin\_edit_form.php:313
+#: ..\..\..\admin\_edit_form.php:311 ..\..\..\admin\_edit_form.php:318
 msgid "The post will appear only in the backoffice"
 msgstr "Der Eintrag wird nur im Back-Office erscheinen"
 
-#: ..\..\..\admin\_edit_form.php:307 ..\..\..\admin\_edit_showposts.php:360
+#: ..\..\..\admin\_edit_form.php:312 ..\..\..\admin\_edit_showposts.php:373
 msgid "Draft (Not published!)"
 msgstr "Entwurf (nicht veröffentlicht!)"
 
-#: ..\..\..\admin\_edit_form.php:313 ..\..\..\admin\_edit_showposts.php:362
+#: ..\..\..\admin\_edit_form.php:319 ..\..\..\admin\_edit_showposts.php:376
 msgid "Deprecated (Not published!)"
 msgstr "Missbilligt (nicht veröffentlicht!)"
 
-#: ..\..\..\admin\_edit_form.php:327
+#: ..\..\..\admin\_edit_form.php:333
+#, fuzzy
 msgid ""
-"Select main category in target blog and optionnaly check addtionnal "
+"Select main category in target blog and optionally check additional "
 "categories"
 msgstr ""
-"Wähle die Hauptkategorie im Ziel-Blog und markiere optional weitere Kategorien"
+"Wähle die Hauptkategorie im Ziel-Blog und markiere optional weitere "
+"Kategorien"
 
-#: ..\..\..\admin\_edit_form.php:348
+#: ..\..\..\admin\_edit_form.php:354
 msgid "Select as an additionnal category"
 msgstr "Wähle als zusätzliche Kategorie"
 
-#: ..\..\..\admin\_edit_form.php:361
+#: ..\..\..\admin\_edit_form.php:367
 msgid "Select as MAIN category"
 msgstr "Wähle als HAUPT-Kategorie"
 
-#: ..\..\..\admin\_edit_form.php:389
+#: ..\..\..\admin\_edit_form.php:395
 msgid "Note: Cross posting among multiple blogs is enabled."
 msgstr "Anmerkung: Quer-Einträge in mehrere Blogs sind möglich."
 
-#: ..\..\..\admin\_edit_form.php:400
+#: ..\..\..\admin\_edit_form.php:406
 msgid "Note: Cross posting among multiple blogs is currently disabled."
 msgstr "Anmerkung: Quer-Einträge in mehrere Blogs sind derzeit nicht möglich."
 
-#: ..\..\..\admin\_edit_form.php:402
+#: ..\..\..\admin\_edit_form.php:408
 msgid "Note: Cross posting among multiple categories is currently disabled."
 msgstr ""
 "Anmerkung: Quer-Einträge in mehrere Kategorien ist derzeit nicht möglich."
 
-#: ..\..\..\admin\_edit_form.php:412 ..\..\..\admin\_edit_showposts.php:192
+#: ..\..\..\admin\_edit_form.php:418 ..\..\..\admin\_edit_showposts.php:195
 #: ..\..\..\skins\_feedback.php:50 ..\..\..\skins\basic\_feedback.php:50
 #: ..\..\..\skins\custom\_main.php:259 ..\..\..\skins\custom\_main.php:264
 #: ..\..\..\skins\custom\_main.php:269 ..\..\..\skins\custom\_main.php:274
@@ -2137,44 +2152,44 @@ msgstr ""
 msgid "Comments"
 msgstr "Kommentare"
 
-#: ..\..\..\admin\_edit_form.php:414
+#: ..\..\..\admin\_edit_form.php:420
 msgid "Visitors can leave comments on this post."
 msgstr "Besucher können Kommentare zu diesem Eintrag hinterlassen."
 
-#: ..\..\..\admin\_edit_form.php:414
+#: ..\..\..\admin\_edit_form.php:421
 msgid "Open"
 msgstr "Offen"
 
-#: ..\..\..\admin\_edit_form.php:416
+#: ..\..\..\admin\_edit_form.php:423
 msgid "Visitors can NOT leave comments on this post."
 msgstr "Besucher können KEINE Kommentare zu diesem Eintrag hinterlassen."
 
-#: ..\..\..\admin\_edit_form.php:416
+#: ..\..\..\admin\_edit_form.php:424
 msgid "Closed"
 msgstr "Geschlossen"
 
-#: ..\..\..\admin\_edit_form.php:418
+#: ..\..\..\admin\_edit_form.php:426
 msgid "Visitors cannot see nor leave comments on this post."
 msgstr "Besucher können Kommentare weder sehen noch hinterlassen."
 
-#: ..\..\..\admin\_edit_form.php:418
+#: ..\..\..\admin\_edit_form.php:427
 msgid "Disabled"
 msgstr "Abgeschaltet"
 
-#: ..\..\..\admin\_edit_form.php:423
+#: ..\..\..\admin\_edit_form.php:432
 msgid "Renderers"
 msgstr "Renderer"
 
-#: ..\..\..\admin\_edit_form.php:493
+#: ..\..\..\admin\_edit_form.php:502
 msgid "Comment info"
 msgstr "Kommentar Information"
 
-#: ..\..\..\admin\_edit_form.php:494 ..\..\..\htsrv\comment_post.php:131
+#: ..\..\..\admin\_edit_form.php:503 ..\..\..\htsrv\comment_post.php:131
 #: ..\..\..\htsrv\comment_post.php:137
 msgid "Author"
 msgstr "Autor"
 
-#: ..\..\..\admin\_edit_form.php:497
+#: ..\..\..\admin\_edit_form.php:506
 msgid "IP address"
 msgstr "IP Adresse"
 
@@ -2228,18 +2243,23 @@ msgstr "Level:"
 msgid "in"
 msgstr "in"
 
+#: ..\..\..\admin\_edit_showposts.php:149
+#: ..\..\..\b2evocore\_functions_bposts.php:790
+msgid "Pages:"
+msgstr "Seiten:"
+
 #. TRANS: Edit button text (&nbsp; for extra space)
-#: ..\..\..\admin\_edit_showposts.php:155
-#: ..\..\..\admin\_edit_showposts.php:255
+#: ..\..\..\admin\_edit_showposts.php:158
+#: ..\..\..\admin\_edit_showposts.php:258
 msgid "&nbsp; Edit &nbsp;"
 msgstr "Editieren"
 
-#: ..\..\..\admin\_edit_showposts.php:163
-#: ..\..\..\admin\_edit_showposts.php:256
+#: ..\..\..\admin\_edit_showposts.php:166
+#: ..\..\..\admin\_edit_showposts.php:259
 msgid "Delete"
 msgstr "Löschen"
 
-#: ..\..\..\admin\_edit_showposts.php:163
+#: ..\..\..\admin\_edit_showposts.php:166
 msgid ""
 "You are about to delete this post!\\n\\'Cancel\\' to stop, \\'OK\\' to "
 "delete."
@@ -2247,85 +2267,85 @@ msgstr ""
 "Du bist dabei, diesen Eintrag zu löschen!\\n\\'Stopp\\' um abzubrechen, \\'OK"
 "\\' um zu löschen."
 
-#: ..\..\..\admin\_edit_showposts.php:173
+#: ..\..\..\admin\_edit_showposts.php:176
 msgid "Publish NOW!"
 msgstr "JETZT veröffentlichen"
 
-#: ..\..\..\admin\_edit_showposts.php:173
+#: ..\..\..\admin\_edit_showposts.php:176
 msgid "Publish now using current date and time."
 msgstr "Veröffentliche jetzt mit aktuellem Datum und Zeit."
 
 #. TRANS: Link to comments for current post
-#: ..\..\..\admin\_edit_showposts.php:179
+#: ..\..\..\admin\_edit_showposts.php:182
 msgid "no comment"
 msgstr "kein Kommentar"
 
-#: ..\..\..\admin\_edit_showposts.php:179
+#: ..\..\..\admin\_edit_showposts.php:182
 #: ..\..\..\b2evocore\_class_item.php:695
 #: ..\..\..\b2evocore\_functions_comments.php:206
 msgid "1 comment"
 msgstr "1 Kommentar"
 
-#: ..\..\..\admin\_edit_showposts.php:179
+#: ..\..\..\admin\_edit_showposts.php:182
 #: ..\..\..\b2evocore\_class_item.php:696
 #: ..\..\..\b2evocore\_functions_comments.php:207
 #, php-format
 msgid "%d comments"
 msgstr "%d Kommentare"
 
-#: ..\..\..\admin\_edit_showposts.php:180
+#: ..\..\..\admin\_edit_showposts.php:183
 msgid "1 Trackback"
 msgstr "1 Trackback"
 
-#: ..\..\..\admin\_edit_showposts.php:180
+#: ..\..\..\admin\_edit_showposts.php:183
 #, php-format
 msgid "%d Trackbacks"
 msgstr "%d Trackbacks"
 
-#: ..\..\..\admin\_edit_showposts.php:181
+#: ..\..\..\admin\_edit_showposts.php:184
 msgid "1 Pingback"
 msgstr "1 Pingback"
 
-#: ..\..\..\admin\_edit_showposts.php:181
+#: ..\..\..\admin\_edit_showposts.php:184
 #, php-format
 msgid "%d Pingbacks"
 msgstr "%d Pingbacks"
 
-#: ..\..\..\admin\_edit_showposts.php:192 ..\..\..\skins\_feedback.php:61
+#: ..\..\..\admin\_edit_showposts.php:195 ..\..\..\skins\_feedback.php:61
 #: ..\..\..\skins\basic\_feedback.php:61
 msgid "Trackbacks"
 msgstr "Trackbacks"
 
-#: ..\..\..\admin\_edit_showposts.php:192 ..\..\..\skins\_feedback.php:66
+#: ..\..\..\admin\_edit_showposts.php:195 ..\..\..\skins\_feedback.php:66
 #: ..\..\..\skins\basic\_feedback.php:66
 msgid "Pingbacks"
 msgstr "Pingbacks"
 
-#: ..\..\..\admin\_edit_showposts.php:199
+#: ..\..\..\admin\_edit_showposts.php:202
 msgid "No feedback for this post yet..."
 msgstr "bisher kein Feedback für diesen Eintrag..."
 
-#: ..\..\..\admin\_edit_showposts.php:231 ..\..\..\skins\_feedback.php:105
+#: ..\..\..\admin\_edit_showposts.php:234 ..\..\..\skins\_feedback.php:105
 #: ..\..\..\skins\basic\_feedback.php:103
 msgid "Comment from:"
 msgstr "Kommentar von:"
 
-#: ..\..\..\admin\_edit_showposts.php:235 ..\..\..\skins\_feedback.php:111
+#: ..\..\..\admin\_edit_showposts.php:238 ..\..\..\skins\_feedback.php:111
 #: ..\..\..\skins\basic\_feedback.php:109
 msgid "Trackback from:"
 msgstr "Trackback von:"
 
-#: ..\..\..\admin\_edit_showposts.php:239 ..\..\..\skins\_feedback.php:116
+#: ..\..\..\admin\_edit_showposts.php:242 ..\..\..\skins\_feedback.php:116
 #: ..\..\..\skins\basic\_feedback.php:114
 msgid "Pingback from:"
 msgstr "Pingback von:"
 
-#: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:126
+#: ..\..\..\admin\_edit_showposts.php:252 ..\..\..\skins\_feedback.php:126
 #: ..\..\..\skins\_lastcomments.php:39
 msgid "Permanent link to this comment"
 msgstr "Permanenter Link zu diesem Kommentar"
 
-#: ..\..\..\admin\_edit_showposts.php:256
+#: ..\..\..\admin\_edit_showposts.php:259
 msgid ""
 "You are about to delete this comment!\\n\\'Cancel\\' to stop, \\'OK\\' to "
 "delete."
@@ -2333,77 +2353,77 @@ msgstr ""
 "Du bist dabei, diesen Kommentar zu löschen!\\n\\'Stopp\\' um abzubrechen, "
 "\\'OK\\' um zu löschen."
 
-#: ..\..\..\admin\_edit_showposts.php:271
+#: ..\..\..\admin\_edit_showposts.php:274
 #: ..\..\..\b2evocore\_class_item.php:694
 #: ..\..\..\b2evocore\_functions_comments.php:205
 #: ..\..\..\skins\_feedback.php:139 ..\..\..\skins\basic\_feedback.php:133
 msgid "Leave a comment"
 msgstr "Hinterlasse einen Kommentar"
 
-#: ..\..\..\admin\_edit_showposts.php:279 ..\..\..\admin\_users_form.php:80
+#: ..\..\..\admin\_edit_showposts.php:282 ..\..\..\admin\_users_form.php:80
 #: ..\..\..\skins\_feedback.php:158 ..\..\..\skins\basic\_feedback.php:153
 msgid "User"
 msgstr "Benutzer"
 
-#: ..\..\..\admin\_edit_showposts.php:282 ..\..\..\skins\_feedback.php:161
+#: ..\..\..\admin\_edit_showposts.php:285 ..\..\..\skins\_feedback.php:161
 #: ..\..\..\skins\basic\_feedback.php:156
 msgid "Edit profile"
 msgstr "Editiere Profil"
 
-#: ..\..\..\admin\_edit_showposts.php:287 ..\..\..\skins\_feedback.php:195
+#: ..\..\..\admin\_edit_showposts.php:290 ..\..\..\skins\_feedback.php:195
 #: ..\..\..\skins\basic\_feedback.php:187
 msgid "Comment text"
 msgstr "Kommentartext"
 
-#: ..\..\..\admin\_edit_showposts.php:289 ..\..\..\skins\_feedback.php:197
+#: ..\..\..\admin\_edit_showposts.php:292 ..\..\..\skins\_feedback.php:197
 #: ..\..\..\skins\basic\_feedback.php:189
 msgid "Allowed XHTML tags"
 msgstr "Erlaubte XHTML Tags"
 
-#: ..\..\..\admin\_edit_showposts.php:289 ..\..\..\skins\_feedback.php:198
+#: ..\..\..\admin\_edit_showposts.php:292 ..\..\..\skins\_feedback.php:198
 #: ..\..\..\skins\basic\_feedback.php:190
 msgid "URLs, email, AIM and ICQs will be converted automatically."
 msgstr "URLs, EMail, AIM und ICQs werden automatisch konvertiert."
 
-#: ..\..\..\admin\_edit_showposts.php:295 ..\..\..\skins\_feedback.php:203
+#: ..\..\..\admin\_edit_showposts.php:298 ..\..\..\skins\_feedback.php:203
 #: ..\..\..\skins\basic\_feedback.php:195
 msgid "Options"
 msgstr "Optionen"
 
-#: ..\..\..\admin\_edit_showposts.php:296
+#: ..\..\..\admin\_edit_showposts.php:299
 msgid "(Line breaks become &lt;br&gt;)"
 msgstr "(Zeilenumbrüche werden zu &lt;br&gt;)"
 
-#: ..\..\..\admin\_edit_showposts.php:303 ..\..\..\skins\_feedback.php:220
+#: ..\..\..\admin\_edit_showposts.php:306 ..\..\..\skins\_feedback.php:220
 #: ..\..\..\skins\basic\_feedback.php:212
 msgid "Send comment"
 msgstr "Kommentar senden"
 
-#: ..\..\..\admin\_edit_showposts.php:346
+#: ..\..\..\admin\_edit_showposts.php:353
 msgid "Posts to show"
 msgstr "Anzuzeigende Einträge"
 
-#: ..\..\..\admin\_edit_showposts.php:348
+#: ..\..\..\admin\_edit_showposts.php:356
 msgid "Past"
 msgstr "Vergangenheit"
 
-#: ..\..\..\admin\_edit_showposts.php:350
+#: ..\..\..\admin\_edit_showposts.php:359
 msgid "Future"
 msgstr "Zukunft"
 
-#: ..\..\..\admin\_edit_showposts.php:370
+#: ..\..\..\admin\_edit_showposts.php:384
 msgid "Title / Text contains"
 msgstr "Titel / Text enthält"
 
-#: ..\..\..\admin\_edit_showposts.php:374
+#: ..\..\..\admin\_edit_showposts.php:388
 msgid "Words"
 msgstr "Wörter"
 
-#: ..\..\..\admin\_edit_showposts.php:374
+#: ..\..\..\admin\_edit_showposts.php:389
 msgid "AND"
 msgstr "UND"
 
-#: ..\..\..\admin\_edit_showposts.php:375
+#: ..\..\..\admin\_edit_showposts.php:391
 msgid "OR"
 msgstr "ODER"
 
@@ -3303,14 +3323,14 @@ msgstr "Kommentare sind für diesen Beitrag geschlossen."
 
 #. TRANS: this is the default text for the extended post "more" link
 #: ..\..\..\b2evocore\_class_item.php:434
-#: ..\..\..\b2evocore\_functions_bposts.php:694
+#: ..\..\..\b2evocore\_functions_bposts.php:696
 msgid "Read more!"
 msgstr "Lies mehr!"
 
 #  TRANS: this is the default text displayed once the more link has been activated
 #. TRANS: this is the default text displayed once the more link has been activated
 #: ..\..\..\b2evocore\_class_item.php:439
-#: ..\..\..\b2evocore\_functions_bposts.php:699
+#: ..\..\..\b2evocore\_functions_bposts.php:701
 msgid "More:"
 msgstr "Mehr:"
 
@@ -3392,18 +3412,6 @@ msgstr "POP3 connect:"
 #: ..\..\..\b2evocore\_class_pop3.php:96
 msgid "No server specified"
 msgstr "Kein Server angegeben"
-
-#: ..\..\..\b2evocore\_class_pop3.php:105
-#: ..\..\..\b2evocore\_class_pop3.php:117
-#: ..\..\..\b2evocore\_class_pop3.php:160
-#: ..\..\..\b2evocore\_class_pop3.php:360
-#: ..\..\..\b2evocore\_class_pop3.php:408
-#: ..\..\..\b2evocore\_class_pop3.php:441
-#: ..\..\..\b2evocore\_class_pop3.php:474
-#: ..\..\..\b2evocore\_class_pop3.php:573
-#: ..\..\..\b2evocore\_class_pop3.php:596
-msgid "Error"
-msgstr "Fehler"
 
 #: ..\..\..\b2evocore\_class_pop3.php:125
 msgid "POP3: premature NOOP OK, NOT an RFC 1939 Compliant server"
@@ -3494,11 +3502,6 @@ msgstr "POP3 login:"
 #: ..\..\..\b2evocore\_class_pop3.php:295
 msgid "POP3 top:"
 msgstr "POP3 top:"
-
-#: ..\..\..\b2evocore\_class_pop3.php:295
-#: ..\..\..\b2evocore\_class_pop3.php:349
-msgid "Error "
-msgstr "Fehler"
 
 #: ..\..\..\b2evocore\_class_pop3.php:321
 #: ..\..\..\b2evocore\_class_pop3.php:349
@@ -3675,39 +3678,35 @@ msgstr "Ungültige Antwort."
 msgid "Requested blog does not exist!"
 msgstr "Angefordertes Blog existiert nicht!"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:645
+#: ..\..\..\b2evocore\_functions_bposts.php:647
 msgid "Post details"
 msgstr "Eintrag-Details"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:653
+#: ..\..\..\b2evocore\_functions_bposts.php:655
 msgid "PREVIEW"
 msgstr "VORSCHAU"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:788
-msgid "Pages:"
-msgstr "Seiten:"
-
-#: ..\..\..\b2evocore\_functions_bposts.php:790
+#: ..\..\..\b2evocore\_functions_bposts.php:792
 msgid "Next page"
 msgstr "Nächste Seite"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:791
+#: ..\..\..\b2evocore\_functions_bposts.php:793
 msgid "Previous page"
 msgstr "Vorige Seite"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:836
+#: ..\..\..\b2evocore\_functions_bposts.php:838
 msgid "Previous post"
 msgstr "Voriger Eintrag"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:893
+#: ..\..\..\b2evocore\_functions_bposts.php:895
 msgid "Next post"
 msgstr "Nächster Eintrag"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:995
+#: ..\..\..\b2evocore\_functions_bposts.php:997
 msgid "Next Page"
 msgstr "Nächste Seite"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:1023
+#: ..\..\..\b2evocore\_functions_bposts.php:1025
 msgid "Previous Page"
 msgstr "Vorige Seite"
 
@@ -5408,69 +5407,117 @@ msgstr "Diese Version ist zu alt!"
 msgid "This version is too recent! We cannot downgrade to it!"
 msgstr "Diese Version ist zu neu! Wir können nicht dorthin downgraden!"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:54
+#: ..\..\..\plugins\plugin.class.php:39
+msgid "No desc available"
+msgstr ""
+
+#: ..\..\..\plugins\plugin.class.php:40
+#: ..\..\..\plugins\renderers\_autolinks.renderer.php:34
+#: ..\..\..\plugins\renderers\_auto_p.renderer.php:34
+#: ..\..\..\plugins\renderers\_bbcode.renderer.php:76
+#: ..\..\..\plugins\renderers\_gmcode.renderer.php:59
+#: ..\..\..\plugins\renderers\_smilies.renderer.php:61
+#: ..\..\..\plugins\renderers\_textile.renderer.php:230
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:34
+#: ..\..\..\plugins\toolbars\_smilies.toolbar.php:44
+msgid "No description available"
+msgstr ""
+
+#: ..\..\..\plugins\renderers\_autolinks.renderer.php:33
+msgid "Make URLs clickable"
+msgstr ""
+
+#: ..\..\..\plugins\renderers\_auto_p.renderer.php:33
+msgid "Automatic &lt;P&gt; and &lt;BR&gt; tags"
+msgstr ""
+
+#: ..\..\..\plugins\renderers\_bbcode.renderer.php:75
+msgid "BB formatting e-g [b]bold[/b]"
+msgstr ""
+
+#: ..\..\..\plugins\renderers\_gmcode.renderer.php:58
+msgid "GreyMatter style formatting"
+msgstr ""
+
+#: ..\..\..\plugins\renderers\_smilies.renderer.php:60
+msgid "Convert text smilies to icons"
+msgstr ""
+
+#: ..\..\..\plugins\renderers\_textile.renderer.php:229
+msgid "Humane Web Text Generator"
+msgstr ""
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:33
+msgid "Easy HTML tags inserting"
+msgstr ""
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:66
 msgid "INSerted [Alt-I]"
 msgstr "eIngefügt [Alt-I]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:62
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:74
 msgid "DELeted [Alt-D]"
 msgstr "gelöscht [Alt-D]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:70
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:82
 msgid "STRong [Alt-S]"
 msgstr "kräftig [Alt-S]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:78
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:90
 msgid "EMphasis [Alt-E]"
 msgstr "hervorgehoben [Alt-E]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:86
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:98
 msgid "CODE [Alt-C]"
 msgstr "CODE [Alt-C]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:94
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:106
 msgid "Paragraph [Alt-P]"
 msgstr "Absatz [Alt-P]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:102
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:114
 msgid "Unordered List [Alt-U]"
 msgstr "Ungeordnete Liste [Alt-U]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:117
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:129
 msgid "List Item [Alt-L]"
 msgstr "Listenelement [Alt-E]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:125
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:137
 msgid "BLOCKQUOTE [Alt-B]"
 msgstr "Blockzitat [Alt-B]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:133
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:145
 msgid "IMaGe [Alt-G]"
 msgstr "IMaGe [Alt-G]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:142
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:154
 msgid "A href [Alt-A]"
 msgstr "a href [Alt-A]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:158
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:170
 msgid "More [Alt-M]"
 msgstr "Mehr [Alt-M]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:167
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:179
 msgid "no teaser [Alt-T]"
 msgstr "kein Teaser (Lockartikel) wenn &quot;Lies Mehr..&quot; [Alt-T]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:176
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:188
 msgid "next page [Alt-Q]"
 msgstr "nächste Seite [Alt-Q]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:245
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:257
 msgid "Close all tags"
 msgstr "Schliesse alle Tags"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:361
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:373
 msgid "ALTernate text"
 msgstr "ALTernativer Text"
+
+#: ..\..\..\plugins\toolbars\_smilies.toolbar.php:43
+msgid "One click smilies inserting"
+msgstr ""
 
 #: ..\..\..\skins\_feedback.php:72 ..\..\..\skins\basic\_feedback.php:71
 msgid "Trackback address for this post:"
@@ -5589,6 +5636,9 @@ msgstr "[...] Lies mehr!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Neuer Pingback zu Deinem Eintrag #%d \"%s\""
+
+#~ msgid "Error "
+#~ msgstr "Fehler"
 
 #~ msgid "Back to new blog form"
 #~ msgstr "Zurück zum neuen Blog Formular"

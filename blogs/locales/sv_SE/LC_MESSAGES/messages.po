@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2004-05-12 01:53+0200\n"
+"POT-Creation-Date: 2004-05-12 20:23+0200\n"
 "PO-Revision-Date: 2004-03-06 03:15+0100\n"
 "Last-Translator: Christina Svensson <b2evo04@cs.se>\n"
 "MIME-Version: 1.0\n"
@@ -20,8 +20,8 @@ msgid "Selected"
 msgstr "Valda"
 
 #: ..\..\..\a_noskin.php:158 ..\..\..\a_noskin.php:249
-#: ..\..\..\multiblogs.php:137 ..\..\..\admin\_edit_form.php:323
-#: ..\..\..\admin\_edit_showposts.php:456 ..\..\..\admin\_menutop.php:71
+#: ..\..\..\multiblogs.php:137 ..\..\..\admin\_edit_form.php:329
+#: ..\..\..\admin\_edit_showposts.php:473 ..\..\..\admin\_menutop.php:71
 #: ..\..\..\skins\basic\_main.php:78 ..\..\..\skins\custom\_main.php:78
 #: ..\..\..\skins\custom\_main.php:178
 #: ..\..\..\skins\fplanque2002\_main.php:97
@@ -31,7 +31,7 @@ msgstr "Kategorier"
 
 #: ..\..\..\a_noskin.php:172 ..\..\..\multiblogs.php:136
 #: ..\..\..\multiblogs.php:219 ..\..\..\multiblogs.php:255
-#: ..\..\..\summary.php:92 ..\..\..\admin\_edit_showposts.php:149
+#: ..\..\..\summary.php:92 ..\..\..\admin\_edit_showposts.php:152
 #: ..\..\..\skins\_linkblog.php:68 ..\..\..\skins\basic\_main.php:68
 #: ..\..\..\skins\basic\_main.php:97 ..\..\..\skins\custom\_main.php:75
 #: ..\..\..\skins\custom\_main.php:92 ..\..\..\skins\fplanque2002\_main.php:94
@@ -41,8 +41,8 @@ msgstr "Permanent länk till hela inlägget"
 
 #: ..\..\..\a_noskin.php:172 ..\..\..\multiblogs.php:136
 #: ..\..\..\multiblogs.php:151 ..\..\..\multiblogs.php:219
-#: ..\..\..\multiblogs.php:255 ..\..\..\admin\_edit_showposts.php:149
-#: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:126
+#: ..\..\..\multiblogs.php:255 ..\..\..\admin\_edit_showposts.php:152
+#: ..\..\..\admin\_edit_showposts.php:252 ..\..\..\skins\_feedback.php:126
 #: ..\..\..\skins\_lastcomments.php:39 ..\..\..\skins\_linkblog.php:68
 #: ..\..\..\skins\basic\_main.php:97 ..\..\..\skins\custom\_main.php:92
 #: ..\..\..\skins\fplanque2002\_main.php:94
@@ -87,8 +87,8 @@ msgid "Some viewing statistics"
 msgstr "Visningsstatistik"
 
 #: ..\..\..\a_noskin.php:237 ..\..\..\a_noskin.php:243
-#: ..\..\..\admin\_edit_showposts.php:341
-#: ..\..\..\admin\_edit_showposts.php:531 ..\..\..\skins\custom\_main.php:166
+#: ..\..\..\admin\_edit_showposts.php:348
+#: ..\..\..\admin\_edit_showposts.php:548 ..\..\..\skins\custom\_main.php:166
 #: ..\..\..\skins\custom\_main.php:172
 #: ..\..\..\skins\fplanque2002\_main.php:183
 #: ..\..\..\skins\fplanque2002\_main.php:189
@@ -106,7 +106,7 @@ msgstr "Alla Ord"
 msgid "Some Word"
 msgstr "Några Ord"
 
-#: ..\..\..\a_noskin.php:242 ..\..\..\admin\_edit_showposts.php:376
+#: ..\..\..\a_noskin.php:242 ..\..\..\admin\_edit_showposts.php:393
 #: ..\..\..\skins\custom\_main.php:171
 #: ..\..\..\skins\fplanque2002\_main.php:188
 msgid "Entire phrase"
@@ -129,7 +129,7 @@ msgstr "Nollställ formulär"
 msgid "Get selection"
 msgstr "Hämta val"
 
-#: ..\..\..\a_noskin.php:261 ..\..\..\admin\_edit_showposts.php:380
+#: ..\..\..\a_noskin.php:261 ..\..\..\admin\_edit_showposts.php:397
 #: ..\..\..\skins\basic\_main.php:137 ..\..\..\skins\bluesky\_main.php:185
 #: ..\..\..\skins\custom\_main.php:190
 #: ..\..\..\skins\fplanque2002\_main.php:207
@@ -503,7 +503,7 @@ msgstr "Avancerade inställningar"
 msgid "Updating Blog [%s]..."
 msgstr "Uppdaterar inlägg..."
 
-#: ..\..\..\admin\b2blogs.php:219 ..\..\..\admin\edit_actions.php:211
+#: ..\..\..\admin\b2blogs.php:219 ..\..\..\admin\edit_actions.php:212
 msgid "Cannot update, please correct these errors:"
 msgstr "Kan inte uppdatera, var snäll och rätta till följande fel:"
 
@@ -567,9 +567,7 @@ msgstr ""
 msgid "Writing to file [%s]..."
 msgstr "Skriver till fil..."
 
-#: ..\..\..\admin\b2blogs.php:545 ..\..\..\admin\edit_actions.php:118
-#: ..\..\..\admin\edit_actions.php:246 ..\..\..\admin\edit_actions.php:338
-#: ..\..\..\admin\edit_actions.php:402
+#: ..\..\..\admin\b2blogs.php:545 ..\..\..\admin\edit_actions.php:337
 #: ..\..\..\b2evocore\_functions_antispam.php:208
 #: ..\..\..\b2evocore\_functions_antispam.php:321
 #: ..\..\..\b2evocore\_functions_pings.php:54
@@ -673,7 +671,7 @@ msgid "Sorry, you have no permission to edit/view any category's properties."
 msgstr "Du har inte rätt att ändra i bloggarna."
 
 #: ..\..\..\admin\b2edit.php:26 ..\..\..\admin\edit_actions.php:191
-#: ..\..\..\admin\edit_actions.php:292
+#: ..\..\..\admin\edit_actions.php:290
 msgid "Oops, no post with this ID."
 msgstr "Ojsan, inget inlägg med detta ID."
 
@@ -921,13 +919,13 @@ msgid "-&gt;S"
 msgstr "-&gt;Sök"
 
 #: ..\..\..\admin\b2stats.php:257 ..\..\..\admin\b2stats.php:271
-#: ..\..\..\admin\_edit_showposts.php:219
+#: ..\..\..\admin\_edit_showposts.php:222
 msgid "Ban this domain!"
 msgstr "Svartlista denna domän"
 
 #. TRANS: Abbrev.
 #: ..\..\..\admin\b2stats.php:257 ..\..\..\admin\b2stats.php:271
-#: ..\..\..\admin\_edit_showposts.php:219
+#: ..\..\..\admin\_edit_showposts.php:222
 msgid "Ban"
 msgstr "Svartlista"
 
@@ -1201,7 +1199,7 @@ msgstr "Bildinformation"
 msgid "Size"
 msgstr "Storlek"
 
-#: ..\..\..\admin\b2upload.php:224 ..\..\..\admin\_edit_form.php:495
+#: ..\..\..\admin\b2upload.php:224 ..\..\..\admin\_edit_form.php:504
 msgid "Type"
 msgstr "Typ"
 
@@ -1351,86 +1349,102 @@ msgstr ""
 msgid "You are not allowed to view other users."
 msgstr "Du är inte inloggad."
 
-#: ..\..\..\admin\edit_actions.php:50
+#: ..\..\..\admin\edit_actions.php:62
 msgid "Adding new post..."
 msgstr "Lägger till nytt inlägg..."
 
-#: ..\..\..\admin\edit_actions.php:88 ..\..\..\admin\edit_actions.php:205
-#: ..\..\..\admin\edit_actions.php:437 ..\..\..\htsrv\comment_post.php:63
+#: ..\..\..\admin\edit_actions.php:100 ..\..\..\admin\edit_actions.php:205
+#: ..\..\..\admin\edit_actions.php:444 ..\..\..\htsrv\comment_post.php:63
 #: ..\..\..\htsrv\trackback.php:63 ..\..\..\xmlsrv\xmlrpc.php:1368
 msgid "Supplied URL is invalid: "
 msgstr "Denna URL är felaktig: "
 
-#: ..\..\..\admin\edit_actions.php:94 ..\..\..\htsrv\getmail.php:243
+#: ..\..\..\admin\edit_actions.php:107 ..\..\..\htsrv\getmail.php:243
 msgid "Cannot post, please correct these errors:"
 msgstr "Kan inte posta inlägget, var snäll och rätta till följande fel:"
 
-#: ..\..\..\admin\edit_actions.php:95 ..\..\..\admin\edit_actions.php:212
-#: ..\..\..\admin\edit_actions.php:442
+#: ..\..\..\admin\edit_actions.php:108 ..\..\..\admin\edit_actions.php:213
+#: ..\..\..\admin\edit_actions.php:449
 msgid "Back to post editing"
 msgstr "Tillbaka till redigering av inlägg"
 
-#: ..\..\..\admin\edit_actions.php:101
+#: ..\..\..\admin\edit_actions.php:114
 msgid "Recording post..."
 msgstr "Sparar inlägg..."
 
-#: ..\..\..\admin\edit_actions.php:114 ..\..\..\admin\edit_actions.php:398
+#: ..\..\..\admin\edit_actions.php:127 ..\..\..\admin\edit_actions.php:243
+#: ..\..\..\admin\edit_actions.php:401
 msgid "Sleeping..."
 msgstr "Sover..."
 
-#: ..\..\..\admin\edit_actions.php:124 ..\..\..\admin\edit_actions.php:252
-#: ..\..\..\admin\edit_actions.php:344
+#: ..\..\..\admin\edit_actions.php:131
+msgid "Posting Done..."
+msgstr "Postningen klar..."
+
+#: ..\..\..\admin\edit_actions.php:137 ..\..\..\admin\edit_actions.php:251
+#: ..\..\..\admin\edit_actions.php:343
 msgid ""
 "Post not publicly published: skipping trackback, pingback and blog pings..."
 msgstr ""
 "Inlägget är inte postat offentligt: hoppar över trackback, pingback och "
 "bloggpings..."
 
-#: ..\..\..\admin\edit_actions.php:152
-msgid "Posting Done..."
-msgstr "Postningen klar..."
-
-#: ..\..\..\admin\edit_actions.php:165
+#: ..\..\..\admin\edit_actions.php:165 ..\..\..\admin\edit_actions.php:219
 msgid "Updating post..."
 msgstr "Uppdaterar inlägg..."
 
-#: ..\..\..\admin\edit_actions.php:268 ..\..\..\admin\edit_actions.php:355
+#: ..\..\..\admin\edit_actions.php:267 ..\..\..\admin\edit_actions.php:354
 msgid "Post had already pinged: skipping blog pings..."
 msgstr "Inlägget har redan pingat: hoppar över bloggpings..."
 
-#: ..\..\..\admin\edit_actions.php:280 ..\..\..\admin\edit_actions.php:367
+#: ..\..\..\admin\edit_actions.php:279 ..\..\..\admin\edit_actions.php:366
 msgid "Updating done..."
 msgstr "Uppdatering klar..."
 
-#: ..\..\..\admin\edit_actions.php:297
+#: ..\..\..\admin\edit_actions.php:296
 msgid "Updating post status..."
 msgstr "Uppdaterar inläggets status..."
 
-#: ..\..\..\admin\edit_actions.php:380
-msgid "Oops, no post with this ID!"
-msgstr "Oops, det finns inget inlägg med detta ID!"
-
-#: ..\..\..\admin\edit_actions.php:384 ..\..\..\admin\edit_actions.php:392
+#: ..\..\..\admin\edit_actions.php:376 ..\..\..\admin\edit_actions.php:395
 msgid "Deleting post..."
 msgstr "Raderar inlägg..."
 
-#: ..\..\..\admin\edit_actions.php:405
+#: ..\..\..\admin\edit_actions.php:384
+msgid "Oops, no post with this ID!"
+msgstr "Oops, det finns inget inlägg med detta ID!"
+
+#: ..\..\..\admin\edit_actions.php:406
 msgid "Deleting Done..."
 msgstr "Radering klar..."
 
-#: ..\..\..\admin\edit_actions.php:441
+#: ..\..\..\admin\edit_actions.php:410 ..\..\..\b2evocore\_class_pop3.php:105
+#: ..\..\..\b2evocore\_class_pop3.php:117
+#: ..\..\..\b2evocore\_class_pop3.php:160
+#: ..\..\..\b2evocore\_class_pop3.php:295
+#: ..\..\..\b2evocore\_class_pop3.php:349
+#: ..\..\..\b2evocore\_class_pop3.php:360
+#: ..\..\..\b2evocore\_class_pop3.php:408
+#: ..\..\..\b2evocore\_class_pop3.php:441
+#: ..\..\..\b2evocore\_class_pop3.php:474
+#: ..\..\..\b2evocore\_class_pop3.php:573
+#: ..\..\..\b2evocore\_class_pop3.php:596
+#, fuzzy
+msgid "Error"
+msgstr "Fel"
+
+#: ..\..\..\admin\edit_actions.php:448
 msgid "Cannot update comment, please correct these errors:"
 msgstr "Kan inte uppdatera kommentaren, var snäll och rätta till följande fel:"
 
-#: ..\..\..\admin\edit_actions.php:503
+#: ..\..\..\admin\edit_actions.php:501
 msgid "Back to posts!"
 msgstr "Tillbaka till inläggen!"
 
-#: ..\..\..\admin\edit_actions.php:507
+#: ..\..\..\admin\edit_actions.php:506
 msgid "You may also want to generate static pages or view your blogs..."
 msgstr "Du kanske också vill generera statiska sidor eller se dina bloggar..."
 
-#: ..\..\..\admin\edit_actions.php:515
+#: ..\..\..\admin\edit_actions.php:514
 msgid "New post"
 msgstr "Nytt inlägg"
 
@@ -1566,7 +1580,7 @@ msgstr "Uppdatera blogg!"
 #: ..\..\..\admin\_blogs_advanced.form.php:46
 #: ..\..\..\admin\_blogs_general.form.php:103
 #: ..\..\..\admin\_blogs_permissions.form.php:205
-#: ..\..\..\admin\_edit_showposts.php:532
+#: ..\..\..\admin\_edit_showposts.php:549
 #: ..\..\..\admin\_set_general.form.php:79
 #: ..\..\..\admin\_set_plugins.form.php:69
 #: ..\..\..\admin\_set_regional.form.php:70
@@ -1991,7 +2005,7 @@ msgstr ""
 "kategorin i samma blogg (minsta kategorinumret)."
 
 #: ..\..\..\admin\_edit_form.php:99
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:362
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:374
 msgid "Title"
 msgstr "Titel"
 
@@ -2014,152 +2028,153 @@ msgstr "E-post"
 
 #: ..\..\..\admin\_edit_form.php:136 ..\..\..\admin\_users_form.php:138
 #: ..\..\..\admin\_users_form.php:140 ..\..\..\admin\_users_list.php:21
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:345
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:357
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:369
 #: ..\..\..\skins\_profile.php:70 ..\..\..\skins\basic\_profile.php:72
 msgid "URL"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:160 ..\..\..\admin\_edit_showposts.php:296
+#: ..\..\..\admin\_edit_form.php:161 ..\..\..\admin\_edit_showposts.php:299
 #: ..\..\..\admin\_set_general.form.php:48 ..\..\..\skins\_feedback.php:207
 #: ..\..\..\skins\basic\_feedback.php:199
 msgid "Auto-BR"
 msgstr "Automatisk radbrytning"
 
-#: ..\..\..\admin\_edit_form.php:160 ..\..\..\admin\_set_general.form.php:48
+#: ..\..\..\admin\_edit_form.php:161 ..\..\..\admin\_set_general.form.php:48
 msgid "This option is deprecated, you should avoid using it."
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:165
+#: ..\..\..\admin\_edit_form.php:166
 msgid "Preview"
 msgstr "Förhandstitt"
 
-#: ..\..\..\admin\_edit_form.php:171
+#: ..\..\..\admin\_edit_form.php:172
 msgid "Blog this !"
 msgstr "Publicera detta!"
 
-#: ..\..\..\admin\_edit_form.php:172
+#: ..\..\..\admin\_edit_form.php:173
 msgid "Edit this !"
 msgstr "Ändra detta!"
 
-#: ..\..\..\admin\_edit_form.php:177
+#: ..\..\..\admin\_edit_form.php:178
 msgid "Spellcheck"
 msgstr "Stavningskontroll"
 
-#: ..\..\..\admin\_edit_form.php:183
+#: ..\..\..\admin\_edit_form.php:184
 msgid "Upload a file/image"
 msgstr "Ladda upp en fil/bild"
 
-#: ..\..\..\admin\_edit_form.php:188
+#: ..\..\..\admin\_edit_form.php:189
 msgid "Advanced properties"
 msgstr "Avancerade egenskaper"
 
-#: ..\..\..\admin\_edit_form.php:196
+#: ..\..\..\admin\_edit_form.php:197
 msgid "Edit timestamp"
 msgstr "Ändra tidsstämpel"
 
-#: ..\..\..\admin\_edit_form.php:231
+#: ..\..\..\admin\_edit_form.php:232
 #, fuzzy
 msgid "URL Title"
 msgstr "Titel"
 
-#: ..\..\..\admin\_edit_form.php:233
+#: ..\..\..\admin\_edit_form.php:234
 msgid "(to be used in permalinks)"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:245
+#: ..\..\..\admin\_edit_form.php:246
 msgid "Additional actions"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:253
+#: ..\..\..\admin\_edit_form.php:254
 msgid "Pingback"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:253
+#: ..\..\..\admin\_edit_form.php:254
 msgid "(Send a pingback to all URLs in this post)"
 msgstr "(Pinga alla URL:ar i detta inlägg)"
 
-#: ..\..\..\admin\_edit_form.php:262
+#: ..\..\..\admin\_edit_form.php:263
 msgid "Trackback URLs"
 msgstr "Trackback-URL:ar"
 
-#: ..\..\..\admin\_edit_form.php:262
+#: ..\..\..\admin\_edit_form.php:263
 msgid "(Separate by space)"
 msgstr "(Separera med mellanslag)"
 
-#: ..\..\..\admin\_edit_form.php:283 ..\..\..\admin\_edit_form.php:496
+#: ..\..\..\admin\_edit_form.php:284 ..\..\..\admin\_edit_form.php:505
 #: ..\..\..\admin\_edit_showposts.php:133
 msgid "Status"
 msgstr "Status"
 
-#: ..\..\..\admin\_edit_form.php:289
+#: ..\..\..\admin\_edit_form.php:290
 msgid "The post will be publicly published"
 msgstr "Detta inlägg kommer att publiceras offentligt"
 
-#: ..\..\..\admin\_edit_form.php:289 ..\..\..\admin\_edit_showposts.php:354
+#: ..\..\..\admin\_edit_form.php:291 ..\..\..\admin\_edit_showposts.php:364
 msgid "Published (Public)"
 msgstr "Publicerad (offentlig)"
 
-#: ..\..\..\admin\_edit_form.php:295
+#: ..\..\..\admin\_edit_form.php:297
 #, fuzzy
 msgid "The post will be published but visible only by logged-in blog members"
 msgstr ""
 "Detta inlägg kommer att publiceras, men är bara synlig för inloggade "
 "medlemmar"
 
-#: ..\..\..\admin\_edit_form.php:295 ..\..\..\admin\_edit_showposts.php:356
+#: ..\..\..\admin\_edit_form.php:298 ..\..\..\admin\_edit_showposts.php:367
 msgid "Protected (Members only)"
 msgstr "Skyddad (endast för medlemmar)"
 
-#: ..\..\..\admin\_edit_form.php:301
+#: ..\..\..\admin\_edit_form.php:304
 msgid "The post will be published but visible only by yourself"
 msgstr "Detta inlägg kommer att publiceras, men är bara synlig för dig själv"
 
-#: ..\..\..\admin\_edit_form.php:301 ..\..\..\admin\_edit_showposts.php:358
+#: ..\..\..\admin\_edit_form.php:305 ..\..\..\admin\_edit_showposts.php:370
 msgid "Private (You only)"
 msgstr "Privat (endast du)"
 
-#: ..\..\..\admin\_edit_form.php:307 ..\..\..\admin\_edit_form.php:313
+#: ..\..\..\admin\_edit_form.php:311 ..\..\..\admin\_edit_form.php:318
 msgid "The post will appear only in the backoffice"
 msgstr "Detta inlägg kommer enbart att visas här i administrationen"
 
-#: ..\..\..\admin\_edit_form.php:307 ..\..\..\admin\_edit_showposts.php:360
+#: ..\..\..\admin\_edit_form.php:312 ..\..\..\admin\_edit_showposts.php:373
 msgid "Draft (Not published!)"
 msgstr "Ukast (ej publicerat)"
 
-#: ..\..\..\admin\_edit_form.php:313 ..\..\..\admin\_edit_showposts.php:362
+#: ..\..\..\admin\_edit_form.php:319 ..\..\..\admin\_edit_showposts.php:376
 msgid "Deprecated (Not published!)"
 msgstr "Nedskrivet (ej publicerat)"
 
-#: ..\..\..\admin\_edit_form.php:327
+#: ..\..\..\admin\_edit_form.php:333
+#, fuzzy
 msgid ""
-"Select main category in target blog and optionnaly check addtionnal "
+"Select main category in target blog and optionally check additional "
 "categories"
 msgstr ""
 "Ange huvudkategori i målbloggen och ange eventuellt också ytterligare "
 "kategorier"
 
-#: ..\..\..\admin\_edit_form.php:348
+#: ..\..\..\admin\_edit_form.php:354
 msgid "Select as an additionnal category"
 msgstr "Ange som ytterligare kategori"
 
-#: ..\..\..\admin\_edit_form.php:361
+#: ..\..\..\admin\_edit_form.php:367
 msgid "Select as MAIN category"
 msgstr "Välj som HUVUDkategori"
 
-#: ..\..\..\admin\_edit_form.php:389
+#: ..\..\..\admin\_edit_form.php:395
 msgid "Note: Cross posting among multiple blogs is enabled."
 msgstr "OBS: Funktionen för korspostning mellan olika bloggar är på."
 
-#: ..\..\..\admin\_edit_form.php:400
+#: ..\..\..\admin\_edit_form.php:406
 msgid "Note: Cross posting among multiple blogs is currently disabled."
 msgstr "OBS: Funktionen för korspostning mellan olika bloggar är avstängd."
 
-#: ..\..\..\admin\_edit_form.php:402
+#: ..\..\..\admin\_edit_form.php:408
 msgid "Note: Cross posting among multiple categories is currently disabled."
 msgstr "OBS: Funktionen för korspostning mellan olika kategorier är avstängd."
 
-#: ..\..\..\admin\_edit_form.php:412 ..\..\..\admin\_edit_showposts.php:192
+#: ..\..\..\admin\_edit_form.php:418 ..\..\..\admin\_edit_showposts.php:195
 #: ..\..\..\skins\_feedback.php:50 ..\..\..\skins\basic\_feedback.php:50
 #: ..\..\..\skins\custom\_main.php:259 ..\..\..\skins\custom\_main.php:264
 #: ..\..\..\skins\custom\_main.php:269 ..\..\..\skins\custom\_main.php:274
@@ -2170,46 +2185,46 @@ msgstr "OBS: Funktionen för korspostning mellan olika kategorier är avstängd."
 msgid "Comments"
 msgstr "Kommentarer"
 
-#: ..\..\..\admin\_edit_form.php:414
+#: ..\..\..\admin\_edit_form.php:420
 msgid "Visitors can leave comments on this post."
 msgstr "Besökare kan kommentera detta inlägg."
 
-#: ..\..\..\admin\_edit_form.php:414
+#: ..\..\..\admin\_edit_form.php:421
 msgid "Open"
 msgstr "…ppen"
 
-#: ..\..\..\admin\_edit_form.php:416
+#: ..\..\..\admin\_edit_form.php:423
 msgid "Visitors can NOT leave comments on this post."
 msgstr "Besökare kan INTE kommentera detta inlägg."
 
-#: ..\..\..\admin\_edit_form.php:416
+#: ..\..\..\admin\_edit_form.php:424
 msgid "Closed"
 msgstr "Stängd"
 
-#: ..\..\..\admin\_edit_form.php:418
+#: ..\..\..\admin\_edit_form.php:426
 #, fuzzy
 msgid "Visitors cannot see nor leave comments on this post."
 msgstr "Besökare kan kommentera detta inlägg."
 
-#: ..\..\..\admin\_edit_form.php:418
+#: ..\..\..\admin\_edit_form.php:427
 msgid "Disabled"
 msgstr ""
 
-#: ..\..\..\admin\_edit_form.php:423
+#: ..\..\..\admin\_edit_form.php:432
 #, fuzzy
 msgid "Renderers"
 msgstr "Referenser"
 
-#: ..\..\..\admin\_edit_form.php:493
+#: ..\..\..\admin\_edit_form.php:502
 msgid "Comment info"
 msgstr "Info om kommentar"
 
-#: ..\..\..\admin\_edit_form.php:494 ..\..\..\htsrv\comment_post.php:131
+#: ..\..\..\admin\_edit_form.php:503 ..\..\..\htsrv\comment_post.php:131
 #: ..\..\..\htsrv\comment_post.php:137
 msgid "Author"
 msgstr "Skribent"
 
-#: ..\..\..\admin\_edit_form.php:497
+#: ..\..\..\admin\_edit_form.php:506
 msgid "IP address"
 msgstr "IP-adress"
 
@@ -2263,18 +2278,24 @@ msgstr "nivå"
 msgid "in"
 msgstr "i"
 
+#: ..\..\..\admin\_edit_showposts.php:149
+#: ..\..\..\b2evocore\_functions_bposts.php:790
+#, fuzzy
+msgid "Pages:"
+msgstr "Lösenord:"
+
 #. TRANS: Edit button text (&nbsp; for extra space)
-#: ..\..\..\admin\_edit_showposts.php:155
-#: ..\..\..\admin\_edit_showposts.php:255
+#: ..\..\..\admin\_edit_showposts.php:158
+#: ..\..\..\admin\_edit_showposts.php:258
 msgid "&nbsp; Edit &nbsp;"
 msgstr "&nbsp; Redigera &nbsp;"
 
-#: ..\..\..\admin\_edit_showposts.php:163
-#: ..\..\..\admin\_edit_showposts.php:256
+#: ..\..\..\admin\_edit_showposts.php:166
+#: ..\..\..\admin\_edit_showposts.php:259
 msgid "Delete"
 msgstr "Radera"
 
-#: ..\..\..\admin\_edit_showposts.php:163
+#: ..\..\..\admin\_edit_showposts.php:166
 #, fuzzy
 msgid ""
 "You are about to delete this post!\\n\\'Cancel\\' to stop, \\'OK\\' to "
@@ -2283,90 +2304,90 @@ msgstr ""
 "Du håller på att radera detta inlägg\\n\\'Avbryt\\' för att avbryta, \\'OK"
 "\\' för att radera."
 
-#: ..\..\..\admin\_edit_showposts.php:173
+#: ..\..\..\admin\_edit_showposts.php:176
 msgid "Publish NOW!"
 msgstr "Publicera NU!"
 
-#: ..\..\..\admin\_edit_showposts.php:173
+#: ..\..\..\admin\_edit_showposts.php:176
 msgid "Publish now using current date and time."
 msgstr "Publicera nu, med nuvarande dag och tid."
 
 #. TRANS: Link to comments for current post
-#: ..\..\..\admin\_edit_showposts.php:179
+#: ..\..\..\admin\_edit_showposts.php:182
 msgid "no comment"
 msgstr "inga kommentarer"
 
-#: ..\..\..\admin\_edit_showposts.php:179
+#: ..\..\..\admin\_edit_showposts.php:182
 #: ..\..\..\b2evocore\_class_item.php:695
 #: ..\..\..\b2evocore\_functions_comments.php:206
 msgid "1 comment"
 msgstr "1 kommentar"
 
-#: ..\..\..\admin\_edit_showposts.php:179
+#: ..\..\..\admin\_edit_showposts.php:182
 #: ..\..\..\b2evocore\_class_item.php:696
 #: ..\..\..\b2evocore\_functions_comments.php:207
 #, fuzzy, php-format
 msgid "%d comments"
 msgstr "% kommentarer"
 
-#: ..\..\..\admin\_edit_showposts.php:180
+#: ..\..\..\admin\_edit_showposts.php:183
 msgid "1 Trackback"
 msgstr ""
 
-#: ..\..\..\admin\_edit_showposts.php:180
+#: ..\..\..\admin\_edit_showposts.php:183
 #, fuzzy, php-format
 msgid "%d Trackbacks"
 msgstr "Trackback-URL:ar"
 
-#: ..\..\..\admin\_edit_showposts.php:181
+#: ..\..\..\admin\_edit_showposts.php:184
 msgid "1 Pingback"
 msgstr ""
 
-#: ..\..\..\admin\_edit_showposts.php:181
+#: ..\..\..\admin\_edit_showposts.php:184
 #, fuzzy, php-format
 msgid "%d Pingbacks"
 msgstr "Tillåt pingbacks"
 
-#: ..\..\..\admin\_edit_showposts.php:192 ..\..\..\skins\_feedback.php:61
+#: ..\..\..\admin\_edit_showposts.php:195 ..\..\..\skins\_feedback.php:61
 #: ..\..\..\skins\basic\_feedback.php:61
 msgid "Trackbacks"
 msgstr ""
 
-#: ..\..\..\admin\_edit_showposts.php:192 ..\..\..\skins\_feedback.php:66
+#: ..\..\..\admin\_edit_showposts.php:195 ..\..\..\skins\_feedback.php:66
 #: ..\..\..\skins\basic\_feedback.php:66
 msgid "Pingbacks"
 msgstr ""
 
-#: ..\..\..\admin\_edit_showposts.php:199
+#: ..\..\..\admin\_edit_showposts.php:202
 #, fuzzy
 msgid "No feedback for this post yet..."
 msgstr "Inga %s på denna post ännu..."
 
-#: ..\..\..\admin\_edit_showposts.php:231 ..\..\..\skins\_feedback.php:105
+#: ..\..\..\admin\_edit_showposts.php:234 ..\..\..\skins\_feedback.php:105
 #: ..\..\..\skins\basic\_feedback.php:103
 #, fuzzy
 msgid "Comment from:"
 msgstr "Kommentar från:"
 
-#: ..\..\..\admin\_edit_showposts.php:235 ..\..\..\skins\_feedback.php:111
+#: ..\..\..\admin\_edit_showposts.php:238 ..\..\..\skins\_feedback.php:111
 #: ..\..\..\skins\basic\_feedback.php:109
 #, fuzzy
 msgid "Trackback from:"
 msgstr "Trackback från:"
 
-#: ..\..\..\admin\_edit_showposts.php:239 ..\..\..\skins\_feedback.php:116
+#: ..\..\..\admin\_edit_showposts.php:242 ..\..\..\skins\_feedback.php:116
 #: ..\..\..\skins\basic\_feedback.php:114
 #, fuzzy
 msgid "Pingback from:"
 msgstr "Pingback från:"
 
-#: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:126
+#: ..\..\..\admin\_edit_showposts.php:252 ..\..\..\skins\_feedback.php:126
 #: ..\..\..\skins\_lastcomments.php:39
 #, fuzzy
 msgid "Permanent link to this comment"
 msgstr "Permanent länk till detta inlägg"
 
-#: ..\..\..\admin\_edit_showposts.php:256
+#: ..\..\..\admin\_edit_showposts.php:259
 #, fuzzy
 msgid ""
 "You are about to delete this comment!\\n\\'Cancel\\' to stop, \\'OK\\' to "
@@ -2375,79 +2396,79 @@ msgstr ""
 "Du håller på att radera denna kommentar\\n\\'Avbryt\\' för att avbryta, \\'OK"
 "\\' to att radera."
 
-#: ..\..\..\admin\_edit_showposts.php:271
+#: ..\..\..\admin\_edit_showposts.php:274
 #: ..\..\..\b2evocore\_class_item.php:694
 #: ..\..\..\b2evocore\_functions_comments.php:205
 #: ..\..\..\skins\_feedback.php:139 ..\..\..\skins\basic\_feedback.php:133
 msgid "Leave a comment"
 msgstr "Kommentera"
 
-#: ..\..\..\admin\_edit_showposts.php:279 ..\..\..\admin\_users_form.php:80
+#: ..\..\..\admin\_edit_showposts.php:282 ..\..\..\admin\_users_form.php:80
 #: ..\..\..\skins\_feedback.php:158 ..\..\..\skins\basic\_feedback.php:153
 #, fuzzy
 msgid "User"
 msgstr "Användare"
 
-#: ..\..\..\admin\_edit_showposts.php:282 ..\..\..\skins\_feedback.php:161
+#: ..\..\..\admin\_edit_showposts.php:285 ..\..\..\skins\_feedback.php:161
 #: ..\..\..\skins\basic\_feedback.php:156
 #, fuzzy
 msgid "Edit profile"
 msgstr "Redigera din profil"
 
-#: ..\..\..\admin\_edit_showposts.php:287 ..\..\..\skins\_feedback.php:195
+#: ..\..\..\admin\_edit_showposts.php:290 ..\..\..\skins\_feedback.php:195
 #: ..\..\..\skins\basic\_feedback.php:187
 msgid "Comment text"
 msgstr "Kommentarstext"
 
-#: ..\..\..\admin\_edit_showposts.php:289 ..\..\..\skins\_feedback.php:197
+#: ..\..\..\admin\_edit_showposts.php:292 ..\..\..\skins\_feedback.php:197
 #: ..\..\..\skins\basic\_feedback.php:189
 msgid "Allowed XHTML tags"
 msgstr "Tillåtna XHTML-taggar"
 
-#: ..\..\..\admin\_edit_showposts.php:289 ..\..\..\skins\_feedback.php:198
+#: ..\..\..\admin\_edit_showposts.php:292 ..\..\..\skins\_feedback.php:198
 #: ..\..\..\skins\basic\_feedback.php:190
 msgid "URLs, email, AIM and ICQs will be converted automatically."
 msgstr "URL:ar, e-post, AIM och ICQ-nummer kommer att konverteras automatiskt."
 
-#: ..\..\..\admin\_edit_showposts.php:295 ..\..\..\skins\_feedback.php:203
+#: ..\..\..\admin\_edit_showposts.php:298 ..\..\..\skins\_feedback.php:203
 #: ..\..\..\skins\basic\_feedback.php:195
 msgid "Options"
 msgstr "Inställningar"
 
-#: ..\..\..\admin\_edit_showposts.php:296
+#: ..\..\..\admin\_edit_showposts.php:299
 msgid "(Line breaks become &lt;br&gt;)"
 msgstr "(radbrytningar blir &lt;br&gt;)"
 
-#: ..\..\..\admin\_edit_showposts.php:303 ..\..\..\skins\_feedback.php:220
+#: ..\..\..\admin\_edit_showposts.php:306 ..\..\..\skins\_feedback.php:220
 #: ..\..\..\skins\basic\_feedback.php:212
 msgid "Send comment"
 msgstr "Skicka kommentar"
 
-#: ..\..\..\admin\_edit_showposts.php:346
+#: ..\..\..\admin\_edit_showposts.php:353
 msgid "Posts to show"
 msgstr "Inlägg att visa"
 
-#: ..\..\..\admin\_edit_showposts.php:348
+#: ..\..\..\admin\_edit_showposts.php:356
 msgid "Past"
 msgstr "Tidigare"
 
-#: ..\..\..\admin\_edit_showposts.php:350
+#: ..\..\..\admin\_edit_showposts.php:359
 msgid "Future"
 msgstr "Senare"
 
-#: ..\..\..\admin\_edit_showposts.php:370
+#: ..\..\..\admin\_edit_showposts.php:384
 msgid "Title / Text contains"
 msgstr "Titel / Text innehåller"
 
-#: ..\..\..\admin\_edit_showposts.php:374
+#: ..\..\..\admin\_edit_showposts.php:388
 msgid "Words"
 msgstr "Ord"
 
-#: ..\..\..\admin\_edit_showposts.php:374
+#: ..\..\..\admin\_edit_showposts.php:389
 msgid "AND"
 msgstr "OCH"
 
-#: ..\..\..\admin\_edit_showposts.php:375
+#: ..\..\..\admin\_edit_showposts.php:391
 msgid "OR"
 msgstr "ELLER"
 
@@ -3374,13 +3395,13 @@ msgstr "Denna post är stängd för kommentarer."
 
 #. TRANS: this is the default text for the extended post "more" link
 #: ..\..\..\b2evocore\_class_item.php:434
-#: ..\..\..\b2evocore\_functions_bposts.php:694
+#: ..\..\..\b2evocore\_functions_bposts.php:696
 msgid "Read more!"
 msgstr "Läs mer!"
 
 #. TRANS: this is the default text displayed once the more link has been activated
 #: ..\..\..\b2evocore\_class_item.php:439
-#: ..\..\..\b2evocore\_functions_bposts.php:699
+#: ..\..\..\b2evocore\_functions_bposts.php:701
 msgid "More:"
 msgstr "Mer:"
 
@@ -3463,19 +3484,6 @@ msgstr "Koppla upp till POP"
 #: ..\..\..\b2evocore\_class_pop3.php:96
 msgid "No server specified"
 msgstr "Ingen server specificerad"
-
-#: ..\..\..\b2evocore\_class_pop3.php:105
-#: ..\..\..\b2evocore\_class_pop3.php:117
-#: ..\..\..\b2evocore\_class_pop3.php:160
-#: ..\..\..\b2evocore\_class_pop3.php:360
-#: ..\..\..\b2evocore\_class_pop3.php:408
-#: ..\..\..\b2evocore\_class_pop3.php:441
-#: ..\..\..\b2evocore\_class_pop3.php:474
-#: ..\..\..\b2evocore\_class_pop3.php:573
-#: ..\..\..\b2evocore\_class_pop3.php:596
-#, fuzzy
-msgid "Error"
-msgstr "Fel"
 
 #: ..\..\..\b2evocore\_class_pop3.php:125
 msgid "POP3: premature NOOP OK, NOT an RFC 1939 Compliant server"
@@ -3566,11 +3574,6 @@ msgstr "POP3 användarnamn:"
 #: ..\..\..\b2evocore\_class_pop3.php:295
 msgid "POP3 top:"
 msgstr ""
-
-#: ..\..\..\b2evocore\_class_pop3.php:295
-#: ..\..\..\b2evocore\_class_pop3.php:349
-msgid "Error "
-msgstr "Fel"
 
 #: ..\..\..\b2evocore\_class_pop3.php:321
 #: ..\..\..\b2evocore\_class_pop3.php:349
@@ -3750,41 +3753,36 @@ msgstr "Felaktigt svar."
 msgid "Requested blog does not exist!"
 msgstr "Angiven blogg existerar inte!"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:645
+#: ..\..\..\b2evocore\_functions_bposts.php:647
 msgid "Post details"
 msgstr "Allt om detta inlägg"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:653
+#: ..\..\..\b2evocore\_functions_bposts.php:655
 msgid "PREVIEW"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_bposts.php:788
-#, fuzzy
-msgid "Pages:"
-msgstr "Lösenord:"
-
-#: ..\..\..\b2evocore\_functions_bposts.php:790
+#: ..\..\..\b2evocore\_functions_bposts.php:792
 msgid "Next page"
 msgstr "Nästa sida"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:791
+#: ..\..\..\b2evocore\_functions_bposts.php:793
 msgid "Previous page"
 msgstr "Föregående sida"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:836
+#: ..\..\..\b2evocore\_functions_bposts.php:838
 msgid "Previous post"
 msgstr "&lt;&lt; Föregående"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:893
+#: ..\..\..\b2evocore\_functions_bposts.php:895
 #, fuzzy
 msgid "Next post"
 msgstr "Nästa &gt;&gt;"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:995
+#: ..\..\..\b2evocore\_functions_bposts.php:997
 msgid "Next Page"
 msgstr "Nästa sida"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:1023
+#: ..\..\..\b2evocore\_functions_bposts.php:1025
 msgid "Previous Page"
 msgstr "Föregående sida"
 
@@ -5354,69 +5352,117 @@ msgstr ""
 msgid "This version is too recent! We cannot downgrade to it!"
 msgstr ""
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:54
+#: ..\..\..\plugins\plugin.class.php:39
+msgid "No desc available"
+msgstr ""
+
+#: ..\..\..\plugins\plugin.class.php:40
+#: ..\..\..\plugins\renderers\_autolinks.renderer.php:34
+#: ..\..\..\plugins\renderers\_auto_p.renderer.php:34
+#: ..\..\..\plugins\renderers\_bbcode.renderer.php:76
+#: ..\..\..\plugins\renderers\_gmcode.renderer.php:59
+#: ..\..\..\plugins\renderers\_smilies.renderer.php:61
+#: ..\..\..\plugins\renderers\_textile.renderer.php:230
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:34
+#: ..\..\..\plugins\toolbars\_smilies.toolbar.php:44
+msgid "No description available"
+msgstr ""
+
+#: ..\..\..\plugins\renderers\_autolinks.renderer.php:33
+msgid "Make URLs clickable"
+msgstr ""
+
+#: ..\..\..\plugins\renderers\_auto_p.renderer.php:33
+msgid "Automatic &lt;P&gt; and &lt;BR&gt; tags"
+msgstr ""
+
+#: ..\..\..\plugins\renderers\_bbcode.renderer.php:75
+msgid "BB formatting e-g [b]bold[/b]"
+msgstr ""
+
+#: ..\..\..\plugins\renderers\_gmcode.renderer.php:58
+msgid "GreyMatter style formatting"
+msgstr ""
+
+#: ..\..\..\plugins\renderers\_smilies.renderer.php:60
+msgid "Convert text smilies to icons"
+msgstr ""
+
+#: ..\..\..\plugins\renderers\_textile.renderer.php:229
+msgid "Humane Web Text Generator"
+msgstr ""
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:33
+msgid "Easy HTML tags inserting"
+msgstr ""
+
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:66
 msgid "INSerted [Alt-I]"
 msgstr "Insjutet [Alt-I]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:62
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:74
 msgid "DELeted [Alt-D]"
 msgstr "raDerad [Alt-D]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:70
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:82
 msgid "STRong [Alt-S]"
 msgstr "stark"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:78
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:90
 msgid "EMphasis [Alt-E]"
 msgstr "bEtonad [Alt-E]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:86
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:98
 msgid "CODE [Alt-C]"
 msgstr "kod [Alt-C]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:94
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:106
 msgid "Paragraph [Alt-P]"
 msgstr "nytt stycke [Alt-P]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:102
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:114
 msgid "Unordered List [Alt-U]"
 msgstr "oordnad lista [Alt-U]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:117
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:129
 msgid "List Item [Alt-L]"
 msgstr "Listpost [Alt-L]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:125
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:137
 msgid "BLOCKQUOTE [Alt-B]"
 msgstr "citatstycke [Alt-B]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:133
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:145
 msgid "IMaGe [Alt-G]"
 msgstr "bild [Alt-G]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:142
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:154
 msgid "A href [Alt-A]"
 msgstr "A href [Alt-A]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:158
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:170
 msgid "More [Alt-M]"
 msgstr "Mer [Alt-M]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:167
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:179
 msgid "no teaser [Alt-T]"
 msgstr "ingen lockText [Alt-T]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:176
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:188
 msgid "next page [Alt-Q]"
 msgstr "nästa sida [Alt-Q]"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:245
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:257
 msgid "Close all tags"
 msgstr "Stäng alla taggar"
 
-#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:361
+#: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:373
 msgid "ALTernate text"
 msgstr "Alternativ text"
+
+#: ..\..\..\plugins\toolbars\_smilies.toolbar.php:43
+msgid "One click smilies inserting"
+msgstr ""
 
 #: ..\..\..\skins\_feedback.php:72 ..\..\..\skins\basic\_feedback.php:71
 msgid "Trackback address for this post:"
@@ -5542,6 +5588,9 @@ msgstr "[...] Läs mer!"
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Ny pingback på ditt inlägg #%d \"%s\""
+
+#~ msgid "Error "
+#~ msgstr "Fel"
 
 #~ msgid "Back to new blog form"
 #~ msgstr "Tillbaka till formuläret"
