@@ -1,6 +1,8 @@
 <?php
 /**
- * Who's Online? - functions to maintain online sessions and
+ * This file implements functions to track who's online.
+ *
+ * Functions to maintain online sessions and
  * displaying who is currently active on the site.
  *
  * b2evolution - {@link http://b2evolution.net/}

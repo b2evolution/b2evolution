@@ -1,6 +1,6 @@
 <?php
 /**
- * Email Messaging Functions
+ * This file implements functions for email messaging users.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -13,6 +13,8 @@
  * Display "Message User" title if it has been requested
  *
  * {@internal msg_title(-) }}
+ *
+ * @todo move to {@link Request} class (fplanque)
  *
  * @param string Prefix to be displayed if something is going to be displayed
  * @param mixed Output format, see {@link format_to_output()} or false to

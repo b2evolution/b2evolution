@@ -26,7 +26,6 @@ switch( $target )
 		$test_user = 'admin';
 		$test_pass = 'testpwd';
 		$client = new xmlrpc_client('/b2evolution/blogs/'.$xmlsrv_subdir.'xmlrpc.php', 'localhost', 8088);
-
 		break;
 		
 	default:

@@ -1,6 +1,6 @@
 <?php
 /**
- * Group handling functions
+ * This file implements user Groups handling functions.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

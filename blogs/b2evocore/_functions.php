@@ -1,6 +1,6 @@
 <?php
 /**
- * General purpose functions
+ * This file implements general purpose functions.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

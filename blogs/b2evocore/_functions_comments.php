@@ -1,6 +1,6 @@
 <?php
 /**
- * Comment handling
+ * This file implements Comment handling functions.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

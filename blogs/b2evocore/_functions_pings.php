@@ -1,6 +1,6 @@
 <?php
 /**
- * Pinging external sites
+ * This file implements functions to ping external sites/directories.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

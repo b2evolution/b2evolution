@@ -1,6 +1,6 @@
 <?php
 /**
- * Misc Functions to be called from the template
+ * This file implements misc functions to be called from the templates.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
