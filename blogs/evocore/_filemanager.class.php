@@ -107,7 +107,7 @@ class FileManager extends Filelist
 	 * @var string
 	 * @access protected
 	 */
-	var $order = NULL;
+	var $order;
 
 	/**
 	 * files ordered ascending?
@@ -115,7 +115,7 @@ class FileManager extends Filelist
 	 * @var boolean
 	 * @access protected
 	 */
-	var $orderasc = NULL;
+	var $orderasc;
 
 	/**
 	 * relative path
@@ -129,14 +129,14 @@ class FileManager extends Filelist
 	 * @var string
 	 * @access protected
 	 */
-	var $mode = NULL;
+	var $mode;
 
 	/**
 	 * Remember the Filemanager mode we're in ('fm_upload', 'fm_cmr')
 	 * @var string
 	 * @access protected
 	 */
-	var $fm_mode = NULL;
+	var $fm_mode;
 
 
 	/**
@@ -144,16 +144,16 @@ class FileManager extends Filelist
 	 * @var boolean
 	 * @access protected
 	 */
-	var $flatmode = NULL;
+	var $flatmode;
 
 
 	/**
 	 * Force display of Filemanager also when in file_upload mode etc.?
 	 * // Is also a usersetting.
-	 * @var boolean
+	 * @var integer
 	 * @access protected
 	 */
-	var $forceFM = NULL;
+	var $forceFM;
 
 
 	/**
@@ -466,7 +466,7 @@ class FileManager extends Filelist
 		$url = $this->getCurUrl( array( 'fm_mode' => 'file_upload', 'mode' => 'upload' ) );
 
 		echo '<input type="button" name="fm_upload_popup" value="'.$title.'" class="ActionButton" onclick="'
-					.$this->getJsPopupCode( $url, 'fileman_upload' ).'" />';
+					.$this->getJsPopupCode( $url, 'fileman_upload' ).'; return false;" />';
 	}
 
 
@@ -489,7 +489,7 @@ class FileManager extends Filelist
 
 		echo '<a href="'.$url
 					#.'" target="fileman_copymoverename" onclick="'
-					#.$this->getJsPopupCode( $url, 'fileman_copymoverename' )
+					#.$this->getJsPopupCode( $url, 'fileman_copymoverename' ).' return false;'
 					.'" title="';
 
 		if( $linkTitle === NULL )
@@ -563,6 +563,41 @@ class FileManager extends Filelist
 				}
 				else return false;">'.getIcon( 'file_delete' ).'</a>';
 		}
+	}
+
+
+	/**
+	 * Generate HTML to display an image File framed.
+	 *
+	 * @return string|false
+	 */
+	function getHtmlImageFrame( $File, $imgAlt = NULL, $subline = NULL )
+	{
+		if( !( $imgSize = $File->getImageSize( 'widthheight' ) ) )
+		{
+			return false;
+		}
+
+		if( is_null( $imgAlt ) )
+		{
+			$imgAlt = T_('The selected image');
+		}
+		if( is_null( $subline ) )
+		{
+			$subline = $File->getName().'<br />'.$File->getImageSize().'<br />'.$File->getSizeNice();
+		}
+
+		$r = "\n<img ";
+		if( $imgAlt !== false )
+		{
+			$r .= 'alt="'.$imgAlt.'" ';
+		}
+		$r .= 'class="framed" src="'.$this->getFileUrl( $File ).'"'
+					.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />'
+					.'<div class="subline">'.$subline.'</div>'
+					."\n</div>";
+
+		return $r;
 	}
 
 
@@ -811,6 +846,13 @@ class FileManager extends Filelist
 	}
 
 
+	/**
+	 * Get the image size of a file.
+	 *
+	 * @uses File::getImageSize()
+	 * @return false|mixed Either false (@see $getImageSizes} or the result
+	 *                     from {@link File::getImageSize()}
+	 */
 	function getFileImageSize( $param = 'widthxheight', $File = NULL )
 	{
 		if( !$this->getImageSizes )
@@ -1192,8 +1234,16 @@ class FileManager extends Filelist
 	}
 
 
-	function getJsPopupCode( $href = NULL, $target = 'fileman_default',
-														$width = NULL, $height = NULL )
+	/**
+	 * Get the Javascript code to open a file in a new window.
+	 *
+	 * @param string|NULL HREF of the new window (default is the {@link $curFile current File} in browse mode)
+	 * @param string|NULL
+	 * @param integer|NULL
+	 * @param integer|NULL
+	 * @return string
+	 */
+	function getJsPopupCode( $href = NULL, $target = 'fileman_default', $width = NULL, $height = NULL )
 	{
 		if( $href === NULL )
 		{
@@ -1216,8 +1266,7 @@ class FileManager extends Filelist
 					."if( typeof(openedWindows) == 'undefined' )"
 					."{ openedWindows = new Array(opened); }"
 					."else"
-					."{ openedWindows.push(opened); }"
-					."return false;";
+					."{ openedWindows.push(opened); }";
 
 		return $r;
 	}
@@ -1402,10 +1451,31 @@ class FileManager extends Filelist
 		}
 	}
 
+
+	/**
+	 *
+	 *
+	 * @return
+	 */
+	function getToggled( $val, $default = 0 )
+	{
+		if( is_null($val) )
+		{
+			return $default;
+		}
+		else
+		{
+			return (int)!$val;
+		}
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.23  2005/01/26 23:44:34  blueyed
+ * no message
+ *
  * Revision 1.22  2005/01/26 17:55:23  blueyed
  * catching up..
  *

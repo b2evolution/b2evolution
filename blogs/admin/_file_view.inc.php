@@ -56,22 +56,20 @@
 	<script type="text/javascript" src="styleswitcher.js"></script>
 	<link href="fileman.css" rel="stylesheet" type="text/css" />
 </head>
-<body><!-- onclick="javascript:window.close()" title="<?php echo T_('Click anywhere in this window to close it.') ?>">-->
+
+<body onclick="if( history.length > 1 ) { history.back() } else { window.close() }"
+			title="<?php echo T_('Click anywhere in this window to go back or close it if no go-back history available.') ?>">
 
 	<?php
-	if( $imgSize = $selectedFile->getImageSize( 'string' ) ) // TODO: check
-	{	// --------------------------------
+	if( $selectedFile->isImage() )
+	{ // --------------------------------
 		// We are displaying an image file:
 		// --------------------------------
-		?>
-		<div class="center">
-			<?php echo $selectedFile->getName() ?><br />
-			<img alt="<?php echo T_('The selected image') ?>"
-				class="framed"
-				src="<?php echo $Fileman->getFileUrl( $selectedFile ) ?>"
-				<?php echo $imgSize; ?> /><br />
-		</div>
-		<?php
+		?><div class="center"><?php
+
+		echo $Fileman->getHtmlImageFrame( $selectedFile );
+
+		?></div><?php
 	}
 	elseif( ($buffer = @file( $selectedFile->getPath() )) !== false )
 	{{{ // display raw file
@@ -84,7 +82,6 @@
 
 		echo '<div class="fileheader">';
 		echo T_('File').': '.$selectedFile->getName().'<br />';
-		$selectedFile->ID();
 
 		if( !$buffer_lines )
 		{
@@ -179,5 +176,6 @@
 																		$Fileman->getFileSubpath( $selectedFile ) ), 'error' );
 	}
 	?>
+
 </body>
 </html>

@@ -148,7 +148,7 @@ class File extends DataObject
 	 * @access protected
 	 */
 	/**
-	 * Cached iconfile name
+	 * @var string Cached iconfile name
 	 */
 	var $_iconfilename = NULL;
 	var $_dir;
@@ -159,6 +159,11 @@ class File extends DataObject
 	var $_size;
 	var $_lastMod;
 	var $_perms;
+	/**
+	 * @see isImage()
+	 * @var boolean Is the File an image?
+	 */
+	var $_isImage = 1;
 	/**#@-*/
 
 
@@ -277,6 +282,9 @@ class File extends DataObject
 	 */
 	function refresh()
 	{
+		// Unset values that will be determined (and cached) upon request
+		$this->_isImage = NULL;
+
 		$this->_exists = file_exists( $this->_dir.$this->_name );
 
 		if( is_dir( $this->_dir.$this->_name ) )
@@ -315,6 +323,22 @@ class File extends DataObject
 	function isDir()
 	{
 		return $this->_isDir;
+	}
+
+
+	/**
+	 * Is the File an image?
+	 *
+	 * @return boolean true if the object is an image, false if not
+	 */
+	function isImage()
+	{
+		if( is_null( $this->_isImage ) )
+		{
+			$this->_isImage = ( $this->getImageSize() !== false );
+		}
+
+		return $this->_isImage;
 	}
 
 
@@ -554,7 +578,9 @@ class File extends DataObject
 	 *
 	 * @todo cache this data (NOTE: we have different params here! - imgsize() does already caching!)
 	 *
+	 * @uses imgsize()
 	 * @param string {@link imgsize()}
+	 * @return false|mixed false if the File is not an image, the requested data otherwise
 	 */
 	function getImageSize( $param = 'widthxheight' )
 	{
@@ -711,6 +737,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2005/01/26 23:44:34  blueyed
+ * no message
+ *
  * Revision 1.18  2005/01/21 20:47:46  blueyed
  * doc, getLastMod() extended
  *

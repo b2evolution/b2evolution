@@ -112,7 +112,14 @@ div.fm_query {
 	border:1px solid;
 }
 
-
+div.img_frame {
+	text-align:center;
+	border:1px solid red;
+}
+div.subline {
+	color:#777;
+	font-size:75%;
+}
 img.framed {
 	border:1px dashed #d91;
 	padding:10px;

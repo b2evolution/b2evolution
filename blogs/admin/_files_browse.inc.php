@@ -276,16 +276,15 @@ while( $lFile =& $Fileman->getNextFile() )
 
 				<button class="filenameIcon" type="button"
 					id="button_new_<?php echo $countFiles ?>"
-					onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();
-						<?php
-
+					onclick="<?php
 						$imgsize = $lFile->getImageSize( 'widthheight' );
 						echo $Fileman->getJsPopupCode( NULL,
 							"'+( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_$countFiles')+'",
-							($imgsize ? $imgsize[0]+42 : NULL),
-							($imgsize ? $imgsize[1]+42 : NULL) );
+							($imgsize ? $imgsize[0]+100 : NULL),
+							($imgsize ? $imgsize[1]+100 : NULL) );
 
-						?>"
+						// Un-do the td-onclick action on the checkbox:
+						?> document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();"
 					><?php
 					echo getIcon( 'window_new' );
 				?></button></a>
@@ -658,6 +657,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.5  2005/01/26 23:44:40  blueyed
+ * no message
+ *
  * Revision 1.4  2005/01/26 17:55:23  blueyed
  * catching up..
  *

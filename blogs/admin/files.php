@@ -1046,7 +1046,31 @@ switch( $Fileman->getMode() )
 <?php
 
 // "Display/hide Filemanager" and "Leave mode" buttons
+
+$toggleButtons = array();
+
 if( $Fileman->getMode() )
+{
+	if( !$UserSettings->get('fm_forceFM') )
+	{ // FM is not forced - link to hide/display
+		$toggleButtons[] =
+			'<a class="ActionButton"'
+			.' href="'.$Fileman->getCurUrl( array( 'forceFM' => Filemanager::getToggled( $Fileman->forceFM ) ) ).'">'
+			.( $Fileman->forceFM !== 0
+					? T_('Hide Filemanager')
+					: T_('Display Filemanager') ).'</a>';
+	}
+
+	if( $Fileman->getMode() == 'file_upload' )
+	{
+		$toggleButtons[] =
+			'<a class="ActionButton"'
+			.' href="'.$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ).'">'
+			. /* TRANS: Button to leave the upload mode */ T_('Leave upload mode').'</a>';
+	}
+}
+
+if( isset($toggleButtons[0]) )
 {
 	?>
 
@@ -1054,25 +1078,7 @@ if( $Fileman->getMode() )
 
 		&mdash;
 
-		<?php
-
-		if( $UserSettings->get('fm_forceFM') != 1 )
-		{ // FM is not forced - link to hide/display
-			?>
-
-			<a class="ActionButton"
-				href="<?php echo $Fileman->getCurUrl( array( 'forceFM' => !$Fileman->forceFM ) ); ?>">
-				<?php echo $Fileman->forceFM ?
-										T_('Hide Filemanager') :
-										T_('Display Filemanager'); ?></a>
-
-			<?php
-		}
-
-		?>
-
-		<a class="ActionButton" href="<?php echo $Fileman->getCurUrl( array( 'fm_mode' => false ) ) ?>">
-			<?php echo /* TRANS: Button to leave the upload mode */ T_('Leave upload mode'); ?></a>
+		<?php echo implode( ' ', $toggleButtons ); ?>
 
 		&mdash;
 
@@ -1119,8 +1125,8 @@ if( isset($action_msg) )
 // }}}
 
 
-if( !empty($mode) && !$Fileman->forceFM )
-{ // what a pity..
+if( $Fileman->getMode() && ( !$Fileman->forceFM ) )
+{ // We're in a mode and don't force the FM
 	?>
 	</div>
 	<?php
@@ -1137,8 +1143,12 @@ require( dirname(__FILE__). '/_files_browse.inc.php' );
 
 require( dirname(__FILE__). '/_footer.php' );
 
+
 /*
  * $Log$
+ * Revision 1.70  2005/01/26 23:44:40  blueyed
+ * no message
+ *
  * Revision 1.69  2005/01/26 17:55:23  blueyed
  * catching up..
  *
