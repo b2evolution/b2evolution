@@ -1158,7 +1158,7 @@ if( isset($msg_action) )
 // }}}
 
 
-if( !$Fileman->forceFM && $Fileman->getMode == 'file_upload' ) // TODO: generalize
+if( !$Fileman->forceFM && $Fileman->getMode() == 'file_upload' ) // TODO: generalize
 { // what a pity..
 	?>
 
@@ -1796,6 +1796,9 @@ require( dirname(__FILE__). '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.62  2005/01/08 12:05:50  blueyed
+ * small bugfix
+ *
  * Revision 1.61  2005/01/08 01:24:19  blueyed
  * filelist refactoring
  *
