@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.3-alpha1\n"
 "POT-Creation-Date: 2004-02-24 14:17+0100\n"
-"PO-Revision-Date: 2004-02-29 18:55+0100\n"
+"PO-Revision-Date: 2004-02-29 20:00+0100\n"
 "Last-Translator: Ron <ron@rononline.nl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -454,7 +454,7 @@ msgstr "meer..."
 #: ..\..\..\skins\fplanque2002\_main.php:220
 #: ..\..\..\skins\guadeloupe\_main.php:184
 msgid "Recent Referers"
-msgstr "Recente Referers"
+msgstr "Recente Refererenden"
 
 #: ..\..\..\noskin_a.php:272
 #: ..\..\..\noskin_all.php:274
@@ -465,7 +465,7 @@ msgstr "Recente Referers"
 #: ..\..\..\skins\fplanque2002\_main.php:229
 #: ..\..\..\skins\guadeloupe\_main.php:193
 msgid "Top Referers"
-msgstr "Hoogste Referers"
+msgstr "Hoogste Refererenden"
 
 #: ..\..\..\noskin_a.php:286
 #: ..\..\..\noskin_all.php:288
@@ -542,7 +542,7 @@ msgstr "Bannen van het sleutelwoord %s van de statistieken en reacties zal lijde
 #: ..\..\..\admin\b2antispam.php:163
 #, php-format
 msgid "...and the following %d referer hits:"
-msgstr "...en de volgende %d referer hits:"
+msgstr "...en de volgende %d refererende hits:"
 
 #: ..\..\..\admin\b2antispam.php:81
 #: ..\..\..\admin\b2antispam.php:175
@@ -573,12 +573,12 @@ msgstr "Bannen van het domein %s van de statistieken en reacties zal lijden tot 
 #: ..\..\..\admin\b2antispam.php:192
 #, php-format
 msgid "Banning the referer of hit #%d, and removing all their comments and hits..."
-msgstr "Bannen van de hit van de referer #%d, en verwijderen van al hun reacties en hits..."
+msgstr "Bannen van de hit van de refererende #%d, en verwijderen van al hun reacties en hits..."
 
 #: ..\..\..\admin\b2antispam.php:205
 #, php-format
 msgid "Banning the referer of hit #%d..."
-msgstr "Bannen van de hit van de referer #%d..."
+msgstr "Bannen van de hit van de refererende #%d..."
 
 #: ..\..\..\admin\b2antispam.php:219
 msgid "You have no right to remove domains from the ban list."
@@ -1056,7 +1056,7 @@ msgstr "Samenvatting"
 #: ..\..\..\admin\b2stats.php:26
 #: ..\..\..\admin\b2stats.php:167
 msgid "Referers"
-msgstr "Referers"
+msgstr "Refererenden"
 
 #: ..\..\..\admin\b2stats.php:30
 #: ..\..\..\admin\b2stats.php:168
@@ -1141,7 +1141,7 @@ msgstr "Leegmaken van deze datum!"
 #: ..\..\..\admin\b2stats.php:228
 #: ..\..\..\skins\_stats.php:16
 msgid "Last referers"
-msgstr "Laatste Referers"
+msgstr "Laatste Refererenden"
 
 #: ..\..\..\admin\b2stats.php:229
 msgid "These are hits from external web pages refering to this blog"
@@ -1173,11 +1173,11 @@ msgstr "Blokkeer"
 #: ..\..\..\admin\b2stats.php:247
 #: ..\..\..\skins\_stats.php:26
 msgid "Top referers"
-msgstr "Hoogste Referers"
+msgstr "Hoogste Refererenden"
 
 #: ..\..\..\admin\b2stats.php:258
 msgid "Total referers"
-msgstr "Totaal Referers"
+msgstr "Totaal Refererenden"
 
 #: ..\..\..\admin\b2stats.php:272
 #: ..\..\..\skins\_stats.php:36
@@ -2537,7 +2537,7 @@ msgstr "verkeerd teken in Browsers"
 #: ..\..\..\b2evocore\_functions_hitlogs.php:120
 #: ..\..\..\b2evocore\_functions_hitlogs.php:133
 msgid "referer ignored"
-msgstr "referer genegeerd"
+msgstr "refererende genegeerd"
 
 #: ..\..\..\b2evocore\_functions_hitlogs.php:92
 msgid "BlackList"
