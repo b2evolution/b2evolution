@@ -49,7 +49,7 @@ if( !$config_is_done )
 				<img src="'.$img_url.'/b2evolution_logo_360.gif" />
 				<br />version '.$b2_version.'<br />
 				Welcome to b2evolution <br />
-				<p>You don\'t seem to have done the installation yet.. <a href="install/index.php">please go there</a></p>
+				<p>You don\'t seem to have done the installation yet.. <a href="'.$baseurl.'/install/index.php">please go there</a></p>
 				</div>';
 	exit;
 }

@@ -507,7 +507,7 @@ switch($action)
 			?>
 			<div class="error">
 				<p class="error"><?php echo T_('File cannot be written!') ?></p>			
-				<p><?php printf( '<p>'.T_('You sould check the permission for [%s]. See <a %s>online manual on file permissions</a>.').'</p>',$staticfilename, 'href="http://b2evolution.net/man/install/file_permissions.html"' ); ?></p>
+				<p><?php printf( '<p>'.T_('You should check the permission for [%s]. See <a %s>online manual on file permissions</a>.').'</p>',$staticfilename, 'href="http://b2evolution.net/man/install/file_permissions.html"' ); ?></p>
 			</div>
 			<?php
 		}

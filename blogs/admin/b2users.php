@@ -32,18 +32,29 @@ $user_profile_only = 0;
 // Check permission:
 if( !$current_User->check_perm( 'users', 'edit', false ) )
 {
+	// allow profile editing/viewing only
+	$user_profile_only = 1;
+	
 	if( ($action && $action != 'userupdate') )
 	{
 		errors_add( T_('You have no permission to edit other users or groups!') );
 	}
-	else
-	{ // allow profile editing only
-		$user_profile_only = 1;
+	elseif( $demo_mode && $action && $current_User->login == 'demouser' )
+	{
+		errors_add( T_('You cannot change the demouser profile in demo mode!') );
 	}
 }
 
 
-if( !errors() ) switch ($action)
+if( errors() )
+{
+	if( $action == 'userupdate' )
+	{	// display top menu that was suppressed before
+		require( dirname(__FILE__).'/_menutop.php' );
+		require( dirname(__FILE__).'/_menutop_end.php' );
+	}
+}
+else switch ($action)
 { // actions only when editing users is allowed
 	case 'newuser':
 		param( 'template', 'integer', -1 );
@@ -183,8 +194,7 @@ if( !errors() ) switch ($action)
 				else
 				{
 					$new_pass = md5( $edited_user_pass2 );
-					// set password
-					$edited_User->set( 'pass', $new_pass );
+					$edited_User->set( 'pass', $new_pass ); // set password
 				}
 			}
 		}
@@ -242,12 +252,14 @@ if( !errors() ) switch ($action)
 		$user_data = get_userdata( $id );
 		$usertopromote_level = get_user_info( 'level', $user_data );
 		
+		echo '<div class="panelinfo">';
+		
 		if( ! in_array($prom, array('up', 'down'))
 				|| ($prom == 'up' && $usertopromote_level > 9)
 				|| ($prom == 'down' && $usertopromote_level < 1)
 			)
 		{
-			echo '<div class="panelinfo"><p class="error">' . T_('Invalid promotion.') . '</p></div>';
+			echo '<p class="error">' . T_('Invalid promotion.');
 		}
 		else
 		{
@@ -263,15 +275,16 @@ if( !errors() ) switch ($action)
 			$result = $DB->query( $sql );
 			
 			if( $result )
-				echo '<div class="panelinfo"><p>'.T_('User level changed.');
+				echo '<p>'.T_('User level changed.').'</p>';
 			else
-				echo '<div class="panelinfo"><p class="error">' . sprintf( T_('Couldn\'t change %s\'s level.'), $user_data['user_login'] );
-			echo '</p></div>';
+				echo '<p class="error">'.sprintf( T_('Couldn\'t change %s\'s level.'), $user_data['user_login'] );
 			
 			// reset cache
 			$cache_userdata[ $id ] = '';
 			
 		}
+		echo '</p></div>';
+		
 		break;
 
 

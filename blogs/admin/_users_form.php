@@ -9,8 +9,8 @@
  * @package admin
  */
 
-$allowed_to_edit = ($current_User->check_perm( 'users', 'edit' )
-										|| ($user_profile_only && $edited_User->ID == $current_User->ID))
+$allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
+											|| ($user_profile_only && $edited_User->ID == $current_User->ID) );
 ?>
 <div class="panelblock">
 	<?php if( $current_User->check_perm( 'users', 'view' ) )
@@ -221,6 +221,7 @@ $allowed_to_edit = ($current_User->check_perm( 'users', 'edit' )
 		}
 		else
 		{
+			echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->Group->ID.'" />';
 			form_info( T_('User group'), $edited_User->Group->dget('name') );
 		}
 		?>
@@ -228,8 +229,7 @@ $allowed_to_edit = ($current_User->check_perm( 'users', 'edit' )
 	</td>
 	</tr>
 	<?php
-	if( $current_User->check_perm( 'users', 'edit' )
-			|| ($user_profile_only && $edited_User->ID == $current_User->ID) )
+	if( $allowed_to_edit )
 	{ ?>
 		<tr><td colspan="2" class="center">
 		<input type="submit" name="submit" value="<?php if( $edited_User->ID == 0 ) echo T_('Create'); else echo T_('Update') ?>" class="search" />

@@ -122,13 +122,13 @@
 					echo '</td><td align="right">';
 					if( ($loop_User->get('level') > 0) )
 					{ // prom=down
-						echo ' <a href="b2users.php?action=promote&id='. $loop_User->get('ID'). '&prom=down'.
-									( ( $user != 0 )? '&user='. $user : ''). '" title="'.T_('decrease user level').'">-</a> ';
+						echo ' <a href="b2users.php?action=promote&id='. $loop_User->get('ID'). '&prom=down'
+									.'" title="'.T_('decrease user level').'">-</a> ';
 					}
 					if( ($loop_User->get('level') < 10 ) )
 					{ // prom=up
-						echo ' <a href="b2users.php?action=promote&id='. $loop_User->get('ID'). '&prom=up'.
-									( ( $user != 0 )? '&user='. $user : '').'" title="'.T_('increase user level').'">+</a> ';
+						echo ' <a href="b2users.php?action=promote&id='. $loop_User->get('ID'). '&prom=up'
+									.'" title="'.T_('increase user level').'">+</a> ';
 					}
 					echo '</td><td>';
 					

@@ -1126,7 +1126,7 @@ function debug_info( $force = false )
 
 	if( $debug || $force )
 	{
-		echo '<hr style="clear: both;" /><h2>Debug info</h2>';
+		echo '<hr class="clear" /><h2>Debug info</h2>';
 
 		echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
 
