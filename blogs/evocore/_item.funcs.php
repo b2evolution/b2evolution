@@ -63,8 +63,8 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	$urltitle = trim( $urltitle );
 
-	if( empty( $urltitle )  ) $urltitle = $title;
-	if( empty( $urltitle )  ) $urltitle = 'title';
+	if( empty( $urltitle ) ) $urltitle = $title;
+	if( empty( $urltitle ) ) $urltitle = 'title';
 
 	// echo 'staring with: ', $urltitle, '<br />';
 
@@ -166,7 +166,7 @@ function get_postdata($postid)
 			'Author_ID' => $myrow->post_creator_user_ID,
 			'Date' => $myrow->post_datestart,
 			'Status' => $myrow->post_status,
-			'Locale' =>  $myrow->post_locale,
+			'Locale' => $myrow->post_locale,
 			'Content' => $myrow->post_content,
 			'Title' => $myrow->post_title,
 			'Url' => $myrow->post_url,
@@ -378,14 +378,14 @@ function single_post_title( $prefix = '#', $display = 'htmlhead' )
 	}
 	elseif( intval($p) )
 	{
-		if(	$Item = $ItemCache->get_by_ID( $p, false ) )
+		if( $Item = $ItemCache->get_by_ID( $p, false ) )
 		{
 			$disp_title = $Item->get('title');
 		}
 	}
 	elseif( !empty( $title ) )
 	{
-		if(	$Item = $ItemCache->get_by_urltitle( $title, false ) )
+		if( $Item = $ItemCache->get_by_urltitle( $title, false ) )
 		{
 			$disp_title = $Item->get('title');
 		}
@@ -407,7 +407,7 @@ function single_post_title( $prefix = '#', $display = 'htmlhead' )
 /**
  * {@internal preview_title(-)}}
  */
-function preview_title( $string = '#', $before = ' ', $after = ''  )
+function preview_title( $string = '#', $before = ' ', $after = '' )
 {
 	global $preview;
 
@@ -434,7 +434,7 @@ function the_content(
 	$after_more_link = '#',
 	$format = 'htmlbody',
 	$cut = 0,
-	$dispmore = '#', 	// 1 to display 'more' text, # for url parameter
+	$dispmore = '#',  // 1 to display 'more' text, # for url parameter
 	$disppage = '#' ) // page number to display specific page, # for url parameter
 {
 	global $id, $postdata, $pages, $multipage, $numpages;
@@ -507,7 +507,7 @@ function the_content(
 	}
 	if ($preview)
 	{ // preview fix for javascript bug with foreign languages
-		$output =  preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10).';'", $output);
+		$output = preg_replace('/\%u([0-9A-F]{4,4})/e',  "'&#'.base_convert('\\1',16,10).';'", $output);
 	}
 
 	$content = format_to_output( $output, $format );
@@ -713,7 +713,7 @@ function next_posts($max_page = 0, $page='' )
 			}
 			elseif( isset($edited_Blog) )
 			{ // We are generating a static page
-				echo url_add_param( $edited_Blog->get('dynurl'), 'paged='.$nextpage  );
+				echo url_add_param( $edited_Blog->get('dynurl'), 'paged='.$nextpage );
 			}
 			// else...should not happen
 		}
@@ -739,7 +739,7 @@ function previous_posts( $page='' )
 		}
 		elseif( isset($edited_Blog) )
 		{ // We are generating a static page
-			echo url_add_param( $edited_Blog->get('dynurl'), 'paged='.$nextpage  );
+			echo url_add_param( $edited_Blog->get('dynurl'), 'paged='.$nextpage );
 		}
 		// else...should not happen
 	}
@@ -760,7 +760,7 @@ function next_posts_link($label='#', $max_page=0, $page='')
 	if ($Settings->get('what_to_show') == 'paged')
 	{
 		global $MainList;
-		if (!$max_page)	$max_page = $MainList->get_max_paged();
+		if (!$max_page) $max_page = $MainList->get_max_paged();
 		if (!$paged) $paged = 1;
 		$nextpage = intval($paged) + 1;
 		if (empty($p) && (empty($paged) || $nextpage <= $max_page))
@@ -786,11 +786,11 @@ function previous_posts_link($label='#', $page='')
 	if( $label == '#' ) $label = '<< '.T_('Previous Page');
 
 	global $p, $paged;
-	if (empty($p)  && ($paged > 1) && ($Settings->get('what_to_show') == 'paged'))
+	if (empty($p) && ($paged > 1) && ($Settings->get('what_to_show') == 'paged'))
 	{
 		echo '<a href="';
 		echo previous_posts( $page );
-		echo '">'.  htmlspecialchars($label) .'</a>';
+		echo '">'.htmlspecialchars($label).'</a>';
 	}
 }
 
@@ -1397,7 +1397,7 @@ function cat_select( $display_info = true )
 
 	$default_main_cat = 0;
 
-	cat_query( false );	// make sure the caches are loaded
+	cat_query( false ); // make sure the caches are loaded
 
 	if( $allow_cross_posting >= 2 )
 	{ // If BLOG cross posting enabled, go through all blogs with cats:
@@ -1406,29 +1406,29 @@ function cat_select( $display_info = true )
 			$current_blog_ID = $i_blog->blog_ID;
 			if( ! blog_has_cats( $current_blog_ID ) ) continue;
 			if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
-			$r .= '<h4>'.format_to_output($i_blog->blog_name).'</h4>\n';
-			$r .= '<table cellspacing="0">'.cat_select_header();
+			$r .= '<h4>'.format_to_output($i_blog->blog_name)."</h4>\n";
+			$r .= '<table class="catselect">'.cat_select_header();
 			$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
 										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
-	   	$r .= '</table>';
+			$r .= '</table>';
 		}
 
 		if( $display_info )
 		{
-	    if( $allow_cross_posting >= 3 )
-	    {
-	      $r .= '<p class="extracatnote">'.T_('Note: Moving posts across blogs is enabled. Use with caution.').'</p> ';
-	    }
-	    $r .= '<p class="extracatnote">'.T_('Note: Cross posting among multiple blogs is enabled.').'</p>';
+			if( $allow_cross_posting >= 3 )
+			{
+				$r .= '<p class="extracatnote">'.T_('Note: Moving posts across blogs is enabled. Use with caution.').'</p> ';
+			}
+			$r .= '<p class="extracatnote">'.T_('Note: Cross posting among multiple blogs is enabled.').'</p>';
 		}
 	}
 	else
 	{ // BLOG Cross posting is disabled. Current blog only:
 		$current_blog_ID = $blog;
-		$r .= '<table cellspacing="0">'.cat_select_header();
+		$r .= '<table class="catselect">'.cat_select_header();
 		$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
 									'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
-   	$r .= '</table>';
+		$r .= '</table>';
 
 		if( $display_info )
 		{
@@ -1450,12 +1450,14 @@ function cat_select( $display_info = true )
 function cat_select_header()
 {
 	global $current_blog_ID, $blog, $allow_cross_posting;
-	$r = '<thead><th class="selector">'.T_('Main').'</th>';
-	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
+
+	$r = '<thead><tr><th class="selector catsel_main">'.T_('Main').'</th>';
+
+	if( $allow_cross_posting )
 	{ // This is current blog or we allow moving posts accross blogs
-		$r .= '<th class="selector">'.T_('Extra').'</th>';
+		$r .= '<th class="selector catsel_extra">'.T_('Extra').'</th>';
 	}
-	$r .= '<th>'.T_('Category').'</th></thead>';
+	$r .= '<th class="catsel_name">'.T_('Category').'</th></tr></thead>';
 	return $r;
 }
 
@@ -1474,7 +1476,7 @@ function cat_select_before_each( $cat_ID, $level )
 { // callback to display sublist element
 	global $current_blog_ID, $blog, $cat, $edited_Item, $post_extracats, $default_main_cat, $next_action, $allow_cross_posting, $cat_select_level;
 	$this_cat = get_the_category_by_ID( $cat_ID );
-	$r = '<tr>';
+	$r = "\n<tr>";
 
 	// Radio for main cat:
 	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
@@ -1483,27 +1485,38 @@ function cat_select_before_each( $cat_ID, $level )
 		{ // Assign default cat for new post
 			$default_main_cat = $cat_ID;
 		}
-		$r .= '<td class="selector"><input type="radio" name="post_category" class="checkbox" title="'
-					.T_('Select as MAIN category').'" value="'.$cat_ID.	'"';
-		if( ($cat_ID == $edited_Item->main_cat_ID) || ($cat_ID == $default_main_cat))
+		$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
+					.T_('Select as MAIN category').'" value="'.$cat_ID.'"';
+		if( ($cat_ID == $edited_Item->main_cat_ID) || ($cat_ID == $default_main_cat) )
+		{ // main cat of the Item or set as default main cat above
 			$r .= ' checked="checked"';
+		}
+		$r .= ' id="sel_maincat_'.$cat_ID.'"';
 		$r .= ' /></td>';
 	}
 	else
 	{ // Don't allow to select this cat as a main cat
-  	$r .= '<td class="selector">&nbsp;</td>';
+		$r .= '<td class="selector">&nbsp;</td>';
 	}
 
 	if( $allow_cross_posting )
 	{ // We allow cross posting, display checkbox:
-		$r .= '<td class="selector"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
-					.T_('Select as an additionnal category').'" value="'.$cat_ID.'"';
-		if (($cat_ID == $edited_Item->main_cat_ID) or (in_array( $cat_ID, $post_extracats )))
+		$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
+					.T_('Select as an additional category').'" value="'.$cat_ID.'"';
+		if( ($cat_ID == $edited_Item->main_cat_ID) || (in_array( $cat_ID, $post_extracats )) )
+		{
 			$r .= ' checked="checked"';
+		}
+		$r .= ' id="sel_extracat_'.$cat_ID.'"';
 		$r .= ' /></td>';
 	}
 
-	$r .= '<td><span style="padding-left:'.($level-1).'em;">'.$this_cat['cat_name'].'</span></td>';
+	$r .= '<td class="catsel_name"><label'
+				.' for="'.( $allow_cross_posting
+											? 'sel_extracat_'.$cat_ID
+											: 'sel_maincat_'.$cat_ID ).'"'
+				.' style="padding-left:'.($level-1).'em;">'.$this_cat['cat_name'].'</label>'
+				."</td></tr>\n";
 
 	return $r;
 }
@@ -1513,7 +1526,7 @@ function cat_select_before_each( $cat_ID, $level )
  */
 function cat_select_after_each( $cat_ID, $level )
 { // callback after each sublist element
-	return "</td></tr>\n";
+	return '';
 }
 
 /**
@@ -1529,6 +1542,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.14  2005/02/10 22:57:23  blueyed
+ * fixed catselection
+ *
  * Revision 1.13  2005/02/08 20:17:45  blueyed
  * removed obsolete $User_ID global
  *
