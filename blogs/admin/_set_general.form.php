@@ -70,6 +70,14 @@
 		?>
 	</fieldset>
 			
+	<fieldset>
+		<legend><?php echo T_('Miscellaneous options') ?></legend>
+		<?php
+			// TODO: better name?!
+			form_text( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 2, T_('Reload-page timeout'), T_('time in seconds before a request to the same URI from the same IP and useragent is considered as new hit.'), 5 );
+		?>
+	</fieldset>
+			
 	<?php if( $current_User->check_perm( 'options', 'edit' ) )
 	{ ?>
 	<fieldset>

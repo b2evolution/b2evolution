@@ -132,6 +132,7 @@ switch( $action )
 		param( 'conf_db_password', 'string', true );
 		param( 'conf_db_name', 'string', true );
 		param( 'conf_db_host', 'string', true );
+		param( 'conf_db_tableprefix', 'string', true );
 		param( 'conf_baseurl', 'string', true );
 		$conf_baseurl = preg_replace( '#(/)?$#', '', $conf_baseurl ); // remove trailing slash
 		param( 'conf_admin_email', 'string', true );
@@ -158,19 +159,21 @@ switch( $action )
 			// Update conf:
 			$conf = preg_replace(
 														array(
-																		"#define\(\s*'DB_USER',\s*'.*?'\s*\);#",
-																		"#define\(\s*'DB_PASSWORD',\s*'.*?'\s*\);#",
-																		"#define\(\s*'DB_NAME',\s*'.*?'\s*\);#",
-																		"#define\(\s*'DB_HOST',\s*'.*?'\s*\);#",
-																		"#baseurl\s*=\s*'.*?';#",
-																		"#admin_email\s*=\s*'.*?';#",
-																		"#config_is_done\s*=.*?;#",
+																		"#define\(\s*'DB_USER',\s*'.*?'\s*\);#i",
+																		"#define\(\s*'DB_PASSWORD',\s*'.*?'\s*\);#i",
+																		"#define\(\s*'DB_NAME',\s*'.*?'\s*\);#i",
+																		"#define\(\s*'DB_HOST',\s*'.*?'\s*\);#i",
+																		"#tableprefix\s*=\s*'.*?';#i",
+																		"#baseurl\s*=\s*'.*?';#i",
+																		"#admin_email\s*=\s*'.*?';#i",
+																		"#config_is_done\s*=.*?;#i",
 																	),
 														array(
 																		"define( 'DB_USER', '$conf_db_user' );",
 																		"define( 'DB_PASSWORD', '$conf_db_password' );",
 																		"define( 'DB_NAME', '$conf_db_name' );",
 																		"define( 'DB_HOST', '$conf_db_host' );",
+																		"tableprefix = '$conf_db_tableprefix';",
 																		"baseurl = '$conf_baseurl';",
 																		"admin_email = '$conf_admin_email';",
 																		'config_is_done = 1;',
@@ -247,6 +250,7 @@ switch( $action )
 			param( 'conf_db_password', 'string', DB_PASSWORD );
 			param( 'conf_db_name', 'string', DB_NAME );
 			param( 'conf_db_host', 'string', DB_HOST );
+			param( 'conf_db_tableprefix', 'string', $tableprefix );
 			// Guess baseurl:
 			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
 			if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
@@ -273,6 +277,7 @@ switch( $action )
 						form_text( 'conf_db_password', $conf_db_password, 16, T_('mySQL Password'), sprintf( T_('Your password to access the database' ) ), 16, '', 'password' );
 						form_text( 'conf_db_name', $conf_db_name, 16, T_('mySQL Database'), sprintf( T_('Name of the database you want to use' ) ), 16 );
 						form_text( 'conf_db_host', $conf_db_host, 16, T_('mySQL Host'), sprintf( T_('You probably won\'t have to change this' ) ), 120 );
+						form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('mySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with that. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
 					?>
 				</fieldset>
 
@@ -370,7 +375,8 @@ to
 		T_('mySQL Username').': '.$conf_db_user."\n".
 		T_('mySQL Password').': '.(($conf_db_password != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )."\n".
 		T_('mySQL Database').': '.$conf_db_name."\n".
-		T_('mySQL Host').': '.$conf_db_host."\n\n".
+		T_('mySQL Host').': '.$conf_db_host."\n".
+		T_('mySQL tables prefix').': '.$tableprefix."\n\n".
 		T_('Base URL').': '.$baseurl."\n\n".
 		T_('Admin email').': '.$admin_email.
 		'</pre>';

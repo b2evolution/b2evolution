@@ -1,6 +1,6 @@
 <?php
 /**
- * Logging of hits
+ * Logging of hits, extraction of stats
  * 
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -35,51 +35,43 @@ function log_hit()
 {
 	global $DB, $localtimenow, $blog, $tablehitlog, $blackList, $search_engines, $user_agents;
 	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER, $page, $ReqURI, $ReqPath;
+	global $HTTP_USER_AGENT;
+	global $uri_reloaded;
 	
 	# TODO: check for already logged?
 	
-	$fullCurrentURL = 'http://'. $_SERVER['SERVER_NAME']. $ReqURI;
-	// debug_log( 'Hit Log: '. "full current url: ".$fullCurrentURL);
-
-	$ref = $HTTP_REFERER;
-	// debug_log( 'Hit Log: '. "referer: ".$ref);
-
-	$RemoteAddr = $_SERVER['REMOTE_ADDR'];
-	// debug_log( 'Hit Log: '. "Remote Addr: ".$RemoteAddr);
-	//$RemoteHost = $_SERVER['REMOTE_HOST'];
-	//debug_log( 'Hit Log: '. "Remote Host: ".$RemoteHost);
-
-	$UserAgent = $_SERVER['HTTP_USER_AGENT'];
-	// debug_log( 'Hit Log: '. "User Agent: ".$UserAgent);
-	if ($UserAgent != strip_tags($UserAgent))
-	{ //then they have tried something funny,
-		//putting HTML or PHP into the HTTP_REFERER
-		debug_log( 'Hit Log: '.T_("bad char in User Agent"));
-		$UserAgent = '';
-	}
+	debug_log( 'Hit Log: '. "ReqURI: ".$ReqURI );
+	debug_log( 'Hit Log: '. "Remote Addr: ".$_SERVER['REMOTE_ADDR'] );
+	debug_log( 'Hit Log: '. "referer: ".$HTTP_REFERER );
+	#debug_log( 'Hit Log: '. "Remote Host: ".$_SERVER['REMOTE_HOST'] );
+	debug_log( 'Hit Log: '. "User Agent: ".$HTTP_USER_AGENT );
 
 	// debug_log( 'Hit Log: '."Languages: ".$_SERVER['HTTP_ACCEPT_LANGUAGE']);
-
+	
+	if( $uri_reloaded )
+	{ // the Request is considered as reload
+		return false;
+	}
 	
 	$ignore = 'no';  // So far so good
 	
-	if( $ref != strip_tags($ref) )
-	{ //then they have tried something funny,
-		//putting HTML or PHP into the HTTP_REFERER
-		//$ignore = 'badchar';
+	if( $HTTP_REFERER != strip_tags($HTTP_REFERER) )
+	{ // then they have tried something funny,
+		// putting HTML or PHP into the HTTP_REFERER
+		// $ignore = 'badchar';
 		debug_log( 'Hit Log: bad char in referer');
 		return;		// Hazardous
 	}
-	elseif( $error = validate_url( $ref, $comments_allowed_uri_scheme ) )
-	{	//if they are trying to inject javascript or a blocked (spam) URL
+	elseif( $error = validate_url( $HTTP_REFERER, $comments_allowed_uri_scheme ) )
+	{	// if they are trying to inject javascript or a blocked (spam) URL
 		debug_log( 'Hit Log: '. $error);
 		return;		// Hazardous
 	}
 	
 	// SEARCH BLACKLIST	
-	foreach ($blackList as $site)
+	foreach( $blackList as $site )
 	{
-		if (stristr($ref, $site))
+		if( stristr($HTTP_REFERER, $site) )
 		{
 			// $ignore = 'blacklist';
 			debug_log( 'Hit Log: '. T_('referer ignored'). ' ('. T_('BlackList'). ')');
@@ -98,7 +90,7 @@ function log_hit()
 	{	// Lookup robots
 		foreach ($user_agents as $user_agent)
 		{
-			if( ($user_agent[0] == 'robot') && (strstr($UserAgent, $user_agent[1])) )
+			if( ($user_agent[0] == 'robot') && (strstr($HTTP_USER_AGENT, $user_agent[1])) )
 			{
 				$ignore = "robot";
 				debug_log( 'Hit Log: '. T_('referer ignored'). ' ('. T_('robot'). ')');
@@ -109,7 +101,7 @@ function log_hit()
 	
 	if( $ignore == 'no' )
 	{
-		if( strlen($ref) < 13 )
+		if( strlen($HTTP_REFERER) < 13 )
 		{	// minimum http://az.fr/ , this will be considered direct access (although it could be https:)
 			$ignore = 'invalid';
 			debug_log( 'Hit Log: '. T_('referer ignored'). ' ('. T_('invalid'). ')' );
@@ -121,7 +113,7 @@ function log_hit()
 		foreach($search_engines as $engine)
 		{
 			// debug_log( 'Hit Log: '."engine: ".$engine);
-			if(stristr($ref, $engine))
+			if( stristr($HTTP_REFERER, $engine) )
 			{
 				$ignore = 'search';
 				debug_log( 'Hit Log: '. T_('referer ignored'). " (". T_('search engine'). ")");
@@ -130,24 +122,27 @@ function log_hit()
 		}
 	}	
 
-	if ($doubleCheckReferers)
+	if( $doubleCheckReferers )
 	{
 		debug_log( 'Hit Log: '. T_('loading referering page') );
 
-		//this is so that the page up until the call to
-		//logReferer will get shown before it tries to check
-		//back against the refering URL.
+		// this is so that the page up until the call to
+		// logReferer will get shown before it tries to check
+		// back against the refering URL.
 		flush();
 
 		$goodReferer = 0;
-		if ( strlen($ref) > 0 )
+		if( strlen($HTTP_REFERER) > 0 )
 		{
-			$fp = @fopen ($ref, 'r');
-			if ($fp)
+			$fullCurrentURL = 'http://'. $_SERVER['SERVER_NAME']. $ReqURI;
+			// debug_log( 'Hit Log: '. "full current url: ".$fullCurrentURL);
+
+			$fp = @fopen( $HTTP_REFERER, 'r' );
+			if( $fp )
 			{
-				//timeout after 5 seconds
+				// timeout after 5 seconds
 				socket_set_timeout($fp, 5);
-				while (!feof ($fp))
+				while( !feof($fp) )
 				{
 					$page .= trim(fgets($fp));
 				}
@@ -157,31 +152,31 @@ function log_hit()
 					$goodReferer = 1;
 				}
 			}
-		} else {
-			// Direct accesses are always good hits
+			
+			if( !$goodReferer )
+			{	// This was probably spam!
+				debug_log( 'Hit Log: '. sprintf('did not find %s in %s', $fullCurrentURL, $page ) );
+				return;
+			}
+		}
+		else
+		{ // Direct accesses are always good hits
 			$goodReferer = 1;
 		}
-
-		if(!$goodReferer)
-		{	// This was probably spam!
-			debug_log( 'Hit Log: '. sprintf('did not find %s in %s', $fullCurrentURL, $page ) );
-			$ref="";
-			return;
-		}
-
 	}
 
-	$baseDomain = preg_replace("/http:\/\//i", "", $ref);
-	$baseDomain = preg_replace("/^www\./i", "", $baseDomain);
-	$baseDomain = preg_replace("/\/.*/i", "", $baseDomain);
+	$baseDomain = preg_replace("/http:\/\//i", '', $HTTP_REFERER);
+	$baseDomain = preg_replace("/^www\./i", '', $baseDomain);
+	$baseDomain = preg_replace("/\/.*/i", '', $baseDomain);
 
+	// insert hit into DB table
 	$sql = "INSERT INTO $tablehitlog( visitTime, visitURL, hit_ignore, referingURL, baseDomain, 
 																		hit_blog_ID, hit_remote_addr, hit_user_agent ) 
 					VALUES( FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($ReqURI)."', '$ignore', 
-									'".$DB->escape($ref)."', '".$DB->escape($baseDomain)."', $blog, 
-									'".$DB->escape($RemoteAddr)."', '".$DB->escape($UserAgent)."')";
-	$DB->query( $sql );
-
+									'".$DB->escape($HTTP_REFERER)."', '".$DB->escape($baseDomain)."', $blog, 
+									'".$DB->escape($_SERVER['REMOTE_ADDR'])."', '".$DB->escape($HTTP_USER_AGENT)."')";
+	
+	return $DB->query( $sql );
 }
 
 
@@ -196,9 +191,9 @@ function hit_delete( $hit_ID )
 {
 	global $DB, $tablehitlog;
 
-	$sql ="DELETE FROM $tablehitlog WHERE visitID = $hit_ID";
-	$DB->query( $sql );
-
+	$sql = "DELETE FROM $tablehitlog WHERE visitID = $hit_ID";
+	
+	return $DB->query( $sql );
 }
 
 
@@ -214,9 +209,10 @@ function hit_prune( $date )
 	global $DB, $tablehitlog;
 
 	$iso_date = date ('Y-m-d', $date);
-	$sql ="DELETE FROM $tablehitlog WHERE DATE_FORMAT(visitTime,'%Y-%m-%d') = '$iso_date'";
-	$DB->query( $sql );
+	$sql = "DELETE FROM $tablehitlog
+					WHERE DATE_FORMAT(visitTime,'%Y-%m-%d') = '$iso_date'";
 
+	return $DB->query( $sql );
 }
 
 
@@ -232,11 +228,11 @@ function hit_change_type( $hit_ID, $type )
 {
 	global $DB, $tablehitlog;
 
-	$sql ="UPDATE $tablehitlog ".
-				"SET hit_ignore = '$type', ".
-				"    visitTime = visitTime ".	// prevent mySQL from updating timestamp
-				"WHERE visitID = $hit_ID";
-	$DB->query( $sql );
+	$sql = "UPDATE $tablehitlog
+					SET hit_ignore = '$type',
+							visitTime = visitTime "	// prevent mySQL from updating timestamp
+					." WHERE visitID = $hit_ID";
+	return $DB->query( $sql );
 }
 
 
@@ -257,7 +253,7 @@ function refererList(
 	$get_total_hits = false, // Get total number of hits (needed for percentages)
 	$get_user_agent = false ) // Get the user agent
 {
-	global 	$DB, $tablehitlog, $res_stats, $stats_total_hits, $ReqURI;
+	global $DB, $tablehitlog, $res_stats, $stats_total_hits, $ReqURI;
 
 	autoquote( $type );		// In case quotes are missing
 
@@ -345,7 +341,7 @@ function stats_hit_ID()
 function stats_time( $format = '' )
 {
 	global $row_stats;
-	if( $format == '' ) 
+	if( $format == '' )
 		$format = locale_datefmt().' '.locale_timefmt();
 	echo date_i18n( $format, $row_stats['visitTime'] );
 }
@@ -374,7 +370,7 @@ function stats_hit_count()
 /*
  * stats_hit_percent(-)
  */
-function stats_hit_percent( 
+function stats_hit_percent(
 	$decimals = 1, 
 	$dec_point = ',' )
 {
@@ -463,7 +459,7 @@ function stats_search_keywords()
 			}
 			$qwords = explode( ' ', $q );
 			foreach( $qwords as $qw )
-			{	
+			{
 				if( strlen( $qw ) > 30 ) $qw = substr( $qw, 0, 30 )."...";	// word too long, crop it
 				$kwout .= $qw.' ';
 			}
@@ -515,13 +511,12 @@ function stats_user_agent( $translate = false )
  * {@internal stats_title(-) }}
  *
  * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to 
- *								return value instead of displaying it
+ * @param mixed Output format, see {@link format_to_output()} or false to return value instead of displaying it
  */
-function stats_title( $prefix = ' ', $display = 'htmlbody' ) 
+function stats_title( $prefix = ' ', $display = 'htmlbody' )
 {
 	global $disp;
-	
+
 	if( $disp == 'stats' )
 	{
 		$info = $prefix. T_('Statistics');
@@ -533,15 +528,14 @@ function stats_title( $prefix = ' ', $display = 'htmlbody' )
 }
 
 
-
 /* select count(*) as nb, hit_ignore
 from b2hitlog
 group by hit_ignore
-order by nb desc 
+order by nb desc
 
 
 update b2hitlog
-set hit_ignore ='robot' 
+set hit_ignore ='robot'
 where `hit_ignore` LIKE 'invalid' AND `hit_user_agent` LIKE 'FAST-WebCrawler/%'  
 
 

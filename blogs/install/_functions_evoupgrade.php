@@ -457,6 +457,13 @@ function upgrade_b2evo_tables()
 							ADD post_views INT DEFAULT '0' NOT NULL AFTER post_flags";
 		$DB->query( $query );
 		echo "OK.<br />\n";
+		
+		echo 'Setting new defaults... ';
+		$query = "INSERT INTO $tablesettings (set_name, set_value)
+							VALUES ( 'reloadpage_timeout', '300' )";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+		
 	}
 
 

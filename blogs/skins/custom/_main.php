@@ -298,7 +298,7 @@
 	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="../../img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
 	&nbsp;
 	<?php
-		$Hits->log();	// log the hit on this page
+		log_hit();	// log the hit on this page
 		debug_info(); // output debug info if requested
 	?>
 </p>

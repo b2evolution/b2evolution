@@ -115,7 +115,7 @@ $DB->query( $query );
  */
 $item_author_User = & $commented_Item->Author;
 
-if( $item_author_User->notify 
+if( $item_author_User->notify
 		&& (!empty( $item_author_User->email ))
 		&& $author_ID != $item_author_User->ID )  // don't send if original author comments (is logged in)
 {	// Author wants to be notified and does not comment himself:

@@ -91,20 +91,22 @@ $redirect_to_postblog = 1;
 /**#@+
  * database tables' names
  *
- * (change them if you want to have multiple b2's in a single database)
+ * (You should not need to change them. 
+ *  If you want to have multiple b2evo installations in a single database you should
+ *  change $tableprefix in _config.php)
  */
-$tableposts      = 'evo_posts';
-$tableusers      = 'evo_users';
-$tablesettings   = 'evo_settings';
-$tablecategories = 'evo_categories';
-$tablecomments   = 'evo_comments';
-$tableblogs      = 'evo_blogs';
-$tablepostcats   = 'evo_postcats';
-$tablehitlog     = 'evo_hitlog';
-$tableantispam   = 'evo_antispam';
-$tablegroups     = 'evo_groups';
-$tableblogusers  = 'evo_blogusers';
-$tablelocales    = 'evo_locales';
+$tableposts      = $tableprefix.'posts';
+$tableusers      = $tableprefix.'users';
+$tablesettings   = $tableprefix.'settings';
+$tablecategories = $tableprefix.'categories';
+$tablecomments   = $tableprefix.'comments';
+$tableblogs      = $tableprefix.'blogs';
+$tablepostcats   = $tableprefix.'postcats';
+$tablehitlog     = $tableprefix.'hitlog';
+$tableantispam   = $tableprefix.'antispam';
+$tablegroups     = $tableprefix.'groups';
+$tableblogusers  = $tableprefix.'blogusers';
+$tablelocales    = $tableprefix.'locales';
 /**#@-*/
 
 /**#@+

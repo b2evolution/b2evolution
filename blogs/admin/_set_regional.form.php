@@ -157,7 +157,7 @@ else
 			<th><?php echo T_('Time fmt') ?></th>
 			<?php if( $current_User->check_perm( 'options', 'edit' ) )
 			{ ?>
-			<th><?php echo T_('Edit') ?></th>
+				<th><?php echo T_('Edit') ?></th>
 				<?php 
 			}
 			if( $showtranslationpercentage )

@@ -30,6 +30,7 @@ class Item extends DataObject
 	var $comments;			// Comments status
 	var $url;					// Should move
 	var $autobr = 0;		// Should move
+	var $views = 0;
 	// Derived:
 	var $blog_ID;
 
@@ -69,6 +70,7 @@ class Item extends DataObject
 			$this->comments = $db_row->post_comments;			// Comments status
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = explode( '.', $db_row->post_renderers );
+			$this->views = $db_row->post_views; 
 			$this->url = $db_row->post_url;				// Should move
 			$this->autobr = $db_row->post_autobr;					// Should move
 			// Private vars
@@ -900,6 +902,7 @@ class Item extends DataObject
 		}
 	}
 
+
 	/**
 	 * Template function: Display the number of words in the post
 	 *
@@ -908,6 +911,27 @@ class Item extends DataObject
 	function wordcount()
 	{
 		echo $this->wordcount;
+	}
+
+
+	/**
+	 * Template function: Display the number of views to the item, if countviews plugin applies to it
+	 *
+	 * {@internal Item::views(-) }}
+	 * @param string what to display in front of views
+	 * @param string what to display after number of views (default: translated ' views')
+	 */
+	function views( $before = '', $after = '#' )
+	{
+		if( 1 )  // TODO: check if countview plugin applies
+		{
+			echo $before;
+			echo $this->views;
+			if( $after == '#' )
+				echo ' '.T_('views');
+			else
+				echo $after;
+		}
 	}
 
 }

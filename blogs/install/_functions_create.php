@@ -801,7 +801,9 @@ function populate_main_tables()
 										( 'newusers_canregister', '0' ),
 										( 'links_extrapath', '0' ),
 										( 'permalink_type', 'urltitle' ),
-										( 'user_minpwdlen', '5' )";
+										( 'user_minpwdlen', '5' ),
+										( 'reloadpage_timeout', '300' )
+										";
 	$DB->query( $query );
 
 	echo "OK.<br />\n";

@@ -21,23 +21,21 @@ class Settings
 	{ // constructor
 		global $new_db_version, $DB, $tablesettings;
 
-		$sql = "SELECT * FROM $tablesettings";
-		
-		$q = $DB->get_results( $sql );
+		$result = $DB->get_results( "SELECT * FROM $tablesettings" );
 
 		if( $DB->get_col_info('name', 0) == 'set_name' )
 		{ // read new format only
-			foreach( $q as $loop_q )
+			foreach( $result as $loop_row )
 			{
-				$this->{$loop_q->set_name}->value = $loop_q->set_value;
-				$this->{$loop_q->set_name}->dbstatus = 'uptodate';
-				$this->{$loop_q->set_name}->dbescape = false;
+				$this->{$loop_row->set_name}->value = $loop_row->set_value;
+				$this->{$loop_row->set_name}->dbstatus = 'uptodate';
+				$this->{$loop_row->set_name}->dbescape = false;
 			}
 		}
 
 		if( !isset($this->db_version ) || $new_db_version != $this->db_version->value )
 		{	// Database is not up to date:
-			$error_message = 'Database is not up to date.';
+			$error_message = 'Database schema is not up to date. You have schema version '.$this->db_version->value.', but we would need '.$new_db_version.'.';
 			require dirname(__FILE__).'/_conf_error.page.php';	// error & exit
 		}
 	}

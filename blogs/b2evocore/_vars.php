@@ -1,7 +1,7 @@
 <?php
 /**
  * This file sets various arrays and variables for use in b2evolution
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -10,41 +10,32 @@
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
 
-$b2_version = '0.9.1+CVS';
+$b2_version = '0.9.1+CVS-20040522';
 $new_db_version = 8070;				// next time: 8080
 
-// Activate gettext:
-if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )
-{ // We are going to use GETTEXT
-	// Specify location of translation tables :
-	bindtextdomain( 'messages', dirname(__FILE__). '/../locales');
-	// Choose domain: (name of the .mo files)
-	textdomain( 'messages' );
-}
-
 // Investigation for following code by Isaac - http://isaac.beigetower.org/
-if(!isset($_SERVER['REQUEST_URI'])) 
-{ // IIS 
-	if(isset($_SERVER['URL'])) 
-	{ //ISAPI 
-		$ReqPath = $_SERVER['URL']; 
+if( !isset($_SERVER['REQUEST_URI']) )
+{ // IIS
+	if( isset($_SERVER['URL']) )
+	{ //ISAPI
+		$ReqPath = $_SERVER['URL'];
 	}
-	elseif(isset($_SERVER['PATH_INFO']))
-	{ //CGI/FastCGI 
-		$ReqPath = $_SERVER['PATH_INFO']; 
+	elseif( isset($_SERVER['PATH_INFO']) )
+	{ //CGI/FastCGI
+		$ReqPath = $_SERVER['PATH_INFO'];
 	}
-	
+
 	$ReqURI = $ReqPath;
-	if (isset($_SERVER['QUERY_STRING'])) 
-	{ //Made a $_GET request 
-		$ReqURI .= '?' . $_SERVER['QUERY_STRING']; 
+	if( isset($_SERVER['QUERY_STRING']) )
+	{ //Made a $_GET request
+		$ReqURI .= '?' . $_SERVER['QUERY_STRING'];
 	}
 }
 else
 { // apache...
 	$ReqURI = $_SERVER['REQUEST_URI'];
 	// Remove params from reqURI:
-	$ReqPath = explode( '?', $ReqURI, 2 );	
+	$ReqPath = explode( '?', $ReqURI, 2 );
 	$ReqPath = $ReqPath[0];
 }
 debug_log( 'Request URI: '.$ReqURI );
@@ -53,9 +44,9 @@ debug_log( 'Request Path: '.$ReqPath );
 
 
 // on which page are we ?
-$pagenow = explode('/', $_SERVER['PHP_SELF'] );
-$pagenow = trim($pagenow[(sizeof($pagenow)-1)]);
-$pagenow = explode('?', $pagenow);
+$pagenow = explode( '/', $_SERVER['PHP_SELF'] );
+$pagenow = trim( $pagenow[(sizeof($pagenow) - 1)] );
+$pagenow = explode( '?', $pagenow );
 $pagenow = $pagenow[0];
 
 // So far, we did not include the javascript for popupups
@@ -106,6 +97,7 @@ if( $HTTP_USER_AGENT != '' )
 
 }
 $is_IE = (($is_macIE) || ($is_winIE));
+// debug_log( 'setting vars: '. "User Agent: ".$HTTP_USER_AGENT);
 
 
 // server detection

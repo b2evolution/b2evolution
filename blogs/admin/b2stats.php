@@ -54,7 +54,7 @@ switch( $action )
 		<div class="panelinfo">
 			<p><?php printf( T_('Changing hit #%d type to: %s'), $hit_ID, $hit_type) ?></p>
 			<?php
-			$Hits->change_type( $hit_ID, $hit_type );
+			hit_change_type( $hit_ID, $hit_type );
 			?>
 		</div>
 		<?php
@@ -71,7 +71,7 @@ switch( $action )
 		<div class="panelinfo">
 			<p><?php printf( T_('Deleting hit #%d...'), $hit_ID )?></p>
 			<?php
-			$Hits->delete( $hit_ID );
+			hit_delete( $hit_ID );
 			?>
 		</div>
 		<?php
@@ -88,7 +88,7 @@ switch( $action )
 		<div class="panelinfo">
 			<p><?php printf( T_('Pruning hits for %s...'), date( locale_datefmt(), $date) ) ?></p>
 			<?php
-			$Hits->prune( $date );
+			hit_prune( $date );
 			?>
 		</div>
 		<?php

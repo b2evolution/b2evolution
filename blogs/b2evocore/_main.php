@@ -36,7 +36,7 @@ require_once( dirname(__FILE__).'/_class_commentlist.php' );
 require_once( dirname(__FILE__).'/_class_archivelist.php' );
 require_once( dirname(__FILE__).'/_class_dataobjectcache.php' );
 require_once( dirname(__FILE__).'/_class_calendar.php' );
-require_once( dirname(__FILE__).'/_class_hits.php' ); // referer logging
+require_once( dirname(__FILE__).'/_functions_hitlogs.php' ); // referer logging
 require_once( dirname(__FILE__).'/_functions_forms.php' );
 require_once( dirname(__FILE__).'/_functions_forms.php' );
 require_once( dirname(__FILE__).'/_class_renderer.php' );
@@ -106,6 +106,19 @@ if( is_logged_in() && $current_User->get('locale') != $default_locale )
 	locale_activate( $default_locale );
 	debug_log('default_locale from user profile: '.$default_locale);
 }
+
+
+/**
+ * check if the URI has been requested from same IP/useragent in past reloadpage_timeout seconds.
+ */
+$uri_reloaded = (bool)$DB->get_var("SELECT visitID FROM $tablehitlog
+									WHERE	visitURL = ".$DB->quote($ReqURI)."
+												AND UNIX_TIMESTAMP( visitTime ) - $localtimenow < ".(int)$Settings->get('reloadpage_timeout')."
+												AND hit_remote_addr = ".$DB->quote($_SERVER['REMOTE_ADDR'])."
+												AND hit_user_agent = ".$DB->quote($HTTP_USER_AGENT) );
+if( $uri_reloaded )
+	debug_log( 'URI-reload!' );
+
 
 
 // Load hacks file if it exists

@@ -1208,7 +1208,7 @@ function obhandler( $output )
 	{  // send 304 and die
 		header( 'Content-Length: 0' );
 		header( $_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified' );
-		#$Hits->log();  // log this somehow?
+		#log_hit();  // log this somehow?
 		die;
 	};
 

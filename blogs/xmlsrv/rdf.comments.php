@@ -44,4 +44,4 @@ while( $Comment = $CommentList->get_next() )
 </item>
 <?php } // End of comment loop. ?>
 </rdf:RDF>
-<?php $Hits->log(); // log the hit on this page ?>
+<?php log_hit(); // log the hit on this page ?>

@@ -95,10 +95,8 @@ class Calendar
 				$this->mode = 'month';
 			}
 		}
-		#$this->mode = 'year';  // FOR TESTING ONLY
 
 		// CONSTRUCT THE WHERE CLAUSE:
-
 		/*
 		 * ----------------------------------------------------
 		 *  Restrict to the statuses we want to show:
@@ -216,12 +214,14 @@ class Calendar
 			$end_of_week = (($start_of_week + 7) % 7);
 	
 			// Find a month with posts
+			$searchmonth = $this->month;
+			$searchyear = $this->year;
 			for( $i = 0; $i < $this->searchframe; $i++ )
 			{
 				$arc_sql = "SELECT COUNT(DISTINCT ID), YEAR(post_issue_date), MONTH(post_issue_date), DAYOFMONTH(post_issue_date) AS myday".
 						" FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID)".
 						" INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID".
-						" WHERE MONTH(post_issue_date) = '$this->month' AND YEAR(post_issue_date) = '$this->year' ".$this->where.
+						" WHERE MONTH(post_issue_date) = '$searchmonth' AND YEAR(post_issue_date) = '$searchyear' ".$this->where.
 						" GROUP BY myday".
 						" ORDER BY post_issue_date DESC";
 				$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
@@ -232,6 +232,8 @@ class Calendar
 					{
 						$daysinmonthwithposts[ $arc_row['myday'] ] = $arc_row['COUNT(DISTINCT ID)'];
 					}
+					$this->month = $searchmonth;
+					$this->year = $searchyear;
 					break; // Don't search any further!
 				}
 				elseif ($this->specific)
@@ -240,10 +242,10 @@ class Calendar
 				}
 				else
 				{	// No, post, let's search in previous month!
-					$this->month = zeroise(intval($this->month)-1,2);
-					if ($this->month == '00') {
-						$this->month = '12';
-						$this->year = ''.(intval($this->year)-1);
+					$searchmonth = zeroise(intval($searchmonth)-1,2);
+					if ($searchmonth == '00') {
+						$searchmonth = '12';
+						$searchyear = ''.(intval($searchyear)-1);
 					}
 				}
 			}

@@ -130,7 +130,7 @@
 
 	</div>
 	<?php
-		$Hits->log();	// log the hit on this page
+		log_hit();	// log the hit on this page
 	?>
 </body>
 </html>

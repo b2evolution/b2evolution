@@ -433,7 +433,7 @@ class ItemList extends DataObjectList
 																			post_status, post_locale, post_content, post_title,
 																			post_urltitle, post_url, post_category,
 																			post_autobr, post_flags, post_wordcount, post_comments,
-																			post_renderers, post_karma
+																			post_views, post_renderers, post_karma
 											FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID)
 														INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
 
@@ -738,6 +738,7 @@ class ItemList extends DataObjectList
 			'AutoBR' => $row->post_autobr,
 			'Flags' => explode( ',', $row->post_flags ),
 			'Wordcount' => $row->post_wordcount,
+			'views' => $row->post_views,
 			'comments' => $row->post_comments,
 			'Karma' => $row->post_karma // this isn't used yet
 			);
@@ -746,23 +747,23 @@ class ItemList extends DataObjectList
 		$authordata = get_userdata($postdata['Author_ID']);
 		$day = mysql2date('d.m.y',$postdata['Date']);
 		$currentmonth = mysql2date('m',$postdata['Date']);
-		$numpages=1;
-		if (!$page)
-			$page=1;
-		if (isset($p))
-			$more=1;
+		$numpages = 1;
+		if( !$page )
+			$page = 1;
+		if( isset($p) )
+			$more = 1;
 		$content = $postdata['Content'];
-		if (preg_match('/<!--nextpage-->/', $postdata['Content']))
+		if( preg_match('/<!--nextpage-->/', $postdata['Content']) )
 		{
-			if ($page > 1)
-				$more=1;
-			$multipage=1;
+			if( $page > 1 )
+				$more = 1;
+			$multipage = 1;
 			$content = $postdata['Content'];
 			$content = str_replace("\n<!--nextpage-->\n", '<!--nextpage-->', $content);
 			$content = str_replace("\n<!--nextpage-->", '<!--nextpage-->', $content);
 			$content = str_replace("<!--nextpage-->\n", '<!--nextpage-->', $content);
-			$pages=explode('<!--nextpage-->', $content);
-			$numpages=count($pages);
+			$pages = explode('<!--nextpage-->', $content);
+			$numpages = count($pages);
 		}
 		else
 		{

@@ -34,4 +34,4 @@
 		<?php } // End of comment loop. ?>
 	</channel>
 </rss>
-<?php $Hits->log(); // log the hit on this page ?>
+<?php log_hit(); // log the hit on this page ?>
