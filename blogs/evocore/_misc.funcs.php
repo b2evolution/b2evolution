@@ -310,28 +310,30 @@ function convert_chars( $content, $flag='html' )
 }
 
 
-/*
- * make_clickable(-)
+/**
+ * Make links clickable in a given text.
+ *
+ * {@internal only used with _autolinks.plugin.php - move it there?
+ *  NOTE: its tested in the misc.funcs.simpletest.php test case }}
  *
  * original function: phpBB, extended here for AIM & ICQ
  * fplanque restricted :// to http:// and mailto://
  */
-function make_clickable($text)
+function make_clickable( $text, $moredelim = '&amp;' )
 {
-	$ret = ' '. $text;
+	$text = preg_replace( array( '#(^|\s)(https?|mailto)://(([^<>{}\s,]|,(?!\s))+)#i',
+																'#(^|\s)aim:([^,<\s]+)#i',
+																'#(^|\s)icq:(\d+)#i',
+																'#(^|\s)www\.([a-z0-9\-]+)\.([a-z0-9\-.\~]+)((?:/[^,<\s]*)?)#i',
+																'#(^|\s)([a-z0-9\-_.]+?)@([^,<\s]+)#i', ),
+												array( '$1<a href="$2://$3">$2://$3</a>',
+																'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.urlencode(T_('Hello')).'">$2$3</a>',
+																'$1<a href="http://wwp.icq.com/scripts/search.dll?to=$2">$2</a>',
+																'$1<a href="http://www.$2.$3$4">www.$2.$3$4</a>',
+																'$1<a href="mailto:$2@$3">$2@$3</a>', ),
+												$text );
 
-	$ret = preg_replace("#([\n ])(http|mailto)://([^, <>{}\n\r]+)#i", "\\1<a href=\"\\2://\\3\">\\2://\\3</a>", $ret);
-
-	$ret = preg_replace("#([\n ])aim:([^,< \n\r]+)#i", "\\1<a href=\"aim:goim?screenname=\\2\\3&message=Hello\">\\2\\3</a>", $ret);
-
-	$ret = preg_replace("#([\n ])icq:([^,< \n\r]+)#i", "\\1<a href=\"http://wwp.icq.com/scripts/search.dll?to=\\2\\3\">\\2\\3</a>", $ret);
-
-	$ret = preg_replace("#([\n ])www\.([a-z0-9\-]+)\.([a-z0-9\-.\~]+)((?:/[^,< \n\r]*)?)#i", "\\1<a href=\"http://www.\\2.\\3\\4\">www.\\2.\\3\\4</a>", $ret);
-
-	$ret = preg_replace("#([\n ])([a-z0-9\-_.]+?)@([^,< \n\r]+)#i", "\\1<a href=\"mailto:\\2@\\3\">\\2@\\3</a>", $ret);
-
-	$ret = substr($ret, 1);
-	return($ret);
+	return $text;
 }
 
 
@@ -1872,6 +1874,9 @@ function header_nocache()
 
 /*
  * $Log$
+ * Revision 1.50  2005/02/23 23:11:54  blueyed
+ * fixed autolinks for commata
+ *
  * Revision 1.49  2005/02/23 22:47:08  blueyed
  * deprecated mysql_oops()
  *

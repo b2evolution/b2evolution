@@ -54,7 +54,7 @@ class wikilinks_plugin extends Plugin
 	function Render( & $params )
 	{
 		if( ! parent::Render( $params ) )
-		{	// We cannot render the required format
+		{ // We cannot render the required format
 			return false;
 		}
 
@@ -65,13 +65,13 @@ class wikilinks_plugin extends Plugin
 		// Regular links:
 		$search = array(
 			// [[http://url]] :
-			'#\[\[((http|https|mailto)://([^, <>{}\n\r]+?))\]\]#i',
+			'#\[\[((https?|mailto)://((?:[^<>{}\s\]]|,(?!\s))+?))\]\]#i',
 			// [[http://url text]] :
-			'#\[\[((http|https|mailto)://([^, <>{}\n\r]+?)) ([^\n\r]+?)\]\]#i',
+			'#\[\[((https?|mailto)://([^<>{}\s\]]+)) ([^\n\r]+?)\]\]#i',
 			// ((http://url)) :
-			'#\(\(((http|https|mailto)://([^, <>{}\n\r]+?))\)\)#i',
+			'#\(\(((https?|mailto)://((?:[^<>{}\s\]]|,(?!\s))+?))\)\)#i',
 			// ((http://url text)) :
-			'#\(\(((http|https|mailto)://([^, <>{}\n\r]+?)) ([^\n\r]+?)\)\)#i'
+			'#\(\(((https?|mailto)://([^<>{}\s\]]+)) ([^\n\r]+?)\)\)#i',
 		);
 		$replace = array(
 			'<a href="$1">$1</a>',
@@ -80,9 +80,9 @@ class wikilinks_plugin extends Plugin
 			'<a href="$1">$4</a>'
 		);
 
-		$content = preg_replace( $search, $replace,	$content );
+		$content = preg_replace( $search, $replace, $content );
 
-/*
+/* QUESTION: fplanque, implementation of this planned? then use make_clickable() - or remove this comment
 	$ret = preg_replace("#([\n ])aim:([^,< \n\r]+)#i", "\\1<a href=\"aim:goim?screenname=\\2\\3&message=Hello\">\\2\\3</a>", $ret);
 
 	$ret = preg_replace("#([\n ])icq:([^,< \n\r]+)#i", "\\1<a href=\"http://wwp.icq.com/scripts/search.dll?to=\\2\\3\">\\2\\3</a>", $ret);
@@ -143,7 +143,7 @@ class wikilinks_plugin extends Plugin
 
 				}
 				else
-				{	// Item not found
+				{ // Item not found
 
 					$create_link = isset($blog) ? ('<a href="'.$admin_url.'b2edit.php?blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
 
@@ -182,10 +182,10 @@ class wikilinks_plugin extends Plugin
 		foreach( $wikiwords as $WikiWord => $wiki_word )
 		{
 			// [[WikiWord text]]
- 			$search_wikiwords[] = '*
+			$search_wikiwords[] = '*
 				\[\[
 				'.$WikiWord.'							# Specific WikiWord to replace
-			 	\s (.+?)
+				\s (.+?)
 				\]\]
 				*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
 
@@ -193,12 +193,12 @@ class wikilinks_plugin extends Plugin
 			$search_wikiwords[] = '*
 				\(\(
 				'.$WikiWord.'							# Specific WikiWord to replace
-			 	\s (.+?)
+				\s (.+?)
 				\)\)
 				*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
 
 			// [[Wikiword]]
- 			$search_wikiwords[] = '*
+			$search_wikiwords[] = '*
 				\[\[
 				'.$WikiWord.'							# Specific WikiWord to replace
 				\]\]
@@ -230,7 +230,7 @@ class wikilinks_plugin extends Plugin
 				$replace_links[] = '<a href="'.$permalink.'">'.$WikiWord.'</a>';
 			}
 			else
-			{	// Item not found
+			{ // Item not found
 
 				$create_link = isset($blog) ? ('<a href="'.$admin_url.'b2edit.php?blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
 
@@ -254,7 +254,7 @@ class wikilinks_plugin extends Plugin
 		// pre_dump( $search_wikiwords );
 
 		if( count( $search_wikiwords ) )
-		{	// We have set some links to replace:
+		{ // We have set some links to replace:
 			$content = preg_replace( $search_wikiwords, $replace_links, $content );
 		}
 
