@@ -1500,9 +1500,14 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 	$message = str_replace( array( "\r\n", "\r" ), "\n", $message );
 
 
-	$Debuglog->add( "Sending mail from &laquo;$from&raquo; to &laquo;$to&raquo;, Subject &laquo;$subject&raquo;." );
+	if( !@mail( $to, $subject, $message, $headerstring ) )
+	{
+		$Debuglog->add( "Sending mail from &laquo;$from&raquo; to &laquo;$to&raquo;, Subject &laquo;$subject&raquo; FAILED." );
+		return false;
+	}
 
-	return @mail( $to, $subject, $message, $headerstring );
+	$Debuglog->add( "Sent mail from &laquo;$from&raquo; to &laquo;$to&raquo;, Subject &laquo;$subject&raquo;." );
+	return true;
 }
 
 
@@ -1852,8 +1857,29 @@ function getBaseDomain( $url )
 }
 
 
+/**
+ * Generate a random password, respecting the minimal password length.
+ *
+ * @return string
+ */
+ function getRandomPassword( $length = NULL )
+{
+	if( is_null($length) )
+	{
+		global $Settings;
+
+		$length = $Settings->get( 'user_minpwdlen' );
+	}
+
+	return substr( md5( uniqid( rand(), true ) ), 0, $length );
+}
+
+
 /*
  * $Log$
+ * Revision 1.43  2005/02/19 22:41:32  blueyed
+ * getRandomPassword() added; Debuglog enhanced for send_mail()
+ *
  * Revision 1.42  2005/02/18 19:16:15  fplanque
  * started relation restriction/cascading handling
  *
