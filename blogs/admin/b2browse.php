@@ -39,7 +39,7 @@ $blogListButtons = $AdminUI->getCollectionList( 'blog_ismember', 1, $pagenow.'?b
 require dirname(__FILE__).'/_menutop.php';
 
 if( $blog )
-{ // We could select a valid blog:
+{ // We could select a valid blog which we have permission to access:
 	// Show the posts:
 	$add_item_url = 'b2edit.php?blog='.$blog;
 	$edit_item_url = 'b2edit.php?action=edit&amp;post=';
@@ -52,5 +52,5 @@ if( $blog )
 	require dirname(__FILE__).'/_edit_showposts.php';
 }
 
-require( dirname(__FILE__).'/_footer.php' );
+require dirname(__FILE__).'/_footer.php';
 ?>

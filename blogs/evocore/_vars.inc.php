@@ -52,8 +52,19 @@ $new_db_version = 8070;				// next time: 8080
 
 /**#@+
  * @deprecated by {@link AdminUI_general} object. Moved already there, but needs further refactoring (/htsrc/_header.php).
+ * fplanque>> NO WAY!!!
+ * Those VARS need to go to a file named /conf/_application.php or something like this, not to a skin
+ * I want to be able to use the same skin in different applications! see my email
  */
 $admin_path_seprator = ' :: ';
+$app_admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website").
+									'"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution" title="'.
+									T_("visit b2evolution's website").'" width="185" height="40" /></a>';
+$app_exit_links = '<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
+									&bull;
+									<a href="'.$baseurl.'">'.T_('Exit to blogs').'
+									<img src="img/close.gif" width="14" height="14" class="top" alt="" title="'
+									.T_('Exit to blogs').'" /></a><br />';
 /**#@-*/
 
 
@@ -245,6 +256,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.17  2005/03/08 14:18:43  fplanque
+ * doc
+ *
  * Revision 1.16  2005/03/07 00:06:18  blueyed
  * admin UI refactoring, part three
  *
