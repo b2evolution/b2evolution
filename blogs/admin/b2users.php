@@ -35,12 +35,16 @@ switch ($action)
 		$edited_User = & new User( get_userdata( $edited_user_ID ) );
 
 		param( 'edited_user_grp_ID', 'integer', true );
-		$edited_user_Group = Group_get_by_ID( $edited_user_grp_ID );
+		$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
 		$edited_User->setGroup( $edited_user_Group );
 		// echo 'new group = ';
 		// $edited_User->Group->disp('name');
 
-		$edited_User->dbupdate();	// Commit update to the DB
+		// Commit update to the DB:
+		$edited_User->dbupdate();	
+		// Commit changes in cache:
+		// not ready: $UserCache->add( $edited_Group );
+		unset( $cache_userdata ); // until better
 
 		// remember, to display the forms
 		$user = $edited_user_ID;
@@ -115,7 +119,7 @@ switch ($action)
 		$current_User->check_perm( 'users', 'edit', true );
 
 		param( 'edited_grp_ID', 'integer', true );
-		$edited_Group = Group_get_by_ID( $edited_grp_ID );
+		$edited_Group = $GroupCache->get_by_ID( $edited_grp_ID );
 
 		param( 'edited_grp_name', 'string', true );
 		$edited_Group->set( 'name', $edited_grp_name );
@@ -141,7 +145,10 @@ switch ($action)
 			$edited_Group->set( 'perm_users', $edited_grp_perm_users );
 		}
 
-		$edited_Group->dbupdate();	// Commit update to the DB
+		// Commit update to the DB:
+		$edited_Group->dbupdate();	
+		// Commit changes in cache:
+		$GroupCache->add( $edited_Group );
 
 		// remember to display the forms
 		$group = $edited_grp_ID;
@@ -159,7 +166,7 @@ if( $current_User->check_perm( 'users', 'view', false ) )
 		// Check permission:
 		$current_User->check_perm( 'users', 'view', true );
 		
-		$edited_Group = Group_get_by_ID( $group );
+		$edited_Group = $GroupCache->get_by_ID( $group );
 		require(dirname(__FILE__). '/_users_groupform.php');
 	}
 		

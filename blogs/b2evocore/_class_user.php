@@ -45,7 +45,7 @@ class User extends DataObject
 	 */
 	function User( $userdata = NULL )
 	{
-		global $tableusers;
+		global $GroupCache, $tableusers;
 
 		// Call parent constructor:
 		parent::DataObject( $tableusers, 'user_' );
@@ -73,7 +73,7 @@ class User extends DataObject
 			$this->level = 0;
 			$this->notify = 1;
 			// Group for this user:
-			$this->Group = Group_get_by_ID( 1 );
+			$this->Group = $GroupCache->get_by_ID( 1 );
 		}
 		else
 		{
@@ -99,7 +99,7 @@ class User extends DataObject
 			$this->notify = $userdata['user_notify'];
 
 			// Group for this user:
-			$this->Group = Group_get_by_ID( $userdata['user_grp_ID'] );
+			$this->Group = $GroupCache->get_by_ID( $userdata['user_grp_ID'] );
 		}
 	}
 

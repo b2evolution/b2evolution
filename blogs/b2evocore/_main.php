@@ -27,6 +27,7 @@ require_once (dirname(__FILE__).'/_class_blog.php');
 require_once (dirname(__FILE__).'/_class_itemlist.php');
 require_once (dirname(__FILE__).'/_class_commentlist.php');
 require_once (dirname(__FILE__).'/_class_archivelist.php');
+require_once (dirname(__FILE__).'/_class_dataobjectcache.php');
 require_once (dirname(__FILE__).'/_class_calendar.php');
 require_once (dirname(__FILE__).'/_functions_hitlogs.php'); // referer logging
 require_once (dirname(__FILE__).'/_functions_forms.php');
@@ -56,6 +57,13 @@ $autobr = get_settings('AutoBR');
 
 $servertimenow = time();
 $localtimenow = $servertimenow + ($time_difference * 3600);
+
+// Object caches init:
+$GroupCache = & new DataObjectCache( 'Group', $tablegroups, 'grp_', 'grp_ID' );
+//			$obj = $GroupCache->get_by_ID( 2 );
+//			$obj->disp( 'name' );
+$BlogCache = & new DataObjectCache( 'Blog', $tableblogs, 'blog_', 'blog_ID' );
+$ItemCache = & new DataObjectCache( 'Item', $tableposts, 'post_', 'ID' );
 
 // Login procedure:
 if( !isset($login_required) ) $login_required = false;

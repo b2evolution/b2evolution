@@ -107,7 +107,7 @@
 				
 				if(  $edited_User->get('ID') != 1 )
 				{
-					form_select( 'edited_user_grp_ID', $edited_User->Group->get('ID'), 'groups_options', T_('User group') );
+					form_select_object( 'edited_user_grp_ID', $edited_User->Group->get('ID'), $GroupCache, T_('User group') );
 				}
 				else
 				{

@@ -95,7 +95,7 @@ switch($action)
 		$new_User->set( 'level', get_settings('pref_newusers_level') );
 		$pref_newusers_grp_ID = get_settings('pref_newusers_grp_ID');
 		// echo $pref_newusers_grp_ID;
-		$new_user_Group = Group_get_by_ID( $pref_newusers_grp_ID );
+		$new_user_Group = $GroupCache->get_by_ID( $pref_newusers_grp_ID );
 		// echo $new_user_Group->disp('name');
 		$new_User->setGroup( $new_user_Group );
 		$new_User->dbinsert();

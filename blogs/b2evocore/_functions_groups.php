@@ -10,5 +10,5 @@
  *
  * @package b2evocore
  */
-
+require_once dirname(__FILE__). '/_class_group.php';
 ?>

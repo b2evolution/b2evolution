@@ -66,7 +66,35 @@ function form_select(
 		echo ' class="', $field_class,'"';
 	}
 	echo '/>';
-	$field_list_callback( $field_value );
+	eval( $field_list_callback( $field_value ) );
+	echo '  </select>';
+	echo '  <span class="notes">', $field_note, '</span></div>';
+	echo "</fieldset>\n\n";
+}
+
+
+/*
+ * form_select_object(-)
+ *
+ * same as select but on cache object
+ */
+function form_select_object(
+	$field_name,
+	$field_value,
+	& $field_object,
+	$field_label,
+	$field_note = '',
+	$field_class = '' )
+{
+	echo '<fieldset>';
+	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
+	echo '  <div class="input"><select name="', $field_name, '" id="', $field_name, '"';
+	if( !empty($field_class) )
+	{
+		echo ' class="', $field_class,'"';
+	}
+	echo '/>';
+	$field_object->option_list( $field_value );
 	echo '  </select>';
 	echo '  <span class="notes">', $field_note, '</span></div>';
 	echo "</fieldset>\n\n";

@@ -64,8 +64,6 @@ switch($action)
 			<legend><?php echo T_('Regional settings') ?></legend>
 		
 			<?php form_text( 'newtime_difference', $time_difference, 2, T_('Time difference'), sprintf( T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 2 );?>
-
-			<?php // form_select( 'edited_user_grp_ID', $edited_User->Group->get('ID'), 'groups_options', T_('User group') );?>
 	
 		</fieldset>
 
@@ -75,7 +73,7 @@ switch($action)
 			
 			 form_checkbox( 'pref_newusers_canregister', get_settings('pref_newusers_canregister'), T_('New users can register'), sprintf( T_('Check to allow new users to register themselves.' ) ) );
 			 
-			 form_select( 'pref_newusers_grp_ID', get_settings('pref_newusers_grp_ID'), 'groups_options', T_('Group for new users'), T_('Groups determine user roles and permissions.') );
+			 form_select_object( 'pref_newusers_grp_ID', get_settings('pref_newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
 			 
 			 form_text( 'pref_newusers_level', get_settings('pref_newusers_level'), 1, T_('Level for new users'), sprintf( T_('Levels determine hierarchy of users in blogs.' ) ), 1 );
 			?>
