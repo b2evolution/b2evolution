@@ -426,13 +426,6 @@ div.menutoptitle
 	margin: 1ex 2ex 0;
 	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
 	color: #BBCCDD;
-	font-size: 14px;
-}
-
-.menutopbloglist
-{
-	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
-	color: #FF0000;
-	font-size: 14px;
+	font-size: 112%;
 }
 
