@@ -5,7 +5,7 @@
  */
 
 $trans['fr_FR'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2005-01-26 20:52+0100\nPO-Revision-Date: 2005-01-26 21:35+0100\nLast-Translator: Francois PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\nX-Poedit-Language: French\nX-Poedit-Country: FRANCE\nX-Poedit-SourceCharset: iso-8859-1\n",
+	'' => "Project-Id-Version: b2evolution 0.9\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2005-01-26 20:52+0100\nPO-Revision-Date: 2005-01-28 20:23+0100\nLast-Translator: Francois PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\nX-Poedit-Language: French\nX-Poedit-Country: FRANCE\nX-Poedit-SourceCharset: iso-8859-1\n",
 	'Selected' => "Sélectionné",
 	'Categories' => "Catégories",
 	'Permanent link to full entry' => "Lien permanent vers l'article complet",
@@ -88,7 +88,7 @@ $trans['fr_FR'] = array(
 	'Reported' => "Rapporté",
 	'Central' => "Centralisé",
 	'Request abuse update from centralized blacklist!' => "Demander une mise à jour depuis la liste noire centralisée!",
-	'Allow keyword back (Remove it from the blacklist)' => "Lever l'interdiction sur ce mot clef (Supprimer le mot clef de la liste noire)",
+	'Allow keyword back (Remove it from the blacklist)' => "Lever l\'interdiction sur ce mot clef (Supprimer le mot clef de la liste noire)",
 	'Allow Back' => "Ré-autoriser",
 	'Actions' => "Actions",
 	'Report abuse to centralized ban blacklist!' => "Rapporter cet abus à la liste noire centralisée!",

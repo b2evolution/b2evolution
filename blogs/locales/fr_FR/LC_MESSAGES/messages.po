@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2005-01-26 20:52+0100\n"
-"PO-Revision-Date: 2005-01-26 21:35+0100\n"
+"PO-Revision-Date: 2005-01-28 20:23+0100\n"
 "Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -481,7 +481,7 @@ msgstr "Demander une mise à jour depuis la liste noire centralisée!"
 
 #: ..\..\..\admin\b2antispam.php:411
 msgid "Allow keyword back (Remove it from the blacklist)"
-msgstr "Lever l'interdiction sur ce mot clef (Supprimer le mot clef de la liste noire)"
+msgstr "Lever l\'interdiction sur ce mot clef (Supprimer le mot clef de la liste noire)"
 
 #: ..\..\..\admin\b2antispam.php:413
 msgid "Allow Back"
