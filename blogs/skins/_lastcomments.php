@@ -15,7 +15,7 @@
 		return false;		// Nothing to do here!
 	}
 	
-	$CommentList = new CommentList( $blog );
+	$CommentList = new CommentList( $blog, "'comment'", $show_statuses );
 	
 	if( $CommentList->get_num_rows() == 0 )
 	{	// No comment has been found:

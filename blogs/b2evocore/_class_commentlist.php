@@ -71,6 +71,14 @@ class CommentList
 		}
 		
 		$this->request .= "comment_type IN ($comment_types) ";
+
+		/*
+		 * ----------------------------------------------------
+		 *  Restrict to the statuses we want to show:
+		 * ----------------------------------------------------
+		 */
+		$this->request .= ' AND '.statuses_where_clause( $show_statuses );
+
 		
 		// order by stuff
 		if( (!empty($order)) && ((strtoupper($order) != 'ASC') && (strtoupper($order) != 'DESC'))) 

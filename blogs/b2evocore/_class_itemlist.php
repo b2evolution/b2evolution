@@ -8,22 +8,22 @@
  * This file built upon code from original b2 - http://cafelog.com/
  */
 
-	function cat_req( $parent_cat_ID, $level )
-	{
-		global $cat_array;
-		// echo "[$parent_cat_ID] ";
-		if( ! in_array( $parent_cat_ID, $cat_array ) )
-		{	// Not already visited
-			$cat_array[] = $parent_cat_ID;
-		}
-		else
-		{
-			// echo "STOP! ALREADY VISITED THIS ONE!";
-			return -1;		// STOP going through that branch
-		}
+function cat_req( $parent_cat_ID, $level )
+{
+	global $cat_array;
+	// echo "[$parent_cat_ID] ";
+	if( ! in_array( $parent_cat_ID, $cat_array ) )
+	{	// Not already visited
+		$cat_array[] = $parent_cat_ID;
 	}
-	
-	function cat_req_dummy() {}
+	else
+	{
+		// echo "STOP! ALREADY VISITED THIS ONE!";
+		return -1;		// STOP going through that branch
+	}
+}
+
+function cat_req_dummy() {}
 
 
 class ItemList
