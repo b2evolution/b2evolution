@@ -253,11 +253,11 @@ class Log
 										$cssclass = NULL, $style = NULL, $outerdivclass = 'log_container' )
 	{
 		if( is_null( $head ) )
-		{	// Use object default:
+		{ // Use object default:
 			$head = $this->head;
 		}
 		if( is_null( $foot ) )
-		{	// Use object default:
+		{ // Use object default:
 			$foot = $this->foot;
 		}
 
@@ -456,6 +456,7 @@ class Log
 		if( $level == 'all' )
 		{
 			$level = array_keys( $this->messages );
+			sort($level);
 		}
 		elseif( !is_array($level) )
 		{
@@ -469,6 +470,7 @@ class Log
 			if( $llevel == 'all' )
 			{ // Put those levels in queue, which have not been processed already
 				$level = array_merge( array_diff( array_keys( $this->messages ), $levelsDone ), $level );
+				sort($level);
 				continue;
 			}
 			if( in_array($llevel, $levelsDone ) )
@@ -499,6 +501,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/19 23:02:45  blueyed
+ * getMessages(): sort by level for 'all'
+ *
  * Revision 1.9  2005/02/17 19:36:24  fplanque
  * no message
  *
