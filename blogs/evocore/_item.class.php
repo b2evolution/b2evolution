@@ -373,6 +373,8 @@ class Item extends DataObject
 	}
 
 
+	// Template functions {{{
+
 	/**
 	 * Template function: display anchor for permalinks to refer to
 	 *
@@ -447,18 +449,17 @@ class Item extends DataObject
 
 
 	/**
-	 * Template function: get list of assigned user options
+	 * Template function: Display the main blog name.
 	 *
-	 * {@internal Item::get_assigned_user_options(-)}}
+	 * @param string Output format. See {@link format_to_output()}.
 	 */
-	function get_assigned_user_options()
+	function blog_name( $format = 'htmlbody' )
 	{
-		global $UserCache, $object_def;
+		global $BlogCache;
 
-		return $UserCache->blog_member_list( $this->blog_ID, $this->AssignedUser->ID,
-							$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
-							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
-							false );
+		$current_Blog =& $BlogCache->get_by_ID( $this->blog_ID );
+
+		$current_Blog->name( $format );
 	}
 
 
@@ -883,7 +884,7 @@ class Item extends DataObject
 
 
 	/**
-	 * Provide link to message form for this Item's author
+	 * Template function: Provide link to message form for this Item's author
 	 *
 	 * {@internal Item::msgform_link(-)}}
 	 *
@@ -1080,7 +1081,6 @@ class Item extends DataObject
 		echo '</a>';
 
 		echo $after;
-
 	}
 
 
@@ -1400,6 +1400,7 @@ class Item extends DataObject
 		}
 	}
 
+
 	/**
 	 * Template function: display type of item
 	 *
@@ -1413,9 +1414,9 @@ class Item extends DataObject
 	{
 		global $itemTypeCache, $object_def;
 
-		if( ! ($Element = $itemTypeCache->get_by_ID( $this->typ_ID, true,
-    					/* Do we allow NULL statuses for this object?: */ !$object_def[$this->objtype]['allow_null']['typ_ID'] ) ) 			)
-    { // No status:
+		$Element = $itemTypeCache->get_by_ID( $this->typ_ID, true, !$object_def[$this->objtype]['allow_null']['typ_ID'] /* Do we allow NULL statuses for this object?: */ );
+		if( !$Element )
+		{ // No status:
 			return;
 		}
 
@@ -1430,6 +1431,7 @@ class Item extends DataObject
 			echo $before.format_to_output( T_( $extra_status ), $format ).$after;
 		}
 	}
+
 
 	/**
 	 * Template function: display title for item and link to related URL
@@ -1468,6 +1470,7 @@ class Item extends DataObject
 		echo $title;
 		echo $after;
 	}
+
 
 	/**
 	 * Template function: Displays trackback autodiscovery information
@@ -1564,6 +1567,8 @@ class Item extends DataObject
 	{
 		echo $this->views;
 	}
+
+	// Template functions }}}
 
 
 	/**
@@ -1789,10 +1794,30 @@ class Item extends DataObject
 
 	}
 
+
+	/**
+	 * Get list of assigned user options
+	 *
+	 * {@internal Item::get_assigned_user_options(-)}}
+	 */
+	function get_assigned_user_options()
+	{
+		global $UserCache, $object_def;
+
+		return $UserCache->blog_member_list( $this->blog_ID, $this->AssignedUser->ID,
+							$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
+							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
+							false );
+	}
+
+
 }
 
 /*
  * $Log$
+ * Revision 1.30  2005/03/13 23:28:27  blueyed
+ * blog_name() template function added, doc, beautified
+ *
  * Revision 1.29  2005/03/10 16:10:26  fplanque
  * no message
  *
