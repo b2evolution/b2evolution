@@ -65,19 +65,6 @@ $permalink_include_pingback = 1;	// Set this to 1 for permalinks to include ping
 $use_extra_path_info = 0; 				// Set this to 1 to enable clean extra path info
 
 
-# Default status for new posts:
-$default_post_status = 'published';		// 'published', 'deprecated', 'protected', 'private', 'draft'
-
-
-# set this to 1 if you want to use the 'preview' function
-$use_preview = 1;
-
-
-# set this to 0 to disable the spell checker, or 1 to enable it
-$use_spellchecker = 1;
-
-
-
 # ** Comments options **
 
 # set this to 1 to require e-mail and name, or 0 to allow comments without e-mail/name
@@ -92,15 +79,6 @@ $notify_from = $b2evo_name.'@'.$basehost; // comment this if you want to customi
 
 # When pinging http://blo.gs, use extended ping to RSS?
 $use_rss = 1;
-
-
-// ** Trackback / Pingback **
-
-# set this to 0 or 1, whether you want to allow your posts to be pingback'able or not
-# note: setting it to zero would also disable sending pingbacks
-$use_pingback = 1;
-
-
 
 
 // ** Image upload **

@@ -14,6 +14,15 @@
 # set this to 2 if you want to be able to cross-post among multiple blogs/categories
 $allow_cross_posting = 1;
 
+# Default status for new posts:
+$default_post_status = 'published';		// 'published', 'deprecated', 'protected', 'private', 'draft'
+
+# set this to 1 if you want to use the 'preview' function
+$use_preview = 1;
+
+# set this to 0 to disable the spell checker, or 1 to enable it
+$use_spellchecker = 1;
+
 # Do you want to display buttons to help insettion of HTML tags
 $use_quicktags = 1;     //  1 to enable, 0 to disable
 
