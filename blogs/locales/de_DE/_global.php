@@ -5,7 +5,7 @@
  */
 
 $trans['de_DE'] = array(
-	'' => 'Project-Id-Version: PACKAGE VERSION\nPOT-Creation-Date: 2003-11-02 21:04+0100\nPO-Revision-Date: 2003-12-15 23:01+0100\nLast-Translator: daniel hahler <daniel@thequod.de>\nLanguage-Team: LANGUAGE <LL@li.org>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
+	'' => 'Project-Id-Version: PACKAGE VERSION\nPOT-Creation-Date: 2003-12-16 01:24+0100\nPO-Revision-Date: 2003-12-16 01:42+0100\nLast-Translator: daniel hahler <daniel@thequod.de>\nLanguage-Team: LANGUAGE <LL@li.org>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\n',
 	'my b2evolution' => 'mein b2evolution',
 	'my blogs' => 'meine Blogs',
 	'A blog tool like it oughta be!' => 'So sollte Bloggen sein!',
@@ -248,10 +248,11 @@ $trans['de_DE'] = array(
 	'Sleeping...' => 'Pausiere...',
 	'Post not publicly published: skipping trackback, pingback and blog pings...' => 'Eintrag wird nicht ver&ouml;ffentlicht: &uuml;berspringe Trackbacks, Pingbacks und Pings zu anderen Blogs...',
 	'Posting Done...' => 'Eintragung beendet...',
+	'Updating post...' => 'Aktualisiere Eintrag...',
 	'Post had already pinged: skipping blog pings...' => 'Eintrag wurde bereits gepingt: &uuml;berspringe Pings f&uuml;rs Blog',
+	'Deleting post...' => 'L&ouml;sche Eintrag...',
 	'Oops, no post with this ID!' => 'Oops, kein Eintrag mit dieser ID!',
 	'You don\'t have the right to delete <strong>%s</strong>\'s posts.' => 'Du darfst <strong>%s</strong>s Eintr&auml;ge nicht l&ouml;schen.',
-	'Deleting post...' => 'L&ouml;sche Eintrag...',
 	'Deleting Done...' => 'L&ouml;schen beendet...',
 	'Oops, no comment with this ID.' => 'Oops, kein Kommentar mit dieser ID.',
 	'Cannot update comment, please correct these errors:' => 'Kommentar kann nicht aktualisiert werden, bitte behebe diese Fehler:',
@@ -382,6 +383,7 @@ $trans['de_DE'] = array(
 	'no teaser [Alt-T]' => 'kein Teaser (Lockartikel) wenn &quot;Lies Mehr..&quot; [Alt-T]',
 	'Login ' => 'Login ',
 	'Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!' => 'Willst du wirklich diesen Benutzer l&ouml;schen?\\nWarnung: alle seine Eintr&auml;ge werden auch gel&ouml;scht!!',
+	' (default skin)' => ' (Standard Skin)',
 	'Tag <code>body</code> can only be used once!' => 'Tag <code>body</code> kann nur einmal benutzt werden!',
 	'Illegal tag' => 'Ung&uuml;ltiger Tag',
 	'Tag %s must occur inside another tag' => 'Tag %s muss in einem anderen Tag auftreten',
@@ -551,6 +553,7 @@ $trans['de_DE'] = array(
 	'Dutch' => 'Holl&auml;ndisch',
 	'English' => 'Englisch',
 	'French' => 'Franz&ouml;sisch',
+	'German' => 'Deutsch',
 	'Japanese' => 'Japanisch',
 	'Lithuanian' => 'Litauisch',
 	'Norwegian Bokm&aring;l' => 'Norwegisch',

@@ -6,9 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2003-12-16 01:24+0100\n"
-"PO-Revision-Date: 2003-12-15 23:01+0100\n"
+"PO-Revision-Date: 2003-12-16 01:42+0100\n"
 "Last-Translator: daniel hahler <daniel@thequod.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -37,27 +36,12 @@ msgid "My Back-Office"
 msgstr "Mein Back-Office"
 
 #: ..\..\..\index.php:30
-msgid ""
-"This page is a placeholder providing links to your blogs and additionnal "
-"demos of what you can do with b2evolution."
-msgstr ""
-"Diese Seite ist ein Platzhalter f&uuml;r Links zu deinen Blogs und weiteren "
-"Demos zu Dingen, die du mit b2evolution machen kannst."
+msgid "This page is a placeholder providing links to your blogs and additionnal demos of what you can do with b2evolution."
+msgstr "Diese Seite ist ein Platzhalter f&uuml;r Links zu deinen Blogs und weiteren Demos zu Dingen, die du mit b2evolution machen kannst."
 
 #: ..\..\..\index.php:31
-msgid ""
-"Of course, you don't want to keep all that for your website. Just select "
-"what you need and erase what you don't. You will probably also delete this "
-"page and rename one of your blogs to index.php. (When you do that, don't "
-"forget to update that blog settings in the back office, so the moved blog "
-"knows its new filename/URL! ;)."
-msgstr ""
-"Nat&uuml;rlich wirst du all das nicht f&uuml;r deine Webseite verwenden. "
-"W&auml;hle,was du brauchst und l&ouml;sche was du nicht brauchst. Du wirst "
-"wahrscheinlich auch diese Seite l&ouml;schen und eine deiner Blogs nach "
-"index.php umbenennen. (Wenn du das machst, vergiss nicht die "
-"Blogeinstellungen im Back-Office anzupassen, so dass das neue Blog seine(n) "
-"Dateinamen/URL weiss! ;)"
+msgid "Of course, you don't want to keep all that for your website. Just select what you need and erase what you don't. You will probably also delete this page and rename one of your blogs to index.php. (When you do that, don't forget to update that blog settings in the back office, so the moved blog knows its new filename/URL! ;)."
+msgstr "Nat&uuml;rlich wirst du all das nicht f&uuml;r deine Webseite verwenden. W&auml;hle,was du brauchst und l&ouml;sche was du nicht brauchst. Du wirst wahrscheinlich auch diese Seite l&ouml;schen und eine deiner Blogs nach index.php umbenennen. (Wenn du das machst, vergiss nicht die Blogeinstellungen im Back-Office anzupassen, so dass das neue Blog seine(n) Dateinamen/URL weiss! ;)"
 
 #: ..\..\..\index.php:42
 #, php-format
@@ -69,22 +53,12 @@ msgid "Blog #1"
 msgstr "Blog #1"
 
 #: ..\..\..\index.php:63
-msgid ""
-"This is a special blog that aggregates all messages from all other blogs!"
-msgstr ""
-"Dies ist ein spezielles Blog, das alle Nachrichten der anderen Blogs "
-"vereinigt!"
+msgid "This is a special blog that aggregates all messages from all other blogs!"
+msgstr "Dies ist ein spezielles Blog, das alle Nachrichten der anderen Blogs vereinigt!"
 
 #: ..\..\..\index.php:68
-msgid ""
-"Please note: the above list (as well as the menu) is automatically generated "
-"and includes only the blogs that have a &quot;stub url name&quot;. You can "
-"set this in the blog configuration in the back-office."
-msgstr ""
-"Bitte beachte: die obige Liste (wie auch das Menu) wird automatisch "
-"generiert und enth&auml;lt nur die Blogs, die einen &quot;Stub&quot;-URL-"
-"Namen haben. Diesen kannst du in der Blogkonfiguration im Back-Office "
-"festlegen."
+msgid "Please note: the above list (as well as the menu) is automatically generated and includes only the blogs that have a &quot;stub url name&quot;. You can set this in the blog configuration in the back-office."
+msgstr "Bitte beachte: die obige Liste (wie auch das Menu) wird automatisch generiert und enth&auml;lt nur die Blogs, die einen &quot;Stub&quot;-URL-Namen haben. Diesen kannst du in der Blogkonfiguration im Back-Office festlegen."
 
 #: ..\..\..\index.php:69
 msgid "More demos"
@@ -104,16 +78,8 @@ msgid "Summary of last posts in all blogs"
 msgstr "Zusammenfassung der letzten Eintr&auml;ge aller Blogs"
 
 #: ..\..\..\index.php:74
-msgid ""
-"Please note: those demos do not make use of evoSkins, even if you enabled "
-"them during install. The only way to change their look and feel is to edit "
-"their PHP template. But once, again, rememner these are just demos destined "
-"to inspire you for your own templates ;)"
-msgstr ""
-"Bitte beachte: diese Demos benutzen keine evoSkins, auch wenn du sie bei der "
-"Installation eingeschaltet hast. Du kannst nur ihr Aussehen ver&auml;ndern, "
-"indem du ihre PHP Vorlage editierst. Aber, noch einmal: vergiss nicht, dass "
-"es nur Demos sind, die dich zu deinen eigenen Vorlagen inspirieren sollen."
+msgid "Please note: those demos do not make use of evoSkins, even if you enabled them during install. The only way to change their look and feel is to edit their PHP template. But once, again, rememner these are just demos destined to inspire you for your own templates ;)"
+msgstr "Bitte beachte: diese Demos benutzen keine evoSkins, auch wenn du sie bei der Installation eingeschaltet hast. Du kannst nur ihr Aussehen ver&auml;ndern, indem du ihre PHP Vorlage editierst. Aber, noch einmal: vergiss nicht, dass es nur Demos sind, die dich zu deinen eigenen Vorlagen inspirieren sollen."
 
 #: ..\..\..\index.php:76
 msgid "official website"
@@ -123,16 +89,26 @@ msgstr "offizielle Webseite"
 msgid "GNU GPL license"
 msgstr "GNU GPL Lizenz"
 
-#: ..\..\..\multiblogs.php:47 ..\..\..\multiblogs.php:121
-#: ..\..\..\noskin_a.php:59 ..\..\..\noskin_a.php:129
-#: ..\..\..\noskin_a.php:221 ..\..\..\noskin_all.php:60
-#: ..\..\..\noskin_all.php:130 ..\..\..\noskin_all.php:223
-#: ..\..\..\noskin_b.php:59 ..\..\..\noskin_b.php:130
-#: ..\..\..\noskin_b.php:232 ..\..\..\noskin_roll.php:59
-#: ..\..\..\noskin_roll.php:129 ..\..\..\noskin_roll.php:222
-#: ..\..\..\skins\bluesky\_main.php:20 ..\..\..\skins\bluesky\_main.php:46
-#: ..\..\..\skins\bluesky\_main.php:127 ..\..\..\skins\custom\_main.php:22
-#: ..\..\..\skins\custom\_main.php:56 ..\..\..\skins\custom\_main.php:155
+#: ..\..\..\multiblogs.php:47
+#: ..\..\..\multiblogs.php:121
+#: ..\..\..\noskin_a.php:59
+#: ..\..\..\noskin_a.php:129
+#: ..\..\..\noskin_a.php:221
+#: ..\..\..\noskin_all.php:60
+#: ..\..\..\noskin_all.php:130
+#: ..\..\..\noskin_all.php:223
+#: ..\..\..\noskin_b.php:59
+#: ..\..\..\noskin_b.php:130
+#: ..\..\..\noskin_b.php:232
+#: ..\..\..\noskin_roll.php:59
+#: ..\..\..\noskin_roll.php:129
+#: ..\..\..\noskin_roll.php:222
+#: ..\..\..\skins\bluesky\_main.php:20
+#: ..\..\..\skins\bluesky\_main.php:46
+#: ..\..\..\skins\bluesky\_main.php:127
+#: ..\..\..\skins\custom\_main.php:22
+#: ..\..\..\skins\custom\_main.php:56
+#: ..\..\..\skins\custom\_main.php:155
 #: ..\..\..\skins\fplanque2002\_main.php:23
 #: ..\..\..\skins\fplanque2002\_main.php:76
 #: ..\..\..\skins\fplanque2002\_main.php:168
@@ -142,13 +118,20 @@ msgstr "GNU GPL Lizenz"
 msgid "Last comments"
 msgstr "Letzte Kommentare"
 
-#: ..\..\..\multiblogs.php:48 ..\..\..\multiblogs.php:122
-#: ..\..\..\noskin_a.php:60 ..\..\..\noskin_a.php:130
-#: ..\..\..\noskin_all.php:61 ..\..\..\noskin_all.php:131
-#: ..\..\..\noskin_b.php:60 ..\..\..\noskin_b.php:131
-#: ..\..\..\noskin_roll.php:60 ..\..\..\noskin_roll.php:130
-#: ..\..\..\skins\bluesky\_main.php:21 ..\..\..\skins\bluesky\_main.php:47
-#: ..\..\..\skins\custom\_main.php:23 ..\..\..\skins\custom\_main.php:57
+#: ..\..\..\multiblogs.php:48
+#: ..\..\..\multiblogs.php:122
+#: ..\..\..\noskin_a.php:60
+#: ..\..\..\noskin_a.php:130
+#: ..\..\..\noskin_all.php:61
+#: ..\..\..\noskin_all.php:131
+#: ..\..\..\noskin_b.php:60
+#: ..\..\..\noskin_b.php:131
+#: ..\..\..\noskin_roll.php:60
+#: ..\..\..\noskin_roll.php:130
+#: ..\..\..\skins\bluesky\_main.php:21
+#: ..\..\..\skins\bluesky\_main.php:47
+#: ..\..\..\skins\custom\_main.php:23
+#: ..\..\..\skins\custom\_main.php:57
 #: ..\..\..\skins\fplanque2002\_main.php:24
 #: ..\..\..\skins\fplanque2002\_main.php:77
 #: ..\..\..\skins\guadeloupe\_main.php:21
@@ -156,12 +139,18 @@ msgstr "Letzte Kommentare"
 msgid "Statistics"
 msgstr "Statistiken"
 
-#: ..\..\..\multiblogs.php:49 ..\..\..\multiblogs.php:123
-#: ..\..\..\noskin_a.php:61 ..\..\..\noskin_a.php:131
-#: ..\..\..\noskin_all.php:62 ..\..\..\noskin_all.php:132
-#: ..\..\..\noskin_b.php:61 ..\..\..\noskin_b.php:132
-#: ..\..\..\noskin_roll.php:61 ..\..\..\noskin_roll.php:131
-#: ..\..\..\skins\custom\_main.php:24 ..\..\..\skins\custom\_main.php:58
+#: ..\..\..\multiblogs.php:49
+#: ..\..\..\multiblogs.php:123
+#: ..\..\..\noskin_a.php:61
+#: ..\..\..\noskin_a.php:131
+#: ..\..\..\noskin_all.php:62
+#: ..\..\..\noskin_all.php:132
+#: ..\..\..\noskin_b.php:61
+#: ..\..\..\noskin_b.php:132
+#: ..\..\..\noskin_roll.php:61
+#: ..\..\..\noskin_roll.php:131
+#: ..\..\..\skins\custom\_main.php:24
+#: ..\..\..\skins\custom\_main.php:58
 #: ..\..\..\skins\fplanque2002\_main.php:25
 #: ..\..\..\skins\fplanque2002\_main.php:78
 msgid "Archive Directory"
@@ -172,98 +161,142 @@ msgid "Multiblog demo"
 msgstr "Multiblog Demo"
 
 #: ..\..\..\multiblogs.php:106
-msgid ""
-"This demo template displays 3 blogs at once (1 on the left, 2 on the right)"
+msgid "This demo template displays 3 blogs at once (1 on the left, 2 on the right)"
 msgstr "Diese Demo-Vorlage zeigt 3 Blogs auf einmal (1 links, 2 rechts)"
 
-#: ..\..\..\multiblogs.php:136 ..\..\..\multiblogs.php:220
-#: ..\..\..\multiblogs.php:255 ..\..\..\noskin_a.php:161
-#: ..\..\..\noskin_all.php:146 ..\..\..\noskin_all.php:162
-#: ..\..\..\noskin_b.php:146 ..\..\..\noskin_b.php:162
-#: ..\..\..\noskin_roll.php:145 ..\..\..\noskin_roll.php:161
-#: ..\..\..\summary.php:91 ..\..\..\skins\_blogroll.php:61
-#: ..\..\..\skins\custom\_main.php:72 ..\..\..\skins\custom\_main.php:95
+#: ..\..\..\multiblogs.php:136
+#: ..\..\..\multiblogs.php:220
+#: ..\..\..\multiblogs.php:255
+#: ..\..\..\noskin_a.php:161
+#: ..\..\..\noskin_all.php:146
+#: ..\..\..\noskin_all.php:162
+#: ..\..\..\noskin_b.php:146
+#: ..\..\..\noskin_b.php:162
+#: ..\..\..\noskin_roll.php:145
+#: ..\..\..\noskin_roll.php:161
+#: ..\..\..\summary.php:91
+#: ..\..\..\skins\_blogroll.php:61
+#: ..\..\..\skins\custom\_main.php:72
+#: ..\..\..\skins\custom\_main.php:95
 #: ..\..\..\skins\fplanque2002\_main.php:92
 #: ..\..\..\skins\fplanque2002\_main.php:108
 msgid "Permanent link to full entry"
 msgstr "Permanenter Link zum ganzen Eintrag"
 
-#: ..\..\..\multiblogs.php:136 ..\..\..\multiblogs.php:152
-#: ..\..\..\multiblogs.php:220 ..\..\..\multiblogs.php:255
-#: ..\..\..\noskin_a.php:161 ..\..\..\noskin_all.php:146
-#: ..\..\..\noskin_all.php:162 ..\..\..\noskin_b.php:146
-#: ..\..\..\noskin_b.php:162 ..\..\..\noskin_roll.php:145
-#: ..\..\..\noskin_roll.php:161 ..\..\..\admin\_edit_showposts.php:163
-#: ..\..\..\skins\_blogroll.php:61 ..\..\..\skins\custom\_main.php:95
+#: ..\..\..\multiblogs.php:136
+#: ..\..\..\multiblogs.php:152
+#: ..\..\..\multiblogs.php:220
+#: ..\..\..\multiblogs.php:255
+#: ..\..\..\noskin_a.php:161
+#: ..\..\..\noskin_all.php:146
+#: ..\..\..\noskin_all.php:162
+#: ..\..\..\noskin_b.php:146
+#: ..\..\..\noskin_b.php:162
+#: ..\..\..\noskin_roll.php:145
+#: ..\..\..\noskin_roll.php:161
+#: ..\..\..\admin\_edit_showposts.php:163
+#: ..\..\..\skins\_blogroll.php:61
+#: ..\..\..\skins\custom\_main.php:95
 #: ..\..\..\skins\fplanque2002\_main.php:92
 #: ..\..\..\skins\fplanque2002\_main.php:108
 #: ..\..\..\skins\guadeloupe\_main.php:62
 msgid "Permalink"
 msgstr "Permalink"
 
-#: ..\..\..\multiblogs.php:137 ..\..\..\noskin_a.php:146
-#: ..\..\..\noskin_a.php:239 ..\..\..\noskin_all.php:147
-#: ..\..\..\noskin_all.php:241 ..\..\..\noskin_b.php:147
-#: ..\..\..\noskin_b.php:250 ..\..\..\noskin_roll.php:146
-#: ..\..\..\noskin_roll.php:240 ..\..\..\admin\b2categories.php:9
-#: ..\..\..\admin\b2categories.php:218 ..\..\..\admin\_edit_form.php:258
-#: ..\..\..\admin\_edit_showposts.php:418 ..\..\..\skins\custom\_main.php:75
+#: ..\..\..\multiblogs.php:137
+#: ..\..\..\noskin_a.php:146
+#: ..\..\..\noskin_a.php:239
+#: ..\..\..\noskin_all.php:147
+#: ..\..\..\noskin_all.php:241
+#: ..\..\..\noskin_b.php:147
+#: ..\..\..\noskin_b.php:250
+#: ..\..\..\noskin_roll.php:146
+#: ..\..\..\noskin_roll.php:240
+#: ..\..\..\admin\b2categories.php:9
+#: ..\..\..\admin\b2categories.php:218
+#: ..\..\..\admin\_edit_form.php:258
+#: ..\..\..\admin\_edit_showposts.php:418
+#: ..\..\..\skins\custom\_main.php:75
 #: ..\..\..\skins\custom\_main.php:173
 #: ..\..\..\skins\fplanque2002\_main.php:93
 #: ..\..\..\skins\fplanque2002\_main.php:186
 msgid "Categories"
 msgstr "Kategorien"
 
-#: ..\..\..\multiblogs.php:145 ..\..\..\noskin_a.php:154
-#: ..\..\..\noskin_all.php:155 ..\..\..\noskin_b.php:155
-#: ..\..\..\noskin_roll.php:154 ..\..\..\skins\custom\_main.php:88
+#: ..\..\..\multiblogs.php:145
+#: ..\..\..\noskin_a.php:154
+#: ..\..\..\noskin_all.php:155
+#: ..\..\..\noskin_b.php:155
+#: ..\..\..\noskin_roll.php:154
+#: ..\..\..\skins\custom\_main.php:88
 #: ..\..\..\skins\fplanque2002\_main.php:101
 msgid "Display comments / Leave a comment"
 msgstr "Zeige Kommentare / Hinterlasse Kommentar"
 
-#: ..\..\..\multiblogs.php:147 ..\..\..\noskin_a.php:156
-#: ..\..\..\noskin_all.php:157 ..\..\..\noskin_b.php:157
-#: ..\..\..\noskin_roll.php:156 ..\..\..\skins\custom\_main.php:90
+#: ..\..\..\multiblogs.php:147
+#: ..\..\..\noskin_a.php:156
+#: ..\..\..\noskin_all.php:157
+#: ..\..\..\noskin_b.php:157
+#: ..\..\..\noskin_roll.php:156
+#: ..\..\..\skins\custom\_main.php:90
 #: ..\..\..\skins\fplanque2002\_main.php:103
 msgid "Display trackbacks / Get trackback address for this post"
 msgstr "Zeige Trackbacks / Trackback Adresse f&uuml;r diesen Eintrag"
 
-#: ..\..\..\multiblogs.php:150 ..\..\..\noskin_a.php:159
-#: ..\..\..\noskin_all.php:160 ..\..\..\noskin_b.php:160
-#: ..\..\..\noskin_roll.php:159 ..\..\..\skins\custom\_main.php:93
+#: ..\..\..\multiblogs.php:150
+#: ..\..\..\noskin_a.php:159
+#: ..\..\..\noskin_all.php:160
+#: ..\..\..\noskin_b.php:160
+#: ..\..\..\noskin_roll.php:159
+#: ..\..\..\skins\custom\_main.php:93
 #: ..\..\..\skins\fplanque2002\_main.php:106
 msgid "Display pingbacks"
 msgstr "Zeige Pingbacks"
 
-#: ..\..\..\multiblogs.php:153 ..\..\..\noskin_a.php:162
-#: ..\..\..\noskin_all.php:163 ..\..\..\noskin_b.php:163
-#: ..\..\..\noskin_roll.php:162 ..\..\..\skins\custom\_main.php:96
+#: ..\..\..\multiblogs.php:153
+#: ..\..\..\noskin_a.php:162
+#: ..\..\..\noskin_all.php:163
+#: ..\..\..\noskin_b.php:163
+#: ..\..\..\noskin_roll.php:162
+#: ..\..\..\skins\custom\_main.php:96
 #: ..\..\..\skins\fplanque2002\_main.php:109
 #, php-format
 msgid "- %d queries so far"
 msgstr "- %d Abfragen bisher"
 
-#: ..\..\..\multiblogs.php:273 ..\..\..\noskin_a.php:293
-#: ..\..\..\noskin_all.php:295 ..\..\..\noskin_b.php:304
-#: ..\..\..\noskin_roll.php:294 ..\..\..\skins\babyblues\_main.php:100
-#: ..\..\..\skins\bluesky\_main.php:206 ..\..\..\skins\custom\_main.php:238
+#: ..\..\..\multiblogs.php:273
+#: ..\..\..\noskin_a.php:293
+#: ..\..\..\noskin_all.php:295
+#: ..\..\..\noskin_b.php:304
+#: ..\..\..\noskin_roll.php:294
+#: ..\..\..\skins\babyblues\_main.php:100
+#: ..\..\..\skins\bluesky\_main.php:206
+#: ..\..\..\skins\custom\_main.php:238
 #: ..\..\..\skins\fplanque2002\_main.php:250
 #: ..\..\..\skins\guadeloupe\_main.php:207
 msgid "Misc"
 msgstr "Sonstiges"
 
-#: ..\..\..\noskin_a.php:95 ..\..\..\noskin_all.php:96
-#: ..\..\..\noskin_b.php:96 ..\..\..\noskin_roll.php:95
+#: ..\..\..\noskin_a.php:95
+#: ..\..\..\noskin_all.php:96
+#: ..\..\..\noskin_b.php:96
+#: ..\..\..\noskin_roll.php:95
 #: ..\..\..\skins\fplanque2002\_bloglist.php:27
 msgid "Selected"
 msgstr "Ausgew&auml;hlt"
 
-#: ..\..\..\noskin_a.php:214 ..\..\..\noskin_a.php:215
-#: ..\..\..\noskin_all.php:216 ..\..\..\noskin_all.php:217
-#: ..\..\..\noskin_b.php:225 ..\..\..\noskin_b.php:226
-#: ..\..\..\noskin_roll.php:215 ..\..\..\noskin_roll.php:216
-#: ..\..\..\skins\bluesky\_main.php:123 ..\..\..\skins\bluesky\_main.php:124
-#: ..\..\..\skins\custom\_main.php:148 ..\..\..\skins\custom\_main.php:149
+#: ..\..\..\noskin_a.php:214
+#: ..\..\..\noskin_a.php:215
+#: ..\..\..\noskin_all.php:216
+#: ..\..\..\noskin_all.php:217
+#: ..\..\..\noskin_b.php:225
+#: ..\..\..\noskin_b.php:226
+#: ..\..\..\noskin_roll.php:215
+#: ..\..\..\noskin_roll.php:216
+#: ..\..\..\skins\bluesky\_main.php:123
+#: ..\..\..\skins\bluesky\_main.php:124
+#: ..\..\..\skins\custom\_main.php:148
+#: ..\..\..\skins\custom\_main.php:149
 #: ..\..\..\skins\fplanque2002\_main.php:161
 #: ..\..\..\skins\fplanque2002\_main.php:162
 #: ..\..\..\skins\guadeloupe\_main.php:123
@@ -271,35 +304,48 @@ msgstr "Ausgew&auml;hlt"
 msgid "Recently"
 msgstr "k&uuml;rzlich"
 
-#: ..\..\..\noskin_a.php:214 ..\..\..\noskin_all.php:216
-#: ..\..\..\noskin_b.php:225 ..\..\..\noskin_roll.php:215
-#: ..\..\..\skins\bluesky\_main.php:123 ..\..\..\skins\custom\_main.php:148
+#: ..\..\..\noskin_a.php:214
+#: ..\..\..\noskin_all.php:216
+#: ..\..\..\noskin_b.php:225
+#: ..\..\..\noskin_roll.php:215
+#: ..\..\..\skins\bluesky\_main.php:123
+#: ..\..\..\skins\custom\_main.php:148
 #: ..\..\..\skins\fplanque2002\_main.php:161
 #: ..\..\..\skins\guadeloupe\_main.php:123
 msgid "(cached)"
 msgstr "(gepuffert)"
 
-#: ..\..\..\noskin_a.php:215 ..\..\..\noskin_all.php:217
-#: ..\..\..\noskin_b.php:226 ..\..\..\noskin_roll.php:216
-#: ..\..\..\skins\bluesky\_main.php:124 ..\..\..\skins\custom\_main.php:149
+#: ..\..\..\noskin_a.php:215
+#: ..\..\..\noskin_all.php:217
+#: ..\..\..\noskin_b.php:226
+#: ..\..\..\noskin_roll.php:216
+#: ..\..\..\skins\bluesky\_main.php:124
+#: ..\..\..\skins\custom\_main.php:149
 #: ..\..\..\skins\fplanque2002\_main.php:162
 #: ..\..\..\skins\guadeloupe\_main.php:124
 msgid "(no cache)"
 msgstr "(ungepuffert)"
 
-#: ..\..\..\noskin_a.php:222 ..\..\..\noskin_all.php:224
-#: ..\..\..\noskin_b.php:233 ..\..\..\noskin_roll.php:223
+#: ..\..\..\noskin_a.php:222
+#: ..\..\..\noskin_all.php:224
+#: ..\..\..\noskin_b.php:233
+#: ..\..\..\noskin_roll.php:223
 #: ..\..\..\skins\custom\_main.php:156
 #: ..\..\..\skins\fplanque2002\_main.php:169
 msgid "Some viewing statistics"
 msgstr "ein paar Statistiken"
 
-#: ..\..\..\noskin_a.php:227 ..\..\..\noskin_a.php:233
-#: ..\..\..\noskin_all.php:229 ..\..\..\noskin_all.php:235
-#: ..\..\..\noskin_b.php:238 ..\..\..\noskin_b.php:244
-#: ..\..\..\noskin_roll.php:228 ..\..\..\noskin_roll.php:234
+#: ..\..\..\noskin_a.php:227
+#: ..\..\..\noskin_a.php:233
+#: ..\..\..\noskin_all.php:229
+#: ..\..\..\noskin_all.php:235
+#: ..\..\..\noskin_b.php:238
+#: ..\..\..\noskin_b.php:244
+#: ..\..\..\noskin_roll.php:228
+#: ..\..\..\noskin_roll.php:234
 #: ..\..\..\admin\_edit_showposts.php:303
-#: ..\..\..\admin\_edit_showposts.php:493 ..\..\..\skins\custom\_main.php:161
+#: ..\..\..\admin\_edit_showposts.php:493
+#: ..\..\..\skins\custom\_main.php:161
 #: ..\..\..\skins\custom\_main.php:167
 #: ..\..\..\skins\fplanque2002\_main.php:174
 #: ..\..\..\skins\fplanque2002\_main.php:180
@@ -307,32 +353,44 @@ msgstr "ein paar Statistiken"
 msgid "Search"
 msgstr "Suche"
 
-#: ..\..\..\noskin_a.php:230 ..\..\..\noskin_all.php:232
-#: ..\..\..\noskin_b.php:241 ..\..\..\noskin_roll.php:231
+#: ..\..\..\noskin_a.php:230
+#: ..\..\..\noskin_all.php:232
+#: ..\..\..\noskin_b.php:241
+#: ..\..\..\noskin_roll.php:231
 #: ..\..\..\skins\custom\_main.php:164
 #: ..\..\..\skins\fplanque2002\_main.php:177
 msgid "All Words"
 msgstr "Alles"
 
-#: ..\..\..\noskin_a.php:231 ..\..\..\noskin_all.php:233
-#: ..\..\..\noskin_b.php:242 ..\..\..\noskin_roll.php:232
+#: ..\..\..\noskin_a.php:231
+#: ..\..\..\noskin_all.php:233
+#: ..\..\..\noskin_b.php:242
+#: ..\..\..\noskin_roll.php:232
 #: ..\..\..\skins\custom\_main.php:165
 #: ..\..\..\skins\fplanque2002\_main.php:178
 msgid "Some Word"
 msgstr "ein Wort"
 
-#: ..\..\..\noskin_a.php:232 ..\..\..\noskin_all.php:234
-#: ..\..\..\noskin_b.php:243 ..\..\..\noskin_roll.php:233
-#: ..\..\..\admin\_edit_showposts.php:338 ..\..\..\skins\custom\_main.php:166
+#: ..\..\..\noskin_a.php:232
+#: ..\..\..\noskin_all.php:234
+#: ..\..\..\noskin_b.php:243
+#: ..\..\..\noskin_roll.php:233
+#: ..\..\..\admin\_edit_showposts.php:338
+#: ..\..\..\skins\custom\_main.php:166
 #: ..\..\..\skins\fplanque2002\_main.php:179
 msgid "Entire phrase"
 msgstr "ganzen Ausdruck"
 
-#: ..\..\..\noskin_a.php:234 ..\..\..\noskin_a.php:246
-#: ..\..\..\noskin_all.php:236 ..\..\..\noskin_all.php:248
-#: ..\..\..\noskin_b.php:245 ..\..\..\noskin_b.php:257
-#: ..\..\..\noskin_roll.php:235 ..\..\..\noskin_roll.php:247
-#: ..\..\..\skins\bluesky\_main.php:142 ..\..\..\skins\custom\_main.php:168
+#: ..\..\..\noskin_a.php:234
+#: ..\..\..\noskin_a.php:246
+#: ..\..\..\noskin_all.php:236
+#: ..\..\..\noskin_all.php:248
+#: ..\..\..\noskin_b.php:245
+#: ..\..\..\noskin_b.php:257
+#: ..\..\..\noskin_roll.php:235
+#: ..\..\..\noskin_roll.php:247
+#: ..\..\..\skins\bluesky\_main.php:142
+#: ..\..\..\skins\custom\_main.php:168
 #: ..\..\..\skins\custom\_main.php:180
 #: ..\..\..\skins\fplanque2002\_main.php:181
 #: ..\..\..\skins\fplanque2002\_main.php:193
@@ -340,32 +398,46 @@ msgstr "ganzen Ausdruck"
 msgid "Reset form"
 msgstr "zur&uuml;cksetzen"
 
-#: ..\..\..\noskin_a.php:245 ..\..\..\noskin_all.php:247
-#: ..\..\..\noskin_b.php:256 ..\..\..\noskin_roll.php:246
-#: ..\..\..\skins\bluesky\_main.php:141 ..\..\..\skins\custom\_main.php:179
+#: ..\..\..\noskin_a.php:245
+#: ..\..\..\noskin_all.php:247
+#: ..\..\..\noskin_b.php:256
+#: ..\..\..\noskin_roll.php:246
+#: ..\..\..\skins\bluesky\_main.php:141
+#: ..\..\..\skins\custom\_main.php:179
 #: ..\..\..\skins\fplanque2002\_main.php:192
 #: ..\..\..\skins\guadeloupe\_main.php:142
 #: ..\..\..\skins\originalb2\_main.php:136
 msgid "Get selection"
 msgstr "Ausw&auml;hlen"
 
-#: ..\..\..\noskin_a.php:251 ..\..\..\noskin_all.php:253
-#: ..\..\..\noskin_b.php:262 ..\..\..\noskin_roll.php:252
-#: ..\..\..\admin\_edit_showposts.php:342 ..\..\..\skins\bluesky\_main.php:176
+#: ..\..\..\noskin_a.php:251
+#: ..\..\..\noskin_all.php:253
+#: ..\..\..\noskin_b.php:262
+#: ..\..\..\noskin_roll.php:252
+#: ..\..\..\admin\_edit_showposts.php:342
+#: ..\..\..\skins\bluesky\_main.php:176
 #: ..\..\..\skins\custom\_main.php:185
 #: ..\..\..\skins\fplanque2002\_main.php:198
 #: ..\..\..\skins\guadeloupe\_main.php:177
 msgid "Archives"
 msgstr "Archive"
 
-#: ..\..\..\noskin_a.php:256 ..\..\..\noskin_a.php:269
-#: ..\..\..\noskin_a.php:278 ..\..\..\noskin_all.php:258
-#: ..\..\..\noskin_all.php:271 ..\..\..\noskin_all.php:280
-#: ..\..\..\noskin_b.php:267 ..\..\..\noskin_b.php:280
-#: ..\..\..\noskin_b.php:289 ..\..\..\noskin_roll.php:257
-#: ..\..\..\noskin_roll.php:270 ..\..\..\noskin_roll.php:279
-#: ..\..\..\skins\bluesky\_main.php:189 ..\..\..\skins\bluesky\_main.php:198
-#: ..\..\..\skins\custom\_main.php:190 ..\..\..\skins\custom\_main.php:214
+#: ..\..\..\noskin_a.php:256
+#: ..\..\..\noskin_a.php:269
+#: ..\..\..\noskin_a.php:278
+#: ..\..\..\noskin_all.php:258
+#: ..\..\..\noskin_all.php:271
+#: ..\..\..\noskin_all.php:280
+#: ..\..\..\noskin_b.php:267
+#: ..\..\..\noskin_b.php:280
+#: ..\..\..\noskin_b.php:289
+#: ..\..\..\noskin_roll.php:257
+#: ..\..\..\noskin_roll.php:270
+#: ..\..\..\noskin_roll.php:279
+#: ..\..\..\skins\bluesky\_main.php:189
+#: ..\..\..\skins\bluesky\_main.php:198
+#: ..\..\..\skins\custom\_main.php:190
+#: ..\..\..\skins\custom\_main.php:214
 #: ..\..\..\skins\custom\_main.php:223
 #: ..\..\..\skins\fplanque2002\_main.php:203
 #: ..\..\..\skins\fplanque2002\_main.php:226
@@ -375,41 +447,55 @@ msgstr "Archive"
 msgid "more..."
 msgstr "mehr..."
 
-#: ..\..\..\noskin_a.php:263 ..\..\..\noskin_all.php:265
-#: ..\..\..\noskin_b.php:274 ..\..\..\noskin_roll.php:264
-#: ..\..\..\skins\bluesky\_main.php:183 ..\..\..\skins\custom\_main.php:208
+#: ..\..\..\noskin_a.php:263
+#: ..\..\..\noskin_all.php:265
+#: ..\..\..\noskin_b.php:274
+#: ..\..\..\noskin_roll.php:264
+#: ..\..\..\skins\bluesky\_main.php:183
+#: ..\..\..\skins\custom\_main.php:208
 #: ..\..\..\skins\fplanque2002\_main.php:220
 #: ..\..\..\skins\guadeloupe\_main.php:184
 msgid "Recent Referers"
 msgstr "Letzte Referer"
 
-#: ..\..\..\noskin_a.php:272 ..\..\..\noskin_all.php:274
-#: ..\..\..\noskin_b.php:283 ..\..\..\noskin_roll.php:273
-#: ..\..\..\skins\bluesky\_main.php:192 ..\..\..\skins\custom\_main.php:217
+#: ..\..\..\noskin_a.php:272
+#: ..\..\..\noskin_all.php:274
+#: ..\..\..\noskin_b.php:283
+#: ..\..\..\noskin_roll.php:273
+#: ..\..\..\skins\bluesky\_main.php:192
+#: ..\..\..\skins\custom\_main.php:217
 #: ..\..\..\skins\fplanque2002\_main.php:229
 #: ..\..\..\skins\guadeloupe\_main.php:193
 msgid "Top Referers"
 msgstr "Top Referer"
 
-#: ..\..\..\noskin_a.php:286 ..\..\..\noskin_all.php:288
-#: ..\..\..\noskin_b.php:297 ..\..\..\noskin_roll.php:287
-#: ..\..\..\admin\_blogs_form.php:59 ..\..\..\skins\bluesky\_main.php:203
+#: ..\..\..\noskin_a.php:286
+#: ..\..\..\noskin_all.php:288
+#: ..\..\..\noskin_b.php:297
+#: ..\..\..\noskin_roll.php:287
+#: ..\..\..\admin\_blogs_form.php:59
+#: ..\..\..\skins\bluesky\_main.php:203
 #: ..\..\..\skins\custom\_main.php:231
 #: ..\..\..\skins\fplanque2002\_main.php:243
 #: ..\..\..\skins\guadeloupe\_main.php:204
 msgid "Blogroll"
 msgstr "Blogroll"
 
-#: ..\..\..\noskin_a.php:307 ..\..\..\noskin_all.php:309
-#: ..\..\..\noskin_b.php:318 ..\..\..\noskin_roll.php:308
+#: ..\..\..\noskin_a.php:307
+#: ..\..\..\noskin_all.php:309
+#: ..\..\..\noskin_b.php:318
+#: ..\..\..\noskin_roll.php:308
 #: ..\..\..\skins\custom\_main.php:251
 #: ..\..\..\skins\fplanque2002\_main.php:264
 msgid "Syndicate this blog"
 msgstr ""
 
-#: ..\..\..\noskin_a.php:338 ..\..\..\noskin_all.php:340
-#: ..\..\..\noskin_b.php:349 ..\..\..\noskin_roll.php:339
-#: ..\..\..\skins\babyblues\_main.php:124 ..\..\..\skins\bluesky\_main.php:233
+#: ..\..\..\noskin_a.php:338
+#: ..\..\..\noskin_all.php:340
+#: ..\..\..\noskin_b.php:349
+#: ..\..\..\noskin_roll.php:339
+#: ..\..\..\skins\babyblues\_main.php:124
+#: ..\..\..\skins\bluesky\_main.php:233
 #: ..\..\..\skins\custom\_main.php:274
 #: ..\..\..\skins\fplanque2002\_main.php:293
 #: ..\..\..\skins\guadeloupe\_main.php:234
@@ -424,22 +510,24 @@ msgstr "Zusammenfassungs-Demo"
 
 #: ..\..\..\summary.php:66
 msgid "This demo template displays a summary of last posts in all blogs"
-msgstr ""
-"Diese Demo-Vorlage zeigt eine Zusammenfassung der letzten Eintr&auml;ge in "
-"allen Blogs"
+msgstr "Diese Demo-Vorlage zeigt eine Zusammenfassung der letzten Eintr&auml;ge in allen Blogs"
 
 #: ..\..\..\summary.php:97
 msgid "More posts..."
 msgstr "Mehr Eintr&auml;ge..."
 
-#: ..\..\..\admin\b2blogs.php:9 ..\..\..\admin\_blogs_list.php:10
-#: ..\..\..\admin\_menutop.php:67 ..\..\..\skins\bluesky\_bloglist.php:17
+#: ..\..\..\admin\b2blogs.php:9
+#: ..\..\..\admin\_blogs_list.php:10
+#: ..\..\..\admin\_menutop.php:67
+#: ..\..\..\skins\bluesky\_bloglist.php:17
 #: ..\..\..\skins\guadeloupe\_bloglist.php:17
 msgid "Blogs"
 msgstr "Blogs"
 
-#: ..\..\..\admin\b2blogs.php:21 ..\..\..\admin\b2blogs.php:50
-#: ..\..\..\admin\b2blogs.php:160 ..\..\..\admin\b2blogs.php:187
+#: ..\..\..\admin\b2blogs.php:21
+#: ..\..\..\admin\b2blogs.php:50
+#: ..\..\..\admin\b2blogs.php:160
+#: ..\..\..\admin\b2blogs.php:187
 #: ..\..\..\admin\b2blogs.php:282
 msgid "You have no right to edit the blogs."
 msgstr "Du darfst die Blogs nicht editieren."
@@ -448,7 +536,8 @@ msgstr "Du darfst die Blogs nicht editieren."
 msgid "New blog"
 msgstr "Neues Blog"
 
-#: ..\..\..\admin\b2blogs.php:71 ..\..\..\admin\b2blogs.php:209
+#: ..\..\..\admin\b2blogs.php:71
+#: ..\..\..\admin\b2blogs.php:209
 #: ..\..\..\admin\edit_actions.php:181
 msgid "Cannot update, please correct these errors:"
 msgstr "Kann nicht aktualisieren, bitte berichtige diese Fehler:"
@@ -478,7 +567,8 @@ msgstr "Erstelle"
 msgid "<p>Changing mod to %o</p>"
 msgstr "<p>&Auml;ndere mod zu %o</p>"
 
-#: ..\..\..\admin\b2blogs.php:133 ..\..\..\admin\b2blogs.php:142
+#: ..\..\..\admin\b2blogs.php:133
+#: ..\..\..\admin\b2blogs.php:142
 #: ..\..\..\admin\b2team.php:227
 msgid "Warning"
 msgstr "Warnung"
@@ -499,9 +589,7 @@ msgstr "chown fehlgeschlagen!"
 #: ..\..\..\admin\b2blogs.php:149
 #, php-format
 msgid "You should <a href=\"%s\">create categories</a> for this blog now!"
-msgstr ""
-"Du solltest jetzt f&uuml;r dieses Blog <a href=\"%s\">Kategorien erstellen</"
-"a>!"
+msgstr "Du solltest jetzt f&uuml;r dieses Blog <a href=\"%s\">Kategorien erstellen</a>!"
 
 #: ..\..\..\admin\b2blogs.php:163
 msgid "Blog params for:"
@@ -511,7 +599,8 @@ msgstr "Blog Parameter f&uuml;r:"
 msgid "Back to blog editing"
 msgstr "Zur&uuml;ck zum Blog editieren"
 
-#: ..\..\..\admin\b2blogs.php:233 ..\..\..\admin\_blogs_list.php:13
+#: ..\..\..\admin\b2blogs.php:233
+#: ..\..\..\admin\_blogs_list.php:13
 msgid "Blog"
 msgstr "Blog"
 
@@ -532,8 +621,10 @@ msgstr "Generiere Seite von <strong>%s</strong> nach <strong>%s</strong>..."
 msgid "Writing to file..."
 msgstr "Schreibe in Datei..."
 
-#: ..\..\..\admin\b2blogs.php:270 ..\..\..\admin\edit_actions.php:97
-#: ..\..\..\admin\edit_actions.php:214 ..\..\..\admin\edit_actions.php:285
+#: ..\..\..\admin\b2blogs.php:270
+#: ..\..\..\admin\edit_actions.php:97
+#: ..\..\..\admin\edit_actions.php:214
+#: ..\..\..\admin\edit_actions.php:285
 #: ..\..\..\b2evocore\_functions_pings.php:53
 #: ..\..\..\b2evocore\_functions_pings.php:87
 #: ..\..\..\b2evocore\_functions_pings.php:146
@@ -545,21 +636,15 @@ msgstr "Fertig."
 msgid "Browse blog:"
 msgstr "Blog anschauen:"
 
-#: ..\..\..\admin\b2browse.php:52 ..\..\..\admin\b2edit.php:69
+#: ..\..\..\admin\b2browse.php:52
+#: ..\..\..\admin\b2edit.php:69
 #: ..\..\..\admin\b2edit.php:195
 #, php-format
-msgid ""
-"Since you're a newcomer, you'll have to wait for an admin to raise your "
-"level to 1, in order to be authorized to post.\tYou can also <a %s>e-mail "
-"the admin</a> to ask for a promotion. When you're promoted, just reload this "
-"page and you'll be able to blog. :)"
-msgstr ""
-"Als Neuling musst du warten, bis ein Admin Deinen Level auf 1 erh&ouml;ht, "
-"damit du posten darfst.\tDu kannst auch den <a %s>Admin um eine Bef&ouml;"
-"rderung bitten</a>. Wenn du bef&ouml;rdert wurdest, brauchst du nur diese "
-"Seite neu zu laden und solltest bloggen k&ouml;nnen. :)"
+msgid "Since you're a newcomer, you'll have to wait for an admin to raise your level to 1, in order to be authorized to post.\tYou can also <a %s>e-mail the admin</a> to ask for a promotion. When you're promoted, just reload this page and you'll be able to blog. :)"
+msgstr "Als Neuling musst du warten, bis ein Admin Deinen Level auf 1 erh&ouml;ht, damit du posten darfst.\tDu kannst auch den <a %s>Admin um eine Bef&ouml;rderung bitten</a>. Wenn du bef&ouml;rdert wurdest, brauchst du nur diese Seite neu zu laden und solltest bloggen k&ouml;nnen. :)"
 
-#: ..\..\..\admin\b2categories.php:21 ..\..\..\admin\b2categories.php:210
+#: ..\..\..\admin\b2categories.php:21
+#: ..\..\..\admin\b2categories.php:210
 msgid "You have no right to edit the categories."
 msgstr "Du darfst keine Kategorien editieren."
 
@@ -588,12 +673,18 @@ msgstr "L&ouml;sche Kategorie..."
 #: ..\..\..\admin\b2categories.php:98
 #: ..\..\..\b2evocore\_functions_users.php:107
 #: ..\..\..\b2evocore\_functions_users.php:138
-#: ..\..\..\htsrv\profile_update.php:47 ..\..\..\htsrv\profile_update.php:56
-#: ..\..\..\htsrv\profile_update.php:64 ..\..\..\htsrv\profile_update.php:69
-#: ..\..\..\htsrv\profile_update.php:77 ..\..\..\htsrv\profile_update.php:85
-#: ..\..\..\htsrv\profile_update.php:89 ..\..\..\htsrv\register.php:34
-#: ..\..\..\htsrv\register.php:41 ..\..\..\htsrv\register.php:48
-#: ..\..\..\htsrv\register.php:56 ..\..\..\htsrv\register.php:61
+#: ..\..\..\htsrv\profile_update.php:47
+#: ..\..\..\htsrv\profile_update.php:56
+#: ..\..\..\htsrv\profile_update.php:64
+#: ..\..\..\htsrv\profile_update.php:69
+#: ..\..\..\htsrv\profile_update.php:77
+#: ..\..\..\htsrv\profile_update.php:85
+#: ..\..\..\htsrv\profile_update.php:89
+#: ..\..\..\htsrv\register.php:34
+#: ..\..\..\htsrv\register.php:41
+#: ..\..\..\htsrv\register.php:48
+#: ..\..\..\htsrv\register.php:56
+#: ..\..\..\htsrv\register.php:61
 #: ..\..\..\htsrv\register.php:76
 msgid "ERROR"
 msgstr "FEHLER"
@@ -614,7 +705,8 @@ msgstr "<strong>Neuer</strong> Name"
 msgid "New parent category"
 msgstr "Neue &Uuml;berkategorie"
 
-#: ..\..\..\admin\b2categories.php:152 ..\..\..\admin\b2categories.php:171
+#: ..\..\..\admin\b2categories.php:152
+#: ..\..\..\admin\b2categories.php:171
 msgid "Old Parent"
 msgstr "Alte &Uuml;berkategorie"
 
@@ -626,12 +718,14 @@ msgstr "Wurzel (nicht &uuml;bergeordnet)"
 msgid "Edit category!"
 msgstr "Editiere Kategorie!"
 
-#: ..\..\..\admin\b2categories.php:231 ..\..\..\admin\_blogs_list.php:25
+#: ..\..\..\admin\b2categories.php:231
+#: ..\..\..\admin\_blogs_list.php:25
 #: ..\..\..\admin\_edit_form.php:199
 msgid "Edit"
 msgstr "Editiere"
 
-#: ..\..\..\admin\b2categories.php:233 ..\..\..\admin\_edit_showposts.php:154
+#: ..\..\..\admin\b2categories.php:233
+#: ..\..\..\admin\_edit_showposts.php:154
 #: ..\..\..\admin\_edit_showposts.php:204
 msgid "Delete"
 msgstr "L&ouml;sche"
@@ -645,19 +739,11 @@ msgid "New category here"
 msgstr "Hier neue Kategorie"
 
 #: ..\..\..\admin\b2categories.php:258
-msgid ""
-"<strong>Note:</strong> Deleting a category does not delete posts from that "
-"category. It will just assign them to the parent category. When deleting a "
-"root category, posts will be assigned to the oldest remaining category in "
-"the same blog (smallest category number)."
-msgstr ""
-"<strong>Beachte:</strong> Das L&ouml;schen einer Kategorie entfernt nicht "
-"die darin enthaltenen Eintr&auml;ge. Sie werden der &uuml;bergeordneten "
-"Kategorie zugeordnet. Wenn eine Wurzelkategorie gel&ouml;scht wird, werden "
-"die Eintr&auml;ge der &auml;ltesten, verbleibenden Kategorie (niedrigste "
-"Kategorienummer) desselben Blogs zugeordnet."
+msgid "<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same blog (smallest category number)."
+msgstr "<strong>Beachte:</strong> Das L&ouml;schen einer Kategorie entfernt nicht die darin enthaltenen Eintr&auml;ge. Sie werden der &uuml;bergeordneten Kategorie zugeordnet. Wenn eine Wurzelkategorie gel&ouml;scht wird, werden die Eintr&auml;ge der &auml;ltesten, verbleibenden Kategorie (niedrigste Kategorienummer) desselben Blogs zugeordnet."
 
-#: ..\..\..\admin\b2edit.php:30 ..\..\..\admin\edit_actions.php:163
+#: ..\..\..\admin\b2edit.php:30
+#: ..\..\..\admin\edit_actions.php:163
 msgid "Oops, no post with this ID."
 msgstr "Oops, kein Eintrag mit dieser ID."
 
@@ -673,8 +759,10 @@ msgstr "Oops, kein Kommentar mit dieser ID!"
 msgid "Editing comment"
 msgstr "Kommentar editieren"
 
-#: ..\..\..\admin\b2edit.php:92 ..\..\..\admin\b2upload.php:13
-#: ..\..\..\admin\edit_actions.php:66 ..\..\..\admin\edit_actions.php:326
+#: ..\..\..\admin\b2edit.php:92
+#: ..\..\..\admin\b2upload.php:13
+#: ..\..\..\admin\edit_actions.php:66
+#: ..\..\..\admin\edit_actions.php:326
 msgid "Cheatin' uh ?"
 msgstr "Schummler, wa ?"
 
@@ -682,49 +770,44 @@ msgstr "Schummler, wa ?"
 msgid "New post in blog:"
 msgstr "Neue Eintr&auml;ge im Blog:"
 
-#: ..\..\..\admin\b2edit.php:134 ..\..\..\admin\b2edit.php:154
-msgid ""
-"Since this blog has no categories, you cannot post to it. You must create "
-"categories first."
-msgstr ""
-"Dieses Blog hat keine Kategorien, du kannst hier nichts schreiben. Du musst "
-"erst kategorien erstellen."
+#: ..\..\..\admin\b2edit.php:134
+#: ..\..\..\admin\b2edit.php:154
+msgid "Since this blog has no categories, you cannot post to it. You must create categories first."
+msgstr "Dieses Blog hat keine Kategorien, du kannst hier nichts schreiben. Du musst erst kategorien erstellen."
 
 #: ..\..\..\admin\b2edit.php:138
 msgid "Switch to this blog (keeping your input if Javascript is active)"
-msgstr ""
-"Zu diesem Blog wechseln (Eingabe wird behalten, falls Javascript aktiv ist)"
+msgstr "Zu diesem Blog wechseln (Eingabe wird behalten, falls Javascript aktiv ist)"
 
-#: ..\..\..\admin\b2login.php:16 ..\..\..\admin\b2upload.php:21
+#: ..\..\..\admin\b2login.php:16
+#: ..\..\..\admin\b2upload.php:21
 #: ..\..\..\htsrv\_header.php:14
 msgid "b2evo"
 msgstr "b2evo"
 
-#: ..\..\..\admin\b2login.php:16 ..\..\..\b2evocore\_functions_users.php:459
+#: ..\..\..\admin\b2login.php:16
+#: ..\..\..\b2evocore\_functions_users.php:459
 msgid "Login..."
 msgstr "Login..."
 
 #: ..\..\..\admin\b2login.php:19
-msgid ""
-"In b2evolution, you do not need to point to the b2login.php page to log in."
-msgstr ""
-"Bei b2evolution brauchst du nicht auf b2login.php verweisen, um einzuloggen."
+msgid "In b2evolution, you do not need to point to the b2login.php page to log in."
+msgstr "Bei b2evolution brauchst du nicht auf b2login.php verweisen, um einzuloggen."
 
 #: ..\..\..\admin\b2login.php:20
 #, php-format
-msgid ""
-"Simply point directly to the backoffice page you need, for example: %s or %"
-"s. b2evo will prompt you to log in if needed."
-msgstr ""
-"Verweise einfach auf die Back-Office-Seite, die du brauchst, zB: %s oder %s. "
-"b2evo wird dich zum Login auffordern, wenn n&ouml;tig."
+msgid "Simply point directly to the backoffice page you need, for example: %s or %s. b2evo will prompt you to log in if needed."
+msgstr "Verweise einfach auf die Back-Office-Seite, die du brauchst, zB: %s oder %s. b2evo wird dich zum Login auffordern, wenn n&ouml;tig."
 
-#: ..\..\..\admin\b2options.php:11 ..\..\..\admin\_edit_showposts.php:257
-#: ..\..\..\admin\_menutop.php:72 ..\..\..\skins\_feedback.php:182
+#: ..\..\..\admin\b2options.php:11
+#: ..\..\..\admin\_edit_showposts.php:257
+#: ..\..\..\admin\_menutop.php:72
+#: ..\..\..\skins\_feedback.php:182
 msgid "Options"
 msgstr "Optionen"
 
-#: ..\..\..\admin\b2options.php:20 ..\..\..\admin\b2options.php:41
+#: ..\..\..\admin\b2options.php:20
+#: ..\..\..\admin\b2options.php:41
 msgid "You have no right to edit the options for this blog."
 msgstr "Du darfst die Optionen dieses Blogs nicht editieren."
 
@@ -772,8 +855,10 @@ msgstr "Zeitunterschied"
 msgid "if you're not on the timezone of your server"
 msgstr "falls du nicht in der Zeitzone des Servers bist"
 
-#: ..\..\..\admin\b2options.php:101 ..\..\..\admin\_edit_form.php:150
-#: ..\..\..\admin\_edit_showposts.php:258 ..\..\..\skins\_feedback.php:186
+#: ..\..\..\admin\b2options.php:101
+#: ..\..\..\admin\_edit_form.php:150
+#: ..\..\..\admin\_edit_showposts.php:258
+#: ..\..\..\skins\_feedback.php:186
 msgid "Auto-BR"
 msgstr "Auto-BR"
 
@@ -781,15 +866,18 @@ msgstr "Auto-BR"
 msgid "converts line-breaks into &lt;br /&gt; tags"
 msgstr "konvertiert Zeilenumbr&uuml;che zu &lt;br /&gt; Tags"
 
-#: ..\..\..\admin\b2options.php:118 ..\..\..\skins\_profile.php:120
+#: ..\..\..\admin\b2options.php:118
+#: ..\..\..\skins\_profile.php:120
 msgid "Update"
 msgstr "Update"
 
-#: ..\..\..\admin\b2profile.php:16 ..\..\..\admin\_menutop.php:82
+#: ..\..\..\admin\b2profile.php:16
+#: ..\..\..\admin\_menutop.php:82
 msgid "My Profile"
 msgstr "Mein Profil"
 
-#: ..\..\..\admin\b2profile.php:24 ..\..\..\b2evocore\_functions_users.php:572
+#: ..\..\..\admin\b2profile.php:24
+#: ..\..\..\b2evocore\_functions_users.php:572
 msgid "Edit your profile"
 msgstr "Editiere Dein Profil"
 
@@ -797,13 +885,17 @@ msgstr "Editiere Dein Profil"
 msgid "Bookmarklet"
 msgstr "Lesezeichen"
 
-#: ..\..\..\admin\b2profile.php:45 ..\..\..\admin\b2profile.php:52
-#: ..\..\..\admin\b2profile.php:60 ..\..\..\admin\b2profile.php:67
+#: ..\..\..\admin\b2profile.php:45
+#: ..\..\..\admin\b2profile.php:52
+#: ..\..\..\admin\b2profile.php:60
+#: ..\..\..\admin\b2profile.php:67
 msgid "Add this link to your Favorites/Bookmarks:"
 msgstr "F&uuml;ge diesen Link zu deinen Favoriten/Lesezeichen hinzu:"
 
-#: ..\..\..\admin\b2profile.php:46 ..\..\..\admin\b2profile.php:53
-#: ..\..\..\admin\b2profile.php:61 ..\..\..\admin\b2profile.php:68
+#: ..\..\..\admin\b2profile.php:46
+#: ..\..\..\admin\b2profile.php:53
+#: ..\..\..\admin\b2profile.php:61
+#: ..\..\..\admin\b2profile.php:68
 msgid "b2evo bookmarklet"
 msgstr "b2evo Lesezeichen"
 
@@ -815,7 +907,8 @@ msgstr "Eintrag in b2evolution"
 msgid "No Sidebar found! You must use Mozilla 0.9.4 or later!"
 msgstr "Keine Sidebar gefunden! Du brauchst Mozilla 0.9.4 oder neuer!"
 
-#: ..\..\..\admin\b2profile.php:87 ..\..\..\admin\b2profile.php:95
+#: ..\..\..\admin\b2profile.php:87
+#: ..\..\..\admin\b2profile.php:95
 msgid "SideBar"
 msgstr "SideBar"
 
@@ -844,19 +937,23 @@ msgstr "Lade Rechtschreibpr&uuml;fung. Bitte warten"
 msgid "View Stats"
 msgstr "Betrachte Statistiken"
 
-#: ..\..\..\admin\b2stats.php:22 ..\..\..\admin\b2stats.php:118
+#: ..\..\..\admin\b2stats.php:22
+#: ..\..\..\admin\b2stats.php:118
 msgid "Summary"
 msgstr "Zusammenfassung"
 
-#: ..\..\..\admin\b2stats.php:26 ..\..\..\admin\b2stats.php:141
+#: ..\..\..\admin\b2stats.php:26
+#: ..\..\..\admin\b2stats.php:141
 msgid "Referers"
 msgstr "Referer"
 
-#: ..\..\..\admin\b2stats.php:30 ..\..\..\admin\b2stats.php:142
+#: ..\..\..\admin\b2stats.php:30
+#: ..\..\..\admin\b2stats.php:142
 msgid "Refering Searches"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:34 ..\..\..\admin\b2stats.php:144
+#: ..\..\..\admin\b2stats.php:34
+#: ..\..\..\admin\b2stats.php:144
 msgid "Syndication"
 msgstr ""
 
@@ -864,7 +961,8 @@ msgstr ""
 msgid "User Agents"
 msgstr "Benutzer-Agenten"
 
-#: ..\..\..\admin\b2stats.php:42 ..\..\..\admin\b2stats.php:145
+#: ..\..\..\admin\b2stats.php:42
+#: ..\..\..\admin\b2stats.php:145
 msgid "Direct Accesses"
 msgstr "Direkte Zugriffe"
 
@@ -886,7 +984,8 @@ msgstr "L&ouml;sche Hit #%d..."
 msgid "Filter"
 msgstr "Filter"
 
-#: ..\..\..\admin\b2stats.php:90 ..\..\..\admin\b2stats.php:94
+#: ..\..\..\admin\b2stats.php:90
+#: ..\..\..\admin\b2stats.php:94
 msgid "None"
 msgstr "keiner"
 
@@ -902,7 +1001,8 @@ msgstr "Indexierende Robots"
 msgid "Total"
 msgstr "gesamt"
 
-#: ..\..\..\admin\b2stats.php:200 ..\..\..\skins\_stats.php:16
+#: ..\..\..\admin\b2stats.php:200
+#: ..\..\..\skins\_stats.php:16
 msgid "Last referers"
 msgstr "Letzte Referer"
 
@@ -910,14 +1010,17 @@ msgstr "Letzte Referer"
 msgid "These are hits from external web pages refering to this blog"
 msgstr "Das sind Hits von externen Webseiten auf dieses Blog"
 
-#: ..\..\..\admin\b2stats.php:208 ..\..\..\admin\b2stats.php:251
+#: ..\..\..\admin\b2stats.php:208
+#: ..\..\..\admin\b2stats.php:251
 #: ..\..\..\admin\b2stats.php:331
 msgid "Delete this hit!"
 msgstr "L&ouml;sche diesen Hit!"
 
 #. TRANS: Abbrev. for Delete (stats)
-#: ..\..\..\admin\b2stats.php:208 ..\..\..\admin\b2stats.php:251
-#: ..\..\..\admin\b2stats.php:331 ..\..\..\admin\_user_list.php:45
+#: ..\..\..\admin\b2stats.php:208
+#: ..\..\..\admin\b2stats.php:251
+#: ..\..\..\admin\b2stats.php:331
+#: ..\..\..\admin\_user_list.php:45
 msgid "Del"
 msgstr "Del"
 
@@ -930,7 +1033,8 @@ msgstr "Stattdessen als Suche behandeln"
 msgid "-&gt;S"
 msgstr "-&gt;S"
 
-#: ..\..\..\admin\b2stats.php:218 ..\..\..\skins\_stats.php:26
+#: ..\..\..\admin\b2stats.php:218
+#: ..\..\..\skins\_stats.php:26
 msgid "Top referers"
 msgstr "Beste Referer"
 
@@ -938,47 +1042,36 @@ msgstr "Beste Referer"
 msgid "Total referers"
 msgstr "Alle Referer"
 
-#: ..\..\..\admin\b2stats.php:243 ..\..\..\skins\_stats.php:36
+#: ..\..\..\admin\b2stats.php:243
+#: ..\..\..\skins\_stats.php:36
 msgid "Last refering searches"
 msgstr ""
 
 #: ..\..\..\admin\b2stats.php:244
-msgid ""
-"These are hits from people who came to this blog system through a search "
-"engine. (Search engines must be listed in /conf/_stats.php)"
-msgstr ""
-"Dies sind Hits von Leuten, die &uuml;ber eine Suchmaschine zu diesem "
-"Blogsystem kamen. (Suchmaschinen m&uuml;ssen in /conf/_stats.php angegeben "
-"werden)"
+msgid "These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)"
+msgstr "Dies sind Hits von Leuten, die &uuml;ber eine Suchmaschine zu diesem Blogsystem kamen. (Suchmaschinen m&uuml;ssen in /conf/_stats.php angegeben werden)"
 
 #: ..\..\..\admin\b2stats.php:260
 msgid "Top refering search engines"
 msgstr ""
 
-#: ..\..\..\admin\b2stats.php:272 ..\..\..\skins\_stats.php:60
+#: ..\..\..\admin\b2stats.php:272
+#: ..\..\..\skins\_stats.php:60
 msgid "Top Indexing Robots"
 msgstr ""
 
 #: ..\..\..\admin\b2stats.php:273
-msgid ""
-"These are hits from automated robots like search engines' indexing robots. "
-"(Robots must be listed in /conf/_stats.php)"
-msgstr ""
-"Dies sind Hits von automatischen Robotern, wie zB indexierende Roboter von "
-"Suchmaschinen. (Roboter m&uuml;ssen in /conf/_stats.php aufgef&uuml;hrt "
-"werden)"
+msgid "These are hits from automated robots like search engines' indexing robots. (Robots must be listed in /conf/_stats.php)"
+msgstr "Dies sind Hits von automatischen Robotern, wie zB indexierende Roboter von Suchmaschinen. (Roboter m&uuml;ssen in /conf/_stats.php aufgef&uuml;hrt werden)"
 
-#: ..\..\..\admin\b2stats.php:297 ..\..\..\skins\_stats.php:75
+#: ..\..\..\admin\b2stats.php:297
+#: ..\..\..\skins\_stats.php:75
 msgid "Top Aggregators"
 msgstr "Top Aggregatoren"
 
 #: ..\..\..\admin\b2stats.php:298
-msgid ""
-"These are hits from RSS news aggregators. (Aggregators must be listed in /"
-"conf/_stats.php)"
-msgstr ""
-"Dies sind Hits von RSS News-Aggregatoren. (Aggregatoren m&uuml;ssen in /conf/"
-"_stats.php angegeben werden)"
+msgid "These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)"
+msgstr "Dies sind Hits von RSS News-Aggregatoren. (Aggregatoren m&uuml;ssen in /conf/_stats.php angegeben werden)"
 
 #: ..\..\..\admin\b2stats.php:309
 msgid "Total RSS hits"
@@ -989,14 +1082,8 @@ msgid "Last direct accesses"
 msgstr "Letzten direkten Zugriffe"
 
 #: ..\..\..\admin\b2stats.php:324
-msgid ""
-"These are hits from people who came to this blog system by direct access "
-"(either by typing the URL directly, or using a bookmark. Invalid (too short) "
-"referers are also listed here.)"
-msgstr ""
-"Dies sind Hits von Leuten, die direkt zu diesem Blogsystem kamen (entweder "
-"durch Tippen der URL, oder ein Lesezeichen. Ung&uuml;ltige (zu kurze) "
-"Referer werden auch hier angezeigt.)"
+msgid "These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)"
+msgstr "Dies sind Hits von Leuten, die direkt zu diesem Blogsystem kamen (entweder durch Tippen der URL, oder ein Lesezeichen. Ung&uuml;ltige (zu kurze) Referer werden auch hier angezeigt.)"
 
 #: ..\..\..\admin\b2stats.php:351
 msgid "Top User Agents"
@@ -1010,46 +1097,62 @@ msgstr "Benutzerverwaltung"
 msgid "Profile for:"
 msgstr "Profil f&uuml;r:"
 
-#: ..\..\..\admin\b2team.php:35 ..\..\..\htsrv\getmail.php:206
-#: ..\..\..\htsrv\login.php:74 ..\..\..\htsrv\register.php:92
-#: ..\..\..\htsrv\_login_form.php:37 ..\..\..\htsrv\_lostpass_form.php:21
-#: ..\..\..\htsrv\_reg_complete.php:14 ..\..\..\htsrv\_reg_form.php:22
+#: ..\..\..\admin\b2team.php:35
+#: ..\..\..\htsrv\getmail.php:206
+#: ..\..\..\htsrv\login.php:74
+#: ..\..\..\htsrv\register.php:92
+#: ..\..\..\htsrv\_login_form.php:37
+#: ..\..\..\htsrv\_lostpass_form.php:21
+#: ..\..\..\htsrv\_reg_complete.php:14
+#: ..\..\..\htsrv\_reg_form.php:22
 #: ..\..\..\skins\_profile.php:28
 msgid "Login:"
 msgstr "Login:"
 
-#: ..\..\..\admin\b2team.php:39 ..\..\..\skins\_profile.php:47
+#: ..\..\..\admin\b2team.php:39
+#: ..\..\..\skins\_profile.php:47
 msgid "First name"
 msgstr "Vorname"
 
-#: ..\..\..\admin\b2team.php:43 ..\..\..\skins\_profile.php:52
+#: ..\..\..\admin\b2team.php:43
+#: ..\..\..\skins\_profile.php:52
 msgid "Last name"
 msgstr "Nachname"
 
-#: ..\..\..\admin\b2team.php:47 ..\..\..\admin\_user_list.php:13
+#: ..\..\..\admin\b2team.php:47
+#: ..\..\..\admin\_user_list.php:13
 #: ..\..\..\skins\_profile.php:57
 msgid "Nickname"
 msgstr "Nickname"
 
-#: ..\..\..\admin\b2team.php:51 ..\..\..\admin\_edit_form.php:127
-#: ..\..\..\admin\_edit_showposts.php:235 ..\..\..\admin\_user_list.php:15
-#: ..\..\..\htsrv\comment_post.php:100 ..\..\..\htsrv\register.php:92
-#: ..\..\..\htsrv\_reg_complete.php:15 ..\..\..\htsrv\_reg_form.php:35
-#: ..\..\..\skins\_feedback.php:160 ..\..\..\skins\_profile.php:78
+#: ..\..\..\admin\b2team.php:51
+#: ..\..\..\admin\_edit_form.php:127
+#: ..\..\..\admin\_edit_showposts.php:235
+#: ..\..\..\admin\_user_list.php:15
+#: ..\..\..\htsrv\comment_post.php:100
+#: ..\..\..\htsrv\register.php:92
+#: ..\..\..\htsrv\_reg_complete.php:15
+#: ..\..\..\htsrv\_reg_form.php:35
+#: ..\..\..\skins\_feedback.php:160
+#: ..\..\..\skins\_profile.php:78
 msgid "Email"
 msgstr "EMail"
 
-#: ..\..\..\admin\b2team.php:55 ..\..\..\admin\_edit_form.php:131
-#: ..\..\..\admin\_quicktags.php:164 ..\..\..\admin\_user_list.php:16
+#: ..\..\..\admin\b2team.php:55
+#: ..\..\..\admin\_edit_form.php:131
+#: ..\..\..\admin\_quicktags.php:164
+#: ..\..\..\admin\_user_list.php:16
 #: ..\..\..\skins\_profile.php:83
 msgid "URL"
 msgstr "URL"
 
-#: ..\..\..\admin\b2team.php:59 ..\..\..\skins\_profile.php:88
+#: ..\..\..\admin\b2team.php:59
+#: ..\..\..\skins\_profile.php:88
 msgid "ICQ"
 msgstr "ICQ"
 
-#: ..\..\..\admin\b2team.php:63 ..\..\..\skins\_profile.php:93
+#: ..\..\..\admin\b2team.php:63
+#: ..\..\..\skins\_profile.php:93
 msgid "AIM"
 msgstr "AIM"
 
@@ -1061,17 +1164,20 @@ msgstr "MSN IM"
 msgid "YahooIM"
 msgstr "YahooIM"
 
-#: ..\..\..\admin\b2team.php:82 ..\..\..\admin\_user_list.php:11
+#: ..\..\..\admin\b2team.php:82
+#: ..\..\..\admin\_user_list.php:11
 #: ..\..\..\skins\_profile.php:31
 msgid "ID"
 msgstr "ID"
 
-#: ..\..\..\admin\b2team.php:86 ..\..\..\admin\_user_list.php:17
+#: ..\..\..\admin\b2team.php:86
+#: ..\..\..\admin\_user_list.php:17
 #: ..\..\..\skins\_profile.php:37
 msgid "Level"
 msgstr "Level"
 
-#: ..\..\..\admin\b2team.php:91 ..\..\..\skins\_profile.php:42
+#: ..\..\..\admin\b2team.php:91
+#: ..\..\..\skins\_profile.php:42
 msgid "Posts"
 msgstr "Eintr&auml;ge"
 
@@ -1081,15 +1187,11 @@ msgstr "Identit&auml;t"
 
 #: ..\..\..\admin\b2team.php:149
 msgid "Can't change the level of an user whose level is higher than yours."
-msgstr ""
-"Du kannst nicht das Level eines Benutzers &auml;ndern, dessen Level h&ouml;"
-"her als Deiner ist."
+msgstr "Du kannst nicht das Level eines Benutzers &auml;ndern, dessen Level h&ouml;her als Deiner ist."
 
 #: ..\..\..\admin\b2team.php:173
 msgid "Can't delete an user whose level is higher than yours."
-msgstr ""
-"Du kannst keinen Benutzer l&ouml;schen, dessen Level h&ouml;her als Deiner "
-"ist."
+msgstr "Du kannst keinen Benutzer l&ouml;schen, dessen Level h&ouml;her als Deiner ist."
 
 #: ..\..\..\admin\b2team.php:176
 #, php-format
@@ -1103,9 +1205,7 @@ msgstr "Konnte Eintr&auml;ge von Benutzer #%d nicht l&ouml;schen."
 
 #: ..\..\..\admin\b2team.php:192
 msgid "Click on an user's login name to see his/her complete Profile."
-msgstr ""
-"Klicke auf den Login-Namen eines Benutzers, um ihr/sein komplettes Profil zu "
-"sehen."
+msgstr "Klicke auf den Login-Namen eines Benutzers, um ihr/sein komplettes Profil zu sehen."
 
 #: ..\..\..\admin\b2team.php:193
 msgid "To edit your Profile, click on your login name."
@@ -1120,23 +1220,19 @@ msgid "Inactive users (level 0)"
 msgstr "Inaktive Benutzer (Level 0)"
 
 #: ..\..\..\admin\b2team.php:226
-msgid ""
-"To delete an user, bring his/her level to zero, then click on the red cross."
-msgstr ""
-"Um einen Benutzer zu l&ouml;schen, setze ihr/sein Level auf 0 und klicke "
-"dann auf's rote Kreuz."
+msgid "To delete an user, bring his/her level to zero, then click on the red cross."
+msgstr "Um einen Benutzer zu l&ouml;schen, setze ihr/sein Level auf 0 und klicke dann auf's rote Kreuz."
 
 #: ..\..\..\admin\b2team.php:227
 msgid "deleting an user also deletes all posts made by this user."
-msgstr ""
-"das L&ouml;schen eines Benutzers l&ouml;scht auch alle Eintr&auml;ge von "
-"diesem Benutzer."
+msgstr "das L&ouml;schen eines Benutzers l&ouml;scht auch alle Eintr&auml;ge von diesem Benutzer."
 
 #: ..\..\..\admin\b2template.php:11
 msgid "Custom skin template editing"
 msgstr "Individuelle Skinvorlage editieren"
 
-#: ..\..\..\admin\b2template.php:25 ..\..\..\admin\b2template.php:47
+#: ..\..\..\admin\b2template.php:25
+#: ..\..\..\admin\b2template.php:47
 msgid "You have no right to edit the templates."
 msgstr "Du darfst keine Vorlagen bearbeiten."
 
@@ -1157,49 +1253,31 @@ msgid "File edited!"
 msgstr "Datei ge&auml;ndert!"
 
 #: ..\..\..\admin\b2template.php:81
-msgid ""
-"Be careful what you do, editing this file could break your template! Do not "
-"edit what's between <code>&lt;?php</code> and <code>?&gt;</code> if you "
-"don't know what you're doing!"
-msgstr ""
-"Sei vorsichtig, was du tust, &auml;ndern der Datei k&ouml;nnte deine Vorlage "
-"besch&auml;digen! &Auml;nder nichts, was sich zwischen <code>&lt;?php</code> "
-"und <code>?&gt;</code> befindet, wenn du nicht weisst, was du tust!"
+msgid "Be careful what you do, editing this file could break your template! Do not edit what's between <code>&lt;?php</code> and <code>?&gt;</code> if you don't know what you're doing!"
+msgstr "Sei vorsichtig, was du tust, &auml;ndern der Datei k&ouml;nnte deine Vorlage besch&auml;digen! &Auml;nder nichts, was sich zwischen <code>&lt;?php</code> und <code>?&gt;</code> befindet, wenn du nicht weisst, was du tust!"
 
 #: ..\..\..\admin\b2template.php:90
 msgid "update template !"
 msgstr "Vorlage aktualisieren !"
 
 #: ..\..\..\admin\b2template.php:94
-msgid ""
-"(you cannot update that file/template: must make it writable, e.g. CHMOD 766)"
-msgstr ""
-"(du kannst diese Datei/Vorlage nicht aktualisieren: musst es schreibbar "
-"machen, zB CHMOD 766)"
+msgid "(you cannot update that file/template: must make it writable, e.g. CHMOD 766)"
+msgstr "(du kannst diese Datei/Vorlage nicht aktualisieren: musst es schreibbar machen, zB CHMOD 766)"
 
 #: ..\..\..\admin\b2template.php:106
-msgid ""
-"This screen allows you to edit the <strong>custom skin</strong> (located "
-"under /skins/custom)."
-msgstr ""
-"Diese Seite erlaubt dir, das <strong>Custom Skin</strong> zu editieren "
-"(liegt im Verzeichnis /skins/custom)."
+msgid "This screen allows you to edit the <strong>custom skin</strong> (located under /skins/custom)."
+msgstr "Diese Seite erlaubt dir, das <strong>Custom Skin</strong> zu editieren (liegt im Verzeichnis /skins/custom)."
 
 #: ..\..\..\admin\b2template.php:107
-msgid ""
-"You can edit any of the following files (provided it's writable by the "
-"server, e.g. CHMOD 766)"
-msgstr ""
-"Du kannst jede der folgenden Dateien &auml;ndern (vorausgesetzt, es ist "
-"schreibbar vom Server, zB CHMOD 766)"
+msgid "You can edit any of the following files (provided it's writable by the server, e.g. CHMOD 766)"
+msgstr "Du kannst jede der folgenden Dateien &auml;ndern (vorausgesetzt, es ist schreibbar vom Server, zB CHMOD 766)"
 
 #: ..\..\..\admin\b2template.php:124
 msgid "This is the template that displays the links to the archives for a blog"
 msgstr "Diese Vorlage zeigt die Links zu den Archiven f&uuml;r ein Blog"
 
 #: ..\..\..\admin\b2template.php:127
-msgid ""
-"This is the template that displays the (recursive) list of (sub)categories"
+msgid "This is the template that displays the (recursive) list of (sub)categories"
 msgstr "Diese Vorlage zeigt die (rekursive) Liste der (Unter-)Kategorien"
 
 #: ..\..\..\admin\b2template.php:130
@@ -1231,14 +1309,8 @@ msgid "This is the page displayed in the trackback popup"
 msgstr "Diese Seite wird im Trackback-Popup angezeigt"
 
 #: ..\..\..\admin\b2template.php:158
-msgid ""
-"Note: of course, you can also edit the files/templates in your text editor "
-"and upload them. This online editor is only meant to be used when you don't "
-"have access to a text editor..."
-msgstr ""
-"Beachte: nat&uuml;rlich kannst du die Dateien/Vorlagen auch im Texteditor "
-"bearbeiten und sie hochladen. Dieser Onlineeditor ist nur f&uuml;r den Fall "
-"gedacht, wenn du keinen Zugriff auf einen Texteditor hast..."
+msgid "Note: of course, you can also edit the files/templates in your text editor and upload them. This online editor is only meant to be used when you don't have access to a text editor..."
+msgstr "Beachte: nat&uuml;rlich kannst du die Dateien/Vorlagen auch im Texteditor bearbeiten und sie hochladen. Dieser Onlineeditor ist nur f&uuml;r den Fall gedacht, wenn du keinen Zugriff auf einen Texteditor hast..."
 
 #: ..\..\..\admin\b2upload.php:16
 msgid "The admin disabled this function"
@@ -1261,7 +1333,8 @@ msgstr "Erlaubte Dateitypen:"
 msgid "Maximum allowed file size: %d KB"
 msgstr "Maximal erlaubte Dateigr&ouml;sse: %d KB"
 
-#: ..\..\..\admin\b2upload.php:114 ..\..\..\admin\b2upload.php:189
+#: ..\..\..\admin\b2upload.php:114
+#: ..\..\..\admin\b2upload.php:189
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -1274,7 +1347,8 @@ msgstr "Hochladen !"
 msgid "File %s: type %s is not allowed."
 msgstr "Datei %s: Typ %s ist nicht erlaubt."
 
-#: ..\..\..\admin\b2upload.php:174 ..\..\..\admin\b2upload.php:204
+#: ..\..\..\admin\b2upload.php:174
+#: ..\..\..\admin\b2upload.php:204
 #: ..\..\..\admin\b2upload.php:207
 msgid "Couldn't upload your file to:"
 msgstr "Konnte Datei nicht hochladen. Zielverzeichnis:"
@@ -1322,8 +1396,10 @@ msgstr "Hier ist der Code, um es anzuzeigen:"
 msgid "Image Details"
 msgstr "Bilddetails"
 
-#: ..\..\..\admin\b2upload.php:231 ..\..\..\admin\_edit_form.php:123
-#: ..\..\..\admin\_edit_showposts.php:229 ..\..\..\admin\_user_list.php:14
+#: ..\..\..\admin\b2upload.php:231
+#: ..\..\..\admin\_edit_form.php:123
+#: ..\..\..\admin\_edit_showposts.php:229
+#: ..\..\..\admin\_user_list.php:14
 #: ..\..\..\skins\_feedback.php:154
 msgid "Name"
 msgstr "Name"
@@ -1332,7 +1408,8 @@ msgstr "Name"
 msgid "Size"
 msgstr "Gr&ouml;&szlig;e"
 
-#: ..\..\..\admin\b2upload.php:237 ..\..\..\admin\_edit_form.php:354
+#: ..\..\..\admin\b2upload.php:237
+#: ..\..\..\admin\_edit_form.php:354
 msgid "Type"
 msgstr "Typ"
 
@@ -1344,17 +1421,22 @@ msgstr "Schliesse dieses Fenster"
 msgid "Adding new post..."
 msgstr "Neuen Eintrag hinzuf&uuml;gen..."
 
-#: ..\..\..\admin\edit_actions.php:72 ..\..\..\admin\edit_actions.php:177
-#: ..\..\..\admin\edit_actions.php:347 ..\..\..\htsrv\comment_post.php:45
-#: ..\..\..\htsrv\trackback.php:60 ..\..\..\xmlsrv\xmlrpc.php:1197
+#: ..\..\..\admin\edit_actions.php:72
+#: ..\..\..\admin\edit_actions.php:177
+#: ..\..\..\admin\edit_actions.php:347
+#: ..\..\..\htsrv\comment_post.php:45
+#: ..\..\..\htsrv\trackback.php:60
+#: ..\..\..\xmlsrv\xmlrpc.php:1197
 msgid "Supplied URL is invalid: "
 msgstr "Angegebene URL ist ung&uuml;ltig:"
 
-#: ..\..\..\admin\edit_actions.php:76 ..\..\..\htsrv\getmail.php:238
+#: ..\..\..\admin\edit_actions.php:76
+#: ..\..\..\htsrv\getmail.php:238
 msgid "Cannot post, please correct these errors:"
 msgstr "Kann nicht gepostet werden, bitte korrigiere diese Fehler:"
 
-#: ..\..\..\admin\edit_actions.php:77 ..\..\..\admin\edit_actions.php:182
+#: ..\..\..\admin\edit_actions.php:77
+#: ..\..\..\admin\edit_actions.php:182
 #: ..\..\..\admin\edit_actions.php:352
 msgid "Back to post editing"
 msgstr "Zur&uuml;ck zum Editieren des Eintr&auml;ge"
@@ -1363,31 +1445,31 @@ msgstr "Zur&uuml;ck zum Editieren des Eintr&auml;ge"
 msgid "Recording post..."
 msgstr "Eintrag wird aufgezeichnet..."
 
-#: ..\..\..\admin\edit_actions.php:93 ..\..\..\admin\edit_actions.php:281
+#: ..\..\..\admin\edit_actions.php:93
+#: ..\..\..\admin\edit_actions.php:281
 msgid "Sleeping..."
 msgstr "Pausiere..."
 
-#: ..\..\..\admin\edit_actions.php:103 ..\..\..\admin\edit_actions.php:220
-msgid ""
-"Post not publicly published: skipping trackback, pingback and blog pings..."
-msgstr ""
-"Eintrag wird nicht ver&ouml;ffentlicht: &uuml;berspringe Trackbacks, "
-"Pingbacks und Pings zu anderen Blogs..."
+#: ..\..\..\admin\edit_actions.php:103
+#: ..\..\..\admin\edit_actions.php:220
+msgid "Post not publicly published: skipping trackback, pingback and blog pings..."
+msgstr "Eintrag wird nicht ver&ouml;ffentlicht: &uuml;berspringe Trackbacks, Pingbacks und Pings zu anderen Blogs..."
 
-#: ..\..\..\admin\edit_actions.php:131 ..\..\..\admin\edit_actions.php:248
+#: ..\..\..\admin\edit_actions.php:131
+#: ..\..\..\admin\edit_actions.php:248
 msgid "Posting Done..."
 msgstr "Eintragung beendet..."
 
 #: ..\..\..\admin\edit_actions.php:142
-#, fuzzy
 msgid "Updating post..."
-msgstr "L&ouml;sche Eintrag..."
+msgstr "Aktualisiere Eintrag..."
 
 #: ..\..\..\admin\edit_actions.php:236
 msgid "Post had already pinged: skipping blog pings..."
 msgstr "Eintrag wurde bereits gepingt: &uuml;berspringe Pings f&uuml;rs Blog"
 
-#: ..\..\..\admin\edit_actions.php:259 ..\..\..\admin\edit_actions.php:275
+#: ..\..\..\admin\edit_actions.php:259
+#: ..\..\..\admin\edit_actions.php:275
 msgid "Deleting post..."
 msgstr "L&ouml;sche Eintrag..."
 
@@ -1418,9 +1500,7 @@ msgstr "Zur&uuml;ck zu den Eintr&auml;gen!"
 
 #: ..\..\..\admin\edit_actions.php:379
 msgid "You may also want to generate static pages or view your blogs..."
-msgstr ""
-"Du m&ouml;chtest eventuell auch statische Seiten generieren oder Deine Blogs "
-"anschauen..."
+msgstr "Du m&ouml;chtest eventuell auch statische Seiten generieren oder Deine Blogs anschauen..."
 
 #: ..\..\..\admin\edit_actions.php:387
 msgid "New post"
@@ -1434,7 +1514,8 @@ msgstr "Neues Blog erstellen!"
 msgid "Update blog!"
 msgstr "Blog aktualisieren!"
 
-#: ..\..\..\admin\_blogs_form.php:25 ..\..\..\admin\_blogs_list.php:14
+#: ..\..\..\admin\_blogs_form.php:25
+#: ..\..\..\admin\_blogs_list.php:14
 msgid "Full Name"
 msgstr "Voller Name"
 
@@ -1464,14 +1545,14 @@ msgstr "Schl&uuml;sselw&ouml;rter"
 
 #: ..\..\..\admin\_blogs_form.php:49
 msgid "This is is used in meta tag keywords. NO HTML!"
-msgstr ""
-"Dies wird f&uuml; Meta-Tag Schl&uuml;sselw&ouml;rter verwendet. KEIN HTML!"
+msgstr "Dies wird f&uuml; Meta-Tag Schl&uuml;sselw&ouml;rter verwendet. KEIN HTML!"
 
 #: ..\..\..\admin\_blogs_form.php:53
 msgid "Long Description"
 msgstr "Lange Beschreibung"
 
-#: ..\..\..\admin\_blogs_form.php:55 ..\..\..\admin\_blogs_form.php:61
+#: ..\..\..\admin\_blogs_form.php:55
+#: ..\..\..\admin\_blogs_form.php:61
 msgid "This is displayed on the blog template."
 msgstr "Dies wird in der Blogvorlage angezeigt."
 
@@ -1484,62 +1565,34 @@ msgid "Blog Folder URL"
 msgstr "Blog Ordner URL"
 
 #: ..\..\..\admin\_blogs_form.php:72
-msgid ""
-"This is the URL to the directory where the <em>Stub filename</em> and "
-"<em>Static filename</em> files live. No trailing slash. (If you don't know, "
-"leave this field empty.)"
-msgstr ""
-"Dies ist der URL zum Verzeichnis, wo sich <em>&quot;Stub&quot;-Datei</em> "
-"und <em>Statische Datei</em> befinden. Kein Slash am Ende. (Falls du dir "
-"nicht sicher bist, lass dieses Feld leer.)"
+msgid "This is the URL to the directory where the <em>Stub filename</em> and <em>Static filename</em> files live. No trailing slash. (If you don't know, leave this field empty.)"
+msgstr "Dies ist der URL zum Verzeichnis, wo sich <em>&quot;Stub&quot;-Datei</em> und <em>Statische Datei</em> befinden. Kein Slash am Ende. (Falls du dir nicht sicher bist, lass dieses Feld leer.)"
 
-#: ..\..\..\admin\_blogs_form.php:76 ..\..\..\admin\_blogs_list.php:15
+#: ..\..\..\admin\_blogs_form.php:76
+#: ..\..\..\admin\_blogs_list.php:15
 msgid "Stub Filename"
 msgstr "&quot;Stub&quot;-Dateiname"
 
 #: ..\..\..\admin\_blogs_form.php:78
-msgid ""
-"This is the <strong>file</strong>name of the main file (e-g: blog_b.php) "
-"used to display this blog. This is used mainly for static page generation, "
-"but setting this incorrectly may also cause navigation to fail."
-msgstr ""
-"Dies ist der <strong>Datei</strong>name der Hauptdatei (zB blog_b.php), die "
-"das Blog anzeigt. Dies wird haupts&auml;chlich zur Generierung der "
-"statischen Seite benutzt, aber durch falsche Angabe kann auch die Navigation "
-"fehlschlagen."
+msgid "This is the <strong>file</strong>name of the main file (e-g: blog_b.php) used to display this blog. This is used mainly for static page generation, but setting this incorrectly may also cause navigation to fail."
+msgstr "Dies ist der <strong>Datei</strong>name der Hauptdatei (zB blog_b.php), die das Blog anzeigt. Dies wird haupts&auml;chlich zur Generierung der statischen Seite benutzt, aber durch falsche Angabe kann auch die Navigation fehlschlagen."
 
 #: ..\..\..\admin\_blogs_form.php:82
 msgid "Stub Urlname"
 msgstr "&quot;Stub&quot;-URL-Name"
 
 #: ..\..\..\admin\_blogs_form.php:84
-msgid ""
-"This is the <strong>url</strong>name of the main file (e-g: blog_b.php) used "
-"to display this blog. A typical setting would be setting this to your "
-"Filename without the .php extension, if your webserver supports this. "
-"<strong>If you are not sure how to set this, use the same as Stub Filename.</"
-"strong> This is used by permalinks, trackback, pingback, etc. Setting this "
-"incorrectly may cause these to fail."
-msgstr ""
-"Dies ist der <strong>URL</strong>name der Hauptdatei (zB blog_b.php), die "
-"das Blog anzeigt. Eine typische Einstellung w&auml;re die Angabe des "
-"Dateinamen, ohne die .php Dateiendung, falls dein Webserver das unterst&uuml;"
-"tzt. <strong>Falls du nicht weisst, was du angibst, nimm das gleiche wie "
-"beim &quot;Stub&quot;-Dateinamen.</strong> Dies wird von Permalinks, "
-"Trackbacks, Pingbacks etc genutzt. Eine falsche Einstellung kann zum "
-"Fehlschlagen ebendieser Funktionen f&uuml;hren."
+msgid "This is the <strong>url</strong>name of the main file (e-g: blog_b.php) used to display this blog. A typical setting would be setting this to your Filename without the .php extension, if your webserver supports this. <strong>If you are not sure how to set this, use the same as Stub Filename.</strong> This is used by permalinks, trackback, pingback, etc. Setting this incorrectly may cause these to fail."
+msgstr "Dies ist der <strong>URL</strong>name der Hauptdatei (zB blog_b.php), die das Blog anzeigt. Eine typische Einstellung w&auml;re die Angabe des Dateinamen, ohne die .php Dateiendung, falls dein Webserver das unterst&uuml;tzt. <strong>Falls du nicht weisst, was du angibst, nimm das gleiche wie beim &quot;Stub&quot;-Dateinamen.</strong> Dies wird von Permalinks, Trackbacks, Pingbacks etc genutzt. Eine falsche Einstellung kann zum Fehlschlagen ebendieser Funktionen f&uuml;hren."
 
-#: ..\..\..\admin\_blogs_form.php:88 ..\..\..\admin\_blogs_list.php:17
+#: ..\..\..\admin\_blogs_form.php:88
+#: ..\..\..\admin\_blogs_list.php:17
 msgid "Static Filename"
 msgstr "Statischer Dateiname"
 
 #: ..\..\..\admin\_blogs_form.php:90
-msgid ""
-"This is the filename that will be used when you generate a static (.html) "
-"version of the blog homepage."
-msgstr ""
-"Dieser Dateiname wird benutzt, wenn eine statische (.html) Version der Blog "
-"Hauptseite generiert wird."
+msgid "This is the filename that will be used when you generate a static (.html) version of the blog homepage."
+msgstr "Dieser Dateiname wird benutzt, wenn eine statische (.html) Version der Blog Hauptseite generiert wird."
 
 #: ..\..\..\admin\_blogs_list.php:16
 msgid "Stub URLname"
@@ -1558,7 +1611,8 @@ msgstr "Gen!"
 msgid "Create new blog !"
 msgstr "Neues Blog erstellen !"
 
-#: ..\..\..\admin\_edit_form.php:97 ..\..\..\admin\_quicktags.php:188
+#: ..\..\..\admin\_edit_form.php:97
+#: ..\..\..\admin\_quicktags.php:188
 msgid "Title"
 msgstr "Titel"
 
@@ -1610,7 +1664,8 @@ msgstr "Rechtschreibpr&uuml;fung"
 msgid "Upload a file/image"
 msgstr "Datei/Bild hochladen"
 
-#: ..\..\..\admin\_edit_form.php:243 ..\..\..\admin\_edit_form.php:355
+#: ..\..\..\admin\_edit_form.php:243
+#: ..\..\..\admin\_edit_form.php:355
 #: ..\..\..\admin\_edit_showposts.php:128
 msgid "Status"
 msgstr "Status"
@@ -1619,48 +1674,47 @@ msgstr "Status"
 msgid "The post will be publicly published"
 msgstr "Der Eintrag wird &ouml;ffentlich ver&ouml;ffentlicht"
 
-#: ..\..\..\admin\_edit_form.php:245 ..\..\..\admin\_edit_showposts.php:316
+#: ..\..\..\admin\_edit_form.php:245
+#: ..\..\..\admin\_edit_showposts.php:316
 msgid "Published (Public)"
 msgstr "Ver&ouml;ffentlicht (&ouml;ffentlich)"
 
 #: ..\..\..\admin\_edit_form.php:247
 msgid "The post will be published but visible only by logged-in team members"
-msgstr ""
-"Der Eintrag wird ver&ouml;ffentlicht, aber ist nur f&uuml;r eingeloggte "
-"Mitglieder sichtbar"
+msgstr "Der Eintrag wird ver&ouml;ffentlicht, aber ist nur f&uuml;r eingeloggte Mitglieder sichtbar"
 
-#: ..\..\..\admin\_edit_form.php:247 ..\..\..\admin\_edit_showposts.php:318
+#: ..\..\..\admin\_edit_form.php:247
+#: ..\..\..\admin\_edit_showposts.php:318
 msgid "Protected (Members only)"
 msgstr "Gesch&uuml;tzt (nur Mitglieder)"
 
 #: ..\..\..\admin\_edit_form.php:249
 msgid "The post will be published but visible only by yourself"
-msgstr ""
-"Der Eintrag wird ver&ouml;ffentlicht, aber ist nur f&uuml;r dich sichtbar."
+msgstr "Der Eintrag wird ver&ouml;ffentlicht, aber ist nur f&uuml;r dich sichtbar."
 
-#: ..\..\..\admin\_edit_form.php:249 ..\..\..\admin\_edit_showposts.php:320
+#: ..\..\..\admin\_edit_form.php:249
+#: ..\..\..\admin\_edit_showposts.php:320
 msgid "Private (You only)"
 msgstr "Privat (nur du)"
 
-#: ..\..\..\admin\_edit_form.php:251 ..\..\..\admin\_edit_form.php:253
+#: ..\..\..\admin\_edit_form.php:251
+#: ..\..\..\admin\_edit_form.php:253
 msgid "The post will appear only in the backoffice"
 msgstr "Der Eintrag wird nur im Back-Office erscheinen"
 
-#: ..\..\..\admin\_edit_form.php:251 ..\..\..\admin\_edit_showposts.php:322
+#: ..\..\..\admin\_edit_form.php:251
+#: ..\..\..\admin\_edit_showposts.php:322
 msgid "Draft (Not published!)"
 msgstr "Entwurf (nicht ver&ouml;ffentlicht!)"
 
-#: ..\..\..\admin\_edit_form.php:253 ..\..\..\admin\_edit_showposts.php:324
+#: ..\..\..\admin\_edit_form.php:253
+#: ..\..\..\admin\_edit_showposts.php:324
 msgid "Deprecated (Not published!)"
 msgstr "Missbilligt (nicht ver&ouml;ffentlicht!)"
 
 #: ..\..\..\admin\_edit_form.php:262
-msgid ""
-"Select main category in target blog and optionnaly check addtionnal "
-"categories"
-msgstr ""
-"W&auml;hle Hauptkategorie im Ziel-Blog und markiere optional weitere "
-"Kategorien"
+msgid "Select main category in target blog and optionnaly check addtionnal categories"
+msgstr "W&auml;hle Hauptkategorie im Ziel-Blog und markiere optional weitere Kategorien"
 
 #: ..\..\..\admin\_edit_form.php:284
 msgid "Select as an additionnal category"
@@ -1676,14 +1730,11 @@ msgstr "Beachte: Quer-Eintr&auml;ge in mehrere Blogs sind m&ouml;glich."
 
 #: ..\..\..\admin\_edit_form.php:335
 msgid "Note: Cross posting among multiple blogs is currently disabled."
-msgstr ""
-"Beachte: Quer-Eintr&auml;ge in mehrere Blogs sind derzeit nicht m&ouml;glich."
+msgstr "Beachte: Quer-Eintr&auml;ge in mehrere Blogs sind derzeit nicht m&ouml;glich."
 
 #: ..\..\..\admin\_edit_form.php:337
 msgid "Note: Cross posting among multiple categories is currently disabled."
-msgstr ""
-"Beachte: Quer-Eintr&auml;ge in mehrere Kategorien ist derzeit nicht m&ouml;"
-"glich."
+msgstr "Beachte: Quer-Eintr&auml;ge in mehrere Kategorien ist derzeit nicht m&ouml;glich."
 
 #: ..\..\..\admin\_edit_form.php:353
 msgid "Comment info"
@@ -1748,11 +1799,11 @@ msgstr "Editieren"
 
 #: ..\..\..\admin\_edit_showposts.php:154
 msgid ""
-"You are about to delete this post!\\n\\'Cancel\\' to stop, \\'OK\\' to "
-"delete."
+"You are about to delete this post!\\n"
+"\\'Cancel\\' to stop, \\'OK\\' to delete."
 msgstr ""
-"Du bist dabei, diesen Eintrag zu l&ouml;schen!\\n\\'Stopp\\' um abzubrechen, "
-"\\'OK\\' um zu l&ouml;schen."
+"Du bist dabei, diesen Eintrag zu l&ouml;schen!\\n"
+"\\'Stopp\\' um abzubrechen, \\'OK\\' um zu l&ouml;schen."
 
 #  TRANS: Link to comments for current post
 #. TRANS: Link to comments for current post
@@ -1791,17 +1842,18 @@ msgstr "% Pingbacks"
 msgid "Permanent link to this post"
 msgstr "Permanenter Link zu diesem Eintrag"
 
-#: ..\..\..\admin\_edit_showposts.php:177 ..\..\..\skins\_feedback.php:43
+#: ..\..\..\admin\_edit_showposts.php:177
+#: ..\..\..\skins\_feedback.php:43
 msgid "Comments"
 msgstr "Kommentare"
 
 #: ..\..\..\admin\_edit_showposts.php:204
 msgid ""
-"You are about to delete this comment!\\n\\'Cancel\\' to stop, \\'OK\\' to "
-"delete."
+"You are about to delete this comment!\\n"
+"\\'Cancel\\' to stop, \\'OK\\' to delete."
 msgstr ""
-"Du bist dabei, diesen Kommentar zu l&ouml;schen!\\n\\'Stopp\\' um "
-"abzubrechen, \\'OK\\' um zu l&ouml;schen."
+"Du bist dabei, diesen Kommentar zu l&ouml;schen!\\n"
+"\\'Stopp\\' um abzubrechen, \\'OK\\' um zu l&ouml;schen."
 
 #: ..\..\..\admin\_edit_showposts.php:220
 #: ..\..\..\b2evocore\_functions_comments.php:149
@@ -1809,27 +1861,33 @@ msgstr ""
 msgid "Leave a comment"
 msgstr "Hinterlasse einen Kommentar"
 
-#: ..\..\..\admin\_edit_showposts.php:237 ..\..\..\skins\_feedback.php:162
+#: ..\..\..\admin\_edit_showposts.php:237
+#: ..\..\..\skins\_feedback.php:162
 msgid "Your email address will <strong>not</strong> be displayed on this site."
 msgstr "Deine EMail-Adresse wird <strong>nicht</strong> angezeigt."
 
-#: ..\..\..\admin\_edit_showposts.php:242 ..\..\..\skins\_feedback.php:167
+#: ..\..\..\admin\_edit_showposts.php:242
+#: ..\..\..\skins\_feedback.php:167
 msgid "Site/Url"
 msgstr "Seite/URL"
 
-#: ..\..\..\admin\_edit_showposts.php:244 ..\..\..\skins\_feedback.php:169
+#: ..\..\..\admin\_edit_showposts.php:244
+#: ..\..\..\skins\_feedback.php:169
 msgid "Your URL will be displayed."
 msgstr "Deine URL wird angezeigt."
 
-#: ..\..\..\admin\_edit_showposts.php:249 ..\..\..\skins\_feedback.php:174
+#: ..\..\..\admin\_edit_showposts.php:249
+#: ..\..\..\skins\_feedback.php:174
 msgid "Comment text"
 msgstr "Kommentartext"
 
-#: ..\..\..\admin\_edit_showposts.php:251 ..\..\..\skins\_feedback.php:176
+#: ..\..\..\admin\_edit_showposts.php:251
+#: ..\..\..\skins\_feedback.php:176
 msgid "Allowed XHTML tags"
 msgstr "Erlaubte XHTML Tags"
 
-#: ..\..\..\admin\_edit_showposts.php:251 ..\..\..\skins\_feedback.php:177
+#: ..\..\..\admin\_edit_showposts.php:251
+#: ..\..\..\skins\_feedback.php:177
 msgid "URLs, email, AIM and ICQs will be converted automatically."
 msgstr "URLs, EMail, AIM und ICQs werden automatisch konvertiert."
 
@@ -1837,7 +1895,8 @@ msgstr "URLs, EMail, AIM und ICQs werden automatisch konvertiert."
 msgid "(Line breaks become &lt;br&gt;)"
 msgstr "(Zeilenumbr&uuml;che werden zu &lt;br&gt;)"
 
-#: ..\..\..\admin\_edit_showposts.php:265 ..\..\..\skins\_feedback.php:195
+#: ..\..\..\admin\_edit_showposts.php:265
+#: ..\..\..\skins\_feedback.php:195
 msgid "Send comment"
 msgstr "Kommentar senden"
 
@@ -1906,8 +1965,10 @@ msgstr "Kats"
 msgid "Templates"
 msgstr "Vorlagen"
 
-#: ..\..\..\admin\_menutop.php:80 ..\..\..\locales\puttenv.php:18
-#: ..\..\..\locales\puttenv.php:23 ..\..\..\locales\puttenv.php:29
+#: ..\..\..\admin\_menutop.php:80
+#: ..\..\..\locales\puttenv.php:18
+#: ..\..\..\locales\puttenv.php:23
+#: ..\..\..\locales\puttenv.php:29
 msgid "Users"
 msgstr "Benutzer"
 
@@ -1992,21 +2053,19 @@ msgstr "Login "
 #. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_user_list.php:45
 msgid ""
-"Are you sure you want to delete this user?\\nWarning: all his posts will be "
-"deleted too!"
+"Are you sure you want to delete this user?\\n"
+"Warning: all his posts will be deleted too!"
 msgstr ""
-"Willst du wirklich diesen Benutzer l&ouml;schen?\\nWarnung: alle seine "
-"Eintr&auml;ge werden auch gel&ouml;scht!!"
+"Willst du wirklich diesen Benutzer l&ouml;schen?\\n"
+"Warnung: alle seine Eintr&auml;ge werden auch gel&ouml;scht!!"
 
 #: ..\..\..\b2evocore\_blog_main.php:181
 msgid " (default skin)"
-msgstr ""
+msgstr " (Standard Skin)"
 
 #: ..\..\..\b2evocore\_blog_main.php:182
 #, php-format
-msgid ""
-"The requested skin [%s] does not exist. The blog cannot be displayed. "
-"Contact the <a %s>webmaster</a>..."
+msgid "The requested skin [%s] does not exist. The blog cannot be displayed. Contact the <a %s>webmaster</a>..."
 msgstr ""
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:112
@@ -2041,7 +2100,8 @@ msgstr "Ung&uuml;ltiger URL gefunden:"
 msgid "Tag %s may not contain raw character data"
 msgstr "Tag %s darf keine &quot;rohen&quot; Daten enthalten"
 
-#: ..\..\..\b2evocore\_class_pop3.php:81 ..\..\..\b2evocore\_class_pop3.php:89
+#: ..\..\..\b2evocore\_class_pop3.php:81
+#: ..\..\..\b2evocore\_class_pop3.php:89
 #: ..\..\..\b2evocore\_class_pop3.php:101
 msgid "POP3 connect:"
 msgstr "POP3 connect:"
@@ -2309,9 +2369,7 @@ msgstr "Kann nicht l&ouml;schen, wenn Unterkategorien enthalten sind!"
 
 #: ..\..\..\b2evocore\_functions_cats.php:146
 msgid "Cannot delete last category if there are posts inside!"
-msgstr ""
-"Letzte Kategorie kann nicht gel&ouml;scht werden, wenn Eintr&auml;ge darin "
-"enthalten sind!"
+msgstr "Letzte Kategorie kann nicht gel&ouml;scht werden, wenn Eintr&auml;ge darin enthalten sind!"
 
 #: ..\..\..\b2evocore\_functions_cats.php:252
 #, php-format
@@ -2428,9 +2486,7 @@ msgstr "Keinen Pingback-Server in Header- und Content-Daten gefunden"
 #: ..\..\..\b2evocore\_functions_pingback.php:178
 #: ..\..\..\b2evocore\_functions_pingback.php:179
 msgid "Pingback server URL is empty (may be an internal PHP fgets error)"
-msgstr ""
-"Die URL des Pingback-Servers fehlt (k&ouml;nnte ein interner PHP fgets "
-"Fehler sein)"
+msgstr "Die URL des Pingback-Servers fehlt (k&ouml;nnte ein interner PHP fgets Fehler sein)"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:184
 msgid "Pingback server data"
@@ -2793,9 +2849,8 @@ msgid "French"
 msgstr "Franz&ouml;sisch"
 
 #: ..\..\..\conf\_locales.php:25
-#, fuzzy
 msgid "German"
-msgstr "Permalink"
+msgstr "Deutsch"
 
 #: ..\..\..\conf\_locales.php:26
 msgid "Japanese"
@@ -2845,7 +2900,8 @@ msgstr "Kann Kommentar nicht verarbeiten, bitte korrigiere diese Fehler:"
 msgid "Back to comment editing"
 msgstr "Zur&uuml;ck zum Kommentar editieren"
 
-#: ..\..\..\htsrv\comment_post.php:93 ..\..\..\htsrv\comment_post.php:97
+#: ..\..\..\htsrv\comment_post.php:93
+#: ..\..\..\htsrv\comment_post.php:97
 #, php-format
 msgid "New comment on your post #%d \"%s\""
 msgstr "Neuer Kommentar zu deinem Eintrag #%d \"%s\""
@@ -2854,7 +2910,8 @@ msgstr "Neuer Kommentar zu deinem Eintrag #%d \"%s\""
 msgid "Author"
 msgstr "Autor"
 
-#: ..\..\..\htsrv\comment_post.php:101 ..\..\..\htsrv\trackback.php:99
+#: ..\..\..\htsrv\comment_post.php:101
+#: ..\..\..\htsrv\trackback.php:99
 #: ..\..\..\xmlsrv\xmlrpc.php:1223
 msgid "Url"
 msgstr "URL"
@@ -2863,7 +2920,8 @@ msgstr "URL"
 msgid "Comment"
 msgstr "Kommentar"
 
-#: ..\..\..\htsrv\comment_post.php:103 ..\..\..\htsrv\trackback.php:101
+#: ..\..\..\htsrv\comment_post.php:103
+#: ..\..\..\htsrv\trackback.php:101
 #: ..\..\..\xmlsrv\xmlrpc.php:1225
 msgid "Edit/Delete"
 msgstr "Edit/L&ouml;schen"
@@ -2941,11 +2999,13 @@ msgstr "Level 0 Benutzer d&uuml;rfen nicht posten."
 msgid "OK."
 msgstr "OK."
 
-#: ..\..\..\htsrv\login.php:65 ..\..\..\htsrv\login.php:87
+#: ..\..\..\htsrv\login.php:65
+#: ..\..\..\htsrv\login.php:87
 msgid "The email was sent successfully to your email address."
 msgstr "Die EMail wurde erfolgreich an Deine EMail-Adresse geschickt."
 
-#: ..\..\..\htsrv\login.php:66 ..\..\..\htsrv\login.php:88
+#: ..\..\..\htsrv\login.php:66
+#: ..\..\..\htsrv\login.php:88
 msgid "Click here to login !"
 msgstr "Klicke hier, um einzuloggen !"
 
@@ -2963,15 +3023,14 @@ msgstr "Die EMail konnte nicht gesendet werden."
 
 #: ..\..\..\htsrv\login.php:83
 msgid "Possible reason: your host may have disabled the mail() function...</p>"
-msgstr ""
-"M&ouml;gliche Ursache: dein Host k&ouml;nnte die mail() Funktion abgestellt "
-"haben...</p>"
+msgstr "M&ouml;gliche Ursache: dein Host k&ouml;nnte die mail() Funktion abgestellt haben...</p>"
 
 #: ..\..\..\htsrv\login.php:99
 msgid "Note: You are already logged in!"
 msgstr "Beachte: Du bist schon eingeloggt!"
 
-#: ..\..\..\htsrv\profile_update.php:31 ..\..\..\skins\_profile.php:16
+#: ..\..\..\htsrv\profile_update.php:31
+#: ..\..\..\skins\_profile.php:16
 msgid "You are not logged in."
 msgstr "Du bist nicht angemeldet."
 
@@ -2979,8 +3038,10 @@ msgstr "Du bist nicht angemeldet."
 msgid "You are not logged in under the same account you are trying to modify."
 msgstr "Du bist nicht unter dem Account eingeloggt, den du &auml;ndern willst."
 
-#: ..\..\..\htsrv\profile_update.php:41 ..\..\..\htsrv\profile_update.php:47
-#: ..\..\..\htsrv\profile_update.php:56 ..\..\..\htsrv\profile_update.php:64
+#: ..\..\..\htsrv\profile_update.php:41
+#: ..\..\..\htsrv\profile_update.php:47
+#: ..\..\..\htsrv\profile_update.php:56
+#: ..\..\..\htsrv\profile_update.php:64
 #: ..\..\..\htsrv\profile_update.php:69
 msgid "Back to profile"
 msgstr "Zur&uuml;ck zum Profil"
@@ -2993,25 +3054,24 @@ msgstr "bitte gib deinen Nicknamen ein (kann der selbe wie dein Login sein)"
 msgid "your ICQ UIN can only be a number, no letters allowed"
 msgstr "Deine ICQ UIN muss eine Nummer sein, keine Buchstaben erlaubt"
 
-#: ..\..\..\htsrv\profile_update.php:64 ..\..\..\htsrv\register.php:56
+#: ..\..\..\htsrv\profile_update.php:64
+#: ..\..\..\htsrv\register.php:56
 msgid "please type your e-mail address"
 msgstr "bitte gib deine EMail-Adresse an"
 
-#: ..\..\..\htsrv\profile_update.php:69 ..\..\..\htsrv\register.php:61
+#: ..\..\..\htsrv\profile_update.php:69
+#: ..\..\..\htsrv\register.php:61
 msgid "the email address is invalid"
 msgstr "die EMail-Adresse ist ung&uuml;ltig"
 
-#: ..\..\..\htsrv\profile_update.php:77 ..\..\..\htsrv\profile_update.php:85
+#: ..\..\..\htsrv\profile_update.php:77
+#: ..\..\..\htsrv\profile_update.php:85
 msgid "you typed your new password only once. Go back to type it twice."
-msgstr ""
-"du hast dein Passwort nur einmal angegeben. Gehe zur&uuml;ck und tipp es "
-"zweimal ein."
+msgstr "du hast dein Passwort nur einmal angegeben. Gehe zur&uuml;ck und tipp es zweimal ein."
 
 #: ..\..\..\htsrv\profile_update.php:89
 msgid "you typed two different passwords. Go back to correct that."
-msgstr ""
-"du hast zwei verschiedene Passw&ouml;rter angegeben. Gehe zur&uuml;ck und "
-"berichtige das."
+msgstr "du hast zwei verschiedene Passw&ouml;rter angegeben. Gehe zur&uuml;ck und berichtige das."
 
 #: ..\..\..\htsrv\register.php:34
 msgid "please enter a Login"
@@ -3029,7 +3089,8 @@ msgstr "bitte tippe das selbe Passwort in die beiden Passwortfelder"
 msgid "this login is already registered, please choose another one"
 msgstr "dieser Login ist schon vergeben, bitte w&auml;hle einen anderen"
 
-#: ..\..\..\htsrv\register.php:91 ..\..\..\htsrv\register.php:95
+#: ..\..\..\htsrv\register.php:91
+#: ..\..\..\htsrv\register.php:95
 msgid "new user registration on your blog"
 msgstr "Neue Benutzeranmeldung f&uuml;r dein Blog"
 
@@ -3037,16 +3098,19 @@ msgstr "Neue Benutzeranmeldung f&uuml;r dein Blog"
 msgid "Manage users"
 msgstr "Benutzer verwalten"
 
-#: ..\..\..\htsrv\trackback.php:92 ..\..\..\htsrv\trackback.php:96
+#: ..\..\..\htsrv\trackback.php:92
+#: ..\..\..\htsrv\trackback.php:96
 #, php-format
 msgid "New trackback on your post #%d \"%s\""
 msgstr "Neuer Trackback zu Deinem Eintrag #%d \"%s\""
 
-#: ..\..\..\htsrv\trackback.php:98 ..\..\..\xmlsrv\xmlrpc.php:1222
+#: ..\..\..\htsrv\trackback.php:98
+#: ..\..\..\xmlsrv\xmlrpc.php:1222
 msgid "Website"
 msgstr "Webseite"
 
-#: ..\..\..\htsrv\trackback.php:100 ..\..\..\xmlsrv\xmlrpc.php:1224
+#: ..\..\..\htsrv\trackback.php:100
+#: ..\..\..\xmlsrv\xmlrpc.php:1224
 msgid "Excerpt"
 msgstr "Auszug"
 
@@ -3054,11 +3118,13 @@ msgstr "Auszug"
 msgid "Login form"
 msgstr "Login Formular"
 
-#: ..\..\..\htsrv\_login_form.php:42 ..\..\..\htsrv\_reg_form.php:27
+#: ..\..\..\htsrv\_login_form.php:42
+#: ..\..\..\htsrv\_reg_form.php:27
 msgid "Password:"
 msgstr "Passwort:"
 
-#: ..\..\..\htsrv\_login_form.php:48 ..\..\..\htsrv\_reg_complete.php:20
+#: ..\..\..\htsrv\_login_form.php:48
+#: ..\..\..\htsrv\_reg_complete.php:20
 msgid "Log in!"
 msgstr "Einloggen!"
 
@@ -3207,7 +3273,8 @@ msgstr "skinne die Seite"
 msgid "archives"
 msgstr "Archive"
 
-#: ..\..\..\skins\bluesky\_main.php:70 ..\..\..\skins\guadeloupe\_main.php:70
+#: ..\..\..\skins\bluesky\_main.php:70
+#: ..\..\..\skins\guadeloupe\_main.php:70
 msgid "Display feedback / Leave a comment"
 msgstr "Zeige Feedback / Hinterlasse einen Kommentar"
 
@@ -3229,12 +3296,15 @@ msgstr "W&auml;hle Skin"
 msgid "Browse all posts by this author"
 msgstr "Zeige alle Eintr&auml;ge dieses Autors"
 
-#: ..\..\..\xmlsrv\rdf.php:41 ..\..\..\xmlsrv\rss.php:27
+#: ..\..\..\xmlsrv\rdf.php:41
+#: ..\..\..\xmlsrv\rss.php:27
 #: ..\..\..\xmlsrv\rss2.php:34
 msgid "[...] Read more!"
 msgstr "[...] Lies mehr!"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1216 ..\..\..\xmlsrv\xmlrpc.php:1220
+#: ..\..\..\xmlsrv\xmlrpc.php:1216
+#: ..\..\..\xmlsrv\xmlrpc.php:1220
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Neuer Pingback zu Deinem Eintrag #%d \"%s\""
+
