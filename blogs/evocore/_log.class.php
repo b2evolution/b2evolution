@@ -117,22 +117,45 @@ class Log
 	 * @param string the level (or container)
 	 * @param string template, where the head/foot gets used (sprintf)
 	 */
-	function getHeadFoot( $headfoot, $level, $template )
+	function getHeadFoot( $headfoot, $level, $template = NULL )
 	{
 		$r = '';
-		if( is_array($headfoot) )
-		{ // Container-Head
-			$r = isset($headfoot[$level]) ? $headfoot[$level] : '';
-		}
-		elseif( !empty($headfoot) && $level == 'container' )
+
+		if( $level == 'container' && is_string($headfoot) )
 		{ // header
 			$r = $headfoot;
 		}
-		if( !empty( $r ) )
-		{
-			return sprintf( $template, $r );
+		elseif( is_array($headfoot) )
+		{ // head or foot for levels
+			if( isset($headfoot[$level]) )
+			{
+				$r = $headfoot[$level];
+			}
+			elseif( isset($headfoot['all']) )
+			{
+				$r = $headfoot['all'];
+			}
+			else
+			{
+				$r = false;
+			}
 		}
-		return false;
+
+		if( empty($r) )
+		{
+			return false;
+		}
+
+		if( strstr( $r, '%s' ) )
+		{
+			$r = sprintf( $r, $level );
+		}
+		elseif( $template !== NULL )
+		{
+			$r = sprintf( $template, $r );
+		}
+
+		return $r;
 	}
 
 
@@ -348,7 +371,12 @@ class Log
 
 
 	/**
-	 * Returns array of messages of that level
+	 * Returns array of messages of a single level or group of levels.
+	 *
+	 * If the level is an array, those levels will be used (where 'all' will
+	 * be translated with the not already processed levels).
+	 * <code>getMessages( array('error', 'note', 'all') )</code> would return
+	 * 'errors', 'notes' and the remaining messages, in that order.
 	 *
 	 * @param string the level
 	 * @param boolean if true will use subarrays for each level
@@ -372,8 +400,22 @@ class Log
 			$level = array( $level );
 		}
 
-		foreach( $level as $llevel )
+		$levelsDone = array();
+
+		while( $llevel = array_shift( $level ) )
 		{
+			if( $llevel == 'all' )
+			{ // Put those levels in queue, which have not been processed already
+				$level = array_merge( array_diff( array_keys( $this->messages ), $levelsDone ), $level );
+				continue;
+			}
+			if( in_array($llevel, $levelsDone ) )
+			{
+				continue;
+			}
+			$levelsDone[] = $llevel;
+
+
 			if( !isset($this->messages[$llevel]) || !count($this->messages[$llevel]) )
 			{
 				continue;
@@ -395,6 +437,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.4  2004/11/05 00:36:43  blueyed
+ * no message
+ *
  * Revision 1.3  2004/10/16 01:31:22  blueyed
  * documentation changes
  *

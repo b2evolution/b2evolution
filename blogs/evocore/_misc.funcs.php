@@ -1216,33 +1216,40 @@ function debug_info( $force = false )
 			echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
 		}
 
-		if( $Debuglog->count( 'all' ) )
-		{
-			echo '<h3>Debug messages</h3>';
-			foreach( $Debuglog->getMessages( 'all' ) as $level => $messages )
+		format_to_output(
+			$Debuglog->display( array( 'container' => '<h3>Debug messages</h3>',
+																	'all' => '<h4>Level [%s]:</h4>' ),
+													'',
+													false,
+													array( 'error', 'all' ),
+													NULL,
+													NULL,
+													'panelblock' ),
+			'htmlbody' );
+		?>
+
+		<div class="panelblock">
+			<h3>DB</h3>
+
+			<?php
+
+			if( !isset($DB) )
 			{
-				echo '<h4>Level ['.$level.']</h4><ul>';
-				foreach( $messages as $message )
-				{
-					echo '<li>', format_to_output( $message, 'htmlbody' ), '</li>';
-				}
-				echo '</ul>';
+				echo 'No DB object.';
 			}
-		}
+			else
+			{
+				echo 'Old style queries: ', $querycount, '<br />';
+				echo 'DB queries: ', $DB->num_queries, '<br />';
 
-		echo '<h3>DB</h3>';
+				$DB->dump_queries();
+			}
 
-		if( !isset($DB) )
-		{
-			echo 'No DB object.';
-		}
-		else
-		{
-			echo 'Old style queries: ', $querycount, '<br />';
-			echo 'DB queries: ', $DB->num_queries, '<br />';
+			?>
 
-			$DB->dump_queries();
-		}
+		</div>
+
+		<?php
 	}
 }
 
@@ -1612,13 +1619,18 @@ function getIconSize( $iconpath, $param = 'widthheight' )
 	else
 	{
 		$Debuglog->add( 'No iconsize for ['.$iconpath.']', 'icons' );
-		return imgsize( $basepath.$iconpath, $param );
+
+		$map_iconsizes[ $iconpath ] = imgsize( $basepath.$iconpath );
+		return getIconSize( $iconpath, $param );
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.8  2004/11/05 00:36:43  blueyed
+ * no message
+ *
  * Revision 1.7  2004/11/03 00:58:02  blueyed
  * update
  *

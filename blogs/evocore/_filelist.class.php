@@ -150,11 +150,11 @@ class Filelist
 
 
 	/**
-	 * loads the filelist entries
+	 * Loads the filelist entries.
 	 *
-	 * @param boolean get recursive size for directories?
+	 * @param boolean use flat mode (all files recursive without directories)
 	 */
-	function load()
+	function load( $flatmode = false )
 	{
 		if( !$this->listpath )
 		{
@@ -165,30 +165,52 @@ class Filelist
 		$this->count_bytes = $this->count_files = $this->count_dirs = 0;
 
 
+		$dirsToAdd = array( $this->listpath );
+		while( $addDir = array_shift( $dirsToAdd ) )
+		{
+			$this->addFilesFromDir( $addDir );
+
+			if( $flatmode )
+			{
+				foreach( $this->entries as $lFile )
+				{
+					if( $lFile->isDir() )
+					{
+						$dirsToAdd[] = $lFile->getPath( true );
+						$this->removeFromList( $lFile );
+					}
+				}
+			}
+		}
+	}
+
+
+	function addFilesFromDir( $path )
+	{
 		if( $this->filterString === NULL || $this->filterIsRegexp )
 		{ // use dir() to access the directory
-			$dir = @dir( $this->listpath );
+			$dir = @dir( $path );
 		}
 		else
 		{ // use glob() to access the directory
 			$oldcwd = getcwd();
-			$dir = @chdir( $this->listpath );
+			$dir = @chdir( $path );
 			if( $dir )
 			{
-				$dir = glob( $this->listpath.$this->filterString, GLOB_BRACE ); // GLOB_BRACE allows {a,b,c} to match a, b or c
+				$dir = glob( $path.$this->filterString, GLOB_BRACE ); // GLOB_BRACE allows {a,b,c} to match a, b or c
 			}
 			chdir( $oldcwd );
 		}
 
 		if( $dir === false )
 		{
-			$this->Messages->add( sprintf( T_('Cannot open directory [%s]!'), $this->listpath ), 'fl_error' );
+			$this->Messages->add( sprintf( T_('Cannot open directory [%s]!'), $path ), 'fl_error' );
 			return false;
 		}
 		else
 		{ // read the directory
 			while( ( ($this->filterString === NULL || $this->filterIsRegexp) && ($entry = $dir->read()) )
-						|| ($this->filterString !== NULL && !$this->filterIsRegexp && ( $entry = each( $dir ) ) && ( $entry = str_replace( $this->listpath, '', $entry[1] ) ) ) )
+						|| ($this->filterString !== NULL && !$this->filterIsRegexp && ( $entry = each( $dir ) ) && ( $entry = str_replace( $path, '', $entry[1] ) ) ) )
 			{
 				if( $entry == '.' || $entry == '..'
 						|| ( !$this->showhidden && substr($entry, 0, 1) == '.' )  // hidden files (prefixed with .)
@@ -198,7 +220,7 @@ class Filelist
 					continue;
 				}
 
-				$this->addFile( $entry );
+				$this->addFile( $path.$entry, true );
 			}
 
 			if( $this->filterString === NULL || $this->filterIsRegexp )
@@ -539,27 +561,37 @@ class Filelist
 
 
 	/**
-	 * Unlinks (deletes) a file
+	 * Unlinks (deletes!) a file.
 	 *
 	 * @param File file object
 	 * @return boolean true on success, false on failure
 	 */
 	function unlink( &$File )
 	{
-		$origFile = $File; // copy!
-
 		if( !($unlinked = $File->unlink()) )
 		{
 			return false;
 		}
 		else
 		{ // remove from list
-			if( ($entryKey = $this->getKeyByName( $File->getName() )) !== false )
-			{
-				unset( $this->entries[$entryKey] );
-			}
+			return $this->removeFromList( $File );
 		}
-		return true;
+	}
+
+
+	/**
+	 * Unsets a {@link File} from the entries list.
+	 *
+	 * @return boolean true on success, false if not found in list.
+	 */
+	function removeFromList( &$File )
+	{
+		if( ($entryKey = $this->getKeyByName( $File->getName() )) !== false )
+		{
+			unset( $this->entries[$entryKey] );
+			return true;
+		}
+		return false;
 	}
 
 
@@ -578,6 +610,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.6  2004/11/05 00:36:43  blueyed
+ * no message
+ *
  * Revision 1.5  2004/11/03 00:58:02  blueyed
  * update
  *

@@ -52,6 +52,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER
  * @author fplanque: François PLANQUE
  * @author Justin VINCENT
  *
@@ -216,6 +217,29 @@ class DB
 		else
 			return $val;
 	}
+
+
+	/**
+	 * Returns the appropriate string to compare $val in a WHERE clause.
+	 *
+	 * @return string Either 'IS NULL', 'IN ("a", "b", "c")' or " = 'a'".
+	 */
+	function compString($val)
+	{
+		if( $val === NULL )
+		{
+			return 'IS NULL';
+		}
+		elseif( is_array($val) )
+		{
+			return 'IN ("'.implode('","', $val).'")';
+		}
+		else
+		{
+			return " = '$root'";
+		}
+	}
+
 
 	/**
 	 * Print SQL/DB error.
@@ -674,6 +698,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.4  2004/11/05 00:36:43  blueyed
+ * no message
+ *
  * Revision 1.3  2004/10/28 11:11:09  fplanque
  * MySQL table options handling
  *

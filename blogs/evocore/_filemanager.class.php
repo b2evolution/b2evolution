@@ -145,12 +145,14 @@ class FileManager extends Filelist
 	 * @param string the URL where the object is included (for generating links)
 	 * @param string the root directory ('user', 'user_X', 'blog_X')
 	 * @param string the dir of the Filemanager object (relative to root)
-	 * @param string filter files by what?
-	 * @param boolean is the filter a regular expression (default is glob pattern)
 	 * @param string order files by what? (NULL means 'name')
 	 * @param boolean order ascending or descending? NULL means ascending for 'name', descending for other
+	 * @param string filter files by what?
+	 * @param boolean is the filter a regular expression (default is glob pattern)
+	 * @param boolean filter in subdirs (search)
 	 */
-	function FileManager( &$cUser, $url, $root, $path = '', $filterString = NULL, $filterIsRegexp = NULL, $order = NULL, $asc = NULL )
+	function FileManager( &$cUser, $url, $root, $path = '', $order = NULL, $asc = NULL,
+												$filterString = NULL, $filterIsRegexp = NULL, $flatmode = NULL )
 	{
 		global $basepath, $baseurl, $media_subdir, $admin_subdir, $admin_url;
 		global $mode;
@@ -287,10 +289,18 @@ class FileManager extends Filelist
 		$this->debug( $this->cwd, 'cwd' );
 		$this->debug( $this->path, 'path' );
 
+		$this->flatmode = (bool)$flatmode;
 
+
+		$this->load();
+	}
+
+
+	function load()
+	{
 		// the directory entries
 		parent::Filelist( $this->cwd );
-		parent::load();
+		parent::load( $this->flatmode );
 		parent::restart();
 
 		$this->debug( $this->entries, 'Filelist' );
@@ -477,16 +487,18 @@ class FileManager extends Filelist
 	 * @param string override mode
 	 * @param string override source
 	 * @param string override keepsource
+	 * @param string override flatmode
 	 * @return string the resulting URL
 	 */
 	function getCurUrl( $root = NULL, $path = NULL, $filterString = NULL,
 											$filterIsRegexp = NULL, $order = NULL, $orderasc = NULL,
-											$mode = NULL, $source = NULL, $keepsource = NULL )
+											$mode = NULL, $source = NULL, $keepsource = NULL,
+											$flatmode = NULL )
 	{
 		$r = $this->url;
 
 		foreach( array('root', 'path', 'filterString', 'filterIsRegexp', 'order',
-										'orderasc', 'mode', 'source', 'keepsource' ) as $check )
+										'orderasc', 'mode', 'source', 'keepsource', 'flatmode' ) as $check )
 		{
 			if( $$check === false )
 			{ // don't include
@@ -511,10 +523,11 @@ class FileManager extends Filelist
 	 */
 	function getFormHiddenInputs( $root = NULL, $path = NULL, $filterString = NULL,
 															$filterIsRegexp = NULL, $order = NULL, $asc = NULL,
-															$mode = NULL, $source = NULL, $keepsource = NULL )
+															$mode = NULL, $source = NULL, $keepsource = NULL,
+															$flatmode = NULL )
 	{
 		// get current Url, remove leading URL and '?'
-		$params = preg_split( '/&amp;/', substr( $this->getCurUrl( $root, $path, $filterString, $filterIsRegexp, $order, $asc, $mode, $source, $keepsource ), strlen( $this->url )+1 ) );
+		$params = preg_split( '/&amp;/', substr( $this->getCurUrl( $root, $path, $filterString, $filterIsRegexp, $order, $asc, $mode, $source, $keepsource, $flatmode ), strlen( $this->url )+1 ) );
 
 		$r = '';
 		foreach( $params as $lparam )
@@ -603,6 +616,36 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Get the path (and name) of a {@link File} relative to the filelists
+	 * root path.
+	 *
+	 * @param File a File object or NULL for current File
+	 * @param boolean appended with name?
+	 * @return string path (and optionally name)
+	 */
+	function getFileSubpath( &$File, $withname = true )
+	{
+		if( $File === NULL )
+		{
+			$File = $this->curFile;
+		}
+
+		$r = $this->path;
+
+		if( $this->flatmode )
+		{
+			$r .= substr( $File->getPath($withname), strlen( $this->cwd ) );
+		}
+		else
+		{
+			$r .= $withname ? $File->getName() : '';
+		}
+
+		return $r;
+	}
+
+
+	/**
 	 * Get the URL to access a file.
 	 *
 	 * @param File the File object
@@ -615,7 +658,7 @@ class FileManager extends Filelist
 		}
 		if( method_exists( $File, 'getName' ) )
 		{
-			return $this->root_url.$this->path.$File->getName();
+			return $this->root_url.$this->getFileSubpath($File);
 		}
 		else
 		{
@@ -655,11 +698,12 @@ class FileManager extends Filelist
 		}
 		if( $File->isDir() && !$folderAsParam )
 		{
-			return $this->getCurUrl( NULL, $this->path.$File->getName() );
+			return $this->getCurUrl( NULL, $this->getFileSubpath($File) );
 		}
 		else
 		{
-			return $this->getCurUrl( NULL, $this->path ).'&amp;file='.urlencode( $File->getName() );
+			return $this->getCurUrl( NULL, $this->getFileSubpath($File, false) )
+							.'&amp;file='.urlencode( $File->getName() );
 		}
 	}
 
@@ -1167,6 +1211,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.7  2004/11/05 00:36:43  blueyed
+ * no message
+ *
  * Revision 1.6  2004/11/03 00:58:02  blueyed
  * update
  *

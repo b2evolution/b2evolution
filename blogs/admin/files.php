@@ -61,10 +61,11 @@ param( 'action', 'string', '' );     // 3.. 2.. 1.. action :)
 param( 'selaction', 'string', '' );  // action for selected files/dirs
 
 param( 'file', 'string', '' );       // selected file
-param( 'filter', '', NULL );
-param( 'filter_regexp', 'integer', NULL );
 param( 'order', 'string', NULL );
 param( 'asc', '', NULL );
+param( 'filter', '', NULL );
+param( 'filter_regexp', 'integer', NULL );
+param( 'flatmode', '', NULL );
 
 param( 'root', 'string', NULL );     // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
 
@@ -93,7 +94,9 @@ if( $action == 'update_settings' )
 /**
  * Filemanager object to work with
  */
-$Fileman = new FileManager( $current_User, 'files.php', $root, $path, $filter, $filter_regexp, $order, $asc );
+$Fileman = new FileManager( $current_User, 'files.php', $root, $path, $order, $asc,
+														$filter, $filter_regexp, $flatmode );
+
 
 if( !empty($file) )
 { // a file is given as parameter
@@ -352,16 +355,16 @@ if( $selaction != '' )
 
 switch( $action ) // {{{ (we catched empty action before)
 {
-	case 'createnew':  // create new file/dir
+	case 'createnew':  // {{{ create new file/dir
 		param( 'createnew', 'string', '' ); // 'file', 'dir'
 		param( 'createname', 'string', '' );
 
 		$Fileman->createDirOrFile( $createnew, $createname );
+		// }}}
 		break;
 
 
-	case 'delete':
-		// TODO: checkperm!
+	case 'delete': // {{{ delete a file/dir, TODO: checkperm!
 		if( !$curFile )
 		{
 			break;
@@ -402,10 +405,12 @@ switch( $action ) // {{{ (we catched empty action before)
 																							$filename ), 'note' );
 			}
 		}
+
+		// }}}
 		break;
 
 
-	case 'editperm':
+	case 'editperm':  // {{{ edit permissions
 		if( !$curFile )
 		{
 			break;
@@ -440,7 +445,8 @@ switch( $action ) // {{{ (we catched empty action before)
 			';
 			if( is_windows() )
 			{
-				$msg_action .= '<input id="chmod_readonly" name="chmod" type="radio" value="444" '
+				$msg_action .= '
+				<input id="chmod_readonly" name="chmod" type="radio" value="444" '
 				.( $curFile->getPerms( 'octal' ) == 444 ? 'checked="checked" ' : '' ).'/>
 				<label for="chmod_readonly">'.T_('Read-only').'</label><br />
 				<input id="chmod_readwrite" name="chmod" type="radio" value="666" '
@@ -458,6 +464,7 @@ switch( $action ) // {{{ (we catched empty action before)
 			';
 
 		}
+		// }}}
 		break;
 
 	// }}}
@@ -904,8 +911,22 @@ if( isset( $msg_action )
 	}
 	?>
 
+	<form action="files.php" name="flatmode" class="toolbaritem">
+		<?php echo $Fileman->getFormHiddenInputs( NULL, NULL, false, false ) ?>
+		<input type="hidden" name="flatmode" value="<?php echo $flatmode ? 0 : 1; ?>" />
+		<input class="ActionButton" type="submit" title="<?php
+			echo format_to_output( $flatmode ?
+															T_('Normal mode') :
+															T_('All files recursive without directories'), 'formvalue' );
+			?>" value="<?php
+			echo format_to_output( $flatmode ?
+															T_('Normal mode') :
+															T_('Flat mode'), 'formvalue' ); ?>" />
+	</form>
+
 	<form action="files.php" name="search" class="toolbaritem">
 		<?php echo $Fileman->getFormHiddenInputs() ?>
+		<input type="hidden" name="action" value="search" />
 		<input type="text" name="searchfor" value="--todo--" size="20" />
 		<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Search'), 'formvalue' ) ?>" />
 	</form>
@@ -926,7 +947,11 @@ if( isset( $msg_action )
 		<form action="files.php" name="filter" class="toolbaritem">
 			<?php echo $Fileman->getFormHiddenInputs( NULL, NULL, false, false ) ?>
 			<input type="text" name="filter" value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>" size="20" />
-			<input type="checkbox" name="filter_regexp" title="<?php echo format_to_output( T_('Filter is regular expression'), 'formvalue' ) ?>" value="1"<?php if( $filter_regexp ) echo ' checked="checked"' ?> />
+			<input type="checkbox" name="filter_regexp" title="<?php
+				echo format_to_output( T_('Filter is regular expression'), 'formvalue' )
+				?>" value="1"<?php if( $filter_regexp ) echo ' checked="checked"' ?> /><?php
+				echo /* TRANS: short for "is regular expression" */ T_('RegExp'); ?>
+
 			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
 		</form>
 	</div>

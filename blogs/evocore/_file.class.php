@@ -229,11 +229,41 @@ class File
 
 
 	/**
-	 * get the entries name
+	 * Get the entries name
 	 */
 	function getName()
 	{
 		return $this->_name;
+	}
+
+	/**
+	 * Get the path, optionally with name.
+	 *
+	 * @param boolean full path with name?
+	 */
+	function getPath( $withname = false )
+	{
+		return $withname ?
+						$this->_path.$this->_name.( $this->isDir() ? '/' : '' ) :
+						$this->_path;
+	}
+
+
+	/**
+	 * Get the file's extension.
+	 *
+	 * @return string the extension
+	 */
+	function getExt()
+	{
+		if( preg_match('/\.([^.]+)$/', $this->_name, $match) )
+		{
+			return $match[1];
+		}
+		else
+		{
+			return '';
+		}
 	}
 
 
@@ -355,35 +385,6 @@ class File
 
 
 	/**
-	 * Get path.
-	 *
-	 * @param boolean full path with name?
-	 */
-	function getPath( $withname = false )
-	{
-		return $withname ? $this->_path.$this->_name : $this->_path;
-	}
-
-
-	/**
-	 * get the file extension
-	 *
-	 * @return string the extension
-	 */
-	function getExt()
-	{
-		if( preg_match('/\.([^.]+)$/', $this->_name, $match) )
-		{
-			return $match[1];
-		}
-		else
-		{
-			return '';
-		}
-	}
-
-
-	/**
 	 * get nice size of the file
 	 *
 	 * @return string size as b/kb/mb/gd; or '&lt;dir&gt;'
@@ -479,6 +480,9 @@ class File
 
 /*
  * $Log$
+ * Revision 1.7  2004/11/05 00:36:43  blueyed
+ * no message
+ *
  * Revision 1.6  2004/11/03 00:58:02  blueyed
  * update
  *

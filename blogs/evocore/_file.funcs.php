@@ -134,7 +134,7 @@ function deldir_recursive( $dir )
  *               'type', 'string' (as for img tags), else 'widthheight' (array)
  * @return mixed false if no image, otherwise what was requested through $param
  */
-function imgsize( $path, $param )
+function imgsize( $path, $param = 'widthheight' )
 {
 	/**
 	 * Cache image sizes
@@ -332,6 +332,9 @@ function isFilename( $filename )
 
 /*
  * $Log$
+ * Revision 1.4  2004/11/05 00:36:43  blueyed
+ * no message
+ *
  * Revision 1.3  2004/10/21 00:14:44  blueyed
  * moved
  *
