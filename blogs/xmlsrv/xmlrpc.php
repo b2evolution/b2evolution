@@ -16,9 +16,6 @@
 
 require_once(dirname(__FILE__)."/../conf/_config.php");
 
-// We don't know who we're talking to, so all messages will be in english:
-$default_locale = 'en_US';
-
 require_once(dirname(__FILE__)."/../$core_subdir/_main.php");
 
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
@@ -247,7 +244,7 @@ function b2_getPostURL($m)
 	}
 
 	// Check permission:
-	if( ! $current_User->is_blog_member( $blog_ID ) )
+	if( ! $current_User->check_perm( 'blog_ismember', 1, false, $blog_ID ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 				 "Permission denied.");
@@ -311,9 +308,9 @@ $bloggernewpost_doc='Adds a post, blogger-api like';
 function bloggernewpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID;
+	global $blog_ID, $default_locale;
 	global $post_default_title,$post_default_category;
-	global $cafelogID, $sleep_after_edit;
+	global $cafelogID, $sleep_after_edit, $default_locale;
 	$err="";
 
 	logIO('I','Called function: blogger.newPost');
@@ -369,7 +366,7 @@ function bloggernewpost($m)
 	}
 
 	// INSERT NEW POST INTO DB:
-	$post_ID = bpost_create( $user_ID, $post_title, $content, $now, $post_category, array( $post_category ), $status, 'en', '', 0, $publish );
+	$post_ID = bpost_create( $user_ID, $post_title, $content, $now, $post_category, array( $post_category ), $status, $default_locale, '', 0, $publish );
 
 	if (!$post_ID)
 		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
@@ -443,7 +440,7 @@ function bloggereditpost($m)
 	global $xmlrpcerruser; // import user errcode value
 	global $blog_ID,$tableposts, $tablepostcats;
 	global $post_default_title,$post_default_category;
-	global $cafelogID, $sleep_after_edit;
+	global $cafelogID, $sleep_after_edit, $default_locale;
 	$err="";
 
 	logIO('I','Called function: blogger.editPost');
@@ -525,7 +522,7 @@ function bloggereditpost($m)
 	}
 
 	// UPDATE POST IN DB:
-	if( !bpost_update( $post_ID, $post_title, $content, '', $post_category, array($post_category), $status, 'en', '', 0, $pingsdone, '', '', 'open' ) )
+	if( !bpost_update( $post_ID, $post_title, $content, '', $post_category, array($post_category), $status, $default_locale, '', 0, $pingsdone, '', '', 'open' ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
 					"For some strange yet very annoying reason, the entry couldn't be edited.");
@@ -707,7 +704,7 @@ function bloggergetusersblogs($m)
 				$curr_blog_ID!=false; 
 				 $curr_blog_ID=blog_list_next() ) 
 	{ 
-		if( ! $current_User->is_blog_member( $curr_blog_ID ) )
+		if( ! $current_User->check_perm( 'blog_ismember', 1, false, $curr_blog_ID ) )
 		{ // Current user is not a member of this blog...
 			continue;
 		}

@@ -156,19 +156,19 @@ function upgrade_b2evo_tables()
 
 		echo 'Creating user blog permissions... ';
 		// Admin: full rights for all blogs (look 'ma, doing a natural join! :>)
-		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID,
+		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 								bloguser_perm_cats, bloguser_perm_properties)
-							SELECT blog_ID, ID, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
+							SELECT blog_ID, ID, 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
 							FROM $tableusers, $tableblogs
 							WHERE user_level = 10";
 		$DB->query( $query );
 
 		// Normal users: basic rights for all blogs (can't stop doing joins :P)
-		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID,
+		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 								bloguser_perm_cats, bloguser_perm_properties)
-							SELECT blog_ID, ID, 'published,protected,private,draft', 0, 1, 0, 0
+							SELECT blog_ID, ID, 1, 'published,protected,private,draft', 0, 1, 0, 0
 							FROM $tableusers, $tableblogs
 							WHERE user_level > 0 AND user_level < 10";
 		$DB->query( $query );
@@ -233,7 +233,7 @@ function upgrade_b2evo_tables()
 			
 			if( !preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $default_locale) )
 			{ // we want a valid locale
-				$default_locale = 'en-US';
+				$default_locale = 'en-EU';
 			}
 			
 			echo 'Converting langs to locales for '. $table. '...<br />';
@@ -287,7 +287,7 @@ function upgrade_b2evo_tables()
 							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
 							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00' 
 										AFTER post_issue_date,
-							CHANGE COLUMN post_lang post_locale varchar(20) NOT NULL default 'en-US',
+							CHANGE COLUMN post_lang post_locale varchar(20) NOT NULL default 'en-EU',
 							DROP COLUMN post_url,
 							CHANGE COLUMN post_trackbacks post_url varchar(250) NOT NULL default NULL,
 							MODIFY COLUMN post_flags SET( 'pingsdone', 'imported'),
@@ -307,7 +307,7 @@ function upgrade_b2evo_tables()
 		
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE $tableblogs
-							CHANGE blog_lang blog_locale varchar(20) NOT NULL default 'en-US'";
+							CHANGE blog_lang blog_locale varchar(20) NOT NULL default 'en-EU'";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
@@ -316,12 +316,17 @@ function upgrade_b2evo_tables()
 		
 		echo 'Upgrading settings table... ';
 		$query = "ALTER TABLE $tablesettings
-							ADD COLUMN default_locale VARCHAR( 20 ) DEFAULT 'en-US' NOT NULL AFTER ID,
+							ADD COLUMN default_locale VARCHAR( 20 ) DEFAULT 'en-EU' NOT NULL AFTER ID,
 							ADD COLUMN pref_links_extrapath tinyint unsigned DEFAULT 0 NOT NULL,
 							ADD COLUMN pref_permalink_type ENUM( 'urltitle', 'pid', 'archive#id', 'archive#title' ) NOT NULL DEFAULT 'urltitle'";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
+		echo 'Upgrading Blog-User permissions table... ';
+		$query = "ALTER TABLE $tableblogusers
+							ADD COLUMN bloguser_ismember tinyint NOT NULL default 0 AFTER bloguser_user_ID";
+		$DB->query( $query );
+		echo "OK.<br />\n";
 
 	}
 

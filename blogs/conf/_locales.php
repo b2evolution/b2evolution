@@ -18,7 +18,7 @@ $dbcharset = 'iso-8859-1';		// If you don't know, don't change this setting.
 # This will be overwritten from database settings, if configured there.
 # These use an ISO 639 language code, a '-' and an ISO 3166 country code.
 # This MUST BE in the list below.
-$default_locale = 'en-US';
+$default_locale = 'en-EU';
 
 
 if( !function_exists('NT_') )
@@ -56,6 +56,13 @@ $locales = array(
 										'datefmt' => 'd.m.y',
 										'timefmt' => 'H:i:s',
 										'messages' => 'de_DE',
+										'enabled' => 1,
+									),
+	'en-EU' => array( 'name' => NT_('English (EU)'),
+										'charset' => 'iso-8859-1',
+										'datefmt' => 'Y-m-d',
+										'timefmt' => 'H:i:s',
+										'messages' => 'en_EU',
 										'enabled' => 1,
 									),
 	'en-UK' => array( 'name' => NT_('English (UK)'),

@@ -35,7 +35,7 @@ elseif( $use_l10n == 2 )
 	function T_( $string, $req_locale = '' )
 	{
 		global $trans, $current_locale, $locales;
-		
+
 		// By default we use the current locale:
 		if( empty($req_locale) ) $req_locale = $current_locale;
 		
@@ -363,14 +363,14 @@ function locale_overwritefromDB()
 	}
 	
 	// overwrite default_locale from DB settings - if enabled.
-	// Checks also if previous $default_locale is enabled. Defaults to en-US, even if not enabled.
+	// Checks also if previous $default_locale is enabled. Defaults to en-EU, even if not enabled.
 	$locale_fromdb = get_settings('default_locale');
 	if( $locale_fromdb  )
 	{
 		if( $locales[$locale_fromdb]['enabled'] )
 			$default_locale = $locale_fromdb;
 		elseif( !$locales[$default_locale]['enabled'] )
-			$default_locale = 'en-US';
+			$default_locale = 'en-EU';
 		
 	}
 }

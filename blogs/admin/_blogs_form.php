@@ -56,6 +56,7 @@ switch( $next_action )
 		<table class="thin">
 			<tr>
 				<th rowspan="2"><?php /* TRANS: table header for user list */ echo T_('Login ') ?></th>
+				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Is<br />member') ?></th>
 				<th colspan="5"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Can post/edit with following statuses:') ?></th>
 				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Delete<br />posts') ?></th>
 				<th rowspan="2"><?php /* TRANS: SHORT table header on TWO lines */ echo T_('Edit<br />comts') ?></th>
@@ -70,12 +71,12 @@ switch( $next_action )
 				<th><?php echo T_('Deprecated') ?></th>
 			</tr>
 			<tr class="group">
-				<td colspan="10">
+				<td colspan="11">
 					<strong><?php echo T_('Members') ?></strong>
 				</td>
 			</tr>
 			<?php
-				$query = "SELECT ID, user_login, bloguser_perm_poststatuses,
+				$query = "SELECT ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
 													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
 													bloguser_perm_properties
 									FROM $tableusers INNER JOIN $tableblogusers
@@ -91,6 +92,11 @@ switch( $next_action )
 					?>
 					<tr>
 						<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
+						<td class="center">
+							<input type="checkbox" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
+								checked="checked"
+								value="1" title="<?php echo T_('Permission to read protected posts') ?>" />
+						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_published_<?php echo $loop_row['ID'] ?>"
 								<?php if( in_array( 'published', $perm_post ) ) { ?>
@@ -159,7 +165,7 @@ switch( $next_action )
 				}
 				?>
 			<tr class="group">
-				<td colspan="10">
+				<td colspan="11">
 					<strong><?php echo T_('Non members') ?></strong>
 				</td>
 			</tr>
@@ -177,6 +183,10 @@ switch( $next_action )
 					?>
 					<tr>
 						<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
+						<td class="center">
+							<input type="checkbox" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
+								value="1" title="<?php echo T_('Permission to read protected posts') ?>" />
+						</td>
 						<td class="center">
 							<input type="checkbox" name="blog_perm_published_<?php echo $loop_row['ID'] ?>"
 								value="1" title="<?php echo T_('Permission to post into this blog with private status') ?>" />

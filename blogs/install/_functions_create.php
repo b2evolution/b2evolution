@@ -30,7 +30,7 @@ function create_b2evo_tables()
 	echo "Creating table for Settings... ";
 	$query = "CREATE TABLE $tablesettings (
 		ID tinyint DEFAULT 1 NOT NULL,
-		default_locale VARCHAR( 20 ) DEFAULT 'en-US' NOT NULL,
+		default_locale VARCHAR( 20 ) DEFAULT 'en-EU' NOT NULL,
 		posts_per_page int unsigned DEFAULT 7 NOT NULL,
 		what_to_show varchar(10) DEFAULT 'days' NOT NULL,
 		archive_mode varchar(10) DEFAULT 'weekly' NOT NULL,
@@ -87,7 +87,7 @@ function create_b2evo_tables()
 		blog_tagline varchar(250) NULL default '',
 		blog_description varchar(250) NULL default '',
 		blog_longdesc TEXT NULL DEFAULT NULL,
-		blog_locale VARCHAR(20) NOT NULL DEFAULT 'en-US',
+		blog_locale VARCHAR(20) NOT NULL DEFAULT 'en-EU',
 		blog_siteurl varchar(120) NOT NULL default '$baseurl',
 		blog_filename varchar(30) NULL default 'blog.php',
 		blog_staticfilename varchar(30) NULL default NULL,
@@ -134,7 +134,7 @@ function create_b2evo_tables()
 		post_mod_date datetime NOT NULL default '0000-00-00 00:00:00',
 		post_status enum('published','deprecated','protected','private','draft')
 									NOT NULL default 'published',
-		post_locale VARCHAR(20) NOT NULL DEFAULT 'en-US',
+		post_locale VARCHAR(20) NOT NULL DEFAULT 'en-EU',
 		post_content text NOT NULL,
 		post_title text NOT NULL,
 		post_urltitle VARCHAR(50) NULL DEFAULT NULL,
@@ -352,6 +352,7 @@ function create_groups()
 	$query = "CREATE TABLE $tableblogusers (
 		bloguser_blog_ID int NOT NULL default 0,
 		bloguser_user_ID int NOT NULL default 0,
+		bloguser_ismember tinyint NOT NULL default 0,
 		bloguser_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
 		bloguser_perm_delpost tinyint NOT NULL default 0,
 		bloguser_perm_comments tinyint NOT NULL default 0,
@@ -369,41 +370,41 @@ function create_groups()
  */
 function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 {
-	global $timestamp;
+	global $timestamp, $default_locale;
 
 	echo "Creating default blogroll entries... ";
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://tin-men.net/' );
+	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en-UK', '', 0, true, '', 'http://tin-men.net/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'dAniel', 'Development', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://thequod.de/' );
+	bpost_create( 1, 'dAniel', 'Development', $now, $cat_blogroll_contrib, array(), 'published',	'de_DE', '', 0, true, '', 'http://thequod.de/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_blogroll_contrib, array(), 'published',	'en', '', 0, true, '', 'http://www.rononline.nl/' );
+	bpost_create( 1, 'Ron', 'Hacks, Testing', $now, $cat_blogroll_contrib, array(), 'published',	'nl-NL', '', 0, true, '', 'http://www.rononline.nl/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, '', 'http://www.tenderfeelings.be/' );
+	bpost_create( 1, 'Topanga', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',	 'nl-NL', '', 0, true, '', 'http://www.tenderfeelings.be/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, '', 'http://www.fromthecrossroads.ws/' );
+	bpost_create( 1, 'Travis', 'Hosting, Development', $now, $cat_blogroll_contrib, array(), 'published',	 'en-US', '', 0, true, '', 'http://www.fromthecrossroads.ws/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',	 'en', '', 0, true, '', 'http://fplanque.net/Blog/' );
+	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',	 'fr_FR', '', 0, true, '', 'http://fplanque.net/Blog/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'b2evolution', 'Project home', $now, $cat_blogroll_b2evo, array(), 'published',	'en', '', 0, true, '', 'http://b2evolution.net/' );
+	bpost_create( 1, 'b2evolution', 'Project home', $now, $cat_blogroll_b2evo, array(), 'published',	'en-EU', '', 0, true, '', 'http://b2evolution.net/' );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, T_('This is a sample blogroll entry'), T_("This is sample text describing the blogroll entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your blogroll entries (favorite/related sites)."), $now, $cat_blogroll_b2evo, array(), 'published',	'en', '', 0, true, '', 'http://b2evolution.net/' );
+	bpost_create( 1, T_('This is a sample blogroll entry'), T_("This is sample text describing the blogroll entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your blogroll entries (favorite/related sites)."), $now, $cat_blogroll_b2evo, array(), 'published',	$default_locale, '', 0, true, '', 'http://b2evolution.net/' );
 
 	echo "OK.<br />\n";
 
@@ -701,19 +702,19 @@ function populate_main_tables()
 
 	echo 'Creating user blog permissions... ';
 	// Admin for blog A:
-	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID,
+	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 							bloguser_perm_cats, bloguser_perm_properties)
 						VALUES
-							( $blog_all_ID, ".$User_Admin->get('ID').",
+							( $blog_all_ID, ".$User_Admin->get('ID').", 1,
 							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
-							( $blog_a_ID, ".$User_Admin->get('ID').",
+							( $blog_a_ID, ".$User_Admin->get('ID').", 1, 
 							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
-							( $blog_b_ID, ".$User_Admin->get('ID').",
+							( $blog_b_ID, ".$User_Admin->get('ID').", 1,
 							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
-							( $blog_roll_ID, ".$User_Admin->get('ID').",
+							( $blog_roll_ID, ".$User_Admin->get('ID').", 1,
 							'published,deprecated,protected,private,draft', 1, 1, 1, 1 ),
-							( $blog_a_ID, ".$User_Demo->get('ID').",
+							( $blog_a_ID, ".$User_Demo->get('ID').", 1,
 							'draft', 0, 0, 0, 0 )";
 	$DB->query( $query );
 

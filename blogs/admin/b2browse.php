@@ -13,7 +13,7 @@ $admin_tab = 'edit';
 $admin_pagetitle = T_('Browse blog:');
 param( 'blog', 'integer', true );
 
-if( ($blog == 0) && $current_User->is_blog_member( $default_to_blog ) )
+if( ($blog == 0) && $current_User->check_perm( 'blog_ismember', 1, false, $default_to_blog ) )
 {	// Default blog is a valid choice
 	$blog = $default_to_blog;
 }
@@ -25,7 +25,7 @@ for( $curr_blog_ID = blog_list_start();
 			$curr_blog_ID != false;
 			$curr_blog_ID = blog_list_next() )
 	{
-		if( ! $current_User->is_blog_member( $curr_blog_ID ) )
+		if( ! $current_User->check_perm( 'blog_ismember', 1, false, $curr_blog_ID ) )
 		{	// Current user is not a member of this blog...
 			continue;
 		}
@@ -61,10 +61,9 @@ for( $curr_blog_ID = blog_list_start();
 	{	// We could select a blog:
 		$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 
-		if( ! $current_User->is_blog_member( $blog ) )
-		{
-			die( 'Permission denied.');
-		}
+		// Check permission:
+		$current_User->check_perm( 'blog_ismember', 1, true, $blog );
+
 		// Show the posts:
 		require dirname(__FILE__). '/_edit_showposts.php';
 	}

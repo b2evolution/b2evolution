@@ -267,8 +267,7 @@ switch($action)
 									$blog_locale, $blog_roll,
 									$blog_keywords, $blog_UID, $blog_allowtrackbacks, $blog_allowpingbacks,
 									$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs,
-									$blog_disp_bloglist )
-								or mysql_oops( $query );
+									$blog_disp_bloglist );
 
 		// Update the user permissions for this blog
 		blog_update_user_perms( $blog );

@@ -1,7 +1,7 @@
 <?php
 /*
  * This is b2evolution's config file
- * Version of this file: 0.8.9
+ * Version of this file: 0.8.9+CVS
  *
  * You need to edit this file to your settings before attempting to install the database!
  *
@@ -56,5 +56,6 @@ $admin_email = 'postmaster@localhost';
 require_once (dirname(__FILE__)."/_advanced.php");
 require_once (dirname(__FILE__)."/_locales.php");
 require_once (dirname(__FILE__)."/_formatting.php");
+require_once( dirname(__FILE__) . '/_admin.php' );
 @include_once (dirname(__FILE__)."/_overrides_TEST.php"); // Override for testing in there
 ?>

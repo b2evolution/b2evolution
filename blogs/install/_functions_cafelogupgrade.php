@@ -74,47 +74,20 @@ function upgrade_cafelog_tables()
 	echo "OK.<br />\n";
 
 	echo "Creating user blog permissions... ";
-	// Admin for upgraded blog:
-	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
+	// Admin for all blogs:
+	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
 							bloguser_perm_cats, bloguser_perm_properties)
-						SELECT $blog_a_ID, ID, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
-						FROM $oldtableusers
-						WHERE user_level = 10";
-	$DB->query( $query );
-
-	// Admin for blog #1:
-	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
-							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
-							bloguser_perm_cats, bloguser_perm_properties)
-						SELECT $blog_all_ID, ID, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
-						FROM $oldtableusers
-						WHERE user_level = 10";
-	$DB->query( $query );
-
-	// Admin for blog B:
-	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
-							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
-							bloguser_perm_cats, bloguser_perm_properties)
-						SELECT $blog_b_ID, ID, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
-						FROM $oldtableusers
-						WHERE user_level = 10";
-	$DB->query( $query );
-
-	// Admin for blog roll:
-	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
-							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
-							bloguser_perm_cats, bloguser_perm_properties)
-						SELECT $blog_roll_ID, ID, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
-						FROM $oldtableusers
+						SELECT blog_ID, ID, 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
+						FROM $oldtableusers, $tableblogs
 						WHERE user_level = 10";
 	$DB->query( $query );
 
 	// Normal users for upgraded blog:
-	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, 
+	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember, 
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
 							bloguser_perm_cats, bloguser_perm_properties)
-						SELECT $blog_a_ID, ID, 'published,protected,private,draft', 0, 1, 0, 0
+						SELECT $blog_a_ID, ID, 1, 'published,protected,private,draft', 0, 1, 0, 0
 						FROM $oldtableusers
 						WHERE user_level > 0 AND user_level < 10";
 	$DB->query( $query );

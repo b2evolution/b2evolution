@@ -227,6 +227,7 @@ class User extends DataObject
 				$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 				break;
 
+			case 'blog_ismember':
 			case 'blog_post_statuses':
 			case 'blog_del_post':
 			case 'blog_comments':
@@ -308,6 +309,7 @@ class User extends DataObject
 	 *
 	 * @see User::check_perm()
 	 * @param string Permission name, can be one of the following:
+	 *									- blog_ismember
 	 *									- blog_post_statuses
 	 *									- blog_del_post
 	 *									- blog_comments
@@ -345,6 +347,8 @@ class User extends DataObject
 			{ // OK, rights found:
 				$this->blog_post_statuses[$perm_target_blog] = array();
 	
+				$this->blog_post_statuses[$perm_target_blog]['blog_ismember'] = $row['bloguser_ismember'];
+
 				$bloguser_perm_post = $row['bloguser_perm_poststatuses'];
 				if( empty($bloguser_perm_post ) )
 					$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = array();
@@ -379,26 +383,6 @@ class User extends DataObject
 				// echo $permname, '=', $this->blog_post_statuses[$perm_target_blog][$permname], ' ';
 				return $this->blog_post_statuses[$perm_target_blog][$permname];
 		}
-	}
-
-
-	/*
-	 * User::is_blog_member(-)
-	 *
-	 * Check if user is a member of specified blog
-	 */
-	function is_blog_member( $blog_ID )
-	{
-		/* echo 'blog=',$blog_ID ,'<br />';
-		echo 'statuses=', $this->check_perm_blogusers( 'blog_post_statuses', 'any', $blog_ID ) ,'<br />';
-		echo 'statuses=', $this->check_perm_blogusers( 'blog_del_post', 1, $blog_ID )  ,'<br />';
-		echo 'statuses=', $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID )  ,'<br />'; */
-		return ( $this->check_perm_blogusers( 'blog_post_statuses', 'any', $blog_ID )
-					|| $this->check_perm_blogusers( 'blog_del_post', 1, $blog_ID )
-					|| $this->check_perm_blogusers( 'blog_comments', 1, $blog_ID )
-					|| $this->check_perm_blogusers( 'blog_cats', 1, $blog_ID )
-					|| $this->check_perm_blogusers( 'blog_properties', 1, $blog_ID )
-					);
 	}
 
 

@@ -11,6 +11,7 @@
 
 // include config and default functions
 require_once( dirname(__FILE__). '/../conf/_config.php' );
+require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
 require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_class_db.php" );
 require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions.php" ); // db funcs
 require_once (dirname(__FILE__). "/$install_dirout/$core_subdir/_functions_cats.php" );
@@ -21,7 +22,7 @@ param( 'action', 'string' );
 // explicit set locale
 param('locale', 'string');
 
-if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,4})?/', $locale) )
+if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $locale) )
 {
 	$default_locale = $locale;
 }
@@ -30,14 +31,15 @@ else
 	$default_locale = locale_from_httpaccept();
 	#echo 'detected locale: ' . $default_locale. '<br />';
 }
+// Activate default locale:
+locale_activate( $default_locale );
 
-require_once( dirname(__FILE__). "/$install_dirout/$core_subdir/_vars.php" );
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><!-- InstanceBegin template="/Templates/b2evodistrib.dwt" codeOutsideHTMLIsLocked="false" -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/b2evodistrib.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 <title>b2 evolution: Database tables installation</title>
 <!-- InstanceEndEditable --><link href="b2evo.css" rel="stylesheet" type="text/css" />
 

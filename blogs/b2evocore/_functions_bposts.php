@@ -24,7 +24,7 @@ function bpost_create(
 	$main_cat_ID = 1,									// Main cat ID
 	$extra_cat_IDs = array(),			// Table of extra cats
 	$post_status = 'published',
-	$post_locale = 'en-US',
+	$post_locale = '#',
 	$post_trackbacks = '',
 	$autobr = 0,									// No AutoBR has been used by default
 	$pingsdone = true,
@@ -34,7 +34,9 @@ function bpost_create(
 	$post_renderers = array() )
 {
 	global $DB, $tableposts, $tablepostcats, $query, $querycount;
-	global $localtimenow;
+	global $localtimenow, $default_locale;
+
+	if( $post_locale == '#' ) $post_locale = $default_locale;
 
 	// Handle the flags:
 	$post_flags = array();
@@ -96,7 +98,7 @@ function bpost_update(
 	$main_cat_ID = 1,							// Main cat ID
 	$extra_cat_IDs = array(),			// Table of extra cats
 	$post_status = 'published',
-	$post_locale = 'en-US',
+	$post_locale = '#',
 	$post_trackbacks = '',
 	$autobr = 0,									// No AutoBR has been used by default
 	$pingsdone = true,
@@ -106,7 +108,9 @@ function bpost_update(
 	$post_renderers = array() )
 {
 	global $DB, $tableposts, $tablepostcats, $query, $querycount;
-	global $localtimenow;
+	global $localtimenow, $default_locale;
+
+	if( $post_locale == '#' ) $post_locale = $default_locale;
 
 	// Handle the flags:
 	$post_flags = array();
@@ -1492,12 +1496,12 @@ function bpost_count_words($string)
 	return $string;
 }
 
-/*
- * statuses_where_clause(-)
+/**
+ * Construct the where clause to limit retrieved posts on their status
  *
- * Construct the where clause to limit post statuses
+ * {@internal statuses_where_clause(-)}}
  *
- * fplanque: created
+ * @param Array statuses of posts we want to get
  */
 function statuses_where_clause( $show_statuses = '' )
 {
@@ -1519,9 +1523,10 @@ function statuses_where_clause( $show_statuses = '' )
 	}
 
 	if( $key = array_search( 'protected', $show_statuses ) )
-	{	// Special handling for Private status:
-		if( ! is_logged_in() )
-		{ // we are not allowed to see this if we are not logged in:
+	{	// Special handling for Protected status:
+		global $current_User, $blog;
+		if( (!is_logged_in()) || (!$current_User->check_perm( 'blog_ismember', 1, false, $blog )) )
+		{ // we are not allowed to see this if we are not a member of the current blog:
 			unset( $show_statuses[$key] );
 		}
 	}

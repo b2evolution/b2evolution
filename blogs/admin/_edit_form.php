@@ -290,7 +290,7 @@ if( $action != 'editcomment' )
 		if( $current_User->check_perm( 'blog_post_statuses', 'protected', false, $blog ) )
 		{
 		?>
-		<label title="<?php echo T_('The post will be published but visible only by logged-in team members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?>><?php echo T_('Protected (Members only)') ?></label><br />
+		<label title="<?php echo T_('The post will be published but visible only by logged-in blog members') ?>"><input type="radio" name="post_status" value="protected" class="checkbox" <?php if( $post_status == 'protected' ) echo 'checked="checked"'; ?>><?php echo T_('Protected (Members only)') ?></label><br />
 		<?php
 		}
 		if( $current_User->check_perm( 'blog_post_statuses', 'private', false, $blog ) )

@@ -29,7 +29,7 @@ function blog_create(
 	$blog_tagline = '',
 	$blog_description = '',
 	$blog_longdesc = '',
-	$blog_locale = 'en-US',
+	$blog_locale = '#',
 	$blog_roll = '',
 	$blog_keywords = '',
 	$blog_UID = '',
@@ -42,7 +42,9 @@ function blog_create(
 	$blog_disp_bloglist	= 1
 )
 {
-	global $DB, $tableblogs, $query, $querycount;
+	global $DB, $tableblogs, $query, $querycount, $default_locale;
+
+	if( $blog_locale == '#' ) $blog_locale = $default_locale;
 
 	$query = "INSERT INTO $tableblogs( blog_name, blog_shortname, blog_siteurl, blog_filename, ".
 						"blog_stub, blog_staticfilename, ".
@@ -92,7 +94,7 @@ function blog_update(
 	$blog_tagline = '',
 	$blog_description = '',
 	$blog_longdesc = '',
-	$blog_locale = 'en-US',
+	$blog_locale = '#',
 	$blog_roll = '',
 	$blog_keywords = '',
 	$blog_UID = '',
@@ -105,8 +107,10 @@ function blog_update(
 	$blog_disp_bloglist	= 1
 	)
 {
-	global $DB, $tableblogs, $query, $querycount;
+	global $DB, $tableblogs, $query, $querycount, $default_locale;
 
+	if( $blog_locale == '#' ) $blog_locale = $default_locale;
+	
 	$query = "UPDATE $tableblogs SET ";
 	$query .= " blog_name = '".$DB->escape($blog_name)."', ";
 	$query .= " blog_shortname = '".$DB->escape($blog_shortname)."', ";
@@ -160,6 +164,8 @@ function blog_update_user_perms( $blog )
 
 		$perm_post = array();
 
+		$ismember = param( 'blog_ismember_'.$loop_user_ID, 'integer', 0 );
+
 		$perm_published = param( 'blog_perm_published_'.$loop_user_ID, 'string', '' );
 		if( !empty($perm_published) ) $perm_post[] = 'published';
 
@@ -182,19 +188,20 @@ function blog_update_user_perms( $blog )
 
 		// Update those permissions in DB:
 
-		if( count($perm_post) || $perm_delpost || $perm_comments || $perm_cats || $perm_properties )
+		if( $ismember || count($perm_post) || $perm_delpost || $perm_comments || $perm_cats || $perm_properties )
 		{	// There are some permissions for this user:
+			$ismember = 1;	// Must have this permission
+		
 			// insert new perms:
-			$inserted_values[] = " ( $blog, $loop_user_ID, '".implode(',',$perm_post)."', ".
-																$perm_delpost.", ".$perm_comments.", ".
-																$perm_cats.', '.$perm_properties." )";
+			$inserted_values[] = " ( $blog, $loop_user_ID, $ismember, '".implode(',',$perm_post)."', 
+																$perm_delpost, $perm_comments, $perm_cats, $perm_properties )";
 		}
 	}
 
 	// Proceed insertions:
 	if( count( $inserted_values ) )
 	{
-		$DB->query( "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID,
+		$DB->query( "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 											bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 											bloguser_perm_cats, bloguser_perm_properties )
 									VALUES ".implode( ',', $inserted_values ) );
