@@ -99,18 +99,18 @@ msgstr "Alles"
 
 #: ../../../a_noskin.php:244 ../../../skins/custom/_main.php:238
 msgid "Some Word"
-msgstr "ein Wort"
+msgstr "Ein Wort"
 
 #: ../../../a_noskin.php:245 ../../../admin/_edit_showposts.php:409
 #: ../../../skins/custom/_main.php:239
 msgid "Entire phrase"
-msgstr "ganzen Ausdruck"
+msgstr "Ganzer Ausdruck"
 
 #: ../../../a_noskin.php:247 ../../../a_noskin.php:259
 #: ../../../skins/bluesky/_main.php:192
 #: ../../../skins/guadeloupe/_main.php:194
 msgid "Reset form"
-msgstr "zurücksetzen"
+msgstr "Formular zurücksetzen"
 
 #: ../../../a_noskin.php:258 ../../../skins/bluesky/_main.php:191
 #: ../../../skins/custom/_main.php:251 ../../../skins/guadeloupe/_main.php:193
