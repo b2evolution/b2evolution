@@ -14,9 +14,10 @@
 <div class="panelblock">
 	<h2><?php echo T_('Groups &amp; Users') ?></h2>
 	<?php
-	$request = "SELECT $tableusers.*, grp_ID, grp_name FROM $tableusers RIGHT JOIN $tablegroups ON user_grp_ID = grp_ID ORDER BY grp_name, user_login";
-	$querycount++;
-	$result = mysql_query($request);
+	$request = "SELECT $tableusers.*, grp_ID, grp_name 
+							FROM $tableusers RIGHT JOIN $tablegroups ON user_grp_ID = grp_ID 
+							ORDER BY grp_name, user_login";
+	$rows = $DB->get_results( $request, ARRAY_A );
 	?>
 <table class="thin">
 	<tr>
@@ -30,7 +31,7 @@
 	</tr>
 	<?php
 	$loop_prev_grp_ID = 0;
-	while($row = mysql_fetch_array($result) )
+	foreach( $rows as $row )
 	{	// For each line (can be a user/group or just an empty group)
 		$loop_grp_ID = $row['grp_ID'];
 		if( $loop_prev_grp_ID != $loop_grp_ID )

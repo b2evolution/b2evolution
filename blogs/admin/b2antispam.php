@@ -49,8 +49,7 @@ switch( $action )
 			// Stats entries first
 			$sql = "DELETE FROM $tablehitlog 
 							WHERE referingURL LIKE '%$dbkeyword%'";
-			$querycount++;
-			mysql_query($sql) or mysql_oops( $sql );
+			$DB->query($sql);
 			echo '</div>';
 		}
 					
@@ -60,8 +59,7 @@ switch( $action )
 			printf( '<h3>'.T_('Deleting comments matching [%s]...').'</h3>', $keyword );
 			$sql = "DELETE FROM $tablecomments 
 							WHERE comment_author_url LIKE '%$dbkeyword%'";	
-			$querycount++;
-			mysql_query($sql) or mysql_oops( $sql );
+			$DB->query($sql);
 			echo '</div>';
 		}
 		
@@ -98,9 +96,8 @@ switch( $action )
 												 FROM $tablehitlog 
 												 WHERE referingURL LIKE '%$dbkeyword%' 
 												 ORDER BY baseDomain ASC";
-					$res_affected_hits = mysql_query( $sql ) or mysql_oops( $sql );
-					$querycount++;
-					if( mysql_affected_rows() == 0 )
+					$res_affected_hits = $DB->get_results( $sql, ARRAY_A );
+					if( $DB->num_rows == 0 )
 					{	// No matching hits.
 						printf( '<p><strong>'.T_('No log-hits match the keyword [%s].').'</strong></p>', format_to_output( $keyword, 'htmlbody' ) );
 					}
@@ -108,10 +105,11 @@ switch( $action )
 					{
 					?>
 						<p><strong><input type="checkbox" name="delhits" value="1" checked="checked" />
-						<?php printf ( T_('Delete the following %d referer hits:'), mysql_affected_rows() ) ?>
+						<?php printf ( T_('Delete the following %d referer hits:'), $DB->num_rows ) ?>
 						</strong></p>
 						<table class="thin">
-							<?php while($row_stats = mysql_fetch_array($res_affected_hits)) {  ?>
+							<?php foreach( $res_affected_hits as $row_stats ) 
+							{  ?>
 							<tr>
 								<td><?php stats_time() ?></td>
 								<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
@@ -128,9 +126,8 @@ switch( $action )
 									FROM $tablecomments 
 									WHERE comment_author_url LIKE '%$dbkeyword%' 
 									ORDER BY comment_date ASC";
-					$res_affected_comments = mysql_query( $sql ) or mysql_oops( $sql );
-					$querycount++;
-					if( mysql_affected_rows() == 0 )
+					$res_affected_comments = $DB->get_results( $sql, ARRAY_A );
+					if( $DB->num_rows == 0 )
 					{	// No matching hits.
 						printf( '<p><strong>'.T_('No comments match the keyword [%s].').'</strong></p>', format_to_output( $keyword, 'htmlbody' ) );
 					}
@@ -141,13 +138,10 @@ switch( $action )
 						<?php printf ( T_('Delete the following %d comments:'), mysql_affected_rows() ) ?>
 						</strong></p>
 						<table class="thin">
-							<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
+							<?php foreach( $res_affected_comments as $row_stats )
+							{ ?>
 							<tr>
-								<td><?php
-								preg_match("/([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/", $row_stats['comment_date'], $matches);
-								$date = mktime($matches[4], $matches[5], $matches[6], $matches[2], $matches[3], $matches[1]);
-								echo date(locale_datefmt()." ".locale_timefmt(), $date);
-								?></td>
+								<td><?php echo mysql2date(locale_datefmt().' '.locale_timefmt(), $row_stats['comment_date'] ); ?></td>
 								<td><?php echo $row_stats['comment_author'] ?></a></td>
 								<td><?php echo $row_stats['comment_author_url'] ?></td>
 								<td><?php

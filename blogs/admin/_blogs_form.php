@@ -82,10 +82,9 @@ switch( $next_action )
 													ON ID = bloguser_user_ID
 									WHERE bloguser_blog_ID = $blog
 									ORDER BY user_login";
-				$result = mysql_query($query) or mysql_oops( $query );
-				$querycount++;
+				$rows = $DB->get_results( $query, ARRAY_A );
 				$members=array();
-				while($loop_row = mysql_fetch_array($result) )
+				foreach( $rows as $loop_row )
 				{	// Go through users:
 					$members[] = $loop_row['ID'];
 					$perm_post = explode( ',', $loop_row['bloguser_perm_poststatuses'] );
