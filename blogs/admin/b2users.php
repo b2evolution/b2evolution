@@ -185,34 +185,33 @@ else switch ($action)
 			if( !empty($edited_user_pass2) )
 			{ // Password provided, we must encode it
 				$new_pass = md5( $edited_user_pass2 );
+
+				// Update cookies
+				if( $edited_user_ID == $current_User->ID )
+				{ // current user updates him/herself - we have to set cookies to keep him logged in
+					if( isset($new_pass) && $current_User->pass != $new_pass )
+					{
+						setcookie( $cookie_pass, $new_pass, $cookie_expires, $cookie_path, $cookie_domain);
+					}
+
+					if( $current_User->login != $edited_User->login )
+					{
+						setcookie( $cookie_user, $edited_User->login, $cookie_expires, $cookie_path, $cookie_domain );
+					}
+				}
+
 				$edited_User->set( 'pass', $new_pass ); // set password
 			}
 
-			if( $edited_User->get('ID') != 0 )
+			if( $edited_User->ID != 0 )
 			{ // Commit update to the DB:
 				$edited_User->dbupdate();
-
 				$Messages->add( T_('User updated.'), 'note' );
-
 			}
 			else
 			{ // Insert user into DB
 				$edited_User->dbinsert();
 				$Messages->add( T_('New user created.'), 'note' );
-			}
-
-			// Update cookies
-			if( $edited_user_ID == $current_User->ID )
-			{ // current user updates him/herself - we have to set cookies to keep him logged in
-				if( isset($new_pass) && $current_User->pass != $new_pass )
-				{
-					setcookie( $cookie_pass, $new_pass, $cookie_expires, $cookie_path, $cookie_domain);
-				}
-
-				if( $current_User->login != $edited_User->login )
-				{
-					setcookie( $cookie_user, $edited_User->login, $cookie_expires, $cookie_path, $cookie_domain );
-				}
 			}
 		}
 
