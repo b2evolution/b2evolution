@@ -302,9 +302,8 @@ class Blog extends DataObject
 
 
 	/**
-	 * generate the blog's media directory
+	 * Generate the blog's media directory (and create it if necessary).
 	 *
-	 * @todo create if necessary
 	 * @param boolean absolute path or relative to $basepath.$media_subdir ?
 	 */
 	function gen_mediadir( $absolute = true )
@@ -328,12 +327,12 @@ class Blog extends DataObject
 		{
 			if( !mkdir( $mediadir ) ) // defaults to 0777
 			{ // add error
-				$Messages->add( sprintf( T_("The blog's media directory [%s] could not be created."), $mediadir ), 'error' );
+				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), $mediadir ), 'error' );
 				return false;
 			}
 			else
 			{ // add note
-				$Messages->add( sprintf( T_("The blog's media directory [%s] has been created with permissions %s."), $mediadir, '777' ), 'note' );
+				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $mediadir, '777' ), 'note' );
 			}
 		}
 
@@ -601,6 +600,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2005/01/05 02:50:45  blueyed
+ * Message changed
+ *
  * Revision 1.5  2004/12/21 21:22:46  fplanque
  * factoring/cleanup
  *
