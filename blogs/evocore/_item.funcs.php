@@ -106,7 +106,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 			$exact_match = true;
 		}
 		if( preg_match( '/_([0-9]+)$/', $existing_urltitle, $matches ) )
-		{	// This one has a number, we extract it:
+		{ // This one has a number, we extract it:
 			$existing_number = (integer) $matches[1];
 			if( $existing_number > $highest_number )
 			{ // This is th enew high
@@ -117,7 +117,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// echo "highest existing number = $highest_number <br />";
 
 	if( $exact_match && !$query_only )
-	{	// We got an exact match, we need to change the number:
+	{ // We got an exact match, we need to change the number:
 		$urltitle = $urlbase.'_'.($highest_number + 1);
 	}
 
@@ -136,7 +136,7 @@ function get_postdata($postid)
 	global $DB, $postdata, $show_statuses;
 
 	if( !empty($postdata) && $postdata['ID'] == $postid )
-	{	// We are asking for postdata of current post in memory! (we're in the b2 loop)
+	{ // We are asking for postdata of current post in memory! (we're in the b2 loop)
 		// Already in memory! This will be the case when generating permalink at display
 		// (but not when sending trackbacks!)
 		// echo "*** Accessing post data in memory! ***<br />\n";
@@ -443,12 +443,12 @@ function the_content(
 	// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
 
 	if( $more_link_text == '#' )
-	{	// TRANS: this is the default text for the extended post "more" link
+	{ // TRANS: this is the default text for the extended post "more" link
 		$more_link_text = '=> '.T_('Read more!');
 	}
 
 	if( $more_anchor == '#' )
-	{	// TRANS: this is the default text displayed once the more link has been activated
+	{ // TRANS: this is the default text displayed once the more link has been activated
 		$more_anchor = '['.T_('More:').']';
 	}
 
@@ -485,7 +485,7 @@ function the_content(
 		$stripteaser=1;
 	$teaser=$content[0];
 	if (($dispmore) && ($stripteaser))
-	{	// We don't want to repeat the teaser:
+	{ // We don't want to repeat the teaser:
 		$teaser='';
 	}
 	$output .= $teaser;
@@ -493,7 +493,7 @@ function the_content(
 	if (count($content)>1)
 	{
 		if ($dispmore)
-		{	// Viewer has already asked for more
+		{ // Viewer has already asked for more
 			if( !empty($more_anchor) ) $output .= $before_more_link;
 			$output .= '<a id="more'.$id.'" name="more'.$id.'"></a>'.$more_anchor;
 			if( !empty($more_anchor) ) $output .= $after_more_link;
@@ -513,7 +513,7 @@ function the_content(
 	$content = format_to_output( $output, $format );
 
 	if( ($format == 'xml') && $cut )
-	{	// Let's cut this down...
+	{ // Let's cut this down...
 		$blah = explode(' ', $content);
 		if (count($blah) > $cut)
 		{
@@ -708,11 +708,11 @@ function next_posts($max_page = 0, $page='' )
 		if (!$max_page || $max_page >= $nextpage)
 		{
 			if( !isset($generating_static) )
-			{	// We are not generating a static page here:
+			{ // We are not generating a static page here:
 				echo regenerate_url( 'paged', 'paged='.$nextpage, $page );
 			}
 			elseif( isset($edited_Blog) )
-			{	// We are generating a static page
+			{ // We are generating a static page
 				echo url_add_param( $edited_Blog->get('dynurl'), 'paged='.$nextpage  );
 			}
 			// else...should not happen
@@ -734,11 +734,11 @@ function previous_posts( $page='' )
 		$nextpage = intval($paged) - 1;
 		if ($nextpage < 1) $nextpage = 1;
 		if( !isset($generating_static) )
-		{	// We are not generating a static page here:
+		{ // We are not generating a static page here:
 			echo regenerate_url( 'paged', 'paged='.$nextpage, $page );
 		}
 		elseif( isset($edited_Blog) )
-		{	// We are generating a static page
+		{ // We are generating a static page
 			echo url_add_param( $edited_Blog->get('dynurl'), 'paged='.$nextpage  );
 		}
 		// else...should not happen
@@ -1171,7 +1171,7 @@ function gen_permalink(
 	}
 
 	if( ! $Settings->get('links_extrapath') )
-	{	// We reference by Query: Dirty but explicit permalinks
+	{ // We reference by Query: Dirty but explicit permalinks
 
 		switch($use_destination)
 		{
@@ -1196,7 +1196,7 @@ function gen_permalink(
 		}
 	}
 	else
-	{	// We reference by path (CLEAN permalinks!)
+	{ // We reference by path (CLEAN permalinks!)
 		switch($use_destination)
 		{
 			case 'monthly':
@@ -1297,7 +1297,7 @@ function bpost_count_words($string)
 {
 	$string = trim(strip_tags($string));
 	if( function_exists( 'str_word_count' ) )
-	{	// PHP >= 4.3
+	{ // PHP >= 4.3
 		return str_word_count($string);
 	}
 
@@ -1336,18 +1336,17 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
 	$or = '';
 
 	if( ($key = array_search( 'private', $show_statuses )) !== false )
-	{	// Special handling for Private status:
+	{ // Special handling for Private status:
 		unset( $show_statuses[$key] );
 		if( is_logged_in() )
-		{	// We need to be logged in to have a chance to see this:
-			global $user_ID;
-			$where .= $or.' ( '.$dbprefix."status = 'private' AND ".$dbprefix."creator_user_ID = $user_ID ) ";
+		{ // We need to be logged in to have a chance to see this:
+			$where .= $or.' ( '.$dbprefix.'status = "private" AND '.$dbprefix.'creator_user_ID = '.$current_User->ID.' ) ';
 			$or = ' OR ';
 		}
 	}
 
 	if( $key = array_search( 'protected', $show_statuses ) )
-	{	// Special handling for Protected status:
+	{ // Special handling for Protected status:
 		if( (!is_logged_in())
 			|| ($blog == 0) // No blog specified (ONgsb)
 			|| (!$current_User->check_perm( 'blog_ismember', 1, false, $blog )) )
@@ -1401,7 +1400,7 @@ function cat_select( $display_info = true )
 	cat_query( false );	// make sure the caches are loaded
 
 	if( $allow_cross_posting >= 2 )
-	{	// If BLOG cross posting enabled, go through all blogs with cats:
+	{ // If BLOG cross posting enabled, go through all blogs with cats:
 		foreach( $cache_blogs as $i_blog )
 		{ // run recursively through the cats
 			$current_blog_ID = $i_blog->blog_ID;
@@ -1424,7 +1423,7 @@ function cat_select( $display_info = true )
 		}
 	}
 	else
-	{	// BLOG Cross posting is disabled. Current blog only:
+	{ // BLOG Cross posting is disabled. Current blog only:
 		$current_blog_ID = $blog;
 		$r .= '<table cellspacing="0">'.cat_select_header();
 		$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
@@ -1464,7 +1463,7 @@ function cat_select_header()
  * callback to start sublist
  */
 function cat_select_before_first( $parent_cat_ID, $level )
-{	// callback to start sublist
+{ // callback to start sublist
 	return ''; // "\n<ul>\n";
 }
 
@@ -1472,7 +1471,7 @@ function cat_select_before_first( $parent_cat_ID, $level )
  * callback to display sublist element
  */
 function cat_select_before_each( $cat_ID, $level )
-{	// callback to display sublist element
+{ // callback to display sublist element
 	global $current_blog_ID, $blog, $cat, $edited_Item, $post_extracats, $default_main_cat, $next_action, $allow_cross_posting, $cat_select_level;
 	$this_cat = get_the_category_by_ID( $cat_ID );
 	$r = '<tr>';
@@ -1481,7 +1480,7 @@ function cat_select_before_each( $cat_ID, $level )
 	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
 	{ // This is current blog or we allow moving posts accross blogs
 		if( ($default_main_cat == 0) && ($next_action == 'create') && ($current_blog_ID == $blog) )
-		{	// Assign default cat for new post
+		{ // Assign default cat for new post
 			$default_main_cat = $cat_ID;
 		}
 		$r .= '<td class="selector"><input type="radio" name="post_category" class="checkbox" title="'
@@ -1491,7 +1490,7 @@ function cat_select_before_each( $cat_ID, $level )
 		$r .= ' /></td>';
 	}
 	else
-	{	// Don't allow to select this cat as a main cat
+	{ // Don't allow to select this cat as a main cat
   	$r .= '<td class="selector">&nbsp;</td>';
 	}
 
@@ -1513,7 +1512,7 @@ function cat_select_before_each( $cat_ID, $level )
  * callback after each sublist element
  */
 function cat_select_after_each( $cat_ID, $level )
-{	// callback after each sublist element
+{ // callback after each sublist element
 	return "</td></tr>\n";
 }
 
@@ -1521,7 +1520,7 @@ function cat_select_after_each( $cat_ID, $level )
  * callback to end sublist
  */
 function cat_select_after_last( $parent_cat_ID, $level )
-{	// callback to end sublist
+{ // callback to end sublist
 	return ''; // "</ul>\n";
 }
 
@@ -1530,6 +1529,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.13  2005/02/08 20:17:45  blueyed
+ * removed obsolete $User_ID global
+ *
  * Revision 1.12  2005/02/08 04:45:02  blueyed
  * improved $DB get_results() handling
  *

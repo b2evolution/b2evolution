@@ -60,7 +60,7 @@ require_once dirname(__FILE__). '/_user.class.php';
 function veriflog( $login_required = false )
 {
 	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error;
-	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_email, $user_url;
+	global $user_login, $user_pass_md5, $userdata, $user_email, $user_url;
 	global $current_User;
 	global $DB, $UserCache;
 
@@ -69,7 +69,6 @@ function veriflog( $login_required = false )
 	$user_login = '';
 	$user_pass_md5 = '';
 	$userdata = '';
-	$user_ID = '';
 	$user_email = '';
 	$user_url = '';
 
@@ -173,7 +172,6 @@ function veriflog( $login_required = false )
 	$current_User = $UserCache->get_by_login( $user_login ); // COPY! we cannot set a global by reference!!
 	# echo $current_User->disp('login');
 
-	$user_ID = $userdata['ID'];
 	$user_email	= $userdata['user_email'];
 	$user_url	= $userdata['user_url'];
 
@@ -187,14 +185,16 @@ function veriflog( $login_required = false )
 function logout()
 {
 	global $cookie_user, $cookie_pass, $cookie_expired, $cookie_path, $cookie_domain;
-	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_email, $user_url;
+	global $user_login, $user_pass_md5, $userdata, $user_email, $user_url;
+	global $current_User;
 
 	// Reset all global variables
 	// Note: unset is bugguy on globals
+	$current_User = false;
+
 	$user_login = '';
 	$user_pass_md5 = '';
 	$userdata = '';
-	$user_ID = '';
 	$user_email = '';
 	$user_url = '';
 
@@ -205,7 +205,6 @@ function logout()
 	setcookie( 'cafelogpass' );		// OLD
 	setcookie( 'cafelogpass', '', $cookie_expired, $cookie_path, $cookie_domain);	// OLD
 	setcookie( $cookie_pass, '', $cookie_expired, $cookie_path, $cookie_domain);
-
 }
 
 
@@ -214,14 +213,14 @@ function logout()
  */
 function is_logged_in()
 {
-	global $user_ID, $generating_static;
+	global $generating_static, $current_User;
 
 	if( isset($generating_static) )
 	{ // When generating static page, we should always consider we are not logged in.
 		return false;
 	}
 
-	return (!empty($user_ID));
+	return !empty( $current_User->ID );
 }
 
 
@@ -631,6 +630,9 @@ function profile_check_params( $newuser_nickname, $newuser_icq, $newuser_email, 
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/08 20:17:57  blueyed
+ * removed obsolete $User_ID global
+ *
  * Revision 1.10  2005/02/08 03:06:26  blueyed
  * marked get_user_info() as deprecated
  *

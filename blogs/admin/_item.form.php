@@ -101,7 +101,7 @@ if( isset( $tsk_ID ) ) $Form->hidden( 'tsk_ID', $tsk_ID );
 // In case we send this to the blog for a preview :
 $Form->hidden( 'preview', 1 );
 $Form->hidden( 'more', 1 );
-$Form->hidden( 'preview_userid', $user_ID );
+$Form->hidden( 'preview_userid', $current_User->ID );
 
 ?>
 
@@ -227,7 +227,7 @@ $Form->hidden( 'preview_userid', $user_ID );
 
 		if( get_bloginfo('allowpingbacks') )
 		{ // --------------------------- PINGBACK --------------------------------------
-			
+
 		?>
 		<div>
 			<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback"
@@ -245,9 +245,9 @@ $Form->hidden( 'preview_userid', $user_ID );
 		</div>
 		<?php
 		}
-		
+
 		$Form->fieldset_end();
-		
+
 	}
 	?>
 
@@ -394,6 +394,9 @@ require dirname(__FILE__).'/_sub_end.inc.php';
 
 /*
  * $Log$
+ * Revision 1.13  2005/02/08 20:17:29  blueyed
+ * removed obsolete $User_ID global
+ *
  * Revision 1.12  2005/01/25 15:07:18  fplanque
  * cleanup
  *

@@ -49,7 +49,7 @@ switch($action)
 		 * INSERT POST & more
 		 */
 		param( 'post_category', 'integer', true );
-		$blog = get_catblog( $post_category ); 
+		$blog = get_catblog( $post_category );
 		$blogparams = get_blogparams_by_ID( $blog );
 		param( 'mode', 'string', '' );
 		switch($mode)
@@ -76,7 +76,7 @@ switch($action)
 
 		$edited_Item = & new Item();
 
- 		$edited_Item->assign_to( param( 'item_assigned_user_ID', 'integer', 0 ) );
+		$edited_Item->assign_to( param( 'item_assigned_user_ID', 'integer', 0 ) );
 
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
@@ -95,7 +95,7 @@ switch($action)
 		param( 'item_st_ID', 'integer', true );
 
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
-		{	// We can use user date:
+		{ // We can use user date:
 			$edited_Item->issue_date = make_valid_date( $item_issue_date, $item_issue_time );
 		}
 
@@ -124,7 +124,7 @@ switch($action)
 		$pingsdone = ( $post_status == 'published' ) ? true : false;
 
 		// INSERT NEW POST INTO DB:
-		$post_ID = $edited_Item->insert( $user_ID, $post_title, $content, $edited_Item->issue_date, $post_category,
+		$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $edited_Item->issue_date, $post_category,
 															$post_extracats, $post_status, $post_locale, '', 0,
 															$pingsdone, $post_urltitle, $post_url, $post_comments,
 															$post_renderers, $item_typ_ID, $item_st_ID );
@@ -138,7 +138,7 @@ switch($action)
 			echo "</div>\n";
 		}
 		else
-		{	// We do all the pinging now!
+		{ // We do all the pinging now!
 			$blogparams = get_blogparams_by_ID( $blog );
 			// trackback
 			trackbacks( $post_trackbacks, $content, $post_title, $post_ID);
@@ -159,7 +159,7 @@ switch($action)
 		 * UPDATE POST
 		 */
 		param( 'post_category', 'integer', true );
-		$blog = get_catblog($post_category); 
+		$blog = get_catblog($post_category);
 		$blogparams = get_blogparams_by_ID( $blog );
 		$location = 'b2browse.php?blog='. $blog;
 
@@ -198,7 +198,7 @@ switch($action)
 		param( 'item_st_ID', 'integer', true );
 
 		if( $current_User->check_perm( 'edit_timestamp' ))
-		{	// We use user date
+		{ // We use user date
 			$edited_Item->issue_date = make_valid_date( $item_issue_date, $item_issue_time );
 		}
 
@@ -225,21 +225,21 @@ switch($action)
 		// We need to check the previous flags...
 		$post_flags = explode(',', $edited_Item->flags );
 		if( in_array( 'pingsdone', $post_flags ) )
-		{	// pings have been done before
+		{ // pings have been done before
 			$pingsdone = true;
 		}
 		elseif( $post_status != 'published' )
-		{	// still not publishing
+		{ // still not publishing
 			$pingsdone = false;
 		}
 		else
-		{	// We'll be pinging now
+		{ // We'll be pinging now
 			$pingsdone = true;
 		}
 
 		// UPDATE POST IN DB:
 		$edited_Item->update( $post_title, $content, $edited_Item->issue_date, $post_category, $post_extracats,
-													$post_status, $post_locale, '',	0, $pingsdone, $post_urltitle, 
+													$post_status, $post_locale, '',	0, $pingsdone, $post_urltitle,
 													$post_url, $post_comments, $post_renderers, $item_typ_ID, $item_st_ID );
 
 		echo '<p>'.T_('Done.').'</p></div>';
@@ -251,7 +251,7 @@ switch($action)
 			echo "</div>\n";
 		}
 		else
-		{	// We may do some pinging now!
+		{ // We may do some pinging now!
 			$blogparams = get_blogparams_by_ID( $blog );
 
 			// trackback
@@ -261,13 +261,13 @@ switch($action)
 
 			// ping ?
 			if( in_array( 'pingsdone', $post_flags ) )
-			{	// pings have been done before
+			{ // pings have been done before
 				echo "<div class=\"panelinfo\">\n";
 				echo '<p>', T_('Post had already pinged: skipping blog pings...'), "</p>\n";
 				echo "</div>\n";
 			}
 			else
-			{	// We'll ping now
+			{ // We'll ping now
 				pingb2evonet( $blogparams, $post_ID, $post_title );
 				pingWeblogs( $blogparams );
 				pingBlogs( $blogparams );
@@ -285,9 +285,9 @@ switch($action)
 		 * PUBLISH POST NOW
 		 */
 		param( 'post_ID', 'integer', true );
-		$edited_Item = $ItemCache->get_by_ID( $post_ID ); 
+		$edited_Item = $ItemCache->get_by_ID( $post_ID );
 		$post_cat = $edited_Item->main_cat_ID;
-		$blog = get_catblog($post_cat); 
+		$blog = get_catblog($post_cat);
 		$blogparams = get_blogparams_by_ID( $blog );
 		$location = 'b2browse.php?blog=' . $blog;
 
@@ -310,15 +310,15 @@ switch($action)
 		// We need to check the previous flags...
 		$post_flags = explode(',', $edited_Item->flags );
 		if( in_array( 'pingsdone', $post_flags ) )
-		{	// pings have been done before
+		{ // pings have been done before
 			$pingsdone = true;
 		}
 		elseif( $post_status != 'published' )
-		{	// still not publishing
+		{ // still not publishing
 			$pingsdone = false;
 		}
 		else
-		{	// We'll be pinging now
+		{ // We'll be pinging now
 			$pingsdone = true;
 			$edited_Item->set( 'flags', 'pingsdone' );
 		}
@@ -340,18 +340,18 @@ switch($action)
 			echo "</div>\n";
 		}
 		else
-		{	// We may do some pinging now!
+		{ // We may do some pinging now!
 			$blogparams = get_blogparams_by_ID( $blog );
 
 			// ping ?
 			if( in_array( 'pingsdone', $post_flags ) )
-			{	// pings have been done before
+			{ // pings have been done before
 				echo "<div class=\"panelinfo\">\n";
 				echo '<p>', T_('Post had already pinged: skipping blog pings...'), "</p>\n";
 				echo "</div>\n";
 			}
 			else
-			{	// We'll ping now
+			{ // We'll ping now
 				pingb2evonet( $blogparams, $post_ID, $post_title);
 				pingWeblogs($blogparams);
 				pingBlogs($blogparams);
@@ -393,7 +393,7 @@ switch($action)
 		echo '<p>'.T_('Deleting Done...')."</p>\n";
 
 		echo '</div>';
-		
+
 		break;
 
 
@@ -441,9 +441,9 @@ switch($action)
 			$edited_Comment->set( 'author_email', $newcomment_author_email );
 			$edited_Comment->set( 'author_url', $newcomment_author_url );
 		}
-		
+
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
-		{	// We use user date
+		{ // We use user date
 			$edited_Comment->set( 'date', date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) ) );
 		}
 
@@ -485,7 +485,7 @@ switch($action)
 
 echo '<div class="panelinfo">';
 if( empty( $mode ) )
-{	// Normal mode:
+{ // Normal mode:
 	if( isset($location) )
 	{
 		echo '<p><strong>[<a href="' . $location . '">' . T_('Back to posts!') . '</a>]</strong></p>';
@@ -496,7 +496,7 @@ if( empty( $mode ) )
 	require( dirname(__FILE__) . '/_blogs_list.php' );
 }
 else
-{	// Special mode:
+{ // Special mode:
 ?>
 	<p><strong>[<a href="b2edit.php?blog=<?php echo $blog ?>&amp;mode=<?php echo $mode ?>"><?php echo T_('New post') ?></a>]</strong></p>
 <?php

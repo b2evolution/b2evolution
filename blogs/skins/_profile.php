@@ -67,7 +67,7 @@ param( 'redirect_to', 'string', '');
 $ProfileForm = & new Form( $htsrv_url.'profile_update.php', 'ProfileForm' );
 
 $ProfileForm->begin_form( 'bComment' );
-$ProfileForm->hidden( 'checkuser_id', $user_ID );
+$ProfileForm->hidden( 'checkuser_id', $current_User->ID );
 $ProfileForm->hidden( 'redirect_to', $redirect_to );
 
 $ProfileForm->info( T_('Login'), $current_User->dget('login'), T_('ID').': '.$current_User->ID );

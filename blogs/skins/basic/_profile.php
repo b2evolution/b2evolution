@@ -17,8 +17,8 @@
 	 */
 	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-	if( ! is_logged_in() )
-	{	// must be logged in!
+	if( !is_logged_in() )
+	{ // must be logged in!
 		echo '<p>', T_( 'You are not logged in.' ), '</p>';
 		return;
 	}
@@ -28,15 +28,15 @@
 	<!-- form to add a comment -->
 	<form action="<?php echo $htsrv_url ?>profile_update.php" method="post">
 
-	<input type="hidden" name="checkuser_id" value="<?php echo $user_ID ?>" />
-	
+	<input type="hidden" name="checkuser_id" value="<?php echo $current_User->ID ?>" />
+
 	<table align="center">
-	
+
 		<tr>
 			<td align="right"><strong><?php echo T_('Login:') ?></strong></td>
 			<td><?php user_info( 'login', 'htmlhead' ) ?>
 				-
-				<strong><?php echo T_('ID') ?>:</strong> 
+				<strong><?php echo T_('ID') ?>:</strong>
 				<?php user_info( 'ID', 'raw' ) ?>
 			</td>
 		</tr>
@@ -56,7 +56,7 @@
 			form_text_tr( 'newuser_lastname', get_user_info( 'lastname' ), 40, T_('Last name'), '', 50, 'bComment' );
 			form_text_tr( 'newuser_nickname', get_user_info( 'nickname' ), 40, T_('Nickname'), '', 50, 'bComment' );
 		?>
-		
+
 		<tr>
 			<td align="right"><strong><label for="newuser_idmode"><?php echo T_('Identity shown') ?>:</label></strong></td>
 			<td>
@@ -88,17 +88,17 @@
 			<td align="right"><strong><label for="pass1"><?php echo T_('New password') ?>:</label></strong></td>
 			<td><input type="password" name="pass1" id="pass1" value="" size="16" /></td>
 		</tr>
-	
+
 		<tr>
 			<td align="right"><strong><label for="pass2"><?php echo T_('Confirm new password') ?>:</label></strong></td>
 			<td><input type="password" name="pass2" id="pass2" value="" size="16" /></td>
-		</tr>		
-	
+		</tr>
+
 		<tr>
 			<td align="center" colspan="2">
 				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" />
 			</td>
 		</tr>
 	</table>
-	
+
 	</form>

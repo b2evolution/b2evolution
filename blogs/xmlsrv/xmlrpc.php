@@ -100,9 +100,7 @@ function b2newpost($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	$userdata = get_userdatabylogin($username);
-	$user_ID = $userdata['ID'];
-	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
+	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check if category exists
 	if( get_the_category_by_ID( $category, false ) === false )
@@ -139,9 +137,9 @@ function b2newpost($m)
 
 	// INSERT NEW POST INTO DB:
 	$edited_Item = & new Item();
-	$post_ID = $edited_Item->insert( $user_ID, $post_title, $content, $now, $category, array(), 'published', $current_User->locale );
+	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $now, $category, array(), 'published', $current_User->locale );
 	if( !empty($DB->last_error) )
-	{	// DB error
+	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
@@ -203,7 +201,7 @@ function b2getcategories( $m )
 
 	$rows = $DB->get_results( $sql );
 	if( !empty($DB->last_error) )
-	{	// DB error
+	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
@@ -266,8 +264,7 @@ function b2_getPostURL($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	$userdata = get_userdatabylogin($username);
-	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
+	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'blog_ismember', 1, false, $blog_ID ) )
@@ -346,12 +343,10 @@ function bloggernewpost( $m )
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	$userdata = get_userdatabylogin($username);
-	$user_ID = $userdata["ID"];
-	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
+	$current_User = & $UserCache->get_by_login( $username );
 
 	if( ! ($post_category = xmlrpc_getpostcategory($content) ) )
-	{	// There was no category passed in the content:
+	{ // There was no category passed in the content:
 		$post_category = $default_category;
 	}
 
@@ -389,10 +384,10 @@ function bloggernewpost( $m )
 
 	// INSERT NEW POST INTO DB:
 	$edited_Item = & new Item();
-	$post_ID = $edited_Item->insert( $user_ID, $post_title, $content, $now, $post_category, array( $post_category ), $status, $current_User->locale, '', 0, $publish );
+	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $now, $post_category, array( $post_category ), $status, $current_User->locale, '', 0, $publish );
 
 	if( !empty($DB->last_error) )
-	{	// DB error
+	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
@@ -497,12 +492,10 @@ function bloggereditpost($m)
 
 	logIO('O','Old post Title: '.$postdata['Title']);
 
-	$userdata = get_userdatabylogin($username);
-	$user_ID = $userdata["ID"];
-	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
+	$current_User = & $UserCache->get_by_login( $username );
 
 	if( ! ($post_category = xmlrpc_getpostcategory($newcontent) ) )
-	{	// No category specified
+	{ // No category specified
 		$post_category = $edited_Item->main_cat_ID;
 	}
 	elseif( get_the_category_by_ID( $post_category, false ) === false )
@@ -554,7 +547,7 @@ function bloggereditpost($m)
 	// UPDATE POST IN DB:
 	$edited_Item->update( $post_title, $content, '', $post_category, array($post_category), $status, '#', '', 0, $pingsdone, '', '', 'open' );
 	if( !empty($DB->last_error) )
-	{	// DB error
+	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
@@ -634,11 +627,7 @@ function bloggerdeletepost($m)
 		return new xmlrpcresp(0, $xmlrpcerruser+7, 'No such post.');	// user error 7
 	}
 
-	$post_authordata=get_userdata($postdata['Author_ID']);
-
-	$userdata = get_userdatabylogin($username);
-	$user_ID = $userdata['ID'];
-	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
+	$current_User = & $UserCache->get_by_login( $username );
 
 	$blog_ID = $edited_Item->blog_ID;
 
@@ -652,7 +641,7 @@ function bloggerdeletepost($m)
 	// DELETE POST FROM DB:
 	$edited_Item->dbdelete();
 	if( !empty($DB->last_error) )
-	{	// DB error
+	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
@@ -709,8 +698,7 @@ function bloggergetusersblogs($m)
 	logIO("O","user approved.");
 
 
-	$userdata = get_userdatabylogin( $username );
-	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
+	$current_User = & $UserCache->get_by_login( $username );
 	logIO("O","Got Current user.".$current_User);
 
 
@@ -922,8 +910,7 @@ function bloggergetrecentposts( $m )
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	$userdata = get_userdatabylogin($username);
-	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
+	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'blog_ismember', 1, false, $blog_ID ) )
@@ -940,7 +927,7 @@ function bloggergetrecentposts( $m )
 	$MainList = & new ItemList( $blog_ID, $show_statuses, '', '', '', '', array(), '', 'DESC', '', $numposts );
 
 	if( !empty($DB->last_error) )
-	{	// DB error
+	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
@@ -1024,8 +1011,7 @@ function bloggergettemplate($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	$userdata = get_userdatabylogin($username);
-	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
+	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'templates' ) )
@@ -1108,8 +1094,7 @@ function bloggersettemplate( $m )
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	$userdata = get_userdatabylogin($username);
-	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
+	$current_User = & $UserCache->get_by_login( $username );
 
 	// Check permission:
 	if( ! $current_User->check_perm( 'templates' ) )
@@ -1185,10 +1170,10 @@ $pingback_ping_doc = 'gets a pingback and registers it as a comment prefixed by 
  */
 function pingback_ping( $m )
 {
-
 	global $DB, $notify_from, $xmlrpcerruser;
 	global $baseurl;
 	global $localtimenow, $Messages;
+	global $UserCache;
 
 	$log = debug_fopen('./xmlrpc.log', 'w');
 
@@ -1257,7 +1242,7 @@ function pingback_ping( $m )
 								WHERE post_title RLIKE '$title'";
 				$blah = $DB->get_row( $sql, ARRAY_A );
 				if( !empty($DB->last_error) )
-				{	// DB error
+				{ // DB error
 					return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 				}
 				$post_ID = $blah['ID'];
@@ -1288,7 +1273,7 @@ function pingback_ping( $m )
 						WHERE ID = '.$post_ID;
 		$rows = $DB->get_results( $sql );
 		if( !empty($DB->last_error) )
-		{	// DB error
+		{ // DB error
 			return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 		}
 
@@ -1303,7 +1288,7 @@ function pingback_ping( $m )
 								AND comment_type = 'pingback'";
 			$rows = $DB->get_results( $sql );
 			if( !empty($DB->last_error) )
-			{	// DB error
+			{ // DB error
 				return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 			}
 
@@ -1374,24 +1359,24 @@ function pingback_ping( $m )
 														'".$DB->escape($context)."')";
 						$DB->query( $sql );
 						if( !empty($DB->last_error) )
-						{	// DB error
+						{ // DB error
 							return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 						}
 
 						/*
 						 * New pingback notification:
 						 */
-						$authordata = get_userdata($postdata['Author_ID']);
-						if( get_user_info( 'notify', $authordata ) )
+						$AuthorUser = & $UserCache->get_by_ID( $postdata['Author_ID'] );
+						if( $AuthorUser->get( 'notify' ) )
 						{ // Author wants to be notified:
-							locale_temp_switch( get_user_info('locale', $authordata) );
+							locale_temp_switch( $AuthorUser->get( 'locale' ) );
 
-							$recipient = get_user_info( 'email', $authordata );
+							$recipient = $AuthorUser->get( 'email' );
 							$subject = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] );
 							// fplanque added:
 							$comment_blogparams = get_blogparams_by_ID( $blog );
 
-							$notify_message	 = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] )."\n";
+							$notify_message  = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] )."\n";
 							$notify_message .= url_add_param( get_bloginfo('blogurl', $comment_blogparams), "p=$post_ID&pb=1\n\n", '&' );
 							$notify_message .= T_('Website'). ": $original_title\n";
 							$notify_message .= T_('Url'). ": $original_pagelinkedfrom\n";
@@ -1408,18 +1393,19 @@ function pingback_ping( $m )
 				{ // URL pattern not found - page doesn't link to us:
 					debug_fwrite($log, 'The page doesn\'t link to us!'."\n");
 					$resp_message = "Page linked to: $pagelinkedto\nPage linked from: $pagelinkedfrom\nTitle: $title\n\n".$messages[1];
-
 				}
-			} else {
-				// We already have a Pingback from this URL
+			}
+			else
+			{ // We already have a Pingback from this URL
 				$resp_message = "Sorry, you already did a pingback to $pagelinkedto from $pagelinkedfrom.";
 			}
-		} else {
-			// Post_ID not found
+		}
+		else
+		{ // Post_ID not found
 			$resp_message = $messages[2];
 			debug_fwrite($log, 'Post doesn\'t exist'."\n");
 		}
-	}	 // / in siteurl
+	} // / in siteurl
 
 	// xmlrpc_debugmsg( 'Okay'.$messages[0] );
 
@@ -1789,7 +1775,7 @@ function mwnewpost($m)
 
 	if( !empty($DB->last_error) )
 
-	{	// DB error
+	{ // DB error
 
 		logIO("O","user error finding category info ...");
 
@@ -1847,12 +1833,8 @@ function mwnewpost($m)
 
 // so some debugging code is probably in order
 
-	$userdata = get_userdatabylogin($username);
-
-	$user_ID = $userdata['ID'];
-
-	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
-	logIO("O","got currentuser ...user_id ->".$user_ID);
+	$current_User = & $UserCache->get_by_login( $username );
+	logIO( 'O', 'Got currentuser ...user_id -> '.$current_User->ID );
 
 
 
@@ -1936,15 +1918,15 @@ function mwnewpost($m)
 
 	// Tor - comment this out to stop inserts into database
 
-//	$post_ID = bpost_create( $user_ID, $post_title, $content, $now, $category, array(), 'published', $current_User->locale );
+//	$post_ID = bpost_create( $current_User->ID, $post_title, $content, $now, $category, array(), 'published', $current_User->locale );
 	// INSERT NEW POST INTO DB:
 	$edited_Item = & new Item();
-	$post_ID = $edited_Item->insert( $user_ID, $post_title, $content, $now, $category, array( $category ), $status, $current_User->locale, '', 0, $publish );
+	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $now, $category, array( $category ), $status, $current_User->locale, '', 0, $publish );
 
 
 	if( !empty($DB->last_error) )
 
-	{	// DB error
+	{ // DB error
 
 		logIO("O","user error 9 ...");
 
@@ -2072,13 +2054,11 @@ function mweditpost($m)
 
 	logIO('O','Old post Title: '.$postdata['Title']);
 
-	$userdata = get_userdatabylogin($username);
-	$user_ID = $userdata["ID"];
-	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
+	$current_User = & $UserCache->get_by_login( $username );
 
 //	if( ! ($post_category = xmlrpc_getpostcategory($newcontent) ) ) // bug in library Tor 23102005
 	if( ! ($post_category = $contentstruct['categories'] ) )
-	{	// No category specified
+	{ // No category specified
 		$post_category = $edited_Item->main_cat_ID;
 	}
 	elseif( get_the_category_by_ID( $post_category, false ) === false )
@@ -2144,7 +2124,7 @@ function mweditpost($m)
 
 	if( !empty($DB->last_error) )
 
-	{	// DB error
+	{ // DB error
 
 	       logIO("O","We got a database error ...");
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
@@ -2221,7 +2201,7 @@ function mwgetcats( $m )
 
 	if( !empty($DB->last_error) )
 
-	{	// DB error
+	{ // DB error
 
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 
@@ -2327,16 +2307,14 @@ function metawebloggetrecentposts( $m )
 
 
 
-	$userdata = get_userdatabylogin($username);
-		logIO("O","In metawebloggetrecentposts, current userdata is ...". $userdata);
+	logIO( 'O', 'In metawebloggetrecentposts, current userdata is ... '. $userdata );
 
 
 
-//	$current_User = & new User( $userdata );
-	$current_User = & $UserCache->get_by_ID( $userdata['ID'] );
+	$current_User = & $UserCache->get_by_login( $username );
 
 
-	logIO("O","In metawebloggetrecentposts, current user is ...". $Current_user);
+	logIO( 'O', 'In metawebloggetrecentposts, current user is ...'.$current_User->ID );
 
 
 
@@ -2376,7 +2354,7 @@ function metawebloggetrecentposts( $m )
 
 	if( !empty($DB->last_error) )
 
-	{	// DB error
+	{ // DB error
 
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 

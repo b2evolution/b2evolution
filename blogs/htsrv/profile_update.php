@@ -36,12 +36,12 @@ param( 'pass2', 'string', '' );
  * Basic security checks:
  */
 if( ! is_logged_in() )
-{	// must be logged in!
+{ // must be logged in!
 	die( T_('You are not logged in.') );
 }
 
-if( $checkuser_id != $user_ID )
-{	// Can only edit your own profile
+if( $checkuser_id != $current_User->ID )
+{ // Can only edit your own profile
 	die( 'You are not logged in under the same account you are trying to modify.' );
 }
 
@@ -100,7 +100,7 @@ $DB->query( "UPDATE T_users
 								user_locale= '".$DB->escape($newuser_locale)."',
 								user_notify= $newuser_notify,
 								user_showonline= $newuser_showonline
-					WHERE ID = $user_ID" );
+					WHERE ID = $current_User->ID" );
 
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
