@@ -1,6 +1,8 @@
 <?php
-// by Edd Dumbill (C) 1999-2001
-// <edd@usefulinc.com>
+/**
+ * @package xmlrpc {@link http://xmlrpc.usefulinc.com/doc/}
+ * @copyright Edd Dumbill <edd@usefulinc.com> (C) 1999-2001
+ */
 // additional fixes for case of missing xml extension file by Michel Valdrighi <m@tidakada.com>
 //
 // Copyright (c) 1999,2000,2001 Edd Dumbill.

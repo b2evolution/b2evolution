@@ -1,28 +1,50 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
- *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
- * Released under GNU GPL License - http://b2evolution.net/about/license.html
- *
+/**
  * This file implements "data objects by fplanque" :P
+ *
+ * @package b2evolution {@link http://b2evolution.net}
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/ }
+ *
+ * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
 
-/*
- * This is typically an abstract class, useful only when derived
+/**
+ * Data Object Base Class
+ *
+ * This is typically an abstract class, useful only when derived.
+ *
+ * @version beta
  */
 class DataObject
 {
+	/**
+	 * Unique ID of object in database
+	 *
+	 * Please use get/set functions to read or write this param
+	 *
+	 * @var int
+	 * @access protected
+	 */
+	var	$ID = 0;		// This will be the ID in the DB
+
+	/**#@+
+	 * @access private
+	 */
 	var	$dbtablename;
 	var $dbprefix;
 	var $dbIDname;
 	var $dbchanges = array();
-	var	$ID = 0;		// This will be the ID in the DB
+	/**#@-*/
 
-	/* 
-	 * DataObject::DataObject(-)
-	 *
+	/** 
 	 * Constructor
+	 *
+	 * {@internal DataObject::DataObject(-) }
+	 *
+	 * @param string Name of table in database
+	 * @param string Prefix of fields in the table
+	 * @param string Name of the ID field (including prefix)
 	 */
 	function DataObject( $tablename, $prefix = '', $dbIDname = 'ID' )
 	{
@@ -31,7 +53,7 @@ class DataObject
 		$this->dbIDname = $dbIDname;
 	}	
 	
-	/* 
+	/** 
 	 * DataObject::get(-)
 	 *
 	 * Get a param
