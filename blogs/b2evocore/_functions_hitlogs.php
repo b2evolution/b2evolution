@@ -40,7 +40,7 @@ function dbg($string)
 function log_hit()
 {
 	global $querycount, $localtimenow, $blog, $tablehitlog, $blackList, $search_engines, $user_agents;
-	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER;
+	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER, $page;
 	
 	$ReqURI = $_SERVER['REQUEST_URI'];
 	// dbg( "current url: ".$ReqURI);
