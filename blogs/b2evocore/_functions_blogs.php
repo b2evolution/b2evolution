@@ -46,11 +46,11 @@ function blog_create(
 	$blog_disp_bloglist	= 1,
 	$blog_in_bloglist = 1 )
 {
-	global $DB, $tableblogs, $query, $querycount, $default_locale;
+	global $DB, $query, $querycount, $default_locale;
 
 	if( $blog_locale == '#' ) $blog_locale = $default_locale;
 
-	$query = "INSERT INTO $tableblogs( blog_name, blog_shortname, blog_siteurl,
+	$query = "INSERT INTO T_blogs( blog_name, blog_shortname, blog_siteurl,
 						blog_stub, blog_staticfilename,
 						blog_tagline, blog_description, blog_longdesc, blog_locale, blog_notes, blog_keywords,
 						blog_UID, blog_allowtrackbacks, blog_allowpingbacks, blog_pingb2evonet,
@@ -90,14 +90,14 @@ function blog_create(
  */
 function blog_update_user_perms( $blog )
 {
-	global $DB, $tableblogusers, $tableusers;
+	global $DB;
 
 	// Delete old perms for thos blog:
-	$DB->query( "DELETE FROM $tableblogusers
+	$DB->query( "DELETE FROM T_blogusers
 								WHERE bloguser_blog_ID = $blog" );
 
 	// Now we need a full user list:
-	$user_IDs = $DB->get_col( "SELECT ID FROM $tableusers" );
+	$user_IDs = $DB->get_col( "SELECT ID FROM T_users" );
 
 	$inserted_values = array();
 	if( count( $user_IDs ) ) foreach( $user_IDs as $loop_user_ID )
@@ -143,7 +143,7 @@ function blog_update_user_perms( $blog )
 	// Proceed insertions:
 	if( count( $inserted_values ) )
 	{
-		$DB->query( "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+		$DB->query( "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 											bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 											bloguser_perm_cats, bloguser_perm_properties )
 									VALUES ".implode( ',', $inserted_values ) );
@@ -188,7 +188,7 @@ function get_bloginfo( $show = '', $this_blogparams = '' )
  */
 function get_blogparams_by_ID( $blog_ID )
 {
-	global $tableblogs, $cache_blogs, $use_cache, $querycount;
+	global $cache_blogs, $use_cache, $querycount;
 
 	if( $blog_ID < 1 ) die( 'No blog is selected!' );
 
@@ -211,7 +211,7 @@ function get_blogparams_by_ID( $blog_ID )
  */
 function Blog_get_by_ID( $blog_ID )
 {
-	global $tableblogs, $cache_blogs, $use_cache, $querycount;
+	global $cache_blogs, $use_cache, $querycount;
 
 	if( $blog_ID < 1 ) die( 'No blog is selected!' );
 
@@ -230,11 +230,11 @@ function Blog_get_by_ID( $blog_ID )
  */
 function blog_load_cache()
 {
-	global $DB, $tableblogs, $cache_blogs, $use_cache;
+	global $DB, $cache_blogs, $use_cache;
 	if( empty($cache_blogs) || !$use_cache )
 	{
 		$cache_blogs = array();
-		$query = "SELECT * FROM $tableblogs ORDER BY blog_ID";
+		$query = "SELECT * FROM T_blogs ORDER BY blog_ID";
 		$result = $DB->get_results( $query );
 		if( count( $result ) ) foreach( $result as $this_blog )
 		{

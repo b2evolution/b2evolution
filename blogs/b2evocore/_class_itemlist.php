@@ -87,7 +87,7 @@ class ItemList extends DataObjectList
 	 * @param array Array of cats to restrict to
 	 * @param mixed List of authors to restrict to
 	 * @param string sort order can be either ASC or DESC
-	 * @param string space separated list of fields to order by. Possible list elements are: 
+	 * @param string space separated list of fields to order by. Possible list elements are:
 	 *               author issue_date mod_date status locale content title urltitle url ctageory
 	 *               wordcount comments
 	 * @param mixed # of posts to display on the page
@@ -98,8 +98,8 @@ class ItemList extends DataObjectList
 	 * @param mixed Search for sentence or for words
 	 * @param mixed Require exact match of title or contents
 	 * @param boolean Is this preview
-	 * @param mixed 
-	 * @param mixed 
+	 * @param mixed
+	 * @param mixed
 	 * @param mixed Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Do not show posts after this timestamp, can be 'now'
 	 * @param string urltitle of post to display
@@ -130,7 +130,7 @@ class ItemList extends DataObjectList
 		$title = '' )													// urltitle of post to display
 	{
 		global $DB;
-		global $tableposts, $tablepostcats, $tablecategories;
+		global $tableposts;
 		global $cache_categories;
 		global $cat_array; // communication with recursive callback funcs
 		global $Settings;
@@ -393,12 +393,12 @@ class ItemList extends DataObjectList
 				$lastpostdate = mysql2date('U',$lastpostdate);
 				$this->limitdate_end = $lastpostdate - (($poststart -1) * 86400);
 				$this->limitdate_start = $lastpostdate+1 - (($postend) * 86400);
-				$where .= ' AND post_issue_date >= \''. date( 'Y-m-d H:i:s', $this->limitdate_start ) 
+				$where .= ' AND post_issue_date >= \''. date( 'Y-m-d H:i:s', $this->limitdate_start )
 									.'\' AND post_issue_date <= \''. date('Y-m-d H:i:s', $this->limitdate_end) . '\'';
-				
+
 			}
 		}
-		elseif( !empty($m) ) 
+		elseif( !empty($m) )
 		{ // no restriction if we request a month... some permalinks may point to the archive!
 			// echo 'ARCHIVE - no limits';
 			$limits = '';
@@ -412,7 +412,7 @@ class ItemList extends DataObjectList
 		{
 			// echo 'PAGED';
 			$pgstrt = '';
-			if ($paged) 
+			if ($paged)
 			{
 				$pgstrt = (intval($paged) -1) * $posts_per_page. ', ';
 			}
@@ -475,13 +475,13 @@ class ItemList extends DataObjectList
 			$where .= ' AND post_issue_date <= \''. $date_max.'\'';
 		}
 
-		$this->request = "SELECT DISTINCT ID, post_author, post_issue_date,	 post_mod_date,
+		$this->request = 'SELECT DISTINCT ID, post_author, post_issue_date, post_mod_date,
 																			post_status, post_locale, post_content, post_title,
 																			post_urltitle, post_url, post_category,
 																			post_autobr, post_flags, post_wordcount, post_comments,
 																			post_views, post_renderers, post_karma
-											FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID)
-														INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
+											FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)
+														INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 
 		if( $blog == 1 )
 		{ // Special case: we aggregate all cats from all blogs
@@ -574,24 +574,24 @@ class ItemList extends DataObjectList
 			$content =	preg_replace('/\%u([0-9A-F]{4,4})/e',	 "'&#'.base_convert('\\1',16,10). ';'", $content);
 		}
 
-		return "SELECT	
-										0 AS ID, 
-										$preview_userid AS post_author, 
+		return "SELECT
+										0 AS ID,
+										$preview_userid AS post_author,
 										'$post_date' AS post_issue_date,
 										'$post_date' AS post_mod_date,
 										'".$DB->escape($post_status)."' AS post_status,
-										'".$DB->escape($post_locale)."' AS post_locale, 
-										'".$DB->escape($content)."' AS post_content, 
+										'".$DB->escape($post_locale)."' AS post_locale,
+										'".$DB->escape($content)."' AS post_content,
 										'".$DB->escape($post_title)."' AS post_title,
-										NULL AS post_urltitle, 
-										'".$DB->escape($post_url)."' AS post_url, 
+										NULL AS post_urltitle,
+										'".$DB->escape($post_url)."' AS post_url,
 										$post_category AS post_category,
-										$post_autobr AS post_autobr, 
-										$post_views AS post_views, 
-										'' AS post_flags, 
-										".bpost_count_words( $content )." AS post_wordcount, 
+										$post_autobr AS post_autobr,
+										$post_views AS post_views,
+										'' AS post_flags,
+										".bpost_count_words( $content )." AS post_wordcount,
 										'open' AS post_comments,
-										'".$DB->escape( $post_renderers )."' AS post_renderers, 
+										'".$DB->escape( $post_renderers )."' AS post_renderers,
 										0 AS post_karma";
 	}
 
@@ -862,7 +862,7 @@ class ItemList extends DataObjectList
 	 */
 	function display_if_empty( $message = '' )
 	{
-		if( empty($message) ) 
+		if( empty($message) )
 		{	// Default message:
 			$message = T_('Sorry, there is no post to display...');
 		}

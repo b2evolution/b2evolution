@@ -251,6 +251,9 @@ class Blog extends DataObject
 
 		switch( $parname )
 		{
+			case 'mediadir':
+				return $this->gen_mediadir();
+
 			case 'subdir':
 				return $this->siteurl;
 
@@ -358,8 +361,7 @@ class Blog extends DataObject
 	 */
 	function dbdelete( $delete_stub_file = false, $delete_static_file = false, $echo = false )
 	{
-		global $DB, $tablehitlog, $tablecategories, $tablecomments, $tableposts,
-						$tablepostcats, $tableblogusers, $cache_blogs;
+		global $DB, $cache_blogs;
 
 		// Note: No need to localize the status messages...
 		if( $echo ) echo '<p>mySQL 3.23 compatibility mode!';
@@ -367,7 +369,7 @@ class Blog extends DataObject
 		// Get list of cats that are going to be deleted (3.23)
 		if( $echo ) echo '<br />Getting category list to delete... ';
 		$cat_list = $DB->get_list( "SELECT cat_ID
-																FROM $tablecategories
+																FROM T_categories
 																WHERE cat_blog_ID = $this->ID" );
 
 		if( empty( $cat_list ) )
@@ -380,7 +382,7 @@ class Blog extends DataObject
 			// Get list of posts that are going to be deleted (3.23)
 			if( $echo ) echo '<br />Getting post list to delete... ';
 			$post_list = $DB->get_list( "SELECT postcat_post_ID
-																		FROM $tablepostcats
+																		FROM T_postcats
 																		WHERE postcat_cat_ID IN ($cat_list)" );
 
 			if( empty( $post_list ) )
@@ -392,21 +394,21 @@ class Blog extends DataObject
 
 				// Delete postcats
 				if( $echo ) echo '<br />Deleting post-categories... ';
-				$ret = $DB->query(	"DELETE FROM $tablepostcats
+				$ret = $DB->query(	"DELETE FROM T_postcats
 															WHERE postcat_cat_ID IN ($cat_list)" );
 				if( $echo ) printf( '(%d rows)', $ret );
 
 
 				// Delete comments
 				if( $echo ) echo '<br />Deleting comments on blog\'s posts... ';
-				$ret = $DB->query( "DELETE FROM $tablecomments
+				$ret = $DB->query( "DELETE FROM T_comments
 														WHERE comment_post_ID IN ($post_list)" );
 				if( $echo ) printf( '(%d rows)', $ret );
 
 
 				// Delete posts
 				if( $echo ) echo '<br />Deleting blog\'s posts... ';
-				$ret = $DB->query(	"DELETE FROM $tableposts
+				$ret = $DB->query(	"DELETE FROM T_posts
 															WHERE ID  IN ($post_list)" );
 				if( $echo ) printf( '(%d rows)', $ret );
 
@@ -414,7 +416,7 @@ class Blog extends DataObject
 
 			// Delete categories
 			if( $echo ) echo '<br />Deleting blog\'s categories... ';
-			$ret = $DB->query( "DELETE FROM $tablecategories
+			$ret = $DB->query( "DELETE FROM T_categories
 													WHERE cat_blog_ID = $this->ID" );
 			if( $echo ) printf( '(%d rows)', $ret );
 
@@ -422,13 +424,13 @@ class Blog extends DataObject
 
 		// Delete blogusers
 		if( $echo ) echo '<br />Deleting user-blog permissions... ';
-		$ret = $DB->query( "DELETE FROM $tableblogusers
+		$ret = $DB->query( "DELETE FROM T_blogusers
 												WHERE bloguser_blog_ID = $this->ID" );
 		if( $echo ) printf( '(%d rows)', $ret );
 
 		// Delete hitlogs
 		if( $echo ) echo '<br />Deleting blog hitlogs... ';
-		$ret = $DB->query( "DELETE FROM $tablehitlog
+		$ret = $DB->query( "DELETE FROM T_hitlog
 												WHERE hit_blog_ID = $this->ID" );
 		if( $echo ) printf( '(%d rows)', $ret );
 

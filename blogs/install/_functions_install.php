@@ -19,24 +19,24 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 function check_db_version()
 {
-	global $DB, $old_db_version, $new_db_version, $tablesettings;
+	global $DB, $old_db_version, $new_db_version;
 
 	echo '<p>'.T_('Checking DB schema version...').' ';
-	$DB->query( "SELECT * FROM $tablesettings LIMIT 1" );
-	
+	$DB->query( 'SELECT * FROM T_settings LIMIT 1' );
+
 	if( $DB->get_col_info('name', 0) == 'set_name' )
 	{ // we have new table format
-		$old_db_version = $DB->get_var( "SELECT set_value FROM $tablesettings WHERE set_name = 'db_version'" );
+		$old_db_version = $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "db_version"' );
 	}
 	else
 	{
-		$old_db_version = $DB->get_var( "SELECT db_version FROM $tablesettings" );
+		$old_db_version = $DB->get_var( 'SELECT db_version FROM T_settings' );
 	}
-	
+
 	if( $old_db_version == NULL ) die( T_('NOT FOUND! This is not a b2evolution database.') );
-	
+
 	echo $old_db_version, ' : ';
-	
+
 	if( $old_db_version < 8000 ) die( T_('This version is too old!') );
 	if( $old_db_version > $new_db_version ) die( T_('This version is too recent! We cannot downgrade to it!') );
 	echo "OK.<br />\n";

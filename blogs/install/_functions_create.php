@@ -18,8 +18,6 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 function create_b2evo_tables()
 {
-	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-				$tablepostcats, $tablehitlog, $tableantispam, $tablesessions;
 	global $baseurl, $new_db_version;
 	global $DB;
 
@@ -28,7 +26,7 @@ function create_b2evo_tables()
 
 
 	echo 'Creating table for Settings... ';
-	$query = "CREATE TABLE $tablesettings (
+	$query = "CREATE TABLE T_settings (
 		set_name VARCHAR( 30 ) NOT NULL ,
 		set_value VARCHAR( 255 ) NULL ,
 		PRIMARY KEY ( set_name )
@@ -39,7 +37,7 @@ function create_b2evo_tables()
 
 
 	echo 'Creating table for Users... ';
-	$query = "CREATE TABLE $tableusers (
+	$query = "CREATE TABLE T_users (
 		ID int(10) unsigned NOT NULL auto_increment,
 		user_login varchar(20) NOT NULL,
 		user_pass CHAR(32) NOT NULL,
@@ -72,7 +70,7 @@ function create_b2evo_tables()
 
 
 	echo 'Creating table for Blogs... ';
-	$query = "CREATE TABLE $tableblogs (
+	$query = "CREATE TABLE T_blogs (
 		blog_ID int(4) NOT NULL auto_increment,
 		blog_shortname varchar(12) NULL default '',
 		blog_name varchar(50) NOT NULL default '',
@@ -112,7 +110,7 @@ function create_b2evo_tables()
 
 
 	echo 'Creating table for Categories... ';
-	$query="CREATE TABLE $tablecategories (
+	$query="CREATE TABLE T_categories (
 		cat_ID int(4) NOT NULL auto_increment,
 		cat_parent_ID int(11) default NULL,
 		cat_name tinytext NOT NULL,
@@ -129,7 +127,7 @@ function create_b2evo_tables()
 
 
 	echo 'Creating table for Posts... ';
-	$query = "CREATE TABLE $tableposts (
+	$query = "CREATE TABLE T_posts (
 		ID int(10) unsigned NOT NULL auto_increment,
 		post_author int(4) NOT NULL default '0',
 		post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
@@ -162,7 +160,7 @@ function create_b2evo_tables()
 
 
 	echo 'Creating table for Categories-to-Posts relationships... ';
-	$query = "CREATE TABLE $tablepostcats (
+	$query = "CREATE TABLE T_postcats (
 		postcat_post_ID int(11) NOT NULL default '0',
 		postcat_cat_ID int(11) NOT NULL default '0',
 		PRIMARY KEY postcat_pk (postcat_post_ID,postcat_cat_ID)
@@ -172,7 +170,7 @@ function create_b2evo_tables()
 
 
 	echo 'Creating table for Comments... ';
-	$query = "CREATE TABLE $tablecomments (
+	$query = "CREATE TABLE T_comments (
 		comment_ID int(11) unsigned NOT NULL auto_increment,
 		comment_post_ID int(11) NOT NULL default '0',
 		comment_type enum('comment','linkback','trackback','pingback') NOT NULL default 'comment',
@@ -195,7 +193,7 @@ function create_b2evo_tables()
 
 
 	echo 'Creating table for Hit-Logs... ';
-	$query = "CREATE TABLE $tablehitlog (
+	$query = "CREATE TABLE T_hitlog (
 		visitID bigint(11) NOT NULL auto_increment,
 		visitTime timestamp(14) NOT NULL,
 		visitURL varchar(250) default NULL,
@@ -259,11 +257,10 @@ function create_b2evo_tables_091()
  */
 function create_antispam()
 {
-	global $tableantispam;
 	global $DB;
 
 	echo 'Creating table for Antispam Blackist... ';
-	$query = "CREATE TABLE $tableantispam (
+	$query = "CREATE TABLE T_antispam (
 		aspm_ID bigint(11) NOT NULL auto_increment,
 		aspm_string varchar(80) NOT NULL,
 		aspm_source enum( 'local','reported','central' ) NOT NULL default 'reported',
@@ -274,7 +271,7 @@ function create_antispam()
 	echo "OK.<br />\n";
 
 	echo 'Creating default blacklist entries... ';
-	$query = "INSERT INTO $tableantispam(aspm_string) VALUES ".
+	$query = "INSERT INTO T_antispam(aspm_string) VALUES ".
 	"('penis-enlargement'), ('online-casino'), ".
 	"('order-viagra'), ('order-phentermine'), ('order-xenical'), ".
 	"('order-prophecia'), ('sexy-lingerie'), ('-porn-'), ".
@@ -294,11 +291,10 @@ function create_antispam()
  */
 function create_locales()
 {
-	global $tablelocales;
 	global $DB;
 
 	echo 'Creating table for Locales... ';
-	$query = "CREATE TABLE $tablelocales (
+	$query = "CREATE TABLE T_locales (
 		loc_locale varchar(20) NOT NULL default '',
 		loc_charset varchar(15) NOT NULL default 'iso-8859-1',
 		loc_datefmt varchar(10) NOT NULL default 'y-m-d',
@@ -324,11 +320,11 @@ function create_locales()
  */
 function create_groups()
 {
-	global $tablegroups, $tableblogusers, $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
+	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
 	global $DB;
 
 	echo 'Creating table for Groups... ';
-	$query = "CREATE TABLE $tablegroups (
+	$query = "CREATE TABLE T_groups (
 		grp_ID int(11) NOT NULL auto_increment,
 		grp_name varchar(50) NOT NULL default '',
 		grp_perm_blogs enum('user','viewall','editall') NOT NULL default 'user',
@@ -385,7 +381,7 @@ function create_groups()
 	echo "OK.<br />\n";
 
 	echo 'Creating table for Blog-User permissions... ';
-	$query = "CREATE TABLE $tableblogusers (
+	$query = "CREATE TABLE T_blogusers (
 		bloguser_blog_ID int NOT NULL default 0,
 		bloguser_user_ID int NOT NULL default 0,
 		bloguser_ismember tinyint NOT NULL default 0,
@@ -707,8 +703,6 @@ If you wish, you can delete these posts one by one after you have read them. You
  */
 function populate_main_tables()
 {
-	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-					$tablepostcats, $tablehitlog, $tableantispam, $tableblogusers;
 	global $baseurl, $new_db_version;
 	global $random_password, $query;
 	global $timestamp, $admin_email;
@@ -755,7 +749,7 @@ function populate_main_tables()
 	echo 'Creating sample comments... ';
 
 	$now = date('Y-m-d H:i:s');
-	$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author,
+	$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author,
 																				comment_author_email, comment_author_url, comment_author_IP,
 																				comment_date, comment_content, comment_karma)
 						VALUES( 1, 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1',
@@ -809,7 +803,7 @@ function populate_main_tables()
 
 	echo 'Creating user blog permissions... ';
 	// Admin for blog A:
-	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+	$query = "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 							bloguser_perm_cats, bloguser_perm_properties)
 						VALUES
@@ -830,7 +824,7 @@ function populate_main_tables()
 
 	echo 'Creating default settings... ';
 	// SETTINGS!
-	$query = "INSERT INTO $tablesettings ( set_name, set_value )
+	$query = "INSERT INTO T_settings ( set_name, set_value )
 						VALUES ( 'db_version', '$new_db_version' ),
 										( 'default_locale', '$default_locale' ),
 										( 'posts_per_page', '5' ),

@@ -1,7 +1,7 @@
 <?php
 /**
  * Category handling
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -23,7 +23,7 @@ function cat_create(
 	$cat_parent_ID,
 	$cat_blog_ID = NULL)
 {
-	global $DB, $tablecategories;
+	global $DB;
 
 	if( $cat_blog_ID == NULL )
 	{
@@ -32,7 +32,7 @@ function cat_create(
 		$cat_blog_ID = $parent_cat['cat_blog_ID'];
 	}
 
-	$sql = "INSERT INTO $tablecategories( cat_parent_ID, cat_name, cat_blog_ID)
+	$sql = "INSERT INTO T_categories( cat_parent_ID, cat_name, cat_blog_ID)
 					VALUES ( $cat_parent_ID, ".$DB->quote($cat_name).", $cat_blog_ID )";
 	if( ! $DB->query( $sql ) )
 		return 0;
@@ -53,16 +53,16 @@ function cat_update(
 	$cat_ID,
 	$cat_name,
 	$cat_parent_ID = 0,
-  $cat_blog_ID = '' )
+	$cat_blog_ID = '' )
 {
-	global $tablecategories, $DB;
+	global $DB;
 
 	if( $cat_parent_ID == 0 ) $cat_parent_ID = 'NULL';
 
-	return $DB->query( "UPDATE $tablecategories 
+	return $DB->query( "UPDATE T_categories
 												SET cat_name = ".$DB->quote($cat_name).",
 														cat_parent_ID = $cat_parent_ID ".
-                      (!empty($cat_blog_ID) ? ", cat_blog_ID = $cat_blog_ID" : '')."
+														(!empty($cat_blog_ID) ? ", cat_blog_ID = $cat_blog_ID" : '')."
 											WHERE cat_ID = $cat_ID" );
 }
 
@@ -78,20 +78,20 @@ function cat_update(
  */
 function cat_delete( $cat_ID )
 {
-	global $DB, $tablecategories, $tableposts, $tablepostcats, $query, $cache_categories, $cache_postcats;
+	global $DB, $query, $cache_categories, $cache_postcats;
 
 	// TODO: START TRANSACTION
 
 	// check there are no subcats
 	$sql = "SELECT COUNT(*)
-					FROM $tablecategories
+					FROM T_categories
 					WHERE cat_parent_ID = $cat_ID";
 	$child_count = $DB->get_var( $sql );
 	if( $child_count != 0 ) return T_("Cannot delete if there are sub-categories!");
 
 	// find parent
 	$sql = "SELECT cat_parent_ID, cat_blog_ID
-					FROM $tablecategories
+					FROM T_categories
 					WHERE cat_ID = $cat_ID";
 	if( ! ($row = $DB->get_row( $sql )) )
 		return 1; // Success: category already deleted!!
@@ -101,14 +101,14 @@ function cat_delete( $cat_ID )
 
 	// Get the list of posts in this category
 	$sql = "SELECT ID
-					FROM $tableposts
+					FROM T_posts
 					WHERE post_category = $cat_ID";
 	$IDarray = $DB->get_col( $sql );
 
 	if( ! $remap_cat_ID )
 	{	// No parent, find another cat in same blog
 		$sql = "SELECT cat_ID
-						FROM $tablecategories
+						FROM T_categories
 						WHERE cat_blog_ID = $cat_blog_ID
 							AND cat_ID != $cat_ID
 						ORDER BY cat_ID
@@ -126,7 +126,7 @@ function cat_delete( $cat_ID )
 	//  --------------- PROCEED WITH DELETING ------------
 
 	// First delete assoc to this cat when it's an extra cat
-	$sql = "DELETE FROM $tablepostcats
+	$sql = "DELETE FROM T_postcats
 						WHERE postcat_cat_ID = $cat_ID ";
 	if( !empty($IDarray) )
 	{
@@ -141,7 +141,7 @@ function cat_delete( $cat_ID )
 	{	// We are moving posts to parent or other category
 
 		// remap the posts to new category:
-		$sql = "UPDATE $tableposts
+		$sql = "UPDATE T_posts
 							SET post_category = $remap_cat_ID
 							WHERE post_category = $cat_ID";
 		$DB->query( $sql );
@@ -149,7 +149,7 @@ function cat_delete( $cat_ID )
 		// Before remapping the extracats we need to get rid of mappings that would become duplicates
 		// We remove every mapping to the old cat where a mapping to the new cat already exists
 		$sql = "SELECT DISTINCT postcat_post_ID
-						FROM $tablepostcats
+						FROM T_postcats
 						WHERE postcat_cat_ID = $remap_cat_ID";
 		$IDarray = $DB->get_col( $sql );
 
@@ -157,7 +157,7 @@ function cat_delete( $cat_ID )
 		{
 			$IDlist = implode( ',', $IDarray );
 
-			$sql = "DELETE FROM $tablepostcats
+			$sql = "DELETE FROM T_postcats
 							WHERE postcat_cat_ID = $cat_ID
 							AND postcat_post_ID IN ($IDlist)";
 			$DB->query( $sql );
@@ -165,14 +165,14 @@ function cat_delete( $cat_ID )
 
 
 		// remap the remaining extracats
-		$sql = "UPDATE $tablepostcats
+		$sql = "UPDATE T_postcats
 						SET postcat_cat_ID = $remap_cat_ID
 						WHERE postcat_cat_ID = $cat_ID";
 		$DB->query( $sql );
 	}
 
 	// do the actual deletion of the cat
-	$sql = "DELETE FROM $tablecategories
+	$sql = "DELETE FROM T_categories
 					WHERE cat_ID = $cat_ID";
 	$DB->query( $sql );
 
@@ -289,16 +289,16 @@ function get_catname($cat_ID)
  */
 function cat_load_cache()
 {
-	global $DB, $tablecategories, $tablepostcats, $tableposts, $cache_categories;
+	global $DB, $cache_categories;
 	global $show_statuses, $timestamp_min, $timestamp_max;
 	global $cat_postcounts_loaded, $blog;
 	global $Settings;
-	
+
 	if( !isset($cache_categories))
 	{
 		// echo "loading CAT cache";
 		$sql = "SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID
-						FROM $tablecategories
+						FROM T_categories
 						ORDER BY cat_name";
 		$rows = $DB->get_results( $sql, ARRAY_A );
 		if( count( $rows ) ) foreach( $rows as $myrow )
@@ -337,7 +337,7 @@ function cat_load_cache()
 
 		// echo 'Number of cats=', count($cache_categories);
 	}
-	
+
 	// ------------------------------
 	// Add post counts:
 	// ------------------------------
@@ -371,7 +371,7 @@ function cat_load_cache()
 		}
 
 		$sql = "SELECT postcat_cat_ID AS cat_ID, COUNT(*) AS cat_postcount
-						FROM $tablepostcats INNER JOIN $tableposts ON postcat_post_ID = ID
+						FROM T_postcats INNER JOIN T_posts ON postcat_post_ID = ID
 						$where
 						GROUP BY cat_ID";
 		$rows = $DB->get_results( $sql, ARRAY_A );
@@ -401,7 +401,7 @@ function cat_load_cache()
  */
 function cat_load_postcats_cache()
 {
-	global $DB, $tablepostcats, $cache_postcats, $postIDlist, $preview;
+	global $DB, $cache_postcats, $postIDlist, $preview;
 
 	if( isset($cache_postcats) )
 	{	// already done!
@@ -421,7 +421,7 @@ function cat_load_postcats_cache()
 	if( !empty($postIDlist) )
 	{
 		$sql = "SELECT postcat_post_ID, postcat_cat_ID
-						FROM $tablepostcats
+						FROM T_postcats
 						WHERE postcat_post_ID IN ($postIDlist)
 						ORDER BY postcat_post_ID, postcat_cat_ID";
 		$rows = $DB->get_results( $sql, ARRAY_A );
@@ -448,12 +448,12 @@ function cat_load_postcats_cache()
  */
 function postcats_get_byID( $post_ID )
 {
-	global $DB, $tablepostcats;
+	global $DB;
 
 	//echo "looking up cats for post $post_ID ";
 
 	$sql = "SELECT postcat_cat_ID
-					FROM $tablepostcats
+					FROM T_postcats
 					WHERE postcat_post_ID = $post_ID
 					ORDER BY postcat_cat_ID";
 	return $DB->get_col( $sql );

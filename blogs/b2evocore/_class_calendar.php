@@ -11,7 +11,7 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 /**
- * Calendar 
+ * Calendar
  *
  * @package evocore
  */
@@ -20,9 +20,9 @@ class Calendar
 	var $blog;
 	var $year, $month;
 	var $specific;					// WE ASKED FOR A SPECIFIC MONTH
-	
+
 	var $mode;  						// 'month' or 'year'
-	
+
 	var $where;
 	var $request;						// SQL query string
 	var $result;						// Result set
@@ -35,12 +35,12 @@ class Calendar
 	var $linktomontharchive;
 	/**
 	 * Where to do the navigation
-	 * 
+	 *
 	 * 'caption' or 'tfoot';
 	 *
 	 * @var string
 	 */
-	var $navigation = 'caption';	
+	var $navigation = 'caption';
 
 	var $tablestart;
 	var $tableend;
@@ -65,7 +65,7 @@ class Calendar
 	var $searchframe;
 
 	var $browseyears;
-	
+
 	/*
 	 * Calendar::Calendar(-)
 	 *
@@ -79,7 +79,7 @@ class Calendar
 		$timestamp_max = 'now'  )	// Do not show posts after this timestamp
 	{
 		global $Settings;
-		
+
 		$this->blog = $blog;
 
 		// Find out which month to display:
@@ -164,7 +164,7 @@ class Calendar
 		$this->headerdisplay = 'D';	 // D => 'Fri'; e => 'F', l (lowercase l) => 'Friday'
 		// These codes are twisted because they're the same as for date formats.
 		// set this to 0 or '' if you don't want to display the "Mon Tue Wed..." header
-		
+
 		$this->headerrowstart = '<thead><tr class="bCalendarRow">' . "\n";
 		$this->headerrowend = "</tr></thead>\n";
 		$this->headercellstart = '<th class="bCalendarHeaderCell" abbr="[abbr]" scope="col" title="[abbr]">';	// please leave [abbr] there !
@@ -185,7 +185,7 @@ class Calendar
 		$this->searchframe = 12;	// How many month will we search back for a post before we give up
 
 		$this->browseyears = ($this->mode == 'year');  // browsing years from Calendar's caption
-		
+
 		/**#@+
 		 * Display number of posts with days/months
 		 *
@@ -225,7 +225,6 @@ class Calendar
 	function display( $file = '', $params = '' )	// Page to use for links
 	{
 		global $DB;
-		global $tableposts, $tablepostcats, $tablecategories;
 		global $weekday, $weekday_abbrev, $weekday_letter, $month, $month_abbrev;
 		global $start_of_week;
 		global $Settings;
@@ -233,20 +232,20 @@ class Calendar
 		if( $this->mode == 'month' )
 		{
 			$end_of_week = (($start_of_week + 7) % 7);
-	
+
 			// Find a month with posts
 			$searchmonth = $this->month;
 			$searchyear = $this->year;
 			for( $i = 0; $i < $this->searchframe; $i++ )
 			{
 				$arc_sql = "SELECT COUNT(DISTINCT ID), YEAR(post_issue_date), MONTH(post_issue_date), DAYOFMONTH(post_issue_date) AS myday".
-						" FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID)".
-						" INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID".
+						" FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID)".
+						" INNER JOIN T_categories ON postcat_cat_ID = cat_ID".
 						" WHERE MONTH(post_issue_date) = '$searchmonth' AND YEAR(post_issue_date) = '$searchyear' ".$this->where.
 						" GROUP BY myday".
 						" ORDER BY post_issue_date DESC";
 				$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
-				
+
 				if( $DB->num_rows > 0 )
 				{	// OK we have a month with posts!
 					foreach( $arc_result as $arc_row )
@@ -270,14 +269,14 @@ class Calendar
 					}
 				}
 			}
-	
+
 			// echo $this->month,'.',$this->year;
-	
+
 			$daysinmonth = intval(date('t', mktime(0, 0, 0, $this->month, 1, $this->year)));
 			// echo 'days in month=', $daysinmonth;
 			$datestartofmonth = $this->year.'-'.$this->month.'-01';
 			$dateendofmonth = $this->year.'-'.$this->month.'-'.$daysinmonth;
-	
+
 			// caution: offset bug inside
 			$calendarblah = get_weekstartend($datestartofmonth, $start_of_week);
 			if (mysql2date('w', $datestartofmonth) == $start_of_week) {
@@ -286,7 +285,7 @@ class Calendar
 				$calendarfirst = $calendarblah['end'] - 604799 + 3600;  // adjust for daylight savings time
 			}
 			//echo 'calendarfirst=', $calendarfirst;
-	
+
 			$calendarblah = get_weekstartend($dateendofmonth, $end_of_week);
 			if (mysql2date('w', $dateendofmonth) == $end_of_week) {
 				$calendarlast = $calendarblah['start'] + 1;
@@ -294,17 +293,17 @@ class Calendar
 				$calendarlast = $calendarblah['end'] + 10000;
 			}
 			//echo 'calendarlast=', $calendarlast;
-	
+
 			// here the offset bug is corrected
 			if ((intval(date('d', $calendarfirst)) > 1) && (intval(date('m', $calendarfirst)) == intval($this->month))) {
 				$calendarfirst = $calendarfirst - 604800;
 			}
-	
+
 			// Create links to previous/next month
 			$previous_month_link = '<a href="'.
 				archive_link( ($this->month > 1) ? $this->year : ($this->year - 1),	($this->month > 1) ? ($this->month - 1) : 12, '', '', false, $file, $params )
 				.'" title="'.T_('previous month').'">&lt;</a>';
-	
+
 			$next_month_link = '<a href="'.
 				archive_link( ($this->month < 12) ? $this->year : ($this->year + 1), ($this->month < 12) ? ($this->month + 1) : 1, '', '', false, $file, $params )
 				.'" title="'.T_('next month').'">&gt;</a>';
@@ -313,14 +312,14 @@ class Calendar
 		{ // mode is 'year'
 			// Find months with posts
 			$arc_sql = "SELECT COUNT(DISTINCT ID), MONTH(post_issue_date) AS mymonth ".
-						"FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) ".
-						"INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ".
+						"FROM (T_posts INNER JOIN T_postcats ON ID = postcat_post_ID) ".
+						"INNER JOIN T_categories ON postcat_cat_ID = cat_ID ".
 						"WHERE YEAR(post_issue_date) = '$this->year' ".$this->where.
 						" GROUP BY mymonth".
 						" ORDER BY post_issue_date DESC";
-	
+
 			$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
-			
+
 			if( $DB->num_rows > 0 )
 			{	// OK we have a month with posts!
 				foreach( $arc_result as $arc_row )
@@ -329,7 +328,7 @@ class Calendar
 				}
 			}
 		}
-		
+
 		if( $this->browseyears )
 		{ // create links to previous/next year
 			$previous_year_link = '<a href="'.
@@ -350,12 +349,12 @@ class Calendar
 		if( $this->displaycaption )
 		{	// caption:
 			echo $this->monthstart;
-			
+
 			if( $this->navigation == 'caption' )
 			{	// Link to previous year:
 				echo isset( $previous_year_link ) ? $previous_year_link : '';
 			}
-			
+
 			if( $this->mode == 'month' )
 			{	// MONTH CAPTION:
 
@@ -375,7 +374,7 @@ class Calendar
 				{	// close link to month archive
 					echo '</a>';
 				}
-			
+
 				if( $this->navigation == 'caption' )
 				{	// Link to next month:
 					echo '&nbsp;&nbsp;'.$next_month_link;
@@ -385,12 +384,12 @@ class Calendar
 			{	// YEAR CAPTION:
 				echo date_i18n('Y', mktime(0, 0, 0, 1, 1, $this->year)); // display year
 			}
-			
+
 			if( $this->navigation == 'caption' )
 			{	// Link to next year:
 				echo isset( $next_year_link ) ? $next_year_link : '';
 			}
-			
+
 			echo $this->monthend;
 		}
 
@@ -409,12 +408,12 @@ class Calendar
 						// e => 'F'
 						echo T_($weekday_letter[($i % 7)]);
 						break;
-						
+
 					case 'l':
 						// l (lowercase l) => 'Friday'
 						echo T_($weekday[($i % 7)]);
 						break;
-			
+
 					default:	// Backward compatibility: any non emty value will display this
 						// D => 'Fri'
 						echo T_($weekday_abbrev[($i % 7)]);
@@ -422,7 +421,7 @@ class Calendar
 
 				echo $this->headercellend;
 			}
-			
+
 			echo $this->headerrowend;
 		}
 
@@ -484,7 +483,7 @@ class Calendar
 					echo $this->cellstart;
 				}
 				echo T_($month_abbrev[ zeroise($i, 2) ]);
-				
+
 				if( isset($monthswithposts[ $i ]) )
 				{ // close anchor and show how many posts we have for this month
 					if( $monthswithposts[ $i ] > 1 && !empty($this->postcount_year_cell) )
@@ -505,11 +504,11 @@ class Calendar
 			}
 		}
 		else // mode == 'month'
-		{	
+		{
 			$newrow = 0;
 			$j = 0;
 			$k = 1;
-			
+
 			for($i = $calendarfirst; $i < ($calendarlast + 86400); $i = $i + 86400)
 			{	// loop day by day (86400 seconds = 24 hours)
 				if ($newrow == 1)
@@ -522,7 +521,7 @@ class Calendar
 					echo $this->rowstart;
 					$newrow = 0;
 				}
-	
+
 				if (date('m', $i) != $this->month)
 				{	// empty cell
 					echo $this->emptycellstart;
@@ -533,7 +532,7 @@ class Calendar
 				{	// This day is in this month
 					$k = $k + 1;
 					$calendartoday = (date('Ymd',$i) == date('Ymd', (time() + ($Settings->get('time_difference') * 3600))));
-	
+
 					if( isset($daysinmonthwithposts[ date('j', $i) ]) )
 					{
 						if( $calendartoday )
@@ -588,9 +587,9 @@ class Calendar
 				}
 			} // loop day by day
 		} // mode == 'month'
-		
+
 		echo $this->rowend;
-		
+
 		echo $this->tableend;
 	}  // display(-)
 

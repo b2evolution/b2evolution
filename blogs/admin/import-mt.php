@@ -307,7 +307,7 @@ param( 'mode', 'string', 'normal' );
 		<?php if( $mode != 'easy' )	{ ?>
 		<fieldset><legend>Author mapping</legend>
 			<?php
-				$evousers = $DB->get_results("SELECT * FROM $tableusers ORDER BY ID");
+				$evousers = $DB->get_results('SELECT * FROM T_users ORDER BY ID');
 				foreach ($authors as $author)
 				{
 					++$i_user;
@@ -563,11 +563,9 @@ param( 'mode', 'string', 'normal' );
 
 		foreach( $catsmapped as $mtcat => $values ) if( $values[0] == 'blogid' )
 		{
-			global $tablecategories;
-
 			echo 'Category <span style="color:#09c">'.$values[2].'</span> (for blog #'.$values[1].') ';
 			// check if it already exists
-			$cat_ID = $DB->get_var("SELECT cat_ID FROM $tablecategories
+			$cat_ID = $DB->get_var("SELECT cat_ID FROM T_categories
 															WHERE cat_blog_ID = {$values[1]}
 															AND cat_name = ".$DB->quote( $values[2] ));
 			if( !$cat_ID )
@@ -843,7 +841,7 @@ param( 'mode', 'string', 'normal' );
 			}
 
 			// Let's check to see if it's in already
-			if( $post_ID = $DB->get_var("SELECT ID FROM $tableposts WHERE post_title = ".$DB->quote($post_title)." AND post_issue_date = '$post_date'")) {
+			if( $post_ID = $DB->get_var("SELECT ID FROM T_posts WHERE post_title = ".$DB->quote($post_title)." AND post_issue_date = '$post_date'")) {
 				$message .= '<li style="color:blue">Post already imported.</li>';
 			}
 			else
@@ -1037,11 +1035,11 @@ param( 'mode', 'string', 'normal' );
 					$comment_content = preg_replace("/\n*-----$/", '', $comment);
 
 					// Check if it's already in there
-					if( !$DB->get_row("SELECT * FROM $tablecomments WHERE comment_date = '$comment_date' AND comment_content = ".$DB->quote( $comment_content )) )
+					if( !$DB->get_row("SELECT * FROM T_comments WHERE comment_date = '$comment_date' AND comment_content = ".$DB->quote( $comment_content )) )
 					{
 						if( !$simulate )
 						{
-							$DB->query( "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author_ID, comment_author,
+							$DB->query( "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author,
 																										comment_author_email, comment_author_url, comment_author_IP,
 																										comment_date, comment_content)
 												VALUES( $post_ID, 'comment', 'NULL', ".$DB->quote($comment_author).",
@@ -1084,11 +1082,11 @@ param( 'mode', 'string', 'normal' );
 					$comment_content = "<strong>$ping_title</strong><br />$comment_content";
 
 					// Check if it's already there
-					if (!$DB->get_row("SELECT * FROM $tablecomments WHERE comment_date = '$comment_date' AND comment_type = 'trackback' AND comment_content = ".$DB->quote($comment_content)))
+					if (!$DB->get_row("SELECT * FROM T_comments WHERE comment_date = '$comment_date' AND comment_type = 'trackback' AND comment_content = ".$DB->quote($comment_content)))
 					{
 						if( !$simulate )
 						{
-							$DB->query( "INSERT INTO $tablecomments
+							$DB->query( "INSERT INTO T_comments
 								(comment_post_ID, comment_type, comment_author, comment_author_email, comment_author_url,
 								comment_author_IP, comment_date, comment_content )
 								VALUES

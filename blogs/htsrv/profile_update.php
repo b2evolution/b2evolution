@@ -44,7 +44,7 @@ if( $checkuser_id != $user_ID )
 
 if( $demo_mode && ($user_login == 'demouser'))
 {
-	die( 'Demo mode: you can\'t edit the demouser profile!<br />[<a href="javascript:history.go(-1)">' 
+	die( 'Demo mode: you can\'t edit the demouser profile!<br />[<a href="javascript:history.go(-1)">'
 				. T_('Back to profile') . '</a>]' );
 }
 
@@ -101,7 +101,7 @@ else
 		die ('<strong>' . T_('ERROR') . '</strong>: ' . T_('you typed two different passwords. Go back to correct that.')
 				. '<br />[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
 	}
-	
+
 	if( strlen($pass1) < $Settings->get('user_minpwdlen') )
 	{
 		die( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen'))
@@ -117,7 +117,7 @@ else
 }
 
 
-$DB->query( "UPDATE $tableusers 
+$DB->query( "UPDATE T_users
 								SET $updatepassword
 										user_firstname= '".$DB->escape($newuser_firstname)."',
 										user_lastname= '".$DB->escape($newuser_lastname)."',

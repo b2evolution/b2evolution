@@ -8,7 +8,7 @@
  *
  * @package htsrv
  */
- 
+
 /**
  * Includes:
  */
@@ -83,7 +83,7 @@ switch( $action )
 
 		// checking the login isn't already used by another user:
 		if( $DB->get_var( "SELECT count(*)
-												FROM $tableusers
+												FROM T_users
 												WHERE user_login = '".$DB->escape($login)."'" ) )
 		{
 			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('this login is already registered, please choose another one');
@@ -115,7 +115,7 @@ switch( $action )
 		// switch to admins locale
 		$admin_data = get_userdata(1);
 		locale_temp_switch( $admin_data['user_locale'] );
-		
+
 		$message  = T_('new user registration on your blog'). ":\n\n";
 		$message .= T_('Login:'). " $login\n\n". T_('Email'). ": $email\n\n";
 		$message .= T_('Manage users'). ": $admin_url/b2users.php\n\n";
@@ -123,7 +123,7 @@ switch( $action )
 		send_mail( $admin_email, T_('new user registration on your blog'), $message, $notify_from );
 
 		locale_restore_previous();
-		
+
 		// Display confirmation screen:
 		require( dirname(__FILE__).'/_reg_complete.php' );
 		exit();

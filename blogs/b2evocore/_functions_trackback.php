@@ -1,7 +1,7 @@
 <?php
 /**
  * Trackback functions
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -173,7 +173,7 @@ function trackback_number( $zero='#', $one='#', $more='#' )
 	if( $one == '#' ) $one = T_('Trackback (1)');
 	if( $more == '#' ) $more = T_('Trackbacks (%d)');
 
-	global $id, $tablecomments, $tb, $querycount, $cache_trackbacknumber, $use_cache;
+	global $id, $tb, $querycount, $cache_trackbacknumber, $use_cache;
 	$number = generic_ctp_number($id, 'trackbacks');
 	if ($number == 0) {
 		$blah = $zero;

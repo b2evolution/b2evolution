@@ -1,7 +1,7 @@
 <?php
 /**
  * Logging of hits, extraction of stats
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -34,13 +34,13 @@ if ($topRefererList)
  */
 function log_hit()
 {
-	global $DB, $localtimenow, $blog, $tablehitlog, $blackList, $search_engines, $user_agents;
+	global $DB, $localtimenow, $blog, $blackList, $search_engines, $user_agents;
 	global $doubleCheckReferers, $comments_allowed_uri_scheme, $HTTP_REFERER, $page, $ReqURI, $ReqPath;
 	global $HTTP_USER_AGENT;
 	global $uri_reloaded, $Debuglog;
-	
+
 	# TODO: check for already logged?
-	
+
 	$Debuglog->add( 'Hit Log: '. "ReqURI: ".$ReqURI );
 	$Debuglog->add( 'Hit Log: '. "Remote Addr: ".$_SERVER['REMOTE_ADDR'] );
 	$Debuglog->add( 'Hit Log: '. "referer: ".$HTTP_REFERER );
@@ -48,14 +48,14 @@ function log_hit()
 	$Debuglog->add( 'Hit Log: '. "User Agent: ".$HTTP_USER_AGENT );
 
 	// $Debuglog->add( 'Hit Log: '."Languages: ".$_SERVER['HTTP_ACCEPT_LANGUAGE']);
-	
+
 	if( $uri_reloaded )
 	{ // the Request is considered as reload
 		return false;
 	}
-	
+
 	$ignore = 'no';  // So far so good
-	
+
 	if( $HTTP_REFERER != strip_tags($HTTP_REFERER) )
 	{ // then they have tried something funny,
 		// putting HTML or PHP into the HTTP_REFERER
@@ -68,8 +68,8 @@ function log_hit()
 		$Debuglog->add( 'Hit Log: '. $error);
 		return;		// Hazardous
 	}
-	
-	// SEARCH BLACKLIST	
+
+	// SEARCH BLACKLIST
 	foreach( $blackList as $site )
 	{
 		if( strpos( $HTTP_REFERER, $site ) !== false )
@@ -79,7 +79,7 @@ function log_hit()
 			return;
 		}
 	}
-			
+
 	if( stristr($ReqPath, 'rss')
 			|| stristr($ReqPath, 'rdf')
 			|| stristr($ReqPath, 'atom')  )
@@ -99,7 +99,7 @@ function log_hit()
 			}
 		}
 	}
-	
+
 	if( $ignore == 'no' )
 	{
 		if( strlen($HTTP_REFERER) < 13 )
@@ -121,7 +121,7 @@ function log_hit()
 				break;
 			}
 		}
-	}	
+	}
 
 	if( $doubleCheckReferers )
 	{
@@ -153,7 +153,7 @@ function log_hit()
 					$goodReferer = 1;
 				}
 			}
-			
+
 			if( !$goodReferer )
 			{	// This was probably spam!
 				$Debuglog->add( 'Hit Log: '. sprintf('did not find %s in %s', $fullCurrentURL, $page ) );
@@ -171,12 +171,12 @@ function log_hit()
 	$baseDomain = preg_replace("/\/.*/i", '', $baseDomain);
 
 	// insert hit into DB table
-	$sql = "INSERT INTO $tablehitlog( visitTime, visitURL, hit_ignore, referingURL, baseDomain, 
-																		hit_blog_ID, hit_remote_addr, hit_user_agent ) 
-					VALUES( FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($ReqURI)."', '$ignore', 
-									'".$DB->escape($HTTP_REFERER)."', '".$DB->escape($baseDomain)."', $blog, 
+	$sql = "INSERT INTO T_hitlog( visitTime, visitURL, hit_ignore, referingURL, baseDomain,
+																		hit_blog_ID, hit_remote_addr, hit_user_agent )
+					VALUES( FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($ReqURI)."', '$ignore',
+									'".$DB->escape($HTTP_REFERER)."', '".$DB->escape($baseDomain)."', $blog,
 									'".$DB->escape($_SERVER['REMOTE_ADDR'])."', '".$DB->escape($HTTP_USER_AGENT)."')";
-	
+
 	return $DB->query( $sql );
 }
 
@@ -190,10 +190,10 @@ function log_hit()
  */
 function hit_delete( $hit_ID )
 {
-	global $DB, $tablehitlog;
+	global $DB;
 
-	$sql = "DELETE FROM $tablehitlog WHERE visitID = $hit_ID";
-	
+	$sql = "DELETE FROM T_hitlog WHERE visitID = $hit_ID";
+
 	return $DB->query( $sql );
 }
 
@@ -207,10 +207,10 @@ function hit_delete( $hit_ID )
  */
 function hit_prune( $date )
 {
-	global $DB, $tablehitlog;
+	global $DB;
 
 	$iso_date = date ('Y-m-d', $date);
-	$sql = "DELETE FROM $tablehitlog
+	$sql = "DELETE FROM T_hitlog
 					WHERE DATE_FORMAT(visitTime,'%Y-%m-%d') = '$iso_date'";
 
 	return $DB->query( $sql );
@@ -227,9 +227,9 @@ function hit_prune( $date )
  */
 function hit_change_type( $hit_ID, $type )
 {
-	global $DB, $tablehitlog;
+	global $DB;
 
-	$sql = "UPDATE $tablehitlog
+	$sql = "UPDATE T_hitlog
 					SET hit_ignore = '$type',
 							visitTime = visitTime "	// prevent mySQL from updating timestamp
 					." WHERE visitID = $hit_ID";
@@ -254,7 +254,7 @@ function refererList(
 	$get_total_hits = false, // Get total number of hits (needed for percentages)
 	$get_user_agent = false ) // Get the user agent
 {
-	global $DB, $tablehitlog, $res_stats, $stats_total_hits, $ReqURI;
+	global $DB, $res_stats, $stats_total_hits, $ReqURI;
 
 	autoquote( $type );		// In case quotes are missing
 
@@ -288,8 +288,8 @@ function refererList(
 	{
 		$sql .= ", hit_user_agent";
 	}
-	
-	$sql_from_where = " FROM $tablehitlog WHERE hit_ignore IN ($type)";
+
+	$sql_from_where = " FROM T_hitlog WHERE hit_ignore IN ($type)";
 	if( !empty($blog_ID) )
 	{
 		$sql_from_where .= " AND hit_blog_ID = '$blog_ID'";
@@ -371,8 +371,8 @@ function stats_hit_count()
 /*
  * stats_hit_percent(-)
  */
-function stats_hit_percent( 
-	$decimals = 1, 
+function stats_hit_percent(
+	$decimals = 1,
 	$dec_point = ',' )
 {
 	global $row_stats, $stats_total_hits;
@@ -460,7 +460,7 @@ function stats_search_keywords()
 			}
 			$qwords = explode( ' ', $q );
 			foreach( $qwords as $qw )
-			{	
+			{
 				if( strlen( $qw ) > 30 ) $qw = substr( $qw, 0, 30 )."...";	// word too long, crop it
 				$kwout .= $qw.' ';
 			}
@@ -512,13 +512,13 @@ function stats_user_agent( $translate = false )
  * {@internal stats_title(-) }}
  *
  * @param string Prefix to be displayed if something is going to be displayed
- * @param mixed Output format, see {@link format_to_output()} or false to 
+ * @param mixed Output format, see {@link format_to_output()} or false to
  *								return value instead of displaying it
  */
-function stats_title( $prefix = ' ', $display = 'htmlbody' ) 
+function stats_title( $prefix = ' ', $display = 'htmlbody' )
 {
 	global $disp;
-	
+
 	if( $disp == 'stats' )
 	{
 		$info = $prefix. T_('Statistics');
@@ -534,12 +534,12 @@ function stats_title( $prefix = ' ', $display = 'htmlbody' )
 /* select count(*) as nb, hit_ignore
 from b2hitlog
 group by hit_ignore
-order by nb desc 
+order by nb desc
 
 
 update b2hitlog
-set hit_ignore ='robot' 
-where `hit_ignore` LIKE 'invalid' AND `hit_user_agent` LIKE 'FAST-WebCrawler/%'  
+set hit_ignore ='robot'
+where `hit_ignore` LIKE 'invalid' AND `hit_user_agent` LIKE 'FAST-WebCrawler/%'
 
 
 

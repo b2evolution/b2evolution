@@ -20,13 +20,13 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 		<?php
 		if( $user > 0 )
 		{	// Links to next/previous user
-			
+
 			$prevuserid = 0;
 			$nextuserid = 0;
-			
-			$query = "SELECT MAX(ID), MIN(ID) FROM $tableusers";
+
+			$query = "SELECT MAX(ID), MIN(ID) FROM T_users";
 			$uminmax = $DB->get_row( $query, ARRAY_A );
-			
+
 			foreach( $userlist as $fuser )
 			{ // find prev/next id
 				if( $fuser['ID'] < $user )
@@ -46,7 +46,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 					}
 				}
 			}
-			
+
 			echo ( $user != $uminmax['MIN(ID)'] ) ? '<a title="'.T_('first user').'" href="?user='.$uminmax['MIN(ID)'].'">[&lt;&lt;]</a>' : '[&lt;&lt;]';
 			echo ( $prevuserid ) ? '<a title="'.T_('previous user').' ('.$prevuserlogin.')" href="?user='.$prevuserid.'">[&lt;]</a>' : '[&lt;]';
 			echo ( $nextuserid ) ? '<a title="'.T_('next user').' ('.$nextuserlogin.')" href="?user='.$nextuserid.'">[&gt;]</a>' : '[&gt;]';
@@ -56,7 +56,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 		<a title="<?php echo T_('Close user profile'); ?>" href="b2users.php"><img src="img/close.gif" alt="X" width="14" height="14" title="<?php echo T_('Close user profile'); ?>" class="middle" /></a>
 	</div>
 	<?php } ?>
-		
+
 	<h2><?php
 	if( $edited_User->get('ID') == 0 )
 	{
@@ -66,9 +66,9 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 	{
 		echo T_('Profile for:').' '.$edited_User->dget('firstname').' '.$edited_User->dget('lastname')
 					.' ['.( isset($edited_user_oldlogin)? $edited_user_oldlogin : $edited_User->dget('login') ).']';
-	}	
+	}
 	?></h2>
-	
+
 	<form class="fform" method="post" action="b2users.php<?php if( $user != 0 ) echo '?user='.$user?>">
 		<input type="hidden" name="action" value="userupdate" />
 		<input type="hidden" name="edited_user_ID" value="<?php $edited_User->disp('ID','formvalue') ?>" />
@@ -76,7 +76,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			echo ( isset($edited_user_oldlogin) ? format_to_output($edited_user_oldlogin, 'formvalue')
 																					: $edited_User->dget('login', 'formvalue') )
 		?>" />
-		
+
 
 	<fieldset>
 		<legend><?php echo T_('User rights') ?></legend>
@@ -144,14 +144,14 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 				form_info( T_('Identity shown'), $edited_User->dget('preferedname') );
 				form_info( T_('Locale'), $edited_User->dget('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
 			}
-			
+
 			$fieldnote = '<a href="mailto:'.$edited_User->get('email').'"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Send an email').'" /></a>';
 
 			if( $allowed_to_edit )
 				form_text( 'edited_user_email', $edited_User->dget('email', 'formvalue'), 30, T_('Email'), $fieldnote, 100 );
 			else
 				form_info( T_('Email'), $edited_User->dget('email'), $fieldnote );
-			
+
 			if( ($url = $edited_User->get('url')) != '' )
 			{
 				if( !preg_match('#://#', $url) )
@@ -165,7 +165,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 				form_text( 'edited_user_url', $edited_User->dget('url', 'formvalue'), 30, T_('URL'), $fieldnote, 100 );
 			else
 				form_info( T_('URL'), $edited_User->dget('url'), $fieldnote );
-			
+
 			if( $edited_User->get('icq') != 0 )
 			{
 				$fieldnote = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$edited_User->get('icq').'" target="_blank"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Search on ICQ.com').'" /></a>';
@@ -175,7 +175,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 				form_text( 'edited_user_icq', $edited_User->dget('icq', 'formvalue'), 30, T_('ICQ'), $fieldnote, 10 );
 			else
 				form_info( T_('ICQ'), $edited_User->dget('icq', 'formvalue'), $fieldnote );
-			
+
 			if( $edited_User->get('aim') != '' )
 			{
 				$fieldnote = '<a href="aim:goim?screenname='.$edited_User->get('aim').'&amp;message=Hello"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Instant Message to user').'" /></a>';
@@ -224,7 +224,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 	</fieldset>
 
 	</form>
-	
+
 	<div class="clear"></div>
 
 

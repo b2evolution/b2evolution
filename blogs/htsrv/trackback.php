@@ -24,11 +24,11 @@ param( 'excerpt', 'html' );
 param( 'blog_name', 'string' );
 if(empty($tb_id))
 {	// No parameter for ID, get if from URL:
-	$path_elements = explode( '/', $ReqPath, 30 );	
+	$path_elements = explode( '/', $ReqPath, 30 );
 	$tb_id = intval( $path_elements[count($path_elements)-1] );
 }
 
-if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url))) 
+if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)))
 {
 	@header('Content-Type: text/xml');
 
@@ -37,7 +37,7 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 	$blog = $postdata['Blog'];
 	$blogparams = get_blogparams_by_ID( $blog );
 
-	if( !get_bloginfo('allowtrackbacks', $blogparams) ) 
+	if( !get_bloginfo('allowtrackbacks', $blogparams) )
 	{
 		trackback_response(1, 'Sorry, this weblog does not allow you to trackback its posts.');
 	}
@@ -57,10 +57,10 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 	$user_domain = gethostbyaddr($user_ip);
 	$now = date('Y-m-d H:i:s', $localtimenow );
 
-	// CHECK and FORMAT content	
+	// CHECK and FORMAT content
 	if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
 	{
-		$Messages->add( T_('Supplied URL is invalid: ').$error );	
+		$Messages->add( T_('Supplied URL is invalid: ').$error );
 	}
 	$comment = format_to_post($comment,1,1);
 
@@ -74,18 +74,18 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 	$comment_author_email = '';
 	$comment_author_url = $url;
 
-	$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author, 
+	$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author,
 																				comment_author_email, comment_author_url, comment_author_IP,
-																				comment_date, comment_content) 
-						VALUES( $comment_post_ID, 'trackback', '".$DB->escape($comment_author)."', 
+																				comment_date, comment_content)
+						VALUES( $comment_post_ID, 'trackback', '".$DB->escape($comment_author)."',
 										'".$DB->escape($comment_author_email)."', '".$DB->escape($comment_author_url)."', '".$DB->escape($user_ip)."',
 										'$now', '".$DB->escape($comment)."' )";
-	if( !$DB->query( $query ) ) 
+	if( !$DB->query( $query ) )
 	{
 		trackback_response(2, "There is an error with the database, it can't store your comment...<br />Contact the <a href=\"mailto:$admin_email\">webmaster</a>");	// TODO: check that error code 2 is ok
 		die ();
 	}
-	
+
 
 	/*
 	 * New trackback notification:
@@ -109,7 +109,7 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 
 		send_mail( $recipient, $subject, $notify_message, $notify_from );
 		locale_restore_previous();
-		
+
 	}
 
 	trackback_response(0,'ok');

@@ -4,7 +4,7 @@
  *
  * It is useful when you want to do very customized templates!
  * It is also called by more complete initializers.
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -34,7 +34,7 @@ require_once( dirname(__FILE__).'/_class_generalsettings.php' );
 require_once( dirname(__FILE__).'/_class_usersettings.php' );
 require_once( dirname(__FILE__).'/_class_db.php' );
 require_once( dirname(__FILE__).'/_functions_template.php' );	// function to be called from templates
-require_once( dirname(__FILE__).'/_functions_xmlrpc.php' );	
+require_once( dirname(__FILE__).'/_functions_xmlrpc.php' );
 require_once( dirname(__FILE__).'/_functions_xmlrpcs.php' );
 require_once( dirname(__FILE__).'/_class_blog.php' );
 require_once( dirname(__FILE__).'/_class_itemlist.php' );
@@ -118,7 +118,7 @@ if( is_logged_in() && $current_User->get('locale') != $default_locale )
 /**
  * check if the URI has been requested from same IP/useragent in past reloadpage_timeout seconds.
  */
-$uri_reloaded = (bool)$DB->get_var("SELECT visitID FROM $tablehitlog
+$uri_reloaded = (bool)$DB->get_var("SELECT visitID FROM T_hitlog
 									WHERE	visitURL = ".$DB->quote($ReqURI)."
 												AND UNIX_TIMESTAMP( visitTime ) - $localtimenow < ".(int)$Settings->get('reloadpage_timeout')."
 												AND hit_remote_addr = ".$DB->quote($_SERVER['REMOTE_ADDR'])."

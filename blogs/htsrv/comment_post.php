@@ -50,12 +50,12 @@ else
 		if( empty($author) ) $Messages->add( T_('Please fill in the name field') );
 		if( empty($email) ) $Messages->add( T_('Please fill in the email field') );
 	}
-	
+
 	if( (!empty($email)) && (!is_email($email)) )
 	{
 		$Messages->add( T_('Supplied email address is invalid') );
 	}
-	
+
 	// add 'http://' if no protocol defined for URL
 	$url = ((!stristr($url, '://')) && ($url != '')) ? 'http://' . $url : $url;
 	if( strlen($url) < 7 ){
@@ -63,7 +63,7 @@ else
 	}
 	if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
 	{
-		$Messages->add( T_('Supplied URL is invalid: ') . $error );	
+		$Messages->add( T_('Supplied URL is invalid: ') . $error );
 	}
 }
 
@@ -71,7 +71,7 @@ $user_ip = $_SERVER['REMOTE_ADDR'];
 $now = date("Y-m-d H:i:s", $localtimenow );
 
 // CHECK and FORMAT content
-//echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);	
+//echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
 $original_comment = strip_tags($comment, $comment_allowed_tags);
 $comment = format_to_post($original_comment, $comment_autobr, 1);
 
@@ -82,7 +82,7 @@ if( empty($comment) )
 
 /* flood-protection */
 $query = "SELECT max(comment_date)
-					FROM $tablecomments
+					FROM T_comments
 					WHERE comment_author_IP = '$user_ip'";
 $ok = 1;
 if( $then = $DB->get_var( $query ) )
@@ -104,9 +104,9 @@ if( $Messages->display( T_('Cannot post comment, please correct these errors:'),
 	exit(); // TODO: nicer displaying here
 }
 
-$query = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author_ID, comment_author, 
+$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author_ID, comment_author,
 																			comment_author_email, comment_author_url, comment_author_IP,
-																			comment_date, comment_content)  
+																			comment_date, comment_content)
 					VALUES( $comment_post_ID, 'comment', ".$DB->null($author_ID).",
 									".$DB->quote($author).", ".$DB->quote($email).",
 									".$DB->quote($url).",'".$DB->escape($user_ip)."','$now',
@@ -126,7 +126,7 @@ if( $item_author_User->notify
 	$recipient = $item_author_User->email;
 	$subject = sprintf( T_('New comment on your post #%d "%s"'), $comment_post_ID, $commented_Item->get('title') );
 	$Blog = Blog_get_by_ID( $commented_Item->blog_ID );
-	
+
 	$notify_message  = sprintf( T_('New comment on your post #%d "%s"'), $comment_post_ID, $commented_Item->get('title') )."\n";
 	$notify_message .= str_replace('&amp;', '&', $commented_Item->gen_permalink( 'pid' ))."\n\n"; // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 	if( is_logged_in() )
@@ -143,17 +143,17 @@ if( $item_author_User->notify
 	}
 	$notify_message .= T_('Comment').": \n".$original_comment."\n\n";
 	$notify_message .= T_('Edit/Delete').': '.$admin_url.'/b2browse.php?blog='.$commented_Item->blog_ID.'&p='.$comment_post_ID."&c=1\n";
-	
-	
+
+
 	// echo "Sending notification to $recipient :<pre>$notify_message</pre>";
-	
+
 	if( is_logged_in() )
 		$mail_from = $current_User->get('email');
 	elseif( empty( $email ) )
 		$mail_from = $notify_from;
 	else
 		$mail_from = "\"$author\" <$email>";
-	
+
 	send_mail( $recipient, $subject, $notify_message, $mail_from );
 	locale_restore_previous();
 }
@@ -164,11 +164,11 @@ if( $item_author_User->notify
  */
 if( $comment_cookies )
 {	// Set cookies:
-	if ($email == '')	
+	if ($email == '')
 		$email = ' '; // this to make sure a cookie is set for 'no email'
-	if ($url == '')	
+	if ($url == '')
 		$url = ' '; // this to make sure a cookie is set for 'no url'
-	
+
 	// fplanque: made cookies available for whole site
 	setcookie( $cookie_name, $author, $cookie_expires, $cookie_path, $cookie_domain);
 	setcookie( $cookie_email, $email, $cookie_expires, $cookie_path, $cookie_domain);
@@ -176,22 +176,22 @@ if( $comment_cookies )
 }
 else
 {	// Erase cookies:
-	if( !empty($_COOKIE[$cookie_name]) ) 
-	{	
+	if( !empty($_COOKIE[$cookie_name]) )
+	{
 		// echo "del1<br />";
 		setcookie('comment_author', '', $cookie_expired, '/');
 		setcookie('comment_author', '', $cookie_expired, $cookie_path, $cookie_domain);
 		setcookie( $cookie_name, '', $cookie_expired, $cookie_path, $cookie_domain);
 	}
 	if( !empty($_COOKIE['comment_author_email']) )
-	{	
+	{
 		// echo "del2<br />";
 		setcookie('comment_author_email', '', $cookie_expired, '/');
 		setcookie('comment_author_email', '', $cookie_expired, $cookie_path, $cookie_domain);
 		setcookie( $cookie_email, '', $cookie_expired, $cookie_path, $cookie_domain);
 	}
 	if( !empty($_COOKIE['comment_author_url']) )
-	{	
+	{
 		// echo "del3<br />";
 		setcookie('comment_author_url', '', $cookie_expired, '/');
 		setcookie('comment_author_url', '', $cookie_expired, $cookie_path, $cookie_domain);

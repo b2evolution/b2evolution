@@ -64,9 +64,9 @@ switch($action)
 		// echo 'login: ', $log;
 		$user_data	= get_userdatabylogin($log);
 		$user_email	= $user_data['user_email'];
-		
+
 		locale_temp_switch( $user_data['user_locale'] );
-		
+
 		// echo 'email: ', $user_email;
 		// echo 'locale: '.$user_data['locale'];
 
@@ -92,14 +92,14 @@ switch($action)
 			}
 			else
 			{
-				$DB->query( "UPDATE $tableusers
+				$DB->query( "UPDATE T_users
 										SET user_pass = '" . md5($random_password) . "'
 										WHERE user_login = '$log'" );
 				$notes = T_('An email with the new password was sent successfully to your email address.')."<br />\n";
 			}
 
 		}
-		
+
 		locale_restore_previous();
 
 
@@ -110,7 +110,7 @@ switch($action)
 		if( is_logged_in() )
 		{	// The user is already logged in...
 			// TODO: use $login_error to be clear
-			
+
 			$error = is_string($error) ? $error.'<br />' : '';
 			$error .= T_('Note: You are already logged in!');
 

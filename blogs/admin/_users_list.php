@@ -34,22 +34,22 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		?>
 	</tr>
 	<?php
-	
+
 	$loop_prev_grp_ID = 0;
-	
+
 	if( count($userlist) )
 	{
 		// query which groups have users
-		$query = "SELECT grp_ID FROM $tablegroups, $tableusers
+		$query = 'SELECT grp_ID FROM T_groups, T_users
 							WHERE user_grp_ID = grp_ID
-							GROUP BY grp_ID";
+							GROUP BY grp_ID';
 		$usedgroups = $DB->get_col($query);
 
 		$count = 0;
 		foreach( $userlist as $row )
 		{	// For each line (can be a user/group or just an empty group)
 			$loop_grp_ID = $row['grp_ID'];
-			
+
 			if( $loop_prev_grp_ID != $loop_grp_ID )
 			{	// ---------- We just entered a new group! ----------
 				?>
@@ -69,8 +69,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 						<td>&nbsp;</td>
 						<td>
 							<a href="b2users.php?group=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /></a>
-							
-							<a href="b2users.php?action=newgroup&amp;template=<?php echo $loop_grp_ID ?>" title="<?php echo T_('Copy group') ?>"><img src="img/copy.gif" width="13" height="13" class="middle" alt="<?php echo T_('Copy') ?>" title="<?php echo T_('Copy group') ?>" /></a> 
+
+							<a href="b2users.php?action=newgroup&amp;template=<?php echo $loop_grp_ID ?>" title="<?php echo T_('Copy group') ?>"><img src="img/copy.gif" width="13" height="13" class="middle" alt="<?php echo T_('Copy') ?>" title="<?php echo T_('Copy group') ?>" /></a>
 						<?php
 						if( ($loop_grp_ID != 1) && ($loop_grp_ID != $Settings->get('newusers_grp_ID'))
 								&& !in_array( $loop_grp_ID, $usedgroups ) )
@@ -86,7 +86,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				<?php
 				$loop_prev_grp_ID = $loop_grp_ID;
 			}
-	
+
 			if( !empty( $row['ID'] ) )
 			{	// We have a user here: (i-e group was not empty)
 				$loop_User = & new User( $row );
@@ -119,12 +119,12 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 					echo "<a href=\"$url\" title=\"website: $url\"><img src=\"img/url.gif\" alt=\"website: $url\" class=\"middle\" /></a>&nbsp;";
 				}
 				echo "</td>\n";
-				
+
 				echo "<td>".$loop_User->get('level');
-				
+
 				if( $current_User->check_perm( 'users', 'edit', false ) )
 				{ // edit actions
-					
+
 					echo '</td><td align="right">';
 					if( ($loop_User->get('level') > 0) )
 					{ // prom=down
@@ -136,15 +136,15 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 						echo ' <a href="b2users.php?action=promote&amp;id='. $loop_User->get('ID'). '&amp;prom=up'
 									.'" title="'.T_('increase user level').'">+</a> ';
 					}
-					
+
 					echo '</td><td>';
-					
+
 					// edit user
 					echo ' <a href="b2users.php?user=', $loop_User->get('ID'), '"><img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" /></a> ';
 
 					// copy user
 					echo ' <a href="?action=newuser&amp;template='.$loop_User->get('ID').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" /></a> ';
-					
+
 					if( ($loop_User->ID != 1) && ($loop_User->ID != $current_User->ID) )
 					{ // delete
 						?>

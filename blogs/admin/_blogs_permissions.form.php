@@ -45,7 +45,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				$query = "SELECT ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
 													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
 													bloguser_perm_properties, bloguser_perm_upload
-									FROM $tableusers INNER JOIN $tableblogusers
+									FROM T_users INNER JOIN T_blogusers
 													ON ID = bloguser_user_ID
 									WHERE bloguser_blog_ID = $blog
 									ORDER BY user_login";
@@ -150,8 +150,8 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				</td>
 			</tr>
 				<?php
-				$query = "SELECT ID, user_login
-									FROM $tableusers ";
+				$query = 'SELECT ID, user_login
+									FROM T_users ';
 				if( count( $members ) )
 				{
 					$query .= "WHERE ID NOT IN (".implode( ',', $members ) .") ";
@@ -222,7 +222,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		<br />
 	</fieldset>
 
-	<?php 
+	<?php
 		// warning if a user withdraws own permission to edit the blog's properties
 		form_submit( ( $current_User->ID != 1 ) ? 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''. /* TRANS: Warning this is a javascript string */ T_('Warning! You are about to remove your own permission to edit this blog!\nYou won\\\'t have access to its properties any longer if you do that!').'\') );"' : '' )
 	?>

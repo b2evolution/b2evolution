@@ -102,8 +102,7 @@ function convert_lang_to_locale( $table, $columnlang, $columnID )
  */
 function upgrade_b2evo_tables()
 {
-	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments,
-					$tableblogs, $tablepostcats, $tablehitlog, $tableantispam, $tablegroups, $tableblogusers;
+	global $tableblogs, $tableposts;
 	global $baseurl, $old_db_version, $new_db_version;
 	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
 	global $locales, $default_locale;
@@ -123,20 +122,20 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 8010 )
 	{
 		echo 'Upgrading users table... ';
-		$query = "ALTER TABLE $tableusers
+		$query = "ALTER TABLE T_users
 							MODIFY COLUMN user_pass CHAR(32) NOT NULL";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		echo 'Upgrading blogs table... ';
-		$query = "ALTER TABLE $tableblogs
+		$query = "ALTER TABLE T_blogs
 							MODIFY COLUMN blog_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
 							MODIFY COLUMN blog_longdesc TEXT NULL DEFAULT NULL";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		echo 'Upgrading categories table... ';
-		$query = "ALTER TABLE $tablecategories
+		$query = "ALTER TABLE T_categories
 							ADD COLUMN cat_description VARCHAR(250) NULL DEFAULT NULL,
 							ADD COLUMN cat_longdesc TEXT NULL DEFAULT NULL,
 							ADD COLUMN cat_icon VARCHAR(30) NULL DEFAULT NULL";
@@ -144,7 +143,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Upgrading posts table... ';
-		$query = "ALTER TABLE $tableposts
+		$query = "ALTER TABLE T_posts
 							MODIFY COLUMN post_lang VARCHAR(20) NOT NULL DEFAULT 'en_US',
 							ADD COLUMN post_urltitle VARCHAR(50) NULL DEFAULT NULL AFTER post_title,
 							ADD COLUMN post_url VARCHAR(250) NULL DEFAULT NULL AFTER post_urltitle,
@@ -153,11 +152,11 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Generating wordcounts... ';
-		$query = "SELECT ID, post_content FROM $tableposts WHERE post_wordcount IS NULL";
+		$query = "SELECT ID, post_content FROM T_posts WHERE post_wordcount IS NULL";
 		$q = $DB->get_results( $query, ARRAY_A );
 		if( count( $q ) ) foreach( $q as $row )
 		{
-			$query_update_wordcount = "UPDATE $tableposts 
+			$query_update_wordcount = "UPDATE T_posts
 																SET post_wordcount = " . bpost_count_words($row['post_content']) . "
 																WHERE ID = " . $row['ID'];
 			$DB->query($query_update_wordcount);
@@ -169,7 +168,7 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 8020 )
 	{
 		echo 'Encoding passwords... ';
-		$query = "UPDATE $tableusers
+		$query = "UPDATE T_users
 							SET user_pass = MD5(user_pass)";
 		$DB->query( $query );
 		echo "OK.<br />\n";
@@ -179,13 +178,13 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 8030 )
 	{
 		echo 'Deleting unecessary logs... ';
-		$query = "DELETE FROM $tablehitlog
+		$query = "DELETE FROM T_hitlog
 							WHERE hit_ignore IN ('badchar', 'blacklist')";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		echo 'Updating blog urls... ';
-		$query = "SELECT blog_ID, blog_siteurl FROM $tableblogs";
+		$query = "SELECT blog_ID, blog_siteurl FROM T_blogs";
 		$q = $DB->query( $query );
 		if( count( $q ) ) foreach( $q as $row )
 		{
@@ -201,7 +200,7 @@ function upgrade_b2evo_tables()
 			$blog_siteurl = substr( $blog_siteurl, strlen( $baseurl) );
 			// echo ' -> ', $blog_siteurl,'<br />';
 
-			$query_update_blog = "UPDATE $tableblogs SET blog_siteurl = '$blog_siteurl' WHERE blog_ID = $blog_ID";
+			$query_update_blog = "UPDATE T_blogs SET blog_siteurl = '$blog_siteurl' WHERE blog_ID = $blog_ID";
 			// echo $query_update_blog, '<br>';
 			$DB->query( $query_update_blog );
 		}
@@ -215,7 +214,7 @@ function upgrade_b2evo_tables()
 		create_antispam();
 
 		echo 'Upgrading Settings table... ';
-		$query = "ALTER TABLE $tablesettings
+		$query = "ALTER TABLE T_settings
 							ADD COLUMN last_antispam_update datetime NOT NULL default '2000-01-01 00:00:00'";
 		$DB->query( $query );
 		echo "OK.<br />\n";
@@ -225,7 +224,7 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 8050 )
 	{ // upgrade to 0.8.9
 		echo 'Upgrading blogs table... ';
-		$query = "ALTER TABLE $tableblogs
+		$query = "ALTER TABLE T_blogs
 							ADD COLUMN blog_allowtrackbacks tinyint(1) NOT NULL default 1,
 							ADD COLUMN blog_allowpingbacks tinyint(1) NOT NULL default 1,
 							ADD COLUMN blog_pingb2evonet tinyint(1) NOT NULL default 0,
@@ -243,26 +242,26 @@ function upgrade_b2evo_tables()
 
 		echo 'Creating user blog permissions... ';
 		// Admin: full rights for all blogs (look 'ma, doing a natural join! :>)
-		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+		$query = "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 								bloguser_perm_cats, bloguser_perm_properties)
 							SELECT blog_ID, ID, 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
-							FROM $tableusers, $tableblogs
+							FROM T_users, T_blogs
 							WHERE user_level = 10";
 		$DB->query( $query );
 
 		// Normal users: basic rights for all blogs (can't stop doing joins :P)
-		$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+		$query = "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 								bloguser_perm_cats, bloguser_perm_properties)
 							SELECT blog_ID, ID, 1, 'published,protected,private,draft', 0, 1, 0, 0
-							FROM $tableusers, $tableblogs
+							FROM T_users, T_blogs
 							WHERE user_level > 0 AND user_level < 10";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		echo 'Upgrading users table... ';
-		$query = "ALTER TABLE $tableusers
+		$query = "ALTER TABLE T_users
 							ADD COLUMN user_notify tinyint(1) NOT NULL default 1,
 							ADD COLUMN user_grp_ID int(4) NOT NULL default 1,
 							MODIFY COLUMN user_idmode varchar(20) NOT NULL DEFAULT 'login',
@@ -275,13 +274,13 @@ function upgrade_b2evo_tables()
 		// Default is 1, so admins are already set.
 
 		// Basic Users:
-		$query = "UPDATE $tableusers
+		$query = "UPDATE T_users
 							SET user_grp_ID = $Group_Users->ID
 							WHERE user_level = 0";
 		$DB->query( $query );
 
 		// Bloggers:
-		$query = "UPDATE $tableusers
+		$query = "UPDATE T_users
 							SET user_grp_ID = $Group_Bloggers->ID
 							WHERE user_level > 0 AND user_level < 10";
 		$DB->query( $query );
@@ -289,7 +288,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Upgrading settings table... ';
-		$query = "ALTER TABLE $tablesettings
+		$query = "ALTER TABLE T_settings
 							DROP COLUMN time_format,
 							DROP COLUMN date_format,
 							ADD COLUMN pref_newusers_grp_ID int unsigned DEFAULT 4 NOT NULL,
@@ -306,10 +305,10 @@ function upgrade_b2evo_tables()
 	{	// --------------------------------------------
 		// upgrade to 0.9
 		// --------------------------------------------
-		
+
 		// Important check:
 		$stub_list = $DB->get_col( "SELECT blog_stub
-																	FROM $tableblogs
+																	FROM T_blogs
 																	GROUP BY blog_stub
 																	HAVING COUNT(*) > 1" );
 		if( !empty($stub_list) )
@@ -321,19 +320,19 @@ function upgrade_b2evo_tables()
 			echo '</p></div>';
 			return false;
 		}
-		
-		// Create locales 
+
+		// Create locales
 		create_locales();
 
 
 		echo 'Upgrading posts table... ';
-		$query = "UPDATE $tableposts
+		$query = "UPDATE T_posts
 							SET post_urltitle = NULL";
 		$DB->query( $query );
 
-		$query = "ALTER TABLE $tableposts
+		$query = "ALTER TABLE T_posts
 							CHANGE COLUMN post_date post_issue_date datetime NOT NULL default '0000-00-00 00:00:00',
-							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00' 
+							ADD COLUMN post_mod_date datetime NOT NULL default '0000-00-00 00:00:00'
 										AFTER post_issue_date,
 							CHANGE COLUMN post_lang post_locale varchar(20) NOT NULL default 'en-EU',
 							DROP COLUMN post_url,
@@ -344,17 +343,17 @@ function upgrade_b2evo_tables()
 							ADD INDEX post_issue_date( post_issue_date ),
 							ADD UNIQUE post_urltitle( post_urltitle )";
 		$DB->query( $query );
-		
-		$query = "UPDATE $tableposts
+
+		$query = "UPDATE T_posts
 							SET post_mod_date = post_issue_date";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		// convert given languages to locales
 		convert_lang_to_locale( $tableposts, 'post_locale', 'ID' );
-		
+
 		echo 'Upgrading blogs table... ';
-		$query = "ALTER TABLE $tableblogs 
+		$query = "ALTER TABLE T_blogs
 							CHANGE blog_lang blog_locale varchar(20) NOT NULL default 'en-EU',
 							CHANGE blog_roll blog_notes TEXT NULL,
 							MODIFY COLUMN blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
@@ -366,7 +365,7 @@ function upgrade_b2evo_tables()
 							ADD UNIQUE KEY blog_stub (blog_stub)";
 		$DB->query( $query );
 
-		$query = "UPDATE $tableblogs
+		$query = "UPDATE T_blogs
 							SET blog_access_type = 'stub',
 									blog_default_skin = 'custom'";
 		$DB->query( $query );
@@ -377,11 +376,11 @@ function upgrade_b2evo_tables()
 		convert_lang_to_locale( $tableblogs, 'blog_locale', 'blog_ID' );
 
 		echo 'Converting settings table... ';
-		
+
 		// get old settings
-		$query = "SELECT * FROM $tablesettings";
+		$query = 'SELECT * FROM T_settings';
 		$row = $DB->get_row( $query, ARRAY_A );
-				
+
 		#pre_dump($row, 'oldrow');
 		$transform = array(
 			'posts_per_page' => array(7),
@@ -394,9 +393,9 @@ function upgrade_b2evo_tables()
 			'pref_newusers_level'  => array(1, 'newusers_level'),
 			'pref_newusers_canregister' => array(0, 'newusers_canregister'),
 		);
-		
-		$query = "INSERT INTO $tablesettings (set_name, set_value) VALUES ";
-		
+
+		$query = "INSERT INTO T_settings (set_name, set_value) VALUES ";
+
 		foreach( $transform as $oldkey => $newarr )
 		{
 			$newname = (isset($newarr[1])) ? $newarr[1] : $oldkey;
@@ -410,7 +409,7 @@ function upgrade_b2evo_tables()
 				$trans[ $newname ] = $row[$oldkey];
 			}
 		}
-		
+
 		$query .= "
 			( 'db_version', '$new_db_version' ),
 			( 'default_locale', 'en-EU' ),
@@ -418,21 +417,21 @@ function upgrade_b2evo_tables()
 			( 'permalink_type', 'urltitle' ),
 			( 'user_minpwdlen', '5' )
 			";
-		
+
 		foreach( $trans as $name => $value )
 		{
 			$query .= ", ('$name', '".$DB->escape($value)."')";
 		}
-		
+
 		// drop old table
-		$DB->query( "DROP TABLE IF EXISTS $tablesettings");
-		
+		$DB->query( 'DROP TABLE IF EXISTS T_settings');
+
 		// create new table
-		$DB->query( "CREATE TABLE $tablesettings (
+		$DB->query( 'CREATE TABLE T_settings (
 								set_name VARCHAR( 30 ) NOT NULL ,
 								set_value VARCHAR( 255 ) NULL ,
 								PRIMARY KEY ( set_name )
-								)");
+								)');
 
 		// write new settings
 		#echo $query;
@@ -442,19 +441,19 @@ function upgrade_b2evo_tables()
 		if( !isset( $tableblogusers_isuptodate ) )
 		{
 			echo 'Upgrading Blog-User permissions table... ';
-			$query = "ALTER TABLE $tableblogusers
+			$query = "ALTER TABLE T_blogusers
 								ADD COLUMN bloguser_ismember tinyint NOT NULL default 0 AFTER bloguser_user_ID";
 			$DB->query( $query );
 
 			// Any row that is created holds at least one permission,
 			// minimum permsission is to be a member, so we add that one too, to all existing rows.
-			$DB->query( "UPDATE $tableblogusers
+			$DB->query( "UPDATE T_blogusers
 											SET bloguser_ismember = 1" );
 			echo "OK.<br />\n";
 		}
 
 		echo 'Upgrading Comments table... ';
-		$query = "ALTER TABLE $tablecomments
+		$query = "ALTER TABLE T_comments
 							ADD COLUMN comment_author_ID int unsigned NULL default NULL AFTER comment_status,
 							MODIFY COLUMN comment_author varchar(100) NULL,
 							MODIFY COLUMN comment_author_email varchar(100) NULL,
@@ -462,9 +461,9 @@ function upgrade_b2evo_tables()
 							MODIFY COLUMN comment_author_IP varchar(23) NOT NULL default ''";
 		$DB->query( $query );
 		echo "OK.<br />\n";
-		
+
 		echo 'Upgrading Users table... ';
-		$query = "ALTER TABLE $tableusers ADD user_locale VARCHAR( 20 ) DEFAULT 'en-EU' NOT NULL AFTER user_yim";
+		$query = "ALTER TABLE T_users ADD user_locale VARCHAR( 20 ) DEFAULT 'en-EU' NOT NULL AFTER user_yim";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
@@ -491,7 +490,7 @@ function upgrade_b2evo_tables()
 	{	// --------------------------------------------
 		// upgrade to 0.9.1
 		// --------------------------------------------
-		
+
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
 							ADD blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
@@ -549,9 +548,9 @@ function upgrade_b2evo_tables()
 		 * Then create a new extension block, and increase db version numbers
 		 * everywhere where needed in this file.
 		 */
-		
+
 	}
-	
+
 	// Update DB schema version to $new_db_version
 	set_upgrade_checkpoint( $new_db_version );
 

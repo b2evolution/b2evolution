@@ -63,7 +63,7 @@ function starify( $string )
 
 $b2newpost_doc='Adds a post, blogger-api like, +title +category +postdate';
 $b2newpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcBoolean, $xmlrpcString, $xmlrpcString, $xmlrpcString));
-/** 
+/**
  * b2.newPost
  *
  * b2 API
@@ -169,7 +169,7 @@ function b2newpost($m)
 
 $b2getcategories_doc='given a blogID, gives a struct that list categories in that blog, using categoryID and categoryName. categoryName is there so the user would choose a category name from the client, rather than just a number. however, when using b2.newPost, only the category ID number should be sent.';
 $b2getcategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
-/** 
+/**
  * b2.getCategories
  *
  * B2 API
@@ -184,7 +184,7 @@ $b2getcategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, 
  */
 function b2getcategories( $m )
 {
-	global $xmlrpcerruser, $tablecategories, $DB;
+	global $xmlrpcerruser, $DB;
 
 	$blogid = $m->getParam(0);
 	$blogid = $blogid->scalarval();
@@ -201,11 +201,11 @@ function b2getcategories( $m )
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	$sql = "SELECT * 
-					FROM $tablecategories ";
+	$sql = 'SELECT *
+					FROM T_categories ';
 	if( $blogid > 1 ) $sql .= "WHERE cat_blog_ID = $blogid ";
 	$sql .= "ORDER BY cat_name ASC";
-	
+
 	$rows = $DB->get_results( $sql );
 	if( !empty($DB->last_error) )
 	{	// DB error
@@ -232,7 +232,7 @@ function b2getcategories( $m )
 
 $b2_getPostURL_doc = 'Given a blog ID, username, password, and a post ID, returns the URL to that post.';
 $b2_getPostURL_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
-/** 
+/**
  * b2.getPostURL
  *
  * B2 API
@@ -329,7 +329,7 @@ function bloggernewpost( $m )
 	global $blog_ID, $default_category, $DB;
 	global $cafelogID, $sleep_after_edit;
 	global $Settings, $Messages;
-	
+
 	logIO('I','Called function: blogger.newPost');
 
 	$username = $m->getParam(2);
@@ -462,7 +462,7 @@ $bloggereditpost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $x
 function bloggereditpost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID, $tableposts, $tablepostcats, $ItemCache;
+	global $blog_ID, $ItemCache;
 	global $cafelogID, $sleep_after_edit, $default_category, $DB;
 	global $Messages;
 
@@ -626,7 +626,7 @@ $bloggerdeletepost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, 
 function bloggerdeletepost($m)
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $blog_ID,$tableposts, $DB;
+	global $blog_ID, $DB;
 	global $sleep_after_edit;
 
 	$post_ID = $m->getParam(1);
@@ -712,7 +712,7 @@ $bloggergetusersblogs_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
 function bloggergetusersblogs($m)
 {
 	global $xmlrpcerruser;
-	global $tableusers, $tableblogs, $baseurl;
+	global $baseurl;
 
 	$username = $m->getParam(1);
 	$username = $username->scalarval();
@@ -784,7 +784,7 @@ $bloggergetuserinfo_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString,
  */
 function bloggergetuserinfo($m)
 {
-	global $xmlrpcerruser,$tableusers;
+	global $xmlrpcerruser;
 
 	$username = $m->getParam(1);
 	$username = $username->scalarval();
@@ -837,7 +837,7 @@ $bloggergetpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
  */
 function bloggergetpost($m)
 {
-	global $xmlrpcerruser,$tableposts;
+	global $xmlrpcerruser;
 
 	$post_ID = $m->getParam(1);
 	$post_ID = $post_ID->scalarval();
@@ -909,7 +909,7 @@ $bloggergetrecentposts_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcSt
  */
 function bloggergetrecentposts( $m )
 {
-	global $xmlrpcerruser, $tableposts, $tablecategories, $DB, $show_statuses;
+	global $xmlrpcerruser, $DB, $show_statuses;
 	global $blog;
 
 	$blog_ID = $m->getParam(1);
@@ -960,7 +960,7 @@ function bloggergetrecentposts( $m )
 		xmlrpc_debugmsg( 'Item:'.$Item->title.
 											' - Issued: '.$Item->issue_date.
 											' - Modified: '.$Item->mod_date );
-		
+
 		$post_date = mysql2date("U", $Item->issue_date);
 		$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
 
@@ -1012,7 +1012,7 @@ $bloggergettemplate_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  */
 function bloggergettemplate($m)
 {
-	global $xmlrpcerruser,$tableusers;
+	global $xmlrpcerruser;
 
 	$blog_ID = $m->getParam(1);
 	$blog_ID = $blog_ID->scalarval();
@@ -1095,7 +1095,7 @@ $bloggersettemplate_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  */
 function bloggersettemplate( $m )
 {
-	global $xmlrpcerruser, $tableusers, $blogfilename;
+	global $xmlrpcerruser, $blogfilename;
 
 	$blog_ID = $m->getParam(1);
 	$blog_ID = $blog_ID->scalarval();
@@ -1198,7 +1198,7 @@ $pingback_ping_doc = 'gets a pingback and registers it as a comment prefixed by 
 function pingback_ping( $m )
 {
 
-	global $DB, $tableposts, $tablecomments, $notify_from, $xmlrpcerruser;
+	global $DB, $notify_from, $xmlrpcerruser;
 	global $baseurl, $b2_version;
 	global $localtimenow, $Messages;
 
@@ -1264,8 +1264,8 @@ function pingback_ping( $m )
 			elseif (is_string($urltest['fragment']))
 			{ // ...or a string #title, a little more complicated
 				$title = preg_replace('/[^a-zA-Z0-9]/', '.', $urltest['fragment']);
-				$sql = "SELECT ID 
-								FROM $tableposts 
+				$sql = "SELECT ID
+								FROM $tableposts
 								WHERE post_title RLIKE '$title'";
 				$blah = $DB->get_row( $sql, ARRAY_A );
 				if( !empty($DB->last_error) )
@@ -1295,8 +1295,8 @@ function pingback_ping( $m )
 
 
 		// Check that post exists
-		$sql = 'SELECT post_author 
-						FROM '.$tableposts.' 
+		$sql = 'SELECT post_author
+						FROM T_posts
 						WHERE ID = '.$post_ID;
 		$rows = $DB->get_results( $sql );
 		if( !empty($DB->last_error) )
@@ -1309,7 +1309,7 @@ function pingback_ping( $m )
 			debug_fwrite($log, 'Post exists'."\n");
 
 			// Let's check that the remote site didn't already pingback this entry
-			$sql = "SELECT * FROM $tablecomments
+			$sql = "SELECT * FROM T_comments
 							WHERE comment_post_ID = $post_ID
 								AND comment_author_url = '".$DB->escape(preg_replace('#&([^amp\;])#is', '&amp;$1', $pagelinkedfrom))."'
 								AND comment_type = 'pingback'";
@@ -1379,7 +1379,7 @@ function pingback_ping( $m )
 						$original_title = $title;
 						$title = strip_tags(trim($title));
 						$now = date('Y-m-d H:i:s', $localtimenow );
-						$sql = "INSERT INTO $tablecomments( comment_post_ID, comment_type, comment_author,
+						$sql = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author,
 																								comment_author_url, comment_date, comment_content)
 										VALUES( $post_ID, 'pingback', '".$DB->escape($title)."',
 														'".$DB->escape($pagelinkedfrom)."', '$now',
@@ -1397,7 +1397,7 @@ function pingback_ping( $m )
 						if( get_user_info( 'notify', $authordata ) )
 						{ // Author wants to be notified:
 							locale_temp_switch( get_user_info('locale', $authordata) );
-							
+
 							$recipient = get_user_info( 'email', $authordata );
 							$subject = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] );
 							// fplanque added:
@@ -1411,7 +1411,7 @@ function pingback_ping( $m )
 							$notify_message .= T_('Edit/Delete').': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$post_ID."&c=1\n\n";
 
 							send_mail( $recipient, $subject, $notify_message, $notify_from );
-							
+
 							locale_restore_previous();
 						}
 					}
@@ -1444,7 +1444,7 @@ function pingback_ping( $m )
 /**** SERVER FUNCTIONS ARRAY ****/
 
 $s=new xmlrpc_server(
-				array( 
+				array(
 							 "b2.newPost" =>
 							 array("function" => "b2newpost",
 										 "signature" => $b2newpost_sig,
@@ -1454,7 +1454,7 @@ $s=new xmlrpc_server(
 							 array("function" => "b2getcategories",
 										 "signature" => $b2getcategories_sig,
 										 "docstring" => $b2getcategories_doc),
-				
+
 							 "b2.getPostURL" =>
 							 array("function" => "pingback_getPostURL",
 										 "signature" => $b2_getPostURL_sig,

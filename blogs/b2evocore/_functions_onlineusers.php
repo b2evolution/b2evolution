@@ -1,7 +1,7 @@
 <?php
 /**
  * Who's Online - functions to maintiain online sessions and displaying who is currently active on the site.
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Jeff Bearer - {@link http://www.jeffbearer.com/}
@@ -14,29 +14,29 @@
  * online_user_update(-)
  *
  * Keep the session active for the current user.
- * 
+ *
  */
 function online_user_update()
 {
-	global $DB, $tablesessions, $user_ID, $online_session_timeout;
+	global $DB, $user_ID, $online_session_timeout;
 
 	// Prepare the statement to remove old session info
-	$sql = "DELETE FROM $tablesessions 
-		WHERE sess_time < ".( time() - $online_session_timeout )." 
+	$sql = "DELETE FROM T_sessions
+		WHERE sess_time < ".( time() - $online_session_timeout )."
 		OR sess_ipaddress='$_SERVER[REMOTE_ADDR]'";
 	if( is_logged_in() )
 	{
 		$sql .= " OR sess_user_ID='$user_ID'";
 	}
-	$DB->query( $sql );	
+	$DB->query( $sql );
 
 	// Prepare the statement to insert the new session info
-	$sql = "INSERT INTO $tablesessions (sess_time,sess_ipaddress,sess_user_ID) 
+	$sql = "INSERT INTO T_sessions (sess_time,sess_ipaddress,sess_user_ID)
 		VALUES ('".time()."','$_SERVER[REMOTE_ADDR]',";
 	$sql .= (empty($user_ID)) ? "NULL" : "'$user_ID'";
 	$sql .= ")";
 	$DB->query( $sql );
-}	
+}
 
 
 /*
@@ -51,13 +51,13 @@ function online_user_update()
  */
 function online_user_display( $before = '', $after = '' )
 {
-	global $DB, $tableusers, $tablesessions, $online_session_timeout;
+	global $DB, $online_session_timeout;
 	$users = array();
 
-	$sql = "SELECT sess_user_ID
-		FROM $tablesessions
-		WHERE sess_user_ID IS NOT NULL 
-		AND " . $tablesessions . ".sess_time > '" . ( time() - $online_session_timeout ) . "'";
+	$sql = 'SELECT sess_user_ID
+		FROM T_sessions
+		WHERE sess_user_ID IS NOT NULL
+		AND T_sessions.sess_time > "'.( time() - $online_session_timeout ).'"';
 
 	$rows = $DB->get_results( $sql, ARRAY_A );
 	$users['guests'] = 0;
@@ -81,7 +81,7 @@ function online_user_display( $before = '', $after = '' )
 	}
 
 	$users['guests'] += $DB->get_var( "SELECT count(*)
-						FROM $tablesessions 
+						FROM T_sessions
 						WHERE sess_user_ID IS NULL");
 
 	// Return the number of registered users and the number of guests

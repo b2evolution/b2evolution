@@ -1,7 +1,7 @@
 <?php
 /**
  * Comment handling
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -25,12 +25,12 @@ require_once dirname(__FILE__). '/_class_comment.php';
  */
 function generic_ctp_number($post_id, $mode = 'comments')
 {
-	global $DB, $debug, $postdata, $tablecomments, $cache_ctp_number, $use_cache, $preview;
+	global $DB, $debug, $postdata, $cache_ctp_number, $use_cache, $preview;
 	if( $preview )
 	{	// we are in preview mode, no comments yet!
 		return 0;
 	}
-	
+
 	if( $mode == 'feedbacks' ) $mode ='ctp';
 
 	// fplanque added: load whole cache
@@ -42,9 +42,9 @@ function generic_ctp_number($post_id, $mode = 'comments')
 		{		// Initializes each post to nocount!
 				$cache_ctp_number[$tmp_post_id] = array( 'comments' => 0, 'trackbacks' => 0, 'pingbacks' => 0, 'ctp' => 0);
 		}
-		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count 
-							FROM $tablecomments 
-							WHERE comment_post_ID IN ($postIDlist) 
+		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count
+							FROM T_comments
+							WHERE comment_post_ID IN ($postIDlist)
 							GROUP BY comment_post_ID, comment_type";
 		$rows = $DB->get_results( $query );
 		if( count( $rows ) ) foreach( $rows as $row )
@@ -74,9 +74,9 @@ function generic_ctp_number($post_id, $mode = 'comments')
 	{	// this should be extremely rare...
 		// echo "CACHE not set for $post_id";
 		$post_id = intval($post_id);
-		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count 
-							FROM $tablecomments 
-							WHERE comment_post_ID = $post_id 
+		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count
+							FROM T_comments
+							WHERE comment_post_ID = $post_id
 							GROUP BY comment_post_ID, comment_type";
 		$rows = $DB->get_results( $query );
 		if( count( $rows ) ) foreach( $rows as $row )
@@ -112,12 +112,12 @@ function generic_ctp_number($post_id, $mode = 'comments')
  */
 function get_commentdata($comment_ID,$no_cache=0)
 { // less flexible, but saves mysql queries
-	global $DB, $rowc,$id,$commentdata,$tablecomments, $baseurl;
+	global $DB, $rowc, $id, $commentdata, $baseurl;
 
 	if ($no_cache)
 	{
-		$query = "SELECT * 
-							FROM $tablecomments 
+		$query = "SELECT *
+							FROM T_comments
 							WHERE comment_ID = $comment_ID";
 		$myrow = $DB->get_row( $query, ARRAY_A );
 	}
@@ -148,12 +148,12 @@ function get_commentdata($comment_ID,$no_cache=0)
  */
 function Comment_get_by_ID( $comment_ID )
 {
-	global $DB, $cache_Comments, $use_cache, $tablecomments, $querycount;
+	global $DB, $cache_Comments, $use_cache, $querycount;
 
 	if((empty($cache_Comments[$comment_ID])) OR (!$use_cache))
 	{	// Load this entry into cache:
-		$query = "SELECT * 
-							FROM $tablecomments 
+		$query = "SELECT *
+							FROM T_comments
 							WHERE comment_ID = $comment_ID";
 		if( $row = $DB->get_row( $query, ARRAY_A ) )
 		{
@@ -212,7 +212,7 @@ function comments_number( $zero='#', $one='#', $more='#' )
 	if( $more == '#' ) $more = T_('%d comments');
 
 	// original hack by dodo@regretless.com
-	global $id,$postdata,$tablecomments,$c,$querycount,$cache_commentsnumber,$use_cache;
+	global $id, $postdata, $c, $querycount, $cache_commentsnumber, $use_cache;
 	$number = generic_ctp_number($id, 'comments');
 	if ($number == 0) {
 		$blah = $zero;
@@ -252,7 +252,7 @@ function comments_link($file='', $tb=0, $pb=0 )
 
 
 /**
- * This will include the javascript that is required to open comments, 
+ * This will include the javascript that is required to open comments,
  * trackback and pingback in popup windows.
  *
  * You should put this tag before the </head> tag in your template.
@@ -265,7 +265,7 @@ function comments_link($file='', $tb=0, $pb=0 )
  * @param boolean do you want a status bar
  * @param boolean do you want the windows to be resizable
   */
-function comments_popup_script( $width = 600, $height = 450, 
+function comments_popup_script( $width = 600, $height = 450,
 																$scrollbars = true, $status = true, $resizable = true )
 {
 	global $b2commentsjavascript;
@@ -507,7 +507,7 @@ function comment_post_link()
  * comment_blog_name(-)
  * fplanque added
  *
- * @deprecated 
+ * @deprecated
  */
 function comment_blog_name( $disp = true )
 {

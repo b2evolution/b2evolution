@@ -22,29 +22,29 @@ require_once dirname(__FILE__). '/_class_dataobject.php';
  */
 class User extends DataObject
 {
-	var	$login;
-	var	$pass;
-	var	$firstname;
-	var	$lastname;
-	var	$nickname;
-	var	$idmode;
-	var	$locale;
-	var	$email;
-	var	$url;
-	var	$icq;
-	var	$aim;
-	var	$msn;
-	var	$yim;
-	var	$ip;
-	var	$domain;
-	var	$browser;
-	var	$datecreated;
-	var	$level;
-	var	$notify;
-	var	$showonline;
+	var $login;
+	var $pass;
+	var $firstname;
+	var $lastname;
+	var $nickname;
+	var $idmode;
+	var $locale;
+	var $email;
+	var $url;
+	var $icq;
+	var $aim;
+	var $msn;
+	var $yim;
+	var $ip;
+	var $domain;
+	var $browser;
+	var $datecreated;
+	var $level;
+	var $notify;
+	var $showonline;
 	var $upload_ufolder; // allowed to upload into his user folder
 
-	var $Group;	// Pointer to group
+	var $Group; // Pointer to group
 
 	// Blog posts statuses permissions:
 	var $blog_post_statuses = array();
@@ -201,11 +201,11 @@ class User extends DataObject
 	 * {@internal User::check_perm(-) }}
 	 *
 	 * @param string Permission name, can be one of:
-	 *								- 'upload'
-	 *								- 'edit_timestamp'
-	 *								- 'cats_post_statuses', see {@link User::check_perm_catsusers()}
-	 *								- either group permission names, see {@link Group::check_perm()}
-	 *								- either blogusers permission names, see {@link User::check_perm_blogusers()}
+	 *                - 'upload'
+	 *                - 'edit_timestamp'
+	 *                - 'cats_post_statuses', see {@link User::check_perm_catsusers()}
+	 *                - either group permission names, see {@link Group::check_perm()}
+	 *                - either blogusers permission names, see {@link User::check_perm_blogusers()}
 	 * @param string Permission level
 	 * @param boolean Execution will halt if this is !0 and permission is denied
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
@@ -239,7 +239,7 @@ class User extends DataObject
 				// Blog permission to edit its properties... (depending on user AND hits group)
 				// Forward request to group:
 				if( $this->Group->check_perm( 'blogs', $permlevel ) )
-				{	// If group says yes
+				{ // If group says yes
 					$perm = true;
 					break;
 				}
@@ -283,8 +283,8 @@ class User extends DataObject
 	 *
 	 * @see User::check_perm()
 	 * @param string Permission name, can be one of the following:
-	 *									- cat_post_statuses
-	 *									- more to come later...
+	 *                  - cat_post_statuses
+	 *                  - more to come later...
 	 * @param string Permission level
 	 * @param array Array of target cat IDs
 	 * @return boolean 0 if permission denied
@@ -331,44 +331,44 @@ class User extends DataObject
 	 *
 	 * @see User::check_perm()
 	 * @param string Permission name, can be one of the following:
-	 *									- blog_ismember
-	 *									- blog_post_statuses
-	 *									- blog_del_post
-	 *									- blog_comments
-	 *									- blog_cats
-	 *									- blog_properties
-	 *									- blog_genstatic
+	 *                  - blog_ismember
+	 *                  - blog_post_statuses
+	 *                  - blog_del_post
+	 *                  - blog_comments
+	 *                  - blog_cats
+	 *                  - blog_properties
+	 *                  - blog_genstatic
 	 * @param string Permission level
 	 * @param integer Permission target blog ID
 	 * @return boolean 0 if permission denied
 	 */
 	function check_perm_blogusers( $permname, $permlevel, $perm_target_blog )
 	{
-		global $DB, $tableblogusers;
+		global $DB;
 		// echo "checkin for $permname >= $permlevel on blog $perm_target_blog<br />";
 
 		if( !isset( $this->blog_post_statuses[$perm_target_blog] ) )
-		{	// Allowed blog post statuses have not been loaded yet:
+		{ // Allowed blog post statuses have not been loaded yet:
 			if( $this->ID == 0 )
-			{	// User not in DB, nothing to load!:
+			{ // User not in DB, nothing to load!:
 				return false;	// Permission denied
 			}
 
 			// Load now:
 			// echo 'loading allowed statuses';
 			$query = "SELECT *
-								FROM $tableblogusers
+								FROM T_blogusers
 								WHERE bloguser_blog_ID = $perm_target_blog
 								  AND bloguser_user_ID = $this->ID";
 			// echo $query, '<br />';
 			if( ($row = $DB->get_row( $query, ARRAY_A )) == NULL )
-			{	// No rights set for this Blog/User
+			{ // No rights set for this Blog/User
 				return false;	// Permission denied
 			}
 			else
 			{ // OK, rights found:
 				$this->blog_post_statuses[$perm_target_blog] = array();
-	
+
 				$this->blog_post_statuses[$perm_target_blog]['blog_ismember'] = $row['bloguser_ismember'];
 
 				$bloguser_perm_post = $row['bloguser_perm_poststatuses'];
@@ -376,7 +376,7 @@ class User extends DataObject
 					$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = array();
 				else
 					$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = explode( ',', $bloguser_perm_post );
-	
+
 				$this->blog_post_statuses[$perm_target_blog]['blog_del_post'] = $row['bloguser_perm_delpost'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_comments'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloguser_perm_cats'];
@@ -421,7 +421,7 @@ class User extends DataObject
 	 */
 	function dbdelete( $echo = false )
 	{
-		global $DB, $tablecomments, $tableposts, $tablepostcats, $tableblogusers;
+		global $DB;
 
 		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
 
@@ -430,18 +430,18 @@ class User extends DataObject
 
 		// Transform registered user comments to unregistered:
 		if( $echo ) echo '<br />Transforming user\'s comments to unregistered comments... ';
-		$ret = $DB->query( "UPDATE $tablecomments 
+		$ret = $DB->query( 'UPDATE T_comments
 												SET comment_author_ID = NULL,
-														comment_author = ".$DB->quote( $this->get('preferedname') ).",
-														comment_author_email = ".$DB->quote( $this->get('email') ).",
-														comment_author_url = ".$DB->quote( $this->get('url') )."
-												WHERE comment_author_ID = $this->ID" );
+														comment_author = '.$DB->quote( $this->get('preferedname') ).',
+														comment_author_email = '.$DB->quote( $this->get('email') ).',
+														comment_author_url = '.$DB->quote( $this->get('url') ).'
+												WHERE comment_author_ID = '.$this->ID );
 		if( $echo ) printf( '(%d rows)', $ret );
 
 		// Get list of posts that are going to be deleted (3.23)
 		if( $echo ) echo '<br />Getting post list to delete... ';
-		$post_list = $DB->get_list( "SELECT ID 
-																	FROM $tableposts
+		$post_list = $DB->get_list( "SELECT ID
+																	FROM T_posts
 																	WHERE post_author = $this->ID" );
 
 		if( empty( $post_list ) )
@@ -452,33 +452,33 @@ class User extends DataObject
 		{
 			// Delete comments
 			if( $echo ) echo '<br />Deleting comments on user\'s posts... ';
-			$ret = $DB->query( "DELETE FROM $tablecomments 
+			$ret = $DB->query( "DELETE FROM T_comments
 													WHERE comment_post_ID IN ($post_list)" );
 			if( $echo ) printf( '(%d rows)', $ret );
 
 			// Delete post extracats
 			if( $echo ) echo '<br />Deleting user\'s posts\' extracats... ';
-			$ret = $DB->query(	"DELETE FROM $tablepostcats
+			$ret = $DB->query(	"DELETE FROM T_postcats
 													WHERE postcat_post_ID IN ($post_list)" );
 			if( $echo ) printf( '(%d rows)', $ret );
 
 			// Delete posts
 			if( $echo ) echo '<br />Deleting user\'s posts... ';
-			$ret = $DB->query(	"DELETE FROM $tableposts 
+			$ret = $DB->query(	"DELETE FROM T_posts
 														WHERE post_author = $this->ID" );
 			if( $echo ) printf( '(%d rows)', $ret );
 		} // no posts
-		
+
 		// Delete userblog permissions
 		if( $echo ) echo '<br />Deleting user-blog permissions... ';
-		$ret = $DB->query(	"DELETE FROM $tableblogusers 
+		$ret = $DB->query(	"DELETE FROM T_blogusers
 													WHERE bloguser_user_ID = $this->ID" );
 		if( $echo ) printf( '(%d rows)', $ret );
 
 		// Delete main object:
 		if( $echo ) echo '<br />Deleting User... ';
 		parent::dbdelete();
-		
+
 		echo '<br />Done.</p>';
 	}
 

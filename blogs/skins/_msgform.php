@@ -38,9 +38,9 @@
 	}
 	elseif (!empty($comment_id))
 	{ // If the email is to a non user comment poster get the email address from the comments table
-		$sql="SELECT comment_author, comment_author_email 
-			FROM ".$tablecomments." 
-			WHERE comment_ID = '$comment_id'";
+		$sql = 'SELECT comment_author, comment_author_email
+			FROM T_comments
+			WHERE comment_ID = "'.$comment_id'"';
 		$row = $DB->get_row( $sql );
 		$recipient_name = $row->comment_author;
 	}
@@ -53,7 +53,7 @@
 	// Get the subject of the email
 	if( !empty($comment_id) || !empty($post_id))
 	{
-		$sql="SELECT post_title FROM ".$tableposts." WHERE ID = '$post_id'";
+		$sql = "SELECT post_title FROM T_posts WHERE ID = '$post_id'";
 		$row = $DB->get_row( $sql );
 		$subject = T_('Re:').' '.$row->post_title;
 	}
@@ -68,17 +68,17 @@
 		<input type="hidden" name="comment_id" value="<?php echo $comment_id ?>" />
 		<input type="hidden" name="redirect_to" value="<?php echo $redirect_to ?>" />
 
-		
-		<?php 
-		if( is_logged_in() ) 
-		{ // If the user is logged in default the from address to that info. 
+
+		<?php
+		if( is_logged_in() )
+		{ // If the user is logged in default the from address to that info.
 
 			$email_author = $current_User->get('preferedname');
 			$email_author_address = $current_User->email;
 
-		} 
+		}
 		?>
-					
+
 
 		<fieldset>
 			<div class="label"><label for="to"><?php echo T_('To')?>:</label></div>
@@ -95,7 +95,7 @@
 
 		<fieldset>
 			<div class="label"><label for="message"><?php echo T_('Message')?>:</label></div>
- 			<div class="input"><textarea name="message" id="message" rows="15" cols="25" class="bComment"></textarea></div> 		</fieldset> 
+ 			<div class="input"><textarea name="message" id="message" rows="15" cols="25" class="bComment"></textarea></div> 		</fieldset>
 		<fieldset>
 			<div class="input">
 				<input type="submit" name="submit" value="<?php echo T_('Send') ?>" class="search" />

@@ -59,12 +59,11 @@ class BlogStats{
 	//////
 	//	Handle global calls
 		global $querycount;										// Total number of queries
-		global $tableposts, $tablepostcats, $tablecategories;	// ?
 		global $cache_categories;				// ?
 		global $cat_array; 										// communication with recursive callback funcs
 		global $DB;
 		global $Settings;
-		
+
 	//////
 	//	Which blog is used?
 		$this->blog = $blog;
@@ -345,9 +344,9 @@ class BlogStats{
 		$this->request = "SELECT COUNT( DISTINCT post_id ) as total_posts ";
 
 		$this->request .= "FROM
-				($tableposts
-					INNER JOIN $tablepostcats ON ID = postcat_post_ID)
-					INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
+				(T_posts
+					INNER JOIN T_postcats ON ID = postcat_post_ID)
+					INNER JOIN T_categories ON postcat_cat_ID = cat_ID ";
 
 		if( $blog == 1 )
 		{	// Special case: we aggregate all cats from all blogs

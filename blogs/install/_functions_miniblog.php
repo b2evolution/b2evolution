@@ -15,8 +15,6 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  */
 function upgrade_miniblog_tables()
 {
-	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments,
-					$tableblogs, $tablepostcats, $tablehitlog, $tableantispam, $tablegroups, $tableblogusers;
 	global $baseurl, $old_db_version, $new_db_version;
 	global $default_locale;
 	global $timestamp, $admin_email;
@@ -27,11 +25,11 @@ function upgrade_miniblog_tables()
 	global $install_password, $random_password;
 
 	// Create blogs:
-	create_default_blogs( 'Blog A (Upg)', 'Blog A (Miniblog Upgrade)', T_("This blog holds all your posts upgraded from Miniblog. This blog is named '%s'. %s"), false );	
+	create_default_blogs( 'Blog A (Upg)', 'Blog A (Miniblog Upgrade)', T_("This blog holds all your posts upgraded from Miniblog. This blog is named '%s'. %s"), false );
 
 
 	echo 'Creating default settings...';
-	$query = "INSERT INTO $tablesettings (set_name, set_value) 
+	$query = "INSERT INTO T_settings (set_name, set_value)
 						VALUES
 									('db_version', '$new_db_version'),
 									('default_locale', '$default_locale'),
@@ -50,8 +48,8 @@ function upgrade_miniblog_tables()
 									";
 	$DB->query( $query );
 	echo "OK.<br />\n";
-	
-		
+
+
 	echo 'Copying Miniblog users... ';
 	if( !isset( $install_password ) )
 	{
@@ -62,22 +60,22 @@ function upgrade_miniblog_tables()
 		$random_password = $install_password;
 	}
 	// Admins:
-	$query = "INSERT INTO $tableusers( ID, user_login, user_pass, user_firstname, user_lastname,
-							user_nickname, user_email, user_url, user_level, user_locale, user_idmode, user_notify, user_grp_ID ) 
+	$query = "INSERT INTO T_users( ID, user_login, user_pass, user_firstname, user_lastname,
+							user_nickname, user_email, user_url, user_level, user_locale, user_idmode, user_notify, user_grp_ID )
 						SELECT id, email, '".md5($random_password)."', '', '', name, email, homePage, 10, '$default_locale', 'nickname', 1, $Group_Admins->ID
 						FROM user
 						WHERE role = 'admin'";
 	$DB->query( $query );
 	// Bloggers:
-	$query = "INSERT INTO $tableusers( ID, user_login, user_pass, user_firstname, user_lastname,
-							user_nickname, user_email, user_url, user_level, user_locale, user_idmode, user_notify, user_grp_ID ) 
+	$query = "INSERT INTO T_users( ID, user_login, user_pass, user_firstname, user_lastname,
+							user_nickname, user_email, user_url, user_level, user_locale, user_idmode, user_notify, user_grp_ID )
 						SELECT id, email, '".md5($random_password)."', '', '', name, email, homePage, 1, '$default_locale', 'nickname', 1, $Group_Bloggers->ID
 						FROM user
 						WHERE role = 'user'";
 	$DB->query( $query );
 	// Regular users:
-	$query = "INSERT INTO $tableusers( ID, user_login, user_pass, user_firstname, user_lastname,
-							user_nickname, user_email, user_url, user_level, user_locale, user_idmode, user_notify, user_grp_ID ) 
+	$query = "INSERT INTO T_users( ID, user_login, user_pass, user_firstname, user_lastname,
+							user_nickname, user_email, user_url, user_level, user_locale, user_idmode, user_notify, user_grp_ID )
 						SELECT id, email, '".md5($random_password)."', '', '', name, email, homePage, 1, '$default_locale', 'nickname', 1, $Group_Users->ID
 						FROM user
 						WHERE role <> 'admin' and role <> 'user'";
@@ -85,38 +83,38 @@ function upgrade_miniblog_tables()
 	echo "OK.<br />\n";
 
 	echo 'Make sure user #1 is at level 10... ';
-	$query = "UPDATE $tableusers
-							 SET user_level = 10
-						 WHERE ID = 1";
+	$query = 'UPDATE T_users
+						SET user_level = 10
+						WHERE ID = 1';
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
 	echo 'Creating user blog permissions... ';
 	// Admin for all blogs:
-	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
-							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
+	$query = "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 							bloguser_perm_cats, bloguser_perm_properties)
 						SELECT blog_ID, ID, 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
-						FROM $tableusers, $tableblogs
+						FROM T_users, T_blogs
 						WHERE user_level = 10";
 	$DB->query( $query );
 
 	// Normal users for upgraded blog:
-	$query = "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember, 
-							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments, 
+	$query = "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 							bloguser_perm_cats, bloguser_perm_properties)
 						SELECT $blog_a_ID, ID, 1, 'published,protected,private,draft', 0, 1, 0, 0
-						FROM $tableusers
+						FROM T_users
 						WHERE user_level > 0 AND user_level < 10";
 	$DB->query( $query );
 	echo "OK.<br />\n";
-	
+
 	echo 'Creating a default category...';
 	$cat_imported = cat_create( 'Imported', 'NULL', $blog_a_ID );
 	echo "OK.<br />\n";
 
 	echo 'Copying Miniblog posts... ';
-	$query = "INSERT INTO $tableposts( ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_category, post_autobr, post_flags, post_comments )  
+	$query = "INSERT INTO T_posts( ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_category, post_autobr, post_flags, post_comments )
 						SELECT id, authorId, created, modified, 'published', '$default_locale', content, title, $cat_imported, 0, 'pingsdone,imported', 'open'
 						FROM miniblog
 						WHERE parentId = 0";
@@ -124,11 +122,11 @@ function upgrade_miniblog_tables()
 	echo "OK.<br />\n";
 
 	echo 'Generating wordcounts... ';
-	$query = "SELECT ID, post_content FROM $tableposts";
+	$query = 'SELECT ID, post_content FROM T_posts';
 	$q = $DB->get_results( $query, ARRAY_A );
 	if( count( $q ) ) foreach( $q as $row )
 	{
-		$query_update_wordcount = "UPDATE $tableposts 
+		$query_update_wordcount = "UPDATE T_posts
 															SET post_wordcount = " . bpost_count_words($row['post_content']) . "
 															WHERE ID = " . $row['ID'];
 		$DB->query($query_update_wordcount);
@@ -136,11 +134,11 @@ function upgrade_miniblog_tables()
 	echo "OK. (".count($q)." rows updated)<br />\n";
 
 	echo 'Generating postcats... ';
-	$query = "INSERT INTO $tablepostcats( postcat_post_ID, postcat_cat_ID ) 
-						SELECT ID, post_category FROM $tableposts";		
+	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID )
+						SELECT ID, post_category FROM T_posts";
 	$DB->query( $query );
 	echo "OK.<br />\n";
-	
+
 	echo 'Copying Miniblog comments... ';
 	$query = "SELECT id, parentId, created, content
 						FROM miniblog
@@ -167,20 +165,20 @@ function upgrade_miniblog_tables()
 			$author_url = $matches[1];
 		else
 			$author_url = '';
-			
+
 		// Trim the content:
 		if( preg_match( '#^(.*?)<p class="posted">Posted by#s', $row->content, $matches ) )
 			$content = $matches[1];
 		else
 			$content = $row->content;
-		
-		$query = "INSERT INTO $tablecomments( comment_ID, comment_post_ID, comment_type, comment_date, comment_content, comment_author, comment_author_email, comment_author_url ) 
+
+		$query = "INSERT INTO T_comments( comment_ID, comment_post_ID, comment_type, comment_date, comment_content, comment_author, comment_author_email, comment_author_url )
 							VALUES ( $row->id, $row->parentId, 'comment', ".$DB->quote($row->created).", ".$DB->quote($content).", ".$DB->quote($author).", ".$DB->quote($author_email).", ".$DB->quote($author_url)." )";
 		$DB->query( $query );
 	}
 	echo "OK.<br />\n";
-	
-		
+
+
 	create_default_categories( false /* not for A */ );
 
 	// POPULATE THE LINKBLOG:

@@ -58,7 +58,7 @@ elseif( $use_l10n == 2 )
 
 		// replace special characters that to msgid-equivalents
 		$search = str_replace( array("\n", "\r", "\t"), array('\n', '', '\t'), $string );
-		
+
 		// echo "Translating ", $search, " to $messages<br />";
 
 		if( !isset($trans[ $messages ] ) )
@@ -306,7 +306,7 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 	{	// File does not exist
 		$country = 'default';
 	}
-	
+
 	if( $absoluteurl !== true )
 	{
 		$iurl = $absoluteurl;
@@ -315,14 +315,14 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 	{
 		$iurl = $img_url.'/flags';
 	}
-	
-	$r = '<img src="'.$iurl.'/'.$collection.'/'.$country.'.gif" alt="' . 
+
+	$r = '<img src="'.$iurl.'/'.$collection.'/'.$country.'.gif" alt="' .
 				(isset($locales[$locale]['name']) ? $locales[$locale]['name'] : $locale) .
 				'"';
 	if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 	if( !empty( $align ) ) $r .= ' align="'.$align.'"';
 	$r .= ' /> ';
-	
+
 	if( $disp )
 		echo $r;   // echo it
 	else
@@ -441,14 +441,14 @@ function locale_priosort( $a, $b )
  */
 function locale_overwritefromDB()
 {
-	global $tablelocales, $DB, $locales, $default_locale, $Settings;
+	global $DB, $locales, $default_locale, $Settings;
 
 	$usedprios = array();  // remember which priorities are used already.
 	$priocounter = 0;
 	$query = 'SELECT
 						loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name,
 						loc_messages, loc_priority, loc_enabled
-						FROM '.$tablelocales.' ORDER BY loc_priority';
+						FROM T_locales ORDER BY loc_priority';
 	$rows = $DB->get_results( $query, ARRAY_A );
 
 	if( count( $rows ) ) foreach( $rows as $row )
@@ -525,7 +525,7 @@ function locale_overwritefromDB()
  */
 function locale_updateDB()
 {
-	global $locales, $tablelocales, $DB;
+	global $locales, $DB;
 
 	$templocales = $locales;
 
@@ -551,7 +551,7 @@ function locale_updateDB()
 
 	$locales = $templocales;
 
-	$query = "REPLACE INTO $tablelocales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled ) VALUES ";
+	$query = "REPLACE INTO T_locales ( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_priority, loc_enabled ) VALUES ";
 	foreach( $locales as $localekey => $lval )
 	{
 		if( empty($lval['messages']) )

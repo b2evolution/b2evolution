@@ -41,7 +41,7 @@ switch( $action )
 		param( 'blacklist', 'integer', 0 );
 		param( 'report', 'integer', 0 );
 
-		// Check if the string is too short, 
+		// Check if the string is too short,
 		// it has to be a minimum of 5 characters to avoid being too generic
 		if( strlen($keyword) < 5 )
 		{
@@ -56,22 +56,22 @@ switch( $action )
 			echo '<div class="panelinfo">';
 			printf( '<h3>'.T_('Deleting log-hits matching [%s]...').'</h3>', $keyword );
 			// Stats entries first
-			$sql = "DELETE FROM $tablehitlog 
+			$sql = "DELETE FROM T_hitlog
 							WHERE referingURL LIKE '%$dbkeyword%'";
 			$DB->query($sql);
 			echo '</div>';
 		}
-					
+
 		if( $delcomments && $deluxe_ban )
 		{ // Then all banned comments
 			echo '<div class="panelinfo">';
 			printf( '<h3>'.T_('Deleting comments matching [%s]...').'</h3>', $keyword );
-			$sql = "DELETE FROM $tablecomments 
-							WHERE comment_author_url LIKE '%$dbkeyword%'";	
+			$sql = "DELETE FROM T_comments
+							WHERE comment_author_url LIKE '%$dbkeyword%'";
 			$DB->query($sql);
 			echo '</div>';
 		}
-		
+
 		if( $blacklist )
 		{	// Local blacklist:
 			echo '<div class="panelinfo">';
@@ -80,12 +80,12 @@ switch( $action )
 			antispam_create( $keyword );
 			echo '</div>';
 		}
-			
+
 		if( $report && $report_abuse )
 		{ // Report this keyword as abuse:
 			b2evonet_report_abuse( $keyword );
 		}
-		
+
 		if( !( $delhits || $delcomments || $blacklist || $report ) )
 		{	// Nothing to do, ask user:
 			?>
@@ -101,9 +101,9 @@ switch( $action )
 				{	// We can we autodelete junk, check for junk:
 					// Check for potentially affected log hits:
 					$sql = "SELECT visitID, UNIX_TIMESTAMP(visitTime) AS visitTime, referingURL,
-												 baseDomain, hit_blog_ID, visitURL 
-												 FROM $tablehitlog 
-												 WHERE referingURL LIKE '%$dbkeyword%' 
+												 baseDomain, hit_blog_ID, visitURL
+												 FROM T_hitlog
+												 WHERE referingURL LIKE '%$dbkeyword%'
 												 ORDER BY baseDomain ASC";
 					$res_affected_hits = $DB->get_results( $sql, ARRAY_A );
 					if( $DB->num_rows == 0 )
@@ -133,11 +133,11 @@ switch( $action )
 						</table>
 					<?php
 					}
-	
+
 					// Check for potentially affected comments:
-					$sql = "SELECT * 
-									FROM $tablecomments 
-									WHERE comment_author_url LIKE '%$dbkeyword%' 
+					$sql = "SELECT *
+									FROM T_comments
+									WHERE comment_author_url LIKE '%$dbkeyword%'
 									ORDER BY comment_date ASC";
 					$res_affected_comments = $DB->get_results( $sql, ARRAY_A );
 					if( $DB->num_rows == 0 )
@@ -192,19 +192,19 @@ switch( $action )
 					<?php printf ( T_('Blacklist the keyword [%s] locally.'), format_to_output( $keyword, 'htmlbody' ) ) ?>
 					</strong></p>
 
-					<?php if( $report_abuse ) 
+					<?php if( $report_abuse )
 					{ ?>
 						<p>
 						<strong><input type="checkbox" name="report" value="1" checked="checked" />
 						<?php printf ( T_('Report the keyword [%s] as abuse to b2evolution.net.'), format_to_output( $keyword, 'htmlbody' ) ) ?>
 						</strong>
 						[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
-						</p>					
+						</p>
 					<?php
 					}
 				}
-				?>				
-				
+				?>
+
 				<input type="submit" value="<?php echo T_('Perform selected operations') ?>" class="search" />
 				</form>
 			</div>
@@ -212,7 +212,7 @@ switch( $action )
 		}
 		break;
 
-		
+
 	case 'remove':
 		// Remove a domain from ban list:
 
@@ -223,7 +223,7 @@ switch( $action )
 		?>
 		<div class="panelinfo">
 			<p><?php printf( T_('Removing entry #%d from the ban list...'), $hit_ID) ?></p>
-			<?php 
+			<?php
 			antispam_delete( $hit_ID );
 			?>
 		</div>
@@ -253,7 +253,7 @@ switch( $action )
 }
 
 
-if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 { ?>
 	<div class="panelblock">
 		<form action="b2antispam.php" method="get" class="fform">
@@ -271,13 +271,13 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 <div class="panelblock">
 	<h2><?php echo T_('Banned domains blacklist') ?></h2>
 	<p class="center"><?php echo T_('Any URL containing one of the following keywords will be banned from posts, comments and logs.');
-	if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+	if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 	{
 		echo '<br />'.T_( 'If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword.');
 	}
 	?></p>
 	<?php list_antiSpam() ?>
-	<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) 
+	<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 	{ ?>
 		<p class="center">
 			[<a href="b2antispam.php?action=poll"><?php echo T_('Request abuse update from centralized blacklist!') ?></a>]

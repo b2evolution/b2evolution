@@ -1,7 +1,7 @@
 <?php
 /**
  * General purpose functions
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -542,14 +542,14 @@ function timer_stop($display=0,$precision=3) { //if called like timer_stop(1), w
 	}
 
 
-function xmlrpc_getposttitle($content) 
+function xmlrpc_getposttitle($content)
 {
 	global $post_default_title;
-	if (preg_match('/<title>(.+?)<\/title>/is', $content, $matchtitle)) 
+	if (preg_match('/<title>(.+?)<\/title>/is', $content, $matchtitle))
 	{
 		$post_title = $matchtitle[1];
-	} 
-	else 
+	}
+	else
 	{
 		$post_title = $post_default_title;
 	}
@@ -559,9 +559,9 @@ function xmlrpc_getposttitle($content)
 /**
  * Also used by post by mail
  */
-function xmlrpc_getpostcategory($content) 
+function xmlrpc_getpostcategory($content)
 {
-	if (preg_match('/<category>([0-9]+?)<\/category>/is', $content, $matchcat)) 
+	if (preg_match('/<category>([0-9]+?)<\/category>/is', $content, $matchcat))
 	{
 		return $matchcat[1];
 	}
@@ -634,19 +634,19 @@ function debug_fopen($filename, $mode) {
 	}
 }
 
-function debug_fwrite($fp, $string) 
+function debug_fwrite($fp, $string)
 {
 	global $debug;
-	if( $debug && $fp ) 
+	if( $debug && $fp )
 	{
 		fwrite($fp, $string);
 	}
 }
 
-function debug_fclose($fp) 
+function debug_fclose($fp)
 {
 	global $debug;
-	if( $debug && $fp ) 
+	if( $debug && $fp )
 	{
 		fclose($fp);
 	}
@@ -861,7 +861,7 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
 		}
 		else
 		{ // param not found! don't set the variable.
-			// Won't be memorized nor type-forced! 
+			// Won't be memorized nor type-forced!
 			return false;
 		}
 	}
@@ -894,7 +894,7 @@ function param(	$var, $type = '',	$default = '', $memorize = false, $override = 
 
 	if( $memorize )
 	{	// Memorize this parameter
-		if( !isset($global_param_list) ) 
+		if( !isset($global_param_list) )
 		{ // Init list if necessary:
 			$global_param_list = array();
 		}
@@ -1269,7 +1269,7 @@ function url_add_param( $url, $param, $moredelim = '&amp;' )
 function url_add_tail( $url, $tail )
 {
 	$parts = explode( '?', $url );
-	if( isset($parts[1]) ) 
+	if( isset($parts[1]) )
 	{
 		return $parts[0].$tail.'?'.$parts[1];
 	}
@@ -1322,5 +1322,48 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 	$Debuglog->add( "Sending mail from $from to $to - subject $subject." );
 
 	return @mail( $to, $subject, $message, $headerstring );
+}
+
+
+/**
+	Does the same thing as the function realpath(), except it will
+	also translate paths that don't exist on the system.
+
+	@param string the path to be translated
+	@return array [0] = the translated string; [1] = TRUE|FALSE (path exists?)
+*/
+function str2path( $path )
+{
+	$path = str_replace( '\\', '/', $path );
+	$pwd = realpath( $path );
+
+	if( !empty($pwd) )
+	{ // path exists
+		return array( $pwd, true );
+	}
+	else
+	{ // no realpath
+		$pwd = '';
+		$strArr = preg_split( '#/#', $path, -1, PREG_SPLIT_NO_EMPTY );
+		$pwdArr = array();
+		$j = 0;
+		for( $i = 0; $i < count($strArr); $i++ )
+		{
+			if( $strArr[$i] != '..' )
+			{
+				if( $strArr[$i] != '.' )
+				{
+					$pwdArr[$j] = $strArr[$i];
+					$j++;
+				}
+			}
+			else
+			{
+				array_pop( $pwdArr );
+				$j--;
+			}
+		}
+		return array( '/'.implode('/', $pwdArr), false );
+	}
 }
 ?>

@@ -35,7 +35,7 @@ function bpost_create(
 	$post_comments = 'open',
 	$post_renderers = array('default') )
 {
-	global $DB, $tableposts, $tablepostcats, $query;
+	global $DB, $query;
 	global $localtimenow, $default_locale;
 
 	if( $post_locale == '#' ) $post_locale = $default_locale;
@@ -55,7 +55,7 @@ function bpost_create(
 
 	// echo 'INSERTING NEW POST ';
 
-	$query = "INSERT INTO $tableposts( post_author, post_title, post_urltitle, post_content,
+	$query = "INSERT INTO T_posts( post_author, post_title, post_urltitle, post_content,
 														post_issue_date, post_mod_date, post_category,  post_status, post_locale,
 														post_url, post_autobr, post_flags, post_wordcount,
 														post_comments, post_renderers )
@@ -78,7 +78,7 @@ function bpost_create(
 	// echo "post ID:".$post_ID;
 
 	// insert new extracats
-	$query = "INSERT INTO $tablepostcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
+	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
 	foreach( $extra_cat_IDs as $extra_cat_ID )
 	{
 		// echo "extracat: $extra_cat_ID <br />";
@@ -117,7 +117,7 @@ function bpost_update(
 	$post_comments = 'open',
 	$post_renderers = array() )
 {
-	global $DB, $tableposts, $tablepostcats, $query, $querycount;
+	global $DB, $query, $querycount;
 	global $localtimenow, $default_locale;
 
 	// Handle the flags:
@@ -133,7 +133,7 @@ function bpost_update(
 	// validate url title
 	$post_urltitle = urltitle_validate( $post_urltitle, $post_title, $post_ID );
 
-	$query = "UPDATE $tableposts
+	$query = "UPDATE T_posts
 						SET post_title = '".$DB->escape($post_title)."',
 								post_urltitle = '".$DB->escape($post_urltitle)."',
 								post_url = '".$DB->escape($post_url)."',
@@ -157,11 +157,11 @@ function bpost_update(
 	if( ! $DB->query( $query ) ) return 0;
 
 	// delete previous extracats
-	$query = "DELETE FROM $tablepostcats WHERE postcat_post_ID = $post_ID";
+	$query = "DELETE FROM T_postcats WHERE postcat_post_ID = $post_ID";
 	if( ! $DB->query( $query ) ) return 0;
 
 	// insert new extracats
-	$query = "INSERT INTO $tablepostcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
+	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
 	foreach( $extra_cat_IDs as $extra_cat_ID )
 	{
 		//echo "extracat: $extracat_ID <br />";
@@ -188,15 +188,13 @@ function bpost_update_status(
 	$pingsdone = true,
 	$post_timestamp = '' )
 {
-	global $DB, $tableposts, $tablepostcats;
-	global $localtimenow;
-	global $query;
+	global $DB, $localtimenow, $query;
 
 	// Handle the flags:
 	$post_flags = array();
 	if( $pingsdone ) $post_flags[] = 'pingsdone';
 
-	$query = "UPDATE $tableposts SET ";
+	$query = "UPDATE T_posts SET ";
 	if( !empty($post_timestamp) )	$query .= "post_issue_date = '$post_timestamp', ";
 	$query .= "post_mod_date = '".date('Y-m-d H:i:s',$localtimenow)."', ";
 	$query .= "post_status = '$post_status', ";
@@ -216,21 +214,21 @@ function bpost_update_status(
  */
 function bpost_delete( $post_ID )
 {
-	global $DB, $tableposts, $tablepostcats, $tablecomments;
+	global $DB;
 
 	// TODO: START TRANSACTION
 
 
 	// delete extracats
-	$query = "DELETE FROM $tablepostcats WHERE postcat_post_ID = $post_ID";
+	$query = "DELETE FROM T_postcats WHERE postcat_post_ID = $post_ID";
 	if( $DB->query( $query ) === false ) return 0;
 
 	// delete comments
-	$query = "DELETE FROM $tablecomments WHERE comment_post_ID = $post_ID";
+	$query = "DELETE FROM T_comments WHERE comment_post_ID = $post_ID";
 	if( $DB->query( $query ) === false ) return 0;
 
 	// delete post
-	$query = "DELETE FROM $tableposts WHERE ID = $post_ID";
+	$query = "DELETE FROM T_posts WHERE ID = $post_ID";
 	if( $DB->query( $query ) === false ) return 0;
 
 
@@ -289,7 +287,7 @@ function get_lastpostdate(
  */
 function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false )
 {
-	global $DB, $tableposts;
+	global $DB;
 
 	$urltitle = trim( $urltitle );
 
@@ -321,7 +319,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	// Find all occurrences of urltitle+number in the DB:
 	$sql = "SELECT post_urltitle
-					FROM $tableposts
+					FROM T_posts
 					WHERE post_urltitle REGEXP '^".$urlbase."(_[0-9]+)?$'
 					  AND ID <> $post_ID";
 	$rows = $DB->get_results( $sql, ARRAY_A );
@@ -363,7 +361,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
  */
 function get_postdata($postid)
 {
-	global $DB, $postdata, $tableusers, $tablecategories, $tableposts, $tablecomments, $show_statuses;
+	global $DB, $postdata, $show_statuses;
 
 	if( !empty($postdata) && $postdata['ID'] == $postid )
 	{	// We are asking for postdata of current post in memory! (we're in the b2 loop)
@@ -375,7 +373,10 @@ function get_postdata($postid)
 
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
-	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_url, post_category, post_autobr, post_flags, post_wordcount, post_comments, post_views, cat_blog_ID FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID WHERE ID = $postid";  
+	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale, post_content, post_title, post_url, post_category, post_autobr, post_flags, post_wordcount, post_comments, post_views, cat_blog_ID
+					FROM T_posts
+					INNER JOIN T_categories ON post_category = cat_ID
+					WHERE ID = $postid";
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
 	// fplanque: 2004-04-04: this should not be needed here. (and is indeed problematic when we want to
@@ -400,7 +401,7 @@ function get_postdata($postid)
 			'AutoBR' => $myrow->post_autobr,
 			'Flags' => explode( ',', $myrow->post_flags ),
 			'Wordcount' => $myrow->post_wordcount,
-			'views' => $myrow->post_views, 
+			'views' => $myrow->post_views,
 			'comments' => $myrow->post_comments,
 			'Blog' => $myrow->cat_blog_ID,
 			);
@@ -427,14 +428,14 @@ function get_postdata($postid)
  */
 function Item_get_by_ID( $post_ID )
 {
-	global $DB, $postdata, $tableusers, $tablecategories, $tableposts, $tablecomments,  $show_statuses;
+	global $DB, $postdata, $show_statuses;
 
 	// We have to load the post
 	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
 									post_content, post_title, post_urltitle, post_url, post_category,
 									post_autobr, post_flags, post_wordcount, post_comments,
 									post_renderers, post_views, cat_blog_ID
-					FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID
+					FROM T_posts INNER JOIN T_categories ON post_category = cat_ID
 					WHERE ID = $post_ID";
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
@@ -463,14 +464,14 @@ function Item_get_by_ID( $post_ID )
  */
 function Item_get_by_title( $urltitle )
 {
-	global $DB, $postdata, $tableusers, $tablecategories, $tableposts, $tablecomments,  $show_statuses;
+	global $DB, $postdata, $show_statuses;
 
 	// We have to load the post
 	$sql = "SELECT ID, post_author, post_issue_date, post_mod_date, post_status, post_locale,
 									post_content, post_title, post_urltitle, post_url, post_category,
-									post_autobr, post_flags, post_wordcount, post_comments, 
-									post_renderers, post_views, cat_blog_ID 
-					FROM $tableposts INNER JOIN $tablecategories ON post_category = cat_ID
+									post_autobr, post_flags, post_wordcount, post_comments,
+									post_renderers, post_views, cat_blog_ID
+					FROM T_posts INNER JOIN T_categories ON post_category = cat_ID
 					WHERE post_urltitle = ".$DB->quote($urltitle);
 
 	if( ! ($row = $DB->get_row( $sql )) )
@@ -874,7 +875,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 {
 	if( $previous == '#' ) $previous = T_('Previous post') . ': ';
 
-	global $DB, $tableposts, $postdata;
+	global $DB, $postdata;
 	global $p, $posts, $s;
 
 	if(($p) || ($posts==1))
@@ -899,7 +900,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 
 		$limitprev--;
 		$sql = "SELECT ID,post_title
-						FROM $tableposts
+						FROM T_posts
 						WHERE post_issue_date < '$current_post_date'
 							$sqlcat
 							$sql_exclude_cats
@@ -931,7 +932,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 {
 	if( $next == '#' ) $next = T_('Next post') . ': ';
 
-	global $tableposts, $p, $posts, $postdata, $localtimenow, $DB;
+	global $p, $posts, $postdata, $localtimenow, $DB;
 	if(($p) || ($posts==1))
 	{
 
@@ -956,7 +957,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 
 		$limitnext--;
 		$sql = "SELECT ID, post_title
-						FROM $tableposts
+						FROM T_posts
 						WHERE post_issue_date > '$current_post_date'
 							AND post_issue_date < '$now'
 							$sqlcat

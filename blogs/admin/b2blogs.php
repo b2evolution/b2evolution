@@ -131,7 +131,7 @@ switch($action)
 
 			// Set default user permissions for this blog
 			// Proceed insertions:
-			$DB->query( "INSERT INTO $tableblogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+			$DB->query( "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 												bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 												bloguser_perm_cats, bloguser_perm_properties )
 										VALUES ( $edited_Blog->ID, $current_User->ID, 1,
@@ -428,20 +428,20 @@ switch($action)
 					else
 						echo '<li>';
 					echo '<a href="b2blogs.php?blog='.$blog.'&amp;action=edit&amp;tab=perm">'. T_('Permissions'). '</a></li>';
-					
+
 					if( $tab == 'advanced' )
 						echo '<li class="current">';
 					else
 						echo '<li>';
 					echo '<a href="b2blogs.php?blog='.$blog.'&amp;action=edit&amp;tab=advanced">'. T_('Advanced'). '</a></li>';
-					
+
 				?>
 				</ul>
 			</div>
 		</div>
 		<div class="tabbedpanelblock">
-		
-		<?php 
+
+		<?php
 		switch( $tab )
 		{
 			case 'general':

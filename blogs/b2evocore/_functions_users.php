@@ -1,7 +1,7 @@
 <?php
 /**
- * User stuff 
- * 
+ * User stuff
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -29,7 +29,7 @@ function veriflog( $login_required = false )
 	global $cookie_user, $cookie_pass, $cookie_expires, $cookie_path, $cookie_domain, $error, $core_dirout;
 	global $user_login, $user_pass_md5, $userdata, $user_ID, $user_nickname, $user_email, $user_url;
 	global $current_User;
-	global $DB, $tableusers;
+	global $DB;
 
 	// Reset all global variables in case some tricky stuff is trying to set them otherwise:
 	// Warning: unset() prevent from setting a new global value later in the func !!! :((
@@ -139,7 +139,7 @@ function veriflog( $login_required = false )
 	$userdata	= get_userdatabylogin($user_login);
 	$current_User = new User( $userdata );	// COPY!
 	//echo $current_User->disp('login');
-	
+
 	$user_ID = $userdata['ID'];
 	$user_nickname = $userdata['user_nickname'];
 	$user_email	= $userdata['user_email'];
@@ -216,11 +216,11 @@ function user_pass_ok( $user_login, $user_pass, $pass_is_md5 = false )
  */
 function get_userdatabylogin( $user_login )
 {
-	global $DB, $tableusers, $cache_userdata, $use_cache;
+	global $DB, $cache_userdata, $use_cache;
 	if( (empty($cache_userdata[$user_login])) OR (!$use_cache) )
 	{
-		$sql = "SELECT * 
-						FROM $tableusers 
+		$sql = "SELECT *
+						FROM T_users
 						WHERE user_login = '".$DB->escape($user_login)."'";
 		$myrow = $DB->get_row( $sql, ARRAY_A );
 		$cache_userdata[$user_login] = $myrow;
@@ -237,11 +237,11 @@ function get_userdatabylogin( $user_login )
  */
 function get_userdata($userid)
 {
-	global $DB, $tableusers, $cache_userdata;
+	global $DB, $cache_userdata;
 	if( empty($cache_userdata[$userid] ) )
 	{	// We do a progressive cache load beacuse there can be many many users!
 		$sql = "SELECT *
-						FROM $tableusers
+						FROM T_users
 						WHERE ID = $userid";
 		if( $myrow = $DB->get_row( $sql, ARRAY_A ) )
 		{
@@ -263,9 +263,9 @@ function get_userdata($userid)
  */
 function get_usernumposts( $userid )
 {
-	global $DB, $tableposts;
+	global $DB;
 	return $DB->get_var( "SELECT count(*)
-												FROM $tableposts
+												FROM T_posts
 												WHERE post_author = $userid" );
 }
 
@@ -348,7 +348,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 
 	if( $link_text == '' ) $link_text = T_('Login...');
 	if( $link_title == '#' ) $link_title = T_('Login if you have an account...');
-		
+
 	if( !isset($generating_static) )
 	{	// We are not generating a static page here:
 		$redirect = '?redirect_to='.urlencode( regenerate_url() );
@@ -361,7 +361,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 	{	// We are in a weird situation
 		$redirect = '';
 	}
-		
+
 	echo $before;
 	echo '<a href="', $htsrv_url, '/login.php'.$redirect.'" title="', $link_title, '">';
 	echo $link_text;
@@ -398,7 +398,7 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 	{	// We are in a weird situation
 		$redirect = '';
 	}
-		
+
 	echo $before;
 	echo '<a href="', $htsrv_url, '/register.php'.$redirect.'" title="', $link_title, '">';
 	echo $link_text;

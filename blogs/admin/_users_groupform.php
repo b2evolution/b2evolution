@@ -21,7 +21,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 			$prevgroupid = 0;
 			$nextgroupid = 0;
 
-			$query = "SELECT MAX(grp_ID), MIN(grp_ID) FROM $tablegroups";
+			$query = "SELECT MAX(grp_ID), MIN(grp_ID) FROM T_groups";
 			$gminmax = $DB->get_row( $query, ARRAY_A );
 
 			foreach( $GroupCache->cache as $fgroup )
@@ -119,7 +119,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 		<?php
 		if( $current_User->check_perm( 'users', 'edit' ) )
-		{ 
+		{
 			form_submit();
 		} ?>
 

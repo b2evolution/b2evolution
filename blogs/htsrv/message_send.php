@@ -36,8 +36,8 @@ if( !empty( $recipient_id ) )
 }
 elseif( !empty( $comment_id ) )
 { // Get the email address for the recipient if a commenter.
-	$sql = 'SELECT comment_author, comment_author_email 
-		FROM ' . $tablecomments . ' 
+	$sql = 'SELECT comment_author, comment_author_email
+		FROM T_comments
 		WHERE comment_ID =' . $comment_id;
 	$row = $DB->get_row( $sql );
 	$recipient_address = $row->comment_author . ' <' . $row->comment_author_email . '>';

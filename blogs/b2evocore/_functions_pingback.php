@@ -1,7 +1,7 @@
 <?php
 /**
  * Pingback support functions
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -19,14 +19,14 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
  *
  * {@internal pingback(-)}}
  */
-function pingback( 
-	$post_pingback, 
-	$content, 
-	$post_title, 
-	$post_url, 
-	$post_ID, 
-	& $blogparams, 
-	$display = true) 
+function pingback(
+	$post_pingback,
+	$content,
+	$post_title,
+	$post_url,
+	$post_ID,
+	& $blogparams,
+	$display = true)
 {
 	global $b2_version, $debug, $ItemCache;
 
@@ -45,7 +45,7 @@ function pingback(
 		$log = debug_fopen('./pingback.log', 'a');
 		$post_links = array();
 		debug_fwrite($log, T_('BEGIN').' '.time()."\n");
-	
+
 		// Variables
 		$ltrs = '\w';
 		$gunk = '/#~:.?+=&%@!\-';
@@ -55,7 +55,7 @@ function pingback(
 		$pingback_str_squote = 'rel=\'pingback\'';
 		$x_pingback_str = 'x-pingback: ';
 		$pingback_href_original_pos = 27;
-	
+
 		$Item = $ItemCache->get_by_ID( $post_ID );
 		$pagelinkedfrom = $Item->gen_permalink();
 
@@ -73,11 +73,11 @@ function pingback(
 		// trailing x is to ignore whitespace
 		// we need to simplify and allow ; in the URL
 		 preg_match_all("{\b http:// [0-9A-Za-z:/_~+\-%.?&=;]+}x", $content, $post_links_temp);
-		 
+
 		// Debug
 		debug_fwrite($log, T_('Post contents').':');
 		debug_fwrite($log, $content."\n");
-		
+
 		// Step 2.
 		// Walking thru the links array
 		// first we get rid of links pointing to sites, not to specific files
@@ -86,29 +86,29 @@ function pingback(
 		// http://dummy-weblog.org/
 		// http://dummy-weblog.org/post.php
 		// We don't wanna ping first and second types, even if they have a valid <link/>
-	
+
 		foreach($post_links_temp[0] as $link_test)
 		{
 			//echo "testing: $link_test <br />";
 			$test = parse_url($link_test);
 			if( $test['scheme'] == 'http' )
 			{
-				if (isset($test['query'])) 
+				if (isset($test['query']))
 				{
 					$post_links[] = $link_test;
 				}
-				elseif(($test['path'] != '/') && ($test['path'] != '')) 
+				elseif(($test['path'] != '/') && ($test['path'] != ''))
 				{
 					$post_links[] = $link_test;
 				}
 			}
 		}
-	
+
 		foreach ($post_links as $pagelinkedto)
 		{
 			if( $display ) echo '<p>', T_('Processing:'), ' ', $pagelinkedto, "<br />\n";
 			debug_fwrite($log, T_('Processing:').' '.$pagelinkedto."\n\n");
-	
+
 			$bits = parse_url($pagelinkedto);
 			if (!isset($bits['host'])) {
 				if( $display ) echo T_('Couldn\'t find a hostname for:'),' ',$pagelinkedto, "<br />\n";
@@ -124,30 +124,30 @@ function pingback(
 				$path = '/';
 			}
 			$port = isset($bits['port']) ? $bits['port'] : 80;
-	
+
 			// Try to connect to the server at $host
 			if( $display ) echo T_('Connect to server at:'), ' ',$host;
 			$fp = fsockopen($host, $port, $errno, $errstr, 30);
-			if (!$fp) 
+			if (!$fp)
 			{
 				if( $display ) echo T_('Couldn\'t open a connection to:'), ' ', $pagelinkedto, "<br />\n";
 				debug_fwrite($log, T_('Couldn\'t open a connection to:').' '.$host."\n\n");
 				continue;
 			}
 			echo "<br />\n";
-	
+
 			// Send the GET request
 			$request = "GET $path HTTP/1.1\r\nHost: $host\r\nUser-Agent: b2evolution/$b2_version PHP/" . phpversion() . "\r\n\r\n";
 			ob_end_flush();
 			fputs($fp, $request);
-	
+
 			// Start receiving headers and content
 			debug_fwrite($log, T_('Start receiving headers and content')."\n");
 			$contents = '';
 			$headers = '';
 			$gettingHeaders = true;
 			$found_pingback_server = 0;
-			while (!feof($fp)) 
+			while (!feof($fp))
 			{
 				$line = fgets($fp, 4096);
 				// echo "line (".strlen($line)."): [",htmlspecialchars($line),"] <br />\n";
@@ -158,21 +158,21 @@ function pingback(
 				$pingback_link_offset_dquote = 0;
 				$pingback_link_offset_squote = 0;
 				$x_pingback_header_offset = 0;
-				if (!$gettingHeaders) 
+				if (!$gettingHeaders)
 				{
 					// echo 'CONTENT';
 					$contents .= trim($line)."\n";
 					// localise rel="'pingback"' :
-					$pingback_link_offset_dquote = strpos($contents, $pingback_str_dquote); 
+					$pingback_link_offset_dquote = strpos($contents, $pingback_str_dquote);
 					$pingback_link_offset_squote = strpos($contents, $pingback_str_squote);
-				} 
-				else 
+				}
+				else
 				{
 					// echo 'HEADER';
 					$headers .= trim($line)."\n";
 					$x_pingback_header_offset = strpos(strtolower($headers), $x_pingback_str);
 				}
-				if ($x_pingback_header_offset) 
+				if ($x_pingback_header_offset)
 				{	// on a trouvé dans les headers
 					preg_match('#x-pingback: (.+)#is', $headers, $matches);
 					$pingback_server_url = trim($matches[1]);
@@ -180,8 +180,8 @@ function pingback(
 					debug_fwrite($log, T_('Pingback server found from X-Pingback header:').' '.$pingback_server_url."\n");
 					$found_pingback_server = 1;
 					break;
-				}	
-				if( $pingback_link_offset_dquote || $pingback_link_offset_squote ) 
+				}
+				if( $pingback_link_offset_dquote || $pingback_link_offset_squote )
 				{	// on a trouvé dans les données
 					$quote = ($pingback_link_offset_dquote) ? '"' : '\'';
 					$pingback_link_offset = ($quote=='"') ? $pingback_link_offset_dquote : $pingback_link_offset_squote;
@@ -196,29 +196,29 @@ function pingback(
 					break;
 				}
 			}
-	
-			if(!$found_pingback_server) 
+
+			if(!$found_pingback_server)
 			{
 				if( $display )	echo T_('Pingback server not found in headers and content'), "<br />\n";
 				debug_fwrite($log, T_('Pingback server not found in headers and content'). "\n\n*************************\n\n");
 				@fclose($fp);
-			} 
+			}
 			elseif( empty($pingback_server_url) )
 			{
 				if( $display )	echo T_('Pingback server URL is empty (may be an internal PHP fgets error)'), "<br />\n";
 				debug_fwrite($log, T_('Pingback server URL is empty (may be an internal PHP fgets error)'). "\n\n*************************\n\n");
 				@fclose($fp);
 			}
-			else 
+			else
 			{
 				debug_fwrite($log,"\n\n". T_('Pingback server data'). "\n");
-				
+
 				$parsed_url = parse_url( $pingback_server_url );
 				debug_fwrite($log, 'host: '.$parsed_url['host']."\n");
 				$port = isset($parsed_url['port']) ? $parsed_url['port'] : 80;
 				debug_fwrite($log, 'port: '.$port."\n");
 				debug_fwrite($log, 'path: '.$parsed_url['path']."\n\n");
-	
+
 				 // Now, the RPC call
 				$method = 'pingback.ping';
 				if( $display )	echo T_('Page Linked To:'), " $pagelinkedto<br />\n";
@@ -243,32 +243,32 @@ function pingback(
 		debug_fclose($log);
 		if( $display )	echo "<p>", T_('Pingbacks done.'), "<p>\n";
 	}
-	if( $display )	echo "</div>\n";	
+	if( $display )	echo "</div>\n";
 }
 
 
 
-/* 
+/*
  * TEMPLATE FUNCTIONS:
  */
 
 
 
 /*****
- * Pingback tags 
+ * Pingback tags
  *****/
 
 /**
  * pingback_number(-)
  * @deprecated deprecated by {@link Item::feedback_link()}
  */
-function pingback_number($zero='#', $one='#', $more='#' ) 
+function pingback_number($zero='#', $one='#', $more='#' )
 {
 	if( $zero == '#' ) $zero = T_('Pingback (0)');
 	if( $one == '#' ) $one = T_('Pingback (1)');
 	if( $more == '#' ) $more = T_('Pingbacks (%d)');
 
-	global $id, $tablecomments, $tb, $querycount, $cache_pingbacknumber, $use_cache;
+	global $id, $tb, $querycount, $cache_pingbacknumber, $use_cache;
 	$number = generic_ctp_number($id, 'pingbacks');
 	if ($number == 0) {
 		$blah = $zero;
@@ -286,7 +286,7 @@ function pingback_number($zero='#', $one='#', $more='#' )
  * Displays link to the pingback page
  * @deprecated deprecated by {@link Item::feedback_link()}
  */
-function pingback_link($file='',$c=0,$tb=0) 
+function pingback_link($file='',$c=0,$tb=0)
 {
 	global $id;
 	if( ($file == '') || ($file == '/')	)
