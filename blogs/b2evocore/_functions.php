@@ -750,7 +750,7 @@ function xmlrpc_displayresult( $result, $log = '' )
 {
 	if( ! $result )
 	{
-		echo T('No response!'),"<br />\n";
+		echo T_('No response!'),"<br />\n";
 		return false;
 	}
 	elseif( $result->faultCode() )

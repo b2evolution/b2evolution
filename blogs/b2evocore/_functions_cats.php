@@ -152,16 +152,15 @@ function cat_delete( $cat_ID )
 	//  --------------- PROCEED WITH DELETING ------------
 
 	// First delete assoc to this cat when it's an extra cat
+	$query = "DELETE FROM $tablepostcats WHERE postcat_cat_ID = $cat_ID ".$IDlist;
+
 	if( !empty($IDarray) )
 	{	
 		$IDlist = " AND postcat_post_ID NOT IN (".implode( ',', $IDarray ).") ";
 	}
 	else
 		$IDList = '';
-
-	// delete when not main cat
-	$query = "DELETE FROM $tablepostcats WHERE postcat_cat_ID = $cat_ID ".$IDlist;
-
+ 
 	$querycount++;
 	$result = mysql_query($query);
 	if( !$result ) return 0;
