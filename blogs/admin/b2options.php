@@ -100,7 +100,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 
 			if( $Settings->updateDB() )
 			{
-				$Messages->add( T_('General settings updated.'), 'note' );
+				$Messages->add( T_('General settings have been updated.'), 'note' );
 			}
 
 			break;
@@ -118,7 +118,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				$Settings->set( 'time_difference', $newtime_difference );
 				$Settings->updateDB();
 
-				$Messages->add( T_('Regional settings updated.'), 'note' );
+				$Messages->add( T_('Regional settings have been updated.'), 'note' );
 				break;
 
 
@@ -158,7 +158,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 											'{$locales[$oldloc_locale]['charset']}', '{$locales[$oldloc_locale]['datefmt']}',
 											'{$locales[$oldloc_locale]['timefmt']}', '{$locales[$oldloc_locale]['name']}',
 											'{$locales[$oldloc_locale]['messages']}', '{$locales[$oldloc_locale]['priority']}',";
-						if( $oldlocale != $newlocale )
+						if( $oldloc_locale != $newloc_locale )
 						{ // disable old locale
 							$query .= ' 0)';
 							$Messages->add( sprintf(T_('Inserted (and disabled) locale &laquo;%s&raquo; into database.'), $oldloc_locale), 'note' );

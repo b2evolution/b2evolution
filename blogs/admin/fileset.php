@@ -43,14 +43,14 @@
 /**
  * Includes:
  */
-require( dirname(__FILE__). '/_header.php' );
+require( dirname(__FILE__).'/_header.php' );
 $admin_tab = 'options';
 $tab = 'files';
 $admin_pagetitle = T_('Settings').$admin_path_seprator.T_('Files');
 
 param( 'action', 'string' );
 
-require( dirname(__FILE__). '/_menutop.php' );
+require( dirname(__FILE__).'/_menutop.php' );
 
 switch( $action )
 {
@@ -75,7 +75,7 @@ switch( $action )
 
 		if( $Settings->updateDB() )
 		{
-			$Messages->add( T_('File settings updated.'), 'note' );
+			$Messages->add( T_('File settings have been updated.'), 'note' );
 		}
 
 		break;

@@ -41,6 +41,13 @@
  * @version $Id$
  */
 
+/**
+ * @global array These locales messages.PO files will be merged after
+ *               generating the new messages.POT file.
+ */
+$localesToMerge = array( 'de_DE' );
+
+
 // check that all external tools are available:
 foreach( array( 'xgettext', 'msgmerge', 'find', 'xargs', 'sed' ) as $testtool )
 {
@@ -75,7 +82,7 @@ system( 'sed -i 1,20"'
 
 
 # Merge with existing .po files:
-foreach( array( 'fr_FR', 'de_DE' ) as $llocale )
+foreach( $localesToMerge as $llocale )
 {
 	$pofile = '../blogs/locales/'.$llocale.'/LC_MESSAGES/messages.po';
 
