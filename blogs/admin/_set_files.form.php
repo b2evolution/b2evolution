@@ -9,20 +9,59 @@
  * @package admin
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
-?>
 
-<form class="fform" name="form" action="fileset.php" method="post">
-	<input type="hidden" name="action" value="update" />
-	<input type="hidden" name="tab" value="<?php echo $tab; ?>" />
 
-	<fieldset>
-		<legend><?php echo T_('Upload options') ?></legend>
-		<?php
-			form_checkbox( 'upload_enabled',
+$FilesForm = new Form( 'fileset.php', 'filesform' );
+
+$FilesForm->begin_form( 'fform' );
+form_hidden( 'action', 'update' );
+form_hidden( 'tab', $tab );
+
+$FilesForm->begin_fieldset( T_('Filemanager options'), 'fm_enabled' );
+$FilesForm->checkbox( 'fm_enabled',
+								$Settings->get('fm_enabled'),
+								T_('Enable Filemanager'),
+								T_('Check to enable the Filemanager.' ) );
+$FilesForm->checkbox( 'fm_enable_roots_blog',
+								$Settings->get('fm_enable_roots_blog'),
+								T_('Enable blog directories'),
+								T_('Check to enable root directories for blogs.' ),
+								'',
+								Form::disabled( !$Settings->get('fm_enabled') ) );
+$FilesForm->checkbox( 'fm_enable_roots_group',
+								$Settings->get('fm_enable_roots_group'),
+								T_('Enable group directories'),
+								T_('Check to enable root directories for groups.' ),
+								'',
+								Form::disabled( !$Settings->get('fm_enabled') ) );
+$FilesForm->checkbox( 'fm_enable_roots_user',
+								$Settings->get('fm_enable_roots_user'),
+								T_('Enable user directories'),
+								T_('Check to enable root directories for users.' ),
+								'',
+								Form::disabled( !$Settings->get('fm_enabled') ) );
+$FilesForm->checkbox( 'fm_enable_create_dir',
+								$Settings->get('fm_enable_create_dir'),
+								T_('Enable creation of dirs'),
+								T_('Check to enable creation of directories.' ),
+								'',
+								Form::disabled( !$Settings->get('fm_enabled') ) );
+$FilesForm->checkbox( 'fm_enable_create_file',
+								$Settings->get('fm_enable_create_file'),
+								T_('Enable creation of files'),
+								T_('Check to enable creation of files.' ),
+								'',
+								Form::disabled( !$Settings->get('fm_enabled') ) );
+$FilesForm->end_fieldset();
+
+
+$FilesForm->begin_fieldset( T_('Upload options'), 'upload_enabled' );
+
+$FilesForm->checkbox( 'upload_enabled',
 											$Settings->get('upload_enabled'),
 											T_('Enable upload'),
 											T_('Check to allow uploading files in general.' ) );
-			form_text( 'upload_allowedext',
+$FilesForm->text( 'upload_allowedext',
 									$Settings->get('upload_allowedext'),
 									40,
 									T_('Allowed file extensions'),
@@ -30,7 +69,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 									.' '.T_('Leave it empty to disable this check.')
 									.' '.sprintf( /* TRANS: %s gets replaced with an example setting */ T_('E.g. &laquo;%s&raquo;'), $Settings->getDefault( 'upload_allowedext' ) ),
 									255 );
-			form_text( 'upload_allowedmime',
+$FilesForm->text( 'upload_allowedmime',
 									$Settings->get('upload_allowedmime'),
 									40,
 									T_('Allowed MIME type'),
@@ -38,27 +77,32 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 									.' '.T_('Leave it empty to disable this check.')
 									.' '.sprintf( /* TRANS: %s gets replaced with an example setting */ T_('E.g. &laquo;%s&raquo;'), $Settings->getDefault( 'upload_allowedmime' ) ),
 									255 );
-			form_text( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximal allowed filesize'), T_('KB'), 7 );
+$FilesForm->text( 'upload_maxkb',
+									$Settings->get('upload_maxkb'),
+									6,
+									T_('Maximal allowed filesize'),
+									T_('KB'),
+									7 );
 
-			// TODO: check/transform $upload_url
-			// TODO: check/transform $upload_realpath
+// TODO: check/transform $upload_url
+// TODO: check/transform $upload_realpath
 
-			#form_select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
+$FilesForm->end_fieldset();
 
-			#form_text( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), sprintf( T_('Levels determine hierarchy of users in blogs.' ) ), 1 );
-		?>
+
+if( $current_User->check_perm( 'options', 'edit' ) )
+{ ?>
+<fieldset class="submit">
+	<fieldset>
+		<div class="input">
+			<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
+			<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
+		</div>
 	</fieldset>
+</fieldset>
+<?php
+}
 
-	<?php if( $current_User->check_perm( 'options', 'edit' ) )
-	{ ?>
-	<fieldset class="submit">
-		<fieldset>
-			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
-				<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
-			</div>
-		</fieldset>
-	</fieldset>
-	<?php } ?>
+$FilesForm->end_form();
 
-</form>
+?>
