@@ -639,13 +639,15 @@ function the_category( $format = 'htmlbody' )
 }
 
 
-/*
+/**
  * the_categories(-) 
  *
  * lists all the category names
  *
  * fplanque: created
  * fplanque: 0.8.3: changed defaults
+ *
+ * @deprecated deprecated by {@link Item::categories()}
  */
 function the_categories( $link_title = '#',				// false if you want no links
 	$before_main='<strong>', $after_main='</strong>', // 'hide' to ignore main cat

@@ -109,52 +109,54 @@
 	?>
 	</div>
 	<?php
-	while( $MainList->get_item() ) 
+	while( $Item = $MainList->get_item() ) 
 	{
 		?>
-  	<div class="bPost<?php the_status() ?>" lang="<?php the_lang() ?>">	
+  	<div class="bPost<?php $Item->scope( 'raw' ) ?>" lang="<?php $Item->lang() ?>">	
 			<?php permalink_anchor(); ?>
 			<div class="bSmallHead">
 				<?php 
 					echo '<strong>';
-					the_time( locale_datefmt().' @ '.locale_timefmt() );
+					$Item->date();
+					echo ' @ ';
+					$Item->time();
 					echo '</strong>';
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 					echo ' ', T_('by'), ' ';
-					the_author();
+					$Item->Author->prefered_name();
 					echo ' (';
-					the_author_login();
+					$Item->Author->login();
 					echo ', ', T_('level:');
-					the_author_level();
+					$Item->Author->level();
 					echo '), ';
 					// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 					echo T_('in'), ' ';
-					the_categories( false );
+					$Item->categories( false );
 					echo ' - ';
-					the_language();
-					echo ' - ', T_('Status'), ': ';
-					the_status( false ); 
+					$Item->language();
+					echo ' - ', T_('Scope'), ': ';
+					$Item->scope(); 
 				?>
 			</div>
 				
-			<h3 class="bTitle"><?php the_title() ?></h3>
+			<h3 class="bTitle"><?php $Item->title() ?></h3>
 
 			<div class="bText">
 				<?php
-				if ($safe_mode) echo "<xmp>";
-				the_content();
-				if ($safe_mode)	echo "</xmp>";
+				if( $safe_mode ) echo "<xmp>";
+				$Item->content();
+				if( $safe_mode ) echo "</xmp>";
 				?>
 			</div>
 
 			<p style="clear:both;">
 				<?php
-				if( $current_User->check_perm( 'blog_post_statuses', $postdata['Status'], false, $blog ) )
+				if( $current_User->check_perm( 'blog_post_statuses', $Item->get( 'scope' ), false, $blog ) )
 				{
 				?>
 				<form action="b2edit.php" method="get" class="inline">
 					<input type="hidden" name="action" value="edit">
-					<input type="hidden" name="post" value="<?php echo $postdata["ID"] ?>">
+					<input type="hidden" name="post" value="<?php $Item->ID() ?>">
 					<input type="submit" name="submit" value="<?php /* TRANS: Edit button text (&nbsp; for extra space) */ echo T_('&nbsp; Edit &nbsp;') ?>" class="search" />
 				</form>
 				<?php 
@@ -164,7 +166,7 @@
 				{				
 				?>
 				<form action="edit_actions.php" method="get" class="inline">
-					<input type="hidden" name="blog" value="<?php echo $blog ?>"><input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" />
+					<input type="hidden" name="action" value="delete"><input type="hidden" name="post" value="<?php $Item->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Delete') ?>" class="search" onclick="return confirm('<?php echo T_('You are about to delete this post!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.') ?>')" />
 				</form>
 				<?php
 				}
@@ -174,12 +176,12 @@
 						&& $current_User->check_perm( 'edit_timestamp' ) )
 				{
 				?>
-				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="publish"><input type="hidden" name="post_ID" value="<?php echo $postdata["ID"] ?>"><input type="submit" name="submit" value="<?php echo T_('Publish NOW!') ?>" class="search" title="<?php echo T_('Publish now using current date and time.') ?>" />
+				<form action="edit_actions.php" method="get" class="inline"><input type="hidden" name="action" value="publish"><input type="hidden" name="post_ID" value="<?php $Item->ID() ?>"><input type="submit" name="submit" value="<?php echo T_('Publish NOW!') ?>" class="search" title="<?php echo T_('Publish now using current date and time.') ?>" />
 				</form>
 				<?php
 				}
 				?>
-				[ <a href="b2browse.php?blog=<?php echo $blog ?>&p=<?php echo $id ?>&c=1"><?php 
+				[ <a href="b2browse.php?blog=<?php echo $blog ?>&p=<?php $Item->ID() ?>&c=1"><?php 
 				// TRANS: Link to comments for current post
 				comments_number(T_('no comment'), T_('1 comment'), T_('% comments'));
 				trackback_number('', ', '.T_('1 Trackback'), ', '.T_('% Trackbacks'));

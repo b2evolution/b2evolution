@@ -438,5 +438,43 @@ class User extends DataObject
 		// Delete main object:
 		return parent::dbdelete();
 	}
+
+	
+	/** 
+	 * Template function: display user's level
+	 *
+	 * {@internal User::level(-) }}
+	 */
+	function level() 
+	{
+		$this->disp( 'level', 'raw' );
+	}
+
+
+	/** 
+	 * Template function: display user's login
+	 *
+	 * {@internal User::login(-) }}
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function login( $format = 'htmlbody' ) 
+	{
+		$this->disp( 'login', $format );
+	}
+
+
+	/** 
+	 * Template function: display user's prefered name
+	 *
+	 * {@internal User::prefered_name(-) }}
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function prefered_name( $format = 'htmlbody' ) 
+	{
+		$this->disp( 'preferedname', $format );
+	}
+
 }
 ?>

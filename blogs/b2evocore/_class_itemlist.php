@@ -11,6 +11,7 @@
  * @package b2evocore
  */
 require_once dirname(__FILE__).'/_class_dataobjectlist.php';
+require_once dirname(__FILE__).'/_class_item.php';
 
 function cat_req( $parent_cat_ID, $level )
 {
@@ -416,7 +417,10 @@ class ItemList extends DataObjectList
 		}
 
 	
-		$this->request = "SELECT DISTINCT ID, post_author, post_date, post_status, post_lang, post_content, post_title, post_trackbacks, post_category, post_autobr, post_flags, post_wordcount, post_comments, post_karma 
+		$this->request = "SELECT DISTINCT ID, post_author, post_date, post_status, post_lang, 
+																			post_content, post_title, post_trackbacks, post_category, 
+																			post_autobr, post_flags, post_wordcount, post_comments, 
+																			post_karma 
 											FROM ($tableposts INNER JOIN $tablepostcats ON ID = postcat_post_ID) 
 														INNER JOIN $tablecategories ON postcat_cat_ID = cat_ID ";
 		
@@ -591,7 +595,7 @@ class ItemList extends DataObjectList
 			return false;
 		}
 		
-		return $this->row;
+		return new Item( $this->row );
 	}
 
 
@@ -701,7 +705,7 @@ class ItemList extends DataObjectList
 				'Wordcount' => bpost_count_words( $content ),
 				'Karma' => 0 // this isn't used yet
 				);
-		}
+		} // End if preview
 
 		// echo ' title: ',$postdata['Title'];
 		$authordata = get_userdata($postdata['Author_ID']);
@@ -730,10 +734,7 @@ class ItemList extends DataObjectList
 			$pages[0]=stripslashes($postdata['Content']);
 			$multipage=0;
 		}
-		return true;
 	}
-
-
 }
 
 ?>

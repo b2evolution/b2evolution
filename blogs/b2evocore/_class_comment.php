@@ -219,12 +219,12 @@ class Comment extends DataObject
 	 * @param string date/time format: leave empty to use locale default date format
 	 * @param boolean true if you want GMT
 	 */
-	function date( $d='', $useGM = false )
+	function date( $format='', $useGM = false )
 	{
-		if( empty($d) ) 
+		if( empty($format) ) 
 			echo mysql2date( locale_datefmt(), $this->date, $useGM);
 		else
-			echo mysql2date( $d, $this->date, $useGM);
+			echo mysql2date( $format, $this->date, $useGM);
 	}
 
 	/** 
@@ -235,12 +235,12 @@ class Comment extends DataObject
 	 * @param string date/time format: leave empty to use locale default time format
 	 * @param boolean true if you want GMT
 	 */
-	function time( $d='', $useGM = false )
+	function time( $format='', $useGM = false )
 	{
-		if( empty($d) ) 
+		if( empty($format) ) 
 			echo mysql2date( locale_timefmt(), $this->date, $useGM );
 		else
-			echo mysql2date( $d, $this->date, $useGM );
+			echo mysql2date( $format, $this->date, $useGM );
 	}
 
 }

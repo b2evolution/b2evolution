@@ -355,6 +355,8 @@ function get_the_title()
  * the_ID(-)
  *
  *
+ * @deprecated deprecated by {@link DataObject::ID()}
+ *
  */
 function the_ID() 
 {
@@ -366,6 +368,8 @@ function the_ID()
  * the_status(-)
  *
  * Display post status
+ *
+ * @deprecated deprecated by {@link Item::scope()}
  */
 function the_status( $raw = true ) 
 {
@@ -382,6 +386,8 @@ function the_status( $raw = true )
  * the_lang(-)
  *
  * Display post language code
+ *
+ * @deprecated deprecated by {@link Item::lang()}
  */
 function the_lang() 
 {
@@ -393,6 +399,8 @@ function the_lang()
  * the_language(-)
  *
  * Display post language name
+ *
+ * @deprecated deprecated by {@link Item::language()}
  */
 function the_language() 
 {
@@ -417,6 +425,8 @@ function the_wordcount()
  *
  * Display post title
  * 03.10.10 - Updated function to allow for silent operations
+ *
+ * @deprecated deprecated by {@link Item::title()}
  */
 function the_title( 
 	$before='',						// HTML/text to be displayed before title
@@ -506,6 +516,8 @@ function single_post_title($prefix = '#', $display = 'htmlhead' )
 
 /*
  * the_content(-)
+ *
+ * @deprecated deprecated by {@link Item::content()}
  */
 function the_content( 
 	$more_link_text='#', 
@@ -980,6 +992,8 @@ function the_weekday_date($before='',$after='')
 
 /*
  * the_author(-)
+ *
+ * @deprecated deprecated by {@link User::prefered_name()}
  */
 function the_author( $format = 'htmlbody' ) 
 {
@@ -1020,6 +1034,8 @@ function the_author( $format = 'htmlbody' )
 
 /*
  * the_author_level(-)
+ *
+ * @deprecated deprecated by {@link User::level()}
  */
 function the_author_level() 
 {
@@ -1029,6 +1045,8 @@ function the_author_level()
 
 /*
  * the_author_login(-)
+ *
+ * @deprecated deprecated by {@link User::level()}
  */
 function the_author_login( $format = 'htmlbody' ) 
 {
@@ -1065,6 +1083,8 @@ function the_author_nickname( $format = 'htmlbody' )
 
 /*
  * the_author_ID(-)
+ *
+ * @deprecated deprecated by {@link DataObject::ID()}
  */
 function the_author_ID() 
 {
