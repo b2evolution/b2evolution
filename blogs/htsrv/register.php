@@ -146,7 +146,7 @@ switch( $action )
 /*
  * Default: registration form:
  */
-param( 'redirect_to', 'string', $admin_url.'/b2edit.php' );
+param( 'redirect_to', 'string', $admin_url.'b2edit.php' );
 // Display reg form:
 require( dirname(__FILE__).'/_reg_form.php' );
 
