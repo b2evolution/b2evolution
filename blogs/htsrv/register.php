@@ -69,15 +69,9 @@ switch($action)
 		// TODO: START TRANSACTION !!
 
 		// checking the login isn't already used by another user:
-		$request = "SELECT user_login 
-								FROM $tableusers 
-								WHERE user_login = '".$DB->escape($login)."'";
-		$result = mysql_query($request) or mysql_oops( $request );
-		$lines = mysql_num_rows($result);
-
-		mysql_free_result($result);
-
-		if ($lines >= 1) 
+		if( $DB->get_var( "SELECT count(*) 
+												FROM $tableusers 
+												WHERE user_login = '".$DB->escape($login)."'" ) )
 		{
 			$error = '<strong>'. T_('ERROR'). "</strong>: ". T_('this login is already registered, please choose another one');
 			break;

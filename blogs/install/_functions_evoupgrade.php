@@ -258,8 +258,9 @@ function upgrade_b2evo_tables()
 					{  // loop given locales
 						if( substr($newlkey, 0, 2) == strtolower($lkey) ) # TODO: check if valid/suitable
 						{  // if language matches, update
-							$query = "UPDATE $table SET $columnlang = '$newlkey' WHERE $columnlang = '$lkey'";
-							$converted = mysql_query($query) or mysql_oops( $query );
+							$converted = $DB->query( "UPDATE $table 
+																				SET $columnlang = '$newlkey' 
+																				WHERE $columnlang = '$lkey'" );
 							echo 'to locale \''. $newlkey. '\'<br />';
 							break;
 						}

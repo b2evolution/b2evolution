@@ -144,7 +144,7 @@ function upgrade_cafelog_tables()
 															WHERE ID = " . $row['ID'];
 		$DB->query($query_update_wordcount);
 	}
-	echo "OK. (".$count($q)." rows updated)<br />\n";
+	echo "OK. (".count($q)." rows updated)<br />\n";
 
 	echo "Generating postcats... ";
 	$query = "INSERT INTO $tablepostcats( postcat_post_ID, postcat_cat_ID ) SELECT ID, post_category FROM $tableposts";		
