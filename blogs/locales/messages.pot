@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2003-08-16 23:00+0200\n"
+"POT-Creation-Date: 2003-08-18 23:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -121,7 +121,7 @@ msgstr ""
 #: ..\..\..\skins\babyblues\_main.php:86
 #: ..\..\..\skins\bluesky\_main.php:201
 #: ..\..\..\skins\custom\_main.php:229
-#: ..\..\..\skins\fplanque2002\_main.php:251
+#: ..\..\..\skins\fplanque2002\_main.php:250
 #: ..\..\..\skins\guadeloupe\_main.php:201
 msgid "Misc"
 msgstr ""
@@ -134,7 +134,7 @@ msgstr ""
 #: ..\..\..\skins\babyblues\_main.php:88
 #: ..\..\..\skins\bluesky\_main.php:203
 #: ..\..\..\skins\custom\_main.php:231
-#: ..\..\..\skins\fplanque2002\_main.php:253
+#: ..\..\..\skins\fplanque2002\_main.php:252
 #: ..\..\..\skins\guadeloupe\_main.php:203
 #: ..\..\..\skins\originalb2\_main.php:146
 msgid "Login..."
@@ -148,7 +148,7 @@ msgstr ""
 #: ..\..\..\skins\babyblues\_main.php:89
 #: ..\..\..\skins\bluesky\_main.php:204
 #: ..\..\..\skins\custom\_main.php:232
-#: ..\..\..\skins\fplanque2002\_main.php:254
+#: ..\..\..\skins\fplanque2002\_main.php:253
 #: ..\..\..\skins\guadeloupe\_main.php:204
 #: ..\..\..\skins\originalb2\_main.php:147
 msgid "Register..."
@@ -297,8 +297,8 @@ msgstr ""
 #: ..\..\..\skins\custom\_main.php:205
 #: ..\..\..\skins\custom\_main.php:214
 #: ..\..\..\skins\fplanque2002\_main.php:203
-#: ..\..\..\skins\fplanque2002\_main.php:227
-#: ..\..\..\skins\fplanque2002\_main.php:236
+#: ..\..\..\skins\fplanque2002\_main.php:226
+#: ..\..\..\skins\fplanque2002\_main.php:235
 #: ..\..\..\skins\guadeloupe\_main.php:184
 #: ..\..\..\skins\guadeloupe\_main.php:193
 msgid "more..."
@@ -310,7 +310,7 @@ msgstr ""
 #: ..\..\..\noskin_roll.php:246
 #: ..\..\..\skins\bluesky\_main.php:178
 #: ..\..\..\skins\custom\_main.php:199
-#: ..\..\..\skins\fplanque2002\_main.php:221
+#: ..\..\..\skins\fplanque2002\_main.php:220
 #: ..\..\..\skins\guadeloupe\_main.php:178
 msgid "Recent Referers"
 msgstr ""
@@ -321,7 +321,7 @@ msgstr ""
 #: ..\..\..\noskin_roll.php:255
 #: ..\..\..\skins\bluesky\_main.php:187
 #: ..\..\..\skins\custom\_main.php:208
-#: ..\..\..\skins\fplanque2002\_main.php:230
+#: ..\..\..\skins\fplanque2002\_main.php:229
 #: ..\..\..\skins\guadeloupe\_main.php:187
 msgid "Top Referers"
 msgstr ""
@@ -333,7 +333,7 @@ msgstr ""
 #: ..\..\..\b2evocore\_blogs_form.php:52
 #: ..\..\..\skins\bluesky\_main.php:198
 #: ..\..\..\skins\custom\_main.php:222
-#: ..\..\..\skins\fplanque2002\_main.php:244
+#: ..\..\..\skins\fplanque2002\_main.php:243
 #: ..\..\..\skins\guadeloupe\_main.php:198
 msgid "Blogroll"
 msgstr ""
@@ -343,7 +343,7 @@ msgstr ""
 #: ..\..\..\noskin_b.php:285
 #: ..\..\..\noskin_roll.php:284
 #: ..\..\..\skins\custom\_main.php:237
-#: ..\..\..\skins\fplanque2002\_main.php:259
+#: ..\..\..\skins\fplanque2002\_main.php:258
 msgid "Syndicate this blog"
 msgstr ""
 
@@ -354,7 +354,7 @@ msgstr ""
 #: ..\..\..\skins\babyblues\_main.php:104
 #: ..\..\..\skins\bluesky\_main.php:222
 #: ..\..\..\skins\custom\_main.php:260
-#: ..\..\..\skins\fplanque2002\_main.php:288
+#: ..\..\..\skins\fplanque2002\_main.php:285
 #: ..\..\..\skins\guadeloupe\_main.php:222
 #: ..\..\..\skins\originalb2\_main.php:159
 #, php-format
@@ -407,8 +407,8 @@ msgid "Name"
 msgstr ""
 
 #: ..\..\..\_feedback.php:160
-#: ..\..\..\admin\b2profile.php:159
-#: ..\..\..\admin\b2profile.php:317
+#: ..\..\..\admin\b2profile.php:155
+#: ..\..\..\admin\b2profile.php:315
 #: ..\..\..\admin\b2register.php:113
 #: ..\..\..\admin\b2register.php:163
 #: ..\..\..\admin\b2register.php:309
@@ -507,102 +507,128 @@ msgid "Top Aggregators"
 msgstr ""
 
 #: ..\..\..\admin\b2blogs.php:2
+#: ..\..\..\admin\CVS\Base\b2blogs.php:2
 #: ..\..\..\b2evocore\_blogs_list.php:2
 #: ..\..\..\b2evocore\_menutop.php:116
 msgid "Blogs"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:14
-#: ..\..\..\admin\b2blogs.php:43
-#: ..\..\..\admin\b2blogs.php:138
-#: ..\..\..\admin\b2blogs.php:165
-#: ..\..\..\admin\b2blogs.php:253
+#: ..\..\..\admin\b2blogs.php:15
+#: ..\..\..\admin\b2blogs.php:44
+#: ..\..\..\admin\b2blogs.php:139
+#: ..\..\..\admin\b2blogs.php:166
+#: ..\..\..\admin\b2blogs.php:254
+#: ..\..\..\admin\CVS\Base\b2blogs.php:15
+#: ..\..\..\admin\CVS\Base\b2blogs.php:44
+#: ..\..\..\admin\CVS\Base\b2blogs.php:139
+#: ..\..\..\admin\CVS\Base\b2blogs.php:166
+#: ..\..\..\admin\CVS\Base\b2blogs.php:254
 msgid "You have no right to edit the blogs."
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:17
+#: ..\..\..\admin\b2blogs.php:18
+#: ..\..\..\admin\CVS\Base\b2blogs.php:18
 msgid "New blog"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:71
+#: ..\..\..\admin\b2blogs.php:72
+#: ..\..\..\admin\CVS\Base\b2blogs.php:72
 msgid "Trying to create stub file"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:82
+#: ..\..\..\admin\b2blogs.php:83
+#: ..\..\..\admin\CVS\Base\b2blogs.php:83
 msgid "Loading"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:86
+#: ..\..\..\admin\b2blogs.php:87
+#: ..\..\..\admin\CVS\Base\b2blogs.php:87
 msgid "Could not load stub model."
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:91
+#: ..\..\..\admin\b2blogs.php:92
+#: ..\..\..\admin\CVS\Base\b2blogs.php:92
 msgid "Creating"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:110
+#: ..\..\..\admin\b2blogs.php:111
+#: ..\..\..\admin\CVS\Base\b2blogs.php:111
 #, php-format
 msgid "<p>Changing mod to %o</p>"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:113
-#: ..\..\..\admin\b2blogs.php:122
+#: ..\..\..\admin\b2blogs.php:114
+#: ..\..\..\admin\b2blogs.php:123
 #: ..\..\..\admin\b2team.php:204
+#: ..\..\..\admin\CVS\Base\b2blogs.php:114
+#: ..\..\..\admin\CVS\Base\b2blogs.php:123
 msgid "Warning"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:113
+#: ..\..\..\admin\b2blogs.php:114
+#: ..\..\..\admin\CVS\Base\b2blogs.php:114
 msgid "chmod failed!"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:119
+#: ..\..\..\admin\b2blogs.php:120
+#: ..\..\..\admin\CVS\Base\b2blogs.php:120
 #, php-format
 msgid "<p>Changing owner to %s</p>"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:122
+#: ..\..\..\admin\b2blogs.php:123
+#: ..\..\..\admin\CVS\Base\b2blogs.php:123
 msgid "chown failed!"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:129
+#: ..\..\..\admin\b2blogs.php:130
+#: ..\..\..\admin\CVS\Base\b2blogs.php:130
 #, php-format
 msgid "You should <a href=\"%s\">create categories</a> for this blog now!"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:141
+#: ..\..\..\admin\b2blogs.php:142
+#: ..\..\..\admin\CVS\Base\b2blogs.php:142
 msgid "Blog params for:"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:200
+#: ..\..\..\admin\b2blogs.php:201
+#: ..\..\..\admin\CVS\Base\b2blogs.php:201
 #: ..\..\..\b2evocore\_blogs_list.php:5
 msgid "Blog"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:204
+#: ..\..\..\admin\b2blogs.php:205
+#: ..\..\..\admin\CVS\Base\b2blogs.php:205
 msgid "You have no right to generate static pages."
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:210
+#: ..\..\..\admin\b2blogs.php:211
+#: ..\..\..\admin\CVS\Base\b2blogs.php:211
 msgid "You haven't set a static filename for this blog!"
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:226
+#: ..\..\..\admin\b2blogs.php:227
+#: ..\..\..\admin\CVS\Base\b2blogs.php:227
 #, php-format
 msgid "Generating page from <strong>%s</strong> to <strong>%s</strong>..."
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:235
+#: ..\..\..\admin\b2blogs.php:236
+#: ..\..\..\admin\CVS\Base\b2blogs.php:236
 msgid "Writing to file..."
 msgstr ""
 
-#: ..\..\..\admin\b2blogs.php:241
+#: ..\..\..\admin\b2blogs.php:242
 #: ..\..\..\admin\edit_actions.php:100
-#: ..\..\..\admin\edit_actions.php:228
-#: ..\..\..\admin\edit_actions.php:297
+#: ..\..\..\admin\edit_actions.php:231
+#: ..\..\..\admin\edit_actions.php:301
+#: ..\..\..\admin\CVS\Base\b2blogs.php:242
 #: ..\..\..\b2evocore\_functions_pings.php:35
-#: ..\..\..\b2evocore\_functions_pings.php:62
-#: ..\..\..\b2evocore\_functions_pings.php:89
-#: ..\..\..\b2evocore\_functions_pings.php:131
+#: ..\..\..\b2evocore\_functions_pings.php:68
+#: ..\..\..\b2evocore\_functions_pings.php:97
+#: ..\..\..\b2evocore\_functions_pings.php:124
+#: ..\..\..\b2evocore\_functions_pings.php:166
 msgid "Done."
 msgstr ""
 
@@ -611,7 +637,7 @@ msgstr ""
 #: ..\..\..\admin\b2sidebar.php:18
 #: ..\..\..\admin\b2upload.php:8
 #: ..\..\..\admin\edit_actions.php:54
-#: ..\..\..\admin\edit_actions.php:339
+#: ..\..\..\admin\edit_actions.php:343
 msgid "Cheatin' uh ?"
 msgstr ""
 
@@ -687,13 +713,13 @@ msgstr ""
 #: ..\..\..\admin\b2login.php:111
 #: ..\..\..\admin\b2login.php:123
 #: ..\..\..\admin\b2login.php:318
-#: ..\..\..\admin\b2profile.php:58
-#: ..\..\..\admin\b2profile.php:65
-#: ..\..\..\admin\b2profile.php:72
-#: ..\..\..\admin\b2profile.php:75
+#: ..\..\..\admin\b2profile.php:54
+#: ..\..\..\admin\b2profile.php:61
+#: ..\..\..\admin\b2profile.php:68
+#: ..\..\..\admin\b2profile.php:71
+#: ..\..\..\admin\b2profile.php:77
 #: ..\..\..\admin\b2profile.php:81
-#: ..\..\..\admin\b2profile.php:85
-#: ..\..\..\admin\b2profile.php:87
+#: ..\..\..\admin\b2profile.php:83
 #: ..\..\..\admin\b2register.php:63
 #: ..\..\..\admin\b2register.php:68
 #: ..\..\..\admin\b2register.php:73
@@ -770,7 +796,7 @@ msgid ""
 msgstr ""
 
 #: ..\..\..\admin\b2edit.php:97
-#: ..\..\..\admin\edit_actions.php:205
+#: ..\..\..\admin\edit_actions.php:207
 msgid "Oops, no post with this ID."
 msgstr ""
 
@@ -807,7 +833,7 @@ msgstr ""
 #: ..\..\..\admin\b2login.php:152
 #: ..\..\..\admin\b2login.php:156
 #: ..\..\..\admin\b2login.php:161
-#: ..\..\..\admin\b2profile.php:91
+#: ..\..\..\admin\b2profile.php:87
 #, php-format
 msgid "setcookie %s failed!"
 msgstr ""
@@ -836,8 +862,8 @@ msgstr ""
 #: ..\..\..\admin\b2login.php:274
 #: ..\..\..\admin\b2login.php:385
 #: ..\..\..\admin\b2mail.php:201
-#: ..\..\..\admin\b2profile.php:143
-#: ..\..\..\admin\b2profile.php:301
+#: ..\..\..\admin\b2profile.php:139
+#: ..\..\..\admin\b2profile.php:299
 #: ..\..\..\admin\b2register.php:295
 msgid "Login:"
 msgstr ""
@@ -938,23 +964,23 @@ msgstr ""
 msgid "Blog ID"
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:257
+#: ..\..\..\admin\b2mail.php:258
 msgid "Posted title"
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:258
+#: ..\..\..\admin\b2mail.php:259
 msgid "Posted content"
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:268
+#: ..\..\..\admin\b2mail.php:269
 msgid "Mission complete, message deleted."
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:274
+#: ..\..\..\admin\b2mail.php:275
 msgid "Level 0 users can't post."
 msgstr ""
 
-#: ..\..\..\admin\b2mail.php:293
+#: ..\..\..\admin\b2mail.php:294
 msgid "End."
 msgstr ""
 
@@ -1015,71 +1041,71 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:1
+#: ..\..\..\admin\b2profile.php:4
 msgid "Profile"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:53
-#: ..\..\..\admin\b2profile.php:58
-#: ..\..\..\admin\b2profile.php:65
-#: ..\..\..\admin\b2profile.php:72
-#: ..\..\..\admin\b2profile.php:75
+#: ..\..\..\admin\b2profile.php:49
+#: ..\..\..\admin\b2profile.php:54
+#: ..\..\..\admin\b2profile.php:61
+#: ..\..\..\admin\b2profile.php:68
+#: ..\..\..\admin\b2profile.php:71
 msgid "Back to profile"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:58
+#: ..\..\..\admin\b2profile.php:54
 msgid "please enter your nickname (can be the same as your login)"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:65
+#: ..\..\..\admin\b2profile.php:61
 msgid "your ICQ UIN can only be a number, no letters allowed"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:72
+#: ..\..\..\admin\b2profile.php:68
 #: ..\..\..\admin\b2register.php:79
 msgid "please type your e-mail address"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:75
+#: ..\..\..\admin\b2profile.php:71
 msgid "the email address isn't correct"
 msgstr ""
 
+#: ..\..\..\admin\b2profile.php:77
 #: ..\..\..\admin\b2profile.php:81
-#: ..\..\..\admin\b2profile.php:85
 msgid "you typed your new password only once. Go back to type it twice."
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:87
+#: ..\..\..\admin\b2profile.php:83
 msgid "you typed two different passwords. Go back to correct that."
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:112
+#: ..\..\..\admin\b2profile.php:108
 msgid "Profile updated!"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:113
+#: ..\..\..\admin\b2profile.php:109
 msgid "If that window doesn't close itself, close it yourself :p"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:147
-#: ..\..\..\admin\b2profile.php:305
+#: ..\..\..\admin\b2profile.php:143
+#: ..\..\..\admin\b2profile.php:303
 msgid "First name"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:151
-#: ..\..\..\admin\b2profile.php:309
+#: ..\..\..\admin\b2profile.php:147
+#: ..\..\..\admin\b2profile.php:307
 msgid "Last name"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:155
-#: ..\..\..\admin\b2profile.php:313
+#: ..\..\..\admin\b2profile.php:151
+#: ..\..\..\admin\b2profile.php:311
 #: ..\..\..\admin\b2team.php:100
 #: ..\..\..\admin\b2team.php:154
 msgid "Nickname"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:163
-#: ..\..\..\admin\b2profile.php:321
+#: ..\..\..\admin\b2profile.php:159
+#: ..\..\..\admin\b2profile.php:319
 #: ..\..\..\admin\b2team.php:103
 #: ..\..\..\admin\b2team.php:157
 #: ..\..\..\b2evocore\_edit_form.php:92
@@ -1087,130 +1113,130 @@ msgstr ""
 msgid "URL"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:167
-#: ..\..\..\admin\b2profile.php:325
+#: ..\..\..\admin\b2profile.php:163
+#: ..\..\..\admin\b2profile.php:323
 msgid "ICQ"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:171
-#: ..\..\..\admin\b2profile.php:329
+#: ..\..\..\admin\b2profile.php:167
+#: ..\..\..\admin\b2profile.php:327
 msgid "AIM"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:175
-#: ..\..\..\admin\b2profile.php:333
+#: ..\..\..\admin\b2profile.php:171
+#: ..\..\..\admin\b2profile.php:331
 msgid "MSN IM"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:179
-#: ..\..\..\admin\b2profile.php:337
+#: ..\..\..\admin\b2profile.php:175
+#: ..\..\..\admin\b2profile.php:335
 msgid "YahooIM"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:190
-#: ..\..\..\admin\b2profile.php:348
+#: ..\..\..\admin\b2profile.php:186
+#: ..\..\..\admin\b2profile.php:346
 #: ..\..\..\admin\b2team.php:99
 #: ..\..\..\admin\b2team.php:153
 msgid "ID"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:194
-#: ..\..\..\admin\b2profile.php:352
+#: ..\..\..\admin\b2profile.php:190
+#: ..\..\..\admin\b2profile.php:350
 #: ..\..\..\admin\b2team.php:104
 #: ..\..\..\admin\b2team.php:158
 msgid "Level"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:199
-#: ..\..\..\admin\b2profile.php:357
+#: ..\..\..\admin\b2profile.php:195
+#: ..\..\..\admin\b2profile.php:355
 msgid "Posts"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:208
+#: ..\..\..\admin\b2profile.php:204
 msgid "Identity"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:256
+#: ..\..\..\admin\b2profile.php:253
 msgid "IE one-click bookmarklet"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:261
+#: ..\..\..\admin\b2profile.php:258
 msgid ""
 "To have a one-click bookmarklet, just copy and paste this into a new text "
 "file:"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:266
+#: ..\..\..\admin\b2profile.php:263
 msgid ""
 "Save it as b2.reg, and double-click on this file in an Explorer window. "
 "Answer Yes to the question, and restart Internet Explorer."
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:267
+#: ..\..\..\admin\b2profile.php:264
 msgid ""
 "That's it, you can now right-click in an IE window and select 'Post to b2' "
 "to make the bookmarklet appear :)"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:271
+#: ..\..\..\admin\b2profile.php:268
 #: ..\..\..\admin\b2upload.php:237
 msgid "Close this window"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:366
+#: ..\..\..\admin\b2profile.php:364
 msgid "<strong>Identity</strong> on the blog"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:392
+#: ..\..\..\admin\b2profile.php:390
 msgid "New <strong>password</strong> (twice):"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:400
+#: ..\..\..\admin\b2profile.php:398
 msgid "Bookmarklet"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:401
+#: ..\..\..\admin\b2profile.php:399
 msgid "Add this link to your Favorites/Bookmarks:"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:405
-#: ..\..\..\admin\b2profile.php:409
-#: ..\..\..\admin\b2profile.php:426
-#: ..\..\..\admin\b2profile.php:430
+#: ..\..\..\admin\b2profile.php:403
+#: ..\..\..\admin\b2profile.php:407
+#: ..\..\..\admin\b2profile.php:424
+#: ..\..\..\admin\b2profile.php:428
 msgid "b2 - bookmarklet"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:420
+#: ..\..\..\admin\b2profile.php:418
 msgid "One-click bookmarklet:"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:421
+#: ..\..\..\admin\b2profile.php:419
 msgid "Click here"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:441
+#: ..\..\..\admin\b2profile.php:439
 msgid "No Sidebar found!  You must use Mozilla 0.9.4 or later!"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:444
-#: ..\..\..\admin\b2profile.php:448
+#: ..\..\..\admin\b2profile.php:442
+#: ..\..\..\admin\b2profile.php:446
 msgid "SideBar"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:445
+#: ..\..\..\admin\b2profile.php:443
 #, php-format
 msgid "Add the <a %s>b2 Sidebar</a> !"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:449
+#: ..\..\..\admin\b2profile.php:447
 msgid "Add this link to your favorites:"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:449
+#: ..\..\..\admin\b2profile.php:447
 msgid "b2 Sidebar"
 msgstr ""
 
-#: ..\..\..\admin\b2profile.php:458
+#: ..\..\..\admin\b2profile.php:456
 msgid "Note: closes the popup window."
 msgstr ""
 
@@ -1657,14 +1683,14 @@ msgid "Adding new post..."
 msgstr ""
 
 #: ..\..\..\admin\edit_actions.php:76
-#: ..\..\..\admin\edit_actions.php:192
-#: ..\..\..\admin\edit_actions.php:368
+#: ..\..\..\admin\edit_actions.php:194
+#: ..\..\..\admin\edit_actions.php:372
 msgid "Supplied URL is invalid."
 msgstr ""
 
 #: ..\..\..\admin\edit_actions.php:80
-#: ..\..\..\admin\edit_actions.php:196
-#: ..\..\..\admin\edit_actions.php:372
+#: ..\..\..\admin\edit_actions.php:198
+#: ..\..\..\admin\edit_actions.php:376
 msgid "Back to post editing"
 msgstr ""
 
@@ -1673,54 +1699,54 @@ msgid "Recording post..."
 msgstr ""
 
 #: ..\..\..\admin\edit_actions.php:96
-#: ..\..\..\admin\edit_actions.php:293
+#: ..\..\..\admin\edit_actions.php:297
 msgid "Sleeping..."
 msgstr ""
 
 #: ..\..\..\admin\edit_actions.php:106
-#: ..\..\..\admin\edit_actions.php:234
+#: ..\..\..\admin\edit_actions.php:237
 msgid ""
 "Post not publicly published: skipping trackback, pingback and blog pings..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:195
+#: ..\..\..\admin\edit_actions.php:197
 msgid "Cannot update, please correct these errors:"
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:248
+#: ..\..\..\admin\edit_actions.php:251
 msgid "Post had already pinged: skipping blog pings..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:280
+#: ..\..\..\admin\edit_actions.php:284
 msgid "Oops, no post with this ID!"
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:284
+#: ..\..\..\admin\edit_actions.php:288
 #, php-format
 msgid "You don't have the right to delete <strong>%s</strong>'s posts."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:287
+#: ..\..\..\admin\edit_actions.php:291
 msgid "Deleting post..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:302
+#: ..\..\..\admin\edit_actions.php:306
 msgid "Deleting Done..."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:323
+#: ..\..\..\admin\edit_actions.php:327
 msgid "Oops, no comment with this ID."
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:371
+#: ..\..\..\admin\edit_actions.php:375
 msgid "Cannot update comment, please correct these errors:"
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:395
+#: ..\..\..\admin\edit_actions.php:399
 msgid "Back to posts!"
 msgstr ""
 
-#: ..\..\..\admin\edit_actions.php:397
+#: ..\..\..\admin\edit_actions.php:401
 msgid "You may also want to generate static pages or view your blogs..."
 msgstr ""
 
@@ -2182,12 +2208,10 @@ msgid "no comment"
 msgstr ""
 
 #: ..\..\..\b2evocore\_edit_showposts.php:162
-#: ..\..\..\b2evocore\_functions_trackback.php:150
 msgid "1 comment"
 msgstr ""
 
 #: ..\..\..\b2evocore\_edit_showposts.php:162
-#: ..\..\..\b2evocore\_functions_trackback.php:151
 #, php-format
 msgid "% comments"
 msgstr ""
@@ -2296,20 +2320,21 @@ msgstr ""
 msgid "Oops, MySQL error!"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:594
+#: ..\..\..\b2evocore\_functions.php:578
 msgid "go back"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:624
+#: ..\..\..\b2evocore\_functions.php:608
 msgid "Redirecting you to:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:626
+#: ..\..\..\b2evocore\_functions.php:610
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions.php:912
+#: ..\..\..\b2evocore\_functions.php:896
+#: ..\..\..\b2evocore\_functions.php:976
 #, php-format
 msgid "Parameter %s is required!"
 msgstr ""
@@ -2376,10 +2401,12 @@ msgid "Browse category"
 msgstr ""
 
 #: ..\..\..\b2evocore\_functions_comments.php:149
+#: ..\..\..\b2evocore\_functions_trackback.php:149
 msgid "Trackback (0)"
 msgstr ""
 
 #: ..\..\..\b2evocore\_functions_comments.php:150
+#: ..\..\..\b2evocore\_functions_trackback.php:150
 msgid "Trackback (1)"
 msgstr ""
 
@@ -2516,26 +2543,43 @@ msgstr ""
 msgid "Pingbacks done."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:26
-msgid "Pinging Weblogs.com..."
+#: ..\..\..\b2evocore\_functions_pingback.php:244
+msgid "Pingback (0)"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:38
-#: ..\..\..\b2evocore\_functions_pings.php:65
-#: ..\..\..\b2evocore\_functions_pings.php:92
-#: ..\..\..\b2evocore\_functions_pings.php:136
+#: ..\..\..\b2evocore\_functions_pingback.php:245
+msgid "Pingback (1)"
+msgstr ""
+
+#: ..\..\..\b2evocore\_functions_pingback.php:246
+msgid "Pingback (%)"
+msgstr ""
+
+#: ..\..\..\b2evocore\_functions_pings.php:24
+msgid "Pinging b2evolution.net..."
+msgstr ""
+
+#: ..\..\..\b2evocore\_functions_pings.php:40
+#: ..\..\..\b2evocore\_functions_pings.php:73
+#: ..\..\..\b2evocore\_functions_pings.php:100
+#: ..\..\..\b2evocore\_functions_pings.php:127
+#: ..\..\..\b2evocore\_functions_pings.php:171
 msgid "Aborted (Running on localhost)."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:54
+#: ..\..\..\b2evocore\_functions_pings.php:59
+msgid "Pinging Weblogs.com..."
+msgstr ""
+
+#: ..\..\..\b2evocore\_functions_pings.php:89
 msgid "Pinging Weblogs.com/rssUpdates..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:81
+#: ..\..\..\b2evocore\_functions_pings.php:116
 msgid "Pinging Cafelog.com..."
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_pings.php:110
+#: ..\..\..\b2evocore\_functions_pings.php:145
 msgid "Pinging Blo.gs..."
 msgstr ""
 
@@ -2567,8 +2611,8 @@ msgstr ""
 msgid "Response:"
 msgstr ""
 
-#: ..\..\..\b2evocore\_functions_trackback.php:149
-msgid "Leave a comment..."
+#: ..\..\..\b2evocore\_functions_trackback.php:151
+msgid "Trackback (%)"
 msgstr ""
 
 #: ..\..\..\b2evocore\_menutop.php:87
@@ -2776,10 +2820,18 @@ msgid "French"
 msgstr ""
 
 #: ..\..\..\conf\b2evo_locale.php:14
-msgid "Dutch"
+msgid "Japanese"
 msgstr ""
 
 #: ..\..\..\conf\b2evo_locale.php:15
+msgid "Dutch"
+msgstr ""
+
+#: ..\..\..\conf\b2evo_locale.php:16
+msgid "Portuguese"
+msgstr ""
+
+#: ..\..\..\conf\b2evo_locale.php:17
 msgid "Swedish"
 msgstr ""
 
@@ -2823,7 +2875,7 @@ msgstr ""
 
 #: ..\..\..\htsrv\comment_post.php:123
 #: ..\..\..\htsrv\trackback.php:90
-#: ..\..\..\xmlsrv\xmlrpc.php:1163
+#: ..\..\..\xmlsrv\xmlrpc.php:1232
 msgid "Url"
 msgstr ""
 
@@ -2838,12 +2890,12 @@ msgid "New trackback on your post #%d \"%s\""
 msgstr ""
 
 #: ..\..\..\htsrv\trackback.php:89
-#: ..\..\..\xmlsrv\xmlrpc.php:1162
+#: ..\..\..\xmlsrv\xmlrpc.php:1231
 msgid "Website"
 msgstr ""
 
 #: ..\..\..\htsrv\trackback.php:91
-#: ..\..\..\xmlsrv\xmlrpc.php:1164
+#: ..\..\..\xmlsrv\xmlrpc.php:1233
 msgid "Excerpt"
 msgstr ""
 
@@ -2853,8 +2905,8 @@ msgstr ""
 msgid "[...] Read more!"
 msgstr ""
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1156
-#: ..\..\..\xmlsrv\xmlrpc.php:1160
+#: ..\..\..\xmlsrv\xmlrpc.php:1225
+#: ..\..\..\xmlsrv\xmlrpc.php:1229
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr ""
