@@ -36,38 +36,38 @@
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 switch( $admin_tab )
-{	// Submenu depends on main admin page:
+{ // Submenu depends on main admin page:
 
 	case 'options':
 		// Settings screen:
 		$submenu = array(
-			'general' => array( T_('General'), 'b2options.php?tab=general' ),
-			'regional' => array( T_('Regional'), 'b2options.php?tab=regional'.( (isset($notransext) && $notransext) ? '&amp;notransext=1' : '' ) ),
-			'files' => array( T_('Files'), 'fileset.php' ),
-			'statuses' => array( T_('Post statuses'), 'statuses.php'),
-			'types' => array( T_('Post types'), 'types.php'),
-			'plugins' => array( T_('Plug-ins'), 'plugins.php'),
+			'general' => array( T_('General'), regenerate_url( '', 'tab=general', 'b2options.php' ) ),
+			'regional' => array( T_('Regional'), regenerate_url( '', array( 'tab=regional', 'notransext='.(int)(isset($notransext) && $notransext) ), 'b2options.php' ) ),
+			'files' => array( T_('Files'), regenerate_url( '', '', 'fileset.php' ) ),
+			'statuses' => array( T_('Post statuses'), regenerate_url( '', '', 'statuses.php' ) ),
+			'types' => array( T_('Post types'), regenerate_url( '', '', 'types.php' ) ),
+			'plugins' => array( T_('Plug-ins'), regenerate_url( '', '', 'plugins.php' ) ),
 			);
 		break;
 
 	case 'blogs':
 		// Blog properties screen:
 		$submenu = array(
-			'general' => array( T_('General'), 'blogs.php?tab=general&amp;action=edit&amp;blog='.$blog ),
-			'perm' => array( T_('Permissions'), 'blogs.php?tab=perm&amp;action=edit&amp;blog='.$blog ),
-			'advanced' => array( T_('Advanced'), 'blogs.php?tab=advanced&amp;action=edit&amp;blog='.$blog ),
+			'general' => array( T_('General'), regenerate_url( '', array( 'tab=general', 'action=edit' ), 'blogs.php' ) ),
+			'perm' => array( T_('Permissions'), regenerate_url( '', array( 'tab=perm', 'action=edit' ), 'blogs.php' ) ),
+			'advanced' => array( T_('Advanced'), regenerate_url( '', array( 'tab=advanced', 'action=edit' ), 'blogs.php' ) ),
 			);
 		break;
 
 	case 'stats':
 		// Stats screens:
 		$submenu = array(
-			'summary' => array( T_('Summary'), 'b2stats.php?tab=summary&amp;blog='.$blog ),
-			'other' => array( T_('Direct Accesses'), 'b2stats.php?tab=other&amp;blog='.$blog ),
-			'referers' => array( T_('Referers'), 'b2stats.php?tab=referers&amp;blog='.$blog ),
-			'refsearches' => array( T_('Refering Searches'), 'b2stats.php?tab=refsearches&amp;blog='.$blog ),
-			'syndication' => array( T_('Syndication'), 'b2stats.php?tab=syndication&amp;blog='.$blog ),
-			'useragents' => array( T_('User Agents'), 'b2stats.php?tab=useragents&amp;blog='.$blog ),
+			'summary' => array( T_('Summary'), regenerate_url( '', 'tab=summary', 'b2stats.php' ) ),
+			'other' => array( T_('Direct Accesses'), regenerate_url( '', 'tab=other', 'b2stats.php' ) ),
+			'referers' => array( T_('Referers'), regenerate_url( '', 'tab=referers', 'b2stats.php' ) ),
+			'refsearches' => array( T_('Refering Searches'), regenerate_url( '', 'tab=refsearches', 'b2stats.php' ) ),
+			'syndication' => array( T_('Syndication'), regenerate_url( '', 'tab=syndication', 'b2stats.php' ) ),
+			'useragents' => array( T_('User Agents'), regenerate_url( '', 'tab=useragents', 'b2stats.php' ) ),
 			);
 		break;
 
@@ -84,6 +84,9 @@ echo '<div class="tabbedpanelblock">';
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/08 21:35:52  blueyed
+ * use regenerate_url()
+ *
  * Revision 1.6  2004/12/17 20:38:51  fplanque
  * started extending item/post capabilities (extra status, type)
  *
