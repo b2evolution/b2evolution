@@ -31,9 +31,9 @@ function upgrade_cafelog_tables()
 
 	echo "Creating default blogs... ";
 	
-	$blog_all_ID = blog_create( 'All Blogs', 'All', '', $stub_all.'.php', $stub_all.'.php', $stub_all.'.html', 'Tagline for All', 'All blogs on this system.', NULL, $default_language,  "This is the blogroll for the \'all blogs\' blog aggregation.", 'all blogs keywords', '' ) or mysql_oops( $query );
+	$blog_all_ID = blog_create( 'All Blogs', 'All', '', $stub_all.'.php', $stub_all.'.php', $stub_all.'.html', 'Tagline for All', 'All blogs on this system.', NULL, $default_language,  "This is the blogroll for the 'all blogs' blog aggregation.", 'all blogs keywords', '' ) or mysql_oops( $query );
 
-	$blog_upgraded_ID = 	blog_create( 'My Upgraded Blog', 'Upgraded', '', $stub_a.'.php', $stub_a.'.php', $stub_a.'.html', 'Tagline for A', 'Upgraded blog - no description yet', 'This is description for your upgraded blog. It has index #2 in the database.', $default_language, 'This is the blogroll for Upgraded Blog...', '', '' ) or mysql_oops( $query );
+	$blog_upgraded_ID = 	blog_create( 'My Upgraded Blog', 'Upgraded', '', $stub_a.'.php', $stub_a.'.php', $stub_a.'.html', 'Tagline for A', 'Upgraded blog - no description yet', 'This is description for your upgraded blog. It has index #2 in the database.', $default_language, '', '', '' ) or mysql_oops( $query );
 	
 	$blog_b_ID =	blog_create( 'Demo Blog B', 'Blog B', '', $stub_b.'.php', $stub_b.'.php', $stub_b.'.html', 'Tagline for B', 'This is demo blog B', 'This is description for demo blog B. It has index #3 in the database.', $default_language, 'This is the blogroll for Blog B...', 'blog B keywords', '') or mysql_oops( $query );
 

@@ -78,6 +78,9 @@
 // ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 </div>
 <div id="side">
+
+	<div class="sidebody"><?php bloginfo('longdesc', 'htmlbody'); ?></div>
+
 	<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
 		require( dirname(__FILE__)."/_bloglist.php"); 
 		// ---------------------------------- END OF BLOG LIST --------------------------------- ?>

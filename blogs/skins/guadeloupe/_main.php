@@ -201,9 +201,6 @@ href="<?php permalink_link() ?>" title="<?php echo T_('Permalink') ?>"><?php the
 
 <?php } ?>
 
-<h4><?php echo T_('Blogroll') ?></h4>
-<?php bloginfo('blogroll'); ?>
-
 <h4><?php echo T_('Misc') ?></h4>
 <ul>
 	<?php 

@@ -127,8 +127,7 @@ Categories: <?php the_categories() ?>
 
 <div id="menu">
 
-<h4>quick links:</h4>
-<?php bloginfo('blogroll'); ?>
+<p><?php bloginfo('longdesc', 'htmlbody'); ?></p>
 
 <h4>categories:</h4>
 <form action="<?php bloginfo('blogurl') ?>" method="get">

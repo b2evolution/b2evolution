@@ -436,7 +436,7 @@ class ItemList
 		$this->result = mysql_query($this->request) or mysql_oops( $this->request );
 	
 		$this->result_num_rows = mysql_num_rows($this->result);
-		// echo 'rows=',$this->result_num_rows,'<br />';
+		// echo '<br/>rows=',$this->result_num_rows,'<br />';
 	
 		// Make a list of posts for future queries!
 		// Also make arrays...
@@ -446,7 +446,7 @@ class ItemList
 		while( $myrow = mysql_fetch_object($this->result) )
 		{
 			$this->result_rows[] = $myrow;
-			// echo "post:".$myrow["ID"]." blog:".$myrow["cat_blog_ID"]."<br />";
+			// echo "post:".$myrow->ID."<br />";
 			array_unshift( $this->postIDarray, $myrow->ID );	// new row at beginning
 		}
 		if( !empty($this->postIDarray) )
@@ -455,7 +455,7 @@ class ItemList
 			// rewind resultset:
 			// mysql_data_seek ($this->result, 0) or die( "Could not rewind resultset" );
 		}
-		// echo "postlist:".$postIDlist;
+		// echo "postlist:".$this->postIDlist;
 	
 		// Initialize loop stuff:
 		$this->restart();	
@@ -538,10 +538,10 @@ class ItemList
 	function get_category_group()
 	{
 		global $row;
-		
+
 		$this->group_by_cat = true;
 
-		if( $this->row_num > $this->result_num_rows )
+		if( ($this->row_num > $this->result_num_rows) || ($this->result_num_rows == 0) )
 		{	// We are at the the end!
 			// echo 'END';
 			return false;
@@ -605,9 +605,13 @@ class ItemList
 
 		if(!$this->preview) 
 		{	// This is not preview:
-			//	echo 'REAL POST';
+			// echo 'REAL POST';
 			$row = & $this->row;
 			$id = $row->ID;
+			if( empty($id) )
+			{
+				die('No post data available!');
+			}
 			// echo 'starting ',$row->post_title;
 			$postdata = array (
 				'ID' => $row->ID, 
@@ -628,7 +632,7 @@ class ItemList
 		} 
 		else
 		{	// We are in preview mode!
-			//	echo 'PREVIEW';
+			// echo 'PREVIEW';
 			// we need globals for the param function
 			global $preview_userid, $preview_date, $post_status, $post_lang, $content, 
 							$post_title, $post_url, $post_category, $post_autobr, $edit_date, 
@@ -698,7 +702,6 @@ class ItemList
 		}
 
 		// echo ' title: ',$postdata['Title'];
-
 		$authordata = get_userdata($postdata['Author_ID']);
 		$day = mysql2date('d.m.y',$postdata['Date']);
 		$currentmonth = mysql2date('m',$postdata['Date']);

@@ -365,16 +365,37 @@ function populate_main_tables()
 	global $stub_all, $stub_a, $stub_b, $stub_roll;
 	global $timestamp, $admin_email;
 	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
+	global $default_blog_longdesc, $default_more_longdesc;
 
 	echo "Creating sample blogs... ";
 	
-	$blog_all_ID = blog_create( 'All Blogs', 'All', '', $stub_all.'.php', $stub_all.'.php', $stub_all.'.html', 'Tagline for All', 'All blogs on this system.', NULL, $default_language,  "This is the blogroll for the \'all blogs\' blog aggregation.", 'all blogs keywords', '' ) or mysql_oops( $query );
+	$blog_shortname = 'Blog All';
+	$blog_stub = $stub_all;
+	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_all.php')."<br />
+<br />
+<strong>".T_("Note: Blog #1 is a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by clearing it's 'Stub Urlname' in the blogs admin.")."</strong>";
+	$blog_ID = 1;
+	$blog_all_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_language, '', $blog_shortname.' keywords', '' ) or mysql_oops( $query );
 
-	$blog_a_ID =	blog_create( 'Demo Blog A', 'Blog A', '', $stub_a.'.php', $stub_a.'.php', $stub_a.'.html', 'Tagline for A', 'This is demo blog A', 'This is description for demo blog A. It has index #2 in the database.', $default_language, 'This is the blogroll for Blog A...', 'blog A keywords', '' ) or mysql_oops( $query );
+	$blog_shortname = 'Blog A';
+	$blog_stub = $stub_a;
+	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_a.php');
+	$blog_ID = 2;
+	$blog_a_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_language, '', $blog_shortname.' keywords', '' ) or mysql_oops( $query );
+
+	$blog_shortname = 'Blog B';
+	$blog_stub = $stub_b;
+	$blog_more_longdesc = sprintf( $default_more_longdesc, 'noskin_b.php');
+	$blog_ID = 3;
+	$blog_b_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_language, '', $blog_shortname.' keywords', '' ) or mysql_oops( $query );
 	
-	$blog_b_ID = blog_create( 'Demo Blog B', 'Blog B', '', $stub_b.'.php', $stub_b.'.php', $stub_b.'.html', 'Tagline for B', 'This is demo blog B', 'This is description for demo blog B. It has index #3 in the database.', $default_language, 'This is the blogroll for Blog B...', 'blog B keywords', '') or mysql_oops( $query );
-
-	$blog_roll_ID = blog_create( 'Demo Blogroll', 'Blogroll', '', $stub_roll.'.php', $stub_roll.'.php', $stub_roll.'.html', 'Tagline for Blogroll', 'This is the demo blogroll', 'This is description for blogroll. It has index #4 in the database.', $default_language, 'This is the blogroll for the blogroll... pretty funky huh? :))', 'blogroll keywords', '') or mysql_oops( $query );
+	$blog_shortname = 'Blogroll';
+	$blog_stub = $stub_roll;
+	$blog_more_longdesc = '<br />
+<br />
+<strong>'.T_("However, the main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links. This is commonly referred to as a 'Blogroll'.").'</strong>';
+	$blog_ID = 4;
+	$blog_roll_ID =	blog_create( 'Demo '.$blog_shortname, $blog_shortname, '', $blog_stub.'.php', $blog_stub.'.php', $blog_stub.'.html', 'Tagline for Demo '.$blog_shortname, 'This is Demo '.$blog_shortname, sprintf( $default_blog_longdesc, $blog_shortname, $blog_ID, $blog_stub.'.php', $blog_more_longdesc ), $default_language, '', $blog_shortname.' keywords', '' ) or mysql_oops( $query );
 
 	echo "OK.<br />\n";
 	

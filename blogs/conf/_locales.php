@@ -40,7 +40,7 @@ $languages = array(
 # This MUST BE in the list below
 $default_locale = 'en_US';
 
-$default_locale = 'fr_FR';		// for testing :))
+//$default_locale = 'fr_FR';		// for testing :))
 
 
 #  and localization:

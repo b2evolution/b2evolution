@@ -40,12 +40,12 @@ function cats_display_blog_list()
 		echo $sep;
 		if( $curr_blog_ID == $blog ) 
 		{ // This is the blog being displayed on this page ?>
-		<strong>[<a href="<?php echo $pagenow ?>?blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>]</strong>
+		<strong>[<a href="b2categories.php?blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>]</strong>
 		<?php 
 		} 
 		else 
 		{ // This is another blog ?>
-		<a href="<?php echo $pagenow ?>?blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>
+		<a href="b2categories.php?blog=<?php echo $curr_blog_ID ?>"><?php blog_list_iteminfo('shortname') ?></a>
 		<?php 
 		} 
 		$sep = ' | ';

@@ -200,9 +200,6 @@ href="<?php permalink_link() ?>" title="Permalink"><?php the_time() ?></a></h3>&
 
 <?php } ?>
 
-<h4><?php echo T_('Blogroll') ?></h4>
-<?php bloginfo('blogroll'); ?>
-
 <h4><?php echo T_('Misc') ?></h4>
 <ul>
 	<?php 
