@@ -43,15 +43,15 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title>Multiblog demo<?php
-		single_cat_title( ' - ', 'htmlhead' );
-		single_month_title( ' - ', 'htmlhead' );
-		single_post_title( ' - ', 'htmlhead' );
-		arcdir_title( ' - ', 'htmlhead' );
-		last_comments_title( ' - ', 'htmlhead' );
-		stats_title( ' - ', 'htmlhead' );
-		profile_title( ' - ', 'htmlhead' );
-	?></title>
+<title>Multiblog demo<?php
+	single_cat_title( ' - ', 'htmlhead' );
+	single_month_title( ' - ', 'htmlhead' );
+	single_post_title( ' - ', 'htmlhead' );
+	arcdir_title( ' - ', 'htmlhead' );
+	last_comments_title( ' - ', 'htmlhead' );
+	stats_title( ' - ', 'htmlhead' );
+	profile_title( ' - ', 'htmlhead' );
+?></title>
 <!-- InstanceEndEditable --> 
 <!-- InstanceBeginEditable name="head" -->
 <base href="<?php skinbase(); // You're not using any skin here but this won't hurt. However it will be very helpfull to have this here when you make the switch to a skin! ?>" />

@@ -24,7 +24,7 @@ require(dirname(__FILE__).'/evocore/_main.inc.php');
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-<title>Summary Demo</title>
+<title><?php echo T_('Summary Demo'); ?></title>
 <!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
  <!-- InstanceEndEditable -->

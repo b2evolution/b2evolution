@@ -143,7 +143,7 @@ function list_users( $layout, $query )
 						<?php
 						$user_easy_group = blogperms_get_easy( $lrow );
 						foreach( array(
-													array( 'nomember', T_('No Member') ),
+													array( 'nomember', T_('Not Member') ),
 													array( 'member', T_('Member') ),
 													array( 'editor', T_('Editor') ),
 													array( 'admin',  T_('Admin') ),

@@ -275,10 +275,10 @@ class Results
 							'colhead_start_first' => '<th class="firstcol">',
 							'colhead_start_last' => '<th class="lastcol">',
 							'colhead_end' => "</th>\n",
-							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending Order').'" height="12" width="11" />',
-							'sort_asc_on' => '<img src="../admin/img/black_arrow_up.gif" alt="A" title="'.T_('Ascending Order').'" height="12" width="11" />',
-							'sort_desc_off' => '<img src="../admin/img/grey_arrow_down.gif" alt="D" title="'.T_('Descending Order').'" height="12" width="11" />',
-							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending Order').'" height="12" width="11" />',
+							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending order').'" height="12" width="11" />',
+							'sort_asc_on' => '<img src="../admin/img/black_arrow_up.gif" alt="A" title="'.T_('Ascending order').'" height="12" width="11" />',
+							'sort_desc_off' => '<img src="../admin/img/grey_arrow_down.gif" alt="D" title="'.T_('Descending order').'" height="12" width="11" />',
+							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending order').'" height="12" width="11" />',
 							'basic_sort_off' => '<img src="../admin/img/basic_sort_off.gif" width="16" height="16" />',
 							'basic_sort_asc' => '<img src="../admin/img/basic_sort_asc.gif" width="16" height="16" />',
 							'basic_sort_desc' => '<img src="../admin/img/basic_sort_desc.gif" width="16" height="16" />',
@@ -452,10 +452,10 @@ class Results
 									.'" '.$title.$class.' >'
 									.$col_header.'</a>' 
 									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_asc)
-									.'" title="'.T_('Ascending Order')
+									.'" title="'.T_('Ascending order')
 									.'" '.$class.' >'.$this->params['sort_asc_'.$asc_status].'</a>'
 									.'<a href="'.regenerate_url( $this->param_prefix.'order', $this->param_prefix.'order='.$order_desc)
-									.'" title="'.T_('Descending Order')
+									.'" title="'.T_('Descending order')
 									.'" '.$class.' >'.$this->params['sort_desc_'.$desc_status].'</a> ';
 					}
 					elseif( $this->params['sort_type'] == 'basic' )
@@ -920,6 +920,9 @@ class Results
 
 /*
  * $Log$
+ * Revision 1.11  2005/01/26 16:47:13  fplanque
+ * i18n tuning
+ *
  * Revision 1.10  2005/01/20 19:19:34  fplanque
  * bugfix
  *

@@ -75,7 +75,7 @@ $FilesForm->text( 'upload_allowedext',
 $FilesForm->text( 'upload_allowedmime',
 									$Settings->get('upload_allowedmime'),
 									40,
-									T_('Allowed MIME type'),
+									T_('Allowed MIME types'),
 									T_('Seperated by space.' )
 									.' '.T_('Leave it empty to disable this check.')
 									.' '.sprintf( /* TRANS: %s gets replaced with an example setting */ T_('E.g. &laquo;%s&raquo;'), $Settings->getDefault( 'upload_allowedmime' ) ),
