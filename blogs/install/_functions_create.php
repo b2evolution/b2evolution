@@ -937,6 +937,7 @@ function create_b2evo_tables_092()
 									sess_lastseen  DATETIME NOT NULL,
 									sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
 									sess_user_ID   INT(10) DEFAULT NULL,
+									sess_data      TEXT NOT NULL,
 									PRIMARY KEY( sess_ID ),
 									UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID )
 								)" );
@@ -1027,6 +1028,7 @@ function create_b2evo_tables_092()
 								dom_ID     INT UNSIGNED NOT NULL AUTO_INCREMENT,
 								dom_name   VARCHAR(250) NOT NULL DEFAULT '',
 								dom_status ENUM('unknown','whitelist','blacklist') NOT NULL DEFAULT 'unknown',
+								dom_type   ENUM('unknown','normal','searcheng','aggregator') NOT NULL DEFAULT 'unknown',
 								PRIMARY KEY (dom_ID),
 								UNIQUE (dom_name) )" );
 	echo "OK.<br />\n";
