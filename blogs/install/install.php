@@ -237,7 +237,7 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://www.teenangst.co.uk/' ) or mysql_oops( $query );
+	bpost_create( 1, 'Graham', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://tin-men.net/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
