@@ -1004,7 +1004,7 @@ class FileManager extends Filelist
 			$height = 800;
 		}
 
-		$r = "opened = window.open('$href','$target','status=yes,toolbar=1,resizable=yes,scrollbars=yes,location=yes,";
+		$r = "opened = window.open('$href','$target','resizable=yes,scrollbars=yes,";  // status=yes,toolbar=1,location=yes,
 
 		if( $width )
 		{
@@ -1131,6 +1131,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.4  2004/10/21 00:41:20  blueyed
+ * made JsPopup nice again
+ *
  * Revision 1.3  2004/10/21 00:14:44  blueyed
  * moved
  *
