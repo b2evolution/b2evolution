@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.6.1\n"
-"POT-Creation-Date: 2004-04-03 03:10+0200\n"
-"PO-Revision-Date: 2004-04-03 03:40+0100\n"
+"POT-Creation-Date: 2004-04-04 18:10+0200\n"
+"PO-Revision-Date: 2004-04-04 18:14+0100\n"
 "Last-Translator: François PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -89,414 +89,366 @@ msgstr "site web officiel"
 msgid "GNU GPL license"
 msgstr "Licence GPL"
 
-#: ..\..\..\multiblogs.php:47
-#: ..\..\..\multiblogs.php:121
-#: ..\..\..\noskin_a.php:59
-#: ..\..\..\noskin_a.php:129
-#: ..\..\..\noskin_a.php:221
-#: ..\..\..\noskin_all.php:60
-#: ..\..\..\noskin_all.php:130
-#: ..\..\..\noskin_all.php:223
-#: ..\..\..\noskin_b.php:59
-#: ..\..\..\noskin_b.php:130
-#: ..\..\..\noskin_b.php:232
-#: ..\..\..\noskin_roll.php:59
-#: ..\..\..\noskin_roll.php:129
-#: ..\..\..\noskin_roll.php:222
-#: ..\..\..\skins\bluesky\_main.php:20
-#: ..\..\..\skins\bluesky\_main.php:46
-#: ..\..\..\skins\bluesky\_main.php:127
-#: ..\..\..\skins\custom\_main.php:22
-#: ..\..\..\skins\custom\_main.php:56
-#: ..\..\..\skins\custom\_main.php:155
-#: ..\..\..\skins\fplanque2002\_main.php:23
-#: ..\..\..\skins\fplanque2002\_main.php:76
-#: ..\..\..\skins\fplanque2002\_main.php:168
-#: ..\..\..\skins\guadeloupe\_main.php:20
-#: ..\..\..\skins\guadeloupe\_main.php:46
-#: ..\..\..\skins\guadeloupe\_main.php:127
-msgid "Last comments"
-msgstr "Derniers commentaires"
-
-#: ..\..\..\multiblogs.php:48
-#: ..\..\..\multiblogs.php:122
-#: ..\..\..\noskin_a.php:60
-#: ..\..\..\noskin_a.php:130
-#: ..\..\..\noskin_all.php:61
-#: ..\..\..\noskin_all.php:131
-#: ..\..\..\noskin_b.php:60
-#: ..\..\..\noskin_b.php:131
-#: ..\..\..\noskin_roll.php:60
-#: ..\..\..\noskin_roll.php:130
-#: ..\..\..\skins\bluesky\_main.php:21
-#: ..\..\..\skins\bluesky\_main.php:47
-#: ..\..\..\skins\custom\_main.php:23
-#: ..\..\..\skins\custom\_main.php:57
-#: ..\..\..\skins\fplanque2002\_main.php:24
-#: ..\..\..\skins\fplanque2002\_main.php:77
-#: ..\..\..\skins\guadeloupe\_main.php:21
-#: ..\..\..\skins\guadeloupe\_main.php:47
-msgid "Statistics"
-msgstr "Statistiques"
-
-#: ..\..\..\multiblogs.php:49
-#: ..\..\..\multiblogs.php:123
-#: ..\..\..\noskin_a.php:61
-#: ..\..\..\noskin_a.php:131
-#: ..\..\..\noskin_all.php:62
-#: ..\..\..\noskin_all.php:132
-#: ..\..\..\noskin_b.php:61
-#: ..\..\..\noskin_b.php:132
-#: ..\..\..\noskin_roll.php:61
-#: ..\..\..\noskin_roll.php:131
-#: ..\..\..\skins\custom\_main.php:24
-#: ..\..\..\skins\custom\_main.php:58
-#: ..\..\..\skins\fplanque2002\_main.php:25
-#: ..\..\..\skins\fplanque2002\_main.php:78
-msgid "Archive Directory"
-msgstr "Liste des Archives"
-
-#: ..\..\..\multiblogs.php:96
+#: ..\..\..\multiblogs.php:97
 msgid "Multiblog demo"
 msgstr "Démo multi-blogs"
 
-#: ..\..\..\multiblogs.php:106
+#: ..\..\..\multiblogs.php:107
 msgid "This demo template displays 3 blogs at once (1 on the left, 2 on the right)"
 msgstr "Ce gabarit de démonstration affiche 3 blogs simultanément (1 à gauche, 2 à droite)"
 
-#: ..\..\..\multiblogs.php:136
-#: ..\..\..\multiblogs.php:220
-#: ..\..\..\multiblogs.php:255
-#: ..\..\..\noskin_a.php:161
-#: ..\..\..\noskin_all.php:146
-#: ..\..\..\noskin_all.php:162
-#: ..\..\..\noskin_b.php:146
-#: ..\..\..\noskin_b.php:162
-#: ..\..\..\noskin_roll.php:145
-#: ..\..\..\noskin_roll.php:161
+#: ..\..\..\multiblogs.php:135
+#: ..\..\..\multiblogs.php:219
+#: ..\..\..\multiblogs.php:254
+#: ..\..\..\noskin_a.php:160
+#: ..\..\..\noskin_all.php:145
+#: ..\..\..\noskin_all.php:161
+#: ..\..\..\noskin_b.php:145
+#: ..\..\..\noskin_b.php:161
+#: ..\..\..\noskin_roll.php:144
+#: ..\..\..\noskin_roll.php:160
 #: ..\..\..\summary.php:91
 #: ..\..\..\skins\_blogroll.php:63
-#: ..\..\..\skins\custom\_main.php:72
-#: ..\..\..\skins\custom\_main.php:95
-#: ..\..\..\skins\fplanque2002\_main.php:92
-#: ..\..\..\skins\fplanque2002\_main.php:108
+#: ..\..\..\skins\basic\_main.php:66
+#: ..\..\..\skins\basic\_main.php:95
+#: ..\..\..\skins\custom\_main.php:70
+#: ..\..\..\skins\custom\_main.php:93
+#: ..\..\..\skins\fplanque2002\_main.php:90
+#: ..\..\..\skins\fplanque2002\_main.php:106
 msgid "Permanent link to full entry"
 msgstr "Lien permanent vers l'article complet"
 
-#: ..\..\..\multiblogs.php:136
-#: ..\..\..\multiblogs.php:152
-#: ..\..\..\multiblogs.php:220
-#: ..\..\..\multiblogs.php:255
-#: ..\..\..\noskin_a.php:161
-#: ..\..\..\noskin_all.php:146
-#: ..\..\..\noskin_all.php:162
-#: ..\..\..\noskin_b.php:146
-#: ..\..\..\noskin_b.php:162
-#: ..\..\..\noskin_roll.php:145
-#: ..\..\..\noskin_roll.php:161
+#: ..\..\..\multiblogs.php:135
+#: ..\..\..\multiblogs.php:151
+#: ..\..\..\multiblogs.php:219
+#: ..\..\..\multiblogs.php:254
+#: ..\..\..\noskin_a.php:160
+#: ..\..\..\noskin_all.php:145
+#: ..\..\..\noskin_all.php:161
+#: ..\..\..\noskin_b.php:145
+#: ..\..\..\noskin_b.php:161
+#: ..\..\..\noskin_roll.php:144
+#: ..\..\..\noskin_roll.php:160
 #: ..\..\..\admin\_edit_showposts.php:188
 #: ..\..\..\skins\_blogroll.php:63
-#: ..\..\..\skins\custom\_main.php:95
-#: ..\..\..\skins\fplanque2002\_main.php:92
-#: ..\..\..\skins\fplanque2002\_main.php:108
-#: ..\..\..\skins\guadeloupe\_main.php:62
+#: ..\..\..\skins\basic\_main.php:95
+#: ..\..\..\skins\custom\_main.php:93
+#: ..\..\..\skins\fplanque2002\_main.php:90
+#: ..\..\..\skins\fplanque2002\_main.php:106
+#: ..\..\..\skins\guadeloupe\_main.php:69
 msgid "Permalink"
 msgstr "Permalien"
 
-#: ..\..\..\multiblogs.php:137
-#: ..\..\..\noskin_a.php:146
-#: ..\..\..\noskin_a.php:239
-#: ..\..\..\noskin_all.php:147
-#: ..\..\..\noskin_all.php:241
-#: ..\..\..\noskin_b.php:147
-#: ..\..\..\noskin_b.php:250
-#: ..\..\..\noskin_roll.php:146
-#: ..\..\..\noskin_roll.php:240
+#: ..\..\..\multiblogs.php:136
+#: ..\..\..\noskin_a.php:145
+#: ..\..\..\noskin_a.php:238
+#: ..\..\..\noskin_all.php:146
+#: ..\..\..\noskin_all.php:240
+#: ..\..\..\noskin_b.php:146
+#: ..\..\..\noskin_b.php:249
+#: ..\..\..\noskin_roll.php:145
+#: ..\..\..\noskin_roll.php:239
 #: ..\..\..\admin\_edit_form.php:303
 #: ..\..\..\admin\_edit_showposts.php:447
-#: ..\..\..\skins\custom\_main.php:75
-#: ..\..\..\skins\custom\_main.php:173
-#: ..\..\..\skins\fplanque2002\_main.php:93
-#: ..\..\..\skins\fplanque2002\_main.php:186
+#: ..\..\..\skins\basic\_main.php:74
+#: ..\..\..\skins\custom\_main.php:73
+#: ..\..\..\skins\custom\_main.php:171
+#: ..\..\..\skins\fplanque2002\_main.php:91
+#: ..\..\..\skins\fplanque2002\_main.php:184
 msgid "Categories"
 msgstr "Catégories"
 
-#: ..\..\..\multiblogs.php:145
-#: ..\..\..\noskin_a.php:154
-#: ..\..\..\noskin_all.php:155
-#: ..\..\..\noskin_b.php:155
-#: ..\..\..\noskin_roll.php:154
-#: ..\..\..\skins\custom\_main.php:88
-#: ..\..\..\skins\fplanque2002\_main.php:101
+#: ..\..\..\multiblogs.php:144
+#: ..\..\..\noskin_a.php:153
+#: ..\..\..\noskin_all.php:154
+#: ..\..\..\noskin_b.php:154
+#: ..\..\..\noskin_roll.php:153
+#: ..\..\..\skins\basic\_main.php:88
+#: ..\..\..\skins\custom\_main.php:86
+#: ..\..\..\skins\fplanque2002\_main.php:99
 msgid "Display comments / Leave a comment"
 msgstr "Afficher les commentaires / Laisser un commentaire"
 
-#: ..\..\..\multiblogs.php:147
-#: ..\..\..\noskin_a.php:156
-#: ..\..\..\noskin_all.php:157
-#: ..\..\..\noskin_b.php:157
-#: ..\..\..\noskin_roll.php:156
-#: ..\..\..\skins\custom\_main.php:90
-#: ..\..\..\skins\fplanque2002\_main.php:103
+#: ..\..\..\multiblogs.php:146
+#: ..\..\..\noskin_a.php:155
+#: ..\..\..\noskin_all.php:156
+#: ..\..\..\noskin_b.php:156
+#: ..\..\..\noskin_roll.php:155
+#: ..\..\..\skins\basic\_main.php:90
+#: ..\..\..\skins\custom\_main.php:88
+#: ..\..\..\skins\fplanque2002\_main.php:101
 msgid "Display trackbacks / Get trackback address for this post"
 msgstr "Afficher les trackbacks / Obtenir l'adresse de trackback pour cet article"
 
-#: ..\..\..\multiblogs.php:150
-#: ..\..\..\noskin_a.php:159
-#: ..\..\..\noskin_all.php:160
-#: ..\..\..\noskin_b.php:160
-#: ..\..\..\noskin_roll.php:159
-#: ..\..\..\skins\custom\_main.php:93
-#: ..\..\..\skins\fplanque2002\_main.php:106
+#: ..\..\..\multiblogs.php:149
+#: ..\..\..\noskin_a.php:158
+#: ..\..\..\noskin_all.php:159
+#: ..\..\..\noskin_b.php:159
+#: ..\..\..\noskin_roll.php:158
+#: ..\..\..\skins\basic\_main.php:93
+#: ..\..\..\skins\custom\_main.php:91
+#: ..\..\..\skins\fplanque2002\_main.php:104
 msgid "Display pingbacks"
 msgstr "Afficher les pingbacks"
 
-#: ..\..\..\multiblogs.php:153
-#: ..\..\..\noskin_a.php:162
-#: ..\..\..\noskin_all.php:163
-#: ..\..\..\noskin_b.php:163
-#: ..\..\..\noskin_roll.php:162
-#: ..\..\..\skins\custom\_main.php:96
-#: ..\..\..\skins\fplanque2002\_main.php:109
+#: ..\..\..\multiblogs.php:152
+#: ..\..\..\noskin_a.php:161
+#: ..\..\..\noskin_all.php:162
+#: ..\..\..\noskin_b.php:162
+#: ..\..\..\noskin_roll.php:161
+#: ..\..\..\skins\custom\_main.php:94
+#: ..\..\..\skins\fplanque2002\_main.php:107
 #, php-format
 msgid "- %d queries so far"
 msgstr "- %d requêtes jusqu'ici"
 
-#: ..\..\..\multiblogs.php:273
-#: ..\..\..\noskin_a.php:293
-#: ..\..\..\noskin_all.php:295
-#: ..\..\..\noskin_b.php:304
-#: ..\..\..\noskin_roll.php:294
-#: ..\..\..\skins\babyblues\_main.php:103
-#: ..\..\..\skins\bluesky\_main.php:203
-#: ..\..\..\skins\custom\_main.php:238
-#: ..\..\..\skins\fplanque2002\_main.php:250
-#: ..\..\..\skins\guadeloupe\_main.php:204
+#: ..\..\..\multiblogs.php:272
+#: ..\..\..\noskin_a.php:292
+#: ..\..\..\noskin_all.php:294
+#: ..\..\..\noskin_b.php:303
+#: ..\..\..\noskin_roll.php:293
+#: ..\..\..\skins\babyblues\_main.php:108
+#: ..\..\..\skins\bluesky\_main.php:210
+#: ..\..\..\skins\custom\_main.php:236
+#: ..\..\..\skins\fplanque2002\_main.php:248
+#: ..\..\..\skins\guadeloupe\_main.php:211
 msgid "Misc"
 msgstr "Divers"
 
-#: ..\..\..\noskin_a.php:95
-#: ..\..\..\noskin_all.php:96
-#: ..\..\..\noskin_b.php:96
-#: ..\..\..\noskin_roll.php:95
+#: ..\..\..\noskin_a.php:96
+#: ..\..\..\noskin_all.php:97
+#: ..\..\..\noskin_b.php:97
+#: ..\..\..\noskin_roll.php:96
 #: ..\..\..\skins\fplanque2002\_bloglist.php:27
 msgid "Selected"
 msgstr "Sélectionné"
 
+#: ..\..\..\noskin_a.php:213
 #: ..\..\..\noskin_a.php:214
-#: ..\..\..\noskin_a.php:215
+#: ..\..\..\noskin_all.php:215
 #: ..\..\..\noskin_all.php:216
-#: ..\..\..\noskin_all.php:217
+#: ..\..\..\noskin_b.php:224
 #: ..\..\..\noskin_b.php:225
-#: ..\..\..\noskin_b.php:226
+#: ..\..\..\noskin_roll.php:214
 #: ..\..\..\noskin_roll.php:215
-#: ..\..\..\noskin_roll.php:216
-#: ..\..\..\skins\bluesky\_main.php:123
-#: ..\..\..\skins\bluesky\_main.php:124
-#: ..\..\..\skins\custom\_main.php:148
-#: ..\..\..\skins\custom\_main.php:149
-#: ..\..\..\skins\fplanque2002\_main.php:161
-#: ..\..\..\skins\fplanque2002\_main.php:162
-#: ..\..\..\skins\guadeloupe\_main.php:123
-#: ..\..\..\skins\guadeloupe\_main.php:124
+#: ..\..\..\skins\bluesky\_main.php:130
+#: ..\..\..\skins\bluesky\_main.php:131
+#: ..\..\..\skins\custom\_main.php:146
+#: ..\..\..\skins\custom\_main.php:147
+#: ..\..\..\skins\fplanque2002\_main.php:159
+#: ..\..\..\skins\fplanque2002\_main.php:160
+#: ..\..\..\skins\guadeloupe\_main.php:130
+#: ..\..\..\skins\guadeloupe\_main.php:131
 msgid "Recently"
 msgstr "Récemment"
 
+#: ..\..\..\noskin_a.php:213
+#: ..\..\..\noskin_all.php:215
+#: ..\..\..\noskin_b.php:224
+#: ..\..\..\noskin_roll.php:214
+#: ..\..\..\skins\bluesky\_main.php:130
+#: ..\..\..\skins\custom\_main.php:146
+#: ..\..\..\skins\fplanque2002\_main.php:159
+#: ..\..\..\skins\guadeloupe\_main.php:130
+msgid "(cached)"
+msgstr "(en cache)"
+
 #: ..\..\..\noskin_a.php:214
 #: ..\..\..\noskin_all.php:216
 #: ..\..\..\noskin_b.php:225
 #: ..\..\..\noskin_roll.php:215
-#: ..\..\..\skins\bluesky\_main.php:123
-#: ..\..\..\skins\custom\_main.php:148
-#: ..\..\..\skins\fplanque2002\_main.php:161
-#: ..\..\..\skins\guadeloupe\_main.php:123
-msgid "(cached)"
-msgstr "(en cache)"
-
-#: ..\..\..\noskin_a.php:215
-#: ..\..\..\noskin_all.php:217
-#: ..\..\..\noskin_b.php:226
-#: ..\..\..\noskin_roll.php:216
-#: ..\..\..\skins\bluesky\_main.php:124
-#: ..\..\..\skins\custom\_main.php:149
-#: ..\..\..\skins\fplanque2002\_main.php:162
-#: ..\..\..\skins\guadeloupe\_main.php:124
+#: ..\..\..\skins\bluesky\_main.php:131
+#: ..\..\..\skins\custom\_main.php:147
+#: ..\..\..\skins\fplanque2002\_main.php:160
+#: ..\..\..\skins\guadeloupe\_main.php:131
 msgid "(no cache)"
 msgstr "(sans cache)"
 
+#: ..\..\..\noskin_a.php:220
+#: ..\..\..\noskin_all.php:222
+#: ..\..\..\noskin_b.php:231
+#: ..\..\..\noskin_roll.php:221
+#: ..\..\..\b2evocore\_functions_comments.php:178
+#: ..\..\..\skins\bluesky\_main.php:134
+#: ..\..\..\skins\custom\_main.php:153
+#: ..\..\..\skins\fplanque2002\_main.php:166
+#: ..\..\..\skins\guadeloupe\_main.php:134
+msgid "Last comments"
+msgstr "Derniers commentaires"
+
 # attention à la longueur
-#: ..\..\..\noskin_a.php:222
-#: ..\..\..\noskin_all.php:224
-#: ..\..\..\noskin_b.php:233
-#: ..\..\..\noskin_roll.php:223
-#: ..\..\..\skins\custom\_main.php:156
-#: ..\..\..\skins\fplanque2002\_main.php:169
+#: ..\..\..\noskin_a.php:221
+#: ..\..\..\noskin_all.php:223
+#: ..\..\..\noskin_b.php:232
+#: ..\..\..\noskin_roll.php:222
+#: ..\..\..\skins\custom\_main.php:154
+#: ..\..\..\skins\fplanque2002\_main.php:167
 msgid "Some viewing statistics"
 msgstr "Quelques statistiques"
 
-#: ..\..\..\noskin_a.php:227
-#: ..\..\..\noskin_a.php:233
-#: ..\..\..\noskin_all.php:229
-#: ..\..\..\noskin_all.php:235
-#: ..\..\..\noskin_b.php:238
-#: ..\..\..\noskin_b.php:244
-#: ..\..\..\noskin_roll.php:228
-#: ..\..\..\noskin_roll.php:234
+#: ..\..\..\noskin_a.php:226
+#: ..\..\..\noskin_a.php:232
+#: ..\..\..\noskin_all.php:228
+#: ..\..\..\noskin_all.php:234
+#: ..\..\..\noskin_b.php:237
+#: ..\..\..\noskin_b.php:243
+#: ..\..\..\noskin_roll.php:227
+#: ..\..\..\noskin_roll.php:233
 #: ..\..\..\admin\_edit_showposts.php:332
 #: ..\..\..\admin\_edit_showposts.php:522
-#: ..\..\..\skins\custom\_main.php:161
-#: ..\..\..\skins\custom\_main.php:167
-#: ..\..\..\skins\fplanque2002\_main.php:174
-#: ..\..\..\skins\fplanque2002\_main.php:180
-#: ..\..\..\skins\originalb2\_main.php:143
+#: ..\..\..\skins\custom\_main.php:159
+#: ..\..\..\skins\custom\_main.php:165
+#: ..\..\..\skins\fplanque2002\_main.php:172
+#: ..\..\..\skins\fplanque2002\_main.php:178
+#: ..\..\..\skins\originalb2\_main.php:146
 msgid "Search"
 msgstr "Rechercher"
+
+#: ..\..\..\noskin_a.php:229
+#: ..\..\..\noskin_all.php:231
+#: ..\..\..\noskin_b.php:240
+#: ..\..\..\noskin_roll.php:230
+#: ..\..\..\skins\custom\_main.php:162
+#: ..\..\..\skins\fplanque2002\_main.php:175
+msgid "All Words"
+msgstr "Tous les mots"
 
 #: ..\..\..\noskin_a.php:230
 #: ..\..\..\noskin_all.php:232
 #: ..\..\..\noskin_b.php:241
 #: ..\..\..\noskin_roll.php:231
-#: ..\..\..\skins\custom\_main.php:164
-#: ..\..\..\skins\fplanque2002\_main.php:177
-msgid "All Words"
-msgstr "Tous les mots"
+#: ..\..\..\skins\custom\_main.php:163
+#: ..\..\..\skins\fplanque2002\_main.php:176
+msgid "Some Word"
+msgstr "N'importe quel mot"
 
 #: ..\..\..\noskin_a.php:231
 #: ..\..\..\noskin_all.php:233
 #: ..\..\..\noskin_b.php:242
 #: ..\..\..\noskin_roll.php:232
-#: ..\..\..\skins\custom\_main.php:165
-#: ..\..\..\skins\fplanque2002\_main.php:178
-msgid "Some Word"
-msgstr "N'importe quel mot"
-
-#: ..\..\..\noskin_a.php:232
-#: ..\..\..\noskin_all.php:234
-#: ..\..\..\noskin_b.php:243
-#: ..\..\..\noskin_roll.php:233
 #: ..\..\..\admin\_edit_showposts.php:367
-#: ..\..\..\skins\custom\_main.php:166
-#: ..\..\..\skins\fplanque2002\_main.php:179
+#: ..\..\..\skins\custom\_main.php:164
+#: ..\..\..\skins\fplanque2002\_main.php:177
 msgid "Entire phrase"
 msgstr "Phrase complète"
 
-#: ..\..\..\noskin_a.php:234
-#: ..\..\..\noskin_a.php:246
-#: ..\..\..\noskin_all.php:236
-#: ..\..\..\noskin_all.php:248
-#: ..\..\..\noskin_b.php:245
-#: ..\..\..\noskin_b.php:257
-#: ..\..\..\noskin_roll.php:235
-#: ..\..\..\noskin_roll.php:247
-#: ..\..\..\skins\bluesky\_main.php:142
-#: ..\..\..\skins\custom\_main.php:168
-#: ..\..\..\skins\custom\_main.php:180
-#: ..\..\..\skins\fplanque2002\_main.php:181
-#: ..\..\..\skins\fplanque2002\_main.php:193
-#: ..\..\..\skins\guadeloupe\_main.php:143
+#: ..\..\..\noskin_a.php:233
+#: ..\..\..\noskin_a.php:245
+#: ..\..\..\noskin_all.php:235
+#: ..\..\..\noskin_all.php:247
+#: ..\..\..\noskin_b.php:244
+#: ..\..\..\noskin_b.php:256
+#: ..\..\..\noskin_roll.php:234
+#: ..\..\..\noskin_roll.php:246
+#: ..\..\..\skins\bluesky\_main.php:149
+#: ..\..\..\skins\custom\_main.php:166
+#: ..\..\..\skins\custom\_main.php:178
+#: ..\..\..\skins\fplanque2002\_main.php:179
+#: ..\..\..\skins\fplanque2002\_main.php:191
+#: ..\..\..\skins\guadeloupe\_main.php:150
 msgid "Reset form"
 msgstr "Valeurs par défaut"
 
-#: ..\..\..\noskin_a.php:245
-#: ..\..\..\noskin_all.php:247
-#: ..\..\..\noskin_b.php:256
-#: ..\..\..\noskin_roll.php:246
-#: ..\..\..\skins\bluesky\_main.php:141
-#: ..\..\..\skins\custom\_main.php:179
-#: ..\..\..\skins\fplanque2002\_main.php:192
-#: ..\..\..\skins\guadeloupe\_main.php:142
-#: ..\..\..\skins\originalb2\_main.php:135
+#: ..\..\..\noskin_a.php:244
+#: ..\..\..\noskin_all.php:246
+#: ..\..\..\noskin_b.php:255
+#: ..\..\..\noskin_roll.php:245
+#: ..\..\..\skins\bluesky\_main.php:148
+#: ..\..\..\skins\custom\_main.php:177
+#: ..\..\..\skins\fplanque2002\_main.php:190
+#: ..\..\..\skins\guadeloupe\_main.php:149
+#: ..\..\..\skins\originalb2\_main.php:138
 msgid "Get selection"
 msgstr "Obtenir sélection"
 
-#: ..\..\..\noskin_a.php:251
-#: ..\..\..\noskin_all.php:253
-#: ..\..\..\noskin_b.php:262
-#: ..\..\..\noskin_roll.php:252
+#: ..\..\..\noskin_a.php:250
+#: ..\..\..\noskin_all.php:252
+#: ..\..\..\noskin_b.php:261
+#: ..\..\..\noskin_roll.php:251
 #: ..\..\..\admin\_edit_showposts.php:371
-#: ..\..\..\skins\bluesky\_main.php:176
-#: ..\..\..\skins\custom\_main.php:185
-#: ..\..\..\skins\fplanque2002\_main.php:198
-#: ..\..\..\skins\guadeloupe\_main.php:177
+#: ..\..\..\skins\basic\_main.php:133
+#: ..\..\..\skins\bluesky\_main.php:183
+#: ..\..\..\skins\custom\_main.php:183
+#: ..\..\..\skins\fplanque2002\_main.php:196
+#: ..\..\..\skins\guadeloupe\_main.php:184
 msgid "Archives"
 msgstr "Archives"
 
-#: ..\..\..\noskin_a.php:256
-#: ..\..\..\noskin_a.php:269
-#: ..\..\..\noskin_a.php:278
-#: ..\..\..\noskin_all.php:258
-#: ..\..\..\noskin_all.php:271
-#: ..\..\..\noskin_all.php:280
-#: ..\..\..\noskin_b.php:267
-#: ..\..\..\noskin_b.php:280
-#: ..\..\..\noskin_b.php:289
-#: ..\..\..\noskin_roll.php:257
-#: ..\..\..\noskin_roll.php:270
-#: ..\..\..\noskin_roll.php:279
-#: ..\..\..\skins\bluesky\_main.php:189
-#: ..\..\..\skins\bluesky\_main.php:198
-#: ..\..\..\skins\custom\_main.php:190
-#: ..\..\..\skins\custom\_main.php:214
-#: ..\..\..\skins\custom\_main.php:223
-#: ..\..\..\skins\fplanque2002\_main.php:203
-#: ..\..\..\skins\fplanque2002\_main.php:226
-#: ..\..\..\skins\fplanque2002\_main.php:235
-#: ..\..\..\skins\guadeloupe\_main.php:190
-#: ..\..\..\skins\guadeloupe\_main.php:199
+#: ..\..\..\noskin_a.php:255
+#: ..\..\..\noskin_a.php:268
+#: ..\..\..\noskin_a.php:277
+#: ..\..\..\noskin_all.php:257
+#: ..\..\..\noskin_all.php:270
+#: ..\..\..\noskin_all.php:279
+#: ..\..\..\noskin_b.php:266
+#: ..\..\..\noskin_b.php:279
+#: ..\..\..\noskin_b.php:288
+#: ..\..\..\noskin_roll.php:256
+#: ..\..\..\noskin_roll.php:269
+#: ..\..\..\noskin_roll.php:278
+#: ..\..\..\skins\bluesky\_main.php:196
+#: ..\..\..\skins\bluesky\_main.php:205
+#: ..\..\..\skins\custom\_main.php:188
+#: ..\..\..\skins\custom\_main.php:212
+#: ..\..\..\skins\custom\_main.php:221
+#: ..\..\..\skins\fplanque2002\_main.php:201
+#: ..\..\..\skins\fplanque2002\_main.php:224
+#: ..\..\..\skins\fplanque2002\_main.php:233
+#: ..\..\..\skins\guadeloupe\_main.php:197
+#: ..\..\..\skins\guadeloupe\_main.php:206
 msgid "more..."
 msgstr "suite..."
 
-#: ..\..\..\noskin_a.php:263
-#: ..\..\..\noskin_all.php:265
-#: ..\..\..\noskin_b.php:274
-#: ..\..\..\noskin_roll.php:264
-#: ..\..\..\skins\bluesky\_main.php:183
-#: ..\..\..\skins\custom\_main.php:208
-#: ..\..\..\skins\fplanque2002\_main.php:220
-#: ..\..\..\skins\guadeloupe\_main.php:184
+#: ..\..\..\noskin_a.php:262
+#: ..\..\..\noskin_all.php:264
+#: ..\..\..\noskin_b.php:273
+#: ..\..\..\noskin_roll.php:263
+#: ..\..\..\skins\bluesky\_main.php:190
+#: ..\..\..\skins\custom\_main.php:206
+#: ..\..\..\skins\fplanque2002\_main.php:218
+#: ..\..\..\skins\guadeloupe\_main.php:191
 msgid "Recent Referers"
 msgstr "Référents récents"
 
-#: ..\..\..\noskin_a.php:272
-#: ..\..\..\noskin_all.php:274
-#: ..\..\..\noskin_b.php:283
-#: ..\..\..\noskin_roll.php:273
-#: ..\..\..\skins\bluesky\_main.php:192
-#: ..\..\..\skins\custom\_main.php:217
-#: ..\..\..\skins\fplanque2002\_main.php:229
-#: ..\..\..\skins\guadeloupe\_main.php:193
+#: ..\..\..\noskin_a.php:271
+#: ..\..\..\noskin_all.php:273
+#: ..\..\..\noskin_b.php:282
+#: ..\..\..\noskin_roll.php:272
+#: ..\..\..\skins\bluesky\_main.php:199
+#: ..\..\..\skins\custom\_main.php:215
+#: ..\..\..\skins\fplanque2002\_main.php:227
+#: ..\..\..\skins\guadeloupe\_main.php:200
 msgid "Top Referers"
 msgstr "Référents les plus fréquents"
 
-#: ..\..\..\noskin_a.php:286
-#: ..\..\..\noskin_all.php:288
-#: ..\..\..\noskin_b.php:297
-#: ..\..\..\noskin_roll.php:287
+#: ..\..\..\noskin_a.php:285
+#: ..\..\..\noskin_all.php:287
+#: ..\..\..\noskin_b.php:296
+#: ..\..\..\noskin_roll.php:286
 #: ..\..\..\admin\_blogs_form.php:253
-#: ..\..\..\skins\custom\_main.php:231
-#: ..\..\..\skins\fplanque2002\_main.php:243
+#: ..\..\..\skins\custom\_main.php:229
+#: ..\..\..\skins\fplanque2002\_main.php:241
 msgid "Blogroll"
 msgstr "Blogs à lire"
 
-#: ..\..\..\noskin_a.php:307
-#: ..\..\..\noskin_all.php:309
-#: ..\..\..\noskin_b.php:318
-#: ..\..\..\noskin_roll.php:308
-#: ..\..\..\skins\custom\_main.php:251
-#: ..\..\..\skins\fplanque2002\_main.php:264
+#: ..\..\..\noskin_a.php:306
+#: ..\..\..\noskin_all.php:308
+#: ..\..\..\noskin_b.php:317
+#: ..\..\..\noskin_roll.php:307
+#: ..\..\..\skins\custom\_main.php:249
+#: ..\..\..\skins\fplanque2002\_main.php:262
 msgid "Syndicate this blog"
 msgstr "Syndiquez ce blog"
 
-#: ..\..\..\noskin_a.php:344
-#: ..\..\..\noskin_all.php:346
-#: ..\..\..\noskin_b.php:354
-#: ..\..\..\noskin_roll.php:345
-#: ..\..\..\skins\babyblues\_main.php:127
-#: ..\..\..\skins\bluesky\_main.php:230
-#: ..\..\..\skins\custom\_main.php:278
+#: ..\..\..\noskin_a.php:345
+#: ..\..\..\noskin_all.php:347
+#: ..\..\..\noskin_b.php:355
+#: ..\..\..\noskin_roll.php:346
+#: ..\..\..\skins\bluesky\_main.php:238
+#: ..\..\..\skins\custom\_main.php:279
 #: ..\..\..\skins\fplanque2002\_main.php:299
-#: ..\..\..\skins\guadeloupe\_main.php:231
-#: ..\..\..\skins\originalb2\_main.php:179
+#: ..\..\..\skins\guadeloupe\_main.php:239
+#: ..\..\..\skins\originalb2\_main.php:182
 #, php-format
 msgid "Totals: %d posts - %d queries - %01.3f seconds"
 msgstr "Totaux: %d articles - %d requêtes - %01.3f secondes"
@@ -562,14 +514,12 @@ msgid "Banned domains blacklist"
 msgstr "Liste noire des domaines interdits"
 
 #: ..\..\..\admin\b2antispam.php:154
-#, fuzzy
 msgid "Any URL containing one of the following keywords will be banned from posts, comments and logs."
-msgstr "Toute URL contenant l'un des mots clefs suivants ne pourra apparaitre dans les articles, commentaires et logs. Si un mot clef empêche la saisie de mots clefs légitimes, cliquez sur la coche verte pour lever l'interdiction sur le mot clef concerné."
+msgstr "Toute URL contenant l'un des mots clefs suivants ne pourra apparaitre dans les articles, commentaires et logs."
 
 #: ..\..\..\admin\b2antispam.php:157
-#, fuzzy
 msgid "If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword."
-msgstr "Toute URL contenant l'un des mots clefs suivants ne pourra apparaitre dans les articles, commentaires et logs. Si un mot clef empêche la saisie de mots clefs légitimes, cliquez sur la coche verte pour lever l'interdiction sur le mot clef concerné."
+msgstr "Si un mot clef empêche la saisie de mots clefs légitimes, cliquez sur la coche verte pour lever l'interdiction sur le mot clef concerné."
 
 #: ..\..\..\admin\b2antispam.php:167
 msgid "Allow keyword back (Remove it from the blacklist)"
@@ -720,16 +670,15 @@ msgstr "Parcourir le blog:"
 #: ..\..\..\admin\b2browse.php:59
 #: ..\..\..\admin\b2categories.php:287
 #: ..\..\..\admin\b2edit.php:153
-#, fuzzy, php-format
+#, php-format
 msgid "Since you're a newcomer, you'll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you're promoted, just reload this page and you'll be able to blog. :)"
-msgstr "Etant donné que vous êtes nouveau, vous allez devoir attendre qu'un administrateur monte votre niveau à 1 avant de pouvoir poster des articles. Vous pouvez aussi <a %s>envoyer un mail à l'administrateur</a> pour lui demander une promotion. Lorsque vous serez promu, rechargez simplement cette page et vous pourrez poster. :)"
+msgstr "Etant donné que vous êtes nouveau, vous allez devoir attendre qu'un administrateur vous autorise à poster. Vous pouvez aussi <a %s>envoyer un mail à l'administrateur</a> pour lui demander une promotion. Lorsque vous serez promu, rechargez simplement cette page et vous pourrez poster. :)"
 
 #: ..\..\..\admin\b2categories.php:14
 #: ..\..\..\admin\_cats_list.php:15
 #: ..\..\..\admin\_menutop.php:60
-#, fuzzy
 msgid "Categories for blog:"
-msgstr "Catégories"
+msgstr "Catégories pour le blog:"
 
 #: ..\..\..\admin\b2categories.php:78
 #, php-format
@@ -777,9 +726,8 @@ msgid "Category deleted."
 msgstr "Catégorie supprimée."
 
 #: ..\..\..\admin\b2categories.php:185
-#, fuzzy
 msgid "Properties for category:"
-msgstr "Créer la catégorie"
+msgstr "Propriétés pour la catégorie:"
 
 #: ..\..\..\admin\b2categories.php:188
 #: ..\..\..\admin\b2upload.php:216
@@ -788,6 +736,7 @@ msgstr "Créer la catégorie"
 #: ..\..\..\admin\_users_groupform.php:26
 #: ..\..\..\admin\_users_list.php:26
 #: ..\..\..\skins\_feedback.php:163
+#: ..\..\..\skins\basic\_feedback.php:151
 msgid "Name"
 msgstr "Nom"
 
@@ -822,9 +771,9 @@ msgid "Editing post"
 msgstr "Edition d'un article"
 
 #: ..\..\..\admin\b2edit.php:36
-#, fuzzy, php-format
+#, php-format
 msgid "#%d in blog: %s"
-msgstr "Nouvelle catégorie dans le blog:: %s"
+msgstr "n°%d dans le blog: %s"
 
 #: ..\..\..\admin\b2edit.php:72
 msgid "Oops, no comment with this ID!"
@@ -873,6 +822,7 @@ msgstr "Pointez simplement et directement sur la page d'administration à laquell
 #: ..\..\..\admin\_menutop.php:110
 #: ..\..\..\admin\_menutop.php:114
 #: ..\..\..\skins\_feedback.php:191
+#: ..\..\..\skins\basic\_feedback.php:179
 msgid "Options"
 msgstr "Options"
 
@@ -885,9 +835,9 @@ msgid "Time difference"
 msgstr "Décalage horaire"
 
 #: ..\..\..\admin\b2options.php:62
-#, fuzzy, php-format
+#, php-format
 msgid "If you're not on the timezone of your server. Current server time is: %s."
-msgstr "si vous n'êtes pas dans le même fuseau horaire que le serveur"
+msgstr "Si vous n'êtes pas dans le même fuseau horaire que le serveur. L'heure courante du serveur est: %s"
 
 #: ..\..\..\admin\b2options.php:69
 msgid "Default user rights"
@@ -918,9 +868,8 @@ msgid "Levels determine hierarchy of users in blogs."
 msgstr "Les niveaux déterminent la hierarchie des utilisateurs dans les blogs."
 
 #: ..\..\..\admin\b2options.php:82
-#, fuzzy
 msgid "Post options"
-msgstr "Contenu de l'article"
+msgstr "Options de l'article"
 
 #: ..\..\..\admin\b2options.php:85
 msgid "days"
@@ -966,18 +915,19 @@ msgstr "Mode d'archivage"
 #: ..\..\..\admin\_edit_form.php:163
 #: ..\..\..\admin\_edit_showposts.php:287
 #: ..\..\..\skins\_feedback.php:195
+#: ..\..\..\skins\basic\_feedback.php:183
 msgid "Auto-BR"
 msgstr "Auto-BR"
 
 #: ..\..\..\admin\b2options.php:99
-#, fuzzy
 msgid "Converts line-breaks into &lt;br /&gt; tags."
-msgstr "convertit les retours à la ligne en balises &lt;br /&gt;"
+msgstr "Convertit les retours à la ligne en balises &lt;br /&gt;."
 
 #: ..\..\..\admin\b2options.php:108
 #: ..\..\..\admin\_users_form.php:110
 #: ..\..\..\admin\_users_groupform.php:76
 #: ..\..\..\skins\_profile.php:91
+#: ..\..\..\skins\basic\_profile.php:93
 msgid "Update"
 msgstr "Mettre à jour"
 
@@ -1396,9 +1346,8 @@ msgid "Here's the code to display it:"
 msgstr "Voici le code pour l'afficher:"
 
 #: ..\..\..\admin\b2upload.php:212
-#, fuzzy
 msgid "Add the code to your post !"
-msgstr "Ajoutez ce lien à vos favoris:"
+msgstr "Ajoutez le code à votre article !"
 
 #: ..\..\..\admin\b2upload.php:215
 msgid "Image Details"
@@ -1649,83 +1598,76 @@ msgstr "Membres"
 #: ..\..\..\admin\_blogs_form.php:184
 #: ..\..\..\admin\_blogs_form.php:192
 msgid "Permission to post into this blog with private status"
-msgstr ""
+msgstr "Permission de poster dans ce blog avec le statut privé"
 
 #: ..\..\..\admin\_blogs_form.php:107
 #: ..\..\..\admin\_blogs_form.php:188
 msgid "Permission to post into this blog with protected status"
-msgstr ""
+msgstr "Permission de poster dans ce blog avec le statut protégé"
 
 #: ..\..\..\admin\_blogs_form.php:121
 #: ..\..\..\admin\_blogs_form.php:196
 msgid "Permission to post into this blog with draft status"
-msgstr ""
+msgstr "Permission de poster dans ce blog avec le statut brouillon"
 
 #: ..\..\..\admin\_blogs_form.php:128
 #: ..\..\..\admin\_blogs_form.php:200
 msgid "Permission to post into this blog with deprecated status"
-msgstr ""
+msgstr "Permission de poster dans ce blog avec le statut périmé"
 
 #: ..\..\..\admin\_blogs_form.php:135
 #: ..\..\..\admin\_blogs_form.php:204
 msgid "Permission to delete posts in this blog"
-msgstr ""
+msgstr "Permission de supprimer des articles de ce blog"
 
 #: ..\..\..\admin\_blogs_form.php:142
 #: ..\..\..\admin\_blogs_form.php:208
 msgid "Permission to edit comments in this blog"
-msgstr ""
+msgstr "Permission d'éditer les commentaires dans ce blog"
 
 #: ..\..\..\admin\_blogs_form.php:149
 #: ..\..\..\admin\_blogs_form.php:211
-#, fuzzy
 msgid "Permission to edit categories for this blog"
-msgstr "Vous n'avez pas le droit d'éditer les options pour ce blog."
+msgstr "Permission d'éditer les catégories pour ce blog"
 
 #: ..\..\..\admin\_blogs_form.php:156
 #: ..\..\..\admin\_blogs_form.php:215
 msgid "Permission to edit blog properties"
-msgstr ""
+msgstr "Permission de modifier les propriétés de ce blog"
 
 #: ..\..\..\admin\_blogs_form.php:164
-#, fuzzy
 msgid "Non members"
-msgstr "Novembre"
+msgstr "Non membres"
 
 #: ..\..\..\admin\_blogs_form.php:226
-#, fuzzy
 msgid "After each new post..."
-msgstr "Ajout du nouvel article..."
+msgstr "Après chaque nouvel article..."
 
 #: ..\..\..\admin\_blogs_form.php:228
-#, fuzzy
 msgid "Ping b2evolution.net"
-msgstr "Ping de b2evolution.net..."
+msgstr "Ping de b2evolution.net"
 
 #: ..\..\..\admin\_blogs_form.php:228
-msgid "to get listed on the \"recently updated\" list. PLEASE NOTE: If you removed the b2evolution button and the link to b2evolution from your blog, don't even bother enabling this. You will *not* be approved and your blog will be blacklisted. Also, the Full Name of your blog must be written in ISO 8859-1 (Latin-1) charset, otherwise we cannot display it on b2evolution.net. You can use HTML entities (e-g &amp;Kappa;) for non latin chars."
-msgstr ""
+msgid "to get listed on the 'recently updated' list. PLEASE NOTE: If you removed the b2evolution button and the link to b2evolution from your blog, don't even bother enabling this. You will *not* be approved and your blog will be blacklisted. Also, the Full Name of your blog must be written in ISO 8859-1 (Latin-1) charset, otherwise we cannot display it on b2evolution.net. You can use HTML entities (e-g &amp;Kappa;) for non latin chars."
+msgstr "pour être listé sur la liste 'recently updated'. NOTE: Si vous avez enlevé de votre blog le bouton b2evolution et le lien vers b2evolution, ne vous fatiguez même pas à activer cette option. Vous ne serez *pas* validé et vous serez placé sur une liste noire. Aussi, le nom complet de votre blog doit être écrit dans le jeu de caractères ISO 8859-1 (Latin-1) pour que nous puissions le lister sur b2evolution.net. Vous pouvez utiliser des entités HTML (par exemple &amp;Kappa;) pour les caractères non latins."
 
 #: ..\..\..\admin\_blogs_form.php:229
-#, fuzzy
 msgid "Ping technorati.com"
-msgstr "Ping de Technorati.com..."
+msgstr "Ping de Technorati.com"
 
 #: ..\..\..\admin\_blogs_form.php:229
 #: ..\..\..\admin\_blogs_form.php:230
 #: ..\..\..\admin\_blogs_form.php:231
 msgid "to give notice of new post."
-msgstr ""
+msgstr "pour signaler un nouvel article."
 
 #: ..\..\..\admin\_blogs_form.php:230
-#, fuzzy
 msgid "Ping weblogs.com"
-msgstr "Ping de Weblogs.com..."
+msgstr "Ping de Weblogs.com"
 
 #: ..\..\..\admin\_blogs_form.php:231
-#, fuzzy
 msgid "Ping blo.gs"
-msgstr "Ping de Blo.gs..."
+msgstr "Ping de Blo.gs"
 
 #: ..\..\..\admin\_blogs_form.php:238
 msgid "Tagline"
@@ -1762,37 +1704,35 @@ msgstr "Affichée sur le gabarit principal."
 
 #: ..\..\..\admin\_blogs_form.php:260
 msgid "Default display options"
-msgstr ""
+msgstr "Options d'affichage par défaut"
 
 #: ..\..\..\admin\_blogs_form.php:264
 msgid "Display blog list"
-msgstr ""
+msgstr "Afficher la liste des blogs"
 
 #: ..\..\..\admin\_blogs_form.php:264
 msgid "Check this if you want to display the list of all blogs on your blog page (if your skin or template supports this)."
-msgstr ""
+msgstr "Cochez cette case si vous voulez afficher la liste de tous les blogs de votre page (si votre habillage ou gabarit supporte cette fonctionnalité)."
 
 #: ..\..\..\admin\_blogs_form.php:269
 msgid "Advanced options"
-msgstr ""
+msgstr "Options avancées"
 
 #: ..\..\..\admin\_blogs_form.php:271
-#, fuzzy
 msgid "Allow trackbacks"
-msgstr "% Trackbacks"
+msgstr "Autoriser les trackbacks"
 
 #: ..\..\..\admin\_blogs_form.php:271
 msgid "Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs."
-msgstr ""
+msgstr "Autoriser les autres bloggueurs à envoyer des trackbacks vers ce blog afin de vous informer quand ils y font référence. Ceci vous autorise également à envoyer des trackbacks vers d'autres blogs."
 
 #: ..\..\..\admin\_blogs_form.php:272
-#, fuzzy
 msgid "Allow pingbacks"
-msgstr "Ré-autoriser"
+msgstr "Autoriser les pingbacks"
 
 #: ..\..\..\admin\_blogs_form.php:272
 msgid "Allow other bloggers to send pingbacks to this blog, letting you know when they refer to it. This will also let you send pingbacks to other blogs."
-msgstr ""
+msgstr "Autoriser les autres bloggueurs à envoyer des pingbacks vers ce blog afin de vous informer quand ils y font référence. Ceci vous autorise également à envoyer des pingbacks vers d'autres blogs."
 
 #: ..\..\..\admin\_blogs_list.php:21
 msgid "Stub URLname"
@@ -1806,9 +1746,8 @@ msgstr "Lang"
 #: ..\..\..\admin\_cats_list.php:29
 #: ..\..\..\admin\_users_list.php:41
 #: ..\..\..\admin\_users_list.php:56
-#, fuzzy
 msgid "Properties"
-msgstr "Protégé"
+msgstr "Propriétés"
 
 #. TRANS: abbrev. for "generate !"
 #: ..\..\..\admin\_blogs_list.php:60
@@ -1821,9 +1760,8 @@ msgstr "Créer un nouveau blog !"
 
 #: ..\..\..\admin\_cats_list.php:41
 #: ..\..\..\admin\_cats_list.php:57
-#, fuzzy
 msgid "Create"
-msgstr "Création de"
+msgstr "Créer"
 
 #: ..\..\..\admin\_cats_list.php:42
 msgid "New sub-category here"
@@ -1860,6 +1798,8 @@ msgstr "Lien vers url"
 #: ..\..\..\htsrv\_reg_form.php:36
 #: ..\..\..\skins\_feedback.php:169
 #: ..\..\..\skins\_profile.php:69
+#: ..\..\..\skins\basic\_feedback.php:157
+#: ..\..\..\skins\basic\_profile.php:71
 msgid "Email"
 msgstr "Email"
 
@@ -1869,6 +1809,7 @@ msgstr "Email"
 #: ..\..\..\admin\_users_form.php:46
 #: ..\..\..\admin\_users_list.php:28
 #: ..\..\..\skins\_profile.php:70
+#: ..\..\..\skins\basic\_profile.php:72
 msgid "URL"
 msgstr "URL"
 
@@ -1898,12 +1839,11 @@ msgstr "Charger un fichier/image"
 
 #: ..\..\..\admin\_edit_form.php:191
 msgid "Advanced properties"
-msgstr ""
+msgstr "Propriétés avancées"
 
 #: ..\..\..\admin\_edit_form.php:200
-#, fuzzy
 msgid "Edit timestamp"
-msgstr "Date de dernière mise à jour"
+msgstr "Editer la date"
 
 #: ..\..\..\admin\_edit_form.php:238
 msgid "Pingback"
@@ -1996,24 +1936,25 @@ msgstr "Note: l'enregistrement d'articles simultanément dans plusieurs catégorie
 #: ..\..\..\admin\_edit_form.php:392
 #: ..\..\..\admin\_edit_showposts.php:202
 #: ..\..\..\skins\_feedback.php:43
+#: ..\..\..\skins\basic\_feedback.php:43
 msgid "Comments"
 msgstr "Commentaires"
 
 #: ..\..\..\admin\_edit_form.php:394
 msgid "Visitors can leave comments on this post."
-msgstr ""
+msgstr "Les visiteurs peuvent laisser des commentaires sur cet article."
 
 #: ..\..\..\admin\_edit_form.php:394
 msgid "Open"
-msgstr ""
+msgstr "Ouverts"
 
 #: ..\..\..\admin\_edit_form.php:396
 msgid "Visitors can NOT leave comments on this post."
-msgstr ""
+msgstr "Les visiteurs ne peuvent PAS laisser de commentaires sur cet article."
 
 #: ..\..\..\admin\_edit_form.php:396
 msgid "Closed"
-msgstr ""
+msgstr "Fermés"
 
 #: ..\..\..\admin\_edit_form.php:408
 msgid "Comment info"
@@ -2065,9 +2006,8 @@ msgid "by"
 msgstr "par"
 
 #: ..\..\..\admin\_edit_showposts.php:127
-#, fuzzy
 msgid "level:"
-msgstr "Niveau"
+msgstr "niveau:"
 
 #. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 #: ..\..\..\admin\_edit_showposts.php:131
@@ -2107,12 +2047,12 @@ msgid "no comment"
 msgstr "pas de commentaire"
 
 #: ..\..\..\admin\_edit_showposts.php:184
-#: ..\..\..\b2evocore\_functions_comments.php:176
+#: ..\..\..\b2evocore\_functions_comments.php:198
 msgid "1 comment"
 msgstr "1 commentaire"
 
 #: ..\..\..\admin\_edit_showposts.php:184
-#: ..\..\..\b2evocore\_functions_comments.php:177
+#: ..\..\..\b2evocore\_functions_comments.php:199
 #, php-format
 msgid "% comments"
 msgstr "% commentaires"
@@ -2146,38 +2086,45 @@ msgstr ""
 "\\'Annuler\\' pour arrêter, \\'OK\\' pour supprimer."
 
 #: ..\..\..\admin\_edit_showposts.php:249
-#: ..\..\..\b2evocore\_functions_comments.php:175
+#: ..\..\..\b2evocore\_functions_comments.php:197
 #: ..\..\..\skins\_feedback.php:148
+#: ..\..\..\skins\basic\_feedback.php:136
 msgid "Leave a comment"
 msgstr "Laisser un commentaire"
 
 #: ..\..\..\admin\_edit_showposts.php:266
 #: ..\..\..\skins\_feedback.php:171
+#: ..\..\..\skins\basic\_feedback.php:159
 msgid "Your email address will <strong>not</strong> be displayed on this site."
 msgstr "Votre adresse email ne sera <strong>pas</strong> affichée sur ce site."
 
 #: ..\..\..\admin\_edit_showposts.php:271
 #: ..\..\..\skins\_feedback.php:176
+#: ..\..\..\skins\basic\_feedback.php:164
 msgid "Site/Url"
 msgstr "Site/Url"
 
 #: ..\..\..\admin\_edit_showposts.php:273
 #: ..\..\..\skins\_feedback.php:178
+#: ..\..\..\skins\basic\_feedback.php:166
 msgid "Your URL will be displayed."
 msgstr "Votre URL sera affichée."
 
 #: ..\..\..\admin\_edit_showposts.php:278
 #: ..\..\..\skins\_feedback.php:183
+#: ..\..\..\skins\basic\_feedback.php:171
 msgid "Comment text"
 msgstr "Texte du commentaire"
 
 #: ..\..\..\admin\_edit_showposts.php:280
 #: ..\..\..\skins\_feedback.php:185
+#: ..\..\..\skins\basic\_feedback.php:173
 msgid "Allowed XHTML tags"
 msgstr "Balises XHTML autorisées"
 
 #: ..\..\..\admin\_edit_showposts.php:280
 #: ..\..\..\skins\_feedback.php:186
+#: ..\..\..\skins\basic\_feedback.php:174
 msgid "URLs, email, AIM and ICQs will be converted automatically."
 msgstr "Les URLs, adresses email, AIM et ICQ seront converties automatiquement."
 
@@ -2187,6 +2134,7 @@ msgstr "(Les retours à la ligne deviennent des  &lt;br /&gt;)"
 
 #: ..\..\..\admin\_edit_showposts.php:294
 #: ..\..\..\skins\_feedback.php:204
+#: ..\..\..\skins\basic\_feedback.php:192
 msgid "Send comment"
 msgstr "Envoyer commentaire"
 
@@ -2240,13 +2188,12 @@ msgid "Exit to blogs"
 msgstr "Retour aux blogs"
 
 #: ..\..\..\admin\_menutop.php:39
-#, fuzzy
 msgid "Blog time:"
-msgstr "Blogguer ceci !"
+msgstr "Heure du blog:"
 
 #: ..\..\..\admin\_menutop.php:40
 msgid "GMT:"
-msgstr ""
+msgstr "GMT:"
 
 #: ..\..\..\admin\_menutop.php:41
 msgid "Logged in as:"
@@ -2358,27 +2305,32 @@ msgstr "Profil pour:"
 #: ..\..\..\htsrv\_reg_complete.php:14
 #: ..\..\..\htsrv\_reg_form.php:23
 #: ..\..\..\skins\_profile.php:28
+#: ..\..\..\skins\basic\_profile.php:30
 msgid "Login:"
 msgstr "Identifiant:"
 
 #: ..\..\..\admin\_users_form.php:30
 #: ..\..\..\skins\_profile.php:47
+#: ..\..\..\skins\basic\_profile.php:49
 msgid "First name"
 msgstr "Prénom"
 
 #: ..\..\..\admin\_users_form.php:34
 #: ..\..\..\skins\_profile.php:48
+#: ..\..\..\skins\basic\_profile.php:50
 msgid "Last name"
 msgstr "Nom"
 
 #: ..\..\..\admin\_users_form.php:38
 #: ..\..\..\admin\_users_list.php:25
 #: ..\..\..\skins\_profile.php:49
+#: ..\..\..\skins\basic\_profile.php:51
 msgid "Nickname"
 msgstr "Surnom"
 
 #: ..\..\..\admin\_users_form.php:50
 #: ..\..\..\skins\_profile.php:71
+#: ..\..\..\skins\basic\_profile.php:73
 msgid "ICQ"
 msgstr "ICQ"
 
@@ -2397,11 +2349,13 @@ msgstr "YahooIM"
 #: ..\..\..\admin\_users_form.php:70
 #: ..\..\..\admin\_users_list.php:23
 #: ..\..\..\skins\_profile.php:31
+#: ..\..\..\skins\basic\_profile.php:33
 msgid "ID"
 msgstr "Idx"
 
 #: ..\..\..\admin\_users_form.php:72
 #: ..\..\..\skins\_profile.php:42
+#: ..\..\..\skins\basic\_profile.php:44
 msgid "Posts"
 msgstr "Articles"
 
@@ -2410,56 +2364,52 @@ msgid "Identity"
 msgstr "Identité"
 
 #: ..\..\..\admin\_users_form.php:76
-#, fuzzy
 msgid "Created on:"
-msgstr "Création de"
+msgstr "Créé le:"
 
 #: ..\..\..\admin\_users_form.php:78
 msgid "From IP:"
-msgstr ""
+msgstr "IP d'origine:"
 
 #: ..\..\..\admin\_users_form.php:80
 msgid "From Domain:"
-msgstr ""
+msgstr "Domaine d'origine:"
 
 #: ..\..\..\admin\_users_form.php:82
 msgid "With Browser:"
-msgstr ""
+msgstr "Browser utilisé:"
 
 #: ..\..\..\admin\_users_form.php:88
-#, fuzzy
 msgid "User rights"
-msgstr "User Agents"
+msgstr "Droits utilisateur"
 
 #: ..\..\..\admin\_users_form.php:89
 #: ..\..\..\admin\_users_list.php:29
 #: ..\..\..\skins\_profile.php:37
+#: ..\..\..\skins\basic\_profile.php:39
 msgid "Level"
 msgstr "Niveau"
 
 #: ..\..\..\admin\_users_form.php:94
 #: ..\..\..\admin\_users_form.php:98
 msgid "User group"
-msgstr ""
+msgstr "Groupe utilisateur"
 
 #: ..\..\..\admin\_users_groupform.php:17
-#, fuzzy
 msgid "Editing group:"
-msgstr "Edition d'un article"
+msgstr "Edition du groupe:"
 
 #: ..\..\..\admin\_users_groupform.php:24
-#, fuzzy
 msgid "General"
-msgstr "Centralisé"
+msgstr "Général"
 
 #: ..\..\..\admin\_users_groupform.php:31
 msgid "Permissons for members of this group"
-msgstr ""
+msgstr "Permissions pour les membres de ce groupe"
 
 #: ..\..\..\admin\_users_groupform.php:35
-#, fuzzy
 msgid "View all"
-msgstr "Statistiques"
+msgstr "Voir tout"
 
 #: ..\..\..\admin\_users_groupform.php:36
 #: ..\..\..\admin\_users_groupform.php:41
@@ -2468,40 +2418,38 @@ msgstr "Statistiques"
 #: ..\..\..\admin\_users_groupform.php:60
 #: ..\..\..\admin\_users_groupform.php:65
 msgid "Full Access"
-msgstr ""
+msgstr "Accès complet"
 
 #: ..\..\..\admin\_users_groupform.php:39
 #: ..\..\..\admin\_users_groupform.php:44
 #: ..\..\..\admin\_users_groupform.php:49
 #: ..\..\..\admin\_users_groupform.php:58
 msgid "No Access"
-msgstr ""
+msgstr "Accès interdit"
 
 #: ..\..\..\admin\_users_groupform.php:40
 #: ..\..\..\admin\_users_groupform.php:45
 #: ..\..\..\admin\_users_groupform.php:50
 #: ..\..\..\admin\_users_groupform.php:59
 msgid "View only"
-msgstr ""
+msgstr "Visualisation uniquement"
 
 #: ..\..\..\admin\_users_groupform.php:52
 msgid "Global options"
-msgstr ""
+msgstr "Options globales"
 
 #: ..\..\..\admin\_users_groupform.php:53
-#, fuzzy
 msgid "Check to allow template editing."
-msgstr "Edition des gabarits de l'habillage \"custom\""
+msgstr "Cochez pour autoriser l'édition des gabarits."
 
 #: ..\..\..\admin\_users_groupform.php:61
 #: ..\..\..\admin\_users_groupform.php:65
-#, fuzzy
 msgid "User/Group Management"
-msgstr "Gestion des utilisateurs"
+msgstr "Gestion des Utilisateurs/Groupes."
 
 #: ..\..\..\admin\_users_list.php:15
 msgid "Groups &amp; Users"
-msgstr ""
+msgstr "Groupes &amp; Utilisateurs"
 
 #. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_users_list.php:79
@@ -2513,9 +2461,8 @@ msgstr ""
 "Attention: tous ses articles seront supprimés également!"
 
 #: ..\..\..\admin\_users_list.php:95
-#, fuzzy
 msgid "Register a new user..."
-msgstr "S'inscire..."
+msgstr "Inscire un nouvel utilisateur..."
 
 #: ..\..\..\admin\_users_list.php:97
 msgid "To delete an user, bring his/her level to zero, then click on the red cross."
@@ -2532,7 +2479,7 @@ msgstr "L'habillage par défaut [%s] n'existe pas. Il doit être correctement conf
 
 #: ..\..\..\b2evocore\_class_group.php:65
 msgid "New group"
-msgstr ""
+msgstr "Nouveau groupe"
 
 #: ..\..\..\b2evocore\_class_htmlchecker.php:95
 msgid "Parser error: "
@@ -2752,13 +2699,12 @@ msgid "Command failed "
 msgstr "La commande a échoué"
 
 #: ..\..\..\b2evocore\_class_user.php:56
-#, fuzzy
 msgid "New user"
-msgstr "Nouvel article"
+msgstr "Nouvel utilisateur"
 
 #: ..\..\..\b2evocore\_class_user.php:248
 msgid "Permission denied!"
-msgstr ""
+msgstr "Permission refusée!"
 
 #: ..\..\..\b2evocore\_functions.php:37
 msgid "Can't connect to the database server. MySQL said:"
@@ -2787,9 +2733,8 @@ msgid "If nothing happens, click <a %s>here</a>."
 msgstr "Si rien ne se passe, cliquez <a %s>ici</a>."
 
 #: ..\..\..\b2evocore\_functions.php:772
-#, fuzzy
 msgid "No response!"
-msgstr "Réponse"
+msgstr "Pas de réponse!"
 
 #: ..\..\..\b2evocore\_functions.php:777
 msgid "Remote error"
@@ -2852,7 +2797,7 @@ msgstr "Réponse incomplète."
 
 #: ..\..\..\b2evocore\_functions_antispam.php:348
 msgid "No new blacklisted strings are available."
-msgstr ""
+msgstr "Aucune nouvelle entrée n'est disponible."
 
 #: ..\..\..\b2evocore\_functions_antispam.php:352
 msgid "Adding strings to local blacklist"
@@ -2879,7 +2824,7 @@ msgstr "Nouvelle date de dernière mise à jour"
 msgid "Invalid reponse."
 msgstr "Réponse non valide."
 
-#: ..\..\..\b2evocore\_functions_blogs.php:351
+#: ..\..\..\b2evocore\_functions_blogs.php:355
 msgid "Requested blog does not exist!"
 msgstr "Le blog demandé n'existe pas!"
 
@@ -2935,13 +2880,13 @@ msgstr "Impossible de supprimer la dernière catégorie si elle contient des artic
 msgid "Requested category %s does not exist!"
 msgstr "La catégorie demandée %s n'existe pas"
 
-#: ..\..\..\b2evocore\_functions_cats.php:597
+#: ..\..\..\b2evocore\_functions_cats.php:599
 msgid "Category"
 msgstr "Catégorie"
 
 #. TRANS: When the categories for a specific post are displayed, the user can click
 #. on these cats to browse them, this is the default href title displayed there
-#: ..\..\..\b2evocore\_functions_cats.php:662
+#: ..\..\..\b2evocore\_functions_cats.php:664
 msgid "Browse category"
 msgstr "Afficher cette catégorie"
 
@@ -2987,6 +2932,10 @@ msgstr "pas une requête - pas de paramètres!"
 #: ..\..\..\b2evocore\_functions_hitlogs.php:472
 msgid "no query string found"
 msgstr "chaîne de recherche non trouvée"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:521
+msgid "Statistics"
+msgstr "Statistiques"
 
 #: ..\..\..\b2evocore\_functions_pingback.php:23
 msgid "Sending pingbacks..."
@@ -3106,6 +3055,10 @@ msgstr "Ping de Technorati.com..."
 msgid "Archives for"
 msgstr "Archives pour"
 
+#: ..\..\..\b2evocore\_functions_template.php:125
+msgid "Archive Directory"
+msgstr "Liste des Archives"
+
 #: ..\..\..\b2evocore\_functions_trackback.php:22
 msgid "Sending trackbacks..."
 msgstr "Envoi des trackbacks..."
@@ -3194,6 +3147,10 @@ msgstr "Atteindre l'interface d'administration"
 #, php-format
 msgid "Profile (%s)"
 msgstr "Profil (%s)"
+
+#: ..\..\..\b2evocore\_functions_users.php:504
+msgid "User profile"
+msgstr "Profil utilisateur"
 
 #: ..\..\..\b2evocore\_vars.php:108
 msgid "Sunday"
@@ -3381,7 +3338,7 @@ msgstr "Centralisé"
 
 #: ..\..\..\conf\_locales.php:21
 msgid "Czech"
-msgstr ""
+msgstr "Tchèque"
 
 #: ..\..\..\conf\_locales.php:22
 msgid "Dutch"
@@ -3401,7 +3358,7 @@ msgstr "Allemand"
 
 #: ..\..\..\conf\_locales.php:26
 msgid "Italian"
-msgstr ""
+msgstr "Italien"
 
 #: ..\..\..\conf\_locales.php:27
 msgid "Japanese"
@@ -3433,7 +3390,7 @@ msgstr "Chinois simplifié"
 
 #: ..\..\..\htsrv\comment_post.php:23
 msgid "Sorry but comments are now closed for this post."
-msgstr ""
+msgstr "Désolé mais les commentaires sont fermés pour cet article."
 
 #: ..\..\..\htsrv\comment_post.php:36
 msgid "Please fill in the name field"
@@ -3540,7 +3497,7 @@ msgstr "Idx Blog"
 
 #: ..\..\..\htsrv\getmail.php:240
 msgid "Permission denied."
-msgstr ""
+msgstr "Permission refusée."
 
 #: ..\..\..\htsrv\getmail.php:270
 msgid "Posted title"
@@ -3585,12 +3542,12 @@ msgid "Note: You are already logged in!"
 msgstr "Note: Vous êtes déjà identifié!"
 
 #: ..\..\..\htsrv\login.php:106
-#, fuzzy
 msgid "Continue..."
-msgstr "S'identifier..."
+msgstr "Continuer..."
 
 #: ..\..\..\htsrv\profile_update.php:32
 #: ..\..\..\skins\_profile.php:16
+#: ..\..\..\skins\basic\_profile.php:16
 msgid "You are not logged in."
 msgstr "Vous n'êtes pas identifié!"
 
@@ -3735,12 +3692,12 @@ msgstr "S'inscire!"
 #: ..\..\..\install\_functions_cafelogupgrade.php:34
 #, php-format
 msgid "This blog holds all your posts upgraded from Cafelog. This blog is named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s"
-msgstr ""
+msgstr "Ce blog contient tous vos articles upgradés depuis Cafelog. Ce blog est nommé '%s'. Il porte l'index n°%d dans la base de données. Par défaut, vous y accédez à travers d'un fichier stub nommé '<code>%s</code>'. %s"
 
 #: ..\..\..\install\_functions_create.php:377
 #, php-format
 msgid "This is a demo blog named '%s'. It has index #%d in the database. By default it is accessed through a stub file called '<code>%s</code>'. %s"
-msgstr ""
+msgstr "Ceci est un blog de démo nommé '%s'. Il porte l'index n°%d dans la base de données. Par défaut, vous y accédez à travers d'un fichier stub nommé '<code>%s</code>'. %s"
 
 #: ..\..\..\install\_functions_create.php:379
 #, php-format
@@ -3751,62 +3708,78 @@ msgid ""
 "<br />\n"
 "If you don't want to use skins, use the provided '<code>%s</code>' file instead."
 msgstr ""
+"<br />\n"
+"<br />\n"
+"Vous pouvez éditer ce fichier pour changer l'habillage par défaut utilisé pour ce blog. Vous pouvez également renommer ce fichier vers un nom plus approprié; mais assurez vous de mettre à jour le nouveau nom dans l'administration des blogs.<br />\n"
+"<br />\n"
+"Si vous ne voulez pas utiliser les habillgaes (skins), utilisez le fichier fourni '<code>%s</code>' à la place du fuchier stub."
 
 #: ..\..\..\install\_functions_create.php:392
 msgid "Note: Blog #1 is a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by clearing it's 'Stub Urlname' in the blogs admin."
-msgstr ""
+msgstr "Note: le blog n°1 est un blog très spécial! Il aggège automatiquement tous les articles de tous les autres blogs. Ceci vous permet de suivre facilement tout ce qui est posté sur ce système. Vous pouvez cacher ce blog au public en supprimant son nom URL de fichier stub dans l'administration des blogs."
 
 #: ..\..\..\install\_functions_create.php:413
 msgid "However, the main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links. This is commonly referred to as a 'Blogroll'."
-msgstr ""
+msgstr "Cependant, la finalité principale de ce blog est d'être inclus comme complément à côté d'un autre blog, afin d'y afficher vos liens favoris/apparentés. Ceci est souvent appelé une liste 'Blogroll'."
 
 #: ..\..\..\skins\_blogroll.php:61
 msgid "more"
 msgstr "suite"
 
 #: ..\..\..\skins\_feedback.php:48
+#: ..\..\..\skins\basic\_feedback.php:48
 msgid "Trackbacks"
 msgstr "Trackbacks"
 
 #: ..\..\..\skins\_feedback.php:53
+#: ..\..\..\skins\basic\_feedback.php:53
 msgid "Pingbacks"
 msgstr "Pingbacks"
 
 #: ..\..\..\skins\_feedback.php:58
+#: ..\..\..\skins\basic\_feedback.php:58
 msgid "Trackback address for this post:"
 msgstr "Adresse de trackback pour cet article:"
 
 #: ..\..\..\skins\_feedback.php:89
+#: ..\..\..\skins\basic\_feedback.php:88
 msgid "Comment from:"
 msgstr "Commentaire de:"
 
 #: ..\..\..\skins\_feedback.php:104
+#: ..\..\..\skins\basic\_feedback.php:99
 msgid "Trackback from:"
 msgstr "Trackback de:"
 
 #: ..\..\..\skins\_feedback.php:119
+#: ..\..\..\skins\basic\_feedback.php:110
 msgid "Pingback from:"
 msgstr "Pingback de:"
 
 #. TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
 #: ..\..\..\skins\_feedback.php:134
+#: ..\..\..\skins\basic\_feedback.php:122
 #, php-format
 msgid "No %s for this post yet..."
 msgstr "Cet article n'a pas de %s pour le moment..."
 
 #: ..\..\..\skins\_feedback.php:143
+#: ..\..\..\skins\basic\_feedback.php:131
 msgid "Comments are closed for this post."
-msgstr ""
+msgstr "Les commentaires sont ferrmés pour cet article."
 
 #: ..\..\..\skins\_feedback.php:195
+#: ..\..\..\skins\basic\_feedback.php:183
 msgid "Line breaks become &lt;br /&gt;"
 msgstr "Les retours à la ligne deviennent des  &lt;br /&gt;"
 
 #: ..\..\..\skins\_feedback.php:198
+#: ..\..\..\skins\basic\_feedback.php:186
 msgid "Remember me"
 msgstr "Se rappeler de moi"
 
 #: ..\..\..\skins\_feedback.php:198
+#: ..\..\..\skins\basic\_feedback.php:186
 msgid "(Set cookies for name, email &amp; url)"
 msgstr "(Placer des cookies pour le nom, l'email &amp; l'url)"
 
@@ -3824,35 +3797,42 @@ msgid "Original post on %s"
 msgstr "Article original sur %s"
 
 #: ..\..\..\skins\_profile.php:53
+#: ..\..\..\skins\basic\_profile.php:55
 msgid "Identity shown"
 msgstr "Identité affichée"
 
 #: ..\..\..\skins\_profile.php:72
-#, fuzzy
+#: ..\..\..\skins\basic\_profile.php:74
 msgid "AOL I.M."
-msgstr "MSN I.M."
+msgstr "AOL I.M."
 
 #: ..\..\..\skins\_profile.php:73
+#: ..\..\..\skins\basic\_profile.php:75
 msgid "MSN I.M."
 msgstr "MSN I.M."
 
 #: ..\..\..\skins\_profile.php:74
+#: ..\..\..\skins\basic\_profile.php:76
 msgid "Yahoo I.M."
 msgstr "Yahoo I.M."
 
 #: ..\..\..\skins\_profile.php:76
+#: ..\..\..\skins\basic\_profile.php:78
 msgid "Notifications"
-msgstr ""
+msgstr "Notifications"
 
 #: ..\..\..\skins\_profile.php:76
+#: ..\..\..\skins\basic\_profile.php:78
 msgid "Check this to receive notification whenever one of your posts receives comments, trackbacks, etc."
-msgstr ""
+msgstr "Cochez pour recevoir une notification à chaque fois que l'un de vos articles reçoit un commentaire, trackback, etc."
 
 #: ..\..\..\skins\_profile.php:80
+#: ..\..\..\skins\basic\_profile.php:82
 msgid "New password"
 msgstr "Nouveau mot de passe"
 
 #: ..\..\..\skins\_profile.php:85
+#: ..\..\..\skins\basic\_profile.php:87
 msgid "Confirm new password"
 msgstr "Confirmez le nouveau mot de passe"
 
@@ -3864,35 +3844,49 @@ msgstr "Moteurs de recherche référents les plus fréquents"
 msgid "blogs"
 msgstr "blogs"
 
-#: ..\..\..\skins\babyblues\_main.php:88
+#: ..\..\..\skins\babyblues\_main.php:93
 msgid "skin the site"
 msgstr "habillez le site"
 
-#: ..\..\..\skins\babyblues\_main.php:96
-#: ..\..\..\skins\originalb2\_main.php:146
+#: ..\..\..\skins\babyblues\_main.php:101
+#: ..\..\..\skins\originalb2\_main.php:149
 msgid "archives"
 msgstr "archives"
 
-#: ..\..\..\skins\bluesky\_main.php:70
-#: ..\..\..\skins\guadeloupe\_main.php:70
-msgid "Display feedback / Leave a comment"
-msgstr "Afficher les retours / Laisser un commentaire"
+#: ..\..\..\skins\basic\_bloglist.php:17
+msgid "Select blog:"
+msgstr "Sélection d'un blog:"
 
-#: ..\..\..\skins\bluesky\_main.php:157
-#: ..\..\..\skins\guadeloupe\_main.php:158
-msgid "Choose a skin"
-msgstr "Choisissez un habillage"
+#: ..\..\..\skins\basic\_main.php:33
+msgid "Select skin:"
+msgstr "Sélection d'un habillage:"
 
-#: ..\..\..\skins\custom\_main.php:79
+#: ..\..\..\skins\basic\_main.php:78
+#: ..\..\..\skins\custom\_main.php:77
 msgid "words"
 msgstr "mots"
 
-#: ..\..\..\skins\custom\_main.php:195
-#: ..\..\..\skins\fplanque2002\_main.php:207
+#  TRANS: this is the default text for the extended post "more" link
+#: ..\..\..\skins\basic\_main.php:83
+msgid "Read more..."
+msgstr "Lire la suite..."
+
+#: ..\..\..\skins\bluesky\_main.php:77
+#: ..\..\..\skins\guadeloupe\_main.php:77
+msgid "Display feedback / Leave a comment"
+msgstr "Afficher les retours / Laisser un commentaire"
+
+#: ..\..\..\skins\bluesky\_main.php:164
+#: ..\..\..\skins\guadeloupe\_main.php:165
+msgid "Choose a skin"
+msgstr "Choisissez un habillage"
+
+#: ..\..\..\skins\custom\_main.php:193
+#: ..\..\..\skins\fplanque2002\_main.php:205
 msgid "Choose skin"
 msgstr "Choisissez l'habillage"
 
-#: ..\..\..\skins\originalb2\_main.php:44
+#: ..\..\..\skins\originalb2\_main.php:47
 msgid "Browse all posts by this author"
 msgstr "Parcourir tous les articles de cet auteur"
 
