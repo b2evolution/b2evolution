@@ -62,7 +62,7 @@ class Settings
 		}
 		else
 		{
-			$Debuglog->add("Setting '$setting' not defined.");
+			$Debuglog->add("Queried setting '$setting' not defined.");
 			return false;
 		}
 	}

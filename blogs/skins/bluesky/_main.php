@@ -237,7 +237,7 @@
 </li>
 </ul>
 
-Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="logo" /></a>
+Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="logo" /></a>
 
 </div>
 

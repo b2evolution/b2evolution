@@ -6,7 +6,6 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @todo: alternate lines with two different colors
  * @todo: thumbnail view
  * @todo: PHPInfo (special permission)
  * @todo: directly run PHP-code (eval)
@@ -29,10 +28,6 @@ param( 'file', 'string', '' );       // selected file
 param( 'order', 'string', 'name' );
 param( 'asc', 'string', '#' );
 
-if( $current_User->login == 'demouser' )
-{
-}
-else
 if( $current_User->level < 10 )
 {
 	die( 'This is alpha. You need user level 10 to play with this.' );

@@ -107,7 +107,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 	# This is the class of for the other blog links:
 	$blog_other_link_class = 'NavButton2';
 	# This is additionnal markup before and after the selected blog name
-	$blog_selected_name_before = '<span class="small"><img src="'. $img_url.'/down_small.gif" width="14" height="12" border="0" alt="['.T_('Selected').']" title="" class="top" />';
+	$blog_selected_name_before = '<span class="small"><img src="'. $img_url.'/down_small.gif" width="14" height="12" alt="['.T_('Selected').']" title="" class="top" />';
 	$blog_selected_name_after = '</span>';
 	# This is additionnal markup before and after the other blog names
 	$blog_other_name_before = '<span class="small">';
@@ -337,7 +337,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 	<tr>
 	<td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
 
-	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="img/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></td>
+	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
 	</tr>
 </table>
 <p class="baseline">

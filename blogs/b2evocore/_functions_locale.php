@@ -318,10 +318,10 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 	
 	$r = '<img src="'.$iurl.'/'.$collection.'/'.$country.'.gif" alt="' . 
 				(isset($locales[$locale]['name']) ? $locales[$locale]['name'] : $locale) .
-				'" border="1" ';
+				'"';
 	if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 	if( !empty( $align ) ) $r .= ' align="'.$align.'"';
-	$r .= '/> ';
+	$r .= ' /> ';
 	
 	if( $disp )
 		echo $r;   // echo it

@@ -131,10 +131,10 @@ class FileManager
 				if( is_dir( $this->cwd.'/'.$entry ) )
 				{
 					$this->entries[ $i ]['type'] = 'dir';
-					$this->entries[ $i ]['size'] = '&lt;DIR&gt;';
+					#$this->entries[ $i ]['size'] = '&lt;DIR&gt;';
 					if( $this->fulldirsize )
 						$this->entries[ $i ]['size'] = $this->get_dirsize( $this->cwd.'/'.$entry );
-					else $this->entries[ $i ]['size'] = '[dir]';
+					else $this->entries[ $i ]['size'] = false;
 				}
 				else
 				{

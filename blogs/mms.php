@@ -678,7 +678,7 @@ if ( strlen( $post_title ) == 0 )
 	else $post_title = date( 'H:i', $localtimenow );
 }
 
-$parts=$md->parts;
+$parts = $md->parts;
 $content = $text . '<br />';
 
 for ( $i = 0; $i < sizeof( $parts ); $i++ )
@@ -690,8 +690,14 @@ for ( $i = 0; $i < sizeof( $parts ); $i++ )
 	if ( $ext != '.smil' )
 	{
 		$filename = 'mms' . mktime() . $ext;
-		$part->writeToFile ( $fileupload_realpath . '/' . $filename );
-		$content .= '<img src="' . $fileupload_url . '/' . $filename . '" border="0" alt="" /><br />';
+		$part->writeToFile ( $fileupload_realpath.'/'.$filename );
+		
+		$content .= '<img src="'.$fileupload_url.'/'.$filename.'"';
+		if( $img_dimensions = getimagesize( $fileupload_realpath.'/'.$filename ) )
+		{ // add 'width="xx" height="xx"'
+			$content .= ' '.$img_dimensions[3];
+		}
+		$content .= ' alt="" /><br />';
 	}
 }
 // $sizeofparts = calcSize( $md ) / 1024;

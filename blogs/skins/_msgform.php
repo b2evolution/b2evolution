@@ -10,10 +10,8 @@
 	 *
 	 * $Id$
 	 */
-	if( substr(basename($_SERVER['SCRIPT_FILENAME']), 0, 1) == '_' )
-		die('Please, do not access this page directly.');
+	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
-	// --- //
 
 	// Parameters
 	param( 'redirect_to', 'string', '' );

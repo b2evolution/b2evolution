@@ -139,7 +139,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		<div class="sidetitle" align="center">credits</div>
 		<div class="sidebody">
 		design from <a href="http://lifeisadiaper.com" title="designed by Sabrina">Sabrina</a><br />
-		powered by <a href="http://b2evolution.net/"title="b2evolution home"><img src="../../img/b2evolution_button.png" width="80" height="15" class="middle" alt="b2evolution" border="0" /></a><br />
+		powered by <a href="http://b2evolution.net/"title="b2evolution home"><img src="../../img/b2evolution_button.png" width="80" height="15" class="middle" alt="b2evolution" /></a><br />
 		</div>
 
 	</div>

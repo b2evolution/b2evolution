@@ -51,7 +51,7 @@ $timestamp = time() - 120; // We start dates 2 minutes ago because their dates i
 </head>
 <body>
 <div id="rowheader" >
-	<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
+	<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" /></a></h1>
 	<div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
 	<h1 id="version"><?php echo T_('Installer for version '), ' ', $b2_version ?></h1>
 	<div id="quicklinks">

@@ -119,7 +119,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 				form_info( T_('Locale'), $edited_User->dget('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
 			}
 			
-			$fieldnote = '<a href="mailto:'.$edited_User->get('email').'"><img src="img/play.png" border="0" height="14" width="14" alt="&gt;" title="'.T_('Send an email').'" /></a>';
+			$fieldnote = '<a href="mailto:'.$edited_User->get('email').'"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Send an email').'" /></a>';
 
 			if( $allowed_to_edit )
 				form_text( 'edited_user_email', $edited_User->dget('email', 'formvalue'), 50, T_('Email'), $fieldnote, 100 );
@@ -132,7 +132,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 				{
 					$url = 'http://'.$url;
 				}
-				$fieldnote = '<a href="'.$url.'" target="_blank"><img src="img/play.png" border="0" height="14" width="14" alt="&gt;" title="'.T_('Visit the site').'" /></a>';
+				$fieldnote = '<a href="'.$url.'" target="_blank"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Visit the site').'" /></a>';
 			}
 			else $fieldnote = '';
 			if( $allowed_to_edit )
@@ -142,7 +142,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			
 			if( $edited_User->get('icq') != 0 )
 			{
-				$fieldnote = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$edited_User->get('icq').'" target="_blank"><img src="img/play.png" border="0" height="14" width="14" alt="&gt;" title="'.T_('Search on ICQ.com').'" /></a>';
+				$fieldnote = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$edited_User->get('icq').'" target="_blank"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Search on ICQ.com').'" /></a>';
 			}
 			else $fieldnote = '';
 			if( $allowed_to_edit )
@@ -152,7 +152,7 @@ $allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
 			
 			if( $edited_User->get('aim') != '' )
 			{
-				$fieldnote = '<a href="aim:goim?screenname='.$edited_User->get('aim').'&amp;message=Hello"><img src="img/play.png" border="0" height="14" width="14" alt="&gt;" title="'.T_('Instant Message to user').'" /></a>';
+				$fieldnote = '<a href="aim:goim?screenname='.$edited_User->get('aim').'&amp;message=Hello"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Instant Message to user').'" /></a>';
 			}
 			else $fieldnote = '';
 			if( $allowed_to_edit )

@@ -105,7 +105,8 @@ class smilies_Rendererplugin extends RendererPlugin
 					$smiley_masked .=  '&#'.ord(substr($smiley, $i, 1)).';';
 				}
 	
-				$this->replace[] = "<img src='$this->smilies_path/$img' border='0' alt='$smiley_masked' class='middle' />";
+				// QUESTION: use getimagesize() here?
+				$this->replace[] = '<img src="'.$this->smilies_path/$img.'" alt="'.$smiley_masked.'" class="middle" />';
 			}
 		}
 
