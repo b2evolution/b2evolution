@@ -49,6 +49,54 @@ function user_delete( $post_id )
 }
 
 
+/*
+ * veriflog(-)
+ *
+ * Verify if user is logged in 
+ * checking login & pass in the database 
+ */
+function veriflog()
+{
+	global $tableusers, $cookie_user, $cookie_pass, $error;
+
+	if( !isset($_COOKIE[$cookie_user]) || !isset($_COOKIE[$cookie_pass]) )
+	{
+		$error = T_('You must log in!');
+		return false;
+	}
+
+	$user_login = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_user]) : $_COOKIE[$cookie_user]));
+	$user_pass_md5 = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_pass]) : $_COOKIE[$cookie_pass]));
+	// echo 'pass=', $user_pass_md5;
+
+	if($user_login == '' || $user_pass_md5 == '')
+	{
+		$error = T_('You must log in!');
+		return false;
+	}
+	
+	$query = "SELECT user_login, user_pass FROM $tableusers WHERE user_login = '$user_login' AND user_pass = '" . $user_pass_md5 . "'";
+	$result = @mysql_query($query) or die("Query: $query<br /><br />Error: ".mysql_error());
+
+	$lines = mysql_num_rows($result);
+	if ($lines < 1)
+	{
+		$error='<strong>'. T_('ERROR'). "</strong>: ". T_('login no longer exists');
+		return false;
+	} 
+	else
+	{
+		$res = mysql_fetch_assoc($result);
+		if ($res['user_login'] == $user_login && $res['user_pass'] == $user_pass_md5)
+		{
+			return true;
+		} else {
+			$error='<strong>'. T_('ERROR'). "</strong>: ". T_('login/password no longer valid');
+			return false;
+		}
+	}
+}
+
 
 function user_pass_ok($user_login,$user_pass) {
 	global $cache_userdata,$use_cache;

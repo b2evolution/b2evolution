@@ -5,7 +5,6 @@ require_once(dirname(__FILE__)."/../conf/b2evo_admin.php");
 require_once(dirname(__FILE__)."/$b2inc/_vars.php");
 require_once(dirname(__FILE__)."/$b2inc/_functions_locale.php"); // locale related functions
 require_once(dirname(__FILE__)."/$b2inc/_functions_template.php");
-require_once(dirname(__FILE__)."/$b2inc/_verifauth.php");
 require_once(dirname(__FILE__)."/$b2inc/_functions.php");
 require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpc.php");
 require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpcs.php");
@@ -13,6 +12,24 @@ require_once(dirname(__FILE__)."/$b2inc/_functions_xmlrpcs.php");
 if (!isset($debug))		$debug=0;
 
 timer_start();
+
+if( $use_gzipcompression && extension_loaded('zlib') )
+{	// gzipping the output of the script
+	ob_start( 'ob_gzhandler' );
+}
+
+// Connecting to the db:
+dbconnect();
+
+if(!veriflog())
+{	// If user is not loggued in:
+	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+	header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+	header("Cache-Control: no-cache, must-revalidate");
+	header("Pragma: no-cache");
+	require(dirname(__FILE__).'/b2login.php');
+	exit();
+}
 
 get_currentuserinfo();
 

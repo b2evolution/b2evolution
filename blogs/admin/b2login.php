@@ -261,9 +261,14 @@ textarea,input,select {
 			echo '<a href="b2login.php">', T_('Click here to login !'), '</a></p>';
 			die();
 		}
+		else
+		{
+			$random_password = substr(md5(uniqid(microtime())),0,6);
+			$query = "UPDATE $tableusers SET user_pass = '" . md5($random_password) . "' WHERE user_login = '$user_login'";
+			$result = mysql_query($query) or mysql_oops( $query );
 
-		$message  = T_('Login:')." $user_login\r\n";
-		$message .= T_('Password:')." $user_pass\r\n";
+			$message  = T_('Login:')." $user_login\r\n";
+			$message .= T_('New Password:')." $random_password\r\n";
 
 		// DEBUG!
 		// echo $message;
