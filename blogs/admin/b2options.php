@@ -18,6 +18,7 @@ param( 'tab', 'string', 'general' );
 param( 'prioup', 'string', '' );
 param( 'priodown', 'string', '' );
 param( 'delete', 'string', '' );
+param( 'notransext', 'int', 0 );
 
 switch( $tab )
 {
@@ -426,7 +427,9 @@ $current_User->check_perm( 'options', 'view', true );
 					echo '<li class="current">';
 				else
 					echo '<li>';
-				echo '<a href="b2options.php?tab=regional">'. T_('Regional'). '</a></li>';
+				echo '<a href="b2options.php?tab=regional';
+				if( $notransext ) echo '&amp;notransext=1';
+				echo '">'. T_('Regional'). '</a></li>';
 		
 				if( $tab == 'plugins' )
 					echo '<li class="current">';

@@ -434,7 +434,7 @@ form.bComment /* New comment form */
 
 .bSmallHead {
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 80%;
+	font-size: 85%;
 	margin-top: 8px;
 	margin-bottom: 8px;
 	color: #8ae;
@@ -529,7 +529,7 @@ input.SearchField {
 
 
 /* Calendar: */
-caption.bCalendarMonth {
+caption.bCalendarCaption {
 	border-left: solid 1px #ccc;
 	border-right: solid 1px #ccc;
 	border-top: solid 1px #ccc;

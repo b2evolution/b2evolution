@@ -10,7 +10,6 @@
  */
 
 param( 'locale', 'string', '' );
-param( 'notransext', 'int', 0 );
 
 if( !empty($locale) && $action != 'extract' )
 {
@@ -58,7 +57,7 @@ if( !empty($locale) && $action != 'extract' )
 		form_text( 'newloc_messages', (isset($ltemplate['messages']) ? $ltemplate['messages'] : ''), 20, T_('Lang file'),
 			T_('the message file being used, from <code>locales</code> subdirectory'), 20 );
 		form_text( 'newloc_priority', (isset($ltemplate['priority']) ? $ltemplate['priority'] : ''), 3, T_('Priority'),
-			T_('The priority for this locale. 1 is highest. It\'s use is for locale autodetect (from HTTP_ACCEPT_LANGUAGE header), when we have more than locale with the requested language. It also affects the order in which locales are shown in dropdown boxes etc.'), 5 );
+			T_('1 is highest. It\'s use is for locale autodetect (from HTTP_ACCEPT_LANGUAGE header), when we have more than locale with the requested language. It also affects the order in which locales are shown in dropdown boxes etc.'), 5 );
 		
 		
 		// generate Javascript array of locales to warn in case of overwriting

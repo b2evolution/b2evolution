@@ -77,8 +77,15 @@ class Calendar
 			$this->year = substr($m, 0, 4);
 			if (strlen($m) < 6)
 			{
-				$this->month = '01';
 				$this->mode = 'year';
+				if( $this->year == date('Y') )
+				{ // we display current year, month gets current
+					$this->month = date('m');
+				}
+				else
+				{
+					$this->month = '01';
+				}
 			} else
 			{
 				$this->month = substr($m, 4, 2);
@@ -131,7 +138,7 @@ class Calendar
 		$this->tablestart = '<table class="bCalendarTable" summary="Monthly calendar with links to each day\'s posts">'."\n";
 		$this->tableend = '</table>';
 
-		$this->monthstart = '<caption class="bCalendarMonth">';
+		$this->monthstart = '<caption class="bCalendarCaption">';
 		$this->monthend = "</caption>\n";
 
 		$this->rowstart = '<tr class="bCalendarRow">' . "\n";
@@ -269,11 +276,11 @@ class Calendar
 			// Create links to previous/next month
 			$previous_month_link = '<a href="'.
 				archive_link( ($this->month > 1) ? $this->year : ($this->year - 1),	($this->month > 1) ? ($this->month - 1) : 12, '', '', false, $file, $params )
-				.'">&lt;</a>&nbsp;&nbsp;';
+				.'" title="'.T_('previoust month').'">&lt;</a>&nbsp;&nbsp;';
 	
 			$next_month_link = '&nbsp;&nbsp;<a href="'.
 				archive_link( ($this->month < 12) ? $this->year : ($this->year + 1), ($this->month < 12) ? ($this->month + 1) : 1, '', '', false, $file, $params )
-				.'">&gt;</a>';
+				.'" title="'.T_('next month').'">&gt;</a>';
 		}
 		else
 		{ // mode is 'year'
@@ -300,10 +307,10 @@ class Calendar
 		{ // create links to previous/next year
 			$previous_year_link = '<a href="'.
 				archive_link( $this->year - 1, ($this->mode == 'month') ? $this->month : '', '', '', false, $file, $params )
-				.'">&lt;&lt;</a>&nbsp;&nbsp;';
+				.'" title="'.T_('previous year').'">&lt;&lt;</a>&nbsp;&nbsp;';
 			$next_year_link = '&nbsp;&nbsp;<a href="'.
 				archive_link( $this->year + 1, ($this->mode == 'month') ? $this->month : '', '', '', false, $file, $params )
-				.'">&gt;&gt;</a>';
+				.'" title="'.T_('next year').'">&gt;&gt;</a>';
 		}
 
 
@@ -323,7 +330,7 @@ class Calendar
 
 				if( $this->linktomontharchive )
 				{	// chosen month with link to archives
-					echo '<a href="'.archive_link( $this->year, $this->month, '', '', false, $file, $params ).'">';
+					echo '<a href="'.archive_link( $this->year, $this->month, '', '', false, $file, $params ).'" title="'.T_('go to month\'s archive').'">';
 				}
 				echo date_i18n($this->monthformat, mktime(0, 0, 0, $this->month, 1, $this->year));
 				if( $this->linktomontharchive )
@@ -356,7 +363,6 @@ class Calendar
 
 		echo $this->rowstart;
 
-		// get time difference between each calendar item
 		if( $this->mode == 'year' )
 		{
 			for ($i = 1; $i < 13; $i = $i + 1)
@@ -386,7 +392,7 @@ class Calendar
 				}
 				elseif( $this->month == $i )
 				{ // current month
-					echo $this->todaycellstart;
+					echo $this->todaycellstart.'hmm';
 				}
 				else
 				{

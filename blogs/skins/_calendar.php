@@ -19,7 +19,7 @@
 	// $Calendar->set( 'tablestart', '<table class="bCalendarTable" summary="Monthly calendar with links to each day\'s posts">' );
 	// $Calendar->set( 'tableend', '</table>' );
 
-	// $Calendar->set( 'monthstart', '<caption class="bCalendarMonth">' );
+	// $Calendar->set( 'monthstart', '<caption class="bCalendarCaption">' );
 	// $Calendar->set( 'monthend', "</caption>\n" );
 
 	// $Calendar->set( 'rowstart', '<tr class="bCalendarRow">' . "\n" );

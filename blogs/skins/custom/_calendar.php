@@ -17,7 +17,7 @@
 
 	// $Calendar->set( 'displaycaption', 1 ); // set this to 0 if you don't want to display the month name
 	// $Calendar->set( 'monthformat', 'F Y' );
-	// $Calendar->set( 'monthstart', '<caption class="bCalendarMonth">' );
+	// $Calendar->set( 'monthstart', '<caption class="bCalendarCaption">' );
 	// $Calendar->set( 'monthend', '</caption>' );
 	
 	// $Calendar->set( 'tablestart', '<table class="bCalendarTable" summary="Monthly calendar with links to each day\'s posts">' );
