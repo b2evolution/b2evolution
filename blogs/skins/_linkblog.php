@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This is the template that displays the linkblog
  *
  * This file is not meant to be called directly.
@@ -8,9 +8,8 @@
 if( substr(basename($_SERVER['SCRIPT_FILENAME']), 0, 1 ) == '_' )
 	die( 'Please, do not access this page directly.' );
 
-if( !$Blog->get('linkblog') )
-{	// No linkblog blog defined, revert to basic linkblog:
-	bloginfo('notes');
+if( !$Blog->get('links_blog_ID') )
+{	// No linkblog blog defined
 	return;
 }
 

@@ -212,11 +212,11 @@ switch($action)
 				param( 'blog_disp_bloglist', 'integer', 0 );
 				$edited_Blog->set( 'disp_bloglist', $blog_disp_bloglist );
 
-				param( 'blog_public', 'integer', 0 );
-				$edited_Blog->set( 'public', $blog_public );
+				param( 'blog_in_bloglist', 'integer', 0 );
+				$edited_Blog->set( 'in_bloglist', $blog_in_bloglist );
 
 				param( 'blog_linkblog', 'integer', 0 );
-				$edited_Blog->set( 'linkblog', $blog_linkblog );
+				$edited_Blog->set( 'links_blog_ID', $blog_linkblog );
 
 				param( 'blog_default_skin', 'string', true );
 				$edited_Blog->set( 'default_skin', $blog_default_skin );
@@ -339,11 +339,11 @@ switch($action)
 				$blog_access_type = $edited_Blog->get( 'access_type' );
 				$blog_siteurl = get_bloginfo( 'subdir' );
 				$blog_stub = get_bloginfo( 'stub' );
-				$blog_linkblog = get_bloginfo( 'linkblog' );
+				$blog_linkblog = get_bloginfo( 'links_blog_ID' );
 				$blog_notes = get_bloginfo( 'notes' );
 				$blog_keywords = get_bloginfo( 'keywords' );
 				$blog_disp_bloglist = get_bloginfo( 'disp_bloglist' );
-				$blog_public = get_bloginfo( 'public' );
+				$blog_in_bloglist = get_bloginfo( 'in_bloglist' );
 				$blog_default_skin = get_bloginfo( 'default_skin' );
 				$blog_force_skin = $edited_Blog->get( 'force_skin' );
 				require( dirname(__FILE__) . '/_blogs_form.php' );

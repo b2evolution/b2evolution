@@ -316,7 +316,7 @@ function upgrade_b2evo_tables()
 							DROP COLUMN blog_filename,
 							ADD COLUMN blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php' AFTER blog_locale,
 							ADD COLUMN blog_force_skin tinyint(1) NOT NULL default 0 AFTER blog_default_skin,
-							ADD COLUMN blog_public tinyint(1) NOT NULL DEFAULT 1";
+							ADD COLUMN blog_in_bloglist tinyint(1) NOT NULL DEFAULT 1 AFTER blog_disp_bloglist";
 		$DB->query( $query );
 
 		$query = "UPDATE $tableblogs

@@ -40,7 +40,7 @@ for( $curr_blog_ID = blog_list_start();
 			$curr_blog_ID != false;
 			 $curr_blog_ID = blog_list_next() )
 {
-	if( !blog_list_iteminfo('public', false) )
+	if( !blog_list_iteminfo( 'in_bloglist', false ) )
 	{ // don't show
 		continue;
 	}

@@ -21,7 +21,7 @@
 	?>
 	</title>
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
-	<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <?php /* -- Please leave this for stats -- */ ?>
+	<meta name="generator" content="b2evolution <?php echo $b2_version ?>" /> <!-- Please leave this for stats -->
 </head>
 <body>
 

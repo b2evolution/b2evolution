@@ -27,7 +27,7 @@ class Blog extends DataObject
 	var $siteurl;
 	var $staticfilename;
 	var $stub;
-	var $linkblog;
+	var $links_blog_ID;
 	var $notes;
 	var $keywords;
 	var $allowtrackbacks = 0;
@@ -39,7 +39,7 @@ class Blog extends DataObject
 	var $default_skin;
 	var $force_skin = 0;
 	var $disp_bloglist = 0;
-	var $public = 1;
+	var $in_bloglist = 1;
 	var $UID;
 
 	/** 
@@ -73,7 +73,7 @@ class Blog extends DataObject
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->staticfilename = $db_row->blog_staticfilename;
 			$this->stub = $db_row->blog_stub;
-			$this->linkblog = $db_row->blog_linkblog;
+			$this->links_blog_ID = $db_row->blog_linkblog;
 			$this->notes = $db_row->blog_notes;
 			$this->keywords = $db_row->blog_keywords;
 			$this->allowtrackbacks = $db_row->blog_allowtrackbacks;
@@ -85,7 +85,7 @@ class Blog extends DataObject
 			$this->default_skin = $db_row->blog_default_skin;
 			$this->force_skin = $db_row->blog_force_skin;
 			$this->disp_bloglist = $db_row->blog_disp_bloglist;
-			$this->public = $db_row->blog_public;
+			$this->in_bloglist = $db_row->blog_in_bloglist;
 			$this->UID = $db_row->blog_UID;
 		}
 	}	

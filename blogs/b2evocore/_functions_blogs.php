@@ -38,7 +38,7 @@ function blog_create(
 	$blog_pingweblogs = 1,
 	$blog_pingblodotgs = 0,
 	$blog_disp_bloglist	= 1,
-	$blog_public = 1,
+	$blog_in_bloglist = 1,
 	$blog_linkblog = 0
 )
 {
@@ -51,7 +51,7 @@ function blog_create(
 						blog_tagline, blog_description, blog_longdesc, blog_locale, blog_notes, blog_keywords,
 						blog_UID, blog_allowtrackbacks, blog_allowpingbacks, blog_pingb2evonet,
 						blog_pingtechnorati, blog_pingweblogs, blog_pingblodotgs, blog_disp_bloglist,
-						blog_public, blog_linkblog )
+						blog_in_bloglist, blog_linkblog )
 	VALUES ( ";
 	$query .= "'".$DB->escape($blog_name)."', ";
 	$query .= "'".$DB->escape($blog_shortname)."', ";
@@ -67,7 +67,7 @@ function blog_create(
 	$query .= "'".$DB->escape($blog_UID)."',
 	$blog_allowtrackbacks, $blog_allowpingbacks,
 	$blog_pingb2evonet, $blog_pingtechnorati, $blog_pingweblogs, $blog_pingblodotgs,
-	$blog_disp_bloglist, $blog_public, $blog_linkblog )	";
+	$blog_disp_bloglist, $blog_in_bloglist, $blog_linkblog )	";
 	if( ! ($DB->query( $query )) )
 		return 0;
 

@@ -94,8 +94,8 @@ function create_b2evo_tables()
 		blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
 		blog_force_skin TINYINT(1) NOT NULL default 0,
 		blog_disp_bloglist TINYINT(1) NOT NULL DEFAULT 1,
+		blog_in_bloglist TINYINT(1) NOT NULL DEFAULT 1,
 		blog_linkblog INT(4) NOT NULL DEFAULT 0,
-		blog_public TINYINT(1) NOT NULL DEFAULT 1,
 		blog_UID VARCHAR(20),
 		PRIMARY KEY	 (blog_ID)
 	)";
