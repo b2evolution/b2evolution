@@ -132,7 +132,7 @@ switch( $action )
 			<div class="panelblock">
 				<h3><?php echo T_('Confirm ban &amp; delete') ?></h3>
 				<?php ban_affected_comments($hit_ID, 'hit_ID') ?>
-				<p><?php printf ( T_('Banning the referer hit %s from the statistics and comments would lead to the deletion of the following %d comments:'), $hit_ID, mysql_affected_rows() ) ?></p>
+				<p><?php printf ( T_('Banning the domain of referer hit #%d from the statistics and comments would lead to the deletion of the following %d comments:'), $hit_ID, mysql_affected_rows() ) ?></p>
 				<table class="thin">
 					<?php while($row_stats = mysql_fetch_array($res_affected_comments)){ ?>
 					<tr>

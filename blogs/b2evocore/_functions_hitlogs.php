@@ -286,7 +286,7 @@ function get_domain_from_hit_ID( $hit_ID )
 {
 	global $tablehitlog, $querycount;
 
-	$sql ="SELECT baseDomain FROM $tablehitlog WHERE visitID = $hit_ID LIMIT 1";
+	$sql ="SELECT baseDomain FROM $tablehitlog WHERE visitID = '$hit_ID' LIMIT 1";
 	$querycount++;
 	$q = mysql_query($sql) or mysql_oops( $sql );
 	while( list($domain) = mysql_fetch_row($q) )
@@ -313,7 +313,7 @@ function domain_ban( $hit_ID )
 	{
 		// Delete all banned comments and stats entries
 		// Stats entries first
-		$sql ="DELETE FROM $tablehitlog WHERE baseDomain = $domain";	// This is quite drastic!
+		$sql ="DELETE FROM $tablehitlog WHERE baseDomain = '$domain'";	// This is quite drastic!
 		$querycount++;
 		mysql_query($sql) or mysql_oops( $sql );
 		
@@ -362,7 +362,7 @@ function remove_ban( $hit_ID )
 {
 	global $tableantispam, $querycount;
 
-	$sql ="DELETE FROM $tableantispam WHERE ID = $hit_ID";
+	$sql ="DELETE FROM $tableantispam WHERE ID = '$hit_ID'";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 }
@@ -378,7 +378,7 @@ function ban_affected_hits($banned, $type)
 	{
 		case "hit_ID":
 			$domain = get_domain_from_hit_ID($banned);
-			$sql = "SELECT * FROM $tablehitlog WHERE baseDomain = $domain ORDER BY baseDomain ASC";
+			$sql = "SELECT * FROM $tablehitlog WHERE baseDomain = '$domain' ORDER BY baseDomain ASC";
 			break;
 		case "keyword":
 		default:
