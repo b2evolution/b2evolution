@@ -95,21 +95,70 @@ require( $core_dirout.$admin_subdir.'img/fileicons/fileicons.php' );
 
 
 /**
- * Represents a file or directory.
+ * Creates an object of the {@link File} class, while providing caching
+ * and making sure that only one reference to a file exists.
+ *
+ * @param string name of the file or directory
+ * @param string path of the file or directory
+ * @return File an {@link File object}
+ */
+function &getFile( $name, $path = NULL )
+{
+	global $cache_File;
+
+	$path = trailing_slash( $path === NULL ? getcwd() : $path );
+	if( isset( $cache_File[$path.$name] ) )
+	{
+		#Log::display( '', '', 'File ['.$path.$name.'] returned from cache!' );
+		return $cache_File[$path.$name];
+	}
+	else
+	{
+		$File =& new File( $name, $path );
+		$cache_File[$path.$name] =& $File;
+		return $File;
+	}
+}
+
+
+/**
+ * Represents a file or directory. Use {@link getFile} to create an instance.
  *
  * @package evocore
  */
 class File
 {
 	/**
-	 * Constructor
+	 * Cached iconfile name
 	 */
-	function File( $name, $path = NULL )
+	var $_iconfilename = NULL;
+
+	/**
+	 * Constructor, not to be meant to called directly. Use {@link getFile()}
+	 * instead, which provides caching and checks that only one object for
+	 * a unique file exists (references).
+	 *
+	 * @param string name of the file / directory
+	 * @param string path to the file / directory
+	 * @return mixed false on failure, File object on success
+	 */
+	function File( $name, $path )
 	{
 		$this->setName( $name );
-		$this->_path = trailing_slash( $path === NULL ? getcwd() : $path );
+		$this->_path = $path;
 
-		if( is_dir( $path.$name ) )
+		$this->refresh();
+	}
+
+
+	/**
+	 * Refreshes (and inits) information about the file.
+	 */
+	function refresh()
+	{
+		$this->_exists = file_exists( $this->_path.$this->_name );
+
+		if( is_dir( $this->_path.$this->_name ) )
 		{
 			$this->_isDir = true;
 			$this->_size = NULL;
@@ -123,6 +172,17 @@ class File
 		// for files and dirs
 		$this->_lastm = @filemtime( $this->_path.$this->_name );
 		$this->_perms = @fileperms( $this->_path.$this->_name );
+	}
+
+
+	/**
+	 * Does the file exist?
+	 *
+	 * @return boolean true, if the file or dir exists; false if not
+	 */
+	function exists()
+	{
+		return $this->_exists;
 	}
 
 
@@ -209,6 +269,37 @@ class File
 	}
 
 
+	function getIconFileName()
+	{
+		global $map_iconfiles, $fm_fileicons;
+		if( $this->_iconfilename !== NULL )
+		{ // cached
+			return $this->_iconfilename;
+		}
+
+		if( $this->isDir() )
+		{
+			$iconfilename = $map_iconfiles['folder']['file'];
+		}
+		else
+		{
+			$iconfilename = $map_iconfiles['file_unknown']['file'];
+			foreach( $fm_fileicons as $ext => $imgfile )
+			{
+				if( preg_match( '/'.$ext.'$/i', $this->_name, $match ) )
+				{
+					$iconfilename = $imgfile;
+					break;
+				}
+			}
+		}
+
+		$this->_iconfilename = $iconfilename;
+
+		return $this->_iconfilename;
+	}
+
+
 	/**
 	 * get size of an image or false if not an image
 	 *
@@ -221,7 +312,8 @@ class File
 
 
 	/**
-	 * get path
+	 * Get path.
+	 *
 	 * @param boolean full path with name?
 	 */
 	function getPath( $withname = false )
@@ -286,7 +378,7 @@ class File
 	 */
 	function rename( $newname )
 	{
-		if( @rename( $this->getPath( true ), $this->getPath().$newname ) )
+		if( rename( $this->getPath( true ), $this->getPath().$newname ) )
 		{
 			$this->setName( $newname );
 			return true;
@@ -295,6 +387,26 @@ class File
 		{
 			return false;
 		}
+	}
+
+
+	/**
+	 * Unlink / Delete the file or folder.
+	 *
+	 * @return boolean true on success, false on failure
+	 */
+	function unlink()
+	{
+		$unlinked = $this->isDir() ?
+								@rmdir( $this->getPath(true) ) :
+								@unlink( $this->getPath(true) );
+		if( !$unlinked )
+		{
+			return false;
+		}
+
+		$this->_exists = false;
+		return true;
 	}
 
 
@@ -324,6 +436,9 @@ class File
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/21 00:14:44  blueyed
+ * moved
+ *
  * Revision 1.2  2004/10/16 01:31:22  blueyed
  * documentation changes
  *

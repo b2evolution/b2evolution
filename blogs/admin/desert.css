@@ -228,7 +228,7 @@ table.grouped tr {
 table.grouped tr:hover,
 table.grouped tr.odd:hover {
 	background-color:#e3dfd0;
-	 cursor: default;
+	cursor: default;
 }
 
 table.grouped td {

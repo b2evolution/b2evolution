@@ -1195,9 +1195,19 @@ function debug_info( $force = false )
 	global $Debuglog;
 	global $DB;
 	global $obhandler_debug;
+	global $cache_imgsize, $cache_File;
 
 	if( $debug || $force )
 	{
+		$Debuglog->add( 'Size of $cache_imgsize: '.count($cache_imgsize), 'memory' );
+		$Debuglog->add( 'Size of $cache_File: '.count($cache_File), 'memory' );
+
+		if( function_exists( 'memory_get_usage' ) )
+		{
+			$Debuglog->add( 'Memory usage: '.bytesreadable(memory_get_usage()), 'memory' );
+		}
+
+
 		echo '<hr class="clear" /><h2>Debug info</h2>';
 
 		if( !$obhandler_debug )
@@ -1494,8 +1504,99 @@ function action_icon( $alt, $title, $img, $url, $width = 13, $height = 13 )
 }
 
 
+/**
+ * Get properties of an icon
+ *
+ * @param string|File icon for what (special purpose or File object)
+ * @param string what to return for that icon ('file', 'url', 'size' {@link imgsize()})
+ * @param string additional parameter (for 'size' {@link imgsize()})
+ */
+function getIcon( $for, $what = 'imgtag', $param = '' )
+{
+	global $fm_fileicons, $map_iconfiles;
+	global $basepath, $admin_subdir, $admin_url;
+
+	if( is_a( $for, 'file' ) )
+	{
+		$iconfile = $for->getIconFileName();
+		if( $iconfile )
+		{
+			$iconfile = 'fileicons/'.$iconfile;
+		}
+	}
+	elseif( isset( $map_iconfiles[$for] ) && isset( $map_iconfiles[$for]['file'] ) )
+	{
+		$iconfile = $map_iconfiles[$for]['file'];
+	}
+	else
+	{
+		$iconfile = false;
+	}
+
+	if( $iconfile === false || !file_exists( $basepath.$admin_subdir.'img/'.$iconfile ) )
+	{
+		return '<div class="error">[no image for '.var_export( $for, true ).'!]</div>';
+		return false;
+	}
+
+	switch( $what )
+	{
+		case 'file':
+			return $iconfile;
+
+		case 'size':
+			if( $what == 'size' )
+			{
+				$iconsize = imgsize( $admin_url.'img/'.$iconfile, $param );
+				return $iconsize;
+			}
+
+		case 'imgtag':
+		case 'url':
+			$iconurl = $admin_url.'img/'.$iconfile;
+			if( $what == 'url' )
+			{
+				return $iconurl;
+			}
+
+		case 'imgtag':
+			$r = '<img class="middle" src="'.$iconurl.'" '
+					.imgsize( $admin_url.'img/'.$iconfile, 'string' )
+					.' alt="';
+
+			if( is_a( $for, 'file' ) )
+			{ // extension as alt-tag for file icons
+				if( $for->isDir() )
+				{
+					$r .= /* TRANS short for directory */ T_('[dir]');
+				}
+				$r .= $for->getExt();
+			}
+			elseif( isset( $map_iconfiles[$for]['alt'] ) )
+			{ // alt-tag from $map_iconfiles
+				$r .= $map_iconfiles[$for]['alt'];
+			}
+			else
+			{ // $for as alt-tag
+				$r .= $for;
+			}
+
+			$r .= '" />';
+			break;
+
+		default:
+			echo 'unknown what: '.$what;
+	}
+
+	return $r;
+}
+
+
 /*
  * $Log$
+ * Revision 1.5  2004/10/21 00:14:44  blueyed
+ * moved
+ *
  * Revision 1.4  2004/10/18 18:34:51  fplanque
  * modified date functions
  *

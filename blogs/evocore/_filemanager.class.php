@@ -129,7 +129,9 @@ class FileManager extends Filelist
 	var $path = '';
 
 	/**
-	 * Remember the mode we're in ('copymove')
+	 * Remember the mode we're in ('file_cmr')
+	 * @var string
+	 * @access protected
 	 */
 	var $mode = NULL;
 
@@ -243,10 +245,34 @@ class FileManager extends Filelist
 		// }}}
 
 
-		$this->url = $url; // base URL, used for created links
+		/**
+		 * base URL, used for created links
+		 */
+		$this->url = $url;
 		$this->mode = empty($mode) ? NULL : $mode; // from global
 
-		$this->source = urldecode( param( 'source', 'string', '' ) );
+		if( $this->mode
+				&& $this->source = urldecode( param( 'source', 'string', '' ) ) )
+		{
+			$sourceName = basename( $this->source );
+			$sourcePath = dirname( $this->source ).'/';
+			if( $this->SourceList =& new Filelist( $sourcePath ) )
+			{ // TODO: should fail for nox-existant sources, or sources where no read-perm
+				$this->SourceList->addFile( $sourceName );
+				$this->keepsource = param( 'keepsource', 'integer', 0 );
+			}
+			else
+			{
+				$this->mode = false;
+			}
+		}
+		else
+		{
+			$this->SourceList = false;
+			$this->source = NULL;
+			$this->keepsource = NULL;
+		}
+
 
 		$this->filterString = $filterString;
 		$this->filterIsRegexp = $filterIsRegexp;
@@ -260,11 +286,6 @@ class FileManager extends Filelist
 		$this->orderasc = ( $asc === NULL  ? NULL : (bool)$asc );
 
 		$this->loadSettings();
-
-
-		// path/url for images (icons)
-		$this->imgpath = $basepath.$admin_subdir.'img/fileicons/';
-		$this->imgurl = $admin_url.'img/fileicons/';
 
 
 		$this->debug( $this->root, 'root' );
@@ -296,6 +317,119 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Display button (icon) to change to the parent directory.
+	 */
+	function dispButtonParent()
+	{
+		if( $link = $this->getLinkParent() )
+		{
+			echo '<a title="'.T_('Go to parent folder').'" href="'.$link.'">'
+						.getIcon( 'folder_parent' ).'</a>';
+		}
+	}
+
+
+	function dispButtonFileEdit( $File = NULL )
+	{
+		if( $File === NULL )
+		{
+			$File = $this->curFile;
+		}
+		if( $link = $this->getLinkFileEdit() )
+		{
+			echo '<a title="'.T_('Edit the file').'" href="'.$link.'">'.getIcon( 'file_edit' ).'</a>';
+		}
+	}
+
+
+	function dispButtonFileEditPerms()
+	{
+		if( $link = $this->getLinkFileEditPerms() )
+		{
+			echo '<a title="'.T_('Edit permissions').'" href="'.$link.'">'
+						.$this->curFile->getPerms( $this->permlikelsl ? 'lsl' : '' ).'</a>';
+		}
+	}
+
+
+	/**
+	 * Display a button to a mode where we choose the destination (name and/or
+	 * folder) of the file or folder.
+	 *
+	 * @param string 'copy', 'move' or 'rename'
+	 */
+	function dispButtonFileCopyMoveRename( $mode )
+	{
+		if( $mode != 'copy' && $mode != 'move' && $mode != 'rename' )
+		{
+			return false;
+		}
+		$url = $this->getCurUrl( NULL, NULL, NULL, NULL, NULL, NULL, 'file_cmr',
+															urlencode( $this->curFile->getPath( true ) ),
+															(int)($mode == 'copy') // keepsource
+														);
+
+		echo '<a href="'.$url.'" target="fileman_copymoverename" onclick="'
+					.$this->getJsPopupCode( $url, 'fileman_copymoverename' )
+					.'" title="';
+		switch( $mode )
+		{
+			case 'copy': echo T_('Copy'); break;
+			case 'move': echo T_('Move'); break;
+			case 'rename': echo T_('Rename'); break;
+		}
+
+		echo '">'.getIcon( 'file_'.$mode ).'</a>';
+	}
+
+
+	function dispButtonFileCopy()
+	{
+		$this->dispButtonFileCopyMoveRename( 'copy' );
+	}
+
+
+	function dispButtonFileMove()
+	{
+		$this->dispButtonFileCopyMoveRename( 'move' );
+	}
+
+
+	function dispButtonFileRename()
+	{
+		$this->dispButtonFileCopyMoveRename( 'rename' );
+	}
+
+
+	function dispButtonFileDelete( $File = NULL )
+	{
+		if( $File === NULL )
+		{
+			$File = $this->curFile;
+		}
+
+		if( $url = $this->getLinkFileDelete( $File ) )
+		{
+			echo '<a title="'.T_('Delete').'" href="'.$url.'" onclick="return confirm(\''
+				.sprintf( /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete [%s]?'),
+				format_to_output( $File->getName(), 'formvalue' ) ).'\');">'
+				.getIcon( 'file_delete' ).'</a>';
+		}
+	}
+
+
+	/**
+	 * Get current mode.
+	 *
+	 * @return string|false 'file_copy', 'file_move', 'file_rename'
+	 */
+	function getMode()
+	{
+		return $this->mode;
+	}
+
+
+	/**
 	 * Get the current url, with all relevant GET params (root, path, filterString,
 	 * filterIsRegexp, order, orderasc).
 	 * Params can be overridden or be forced to
@@ -307,16 +441,18 @@ class FileManager extends Filelist
 	 * @param string override order
 	 * @param string override orderasc
 	 * @param string override mode
+	 * @param string override source
+	 * @param string override keepsource
 	 * @return string the resulting URL
 	 */
 	function getCurUrl( $root = NULL, $path = NULL, $filterString = NULL,
 											$filterIsRegexp = NULL, $order = NULL, $orderasc = NULL,
-											$mode = NULL, $source = NULL )
+											$mode = NULL, $source = NULL, $keepsource = NULL )
 	{
 		$r = $this->url;
 
 		foreach( array('root', 'path', 'filterString', 'filterIsRegexp', 'order',
-										'orderasc', 'mode', 'source' ) as $check )
+										'orderasc', 'mode', 'source', 'keepsource' ) as $check )
 		{
 			if( $$check === false )
 			{ // don't include
@@ -341,10 +477,10 @@ class FileManager extends Filelist
 	 */
 	function getFormHiddenInputs( $root = NULL, $path = NULL, $filterString = NULL,
 															$filterIsRegexp = NULL, $order = NULL, $asc = NULL,
-															$mode = NULL, $source = NULL )
+															$mode = NULL, $source = NULL, $keepsource = NULL )
 	{
 		// get current Url, remove leading URL and '?'
-		$params = preg_split( '/&amp;/', substr( $this->getCurUrl( $root, $path, $filterString, $filterIsRegexp, $order, $asc, $mode, $source ), strlen( $this->url )+1 ) );
+		$params = preg_split( '/&amp;/', substr( $this->getCurUrl( $root, $path, $filterString, $filterIsRegexp, $order, $asc, $mode, $source, $keepsource ), strlen( $this->url )+1 ) );
 
 		$r = '';
 		foreach( $params as $lparam )
@@ -410,9 +546,9 @@ class FileManager extends Filelist
 		if( $this->order == $type )
 		{ // add asc/desc image
 			if( $this->isSortingAsc() )
-				$r .= ' '.$this->getIcon( 'ascending', 'imgtag' );
+				$r .= ' '.$this->getIcon( 'ascending' );
 			else
-				$r .= ' '.$this->getIcon( 'descending', 'imgtag' );
+				$r .= ' '.$this->getIcon( 'descending' );
 		}
 
 		return $r.'</a>';
@@ -430,42 +566,6 @@ class FileManager extends Filelist
 		$this->curFile = parent::getNextFile( $type );
 
 		return $this->curFile;
-	}
-
-
-	function getFileType( $File = NULL )
-	{
-		if( $File === NULL )
-		{
-			$File = $this->curFile;
-		}
-		elseif( is_string( $File ) )
-		{{{ // special names
-			switch( $File )
-			{
-				case 'parent':
-					return T_('Go to parent directory');
-				case 'home':
-					return T_('home directory');
-				case 'descending':
-					return T_('descending');
-				case 'ascending':
-					return T_('ascending');
-				case 'edit':
-					return T_('Edit');
-				case 'copymove':
-					return T_('Copy / Move');
-				case 'rename':
-					return T_('Rename');
-				case 'delete':
-					return T_('Delete');
-				case 'window_new':
-					return T_('Open in new window');
-			}
-			return false;
-		}}}
-
-		return $File->getType();
 	}
 
 
@@ -487,64 +587,68 @@ class FileManager extends Filelist
 	}
 
 
-	function getLinkCurfile( $param = '' )
+	/**
+	 * Get the link to access a file or folder.
+	 *
+	 * @param File file object
+	 * @param boolean force link to a folder (default is to change into that folder).
+	 */
+	function getLinkFile( $File = NULL, $folderAsParam = false )
 	{
-		if( $this->curFile->isDir() && $param != 'forcefile' )
+		if( $File === NULL )
 		{
-			return $this->getCurUrl( NULL, $this->path.$this->curFile->getName() );
+			$File = $this->curFile;
+		}
+		if( $File->isDir() && !$folderAsParam )
+		{
+			return $this->getCurUrl( NULL, $this->path.$File->getName() );
 		}
 		else
 		{
-			return $this->getCurUrl( NULL, $this->path ).'&amp;file='.urlencode( $this->curFile->getName() );
+			return $this->getCurUrl( NULL, $this->path ).'&amp;file='.urlencode( $File->getName() );
 		}
 	}
 
 
-	function getLinkCurfile_editperm()
+	function getLinkFileEditPerms()
 	{
-		return $this->getLinkCurfile('forcefile').'&amp;action=editperm';
+		return $this->getLinkFile( NULL, true ).'&amp;action=editperm';
 	}
 
 
-	function getLinkCurfile_edit()
+	function getLinkFileEdit()
 	{
 		if( $this->curFile->isDir() )
 		{
 			return false;
 		}
-		return $this->getLinkCurfile().'&amp;action=edit';
+		return $this->getLinkFile().'&amp;action=edit';
 	}
 
 
 	/**
-	 * Get the link to a mode where we choose the destination of the file/dir
+	 * Get link to rename a file or folder.
 	 *
-	 * @return string the link
+	 * @return string the URL
 	 */
-	function getLinkCurfile_copymove()
+	function getLinkFileRename()
 	{
-		return $this->getCurUrl( NULL, NULL, NULL, NULL, NULL, NULL, 'copymove',
-															urlencode( $this->curFile->getPath( true ) ) );
+		return $this->getLinkFile( NULL, true ).'&amp;action=rename';
 	}
 
 
 	/**
-	 * get link to delete current file
+	 * Get link to delete a file or folder.
+	 *
 	 * @return string the URL
 	 */
-	function getLinkCurfile_rename()
+	function getLinkFileDelete( $File = NULL )
 	{
-		return $this->getLinkCurfile('forcefile').'&amp;action=rename';
-	}
-
-
-	/**
-	 * get link to delete current file
-	 * @return string the URL
-	 */
-	function getLinkCurfile_delete()
-	{
-		return $this->getLinkCurfile('forcefile').'&amp;action=delete';
+		if( $File === NULL )
+		{
+			$File = $this->curFile;
+		}
+		return $this->getLinkFile( $File, true ).'&amp;action=delete';
 	}
 
 
@@ -569,96 +673,6 @@ class FileManager extends Filelist
 	function getLinkHome()
 	{
 		return $this->getCurUrl( 'user', false );
-	}
-
-
-	/**
-	 * get properties of a special icon
-	 *
-	 * @param string icon for what (special puposes or 'cfile' for current file/dir)
-	 * @param string what to return for that icon (file, url, size {@link see imgsize()}})
-	 * @param string additional parameter (for size)
-	 */
-	function getIcon( $for, $what = 'imgtag', $param = '' )
-	{
-		global $fm_fileicons, $fm_fileicons_special;
-
-		if( is_a( $for, 'file' ) )
-		{
-			if( !$this->curFile )
-			{
-				$iconfile = false;
-			}
-			elseif( $this->curFile->isDir() )
-			{
-				$iconfile = $fm_fileicons_special['folder'];
-			}
-			else
-			{
-				$iconfile = $fm_fileicons_special['unknown'];
-				$filename = $this->curFile->getName();
-				foreach( $fm_fileicons as $ext => $imgfile )
-				{
-					if( preg_match( '/'.$ext.'$/i', $filename, $match ) )
-					{
-						$iconfile = $imgfile;
-						break;
-					}
-				}
-			}
-		}
-		elseif( isset( $fm_fileicons_special[$for] ) )
-		{
-			$iconfile = $fm_fileicons_special[$for];
-		}
-		else
-		{
-			$iconfile = false;
-		}
-
-		if( !$iconfile || !file_exists( $this->imgpath.$iconfile ) )
-		{
-			#return '<div class="error">[no image for '.$for.'!]</div>';
-			return false;
-		}
-
-		switch( $what )
-		{
-			case 'file':
-				$r = $iconfile;
-				break;
-
-			case 'url':
-				$r = $this->imgurl.$iconfile;
-				break;
-
-			case 'size':
-				$r = imgsize( $this->imgpath.$iconfile, $param );
-				break;
-
-			case 'imgtag':
-				$r = '<img class="middle" src="'.$this->getIcon( $for, 'url' ).'" '.$this->getIcon( $for, 'size', 'string' )
-				.' alt="';
-
-				if( is_a( $for, 'file' ) )
-				{ // extension as alt-tag for cfile-icons
-					if( $for->isDir() )
-					{
-						$r .= /* TRANS short for directory */ T_('[dir]');
-					}
-					$r .= $for->getExt();
-				}
-
-				$r .= '" title="'.$this->getFileType( $for );
-
-				$r .= '" />';
-				break;
-
-			default:
-				echo 'unknown what: '.$what;
-		}
-
-		return $r;
 	}
 
 
@@ -979,7 +993,7 @@ class FileManager extends Filelist
 	{
 		if( $href === NULL )
 		{
-			$href = $this->getLinkCurfile().'&amp;mode=browse';
+			$href = $this->getLinkFile().'&amp;mode=browse';
 		}
 		if( $width === NULL )
 		{
@@ -990,7 +1004,7 @@ class FileManager extends Filelist
 			$height = 800;
 		}
 
-		$r = "opened = window.open('$href','$target','status=yes,toolbar=1,resizable=yes,scrollbars=yes,";
+		$r = "opened = window.open('$href','$target','status=yes,toolbar=1,resizable=yes,scrollbars=yes,location=yes,";
 
 		if( $width )
 		{
@@ -1086,10 +1100,40 @@ class FileManager extends Filelist
 	}
 
 
+	/**
+	 * Copies a File object physically to another File object
+	 *
+	 * @param File the source file (expected to exist)
+	 * @param File the target file (expected to not exist)
+	 * @return boolean true on success, false on failure
+	 */
+	function copyFileToFile( $SourceFile, &$TargetFile )
+	{
+		if( !$SourceFile->exists() || $TargetFile->exists() )
+		{
+			return false;
+		}
+		else
+		{
+			if( $r = copy( $SourceFile->getPath(true), $TargetFile->getPath(true) ) )
+			{
+				$TargetFile->refresh();
+				if( !$this->findkey( $TargetFile->getName() ) )
+				{ // File not in filelist (expected)
+					$this->addFile( $TargetFile->getName() );
+				}
+			}
+			return $r;
+		}
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/21 00:14:44  blueyed
+ * moved
+ *
  * Revision 1.2  2004/10/16 01:31:22  blueyed
  * documentation changes
  *

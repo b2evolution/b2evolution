@@ -21,31 +21,37 @@ $demo_mode = false;
 
 
 /**
- * Comments: set this to 1 to require e-mail and name, or 0 to allow comments without e-mail/name
+ * Comments: Set this to 1 to require e-mail and name, or 0 to allow comments
+ * without e-mail/name.
  * @global boolean $require_name_email
  */
 $require_name_email = 1;
 
 /**
- * Minimum interval (in seconds) between consecutive comments from same IP
+ * Minimum interval (in seconds) between consecutive comments from same IP.
  * @global int $minimum_comment_interval
  */
 $minimum_comment_interval = 30;
 
 
-# Set the blog number to be used when not otherwise specified
-# 2 is the default setting, since it is the first user blog created by b2evo
-# 1 is also a popular choice, since it is a special blog aggregating all the others
-if( !isset($default_to_blog) ) $default_to_blog = 2;
+if( !isset($default_to_blog) )
+{ /**
+	 * Set the blog number to be used when not otherwise specified.
+	 * 2 is the default setting, since it is the first user blog created by b2evo.
+	 * 1 is also a popular choice, since it is a special blog aggregating all the others.
+	 * @global int $default_to_blog
+	 */
+	$default_to_blog = 2;
+}
 
 /**
  * Set the length of the online session time out (in seconds).
  *
- * This is for the Who's Online block.
+ * This is for the Who's Online block. Default: 5 minutes (300s).
  *
  * @global int $online_session_timeout
  */
-$online_session_timeout = 300; // default: 5 minutes (300s)
+$online_session_timeout = 300;
 
 
 // Get hostname out of baseurl
@@ -363,7 +369,7 @@ $locales_dirout = '../';                 // Relative path to go back to base
  * @global string $plugins_subdir
  */
 $plugins_subdir = 'plugins/';            // Subdirectory relative to base
-$plugins_dirout = '../';       				   // Relative path to go back to base
+$plugins_dirout = '../';                 // Relative path to go back to base
 /**
  * Location of the install folder.
  * @global string $install_subdir
@@ -387,6 +393,13 @@ $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 
 
-$regexp_images = '/\.(jpe?g|gif|png|swf)$/i'; // match image files
-$regexp_filename = '#^\.?[\w0-9äÄöÖüÜß\-_]+(\.[a-zA-Z0-9]+)?$#'; // match valid filename (no path allowed)
+/**
+ * Regular expression to match image filenames.
+ */
+$regexp_images = '/\.(jpe?g|gif|png|swf)$/i';
+/**
+ * Regular expression to match a valid filename (no path allowed)
+ */
+$regexp_filename = '#^\.?[\w0-9äÄöÖüÜß\-_]+(\.[a-zA-Z0-9]+)?$#';
+
 ?>

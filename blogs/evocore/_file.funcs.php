@@ -136,11 +136,25 @@ function deldir_recursive( $dir )
  */
 function imgsize( $path, $param )
 {
-	if( !($size = @getimagesize( $path )) )
+	/**
+	 * Cache image sizes
+	 */
+	global $cache_imgsize;
+
+	if( isset($cache_imgsize[$path]) )
+	{
+		$size = $cache_imgsize[$path];
+	}
+	elseif( !($size = @getimagesize( $path )) )
 	{
 		return false;
 	}
-	elseif( $param == 'width' )
+	else
+	{
+		$cache_imgsize[$path] = $size;
+	}
+
+	if( $param == 'width' )
 	{
 		return $size[0];
 	}
@@ -318,6 +332,9 @@ function isFilename( $filename )
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/21 00:14:44  blueyed
+ * moved
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

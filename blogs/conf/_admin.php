@@ -157,4 +157,70 @@ $fileupload_allowedusers = '';
  */
 $maxlength_urlname_stub = 30;
 
+
+/**
+ * Map of filenames for icons in the folder admin/img/
+ *
+ * @global array $map_iconfiles
+ */
+$map_iconfiles = array(
+	'folder' => array(        // icon for folders
+		'file' => 'folder.png',
+		'alt' => T_('folder'),
+	),
+	'folder_parent' => array( // go to parent directory
+		'file' => 'up.png',
+		'alt' => T_('Parent folder'),
+	),
+	'folder_home' => array(   // home folder
+		'file' => 'folder_home2.png',
+		'alt' => T_('Home folder'),
+	),
+
+
+	'file_unknown' => array(  // icon for unknown files
+		'file' => 'default.png',
+		'alt' => T_('Unknown file'),
+	),
+	'file_empty' => array(    // empty file
+		'file' => 'empty.png',
+		'alt' => T_('Empty file'),
+	),
+	'file_edit' => array(     // edit a file
+		'file' => 'edit.png',
+		'alt' => T_('Edit'),
+	),
+	'file_copy' => array(     // copy a file/folder
+		'file' => 'filecopy.png',
+		'alt' => T_('Copy'),
+	),
+	'file_move' => array(     // move a file/folder
+		'file' => 'filemove.png',
+		'alt' => T_('Move'),
+	),
+	'file_rename' => array(   // rename a file/folder
+		'file' => 'filerename.png',
+		'alt' => T_('Rename'),
+	),
+	'file_delete' => array(   // delete a file/folder
+		'file' => 'filedelete.png',
+		'alt' => T_('Delete'),
+	),
+
+
+	'window_new' => array(    // open in a new window
+		'file' => 'window_new.png',
+		'alt' => T_('New window'),
+	),
+	'ascending' => array(     // sort ascending
+		'file' => 'ascending.png',
+		'alt' => T_('ascending'),
+	),
+	'descending' => array(    // sort descending
+		'file' => 'descending.png',
+		'alt' => T_('descending'),
+	),
+);
+
+
 ?>

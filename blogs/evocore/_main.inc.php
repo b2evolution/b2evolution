@@ -72,7 +72,7 @@ $main_init = true;
  */
 require_once( dirname(__FILE__).'/../conf/_config.php' );
 if( !$config_is_done )
-{ // base config is not done!
+{
 	$error_message = 'Base configuration is not done! (see /conf/_config.php)';
 }
 elseif( !isset( $locales[$default_locale] ) )
@@ -80,8 +80,8 @@ elseif( !isset( $locales[$default_locale] ) )
 	$error_message = 'The default locale does not exist! (see /conf/_locales.php)';
 }
 if( isset( $error_message ) )
-{
-	require dirname(__FILE__).'/_conf_error.inc.php';	// error & exit
+{ // error & exit
+	require dirname(__FILE__).'/_conf_error.inc.php';
 }
 
 
@@ -123,24 +123,36 @@ timer_start();
 require_once( dirname(__FILE__).'/_vars.inc.php' );
 
 
+require_once( dirname(__FILE__).'/_db.class.php' );
 /**
  * Database connection (connection opened here)
  *
  * @global DB $DB
  */
-require_once( dirname(__FILE__).'/_db.class.php' );
 $DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $db_aliases );
 
 require_once( dirname(__FILE__).'/_results.class.php' );
 
 
+/**#@+
+ * Load settings class
+ */
+require_once( dirname(__FILE__).'/_generalsettings.class.php' );
+require_once( dirname(__FILE__).'/_usersettings.class.php' );
+/**#@-*/
 /**
  * Interface to general settings
  *
  * @global GeneralSettings $Settings
  */
-require_once( dirname(__FILE__).'/_generalsettings.class.php' );
 $Settings = & new GeneralSettings();
+/**
+ * Interface to user settings
+ *
+ * @global UserSettings $UserSettings
+ */
+$UserSettings = & new UserSettings();
+
 
 /**
  * Absolute Unix timestamp for server
@@ -152,15 +164,6 @@ $servertimenow = time();
  * @global int $localtimenow
  */
 $localtimenow = $servertimenow + ($Settings->get('time_difference') * 3600);
-
-
-/**
- * Interface to user settings
- *
- * @global UserSettings $UserSettings
- */
-require_once( dirname(__FILE__).'/_usersettings.class.php' );
-$UserSettings = & new UserSettings();
 
 
 /**
@@ -279,6 +282,9 @@ $hit_type = filter_hit();
 
 /*
  * $Log$
+ * Revision 1.5  2004/10/21 00:14:44  blueyed
+ * moved
+ *
  * Revision 1.4  2004/10/17 20:18:37  fplanque
  * minor changes
  *

@@ -202,7 +202,11 @@ class Filelist
 
 
 	/**
-	 * Add a file to the list
+	 * Add a file to the list. If the file already exists in the list.
+	 *
+	 * @param string file name or full path
+	 * @param boolean allow other paths than the lists default path?
+	 * @return File|false File on success, false on failure
 	 */
 	function addFile( $name, $allPaths = false )
 	{
@@ -214,12 +218,17 @@ class Filelist
 			}
 			else
 			{
-				$entry =& new File( basename($name), dirname($name).'/' );
+				$entry =& getFile( basename($name), dirname($name).'/' );
 			}
 		}
 		else
 		{
-			$entry =& new File( $name, $this->listpath );
+			$entry =& getFile( $name, $this->listpath );
+		}
+
+		if( !$entry->exists() )
+		{
+			return false;
 		}
 
 		if( $this->recursivedirsize && $entry->isDir( $this->listpath.$name ) )
@@ -237,7 +246,7 @@ class Filelist
 		}
 		$this->count_bytes += $entry->getSize();
 
-		$this->entries[] = $entry;
+		$this->entries[] =& $entry;
 
 		return $entry;
 	}
@@ -470,31 +479,6 @@ class Filelist
 
 
 	/**
-	 * wrapper to get properties of a specific file.
-	 *
-	 * @param string the file (in cwd)
-	 * @param string what to get
-	 * @param mixed optional parameter
-	 */
-	function cget_file( $file, $what, $param = '', $displayiftrue = '' )
-	{
-		echo 'obsolete call to cget_file!';
-		return false;
-		if( $this->loadc( $file ) )
-		{
-			$r = $this->cget( $what, $param, $displayiftrue );
-		}
-		else
-		{
-			return false;
-		}
-
-		$this->restorec();
-		return $r;
-	}
-
-
-	/**
 	 * finds an entry ('name' field) in the entries array
 	 *
 	 * @access protected
@@ -520,31 +504,32 @@ class Filelist
 	 * @param File file object
 	 * @return boolean true on success, false on failure
 	 */
-	function unlink( $File )
+	function unlink( &$File )
 	{
-		foreach( $this->entries as $lkey => $lentry )
+		$origFile = $File; // copy!
+
+		if( !($unlinked = $File->unlink()) )
 		{
-			if( $lentry == $File )
+			return false;
+		}
+		else
+		{ // remove from list
+
+			if( $entryKey = $this->findkey( $File->getName() ) )
 			{
-				$unlinked = $File->isDir() ?
-										@rmdir( $File->getPath(true) ) :
-										@unlink( $lentry->getPath(true) );
-
-				if( !$unlinked )
-				{
-					return false;
-				}
-
-				unset( $this->entries[$lkey] );
-				return true;
+				unset( $this->entries[$entryKey] );
 			}
 		}
-		return false;
+		return true;
 	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/21 00:14:44  blueyed
+ * moved
+ *
  * Revision 1.2  2004/10/16 01:31:22  blueyed
  * documentation changes
  *

@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the file icons for the File class. {{{
+ * This file implements the file icons for the File class.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -38,31 +38,9 @@
  *
  * Most of the default sets icons are from the crystal icon package {@link http://www.everaldo.com/crystal.html}
  *
- * @version $Id$ }}}
+ * @version $Id$
  *
  */
-
-/**
- * Icons for special purposes
- */
-$fm_fileicons_special = array(
-	'unknown' => 'default.png',  // icon for unknown files
-	'folder' => 'folder.png',    // icon for folders
-	'parent' => 'up.png',        // go to parent directory
-	'home' => 'folder_home2.png', // home folder
-	'empty' => 'empty.png',      // empty file
-
-	'ascending' => 'ascending.png',
-	'descending' => 'descending.png',
-
-	'edit' => 'edit.png',
-	'copymove' => 'editcopy.png',
-	'rename' => 'item_rename.png',
-	'delete' => 'editdelete.png',
-
-	'window_new' => 'window_new.png',
-);
-
 
 /**
  * These are the file icons. The extension is a regular expression that must match the end of the file.
