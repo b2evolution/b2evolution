@@ -143,7 +143,7 @@ $current_User->check_perm( 'options', 'view', true );
 		<fieldset>
 			<legend><?php echo T_('Regional settings') ?></legend>
 
-			<?php form_text( 'newtime_difference', $time_difference, 2, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 2 );?>
+			<?php form_text( 'newtime_difference', $time_difference, 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );?>
 
 		</fieldset>
 
