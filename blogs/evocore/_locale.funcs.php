@@ -118,7 +118,7 @@ elseif( $use_l10n == 2 )
 		if( !isset($trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
 			// echo 'LOADING', dirname(__FILE__). '/../locales/'. $messages. '/_global.php';
-			@include_once( dirname(__FILE__). '/../locales/'.$messages.'/_global.php' );
+			@include_once dirname(__FILE__).'/../locales/'.$messages.'/_global.php';
 			if( !isset($trans[ $messages ] ) )
 			{ // Still not loaded... file doesn't exist, memorize that no translations are available
 				// echo 'file not found!';
@@ -156,6 +156,17 @@ else
 		return $string;
 	}
 
+}
+
+
+/**
+ * Translate and escape single quotes.
+ *
+ * This is to used mainly for Javascript stings
+ */
+function TS_( $string, $req_locale = '' )
+{
+	return str_replace( "'", "\'", T_( $string, $req_locale ) );
 }
 
 
@@ -670,6 +681,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/14 13:32:08  fplanque
+ * form handling
+ *
  * Revision 1.7  2005/02/11 00:29:57  blueyed
  * added todo, small improvements
  *

@@ -13,7 +13,6 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -70,13 +69,13 @@ $ProfileForm->begin_form( 'bComment' );
 $ProfileForm->hidden( 'checkuser_id', $current_User->ID );
 $ProfileForm->hidden( 'redirect_to', $redirect_to );
 
-$ProfileForm->info( T_('Login'), $current_User->dget('login'), T_('ID').': '.$current_User->ID );
-$ProfileForm->info( T_('Level'), $current_User->dget('level') );
-$ProfileForm->info( T_('Posts'), $current_User->dget('num_posts') );
+$ProfileForm->info( T_('Login'), $current_User->get('login'), T_('ID').': '.$current_User->ID );
+$ProfileForm->info( T_('Level'), $current_User->get('level') );
+$ProfileForm->info( T_('Posts'), $current_User->get('num_posts') );
 
-$ProfileForm->text( 'newuser_firstname', $current_User->dget( 'firstname' ), 40, T_('First name'), '', 50, 'bComment' );
-$ProfileForm->text( 'newuser_lastname', $current_User->dget( 'lastname' ), 40, T_('Last name'), '', 50, 'bComment' );
-$ProfileForm->text( 'newuser_nickname', $current_User->dget( 'nickname' ), 40, T_('Nickname'), '', 50, 'bComment' );
+$ProfileForm->text( 'newuser_firstname', $current_User->get( 'firstname' ), 40, T_('First name'), '', 50, 'bComment' );
+$ProfileForm->text( 'newuser_lastname', $current_User->get( 'lastname' ), 40, T_('Last name'), '', 50, 'bComment' );
+$ProfileForm->text( 'newuser_nickname', $current_User->get( 'nickname' ), 40, T_('Nickname'), '', 50, 'bComment' );
 
 
 $field_options = '';
@@ -136,4 +135,3 @@ $ProfileForm->buttons( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 $ProfileForm->end_form();
 ?>
-<div class="clear"></div>

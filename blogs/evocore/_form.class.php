@@ -93,7 +93,7 @@ class Form extends Widget
 	 * @param string the method used to send data
 	 * @param string the form layout : 'fieldset', 'table' or ''
 	 */
-	function Form( $form_action='', $form_name='', $form_method='post', $layout = 'fieldset' )
+	function Form( $form_action = '', $form_name = '', $form_method = 'post', $layout = 'fieldset' )
 	{
 		$this->form_name = $form_name;
 		$this->form_action = $form_action;
@@ -383,13 +383,13 @@ class Form extends Widget
 							."'".T_($weekday_letter[5])."',"
 							."'".T_($weekday_letter[6])."' );\n"
 				.' cal_'.$field_name.'.setWeekStartDay('.$start_of_week.');
-						cal_'.$field_name.".setTodayText('".T_('Today')."');
+						cal_'.$field_name.".setTodayText('".TS_('Today')."');
 						// -->
 					</script>\n"
 				.'<input type="text" name="'.$field_name.'" id="'.$field_name.'"
 					size="'.$field_size.'" maxlength="'.$field_size.'" value="'.format_to_output($field_value, 'formvalue').'"'
 				." />\n"
-				.'<a href="#" onClick="cal_'.$field_name.'.select(document.forms[0].'.$field_name.",'anchor_".$field_name."', '".$date_format."' );"
+				.'<a href="#" onClick="cal_'.$field_name.'.select(get_form(this).'.$field_name.",'anchor_".$field_name."', '".$date_format."' );"
 				.' return false;" name="anchor_'.$field_name.'" ID="anchor_'.$field_name.'">'.T_('Select').'</a>'
 				.' <span class="notes">('.$date_format.')</span>'
 				.$this->end_field();
@@ -430,22 +430,19 @@ class Form extends Widget
 	 * Builds a checkbox field
 	 *
 	 * @param string the name of the checkbox
-	 * @param boolean initial value
+	 * @param boolean indicating if the checkbox must be checked
 	 * @param string label
 	 * @param string note
 	 * @param string CSS class
-	 * @param a boolean indicating if the checkbox must be checked by default
+	 * @param sting value to use
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checkbox( $field_name, $field_value, $field_label, $field_note = '',
-											$field_class = '', $field_checked = 0 )
+	function checkbox( $field_name, $field_checked, $field_label, $field_note = '',
+											$field_class = '', $field_value = 1 )
 	{
 		$r = $this->begin_field( $field_name, $field_label )
-				.'<input type="checkbox" class="checkbox" name="'.$field_name.'" id="'.$field_name.'" value="1"';
-		if( $field_value )
-		{
-			$r .= ' checked="checked"';
-		}
+				.'<input type="checkbox" class="checkbox" name="'.$field_name.'" id="'.$field_name.'" value="'
+				.format_to_output($field_value,'formvalue').'"';
 		if( !empty($field_class) )
 		{
 			$r .= ' class="'.$field_class.'"';
@@ -776,10 +773,11 @@ class Form extends Widget
 	 *
 	 * @param string the field label
 	 * @param string the field info
+	 * @param string see {@see format_to_output()}
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 * An info field is a fieldset containing a label div and an info div.
 	 */
-	function info( $field_label, $field_info, $field_note = NULL )
+	function info( $field_label, $field_info, $field_note = NULL, $format = 'htmlbody' )
 	{
 		$r = $this->fieldstart;
 
@@ -796,7 +794,8 @@ class Form extends Widget
 
 		$r .= $this->inputstart;
 
-		$r .= $field_info;
+		// PAYLOAD:
+		$r .= format_to_output( $field_info, $format );
 
 		if( !empty($field_note) )
 		{

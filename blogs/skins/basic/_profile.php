@@ -28,16 +28,16 @@
 	<!-- form to add a comment -->
 	<form action="<?php echo $htsrv_url ?>profile_update.php" method="post">
 
-	<input type="hidden" name="checkuser_id" value="<?php echo $current_User->get('ID') ?>" />
+	<input type="hidden" name="checkuser_id" value="<?php $current_User->ID() ?>" />
 
 	<table align="center">
 
 		<tr>
 			<td align="right"><strong><?php echo T_('Login:') ?></strong></td>
-			<td><?php $current_User->disp( 'login', 'htmlhead' ) ?>
+			<td><?php $current_User->disp( 'login' ) ?>
 				-
 				<strong><?php echo T_('ID') ?>:</strong>
-				<?php $current_User->disp( 'ID', 'raw' ) ?>
+				<?php $current_User->ID() ?>
 			</td>
 		</tr>
 
