@@ -2,7 +2,7 @@
 /*
  * b2evolution - http://b2evolution.net/
  *
- * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
 ?>
@@ -22,7 +22,7 @@ if ($debug=="1")
 - 
 <span class="nobr">&copy;2001-2002 by <a href="http://cafelog.com/">Michel V</a></span>
 -
-<span class="nobr">&copy;2003 by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a></span>
+<span class="nobr">&copy;2003-2004 by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a></span>
 </p>
 
 <!-- this is for the spellchecker -->

@@ -2,7 +2,7 @@
 /*
  * b2evolution - http://b2evolution.net/
  *
- * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
  *
  * Modified 2004 by Hans Reinders - http://hansreinders.com/
  *
