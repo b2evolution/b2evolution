@@ -1,7 +1,7 @@
 <?php
 /*
  * This is b2evolution's config file
- * Version of this file: 0.8.3
+ * Version of this file: 0.8.5
  *
  * You need to edit this file to your settings before attempting to install the database!
  *
@@ -66,8 +66,6 @@ $new_users_can_blog = 1;		// FOR TESTING
 # set this to 1 if you want to display the blog list on blog templates
 $display_blog_list = 0;
 
-# set this to  1 if you want to be able to cross-post among multiple blogs
-$allow_cross_posting = 0;
 
 # Set the blog # to be used when not otherwise specified:
 # 2 is the default setting, since it is the first user blog created by b2evo

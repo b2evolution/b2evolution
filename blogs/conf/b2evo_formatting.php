@@ -9,8 +9,6 @@
  */
 
 
-$use_quicktags = 1;     // buttons for HTML tags (they won't work on IE Mac yet)
-
 /* Formatting */
 
 # Choose the formatting options for your posts:

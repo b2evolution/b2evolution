@@ -25,42 +25,45 @@
 	{ // ------------------------------ POST HEADER -----------------------
 	?>
 	
-	<span class="line">
-	<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
-	<input type="text" name="post_title" size="45" value="<?php echo $edited_post_title; ?>" id="post_title" tabindex="1" />
-	</span>
-	
-	<span class="line">
-	<label for="post_lang"><strong><?php echo T_('Language') ?>:</strong></label>
-	<select name="post_lang" id="post_lang" tabindex="2"><?php lang_options( $post_lang ) ?></select>
-	</span>
-	
-	<span class="line">
-	<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
-	<input type="text" name="post_url"  size="40" value="<?php echo $post_url; ?>" id="post_url" tabindex="3" />
-	</span>
-	
-	<?php
+		<span class="line">
+		<label for="post_title"><strong><?php echo T_('Title') ?>:</strong></label>
+		<input type="text" name="post_title" size="45" value="<?php echo $edited_post_title; ?>" id="post_title" tabindex="1" />
+		</span>
+		
+		<span class="line">
+		<label for="post_lang"><strong><?php echo T_('Language') ?>:</strong></label>
+		<select name="post_lang" id="post_lang" tabindex="2"><?php lang_options( $post_lang ) ?></select>
+		</span>
+		
+		<?php if( $use_post_url ) { ?>
+		<span class="line">
+		<label for="post_url"><strong><?php echo T_('Link to url') ?>:</strong></label>
+		<input type="text" name="post_url"  size="40" value="<?php echo $post_url; ?>" id="post_url" tabindex="3" />
+		</span>
+		<?php } else { ?>
+		<input type="hidden" name="post_url"  size="40" value="" id="post_url" />
+		<?php
+		}
 	} 
 	else 
 	{ // ------------------------------ COMMENT HEADER -----------------------
 		?>
-	<input type="hidden" name="comment_ID" value="<?php echo $comment ?>" />
-	<input type="hidden" name="comment_post_ID" value="<?php echo $commentdata['comment_post_ID'] ?>" />
-
-	<span class="line">
-	<label for="name"><strong><?php echo T_('Name') ?>:</strong></label><input type="text" name="newcomment_author" size="20" value="<?php echo format_to_edit($commentdata["comment_author"]) ?>" id="name" tabindex="1" />
-	</span>
+		<input type="hidden" name="comment_ID" value="<?php echo $comment ?>" />
+		<input type="hidden" name="comment_post_ID" value="<?php echo $commentdata['comment_post_ID'] ?>" />
 	
-	<span class="line">
-	<label for="email"><strong><?php echo T_('Email') ?>:</strong></label><input type="text" name="newcomment_author_email" size="20" value="<?php echo format_to_edit($commentdata["comment_author_email"]) ?>" id="email" tabindex="2" />
-	</span>
+		<span class="line">
+		<label for="name"><strong><?php echo T_('Name') ?>:</strong></label><input type="text" name="newcomment_author" size="20" value="<?php echo format_to_edit($commentdata["comment_author"]) ?>" id="name" tabindex="1" />
+		</span>
+		
+		<span class="line">
+		<label for="email"><strong><?php echo T_('Email') ?>:</strong></label><input type="text" name="newcomment_author_email" size="20" value="<?php echo format_to_edit($commentdata["comment_author_email"]) ?>" id="email" tabindex="2" />
+		</span>
+		
+		<span class="line">
+		<label for="URL"><strong><?php echo T_('URL') ?>:</strong></label><input type="text" name="newcomment_author_url" size="20" value="<?php echo format_to_edit($commentdata["comment_author_url"]) ?>" id="URL" tabindex="3" />
+		</span>
 	
-	<span class="line">
-	<label for="URL"><strong><?php echo T_('URL') ?>:</strong></label><input type="text" name="newcomment_author_url" size="20" value="<?php echo format_to_edit($commentdata["comment_author_url"]) ?>" id="URL" tabindex="3" />
-	</span>
-	
-	<?php
+		<?php
 	}
 	?>
 	
@@ -204,15 +207,18 @@ if( $action != 'editcomment' )
 	
 	function cat_select_before_each( $cat_ID, $level )
 	{	// callback to display sublist element
-		global $current_blog_ID, $blog, $cat, $postdata, $extracats, $default_main_cat, $action, $tabindex;
+		global $current_blog_ID, $blog, $cat, $postdata, $extracats, $default_main_cat, $action, $tabindex, $allow_cross_posting;
 		$this_cat = get_the_category_by_ID( $cat_ID );
-
-		// Checkbox:
-		echo '<li><input type="checkbox" name="extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'" tabindex="', $tabindex++,'"';
-		if (($cat_ID == $postdata["Category"]) or (in_array($cat_ID,$extracats)))
-			echo ' checked="checked"';
-		echo '>';
-
+		echo '<li>';
+		
+		if( $allow_cross_posting )
+		{ // We allow cross posting, display checkbox:
+			echo'<input type="checkbox" name="extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'" tabindex="', $tabindex++,'"';
+			if (($cat_ID == $postdata["Category"]) or (in_array($cat_ID,$extracats)))
+				echo ' checked="checked"';
+			echo '>';
+		}
+		
 		// Radio for main cat:
 		if( $current_blog_ID == $blog )
 		{
@@ -236,8 +242,8 @@ if( $action != 'editcomment' )
 		echo "</ul>\n";
 	}
 
-	if( $allow_cross_posting )
-	{	// If cross posting is allowed, go through all blogs with cats:
+	if( $allow_cross_posting == 2 )
+	{	// If BLOG cross posting enabled, go through all blogs with cats:
 		foreach( $cache_blogs as $i_blog )
 		{ // run recursively through the cats
 			$current_blog_ID = $i_blog->blog_ID;
@@ -251,12 +257,17 @@ if( $action != 'editcomment' )
 		<?php
 	}
 	else
-	{	// Cross posting is not allowed. Current blog only:
+	{	// BLOG Cross posting is disabled. Current blog only:
 		$current_blog_ID = $blog;
 		cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first', 
 									'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
 		?>
-		<p class="notes"><?php echo T_('Note: Cross posting among multiple blogs is currently disabled.') ?></p>
+		<p class="notes"><?php
+		if( $allow_cross_posting )
+			echo T_('Note: Cross posting among multiple blogs is currently disabled.');
+		else
+			echo T_('Note: Cross posting among multiple categories is currently disabled.');
+		?></p>
 		<?php
 	}
 	// ----------------- END RECURSIVE CAT LIST ----------------

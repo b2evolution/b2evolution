@@ -17,12 +17,14 @@
   <li>Security pacthes (by Sakichan)</li>
   <li><strong>Heavy</strong> code refactoring.</li>
   <li>New template functions: user_login_link(), user_register_link(), user_logout_link(), user_admin_link(), user_profile_link()</li>
-  <li>New login/registering system</li>
+  <li>New login/registering system.</li>
+  <li>You can login directly on whichever function page you want. b2edit.php, b2browse.php, b2stats.php, etc... pick the backoffice homepage you prefer.</li>
   <li>New post statuses: protected, private and deprecated</li>
   <li><strong>Complete b2evo bookmarklet and sidebar</strong></li>
-  <li>Blog switching in b2edit preserves data (javascript)</li>
+  <li><strong>You can now switch to another blog in the middle of a post and preserve all your current edits</strong> (uses javascript)</li>
   <li><strong>Comment spam prevention (vig-rx syndrome)</strong>: blocks comments and posts containing blacklisted URLs (if you have had vig-rx posting on your blog, you know why you need this ;)</li>
   <li>Smilies are now displayed in their correct chosen order. They are not displayed when they are deactivated.</li>
+  <li>$allow_cross_posting = 0 will disable cross posting among multiple categories.</li>
 </ul>
 <div class="main">
   <h2>0.8.3-beta1</h2>
@@ -33,7 +35,7 @@
   </li>
   <li>Code refactoring</li>
   <li>New front page for 'my blogs' explaining a little more what's going on there ;)</li>
-  <li>Cross posting among multiple blogs has been disabled by default. Again too many people seem to be confused about this. Enabling is as easy as setting $allow_cross_posting = 1; in b2evo_conf.php.</li>
+  <li>Cross posting among multiple blogs has been disabled by default. Again too many people seem to be confused about this. Enabling is as easy as setting $allow_cross_posting = 2; in b2evo_conf.php.</li>
   <li>Fixed filtering by author</li>
   <li>wordcount support (by Swirlee)</li>
   <li><strong>Full localization even without gettext!</strong></li>
