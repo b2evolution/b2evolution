@@ -36,7 +36,7 @@ class RendererPlugin extends Plugin
 	var $apply_to_html = true; 
 	/**
 	 * Should this plugin apply to XML?
-	 * It shoulf actually only apply when:
+	 * It should actually only apply when:
 	 * - it generates some content that is visible without HTML tags
 	 * - it removes some dirty markup when generating the tags (which will get stripped afterwards)
 	 * Note: htmlentityencoded is not considered as XML here.
