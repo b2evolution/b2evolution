@@ -103,7 +103,8 @@ switch( $action )
 		$message .= T_('Login:', $default_locale). " $login\n\n". T_('Email', $default_locale). ": $user_email\n\n";
 		$message .= T_('Manage users', $default_locale). ": $admin_url/b2users.php\n\n";
 
-		@mail( $admin_email, T_('new user registration on your blog', $default_locale), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
+		ini_set('sendmail_from', $notify_from); // set Return-Path for Win32
+		@mail( $admin_email, T_('new user registration on your blog', $default_locale), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion(), "-f$notify_from");
 
 		// Display confirmation screen:
 		require( dirname(__FILE__).'/_reg_complete.php' );

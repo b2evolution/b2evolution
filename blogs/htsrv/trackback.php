@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * file
  *
@@ -105,7 +105,8 @@ if ((strlen(''.$tb_id)) && (empty($HTTP_GET_VARS['__mode'])) && (strlen(''.$url)
 		$notify_message .= T_('Excerpt', $default_locale).": \n".$original_comment."\n\n";
 		$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
 
-		@mail($recipient, $subject, $notify_message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion() );
+		ini_set('sendmail_from', $notify_from); // set Return-Path for Win32
+		@mail($recipient, $subject, $notify_message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion(), "-f$notify_from" );
 		
 	}
 

@@ -116,27 +116,27 @@ $DB->query( $query );
 $item_author_User = & $commented_Item->Author;
 if( $item_author_User->notify )
 {	// Author wants to be notified:
+	locale_temp_switch($item_author_User->locale);
 	$recipient = $item_author_User->email;
-	$subject = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID,$commented_Item->get('title') );
+	$subject = sprintf( T_('New comment on your post #%d "%s"'), $comment_post_ID, $commented_Item->get('title') );
 	$Blog = Blog_get_by_ID( $commented_Item->blog_ID );
 	
-	// Not translated because sent to someone else...
-	$notify_message  = sprintf( T_('New comment on your post #%d "%s"', $default_locale), $comment_post_ID, $commented_Item->get('title') )."\n";
+	$notify_message  = sprintf( T_('New comment on your post #%d "%s"'), $comment_post_ID, $commented_Item->get('title') )."\n";
 	$notify_message .= $commented_Item->gen_permalink( 'pid' )."\n\n"; // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 	if( is_logged_in() )
 	{
-		$notify_message .= T_('Author', $default_locale).': '.$current_User->get('preferedname').
+		$notify_message .= T_('Author').': '.$current_User->get('preferedname').
 												' ('.$current_User->get('login').")\n";
 	}
 	else
 	{
 		$user_domain = gethostbyaddr($user_ip);
-		$notify_message .= T_('Author', $default_locale).": $author (IP: $user_ip, $user_domain)\n";
-		$notify_message .= T_('Email', $default_locale).": $email\n";
-		$notify_message .= T_('Url', $default_locale).": $url\n";
+		$notify_message .= T_('Author').": $author (IP: $user_ip, $user_domain)\n";
+		$notify_message .= T_('Email').": $email\n";
+		$notify_message .= T_('Url').": $url\n";
 	}
-	$notify_message .= T_('Comment', $default_locale).": \n".$original_comment."\n\n";
-	$notify_message .= T_('Edit/Delete', $default_locale).': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n";
+	$notify_message .= T_('Comment').": \n".$original_comment."\n\n";
+	$notify_message .= T_('Edit/Delete').': '.$admin_url.'/b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n";
 	
 	
 	// echo "Sending notification to $recipient :<pre>$notify_message</pre>";
@@ -148,7 +148,9 @@ if( $item_author_User->notify )
 	else
 		$mail_from = "\"$author\" <$email>";
 	
-	@mail($recipient, $subject, $notify_message, "From: $mail_from\nX-Mailer: b2evolution $b2_version - PHP/" . phpversion());
+	ini_set('sendmail_from', $mail_from); // set Return-Path for Win32
+	@mail($recipient, $subject, $notify_message, "From: $mail_from\nX-Mailer: b2evolution $b2_version - PHP/" . phpversion(), "-f$mail_from");
+	locale_restore_previous();
 }
 
 
