@@ -6,12 +6,16 @@
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
 
-/*
- * T_(-)
- * 
+/**
  * TRANSLATE!
- * Translated a text to the desired locale (b2evo localization only)
+ *
+ * Translate a text to the desired locale (b2evo localization only)
  * or to the current locale
+ * 
+ * {@internal T_(-)}}
+ * 
+ * @param string String to translate, '' to get language file info (as in gettext spec)
+ * @param strinf locale to translate to, '' to use current locale (basic gettext does only support '')
  */
 if( ($use_l10n == 1) && function_exists('_') )
 {	// We are going to use GETTEXT
@@ -36,11 +40,6 @@ elseif( $use_l10n == 2 )
 	{
 		global $trans, $current_locale, $locales;
 
-		if( empty($string) )
-		{ // don't return .po file info in this case
-			return '';
-		}
-		
 		// By default we use the current locale:
 		if( empty($req_locale) ) $req_locale = $current_locale;
 		
