@@ -434,7 +434,7 @@ class Form extends Widget
 	 * @param string label
 	 * @param string note
 	 * @param string CSS class
-	 * @param sting value to use
+	 * @param string value to use
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function checkbox( $field_name, $field_checked, $field_label, $field_note = '',
