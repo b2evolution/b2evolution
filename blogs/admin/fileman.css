@@ -28,6 +28,9 @@
 #filemanmain table.grouped caption {
 	text-align:left;
 }
+#filemanmain table.grouped th {
+	white-space:nowrap;
+}
 #filemanmain table.grouped td {
 	text-align:center;
 }
@@ -46,6 +49,10 @@
 #filemanmain table.grouped td.filename {
 	text-align: left;
 	width: 45%;
+}
+#filemanmain table.grouped td.filename div.path {
+	clear:right;
+	float:right;
 }
 #filemanmain table.grouped td.timestamp {
 	white-space: nowrap;

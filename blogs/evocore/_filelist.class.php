@@ -136,10 +136,9 @@ class Filelist
 	 *
 	 * @param string the path for the files
 	 */
-	function Filelist( $path, $filterString = NULL, $filterIsRegexp = NULL, $showhidden = false )
+	function Filelist( $path )
 	{
 		$this->listpath = trailing_slash( $path );
-		$this->showhidden = (bool)$showhidden;
 		if( empty($path) )
 		{
 			$this->Messages->add( 'No valid path provided.', 'fl_error' );
@@ -165,6 +164,7 @@ class Filelist
 
 
 		$dirsToAdd = array( $this->listpath );
+		$dirsAdded = array();
 		while( $addDir = array_shift( $dirsToAdd ) )
 		{
 			$this->addFilesFromDir( $addDir );
@@ -172,11 +172,14 @@ class Filelist
 			if( $flatmode )
 			{
 				foreach( $this->entries as $lFile )
-				{
+				{ // TODO: optimize!
 					if( $lFile->isDir() )
 					{
-						$dirsToAdd[] = $lFile->getPath( true );
-						$this->removeFromList( $lFile );
+						$path = $lFile->getPath( true );
+						if( !in_array( $path, $dirsAdded ) )
+						{
+							$dirsToAdd[] = $dirsAdded[] = $path;
+						}
 					}
 				}
 			}
@@ -219,7 +222,7 @@ class Filelist
 					continue;
 				}
 
-				$this->addFile( $path.$entry, true );
+				$this->addFileByPath( $path.$entry, true );
 			}
 
 			if( $this->filterString === NULL || $this->filterIsRegexp )
@@ -227,6 +230,16 @@ class Filelist
 				$dir->close();
 			}
 		}
+	}
+
+
+	function addFile( $File )
+	{
+		if( !is_a( $File, 'file' ) )
+		{
+			return false;
+		}
+		$this->addFileByPath( $File->getPath(true) );
 	}
 
 
@@ -239,26 +252,23 @@ class Filelist
 	 *                 already in filelist, does not exist)
 	 * @todo optimize (blueyed)
 	 */
-	function addFile( $name, $allPaths = false )
+	function addFileByPath( $path, $allPaths = false )
 	{
-		if( is_a( $name, 'file' ) )
-		{
-			$name = $name->getPath(true);
-		}
-		if( basename($name) != $name )
+		$basename = basename($path);
+		if( $basename != $path )
 		{ // path attached
-			if( !$allPaths && (dirname($name).'/' != $this->listpath) )
+			if( !$allPaths && (dirname($path).'/' != $this->listpath) )
 			{ // not this list's path
 				return false;
 			}
 			else
 			{
-				$NewFile =& getFile( basename($name), dirname($name).'/' );
+				$NewFile =& getFile( $basename, dirname($path).'/' );
 			}
 		}
 		else
 		{
-			$NewFile =& getFile( $name, $this->listpath );
+			$NewFile =& getFile( $path, $this->listpath );
 		}
 
 		if( !$NewFile->exists() )
@@ -272,7 +282,7 @@ class Filelist
 
 			if( $this->recursivedirsize && $NewFile->isDir() )
 			{ // won't be done in the File constructor
-				$entry->setSize( get_dirsize_recursive( $this->listpath.$name ) );
+				$NewFile->setSize( get_dirsize_recursive( $NewFile->getPath(true) ) );
 			}
 
 			if( $NewFile->isDir() )
@@ -448,8 +458,18 @@ class Filelist
 	 */
 	function &getNextFile( $type = '' )
 	{
+		/**
+		 * @debug return the same file 10 times, useful for profiling
+		static $debugMakeLonger = 0;
+		if( $debugMakeLonger-- == 0 )
+		{
+			$this->current_file_idx++;
+			$debugMakeLonger = 9;
+		}
+		*/
 		$this->current_file_idx++;
-		if( !count($this->entries) || $this->current_file_idx >= count( $this->entries ) )
+
+		if( !isset($this->entries[$this->current_file_idx]) )
 		{
 			return false;
 		}
@@ -458,11 +478,11 @@ class Filelist
 		{
 			if( $type == 'dir' && !$this->entries[ $this->current_file_idx ]->isDir() )
 			{ // we want a dir
-				return $this->get_next( 'dir' );
+				return $this->getNextFile( 'dir' );
 			}
 			elseif( $this->entries[ $this->current_file_idx ]->isDir() )
 			{ // we want a file
-				return $this->get_next( 'file' );
+				return $this->getNextFile( 'file' );
 			}
 		}
 		else
@@ -609,6 +629,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.8  2004/12/29 02:25:55  blueyed
+ * no message
+ *
  * Revision 1.7  2004/11/05 15:44:31  blueyed
  * no message
  *

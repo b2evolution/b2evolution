@@ -1205,24 +1205,27 @@ function debug_info( $force = false )
 	global $Debuglog;
 	global $DB;
 	global $obhandler_debug;
-	global $cache_imgsize, $cache_File;
+	global $cache_imgsize, $cache_File, $cache_fmCurUrls;
 
 	if( $debug || $force )
 	{
-		$Debuglog->add( 'Size of $cache_imgsize: '.count($cache_imgsize), 'memory' );
-		$Debuglog->add( 'Size of $cache_File: '.count($cache_File), 'memory' );
+		?>
+
+		<hr class="clear" />
+		<div class="panelblock">
+
+		<h2>Debug info</h2>
+
+		<?php
+
+		$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
+		$Debuglog->add( 'Len of serialized $cache_File: '.strlen(serialize($cache_File)), 'memory' );
+		$Debuglog->add( 'Len of serialized $cache_fmCurUrls: '.strlen(serialize($cache_fmCurUrls)), 'memory' );
 
 		if( function_exists( 'memory_get_usage' ) )
 		{
 			$Debuglog->add( 'Memory usage: '.bytesreadable(memory_get_usage()), 'memory' );
 		}
-
-		?>
-		<hr class="clear" />
-		<div class="panelblock">
-		<h2>Debug info</h2>
-
-		<?php
 
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
@@ -1572,10 +1575,8 @@ function getIcon( $for, $what = 'imgtag', $param = '' )
 				return $iconurl;
 			}
 
-		case 'imgtag':
 			$r = '<img class="middle" src="'.$iconurl.'" '
 					.getIconSize( $iconfile, 'string' )
-					#.imgsize( $admin_url.'img/'.$iconfile, 'string' ) // time consuming!
 					.' alt="';
 
 			if( is_a( $for, 'file' ) )
@@ -1597,9 +1598,6 @@ function getIcon( $for, $what = 'imgtag', $param = '' )
 
 			$r .= '" />';
 			break;
-
-		default:
-			echo 'unknown what: '.$what;
 	}
 
 	return $r;
@@ -1665,6 +1663,9 @@ function make_valid_date( $date, $time )
 
 /*
  * $Log$
+ * Revision 1.20  2004/12/29 02:25:55  blueyed
+ * no message
+ *
  * Revision 1.19  2004/12/27 18:37:58  fplanque
  * changed class inheritence
  *

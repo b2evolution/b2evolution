@@ -42,41 +42,26 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 
 /**
- * converts bytes to readable bytes/kb/mb/gb
+ * Converts bytes to readable bytes/kb/mb/gb, like "12.45mb"
  *
  * @param integer bytes
  * @return string bytes made readable
  */
 function bytesreadable( $bytes )
 {
-	$type = array ('b', 'kb', 'mb', 'gb');
+	$type = array ( 'b', 'kb', 'mb', 'gb' );
 
-	for ($i = 0; $bytes > 1024; $i++)
+	for( $i = 0; $bytes > 1024; $i++ )
+	{
 		$bytes /= 1024;
+	}
 
-	return str_replace(',', '.', round($bytes, 2)) . $type[$i];
+	return round($bytes, 2).$type[$i];
 }
 
 
 /**
- * create crossplatform-safe filename
- * @param string filename/path
- * @return string converted path
- */
-function safefilename( $path )
-{
-	$path = preg_replace( '/[^A-Za-z0-9]+/', '_', $path );
-
-	// remove trailing/leading '_'
-	$path = preg_replace( '/^_+/', '', $path );
-	$path = preg_replace( '/_+$/', '', $path );
-
-	return $path;
-}
-
-
-/**
- * get size of directory, including anything in there.
+ * Get size of a directory, including anything (especially subdirs) in there.
  *
  * @param string the dir's full path
  */
@@ -86,6 +71,7 @@ function get_dirsize_recursive( $path )
 	{
 		return false;
 	}
+
 	$total = 0;
 	while( $cur = readdir($dir) ) if( !in_array( $cur, array('.', '..')) )
 	{
@@ -103,7 +89,7 @@ function get_dirsize_recursive( $path )
 
 
 /**
- * deletes a dir recursive, wiping out all subdirectories!!
+ * Deletes a dir recursive, wiping out all subdirectories!!
  *
  * @param string the dir
  */
@@ -332,7 +318,7 @@ function isFilename( $filename )
 
 /*
  * $Log$
- * Revision 1.4  2004/11/05 00:36:43  blueyed
+ * Revision 1.5  2004/12/29 02:25:55  blueyed
  * no message
  *
  * Revision 1.3  2004/10/21 00:14:44  blueyed

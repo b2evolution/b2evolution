@@ -101,12 +101,26 @@ class AbstractSettings
 	 */
 	var $allLoaded = false;
 
+	/**
+	 * Default settings.
+	 *
+	 * Maps last colkeyname to some default setting that will be used by
+	 * {@link get()} if no value was defined (and it is set as a default).
+	 *
+	 * @var array
+	 */
+	var $_defaults = array();
+
 
 	/**
 	 * Constructor, does nothing.
 	 */
 	function AbstractSettings()
 	{
+		if( count( $this->colkeynames ) > 3 || count( $this->colkeynames ) < 1 )
+		{
+			die( 'Settings keycount not supported for class '.get_class() );
+		}
 	}
 
 
@@ -211,9 +225,6 @@ class AbstractSettings
 					$this->cache[$loop_row->{$this->colkeynames[0]}][$loop_row->{$this->colkeynames[1]}][$loop_row->{$this->colkeynames[2]}]->uptodate = true;
 				}
 				break;
-
-			default:
-				die( 'Settings keycount not supported for class '.get_class() );
 		}
 
 		return true;
@@ -242,7 +253,9 @@ class AbstractSettings
 			return false;
 		}
 
-		$r = false;
+		$debugMsg = get_class($this).'::get( '.implode( ', ', $args ).' ): ';
+
+		$r = NULL;
 
 		switch( count( $this->colkeynames ) )
 		{
@@ -251,34 +264,41 @@ class AbstractSettings
 				{
 					$r = $this->cache[ $args[0] ]->value;
 				}
+				elseif( isset($this->_defaults[ $args[0] ]) )
+				{
+					$r = $this->_defaults[ $args[0] ];
+					$debugMsg .= '[default]: ';
+				}
 				break;
+
 			case 2:
 				if( isset($this->cache[ $args[0] ][ $args[1] ]) )
 				{
 					$r = $this->cache[ $args[0] ][ $args[1] ]->value;
 				}
+				elseif( isset($this->_defaults[ $args[1] ]) )
+				{
+					$r = $this->_defaults[ $args[1] ];
+					$debugMsg .= '[default]: ';
+				}
 				break;
+
 			case 3:
 				if( isset($this->cache[ $args[0] ][ $args[1] ][ $args[2] ]) )
 				{
 					$r = $this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->value;
 				}
+				elseif( isset($this->_defaults[ $args[2] ]) )
+				{
+					$r = $this->_defaults[ $args[2] ];
+					$debugMsg .= '[default]: ';
+				}
 				break;
-			default:
-				$r = false;
 		}
 
-		if( $r === false )
-		{
-			$Debuglog->add( get_class($this).'::get(): queried setting ['.implode( ', ', $args ).'] not defined.', 'settings' );
-			return NULL;
-		}
-		else
-		{
-			$Debuglog->add( get_class($this).'::get: ['.implode(', ', $args ).']: '
-											.'['.var_export( $r, true ).']', 'settings' );
-			return $r;
-		}
+		$Debuglog->add( $debugMsg.var_export( $r, true ), 'settings' );
+
+		return $r;
 	}
 
 
@@ -433,6 +453,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.6  2004/12/29 02:25:55  blueyed
+ * no message
+ *
  * Revision 1.5  2004/11/08 02:48:26  blueyed
  * doc updated
  *

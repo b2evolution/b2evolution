@@ -41,7 +41,6 @@
  * @todo thumbnail view
  * @todo PHPInfo (special permission)
  * @todo directly run PHP-code (eval)
- *
  */
 
 /**
@@ -526,7 +525,7 @@ switch( $Fileman->getMode() )
 				elseif( move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lkey], $newName ) )
 				{
 					$Fileman->Messages->add( sprintf( T_('The file [%s] has been successfully uploaded.'), basename($newName) ), 'note' );
-					$Fileman->addFile( $newName );
+					$Fileman->addFileByPath( $newName );
 					continue;
 				}
 
@@ -878,7 +877,7 @@ if( isset( $msg_action )
 
 
 <div class="panelblock">
-	<?php
+<?php
 	echo '<a title="'.T_('Go to your home directory').'" class="toolbaritem" href="'
 				.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a>';
 
@@ -886,7 +885,7 @@ if( isset( $msg_action )
 	if( count($rootlist) > 1 )
 	{ // provide list of roots
 		echo '<form action="files.php" name="roots" class="toolbaritem">'
-					.$Fileman->getFormHiddenInputs( false );
+					.$Fileman->getFormHiddenInputs( array( 'root' => false ) );
 		echo '<select name="root" onchange="this.form.submit()">';
 
 		foreach( $rootlist as $lroot )
@@ -898,14 +897,15 @@ if( isset( $msg_action )
 			}
 			echo '<option value="'.$lroot_value.'"';
 
-			if( $root == $lroot_value )
+			if( $root == $lroot_value
+					|| $root === NULL && $lroot_value == 'user' )
 			{
 				echo ' selected="selected"';
 			}
 
 			echo '>'.format_to_output( $lroot['name'] ).'</option>';
 		}
-		echo '</select><input type="submit" value="'.T_('Change root').'" />'
+		echo '</select><input class="ActionButton" type="submit" value="'.T_('Change root').'" />'
 					."</form>\n";
 	}
 	?>
@@ -937,7 +937,7 @@ if( isset( $msg_action )
 			<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php
 				echo format_to_output( T_('Filter is regular expression'), 'formvalue' )
 				?>" value="1"<?php if( $filterIsRegexp ) echo ' checked="checked"' ?> /><?php
-				echo '<label for="filterIsRegexp">'./* TRANS: short for "is regular expression" */ T_('RegExp').'</label>'; ?>
+				echo ' <label for="filterIsRegexp">'./* TRANS: short for "is regular expression" */ T_('RegExp').'</label>'; ?>
 
 			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Filter'), 'formvalue' ) ?>" />
 		</form>
@@ -955,15 +955,16 @@ if( isset( $msg_action )
 		?>
 
 	</div>
-
-	<div class="clear"></div>
 </div>
+
+<div class="clear"></div>
 
 
 <div class="panelblock">
 <form name="FilesForm" action="files.php" method="post">
 <input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
 <input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
+
 <table class="grouped">
 <caption>
 <?php
@@ -972,16 +973,30 @@ if( $Fileman->isFiltering() )
 {
 	echo '<br />'.T_('Filter').': ['.$Fileman->getFilter().']';
 }
+
+/**
+ * @global integer Number of cols for the files table, 8 by default
+ */
+$filetable_cols = 8;
 ?>
 </caption>
 <thead>
 <tr>
 	<th colspan="2"><?php $Fileman->dispButtonParent(); ?></th>
-	<th><?php echo $Fileman->getLinkSort( 'name', /* TRANS: file name */ T_('Name') ) ?></th>
+	<th><?php
+		echo $Fileman->getLinkSort( 'name', /* TRANS: file name */ T_('Name') );
+
+		if( $Fileman->flatmode )
+		{
+			echo ' &ndash; '.$Fileman->getLinkSort( 'path', /* TRANS: file/directory path */ T_('Path') );
+		}
+
+	?></th>
+
 	<th><?php echo $Fileman->getLinkSort( 'type', /* TRANS: file type */ T_('Type') ) ?></th>
 	<th><?php echo $Fileman->getLinkSort( 'size', /* TRANS: file size */ T_('Size') ) ?></th>
 	<th><?php echo $Fileman->getLinkSort( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ) ?></th>
-	<th><?php echo $Fileman->getLinkSort( 'perms', /* TRANS: file's permissions */ T_('Perms') ) ?></th>
+	<th><?php echo $Fileman->getLinkSort( 'perms', /* TRANS: file's permissions (short) */ T_('Perms') ) ?></th>
 	<th><?php echo /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions') ?></th>
 </tr>
 </thead>
@@ -1007,19 +1022,21 @@ while( $lFile = $Fileman->getNextFile() )
 				echo $countFiles ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php
 				echo $countFiles ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
 		</td>
+
 		<td class="icon">
 			<a href="<?php
 				if( $lFile->isDir() )
 				{
-					echo $Fileman->getLinkFile();
+					echo $Fileman->getLinkFile( $lFile );
 				}
 				else
 				{
 					echo $Fileman->getFileUrl();
 				} ?>"><?php echo getIcon( $lFile ) ?></a>
 		</td>
+
 		<td class="filename">
-			<a href="<?php echo $Fileman->getLinkFile() ?>" target="fileman_default" onclick="return false;">
+			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>" target="fileman_default" onclick="return false;">
 			<button class="image" type="button" onclick="document.getElementsByName('selectedfiles[]')[<?php
 				echo $countFiles ?>].click(); <?php
 
@@ -1032,13 +1049,27 @@ while( $lFile = $Fileman->getNextFile() )
 				?>" id="button_new_<?php echo $countFiles ?>" title="Open in a new window">
 				<?php echo getIcon( 'window_new' )
 			?></button></a>
-			<a onclick="clickedonlink=1;" href="<?php echo $Fileman->getLinkFile() ?>">
+
+			<a onclick="clickedonlink=1;" href="<?php echo $Fileman->getLinkFile( $lFile ) ?>">
 			<?php
 			echo $lFile->getName();
 			disp_cond( $Fileman->getFileImageSize(), ' (%s)' )
 			?>
 			</a>
+
+			<?php
+			if( $Fileman->flatmode )
+			{
+				?><div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
+				$path = substr( $Fileman->getFileSubpath( $lFile, false ), 0, -1 );
+				echo empty( $path ) ?
+							' - ' :
+							$path;
+				?></div><?php
+			}
+			?>
 		</td>
+
 		<td class="type"><?php echo $lFile->getType() ?></td>
 		<td class="size"><?php echo $lFile->getSizeNice() ?></td>
 		<td class="timestamp"><?php echo $lFile->getLastMod() ?></td>
@@ -1056,16 +1087,17 @@ while( $lFile = $Fileman->getNextFile() )
 	$countFiles++;
 }
 
+
 if( $countFiles == 0 )
 { // Filelist errors or "directory is empty"
 	?>
 	<tr>
-	<td colspan="8">
+	<td colspan="<?php echo $filetable_cols ?>">
 	<?php
 	if( !$Fileman->Messages->count( 'fl_error' ) )
 	{ // no Filelist errors, the directory must be empty
-		$Fileman->Messages->add( T_('The directory is empty.')
-			.( $Fileman->isFiltering() ? '<br />'.T_('Filter').': ['.$Fileman->getFilter().']' : '' ), 'fl_error' );
+		$Fileman->Messages->add( T_('No files found.')
+			.( $Fileman->isFiltering() ? '<br />'.T_('Filter').': &laquo;'.$Fileman->getFilter().'&raquo;' : '' ), 'fl_error' );
 	}
 	$Fileman->Messages->display( '', '', true, 'fl_error', 'log_error' );
 
@@ -1077,7 +1109,7 @@ if( $countFiles == 0 )
 else
 {{{ // Footer with "check all", "with selected: .."
 ?>
-<tr class="group"><td colspan="8">
+<tr class="group"><td colspan="<?php echo $filetable_cols ?>">
 	<a id="checkallspan_0" href="<?php
 		echo url_add_param( $Fileman->getCurUrl(), 'checkall='.( $checkall ? '0' : '1' ) );
 		?>" onclick="toggleCheckboxes('FilesForm', 'selectedfiles[]'); return false;"><?php
@@ -1089,12 +1121,15 @@ else
 	<input class="ActionButton" type="submit" name="selaction" value="<?php echo T_('Download') ?>" onclick="return openselectedfiles(true);" />
 	<input class="ActionButton" type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" />
 	<input class="ActionButton" type="button" name="selaction" value="<?php echo T_('Open in new windows') ?>" onclick="openselectedfiles(); return false;" />
-	&mdash; <?php
+
+	<div class="small">
+	<?php
 	disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
 	echo ', ';
 	disp_cond( $Fileman->countFiles(), T_('One file'), T_('%d files'), T_('No files' ) );
 	echo ', '.bytesreadable( $Fileman->countBytes() );
 	?>
+	</div>
 </td></tr>
 <?php
 }}}
@@ -1205,7 +1240,7 @@ param( 'options_show', 'integer', 0 );
 
 
 <form action="" class="toolbaritem">
-	<?php $Fileman->dispButtonUpload(); ?>
+	<?php $Fileman->dispButtonUploadMode(); ?>
 </form>
 
 <form action="" class="toolbaritem">

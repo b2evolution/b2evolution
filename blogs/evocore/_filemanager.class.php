@@ -37,7 +37,9 @@
  * @author blueyed: Daniel HAHLER.
  *
  * @version $Id$
+ *
  * @todo Permissions!
+ * @todo Performance
  * @todo favorite folders/bookmarks
  */
 if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
@@ -106,7 +108,7 @@ class FileManager extends Filelist
 
 	/* ----- PRIVATE ----- */
 	/**
-	 * order files by what? (name/type/size/lastmod/perms)
+	 * order files by what? (name/path/type/size/lastmod/perms)
 	 * 'name' as default.
 	 * @var string
 	 * @access protected
@@ -150,10 +152,8 @@ class FileManager extends Filelist
 	 * @access private
 	 */
 	var $_internalGlobals = array(
-			'root' => NULL, 'path' => NULL, 'filterString' => NULL,
-			'filterIsRegexp' => NULL, 'order' => NULL, 'orderasc' => NULL,
-			'mode' => NULL, 'source' => NULL, 'keepsource' => NULL,
-			'flatmode' => NULL
+			'root', 'path', 'filterString', 'filterIsRegexp', 'order', 'orderasc',
+			'mode', 'source', 'keepsource', 'flatmode',
 		);
 
 	// }}}
@@ -178,6 +178,7 @@ class FileManager extends Filelist
 		global $basepath, $baseurl, $media_subdir, $admin_subdir, $admin_url;
 		global $mode;
 		global $BlogCache, $UserCache;
+		global $Debuglog;
 
 		$this->User =& $cUser;
 		$this->Messages =& new Log( 'error' );
@@ -215,7 +216,7 @@ class FileManager extends Filelist
 		}
 
 		list( $real_root_dir, $real_root_dir_exists ) = str2path( $this->root_dir );
-		$this->debug( $real_root_dir, 'real_root_dir' );
+		$Debuglog->add( 'real_root_dir: '.var_export( $real_root_dir, true ), 'filemanager' );
 
 		if( !$this->root_dir )
 		{
@@ -233,7 +234,6 @@ class FileManager extends Filelist
 			// get real cwd
 
 			list( $realpath, $realpath_exists ) = str2path( $this->cwd );
-			$this->debug( $realpath, 'realpath' );
 
 
 			if( !preg_match( '#^'.$this->root_dir.'#', $realpath ) )
@@ -255,7 +255,6 @@ class FileManager extends Filelist
 			}
 		}
 
-
 		// get the subpath relative to root
 		$this->path = preg_replace( '#^'.$this->root_dir.'#', '', $this->cwd );
 		// }}}
@@ -263,9 +262,14 @@ class FileManager extends Filelist
 
 		/**
 		 * base URL, used for created links
+		 * @var string
 		 */
 		$this->url = $url;
-		$this->mode = empty($mode) ? NULL : $mode; // from global
+		/**
+		 * Remember mode from passed global.
+		 * @var string
+		 */
+		$this->mode = empty($mode) ? NULL : $mode;
 
 		if( $this->mode
 				&& $this->source = urldecode( param( 'source', 'string', '' ) ) )
@@ -273,8 +277,8 @@ class FileManager extends Filelist
 			$sourceName = basename( $this->source );
 			$sourcePath = dirname( $this->source ).'/';
 			if( $this->SourceList =& new Filelist( $sourcePath ) )
-			{ // TODO: should fail for nox-existant sources, or sources where no read-perm
-				$this->SourceList->addFile( $sourceName );
+			{ // TODO: should fail for non-existant sources, or sources where no read-perm
+				$this->SourceList->addFileByPath( $sourceName );
 				$this->keepsource = param( 'keepsource', 'integer', 0 );
 			}
 			else
@@ -298,17 +302,17 @@ class FileManager extends Filelist
 			$this->Messages->add( sprintf( T_('The filter [%s] is not a regular expression.'), $this->filterString ) );
 			$this->filterString = '.*';
 		}
-		$this->order = ( in_array( $order, array( 'name', 'type', 'size', 'lastmod', 'perms' ) ) ? $order : NULL );
+		$this->order = ( in_array( $order, array( 'name', 'path', 'type', 'size', 'lastmod', 'perms' ) ) ? $order : NULL );
 		$this->orderasc = ( $asc === NULL  ? NULL : (bool)$asc );
 
 		$this->loadSettings();
 
 
-		$this->debug( $this->root, 'root' );
-		$this->debug( $this->root_dir, 'root_dir' );
-		$this->debug( $this->root_url, 'root_url' );
-		$this->debug( $this->cwd, 'cwd' );
-		$this->debug( $this->path, 'path' );
+		$Debuglog->add( 'root: '.var_export( $this->root, true ), 'filemanager' );
+		$Debuglog->add( 'root_dir: '.var_export( $this->root_dir, true ), 'filemanager' );
+		$Debuglog->add( 'root_url: '.var_export( $this->root_url, true ), 'filemanager' );
+		$Debuglog->add( 'cwd: '.var_export( $this->cwd, true ), 'filemanager' );
+		$Debuglog->add( 'path: '.var_export( $this->path, true ), 'filemanager' );
 
 		$this->flatmode = $flatmode;
 
@@ -317,26 +321,27 @@ class FileManager extends Filelist
 	}
 
 
+	/**
+	 * Calls the parent constructor, loads and rewinds the filelist.
+	 */
 	function load()
 	{
-		// the directory entries
 		parent::Filelist( $this->cwd );
 		parent::load( $this->flatmode );
 		parent::restart();
 
-		$this->debug( $this->entries, 'Filelist' );
+		#debug: pre_dump( $this->entries );
 	}
 
 
 	/**
-	 * Sort the Filelist entries
+	 * Sort the Filelist entries.
 	 */
 	function sort()
 	{
 		parent::sort( $this->translate_order( $this->order ),
 									$this->translate_asc( $this->orderasc, $this->translate_order( $this->order ) ),
 									!$this->dirsnotattop );
-
 	}
 
 
@@ -353,6 +358,11 @@ class FileManager extends Filelist
 	}
 
 
+	/**
+	 * Display a button to edit a file.
+	 *
+	 * @param File the File, defaults to current.
+	 */
 	function dispButtonFileEdit( $File = NULL )
 	{
 		if( $File === NULL )
@@ -366,6 +376,9 @@ class FileManager extends Filelist
 	}
 
 
+	/**
+	 * Display a button to edit the permissions of the current file.
+	 */
 	function dispButtonFileEditPerms()
 	{
 		if( $link = $this->getLinkFileEditPerms() )
@@ -376,7 +389,13 @@ class FileManager extends Filelist
 	}
 
 
-	function dispButtonUpload( $title = NULL, $attribs = '' )
+	/**
+	 * Displays a button to enter upload mode.
+	 *
+	 * @param string title for the button
+	 * @param string optional HTML attribs for the input button
+	 */
+	function dispButtonUploadMode( $title = NULL, $attribs = '' )
 	{
 		if( $title === NULL )
 		{
@@ -388,6 +407,15 @@ class FileManager extends Filelist
 		echo '<input class="ActionButton" type="button" value="'.format_to_output( $title, 'formvalue' )
 					.'" onclick="'.$this->getJsPopupCode( $url, 'fileman_upload' )
 					.'" '.$attribs.' />';
+	}
+
+
+	/**
+	 * Stub for dispButtonUploadMode() until re-designed
+	 */
+	function dispButtonUpload( $title = NULL, $attribs = '' )
+	{
+		return $this->dispButtonUploadMode( $title, $attribs );
 	}
 
 
@@ -404,8 +432,9 @@ class FileManager extends Filelist
 			return false;
 		}
 		$url = $this->getCurUrl( array( 'mode' => 'file_cmr',
-																		'source' => urlencode( $this->curFile->getPath( true ) ),
+																		'source' => false,
 																		'keepsource' => (int)($mode == 'copy') ) );
+		$url .= '&amp;source='.urlencode( $this->curFile->getPath( true ) );
 
 		echo '<a href="'.$url.'" target="fileman_copymoverename" onclick="'
 					.$this->getJsPopupCode( $url, 'fileman_copymoverename' )
@@ -421,24 +450,39 @@ class FileManager extends Filelist
 	}
 
 
+	/**
+	 * Display a button to copy the current File.
+	 */
 	function dispButtonFileCopy()
 	{
 		$this->dispButtonFileCopyMoveRename( 'copy' );
 	}
 
 
+	/**
+	 * Display a button to move the current File.
+	 */
 	function dispButtonFileMove()
 	{
 		$this->dispButtonFileCopyMoveRename( 'move' );
 	}
 
 
+	/**
+	 * Display a button to rename the current File.
+	 */
 	function dispButtonFileRename()
 	{
 		$this->dispButtonFileCopyMoveRename( 'rename' );
 	}
 
 
+	/**
+	 * Display a button to delete a File. When the action is confirmed using
+	 * Javascript the GET param confirmed gets appended and set to 1.
+	 *
+	 * @param File|NULL the File to delete
+	 */
 	function dispButtonFileDelete( $File = NULL )
 	{
 		if( $File === NULL )
@@ -504,25 +548,30 @@ class FileManager extends Filelist
 	 */
 	function getCurUrl( $override = array() )
 	{
+		global $cache_fmCurUrls;
+
 		$r = $this->url;
 
-		$buildUpon = array_merge( $this->_internalGlobals, $override );
-		foreach( $buildUpon as $check => $checkval )
+		$toAppend = array();
+		foreach( $this->_internalGlobals as $check )
 		{
-			if( $checkval === false )
-			{ // don't include
-				continue;
-			}
-			if( $checkval !== NULL )
-			{ // use local param
-				$r = url_add_param( $r, $check.'='.$checkval );
+			if( isset( $override[$check] ) )
+			{
+				if( $override[$check] === false )
+				{ // don't include
+					continue;
+				}
+
+				$toAppend[] = $check.'='.$override[$check];
 			}
 			elseif( $this->$check !== NULL )
 			{
-				$r = url_add_param( $r, $check.'='.$this->$check );
+				$toAppend[] = $check.'='.$this->$check;
 			}
 		}
+		$r = url_add_param( $r, implode( '&amp;', $toAppend ) );
 
+		@$cache_fmCurUrls[$r]++;
 		return $r;
 	}
 
@@ -533,7 +582,8 @@ class FileManager extends Filelist
 	function getFormHiddenInputs( $override = array() )
 	{
 		// get current Url, remove leading URL and '?'
-		$params = preg_split( '/&amp;/', substr( $this->getCurUrl( $override ), strlen( $this->url )+1 ) );
+		$params = preg_split( '/&amp;/',
+														substr( $this->getCurUrl( $override ), strlen( $this->url )+1 ) );
 
 		$r = '';
 		foreach( $params as $lparam )
@@ -614,7 +664,7 @@ class FileManager extends Filelist
 	 * @param string can be used to query only 'file's or 'dir's.
 	 * @return boolean File object on success, false on end of list
 	 */
-	function getNextFile( $type = '' )
+	function &getNextFile( $type = '' )
 	{
 		$this->curFile = parent::getNextFile( $type );
 
@@ -697,27 +747,32 @@ class FileManager extends Filelist
 	 * @param File file object
 	 * @param boolean force link to a folder (default is to change into that folder).
 	 */
-	function getLinkFile( $File = NULL, $folderAsParam = false )
+	function getLinkFile( &$File, $folderAsParam = false )
 	{
-		if( $File === NULL )
-		{
-			$File = $this->curFile;
-		}
 		if( $File->isDir() && !$folderAsParam )
 		{
-			return $this->getCurUrl( array( 'path' => $this->getFileSubpath($File) ) );
+			if( !isset( $File->cache['linkFile_1'] ) )
+			{
+				$File->cache['linkFile_1'] = $this->getCurUrl( array( 'path' => $this->getFileSubpath($File) ) );
+			}
+
+			return $File->cache['linkFile_1'];
 		}
 		else
 		{
-			return $this->getCurUrl( array( 'path' => $this->getFileSubpath($File, false) ) )
+			if( !isset( $File->cache['linkFile_2'] ) )
+			{
+				$File->cache['linkFile_2'] = $this->getCurUrl( array( 'path' => $this->getFileSubpath($File, false) ) )
 							.'&amp;file='.urlencode( $File->getName() );
+			}
+			return $File->cache['linkFile_2'];
 		}
 	}
 
 
 	function getLinkFileEditPerms()
 	{
-		return $this->getLinkFile( NULL, true ).'&amp;action=editperm';
+		return $this->getLinkFile( $this->curFile, true ).'&amp;action=editperm';
 	}
 
 
@@ -727,7 +782,7 @@ class FileManager extends Filelist
 		{
 			return false;
 		}
-		return $this->getLinkFile().'&amp;action=edit';
+		return $this->getLinkFile( $this->curFile ).'&amp;action=edit';
 	}
 
 
@@ -907,38 +962,6 @@ class FileManager extends Filelist
 
 
 	/**
-	 * Create a root dir, while making the suggested name an safe filename.
-	 * @param string the path where to create the directory
-	 * @param string suggested dirname, will be converted to a safe dirname
-	 * @param integer permissions for the new directory (octal format)
-	 * @return mixed full path that has been created; false on error
-	 */
-	function create_rootdir( $path, $suggested_name, $chmod = NULL )
-	{
-		global $Debuglog;
-
-		if( $chmod === NULL )
-		{
-			$chmod = $this->default_chmod_dir;
-		}
-
-		$realname = safefilename( $suggested_name );
-		if( $realname != $suggested_name )
-		{
-			$Debuglog->add( 'Realname for dir ['.$suggested_name.']: ['.$realname.']', 'fileman' );
-		}
-		if( $this->createDir( $realname, $path, $chmod ) )
-		{
-			return $path.'/'.$realname;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-
-	/**
 	 * Creates a directory or file.
 	 *
 	 * Meant to be called by {@link createDir()} or {@link createFile()}
@@ -1015,24 +1038,6 @@ class FileManager extends Filelist
 	}
 
 
-	function debug( $what, $desc, $forceoutput = 0 )
-	{
-		global $Debuglog;
-
-		ob_start();
-		pre_dump( $what, '[Fileman] '.$desc );
-		$Debuglog->add( ob_get_contents() );
-		if( $forceoutput )
-		{
-			ob_end_flush();
-		}
-		else
-		{
-			ob_end_clean();
-		}
-	}
-
-
 	/**
 	 * Returns cwd, where the accessible directories (below root) are clickable
 	 *
@@ -1074,7 +1079,7 @@ class FileManager extends Filelist
 	{
 		if( $href === NULL )
 		{
-			$href = $this->getLinkFile().'&amp;mode=browse';
+			$href = $this->getLinkFile( $this->curFile ).'&amp;mode=browse';
 		}
 		if( $width === NULL )
 		{
@@ -1085,30 +1090,29 @@ class FileManager extends Filelist
 			$height = 800;
 		}
 
-		$r = "opened = window.open('$href','$target','resizable=yes,scrollbars=yes,";  // status=yes,toolbar=1,location=yes,";
-
-		if( $width )
-		{
-			$r .= "width=$width,";
-		}
-		if( $height )
-		{
-			$r .= "height=$height,";
-		}
-
-		$r = substr( $r, 0, -1 ) // cut last commata
+		$r = "opened = window.open('$href','$target','scrollbars=yes,"  // ."status=yes,toolbar=1,location=yes,"
+					.( $width ?
+							"width=$width," :
+							'' )
+					.( $height ?
+							"height=$height," :
+							'' )
+					.'resizable=yes'
 					."'); opened.focus();"
 					."if( typeof(openedWindows) == 'undefined' )"
 					."{ openedWindows = new Array(opened); }"
 					."else"
 					."{ openedWindows.push(opened); }"
 					."return false;";
+
 		return $r;
 	}
 
 
 	/**
-	 * get prefs from user's Settings
+	 * Load user's preferences from {@link $UserSettings}
+	 *
+	 * @return void
 	 */
 	function loadSettings()
 	{
@@ -1123,7 +1127,7 @@ class FileManager extends Filelist
 
 
 	/**
-	 * check permissions
+	 * Check permissions
 	 *
 	 * @param string for what? (upload)
 	 * @return true if permission granted, false if not
@@ -1219,6 +1223,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.11  2004/12/29 02:25:55  blueyed
+ * no message
+ *
  * Revision 1.10  2004/11/10 22:44:26  blueyed
  * small fix
  *

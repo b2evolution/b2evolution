@@ -101,6 +101,7 @@ $fm_filetypes = array( // {{{
 function &getFile( $name, $path = NULL )
 {
 	global $cache_File;
+
 	$path = trailing_slash( $path === NULL ?
 													getcwd() :
 													$path );
@@ -221,6 +222,8 @@ class File
 
 	/**
 	 * Is the File a directory?
+	 *
+	 * @return boolean true if the object is a directory, false if not
 	 */
 	function isDir()
 	{
@@ -269,9 +272,16 @@ class File
 
 	function getType()
 	{
+		if( isset( $this->_type ) )
+		{
+			return $this->_type;
+		}
+
+
 		if( $this->isDir() )
 		{
-			return T_('directory');
+			$this->_type = T_('directory');
+			return $this->_type;
 		}
 		global $fm_filetypes;
 
@@ -280,10 +290,13 @@ class File
 		{
 			if( preg_match('/'.$type.'$/i', $filename) )
 			{
-				return $desc;
+				$this->_type = $desc;
+				return $this->_type;
 			}
 		}
-		return T_('unknown');
+
+		$this->_type = T_('unknown');
+		return $this->_type;
 	}
 
 
@@ -480,6 +493,9 @@ class File
 
 /*
  * $Log$
+ * Revision 1.8  2004/12/29 02:25:55  blueyed
+ * no message
+ *
  * Revision 1.7  2004/11/05 00:36:43  blueyed
  * no message
  *
