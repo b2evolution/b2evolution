@@ -52,7 +52,7 @@ function cleanup_post_quotes()
 
 	echo "Checking for extra quote escaping in posts... ";
 	$query = "SELECT ID, post_title, post_content
-							FROM EVO_posts
+							FROM T_posts
 						 WHERE post_title LIKE '%\\\\\\\\\'%'
 						 		OR post_title LIKE '%\\\\\\\\\"%'
 						 		OR post_content LIKE '%\\\\\\\\\'%'
@@ -67,7 +67,7 @@ function cleanup_post_quotes()
 		foreach( $rows as $row )
 		{
 			// echo '<br />'.$row['post_title'];
-			$query = "UPDATE EVO_posts
+			$query = "UPDATE T_posts
 								SET post_title = ".$DB->quote( stripslashes( $row['post_title'] ) ).",
 										post_content = ".$DB->quote( stripslashes( $row['post_content'] ) )."
 								WHERE ID = ".$row['ID'];
@@ -88,7 +88,7 @@ function cleanup_comment_quotes()
 
 	echo "Checking for extra quote escaping in comments... ";
 	$query = "SELECT comment_ID, comment_content
-							FROM EVO_comments
+							FROM T_comments
 						 WHERE comment_content LIKE '%\\\\\\\\\'%'
 						 		OR comment_content LIKE '%\\\\\\\\\"%' ";
 	/* FP: the above looks overkill, but mySQL is really full of surprises...
@@ -100,7 +100,7 @@ function cleanup_comment_quotes()
 		echo 'Updating '.$DB->num_rows.' comments... ';
 		foreach( $rows as $row )
 		{
-			$query = "UPDATE EVO_comments
+			$query = "UPDATE T_comments
 								SET comment_content = ".$DB->quote( stripslashes( $row['comment_content'] ) )."
 								WHERE comment_ID = ".$row['comment_ID'];
 			// echo '<br />'.$query;

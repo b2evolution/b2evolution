@@ -23,7 +23,7 @@ function set_upgrade_checkpoint( $version )
  	global $DB;
 
 	echo "Creating DB schema version checkpoint at $version... ";
-	$DB->query( "UPDATE EVO_settings
+	$DB->query( "UPDATE T_settings
 									SET set_value = '$version'
 								WHERE set_name = 'db_version'" );
 	echo "OK.<br />\n";
@@ -493,7 +493,7 @@ function upgrade_b2evo_tables()
 		// --------------------------------------------
 		
 		echo 'Upgrading blogs table... ';
-		$query = "ALTER TABLE EVO_blogs
+		$query = "ALTER TABLE T_blogs
 							ADD blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
 							ADD blog_media_location ENUM( 'default', 'subdir', 'custom' ) DEFAULT 'default' NOT NULL AFTER blog_commentsexpire,
 							ADD blog_media_subdir VARCHAR( 255 ) NOT NULL AFTER blog_media_location,
@@ -507,33 +507,33 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Copying urlnames to stub names... ';
-		$query = 'UPDATE EVO_blogs
+		$query = 'UPDATE T_blogs
 							SET blog_stub = blog_urlname';
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		echo 'Upgrading posts table... ';
-		$query = "ALTER TABLE EVO_posts
+		$query = "ALTER TABLE T_posts
 							ADD post_views INT(4) NOT NULL DEFAULT '0' AFTER post_flags,
 							ADD post_commentsexpire DATETIME DEFAULT NULL AFTER post_comments";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		echo 'Upgrading users table... ';
-		$query = "ALTER TABLE EVO_users
+		$query = "ALTER TABLE T_users
 							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1 AFTER user_notify,
 							ADD COLUMN user_upload_ufolder tinyint(1) NOT NULL default 0 AFTER user_showonline";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		echo 'Setting new defaults... ';
-		$query = "INSERT INTO EVO_settings (set_name, set_value)
+		$query = "INSERT INTO T_settings (set_name, set_value)
 							VALUES ( 'reloadpage_timeout', '300' )";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		echo 'Altering table for Blog-User permissions... ';
-		$DB->query( 'ALTER TABLE EVO_blogusers
+		$DB->query( 'ALTER TABLE T_blogusers
 									ADD COLUMN bloguser_perm_upload tinyint NOT NULL default 0' );
 		echo "OK.<br />\n";
 

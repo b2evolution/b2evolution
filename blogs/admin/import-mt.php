@@ -663,7 +663,7 @@ param( 'mode', 'string', 'normal' );
 
 		if( $simulate )
 		{
-			$simulate_cat_id = $DB->get_var( 'SELECT MAX( cat_ID )+1 FROM EVO_categories' );
+			$simulate_cat_id = $DB->get_var( 'SELECT MAX( cat_ID )+1 FROM T_categories' );
 		}
 
 		$i = -1;

@@ -1,0 +1,76 @@
+/**
+ * Backoffice main Cascading Style Sheets definitions
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
+ */
+ 
+@import url(desert.css);	/* This is based on desert.css */
+
+/* Titles */
+#TitleArea h1 {
+	color: #a00;
+}
+h2 {
+	color: #a00;
+}
+div.bSideItem h3 {
+	color: #a00;
+}
+h4 {
+	color: #a00;
+}
+
+
+a.ActionButton,
+a.DeleteButton,
+a.ActionButton:hover,
+a.DeleteButton:hover,
+a.PublishButton,
+a.PublishButton:hover,
+div.edit_actions input.SaveButton,
+div.edit_actions input,
+div.PostActionsArea input,
+div.edit_actions input:hover,
+div.PostActionsArea input:hover,
+div.edit_actions input.SaveButton:hover,
+div.edit_actions input.DeleteButton:hover {
+	color:#333;
+	background-color: #fff;
+	background-image: url("../admin/img/desert-button-2.gif");
+	border: 1px solid #ccc5aa;
+}
+fieldset.submit input.SaveButton:hover,
+fieldset.submit input.ResetButton:hover,
+input.search,
+input.search:hover {
+	color:#333;
+	background-color: #e1ddce;
+	background-image: url("../admin/img/desert-button.gif");
+	border: 1px solid #ccc5aa;
+}
+input.SaveButton:hover {
+	color:#333;
+	border: 1px solid #ccc5aa;
+}
+
+legend {
+	color: #a00;
+}
+table.grouped th {
+	color: #a00;
+}
+
+
+
+form.fform fieldset.submit fieldset {
+	background: transparent;
+}
+form.fform fieldset.submit {
+	border:0;
+	background:transparent;
+	clear:both;
+}

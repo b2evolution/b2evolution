@@ -1,0 +1,713 @@
+/**
+ * Backoffice main Cascading Style Sheets definitions
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
+ */
+ 
+@import url(../rsc/basic.css);	/* Import basic styles */
+@import url(../rsc/img.css);	/* Import standard image styles */
+@import url(../rsc/blog_elements.css);	/* Import standard blog elements styles */
+@import url(../rsc/forms.css);	/* Import default form styles */
+@import url(../rsc/comments.css);	/* Import default comment styles */
+
+body {
+	margin: 0;
+	background-color: #fff;
+	color: #000;
+	font-family: Verdana, Geneva, Arial, Helvetica;
+	font-size: 84%;
+}
+
+/* Titles */
+#TitleArea h1 {
+	clear: both;
+	margin: 1ex 0;
+	padding: 1ex;
+	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
+	color: #9e9286;
+	font-size: 112%;
+	font-weight:normal;
+	background-color: #efede0;
+	border: 1px solid #e1ddce;
+}
+h1.logintitle {
+	color: #000;
+	font-size: 120%;
+	padding: 0;
+	margin: .5ex;
+}
+h2 {
+	margin-top: 0ex;
+	margin-bottom: 1ex;
+	color: #9e9286;
+	font-size: 140%;
+}
+h3 {
+	font-size: 120%;
+}
+div.bSideItem h3 {
+	color: #9e9286;
+	margin: .5ex 0;
+}
+div.panelinfo h3 {
+	margin: 1ex 0;
+	padding: 0;
+}
+h4 {
+	font-size: 110%;
+	margin-bottom: 1ex;
+	color: #9e9286;
+}
+
+/* Form elements: */
+textarea,
+input,
+select {
+	border: 1px solid #ccc5aa;
+	background-color: #f4f3ee;
+	padding: 1px;
+	margin: 1px;
+	vertical-align: middle;
+}
+input.checkbox,
+input.radio {
+	background-color: #fff;
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+form.fform fieldset {
+	border-color: #eee7e0;
+}
+
+legend {
+	font-weight: bold;
+	color: #9e9286;
+}
+
+
+/* Links and buttons: */
+a {
+	background-color: transparent;
+	color: #008;
+	text-decoration: none;
+}
+a:hover {
+	color: #00b;
+	text-decoration: underline;
+}
+a.CurrentBlog,
+a.OtherBlog,
+a.ActionButton,
+a.DeleteButton {
+	color:#333;
+	text-decoration: none;
+	padding: 2px 1ex;
+	border: 1px solid #ccc5aa;
+}
+a.CurrentBlog {
+	font-weight: bold;
+	background-image: url("../admin/img/desert-button-2.gif");
+	background-color: #fff;
+}
+a.CurrentBlog:hover {
+	color: #000;
+	text-decoration: underline;
+	border: 1px solid #000;
+}
+a.OtherBlog,
+a.ActionButton,
+a.DeleteButton {
+	background-image: url("../admin/img/desert-button.gif");
+	background-color: #e1ddce;
+}
+a.OtherBlog {
+	line-height: 3.5ex;
+}
+a.OtherBlog:hover,
+a.ActionButton:hover {
+	color: #00b;
+	text-decoration: underline;
+	background-color: #fff;
+	background-image: url("../admin/img/desert-button-2.gif");
+	border: 1px solid #00b;
+}
+a.DeleteButton:hover {
+	color: #c00;
+	text-decoration: underline;
+	background-color: #fff;
+	background-image: url("../admin/img/desert-button-2.gif");
+	border: 1px solid #c00;
+}
+a.PublishButton {
+	color:#333;
+	background-color: transparent;
+	text-decoration: none;
+	font-weight: bold;
+	padding: 2px 1ex;
+	background-image: url("../admin/img/desert-button.gif");
+	background-color: #e1ddce;
+	border: 1px solid #ccc5aa;
+}
+a.PublishButton:hover {
+	color: #c00;
+	text-decoration: underline;
+	background-color: #fff;
+	background-image: url("../admin/img/desert-button-2.gif");
+	border: 1px solid #c00;
+}
+
+input.search,
+input.SaveButton,
+input.ResetButton,
+div.edit_actions input,
+div.PostActionsArea input {
+	font-family: Arial, Helvetica, sans-serif;
+	padding: 2px;
+	margin: 0 1px;
+	color:#333;
+	background-image: url("../admin/img/desert-button.gif");
+	background-color: #e1ddce;
+	border: 1px solid #ccc5aa;
+}
+div.edit_actions input,
+div.PostActionsArea input {
+	margin: 1px 1px;
+}
+input.search:hover,
+div.edit_actions input:hover,
+div.PostActionsArea input:hover {
+	color: #00b;
+	text-decoration: underline;
+	background-color: #fff;
+	background-image: url("../admin/img/desert-button-2.gif");
+	border: 1px solid #00b;
+}
+
+input.SaveButton,
+div.edit_actions input.SaveButton {
+	font-weight: bold;
+}
+input.SaveButton:hover,
+input.ResetButton:hover,
+div.edit_actions input.SaveButton:hover,
+div.edit_actions input.DeleteButton:hover {
+	color: #c00;
+	border: 1px solid #c00;
+}
+
+
+/* Tables: */
+
+table.grouped
+{
+	border: 1px solid #9e9286;
+	margin: auto;
+	border-collapse: collapse; 
+}
+
+table.grouped td {
+	background-color: #f5f3ef;
+	border-left: 1px solid #9e9286;
+	padding: .3ex 1ex;
+}
+
+table.grouped tr.odd td {
+	background-color: #efede0;
+} 
+
+table.grouped th {
+	border-bottom: 1px solid #9e9286;
+	border-left: 1px solid #9e9286;
+	color: #9e9286;
+	background-color: #efede0;
+	padding: .3ex 1ex;
+}
+tr.group td {
+	font-weight: bold;
+	color: #8e8276;
+	background-color: #e3dfd0;
+	border-top: 1px solid #9e9286;
+	border-bottom: 1px solid #9e9286;	
+	border-left: 0;
+}
+td.right {
+	text-align: right;
+}
+table.grouped .firstcol,
+table.grouped tr.odd .firstcol {
+	border-left: 0;
+}
+
+/* Page layout: */
+#header {
+	float:left;
+	width:100%;
+	background: url("img/bg.gif") repeat-x bottom;
+	font-size:85%;
+	line-height:normal;
+}
+#TitleArea {
+	clear: both;
+	margin: 0 1em;
+	padding: 0;
+	border-top: 1px solid #fff;	/* force moz to display float before */
+}
+#evologo {
+	float:left;
+	padding-left: 1em;
+	padding-right: 1em;
+	vertical-align: middle;
+	border: 0;
+}
+#headfunctions {
+	margin-top: .5ex;
+	text-align:right;
+	margin-right: 1ex;
+	color: #b0b0b0;
+}
+#headfunctions a {
+	padding: 1px;
+	color: #b0b0b0;
+	background-color: transparent;
+	text-decoration: none;
+}
+#headfunctions a:hover {
+	color: #000;
+	background-color: #f0e0e0;
+	text-decoration: none;
+}
+#headinfo {
+	padding-left: 1em;
+	line-height: 150%;
+	color: #b0b0b0;
+	white-space: nowrap;
+}
+.panelbody {
+	margin: 0;
+	padding: 0;
+	/* border:	1px solid #f00; */
+}
+.left_col {
+	vertical-align: top;
+	float: left;
+	width: 65%;
+	clear: left;
+	/* border:	1px solid #f00; */
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+.right_col {
+	/* border:	1px solid #f00; */
+	width: 33%;
+	vertical-align: top;
+	float: right;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+div.panelinfo {
+	clear: both;
+	background-color: #efede0;
+	border: 1px solid #e1ddce;
+	padding: 0 1ex; 
+	margin: 1ex 1em;
+}
+div.panelinfo p {
+	margin: 1ex 0;
+	padding: 0;
+}
+div.panelblock {
+	border: 1px solid #e1ddce;
+	padding: 1ex;
+	margin: 1ex 1em;
+}
+.footer {
+	text-align: center;
+	font-size: 74%;
+	margin-top: 0ex;
+	margin-bottom: 0ex;
+	padding-bottom: 1ex;
+	clear: both;
+}
+
+/* Main tabs: */
+ul.tabs {
+	margin:0;
+	clear: both;
+	padding: 0.1ex 1em 0;
+	list-style: none;
+}
+ul.tabs li {
+	float:left;
+	background:url("img/left_both.gif") no-repeat left top;
+	margin:0;
+	padding:0 0 0 9px;
+	border-bottom:1px solid #9e9286;
+}
+ul.tabs li a {
+	float:left;
+	display:block;
+	white-space:nowrap;
+	background: url("img/right_both.gif") no-repeat right top;
+	padding:4px 11px 3px 2px;
+	text-decoration:none;
+	color:#765;
+}
+/* Commented Backslash Hack: hides rule from IE5-Mac \*/
+ul.tabs li a {float:none;}
+/* End IE5-Mac hack */
+ul.tabs li a:hover {
+	color:#33c;
+	text-decoration: underline;		/* for IE */
+}
+ul.tabs li:hover {			/* Won't work in IE */
+	background-position:0% -150px;
+	color:#333;
+}
+ul.tabs li:hover a {			/* Won't work in IE */
+	background-position:100% -150px;
+	color:#33c;
+	/* text-decoration: none; */
+}
+ul.tabs li.current {
+	background-position:0% -150px;
+	border-width:0;
+}
+ul.tabs li.current a {
+	background-position:100% -150px;
+	color:#333;
+	padding-bottom:4px;
+}
+ul.tabs li.current a:hover {
+	text-decoration: underline;
+	color:#333;
+}
+
+/* Sub-tabs */
+div.pt
+{
+	margin: 0 1em;
+}
+div.panelblocktabs
+{
+	clear: both;
+	margin-top: 1ex;
+	float:left;
+	width:100%;
+	background: url("img/tabs_bg.gif") repeat-x bottom;
+	font-size:85%;
+	line-height:normal;
+}
+div.tabbedpanelblock {
+	clear: both;
+	border: 1px solid #9e9286;
+	border-top: none;
+	background-color: #fbfaf9;
+	padding: 1ex 1em 1ex 1em;
+	margin: 0 1em 2ex 1em;
+}
+
+
+/* Login screen: */
+div.loginblock {
+	border: 1px solid #CCCCCC;
+	padding: 2ex;
+	margin: 3ex auto;
+	width: 30em;
+	clear: both;
+}
+div.loginblock fieldset {
+	margin: 0;
+	padding: 1ex 0;
+}
+
+
+/* browse/ Edit Screen: */
+div.NavBar {
+	background-color: #efede0;
+	border: 1px solid #e1ddce;
+	padding: 1ex;
+	margin: 0 0 1ex 1em;
+}
+div.NavBar table {
+	width: 100%;
+}
+div.PostActionsArea,
+div.CommentActionsArea {
+	clear: both;
+	background-color: #efede0;
+	border-top: 1px solid #e1ddce;
+	border-bottom: 1px solid #e1ddce;
+	padding: 1ex;
+	margin: 0;
+}
+
+div.bSideItem {
+	border: 1px solid #eee7e0;
+	padding: 1ex;
+	margin: 0 1em 1ex 0;
+	margin-left: 0ex;
+}
+
+.bSmallHead {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 85%;
+	padding: 1ex;
+	margin: 0;
+	color: #9e9286;
+	border-bottom: 1px solid #e1ddce;
+}
+.bSmallHeadRight {
+	float: right;
+	text-align: right;
+}
+
+div.bPostpublished {
+	border: 1px solid #e1ddce;
+	padding: 0;
+	margin: 0 0 1ex 1em;
+	margin-right: 0ex;
+}
+.bPostpublished span.Status {
+	color: #0b0;
+}
+.bPostprotected {
+	clear: both;
+	padding: 0;
+	margin: 0 0 1ex 1em;
+	margin-right: 0ex;
+	border: 1px solid #fc9;
+	/* background-color: #fff7e7; */
+}
+.bPostprotected span.Status {
+	color: #ea0;
+}
+.bPostprotected > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px solid #fc9;
+}
+.bPostprivate {
+	clear: both;
+	padding: 0;
+	margin: 0 0 1ex 1em;
+	margin-right: 0ex;
+	border: 1px solid #f99;
+	/* background-color: #fee; */
+}
+.bPostprivate span.Status {
+	color: #e00;
+}
+.bPostprivate > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px solid #f99;
+}
+.bPostdraft {
+	clear: both;
+	padding: 0;
+	margin: 0 0 1ex 1em;
+	margin-right: 0ex;
+	border: 1px dashed #ccc;
+	background-color: #f4f4f4;
+}
+.bPostdraft span.Status {
+	color: #666;
+}
+.bPostdraft > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px dashed #ccc;
+}
+.bPostdeprecated {
+	clear: both;
+	padding: 0;
+	margin: 0 0 1ex 1em;
+	margin-right: 0ex;
+	border: 1px dashed #000;
+	background-color: #d8d8d8;
+	color: #888;
+}
+.bPostdeprecated span.Status {
+	color: #000;
+}
+.bPostdeprecated > div.bSmallHead /* Direct child only */
+{
+	border-bottom: 1px dashed #000;
+}
+.bContent,
+.bCommentContent,
+.bFeedback {
+	margin: 1ex;
+}
+.bTitle {
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+}
+.bText {
+	margin: 0;
+	padding: 0;
+}
+a.permalink_right {
+	margin: .3ex .3ex 0 0;
+}
+
+div.bComment, /* Entire comment block */
+form.bComment /* New comment form */
+{
+	border: 1px solid #eee7e0;
+	padding: 0;
+	margin: 1ex;
+}
+
+.bSideItem ul,
+.right_col ul {
+	margin-left: 0ex;
+	padding-left: 0ex;
+	margin-top: .5ex;
+	margin-bottom: .5ex;
+	list-style-type:none;
+}
+.bSideItem ul ul,
+.right_col ul ul {
+	margin-left: 1ex;
+	padding-left: 1ex;
+}
+
+input.SearchField {
+	width: 96%;
+	margin: .5ex auto 0 auto;
+	padding: 2px;
+}
+
+
+/* Calendar: */
+caption.bCalendarCaption {
+	border: 1px solid #e1ddce;
+	background-color: #efede0;
+	border-bottom: 0;
+}
+table.bCalendarTable {
+	border: solid 1px #e1ddce;
+}
+table.bCalendarTable tfoot td {
+	background-color: #efede0;
+	border-top: 1px solid #e1ddce;
+}
+table.bCalendarTable a:hover {
+	background-color: #e1ddce;
+}
+table.bCalendarTable td:hover /* Not in IE */
+{	
+	background-color: #e1ddce;
+}
+table.bCalendarTable tfoot td:hover /* Not in IE */
+{	
+	background-color: #efede0;
+}
+table.bCalendarTable tfoot a {
+	text-decoration: none;
+}
+th.bCalendarHeaderCell {
+	color: #9e9286;
+}
+#bCalendarToday {
+	background-color: #efede0;
+}
+
+/* Write/compose Screen */
+.left_col fieldset {
+	border: 1px solid #eee7e0;
+	margin: 0 0 1ex 1em;
+	padding: 0 1ex 1ex 1ex;
+}
+
+.bSideItem fieldset div {
+	margin: 1ex 0ex;
+}
+
+.right_col fieldset {
+	border: 1px solid #eee7e0;
+	margin: 0 1em 1ex 0;
+	padding: 0 1ex 1ex 1ex;
+}
+.bSideItem fieldset
+{
+	margin: 1ex 0;
+	clear: both;
+}
+
+fieldset.extracats {
+	border: 1px solid #eee7e0;
+	padding: 0 0 0 1ex;
+	margin: 1ex 1em 1ex 0;
+	overflow: visible;
+}
+fieldset.extracats div.extracats {
+	/* border: 1px solid #f00; */
+	height: 44ex;
+	overflow: auto;
+	padding: 0 1ex 0 0;
+	margin: 0 0 0 0;
+}
+.extracatnote {
+	/* display: block; */
+	font-size: 80%;
+	margin: 1ex 0;
+	padding: 0;
+	color: #999;
+	/* border: 1px solid #f00; */
+}
+
+div.edit_toolbars {
+	margin-top: 1ex;
+	width: 100%;
+	text-align: center;
+}
+div.edit_toolbar {
+	background-color: #efede0;
+	border: 1px solid #e1ddce;
+	padding: 1px;
+	margin: 1px auto;
+	width: 98%;
+}
+div.edit_toolbar input {
+	font-family: Arial, Helvetica, sans-serif;
+	color:#333;
+	background-color: #fff;
+	background-image: url("../admin/img/desert-button-2.gif");
+	border: 1px solid #ccc5aa;
+	margin: 0 1px;
+}
+div.edit_toolbar input:hover {
+	color: #000;
+	text-decoration: underline;  
+	border: 1px solid #000;
+}
+div.edit_area {
+	width: 100%;
+	text-align: center;
+}
+div.edit_area textarea,
+textarea.bComment {
+	width: 98%;
+	margin: 0 auto;
+}
+div.edit_actions {
+	background-color: #efede0;
+	border: 1px solid #e1ddce;
+	padding: 1px;
+	margin: 1ex auto;
+	width: 98%;
+	text-align: center;
+}
+
+/* User rights: */
+span.checkall,
+th.checkright {
+	font-size: 84%;
+}

@@ -124,20 +124,20 @@ $tableusersettings = $tableprefix.'usersettings';
  * Aliases for class DB:
  */
 $db_aliases = array(
-		'EVO_posts'        => $tableposts       ,
-		'EVO_users'        => $tableusers       ,
-		'EVO_settings'     => $tablesettings    ,
-		'EVO_categories'   => $tablecategories  ,
-		'EVO_comments'     => $tablecomments    ,
-		'EVO_blogs'        => $tableblogs       ,
-		'EVO_postcats'     => $tablepostcats    ,
-		'EVO_hitlog'       => $tablehitlog      ,
-		'EVO_antispam'     => $tableantispam    ,
-		'EVO_groups'       => $tablegroups      ,
-		'EVO_blogusers'    => $tableblogusers   ,
-		'EVO_locales'      => $tablelocales     ,
-		'EVO_sessions'     => $tablesessions    ,
-		'EVO_usersettings' => $tableusersettings,
+		'T_posts'        => $tableposts       ,
+		'T_users'        => $tableusers       ,
+		'T_settings'     => $tablesettings    ,
+		'T_categories'   => $tablecategories  ,
+		'T_comments'     => $tablecomments    ,
+		'T_blogs'        => $tableblogs       ,
+		'T_postcats'     => $tablepostcats    ,
+		'T_hitlog'       => $tablehitlog      ,
+		'T_antispam'     => $tableantispam    ,
+		'T_groups'       => $tablegroups      ,
+		'T_blogusers'    => $tableblogusers   ,
+		'T_locales'      => $tablelocales     ,
+		'T_sessions'     => $tablesessions    ,
+		'T_usersettings' => $tableusersettings,
 	);
 
 /**#@+

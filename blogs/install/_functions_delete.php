@@ -18,49 +18,49 @@ function db_delete()
 	global $DB;
 
 	echo "Dropping Antispam table...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_antispam' );
+	$DB->query( 'DROP TABLE IF EXISTS T_antispam' );
 
 	echo "Dropping Hit-Logs...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_hitlog' );
+	$DB->query( 'DROP TABLE IF EXISTS T_hitlog' );
 
 	echo "Dropping Comments...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_comments' );
+	$DB->query( 'DROP TABLE IF EXISTS T_comments' );
 
 	echo "Dropping Categories-to-Posts relationships...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_postcats' );
+	$DB->query( 'DROP TABLE IF EXISTS T_postcats' );
 
 	echo "Dropping Categories...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_categories' );
+	$DB->query( 'DROP TABLE IF EXISTS T_categories' );
 
 	echo "Dropping Posts...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_posts' );
+	$DB->query( 'DROP TABLE IF EXISTS T_posts' );
 
 	echo "Dropping User Settings...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_usersettings' );
+	$DB->query( 'DROP TABLE IF EXISTS T_usersettings' );
 
  	echo "Dropping User sessions...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_sessions' );
+	$DB->query( 'DROP TABLE IF EXISTS T_sessions' );
 
 	echo "Dropping Users...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_users' );
+	$DB->query( 'DROP TABLE IF EXISTS T_users' );
 
 	echo "Dropping Groups...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_groups' );
+	$DB->query( 'DROP TABLE IF EXISTS T_groups' );
 
 	echo "Dropping Blogs...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_blogs' );
+	$DB->query( 'DROP TABLE IF EXISTS T_blogs' );
 
 	echo "Dropping Blogusers...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_blogusers' );
+	$DB->query( 'DROP TABLE IF EXISTS T_blogusers' );
 
 	echo "Dropping Settings...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_settings' );
+	$DB->query( 'DROP TABLE IF EXISTS T_settings' );
 
 	echo "Dropping Locales...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_locales' );
+	$DB->query( 'DROP TABLE IF EXISTS T_locales' );
 
 	echo "Dropping User Settings...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS EVO_usersettings' );
+	$DB->query( 'DROP TABLE IF EXISTS T_usersettings' );
 }
 
 ?>

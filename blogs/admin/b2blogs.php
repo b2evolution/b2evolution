@@ -88,7 +88,7 @@ switch($action)
 			$Messages->add( T_('You must provide an URL blog name!') );
 		}
 		else if( $DB->get_var( 'SELECT COUNT(*)
-												FROM EVO_blogs
+												FROM T_blogs
 												WHERE blog_urlname = '.$DB->quote($blog_urlname) ) )
 		{ // urlname is already in use
 			$Messages->add( T_('This URL blog name is already in use by another blog. Please choose another name.') );
@@ -279,7 +279,7 @@ switch($action)
 					$Messages->add( T_('You must provide an URL blog name!') );
 				}
 				else if( $DB->get_var( 'SELECT COUNT(*)
-														FROM EVO_blogs
+														FROM T_blogs
 														WHERE blog_urlname = '.$DB->quote($blog_urlname).'
 															AND blog_ID <> '.$edited_Blog->ID ) )
 				{ // urlname is already in use

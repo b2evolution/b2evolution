@@ -1,0 +1,280 @@
+/**
+ * Backoffice main Cascading Style Sheets definitions
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
+ */
+ 
+@import url(desert.css);	/* based on desert.css */
+
+/* Titles */
+#TitleArea h1 {
+	margin: 1ex 0;
+	padding: 0;
+	color: #abc;
+	background-color: #fff;
+	border: 0;
+}
+h2 {
+	color: #abc;
+}
+div.bSideItem h3 {
+	color: #abc;
+}
+h4 {
+	color: #abc;
+}
+
+/* Form elements: */
+textarea,
+input,
+select {
+	border: 1px solid #ccc;
+	background-color: #f4f4f4;
+}
+form.fform fieldset {
+	border-color: #ddd;
+}
+
+legend {
+	color: #abc;
+}
+
+
+/* Links and buttons: */
+a {
+	background-color: transparent;
+	color: #00e;
+	text-decoration: none;
+}
+a:hover {
+	color: #b0b0b0;
+	text-decoration: underline;
+}
+a.CurrentBlog,
+a.OtherBlog,
+a.ActionButton,
+a.DeleteButton {
+	border: 1px solid #ccc;
+}
+a.CurrentBlog
+{
+	background-image: none;
+	background-color: #fff;
+	border: 1px solid #abc;
+	color: #00e;
+}
+a.OtherBlog
+{
+	background-image: none;
+	background-color: #eee;
+	border: 1px solid #abc;
+	color: #00e;
+}
+a.ActionButton,
+a.DeleteButton {
+	background-image: url("img/legacy-button.gif");
+	background-color: #fec;
+}
+a.OtherBlog:hover,
+a.CurrentBlog:hover
+{
+	background-image: none;
+	background-color: #fff;
+	color: #b0b0b0;
+}
+a.ActionButton:hover {
+	background-color: #fff;
+	background-image: url("img/legacy-button.gif");
+	border: 1px solid #fec;
+}
+a.DeleteButton:hover {
+	background-color: #fff;
+	background-image: url("img/legacy-button.gif");
+	border: 1px solid #fec;
+}
+a.PublishButton {
+	background-image: url("img/legacy-button.gif");
+	background-color: #fec;
+	border: 1px solid #ccc;
+}
+a.PublishButton:hover {
+	background-color: #fff;
+	background-image: url("img/legacy-button.gif");
+	border: 1px solid #fec;
+}
+
+input.search,
+input.SaveButton,
+input.ResetButton,
+div.edit_actions input,
+div.PostActionsArea input {
+	background-image: url("img/legacy-button.gif");
+	background-color: #fec;
+	border: 1px solid #ccc;
+
+}
+input.search:hover,
+div.edit_actions input:hover,
+div.PostActionsArea input:hover {
+	background-color: #fec;
+	background-image: url("img/legacy-button.gif");
+	border: 1px solid #00b;
+
+}
+/* Tables: */
+
+table.grouped
+{
+	border: 1px solid #999;
+}
+
+table.grouped td {
+	background-color: #eee;
+	border-left: 1px solid #999;
+}
+
+table.grouped tr.odd td {
+	background-color: #ddd;
+} 
+
+table.grouped th {
+	border-bottom: 1px solid #999;
+	border-left: 1px solid #999;
+	color: #fff;
+	background-color: #abc;
+}
+tr.group td {
+	color: #999;
+	background-color: #ccc;
+	border-left: 0;
+	border-top: 1px solid #999;
+	border-bottom: 1px solid #999;	
+}
+
+/* Page layout: */
+#header {
+	background: url("img/bg_grey.gif") repeat-x bottom;
+}
+div.panelinfo {
+	clear: both;
+	border: 1px solid #def;
+	background: #eef5ff;
+	padding: 0 1ex; 
+	margin: 1ex 1em;
+}
+/* Main tabs: */
+ul.tabs li {
+	background:url("img/tabs_left_grey.gif") no-repeat left top;
+	border-bottom:1px solid #949494;
+}
+ul.tabs li a {
+	background: url("img/tabs_right_grey.gif") no-repeat right top;
+}
+/* Sub-tabs */
+div.panelblocktabs
+{
+	background: url("img/tabs_bg_grey.gif") repeat-x bottom;
+}
+div.tabbedpanelblock {
+	border: 1px solid #939393;
+	border-top: none;
+	background-color: #fafafa;
+}
+
+
+
+
+
+/* browse/ Edit Screen: */
+div.NavBar {
+	background-color: #eee;
+	border: 1px solid #ccc;
+}
+div.PostActionsArea,
+div.CommentActionsArea {
+	background-color: #eee;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+
+div.bSideItem {
+	border: 1px solid #ddd;
+}
+
+.bSmallHead {
+	color: #abc;
+	border-bottom: 1px solid #ccc;
+}
+
+div.bPostpublished {
+	border: 1px solid #ccc;
+
+}
+
+
+/* Calendar: */
+caption.bCalendarCaption {
+	border: 1px solid #ccc;
+	background-color: #eee;
+	border-bottom: 0;
+}
+table.bCalendarTable {
+	border: solid 1px #ccc;
+	border-collapse: separate; 
+}
+table.bCalendarTable tfoot td {
+	background-color: #eee;
+	border-top: 1px solid #ccc;
+}
+table.bCalendarTable a:hover {
+	background-color: transparent;
+	color: #b0b0b0;
+}
+table.bCalendarTable td:hover /* Not in IE */
+{	
+	background-color: transparent;
+	color: inherit;
+}
+table.bCalendarTable tfoot td:hover /* Not in IE */
+{	
+	background-color: #eee;
+}
+th.bCalendarHeaderCell {
+	color: #abc;
+}
+#bCalendarToday {
+	background-color: #cff;
+}
+
+/* Write/compose Screen */
+.left_col fieldset {
+	border: 1px solid #ddd;
+}
+
+.right_col fieldset {
+	border: 1px solid #ddd;
+}
+
+fieldset.extracats {
+	border: 1px solid #ddd;
+
+}
+div.edit_toolbar {
+	background-color: #eee;
+	border: 1px solid #ccc;
+
+}
+div.edit_toolbar input {
+	background-color: #eee;
+	background-image: url("img/legacy-button-2.gif");
+	border: 1px solid #ccc;
+
+}
+div.edit_actions {
+	background-color: #eee;
+	border: 1px solid #ccc;
+}

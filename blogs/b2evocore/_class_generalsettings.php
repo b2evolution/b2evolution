@@ -30,7 +30,7 @@ class GeneralSettings extends AbstractSettings
 	{ // constructor
 		global $new_db_version;
 
-		$this->dbtablename = 'EVO_settings';
+		$this->dbtablename = 'T_settings';
 		$this->colkeynames = array( 'set_name' );
 		$this->colvaluename = 'set_value';
 

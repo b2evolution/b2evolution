@@ -229,7 +229,7 @@ function create_b2evo_tables_091()
 	global $DB;
 
 	echo 'Creating table for active sessions... ';
-	$DB->query( "CREATE TABLE EVO_sessions (
+	$DB->query( "CREATE TABLE T_sessions (
 									sess_time int(10) unsigned NOT NULL,
 									sess_ipaddress varchar(15) NOT NULL,
 									sess_user_ID mediumint(8) unsigned NULL default NULL,
@@ -240,7 +240,7 @@ function create_b2evo_tables_091()
 
 
 	echo 'Creating user settings table... ';
-	$DB->query( "CREATE TABLE EVO_usersettings (
+	$DB->query( "CREATE TABLE T_usersettings (
 									uset_user_ID INT(10) NOT NULL ,
 									uset_name VARCHAR( 30 ) NOT NULL,
 									uset_value VARCHAR( 255 ) NULL,
