@@ -59,7 +59,8 @@ profile_check_params( array( 'nickname' => $newuser_nickname,
 															'email' => $newuser_email,
 															'url' => $newuser_url,
 															'pass1' => $pass1,
-															'pass2' => $pass2 ) );
+															'pass2' => $pass2,
+															'pass_required' => false ) );
 
 
 if( $Messages->count( 'error' ) )
