@@ -64,7 +64,7 @@ switch( $action )
 		$current_User->check_perm( 'options', 'edit', true );
 		// Install plugin:
 		param( 'plugin', 'string', true );
-		$Messages->add( T_('Installing plugin: ').$plugin, 'note' );
+		$Messages->add( T_('Installing plugin:').' '.$plugin, 'note' );
 		$Plugins->install( $plugin );
 		break;
 
