@@ -13,11 +13,17 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 switch( $edited_Blog->get( 'access_type' ) )
 {
-	case 'default': $blog_urlappend = 'index.php'; break;
-	case 'index.php': $blog_urlappend = 'index.php'.( $Settings->get('links_extrapath') ? '/'.$edited_Blog->get( 'stub' ) : '?blog='.$edited_Blog->ID ); break;
-	case 'stub': $blog_urlappend = $edited_Blog->get( 'stub' ); break;
+	case 'default': 
+		$blog_urlappend = 'index.php'; 
+		break;
+	case 'index.php': 
+		$blog_urlappend = 'index.php'.( $Settings->get('links_extrapath') ? '/'.$edited_Blog->get( 'stub' ) : '?blog='.$edited_Blog->ID ); 
+		break;
+	case 'stub': 
+		$blog_urlappend = $edited_Blog->get( 'stub' ); 
+		break;
 }
-$blog_urlappend = str_replace( "'", "\'", $blog_urlappend );
+$blog_urlappend = str_replace( "'", "\'", $blog_urlappend ); // Javascript escape
 ?>
 <script type="text/javascript">
 <!--

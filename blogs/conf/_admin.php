@@ -3,7 +3,7 @@
  * This is b2evolution's admin config file
  *
  * This sets how the back-office works
- * Last significant changes to this file: version 0.9.0.10
+ * Last significant changes to this file: version 0.9.1
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -71,13 +71,13 @@ $use_fileupload = 1;
 #   If you're unsure about what your real path is, please ask your host's support staff.
 #   Note that the  directory must be writable by the webserver (ChMod 766).
 #   Note for windows-servers users: use forwardslashes instead of backslashes
-# $fileupload_realpath = '/home/example/public_html/media/';
+# $fileupload_realpath = '/home/example/public_html/media/';	# WITH traling slash!
 # Alternatively you may want to use this form:
-$fileupload_realpath = $basepath.'media/';
+$fileupload_realpath = $basepath.'media/';	# WARNING: slashes moved!
 # Enter the URL of that directory (it's used to generate the links to the pictures).
-# $fileupload_url = 'http://example.com/media/';
+# $fileupload_url = 'http://example.com/media/';	# WITH traling slash!
 # Alternatively you may want to use this form:
-$fileupload_url = $baseurl.'media/';
+$fileupload_url = $baseurl.'media/';				# WARNING: slashes moved!
 # Accepted file types, you can add to that list if you want.
 #   Note: add a space before and after each file type.
 #   Example: $fileupload_allowedtypes = ' jpg gif png ';

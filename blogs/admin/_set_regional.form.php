@@ -70,7 +70,7 @@ if( !empty($locale) && $action != 'extract' )
 		?>
 		<div class="panelinfo">
 			<h3><?php echo T_('Flags') ?></h3>
-			<p><?php printf(T_('The flags are stored in subdirectories from <code>%s</code>. Their filename is equal to the country part of the locale (characters 4-5); file extension is .gif .'), '/'.$img_subdir.'flags/'); ?></p>
+			<p><?php printf(T_('The flags are stored in subdirectories of <code>%s</code>. Their filename is equal to the country part of the locale (characters 4-5); file extension is .gif .'), '/'.$img_subdir.'flags/'); ?></p>
 			<h3><?php echo T_('Date/Time Formats') ?></h3>
 			<p><?php echo T_('The following characters are recognized in the format strings:') ?></p>
 			<p>

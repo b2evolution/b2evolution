@@ -149,7 +149,7 @@ class SafeHtmlChecker
 			}
 		}
 		// Are tag attributes valid?
-		foreach ($attrs as $attr => $value)
+		foreach( $attrs as $attr => $value )
 		{
 			if (!isset($this->tagattrs[$tag]) || !in_array($attr, explode(' ', $this->tagattrs[$tag])))
 			{
@@ -157,12 +157,12 @@ class SafeHtmlChecker
 			}
 			if (in_array($attr, $this->uri_attrs))
 			{ // Must this attribute be checked for URIs
-			$matches = array();
-			$value = trim($value);
-			if( $error = validate_url( $value, $this->allowed_uri_scheme ) )
-			{
-				$this->html_error( T_('Found invalid URL: ').$error );
-			}
+				$matches = array();
+				$value = trim($value);
+				if( $error = validate_url( $value, $this->allowed_uri_scheme ) )
+				{
+					$this->html_error( T_('Found invalid URL: ').$error );
+				}
 			}
 		}
 		// Set previous, used for checking nesting context rules

@@ -3,7 +3,7 @@
  * This is b2evolution's stats config file
  *
  * This file sets how b2evolution will log hits and stats
- * Last significant changes to this file: version 0.9.0.4
+ * Last significant changes to this file: version 0.9.1
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

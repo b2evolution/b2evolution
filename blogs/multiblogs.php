@@ -89,7 +89,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 	$blog_other_name_before = '<span class="small">';
 	$blog_other_name_after = '</span>';
 	// Include the bloglist
-	require( get_path('skins').'_bloglist.php');
+	require get_path('skins').'_bloglist.php';
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 <!-- InstanceEndEditable -->
 
@@ -160,7 +160,7 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 
 		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
 		$disp_pingbacks = 1;				// Display the pingbacks if requested
-		require( get_path('skins').'_feedback.php');
+		require get_path('skins').'_feedback.php';
 		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ------------------- ?>
 	</div>
 <?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
@@ -172,22 +172,22 @@ require(dirname(__FILE__).'/b2evocore/_blog_main.php');
 	{
 		case 'comments':
 			// this includes the last comments if requested:
-			require( get_path('skins').'_lastcomments.php' );
+			require get_path('skins').'_lastcomments.php';
 			break;
 
 		case 'stats':
 			// this includes the statistics if requested:
-			require( get_path('skins').'_stats.php');
+			require get_path('skins').'_stats.php';
 			break;
 
 		case 'arcdir':
 			// this includes the archive directory if requested
-			require( get_path('skins').'_arcdir.php');
+			require get_path('skins').'_arcdir.php';
 			break;
 
 		case 'profile':
 			// this includes the profile form if requested
-			require( get_path('skins').'_profile.php');
+			require get_path('skins').'_profile.php';
 			break;
 	}
 // ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>

@@ -65,7 +65,7 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
  * Use http://localhost/b2evolution/blogs/ instead. And log in on localhost too, not homer!
  * If you don't, login cookies will not hold.
  */
-$baseurl = 'http://localhost/b2evolution/blogs/';  // with ending slash!
+$baseurl = 'http://localhost/b2evolution/blogs/';  // WITH ending slash! (NEW in 0.9.1!)
 
 
 /**

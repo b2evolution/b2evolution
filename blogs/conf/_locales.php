@@ -36,7 +36,7 @@ $default_locale = 'en-EU';
 /**
  * Load locale related functions: (we need NT_(-) here)
  */
-require_once( dirname(__FILE__).'/'.$conf_dirout.$core_subdir.'_functions_locale.php' );
+require_once dirname(__FILE__).'/'.$conf_dirout.$core_subdir.'_functions_locale.php';
 
 
 //{{{ defining the locales:

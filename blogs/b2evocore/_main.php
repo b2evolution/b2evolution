@@ -23,19 +23,6 @@ $main_init = true;
  * Includes:
  */
 require_once( dirname(__FILE__).'/../conf/_config.php' );
-
-
-if( !function_exists( 'gzencode' ) )
-{ // when there is no function to gzip, we won't do it
-	$use_gzipcompression = false;
-}
-
-if( $use_obhandler )
-{ // register output buffer handler
-	ob_start( 'obhandler' );
-}
-
-
 require_once( dirname(__FILE__).'/_class_log.php' );
 $Debuglog = new Log( 'note' );
 $Messages = new Log( 'error' );
@@ -66,6 +53,17 @@ if( !$config_is_done )
 { // base config is not done.
 	$error_message = 'Base configuration is not done.';
 	require dirname(__FILE__).'/_conf_error.page.php';	// error & exit
+}
+
+// FP: Daniel, why do you want to move this further up?
+if( !function_exists( 'gzencode' ) )
+{ // when there is no function to gzip, we won't do it
+	$use_gzipcompression = false;
+}
+
+if( $use_obhandler )
+{ // register output buffer handler
+	ob_start( 'obhandler' );
 }
 
 
