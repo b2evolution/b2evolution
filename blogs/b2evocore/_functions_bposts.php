@@ -272,7 +272,7 @@ function get_lastpostdate( $blog = 1, $show_statuses = '' )
  * @param integer ID of post
  * @return string validated url title
  */
-function urltitle_validate( $urltitle, $title, $post_ID = 0 )
+function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false )
 {
 	global $DB, $tableposts;
 
@@ -331,7 +331,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0 )
 	}
 	// echo "highest existing number = $highest_number <br />";
 
-	if( $exact_match )
+	if( $exact_match && !$query_only )
 	{	// We got an exact match, we need to change the number:
 		$urltitle = $urlbase.'_'.($highest_number + 1);
 	}

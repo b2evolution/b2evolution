@@ -195,15 +195,26 @@ function cat_delete( $cat_ID )
  * fplanque: reused "R. U. Serious" optimization here
  * fplanque: added blog ID stuff
  * TODO: move. dis is not a template tag
+ *
+ * @param integer category ID
+ * @param boolean die() if category does not exist? (default: true)
+ *
  */
-function get_the_category_by_ID($cat_ID)
+function get_the_category_by_ID( $cat_ID, $die = true )
 {
-	global $id,$tablecategories,$querycount,$cache_categories,$use_cache;
-	if ((empty($cache_categories[$cat_ID])) OR (!$use_cache))
+	global $cache_categories, $use_cache;
+	if( (empty($cache_categories[$cat_ID]) ) OR (!$use_cache) )
 	{
 		cat_load_cache();
 	}
-	if( !isset( $cache_categories[$cat_ID] ) ) die( sprintf( T_('Requested category %s does not exist!'),  $cat_ID ) );
+	if( !isset( $cache_categories[$cat_ID] ) )
+	{
+		if( $die )
+		{
+			die( sprintf( T_('Requested category %s does not exist!'),  $cat_ID ) );
+		}
+		else return false;
+	}
 	return $cache_categories[$cat_ID];
 }
 
