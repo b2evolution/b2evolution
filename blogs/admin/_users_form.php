@@ -87,6 +87,9 @@
 	
 		</fieldset>
 	
+		<?php 
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{ ?>
 		<fieldset>
 			<fieldset>
 				<div class="input">
@@ -95,7 +98,8 @@
 				</div>
 			</fieldset>
 		</fieldset>
-	
+		<?php } ?>	
+		
 		<div class="clear"></div>
 	</form>
 

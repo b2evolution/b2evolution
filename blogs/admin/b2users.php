@@ -18,6 +18,9 @@ case 'useredit':
 	/* 
 	 * View user:
 	 */
+	// Check permission:
+	$current_User->check_perm( 'users', 'view', true );
+
 	param( 'user', 'integer', true );
 	$edited_User = new User( get_userdata($user) );
 	require(dirname(__FILE__).'/_menutop.php');
@@ -31,6 +34,9 @@ case 'userupdate':
 	 */
 	require(dirname(__FILE__).'/_menutop.php');
 	require(dirname(__FILE__).'/_menutop_end.php');
+
+	// Check permission:
+	$current_User->check_perm( 'users', 'edit', true );
 
 	param( 'edited_user_ID', 'integer', true );
 	$edited_User = new User( get_userdata( $edited_user_ID ) );
@@ -47,7 +53,10 @@ case 'userupdate':
 	exit();
 
 	
-case "promote":
+case 'promote':
+	// Check permission:
+	$current_User->check_perm( 'users', 'edit', true );
+
 	param( 'prom', 'string', true );
 	param( 'id', 'integer', true );
 	
@@ -77,12 +86,16 @@ case "promote":
 	header("Location: b2users.php");
 	exit();
 
-case "delete":
+case 'delete':
 	/*
 	 * Delete user
 	 */
+	// Check permission:
+	$current_User->check_perm( 'users', 'edit', true );
+
 	param( 'id', 'integer' );
-	if (!$id) {
+	if (!$id) 
+	{
 		header("Location: b2users.php");
 	}
 
@@ -107,6 +120,9 @@ case 'groupedit':
 	/* 
 	 * View group:
 	 */
+	// Check permission:
+	$current_User->check_perm( 'users', 'view', true );
+
 	param( 'grp_ID', 'integer', true );
 	$edited_Group = Group_get_by_ID( $grp_ID );
 	require(dirname(__FILE__).'/_menutop.php');
@@ -119,8 +135,14 @@ case 'groupupdate':
 	/* 
 	 * Update group:
 	 */
+	// Check permission:
+	$current_User->check_perm( 'users', 'edit', true );
+
 	param( 'edited_grp_ID', 'integer', true );
 	$edited_Group = Group_get_by_ID( $edited_grp_ID );
+
+	param( 'edited_grp_name', 'string', true );
+	$edited_Group->set( 'name', $edited_grp_name );
 
 	param( 'edited_grp_perm_stats', 'string', true );
 	$edited_Group->set( 'perm_stats', $edited_grp_perm_stats );
@@ -133,7 +155,13 @@ case 'groupupdate':
 	
 	param( 'edited_grp_perm_templates', 'int', 0 );
 	$edited_Group->set( 'perm_templates', $edited_grp_perm_templates );
-	
+
+	if( $edited_grp_ID != 1 )
+	{	// Groups others than #1 can be prevented from editing users
+		param( 'edited_grp_perm_users', 'string', true );
+		$edited_Group->set( 'perm_users', $edited_grp_perm_users );
+	}
+		
 	$edited_Group->dbupdate();	// Commit update to the DB
 	
 	header("Location: b2users.php");
@@ -143,6 +171,9 @@ case 'groupupdate':
 default:
 	require( dirname(__FILE__).'/_menutop.php');
 	require( dirname(__FILE__).'/_menutop_end.php');
+
+	// Check permission:
+	$current_User->check_perm( 'users', 'view', true );
 }
 
 // Display user list:

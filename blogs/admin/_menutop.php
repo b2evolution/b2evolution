@@ -111,12 +111,15 @@ if( empty($mode) )
 			echo '<a href="b2template.php">', T_('Templates'), '</a></li>';
 		}
 	
-		if( $title == T_('User management') )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="b2users.php" >', T_('Users'), '</a></li>';
-	
+		if( $current_User->check_perm( 'users', 'view' ) )
+		{
+			if( $title == T_('User management') )
+				echo '<li class="current">';
+			else
+				echo '<li>';
+			echo '<a href="b2users.php" >', T_('Users'), '</a></li>';
+		}
+			
 		if( $title == T_('My Profile') )
 			echo '<li class="current">';
 		else

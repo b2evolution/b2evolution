@@ -14,6 +14,7 @@ class Group extends DataObject
 	var	$perm_spamblacklist;
 	var	$perm_options;
 	var	$perm_templates;
+	var	$perm_users;
 
 	/* 
 	 * Group::Group(-)
@@ -35,6 +36,7 @@ class Group extends DataObject
 			$this->perm_spamblacklist = 'none';
 			$this->perm_options = 'none';
 			$this->perm_templates = 0;
+			$this->perm_users = 'none';
 		}
 		else
 		{
@@ -45,6 +47,7 @@ class Group extends DataObject
 			$this->perm_spamblacklist = $db_row->grp_perm_spamblacklist;
 			$this->perm_options = $db_row->grp_perm_options;
 			$this->perm_templates = $db_row->grp_perm_templates;
+			$this->perm_users = $db_row->grp_perm_users;
 		}
 	}	
 	
@@ -86,6 +89,7 @@ class Group extends DataObject
 			case 'stats':
 			case 'spamblacklist':
 			case 'options':
+			case 'users':
 				switch( $permvalue )
 				{
 					case 'edit':

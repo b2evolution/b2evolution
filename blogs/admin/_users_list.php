@@ -58,11 +58,11 @@
 				echo "<a href=\"$url\" title=\"website: $url\"><img src=\"img/url.gif\" border=\"0\" alt=\"website: $url\" /></a>&nbsp;";
 			echo "</td>\n";
 			echo "<td>".$loop_User->get('level');
-			if (($user_level >= 2) && ($user_level > ($loop_User->get('level') + 1)))
+			if( ($user_level > ($loop_User->get('level') + 1)) && $current_User->check_perm( 'users', 'edit' ) )
 				echo " <a href=\"b2users.php?action=promote&id=".$loop_User->get('ID')."&prom=up\">+</a> ";
-			if (($user_level >= 2) && ($user_level > $loop_User->get('level')) && ($loop_User->get('level') > 0))
+			if( ($user_level > $loop_User->get('level')) && ($loop_User->get('level') > 0) && $current_User->check_perm( 'users', 'edit' ))
 				echo " <a href=\"b2users.php?action=promote&id=".$loop_User->get('ID')."&prom=down\">-</a> ";
-			if (($user_level >= 3) && ($loop_User->get('level') == 0))
+			if( ($loop_User->get('level') == 0) && $current_User->check_perm( 'users', 'edit' ) )
 			{
 				?>
 				<a href="b2users.php?action=delete&id=<?php echo $loop_User->get('ID') ?>" style="color:red;font-weight:bold;" onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
@@ -77,7 +77,7 @@
 </div>
 
 <?php 
-	if ($user_level >= 3) 
+	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ ?>
 		<div class="panelblock">
 			<?php	

@@ -233,6 +233,7 @@ function create_groups()
   	grp_perm_stats enum('none','view','edit') NOT NULL default 'none',
   	grp_perm_spamblacklist enum('none','view','edit') NOT NULL default 'none',
   	grp_perm_options enum('none','view','edit') NOT NULL default 'none',
+  	grp_perm_users enum('none','view','edit') NOT NULL default 'none',
 		grp_perm_templates TINYINT NOT NULL DEFAULT 0,
 	  PRIMARY KEY (grp_ID)
 	)";
@@ -246,6 +247,7 @@ function create_groups()
 	$Group_Admins->set( 'perm_spamblacklist', 'edit' );
 	$Group_Admins->set( 'perm_options', 'edit' );
 	$Group_Admins->set( 'perm_templates', 1 );
+	$Group_Admins->set( 'perm_users', 'edit' );
 	$Group_Admins->dbinsert();
 
 	$Group_Priviledged = new Group();
@@ -254,6 +256,7 @@ function create_groups()
 	$Group_Priviledged->set( 'perm_spamblacklist', 'edit' );
 	$Group_Priviledged->set( 'perm_options', 'view' );
 	$Group_Priviledged->set( 'perm_templates', 0 );
+	$Group_Priviledged->set( 'perm_users', 'view' );
 	$Group_Priviledged->dbinsert();
 
 	$Group_Bloggers = new Group();
@@ -262,6 +265,7 @@ function create_groups()
 	$Group_Bloggers->set( 'perm_spamblacklist', 'view' );
 	$Group_Bloggers->set( 'perm_options', 'none' );
 	$Group_Bloggers->set( 'perm_templates', 0 );
+	$Group_Bloggers->set( 'perm_users', 'none' );
 	$Group_Bloggers->dbinsert();
 
 	$Group_Users = new Group();
@@ -270,6 +274,7 @@ function create_groups()
 	$Group_Users->set( 'perm_spamblacklist', 'none' );
 	$Group_Users->set( 'perm_options', 'none' );
 	$Group_Users->set( 'perm_templates', 0 );
+	$Group_Users->set( 'perm_users', 'none' );
 	$Group_Users->dbinsert();
 
 }
