@@ -53,7 +53,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 				$members = array();
 				$i = 0;  // incemental counter (for "check all" span IDs)
 				if( count($rows) ) foreach( $rows as $loop_row )
-				{	// Go through users:
+				{ // Go through users:
 					$members[] = $loop_row['ID'];
 					$perm_post = explode( ',', $loop_row['bloguser_perm_poststatuses'] );
 					?>
@@ -135,7 +135,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 								value="1" title="<?php echo T_("Permission to upload into blog's media folder") ?>" />
 						</td>
 						<td class="center">
-							<a href="#" onclick="toggleall(document.FormPerm, <?php echo $loop_row['ID'].', '.$i ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
+							<a href="javascript:toggleall(document.FormPerm, <?php echo $loop_row['ID'].', '.$i ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
 								<span id="checkallspan_<?php echo $i ?>"><?php echo T_('(un)check all')?></span>
 							</a>
 						</td>
@@ -209,7 +209,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 								value="1" title="<?php echo T_("Permission to upload into blog's media folder") ?>" />
 						</td>
 						<td class="center">
-							<a href="#" onclick="toggleall(document.FormPerm, <?php echo $loop_row['ID'].', '.$i ?>);">
+							<a href="javascript:toggleall(document.FormPerm, <?php echo $loop_row['ID'].', '.$i ?>);">
 								<span id="checkallspan_<?php echo $i ?>"><?php echo T_('(un)check all')?></span>
 							</a>
 						</td>
