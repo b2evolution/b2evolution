@@ -235,7 +235,6 @@ function create_b2evo_tables_091()
 								)" );
 	echo "OK.<br />\n";
 
-
 	echo 'Creating user settings table... ';
 	$DB->query( "CREATE TABLE T_usersettings (
 									uset_user_ID INT(10) NOT NULL ,
