@@ -145,10 +145,11 @@ class File
 	 * @param string path to the file / directory
 	 * @return mixed false on failure, File object on success
 	 */
-	function File( $name, $path )
+	function File( $name, $dir )
 	{
 		$this->setName( $name );
-		$this->_path = $path;
+		$this->_dir = $dir;
+		$this->_md5ID = md5( $this->_dir.$this->_name );
 
 		$this->refresh();
 	}
@@ -157,20 +158,21 @@ class File
 	/**
 	 * Create the file, if it does not exist.
 	 *
+	 * @param string type ('dir' / 'file')
 	 * @param string optional permissions (octal format)
 	 * @return boolean true if file was created, false on failure
 	 */
-	function create( $chmod = NULL )
+	function create( $type = 'file', $chmod = NULL )
 	{
-		if( $this->_isDir )
+		if( $type == 'dir' )
 		{
 			$r = $chmod === NULL ?
-						@mkdir( $this->_path.$this->_name ) :
-						@mkdir( $this->_path.$this->_name, octdec($chmod) );
+						@mkdir( $this->_dir.$this->_name ) :
+						@mkdir( $this->_dir.$this->_name, octdec($chmod) );
 		}
 		else
 		{
-			$r = touch( $this->_path.$this->_name );
+			$r = touch( $this->_dir.$this->_name );
 			if( $chmod !== NULL )
 			{
 				$this->chmod( $chmod );
@@ -179,7 +181,7 @@ class File
 
 		if( $r )
 		{
-			$this->_exists = true;
+			$this->refresh();
 		}
 		return $r;
 	}
@@ -190,9 +192,9 @@ class File
 	 */
 	function refresh()
 	{
-		$this->_exists = file_exists( $this->_path.$this->_name );
+		$this->_exists = file_exists( $this->_dir.$this->_name );
 
-		if( is_dir( $this->_path.$this->_name ) )
+		if( is_dir( $this->_dir.$this->_name ) )
 		{
 			$this->_isDir = true;
 			$this->_size = NULL;
@@ -200,12 +202,12 @@ class File
 		else
 		{
 			$this->_isDir = false;
-			$this->_size = @filesize( $this->_path.$this->_name );
+			$this->_size = @filesize( $this->_dir.$this->_name );
 		}
 
 		// for files and dirs
-		$this->_lastm = @filemtime( $this->_path.$this->_name );
-		$this->_perms = @fileperms( $this->_path.$this->_name );
+		$this->_lastm = @filemtime( $this->_dir.$this->_name );
+		$this->_perms = @fileperms( $this->_dir.$this->_name );
 	}
 
 
@@ -232,6 +234,17 @@ class File
 
 
 	/**
+	 * Get the File's ID (MD5 of path and name)
+	 *
+	 * @return string
+	 */
+	function getID()
+	{
+		return $this->_md5ID;
+	}
+
+
+	/**
 	 * Get the File's name.
 	 *
 	 * @return string
@@ -241,17 +254,28 @@ class File
 		return $this->_name;
 	}
 
+	/**
+	 * Get the File's directory.
+	 *
+	 * @return string
+	 */
+	function getDir()
+	{
+		return $this->_dir;
+	}
+
 
 	/**
-	 * Get the path, optionally with name.
+	 * Get the full path (directory and name) to the file.
 	 *
 	 * @param boolean full path with name?
 	 */
-	function getPath( $withname = false )
+	function getPath( $withname = true )
 	{
-		return $withname ?
-						$this->_path.$this->_name.( $this->isDir() ? '/' : '' ) :
-						$this->_path;
+		return $this->_dir.$this->_name
+						.( $this->isDir() ?
+								'/' :
+								'' );
 	}
 
 
@@ -329,8 +353,10 @@ class File
 		{
 			case 'raw':
 				return $this->_perms;
+
 			case 'lsl':
 				return translatePerm( $this->_perms );
+
 			case NULL:
 				if( is_windows() )
 				{
@@ -340,6 +366,7 @@ class File
 					}
 					else return 'r';
 				}
+
 			case 'octal':
 				return substr( sprintf('%o', $this->_perms), -3 );
 		}
@@ -354,7 +381,7 @@ class File
 	 * 'file_unknown' map entry is used if no match was found, or 'folder' if
 	 * the file is a directory.
 	 *
-	 * {@uses $map_iconfiles}
+	 * @uses $map_iconfiles
 	 * @return string Path to the iconfile (relative to {@link $baseurl})
 	 */
 	function getIconPath()
@@ -396,7 +423,7 @@ class File
 	 */
 	function getImageSize( $param = 'widthxheight' )
 	{
-		return imgsize( $this->getPath( true ), $param );
+		return imgsize( $this->getPath(), $param );
 	}
 
 
@@ -443,7 +470,7 @@ class File
 	 */
 	function rename( $newname )
 	{
-		if( rename( $this->getPath( true ), $this->getPath().$newname ) )
+		if( rename( $this->getPath(), $this->getDir().$newname ) )
 		{
 			$this->setName( $newname );
 			return true;
@@ -463,8 +490,8 @@ class File
 	function unlink()
 	{
 		$unlinked = $this->isDir() ?
-								@rmdir( $this->getPath(true) ) :
-								@unlink( $this->getPath(true) );
+								@rmdir( $this->getPath() ) :
+								@unlink( $this->getPath() );
 		if( !$unlinked )
 		{
 			return false;
@@ -484,11 +511,12 @@ class File
 	function chmod( $chmod )
 	{
 		$chmod = octdec( $chmod );
-		if( chmod( $this->getPath(true), $chmod) )
+		if( chmod( $this->getPath(), $chmod) )
 		{
 			clearstatcache();
 			// update current entry
-			$this->_perms = fileperms( $this->getPath(true) );
+			$this->_perms = fileperms( $this->getPath() );
+
 			return $this->_perms;
 		}
 		else
@@ -501,11 +529,8 @@ class File
 
 /*
  * $Log$
- * Revision 1.9  2004/12/29 04:32:10  blueyed
- * no message
- *
- * Revision 1.7  2004/11/05 00:36:43  blueyed
- * no message
+ * Revision 1.10  2005/01/05 03:04:00  blueyed
+ * refactored
  *
  * Revision 1.6  2004/11/03 00:58:02  blueyed
  * update
@@ -515,9 +540,6 @@ class File
  *
  * Revision 1.4  2004/10/23 23:07:16  blueyed
  * case-insensitive for windows!
- *
- * Revision 1.3  2004/10/21 00:14:44  blueyed
- * moved
  *
  * Revision 1.2  2004/10/16 01:31:22  blueyed
  * documentation changes

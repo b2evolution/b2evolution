@@ -90,12 +90,6 @@ class FileManager extends Filelist
 	var $dirsnotattop = false;
 
 	/**
-	 * User preference: show hidden files?
-	 * @var boolean
-	 */
-	var $showhidden = true;
-
-	/**
 	 * User preference: show permissions like "ls -l" (true) or octal (false)?
 	 * @var boolean
 	 */
@@ -153,8 +147,17 @@ class FileManager extends Filelist
 	 */
 	var $_internalGlobals = array(
 			'root', 'path', 'filterString', 'filterIsRegexp', 'order', 'orderasc',
-			'mode', 'source', 'keepsource', 'flatmode',
+			'mode', 'fm_sources', 'cmr_keepsource', 'flatmode',
 		);
+
+	/**
+	 * A list of selected files. Gets build on first call to
+	 * {@link getFilelistSelected()}.
+	 *
+	 * @var Filelist
+	 * @access private
+	 */
+	var $_selectedFiles;
 
 	// }}}
 
@@ -172,7 +175,7 @@ class FileManager extends Filelist
 	 * @param boolean is the filter a regular expression (default is glob pattern)
 	 * @param boolean filter in subdirs (search)
 	 */
-	function FileManager( &$cUser, $url, $root, $path = '', $order = NULL, $asc = NULL,
+	function FileManager( &$cUser, $url, $root, $path = '', $order = NULL, $orderasc = NULL,
 												$filterString = NULL, $filterIsRegexp = NULL, $flatmode = NULL )
 	{
 		global $basepath, $baseurl, $media_subdir, $admin_subdir, $admin_url;
@@ -272,14 +275,16 @@ class FileManager extends Filelist
 		$this->mode = empty($mode) ? NULL : $mode;
 
 		if( $this->mode
-				&& $this->source = urldecode( param( 'source', 'string', '' ) ) )
+				&& $this->fm_sources = param( 'fm_sources', 'array', array() ) )
 		{
-			$sourceName = basename( $this->source );
-			$sourcePath = dirname( $this->source ).'/';
-			if( $this->SourceList =& new Filelist( $sourcePath ) )
+			if( $this->SourceList =& new Filelist() )
 			{ // TODO: should fail for non-existant sources, or sources where no read-perm
-				$this->SourceList->addFileByPath( $sourceName );
-				$this->keepsource = param( 'keepsource', 'integer', 0 );
+
+				foreach( $this->fm_sources as $lSource )
+				{
+					$this->SourceList->addFileByPath( urldecode($lSource), true );
+				}
+				$this->cmr_keepsource = param( 'cmr_keepsource', 'integer', 0 );
 			}
 			else
 			{
@@ -289,12 +294,14 @@ class FileManager extends Filelist
 		else
 		{
 			$this->SourceList = false;
-			$this->source = NULL;
-			$this->keepsource = NULL;
+			$this->fm_sources = NULL;
+			$this->cmr_keepsource = NULL;
 		}
 
 
-		$this->filterString = $filterString;
+		$this->filterString = !empty($filterString) ?
+														$filterString :
+														NULL;
 		$this->filterIsRegexp = $filterIsRegexp;
 
 		if( $this->filterIsRegexp && !is_regexp( $this->filterString ) )
@@ -303,9 +310,24 @@ class FileManager extends Filelist
 			$this->filterString = '.*';
 		}
 		$this->order = ( in_array( $order, array( 'name', 'path', 'type', 'size', 'lastmod', 'perms' ) ) ? $order : NULL );
-		$this->orderasc = ( $asc === NULL  ? NULL : (bool)$asc );
+		$this->orderasc = ( $orderasc === NULL  ? NULL : (bool)$orderasc );
 
 		$this->loadSettings();
+
+
+		if( !empty($file) )
+		{ // a file is given as parameter
+			$curFile =& $Fileman->getFileByName( $file );
+
+			if( !$curFile )
+			{
+				$Fileman->Messages->add( sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $file ) );
+			}
+		}
+		else
+		{
+			$curFile = false;
+		}
 
 
 		$Debuglog->add( 'root: '.var_export( $this->root, true ), 'filemanager' );
@@ -432,9 +454,9 @@ class FileManager extends Filelist
 			return false;
 		}
 		$url = $this->getCurUrl( array( 'mode' => 'file_cmr',
-																		'source' => false,
-																		'keepsource' => (int)($mode == 'copy') ) );
-		$url .= '&amp;source='.urlencode( $this->curFile->getPath( true ) );
+																		'fm_sources' => false,
+																		'cmr_keepsource' => (int)($mode == 'copy') ) );
+		$url .= '&amp;fm_sources[]='.urlencode( $this->curFile->getPath() );
 
 		echo '<a href="'.$url.'" target="fileman_copymoverename" onclick="'
 					.$this->getJsPopupCode( $url, 'fileman_copymoverename' )
@@ -529,7 +551,7 @@ class FileManager extends Filelist
 	/**
 	 * Get current mode.
 	 *
-	 * @return string|false 'file_copy', 'file_move', 'file_rename'
+	 * @return string|false 'file_cmr'
 	 */
 	function getMode()
 	{
@@ -540,16 +562,15 @@ class FileManager extends Filelist
 	/**
 	 * Get the current url, with all relevant GET params (root, path, filterString,
 	 * filterIsRegexp, order, orderasc).
-	 * Params can be overridden or be forced to
+	 * Params can be overridden / disabled.
 	 *
 	 * @uses $_internalGlobals
-	 * @param array override internal globals {@link $_internalGlobals}
+	 * @param array override/disable internal globals {@link $_internalGlobals} or
+	 *              add own key => value pairs as URL params
 	 * @return string the resulting URL
 	 */
 	function getCurUrl( $override = array() )
 	{
-		global $cache_fmCurUrls;
-
 		$r = $this->url;
 
 		$toAppend = array();
@@ -557,27 +578,51 @@ class FileManager extends Filelist
 		{
 			if( isset( $override[$check] ) )
 			{
-				if( $override[$check] === false )
+				$overrideValue = $override[$check];
+				unset( $override[$check] );
+
+				if( $overrideValue === false )
 				{ // don't include
 					continue;
 				}
 
-				$toAppend[] = $check.'='.$override[$check];
+				$toAppend[$check] = $overrideValue;
 			}
 			elseif( $this->$check !== NULL )
 			{
-				$toAppend[] = $check.'='.$this->$check;
+				$toAppend[$check] = $this->$check;
 			}
 		}
-		$r = url_add_param( $r, implode( '&amp;', $toAppend ) );
+		while( list( $lKey, $lValue ) = each( $override ) )
+		{ // Additional params to add, no internal globals
+			$toAppend[$lKey] = $lValue;
+		}
 
-		@$cache_fmCurUrls[$r]++;
+		$strAppend = '';
+		while( list( $lName, $lValue ) = each( $toAppend ) )
+		{
+			if( is_array( $lValue ) )
+			{
+				$strAppend .= ( !empty($strAppend) ? '&amp;' : '' )
+										.$lName.'[]='.implode( '&amp;'.$lName.'[]=', $lValue );
+			}
+			else
+			{
+				$strAppend .= ( !empty($strAppend) ? '&amp;' : '' )
+										.$lName.'='.$lValue;
+			}
+		}
+
+		$r = url_add_param( $r, $strAppend );
+
 		return $r;
 	}
 
 
 	/**
 	 * Generates hidden input fields for forms, based on {@link getCurUrll()}
+	 *
+	 * @return string
 	 */
 	function getFormHiddenInputs( $override = array() )
 	{
@@ -590,8 +635,34 @@ class FileManager extends Filelist
 		{
 			if( $pos = strpos($lparam, '=') )
 			{
-				$r .= '<input type="hidden" name="'.substr( $lparam, 0, $pos ).'" value="'.format_to_output( substr( $lparam, $pos+1 ), 'formvalue' ).'" />';
+				$r .= '<input type="hidden" name="'.substr( $lparam, 0, $pos )
+							.'" value="'.format_to_output( substr( $lparam, $pos+1 ), 'formvalue' )."\" />\n";
 			}
+		}
+
+		return $r;
+	}
+
+
+		function getmicrotime(){
+			 list($usec, $sec) = explode(" ",microtime());
+			 return ((float)$usec + (float)$sec);
+			 }
+
+	/**
+	 * Generate hidden input fields for the selected files
+	 *
+	 * @return string
+	 */
+	function getFormHiddenSelectedFiles()
+	{
+		$r = '';
+
+		reset( $this->_selectedFiles->entries );
+		while( list($lKey, $lFile) = each($this->_selectedFiles->entries) )
+		{
+			$r .= '<input type="hidden" name="fm_selected[]" value="'
+						.$this->_selectedFiles->entries[$lKey]->getID()."\" />\n";
 		}
 
 		return $r;
@@ -628,28 +699,34 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Get the link to sort by a column. Handle current order and appends an
+	 * icon to reflect the current state (ascending/descending).
 	 *
+	 * @param string The type (name, path, size, ..)
+	 * @param string The text for the anchor.
+	 * @return string
 	 */
 	function getLinkSort( $type, $atext )
 	{
+		$asc = $this->order == $type ?
+						(1 - $this->isSortingAsc()) : // change asc/desc
+						1;
+
 		$r = '<a href="'
 					.$this->getCurUrl( array( 'order' => $type,
-																		'asc' => false ) );
-
-		if( $this->order == $type )
-		{ // change asc
-			$r .= '&amp;asc='.(1 - $this->isSortingAsc());
-		}
+																		'orderasc' => $asc ) );
 
 		$r .= '" title="'
-					.( ($this->order == $type && !$this->isSortingAsc($type))
-						|| ( $this->order != $type && $this->isSortingAsc($type) )
-							? T_('Sort ascending by this column') : T_('Sort descending by this column')
-					).'">'.$atext;
+					.( $asc ?
+							/* TRANS: %s gets replaced with column names 'Name', 'Type', .. */
+							sprintf( T_('Sort ascending by: %s'), $atext ) :
+							/* TRANS: %s gets replaced with column names 'Name', 'Type', .. */
+							sprintf( T_('Sort descending by: %s'), $atext ) )
+					.'">'.$atext;
 
 		if( $this->order == $type )
-		{ // add asc/desc image
-			$r .= ' '.( $this->isSortingAsc() ?
+		{ // add asc/desc image to represent current state
+			$r .= ' '.( !$asc ?
 										getIcon( 'ascending' ) :
 										getIcon( 'descending' ) );
 		}
@@ -659,51 +736,46 @@ class FileManager extends Filelist
 
 
 	/**
-	 * get the next File in the Filelist
+	 * Get the next File in the Filelist by reference.
 	 *
 	 * @param string can be used to query only 'file's or 'dir's.
 	 * @return boolean File object on success, false on end of list
 	 */
 	function &getNextFile( $type = '' )
 	{
-		$this->curFile = parent::getNextFile( $type );
+		$this->curFile =& parent::getNextFile( $type );
 
 		return $this->curFile;
 	}
 
 
 	/**
-	 * Get the path (and name) of a {@link File} relative to the filelists
-	 * root path.
+	 * Get the path (and name) of a {@link File} relative to the cwd.
 	 *
-	 * @param File a File object or NULL for current File
+	 * @param File the File object
 	 * @param boolean appended with name?
 	 * @return string path (and optionally name)
 	 */
 	function getFileSubpath( &$File, $withname = true )
 	{
-		if( $File === NULL )
+		$path = substr( $this->path.$File->getDir(), strlen( $this->cwd ) );
+
+		if( empty($path) )
 		{
-			$File = $this->curFile;
+			$path = './';
 		}
 
-		$r = $this->path;
-
-		if( $this->flatmode )
+		if( $withname )
 		{
-			$r .= substr( $File->getPath($withname), strlen( $this->cwd ) );
-		}
-		else
-		{
-			$r .= $withname ? $File->getName() : '';
+			$path .= $File->getName();
 		}
 
-		return $r;
+		return $path;
 	}
 
 
 	/**
-	 * Get the URL to access a file.
+	 * Get the URL of a file.
 	 *
 	 * @param File the File object
 	 */
@@ -713,14 +785,8 @@ class FileManager extends Filelist
 		{
 			$File = $this->curFile;
 		}
-		if( method_exists( $File, 'getName' ) )
-		{
-			return $this->root_url.$this->getFileSubpath($File);
-		}
-		else
-		{
-			return false;
-		}
+
+		return $this->root_url.$this->getFileSubpath($File);
 	}
 
 
@@ -737,7 +803,6 @@ class FileManager extends Filelist
 		}
 
 		return $File->getImageSize( $param );
-
 	}
 
 
@@ -762,8 +827,7 @@ class FileManager extends Filelist
 		{
 			if( !isset( $File->cache['linkFile_2'] ) )
 			{
-				$File->cache['linkFile_2'] = $this->getCurUrl( array( 'path' => $this->getFileSubpath($File, false) ) )
-							.'&amp;file='.urlencode( $File->getName() );
+				$File->cache['linkFile_2'] = $this->getCurUrl().'&amp;action=default&amp;fm_selected[]='.$File->getID();
 			}
 			return $File->cache['linkFile_2'];
 		}
@@ -838,126 +902,39 @@ class FileManager extends Filelist
 
 
 	/**
-	 * do actions to a file/dir
+	 * Get a list of selected files, by using the 'fm_selected' param.
 	 *
-	 * @param string filename (in cwd)
-	 * @param string the action (chmod)
-	 * @param string parameter for action
+	 * @return array of File by reference
 	 */
-	function obsolete__cdo_file( $filename, $what, $param = '' )
+	function &getFilelistSelected()
 	{
-		if( $this->loadc( $filename ) )
+		if( is_null($this->_selectedFiles) )
 		{
-			$path = $this->cget( 'path' );
-			switch( $what )
+			$this->_selectedFiles = new Filelist();
+
+			$fm_selected = param( 'fm_selected', 'array', array() );
+
+			foreach( $fm_selected as $lSelectedID )
 			{
-				case 'send':
-					if( is_dir($path) )
-					{ // we cannot send directories!
-						return false;
-					}
-					else
-					{
-						header('Content-type: application/octet-stream');
-						//force download dialog
-						header('Content-disposition: attachment; filename="' . $filename . '"');
-
-						header('Content-transfer-encoding: binary');
-						header('Content-length: ' . filesize($path));
-
-						//send file contents
-						readfile($path);
-						exit;
-					}
+				if( $File =& $this->getFileByID( $lSelectedID ) )
+				{
+					$this->_selectedFiles->addFile( $File );
+				}
 			}
 		}
-		else
-		{
-			$this->Messages->add( sprintf( T_('File [%s] not found.'), $filename ) );
-			return false;
-		}
 
-		$this->restorec();
-		return $r;
+		return $this->_selectedFiles;
 	}
 
 
 	/**
-	 * Remove a file or directory.
+	 * Is the File in the list of selected files?
 	 *
-	 * @param string filename, defaults to current loop entry
-	 * @param boolean delete subdirs of a dir?
-	 * @return boolean true on success, false on failure
-	 * @deprecated not used anymore
+	 * @return boolean
 	 */
-	function delete( $file = NULL, $delsubdirs = false )
+	function isSelected( $File )
 	{
-		// TODO: permission check
-
-		if( $file == NULL )
-		{ // use current entry
-			if( isset($this->current_entry) )
-			{
-				$entry = $this->current_entry;
-			}
-			else
-			{
-				$this->Messages->add('delete: no current file!');
-				return false;
-			}
-		}
-		else
-		{ // use a specific entry
-			if( ($key = $this->getKeyByName( $file )) !== false )
-			{
-				$entry = $this->entries[$key];
-			}
-			else
-			{
-				$this->Messages->add( sprintf(T_('The file &laquo;%s&raquo; could not be found.'), $file) );
-				return false;
-			}
-		}
-
-		if( $entry['type'] == 'dir' )
-		{
-			if( $delsubdirs )
-			{
-				if( deldir_recursive( $this->cwd.'/'.$entry['name'] ) )
-				{
-					$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'), $entry['name'] ), 'note' );
-					return true;
-				}
-				else
-				{
-					$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted.'), $entry['name'] ) );
-					return false;
-				}
-			}
-			elseif( @rmdir( $this->cwd.$entry['name'] ) )
-			{
-				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been deleted.'), $entry['name'] ), 'note' );
-				return true;
-			}
-			else
-			{
-				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted (probably not empty).'), $entry['name'] ) );
-				return false;
-			}
-		}
-		else
-		{
-			if( unlink( $this->cwd.$entry['name'] ) )
-			{
-				$this->Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been deleted.'), $entry['name'] ), 'note' );
-				return true;
-			}
-			else
-			{
-				$this->Messages->add( sprintf( T_('The file &laquo;%s&raquo; could not be deleted.'), $entry['name'] ) );
-				return false;
-			}
-		}
+		return $this->_selectedFiles->holdsFile( $File );
 	}
 
 
@@ -1009,7 +986,7 @@ class FileManager extends Filelist
 			return false;
 		}
 
-		if( $newFile->create() )
+		if( $newFile->create( $type ) )
 		{
 			if( $type == 'file' )
 			{
@@ -1043,7 +1020,7 @@ class FileManager extends Filelist
 	 *
 	 * @return string cwd as clickable html
 	 */
-	function getCwdClickable()
+	function getCwdClickable( $clickableOnly = true )
 	{
 		if( !$this->cwd )
 		{
@@ -1054,6 +1031,11 @@ class FileManager extends Filelist
 
 		// get the part that is clickable
 		$clickabledirs = explode( '/', substr( $this->cwd, strlen($r) ) );
+
+		if( $clickableOnly )
+		{
+			$r = '';
+		}
 
 		$cd = '';
 		foreach( $clickabledirs as $nr => $dir )
@@ -1091,12 +1073,8 @@ class FileManager extends Filelist
 		}
 
 		$r = "opened = window.open('$href','$target','scrollbars=yes,"  // ."status=yes,toolbar=1,location=yes,"
-					.( $width ?
-							"width=$width," :
-							'' )
-					.( $height ?
-							"height=$height," :
-							'' )
+					.( $width ? "width=$width," : '' )
+					.( $height ? "height=$height," : '' )
 					.'resizable=yes'
 					."'); opened.focus();"
 					."if( typeof(openedWindows) == 'undefined' )"
@@ -1149,7 +1127,8 @@ class FileManager extends Filelist
 
 
 	/**
-	 * translates $asc parameter, if it's NULL
+	 * Translates $asc parameter, if it's NULL.
+	 *
 	 * @param boolean sort ascending?
 	 * @return integer 1 for ascending, 0 for descending
 	 */
@@ -1193,6 +1172,57 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Unlinks (deletes!) a file.
+	 *
+	 * @param File file object
+	 * @return boolean true on success, false on failure
+	 */
+	function unlink( &$File, $delsubdirs = false )
+	{
+		// TODO: permission check
+
+		if( !is_a( $File, 'file' ) )
+		{
+			return false;
+		}
+
+		$unlinked = true;
+
+		if( $File->isDir() && $delsubdirs )
+		{
+			if( $unlinked = deldir_recursive( $File->getPath() ) )
+			{
+				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'), $File->getName() ),
+															'note' );
+			}
+			else
+			{
+				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'), $File->getName() ) );
+			}
+			$this->load(); // Reload!
+		}
+		elseif( $unlinked = $File->unlink() )
+		{ // remove from list
+			$this->Messages->add( sprintf( ( $File->isDir() ?
+																					T_('The directory &laquo;%s&raquo; has been deleted.') :
+																					T_('The file &laquo;%s&raquo; has been deleted.') ),
+																			$File->getName() ),
+														'note' );
+			$this->removeFromList( $File );
+		}
+		else
+		{
+			$this->Messages->add( sprintf( ( $File->isDir() ?
+																				T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') :
+																				T_('Could not delete the file &laquo;%s&raquo;.') ),
+																				$File->getName() ) );
+		}
+
+		return $unlinked;
+	}
+
+
+	/**
 	 * Copies a File object physically to another File object
 	 *
 	 * @param File the source file (expected to exist)
@@ -1207,7 +1237,7 @@ class FileManager extends Filelist
 		}
 		else
 		{
-			if( $r = copy( $SourceFile->getPath(true), $TargetFile->getPath(true) ) )
+			if( $r = copy( $SourceFile->getPath(), $TargetFile->getPath() ) )
 			{
 				$TargetFile->refresh();
 				if( $this->getKeyByName( $TargetFile->getName() ) === false )
@@ -1223,20 +1253,14 @@ class FileManager extends Filelist
 
 /*
  * $Log$
- * Revision 1.12  2004/12/29 04:32:10  blueyed
- * no message
+ * Revision 1.13  2005/01/05 03:04:01  blueyed
+ * refactored
  *
  * Revision 1.10  2004/11/10 22:44:26  blueyed
  * small fix
  *
  * Revision 1.9  2004/11/09 00:25:12  blueyed
  * minor translation changes (+MySQL spelling :/)
- *
- * Revision 1.8  2004/11/05 15:44:31  blueyed
- * no message
- *
- * Revision 1.7  2004/11/05 00:36:43  blueyed
- * no message
  *
  * Revision 1.6  2004/11/03 00:58:02  blueyed
  * update
@@ -1246,9 +1270,6 @@ class FileManager extends Filelist
  *
  * Revision 1.4  2004/10/21 00:41:20  blueyed
  * made JsPopup nice again
- *
- * Revision 1.3  2004/10/21 00:14:44  blueyed
- * moved
  *
  * Revision 1.2  2004/10/16 01:31:22  blueyed
  * documentation changes

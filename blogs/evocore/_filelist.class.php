@@ -116,6 +116,13 @@ class Filelist
 
 
 	/**
+	 * include hidden files? (Filemanager user preference)
+	 * @var boolean
+	 */
+	var $showhidden = true;
+
+
+	/**
 	 * User preference: recursive size of dirs?
 	 *
 	 * The load() method uses this.
@@ -135,14 +142,13 @@ class Filelist
 	/**
 	 * Constructor
 	 *
-	 * @param string the path for the files
+	 * @param string the default path for the files
 	 */
-	function Filelist( $path )
+	function Filelist( $path = '' )
 	{
 		$this->listpath = trailing_slash( $path );
 		if( empty($path) )
 		{
-			$this->Messages->add( 'No valid path provided.', 'fl_error' );
 			$this->listpath = false;
 		}
 	}
@@ -164,31 +170,54 @@ class Filelist
 		$this->count_bytes = $this->count_files = $this->count_dirs = 0;
 
 
-		$dirsToAdd = array( $this->listpath );
-		$dirsAdded = array();
-		while( $addDir = array_shift( $dirsToAdd ) )
+		if( $flatmode )
 		{
-			$this->addFilesFromDir( $addDir );
+			$toAdd = retrieveFiles( $this->listpath );
+		}
+		else
+		{
+			$toAdd = retrieveFiles( $this->listpath, true, true, true, false );
+		}
 
-			if( $flatmode )
-			{
-				foreach( $this->entries as $lFile )
-				{ // TODO: optimize!
-					if( $lFile->isDir() )
+		if( $toAdd === false )
+		{
+			$this->Messages->add( sprintf( T_('Cannot open directory [%s]!'), $this->listpath ), 'fl_error' );
+			return false;
+		}
+
+
+		foreach( $toAdd as $entry )
+		{
+			if( !$this->showhidden && substr($entry, 0, 1) == '.' )
+			{ // hidden files (prefixed with .)
+				continue;
+			}
+			if( $this->filterString !== NULL )
+			{ // Filter: must match filename
+				$name = basename( $entry );
+
+				if( $this->filterIsRegexp )
+				{
+					if( !preg_match( '#'.str_replace( '#', '\#', $this->filterString ).'#', $name ) )
+					{ // does not match the regexp filter
+						continue;
+					}
+				}
+				else
+				{
+					if( !my_fnmatch( $this->filterString, $name ) )
 					{
-						$path = $lFile->getPath( true );
-						if( !in_array( $path, $dirsAdded ) )
-						{
-							$dirsToAdd[] = $dirsAdded[] = $path;
-						}
+						continue;
 					}
 				}
 			}
+
+			$this->addFileByPath( $entry, true );
 		}
 	}
 
 
-	function addFilesFromDir( $path )
+	function obsolete_addFilesFromDir( $path )
 	{
 		if( $this->filterString === NULL || $this->filterIsRegexp )
 		{ // use dir() to access the directory
@@ -234,13 +263,19 @@ class Filelist
 	}
 
 
+	/**
+	 * Add a File object to the list.
+	 *
+	 * @return boolean true on success, false on failure
+	 */
 	function addFile( $File )
 	{
 		if( !is_a( $File, 'file' ) )
 		{
 			return false;
 		}
-		$this->addFileByPath( $File->getPath(true) );
+
+		return $this->addFileByPath( $File->getPath(), true );
 	}
 
 
@@ -282,7 +317,7 @@ class Filelist
 
 		if( $this->recursivedirsize && $NewFile->isDir() )
 		{ // won't be done in the File constructor
-			$NewFile->setSize( get_dirsize_recursive( $NewFile->getPath(true) ) );
+			$NewFile->setSize( get_dirsize_recursive( $NewFile->getPath() ) );
 		}
 
 		if( $NewFile->isDir() )
@@ -406,35 +441,72 @@ class Filelist
 
 
 	/**
+	 * Is a File in the list?
+	 *
+	 * @param File the File object to look for
+	 * @return boolean
+	 */
+	function holdsFile( $File )
+	{
+		foreach( $this->entries as $lFile )
+		{
+			if( $lFile == $File )
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	/**
 	 * Return the current filter
 	 *
-	 * @param boolean add a note when it's a regexp?
+	 * @param boolean add a note when it's a regexp or no filter?
 	 * @return string the filter
 	 */
 	function getFilter( $note = true )
 	{
 		if( $this->filterString === NULL )
 		{
-			return ($note ? T_('No filter') : '');
+			return $note ?
+							T_('No filter') :
+							'';
 		}
 		else
 		{
-			$r = $this->filterString;
-			if( $note && $this->filterIsRegexp )
-			{
-				$r .= ' ('.T_('regular expression').')';
-			}
-			return $r;
+			return $this->filterString
+							.( $note && $this->filterIsRegexp ?
+									' ('.T_('regular expression').')' :
+									'' );
 		}
 	}
 
 
+	/**
+	 * Get the number of entries.
+	 * @return integer
+	 */
+	function count()
+	{
+		return $this->count_dirs + $this->count_files;
+	}
+
+
+	/**
+	 * Get the number of directories.
+	 * @return integer
+	 */
 	function countDirs()
 	{
 		return $this->count_dirs;
 	}
 
 
+	/**
+	 * Get the number of files.
+	 * @return integer
+	 */
 	function countFiles()
 	{
 		return $this->count_files;
@@ -477,61 +549,64 @@ class Filelist
 			{ // we want a dir
 				return $this->getNextFile( 'dir' );
 			}
-			elseif( $this->entries[ $this->current_file_idx ]->isDir() )
+			elseif( $type == 'file' && $this->entries[ $this->current_file_idx ]->isDir() )
 			{ // we want a file
 				return $this->getNextFile( 'file' );
 			}
 		}
-		else
-		{
-			return $this->entries[ $this->current_file_idx ];
-		}
+
+		return $this->entries[ $this->current_file_idx ];
 	}
 
 
 	/**
-	 * loads a specific file as current file and saves current one (can be nested).
-	 *
-	 * (for restoring see {@link Fileman::restorec()})
+	 * Get a file by it's name.
 	 *
 	 * @param string the filename (in cwd)
 	 * @return mixed File object (by reference) on success, false on failure.
 	 */
 	function &getFileByFilename( $filename )
 	{
-		$this->save_idx[] = $this->current_file_idx;
-
-		if( ($this->current_file_idx = $this->getKeyByName( $filename )) === false )
+		if( ( $idx = $this->getKeyByName( $filename ) ) === false )
 		{ // file could not be found
-			$this->current_file_idx = array_pop( $this->save_idx );
 			return false;
 		}
 		else
 		{
-			return $this->entries[ $this->current_file_idx ];
+			return $this->entries[ $idx ];
 		}
 	}
 
 
 	/**
-	 * restores the previous current entry (see {@link Fileman::loadc()})
-	 * @return boolean true on success, false on failure (if there are no entries to restore on the stack)
+	 * Get a file by it's ID.
+	 *
+	 * @param string the ID (MD5 of path and name)
+	 * @return mixed File object (by reference) on success, false on failure.
 	 */
-	function restorec()
+	function &getFileByID( $md5id )
 	{
-		if( count($this->save_idx) )
-		{
-			$this->current_file_idx = array_pop( $this->save_idx );
-			if( $this->current_file_idx != -1 )
-			{
-				$this->current_entry = $this->entries[ $this->current_file_idx ];
-			}
-			return true;
+		if( ( $idx = $this->getKeyByID( $md5id ) ) === false )
+		{ // file could not be found
+			return false;
 		}
 		else
 		{
-			return false;
+			return $this->entries[ $idx ];
 		}
+	}
+
+
+	/**
+	 * Get a file by index.
+	 *
+	 * @return false|File
+	 */
+	function &getFileByIndex( $index )
+	{
+		return isset( $this->entries[$index] ) ?
+						$this->entries[$index] :
+						false;
 	}
 
 
@@ -556,18 +631,17 @@ class Filelist
 
 
 	/**
-	 * Get the key of the entries list by filename and path.
+	 * Get the key of the entries list by filename.
 	 *
 	 * @access protected
 	 * @param string needle
-	 * @param string second needle
 	 * @return integer the key of the entries array
 	 */
-	function getKeyByNameAndPath( $name, $path )
+	function getKeyByID( $md5id )
 	{
 		foreach( $this->entries as $key => $File )
 		{
-			if( $File->getName() == $name && $File->getPath() == $path )
+			if( $File->getID() == $md5id )
 			{
 				return $key;
 			}
@@ -577,21 +651,23 @@ class Filelist
 
 
 	/**
-	 * Unlinks (deletes!) a file.
+	 * Get the key of the entries list by its full path (dir and filename).
 	 *
-	 * @param File file object
-	 * @return boolean true on success, false on failure
+	 * @access protected
+	 * @param string needle
+	 * @param string second needle
+	 * @return integer the key of the entries array
 	 */
-	function unlink( &$File )
+	function getKeyByPath( $path )
 	{
-		if( !($unlinked = $File->unlink()) )
+		foreach( $this->entries as $key => $File )
 		{
-			return false;
+			if( $File->getPath() == $path )
+			{
+				return $key;
+			}
 		}
-		else
-		{ // remove from list
-			return $this->removeFromList( $File );
-		}
+		return false;
 	}
 
 
@@ -602,7 +678,7 @@ class Filelist
 	 */
 	function removeFromList( &$File )
 	{
-		if( ($entryKey = $this->getKeyByName( $File->getName() )) !== false )
+		if( ($entryKey = $this->getKeyByID( $File->getID() )) !== false )
 		{
 			unset( $this->entries[$entryKey] );
 			return true;
@@ -626,17 +702,8 @@ class Filelist
 
 /*
  * $Log$
- * Revision 1.10  2004/12/30 16:45:40  fplanque
- * minor changes on file manager user interface
- *
- * Revision 1.9  2004/12/29 04:32:10  blueyed
- * no message
- *
- * Revision 1.7  2004/11/05 15:44:31  blueyed
- * no message
- *
- * Revision 1.6  2004/11/05 00:36:43  blueyed
- * no message
+ * Revision 1.11  2005/01/05 03:04:01  blueyed
+ * refactored
  *
  * Revision 1.5  2004/11/03 00:58:02  blueyed
  * update

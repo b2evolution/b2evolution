@@ -29,10 +29,11 @@
 #filemanmain table.grouped caption {
 	text-align:left;
 	padding: .5ex;
-	/* Temporary colors, needs overriding */
-	background-color: #efede0;	
+	/* Temporary colors, needs overriding - adjust div.fm_roots, too */
+	background-color: #efede0;
 	border: 1px solid #9e9286;
 	border-bottom: none;
+	border-top: none;
 }
 #filemanmain table.grouped th {
 	white-space:nowrap;
@@ -88,16 +89,25 @@
 	background-color: #efede0;		/* Temp color */
 }
 
+span.fm_filecounts {
+	display:inline;
+	font-size:84%;
+	margin:0 1ex;
+}
+
+div.fm_roots {
+	background-color: #efede0;
+	border: 1px solid #9e9286;
+	border-bottom:none;
+	padding:.5ex;
+}
+
 
 div.fm_query {
 	padding-top: 2ex;
 	border:1px solid;
 }
 
-a#options_toggle {
-	display:block;
-	text-align:right;
-}
 
 
 img.framed {
@@ -132,10 +142,19 @@ button.image {
 	color:#f00;
 }
 
-.iconlegend {
-	text-align: right;
+fieldset.iconlegend {
+	float:right;
 }
 
 .tooltitle {
 	font-weight:bold;
 }
+ul.iconlegend {
+	list-style-type:none;
+	margin:1ex;
+	padding:0;
+}
+ul.iconlegend li {
+	margin-bottom:.5ex;
+}
+

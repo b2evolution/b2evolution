@@ -45,7 +45,7 @@
  */
 
 /**
- * Load config, init and get {@link $mode mode param}
+ * Load config, init and get the {@link $mode mode param}
  */
 require_once dirname(__FILE__).'/_header.php';
 /**
@@ -58,11 +58,9 @@ $admin_pagetitle = T_('Filemanager').' (beta)';
 
 param( 'path', 'string', '' );       // the path relative to the root dir
 param( 'action', 'string', '' );     // 3.. 2.. 1.. action :)
-param( 'selaction', 'string', '' );  // action for selected files/dirs
 
-param( 'file', 'string', '' );       // selected file
 param( 'order', 'string', NULL );
-param( 'asc', '', NULL );
+param( 'orderasc', '', NULL );
 param( 'filterString', '', NULL );
 param( 'filterIsRegexp', 'integer', NULL );
 param( 'flatmode', '', NULL );
@@ -88,391 +86,434 @@ if( $action == 'update_settings' )
 	{
 		$Messages->add( T_('Your user settings have been updated.'), 'note' );
 	}
+
+	$action = '';
 }
 
 
 /**
  * Filemanager object to work with
  */
-$Fileman = new FileManager( $current_User, 'files.php', $root, $path, $order, $asc,
+$Fileman = new FileManager( $current_User, 'files.php', $root, $path, $order, $orderasc,
 														$filterString, $filterIsRegexp, $flatmode );
 
+/**
+ * @var Filelist the selected files
+ */
+$selectedFiles = $Fileman->getFilelistSelected();
 
-if( !empty($file) )
-{ // a file is given as parameter
-	$curFile =& $Fileman->getFileByFilename( $file );
 
-	if( !$curFile )
-	{
-		$Fileman->Messages->add( sprintf( T_('File [%s] could not be accessed!'), $file ) );
-	}
-}
-else
+if( !empty($action) )
 {
-	$curFile = false;
-}
-
-
-if( $action == '' && $file != '' && $curFile )
-{ // a file is selected/clicked, default action
-	{{{ // do the default action
-
-		?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-		<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
-		<head>
-			<title><?php echo $file.' :: '.$app_name.' '.T_('Filemanager') ?></title>
-			<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-			<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
-			<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
-			<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
-			<?php if( is_file( dirname(__FILE__).'/custom.css' ) ) { ?>
-			<link href="custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />
-			<?php } ?>
-			<script type="text/javascript" src="styleswitcher.js"></script>
-			<link href="fileman.css" rel="stylesheet" type="text/css" />
-		</head>
-
-		<body><!-- onclick="javascript:window.close()" title="<?php echo T_('Click anywhere in this window to close it.') ?>">-->
-
-		<?php
-			if( isImage( $file ) )
-			{ // display image file
-				?>
-				<div class="center">
-					<img alt="<?php echo T_('The selected image') ?>" class="framed" src="<?php echo $Fileman->getFileUrl( $curFile ) ?>" <?php echo $curFile->getImageSize( 'string' ) ?> />
-				</div>
-				<?php
-			}
-			elseif( ($buffer = @file( $curFile->getPath( true ) )) !== false )
-			{{{ // display raw file
-				param( 'showlinenrs', 'integer', 0 );
-
-				// TODO: check if new window was opened and provide close X in case
-				/*<a href="javascript:window.close()"><img class="center" src="<?php echo $admin_url.'img/xross.gif' ?>" width="13" height="13" alt="[X]" title="<?php echo T_('Close this window') ?>" /></a>*/
-
-				echo '<div class="fileheader">';
-				echo T_('File').': '.$file.'<br />';
-
-				if( !count($buffer) )
-				{
-					echo '</div> ** '.T_('empty file').' ** ';
-				}
-				else
-				{
-					printf( T_('%d lines'), count($buffer) ).'<br />';
-					$linenr_width = strlen( count($buffer)+1 );
-
-					?>
-					<noscript type="text/javascript">
-						<a href="<?php echo $Fileman->getCurUrl().'&amp;file='.$file.'&amp;showlinenrs='.(1-$showlinenrs).'">'
-							.( $showlinenrs ? T_('hide line numbers') : T_('show line numbers') ).'</a>';
-					?>
-					</noscript>
-					<script type="text/javascript">
-					<!--
-					document.write('<a id="togglelinenrs" href="javascript:toggle_linenrs()">toggle</a>');
-					//-->
-					</script>
-
-					</div>
-					<pre class="rawcontent"><?php
-					foreach( $buffer as $linenr => $line )
-					{
-						echo '<span name="linenr" class="linenr">';
-						if( $showlinenrs ) echo ' '.str_pad($linenr+1, $linenr_width, ' ', STR_PAD_LEFT).' ';
-						echo '</span>'.htmlspecialchars( str_replace( "\t", '  ', $line ) );  // TODO: customize tab-width
-					}
-
-					?>
-
-					<script type="text/javascript">
-					<!--
-					showlinenrs = true;
-					toggle_linenrs();
-					function toggle_linenrs()
-					{
-						if( showlinenrs )
-						{
-							var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('show line numbers') ?>');
-							showlinenrs = false;
-							var text = document.createTextNode( '' );
-							for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
-							{
-								if( document.getElementsByTagName("span")[i].hasChildNodes() )
-									document.getElementsByTagName("span")[i].firstChild.data = '';
-								else
-								{
-									document.getElementsByTagName("span")[i].appendChild( text );
-								}
-							}
-						}
-						else
-						{
-							var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('hide line numbers') ?>');
-							showlinenrs = true;
-							for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
-							{
-								var text = String(i+1);
-								var upto = <?php echo $linenr_width ?>-text.length;
-								for( var j=0; j<upto; j++ ){ text = ' '+text; }
-								if( document.getElementsByTagName("span")[i].hasChildNodes() )
-									document.getElementsByTagName("span")[i].firstChild.data = ' '+text+' ';
-								else
-									document.getElementsByTagName("span")[i].appendChild( document.createTextNode( ' '+text+' ' ) );
-							}
-						}
-
-						document.getElementById('togglelinenrs').replaceChild(replace, document.getElementById( 'togglelinenrs' ).firstChild);
-					}
-					-->
-					</script>
-					<?php
-
-				}
-				?></pre>
-
-				<?php
-			}}}
-			else
-			{
-				printf( '<p class="error">'.T_('File [%s] could not be accessed!').'</p>', $file );
-			}
-			?>
-		</body>
-	</html>
-	<?php
-	exit;
-	}}}
-}
-
-
-if( $selaction != '' )
-{{{ // Actions for selected files
-	param( 'selectedfiles', 'array', array() );
-
-	if( !count( $selectedfiles ) )
+	if( !$selectedFiles->count() && $action != 'createnew' )
 	{
 		$Fileman->Messages->add( T_('Nothing selected.') );
 	}
-	else
+
+	switch( $action )
 	{
-		$curFiles = array();
-		foreach( $selectedfiles as $file )
-		{
-			$selectedFiles[] = $Fileman->getFileByFilename( $file );
-		}
+		// catch JS-only actions
+		case 'open_in_new_windows':
+			$Fileman->Messages->add( T_('You have to enable JavaScript to use this feature.') );
+			break;
 
-		switch( $selaction )
-		{
-			case T_('Send by mail'):
-				echo 'todo: Send selected by mail, query email address..';
-				break;
 
-			case T_('Download'):
-				// TODO: provide optional zip formats
-				param( 'zipname', 'string', '' );
-				param( 'exclude_sd', 'integer', 0 );
+		case 'createnew':  // create new file/dir
+			param( 'createnew', 'string', '' ); // 'file', 'dir'
+			param( 'createname', 'string', '' );
 
-				if( empty($zipname) )
+			$Fileman->createDirOrFile( $createnew, $createname );
+			break;
+
+
+		case T_('Send by mail'):
+			echo 'TODO: Send selected by mail, query email address..';
+			break;
+
+
+		case T_('Download'):
+			// TODO: provide optional zip formats
+			param( 'zipname', 'string', '' );
+			param( 'exclude_sd', 'integer', 0 );
+
+			if( empty($zipname) )
+			{
+				$msg_action = '
+				<p>
+				'.T_('You want to download:').'<ul>';
+
+				$atLeastOneDir = false;
+
+				$selectedFiles->restart();
+
+				while( $lFile =& $selectedFiles->getNextFile() )
 				{
-					$msg_action = '
-					<p>
-					'.T_('You want to download:').'<ul>';
-
-					$atLeastOneDir = false;
-					foreach( $selectedFiles as $lFile )
+					if( $lFile->isDir() )
 					{
-						if( $lFile->isDir() )
-						{
-							$msg_action .= sprintf('<li>'.T_('Directory [%s]')."</li>\n", $lFile->getName());
-							$atLeastOneDir = true;
-						}
-						else $msg_action .= sprintf('<li>'.T_('File [%s]')."</li>\n", $lFile->getName());
+						$msg_action .= sprintf('<li>'.T_('Directory [%s]')."</li>\n", $lFile->getName());
+						$atLeastOneDir = true;
+					}
+					else $msg_action .= sprintf('<li>'.T_('File [%s]')."</li>\n", $lFile->getName());
+				}
+
+				$msg_action .= '
+				</p>
+				</div>
+
+				<div class="panelblock">
+				<form action="files.php" class="fform" method="post">
+				<fieldset>
+					<legend>'.T_('Download options').'</legend>';
+
+					foreach( $selectedFiles->entries as $lFile )
+					{
+						$msg_action .= '<input type="hidden" name="fm_selected[]" value="'
+														.$lFile->getID()."\" />\n";
 					}
 
-					$msg_action .= '
-					</p>
-					</div>
-					<div class="panelblock">
-					<form action="files.php" class="fform" method="post">
-					<fieldset>
-						<legend>'.T_('Download options').'</legend>';
+					$msg_action .= $Fileman->getFormHiddenInputs()."\n"
+											.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the file's name that will get sent to you."), 80, '', 'text', false )."\n"
+											.( $atLeastOneDir ?
+													form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n" :
+													'' )
+											.'
+											<div class="input"><input type="submit" name="selaction" value="'
+											.format_to_output( T_('Download'), 'formvalue' ).'" />
+											</div>
+				</fieldset>
+				</form>';
+			}
+			else
+			{ // Downloading
+				require( dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php' );
 
-						foreach( $selectedfiles as $file )
-						{
-							$msg_action .= '<input type="hidden" name="selectedfiles[]" value="'.format_to_output( $file, 'formvalue' )."\" />\n";
-						}
+				$options = array (
+					'basedir' => $Fileman->getCwd(),
+					'inmemory' => 1,
+					'recurse' => 1-$exclude_sd,
+				);
 
-						$msg_action .= $Fileman->getFormHiddenInputs()."\n"
-												.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the file's name that will get sent to you."), 80, '', 'text', false )."\n"
-												.( $atLeastOneDir ?
-														form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n" :
-														'' )
-												.'<div class="input"><input type="submit" name="selaction" value="'.T_('Download').'" /></div>
-					</fieldset>
-					</form>';
+				$zipfile = new zip_file( $zipname );
+				$zipfile->set_options( $options );
+
+				$arraylist = array();
+
+				foreach( $selectedFiles->entries as $File )
+				{
+					$arraylist[] = $File->getName();
+				}
+				$zipfile->add_files( $arraylist );
+
+				$zipfile->create_archive();
+
+				#header('Content-length: ' . filesize($path));
+				$zipfile->download_file();
+				exit;
+				#$Fileman->Messages->add( sprintf(T_('Zipfile [%s] sent to you!'), $zipname), 'note' );
+
+			}
+
+			break;
+
+
+		case 'delete': // delete a file/dir, TODO: checkperm! {{{
+			param( 'confirmed', 'integer', 0 );
+			param( 'delsubdirs', 'array', array() );
+
+			if( !$confirmed )
+			{
+				$msg_action = '
+					<form action="" class="inline">
+						<input type="hidden" name="confirmed" value="1" />
+						<input type="hidden" name="action" value="delete" />
+						'.$Fileman->getFormHiddenSelectedFiles()
+						.$Fileman->getFormHiddenInputs()."\n";
+
+
+				$msg_action .= $selectedFiles->count() > 1 ?
+												T_('Do you really want to delete the following files?') :
+												T_('Do you really want to delete the following file?');
+
+				$msg_action .= '
+				<ul>
+				';
+
+				foreach( $selectedFiles->entries as $lFile )
+				{
+					$msg_action .= '<li>'.$lFile->getName();
+
+					if( $lFile->isDir() )
+					{
+						$msg_action .= '
+							<br />
+							<input title="'.sprintf( T_('Check to include subdirectories of &laquo;%s&raquo;'), $lFile->getName() ).'"
+								type="checkbox"
+								name="delsubdirs['.$lFile->getID().']"
+								id="delsubdirs_'.$lFile->getID().'"
+								value="1" />
+								<label for="delsubdirs_'.$lFile->getID().'">'
+									.T_( 'Including subdirectories' ).'</label>';
+					}
+
+					$msg_action .= '</li>';
+				}
+
+				$msg_action .= "</ul>\n";
+
+
+				$msg_action .= '
+					<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
+					</form>
+					<form action="" class="inline">
+						'.$Fileman->getFormHiddenInputs().'
+						<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
+					</form>
+					';
+			}
+			else
+			{
+				$selectedFiles->restart();
+				while( $lFile =& $selectedFiles->getNextFile() )
+				{
+					if( !$Fileman->unlink( $lFile, isset( $delsubdirs[$lFile->getID()] ) ) ) // handles Messages
+					{
+						// TODO: offer file again, allowing to include subdirs..
+					}
+				}
+			}
+
+			// }}}
+			break;
+
+
+		case 'editperm': // edit permissions {{{
+			param( 'perms', 'array', array() );
+
+			if( count( $perms ) )
+			{
+				$selectedFiles->restart();
+				while( $lFile =& $selectedFiles->getNextFile() )
+				{
+					$chmod = $perms[ $lFile->getID() ];
+
+					$oldperms = $lFile->getPerms( 'raw' );
+					$newperms = $lFile->chmod( $chmod );
+
+					if( $newperms === false )
+					{
+						$Fileman->Messages->add( sprintf( T_('Failed to set permissions on [%s] to [%s].'), $lFile->getName(), $chmod ) );
+					}
+					elseif( $newperms === $oldperms )
+					{
+						$Fileman->Messages->add( sprintf( T_('Permissions for [%s] not changed.'), $lFile->getName() ), 'note' );
+					}
+					else
+					{
+						$Fileman->Messages->add( sprintf( T_('Permissions for [%s] changed to [%s].'), $lFile->getName(), $lFile->getPerms() ), 'note' );
+					}
+				}
+			}
+			else
+			{
+				$msg_action = '
+				<form name="form_chmod" action="files.php">
+				'.$Fileman->getFormHiddenSelectedFiles()
+				.$Fileman->getFormHiddenInputs().'
+
+				<input type="hidden" name="action" value="editperm" />
+				';
+
+				if( is_windows() )
+				{
+					if( $selectedFiles->count() > 1 )
+					{ // more than one file, provide default
+
+					}
+					foreach( $selectedFiles->entries as $lFile )
+					{
+						$msg_action .= "\n".$Fileman->getFileSubpath( $lFile ).':<br />
+						<input id="perms_readonly_'.$lFile->getID().'"
+							name="perms['.$lFile->getID().']"
+							type="radio"
+							value="444"'
+							.( $lFile->getPerms( 'octal' ) == 444 ?
+									' checked="checked"' :
+									'' ).' />
+						<label for="perms_readonly_'.$lFile->getID().'">'.T_('Read-only').'</label>
+
+						<input id="perms_readwrite_'.$lFile->getID().'"
+							name="perms['.$lFile->getID().']"
+							type="radio"
+							value="666"'
+							.( $lFile->getPerms( 'octal' ) == 666 ?
+									'checked="checked"' :
+									'' ).' />
+						<label for="perms_readwrite_'.$lFile->getID().'">'.T_('Read and write').'</label>
+						<br />';
+					}
 				}
 				else
-				{ // Downloading
-					require( dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php' );
-
-					$options = array (
-						'basedir' => $Fileman->getCwd(),
-						'inmemory' => 1,
-						'recurse' => 1-$exclude_sd,
-					);
-
-					$zipfile = new zip_file( $zipname );
-					$zipfile->set_options( $options );
-
-					$arraylist = array();
-					foreach( $selectedFiles as $File )
-					{
-						$arraylist[] = $File->getName();
-					}
-					$zipfile->add_files( $arraylist );
-
-					$zipfile->create_archive();
-
-					#header('Content-length: ' . filesize($path));
-					$zipfile->download_file();
-					exit;
-					#$Fileman->Messages->add( sprintf(T_('Zipfile [%s] sent to you!'), $selectedfiles[0]), 'note' );
-
-				}
-
-				break;
-
-			case T_('Delete'):
-				// TODO: extra confirmation
-
-				foreach( $selectedfiles as $file )
 				{
-					$Fileman->Messages->add( sprintf('Would delete [%s]', $file).'..', 'note' );
-
+					$msg_action .= '<input type="text" name="chmod" value="'
+													.$lFile->getPerms( 'octal' ).'" maxlength="3" size="3" /><br />';
+					$js_focus = 'document.form_chmod.chmod';
 				}
 
-				break;
-		}
-	}
-}}}
-
-
-switch( $action ) // {{{ (we catched empty action before)
-{
-	case 'createnew':  // {{{ create new file/dir
-		param( 'createnew', 'string', '' ); // 'file', 'dir'
-		param( 'createname', 'string', '' );
-
-		$Fileman->createDirOrFile( $createnew, $createname );
-		// }}}
-		break;
-
-
-	case 'delete': // {{{ delete a file/dir, TODO: checkperm!
-		if( !$curFile )
-		{
-			break;
-		}
-		param( 'confirmed', 'integer', 0 );
-		if( !$confirmed )
-		{
-			$msg_action = '<p>'.sprintf( T_('Do you really want to delete [%s]?'), $file ).'</p>'
-			.'
-			<form action="" class="inline">
-				<input type="hidden" name="confirmed" value="1" />
-				<input type="hidden" name="action" value="delete" />
-				<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
-				'.$Fileman->getFormHiddenInputs().'
-				<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
-			</form>
-			<form action="" class="inline">
-				'.$Fileman->getFormHiddenInputs().'
-				<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
-			</form>
-			';
-		}
-		else
-		{
-			$filename = $curFile->getName();
-			if( !$Fileman->unlink( $curFile ) )
-			{
-				$Fileman->Messages->add( sprintf( ( $curFile->isDir() ?
-																							T_('Could not delete directory [%s] (not empty?).') :
-																							T_('Could not delete [%s].') ),
-																							$filename ) );
-			}
-			else
-			{
-				$Fileman->Messages->add( sprintf( ( $curFile->isDir() ?
-																							T_('Deleted directory [%s].') :
-																							T_('Deleted file [%s].') ),
-																							$filename ), 'note' );
-			}
-		}
-
-		// }}}
-		break;
-
-
-	case 'editperm':  // {{{ edit permissions
-		if( !$curFile )
-		{
-			break;
-		}
-		param( 'chmod', 'string', '' );
-
-		if( !empty($chmod) )
-		{
-			$oldperms = $curFile->getPerms();
-			$newperms = $curFile->chmod( $chmod );
-			if( $newperms === false )
-			{
-				$Fileman->Messages->add( sprintf( T_('Failed to set permissions on [%s] to [%s].'), $curFile->getName(), $chmod ) );
-			}
-			elseif( $newperms === $oldperms )
-			{
-				$Fileman->Messages->add( sprintf( T_('Permissions for [%s] not changed.'), $curFile->getName() ), 'note' );
-			}
-			else
-			{
-				$Fileman->Messages->add( sprintf( T_('Permissions for [%s] changed to [%s].'), $curFile->getName(), $curFile->getPerms() ), 'note' );
-			}
-			#pre_dump( $Fileman->cdo_file( $file, 'chmod', $chmod ), 'chmod!');
-		}
-		else
-		{
-			$msg_action = '
-			<form name="form_chmod" action="files.php">
-			'.$Fileman->getFormHiddenInputs().'
-			<input type="hidden" name="file" value="'.format_to_output( $file, 'formvalue' ).'" />
-			<input type="hidden" name="action" value="editperm" />
-			';
-			if( is_windows() )
-			{
 				$msg_action .= '
-				<input id="chmod_readonly" name="chmod" type="radio" value="444" '
-				.( $curFile->getPerms( 'octal' ) == 444 ? 'checked="checked" ' : '' ).'/>
-				<label for="chmod_readonly">'.T_('Read-only').'</label><br />
-				<input id="chmod_readwrite" name="chmod" type="radio" value="666" '
-				.( $curFile->getPerms( 'octal' ) == 666 ? 'checked="checked" ' : '' ).'/>
-				<label for="chmod_readwrite">'.T_('Read and write').'</label><br />';
-			}
-			else
-			{
-				$msg_action .= '<input type="text" name="chmod" value="'.$curFile->getPerms( 'octal' ).'" maxlength="3" size="3" /><br />';
-				$js_focus = 'document.form_chmod.chmod';
-			}
-			$msg_action .= '
-			<input type="submit" value="'.format_to_output( T_('Set new permissions'), 'formvalue' ).'" />
-			</form>
-			';
+				<input type="submit" value="'.format_to_output( T_('Set new permissions'), 'formvalue' ).'" />
+				</form>
+				';
 
-		}
+			}
+			// }}}
+			break;
+
+
+		default: // default action (view) {{{
+			$selectedFile =& $selectedFiles->getFileByIndex(0);
+
+			// TODO: check if available
+
+			?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+			<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
+			<head>
+				<title><?php echo $selectedFile->getName().' :: '.$app_name.' '.T_('Filemanager') ?></title>
+				<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+				<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
+				<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
+				<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
+				<?php if( is_file( dirname(__FILE__).'/custom.css' ) ) { ?>
+				<link href="custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />
+				<?php } ?>
+				<script type="text/javascript" src="styleswitcher.js"></script>
+				<link href="fileman.css" rel="stylesheet" type="text/css" />
+			</head>
+
+			<body><!-- onclick="javascript:window.close()" title="<?php echo T_('Click anywhere in this window to close it.') ?>">-->
+
+			<?php
+				if( isImage( $selectedFile->getName() ) )
+				{ // display image file
+					?>
+					<div class="center">
+						<img alt="<?php echo T_('The selected image') ?>"
+							class="framed"
+							src="<?php echo $Fileman->getFileUrl( $selectedFile ) ?>"
+							<?php echo $selectedFile->getImageSize( 'string' ) ?> />
+					</div>
+					<?php
+				}
+				elseif( ($buffer = @file( $selectedFile->getPath() )) !== false )
+				{{{ // display raw file
+					param( 'showlinenrs', 'integer', 0 );
+
+					$buffer_lines = count( $buffer );
+
+					// TODO: check if new window was opened and provide close X in case
+					/*<a href="javascript:window.close()"><img class="center" src="<?php echo $admin_url.'img/xross.gif' ?>" width="13" height="13" alt="[X]" title="<?php echo T_('Close this window') ?>" /></a>*/
+
+					echo '<div class="fileheader">';
+					echo T_('File').': '.$selectedFile->getName().'<br />';
+
+					if( !$buffer_lines )
+					{
+						echo '</div> ** '.T_('empty file').' ** ';
+					}
+					else
+					{
+						printf( T_('%d lines'), $buffer_lines ).'<br />';
+						$linenr_width = strlen( $buffer_lines+1 );
+
+						?>
+						<noscript type="text/javascript">
+							<a href="<?php echo $Fileman->getLinkFile( $selectedFile ).'&amp;showlinenrs='.(1-$showlinenrs).'">'
+								.( $showlinenrs ?
+										T_('hide line numbers') :
+										T_('show line numbers') ).'</a>';
+						?>
+						</noscript>
+						<script type="text/javascript">
+						<!--
+						document.write('<a id="togglelinenrs" href="javascript:toggle_linenrs()">toggle</a>');
+						//-->
+						</script>
+
+						</div>
+						<pre class="rawcontent"><?php
+
+						for( $i = 0; $i < $buffer_lines; $i++ )
+						{
+							echo '<span name="linenr" class="linenr">';
+							if( $showlinenrs )
+							{
+								echo ' '.str_pad($i+1, $linenr_width, ' ', STR_PAD_LEFT).' ';
+							}
+							echo '</span>'.htmlspecialchars( str_replace( "\t", '  ', $buffer[$i] ) );  // TODO: customize tab-width
+						}
+
+						?>
+
+						<script type="text/javascript">
+						<!--
+						showlinenrs = <?php var_export( !$showlinenrs ); ?>;
+						toggle_linenrs();
+						function toggle_linenrs()
+						{
+							if( showlinenrs )
+							{
+								var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('show line numbers') ?>');
+								showlinenrs = false;
+								var text = document.createTextNode( '' );
+								for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
+								{
+									if( document.getElementsByTagName("span")[i].hasChildNodes() )
+										document.getElementsByTagName("span")[i].firstChild.data = '';
+									else
+									{
+										document.getElementsByTagName("span")[i].appendChild( text );
+									}
+								}
+							}
+							else
+							{
+								var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('hide line numbers') ?>');
+								showlinenrs = true;
+								for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
+								{
+									var text = String(i+1);
+									var upto = <?php echo $linenr_width ?>-text.length;
+									for( var j=0; j<upto; j++ ){ text = ' '+text; }
+									if( document.getElementsByTagName("span")[i].hasChildNodes() )
+										document.getElementsByTagName("span")[i].firstChild.data = ' '+text+' ';
+									else
+										document.getElementsByTagName("span")[i].appendChild( document.createTextNode( ' '+text+' ' ) );
+								}
+							}
+
+							document.getElementById('togglelinenrs').replaceChild(replace, document.getElementById( 'togglelinenrs' ).firstChild);
+						}
+						-->
+						</script>
+						<?php
+
+					}
+					?></pre>
+
+					<?php
+				}}}
+				else
+				{
+					Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'),
+																					$Fileman->getFileSubpath( $selectedFile ) ), 'error' );
+				}
+				?>
+			</body>
+		</html>
+		<?php
+		exit;
+
 		// }}}
-		break;
-
-	// }}}
+	}
 }
 
 
@@ -483,6 +524,7 @@ require dirname(__FILE__).'/_menutop.php';
 /**#@-*/
 
 ?>
+
 
 <div id="filemanmain">
 <?php
@@ -604,6 +646,14 @@ switch( $Fileman->getMode() )
 						<input class="ActionButton" type="submit" value="<?php echo T_('Upload !') ?>" />
 					</fieldset>
 					</fieldset>
+
+					<?php
+					/* not comitted yet
+					echo $Fileman->getDirectoryTreeRadio();
+					*/
+
+					?>
+
 				</form>
 			</div>
 
@@ -621,17 +671,15 @@ switch( $Fileman->getMode() )
 	case 'file_cmr': // copy/move/rename a file {{{
 		$LogCmr = new Log( 'error' );  // Log for copy/move/rename mode
 
-		if( !($SourceFile =& $Fileman->SourceList->getFileByFilename( basename($Fileman->source) )) )
-		{ // source file not in source filelist
-			$Fileman->Messages->add( sprintf( T_('Invalid source file [%s].'), $Fileman->source ) );
+		if( !$Fileman->SourceList )
+		{
+			$Fileman->Messages->add( sprintf( T_('No source files!') ) );
 			break;
 		}
 
-		#pre_dump( $SourceFile, 'SourceFile' );
-
-		param( 'newname', 'string', $SourceFile->getName() );
-		param( 'keepsource', 'integer', 0 );
-		param( 'overwrite', 'integer', 0 );
+		param( 'cmr_keepsource', 'integer', 0 );
+		param( 'cmr_newname', 'array', array() );
+		param( 'cmr_overwrite', 'array', array() );
 		param( 'cmr_doit', 'integer', 0 );
 
 
@@ -669,15 +717,15 @@ switch( $Fileman->getMode() )
 
 			if( !$LogCmr->count( 'error' ) )
 			{ // no errors, safe for action
-				$oldpath = $SourceFile->getPath(true);
+				$oldpath = $SourceFile->getPath();
 
 				if( $Fileman->copyFileToFile( $SourceFile, $TargetFile ) )
 				{
-					if( !$keepsource )
+					if( !$cmr_keepsource )
 					{ // move/rename
 						if( $Fileman->unlink( $SourceFile ) )
 						{
-							if( $SourceFile->getPath() == $Fileman->getCwd() )
+							if( $SourceFile->getDir() == $Fileman->getCwd() )
 							{ // successfully renamed
 								$Fileman->Messages->add( sprintf( T_('Renamed [%s] to [%s].'),
 																									basename($oldpath),
@@ -694,7 +742,7 @@ switch( $Fileman->getMode() )
 						else
 						{
 							$LogCmr->add( sprintf( T_('Could not remove [%s], but the file has been copied to [%s].'),
-																		($SourceFile->getPath() == $Fileman->getCwd() ?
+																		($SourceFile->getDir() == $Fileman->getCwd() ?
 																			basename($oldpath) :
 																			$oldpath ),
 																		$TargetFile->getName() ) );
@@ -704,17 +752,17 @@ switch( $Fileman->getMode() )
 					{ // copy only
 						$Fileman->Messages->add( sprintf(
 							T_('Copied [%s] to [%s].'),
-							( $SourceFile->getPath() == $Fileman->getCwd() ?
-								$SourceFile->getName() :
-								$SourceFile->getPath(true) ),
+							( $SourceFile->getDir() == $Fileman->getCwd() ?
+									$SourceFile->getName() :
+									$SourceFile->getPath() ),
 							$TargetFile->getName() ), 'note' );
 					}
 				}
 				else
 				{
 					$LogCmr->add( sprintf( T_('Could not copy [%s] to [%s].'),
-																	$SourceFile->getPath(true),
-																	$TargetFile->getPath(true) ), 'error' );
+																	$SourceFile->getPath(),
+																	$TargetFile->getPath() ), 'error' );
 				}
 			}
 		}}}
@@ -722,8 +770,11 @@ switch( $Fileman->getMode() )
 
 		if( !$cmr_doit || $LogCmr->count( 'all' ) )
 		{
+			$SourceFile =& $Fileman->SourceList->getNextFile();
+			$Fileman->SourceList->restart();
+
 			// text and value for JS dynamic fields, when referring to move/rename
-			if( $SourceFile->getPath() == $Fileman->getCwd() )
+			if( $SourceFile->getDir() == $Fileman->getCwd() )
 			{
 				$submitMoveOrRenameText = format_to_output( T_('Rename'), 'formvalue' );
 			}
@@ -739,7 +790,7 @@ switch( $Fileman->getMode() )
 					<input type="hidden" name="cmr_doit" value="1" />
 					<fieldset>
 						<legend><?php
-						echo T_('Source').': '.$SourceFile->getPath(true);
+						echo T_('Copy / Move / Rename');
 						?></legend>
 
 						<div class="notes">
@@ -752,42 +803,64 @@ switch( $Fileman->getMode() )
 
 						$LogCmr->display( '', '', true, 'all' );
 
-
-						if( $overwrite === 'ask' )
+						while( $SourceFile =& $Fileman->SourceList->getNextFile() )
 						{
-							form_checkbox( 'overwrite', 0, '<span class="error">'.T_('Overwrite existing file').'</span>',
-															sprintf( T_('The existing file [%s] will be replaced with this file.'),
-																				$TargetFile->getPath(true) ) );
+							?>
+
+							<fieldset>
+								<legend><?php echo T_('Source').': '.$SourceFile->getPath();
+								?></legend>
+
+								<?php
+
+
+								if( isset( $cmr_overwrite[$SourceFile->getID()] )
+										&& $cmr_overwrite[$SourceFile->getID()] === 'ask' )
+								{
+									form_checkbox( 'overwrite', 0, '<span class="error">'.T_('Overwrite existing file').'</span>',
+																	sprintf( T_('The existing file [%s] will be replaced with this file.'),
+																						$TargetFile->getPath() ) );
+								}
+								?>
+
+								<div class="label">
+									<label for="cmr_keepsource_<?php $SourceFile->getID(); ?>"><?php echo T_('Keep source file') ?>:</label>
+								</div>
+								<div class="input">
+									<input class="checkbox" type="checkbox" value="1"
+										name="cmr_keepsource[<?php echo $SourceFile->getID(); ?>]"
+										id="cmr_keepsource_<?php $SourceFile->getID(); ?>"
+										onclick="setCmrSubmitButtonValue( this.form );"<?php
+										if( $cmr_keepsource )
+										{
+											echo ' checked="checked"';
+										} ?> />
+									<span class="notes"><?php echo T_('Do not delete the source file.') ?></span>
+								</div>
+								<div class="clear"></div>
+
+
+								<div class="label">
+									<label for="cmr_newname_<?php $SourceFile->getID(); ?>">New name:</label>
+								</div>
+								<div class="input">
+									<input type="text" name="cmr_newname[<?php $SourceFile->getID(); ?>]"
+										id="cmr_newname_<?php $SourceFile->getID(); ?>" value="<?php
+										echo isset( $cmr_newname[$SourceFile->getID()] ) ?
+														$cmr_newname[$SourceFile->getID()] :
+														$SourceFile->getName() ?>" />
+								</div>
+
+							</fieldset>
+
+						<?php
 						}
 						?>
 
 						<fieldset>
-							<div class="label">
-								<label for="fm_keepsource"><?php echo T_('Keep source file') ?>:</label>
-							</div>
 							<div class="input">
-								<input class="checkbox" type="checkbox" value="1" name="keepsource"
-									id="fm_keepsource" onclick="setCmrSubmitButtonValue( this.form );"<?php
-									if( $keepsource )
-									{
-										echo ' checked="checked"';
-									} ?> />
-								<span class="notes"><?php echo T_('Do not delete the source file.') ?></span>
-							</div>
-						</fieldset>
-
-						<fieldset>
-							<div class="label">
-								<label for="fm_newname">New name:</label>
-							</div>
-							<div class="input">
-								<input type="text" name="newname" id="fm_newname" value="<?php echo $newname ?>" />
-							</div>
-						</fieldset>
-						<fieldset>
-							<div class="input">
-								<input id="fm_cmr_submit" type="submit" value="<?php
-									if( $keepsource )
+								<input id="cmr_submit" type="submit" value="<?php
+									if( $cmr_keepsource )
 									{
 										echo format_to_output( T_('Copy'), 'formvalue' );
 									}
@@ -800,11 +873,13 @@ switch( $Fileman->getMode() )
 						</fieldset>
 					</fieldset>
 				</form>
+
+
 				<script type="text/javascript">
 					<!--
 					function setCmrSubmitButtonValue()
 					{
-						if( document.getElementById( 'fm_keepsource' ).checked )
+						if( document.getElementById( 'cmr_keepsource' ).checked )
 						{
 							text = '<?php echo format_to_output( T_('Copy'), 'formvalue' ) ?>';
 						}
@@ -812,7 +887,7 @@ switch( $Fileman->getMode() )
 						{
 							text = '<?php echo $submitMoveOrRenameText ?>';
 						}
-						document.getElementById( 'fm_cmr_submit' ).value = text;
+						document.getElementById( 'cmr_submit' ).value = text;
 					}
 					setCmrSubmitButtonValue(); // init call
 					// -->
@@ -861,9 +936,8 @@ if( isset( $msg_action )
 } // }}}
 
 
-
-// reload opener window, if popup is in the same directory and filelist md5
-// differs
+// Display reload-icon in the opener window if we're a popup in the same CWD and the
+// Filemanager content differs.
 ?>
 
 
@@ -872,11 +946,13 @@ if( isset( $msg_action )
 	if( opener
 			&& typeof(opener.document.FilesForm.md5_filelist.value) != 'undefined'
 			&& typeof(opener.document.FilesForm.md5_cwd.value) != 'undefined'
-			&& opener.document.FilesForm.md5_filelist.value != '<?php echo $Fileman->toMD5(); ?>'
 			&& opener.document.FilesForm.md5_cwd.value == '<?php echo md5($Fileman->getCwd()); ?>'
-			)
+		)
 	{
-		opener.location.reload();
+		opener.document.getElementById( 'fm_reloadhint' ).style.display =
+			opener.document.FilesForm.md5_filelist.value == '<?php echo $Fileman->toMD5(); ?>' ?
+				'none' :
+				'inline';
 	}
 	// -->
 </script>
@@ -914,7 +990,7 @@ if( isset( $msg_action )
 				?>" value="1"<?php if( $filterIsRegexp ) echo ' checked="checked"' ?> /><?php
 				echo '<label for="filterIsRegexp">'./* TRANS: short for "is regular expression" */ T_('RegExp').'</label>'; ?>
 
-			<input class="ActionButton" type="submit" value="<?php echo T_('Apply') ?>" />
+			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
 		</form>
 
 		<?php
@@ -923,7 +999,7 @@ if( isset( $msg_action )
 		?>
 		<form action="files.php" name="unfilter" class="inline">
 			<?php echo $Fileman->getFormHiddenInputs( array( 'filterString' => false, 'filterIsRegexp' => false ) ) ?>
-			<input class="ActionButton" type="submit" value="<?php echo T_('Disable') ?>" />
+			<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Disable'), 'formvalue' ) ?>" />
 		</form>
 		<?php
 		}
@@ -940,67 +1016,81 @@ if( isset( $msg_action )
 		<input class="ActionButton" type="submit" title="<?php
 			echo format_to_output( $flatmode ?
 															T_('Normal mode') :
-															T_('All files recursive without directories'), 'formvalue' );
+															T_('All files and folders, including subdirectories'), 'formvalue' );
 			?>" value="<?php
 			echo format_to_output( $flatmode ?
 															T_('Normal mode') :
 															T_('Flat mode'), 'formvalue' ); ?>" />
 	</form>
-
 </div>
 
 <div class="clear"></div>
 
 
 <div class="panelblock">
+
+<form name="FilesForm" id="FilesForm" action="files.php" method="get">
+<input type="hidden" name="confirmed" value="0" />
+<input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
+<input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
+<?php echo $Fileman->getFormHiddenInputs() ?>
+
+
+<?php
+$rootlist = $Fileman->getRootList();
+if( count($rootlist) > 1 )
+{ // provide list of roots
+?>
+	<!-- ROOT LISTS -->
+
+	<div class="fm_roots">
+
+		<select name="root" class="fm_roots" onchange="this.form.submit()">
+		<?php
+		foreach( $rootlist as $lroot )
+		{
+			$lroot_value = $lroot['type'];
+			if( isset($lroot['id']) )
+			{
+				$lroot_value .= '_'.$lroot['id'];
+			}
+			echo '<option value="'.$lroot_value.'"';
+
+			if( $root == $lroot_value
+					|| $root === NULL && $lroot_value == 'user' )
+			{
+				echo ' selected="selected"';
+			}
+
+			echo '>'.format_to_output( $lroot['name'] )."</option>\n";
+		}
+
+		echo '</select>
+
+		<input class="ActionButton" type="submit" value="'.T_('Change root').'" />
+	</div>
+	';
+}
+?>
+
+
 <table class="grouped">
 <caption>
 <?php
 // -----------------------------------------------
-// Display tabel caption: directory location info:
+// Display table caption: directory location info:
 // -----------------------------------------------
 
 
 // Quick links to usual homes for user, group and maybe blog...:
-echo '<a title="'.T_('Go to your home directory').'" class="middle" href="'
-			.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a> &nbsp;';
+// echo '<a title="'.T_('Go to your home directory').'" class="middle" href="'.$Fileman->getLinkHome().'">'.getIcon( 'folder_home' ).'</a> &nbsp;';
 // TODO: add group home...
 // TODO: add blog home?
 
 
-// Display available roots list:
-$rootlist = $Fileman->getRootList();
-//if( count($rootlist) > 1 )
-{ // provide list of roots
-	echo '<form action="files.php" name="roots" class="inline">'
-				.$Fileman->getFormHiddenInputs( array( 'root' => false ) );
-	echo '<select name="root" onchange="this.form.submit()">';
-
-	foreach( $rootlist as $lroot )
-	{
-		$lroot_value = $lroot['type'];
-		if( isset($lroot['id']) )
-		{
-			$lroot_value .= '_'.$lroot['id'];
-		}
-		echo '<option value="'.$lroot_value.'"';
-
-		if( $root == $lroot_value
-				|| $root === NULL && $lroot_value == 'user' )
-		{
-			echo ' selected="selected"';
-		}
-
-		echo '>'.format_to_output( $lroot['name'] ).'</option>';
-	}
-	echo '</select><input class="ActionButton" type="submit" value="'.T_('Change root').'" />'
-				."</form>\n";
-}
-
-echo '<div>';
-
 // Display current dir:
 echo T_('Current dir').': <strong class="currentdir">'.$Fileman->getCwdClickable().'</strong>';
+
 
 // Display current filter:
 if( $Fileman->isFiltering() )
@@ -1009,29 +1099,40 @@ if( $Fileman->isFiltering() )
 	// TODO: maybe clicking on the filter should open a JS popup saying "Remove filter [...]? Yes|No"
 }
 
+
+// The hidden reload button
+?>
+
+<span style="display:none;" id="fm_reloadhint">
+	<a href="<?php echo $Fileman->getCurUrl() ?>"
+		title="<?php echo T_('A popup has discovered that the displayed content of this window is not up to date. Click to reload.'); ?>">
+		<?php echo getIcon( 'reload' ) ?>
+	</a>
+</span>
+
+
+<?php
 // Display filecounts:
-echo '<span class="small"> &nbsp; (';
+?>
+
+<span class="fm_filecounts" title="<?php printf( T_('%s bytes'), number_format($Fileman->countBytes()) ); ?>"> (<?php
 disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
 echo ', ';
 disp_cond( $Fileman->countFiles(), T_('One file'), T_('%d files'), T_('No files' ) );
 echo ', '.bytesreadable( $Fileman->countBytes() );
-echo ')</span>';
+?>
+)</span>
 
-echo '</div>';
+</caption>
 
 
+<?php
 /**
  * @global integer Number of cols for the files table, 8 by default
  */
 $filetable_cols = 8;
+
 ?>
-</caption>
-
-
-<form name="FilesForm" action="files.php" method="post">
-<input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
-<input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
-
 
 <thead>
 <tr>
@@ -1061,63 +1162,72 @@ param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 $Fileman->sort();
 
 $countFiles = 0;
-while( $lFile = $Fileman->getNextFile() )
+while( $lFile =& $Fileman->getNextFile() )
 { // loop through all Files:
 	?>
 
 	<tr<?php
 		if( $countFiles%2 ) echo ' class="odd"';
-		?> onclick="document.getElementsByName('selectedfiles[]')[<?php echo $countFiles ?>].click();">
+		?> onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();">
 		<td class="checkbox">
 			<input title="<?php echo T_('Select this file') ?>" type="checkbox"
-				name="selectedfiles[]" value="<?php
-				echo format_to_output( $lFile->getName(), 'formvalue' ) ?>" id="cb_filename_<?php
-				echo $countFiles ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php
-				echo $countFiles ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
+				name="fm_selected[]"
+				value="<?php echo $lFile->getID(); ?>"
+				id="cb_filename_<?php echo $countFiles ?>"
+				onclick="this.click();"<?php
+				if( $checkall || $Fileman->isSelected( $lFile ) )
+				{
+					echo ' checked="checked"';
+				}
+				?> />
 		</td>
 
 		<td class="icon">
 			<a href="<?php
 				if( $lFile->isDir() )
 				{
-					echo $Fileman->getLinkFile( $lFile );
+					echo $Fileman->getLinkFile( $lFile ).'" title="'.T_('Change into this directory');
 				}
 				else
 				{
-					echo $Fileman->getFileUrl();
-				} ?>"><?php echo getIcon( $lFile ) ?></a>
+					echo $Fileman->getFileUrl().'" title="'.T_('Let the browser handle this file');
+				}
+				?>"><?php echo getIcon( $lFile ) ?></a>
 		</td>
 
 		<td class="filename">
-			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>" target="fileman_default" onclick="return false;">
-			<button class="image" type="button" onclick="document.getElementsByName('selectedfiles[]')[<?php
-				echo $countFiles ?>].click(); <?php
+			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"
+				target="fileman_default"
+				title="<?php echo T_('Open in a new window'); ?>"
+				onclick="return false;">
 
-				$imgsize = $lFile->getImageSize( 'widthheight' );
-				echo $Fileman->getJsPopupCode( NULL,
-					"'+( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_$countFiles')+'",
-					($imgsize ? $imgsize[0]+42 : NULL),
-					($imgsize ? $imgsize[1]+42 : NULL) );
+				<button class="image" type="button"
+					id="button_new_<?php echo $countFiles ?>"
+					onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();
+						<?php
 
-				?>" id="button_new_<?php echo $countFiles ?>" title="Open in a new window">
-				<?php echo getIcon( 'window_new' )
-			?></button></a>
+						$imgsize = $lFile->getImageSize( 'widthheight' );
+						echo $Fileman->getJsPopupCode( NULL,
+							"'+( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_$countFiles')+'",
+							($imgsize ? $imgsize[0]+42 : NULL),
+							($imgsize ? $imgsize[1]+42 : NULL) );
 
-			<a onclick="clickedonlink=1;" href="<?php echo $Fileman->getLinkFile( $lFile ) ?>">
-			<?php
-			echo $lFile->getName();
-			disp_cond( $Fileman->getFileImageSize(), ' (%s)' )
-			?>
+						?>"
+					><?php echo getIcon( 'window_new' )
+				?></button></a>
+
+			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>">	<?php
+				echo $lFile->getName();
+				disp_cond( $Fileman->getFileImageSize(), ' (%s)' )
+				?>
 			</a>
 
 			<?php
 			if( $Fileman->flatmode )
 			{
-				?><div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
-				$path = substr( $lFile->getPath( false ), strlen( $Fileman->cwd ), -1 );
-				echo empty( $path ) ?
-							' - ' :
-							$path;
+				?>
+				<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
+				echo $Fileman->getFileSubpath( $lFile, false );
 				?>
 				</div>
 				<?php
@@ -1170,15 +1280,70 @@ else
 	<td colspan="<?php echo $filetable_cols ?>">
 	<a id="checkallspan_0" href="<?php
 		echo url_add_param( $Fileman->getCurUrl(), 'checkall='.( $checkall ? '0' : '1' ) );
-		?>" onclick="toggleCheckboxes('FilesForm', 'selectedfiles[]'); return false;"><?php
+		?>" onclick="toggleCheckboxes('FilesForm', 'fm_selected[]'); return false;"><?php
 		echo ($checkall) ? T_('uncheck all') : T_('check all');
 		?></a>
 	&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
-	<?php echo $Fileman->getFormHiddenInputs() ?>
-	<!-- Not implemented yet: input class="DeleteButton" type="submit" name="selaction" value="<?php echo T_('Delete') ?>" onclick="return openselectedfiles(true) ? confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>') : false;" / -->
-	<!-- Not implemented yet: input class="ActionButton" type="submit" name="selaction" value="<?php echo T_('Download') ?>" onclick="return openselectedfiles(true);" / -->
-	<!-- Not implemented yet: input class="ActionButton" type="submit" name="selaction" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
-	<input class="ActionButton" type="button" name="selaction" value="<?php echo T_('Open in new windows') ?>" onclick="openselectedfiles(); return false;" />
+
+	<input class="DeleteButton" type="image"
+		title="<?php echo T_('Delete the selected files') ?>"
+		name="action"
+		value="delete"
+		src="<?php echo getIcon( 'file_delete', 'url' ) ?>"
+		onclick="if( r = openselectedfiles(true) )
+							{
+								if( confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>') )
+								{
+									document.getElementById( 'FilesForm' ).confirmed.value = 1;
+									return true;
+								}
+							}; return false;" />
+
+	<!-- Not implemented yet: input class="ActionButton" type="submit" name="action" value="<?php echo T_('Download') ?>" onclick="return openselectedfiles(true);" / -->
+	<!-- Not implemented yet: input class="ActionButton" type="submit" name="action" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
+
+	<?php
+
+	/*
+	TODO: "link these into current post" (that is to say the post that opened the popup window).
+				This would create <img> or <a href> tags depending on file types.
+	*/
+
+	?>
+
+	<input class="ActionButton" type="image" name="action"
+		title="<?php echo T_('Open in new windows'); ?>"
+		value="open_in_new_windows"
+		src="<?php echo getIcon( 'window_new', 'url' ) ?>"
+		onclick="openselectedfiles(); return false;" />
+
+	<?php
+	/* Not fully functional
+	<input class="ActionButton" type="image" name="action"
+		title="<?php echo T_('Rename the selected files'); ?>"
+		value="file_cmr"
+		onclick="return openselectedfiles(true);"
+		src="<?php echo getIcon( 'file_rename', 'url' ); ?>" />
+
+	<input class="ActionButton" type="image" name="action"
+		title="<?php echo T_('Copy the selected files'); ?>"
+		value="file_cmr"
+		onclick="return openselectedfiles(true);"
+		src="<?php echo getIcon( 'file_copy', 'url' ); ?>" />
+
+	<input class="ActionButton" type="image" name="action"
+		title="<?php echo T_('Move the selected files'); ?>"
+		value="file_cmr"
+		onclick="return openselectedfiles(true);"
+		src="<?php echo getIcon( 'file_move', 'url' ); ?>" />
+
+	<input class="ActionButton" type="image" name="action" value="editperm"
+		onclick="return openselectedfiles(true);"
+		title="<?php echo T_('Change permissions'); ?>"
+		src="<?php echo getIcon( 'file_perms', 'url' ); ?>" />
+
+	*/ ?>
+
 	</td>
 </tr>
 <?php
@@ -1186,9 +1351,10 @@ else
 ?>
 </tbody>
 
+</table>
+
 </form>
 
-</table>
 
 <?php
 if( $countFiles )
@@ -1199,7 +1365,7 @@ if( $countFiles )
 	<!--
 	function openselectedfiles( checkonly )
 	{
-		elems = document.getElementsByName( 'selectedfiles[]' );
+		elems = document.getElementsByName( 'fm_selected[]' );
 		fm_popup_type = 'selected';
 		var opened = 0;
 		for( i = 0; i < elems.length; i++ )
@@ -1235,7 +1401,7 @@ if( $countFiles )
 <!-- CREATE: -->
 
 <form action="" class="toolbaritem">
-	<label class="tooltitle">New</label>
+	<label class="tooltitle"><?php echo T_('New'); ?></label>
 	<select name="createnew">
 		<option value="file"><?php echo T_('file') ?></option>
 		<option value="dir"<?php
@@ -1264,33 +1430,32 @@ if( $countFiles )
 
 
 <div class="clear"></div>
-<div class="fform">
-	<fieldset class="iconlegend">
-		<legend><?php echo T_('Icon legend') ?></legend>
-		<span class="nobr"><?php echo getIcon( 'folder_home' ).' '.T_('Home dir'); ?></span>
-		<span class="nobr"><?php echo getIcon( 'folder_parent' ).' '.T_('Up one level'); ?></span>
-		<span class="nobr"><?php echo getIcon( 'window_new' ).' '.T_('Open in new window'); ?></span>
+
+<fieldset class="iconlegend">
+	<legend><?php echo T_('Icon legend') ?></legend>
+	<ul class="iconlegend">
+		<li><?php echo getIcon( 'folder_home' ).' '.T_('Home dir'); ?></li>
+		<li><?php echo getIcon( 'folder_parent' ).' '.T_('Up one level'); ?></li>
+		<li><?php echo getIcon( 'window_new' ).' '.T_('Open in new window'); ?></li>
 		<!-- Not implemented yet: span class="nobr"><?php echo getIcon( 'file_edit' ).' '.T_('Edit file'); ?></span -->
-		<span class="nobr"><?php echo getIcon( 'file_copy' ).' '.T_('Copy'); ?></span>
-		<span class="nobr"><?php echo getIcon( 'file_move' ).' '.T_('Move'); ?></span>
-		<span class="nobr"><?php echo getIcon( 'file_rename' ).' '.T_('Rename'); ?></span>
-		<span class="nobr"><?php echo getIcon( 'file_delete' ).' '.T_('Delete'); ?></span>
-	</fieldset>
-</div>
-
-<div class="fform">
-	<fieldset>
-	<legend><?php echo T_('Information') ?></legend>
-
-	<ul>
-		<li><?php echo T_("Clicking on a file's name invokes the default action (images get displayed as image, raw content for all other files)."); ?></li>
-		<li><?php echo T_("Clicking on a file's icon lets the browser handle the file."); ?></li>
-		<!-- This is redundant with icon legend: li><?php printf( T_('The new window icon (%s) opens the file in a popup window.'), getIcon( 'window_new' ) ); ?></li -->
+		<li><?php echo getIcon( 'file_copy' ).' '.T_('Copy'); ?></li>
+		<li><?php echo getIcon( 'file_move' ).' '.T_('Move'); ?></li>
+		<li><?php echo getIcon( 'file_rename' ).' '.T_('Rename'); ?></li>
+		<li><?php echo getIcon( 'file_delete' ).' '.T_('Delete'); ?></li>
+		<li><?php echo getIcon( 'file_perms' ).' '.T_('Change permissions'); ?></li>
 	</ul>
-	</fieldset>
-</div>
+</fieldset>
 
+<fieldset>
+<legend><?php echo T_('Information') ?></legend>
+
+<ul>
+	<li><?php echo T_("Clicking on a file's name invokes the default action (images get displayed as image, raw content for all other files)."); ?></li>
+	<li><?php echo T_("Clicking on a file's icon lets the browser handle the file."); ?></li>
+</ul>
+</fieldset>
 <?php
+
 
 // ------------------
 // Display options:
@@ -1299,12 +1464,18 @@ if( $countFiles )
 // ------------------
 param( 'options_show', 'integer', 0 );
 ?>
-<form class="toolbaritem" action="files.php" method="post">
-	<a id="options_toggle" href="<?php echo url_add_param( $Fileman->getCurUrl(), ( !$options_show ? 'options_show=1' : '' ) ) ?>"
-		onclick="return toggle_options();"><?php
-		echo ( $options_show ) ? T_('Hide options') : T_('Show options') ?></a>
+<form id="options_form" action="files.php" method="post">
+	<fieldset>
+	<legend><a id="options_toggle" href="<?php
+	echo url_add_param( $Fileman->getCurUrl(), ( !$options_show ?
+																									'options_show=1' :
+																									'' ) )
+	?>" onclick="return toggle_options();"><?php
+	echo $options_show ?
+				T_('Hide options') :
+				T_('Show options'); ?></a></legend>
 
-	<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
+	<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>
 		<input type="checkbox" id="option_dirsattop" name="option_dirsattop" value="1"<?php if( !$UserSettings->get('fm_dirsnotattop') ) echo ' checked="checked"' ?> />
 		<label for="option_dirsattop"><?php echo T_('Sort directories at top') ?></label>
 		<br />
@@ -1324,10 +1495,12 @@ param( 'options_show', 'integer', 0 );
 		<?php echo $Fileman->getFormHiddenInputs() ?>
 		<input type="hidden" name="action" value="update_settings" />
 		<input type="hidden" name="options_show" value="1" />
+
 		<div class="input">
-		<input type="submit" value="<?php echo T_('Update !') ?>" />
+			<input type="submit" value="<?php echo T_('Update !') ?>" />
 		</div>
 	</div>
+	</fieldset>
 
 	<script type="text/javascript">
 	<!--
@@ -1337,13 +1510,13 @@ param( 'options_show', 'integer', 0 );
 		{
 			if( showoptions )
 			{
-				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('show options') ?>');
+				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('Show options') ?>');
 				var display_list = 'none';
 				showoptions = false;
 			}
 			else
 			{
-				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('hide options') ?>');
+				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('Hide options') ?>');
 				var display_list = 'inline';
 				showoptions = true;
 			}

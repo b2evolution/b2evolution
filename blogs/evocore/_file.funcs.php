@@ -103,29 +103,136 @@ function bytesreadable( $bytes )
 
 
 /**
+ * Get an array of all directories (and optionally files) of a given
+ * directory, either flat (one-dimensional array) or multi-dimensional (then
+ * dirs are the keys and hold subdirs/files).
+ *
+ * @param string the path to start
+ * @param boolean include files (not only directories)
+ * @param boolean include directories (not the directory itself!)
+ * @param boolean flat (return an one-dimension-array)
+ * @return false|array false if the first directory could not be accesses,
+ *                     array of entries otherwise
+ */
+function retrieveFiles( $path, $includeFiles = true, $includeDirs = true, $flat = true, $recurse = true )
+{
+	$r = array();
+
+	$path = trailing_slash( $path );
+
+	if( $dir = @opendir($path) )
+	{
+		while( ( $file = readdir($dir) ) !== false )
+		{
+			if( $file == '.' || $file == '..' )
+			{
+				continue;
+			}
+			if( is_dir($path.$file) )
+			{
+				if( $flat )
+				{
+					if( $includeDirs )
+					{
+						$r[] = $path.$file;
+					}
+					if( $recurse )
+					{
+						$rSub = retrieveFiles( $path.$file, $flat, $includeFiles, $recurse );
+						if( $rSub )
+						{
+							$r = array_merge( $r, $rSub );
+						}
+					}
+				}
+				else
+				{
+					$r[$file] = retrieveFiles( $path.$file, $flat, $includeFiles );
+				}
+			}
+			elseif( $includeFiles )
+			{
+				$r[] = $path.$file;
+			}
+		}
+		closedir($dir);
+	}
+	else
+	{
+		return false;
+	}
+
+	return $r;
+}
+
+
+/**
+ * A replacement for fnmatch() which needs PHP 4.3
+ *
+ * @author jcl [atNOSPAM] jcl [dot] name {@link http://php.net/manual/function.fnmatch.php}
+ */
+function my_fnmatch ($pattern, $file)
+{
+	$lenpattern = strlen($pattern);
+	$lenfile    = strlen($file);
+
+	for($i=0 ; $i<$lenpattern ; $i++)
+	{
+		if($pattern[$i] == "*")
+		{
+			for($c=$i ; $c<max($lenpattern, $lenfile) ; $c++)
+			{
+				if(my_fnmatch(substr($pattern, $i+1), substr($file, $c)))
+					return true;
+			}
+			return false;
+		}
+
+		if($pattern[$i] == "[")
+		{
+			$letter_set = array();
+			for($c=$i+1 ; $c<$lenpattern ; $c++)
+			{
+				if($pattern[$c] != "]")
+					array_push($letter_set, $pattern[$c]);
+				else
+					break;
+			}
+			foreach($letter_set as $letter)
+			{
+				if(my_fnmatch($letter.substr($pattern, $c+1), substr($file, $i)))
+					return true;
+			}
+			return false;
+		}
+
+		if($pattern[$i] == "?") continue;
+		if($pattern[$i] != $file[$i]) return false;
+	}
+
+	if(($lenpattern != $lenfile) && ($pattern[$i - 1] == "?")) return false;
+	return true;
+}
+
+
+
+/**
  * Get size of a directory, including anything (especially subdirs) in there.
  *
  * @param string the dir's full path
  */
 function get_dirsize_recursive( $path )
 {
-	if( !($dir = @opendir( $path )) )
-	{
-		return false;
-	}
+	$files = retrieveFiles( $path, true, false );
 
 	$total = 0;
-	while( $cur = readdir($dir) ) if( !in_array( $cur, array('.', '..')) )
+
+
+	foreach( $files as $lFile )
 	{
-		if( is_dir($path.'/'.$cur) )
-		{
-			$total += get_dirsize_recursive($path.'/'.$cur);
-		}
-		else
-		{
-			$total += filesize($path.'/'.$cur);
-		}
+		$total += filesize($lFile);
 	}
+
 	return $total;
 }
 
@@ -138,20 +245,23 @@ function get_dirsize_recursive( $path )
  */
 function deldir_recursive( $dir )
 {
-	$current_dir = opendir( $dir );
-	while( $entryname = readdir($current_dir) )
+	$toDelete = retrieveFiles( $dir );
+	$toDelete = array_reverse( $toDelete );
+	$toDelete[] = $dir;
+
+	while( list( $lKey, $lPath ) = each( $toDelete ) )
 	{
-		if( is_dir( "$dir/$entryname" ) && ( $entryname != '.' && $entryname != '..') )
+		if( is_dir( $lPath ) )
 		{
-			deldir_recursive( "$dir/$entryname" );
+			rmdir( $lPath );
 		}
-		elseif( $entryname != '.' && $entryname != '..' )
+		else
 		{
-			unlink( "$dir/$entryname" );
+			unlink( $lPath );
 		}
 	}
-	closedir( $current_dir );
-	return rmdir( $dir );
+
+	return true;
 }
 
 
@@ -361,6 +471,9 @@ function isFilename( $filename )
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/05 03:04:00  blueyed
+ * refactored
+ *
  * Revision 1.7  2004/12/31 17:43:09  blueyed
  * enhanced bytesreadable(), fixed deldir_recursive()
  *
