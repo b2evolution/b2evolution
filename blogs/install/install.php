@@ -13,7 +13,7 @@
 <div id="rowheader" >
 <h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" border="0" /></a></h1>
 <div id="tagline">A blog tool like it oughta be!</div>
-<h1 id="version">Version: 0.8.6.2</h1>
+<h1 id="version">Version: 0.8.6</h1>
 <div id="quicklinks">Setup Links: <a href="../../index.html">My b2evo</a> &middot; <a href="http://b2evolution.net/man/">Online Manual</a> &middot; <a href="install.php">My DB Install</a> &middot; <a href="../index.php">My Blogs</a> &middot; <a href="../admin/b2edit.php">My Back-Office</a></div>
 </div>
 <!-- InstanceBeginEditable name="Main" -->
@@ -48,7 +48,7 @@ $new_db_version = 8030;				// next time: 8030
 function create_b2evo_tables()
 {
 	global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
-$tablepostcats, $tablehitlog;
+        $tablepostcats, $tablehitlog, $tablemailinglist;
 	global $baseurl, $new_db_version;
 
 	echo "<p>Creating the necessary tables in the database...</p>";
@@ -56,7 +56,7 @@ $tablepostcats, $tablehitlog;
 	
 	echo "<p>Creating table for Settings...<br />\n";
 	$query = "CREATE TABLE $tablesettings ( 
-		ID tinyint(3) DEFAULT '1' NOT NULL, 
+		ID int(4) DEFAULT '1' NOT NULL, 
 		posts_per_page int(4) unsigned DEFAULT '7' NOT NULL, 
 		what_to_show varchar(5) DEFAULT 'days' NOT NULL, 
 		archive_mode varchar(10) DEFAULT 'weekly' NOT NULL, 
@@ -211,6 +211,15 @@ $tablepostcats, $tablehitlog;
 		KEY hit_user_agent (hit_user_agent)
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
+	 
+	 
+	echo "<p>Creating table for Mailing List...<br />\n";
+	$query = "CREATE TABLE $tablesmailinglist ( 
+		ID int(4) NOT NULL auto_increment,
+		email_address text NOT NULL,
+		cat_subscribe text NOT NULL
+	)";
+	$q = mysql_query($query) or mysql_oops( $query );
 	
 	echo "<p>All tables created successfully.</p>\n";
 }
@@ -224,8 +233,8 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 	bpost_create( 1, 'Candle', 'Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://www.candles-weblog.us/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
-	//	$now = date('Y-m-d H:i:s',$timestamp++);
-	//	bpost_create( 1, 'Sabrina', 'evoSkins.org, Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://lifeisadiaper.com/' ) or mysql_oops( $query );
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'Sabrina', 'evoSkins.org, Testing', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://lifeisadiaper.com/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -256,8 +265,8 @@ function populate_blogroll( & $now, $cat_blogroll_b2evo, $cat_blogroll_contrib)
 	bpost_create( 1, 'François', 'Main dev', $now, $cat_blogroll_contrib, array(), 'published',  'en', '', 0, true, 'http://fplanque.net/Blog/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
-	//	$now = date('Y-m-d H:i:s',$timestamp++);
-	//	bpost_create( 1, 'evoSkins.org', 'get more skins!', $now, $cat_blogroll_b2evo, array(), 'published',  'en', '', 0, true, 'http://www.evoskins.org/' ) or mysql_oops( $query );
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	bpost_create( 1, 'evoSkins.org', 'get more skins!', $now, $cat_blogroll_b2evo, array(), 'published',  'en', '', 0, true, 'http://www.evoskins.org/' ) or mysql_oops( $query );
 
 	// Insert a post into blogroll:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -540,6 +549,22 @@ switch( $action )
 	
 		if( $old_db_version < 8040 )
 		{
+			global $tableposts, $tableusers, $tablesettings, $tablecategories, $tablecomments, $tableblogs,
+                        $tablepostcats, $tablehitlog, $tablemailinglist;
+	                global $baseurl, $new_db_version;
+			
+			echo "Creating table for Mailing List...</p>\n";
+                	$query = "CREATE TABLE $tablemailinglist (
+                		ID int(4) NOT NULL auto_increment,
+                		email_address text NOT NULL,
+                		cat_subscribe text NOT NULL,
+                		PRIMARY KEY (ID)
+                	)";
+                	$q = mysql_query($query) or mysql_oops( $query );
+			
+			
+	               
+			
 			/* 
 			 * CONTRIBUTORS: If you need some more changes, put them here!
 			 */
