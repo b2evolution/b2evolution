@@ -1,0 +1,622 @@
+/* Designed by François PLANQUE http://fplanque.net/ */
+
+@import url(basic.css);	/* Import basic styles */
+@import url(forms.css);	/* Import default form styles */
+@import url(comments.css);	/* Import default comment styles */
+@import url(img.css);	/* Import standard image styles */
+@import url(blog_elements.css);	/* Import standard blog elements styles */
+
+div.main {
+	margin-right: 0px;
+	margin-left: 0px;
+}
+
+/* Styles for main area (left) */
+h2 {
+	margin-left: 8px;
+}
+
+/* Styles for posts */
+.bPosts {
+	vertical-align: top;
+	float: left;
+	width: 66%;
+	overflow: hidden;
+}
+.bPost, .bPostpublished
+{
+	clear: both;
+	margin-right: 10px;
+	margin-left: 20px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	border: 1px dashed #000000;
+	padding-right: 8px;
+	padding-left: 8px;
+}
+.bPostSide
+{
+	margin-bottom: 8px;
+}
+.bSmallHead {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 80%;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	color: #339999;
+}
+.bTitle {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+.bText {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bMore
+{
+	text-align: center;
+}
+.bMore a
+{
+	font-weight: bold;
+	font-size: 110%;
+}
+.bSmallPrint,
+{
+	clear: both;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 80%;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+/* Styles for comments */
+div.bComment {
+	border-color: #33CCCC; /* override */
+}
+
+/* Styles for comment form */
+input.bComment, 
+textarea.bComment
+{
+	background-color: #f0f0f0;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 98%;
+	margin: 0ex;
+}
+select.bComment
+{
+	background-color: #f0f0f0;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 100%;
+	margin: 0ex;
+}
+
+
+/* Styles for stats */
+div.statbloc
+{
+	float: left;
+	width: 44%;
+	margin-left: 2%; 
+	margin-right: 0%; 
+	margin-bottom: 2ex;
+	border: 1px solid #33BBBB;
+}
+div.statbloc h3
+{
+	margin-top: 0px;
+	margin-left: 0px;
+	margin-right: 0px;
+	color: #FFFFFF;
+	text-align: center;
+	background: #33BBBB;
+	padding: 1ex;
+}
+
+
+/* Styles for sidebar (right) */
+.bSideBar {
+	width: 33%;
+	vertical-align: top;
+	float: right;
+	overflow: hidden;
+}
+.bSideItem {
+	margin-right: 20px;
+	margin-left: 10px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	border: 1px dashed #CCCCCC;
+	padding: 8px;
+}
+.bSideItem h3 {
+	margin-top: 0px;
+	margin-bottom: 8px;
+}
+.bSideItem ul {
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+.bSideItem ul ul{
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bSideItem form {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.dimmed
+{
+	color: #aaa;
+	font-size: 84%;
+}
+input.SearchField
+{
+	background-color: #f0f0f0;
+	border-width: 1px;
+	border-color: #cccccc;
+	border-style: solid;
+	padding: .5ex;
+	width: 96%;
+	margin: 0ex;
+}
+
+/* Styles for Calendar: */
+caption.bCalendarCaption
+{
+	border-left: solid 1px #ccc;
+	border-right: solid 1px #ccc;
+	border-top: solid 1px #ccc;
+	margin: auto;
+	white-space: nowrap;
+}
+table.bCalendarTable
+{
+	margin: auto;
+	font-size: 84%;
+	border: solid 1px #ccc;
+}
+tr.bCalendarRow
+{
+	text-align: center;
+}
+th.bCalendarHeaderCell
+{
+	font-size: 84%;
+}
+td.bCalendarCell
+{
+}
+td.bCalendarEmptyCell
+{
+}
+.bCalendarLinkPost
+{
+	font-weight: bold;
+}
+#bCalendarToday
+{
+	background-color: #DEF;
+}
+
+
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	background-color: #FFFFFF;
+	background-repeat: repeat-x;
+	margin: 8px;
+	color: #000000;
+/*	font-size: 84%; 	poussé vers l'extérieur pour éviter des combinaisons en trop grand nombre */
+}
+div.main {
+	margin: 8px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 84%;
+}
+td {
+	font-family: Arial, Helvetica, sans-serif;
+}
+th {
+	font-family: Arial, Helvetica, sans-serif;
+}
+caption {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+}
+
+A 			{
+}
+A:link		{
+	color: #0066CC;
+}
+A:visited	{
+	color: #009999;
+}
+A:active	{
+	color: #003399;
+}
+A:hover		{
+	color: #003399;
+}
+h1 {
+	color: #009999;
+	font-size: 225%;
+}
+h2 {
+	color: #009999;
+	font-size: 180%;
+}
+h3 {
+	font-size: 120%;
+}
+h4 {
+	font-size: 110%;
+	margin-bottom: 0ex;
+}
+table.wide {
+	width: 100%;
+	clear: both;
+}
+td.cartouche {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 84%;
+	color: #009999;
+	background-color: #FFFFFF;
+	padding: 1px 4px;
+	border: 1px solid #33CCCC;
+}
+table.thin
+{
+	border: 1px solid #33CCCC;
+	margin: auto;
+	border-collapse: collapse
+}
+table.thin td
+{
+	border-bottom: 1px solid #33CCCC;
+	padding: .3ex 1ex;
+}
+table.thin th
+{
+	color: #FFFFFF;
+	background-color: #33CCCC;
+	border-left: 1px solid #FFFFFF;
+	border-right: 1px solid #FFFFFF;
+	padding: .3ex 1ex;
+}
+
+table.invisible
+{
+	margin: 1ex;
+	border-collapse: collapse
+}
+table.invisible td
+{
+	padding: 0ex 1ex;
+}
+td.right
+{
+	text-align: right;
+}
+p.baseline {
+	font-size: 65%;
+	color: #009999;
+	text-align: center;
+	margin-top: 8px;
+}
+hr {
+	height: 0px;
+	width: 50%;
+	border-top: 1px solid #33CCCC;
+	border-right: 1px none #33CCCC;
+	border-bottom: 1px none #33CCCC;
+	border-left: 1px none #33CCCC;
+
+}
+dt {
+	font-weight: bold;
+	color: #009999;
+}
+blockquote {
+	border: 2px dotted #33CCCC;
+	padding: 12px 16px;
+	background-color: #DDEEEE;
+	margin: 10px;
+}
+.center
+{
+	text-align: center;
+}
+
+.FigZone {
+	text-align: center;
+	margin: 8px;
+}
+
+.FigCent240 {
+	width: 240px;
+	color: #FFFFFF;
+	background-color: #000000;
+	padding: 12px;
+	margin: 0ex auto;
+	border: 1px solid #FFFFFF;
+	text-align: center;
+}
+.FigCent320 {
+	width: 320px;
+	color: #FFFFFF;
+	background-color: #000000;
+	padding: 12px;
+	margin: 0ex auto;
+	border: 1px solid #FFFFFF;
+	text-align: center;
+}
+.FigZone img{
+	border: none;
+	margin-bottom: 8px;
+}
+.FigZone a{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.FigZone a:link{
+	color: #FFFFFF;
+}
+.FigZone a:visited{
+	color: #FFFFFF;
+}
+.FigZone a:active{
+	color: #FFFFFF;
+}
+acronym {
+	border-bottom-width: 1px;
+	border-bottom-style: dotted;
+	border-bottom-color: #000000;
+	cursor: help;
+}
+abbr {
+	border-bottom-width: 1px;
+	border-bottom-style: dotted;
+	border-bottom-color: #000000;
+	cursor: help;
+}
+del {
+	color: #999999;
+}
+ins {
+	color: #009999;
+	text-decoration: none;
+}
+
+
+
+body {
+	padding: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-left: 0px;
+}
+div.pageHeader {
+	background-color: #33CCCC;
+	width: 100%;
+}
+div.pageHeaderContent {
+	padding-left: 5px;
+	padding-top: 2px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 84%;
+	width: 90ex;
+	text-align: left;
+	margin-right: auto;
+	margin-left: auto;
+	/* border: 1px solid #990000; */
+
+}
+div.pageTitle {
+	white-space: nowrap;
+	padding-left: 2.5ex;
+	padding-top: 8px;
+	padding-right: 0px;
+	padding-bottom: 8px;
+	background-color: #33CCCC;
+	border: 1px solid #FFFFFF;
+	margin-top: 3px;
+	float: left;
+	width: 75ex;
+}
+h1#pageTitle {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #FFFFFF;
+	font-size: 270%;
+	font-weight: bold;
+	padding: 0px;
+	margin: 0px;
+}
+div#Logo {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #FFFFFF;
+	font-size: 270%;
+	font-weight: bold;
+	vertical-align: bottom;
+	border: 1px solid #FFFFFF;
+	margin-top: 3px;
+	margin-right: 3px;
+	padding-left: .6ex;
+	padding-top: 8px;
+	padding-right: .6ex;
+	padding-bottom: 8px;
+	float: left;
+	background-image:  url(../img/right.gif);
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 32px;
+}
+
+div.NavBar {
+	clear: both;
+	height: 1ex;
+}
+.pageHeaderEnd {
+	clear: both;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	padding: 0px;
+	height: 5px;
+	font-size: 0ex;
+}
+a.NavButton {
+	text-decoration: none;
+	background-color: #33AAAA;
+	border: 1px solid #FFFFFF;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+	white-space: nowrap;
+	margin-right: 3px;
+	margin-top: 3px;
+	display: block;
+	width: 14ex;
+	float: left;
+}
+a.NavButtonCurr {
+	text-decoration: none;
+	background-color: #33CCCC;
+	border: 1px solid #FFFFFF;
+	text-align: left;
+	vertical-align: top;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+	white-space: nowrap;
+	margin-top: 3px;
+	margin-right: 3px;
+	display: block;
+	width: 14ex;
+	float: left;
+}
+a.NavButton2 {
+	text-decoration: none;
+	background-color: #33BBBB;
+	border: 1px solid #FFFFFF;
+	vertical-align: middle;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+	white-space: nowrap;
+	margin-top: 3px;
+	margin-right: 3px;
+	display: block;
+	width: 14ex;
+	float: left;
+}
+a.NavButton2Curr {
+	text-decoration: none;
+	background-color: #33CCCC;
+	border: 1px solid #FFFFFF;
+	vertical-align: middle;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+	white-space: nowrap;
+	margin-top: 3px;
+	margin-right: 3px;
+	display: block;
+	width: 14ex;
+	float: left;
+}
+
+A.NavButton:link		{
+	color: #FFFFFF;
+}
+A.NavButton:visited	{
+	color: #FFFFFF;
+}
+A.NavButton:active	{
+	color: #FFFFFF;
+}
+A.NavButton:hover		{
+	color: #FFFFFF;
+	background-color: #33CCCC;
+	/* text-decoration: underline; */
+}
+A.NavButtonCurr:link		{
+	color: #FFFFFF;
+}
+A.NavButtonCurr:visited	{
+	color: #FFFFFF;
+}
+A.NavButtonCurr:active	{
+	color: #FFFFFF;
+}
+A.NavButtonCurr:hover		{
+	color: #338888;
+	/* text-decoration: underline; */
+}
+A.NavButton2:link		{
+	color: #FFFFFF;
+}
+A.NavButton2:visited	{
+	color: #FFFFFF;
+}
+A.NavButton2:active	{
+	color: #FFFFFF;
+}
+A.NavButton2:hover		{
+	color: #FFFFFF;
+	background-color: #33CCCC;
+	/* text-decoration: underline; */
+}
+A.NavButton2Curr:link		{
+	color: #FFFFFF;
+}
+A.NavButton2Curr:visited	{
+	color: #FFFFFF;
+}
+A.NavButton2Curr:active	{
+	color: #FFFFFF;
+}
+A.NavButton2Curr:hover		{
+	color: #33AAAA;
+	/* text-decoration: underline; */
+}
+.pageSubTitle {
+	font-size: 109%;
+	color: #009999;
+	font-family: Arial, Helvetica, sans-serif;
+	letter-spacing: 4px;
+	text-align: center;
+	vertical-align: middle;
+	border: 0px;
+	padding-right: 6px;
+	padding-top: 6px;
+	padding-bottom: 4px;
+	padding-left: 6px;
+}
+div.stats{
+	float: right;
+	padding-right: 1px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	padding-left: 0px;
+}
+
