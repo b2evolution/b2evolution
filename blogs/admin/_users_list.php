@@ -2,11 +2,34 @@
 /**
  * This file implements the UI view for the user/group list for user/group editing.
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * }}
  *
  * @package admin
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: François PLANQUE
+ *
+ * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -67,7 +90,7 @@ $userlist = $DB->get_results( $request );
 				?>
 				<tr class="group">
 					<td colspan="7" class="firstcol">
-						<strong><a href="b2users.php?group=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /> <?php echo format_to_output( $row->grp_name, 'htmlbody' ); ?></a></strong>
+						<strong><a href="b2users.php?grp_ID=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /> <?php echo format_to_output( $row->grp_name, 'htmlbody' ); ?></a></strong>
 						<?php
 							if( $loop_grp_ID == $Settings->get('newusers_grp_ID') )
 							{
@@ -82,9 +105,10 @@ $userlist = $DB->get_results( $request );
 						<td>&nbsp;</td>
 						<td class="lastcol">
 						<?php
-						echo action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'action', 'group='.$loop_grp_ID ) );
+						echo action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'action', 'grp_ID='.$loop_grp_ID ) );
 
-						echo action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'action', 'action=newgroup&amp;template='.$loop_grp_ID ) );
+						echo action_icon( T_('Duplicate this group...'), 'copy',
+															regenerate_url( 'action', 'action=new_group&amp;grp_ID='.$loop_grp_ID ) );
 
 						if( ($loop_grp_ID != 1) && ($loop_grp_ID != $Settings->get('newusers_grp_ID'))
 								&& !in_array( $loop_grp_ID, $usedgroups ) )
@@ -109,7 +133,7 @@ $userlist = $DB->get_results( $request );
 
 				echo '<td class="firstcol">', $loop_User->get('ID'), "</td>\n";
 
-				echo '<td><a href="b2users.php?user=', $loop_User->get('ID'), '">';
+				echo '<td><a href="b2users.php?user_ID=', $loop_User->get('ID'), '">';
 				echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" /> ';
 				echo $loop_User->get('login'), "</a></td>\n";
 
@@ -163,9 +187,9 @@ $userlist = $DB->get_results( $request );
 					// Edit actions:
 					echo '<td class="lastcol">';
 					// edit user:
-					echo action_icon( T_('Edit this user...'), 'edit', regenerate_url( 'action', 'user='.$loop_User->get('ID') ) );
+					echo action_icon( T_('Edit this user...'), 'edit', regenerate_url( 'action', 'user_ID='.$loop_User->get('ID') ) );
 					// copy user:
-					echo action_icon( T_('Duplicate this user...'), 'copy', regenerate_url( 'action', 'action=newuser&amp;template='.$loop_User->get('ID') ) );
+					echo action_icon( T_('Duplicate this user...'), 'copy', regenerate_url( 'action', 'action=new_user&amp;user_ID='.$loop_User->get('ID') ) );
 					if( ($loop_User->ID != 1) && ($loop_User->ID != $current_User->ID) )
 					{ // delete user:
 						echo action_icon( T_('Delete this user!'), 'delete', regenerate_url( 'action', 'action=deleteuser&amp;id='.$loop_User->get('ID') ) );
@@ -184,9 +208,9 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 { // create new user link
 	?>
 	<p class="center">
-		<a href="?action=newuser"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('New user...') ?></a>
+		<a href="?action=new_user"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('New user...') ?></a>
 		&middot;
-		<a href="?action=newgroup"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('New group...') ?></a>
+		<a href="?action=new_group"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('New group...') ?></a>
 	</p>
 	<?php
 }
