@@ -64,27 +64,7 @@ if( !isset( $use_html_checker ) ) $use_html_checker = 1;
 if( $use_html_checker ) require_once dirname(__FILE__).'/_htmlchecker.class.php';
 
 
-/**
- * Report MySQL errors in detail.
- *
- * {@internal mysql_oops(-) }}
- *
- * @deprecated use class DB instead - not used in core anymore
- *
- * @param string The query which led to the error
- * @return boolean success?
- */
-function mysql_oops( $sql_query )
-{
-	$error  = '<p class="error">'. T_('Oops, MySQL error!'). '</p>'
-		. '<p>Your query:<br /><code>'. $sql_query. '</code></p>'
-		. '<p>MySQL said:<br /><code>'. mysql_error(). ' (error '. mysql_errno(). ')</code></p>';
-	die( $error );
-}
-
-
 /***** Formatting functions *****/
-
 
 /**
  * Format a string/content for being output
@@ -1892,6 +1872,9 @@ function header_nocache()
 
 /*
  * $Log$
+ * Revision 1.49  2005/02/23 22:47:08  blueyed
+ * deprecated mysql_oops()
+ *
  * Revision 1.48  2005/02/23 19:31:59  blueyed
  * get_weekstartend() fixed
  *
