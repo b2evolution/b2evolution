@@ -1,0 +1,331 @@
+# b2evolution - Japanese language file for static files
+# Copyright (C) 2004 François PLANQUE
+# This file is distributed under the same license as the b2evolution package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: b2evolution 0.9\n"
+"POT-Creation-Date: 2004-04-26 03:00+0200\n"
+"PO-Revision-Date: 2004-05-13 20:56+0900\n"
+"Last-Translator: Jun MUTO <jmuto@saku2.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../index.src.html:6
+#: ../../index.src.html:17
+#: ../../doc/install_new.src.html:6
+#: ../../doc/install_new.src.html:17
+#: ../../doc/upgradefrom_b2.src.html:6
+#: ../../doc/upgradefrom_b2.src.html:17
+#: ../../doc/upgradefrom_b2evo.src.html:6
+#: ../../doc/upgradefrom_b2evo.src.html:17
+msgid "b2evo package"
+msgstr "b2evo パッケージ"
+
+#: ../../index.src.html:6
+#: ../../index.src.html:18
+#: ../../doc/install_new.src.html:18
+#: ../../doc/upgradefrom_b2.src.html:18
+#: ../../doc/upgradefrom_b2evo.src.html:18
+msgid "Start page"
+msgstr "スタート ページ"
+
+#: ../../index.src.html:13
+#: ../../doc/install_new.src.html:13
+#: ../../doc/upgradefrom_b2.src.html:13
+#: ../../doc/upgradefrom_b2evo.src.html:13
+msgid "b2evolution: official site"
+msgstr "b2evolution: 公式サイト"
+
+#: ../../index.src.html:14
+#: ../../doc/install_new.src.html:14
+#: ../../doc/upgradefrom_b2.src.html:14
+#: ../../doc/upgradefrom_b2evo.src.html:14
+msgid "Multilingual multiuser multi-blog engine."
+msgstr "多言語・複数ユーザ・マルチblogエンジン。"
+
+#: ../../index.src.html:15
+#: ../../doc/install_new.src.html:15
+#: ../../doc/upgradefrom_b2.src.html:15
+#: ../../doc/upgradefrom_b2evo.src.html:15
+msgid "Version"
+msgstr "バージョン"
+
+#: ../../index.src.html:19
+#: ../../doc/install_new.src.html:19
+#: ../../doc/upgradefrom_b2.src.html:19
+#: ../../doc/upgradefrom_b2evo.src.html:19
+msgid "Install"
+msgstr "インストール"
+
+#: ../../index.src.html:20
+#: ../../doc/install_new.src.html:20
+#: ../../doc/upgradefrom_b2.src.html:20
+#: ../../doc/upgradefrom_b2evo.src.html:20
+msgid "Blogs"
+msgstr "Blogs"
+
+#: ../../index.src.html:21
+#: ../../doc/install_new.src.html:21
+#: ../../doc/upgradefrom_b2.src.html:21
+#: ../../doc/upgradefrom_b2evo.src.html:21
+msgid "Admin"
+msgstr "管理"
+
+#: ../../index.src.html:22
+#: ../../doc/install_new.src.html:22
+#: ../../doc/upgradefrom_b2.src.html:22
+#: ../../doc/upgradefrom_b2evo.src.html:22
+msgid "Online"
+msgstr "オンライン"
+
+#: ../../index.src.html:23
+#: ../../doc/install_new.src.html:23
+#: ../../doc/upgradefrom_b2.src.html:23
+#: ../../doc/upgradefrom_b2evo.src.html:23
+msgid "Manual"
+msgstr "マニュアル"
+
+#: ../../index.src.html:24
+#: ../../doc/install_new.src.html:24
+#: ../../doc/upgradefrom_b2.src.html:24
+#: ../../doc/upgradefrom_b2evo.src.html:24
+msgid "Support"
+msgstr "サポート"
+
+#: ../../index.src.html:28
+#: ../../doc/install_new.src.html:28
+#: ../../doc/upgradefrom_b2.src.html:28
+#: ../../doc/upgradefrom_b2evo.src.html:28
+msgid "Available translations for this page:"
+msgstr "利用可能なこのページの翻訳:"
+
+#: ../../index.src.html:32
+msgid "Welcome!"
+msgstr "ようこそ!"
+
+#: ../../index.src.html:34
+msgid "b2evolution is probably the most comprehensive blog engine you can find! It includes almost any feature you could expect from a blog tool, and more! Plus, it's free, it's open-source (GPL), it runs virtually anywhere (PHP/mySQL) and it's available in many languages!"
+msgstr "b2evolution は、おそらくあなたが見つけ出すことのできる最も包括的なblogエンジンです。これには、blogツールに期待するあらゆる機能と、それ以上のものがほとんど組み込まれています! 加えて、これは無償で、オープンソース (GPL) で、事実上どの環境でも (PHP と mySQL があれば) 動作し、たくさんの言語が利用可能です!"
+
+#: ../../index.src.html:35
+msgid "You will find complete information on the official <a %s>b2evolution website</a>."
+msgstr "詳細な情報は <a %s>b2evolution ウェブサイト</a> で見つけることができるでしょう。"
+
+#: ../../index.src.html:36
+msgid "Quickstart instructions:"
+msgstr "クイックスタート説明書:"
+
+#: ../../index.src.html:37
+msgid "You can set up b2evolution in just a few minutes. Just follow the instructions matching your situation:"
+msgstr "b2evolution はたった数分で設置することができます。あなたの状況にあった説明書に従ってください。"
+
+#: ../../index.src.html:39
+msgid "New users:"
+msgstr "新規ユーザ:"
+
+#: ../../index.src.html:39
+msgid "installing b2evolution from scratch"
+msgstr "新規にb2evolutionをインストール"
+
+#: ../../index.src.html:40
+msgid "Existing b2evolution users:"
+msgstr "既存の b2evolution ユーザ:"
+
+#: ../../index.src.html:40
+msgid "upgrading from a previous version of b2evolution"
+msgstr "以前のバージョンの b2evolution からアップグレード"
+
+#: ../../index.src.html:41
+msgid "Cafelog/b2 users:"
+msgstr "Cafelog/b2 ユーザ:"
+
+#: ../../index.src.html:41
+msgid "upgrading from Cafelog/b2 version 0.6.x"
+msgstr "Cafelog/b2 バージョン 0.6.x からアップグレード"
+
+#: ../../index.src.html:45
+#: ../../doc/install_new.src.html:55
+#: ../../doc/upgradefrom_b2.src.html:74
+#: ../../doc/upgradefrom_b2evo.src.html:54
+msgid "official website"
+msgstr "公式ウェブサイト"
+
+#: ../../index.src.html:46
+#: ../../doc/install_new.src.html:56
+#: ../../doc/upgradefrom_b2.src.html:75
+#: ../../doc/upgradefrom_b2evo.src.html:55
+msgid "GNU GPL license"
+msgstr "GNU GPL ライセンス"
+
+#: ../../index.src.html:47
+#: ../../doc/install_new.src.html:57
+#: ../../doc/upgradefrom_b2.src.html:76
+#: ../../doc/upgradefrom_b2evo.src.html:56
+msgid "contact"
+msgstr "連絡"
+
+#: ../../doc/install_new.src.html:6
+msgid "Install instructions for new users"
+msgstr "新規ユーザ用インストール説明書"
+
+#: ../../doc/install_new.src.html:32
+msgid "Installation instructions for new users"
+msgstr "新規ユーザ用インストール説明書"
+
+#: ../../doc/install_new.src.html:34
+#: ../../doc/upgradefrom_b2.src.html:34
+#: ../../doc/upgradefrom_b2evo.src.html:33
+msgid "Before you begin, please note that some network features of b2evolution require you to agree our simple <a %s>Terms of service</a>."
+msgstr "始める前に、b2evolution のいくつかのネットワーク機能を利用するために、あなたには簡単な <a %s>利用規約</a> に同意していただく必要があります。"
+
+#: ../../doc/install_new.src.html:36
+#: ../../doc/upgradefrom_b2.src.html:43
+msgid "Once you have unzipped the b2evolution distribution:"
+msgstr "b2evolution 配布 .zip アーカイブを展開した後:"
+
+#: ../../doc/install_new.src.html:37
+msgid "On your server, create or locate a mysql database for b2evolution. (For example, you can call it \"b2evolution\")"
+msgstr "あなたのサーバ上で、b2evolution 用に mySQL データベースを作成もしくは指定してください。(例えば、それを \"b2evolution\" と名づけることができます)"
+
+#: ../../doc/install_new.src.html:39
+#: ../../doc/install_new.src.html:42
+#: ../../doc/upgradefrom_b2.src.html:60
+msgid "Note:"
+msgstr "注意:"
+
+#: ../../doc/install_new.src.html:39
+msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. Your existing tables will not be affected in any way."
+msgstr "設定を変更しなかった場合は、b2evolution によって作られる全てのテーブルには evo_ と接頭辞が付きます。同じ接頭辞を用いるアプリケーションをすでに使用しているのでなければ、これによって安全に他のアプリケーションと一つのデータベースを共有することができます。既存のテーブルが影響を受けることはないはずです。"
+
+#: ../../doc/install_new.src.html:40
+#: ../../doc/upgradefrom_b2.src.html:58
+msgid "Upload the b2evolution files to your website."
+msgstr "b2evolution のファイル群をあなたのウェブサイトにアップロードしてください。"
+
+#: ../../doc/install_new.src.html:42
+msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another."
+msgstr "あなたのサイトにアップロードする必要があるのは <code>/blogs</code> ディレクトリの中身だけです。b2evolution をあなたのサイトのホームページとして扱いたい場合は、<code>/blogs</code> フォルダの中身をあなたのウェブサイトのルートにアップロードしてください。そうでなければ、ウェブサーバのサブディレクトリにファイル群をアップロードするのが望ましいです。<code>/blogs</code> というサブディレクトリ名をそのままにすることもできますが、別のものに変更することもできます。"
+
+#: ../../doc/install_new.src.html:45
+msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/yourfolder</code> ..."
+msgstr "あなたが blogs フォルダの中身を <code>http://yoursite.com/yourfolder</code> にインストールすると仮定しましょう..."
+
+#: ../../doc/install_new.src.html:46
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you."
+msgstr "インストール スクリプトをサーバ上で実行してください。スクリプトは  <code>http://yoursite.com/yourfolder/install</code> に配置されています。それから、画面の指示に従ってください。<br /> <br /> インストーラは、あなたに数個の質問をして、必要なデータベース テーブルを作り、あなたの b2evolution の設定を行います。"
+
+#: ../../doc/install_new.src.html:49
+#: ../../doc/upgradefrom_b2.src.html:67
+#: ../../doc/upgradefrom_b2evo.src.html:44
+msgid "Check to make sure the new installation works."
+msgstr "新しくインストールされたものが動作していることを確認してください。"
+
+#: ../../doc/install_new.src.html:50
+#: ../../doc/upgradefrom_b2.src.html:68
+#: ../../doc/upgradefrom_b2evo.src.html:45
+msgid "On production servers, it is recommended that you delete the <code>/install</code> subfolder."
+msgstr "公開サーバでは、<code>/install</code> サブフォルダを削除することを推奨します。"
+
+#: ../../doc/install_new.src.html:51
+#: ../../doc/upgradefrom_b2.src.html:70
+#: ../../doc/upgradefrom_b2evo.src.html:50
+msgid "After basic install is done, there are a few <a %s>tricky things you may need to take care of</a> (online manual)."
+msgstr "基本的なインストールが終わった後で、いくつかの <a %s>処理する必要がある手の込んだ事柄</a> (オンライン マニュアル) があります。"
+
+#: ../../doc/upgradefrom_b2.src.html:6
+msgid "Upgrading from Cafelog/b2"
+msgstr "Cafelog/b2 からのアップグレード"
+
+#: ../../doc/upgradefrom_b2.src.html:32
+msgid "Upgrading from Cafelog/b2 (the original b2)"
+msgstr "Cafelog/b2 (オリジナルの b2) からのアップグレード"
+
+#: ../../doc/upgradefrom_b2.src.html:36
+msgid "The upgrade procedure below has been tested exclusively with b2 versions 0.6.1 and 0.6.2. Though, we believe that versions 0.5.x should also upgrade without problems. Anyway, if you run any older version of b2, you can give it a try quite safely. b2evolution will not harm your data, even if it can't understand it. The worst you would get is an error message."
+msgstr "以下のアップグレード手順は、b2 バージョン 0.6.1 と 0.6.2 でのみテストされています。しかし、バージョン 0.5.x 系でも問題無くアップグレードできるはずだと考えています。とにかく、あなたが b2 のどの古いバージョンを使っていても、まったく安全にアップグレードを試してみることができます。b2evolution はあなたのデータを解釈できなくても、データを傷つけることはありません。最悪の場合で、エラーメッセージが表示されるだけです。"
+
+#: ../../doc/upgradefrom_b2.src.html:40
+msgid "However, as always, it is wise to do a backup of your current website / blog / database (depending on what you already have) before starting to install something new."
+msgstr "しかし、新しいもののインストールを始める前には、例のごとく、現在のウェブサイト / blog / データベース (あなたが設置しているものによります) のバックアップを行うのが賢明です。"
+
+#: ../../doc/upgradefrom_b2.src.html:46
+msgid "On your server, locate the mysql database you are already using for Cafelog/b2. You must use the same database for b2evolution to be able to upgrade. Feel safe, b2evolution will not alter your Cafelog/b2 tables and data in any way!"
+msgstr "サーバ上で、Cafelog/b2 用にあなたが現在使用している mySQL データベースを確認してください。アップグレードを可能にするために、b2evolution 用にも同じデータベースを使用しなければなりません。安心してください、b2evolution はあなたの Cafelog/b2 のテーブルやデータを変更することはありません!"
+
+#: ../../doc/upgradefrom_b2.src.html:50
+msgid "Note 1:"
+msgstr "注意1:"
+
+#: ../../doc/upgradefrom_b2.src.html:50
+msgid "Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. For example, Cafelog/b2 used tables prefixed with b2 . Your existing tables will not be affected in any way."
+msgstr "設定を変更しなかった場合は、b2evolution によって作られる全てのテーブルには evo_ と接頭辞が付きます。同じ接頭辞を用いるアプリケーションをすでに使用しているのでなければ、これによって安全に他のアプリケーションと一つのデータベースを共有することができます。例えば、Cafelog/b2 は b2 をいう接頭辞のついたテーブルを使用します。既存のテーブルが影響を受けることはないはずです。"
+
+#: ../../doc/upgradefrom_b2.src.html:54
+msgid "Note 2:"
+msgstr "注意2:"
+
+#: ../../doc/upgradefrom_b2.src.html:54
+msgid "Why the same database? Because the SQL process we use to copy the data -- which is fast and secure -- can only be done within a single database."
+msgstr "なぜ同じデータベースなのか? データをコピーするのに使用している SQL プロセス -- これは早くて安全です -- が、一つのデータベース内でしか行えないからです。"
+
+#: ../../doc/upgradefrom_b2.src.html:60
+msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Cafelog/b2 blog remains fully functional while you check out b2evolution.</strong>"
+msgstr "あなたのサイトにアップロードする必要があるのは <code>/blogs</code> ディレクトリの中身だけです。b2evolution をあなたのサイトのホームページとして扱いたい場合は、<code>/blogs</code> フォルダの中身をあなたのウェブサイトのルートにアップロードしてください。しかし、新しいサブディレクトリ、例えば <code>/b2evo</code> に、ファイル群をアップロードすることもできます。この方法では、<strong>あなたが b2evolution を試してみている間、既存の Cafelog/b2 blog が完全に機能し続けます。</strong>"
+
+#: ../../doc/upgradefrom_b2.src.html:62
+msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/b2evo</code> ..."
+msgstr "あなたが blogs フォルダの中身を <code>http://yoursite.com/b2evo</code> にインストールすると仮定しましょう..."
+
+#: ../../doc/upgradefrom_b2.src.html:64
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />   <br /> The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you."
+msgstr "インストール スクリプトをサーバ上で実行してください。スクリプトは  <code>http://yoursite.com/b2evo/install</code> に配置されています。それから、画面の指示に従ってください。<br /> <br /> インストーラは、あなたに数個の質問をして、必要なデータベース テーブルを作り、b2 のデータを b2evo にコピーし (b2 に影響を及ぼしません)、あなたの b2evolution の設定を行います。"
+
+#: ../../doc/upgradefrom_b2.src.html:69
+msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading your existing b2 template to b2evolution."
+msgstr "既存の b2 テンプレートを b2evolution にアップグレードする注意事項を <a %s>wiki</a> や <a %s>フォーラム</a> で確認してください。"
+
+#: ../../doc/upgradefrom_b2evo.src.html:6
+#: ../../doc/upgradefrom_b2evo.src.html:32
+msgid "Upgrading from a previous version of b2evolution"
+msgstr "以前のバージョンの b2evolution からのアップグレード"
+
+#: ../../doc/upgradefrom_b2evo.src.html:35
+msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, etc..."
+msgstr "あなたの b2evolution のファイルを全てバックアップしてください。あなたが変更したファイル、/conf の中身やスキン、blogテンプレート、スタブファイルなどには特に注意を払ってください。"
+
+#: ../../doc/upgradefrom_b2evo.src.html:36
+msgid "You should also backup your database if you can. This functionality should be provided by your host."
+msgstr "できるならば、あなたのデータベースのバックアップも行うべきです。この機能はあなたが使用しているホストが提供しているでしょう。"
+
+#: ../../doc/upgradefrom_b2evo.src.html:37
+msgid "Delete all your existing b2evolution files from your site before uploading the new ones! This will ensure you don't keep unnecessary files on your server after upgrading. It's also better for security."
+msgstr "新しい b2evolution ファイル群をアップロードする前に、既存の b2evolution のファイルを全て削除してください! これは、アップグレード後にサーバ上に不要なファイルが残らないようにするためです。また、こうすることがセキュリティのためにも良いです。"
+
+#: ../../doc/upgradefrom_b2evo.src.html:38
+msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you can't reuse your customized files, including  /conf, skins, blog templates, stubfiles, etc. as they are!<br /> <br /> That means you will have to customize all these files again. We're sorry but, due to the pace of development and adding of new features, we cannot guarantee that anything will work if you keep older files in place. <strong>However</strong>, since you have backed up all these files in step 1, you can try to partially reuse them once the upgrade process is done. See step 8 below."
+msgstr "あなたのサイトに、<strong>/blogs フォルダから新しい b2evolution のファイル全てを</strong>アップロードします。念のためもう一度強調します、<strong>全てのファイル</strong>です! これは、/conf の中身やスキン、blogテンプレート、スタブファイルなど、あなたがカスタマイズしたファイルをそのまま再利用できないことを意味します!<br /> <br /> あなたは、これらのファイル全てをもう一度カスタマイズする必要があるということです。申し訳ないと思いますが、開発速度と新機能の追加のため、以前のファイルを残しても動作する保証をすることができません。<strong>しかし</strong>、最初の手順でこれらのファイルをバックアップしているので、アップグレード操作が終わった後で、それらを部分的に再利用しようと試みることができます。以下の手順 8 を参照してください。"
+
+#: ../../doc/upgradefrom_b2evo.src.html:41
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one."
+msgstr "インストール スクリプトをサーバ上で実行してください。スクリプトは  <code>http://yoursite.com/yourfolder/install</code> に配置されています。それから、画面の指示に従ってください。<br /> <br /> インストーラは、あなたに基本設定の質問をします (あなたがアップロードする前に /conf/_config.php を更新しておいていない場合)。その後で、どの b2evoluiton からでも、新しいバージョンにデータベースのアップグレードを行えるようにします。"
+
+#: ../../doc/upgradefrom_b2evo.src.html:46
+msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.<br /> <br /> You can also check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading specific files from a specific version to another."
+msgstr "ここの時点で、以前のカスタマイズを復活させます。<a %s>WinMerge</a> のような差分/合成ツールを用意することを推奨します。これは、古い (バックアップした) ファイルと新しいファイルを (一度に全ディレクトリでも) 簡単に比較して、変更点を報告してくれます。<br /> <br /> また、特定のバージョンから特定のファイルをアップグレードする注意事項を <a %s>wiki</a> や <a %s>フォーラム</a> で確認することができます。"
+
+msgid "English (EU)"
+msgstr "英語 (EU)"
+
+msgid "German (DE)"
+msgstr "ドイツ語 (DE)"
+
+msgid "French (FR)"
+msgstr "フランス語 (FR)"
+
+msgid "Dutch (NL)"
+msgstr "オランダ語 (NL)"
+
