@@ -76,6 +76,10 @@ function create_b2evo_tables()
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 	
+
+	echo "Creating table for Groups...<br />\n";
+	create_groups();
+
 	
 	echo "Creating table for Users...<br />\n";
 	$query = "CREATE TABLE $tableusers ( 
@@ -98,9 +102,10 @@ function create_b2evo_tables()
 		user_yim varchar(50) NOT NULL, 
 		user_idmode varchar(20) NOT NULL, 
 		user_notify tinyint(1) NOT NULL default 1,
+		user_grp_ID int(4) NOT NULL default 1,
 		PRIMARY KEY (ID), 
-		UNIQUE ID (ID), 
-		UNIQUE (user_login) 
+		UNIQUE (user_login),
+	  KEY user_grp_ID (user_grp_ID)
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 	
@@ -225,7 +230,6 @@ function create_b2evo_tables()
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 	 
-	
 	echo "Creating table for Anti-Spam Ban List...</p>\n";
 	create_antispam();
 
@@ -248,6 +252,26 @@ function create_antispam()
 		aspm_source enum( 'local','reported','central' ) NOT NULL default 'reported',
 		PRIMARY KEY (aspm_ID),
 		UNIQUE aspm_string (aspm_string)
+	)";
+	$q = mysql_query($query) or mysql_oops( $query );
+}
+
+
+/*
+ * create_groups(-)
+ *
+ * Used when creating full install and upgrading from earlier versions
+ */
+function create_groups()
+{
+	global $tablegroups;
+	
+	$query = "CREATE TABLE tablegroups (
+		grp_ID int(11) NOT NULL auto_increment,
+  	grp_name varchar(50) NOT NULL default '',
+  	grp_perm_stats enum('none','view','edit') NOT NULL default 'none',
+  	grp_perm_spamblacklist enum('none','view','edit') NOT NULL default 'none',
+	  PRIMARY KEY (grp_ID)
 	)";
 	$q = mysql_query($query) or mysql_oops( $query );
 }
@@ -635,9 +659,16 @@ switch( $action )
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
 
+			echo "<p>Creating Groups List... ";
+			create_groups();
+			echo "OK.<br />\n";
+
 			echo "<p>Upgrading users table... ";
 			$query = "ALTER TABLE $tableusers
-								ADD COLUMN user_notify tinyint(1) NOT NULL default 1";
+								DROP KEY ID,
+								ADD COLUMN user_notify tinyint(1) NOT NULL default 1,
+								ADD COLUMN user_grp_ID int(4) NOT NULL default 1,
+								ADD KEY user_grp_ID (user_grp_ID)";
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
 
@@ -661,7 +692,6 @@ switch( $action )
 			#	echo "OK.<br />\n";
 		}
 		
-		// $new_db_version = 8001; // FOR TESTING
 		echo "<p>Update DB schema version to $new_db_version... ";
 		$query = "UPDATE $tablesettings SET db_version = $new_db_version WHERE ID = 1";
 		$q = mysql_query($query) or mysql_oops( $query );
@@ -700,7 +730,7 @@ switch( $action )
 
 			echo "<p>Upgrading users table... ";
 			$query = "ALTER TABLE $tableusers
-								ADD COLUMN user_notify tinyint(1) NOT NULL default 1";
+								DROP KEY ID";
 			$q = mysql_query($query) or mysql_oops( $query );
 			echo "OK.<br />\n";
 
@@ -926,6 +956,10 @@ switch( $action )
 
 		echo "Droping Users...<br />\n";
 		$query = "DROP TABLE IF EXISTS $tableusers";
+		$q = mysql_query($query) or mysql_oops( $query );
+
+		echo "Droping Groups...<br />\n";
+		$query = "DROP TABLE IF EXISTS $tablegroups";
 		$q = mysql_query($query) or mysql_oops( $query );
 
 		echo "Droping Blogs...<br />\n";

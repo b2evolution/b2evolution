@@ -25,11 +25,8 @@ switch( $next_action )
 		<?php 
 			form_text( 'blog_name', $blog_name, 50, T_('Full Name') );
 			form_text( 'blog_shortname', $blog_shortname, 12, T_('Short Name') );
+			form_select( 'blog_lang', $blog_lang, 'lang_options', T_('Main Language') );
 		?>
-		<fieldset>
-			<div class="label"><label for="blog_lang"><?php echo T_('Main Language') ?>:</label></div> 
-			<div class="input"><select name="blog_lang" id="blog_lang"><?php lang_options( $blog_lang )?></select></div>
-		</fieldset>
 	</fieldset>
 
 	<fieldset>
@@ -95,7 +92,7 @@ switch( $next_action )
 		<fieldset>
 			<div class="input">
 				<input type="submit" name="submit" value="<?php echo $submit ?>" class="search">
-				<input type="reset" value="Reset" class="search">
+				<input type="reset" value="<?php echo T_('Reset') ?>" class="search">
 			</div>
 		</fieldset>
 	</fieldset>

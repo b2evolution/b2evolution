@@ -7,6 +7,8 @@
  *
  * This file built upon code from original b2 - http://cafelog.com/
  */
+require_once dirname(__FILE__).'/_functions_groups.php';
+require_once dirname(__FILE__).'/_class_User.php';
 
 /*
  * user_create(-)

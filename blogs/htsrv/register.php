@@ -90,7 +90,7 @@ switch($action)
 
 		$message  = T_('new user registration on your blog', $default_locale). ":\n\n";
 		$message .= T_('Login:', $default_locale). " $login\n\n". T_('Email', $default_locale). ": $user_email\n\n";
-		$message .= T_('Manage users', $default_locale). ": $admin_url/b2team.php\n\n";
+		$message .= T_('Manage users', $default_locale). ": $admin_url/b2users.php\n\n";
 
 		@mail( $admin_email, T_('new user registration on your blog', $default_locale), $message, "From: $notify_from\nX-Mailer: b2evolution $b2_version - PHP/".phpversion());
 

@@ -7,6 +7,6 @@
  */
 ?>
 
-</div>
+</h1>
 
 <div class="panelbody">

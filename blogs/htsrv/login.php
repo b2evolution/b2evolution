@@ -97,6 +97,9 @@ switch($action)
 		if( is_logged_in() )
 		{	// The user is already logged in...
 			$error = T_('Note: You are already logged in!');
+
+			param( 'redirect_to', 'string', $_SERVER['REQUEST_URI'] );
+			$error .= ' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>';
 		}
 		
 		// Display login form:

@@ -24,9 +24,9 @@
 		$email = $user_data["user_email"];
 		$url = $user_data["user_url"];
 		echo "<td>".$user_data["ID"]."</td>\n";
-		echo "<td>".$user_data["user_login"]."</td>\n";
+		echo '<td><a href="b2users.php?action=view&amp;user=', $user_data['ID'], '">', $user_data["user_login"],"</a></td>\n";
 		?>
-		<td><strong><a href="b2team.php?action=view&amp;user=<?php echo $user_data['ID'] ?>"><?php echo $user_data["user_nickname"] ?></a></strong></td>
+		<td><?php echo $user_data["user_nickname"] ?></td>
 		<?php
 		echo "<td>".$user_data['user_firstname']."&nbsp;".$user_data["user_lastname"]."</td>\n";
 		echo "<td>&nbsp;<a href=\"mailto:$email\" title=\"e-mail: $email\"><img src=\"img/email.gif\" border=\"0\" alt=\"e-mail: $email\" /></a>&nbsp;</td>";
@@ -36,13 +36,13 @@
 		echo "</td>\n";
 		echo "<td>".$user_data["user_level"];
 		if (($user_level >= 2) && ($user_level > ($user_data["user_level"] + 1)))
-			echo " <a href=\"b2team.php?action=promote&id=".$user_data["ID"]."&prom=up\">+</a> ";
+			echo " <a href=\"b2users.php?action=promote&id=".$user_data["ID"]."&prom=up\">+</a> ";
 		if (($user_level >= 2) && ($user_level > $user_data["user_level"]) && ($user_data["user_level"] > 0))
-			echo " <a href=\"b2team.php?action=promote&id=".$user_data["ID"]."&prom=down\">-</a> ";
-		if ($user_level >= 3)
+			echo " <a href=\"b2users.php?action=promote&id=".$user_data["ID"]."&prom=down\">-</a> ";
+		if (($user_level >= 3) && ($user_data["user_level"] == 0))
 		{
 			?>
-			<a href="b2team.php?action=delete&id=<?php echo $user_data['ID'] ?>" style="color:red;font-weight:bold;" onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
+			<a href="b2users.php?action=delete&id=<?php echo $user_data['ID'] ?>" style="color:red;font-weight:bold;" onClick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!') ?>')"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
 			<?php
 		}
 		echo "</td>\n";

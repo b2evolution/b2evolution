@@ -260,8 +260,9 @@ function get_blogparams_by_ID($blog_ID)
 function blog_load_cache()
 {
 	global $tableblogs, $cache_blogs, $use_cache, $querycount;
-	if (empty($cache_blogs)) 
+	if( empty($cache_blogs) || !$use_cache )  
 	{
+		$cache_blogs = array();
 		$query = "SELECT * FROM $tableblogs ORDER BY blog_ID";
 		$result = mysql_query($query) or mysql_oops( $query ); 
 		$querycount++; 

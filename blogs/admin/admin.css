@@ -9,8 +9,12 @@ body {
 	font-size: 84%;
 }
 h1 {
-	color: #8ae;
-	font-size: 160%;
+	clear: both;
+	margin: 0 2ex 0;
+	padding: 1ex 0 0 0;
+	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
+	color: #BBCCDD;
+	font-size: 112%;
 }
 h1.logintitle {
 	color: #000;
@@ -19,7 +23,7 @@ h1.logintitle {
 h2 {
 	margin-top: 0ex;
 	margin-bottom: 1ex;
-	color: #8ae;
+	color: #b0b0b0;
 	font-size: 140%;
 }
 h3 {
@@ -33,11 +37,11 @@ h4 {
 
 a {
 	background-color: transparent; 
-	color: #0000FF;
+	color: #00e;
 	text-decoration: none;
 }
 a:hover {
-	color: #FF3300;
+	color: #b0b0b0;
 	text-decoration: underline;
 }
 .panelbody {
@@ -371,14 +375,6 @@ span.line
 }
 #header li.current a:hover {
 	text-decoration: underline;
-}
-div.menutoptitle {
-	clear: both;
-	margin: 0 2ex 0;
-	padding: 1ex 0 0 0;
-	font-family: Arial, Verdana, Geneva, Arial, Helvetica;
-	color: #BBCCDD;
-	font-size: 112%;
 }
 
 /* --- admin blog display --- */

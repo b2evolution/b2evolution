@@ -26,6 +26,33 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 	echo "</fieldset>\n\n";
 }
 
+
+/*
+ * form_select(-)
+ */
+function form_select( 
+	$field_name, 
+	$field_value, 
+	$field_list_callback, 
+	$field_label, 
+	$field_note = '',
+	$field_class = '' )
+{
+	echo '<fieldset>';
+	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
+	echo '  <div class="input"><select name="', $field_name, '" id="', $field_name, '"';
+	if( !empty($field_class) ) 
+	{ 
+		echo ' class="', $field_class,'"'; 
+	} 
+	echo '/>';
+	$field_list_callback( $field_value );
+	echo '  </select>';
+	echo '  <span class="notes">', $field_note, '</span></div>';
+	echo "</fieldset>\n\n";
+}
+
+
 /*
  * form_checkbox(-)
  */

@@ -115,7 +115,7 @@ if( empty($mode) )
 			echo '<li class="current">';
 		else
 			echo '<li>';
-		echo '<a href="b2team.php" >', T_('Users'), '</a></li>';
+		echo '<a href="b2users.php" >', T_('Users'), '</a></li>';
 	
 		if( $title == T_('My Profile') )
 			echo '<li class="current">';
@@ -132,6 +132,6 @@ if( empty($mode) )
 }	// / not in special mode
 ?>
 	
-<div class="menutoptitle"><strong>:: <?php echo $title; ?></strong>
+<h1><strong>:: <?php echo $title; ?></strong>
 
 
