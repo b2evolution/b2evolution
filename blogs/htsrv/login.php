@@ -112,7 +112,7 @@ switch($action)
 			param( 'redirect_to', 'string', $_SERVER['REQUEST_URI'] );
 			if( basename( $redirect_to ) == basename( $_SERVER['SCRIPT_NAME'] ) )
 			{ // avoid "endless loops"
-				$redirect_to = $admin_url.'/b2edit.php';
+				$redirect_to = $admin_url.'/';
 			}
 			$error .= ' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>';
 		}

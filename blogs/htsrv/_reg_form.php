@@ -39,7 +39,7 @@ require(dirname(__FILE__).'/_header.php');
 	</fieldset>
 
 	<?php
-	form_select( 'locale', $default_locale, 'locale_options', T_('Locale'), T_('Prefered language') );
+	form_select( 'locale', $locale, 'locale_options', T_('Locale'), T_('Prefered language') );
 	?>
 	<fieldset>
 		<div class="input">
