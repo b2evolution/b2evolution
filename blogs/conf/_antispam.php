@@ -7,7 +7,7 @@
  */
 
 # Block URLs containing the following strings:
-$block_urls = array(	
+$block_urls = array(
 // Real bad spammers:	
 	'penis-enlargement',
 	'online-casino',
@@ -18,12 +18,17 @@ $block_urls = array(
 	'sexy-lingerie',
 	'-porn-',
 	'-adult-',
-// Light spammers:
-	'pcfamily.ch',
-	'nositeyet.com',
+	'-tits-',
 	'mneuron.com',
 	'buy-phentermine',
 	'order-cheap-pills',
+	'menguma.com',
+	'gdough.com',
+// Light spammers:
+	'pcfamily.ch',
+	'nositeyet.com',
+	'boris.com',
+	'mishka.com',
 	);
 
 ?>
