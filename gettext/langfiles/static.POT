@@ -291,9 +291,6 @@ msgid "Check the <a %s>wiki</a> or the <a %s>forums</a> for notes on upgrading y
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:6
-msgid "Upgrading from previous b2evolution"
-msgstr ""
-
 #: ../../doc/upgradefrom_b2evo.src.html:32
 msgid "Upgrading from a previous version of b2evolution"
 msgstr ""

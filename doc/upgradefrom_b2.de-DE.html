@@ -37,9 +37,9 @@
 	
 <h1>Upgraden von Cafelog/b2 (dem originalen b2)</h1>
 
-<p>Before you begin, please note that some network features of b2evolution require you to agree our simple <a href="http://b2evolution.net/about/terms.html">Terms of service</a>.</p>
+<p>Bevor du anfängst beachte bitte, dass einige Netzwerk-Funktionen von b2evolution voraussetzen, dass du den einfachen <a href="http://b2evolution.net/about/terms.html">Servicebedingungen</a> zustimmst.</p>
 
-<p>Die untere Upgrade-Prozedur wurde ausschliesslich mit b2 Versionen 0.6.1 und 0.6.2 getestet. Trotzdem sollten Versionen 0.5.x auch ohne Probleme funktionieren. Wie auch immer, falls du eine ältere b2 Version laufen hast kannst du dem ganzen ziemlich sicher einen Versuch abstatten. b2evolution wird deinen Daten keinen Schaden zufügen. Das Schlimmste was passieren wird wäre eine Fehlermeldung.</p>
+<p>Die untere Upgrade-Prozedur wurde ausschliesslich mit b2 Versionen 0.6.1 und 0.6.2 getestet. Trotzdem sollte sie für Versionen 0.5.x auch funktionieren. Wie auch immer, falls du eine ältere b2 Version laufen hast kannst du dem ganzen ziemlich sicher einen Versuch abstatten. b2evolution wird deinen Daten keinen Schaden zufügen, auch wenn es sie nicht versteht. Das Schlimmste was passieren kann wäre eine Fehlermeldung.</p>
 <p><em>Wie immer ist es natürlich weise ein Backup deiner jetzigen Webseite / Blog / Datenbank (je nachdem was du schon hast) zu machen, bevor du anfängst etwas neues zu installieren.</em></p>
 
 <p>Sobald du die b2evolution Distribution entpackt hast:</p>
@@ -51,18 +51,16 @@
 		<strong>Anmerkung 2:</strong> Warum dieselbe Datenbank? Weil der (schnelle und sichere) SQL-Prozess den wir benutzen um die Daten zu kopieren nur innerhalb einer Datenbank ausgeführt werden kann.</span>
 </li>
 
-<li>Lade die b2evolution Dateien auf deine Webseite hoch, entsprechend der URL die du gerade konfiguriert hast.<br />
+<li>Lade die b2evolution Dateien auf deine Webseite hoch.<br />
   <br />
-  <span class="small"><strong>Anmerkung:</strong> Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. However, you could start by uploading the files to a new subdirectory, <code>/b2evo</code> for example; that way<strong> your existing Cafelog/b2 blog remains fully functional while you check out b2evolution.</strong><br />
+  <span class="small"><strong>Anmerkung:</strong> Nur der Inhalt des <code>/blogs</code> Verzeichnisses muss auf deine Seite hochgeladen werden. Falls du möchtest, dass b2evolution zur Homepage deiner Seite wird, uploade den Inhalt des <code>/blogs</code> Ordners ins Root (Wurzelverzeichnis) deiner Webseite. Du könntest aber genauso gut die Dateien in ein neues Unterverzeichnis hochladen, zB <code>/b2evo</code>; so <strong>bleibt dein existierendes Cafelog/b2 Blog weiterhin komplett funktionsfähig, während du b2evolution ausprobierst.</strong><br />
   </span> <br />
-Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/b2evo</code> ...</li>
+Nehmen wir an, du installierst den Inhalt des blogs-Ordners nach <code>http://deineseite.de/b2evo</code> ...</li>
 
-<li>Run the installation script on your server. It is located in <code>http://yoursite.com/b2evo/install</code> . Then, simply follow the on screen instructions.<br />
-  	<br />
-	The installer will ask you a few questions, create required database tables, copy your b2 data to b2evo (without affecting b2) and configure b2evolution for you. </li>
+<li>Starte das Installations-Skript auf deinem Server. Es befindet sich in <code>http://deineseite.de/b2evo/install</code>. Dann folge einfach den Anweisungen dort.<br /> <br /> Der Installer wird dir ein paar Fragen stellen, die notwendigen Datenbank-Tabellen erstellen, deine b2-Daten nach b2evo kopieren (ohne b2 zu beeinträchtigen) und b2evolution für dich konfigurieren. </li>
 <li>Überprüfe, ob die neue Installation funktioniert.</li>
-<li>Auf Produktionsservern ist es empfehlenswert, den Unterordner /blogs/install zu löschen.</li>
-<li>Check the <a href="http://wiki.b2evolution.net/">wiki</a> or the <a href="http://forums.b2evolution.net/">forums</a> for notes on upgrading your existing b2 template to b2evolution.</li>
+<li>Auf Produktionsservern ist es empfehlenswert, den <code>/install</code> Unterordner zu löschen.</li>
+<li>Checke das <a href="http://wiki.b2evolution.net/">Wiki</a> oder die <a href="http://forums.b2evolution.net/">Foren</a> für Hinweise, um dein vorhandenes b2-Template (Vorlage) nach b2evolution upzugraden.</li>
 <li>Nach der Grundinstallation gibt es noch ein paar <a href="http://b2evolution.net/man/install/trickystuff.html">tricky things die du beachten solltest</a> (Online Anleitung).</li>
 </ol>
 
