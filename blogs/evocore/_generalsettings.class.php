@@ -43,7 +43,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Includes
  */
-require_once( dirname(__FILE__).'/_abstractsettings.class.php' );
+require_once dirname(__FILE__).'/_abstractsettings.class.php';
 
 /**
  * Class to handle the global settings.
@@ -93,6 +93,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.10  2005/03/15 16:57:01  fplanque
+ * minor
+ *
  * Revision 1.9  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

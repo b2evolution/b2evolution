@@ -36,10 +36,13 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Includes:
  */
-require_once dirname(__FILE__). '/_group.class.php';
+require_once dirname(__FILE__).'/_group.class.php';
 
 /*
  * $Log$
+ * Revision 1.3  2005/03/15 16:57:01  fplanque
+ * minor
+ *
  * Revision 1.2  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

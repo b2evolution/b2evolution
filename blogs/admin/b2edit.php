@@ -14,9 +14,6 @@
  */
 require_once (dirname(__FILE__). '/_header.php');
 
-$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
-$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
-
 $AdminUI->setPath( 'new' );
 param( 'action', 'string' );
 

@@ -70,7 +70,7 @@ define( 'EVO_MAIN_INIT', true );
 /**
  * Load base + advanced configuration:
  */
-require_once( dirname(__FILE__).'/../conf/_config.php' );
+require_once dirname(__FILE__).'/../conf/_config.php';
 if( !$config_is_done )
 { // base config is not done!
 	$error_message = 'Base configuration is not done! (see /conf/_config.php)';
@@ -88,7 +88,7 @@ if( isset( $error_message ) )
 /**
  * Load logging class
  */
-require_once( dirname(__FILE__).'/_log.class.php' );
+require_once dirname(__FILE__).'/_log.class.php';
 /**
  * Debug message log for debugging only (initialized here)
  * @global Log $Debuglog
@@ -113,26 +113,26 @@ if( !function_exists( 'gzencode' ) )
 /**
  * Include obsolete functions
  */
-@include_once( dirname(__FILE__).'/_obsolete092.php' );
+@include_once dirname(__FILE__).'/_obsolete092.php';
 
 
 /**
  * Includes:
  */
-require_once( dirname(__FILE__).'/_misc.funcs.php' );
+require_once dirname(__FILE__).'/_misc.funcs.php';
 
 timer_start();
 
 /**
  * Sets various arrays and vars
  */
-require_once( dirname(__FILE__).'/_vars.inc.php' );
+require_once dirname(__FILE__).'/_vars.inc.php';
 
 
 /**
  * DB class
  */
-require_once( dirname(__FILE__).'/_db.class.php' );
+require_once dirname(__FILE__).'/_db.class.php';
 /**
  * Database connection (connection opened here)
  *
@@ -140,14 +140,14 @@ require_once( dirname(__FILE__).'/_db.class.php' );
  */
 $DB = new DB( $EvoConfig->DB['user'], $EvoConfig->DB['password'], $EvoConfig->DB['name'], $EvoConfig->DB['host'], $db_aliases, $db_table_options );
 
-require_once( dirname(__FILE__).'/_results.class.php' );
+require_once dirname(__FILE__).'/_results.class.php';
 
 
 /**#@+
  * Load settings class
  */
-require_once( dirname(__FILE__).'/_generalsettings.class.php' );
-require_once( dirname(__FILE__).'/_usersettings.class.php' );
+require_once dirname(__FILE__).'/_generalsettings.class.php';
+require_once dirname(__FILE__).'/_usersettings.class.php';
 /**#@-*/
 /**
  * Interface to general settings
@@ -178,7 +178,7 @@ $localtimenow = $servertimenow + ($Settings->get('time_difference') * 3600);
 /**
  * The Hit class
  */
-require_once( dirname(__FILE__).'/_hit.class.php' );
+require_once dirname(__FILE__).'/_hit.class.php';
 /**
  * @global Hit The Hit object
  */
@@ -202,11 +202,13 @@ require_once dirname(__FILE__).'/_usercache.class.php';
 require_once dirname(__FILE__).'/_link.class.php';
 require_once dirname(__FILE__).'/_linkcache.class.php';
 // Object caches init:
-$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
-$UserCache = & new UserCache();
 $BlogCache = & new BlogCache();
-$LinkCache = & new LinkCache();
+$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
 $ItemCache = & new ItemCache();
+$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_tasktypes', 'tsktyp_', 'tsktyp_ID' );
+$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_taskstatuses', 'tskst_', 'tskst_ID' );
+$LinkCache = & new LinkCache();
+$UserCache = & new UserCache();
 
 require_once dirname(__FILE__).'/_calendar.class.php';
 require_once dirname(__FILE__).'/_hitlog.funcs.php';     // referer logging
@@ -371,7 +373,7 @@ if( $Messages->count( 'login_error' ) )
 {
 	header_nocache();
 
-	require( dirname(__FILE__).'/'.$core_dirout.$htsrv_subdir.'login.php' );
+	require dirname(__FILE__).'/'.$core_dirout.$htsrv_subdir.'login.php';
 	exit();
 }
 
@@ -384,7 +386,7 @@ if( $Messages->count( 'login_error' ) )
 /**
  * The Session class
  */
-require_once( dirname(__FILE__).'/_session.class.php' );
+require_once dirname(__FILE__).'/_session.class.php';
 /**
  * @global Session The Session object
  */
@@ -393,7 +395,7 @@ $Session =& new Session();
 /**
  * The Sessions class
  */
-require_once( dirname(__FILE__).'/_sessions.class.php' );
+require_once dirname(__FILE__).'/_sessions.class.php';
 /**
  * @global Sessions The Sessions object
  */
@@ -422,16 +424,19 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale
 /**
  * Load the icons - we need the users locale set there ({@link T_()})
  */
-require_once( $conf_path.'_icons.php' );
+require_once $conf_path.'_icons.php';
 
 
 /**
  * Load hacks file if it exists
  */
-@include_once( dirname(__FILE__) . '/../conf/hacks.php' );
+@include_once dirname(__FILE__).'/../conf/hacks.php';
 
 /*
  * $Log$
+ * Revision 1.26  2005/03/15 16:57:01  fplanque
+ * minor
+ *
  * Revision 1.25  2005/03/14 20:22:19  fplanque
  * refactoring, some cacheing optimization
  *

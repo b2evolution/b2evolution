@@ -42,7 +42,7 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
-require_once( dirname(__FILE__).'/../'.$adminskins_dirout.'_adminUI_general.class.php' );
+require_once dirname(__FILE__).'/../'.$adminskins_dirout.'_adminUI_general.class.php';
 
 
 /**
