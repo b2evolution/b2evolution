@@ -23,9 +23,9 @@
 	{	// callback to display sublist element
 		$cat = get_the_category_by_ID( $cat_ID );
 		echo '<li>';
-		echo "<a href=\"?action=Edit&cat_ID=".$cat_ID.'">';
+		echo "<a href=\"?action=Edit&cat_ID=".$cat_ID.'" title="'.T_('Edit category properties').'">';
 		echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" />';
-		echo '</a> <strong>'.$cat['cat_name'].'</strong>';
+		echo ' <strong>'.$cat['cat_name'].'</strong></a>';
 		echo " <a href=\"?action=Delete&cat_ID=", $cat_ID, 
 			'" onClick="return confirm(\''.T_('Are you sure you want to delete?').'\')">';
 		echo '<img src="img/xross.gif" width="13" height="13" class="middle" alt="', /* TRANS: Abbrev. for Delete */ T_('Del'), '" />';
