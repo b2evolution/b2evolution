@@ -171,7 +171,7 @@ function retrieveFiles( $path, $includeFiles = true, $includeDirs = true, $flat 
  *
  * @author jcl [atNOSPAM] jcl [dot] name {@link http://php.net/manual/function.fnmatch.php}
  */
-function my_fnmatch ($pattern, $file)
+function my_fnmatch( $pattern, $file )
 {
 	$lenpattern = strlen($pattern);
 	$lenfile    = strlen($file);
@@ -224,9 +224,7 @@ function my_fnmatch ($pattern, $file)
 function get_dirsize_recursive( $path )
 {
 	$files = retrieveFiles( $path, true, false );
-
 	$total = 0;
-
 
 	foreach( $files as $lFile )
 	{
@@ -350,7 +348,6 @@ function trailing_slash( $path )
  * Displays file permissions like 'ls -l'
  *
  * @author zilinex at linuxmail dot com {@link www.php.net/manual/en/function.fileperms.php}
- * @todo move out of class
  * @param string
  */
 function translatePerm( $in_Perms )
@@ -444,8 +441,9 @@ function str2path( $path )
 
 
 /**
- * Check a filename if it has an image extension
+ * Check a filename if it has an image extension.
  *
+ * @uses $regexp_images
  * @param string the filename to check
  * @return boolean true if the filename indicates an image, false otherwise
  */
@@ -458,9 +456,11 @@ function isImage( $filename )
 
 
 /**
- * Check for valid filename (no path allowed)
+ * Check for valid filename (no path allowed).
  *
+ * @uses $regexp_filename
  * @param string filename to test
+ * @return boolean true if the filename is valid according to the regular expression, false if not
  */
 function isFilename( $filename )
 {
@@ -471,6 +471,9 @@ function isFilename( $filename )
 
 /*
  * $Log$
+ * Revision 1.9  2005/01/13 20:27:07  blueyed
+ * doc
+ *
  * Revision 1.8  2005/01/05 03:04:00  blueyed
  * refactored
  *
