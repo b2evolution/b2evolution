@@ -112,14 +112,14 @@ class Results extends Widget
 	{
 		global $DB;
 		$this->DB = & $DB;
- 		$this->sql = $sql;
+		$this->sql = $sql;
 		$this->limit = $limit;
 		$this->param_prefix = $param_prefix;
 
 		// Count total rows:
 		$this->count_total_rows();
 
-    $this->total_pages = ceil($this->total_rows / $this->limit);
+		$this->total_pages = ceil($this->total_rows / $this->limit);
 
 		if( is_null($page) )
 		{ //attribution of a page number
@@ -157,7 +157,7 @@ class Results extends Widget
 	function query( $sql )
 	{
 		if( is_null( $this->rows ) )
-		{	// Query has not executed yet:
+		{ // Query has not executed yet:
 
 			$this->asc = ' ASC ';
 
@@ -194,9 +194,9 @@ class Results extends Widget
 			$this->rows = $this->DB->get_results( $sql );
 
 			// Store row count
-	 		$this->result_num_rows = $this->DB->num_rows;
+			$this->result_num_rows = $this->DB->num_rows;
 
-   		// echo 'rows on page='.$this->result_num_rows;
+			// echo 'rows on page='.$this->result_num_rows;
 		}
 	}
 
@@ -209,7 +209,7 @@ class Results extends Widget
 	function count_total_rows()
 	{
 		if( is_null($this->sql) )
-		{	// We may want to remove this later...
+		{ // We may want to remove this later...
 			$this->total_rows = 0;
 			return;
 		}
@@ -241,7 +241,7 @@ class Results extends Widget
 			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $sql_count );
 		}
 		else
-		{	// Single table request: we must NOT use field names in the count.
+		{ // Single table request: we must NOT use field names in the count.
 			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( * ) FROM', $sql_count );
 		}
 
@@ -261,11 +261,11 @@ class Results extends Widget
 	function display( $display_params = NULL )
 	{
 		if( !is_null($display_params) )
-		{	// Use passed params:
+		{ // Use passed params:
 			$this->params = & $display_params;
 		}
 		elseif( empty( $this->params ) )
-		{	// Set default params:
+		{ // Set default params:
 			$this->params = array(
 				'before' => '<div class="results">',
 					'header_start' => '<div class="results_nav">',
@@ -329,7 +329,7 @@ class Results extends Widget
 
 
 		if( is_null( $this->cols ) )
-		{	// Let's create default column definitions:
+		{ // Let's create default column definitions:
 			$this->cols = array();
 
 			if( !preg_match( '#SELECT \s+ (.+?) \s+ FROM#six', $this->sql, $matches ) ) die( 'No SELECT clause!' );
@@ -351,7 +351,7 @@ class Results extends Widget
 
 		echo $this->params['header_start'];
 		$this->nav_text( $this->params['header_text'], $this->params['header_text_single'] );
-   	echo $this->params['header_end'];
+		echo $this->params['header_end'];
 
 		/*
 		echo $this->params['title_start'];
@@ -360,7 +360,7 @@ class Results extends Widget
 		*/
 
 		if( $this->total_pages == 0 )
-		{	// There are no results! Nothing to display!
+		{ // There are no results! Nothing to display!
 			echo $this->replace_vars( $this->params['no_results'] );
 			echo $this->params['after'];
 			return 0;
@@ -372,12 +372,12 @@ class Results extends Widget
 		// COLUMN HEADERS:
 		// -----------------------------
 		if( !is_null( $this->col_headers ) )
-		{	// We have headers to display:
+		{ // We have headers to display:
 			echo $this->params['head_start'];
 
 			if( isset($this->title) )
-			{	// A title has been defined for this result set:
-		 		echo $this->replace_vars( $this->params['head_title'] );
+			{ // A title has been defined for this result set:
+				echo $this->replace_vars( $this->params['head_title'] );
 			}
 
 			$col_count = 0;
@@ -398,7 +398,7 @@ class Results extends Widget
 					echo $this->params['colhead_start_last'];
 				}
 				else
-				{	// Regular columns:
+				{ // Regular columns:
 					echo $this->params['colhead_start'];
 				}
 
@@ -410,7 +410,7 @@ class Results extends Widget
 					$color_asc = '';
 					$color_desc = '';
 
-					for( $i = 0; $i < count($this->cols); $i++)
+					for( $i = 0, $icount = count($this->cols); $i < $icount; $i++)
 					{ //construction of the values which can be taken by $order
 						if( !empty( $this->default_col ) && !strcasecmp( $this->col_orders[$col_count], $this->default_col ) )
 						{ // there is a default order
@@ -493,18 +493,18 @@ class Results extends Widget
 				}
 				$col_count++;
 
- 				echo $this->params['colhead_end'];
+				echo $this->params['colhead_end'];
 
 			}
 
-    	echo $this->params['head_end'];
+			echo $this->params['head_end'];
 		}
 
-   	echo $this->params['tfoot_start'];
+		echo $this->params['tfoot_start'];
 
-   	echo $this->params['tfoot_end'];
+		echo $this->params['tfoot_end'];
 
-   	echo $this->params['body_start'];
+		echo $this->params['body_start'];
 
 
 		// -----------------------------
@@ -512,17 +512,17 @@ class Results extends Widget
 		// -----------------------------
 		$line_count = 0;
 		foreach( $this->rows as $row )
-		{	// For each row/line:
+		{ // For each row/line:
 
 			if( $this->current_idx % 2 )
-			{	// Odd line:
+			{ // Odd line:
 				if( $this->current_idx == count($this->rows)-1 )
 					echo $this->params['line_start_odd_last'];
 				else
 					echo $this->params['line_start_odd'];
 			}
 			else
-			{	// Even line:
+			{ // Even line:
 				if( $this->current_idx == count($this->rows)-1 )
 					echo $this->params['line_start_last'];
 				else
@@ -531,14 +531,14 @@ class Results extends Widget
 
 			$col_count = 0;
 			foreach( $this->cols as $col )
-			{	// For each column:
+			{ // For each column:
 
 				if( isset($this->col_starts[$col_count] ) )
 				{ // We have a customized column start for this one:
 					$output = $this->col_starts[$col_count];
 				}
 				elseif( ($col_count==0) && isset($this->params['col_start_first']) )
-				{	// Display first column column start:
+				{ // Display first column column start:
 					$output = $this->params['col_start_first'];
 				}
 				elseif( ($col_count==count($this->cols)-1) && isset($this->params['col_start_last']) )
@@ -546,7 +546,7 @@ class Results extends Widget
 					$output = $this->params['col_start_last'];
 				}
 				else
-				{	// Display regular colmun start:
+				{ // Display regular colmun start:
 					$output = $this->params['col_start'];
 				}
 
@@ -569,13 +569,13 @@ class Results extends Widget
 			echo $this->params['line_end'];
 			$this->current_idx++;
 		}
-   	echo $this->params['body_end'];
+		echo $this->params['body_end'];
 
 		echo $this->params['list_end'];
 
-   	echo $this->params['footer_start'];
-   	$this->nav_text( $this->params['footer_text'], $this->params['footer_text_single'] );
-   	echo $this->params['footer_end'];
+		echo $this->params['footer_start'];
+		$this->nav_text( $this->params['footer_text'], $this->params['footer_text_single'] );
+		echo $this->params['footer_end'];
 
 		echo $this->params['after'];
 
@@ -639,7 +639,7 @@ class Results extends Widget
 			echo $single;
 		}
 		else
-		{	//preg_replace_callback is used to avoid calculating unecessary values
+		{ //preg_replace_callback is used to avoid calculating unecessary values
 			echo $this->replace_vars( $template );
 		}
 	}
@@ -657,24 +657,24 @@ class Results extends Widget
 		switch( $matches[1] )
 			{
 				case 'start' :
-					//total number of rows in the sql query 
-					return  ( ($this->page-1)*$this->limit+1 ); 
-					
-				case 'end' : 
-					return (	min( $this->total_rows, $this->page*$this->limit ) );		
+					//total number of rows in the sql query
+					return  ( ($this->page-1)*$this->limit+1 );
 
-				case 'total_rows' : 
+				case 'end' :
+					return (	min( $this->total_rows, $this->page*$this->limit ) );
+
+				case 'total_rows' :
 					return ( $this->total_rows );
 
 				case 'page' :
 					//current page number
 					return ( $this->page );
-					
-				case 'total_pages' : 
+
+				case 'total_pages' :
 					//total number of pages
 					return ( $this->total_pages );
-					
-				case 'prev' : 
+
+				case 'prev' :
 					//inits the link to previous page
 					return ( $this->page>1 ) ? '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.($this->page-1) ).'">'.
 																$this->params['prev_text'].'</a>' : $this->params['prev_text'];
@@ -683,26 +683,26 @@ class Results extends Widget
 					//inits the link to next page
 					return ( $this->page<$this->total_pages ) ? '<a href="'.regenerate_url( $this->param_prefix.'page',  $this->param_prefix.'page='.($this->page+1) )
 							.		'">  '.$this->params['next_text'].'</a>' : $this->params['next_text'];
-				case 'list' : 
+				case 'list' :
 					//inits the page list
-					return $this->page_list($this->first(),$this->last()); 
-					
+					return $this->page_list($this->first(),$this->last());
+
 				case 'scroll_list' :
 					//inits the scrolling list of pages
 					return $this->page_scroll_list();
-					
+
 				case 'first' :
 					//inits the link to first page
-					return $this->display_first(); 
-					
+					return $this->display_first();
+
 				case 'last' :
 					//inits the link to last page
 					return $this->display_last();
-					
+
 				case 'list_prev' :
 					//inits the link to previous page range
 					return $this->display_prev();
-					
+
 				case 'list_next' :
 					//inits the link to next page range
 					return $this->display_next();
@@ -775,11 +775,11 @@ class Results extends Widget
 	function display_last()
 	{
 		if( $this->last() < $this->total_pages )
-		{	//the list doesn't contain the last page
+		{ //the list doesn't contain the last page
 			return '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.$this->total_pages ).'">'.$this->total_pages.'</a>';
 		}
 		else
-		{	//the list already contains the last page
+		{ //the list already contains the last page
 			return NULL;
 		}
 	}
@@ -791,11 +791,11 @@ class Results extends Widget
 	function display_prev()
 	{
 		if( $this->display_first() != NULL )
-		{	//the list has to be displayed
+		{ //the list has to be displayed
 			return '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.($this->first()-1) ).'">'
 								.$this->params['list_prev_text'].'</a>';
 		}
-			
+
 	}
 
 
@@ -808,10 +808,10 @@ class Results extends Widget
 		{ //the list has to be displayed
 			return '<a href="'.regenerate_url( $this->param_prefix.'page', $this->param_prefix.'page='.($this->last()+1) ).'">'
 								.$this->params['list_next_text'].'</a>';
-		}	
+		}
 	}
-  
-	
+
+
 	/**
 	 * Returns the page link list under the table
 	 */
@@ -835,7 +835,7 @@ class Results extends Widget
 	}
 
 
-	/* 
+	/*
 	 * Returns a scrolling page list under the table
 	 */
 	function page_scroll_list()
@@ -843,7 +843,7 @@ class Results extends Widget
 		$scroll = '';
 		$i = 0;
 		$range = $this->params['scroll_list_range'];
-		$min = 1; 
+		$min = 1;
 		$max = 1;
 		$option = '';
 		$selected = '';
@@ -857,10 +857,10 @@ class Results extends Widget
 			{ //initialisation of the range
 				$max = $range;
 			}
-			
+
 		//initialization of the form
 		$scroll ='<form class="inline" method="post" action="'.regenerate_url( $this->param_prefix.'page' ).'">
-    					<select name="'.$this->param_prefix.'page" onchange="parentNode.submit()">';//javascript to change page clicking in the scroll list
+							<select name="'.$this->param_prefix.'page" onchange="parentNode.submit()">';//javascript to change page clicking in the scroll list
 
 		while( $max <= $this->total_pages )
 		{ //construction loop
@@ -879,7 +879,7 @@ class Results extends Widget
 													.T_('Pages').' '.$min.' '.T_('to').' '.$max;
 				$scroll = $scroll.$range_display;
 			}
-						
+
 			if( $max+$range > $this->total_pages && $max != $this->total_pages)
 			{ //$max has to be the total number of pages
 				$max = $this->total_pages;
@@ -890,8 +890,8 @@ class Results extends Widget
 			}
 
 			$min = $min+$range;//incrementation of the minimum value by the range
-				
-			
+
+
 		}
 		/*$input ='';
 			$input = '<input type="submit" value="submit" />';*/
@@ -925,16 +925,16 @@ class Results extends Widget
 	function display_if_empty( $message = '' )
 	{
 		if( empty($message) )
-		{	// Default message:
+		{ // Default message:
 			$message = T_('Sorry, there is nothing to display...');
 		}
 
 		if( $this->result_num_rows == 0 )
 		{
 			echo $message;
-      return true;
+			return true;
 		}
-    return false;
+		return false;
 	}
 
 }
@@ -942,6 +942,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.14  2005/02/27 20:28:03  blueyed
+ * taken count() out of loop
+ *
  * Revision 1.13  2005/02/17 19:36:24  fplanque
  * no message
  *
