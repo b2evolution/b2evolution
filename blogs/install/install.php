@@ -418,6 +418,8 @@ function populate_antispam()
 	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'visitcelebrities.com')";
 	mysql_query($query) or mysql_oops( $query );
+	$query = "INSERT INTO $tableantispam VALUES ('', 'bushflash.com')";
+	mysql_query($query) or mysql_oops( $query );
 }
 
 function create_pluginsettings()
