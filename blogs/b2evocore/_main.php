@@ -62,4 +62,10 @@ if( $error = veriflog( $login_required ) )
 {	// Login failed:
 	require(dirname(__FILE__)."/$core_dirout/$htsrv_subdir/login.php");
 }
+
+// Load hacks file if it exists
+if( file_exists( dirname(__FILE__).'/../conf/hacks.php' ) )
+{
+	require_once( dirname(__FILE__).'/../conf/hacks.php' );
+}
 ?>
