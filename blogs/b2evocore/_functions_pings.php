@@ -13,11 +13,10 @@
  * pingb2evonet(-)
  *
  * pings b2evolution.net
- * EXPERIMENTAL
  */
 function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true ) 
 {
-	$test = 0;
+	$test = 2;
 
 	global $baseurl, $use_b2evonetping;
 	if( ! $use_b2evonetping ) return false;
@@ -28,7 +27,7 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
 	}
 	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || $test ) 
 	{
-		if( $test )
+		if( $test == 2)
 		{
 		 	$client = new xmlrpc_client('/b2evolution/blogs/evonetsrv/xmlrpc.php', 'localhost', 8088);
 			$client->debug = 1;
@@ -69,7 +68,7 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
  */
 function b2evonet_report_abuse( $abuse_string, $display = true ) 
 {
-	$test = 0;
+	$test = 2;
 
 	global $baseurl;
 	if( $display )
@@ -90,15 +89,19 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
 			// $client->debug = 1;
 		}
 		
-		$message = new xmlrpcmsg( 'b2evo.reportabuse', array( 
-															new xmlrpcval('id') ,			// Reserved
-															new xmlrpcval('user'),		// Reserved
-															new xmlrpcval('pass'),		// Reserved
-															new xmlrpcval($abuse_string), 
-															new xmlrpcval($baseurl)
-														)  );
+		$message = new xmlrpcmsg( 
+									'b2evo.reportabuse',	 											// Function to be called
+									array( 
+										new xmlrpcval(0,'int'),										// Reserved
+										new xmlrpcval('annonymous','string'),			// Reserved
+										new xmlrpcval('nopassrequired','string'),	// Reserved
+										new xmlrpcval($abuse_string,'string'),		// The abusive string to report
+										new xmlrpcval($baseurl,'string')					// The base URL of this b2evo
+									)  
+								);
 		$result = $client->send($message);
 		$ret = xmlrpc_displayresult( $result );
+
 		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
 		return($ret);
 	} 

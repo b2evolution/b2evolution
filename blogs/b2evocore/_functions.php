@@ -742,42 +742,42 @@ function xmlrpc_removepostdata($content)
 
 
 /*
+ * xmlrpc_displayresult(-)
+ *
  * fplanque: created
  */
 function xmlrpc_displayresult( $result, $log = '' )
 {
-	if ($result)
+	if( ! $result )
 	{
-		if (!$result->value())
+		echo T('No response!'),"<br />\n";
+		return false;
+	}
+	elseif( $result->faultCode() )
+	{	// We got a remote error:
+		echo T_('Remote error'), ': ', $result->faultString(), ' (', $result->faultCode(), ")<br />\n";
+		debug_fwrite($log, $result->faultCode().' -- '.$result->faultString());
+		return false;
+	}
+
+	// We'll display the response:
+	$value = xmlrpc_decode($result->value());
+	if (is_array($value))
+	{
+		$value_arr = '';
+		foreach($value as $blah)
 		{
-			echo $result->faultCode().' -- '.$result->faultString()."<br />\n";
-			debug_fwrite($log, $result->faultCode().' -- '.$result->faultString());
-			return false;
+			$value_arr .= $blah.' |||| ';
 		}
-		else
-		{
-			$value = xmlrpc_decode($result->value());
-			if (is_array($value))
-			{
-				$value_arr = '';
-				foreach($value as $blah)
-				{
-					$value_arr .= $blah.' |||| ';
-				}
-				echo "Response: $value_arr <br />\n";
-				debug_fwrite($log, $value_arr);
-			}
-			else
-			{
-				echo "Response: $value <br />\n";
-				debug_fwrite($log, $value);
-			}
-		}
+		echo T_('Response'), ': ', $value_arr, "<br />\n";
+		debug_fwrite($log, $value_arr);
 	}
 	else
 	{
-		echo "No response<br />\n";
+		echo T_('Response'), ': ', $value ,"<br />\n";
+		debug_fwrite($log, $value);
 	}
+
 	return true;
 }
 

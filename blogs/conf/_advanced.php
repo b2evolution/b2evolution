@@ -106,6 +106,9 @@ $notify_from = $b2evo_name.'@'.$basehost; // comment this if you want to customi
 # cannot display it on b2evolution.net. You can use HTML entities (e-g &Kappa;) for non latin chars.
 $use_b2evonetping = 0;
 
+$use_b2evonetping = 1;		// FOR TESTING
+
+
 # Listing on http://cafelog.com
 # set this to 1 if you want your site to be listed on cafelog.com when you add a new post
 # ATTENTION: Please do only enable this AFTER you have done all your blog setup tests and when

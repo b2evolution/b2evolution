@@ -168,7 +168,8 @@ function xmlrpc_entity_decode($string) {
   return $op;
 }
 
-function xmlrpc_lookup_entity($ent) {
+function xmlrpc_lookup_entity($ent) 
+{
   global $xmlEntities;
   
   if (isset($xmlEntities[strtolower($ent)]))
@@ -178,7 +179,8 @@ function xmlrpc_lookup_entity($ent) {
   return "?";
 }
 
-function xmlrpc_se($parser, $name, $attrs) {
+function xmlrpc_se($parser, $name, $attrs) 
+{
 	global $_xh, $xmlrpcDateTime, $xmlrpcString;
 	
 	switch($name) {
@@ -243,7 +245,8 @@ function xmlrpc_se($parser, $name, $attrs) {
 	if ($name!="VALUE") $_xh[$parser]['lv']=0;
 }
 
-function xmlrpc_ee($parser, $name) {
+function xmlrpc_ee($parser, $name) 
+{
 	global $_xh,$xmlrpcTypes,$xmlrpcString;
 
 	switch($name) {
@@ -382,7 +385,8 @@ function xmlrpc_dh($parser, $data)
   }
 }
 
-class xmlrpc_client {
+class xmlrpc_client 
+{
   var $path;
   var $server;
   var $port;
@@ -552,41 +556,49 @@ class xmlrpc_client {
 
 } // end class xmlrpc_client
 
-class xmlrpcresp {
+class xmlrpcresp 
+{
   var $xv;
   var $fn;
   var $fs;
   var $hdrs;
 
-  function xmlrpcresp($val, $fcode=0, $fstr="") {
+  function xmlrpcresp($val, $fcode=0, $fstr="") 
+	{
     if ($fcode!=0) 
-		{
+		{	// Service returns an error code:
       $this->xv=0;
       $this->fn=$fcode;
       $this->fs=trim(htmlspecialchars($fstr));
 	  	// logIO('O',$this->fs);
     } 
 		else 
-		{
+		{	// No error:
       $this->xv=$val;
       $this->fn=0;
     }
   }
 
-  function faultCode() { 
+  function faultCode() 
+	{ 
 		if (isset($this->fn)) 
 			return $this->fn;
 		else
 			return 0; 
 	}
 
-  function faultString() { return $this->fs; }
-  function value() { return $this->xv; }
+  function faultString() 
+	{ return $this->fs; }
+  
+	function value() 
+	{ return $this->xv; }
 
-  function serialize() { 
-	$rs="<methodResponse>";
-	if ($this->fn) {
-	  $rs.="<fault>
+  function serialize() 
+	{ 
+		$rs="<methodResponse>";
+		if ($this->fn) 
+		{
+			$rs.="<fault>
   <value>
     <struct>
       <member>
@@ -600,15 +612,17 @@ class xmlrpcresp {
     </struct>
   </value>
 </fault>";
-	} else {
-	  $rs.="<params><param>" . $this->xv->serialize() . 
-		"</param></params>";
-	}
-	$rs.="</methodResponse>";
-
-	logIO("O",$rs);
-
-	return $rs;
+		} 
+		else 
+		{
+			$rs.="<params><param>" . $this->xv->serialize() . 
+			"</param></params>";
+		}
+		$rs.="</methodResponse>";
+	
+		logIO("O",$rs);
+	
+		return $rs;
   }
 }
 
@@ -792,27 +806,33 @@ class xmlrpcmsg
 
 }
 
-class xmlrpcval {
+class xmlrpcval 
+{
   var $me=array();
   var $mytype=0;
 
-  function xmlrpcval($val=-1, $type="") {
+	/*
+	 * Type will default to string
+	 */
+  function xmlrpcval($val=-1, $type="") 
+	{
 		global $xmlrpcTypes;
 		$this->me=array();
 		$this->mytype=0;
-		if ($val!=-1 || $type!="") {
+		if ($val!=-1 || $type!="") 
+		{
 			if ($type=="") $type="string";
-			if ($xmlrpcTypes[$type]==1) {
+			if ($xmlrpcTypes[$type]==1) 
 				$this->addScalar($val,$type);
-			}
-	  else if ($xmlrpcTypes[$type]==2)
-			$this->addArray($val);
+			else if ($xmlrpcTypes[$type]==2)
+				$this->addArray($val);
 			else if ($xmlrpcTypes[$type]==3)
 				$this->addStruct($val);
 		}
   }
 
-  function addScalar($val, $type="string") {
+  function addScalar($val, $type="string") 
+	{
 		global $xmlrpcTypes, $xmlrpcBoolean;
 
 		if ($this->mytype==1) {
@@ -848,7 +868,8 @@ class xmlrpcval {
 		return 1;
   }
 
-  function addArray($vals) {
+  function addArray($vals) 
+	{
 		global $xmlrpcTypes;
 		if ($this->mytype!=0) {
 			echo "<strong>xmlrpcval</strong>: already initialized as a [" . 
@@ -861,46 +882,52 @@ class xmlrpcval {
 		return 1;
   }
 
-  function addStruct($vals) {
-	global $xmlrpcTypes;
-	if ($this->mytype!=0) {
-	  echo "<strong>xmlrpcval</strong>: already initialized as a [" . 
-		$this->kindOf() . "]<br />";
-	  return 0;
-	}
-	$this->mytype=$xmlrpcTypes["struct"];
-	$this->me["struct"]=$vals;
-	return 1;
-  }
-
-  function dump($ar) {
-	reset($ar);
-	while ( list( $key, $val ) = each( $ar ) ) {
-	  echo "$key => $val<br />";
-	  if ($key == 'array')
-		while ( list( $key2, $val2 ) = each( $val ) ) {
-		  echo "-- $key2 => $val2<br />";
+  function addStruct($vals) 
+	{
+		global $xmlrpcTypes;
+		if ($this->mytype!=0) {
+			echo "<strong>xmlrpcval</strong>: already initialized as a [" . 
+			$this->kindOf() . "]<br />";
+			return 0;
 		}
-	}
+		$this->mytype=$xmlrpcTypes["struct"];
+		$this->me["struct"]=$vals;
+		return 1;
   }
 
-  function kindOf() {
-	switch($this->mytype) {
-	case 3:
-	  return "struct";
-	  break;
-	case 2:
-	  return "array";
-	  break;
-	case 1:
-	  return "scalar";
-	  break;
-	default:
-	  return "undef";
-	}
+  function dump($ar) 
+	{
+		reset($ar);
+		while ( list( $key, $val ) = each( $ar ) ) 
+		{
+			echo "$key => $val<br />";
+			if ($key == 'array')
+			while ( list( $key2, $val2 ) = each( $val ) ) {
+				echo "-- $key2 => $val2<br />";
+			}
+		}
   }
 
-  function serializedata($typ, $val) {
+  function kindOf() 
+	{
+		switch($this->mytype) 
+		{
+		case 3:
+			return "struct";
+			break;
+		case 2:
+			return "array";
+			break;
+		case 1:
+			return "scalar";
+			break;
+		default:
+			return "undef";
+		}
+  }
+
+  function serializedata($typ, $val) 
+	{
 		$rs="";
 		global $xmlrpcTypes, $xmlrpcBase64, $xmlrpcString,
 			$xmlrpcBoolean;
