@@ -3,6 +3,9 @@
  * b2evolution - http://b2evolution.net/
  *
  * Copyright (c) 2003 by Francois PLANQUE - http://fplanque.net/
+ *
+ * Modified 2004 by Hans Reinders - http://hansreinders.com/
+ *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  */
 
@@ -10,14 +13,13 @@ class Calendar
 {
 	var $blog;
 	var $year, $month;
-	var $specific;						// WA ASKED FOR A SPECIFIC MONTH
+	var $specific;			// WE ASKED FOR A SPECIFIC MONTH
 
 	var $where;
-	var $request;							// SQL query string
-	var $result;							// Result set
-	var $result_num_rows;			// Number of rows in result set
+	var $request;			// SQL query string
+	var $result;			// Result set
+	var $result_num_rows;		// Number of rows in result set
 	
-
 	var $monthdisplay;
 	var $monthformat;
 	var $monthstart;
@@ -52,14 +54,13 @@ class Calendar
 		$blog = 1, 
 		$m= '', 
 		$show_statuses = array(),
-		$timestamp_min = '',									// Do not show posts before this timestamp
-		$timestamp_max = 'now'  )							// Do not show posts after this timestamp
+		$timestamp_min = '',		// Do not show posts before this timestamp
+		$timestamp_max = 'now'  )	// Do not show posts after this timestamp
 	{
 		global $time_difference;
 
 		$this->blog = $blog;
 		
-
 		// Find out which month to display:
 		if( empty($m) ) 
 		{
@@ -88,7 +89,6 @@ class Calendar
 		$where = ' AND '.statuses_where_clause( $show_statuses );
 		$where_link = ' AND ';
 
-
 		// Restrict to timestamp limits:
 		if( $timestamp_min == 'now' ) $timestamp_min = time();
 		if( !empty($timestamp_min) ) 
@@ -113,34 +113,37 @@ class Calendar
 		}
  	
 		$this->where = $where;
- 
+
 
 		// Default styling:
 		$this->monthdisplay = 1;	// set this to 0 if you don't want to display the month name
 		$this->monthformat = 'F Y';
-		$this->monthstart = '<caption class="bCalendarMonth">';
-		$this->monthend = '</caption>';
-		
-		$this->tablestart = '<table class="bCalendarTable" summary="Monthly calendar with links to each day\'s posts">';
+
+		$this->tablestart = '<table class="bCalendarTable" summary="Monthly calendar with links to each day\'s posts">'."\n";
 		$this->tableend = '</table>';
-		
-		$this->rowstart = '<tr class="bCalendarRow">';
-		$this->rowend = '</tr>';
-		
+
+		$this->monthstart = '<caption class="bCalendarMonth">';
+		$this->monthend = "</caption>\n";
+
+		$this->rowstart = '<tr class="bCalendarRow">' . "\n";
+		$this->rowend = "</tr>\n";
+
 		$this->headerdisplay = 1;	// set this to 0 if you don't want to display the "Mon Tue Wed..." header
 		$this->headercellstart = '<th class="bCalendarHeaderCell" abbr="[abbr]">';	// please leave [abbr] there !
-		$this->headercellend = '</th>';
-		
+		$this->headercellend = "</th>\n";
+
 		$this->cellstart = '<td class="bCalendarCell">';
-		$this->cellend = '</td>';
-		
+		$this->cellend = "</td>\n";
+
 		$this->emptycellstart = '<td class="bCalendarEmptyCell">';
-		$this->emptycellend = '</td>';
-		
+		$this->emptycellend = "</td>\n";
 		$this->emptycellcontent = '&nbsp;';
-		
+
+		$this->linkpostcellstart = '<td class="bCalendarLinkPost">';
+		$this->todaycellstart = '<td class="bCalendarToday">';
+
 		$this->searchframe = 12;	// How many month will we search back for a post before we give up		
-	
+
 	}
 
 	/* 
@@ -239,17 +242,16 @@ class Calendar
 		// Create links to previous/next month
 		$previous_month = ($this->month>1) ? ($this->month-1) : 12;
 		$previous_year = ($this->month>1) ? $this->year : ($this->year-1);
-		$previous_month_link = '<a href="'.archive_link( $previous_year, $previous_month, '', '', false, $file, $params ).'" style="text-decoration: none;">&lt;</a>&nbsp;&nbsp;';
+		$previous_month_link = '<a href="'.archive_link( $previous_year, $previous_month, '', '', false, $file, $params ).'">&lt;</a>&nbsp;&nbsp;';
 		
 		$next_month = ($this->month<12) ? ($this->month+1) : 1;
 		$next_year = ($this->month<12) ? $this->year : ($this->year+1);
-		$next_month_link = '&nbsp;&nbsp;<a href="'.archive_link( $next_year, $next_month, '', '', false, $file, $params ).'" style="text-decoration: none;">&gt;</a>';
+		$next_month_link = '&nbsp;&nbsp;<a href="'.archive_link( $next_year, $next_month, '', '', false, $file, $params ).'">&gt;</a>';
 
-		
 		
 		// displays everything
 		
-		echo $this->tablestart."\n";
+		echo $this->tablestart;
 		
 		if ($this->monthdisplay) 
 		{	// caption:
@@ -257,12 +259,12 @@ class Calendar
 			echo $previous_month_link;
 			echo date_i18n($this->monthformat, mktime(0, 0, 0, $this->month, 1, $this->year));
 			echo $next_month_link;
-			echo $this->monthend."\n";
+			echo $this->monthend;
 		}
 		
 		if ($this->headerdisplay) 
 		{	// Weekdays:
-			echo $this->rowstart."\n";
+			echo $this->rowstart;
 		
 			for ($i = $start_of_week; $i<($start_of_week+7); $i = $i + 1) 
 			{
@@ -271,10 +273,10 @@ class Calendar
 				echo $this->headercellend;
 			}
 		
-			echo $this->rowend."\n";
+			echo $this->rowend;
 		}
 
-		echo $this->rowstart."\n";
+		echo $this->rowstart;
 		
 		$newrow = 0;
 		$j = 0;
@@ -288,8 +290,8 @@ class Calendar
 				{	// Last day already displayed!
 					break;
 				}
-				echo $this->rowend."\n";
-				echo $this->rowstart."\n";
+				echo $this->rowend;
+				echo $this->rowstart;
 				$newrow = 0;
 			}
 			
@@ -297,36 +299,36 @@ class Calendar
 			{	// empty cell
 				echo $this->emptycellstart;
 				echo $this->emptycellcontent;
-				echo $this->emptycellend."\n";
+				echo $this->emptycellend;
 			} 
 			else
 			{	// This day is in this month
 				$k = $k + 1;
-				echo $this->cellstart;
 				$calendarblah = '-'.date('j',$i).'-';
 				$calendarthereisapost = ereg($calendarblah, $daysinmonthwithposts);
 				$calendartoday = (date('Ymd',$i) == date('Ymd', (time() + ($time_difference * 3600))));
 		
 				if ($calendarthereisapost) 
 				{
+					echo $this->linkpostcellstart;
 					echo '<a href="';
 					archive_link( $this->year, $this->month, date('d',$i), '', true, $file, $params );
-					echo '" class="bCalendarLinkPost">';
+					echo '">';
 				}
-				if ($calendartoday) 
+				elseif ($calendartoday) 
 				{
-					echo '<span class="bCalendarToday">';
+					echo $this->todaycellstart;
+				}
+				else
+				{
+					echo $this->cellstart;
 				}
 				echo date('j',$i);
-				if ($calendartoday) 
-				{
-					echo '</span>';
-				}
 				if ($calendarthereisapost) 
 				{
 					echo '</a>';
 				}
-				echo $this->cellend."\n";
+				echo $this->cellend;
 			}
 			$j = $j + 1;
 			if ($j == 7) 
@@ -336,7 +338,7 @@ class Calendar
 			}
 		}
 		
-		echo $this->rowend."\n";
+		echo $this->rowend;
 		echo $this->tableend;
 
 	}
