@@ -420,11 +420,20 @@ function populate_antispam()
 	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'bushflash.com')";
 	mysql_query($query) or mysql_oops( $query );
+	
+	/*
+	These may look innocent and human-made, but they are in fact clever tricks.
+	They all spammed my referer logs on the same day, in rapid succession.
+	*/
 	$query = "INSERT INTO $tableantispam VALUES ('', 'veronicabee.com')";
 	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'evesmith.com')";
 	mysql_query($query) or mysql_oops( $query );
 	$query = "INSERT INTO $tableantispam VALUES ('', 'jennyknicks.com')";
+	mysql_query($query) or mysql_oops( $query );
+	$query = "INSERT INTO $tableantispam VALUES ('', 'princessnina.com')";
+	mysql_query($query) or mysql_oops( $query );
+	$query = "INSERT INTO $tableantispam VALUES ('', 'tawnygirl.com')";
 	mysql_query($query) or mysql_oops( $query );
 	
 }
