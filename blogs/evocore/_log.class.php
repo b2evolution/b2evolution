@@ -55,6 +55,12 @@ class Log
 	var $defaultlevel = 'error';
 
 	/**
+	 * @var boolean Should {@link add()} automatically output the messages?
+	 */
+	var $dumpAdds = false;
+
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string sets default level
@@ -104,6 +110,12 @@ class Log
 		}
 
 		$this->messages[ $level ][] = $message;
+
+
+		if( $this->dumpAdds )
+		{
+			Log::display( '', '', $message, $level );
+		}
 	}
 
 
@@ -166,6 +178,18 @@ class Log
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Display all messages of a single or all level(s).
+	 *
+	 * @param string the level to use (defaults to 'all')
+	 * @return void
+	 */
+	function dumpAll( $level = 'all' )
+	{
+		$this->display( '', '', true, $level );
 	}
 
 
@@ -346,7 +370,7 @@ class Log
 	 * @param string the level
 	 * @return string the messages, imploded. Tags stripped.
 	 */
-	function getString( $head = '', $foot = '', $level = NULL )
+	function getString( $head = '', $foot = '', $level = NULL, $implodeBy = ', ' )
 	{
 		if( !$this->count( $level ) )
 		{
@@ -358,7 +382,7 @@ class Log
 		{
 			$r .= $head.' ';
 		}
-		$r .= implode(', ', $this->getMessages( $level, true ));
+		$r .= implode( $implodeBy, $this->getMessages( $level, true ) );
 		if( '' != $foot )
 		{
 			$r .= ' '.$foot;
@@ -447,11 +471,8 @@ class Log
 
 /*
  * $Log$
- * Revision 1.5  2004/11/05 15:44:31  blueyed
- * no message
- *
- * Revision 1.4  2004/11/05 00:36:43  blueyed
- * no message
+ * Revision 1.6  2005/01/02 19:16:44  blueyed
+ * $implodeBy added to getString(), $dumpAdds added
  *
  * Revision 1.3  2004/10/16 01:31:22  blueyed
  * documentation changes
