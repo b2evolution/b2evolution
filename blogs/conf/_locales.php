@@ -41,6 +41,7 @@ if( !function_exists('NT_') )
 # This array will be overwritten from DB if locales are set there,
 # that is when they get updated from the Backoffice
 # They are also used as fallback, if we have no access to the DB yet.
+# Flag source: http://www.crwflags.com/fotw/flags/iso3166.html
 # IMPORTANT: Try to keep the locale names short, they take away valuable space on the screen!
 $locales = array(
 	'cs-CZ' => array(	'name' => NT_('Czech (CZ)'),

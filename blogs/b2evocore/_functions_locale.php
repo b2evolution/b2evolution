@@ -209,7 +209,7 @@ function locale_timefmt()
  * @param string locale to use, '' for current
  * @param string collection name (subdir of img/flags)
  */
-function locale_flag( $locale = '', $collection = 'h10px' )
+function locale_flag( $locale = '', $collection = 'w16px' )
 {
 	global $locales, $current_locale, $core_dirout, $img_subdir, $img_url;
 	
