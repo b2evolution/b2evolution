@@ -885,7 +885,11 @@ param( 'mode', 'string', 'normal' );
 							$new_user->setGroup( $new_user_Group );
 							$new_user->set_datecreated( time() + ($Settings->get('time_difference') * 3600) );
 
-							if( !$simulate )
+							if( $simulate )
+							{
+								$cache_userdata[ $post_author ] = array( 'ID' => 'simulating' );
+							}
+							else
 							{
 								$new_user->dbinsert();
 							}
@@ -977,8 +981,17 @@ param( 'mode', 'string', 'normal' );
 				if( $convert_html_tags )
 				{
 					$old_content = $post_content;
+					// convert tags to lowercase
 					$post_content = preg_replace( "/(<\/?)(\w+)([^>]*>)/e", "'\\1'.strtolower('\\2').'\\3'", $post_content);
+
+					// close br, hr and img tags
 					$post_content = preg_replace( array('/<(br)>/', '/<(hr\s?.*?)>/', '/<(img\s.*?)>/'), '<\\1 />', remove_magic_quotes($post_content) );
+
+					// add quotes for href tags that don't have them
+					$post_content = preg_replace( '|href=([^"\'][^\s>"\']+)["\']?|', 'href="$1"', $post_content );
+
+					$post_content = preg_replace( array('/<(br)>/', '/<(hr\s?.*?)>/', '/<(img\s.*?)>/'), '<\\1 />', remove_magic_quotes($post_content) );
+
 					if( $post_content != $old_content )
 					{
 						$message .= '<li><p style="color:darkblue;border:1px dashed orange;">'.htmlspecialchars($old_content).'</p>

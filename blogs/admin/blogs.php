@@ -433,10 +433,6 @@ switch($action)
 
 	case 'GenStatic':
 		// ----------  Generate static homepage for blog ----------
-		param( 'blog', 'integer', true );
-		require( dirname(__FILE__) . '/_menutop.php' );
-		require( dirname(__FILE__) . '/_menutop_end.php' );
-		$edited_Blog = Blog_get_by_ID( $blog );
 		?>
 			<div class="panelinfo">
 				<h3>
@@ -494,7 +490,7 @@ switch($action)
 		$staticfilename = $edited_Blog->get('staticfilepath');
 
 		if( ! ($fp = @fopen( $staticfilename, 'w' )) )
-		{	// could not open file
+		{ // could not open file
 			?>
 			<div class="error">
 				<p class="error"><?php echo T_('File cannot be written!') ?></p>
@@ -503,7 +499,7 @@ switch($action)
 			<?php
 		}
 		else
-		{	// file writing OK
+		{ // file writing OK
 			printf( '<p>'.T_('Writing to file [%s]...').'</p>', $staticfilename );
 			fwrite( $fp, $page );
 			fclose( $fp );
@@ -515,15 +511,9 @@ switch($action)
 		<?php
 		break;
 
-
-	default:
-		require( dirname(__FILE__). '/_menutop.php' );
-		require( dirname(__FILE__). '/_menutop_end.php' );
-
 }
 
 // List the blogs:
 require( dirname(__FILE__).'/_blogs_list.php' );
-
-require( dirname(__FILE__). '/_footer.php' );
+require( dirname(__FILE__).'/_footer.php' );
 ?>

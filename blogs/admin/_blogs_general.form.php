@@ -80,7 +80,6 @@ function update_IDs( ids, text, notrailingslash )
 										.'<div class="input"><input type="text" name="blog_stub" id="blog_stub" size="20" maxlength="'.$maxlength_urlname_stub.'" value="'.$edited_Blog->dget( 'stub', 'formvalue' ).'" onkeyup="update_IDs( \'blog_stub_js\', this.value, true )" onfocus="update_IDs( \'blog_stub_js\', this.value, true ); document.getElementsByName(\'blog_access_type\')[2].checked = true;" /></div>'
 										.'<div class="notes">'.T_("You MUST create a stub file for this to work or handle it accordingly on the Webserver (like Apache's mod_rewrite).").'</div>',
 										'onclick="document.getElementById( \'blog_stub\' ).focus()"'
-
 						),
 					), T_('Preferred access type'), true );
 
@@ -89,8 +88,8 @@ function update_IDs( ids, text, notrailingslash )
 						array( 'relative',
 										T_('relative to baseurl').':',
 										'',
-										' <span class="nobr"><code>'.$baseurl.'/</code>
-											<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_relative, 'formvalue' ).'" onkeyup="update_IDs( \'blogbaseurl\', \''.$baseurl.'/\'+this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[0].checked=true; update_IDs( \'blogbaseurl\', \''.$baseurl.'/\'+this.value );" /></span>',
+										' <span class="nobr"><code>'.$baseurl.'/</code>'
+										.'<input type="text" id="blog_siteurl_relative" name="blog_siteurl_relative" size="40" maxlength="120" value="'.format_to_output( $blog_siteurl_relative, 'formvalue' ).'" onkeyup="update_IDs( \'blogbaseurl\', \''.$baseurl.'/\'+this.value );" onfocus="document.getElementsByName(\'blog_siteurl_type\')[0].checked=true; update_IDs( \'blogbaseurl\', \''.$baseurl.'/\'+this.value );" /></span>',
 										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
 						),
 						array( 'absolute',
