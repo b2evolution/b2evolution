@@ -719,11 +719,11 @@ class Calendar
 																							)
 																				)
 																				'.$this->where_narrow.'
-																				ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, MONTH('.$this->dbprefix.'datestart) ASC
+																				ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, MONTH('.$this->dbprefix.'datestart) DESC
 																				LIMIT 1',
 																				OBJECT,
 																				0,
-																				'Calendar: Find next month with posts' ) ) )
+																				'Calendar: Find prev month with posts' ) ) )
 				{
 					$r[] = '<a href="'
 									.archive_link( $row->year, $row->month, '', '', false, $this->file, $this->params )
@@ -800,6 +800,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.10  2005/03/18 01:40:50  blueyed
+ * link to prev month fixed
+ *
  * Revision 1.9  2005/03/18 00:29:32  blueyed
  * navigation: only link to month/year with posts
  *
