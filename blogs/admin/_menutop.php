@@ -37,7 +37,7 @@ if( empty($mode) )
 	</div>
 
 	<?php	
-	if( !isset( $obhandler_debug ) )
+	if( !$obhandler_debug )
 	{ // don't display changing time when we want to test obhandler
 	?>
 	<div id="headinfo">
@@ -48,7 +48,7 @@ if( empty($mode) )
 	</div>
 	<?php } ?>
 	
-	<ul>
+	<ul class="tabs">
 	<?php
 		if( ($title == T_('New post in blog:')) || ($title == T_('Adding new post...')) )
 			echo '<li class="current">';

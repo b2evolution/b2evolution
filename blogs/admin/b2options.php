@@ -17,13 +17,6 @@ $title = T_('Options');
 require( dirname(__FILE__). '/_menutop.php' );
 require( dirname(__FILE__). '/_menutop_end.php' );
 
-switch( $tab )
-{
-	case 'locales':
-		$title .= ': '. T_('Locales'); break;
-	default:
-		$title .= ': '. T_('General');
-}
 
 
 /* TODO: locales (default / enabling)
@@ -103,27 +96,34 @@ if( $action == 'update' )
 // Check permission:
 $current_User->check_perm( 'options', 'view', true );
 ?>
-
-	<div id="tabheader">
-	<ul>
-	<?php
-		if( $tab == '' )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="b2options.php">'. T_('General'). '</a></li>';
+	<div class="pt" >
+		<div class="panelblocktabs">
+			<ul class="tabs">
+			<?php
+				if( $tab == '' )
+					echo '<li class="current">';
+				else
+					echo '<li>';
+				echo '<a href="b2options.php">'. T_('General'). '</a></li>';
+				
+				if( $tab == 'locales' )
+					echo '<li class="current">';
+				else
+					echo '<li>';
+				echo '<a href="b2options.php?tab=locales">'. T_('Locales'). '</a></li>';
 		
-		if( $tab == 'locales' )
-			echo '<li class="current">';
-		else
-			echo '<li>';
-		echo '<a href="b2options.php?tab=locales">'. T_('Locales'). '</a></li>';
-
-	?>
-
-	</ul>
+				if( $tab == 'plugins' )
+					echo '<li class="current">';
+				else
+					echo '<li>';
+				echo '<a href="b2options.php?tab=plugins">'. T_('Plug-ins'). '</a></li>';
+		
+			?>
+		
+			</ul>
+		</div>
 	</div>
-	<div class="panelblock">
+	<div class="tabbedpanelblock">
 
 		<form class="fform" name="form" action="b2options.php" method="post">
 		<input type="hidden" name="action" value="update" />
