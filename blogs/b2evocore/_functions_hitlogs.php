@@ -230,9 +230,9 @@ function hit_change_type( $hit_ID, $type )
  */
 function list_antiSpam()
 {
-	global 	$querycount, $tableblacklist, $res_stats;
+	global 	$querycount, $tableantispam, $res_stats;
 
-	$sql = "SELECT * FROM $tableblacklist ORDER BY domain ASC";
+	$sql = "SELECT * FROM $tableantispam ORDER BY domain ASC";
 	$res_stats = mysql_query( $sql ) or mysql_oops( $sql );
 	$querycount++;
 }
@@ -262,7 +262,7 @@ function antiSpam_domain()
  */
 function domain_ban( $hit_ID )
 {
-	global $tablehitlog, $tableblacklist, $querycount, $deluxe_ban;
+	global $tablehitlog, $tableantispam, $querycount, $deluxe_ban;
 
 	$sql ="SELECT baseDomain FROM $tablehitlog WHERE visitID = $hit_ID LIMIT 1";
 	$querycount++;
@@ -271,7 +271,7 @@ function domain_ban( $hit_ID )
 	{
 		$domain = $tmp;
 	}
-	$sql ="INSERT INTO $tableblacklist VALUES ('', '$domain')";
+	$sql ="INSERT INTO $tableantispam VALUES ('', '$domain')";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 	
@@ -298,9 +298,9 @@ function domain_ban( $hit_ID )
  */
 function keyword_ban( $keyword )
 {
-	global $tableblacklist, $querycount, $deluxe_ban;
+	global $tableantispam, $querycount, $deluxe_ban;
 
-	$sql ="INSERT INTO $tableblacklist VALUES ('', '$keyword')";
+	$sql ="INSERT INTO $tableantispam VALUES ('', '$keyword')";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 	
@@ -326,9 +326,9 @@ function keyword_ban( $keyword )
  */
 function remove_ban( $hit_ID )
 {
-	global $tableblacklist, $querycount;
+	global $tableantispam, $querycount;
 
-	$sql ="DELETE FROM $tableblacklist WHERE ID = $hit_ID";
+	$sql ="DELETE FROM $tableantispam WHERE ID = $hit_ID";
 	$querycount++;
 	mysql_query($sql) or mysql_oops( $sql );
 }

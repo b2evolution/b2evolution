@@ -1204,7 +1204,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 	}
 
 	// Search for blocked URLs:
-	$query = "SELECT * FROM $tableblacklist";
+	$query = "SELECT * FROM $tableantispam";
 	$querycount++;
 	$q = mysql_query( $query ) or mysql_oops( $query );
 	$block_urls = array();
