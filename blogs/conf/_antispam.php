@@ -8,7 +8,8 @@
 
 # Block URLs containing the following strings:
 $block_urls = array(
-// Real bad spammers:	
+// Real bad spammers:
+	'prescriptions.md',	
 	'penis-enlargement',
 	'online-casino',
 	'order-viagra',

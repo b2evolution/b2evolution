@@ -826,26 +826,27 @@ function bloggergetrecentposts($m) {
 #			$content = $postdata["Title"];
 
 			$authordata = get_userdata($postdata["Author_ID"]);
-			switch($authordata["user_idmode"]) {
+			switch($authordata['user_idmode']) 
+			{
 				case "nickname":
 					$authorname = $authordata["user_nickname"];
 
-			case "login":
+				case "login":
 					$authorname = $authordata["user_login"];
 					break;
-			case "firstname":
+				case "firstname":
 					$authorname = $authordata["user_firstname"];
 					break;
-			case "lastname":
+				case "lastname":
 					$authorname = $authordata["user_lastname"];
 					break;
-			case "namefl":
+				case "namefl":
 					$authorname = $authordata["user_firstname"]." ".$authordata["user_lastname"];
 					break;
-			case "namelf":
+				case "namelf":
 					$authorname = $authordata["user_lastname"]." ".$authordata["user_firstname"];
 					break;
-			default:
+				default:
 					$authorname = $authordata["user_nickname"];
 					break;
 			}

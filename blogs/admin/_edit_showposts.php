@@ -140,7 +140,7 @@
 
 			<p style="clear:both;">
 			<?php
-			if (($user_level > $authordata[13]) or ($user_login == $authordata[1])) 
+			if (($user_level > $authordata['user_level']) or ($user_ID == $authordata['ID'])) 
 			{
 				?>
 				<form action="b2edit.php" method="get" class="inline">
@@ -189,7 +189,7 @@
 					</div>
 					<p>
 					<?php 
-					if (($user_level > $authordata[13]) or ($user_login == $authordata[1])) 
+					if (($user_level > $authordata['user_level']) or ($user_ID == $authordata['ID'])) 
 					{
 					?>
 					<form action="b2edit.php" method="get" class="inline">

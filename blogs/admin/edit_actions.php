@@ -266,10 +266,10 @@ case "delete":
 	param( 'post', 'integer' );
 	// echo $post;
 	$postdata = get_postdata($post) or die(T_('Oops, no post with this ID!'));
-	$authordata = get_userdata($postdata["Author_ID"]);
+	$authordata = get_userdata($postdata['Author_ID']);
 
-	if ($user_level < $authordata[13])
-	die (sprintf( T_('You don\'t have the right to delete <strong>%s</strong>\'s posts.'), $authordata[1] ));
+	if ($user_level < $authordata['user_level'])
+	die (sprintf( T_('You don\'t have the right to delete <strong>%s</strong>\'s posts.'), $authordata['user_login'] ));
 
 	echo "<div class=\"panelinfo\">\n";
 	echo '<h3>', T_('Deleting post...'), "</h3>\n";

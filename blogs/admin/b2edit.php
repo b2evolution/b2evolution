@@ -42,8 +42,8 @@ case "edit":
 	if ($user_level > 0) 
 	{
 		$authordata = get_userdata($postdata['Author_ID']);
-		if ($user_level < $authordata[13])
-			die("You don't have the right to edit <strong>".$authordata[1]."</strong>'s posts.");
+		if ($user_level < $authordata['user_level'])
+			die("You don't have the right to edit <strong>".$authordata['user_login']."</strong>'s posts.");
 
 		$edited_post_title = format_to_edit($postdata['Title']);
 		$post_url = format_to_edit( $postdata['Url'] );
