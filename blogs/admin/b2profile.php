@@ -96,7 +96,7 @@ require( dirname(__FILE__).'/_menutop_end.php' );
 	<div style="clear:both;"></div>
 <?php
 
-require( dirname(__FILE__). '/_footer.php' );
-veriflog()
+require( dirname(__FILE__).'/_footer.php' );
+veriflog();
 
 ?>

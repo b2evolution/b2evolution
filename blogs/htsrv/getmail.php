@@ -16,7 +16,7 @@ require_once(dirname(__FILE__)."/$htsrv_dirout/$core_subdir/_class_pop3.php");
 
 if( $use_phoneemail )
 { // if you're using phone email, the email will already be in your timezone
-	set_settings('time_difference', 0);
+	$Settings->set('time_difference', 0);
 }
 
 // error_reporting( E_ALL );
@@ -119,13 +119,13 @@ for( $iCount = 1; $iCount <= $Count; $iCount++)
 					}
 				}
 				$ddate_U = mktime($ddate_H, $ddate_i, $ddate_s, $ddate_m, $ddate_d, $ddate_Y);
-				$ddate_U = $ddate_U + (get_settings('time_difference') * 3600);
+				$ddate_U = $ddate_U + ($Settings->get('time_difference') * 3600);
 				$post_date = date('Y-m-d H:i:s', $ddate_U);
 			}
 		}
 	}
 
-	$ddate_today = time() + (get_settings('time_difference') * 3600);
+	$ddate_today = time() + ($Settings->get('time_difference') * 3600);
 	$ddate_difference_days = ($ddate_today - $ddate_U) / 86400;
 
 
@@ -238,7 +238,7 @@ for( $iCount = 1; $iCount <= $Count; $iCount++)
 	{
 		// CHECK and FORMAT content
 		$post_title = format_to_post( trim($post_title), 0, 0 );
-		$content = format_to_post( trim($content), get_settings('AutoBR'), 0);
+		$content = format_to_post( trim($content), $Settings->get('AutoBR'), 0);
 
 		if( errors_display( T_('Cannot post, please correct these errors:'), '' ) )
 		{
@@ -248,7 +248,7 @@ for( $iCount = 1; $iCount <= $Count; $iCount++)
 		}
 
 		// INSERT NEW POST INTO DB:
-		$post_ID = bpost_create( $post_author, $post_title, $content, $post_date, $post_category,	array(), 'published', $default_locale, '',	get_settings('AutoBR'), true ) or mysql_oops($query);
+		$post_ID = bpost_create( $post_author, $post_title, $content, $post_date, $post_category,	array(), 'published', $default_locale, '',	$Settings->get('AutoBR'), true ) or mysql_oops($query);
 
 		if (isset($sleep_after_edit) && $sleep_after_edit > 0)
 		{

@@ -199,7 +199,7 @@ switch($action)
 		param( 'popupurl', 'string', '' );
 		param( 'text', 'html', '' );
 
-		param( 'post_autobr', 'integer', get_settings('AutoBR') );  // Use default if nothing provided
+		param( 'post_autobr', 'integer', $Settings->get('AutoBR') );  // Use default if nothing provided
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;

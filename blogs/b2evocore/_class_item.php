@@ -35,7 +35,7 @@ class Item extends DataObject
 	 */
 	var $blog_ID;
 
-	/** 
+	/**
 	 * Constructor
 	 *
 	 * {@internal Item::Item(-)}}
@@ -43,10 +43,10 @@ class Item extends DataObject
 	function Item( $db_row = NULL )
 	{
 		global $tableposts;
-		
+
 		// Call parent constructor:
 		parent::DataObject( $tableposts, 'post_', 'ID' );
-	
+
 		if( $db_row == NULL )
 		{
 			$this->ID = 0;
@@ -76,7 +76,7 @@ class Item extends DataObject
 			// Private vars
 			$this->blog_ID = get_catblog( $this->main_cat_ID );
 		}
-	}	
+	}
 
 
 	/**
@@ -85,23 +85,23 @@ class Item extends DataObject
 	 * {@internal Item::gen_permalink(-)}}
 	 *
 	 * @todo archives modes in clean mode
-	 * 
+	 *
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
 	function gen_permalink( $mode = '', $blogurl = '', $force_single = false )
 	{
-		global $DB, $cacheweekly;
+		global $DB, $cacheweekly, $Settings;
 
 		if( empty( $mode ) )
-			$mode = get_settings( 'permalink_type' );
-	
+			$mode = $Settings->get( 'permalink_type' );
+
 		if( $force_single && (strpos( $mode, 'archive' ) !== false) )
 		{	// Comments cannot be displayed in archive mode
 			$mode = 'pid';
 		}
 
-		if( empty( $blogurl ) ) 
+		if( empty( $blogurl ) )
 			$blogurl = get_bloginfo('blogurl', get_blogparams_by_ID( $this->blog_ID ) );
 
 		$post_date = $this->issue_date;
@@ -110,25 +110,25 @@ class Item extends DataObject
 		{
 			case 'archive#id':
 				// Link to an archive page:
-				$dest_type = get_settings('archive_mode');
+				$dest_type = $Settings->get('archive_mode');
 				$anchor = $this->ID;
 				$urltail = 'p'.$this->ID;
 				break;
 
 			case 'archive#title':
 				// Link to an archive page:
-				$dest_type = get_settings('archive_mode');
+				$dest_type = $Settings->get('archive_mode');
 				$anchor = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $this->title );
 				$urltail = 'p'.$this->ID;
 				break;
-			
+
 			case 'pid':
 				// Link to individual post:
 				$dest_type = 'postbypost';
 				$urlparam = 'p='.$this->ID;
 				$urltail = 'p'.$this->ID;
 				break;
-				
+
 			case 'urltitle':
 			default:
 				// Link to individual post:
@@ -145,27 +145,27 @@ class Item extends DataObject
 				}
 		}
 
-		if( ! get_settings('links_extrapath') )
+		if( ! $Settings->get('links_extrapath') )
 		{	// We reference by Query: Dirty but explicit permalinks
-	
-			switch( $dest_type ) 
+
+			switch( $dest_type )
 			{
 				case 'monthly':
 					$permalink = $blogurl.'?m='.substr($post_date,0,4).substr($post_date,5,2).'#'.$anchor;
 					break;
-					
+
 				case 'weekly':
-					if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date]))) 
+					if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date])))
 					{
 						$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
 					}
 					$permalink = $blogurl.'?m='.substr($post_date,0,4).'&amp;w='.$cacheweekly[$post_date].'#'.$anchor;
 					break;
-					
+
 				case 'daily':
 					$permalink = $blogurl.'?m='.substr($post_date,0,4).substr($post_date,5,2).substr($post_date,8,2).'#'.$anchor;
 					break;
-					
+
 				case 'postbypost':
 				default:
 					$permalink = $blogurl.'?'.$urlparam.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1';
@@ -174,24 +174,24 @@ class Item extends DataObject
 		}
 		else
 		{	// We reference by path (CLEAN permalinks!)
-			switch( $dest_type ) 
+			switch( $dest_type )
 			{
 				case 'monthly':
 					$permalink = $blogurl.mysql2date("/Y/m", $post_date).'#'.$anchor;
 					break;
-					
+
 				case 'weekly':
-					if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date]))) 
+					if((!isset($cacheweekly)) || (empty($cacheweekly[$post_date])))
 					{
 						$cacheweekly[$post_date] = $DB->get_var( "SELECT WEEK('".$post_date."')" );
 					}
 					$permalink = $blogurl.mysql2date("/Y/", $post_date).'w'.$cacheweekly[$post_date].'#'.$anchor;
 					break;
-					
+
 				case 'daily':
 					$permalink = $blogurl.mysql2date("/Y/m/d", $post_date).'#'.$anchor;
 					break;
-					
+
 				case 'postbypost':
 				default:
 					// This is THE CLEANEST available: RECOMMENDED!
@@ -199,12 +199,12 @@ class Item extends DataObject
 					break;
 			}
 		}
-		
+
 		return $permalink;
 	}
 
 
-	/** 
+	/**
 	 * Template function: display anchor for permalinks to refer to
 	 *
 	 * {@internal Item::anchor(-) }}
@@ -213,10 +213,12 @@ class Item extends DataObject
 	 *
 	 * @param string 'id' or 'title'
 	 */
-	function anchor( $mode = '' ) 
+	function anchor( $mode = '' )
 	{
+		global $Settings;
+
 		if( empty( $mode ) )
-			$mode = get_settings( 'permalink_type' );
+			$mode = $Settings->get( 'permalink_type' );
 
 		switch( $mode )
 		{
@@ -225,7 +227,7 @@ class Item extends DataObject
 				$title = preg_replace( '/[^a-zA-Z0-9_\.-]/', '_', $this->title );
 				echo '<a name="'.$title.'"></a>';
 				break;
-				
+
 			case 'archive#id': // permalink_type
 			case 'id': // explicit choice
 				echo '<a name="'.$this->ID.'"></a>';
@@ -237,16 +239,16 @@ class Item extends DataObject
 			default:
 		}
 	}
-	
 
-	/** 
+
+	/**
 	 * Template function: list all the category names
 	 *
 	 * {@internal Item::categories(-) }}
 	 *
 	 * @param string link title, '#' for default, false if you want no links
 	 * @param string string fo display before the MAIN category, 'hide' to ignore main cat
-	 * @param string string fo display after the MAIN category, 'hide' to ignore main cat 
+	 * @param string string fo display after the MAIN category, 'hide' to ignore main cat
 	 * @param string string fo display before OTHER categories, 'hide' to ignore other cats
 	 * @param string string fo display after OTHER categories, 'hide' to ignore other cats
 	 * @param string string fo display before EXTERNAL categories, 'hide' to ignore external cats
@@ -254,38 +256,38 @@ class Item extends DataObject
 	 * @param string separator string
 	 * @param string Output format for each cat, see {@link format_to_output()}
 	 */
-	function categories( 
+	function categories(
 		$link_title = '#',
 		$before_main='<strong>', $after_main='</strong>',
 		$before_other='', $after_other='',
 		$before_external='<em>', $after_external='</em>',
-		$separator = ', ', 
+		$separator = ', ',
 		$format = 'htmlbody'
 	 )
 	{
 		global $cache_postcats;
-	
-		if( $link_title == '#' ) 
+
+		if( $link_title == '#' )
 		{	/* TRANS: When the categories for a specific post are displayed, the user can click
 					on these cats to browse them, this is the default href title displayed there */
 			$link_title = T_('Browse category');
 		}
-	
+
 		cat_load_postcats_cache();
 		$categoryIDs = $cache_postcats[$this->ID];
-		
+
 		$categoryNames = array();
 		foreach( $categoryIDs as $cat_ID )
 		{
 			$cat = get_the_category_by_ID($cat_ID);
 			$cat_name = format_to_output( $cat["cat_name"], $format );
-			
+
 			if( $link_title )
 			{	// we want to display links
 				$curr_blogparams = get_blogparams_by_ID( $cat['cat_blog_ID'] );
 				$cat_name = '<a href="'.get_bloginfo('blogurl', $curr_blogparams).'?cat='.$cat_ID.'" title="'.$link_title.'">'.$cat_name.'</a>';
 			}
-	
+
 			if( $cat_ID == $this->main_cat_ID )
 			{	// We are displaying the main cat!
 				if( $before_main == 'hide' )
@@ -310,32 +312,32 @@ class Item extends DataObject
 				}
 				$cat_name = $before_external.$cat_name.$after_external;
 			}
-	
+
 			$categoryNames[] = $cat_name;
 		}
 		echo implode( $separator, $categoryNames );
 	}
-	
 
-	/** 
+
+	/**
 	 * Template function: display main category name
 	 *
 	 * {@internal Item::main_category(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function main_category( $format = 'htmlbody' ) 
+	function main_category( $format = 'htmlbody' )
 	{
 		echo format_to_output( get_catname( $this->main_cat_ID ), $format );
 	}
 
 
-	/** 
-	 * Check if user can see comments on this post 
+	/**
+	 * Check if user can see comments on this post
 	 *
 	 * {@internal Item::can_see_comments(-) }}
 	 */
-	function can_see_comments() 
+	function can_see_comments()
 	{
 		if( $this->comments == 'disabled'  )
 		{	// Comments are disabled on this post
@@ -345,7 +347,7 @@ class Item extends DataObject
 		return true; // OK, user can see comments
 	}
 
-	/** 
+	/**
 	 * Template function: Check if user can leave comment on this post or display error
 	 *
 	 * {@internal Item::can_comment(-) }}
@@ -356,18 +358,18 @@ class Item extends DataObject
 	 * @param string error message for closed comments posts, '#' for default
 	 * @return boolean true if user can post
 	 */
-	function can_comment( 
-						$before_error = '<p><em>', 
-						$after_error = '</p></em>', 
+	function can_comment(
+						$before_error = '<p><em>',
+						$after_error = '</p></em>',
 						$non_published_msg = '#',
 						$closed_msg = '#'
-						) 
+						)
 	{
 		if( ($this->status == 'draft') || ($this->status == 'deprecated' ) )
 		{	// Post is not published
 			if( $non_published_msg == '#' )
 				$non_published_msg = T_( 'This post is not published. You cannot leave comments.' );
-		
+
 			echo $before_error;
 			echo $non_published_msg;
 			echo $after_error;
@@ -379,7 +381,7 @@ class Item extends DataObject
 		{	// Comments are not open on this post
 			if( $closed_msg == '#' )
 				$closed_msg = T_( 'Comments are closed for this post.' );
-		
+
 			echo $before_error;
 			echo $closed_msg;
 			echo $after_error;
@@ -391,7 +393,7 @@ class Item extends DataObject
 	}
 
 
-	/** 
+	/**
 	 * Template function: display content of item
 	 *
 	 * WARNING: parameter order is different from deprecated the_content(...)
@@ -406,51 +408,51 @@ class Item extends DataObject
 	 * @param string string to display before more link/anchor
 	 * @param string string to display after more link/anchor
 	 * @param string Output format, see {@link format_to_output()}
-	 * @param integer max number of words 
+	 * @param integer max number of words
 	 * @param boolean true if you don't want to repeat teaser after more link was pressed
 	 * @param string filename to use to display more
 	 */
-	function content( 
+	function content(
 		$disppage = '#',
 		$dispmore = '#',
-		$more_link_text = '#', 
-		$more_anchor = '#', 
-		$before_more = '#', 
-		$after_more = '#', 
-		$format = 'htmlbody', 
+		$more_link_text = '#',
+		$more_anchor = '#',
+		$before_more = '#',
+		$after_more = '#',
+		$format = 'htmlbody',
 		$cut = 0,
-		$stripteaser = false, 
+		$stripteaser = false,
 		$more_file = ''
-		) 
+		)
 	{
 		global $Renderer;
 		// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
-		
-		if( $more_link_text == '#' ) 
+
+		if( $more_link_text == '#' )
 		{	// TRANS: this is the default text for the extended post "more" link
 			$more_link_text = '=> '.T_('Read more!');
 		}
-	
-		if( $more_anchor == '#' ) 
+
+		if( $more_anchor == '#' )
 		{	// TRANS: this is the default text displayed once the more link has been activated
 			$more_anchor = '['.T_('More:').']';
 		}
-	
-		if( $before_more == '#' ) 
+
+		if( $before_more == '#' )
 			$before_more = '<p class="bMore">';
-	
-		if( $after_more == '#' ) 
+
+		if( $after_more == '#' )
 			$after_more = '</p>';
-		
+
 		if( $dispmore === '#' )
 		{ // We want to display more if requested by user:
 			global $more;
 			$dispmore = $more;
 		}
-	
+
 		$content = $this->content;
 		$numpages = 1;
-		
+
 		if( preg_match('/<!--nextpage-->/', $content ) )
 		{	// This is a multipage post
 			if ($page > 1) $dispmore=1;
@@ -464,16 +466,16 @@ class Item extends DataObject
 				global $page;
 				$disppage = $page;
 			}
-			if( $disppage > $numpages ) 
-				$disppage = $numpages;	
+			if( $disppage > $numpages )
+				$disppage = $numpages;
 			$content = $pages[$disppage-1];
 		}
-		
+
 		$content_parts = explode('<!--more-->', $content);
-	
-		if( count($content_parts)>1 ) 
+
+		if( count($content_parts)>1 )
 		{	// This is an extended post (has a more section):
-			if( $dispmore )   
+			if( $dispmore )
 			{	// Viewer has already asked for more
 				if( $stripteaser || preg_match('/<!--noteaser-->/', $content ) )
 				{	// We want to strip the teaser:
@@ -484,8 +486,8 @@ class Item extends DataObject
 				$output .= '<a id="more'.$this->ID.'" name="more'.$this->ID.'"></a>'.$more_anchor;
 				if( !empty($more_anchor) ) $output .= $after_more;
 				$output .= $content_parts[1];
-			} 
-			else 
+			}
+			else
 			{ // We are offering to read more
 				$output = $content_parts[0];
 				$output .= $before_more .
@@ -505,13 +507,13 @@ class Item extends DataObject
 
 		// Character conversions
 		$output = format_to_output( $output, $format );
-		
+
 		if( ($format == 'xml') && $cut )
 		{	// Let's cut this down...
 			$blah = explode(' ', $output);
-			if (count($blah) > $cut) 
+			if (count($blah) > $cut)
 			{
-				for ($i=0; $i<$cut; $i++) 
+				for ($i=0; $i<$cut; $i++)
 				{
 					$excerpt .= $blah[$i].' ';
 				}
@@ -522,8 +524,8 @@ class Item extends DataObject
 		echo $output;
 	}
 
-	
-	/** 
+
+	/**
 	 * Template function: display issue date (datetime) of Item
 	 *
 	 * {@internal Item::issue_date(-) }}
@@ -533,13 +535,13 @@ class Item extends DataObject
 	 */
 	function issue_date( $format = '', $useGM = false )
 	{
-		if( empty($format) ) 
+		if( empty($format) )
 			echo mysql2date( locale_datefmt(), $this->issue_date, $useGM);
 		else
 			echo mysql2date( $format, $this->issue_date, $useGM);
 	}
 
-	/** 
+	/**
 	 * Template function: display issue time (datetime) of Item
 	 *
 	 * {@internal Item::issue_time(-) }}
@@ -549,43 +551,43 @@ class Item extends DataObject
 	 */
 	function issue_time( $format = '', $useGM = false )
 	{
-		if( empty($format) ) 
+		if( empty($format) )
 			echo mysql2date( locale_timefmt(), $this->issue_date, $useGM );
 		else
 			echo mysql2date( $format, $this->issue_date, $useGM );
 	}
 
 
-	/** 
+	/**
 	 * Template function: display locale for item
 	 *
 	 * {@internal Item::lang(-) }}
 	 */
-	function lang() 
+	function lang()
 	{
 		$this->disp( 'locale', 'raw' );
 	}
 
-	/** 
+	/**
 	 * Template function: display locale for item
 	 *
 	 * {@internal Item::locale(-) }}
 	 */
-	function locale() 
+	function locale()
 	{
 		$this->disp( 'locale', 'raw' );
 	}
 
 
 
-	/** 
+	/**
 	 * Template function: display language name for item
 	 *
 	 * {@internal Item::language(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function language( $format = 'htmlbody' ) 
+	function language( $format = 'htmlbody' )
 	{
 		global $locales;
 		$locale = $locales[ $this->locale ];
@@ -593,7 +595,7 @@ class Item extends DataObject
 	}
 
 
-	/** 
+	/**
 	 * Template function: display last mod date (datetime) of Item
 	 *
 	 * {@internal Item::mod_date(-) }}
@@ -603,13 +605,13 @@ class Item extends DataObject
 	 */
 	function mod_date( $format = '', $useGM = false )
 	{
-		if( empty($format) ) 
+		if( empty($format) )
 			echo mysql2date( locale_datefmt(), $this->mod_date, $useGM);
 		else
 			echo mysql2date( $format, $this->mod_date, $useGM);
 	}
 
-	/** 
+	/**
 	 * Template function: display last mod time (datetime) of Item
 	 *
 	 * {@internal Item::mod_time(-) }}
@@ -619,14 +621,14 @@ class Item extends DataObject
 	 */
 	function mod_time( $format = '', $useGM = false )
 	{
-		if( empty($format) ) 
+		if( empty($format) )
 			echo mysql2date( locale_timefmt(), $this->mod_time, $useGM );
 		else
 			echo mysql2date( $format, $this->mod_time, $useGM );
 	}
 
 
-	/** 
+	/**
 	 * Template function: display permalink for item
 	 *
 	 * {@internal Item::permalink(-)}}
@@ -657,8 +659,8 @@ class Item extends DataObject
 	 * @param string 'pid' or 'title'
 	 * @param string url to use
 	 */
-	function feedback_link( $type = 'feedbacks', $before = '', $after = '', 
-													$zero='#', $one='#', $more='#', $title='#', 
+	function feedback_link( $type = 'feedbacks', $before = '', $after = '',
+													$zero='#', $one='#', $more='#', $title='#',
 													$use_popup = '#',
 													$hideifnone = '#', $mode = '', $blogurl='' )
 	{
@@ -668,46 +670,46 @@ class Item extends DataObject
 		{
 			case 'feedbacks':
 				if( $hideifnone == '#' ) $hideifnone = false;
-				if( $title == '#' ) $title = T_('Display feedback / Leave a comment'); 
+				if( $title == '#' ) $title = T_('Display feedback / Leave a comment');
 				if( $zero == '#' ) $zero = T_('Send feedback');
 				if( $one == '#' ) $one = T_('1 feedback');
-				if( $more == '#' ) $more = T_('% feedbacks'); 
+				if( $more == '#' ) $more = T_('% feedbacks');
 				break;
 
 			case 'comments':
 				if( ! $this->can_see_comments() )
 					return false;
-				if( $hideifnone == '#' ) 
+				if( $hideifnone == '#' )
 				{
 					if( $this->can_comment( '', '', '', '' ) )
 						$hideifnone = false;
 					else
 						$hideifnone = true;
 				}
-				if( $title == '#' ) $title = T_('Display comments / Leave a comment'); 
+				if( $title == '#' ) $title = T_('Display comments / Leave a comment');
 				if( $zero == '#' ) $zero = T_('Leave a comment');
 				if( $one == '#' ) $one = T_('1 comment');
-				if( $more == '#' ) $more = T_('% comments'); 
+				if( $more == '#' ) $more = T_('% comments');
 				break;
 
 			case 'trackbacks':
 				if( $hideifnone == '#' ) $hideifnone = false;
-				if( $title == '#' ) $title = T_('Display trackbacks / Get trackback address for this post'); 
+				if( $title == '#' ) $title = T_('Display trackbacks / Get trackback address for this post');
 				if( $zero == '#' ) $zero = T_('Trackback (0)');
 				if( $one == '#' ) $one = T_('Trackback (1)');
-				if( $more == '#' ) $more = T_('Trackbacks (%)'); 
+				if( $more == '#' ) $more = T_('Trackbacks (%)');
 				break;
 
 			case 'pingbacks':
 				if( $hideifnone == '#' ) $hideifnone = true;
-				if( $title == '#' ) $title = T_('Display pingbacks'); 
+				if( $title == '#' ) $title = T_('Display pingbacks');
 				if( $zero == '#' ) $zero = T_('Pingback (0)');
 				if( $one == '#' ) $one = T_('Pingback (1)');
-				if( $more == '#' ) $more = T_('Pingback (%)'); 
+				if( $more == '#' ) $more = T_('Pingback (%)');
 				break;
 
 			default:
-				die( "Unkown feedback type [$type]" );		
+				die( "Unkown feedback type [$type]" );
 		}
 
 		if( $use_popup == '#' )
@@ -719,7 +721,7 @@ class Item extends DataObject
 
 		if( ($number == 0) && $hideifnone )
 			return false;
-			
+
 		$url = $this->gen_permalink( $mode, $blogurl, true );
 		if( $use_popup )
 		{ // We need to tell b2evo to use the popup template
@@ -732,7 +734,7 @@ class Item extends DataObject
 				$url .= '?template=popup';
 			}
 		}
-			
+
 		echo $before;
 
 		echo '<a href="', $url;
@@ -741,11 +743,11 @@ class Item extends DataObject
 		if( $use_popup ) echo '" onclick="b2open(this.href); return false"';
 		echo '>';
 
-		if( $number == 0 ) 
+		if( $number == 0 )
 			echo $zero;
 		elseif( $number == 1 )
 			echo $one;
-	 	elseif( $number > 1 ) 
+	 	elseif( $number > 1 )
 			echo str_replace( '%', $number, $more );
 
 		echo '</a>';
@@ -754,7 +756,7 @@ class Item extends DataObject
 
 	}
 
-	/** 
+	/**
 	 * Template function: display status of item
 	 *
 	 * Statuses:
@@ -768,7 +770,7 @@ class Item extends DataObject
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function status( $format = 'htmlbody' ) 
+	function status( $format = 'htmlbody' )
 	{
 		global $post_statuses;
 
@@ -783,7 +785,7 @@ class Item extends DataObject
 	}
 
 
-	/** 
+	/**
 	 * Template function: display title for item and link to related URL
 	 *
 	 * {@internal Item::title(-) }}
@@ -793,11 +795,11 @@ class Item extends DataObject
 	 * @param boolean false if you don't want to link to URL
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function title( 
+	function title(
 		$before='',						// HTML/text to be displayed before title
 		$after='', 						// HTML/text to be displayed after title
 		$add_link = true, 		// Added link to this title?
-		$format = 'htmlbody' ) 
+		$format = 'htmlbody' )
 	{
 		if( empty($this->title) && $add_link )
 			$title = $this->url;
@@ -808,25 +810,25 @@ class Item extends DataObject
 		{	// Nothing to display
 			return;
 		}
-		
+
 		$title = format_to_output( $title, $format );
 
 		if( $add_link && (!empty($this->url)) )
 		{
 			$title = '<a href="'.$this->url.'">'.$title.'</a>';
 		}
-	
+
 		echo $before;
 		echo $title;
 		echo $after;
 	}
-	
-	/** 
+
+	/**
 	 * Template function: Displays trackback autodiscovery information
 	 *
 	 * {@internal Item::trackback_rdf(-) }}
 	 */
-	function trackback_rdf() 
+	function trackback_rdf()
 	{
 		// if (!stristr($_SERVER['HTTP_USER_AGENT'], 'W3C_Validator')) {
 		// fplanque WARNING: this isn't a very clean way to validate :/
@@ -852,27 +854,27 @@ class Item extends DataObject
 	}
 
 
-	/** 
+	/**
 	 * Template function: displays url to use to trackback this item
 	 *
 	 * {@internal Item::trackback_url(-) }}
 	 */
-	function trackback_url() 
+	function trackback_url()
 	{
-		global $htsrv_url;
-
-		if( get_settings('links_extrapath') ) 
+		global $htsrv_url, $Settings;
+		
+		if( $Settings->get('links_extrapath') )
 		{
 			echo "$htsrv_url/trackback.php/$this->ID";
 		}
-		else 
+		else
 		{
 			echo "$htsrv_url/trackback.php?tb_id=$this->ID";
 		}
 	}
 
 
-	/** 
+	/**
 	 * Template function: Display link to item related url
 	 *
 	 * {@internal Item::url_link(-) }}
@@ -881,7 +883,7 @@ class Item extends DataObject
 	 * @param string string to display after the url (if exists)
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function url_link( $before='', $after='', $format = 'htmlbody' ) 
+	function url_link( $before='', $after='', $format = 'htmlbody' )
 	{
 		if( !empty( $this->url ) )
 		{
@@ -893,7 +895,7 @@ class Item extends DataObject
 		}
 	}
 
-	/** 
+	/**
 	 * Template function: Display the number of words in the post
 	 *
 	 * {@internal Item::wordcount(-) }}

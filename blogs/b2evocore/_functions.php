@@ -370,7 +370,8 @@ function mysql2date( $dateformatstring, $mysqlstring, $useGM = false )
 function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 {
 	global $month, $month_abbrev, $weekday, $weekday_abbrev;
-
+	global $Settings;
+	
 	$datemonth = date('m', $unixtimestamp);
 	$dateweekday = date('w', $unixtimestamp);
 
@@ -381,7 +382,7 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 
 	if( $useGM )
 	{ // We want a Greenwich Meridian time:
-		$j = gmdate($dateformatstring, $unixtimestamp - (get_settings('time_difference') * 3600));
+		$j = gmdate($dateformatstring, $unixtimestamp - ($Settings->get('time_difference') * 3600));
 	}
 	else
 	{	// We want default timezone time:
@@ -476,7 +477,7 @@ function is_email($user_email) {
  * Get setting from DB (cached)
  *
  * {@internal get_settings(-) }}
- *
+ * @deprecated
  * @param string setting to retrieve
  */
 function get_settings( $setting )
@@ -509,6 +510,7 @@ function get_settings( $setting )
 /**
  * overrides settings that have been read from DB
  *
+ * @deprecated
  * @param string setting name
  * @param mixed setting value
  */
@@ -529,6 +531,7 @@ function set_settings( $setting, $value )
  *
  * {@internal change_setting(-)}}
  *
+ * @deprecated
  * @param string setting name
  * @param mixed setting value
  */

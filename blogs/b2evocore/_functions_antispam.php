@@ -223,10 +223,11 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
  */
 function b2evonet_poll_abuse( $display = true ) 
 {
-	$test = 0;
-
+	global $Settings;
 	global $DB, $baseurl, $tablesettings;
 	
+	$test = 0;
+
 	if( $display )
 	{	
 		echo "<div class=\"panelinfo\">\n";
@@ -246,7 +247,7 @@ function b2evonet_poll_abuse( $display = true )
 	}
 	
 	// Get datetime from last update, because we only want newer stuff...
-	$m = get_settings( 'antispam_last_update' );
+	$m = $Settings->get( 'antispam_last_update' );
 	// Encode it in the XML-RPC format
 	echo '<p>', T_('Latest update timestamp'), ': ', $m, '</p>';
 	$startat = mysql2date( 'Ymd\TH:i:s', $m );

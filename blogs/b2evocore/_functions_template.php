@@ -39,6 +39,8 @@ function imgbase()
  *
  * fplanque: 0.8.3: changed defaults
  *
+ * @todo Respect locales datefmt
+ *
  * @param string prefix to display, default is 'Archives for: '
  * @param string format to output, default 'htmlbody'
  * @param boolean show the year as link to year's archive (in monthly mode)
@@ -119,12 +121,14 @@ function arcdir_title( $prefix = ' ', $display = 'htmlbody' )
  */
 function archive_link( $year, $month, $day = '', $week = '', $show = true, $file = '', $params = '' )
 {
+	global $Settings;
+	
 	if( empty($file) )
 		$link = get_bloginfo('blogurl');
 	else
 		$link = $file;
 
-	if( (! get_settings('links_extrapath')) || (!empty($params)) )
+	if( (! $Settings->get('links_extrapath')) || (!empty($params)) )
 	{	// We reference by Query: Dirty but explicit permalinks
 		$link .= '?'.$params.'&amp;m=';
 		$separator = '';
@@ -147,7 +151,7 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 	}
 	elseif( !empty( $week ) )
 	{
-		if( ! get_settings('links_extrapath') )
+		if( ! $Settings->get('links_extrapath') )
 		{	// We reference by Query: Dirty but explicit permalinks
 			$link .= '&amp;w='.$week;
 		}

@@ -55,24 +55,27 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 			
 			$defaults = array
 			( // checkboxes
-				'autobr' => 0,
+				'AutoBR' => 0,
 				'newusers_canregister' => 0,
 				'links_extrapath' => 0
 			);
 			
-			foreach( array( 'default_blog_ID', 'posts_per_page', 'what_to_show', 'archive_mode', 'autoBR',
+			foreach( array( 'default_blog_ID', 'posts_per_page', 'what_to_show', 'archive_mode', 'AutoBR',
 											'newusers_canregister', 'newusers_grp_ID', 'newusers_level',
-											'links_extrapath', 'permalink_type') as $param )
+											'links_extrapath', 'permalink_type', 'user_minpwdlen') as $param )
 			{
-				if( param($param, 'string', '', false, false, false) !== false ) // don't force setting
+				// force type, string parameters must be listed here
+				$ptype = in_array($param, array( 'what_to_show', 'archive_mode', 'permalink_type' ) ) ? 'string' : 'integer';
+				
+				if( param($param, $ptype, '', false, false, false) !== false ) // don't force setting
 				{ // We have provided a new value
-					change_setting( $param, $$param );
+					$Settings->set( $param, $$param );
 				}
 				elseif( in_array($$param, $defaults) )
 				{
-					if( get_settings($param) != $$param )
+					if( $Settings->get($param) != $$param )
 					{
-						change_setting( $param, $defaults[$param] );
+						$Settings->set( $param, $defaults[$param] );
 					}
 				}
 				else
@@ -90,7 +93,10 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 			}
 			else
 			{
-				$status_update[] = T_('General settings updated.');
+				if( $Settings->updateDB() )
+				{
+					$status_update[] = T_('General settings updated.');
+				}
 			}
 			
 			break;
@@ -104,10 +110,11 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 				param( 'newdefault_locale', 'string', true);
 				param( 'newtime_difference', 'integer', true );
 				
-				change_setting('default_locale', $newdefault_locale);
-				change_setting('time_difference', $newtime_difference);
 				locale_updateDB();
-
+				$Settings->set( 'default_locale', $newdefault_locale );
+				$Settings->set( 'time_difference', $newtime_difference );
+				$Settings->updateDB();
+				
 				$status_update[] = T_('Regional settings updated.');
 				break;
 

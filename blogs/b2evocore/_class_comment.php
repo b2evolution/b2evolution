@@ -240,8 +240,10 @@ class Comment extends DataObject
 	 */
 	function permalink( $mode = '', $blogurl='' )
 	{
+		global $Settings;
+		
 		if( empty( $mode ) )
-			$mode = get_settings( 'permalink_type' );
+			$mode = $Settings->get( 'permalink_type' );
 
 		// some permalink modes are not acceptable here:
 		switch( $mode )

@@ -89,12 +89,21 @@ else
 {
 	if ($pass2 == '')
 	{
-		die ('<strong>' . T_('ERROR') . '</strong>: ' . T_('you typed your new password only once. Go back to type it twice.') );
+		die ('<strong>' . T_('ERROR') . '</strong>: ' . T_('you typed your new password only once. Go back to type it twice.')
+				. '<br />[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
 	}
 	if ($pass1 != $pass2)
 	{
-		die ('<strong>' . T_('ERROR') . '</strong>: ' . T_('you typed two different passwords. Go back to correct that.') );
+		die ('<strong>' . T_('ERROR') . '</strong>: ' . T_('you typed two different passwords. Go back to correct that.')
+				. '<br />[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
 	}
+	
+	if( strlen($pass1) < $Settings->get('user_minpwdlen') )
+	{
+		die( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen'))
+				. '<br />[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
+	}
+
 	$newuser_pass = md5($pass1);
 	$updatepassword = "user_pass = '$newuser_pass', ";
 	if( !setcookie( $cookie_pass, $newuser_pass, $cookie_expires, $cookie_path, $cookie_domain) )

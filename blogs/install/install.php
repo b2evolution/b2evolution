@@ -108,8 +108,6 @@ if( empty($action) )
 
 <?php
 
-$new_db_version = 8060;				// next time: 8070
-
 /**
  * check_db_version(-)
  *

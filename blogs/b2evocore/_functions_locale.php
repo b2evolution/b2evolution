@@ -375,7 +375,7 @@ function locale_priosort( $a, $b )
  */
 function locale_overwritefromDB()
 {
-	global $tablelocales, $DB, $locales, $default_locale;
+	global $tablelocales, $DB, $locales, $default_locale, $Settings;
 	
 	$usedprios = array();  // remember which priorities are used already.
 	$priocounter = 0;
@@ -437,7 +437,7 @@ function locale_overwritefromDB()
 	
 	// overwrite default_locale from DB settings - if enabled.
 	// Checks also if previous $default_locale is enabled. Defaults to en-EU, even if not enabled.
-	$locale_fromdb = get_settings('default_locale');
+	$locale_fromdb = $Settings->get('default_locale');
 
 	if( $locale_fromdb  )
 	{

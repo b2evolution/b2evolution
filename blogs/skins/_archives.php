@@ -35,12 +35,12 @@
 		$archive_week_end_date_format   = $dateformat;
 	}
 		
-	$ArchiveList = & new ArchiveList( $blog, get_settings('archive_mode'), $show_statuses,	$timestamp_min, $timestamp_max, $archive_limit );
+	$ArchiveList = & new ArchiveList( $blog, $Settings->get('archive_mode'), $show_statuses,	$timestamp_min, $timestamp_max, $archive_limit );
 	
 	while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
 	{
 		echo $archive_line_start;
-		switch( get_settings('archive_mode') )
+		switch( $Settings->get('archive_mode') )
 		{
 			case 'monthly':
 				// --------------------------------- MONTHLY ARCHIVES ---------------------------------------

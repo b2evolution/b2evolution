@@ -22,7 +22,7 @@ function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
 {
 	echo "<div class=\"panelinfo\">\n";
 	echo "<h3>", T_('Sending trackbacks...'), "</h3>\n";
-	if(empty($post_trackbacks)) 
+	if(empty($post_trackbacks))
 	{
 		echo "<p>", T_('No trackback to be sent.'), "</p>\n";
 	}
@@ -31,7 +31,7 @@ function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
 		$excerpt = (strlen(strip_tags($content)) > 255) ? substr(strip_tags($content), 0, 252).'...' : strip_tags($content);
 		echo "<p>", T_('Excerpt to be sent:'), " $excerpt</p>\n";
 		$trackback_urls = split('( )+', $post_trackbacks,10);		// fplanque: ;
-		foreach($trackback_urls as $tb_url) 
+		foreach($trackback_urls as $tb_url)
 		{	// trackback each url:
 			$tb_url = trim($tb_url);
 			if( empty( $tb_url ) ) continue;
@@ -49,11 +49,11 @@ function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
  * TODO: add autodiscovery
  */
 function trackback(
-	$trackback_url, 
-	$title, 
+	$trackback_url,
+	$title,
 	$excerpt,
-	$ID) // post ID 
-{	
+	$ID) // post ID
+{
 	global $ItemCache;
 
 	echo "<p>", T_('Sending trackback to:'), " $trackback_url ...\n";
@@ -66,7 +66,7 @@ function trackback(
 	// dis is the trackback stuff to be sent:
 	$query_string = "title=$title&url=$url&blog_name=$blog_name&excerpt=$excerpt";
 	// echo "url:$trackback_url<br>$sending:$query_string<br />";
-	if (strstr($trackback_url, '?')) 
+	if (strstr($trackback_url, '?'))
 	{
 		echo '[get]';
 		$trackback_url .= "&".$query_string;;
@@ -83,7 +83,7 @@ function trackback(
 		fclose($fp);
 */
 
-	} 
+	}
 	else
 	{
 		echo '[post]';
@@ -114,11 +114,11 @@ function trackback(
 */
 		fclose($fs);
 	}
-	echo "<br \>", T_('Response:'), " $result</p>\n";	
+	echo "<br \>", T_('Response:'), " $result</p>\n";
 	return $result;
 }
 
-function trackback_response($error = 0, $error_message = '') 
+function trackback_response($error = 0, $error_message = '')
 {	// trackback - reply
 	echo '<?xml version="1.0" encoding="iso-8859-1"?'.">\n";
 	echo "<response>\n";
@@ -129,29 +129,30 @@ function trackback_response($error = 0, $error_message = '')
 }
 
 
-/* 
+/*
  * TEMPLATE FUNCTIONS:
  */
 
 
 
 /*****
- * Trackback tags 
+ * Trackback tags
  *****/
 
 /**
  *
  * @deprecated deprecated by {@link Item::trackback_url()}
  */
-function trackback_url($display = 1) 
+function trackback_url($display = 1)
 {
 	global $htsrv_url, $id;
-	
-	if( get_settings('links_extrapath') ) 
+	global $Settings;
+
+	if( $Settings->get('links_extrapath') )
 	{
 		$tb_url = "$htsrv_url/trackback.php/$id";
-	} 
-	else 
+	}
+	else
 	{
 		$tb_url = "$htsrv_url/trackback.php?tb_id=$id";
 	}
@@ -166,7 +167,7 @@ function trackback_url($display = 1)
  * trackback_number(-)
  * @deprecated deprecated by {@link Item::feedback_link()}
  */
-function trackback_number( $zero='#', $one='#', $more='#' ) 
+function trackback_number( $zero='#', $one='#', $more='#' )
 {
 	if( $zero == '#' ) $zero = T_('Trackback (0)');
 	if( $one == '#' ) $one = T_('Trackback (1)');
@@ -190,29 +191,29 @@ function trackback_number( $zero='#', $one='#', $more='#' )
  * Displays link to the trackback page
  * @deprecated deprecated by {@link Item::feedback_link()}
  */
-function trackback_link($file='',$c=0,$pb=0) 
+function trackback_link($file='',$c=0,$pb=0)
 {
 	global $id;
 	if( ($file == '') || ($file == '/')	)
 		$file = get_bloginfo('blogurl');
 	echo $file.'?p='.$id;
 	if( $c == 1 )
-	{	// include comments 
+	{	// include comments
 		echo '&amp;c=1';
 	}
 	echo '&amp;tb=1';
 	if( $pb == 1 )
-	{	// include pingback 
+	{	// include pingback
 		echo '&amp;pb=1';
 	}
-	echo '#trackbacks';		
+	echo '#trackbacks';
 }
 
 /**
  *
  * @deprecated deprecated by {@link Item::feedback_link()}
  */
-function trackback_popup_link($zero='#', $one='#', $more='#', $CSSclass='') 
+function trackback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 {
 	global $blog, $id, $b2trackbackpopupfile, $b2commentsjavascript;
 	echo '<a href="';
@@ -237,7 +238,7 @@ function trackback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
  *
  * @deprecated deprecated by {@link Item::trackback_rdf()}
  */
-function trackback_rdf($timezone=0) 
+function trackback_rdf($timezone=0)
 {
 	global $id, $blogfilename;	// fplanque added: $blogfilename
 	// if (!stristr($_SERVER['HTTP_USER_AGENT'], 'W3C_Validator')) {
@@ -262,7 +263,7 @@ function trackback_rdf($timezone=0)
 }
 
 /*****
- * /Trackback tags 
+ * /Trackback tags
  *****/
 
 

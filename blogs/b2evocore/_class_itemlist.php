@@ -95,6 +95,7 @@ class ItemList extends DataObjectList
 		global $tableposts, $tablepostcats, $tablecategories;
 		global $cache_categories;
 		global $cat_array; // communication with recursive callback funcs
+		global $Settings;
 
 		// Call parent constructor:
 		parent::DataObjectList( $tableposts, 'post_', 'ID' );
@@ -108,10 +109,10 @@ class ItemList extends DataObjectList
 		elseif( !empty($default_posts_per_page) )
 			$posts_per_page = $default_posts_per_page;
 		else
-			$posts_per_page = get_settings('posts_per_page');
+			$posts_per_page = $Settings->get('posts_per_page');
 		$this->posts_per_page = $posts_per_page;
 
-		$what_to_show = (empty($init_what_to_show)) ? get_settings('what_to_show') : $init_what_to_show;
+		$what_to_show = (empty($init_what_to_show)) ? $Settings->get('what_to_show') : $init_what_to_show;
 		$this->what_to_show = $what_to_show;
 
 		// First let's clear some variables
@@ -412,7 +413,7 @@ class ItemList extends DataObjectList
 		if( !empty($timestamp_min) )
 		{ // Hide posts before
 			// echo 'before';
-			$date_min = date('Y-m-d H:i:s', $timestamp_min + (get_settings('time_difference') * 3600) );
+			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
 			$where .= ' AND post_issue_date >= \''. $date_min.'\'';
 		}
 
@@ -424,7 +425,7 @@ class ItemList extends DataObjectList
 		if( !empty($timestamp_max) )
 		{ // Hide posts after
 			// echo 'after';
-			$date_max = date('Y-m-d H:i:s', $timestamp_max + (get_settings('time_difference') * 3600) );
+			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
 			$where .= ' AND post_issue_date <= \''. $date_max.'\'';
 		}
 

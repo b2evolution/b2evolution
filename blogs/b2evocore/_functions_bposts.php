@@ -919,8 +919,9 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
  */
 function next_posts($max_page = 0, $page='' )
 {
-	global $p, $paged;
-	if (empty($p) && (get_settings('what_to_show') == 'paged'))
+	global $p, $paged, $Settings;
+
+	if (empty($p) && ($Settings->get('what_to_show') == 'paged'))
 	{
 		if (!$paged) $paged = 1;
 		$nextpage = intval($paged) + 1;
@@ -940,8 +941,9 @@ function next_posts($max_page = 0, $page='' )
  */
 function previous_posts( $page='' )
 {
-	global $p, $paged;
-	if (empty($p) && (get_settings('what_to_show') == 'paged'))
+	global $p, $paged, $Settings;
+	
+	if (empty($p) && ($Settings->get('what_to_show') == 'paged'))
 	{
 		$nextpage = intval($paged) - 1;
 		if ($nextpage < 1) $nextpage = 1;
@@ -957,10 +959,11 @@ function previous_posts( $page='' )
  */
 function next_posts_link($label='#', $max_page=0, $page='')
 {
+	global $p, $paged, $result, $request, $Settings;
+	
 	if( $label == '#' ) $label = T_('Next Page').' >>';
 
-	global $p, $paged, $result, $request;
-	if (get_settings('what_to_show') == 'paged')
+	if ($Settings->get('what_to_show') == 'paged')
 	{
 		global $MainList;
 		if (!$max_page)	$max_page = $MainList->get_max_paged();
@@ -984,10 +987,12 @@ function next_posts_link($label='#', $max_page=0, $page='')
  */
 function previous_posts_link($label='#', $page='')
 {
+	global $Settings;
+	
 	if( $label == '#' ) $label = '<< '.T_('Previous Page');
 
 	global $p, $paged;
-	if (empty($p)  && ($paged > 1) && (get_settings('what_to_show') == 'paged'))
+	if (empty($p)  && ($paged > 1) && ($Settings->get('what_to_show') == 'paged'))
 	{
 		echo '<a href="';
 		echo previous_posts( $page );
@@ -1005,7 +1010,9 @@ function previous_posts_link($label='#', $page='')
 function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
 {
 	global $request, $p;
-	if( !empty( $request ) && empty($p) && (get_settings('what_to_show') == 'paged'))
+	global $Settings;
+	
+	if( !empty( $request ) && empty($p) && ($Settings->get('what_to_show') == 'paged'))
 	{
 		global $MainList;
 		$max_paged = $MainList->get_max_paged();
@@ -1343,6 +1350,7 @@ function gen_permalink(
 	$use_pingback = NULL )  // DEPRECATED
 {
 	global $cacheweekly;
+	global $Settings;
 
 	// We're gonna need access to more postdata in several cases:
 	$postdata = get_postdata( $id );
@@ -1350,9 +1358,9 @@ function gen_permalink(
 	// Defaults:
 	if (empty($use_anchor_mode)) $use_anchor_mode = 'id';
 	if (empty($use_destination))
-			$use_destination = ( strstr( get_settings('permalink_type'), 'archive' ) !== false )
+			$use_destination = ( strstr( $Settings->get('permalink_type'), 'archive' ) !== false )
 					? 'archive' : 'single';
-	if ($use_destination=='archive') $use_destination = get_settings('archive_mode');
+	if ($use_destination=='archive') $use_destination = $Settings->get('archive_mode');
 
 	// Generate anchor
 	switch(strtolower($use_anchor_mode))
@@ -1368,7 +1376,7 @@ function gen_permalink(
 			break;
 	}
 
-	if( ! get_settings('links_extrapath') )
+	if( ! $Settings->get('links_extrapath') )
 	{	// We reference by Query: Dirty but explicit permalinks
 
 		switch($use_destination)

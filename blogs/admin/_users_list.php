@@ -55,7 +55,7 @@
 					<td colspan="7">
 						<strong><a href="b2users.php?group=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /> <?php echo format_to_output( $row['grp_name'], 'htmlbody' ); ?></a></strong>
 						<?php
-							if( $loop_grp_ID == get_settings('newusers_grp_ID') )
+							if( $loop_grp_ID == $Settings->get('newusers_grp_ID') )
 							{
 								echo '<span style="font-weight:normal">('.T_('default group for new users').')</span>';
 							}
@@ -67,8 +67,8 @@
 						<td></td>
 						<td>
 							<a href="b2users.php?action=newgroup&amp;template=<?php echo $loop_grp_ID ?>" title="<?php echo T_('Copy group') ?>"><img src="img/copy.gif" width="13" height="13" class="middle" alt="<?php echo T_('Copy') ?>" title="<?php echo T_('Copy group') ?>" /></a>
-						<?php 
-						if( ($loop_grp_ID != 1) && ($loop_grp_ID != get_settings('newusers_grp_ID'))
+						<?php
+						if( ($loop_grp_ID != 1) && ($loop_grp_ID != $Settings->get('newusers_grp_ID'))
 								&& !in_array( $loop_grp_ID, $usedgroups ) )
 						{ // delete
 							?>

@@ -65,7 +65,9 @@ function b2newpost($m)
 	global $blog_ID;
 	global $post_default_title,$post_default_category;
 	global $cafelogID, $sleep_after_edit;
-	$err="";
+	global $Settings;
+	
+	$err = '';
 
 	$username=$m->getParam(2);
 	$password=$m->getParam(3);
@@ -108,7 +110,7 @@ function b2newpost($m)
 	}
 	else
 	{
-		$now = date("Y-m-d H:i:s",(time() + (get_settings('time_difference') * 3600)));
+		$now = date("Y-m-d H:i:s",(time() + ($Settings->get('time_difference') * 3600)));
 	}
 
 	// CHECK and FORMAT content
@@ -311,7 +313,9 @@ function bloggernewpost($m)
 	global $blog_ID, $default_locale;
 	global $post_default_title,$post_default_category;
 	global $cafelogID, $sleep_after_edit, $default_locale;
-	$err="";
+	global $Settings;
+	
+	$err = '';
 
 	logIO('I','Called function: blogger.newPost');
 
@@ -354,7 +358,7 @@ function bloggernewpost($m)
 
 	$content = xmlrpc_removepostdata( $content );
 
-	$now = date('Y-m-d H:i:s', (time() + (get_settings('time_difference') * 3600)));
+	$now = date('Y-m-d H:i:s', (time() + ($Settings->get('time_difference') * 3600)));
 
 	// CHECK and FORMAT content
 	$post_title = format_to_post($post_title,0,0);

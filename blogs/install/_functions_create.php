@@ -729,7 +729,8 @@ function populate_main_tables()
 										( 'newusers_level', '1' ),
 										( 'newusers_canregister', '0' ),
 										( 'links_extrapath', '0' ),
-										( 'permalink_type', 'urltitle' )";
+										( 'permalink_type', 'urltitle' ),
+										( 'user_minpwdlen', '5' )";
 	$DB->query( $query );
 
 	echo "OK.<br />\n";

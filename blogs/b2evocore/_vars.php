@@ -11,6 +11,7 @@
  */
 
 $b2_version = '0.8.9+CVS';
+$new_db_version = 8060;				// next time: 8070
 
 // Activate gettext:
 if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )

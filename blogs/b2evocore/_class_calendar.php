@@ -62,6 +62,8 @@ class Calendar
 		$timestamp_min = '',		// Do not show posts before this timestamp
 		$timestamp_max = 'now'  )	// Do not show posts after this timestamp
 	{
+		global $Settings;
+		
 		$this->blog = $blog;
 
 		// Find out which month to display:
@@ -108,14 +110,14 @@ class Calendar
 		if( $timestamp_min == 'now' ) $timestamp_min = time();
 		if( !empty($timestamp_min) )
 		{	// Hide posts before
-			$date_min = date('Y-m-d H:i:s', $timestamp_min + (get_settings('time_difference') * 3600) );
+			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
 			$where .= $where_link.' post_issue_date >= \''.$date_min.'\'';
 			$where_link = ' AND ';
 		}
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) )
 		{	// Hide posts after
-			$date_max = date('Y-m-d H:i:s', $timestamp_max + (get_settings('time_difference') * 3600) );
+			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
 			$where .= $where_link.' post_issue_date <= \''.$date_max.'\'';
 			$where_link = ' AND ';
 		}
@@ -206,6 +208,7 @@ class Calendar
 		global $tableposts, $tablepostcats, $tablecategories;
 		global $weekday, $weekday_abbrev, $month, $month_abbrev;
 		global $start_of_week;
+		global $Settings;
 
 		if( $this->mode == 'month' )
 		{
@@ -447,7 +450,7 @@ class Calendar
 				else
 				{	// This day is in this month
 					$k = $k + 1;
-					$calendartoday = (date('Ymd',$i) == date('Ymd', (time() + (get_settings('time_difference') * 3600))));
+					$calendartoday = (date('Ymd',$i) == date('Ymd', (time() + ($Settings->get('time_difference') * 3600))));
 	
 					if( isset($daysinmonthwithposts[ date('j', $i) ]) )
 					{

@@ -357,9 +357,9 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
  */
 function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $htsrv_url, $blog;
+	global $htsrv_url, $blog, $Settings;
 
-	if( is_logged_in() || !get_settings('newusers_canregister'))
+	if( is_logged_in() || !$Settings->get('newusers_canregister'))
 	{	// There's no need to provide this link if already logged in or if we won't let him register
 		return false;
 	}

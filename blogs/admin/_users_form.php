@@ -187,7 +187,7 @@
 				
 		if(  $edited_User->get('ID') != 1 )
 		{
-			$chosengroup = ( $edited_User->Group === NULL ) ? get_settings('newusers_grp_ID') : $edited_User->Group->get('ID');
+			$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->get('ID');
 			form_select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
 		}
 		else
@@ -202,7 +202,7 @@
 	<?php
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ ?>
-		<tr><td colspan="2" style="text-align:center">
+		<tr><td colspan="2" class="center">
 		<input type="submit" name="submit" value="<?php if( $edited_User->get('ID') == 0 ) echo T_('Create'); else echo T_('Update') ?>" class="search" />
 		<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
 		</td></tr>

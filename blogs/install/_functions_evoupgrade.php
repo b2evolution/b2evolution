@@ -354,7 +354,9 @@ function upgrade_b2evo_tables()
 			( 'db_version', '$new_db_version' ),
 			( 'default_locale', 'en-EU' ),
 			( 'links_extrapath', '0' ),
-			( 'permalink_type', 'urltitle' )";
+			( 'permalink_type', 'urltitle' ),
+			( 'user_minpwdlen', '5' )
+			";
 		
 		foreach( $trans as $name => $value )
 		{

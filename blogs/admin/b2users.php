@@ -89,7 +89,6 @@ switch ($action)
 		
 		if( $edited_user_ID == 0 )
 		{ // we create a new user
-			
 			$edited_User = & new User();
 			$edited_User->set_datecreated( $localtimenow );
 		}
@@ -127,15 +126,22 @@ switch ($action)
 		
 		param( 'edited_user_pass1', 'string', true );
 		param( 'edited_user_pass2', 'string', true );
-		if( $edited_user_pass1 != '' )
-		{
+		if( $edited_user_pass1 != '' || $edited_user_ID == 0 )
+		{ // update password, explicit for new users
 			if( $edited_user_pass1 != $edited_user_pass2 )
 			{
-				errors_add( T_('you typed two different passwords. Go back to correct that.') );
+				errors_add( T_('You typed two different passwords.') );
 			}
 			else
 			{
-				$edited_User->set( 'pass', md5( $edited_user_pass2 ) );
+				if( strlen($edited_user_pass2) < $Settings->get('user_minpwdlen') )
+				{
+					errors_add( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen')) );
+				}
+				else
+				{ // set password
+					$edited_User->set( 'pass', md5( $edited_user_pass2 ) );
+				}
 			}
 		}
 		
@@ -283,7 +289,7 @@ switch ($action)
 		{
 			errors_add( T_('You can\'t delete Group #1!') );
 		}
-		if( $id == get_settings('newusers_grp_ID' ) )
+		if( $id == $Settings->get('newusers_grp_ID' ) )
 		{
 			errors_add( T_('You can\'t delete the default group for new users!') );
 		}
@@ -401,7 +407,13 @@ switch ($action)
 if( count($errors) )
 {
 	echo '<div class="panelinfo">';
-	errors_display('', '');
+	errors_display(
+		(isset( $edited_user_ID ) ?
+			(($edited_user_ID == 0) ? T_('The user was not created:') : T_('The user was not updated:'))
+		: (isset( $edited_grp_ID) ?
+			(($edited_grp_ID == 0) ? T_('The group was not created:') : T_('The group was not updated:'))
+			: '')
+		), '');
 	echo '</div>';
 }
 

@@ -402,12 +402,12 @@
 
 				$arc_link_start = $pagenow. '?blog='. $blog. '&amp;';
 
-				$ArchiveList = & new ArchiveList( $blog, get_settings('archive_mode'), $show_statuses,	$timestamp_min, $timestamp_max, 36 );
+				$ArchiveList = & new ArchiveList( $blog, $Settings->get('archive_mode'), $show_statuses,	$timestamp_min, $timestamp_max, 36 );
 
 				while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
 				{
 					echo $archive_line_start;
-					switch( get_settings('archive_mode') )
+					switch( $Settings->get('archive_mode') )
 					{
 						case 'monthly':
 							// --------------------------------- MONTHLY ARCHIVES ---------------------------------

@@ -55,9 +55,10 @@
 									FROM $tableusers INNER JOIN $tableblogusers
 													ON ID = bloguser_user_ID
 									WHERE bloguser_blog_ID = $blog
+												AND bloguser_ismember = 1
 									ORDER BY user_login";
 				$rows = $DB->get_results( $query, ARRAY_A );
-				$members=array();
+				$members = array();
 				if( count($rows) ) foreach( $rows as $loop_row )
 				{	// Go through users:
 					$members[] = $loop_row['ID'];
@@ -66,7 +67,7 @@
 					<tr>
 						<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
 						<td class="center">
-							<input type="checkbox" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
+							<input type="checkbox" style="border:1px dotted" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
 								checked="checked"
 								value="1" title="<?php echo T_('Permission to read protected posts') ?>" />
 						</td>
@@ -157,7 +158,7 @@
 					<tr>
 						<td><?php echo format_to_output( $loop_row['user_login'], 'htmlbody' ); ?></td>
 						<td class="center">
-							<input type="checkbox" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
+							<input type="checkbox" style="border:1px dotted" name="blog_ismember_<?php echo $loop_row['ID'] ?>"
 								value="1" title="<?php echo T_('Permission to read protected posts') ?>" />
 						</td>
 						<td class="center">
