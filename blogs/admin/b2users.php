@@ -37,7 +37,7 @@ if( !$current_User->check_perm( 'users', 'edit', false ) )
 	$user_profile_only = 1;
 
 	if( ($action && $action != 'userupdate') )
-	{	// This should be prevented un the UI
+	{ // This should be prevented un the UI
 		$Messages->add( 'You have no permission to edit other users or groups!' );
 		$action = ''; // don't show group form (we have no group ID)
 	}
@@ -51,7 +51,7 @@ if( !$current_User->check_perm( 'users', 'edit', false ) )
 if( $Messages->count() )
 {
 	if( $action == 'userupdate' )
-	{	// display top menu that was suppressed before
+	{ // display top menu that was suppressed before
 		require( dirname(__FILE__).'/_menutop.php' );
 		require( dirname(__FILE__).'/_menutop_end.php' );
 	}

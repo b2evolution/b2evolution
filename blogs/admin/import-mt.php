@@ -7,10 +7,12 @@
  *  - assign comment_author_ID to comments if user exist?!
  *
  * CHANGES:
- *  0.9.0.10+:
- *  - bad bug(s) fixes, regarding post parsing
+ *  0.9.0.10:
+ *   - bugfixes (regarding post parsing, author mapping)
+ *   - "convert ugly html" puts quotes around href attributes, if missing
+ *   Thanks to Ben Franske (http://ben.franske.com) for reporting and idea
  *  0.9.0.9:
- *	 + Simulate the import before performing it for real
+ *   + Simulate the import before performing it for real
  *   + Redesign of output and parsing
  *   - Fixes
  *     - Post status is now compared case insensitive
@@ -328,7 +330,7 @@ param( 'mode', 'string', 'normal' );
 							}
 						?></select>
 						<input type="text" value="<?php echo format_to_output($author, 'formvalue') ?>" name="user_name[]" maxlength="30" class="input" />
-						<span class="notes">(name for new user)</span>
+						<span class="notes">(login for new user)</span>
 					</div>
 					</fieldset>
 					<?php
@@ -869,7 +871,7 @@ param( 'mode', 'string', 'normal' );
 
 					case 'createnew':
 						// check if the user already exists
-						$user_data = get_userdatabylogin( $post_author );
+						$user_data = get_userdatabylogin( $usersmapped[ $post_author ][1] );
 						if( $user_data )
 						{
 							$post_author = $user_data['ID'];

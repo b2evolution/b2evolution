@@ -42,9 +42,9 @@ function update_IDs( ids, text, notrailingslash )
 	<fieldset>
 		<legend><?php echo T_('General parameters') ?></legend>
 		<?php
-			form_text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Full Name'), T_('Will be displayed on top of the blog.') );
-			form_text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 12, T_('Short Name'), T_('Will be used in selection menus and throughout the admin interface.') );
-			form_select( 'blog_locale', $edited_Blog->get( 'locale' ), 'locale_options', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
+			form_text( 'blog_name', $edited_Blog->dget( 'name' ), 50, T_('Full Name'), T_('Will be displayed on top of the blog.') );
+			form_text( 'blog_shortname', $edited_Blog->dget( 'shortname', 'formvalue' ), 12, T_('Short Name'), T_('Will be used in selection menus and throughout the admin interface.') );
+			form_select( 'blog_locale', $edited_Blog->dget( 'locale' ), 'locale_options', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
 		?>
 	</fieldset>
 
@@ -59,23 +59,23 @@ function update_IDs( ids, text, notrailingslash )
 					$defblog = $default_Blog->dget('shortname');
 				}
 			}
-			form_radio( 'blog_access_type', $edited_Blog->get( 'access_type' ),
+			form_radio( 'blog_access_type', $edited_Blog->dget( 'access_type' ),
 					array(
 						array( 'default',
 										T_('Default blog on index.php'),
-										'<span id="blogbaseurl0">'.$edited_Blog->get('baseurl').'</span>index.php'.( isset($defblog)
+										'<span id="blogbaseurl0">'.$edited_Blog->dget('baseurl').'</span>index.php'.( isset($defblog)
 											? '  ['. /* TRANS: current default blog */ T_('Current default is:').' '.$defblog.']'
 											: '' )
 						),
 						array( 'index.php',
 										T_('Other blog through index.php'),
-										'<span id="blogbaseurl1">'.$edited_Blog->get('baseurl').'</span>index.php'.( $Settings->get('links_extrapath')
-											? '/'.$edited_Blog->get( 'stub' )
+										'<span id="blogbaseurl1">'.$edited_Blog->dget('baseurl').'</span>index.php'.( $Settings->get('links_extrapath')
+											? '/'.$edited_Blog->dget( 'stub' )
 											: '?blog='.$edited_Blog->ID)
 						),
 						array( 'stub',
 										T_('Other blog through stub file (Advanced)'),
-										'<span id="blogbaseurl2">'.$edited_Blog->get('baseurl').'</span><span id="blog_stub_js0">'.$edited_Blog->dget( 'stub' ).'</span>',
+										'<span id="blogbaseurl2">'.$edited_Blog->dget('baseurl').'</span><span id="blog_stub_js0">'.$edited_Blog->dget( 'stub' ).'</span>',
 										'<div class="label"><label for="blog_stub">'.T_('Stub name').':</label></div>'
 										.'<div class="input"><input type="text" name="blog_stub" id="blog_stub" size="20" maxlength="'.$maxlength_urlname_stub.'" value="'.$edited_Blog->dget( 'stub', 'formvalue' ).'" onkeyup="update_IDs( \'blog_stub_js\', this.value, true )" onfocus="update_IDs( \'blog_stub_js\', this.value, true ); document.getElementsByName(\'blog_access_type\')[2].checked = true;" /></div>'
 										.'<div class="notes">'.T_("You MUST create a stub file for this to work or handle it accordingly on the Webserver (like Apache's mod_rewrite).").'</div>',
@@ -101,37 +101,37 @@ function update_IDs( ids, text, notrailingslash )
 					),
 					T_('Blog Folder URL'), true, T_('No trailing slash. (If you don\'t know, leave this field empty.)') );
 
-			form_text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL blog name'), T_('Used in URLs to identify this blog.'), $maxlength_urlname_stub );
+			form_text( 'blog_urlname', $edited_Blog->dget( 'urlname' ), 20, T_('URL blog name'), T_('Used in URLs to identify this blog.'), $maxlength_urlname_stub );
 		?>
 	</fieldset>
 
 	<fieldset>
 		<legend><?php echo T_('Default display options') ?></legend>
 		<?php
-			form_select( 'blog_default_skin', $edited_Blog->get( 'default_skin' ), 'skin_options', T_('Default skin') , T_('This is the default skin that will be used to display this blog.') );
+			form_select( 'blog_default_skin', $edited_Blog->dget( 'default_skin' ), 'skin_options', T_('Default skin') , T_('This is the default skin that will be used to display this blog.') );
 
-			form_checkbox( 'blog_force_skin', 1-$edited_Blog->get( 'force_skin' ), T_('Allow skin switching'), T_('Users will be able to select another skin to view the blog (and their prefered skin will be saved in a cookie).') );
+			form_checkbox( 'blog_force_skin', 1-$edited_Blog->dget( 'force_skin' ), T_('Allow skin switching'), T_('Users will be able to select another skin to view the blog (and their prefered skin will be saved in a cookie).') );
 
-			form_checkbox( 'blog_disp_bloglist', $edited_Blog->get( 'disp_bloglist' ), T_('Display public blog list'), T_('Check this if you want to display the list of all blogs on your blog page (if your skin supports this).') );
+			form_checkbox( 'blog_disp_bloglist', $edited_Blog->dget( 'disp_bloglist' ), T_('Display public blog list'), T_('Check this if you want to display the list of all blogs on your blog page (if your skin supports this).') );
 
-			form_checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want to this blog to be displayed in the list of all public blogs.') );
+			form_checkbox( 'blog_in_bloglist', $edited_Blog->dget( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want to this blog to be displayed in the list of all public blogs.') );
 
-			form_select_object( 'blog_links_blog_ID', $edited_Blog->get( 'links_blog_ID' ), $BlogCache, T_('Default linkblog'), T_('Will be displayed next to this blog (if your skin supports this).'), true );
+			form_select_object( 'blog_links_blog_ID', $edited_Blog->dget( 'links_blog_ID' ), $BlogCache, T_('Default linkblog'), T_('Will be displayed next to this blog (if your skin supports this).'), true );
 		?>
 	</fieldset>
 
 	<fieldset>
 		<legend><?php echo T_('Description') ?></legend>
 		<?php
-			form_text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template.'), 250 );
+			form_text( 'blog_tagline', $edited_Blog->dget( 'tagline' ), 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template.'), 250 );
 
-			form_textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 8, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
+			form_textarea( 'blog_longdesc', $edited_Blog->dget( 'longdesc' ), 8, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
 
-			form_text( 'blog_description', $edited_Blog->get( 'description' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
+			form_text( 'blog_description', $edited_Blog->dget( 'description' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
 
-			form_text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
+			form_text( 'blog_keywords', $edited_Blog->dget( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
 
-			form_textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 8, T_('Notes'), T_('Additional info.'), 50, 'large' );
+			form_textarea( 'blog_notes', $edited_Blog->dget( 'notes' ), 8, T_('Notes'), T_('Additional info.'), 50, 'large' );
 		?>
 	</fieldset>
 
