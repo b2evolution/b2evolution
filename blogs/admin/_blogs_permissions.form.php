@@ -173,7 +173,7 @@ $Form->begin_form( 'fform' );
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'perm' );
 $Form->hidden( 'blog', $edited_Blog->ID );
-$Form->hidden( 'action', $layout );
+$Form->hidden( 'layout', $layout );
 
 $Form->fieldset( T_('User permissions') );
 ?>
