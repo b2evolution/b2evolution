@@ -554,14 +554,15 @@ class Form extends Widget
 	/**
 	 * Builds the fieldset tag
 	 *
-	 * @param string the title of the fieldset to display in the 'legend' tags
+	 * @param string the title of the fieldset
+	 * @param string the class of the fieldset
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function fieldset( $title, $class='fieldset' )
+	function fieldset( $title = '', $class = 'fieldset' )
 	{
 		switch( $this->layout )
 		{
-			case 'table':
+			case 'table': // QUESTION: better use <th> instead of <tr>?
 				$r = '<tr ';
 				if( $class != '' )
 				{ //there is a class option to display in the fieldset tag

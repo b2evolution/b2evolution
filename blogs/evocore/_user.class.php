@@ -73,17 +73,22 @@ class User extends DataObject
 	var $level;
 	var $notify;
 	var $showonline;
+
 	/**
-	 * Number of posts by this user.
-	 * Use get('num_posts') to access this.
+	 * Number of posts by this user. Use getNumPosts() to access this (lazy filled).
 	 * @var integer|NULL
 	 * @access protected
 	 */
 	var $_numPosts;
 
-	var $Group; // Pointer to group
+	/**
+	* @var NULL|Group Reference to group
+	 */
+	var $Group;
 
-	// Blog posts statuses permissions:
+	/**
+	 * Blog posts statuses permissions
+	 */
 	var $blog_post_statuses = array();
 
 
@@ -786,6 +791,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/19 18:54:52  blueyed
+ * doc
+ *
  * Revision 1.9  2005/02/15 22:05:10  blueyed
  * Started moving obsolete functions to _obsolete092.php..
  *
