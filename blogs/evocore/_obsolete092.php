@@ -1248,10 +1248,36 @@ function redirect_js($url,$title="...") {
  */
 $start_of_week = 1;
 
+
+/**#@+
+ * database tables' names
+ *
+ * @deprecated by {@link $db_aliases}
+ */
+$tableposts        = $tableprefix.'posts';
+$tableusers        = $tableprefix.'users';
+$tablesettings     = $tableprefix.'settings';
+$tablecategories   = $tableprefix.'categories';
+$tablecomments     = $tableprefix.'comments';
+$tableblogs        = $tableprefix.'blogs';
+$tablepostcats     = $tableprefix.'postcats';
+$tablehitlog       = $tableprefix.'hitlog';
+$tableantispam     = $tableprefix.'antispam';
+$tablegroups       = $tableprefix.'groups';
+$tableblogusers    = $tableprefix.'blogusers';
+$tablelocales      = $tableprefix.'locales';
+$tablesessions     = $tableprefix.'sessions';
+$tableusersettings = $tableprefix.'usersettings';
+/**#@-*/
+
+
 // globals }}}
 
 /*
  * $Log$
+ * Revision 1.9  2005/03/06 16:30:40  blueyed
+ * deprecated global table names.
+ *
  * Revision 1.8  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

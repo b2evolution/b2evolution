@@ -1443,7 +1443,7 @@ function pingback_ping( $m )
 
 function mwnewMediaObj($m) {
 
-		global $xmlrpcerruser,$tablecategories; // import user errcode value
+		global $xmlrpcerruser; // import user errcode value
 
 		global $blog_ID;
 
@@ -1693,7 +1693,7 @@ function mwnewpost($m)
 	global $xmlrpcerruser; // import user errcode value
 	global $blog_ID, $default_category, $DB;
 	global $cafelogID;
-	global $Settings, $Messages, $UserCache,$tablecategories;;
+	global $Settings, $Messages, $UserCache;
 	logIO("O","start of mwnewpost...");
 
 
@@ -1764,9 +1764,9 @@ function mwnewpost($m)
 
 ///
 
-//	$sql = "SELECT * FROM $tablecategories WHERE cat_blog_ID = $blogid AND cat_name = $categories[0] ";
+//	$sql = "SELECT * FROM T_categories WHERE cat_blog_ID = $blogid AND cat_name = $categories[0] ";
 
-	$sql = "SELECT * FROM $tablecategories WHERE cat_blog_ID = $blogid ";
+	$sql = "SELECT * FROM T_categories WHERE cat_blog_ID = $blogid ";
 
 		logIO("O","sql for finding ID ...".$sql);
 
@@ -2154,7 +2154,7 @@ function mwgetcats( $m )
 
 {
 
-	global $xmlrpcerruser, $tablecategories, $DB;
+	global $xmlrpcerruser, $DB;
 
 
 
@@ -2190,7 +2190,7 @@ function mwgetcats( $m )
 
 	$sql = "SELECT *
 
-					FROM $tablecategories ";
+					FROM T_categories ";
 
 	if( $blogid > 1 ) $sql .= "WHERE cat_blog_ID = $blogid ";
 
@@ -2262,7 +2262,7 @@ function metawebloggetrecentposts( $m )
 
 {
 
-	global $xmlrpcerruser, $tableposts, $tablecategories, $DB, $show_statuses, $UserCache;
+	global $xmlrpcerruser, $DB, $show_statuses, $UserCache;
 
 	global $blog;
 
@@ -2520,7 +2520,7 @@ function mwgetpost($m)
 
 {
 
-	global $xmlrpcerruser,$tableposts;
+	global $xmlrpcerruser;
 
 
 

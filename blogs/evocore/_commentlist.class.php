@@ -79,13 +79,12 @@ class CommentList extends DataObjectList
 		$init_what_to_show = ''  )
 	{
 		global $DB;
-		global $tablecomments;
 		global $cache_categories;
 		global $cat_array; // communication with recursive callback funcs
 		global $pagenow;		// Bleh !
 
 		// Call parent constructor:
-		parent::DataObjectList( $tablecomments, 'comment_', 'comment_ID' );
+		parent::DataObjectList( 'T_comments', 'comment_', 'comment_ID' );
 
 		$this->blog = $blog;
 
@@ -182,6 +181,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.4  2005/03/06 16:30:40  blueyed
+ * deprecated global table names.
+ *
  * Revision 1.3  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

@@ -55,6 +55,7 @@ if( !isset($default_to_blog) )
 	 * 2 is the default setting, since it is the first user blog created by b2evo.
 	 * 1 is also a popular choice, since it is a special blog aggregating all the others.
 	 * @global int $default_to_blog
+	 * @todo move to $Settings
 	 */
 	$default_to_blog = 2;
 }
@@ -65,6 +66,7 @@ if( !isset($default_to_blog) )
  * This is for the Who's Online block. Default: 5 minutes (300s).
  *
  * @global int $online_session_timeout
+ * @todo move to $Settings
  */
 $online_session_timeout = 300;
 
@@ -159,47 +161,29 @@ $redirect_to_postblog = false;
 
 // ** DB table names **
 
-/**#@+
- * database tables' names
+/**
+ * Aliases for class DB:
  *
  * (You should not need to change them.
  *  If you want to have multiple b2evo installations in a single database you should
  *  change $tableprefix in _config.php)
- */
-$tableposts        = $tableprefix.'posts';
-$tableusers        = $tableprefix.'users';
-$tablesettings     = $tableprefix.'settings';
-$tablecategories   = $tableprefix.'categories';
-$tablecomments     = $tableprefix.'comments';
-$tableblogs        = $tableprefix.'blogs';
-$tablepostcats     = $tableprefix.'postcats';
-$tablehitlog       = $tableprefix.'hitlog';
-$tableantispam     = $tableprefix.'antispam';
-$tablegroups       = $tableprefix.'groups';
-$tableblogusers    = $tableprefix.'blogusers';
-$tablelocales      = $tableprefix.'locales';
-$tablesessions     = $tableprefix.'sessions';
-$tableusersettings = $tableprefix.'usersettings';
-/**#@-*/
-
-/**
- * Aliases for class DB:
+ * @global array
  */
 $db_aliases = array(
-		'T_posts'        => $tableposts       ,
-		'T_users'        => $tableusers       ,
-		'T_settings'     => $tablesettings    ,
-		'T_categories'   => $tablecategories  ,
-		'T_comments'     => $tablecomments    ,
-		'T_blogs'        => $tableblogs       ,
-		'T_postcats'     => $tablepostcats    ,
-		'T_hitlog'       => $tablehitlog      ,
-		'T_antispam'     => $tableantispam    ,
-		'T_groups'       => $tablegroups      ,
-		'T_blogusers'    => $tableblogusers   ,
-		'T_locales'      => $tablelocales     ,
-		'T_sessions'     => $tablesessions    ,
-		'T_usersettings' => $tableusersettings,
+		'T_posts'        => $tableprefix.'posts',
+		'T_users'        => $tableprefix.'users',
+		'T_settings'     => $tableprefix.'settings',
+		'T_categories'   => $tableprefix.'categories',
+		'T_comments'     => $tableprefix.'comments',
+		'T_blogs'        => $tableprefix.'blogs',
+		'T_postcats'     => $tableprefix.'postcats',
+		'T_hitlog'       => $tableprefix.'hitlog',
+		'T_antispam'     => $tableprefix.'antispam',
+		'T_groups'       => $tableprefix.'groups',
+		'T_blogusers'    => $tableprefix.'blogusers',
+		'T_locales'      => $tableprefix.'locales',
+		'T_sessions'     => $tableprefix.'sessions',
+		'T_usersettings' => $tableprefix.'usersettings',
 		'T_posttypes'    => $tableprefix.'posttypes',
 		'T_poststatuses' => $tableprefix.'poststatuses',
 		'T_plugins'      => $tableprefix.'plugins',

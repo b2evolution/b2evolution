@@ -74,10 +74,10 @@ class Comment extends DataObject
 	 */
 	function Comment( $db_row = NULL )
 	{
-		global $tablecomments, $ItemCache, $UserCache;
+		global $ItemCache, $UserCache;
 
 		// Call parent constructor:
-		parent::DataObject( $tablecomments, 'comment_', 'comment_ID' );
+		parent::DataObject( 'T_comments', 'comment_', 'comment_ID' );
 
 		if( $db_row == NULL )
 		{
@@ -478,6 +478,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2005/03/06 16:30:40  blueyed
+ * deprecated global table names.
+ *
  * Revision 1.4  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

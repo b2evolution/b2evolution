@@ -117,7 +117,7 @@ function convert_lang_to_locale( $table, $columnlang, $columnID )
  */
 function upgrade_b2evo_tables()
 {
-	global $tableblogs, $tableposts;
+	global $db_aliases;
 	global $baseurl, $old_db_version, $new_db_version;
 	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
 	global $locales, $default_locale;
@@ -333,7 +333,7 @@ function upgrade_b2evo_tables()
 			echo '<div class="error"><p class="error">';
 			printf( T_("It appears that the following blog stub names are used more than once: ['%s']" ), implode( "','", $stub_list ) );
 			echo '</p><p>';
-			printf( T_("I can't upgrade until you make them unique. DB field: [%s]" ), $tableblogs.'.blog_stub' );
+			printf( T_("I can't upgrade until you make them unique. DB field: [%s]" ), $db_aliases['T_blogs'].'.blog_stub' );
 			echo '</p></div>';
 			return false;
 		}
@@ -367,7 +367,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		// convert given languages to locales
-		convert_lang_to_locale( $tableposts, 'post_locale', 'ID' );
+		convert_lang_to_locale( 'T_posts', 'post_locale', 'ID' );
 
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
@@ -390,7 +390,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		// convert given languages to locales
-		convert_lang_to_locale( $tableblogs, 'blog_locale', 'blog_ID' );
+		convert_lang_to_locale( 'T_blogs', 'blog_locale', 'blog_ID' );
 
 
 		echo 'Converting settings table... ';
