@@ -113,7 +113,6 @@ function locale_activate( $locale )
 			bind_textdomain_codeset( 'messages', $current_charset );
 		}
 	}
-
 	
 	# Set locale for default language:
 	# This will influence the way numbers are displayed, etc.
@@ -151,7 +150,10 @@ function locale_by_lang( $lang )
 /*
  * locale_lang(-)
  *
- * Returns the language code part of a locale name
+ * Returns the language code part of current locale
+ *
+ * @param boolean true (default) if we want it to be outputted
+ * @return string current language code, if $disp = false
  */
 function locale_lang( $disp = true )
 {
@@ -224,7 +226,7 @@ function locale_options( $default = '' )
 
 
 /**
- *	Detect language from HTTP_ACCEPT_LANGUAGE
+ * Detect language from HTTP_ACCEPT_LANGUAGE
  *
  * @author dAniel
  * @return locale made out of HTTP_ACCEPT_LANGUAGE or $default_locale, if no match
@@ -233,33 +235,35 @@ function locale_options( $default = '' )
 function locale_from_httpaccept()
 {
 	global $locales, $default_locale;
-	if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+	if( isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) )
 	{
 		#pre_dump($_SERVER['HTTP_ACCEPT_LANGUAGE'], 'http_accept_language');
 		// look for each language in turn in the preferences, which we saved in $langs
 		foreach( $locales as $localekey => $v ) {
 			#echo 'checking '. $localekey;
 			$checklang = substr($localekey, 0, 2);
-			$pos = strpos($_SERVER['HTTP_ACCEPT_LANGUAGE'], $checklang);
+			$pos = strpos( $_SERVER['HTTP_ACCEPT_LANGUAGE'], $checklang );
 			if( $pos !== false )
 			{
-				$text[] = str_pad($pos, 3, '0', STR_PAD_LEFT). '-'. $checklang. '-'. $localekey;
+				$text[] = str_pad( $pos, 3, '0', STR_PAD_LEFT ). '-'. $checklang. '-'. $localekey;
 			}
 		}
-		if( sizeof($text) != 0 ) sort( $text );
+		if( sizeof($text) != 0 )
+		{
+			sort( $text );
 		
-		#var_dump($matches);
-		// the preferred locale/language should be in $text[0]
-		if( preg_match('/\d\d\d\-([a-z]{2})\-(.*)/', $text[0], $matches) )
-			return $matches[2];
+			// the preferred locale/language should be in $text[0]
+			if( preg_match('/\d\d\d\-([a-z]{2})\-(.*)/', $text[0], $matches) )
+				return $matches[2];
+		}
 	}
 	return $default_locale;
 }
 
 
-// load locales from DB into $locales array
-
 return;
+
+// load locales from DB into $locales array
 $query = 'SELECT
 					loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_name, loc_messages, loc_enabled
 					FROM '. $tablelocales;

@@ -7,8 +7,24 @@
  *
  * This file built upon code from original b2 - http://cafelog.com/
  */
-require( dirname(__FILE__). '/_header.php');
+require( dirname(__FILE__). '/_header.php' );
+
+param( 'action', 'string' );
+param( 'cat', 'string' );
+
 $title = T_('Options');
+
+require( dirname(__FILE__). '/_menutop.php' );
+require( dirname(__FILE__). '/_menutop_end.php' );
+
+switch( $cat )
+{
+	case 'locales':
+		$title .= ': '. T_('Locales'); break;
+	default:
+		$title .= ': '. T_('General');
+}
+
 
 /* TODO: locales (default / enabling)
 	locales admin in the backoffice should READ **everything** from the
@@ -41,8 +57,6 @@ $title = T_('Options');
 	echo "<br />\n";
 
 */
-
-param( 'action', 'string' );
 
 
 switch($action)
@@ -81,18 +95,41 @@ switch($action)
 	break;
 
 	default:
-		require(dirname(__FILE__).'/_menutop.php');
-		require(dirname(__FILE__).'/_menutop_end.php');
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'view', true );
 		?>
 
+	<div id="catheader">
+	<ul>
+	<?php
+		if( $cat == '' )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		echo '<a href="b2options.php">'. T_('General'). '</a></li>';
+		
+		if( $cat == 'locales' )
+			echo '<li class="current">';
+		else
+			echo '<li>';
+		echo '<a href="b2options.php?cat=locales">'. T_('Locales'). '</a></li>';
+
+	?>
+
+	</ul>
+	</div>
 	<div class="panelblock">
 
 		<form class="fform" name="form" action="b2options.php" method="post">
 		<input type="hidden" name="action" value="update" />
+		<input type="hidden" name="cat" value="<?php echo $cat; ?>" />
 
+		<?php
+		switch( $cat )
+		{
+			// GENERAL OPTIONS -----------------------------------------------------------
+			case '':?>
 		<fieldset>
 			<legend><?php echo T_('Regional settings') ?></legend>
 
@@ -111,7 +148,6 @@ switch($action)
 			form_text( 'pref_newusers_level', get_settings('pref_newusers_level'), 1, T_('Level for new users'), sprintf( T_('Levels determine hierarchy of users in blogs.' ) ), 1 );
 			?>
 		</fieldset>
-
 
 		<fieldset>
 			<legend><?php echo T_('Display options') ?></legend>
@@ -149,7 +185,18 @@ switch($action)
 			?>
 		</fieldset>
 
-		<?php if( $current_User->check_perm( 'options', 'edit' ) )
+			<?php
+			break;
+			
+			// LOCALE OPTIONS -----------------------------------------------------------
+			case 'locales':?>
+			Locales options go here.
+			
+			<?php
+			break;
+		}
+		
+		if( $current_User->check_perm( 'options', 'edit' ) )
 		{ ?>
 		<fieldset>
 			<fieldset>
