@@ -488,9 +488,9 @@ class ItemList extends DataObjectList
 	{
 		// we need globals for the param function
 		global $preview_userid, $preview_date, $post_status, $post_locale, $content,
-						$post_title, $post_url, $post_category, $post_autobr, $edit_date,
+						$post_title, $post_url, $post_category, $post_autobr, $post_views, $edit_date,
 						$aa, $mm, $jj, $hh, $mn, $ss, $renderers;
-		global $DB, $localtimenow;
+		global $DB, $localtimenow, $Messages;
 
 		$id = 0;
 		param( 'preview_userid', 'integer', true );
@@ -501,6 +501,7 @@ class ItemList extends DataObjectList
 		param( 'post_url', 'string', true );
 		param( 'post_category', 'integer', true );
 		param( 'post_autobr', 'integer', 0 );
+		param( 'post_views', 'integer', 0 );
 		param( 'renderers', 'array', array() );
 
 		$post_title = format_to_post( $post_title, 0 );
@@ -545,6 +546,7 @@ class ItemList extends DataObjectList
 										'".$DB->escape($post_url)."' AS post_url, 
 										$post_category AS post_category,
 										$post_autobr AS post_autobr, 
+										$post_views AS post_views, 
 										'' AS post_flags, 
 										".bpost_count_words( $content )." AS post_wordcount, 
 										'open' AS post_comments,

@@ -428,7 +428,7 @@ class Item extends DataObject
 		$more_file = ''
 		)
 	{
-		global $Renderer, $uri_reloaded;
+		global $Renderer, $uri_reloaded, $more, $preview;
 		// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
 
 		if( $more_link_text == '#' )
@@ -449,11 +449,10 @@ class Item extends DataObject
 
 		if( $dispmore === '#' )
 		{ // We want to display more if requested by user:
-			global $more;
 			$dispmore = $more;
 		}
 		
-		if( $dispmore )
+		if( $dispmore && !$preview )
 		{ // increment view counter
 			if( !$uri_reloaded )
 			{
