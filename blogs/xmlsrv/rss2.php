@@ -28,7 +28,7 @@
       <pubDate><?php the_time('r',1,1); ?></pubDate>
       <?php // Disabled because of spambots: <author><php the_author_email( 'xml' ) ></author>?>
       <?php the_categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml', 'raw' ) ?>
-      <guid isPermaLink="false"><?php echo $id; ?>@<?php echo $baseurl ?></guid>
+      <guid isPermaLink="false"><?php the_ID() ?>@<?php echo $baseurl ?></guid>
       <description><?php
         the_link( '', ' ', 'xml' );
         the_content(T_('[...] Read more!'), 0, '', '', '', '', 'xml', $rss_excerpt_length, 0, 1 );
