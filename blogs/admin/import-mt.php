@@ -147,7 +147,7 @@ $head .= <<<EOB
 <div id="header">
 	<a href="http://b2evolution.net"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution"  title="visit b2evolution's website" width="185" height="40" /></a>
 	<div id="headinfo">
-		<br /><span style="font-size:150%; font-weight:bold">import Movable Type into b2evolution - version 0.9.0.9pre</span>
+		<br /><span style="font-size:150%; font-weight:bold">Import Movable Type into b2evolution</span>
 	</div>
 </div>
 EOB;
@@ -928,7 +928,6 @@ param( 'mode', 'string', 'normal' );
 							$new_user->set('level', $default_userlevel);
 							$new_user_Group =& $GroupCache->get_by_ID( $default_usergroup );
 							$new_user->setGroup( $new_user_Group );
-							$new_user->set_datecreated( time() + ($Settings->get('time_difference') * 3600) );
 
 							if( !$simulate )
 							{
@@ -1469,10 +1468,14 @@ function import_data_extract_authors_cats()
 }
 
 
-// outputs renderer list
+/**
+ * Outputs a list of available renderers (not necessarily installed).
+ */
 function renderer_list()
 {
 	global $Plugins, $renderers;
+
+	$Plugins->discover();
 
 	$renderers = array('default');
 	$Plugins->restart();	 // make sure iterator is at start position
