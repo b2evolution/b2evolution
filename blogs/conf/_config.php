@@ -27,9 +27,9 @@
 /**#@+
  * MySQL settings. Fill in your database details (check carefully or nothing will work!)
  */
-define( 'DB_USER', 'b2evo' );      // your MySQL username
-define( 'DB_PASSWORD', 'b2evoadmin' );  // ...and password
-define( 'DB_NAME', 'b2cvs' );   // the name of the database
+define( 'DB_USER', 'demouser' );      // your MySQL username
+define( 'DB_PASSWORD', 'demopass' );  // ...and password
+define( 'DB_NAME', 'b2evolution' );   // the name of the database
 define( 'DB_HOST', 'localhost' );     // MySQL Server (typically 'localhost')
 /**#@-*/
 
@@ -69,7 +69,7 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
  *
  * @global string $baseurl
  */
-$baseurl = 'http://fret235e-pc.uncc.edu/eclipse3/b2evo-cvs/blogs/';  // WITH ending slash! (NEW in 0.9.1!)
+$baseurl = 'http://localhost/b2evolution/blogs/';  // WITH ending slash! (NEW in 0.9.1!)
 
 
 /**
@@ -82,7 +82,7 @@ $admin_email = 'postmaster@localhost';
 /**
  * Once you have edited this file to your settings, set the following to 1 (one):
  */
-$config_is_done = 1;
+$config_is_done = 0;
 
 
 # IMPORTANT: you will find more parameters in the other files of the /conf folder.
