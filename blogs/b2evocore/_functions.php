@@ -19,6 +19,7 @@ require_once( dirname(__FILE__). '/_functions_pings.php' );
 require_once( dirname(__FILE__). '/_functions_skins.php' );
 require_once( dirname(__FILE__). '/_functions_antispam.php' );
 require_once( dirname(__FILE__). '/_functions_onlineusers.php' );
+require_once( dirname(__FILE__). '/_functions_message.php' );
 if( !isset( $use_html_checker ) ) $use_html_checker = 1;
 if( $use_html_checker ) require_once( dirname(__FILE__). '/_class_htmlchecker.php' );
 
