@@ -1,18 +1,24 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * This file implements archive lists
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
+ * b2evolution - {@link http://b2evolution.net/}
+ *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
  */
+require_once dirname(__FILE__).'/_class_dataobjectlist.php';
 
-class ArchiveList
+/**
+ * Archive List Class
+ */
+class ArchiveList extends DataObjectList
 {
 	var $blog;
 	var $archive_mode;
-	var $request;							// SQL query string
-	var $result;							// Result set
-	var $result_num_rows;			// Number of rows in result set
 	var $arc_w_last;
 	
 	/* 
@@ -128,14 +134,6 @@ class ArchiveList
 		$this->arc_w_last = '';
 	}
 
-	/*
-	 * ArchiveList->get_num_rows(-)
-	 */
-	function get_num_rows()
-	{
-		return $this->result_num_rows;
-	}
-	
 	/*
 	 * ArchiveList->get_item(-)
 	 */

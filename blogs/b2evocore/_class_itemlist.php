@@ -1,12 +1,16 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * This file implements item/post/article lists
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
+ * b2evolution - {@link http://b2evolution.net/}
+ *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
  *
- * This file built upon code from original b2 - http://cafelog.com/
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
  */
+require_once dirname(__FILE__).'/_class_dataobjectlist.php';
 
 function cat_req( $parent_cat_ID, $level )
 {
@@ -25,17 +29,16 @@ function cat_req( $parent_cat_ID, $level )
 
 function cat_req_dummy() {}
 
-
-class ItemList
+/**
+ * Item List Class
+ */
+class ItemList extends DataObjectList
 {
 	var $preview;
 	var $blog;
 	var $p;
-	var $posts_per_page, $what_to_show;
-	var $request;							// SQL query string
-	var $result;							// Result set
+	var $what_to_show;
 	var $result_num_rows;			// Number of rows in result set
-	var $result_rows;					// Array of rows
 	var $postIDlist;
 	var $postIDarray;
 
@@ -84,6 +87,9 @@ class ItemList
 		global $cache_categories, $time_difference;
 		global $cat_array; // communication with recursive callback funcs
 			
+		// Call parent constructor:
+		parent::DataObjectList( $tableposts, 'post_', 'ID' );
+
 		$this->preview = $preview;
 		$this->blog = $blog;
 		$this->p = $p;
@@ -476,14 +482,6 @@ class ItemList
 	}
 
 
-	/*
-	 * ItemList->get_num_rows(-)
-	 */
-	function get_num_rows()
-	{
-		return $this->result_num_rows;
-	}
-	
 	/*
 	 * ItemList->get_max_paged(-)
 	 *

@@ -1,18 +1,23 @@
 <?php
-/*
- * b2evolution - http://b2evolution.net/
+/**
+ * This file implements comment lists
  *
- * Copyright (c) 2003-2004 by Francois PLANQUE - http://fplanque.net/
+ * b2evolution - {@link http://b2evolution.net/}
+ *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
+ *
+ * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package b2evocore
  */
+require_once dirname(__FILE__).'/_class_dataobjectlist.php';
 
-class CommentList
+/**
+ * Comment List Class
+ */
+class CommentList extends DataObjectList
 {
 	var $blog;
-	var $posts_per_page;
-	var $request;							// SQL query string
-	var $result;							// Result set
-	var $result_num_rows;			// Number of rows in result set
 	
 	/* 
 	 * CommentList::CommentList(-)
@@ -34,7 +39,7 @@ class CommentList
 		$s = '',															// Not used yet
 		$sentence = '',												// Not used yet
 		$exact = '',													// Not used yet
-		$posts_per_page = '', 
+		$default_posts_per_page = '', 
 		$init_what_to_show = ''  )
 	{
 		global $querycount;
@@ -42,16 +47,16 @@ class CommentList
 		global $cache_categories;
 		global $cat_array; // communication with recursive callback funcs
 		global $pagenow;		// Bleh !
-	
+		
+		// Call parent constructor:
+		parent::DataObjectList( $tablecomments, 'comment_', 'comment_ID' );
+
 		$this->blog = $blog;
 		
 		if( !empty($posts) )
-			$posts_per_page = $posts;
+			$this->posts_per_page = $posts;
 		elseif( !empty($default_posts_per_page) )
-			$posts_per_page = $default_posts_per_page;
-		else
-			$posts_per_page = get_settings('posts_per_page');
-		$this->posts_per_page = $posts_per_page;
+			$this->posts_per_page = $default_posts_per_page;
 
 		$this->request = "SELECT DISTINCT comment_ID, comment_post_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_karma, comment_type, comment_status, ID, post_title, blog_ID, blog_name, blog_siteurl, blog_stub 
 											FROM (((($tablecomments INNER JOIN $tableposts ON comment_post_ID = ID) ";
@@ -104,7 +109,7 @@ class CommentList
 		}
 
 
-		$this->request .= "ORDER BY $orderby LIMIT $posts_per_page";
+		$this->request .= "ORDER BY $orderby LIMIT $this->posts_per_page";
 
 		// echo $this->request;
 		
@@ -117,13 +122,6 @@ class CommentList
 		
 	}
 
-	/*
-	 * CommentList->get_num_rows(-)
-	 */
-	function get_num_rows()
-	{
-		return $this->result_num_rows;
-	}
 	
 	/** 
 	 * Get next comment in list
@@ -140,6 +138,23 @@ class CommentList
 			return false;
 		}
 		return new Comment( $row ); // COPY !
+	}
+
+	/**
+	 * Template function: display message if list is empty
+	 *
+	 * {@internal Comment::display_if_empty(-) }}
+	 *
+	 * @param string String to display if list is empty
+	 */
+	function display_if_empty( $message = '' )
+	{
+		if( empty($message) ) 
+		{	// Default message:
+			$message = T_('No comment yet...');
+		}
+
+		parent::display_if_empty( $message );
 	}
 
 }

@@ -1,7 +1,8 @@
 <?php
 /**
- * This file implements "data objects by fplanque" :P
- *
+ * Data Object Base Class
+ * 
+ * "data objects by fplanque" :P
  * b2evolution - {@link http://b2evolution.net/}
  *
  * Released under GNU GPL License - http://b2evolution.net/about/license.html
@@ -57,49 +58,14 @@ class DataObject
 	}	
 	
 	/** 
-	 * Get a member param by its name
-	 *
-	 * {@internal DataObject::get(-) }}
-	 *
-	 * @param mixed Name of parameter
-	 * @return mixed Value of parameter
-	 */
-	function get( $parname )
-	{
-		return $this->$parname;
-	}
-
-	/** 
-	 * Display a member param by its name
-	 *
-	 * {@internal DataObject::disp(-) }}
-	 *
-	 * @param string Name of parameter
-	 * @param string Output format, see {@link format_to_output()}
-	 */
-	function disp( $parname, $format = 'htmlbody' )
-	{
-		// Note: we call get again because of derived objects specific handlers !
-		echo format_to_output( $this->get($parname), $format );
-	}
-
-	/* 
-	 * User::set_param(-)
-	 *
-	 * Set param value
-	 */
-	function set_param( $parname, $fieldtype, $parvalue )
-	{
-		// Set value:
-		$this->$parname = $parvalue;
-		// Remmeber change for later db update:
-		$this->dbchange( $this->dbprefix.$parname , $fieldtype, $parname );
-	}
-
-	/* 
-	 * DataObject::dbchange(-)
-	 *
 	 * Records a change that will need to be updated in the db
+	 *
+	 * {@internal DataObject::dbchange(-) }}
+	 *
+	 * @access protected
+	 * @param string Name of parameter
+	 * @param string DB field type ('string', 'number', 'date' )
+	 * @param mixed Pointer to value of parameter
 	 */
 	function dbchange( $dbfieldname, $dbfieldtype, $valuepointer )
 	{
@@ -218,5 +184,60 @@ class DataObject
 
 		return true;
 	}	
+
+
+	/** 
+	 * Get a member param by its name
+	 *
+	 * {@internal DataObject::get(-) }}
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		return $this->$parname;
+	}
+
+	/** 
+	 * Display a member param by its name
+	 *
+	 * {@internal DataObject::disp(-) }}
+	 *
+	 * @param string Name of parameter
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function disp( $parname, $format = 'htmlbody' )
+	{
+		// Note: we call get again because of derived objects specific handlers !
+		echo format_to_output( $this->get($parname), $format );
+	}
+
+	/** 
+	 * Set param value
+	 *
+	 * {@internal DataObject::set_param(-) }}
+	 *
+	 * @param string Name of parameter
+	 * @param string DB field type ('string', 'number', 'date' )
+	 * @param mixed Value of parameter
+	 */
+	function set_param( $parname, $fieldtype, $parvalue )
+	{
+		// Set value:
+		$this->$parname = $parvalue;
+		// Remmeber change for later db update:
+		$this->dbchange( $this->dbprefix.$parname , $fieldtype, $parname );
+	}
+
+	/** 
+	 * Template function: Displays object ID
+	 *
+	 * {@internal DataObject::ID(-) }}
+	 */
+	function ID()
+	{
+		echo $this->ID;
+	}
 }
 ?>

@@ -302,7 +302,8 @@ function comment_ID()
  */
 function comment_author() 
 {
-	global $commentdata;	echo stripslashes($commentdata['comment_author']);
+	global $commentdata;	
+	echo stripslashes($commentdata['comment_author']);
 }
 
 /*

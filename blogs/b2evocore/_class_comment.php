@@ -12,6 +12,9 @@
  */
 require_once dirname(__FILE__).'/_class_dataobject.php';
 
+/**
+ * Comment Class
+ */
 class Comment extends DataObject
 {
 	var	$post_ID;
@@ -108,23 +111,66 @@ class Comment extends DataObject
 		return $this->$parname;	
 	}
 
-	// TEMP:
-	function author_url_link($linktext='', $before='', $after='') 
+
+	/** 
+	 * Template function: display link to comment author's provided URL
+	 *
+	 * {@internal Comment::author_url_link(-) }}
+	 *
+	 * @param string String to display for link: leave empty to display URL
+	 * @param string String to display before link, if link exists
+	 * @param string String to display after link, if link exists
+	 */
+	function author_url_link( $linktext='', $before='', $after='' ) 
 	{
 		$url = trim($this->author_url);
-		$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);
+		$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);	// Escape &
 		$url = (!stristr($url, '://')) ? 'http://'.$url : $url;
 		if ((!empty($url)) && ($url != 'http://') && ($url != 'http://url'))
-		{
-			$display = ($linktext != '') ? $linktext : stripslashes($url);
+		{	// If URL exists:
+			$display = ($linktext != '') ? $linktext : $url;
 			echo $before;
-			echo '<a href="'.stripslashes($url).'">'.$display.'</a>';
+			echo '<a href="'.$url.'">'.$display.'</a>';
 			echo $after;
 		}
 	}
 
-	// TEMP:
-	function text() 
+	/** 
+	 * Template function: display author of comment
+	 *
+	 * {@internal Comment::author(-) }}
+	 */
+	function author() 
+	{
+		$this->disp( 'author' );
+	}
+
+	/** 
+	 * Template function: display comment's original post's title
+	 *
+	 * {@internal Comment::post_title(-) }}
+	 */
+	function post_title() 
+	{
+		$this->disp( 'post_title' );
+	}
+
+	/** 
+	 * Template function: display link to comment's original post
+	 *
+	 * {@internal Comment::post_link(-) }}
+	 */
+	function post_link() 
+	{
+		$this->disp( 'post_link', 'raw' );
+	}
+
+	/** 
+	 * Template function: display content of comment
+	 *
+	 * {@internal Comment::content(-) }}
+	 */
+	function content() 
 	{
 		global $use_textile;
 	
@@ -138,17 +184,31 @@ class Comment extends DataObject
 		echo $comment;
 	}
 
-	function date($d='') 
+	/** 
+	 * Template function: display date (datetime) of comment
+	 *
+	 * {@internal Comment::date(-) }}
+	 *
+	 * @param string date/time format: leave empty to use locale default date format
+	 */
+	function date( $d='' ) 
 	{
-		if ($d == '') 
+		if( empty($d) ) 
 			echo mysql2date( locale_datefmt(), $this->date );
 		else
 			echo mysql2date( $d, $this->date );
 	}
 
-	function time($d='') 
+	/** 
+	 * Template function: display time (datetime) of comment
+	 *
+	 * {@internal Comment::time(-) }}
+	 *
+	 * @param string date/time format: leave empty to use locale default time format
+	 */
+	function time( $d='' ) 
 	{
-		if ($d == '')
+		if( empty($d) ) 
 			echo mysql2date( locale_timefmt(), $this->date );
 		else
 			echo mysql2date( $d, $this->date );
