@@ -382,13 +382,12 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 }
 
 
-/*
- * locale_options(-)
+/**
+ * [callback function] Outputs an <option> set with default locale selected
  *
- *	Outputs a <option> set with default locale selected
+ * {@internal locale_options(-)}}
  *
- * was: lang_options(-)
- *
+ * @param string default value
  */
 function locale_options( $default = '' )
 {
@@ -630,6 +629,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.3  2004/10/21 18:34:02  fplanque
+ * minor changes
+ *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright
  *

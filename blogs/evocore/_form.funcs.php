@@ -138,8 +138,15 @@ function form_text_tr( $field_name, $field_value, $field_size, $field_label, $fi
 }
 
 
-/*
+/**
  * Display a select field and populate it with a callback function.
+ *
+ * @param string field name
+ * @param string default field value
+ * @param callback callback function
+ * @param string field label to be display before the field
+ * @param string note to be displayed after the field
+ * @param string CSS class for select
  */
 function form_select(
 	$field_name,
@@ -164,7 +171,7 @@ function form_select(
 }
 
 
-/*
+/**
  * Display a select field and populate it with a cache object.
  *
  * @param string field name
@@ -261,7 +268,8 @@ function form_radio(
  * @param boolean to output (default)  or not
  * @return mixed true (if output) or the generated HTML if not outputting
  */
-function form_checkbox( $field_name, $field_value, $field_label, $field_note = '', $field_class = '', $output = true )
+function form_checkbox( $field_name, $field_value, $field_label, $field_note = '',
+												$field_class = '', $output = true )
 {
 	$r = "<fieldset>\n"
 			.'<div class="label"><label for="'.$field_name.'">'.$field_label.":</label></div>\n"
@@ -399,6 +407,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.4  2004/10/21 18:34:02  fplanque
+ * minor changes
+ *
  * Revision 1.3  2004/10/14 18:31:25  blueyed
  * granting copyright
  *
