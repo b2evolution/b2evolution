@@ -61,6 +61,7 @@ function create_b2evo_tables()
 		user_locale varchar(20) DEFAULT 'en-EU' NOT NULL,
 		user_idmode varchar(20) NOT NULL DEFAULT 'login',
 		user_notify tinyint(1) NOT NULL default 1,
+		user_showonline tinyint(1) NOT NULL default 1,
 		user_grp_ID int(4) NOT NULL default 1,
 		PRIMARY KEY user_ID (ID),
 		UNIQUE user_login (user_login),
@@ -205,6 +206,19 @@ function create_b2evo_tables()
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
+
+	echo 'Creating table for active sessions... ';
+	$query = "CREATE TABLE $tablesessions (
+		sess_time int(10) unsigned NOT NULL,
+		sess_ipaddress varchar(15) NOT NULL,
+		sess_userid mediumint(8) NOT NULL default '0'',
+		KEY start_time (sess_time),
+		KEY remote_ip (sess_ipaddress)
+	)";
+	$DB->query( $query );
+	echo "OK.<br />\n";
+
+	
 
 	create_antispam();
 
