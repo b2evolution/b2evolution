@@ -13,6 +13,7 @@
 @import url(../rsc/blog_elements.css);	/* Import standard blog elements styles */
 @import url(../rsc/forms.css);	/* Import default form styles */
 @import url(../rsc/comments.css);	/* Import default comment styles */
+@import url(fileman.css); /* Import filemanager styles */
 
 body {
 	margin: 0;
@@ -206,7 +207,7 @@ table.grouped
 {
 	border: 1px solid #9e9286;
 	margin: auto;
-	border-collapse: collapse; 
+	border-collapse: collapse;
 }
 
 table.grouped td {
@@ -217,7 +218,7 @@ table.grouped td {
 
 table.grouped tr.odd td {
 	background-color: #efede0;
-} 
+}
 
 table.grouped th {
 	border-bottom: 1px solid #9e9286;
@@ -231,7 +232,7 @@ tr.group td {
 	color: #8e8276;
 	background-color: #e3dfd0;
 	border-top: 1px solid #9e9286;
-	border-bottom: 1px solid #9e9286;	
+	border-bottom: 1px solid #9e9286;
 	border-left: 0;
 }
 td.right {
@@ -314,7 +315,7 @@ div.panelinfo {
 	clear: both;
 	background-color: #efede0;
 	border: 1px solid #e1ddce;
-	padding: 0 1ex; 
+	padding: 0 1ex;
 	margin: 1ex 1em;
 }
 div.panelinfo p {
@@ -609,11 +610,11 @@ table.bCalendarTable a:hover {
 	background-color: #e1ddce;
 }
 table.bCalendarTable td:hover /* Not in IE */
-{	
+{
 	background-color: #e1ddce;
 }
 table.bCalendarTable tfoot td:hover /* Not in IE */
-{	
+{
 	background-color: #efede0;
 }
 table.bCalendarTable tfoot a {
@@ -691,7 +692,7 @@ div.edit_toolbar input {
 }
 div.edit_toolbar input:hover {
 	color: #000;
-	text-decoration: underline;  
+	text-decoration: underline;
 	border: 1px solid #000;
 }
 div.edit_area {

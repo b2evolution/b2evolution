@@ -17,7 +17,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 /**
  * Cross posting
  *
- * Possble values:
+ * Possible values:
  *   - 0 if you want users to post to a single category only
  *   - 1 if you want to be able to cross-post among multiple categories
  *   - 2 if you want to be able to cross-post among multiple blogs/categories
@@ -50,7 +50,7 @@ $use_spellchecker = 1;
 
 
 # Do you want to be able to link each post to an URL ?
-$use_post_url = 1;			// 1 to enable, 0 to disable
+$use_post_url = 1;  // 1 to enable, 0 to disable
 
 
 # When banning referrers/comment URLs, do you want to remove

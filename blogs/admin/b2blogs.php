@@ -171,6 +171,7 @@ switch($action)
 			param( 'blog_siteurl', 'string', '' );
 			param( 'blog_siteurl_type', 'string', 'relative' );
 			param( 'blog_siteurl_relative', 'string', '' );
+			param( 'blog_siteurl_absolute', 'string', '' );
 			param( 'blog_stub', 'string', '' );
 			param( 'blog_urlname', 'string', 'new' );
 			param( 'blog_default_skin', 'string', 'basic' );
@@ -182,6 +183,7 @@ switch($action)
 			$blog_disp_bloglist = 1;
 			$blog_in_bloglist = 1;
 			$blog_force_skin = 0;
+			$edited_Blog = new Blog();
 		}
 
 		echo '<div class="panelblock">';

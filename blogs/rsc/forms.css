@@ -68,6 +68,13 @@ form.fform fieldset.input{
 	margin: 0;
 	/* border: 1px solid #0f0; */
 }
+form.fform fieldset fieldset fieldset div.label {
+	font-weight:normal;
+	width:20%;
+}
+form.fform fieldset fieldset fieldset div.input {
+	width:79%;
+}
 form.fform div.info {
 	margin: 0 0 0 25%;
 	padding-top: .5ex;

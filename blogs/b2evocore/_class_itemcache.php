@@ -32,7 +32,7 @@ class ItemCache extends DataObjectCache
 	function ItemCache()
 	{
 		global $tableposts;
-		
+
 		parent::DataObjectCache( 'Item', false, $tableposts, 'post_', 'ID' );
 	}
 
@@ -53,9 +53,9 @@ class ItemCache extends DataObjectCache
 		if( !isset( $this->urltitle_index[$req_urltitle] ) )
 		{ // not yet in cache:
 			// Load just the requested object:
-			debug_log( "Loading <strong>$this->objtype($req_urltitle)</strong> into cache" );
-			$sql = "SELECT * 
-							FROM $this->dbtablename 
+			$Debuglog->add( "Loading <strong>$this->objtype($req_urltitle)</strong> into cache" );
+			$sql = "SELECT *
+							FROM $this->dbtablename
 							WHERE post_urltitle = ".$DB->quote($req_urltitle);
 			$row = $DB->get_row( $sql );
 			if( empty( $row ) )
@@ -65,19 +65,19 @@ class ItemCache extends DataObjectCache
 				$this->urltitle_index[$req_urltitle] = false;
 				return false;
 			}
-			
+
 			$dbIDname = $this->dbIDname;
 			$objtype = $this->objtype;
 			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
-			
+
 			// put into index:
 			$this->urltitle_index[$req_urltitle] = & $this->cache[ $row->$dbIDname ];
 		}
-		else 
+		else
 		{
-			debug_log( "Retrieving <strong>$this->objtype($req_urltitle)</strong> from cache" );
+			$Debuglog->add( "Retrieving <strong>$this->objtype($req_urltitle)</strong> from cache" );
 		}
-		
+
 		return $this->urltitle_index[$req_urltitle];
 	}
 
@@ -94,7 +94,7 @@ class ItemCache extends DataObjectCache
 		global $DB;
 
 		$req_list = "'".implode( "','", $req_array)."'";
-		debug_log( "Loading <strong>$this->objtype($req_list)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache" );
 		$sql = "SELECT * FROM $this->dbtablename WHERE post_urltitle IN ( $req_list )";
 		$rows = $DB->get_results( $sql );
 		$dbIDname = $this->dbIDname;
@@ -108,16 +108,16 @@ class ItemCache extends DataObjectCache
 			// put into index:
 			$this->urltitle_index[$row->post_urltitle] = & $this->cache[ $row->$dbIDname ];
 
-			debug_log( "Cached <strong>$this->objtype($row->post_urltitle)</strong>" );
+			$Debuglog->add( "Cached <strong>$this->objtype($row->post_urltitle)</strong>" );
 		}
-		
+
 		// Set cache for non found objects:
 		foreach( $req_array as $urltitle )
 		{
 			if( !isset( $this->urltitle_index[$urltitle] ) )
 			{ // not yet in cache:
 				$this->urltitle_index[$urltitle] = false; // Remember it doesn't exist in DB either
-				debug_log( "Cached <strong>$this->objtype($urltitle)</strong> as NON EXISTENT" );
+				$Debuglog->add( "Cached <strong>$this->objtype($urltitle)</strong> as NON EXISTENT" );
 			}
 		}
 	}

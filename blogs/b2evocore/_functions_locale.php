@@ -321,7 +321,7 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 				'"';
 	if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 	if( !empty( $align ) ) $r .= ' align="'.$align.'"';
-	$r .= '/> ';
+	$r .= ' /> ';
 	
 	if( $disp )
 		echo $r;   // echo it

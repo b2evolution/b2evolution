@@ -1,7 +1,7 @@
 <?php
 /**
  * This file sets various arrays and variables for use in b2evolution
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
@@ -19,7 +19,7 @@ $new_db_version = 8070;				// next time: 8080
 if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
 {	// Warning: on some IIS installs it it set but empty!
 	// Besides, use of explode is not very efficient so other methods are preferred.
-	debug_log( "Getting ReqURI from 'REQUEST_URI'" );
+	$Debuglog->add( "Getting ReqURI from 'REQUEST_URI'" );
 	$ReqURI = $_SERVER['REQUEST_URI'];
 	// Remove params from reqURI:
 	$ReqPath = explode( '?', $ReqURI, 2 );
@@ -27,25 +27,25 @@ if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
 }
 elseif( isset($_SERVER['URL']) )
 { // ISAPI
-	debug_log( "Getting ReqPath from 'URL'" );
+	$Debuglog->add( "Getting ReqPath from 'URL'" );
 	$ReqPath = $_SERVER['URL'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['PATH_INFO']) )
 { // CGI/FastCGI
-	debug_log( "Getting ReqPath from 'PATH_INFO'" );
+	$Debuglog->add( "Getting ReqPath from 'PATH_INFO'" );
 	$ReqPath = $_SERVER['PATH_INFO'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['SCRIPT_NAME']) )
 { // Some Odd Win2k Stuff
-	debug_log( "Getting ReqPath from 'SCRIPT_NAME'" );
+	$Debuglog->add( "Getting ReqPath from 'SCRIPT_NAME'" );
 	$ReqPath = $_SERVER['SCRIPT_NAME'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['PHP_SELF']) )
 { // The Old Stand-By
-	debug_log( "Getting ReqPath from 'PHP_SELF'" );
+	$Debuglog->add( "Getting ReqPath from 'PHP_SELF'" );
 	$ReqPath = $_SERVER['PHP_SELF'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }

@@ -20,7 +20,7 @@ param( 'redirect_to', 'string', $ReqURI );
 param( 'log', 'string', '' );		// last typed login
 
 $location = $redirect_to;
-debug_log( 'location: '.$location );
+$Debuglog->add( 'location: '.$location );
 ?>
 
 <form action="<?php echo $location  ?>" method="post" class="fform">
