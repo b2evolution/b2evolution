@@ -19,8 +19,8 @@ param( 'user', 'integer', 0 );
 param( 'group', 'integer', 0 );
 
 // show the top menu
-require(dirname(__FILE__). '/_menutop.php');
-require(dirname(__FILE__). '/_menutop_end.php');
+require( dirname(__FILE__).'/_menutop.php' );
+require( dirname(__FILE__).'/_menutop_end.php' );
 
 
 switch ($action)
@@ -37,8 +37,22 @@ switch ($action)
 		{ // we use an empty user
 			$edited_User = & new User();
 		}
-		#$query = "SELECT MAX(ID) FROM $tableusers";
-		#$edited_User->set('ID', $DB->get_var( $query ) + 1);
+		
+		break;
+
+
+	case 'newgroup':
+		param( 'template', 'integer', -1 );
+		
+		if( $template > -1 )
+		{ // we use a template
+			$edited_Group = $GroupCache->get_by_ID( $template );
+			$edited_Group->set('ID', 0);
+		}
+		else
+		{ // we use an empty user
+			$edited_Group = & new Group();
+		}
 		
 		break;
 
@@ -50,8 +64,6 @@ switch ($action)
 		$errors = array();
 		
 		param( 'edited_user_ID', 'integer', true );
-		// remember, to display the form; we take care for new created users later
-		#$user = $edited_user_ID;
 		param( 'edited_user_oldlogin', 'string', true );
 		param( 'edited_user_login', 'string', true );
 		
@@ -127,17 +139,18 @@ switch ($action)
 		}
 		
 		param( 'edited_user_grp_ID', 'integer', true );
-		$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
+		if( $edited_user_grp_ID > 0 )
+		{
+			$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
+		}
+		else $edited_user_Group = & new Group();
+		
 		$edited_User->setGroup( $edited_user_Group );
 		// echo 'new group = ';
 		// $edited_User->Group->disp('name');
 		
 		if( count($errors) )
 		{
-			echo '<div class="panelinfo">';
-			
-			errors_display('', '');
-			echo '</div>';
 			break;	
 		}
 		
@@ -153,7 +166,6 @@ switch ($action)
 		{ // Insert user into DB
 			$edited_User->dbinsert();
 			echo '<div class="panelinfo"><p>' . T_('New user created.') . '</p></div>';
-			$user = $edited_User->get('ID');
 		}
 
 		break;
@@ -174,7 +186,7 @@ switch ($action)
 				|| ($prom == 'down' && $usertopromote_level < 1)
 			)
 		{
-			echo '<div class="panelinfo"><span class="error">' . T_('Invalid promotion.') . '</span></div>';
+			echo '<div class="panelinfo"><p class="error">' . T_('Invalid promotion.') . '</p></div>';
 		}
 		else
 		{
@@ -202,29 +214,136 @@ switch ($action)
 		break;
 
 
-	case 'delete':
+	case 'deleteuser':
 		/*
 		 * Delete user
 		 */
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		if( $current_User->check_perm( 'users', 'edit', false ) )
+		{
+			param( 'id', 'integer', true );
+			param( 'confirm', 'integer', 0 );
+				
+			if( $id == $current_User->ID )
+			{
+				errors_add( T_('You can\'t delete yourself!') );
+			}
+			if( $id == 1 )
+			{
+				errors_add( T_('You can\'t delete User #1!') );
+			}
+			
+			if( $errors )
+			{
+				break;
+			}
+	
+			$user_data = get_userdata( $id );
+			$deleted_User = & new User( $user_data );
+	
+			if( !$confirm )
+			{?>
+			<div class="panelinfo">
+				<h3><?php printf( T_('Delete User %s?'), $deleted_User->get( 'firstname' ).' '.$deleted_User->get( 'lastname' ).' ['.$deleted_User->get( 'login' ).']' )?></h3>
 
-		param( 'id', 'integer', true );
+				<p><?php echo T_('Warning').': '.T_('deleting an user also deletes all posts made by this user.') ?></p>
 
-		if( $id == $current_User->ID )
-			die( 'You can\'t delete yourself!' );
+				<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
-		if( $id == 1 )
-			die( 'You can\'t delete User #1!' );
+				<p>
+					<form action="b2users.php" method="get" class="inline">
+						<input type="hidden" name="action" value="deleteuser" />
+						<input type="hidden" name="id" value="<?php $deleted_User->ID() ?>" />
+						<input type="hidden" name="confirm" value="1" />
+						
+						<input type="submit" value="<?php echo T_('I am sure!') ?>" class="search" />
+					</form>
+					<form action="b2users.php" method="get" class="inline">
+						<input type="submit" value="<?php echo T_('CANCEL') ?>" class="search" />
+					</form>
+				</p>
 
-		$user_data = get_userdata($id);
-		$edited_User = & new User( $user_data );
+			</div>
+		<?php
+			}
+			else
+			{ // confirmed
+				// Delete from DB:
+				echo '<div class="panelinfo"><h3>'.T_('Deleting User...').'</h3>';
+				$deleted_User->dbdelete( true );
+				echo '</div>';
+			}
+			
+		}
+		else
+		{ // no permission
+			errors_add( T_('You have no permission!') );
+		}
 
-		// Delete from DB:
-		echo '<div class="panelinfo">
-						<h3>Deleting User...</h3>';
-		$edited_User->dbdelete( true );
-		echo '</div>';
+		break;
+
+
+	case 'deletegroup':
+		/*
+		 * Delete group
+		 */
+		// Check permission:
+		if( $current_User->check_perm( 'users', 'edit', false ) )
+		{
+			param( 'id', 'integer', true );
+			param( 'confirm', 'integer', 0 );
+				
+			if( $id == 1 )
+			{
+				errors_add( T_('You can\'t delete Group #1!') );
+			}
+			if( $id == get_settings('pref_newusers_grp_ID' ) )
+			{
+				errors_add( T_('You can\'t delete the default group for new users!') );
+			}
+			
+			if( $errors )
+			{
+				break;
+			}
+	
+			$del_Group = $GroupCache->get_by_ID( $id );
+	
+			if( !$confirm )
+			{?>
+			<div class="panelinfo">
+				<h3><?php printf( T_('Delete Group [%s]?'), $del_Group->get( 'name' ) )?></h3>
+
+				<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
+
+				<p>
+					<form action="b2users.php" method="get" class="inline">
+						<input type="hidden" name="action" value="deletegroup" />
+						<input type="hidden" name="id" value="<?php $del_Group->ID() ?>" />
+						<input type="hidden" name="confirm" value="1" />
+						
+						<input type="submit" value="<?php echo T_('I am sure!') ?>" class="search" />
+					</form>
+					<form action="b2users.php" method="get" class="inline">
+						<input type="submit" value="<?php echo T_('CANCEL') ?>" class="search" />
+					</form>
+				</p>
+
+			</div>
+		<?php
+			}
+			else
+			{ // confirmed
+				// Delete from DB:
+				$del_Group->dbdelete( true );
+				echo '<div class="panelinfo"><p>'.T_('Group deleted...').'</p></div>';
+			}
+			
+		}
+		else
+		{ // no permission
+			errors_add( T_('You have no permission!') );
+		}
 
 		break;
 
@@ -237,7 +356,14 @@ switch ($action)
 		$current_User->check_perm( 'users', 'edit', true );
 
 		param( 'edited_grp_ID', 'integer', true );
-		$edited_Group = $GroupCache->get_by_ID( $edited_grp_ID );
+		if( $edited_grp_ID == 0 )
+		{
+			$edited_Group = & new Group();
+		}
+		else
+		{
+			$edited_Group = $GroupCache->get_by_ID( $edited_grp_ID );
+		}
 
 		param( 'edited_grp_name', 'string', true );
 		$edited_Group->set( 'name', $edited_grp_name );
@@ -263,17 +389,30 @@ switch ($action)
 			$edited_Group->set( 'perm_users', $edited_grp_perm_users );
 		}
 
-		// Commit update to the DB:
-		$edited_Group->dbupdate();	
+		if( $edited_grp_ID == 0 )
+		{	// Insert into the DB:
+			$edited_Group->dbinsert();
+		}
+		else
+		{ // Commit update to the DB:
+			$edited_Group->dbupdate();
+		}
 		// Commit changes in cache:
 		$GroupCache->add( $edited_Group );
 
 		// remember to display the forms
 		$group = $edited_grp_ID;
 
-		echo '<div class="panelinfo">' . T_('Group updated.') . '</div>';
+		echo '<div class="panelinfo"><p>' . T_('Group updated.') . '</p></div>';
 		break;
 
+}
+
+if( count($errors) )
+{
+	echo '<div class="panelinfo">';
+	errors_display('', '');
+	echo '</div>';
 }
 
 
@@ -286,9 +425,12 @@ if( $current_User->check_perm( 'users', 'view', false ) )
 	$userlist = $DB->get_results( $request, ARRAY_A );
 
 
-	if( ($group != 0) )
+	if( ($group != 0) || in_array($action, array( 'newgroup', 'groupupdate' ))  )
 	{ // display group form
-		$edited_Group = $GroupCache->get_by_ID( $group );
+		if( $group != 0 )
+		{
+			$edited_Group = $GroupCache->get_by_ID( $group );
+		}
 		require(dirname(__FILE__). '/_users_groupform.php');
 	}
 

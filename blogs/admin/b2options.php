@@ -102,6 +102,14 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 						
 						$default_locale = $newdefault_locale;
 						
+						// re-activate locale
+						/*
+						$default_locale = locale_from_httpaccept();
+						debug_log('default_locale from HTTP_ACCEPT: '.$default_locale);
+						// Activate default locale:
+						locale_activate( $default_locale );
+						*/
+						
 						$status_update[] = T_('New default locale set.');
 					}
 					break;
@@ -218,7 +226,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 						$matches = array();
 						$sources = array();
 						$loc_vars = array();
-						$trans = array();
+						$ttrans = array();
 						foreach ($lines as $line) 
 						{
 							// echo 'LINE:', $line, '<br />';
@@ -245,9 +253,9 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 										}
 						
 										// Save the string
-										// $trans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => '".str_replace( "'", "\'", str_replace( '\"', '"', $msgstr ))."',";
-										// $trans[] = "\n\t\"$msgid\" => \"$msgstr\",";
-										$trans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => \"".str_replace( '$', '\$', $msgstr)."\",";
+										// $ttrans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => '".str_replace( "'", "\'", str_replace( '\"', '"', $msgstr ))."',";
+										// $ttrans[] = "\n\t\"$msgid\" => \"$msgstr\",";
+										$ttrans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => \"".str_replace( '$', '\$', $msgstr)."\",";
 						
 									}
 								}
@@ -291,8 +299,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 							elseif(strpos($line,'#, fuzzy') === 0) 
 								$fuzzy++;
 						}
-						
-						
+												
 						ksort( $loc_vars );
 						foreach( $loc_vars as $source => $c )
 						{
@@ -308,7 +315,7 @@ if( in_array( $action, array('update', 'reset', 'updatelocale', 'createlocale', 
 						fwrite( $fp, " */\n" );
 						fwrite( $fp, "\n\$trans['".$locales[$locale]['messages']."'] = array(" );
 						// echo '<pre>';
-						foreach( $trans as $line )
+						foreach( $ttrans as $line )
 						{
 							// echo htmlspecialchars( $line );
 							fwrite( $fp, $line );

@@ -12,7 +12,7 @@
 param( 'locale', 'string', '' );
 param( 'notransext', 'int', 0 );
 
-if( !empty($locale) )
+if( !empty($locale) && $action != 'extract' )
 {
 	param( 'template', 'string', '' );
 	?>
@@ -93,7 +93,7 @@ else
 	
 			<?php
 			form_text( 'newtime_difference', get_settings('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );
-			form_select( 'newdefault_locale', get_settings('default_locale'), 'locale_options', T_('Default locale'), T_('Default locale used for backoffice and notification messages.'));
+			form_select( 'newdefault_locale', get_settings('default_locale'), 'locale_options', T_('Default locale'), T_('Default locale. Overwritten from HTTP_ACCEPT_LANGUAGE header, user locale or blog locale (in this order).'));
 			?>
 			
 		</fieldset>

@@ -57,13 +57,13 @@ $DB = new DB( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
 $servertimenow = time();
 $localtimenow = $servertimenow + (get_settings('time_difference') * 3600);
 
+
 debug_log('default_locale from conf: '.$default_locale);
 locale_overwritefromDB();
 debug_log('default_locale from DB: '.$default_locale);
 // set default locale by autodetect
 $default_locale = locale_from_httpaccept();
 debug_log('default_locale from HTTP_ACCEPT: '.$default_locale);
-
 
 // Activate default locale:
 locale_activate( $default_locale );
@@ -85,6 +85,14 @@ if( $error = veriflog( $login_required ) )
 {	// Login failed:
 	require(dirname(__FILE__) . "/$core_dirout/$htsrv_subdir/login.php");
 }
+
+if( is_logged_in() && $current_User->get('locale') != $default_locale )
+{ // change locale to users preference
+	$default_locale = $current_User->get('locale');
+	locale_activate( $default_locale );
+	debug_log('default_locale from user profile: '.$default_locale);
+}
+
 
 // Load hacks file if it exists
 @include_once( dirname(__FILE__) . '/../conf/hacks.php' );

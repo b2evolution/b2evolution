@@ -14,7 +14,16 @@
 ?>
 <div class="panelblock">
 	<div style="float:right;"><a title="<?php echo T_('Close group profile'); ?>" href="b2users.php">[ X ]</a></div>
-	<h2><?php echo T_('Editing group:'), ' ', $edited_Group->disp('name') ?></h2>
+	<h2><?php
+	if( $edited_Group->get('ID') == 0 )
+	{
+		echo T_('Creating new group');
+	}
+	else
+	{
+		echo T_('Editing group:').' '.$edited_Group->get('name');
+	}
+	?></h2>
 
 	<form class="fform" method="post" action="b2users.php">
 		<input type="hidden" name="action" value="groupupdate" />
@@ -73,7 +82,7 @@
 		<fieldset>
 			<fieldset>
 				<div class="input">
-					<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
+					<input type="submit" name="submit" value="<?php if( $edited_Group->get('ID') == 0 ) echo T_('Create'); else echo T_('Update') ?>" class="search" />
 					<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
 				</div>
 			</fieldset>

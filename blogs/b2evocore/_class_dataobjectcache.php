@@ -1,7 +1,7 @@
 <?php
 /**
  * Data Object Cache Class
- * 
+ *
  * "data objects by fplanque" :P
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -29,7 +29,7 @@ class DataObjectCache
 	var $all_loaded = false;
 	/**#@-*/
 
-	/** 
+	/**
 	 * Constructor
 	 *
 	 * {@internal DataObjectCache::DataObjectCache(-) }}
@@ -47,10 +47,10 @@ class DataObjectCache
 		$this->dbtablename = $tablename;
 		$this->dbprefix = $prefix;
 		$this->dbIDname = $dbIDname;
-	}	
-	
+	}
 
-	/** 
+
+	/**
 	 * Load the cache **extensively**
 	 *
 	 * {@internal DataObjectCache::load_all(-) }}
@@ -61,7 +61,7 @@ class DataObjectCache
 
 		if( $this->all_loaded )
 			return	false;	// Already loaded;
-		
+
 		debug_log( "Loading <strong>$this->objtype(ALL)</strong> into cache" );
 		$sql = "SELECT * FROM $this->dbtablename";
 		$rows = $DB->get_results( $sql );
@@ -73,15 +73,15 @@ class DataObjectCache
 			// $obj = $this->cache[ $row->$dbIDname ];
 			// $obj->disp( 'name' );
 		}
-	
+
 		$this->all_loaded = true;
 
 		return true;
 	}
 
 
-	/** 
-	 * Load a list of objects into the cache 
+	/**
+	 * Load a list of objects into the cache
 	 *
 	 * {@internal DataObjectCache::load_list(-) }}
 	 *
@@ -103,9 +103,9 @@ class DataObjectCache
 			// $obj->disp( 'name' );
 		}
 	}
-	
 
-	/** 
+
+	/**
 	 * Add a dataobject to the cache
 	 *
 	 * {@internal DataObjectCache::add(-) }}
@@ -120,8 +120,8 @@ class DataObjectCache
 		return false;
 	}
 
-	
-	/** 
+
+	/**
 	 * Clear the cache **extensively**
 	 *
 	 * {@internal DataObjectCache::clear(-) }}
@@ -133,7 +133,7 @@ class DataObjectCache
 	}
 
 
-	/** 
+	/**
 	 * Get an object from cache by ID
 	 *
 	 * Load the cache if necessary
@@ -143,7 +143,7 @@ class DataObjectCache
 	 * @param integer ID of object to load
 	 * @param boolean false if you want to return false on error
 	 */
-	function get_by_ID( $req_ID, $halt_on_error = true ) 
+	function get_by_ID( $req_ID, $halt_on_error = true )
 	{
 		global $DB;
 
@@ -168,40 +168,41 @@ class DataObjectCache
 				$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
 			}
 		}
-	
-		if( empty( $this->cache[ $req_ID ] ) ) 
+
+		if( empty( $this->cache[ $req_ID ] ) )
 		{	// Requested object does not exist
 			if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
 			return false;
 		}
-	
+
 		return $this->cache[ $req_ID ];
 	}
 
 
-	/** 
-	 * Display option list with cache contents
+	/**
+	 * Display form option list with cache contents
 	 *
 	 * Load the cache if necessary
 	 *
 	 * {@internal DataObjectCache::get_by_ID(-) }}
+	 *
+	 * @param integer selected ID
 	 */
 	function option_list( $default = 0 )
 	{
 		global $cache_Groups;
-	
+		
 		if( ! $this->all_loaded )
 			$this->load_all();
-		
+
 		foreach( $this->cache as $loop_Obj )
 		{
 			echo '<option value="'.$loop_Obj->ID.'"';
 			if( $loop_Obj->ID == $default ) echo ' selected="selected"';
 			echo '>';
 			$loop_Obj->disp( 'name' );
-			echo '</option>';
+			echo '</option>'."\n";
 		}
 	}
-	
 }
 ?>

@@ -60,7 +60,8 @@
 	}
 	else
 	{
-		echo T_('Profile for:').' '.$edited_User->get('nickname').' ('.$edited_User->get('login').')';
+		echo T_('Profile for:').' '.$edited_User->get('firstname').' '.$edited_User->get('lastname')
+					.' ['.$edited_User->get('login').']';
 	}	
 	?></h2>
 	
@@ -184,23 +185,18 @@
 
 	<fieldset>
 		<legend><?php echo T_('User rights') ?></legend>
-		
 		<?php
-		/*<label for="edited_user_level"><?php echo T_('Level')?></label>
-		<input type="text" name="edited_user_level" value="<?php $edited_User->disp('level')?>" />
-		<span class="notes">[0 - 10]</span>*/
-			
 		form_text(  'edited_user_level', $edited_User->get('level'), 2, T_('Level'), '[0 - 10]', 2 );
 				
 		if(  $edited_User->get('ID') != 1 )
 		{
-			$chosengroup = ( $edited_User->Group === NULL ) ? '' : $edited_User->Group->get('ID');
+			$chosengroup = ( $edited_User->Group === NULL ) ? get_settings('pref_newusers_grp_ID') : $edited_User->Group->get('ID');
 			form_select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
 		}
 		else
 		{
 			echo '<input type="hidden" name="edited_user_grp_ID" value="1" />';
-			form_info(  T_('User group'), $edited_User->Group->get('name') );
+			form_info( T_('User group'), $edited_User->Group->get('name') );
 		}
 		?>
 	</fieldset>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.8.9\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-04-26 23:50+0100\n"
+"PO-Revision-Date: 2004-04-28 03:14+0100\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team: dAniel hAhler <daniel@thequod.de>\n"
 "MIME-Version: 1.0\n"
@@ -1171,7 +1171,6 @@ msgid "(you cannot update that file/template: must make it writable, e.g. CHMOD 
 msgstr "(du kannst diese Datei/Vorlage nicht aktualisieren: musst es schreibbar machen, zB CHMOD 766)"
 
 #: ..\..\..\admin\b2template.php:100
-#, fuzzy
 msgid "This screen allows you to edit the <strong>custom skin</strong> (located under /skins/custom). "
 msgstr "Diese Seite erlaubt dir, das <strong>Custom Skin</strong> zu editieren (liegt im Verzeichnis /skins/custom)."
 
@@ -1475,9 +1474,8 @@ msgid "Short Name"
 msgstr "Kurzer Name"
 
 #: ..\..\..\admin\_blogs_form.php:33
-#, fuzzy
 msgid "Main Locale"
-msgstr "Hauptsprache"
+msgstr "Haupt-Locale"
 
 #: ..\..\..\admin\_blogs_form.php:38
 msgid "Access parameters"
@@ -1594,9 +1592,8 @@ msgstr "Mitglieder"
 
 #: ..\..\..\admin\_blogs_form.php:98
 #: ..\..\..\admin\_blogs_form.php:188
-#, fuzzy
 msgid "Permission to read protected posts"
-msgstr "Erlaubnis, um Blogeigenschaften zu ändern"
+msgstr "Erlaubnis, geschützte Einträge zu lesen"
 
 #: ..\..\..\admin\_blogs_form.php:105
 #: ..\..\..\admin\_blogs_form.php:119
@@ -1763,9 +1760,8 @@ msgstr "&quot;Stub&quot; URL-Name"
 #: ..\..\..\admin\_set_regional.form.php:244
 #: ..\..\..\admin\_users_form.php:59
 #: ..\..\..\skins\_profile.php:68
-#, fuzzy
 msgid "Locale"
-msgstr "Lokal"
+msgstr "Locale"
 
 #: ..\..\..\admin\_blogs_list.php:45
 #: ..\..\..\admin\_cats_list.php:29
@@ -1945,7 +1941,6 @@ msgid "Published (Public)"
 msgstr "Veröffentlicht (öffentlich)"
 
 #: ..\..\..\admin\_edit_form.php:297
-#, fuzzy
 msgid "The post will be published but visible only by logged-in blog members"
 msgstr "Der Eintrag wird veröffentlicht, aber ist nur für eingeloggte Mitglieder sichtbar"
 
@@ -2026,18 +2021,16 @@ msgid "Closed"
 msgstr "Geschlossen"
 
 #: ..\..\..\admin\_edit_form.php:420
-#, fuzzy
 msgid "Visitors cannot see nor leave comments on this post."
-msgstr "Besucher können Kommentare zu diesem Eintrag hinterlassen."
+msgstr "Besucher können Kommentare weder sehen noch hinterlassen."
 
 #: ..\..\..\admin\_edit_form.php:420
 msgid "Disabled"
 msgstr "Abgeschaltet"
 
 #: ..\..\..\admin\_edit_form.php:425
-#, fuzzy
 msgid "Renderers"
-msgstr "Referer"
+msgstr "Renderer"
 
 #: ..\..\..\admin\_edit_form.php:495
 msgid "Comment info"
@@ -2201,9 +2194,8 @@ msgstr "Pingback von:"
 #: ..\..\..\admin\_edit_showposts.php:255
 #: ..\..\..\skins\_feedback.php:126
 #: ..\..\..\skins\_lastcomments.php:39
-#, fuzzy
 msgid "Permamnent link to this comment"
-msgstr "Permanenter Link zu diesem Eintrag"
+msgstr "Permanenter Link zu diesem Kommentar"
 
 #: ..\..\..\admin\_edit_showposts.php:266
 msgid ""
@@ -2464,7 +2456,7 @@ msgstr "Aktualisieren"
 
 #: ..\..\..\admin\_set_plugins.form.php:18
 msgid "Rendering plug-ins"
-msgstr ""
+msgstr "Render-Plugins"
 
 #: ..\..\..\admin\_set_plugins.form.php:21
 #: ..\..\..\admin\_set_plugins.form.php:45
@@ -2477,11 +2469,11 @@ msgstr "Anwenden"
 
 #: ..\..\..\admin\_set_plugins.form.php:42
 msgid "Toolbar plug-ins"
-msgstr ""
+msgstr "Toolbar Plugins"
 
 #: ..\..\..\admin\_set_regional.form.php:16
 msgid "Note: default locale is not enabled."
-msgstr ""
+msgstr "Beachte: Standard-Locale ist nicht eingeschaltet."
 
 #: ..\..\..\admin\_set_regional.form.php:24
 msgid "Regional settings"
@@ -2502,7 +2494,7 @@ msgstr "Falls du nicht in der Zeitzone des Servers bist. Aktuelle Serverzeit ist
 
 #: ..\..\..\admin\_set_regional.form.php:28
 msgid "Default locale"
-msgstr ""
+msgstr "Standard-Locale"
 
 #: ..\..\..\admin\_set_regional.form.php:28
 msgid "Default locale used for backoffice and notification messages."
@@ -2510,15 +2502,15 @@ msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:34
 msgid "Available locales"
-msgstr ""
+msgstr "Verfügbare Locales"
 
 #: ..\..\..\admin\_set_regional.form.php:40
 msgid "Hide translation percentages"
-msgstr ""
+msgstr "Verstecke Übersetzungs-Prozentanzeige"
 
 #: ..\..\..\admin\_set_regional.form.php:45
 msgid "Show translation percentages"
-msgstr ""
+msgstr "Zeige Übersetzungs-Prozentanzeige"
 
 #: ..\..\..\admin\_set_regional.form.php:54
 #: ..\..\..\admin\_set_regional.form.php:245
@@ -2537,7 +2529,7 @@ msgstr "Zeitformat"
 
 #: ..\..\..\admin\_set_regional.form.php:60
 msgid "Strings"
-msgstr ""
+msgstr "Zeichenketten"
 
 #: ..\..\..\admin\_set_regional.form.php:61
 msgid "Translated"
@@ -2574,7 +2566,7 @@ msgstr "Verringere Priorität"
 
 #: ..\..\..\admin\_set_regional.form.php:201
 msgid "new"
-msgstr ""
+msgstr "neu"
 
 #: ..\..\..\admin\_set_regional.form.php:201
 msgid "Use as template for &quot;Create New&quot; form"
@@ -2582,7 +2574,7 @@ msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:206
 msgid "Delete from database!"
-msgstr ""
+msgstr "Aus der Datenbank löschen!"
 
 #: ..\..\..\admin\_set_regional.form.php:218
 msgid "Are you sure you want to reset?"
@@ -2598,7 +2590,7 @@ msgstr ""
 
 #: ..\..\..\admin\_set_regional.form.php:230
 msgid "Edit / Create new Locale"
-msgstr ""
+msgstr "Editiere / Erstelle neue Locale"
 
 #: ..\..\..\admin\_set_regional.form.php:231
 msgid "This form lets you edit an existing locale or create a new one, if the locale does not exist yet. Use the &quot;New&quot; icon next to the existing locales to use them as template here."
@@ -2620,7 +2612,7 @@ msgstr "Erstellen / Editieren"
 #: ..\..\..\admin\_set_regional.form.php:262
 #, php-format
 msgid "This will replace locale \\'%s\\'. Ok?"
-msgstr ""
+msgstr "Das wird Locale \\'%s\\' ersetzen. Ok?"
 
 #: ..\..\..\admin\_set_regional.form.php:267
 #, php-format
@@ -2884,7 +2876,7 @@ msgstr "Das Standardskin [%s] existiert nicht. Es muss in der %quot;Stub&quot;-D
 #: ..\..\..\b2evocore\_class_blog.php:280
 #, php-format
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
-msgstr ""
+msgstr "FEHLER! Löschen fehlgeschlagen! Du wirst die Datei [%s] von Hand löschen müssen."
 
 #: ..\..\..\b2evocore\_class_calendar.php:166
 #, php-format
@@ -2963,7 +2955,7 @@ msgstr "W6auml;hle Kategorie"
 
 #: ..\..\..\b2evocore\_class_item.php:369
 msgid "This post is not published. You cannot leave comments."
-msgstr ""
+msgstr "Dieser Eintrag ist nicht veröffentlicht. Du kannst keinen Kommentar hinterlassen."
 
 #: ..\..\..\b2evocore\_class_item.php:381
 msgid "Comments are closed for this post."
@@ -2988,11 +2980,11 @@ msgstr "Zeige Feedback / Hinterlasse einen Kommentar"
 
 #: ..\..\..\b2evocore\_class_item.php:672
 msgid "Send feeback"
-msgstr ""
+msgstr "Sende Feedback"
 
 #: ..\..\..\b2evocore\_class_item.php:673
 msgid "1 feedback"
-msgstr ""
+msgstr "1 Feedback"
 
 #: ..\..\..\b2evocore\_class_item.php:674
 #, php-format
@@ -3815,88 +3807,72 @@ msgid "Central"
 msgstr "Zentral"
 
 #: ..\..\..\conf\_locales.php:47
-#, fuzzy
 msgid "Czech (CZ)"
-msgstr "Tschechisch"
+msgstr "Tschechisch (CZ)"
 
 #: ..\..\..\conf\_locales.php:54
-#, fuzzy
 msgid "German (DE)"
-msgstr "Deutsch"
+msgstr "Deutsch (DE)"
 
 #: ..\..\..\conf\_locales.php:61
-#, fuzzy
 msgid "English (EU)"
-msgstr "Englisch"
+msgstr "Englisch (EU)"
 
 #: ..\..\..\conf\_locales.php:68
-#, fuzzy
 msgid "English (UK)"
-msgstr "Englisch"
+msgstr "Englisch (UK)"
 
 #: ..\..\..\conf\_locales.php:75
-#, fuzzy
 msgid "English (US)"
-msgstr "Englisch"
+msgstr "Englisch (US)"
 
 #: ..\..\..\conf\_locales.php:82
-#, fuzzy
 msgid "Spanish (ES)"
-msgstr "Spanisch"
+msgstr "Spanisch (ES)"
 
 #: ..\..\..\conf\_locales.php:89
-#, fuzzy
 msgid "French (FR)"
-msgstr "Französisch"
+msgstr "Französisch (FR)"
 
 #: ..\..\..\conf\_locales.php:96
-#, fuzzy
 msgid "Italian (IT)"
-msgstr "Italienisch"
+msgstr "Italienisch (IT)"
 
 #: ..\..\..\conf\_locales.php:103
-#, fuzzy
 msgid "Japanese (JP)"
-msgstr "Japanisch"
+msgstr "Japanisch (JP)"
 
 #: ..\..\..\conf\_locales.php:110
-#, fuzzy
 msgid "Lithuanian (LT)"
-msgstr "Litauisch"
+msgstr "Litauisch (LT)"
 
 #: ..\..\..\conf\_locales.php:117
-#, fuzzy
 msgid "Bokm&aring;l (NO)"
-msgstr "Norwegisch"
+msgstr "Norwegisch (NO)"
 
 #: ..\..\..\conf\_locales.php:124
-#, fuzzy
 msgid "Dutch (NL)"
-msgstr "Holländisch"
+msgstr "Holländisch (NL)"
 
 #: ..\..\..\conf\_locales.php:131
-#, fuzzy
 msgid "Portuguese (BR)"
-msgstr "Portugiesisch"
+msgstr "Portugiesisch (BR)"
 
 #: ..\..\..\conf\_locales.php:138
-#, fuzzy
 msgid "Swedish (SE)"
-msgstr "Schwedisch"
+msgstr "Schwedisch (SE)"
 
 #: ..\..\..\conf\_locales.php:145
-#, fuzzy
 msgid "Simpl. Chinese (CN)"
-msgstr "Chinesisch (vereinfacht)"
+msgstr "Vereinf. Chinesisch (CN)"
 
 #: ..\..\..\conf\_locales.php:152
 msgid "Trad. Chinese (TW)"
-msgstr ""
+msgstr "Trad. Chinesisch (TW)"
 
 #: ..\..\..\htsrv\comment_post.php:24
-#, fuzzy
 msgid "You cannot leave comments on this post!"
-msgstr "Besucher können Kommentare zu diesem Eintrag hinterlassen."
+msgstr "Du kannst zu diesem Eintrag keinen Kommentar hinterlassen!"
 
 #: ..\..\..\htsrv\comment_post.php:47
 msgid "Please fill in the name field"
@@ -3912,7 +3888,7 @@ msgstr "Die angegebene EMail-Adresse ist ungültig"
 
 #: ..\..\..\htsrv\comment_post.php:77
 msgid "Please do not send empty comment"
-msgstr ""
+msgstr "Bitte schicke keine leeren Kommentare"
 
 #: ..\..\..\htsrv\comment_post.php:94
 msgid "You can only post a new comment every 30 seconds."
@@ -4249,14 +4225,13 @@ msgid "Clean Permalinks! :idea:"
 msgstr "Saubere Permalinks! :idea:"
 
 #: ..\..\..\install\_functions_create.php:536
-#, fuzzy
 msgid ""
 "<p>b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.</p>\n"
 "\n"
 "<p>Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the Options screen... (check 'use extra-path info')</p>"
 msgstr ""
 "<p>b2evolution benutzt standardmässig old-style Permalinks und Feedback-Links. Dies dient zur maximalen Kompatibilität mit verschiedenen Webserver-Konfigurationen.</p>\n"
-"<p>Nichtsdestoweniger, wenn du dich behaglich im Umgang mit b2evolution fühlst, solltest du versuchen, &quot;saubere Permalinks&quot; in der Datei <code>/conf/_advanced.php</code> zu aktivieren... (<code>$use_extra_path_info = 1;</code>)</p>"
+"<p>Nichtsdestotrotz, wenn du dich behaglich im Umgang mit b2evolution fühlst, solltest du versuchen, &quot;saubere Permalinks&quot; in den Einstellungen einzuschalten (aktiviere 'benutze Extra-Path Info')</p>"
 
 #: ..\..\..\install\_functions_create.php:542
 msgid "Apache optimization... :idea:"
@@ -4336,13 +4311,17 @@ msgid ""
 "\n"
 "<p>You can create additionnal blogs or delte unwanted blogs from the blogs admin.</p>"
 msgstr ""
+"<p>Standardmässig kommt b2evolution mit vier Blogs, namentlich 'Blog All', 'Blog A', 'Blog B' und 'Blogroll'.</p>\n"
+"\n"
+"<p>Einige dieser Blogs spielen eine spezielle Rolle. Lies mehr darüber auf der zugehörigen Seite.</p>\n"
+"\n"
+"<p>Du kannst im Adminbereich weitere Blogs erstellen oder ungewollte löschen.</p>"
 
 #: ..\..\..\install\_functions_create.php:582
 msgid "File permissions!"
 msgstr "Dateirechte!"
 
 #: ..\..\..\install\_functions_create.php:583
-#, fuzzy
 msgid ""
 "<p><strong>This is pretty important. Make sure you read this in order to have a fully functionning installation!</strong></p>\n"
 "\n"
@@ -4360,11 +4339,11 @@ msgstr ""
 "\n"
 "<ul>\n"
 "\n"
-"  <li>Um neue Blogs aus dem Adminbereich zu erstellen oder statische Seiten zu generieren muss das Verzeichnis <code>/blogs</code> schreibbar vom PHP-Prozess des Servers sein. Du könntest ein chmod auf dieses Verzeichnis machen müssen. Falls du es nicht genau weisst, probiere ein chmod 777. Du kannst das mit einem FTP-Programm, einer Unix Shell oder einem Web-Dateimanager (wie dem in cPanel oder confixx) machen. Falls dein Server unter Windows läuft, brauchst du wahrscheinlich gar nichts zu ändern.</li>\n"
+"\t<li>Um neue Blogs aus dem Adminbereich zu erstellen oder statische Seiten zu generieren muss das Verzeichnis <code>/blogs</code> schreibbar vom PHP-Prozess des Servers sein. Du könntest ein chmod auf dieses Verzeichnis machen müssen. Falls du es nicht genau weisst, probiere ein chmod 777. Du kannst das mit einem FTP-Programm, einer Unix Shell oder einem Web-Dateimanager (wie dem in cPanel oder confixx) machen. Falls dein Server unter Windows läuft, brauchst du wahrscheinlich gar nichts zu ändern.</li>\n"
 "\n"
-"  <li>Um den Vorlagen-Editor für das individuelle Skin zu benutzen, muss das Verzeichnis <code>/skins/custom</code> schreibbar vom PHP-Prozess des Servers sein. Siehe oben.</li>\n"
+"\t<li>Um den Vorlagen-Editor für das individuelle Skin zu benutzen, muss das Verzeichnis <code>/skins/custom</code> schreibbar vom PHP-Prozess des Servers sein. Siehe oben.</li>\n"
 "\n"
-"  <li>Das folgende ist nicht notwendig, aber erhöht deine Sicherheit: mache ein chmod 644 auf alle Dateien im Verzeichnis <code>/blogs/conf</code>, so dass keiner ausser dir sie überschreiben kann. Wenn dein Server unter Windows läuft, setze die Dateien auf 'nur-lesen'.</li>\n"
+"\t<li>Das folgende ist nicht notwendig, aber erhöht deine Sicherheit: mache ein chmod 644 auf alle Dateien im Verzeichnis <code>/blogs/conf</code>, so dass keiner ausser dir sie überschreiben kann. Wenn dein Server unter Windows läuft, setze die Dateien auf 'nur-lesen'.</li>\n"
 "\n"
 "</ul>"
 
@@ -4430,7 +4409,7 @@ msgstr ""
 
 #: ..\..\..\install\_functions_create.php:667
 msgid "Hi, this is a comment.<br />To delete a comment, just log in, and view the posts' comments, there you will have the option to edit or delete them."
-msgstr ""
+msgstr "Hi, dies ist ein Kommentar.<br />Um einen Kommentar zu löschen, log dich einfach ein und betrachte die Kommentare des Eintrags. Von dort aus hast du die Option zum Editieren oder Löschen."
 
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:54
 msgid "INSerted [Alt-I]"
