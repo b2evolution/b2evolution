@@ -48,7 +48,7 @@ require_once dirname(__FILE__).'/_header.php';
 require_once dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_class_filemanager.php';
 
 $admin_tab = 'files';
-$admin_pagetitle = T_('File Manager').' (alpha)';
+$admin_pagetitle = T_('Filemanager').' (beta)';
 
 param( 'path', 'string', '' );       // the path relative to the root dir
 param( 'action', 'string', '' );     // 3.. 2.. 1.. action :)
@@ -103,7 +103,7 @@ if( $action == '' && $file != '' && $curFile )
 		?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 		<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 		<head>
-			<title><?php echo $file.' :: '.T_('b2evolution Filemanager') ?></title>
+			<title><?php echo $file.' :: '.$app_name.' '.T_('Filemanager') ?></title>
 			<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 			<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
 			<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
@@ -134,7 +134,7 @@ if( $action == '' && $file != '' && $curFile )
 				/*<a href="javascript:window.close()"><img class="center" src="<?php echo $admin_url.'img/xross.gif' ?>" width="13" height="13" alt="[X]" title="<?php echo T_('Close this window') ?>" /></a>*/
 
 				echo '<div class="fileheader">';
-				echo T_('file').': '.$file.'<br />';
+				echo T_('File').': '.$file.'<br />';
 
 				if( !count($buffer) )
 				{
@@ -142,7 +142,7 @@ if( $action == '' && $file != '' && $curFile )
 				}
 				else
 				{
-					echo count($buffer).' '.T_('lines').'<br />';
+					printf( T_('%d lines'), count($buffer) ).'<br />';
 					$linenr_width = strlen( count($buffer)+1 );
 
 					?>
@@ -265,7 +265,7 @@ if( $selaction != '' )
 					{
 						if( $lFile->isDir() )
 						{
-							$msg_action .= sprintf('<li>'.T_('Directory [%s]'."</li>\n"), $file);
+							$msg_action .= sprintf('<li>'.T_('Directory [%s]')."</li>\n", $file);
 						}
 						else $msg_action .= sprintf('<li>'.T_('File [%s]')."</li>\n", $file);
 					}
@@ -284,7 +284,7 @@ if( $selaction != '' )
 						}
 
 						$msg_action .= $Fileman->form_hiddeninputs()."\n"
-												.form_text( 'zipname', '', 20, T_('Archive filename'), T_('This is the filename that will be send to you.'), 80, '', 'text', false )."\n"
+												.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is file's name that will be send to you."), 80, '', 'text', false )."\n"
 												.form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n"
 												.'<div class="input"><input type="submit" name="selaction" value="'.T_('Download').'" class="search" /></div>
 					</fielset>
@@ -447,7 +447,7 @@ switch( $action ) // {{{ (we catched empty action before)
 		<label for="form_newname">'.sprintf( T_('New name for [%s]:'), $file ).'</label>
 		<input type="text" id="form_newname" name="newname" value="'
 		.format_to_output( empty($newname) ? $file : $newname, 'formvalue' ).'" maxlength="255" size="30" />
-		<input type="submit" value="'.format_to_output( T_('Rename it'), 'formvalue' ).'" />
+		<input type="submit" value="'.format_to_output( T_('Rename !'), 'formvalue' ).'" />
 		</form>';
 		$js_focus = 'document.form_rename.form_newname';
 
@@ -711,7 +711,7 @@ if( isset( $msg_action )
 		?>
 		<form action="files.php" name="unfilter" class="toolbaritem">
 			<?php echo $Fileman->form_hiddeninputs( NULL, NULL, false, false ) ?>
-			<input type="submit" value="<?php echo format_to_output( T_('No Filter'), 'formvalue' ) ?>" />
+			<input type="submit" value="<?php echo format_to_output( T_('No filter'), 'formvalue' ) ?>" />
 		</form>
 		<?php
 		}
@@ -772,7 +772,7 @@ while( $lFile = $Fileman->getNextFile() )
 		if( $i%2 ) echo ' class="odd"';
 		?> onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();">
 		<td class="checkbox">
-			<input title="<?php echo T_('select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $lFile->getName(), 'formvalue' ) ?>" id="cb_filename_<?php echo $i ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
+			<input title="<?php echo T_('Select this file') ?>" type="checkbox" name="selectedfiles[]" value="<?php echo format_to_output( $lFile->getName(), 'formvalue' ) ?>" id="cb_filename_<?php echo $i ?>" onclick="document.getElementsByName('selectedfiles[]')[<?php echo $i ?>].click();"<?php if( $checkall ) echo ' checked="checked" '?> />
 		</td>
 		<td class="icon" onclick="window.location.href = '<?php echo $Fileman->getLinkCurfile() ?>'">
 			<?php echo $Fileman->getIcon( $lFile, 'imgtag' ) ?>
@@ -883,7 +883,7 @@ function openselectedfiles( checkonly )
 		}
 		else
 		{ // Non-JS
-			echo ($checkall) ? T_('uncheck all_1') : T_('check all');
+			echo ($checkall) ? T_('uncheck all') : T_('check all');
 		}
 		?></a>
 	&mdash; <strong><?php echo T_('with selected files:') ?> </strong>
@@ -913,7 +913,7 @@ function openselectedfiles( checkonly )
 	<form class="toolbaritem" action="files.php" method="post">
 		<a id="options_toggle" href="<?php echo url_add_param( $Fileman->curl(), ( !$options_show ? 'options_show=1' : '' ) ) ?>"
 			onclick="return toggle_options();"><?php
-			echo ( $options_show ) ? T_('hide options') : T_('show options') ?></a>
+			echo ( $options_show ) ? T_('Hide options') : T_('Show options') ?></a>
 
 		<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
 			<input type="checkbox" id="option_dirsattop" name="option_dirsattop" value="1"<?php if( $UserSettings->get('fm_dirsattop') ) echo ' checked="checked"' ?> />

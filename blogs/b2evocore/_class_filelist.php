@@ -359,7 +359,7 @@ class Filelist
 	{
 		if( $this->filterString === NULL )
 		{
-			return T_('no filter');
+			return T_('No filter');
 		}
 		else
 		{

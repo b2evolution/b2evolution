@@ -70,7 +70,7 @@ elseif( !empty( $post_id ) )
 	$message .= "\n\n";
 }
 
-$message .= T_('This message was sent via the messaging system on') . ' ' . $Blog->name . ".\n";
+$message .= sprintf( T_('This message was sent via the messaging system on %s.'), $Blog->name ).".\n";
 $message .= $Blog->get('url') . "\n";
 
 

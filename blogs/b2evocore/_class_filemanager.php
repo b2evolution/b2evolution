@@ -384,7 +384,7 @@ class FileManager extends Filelist
 		$r .= '" title="'
 					.( ($this->order == $type && !$this->isSortingAsc($type))
 						|| ( $this->order != $type && $this->isSortingAsc($type) )
-							? T_('sort ascending by this column') : T_('sort descending by this column')
+							? T_('Sort ascending by this column') : T_('Sort descending by this column')
 					).'">'.$atext;
 
 		if( $this->order == $type )
@@ -424,7 +424,7 @@ class FileManager extends Filelist
 			switch( $File )
 			{
 				case 'parent':
-					return T_('go to parent directory');
+					return T_('Go to parent directory');
 				case 'home':
 					return T_('home directory');
 				case 'descending':
@@ -434,7 +434,7 @@ class FileManager extends Filelist
 				case 'edit':
 					return T_('Edit');
 				case 'copymove':
-					return T_('Copy/Move');
+					return T_('Copy / Move');
 				case 'rename':
 					return T_('Rename');
 				case 'delete':
