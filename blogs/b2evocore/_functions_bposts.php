@@ -924,92 +924,117 @@ function the_author( $format = 'htmlbody' )
 			$author = $authordata['user_nickname'];
 	}
 	
-	echo format_to_post( $author, $format );
+	echo format_to_output( $author, $format );
 }
 
 
 /*
  * the_author_login(-)
  */
-function the_author_login() {
-	global $id,$authordata;	echo $authordata['user_login'];
+function the_author_login( $format = 'htmlbody' ) 
+{
+	global $id,$authordata;
+	echo format_to_output( $authordata['user_login'], $format );
 }
 
 /*
  * the_author_firstname(-)
  */
-function the_author_firstname() {
-	global $id,$authordata;	echo $authordata['user_firstname'];
+function the_author_firstname( $format = 'htmlbody' ) 
+{
+	global $id,$authordata;	
+	echo format_to_output( $authordata['user_firstname'], $format );
 }
 
 /*
  * the_author_lastname(-)
  */
-function the_author_lastname() {
-	global $id,$authordata;	echo $authordata['user_lastname'];
+function the_author_lastname( $format = 'htmlbody' ) 
+{
+	global $id,$authordata;	
+	echo format_to_output( $authordata['user_lastname'], $format );
 }
 
 /*
  * the_author_nickname(-)
  */
-function the_author_nickname() {
-	global $id,$authordata;	echo $authordata['user_nickname'];
+function the_author_nickname( $format = 'htmlbody' ) 
+{
+	global $id,$authordata;	
+	echo format_to_output( $authordata['user_nickname'], $format );
 }
 
 /*
  * the_author_ID(-)
  */
-function the_author_ID() {
-	global $id,$authordata;	echo $authordata['ID'];
+function the_author_ID() 
+{
+	global $id,$authordata;		
+	echo $authordata['ID'];
 }
 
 /*
  * the_author_email(-)
  */
-function the_author_email() {
-	global $id,$authordata;	echo antispambot($authordata['user_email']);
+function the_author_email( $format = 'raw' ) 
+{
+	global $id,$authordata;			
+	echo format_to_output( antispambot($authordata['user_email']), $format );
 }
 
 /*
  * the_author_url(-)
  */
-function the_author_url() {
-	global $id,$authordata;	echo $authordata['user_url'];
+function the_author_url( $format = 'raw' ) 
+{
+	global $id,$authordata;			
+	echo format_to_output( $authordata['user_url'], $format );
 }
 
 /*
  * the_author_icq(-)
  */
-function the_author_icq() {
-	global $id,$authordata;	echo $authordata['user_icq'];
+function the_author_icq( $format = 'raw' ) 
+{
+	global $id,$authordata;			
+	echo format_to_output( $authordata['user_icq'], $format );
 }
 
 /*
  * the_author_aim(-)
  */
-function the_author_aim() {
-	global $id,$authordata;	echo str_replace(' ', '+', $authordata['user_aim']);
+function the_author_aim( $format = 'raw' ) 
+{
+	global $id,$authordata;			
+	echo format_to_output( str_replace(' ', '+', $authordata['user_aim']), $format );
 }
 
 /*
  * the_author_yim(-)
  */
-function the_author_yim() {
-	global $id,$authordata;	echo $authordata['user_yim'];
+function the_author_yim( $format = 'raw' ) 
+{
+	global $id,$authordata;			
+	echo format_to_output( $authordata['user_yim'], $format );
 }
 
 /*
  * the_author_msn(-)
  */
-function the_author_msn() {
-	global $id,$authordata;	echo $authordata['user_msn'];
+function the_author_msn( $format = 'raw' ) 
+{
+	global $id,$authordata;	
+	echo format_to_output( $authordata['user_msn'], $format );
 }
 
 /*
  * the_author_posts(-)
  */
-function the_author_posts() {
-	global $id,$postdata;	$posts=get_usernumposts($postdata['Author_ID']);	echo $posts;
+function the_author_posts() 
+{
+	global $id,$postdata;	
+	$posts=get_usernumposts($postdata['Author_ID']);
+	echo $posts;
 }
 
 /*****
