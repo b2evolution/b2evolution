@@ -128,6 +128,13 @@ class Item extends DataObject
 	 * @var integer
 	 */
 	var $blog_ID;
+	/**
+	 * The Blog of the Item (lazy filled, use {@link getBlog()} to access it.
+	 * @access protected
+	 * @var Blog
+	 */
+	var $Blog;
+
 
 	/**
 	 * Constructor
@@ -455,10 +462,7 @@ class Item extends DataObject
 	 */
 	function blog_name( $format = 'htmlbody' )
 	{
-		global $BlogCache;
-
-		$current_Blog =& $BlogCache->get_by_ID( $this->blog_ID );
-
+		$current_Blog =& $this->getBlog();
 		$current_Blog->name( $format );
 	}
 
@@ -1811,10 +1815,29 @@ class Item extends DataObject
 	}
 
 
+	/**
+	 * Get the Blog object for the Item.
+	 *
+	 * @return Blog
+	 */
+	function &getBlog()
+	{
+		if( is_null($this->Blog) )
+		{
+			global $BlogCache;
+			$this->Blog =& $BlogCache->get_by_ID( $this->blog_ID );
+		}
+
+		return $this->Blog;
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.31  2005/03/13 23:56:30  blueyed
+ * getBlog() added
+ *
  * Revision 1.30  2005/03/13 23:28:27  blueyed
  * blog_name() template function added, doc, beautified
  *
