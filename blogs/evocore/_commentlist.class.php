@@ -152,7 +152,7 @@ class CommentList extends DataObjectList
 				$this->Obj[$i] = new Comment( $row ); // COPY !!??
 
 				// To avoid potential future waste, cache this object:
-				$this->DataObjectCache->add( $this->Obj[$i] );
+				// $this->DataObjectCache->add( $this->Obj[$i] );
 
 				$i++;
 			}
@@ -182,6 +182,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.7  2005/04/07 17:55:50  fplanque
+ * minor changes
+ *
  * Revision 1.6  2005/03/14 20:22:19  fplanque
  * refactoring, some cacheing optimization
  *

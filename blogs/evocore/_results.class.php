@@ -166,8 +166,10 @@ class Results extends Widget
 			{ // $order is not an empty string:
 				$this->asc = strstr( $this->order, 'A' ) ? ' ASC' : ' DESC';
 			}
-			else // if isset( $this->cols ) do we need this ??
-			{	// We'll have to find the first order:
+			elseif( isset( $this->cols ) )
+			{	// We still have columns specified (may not be the case, example: ArchievList)
+				// We'll have to find the first order:
+
 				foreach( $this->cols as $col )
 				{
 					if( isset( $col['order'] ) )
@@ -891,6 +893,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.19  2005/04/07 17:55:50  fplanque
+ * minor changes
+ *
  * Revision 1.18  2005/04/06 19:11:02  fplanque
  * refactored Results class:
  * all col params are now passed through a 2 dimensional table which allows easier parametering of large tables with optional columns

@@ -387,8 +387,8 @@ class Comment extends DataObject
 		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID );
 		$form_url = url_add_param( $form_url, 'post_id='.$this->Item->ID );
 
-		if( $text == '#' ) $text = '<img src="'.$img_url.'envelope.gif" height="10" width="13" class="middle" alt="'.T_('EMail').'" />';
 		if( $title == '#' ) $title = T_('Send email to comment author');
+		if( $text == '#' ) $text = getIcon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
 
 		echo $before;
 		echo '<a href="'.$form_url.'" title="'.$title.'"';
@@ -478,6 +478,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2005/04/07 17:55:50  fplanque
+ * minor changes
+ *
  * Revision 1.5  2005/03/06 16:30:40  blueyed
  * deprecated global table names.
  *

@@ -146,7 +146,8 @@ $userlist = $DB->get_results( $request );
 				$email = $loop_User->get('email');
 				if( !empty($email) )
 				{
-					echo '<a href="mailto:'.$email.'" title="e-mail: '.$email.'"><img src="img/email.gif"  alt="e-mail: '.$email.'" class="middle" /></a>&nbsp;';
+					echo '<a href="mailto:'.$email.'" title="e-mail: '.$email.'">'
+								.getIcon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => 'Email: '.$email ) ).'</a>&nbsp;';
 				}
 				echo "</td>\n";
 
@@ -159,7 +160,8 @@ $userlist = $DB->get_results( $request );
 					{
 						$url = 'http://'.$url;
 					}
-					echo "<a href=\"$url\" title=\"website: $url\"><img src=\"img/url.gif\" alt=\"website: $url\" class=\"middle\" /></a>&nbsp;";
+					echo '<a href="'.$url.'" title="Website: '.$url.'">'
+								.getIcon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: '.$url ) ).'</a>&nbsp;';
 				}
 				echo "</td>\n";
 
@@ -216,6 +218,9 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 
 /*
  * $Log$
+ * Revision 1.40  2005/04/07 17:55:48  fplanque
+ * minor changes
+ *
  * Revision 1.39  2005/04/06 13:33:28  fplanque
  * minor changes
  *

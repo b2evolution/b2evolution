@@ -202,6 +202,17 @@ $map_iconfiles = array(
 		'size' => array( 16, 16 ),
 	),
 
+	'email' => array(
+		'file' => $rsc_subdir.'icons/envelope.gif',
+		'alt' => T_('Email'),
+		'size' => array( 13, 10 ),
+	),
+	'www' => array(
+		'file' => $rsc_subdir.'icons/url.gif',
+		'alt' => T_('WWW'),
+		'size' => array( 34, 17 ),
+	),
+
 	'new' => array(
 		'file' => $admin_subdir.'img/new.gif',
 		'alt' => T_('New'),
