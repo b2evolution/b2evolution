@@ -331,8 +331,7 @@ class Comment extends DataObject
 		{	// Display as button
 			echo '<input type="button"';
 			echo ' value="'.$text.'" title="'.$title.'" onclick="if ( confirm(\'';
-			/* TRANS: Warning this is a javascript string */
-			echo T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.');
+			echo TS_('You are about to delete this comment!\\n\'Cancel\' to stop, \'OK\' to delete.');
 			echo '\') ) { document.location.href=\''.$url.'\' }"';
 			if( !empty( $class ) ) echo ' class="'.$class.'"';
 			echo '/>';
@@ -340,8 +339,7 @@ class Comment extends DataObject
 		else
 		{	// Display as link
 			echo '<a href="'.$url.'" title="'.$title.'" onclick="return confirm(\'';
-			/* TRANS: Warning this is a javascript string */
-			echo T_('You are about to delete this comment!\\n\\\'Cancel\\\' to stop, \\\'OK\\\' to delete.');
+			echo TS_('You are about to delete this comment!\\n\'Cancel\' to stop, \'OK\' to delete.');
 			echo '\')"';
 			if( !empty( $class ) ) echo ' class="'.$class.'"';
 			echo '>'.$text.'</a>';
@@ -478,6 +476,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2005/04/12 18:58:16  fplanque
+ * use TS_() instead of T_() for JavaScript strings
+ *
  * Revision 1.6  2005/04/07 17:55:50  fplanque
  * minor changes
  *

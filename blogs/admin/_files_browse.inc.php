@@ -424,7 +424,7 @@ else
 			src="<?php echo getIcon( 'file_delete', 'url' ) ?>"
 			onclick="if( r = openselectedfiles(true) )
 								{
-									if( confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete the selected files?') ?>') )
+									if( confirm('<?php echo TS_('Do you really want to delete the selected files?') ?>') )
 									{
 										document.getElementById( 'FilesForm' ).confirmed.value = 1;
 										return true;
@@ -653,13 +653,13 @@ param( 'options_show', 'integer', 0 );
 		{
 			if( showoptions )
 			{
-				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('Show options') ?>');
+				var replace = document.createTextNode('<?php echo TS_('Show') ?>');
 				var display_list = 'none';
 				showoptions = false;
 			}
 			else
 			{
-				var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('Hide options') ?>');
+				var replace = document.createTextNode('<?php echo TS_('Hide') ?>');
 				var display_list = 'inline';
 				showoptions = true;
 			}
@@ -683,6 +683,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.15  2005/04/12 18:58:14  fplanque
+ * use TS_() instead of T_() for JavaScript strings
+ *
  * Revision 1.14  2005/03/16 19:58:13  fplanque
  * small AdminUI cleanup tasks
  *

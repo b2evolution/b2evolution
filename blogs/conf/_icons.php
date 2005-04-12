@@ -256,8 +256,13 @@ $map_iconfiles = array(
 		'alt' => T_('Link'),
 		'size' => array( 14, 14 ),
 	),
+ 	'unlink' => array(
+		'file' => $rsc_subdir.'icons/chain_unlink.gif',
+		'alt' => T_('Unlink'),
+		'size' => array( 14, 14 ),
+	),
 	'help' => array(
-	'file' => $img_subdir.'smilies/icon_question.gif',
+		'file' => $img_subdir.'smilies/icon_question.gif',
 		'alt' => T_('Help'),
 		'size' => array( 15, 15 ),
 	),

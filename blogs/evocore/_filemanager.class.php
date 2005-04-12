@@ -555,7 +555,7 @@ class FileManager extends Filelist
 		if( $url = $this->getLinkFileDelete( $File ) )
 		{
 			echo '<a title="'.T_('Delete').'" href="'.$url.'" onclick="if( confirm(\''
-				.sprintf( /* TRANS: Warning this is a javascript string */ T_('Do you really want to delete &laquo;%s&raquo;?'),
+				.sprintf( TS_('Do you really want to delete &laquo;%s&raquo;?'),
 				format_to_output( $File->getName(), 'formvalue' ) ).'\') )
 				{
 					this.href += \'&amp;confirmed=1\';
@@ -1454,6 +1454,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.26  2005/04/12 18:58:19  fplanque
+ * use TS_() instead of T_() for JavaScript strings
+ *
  * Revision 1.25  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

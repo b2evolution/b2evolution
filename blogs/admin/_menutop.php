@@ -283,11 +283,11 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 				if( allchecked[nr] )
 				{
-					var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('uncheck all') ?>');
+					var replace = document.createTextNode('<?php echo TS_('uncheck all') ?>');
 				}
 				else
 				{
-					var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('check all') ?>');
+					var replace = document.createTextNode('<?php echo TS_('check all') ?>');
 				}
 
 				if( document.getElementById( idprefix+'_'+String(nr) ) )

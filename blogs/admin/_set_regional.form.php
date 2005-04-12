@@ -66,7 +66,7 @@ if( $action == 'edit' )
 		}
 
 		$Form->buttons( array( array( '', '', ($edit_locale == '_new_') ? T_('Create') : T_('Update'),
-																	'search', 'var Locales = new Array('.$l_warnfor.'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''. /* TRANS: Warning this is a javascript string */ T_("This will replace locale \'%s\'. Ok?").'\'.replace(/%s/, check); return confirm( c )}};' ),
+																	'search', 'var Locales = new Array('.$l_warnfor.'); while( Locales.length > 0 ){ check = Locales.shift(); if( document.createnew.newloc_locale.value == check ){ c = \''.TS_('This will replace locale \'%s\'. Ok?').'\'.replace(/%s/, check); return confirm( c )}};' ),
 													 array( 'reset', '', format_to_output(T_('Reset'), 'formvalue'), 'search' ) ) );
 
 		?>
@@ -372,7 +372,7 @@ else
 			<p class="center"><a href="b2options.php?tab=regional&amp;action=edit<?php if( $loc_transinfo ) echo '&amp;loc_transinfo=1'?>&amp;edit_locale=_new_"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('Create new locale');?></a></p>
 			<?php if( isset($l_atleastonefromdb) )
 			{ ?>
-				<p class="center"><a href="?tab=regional<?php if( $loc_transinfo ) echo '&amp;loc_transinfo=1'?>&amp;action=reset" onclick="return confirm('<?php echo /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" class="middle" alt="" /> <?php echo T_('Reset to defaults (delete database table)');?></a></p>
+				<p class="center"><a href="?tab=regional<?php if( $loc_transinfo ) echo '&amp;loc_transinfo=1'?>&amp;action=reset" onclick="return confirm('<?php echo TS_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" class="middle" alt="" /> <?php echo T_('Reset to defaults (delete database table)');?></a></p>
 				<?php
 			}
 		}

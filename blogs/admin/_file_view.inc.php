@@ -129,7 +129,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			{
 				if( showlinenrs )
 				{
-					var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('show line numbers') ?>');
+					var replace = document.createTextNode('<?php echo TS_('show line numbers') ?>');
 					showlinenrs = false;
 					var text = document.createTextNode( '' );
 					for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
@@ -144,7 +144,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 				}
 				else
 				{
-					var replace = document.createTextNode('<?php echo /* TRANS: Warning this is a javascript string */ T_('hide line numbers') ?>');
+					var replace = document.createTextNode('<?php echo TS_('hide line numbers') ?>');
 					showlinenrs = true;
 					for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
 					{

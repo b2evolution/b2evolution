@@ -205,6 +205,7 @@ $locales = array(
 										'charset' => 'iso-8859-1',
 										'datefmt' => 'd.m.y',
 										'timefmt' => 'H:i:s',
+										'startofweek' => 1,
 										'messages' => 'gl_ES',
 										'enabled' => 1,
 									),

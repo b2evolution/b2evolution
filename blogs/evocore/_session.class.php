@@ -107,7 +107,8 @@ class Session
 		{ // start new session
 			$this->key = md5( $Hit->IP.$Hit->getUseragent() );
 
-			$DB->query( 'INSERT INTO T_sessions
+			// fplanque>> I'm changing INSERT into REPLACE because this fails all the time on duplicate entry! :(((
+			$DB->query( 'REPLACE INTO T_sessions
 										(sess_key, sess_lastseen, sess_ipaddress, sess_user_ID)
 										VALUES (
 											"'.$this->key.'",

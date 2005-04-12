@@ -41,7 +41,7 @@ function cat_edit_before_each( $cat_ID, $level )
 	echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" />';
 	echo ' <strong>'.$cat['cat_name'].'</strong></a>';
 	echo ' <a href="?action=Delete&amp;cat_ID='.$cat_ID.'&amp;blog='.$blog
-				.'" onclick="return confirm(\''. /* TRANS: Warning this is a javascript string */ T_('Are you sure you want to delete?').'\')">';
+				.'" onclick="return confirm(\''.TS_('Are you sure you want to delete?').'\')">';
 	echo '<img src="img/xross.gif" width="13" height="13" class="middle" alt="', /* TRANS: Abbrev. for Delete */ T_('Del'), '" />';
 	echo '</a>';
 	echo "

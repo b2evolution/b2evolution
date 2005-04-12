@@ -367,7 +367,7 @@ switch( $action )
 			<p>
 			<input type="submit" value="&nbsp; <?php echo T_('GO!')?> &nbsp;"
 				onclick="if( document.getElementById( 'deletedb' ).checked ) { return confirm( '<?php
-					printf( /* TRANS: Warning this is a javascript string */ T_( 'Are you sure you want to delete your existing %s tables?\nDo you have a backup?' ), $app_name );
+					printf( TS_( 'Are you sure you want to delete your existing %s tables?\nDo you have a backup?' ), $app_name );
 					?>' ); }" />
 			</p>
 			</form>
