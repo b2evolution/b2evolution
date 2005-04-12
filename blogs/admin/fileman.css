@@ -162,6 +162,7 @@ ul.iconlegend {
 	list-style:none;
 	margin:1ex;
 	padding:0;
+	display: inline;
 }
 ul.iconlegend li {
 	display:inline;
@@ -176,9 +177,9 @@ ul#uploadfileinputs {
 	padding:0;
 }
 ul#uploadfileinputs li {
-	border-top:1px solid #ddd;
-	margin-bottom:2ex 0;
-	padding:2ex 0;
+	background-color:#efede0; /* Temp color, needs overriding */
+	margin:1em 0;
+	padding:1ex;
 }
 ul#uploadfileinputs li.invalid {
 	border:1px solid #f00;
@@ -202,4 +203,18 @@ div.toggleModeAndFM {
 	clear:both;
 	border-top:1px solid #ddd;
 	border-bottom:1px solid #ddd;
+}
+
+fieldset.files_to_upload {
+	float:left;
+	width:60%;
+}
+fieldset.upload_into {
+	float: right;
+	width: 35%;
+}
+div.panelblock fieldset.upload_submit
+{
+	text-align:center;
+	border:none;
 }

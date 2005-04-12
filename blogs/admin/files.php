@@ -7,7 +7,8 @@
  *
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
- * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
+ * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte
+ * as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -617,189 +618,8 @@ switch( $Fileman->getMode() )
 		}}}
 
 
-		// Upload dialog {{{
-		?>
-
-		<script type="text/javascript">
-			/**
-			 * Mighty cool function to append an input or textarea element onto another element.
-			 *
-			 * @usedby addAnotherFileInput()
-			 *
-			 * @author proud daniel hahler :)
-			 */
-			function appendLabelAndInputElements( appendTo, labelText, inputOrTextarea, inputName, inputSizeOrCols, inputMaxLengthOrRows, inputType )
-			{
-				/*var fileDivLabel = document.createElement("div");
-				fileDivLabel.className = "label";*/
-				var fileLabel = document.createElement("label");
-				var fileLabelText = document.createTextNode( labelText );
-				fileLabel.appendChild( fileLabelText );
-				/*fileDivLabel.appendChild( fileLabel );*/
-				appendTo.appendChild( fileLabel );
-				appendTo.appendChild( document.createElement("br") );
-
-				/*var fileDivInput = document.createElement("div");
-				fileDivInput.className = "input";*/
-				var fileInput = document.createElement( inputOrTextarea );
-				fileInput.name = inputName;
-				if( inputOrTextarea == "input" )
-				{
-					fileInput.type = typeof( inputType ) !== 'undefined' ?
-														inputType :
-														"text";
-					fileInput.size = inputSizeOrCols;
-					if( typeof( inputMaxLengthOrRows ) != 'undefined' )
-					{
-						fileInput.maxlength = inputMaxLengthOrRows;
-					}
-				}
-				else
-				{
-					fileInput.cols = inputSizeOrCols;
-					fileInput.rows = inputMaxLengthOrRows;
-				}
-				/*fileDivInput.appendChild( fileInput );*/
-				appendTo.appendChild( fileInput );
-				appendTo.appendChild( document.createElement("br") );
-			}
-
-			/**
-			 * Add a new fileinput area to the upload form.
-			 *
-			 * @author proud daniel hahler :)
-			 */
-			function addAnotherFileInput()
-			{
-				var newLI = document.createElement("li");
-				newLI.className = "clear";
-				uploadfiles = document.getElementById("uploadfileinputs");
-
-				uploadfiles.appendChild( newLI );
-
-
-				appendLabelAndInputElements( newLI, "<?php echo T_('Choose a file'); ?>:", "input", "uploadfile[]", "40", "0", "file" );
-				appendLabelAndInputElements( newLI, "<?php echo T_('Alternative text'); ?>:", "input", "uploadfile_alt[]", "40", "80", "text" );
-				appendLabelAndInputElements( newLI, "<?php echo T_('Description of the file'); ?>:", "textarea", "uploadfile_desc[]", "40", "3" );
-				appendLabelAndInputElements( newLI, "<?php echo T_('New filename (without path)'); ?>:", "input", "uploadfile_name[]", "40", "80", "text" );
-			}
-		</script>
-
-
-		<div class="panelblock">
-			<form enctype="multipart/form-data" action="files.php" method="post" class="fform">
-				<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $Settings->get( 'upload_maxkb' )*1024 ?>" />
-				<?php
-				// we'll use $rootIDAndPath only
-				echo $Fileman->getFormHiddenInputs( array( 'root' => false, 'path' => false ) );
-				form_hidden( 'rootIDAndPath', serialize( array( 'id' => $Fileman->root, 'path' => $Fileman->getPath() ) ) );
-				?>
-
-				<h1><?php echo T_('File upload'); ?></h1> <?php /* TODO: We need a good (smaller) default h1! */ ?>
-
-				<?php
-				if( count( $failedFiles ) )
-				{
-					$LogUpload->add( T_('Some file uploads failed. Please check the errors below.'), 'note' );
-				}
-				$LogUpload->display( '', '', true, 'all' ); ?>
-
-
-				<fieldset style="float:left;width:60%;">
-					<legend><?php echo T_('Files to upload') ?></legend>
-
-					<p>
-						<?php
-						$restrictNotes = array();
-
-						if( $allowedFileExtensions )
-						{
-							$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.implode( ', ', $allowedFileExtensions );
-						}
-						if( $allowedMimeTypes )
-						{
-							$restrictNotes[] = '<strong>'.T_('Allowed MIME types').'</strong>: '.implode( ', ', $allowedMimeTypes );
-						}
-						if( $Settings->get( 'upload_maxkb' ) )
-						{
-							$restrictNotes[] = '<strong>'.T_('Maximum allowed file size').'</strong>: '.bytesreadable( $Settings->get( 'upload_maxkb' )*1024 );
-						}
-
-						if( $restrictNotes )
-						{
-							echo implode( '<br />', $restrictNotes ).'<br />';
-						}
-
-						?>
-					</p>
-
-					<ul id="uploadfileinputs">
-						<?php
-						$failedFiles[] = NULL; // display at least one upload div
-						foreach( $failedFiles as $lKey => $lMessage )
-						{
-							?><li<?php
-								if( $lMessage !== NULL )
-								{
-									echo ' class="invalid" title="'./* TRANS: will be displayed as title for failed file uploads */ T_('Invalid submission.').'"';
-								} ?>>
-
-								<?php
-								if( $lMessage !== NULL )
-								{
-									Log::display( '', '', $lMessage, 'error' );
-								}
-								?>
-
-								<label><?php echo T_('Choose a file'); ?>:</label><br />
-								<input name="uploadfile[]" type="file" size="37" /><br />
-
-								<label><?php echo T_('Alternative text'); ?></label>:<br />
-								<input name="uploadfile_alt[]" type="text" size="50" maxlength="80"
-									value="<?php echo ( isset( $uploadfile_alt[$lKey] ) ? format_to_output( $uploadfile_alt[$lKey], 'formvalue' ) : '' );
-									?>" /><br />
-
-								<label><?php echo T_('Description of the file'); /* TODO: maxlength (DB) */ ?></label>:<br />
-								<textarea name="uploadfile_desc[]" rows="3" cols="37"><?php
-									echo ( isset( $uploadfile_desc[$lKey] ) ? $uploadfile_desc[$lKey] : '' )
-								?></textarea><br />
-
-								<label><?php echo T_('New filename (without path)'); ?></label>:<br />
-								<input name="uploadfile_name[]" type="text" size="50" maxlength="80"
-									value="<?php echo ( isset( $uploadfile_name[$lKey] ) ? format_to_output( $uploadfile_name[$lKey], 'formvalue' ) : '' ) ?>" /><br />
-							</li><?php // no text after </li> or JS will bite you!
-						}
-
-
-						?></ul>
-
-				</fieldset>
-
-				<fieldset>
-					<legend><?php echo T_('Upload files into:'); ?></legend>
-					<?php
-					#echo 'Choose the directory you want to upload the files into. la la la la la la la';
-					?>
-
-					<?php
-					echo $Fileman->getDirectoryTreeRadio();
-					?>
-				</fieldset>
-
-				<div class="clear"></div>
-				<fieldset class="center">
-					<input class="ActionButton" type="submit" value="<?php echo T_('Upload !') ?>" />
-					<input class="ActionButton" type="button" value="<?php echo T_('Add another file') ?>" onclick="addAnotherFileInput();" />
-				</fieldset>
-			</form>
-
-		</div>
-
-		<div class="clear"></div>
-
-
-		<?php
-		// }}}
+		// Upload dialog:
+		require dirname(__FILE__).'/_files_upload.inc.php';
 
 		// }}}
 		break;
@@ -1186,6 +1006,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.82  2005/04/12 19:00:22  fplanque
+ * File manager cosmetics
+ *
  * Revision 1.81  2005/03/15 19:19:46  fplanque
  * minor, moved/centralized some includes
  *

@@ -361,11 +361,14 @@ while( $lFile =& $Fileman->getNextFile() )
 		</td>
 
 		<td class="type"><?php echo $lFile->getType() ?></td>
+
 		<td class="size"><?php echo $lFile->getSizeNice() ?></td>
+
 		<td class="timestamp">
 			<span class="date"><?php echo $lFile->getLastMod( 'date' ) ?></span>
 			<span class="time"><?php echo $lFile->getLastMod( 'time' ) ?></span>
 		</td>
+
 		<td class="perms"><?php $Fileman->dispButtonFileEditPerms() ?></td>
 		<td class="actions lastcol"><?php
 			// Not implemented yet: $Fileman->dispButtonFileEdit();
@@ -498,39 +501,37 @@ else
 if( $countFiles )
 {
 	?>
-
 	<script type="text/javascript">
-	<!--
-	function openselectedfiles( checkonly )
-	{
-		elems = document.getElementsByName( 'fm_selected[]' );
-		fm_popup_type = 'selected';
-		var opened = 0;
-		for( i = 0; i < elems.length; i++ )
+		<!--
+		function openselectedfiles( checkonly )
 		{
-			if( elems[i].checked )
+			elems = document.getElementsByName( 'fm_selected[]' );
+			fm_popup_type = 'selected';
+			var opened = 0;
+			for( i = 0; i < elems.length; i++ )
 			{
-				if( !checkonly )
+				if( elems[i].checked )
 				{
-					id = elems[i].id.substring( elems[i].id.lastIndexOf('_')+1, elems[i].id.length );
-					document.getElementById( 'button_new_'+id ).click();
+					if( !checkonly )
+					{
+						id = elems[i].id.substring( elems[i].id.lastIndexOf('_')+1, elems[i].id.length );
+						document.getElementById( 'button_new_'+id ).click();
+					}
+					opened++;
 				}
-				opened++;
+			}
+			if( !opened )
+			{
+				alert( '<?php echo TS_('Nothing selected.') ?>' );
+				return false;
+			}
+			else
+			{
+				return true;
 			}
 		}
-		if( !opened )
-		{
-			alert( '<?php echo /* TRANS: Warning this is a javascript string */ T_('Nothing selected.') ?>' );
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}
-	// -->
+		// -->
 	</script>
-
 	<?php
 }
 ?>
@@ -539,14 +540,24 @@ if( $countFiles )
 <!-- CREATE: -->
 
 <form action="files.php#FM_anchor" class="toolbaritem">
-	<?php echo $Fileman->getFormHiddenInputs(); ?>
+	<?php echo $Fileman->getFormHiddenInputs();
+	echo T_('New'); ?>
 	<select name="createnew">
-		<option value="file"><?php echo T_('New file') ?></option>
-		<option value="dir"<?php
-			if( !empty($createnew) && $createnew == 'dir' )
+		<?php
+			echo '<option value="dir"';
+			if( isset($createnew) &&  $createnew == 'dir' )
 			{
 				echo ' selected="selected"';
-			} ?>><?php echo T_('New directory') ?></option>
+			}
+			echo '>'.T_('directory').'</option>';
+
+			echo '<option value="file"';
+			if( isset($createnew) && $createnew == 'file' )
+			{
+				echo ' selected="selected"';
+			}
+			echo '>'.T_('file').'</option>';
+		?>
 	</select>:
 	<input type="text" name="createname" value="<?php
 		if( isset( $createname ) )
@@ -560,40 +571,41 @@ if( $countFiles )
 
 <!-- UPLOAD: -->
 
+<form action="files.php" method="post" class="toolbaritem">
+	<div>
+		<?php echo $Fileman->getFormHiddenInputs( array( 'fm_mode' => 'file_upload' ) ); ?>
+		<input class="ActionButton" type="submit" value="<?php echo T_('Upload file...'); ?>" />
+	</div>
+</form>
+
 <form enctype="multipart/form-data" action="files.php" method="post" class="toolbaritem">
+	<!-- The following is mainly a hint to the browser. -->
 	<?php form_hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); ?>
+
 	<?php echo $Fileman->getFormHiddenInputs( array( 'fm_mode' => 'file_upload' ) ); ?>
 
 	<div>
 		<input name="uploadfile[]" type="file" size="10" />
-		<input class="ActionButton" type="submit" value="<?php echo T_('Upload..'); ?>" />
+		<input class="ActionButton" type="submit" value="<?php echo T_('Quick Upload!'); ?>" />
 	</div>
 </form>
 
-
 <div class="clear"></div>
 
-<fieldset class="iconlegend">
-	<legend><?php echo T_('Icon legend') ?></legend>
-	<ul class="iconlegend">
-		<li><?php echo getIcon( 'folder_parent' ).' '.T_('Up one level'); ?></li>
-		<li><?php echo getIcon( 'window_new' ).' '.T_('Open in new window'); ?></li>
-		<!-- Not implemented yet: span class="nobr"><?php echo getIcon( 'file_edit' ).' '.T_('Edit file'); ?></span -->
-		<li><?php echo getIcon( 'file_copy' ).' '.T_('Copy'); ?></li>
-		<li><?php echo getIcon( 'file_move' ).' '.T_('Move'); ?></li>
-		<li><?php echo getIcon( 'file_rename' ).' '.T_('Rename'); ?></li>
-		<li><?php echo getIcon( 'file_delete' ).' '.T_('Delete'); ?></li>
-		<li><?php echo getIcon( 'file_perms' ).' '.T_('Change permissions'); ?></li>
-	</ul>
-</fieldset>
-
 <fieldset>
-<legend><?php echo T_('Information') ?></legend>
-
-<ul>
-	<li><?php echo T_("Clicking on a file name invokes the default action (images get displayed as image, raw content for all other files)."); ?></li>
-	<li><?php echo T_("Clicking on a file icon lets the browser handle the file."); ?></li>
-</ul>
+	<legend><?php echo T_('Help') ?></legend>
+	<ul>
+		<li><?php echo T_('Clicking on a file icon lets the browser handle the file.'); ?></li>
+		<li><?php echo T_('Clicking on a file name invokes the default action (images get displayed as image, raw content for all other files).'); ?></li>
+		<li><?php printf( T_('Clicking on the %s icon invokes the default action in a new window.'), getIcon( 'window_new' ) ); ?></li>
+		<li><?php echo T_('Actions'); ?>:
+			<ul class="iconlegend">
+				<li><?php echo getIcon( 'file_rename' ).' '.T_('Rename'); ?></li>
+				<li><?php echo getIcon( 'file_copy' ).' '.T_('Copy'); ?></li>
+				<li><?php echo getIcon( 'file_move' ).' '.T_('Move'); ?></li>
+				<li><?php echo getIcon( 'file_delete' ).' '.T_('Delete'); ?></li>
+			</ul>
+		</li>
 </fieldset>
 <?php
 
@@ -607,14 +619,12 @@ param( 'options_show', 'integer', 0 );
 ?>
 <form action="files.php#FM_anchor" id="options_form" method="post">
 	<fieldset>
-	<legend><a id="options_toggle" href="<?php
+	<legend><?php echo T_('Options') ?>
+	[<a id="options_toggle" href="<?php
 	echo url_add_param( $Fileman->getCurUrl(), ( !$options_show ?
 																									'options_show=1' :
 																									'' ) )
-	?>" onclick="return toggle_options();"><?php
-	echo $options_show ?
-				T_('Hide options') :
-				T_('Show options'); ?></a></legend>
+	?>" onclick="return toggle_options();"><?php echo $options_show ? T_('Hide') : T_('Show'); ?></a>]</legend>
 
 	<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
 		<input type="checkbox" id="option_dirsattop" name="option_dirsattop" value="1"<?php if( !$UserSettings->get('fm_dirsnotattop') ) echo ' checked="checked"' ?> />
@@ -649,6 +659,9 @@ param( 'options_show', 'integer', 0 );
 	<!--
 		showoptions = <?php echo ($options_show) ? 'true' : 'false' ?>;
 
+		/**
+		 * Toggles the display of the filemanager options.
+		 */
 		function toggle_options()
 		{
 			if( showoptions )
@@ -683,8 +696,8 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
- * Revision 1.15  2005/04/12 18:58:14  fplanque
- * use TS_() instead of T_() for JavaScript strings
+ * Revision 1.16  2005/04/12 19:00:22  fplanque
+ * File manager cosmetics
  *
  * Revision 1.14  2005/03/16 19:58:13  fplanque
  * small AdminUI cleanup tasks
