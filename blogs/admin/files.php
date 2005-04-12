@@ -902,7 +902,7 @@ switch( $Fileman->getMode() )
 
 <?php
 
-// "Display/hide Filemanager" and "Leave mode" buttons
+// "Display/hide Filemanager"
 
 $showFilemanager = !$Fileman->getMode()
 										|| ( $UserSettings->get('fm_forceFM') || $Fileman->forceFM );
@@ -913,38 +913,12 @@ if( $Fileman->getMode() )
 {
 	if( !$UserSettings->get('fm_forceFM') )
 	{ // FM is not forced - link to hide/display
-		$toggleButtons[] =
-			'<a class="ActionButton"'
-			.' href="'.$Fileman->getCurUrl( array( 'forceFM' => 1-$Fileman->forceFM ) ).'">'
-			.( $showFilemanager
-					? T_('Hide Filemanager')
-					: T_('Display Filemanager') ).'</a>';
+		echo '<div class="toggleModeAndFM" id="FM_anchor">';
+		echo '[<a '
+				.' href="'.$Fileman->getCurUrl( array( 'forceFM' => 1-$Fileman->forceFM ) ).'">'
+				.( $showFilemanager ? T_('Hide Filemanager') : T_('Display Filemanager') ).'</a>]';
+		echo '</div>';
 	}
-
-	if( $Fileman->getMode() == 'file_upload' )
-	{
-		$toggleButtons[] =
-			'<a class="ActionButton"'
-			.' href="'.$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ).'">'
-			. /* TRANS: Button to leave the upload mode */ T_('Leave upload mode').'</a>';
-	}
-}
-
-if( isset($toggleButtons[0]) )
-{
-	?>
-
-	<div class="toggleModeAndFM" id="FM_anchor">
-
-		&mdash;
-
-		<?php echo implode( ' ', $toggleButtons ); ?>
-
-		&mdash;
-
-	</div>
-
-	<?php
 }
 
 if( isset($action_title) )
@@ -1006,6 +980,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.83  2005/04/12 19:36:30  fplanque
+ * File manager cosmetics
+ *
  * Revision 1.82  2005/04/12 19:00:22  fplanque
  * File manager cosmetics
  *

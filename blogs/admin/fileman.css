@@ -176,9 +176,10 @@ ul#uploadfileinputs {
 	margin:0;
 	padding:0;
 }
-ul#uploadfileinputs li {
+ul#uploadfileinputs li,
+p.uploadfileinputs {
 	background-color:#efede0; /* Temp color, needs overriding */
-	margin:1em 0;
+	margin:1ex 0;
 	padding:1ex;
 }
 ul#uploadfileinputs li.invalid {
@@ -201,15 +202,15 @@ div.toggleModeAndFM {
 	margin:0 2ex;
 	text-align:center;
 	clear:both;
-	border-top:1px solid #ddd;
-	border-bottom:1px solid #ddd;
+	background-color:#efede0; /* Temp color, needs overriding */
 }
 
-fieldset.files_to_upload {
+div.panelblock fieldset.files_to_upload {
 	float:left;
 	width:60%;
+	padding: 1ex;
 }
-fieldset.upload_into {
+div.panelblock fieldset.upload_into {
 	float: right;
 	width: 35%;
 }

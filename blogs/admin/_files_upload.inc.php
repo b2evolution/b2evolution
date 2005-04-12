@@ -118,7 +118,14 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		echo $Fileman->getFormHiddenInputs( array( 'root' => false, 'path' => false ) );
 		form_hidden( 'rootIDAndPath', serialize( array( 'id' => $Fileman->root, 'path' => $Fileman->getPath() ) ) );
 
+
+		echo '<span style="float: right;">';
+		echo '<a href="'.$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ).'">';
+		echo '<img class="middle" src="http://localhost:8088/b2evo/blogs/admin/img/close.gif" title="Quit upload mode" alt="Fermer" height="14" width="14">';
+		echo '</a></span>';
 		echo '<h2>'.T_('File upload').'</h2>';
+
+
 
 		if( count( $failedFiles ) )
 		{
@@ -192,10 +199,9 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 					</li><?php // no text after </li> or JS will bite you!
 				}
 
-
 				?></ul>
 
-			<a href="#" onclick="addAnotherFileInput();"><?php echo T_('Add another file'); ?></a>
+			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput();"><?php echo T_('Add another file'); ?></a></p>
 
 		</fieldset>
 
@@ -209,7 +215,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		<div class="clear"></div>
 
 		<fieldset class="upload_submit">
-			<input class="ActionButton" type="submit" value="<?php echo T_('Upload !') ?>" />
+			<input class="ActionButton" type="submit" value="<?php echo T_('Upload Now!') ?>" />
+      <?php
+				// TODO: Turn this into a button somehow...
+      	echo '<a class="ActionButton" href="'.$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ).'">'
+      				.T_('Cancel').'</a>';
+			?>
 		</fieldset>
 	</form>
 
@@ -220,9 +231,11 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 <?php
 /*
  * $Log$
- * Revision 1.1  2005/04/12 19:00:22  fplanque
+ * Revision 1.2  2005/04/12 19:36:30  fplanque
  * File manager cosmetics
  *
+ * Revision 1.1  2005/04/12 19:00:22  fplanque
+ * File manager cosmetics
  *
  * This file was extracted from _files.php
  */
