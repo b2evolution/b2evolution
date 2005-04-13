@@ -701,10 +701,12 @@ switch( $Fileman->getMode() )
 
 		$Fileman->SourceList->restart();
 
+		$file_count = 0;
 		if( $cmr_doit )
 		{{{ // we want Action!
-			while( $lSourceFile =& $Fileman->SourceList->getNextFile() )
+			while( $SourceFile = & $Fileman->SourceList->getNextFile() )
 			{
+				$newname = trim(strip_tags($cmr_newname[$file_count]));
 				if( !isFilename($newname) )
 				{
 					$LogCmr->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $newname ) );
@@ -786,6 +788,7 @@ switch( $Fileman->getMode() )
 					}
 				}
 			}
+			$file_count++;
 		}}}
 
 
@@ -797,10 +800,14 @@ switch( $Fileman->getMode() )
 				<form action="files.php" class="fform" id="cmr_form">
 					<?php echo $Fileman->getFormHiddenInputs() ?>
 					<input type="hidden" name="cmr_doit" value="1" />
-					<fieldset>
-						<legend><?php
-						echo T_('Copy / Move / Rename');
-						?></legend>
+					<?php
+						// C/M/R TITLE:
+						echo '<span style="float: right;">';
+						echo '<a href="'.$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ).'">';
+						echo '<img class="middle" src="http://localhost:8088/b2evo/blogs/admin/img/close.gif" title="Quit copy/move/rename mode" alt="Fermer" height="14" width="14">';
+						echo '</a></span>';
+						echo '<h2>'.T_('Copy / Move / Rename').'</h2>';
+					?>
 
 						<div class="notes">
 							<?php
@@ -883,8 +890,7 @@ switch( $Fileman->getMode() )
 
 						?>
 
-						<fieldset>
-							<div class="input">
+						<fieldset class="cmr_submit">
 								<input id="cmr_submit" type="submit" value="<?php
 									if( $cmr_keepsource )
 									{
@@ -895,9 +901,8 @@ switch( $Fileman->getMode() )
 										echo $submitMoveOrRenameText;
 									} ?>" />
 								<input type="reset" value="<?php echo format_to_output( T_('Reset'), 'formvalue' ) ?>" />
-							</div>
 						</fieldset>
-					</fieldset>
+
 				</form>
 
 
@@ -957,9 +962,9 @@ switch( $Fileman->getMode() )
 <?php
 
 // "Display/hide Filemanager"
+// TODO: do not display this after a successful rename...
 
-$showFilemanager = !$Fileman->getMode()
-										|| ( $UserSettings->get('fm_forceFM') || $Fileman->forceFM );
+$showFilemanager = !$Fileman->getMode() || $UserSettings->get('fm_forceFM') || $Fileman->forceFM ;
 
 $toggleButtons = array();
 
@@ -1034,6 +1039,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.85  2005/04/13 18:31:27  fplanque
+ * tried to make copy/move/rename work ...
+ *
  * Revision 1.84  2005/04/13 17:48:21  fplanque
  * File manager refactoring
  * storing of file meta data through upload

@@ -209,7 +209,8 @@ div.panelblock fieldset.upload_into {
 	float: right;
 	width: 35%;
 }
-div.panelblock fieldset.upload_submit
+div.panelblock fieldset.upload_submit,
+div.panelblock fieldset.cmr_submit
 {
 	text-align:center;
 	border:none;

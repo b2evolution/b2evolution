@@ -295,10 +295,13 @@ while( $lFile =& $Fileman->getNextFile() )
 		</td>
 
 		<td class="filename">
+
+
 			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"
 				target="fileman_default"
 				title="<?php echo T_('Open in a new window'); ?>"
 				onclick="return false;">
+
 
 				<button class="filenameIcon" type="button"
 					id="button_new_<?php echo $countFiles ?>"
@@ -696,6 +699,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.17  2005/04/13 18:31:26  fplanque
+ * tried to make copy/move/rename work ...
+ *
  * Revision 1.16  2005/04/12 19:00:22  fplanque
  * File manager cosmetics
  *
