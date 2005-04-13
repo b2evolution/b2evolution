@@ -569,36 +569,8 @@ class FileManager extends Filelist
 	/**
 	 * Generate HTML to display an image File framed.
 	 *
-	 * @return string|false
+	 * @movedTo _file_view.inc.php because this is definitely not a FM feature, it's pure image display...
 	 */
-	function getHtmlImageFrame( $File, $imgAlt = NULL, $subline = NULL )
-	{
-		if( !( $imgSize = $File->getImageSize( 'widthheight' ) ) )
-		{
-			return false;
-		}
-
-		if( is_null( $imgAlt ) )
-		{
-			$imgAlt = T_('The selected image');
-		}
-		if( is_null( $subline ) )
-		{
-			$subline = $File->getName().'<br />'.$File->getImageSize().'<br />'.$File->getSizeNice();
-		}
-
-		$r = "\n<img ";
-		if( $imgAlt !== false )
-		{
-			$r .= 'alt="'.$imgAlt.'" ';
-		}
-		$r .= 'class="framed" src="'.$this->getFileUrl( $File ).'"'
-					.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />'
-					.'<div class="subline">'.$subline.'</div>'
-					."\n</div>";
-
-		return $r;
-	}
 
 
 	/**
@@ -1454,6 +1426,11 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.27  2005/04/13 17:48:23  fplanque
+ * File manager refactoring
+ * storing of file meta data through upload
+ * displaying or metadate in previews
+ *
  * Revision 1.26  2005/04/12 18:58:19  fplanque
  * use TS_() instead of T_() for JavaScript strings
  *

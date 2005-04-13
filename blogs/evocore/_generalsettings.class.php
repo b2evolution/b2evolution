@@ -53,8 +53,8 @@ require_once dirname(__FILE__).'/_abstractsettings.class.php';
 class GeneralSettings extends AbstractSettings
 {
 	var $_defaults = array( 'upload_enabled' => '1',
-													'upload_allowedext' => 'jpg gif png',
-													'upload_allowedmime' => 'image/jpeg image/gif image/png',
+													'upload_allowedext' => 'jpg gif png txt',
+													'upload_allowedmime' => '',
 													'upload_maxkb' => '100',
 
 													'fm_enabled' => '1',
@@ -93,6 +93,11 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.12  2005/04/13 17:48:23  fplanque
+ * File manager refactoring
+ * storing of file meta data through upload
+ * displaying or metadate in previews
+ *
  * Revision 1.11  2005/03/15 19:19:47  fplanque
  * minor, moved/centralized some includes
  *

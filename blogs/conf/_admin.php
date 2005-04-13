@@ -132,7 +132,7 @@ $fileupload_url = $baseurl.'media/';				# WARNING: slashes moved!
  * @global string $fileupload_allowedtypes
  * @deprecated 0.9.2: this is only used for creating the defaults when upgrading
  */
-$fileupload_allowedtypes = ' jpg gif png ';
+$fileupload_allowedtypes = ' jpg gif png txt ';
 
 /**
  * by default, most servers limit the size of uploads to 2048 KB

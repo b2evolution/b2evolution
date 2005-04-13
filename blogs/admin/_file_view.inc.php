@@ -48,7 +48,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo $selectedFile->getName().' :: '.$app_name.' '.T_('Filemanager'); ?></title>
+	<title><?php echo $selectedFile->getName().' ('.T_('Preview').')'; ?></title>
 	<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
 	<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
 	<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
@@ -59,55 +59,136 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	<link href="fileman.css" rel="stylesheet" type="text/css" />
 </head>
 
-<body onclick="if( history.length > 1 ) { history.back() } else { window.close() }"
-			title="<?php echo T_('Click anywhere in this window to go back or close it if no go-back history available.') ?>">
-
+<body>
 	<?php
+	 /* 21st century and some people still like to break copy/paste functionnality and stuff like that... :'(
+		  onclick="if( history.length > 1 ) { history.back() } else { window.close() }"
+			title="<?php echo T_('Click anywhere in this window to go back or close it if no go-back history available.') ?>">
+		*/
+
 	if( $selectedFile->isImage() )
 	{ // --------------------------------
 		// We are displaying an image file:
 		// --------------------------------
-		?><div class="center"><?php
+		echo '<div class="center">';
 
-		echo $Fileman->getHtmlImageFrame( $selectedFile );
+		if( $imgSize = $selectedFile->getImageSize( 'widthheight' ) )
+		{
+			echo '<img ';
+			if( $alt = $selectedFile->dget( 'alt', 'htmlattr' ) )
+			{
+				echo 'alt="'.$alt.'" ';
+			}
+			if( $title = $selectedFile->dget( 'title', 'htmlattr' ) )
+			{
+				echo 'title="'.$title.'" ';
+			}
+			echo 'class="framed" src="'.$Fileman->getFileUrl( $selectedFile ).'"'
+						.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />';
 
-		?></div><?php
+			echo '<div class="subline">';
+			echo '<p><strong>'.$selectedFile->dget( 'title' ).'</strong></p>';
+			echo '<p>'.$selectedFile->dget( 'desc' ).'</p>';
+			echo '<p>'.$selectedFile->getName().' &middot; ';
+			echo $selectedFile->getImageSize().' &middot; ';
+			echo $selectedFile->getSizeNice().'</p>';
+			echo '</div>';
+
+		}
+
+		echo '</div>';
 	}
 	elseif( ($buffer = @file( $selectedFile->getPath() )) !== false )
-	{{{ // display raw file
+	{{{ // --------------------------------
+		// display raw file
+		// --------------------------------
 		param( 'showlinenrs', 'integer', 0 );
 
 		$buffer_lines = count( $buffer );
 
 		echo '<div class="fileheader">';
-		echo T_('File').': '.$selectedFile->getName().'<br />';
+
+		echo '<p>';
+		echo T_('File').': <strong>'.$selectedFile->getName().'</strong>';
+		echo ' &middot; ';
+		echo T_('Title').': <strong>'.$selectedFile->dget( 'title' ).'</strong>';
+		echo '</p>';
+
+ 		echo '<p>';
+		echo T_('Description').': '.$selectedFile->dget( 'desc' );
+		echo '</p>';
+
 
 		if( !$buffer_lines )
 		{
-			echo '</div> ** '.T_('empty file').' ** ';
+			echo '<p>** '.T_('Empty file!').' ** </p></div>';
 		}
 		else
 		{
-			printf( T_('%d lines'), $buffer_lines ).'<br />';
+			echo '<p>';
+			printf( T_('%d lines'), $buffer_lines );
+
 			$linenr_width = strlen( $buffer_lines+1 );
 
+			echo ' [';
 			?>
 			<noscript type="text/javascript">
 				<a href="<?php echo $Fileman->getLinkFile( $selectedFile ).'&amp;showlinenrs='.(1-$showlinenrs); ?>">
 
-				<?php echo $showlinenrs ?
-										T_('hide line numbers') :
-										T_('show line numbers');
+				<?php echo $showlinenrs ? T_('Hide line numbers') : T_('Show line numbers');
 				?></a>
 			</noscript>
 			<script type="text/javascript">
-			<!--
-			document.write('<a id="togglelinenrs" href="javascript:toggle_linenrs()">toggle</a>');
-			//-->
-			</script>
+				<!--
+				document.write('<a id="togglelinenrs" href="javascript:toggle_linenrs()">toggle</a>');
 
-			</div>
-			<pre class="rawcontent"><?php
+				showlinenrs = <?php var_export( !$showlinenrs ); ?>;
+
+				toggle_linenrs();
+
+				function toggle_linenrs()
+				{
+					if( showlinenrs )
+					{
+						var replace = document.createTextNode('<?php echo TS_('Show line numbers') ?>');
+						showlinenrs = false;
+						var text = document.createTextNode( '' );
+						for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
+						{
+							if( document.getElementsByTagName("span")[i].hasChildNodes() )
+								document.getElementsByTagName("span")[i].firstChild.data = '';
+							else
+							{
+								document.getElementsByTagName("span")[i].appendChild( text );
+							}
+						}
+					}
+					else
+					{
+						var replace = document.createTextNode('<?php echo TS_('Hide line numbers') ?>');
+						showlinenrs = true;
+						for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
+						{
+							var text = String(i+1);
+							var upto = <?php echo $linenr_width ?>-text.length;
+							for( var j=0; j<upto; j++ ){ text = ' '+text; }
+							if( document.getElementsByTagName("span")[i].hasChildNodes() )
+								document.getElementsByTagName("span")[i].firstChild.data = ' '+text+' ';
+							else
+								document.getElementsByTagName("span")[i].appendChild( document.createTextNode( ' '+text+' ' ) );
+						}
+					}
+
+					document.getElementById('togglelinenrs').replaceChild(replace, document.getElementById( 'togglelinenrs' ).firstChild);
+				}
+				-->
+			</script>
+			<?php
+
+			echo ']</p>';
+			echo '</div>';
+
+			echo '<pre class="rawcontent">';
 
 			for( $i = 0; $i < $buffer_lines; $i++ )
 			{
@@ -119,61 +200,19 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 				echo '</span>'.htmlspecialchars( str_replace( "\t", '  ', $buffer[$i] ) );  // TODO: customize tab-width
 			}
 
-			?>
+  		echo '</pre>';
 
-			<script type="text/javascript">
-			<!--
-			showlinenrs = <?php var_export( !$showlinenrs ); ?>;
-			toggle_linenrs();
-			function toggle_linenrs()
-			{
-				if( showlinenrs )
-				{
-					var replace = document.createTextNode('<?php echo TS_('show line numbers') ?>');
-					showlinenrs = false;
-					var text = document.createTextNode( '' );
-					for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
-					{
-						if( document.getElementsByTagName("span")[i].hasChildNodes() )
-							document.getElementsByTagName("span")[i].firstChild.data = '';
-						else
-						{
-							document.getElementsByTagName("span")[i].appendChild( text );
-						}
-					}
-				}
-				else
-				{
-					var replace = document.createTextNode('<?php echo TS_('hide line numbers') ?>');
-					showlinenrs = true;
-					for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
-					{
-						var text = String(i+1);
-						var upto = <?php echo $linenr_width ?>-text.length;
-						for( var j=0; j<upto; j++ ){ text = ' '+text; }
-						if( document.getElementsByTagName("span")[i].hasChildNodes() )
-							document.getElementsByTagName("span")[i].firstChild.data = ' '+text+' ';
-						else
-							document.getElementsByTagName("span")[i].appendChild( document.createTextNode( ' '+text+' ' ) );
-					}
-				}
-
-				document.getElementById('togglelinenrs').replaceChild(replace, document.getElementById( 'togglelinenrs' ).firstChild);
-			}
-			-->
-			</script>
-			<?php
-
+			echo '<div class="eof">** '.T_('End Of File').' **</div>';
 		}
-		?></pre>
 
-		<?php
 	}}}
 	else
 	{
 		Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'),
 																		$Fileman->getFileSubpath( $selectedFile ) ), 'error' );
 	}
+
+	debug_info();
 	?>
 
 </body>

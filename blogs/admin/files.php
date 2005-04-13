@@ -166,13 +166,14 @@ if( !empty($action) )
 {
 	switch( $action )
 	{
-		// catch JS-only actions
 		case 'open_in_new_windows':
+			// catch JS-only actions
 			$Fileman->Messages->add( T_('You have to enable JavaScript to use this feature.') );
 			break;
 
 
-		case 'createnew':  // create new file/dir
+		case 'createnew':
+			// create new file/dir
 			param( 'createnew', 'string', '' ); // 'file', 'dir'
 			param( 'createname', 'string', '' );
 
@@ -263,7 +264,8 @@ if( !empty($action) )
 			break;
 
 
-		case 'delete': // delete a file/dir, TODO: checkperm! {{{
+		case 'delete':
+			// delete a file/dir, TODO: checkperm! {{{
 			if( !$SelectedFiles->count() )
 			{
 				$Fileman->Messages->add( T_('Nothing selected.') );
@@ -339,7 +341,8 @@ if( !empty($action) )
 			break;
 
 
-		case 'editperm': // edit permissions {{{
+		case 'editperm':
+			// edit permissions {{{
 			$action_title = T_('Change permissions');
 
 			if( !$SelectedFiles->count() )
@@ -433,7 +436,8 @@ if( !empty($action) )
 			break;
 
 
-		case 'file_cmr': // copy/move/rename - we come here from the "with selected" toolbar {{{
+		case 'file_cmr':
+			// copy/move/rename - we come here from the "with selected" toolbar {{{
 			#pre_dump( $SelectedFiles );
 
 			// }}}
@@ -452,6 +456,9 @@ if( !empty($action) )
 
 			$selectedFile = & $SelectedFiles->getFileByIndex(0);
 
+			// Load meta data:
+			$selectedFile->load_meta();
+
 			// TODO: check if available
 
 			require dirname(__FILE__).'/_file_view.inc.php';
@@ -459,7 +466,8 @@ if( !empty($action) )
 			exit;
 
 
-		case 'leaveMode': // leave mode (upload, ..)
+		case 'leaveMode':
+			// leave mode (upload, ..)
 			$Fileman->mode = NULL;
 			header( 'Location: '.$Fileman->getCurUrl() );
 			break;
@@ -468,11 +476,10 @@ if( !empty($action) )
 
 
 
-/**#@+
+/**
  * The top menu
  */
 require dirname(__FILE__).'/_menutop.php';
-/**#@-*/
 
 ?>
 
@@ -483,7 +490,8 @@ require dirname(__FILE__).'/_menutop.php';
 switch( $Fileman->getMode() )
 { // handle modes {{{
 
-	case 'file_upload': // {{{ upload mode
+	case 'file_upload':
+		// {{{ upload mode
 		// Check permissions:
 		if( !$Fileman->perm( 'upload' ) )
 		{
@@ -500,9 +508,11 @@ switch( $Fileman->getMode() )
 		 */
 		$failedFiles = array();
 
-
+		// Process uploaded files:
 		if( isset($_FILES) && count( $_FILES ) )
-		{{{ // Process uploaded files
+		{{{	// Some files have been uploaded:
+
+			param( 'uploadfile_title', 'array', array() );
 			param( 'uploadfile_alt', 'array', array() );
 			param( 'uploadfile_desc', 'array', array() );
 			param( 'uploadfile_name', 'array', array() );
@@ -510,64 +520,82 @@ switch( $Fileman->getMode() )
 			foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
 			{
 				if( empty( $lName ) )
-				{
-					if( !empty( $uploadfile_alt[$lKey] ) || !empty( $uploadfile_desc[$lKey] ) || !empty( $uploadfile_name[$lKey] ) )
-					{ // Remember the file as failed when additional info provided.
+				{	// No file name
+
+					if( !empty( $uploadfile_title[$lKey] )
+						|| !empty( $uploadfile_alt[$lKey] )
+						|| !empty( $uploadfile_desc[$lKey] )
+						|| !empty( $uploadfile_name[$lKey] ) )
+					{	// User specified params but NO file!!!
+						// Remember the file as failed when additional info provided.
 						$failedFiles[$lKey] = T_( 'Please select a local file to upload.' );
 					}
+					// Abort upload for this file:
 					continue;
 				}
 
-
-				if( ( $Settings->get( 'upload_maxkb' ) && $_FILES['uploadfile']['size'][$lKey] > $Settings->get( 'upload_maxkb' )*1024 )
-						|| $_FILES['uploadfile']['error'][$lKey] == UPLOAD_ERR_FORM_SIZE ) // The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
+				if( $Settings->get( 'upload_maxkb' ) && ( $_FILES['uploadfile']['size'][$lKey] > $Settings->get( 'upload_maxkb' )*1024 ) )
 				{ // bigger than defined by blog
-					$failedFiles[$lKey] = sprintf( /* TRANS: %s will be replaced by the difference */ T_('The file is %s too big.'), bytesreadable( $_FILES['uploadfile']['size'][$lKey] - $Settings->get( 'upload_maxkb' ) ) );
+					$failedFiles[$lKey] = sprintf( /* TRANS: %s will be replaced by the difference */ T_('The file is %s too large.'),
+															 bytesreadable( $_FILES['uploadfile']['size'][$lKey] - $Settings->get( 'upload_maxkb' ) ) );
+					// Abort upload for this file:
 					continue;
 				}
-				elseif( $_FILES['uploadfile']['error'][$lKey] )
-				{
+
+				if( $_FILES['uploadfile']['error'][$lKey] )
+				{	// PHP has detected an error!:
 					switch( $_FILES['uploadfile']['error'][$lKey] )
 					{
+						case UPLOAD_ERR_FORM_SIZE:
+							// The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
+							$failedFiles[$lKey] = sprintf( T_('The file is too large. Maximum allowed is: %s.'),
+																		bytesreadable( $Settings->get( 'upload_maxkb' )*1024 ) );
+							break;
+
 						case UPLOAD_ERR_INI_SIZE: // bigger than allowed in php.ini
 							$failedFiles[$lKey] = T_('The file exceeds the upload_max_filesize directive in php.ini.');
-							continue 2;
+							break;
 
 						case UPLOAD_ERR_PARTIAL:
 							$failedFiles[$lKey] = T_('The file was only partially uploaded.');
-							continue 2;
+							break;
 
 						case UPLOAD_ERR_NO_FILE:
 							// Is probably the same as empty($lName) before.
 							$failedFiles[$lKey] = T_('No file was uploaded.');
-							continue 2;
+							break;
 
-						case 6:
+						case 6:	// fplanque>> where is the 6 coming from?
 						case UPLOAD_ERR_NO_TMP_DIR: // PHP 4.3.10, 5.0.3
 							// Missing a temporary folder.
 							$failedFiles[$lKey] = T_('Missing a temporary folder (upload_tmp_dir in php.ini).');
-							continue 2;
+							break;
 
+						default:
+							$failedFiles[$lKey] = T_('Unknown error.').' #'.$_FILES['uploadfile']['error'][$lKey];
 					}
-
-					$failedFiles[$lKey] = T_('Unknown error.').' #'.$_FILES['uploadfile']['error'][$lKey];
+					// Abort upload for this file:
 					continue;
 				}
-				elseif( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
-				{
+
+				if( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
+				{	// fplanque>> when does this happen??
 					$failedFiles[$lKey] = T_('The file does not seem to be a valid upload!');
+					// Abort upload for this file:
 					continue;
 				}
 
-
+				// Use new name on server if specified:
 				$newName = !empty( $uploadfile_name[ $lKey ] ) ? $uploadfile_name[ $lKey ] : $lName;
 
 				if( !isFilename( $newName ) )
 				{
-					$failedFiles[$lKey] = sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $newName );
+					$failedFiles[$lKey] = sprintf( T_('&laquo;%s&raquo; cannot be used as a valid filename on this server.'), $newName );
+					// Abort upload for this file:
 					continue;
 				}
 
+				// Check file extension:
 				if( !empty($allowedFileExtensions) )
 				{ // check extension
 					if( preg_match( '#\.([^.]+)$#', $newName, $match ) )
@@ -577,43 +605,69 @@ switch( $Fileman->getMode() )
 						if( !in_array( $extension, $allowedFileExtensions ) )
 						{
 							$failedFiles[$lKey] = sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension );
+							// Abort upload for this file:
 							continue;
 						}
 					}
 					// NOTE: Files with no extension are allowed..
 				}
 
+				// Check file MIME type:
+				// fplanque>>blueyed: I think that checking against a browser provided type is a bad idea,
+				// people will think it's a secure way to prevent upload of scripts... but it's not :(
 				if( !empty($allowedMimeTypes)
 						&& !empty( $_FILES['uploadfile']['type'][$lKey] ) // browser provided type
 						&& in_array( $_FILES['uploadfile']['type'][$lKey], $allowedMimeTypes )
 					)
 				{
 					$failedFiles[$lKey] = sprintf( T_('The file type (MIME) &laquo;%s&raquo; is not allowed.'), $_FILES['uploadfile']['type'][$lKey] );
+					// Abort upload for this file:
 					continue;
 				}
 
-
-				$newFile =& getFile( $newName, $Fileman->getCwd() );
+				// Get File object for requested target location:
+				$newFile = & getFile( $newName, $Fileman->getCwd(), true );
 
 				if( $newFile->exists() )
-				{
+				{	// The file already exists in the target location!
 					// TODO: Rename/Overwriting
 					$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->getName() );
+					// Abort upload for this file:
 					continue;
 				}
-				elseif( !move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->getPath() ) )
+
+				// Attempt to move the uploaded file to the requested target location:
+				if( !move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->getPath() ) )
 				{
 					$failedFiles[$lKey] = T_('An unknown error occurred when moving the uploaded file on the server.');
+					// Abort upload for this file:
 					continue;
 				}
-				else
-				{
-					$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->getName() ), 'note' );
 
-					$newFile->refresh();
-					$Fileman->addFile( $newFile );
-					continue;
+				$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->getName() ), 'note' );
+
+				// Refreshes (and inits) information about the file.
+				$newFile->refresh();
+
+				// Store extra info about the file into File Object:
+				if( isset( $uploadfile_title[$lKey] ) )
+				{	// If a title text has been passed... (does not happen in quick upload mode)
+					$newFile->set( 'title', trim( strip_tags($uploadfile_title[$lKey])) );
 				}
+				if( isset( $uploadfile_alt[$lKey] ) )
+				{	// If an alt text has been passed... (does not happen in quick upload mode)
+					$newFile->set( 'alt', trim( strip_tags($uploadfile_alt[$lKey])) );
+				}
+				if( isset( $uploadfile_desc[$lKey] ) )
+				{	// If a desc text has been passed... (does not happen in quick upload mode)
+					$newFile->set( 'desc', trim( strip_tags($uploadfile_desc[$lKey])) );
+				}
+
+				// Store File object into DB:
+				$newFile->dbsave();
+
+				// Tell the filamanager about the new file:
+				$Fileman->addFile( $newFile );
 			}
 		}}}
 
@@ -980,6 +1034,11 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.84  2005/04/13 17:48:21  fplanque
+ * File manager refactoring
+ * storing of file meta data through upload
+ * displaying or metadate in previews
+ *
  * Revision 1.83  2005/04/12 19:36:30  fplanque
  * File manager cosmetics
  *

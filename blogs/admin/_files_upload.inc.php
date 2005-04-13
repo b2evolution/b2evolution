@@ -44,6 +44,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 ?>
 
 <script type="text/javascript">
+	<!--
 	/**
 	 * Mighty cool function to append an input or textarea element onto another element.
 	 *
@@ -51,19 +52,36 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	 *
 	 * @author proud daniel hahler :)
 	 */
-	function appendLabelAndInputElements( appendTo, labelText, inputOrTextarea, inputName, inputSizeOrCols, inputMaxLengthOrRows, inputType )
+	function appendLabelAndInputElements( appendTo, labelText, labelBr, inputOrTextarea, inputName,
+																				inputSizeOrCols, inputMaxLengthOrRows, inputType, inputClass )
 	{
-		/*var fileDivLabel = document.createElement("div");
-		fileDivLabel.className = "label";*/
-		var fileLabel = document.createElement("label");
+		// LABEL:
+
+		// var fileDivLabel = document.createElement("div");
+		// fileDivLabel.className = "label";
+
+		var fileLabel = document.createElement('label');
 		var fileLabelText = document.createTextNode( labelText );
 		fileLabel.appendChild( fileLabelText );
-		/*fileDivLabel.appendChild( fileLabel );*/
-		appendTo.appendChild( fileLabel );
-		appendTo.appendChild( document.createElement("br") );
 
-		/*var fileDivInput = document.createElement("div");
-		fileDivInput.className = "input";*/
+		// fileDivLabel.appendChild( fileLabel )
+
+		appendTo.appendChild( fileLabel );
+
+		if( labelBr )
+		{	// We want a BR after the label:
+			appendTo.appendChild( document.createElement('br') );
+		}
+		else
+		{
+			appendTo.appendChild( document.createTextNode( ' ' ) );
+		}
+
+		// INPUT:
+
+		// var fileDivInput = document.createElement("div");
+		// fileDivInput.className = "input";
+
 		var fileInput = document.createElement( inputOrTextarea );
 		fileInput.name = inputName;
 		if( inputOrTextarea == "input" )
@@ -82,10 +100,15 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			fileInput.cols = inputSizeOrCols;
 			fileInput.rows = inputMaxLengthOrRows;
 		}
-		/*fileDivInput.appendChild( fileInput );*/
+
+		fileInput.className = inputClass;
+
+		// fileDivInput.appendChild( fileInput );
+
 		appendTo.appendChild( fileInput );
-		appendTo.appendChild( document.createElement("br") );
+		appendTo.appendChild( document.createElement('br') );
 	}
+
 
 	/**
 	 * Add a new fileinput area to the upload form.
@@ -101,11 +124,18 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		uploadfiles.appendChild( newLI );
 
 
-		appendLabelAndInputElements( newLI, "<?php echo T_('Choose a file'); ?>:", "input", "uploadfile[]", "40", "0", "file" );
-		appendLabelAndInputElements( newLI, "<?php echo T_('Alternative text'); ?>:", "input", "uploadfile_alt[]", "40", "80", "text" );
-		appendLabelAndInputElements( newLI, "<?php echo T_('Description of the file'); ?>:", "textarea", "uploadfile_desc[]", "40", "3" );
-		appendLabelAndInputElements( newLI, "<?php echo T_('New filename (without path)'); ?>:", "input", "uploadfile_name[]", "40", "80", "text" );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Choose a file'); ?>:', false,
+																	'input', 'uploadfile[]', '20', '0', 'file', '' );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Filename on server (optional)'); ?>:', false,
+																	'input', 'uploadfile_name[]', '20', '80', 'text', '' );
+ 		appendLabelAndInputElements( newLI, '<?php echo TS_('Long title'); ?>:', true,
+ 																	'input', 'uploadfile_title[]', '50', '255', 'text', 'large' );
+ 		appendLabelAndInputElements( newLI, '<?php echo TS_('Alternative text (useful for images)'); ?>:', true,
+ 																	'input', 'uploadfile_alt[]', '50', '255', 'text', 'large' );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Caption/Description of the file'); ?>:', true,
+																	'textarea', 'uploadfile_desc[]', '38', '3', '', 'large' );
 	}
+	// -->
 </script>
 
 
@@ -118,14 +148,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		echo $Fileman->getFormHiddenInputs( array( 'root' => false, 'path' => false ) );
 		form_hidden( 'rootIDAndPath', serialize( array( 'id' => $Fileman->root, 'path' => $Fileman->getPath() ) ) );
 
-
+		// FILE UPLOAD TITLE:
 		echo '<span style="float: right;">';
 		echo '<a href="'.$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ).'">';
 		echo '<img class="middle" src="http://localhost:8088/b2evo/blogs/admin/img/close.gif" title="Quit upload mode" alt="Fermer" height="14" width="14">';
 		echo '</a></span>';
 		echo '<h2>'.T_('File upload').'</h2>';
-
-
 
 		if( count( $failedFiles ) )
 		{
@@ -164,42 +192,60 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 			<ul id="uploadfileinputs">
 				<?php
-				$failedFiles[] = NULL; // display at least one upload div
-				foreach( $failedFiles as $lKey => $lMessage )
-				{
-					?><li<?php
-						if( $lMessage !== NULL )
-						{
-							echo ' class="invalid" title="'./* TRANS: will be displayed as title for failed file uploads */ T_('Invalid submission.').'"';
-						} ?>>
+					if( empty($failedFiles) )
+					{	// No failed failes, display one empty input block:
+						$displayFiles[] = NULL;
+					}
+					else
+					{	// Display failed files:
+						$displayFiles = & $failedFiles;
+					}
 
-						<?php
+					foreach( $displayFiles as $lKey => $lMessage )
+					{	// For each file upload block to display:
+
 						if( $lMessage !== NULL )
-						{
+						{ // This is a failed upload:
+							echo '<li class="invalid" title="'
+											./* TRANS: will be displayed as title for failed file uploads */ T_('Invalid submission.').'">';
 							Log::display( '', '', $lMessage, 'error' );
 						}
+						else
+						{	// Not a failed upload, display normal block:
+							echo '<li>';
+						}
+
 						?>
 
-						<label><?php echo T_('Choose a file'); ?>:</label><br />
-						<input name="uploadfile[]" type="file" size="37" /><br />
+						<label><?php echo T_('Choose a file'); ?>:</label>
+						<input name="uploadfile[]" size="20" type="file" /><br />
 
-						<label><?php echo T_('Alternative text'); ?></label>:<br />
-						<input name="uploadfile_alt[]" type="text" size="50" maxlength="80"
+						<label><?php echo T_('Filename on server (optional)'); ?>:</label>
+						<input name="uploadfile_name[]" type="text" size="20" maxlength="80"
+							value="<?php echo ( isset( $uploadfile_name[$lKey] ) ? format_to_output( $uploadfile_name[$lKey], 'formvalue' ) : '' ) ?>" /><br />
+
+						<label><?php echo T_('Long title'); ?>:</label><br />
+						<input name="uploadfile_title[]" type="text" size="50" maxlength="255" class="large"
+							value="<?php echo ( isset( $uploadfile_title[$lKey] ) ? format_to_output( $uploadfile_title[$lKey], 'formvalue' ) : '' );
+							?>" /><br />
+
+						<label><?php echo T_('Alternative text (useful for images)'); ?>:</label><br />
+						<input name="uploadfile_alt[]" type="text" size="50" maxlength="255" class="large"
 							value="<?php echo ( isset( $uploadfile_alt[$lKey] ) ? format_to_output( $uploadfile_alt[$lKey], 'formvalue' ) : '' );
 							?>" /><br />
 
-						<label><?php echo T_('Description of the file'); /* TODO: maxlength (DB) */ ?></label>:<br />
-						<textarea name="uploadfile_desc[]" rows="3" cols="37"><?php
+						<label><?php echo T_('Caption/Description of the file'); /* TODO: maxlength (DB) */ ?>:</label><br />
+						<textarea name="uploadfile_desc[]" rows="3" cols="38" class="large"><?php
 							echo ( isset( $uploadfile_desc[$lKey] ) ? $uploadfile_desc[$lKey] : '' )
 						?></textarea><br />
 
-						<label><?php echo T_('New filename (without path)'); ?></label>:<br />
-						<input name="uploadfile_name[]" type="text" size="50" maxlength="80"
-							value="<?php echo ( isset( $uploadfile_name[$lKey] ) ? format_to_output( $uploadfile_name[$lKey], 'formvalue' ) : '' ) ?>" /><br />
-					</li><?php // no text after </li> or JS will bite you!
-				}
+						<?php
+						echo '</li>';
+						// no text after </li> or JS will bite you! (This is where additional blocks get inserted)
+					}
 
-				?></ul>
+				?>
+			</ul>
 
 			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput();"><?php echo T_('Add another file'); ?></a></p>
 
@@ -231,6 +277,11 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 <?php
 /*
  * $Log$
+ * Revision 1.3  2005/04/13 17:48:21  fplanque
+ * File manager refactoring
+ * storing of file meta data through upload
+ * displaying or metadate in previews
+ *
  * Revision 1.2  2005/04/12 19:36:30  fplanque
  * File manager cosmetics
  *

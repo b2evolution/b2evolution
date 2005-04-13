@@ -100,35 +100,35 @@ $fm_filetypes = array( // {{{
  *
  * @param string name of the file or directory
  * @param string path of the file or directory
+ * @param boolean check for meta data?
  * @return File an {@link File} object
  */
-function & getFile( $name, $path = NULL )
+function & getFile( $name, $path = NULL, $load_meta = false )
 {
 	global $cache_File;
 
-	$path = trailing_slash( $path === NULL ?
-													getcwd() :
-													$path );
+	$path = trailing_slash( $path === NULL ? getcwd() : $path );
 
 	$path = str_replace( '\\', '/', trailing_slash($path) );
 
-	$cacheindex = is_windows() ?
-								strtolower($path.$name) :
-								$path.$name;
-
+	$cacheindex = is_windows() ? strtolower($path.$name) : $path.$name;
 
 	if( isset( $cache_File[ $cacheindex ] ) )
 	{
 		#Log::display( '', '', 'File ['.$cacheindex.'] returned from cache.' );
-		return $cache_File[ $cacheindex ];
+		$File = & $cache_File[ $cacheindex ];
+		if( $load_meta )
+		{	// Make sure meta is loaded:
+			$File->load_meta();
+		}
 	}
 	else
 	{
 		#Log::display( '', '', 'File ['.$cacheindex.'] not cached.' );
-		$File =& new File( $name, $path );
-		$cache_File[$cacheindex] =& $File;
-		return $File;
+		$File = & new File( $name, $path, $load_meta );
+		$cache_File[$cacheindex] = & $File;
 	}
+	return $File;
 }
 
 
@@ -143,6 +143,9 @@ class File extends DataObject
 	 * We haven't checked for meta data yet
 	 */
 	var $meta = 'unknown';
+	var $title;
+	var $alt;
+	var $desc;
 
 	/**#@+
 	 * @access protected
@@ -177,7 +180,7 @@ class File extends DataObject
 	 * @param boolean check for meta data?
 	 * @return mixed false on failure, File object on success
 	 */
-	function File( $name, $dir, $meta = false )
+	function File( $name, $dir, $load_meta = false )
 	{
 		// Call parent constructor
 		parent::DataObject( 'T_files', 'file_', 'file_ID', '', '', '', '' );
@@ -188,13 +191,12 @@ class File extends DataObject
 
 		$this->setName( $name );
 		$this->setDir( $dir );
-
 		$this->_md5ID = md5( $this->_dir.$this->_name );
 
-		// Get/Memorize detailed file info:
+		// Get/Memorize detailed diskfile info:
 		$this->refresh();
 
-		if( $meta )
+		if( $load_meta )
 		{ // Try to load DB meta info:
 			$this->load_meta();
 		}
@@ -213,12 +215,17 @@ class File extends DataObject
 		if( $this->meta == 'unknown' )
 		{ // We haven't tried loading yet:
 			if( $row = $DB->get_row( 'SELECT * FROM T_files
-																WHERE file_path = '.$DB->quote($this->getPath()) ) )
+																WHERE file_root_type = \'absolute\'
+																	AND file_root_ID = 0
+																	AND file_path = '.$DB->quote($this->getPath()),
+																OBJECT, 0, 'Load file meta data' ) )
 			{ // We found meta data
 				$Debuglog->add('Loaded metadata for '.$this->getPath());
-				$this->meta = 'loaded';
-				$this->ID = $row->file_ID;
-				$this->caption = $row->file_caption;
+				$this->meta  = 'loaded';
+				$this->ID    = $row->file_ID;
+				$this->title = $row->file_title;
+				$this->alt   = $row->file_alt;
+				$this->desc  = $row->file_desc;
 			}
 			else
 			{
@@ -737,10 +744,48 @@ class File extends DataObject
 		}
 	}
 
+
+	/**
+	 * Insert object into DB based on previously recorded changes
+	 */
+	function dbinsert( )
+	{
+		if( $this->meta == 'unknown' )
+			die( 'cannot insert File if meta data has not been checked before' );
+
+		if( $this->ID != 0 ) die( 'Existing file object cannot be inserted!' );
+
+		// We need to track filepath:
+		$this->set_param( 'path', 'string', $this->_dir.$this->_name );
+
+		// Let parent do the insert:
+		parent::dbinsert();
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * {@internal DataObject::dbupdate(-)}}
+	 */
+	function dbupdate( )
+	{
+		if( $this->meta == 'unknown' )
+			die( 'cannot update File if meta data has not been checked before' );
+
+		// Let parent do the update:
+		parent::dbupdate();
+	}
 }
+
 
 /*
  * $Log$
+ * Revision 1.24  2005/04/13 17:48:22  fplanque
+ * File manager refactoring
+ * storing of file meta data through upload
+ * displaying or metadate in previews
+ *
  * Revision 1.23  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

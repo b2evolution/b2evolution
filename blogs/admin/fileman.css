@@ -131,10 +131,12 @@ img.framed {
 	background-color:#ff0;
 	font-weight:bold;
 }
-div.fileheader {
+div.fileheader,
+div.eof
+{	/* Use in RAW file preview */
 	background:#ccc;
-	border:1px solid #ddd;
 	padding:1ex;
+	margin: 0;
 }
 pre.rawcontent {
 	margin:0;
@@ -182,16 +184,9 @@ p.uploadfileinputs {
 	margin:1ex 0;
 	padding:1ex;
 }
-ul#uploadfileinputs li.invalid {
+ul#uploadfileinputs li.invalid 
+{	/* Upload block displayed when upload has failed: */
 	border:1px solid #f00;
-	padding:2ex;
-}
-ul#uploadfileinputs li input,
-ul#uploadfileinputs li textarea {
-	width:99%;
-}
-ul#uploadfileinputs li input[type=file] {
-	width:auto;
 }
 ul#uploadfileinputs label {
 	font-weight:bold;

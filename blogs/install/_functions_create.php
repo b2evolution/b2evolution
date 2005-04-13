@@ -766,7 +766,7 @@ function create_default_settings( $override = array() )
 								'user_minpwdlen' => '5',
 								'reloadpage_timeout' => '300',
 								'upload_enabled' => '1',
-								'upload_allowedext' => 'jpg gif png',
+								'upload_allowedext' => 'jpg gif png txt',
 								'upload_maxkb' => '96',
 								'upload_minlevel' => '1',
 							);
@@ -992,13 +992,15 @@ function create_b2evo_tables_092()
 
 	echo 'Creating table for File Meta Data... ';
 	$DB->query( "CREATE TABLE T_files (
-									file_ID         int(11) unsigned NOT NULL auto_increment,
-									file_root_type  enum('user','group','collection') NOT NULL default 'user',
-									file_root_ID    int(11) unsigned NOT NULL default '0',
-									file_path       varchar(255) NOT NULL default '',
-									file_caption    varchar(255) NOT NULL default '',
-									PRIMARY KEY (file_ID),
-									UNIQUE KEY file (file_root_type, file_root_ID, file_path)
+								 file_ID                        int(11) unsigned               not null AUTO_INCREMENT,
+								 file_root_type                 enum('absolute','user','group','collection') not null default 'absolute',
+								 file_root_ID                   int(11) unsigned               not null default 0,
+								 file_path                      varchar(255)                   not null default '',
+							   file_title                     varchar(255),
+								 file_alt                       varchar(255),
+								 file_desc                      text,
+								 primary key (file_ID),
+								 unique file (file_root_type, file_root_ID, file_path)
 								)" );
 	echo "OK.<br />\n";
 
