@@ -349,6 +349,7 @@ if( !empty($action) )
 
 		case 'editperm':
 			// edit permissions {{{
+			// fplanque>> TODO: as long as we use fm_modes this thing should at least work like a mode or at the bare minimun, turn off any active mode.
 			$action_title = T_('Change permissions');
 
 			if( !$SelectedFiles->count() )
@@ -384,8 +385,9 @@ if( !empty($action) )
 				}
 			}
 			else
-			{
+			{	// Display dialog:
 				// TODO: use Form class, finish non-Windows
+				// TODO: move to a file called _file_permissions.form.php
 				$action_msg = '
 				<div class="panelblock">
 				<form name="form_chmod" action="files.php">
@@ -396,7 +398,7 @@ if( !empty($action) )
 				';
 
 				if( is_windows() )
-				{
+				{ // WINDOWS read/write permissons:
 					if( $SelectedFiles->count() > 1 )
 					{ // more than one file, provide default
 
@@ -425,7 +427,7 @@ if( !empty($action) )
 					}
 				}
 				else
-				{
+				{	// UNIX permissions:
 					$action_msg .= '<input type="text" name="chmod" value="'
 													.$lFile->getPerms( 'octal' ).'" maxlength="3" size="3" /><br />';
 					$js_focus = 'document.form_chmod.chmod';
@@ -821,6 +823,13 @@ switch( $Fileman->getMode() )
 
 
 	case 'File_properties':
+		// File properties (Meta data):
+
+		$selectedFile = & $SelectedFiles->getFileByIndex(0);
+
+		// Load meta data:
+		$selectedFile->load_meta();
+
 		// File properties (Meta data) dialog:
 		require dirname(__FILE__).'/_file_properties.inc.php';
 		break;
@@ -930,6 +939,11 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.88  2005/04/14 19:57:52  fplanque
+ * filemanager refactoring & cleanup
+ * started implementation of properties/meta data editor
+ * note: the whole fm_mode thing is not really desireable...
+ *
  * Revision 1.87  2005/04/14 18:34:03  fplanque
  * filemanager refactoring
  *

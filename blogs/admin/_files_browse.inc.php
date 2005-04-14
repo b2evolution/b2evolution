@@ -296,7 +296,6 @@ while( $lFile =& $Fileman->getNextFile() )
 
 		<td class="filename">
 
-
 			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"
 				target="fileman_default"
 				title="<?php echo T_('Open in a new window'); ?>"
@@ -310,7 +309,7 @@ while( $lFile =& $Fileman->getNextFile() )
 						echo $Fileman->getJsPopupCode( NULL,
 							"'+( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_$countFiles')+'",
 							($imgsize ? $imgsize[0]+100 : NULL),
-							($imgsize ? $imgsize[1]+100 : NULL) );
+							($imgsize ? $imgsize[1]+150 : NULL) );
 
 						// Un-do the td-onclick action on the checkbox:
 						?> document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();"
@@ -700,6 +699,11 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.19  2005/04/14 19:57:52  fplanque
+ * filemanager refactoring & cleanup
+ * started implementation of properties/meta data editor
+ * note: the whole fm_mode thing is not really desireable...
+ *
  * Revision 1.18  2005/04/14 18:34:03  fplanque
  * filemanager refactoring
  *

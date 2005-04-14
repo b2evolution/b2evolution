@@ -76,7 +76,7 @@ $Form->begin_form( 'fform', T_('Copy / Move / Rename') );
 
 	$sourcesInSameDir = true;
 
-	while( $lSourceFile =& $Fileman->SourceList->getNextFile() )
+	while( $lSourceFile = & $Fileman->SourceList->getNextFile() )
 	{
 		if( $sourcesInSameDir && $lSourceFile->getDir() != $Fileman->cwd )
 		{
@@ -85,12 +85,9 @@ $Form->begin_form( 'fform', T_('Copy / Move / Rename') );
 		?>
 
 		<fieldset>
-			<legend><?php echo T_('Source').': '.$lSourceFile->getPath();
-			?></legend>
+			<legend><?php echo T_('Source').': '.$lSourceFile->getPath(); ?></legend>
 
 			<?php
-
-
 			if( isset( $cmr_overwrite[$lSourceFile->getID()] )
 					&& $cmr_overwrite[$lSourceFile->getID()] === 'ask' )
 			{
@@ -136,31 +133,18 @@ $Form->begin_form( 'fform', T_('Copy / Move / Rename') );
 	// text and value for JS dynamic fields, when referring to move/rename
 	if( $sourcesInSameDir )
 	{
-		$submitMoveOrRenameText = format_to_output( T_('Rename'), 'formvalue' );
+		$submitMoveOrRenameText = T_('Rename');
+		$submitMoveOrRenameText_JS = TS_('Rename');
 	}
 	else
 	{
-		$submitMoveOrRenameText = format_to_output( T_('Move'), 'formvalue' );
+		$submitMoveOrRenameText = T_('Move');
+		$submitMoveOrRenameText_JS = TS_('Move');
 	}
 
-	?>
 
-	<fieldset class="cmr_submit">
-			<input id="cmr_submit" type="submit" value="<?php
-				if( $cmr_keepsource )
-				{
-					echo format_to_output( T_('Copy'), 'formvalue' );
-				}
-				else
-				{
-					echo $submitMoveOrRenameText;
-				} ?>" />
-			<input type="reset" value="<?php echo format_to_output( T_('Reset'), 'formvalue' ) ?>" />
-	</fieldset>
-
-	<?php
-
-$Form->end_form();
+$Form->end_form( array( array( 'submit', 'cmr_submit', $cmr_keepsource ?  T_('Copy') : $submitMoveOrRenameText, 'SaveButton' ),
+												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 ?>
 <script type="text/javascript">
@@ -169,11 +153,11 @@ $Form->end_form();
 	{
 		if( document.getElementById( 'cmr_keepsource' ).checked )
 		{
-			text = '<?php echo format_to_output( T_('Copy'), 'formvalue' ) ?>';
+			text = '<?php echo TS_('Copy') ?>';
 		}
 		else
 		{
-			text = '<?php echo $submitMoveOrRenameText ?>';
+			text = '<?php echo $submitMoveOrRenameText_JS ?>';
 		}
 		document.getElementById( 'cmr_submit' ).value = text;
 	}
@@ -187,6 +171,11 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.2  2005/04/14 19:57:52  fplanque
+ * filemanager refactoring & cleanup
+ * started implementation of properties/meta data editor
+ * note: the whole fm_mode thing is not really desireable...
+ *
  * Revision 1.1  2005/04/14 18:34:03  fplanque
  * filemanager refactoring
  *

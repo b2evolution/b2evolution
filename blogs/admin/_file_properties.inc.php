@@ -50,15 +50,34 @@ $Form->global_icon( T_('Close properties!'), 'close',	$Fileman->getCurUrl( array
 
 $Form->begin_form( 'fform', T_('File properties') );
 
-$Form->end_form();
+	echo $Fileman->getFormHiddenInputs();
+	echo $Fileman->getFormHiddenSelectedFiles();
+	$Form->hidden( 'action', 'edit_properties' );
 
+	$Form->fieldset( T_('Properties') );
+		$Form->info( T_('Filename'), $selectedFile->getName(), T_('This is the name of the file on the server hard drive.') );
+		$Form->info( T_('Type'), getIcon( $selectedFile ).' '.$selectedFile->getType() );
+	$Form->fieldset_end();
 
+	$Form->fieldset( T_('Meta data') );
+	  $Form->text( 'title', $selectedFile->title, 50, T_('Long title'), T_('This is a longer descriptive title'), 255 );
+	  $Form->text( 'alt', $selectedFile->alt, 50, T_('Alternative text'), T_('This is useful for images'), 255 );
+	  $Form->textarea( 'desc', $selectedFile->desc, 10, T_('Caption/Description') );
+	$Form->fieldset_end();
+
+$Form->end_form( array( array( 'submit', '', T_('Update'), 'SaveButton' ),
+												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 // End payload block:
 $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.2  2005/04/14 19:57:51  fplanque
+ * filemanager refactoring & cleanup
+ * started implementation of properties/meta data editor
+ * note: the whole fm_mode thing is not really desireable...
+ *
  * Revision 1.1  2005/04/14 18:34:02  fplanque
  * filemanager refactoring
  *

@@ -1103,6 +1103,7 @@ class Form extends Widget
 
 		if( !empty($options[1]) )
 		{ //a name has been specified
+			$r .= ' id="'.$options[1].'" ';
 			$r .= ' name="'.$options[1].'" ';
 		}
 

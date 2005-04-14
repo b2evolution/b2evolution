@@ -150,7 +150,8 @@ class FileManager extends Filelist
 
 
 	/**
-	 * These are variables that get considered when regenerating a URL
+	 * These are variables that get considered when regenerating an URL
+	 *
 	 * @var array
 	 * @access private
 	 */
@@ -646,8 +647,10 @@ class FileManager extends Filelist
 				$toAppend[$check] = $this->$check;
 			}
 		}
+
+		// Additional params to add, no internal globals:
 		while( list( $lKey, $lValue ) = each( $override ) )
-		{ // Additional params to add, no internal globals
+		{
 			$toAppend[$lKey] = $lValue;
 		}
 
@@ -1420,6 +1423,11 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.29  2005/04/14 19:57:52  fplanque
+ * filemanager refactoring & cleanup
+ * started implementation of properties/meta data editor
+ * note: the whole fm_mode thing is not really desireable...
+ *
  * Revision 1.28  2005/04/14 18:34:04  fplanque
  * filemanager refactoring
  *

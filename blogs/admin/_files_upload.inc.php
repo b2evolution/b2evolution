@@ -267,24 +267,21 @@ if( false )
 
 		<div class="clear"></div>
 
-		<fieldset class="upload_submit">
-			<input class="ActionButton" type="submit" value="<?php echo T_('Upload Now!') ?>" />
-      <?php
-				// TODO: Turn this into a button somehow...
-      	echo '<a class="ActionButton" href="'.$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ).'">'
-      				.T_('Cancel').'</a>';
-			?>
-		</fieldset>
-
 <?php
 
-	$Form->end_form();
+	$Form->end_form( array( array( 'submit', '', T_('Update'), 'SaveButton' ),
+													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 	// End payload block:
 	$AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.5  2005/04/14 19:57:52  fplanque
+ * filemanager refactoring & cleanup
+ * started implementation of properties/meta data editor
+ * note: the whole fm_mode thing is not really desireable...
+ *
  * Revision 1.4  2005/04/14 18:34:03  fplanque
  * filemanager refactoring
  *
