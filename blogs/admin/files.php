@@ -683,6 +683,15 @@ switch( $Fileman->getMode() )
 		// ------------------------
 		// copy/move/rename a file:
 		// ------------------------
+		/*
+		 * fplanque>> This whole thing is fkawed:
+		 * 1) only geeks can possibly like to use the same interface for renaming, moving and copying
+		 * 2) even the geeky unix commands won't pretend copying and moving are the same thing. They are not!
+		 *    Only moving and renaming are similar, and again FOR GEEKS ONLY.
+		 * 3) The way this works it breaks the File meta data (I'm working on it).
+		 * 4) For Move and Copy, this should use a "destination directory tree" on the right (same as for upload)
+		 * 5) Given all the reasons above copy, move and rename should be clearly separated into 3 different interfaces.
+		 */
 		// {{{
 		$LogCmr = new Log( 'error' );  // Log for copy/move/rename mode
 
@@ -807,15 +816,9 @@ switch( $Fileman->getMode() )
 						echo '<img class="middle" src="http://localhost:8088/b2evo/blogs/admin/img/close.gif" title="Quit copy/move/rename mode" alt="Fermer" height="14" width="14">';
 						echo '</a></span>';
 						echo '<h2>'.T_('Copy / Move / Rename').'</h2>';
-					?>
 
-						<div class="notes">
-							<?php
-							echo '<strong>'.T_('You are in copy-move-rename mode.')
-										.'</strong><br />'.T_('Please navigate to the desired location.'); ?>
-						</div>
-
-						<?php
+						echo '<div class="notes"><strong>'.T_('You are in copy-move-rename mode.')
+										.'</strong><br />'.T_('Please navigate to the desired location.').'</div>';
 
 						$LogCmr->display( '', '', true, 'all' );
 
@@ -857,7 +860,7 @@ switch( $Fileman->getMode() )
 										{
 											echo ' checked="checked"';
 										} ?> />
-									<span class="notes"><?php echo T_('Do not delete the source file.') ?></span>
+									<span class="notes"><?php echo T_('Copy instead of move.') ?></span>
 								</div>
 								<div class="clear"></div>
 
@@ -1039,6 +1042,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.86  2005/04/14 13:14:03  fplanque
+ * copy / move / rename is such a bad thing :'(
+ *
  * Revision 1.85  2005/04/13 18:31:27  fplanque
  * tried to make copy/move/rename work ...
  *
