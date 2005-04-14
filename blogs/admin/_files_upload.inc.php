@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UI controller for file upload.
+ * This file implements the UI for file upload.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -41,6 +41,13 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+if( false )
+{	/**
+	 * This is ugly, sorry, but I temporarily need this until NuSphere fixes their CodeInsight :'(
+	 */
+	include('_header.php');
+	include('files.php');
+}
 ?>
 
 <script type="text/javascript">
@@ -138,22 +145,22 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	// -->
 </script>
 
+<?php
+	// Begin payload block:
+	$AdminUI->dispPayloadBegin();
 
-<div class="panelblock">
-	<form enctype="multipart/form-data" action="files.php" method="post" class="fform">
-		<!-- The following is mainly a hint to the browser. -->
-		<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $Settings->get( 'upload_maxkb' )*1024 ?>" />
-		<?php
+	$Form = & new Form( 'files.php', '', 'post', 'fieldset', 'multipart/form-data' );
+
+	$Form->global_icon( T_('Quit upload mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
+
+	$Form->begin_form( 'fform', T_('File upload') );
+
+		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
+
 		// we'll use $rootIDAndPath only
 		echo $Fileman->getFormHiddenInputs( array( 'root' => false, 'path' => false ) );
-		form_hidden( 'rootIDAndPath', serialize( array( 'id' => $Fileman->root, 'path' => $Fileman->getPath() ) ) );
+		$Form->hidden( 'rootIDAndPath', serialize( array( 'id' => $Fileman->root, 'path' => $Fileman->getPath() ) ) );
 
-		// FILE UPLOAD TITLE:
-		echo '<span style="float: right;">';
-		echo '<a href="'.$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ).'">';
-		echo '<img class="middle" src="http://localhost:8088/b2evo/blogs/admin/img/close.gif" title="Quit upload mode" alt="Fermer" height="14" width="14">';
-		echo '</a></span>';
-		echo '<h2>'.T_('File upload').'</h2>';
 
 		if( count( $failedFiles ) )
 		{
@@ -268,15 +275,19 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
       				.T_('Cancel').'</a>';
 			?>
 		</fieldset>
-	</form>
-
-</div>
-
-<div class="clear"></div>
 
 <?php
+
+	$Form->end_form();
+
+	// End payload block:
+	$AdminUI->dispPayloadEnd();
+
 /*
  * $Log$
+ * Revision 1.4  2005/04/14 18:34:03  fplanque
+ * filemanager refactoring
+ *
  * Revision 1.3  2005/04/13 17:48:21  fplanque
  * File manager refactoring
  * storing of file meta data through upload

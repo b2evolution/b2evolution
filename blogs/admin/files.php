@@ -341,6 +341,12 @@ if( !empty($action) )
 			break;
 
 
+		case 'edit_properties':
+			// Edit File properties (Meta Data):
+			$Fileman->fm_mode = 'File_properties';
+			break;
+
+
 		case 'editperm':
 			// edit permissions {{{
 			$action_title = T_('Change permissions');
@@ -468,7 +474,7 @@ if( !empty($action) )
 
 		case 'leaveMode':
 			// leave mode (upload, ..)
-			$Fileman->mode = NULL;
+			$Fileman->fm_mode = NULL;
 			header( 'Location: '.$Fileman->getCurUrl() );
 			break;
 	}
@@ -486,7 +492,6 @@ require dirname(__FILE__).'/_menutop.php';
 
 <div id="filemanmain">
 <?php
-
 switch( $Fileman->getMode() )
 { // handle modes {{{
 
@@ -684,7 +689,7 @@ switch( $Fileman->getMode() )
 		// copy/move/rename a file:
 		// ------------------------
 		/*
-		 * fplanque>> This whole thing is fkawed:
+		 * fplanque>> This whole thing is flawed:
 		 * 1) only geeks can possibly like to use the same interface for renaming, moving and copying
 		 * 2) even the geeky unix commands won't pretend copying and moving are the same thing. They are not!
 		 *    Only moving and renaming are similar, and again FOR GEEKS ONLY.
@@ -698,7 +703,7 @@ switch( $Fileman->getMode() )
 		if( !$Fileman->SourceList->count() )
 		{
 			$Fileman->Messages->add( sprintf( T_('No source files!') ) );
-			$Fileman->mode = NULL;
+			$Fileman->fm_mode = NULL;
 			break;
 		}
 
@@ -803,140 +808,23 @@ switch( $Fileman->getMode() )
 
 		if( !$cmr_doit || $LogCmr->count( 'all' ) )
 		{
-			?>
-
-			<div class="panelblock">
-				<form action="files.php" class="fform" id="cmr_form">
-					<?php echo $Fileman->getFormHiddenInputs() ?>
-					<input type="hidden" name="cmr_doit" value="1" />
-					<?php
-						// C/M/R TITLE:
-						echo '<span style="float: right;">';
-						echo '<a href="'.$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ).'">';
-						echo '<img class="middle" src="http://localhost:8088/b2evo/blogs/admin/img/close.gif" title="Quit copy/move/rename mode" alt="Fermer" height="14" width="14">';
-						echo '</a></span>';
-						echo '<h2>'.T_('Copy / Move / Rename').'</h2>';
-
-						echo '<div class="notes"><strong>'.T_('You are in copy-move-rename mode.')
-										.'</strong><br />'.T_('Please navigate to the desired location.').'</div>';
-
-						$LogCmr->display( '', '', true, 'all' );
-
-						$sourcesInSameDir = true;
-
-						while( $lSourceFile =& $Fileman->SourceList->getNextFile() )
-						{
-							if( $sourcesInSameDir && $lSourceFile->getDir() != $Fileman->cwd )
-							{
-								$sourcesInSameDir = false;
-							}
-							?>
-
-							<fieldset>
-								<legend><?php echo T_('Source').': '.$lSourceFile->getPath();
-								?></legend>
-
-								<?php
-
-
-								if( isset( $cmr_overwrite[$lSourceFile->getID()] )
-										&& $cmr_overwrite[$lSourceFile->getID()] === 'ask' )
-								{
-									form_checkbox( 'overwrite', 0, '<span class="error">'.T_('Overwrite existing file').'</span>',
-																	sprintf( T_('The existing file &laquo;%s&raquo; will be replaced with this file.'),
-																						$TargetFile->getPath() ) );
-								}
-								?>
-
-								<div class="label">
-									<label for="cmr_keepsource_<?php $lSourceFile->getID(); ?>"><?php echo T_('Keep source file') ?>:</label>
-								</div>
-								<div class="input">
-									<input class="checkbox" type="checkbox" value="1"
-										name="cmr_keepsource[<?php echo $lSourceFile->getID(); ?>]"
-										id="cmr_keepsource_<?php $lSourceFile->getID(); ?>"
-										onclick="setCmrSubmitButtonValue( this.form );"<?php
-										if( $cmr_keepsource )
-										{
-											echo ' checked="checked"';
-										} ?> />
-									<span class="notes"><?php echo T_('Copy instead of move.') ?></span>
-								</div>
-								<div class="clear"></div>
-
-
-								<div class="label">
-									<label for="cmr_newname_<?php $lSourceFile->getID(); ?>">New name:</label>
-								</div>
-								<div class="input">
-									<input type="text" name="cmr_newname[<?php $lSourceFile->getID(); ?>]"
-										id="cmr_newname_<?php $lSourceFile->getID(); ?>" value="<?php
-										echo isset( $cmr_newname[$lSourceFile->getID()] ) ?
-														$cmr_newname[$lSourceFile->getID()] :
-														$lSourceFile->getName() ?>" />
-								</div>
-
-							</fieldset>
-
-						<?php
-						}
-
-						// text and value for JS dynamic fields, when referring to move/rename
-						if( $sourcesInSameDir )
-						{
-							$submitMoveOrRenameText = format_to_output( T_('Rename'), 'formvalue' );
-						}
-						else
-						{
-							$submitMoveOrRenameText = format_to_output( T_('Move'), 'formvalue' );
-						}
-
-						?>
-
-						<fieldset class="cmr_submit">
-								<input id="cmr_submit" type="submit" value="<?php
-									if( $cmr_keepsource )
-									{
-										echo format_to_output( T_('Copy'), 'formvalue' );
-									}
-									else
-									{
-										echo $submitMoveOrRenameText;
-									} ?>" />
-								<input type="reset" value="<?php echo format_to_output( T_('Reset'), 'formvalue' ) ?>" />
-						</fieldset>
-
-				</form>
-
-
-				<script type="text/javascript">
-					<!--
-					function setCmrSubmitButtonValue()
-					{
-						if( document.getElementById( 'cmr_keepsource' ).checked )
-						{
-							text = '<?php echo format_to_output( T_('Copy'), 'formvalue' ) ?>';
-						}
-						else
-						{
-							text = '<?php echo $submitMoveOrRenameText ?>';
-						}
-						document.getElementById( 'cmr_submit' ).value = text;
-					}
-					setCmrSubmitButtonValue(); // init call
-					// -->
-				</script>
-
-			</div>
-			<?php
+			// CMR dialog:
+			require dirname(__FILE__).'/_files_cmr.inc.php';
 		}
 		else
 		{ // successfully finished, leave mode
-			$Fileman->mode = NULL;
+			$Fileman->fm_mode = NULL;
 		}
 
 		// }}}
 		break;
+
+
+	case 'File_properties':
+		// File properties (Meta data) dialog:
+		require dirname(__FILE__).'/_file_properties.inc.php';
+		break;
+
 } // }}}
 
 
@@ -1042,6 +930,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.87  2005/04/14 18:34:03  fplanque
+ * filemanager refactoring
+ *
  * Revision 1.86  2005/04/14 13:14:03  fplanque
  * copy / move / rename is such a bad thing :'(
  *

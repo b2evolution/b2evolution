@@ -94,12 +94,13 @@ class Form extends Widget
 	 * @param string the method used to send data
 	 * @param string the form layout : 'fieldset', 'table' or ''
 	 */
-	function Form( $form_action = '', $form_name = '', $form_method = 'post', $layout = 'fieldset' )
+	function Form( $form_action = '', $form_name = '', $form_method = 'post', $layout = 'fieldset', $enctype = '' )
 	{
 		$this->form_name = $form_name;
 		$this->form_action = $form_action;
 		$this->form_method = $form_method;
 		$this->layout = $layout;
+		$this->enctype = $enctype;
 
 		switch( $this->layout )
 		{
@@ -576,6 +577,7 @@ class Form extends Widget
 					.'<form'
 					.( !empty( $this->form_name ) ? ' name="'.$this->form_name.'"' : '' )
 					.( !empty( $this->form_name ) ? ' id="'.$this->form_name.'"' : '' )
+					.( !empty( $this->enctype ) ? ' enctype="'.$this->enctype.'"' : '' )
 					.' method="'.$this->form_method
 					.'" action="'.$this->form_action.'"'
 					.( !empty( $form_class ) ? ' class="'.$form_class : '' )

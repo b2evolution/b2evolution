@@ -56,6 +56,7 @@
 }
 #filemanmain table.grouped td.timestamp {
 	width:15%;
+	white-space: nowrap;	
 }
 #filemanmain table.grouped td.timestamp span.time {
 	font-size:84%;

@@ -125,13 +125,6 @@ class FileManager extends Filelist
 	var $path = '';
 
 	/**
-	 * Remember the mode we're in ('upload')
-	 * @var string
-	 * @access protected
-	 */
-	var $mode;
-
-	/**
 	 * Remember the Filemanager mode we're in ('fm_upload', 'fm_cmr')
 	 * @var string
 	 * @access protected
@@ -163,7 +156,7 @@ class FileManager extends Filelist
 	 */
 	var $_internalGlobals = array(
 			'root', 'path', 'filterString', 'filterIsRegexp', 'order', 'orderasc',
-			'mode', 'fm_mode', 'fm_sources', 'cmr_keepsource', 'flatmode', 'forceFM'
+			'fm_mode', 'fm_sources', 'cmr_keepsource', 'flatmode', 'forceFM'
 		);
 
 	/**
@@ -196,7 +189,6 @@ class FileManager extends Filelist
 												$filterString = NULL, $filterIsRegexp = NULL, $flatmode = NULL )
 	{
 		global $basepath, $baseurl, $media_subdir, $admin_subdir, $admin_url;
-		global $mode;
 		global $BlogCache, $UserCache;
 		global $Debuglog;
 
@@ -287,11 +279,6 @@ class FileManager extends Filelist
 		 * @var string
 		 */
 		$this->url = $url;
-		/**
-		 * Remember mode from global.
-		 * @var string
-		 */
-		$this->mode = $mode;
 		/**
 		 * Get FM mode from params.
 		 * @var string
@@ -545,6 +532,24 @@ class FileManager extends Filelist
 	 *
 	 * @param File|NULL the File to delete
 	 */
+	function dispButtonFileProperties( $File = NULL )
+	{
+		if( $File === NULL )
+		{
+			$File = $this->curFile;
+		}
+
+		echo '<a title="'.T_('Edit properties...').'" href="'
+					.$this->getLinkFile( $File, 'edit_properties' ).'">'.getIcon( 'edit' ).'</a>';
+
+	}
+
+
+	/**
+	 * Display a button to edit File properties.
+	 *
+	 * @param File|NULL the File to delete
+	 */
 	function dispButtonFileDelete( $File = NULL )
 	{
 		if( $File === NULL )
@@ -554,7 +559,8 @@ class FileManager extends Filelist
 
 		if( $url = $this->getLinkFileDelete( $File ) )
 		{
-			echo '<a title="'.T_('Delete').'" href="'.$url.'" onclick="if( confirm(\''
+			echo '<a title="'.T_('Delete').'" href="'.$url
+				.'" onclick="if( confirm(\''
 				.sprintf( TS_('Do you really want to delete &laquo;%s&raquo;?'),
 				format_to_output( $File->getName(), 'formvalue' ) ).'\') )
 				{
@@ -858,33 +864,32 @@ class FileManager extends Filelist
 	 * Get the link to access a file or folder.
 	 *
 	 * @param File file object
-	 * @param boolean force link to a folder (default is to change into that folder).
+	 * @param string action to perform
 	 */
-	function getLinkFile( &$File, $folderAsParam = false )
+	function getLinkFile( & $File, $action = 'default' )
 	{
-		if( $File->isDir() && !$folderAsParam )
-		{
+		if( $File->isDir() && ($action == 'default') )
+		{	// Link to open this directory:
 			if( !isset( $File->cache['linkFile_1'] ) )
 			{
 				$File->cache['linkFile_1'] = $this->getCurUrl( array( 'path' => $this->getFileSubpath( $File ) ) );
 			}
-
 			return $File->cache['linkFile_1'];
 		}
 		else
-		{
+		{	// Link to perform given $action on directory or file:
 			if( !isset( $File->cache['linkFile_2'] ) )
 			{
-				$File->cache['linkFile_2'] = $this->getCurUrl().'&amp;action=default&amp;fm_selected[]='.$File->getID();
+				$File->cache['linkFile_2'] = $this->getCurUrl().'&amp;fm_selected[]='.$File->getID();
 			}
-			return $File->cache['linkFile_2'];
+			return $File->cache['linkFile_2'].'&amp;action='.$action;
 		}
 	}
 
 
 	function getLinkFileEditPerms()
 	{
-		return $this->getLinkFile( $this->curFile, true ).'&amp;action=editperm';
+		return $this->getLinkFile( $this->curFile, 'editperm' );
 	}
 
 
@@ -894,18 +899,7 @@ class FileManager extends Filelist
 		{
 			return false;
 		}
-		return $this->getLinkFile( $this->curFile ).'&amp;action=edit';
-	}
-
-
-	/**
-	 * Get link to rename a file or folder.
-	 *
-	 * @return string the URL
-	 */
-	function getLinkFileRename()
-	{
-		return $this->getLinkFile( NULL, true ).'&amp;action=rename';
+		return $this->getLinkFile( $this->curFile, 'edit' );
 	}
 
 
@@ -920,7 +914,7 @@ class FileManager extends Filelist
 		{
 			$File = $this->curFile;
 		}
-		return $this->getLinkFile( $File, true ).'&amp;action=delete';
+		return $this->getLinkFile( $File, 'delete' );
 	}
 
 
@@ -1426,6 +1420,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.28  2005/04/14 18:34:04  fplanque
+ * filemanager refactoring
+ *
  * Revision 1.27  2005/04/13 17:48:23  fplanque
  * File manager refactoring
  * storing of file meta data through upload

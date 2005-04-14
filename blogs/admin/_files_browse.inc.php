@@ -375,6 +375,7 @@ while( $lFile =& $Fileman->getNextFile() )
 		<td class="perms"><?php $Fileman->dispButtonFileEditPerms() ?></td>
 		<td class="actions lastcol"><?php
 			// Not implemented yet: $Fileman->dispButtonFileEdit();
+			$Fileman->dispButtonFileProperties();
 			$Fileman->dispButtonFileRename();
 			$Fileman->dispButtonFileCopy();
 			$Fileman->dispButtonFileMove();
@@ -699,6 +700,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.18  2005/04/14 18:34:03  fplanque
+ * filemanager refactoring
+ *
  * Revision 1.17  2005/04/13 18:31:26  fplanque
  * tried to make copy/move/rename work ...
  *
