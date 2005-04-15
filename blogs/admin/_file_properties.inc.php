@@ -52,7 +52,7 @@ $Form->begin_form( 'fform', T_('File properties') );
 
 	echo $Fileman->getFormHiddenInputs();
 	echo $Fileman->getFormHiddenSelectedFiles();
-	$Form->hidden( 'action', 'edit_properties' );
+	$Form->hidden( 'action', 'update_properties' );
 
 	$Form->fieldset( T_('Properties') );
 		$Form->info( T_('Filename'), $selectedFile->getName(), T_('This is the name of the file on the server hard drive.') );
@@ -73,6 +73,10 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.3  2005/04/15 18:02:58  fplanque
+ * finished implementation of properties/meta data editor
+ * started implementation of files to items linking
+ *
  * Revision 1.2  2005/04/14 19:57:51  fplanque
  * filemanager refactoring & cleanup
  * started implementation of properties/meta data editor

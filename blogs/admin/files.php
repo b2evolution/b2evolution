@@ -58,9 +58,17 @@
  */
 require_once dirname(__FILE__).'/_header.php';
 
+/**
+ * Load FileManager class
+ */
+require_once dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php';
+
 $AdminUI->setPath( 'files' );
 
 
+/**
+ * Check global access permissions:
+ */
 if( !$Settings->get( 'fm_enabled' ) )
 {
 	require dirname(__FILE__).'/_menutop.php';
@@ -69,14 +77,13 @@ if( !$Settings->get( 'fm_enabled' ) )
 	return;
 }
 
+if( $current_User->level < 7 )
+{
+	echo 'The filemanager is still beta. You need user level 7 to play with this.';
+	return;
+}
 
-/**
- * Load FileManager class
- */
-require_once dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php';
-
-
-if( param( 'rootIDAndPath', 'string', '' ) )
+if( param( 'rootIDAndPath', 'string', '', true ) )
 { // root and path together: decode and override
 	$rootIDAndPath = unserialize( $rootIDAndPath );
 	$root = $rootIDAndPath['id'];
@@ -84,26 +91,19 @@ if( param( 'rootIDAndPath', 'string', '' ) )
 }
 else
 {
-	param( 'root', 'string', NULL ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
-	param( 'path', 'string', '/' );  // the path relative to the root dir
+	param( 'root', 'string', NULL, true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
+	param( 'path', 'string', '/', true );  // the path relative to the root dir
 }
 
-param( 'order', 'string', NULL );
-param( 'orderasc', '', NULL );
-param( 'filterString', '', NULL );
-param( 'filterIsRegexp', 'integer', NULL );
-param( 'flatmode', '', NULL );
-
-param( 'action', 'string', '' );     // 3.. 2.. 1.. action :)
+param( 'order', 'string', NULL, true );
+param( 'orderasc', '', NULL, true );
+param( 'filterString', '', NULL, true );
+param( 'filterIsRegexp', 'integer', NULL, true );
+param( 'flatmode', '', NULL, true );
+param( 'action', 'string', '', true );     // 3.. 2.. 1.. action :)
 if( empty($action) )
 { // check f*cking IE syntax, which send input[image] submits without value, only name.x and name.y
-	$action = array_pop( array_keys( param( 'actionArray', 'array', array() ) ) );
-}
-
-if( $current_User->level < 10 )
-{ // allow demouser, but noone else below level 10
-	echo 'The filemanager is still beta. You need user level 10 to play with this.';
-	return;
+	$action = array_pop( array_keys( param( 'actionArray', 'array', array(), true ) ) );
 }
 
 if( $action == 'update_settings' )
@@ -122,6 +122,37 @@ if( $action == 'update_settings' )
 
 	$action = '';
 }
+
+
+/*
+ * Load editable objects:
+ */
+if( param( 'link_ID', 'integer', NULL, false, false, false ) )
+{
+	if( ($edited_Link = $LinkCache->get_by_ID( $link_ID, false )) === false )
+	{	// We could not find the linke to edit:
+		$Messages->head = T_('Cannot edit link!');
+		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
+		unset( $edited_Link );
+		unset( $link_ID );
+	}
+}
+
+
+/*
+ * Load linkable objects:
+ */
+if( param( 'item_ID', 'integer', NULL, true, false, false ) )
+{ // Load Requested iem:
+	if( ($edited_Item = $ItemCache->get_by_ID( $item_ID, false )) === false )
+	{	// We could not find the contact to link:
+		$Messages->head = T_('Cannot link Item!');
+		$Messages->add( T_('Requested item does not exist any longer.'), 'error' );
+		unset( $edited_Item );
+		unset( $item_ID );
+	}
+}
+
 
 
 /**
@@ -343,7 +374,86 @@ if( !empty($action) )
 
 		case 'edit_properties':
 			// Edit File properties (Meta Data):
+
+			$selectedFile = & $SelectedFiles->getFileByIndex(0);
+			// Load meta data:
+			$selectedFile->load_meta();
+
 			$Fileman->fm_mode = 'File_properties';
+			break;
+
+
+		case 'update_properties':
+			// Update File properties (Meta Data):
+
+			$selectedFile = & $SelectedFiles->getFileByIndex(0);
+			// Load meta data:
+			$selectedFile->load_meta();
+
+			$selectedFile->set( 'title', param( 'title', 'string', '' ) );
+			$selectedFile->set( 'alt', param( 'alt', 'string', '' ) );
+			$selectedFile->set( 'desc', param( 'desc', 'string', '' ) );
+
+			// Store File object into DB:
+			$selectedFile->dbsave();
+
+			// Leave special display mode:
+ 			$Fileman->fm_mode = 'NULL';
+			break;
+
+
+		case 'link':
+			// Link File to Item:
+			if( !$SelectedFiles->count() )
+			{
+				$Fileman->Messages->add( T_('Nothing selected.') );
+				break;
+			}
+
+			if( !isset($edited_Item) )
+			{	// No Item to link to...
+				$Fileman->fm_mode = NULL;
+				break;
+			}
+
+			// TODO: check item EDIT permissions!
+
+			$selectedFile = & $SelectedFiles->getFileByIndex(0);
+
+			$DB->begin();
+
+			// Load meta data AND MAKE SURE IT IS CREATED IN DB:
+			$selectedFile->load_meta( true );
+
+			// Let's make the link!
+			$edited_Link = & new Link();
+			$edited_Link->set( 'item_ID', $edited_Item->ID );
+			$edited_Link->set( 'file_ID', $selectedFile->ID );
+			$edited_Link->dbinsert();
+
+			$DB->commit();
+
+			$Messages->add( T_('Selected file has been linked to item.'), 'note' );
+			break;
+
+
+		case 'unlink':
+			// Unlink File from Item:
+			if( !isset( $edited_Link ) )
+			{
+				$Fileman->Messages->add( T_('Nothing selected.') );
+				break;
+			}
+
+			// TODO: get Item from Link to check perm
+
+			// TODO: check item EDIT permissions!
+
+			// Delete from DB:
+			$msg = sprintf( T_('Link from &laquo;%s&raquo; deleted.'), $edited_Link->Item->dget('title') );
+			$edited_Link->dbdelete( true );
+			unset($edited_Link);
+			$Messages->add( $msg, 'note' );
 			break;
 
 
@@ -492,7 +602,6 @@ require dirname(__FILE__).'/_menutop.php';
 ?>
 
 
-<div id="filemanmain">
 <?php
 switch( $Fileman->getMode() )
 { // handle modes {{{
@@ -823,15 +932,84 @@ switch( $Fileman->getMode() )
 
 
 	case 'File_properties':
-		// File properties (Meta data):
-
-		$selectedFile = & $SelectedFiles->getFileByIndex(0);
-
-		// Load meta data:
-		$selectedFile->load_meta();
-
 		// File properties (Meta data) dialog:
 		require dirname(__FILE__).'/_file_properties.inc.php';
+		break;
+
+
+	case 'link_item':
+		// We want to link file(s) to an item:
+
+		if( !isset($edited_Item) )
+		{	// No Item to link to...
+			$Fileman->fm_mode = NULL;
+			break;
+		}
+
+		// TODO: check EDIT permissions!
+
+		// Begin payload block:
+		$AdminUI->dispPayloadBegin();
+
+		$Form = & new Form( 'files.php' );
+
+		$Form->global_icon( T_('Quit link mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
+
+		$Form->begin_form( 'fform', sprintf( T_('Link files to a &laquo;%s&raquo;...'), $edited_Item->dget( 'title') ) );
+
+		$edited_Item->edit_link( '<p>', '</p>', T_('Edit this post') );
+
+		$Results = & new Results(
+							'SELECT link_ID, link_ltype_ID, file_ID, file_path
+								 FROM T_links INNER JOIN T_files ON link_file_ID = file_ID
+								WHERE link_item_ID = '.$edited_Item->ID,
+								20, 'link_' );
+
+		$Results->title = T_('Existing links');
+
+
+		$Results->cols[] = array(
+								'th' => T_('Link ID'),
+								'order' => 'link_ID',
+								'td' => '$link_ID$',
+							);
+
+		$Results->cols[] = array(
+								'th' => T_('Type'),
+								'order' => 'link_ltype_ID',
+								'td' => '$link_ltype_ID$',
+							);
+
+ 		$Results->cols[] = array(
+								'th' => T_('File ID'),
+								'order' => 'file_ID',
+								'td' => '$file_ID$',
+							);
+
+ 		$Results->cols[] = array(
+								'th' => T_('Path'),
+								'order' => 'file_path',
+								'td_start' => '<td class="left">',
+								'td' => '$file_path$',
+							);
+
+	 	$Results->cols[] = array(
+								'th' => T_('Unlink'),
+								'td_start' => '<td class="center">',
+								'td' => action_icon( T_('Delete this link!'), 'unlink',
+	                        '%regenerate_url( \'action\', \'link_ID=$link_ID$&amp;action=unlink\')%' ),
+							);
+
+		$Results->display();
+
+		printf( '<p>'.T_('Click on a link icon %s below to link an additional file to this post.').'</p>', getIcon( 'link' ) );
+
+		$Form->end_form( );
+
+		// End payload block:
+		$AdminUI->dispPayloadEnd();
+
+		$Fileman->forceFM = 1;
 		break;
 
 } // }}}
@@ -917,6 +1095,7 @@ if( isset($action_msg) )
 
 // }}}
 
+?><div id="filemanmain"><?php
 
 if( !$showFilemanager )
 { // We're in a mode and don't force the FM
@@ -939,6 +1118,10 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.89  2005/04/15 18:02:58  fplanque
+ * finished implementation of properties/meta data editor
+ * started implementation of files to items linking
+ *
  * Revision 1.88  2005/04/14 19:57:52  fplanque
  * filemanager refactoring & cleanup
  * started implementation of properties/meta data editor

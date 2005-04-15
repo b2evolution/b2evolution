@@ -15,7 +15,7 @@
 require_once (dirname(__FILE__). '/_header.php');
 
 $AdminUI->setPath( 'new' );
-param( 'action', 'string' );
+param( 'action', 'string', '', true );
 
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
@@ -28,7 +28,7 @@ switch($action)
 		 * --------------------------------------------------------------------
 		 * Display post editing form
 		 */
-		param( 'post', 'integer', true );
+		param( 'post', 'integer', true, true );
 		$edited_Item = $ItemCache->get_by_ID( $post );
 		$post_locale = $edited_Item->get( 'locale' );
 		$cat = $edited_Item->get( 'main_cat_ID' );

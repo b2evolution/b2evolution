@@ -208,7 +208,7 @@ class File extends DataObject
 	 *
 	 * Will attempt only once and cache the result.
 	 */
-	function load_meta()
+	function load_meta( $force_creation = false )
 	{
 		global $DB, $Debuglog;
 
@@ -228,8 +228,13 @@ class File extends DataObject
 				$this->desc  = $row->file_desc;
 			}
 			else
-			{
+			{ // No meta data...
 				$this->meta = 'notfound';
+
+				if( $force_creation )
+				{	// No meta data, we have to create it now!
+					$this->dbinsert();
+				}
 			}
 		}
 
@@ -753,13 +758,16 @@ class File extends DataObject
 		if( $this->meta == 'unknown' )
 			die( 'cannot insert File if meta data has not been checked before' );
 
-		if( $this->ID != 0 ) die( 'Existing file object cannot be inserted!' );
+		if( ($this->ID != 0) || ($this->meta != 'notfound') ) die( 'Existing file object cannot be inserted!' );
 
 		// We need to track filepath:
 		$this->set_param( 'path', 'string', $this->_dir.$this->_name );
 
 		// Let parent do the insert:
 		parent::dbinsert();
+
+		// We can now consider the meta data has been loaded:
+		$this->meta  = 'loaded';
 	}
 
 
@@ -781,6 +789,10 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2005/04/15 18:02:59  fplanque
+ * finished implementation of properties/meta data editor
+ * started implementation of files to items linking
+ *
  * Revision 1.24  2005/04/13 17:48:22  fplanque
  * File manager refactoring
  * storing of file meta data through upload

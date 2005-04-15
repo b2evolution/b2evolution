@@ -59,8 +59,8 @@ class Link extends DataObject
 	 */
 	function Link( $db_row = NULL )
 	{
-		global $TaskCache, $ContactCache, $EstablishmentCache, $FirmCache, $TaskCache;
-
+		global $ItemCache;
+		
 		// Call parent constructor:
 		parent::DataObject( 'T_links', 'link_', 'link_ID' );
 
@@ -70,6 +70,12 @@ class Link extends DataObject
 			$this->ltype_ID = $db_row->link_ltype_ID;
 
 			// source of link:
+			$this->Item     = & $ItemCache->get_by_ID( $db_row->link_item_ID );
+
+			/*
+			global $TaskCache, $ContactCache, $EstablishmentCache, $FirmCache, $TaskCache;
+
+			// source of link:
 			$this->Item     = & $TaskCache->get_by_ID( $db_row->link_item_ID );
 
 			// Possible destinations:
@@ -77,6 +83,7 @@ class Link extends DataObject
 			$this->Establishment = & $EstablishmentCache->get_by_ID( $db_row->link_etab_ID, true, false );
 			$this->Firm          = & $FirmCache->get_by_ID( $db_row->link_firm_ID, true, false );
 			$this->Task          = & $TaskCache->get_by_ID( $db_row->link_dest_item_ID, true, false );
+			*/
 	 	}
 	 	else
 	 	{	// New object:
@@ -119,6 +126,10 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2005/04/15 18:02:59  fplanque
+ * finished implementation of properties/meta data editor
+ * started implementation of files to items linking
+ *
  * Revision 1.3  2005/03/21 17:38:00  fplanque
  * results/table layout refactoring
  *

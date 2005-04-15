@@ -149,8 +149,11 @@ while( $Item = $MainList->get_item() )
 		</div>
 
 		<div class="PostActionsArea">
-			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 			<?php
+			echo '<a href="';
+			$Item->permalink();
+			echo '" title="'.T_('Permanent link to full entry').'" class="permalink_right">'.getIcon( 'permalink' ).'</a>';
+
 			// Display edit button if current user has the rights:
 			$Item->edit_link( ' ', ' ', '#', '#', 'ActionButton', $edit_item_url );
 
@@ -337,6 +340,10 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.97  2005/04/15 18:02:57  fplanque
+ * finished implementation of properties/meta data editor
+ * started implementation of files to items linking
+ *
  * Revision 1.96  2005/03/11 18:33:35  fplanque
  * mutiple browsing views part TWO
  *

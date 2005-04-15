@@ -688,6 +688,7 @@ class AdminUI_general
 
 				break;
 
+
 			case 'sub':
 				// submenu, we support just one sub-level
 				return array(
@@ -706,6 +707,7 @@ class AdminUI_general
 						'beforeEachSel' => '<li class="current">',
 						'afterEachSel' => '</li>',
 					);
+
 
 			case 'CollectionList':
 				// fp>>daniel: is it a bad idea to put this here??
@@ -727,27 +729,33 @@ class AdminUI_general
 						'afterEachSel' => '</li>',
 					);
 
+
 			case 'Results':
 				// Results list:
 				return array(
 				'before' => '<div class="results">',
 					'header_start' => '<div class="results_nav">',
 					'header_text' => '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$',
-					'header_text_single' => T_('1 page'),
+					'header_text_single' => '',
 					'header_end' => '</div>',
 					'title_start' => "<div>\n",
 					'title_end' => "</div>\n",
 					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
 						'head_start' => "<thead><tr>\n",
-							'head_title' => '<th colspan="$nb_cols$">$title$</th></tr>'."\n\n<tr>\n",
+							'head_title' => '<th colspan="$nb_cols$"><span style="float:right">$global_icons$</span>$title$</th></tr>'
+															."\n\n<tr>\n",
 							'colhead_start' => '<th>',
 							'colhead_start_first' => '<th class="firstcol">',
 							'colhead_start_last' => '<th class="lastcol">',
 							'colhead_end' => "</th>\n",
-							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending order').'" height="12" width="11" />',
-							'sort_asc_on' => '<img src="../admin/img/black_arrow_up.gif" alt="A" title="'.T_('Ascending order').'" height="12" width="11" />',
-							'sort_desc_off' => '<img src="../admin/img/grey_arrow_down.gif" alt="D" title="'.T_('Descending order').'" height="12" width="11" />',
-							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending order').'" height="12" width="11" />',
+							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending order')
+																	.'" height="12" width="11" />',
+							'sort_asc_on' => '<img src="../admin/img/black_arrow_up.gif" alt="A" title="'.T_('Ascending order')
+																	.'" height="12" width="11" />',
+							'sort_desc_off' => '<img src="../admin/img/grey_arrow_down.gif" alt="D" title="'.T_('Descending order')
+																	.'" height="12" width="11" />',
+							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending order')
+																	.'" height="12" width="11" />',
 							'basic_sort_off' => '<img src="../admin/img/basic_sort_off.gif" width="16" height="16" />',
 							'basic_sort_asc' => '<img src="../admin/img/basic_sort_asc.gif" width="16" height="16" />',
 							'basic_sort_desc' => '<img src="../admin/img/basic_sort_desc.gif" width="16" height="16" />',
@@ -778,7 +786,11 @@ class AdminUI_general
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
-					'no_results' => T_('No results.'),
+					'no_results' => '<table class="grouped" cellspacing="0">'."\n\n"
+																.'<th><span style="float:right">$global_icons$</span>'
+																.'$title$</th></tr>'."\n\n<tr>\n"
+																.'<tr class="lastline"><td class="firstcol lastcol">'.T_('No results.').'</td></tr>'
+																.'</table>'."\n\n",
 				'after' => '</div>',
 				'sort_type' => 'basic'
 				);
@@ -1062,6 +1074,10 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.19  2005/04/15 18:02:57  fplanque
+ * finished implementation of properties/meta data editor
+ * started implementation of files to items linking
+ *
  * Revision 1.18  2005/03/21 17:37:47  fplanque
  * results/table layout refactoring
  *

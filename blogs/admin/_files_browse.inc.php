@@ -302,7 +302,7 @@ while( $lFile =& $Fileman->getNextFile() )
 				onclick="return false;">
 
 
-				<button class="filenameIcon" type="button"
+			<button class="filenameIcon" type="button"
 					id="button_new_<?php echo $countFiles ?>"
 					onclick="<?php
 						$imgsize = $lFile->getImageSize( 'widthheight' );
@@ -325,7 +325,12 @@ while( $lFile =& $Fileman->getNextFile() )
 				echo getIcon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => T_('The filename appears to be invalid and may cause problems.') ) );
 			}
 
+			if( $Fileman->fm_mode == 'link_item' )
+			{	// Offer option to link the file to an Item:
+				$Fileman->dispButtonFileLink();
+			}
 			?>
+
 
 
 			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"
@@ -699,6 +704,10 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.20  2005/04/15 18:02:58  fplanque
+ * finished implementation of properties/meta data editor
+ * started implementation of files to items linking
+ *
  * Revision 1.19  2005/04/14 19:57:52  fplanque
  * filemanager refactoring & cleanup
  * started implementation of properties/meta data editor

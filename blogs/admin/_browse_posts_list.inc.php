@@ -34,6 +34,14 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+if( false )
+{	/**
+	 * This is ugly, sorry, but I temporarily need this until NuSphere fixes their CodeInsight :'(
+	 */
+	include('_header.php');
+	include('b2browse.php');
+}
+
 /**
  * Includes:
  */
@@ -110,13 +118,15 @@ while( $Item = $MainList->get_item() )
 	echo '">';
 	// We don't switch locales in the backoffice, since we use the user pref anyway
 
-	echo '<td>';
+	echo '<td class="nowrap">';
 	echo '<a href="';
 	$Item->permalink();
-	echo '" title="'.T_('Permanent link to full entry').'"><img src="img/chain_link.gif" alt="'.T_('Permalink')
-				.'" width="14" height="14" border="0" class="middle" /></a> ';
-	$Item->issue_date(); echo ' @ '; $Item->issue_time();
-	echo "</td>\n";
+	echo '" title="'.T_('Permanent link to full entry').'">'.getIcon( 'permalink' ).'</a> ';
+	echo '<span class="date">';
+	$Item->issue_date();
+	echo '</span> <span class="time">';
+	$Item->issue_time();
+	echo "</span></td>\n";
 
 	echo '<td>';
 	$Item->Author->prefered_name();
@@ -147,13 +157,13 @@ while( $Item = $MainList->get_item() )
 
 	echo '<td>';
 	// Display edit button if current user has the rights:
-	$Item->edit_link( ' ', ' ', '#', '#', '', $edit_item_url );
+	$Item->edit_link( ' ', ' ', getIcon( 'edit' ), '#', '', $edit_item_url );
 
 	// Display publish NOW button if current user has the rights:
 	$Item->publish_link( ' ', ' ', '#', '#', '');
 
 	// Display delete button if current user has the rights:
-	$Item->delete_link( ' ', ' ', '#', '#', '', false, $delete_item_url );
+	$Item->delete_link( ' ', ' ', getIcon( 'delete' ), '#', '', false, $delete_item_url );
 
 	echo "</td>\n";
 
@@ -183,6 +193,10 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.2  2005/04/15 18:02:57  fplanque
+ * finished implementation of properties/meta data editor
+ * started implementation of files to items linking
+ *
  * Revision 1.1  2005/03/14 19:54:42  fplanque
  * no message
  *

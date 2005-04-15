@@ -125,6 +125,12 @@ class FileManager extends Filelist
 	var $path = '';
 
 	/**
+	 * Evo Display mode (upload, bookmarklet, etc..)
+	 * @var string
+	 */
+	var $mode;
+
+	/**
 	 * Remember the Filemanager mode we're in ('fm_upload', 'fm_cmr')
 	 * @var string
 	 * @access protected
@@ -148,6 +154,10 @@ class FileManager extends Filelist
 	 */
 	var $forceFM;
 
+	/**
+	 * Item to link on...
+	 */
+	var $item_ID;
 
 	/**
 	 * These are variables that get considered when regenerating an URL
@@ -157,7 +167,8 @@ class FileManager extends Filelist
 	 */
 	var $_internalGlobals = array(
 			'root', 'path', 'filterString', 'filterIsRegexp', 'order', 'orderasc',
-			'fm_mode', 'fm_sources', 'cmr_keepsource', 'flatmode', 'forceFM'
+			'mode', 'fm_mode', 'fm_sources', 'cmr_keepsource', 'flatmode', 'forceFM',
+			'item_ID'	// Used in fm_mode=link_item
 		);
 
 	/**
@@ -192,6 +203,11 @@ class FileManager extends Filelist
 		global $basepath, $baseurl, $media_subdir, $admin_subdir, $admin_url;
 		global $BlogCache, $UserCache;
 		global $Debuglog;
+
+		// Global params to remember:
+		global $mode, $item_ID;
+		$this->mode = $mode;
+		$this->item_ID = $item_ID;
 
 		$this->User =& $cUser;
 		$this->Messages =& new Log( 'error' );
@@ -284,7 +300,7 @@ class FileManager extends Filelist
 		 * Get FM mode from params.
 		 * @var string
 		 */
-		$this->fm_mode = param( 'fm_mode', 'string', NULL );
+		$this->fm_mode = param( 'fm_mode', 'string', NULL, true );
 
 
 		if( $this->fm_mode && $this->fm_sources = param( 'fm_sources', 'array', array() ) )
@@ -528,10 +544,9 @@ class FileManager extends Filelist
 
 
 	/**
-	 * Display a button to delete a File. When the action is confirmed using
-	 * Javascript the GET param confirmed gets appended and set to 1.
+	 * Display a button to delete a File.
 	 *
-	 * @param File|NULL the File to delete
+	 * @param File|NULL the File to edit
 	 */
 	function dispButtonFileProperties( $File = NULL )
 	{
@@ -542,7 +557,23 @@ class FileManager extends Filelist
 
 		echo '<a title="'.T_('Edit properties...').'" href="'
 					.$this->getLinkFile( $File, 'edit_properties' ).'">'.getIcon( 'edit' ).'</a>';
+	}
 
+
+	/**
+	 * Display a button to link a File to an Item.
+	 *
+	 * @param File|NULL the File to link
+	 */
+	function dispButtonFileLink( $File = NULL )
+	{
+		if( $File === NULL )
+		{
+			$File = $this->curFile;
+		}
+
+		echo '<a title="'.T_('Link this file!').'" href="'
+					.$this->getLinkFile( $File, 'link' ).'">'.getIcon( 'link' ).'</a>';
 	}
 
 
@@ -617,6 +648,8 @@ class FileManager extends Filelist
 	 * Get the current url, with all relevant GET params (root, path, filterString,
 	 * filterIsRegexp, order, orderasc).
 	 * Params can be overridden / disabled.
+	 *
+	 * @todo get rid of this and use regenerate_url() instead !!
 	 *
 	 * @uses $_internalGlobals
 	 * @param array override/disable internal globals {@link $_internalGlobals} or
@@ -1423,6 +1456,10 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.30  2005/04/15 18:02:59  fplanque
+ * finished implementation of properties/meta data editor
+ * started implementation of files to items linking
+ *
  * Revision 1.29  2005/04/14 19:57:52  fplanque
  * filemanager refactoring & cleanup
  * started implementation of properties/meta data editor

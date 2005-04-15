@@ -151,7 +151,7 @@ class AdminUI extends AdminUI_general
 	{
 		$r = '';
 
-		if( empty($mode) )
+		if( empty($this->mode) )
 		{ // We're not running in an special mode (bookmarklet, sidebar...)
 			$r .= $this->getPageHead();
 		}

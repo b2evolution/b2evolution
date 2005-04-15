@@ -170,7 +170,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	{ // ---------- UPLOAD ----------
 		require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php' );
 		$Fileman = new Filemanager( $current_User, 'files.php', 'user' );
-		$Fileman->dispButtonUploadPopup( T_('Files') );
+		$Fileman->dispButtonUploadPopup( T_('File upload') );
 	}
 
 	// CALL PLUGINS NOW:
@@ -324,15 +324,68 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 <?php
 
+// ================================== END OF EDIT FORM ==================================
 $Form->end_form();
 
-// ================================== END OF EDIT FORM ==================================
+// End payload block:
+$AdminUI->dispPayloadEnd();
+
+
+// Begin payload block:
+$AdminUI->dispPayloadBegin();
+
+ 	// ####################### LINKS #########################
+
+	if( $next_action == 'update' )
+	{ // Editing post
+		$Results = & new Results(
+							'SELECT link_ID, link_ltype_ID, file_ID, file_path
+								 FROM T_links INNER JOIN T_files ON link_file_ID = file_ID
+								WHERE link_item_ID = '.$edited_Item->ID,
+								20, 'link_' );
+
+		$Results->title = T_('Linked to...');
+
+
+		$Results->cols[] = array(
+								'th' => T_('Link ID'),
+								'order' => 'link_ID',
+								'td' => '$link_ID$',
+							);
+
+		$Results->cols[] = array(
+								'th' => T_('Type'),
+								'order' => 'link_ltype_ID',
+								'td' => '$link_ltype_ID$',
+							);
+
+ 		$Results->cols[] = array(
+								'th' => T_('File ID'),
+								'order' => 'file_ID',
+								'td' => '$file_ID$',
+							);
+
+ 		$Results->cols[] = array(
+								'th' => T_('Path'),
+								'order' => 'file_path',
+								'td' => '$file_path$',
+							);
+
+		$Results->global_icon( T_('Link a file...'), 'link',
+														'files.php?fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('File') );
+
+		$Results->display();
+	}
 
 // End payload block:
 $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.20  2005/04/15 18:02:58  fplanque
+ * finished implementation of properties/meta data editor
+ * started implementation of files to items linking
+ *
  * Revision 1.19  2005/03/16 19:58:13  fplanque
  * small AdminUI cleanup tasks
  *
@@ -368,12 +421,6 @@ $AdminUI->dispPayloadEnd();
  *
  * Revision 1.8  2005/01/09 05:36:39  blueyed
  * fileupload
- *
- * Revision 1.7  2005/01/03 15:17:51  fplanque
- * no message
- *
- * Revision 1.6  2004/12/23 21:19:40  fplanque
- * no message
  *
  * Revision 1.5  2004/12/21 21:18:37  fplanque
  * Finished handling of assigning posts/items to users
