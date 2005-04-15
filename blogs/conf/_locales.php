@@ -289,6 +289,14 @@ $locales = array(
 										'messages' => 'sv_SE',
 										'enabled' => 1,
 									),
+	'th-TH' => array( 'name' => NT_('Thai (TH)'),
+										'charset' => 'utf-8',
+										'datefmt' => 'd/m/Y',
+										'timefmt' => 'H:i:s',
+										'startofweek' => 1,
+										'messages' => 'th_TH',
+										'enabled' => 1,
+									),
 	'zh-CN' => array( 'name' => NT_('Chinese(S) gb2312 (CN)'),
 										'charset' => 'gb2312',
 										'datefmt' => 'y-m-d',
@@ -305,6 +313,14 @@ $locales = array(
 										'messages' => 'zh_CN_utf-8',
 										'enabled' => 1,
 									),
+/*
+Locale: zh-HK
+Name: Trad. Chinese (HK)
+Charset: utf-8
+Date Format: d/m/y
+Time Format: H:i:s
+Lang file: zh_TW
+*/
 	'zh-TW' => array( 'name' => NT_('Trad. Chinese (TW)'),
 										'charset' => 'utf-8',
 										'datefmt' => 'Y-m-d',

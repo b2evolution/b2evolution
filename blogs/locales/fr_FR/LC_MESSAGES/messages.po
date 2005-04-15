@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2005-01-26 20:52+0100\n"
-"PO-Revision-Date: 2005-01-28 20:23+0100\n"
+"PO-Revision-Date: 2005-04-12 20:23+0100\n"
 "Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -1055,7 +1055,7 @@ msgstr "charger des fichiers/images"
 #: ..\..\..\admin\b2upload.php:54
 #: ..\..\..\admin\files.php:642
 msgid "File upload"
-msgstr "Chargement d'un fichier"
+msgstr "Upload de fichier"
 
 #: ..\..\..\admin\b2upload.php:55
 msgid "Allowed file types:"
