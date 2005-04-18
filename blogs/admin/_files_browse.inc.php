@@ -432,7 +432,11 @@ else
 			name="actionArray[delete]"
 			value="delete"
 			type="image"
-			src="<?php echo getIcon( 'file_delete', 'url' ) ?>"
+			src="<?php echo getIcon( 'file_delete', 'url' ) ?>" />
+
+		<?php
+			/* No delete javascript, we need toi check DB integrity:
+
 			onclick="if( r = openselectedfiles(true) )
 								{
 									if( confirm('<?php echo TS_('Do you really want to delete the selected files?') ?>') )
@@ -442,23 +446,22 @@ else
 									}
 								}; return false;" />
 
-		<!-- Not implemented yet: input class="ActionButton"
-			title="<?php echo T_('Download the selected files') ?>"
-			name="actionArray[download]"
-			value="download"
-			type="image"
-			src="<?php echo getIcon( 'download', 'url' ) ?>"
-			onclick="return openselectedfiles(true);" / -->
+			<!-- Not implemented yet: input class="ActionButton"
+				title="<?php echo T_('Download the selected files') ?>"
+				name="actionArray[download]"
+				value="download"
+				type="image"
+				src="<?php echo getIcon( 'download', 'url' ) ?>"
+				onclick="return openselectedfiles(true);" / -->
 
-		<!-- Not implemented yet: input class="ActionButton" type="submit"
-			name="actionArray[sendbymail]" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
+			<!-- Not implemented yet: input class="ActionButton" type="submit"
+				name="actionArray[sendbymail]" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
 
-		<?php
 
-		/*
-		TODO: "link these into current post" (that is to say the post that opened the popup window).
-					This would create <img> or <a href> tags depending on file types.
-		*/
+			/*
+			TODO: "link these into current post" (that is to say the post that opened the popup window).
+						This would create <img> or <a href> tags depending on file types.
+			*/
 
 		?>
 
@@ -704,6 +707,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.21  2005/04/18 19:09:48  fplanque
+ * no message
+ *
  * Revision 1.20  2005/04/15 18:02:58  fplanque
  * finished implementation of properties/meta data editor
  * started implementation of files to items linking

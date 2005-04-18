@@ -591,7 +591,8 @@ class FileManager extends Filelist
 
 		if( $url = $this->getLinkFileDelete( $File ) )
 		{
-			echo '<a title="'.T_('Delete').'" href="'.$url
+			echo '<a title="'.T_('Delete').'" href="'.$url.'">'.getIcon( 'file_delete' ).'</a>';
+			/* No JS: we need to check DB integrity!
 				.'" onclick="if( confirm(\''
 				.sprintf( TS_('Do you really want to delete &laquo;%s&raquo;?'),
 				format_to_output( $File->getName(), 'formvalue' ) ).'\') )
@@ -599,7 +600,8 @@ class FileManager extends Filelist
 					this.href += \'&amp;confirmed=1\';
 					return true;
 				}
-				else return false;">'.getIcon( 'file_delete' ).'</a>';
+				else return false;">'
+			*/
 		}
 	}
 
@@ -1456,6 +1458,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.31  2005/04/18 19:09:52  fplanque
+ * no message
+ *
  * Revision 1.30  2005/04/15 18:02:59  fplanque
  * finished implementation of properties/meta data editor
  * started implementation of files to items linking

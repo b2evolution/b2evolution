@@ -175,7 +175,6 @@ class Item extends DataObject
 												$creator_field, $lasteditor_field );
 
 		$this->delete_restrictions = array(
-				array( 'table'=>'T_links', 'fk'=>'link_item_ID', 'msg'=>T_('%d links to destination items') ),
 				array( 'table'=>'T_links', 'fk'=>'link_dest_item_ID', 'msg'=>T_('%d links to source items') ),
  				// b2evo only:
  				array( 'table'=>'T_posts', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
@@ -185,8 +184,10 @@ class Item extends DataObject
 			);
 
    	$this->delete_cascades = array(
+				array( 'table'=>'T_links', 'fk'=>'link_item_ID', 'msg'=>T_('%d links to destination items') ),
  				// b2evo only:
  				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
+ 				array( 'table'=>'T_comments', 'fk'=>'comment_post_ID', 'msg'=>T_('%d comments') ),
 				// progidistri only: (those won't hurt)
  				array( 'table'=>'T_taskcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
 				array( 'table'=>'T_tsk_tsel', 'fk'=>'tkts_tsk_ID', 'msg'=>T_('%d task selections') ),
@@ -1841,31 +1842,6 @@ class Item extends DataObject
 
 
 	/**
-	 * Delete object from DB
-	 *
-	 * {@internal Item::dbdelete(-)}}
-	 */
-	function dbdelete( $del_comments = true )
-	{
-		global $DB;
-
-		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
-
-		// delete extracats
-		$DB->query( "DELETE FROM T_postcats WHERE postcat_post_ID = $this->ID" );
-
-		if( $del_comments )
-		{ // delete comments
-			$DB->query( "DELETE FROM T_comments WHERE comment_post_ID = $this->ID" );
-		}
-
-		// delete post
-		$DB->query( "DELETE FROM $this->dbtablename WHERE $this->dbIDname = $this->ID" );
-
-	}
-
-
-	/**
 	 * Get the Blog object for the Item.
 	 *
 	 * @return Blog
@@ -1885,6 +1861,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2005/04/18 19:09:52  fplanque
+ * no message
+ *
  * Revision 1.35  2005/04/12 18:58:20  fplanque
  * use TS_() instead of T_() for JavaScript strings
  *

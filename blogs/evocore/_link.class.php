@@ -72,18 +72,6 @@ class Link extends DataObject
 			// source of link:
 			$this->Item     = & $ItemCache->get_by_ID( $db_row->link_item_ID );
 
-			/*
-			global $TaskCache, $ContactCache, $EstablishmentCache, $FirmCache, $TaskCache;
-
-			// source of link:
-			$this->Item     = & $TaskCache->get_by_ID( $db_row->link_item_ID );
-
-			// Possible destinations:
-			$this->Contact       = & $ContactCache->get_by_ID( $db_row->link_cont_ID, true, false );
-			$this->Establishment = & $EstablishmentCache->get_by_ID( $db_row->link_etab_ID, true, false );
-			$this->Firm          = & $FirmCache->get_by_ID( $db_row->link_firm_ID, true, false );
-			$this->Task          = & $TaskCache->get_by_ID( $db_row->link_dest_item_ID, true, false );
-			*/
 	 	}
 	 	else
 	 	{	// New object:
@@ -126,6 +114,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2005/04/18 19:09:56  fplanque
+ * no message
+ *
  * Revision 1.4  2005/04/15 18:02:59  fplanque
  * finished implementation of properties/meta data editor
  * started implementation of files to items linking

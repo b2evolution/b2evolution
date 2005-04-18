@@ -308,7 +308,10 @@ if( !empty($action) )
 
 			if( !$confirmed )
 			{
-				$action_msg = '
+				$action_msg = '<div class="panelinfo">';
+				$action_msg .= '<h2>'.T_('Delete file(s)?').'</h2>';
+
+				$action_msg .= '
 					<form action="files.php" class="inline">
 						<input type="hidden" name="confirmed" value="1" />
 						<input type="hidden" name="action" value="delete" />
@@ -324,10 +327,15 @@ if( !empty($action) )
 				<ul>
 				';
 
-				foreach( $SelectedFiles->entries as $lFile )
+
+				foreach( $SelectedFiles->_entries as $lFile )
 				{
 					$action_msg .= '<li>'.$lFile->getName();
 
+					// TODO: check 	if( ! $edited_Establishment->check_delete( sprintf( T_('Cannot delete Establishment &laquo;%s&raquo;'), $edited_Establishment->dget('name') ) ) )
+
+
+					/* fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB integrity for these...
 					if( $lFile->isDir() )
 					{
 						$action_msg .= '
@@ -340,7 +348,7 @@ if( !empty($action) )
 								<label for="delsubdirs_'.$lFile->getID().'">'
 									.T_( 'Including subdirectories' ).'</label>';
 					}
-
+					*/
 					$action_msg .= '</li>';
 				}
 
@@ -355,6 +363,9 @@ if( !empty($action) )
 						<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
 					</form>
 					';
+
+				$action_msg .= '</div>';
+
 			}
 			else
 			{
@@ -1118,6 +1129,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.90  2005/04/18 19:09:49  fplanque
+ * no message
+ *
  * Revision 1.89  2005/04/15 18:02:58  fplanque
  * finished implementation of properties/meta data editor
  * started implementation of files to items linking
