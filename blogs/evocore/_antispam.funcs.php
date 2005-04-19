@@ -116,6 +116,12 @@ function antispam_url( $url )
 {
 	global $DB, $cache_antispam, $Debuglog;
 
+	// check for blacklisted IP first
+	if ( $results = antispam_ip($_SERVER["REMOTE_ADDR"]) ) {
+		return $results;
+	}
+
+
 	// TODO: 'SELECT COUNT(*) FROM T_antispam WHERE aspm_string LIKE "%'.$url.'%" ?
 	// TODO: Check basedomain against T_basedomains (dom_status = 'blacklist')
 
@@ -138,6 +144,36 @@ function antispam_url( $url )
 
 }
 
+/**
+ * Check if an IP is blacklisted
+ * Returns false if the ip is OK
+ * Returns the value of the lookup is blacklisted
+ *
+ * antispam_ip(-)
+ */
+function antispam_ip( $ip )
+{
+	global $rbl_config, $Debuglog;
+
+	// uncomment the following line to test RBL with spamhaus
+	//	$ip="127.0.0.2";
+	// check each blacklist in $rbl_config
+	foreach ($rbl_config as $blacklist) {
+		$Debuglog->add( 'Checking RBL ' . $blacklist );
+		// if ipaddr is 1.2.3.4, then
+		// lookup format is: 4.3.2.1.sbl-xbl.spamhaus.org
+		$rev = array_reverse(explode('.', $ip));
+		$lookup = implode('.', $rev) . '.' . $blacklist;
+		$results = gethostbyname($lookup);
+		if ($lookup != $results) {
+			$Debuglog->add( 'Blacklisted IP: ' . $results );
+			return $blacklist . ": " . $results;
+		}
+	}
+	
+	return false;
+	
+}
 
 
 // -------------------- XML-RPC callers ---------------------------
@@ -288,6 +324,10 @@ function b2evonet_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.7  2005/04/19 20:34:11  jwedgeco
+ * Added Real-time DNS blacklist support.
+ * Configure in conf/advanced.php.
+ *
  * Revision 1.6  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

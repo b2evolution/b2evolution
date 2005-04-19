@@ -473,6 +473,17 @@ if ($use_memcached) {
 	$memcache_expire = 3600; //  how long objects stay cached. Default one hour
 }
 
+/**
+ * Use a Real-time DNS blacklist
+ * Provide an array of dns blacklists to use.
+ * For example to use spamhaus xbl, use 
+ * $rbl_config = array(
+ *	'sbl-xbl.spamhaus.org'
+ * );
+ */
+$rbl_config = array(
+);
+
 
 
 
