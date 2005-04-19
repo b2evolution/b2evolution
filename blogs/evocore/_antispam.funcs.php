@@ -8,6 +8,8 @@
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
+ * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
+ * contributed by Jason Edgecombe {@link http://tst.uncc.edu/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -34,7 +36,12 @@
  * Vegar BERG GULDAL grants Francois PLANQUE the right to license
  * Vegar BERG GULDAL's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
+ *
+ * The University of North Carolina at Charlotte grants François PLANQUE the right to license
+ * Jason EDGECOMBE's contributions to this file and the b2evolution project
+ * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
+ * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
+ *  }}
  *
  * @package evocore
  *
@@ -324,6 +331,9 @@ function b2evonet_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.8  2005/04/19 20:39:37  jwedgeco
+ * I forgot to add the copyright and license text. I added it.
+ *
  * Revision 1.7  2005/04/19 20:34:11  jwedgeco
  * Added Real-time DNS blacklist support.
  * Configure in conf/advanced.php.
