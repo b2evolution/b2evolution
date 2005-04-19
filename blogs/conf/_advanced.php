@@ -221,6 +221,16 @@ $db_table_options = '';
 
 
 /**
+ * Use transactions in DB?
+ *
+ * You need to use InnoDB in order to enable this. {@see $db_table_options}
+ */
+$db_use_transactions = false;
+// Recommended settings:
+# $db_use_transactions = true;
+
+
+/**
  * Foreign key options.
  *
  * Set this to true if your MySQL supports Foreign keys.

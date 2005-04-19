@@ -303,6 +303,9 @@ class DataObject
 			// End transaction:
 			$DB->commit();
 		}
+
+		// Just in case... remember this object has been deleted from DB!
+		$this->ID = 0;
 	}
 
 
@@ -524,6 +527,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.15  2005/04/19 18:04:37  fplanque
+ * implemented nested transactions for MySQL
+ *
  * Revision 1.14  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

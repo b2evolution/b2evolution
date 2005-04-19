@@ -26,6 +26,7 @@ class DbUnitTestCase extends EvoUnitTestCase
 													$testDB_conf['DB_NAME'],
 													$testDB_conf['DB_HOST'],
 													$db_aliases,
+													true, 
 													$testDB_conf['db_table_options'],
 													true // halt_on_error
 												);

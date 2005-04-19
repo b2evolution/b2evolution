@@ -106,7 +106,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 
 if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
 { // Connect to DB:
-	$DB = new DB( $EvoConfig->DB['user'], $EvoConfig->DB['password'], $EvoConfig->DB['name'], $EvoConfig->DB['host'], $db_aliases, $db_table_options, false );
+	$DB = new DB( $EvoConfig->DB['user'], $EvoConfig->DB['password'], $EvoConfig->DB['name'], $EvoConfig->DB['host'], $db_aliases, $db_use_transactions, $db_table_options, false );
 	if( $DB->error )
 	{ // restart conf
 		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
@@ -151,7 +151,7 @@ switch( $action )
 		param( 'conf_admin_email', 'string', true );
 
 		// Connect to DB:
-		$DB = new DB( $conf_db_user, $conf_db_password, $conf_db_name, $conf_db_host, $db_aliases, $db_table_options, false );
+		$DB = new DB( $conf_db_user, $conf_db_password, $conf_db_name, $conf_db_host, $db_aliases, $db_use_transactions, $db_table_options, false );
 		if( $DB->error )
 		{ // restart conf
 			echo '<p class="error">'.T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...').'</p>';

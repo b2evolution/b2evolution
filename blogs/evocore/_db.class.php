@@ -123,13 +123,28 @@ class DB
 	 */
 	var $dbtableoptions;
 
+	/**
+	 * Do we want to use transactions:
+	 */
+	var $use_transactions;
+
+	/**
+	 * How many transactions are currently nested?
+	 */
+	var $transaction_nesting_level = 0;
+
+	/**
+	 * Rememeber if we have to rollback at the end of a nested transaction construct
+	 */
+	var $rollback_nested_transaction = false;
+
 
 	/**
 	 * DB Constructor
 	 *
 	 * connects to the server and selects a database
 	 */
-	function DB( $dbuser, $dbpassword, $dbname, $dbhost, $dbaliases, $dbtableoptions = '', $halt_on_error = true )
+	function DB( $dbuser, $dbpassword, $dbname, $dbhost, $dbaliases, $db_use_transactions, $dbtableoptions = '', $halt_on_error = true )
 	{
 		$this->halt_on_error = $halt_on_error;
 
@@ -180,7 +195,7 @@ class DB
 		}
 		// echo count($this->dbaliases);
 
-
+		$this->use_transactions = $db_use_transactions;
 		$this->dbtableoptions = $dbtableoptions;
 	}
 
@@ -805,10 +820,27 @@ class DB
 
 
 	/**
-	 * @todo implement transactions!
+	 * BEGIN A TRANSCATION
+	 *
+	 * Note:  By default, MySQL runs with autocommit mode enabled. 
+	 * This means that as soon as you execute a statement that updates (modifies) 
+	 * a table, MySQL stores the update on disk.
+	 * Once you execute a BEGIN, the updates are "pending" until you execute a 
+	 * COMMIT {@see DB::commit()} or a ROLLBACK {@see DB:rollback()}
+	 *
+	 * Note 2: standard syntax would be START TRANSACTION but it's not supported by older 
+	 * MySQL versions whereas BEGIN is...
+	 *
+	 * Note 3: The default isolation level is REPEATABLE READ.
 	 */
 	function begin()
 	{
+		if( $this->use_transactions )
+		{
+			$this->query( 'BEGIN', 'BEGIN transaction' );
+
+			$this->transaction_nesting_level++;
+		}
 	}
 
 
@@ -817,6 +849,22 @@ class DB
 	 */
 	function commit()
 	{
+		if( $this->use_transactions )
+		{
+			if( $this->transaction_nesting_level == 1 )
+			{	// Only COMMIT if there are no remaining nested transactions:
+				if( $this->rollback_nested_transaction )
+				{
+					$this->query( 'ROLLBACK', 'ROLLBACK transaction because there was a failure somewhere in the nesting of transactions' );
+				}
+				else
+				{
+					$this->query( 'COMMIT', 'COMMIT transaction' );
+				}
+				$this->rollback_nested_transaction = false;
+			}
+			$this->transaction_nesting_level--;
+		}
 	}
 
 
@@ -825,12 +873,28 @@ class DB
 	 */
 	function rollback()
 	{
+		if( $this->use_transactions )
+		{
+			if( $this->transaction_nesting_level == 1 )
+			{	// Only ROLLBACK if there are no remaining nested transactions:
+				$this->query( 'ROLLBACK', 'ROLLBACK transaction' );
+				$this->rollback_nested_transaction = false;
+			}
+			else
+			{	// Remember we'll have to roll back at the end!
+				$this->rollback_nested_transaction = true;
+			}
+			$this->transaction_nesting_level--;
+		}
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.13  2005/04/19 18:04:38  fplanque
+ * implemented nested transactions for MySQL
+ *
  * Revision 1.12  2005/03/08 20:32:07  fplanque
  * small fixes; slightly enhanced WEEK() handling
  *

@@ -669,6 +669,16 @@ class File extends DataObject
 	 */
 	function unlink()
 	{
+		global $DB;
+
+		$DB->begin();
+
+		// Check if there is meta data to be removed:
+		if( $this->load_meta() )
+		{ // remove meta data from DB:
+			$this->dbdelete();
+		}
+
 		if( $this->isDir() )
 		{
 			$unlinked =	@rmdir( $this->getPath() );
@@ -680,16 +690,14 @@ class File extends DataObject
 
 		if( !$unlinked )
 		{
+			$DB->rollback();
+
 			return false;
 		}
 
 		$this->_exists = false;
 
-		// Check if there is meta data to be removed:
-		if( $this->load_meta() )
-		{ // remove meta data from DB:
-			$this->dbdelete();
-		}
+		$DB->commit();
 
 		return true;
 	}
@@ -759,6 +767,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2005/04/19 18:04:38  fplanque
+ * implemented nested transactions for MySQL
+ *
  * Revision 1.26  2005/04/19 16:23:02  fplanque
  * cleanup
  * added FileCache

@@ -161,7 +161,7 @@ require_once dirname(__FILE__).'/_db.class.php';
  *
  * @global DB $DB
  */
-$DB = new DB( $EvoConfig->DB['user'], $EvoConfig->DB['password'], $EvoConfig->DB['name'], $EvoConfig->DB['host'], $db_aliases, $db_table_options );
+$DB = new DB( $EvoConfig->DB['user'], $EvoConfig->DB['password'], $EvoConfig->DB['name'], $EvoConfig->DB['host'], $db_aliases, $db_use_transactions, $db_table_options );
 
 require_once dirname(__FILE__).'/_results.class.php';
 
@@ -497,6 +497,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.31  2005/04/19 18:04:38  fplanque
+ * implemented nested transactions for MySQL
+ *
  * Revision 1.30  2005/04/19 16:23:03  fplanque
  * cleanup
  * added FileCache
