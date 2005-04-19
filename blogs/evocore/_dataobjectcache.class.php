@@ -136,7 +136,9 @@ class DataObjectCache
 			return false;
 		}
 
-		$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname IN ($req_list)";
+		$sql = "SELECT *
+							FROM $this->dbtablename
+						 WHERE $this->dbIDname IN ($req_list)";
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
 		foreach( $DB->get_results( $sql ) as $row )
@@ -179,7 +181,7 @@ class DataObjectCache
 	/**
 	 * Get an object from cache by ID
 	 *
-	 * Load the cache if necessary
+	 * Load the cache if necessary (all at once if allowed).
 	 *
 	 * {@internal DataObjectCache::get_by_ID(-) }}
 	 *
@@ -319,6 +321,11 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.16  2005/04/19 16:23:02  fplanque
+ * cleanup
+ * added FileCache
+ * improved meta data handling
+ *
  * Revision 1.15  2005/03/14 20:22:19  fplanque
  * refactoring, some cacheing optimization
  *

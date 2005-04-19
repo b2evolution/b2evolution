@@ -221,6 +221,7 @@ require_once dirname(__FILE__).'/_commentlist.class.php';
 require_once dirname(__FILE__).'/_archivelist.class.php';
 require_once dirname(__FILE__).'/_dataobjectcache.class.php';
 require_once dirname(__FILE__).'/_element.class.php';
+require_once dirname(__FILE__).'/_filecache.class.php';
 require_once dirname(__FILE__).'/_usercache.class.php';
 require_once dirname(__FILE__).'/_link.class.php';
 require_once dirname(__FILE__).'/_linkcache.class.php';
@@ -250,13 +251,15 @@ if ( $use_memcached )
 if ( $response == null )
 {
 	$BlogCache = & new BlogCache();
+	$FileCache = & new fileCache();
 	$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
 	$ItemCache = & new ItemCache();
 	$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
 	$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
 	$LinkCache = & new LinkCache();
 	$UserCache = & new UserCache();
-} else 
+}
+else
 {
 	$BlogCache = & $response;	
 //		$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
@@ -459,7 +462,7 @@ require_once dirname(__FILE__).'/_sessions.class.php';
 /**
  * @global Sessions The Sessions object
  */
-$Sessions =& new Sessions();
+$Sessions = & new Sessions();
 
 
 /**
@@ -494,6 +497,11 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.30  2005/04/19 16:23:03  fplanque
+ * cleanup
+ * added FileCache
+ * improved meta data handling
+ *
  * Revision 1.29  2005/04/06 13:33:29  fplanque
  * minor changes
  *

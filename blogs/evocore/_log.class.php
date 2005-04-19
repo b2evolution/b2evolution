@@ -34,7 +34,8 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER.
+ * @author blueyed: Daniel HAHLER
+ * @author fplanque: François PLANQUE
  *
  * @version $Id$ }}}
  *
@@ -46,7 +47,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * Log class. Logs notes and errors.
  *
  * Messages can be logged into different categories (aka levels)
- * Examples: 'note', 'error'. Note: 'all' is reserved to display all levels together.
+ * Examples: 'note', 'error'. Note: 'all' is reserved to display all categories together.
  * Messages can later be displayed grouped by category/level.
  *
  * @package evocore
@@ -54,16 +55,16 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 class Log
 {
 	/**
-	 * The stored messages (by level).
-	 * @var array
+	 * The stored messages (by category).
+	 * @var array array of arrays
 	 */
 	var $messages = array();
 
 	/**
-	 * Default level for messages.
+	 * Default category for messages.
 	 * @var string
 	 */
-	var $defaultlevel = 'error';
+	var $defaultcategory = 'error';
 
 	/**
 	 * @var mixed string or array to display before messages
@@ -89,37 +90,37 @@ class Log
 	/**
 	 * Constructor.
 	 *
-	 * @param string sets default level
+	 * @param string sets default category
 	 */
-	function Log( $level = 'error' )
+	function Log( $category = 'error' )
 	{
-		$this->defaultlevel = $level;
+		$this->defaultcategory = $category;
 
-		// create the array for this level
-		$this->messages[$level] = array();
+		// create the array for this category
+		$this->messages[$category] = array();
 	}
 
 
 	/**
-	 * Clears the Log
+	 * Clears the Log (all or specified category).
 	 *
-	 * @param string level, use 'all' to unset all levels
+	 * @param string category, use 'all' to unset all categories
 	 */
-	function clear( $level = NULL )
+	function clear( $category = NULL )
 	{
-		if( $level == 'all' )
+		if( $category == 'all' )
 		{
 			unset( $this->messages );
 			$this->_count = array();
 		}
 		else
 		{
-			if( $level === NULL )
+			if( $category === NULL )
 			{
-				$level = $this->defaultlevel;
+				$category = $this->defaultcategory;
 			}
-			unset( $this->messages[ $level ] );
-			unset( $this->_count[$level] );
+			unset( $this->messages[ $category ] );
+			unset( $this->_count[$category] );
 			unset( $this->_count['all'] );
 		}
 	}
@@ -129,54 +130,54 @@ class Log
 	 * Add a message to the Log.
 	 *
 	 * @param string the message
-	 * @param string the level, default is to use the object's default level
+	 * @param string the category, default is to use the object's default category
 	 * @param boolean Dump (echo) this directly?
 	 */
-	function add( $message, $level = NULL, $dumpThis = false )
+	function add( $message, $category = NULL, $dumpThis = false )
 	{
-		if( $level === NULL )
-		{ // By default, we use the default level:
-			$level = $this->defaultlevel;
+		if( $category === NULL )
+		{ // By default, we use the default category:
+			$category = $this->defaultcategory;
 		}
 
-		$this->messages[ $level ][] = $message;
+		$this->messages[$category][] = $message;
 
-		if( empty($this->_count[$level]) )
+		if( empty($this->_count[$category]) )
 		{
-			$this->_count[$level] = 0;
+			$this->_count[$category] = 0;
 		}
-		$this->_count[$level]++;
+		$this->_count[$category]++;
 
 
 		if( $this->dumpAdds || $dumpThis )
 		{
-			Log::display( '', '', $message, $level );
+			Log::display( '', '', $message, $category );
 		}
 	}
 
 
 	/**
-	 * Get head/foot for a specific level, designed for internal use of {@link display()}
+	 * Get head/foot for a specific category, designed for internal use of {@link display()}
 	 *
 	 * @static
 	 * @access private
 	 *
-	 * @param mixed head or foot (array [ level => head/foot, level => 'string', 'template',
+	 * @param mixed head or foot (array [ category => head/foot, category => 'string', 'template',
 	 *              or string [for container only])
-	 * @param string the level (or container)
+	 * @param string the category (or container)
 	 * @param string template, where the head/foot gets used (%s)
 	 */
-	function getHeadFoot( $headfoot, $level, $template = NULL )
+	function getHeadFoot( $headfoot, $category, $template = NULL )
 	{
-		if( is_string($headfoot) && $level == 'container' )
+		if( is_string($headfoot) && $category == 'container' )
 		{ // container head or foot
 			$r = $headfoot;
 		}
 		elseif( is_array($headfoot) )
-		{ // head or foot for levels
-			if( isset($headfoot[$level]) )
+		{ // head or foot for categories
+			if( isset($headfoot[$category]) )
 			{
-				$r = $headfoot[$level];
+				$r = $headfoot[$category];
 			}
 			elseif( isset($headfoot['all']) )
 			{
@@ -198,7 +199,7 @@ class Log
 
 			if( strstr( $r, '%s' ) )
 			{
-				$r = sprintf( $r, $level );
+				$r = sprintf( $r, $category );
 			}
 		}
 
@@ -218,44 +219,44 @@ class Log
 
 
 	/**
-	 * Display all messages of a single or all level(s).
+	 * Display all messages of a single or all categories.
 	 *
-	 * @param string the level to use (defaults to 'all')
+	 * @param string the category to use (defaults to 'all')
 	 * @return void
 	 */
-	function dumpAll( $level = 'all' )
+	function dumpAll( $category = 'all' )
 	{
-		$this->display( '', '', true, $level );
+		$this->display( '', '', true, $category );
 	}
 
 
 	/**
 	 * Wrapper to display messages as simple paragraphs.
 	 *
-	 * @param mixed the level of messages, see {@link display()}
+	 * @param mixed the category of messages, see {@link display()}
 	 * @param mixed the outer div, see {@link display()}
 	 * @param mixed the css class for inner paragraphs
 	 */
-	function displayParagraphs( $level = NULL, $outerdivclass = 'panelinfo', $cssclass = NULL )
+	function displayParagraphs( $category = NULL, $outerdivclass = 'panelinfo', $cssclass = NULL )
 	{
 		if( is_null($cssclass) )
 		{
 			$cssclass = array( 'all' => array( 'divClass' => false ) );
 		}
-		return $this->display( '', '', true, $level, $cssclass, 'p', $outerdivclass );
+		return $this->display( '', '', true, $category, $cssclass, 'p', $outerdivclass );
 	}
 
 
 	/**
 	 * Display messages of the Log object.
 	 *
-	 * - You can either output/get the logs of a level (string),
-	 *   all levels ('all') or level groups (array of strings).
+	 * - You can either output/get the logs of a category (string),
+	 *   all categories ('all') or category groups (array of strings).
 	 * - Head/Foot will be displayed on top/bottom of the messages. You can pass
-	 *   an array as head/foot with the level as key and this will be displayed
-	 *   on top of the level's messages.
+	 *   an array as head/foot with the category as key and this will be displayed
+	 *   on top of the category's messages.
 	 * - You can choose from various styles for message groups ('ul', 'p', 'br')
-	 *   and set a css class for it (by default 'log_'.$level gets used).
+	 *   and set a css class for it (by default 'log_'.$category gets used).
 	 * - You can suppress the outer div or set a css class for it (defaults to
 	 *   'log_container').
 	 *
@@ -266,19 +267,19 @@ class Log
 	 *   Please note: when called static, it will always display, because $display
 	 *                equals true.
 	 *
-	 * @param string header/title (default: empty), might be array ( level => msg ),
+	 * @param string header/title (default: empty), might be array ( category => msg ),
 	 *               'container' is then top
-	 * @param string footer (default: empty), might be array ( level => msg ),
+	 * @param string footer (default: empty), might be array ( category => msg ),
 	 *               'container' is then bottom
 	 * @param boolean to display or return (default: display)
-	 * @param mixed the level of messages to use (level, 'all', or list of levels (array))
-	 * @param string the CSS class of the messages div tag (default: 'log_'.$level)
+	 * @param mixed the category of messages to use (category, 'all', or list of categories (array))
+	 * @param string the CSS class of the messages div tag (default: 'log_'.$category)
 	 * @param string the style to use, 'ul', 'p', 'br'
 	 *               (default: 'br' for single message, 'ul' for more)
 	 * @param mixed the outer div, may be false
 	 * @return boolean false, if no messages; else true (and outputs if $display)
 	 */
-	function display( $head = NULL, $foot = NULL, $display = true, $level = NULL,
+	function display( $head = NULL, $foot = NULL, $display = true, $category = NULL,
 										$cssclass = NULL, $style = NULL, $outerdivclass = 'log_container' )
 	{
 		if( is_null( $head ) )
@@ -289,21 +290,21 @@ class Log
 		{ // Use object default:
 			$foot = isset( $this->foot ) ? $this->foot : '';
 		}
-		if( is_null( $level ) )
+		if( is_null( $category ) )
 		{
-			$level = isset( $this->defaultlevel ) ? $this->defaultlevel : 'error';
+			$category = isset( $this->defaultcategory ) ? $this->defaultcategory : 'error';
 		}
 		if( !is_bool($display) )
 		{ // We have just a string - static use case
-			$messages = array( $level => array($display) );
+			$messages = array( $category => array($display) );
 		}
-		elseif( !$this->count( $level ) )
+		elseif( !$this->count( $category ) )
 		{ // no messages
 			return false;
 		}
 		else
 		{
-			$messages = $this->getMessages( $level );
+			$messages = $this->getMessages( $category );
 		}
 
 		if( !is_array($cssclass) )
@@ -329,12 +330,12 @@ class Log
 		$disp .= Log::getHeadFoot( $head, 'container', '<h2>%s</h2>' );
 
 
-		foreach( $messages as $llevel => $lmessages )
+		foreach( $messages as $lcategory => $lmessages )
 		{
-			$lcssclass = isset($cssclass[$llevel]) ? $cssclass[$llevel] : $cssclass['all'];
+			$lcssclass = isset($cssclass[$lcategory]) ? $cssclass[$lcategory] : $cssclass['all'];
 			if( !isset($lcssclass['class']) || is_null($lcssclass['class']) )
 			{
-				$lcssclass['class'] = 'log_'.$llevel;
+				$lcssclass['class'] = 'log_'.$lcategory;
 			}
 			if( !isset($lcssclass['divClass']) || is_null($lcssclass['divClass']) || $lcssclass['divClass'] === true )
 			{
@@ -348,7 +349,7 @@ class Log
 				$disp .= "\t<div class=\"{$lcssclass['divClass']}\">";
 			}
 
-			$disp .= Log::getHeadFoot( $head, $llevel, '<h3>%s</h3>' );
+			$disp .= Log::getHeadFoot( $head, $lcategory, '<h3>%s</h3>' );
 
 			if( $style == NULL )
 			{ // 'br' for a single message, 'ul' for more
@@ -370,7 +371,7 @@ class Log
 			{
 				$disp .= "\t".implode( "\n<br />\t", $lmessages );
 			}
-			$disp .= Log::getHeadFoot( $foot, $llevel, "\n<p>%s</p>" );
+			$disp .= Log::getHeadFoot( $foot, $lcategory, "\n<p>%s</p>" );
 			if( $lcssclass['divClass'] )
 			{
 				$disp .= "\t</div>\n";
@@ -395,60 +396,62 @@ class Log
 
 
 	/**
-	 * Wrapper for {@link display()}: use header/footer dependent on message count
+	 * Wrapper for {@link Log::display()}: use header/footer dependent on message count
 	 * (one or more).
 	 *
 	 * @param string header/title for one message (default: empty), might be array
-	 *               ( level => msg ), 'container' is then top
+	 *               ( category => msg ), 'container' is then top
 	 * @param string|NULL header/title (if more than one message) - NULL means "use $head1"
 	 * @param string footer (if one message) (default: empty), might be array
-	 *               ( level => msg ), 'container' is then bottom
+	 *               ( category => msg ), 'container' is then bottom
 	 * @param string|NULL footer (if more than one message) - NULL means "use $foot1"
 	 * @param boolean to display or return (default: true)
-	 * @param mixed the level of messages to use (level, 'all', or list of levels (array))
-	 * @param string the CSS class of the messages div tag (default: 'log_'.$level)
+	 * @param mixed the category of messages to use (category, 'all', or list of categories (array))
+	 * @param string the CSS class of the messages div tag (default: 'log_'.$category)
 	 * @param string the style to use, 'ul', 'p', 'br'
 	 *               (default: 'br' for single message, 'ul' for more)
 	 * @param mixed the outer div, may be false
 	 * @return boolean false, if no messages; else true (and outputs if $display)
 	 */
-	function display_cond( $head1 = '', $head2 = '', $foot1 = '', $foot2 = '',
-													$display = true, $level = NULL, $cssclass = NULL,
+	function display_cond( $head1 = '', $head_more = '', $foot1 = '', $foot_more = '',
+													$display = true, $category = NULL, $cssclass = NULL,
 													$style = NULL, $outerdivclass = 'log_container' )
 	{
-		if( is_null( $head2 ) )
+		if( is_null( $head_more ) )
 		{
-			$head2 = $head1;
+			$head_more = $head1;
 		}
-		if( is_null( $foot2 ) )
+
+		if( is_null( $foot_more ) )
 		{
-			$foot2 = $foot1;
+			$foot_more = $foot1;
 		}
-		switch( $this->count( $level ) )
+
+		switch( $this->count( $category ) )
 		{
 			case 0:
 				return false;
 
 			case 1:
-				return $this->display( $head1, $foot1, $display, $level, $cssclass, $style );
+				return $this->display( $head1, $foot1, $display, $category, $cssclass, $style );
 
 			default:
-				return $this->display( $head2, $foot2, $display, $level, $cssclass, $style );
+				return $this->display( $head_more, $foot_more, $display, $category, $cssclass, $style );
 		}
 	}
 
 
 	/**
-	 * Concatenates messages of a given level to a string
+	 * Concatenates messages of a given category to a string
 	 *
 	 * @param string prefix of the string
 	 * @param string suffic of the string
-	 * @param string the level
+	 * @param string the category
 	 * @return string the messages, imploded. Tags stripped.
 	 */
-	function getString( $head = '', $foot = '', $level = NULL, $implodeBy = ', ' )
+	function getString( $head = '', $foot = '', $category = NULL, $implodeBy = ', ' )
 	{
-		if( !$this->count( $level ) )
+		if( !$this->count( $category ) )
 		{
 			return false;
 		}
@@ -458,7 +461,7 @@ class Log
 		{
 			$r .= $head.' ';
 		}
-		$r .= implode( $implodeBy, $this->getMessages( $level, true ) );
+		$r .= implode( $implodeBy, $this->getMessages( $category, true ) );
 		if( '' != $foot )
 		{
 			$r .= ' '.$foot;
@@ -469,94 +472,95 @@ class Log
 
 
 	/**
-	 * Counts messages of a given level
+	 * Counts messages of a given category
 	 *
-	 * @param string the level
+	 * @param string the category
 	 * @return number of messages
 	 */
-	function count( $level = NULL )
+	function count( $category = NULL )
 	{
-		if( is_null($level) )
-		{
-			$level = $this->defaultlevel;
+		if( is_null($category) )
+		{	// use default category:
+			$category = $this->defaultcategory;
 		}
-		if( is_string($level) )
+
+		if( is_string($category) )
 		{
-			if( empty( $this->_count[$level] ) )
+			if( empty( $this->_count[$category] ) )
 			{
-				$this->_count[$level] = count( $this->getMessages( $level, true ) );
+				$this->_count[$category] = count( $this->getMessages( $category, true ) );
 			}
-			if( $level != 'all' )
+			if( $category != 'all' )
 			{
 				unset($this->_count['all']);
 			}
-			return $this->_count[$level];
+			return $this->_count[$category];
 		}
 
-		return count( $this->getMessages( $level, true ) );
+		return count( $this->getMessages( $category, true ) );
 	}
 
 
 	/**
-	 * Returns array of messages of a single level or group of levels.
+	 * Returns array of messages of a single category or group of categories.
 	 *
-	 * If the level is an array, those levels will be used (where 'all' will
-	 * be translated with the not already processed levels).
+	 * If the category is an array, those categories will be used (where 'all' will
+	 * be translated with the not already processed categories).
 	 * <code>getMessages( array('error', 'note', 'all') )</code> would return
 	 * 'errors', 'notes' and the remaining messages, in that order.
 	 *
-	 * @param string the level
-	 * @param boolean if true will use subarrays for each level
+	 * @param string the category
+	 * @param boolean if true will use subarrays for each category
 	 * @return array the messages, one or two dimensions (depends on second param)
 	 */
-	function getMessages( $level = NULL, $singleDimension = false )
+	function getMessages( $category = NULL, $singleDimension = false )
 	{
 		$messages = array();
 
-		if( is_null($level) )
+		if( is_null($category) )
 		{
-			$level = $this->defaultlevel;
+			$category = $this->defaultcategory;
 		}
 
-		if( $level == 'all' )
+		if( $category == 'all' )
 		{
-			$level = array_keys( $this->messages );
-			sort($level);
+			$category = array_keys( $this->messages );
+			sort($category);
 		}
-		elseif( !is_array($level) )
+		elseif( !is_array($category) )
 		{
-			$level = array( $level );
+			$category = array( $category );
 		}
 
-		$levelsDone = array();
+		$categoriesDone = array();
 
-		while( $llevel = array_shift( $level ) )
+		while( $lcategory = array_shift( $category ) )
 		{
-			if( $llevel == 'all' )
-			{ // Put those levels in queue, which have not been processed already
-				$level = array_merge( array_diff( array_keys( $this->messages ), $levelsDone ), $level );
-				sort($level);
+			if( $lcategory == 'all' )
+			{ // Put those categories in queue, which have not been processed already
+				$category = array_merge( array_diff( array_keys( $this->messages ), $categoriesDone ), $category );
+				sort($category);
 				continue;
 			}
-			if( in_array( $llevel, $levelsDone ) )
+			if( in_array( $lcategory, $categoriesDone ) )
 			{
 				continue;
 			}
-			$levelsDone[] = $llevel;
+			$categoriesDone[] = $lcategory;
 
 
-			if( !isset($this->messages[$llevel][0]) )
+			if( !isset($this->messages[$lcategory][0]) )
 			{ // no messages
 				continue;
 			}
 
 			if( $singleDimension )
 			{
-				$messages = array_merge( $messages, $this->messages[$llevel] );
+				$messages = array_merge( $messages, $this->messages[$lcategory] );
 			}
 			else
 			{
-				$messages[$llevel] = $this->messages[$llevel];
+				$messages[$lcategory] = $this->messages[$lcategory];
 			}
 		}
 		return $messages;
@@ -566,6 +570,11 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.14  2005/04/19 16:23:03  fplanque
+ * cleanup
+ * added FileCache
+ * improved meta data handling
+ *
  * Revision 1.13  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
@@ -576,7 +585,7 @@ class Log
  * check for defined DB_USER!
  *
  * Revision 1.10  2005/02/19 23:02:45  blueyed
- * getMessages(): sort by level for 'all'
+ * getMessages(): sort by category for 'all'
  *
  * Revision 1.9  2005/02/17 19:36:24  fplanque
  * no message

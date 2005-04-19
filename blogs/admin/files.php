@@ -278,7 +278,7 @@ if( !empty($action) )
 				$arraylist = $SelectedFiles->getFilesArray( 'getname' );
 
 				$options = array (
-					'basedir' => $Fileman->getCwd(),
+					'basedir' => $Fileman->cwd,
 					'inmemory' => 1,
 					'recurse' => 1-$exclude_sd,
 				);
@@ -327,18 +327,21 @@ if( !empty($action) )
 				<ul>
 				';
 
+				// So far there is no problem with confirming...
+				$can_confirm = true;
+
+				// make sure we have loaded metas for all files in selection!
+				$SelectedFiles->load_meta();
 
 				foreach( $SelectedFiles->_entries as $lFile )
 				{
 					$action_msg .= '<li>'.$lFile->getName();
 
-					// TODO: check 	if( ! $edited_Establishment->check_delete( sprintf( T_('Cannot delete Establishment &laquo;%s&raquo;'), $edited_Establishment->dget('name') ) ) )
-
-
-					/* fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB integrity for these...
 					if( $lFile->isDir() )
-					{
-						$action_msg .= '
+					{	// This is a directory
+						$action_msg .= ' &lt;dir&gt;';
+							/* fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB integrity for these...
+							$action_msg .= '
 							<br />
 							<input title="'.sprintf( T_('Check to include subdirectories of &laquo;%s&raquo;'), $lFile->getName() ).'"
 								type="checkbox"
@@ -347,22 +350,38 @@ if( !empty($action) )
 								value="1" />
 								<label for="delsubdirs_'.$lFile->getID().'">'
 									.T_( 'Including subdirectories' ).'</label>';
+							*/
 					}
-					*/
+
+					// Check if there are delete restrictions on this file:
+					$lFile->check_relations( 'delete_restrictions' );
+
+					if( $Messages->count('restrict') )
+					{	// There are restrictions:
+						$action_msg .= ': <strong>'.T_('cannot be deleted because of the following relations').'</strong> :'; 
+						$action_msg .= $Messages->display( NULL, NULL, false, 'restrict', '', 'ul', false );
+						$Messages->clear( 'restrict' );
+						// We won't be able to continue with deletion...
+						$can_confirm = false;
+					}
+
 					$action_msg .= '</li>';
 				}
 
 				$action_msg .= "</ul>\n";
 
 
-				$action_msg .= '
-					<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
-					</form>
-					<form action="files.php" class="inline">
-						'.$Fileman->getFormHiddenInputs().'
-						<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
-					</form>
-					';
+				if( $can_confirm )
+				{	// No integrity problem detected...
+					$action_msg .= '
+						<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
+						</form>
+						<form action="files.php" class="inline">
+							'.$Fileman->getFormHiddenInputs().'
+							<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
+						</form>
+						';
+				}
 
 				$action_msg .= '</div>';
 
@@ -614,7 +633,7 @@ require dirname(__FILE__).'/_menutop.php';
 
 
 <?php
-switch( $Fileman->getMode() )
+switch( $Fileman->fm_mode )
 { // handle modes {{{
 
 	case 'file_upload':
@@ -753,7 +772,7 @@ switch( $Fileman->getMode() )
 				}
 
 				// Get File object for requested target location:
-				$newFile = & getFile( $newName, $Fileman->getCwd(), true );
+				$newFile = & $FileCache->get_by_path( $Fileman->cwd.$newName, true );
 
 				if( $newFile->exists() )
 				{	// The file already exists in the target location!
@@ -847,7 +866,7 @@ switch( $Fileman->getMode() )
 				{
 					$LogCmr->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $newname ) );
 				}
-				elseif( ($TargetFile =& getFile( $newname, $Fileman->getCwd() ))
+				elseif( ($TargetFile = & $FileCache->get_by_path( $Fileman->cwd.$newname ))
 								&& $TargetFile->exists() )
 				{ // target filename already given to another file
 					if( $TargetFile === $SourceFile )
@@ -883,7 +902,7 @@ switch( $Fileman->getMode() )
 						{ // move/rename
 							if( $Fileman->unlink( $SourceFile ) )
 							{
-								if( $SourceFile->getDir() == $Fileman->getCwd() )
+								if( $SourceFile->getDir() == $Fileman->cwd )
 								{ // successfully renamed
 									$Fileman->Messages->add( sprintf( T_('Renamed &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																										basename($oldpath),
@@ -900,7 +919,7 @@ switch( $Fileman->getMode() )
 							else
 							{
 								$LogCmr->add( sprintf( T_('Could not remove &laquo;%s&raquo;, but the file has been copied to &laquo;%s&raquo;.'),
-																			($SourceFile->getDir() == $Fileman->getCwd() ?
+																			($SourceFile->getDir() == $Fileman->cwd ?
 																				basename($oldpath) :
 																				$oldpath ),
 																			$TargetFile->getName() ) );
@@ -910,7 +929,7 @@ switch( $Fileman->getMode() )
 						{ // copy only
 							$Fileman->Messages->add( sprintf(
 								T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-								( $SourceFile->getDir() == $Fileman->getCwd() ?
+								( $SourceFile->getDir() == $Fileman->cwd ?
 										$SourceFile->getName() :
 										$SourceFile->getPath() ),
 								$TargetFile->getName() ), 'note' );
@@ -1036,7 +1055,7 @@ switch( $Fileman->getMode() )
 			&& opener.document.FilesForm
 			&& typeof(opener.document.FilesForm.md5_filelist.value) != 'undefined'
 			&& typeof(opener.document.FilesForm.md5_cwd.value) != 'undefined'
-			&& opener.document.FilesForm.md5_cwd.value == '<?php echo md5($Fileman->getCwd()); ?>'
+			&& opener.document.FilesForm.md5_cwd.value == '<?php echo md5($Fileman->cwd); ?>'
 		)
 	{
 		opener.document.getElementById( 'fm_reloadhint' ).style.display =
@@ -1053,11 +1072,11 @@ switch( $Fileman->getMode() )
 // "Display/hide Filemanager"
 // TODO: do not display this after a successful rename...
 
-$showFilemanager = !$Fileman->getMode() || $UserSettings->get('fm_forceFM') || $Fileman->forceFM ;
+$showFilemanager = !$Fileman->fm_mode || $UserSettings->get('fm_forceFM') || $Fileman->forceFM ;
 
 $toggleButtons = array();
 
-if( $Fileman->getMode() )
+if( $Fileman->fm_mode )
 {
 	if( !$UserSettings->get('fm_forceFM') )
 	{ // FM is not forced - link to hide/display
@@ -1129,8 +1148,10 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
- * Revision 1.90  2005/04/18 19:09:49  fplanque
- * no message
+ * Revision 1.91  2005/04/19 16:23:01  fplanque
+ * cleanup
+ * added FileCache
+ * improved meta data handling
  *
  * Revision 1.89  2005/04/15 18:02:58  fplanque
  * finished implementation of properties/meta data editor

@@ -41,21 +41,24 @@
 #filemanmain table.grouped td.icon,
 #filemanmain table.grouped td.checkbox,
 #filemanmain table.grouped td.perms {
-	width:2%;
 }
 #filemanmain table.grouped td.type {
-	width:15%;
+	white-space:nowrap;
 }
 #filemanmain table.grouped td.filename {
-	width:45%;
+	width:100%;
 	text-align: left;
 }
 #filemanmain table.grouped td.filename div.path {
 	clear:right;
 	float:right;
 }
+.filemeta /* meta data after filename */
+{
+	color: #999;
+	font-size: 84%;
+}
 #filemanmain table.grouped td.timestamp {
-	width:15%;
 	white-space: nowrap;	
 }
 #filemanmain table.grouped td.timestamp span.time {
@@ -63,7 +66,6 @@
 }
 #filemanmain table.grouped td.size,
 #filemanmain table.grouped td.actions {
-	width:10%;
 	white-space: nowrap;
 }
 #filemanmain table.grouped td.size {
@@ -80,6 +82,7 @@
 	background-color: #efede0;
 	border: 1px solid #9e9286;
 }
+
 /* }}} */
 
 .toolbaritem,

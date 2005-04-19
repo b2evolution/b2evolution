@@ -345,6 +345,25 @@ function trailing_slash( $path )
 
 
 /**
+ * Remove trailing slash, if present
+ *
+ * @param string the path/url
+ * @return string the path/url without trailing slash
+ */
+function no_trailing_slash( $path )
+{
+	if( substr( $path, -1 ) == '/' )
+	{
+		return substr( $path, 0, strlen( $path ) );
+	}
+	else
+	{
+		return $path;
+	}
+}
+
+
+/**
  * Displays file permissions like 'ls -l'
  *
  * @author zilinex at linuxmail dot com {@link www.php.net/manual/en/function.fileperms.php}
@@ -471,6 +490,11 @@ function isFilename( $filename )
 
 /*
  * $Log$
+ * Revision 1.12  2005/04/19 16:23:02  fplanque
+ * cleanup
+ * added FileCache
+ * improved meta data handling
+ *
  * Revision 1.11  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

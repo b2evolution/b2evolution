@@ -77,7 +77,7 @@ class FileManager extends Filelist
 	var $root_url;
 
 	/**
-	 * current working directory
+	 * Current working directory WITH trailing slash.
 	 * @param string
 	 */
 	var $cwd;
@@ -374,8 +374,10 @@ class FileManager extends Filelist
 		parent::Filelist( $this->cwd );
 		parent::load( $this->flatmode );
 		parent::restart();
-
 		#debug: pre_dump( $this->_entries );
+
+		// Load meta data for the filelist:
+		parent::load_meta();
 	}
 
 
@@ -611,39 +613,6 @@ class FileManager extends Filelist
 	 *
 	 * @movedTo _file_view.inc.php because this is definitely not a FM feature, it's pure image display...
 	 */
-
-
-	/**
-	 * Get current working directory.
-	 *
-	 * @return string the current working directory
-	 */
-	function getCwd()
-	{
-		return $this->cwd;
-	}
-
-
-	/**
-	 * Get the path of the Filemanager, relative to root.
-	 *
-	 * @return string the path
-	 */
-	function getPath()
-	{
-		return $this->path;
-	}
-
-
-	/**
-	 * Get current mode.
-	 *
-	 * @return string|NULL 'file_cmr', 'file_upload'
-	 */
-	function getMode()
-	{
-		return $this->fm_mode;
-	}
 
 
 	/**
@@ -1131,6 +1100,8 @@ class FileManager extends Filelist
 	 */
 	function createDirOrFile( $type, $name, $path = NULL, $chmod = NULL )
 	{
+		global $FileCache;
+
 		if( $type != 'dir' && $type != 'file' )
 		{
 			return false;
@@ -1160,7 +1131,7 @@ class FileManager extends Filelist
 		}
 
 
-		$newFile =& getFile( $name, $path );
+		$newFile = & $FileCache->get_by_path( $path );
 
 		if( $newFile->exists() )
 		{
@@ -1458,8 +1429,10 @@ class FileManager extends Filelist
 
 /*
  * $Log$
- * Revision 1.31  2005/04/18 19:09:52  fplanque
- * no message
+ * Revision 1.32  2005/04/19 16:23:02  fplanque
+ * cleanup
+ * added FileCache
+ * improved meta data handling
  *
  * Revision 1.30  2005/04/15 18:02:59  fplanque
  * finished implementation of properties/meta data editor

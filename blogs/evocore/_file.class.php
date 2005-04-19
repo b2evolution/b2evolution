@@ -94,43 +94,6 @@ $fm_filetypes = array( // {{{
 ); // }}}
 
 
-/**
- * Creates an object of the {@link File} class, while providing caching
- * and making sure that only one reference to a file exists.
- *
- * @param string name of the file or directory
- * @param string path of the file or directory
- * @param boolean check for meta data?
- * @return File an {@link File} object
- */
-function & getFile( $name, $path = NULL, $load_meta = false )
-{
-	global $cache_File;
-
-	$path = trailing_slash( $path === NULL ? getcwd() : $path );
-
-	$path = str_replace( '\\', '/', trailing_slash($path) );
-
-	$cacheindex = is_windows() ? strtolower($path.$name) : $path.$name;
-
-	if( isset( $cache_File[ $cacheindex ] ) )
-	{
-		#Log::display( '', '', 'File ['.$cacheindex.'] returned from cache.' );
-		$File = & $cache_File[ $cacheindex ];
-		if( $load_meta )
-		{	// Make sure meta is loaded:
-			$File->load_meta();
-		}
-	}
-	else
-	{
-		#Log::display( '', '', 'File ['.$cacheindex.'] not cached.' );
-		$File = & new File( $name, $path, $load_meta );
-		$cache_File[$cacheindex] = & $File;
-	}
-	return $File;
-}
-
 
 /**
  * Represents a file or directory. Use {@link getFile} to create an instance.
@@ -171,16 +134,15 @@ class File extends DataObject
 
 
 	/**
-	 * Constructor, not meant to be called directly. Use {@link getFile()}
+	 * Constructor, not meant to be called directly. Use {@link FileCache::get_by_path()}
 	 * instead, which provides caching and checks that only one object for
 	 * a unique file exists (references).
 	 *
-	 * @param string name of the file / directory
-	 * @param string path to the file / directory
+	 * @param string path to the file / directory (with trailing slash if directory).
 	 * @param boolean check for meta data?
 	 * @return mixed false on failure, File object on success
 	 */
-	function File( $name, $dir, $load_meta = false )
+	function File( $path, $load_meta = false )
 	{
 		// Call parent constructor
 		parent::DataObject( 'T_files', 'file_', 'file_ID', '', '', '', '' );
@@ -189,8 +151,9 @@ class File extends DataObject
 				array( 'table'=>'T_links', 'fk'=>'link_file_ID', 'msg'=>T_('%d linked items') ),
 			);
 
-		$this->setName( $name );
-		$this->setDir( $dir );
+		$posix_path = no_trailing_slash( $path );
+		$this->setName( basename( $posix_path ) );
+		$this->setDir( dirname( $posix_path ) );
 		$this->_md5ID = md5( $this->_dir.$this->_name );
 
 		// Get/Memorize detailed diskfile info:
@@ -208,17 +171,22 @@ class File extends DataObject
 	 *
 	 * Will attempt only once and cache the result.
 	 */
-	function load_meta( $force_creation = false )
+	function load_meta( $force_creation = false, $row = NULL )
 	{
-		global $DB, $Debuglog;
+		global $DB, $Debuglog, $FileCache;
 
 		if( $this->meta == 'unknown' )
 		{ // We haven't tried loading yet:
-			if( $row = $DB->get_row( 'SELECT * FROM T_files
+			if( is_null( $row )	)
+			{	// No DB data has been provided:
+				$row = $DB->get_row( 'SELECT * FROM T_files
 																WHERE file_root_type = \'absolute\'
 																	AND file_root_ID = 0
 																	AND file_path = '.$DB->quote($this->getPath()),
-																OBJECT, 0, 'Load file meta data' ) )
+																OBJECT, 0, 'Load file meta data' );
+			}
+
+			if( $row )
 			{ // We found meta data
 				$Debuglog->add('Loaded metadata for '.$this->getPath());
 				$this->meta  = 'loaded';
@@ -226,6 +194,9 @@ class File extends DataObject
 				$this->title = $row->file_title;
 				$this->alt   = $row->file_alt;
 				$this->desc  = $row->file_desc;
+
+				// Store this in the FileCache:
+				$FileCache->add( $this );
 			}
 			else
 			{ // No meta data...
@@ -418,8 +389,7 @@ class File extends DataObject
 	 */
 	function getPath( $withname = true )
 	{
-		return $this->_dir.$this->_name
-						.( $this->isDir() ? '/' : '' );
+		return $this->_dir.$this->_name.( $this->isDir() ? '/' : '' );
 	}
 
 
@@ -761,7 +731,7 @@ class File extends DataObject
 		if( ($this->ID != 0) || ($this->meta != 'notfound') ) die( 'Existing file object cannot be inserted!' );
 
 		// We need to track filepath:
-		$this->set_param( 'path', 'string', $this->_dir.$this->_name );
+		$this->set_param( 'path', 'string', $this->getPath() );
 
 		// Let parent do the insert:
 		parent::dbinsert();
@@ -789,6 +759,11 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2005/04/19 16:23:02  fplanque
+ * cleanup
+ * added FileCache
+ * improved meta data handling
+ *
  * Revision 1.25  2005/04/15 18:02:59  fplanque
  * finished implementation of properties/meta data editor
  * started implementation of files to items linking

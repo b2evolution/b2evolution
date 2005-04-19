@@ -134,7 +134,7 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 <form action="files.php#FM_anchor" name="FilesForm" id="FilesForm" method="post">
 <input type="hidden" name="confirmed" value="0" />
 <input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
-<input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->getCwd()) ?>" />
+<input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->cwd) ?>" />
 <?php echo $Fileman->getFormHiddenInputs(); ?>
 
 
@@ -335,19 +335,33 @@ while( $lFile =& $Fileman->getNextFile() )
 
 			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"
 				onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();"><?php
+
 				if( $Fileman->flatmode && $Fileman->getOrder() != 'name' )
-				{
+				{	// Display path
 					echo './'.$Fileman->getFileSubpath( $lFile );
 				}
 				else
-				{
+				{	// Display short name
 					echo $lFile->getName();
 				}
-				disp_cond( $Fileman->getFileImageSize(), ' (%s)' )
+
 				?>
 			</a>
 
 			<?php
+
+			echo '<span class="filemeta">';
+
+			// Optionnaly display IMAGE pixel size:
+			disp_cond( $Fileman->getFileImageSize(), ' (%s)' );
+
+			// Optionnaly display meta data title:
+			if( $lFile->meta == 'loaded' )
+			{	// We have loaded meta data for this file:
+				echo ' - '.$lFile->title;
+			}
+
+			echo '</span>';
 
 			if( $Fileman->flatmode && $Fileman->getOrder() == 'name' )
 			{
@@ -707,8 +721,10 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
- * Revision 1.21  2005/04/18 19:09:48  fplanque
- * no message
+ * Revision 1.22  2005/04/19 16:23:00  fplanque
+ * cleanup
+ * added FileCache
+ * improved meta data handling
  *
  * Revision 1.20  2005/04/15 18:02:58  fplanque
  * finished implementation of properties/meta data editor

@@ -159,7 +159,7 @@ if( false )
 
 		// we'll use $rootIDAndPath only
 		echo $Fileman->getFormHiddenInputs( array( 'root' => false, 'path' => false ) );
-		$Form->hidden( 'rootIDAndPath', serialize( array( 'id' => $Fileman->root, 'path' => $Fileman->getPath() ) ) );
+		$Form->hidden( 'rootIDAndPath', serialize( array( 'id' => $Fileman->root, 'path' => $Fileman->path ) ) );
 
 
 		if( count( $failedFiles ) )
@@ -277,6 +277,11 @@ if( false )
 
 /*
  * $Log$
+ * Revision 1.6  2005/04/19 16:23:01  fplanque
+ * cleanup
+ * added FileCache
+ * improved meta data handling
+ *
  * Revision 1.5  2005/04/14 19:57:52  fplanque
  * filemanager refactoring & cleanup
  * started implementation of properties/meta data editor

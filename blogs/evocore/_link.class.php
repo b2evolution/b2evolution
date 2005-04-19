@@ -114,8 +114,10 @@ class Link extends DataObject
 
 /*
  * $Log$
- * Revision 1.5  2005/04/18 19:09:56  fplanque
- * no message
+ * Revision 1.6  2005/04/19 16:23:03  fplanque
+ * cleanup
+ * added FileCache
+ * improved meta data handling
  *
  * Revision 1.4  2005/04/15 18:02:59  fplanque
  * finished implementation of properties/meta data editor

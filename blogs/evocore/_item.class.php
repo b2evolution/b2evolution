@@ -1861,8 +1861,10 @@ class Item extends DataObject
 
 /*
  * $Log$
- * Revision 1.36  2005/04/18 19:09:52  fplanque
- * no message
+ * Revision 1.37  2005/04/19 16:23:02  fplanque
+ * cleanup
+ * added FileCache
+ * improved meta data handling
  *
  * Revision 1.35  2005/04/12 18:58:20  fplanque
  * use TS_() instead of T_() for JavaScript strings

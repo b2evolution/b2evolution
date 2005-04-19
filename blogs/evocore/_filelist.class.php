@@ -266,7 +266,7 @@ class Filelist
 	 * @param boolean Has the file to exist to get added?
 	 * @return boolean true on success, false on failure
 	 */
-	function addFile( &$File, $mustExist = false )
+	function addFile( & $File, $mustExist = false )
 	{
 		if( !is_a( $File, 'file' ) )
 		{
@@ -320,6 +320,8 @@ class Filelist
 	 */
 	function addFileByPath( $path, $mustExist = false )
 	{
+		global $FileCache;
+
 		$basename = basename($path);
 		$dirname = dirname($path).'/';
 
@@ -331,7 +333,7 @@ class Filelist
 			}
 		}
 
-		$NewFile =& getFile( $basename, $dirname );
+		$NewFile = & $FileCache->get_by_path( $path  );
 
 		return $this->addFile( $NewFile, $mustExist );
 	}
@@ -787,10 +789,66 @@ class Filelist
 		return md5( serialize( $this->_entries ) );
 	}
 
+
+	/**
+	 * Attempt to load meta data for all files in the list.
+	 *
+	 * Will attempt only once per file and cache the result.
+	 */
+	function load_meta( $force_creation = false )
+	{
+		global $DB, $Debuglog, $FileCache;
+
+		$to_load = array();
+
+		foreach( $this->_entries as $loop_File )
+		{	// For each file:
+			// echo $loop_File->getPath();
+
+			if( $loop_File->meta != 'unknown' )
+			{ // We have already loading meta data:
+				continue;
+			}
+
+			$to_load[] = $DB->quote( $loop_File->getPath() );
+		}
+
+		if( ! count( $to_load ) )
+		{	// We don't need to load anything...
+			return false;
+		}
+
+		if( ! $rows = $DB->get_results( 'SELECT *
+																			 FROM T_files
+																			WHERE file_root_type = \'absolute\'
+																				AND file_root_ID = 0
+																				AND file_path IN ('.implode( ',', $to_load ).')',
+																			OBJECT, 'Load FileList meta data' ) )
+		{ // We haven't found any meta data...
+			return false;
+		}
+
+		// Go through rows of loaded meta data...
+		foreach( $rows as $row )
+		{
+			// Retrieve matching File object:
+			$loop_File = & $FileCache->get_by_path( $row->file_path );
+
+			// Associate meta data to File object:
+			$loop_File->load_meta( false, $row );
+		}
+
+		return true;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.21  2005/04/19 16:23:02  fplanque
+ * cleanup
+ * added FileCache
+ * improved meta data handling
+ *
  * Revision 1.20  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
