@@ -49,14 +49,14 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo $selectedFile->getName().' ('.T_('Preview').')'; ?></title>
-	<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
-	<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
-	<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
-	<?php if( is_file( dirname(__FILE__).'/custom.css' ) ) { ?>
-	<link href="custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />
+	<link href="skins/legacy/rsc/css/variation.css" rel="stylesheet" type="text/css" title="Variation" />
+	<link href="skins/legacy/rsc/css/desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
+	<link href="skins/legacy/rsc/css/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
+	<?php if( is_file( dirname(__FILE__).'/skins/legacy/rsc/css/custom.css' ) ) { ?>
+	<link href="skins/legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />
 	<?php } ?>
-	<script type="text/javascript" src="styleswitcher.js"></script>
-	<link href="fileman.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="../rsc/js/styleswitcher.js"></script>
+	<link href="../rsc/css/fileman.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>

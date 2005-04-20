@@ -4,6 +4,7 @@
  *
  * Based on ezSQL - Class to make it very easy to deal with MySQL database connections.
  * b2evo Additions:
+ * - nested transactions
  * - symbolic table names
  * - query log
  * - get_list
@@ -892,6 +893,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.14  2005/04/20 18:37:59  fplanque
+ * Relocation of javascripts and CSS files to their proper places...
+ *
  * Revision 1.13  2005/04/19 18:04:38  fplanque
  * implemented nested transactions for MySQL
  *

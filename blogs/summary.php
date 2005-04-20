@@ -28,7 +28,7 @@ require(dirname(__FILE__).'/evocore/_main.inc.php');
 <!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
  <!-- InstanceEndEditable -->
-<link rel="stylesheet" href="rsc/fp02.css" type="text/css" />
+<link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 </head>
 <body>
 <div class="pageHeader">

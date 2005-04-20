@@ -87,22 +87,22 @@ class AdminUI extends AdminUI_general
 	 */
 	function getHeadlinks()
 	{
-		global $mode;
+		global $mode, $rsc_url;
 
-		$r ='<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
-				<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
-				<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />';
+		$r ='<link href="skins/legacy/rsc/css/variation.css" rel="stylesheet" type="text/css" title="Variation" />
+				<link href="skins/legacy/rsc/css/desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
+				<link href="skins/legacy/rsc/css/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />';
 
-		if( is_file( dirname(__FILE__).'/custom.css' ) )
+		if( is_file( dirname(__FILE__).'/rsc/css/custom.css' ) )
 		{
-			$r .= '<link href="custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
+			$r .= '<link href="skins/legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
 		}
 
-		$r .= '<script type="text/javascript" src="styleswitcher.js"></script>';
+		$r .= '<script type="text/javascript" src="'.$rsc_url.'js/styleswitcher.js"></script>';
 
 		if( $mode == 'sidebar' )
 		{ // Include CSS overrides for sidebar:
-			$r .= '<link href="sidebar.css" rel="stylesheet" type="text/css" />';
+			$r .= '<link href="skins/legacy/rsc/css/sidebar.css" rel="stylesheet" type="text/css" />';
 		}
 
 		return $r;
@@ -125,7 +125,7 @@ class AdminUI extends AdminUI_general
 				<a href="#" onclick="setActiveStyleSheet(\'Variation\'); return false;" title="Variation (Default)">V</a>'
 				.'&middot;<a href="#" onclick="setActiveStyleSheet(\'Desert\'); return false;" title="Desert">D</a>'
 				.'&middot;<a href="#" onclick="setActiveStyleSheet(\'Legacy\'); return false;" title="Legacy">L</a>'
-				.( is_file( dirname(__FILE__).'/custom.css' ) ? '&middot;<a href="#" onclick="setActiveStyleSheet(\'Custom\'); return false;" title="Custom">C</a>' : '' )
+				.( is_file( dirname(__FILE__).'/rsc/css/custom.css' ) ? '&middot;<a href="#" onclick="setActiveStyleSheet(\'Custom\'); return false;" title="Custom">C</a>' : '' )
 				.'
 				&bull;
 				'.$this->exit_links.'

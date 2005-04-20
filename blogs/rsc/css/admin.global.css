@@ -1,25 +1,37 @@
 /**
  * Global / basic CSS styles for the admin.
  *
- * This should be included with every skin.
+ * This should be included with every skin and overridden when needed.
  */
 
 
-/* Cat selection table */
+/* 
+ * Categories selection table:
+ */
 table.catselect {
 	border-spacing:0;
+	width:90%;
+	border: 1px solid #bbb;
 }
 table.catselect th {
-	text-align:left;
-	margin-left:1ex;
+	padding: .3ex 1ex;
+	background-color: #ddd;
+	border-bottom: 1px solid #bbb;
 }
-table.catselect th,
 table.catselect td {
-	padding:0 .5ex;
+	padding: .2ex 1ex;
+	background-color: #eee;
 }
-td.selector {
+table.catselect input {
+	background-color: #eee;
+}
+table.catselect th.selector,
+table.catselect td.selector {
+	width: 1%;
 	text-align:center;
+	border-right: 1px solid #bbb;
 }
-
-
+table.catselect tr:hover td {
+	background-color:#ccc;
+}
 

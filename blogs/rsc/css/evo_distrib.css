@@ -1,7 +1,7 @@
 
-@import url(../rsc/basic.css);	/* Import basic styles */
-@import url(../rsc/img.css);	/* Import standard image styles */
-@import url(../rsc/forms.css);	/* Import standard form styles */
+@import url(basic.css);	/* Import basic styles */
+@import url(img.css);	/* Import standard image styles */
+@import url(forms.css);	/* Import standard form styles */
 
 /* Global page layout */
 #rowheader {

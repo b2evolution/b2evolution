@@ -122,12 +122,13 @@ function antispam_delete( $string_ID )
 function antispam_url( $url )
 {
 	global $DB, $cache_antispam, $Debuglog;
-
+/*
 	// check for blacklisted IP first
+	// TODO: move this into _main or somewhere early and stop processing if matched. don't check with EVERY SINGLE URL!!
 	if ( $results = antispam_ip($_SERVER["REMOTE_ADDR"]) ) {
 		return $results;
 	}
-
+*/
 
 	// TODO: 'SELECT COUNT(*) FROM T_antispam WHERE aspm_string LIKE "%'.$url.'%" ?
 	// TODO: Check basedomain against T_basedomains (dom_status = 'blacklist')
@@ -161,7 +162,7 @@ function antispam_url( $url )
 function antispam_ip( $ip )
 {
 	global $rbl_config, $Debuglog;
-
+/*
 	// uncomment the following line to test RBL with spamhaus
 	//	$ip="127.0.0.2";
 	// check each blacklist in $rbl_config
@@ -179,7 +180,7 @@ function antispam_ip( $ip )
 	}
 	
 	return false;
-	
+*/	
 }
 
 
@@ -331,6 +332,9 @@ function b2evonet_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.9  2005/04/20 18:37:59  fplanque
+ * Relocation of javascripts and CSS files to their proper places...
+ *
  * Revision 1.8  2005/04/19 20:39:37  jwedgeco
  * I forgot to add the copyright and license text. I added it.
  *

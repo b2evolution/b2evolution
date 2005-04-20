@@ -5,10 +5,10 @@ used as default layout for b2, with permission from Dean Peters,
 who first adapted it ( http://www.deanpeters.com/b2 )
 */
 
-@import url(../../rsc/basic.css);	/* Import basic styles */
-@import url(../../rsc/img.css);	/* Import standard image styles */
-@import url(../../rsc/forms.css);	/* Import default form styles */
-@import url(../../rsc/comments.css);	/* Import default comment styles */
+@import url(../../rsc/css/basic.css);	/* Import basic styles */
+@import url(../../rsc/css/img.css);	/* Import standard image styles */
+@import url(../../rsc/css/forms.css);	/* Import default form styles */
+@import url(../../rsc/css/comments.css);	/* Import default comment styles */
 
 body {
 	margin:0px;

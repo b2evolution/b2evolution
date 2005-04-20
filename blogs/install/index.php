@@ -56,7 +56,7 @@ $timestamp = time() - 120; // We start dates 2 minutes ago because their dates i
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo T_('b2evo installer') ?></title>
-	<link href="../rsc/b2evo.css" rel="stylesheet" type="text/css" />
+	<link href="../rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div id="rowheader" >

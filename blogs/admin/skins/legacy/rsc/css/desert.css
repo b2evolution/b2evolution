@@ -8,13 +8,13 @@
  * @package admin
  */
 
-@import url(../rsc/basic.css);            /* Import basic styles */
-@import url(../rsc/img.css);              /* Import standard image styles */
-@import url(../rsc/blog_elements.css);    /* Import standard blog elements styles */
-@import url(../rsc/forms.css);            /* Import default form styles */
-@import url(../rsc/comments.css);         /* Import default comment styles */
-@import url(fileman.css);                 /* Import filemanager styles */
-@import url(../rsc/css/admin.global.css); /* Import basic admin styles */
+@import url(../../../../../rsc/css/basic.css);            /* Import basic styles */
+@import url(../../../../../rsc/css/img.css);              /* Import standard image styles */
+@import url(../../../../../rsc/css/blog_elements.css);    /* Import standard blog elements styles */
+@import url(../../../../../rsc/css/forms.css);            /* Import default form styles */
+@import url(../../../../../rsc/css/comments.css);         /* Import default comment styles */
+@import url(../../../../../rsc/css/fileman.css);          /* Import filemanager styles */
+@import url(../../../../../rsc/css/admin.global.css);     /* Import basic admin styles */
 
 body {
 	margin: 0;
@@ -22,8 +22,6 @@ body {
 	color: #000;
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 	font-size: 84%;
-	background-image: url(skins/evo/rsc/leftfade.png);
-	background-repeat: repeat-y;
 }
 
 /* Titles */
@@ -91,9 +89,6 @@ input.radio {
 form.fform fieldset {
 	border-color: #eee7e0;
 }
-form.fform fieldset.fieldset fieldset {
-	border:transparent;
-}
 
 legend {
 	font-weight: bold;
@@ -122,7 +117,7 @@ a.DeleteButton {
 }
 a.CurrentBlog {
 	font-weight: bold;
-	background-image: url("../admin/img/desert-button-2.gif");
+	background-image: url(../../../../img/desert-button-2.gif);
 	background-color: #fff;
 }
 a.CurrentBlog:hover {
@@ -133,7 +128,7 @@ a.CurrentBlog:hover {
 a.OtherBlog,
 a.ActionButton,
 a.DeleteButton {
-	background-image: url("../admin/img/desert-button.gif");
+	background-image: url(../../../../img/desert-button.gif);
 	background-color: #e1ddce;
 }
 a.OtherBlog {
@@ -144,14 +139,14 @@ a.ActionButton:hover {
 	color: #00b;
 	text-decoration: underline;
 	background-color: #fff;
-	background-image: url("../admin/img/desert-button-2.gif");
+	background-image: url(../../../../img/desert-button-2.gif);
 	border: 1px solid #00b;
 }
 a.DeleteButton:hover {
 	color: #c00;
 	text-decoration: underline;
 	background-color: #fff;
-	background-image: url("../admin/img/desert-button-2.gif");
+	background-image: url(../../../../img/desert-button-2.gif);
 	border: 1px solid #c00;
 }
 a.PublishButton {
@@ -160,7 +155,7 @@ a.PublishButton {
 	text-decoration: none;
 	font-weight: bold;
 	padding: 2px 1ex;
-	background-image: url("../admin/img/desert-button.gif");
+	background-image: url(../../../../img/desert-button.gif);
 	background-color: #e1ddce;
 	border: 1px solid #ccc5aa;
 }
@@ -168,7 +163,7 @@ a.PublishButton:hover {
 	color: #c00;
 	text-decoration: underline;
 	background-color: #fff;
-	background-image: url("../admin/img/desert-button-2.gif");
+	background-image: url(../../../../img/desert-button-2.gif);
 	border: 1px solid #c00;
 }
 
@@ -183,7 +178,7 @@ div.PostActionsArea input {
 	padding: 2px;
 	margin: .5ex 1px;
 	color:#333;
-	background-image: url("../admin/img/desert-button.gif");
+	background-image: url(../../../../img/desert-button.gif);
 	background-color: #e1ddce;
 	border: 1px solid #ccc5aa;
 }
@@ -200,7 +195,7 @@ div.PostActionsArea input:hover {
 	color: #00b;
 	text-decoration: underline;
 	background-color: #fff;
-	background-image: url("../admin/img/desert-button-2.gif");
+	background-image: url(../../../../img/desert-button-2.gif);
 	border: 1px solid #00b;
 }
 
@@ -227,7 +222,7 @@ table.grouped
 	border: 1px solid #9e9286;
 	margin: 1ex auto;
 	border-collapse: collapse;
-	/* clear:both; */
+	clear:both;
 }
 
 table.grouped tr {
@@ -253,45 +248,8 @@ table.grouped th {
 	border-left: 1px solid #9e9286;
 	color: #9e9286;
 	background-color: #efede0;
-	font-weight: bold;
-	padding-left: 1ex;
-	padding-right: 1ex;
+	padding: .3ex 1ex;
 }
-
-table.grouped th a.basic_current,
-table.grouped th a.basic_sort_link {
-	padding: 0 1ex;
-}
-
-table.grouped th a img {
-	vertical-align: middle
-}
-
-table.grouped th a.basic_current,
-table.grouped th a.basic_sort_link {
-	display: block;
-	height: 100%;
-}
-
-table.grouped th a.single_current {
-	font-weight : bold;
-}
-
-table.grouped th a.basic_current {
-	background-color:#e3dfd0;
-	font-weight: bold;
-}
-
-table.grouped th a.basic_sort_link:hover {
-	background-color:#e3dfd0;
-	font-weight: normal;
-}
-
-table.grouped th a.single_current:hover,
-table.grouped th a.single_sort_link:hover {
-	text-decoration: underline;
-}
-
 tr.group td {
 	font-weight: bold;
 	color: #8e8276;
@@ -300,11 +258,9 @@ tr.group td {
 	border-bottom: 1px solid #9e9286;
 	border-left: 0;
 }
-
 td.right {
 	text-align: right;
 }
-
 table.grouped .firstcol,
 table.grouped tr.odd .firstcol {
 	border-left: 0;
@@ -312,26 +268,30 @@ table.grouped tr.odd .firstcol {
 
 /* Page layout: */
 #header {
+	float:left;
+	width:100%;
+	background: url(../../../../img/bg.gif) repeat-x bottom;
 	font-size:85%;
-	background: #fff url(img/bg_grey.gif) repeat-x bottom;
-	/* border: 1px solid #00f; */
-	margin: 0;
+	line-height:normal;
+	padding:0;
+	margin:0;
 }
 #TitleArea {
-	/* clear: both; */
-	margin: 1ex 1em 1ex 1em;
-	padding: .5ex;
-	background-color:#69f;
-	border: 1px solid #36c;	/* force moz to display float before */
+	clear: both;
+	margin: 0 1em;
+	padding: 0;
+	border-top: 1px solid #fff;	/* force moz to display float before */
 }
 #evologo {
-	float: left;
-	margin: 2px 1ex 0;
+	float:left;
+	padding-left: 1em;
+	padding-right: 1em;
+	vertical-align: middle;
 	border: 0;
-	/* border: 1px solid #00f; */
 }
 #headfunctions {
-	float:right;
+	margin-top: .5ex;
+	text-align:right;
 	margin-right: 1ex;
 	color: #b0b0b0;
 }
@@ -347,39 +307,23 @@ table.grouped tr.odd .firstcol {
 	text-decoration: none;
 }
 #headinfo {
-	padding-top: .5ex;
 	padding-left: 1em;
+	line-height: 150%;
 	color: #b0b0b0;
 	white-space: nowrap;
 }
-#header h1 {
-	margin: 0;
-	padding: .5ex;
-	font-size: 150%;
-}
-div#mainmenu {
-	clear:left;
-	float:left;
-	width:12em;
-	/* border:	1px solid #f0f; */
-}
 .panelbody {
-	margin: 0 0 0 12em;
+	margin: 0;
 	padding: 0;
-	/* border:	1px solid #f00; */
-}
-#payload {
-	float:left;
-	width: 100%;
 	/* border:	1px solid #f00; */
 }
 .left_col {
 	vertical-align: top;
 	float: left;
 	width: 65%;
-	/* clear: left; */
+	clear: left;
 	/* border:	1px solid #f00; */
-	margin: 1ex 0 0 0;
+	margin: 0;
 	padding: 0;
 	overflow: hidden;
 }
@@ -388,12 +332,12 @@ div#mainmenu {
 	width: 33%;
 	vertical-align: top;
 	float: right;
-	margin: 1ex 0 0 0;
+	margin: 0;
 	padding: 0;
 	overflow: hidden;
 }
 div.panelinfo {
-	/* clear: both; */
+	clear: both;
 	background-color: #efede0;
 	border: 1px solid #e1ddce;
 	padding: 0 1ex;
@@ -408,6 +352,7 @@ div.panelinfo p {
 	padding: 0;
 }
 div.panelblock {
+	clear:both;
 	border: 1px solid #e1ddce;
 	padding: 1ex;
 	margin: 1ex 1em;
@@ -422,44 +367,15 @@ div.panelblock {
 }
 
 /* Main tabs: */
-#mainmenu ul{
-	list-style: none;
-	margin: .5ex;
-	padding:0;
-}
-#mainmenu li{
-	border: 1px solid #ddd;
-	background: #fff;
-	margin: .5ex;
-	padding: 0;
-}
-#mainmenu li.current {
-	border: 1px solid #008;
-	background: #ddd;
-	font-weight: bold;
-}
-#mainmenu li:hover,
-#mainmenu li.parent{
-	border: 1px solid #00b;
-	background: #f0f0f0;
-	font-weight: bold;
-}
-#mainmenu li.parent ul.submenu li {
-	font-weight:normal;
-}
-#mainmenu li a{ /* made mainmenu links clickable in whole li (at least with Mozilla) */
-	display:block;
-	padding:.5ex;
-}
 ul.tabs {
 	margin:0;
-	/* clear: both; */
+	clear: both;
 	padding: 0.1ex 1em 0;
 	list-style: none;
 }
 ul.tabs li {
 	float:left;
-	background:url("img/tabs_left_grey.gif") no-repeat left top;
+	background:url(../../../../img/left_both.gif) no-repeat left top;
 	margin:0;
 	padding:0 0 0 9px;
 	border-bottom:1px solid #9e9286;
@@ -468,7 +384,7 @@ ul.tabs li a {
 	float:left;
 	display:block;
 	white-space:nowrap;
-	background: url("img/tabs_right_grey.gif") no-repeat right top;
+	background: url(../../../../img/right_both.gif) no-repeat right top;
 	padding:4px 11px 3px 2px;
 	text-decoration:none;
 	color:#765;
@@ -506,7 +422,7 @@ ul.tabs li.current a:hover {
 /* Sub-tabs */
 ul.hack {
 	margin:0;
-	/* clear: both; */
+	clear: both;
 	padding: 0.1ex 1em 0;
 	list-style: none;
 }
@@ -519,11 +435,11 @@ div.pt
 }
 div.panelblocktabs
 {
-	/* clear: both; */
+	clear: both;
 	margin-top: 1ex;
 	float:left;
 	width:100%;
-	background: url("img/tabs_bg.gif") repeat-x bottom;
+	background: url(../../../../img/tabs_bg.gif) repeat-x bottom;
 	font-size:85%;
 	line-height:normal;
 }
@@ -535,7 +451,6 @@ div.tabbedpanelblock {
 	padding: 1ex 1em 1ex 1em;
 	margin: 0 1em 2ex 1em;
 }
-div.panelblock fieldset,
 div.tabbedpanelblock fieldset {
 	border: 1px solid #ddd;
 	margin: 0 0 1ex 0;
@@ -809,7 +724,7 @@ div.edit_toolbar {
 div.edit_toolbar input {
 	color:#333;
 	background-color: #fff;
-	background-image: url("../admin/img/desert-button-2.gif");
+	background-image: url(../../../../img/desert-button-2.gif);
 	border: 1px solid #ccc5aa;
 	margin: 0 1px;
 }
@@ -841,61 +756,3 @@ span.checkall,
 th.checkright {
 	font-size: 84%;
 }
-
-/* Tasks */
-
-.tskst_5 /* Finished */,
-.tskst_6 /* Canceled */ {
-	text-decoration: line-through;
-}
-
-.past_deadline {
-	color: #c00;
-	font-weight: bold;
-}
-
-/*
- * $Log$
- * Revision 1.20  2005/03/21 17:37:57  fplanque
- * results/table layout refactoring
- *
- * Revision 1.19  2005/03/02 18:30:53  fplanque
- * tedious merging... :/
- *
- * Revision 1.18  2005/03/02 17:04:15  blueyed
- * submenus not bold
- *
- * Revision 1.17  2005/02/28 22:16:24  blueyed
- * AdminUI refactoring (recurse into submenus)
- *
- * Revision 1.16  2005/02/23 04:49:40  blueyed
- * no borders for fieldsets in fieldset.fieldset
- *
- * Revision 1.15  2005/02/20 23:02:56  blueyed
- * horizontal padding for th
- *
- * Revision 1.14  2005/02/10 22:59:00  blueyed
- * start of CSS refactoring
- *
- * Revision 1.13  2005/01/25 18:07:45  fplanque
- * CSS/style cleanup
- *
- * Revision 1.12  2005/01/20 14:00:42  fplanque
- * no message
- *
- * Revision 1.11  2005/01/13 19:53:48  fplanque
- * Refactoring... mostly by Fabrice... not fully checked :/
- *
- * Revision 1.10  2005/01/03 15:17:52  fplanque
- * no message
- *
- * Revision 1.9  2004/12/29 03:16:00  blueyed
- * clear:both-Hack removed
- *
- * Revision 1.8  2004/12/03 15:13:16  fplanque
- * removed my own bugs from CSS
- *
- * Revision 1.7  2004/12/03 11:57:17  fplanque
- * no message
- *
- */

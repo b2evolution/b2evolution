@@ -1,0 +1,59 @@
+/**
+ * CSS Overrides for the sidebar
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package admin
+ */
+#TitleArea {
+	margin: 1ex;
+	padding: 0;
+}
+div.panelinfo {
+	margin: 1ex;
+}
+.left_col,
+.right_col
+ {
+	float: none;
+	width: 100%;
+	clear: none;
+	overflow: visible;
+	margin: 0;
+	padding: 0;
+}
+.left_col fieldset,
+.right_col fieldset {
+	margin: 1ex;
+	padding: 0 1ex 1ex 1ex;
+}
+fieldset.extracats {
+	padding: 0 0 0 1ex;
+	margin: 1ex;
+	overflow: visible;
+}
+div.extracats
+{
+	height: auto;
+	overflow: visible;
+	padding: 0ex 1ex;
+	margin: 0ex;
+}
+.notes,
+.extracatnote
+{
+	display: none;
+	color: #f00;
+}
+span.line
+{
+	white-space: normal;
+	display: block;
+	
+}
+span.line input
+{
+	width: 98%;
+}

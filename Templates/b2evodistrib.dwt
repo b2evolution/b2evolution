@@ -4,7 +4,7 @@
 	<!-- TemplateBeginEditable name="doctitle" -->
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<title>{{{b2evo package}}}:</title>
-	<!-- TemplateEndEditable --><link href="../blogs/rsc/b2evo.css" rel="stylesheet" type="text/css" />
+	<!-- TemplateEndEditable --><link href="../blogs/rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
 	<!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable -->
 	<!-- TemplateParam name="lang" type="text" value="en-EU" passthrough="true" --> 
 </head>

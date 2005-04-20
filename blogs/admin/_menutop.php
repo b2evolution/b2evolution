@@ -32,11 +32,11 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	</script>
 
 	<!-- script allowing to check and uncheck all boxes in forms -->
-	<script type="text/javascript" src="check.js"></script>
-	<script type="text/javascript" src="anchorposition.js"></script>
-	<script type="text/javascript" src="date.js"></script>
-	<script type="text/javascript" src="popupwindow.js"></script>
-	<script type="text/javascript" src="calendarpopup.js"></script>
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/form_extensions.js"></script>
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/anchorposition.js"></script>
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/date.js"></script>
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/popupwindow.js"></script>
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/calendarpopup.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/functions.js"></script>
 
 	<?php

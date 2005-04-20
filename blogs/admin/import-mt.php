@@ -132,16 +132,16 @@ $head = <<<EOB
 <head>
 	<title>b2evolution &rsaquo; Import from Movable Type</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-	<link href="variation.css" rel="stylesheet" type="text/css" title="Variation" />
-	<link href="desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
-	<link href="legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
+	<link href="skins/legacy/rsc/css/variation.css" rel="stylesheet" type="text/css" title="Variation" />
+	<link href="skins/legacy/rsc/css/desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
+	<link href="skins/legacy/rsc/css/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
 EOB;
-if( is_file( dirname(__FILE__).'/custom.css' ) )
+if( is_file( dirname(__FILE__).'/skins/legacy/rsc/css/custom.css' ) )
 {
-	$head .= '<link href="custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
+	$head .= '<link href="skins/legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
 }
 $head .= <<<EOB
-	<script type="text/javascript" src="styleswitcher.js"></script>
+	<script type="text/javascript" src="../rsc/js/styleswitcher.js"></script>
 </head>
 <body>
 <div id="header">

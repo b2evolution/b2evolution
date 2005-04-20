@@ -58,11 +58,11 @@ class AdminUI extends AdminUI_general
 	{
 		global $mode;
 
-		$r ='<link href="blue.css" rel="stylesheet" type="text/css" title="Blue" />';
+		$r ='<link href="skins/evo/rsc/css/style.css" rel="stylesheet" type="text/css" title="Blue" />';
 
 		if( $mode == 'sidebar' )
 		{ // Include CSS overrides for sidebar:
-			$r .= '<link href="sidebar.css" rel="stylesheet" type="text/css" />';
+			$r .= '<link href="skins/evo/rsc/css/sidebar.css" rel="stylesheet" type="text/css" />';
 		}
 
 		return $r;

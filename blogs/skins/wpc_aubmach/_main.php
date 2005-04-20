@@ -70,8 +70,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
 	<style type="text/css">
-		@import url(../../rsc/img.css);	/* Import standard image styles */
-		@import url(../../rsc/blog_elements.css);	/* Import standard blog elements styles */
+		@import url(../../rsc/css/img.css);	/* Import standard image styles */
+		@import url(../../rsc/css/blog_elements.css);	/* Import standard blog elements styles */
 		@import url(style.css);
 	</style>
 	<?php

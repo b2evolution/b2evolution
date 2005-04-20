@@ -16,13 +16,13 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo $app_shortname.$admin_path_seprator.$page_title ?></title>
 	<base href="<?php echo $htsrv_url; ?>" />
-	<link href="<?php echo $admin_url ?>variation.css" rel="stylesheet" type="text/css" title="Variation" />
-	<link href="<?php echo $admin_url ?>desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
-	<link href="<?php echo $admin_url ?>legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
-	<?php if( is_file( dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'custom.css' ) ) { ?>
-	<link href="<?php echo $admin_url ?>custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />
+	<link href="<?php echo $admin_url ?>skins/legacy/rsc/css/variation.css" rel="stylesheet" type="text/css" title="Variation" />
+	<link href="<?php echo $admin_url ?>skins/legacy/rsc/css/desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
+	<link href="<?php echo $admin_url ?>skins/legacy/rsc/css/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
+	<?php if( is_file( dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'skins/legacy/rsc/css/custom.css' ) ) { ?>
+	<link href="<?php echo $admin_url ?>skins/legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />
 	<?php } ?>
-	<script type="text/javascript" src="styleswitcher.js"></script>
+	<script type="text/javascript" src="../rsc/js/styleswitcher.js"></script>
 </head>
 <body>
 

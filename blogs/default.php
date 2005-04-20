@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/evocore/_main.inc.php';
 	<base href="<?php echo $baseurl ?>" />
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo T_('Default page for b2evolution') ?></title>
-	<link href="rsc/b2evo.css" rel="stylesheet" type="text/css" />
+	<link href="rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div id="rowheader2">

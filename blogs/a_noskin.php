@@ -82,7 +82,7 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 <link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 <link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
 <!-- InstanceEndEditable -->
-<link rel="stylesheet" href="rsc/fp02.css" type="text/css" />
+<link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 </head>
 <body>
 <div class="pageHeader">
