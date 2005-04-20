@@ -24,16 +24,6 @@
 #filemanmain table.grouped {
 	width:100%;
 }
-#filemanmain table.grouped thead td {
-	text-align:left;
-	padding: .5ex;
-	/* Temporary colors, needs overriding */
-	background-color: #efede0;
-	border: 1px solid #9e9286;
-}
-#filemanmain table.grouped td {
-	text-align:center;
-}
 #filemanmain table.grouped td.error {
 	padding:2ex;
 	color:red;
@@ -75,38 +65,19 @@
 	margin:0 2px;
 }
 #filemanmain table.grouped tr.listfooter td {
-	font-weight: bold;
-	border-left: 0;
-	text-align:left;
 	/* Temporary colors, needs overriding */
 	background-color: #efede0;
 	border: 1px solid #9e9286;
 }
 
-/* }}} */
+/* }}} / Files table */
 
-.toolbaritem,
-#fmbar_roots,
-#fmbar_cwd {
+.toolbaritem {
 	margin:.5ex 0 .5ex 1ex;
 	padding:.5ex;
 	float:right;
 	white-space:nowrap;
 	background-color:#efede0; /* Temp color, needs overriding */
-}
-#fmbar_roots,
-#fmbar_cwd {
-	margin:.5ex;
-	padding:0;
-	float:left;
-	text-align:left;
-}
-#fmbar_cwd {
-	clear:both;
-}
-
-#filemanmain table.grouped thead td .toolbaritem {
-	border:1px solid #ddd;
 }
 
 .fm_filecounts {
@@ -182,8 +153,8 @@ ul#uploadfileinputs {
 	margin:0;
 	padding:0;
 }
-ul#uploadfileinputs li,
-p.uploadfileinputs {
+ul#uploadfileinputs li, /* Info block about a file to upload */
+p.uploadfileinputs {    /* Link to add a new info block */
 	background-color:#efede0; /* Temp color, needs overriding */
 	margin:1ex 0;
 	padding:1ex;
@@ -196,12 +167,9 @@ ul#uploadfileinputs label {
 	font-weight:bold;
 }
 
-div.toggleModeAndFM {
+div#FM_anchor {
 	padding:2ex 0;
-	margin:0 2ex;
 	text-align:center;
-	clear:both;
-	background-color:#efede0; /* Temp color, needs overriding */
 }
 
 div.panelblock fieldset.files_to_upload {

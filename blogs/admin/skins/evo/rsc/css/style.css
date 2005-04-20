@@ -248,16 +248,19 @@ table.grouped tr.odd {
 	background-color: #efede0;
 }
 
-table.grouped th {
+table.grouped th,
+table.grouped thead td,
+table.grouped tfoot td {
+	padding: .5ex;
 	border-bottom: 1px solid #9e9286;
 	border-left: 1px solid #9e9286;
-	color: #9e9286;
 	background-color: #efede0;
-	font-weight: bold;
-	padding-left: 1ex;
-	padding-right: 1ex;
 }
-
+table.grouped th {
+	padding: .3ex 1ex;
+	color: #9e9286;
+	font-weight: bold;
+}
 table.grouped th a.basic_current,
 table.grouped th a.basic_sort_link {
 	padding: 0 1ex;
@@ -856,6 +859,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.2  2005/04/20 20:04:14  fplanque
+ * visual cleanup of FM
+ *
  * Revision 1.1  2005/04/20 18:37:58  fplanque
  * Relocation of javascripts and CSS files to their proper places...
  *

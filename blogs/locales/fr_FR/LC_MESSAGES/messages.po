@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2005-01-26 20:52+0100\n"
-"PO-Revision-Date: 2005-04-12 20:23+0100\n"
+"PO-Revision-Date: 2005-04-20 21:57+0100\n"
 "Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -3093,7 +3093,7 @@ msgstr "Chemin d'accès"
 #. TRANS: file's last change / timestamp
 #: ..\..\..\admin\_files_browse.inc.php:229
 msgid "Last change"
-msgstr "Dernière modification"
+msgstr "Dernière mod."
 
 #. TRANS: file's permissions (short)
 #: ..\..\..\admin\_files_browse.inc.php:230

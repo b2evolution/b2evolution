@@ -1080,7 +1080,7 @@ if( $Fileman->fm_mode )
 {
 	if( !$UserSettings->get('fm_forceFM') )
 	{ // FM is not forced - link to hide/display
-		echo '<div class="toggleModeAndFM" id="FM_anchor">';
+		echo '<div class="panelinfo" id="FM_anchor">';
 		echo '[<a '
 				.' href="'.$Fileman->getCurUrl( array( 'forceFM' => 1-$Fileman->forceFM ) ).'">'
 				.( $showFilemanager ? T_('Hide Filemanager') : T_('Display Filemanager') ).'</a>]';
@@ -1148,6 +1148,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.92  2005/04/20 20:04:12  fplanque
+ * visual cleanup of FM
+ *
  * Revision 1.91  2005/04/19 16:23:01  fplanque
  * cleanup
  * added FileCache
