@@ -36,6 +36,14 @@ table.grouped td {
 table.grouped tr.group td {
 	border-left: 0;
 }
+table.grouped input.checkbox {
+	border:none;
+	background-color: #eee;
+}
+table.grouped tr.odd input.checkbox {
+	border:none;
+	background-color: #ddd;
+}
 table.grouped tr:hover,
 table.grouped tr.odd:hover {
 	background-color:#ccc;

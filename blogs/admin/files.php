@@ -981,11 +981,11 @@ switch( $Fileman->fm_mode )
 		// Begin payload block:
 		$AdminUI->dispPayloadBegin();
 
-		$Form = & new Form( 'files.php' );
+		$Form = & new Form( 'files.php', '', 'post', 'fieldset' );
 
 		$Form->global_icon( T_('Quit link mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
 
-		$Form->begin_form( 'fform', sprintf( T_('Link files to a &laquo;%s&raquo;...'), $edited_Item->dget( 'title') ) );
+		$Form->begin_form( 'fform', sprintf( T_('Link files to &laquo;%s&raquo;...'), $edited_Item->dget( 'title') ) );
 
 		$edited_Item->edit_link( '<p>', '</p>', T_('Edit this post') );
 
@@ -1020,7 +1020,7 @@ switch( $Fileman->fm_mode )
  		$Results->cols[] = array(
 								'th' => T_('Path'),
 								'order' => 'file_path',
-								'td_start' => '<td class="left">',
+								'td_start' => '<td class="firstcol left">',
 								'td' => '$file_path$',
 							);
 
@@ -1033,14 +1033,14 @@ switch( $Fileman->fm_mode )
 
 	 	$Results->cols[] = array(
 								'th' => T_('Unlink'),
-								'td_start' => '<td class="center">',
+								'td_start' => '<td class="lastcol center">',
 								'td' => action_icon( T_('Delete this link!'), 'unlink',
 	                        '%regenerate_url( \'action\', \'link_ID=$link_ID$&amp;action=unlink\')%' ),
 							);
 
 		$Results->display();
 
-		printf( '<p>'.T_('Click on a link icon %s below to link an additional file to this post.').'</p>', getIcon( 'link' ) );
+		printf( '<p>'.T_('Click on a link icon %s below to link an additional file to this item.').'</p>', getIcon( 'link' ) );
 
 		$Form->end_form( );
 
@@ -1156,6 +1156,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.95  2005/04/21 19:55:00  fplanque
+ * no message
+ *
  * Revision 1.94  2005/04/21 18:01:29  fplanque
  * CSS styles refactoring
  *

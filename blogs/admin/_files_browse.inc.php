@@ -89,7 +89,7 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 		value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>"
 		size="7"
 		accesskey="f" />
-	<input type="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php echo $titleRegExp; ?>"
+	<input type="checkbox" class="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php echo $titleRegExp; ?>"
 		value="1"<?php if( $Fileman->filterIsRegexp ) echo ' checked="checked"' ?> />
 	<label for="filterIsRegexp" title="<?php echo $titleRegExp; ?>"><?php
 		echo /* TRANS: short for "is regular expression" */ T_('RegExp'); ?></label>
@@ -233,7 +233,7 @@ $filetable_cols = 8;
 </tr>
 
 <tr>
-	<th colspan="2" class="firstcol"><?php $Fileman->dispButtonParent(); ?></th>
+	<th colspan="2" class="firstcol">&nbsp;<?php $Fileman->dispButtonParent(); ?>&nbsp;</th>
 	<th><?php
 		echo $Fileman->getLinkSort( 'name', /* TRANS: file name */ T_('Name') );
 
@@ -267,7 +267,7 @@ while( $lFile =& $Fileman->getNextFile() )
 		if( $countFiles%2 ) echo ' class="odd"';
 		?> onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();">
 		<td class="checkbox firstcol">
-			<input title="<?php echo T_('Select this file') ?>" type="checkbox"
+			<input title="<?php echo T_('Select this file') ?>" type="checkbox" class="checkbox"
 				name="fm_selected[]"
 				value="<?php echo $lFile->getID(); ?>"
 				id="cb_filename_<?php echo $countFiles ?>"
@@ -345,10 +345,7 @@ while( $lFile =& $Fileman->getNextFile() )
 					echo $lFile->getName();
 				}
 
-				?>
-			</a>
-
-			<?php
+			echo '</a>';
 
 			echo '<span class="filemeta">';
 
@@ -721,6 +718,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.23  2005/04/21 19:54:59  fplanque
+ * no message
+ *
  * Revision 1.22  2005/04/19 16:23:00  fplanque
  * cleanup
  * added FileCache

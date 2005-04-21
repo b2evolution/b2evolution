@@ -1727,12 +1727,12 @@ function selection_checkbox( $item_ID, $item_name )
 
 	if( in_array( $item_ID, $item_ID_array ) )
 	{	// We have already displayed a checkbox for this ID
-		return '';
+		return '&nbsp;';	// nbsp is for IE...
 	}
 
 	$item_ID_array[] = $item_ID; //construction of the ID list
 
-	$r = '<input type="checkbox" name="'.$item_name.'_items[]" value='.$item_ID;
+	$r = '<input type="checkbox" class="checkbox" name="'.$item_name.'_items[]" value='.$item_ID;
 
 	if( in_array( $item_ID, $cols_check ) )
 	{	// already in selection:
@@ -1881,6 +1881,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.63  2005/04/21 19:55:01  fplanque
+ * no message
+ *
  * Revision 1.62  2005/04/06 19:11:01  fplanque
  * refactored Results class:
  * all col params are now passed through a 2 dimensional table which allows easier parametering of large tables with optional columns
