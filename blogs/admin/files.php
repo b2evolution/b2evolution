@@ -711,8 +711,8 @@ switch( $Fileman->fm_mode )
 							$failedFiles[$lKey] = T_('No file was uploaded.');
 							break;
 
-						case 6:	// fplanque>> where is the 6 coming from?
-						case UPLOAD_ERR_NO_TMP_DIR: // PHP 4.3.10, 5.0.3
+						case 6: // numerical value of UPLOAD_ERR_NO_TMP_DIR
+						# (min_php: 4.3.10, 5.0.3) case UPLOAD_ERR_NO_TMP_DIR:
 							// Missing a temporary folder.
 							$failedFiles[$lKey] = T_('Missing a temporary folder (upload_tmp_dir in php.ini).');
 							break;
@@ -725,7 +725,7 @@ switch( $Fileman->fm_mode )
 				}
 
 				if( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
-				{	// fplanque>> when does this happen??
+				{	// Ensure that a malicious user hasn't tried to trick the script into working on files upon which it should not be working.
 					$failedFiles[$lKey] = T_('The file does not seem to be a valid upload!');
 					// Abort upload for this file:
 					continue;
@@ -1148,6 +1148,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.93  2005/04/21 12:13:42  blueyed
+ * doc
+ *
  * Revision 1.92  2005/04/20 20:04:12  fplanque
  * visual cleanup of FM
  *
