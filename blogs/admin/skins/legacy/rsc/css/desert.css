@@ -215,7 +215,10 @@ div.edit_actions input.DeleteButton:hover {
 }
 
 
-/* Tables: */
+/*
+ * Tables: 
+ * TODO: factorize with results.css
+ */
 
 table.grouped
 {
@@ -257,9 +260,6 @@ tr.group td {
 	border-top: 1px solid #9e9286;
 	border-bottom: 1px solid #9e9286;
 	border-left: 0;
-}
-td.right {
-	text-align: right;
 }
 table.grouped .firstcol,
 table.grouped tr.odd .firstcol {

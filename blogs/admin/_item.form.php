@@ -339,14 +339,14 @@ $AdminUI->dispPayloadBegin();
 	if( $next_action == 'update' )
 	{ // Editing post
 		$Results = & new Results(
-							'SELECT link_ID, link_ltype_ID, file_ID, file_path
+							'SELECT link_ID, link_ltype_ID, file_ID, file_path, file_title
 								 FROM T_links INNER JOIN T_files ON link_file_ID = file_ID
 								WHERE link_item_ID = '.$edited_Item->ID,
 								20, 'link_' );
 
 		$Results->title = T_('Linked to...');
 
-
+		/*
 		$Results->cols[] = array(
 								'th' => T_('Link ID'),
 								'order' => 'link_ID',
@@ -364,12 +364,21 @@ $AdminUI->dispPayloadBegin();
 								'order' => 'file_ID',
 								'td' => '$file_ID$',
 							);
+		*/
 
  		$Results->cols[] = array(
 								'th' => T_('Path'),
 								'order' => 'file_path',
 								'td' => '$file_path$',
 							);
+
+ 		$Results->cols[] = array(
+								'th' => T_('Title'),
+								'order' => 'file_title',
+								'td_start' => '<td class="left">',
+								'td' => '$file_title$',
+							);
+
 
 		$Results->global_icon( T_('Link a file...'), 'link',
 														'files.php?fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('File') );
@@ -382,6 +391,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.21  2005/04/21 18:01:28  fplanque
+ * CSS styles refactoring
+ *
  * Revision 1.20  2005/04/15 18:02:58  fplanque
  * finished implementation of properties/meta data editor
  * started implementation of files to items linking

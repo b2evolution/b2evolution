@@ -126,11 +126,16 @@ $userlist = $DB->get_results( $request );
 			{ // We have a user here: (i-e group was not empty)
 				$loop_User = & new User( $row );
 				if( $count%2 == 1 )
-					echo "<tr class=\"odd\">\n";
+					echo '<tr class="odd ';
 				else
-					echo "<tr>\n";
+					echo '<tr class="';
 
-				echo '<td class="firstcol">', $loop_User->get('ID'), "</td>\n";
+				if( $count+1 == count($userlist) )
+					echo 'lastline';
+
+				echo "\">\n";
+
+				echo '<td class="firstcol">'.$loop_User->get('ID')."</td>\n";
 
 				echo '<td><a href="b2users.php?user_ID=', $loop_User->get('ID'), '">';
 				echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" /> ';
@@ -166,7 +171,7 @@ $userlist = $DB->get_results( $request );
 				echo "</td>\n";
 
 				// User level:
-				echo '<td>'.$loop_User->get('level').'</td>';
+				echo '<td class="right">'.$loop_User->get('level').'</td>';
 
 				if( $current_User->check_perm( 'users', 'edit', false ) )
 				{ // We have permission to edit the user:
@@ -218,6 +223,9 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 
 /*
  * $Log$
+ * Revision 1.41  2005/04/21 18:01:28  fplanque
+ * CSS styles refactoring
+ *
  * Revision 1.40  2005/04/07 17:55:48  fplanque
  * minor changes
  *

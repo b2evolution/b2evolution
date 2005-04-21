@@ -1,0 +1,100 @@
+/**
+ * Results/tables styles for the admin.
+ *
+ * This should be included with every skin and overridden when needed.
+ */
+
+
+/* 
+ * Results tables:
+ */
+table.grouped {
+	border: 1px solid #bbb;
+	margin: 1ex auto;
+	border-collapse: collapse;
+	/* clear:both; */
+}
+ 
+/* Table rows: */
+table.grouped tr {
+	background-color: #eee;
+}
+table.grouped tr.odd {
+	background-color: #ddd;
+}
+table.grouped tr.group {
+	font-weight: bold;
+	color: #8e8276;
+	background-color: #ccc;
+	border-top: 1px solid #bbb;
+	border-bottom: 1px solid #bbb;
+}
+table.grouped td {
+	border-left: 1px solid #bbb;
+	padding: .3ex 1ex;
+}
+table.grouped tr.group td {
+	border-left: 0;
+}
+table.grouped tr:hover,
+table.grouped tr.odd:hover {
+	background-color:#ccc;
+	cursor: default;
+}
+
+/* Table headers/footers: */
+table.grouped th,
+table.grouped thead td,
+table.grouped tfoot td {
+	padding: .5ex;
+	border-bottom: 1px solid #bbb;
+	border-left: 1px solid #bbb;
+	background-color: #ddd;
+}
+table.grouped th {
+	padding: .3ex 1ex;
+}
+table.grouped th img {
+	vertical-align: bottom;
+}
+
+/* Table BASIC sort buttons/headers: */
+table.grouped th a.basic_current,
+table.grouped th a.basic_sort_link {
+	padding: 0 1ex;
+	display: block;
+	height: 100%;
+}
+table.grouped th a.basic_current {
+	background-color:#ccc;
+}
+table.grouped th a.basic_sort_link:hover {
+	background-color:#ccc;
+}
+
+/* Table SINGLE sort buttons/headers: */
+table.grouped th a.single_current {
+	font-weight : bold;
+}
+table.grouped th a.single_current:hover,
+table.grouped th a.single_sort_link:hover {
+	text-decoration: underline;
+}
+/* / Results tables */
+
+
+/*
+ * Results navigation:
+ */
+/*
+.results {
+	text-align: center;
+	margin: 0 auto;
+	width:100%;
+	border: 1px solid black;
+}*/
+.results_nav {
+	text-align: center;
+}
+
+/* / Results navigation */

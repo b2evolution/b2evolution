@@ -756,9 +756,9 @@ class AdminUI_general
 																	.'" height="12" width="11" />',
 							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending order')
 																	.'" height="12" width="11" />',
-							'basic_sort_off' => '<img src="../admin/img/basic_sort_off.gif" width="16" height="16" />',
-							'basic_sort_asc' => '<img src="../admin/img/basic_sort_asc.gif" width="16" height="16" />',
-							'basic_sort_desc' => '<img src="../admin/img/basic_sort_desc.gif" width="16" height="16" />',
+							'basic_sort_off' => '',
+							'basic_sort_asc' => getIcon( 'ascending' ),
+							'basic_sort_desc' => getIcon( 'descending' ),
 						'head_end' => "</tr></thead>\n\n",
 						'tfoot_start' => "<tfoot>\n",
 						'tfoot_end' => "</tfoot>\n\n",
@@ -1074,6 +1074,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.20  2005/04/21 18:01:28  fplanque
+ * CSS styles refactoring
+ *
  * Revision 1.19  2005/04/15 18:02:57  fplanque
  * finished implementation of properties/meta data editor
  * started implementation of files to items linking

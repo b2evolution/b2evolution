@@ -10,6 +10,7 @@
 
 @import url(../../../../../rsc/css/basic.css);            /* Import basic styles */
 @import url(../../../../../rsc/css/img.css);              /* Import standard image styles */
+@import url(../../../../../rsc/css/results.css);          /* Import results/tables styles */
 @import url(../../../../../rsc/css/blog_elements.css);    /* Import standard blog elements styles */
 @import url(../../../../../rsc/css/forms.css);            /* Import default form styles */
 @import url(../../../../../rsc/css/comments.css);         /* Import default comment styles */
@@ -220,100 +221,60 @@ div.edit_actions input.DeleteButton:hover {
 }
 
 
-/* Tables: */
+/*
+ * Results tables OVERRIDES:
+ */
 
-table.grouped
-{
+/* Table rows: */
+table.grouped {
 	border: 1px solid #9e9286;
-	margin: 1ex auto;
-	border-collapse: collapse;
-	/* clear:both; */
 }
-
 table.grouped tr {
 	background-color: #f5f3ef;
+}
+table.grouped tr.odd {
+	background-color: #efede0;
+}
+table.grouped tr.group {
+	color: #8e8276;
+	background-color: #e3dfd0;
+	border-top: 1px solid #9e9286;
+	border-bottom: 1px solid #9e9286;
+}
+table.grouped td {
+	border-left: 1px solid #9e9286;
 }
 table.grouped tr:hover,
 table.grouped tr.odd:hover {
 	background-color:#e3dfd0;
-	cursor: default;
 }
 
-table.grouped td {
-	border-left: 1px solid #9e9286;
-	padding: .3ex 1ex;
-}
-
-table.grouped tr.odd {
-	background-color: #efede0;
-}
-
+/* Table headers/footers: */
 table.grouped th,
 table.grouped thead td,
 table.grouped tfoot td {
-	padding: .5ex;
 	border-bottom: 1px solid #9e9286;
 	border-left: 1px solid #9e9286;
 	background-color: #efede0;
 }
 table.grouped th {
-	padding: .3ex 1ex;
 	color: #9e9286;
-	font-weight: bold;
-}
-table.grouped th a.basic_current,
-table.grouped th a.basic_sort_link {
-	padding: 0 1ex;
 }
 
-table.grouped th a img {
-	vertical-align: middle
-}
-
-table.grouped th a.basic_current,
-table.grouped th a.basic_sort_link {
-	display: block;
-	height: 100%;
-}
-
-table.grouped th a.single_current {
-	font-weight : bold;
-}
-
+/* Table BASIC sort buttons/headers: */
 table.grouped th a.basic_current {
 	background-color:#e3dfd0;
-	font-weight: bold;
 }
-
 table.grouped th a.basic_sort_link:hover {
 	background-color:#e3dfd0;
-	font-weight: normal;
 }
 
-table.grouped th a.single_current:hover,
-table.grouped th a.single_sort_link:hover {
-	text-decoration: underline;
-}
+/* / Results tables */
 
-tr.group td {
-	font-weight: bold;
-	color: #8e8276;
-	background-color: #e3dfd0;
-	border-top: 1px solid #9e9286;
-	border-bottom: 1px solid #9e9286;
-	border-left: 0;
-}
 
-td.right {
-	text-align: right;
-}
-
-table.grouped .firstcol,
-table.grouped tr.odd .firstcol {
-	border-left: 0;
-}
-
-/* Page layout: */
+/*
+ * Page layout: 
+ */
 #header {
 	font-size:85%;
 	background: #fff url(../../../../img/bg_grey.gif) repeat-x bottom;
@@ -859,6 +820,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.3  2005/04/21 18:01:30  fplanque
+ * CSS styles refactoring
+ *
  * Revision 1.2  2005/04/20 20:04:14  fplanque
  * visual cleanup of FM
  *

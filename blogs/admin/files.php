@@ -990,14 +990,14 @@ switch( $Fileman->fm_mode )
 		$edited_Item->edit_link( '<p>', '</p>', T_('Edit this post') );
 
 		$Results = & new Results(
-							'SELECT link_ID, link_ltype_ID, file_ID, file_path
+							'SELECT link_ID, link_ltype_ID, file_ID, file_path, file_title
 								 FROM T_links INNER JOIN T_files ON link_file_ID = file_ID
 								WHERE link_item_ID = '.$edited_Item->ID,
 								20, 'link_' );
 
 		$Results->title = T_('Existing links');
 
-
+		/*
 		$Results->cols[] = array(
 								'th' => T_('Link ID'),
 								'order' => 'link_ID',
@@ -1015,12 +1015,20 @@ switch( $Fileman->fm_mode )
 								'order' => 'file_ID',
 								'td' => '$file_ID$',
 							);
+		*/
 
  		$Results->cols[] = array(
 								'th' => T_('Path'),
 								'order' => 'file_path',
 								'td_start' => '<td class="left">',
 								'td' => '$file_path$',
+							);
+
+ 		$Results->cols[] = array(
+								'th' => T_('Title'),
+								'order' => 'file_title',
+								'td_start' => '<td class="left">',
+								'td' => '$file_title$',
 							);
 
 	 	$Results->cols[] = array(
@@ -1148,6 +1156,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.94  2005/04/21 18:01:29  fplanque
+ * CSS styles refactoring
+ *
  * Revision 1.93  2005/04/21 12:13:42  blueyed
  * doc
  *
