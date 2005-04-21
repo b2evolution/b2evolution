@@ -106,6 +106,7 @@ class DB
 	var $insert_id = 0;
 	var $num_rows = 0;
 	var $rows_affected = 0;
+	var $last_result;
 	/**
 	 * Log of queries:
 	 */
@@ -518,7 +519,7 @@ class DB
 	/**
 	 * Get one row from the DB - see docs for more detail
 	 *
-	 * @return array
+	 * @return array|object
 	 */
 	function get_row( $query = NULL, $output = OBJECT, $y = 0, $title = '' )
 	{
@@ -577,7 +578,7 @@ class DB
 
 		// Extract the column values
 		$new_array = array();
-		for ( $i = 0, $count = count($this->last_result); $i < $count; $i++ )
+		for( $i = 0, $count = count($this->last_result); $i < $count; $i++ )
 		{
 			$new_array[$i] = $this->get_var( NULL, $x, $i );
 		}
@@ -746,7 +747,7 @@ class DB
 			echo "<tr bgcolor=eeeeee><td nowrap valign=bottom><font color=555599 face=arial size=2><b>(row)</b></font></td>";
 
 
-			for ( $i = 0, $count = count($this->col_info); $i < $count; $i++ )
+			for( $i = 0, $count = count($this->col_info); $i < $count; $i++ )
 			{
 				echo "<td nowrap align=left valign=top><font size=1 color=555599 face=arial>{$this->col_info[$i]->type} {$this->col_info[$i]->max_length}</font><br><span style='font-family: arial; font-size: 10pt; font-weight: bold;'>{$this->col_info[$i]->name}</span></td>";
 			}
@@ -893,6 +894,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.15  2005/04/21 12:10:50  blueyed
+ * minor
+ *
  * Revision 1.14  2005/04/20 18:37:59  fplanque
  * Relocation of javascripts and CSS files to their proper places...
  *
