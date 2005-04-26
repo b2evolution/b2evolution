@@ -36,6 +36,12 @@ table.grouped td {
 table.grouped tr.group td {
 	border-left: 0;
 }
+table.grouped td.shrinkwrap
+{
+	width: 1%;
+	white-space:nowrap;
+	text-align:center;
+}
 table.grouped input.checkbox {
 	border:none;
 	background-color: #eee;

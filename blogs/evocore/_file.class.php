@@ -256,7 +256,6 @@ class File extends DataObject
 		$this->load_meta();
 		// TODO: make path relative to a root.
 		$this->set( 'path', $this->getPath() );
-		$this->set( 'caption', 'dummy demo text' );
 		// Record to DB:
 		$this->dbsave();
 
@@ -767,6 +766,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2005/04/26 18:19:25  fplanque
+ * no message
+ *
  * Revision 1.27  2005/04/19 18:04:38  fplanque
  * implemented nested transactions for MySQL
  *

@@ -50,7 +50,9 @@ require_once dirname(__FILE__).'/_file.class.php';
 
 
 /**
- * Implements a list of files.
+ * Lists files in a directory.
+ *
+ * Can work recursively through subdirectories.
  *
  * @package evocore
  */
@@ -844,6 +846,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.22  2005/04/26 18:19:25  fplanque
+ * no message
+ *
  * Revision 1.21  2005/04/19 16:23:02  fplanque
  * cleanup
  * added FileCache

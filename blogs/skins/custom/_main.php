@@ -342,7 +342,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 					<a href="<?php $Blog->disp( 'comments_atom_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
 				</li>
 			</ul>
-			<a href="http://fplanque.net/Blog/devblog/2004/01/10/p456" title="External - English"><?php echo T_('What is RSS?') ?></a>
+			<a href="http://fplanque.net/Blog/itTrends/2004/01/10/rss_rdf_and_atom_in_a_nutshell" title="External - English"><?php echo T_('What is RSS?') ?></a>
 	</div>
 
 

@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_adminUI.cla
  *
  * @global AdminUI
  */
-$AdminUI =& new AdminUI();
+$AdminUI = & new AdminUI();
 
 
 // TODO: we might move this to some file and include it, but OTOH the call of a method allows to dismiss entries

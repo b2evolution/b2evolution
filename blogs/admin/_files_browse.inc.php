@@ -153,37 +153,30 @@ $filetable_cols = 8;
 	<td colspan="<?php echo $filetable_cols ?>" class="firstcol lastcol">
 
 		<?php
+		/*
+		 * -----------------------------------------------
+		 * Display ROOTs list:
+		 * -----------------------------------------------
+		 */
 		$rootlist = $Fileman->getRootList();
-
 		if( count($rootlist) > 1 )
 		{ // provide list of roots
-			?>
+			echo '<div id="fmbar_roots">';
+			echo '<select name="rootIDAndPath" onchange="this.form.submit()">';
+			foreach( $rootlist as $lroot )
+			{
+				echo '<option value="'.format_to_output( serialize( array( 'id' => $lroot['id'], 'path' => '' ) ), 'formvalue' ).'"';
 
-			<!-- ROOT LISTS -->
-
-			<div id="fmbar_roots">
-				<select name="rootIDAndPath" onchange="this.form.submit()">
-				<?php
-				foreach( $rootlist as $lroot )
+				if( $Fileman->root == $lroot['id'] || ($Fileman->root === NULL && $lroot['id'] == 'user') )
 				{
-					echo '<option value="'.format_to_output( serialize( array( 'id' => $lroot['id'], 'path' => '' ) ), 'formvalue' ).'"';
-
-					if( $Fileman->root == $lroot['id'] || ($Fileman->root === NULL && $lroot['id'] == 'user') )
-					{
-						echo ' selected="selected"';
-					}
-
-					echo '>'.format_to_output( $lroot['name'] )."</option>\n";
+					echo ' selected="selected"';
 				}
-				?>
 
-				</select>
-
-				<input class="ActionButton" type="submit" value="<?php echo T_('Change root') ?>" />
-
-			</div>
-
-			<?php
+				echo '>'.format_to_output( $lroot['name'] )."</option>\n";
+			}
+			echo '</select> ';
+			echo '<input class="ActionButton" type="submit" value="'.T_('Change root').'" />';
+			echo '</div>';
 		}
 		?>
 
@@ -208,7 +201,6 @@ $filetable_cols = 8;
 
 			// The hidden reload button
 			?>
-
 			<span style="display:none;" id="fm_reloadhint">
 				<a href="<?php echo $Fileman->getCurUrl() ?>"
 					title="<?php echo T_('A popup has discovered that the displayed content of this window is not up to date. Click to reload.'); ?>">
@@ -232,22 +224,28 @@ $filetable_cols = 8;
 
 </tr>
 
-<tr>
-	<th colspan="2" class="firstcol">&nbsp;<?php $Fileman->dispButtonParent(); ?>&nbsp;</th>
-	<th><?php
-		echo $Fileman->getLinkSort( 'name', /* TRANS: file name */ T_('Name') );
+<?php
+	/*
+	 * Col headers:
+	 */
+	echo '<tr>';
+	echo '<th colspan="2" class="firstcol">';
+	$Fileman->dispButtonParent();
+	echo '</th>';
+	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'name', /* TRANS: file name */ T_('Name') );
+	if( $Fileman->flatmode )
+	{
+		echo ' &ndash; '.$Fileman->getLinkSort( 'path', /* TRANS: file/directory path */ T_('Path') );
+	}
+	echo '</th>';
+	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
+	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'size', /* TRANS: file size */ T_('Size') ).'</th>';
+	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ).'</th>';
+	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'perms', /* TRANS: file's permissions (short) */ T_('Perms') ).'</th>';
+	echo '<th class="lastcol nowrap">'. /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions').'</th>';
+	echo '</tr>';
+?>
 
-		if( $Fileman->flatmode )
-		{
-			echo ' &ndash; '.$Fileman->getLinkSort( 'path', /* TRANS: file/directory path */ T_('Path') );
-		}
-	?></th>
-	<th><?php echo $Fileman->getLinkSort( 'type', /* TRANS: file type */ T_('Type') ) ?></th>
-	<th><?php echo $Fileman->getLinkSort( 'size', /* TRANS: file size */ T_('Size') ) ?></th>
-	<th><?php echo $Fileman->getLinkSort( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ) ?></th>
-	<th><?php echo $Fileman->getLinkSort( 'perms', /* TRANS: file's permissions (short) */ T_('Perms') ) ?></th>
-	<th class="lastcol"><?php echo /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions') ?></th>
-</tr>
 </thead>
 
 
@@ -256,152 +254,171 @@ $filetable_cols = 8;
 <?php
 param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 
+/*
+ * ---------------------------------------------
+ * MAIN FILE LIST:
+ * ---------------------------------------------
+ */
 $Fileman->sort();
-
 $countFiles = 0;
 while( $lFile =& $Fileman->getNextFile() )
 { // loop through all Files:
-	?>
+	echo '<tr';
 
-	<tr<?php
-		if( $countFiles%2 ) echo ' class="odd"';
-		?> onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();">
-		<td class="checkbox firstcol">
-			<input title="<?php echo T_('Select this file') ?>" type="checkbox" class="checkbox"
-				name="fm_selected[]"
-				value="<?php echo $lFile->getID(); ?>"
-				id="cb_filename_<?php echo $countFiles ?>"
-				onclick="this.click();"<?php
-				if( $checkall || $Fileman->isSelected( $lFile ) )
-				{
-					echo ' checked="checked"';
-				}
-				?> />
-		</td>
+	if( $countFiles%2 ) echo ' class="odd"';
 
-		<td class="icon">
-			<a href="<?php
-				if( $lFile->isDir() )
-				{
-					echo $Fileman->getLinkFile( $lFile ).'" title="'.T_('Change into this directory');
-				}
-				else
-				{
-					echo $Fileman->getFileUrl().'" title="'.T_('Let the browser handle this file');
-				}
-				?>"
-				onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();"><?php
-				echo getIcon( $lFile ) ?></a>
-		</td>
+	echo ' onclick="document.getElementById(\'cb_filename_'.$countFiles.'\').click();">';
 
-		<td class="filename">
+	/*
+	 * Checkbox:
+	 */
+	echo '<td class="checkbox firstcol">';
+	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
+				name="fm_selected[]" value="'.$lFile->getID().'" id="cb_filename_'.$countFiles.'"
+				onclick="this.click();"';
+	if( $checkall || $Fileman->isSelected( $lFile ) )
+	{
+		echo ' checked="checked"';
+	}
+	echo ' />';
+	echo '</td>';
 
-			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"
-				target="fileman_default"
-				title="<?php echo T_('Open in a new window'); ?>"
-				onclick="return false;">
+	/*
+	 * File type Icon:
+	 */
+	echo '<td class="icon">';
+	echo '<a href="';
+	if( $lFile->isDir() )
+	{
+		echo $Fileman->getLinkFile( $lFile ).'" title="'.T_('Change into this directory');
+	}
+	else
+	{
+		echo $Fileman->getFileUrl().'" title="'.T_('Let the browser handle this file');
+	}
+	echo '">'.getIcon( $lFile ).'</a>';
+	echo '</td>';
 
+	echo '<td class="filename">';
 
-			<button class="filenameIcon" type="button"
-					id="button_new_<?php echo $countFiles ?>"
-					onclick="<?php
-						$imgsize = $lFile->getImageSize( 'widthheight' );
-						echo $Fileman->getJsPopupCode( NULL,
+	/*
+	 * Open in new window:
+	 */
+	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" target="fileman_default"
+				title="'.T_('Open in a new window').'" onclick="return false;">';
+	$imgsize = $lFile->getImageSize( 'widthheight' );
+	echo '<button class="filenameIcon" type="button" id="button_new_'.$countFiles.'" onclick="'
+				.$Fileman->getJsPopupCode( NULL,
 							"'+( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_$countFiles')+'",
-							($imgsize ? $imgsize[0]+100 : NULL),
-							($imgsize ? $imgsize[1]+150 : NULL) );
+							($imgsize ? $imgsize[0]+100 : NULL), ($imgsize ? $imgsize[1]+150 : NULL) )
+				.'">'.getIcon( 'window_new' ).'</button></a>';
 
-						// Un-do the td-onclick action on the checkbox:
-						?> document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();"
-					><?php
-					echo getIcon( 'window_new' );
-				?></button></a>
+	/*
+	 * Invalid filename warning:
+	 */
+	if( !isFilename( $lFile->getName() ) )
+	{ // TODO: Warning icon with hint
+		echo getIcon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => T_('The filename appears to be invalid and may cause problems.') ) );
+	}
 
-			<?php
+	/*
+	 * Link ("chain") icon:
+	 */
+	if( $Fileman->fm_mode == 'link_item' )
+	{	// Offer option to link the file to an Item:
+		$Fileman->dispButtonFileLink();
+		echo ' ';
+	}
 
-			if( !isFilename( $lFile->getName() ) )
-			{
-				// TODO: Warning icon with hint
-				echo getIcon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => T_('The filename appears to be invalid and may cause problems.') ) );
-			}
+	/*
+	 * Filename:
+	 */
+	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" onclick="document.getElementById(\'cb_filename_'.$countFiles.'\').click();">';
+	if( $Fileman->flatmode && $Fileman->getOrder() != 'name' )
+	{	// Display directory name
+		echo './'.$Fileman->getFileSubpath( $lFile );
+	}
+	else
+	{	// Display file short name
+		echo $lFile->getName();
+	}
+	echo '</a>';
 
-			if( $Fileman->fm_mode == 'link_item' )
-			{	// Offer option to link the file to an Item:
-				$Fileman->dispButtonFileLink();
-			}
-			?>
+	/*
+	 * File meta data:
+	 */
+	echo '<span class="filemeta">';
+	// Optionnaly display IMAGE pixel size:
+	disp_cond( $Fileman->getFileImageSize(), ' (%s)' );
+	// Optionnaly display meta data title:
+	if( $lFile->meta == 'loaded' )
+	{	// We have loaded meta data for this file:
+		echo ' - '.$lFile->title;
+	}
+	echo '</span>';
 
+	/*
+	 * Directory in flat mode:
+	 */
+	if( $Fileman->flatmode && $Fileman->getOrder() == 'name' )
+	{
+		?>
+		<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
+		$subPath = $Fileman->getFileSubpath( $lFile, false );
+		if( empty( $subPath ) )
+		{
+			$subPath = './';
+		}
+		echo $subPath;
+		?>
+		</div>
+		<?php
+	}
 
+	echo '</td>';
 
-			<a href="<?php echo $Fileman->getLinkFile( $lFile ) ?>"
-				onclick="document.getElementById('cb_filename_<?php echo $countFiles; ?>').click();"><?php
+	/*
+	 * File type:
+	 */
+	echo '<td class="type">'.$lFile->getType().'</td>';
 
-				if( $Fileman->flatmode && $Fileman->getOrder() != 'name' )
-				{	// Display path
-					echo './'.$Fileman->getFileSubpath( $lFile );
-				}
-				else
-				{	// Display short name
-					echo $lFile->getName();
-				}
+	/*
+	 * File size:
+	 */
+	echo '<td class="size">'.$lFile->getSizeNice().'</td>';
 
-			echo '</a>';
+	/*
+	 * File time stamp:
+	 */
+	echo '<td class="timestamp">';
+	echo '<span class="date">'.$lFile->getLastMod( 'date' ).'</span>';
+	echo '<span class="time">'.$lFile->getLastMod( 'time' ).'</span>';
+	echo '</td>';
 
-			echo '<span class="filemeta">';
+	/*
+	 * File permissions:
+	 */
+	echo '<td class="perms">';
+	$Fileman->dispButtonFileEditPerms();
+	echo '</td>';
 
-			// Optionnaly display IMAGE pixel size:
-			disp_cond( $Fileman->getFileImageSize(), ' (%s)' );
+	/*
+	 * Action icons:
+	 */
+	echo '<td class="actions lastcol">';
+	// Not implemented yet: $Fileman->dispButtonFileEdit();
+	$Fileman->dispButtonFileProperties();
+	$Fileman->dispButtonFileRename();
+	$Fileman->dispButtonFileCopy();
+	$Fileman->dispButtonFileMove();
+	$Fileman->dispButtonFileDelete();
+	echo '</td>';
 
-			// Optionnaly display meta data title:
-			if( $lFile->meta == 'loaded' )
-			{	// We have loaded meta data for this file:
-				echo ' - '.$lFile->title;
-			}
+	echo '</tr>';
 
-			echo '</span>';
-
-			if( $Fileman->flatmode && $Fileman->getOrder() == 'name' )
-			{
-				?>
-				<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
-				$subPath = $Fileman->getFileSubpath( $lFile, false );
-				if( empty( $subPath ) )
-				{
-					$subPath = './';
-				}
-				echo $subPath;
-				?>
-				</div>
-				<?php
-			}
-
-			?>
-		</td>
-
-		<td class="type"><?php echo $lFile->getType() ?></td>
-
-		<td class="size"><?php echo $lFile->getSizeNice() ?></td>
-
-		<td class="timestamp">
-			<span class="date"><?php echo $lFile->getLastMod( 'date' ) ?></span>
-			<span class="time"><?php echo $lFile->getLastMod( 'time' ) ?></span>
-		</td>
-
-		<td class="perms"><?php $Fileman->dispButtonFileEditPerms() ?></td>
-		<td class="actions lastcol"><?php
-			// Not implemented yet: $Fileman->dispButtonFileEdit();
-			$Fileman->dispButtonFileProperties();
-			$Fileman->dispButtonFileRename();
-			$Fileman->dispButtonFileCopy();
-			$Fileman->dispButtonFileMove();
-			$Fileman->dispButtonFileDelete();
-			?></td>
-	</tr>
-
-	<?php
 	$countFiles++;
 }
-
+// / End of file list..
 
 if( $countFiles == 0 )
 { // Filelist errors or "directory is empty"
@@ -718,7 +735,7 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
- * Revision 1.23  2005/04/21 19:54:59  fplanque
+ * Revision 1.24  2005/04/26 18:19:24  fplanque
  * no message
  *
  * Revision 1.22  2005/04/19 16:23:00  fplanque

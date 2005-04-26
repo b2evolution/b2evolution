@@ -180,6 +180,9 @@ class FileManager extends Filelist
 	 */
 	var $_selectedFiles;
 
+
+	var $result_params;
+
 	// }}}
 
 
@@ -202,16 +205,17 @@ class FileManager extends Filelist
 	{
 		global $basepath, $baseurl, $media_subdir, $admin_subdir, $admin_url;
 		global $BlogCache, $UserCache;
-		global $Debuglog;
+		global $Debuglog, $AdminUI;
 
 		// Global params to remember:
 		global $mode, $item_ID;
 		$this->mode = $mode;
 		$this->item_ID = $item_ID;
 
-		$this->User =& $cUser;
-		$this->Messages =& new Log( 'error' );
+		$this->User = & $cUser;
+		$this->Messages = & new Log( 'error' );
 
+		$this->result_params = $AdminUI->getMenuTemplate('Results');
 
 		// {{{ -- get/translate root directory ----
 		$root_A = explode( '_', $root );
@@ -367,6 +371,8 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Load current directory contents:
+	 *
 	 * Calls the parent constructor, loads and rewinds the filelist.
 	 */
 	function load()
@@ -417,11 +423,13 @@ class FileManager extends Filelist
 	 */
 	function dispButtonParent()
 	{
-		if( $link = $this->getLinkParent() )
-		{
-			echo '<a title="'.T_('Go to parent folder').'" href="'.$link.'">'
-						.getIcon( 'folder_parent' ).'</a>';
+		if( empty($this->path) )
+		{ // cannot go higher
+			return '&nbsp;';	// for IE
 		}
+
+		echo '<a title="'.T_('Go to parent folder').'" href="'.$this->getCurUrl( array( 'path' => $this->path.'..' ) ).'">'
+						.getIcon( 'folder_parent' ).'</a>';
 	}
 
 
@@ -773,29 +781,26 @@ class FileManager extends Filelist
 	 */
 	function getLinkSort( $type, $atext )
 	{
-		$newAsc = $this->order == $type ?
-								(1 - $this->isSortingAsc()) : // change asc/desc
-								1;
+		$newAsc = $this->order == $type ? (1 - $this->isSortingAsc()) :  1;
 
+		$r = '<a href="'.$this->getCurUrl( array( 'order' => $type,	'orderasc' => $newAsc ) ).'" title="'.T_('Change Order').'"';
 
-		$r = '<a href="'
-					.$this->getCurUrl( array( 'order' => $type,
-																		'orderasc' => $newAsc ) );
-
-		$r .= '" title="'
-					.( $newAsc ?
-							/* TRANS: %s gets replaced with column names 'Name', 'Type', .. */
-							sprintf( T_('Sort ascending by: %s'), $atext ) :
-							/* TRANS: %s gets replaced with column names 'Name', 'Type', .. */
-							sprintf( T_('Sort descending by: %s'), $atext ) )
-					.'">'.$atext;
-
-		if( $this->translate_order($this->order) == $type )
-		{ // add asc/desc image to represent current state
-			$r .= ' '.( $this->isSortingAsc($type) ?
-										getIcon( 'ascending' ) :
-										getIcon( 'descending' ) );
+		// Sorting icon:
+		if( $this->translate_order($this->order) != $type )
+		{	// Not sorted on this column:
+			$r .= ' class="basic_sort_link">'.$this->result_params['basic_sort_off'];
 		}
+		elseif( $this->isSortingAsc($type) )
+		{ // We are sorting on this column , in ascneding order:
+			$r .=	' class="basic_current">'.$this->result_params['basic_sort_asc'];
+		}
+		else
+		{ // Descending order:
+			$r .=	' class="basic_current">'.$this->result_params['basic_sort_desc'];
+		}
+
+		$r .= ' '.$atext;
+
 
 		return $r.'</a>';
 	}
@@ -922,21 +927,6 @@ class FileManager extends Filelist
 			$File = $this->curFile;
 		}
 		return $this->getLinkFile( $File, 'delete' );
-	}
-
-
-	/**
-	 * Get the link to the parent folder
-	 *
-	 * @return mixed URL or false if in root
-	 */
-	function getLinkParent()
-	{
-		if( empty($this->path) )
-		{ // cannot go higher
-			return false;
-		}
-		return $this->getCurUrl( array( 'path' => $this->path.'..' ) );
 	}
 
 
@@ -1106,17 +1096,17 @@ class FileManager extends Filelist
 		{
 			return false;
 		}
-		$path = $path === NULL ? $this->cwd : trailing_slash( $path );
+		$path = ($path === NULL ? $this->cwd : trailing_slash( $path ));
 
 		if( $chmod == NULL )
-		{
+		{ // No perms were supplied:
 			$chmod = $type == 'dir' ?
 								$this->default_chmod_dir :
 								$this->default_chmod_file;
 		}
 
 		if( empty($name) )
-		{
+		{	// No name was supplied:
 			$this->Messages->add( $type == 'dir' ?
 														T_('Cannot create a directory without name.') :
 														T_('Cannot create a file without name.') );
@@ -1130,8 +1120,8 @@ class FileManager extends Filelist
 			return false;
 		}
 
-
-		$newFile = & $FileCache->get_by_path( $path );
+		// Try to get File object:
+		$newFile = & $FileCache->get_by_path( $path.$name );
 
 		if( $newFile->exists() )
 		{
@@ -1429,6 +1419,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.33  2005/04/26 18:19:25  fplanque
+ * no message
+ *
  * Revision 1.32  2005/04/19 16:23:02  fplanque
  * cleanup
  * added FileCache

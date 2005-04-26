@@ -29,8 +29,7 @@
 	color:red;
 }
 #filemanmain table.grouped td.icon,
-#filemanmain table.grouped td.checkbox,
-#filemanmain table.grouped td.perms {
+#filemanmain table.grouped td.checkbox{
 }
 #filemanmain table.grouped td.type {
 	white-space:nowrap;
@@ -49,7 +48,7 @@
 	font-size: 84%;
 }
 #filemanmain table.grouped td.timestamp {
-	white-space: nowrap;	
+	white-space: nowrap;
 }
 #filemanmain table.grouped td.timestamp span.time {
 	font-size:84%;
@@ -60,6 +59,9 @@
 }
 #filemanmain table.grouped td.size {
 	text-align: right;
+}
+#filemanmain table.grouped td.perms {
+	text-align: center;
 }
 #filemanmain table.grouped td.actions img {
 	margin:0 2px;

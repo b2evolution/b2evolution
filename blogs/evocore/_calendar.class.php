@@ -206,13 +206,14 @@ class Calendar
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
 			$where_time[] = $dbprefix.'datestart >= \''.$date_min.'\'';
 		}
+
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) )
 		{ // Hide posts after
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
 			$where_time[] = $dbprefix.'datestart <= \''.$date_max.'\'';
 		}
-		$this->where_time = $where_time ? ' AND '.implode($where_time) : '';
+		$this->where_time = $where_time ? implode( ' AND ', $where_time) : '';
 
 
 		// Default styling:
@@ -800,6 +801,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.11  2005/04/26 18:19:25  fplanque
+ * no message
+ *
  * Revision 1.10  2005/03/18 01:40:50  blueyed
  * link to prev month fixed
  *

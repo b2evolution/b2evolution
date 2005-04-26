@@ -277,6 +277,7 @@ require_once dirname(__FILE__).'/_calendar.class.php';
 require_once dirname(__FILE__).'/_hitlog.funcs.php';     // referer logging
 require_once dirname(__FILE__).'/_form.funcs.php';
 require_once dirname(__FILE__).'/_form.class.php';
+require_once dirname(__FILE__).'/_sql.class.php';
 require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_swfcharts.php';
 
 /**
@@ -497,6 +498,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.32  2005/04/26 18:19:25  fplanque
+ * no message
+ *
  * Revision 1.31  2005/04/19 18:04:38  fplanque
  * implemented nested transactions for MySQL
  *

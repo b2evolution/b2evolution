@@ -728,6 +728,7 @@ class Form extends Widget
 	 *  - the comment to put between <input> and <br />
 	 *  - a boolean indicating whether the box must be checked or not
 	 *  - an optional boolean indicating whether the box is disabled or not
+	 *  - an optional note
 	 *
 	 * @param array a two-dimensional array containing the parameters of the input tag
 	 * @param string name
@@ -748,7 +749,12 @@ class Form extends Widget
 			{ // the checkbox has to be disabled
 				$r .= ' disabled="disabled" ';
 			}
-			$r .= ' class="checkbox" />'.$option[2]."<br />\n";
+			$r .= ' class="checkbox" />'.$option[2];
+			if( !empty($option[5]) )
+			{	// We want to display a note:
+				$r .= ' <span class="notes">'.$option[5].'</span>';
+			}
+			$r .= "<br />\n";
 		}
 		$r .= $this->end_field();
 		if( $this->output )

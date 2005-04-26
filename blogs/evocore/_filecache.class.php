@@ -71,7 +71,7 @@ class FileCache extends DataObjectCache
 	 */
 	function & get_by_path( $path, $load_meta = false )
 	{
-		global $cache_File;
+		global $Debuglog, $cache_File;
 
 		$path = str_replace( '\\', '/', $path );
 
@@ -79,7 +79,7 @@ class FileCache extends DataObjectCache
 
 		if( isset( $this->cache_path[$cacheindex] ) )
 		{	// Already in cache
-			// echo 'got file from cache';
+			$Debuglog->add( 'File retrieved from cache: '.$path );
 			$File = & $this->cache_path[$cacheindex];
 			if( $load_meta )
 			{	// Make sure meta is loaded:
@@ -88,6 +88,7 @@ class FileCache extends DataObjectCache
 		}
 		else
 		{	// Not in cache
+			$Debuglog->add( 'File not in cache: '.$path );
 			$File = & new File( $path, $load_meta );
 			$this->cache_path[$cacheindex] = & $File;
 		}
@@ -98,6 +99,9 @@ class FileCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.2  2005/04/26 18:19:25  fplanque
+ * no message
+ *
  * Revision 1.1  2005/04/19 16:23:02  fplanque
  * cleanup
  * added FileCache

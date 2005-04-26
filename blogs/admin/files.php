@@ -990,7 +990,7 @@ switch( $Fileman->fm_mode )
 		$edited_Item->edit_link( '<p>', '</p>', T_('Edit this post') );
 
 		$Results = & new Results(
-							'SELECT link_ID, link_ltype_ID, file_ID, file_path, file_title
+							'SELECT link_ID, link_ltype_ID, T_files.*
 								 FROM T_links INNER JOIN T_files ON link_file_ID = file_ID
 								WHERE link_item_ID = '.$edited_Item->ID,
 								20, 'link_' );
@@ -1029,6 +1029,27 @@ switch( $Fileman->fm_mode )
 								'order' => 'file_title',
 								'td_start' => '<td class="left">',
 								'td' => '$file_title$',
+							);
+
+		function file_exp( & $row )
+		{
+			// Instantiate a File object for this line:
+			$current_File = & new File( $row->file_path );
+			// Flow meta data into File object:
+			$current_File->load_meta( false, $row );
+
+			// File title
+			$r = $current_File->title;
+
+			// File type:
+			$r .= ' '.getIcon( $current_File ).' '.$current_File->getType();
+
+			return $r;
+		}
+ 		$Results->cols[] = array(
+								'th' => T_('Exp'),
+								'td_start' => '<td class="left">',
+								'td' => '%file_exp( {row} )%',
 							);
 
 	 	$Results->cols[] = array(
@@ -1156,7 +1177,7 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
- * Revision 1.95  2005/04/21 19:55:00  fplanque
+ * Revision 1.96  2005/04/26 18:19:24  fplanque
  * no message
  *
  * Revision 1.94  2005/04/21 18:01:29  fplanque
