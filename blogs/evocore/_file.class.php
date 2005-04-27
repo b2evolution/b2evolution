@@ -44,93 +44,113 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 
 /**
- * These are the filetypes.
- * The extension is a regular expression that must match the end of the file.
+ * Represents a file or folder on disk. Optionnaly stores meta data from DB.
  *
- * @todo Move it to some /conf file.
- */
-$fm_filetypes = array( // {{{
-	'\.ai' => T_('Adobe Illustrator'),
-	'\.bmp' => T_('BMP image'),
-	'\.bz'  => T_('BZ archive'),
-	'\.c' => T_('C source'),
-	'\.cgi' => T_('CGI file'),
-	'\.(conf|inf)' => T_('Config file'),
-	'\.cpp' => T_('C++ source'),
-	'\.css' => T_('Stylesheet'),
-	'\.doc' => T_('MS Word document'),
-	'\.exe' => T_('Windows executable'),
-	'\.gif' => T_('GIF image'),
-	'\.gz'  => T_('GZ archive'),
-	'\.h' => T_('Header file'),
-	'\.hlp' => T_('Help file'),
-	'\.ht(access|passwd)' => T_('Apache conf.'),
-	'\.htm' => T_('HyperText Markup'),
-	'\.html' => T_('HyperText Markup'),
-	'\.htt' => T_('Windows access'),
-	'\.inc' => T_('Include file'),
-	'\.ini' => T_('Settings file'),
-	'\.jpe?g' => T_('JPEG image'),
-	'\.js'  => T_('JavaScript'),
-	'\.log' => T_('Log file'),
-	'\.mdb' => T_('Access database'),
-	'\.midi' => T_('MIDI file'),
-	'\.p(hp[345]?|html)' => T_('PHP script'),
-	'\.pl' => T_('Perl script'),
-	'\.png' => T_('PNG image'),
-	'\.ppt' => T_('MS Powerpoint'),
-	'\.psd' => T_('Photoshop image'),
-	'\.ram?' => T_('RealMedia file'),
-	'\.rar' => T_('RAR Archive'),
-	'\.rtf' => T_('Rich Text Format'),
-	'\.sql' => T_('SQL query file'),
-	'\.s[tx]w' => T_('OpenOffice file'),
-	'\.te?xt' => T_('Text document'),
-	'\.tgz' => T_('TAR GZ archive'),
-	'\.vbs' => T_('MS VBscript'),
-	'\.wri' => T_('MS Write document'),
-	'\.xml' => T_('XML file'),
-	'\.zip' => T_('ZIP archive'),
-); // }}}
-
-
-
-/**
- * Represents a file or directory. Use {@link getFile} to create an instance.
+ * Use {@link FileCache::get_by_path()} to create an instance.
+ * This is based on {@link DataObject} for the meta data.
  *
  * @package evocore
  */
 class File extends DataObject
 {
 	/**
-	 * We haven't checked for meta data yet
+	 * @var string Have we checked for meta data in the DB yet?
 	 */
 	var $meta = 'unknown';
+
+	/**
+	 * @var string Meta data: Long title
+	 */
 	var $title;
+
+	/**
+	 * @var string Meta data: ALT text for images
+	 */
 	var $alt;
+
+	/**
+	 * @var string Meta data: Description
+	 */
 	var $desc;
 
-	/**#@+
+
+	/**
+	 * @var string Full path for this file/folder, including trailing slash.
+	 * @see get_full_path()
 	 * @access protected
 	 */
+	var $_full_path;
+
 	/**
-	 * @var string Cached iconfile name
+	 * @var string Full path for this file/folder, WITHOUT trailing slash.
+	 * @access protected
 	 */
-	var $_iconfilename = NULL;
+	var $_posix_path;
+
+	/**
+	 * @var string Directory path for this file/folder, including trailing slash.
+	 * @see get_dir()
+	 * @access protected
+	 */
 	var $_dir;
-	var $_name;
-	var $_md5ID;
-	var $_exists;
-	var $_isDir;
-	var $_size;
-	var $_lastMod;
-	var $_perms;
+
 	/**
-	 * @see isImage()
-	 * @var boolean Is the File an image?
+	 * @var string Name of this file/folder, without path.
+	 * @see get_name()
+	 * @access protected
 	 */
-	var $_isImage = 1;
-	/**#@-*/
+	var $_name;
+
+	/**
+	 * MD5 hash of full pathname.
+	 *
+	 * @todo fplanque>> the purpose of this thing isn't very clear... get rid of it?
+	 *
+	 * @var string
+	 * @see get_md5_ID()
+	 * @access protected
+	 */
+	var $_md5ID;
+
+	/**
+	 * @var boolean does the File/folder exist on disk?
+	 * @see exists()
+	 * @access protected
+	 */
+	var $_exists;
+
+	/**
+	 * @var boolean Is the File a directory?
+	 * @see is_dir()
+	 * @access protected
+	 */
+	var $_is_dir;
+
+	/**
+	 * @var integer file size in bytes.
+	 * @see get_size()
+	 * @access protected
+	 */
+	var $_size;
+
+	/**
+	 * @var integer UNIX timestamp of last modification on disk.
+	 * @access protected
+	 */
+	var $_lastMod;
+
+	/**
+	 * @var integer UNIX file permissions.
+	 * @access protected
+	 */
+	var $_perms;
+
+	/**
+	 * @var NULL|boolean Is the File an image?
+	 * @see is_image()
+	 * @access protected
+	 */
+	var $_is_image;
 
 
 	/**
@@ -151,13 +171,15 @@ class File extends DataObject
 				array( 'table'=>'T_links', 'fk'=>'link_file_ID', 'msg'=>T_('%d linked items') ),
 			);
 
-		$posix_path = no_trailing_slash( $path );
-		$this->setName( basename( $posix_path ) );
-		$this->setDir( dirname( $posix_path ) );
-		$this->_md5ID = md5( $this->_dir.$this->_name );
+		// Memorize filepath:
+		$this->_full_path = str_replace( '\\', '/', $path );
+		$this->_posix_path = no_trailing_slash( $this->_full_path );
+		$this->_name = basename( $this->_posix_path );
+		$this->_dir = dirname( $this->_posix_path ).'/';
+		$this->_md5ID = md5( $this->_posix_path );
 
-		// Get/Memorize detailed diskfile info:
-		$this->refresh();
+		// Initializes file properties (type, size, perms...)
+		$this->load_properties();
 
 		if( $load_meta )
 		{ // Try to load DB meta info:
@@ -170,6 +192,10 @@ class File extends DataObject
 	 * Attempt to load meta data.
 	 *
 	 * Will attempt only once and cache the result.
+	 *
+	 * @param boolean create meta data in DB if it doesn't exist yet? (generates a $File->ID)
+	 * @param object database row containing all fields needed to initialize meta data
+	 * @return boolean true if meta data has been loaded/initialized.
 	 */
 	function load_meta( $force_creation = false, $row = NULL )
 	{
@@ -182,13 +208,13 @@ class File extends DataObject
 				$row = $DB->get_row( 'SELECT * FROM T_files
 																WHERE file_root_type = \'absolute\'
 																	AND file_root_ID = 0
-																	AND file_path = '.$DB->quote($this->getPath()),
+																	AND file_path = '.$DB->quote($this->_full_path),
 																OBJECT, 0, 'Load file meta data' );
 			}
 
 			if( $row )
 			{ // We found meta data
-				$Debuglog->add('Loaded metadata for '.$this->getPath());
+				$Debuglog->add('Loaded metadata for '.$this->_full_path);
 				$this->meta  = 'loaded';
 				$this->ID    = $row->file_ID;
 				$this->title = $row->file_title;
@@ -214,14 +240,14 @@ class File extends DataObject
 
 
 	/**
-	 * Create the file/directory on disk, if it does not exist.
+	 * Create the file/folder on disk, if it does not exist yet.
 	 *
 	 * Also sets file permissions.
-	 * Also inserts meta data into DB.
+	 * Also inserts meta data into DB (if file/folder was successfully created).
 	 *
 	 * @param string type ('dir'|'file')
 	 * @param string optional permissions (octal format)
-	 * @return boolean true if file was created, false on failure
+	 * @return boolean true if file/folder was created, false on failure
 	 */
 	function create( $type = 'file', $chmod = NULL )
 	{
@@ -229,69 +255,71 @@ class File extends DataObject
 		{ // Create an empty directory:
 			if( $chmod === NULL )
 			{ // Create dir with default permissions (777)
-				$r = @mkdir( $this->_dir.$this->_name );
+				$success = @mkdir( $this->_posix_path );
 			}
 			else
 			{ // Create directory with specific permissions:
-				$r = @mkdir( $this->_dir.$this->_name, octdec($chmod) );
+				$success = @mkdir( $this->_posix_path, octdec($chmod) );
 			}
 		}
 		else
 		{ // Create an empty file:
-			$r = touch( $this->_dir.$this->_name );
+			$success = touch( $this->_posix_path );
 			if( $chmod !== NULL )
 			{
 				$this->chmod( $chmod );
 			}
 		}
 
-		if( $r )
-		{ // Get/Memorize detailed file info:
-			$this->refresh();
+		if( $success )
+		{	// The file/folder has been successfully created:
+
+			// Initializes file properties (type, size, perms...)
+			$this->load_properties();
+
+			// If there was meta data for this file in the DB:
+			// (maybe the file had existed before?)
+			// Let's recycle it! :
+			$this->load_meta();
+			// TODO: make path relative to a root.
+			$this->set( 'path', $this->_full_path );
+			// Record to DB:
+			$this->dbsave();
 		}
 
-		// If there was meta data for this file in the DB:
-		// (maybe the file had existed before?)
-		// Let's recycle it! :
-		$this->load_meta();
-		// TODO: make path relative to a root.
-		$this->set( 'path', $this->getPath() );
-		// Record to DB:
-		$this->dbsave();
-
-		return $r;
+		return $success;
 	}
 
 
 	/**
-	 * Refreshes (and inits) information about the file.
+	 * Initializes or refreshes file properties (type, size, perms...)
 	 */
-	function refresh()
+	function load_properties()
 	{
 		// Unset values that will be determined (and cached) upon request
-		$this->_isImage = NULL;
+		$this->_is_image = NULL;
 
-		$this->_exists = file_exists( $this->_dir.$this->_name );
+		$this->_exists = file_exists( $this->_posix_path );
 
-		if( is_dir( $this->_dir.$this->_name ) )
-		{
-			$this->_isDir = true;
+		if( is_dir( $this->_posix_path ) )
+		{	// The File is a directory:
+			$this->_is_dir = true;
 			$this->_size = NULL;
 		}
 		else
-		{
-			$this->_isDir = false;
-			$this->_size = @filesize( $this->_dir.$this->_name );
+		{	// The File is a regular file:
+			$this->_is_dir = false;
+			$this->_size = @filesize( $this->_posix_path );
 		}
 
-		// for files and dirs
-		$this->_lastMod = @filemtime( $this->_dir.$this->_name );
-		$this->_perms = @fileperms( $this->_dir.$this->_name );
+		// for files and dirs:
+		$this->_lastMod = @filemtime( $this->_posix_path );
+		$this->_perms = @fileperms( $this->_posix_path );
 	}
 
 
 	/**
-	 * Does the file exist?
+	 * Does the File/folder exist on disk?
 	 *
 	 * @return boolean true, if the file or dir exists; false if not
 	 */
@@ -306,25 +334,27 @@ class File extends DataObject
 	 *
 	 * @return boolean true if the object is a directory, false if not
 	 */
-	function isDir()
+	function is_dir()
 	{
-		return $this->_isDir;
+		return $this->_is_dir;
 	}
 
 
 	/**
 	 * Is the File an image?
 	 *
+	 * Tries to determine if it is and caches the info.
+	 *
 	 * @return boolean true if the object is an image, false if not
 	 */
-	function isImage()
+	function is_image()
 	{
-		if( is_null( $this->_isImage ) )
-		{
-			$this->_isImage = ( $this->getImageSize() !== false );
+		if( is_null( $this->_is_image ) )
+		{	// We don't know yet
+			$this->_is_image = ( $this->getImageSize() !== false );
 		}
 
-		return $this->_isImage;
+		return $this->_is_image;
 	}
 
 
@@ -333,7 +363,7 @@ class File extends DataObject
 	 *
 	 * @return string
 	 */
-	function getID()
+	function get_md5_ID()
 	{
 		return $this->_md5ID;
 	}
@@ -344,20 +374,22 @@ class File extends DataObject
 	 *
 	 * @return string
 	 */
-	function getName()
+	function get_name()
 	{
 		return $this->_name;
 	}
 
 
 	/**
-	 * Get the name either prefix with "Directory" or "File".
+	 * Get the name prefixed either with "Directory" or "File".
+	 *
+	 * Returned string is localized.
 	 *
 	 * @return string
 	 */
-	function getNameWithType()
+	function get_typed_name()
 	{
-		if( $this->isDir() )
+		if( $this->is_dir() )
 		{
 			return sprintf( T_('Directory &laquo;%s&raquo;'), $this->_name );
 		}
@@ -373,7 +405,7 @@ class File extends DataObject
 	 *
 	 * @return string
 	 */
-	function getDir()
+	function get_dir()
 	{
 		return $this->_dir;
 	}
@@ -384,11 +416,11 @@ class File extends DataObject
 	 *
 	 * If the File is a directory, the Path ends with a /
 	 *
-	 * @param boolean full path with name?
+	 * @return string full path
 	 */
-	function getPath( $withname = true )
+	function get_full_path()
 	{
-		return $this->_dir.$this->_name.( $this->isDir() ? '/' : '' );
+		return $this->_full_path;
 	}
 
 
@@ -422,18 +454,17 @@ class File extends DataObject
 			return $this->_type;
 		}
 
-		if( $this->isDir() )
+		if( $this->is_dir() )
 		{
 			$this->_type = T_('Directory');
 			return $this->_type;
 		}
 
-		$filename = $this->getName();
 		foreach( $fm_filetypes as $type => $desc )
 		{
-			if( preg_match('/'.$type.'$/i', $filename) )
+			if( preg_match('/'.$type.'$/i', $this->_name) )
 			{
-				$this->_type = $desc;
+				$this->_type = T_($desc);	// Localized type desc
 				return $this->_type;
 			}
 		}
@@ -444,11 +475,11 @@ class File extends DataObject
 
 
 	/**
-	 * Get file size in bytes
+	 * Get file size in bytes.
 	 *
 	 * @return integer bytes
 	 */
-	function getSize()
+	function get_size()
 	{
 		return $this->_size;
 	}
@@ -533,7 +564,7 @@ class File extends DataObject
 
 		if( !isset($this->_iconKey) )
 		{
-			if( $this->isDir() )
+			if( $this->is_dir() )
 			{ // Directory icon:
 				$this->_iconKey = 'folder';
 			}
@@ -569,7 +600,7 @@ class File extends DataObject
 	 */
 	function getImageSize( $param = 'widthxheight' )
 	{
-		return imgsize( $this->getPath(), $param );
+		return imgsize( $this->_full_path, $param );
 	}
 
 
@@ -579,7 +610,7 @@ class File extends DataObject
 	 * @uses bytesreadable()
 	 * @return string size as b/kb/mb/gd; or '&lt;dir&gt;'
 	 */
-	function getSizeNice()
+	function get_sizeNice()
 	{
 		if( $this->_size === NULL )
 		{
@@ -589,30 +620,6 @@ class File extends DataObject
 		{
 			return bytesreadable( $this->_size );
 		}
-	}
-
-
-	/**
-	 * Internally sets the filename.
-	 *
-	 * @access private
-	 * @param string
-	 */
-	function setName( $name )
-	{
-		$this->_name = $name;
-	}
-
-
-	/**
-	 * Internally sets the file path
-	 *
-	 * @access private
-	 * @param string
-	 */
-	function setDir( $dir )
-	{
-		$this->_dir = str_replace( '\\', '/', trailing_slash( $dir ) );
 	}
 
 
@@ -639,13 +646,13 @@ class File extends DataObject
 	 */
 	function rename( $newname )
 	{
-		if( rename( $this->getPath(), $this->getDir().$newname ) )
+		if( rename( $this->_full_path, $this->_dir.$newname ) )
 		{
-			$this->setName( $newname );
+			$this->_name = $newname;
 
 			// Meta data...:
 			// TODO: make path relative to a root.
-			$this->set( 'path', $this->getPath() );
+			$this->set( 'path', $this->_full_path );
 			// Record to DB:
 			$this->dbupdate();
 
@@ -678,13 +685,13 @@ class File extends DataObject
 			$this->dbdelete();
 		}
 
-		if( $this->isDir() )
+		if( $this->is_dir() )
 		{
-			$unlinked =	@rmdir( $this->getPath() );
+			$unlinked =	@rmdir( $this->_posix_path );
 		}
 		else
 		{
-			$unlinked =	@unlink( $this->getPath() );
+			$unlinked =	@unlink( $this->_posix_path );
 		}
 
 		if( !$unlinked )
@@ -712,11 +719,11 @@ class File extends DataObject
 	function chmod( $chmod )
 	{
 		$chmod = octdec( $chmod );
-		if( chmod( $this->getPath(), $chmod) )
+		if( chmod( $this->_posix_path, $chmod ) )
 		{
 			clearstatcache();
 			// update current entry
-			$this->_perms = fileperms( $this->getPath() );
+			$this->_perms = fileperms( $this->_posix_path );
 
 			return $this->_perms;
 		}
@@ -738,7 +745,7 @@ class File extends DataObject
 		if( ($this->ID != 0) || ($this->meta != 'notfound') ) die( 'Existing file object cannot be inserted!' );
 
 		// We need to track filepath:
-		$this->set_param( 'path', 'string', $this->getPath() );
+		$this->set_param( 'path', 'string', $this->_full_path );
 
 		// Let parent do the insert:
 		parent::dbinsert();
@@ -766,8 +773,8 @@ class File extends DataObject
 
 /*
  * $Log$
- * Revision 1.28  2005/04/26 18:19:25  fplanque
- * no message
+ * Revision 1.29  2005/04/27 19:05:46  fplanque
+ * normalizing, cleanup, documentaion
  *
  * Revision 1.27  2005/04/19 18:04:38  fplanque
  * implemented nested transactions for MySQL

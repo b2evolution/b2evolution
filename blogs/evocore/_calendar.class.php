@@ -801,8 +801,8 @@ class Calendar
 
 /*
  * $Log$
- * Revision 1.11  2005/04/26 18:19:25  fplanque
- * no message
+ * Revision 1.12  2005/04/27 19:05:46  fplanque
+ * normalizing, cleanup, documentaion
  *
  * Revision 1.10  2005/03/18 01:40:50  blueyed
  * link to prev month fixed

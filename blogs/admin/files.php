@@ -245,7 +245,7 @@ if( !empty($action) )
 					."\n"
 					.T_('You want to download:')
 					.'<ul>'
-					.'<li>'.implode( "</li>\n<li>", $SelectedFiles->getFilesArray( 'getNameWithType' ) )."</li>\n"
+					.'<li>'.implode( "</li>\n<li>", $SelectedFiles->getFilesArray( 'get_typed_name' ) )."</li>\n"
 					.'</ul>
 
 					<form action="files.php" class="fform" method="post">
@@ -335,23 +335,22 @@ if( !empty($action) )
 
 				foreach( $SelectedFiles->_entries as $lFile )
 				{
-					$action_msg .= '<li>'.$lFile->getName();
+					$action_msg .= '<li>'.$lFile->get_typed_name();
 
-					if( $lFile->isDir() )
+					/* fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB integrity for these...
+					if( $lFile->is_dir() )
 					{	// This is a directory
-						$action_msg .= ' &lt;dir&gt;';
-							/* fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB integrity for these...
 							$action_msg .= '
 							<br />
-							<input title="'.sprintf( T_('Check to include subdirectories of &laquo;%s&raquo;'), $lFile->getName() ).'"
+							<input title="'.sprintf( T_('Check to include subdirectories of &laquo;%s&raquo;'), $lFile->get_name() ).'"
 								type="checkbox"
-								name="delsubdirs['.$lFile->getID().']"
-								id="delsubdirs_'.$lFile->getID().'"
+								name="delsubdirs['.$lFile->get_md5_ID().']"
+								id="delsubdirs_'.$lFile->get_md5_ID().'"
 								value="1" />
-								<label for="delsubdirs_'.$lFile->getID().'">'
+								<label for="delsubdirs_'.$lFile->get_md5_ID().'">'
 									.T_( 'Including subdirectories' ).'</label>';
-							*/
 					}
+					*/
 
 					// Check if there are delete restrictions on this file:
 					$lFile->check_relations( 'delete_restrictions' );
@@ -391,7 +390,7 @@ if( !empty($action) )
 				$SelectedFiles->restart();
 				while( $lFile =& $SelectedFiles->getNextFile() )
 				{
-					if( !$Fileman->unlink( $lFile, isset( $delsubdirs[$lFile->getID()] ) ) ) // handles Messages
+					if( !$Fileman->unlink( $lFile, isset( $delsubdirs[$lFile->get_md5_ID()] ) ) ) // handles Messages
 					{
 						// TODO: offer file again, allowing to include subdirs..
 					}
@@ -505,22 +504,22 @@ if( !empty($action) )
 				$SelectedFiles->restart();
 				while( $lFile =& $SelectedFiles->getNextFile() )
 				{
-					$chmod = $perms[ $lFile->getID() ];
+					$chmod = $perms[ $lFile->get_md5_ID() ];
 
 					$oldperms = $lFile->getPerms( 'raw' );
 					$newperms = $lFile->chmod( $chmod );
 
 					if( $newperms === false )
 					{
-						$Fileman->Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $lFile->getName(), $chmod ) );
+						$Fileman->Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $lFile->get_name(), $chmod ) );
 					}
 					elseif( $newperms === $oldperms )
 					{
-						$Fileman->Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; not changed.'), $lFile->getName() ), 'note' );
+						$Fileman->Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; not changed.'), $lFile->get_name() ), 'note' );
 					}
 					else
 					{
-						$Fileman->Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->getName(), $lFile->getPerms() ), 'note' );
+						$Fileman->Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->getPerms() ), 'note' );
 					}
 				}
 			}
@@ -546,23 +545,23 @@ if( !empty($action) )
 					foreach( $SelectedFiles->getFilesArray() as $lFile )
 					{
 						$action_msg .= "\n".$Fileman->getFileSubpath( $lFile ).':<br />
-						<input id="perms_readonly_'.$lFile->getID().'"
-							name="perms['.$lFile->getID().']"
+						<input id="perms_readonly_'.$lFile->get_md5_ID().'"
+							name="perms['.$lFile->get_md5_ID().']"
 							type="radio"
 							value="444"'
 							.( $lFile->getPerms( 'octal' ) == 444 ?
 									' checked="checked"' :
 									'' ).' />
-						<label for="perms_readonly_'.$lFile->getID().'">'.T_('Read-only').'</label>
+						<label for="perms_readonly_'.$lFile->get_md5_ID().'">'.T_('Read-only').'</label>
 
-						<input id="perms_readwrite_'.$lFile->getID().'"
-							name="perms['.$lFile->getID().']"
+						<input id="perms_readwrite_'.$lFile->get_md5_ID().'"
+							name="perms['.$lFile->get_md5_ID().']"
 							type="radio"
 							value="666"'
 							.( $lFile->getPerms( 'octal' ) == 666 || $lFile->getPerms( 'octal' ) == 777 ?
 									'checked="checked"' :
 									'' ).' />
-						<label for="perms_readwrite_'.$lFile->getID().'">'.T_('Read and write').'</label>
+						<label for="perms_readwrite_'.$lFile->get_md5_ID().'">'.T_('Read and write').'</label>
 						<br />';
 					}
 				}
@@ -777,23 +776,23 @@ switch( $Fileman->fm_mode )
 				if( $newFile->exists() )
 				{	// The file already exists in the target location!
 					// TODO: Rename/Overwriting
-					$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->getName() );
+					$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->get_name() );
 					// Abort upload for this file:
 					continue;
 				}
 
 				// Attempt to move the uploaded file to the requested target location:
-				if( !move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->getPath() ) )
+				if( !move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->get_full_path() ) )
 				{
 					$failedFiles[$lKey] = T_('An unknown error occurred when moving the uploaded file on the server.');
 					// Abort upload for this file:
 					continue;
 				}
 
-				$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->getName() ), 'note' );
+				$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() ), 'note' );
 
-				// Refreshes (and inits) information about the file.
-				$newFile->refresh();
+				// Refreshes file properties (type, size, perms...)
+				$newFile->load_properties();
 
 				// Store extra info about the file into File Object:
 				if( isset( $uploadfile_title[$lKey] ) )
@@ -894,7 +893,7 @@ switch( $Fileman->fm_mode )
 
 				if( !$LogCmr->count( 'error' ) )
 				{ // no errors, safe for action
-					$oldpath = $SourceFile->getPath();
+					$oldpath = $SourceFile->get_full_path();
 
 					if( $Fileman->copyFileToFile( $SourceFile, $TargetFile ) )
 					{
@@ -902,44 +901,44 @@ switch( $Fileman->fm_mode )
 						{ // move/rename
 							if( $Fileman->unlink( $SourceFile ) )
 							{
-								if( $SourceFile->getDir() == $Fileman->cwd )
+								if( $SourceFile->get_dir() == $Fileman->cwd )
 								{ // successfully renamed
 									$Fileman->Messages->add( sprintf( T_('Renamed &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																										basename($oldpath),
-																										$TargetFile->getName() ), 'note' );
+																										$TargetFile->get_name() ), 'note' );
 								}
 								else
 								{ // successfully moved
 									$Fileman->Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																										$oldpath,
-																										$TargetFile->getName() ), 'note' );
+																										$TargetFile->get_name() ), 'note' );
 
 								}
 							}
 							else
 							{
 								$LogCmr->add( sprintf( T_('Could not remove &laquo;%s&raquo;, but the file has been copied to &laquo;%s&raquo;.'),
-																			($SourceFile->getDir() == $Fileman->cwd ?
+																			($SourceFile->get_dir() == $Fileman->cwd ?
 																				basename($oldpath) :
 																				$oldpath ),
-																			$TargetFile->getName() ) );
+																			$TargetFile->get_name() ) );
 							}
 						}
 						else
 						{ // copy only
 							$Fileman->Messages->add( sprintf(
 								T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-								( $SourceFile->getDir() == $Fileman->cwd ?
-										$SourceFile->getName() :
-										$SourceFile->getPath() ),
-								$TargetFile->getName() ), 'note' );
+								( $SourceFile->get_dir() == $Fileman->cwd ?
+										$SourceFile->get_name() :
+										$SourceFile->get_full_path() ),
+								$TargetFile->get_name() ), 'note' );
 						}
 					}
 					else
 					{
 						$LogCmr->add( sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																		$SourceFile->getPath(),
-																		$TargetFile->getPath() ), 'error' );
+																		$SourceFile->get_full_path(),
+																		$TargetFile->get_full_path() ), 'error' );
 					}
 				}
 			}
@@ -1177,8 +1176,8 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
- * Revision 1.96  2005/04/26 18:19:24  fplanque
- * no message
+ * Revision 1.97  2005/04/27 19:05:44  fplanque
+ * normalizing, cleanup, documentaion
  *
  * Revision 1.94  2005/04/21 18:01:29  fplanque
  * CSS styles refactoring

@@ -24,6 +24,16 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * NT_(-)
+ *
+ * No Translation
+ * Nevertheless, the string will be extracted by the gettext tools
+ */
+function NT_( $string )
+{
+	return $string;
+}
 
 /**
  * Display debugging informations?
@@ -486,17 +496,58 @@ $rbl_config = array(
 
 
 
+/**
+ * These are the filetypes.
+ *
+ * The extension is a regular expression that must match the end of the file.
+ */
+$fm_filetypes = array(
+	'\.ai'                => NT_('Adobe Illustrator'),
+	'\.bmp'               => NT_('BMP image'),
+	'\.bz'                => NT_('BZ archive'),
+	'\.c'                 => NT_('C source'),
+	'\.cgi'               => NT_('CGI file'),
+	'\.(conf|inf)'        => NT_('Config file'),
+	'\.cpp'               => NT_('C++ source'),
+	'\.css'               => NT_('Stylesheet'),
+	'\.doc'               => NT_('MS Word document'),
+	'\.exe'               => NT_('Windows executable'),
+	'\.gif'               => NT_('GIF image'),
+	'\.gz'                => NT_('GZ archive'),
+	'\.h'                 => NT_('Header file'),
+	'\.hlp'               => NT_('Help file'),
+	'\.ht(access|passwd)' => NT_('Apache conf.'),
+	'\.html?'             => NT_('HyperText Markup'),
+	'\.htt'               => NT_('Windows access'),
+	'\.inc'               => NT_('Include file'),
+	'\.ini'               => NT_('Settings file'),
+	'\.jpe?g'             => NT_('JPEG image'),
+	'\.js'                => NT_('JavaScript'),
+	'\.log'               => NT_('Log file'),
+	'\.mdb'               => NT_('Access database'),
+	'\.midi'              => NT_('MIDI file'),
+	'\.p(hp[345]?|html)'  => NT_('PHP script'),
+	'\.pl'                => NT_('Perl script'),
+	'\.png'               => NT_('PNG image'),
+	'\.ppt'               => NT_('MS Powerpoint'),
+	'\.psd'               => NT_('Photoshop image'),
+	'\.ram?'              => NT_('RealMedia file'),
+	'\.rar'               => NT_('RAR Archive'),
+	'\.rtf'               => NT_('Rich Text Format'),
+	'\.sql'               => NT_('SQL query file'),
+	'\.s[tx]w'            => NT_('OpenOffice file'),
+	'\.te?xt'             => NT_('Text document'),
+	'\.tgz'               => NT_('TAR GZ archive'),
+	'\.vbs'               => NT_('MS VBscript'),
+	'\.wri'               => NT_('MS Write document'),
+	'\.xml'               => NT_('XML file'),
+	'\.zip'               => NT_('ZIP archive'),
+);
+
 
 // ----- CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
 $evonetsrv_host = 'b2evolution.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
-
-
-/**
- * Regular expression to match image filenames.
- * @global string Default: '/\.(jpe?g|gif|png|swf)$/i'
- */
-$regexp_images = '/\.(jpe?g|gif|png|swf)$/i';
 
 ?>

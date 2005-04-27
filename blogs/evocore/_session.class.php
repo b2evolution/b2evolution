@@ -146,17 +146,6 @@ class Session
 
 
 	/**
-	 *
-	 *
-	 * @return integer
-	 */
-	function getID()
-	{
-		return $this->ID;
-	}
-
-
-	/**
 	 * Is the session validated by a key?
 	 *
 	 * @return boolean

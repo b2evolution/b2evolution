@@ -467,7 +467,7 @@ class Hit
 		$sql = 'INSERT INTO T_hitlog( hit_sess_ID, hit_datetime, hit_uri,
 																	hit_agnt_ID, hit_referer_type, hit_referer,
 																	hit_referer_dom_ID, hit_blog_ID, hit_remote_addr )
-						VALUES( "'.$Session->getID().'", FROM_UNIXTIME('.$this->localtimenow.'), "'.$DB->escape($ReqURI).'",
+						VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$this->localtimenow.'), "'.$DB->escape($ReqURI).'",
 										"'.$this->agentID.'", "'.$this->refererType.'", "'.$DB->escape($this->referer).'",
 										"'.$this->refererDomainID.'", "'.$Blog->ID.'", "'.$DB->escape( $this->IP ).'"
 									)';

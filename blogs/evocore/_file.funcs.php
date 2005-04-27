@@ -459,20 +459,6 @@ function str2path( $path )
 }
 
 
-/**
- * Check a filename if it has an image extension.
- *
- * @uses $regexp_images
- * @param string the filename to check
- * @return boolean true if the filename indicates an image, false otherwise
- */
-function isImage( $filename )
-{
-	global $regexp_images;
-
-	return (boolean)preg_match( $regexp_images, $filename );
-}
-
 
 /**
  * Check for valid filename (no path allowed).
@@ -490,6 +476,9 @@ function isFilename( $filename )
 
 /*
  * $Log$
+ * Revision 1.13  2005/04/27 19:05:46  fplanque
+ * normalizing, cleanup, documentaion
+ *
  * Revision 1.12  2005/04/19 16:23:02  fplanque
  * cleanup
  * added FileCache

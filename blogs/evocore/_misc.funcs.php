@@ -838,17 +838,17 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		if( isset($_POST[$var]) )
 		{
 			$$var = remove_magic_quotes( $_POST[$var] );
-			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by POST', 'params' );
+			// $Debuglog->add( 'param(-): '.$var.'='.$$var.' set by POST', 'params' );
 		}
 		elseif( isset($_GET[$var]) )
 		{
 			$$var = remove_magic_quotes($_GET[$var]);
-			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by GET', 'params' );
+			// $Debuglog->add( 'param(-): '.$var.'='.$$var.' set by GET', 'params' );
 		}
 		elseif( isset($_COOKIE[$var]))
 		{
 			$$var = remove_magic_quotes($_COOKIE[$var]);
-			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by COOKIE', 'params' );
+			// $Debuglog->add( 'param(-): '.$var.'='.$$var.' set by COOKIE', 'params' );
 		}
 		elseif( $default === true )
 		{
@@ -857,7 +857,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		elseif( $forceset )
 		{
 			$$var = $default;
-			$Debuglog->add( 'param(-): '.$var.'='.$$var.' set by default', 'params' );
+			// $Debuglog->add( 'param(-): '.$var.'='.$$var.' set by default', 'params' );
 		}
 		else
 		{ // param not found! don't set the variable.
@@ -869,7 +869,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 	{ // Variable was already set but we need to remove the auto quotes
 		$$var = remove_magic_quotes($$var);
 
-		$Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($$var, true).']!', 'params' );
+		// $Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($$var, true).']!', 'params' );
 	}
 
 	// type will be forced even if it was set before and not overriden
@@ -913,7 +913,7 @@ function memorize_param( $var, $type, $default, $value = NULL )
 		$global_param_list = array();
 	}
 
-	$Debuglog->add( "memorize_param() 'var' => $var, 'type' => $type, 'default' => $default"
+	$Debuglog->add( "memorize_param: $var $type default=$default"
 									.(is_null($value) ? '' : " value=$value"), 'params');
 	$global_param_list[$var] = array( 'type' => $type, 'default' => (($default===true) ? NULL : $default) );
 
@@ -1085,7 +1085,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 	{
 		$url = url_add_param( $url, implode( '&amp;', $params ) );
 	}
-	$Debuglog->add( 'regenerate_url(): ['.$url.']', 'params' );
+	// $Debuglog->add( 'regenerate_url(): ['.$url.']', 'params' );
 	return $url;
 }
 
@@ -1640,7 +1640,7 @@ function getIcon( $for, $what = 'imgtag', $params = NULL )
 			}
 			elseif( is_a( $for, 'file' ) )
 			{ // extension as alt-tag for file icons
-				if( $for->isDir() )
+				if( $for->is_dir() )
 				{
 					$r .= /* TRANS: short for '<directory>' */ T_('&lt;dir&gt;');
 				}
@@ -1881,6 +1881,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.65  2005/04/27 19:05:46  fplanque
+ * normalizing, cleanup, documentaion
+ *
  * Revision 1.64  2005/04/26 18:19:25  fplanque
  * no message
  *

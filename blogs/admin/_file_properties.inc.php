@@ -55,7 +55,7 @@ $Form->begin_form( 'fform', T_('File properties') );
 	$Form->hidden( 'action', 'update_properties' );
 
 	$Form->fieldset( T_('Properties') );
-		$Form->info( T_('Filename'), $selectedFile->getName(), T_('This is the name of the file on the server hard drive.') );
+		$Form->info( T_('Filename'), $selectedFile->get_name(), T_('This is the name of the file on the server hard drive.') );
 		$Form->info( T_('Type'), getIcon( $selectedFile ).' '.$selectedFile->getType() );
 	$Form->fieldset_end();
 
@@ -73,6 +73,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.4  2005/04/27 19:05:43  fplanque
+ * normalizing, cleanup, documentaion
+ *
  * Revision 1.3  2005/04/15 18:02:58  fplanque
  * finished implementation of properties/meta data editor
  * started implementation of files to items linking

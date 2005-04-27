@@ -47,7 +47,7 @@ class FileTestCase extends FilemanUnitTestCase
 
 		$this->assertTrue( $File->exists(), 'File exists' );
 
-		$this->assertTrue( $File->getSize() == 4, 'File size is correct' );
+		$this->assertTrue( $File->get_size() == 4, 'File size is correct' );
 	}
 
 
@@ -79,11 +79,11 @@ class FileTestCase extends FilemanUnitTestCase
 	function testIsDir()
 	{
 		$Dir = new File( basename(TMPDIR), dirname(TMPDIR) );
-		$this->assertTrue( $Dir->isDir(), 'Dir is dir.' );
+		$this->assertTrue( $Dir->is_dir(), 'Dir is dir.' );
 
 		$this->tempName = tempnam( 'temp', 'TMP' );
 		$File = new File( basename( $this->tempName ), TMPDIR );
-		$this->assertFalse( $File->isDir(), 'File is no dir.' );
+		$this->assertFalse( $File->is_dir(), 'File is no dir.' );
 	}
 
 

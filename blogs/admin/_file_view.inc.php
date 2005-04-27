@@ -48,7 +48,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo $selectedFile->getName().' ('.T_('Preview').')'; ?></title>
+	<title><?php echo $selectedFile->get_name().' ('.T_('Preview').')'; ?></title>
 	<link href="skins/legacy/rsc/css/variation.css" rel="stylesheet" type="text/css" title="Variation" />
 	<link href="skins/legacy/rsc/css/desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
 	<link href="skins/legacy/rsc/css/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
@@ -66,7 +66,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			title="<?php echo T_('Click anywhere in this window to go back or close it if no go-back history available.') ?>">
 		*/
 
-	if( $selectedFile->isImage() )
+	if( $selectedFile->is_image() )
 	{ // --------------------------------
 		// We are displaying an image file:
 		// --------------------------------
@@ -89,16 +89,16 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			echo '<div class="subline">';
 			echo '<p><strong>'.$selectedFile->dget( 'title' ).'</strong></p>';
 			echo '<p>'.$selectedFile->dget( 'desc' ).'</p>';
-			echo '<p>'.$selectedFile->getName().' &middot; ';
+			echo '<p>'.$selectedFile->get_name().' &middot; ';
 			echo $selectedFile->getImageSize().' &middot; ';
-			echo $selectedFile->getSizeNice().'</p>';
+			echo $selectedFile->get_sizeNice().'</p>';
 			echo '</div>';
 
 		}
 
 		echo '</div>';
 	}
-	elseif( ($buffer = @file( $selectedFile->getPath() )) !== false )
+	elseif( ($buffer = @file( $selectedFile->get_full_path() )) !== false )
 	{{{ // --------------------------------
 		// display raw file
 		// --------------------------------
@@ -109,7 +109,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		echo '<div class="fileheader">';
 
 		echo '<p>';
-		echo T_('File').': <strong>'.$selectedFile->getName().'</strong>';
+		echo T_('File').': <strong>'.$selectedFile->get_name().'</strong>';
 		echo ' &middot; ';
 		echo T_('Title').': <strong>'.$selectedFile->dget( 'title' ).'</strong>';
 		echo '</p>';

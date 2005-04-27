@@ -78,32 +78,32 @@ $Form->begin_form( 'fform', T_('Copy / Move / Rename') );
 
 	while( $lSourceFile = & $Fileman->SourceList->getNextFile() )
 	{
-		if( $sourcesInSameDir && $lSourceFile->getDir() != $Fileman->cwd )
+		if( $sourcesInSameDir && $lSourceFile->get_dir() != $Fileman->cwd )
 		{
 			$sourcesInSameDir = false;
 		}
 		?>
 
 		<fieldset>
-			<legend><?php echo T_('Source').': '.$lSourceFile->getPath(); ?></legend>
+			<legend><?php echo T_('Source').': '.$lSourceFile->get_full_path(); ?></legend>
 
 			<?php
-			if( isset( $cmr_overwrite[$lSourceFile->getID()] )
-					&& $cmr_overwrite[$lSourceFile->getID()] === 'ask' )
+			if( isset( $cmr_overwrite[$lSourceFile->get_md5_ID()] )
+					&& $cmr_overwrite[$lSourceFile->get_md5_ID()] === 'ask' )
 			{
 				form_checkbox( 'overwrite', 0, '<span class="error">'.T_('Overwrite existing file').'</span>',
 												sprintf( T_('The existing file &laquo;%s&raquo; will be replaced with this file.'),
-																	$TargetFile->getPath() ) );
+																	$TargetFile->get_full_path() ) );
 			}
 			?>
 
 			<div class="label">
-				<label for="cmr_keepsource_<?php $lSourceFile->getID(); ?>"><?php echo T_('Keep source file') ?>:</label>
+				<label for="cmr_keepsource_<?php $lSourceFile->get_md5_ID(); ?>"><?php echo T_('Keep source file') ?>:</label>
 			</div>
 			<div class="input">
 				<input class="checkbox" type="checkbox" value="1"
-					name="cmr_keepsource[<?php echo $lSourceFile->getID(); ?>]"
-					id="cmr_keepsource_<?php $lSourceFile->getID(); ?>"
+					name="cmr_keepsource[<?php echo $lSourceFile->get_md5_ID(); ?>]"
+					id="cmr_keepsource_<?php $lSourceFile->get_md5_ID(); ?>"
 					onclick="setCmrSubmitButtonValue( this.form );"<?php
 					if( $cmr_keepsource )
 					{
@@ -115,14 +115,14 @@ $Form->begin_form( 'fform', T_('Copy / Move / Rename') );
 
 
 			<div class="label">
-				<label for="cmr_newname_<?php $lSourceFile->getID(); ?>">New name:</label>
+				<label for="cmr_newname_<?php $lSourceFile->get_md5_ID(); ?>">New name:</label>
 			</div>
 			<div class="input">
-				<input type="text" name="cmr_newname[<?php $lSourceFile->getID(); ?>]"
-					id="cmr_newname_<?php $lSourceFile->getID(); ?>" value="<?php
-					echo isset( $cmr_newname[$lSourceFile->getID()] ) ?
-									$cmr_newname[$lSourceFile->getID()] :
-									$lSourceFile->getName() ?>" />
+				<input type="text" name="cmr_newname[<?php $lSourceFile->get_md5_ID(); ?>]"
+					id="cmr_newname_<?php $lSourceFile->get_md5_ID(); ?>" value="<?php
+					echo isset( $cmr_newname[$lSourceFile->get_md5_ID()] ) ?
+									$cmr_newname[$lSourceFile->get_md5_ID()] :
+									$lSourceFile->get_name() ?>" />
 			</div>
 
 		</fieldset>
@@ -171,6 +171,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.3  2005/04/27 19:05:44  fplanque
+ * normalizing, cleanup, documentaion
+ *
  * Revision 1.2  2005/04/14 19:57:52  fplanque
  * filemanager refactoring & cleanup
  * started implementation of properties/meta data editor

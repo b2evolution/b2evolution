@@ -282,20 +282,20 @@ class Filelist
 
 
 		$this->_entries[$this->count_entries] =& $File;
-		$this->_indexID[$File->getID()] = $this->count_entries;
-		$this->_indexPath[$File->getPath()] = $this->count_entries;
+		$this->_indexID[$File->get_md5_ID()] = $this->count_entries;
+		$this->_indexPath[$File->get_full_path()] = $this->count_entries;
 		// add file to the end:
 		$this->_indexOrder[$this->count_entries] = $this->count_entries;
 
 		$this->count_entries++;
 
 
-		if( $this->recursivedirsize && $File->isDir() )
+		if( $this->recursivedirsize && $File->is_dir() )
 		{ // won't be done in the File constructor
-			$File->setSize( get_dirsize_recursive( $File->getPath() ) );
+			$File->setSize( get_dirsize_recursive( $File->get_full_path() ) );
 		}
 
-		if( $File->isDir() )
+		if( $File->is_dir() )
 		{
 			$this->count_dirs++;
 		}
@@ -303,7 +303,7 @@ class Filelist
 		{
 			$this->count_files++;
 		}
-		$this->count_bytes += $File->getSize();
+		$this->count_bytes += $File->get_size();
 
 		return true;
 	}
@@ -393,21 +393,21 @@ class Filelist
 			case 'size':
 				if( $this->recursivedirsize )
 				{
-					$r = $FileA->getSize() - $FileB->getSize();
+					$r = $FileA->get_size() - $FileB->get_size();
 				}
 				else
 				{
-					$r = $FileA->isDir() && $FileB->isDir() ?
-									strcasecmp( $FileA->getName(), $FileB->getName() ) :
-									( $FileA->getSize() - $FileB->getSize() );
+					$r = $FileA->is_dir() && $FileB->is_dir() ?
+									strcasecmp( $FileA->get_name(), $FileB->get_name() ) :
+									( $FileA->get_size() - $FileB->get_size() );
 				}
 				break;
 
 			case 'path': // group by dir
-				$r = strcasecmp( $FileA->getDir(), $FileB->getDir() );
+				$r = strcasecmp( $FileA->get_dir(), $FileB->get_dir() );
 				if( $r == 0 )
 				{
-					$r = strcasecmp( $FileA->getName(), $FileB->getName() );
+					$r = strcasecmp( $FileA->get_name(), $FileB->get_name() );
 				}
 				break;
 
@@ -422,10 +422,10 @@ class Filelist
 
 			default:
 			case 'name':
-				$r = strcasecmp( $FileA->getName(), $FileB->getName() );
+				$r = strcasecmp( $FileA->get_name(), $FileB->get_name() );
 				if( $r == 0 )
 				{ // same name: look at path
-					$r = strcasecmp( $FileA->getDir(), $FileB->getDir() );
+					$r = strcasecmp( $FileA->get_dir(), $FileB->get_dir() );
 				}
 				break;
 		}
@@ -438,11 +438,11 @@ class Filelist
 
 		if( !$this->dirsnotattop )
 		{
-			if( $FileA->isDir() && !$FileB->isDir() )
+			if( $FileA->is_dir() && !$FileB->is_dir() )
 			{
 				$r = -1;
 			}
-			elseif( $FileB->isDir() && !$FileA->isDir() )
+			elseif( $FileB->is_dir() && !$FileA->is_dir() )
 			{
 				$r = 1;
 			}
@@ -504,7 +504,7 @@ class Filelist
 	 */
 	function holdsFile( $File )
 	{
-		return isset( $this->_indexID[ $File->getID() ] );
+		return isset( $this->_indexID[ $File->get_md5_ID() ] );
 	}
 
 
@@ -615,11 +615,11 @@ class Filelist
 
 		if( $type != '' )
 		{
-			if( $type == 'dir' && !$this->_entries[ $index ]->isDir() )
+			if( $type == 'dir' && !$this->_entries[ $index ]->is_dir() )
 			{ // we want a dir
 				return $this->getNextFile( 'dir' );
 			}
-			elseif( $type == 'file' && $this->_entries[ $index ]->isDir() )
+			elseif( $type == 'file' && $this->_entries[ $index ]->is_dir() )
 			{ // we want a file
 				return $this->getNextFile( 'file' );
 			}
@@ -701,12 +701,12 @@ class Filelist
 		{
 			$rootDir = $this->listpath;
 		}
-		$path = substr( $File->getDir(), strlen($rootDir) );
+		$path = substr( $File->get_dir(), strlen($rootDir) );
 
 		if( $withName )
 		{
-			$path .= $File->getName();
-			if( $File->isDir() )
+			$path .= $File->get_name();
+			if( $File->is_dir() )
 			{
 				$path .= '/';
 			}
@@ -723,10 +723,10 @@ class Filelist
 	 */
 	function removeFromList( &$File )
 	{
-		if( isset( $this->_indexID[ $File->getID() ] ) )
+		if( isset( $this->_indexID[ $File->get_md5_ID() ] ) )
 		{ // unset indexes and entry
-			$index = $this->_indexPath[ $File->getPath() ];
-			unset( $this->_indexPath[ $File->getPath() ] );
+			$index = $this->_indexPath[ $File->get_full_path() ];
+			unset( $this->_indexPath[ $File->get_full_path() ] );
 
 			foreach( $this->_indexOrder as $lKey => $lValue )
 			{
@@ -739,8 +739,8 @@ class Filelist
 					unset( $this->_indexOrder[$lKey - 1] );
 				}
 			}
-			unset( $this->_entries[ $this->_indexID[ $File->getID() ] ] );
-			unset( $this->_indexID[ $File->getID() ] );
+			unset( $this->_entries[ $this->_indexID[ $File->get_md5_ID() ] ] );
+			unset( $this->_indexID[ $File->get_md5_ID() ] );
 
 			return true;
 		}
@@ -805,14 +805,14 @@ class Filelist
 
 		foreach( $this->_entries as $loop_File )
 		{	// For each file:
-			// echo $loop_File->getPath();
+			// echo $loop_File->get_full_path();
 
 			if( $loop_File->meta != 'unknown' )
 			{ // We have already loading meta data:
 				continue;
 			}
 
-			$to_load[] = $DB->quote( $loop_File->getPath() );
+			$to_load[] = $DB->quote( $loop_File->get_full_path() );
 		}
 
 		if( ! count( $to_load ) )
@@ -846,8 +846,8 @@ class Filelist
 
 /*
  * $Log$
- * Revision 1.22  2005/04/26 18:19:25  fplanque
- * no message
+ * Revision 1.23  2005/04/27 19:05:46  fplanque
+ * normalizing, cleanup, documentaion
  *
  * Revision 1.21  2005/04/19 16:23:02  fplanque
  * cleanup

@@ -274,7 +274,7 @@ while( $lFile =& $Fileman->getNextFile() )
 	 */
 	echo '<td class="checkbox firstcol">';
 	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
-				name="fm_selected[]" value="'.$lFile->getID().'" id="cb_filename_'.$countFiles.'"
+				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"
 				onclick="this.click();"';
 	if( $checkall || $Fileman->isSelected( $lFile ) )
 	{
@@ -288,7 +288,7 @@ while( $lFile =& $Fileman->getNextFile() )
 	 */
 	echo '<td class="icon">';
 	echo '<a href="';
-	if( $lFile->isDir() )
+	if( $lFile->is_dir() )
 	{
 		echo $Fileman->getLinkFile( $lFile ).'" title="'.T_('Change into this directory');
 	}
@@ -316,7 +316,7 @@ while( $lFile =& $Fileman->getNextFile() )
 	/*
 	 * Invalid filename warning:
 	 */
-	if( !isFilename( $lFile->getName() ) )
+	if( !isFilename( $lFile->get_name() ) )
 	{ // TODO: Warning icon with hint
 		echo getIcon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => T_('The filename appears to be invalid and may cause problems.') ) );
 	}
@@ -340,7 +340,7 @@ while( $lFile =& $Fileman->getNextFile() )
 	}
 	else
 	{	// Display file short name
-		echo $lFile->getName();
+		echo $lFile->get_name();
 	}
 	echo '</a>';
 
@@ -385,7 +385,7 @@ while( $lFile =& $Fileman->getNextFile() )
 	/*
 	 * File size:
 	 */
-	echo '<td class="size">'.$lFile->getSizeNice().'</td>';
+	echo '<td class="size">'.$lFile->get_sizeNice().'</td>';
 
 	/*
 	 * File time stamp:
@@ -735,8 +735,8 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
- * Revision 1.24  2005/04/26 18:19:24  fplanque
- * no message
+ * Revision 1.25  2005/04/27 19:05:44  fplanque
+ * normalizing, cleanup, documentaion
  *
  * Revision 1.22  2005/04/19 16:23:00  fplanque
  * cleanup

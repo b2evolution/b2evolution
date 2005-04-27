@@ -171,18 +171,6 @@ function TS_( $string, $req_locale = '' )
 
 
 /**
- * NT_(-)
- *
- * No Translation
- * Nevertheless, the string will be extracted by the gettext tools
- */
-function NT_( $string )
-{
-	return $string;
-}
-
-
-/**
  * Temporarily switch to another locale
  *
  * Calls can be nested, see {@link locale_restore_previous}.
@@ -711,6 +699,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.12  2005/04/27 19:05:46  fplanque
+ * normalizing, cleanup, documentaion
+ *
  * Revision 1.11  2005/03/15 19:19:47  fplanque
  * minor, moved/centralized some includes
  *

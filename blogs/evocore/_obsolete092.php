@@ -49,6 +49,7 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
+
 // _user.funcs.php {{{
 
 /**
@@ -1521,6 +1522,23 @@ function msgform_title( $prefix = ' ', $display = 'htmlbody' )
 	}
 }
 
+
+
+/**
+ * Check a filename if it has an image extension.
+ *
+ * @uses $regexp_images
+ * @param string the filename to check
+ * @return boolean true if the filename indicates an image, false otherwise
+ */
+function isImage( $filename )
+{
+	global $regexp_images;
+
+	return (boolean)preg_match( $regexp_images, $filename );
+}
+
+
 // globals {{{
 
 /**
@@ -1557,10 +1575,21 @@ $tableusersettings = $tableprefix.'usersettings';
 /**#@-*/
 
 
+/**
+ * Regular expression to match image filenames.
+ * @global string Default: '/\.(jpe?g|gif|png|swf)$/i'
+ */
+$regexp_images = '/\.(jpe?g|gif|png|swf)$/i';
+
+
+
 // globals }}}
 
 /*
  * $Log$
+ * Revision 1.11  2005/04/27 19:05:47  fplanque
+ * normalizing, cleanup, documentaion
+ *
  * Revision 1.10  2005/03/09 14:54:26  fplanque
  * refactored *_title() galore to requested_title()
  *

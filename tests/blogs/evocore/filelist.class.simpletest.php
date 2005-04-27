@@ -49,7 +49,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 		$File =& $this->Filelist->getFileByPath( TMPDIR.'a' );
 		$this->assertIsA( $File, 'file', 'We got a File.' );
 
-		$this->assertEqual( $File->getName(), 'a', 'File has the same name.' );
+		$this->assertEqual( $File->get_name(), 'a', 'File has the same name.' );
 	}
 
 
@@ -59,7 +59,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 	function testFileReference()
 	{
 		$File = new File( 'a', TMPDIR );
-		$id = $File->getID();
+		$id = $File->get_md5_ID();
 
 		$r = $this->Filelist->addFile( $File );
 		$this->assertEqual( $r, true, 'File added.' );
@@ -139,7 +139,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 
 
 		// Make $FileA a directory
-		$FileA->_isDir = true;
+		$FileA->_is_dir = true;
 
 		// descending, dirs at top:
 		$this->Filelist->sort( 'name', false, true );

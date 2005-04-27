@@ -499,7 +499,7 @@ class FileManager extends Filelist
 		$url = $this->getCurUrl( array( 'fm_mode' => 'file_cmr',
 																		'fm_sources' => false,
 																		'cmr_keepsource' => (int)($mode == 'copy') ) );
-		$url .= '&amp;fm_sources[]='.urlencode( $this->curFile->getPath() );
+		$url .= '&amp;fm_sources[]='.urlencode( $this->curFile->get_full_path() );
 
 		echo '<a href="'.$url
 					#.'" target="fileman_copymoverename" onclick="'
@@ -605,7 +605,7 @@ class FileManager extends Filelist
 			/* No JS: we need to check DB integrity!
 				.'" onclick="if( confirm(\''
 				.sprintf( TS_('Do you really want to delete &laquo;%s&raquo;?'),
-				format_to_output( $File->getName(), 'formvalue' ) ).'\') )
+				format_to_output( $File->get_name(), 'formvalue' ) ).'\') )
 				{
 					this.href += \'&amp;confirmed=1\';
 					return true;
@@ -730,7 +730,7 @@ class FileManager extends Filelist
 		while( list($lKey, $lFile) = each($this->_selectedFiles->_entries) )
 		{
 			$r .= '<input type="hidden" name="fm_selected[]" value="'
-						.$this->_selectedFiles->_entries[$lKey]->getID()."\" />\n";
+						.$this->_selectedFiles->_entries[$lKey]->get_md5_ID()."\" />\n";
 		}
 
 		return $r;
@@ -880,7 +880,7 @@ class FileManager extends Filelist
 	 */
 	function getLinkFile( & $File, $action = 'default' )
 	{
-		if( $File->isDir() && ($action == 'default') )
+		if( $File->is_dir() && ($action == 'default') )
 		{	// Link to open this directory:
 			if( !isset( $File->cache['linkFile_1'] ) )
 			{
@@ -892,7 +892,7 @@ class FileManager extends Filelist
 		{	// Link to perform given $action on directory or file:
 			if( !isset( $File->cache['linkFile_2'] ) )
 			{
-				$File->cache['linkFile_2'] = $this->getCurUrl().'&amp;fm_selected[]='.$File->getID();
+				$File->cache['linkFile_2'] = $this->getCurUrl().'&amp;fm_selected[]='.$File->get_md5_ID();
 			}
 			return $File->cache['linkFile_2'].'&amp;action='.$action;
 		}
@@ -907,7 +907,7 @@ class FileManager extends Filelist
 
 	function getLinkFileEdit()
 	{
-		if( $this->curFile->isDir() )
+		if( $this->curFile->is_dir() )
 		{
 			return false;
 		}
@@ -1047,7 +1047,7 @@ class FileManager extends Filelist
 
 			while( $lFile =& $Nodelist->getNextFile( 'dir' ) )
 			{
-				$rSub = $this->getDirectoryTreeRadio( $rootID, $lFile->getPath(), $rootSubpath.$Nodelist->getFileSubpath( $lFile ) );
+				$rSub = $this->getDirectoryTreeRadio( $rootID, $lFile->get_full_path(), $rootSubpath.$Nodelist->getFileSubpath( $lFile ) );
 
 				if( $rSub['opened'] )
 				{
@@ -1355,34 +1355,34 @@ class FileManager extends Filelist
 
 		$unlinked = true;
 
-		if( $File->isDir() && $delsubdirs )
+		if( $File->is_dir() && $delsubdirs )
 		{
-			if( $unlinked = deldir_recursive( $File->getPath() ) )
+			if( $unlinked = deldir_recursive( $File->get_full_path() ) )
 			{
-				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'), $File->getName() ),
+				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'), $File->get_name() ),
 															'note' );
 			}
 			else
 			{
-				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'), $File->getName() ) );
+				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'), $File->get_name() ) );
 			}
 			$this->load(); // Reload!
 		}
 		elseif( $unlinked = $File->unlink() )
 		{ // remove from list
-			$this->Messages->add( sprintf( ( $File->isDir() ?
+			$this->Messages->add( sprintf( ( $File->is_dir() ?
 																					T_('The directory &laquo;%s&raquo; has been deleted.') :
 																					T_('The file &laquo;%s&raquo; has been deleted.') ),
-																			$File->getName() ),
+																			$File->get_name() ),
 														'note' );
 			$this->removeFromList( $File );
 		}
 		else
 		{
-			$this->Messages->add( sprintf( ( $File->isDir() ?
+			$this->Messages->add( sprintf( ( $File->is_dir() ?
 																				T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') :
 																				T_('Could not delete the file &laquo;%s&raquo;.') ),
-																				$File->getName() ) );
+																				$File->get_name() ) );
 		}
 
 		return $unlinked;
@@ -1404,9 +1404,10 @@ class FileManager extends Filelist
 		}
 		else
 		{
-			if( $r = copy( $SourceFile->getPath(), $TargetFile->getPath() ) )
+			if( $r = copy( $SourceFile->get_full_path(), $TargetFile->get_full_path() ) )
 			{
-				$TargetFile->refresh();
+				// Initializes file properties (type, size, perms...)
+				$TargetFile->load_properties();
 				if( $this->holdsFile( $TargetFile ) === false )
 				{ // File not in filelist (expected)
 					$this->addFile( $TargetFile );
@@ -1419,8 +1420,8 @@ class FileManager extends Filelist
 
 /*
  * $Log$
- * Revision 1.33  2005/04/26 18:19:25  fplanque
- * no message
+ * Revision 1.34  2005/04/27 19:05:46  fplanque
+ * normalizing, cleanup, documentaion
  *
  * Revision 1.32  2005/04/19 16:23:02  fplanque
  * cleanup
