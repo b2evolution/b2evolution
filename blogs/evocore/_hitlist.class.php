@@ -71,7 +71,6 @@ class Hitlist
 	 * Delete all hits from a certain date
 	 *
 	 * @static
-	 *
 	 * @param int unix timestamp to delete hits for
 	 * @return mixed Return value of {@link DB::query()}
 	 */
@@ -91,7 +90,6 @@ class Hitlist
 	 * Change type for a hit
 	 *
 	 * @static
-	 *
 	 * @param int ID to change
 	 * @param string new type, must be valid ENUM for hit_referer_type field
 	 * @return mixed Return value of {@link DB::query()}

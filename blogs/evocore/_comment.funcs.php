@@ -54,7 +54,7 @@ require_once dirname(__FILE__).'/_comment.class.php';
  *
  * @todo check this in a multiblog page...
  *
- * @param
+ * @param integer
  * @param string what to count
  */
 function generic_ctp_number( $post_id, $mode = 'comments' )
@@ -321,6 +321,9 @@ function comment_author_url_basedomain( $disp = true )
 
 /*
  * $Log$
+ * Revision 1.11  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.10  2005/03/14 20:22:19  fplanque
  * refactoring, some cacheing optimization
  *

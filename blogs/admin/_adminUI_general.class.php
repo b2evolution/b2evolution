@@ -51,6 +51,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * Admin skins should derive from this class and override {@link getMenuTemplate()}
  * for example.
  *
+ * @package admin
  * @todo CODE DOCUMENTATION!!!
  */
 class AdminUI_general
@@ -116,8 +117,6 @@ class AdminUI_general
 
 	/**
 	 * Constructor.
-	 *
-	 * @return
 	 */
 	function AdminUI()
 	{
@@ -159,7 +158,7 @@ class AdminUI_general
 	/**
 	 * Get the title of the page.
 	 *
-	 * @return
+	 * @return string
 	 */
 	function getTitle( $reversedDefault = false )
 	{
@@ -190,7 +189,7 @@ class AdminUI_general
 	/**
 	 * Get the title for the titlearea (<h1>). Falls back to {@link getTitle()}.
 	 *
-	 * @return
+	 * @return string
 	 */
 	function getTitleForTitlearea()
 	{
@@ -298,11 +297,6 @@ class AdminUI_general
 	}
 
 
-	/**
-	 *
-	 *
-	 * @return
-	 */
 	function getPathProperty( $nr, $propertyByPreference )
 	{
 		if( $pathWithProps = $this->getPath( $nr, true ) )
@@ -757,8 +751,8 @@ class AdminUI_general
 							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending order')
 																	.'" height="12" width="11" />',
 							'basic_sort_off' => '',
-							'basic_sort_asc' => getIcon( 'ascending' ),
-							'basic_sort_desc' => getIcon( 'descending' ),
+							'basic_sort_asc' => get_icon( 'ascending' ),
+							'basic_sort_desc' => get_icon( 'descending' ),
 						'head_end' => "</tr></thead>\n\n",
 						'tfoot_start' => "<tfoot>\n",
 						'tfoot_end' => "</tfoot>\n\n",
@@ -1020,7 +1014,7 @@ class AdminUI_general
 	/**
 	 * GLOBAL HEADER - APP TITLE, LOGOUT, ETC.
 	 *
-	 * @return
+	 * @return string
 	 */
 	function getPageHead()
 	{
@@ -1074,6 +1068,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.21  2005/04/28 20:44:17  fplanque
+ * normalizing, doc
+ *
  * Revision 1.20  2005/04/21 18:01:28  fplanque
  * CSS styles refactoring
  *

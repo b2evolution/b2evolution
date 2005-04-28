@@ -983,7 +983,7 @@ class Item extends DataObject
 		$form_url = url_add_param( $form_url, 'post_id='.$this->ID );
 
 		if( $title == '#' ) $title = T_('Send email to post author');
-		if( $text == '#' ) $text = getIcon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
+		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
 
 		echo $before;
 		echo '<a href="'.$form_url.'" title="'.$title.'"';
@@ -1678,7 +1678,7 @@ class Item extends DataObject
 	 *
 	 * {@internal Item::insert(-)}}
 	 *
-	 * @TODO: cleanup the set() calls
+	 * @todo cleanup the set() calls
 	 */
 	function insert(
 		$author_user_ID,              // Author
@@ -1861,6 +1861,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.37  2005/04/19 16:23:02  fplanque
  * cleanup
  * added FileCache

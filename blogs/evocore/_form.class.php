@@ -205,7 +205,7 @@ class Form extends Widget
 	 *
 	 * @deprecated by ::fieldset but all functionality is not available
 	 * @author blueyed
-	 * @see {@link end_fieldset()}
+	 * @see end_fieldset()
 	 * @param string The fieldset legend
 	 * @param string fieldname of a checkbox that controls .disable of all
 	 *               elements in the fieldset group (checkbox and text only for now).

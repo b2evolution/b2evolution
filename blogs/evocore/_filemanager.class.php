@@ -31,10 +31,11 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * @package admin
+ * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER.
+ * @author blueyed: Daniel HAHLER
+ * @author fplanque: Francois PLANQUE
  *
  * @version $Id$
  *
@@ -53,7 +54,7 @@ require_once dirname(__FILE__).'/_filelist.class.php';
 /**
  * Extends {@link Filelist} and provides file management functionality.
  *
- * @package admin
+ * @package evocore
  */
 class FileManager extends Filelist
 {
@@ -331,8 +332,8 @@ class FileManager extends Filelist
 		}
 
 
-		$this->order = ( in_array( $order, array( 'name', 'path', 'type', 'size', 'lastmod', 'perms' ) ) ? $order : NULL );
-		$this->orderasc = ( $orderasc === NULL  ? NULL : (bool)$orderasc );
+		$this->_order = ( in_array( $order, array( 'name', 'path', 'type', 'size', 'lastmod', 'perms' ) ) ? $order : NULL );
+		$this->_order_asc = ( $orderasc === NULL  ? NULL : (bool)$orderasc );
 
 		$this->setFilter( $filterString, $filterIsRegexp );
 
@@ -412,8 +413,8 @@ class FileManager extends Filelist
 	 */
 	function sort()
 	{
-		parent::sort( $this->translate_order( $this->order ),
-									$this->translate_asc( $this->orderasc, $this->translate_order( $this->order ) ),
+		parent::sort( $this->translate_order( $this->_order ),
+									$this->translate_asc( $this->_order_asc, $this->translate_order( $this->_order ) ),
 									!$this->dirsnotattop );
 	}
 
@@ -429,7 +430,7 @@ class FileManager extends Filelist
 		}
 
 		echo '<a title="'.T_('Go to parent folder').'" href="'.$this->getCurUrl( array( 'path' => $this->path.'..' ) ).'">'
-						.getIcon( 'folder_parent' ).'</a>';
+						.get_icon( 'folder_parent' ).'</a>';
 	}
 
 
@@ -446,7 +447,7 @@ class FileManager extends Filelist
 		}
 		if( $link = $this->getLinkFileEdit() )
 		{
-			echo '<a title="'.T_('Edit the file').'" href="'.$link.'">'.getIcon( 'file_edit' ).'</a>';
+			echo '<a title="'.T_('Edit the file').'" href="'.$link.'">'.get_icon( 'file_edit' ).'</a>';
 		}
 	}
 
@@ -459,7 +460,7 @@ class FileManager extends Filelist
 		if( $link = $this->getLinkFileEditPerms() )
 		{
 			echo '<a title="'.T_('Edit permissions').'" href="'.$link.'">'
-						.$this->curFile->getPerms( $this->permlikelsl ? 'lsl' : '' ).'</a>';
+						.$this->curFile->get_perms( $this->permlikelsl ? 'lsl' : '' ).'</a>';
 		}
 	}
 
@@ -520,7 +521,7 @@ class FileManager extends Filelist
 			echo $linkTitle;
 		}
 
-		echo '">'.getIcon( 'file_'.$mode ).'</a>';
+		echo '">'.get_icon( 'file_'.$mode ).'</a>';
 	}
 
 
@@ -566,7 +567,7 @@ class FileManager extends Filelist
 		}
 
 		echo '<a title="'.T_('Edit properties...').'" href="'
-					.$this->getLinkFile( $File, 'edit_properties' ).'">'.getIcon( 'edit' ).'</a>';
+					.$this->getLinkFile( $File, 'edit_properties' ).'">'.get_icon( 'edit' ).'</a>';
 	}
 
 
@@ -583,7 +584,7 @@ class FileManager extends Filelist
 		}
 
 		echo '<a title="'.T_('Link this file!').'" href="'
-					.$this->getLinkFile( $File, 'link' ).'">'.getIcon( 'link' ).'</a>';
+					.$this->getLinkFile( $File, 'link' ).'">'.get_icon( 'link' ).'</a>';
 	}
 
 
@@ -601,7 +602,7 @@ class FileManager extends Filelist
 
 		if( $url = $this->getLinkFileDelete( $File ) )
 		{
-			echo '<a title="'.T_('Delete').'" href="'.$url.'">'.getIcon( 'file_delete' ).'</a>';
+			echo '<a title="'.T_('Delete').'" href="'.$url.'">'.get_icon( 'file_delete' ).'</a>';
 			/* No JS: we need to check DB integrity!
 				.'" onclick="if( confirm(\''
 				.sprintf( TS_('Do you really want to delete &laquo;%s&raquo;?'),
@@ -781,12 +782,12 @@ class FileManager extends Filelist
 	 */
 	function getLinkSort( $type, $atext )
 	{
-		$newAsc = $this->order == $type ? (1 - $this->isSortingAsc()) :  1;
+		$newAsc = $this->_order == $type ? (1 - $this->isSortingAsc()) :  1;
 
 		$r = '<a href="'.$this->getCurUrl( array( 'order' => $type,	'orderasc' => $newAsc ) ).'" title="'.T_('Change Order').'"';
 
 		// Sorting icon:
-		if( $this->translate_order($this->order) != $type )
+		if( $this->translate_order($this->_order) != $type )
 		{	// Not sorted on this column:
 			$r .= ' class="basic_sort_link">'.$this->result_params['basic_sort_off'];
 		}
@@ -839,9 +840,9 @@ class FileManager extends Filelist
 	/**
 	 * Get the image size of a file.
 	 *
-	 * @uses File::getImageSize()
+	 * @uses File::get_image_size()
 	 * @return false|mixed Either false (@see $getImageSizes} or the result
-	 *                     from {@link File::getImageSize()}
+	 *                     from {@link File::get_image_size()}
 	 */
 	function getFileImageSize( $param = 'widthxheight', $File = NULL )
 	{
@@ -855,7 +856,7 @@ class FileManager extends Filelist
 			$File =& $this->curFile;
 		}
 
-		return $File->getImageSize( $param );
+		return $File->get_image_size( $param );
 	}
 
 
@@ -1037,7 +1038,7 @@ class FileManager extends Filelist
 		}
 		else
 		{ // Process subdirs
-			$r['string'] .= '<img src="'.getIcon( 'collapse', 'url' ).'"'
+			$r['string'] .= '<img src="'.get_icon( 'collapse', 'url' ).'"'
 											.' onclick="toggle_clickopen(\''.$id_path.'\');"'
 											.' id="clickimg_'.$id_path.'" alt="+ / -" />
 										'.$label.'
@@ -1249,7 +1250,7 @@ class FileManager extends Filelist
 		$UserSettings->get_cond( $this->dirsnotattop,     'fm_dirsnotattop',     $this->User->ID );
 		$UserSettings->get_cond( $this->permlikelsl,      'fm_permlikelsl',      $this->User->ID );
 		$UserSettings->get_cond( $this->getImageSizes,    'fm_getimagesizes',    $this->User->ID );
-		$UserSettings->get_cond( $this->recursivedirsize, 'fm_recursivedirsize', $this->User->ID ); // TODO: check for permission (Server load)
+		$UserSettings->get_cond( $this->_use_recursive_dirsize, 'fm_recursivedirsize', $this->User->ID ); // TODO: check for permission (Server load)
 		$UserSettings->get_cond( $this->showhidden,       'fm_showhidden',       $this->User->ID );
 		$UserSettings->get_cond( $this->forceFM,          'fm_forceFM',          $this->User->ID );
 	}
@@ -1289,9 +1290,9 @@ class FileManager extends Filelist
 		{
 			return $asc;
 		}
-		elseif( $this->orderasc !== NULL )
+		elseif( $this->_order_asc !== NULL )
 		{
-			return $this->orderasc;
+			return $this->_order_asc;
 		}
 		else
 		{
@@ -1312,9 +1313,9 @@ class FileManager extends Filelist
 		{
 			return $order;
 		}
-		elseif( $this->order !== NULL )
+		elseif( $this->_order !== NULL )
 		{
-			return $this->order;
+			return $this->_order;
 		}
 		elseif( $this->flatmode )
 		{
@@ -1334,7 +1335,7 @@ class FileManager extends Filelist
 	 */
 	function getOrder()
 	{
-		return $this->translate_order( $this->order );
+		return $this->translate_order( $this->_order );
 	}
 
 
@@ -1420,6 +1421,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.35  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.34  2005/04/27 19:05:46  fplanque
  * normalizing, cleanup, documentaion
  *

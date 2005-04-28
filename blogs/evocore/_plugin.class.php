@@ -317,7 +317,7 @@ class Plugin
 		{ // Link to the help for this renderer plugin
 			echo ' <a href="'.$this->help_url.'"'
 						.' target="_blank" title="'.T_('Open help for this renderer in a new window.').'">'
-						.getIcon( 'help' )
+						.get_icon( 'help' )
 						.'</a>';
 			return true;
 		}
@@ -488,6 +488,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.8  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.7  2005/03/14 20:22:20  fplanque
  * refactoring, some cacheing optimization
  *

@@ -35,8 +35,10 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
- //dirname(__FILE__).'/
-require_once( '_http.class.php');
+/**
+ * Includes
+ */
+require_once dirname(__FILE__).'/_http.class.php';
 
 /**
  * Class download
@@ -115,6 +117,9 @@ class Download
 
 /*
  * $Log$
+ * Revision 1.4  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.3  2005/02/28 09:06:32  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

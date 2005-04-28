@@ -255,7 +255,7 @@ class AbstractSettings
 	/**
 	 * Get a setting from the DB settings table.
 	 *
-	 * @uses {@link getDefault()}
+	 * @uses getDefault()
 	 * @param string $args,... the values for the column keys (depends on
 	 *                         $this->colKeyNames and must match its count and order)
 	 * @return string|false|NULL value as string on success;
@@ -621,6 +621,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.13  2005/04/28 20:44:19  fplanque
+ * normalizing, doc
+ *
  * Revision 1.12  2005/02/28 09:06:31  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

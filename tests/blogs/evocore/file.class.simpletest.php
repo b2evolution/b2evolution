@@ -88,15 +88,15 @@ class FileTestCase extends FilemanUnitTestCase
 
 
 	/**
-	 * Test getExt()
+	 * Test get_ext()
 	 */
 	function testGetExt()
 	{
 		$File =& new File( 'abc.def', TMPDIR );
-		$this->assertEqual( $File->getExt(), 'def', 'Simple file extension recognized.' );
+		$this->assertEqual( $File->get_ext(), 'def', 'Simple file extension recognized.' );
 
 		$File =& new File( 'abc.noext.def', TMPDIR );
-		$this->assertEqual( $File->getExt(), 'def', 'File extension recognized.' );
+		$this->assertEqual( $File->get_ext(), 'def', 'File extension recognized.' );
 	}
 }
 

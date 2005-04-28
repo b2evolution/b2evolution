@@ -18,16 +18,17 @@
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
- * }
+ * }}
  * 
  * @package conf
+ *
+ * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
- * NT_(-)
+ * No Translation. Does nothing.
  *
- * No Translation
  * Nevertheless, the string will be extracted by the gettext tools
  */
 function NT_( $string )
@@ -222,8 +223,7 @@ $db_aliases = array(
  *
  * @global string $db_table_options
  */
-// Low ranking MySQL hosting compatibility Default:
-$db_table_options = '';
+$db_table_options = ''; 	// Low ranking MySQL hosting compatibility Default
 // Recommended settings:
 # $db_table_options = ' ENGINE=InnoDB ';
 // Development settings:
@@ -500,6 +500,8 @@ $rbl_config = array(
  * These are the filetypes.
  *
  * The extension is a regular expression that must match the end of the file.
+ *
+ * @global array $fm_filetypes
  */
 $fm_filetypes = array(
 	'\.ai'                => NT_('Adobe Illustrator'),

@@ -56,7 +56,7 @@ $Form->begin_form( 'fform', T_('File properties') );
 
 	$Form->fieldset( T_('Properties') );
 		$Form->info( T_('Filename'), $selectedFile->get_name(), T_('This is the name of the file on the server hard drive.') );
-		$Form->info( T_('Type'), getIcon( $selectedFile ).' '.$selectedFile->getType() );
+		$Form->info( T_('Type'), $selectedFile->get_icon().' '.$selectedFile->get_type() );
 	$Form->fieldset_end();
 
 	$Form->fieldset( T_('Meta data') );
@@ -73,6 +73,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.5  2005/04/28 20:44:18  fplanque
+ * normalizing, doc
+ *
  * Revision 1.4  2005/04/27 19:05:43  fplanque
  * normalizing, cleanup, documentaion
  *

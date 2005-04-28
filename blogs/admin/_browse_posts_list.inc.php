@@ -121,7 +121,7 @@ while( $Item = $MainList->get_item() )
 	echo '<td class="nowrap">';
 	echo '<a href="';
 	$Item->permalink();
-	echo '" title="'.T_('Permanent link to full entry').'">'.getIcon( 'permalink' ).'</a> ';
+	echo '" title="'.T_('Permanent link to full entry').'">'.get_icon( 'permalink' ).'</a> ';
 	echo '<span class="date">';
 	$Item->issue_date();
 	echo '</span> <span class="time">';
@@ -157,13 +157,13 @@ while( $Item = $MainList->get_item() )
 
 	echo '<td>';
 	// Display edit button if current user has the rights:
-	$Item->edit_link( ' ', ' ', getIcon( 'edit' ), '#', '', $edit_item_url );
+	$Item->edit_link( ' ', ' ', get_icon( 'edit' ), '#', '', $edit_item_url );
 
 	// Display publish NOW button if current user has the rights:
 	$Item->publish_link( ' ', ' ', '#', '#', '');
 
 	// Display delete button if current user has the rights:
-	$Item->delete_link( ' ', ' ', getIcon( 'delete' ), '#', '', false, $delete_item_url );
+	$Item->delete_link( ' ', ' ', get_icon( 'delete' ), '#', '', false, $delete_item_url );
 
 	echo "</td>\n";
 
@@ -193,6 +193,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.3  2005/04/28 20:44:17  fplanque
+ * normalizing, doc
+ *
  * Revision 1.2  2005/04/15 18:02:57  fplanque
  * finished implementation of properties/meta data editor
  * started implementation of files to items linking

@@ -64,10 +64,13 @@
  * @version $Id$
  */
 
+/**
+ * Prevent double loading since require_once won't work in all situations
+ * on windows when some subfolders have caps :(
+ * (Check it out on static page generation)
+ */
 if( defined( 'EVO_MAIN_INIT' ) )
-{ // Prevent double loading since require_once won't work in all situations
-	// on windows when some subfolders have caps :(
-	// (Check it out on static page generation)
+{
 	return;
 }
 define( 'EVO_MAIN_INIT', true );
@@ -498,6 +501,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.33  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.32  2005/04/26 18:19:25  fplanque
  * no message
  *

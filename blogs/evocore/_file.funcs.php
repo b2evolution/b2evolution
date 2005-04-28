@@ -239,7 +239,6 @@ function get_dirsize_recursive( $path )
  * Deletes a dir recursive, wiping out all subdirectories!!
  *
  * @param string the dir
- * @return
  */
 function deldir_recursive( $dir )
 {
@@ -364,60 +363,12 @@ function no_trailing_slash( $path )
 
 
 /**
- * Displays file permissions like 'ls -l'
+ * Does the same thing as the function realpath(), except it will
+ * also translate paths that don't exist on the system.
  *
- * @author zilinex at linuxmail dot com {@link www.php.net/manual/en/function.fileperms.php}
- * @param string
+ * @param string the path to be translated
+ * @return array [0] = the translated path (with trailing slash); [1] = TRUE|FALSE (path exists?)
  */
-function translatePerm( $in_Perms )
-{
-	$sP = '';
-
-	if(($in_Perms & 0xC000) == 0xC000)     // Socket
-		$sP = 's';
-	elseif(($in_Perms & 0xA000) == 0xA000) // Symbolic Link
-		$sP = 'l';
-	elseif(($in_Perms & 0x8000) == 0x8000) // Regular
-		$sP = '&minus;';
-	elseif(($in_Perms & 0x6000) == 0x6000) // Block special
-		$sP = 'b';
-	elseif(($in_Perms & 0x4000) == 0x4000) // Directory
-		$sP = 'd';
-	elseif(($in_Perms & 0x2000) == 0x2000) // Character special
-		$sP = 'c';
-	elseif(($in_Perms & 0x1000) == 0x1000) // FIFO pipe
-		$sP = 'p';
-	else                                   // UNKNOWN
-		$sP = 'u';
-
-	// owner
-	$sP .= (($in_Perms & 0x0100) ? 'r' : '&minus;') .
-					(($in_Perms & 0x0080) ? 'w' : '&minus;') .
-					(($in_Perms & 0x0040) ? (($in_Perms & 0x0800) ? 's' : 'x' ) :
-																	(($in_Perms & 0x0800) ? 'S' : '&minus;'));
-
-	// group
-	$sP .= (($in_Perms & 0x0020) ? 'r' : '&minus;') .
-					(($in_Perms & 0x0010) ? 'w' : '&minus;') .
-					(($in_Perms & 0x0008) ? (($in_Perms & 0x0400) ? 's' : 'x' ) :
-																	(($in_Perms & 0x0400) ? 'S' : '&minus;'));
-
-	// world
-	$sP .= (($in_Perms & 0x0004) ? 'r' : '&minus;') .
-					(($in_Perms & 0x0002) ? 'w' : '&minus;') .
-					(($in_Perms & 0x0001) ? (($in_Perms & 0x0200) ? 't' : 'x' ) :
-																	(($in_Perms & 0x0200) ? 'T' : '&minus;'));
-	return $sP;
-}
-
-
-/**
-	Does the same thing as the function realpath(), except it will
-	also translate paths that don't exist on the system.
-
-	@param string the path to be translated
-	@return array [0] = the translated path (with trailing slash); [1] = TRUE|FALSE (path exists?)
-*/
 function str2path( $path )
 {
 	$path = str_replace( '\\', '/', $path );
@@ -459,7 +410,6 @@ function str2path( $path )
 }
 
 
-
 /**
  * Check for valid filename (no path allowed).
  *
@@ -476,6 +426,9 @@ function isFilename( $filename )
 
 /*
  * $Log$
+ * Revision 1.14  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.13  2005/04/27 19:05:46  fplanque
  * normalizing, cleanup, documentaion
  *
@@ -519,6 +472,5 @@ function isFilename( $filename )
  *
  * Revision 1.9  2004/10/12 17:22:30  fplanque
  * Edited code documentation.
- *
  */
 ?>

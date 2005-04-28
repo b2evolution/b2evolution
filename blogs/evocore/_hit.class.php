@@ -124,8 +124,6 @@ class Hit
 
 	/**
 	 * Constructor
-	 *
-	 * @return
 	 */
 	function Hit()
 	{
@@ -174,8 +172,6 @@ class Hit
 
 	/**
 	 * Detect a reload.
-	 *
-	 * @return
 	 */
 	function detectReload()
 	{
@@ -203,8 +199,6 @@ class Hit
 	/**
 	 * Detect Referrer (sic!).
 	 * Due to potential non-thread safety with getenv() (fallback), we'd better do this early.
-	 *
-	 * @return
 	 */
 	function detectReferrer()
 	{
@@ -296,8 +290,6 @@ class Hit
 	/**
 	 * Set {@link $userAgent} and detect the browser.
 	 * This function also handles the relations with T_useragents and sets {@link $agentType}.
-	 *
-	 * @return
 	 */
 	function detectUseragent()
 	{
@@ -454,8 +446,6 @@ class Hit
 
 	/**
 	 * This records the hit. You should not call this directly, but {@link log()}
-	 *
-	 * @return
 	 */
 	function recordTheHit()
 	{
@@ -487,7 +477,6 @@ class Hit
 	 * On success, this methods records the hit.
 	 *
 	 * @uses recordTheHit()
-	 * @return
 	 */
 	function doubleCheckReferers()
 	{
@@ -533,7 +522,7 @@ class Hit
 	/**
 	 * Get the User agent's signature.
 	 *
-	 * @return
+	 * @return string
 	 */
 	function getUserAgent()
 	{

@@ -386,7 +386,7 @@ class Comment extends DataObject
 		$form_url = url_add_param( $form_url, 'post_id='.$this->Item->ID );
 
 		if( $title == '#' ) $title = T_('Send email to comment author');
-		if( $text == '#' ) $text = getIcon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
+		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
 
 		echo $before;
 		echo '<a href="'.$form_url.'" title="'.$title.'"';
@@ -476,6 +476,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.7  2005/04/12 18:58:16  fplanque
  * use TS_() instead of T_() for JavaScript strings
  *

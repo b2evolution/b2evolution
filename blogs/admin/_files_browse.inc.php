@@ -107,7 +107,7 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 			type="image"
 			name="actionArray[filter_unset]"
 			class="ActionButton"
-			src="<?php echo getIcon( 'delete', 'url' ) ?>" />
+			src="<?php echo get_icon( 'delete', 'url' ) ?>" />
 		<?php
 	}
 	?>
@@ -204,7 +204,7 @@ $filetable_cols = 8;
 			<span style="display:none;" id="fm_reloadhint">
 				<a href="<?php echo $Fileman->getCurUrl() ?>"
 					title="<?php echo T_('A popup has discovered that the displayed content of this window is not up to date. Click to reload.'); ?>">
-					<?php echo getIcon( 'reload' ) ?>
+					<?php echo get_icon( 'reload' ) ?>
 				</a>
 			</span>
 
@@ -296,7 +296,7 @@ while( $lFile =& $Fileman->getNextFile() )
 	{
 		echo $Fileman->getFileUrl().'" title="'.T_('Let the browser handle this file');
 	}
-	echo '">'.getIcon( $lFile ).'</a>';
+	echo '">'.$lFile->get_icon().'</a>';
 	echo '</td>';
 
 	echo '<td class="filename">';
@@ -306,19 +306,19 @@ while( $lFile =& $Fileman->getNextFile() )
 	 */
 	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" target="fileman_default"
 				title="'.T_('Open in a new window').'" onclick="return false;">';
-	$imgsize = $lFile->getImageSize( 'widthheight' );
+	$imgsize = $lFile->get_image_size( 'widthheight' );
 	echo '<button class="filenameIcon" type="button" id="button_new_'.$countFiles.'" onclick="'
 				.$Fileman->getJsPopupCode( NULL,
 							"'+( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_$countFiles')+'",
 							($imgsize ? $imgsize[0]+100 : NULL), ($imgsize ? $imgsize[1]+150 : NULL) )
-				.'">'.getIcon( 'window_new' ).'</button></a>';
+				.'">'.get_icon( 'window_new' ).'</button></a>';
 
 	/*
 	 * Invalid filename warning:
 	 */
 	if( !isFilename( $lFile->get_name() ) )
 	{ // TODO: Warning icon with hint
-		echo getIcon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => T_('The filename appears to be invalid and may cause problems.') ) );
+		echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => T_('The filename appears to be invalid and may cause problems.') ) );
 	}
 
 	/*
@@ -380,19 +380,19 @@ while( $lFile =& $Fileman->getNextFile() )
 	/*
 	 * File type:
 	 */
-	echo '<td class="type">'.$lFile->getType().'</td>';
+	echo '<td class="type">'.$lFile->get_type().'</td>';
 
 	/*
 	 * File size:
 	 */
-	echo '<td class="size">'.$lFile->get_sizeNice().'</td>';
+	echo '<td class="size">'.$lFile->get_size_formatted().'</td>';
 
 	/*
 	 * File time stamp:
 	 */
 	echo '<td class="timestamp">';
-	echo '<span class="date">'.$lFile->getLastMod( 'date' ).'</span>';
-	echo '<span class="time">'.$lFile->getLastMod( 'time' ).'</span>';
+	echo '<span class="date">'.$lFile->get_lastmod_formatted( 'date' ).'</span> ';
+	echo '<span class="time">'.$lFile->get_lastmod_formatted( 'time' ).'</span>';
 	echo '</td>';
 
 	/*
@@ -460,7 +460,7 @@ else
 			name="actionArray[delete]"
 			value="delete"
 			type="image"
-			src="<?php echo getIcon( 'file_delete', 'url' ) ?>" />
+			src="<?php echo get_icon( 'file_delete', 'url' ) ?>" />
 
 		<?php
 			/* No delete javascript, we need toi check DB integrity:
@@ -479,7 +479,7 @@ else
 				name="actionArray[download]"
 				value="download"
 				type="image"
-				src="<?php echo getIcon( 'download', 'url' ) ?>"
+				src="<?php echo get_icon( 'download', 'url' ) ?>"
 				onclick="return openselectedfiles(true);" / -->
 
 			<!-- Not implemented yet: input class="ActionButton" type="submit"
@@ -498,7 +498,7 @@ else
 			name="actionArray[open_in_new_windows]"
 			value="open_in_new_windows"
 			type="image"
-			src="<?php echo getIcon( 'window_new', 'url' ) ?>"
+			src="<?php echo get_icon( 'window_new', 'url' ) ?>"
 			onclick="openselectedfiles(); return false;" />
 
 	<?php
@@ -506,22 +506,22 @@ else
 		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
 			title="<?php echo T_('Rename the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
-			src="<?php echo getIcon( 'file_rename', 'url' ); ?>" />
+			src="<?php echo get_icon( 'file_rename', 'url' ); ?>" />
 
 		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
 			title="<?php echo T_('Copy the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
-			src="<?php echo getIcon( 'file_copy', 'url' ); ?>" />
+			src="<?php echo get_icon( 'file_copy', 'url' ); ?>" />
 
 		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
 			title="<?php echo T_('Move the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
-			src="<?php echo getIcon( 'file_move', 'url' ); ?>" />
+			src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
 
 		<input class="ActionButton" type="image" name="actionArray[editperm]"
 			onclick="return openselectedfiles(true);"
 			title="<?php echo T_('Change permissions for the selected files'); ?>"
-			src="<?php echo getIcon( 'file_perms', 'url' ); ?>" />
+			src="<?php echo get_icon( 'file_perms', 'url' ); ?>" />
 	*/ ?>
 
 		</td>
@@ -636,13 +636,13 @@ if( $countFiles )
 	<ul>
 		<li><?php echo T_('Clicking on a file icon lets the browser handle the file.'); ?></li>
 		<li><?php echo T_('Clicking on a file name invokes the default action (images get displayed as image, raw content for all other files).'); ?></li>
-		<li><?php printf( T_('Clicking on the %s icon invokes the default action in a new window.'), getIcon( 'window_new' ) ); ?></li>
+		<li><?php printf( T_('Clicking on the %s icon invokes the default action in a new window.'), get_icon( 'window_new' ) ); ?></li>
 		<li><?php echo T_('Actions'); ?>:
 			<ul class="iconlegend">
-				<li><?php echo getIcon( 'file_rename' ).' '.T_('Rename'); ?></li>
-				<li><?php echo getIcon( 'file_copy' ).' '.T_('Copy'); ?></li>
-				<li><?php echo getIcon( 'file_move' ).' '.T_('Move'); ?></li>
-				<li><?php echo getIcon( 'file_delete' ).' '.T_('Delete'); ?></li>
+				<li><?php echo get_icon( 'file_rename' ).' '.T_('Rename'); ?></li>
+				<li><?php echo get_icon( 'file_copy' ).' '.T_('Copy'); ?></li>
+				<li><?php echo get_icon( 'file_move' ).' '.T_('Move'); ?></li>
+				<li><?php echo get_icon( 'file_delete' ).' '.T_('Delete'); ?></li>
 			</ul>
 		</li>
 </fieldset>
@@ -735,6 +735,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.26  2005/04/28 20:44:18  fplanque
+ * normalizing, doc
+ *
  * Revision 1.25  2005/04/27 19:05:44  fplanque
  * normalizing, cleanup, documentaion
  *

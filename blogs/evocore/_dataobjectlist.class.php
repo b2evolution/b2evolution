@@ -33,6 +33,9 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Includes
+ */
 require_once dirname(__FILE__).'/_results.class.php';
 
 /**
@@ -121,6 +124,9 @@ class DataObjectList extends Results
 
 /*
  * $Log$
+ * Revision 1.8  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.7  2005/03/14 20:22:19  fplanque
  * refactoring, some cacheing optimization
  *

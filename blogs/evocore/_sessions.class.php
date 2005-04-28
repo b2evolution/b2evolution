@@ -167,7 +167,7 @@ class Sessions extends Widget
 	/**
 	 *
 	 *
-	 * @return
+	 * @return string
 	 */
 	function displayOnlineGuests( $before = NULL, $after = NULL)
 	{

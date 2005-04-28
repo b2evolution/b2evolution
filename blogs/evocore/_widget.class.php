@@ -52,7 +52,7 @@ class Widget
 	 *
 	 * @param string TITLE text (IMG and A link)
 	 * @param string icon code {@see $$map_iconfiles}
-	 * @param string icon code for {@see getIcon()}
+	 * @param string icon code for {@see get_icon()}
 	 */
 	function global_icon( $title, $icon, $url, $word = '' )
 	{

@@ -27,8 +27,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	?>
 
 	<script type="text/javascript">
-		imgpath_expand = '<?php echo getIcon( 'expand', 'url' ); ?>';
-		imgpath_collapse = '<?php echo getIcon( 'collapse', 'url' ); ?>';
+		imgpath_expand = '<?php echo get_icon( 'expand', 'url' ); ?>';
+		imgpath_collapse = '<?php echo get_icon( 'collapse', 'url' ); ?>';
 	</script>
 
 	<!-- script allowing to check and uncheck all boxes in forms -->

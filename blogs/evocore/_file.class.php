@@ -54,48 +54,56 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 class File extends DataObject
 {
 	/**
-	 * @var string Have we checked for meta data in the DB yet?
+	 * Have we checked for meta data in the DB yet?
+	 * @var string
 	 */
 	var $meta = 'unknown';
 
 	/**
-	 * @var string Meta data: Long title
+	 * Meta data: Long title
+	 * @var string
 	 */
 	var $title;
 
 	/**
-	 * @var string Meta data: ALT text for images
+	 * Meta data: ALT text for images
+	 * @var string
 	 */
 	var $alt;
 
 	/**
-	 * @var string Meta data: Description
+	 * Meta data: Description
+	 * @var string
 	 */
 	var $desc;
 
 
 	/**
-	 * @var string Full path for this file/folder, including trailing slash.
+	 * Full path for this file/folder, including trailing slash.
+	 * @var string
 	 * @see get_full_path()
 	 * @access protected
 	 */
 	var $_full_path;
 
 	/**
-	 * @var string Full path for this file/folder, WITHOUT trailing slash.
+	 * Full path for this file/folder, WITHOUT trailing slash.
+	 * @var string
 	 * @access protected
 	 */
 	var $_posix_path;
 
 	/**
-	 * @var string Directory path for this file/folder, including trailing slash.
+	 * Directory path for this file/folder, including trailing slash.
+	 * @var string
 	 * @see get_dir()
 	 * @access protected
 	 */
 	var $_dir;
 
 	/**
-	 * @var string Name of this file/folder, without path.
+	 * Name of this file/folder, without path.
+	 * @var string
 	 * @see get_name()
 	 * @access protected
 	 */
@@ -113,45 +121,60 @@ class File extends DataObject
 	var $_md5ID;
 
 	/**
-	 * @var boolean does the File/folder exist on disk?
+	 * does the File/folder exist on disk?
+	 * @var boolean
 	 * @see exists()
 	 * @access protected
 	 */
 	var $_exists;
 
 	/**
-	 * @var boolean Is the File a directory?
+	 * Is the File a directory?
+	 * @var boolean
 	 * @see is_dir()
 	 * @access protected
 	 */
 	var $_is_dir;
 
 	/**
-	 * @var integer file size in bytes.
+	 * file size in bytes.
+	 * @var integer
 	 * @see get_size()
 	 * @access protected
 	 */
 	var $_size;
 
 	/**
-	 * @var integer UNIX timestamp of last modification on disk.
+	 * UNIX timestamp of last modification on disk.
+	 * @var integer
+	 * @see get_lastmod_ts()
+	 * @see get_lastmod_formatted()
 	 * @access protected
 	 */
-	var $_lastMod;
+	var $_lastmod_ts;
 
 	/**
-	 * @var integer UNIX file permissions.
+	 * UNIX file permissions.
+	 * @var integer
+	 * @see get_perms()
 	 * @access protected
 	 */
 	var $_perms;
 
 	/**
-	 * @var NULL|boolean Is the File an image?
+	 * Is the File an image?
+	 * @var NULL|boolean
 	 * @see is_image()
 	 * @access protected
 	 */
 	var $_is_image;
 
+	/**
+	 * caches the icon key for this file (based on its extension)
+	 * @var string
+	 * @access protected
+	 */
+	var $_icon_key;
 
 	/**
 	 * Constructor, not meant to be called directly. Use {@link FileCache::get_by_path()}
@@ -313,7 +336,7 @@ class File extends DataObject
 		}
 
 		// for files and dirs:
-		$this->_lastMod = @filemtime( $this->_posix_path );
+		$this->_lastmod_ts = @filemtime( $this->_posix_path );
 		$this->_perms = @fileperms( $this->_posix_path );
 	}
 
@@ -351,7 +374,7 @@ class File extends DataObject
 	{
 		if( is_null( $this->_is_image ) )
 		{	// We don't know yet
-			$this->_is_image = ( $this->getImageSize() !== false );
+			$this->_is_image = ( $this->get_image_size() !== false );
 		}
 
 		return $this->_is_image;
@@ -429,7 +452,7 @@ class File extends DataObject
 	 *
 	 * @return string the extension
 	 */
-	function getExt()
+	function get_ext()
 	{
 		if( preg_match('/\.([^.]+)$/', $this->_name, $match) )
 		{
@@ -443,9 +466,12 @@ class File extends DataObject
 
 
 	/**
-	 * Get the file type as a descriptive string.
+	 * Get the file type as a descriptive localized string.
+	 *
+	 * @uses $fm_filetypes
+	 * @return string localized type name or 'Directory' or 'Unknown'
 	 */
-	function getType()
+	function get_type()
 	{
 		global $fm_filetypes;
 
@@ -486,12 +512,22 @@ class File extends DataObject
 
 
 	/**
-	 * Get date of last modification
+	 * Get timestamp of last modification.
 	 *
-	 $ @param string date format
-	 * @return string locale formatted date
+	 * @return integer Timestamp
 	 */
-	function getLastMod( $format = '#' )
+	function get_lastmod_ts()
+	{
+		return $this->_lastmod_ts;
+	}
+
+	/**
+	 * Get date/time of last modification, formatted.
+	 *
+	 $ @param string date format or 'date' or 'time' for default locales.
+	 * @return string locale formatted date/time
+	 */
+	function get_lastmod_formatted( $format = '#' )
 	{
 		switch( $format )
 		{
@@ -508,19 +544,26 @@ class File extends DataObject
 				break;
 		}
 
-		return date_i18n( $format, $this->_lastMod );
+		return date_i18n( $format, $this->_lastmod_ts );
 	}
 
 
 	/**
 	 * Get permissions
 	 *
-	 * @param mixed type; 'raw': integer, 'lsl' string like 'ls -l',
-	 *              'octal': 3 digits; default: 'r'/'r+w' for windows, 'octal'
-	 *              for other OS
-	 * @return string permissions
+	 * Possible return formats are:
+	 *   - 'raw'=integer
+	 *   - 'lsl'=string like 'ls -l'
+	 *   - 'octal'=3 digits
+	 *
+	 * Default value:
+	 *   - 'r'/'r+w' for windows
+	 *   - 'octal' for other OS
+	 *
+	 * @param string type, see desc above.
+	 * @return mixed permissions
 	 */
-	function getPerms( $type = NULL )
+	function get_perms( $type = NULL )
 	{
 		switch( $type )
 		{
@@ -528,7 +571,43 @@ class File extends DataObject
 				return $this->_perms;
 
 			case 'lsl':
-				return translatePerm( $this->_perms );
+				$sP = '';
+
+				if(($this->_perms & 0xC000) == 0xC000)     // Socket
+					$sP = 's';
+				elseif(($this->_perms & 0xA000) == 0xA000) // Symbolic Link
+					$sP = 'l';
+				elseif(($this->_perms & 0x8000) == 0x8000) // Regular
+					$sP = '&minus;';
+				elseif(($this->_perms & 0x6000) == 0x6000) // Block special
+					$sP = 'b';
+				elseif(($this->_perms & 0x4000) == 0x4000) // Directory
+					$sP = 'd';
+				elseif(($this->_perms & 0x2000) == 0x2000) // Character special
+					$sP = 'c';
+				elseif(($this->_perms & 0x1000) == 0x1000) // FIFO pipe
+					$sP = 'p';
+				else                                   // UNKNOWN
+					$sP = 'u';
+
+				// owner
+				$sP .= (($this->_perms & 0x0100) ? 'r' : '&minus;') .
+								(($this->_perms & 0x0080) ? 'w' : '&minus;') .
+								(($this->_perms & 0x0040) ? (($this->_perms & 0x0800) ? 's' : 'x' ) :
+																				(($this->_perms & 0x0800) ? 'S' : '&minus;'));
+
+				// group
+				$sP .= (($this->_perms & 0x0020) ? 'r' : '&minus;') .
+								(($this->_perms & 0x0010) ? 'w' : '&minus;') .
+								(($this->_perms & 0x0008) ? (($this->_perms & 0x0400) ? 's' : 'x' ) :
+																				(($this->_perms & 0x0400) ? 'S' : '&minus;'));
+
+				// world
+				$sP .= (($this->_perms & 0x0004) ? 'r' : '&minus;') .
+								(($this->_perms & 0x0002) ? 'w' : '&minus;') .
+								(($this->_perms & 0x0001) ? (($this->_perms & 0x0200) ? 't' : 'x' ) :
+																				(($this->_perms & 0x0200) ? 'T' : '&minus;'));
+				return $sP;
 
 			case NULL:
 				if( is_windows() )
@@ -549,28 +628,26 @@ class File extends DataObject
 
 
 	/**
-	 * Get the key of the respective icon file for this file (looks at file's extension).
+	 * Get icon for this file.
 	 *
-	 *
+	 * Looks at the file's extension.
 	 *
 	 * @uses $map_iconfiles
-	 * @return string Key of the iconfile in {@link $map_iconfiles}.
-	 *                'file_unknown' if no match was found.
-	 *                'folder' if the file is a directory.
+	 * @return string img tag
 	 */
-	function getIconKey()
+	function get_icon()
 	{
 		global $map_iconfiles;
 
-		if( !isset($this->_iconKey) )
-		{
+		if( !isset($this->_icon_key) )
+		{	// We haven't cached the icon key before...
 			if( $this->is_dir() )
 			{ // Directory icon:
-				$this->_iconKey = 'folder';
+				$this->_icon_key = 'folder';
 			}
 			else
 			{
-				$this->_iconKey = 'file_unknown';
+				$this->_icon_key = 'file_unknown';
 
 				// Loop through known file icons:
 				foreach( $map_iconfiles as $lKey => $lIconfile )
@@ -578,39 +655,40 @@ class File extends DataObject
 					if( isset( $lIconfile['ext'] )
 							&& preg_match( '/'.$lIconfile['ext'].'$/i', $this->_name, $match ) )
 					{
-						$this->_iconKey = $lKey;
+						$this->_icon_key = $lKey;
 						break;
 					}
 				}
 			}
 		}
 
-		return $this->_iconKey;
+		// Return Icon for the determined key:
+		return get_icon( $this->_icon_key, 'imgtag', array( 'alt'=>$this->get_ext(), 'title'=>$this->get_type() ) );
 	}
 
 
 	/**
 	 * Get size of an image or false if not an image
 	 *
-	 * @todo cache this data (NOTE: we have different params here! - imgsize() does already caching!)
+	 * @todo cache this data (NOTE: we have different params here! - imgsize() does caching already!)
 	 *
 	 * @uses imgsize()
 	 * @param string {@link imgsize()}
 	 * @return false|mixed false if the File is not an image, the requested data otherwise
 	 */
-	function getImageSize( $param = 'widthxheight' )
+	function get_image_size( $param = 'widthxheight' )
 	{
 		return imgsize( $this->_full_path, $param );
 	}
 
 
 	/**
-	 * Get nice size of the file.
+	 * Get size of the file, formatted to nearest unit (kb, mb, etc.)
 	 *
 	 * @uses bytesreadable()
 	 * @return string size as b/kb/mb/gd; or '&lt;dir&gt;'
 	 */
-	function get_sizeNice()
+	function get_size_formatted()
 	{
 		if( $this->_size === NULL )
 		{
@@ -626,7 +704,12 @@ class File extends DataObject
 	/**
 	 * Internally sets the file/directory size
 	 *
-	 * @access private
+	 * This is used when the FileList wants to set the recursive size of a directory!
+	 *
+	 * @todo pass a param to the constructor telling it we want to store a recursive size for the direcrory.
+	 * @todo store the recursive size separately (in another member), to avoid confusion
+	 *
+	 * @access public
 	 * @param integer
 	 */
 	function setSize( $bytes )
@@ -649,6 +732,9 @@ class File extends DataObject
 		if( rename( $this->_full_path, $this->_dir.$newname ) )
 		{
 			$this->_name = $newname;
+			$this->_posix_path = $this->_dir.$this->_name;
+			$this->_full_path = $this->_posix_path.'/';
+			$this->_md5ID = md5( $this->_posix_path );
 
 			// Meta data...:
 			// TODO: make path relative to a root.
@@ -713,7 +799,7 @@ class File extends DataObject
 	 * Change file permissions on disk.
 	 *
 	 * @access public
-	 * @param string chmod (three-digit-format, eg '777')
+	 * @param string chmod (octal three-digit-format, eg '777')
 	 * @return mixed new permissions on success (octal format), false on failure
 	 */
 	function chmod( $chmod )
@@ -773,6 +859,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.29  2005/04/27 19:05:46  fplanque
  * normalizing, cleanup, documentaion
  *
@@ -812,7 +901,7 @@ class File extends DataObject
  * doc, whitespace
  *
  * Revision 1.15  2005/01/15 20:20:51  blueyed
- * $map_iconsizes merged with $map_iconfiles, removed obsolete getIconSize() (functionality moved to getIcon())
+ * $map_iconsizes merged with $map_iconfiles, removed obsolete getIconSize() (functionality moved to get_icon())
  *
  * Revision 1.14  2005/01/12 20:22:51  fplanque
  * started file/dataobject linking

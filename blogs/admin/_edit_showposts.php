@@ -152,7 +152,7 @@ while( $Item = $MainList->get_item() )
 			<?php
 			echo '<a href="';
 			$Item->permalink();
-			echo '" title="'.T_('Permanent link to full entry').'" class="permalink_right">'.getIcon( 'permalink' ).'</a>';
+			echo '" title="'.T_('Permanent link to full entry').'" class="permalink_right">'.get_icon( 'permalink' ).'</a>';
 
 			// Display edit button if current user has the rights:
 			$Item->edit_link( ' ', ' ', '#', '#', 'ActionButton', $edit_item_url );
@@ -340,6 +340,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.98  2005/04/28 20:44:17  fplanque
+ * normalizing, doc
+ *
  * Revision 1.97  2005/04/15 18:02:57  fplanque
  * finished implementation of properties/meta data editor
  * started implementation of files to items linking

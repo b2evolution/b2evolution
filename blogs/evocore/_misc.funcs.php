@@ -1527,12 +1527,12 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  *
  * @param string TITLE text (IMG and A link)
  * @param string icon code {@see $$map_iconfiles}
- * @param string icon code for {@see getIcon()}
+ * @param string icon code for {@see get_icon()}
  */
 function action_icon( $title, $icon, $url, $word = '' )
 {
 	$r = '<a href="'.$url.'" title="'.$title.'">'
-				.getIcon( $icon, 'imgtag', array( 'title'=>$title ) );
+				.get_icon( $icon, 'imgtag', array( 'title'=>$title ) );
 	if( !empty( $word) )
 	{
 		$r .= $word;
@@ -1546,18 +1546,18 @@ function action_icon( $title, $icon, $url, $word = '' )
 /**
  * Get properties of an icon.
  *
+ * Note: to get a file type icon, use {@link File::get_icon()} instead.
+ *
  * @uses $map_iconfiles
- * @param string|File icon for what (special purpose or File object)
+ * @param string icon for what?
  * @param string what to return for that icon ('file', 'url', 'size' {@link imgsize()})
  * @param array additional params ( 'class' => class name when getting 'imgtag',
 																		'size' => param for 'size',
 																		'title' => title attribute for imgtag)
  */
-function getIcon( $for, $what = 'imgtag', $params = NULL )
+function get_icon( $iconKey, $what = 'imgtag', $params = NULL )
 {
 	global $map_iconfiles, $basepath, $admin_subdir, $baseurl, $Debuglog;
-
-	$iconKey = is_a( $for, 'file' ) ? $for->getIconKey() : $for;
 
 	if( isset( $map_iconfiles[$iconKey] ) && isset( $map_iconfiles[$iconKey]['file'] ) )
 	{
@@ -1569,8 +1569,8 @@ function getIcon( $for, $what = 'imgtag', $params = NULL )
 	}
 
 	/**
-	 * @debug quite time consuming
-	 * fplanque removed <div> tags because they make it even harder to debug :/
+	 * debug quite time consuming
+	 * fplanque>> removed <div> tags because they make it even harder to debug :/
 	 */
 	if( $iconfile === false )
 	{
@@ -1637,14 +1637,6 @@ function getIcon( $for, $what = 'imgtag', $params = NULL )
 			if( isset( $params['alt'] ) )
 			{
 				$r .= $params['alt'];
-			}
-			elseif( is_a( $for, 'file' ) )
-			{ // extension as alt-tag for file icons
-				if( $for->is_dir() )
-				{
-					$r .= /* TRANS: short for '<directory>' */ T_('&lt;dir&gt;');
-				}
-				$r .= $for->getExt();
 			}
 			elseif( isset( $map_iconfiles[$iconKey]['alt'] ) )
 			{ // alt-tag from $map_iconfiles
@@ -1753,9 +1745,9 @@ function selection_checkbox( $item_ID, $item_name )
 function bullet( $bool )
 {
 	if( $bool )
-		return getIcon( 'bullet_full', 'imgtag' );
+		return get_icon( 'bullet_full', 'imgtag' );
 
-	return getIcon( 'bullet_empty', 'imgtag' );
+	return get_icon( 'bullet_empty', 'imgtag' );
 }
 
 /**
@@ -1847,8 +1839,6 @@ function header_nocache()
  * Sends HTTP header to redirect to the previous location (which
  * can be given as function parameter, GET parameter (redirecto_to),
  * is taken from {@link Hit::referer} or {@link $baseurl})
- *
- * @return
  */
 function header_redirect( $redirectTo = NULL )
 {
@@ -1881,6 +1871,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.66  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.65  2005/04/27 19:05:46  fplanque
  * normalizing, cleanup, documentaion
  *
@@ -1970,7 +1963,7 @@ function header_redirect( $redirectTo = NULL )
  * enhanced UI widgets
  *
  * Revision 1.33  2005/01/15 20:20:51  blueyed
- * $map_iconsizes merged with $map_iconfiles, removed obsolete getIconSize() (functionality moved to getIcon())
+ * $map_iconsizes merged with $map_iconfiles, removed obsolete getIconSize() (functionality moved to get_icon())
  *
  * Revision 1.32  2005/01/15 17:30:08  blueyed
  * regexp_fileman moved to $Settings

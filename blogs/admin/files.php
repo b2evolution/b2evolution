@@ -506,7 +506,7 @@ if( !empty($action) )
 				{
 					$chmod = $perms[ $lFile->get_md5_ID() ];
 
-					$oldperms = $lFile->getPerms( 'raw' );
+					$oldperms = $lFile->get_perms( 'raw' );
 					$newperms = $lFile->chmod( $chmod );
 
 					if( $newperms === false )
@@ -519,7 +519,7 @@ if( !empty($action) )
 					}
 					else
 					{
-						$Fileman->Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->getPerms() ), 'note' );
+						$Fileman->Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->get_perms() ), 'note' );
 					}
 				}
 			}
@@ -549,7 +549,7 @@ if( !empty($action) )
 							name="perms['.$lFile->get_md5_ID().']"
 							type="radio"
 							value="444"'
-							.( $lFile->getPerms( 'octal' ) == 444 ?
+							.( $lFile->get_perms( 'octal' ) == 444 ?
 									' checked="checked"' :
 									'' ).' />
 						<label for="perms_readonly_'.$lFile->get_md5_ID().'">'.T_('Read-only').'</label>
@@ -558,7 +558,7 @@ if( !empty($action) )
 							name="perms['.$lFile->get_md5_ID().']"
 							type="radio"
 							value="666"'
-							.( $lFile->getPerms( 'octal' ) == 666 || $lFile->getPerms( 'octal' ) == 777 ?
+							.( $lFile->get_perms( 'octal' ) == 666 || $lFile->get_perms( 'octal' ) == 777 ?
 									'checked="checked"' :
 									'' ).' />
 						<label for="perms_readwrite_'.$lFile->get_md5_ID().'">'.T_('Read and write').'</label>
@@ -568,7 +568,7 @@ if( !empty($action) )
 				else
 				{	// UNIX permissions:
 					$action_msg .= '<input type="text" name="chmod" value="'
-													.$lFile->getPerms( 'octal' ).'" maxlength="3" size="3" /><br />';
+													.$lFile->get_perms( 'octal' ).'" maxlength="3" size="3" /><br />';
 					$js_focus = 'document.form_chmod.chmod';
 				}
 
@@ -1041,7 +1041,7 @@ switch( $Fileman->fm_mode )
 			$r = $current_File->title;
 
 			// File type:
-			$r .= ' '.getIcon( $current_File ).' '.$current_File->getType();
+			$r .= ' '.$current_File->get_icon().' '.$current_File->get_type();
 
 			return $r;
 		}
@@ -1060,7 +1060,7 @@ switch( $Fileman->fm_mode )
 
 		$Results->display();
 
-		printf( '<p>'.T_('Click on a link icon %s below to link an additional file to this item.').'</p>', getIcon( 'link' ) );
+		printf( '<p>'.T_('Click on a link icon %s below to link an additional file to this item.').'</p>', get_icon( 'link' ) );
 
 		$Form->end_form( );
 
@@ -1176,6 +1176,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.98  2005/04/28 20:44:18  fplanque
+ * normalizing, doc
+ *
  * Revision 1.97  2005/04/27 19:05:44  fplanque
  * normalizing, cleanup, documentaion
  *

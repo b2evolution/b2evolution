@@ -44,6 +44,9 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Includes
+ */
 require_once  dirname(__FILE__).'/'.$core_dirout.$conf_subdir.'_application.php';    // application settings
 
 
@@ -238,6 +241,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.20  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.19  2005/03/13 21:13:48  blueyed
  * include application vars
  *

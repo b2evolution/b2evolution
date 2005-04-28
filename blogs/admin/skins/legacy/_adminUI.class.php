@@ -42,11 +42,17 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Includes
+ */
 require_once dirname(__FILE__).'/../'.$adminskins_dirout.'_adminUI_general.class.php';
 
 
 /**
  * We define a special template for the main menu.
+ *
+ * @package admin-skin
+ * @subpackage evo
  */
 class AdminUI extends AdminUI_general
 {

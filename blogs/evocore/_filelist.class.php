@@ -34,8 +34,8 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE.
+ * @author blueyed: Daniel HAHLER
+ * @author fplanque: François PLANQUE
  *
  * @version $Id$
  *
@@ -63,78 +63,98 @@ class Filelist
 	var $filterString = NULL;
 	var $filterIsRegexp = NULL;
 
-
-	/* -- PRIVATE -- */
-
 	/**
 	 * The list of Files.
-	 *
-	 * @var array
+	 * @var array of File objects
 	 * @access protected
 	 */
 	var $_entries = array();
 
 	/**
-	 * @var array Index over File IDs (id => {@link $_entries} key).
+	 * Index on File IDs (id => {@link $_entries} key).
+	 *
+	 * Note: fplanque>> what's the purpose of the md5 IDs??
+	 *
+	 * @todo make these direct links to &File objects
+	 * @var array
 	 * @access protected
 	 */
-	var $_indexID = array();
+	var $_md5_ID_index = array();
 
 	/**
-	 * @var array Index over File Paths (path => {@link $_entries} key).
+	 * Index on full paths (path => {@link $_entries} key).
+	 * @todo make these direct links to &File objects
+	 * @var array
 	 * @access protected
 	 */
-	var $_indexPath = array();
+	var $_full_path_index = array();
 
 	/**
-	 * @var array Order (order => {@link $_entries} key).
+	 * Index on sort order (order # => {@link $_entries} key).
+	 * @todo make these direct links to &File objects
+	 * @var array
 	 * @access protected
 	 */
-	var $_indexOrder = array();
+	var $_order_index = array();
 
 	/**
-	 * @var integer internal counter for the {@link $_entries} array
-	 */
-	var $count_entries = 0;
-
-	/**
-	 * @var integer Number of directories
-	 */
-	var $count_dirs = 0;
-
-	/**
-	 * @var integer Number of files
-	 */
-	var $count_files = 0;
-
-	/**
-	 * @var integer Number of bytes
-	 */
-	var $count_bytes = 0;
-
-	/**
-	 * The current index of the directory items (looping).
-	 * This is the key of {@link $_indexOrder}
+	 * Number of entries in the {@link $_entries} array
+	 *
+	 * Note: $_total_entries = $_total_dirs + $_total_files
 	 *
 	 * @var integer
 	 * @access protected
 	 */
-	var $current_file_idx = -1;
-
+	var $_total_entries = 0;
 
 	/**
-	 * Order
+	 * @var integer Number of directories
+	 * @access protected
+	 */
+	var $_total_dirs = 0;
+
+	/**
+	 * @var integer Number of files
+	 * @access protected
+	 */
+	var $_total_files = 0;
+
+	/**
+	 * @var integer Number of bytes
+	 * @access protected
+	 */
+	var $_total_bytes = 0;
+
+	/**
+	 * Index of the current iterator position.
+	 *
+	 * This is the key of {@link $_order_index}
+	 *
+	 * @var integer
+	 * @access protected
+	 */
+	var $_current_idx = -1;
+
+	/**
+	 * What column is the list ordered on?
+	 *
+	 * Possible values are: 'name', 'path', 'type', 'size', 'lastmod', 'perms'
+	 *
 	 * @var string
 	 * @access protected
 	 */
-	var $order = NULL;
+	var $_order = NULL;
 
 	/**
-	 * Are we sorting ascending (or descending). default is asc for 'name', desc for the rest
+	 * Are we sorting ascending (or descending). 
+	 * 
+	 * NULL is default and means ascending for 'name', descending for the rest
+	 *
+	 * @todo fplanque>> document possible values!!
 	 * @var mixed
 	 * @access protected
 	 */
-	var $orderasc = NULL;
+	var $_order_asc = NULL;
 
 	/**
 	 * Sort dirs not at top
@@ -161,11 +181,12 @@ class Filelist
 	/**
 	 * User preference: recursive size of dirs?
 	 *
-	 * The load() method uses this.
+	 * The load() & sort() methods use this.
 	 *
 	 * @var boolean
+	 * @access protected
 	 */
-	var $recursivedirsize = false;
+	var $_use_recursive_dirsize = false;
 
 
 	/**
@@ -209,9 +230,15 @@ class Filelist
 			return false;
 		}
 
-		$this->count_entries = $this->count_bytes = $this->count_files = $this->count_dirs = 0;
+		$this->_total_entries = 0;
+		$this->_total_bytes = 0;
+		$this->_total_files = 0;
+		$this->_total_dirs = 0;
 
-		$this->_entries = $this->_indexID = $this->_indexPath = $this->_indexOrder = array();
+		$this->_entries = array();
+		$this->_md5_ID_index = array();
+		$this->_full_path_index = array();
+		$this->_order_index = array();
 
 
 		if( $flatmode )
@@ -281,29 +308,33 @@ class Filelist
 		}
 
 
-		$this->_entries[$this->count_entries] =& $File;
-		$this->_indexID[$File->get_md5_ID()] = $this->count_entries;
-		$this->_indexPath[$File->get_full_path()] = $this->count_entries;
+		$this->_entries[$this->_total_entries] = & $File;
+		$this->_md5_ID_index[$File->get_md5_ID()] = $this->_total_entries;
+		$this->_full_path_index[$File->get_full_path()] = $this->_total_entries;
 		// add file to the end:
-		$this->_indexOrder[$this->count_entries] = $this->count_entries;
+		$this->_order_index[$this->_total_entries] = $this->_total_entries;
 
-		$this->count_entries++;
-
-
-		if( $this->recursivedirsize && $File->is_dir() )
-		{ // won't be done in the File constructor
-			$File->setSize( get_dirsize_recursive( $File->get_full_path() ) );
-		}
+		// Count 1 more entry (file or dir)
+		$this->_total_entries++;
 
 		if( $File->is_dir() )
-		{
-			$this->count_dirs++;
+		{	// Count 1 more directory
+			$this->_total_dirs++;
+
+			// fplanque>> TODO: get this outta here??
+			if( $this->_use_recursive_dirsize )
+			{ // We want to use recursive directory sizes
+				// won't be done in the File constructor
+				$File->setSize( get_dirsize_recursive( $File->get_full_path() ) );
+			}
 		}
 		else
-		{
-			$this->count_files++;
+		{	// Count 1 more file
+			$this->_total_files++;
 		}
-		$this->count_bytes += $File->get_size();
+		
+		// Count total bytes in this dir
+		$this->_total_bytes += $File->get_size();
 
 		return true;
 	}
@@ -342,7 +373,7 @@ class Filelist
 
 
 	/**
-	 * Sort the entries by sorting the internal {@link $_indexOrder} array.
+	 * Sort the entries by sorting the internal {@link $_order_index} array.
 	 *
 	 * @param string The order to use ('name', 'type', 'lastmod', .. )
 	 * @param boolean Ascending (true) or descending
@@ -350,25 +381,25 @@ class Filelist
 	 */
 	function sort( $order = NULL, $orderasc = NULL, $dirsattop = NULL )
 	{
-		if( !$this->count_entries )
+		if( !$this->_total_entries )
 		{
 			return false;
 		}
 
 		if( $order !== NULL )
 		{
-			$this->order = $order;
+			$this->_order = $order;
 		}
 		if( $orderasc !== NULL )
 		{
-			$this->orderasc = $orderasc;
+			$this->_order_asc = $orderasc;
 		}
 		if( $dirsattop !== NULL )
 		{
 			$this->dirsnotattop = !$dirsattop;
 		}
 
-		usort( $this->_indexOrder, array( $this, '_sortCallback' ) );
+		usort( $this->_order_index, array( $this, '_sortCallback' ) );
 
 
 		// Restart the list
@@ -387,12 +418,12 @@ class Filelist
 		$FileA =& $this->_entries[$a];
 		$FileB =& $this->_entries[$b];
 
-
-		switch( $this->order )
+		// What colmun are we sorting on?
+		switch( $this->_order )
 		{
 			case 'size':
-				if( $this->recursivedirsize )
-				{
+				if( $this->_use_recursive_dirsize )
+				{	// We are using recursive directory sizes:
 					$r = $FileA->get_size() - $FileB->get_size();
 				}
 				else
@@ -412,12 +443,12 @@ class Filelist
 				break;
 
 			case 'lastmod':
-				$r = $FileB->getLastMod() - $FileA->getLastMod();
+				$r = $FileB->get_lastmod_ts() - $FileA->get_lastmod_ts();
 				break;
 
 			case 'perms':
 				// This will use literal representation ( 'r', 'r+w' / octal )
-				$r = strcasecmp( $FileA->getPerms(), $FileB->getPerms() );
+				$r = strcasecmp( $FileA->get_perms(), $FileB->get_perms() );
 				break;
 
 			default:
@@ -431,7 +462,7 @@ class Filelist
 		}
 
 
-		if( !$this->orderasc )
+		if( !$this->_order_asc )
 		{ // switch order
 			$r = -$r;
 		}
@@ -457,7 +488,7 @@ class Filelist
 	 */
 	function restart()
 	{
-		$this->current_file_idx = -1;
+		$this->_current_idx = -1;
 	}
 
 
@@ -471,16 +502,16 @@ class Filelist
 	{
 		if( empty($type) )
 		{
-			$type = $this->order;
+			$type = $this->_order;
 		}
 
-		if( $this->orderasc === NULL )
+		if( $this->_order_asc === NULL )
 		{ // default
 			return ( $type == 'name' || $type == 'path' ) ? 1 : 0;
 		}
 		else
 		{
-			return ( $this->orderasc ) ? 1 : 0;
+			return ( $this->_order_asc ) ? 1 : 0;
 		}
 	}
 
@@ -504,7 +535,7 @@ class Filelist
 	 */
 	function holdsFile( $File )
 	{
-		return isset( $this->_indexID[ $File->get_md5_ID() ] );
+		return isset( $this->_md5_ID_index[ $File->get_md5_ID() ] );
 	}
 
 
@@ -515,7 +546,7 @@ class Filelist
 	 */
 	function getOrder()
 	{
-		return $this->order;
+		return $this->_order;
 	}
 
 
@@ -550,7 +581,7 @@ class Filelist
 	 */
 	function count()
 	{
-		return $this->count_entries;
+		return $this->_total_entries;
 	}
 
 
@@ -561,7 +592,7 @@ class Filelist
 	 */
 	function countDirs()
 	{
-		return $this->count_dirs;
+		return $this->_total_dirs;
 	}
 
 
@@ -572,7 +603,7 @@ class Filelist
 	 */
 	function countFiles()
 	{
-		return $this->count_files;
+		return $this->_total_files;
 	}
 
 
@@ -583,7 +614,7 @@ class Filelist
 	 */
 	function countBytes()
 	{
-		return $this->count_bytes;
+		return $this->_total_bytes;
 	}
 
 
@@ -593,25 +624,25 @@ class Filelist
 	 * @param string can be used to query only 'file's or 'dir's.
 	 * @return boolean File object (by reference) on success, false on end of list
 	 */
-	function &getNextFile( $type = '' )
+	function & getNextFile( $type = '' )
 	{
 		/**
 		 * @debug return the same file 10 times, useful for profiling
 		static $debugMakeLonger = 0;
 		if( $debugMakeLonger-- == 0 )
 		{
-			$this->current_file_idx++;
+			$this->_current_idx++;
 			$debugMakeLonger = 9;
 		}
 		*/
 
-		if( !isset($this->_indexOrder[$this->current_file_idx + 1]) )
+		if( !isset($this->_order_index[$this->_current_idx + 1]) )
 		{
 			return false;
 		}
-		$this->current_file_idx++;
+		$this->_current_idx++;
 
-		$index = $this->_indexOrder[$this->current_file_idx];
+		$index = $this->_order_index[$this->_current_idx];
 
 		if( $type != '' )
 		{
@@ -639,9 +670,9 @@ class Filelist
 	{
 		$path = str_replace( '\\', '/', $path );
 
-		if( isset( $this->_indexPath[ $path ] ) )
+		if( isset( $this->_full_path_index[ $path ] ) )
 		{
-			return $this->_entries[ $this->_indexPath[ $path ] ];
+			return $this->_entries[ $this->_full_path_index[ $path ] ];
 		}
 		else
 		{
@@ -658,9 +689,9 @@ class Filelist
 	 */
 	function &getFileByID( $md5id )
 	{
-		if( isset( $this->_indexID[ $md5id ] ) )
+		if( isset( $this->_md5_ID_index[ $md5id ] ) )
 		{
-			return $this->_entries[ $this->_indexID[ $md5id ] ];
+			return $this->_entries[ $this->_md5_ID_index[ $md5id ] ];
 		}
 		else
 		{
@@ -677,9 +708,9 @@ class Filelist
 	 */
 	function &getFileByIndex( $index )
 	{
-		if( isset( $this->_indexOrder[ $index ] ) )
+		if( isset( $this->_order_index[ $index ] ) )
 		{
-			return $this->_entries[ $this->_indexOrder[ $index ] ];
+			return $this->_entries[ $this->_order_index[ $index ] ];
 		}
 		else
 		{
@@ -723,24 +754,24 @@ class Filelist
 	 */
 	function removeFromList( &$File )
 	{
-		if( isset( $this->_indexID[ $File->get_md5_ID() ] ) )
+		if( isset( $this->_md5_ID_index[ $File->get_md5_ID() ] ) )
 		{ // unset indexes and entry
-			$index = $this->_indexPath[ $File->get_full_path() ];
-			unset( $this->_indexPath[ $File->get_full_path() ] );
+			$index = $this->_full_path_index[ $File->get_full_path() ];
+			unset( $this->_full_path_index[ $File->get_full_path() ] );
 
-			foreach( $this->_indexOrder as $lKey => $lValue )
+			foreach( $this->_order_index as $lKey => $lValue )
 			{
 				if( $lValue == $index )
 				{
-					while( isset( $this->_indexOrder[++$lKey] ) )
+					while( isset( $this->_order_index[++$lKey] ) )
 					{
-						$this->_indexOrder[ $lKey - 1 ] = $this->_indexOrder[ $lKey ];
+						$this->_order_index[ $lKey - 1 ] = $this->_order_index[ $lKey ];
 					}
-					unset( $this->_indexOrder[$lKey - 1] );
+					unset( $this->_order_index[$lKey - 1] );
 				}
 			}
-			unset( $this->_entries[ $this->_indexID[ $File->get_md5_ID() ] ] );
-			unset( $this->_indexID[ $File->get_md5_ID() ] );
+			unset( $this->_entries[ $this->_md5_ID_index[ $File->get_md5_ID() ] ] );
+			unset( $this->_md5_ID_index[ $File->get_md5_ID() ] );
 
 			return true;
 		}
@@ -763,14 +794,14 @@ class Filelist
 
 		if( is_string($method) )
 		{
-			foreach( $this->_indexOrder as $index )
+			foreach( $this->_order_index as $index )
 			{
 				$r[] =& $this->_entries[ $index ]->$method();
 			}
 		}
 		else
 		{
-			foreach( $this->_indexOrder as $index )
+			foreach( $this->_order_index as $index )
 			{
 				$r[] =& $this->_entries[ $index ];
 			}
@@ -846,6 +877,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.24  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.23  2005/04/27 19:05:46  fplanque
  * normalizing, cleanup, documentaion
  *

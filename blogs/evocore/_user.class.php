@@ -715,7 +715,7 @@ class User extends DataObject
 		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID );
 
 		if( $title == '#' ) $title = T_('Send email to user');
-		if( $text == '#' ) $text = getIcon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
+		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
 
 		echo $before;
 		echo '<a href="'.$form_url.'" title="'.$title.'"';
@@ -868,6 +868,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2005/04/28 20:44:20  fplanque
+ * normalizing, doc
+ *
  * Revision 1.24  2005/04/07 17:55:50  fplanque
  * minor changes
  *

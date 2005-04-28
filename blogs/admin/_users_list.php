@@ -152,7 +152,7 @@ $userlist = $DB->get_results( $request );
 				if( !empty($email) )
 				{
 					echo '<a href="mailto:'.$email.'" title="e-mail: '.$email.'">'
-								.getIcon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => 'Email: '.$email ) ).'</a>&nbsp;';
+								.get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => 'Email: '.$email ) ).'</a>&nbsp;';
 				}
 				echo "</td>\n";
 
@@ -166,7 +166,7 @@ $userlist = $DB->get_results( $request );
 						$url = 'http://'.$url;
 					}
 					echo '<a href="'.$url.'" title="Website: '.$url.'">'
-								.getIcon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: '.$url ) ).'</a>&nbsp;';
+								.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: '.$url ) ).'</a>&nbsp;';
 				}
 				echo "</td>\n";
 
@@ -223,6 +223,9 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 
 /*
  * $Log$
+ * Revision 1.42  2005/04/28 20:44:18  fplanque
+ * normalizing, doc
+ *
  * Revision 1.41  2005/04/21 18:01:28  fplanque
  * CSS styles refactoring
  *

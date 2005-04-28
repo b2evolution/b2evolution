@@ -72,7 +72,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		// --------------------------------
 		echo '<div class="center">';
 
-		if( $imgSize = $selectedFile->getImageSize( 'widthheight' ) )
+		if( $imgSize = $selectedFile->get_image_size( 'widthheight' ) )
 		{
 			echo '<img ';
 			if( $alt = $selectedFile->dget( 'alt', 'htmlattr' ) )
@@ -90,8 +90,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			echo '<p><strong>'.$selectedFile->dget( 'title' ).'</strong></p>';
 			echo '<p>'.$selectedFile->dget( 'desc' ).'</p>';
 			echo '<p>'.$selectedFile->get_name().' &middot; ';
-			echo $selectedFile->getImageSize().' &middot; ';
-			echo $selectedFile->get_sizeNice().'</p>';
+			echo $selectedFile->get_image_size().' &middot; ';
+			echo $selectedFile->get_size_formatted().'</p>';
 			echo '</div>';
 
 		}
