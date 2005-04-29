@@ -76,7 +76,7 @@ $Form->begin_form( 'fform', T_('Copy / Move / Rename') );
 
 	$sourcesInSameDir = true;
 
-	while( $lSourceFile = & $Fileman->SourceList->getNextFile() )
+	while( $lSourceFile = & $Fileman->SourceList->get_next() )
 	{
 		if( $sourcesInSameDir && $lSourceFile->get_dir() != $Fileman->cwd )
 		{
@@ -171,6 +171,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.4  2005/04/29 18:49:32  fplanque
+ * Normalizing, doc, cleanup
+ *
  * Revision 1.3  2005/04/27 19:05:44  fplanque
  * normalizing, cleanup, documentaion
  *

@@ -50,18 +50,50 @@ require_once dirname(__FILE__).'/_file.class.php';
 
 
 /**
- * Lists files in a directory.
+ * Holds a list of File objects.
  *
- * Can work recursively through subdirectories.
+ * Can hold an arbitraty list of Files.
+ * Can list files in a directory by itself.
+ * Can walk recursively down a directory tree to list in "flat mode".
+ * Can sort file list.
+ * Can iterate through list.
  *
+ * @see File
  * @package evocore
  */
 class Filelist
 {
-	var $listpath = '';
+	/**
+	 * Path to list with trailing slash.
+	 *
+	 * false if we are constructing an arbitraty list (i-e not tied to a single directory)
+	 *
+	 * @var boolean|string
+	 * @access protected
+	 */
+	var $_list_full_path = false;
 
-	var $filterString = NULL;
-	var $filterIsRegexp = NULL;
+	/**
+	 * Filename filter pattern
+	 *
+	 * Will be matched against the filename part (not the path)
+	 * NULL if disabled
+	 *
+	 * @var NULL|string
+	 * @access protected
+	 */
+	var $_filter = NULL;
+	
+	/**
+	 * Is the filter a regular expression?
+	 *
+	 *  NULL if disabled
+	 *
+	 * @see Filelist::_filter
+	 * @var NULL|boolean
+	 * @access protected
+	 */
+	var $_filter_is_regexp = NULL;
 
 	/**
 	 * The list of Files.
@@ -157,26 +189,20 @@ class Filelist
 	var $_order_asc = NULL;
 
 	/**
-	 * Sort dirs not at top
-	 * @var boolean
-	 */
-	var $dirsnotattop = false;
-
-
-	/**
-	 * Get size (width, height) for images?
+	 * User preference: Sort dirs not at top
 	 *
 	 * @var boolean
 	 */
-	var $getImageSizes = false;
-
+	var $_dirs_not_at_top = false;
 
 	/**
-	 * include hidden files? (Filemanager user preference)
+	 * User preference: Load and show hidden files?
+	 *
+	 * "Hidden files" are prefixed with a dot .
+	 *
 	 * @var boolean
 	 */
-	var $showhidden = true;
-
+	var $_show_hidden_files = true;
 
 	/**
 	 * User preference: recursive size of dirs?
@@ -190,29 +216,19 @@ class Filelist
 
 
 	/**
-	 * to be extended by Filemanager class
-	 * @var Log
-	 */
-	var $Messages;
-
-
-	/**
 	 * Constructor
 	 *
-	 * @param string the default path for the files
-	 * @param string Allow all paths or just the default path (which must be non-empty then)?
+	 * @param boolean|string the default path for the files, false if you want to create an arbitraty list
 	 */
-	function Filelist( $path = '', $allowAllPaths = true )
+	function Filelist( $path = false )
 	{
 		if( empty($path) )
 		{
-			$this->listpath = false;
-			$this->_allowAllPaths = true;
+			$this->_list_full_path = false;
 		}
 		else
 		{
-			$this->listpath = trailing_slash( $path );
-			$this->_allowAllPaths = $allowAllPaths;
+			$this->_list_full_path = trailing_slash( $path );
 		}
 
 	}
@@ -225,65 +241,63 @@ class Filelist
 	 */
 	function load( $flatmode = false )
 	{
-		if( !$this->listpath )
-		{
+		global $Messages;
+	
+		if( !$this->_list_full_path )
+		{	// We have no path to load from:
 			return false;
 		}
 
+		// Clears the list:
 		$this->_total_entries = 0;
 		$this->_total_bytes = 0;
 		$this->_total_files = 0;
 		$this->_total_dirs = 0;
-
 		$this->_entries = array();
 		$this->_md5_ID_index = array();
 		$this->_full_path_index = array();
 		$this->_order_index = array();
 
-
-		if( $flatmode )
+		// Attempt list files for requested directory: (recursively if flat mode):
+		if( ($filepath_array = retrieveFiles( $this->_list_full_path, true, true, true, $flatmode )) === false )
 		{
-			$toAdd = retrieveFiles( $this->listpath );
-		}
-		else
-		{
-			$toAdd = retrieveFiles( $this->listpath, true, true, true, false );
-		}
-
-		if( $toAdd === false )
-		{
-			$this->Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->listpath ), 'fl_error' );
+			$Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->_list_full_path ), 'fl_error' );
 			return false;
 		}
 
-
-		foreach( $toAdd as $entry )
+		// Loop through file list:
+		foreach( $filepath_array as $filepath )
 		{
-			if( !$this->showhidden && substr($entry, 0, 1) == '.' )
-			{ // hidden files (prefixed with .)
+			// Extract the filename from the full path
+			$name = basename( $filepath );
+
+			// Check for hidden status...
+			if( (! $this->_show_hidden_files) && (substr($name, 0, 1) == '.') )
+			{ // Do not load & show hidden files (prefixed with .)
 				continue;
 			}
-			if( $this->filterString !== NULL )
-			{ // Filter: must match filename
-				$name = basename( $entry );
 
-				if( $this->filterIsRegexp )
-				{
-					if( !preg_match( '#'.str_replace( '#', '\#', $this->filterString ).'#', $name ) )
+			// Check filter...
+			if( $this->_filter !== NULL )
+			{ // Filter: must match filename
+				if( $this->_filter_is_regexp )
+				{ // Filter is a reg exp:
+					if( !preg_match( '#'.str_replace( '#', '\#', $this->_filter ).'#', $name ) )
 					{ // does not match the regexp filter
 						continue;
 					}
 				}
 				else
-				{
-					if( !my_fnmatch( $this->filterString, $name ) )
+				{ // Filter is NOT a regexp:
+					if( !my_fnmatch( $this->_filter, $name ) )
 					{
 						continue;
 					}
 				}
 			}
 
-			$this->addFileByPath( $entry, true );
+			// Add the file into current list:
+			$this->add_by_path( $filepath, true );
 		}
 	}
 
@@ -295,15 +309,15 @@ class Filelist
 	 * @param boolean Has the file to exist to get added?
 	 * @return boolean true on success, false on failure
 	 */
-	function addFile( & $File, $mustExist = false )
+	function add( & $File, $mustExist = false )
 	{
 		if( !is_a( $File, 'file' ) )
-		{
+		{	// Passed object is not a File!! :(
 			return false;
 		}
 
 		if( $mustExist && !$File->exists() )
-		{
+		{	// File does not exist..
 			return false;
 		}
 
@@ -311,7 +325,7 @@ class Filelist
 		$this->_entries[$this->_total_entries] = & $File;
 		$this->_md5_ID_index[$File->get_md5_ID()] = $this->_total_entries;
 		$this->_full_path_index[$File->get_full_path()] = $this->_total_entries;
-		// add file to the end:
+		// add file to the end of current list:
 		$this->_order_index[$this->_total_entries] = $this->_total_entries;
 
 		// Count 1 more entry (file or dir)
@@ -343,7 +357,7 @@ class Filelist
 	/**
 	 * Add a file to the list, by filename.
 	 *
-	 * This is a stub for {@link addFile()}.
+	 * This is a stub for {@link Filelist::add()}.
 	 *
 	 * @param string|File file name / full path or {@link File} object
 	 * @param boolean Has the file to exist to get added?
@@ -351,24 +365,13 @@ class Filelist
 	 *                 file does not exist)
 	 * @todo optimize (blueyed)
 	 */
-	function addFileByPath( $path, $mustExist = false )
+	function add_by_path( $path, $mustExist = false )
 	{
 		global $FileCache;
 
-		$basename = basename($path);
-		$dirname = dirname($path).'/';
+		$NewFile = & $FileCache->get_by_path( $path );
 
-		if( $basename != $path && !$this->_allowAllPaths )
-		{ // path attached and not all paths allowed
-			if( $dirname != $this->listpath )
-			{ // not this list's path
-				return false;
-			}
-		}
-
-		$NewFile = & $FileCache->get_by_path( $path  );
-
-		return $this->addFile( $NewFile, $mustExist );
+		return $this->add( $NewFile, $mustExist );
 	}
 
 
@@ -396,27 +399,26 @@ class Filelist
 		}
 		if( $dirsattop !== NULL )
 		{
-			$this->dirsnotattop = !$dirsattop;
+			$this->_dirs_not_at_top = ! $dirsattop;
 		}
 
-		usort( $this->_order_index, array( $this, '_sortCallback' ) );
+		usort( $this->_order_index, array( $this, '_sort_callback' ) );
 
-
-		// Restart the list
+		// Reset the iterator:
 		$this->restart();
 	}
 
 
 	/**
-	 * usort callback function for {@link sort()}, because we cannot eval() right there
+	 * usort callback function for {@link Filelist::sort()}
 	 *
 	 * @access protected
 	 * @return integer
 	 */
-	function _sortCallback( $a, $b )
+	function _sort_callback( $a, $b )
 	{
-		$FileA =& $this->_entries[$a];
-		$FileB =& $this->_entries[$b];
+		$FileA = & $this->_entries[$a];
+		$FileB = & $this->_entries[$b];
 
 		// What colmun are we sorting on?
 		switch( $this->_order )
@@ -462,13 +464,13 @@ class Filelist
 		}
 
 
-		if( !$this->_order_asc )
-		{ // switch order
-			$r = -$r;
+		if( ! $this->_order_asc )
+		{ // We want descending order: switch order
+			$r = - $r;
 		}
 
-		if( !$this->dirsnotattop )
-		{
+		if( ! $this->_dirs_not_at_top )
+		{	// We want dirs to be on top, always:
 			if( $FileA->is_dir() && !$FileB->is_dir() )
 			{
 				$r = -1;
@@ -484,7 +486,7 @@ class Filelist
 
 
 	/**
-	 * Restart the list
+	 * Reset the iterator
 	 */
 	function restart()
 	{
@@ -498,19 +500,18 @@ class Filelist
 	 * @param string The type (empty for current order type)
 	 * @return integer 1 for ascending sorting, 0 for descending
 	 */
-	function isSortingAsc( $type = '' )
+	function is_sorting_asc( $col = '' )
 	{
-		if( empty($type) )
-		{
-			$type = $this->_order;
-		}
-
 		if( $this->_order_asc === NULL )
-		{ // default
-			return ( $type == 'name' || $type == 'path' ) ? 1 : 0;
+		{ // We have not specified a sort order by now, use default:
+			if( empty($col) )
+			{
+				$col = $this->_order;
+			}
+			return ( $col == 'name' || $col == 'path' ) ? 1 : 0;
 		}
 		else
-		{
+		{	// Use previsously specified sort order:
 			return ( $this->_order_asc ) ? 1 : 0;
 		}
 	}
@@ -521,19 +522,19 @@ class Filelist
 	 *
 	 * @return boolean
 	 */
-	function isFiltering()
+	function is_filtering()
 	{
-		return $this->filterString !== NULL;
+		return ($this->_filter !== NULL);
 	}
 
 
 	/**
-	 * Is a File in the list?
+	 * Does the list contain a specific File?
 	 *
 	 * @param File the File object to look for
 	 * @return boolean
 	 */
-	function holdsFile( $File )
+	function contains( & $File )
 	{
 		return isset( $this->_md5_ID_index[ $File->get_md5_ID() ] );
 	}
@@ -544,7 +545,7 @@ class Filelist
 	 *
 	 * @return NULL|string
 	 */
-	function getOrder()
+	function get_sort_order()
 	{
 		return $this->_order;
 	}
@@ -556,26 +557,32 @@ class Filelist
 	 * @param boolean add a note when it's a regexp or no filter?
 	 * @return string the filter
 	 */
-	function getFilter( $note = true )
+	function get_filter( $verbose = true )
 	{
-		if( $this->filterString === NULL )
-		{
-			return $note ?
-							T_('No filter') :
-							'';
+		if( $this->_filter === NULL )
+		{	// Filtering is not active
+			return $verbose ? T_('No filter') : '';
 		}
 		else
-		{
-			return $this->filterString
-							.( $note && $this->filterIsRegexp ?
-									' ('.T_('regular expression').')' :
-									'' );
+		{	// Filtering is active
+			return $this->_filter
+							.( $verbose && $this->_filter_is_regexp ? ' ('.T_('regular expression').')' : '' );
 		}
+	}
+
+	/**
+	 * Is the current Filter a regexp?
+	 *
+	 * @return NULL|boolean true if regexp, NULL if no filter set
+	 */
+	function is_filter_regexp()
+	{
+		return $this->_filter_is_regexp;
 	}
 
 
 	/**
-	 * Get the number of entries.
+	 * Get the total number of entries in the list.
 	 *
 	 * @return integer
 	 */
@@ -586,33 +593,33 @@ class Filelist
 
 
 	/**
-	 * Get the number of directories.
+	 * Get the total number of directories in the list
 	 *
 	 * @return integer
 	 */
-	function countDirs()
+	function count_dirs()
 	{
 		return $this->_total_dirs;
 	}
 
 
 	/**
-	 * Get the number of files.
+	 * Get the total number of files in the list
 	 *
 	 * @return integer
 	 */
-	function countFiles()
+	function count_files()
 	{
 		return $this->_total_files;
 	}
 
 
 	/**
-	 * Get the number of bytes of all files.
+	 * Get the total number of bytes of all files in the list
 	 *
 	 * @return integer
 	 */
-	function countBytes()
+	function count_bytes()
 	{
 		return $this->_total_bytes;
 	}
@@ -622,22 +629,22 @@ class Filelist
 	 * Get the next entry and increment internal counter.
 	 *
 	 * @param string can be used to query only 'file's or 'dir's.
-	 * @return boolean File object (by reference) on success, false on end of list
+	 * @return boolean|File object (by reference) on success, false on end of list
 	 */
-	function & getNextFile( $type = '' )
+	function & get_next( $type = '' )
 	{
-		/**
-		 * @debug return the same file 10 times, useful for profiling
-		static $debugMakeLonger = 0;
-		if( $debugMakeLonger-- == 0 )
-		{
-			$this->_current_idx++;
-			$debugMakeLonger = 9;
-		}
+		/*
+		 * DEBUG: return the same file 10 times, useful for profiling
+			static $debugMakeLonger = 0;
+			if( $debugMakeLonger-- == 0 )
+			{
+				$this->_current_idx++;
+				$debugMakeLonger = 9;
+			}
 		*/
 
 		if( !isset($this->_order_index[$this->_current_idx + 1]) )
-		{
+		{	// End of list:
 			return false;
 		}
 		$this->_current_idx++;
@@ -648,11 +655,11 @@ class Filelist
 		{
 			if( $type == 'dir' && !$this->_entries[ $index ]->is_dir() )
 			{ // we want a dir
-				return $this->getNextFile( 'dir' );
+				return $this->get_next( 'dir' );
 			}
 			elseif( $type == 'file' && $this->_entries[ $index ]->is_dir() )
 			{ // we want a file
-				return $this->getNextFile( 'file' );
+				return $this->get_next( 'file' );
 			}
 		}
 
@@ -661,12 +668,12 @@ class Filelist
 
 
 	/**
-	 * Get a file by it's full path.
+	 * Get a file by its full path.
 	 *
 	 * @param string the full path
 	 * @return mixed File object (by reference) on success, false on failure.
 	 */
-	function &getFileByPath( $path )
+	function & get_by_path( $path )
 	{
 		$path = str_replace( '\\', '/', $path );
 
@@ -687,7 +694,7 @@ class Filelist
 	 * @param string the ID (MD5 of path and name)
 	 * @return mixed File object (by reference) on success, false on failure.
 	 */
-	function &getFileByID( $md5id )
+	function & get_by_md5_ID( $md5id )
 	{
 		if( isset( $this->_md5_ID_index[ $md5id ] ) )
 		{
@@ -706,7 +713,7 @@ class Filelist
 	 * @param integer Index of the entries (starting with 0)
 	 * @return false|File
 	 */
-	function &getFileByIndex( $index )
+	function & getFileByIndex( $index )
 	{
 		if( isset( $this->_order_index[ $index ] ) )
 		{
@@ -720,17 +727,20 @@ class Filelist
 
 
 	/**
-	 * Get the path (and name) of a {@link File} relative to the {@link $listpath list's path}.
+	 * Get the path (and name) of a {@link File} relative to the {@link Filelist::_list_full_path} list's path.
+	 *
+	 * @todo fplanque>> optimize withName by calliong File::get_full_path tight away
+	 * @todo fplanque>> check that the rootDir matches!
 	 *
 	 * @param File the File object
 	 * @param boolean appended with name? (folders will get an ending slash)
 	 * @return string path (and optionally name)
 	 */
-	function getFileSubpath( &$File, $withName = true, $rootDir = NULL )
+	function get_relative_path( & $File, $withName = true, $rootDir = NULL )
 	{
 		if( $rootDir === NULL )
 		{
-			$rootDir = $this->listpath;
+			$rootDir = $this->_list_full_path;
 		}
 		$path = substr( $File->get_dir(), strlen($rootDir) );
 
@@ -752,7 +762,7 @@ class Filelist
 	 *
 	 * @return boolean true on success, false if not found in list.
 	 */
-	function removeFromList( &$File )
+	function remove( & $File )
 	{
 		if( isset( $this->_md5_ID_index[ $File->get_md5_ID() ] ) )
 		{ // unset indexes and entry
@@ -788,7 +798,7 @@ class Filelist
 	 * @param string Use this method on every File and put the result into the list.
 	 * @return array The array with the File objects or method results
 	 */
-	function getFilesArray( $method = NULL )
+	function get_array( $method = NULL )
 	{
 		$r = array();
 
@@ -817,7 +827,7 @@ class Filelist
 	 *
 	 * @return string md5 hash
 	 */
-	function toMD5()
+	function md5_checksum()
 	{
 		return md5( serialize( $this->_entries ) );
 	}
@@ -877,6 +887,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.25  2005/04/29 18:49:32  fplanque
+ * Normalizing, doc, cleanup
+ *
  * Revision 1.24  2005/04/28 20:44:20  fplanque
  * normalizing, doc
  *

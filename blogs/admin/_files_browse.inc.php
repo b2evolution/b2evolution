@@ -80,17 +80,17 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 
 <form action="files.php#FM_anchor" id="fmbar_filter" class="toolbaritem">
 	<?php
-	echo $Fileman->getFormHiddenInputs();
+	echo $Fileman->getFormHiddenInputs( array( 'filterString'=>'', 'filterIsRegexp'=>'' ) );
 	echo $Fileman->getFormHiddenSelectedFiles();
 	?>
 	<label for="filterString" id="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
 	<input type="text"
 		name="filterString"
-		value="<?php echo format_to_output( $Fileman->getFilter( false ), 'formvalue' ) ?>"
+		value="<?php echo format_to_output( $Fileman->get_filter( false ), 'formvalue' ) ?>"
 		size="7"
 		accesskey="f" />
 	<input type="checkbox" class="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php echo $titleRegExp; ?>"
-		value="1"<?php if( $Fileman->filterIsRegexp ) echo ' checked="checked"' ?> />
+		value="1"<?php if( $Fileman->is_filter_regexp() ) echo ' checked="checked"' ?> />
 	<label for="filterIsRegexp" title="<?php echo $titleRegExp; ?>"><?php
 		echo /* TRANS: short for "is regular expression" */ T_('RegExp'); ?></label>
 
@@ -100,7 +100,7 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 		value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
 
 	<?php
-	if( $Fileman->isFiltering() )
+	if( $Fileman->is_filtering() )
 	{ // "reset filter" form
 		?>
 		<input title="<?php echo T_('Unset filter'); ?>"
@@ -133,7 +133,7 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 
 <form action="files.php#FM_anchor" name="FilesForm" id="FilesForm" method="post">
 <input type="hidden" name="confirmed" value="0" />
-<input type="hidden" name="md5_filelist" value="<?php echo $Fileman->toMD5() ?>" />
+<input type="hidden" name="md5_filelist" value="<?php echo $Fileman->md5_checksum() ?>" />
 <input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->cwd) ?>" />
 <?php echo $Fileman->getFormHiddenInputs(); ?>
 
@@ -192,9 +192,9 @@ $filetable_cols = 8;
 
 
 			// Display current filter:
-			if( $Fileman->isFiltering() )
+			if( $Fileman->is_filtering() )
 			{
-				echo '[<em class="filter">'.$Fileman->getFilter().'</em>]';
+				echo '[<em class="filter">'.$Fileman->get_filter().'</em>]';
 				// TODO: maybe clicking on the filter should open a JS popup saying "Remove filter [...]? Yes|No"
 			}
 
@@ -212,11 +212,11 @@ $filetable_cols = 8;
 			// Display filecounts:
 			?>
 
-			<span class="fm_filecounts" title="<?php printf( T_('%s bytes'), number_format($Fileman->countBytes()) ); ?>"> (<?php
-			disp_cond( $Fileman->countDirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
+			<span class="fm_filecounts" title="<?php printf( T_('%s bytes'), number_format($Fileman->count_bytes()) ); ?>"> (<?php
+			disp_cond( $Fileman->count_dirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
 			echo ', ';
-			disp_cond( $Fileman->countFiles(), T_('One file'), T_('%d files'), T_('No files' ) );
-			echo ', '.bytesreadable( $Fileman->countBytes() );
+			disp_cond( $Fileman->count_files(), T_('One file'), T_('%d files'), T_('No files' ) );
+			echo ', '.bytesreadable( $Fileman->count_bytes() );
 			?>
 			)</span>
 		</div>
@@ -261,7 +261,7 @@ param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
  */
 $Fileman->sort();
 $countFiles = 0;
-while( $lFile =& $Fileman->getNextFile() )
+while( $lFile =& $Fileman->get_next() )
 { // loop through all Files:
 	echo '<tr';
 
@@ -334,9 +334,9 @@ while( $lFile =& $Fileman->getNextFile() )
 	 * Filename:
 	 */
 	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" onclick="document.getElementById(\'cb_filename_'.$countFiles.'\').click();">';
-	if( $Fileman->flatmode && $Fileman->getOrder() != 'name' )
+	if( $Fileman->flatmode && $Fileman->get_sort_order() != 'name' )
 	{	// Display directory name
-		echo './'.$Fileman->getFileSubpath( $lFile );
+		echo './'.$Fileman->get_relative_path( $lFile );
 	}
 	else
 	{	// Display file short name
@@ -360,11 +360,11 @@ while( $lFile =& $Fileman->getNextFile() )
 	/*
 	 * Directory in flat mode:
 	 */
-	if( $Fileman->flatmode && $Fileman->getOrder() == 'name' )
+	if( $Fileman->flatmode && $Fileman->get_sort_order() == 'name' )
 	{
 		?>
 		<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
-		$subPath = $Fileman->getFileSubpath( $lFile, false );
+		$subPath = $Fileman->get_relative_path( $lFile, false );
 		if( empty( $subPath ) )
 		{
 			$subPath = './';
@@ -427,12 +427,12 @@ if( $countFiles == 0 )
 	<tr>
 		<td colspan="<?php echo $filetable_cols ?>">
 			<?php
-			if( !$Fileman->Messages->count( 'fl_error' ) )
+			if( !$Messages->count( 'fl_error' ) )
 			{ // no Filelist errors, the directory must be empty
-				$Fileman->Messages->add( T_('No files found.')
-					.( $Fileman->isFiltering() ? '<br />'.T_('Filter').': &laquo;'.$Fileman->getFilter().'&raquo;' : '' ), 'fl_error' );
+				$Messages->add( T_('No files found.')
+					.( $Fileman->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$Fileman->get_filter().'&raquo;' : '' ), 'fl_error' );
 			}
-			$Fileman->Messages->display( '', '', true, 'fl_error', 'log_error' );
+			$Messages->display( '', '', true, 'fl_error', 'log_error' );
 
 			?>
 		</td>
@@ -735,6 +735,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.27  2005/04/29 18:49:32  fplanque
+ * Normalizing, doc, cleanup
+ *
  * Revision 1.26  2005/04/28 20:44:18  fplanque
  * normalizing, doc
  *

@@ -111,7 +111,7 @@ function bytesreadable( $bytes )
  * @param boolean include files (not only directories)
  * @param boolean include directories (not the directory itself!)
  * @param boolean flat (return an one-dimension-array)
- * @return false|array false if the first directory could not be accesses,
+ * @return false|array false if the first directory could not be accessed,
  *                     array of entries otherwise
  */
 function retrieveFiles( $path, $includeFiles = true, $includeDirs = true, $flat = true, $recurse = true )
@@ -426,6 +426,9 @@ function isFilename( $filename )
 
 /*
  * $Log$
+ * Revision 1.15  2005/04/29 18:49:32  fplanque
+ * Normalizing, doc, cleanup
+ *
  * Revision 1.14  2005/04/28 20:44:20  fplanque
  * normalizing, doc
  *

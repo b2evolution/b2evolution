@@ -37,16 +37,16 @@ class FilelistTestCase extends FilemanUnitTestCase
 
 
 	/**
-	 * Tests addFileByPath()
+	 * Tests add_by_path()
 	 */
 	function testAddFileByPath()
 	{
-		$r = $this->Filelist->addFileByPath( TMPDIR.'a' );
+		$r = $this->Filelist->add_by_path( TMPDIR.'a' );
 		$this->assertEqual( $r, true, 'File was added.' );
 
 		$this->assertEqual( $this->Filelist->count(), 1, 'Filecount matches.' );
 
-		$File =& $this->Filelist->getFileByPath( TMPDIR.'a' );
+		$File = & $this->Filelist->get_by_path( TMPDIR.'a' );
 		$this->assertIsA( $File, 'file', 'We got a File.' );
 
 		$this->assertEqual( $File->get_name(), 'a', 'File has the same name.' );
@@ -61,12 +61,12 @@ class FilelistTestCase extends FilemanUnitTestCase
 		$File = new File( 'a', TMPDIR );
 		$id = $File->get_md5_ID();
 
-		$r = $this->Filelist->addFile( $File );
+		$r = $this->Filelist->add( $File );
 		$this->assertEqual( $r, true, 'File added.' );
 		$this->assertEqual( $this->Filelist->count(), 1, 'Filecount matches.' );
 
-		$GetFile =& $this->Filelist->getFileByID( $id );
-		#$File =& $this->Filelist->getFileByID( $id );
+		$GetFile =& $this->Filelist->get_by_md5_ID( $id );
+		#$File =& $this->Filelist->get_by_md5_ID( $id );
 		$this->assertReference( $File, $GetFile, 'Got the same file.' );
 		$this->assertReference( $File, $GetFile, 'Got the same file.' );
 	}
@@ -78,12 +78,12 @@ class FilelistTestCase extends FilemanUnitTestCase
 	function testRemoveFromList()
 	{
 		$File =& new File( 'a', TMPDIR );
-		$r = $this->Filelist->addFile( $File );
+		$r = $this->Filelist->add( $File );
 
 		$this->assertEqual( $r, true, 'File added.' );
 		$this->assertEqual( $this->Filelist->count(), 1, 'Count ok.' );
 
-		$this->Filelist->removeFromList( $File );
+		$this->Filelist->remove( $File );
 		$this->assertEqual( $this->Filelist->count(), 1, 'File removed.' );
 	}
 
@@ -94,13 +94,13 @@ class FilelistTestCase extends FilemanUnitTestCase
 	{
 		$FileA = new File( 'a', TMPDIR );
 		$FileB = new File( 'b', TMPDIR );
-		$r = $this->Filelist->addFile( $FileA );
-		$r = $this->Filelist->addFile( $FileB );
+		$r = $this->Filelist->add( $FileA );
+		$r = $this->Filelist->add( $FileB );
 
 		$this->assertReference( $this->Filelist->getFileByIndex(0), $FileA, 'First file ok.' );
 		$this->assertReference( $this->Filelist->getFileByIndex(1), $FileB, 'Second file ok.' );
 
-		$r = $this->Filelist->removeFromList( $FileA );
+		$r = $this->Filelist->remove( $FileA );
 		$this->assertTrue( $r, true, 'Remove ok.' );
 		$this->assertTrue( $this->Filelist->count(), 1, 'Count after remove ok.' );
 
@@ -115,11 +115,11 @@ class FilelistTestCase extends FilemanUnitTestCase
 	function testSort()
 	{
 		$FileA = new File( 'a', TMPDIR );
-		$this->Filelist->addFile( $FileA );
+		$this->Filelist->add( $FileA );
 		$FileB = new File( 'b', TMPDIR );
-		$this->Filelist->addFile( $FileB );
+		$this->Filelist->add( $FileB );
 		$FileC = new File( 'c', TMPDIR );
-		$this->Filelist->addFile( $FileC );
+		$this->Filelist->add( $FileC );
 
 
 		// ascending, dirs not at top:

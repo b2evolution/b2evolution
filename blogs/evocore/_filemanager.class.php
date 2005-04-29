@@ -54,6 +54,8 @@ require_once dirname(__FILE__).'/_filelist.class.php';
 /**
  * Extends {@link Filelist} and provides file management functionality.
  *
+ * @todo fplanque>> This object doesn't really make sense, we may get rid of it and move the functionnality back to files.php
+ * @author blueyed
  * @package evocore
  */
 class FileManager extends Filelist
@@ -83,12 +85,6 @@ class FileManager extends Filelist
 	 */
 	var $cwd;
 
-
-	/**
-	 * User preference: sort dirs not at top
-	 * @var boolean
-	 */
-	var $dirsnotattop = false;
 
 	/**
 	 * User preference: show permissions like "ls -l" (true) or octal (false)?
@@ -148,6 +144,14 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Display size (width, height) for images?
+	 *
+	 * @var boolean
+	 */
+	var $getImageSizes = false;
+
+
+	/**
 	 * Force display of Filemanager also when in file_upload mode etc.?
 	 * // Is also a usersetting.
 	 * @var integer
@@ -167,9 +171,19 @@ class FileManager extends Filelist
 	 * @access private
 	 */
 	var $_internalGlobals = array(
-			'root', 'path', 'filterString', 'filterIsRegexp', 'order', 'orderasc',
-			'mode', 'fm_mode', 'fm_sources', 'cmr_keepsource', 'flatmode', 'forceFM',
-			'item_ID'	// Used in fm_mode=link_item
+			'root'           => 'root',
+			'path'           => 'path',
+			'filterString'   => '_filter',
+			'filterIsRegexp' => '_filter_is_regexp',
+			'order'          => 'order',
+			'orderasc'       => 'orderasc',
+			'mode'           => 'mode',
+			'fm_mode'        => 'fm_mode',
+			'fm_sources'     => 'fm_sources',
+			'cmr_keepsource' => 'cmr_keepsource',
+			'flatmode'       => 'flatmode',
+			'forceFM'        => 'forceFM',
+			'item_ID'	       => 'item_ID'	             // Used in fm_mode=link_item
 		);
 
 	/**
@@ -201,12 +215,13 @@ class FileManager extends Filelist
 	 * @param boolean is the filter a regular expression (default is glob pattern)
 	 * @param boolean filter in subdirs (search)
 	 */
-	function FileManager( &$cUser, $url, $root, $path = '', $order = NULL, $orderasc = NULL,
+	function FileManager( & $cUser, $url, $root, $path = '', $order = NULL, $orderasc = NULL,
 												$filterString = NULL, $filterIsRegexp = NULL, $flatmode = NULL )
 	{
 		global $basepath, $baseurl, $media_subdir, $admin_subdir, $admin_url;
 		global $BlogCache, $UserCache;
 		global $Debuglog, $AdminUI;
+		global $Messages;
 
 		// Global params to remember:
 		global $mode, $item_ID;
@@ -214,7 +229,6 @@ class FileManager extends Filelist
 		$this->item_ID = $item_ID;
 
 		$this->User = & $cUser;
-		$this->Messages = & new Log( 'error' );
 
 		$this->result_params = $AdminUI->getMenuTemplate('Results');
 
@@ -255,12 +269,12 @@ class FileManager extends Filelist
 
 		if( !$this->root_dir )
 		{
-			$this->Messages->add( T_('No access to root directory.'), 'error' );
+			$Messages->add( T_('No access to root directory.'), 'error' );
 			$this->cwd = NULL;
 		}
 		elseif( !$real_root_dir_exists )
 		{
-			$this->Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $this->root_dir ), 'error' );
+			$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $this->root_dir ), 'error' );
 			$this->cwd = NULL;
 		}
 		else
@@ -273,14 +287,14 @@ class FileManager extends Filelist
 
 			if( !preg_match( '#^'.$this->root_dir.'#', $realpath ) )
 			{ // cwd is not below root!
-				$this->Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
+				$Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
 				$this->cwd = $this->root_dir;
 			}
 			else
 			{ // allowed
 				if( !$realpath_exists )
 				{ // does not exist
-					$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $this->cwd ) );
+					$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $this->cwd ) );
 					$this->cwd = NULL;
 				}
 				else
@@ -310,12 +324,12 @@ class FileManager extends Filelist
 
 		if( $this->fm_mode && $this->fm_sources = param( 'fm_sources', 'array', array() ) )
 		{
-			if( $this->SourceList =& new Filelist() )
+			if( $this->SourceList = & new Filelist() )
 			{ // TODO: should fail for non-existant sources, or sources where no read-perm
 
 				foreach( $this->fm_sources as $lSourcePath )
 				{
-					$this->SourceList->addFileByPath( urldecode($lSourcePath) );
+					$this->SourceList->add_by_path( urldecode($lSourcePath) );
 				}
 				$this->cmr_keepsource = param( 'cmr_keepsource', 'integer', 0 );
 			}
@@ -339,22 +353,6 @@ class FileManager extends Filelist
 
 
 		$this->loadSettings();
-
-
-		if( !empty($file) )
-		{ // a file is given as parameter
-			$curFile =& $Fileman->getFileByName( $file );
-
-			if( !$curFile )
-			{
-				$Fileman->Messages->add( sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $file ) );
-			}
-		}
-		else
-		{
-			$curFile = false;
-		}
-
 
 		$Debuglog->add( 'root: '.var_export( $this->root, true ), 'filemanager' );
 		$Debuglog->add( 'root_dir: '.var_export( $this->root_dir, true ), 'filemanager' );
@@ -396,15 +394,17 @@ class FileManager extends Filelist
 	 */
 	function setFilter( $filterString, $filterIsRegexp = true )
 	{
-		$this->filterIsRegexp = $filterIsRegexp;
+		global $Messages;
 
-		if( $this->filterIsRegexp && !isRegexp( $filterString ) )
+		$this->_filter_is_regexp = $filterIsRegexp;
+
+		if( $this->_filter_is_regexp && !isRegexp( $filterString ) )
 		{
-			$this->Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $filterString ) );
+			$Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $filterString ) );
 			$filterString = '.*';
 		}
 
-		$this->filterString = empty($filterString) ? NULL : $filterString;
+		$this->_filter = empty($filterString) ? NULL : $filterString;
 	}
 
 
@@ -415,7 +415,7 @@ class FileManager extends Filelist
 	{
 		parent::sort( $this->translate_order( $this->_order ),
 									$this->translate_asc( $this->_order_asc, $this->translate_order( $this->_order ) ),
-									!$this->dirsnotattop );
+									!$this->_dirs_not_at_top );
 	}
 
 
@@ -641,7 +641,7 @@ class FileManager extends Filelist
 		$r = $this->url;
 
 		$toAppend = array();
-		foreach( $this->_internalGlobals as $check )
+		foreach( $this->_internalGlobals as $check => $var )
 		{
 			if( isset( $override[$check] ) )
 			{
@@ -655,9 +655,9 @@ class FileManager extends Filelist
 
 				$toAppend[$check] = $overrideValue;
 			}
-			elseif( $this->$check !== NULL )
+			elseif( $this->$var !== NULL )
 			{
-				$toAppend[$check] = $this->$check;
+				$toAppend[$check] = $this->$var;
 			}
 		}
 
@@ -782,7 +782,7 @@ class FileManager extends Filelist
 	 */
 	function getLinkSort( $type, $atext )
 	{
-		$newAsc = $this->_order == $type ? (1 - $this->isSortingAsc()) :  1;
+		$newAsc = $this->_order == $type ? (1 - $this->is_sorting_asc()) :  1;
 
 		$r = '<a href="'.$this->getCurUrl( array( 'order' => $type,	'orderasc' => $newAsc ) ).'" title="'.T_('Change Order').'"';
 
@@ -791,7 +791,7 @@ class FileManager extends Filelist
 		{	// Not sorted on this column:
 			$r .= ' class="basic_sort_link">'.$this->result_params['basic_sort_off'];
 		}
-		elseif( $this->isSortingAsc($type) )
+		elseif( $this->is_sorting_asc($type) )
 		{ // We are sorting on this column , in ascneding order:
 			$r .=	' class="basic_current">'.$this->result_params['basic_sort_asc'];
 		}
@@ -813,9 +813,9 @@ class FileManager extends Filelist
 	 * @param string can be used to query only 'file's or 'dir's.
 	 * @return boolean File object on success, false on end of list
 	 */
-	function &getNextFile( $type = '' )
+	function &get_next( $type = '' )
 	{
-		$this->curFile =& parent::getNextFile( $type );
+		$this->curFile =& parent::get_next( $type );
 
 		return $this->curFile;
 	}
@@ -833,7 +833,7 @@ class FileManager extends Filelist
 			$File = $this->curFile;
 		}
 
-		return $this->root_url.$this->getFileSubpath( $File );
+		return $this->root_url.$this->get_relative_path( $File );
 	}
 
 
@@ -867,9 +867,9 @@ class FileManager extends Filelist
 	 * @param boolean appended with name? (folders will get an ending slash)
 	 * @return string path (and optionally name)
 	 */
-	function getFileSubpath( &$File, $withName = true )
+	function get_relative_path( &$File, $withName = true )
 	{
-		return parent::getFileSubpath( $File, $withName, $this->root_dir );
+		return parent::get_relative_path( $File, $withName, $this->root_dir );
 	}
 
 
@@ -885,7 +885,7 @@ class FileManager extends Filelist
 		{	// Link to open this directory:
 			if( !isset( $File->cache['linkFile_1'] ) )
 			{
-				$File->cache['linkFile_1'] = $this->getCurUrl( array( 'path' => $this->getFileSubpath( $File ) ) );
+				$File->cache['linkFile_1'] = $this->getCurUrl( array( 'path' => $this->get_relative_path( $File ) ) );
 			}
 			return $File->cache['linkFile_1'];
 		}
@@ -946,7 +946,7 @@ class FileManager extends Filelist
 	 *
 	 * @return array of File by reference
 	 */
-	function &getFilelistSelected()
+	function & getFilelistSelected()
 	{
 		if( is_null($this->_selectedFiles) )
 		{
@@ -956,9 +956,9 @@ class FileManager extends Filelist
 
 			foreach( $fm_selected as $lSelectedID )
 			{
-				if( $File =& $this->getFileByID( $lSelectedID ) )
+				if( $File =& $this->get_by_md5_ID( $lSelectedID ) )
 				{
-					$this->_selectedFiles->addFile( $File );
+					$this->_selectedFiles->add( $File );
 				}
 			}
 		}
@@ -1031,7 +1031,7 @@ class FileManager extends Filelist
 
 
 
-		if( !$Nodelist->countDirs() )
+		if( !$Nodelist->count_dirs() )
 		{
 			$r['string'] .= $label;
 			return $r;
@@ -1046,9 +1046,9 @@ class FileManager extends Filelist
 
 										';
 
-			while( $lFile =& $Nodelist->getNextFile( 'dir' ) )
+			while( $lFile =& $Nodelist->get_next( 'dir' ) )
 			{
-				$rSub = $this->getDirectoryTreeRadio( $rootID, $lFile->get_full_path(), $rootSubpath.$Nodelist->getFileSubpath( $lFile ) );
+				$rSub = $this->getDirectoryTreeRadio( $rootID, $lFile->get_full_path(), $rootSubpath.$Nodelist->get_relative_path( $lFile ) );
 
 				if( $rSub['opened'] )
 				{
@@ -1076,7 +1076,7 @@ class FileManager extends Filelist
 	 */
 	function isSelected( $File )
 	{
-		return $this->_selectedFiles->holdsFile( $File );
+		return $this->_selectedFiles->contains( $File );
 	}
 
 
@@ -1092,6 +1092,7 @@ class FileManager extends Filelist
 	function createDirOrFile( $type, $name, $path = NULL, $chmod = NULL )
 	{
 		global $FileCache;
+		global $Messages;
 
 		if( $type != 'dir' && $type != 'file' )
 		{
@@ -1108,14 +1109,14 @@ class FileManager extends Filelist
 
 		if( empty($name) )
 		{	// No name was supplied:
-			$this->Messages->add( $type == 'dir' ?
+			$Messages->add( $type == 'dir' ?
 														T_('Cannot create a directory without name.') :
 														T_('Cannot create a file without name.') );
 			return false;
 		}
 		elseif( !isFilename($name) )
 		{
-			$this->Messages->add( sprintf( ($type == 'dir' ?
+			$Messages->add( sprintf( ($type == 'dir' ?
 																			T_('&laquo;%s&raquo; is not a valid directory.') :
 																			T_('&laquo;%s&raquo; is not a valid filename.') ), $name) );
 			return false;
@@ -1126,7 +1127,7 @@ class FileManager extends Filelist
 
 		if( $newFile->exists() )
 		{
-			$this->Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $name ) );
+			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $name ) );
 			return false;
 		}
 
@@ -1134,24 +1135,24 @@ class FileManager extends Filelist
 		{
 			if( $type == 'file' )
 			{
-				$this->Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been created.'), $name ), 'note' );
+				$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been created.'), $name ), 'note' );
 			}
 			else
 			{
-				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been created.'), $name ), 'note' );
+				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been created.'), $name ), 'note' );
 			}
 
-			$this->addFile( $newFile );
+			$this->add( $newFile );
 		}
 		else
 		{
 			if( $type == 'file' )
 			{
-				$this->Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $path ) );
+				$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $path ) );
 			}
 			else
 			{
-				$this->Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $path ) );
+				$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $path ) );
 			}
 		}
 
@@ -1247,11 +1248,11 @@ class FileManager extends Filelist
 	{
 		global $UserSettings;
 
-		$UserSettings->get_cond( $this->dirsnotattop,     'fm_dirsnotattop',     $this->User->ID );
+		$UserSettings->get_cond( $this->_dirs_not_at_top,       'fm_dirsnotattop',     $this->User->ID );
 		$UserSettings->get_cond( $this->permlikelsl,      'fm_permlikelsl',      $this->User->ID );
 		$UserSettings->get_cond( $this->getImageSizes,    'fm_getimagesizes',    $this->User->ID );
 		$UserSettings->get_cond( $this->_use_recursive_dirsize, 'fm_recursivedirsize', $this->User->ID ); // TODO: check for permission (Server load)
-		$UserSettings->get_cond( $this->showhidden,       'fm_showhidden',       $this->User->ID );
+		$UserSettings->get_cond( $this->_show_hidden_files,     'fm_showhidden',       $this->User->ID );
 		$UserSettings->get_cond( $this->forceFM,          'fm_forceFM',          $this->User->ID );
 	}
 
@@ -1333,7 +1334,7 @@ class FileManager extends Filelist
 	 *
 	 * @return string
 	 */
-	function getOrder()
+	function get_sort_order()
 	{
 		return $this->translate_order( $this->_order );
 	}
@@ -1345,8 +1346,10 @@ class FileManager extends Filelist
 	 * @param File file object
 	 * @return boolean true on success, false on failure
 	 */
-	function unlink( &$File, $delsubdirs = false )
+	function unlink( & $File, $delsubdirs = false )
 	{
+		global $Messages;
+
 		// TODO: permission check
 
 		if( !is_a( $File, 'file' ) )
@@ -1360,27 +1363,27 @@ class FileManager extends Filelist
 		{
 			if( $unlinked = deldir_recursive( $File->get_full_path() ) )
 			{
-				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'), $File->get_name() ),
-															'note' );
+				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'), 
+															$File->get_name() ), 'note' );
 			}
 			else
 			{
-				$this->Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'), $File->get_name() ) );
+				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'), $File->get_name() ) );
 			}
 			$this->load(); // Reload!
 		}
 		elseif( $unlinked = $File->unlink() )
 		{ // remove from list
-			$this->Messages->add( sprintf( ( $File->is_dir() ?
+			$Messages->add( sprintf( ( $File->is_dir() ?
 																					T_('The directory &laquo;%s&raquo; has been deleted.') :
 																					T_('The file &laquo;%s&raquo; has been deleted.') ),
 																			$File->get_name() ),
 														'note' );
-			$this->removeFromList( $File );
+			$this->remove( $File );
 		}
 		else
 		{
-			$this->Messages->add( sprintf( ( $File->is_dir() ?
+			$Messages->add( sprintf( ( $File->is_dir() ?
 																				T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') :
 																				T_('Could not delete the file &laquo;%s&raquo;.') ),
 																				$File->get_name() ) );
@@ -1409,9 +1412,9 @@ class FileManager extends Filelist
 			{
 				// Initializes file properties (type, size, perms...)
 				$TargetFile->load_properties();
-				if( $this->holdsFile( $TargetFile ) === false )
+				if( $this->contains( $TargetFile ) === false )
 				{ // File not in filelist (expected)
-					$this->addFile( $TargetFile );
+					$this->add( $TargetFile );
 				}
 			}
 			return $r;
@@ -1421,6 +1424,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.36  2005/04/29 18:49:32  fplanque
+ * Normalizing, doc, cleanup
+ *
  * Revision 1.35  2005/04/28 20:44:20  fplanque
  * normalizing, doc
  *

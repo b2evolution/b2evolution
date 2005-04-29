@@ -410,7 +410,7 @@ class File extends DataObject
 	 *
 	 * @return string
 	 */
-	function get_typed_name()
+	function get_prefixed_name()
 	{
 		if( $this->is_dir() )
 		{
@@ -859,6 +859,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2005/04/29 18:49:32  fplanque
+ * Normalizing, doc, cleanup
+ *
  * Revision 1.30  2005/04/28 20:44:20  fplanque
  * normalizing, doc
  *

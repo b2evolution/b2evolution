@@ -199,7 +199,7 @@ if( !empty($action) )
 	{
 		case 'open_in_new_windows':
 			// catch JS-only actions
-			$Fileman->Messages->add( T_('You have to enable JavaScript to use this feature.') );
+			$Messages->add( T_('You have to enable JavaScript to use this feature.') );
 			break;
 
 
@@ -216,7 +216,7 @@ if( !empty($action) )
 			// TODO: implement
 			if( !$SelectedFiles->count() )
 			{
-				$Fileman->Messages->add( T_('Nothing selected.') );
+				$Messages->add( T_('Nothing selected.') );
 				break;
 			}
 
@@ -230,7 +230,7 @@ if( !empty($action) )
 
 			if( !$SelectedFiles->count() )
 			{
-				$Fileman->Messages->add( T_('Nothing selected.') );
+				$Messages->add( T_('Nothing selected.') );
 				break;
 			}
 
@@ -245,7 +245,7 @@ if( !empty($action) )
 					."\n"
 					.T_('You want to download:')
 					.'<ul>'
-					.'<li>'.implode( "</li>\n<li>", $SelectedFiles->getFilesArray( 'get_typed_name' ) )."</li>\n"
+					.'<li>'.implode( "</li>\n<li>", $SelectedFiles->get_array( 'get_prefixed_name' ) )."</li>\n"
 					.'</ul>
 
 					<form action="files.php" class="fform" method="post">
@@ -258,7 +258,7 @@ if( !empty($action) )
 						<legend>'.T_('Download options').'</legend>
 						'
 						.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the name of the file which will get sent to you."), 80, '', 'text', false )."\n"
-						.( $SelectedFiles->countDirs() ?
+						.( $SelectedFiles->count_dirs() ?
 								form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n" :
 								'' )
 						.'
@@ -275,7 +275,7 @@ if( !empty($action) )
 			{ // Downloading
 				require dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php';
 
-				$arraylist = $SelectedFiles->getFilesArray( 'getname' );
+				$arraylist = $SelectedFiles->get_array( 'getname' );
 
 				$options = array (
 					'basedir' => $Fileman->cwd,
@@ -289,7 +289,7 @@ if( !empty($action) )
 				$zipfile->create_archive();
 				$zipfile->download_file();
 				exit;
-				#$Fileman->Messages->add( sprintf(T_('Zipfile &laquo;%s&raquo; sent to you!'), $zipname), 'note' );
+				#$Messages->add( sprintf(T_('Zipfile &laquo;%s&raquo; sent to you!'), $zipname), 'note' );
 			}
 
 			break;
@@ -299,7 +299,7 @@ if( !empty($action) )
 			// delete a file/dir, TODO: checkperm! {{{
 			if( !$SelectedFiles->count() )
 			{
-				$Fileman->Messages->add( T_('Nothing selected.') );
+				$Messages->add( T_('Nothing selected.') );
 				break;
 			}
 
@@ -335,7 +335,7 @@ if( !empty($action) )
 
 				foreach( $SelectedFiles->_entries as $lFile )
 				{
-					$action_msg .= '<li>'.$lFile->get_typed_name();
+					$action_msg .= '<li>'.$lFile->get_prefixed_name();
 
 					/* fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB integrity for these...
 					if( $lFile->is_dir() )
@@ -388,7 +388,7 @@ if( !empty($action) )
 			else
 			{
 				$SelectedFiles->restart();
-				while( $lFile =& $SelectedFiles->getNextFile() )
+				while( $lFile =& $SelectedFiles->get_next() )
 				{
 					if( !$Fileman->unlink( $lFile, isset( $delsubdirs[$lFile->get_md5_ID()] ) ) ) // handles Messages
 					{
@@ -435,7 +435,7 @@ if( !empty($action) )
 			// Link File to Item:
 			if( !$SelectedFiles->count() )
 			{
-				$Fileman->Messages->add( T_('Nothing selected.') );
+				$Messages->add( T_('Nothing selected.') );
 				break;
 			}
 
@@ -470,7 +470,7 @@ if( !empty($action) )
 			// Unlink File from Item:
 			if( !isset( $edited_Link ) )
 			{
-				$Fileman->Messages->add( T_('Nothing selected.') );
+				$Messages->add( T_('Nothing selected.') );
 				break;
 			}
 
@@ -493,7 +493,7 @@ if( !empty($action) )
 
 			if( !$SelectedFiles->count() )
 			{
-				$Fileman->Messages->add( T_('Nothing selected.') );
+				$Messages->add( T_('Nothing selected.') );
 				break;
 			}
 
@@ -502,7 +502,7 @@ if( !empty($action) )
 			if( count( $perms ) )
 			{ // Change perms
 				$SelectedFiles->restart();
-				while( $lFile =& $SelectedFiles->getNextFile() )
+				while( $lFile = & $SelectedFiles->get_next() )
 				{
 					$chmod = $perms[ $lFile->get_md5_ID() ];
 
@@ -511,15 +511,15 @@ if( !empty($action) )
 
 					if( $newperms === false )
 					{
-						$Fileman->Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $lFile->get_name(), $chmod ) );
+						$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $lFile->get_name(), $chmod ) );
 					}
 					elseif( $newperms === $oldperms )
 					{
-						$Fileman->Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; not changed.'), $lFile->get_name() ), 'note' );
+						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; not changed.'), $lFile->get_name() ), 'note' );
 					}
 					else
 					{
-						$Fileman->Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->get_perms() ), 'note' );
+						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->get_perms() ), 'note' );
 					}
 				}
 			}
@@ -542,9 +542,9 @@ if( !empty($action) )
 					{ // more than one file, provide default
 
 					}
-					foreach( $SelectedFiles->getFilesArray() as $lFile )
+					foreach( $SelectedFiles->get_array() as $lFile )
 					{
-						$action_msg .= "\n".$Fileman->getFileSubpath( $lFile ).':<br />
+						$action_msg .= "\n".$Fileman->get_relative_path( $lFile ).':<br />
 						<input id="perms_readonly_'.$lFile->get_md5_ID().'"
 							name="perms['.$lFile->get_md5_ID().']"
 							type="radio"
@@ -597,7 +597,7 @@ if( !empty($action) )
 			// ------------------------
 			if( !$SelectedFiles->count() )
 			{
-				$Fileman->Messages->add( T_('Nothing selected.') );
+				$Messages->add( T_('Nothing selected.') );
 				break;
 			}
 
@@ -640,7 +640,7 @@ switch( $Fileman->fm_mode )
 		// Check permissions:
 		if( !$Fileman->perm( 'upload' ) )
 		{
-			$Fileman->Messages->add( T_('You have no permissions to upload into this directory.') );
+			$Messages->add( T_('You have no permissions to upload into this directory.') );
 			break;
 		}
 
@@ -812,7 +812,7 @@ switch( $Fileman->fm_mode )
 				$newFile->dbsave();
 
 				// Tell the filamanager about the new file:
-				$Fileman->addFile( $newFile );
+				$Fileman->add( $newFile );
 			}
 		}}}
 
@@ -842,7 +842,7 @@ switch( $Fileman->fm_mode )
 
 		if( !$Fileman->SourceList->count() )
 		{
-			$Fileman->Messages->add( sprintf( T_('No source files!') ) );
+			$Messages->add( sprintf( T_('No source files!') ) );
 			$Fileman->fm_mode = NULL;
 			break;
 		}
@@ -858,7 +858,7 @@ switch( $Fileman->fm_mode )
 		$file_count = 0;
 		if( $cmr_doit )
 		{{{ // we want Action!
-			while( $SourceFile = & $Fileman->SourceList->getNextFile() )
+			while( $SourceFile = & $Fileman->SourceList->get_next() )
 			{
 				$newname = trim(strip_tags($cmr_newname[$file_count]));
 				if( !isFilename($newname) )
@@ -886,7 +886,7 @@ switch( $Fileman->fm_mode )
 						}
 						else
 						{
-							$Fileman->Messages->add( sprintf( T_('Deleted file &laquo;%s&raquo;.'), $newname ), 'note' );
+							$Messages->add( sprintf( T_('Deleted file &laquo;%s&raquo;.'), $newname ), 'note' );
 						}
 					}
 				}
@@ -903,13 +903,13 @@ switch( $Fileman->fm_mode )
 							{
 								if( $SourceFile->get_dir() == $Fileman->cwd )
 								{ // successfully renamed
-									$Fileman->Messages->add( sprintf( T_('Renamed &laquo;%s&raquo; to &laquo;%s&raquo;.'),
+									$Messages->add( sprintf( T_('Renamed &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																										basename($oldpath),
 																										$TargetFile->get_name() ), 'note' );
 								}
 								else
 								{ // successfully moved
-									$Fileman->Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'),
+									$Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																										$oldpath,
 																										$TargetFile->get_name() ), 'note' );
 
@@ -926,7 +926,7 @@ switch( $Fileman->fm_mode )
 						}
 						else
 						{ // copy only
-							$Fileman->Messages->add( sprintf(
+							$Messages->add( sprintf(
 								T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 								( $SourceFile->get_dir() == $Fileman->cwd ?
 										$SourceFile->get_name() :
@@ -1087,7 +1087,7 @@ switch( $Fileman->fm_mode )
 		)
 	{
 		opener.document.getElementById( 'fm_reloadhint' ).style.display =
-			opener.document.FilesForm.md5_filelist.value == '<?php echo $Fileman->toMD5(); ?>'
+			opener.document.FilesForm.md5_filelist.value == '<?php echo $Fileman->md5_checksum(); ?>'
 			? 'none'
 			: 'inline';
 	}
@@ -1122,17 +1122,14 @@ if( isset($action_title) )
 }
 
 // Output errors, notes and action messages {{{
-if( $Fileman->Messages->count( array( 'error', 'note' ) ) || $Messages->count( 'all' ) )
+if( $Messages->count( 'all' ) )
 {
 	?>
-
 	<div class="panelinfo">
 		<?php
 		$Messages->display( '', '', true, 'all' );
-		$Fileman->Messages->display( '', '', true, array( 'error', 'note' ) );
 		?>
 	</div>
-
 	<?php
 }
 
@@ -1176,6 +1173,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.99  2005/04/29 18:49:32  fplanque
+ * Normalizing, doc, cleanup
+ *
  * Revision 1.98  2005/04/28 20:44:18  fplanque
  * normalizing, doc
  *
