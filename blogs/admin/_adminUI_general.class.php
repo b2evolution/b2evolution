@@ -766,6 +766,15 @@ class AdminUI_general
 								'col_start_last' => '<td class="lastcol">',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
+							'grp_line_start' => '<tr class="group">'."\n",
+							'grp_line_start_odd' => '<tr class="odd">'."\n",
+							'grp_line_start_last' => '<tr class="lastline">'."\n",
+							'grp_line_start_odd_last' => '<tr class="odd lastline">'."\n",
+								'grp_col_start' => '<td>',
+								'grp_col_start_first' => '<td class="firstcol">',
+								'grp_col_start_last' => '<td class="lastcol">',
+								'grp_col_end' => "</td>\n",
+							'grp_line_end' => "</tr>\n\n",
 						'body_end' => "</tbody>\n\n",
 					'list_end' => "</table>\n\n",
 					'footer_start' => '<div class="results_nav">',
@@ -1068,6 +1077,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.22  2005/05/02 19:06:44  fplanque
+ * started paging of user list..
+ *
  * Revision 1.21  2005/04/28 20:44:17  fplanque
  * normalizing, doc
  *

@@ -34,10 +34,122 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 // get the userlist
-$request = "SELECT T_users.*, grp_ID, grp_name
-							FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
-						 ORDER BY grp_name, user_login";
-$userlist = $DB->get_results( $request );
+$sql = "SELECT T_users.*, grp_ID, grp_name
+					FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
+				 ORDER BY grp_name, user_login";
+
+function conditional( $condition, $on_true, $on_false = '' )
+{
+	if( $condition )
+	{
+		return $on_true;
+	}
+	else
+	{
+		return $on_false;
+	}
+}
+
+$Results = & new Results( $sql, 20, 'cont_' );
+
+$Results->title = T_('Groups &amp; Users');
+
+$Results->group_by = 'grp_ID';
+$Results->ID_col = 'ID';
+
+
+$Results->grp_cols[] = array(
+						'td_start' => '<td class="firstcol shrinkwrap">',
+						'td' => '$grp_ID$',
+					);
+
+$Results->grp_cols[] = array(
+						'td_start' => '<td colspan="'.($current_User->check_perm( 'users', 'edit', false ) ? 6 : 5).'">',
+						'td' => '$grp_name$',
+					);
+
+$Results->grp_cols[] = array(
+						'td' => 'todo',
+					);
+
+
+$Results->cols[] = array(
+						'th' => T_('ID'),
+						'td_start' => '<td class="firstcol shrinkwrap">',
+						'td' => '$ID$',
+					);
+
+$Results->cols[] = array(
+						'th' => T_('Login'),
+						'td' => '$user_login$',
+					);
+
+$Results->cols[] = array(
+						'th' => T_('Nickname'),
+						'td' => '$user_nickname$',
+					);
+
+$Results->cols[] = array(
+						'th' => T_('Name'),
+						'td' => '$user_firstname$ $user_lastname$',
+					);
+
+$Results->cols[] = array(
+						'th' => T_('Email'),
+						'td_start' => '<td class="shrinkwrap">',
+						'td' => '¤conditional( !empty(#user_email#), \'<a href="mailto:$user_email$" title="e-mail: $user_email$">'
+								.get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => 'Email: $user_email$' ) ).'</a>\', \'&nbsp;\' )¤',
+					);
+
+$Results->cols[] = array(
+						'th' => T_('URL'),
+						'td_start' => '<td class="shrinkwrap">',
+						'td' => '¤conditional( (#user_url# != \'http://\') && (#user_url# != \'\'), \'<a href="$user_url$" title="Website: $user_url$">'
+								.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: $user_url$' ) ).'</a>\', \'&nbsp;\' )¤',
+					);
+
+if( $current_User->check_perm( 'users', 'edit', false ) )
+{
+	$Results->cols[] = array(
+						'th' => T_('Level'),
+						'td_start' => '<td class="right">',
+						'td' => '¤conditional( (#user_level# > 0), \''
+											.action_icon( T_('Decrease user level'), 'arrow_down',
+												'%regenerate_url( \'action\', \'action=promote&amp;prom=down&amp;id=$ID$\' )%' ).'\' )¤'
+										.'$user_level$'
+										.'¤conditional( (#user_level# < 10), \''
+											.action_icon( T_('Increase user level'), 'arrow_up',
+												'%regenerate_url( \'action\', \'action=promote&amp;prom=up&amp;id=$ID$\' )%' ).'\' )¤',
+					);
+
+
+	$Results->cols[] = array(
+						'th' => T_('Actions'),
+						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'action\', \'user_ID=$ID$\' )%' )
+										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'action\', \'action=new_user&amp;user_ID=$ID$\' )%' )
+										.'¤conditional( (#ID# != 1) && (#ID# != '.$current_User->ID.'), \''
+											.action_icon( T_('Delete this user!'), 'delete', '%regenerate_url( \'action\', \'action=deleteuser&amp;id=$ID$\' )%' ).'\' )¤'
+
+					);
+}
+
+
+$Results->global_icon( T_('Add a user...'), 'new', '?action=new_user', T_('User') );
+$Results->global_icon( T_('Add a group...'), 'new', '?action=new_group', T_('Group') );
+
+
+// Display result :
+$Results->display();
+
+
+
+
+
+
+
+
+
+$userlist = $DB->get_results( $sql );
 ?>
 <h2><?php echo T_('Groups &amp; Users') ?></h2>
 <table class="grouped" cellspacing="0">
@@ -73,7 +185,7 @@ $userlist = $DB->get_results( $request );
 
 	if( count($userlist) )
 	{
-		// query which groups have users
+		// query which groups have users (in order to prevent deletion of groups which have users)
 		$query = 'SELECT grp_ID FROM T_groups, T_users
 							WHERE user_grp_ID = grp_ID
 							GROUP BY grp_ID';
@@ -223,6 +335,9 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 
 /*
  * $Log$
+ * Revision 1.43  2005/05/02 19:06:45  fplanque
+ * started paging of user list..
+ *
  * Revision 1.42  2005/04/28 20:44:18  fplanque
  * normalizing, doc
  *

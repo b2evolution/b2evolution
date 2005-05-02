@@ -59,8 +59,9 @@ class Results extends Widget
 	var $page;
 	var $total_pages;
 	var $rows = NULL;
+
 	/**
-	 * Definitions for each columns:
+	 * Definitions for each column:
 	 * -th
 	 * -td
 	 * -order
@@ -71,8 +72,21 @@ class Results extends Widget
 	 *   - $this->params['col_start'];
 	 */
 	var $cols = NULL;
+
 	/**
-	 * Array of headers for each column
+	 * Definitions for each GROUP column:
+	 * -td
+	 * -td_start. A column with no def will de displayed using
+	 * the default defs from Results::params, that is to say, one of these:
+	 *   - $this->params['grp_col_start_first'];
+	 *   - $this->params['grp_col_start_last'];
+	 *   - $this->params['grp_col_start'];
+	 */
+	var $grp_cols = NULL;
+
+	/**
+	 * Do we want to display column headers?
+	 * @var boolean
 	 */
 	var $col_headers = true;
 
@@ -88,6 +102,31 @@ class Results extends Widget
 	 * Current object idx in array:
 	 */
 	var $current_idx = 0;
+
+	/**
+	 * Current group identifier:
+	 * @var string
+	 */
+	var $current_group_ID = 0;
+
+	/**
+	 * Fieldname to group on.
+	 *
+	 * Leave empty if you don't want to group.
+	 *
+	 * @var string
+	 */
+	var $group_by = '';
+
+	/**
+	 * Fieldname to detect empty data rows.
+	 *
+	 * Empty data rows can happen when left joining on groups.
+	 * Leave empty if you don't want to detect empty datarows.
+	 *
+	 * @var string
+	 */
+	var $ID_col = '';
 
 	/**
 	 * URL param names
@@ -147,6 +186,8 @@ class Results extends Widget
 		$this->query( $this->sql );
 
 		$this->current_idx = 0;
+
+		$this->current_group_ID = 0;
 	}
 
 
@@ -213,7 +254,10 @@ class Results extends Widget
 	/**
 	 * Count the number of rows of the SQL result
 	 *
-	 * This is done by dynamicallt modifying the SQL query and forging a COUNT() into it.
+	 * This is done by dynamically modifying the SQL query and forging a COUNT() into it.
+	 *
+	 * @todo allow overriding?
+	 * @todo handle problem of empty groups!
 	 */
 	function count_total_rows()
 	{
@@ -468,11 +512,67 @@ class Results extends Widget
 
 
 		// -----------------------------
-		// DATA ROWS:
+		// GROUP & DATA ROWS:
 		// -----------------------------
 		$line_count = 0;
 		foreach( $this->rows as $row )
 		{ // For each row/line:
+
+			/*
+			 * Group row stuff:
+			 */
+			if( !empty($this->group_by) )
+			{	// We are grouping...
+				if( $row->{$this->group_by} != $this->current_group_ID )
+				{	// We have just entered a new group!
+					// memorize new group identifier:
+					$this->current_group_ID = $row->{$this->group_by};
+
+					echo '<tr class="group">';
+
+					$col_count = 0;
+					foreach( $this->grp_cols as $grp_col )
+					{ // For each column:
+						if( isset( $grp_col['td_start'] ) )
+						{ // We have a customized column start for this one:
+							$output = $grp_col['td_start'];
+						}
+						elseif( ($col_count==0) && isset($this->params['grp_col_start_first']) )
+						{ // Display first column column start:
+							$output = $this->params['col_start_first'];
+						}
+						elseif( ($col_count==count($this->cols)-1) && isset($this->params['grp_col_start_last']) )
+						{ // Last column can get special formatting:
+							$output = $this->params['grp_col_start_last'];
+						}
+						else
+						{ // Display regular colmun start:
+							$output = $this->params['grp_col_start'];
+						}
+
+						// Contents to output:
+						$output .= $this->parse_col_content( $grp_col['td'] );
+						//echo $output;
+						eval( "echo '$output';" );
+
+          	echo '</td>';
+						$col_count++;
+					}
+
+					echo '</tr>';
+
+				}
+			}
+
+
+			/*
+			 * Data row stuff:
+			 */
+			if( !empty($this->ID_col) && empty($row->{$this->ID_col}) )
+			{	// We have detected an empty data row which we want to ignore...
+				continue;
+			}
+
 
 			if( $this->current_idx % 2 )
 			{ // Odd line:
@@ -510,17 +610,9 @@ class Results extends Widget
 					$output = $this->params['col_start'];
 				}
 
-				$output .= $col['td'];
-
-				// Make variable substitution for STRINGS:
-				$output = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $output );
-				// Make variable substitution for RAWS:
-				$output = preg_replace( '!\# (\w+) \#!ix', "\$row->$1", $output );
-				// Make variable substitution for full ROW:
-				$output = str_replace( '{row}', '$row', $output );
-				// Make callback function substitution:
-				$output = preg_replace( '#% (.+?) %#ix', "'.$1.'", $output );
-
+				// Contents to output:
+				$output .= $this->parse_col_content( $col['td'] );
+				//echo $output;
 				eval( "echo '$output';" );
 
 				echo $this->params['col_end'];
@@ -593,6 +685,23 @@ class Results extends Widget
 		{ //preg_replace_callback is used to avoid calculating unecessary values
 			echo $this->replace_vars( $template );
 		}
+	}
+
+
+	function parse_col_content( $content )
+	{
+		// Make variable substitution for STRINGS:
+		$content = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $content );
+		// Make variable substitution for RAWS:
+		$content = preg_replace( '!\# (\w+) \#!ix', "\$row->$1", $content );
+		// Make variable substitution for full ROW:
+		$content = str_replace( '{row}', '$row', $content );
+		// Make callback function substitution:
+		$content = preg_replace( '#% (.+?) %#ix', "'.$1.'", $content );
+		// Make callback function substitution:
+		$content = preg_replace( '#¤ (.+?) ¤#ix', "'.$1.'", $content );
+
+		return $content;
 	}
 
 
@@ -893,6 +1002,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.20  2005/05/02 19:06:47  fplanque
+ * started paging of user list..
+ *
  * Revision 1.19  2005/04/07 17:55:50  fplanque
  * minor changes
  *
