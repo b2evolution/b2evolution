@@ -33,10 +33,15 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+// query which groups have users (in order to prevent deletion of groups which have users)
+$usedgroups = $DB->get_col( 'SELECT grp_ID FROM T_groups, T_users
+															WHERE user_grp_ID = grp_ID
+															GROUP BY grp_ID');
+
 // get the userlist
 $sql = "SELECT T_users.*, grp_ID, grp_name
 					FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
-				 ORDER BY grp_name, user_login";
+				 ORDER BY grp_name";
 
 function conditional( $condition, $on_true, $on_false = '' )
 {
@@ -50,6 +55,8 @@ function conditional( $condition, $on_true, $on_false = '' )
 	}
 }
 
+
+param( 'results_cont_order', 'string', '-A', true );
 $Results = & new Results( $sql, 20, 'cont_' );
 
 $Results->title = T_('Groups &amp; Users');
@@ -57,40 +64,63 @@ $Results->title = T_('Groups &amp; Users');
 $Results->group_by = 'grp_ID';
 $Results->ID_col = 'ID';
 
-
+/*
+ * Group columns:
+ */
 $Results->grp_cols[] = array(
-						'td_start' => '<td class="firstcol shrinkwrap">',
-						'td' => '$grp_ID$',
+						'td_start' => '<td colspan="'
+														.($current_User->check_perm( 'users', 'edit', false ) ? 7 : 6)
+														.'" class="firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ).'">',
+						'td' => '<a href="b2users.php?grp_ID=$grp_ID$">$grp_name$</a>'
+										.'¤conditional( (#grp_ID# == '.$Settings->get('newusers_grp_ID').'), \' <span class="notes">('.T_('default group for new users').')</span>\' )¤',
 					);
 
+function grp_actions( & $row )
+{
+	global $usedgroups, $Settings;
+
+	$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'action', 'grp_ID='.$row->grp_ID ) );
+
+	$r .= action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'action', 'action=new_group&amp;grp_ID='.$row->grp_ID ) );
+
+	if( ($row->grp_ID != 1) && ($row->grp_ID != $Settings->get('newusers_grp_ID')) && !in_array( $row->grp_ID, $usedgroups ) )
+	{ // delete
+		$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'action', 'action=deletegroup&amp;id='.$row->grp_ID ) );
+	}
+
+	return $r;
+}
 $Results->grp_cols[] = array(
-						'td_start' => '<td colspan="'.($current_User->check_perm( 'users', 'edit', false ) ? 6 : 5).'">',
-						'td' => '$grp_name$',
+						'td_start' => '<td class="lastcol shrinkwrap">',
+						'td' => '%grp_actions( {row} )%',
 					);
 
-$Results->grp_cols[] = array(
-						'td' => 'todo',
-					);
-
-
+/*
+ * Data columns:
+ */
 $Results->cols[] = array(
 						'th' => T_('ID'),
+						'th_start' => '<th class="firstcol shrinkwrap">',
 						'td_start' => '<td class="firstcol shrinkwrap">',
+						'order' => 'ID',
 						'td' => '$ID$',
 					);
 
 $Results->cols[] = array(
 						'th' => T_('Login'),
-						'td' => '$user_login$',
+						'order' => 'user_login',
+						'td' => '<a href="b2users.php?user_ID=$ID$">$user_login$</a>',
 					);
 
 $Results->cols[] = array(
 						'th' => T_('Nickname'),
+						'order' => 'user_nickname',
 						'td' => '$user_nickname$',
 					);
 
 $Results->cols[] = array(
 						'th' => T_('Name'),
+						'order' => 'user_lastname, user_firstname',
 						'td' => '$user_firstname$ $user_lastname$',
 					);
 
@@ -108,15 +138,25 @@ $Results->cols[] = array(
 								.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: $user_url$' ) ).'</a>\', \'&nbsp;\' )¤',
 					);
 
-if( $current_User->check_perm( 'users', 'edit', false ) )
+if( ! $current_User->check_perm( 'users', 'edit', false ) )
+{
+ 	$Results->cols[] = array(
+						'th' => T_('Level'),
+						'td_start' => '<td class="right">',
+						'order' => 'user_level',
+						'td' => '$user_level$',
+					);
+}
+else
 {
 	$Results->cols[] = array(
 						'th' => T_('Level'),
 						'td_start' => '<td class="right">',
+						'order' => 'user_level',
 						'td' => '¤conditional( (#user_level# > 0), \''
 											.action_icon( T_('Decrease user level'), 'arrow_down',
 												'%regenerate_url( \'action\', \'action=promote&amp;prom=down&amp;id=$ID$\' )%' ).'\' )¤'
-										.'$user_level$'
+										.'$user_level$ '
 										.'¤conditional( (#user_level# < 10), \''
 											.action_icon( T_('Increase user level'), 'arrow_up',
 												'%regenerate_url( \'action\', \'action=promote&amp;prom=up&amp;id=$ID$\' )%' ).'\' )¤',
@@ -134,207 +174,20 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 }
 
 
-$Results->global_icon( T_('Add a user...'), 'new', '?action=new_user', T_('User') );
-$Results->global_icon( T_('Add a group...'), 'new', '?action=new_group', T_('Group') );
-
+if( $current_User->check_perm( 'users', 'edit', false ) )
+{ // create new user link
+	$Results->global_icon( T_('Add a user...'), 'new', '?action=new_user', T_('User') );
+	$Results->global_icon( T_('Add a group...'), 'new', '?action=new_group', T_('Group') );
+}
 
 // Display result :
 $Results->display();
 
-
-
-
-
-
-
-
-
-$userlist = $DB->get_results( $sql );
-?>
-<h2><?php echo T_('Groups &amp; Users') ?></h2>
-<table class="grouped" cellspacing="0">
-	<tr>
-		<?php
-			echo '<th class="firstcol">'.T_('ID')."</th>\n";
-			/* TRANS: table header for user list: */
-			echo '<th>'.T_('Login ')."</th>\n";
-			echo '<th>'.T_('Nickname')."</th>\n";
-			echo '<th>'.T_('Name')."</th>\n";
-			echo '<th>'.T_('Email')."</th>\n";
-			echo '<th>'.T_('URL')."</th>\n";
-			echo '<th';
-			if( ! $current_User->check_perm( 'users', 'edit', false ) )
-			{ // This will be last col:
-				echo ' class="lastcol"';
-			}
-			if( $current_User->check_perm( 'users', 'edit', false ) )
-			{ // extra table cell for +/-
-				echo ' colspan="2"';
-			}
-			echo '>'.T_('Level')."</th>\n";
-
-			if( $current_User->check_perm( 'users', 'edit', false ) )
-			{
-				echo '<th class="lastcol">'.T_('Edit').'</th>';
-			}
-		?>
-	</tr>
-	<?php
-
-	$loop_prev_grp_ID = 0;
-
-	if( count($userlist) )
-	{
-		// query which groups have users (in order to prevent deletion of groups which have users)
-		$query = 'SELECT grp_ID FROM T_groups, T_users
-							WHERE user_grp_ID = grp_ID
-							GROUP BY grp_ID';
-		$usedgroups = $DB->get_col($query);
-
-		$count = 0;
-		foreach( $userlist as $row )
-		{ // For each line (can be a user/group or just an empty group)
-			$loop_grp_ID = $row->grp_ID;
-
-			if( $loop_prev_grp_ID != $loop_grp_ID )
-			{ // ---------- We just entered a new group! ----------
-				?>
-				<tr class="group">
-					<td colspan="7" class="firstcol">
-						<strong><a href="b2users.php?grp_ID=<?php echo $loop_grp_ID ?>"><img src="img/properties.png" width="18" height="13" class="middle" alt="<?php echo T_('Properties') ?>" /> <?php echo format_to_output( $row->grp_name, 'htmlbody' ); ?></a></strong>
-						<?php
-							if( $loop_grp_ID == $Settings->get('newusers_grp_ID') )
-							{
-								echo '<span class="notes">('.T_('default group for new users').')</span>';
-							}
-						?>
-					</td>
-					<?php
-					if( $current_User->check_perm( 'users', 'edit', false ) )
-					{ // copy
-						?>
-						<td>&nbsp;</td>
-						<td class="lastcol">
-						<?php
-						echo action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'action', 'grp_ID='.$loop_grp_ID ) );
-
-						echo action_icon( T_('Duplicate this group...'), 'copy',
-															regenerate_url( 'action', 'action=new_group&amp;grp_ID='.$loop_grp_ID ) );
-
-						if( ($loop_grp_ID != 1) && ($loop_grp_ID != $Settings->get('newusers_grp_ID'))
-								&& !in_array( $loop_grp_ID, $usedgroups ) )
-						{ // delete
-							echo action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'action', 'action=deletegroup&amp;id='.$loop_grp_ID ) );
-						}
-						echo '</td>';
-					}
-					?>
-				</tr>
-				<?php
-				$loop_prev_grp_ID = $loop_grp_ID;
-			}
-
-			if( !empty( $row->ID ) )
-			{ // We have a user here: (i-e group was not empty)
-				$loop_User = & new User( $row );
-				if( $count%2 == 1 )
-					echo '<tr class="odd ';
-				else
-					echo '<tr class="';
-
-				if( $count+1 == count($userlist) )
-					echo 'lastline';
-
-				echo "\">\n";
-
-				echo '<td class="firstcol">'.$loop_User->get('ID')."</td>\n";
-
-				echo '<td><a href="b2users.php?user_ID=', $loop_User->get('ID'), '">';
-				echo '<img src="img/properties.png" width="18" height="13" class="middle" alt="', T_('Properties'), '" /> ';
-				echo $loop_User->get('login'), "</a></td>\n";
-
-				echo '<td>';
-				$loop_User->disp('nickname');
-				echo '</td>';
-
-				echo '<td>', $loop_User->get('fullname')."</td>\n";
-				// Email:
-				echo '<td>&nbsp;';
-				$email = $loop_User->get('email');
-				if( !empty($email) )
-				{
-					echo '<a href="mailto:'.$email.'" title="e-mail: '.$email.'">'
-								.get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => 'Email: '.$email ) ).'</a>&nbsp;';
-				}
-				echo "</td>\n";
-
-				// URL:
-				echo '<td>&nbsp;';
-				$url = $loop_User->get('url');
-				if (($url != 'http://') and ($url != ''))
-				{
-					if( !preg_match('#://#', $url) )
-					{
-						$url = 'http://'.$url;
-					}
-					echo '<a href="'.$url.'" title="Website: '.$url.'">'
-								.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: '.$url ) ).'</a>&nbsp;';
-				}
-				echo "</td>\n";
-
-				// User level:
-				echo '<td class="right">'.$loop_User->get('level').'</td>';
-
-				if( $current_User->check_perm( 'users', 'edit', false ) )
-				{ // We have permission to edit the user:
-
-					// Promotion buttons:
-					echo '<td align="right">';
-					if( ($loop_User->get('level') > 0) )
-					{ // prom=down
-						echo action_icon( T_('Decrease user level'), 'arrow_down',
-										regenerate_url( 'action', 'action=promote&amp;prom=down&amp;id='.$loop_User->get('ID') ) );
-					}
-					if( ($loop_User->get('level') < 10 ) )
-					{ // prom=up
-						echo action_icon( T_('Increase user level'), 'arrow_up',
-										regenerate_url( 'action', 'action=promote&amp;prom=up&amp;id='.$loop_User->get('ID') ) );
-					}
-					echo '</td>';
-
-					// Edit actions:
-					echo '<td class="lastcol">';
-					// edit user:
-					echo action_icon( T_('Edit this user...'), 'edit', regenerate_url( 'action', 'user_ID='.$loop_User->get('ID') ) );
-					// copy user:
-					echo action_icon( T_('Duplicate this user...'), 'copy', regenerate_url( 'action', 'action=new_user&amp;user_ID='.$loop_User->get('ID') ) );
-					if( ($loop_User->ID != 1) && ($loop_User->ID != $current_User->ID) )
-					{ // delete user:
-						echo action_icon( T_('Delete this user!'), 'delete', regenerate_url( 'action', 'action=deleteuser&amp;id='.$loop_User->get('ID') ) );
-					}
-					echo '</td>';
-				}
-				echo "\n</tr>\n";
-				$count++;
-			}
-		}
-
-		echo "\n</table>";
-	}
-
-if( $current_User->check_perm( 'users', 'edit', false ) )
-{ // create new user link
-	?>
-	<p class="center">
-		<a href="?action=new_user"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('New user...') ?></a>
-		&middot;
-		<a href="?action=new_group"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('New group...') ?></a>
-	</p>
-	<?php
-}
-
 /*
  * $Log$
+ * Revision 1.44  2005/05/03 14:38:14  fplanque
+ * finished multipage userlist
+ *
  * Revision 1.43  2005/05/02 19:06:45  fplanque
  * started paging of user list..
  *

@@ -25,6 +25,7 @@ fieldset.input {
 .notes {
 	font-size: 84%;
 	color: #999;
+	font-weight:normal;
 }
 
 fieldset div.notes {

@@ -227,14 +227,11 @@ class Results extends Widget
 
 			if( strpos( $this->sql, 'ORDER BY') === false )
 			{ //there is no ORDER BY clause in the original SQL query
-				$this->sql .= $this->order( $this->order, $this->asc );
+				$this->sql .= ' ORDER BY '.$this->order();
 			}
 			else
-			{ //the chosen order must be inserted into an existing ORDER BY clause
-				$split = split( 'ORDER BY', $this->sql );
-				$this->sql = $split['0']
-					.( ( $this->order($this->order, $this->asc) !== '' ) ? $this->order($this->order, $this->asc).', ' : ' ORDER BY ' )
-					.$split['1'];
+			{ //the chosen order must be appended to an existing ORDER BY clause
+				$this->sql .= ', '.$this->order();
 			}
 
 			// Limit to requested page
@@ -1002,6 +999,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.21  2005/05/03 14:38:15  fplanque
+ * finished multipage userlist
+ *
  * Revision 1.20  2005/05/02 19:06:47  fplanque
  * started paging of user list..
  *

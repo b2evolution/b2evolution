@@ -235,7 +235,7 @@ table.grouped tr {
 table.grouped tr.odd {
 	background-color: #efede0;
 }
-table.grouped tr.group {
+table.grouped tr.group td {
 	color: #8e8276;
 	background-color: #e3dfd0;
 	border-top: 1px solid #9e9286;
@@ -820,6 +820,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.4  2005/05/03 14:38:14  fplanque
+ * finished multipage userlist
+ *
  * Revision 1.3  2005/04/21 18:01:30  fplanque
  * CSS styles refactoring
  *

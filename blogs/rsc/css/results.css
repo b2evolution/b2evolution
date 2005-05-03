@@ -22,19 +22,20 @@ table.grouped tr {
 table.grouped tr.odd {
 	background-color: #ddd;
 }
-table.grouped tr.group {
-	font-weight: bold;
-	color: #8e8276;
-	background-color: #ccc;
-	border-top: 1px solid #bbb;
-	border-bottom: 1px solid #bbb;
-}
 table.grouped td {
 	border-left: 1px solid #bbb;
 	padding: .3ex 1ex;
 }
 table.grouped tr.group td {
+	font-weight: bold;
+	color: #8e8276;
+	background-color: #ccc;
+	border-top: 1px solid #bbb;
+	border-bottom: 1px solid #bbb;
 	border-left: 0;
+}
+table.grouped .notes {
+	color: #666;
 }
 table.grouped td.shrinkwrap
 {
