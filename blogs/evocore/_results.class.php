@@ -633,9 +633,9 @@ class Results extends Widget
 
 
 	/**
-	 * Returns ORDER clause:
+	 * Returns ORDER fields:
 	 */
-	function order( $order, $asc )
+	function order()
 	{
 		$orders = array();
 
@@ -646,11 +646,11 @@ class Results extends Widget
 				switch( substr( $this->order, $i, 1 ) )
 				{
 					case 'A':
-						$orders[] = $this->cols[$i]['order'].' ASC';
+						$orders[] = str_replace( ',', ' ASC,', $this->cols[$i]['order']).' ASC';
 						break;
 
 					case 'D':
-						$orders[] = $this->cols[$i]['order'].' DESC';
+						$orders[] = str_replace( ',', ' DESC,', $this->cols[$i]['order']).' DESC';
 						break;
 				}
 			}
@@ -659,7 +659,7 @@ class Results extends Widget
 		if( empty($orders) )
 			return '';
 
-		return ' ORDER BY '.implode(',',$orders).' ';
+		return implode(',',$orders).' ';
 	}
 
 
@@ -999,6 +999,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.22  2005/05/03 14:43:33  fplanque
+ * no message
+ *
  * Revision 1.21  2005/05/03 14:38:15  fplanque
  * finished multipage userlist
  *

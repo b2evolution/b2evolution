@@ -88,7 +88,7 @@ $Form->radio( 'edited_grp_perm_options', $edited_Group->get('perm_options'),
 		array(  array( 'none', T_('No Access') ),
 						array( 'view', T_('View only') ),
 						array( 'edit', T_('Full Access') )
-					), T_('Global options') );
+					), T_('Settings') );
 $Form->checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Templates'), T_('Check to allow template editing.') );
 
 if( $edited_Group->get('ID') != 1 )
@@ -119,6 +119,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.27  2005/05/03 14:43:33  fplanque
+ * no message
+ *
  * Revision 1.26  2005/03/22 16:36:01  fplanque
  * refactoring, standardization
  * fixed group creation bug
