@@ -56,22 +56,7 @@ class Group extends DataObject
 	 * @access protected
 	 */
 	var	$name;
-	/**
-	 * Permissions for stats
-	 *
-	 * Possible values: none, view, edit
-	 *
-	 * Please use get/set functions to read or write this param
-	 *
-	 * @var string
-	 * @access protected
-	 */
-	var	$perm_stats;
-	var	$perm_blogs;
-	var	$perm_spamblacklist;
-	var	$perm_options;
-	var	$perm_templates;
-	var	$perm_users;
+
 
 	/**
 	 * Constructor
@@ -85,6 +70,13 @@ class Group extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_groups', 'grp_', 'grp_ID' );
 
+		$this->delete_restrictions = array(
+				array( 'table'=>'T_users', 'fk'=>'user_grp_ID', 'msg'=>T_('%d users in this group') ),
+			);
+
+   	$this->delete_cascades = array(
+			);
+
 		if( $db_row == NULL )
 		{
 			// echo 'Creating blank group';
@@ -92,8 +84,8 @@ class Group extends DataObject
 			$this->perm_blogs = 'user';
 			$this->perm_stats = 'none';
 			$this->perm_spamblacklist = 'none';
-			$this->perm_options = 'none';
 			$this->perm_templates = 0;
+			$this->perm_options = 'none';
 			$this->perm_users = 'none';
 		}
 		else
@@ -104,11 +96,12 @@ class Group extends DataObject
 			$this->perm_blogs = $db_row->grp_perm_blogs;
 			$this->perm_stats = $db_row->grp_perm_stats;
 			$this->perm_spamblacklist = $db_row->grp_perm_spamblacklist;
-			$this->perm_options = $db_row->grp_perm_options;
 			$this->perm_templates = $db_row->grp_perm_templates;
+			$this->perm_options = $db_row->grp_perm_options;
 			$this->perm_users = $db_row->grp_perm_users;
 		}
 	}
+
 
 	/**
 	 * Set param value
@@ -131,10 +124,9 @@ class Group extends DataObject
 		}
 	}
 
+
 	/**
 	 * Check a permission for this group
-	 *
-	 * {@internal Group::check_perm(-) }}
 	 *
 	 * @param string Permission name:
 	 *									- templates
@@ -148,6 +140,7 @@ class Group extends DataObject
 	 */
 	function check_perm( $permname, $permlevel )
 	{
+		// Check group permission:
 		eval( '$permvalue = $this->perm_'.$permname.';' );
 		// echo $permvalue;
 
@@ -160,7 +153,8 @@ class Group extends DataObject
 
 			case 'blogs':
 				switch( $permvalue )
-				{
+				{	// Depending on current group permission:
+
 					case 'editall':
 						// All permissions granted
 						return true;	// Permission granted
@@ -177,7 +171,8 @@ class Group extends DataObject
 			case 'options':
 			case 'users':
 				switch( $permvalue )
-				{
+				{	// Depending on current group permission:
+
 					case 'edit':
 						// All permissions granted
 						return true;	// Permission granted
@@ -211,8 +206,9 @@ class Group extends DataObject
 		}
 	}
 
+
 	/**
-	 * Template function: return name of blog
+	 * Template function: return name of group
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
@@ -226,6 +222,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2005/05/04 18:16:55  fplanque
+ * Normalizing
+ *
  * Revision 1.4  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

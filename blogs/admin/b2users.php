@@ -331,68 +331,42 @@ else
 			break;
 
 
-		case 'deleteuser':
+		case 'delete_user':
 			/*
 			 * Delete user
 			 */
-			param( 'id', 'integer', true );
-			param( 'confirm', 'integer', 0 );
+			if( !isset($edited_User) )
+				die( 'no User set' );
 
-			if( $id == $current_User->ID )
+			if( $edited_User->ID == $current_User->ID )
 			{
 				$Messages->add( T_('You can\'t delete yourself!') );
+				$action = 'view_user';
+				break;
 			}
-			if( $id == 1 )
+			if( $edited_User->ID == 1 )
 			{
 				$Messages->add( T_('You can\'t delete User #1!') );
-			}
-
-			if( $Messages->count() )
-			{
+				$action = 'view_user';
 				break;
 			}
 
-			$deleted_User = & $UserCache->get_by_ID( $id );
-
-			if( !$confirm )
-			{?>
-			<div class="panelinfo">
-				<h3><?php printf( T_('Delete User %s?'), $deleted_User->get( 'fullname' ).' ['.$deleted_User->get( 'login' ).']' )?></h3>
-
-				<p><?php echo T_('Warning').': '.T_('deleting an user also deletes all posts made by this user.') ?></p>
-
-				<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
-
-				<p>
-					<?php
-						$Form = & new Form( 'b2users.php', 'form', 'get' );
-
-						$Form->begin_form( 'inline' );
-						$Form->hidden( 'action', 'deleteuser' );
-						$Form->hidden( 'id', $deleted_User->ID );
-						$Form->hidden( 'confirm', 1 );
-						$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
-						$Form->end_form();
-
-						$Form->begin_form( 'inline' );
-						$Form->submit( array( '', T_('CANCEL'), 'search' ) );
-						$Form->end_form();
-
-					?>
-				</p>
-
-			</div>
-		<?php
+			if( param( 'confirm', 'integer', 0 ) )
+			{ // confirmed, Delete from DB:
+				$msg = sprintf( T_('User &laquo;%s&raquo; [%s] deleted.'), $edited_User->dget( 'fullname' ), $edited_User->dget( 'login' ) );
+				$edited_User->dbdelete( true );
+				unset($edited_User);
+				forget_param('user_ID');
+				$Messages->add( $msg, 'note' );
+				$action = 'list';
 			}
 			else
-			{ // confirmed
-				// Delete from DB:
-				echo '<div class="panelinfo"><h3>'.T_('Deleting User...').'</h3>';
-				$deleted_User->dbdelete( true );
-				unset($deleted_User);
-				echo '</div>';
+			{	// not confirmed, Check for restrictions:
+				if( ! $edited_User->check_delete( sprintf( T_('Cannot delete User &laquo;%s&raquo; [%s]'), $edited_User->dget( 'fullname' ), $edited_User->dget( 'login' ) ) ) )
+				{	// There are restrictions:
+					$action = 'view_user';
+				}
 			}
-
 			break;
 
 
@@ -484,61 +458,42 @@ else
 			break;
 
 
-		case 'deletegroup':
+		case 'delete_group':
 			/*
 			 * Delete group
 			 */
-			param( 'id', 'integer', true );
-			param( 'confirm', 'integer', 0 );
+			if( !isset($edited_Group) )
+				die( 'no Group set' );
 
-			if( $id == 1 )
+			if( $edited_Group->ID == 1 )
 			{
 				$Messages->add( T_('You can\'t delete Group #1!') );
+				$action = 'view_group';
+				break;
 			}
-			if( $id == $Settings->get('newusers_grp_ID' ) )
+			if( $edited_Group->ID == $Settings->get('newusers_grp_ID' ) )
 			{
 				$Messages->add( T_('You can\'t delete the default group for new users!') );
-			}
-
-			if( $Messages->count() )
-			{
+				$action = 'view_group';
 				break;
 			}
 
-			$del_Group = $GroupCache->get_by_ID( $id );
-
-			if( !$confirm )
-			{ // TODO: move confirmation down to payload section...
-			?>
-			<div class="panelinfo">
-				<h3><?php printf( T_('Delete group &laquo;%s&raquo;?'), $del_Group->get( 'name' ) )?></h3>
-
-				<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
-
-				<p>
-					<form action="b2users.php" method="get" class="inline">
-						<input type="hidden" name="action" value="deletegroup" />
-						<input type="hidden" name="id" value="<?php $del_Group->ID() ?>" />
-						<input type="hidden" name="confirm" value="1" />
-
-						<input type="submit" value="<?php echo T_('I am sure!') ?>" class="search" />
-					</form>
-					<form action="b2users.php" method="get" class="inline">
-						<input type="submit" value="<?php echo T_('CANCEL') ?>" class="search" />
-					</form>
-				</p>
-
-			</div>
-			<?php
+			if( param( 'confirm', 'integer', 0 ) )
+			{ // confirmed, Delete from DB:
+				$msg = sprintf( T_('Group &laquo;%s&raquo;deleted.'), $edited_Group->dget( 'name' ) );
+				$edited_Group->dbdelete( true );
+				unset($edited_Group);
+				forget_param('grp_ID');
+				$Messages->add( $msg, 'note' );
+				$action = 'list';
 			}
 			else
-			{ // confirmed
-				// Delete from DB:
-				$del_Group->dbdelete( true );
-				unset($del_Group);
-				$Messages->add( T_('Group deleted...'), 'note' );
+			{	// not confirmed, Check for restrictions:
+				if( ! $edited_Group->check_delete( sprintf( T_('Cannot delete Group &laquo;%s&raquo;'), $edited_Group->dget( 'name' ) ) ) )
+				{	// There are restrictions:
+					$action = 'view_group';
+				}
 			}
-
 			break;
 	}
 }
@@ -591,15 +546,29 @@ else
 			break;
 
 
+		case 'delete_user':
+			// We need to ask for confirmation:
+			$hiddens = array( array( 'user_ID', $edited_User->ID ) );
+			$edited_User->confirm_delete(
+					sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $edited_User->dget( 'fullname' ), $edited_User->dget( 'login' ) ),
+					$action, $hiddens );
 		case 'new_user':
+		case 'view_user':
 		case 'edit_user':
 			// Display user form:
 			require dirname(__FILE__).'/_users_form.php';
 			break;
 
 
+		case 'delete_group':
+			// We need to ask for confirmation:
+			$hiddens = array( array( 'grp_ID', $edited_Group->ID ) );
+			$edited_Group->confirm_delete(
+					sprintf( T_('Delete group &laquo;%s&raquo;?'), $edited_Group->dget( 'name' ) ),
+					$action, $hiddens );
 		case 'new_group':
 		case 'edit_group':
+		case 'view_group':
 			// Display group form:
 			require dirname(__FILE__).'/_users_groupform.php';
 			break;
@@ -623,6 +592,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.87  2005/05/04 18:16:55  fplanque
+ * Normalizing
+ *
  * Revision 1.86  2005/04/06 13:33:29  fplanque
  * minor changes
  *

@@ -1162,7 +1162,17 @@ function create_b2evo_relations()
 							 				foreign key (link_item_ID)
 								      references T_posts (ID)
 								      on delete restrict
-								      on update restrict' );
+								      on update restrict,
+								add constraint FK_link_creator_user_ID 
+											foreign key (link_creator_user_ID)
+	 										references gsb_users (ID) 
+											on delete restrict on 
+											update restrict,
+								add constraint FK_link_lastedit_user_ID 
+											foreign key (link_lastedit_user_ID)
+											references gsb_users (ID) 
+											on delete restrict 
+											on update restrict' );
 
 	$DB->query( 'alter table T_users
 								add constraint FK_user_grp_ID

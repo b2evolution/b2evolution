@@ -62,7 +62,8 @@ class Link extends DataObject
 		global $ItemCache;
 		
 		// Call parent constructor:
-		parent::DataObject( 'T_links', 'link_', 'link_ID' );
+		parent::DataObject( 'T_links', 'link_', 'link_ID',
+													'datecreated', 'datemodified', 'creator_user_ID', 'lastedit_user_ID' );
 
  		if( $db_row != NULL )
 		{
@@ -114,6 +115,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2005/05/04 18:16:55  fplanque
+ * Normalizing
+ *
  * Revision 1.6  2005/04/19 16:23:03  fplanque
  * cleanup
  * added FileCache

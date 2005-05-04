@@ -85,7 +85,7 @@ function grp_actions( & $row )
 
 	if( ($row->grp_ID != 1) && ($row->grp_ID != $Settings->get('newusers_grp_ID')) && !in_array( $row->grp_ID, $usedgroups ) )
 	{ // delete
-		$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'action', 'action=deletegroup&amp;id='.$row->grp_ID ) );
+		$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'action', 'action=delete_group&amp;grp_ID='.$row->grp_ID ) );
 	}
 
 	return $r;
@@ -168,7 +168,7 @@ else
 						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'action\', \'user_ID=$ID$\' )%' )
 										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'action\', \'action=new_user&amp;user_ID=$ID$\' )%' )
 										.'¤conditional( (#ID# != 1) && (#ID# != '.$current_User->ID.'), \''
-											.action_icon( T_('Delete this user!'), 'delete', '%regenerate_url( \'action\', \'action=deleteuser&amp;id=$ID$\' )%' ).'\' )¤'
+											.action_icon( T_('Delete this user!'), 'delete', '%regenerate_url( \'action\', \'action=delete_user&amp;user_ID=$ID$\' )%' ).'\' )¤'
 
 					);
 }
@@ -185,6 +185,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.45  2005/05/04 18:16:55  fplanque
+ * Normalizing
+ *
  * Revision 1.44  2005/05/03 14:38:14  fplanque
  * finished multipage userlist
  *

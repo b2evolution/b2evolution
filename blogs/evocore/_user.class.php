@@ -106,6 +106,20 @@ class User extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_users', 'user_' );
 
+		$this->delete_restrictions = array(
+				array( 'table'=>'T_posts', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
+				array( 'table'=>'T_posts', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
+				array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user') ),
+				array( 'table'=>'T_links', 'fk'=>'link_lastedit_user_ID', 'msg'=>T_('%d links last edited by this user') ),
+			);
+
+   	$this->delete_cascades = array(
+				array( 'table'=>'T_usersettings', 'fk'=>'uset_user_ID', 'msg'=>T_('%d user settings on collections') ),
+				array( 'table'=>'T_sessions', 'fk'=>'sess_user_ID', 'msg'=>T_('%d sessions opened by this user') ),
+				array( 'table'=>'T_blogusers', 'fk'=>'bloguser_user_ID', 'msg'=>T_('%d user permissions on blogs') ),
+				array( 'table'=>'T_posts', 'fk'=>'post_creator_user_ID', 'msg'=>T_('%d posts created by this user') ),
+			);
+
 		if( $db_row == NULL )
 		{
 			// echo 'Creating blank user';
@@ -411,7 +425,7 @@ class User extends DataObject
 
 		if( !$perm && $assert )
 		{ // We can't let this go on!
-			die( T_('Permission denied!'). ' ('. $permname . '/'. $permlevel . ')' );
+			die( 'Permission denied! ('. $permname . '/'. $permlevel . ')' );
 		}
 
 		return $perm;
@@ -569,8 +583,8 @@ class User extends DataObject
 
 		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
 
-		// Note: No need to localize the status messages...
-		if( $echo ) echo '<p>MySQL 3.23 compatibility mode!';
+		$DB->begin();
+
 
 		// Transform registered user comments to unregistered:
 		if( $echo ) echo '<br />Transforming user\'s comments to unregistered comments... ';
@@ -606,24 +620,15 @@ class User extends DataObject
 													WHERE postcat_post_ID IN ($post_list)" );
 			if( $echo ) printf( '(%d rows)', $ret );
 
-			// Delete posts
-			if( $echo ) echo '<br />Deleting user\'s posts... ';
-			$ret = $DB->query(	"DELETE FROM T_posts
-														WHERE post_creator_user_ID = $this->ID" );
-			if( $echo ) printf( '(%d rows)', $ret );
+			// Posts will we auto-deleted by parent method
 		} // no posts
-
-		// Delete userblog permissions
-		if( $echo ) echo '<br />Deleting user-blog permissions... ';
-		$ret = $DB->query(	"DELETE FROM T_blogusers
-													WHERE bloguser_user_ID = $this->ID" );
-		if( $echo ) printf( '(%d rows)', $ret );
 
 		// Delete main object:
 		if( $echo ) echo '<br />Deleting User... ';
 		parent::dbdelete();
 
 		echo '<br />Done.</p>';
+		$DB->commit();
 	}
 
 
@@ -868,6 +873,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2005/05/04 18:16:55  fplanque
+ * Normalizing
+ *
  * Revision 1.25  2005/04/28 20:44:20  fplanque
  * normalizing, doc
  *
