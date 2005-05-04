@@ -52,17 +52,17 @@ require_once dirname(__FILE__).'/_abstractsettings.class.php';
  */
 class GeneralSettings extends AbstractSettings
 {
-	var $_defaults = array( 'upload_enabled' => '1',
+	var $_defaults = array( 'upload_enabled' => '1',						// partially handled
 													'upload_allowedext' => 'jpg gif png txt',
 													'upload_allowedmime' => '',
 													'upload_maxkb' => '100',
 
 													'fm_enabled' => '1',
-													'fm_enable_roots_blog' => '1',
-													'fm_enable_roots_group' => '1',
-													'fm_enable_roots_user' => '1',
-													'fm_enable_create_dir' => '1',
-													'fm_enable_create_file' => '1',
+													'fm_enable_roots_blog' => '1',			// TO DO
+													// 'fm_enable_roots_group' => '0',	// TO DO
+													'fm_enable_roots_user' => '0',			// TO DO
+													'fm_enable_create_dir' => '1',			// partially handled
+													'fm_enable_create_file' => '0',			// partially handled
 
 													'regexp_filename' => '^[a-zA-Z0-9\-_.]+$'
 												);
@@ -93,6 +93,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.13  2005/05/04 19:40:41  fplanque
+ * cleaned up file settings a little bit
+ *
  * Revision 1.12  2005/04/13 17:48:23  fplanque
  * File manager refactoring
  * storing of file meta data through upload

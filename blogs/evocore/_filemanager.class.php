@@ -1091,10 +1091,25 @@ class FileManager extends Filelist
 	 */
 	function createDirOrFile( $type, $name, $path = NULL, $chmod = NULL )
 	{
-		global $FileCache;
-		global $Messages;
+		global $FileCache, $Settings, $Messages;
 
-		if( $type != 'dir' && $type != 'file' )
+		if( $type == 'dir' )
+		{
+			if( !$Settings->get( 'fm_enable_create_dir' ) )
+			{	// Directory creation is gloablly disabled:
+				$Messages->add( T_('Directory creation is disabled') );
+				return false;
+			}
+		}
+		elseif( $type == 'file' )
+		{
+			if( !$Settings->get( 'fm_enable_create_file' ) )
+			{	// File creation is gloablly disabled:
+				$Messages->add( T_('File creation is disabled') );
+				return false;
+			}
+		}
+		else
 		{
 			return false;
 		}
@@ -1424,6 +1439,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.37  2005/05/04 19:40:41  fplanque
+ * cleaned up file settings a little bit
+ *
  * Revision 1.36  2005/04/29 18:49:32  fplanque
  * Normalizing, doc, cleanup
  *

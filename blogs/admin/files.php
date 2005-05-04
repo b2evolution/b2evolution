@@ -58,6 +58,13 @@
  */
 require_once dirname(__FILE__).'/_header.php';
 
+if( false )
+{	/**
+	 * This is ugly, sorry, but I temporarily need this until NuSphere fixes their CodeInsight :'(
+	 */
+	include('_header.php');
+}
+
 /**
  * Load FileManager class
  */
@@ -1173,6 +1180,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.100  2005/05/04 19:40:40  fplanque
+ * cleaned up file settings a little bit
+ *
  * Revision 1.99  2005/04/29 18:49:32  fplanque
  * Normalizing, doc, cleanup
  *

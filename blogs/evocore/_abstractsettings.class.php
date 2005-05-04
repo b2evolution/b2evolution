@@ -426,7 +426,7 @@ class AbstractSettings
 
 
 	/**
-	 *
+	 * The purpose is to catch a setting from a form value.
 	 * @uses param()
 	 */
 	function setByParam()
@@ -448,10 +448,7 @@ class AbstractSettings
 
 
 		$Debuglog->add( get_class($this).'::setByParam(): param( '.implode( ', ', $paramArgs ).' ): '.var_export($param, true)
-										.' => '.( is_null($param) ?
-															'NOT set!' :
-															'set!' ),
-										'note' );
+										.' => '.( is_null($param) ? 'NOT set!' : 'note' ) );
 
 		return true;
 	}
@@ -621,6 +618,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.14  2005/05/04 19:40:41  fplanque
+ * cleaned up file settings a little bit
+ *
  * Revision 1.13  2005/04/28 20:44:19  fplanque
  * normalizing, doc
  *

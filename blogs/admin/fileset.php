@@ -58,23 +58,33 @@ switch( $action )
 		$current_User->check_perm( 'options', 'edit', true );
 
 		param( 'submit', 'string', '' );
-
-		if( $submit == T_('Set defaults') )
+		if( $submit == T_('Restore defaults') )
 		{
-			$Settings->deleteArray( array( 'fm_enabled', 'fm_enable_roots_blog', 'fm_enable_roots_group', 'fm_enable_roots_user', 'fm_enable_create_dir', 'fm_enable_create_file', 'upload_enabled', 'upload_allowedext', 'upload_allowedmime', 'upload_maxkb', 'regexp_filename' ) );
+			$Messages->add( 'Restoring default values.', 'note' );
+			$Settings->deleteArray( array( 'fm_enabled',
+																			'fm_enable_roots_blog',
+																			// 'fm_enable_roots_group',
+																			'fm_enable_roots_user',
+																			'fm_enable_create_dir',
+																			'fm_enable_create_file',
+																			'upload_enabled',
+																			'upload_allowedext',
+																			'upload_allowedmime',
+																			'upload_maxkb',
+																			'regexp_filename' ) );
 		}
 		else
 		{
 			// Filemanager
-			$Settings->setByParam( 'fm_enabled', 'fm_enabled', 'integer', 0 );
-			$Settings->setByParam( 'fm_enable_roots_blog', 'fm_enable_roots_blog', 'integer', 0 );
-			$Settings->setByParam( 'fm_enable_roots_group', 'fm_enable_roots_group', 'integer', 0 );
-			$Settings->setByParam( 'fm_enable_roots_user', 'fm_enable_roots_user', 'integer', 0 );
-			$Settings->setByParam( 'fm_enable_create_dir', 'fm_enable_create_dir', 'integer', 0 );
+			$Settings->setByParam( 'fm_enabled',            'fm_enabled', 'integer', 0 );
+			$Settings->setByParam( 'fm_enable_roots_blog',  'fm_enable_roots_blog',  'integer', 0 );
+			// $Settings->setByParam( 'fm_enable_roots_group', 'fm_enable_roots_group', 'integer', 0 );
+			$Settings->setByParam( 'fm_enable_roots_user',  'fm_enable_roots_user',  'integer', 0 );
+			$Settings->setByParam( 'fm_enable_create_dir',  'fm_enable_create_dir',  'integer', 0 );
 			$Settings->setByParam( 'fm_enable_create_file', 'fm_enable_create_file', 'integer', 0 );
 
 			// Upload
-			$Settings->setByParam( 'upload_enabled', 'upload_enabled', 'integer', 0 );
+			$Settings->setByParam( 'upload_enabled',         'upload_enabled', 'integer', 0 );
 			param( 'upload_allowedext', 'string', true );
 			$Settings->set( 'upload_allowedext', trim($upload_allowedext) );
 			param( 'upload_allowedmime', 'string', true );

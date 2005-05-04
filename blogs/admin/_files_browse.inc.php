@@ -573,9 +573,11 @@ if( $countFiles )
 	</script>
 	<?php
 }
+
+
+if( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ) )
+{ // dir or file creation is enabled:
 ?>
-
-
 <!-- CREATE: -->
 
 <form action="files.php#FM_anchor" class="toolbaritem">
@@ -606,7 +608,9 @@ if( $countFiles )
 	<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
 	<input type="hidden" name="action" value="createnew" />
 </form>
-
+<?php
+}
+?>
 
 <!-- UPLOAD: -->
 
@@ -735,6 +739,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.28  2005/05/04 19:40:40  fplanque
+ * cleaned up file settings a little bit
+ *
  * Revision 1.27  2005/04/29 18:49:32  fplanque
  * Normalizing, doc, cleanup
  *
