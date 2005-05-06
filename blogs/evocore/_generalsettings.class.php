@@ -52,20 +52,20 @@ require_once dirname(__FILE__).'/_abstractsettings.class.php';
  */
 class GeneralSettings extends AbstractSettings
 {
-	var $_defaults = array( 'upload_enabled' => '1',						// partially handled
-													'upload_allowedext' => 'jpg gif png txt',
-													'upload_allowedmime' => '',
-													'upload_maxkb' => '100',
+	var $_defaults = array(
+										'fm_enabled' => '1',			          // handled
+										'fm_enable_roots_blog' => '1',			// handled
+										// 'fm_enable_roots_group' => '0',	// TO DO
+										'fm_enable_roots_user' => '0',			// handled
+										'fm_enable_create_dir' => '1',			// handled
+										'fm_enable_create_file' => '0',			// handled
 
-													'fm_enabled' => '1',
-													'fm_enable_roots_blog' => '1',			// TO DO
-													// 'fm_enable_roots_group' => '0',	// TO DO
-													'fm_enable_roots_user' => '0',			// TO DO
-													'fm_enable_create_dir' => '1',			// partially handled
-													'fm_enable_create_file' => '0',			// partially handled
+                    'upload_enabled' => '1',						// ...
+										'upload_allowedext' => 'jpg gif png txt',	// handled
+										'upload_maxkb' => '100',
 
-													'regexp_filename' => '^[a-zA-Z0-9\-_.]+$'
-												);
+										'regexp_filename' => '^[a-zA-Z0-9\-_.]+$'
+									);
 	/**
 	 * Constructor
 	 *
@@ -93,6 +93,10 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.14  2005/05/06 20:04:48  fplanque
+ * added contribs
+ * fixed filemanager settings
+ *
  * Revision 1.13  2005/05/04 19:40:41  fplanque
  * cleaned up file settings a little bit
  *

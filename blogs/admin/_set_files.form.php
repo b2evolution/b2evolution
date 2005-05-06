@@ -44,40 +44,32 @@ $Form->fieldset_end();
 
 
 $Form->fieldset( T_('Upload options') );
-$Form->checkbox( 'upload_enabled', $Settings->get('upload_enabled'),
-											T_('Enable upload'), T_('Check to allow uploading files in general.' ) );
-$Form->text( 'upload_allowedext',
-									$Settings->get('upload_allowedext'),
-									40,
-									T_('Allowed file extensions'),
-									T_('Seperated by space.' )
-									.' '.T_('Leave it empty to disable this check.')
-									.' '.sprintf( /* TRANS: %s gets replaced with an example setting */ T_('E.g. &laquo;%s&raquo;'), $Settings->getDefault( 'upload_allowedext' ) ),
-									255 );
-$Form->text( 'upload_allowedmime',
-									$Settings->get('upload_allowedmime'),
-									40,
-									T_('Allowed MIME types'),
-									T_('Seperated by space.' )
-									.' '.T_('Leave it empty to disable this check.')
-									.' '.sprintf( /* TRANS: %s gets replaced with an example setting */ T_('E.g. &laquo;%s&raquo;'), $Settings->getDefault( 'upload_allowedmime' ) ),
-									255 );
-$Form->text( 'upload_maxkb',
-									$Settings->get('upload_maxkb'),
-									6,
-									T_('Maximal allowed filesize'),
-									T_('KB'),
-									7 );
+	$Form->checkbox( 'upload_enabled', $Settings->get('upload_enabled'),
+												T_('Enable upload'), T_('Check to allow uploading files in general.' ) );
+	$Form->text( 'upload_allowedext',
+										$Settings->get('upload_allowedext'),
+										40,
+										T_('Allowed file extensions'),
+										T_('Seperated by space.' )
+										.' '.T_('Leave it empty to disable this check.')
+										.' '.sprintf( /* TRANS: %s gets replaced with an example setting */ T_('E.g. &laquo;%s&raquo;'), $Settings->getDefault( 'upload_allowedext' ) ),
+										255 );
+	$Form->text( 'upload_maxkb',
+										$Settings->get('upload_maxkb'),
+										6,
+										T_('Maximal allowed filesize'),
+										T_('KB'),
+										7 );
 $Form->fieldset_end();
 
 
 $Form->fieldset( T_('Advanced options') );
-$Form->text( 'regexp_filename',
-									$Settings->get('regexp_filename'),
-									40,
-									T_('Valid filename'),
-									T_('Regular expression'),
-									255 );
+	$Form->text( 'regexp_filename',
+										$Settings->get('regexp_filename'),
+										40,
+										T_('Valid filename'),
+										T_('Regular expression'),
+										255 );
 $Form->fieldset_end();
 
 

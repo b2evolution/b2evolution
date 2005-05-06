@@ -263,7 +263,13 @@ class User extends DataObject
 	 */
 	function getMediaDir()
 	{
-		global $basepath, $media_subdir, $Messages;
+		global $basepath, $media_subdir, $Messages, $Settings, $Debuglog;
+
+		if( ! $Settings->get( 'fm_enable_roots_user' ) )
+		{	// User directories are disabled:
+			$Debuglog->add( 'Attempt to access user media dir, but this feature is disabled' );
+			return false;
+		}
 
 		$userdir = $basepath.$media_subdir.'users/'.$this->login.'/';
 		if( !is_dir( $userdir ) )
@@ -289,7 +295,13 @@ class User extends DataObject
 	 */
 	function getMediaUrl()
 	{
-		global $baseurl, $media_subdir;
+		global $baseurl, $media_subdir, $Settings, $Debuglog;
+
+ 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
+		{	// User directories are disabled:
+			$Debuglog->add( 'Attempt to access user media URL, but this feature is disabled' );
+			return false;
+		}
 
 		return $baseurl.$media_subdir.'users/'.$this->login.'/';
 	}
@@ -873,6 +885,10 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2005/05/06 20:04:48  fplanque
+ * added contribs
+ * fixed filemanager settings
+ *
  * Revision 1.26  2005/05/04 18:16:55  fplanque
  * Normalizing
  *

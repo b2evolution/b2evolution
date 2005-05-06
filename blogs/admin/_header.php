@@ -129,6 +129,14 @@ $AdminUI->addMenuEntries(
 									'href'=>'b2template.php'
 								),
 
+			// TODO: check filemanager permission
+			'files' => array(
+									'text' => T_('Files'),
+									'title' => T_('Filemanager').' (beta)',
+									'href'=>'files.php',
+									'perm_eval' => 'global $Settings; return $Settings->get( \'fm_enabled\' ) && $current_User->level >= 7;'
+								),
+
 			'users' => array(
 									'text'=>T_('Users & Groups'),
 									'title'=>T_('User management'),
@@ -136,13 +144,6 @@ $AdminUI->addMenuEntries(
 									'perm_level'=>'view',
 									'text_noperm'=>T_('User Profile'),	// displayed if perm not granted
 									'href'=>'b2users.php'
-								),
-
-			'files' => array(
-									'text'=>T_('Files'),
-									'title' => T_('Filemanager').' (beta)',
-									'href'=>'files.php',
-									'perm_eval' => 'return $current_User->level == 10;'
 								),
 
 			'options' => array(

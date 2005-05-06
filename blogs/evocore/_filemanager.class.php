@@ -236,7 +236,7 @@ class FileManager extends Filelist
 		$root_A = explode( '_', $root );
 
 		if( count($root_A) == 2 && $root_A[1] !== '' )
-		{
+		{	// We have requested a specific root folder:
 			switch( $root_A[0] )
 			{
 				case 'blog':
@@ -253,60 +253,71 @@ class FileManager extends Filelist
 					$this->root = 'user_'.$root_A[1];
 					break;
 			}
-		}
-		else switch( $root_A[0] )
-		{
-			case NULL:
-			case 'user':
-				$this->root_dir = $this->User->getMediaDir();
-				$this->root_url = $this->User->getMediaUrl();
-				$this->root = 'user';
-				break;
-		}
 
-		list( $real_root_dir, $real_root_dir_exists ) = str2path( $this->root_dir );
-		$Debuglog->add( 'real_root_dir: '.var_export( $real_root_dir, true ), 'filemanager' );
-
-		if( !$this->root_dir )
-		{
-			$Messages->add( T_('No access to root directory.'), 'error' );
-			$this->cwd = NULL;
-		}
-		elseif( !$real_root_dir_exists )
-		{
-			$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $this->root_dir ), 'error' );
-			$this->cwd = NULL;
+			if( !$this->root_dir )
+			{
+				$Messages->add( T_('You don\'t have access to the requested root directory.'), 'error' );
+				$this->cwd = NULL;
+			}
 		}
 		else
-		{
-			$this->cwd = trailing_slash( $this->root_dir.$path );
-			// get real cwd
+		{	// NO folder requested, get the first one available:
+			$root_array = $this->getRootList();
 
-			list( $realpath, $realpath_exists ) = str2path( $this->cwd );
-
-
-			if( !preg_match( '#^'.$this->root_dir.'#', $realpath ) )
-			{ // cwd is not below root!
-				$Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
-				$this->cwd = $this->root_dir;
+			if( count($root_array) )
+			{	// We found at least one media dir:
+				$this->root_dir = $root_array[0]['path'];
+				$this->root_url = $root_array[0]['url'];
+				$this->root = $root_array[0]['id'];
 			}
 			else
-			{ // allowed
-				if( !$realpath_exists )
-				{ // does not exist
-					$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $this->cwd ) );
-					$this->cwd = NULL;
-				}
-				else
-				{
-					$this->cwd = $realpath;
-				}
+			{
+				$Messages->add( T_('You don\'t have access to any root directory.'), 'error' );
+				$this->cwd = NULL;
 			}
 		}
 
-		// Get the subpath relative to root
-		$this->path = preg_replace( '#^'.$this->root_dir.'#', '', $this->cwd );
+		if( $this->root_dir )
+		{	// We have access to a/requested root dir:
 
+			list( $real_root_dir, $real_root_dir_exists ) = str2path( $this->root_dir );
+			$Debuglog->add( 'real_root_dir: '.var_export( $real_root_dir, true ), 'filemanager' );
+
+			if( !$real_root_dir_exists )
+			{
+				$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $this->root_dir ), 'error' );
+				$this->cwd = NULL;
+			}
+			else
+			{
+				$this->cwd = trailing_slash( $this->root_dir.$path );
+				// get real cwd
+
+				list( $realpath, $realpath_exists ) = str2path( $this->cwd );
+
+
+				if( !preg_match( '#^'.$this->root_dir.'#', $realpath ) )
+				{ // cwd is not below root!
+					$Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
+					$this->cwd = $this->root_dir;
+				}
+				else
+				{ // allowed
+					if( !$realpath_exists )
+					{ // does not exist
+						$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $this->cwd ) );
+						$this->cwd = NULL;
+					}
+					else
+					{
+						$this->cwd = $realpath;
+					}
+				}
+			}
+
+			// Get the subpath relative to root
+			$this->path = preg_replace( '#^'.$this->root_dir.'#', '', $this->cwd );
+		}
 		// }}}
 
 
@@ -751,22 +762,30 @@ class FileManager extends Filelist
 
 		$r = array();
 
+		// blog media dirs:
 		foreach( $bloglist as $blog_ID )
 		{
 			$Blog = & $BlogCache->get_by_ID( $blog_ID );
 
-			$r[] = array( 'type' => 'blog',
-										'id' => 'blog_'.$blog_ID,
-										'name' => $Blog->get( 'shortname' ),
-										'path' => $Blog->getMediaDir() );
+			if( $blog_media_dir = $Blog->getMediaDir() )
+			{ // we got a blog media dir:
+				$r[] = array( 'type' => 'blog',
+											'id'   => 'blog_'.$blog_ID,
+											'name' => $Blog->get( 'shortname' ),
+											'path' => $blog_media_dir,
+											'url'  => $Blog->get( 'mediaurl' ) );
+			}
 		}
 
 		// the user's root
-		$r[] = array( 'type' => 'user',
-									'id' => 'user',
-									'name' => T_('My folder'),
-									'path' => $this->User->getMediaDir() );
-
+		if( $user_media_dir = $this->User->getMediaDir() )
+		{	// We got a user media dir:
+			$r[] = array( 'type' => 'user',
+										'id'   => 'user',
+										'name' => T_('My folder'),
+										'path' => $user_media_dir,
+										'url'  => $this->User->getMediaUrl() );
+		}
 		return $r;
 	}
 
@@ -1209,7 +1228,7 @@ class FileManager extends Filelist
 				$cd .= $dir.'/';
 			}
 			$r .= '<a href="'.$this->getCurUrl( array( 'path' => $cd ) )
-					.'" title="'.T_('Change to this directory').'">'.$dir.'/</a>';
+					.'" title="'.T_('Change to this directory').'">'.$dir.'</a>/';
 		}
 
 		return $r;
@@ -1439,6 +1458,10 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.38  2005/05/06 20:04:48  fplanque
+ * added contribs
+ * fixed filemanager settings
+ *
  * Revision 1.37  2005/05/04 19:40:41  fplanque
  * cleaned up file settings a little bit
  *

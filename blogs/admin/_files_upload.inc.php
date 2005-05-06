@@ -180,10 +180,6 @@ if( false )
 				{	// We want to restrict on file extensions:
 					$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.implode( ', ', $allowedFileExtensions );
 				}
-				if( $allowedMimeTypes )
-				{	// We want to restrict on file MIME types:
-					$restrictNotes[] = '<strong>'.T_('Allowed MIME types').'</strong>: '.implode( ', ', $allowedMimeTypes );
-				}
 				if( $Settings->get( 'upload_maxkb' ) )
 				{	// We want to restrict on file size:
 					$restrictNotes[] = '<strong>'.T_('Maximum allowed file size').'</strong>: '.bytesreadable( $Settings->get( 'upload_maxkb' )*1024 );
@@ -277,6 +273,10 @@ if( false )
 
 /*
  * $Log$
+ * Revision 1.7  2005/05/06 20:04:47  fplanque
+ * added contribs
+ * fixed filemanager settings
+ *
  * Revision 1.6  2005/04/19 16:23:01  fplanque
  * cleanup
  * added FileCache

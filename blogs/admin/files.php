@@ -643,17 +643,27 @@ switch( $Fileman->fm_mode )
 { // handle modes {{{
 
 	case 'file_upload':
-		// {{{ upload mode
+		// {{{
+		/*
+		 * upload mode
+		 */
 		// Check permissions:
+		if( ! $Settings->get('upload_enabled') )
+		{	// Upload is gloablly disabled
+			$Messages->add( T_('Upload is disabled.') );
+			$Fileman->fm_mode = NULL;
+			break;
+		}
+
 		if( !$Fileman->perm( 'upload' ) )
 		{
 			$Messages->add( T_('You have no permissions to upload into this directory.') );
+			$Fileman->fm_mode = NULL;
 			break;
 		}
 
 		$LogUpload = new Log( 'error' );
 		$allowedFileExtensions = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedext' ) ), -1, PREG_SPLIT_NO_EMPTY );
-		$allowedMimeTypes = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedmime' ) ), -1, PREG_SPLIT_NO_EMPTY );
 
 		/**
 		 * @var array Remember failed files (and the error messages)
@@ -762,19 +772,6 @@ switch( $Fileman->fm_mode )
 						}
 					}
 					// NOTE: Files with no extension are allowed..
-				}
-
-				// Check file MIME type:
-				// fplanque>>blueyed: I think that checking against a browser provided type is a bad idea,
-				// people will think it's a secure way to prevent upload of scripts... but it's not :(
-				if( !empty($allowedMimeTypes)
-						&& !empty( $_FILES['uploadfile']['type'][$lKey] ) // browser provided type
-						&& in_array( $_FILES['uploadfile']['type'][$lKey], $allowedMimeTypes )
-					)
-				{
-					$failedFiles[$lKey] = sprintf( T_('The file type (MIME) &laquo;%s&raquo; is not allowed.'), $_FILES['uploadfile']['type'][$lKey] );
-					// Abort upload for this file:
-					continue;
 				}
 
 				// Get File object for requested target location:
@@ -1180,6 +1177,12 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.101  2005/05/06 20:04:47  fplanque
+ * added contribs
+ * fixed filemanager settings
+ *
+ * Removed checking against browser provided mime types (very unsecure!)
+ *
  * Revision 1.100  2005/05/04 19:40:40  fplanque
  * cleaned up file settings a little bit
  *

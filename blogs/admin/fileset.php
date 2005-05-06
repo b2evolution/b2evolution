@@ -48,7 +48,6 @@ require( dirname(__FILE__).'/_header.php' );
 $AdminUI->setPath( 'options', 'files' );
 
 param( 'action', 'string' );
-
 require( dirname(__FILE__).'/_menutop.php' );
 
 switch( $action )
@@ -69,7 +68,6 @@ switch( $action )
 																			'fm_enable_create_file',
 																			'upload_enabled',
 																			'upload_allowedext',
-																			'upload_allowedmime',
 																			'upload_maxkb',
 																			'regexp_filename' ) );
 		}
@@ -87,8 +85,6 @@ switch( $action )
 			$Settings->setByParam( 'upload_enabled',         'upload_enabled', 'integer', 0 );
 			param( 'upload_allowedext', 'string', true );
 			$Settings->set( 'upload_allowedext', trim($upload_allowedext) );
-			param( 'upload_allowedmime', 'string', true );
-			$Settings->set( 'upload_allowedmime', trim($upload_allowedmime) );
 			$Settings->setByParam( 'upload_maxkb', 'upload_maxkb', 'integer', true );
 
 			// Advanced settings

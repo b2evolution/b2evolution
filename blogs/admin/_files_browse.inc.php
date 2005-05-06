@@ -144,7 +144,14 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 /**
  * @global integer Number of cols for the files table, 8 by default
  */
-$filetable_cols = 8;
+if( $Fileman->flatmode )
+{
+	$filetable_cols = 9;
+}
+else
+{
+	$filetable_cols = 8;
+}
 
 ?>
 
@@ -160,7 +167,7 @@ $filetable_cols = 8;
 		 */
 		$rootlist = $Fileman->getRootList();
 		if( count($rootlist) > 1 )
-		{ // provide list of roots
+		{ // provide list of roots to choose from
 			echo '<div id="fmbar_roots">';
 			echo '<select name="rootIDAndPath" onchange="this.form.submit()">';
 			foreach( $rootlist as $lroot )
@@ -232,12 +239,11 @@ $filetable_cols = 8;
 	echo '<th colspan="2" class="firstcol">';
 	$Fileman->dispButtonParent();
 	echo '</th>';
-	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'name', /* TRANS: file name */ T_('Name') );
 	if( $Fileman->flatmode )
 	{
-		echo ' &ndash; '.$Fileman->getLinkSort( 'path', /* TRANS: file/directory path */ T_('Path') );
+		echo '<th>'.$Fileman->getLinkSort( 'path', /* TRANS: file/directory path */ T_('Path') ).'</th>';
 	}
-	echo '</th>';
+	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'name', /* TRANS: file name */ T_('Name') ).'</th>';
 	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
 	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'size', /* TRANS: file size */ T_('Size') ).'</th>';
 	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ).'</th>';
@@ -261,7 +267,7 @@ param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
  */
 $Fileman->sort();
 $countFiles = 0;
-while( $lFile =& $Fileman->get_next() )
+while( $lFile = & $Fileman->get_next() )
 { // loop through all Files:
 	echo '<tr';
 
@@ -299,6 +305,17 @@ while( $lFile =& $Fileman->get_next() )
 	echo '">'.$lFile->get_icon().'</a>';
 	echo '</td>';
 
+ 	/*
+	 * Path (flatmode):
+	 */
+	if( $Fileman->flatmode )
+	{
+		echo '<td class="filepath">';
+		echo $Fileman->get_relative_path( $lFile, false );
+		echo '</td>';
+	}
+
+
 	echo '<td class="filename">';
 
 	/*
@@ -334,11 +351,13 @@ while( $lFile =& $Fileman->get_next() )
 	 * Filename:
 	 */
 	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" onclick="document.getElementById(\'cb_filename_'.$countFiles.'\').click();">';
+	/*
 	if( $Fileman->flatmode && $Fileman->get_sort_order() != 'name' )
 	{	// Display directory name
 		echo './'.$Fileman->get_relative_path( $lFile );
 	}
 	else
+	*/
 	{	// Display file short name
 		echo $lFile->get_name();
 	}
@@ -359,7 +378,7 @@ while( $lFile =& $Fileman->get_next() )
 
 	/*
 	 * Directory in flat mode:
-	 */
+	 *
 	if( $Fileman->flatmode && $Fileman->get_sort_order() == 'name' )
 	{
 		?>
@@ -374,7 +393,7 @@ while( $lFile =& $Fileman->get_next() )
 		</div>
 		<?php
 	}
-
+	*/
 	echo '</td>';
 
 	/*
@@ -574,23 +593,36 @@ if( $countFiles )
 	<?php
 }
 
-
+/*
+ * CREATE:
+ */
 if( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ) )
 { // dir or file creation is enabled:
 ?>
-<!-- CREATE: -->
 
 <form action="files.php#FM_anchor" class="toolbaritem">
-	<?php echo $Fileman->getFormHiddenInputs();
-	echo T_('New'); ?>
-	<select name="createnew">
-		<?php
+	<?php
+		echo $Fileman->getFormHiddenInputs();
+		if( ! $Settings->get( 'fm_enable_create_dir' ) )
+		{	// We can create files only:
+			echo T_('New file:');
+			echo '<input type="hidden" name="createnew" value="file" />';
+		}
+		elseif( ! $Settings->get( 'fm_enable_create_file' ) )
+		{	// We can create directories only:
+			echo T_('New folder:');
+			echo '<input type="hidden" name="createnew" value="dir" />';
+		}
+		else
+		{	// We can create both files and directories:
+			echo T_('New');
+			echo '<select name="createnew">';
 			echo '<option value="dir"';
 			if( isset($createnew) &&  $createnew == 'dir' )
 			{
 				echo ' selected="selected"';
 			}
-			echo '>'.T_('directory').'</option>';
+			echo '>'.T_('folder').'</option>';
 
 			echo '<option value="file"';
 			if( isset($createnew) && $createnew == 'file' )
@@ -598,8 +630,9 @@ if( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_creat
 				echo ' selected="selected"';
 			}
 			echo '>'.T_('file').'</option>';
-		?>
-	</select>:
+			echo '</select>:';
+		}
+	?>
 	<input type="text" name="createname" value="<?php
 		if( isset( $createname ) )
 		{
@@ -610,8 +643,14 @@ if( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_creat
 </form>
 <?php
 }
-?>
 
+
+/*
+ * UPLOAD:
+ */
+if(  $Settings->get('upload_enabled') )
+{	// Upload is gloablly enabled
+?>
 <!-- UPLOAD: -->
 
 <form action="files.php" method="post" class="toolbaritem">
@@ -632,6 +671,9 @@ if( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_creat
 		<input class="ActionButton" type="submit" value="<?php echo T_('Quick Upload!'); ?>" />
 	</div>
 </form>
+<?php
+}
+?>
 
 <div class="clear"></div>
 
@@ -739,6 +781,10 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.29  2005/05/06 20:04:33  fplanque
+ * added contribs
+ * fixed filemanager settings
+ *
  * Revision 1.28  2005/05/04 19:40:40  fplanque
  * cleaned up file settings a little bit
  *

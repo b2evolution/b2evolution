@@ -329,7 +329,13 @@ class Blog extends DataObject
 	 */
 	function getMediaDir( $absolute = true )
 	{
-		global $basepath, $media_subdir, $Messages;
+		global $basepath, $media_subdir, $Messages, $Settings, $Debuglog;
+
+ 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
+		{	// User directories are disabled:
+			$Debuglog->add( 'Attempt to access blog media dir, but this feature is disabled' );
+			return false;
+		}
 
 		switch( $this->media_location )
 		{
@@ -370,7 +376,7 @@ class Blog extends DataObject
 	 */
 	function get( $parname )
 	{
-		global $xmlsrv_url, $admin_email, $baseurl, $basepath, $media_url, $current_User;
+		global $xmlsrv_url, $admin_email, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
 
 		switch( $parname )
 		{
@@ -378,6 +384,12 @@ class Blog extends DataObject
 				return $this->getMediaDir();
 
 			case 'mediaurl':
+		 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
+				{	// User directories are disabled:
+					$Debuglog->add( 'Attempt to access blog media URL, but this feature is disabled' );
+					return false;
+				}
+
 				return ($this->media_location == 'custom')
 								? $this->media_url
 								: $media_url.'blogs/'.$this->getMediaDir( false );
@@ -675,6 +687,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2005/05/06 20:04:48  fplanque
+ * added contribs
+ * fixed filemanager settings
+ *
  * Revision 1.16  2005/03/16 19:58:23  fplanque
  * small AdminUI cleanup tasks
  *
