@@ -60,7 +60,7 @@ class GeneralSettings extends AbstractSettings
 										'fm_enable_create_dir' => '1',			// handled
 										'fm_enable_create_file' => '0',			// handled
 
-                    'upload_enabled' => '1',						// ...
+                    'upload_enabled' => '1',						// handled
 										'upload_allowedext' => 'jpg gif png txt',	// handled
 										'upload_maxkb' => '100',
 
@@ -93,6 +93,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.15  2005/05/09 16:09:42  fplanque
+ * implemented file manager permissions through Groups
+ *
  * Revision 1.14  2005/05/06 20:04:48  fplanque
  * added contribs
  * fixed filemanager settings

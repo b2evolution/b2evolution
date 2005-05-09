@@ -563,8 +563,7 @@ function upgrade_b2evo_tables()
 								( "reloadpage_timeout", "300" ),
 								( "upload_enabled", "'.(isset($use_fileupload) ? $use_fileupload : '1').'" ),
 								( "upload_allowedext", "'.(isset($fileupload_allowedtypes) ? $fileupload_allowedtypes : 'jpg gif png').'" ),
-								( "upload_maxkb", "'.(isset($fileupload_maxk) ? $fileupload_maxk : '96').'" ),
-								( "upload_minlevel", "'.(isset($fileupload_minlevel) ? $fileupload_minlevel : '1').'" )
+								( "upload_maxkb", "'.(isset($fileupload_maxk) ? $fileupload_maxk : '96').'" )
 							';
 		$DB->query( $query );
 
@@ -575,40 +574,6 @@ function upgrade_b2evo_tables()
 									  AND set_value = "paged"' );
 
 		echo "OK.<br />\n";
-
-
-		// explicit upload permissions
-		$notset = $set = array();
-		if( isset($fileupload_allowedusers) && !empty($fileupload_allowedusers) )
-		{
-			echo 'Giving explicit upload permissions to users... ';
-			foreach( preg_split( '#\s+#', $fileupload_allowedusers, -1, PREG_SPLIT_NO_EMPTY )
-								as $llogin )
-			{
-				if( $lid = $DB->get_var( "SELECT ID FROM T_users
-																	WHERE user_login = '$llogin'" ) )
-				{
-					$set[$lid] = $llogin;
-				}
-				else
-				{
-					$notset[] = $llogin;
-				}
-			}
-			if( count( $set ) )
-			{
-				$DB->query( 'REPLACE INTO T_usersettings (uset_user_ID, uset_name, uset_value)
-											VALUES ("'
-											.implode( '", "upload_allowed", "1" ), ("', array_keys($set) )
-											.'", "upload_allowed", "1" )' );
-				echo '<br />&nbsp;&middot; set: '.implode( ', ', $set );
-			}
-			if( count( $notset ) )
-			{
-				echo '<br />&nbsp;&middot; login not found: '.implode( ', ', $notset );
-			}
-			echo "<br />OK.<br />\n";
-		}
 
 
 		echo 'Altering table for Blog-User permissions... ';
@@ -655,8 +620,12 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
-		// TODO: alter T_hitlog!
+		echo 'Altering Groups table... ';
+		$DB->query( "ALTER TABLE T_groups
+								  ADD COLUMN grp_perm_files enum('none','view','add','edit') NOT NULL default 'none'" );
+		echo "OK.<br />\n";
 
+		// TODO: alter T_hitlog!
 
 		// Create relations:
 		create_b2evo_relations();

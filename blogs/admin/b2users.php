@@ -416,25 +416,16 @@ else
 
 			$edited_Group->set( 'name', $edited_grp_name );
 
-			param( 'edited_grp_perm_blogs', 'string', true );
-			$edited_Group->set( 'perm_blogs', $edited_grp_perm_blogs );
-
-			param( 'edited_grp_perm_stats', 'string', true );
-			$edited_Group->set( 'perm_stats', $edited_grp_perm_stats );
-
-			param( 'edited_grp_perm_spamblacklist', 'string', true );
-			$edited_Group->set( 'perm_spamblacklist', $edited_grp_perm_spamblacklist );
-
-			param( 'edited_grp_perm_options', 'string', true );
-			$edited_Group->set( 'perm_options', $edited_grp_perm_options );
-
-			param( 'edited_grp_perm_templates', 'integer', 0 );
-			$edited_Group->set( 'perm_templates', $edited_grp_perm_templates );
+			$edited_Group->set( 'perm_blogs', param( 'edited_grp_perm_blogs', 'string', true ) );
+			$edited_Group->set( 'perm_stats', param( 'edited_grp_perm_stats', 'string', true ) );
+			$edited_Group->set( 'perm_spamblacklist', param( 'edited_grp_perm_spamblacklist', 'string', true ) );
+			$edited_Group->set( 'perm_options', param( 'edited_grp_perm_options', 'string', true ) );
+			$edited_Group->set( 'perm_files', param( 'edited_grp_perm_files', 'string', true ) );
+			$edited_Group->set( 'perm_templates', param( 'edited_grp_perm_templates', 'integer', 0 ) );
 
 			if( $edited_grp_ID != 1 )
 			{ // Groups others than #1 can be prevented from editing users
-				param( 'edited_grp_perm_users', 'string', true );
-				$edited_Group->set( 'perm_users', $edited_grp_perm_users );
+				$edited_Group->set( 'perm_users', param( 'edited_grp_perm_users', 'string', true ) );
 			}
 
 			if( $Messages->count( 'error' ) )
@@ -592,6 +583,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.88  2005/05/09 16:09:38  fplanque
+ * implemented file manager permissions through Groups
+ *
  * Revision 1.87  2005/05/04 18:16:55  fplanque
  * Normalizing
  *

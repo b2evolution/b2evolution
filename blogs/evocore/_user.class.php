@@ -378,23 +378,12 @@ class User extends DataObject
 	 */
 	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
 	{
-		global $use_fileupload, $fileupload_minlevel, $fileupload_allowedusers;
-		global $Settings, $UserSettings;
+		// echo "<br>Checking user perm $permname:$permlevel on target $perm_target";
 
 		$perm = false;
 
 		switch( $permname )
 		{ // What permission do we want to check?
-			case 'upload':
-				/* old:
-				$perm = (($use_fileupload) && ($this->level) >= $fileupload_minlevel)
-								&& ((ereg(' '. $this->login. ' ', $fileupload_allowedusers)) || (trim($fileupload_allowedusers)==''));
-				*/
-				$perm = $Settings->get( 'upload_enabled' )
-								&& ( $this->level >= $Settings->get( 'upload_minlevel' )
-										|| $UserSettings->get( 'upload_allowed' ) );
-				break;
-
 			case 'edit_timestamp':
 				// Global permission to edit timestamps...
 				$perm = ($this->level >= 5);
@@ -430,14 +419,15 @@ class User extends DataObject
 				break;
 
 			default:
-				// Other global permissions (see if the group can handle them)
+				// Other global permissions (see if the group can handle them), includes:
+				// files
 				// Forward request to group:
 				$perm = $this->Group->check_perm( $permname, $permlevel );
 		}
 
 		if( !$perm && $assert )
 		{ // We can't let this go on!
-			die( 'Permission denied! ('. $permname . '/'. $permlevel . ')' );
+			die( 'Permission denied! ('.$permname.':'.$permlevel.')' );
 		}
 
 		return $perm;
@@ -885,6 +875,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2005/05/09 16:09:42  fplanque
+ * implemented file manager permissions through Groups
+ *
  * Revision 1.27  2005/05/06 20:04:48  fplanque
  * added contribs
  * fixed filemanager settings

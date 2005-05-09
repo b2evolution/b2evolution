@@ -98,8 +98,6 @@ switch( $action )
 				$Settings->set( 'regexp_filename', $regexp_filename );
 			}
 
-			#param( 'upload_minlevel', 'integer', true );
-			#$Settings->set( 'upload_minlevel', $reloadpage_minlevel );
 		}
 
 		if( $Settings->updateDB() )

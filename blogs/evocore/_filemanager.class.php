@@ -468,10 +468,14 @@ class FileManager extends Filelist
 	 */
 	function dispButtonFileEditPerms()
 	{
-		if( $link = $this->getLinkFileEditPerms() )
-		{
-			echo '<a title="'.T_('Edit permissions').'" href="'.$link.'">'
+		if( $this->User->check_perm( 'files', 'edit' ) )
+		{ // User can edit:
+			echo '<a title="'.T_('Edit permissions').'" href="'.$this->getLinkFile( $this->curFile, 'editperm' ).'">'
 						.$this->curFile->get_perms( $this->permlikelsl ? 'lsl' : '' ).'</a>';
+		}
+		else
+		{
+			echo $this->curFile->get_perms( $this->permlikelsl ? 'lsl' : '' );
 		}
 	}
 
@@ -919,12 +923,6 @@ class FileManager extends Filelist
 	}
 
 
-	function getLinkFileEditPerms()
-	{
-		return $this->getLinkFile( $this->curFile, 'editperm' );
-	}
-
-
 	function getLinkFileEdit()
 	{
 		if( $this->curFile->is_dir() )
@@ -1292,28 +1290,6 @@ class FileManager extends Filelist
 
 
 	/**
-	 * Check permissions
-	 *
-	 * @param string for what? (upload)
-	 * @return true if permission granted, false if not
-	 */
-	function perm( $for )
-	{
-		global $Debuglog;
-
-		switch( $for )
-		{
-			case 'upload':
-				return $this->User->check_perm( 'upload', 'any', false );
-
-			default:  // return false if not defined
-				$Debuglog->add( 'Filemanager: permission check for ['.$for.'] not defined!' );
-				return false;
-		}
-	}
-
-
-	/**
 	 * Translates $asc parameter, if it's NULL.
 	 *
 	 * @param boolean sort ascending?
@@ -1458,6 +1434,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.39  2005/05/09 16:09:42  fplanque
+ * implemented file manager permissions through Groups
+ *
  * Revision 1.38  2005/05/06 20:04:48  fplanque
  * added contribs
  * fixed filemanager settings

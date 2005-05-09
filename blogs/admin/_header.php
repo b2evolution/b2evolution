@@ -134,7 +134,7 @@ $AdminUI->addMenuEntries(
 									'text' => T_('Files'),
 									'title' => T_('Filemanager').' (beta)',
 									'href'=>'files.php',
-									'perm_eval' => 'global $Settings; return $Settings->get( \'fm_enabled\' ) && $current_User->level >= 7;'
+									'perm_eval' => 'global $Settings; return $Settings->get( \'fm_enabled\' ) && $current_User->check_perm( \'files\', \'view\' );'
 								),
 
 			'users' => array(

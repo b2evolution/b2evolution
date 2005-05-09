@@ -60,19 +60,38 @@ $Form->begin_form( 'fform', T_('File properties') );
 	$Form->fieldset_end();
 
 	$Form->fieldset( T_('Meta data') );
-	  $Form->text( 'title', $selectedFile->title, 50, T_('Long title'), T_('This is a longer descriptive title'), 255 );
-	  $Form->text( 'alt', $selectedFile->alt, 50, T_('Alternative text'), T_('This is useful for images'), 255 );
-	  $Form->textarea( 'desc', $selectedFile->desc, 10, T_('Caption/Description') );
+		if( $current_User->check_perm( 'files', 'edit' ) )
+		{ // User can edit:
+		  $Form->text( 'title', $selectedFile->title, 50, T_('Long title'), T_('This is a longer descriptive title'), 255 );
+		  $Form->text( 'alt', $selectedFile->alt, 50, T_('Alternative text'), T_('This is useful for images'), 255 );
+		  $Form->textarea( 'desc', $selectedFile->desc, 10, T_('Caption/Description') );
+		}
+		else
+		{	// Use rcan view only:
+		  $Form->info( T_('Long title'), $selectedFile->dget('title'), T_('This is a longer descriptive title') );
+		  $Form->info( T_('Alternative text'), $selectedFile->dget('alt'), T_('This is useful for images') );
+		  $Form->info( T_('Caption/Description'), $selectedFile->dget('desc') );
+		}
 	$Form->fieldset_end();
 
-$Form->end_form( array( array( 'submit', '', T_('Update'), 'SaveButton' ),
-												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+if( $current_User->check_perm( 'files', 'edit' ) )
+{ // User can edit:
+	$Form->end_form( array( array( 'submit', '', T_('Update'), 'SaveButton' ),
+													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+}
+else
+{	// Use rcan view only:
+	$Form->end_form();
+}
 
 // End payload block:
 $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.6  2005/05/09 16:09:31  fplanque
+ * implemented file manager permissions through Groups
+ *
  * Revision 1.5  2005/04/28 20:44:18  fplanque
  * normalizing, doc
  *

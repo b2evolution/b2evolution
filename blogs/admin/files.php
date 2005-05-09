@@ -78,17 +78,11 @@ $AdminUI->setPath( 'files' );
  */
 if( !$Settings->get( 'fm_enabled' ) )
 {
-	require dirname(__FILE__).'/_menutop.php';
-	Log::display( '', '', T_('The filemanager is disabled.') );
-	require( dirname(__FILE__). '/_footer.php' );
-	return;
+	die( 'The filemanager is disabled.' );
 }
+// Check permission:
+$current_User->check_perm( 'files', 'view', true );
 
-if( $current_User->level < 7 )
-{
-	echo 'The filemanager is still beta. You need user level 7 to play with this.';
-	return;
-}
 
 if( param( 'rootIDAndPath', 'string', '', true ) )
 { // root and path together: decode and override
@@ -211,6 +205,9 @@ if( !empty($action) )
 
 
 		case 'createnew':
+			// Check permission:
+			$current_User->check_perm( 'files', 'add', true );
+
 			// create new file/dir
 			param( 'createnew', 'string', '' ); // 'file', 'dir'
 			param( 'createname', 'string', '' );
@@ -218,7 +215,7 @@ if( !empty($action) )
 			$Fileman->createDirOrFile( $createnew, $createname ); // handles messages
 			break;
 
-
+		/*
 		case T_('Send by mail'):
 			// TODO: implement
 			if( !$SelectedFiles->count() )
@@ -229,8 +226,9 @@ if( !empty($action) )
 
 			echo 'TODO: Send selected by mail, query email address..';
 			break;
+		*/
 
-
+		/*
 		case 'download':
 			// TODO: provide optional zip formats
 			$action_title = T_('Download');
@@ -300,10 +298,13 @@ if( !empty($action) )
 			}
 
 			break;
-
+		*/
 
 		case 'delete':
-			// delete a file/dir, TODO: checkperm! {{{
+			// Check permission:
+			$current_User->check_perm( 'files', 'edit', true );
+
+			// delete a file/dir {{{
 			if( !$SelectedFiles->count() )
 			{
 				$Messages->add( T_('Nothing selected.') );
@@ -411,6 +412,9 @@ if( !empty($action) )
 		case 'edit_properties':
 			// Edit File properties (Meta Data):
 
+			// Check permission:
+			$current_User->check_perm( 'files', 'view', true );
+
 			$selectedFile = & $SelectedFiles->getFileByIndex(0);
 			// Load meta data:
 			$selectedFile->load_meta();
@@ -421,6 +425,9 @@ if( !empty($action) )
 
 		case 'update_properties':
 			// Update File properties (Meta Data):
+
+			// Check permission:
+			$current_User->check_perm( 'files', 'edit', true );
 
 			$selectedFile = & $SelectedFiles->getFileByIndex(0);
 			// Load meta data:
@@ -439,6 +446,8 @@ if( !empty($action) )
 
 
 		case 'link':
+			// TODO: check perm!!
+
 			// Link File to Item:
 			if( !$SelectedFiles->count() )
 			{
@@ -474,6 +483,8 @@ if( !empty($action) )
 
 
 		case 'unlink':
+			// TODO: check perm!
+
 			// Unlink File from Item:
 			if( !isset( $edited_Link ) )
 			{
@@ -494,6 +505,9 @@ if( !empty($action) )
 
 
 		case 'editperm':
+			// Check permission:
+			$current_User->check_perm( 'files', 'edit', true );
+
 			// edit permissions {{{
 			// fplanque>> TODO: as long as we use fm_modes this thing should at least work like a mode or at the bare minimun, turn off any active mode.
 			$action_title = T_('Change permissions');
@@ -649,15 +663,15 @@ switch( $Fileman->fm_mode )
 		 */
 		// Check permissions:
 		if( ! $Settings->get('upload_enabled') )
-		{	// Upload is gloablly disabled
+		{	// Upload is globally disabled
 			$Messages->add( T_('Upload is disabled.') );
 			$Fileman->fm_mode = NULL;
 			break;
 		}
 
-		if( !$Fileman->perm( 'upload' ) )
-		{
-			$Messages->add( T_('You have no permissions to upload into this directory.') );
+		if( ! $current_User->check_perm( 'files', 'add' ) )
+		{	// We do not have permission to add files
+			$Messages->add( T_('You have no permission to add/upload files.') );
 			$Fileman->fm_mode = NULL;
 			break;
 		}
@@ -842,6 +856,14 @@ switch( $Fileman->fm_mode )
 		 * 5) Given all the reasons above copy, move and rename should be clearly separated into 3 different interfaces.
 		 */
 		// {{{
+
+		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		{	// We do not have permission to edit files
+			$Messages->add( T_('You have no permission to edit/modify files.') );
+			$Fileman->fm_mode = NULL;
+			break;
+		}
+
 		$LogCmr = new Log( 'error' );  // Log for copy/move/rename mode
 
 		if( !$Fileman->SourceList->count() )
@@ -972,6 +994,8 @@ switch( $Fileman->fm_mode )
 
 	case 'link_item':
 		// We want to link file(s) to an item:
+
+		// TODO: check perms. ??
 
 		if( !isset($edited_Item) )
 		{	// No Item to link to...
@@ -1177,6 +1201,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.102  2005/05/09 16:09:38  fplanque
+ * implemented file manager permissions through Groups
+ *
  * Revision 1.101  2005/05/06 20:04:47  fplanque
  * added contribs
  * fixed filemanager settings

@@ -1582,11 +1582,34 @@ $tableusersettings = $tableprefix.'usersettings';
 $regexp_images = '/\.(jpe?g|gif|png|swf)$/i';
 
 
+/**
+ * you may not want all users to upload pictures/files, so you can set a minimum level for this
+ * @global int $fileupload_minlevel
+ * @deprecated
+ */
+$fileupload_minlevel = 1;
+
+
+/**
+ * You may want to authorize only some users to upload. Enter their logins here, separated by space.
+ *
+ * if you leave that variable blank, all users who have the minimum level are authorized to upload.
+ * note: add a space before and after each login name.
+ * example: $fileupload_allowedusers = ' barbara anne ';
+ *
+ * @global string $fileupload_allowedusers
+ * @deprecated
+ */
+$fileupload_allowedusers = '';
+
 
 // globals }}}
 
 /*
  * $Log$
+ * Revision 1.12  2005/05/09 16:09:42  fplanque
+ * implemented file manager permissions through Groups
+ *
  * Revision 1.11  2005/04/27 19:05:47  fplanque
  * normalizing, cleanup, documentaion
  *

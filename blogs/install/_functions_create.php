@@ -355,6 +355,8 @@ function create_groups()
 		grp_perm_options enum('none','view','edit') NOT NULL default 'none',
 		grp_perm_users enum('none','view','edit') NOT NULL default 'none',
 		grp_perm_templates TINYINT NOT NULL DEFAULT 0,
+		grp_perm_files enum('none','view','add','edit') NOT NULL default 'none',
+		grp_perm_upload TINYINT NOT NULL DEFAULT 0,
 		PRIMARY KEY grp_ID (grp_ID)
 	)";
 	$DB->query( $query );
@@ -768,7 +770,6 @@ function create_default_settings( $override = array() )
 								'upload_enabled' => '1',
 								'upload_allowedext' => 'jpg gif png txt',
 								'upload_maxkb' => '96',
-								'upload_minlevel' => '1',
 							);
 
 	$insertvalues = array();

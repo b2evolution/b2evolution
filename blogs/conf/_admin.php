@@ -142,25 +142,6 @@ $fileupload_allowedtypes = ' jpg gif png txt ';
  * @deprecated 0.9.2: this is only used for creating the defaults when upgrading
  */
 $fileupload_maxk = '96'; // in kilo bytes
-
-/**
- * you may not want all users to upload pictures/files, so you can set a minimum level for this
- * @global int $fileupload_minlevel
- * @deprecated 0.9.2: this is only used for creating the defaults when upgrading
- */
-$fileupload_minlevel = 1;
-
-/**
- * You may want to authorize only some users to upload. Enter their logins here, separated by space.
- *
- * if you leave that variable blank, all users who have the minimum level are authorized to upload.
- * note: add a space before and after each login name.
- * example: $fileupload_allowedusers = ' barbara anne ';
- *
- * @global string $fileupload_allowedusers
- * @deprecated 0.9.2: this is only used for creating the defaults when upgrading
- */
-$fileupload_allowedusers = '';
 // }}}
 
 

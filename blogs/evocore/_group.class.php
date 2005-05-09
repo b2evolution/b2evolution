@@ -85,6 +85,7 @@ class Group extends DataObject
 			$this->perm_stats = 'none';
 			$this->perm_spamblacklist = 'none';
 			$this->perm_templates = 0;
+			$this->perm_files = 'none';
 			$this->perm_options = 'none';
 			$this->perm_users = 'none';
 		}
@@ -97,6 +98,7 @@ class Group extends DataObject
 			$this->perm_stats = $db_row->grp_perm_stats;
 			$this->perm_spamblacklist = $db_row->grp_perm_spamblacklist;
 			$this->perm_templates = $db_row->grp_perm_templates;
+			$this->perm_files = $db_row->grp_perm_files;
 			$this->perm_options = $db_row->grp_perm_options;
 			$this->perm_users = $db_row->grp_perm_users;
 		}
@@ -138,11 +140,11 @@ class Group extends DataObject
 	 * @param string Permission level
 	 * @return strind Permission value
 	 */
-	function check_perm( $permname, $permlevel )
+	function check_perm( $permname, $permlevel = 'any' )
 	{
 		// Check group permission:
 		eval( '$permvalue = $this->perm_'.$permname.';' );
-		// echo $permvalue;
+		//echo "<br>Checking group perm $permname:$permlevel against $permvalue";
 
 		switch( $permname )
 		{
@@ -163,12 +165,13 @@ class Group extends DataObject
 						// User can only ask for view perm
 						if(( $permlevel == 'view' ) || ( $permlevel == 'any' ))
 							return true;	// Permission granted
-						break;
 				}
+				break;
 
 			case 'stats':
 			case 'spamblacklist':
 			case 'options':
+			case 'files':
 			case 'users':
 				switch( $permvalue )
 				{	// Depending on current group permission:
@@ -177,12 +180,18 @@ class Group extends DataObject
 						// All permissions granted
 						return true;	// Permission granted
 
+					case 'add':
+						// We can ask for add perm...
+						if( $permlevel == 'add' )
+							return true;	// Permission granted
+						// ... or for any lower priority perm... (no break)
+
 					case 'view':
 						// User can only ask for view perm
 						if( $permlevel == 'view' )
 							return true;	// Permission granted
-						break;
 				}
+				break;
 		}
 
 		return false;	// Permission denied!
@@ -222,6 +231,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2005/05/09 16:09:42  fplanque
+ * implemented file manager permissions through Groups
+ *
  * Revision 1.5  2005/05/04 18:16:55  fplanque
  * Normalizing
  *

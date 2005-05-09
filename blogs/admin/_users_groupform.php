@@ -85,7 +85,12 @@ $Form->fieldset( T_('Permissons for members of this group') );
 							array( 'edit', T_('Full Access') )
 						), T_('Antispam') );
 	$Form->checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Templates'), T_('Check to allow template editing.') );
-
+	$Form->radio( 'edited_grp_perm_files', $edited_Group->get('perm_files'),
+			array(  array( 'none', T_('No Access') ),
+							array( 'view', T_('View only') ),
+							array( 'add', T_('Add/Upload') ),
+							array( 'edit', T_('Full Access') )
+						), T_('Files') );
 	$Form->radio( 'edited_grp_perm_options', $edited_Group->get('perm_options'),
 			array(  array( 'none', T_('No Access') ),
 							array( 'view', T_('View only') ),
@@ -121,6 +126,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.29  2005/05/09 16:09:38  fplanque
+ * implemented file manager permissions through Groups
+ *
  * Revision 1.28  2005/05/04 18:16:55  fplanque
  * Normalizing
  *

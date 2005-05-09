@@ -427,10 +427,13 @@ while( $lFile = & $Fileman->get_next() )
 	echo '<td class="actions lastcol">';
 	// Not implemented yet: $Fileman->dispButtonFileEdit();
 	$Fileman->dispButtonFileProperties();
-	$Fileman->dispButtonFileRename();
-	$Fileman->dispButtonFileCopy();
-	$Fileman->dispButtonFileMove();
-	$Fileman->dispButtonFileDelete();
+	if( $current_User->check_perm( 'files', 'edit' ) )
+	{ // User can edit:
+		$Fileman->dispButtonFileRename();
+		$Fileman->dispButtonFileCopy();
+		$Fileman->dispButtonFileMove();
+		$Fileman->dispButtonFileDelete();
+	}
 	echo '</td>';
 
 	echo '</tr>';
@@ -474,14 +477,19 @@ else
 			?></a>
 		&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
 
-		<input class="DeleteButton"
-			title="<?php echo T_('Delete the selected files') ?>"
-			name="actionArray[delete]"
-			value="delete"
-			type="image"
-			src="<?php echo get_icon( 'file_delete', 'url' ) ?>" />
-
 		<?php
+    if( $current_User->check_perm( 'files', 'edit' ) )
+		{ // User can edit:
+			?>
+			<input class="DeleteButton"
+				title="<?php echo T_('Delete the selected files') ?>"
+				name="actionArray[delete]"
+				value="delete"
+				type="image"
+				src="<?php echo get_icon( 'file_delete', 'url' ) ?>" />
+		<?php
+		}
+
 			/* No delete javascript, we need toi check DB integrity:
 
 			onclick="if( r = openselectedfiles(true) )
@@ -596,10 +604,10 @@ if( $countFiles )
 /*
  * CREATE:
  */
-if( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ) )
-{ // dir or file creation is enabled:
+if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ))
+			&& $current_User->check_perm( 'files', 'add' ) )
+{ // dir or file creation is enabled and we're allowed to add files:
 ?>
-
 <form action="files.php#FM_anchor" class="toolbaritem">
 	<?php
 		echo $Fileman->getFormHiddenInputs();
@@ -648,8 +656,8 @@ if( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_creat
 /*
  * UPLOAD:
  */
-if(  $Settings->get('upload_enabled') )
-{	// Upload is gloablly enabled
+if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
+{	// Upload is enabled and we have permission to use it...
 ?>
 <!-- UPLOAD: -->
 
@@ -781,6 +789,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.30  2005/05/09 16:09:37  fplanque
+ * implemented file manager permissions through Groups
+ *
  * Revision 1.29  2005/05/06 20:04:33  fplanque
  * added contribs
  * fixed filemanager settings

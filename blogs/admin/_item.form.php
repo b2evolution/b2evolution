@@ -166,7 +166,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
 	}
 
-	if( $Settings->get( 'fm_enabled' ) && $Settings->get( 'upload_enabled' ) )
+	if( $Settings->get( 'fm_enabled' ) && $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
 	{ // ---------- UPLOAD ----------
 		require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php' );
 		$Fileman = new Filemanager( $current_User, 'files.php', 'user' );
@@ -391,6 +391,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.22  2005/05/09 16:09:38  fplanque
+ * implemented file manager permissions through Groups
+ *
  * Revision 1.21  2005/04/21 18:01:28  fplanque
  * CSS styles refactoring
  *
