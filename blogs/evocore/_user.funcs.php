@@ -217,8 +217,8 @@ function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link
 
 	if( ! is_logged_in() ) return false;
 
-	if( $current_User->get('level') == 0 )
-	{ // If user is NOT active:
+	if( ! $current_User->check_perm( 'admin', 'visible' ) )
+	{ // If user should NOT see admin link:
 		return false;
 	}
 
@@ -379,6 +379,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.22  2005/05/09 19:07:05  fplanque
+ * bugfixes + global access permission
+ *
  * Revision 1.21  2005/03/15 19:19:49  fplanque
  * minor, moved/centralized some includes
  *

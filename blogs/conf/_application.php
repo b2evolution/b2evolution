@@ -22,7 +22,7 @@ $app_admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolut
 $app_exit_links = '<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
 									&bull;
 									<a href="'.$baseurl.'">'.T_('Exit to blogs').'
-									<img src="img/close.gif" width="14" height="14" class="top" alt="" title="'
+									<img src="img/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
 									.T_('Exit to blogs').'" /></a><br />';
 
 $app_footer_text = '<a href="http://www.b2evolution.net"><strong><span style="color:#333">b</span><sub><span style="color:#f90;margin-top:2ex;">2</span></sub><span style="color:#333">e</span><span style="color:#543">v</span><span style="color:#752">o</span><span style="color:#962">l</span><span style="color:#b72">u</span><span style="color:#c81">t</span><span style="color:#d91">i</span><span style="color:#e90">o</span><span style="color:#f90">n</span></strong> '.$app_version.'</a>

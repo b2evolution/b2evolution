@@ -349,6 +349,7 @@ function create_groups()
 	$query = "CREATE TABLE T_groups (
 		grp_ID int(11) NOT NULL auto_increment,
 		grp_name varchar(50) NOT NULL default '',
+		grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible',
 		grp_perm_blogs enum('user','viewall','editall') NOT NULL default 'user',
 		grp_perm_stats enum('none','view','edit') NOT NULL default 'none',
 		grp_perm_spamblacklist enum('none','view','edit') NOT NULL default 'none',
@@ -365,9 +366,11 @@ function create_groups()
 	echo 'Creating default groups... ';
 	$Group_Admins = new Group(); // COPY !
 	$Group_Admins->set( 'name', 'Administrators' );
+	$Group_Admins->set( 'perm_admin', 'visible' );
 	$Group_Admins->set( 'perm_blogs', 'editall' );
 	$Group_Admins->set( 'perm_stats', 'edit' );
 	$Group_Admins->set( 'perm_spamblacklist', 'edit' );
+	$Group_Admins->set( 'files', 'edit' );
 	$Group_Admins->set( 'perm_options', 'edit' );
 	$Group_Admins->set( 'perm_templates', 1 );
 	$Group_Admins->set( 'perm_users', 'edit' );
@@ -375,9 +378,11 @@ function create_groups()
 
 	$Group_Priviledged = new Group(); // COPY !
 	$Group_Priviledged->set( 'name', 'Priviledged Bloggers' );
+	$Group_Priviledged->set( 'perm_admin', 'visible' );
 	$Group_Priviledged->set( 'perm_blogs', 'viewall' );
 	$Group_Priviledged->set( 'perm_stats', 'view' );
 	$Group_Priviledged->set( 'perm_spamblacklist', 'edit' );
+	$Group_Priviledged->set( 'files', 'add' );
 	$Group_Priviledged->set( 'perm_options', 'view' );
 	$Group_Priviledged->set( 'perm_templates', 0 );
 	$Group_Priviledged->set( 'perm_users', 'view' );
@@ -385,19 +390,23 @@ function create_groups()
 
 	$Group_Bloggers = new Group(); // COPY !
 	$Group_Bloggers->set( 'name', 'Bloggers' );
+	$Group_Bloggers->set( 'perm_admin', 'visible' );
 	$Group_Bloggers->set( 'perm_blogs', 'user' );
 	$Group_Bloggers->set( 'perm_stats', 'none' );
 	$Group_Bloggers->set( 'perm_spamblacklist', 'view' );
+	$Group_Bloggers->set( 'files', 'view' );
 	$Group_Bloggers->set( 'perm_options', 'none' );
 	$Group_Bloggers->set( 'perm_templates', 0 );
 	$Group_Bloggers->set( 'perm_users', 'none' );
 	$Group_Bloggers->dbinsert();
 
 	$Group_Users = new Group(); // COPY !
-	$Group_Users->set( 'perm_blogs', 'user' );
 	$Group_Users->set( 'name', 'Basic Users' );
+	$Group_Users->set( 'perm_admin', 'none' );
+	$Group_Users->set( 'perm_blogs', 'user' );
 	$Group_Users->set( 'perm_stats', 'none' );
 	$Group_Users->set( 'perm_spamblacklist', 'none' );
+	$Group_Users->set( 'files', 'none' );
 	$Group_Users->set( 'perm_options', 'none' );
 	$Group_Users->set( 'perm_templates', 0 );
 	$Group_Users->set( 'perm_users', 'none' );

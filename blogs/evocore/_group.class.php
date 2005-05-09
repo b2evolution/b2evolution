@@ -81,6 +81,7 @@ class Group extends DataObject
 		{
 			// echo 'Creating blank group';
 			$this->name = T_('New group');
+			$this->perm_admin = 'visible';
 			$this->perm_blogs = 'user';
 			$this->perm_stats = 'none';
 			$this->perm_spamblacklist = 'none';
@@ -94,6 +95,7 @@ class Group extends DataObject
 			// echo 'Instanciating existing group';
 			$this->ID = $db_row->grp_ID;
 			$this->name = $db_row->grp_name;
+			$this->perm_admin = $db_row->grp_perm_admin;
 			$this->perm_blogs = $db_row->grp_perm_blogs;
 			$this->perm_stats = $db_row->grp_perm_stats;
 			$this->perm_spamblacklist = $db_row->grp_perm_spamblacklist;
@@ -144,13 +146,28 @@ class Group extends DataObject
 	{
 		// Check group permission:
 		eval( '$permvalue = $this->perm_'.$permname.';' );
-		//echo "<br>Checking group perm $permname:$permlevel against $permvalue";
+		// echo "<br>Checking group perm $permname:$permlevel against $permvalue";
 
 		switch( $permname )
 		{
 			case 'templates':
 				if( $permvalue )
 					return true;	// Permission granted
+				break;
+
+			case 'admin':
+				switch( $permvalue )
+				{	// Depending on current group permission:
+
+					case 'visible':
+						// All permissions granted
+						return true;	// Permission granted
+
+					case 'hidden':
+						// User can only ask for hidden perm
+						if(( $permlevel == 'hidden' ) || ( $permlevel == 'any' ))
+							return true;	// Permission granted
+				}
 				break;
 
 			case 'blogs':
@@ -194,6 +211,7 @@ class Group extends DataObject
 				break;
 		}
 
+		// echo 'DENIED';
 		return false;	// Permission denied!
 	}
 
@@ -231,6 +249,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2005/05/09 19:07:04  fplanque
+ * bugfixes + global access permission
+ *
  * Revision 1.6  2005/05/09 16:09:42  fplanque
  * implemented file manager permissions through Groups
  *

@@ -69,6 +69,18 @@ $Form->fieldset_end();
 
 $Form->fieldset( T_('Permissons for members of this group') );
 
+	if( $edited_Group->get('ID') != 1 )
+	{	// Groups others than #1 can be prevented from editing users
+		$Form->radio( 'edited_grp_perm_admin', $edited_Group->get('perm_admin'),
+				array(  array( 'none', T_('No Access') ),
+								array( 'hidden', T_('Hidden') ),
+								array( 'visible', T_('Visible link') )
+							), T_('Access to Admin area') );
+	}
+	else
+	{	// Group #1 always has user management right:
+		$Form->info( T_('Access to Admin area'), T_('Visible link') );
+	}
 	$Form->radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
 			array(  array( 'user', T_('User permissions') ),
 							array( 'viewall', T_('View all') ),
@@ -78,7 +90,7 @@ $Form->fieldset( T_('Permissons for members of this group') );
 			array(  array( 'none', T_('No Access') ),
 							array( 'view', T_('View only') ),
 							array( 'edit', T_('Full Access') )
-						), T_('Statistics') );
+						), T_('Stats') );
 	$Form->radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'),
 			array(  array( 'none', T_('No Access') ),
 							array( 'view', T_('View only') ),
@@ -91,33 +103,31 @@ $Form->fieldset( T_('Permissons for members of this group') );
 							array( 'add', T_('Add/Upload') ),
 							array( 'edit', T_('Full Access') )
 						), T_('Files') );
-	$Form->radio( 'edited_grp_perm_options', $edited_Group->get('perm_options'),
-			array(  array( 'none', T_('No Access') ),
-							array( 'view', T_('View only') ),
-							array( 'edit', T_('Full Access') )
-						), T_('Settings') );
-
 	if( $edited_Group->get('ID') != 1 )
 	{	// Groups others than #1 can be prevented from editing users
 		$Form->radio( 'edited_grp_perm_users', $edited_Group->get('perm_users'),
 				array(  array( 'none', T_('No Access') ),
 								array( 'view', T_('View only') ),
 								array( 'edit', T_('Full Access') )
-							), T_('User/Group Management') );
+							), T_('Users &amp; Groups') );
 	}
 	else
 	{	// Group #1 always has user management right:
-		$Form->info( T_('User/Group Management'), T_('Full Access') );
+		$Form->info( T_('Users &amp; Groups'), T_('Full Access') );
 	}
-	$Form->fieldset_end();
-
-	if( $current_User->check_perm( 'users', 'edit' ) )
-	{
-		$Form->buttons( array( array( '', '', T_('Save !'), 'SaveButton' ),
-													 array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
-	}
+	$Form->radio( 'edited_grp_perm_options', $edited_Group->get('perm_options'),
+			array(  array( 'none', T_('No Access') ),
+							array( 'view', T_('View only') ),
+							array( 'edit', T_('Full Access') )
+						), T_('Settings') );
 
 $Form->fieldset_end();
+
+if( $current_User->check_perm( 'users', 'edit' ) )
+{
+	$Form->buttons( array( array( '', '', T_('Save !'), 'SaveButton' ),
+												 array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+}
 
 $Form->end_form();
 
@@ -126,6 +136,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.30  2005/05/09 19:06:53  fplanque
+ * bugfixes + global access permission
+ *
  * Revision 1.29  2005/05/09 16:09:38  fplanque
  * implemented file manager permissions through Groups
  *

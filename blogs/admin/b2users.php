@@ -424,7 +424,8 @@ else
 			$edited_Group->set( 'perm_templates', param( 'edited_grp_perm_templates', 'integer', 0 ) );
 
 			if( $edited_grp_ID != 1 )
-			{ // Groups others than #1 can be prevented from editing users
+			{ // Groups others than #1 can be prevented from logging in or editing users
+				$edited_Group->set( 'perm_admin', param( 'edited_grp_perm_admin', 'string', true ) );
 				$edited_Group->set( 'perm_users', param( 'edited_grp_perm_users', 'string', true ) );
 			}
 
@@ -583,6 +584,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.89  2005/05/09 19:06:54  fplanque
+ * bugfixes + global access permission
+ *
  * Revision 1.88  2005/05/09 16:09:38  fplanque
  * implemented file manager permissions through Groups
  *

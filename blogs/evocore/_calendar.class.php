@@ -213,7 +213,7 @@ class Calendar
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
 			$where_time[] = $dbprefix.'datestart <= \''.$date_max.'\'';
 		}
-		$this->where_time = $where_time ? implode( ' AND ', $where_time) : '';
+		$this->where_time = $where_time ? (' AND '.implode( ' AND ', $where_time)) : '';
 
 
 		// Default styling:
@@ -801,6 +801,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.13  2005/05/09 19:07:03  fplanque
+ * bugfixes + global access permission
+ *
  * Revision 1.12  2005/04/27 19:05:46  fplanque
  * normalizing, cleanup, documentaion
  *

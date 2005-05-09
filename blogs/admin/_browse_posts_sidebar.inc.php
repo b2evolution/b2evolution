@@ -123,153 +123,153 @@ echo '<div class="bSideItem">';
 
 		$Form->fieldset( 'Archives', T_('Archives') );
 		?>
-					<ul>
-					<?php
-					// this is what will separate your archive links
-					$archive_line_start = '<li>';
-					$archive_line_end = '</li>';
-					// this is what will separate dates on weekly archive links
-					$archive_week_separator = ' - ';
+		<ul>
+		<?php
+		// this is what will separate your archive links
+		$archive_line_start = '<li>';
+		$archive_line_end = '</li>';
+		// this is what will separate dates on weekly archive links
+		$archive_week_separator = ' - ';
 
-					$dateformat = locale_datefmt();
-					$archive_day_date_format = $dateformat;
-					$archive_week_start_date_format = $dateformat;
-					$archive_week_end_date_format   = $dateformat;
+		$dateformat = locale_datefmt();
+		$archive_day_date_format = $dateformat;
+		$archive_week_start_date_format = $dateformat;
+		$archive_week_end_date_format   = $dateformat;
 
-					$arc_link_start = $pagenow.'?tab='.$tab.'&amp;blog='.$blog.'&amp;';
+		$arc_link_start = $pagenow.'?tab='.$tab.'&amp;blog='.$blog.'&amp;';
 
-					$ArchiveList = & new ArchiveList( $blog, $Settings->get('archive_mode'), $show_statuses,	$timestamp_min,
-																						$timestamp_max, 36, $dbtable, $dbprefix, $dbIDname );
-					while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
-					{
-						echo $archive_line_start;
-						switch( $Settings->get('archive_mode') )
-						{
-							case 'monthly':
-								// --------------------------------- MONTHLY ARCHIVES ---------------------------------
-								$arc_m = $arc_year.zeroise($arc_month,2);
-								echo '<input type="radio" name="m" value="'. $arc_m. '" class="checkbox"';
-								if( $m == $arc_m ) echo ' checked="checked"' ;
-								echo ' /> ';
-								echo '<a href="'. $arc_link_start. 'm='. $arc_m. '">';
-								echo T_($month[zeroise($arc_month,2)]), ' ', $arc_year;
-								echo "</a> ($arc_count)";
-								break;
+		$ArchiveList = & new ArchiveList( $blog, $Settings->get('archive_mode'), $show_statuses,	$timestamp_min,
+																			$timestamp_max, 36, $dbtable, $dbprefix, $dbIDname );
+		while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
+		{
+			echo $archive_line_start;
+			switch( $Settings->get('archive_mode') )
+			{
+				case 'monthly':
+					// --------------------------------- MONTHLY ARCHIVES ---------------------------------
+					$arc_m = $arc_year.zeroise($arc_month,2);
+					echo '<input type="radio" name="m" value="'. $arc_m. '" class="checkbox"';
+					if( $m == $arc_m ) echo ' checked="checked"' ;
+					echo ' /> ';
+					echo '<a href="'. $arc_link_start. 'm='. $arc_m. '">';
+					echo T_($month[zeroise($arc_month,2)]), ' ', $arc_year;
+					echo "</a> ($arc_count)";
+					break;
 
-							case 'daily':
-								// --------------------------------- DAILY ARCHIVES -----------------------------------
-								$arc_m = $arc_year.zeroise($arc_month,2).zeroise($arc_dayofmonth,2);
-								echo '<input type="radio" name="m" value="'. $arc_m. '" class="checkbox"';
-								if( $m == $arc_m ) echo ' checked="checked"' ;
-								echo ' /> ';
-								echo '<a href="'. $arc_link_start. 'm='. $arc_m. '">';
-								echo mysql2date($archive_day_date_format, $arc_year. '-'. zeroise($arc_month,2). '-'. zeroise($arc_dayofmonth,2). ' 00:00:00');
-								echo "</a> ($arc_count)";
-								break;
+				case 'daily':
+					// --------------------------------- DAILY ARCHIVES -----------------------------------
+					$arc_m = $arc_year.zeroise($arc_month,2).zeroise($arc_dayofmonth,2);
+					echo '<input type="radio" name="m" value="'. $arc_m. '" class="checkbox"';
+					if( $m == $arc_m ) echo ' checked="checked"' ;
+					echo ' /> ';
+					echo '<a href="'. $arc_link_start. 'm='. $arc_m. '">';
+					echo mysql2date($archive_day_date_format, $arc_year. '-'. zeroise($arc_month,2). '-'. zeroise($arc_dayofmonth,2). ' 00:00:00');
+					echo "</a> ($arc_count)";
+					break;
 
-							case 'weekly':
-								// --------------------------------- WEEKLY ARCHIVES ---------------------------------
-								echo '<a href="'. $arc_link_start. 'm='. $arc_year. '&amp;w='. $arc_w. '">';
-								echo $arc_year.', '.T_('week').' '.$arc_w;
-								echo "</a> ($arc_count)";
-							break;
+				case 'weekly':
+					// --------------------------------- WEEKLY ARCHIVES ---------------------------------
+					echo '<a href="'. $arc_link_start. 'm='. $arc_year. '&amp;w='. $arc_w. '">';
+					echo $arc_year.', '.T_('week').' '.$arc_w;
+					echo "</a> ($arc_count)";
+				break;
 
-							case 'postbypost':
-							default:
-								// ------------------------------- POSY BY POST ARCHIVES -----------------------------
-								echo '<a href="'. $arc_link_start. 'p='. $post_ID. '">';
-								if ($post_title) {
-									echo strip_tags($post_title);
-								} else {
-									echo $post_ID;
-								}
-								echo '</a>';
-						}
-
-						echo $archive_line_end."\n";
+				case 'postbypost':
+				default:
+					// ------------------------------- POSY BY POST ARCHIVES -----------------------------
+					echo '<a href="'. $arc_link_start. 'p='. $post_ID. '">';
+					if ($post_title) {
+						echo strip_tags($post_title);
+					} else {
+						echo $post_ID;
 					}
+					echo '</a>';
+			}
+
+			echo $archive_line_end."\n";
+		}
+		?>
+
+		</ul>
+		<?php
+			$Form->fieldset_end();
+		?>
+
+		<fieldset title="Categories">
+			<legend><?php echo T_('Categories') ?></legend>
+			<ul>
+			<?php
+			$cat_line_start = '<li>';
+			$cat_line_end = '</li>';
+			$cat_group_start = '<ul>';
+			$cat_group_end = '</ul>';
+			# When multiple blogs are listed on same page:
+			$cat_blog_start = '<li><strong>';
+			$cat_blog_end = '</strong></li>';
+
+
+			// ----------------- START RECURSIVE CAT LIST ----------------
+			cat_query( true );	// make sure the caches are loaded
+			if( ! isset( $cat_array ) ) $cat_array = array();
+			function cat_list_before_first( $parent_cat_ID, $level )
+			{ // callback to start sublist
+				global $cat_group_start;
+				if( $level > 0 ) echo "\n",$cat_group_start,"\n";
+			}
+			function cat_list_before_each( $cat_ID, $level )
+			{ // callback to display sublist element
+				global $tab, $blog, $cat_array, $cat_line_start, $pagenow;
+				$cat = get_the_category_by_ID( $cat_ID );
+				echo $cat_line_start;
+				echo '<label><input type="checkbox" name="catsel[]" value="'. $cat_ID. '" class="checkbox"';
+				if( in_array( $cat_ID, $cat_array ) )
+				{ // This category is in the current selection
+					echo ' checked="checked"';
+				}
+				echo ' /> ';
+				echo '<a href="'.$pagenow.'?tab='.$tab.'&amp;blog='.$blog.'&amp;cat='.$cat_ID.'">'.$cat['cat_name'].'</a> ('.$cat['cat_postcount'].')';
+				if( in_array( $cat_ID, $cat_array ) )
+				{ // This category is in the current selection
+					echo "*";
+				}
+				echo '</label>';
+			}
+			function cat_list_after_each( $cat_ID, $level )
+			{ // callback to display sublist element
+				global $cat_line_end;
+				echo $cat_line_end,"\n";
+			}
+			function cat_list_after_last( $parent_cat_ID, $level )
+			{ // callback to end sublist
+				global  $cat_group_end;
+				if( $level > 0 ) echo $cat_group_end,"\n";
+			}
+
+			if( $blog > 1 )
+			{ // We want to display cats for one blog
+				cat_children( $cache_categories, $blog, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 0 );
+			}
+			else
+			{ // We want to display cats for all blogs
+				for( $curr_blog_ID=blog_list_start('stub');
+							$curr_blog_ID!=false;
+							 $curr_blog_ID=blog_list_next('stub') )
+				{
+
+					echo $cat_blog_start;
 					?>
-
-					</ul>
-				<?php
-					$Form->fieldset_end();
-				?>
-
-				<fieldset title="Categories">
-					<legend><?php echo T_('Categories') ?></legend>
-					<ul>
+					<a href="<?php blog_list_iteminfo('blogurl') ?>"><?php blog_list_iteminfo('name') ?></a>
 					<?php
-					$cat_line_start = '<li>';
-					$cat_line_end = '</li>';
-					$cat_group_start = '<ul>';
-					$cat_group_end = '</ul>';
-					# When multiple blogs are listed on same page:
-					$cat_blog_start = '<li><strong>';
-					$cat_blog_end = '</strong></li>';
+					echo $cat_blog_end;
 
-
-					// ----------------- START RECURSIVE CAT LIST ----------------
-					cat_query( true );	// make sure the caches are loaded
-					if( ! isset( $cat_array ) ) $cat_array = array();
-					function cat_list_before_first( $parent_cat_ID, $level )
-					{ // callback to start sublist
-						global $cat_group_start;
-						if( $level > 0 ) echo "\n",$cat_group_start,"\n";
-					}
-					function cat_list_before_each( $cat_ID, $level )
-					{ // callback to display sublist element
-						global $tab, $blog, $cat_array, $cat_line_start, $pagenow;
-						$cat = get_the_category_by_ID( $cat_ID );
-						echo $cat_line_start;
-						echo '<label><input type="checkbox" name="catsel[]" value="'. $cat_ID. '" class="checkbox"';
-						if( in_array( $cat_ID, $cat_array ) )
-						{ // This category is in the current selection
-							echo ' checked="checked"';
-						}
-						echo ' /> ';
-						echo '<a href="'.$pagenow.'?tab='.$tab.'&amp;blog='.$blog.'&amp;cat='.$cat_ID.'">'.$cat['cat_name'].'</a> ('.$cat['cat_postcount'].')';
-						if( in_array( $cat_ID, $cat_array ) )
-						{ // This category is in the current selection
-							echo "*";
-						}
-						echo '</label>';
-					}
-					function cat_list_after_each( $cat_ID, $level )
-					{ // callback to display sublist element
-						global $cat_line_end;
-						echo $cat_line_end,"\n";
-					}
-					function cat_list_after_last( $parent_cat_ID, $level )
-					{ // callback to end sublist
-						global  $cat_group_end;
-						if( $level > 0 ) echo $cat_group_end,"\n";
-					}
-
-					if( $blog > 1 )
-					{ // We want to display cats for one blog
-						cat_children( $cache_categories, $blog, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 0 );
-					}
-					else
-					{ // We want to display cats for all blogs
-						for( $curr_blog_ID=blog_list_start('stub');
-									$curr_blog_ID!=false;
-									 $curr_blog_ID=blog_list_next('stub') )
-						{
-
-							echo $cat_blog_start;
-							?>
-							<a href="<?php blog_list_iteminfo('blogurl') ?>"><?php blog_list_iteminfo('name') ?></a>
-							<?php
-							echo $cat_blog_end;
-
-							// run recursively through the cats
-							cat_children( $cache_categories, $curr_blog_ID, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 1 );
-						}
-					}
-					// ----------------- END RECURSIVE CAT LIST ----------------
-					?>
-					</ul>
-				</fieldset>
+					// run recursively through the cats
+					cat_children( $cache_categories, $curr_blog_ID, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 1 );
+				}
+			}
+			// ----------------- END RECURSIVE CAT LIST ----------------
+			?>
+			</ul>
+		</fieldset>
 		<?php
 
 		$Form->submit( array( 'submit', T_('Search'), 'search' ) );
@@ -281,6 +281,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.2  2005/05/09 19:06:53  fplanque
+ * bugfixes + global access permission
+ *
  * Revision 1.1  2005/03/14 19:54:42  fplanque
  * no message
  *

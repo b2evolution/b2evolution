@@ -16,6 +16,13 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 $login_required = true;
 require_once dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_main.inc.php';
 
+
+// Check global permission:
+if( ! $current_User->check_perm( 'admin', 'any' ) )
+{	// No permission to access admin...
+	require dirname(__FILE__).'/_access_denied.inc.php';
+}
+
 param( 'blog', 'integer', 0, true ); // We may need this for the urls
 param( 'mode', 'string', '' );  // Sidebar, bookmarklet
 

@@ -225,14 +225,8 @@ class Results extends Widget
 				}
 			}
 
-			if( strpos( $this->sql, 'ORDER BY') === false )
-			{ //there is no ORDER BY clause in the original SQL query
-				$this->sql .= ' ORDER BY '.$this->order();
-			}
-			else
-			{ //the chosen order must be appended to an existing ORDER BY clause
-				$this->sql .= ', '.$this->order();
-			}
+			// Append ORDER clause if necessary:
+			$this->sql .= $this->order();
 
 			// Limit to requested page
 			$sql = $this->sql.' LIMIT '.max(0, ($this->page-1)*$this->limit).', '.$this->limit;
@@ -633,7 +627,7 @@ class Results extends Widget
 
 
 	/**
-	 * Returns ORDER fields:
+	 * Returns ORDER clause to add to SQL query:
 	 */
 	function order()
 	{
@@ -657,9 +651,20 @@ class Results extends Widget
 		}
 
 		if( empty($orders) )
+		{	// No order needs to be appended
 			return '';
+		}
 
-		return implode(',',$orders).' ';
+		if( strpos( $this->sql, 'ORDER BY') === false )
+		{ // there is no ORDER BY clause in the original SQL query
+			$prefix = ' ORDER BY ';
+		}
+		else
+		{ //the chosen order must be appended to an existing ORDER BY clause
+			$prefix = ', ';
+		}
+
+		return $prefix.implode(',',$orders).' ';
 	}
 
 
@@ -999,6 +1004,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.23  2005/05/09 19:07:04  fplanque
+ * bugfixes + global access permission
+ *
  * Revision 1.22  2005/05/03 14:43:33  fplanque
  * no message
  *
