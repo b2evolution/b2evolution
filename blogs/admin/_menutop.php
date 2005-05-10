@@ -343,18 +343,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 <body>
 <?php
 
-// Include title, menu, etc.
+// Include title, menu, messages, etc.
 echo $AdminUI->getBodyTop();
-
-
-/* TODO: move to AdminUI */
-if( $Messages->count() )
-{ // display errors
-	?>
-	<div class="panelinfo">
-	<?php $Messages->display(); ?>
-	</div>
-	<?php
-}
 
 ?>

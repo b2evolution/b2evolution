@@ -336,6 +336,10 @@ table.grouped tr.odd .firstcol {
 	padding: 0;
 	overflow: hidden;
 }
+div.action_messages /* Page top messages */
+{
+	margin:1ex 1em;
+}
 div.panelinfo {
 	clear: both;
 	background-color: #efede0;

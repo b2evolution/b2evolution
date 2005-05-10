@@ -1149,16 +1149,11 @@ if( isset($action_title) )
 	echo "\n<h2>$action_title</h2>\n";
 }
 
+// TODO: remove this!
 // Output errors, notes and action messages {{{
 if( $Messages->count( 'all' ) )
 {
-	?>
-	<div class="panelinfo">
-		<?php
-		$Messages->display( '', '', true, 'all' );
-		?>
-	</div>
-	<?php
+	$Messages->display( '', '', true, 'all' );
 }
 
 if( isset($action_msg) )
@@ -1201,13 +1196,15 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.103  2005/05/10 18:38:15  fplanque
+ * cleaned up log message display (part 1)
+ *
  * Revision 1.102  2005/05/09 16:09:38  fplanque
  * implemented file manager permissions through Groups
  *
  * Revision 1.101  2005/05/06 20:04:47  fplanque
  * added contribs
  * fixed filemanager settings
- *
  * Removed checking against browser provided mime types (very unsecure!)
  *
  * Revision 1.100  2005/05/04 19:40:40  fplanque

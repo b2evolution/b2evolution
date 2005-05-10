@@ -83,6 +83,8 @@ class AdminUI extends AdminUI_general
 	 */
 	function getBodyTop()
 	{
+		global $Messages;
+
 		$r = '';
 
 		if( empty($this->mode) )
@@ -103,6 +105,9 @@ class AdminUI extends AdminUI_general
 		';
 
 		$r .= $this->getBloglistButtons( '<div id="TitleArea">', '</div>' );
+
+		// Display info & error messages
+		$r .= $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
 
 		return $r;
 	}

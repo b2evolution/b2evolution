@@ -337,6 +337,10 @@ div#mainmenu {
 	width: 100%;
 	/* border:	1px solid #f00; */
 }
+div.action_messages /* Page top messages */
+{
+	margin:1ex 1em;
+}
 .left_col {
 	vertical-align: top;
 	float: left;
@@ -820,6 +824,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.5  2005/05/10 18:38:16  fplanque
+ * cleaned up log message display (part 1)
+ *
  * Revision 1.4  2005/05/03 14:38:14  fplanque
  * finished multipage userlist
  *

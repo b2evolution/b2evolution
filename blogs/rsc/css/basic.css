@@ -56,27 +56,36 @@ code {
 /*
 {{{ Messages
 */
-div.error {
-	padding:1ex;
-}
-div.error,
-div.log_container {
-	margin:1ex auto;
+div.log_container,
+div.action_messages {
+	margin:1ex;
 }
 div.log_container ul,
-div.log_container ol {
+div.action_messages ul,
+div.log_container ol,
+div.action_messages ol {
 	list-style: square;
 	list-style-image:none;
 	margin:1ex 0;
 	padding-left:3ex;
 }
-div.log_container div {
+div.log_container div,
+div.action_messages div
+ {
 	border:1px solid #6287c2;
 	background:#ddd;
 	margin:1ex auto;
 	padding:1ex;
 }
+div.log_container div.log_success,
+div.action_messages div.log_success,
+div.success {
+	border:1px solid #9d9;
+	background:#f2fbee;
+	color:#0c0;
+}
 div.log_container div.log_error,
+div.action_messages div.log_error,
 div.error {
 	border:1px solid #d99;
 	background:#fbf2ee;
