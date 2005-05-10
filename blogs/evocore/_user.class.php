@@ -427,7 +427,7 @@ class User extends DataObject
 
 		if( !$perm && $assert )
 		{ // We can't let this go on!
-			die( 'Permission denied! ('.$permname.':'.$permlevel.')' );
+			die( "Permission denied! ($permname:$permlevel:$perm_target)" );
 		}
 
 		return $perm;
@@ -875,6 +875,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2005/05/10 18:40:08  fplanque
+ * normalizing
+ *
  * Revision 1.28  2005/05/09 16:09:42  fplanque
  * implemented file manager permissions through Groups
  *
@@ -887,12 +890,6 @@ class User extends DataObject
  *
  * Revision 1.25  2005/04/28 20:44:20  fplanque
  * normalizing, doc
- *
- * Revision 1.24  2005/04/07 17:55:50  fplanque
- * minor changes
- *
- * Revision 1.23  2005/04/06 13:33:29  fplanque
- * minor changes
  *
  * Revision 1.22  2005/03/22 19:17:27  fplanque
  * cleaned up some nonsense...

@@ -99,8 +99,26 @@ class Form extends Widget
 		$this->form_name = $form_name;
 		$this->form_action = $form_action;
 		$this->form_method = $form_method;
-		$this->layout = $layout;
 		$this->enctype = $enctype;
+		$this->saved_layout = $layout;
+		$this->switch_layout( NULL );	// "restore" saved layout.
+	}
+
+	/**
+	 * @param string|NULL the form layout : 'fieldset', 'table' or ''; NULL to restore previsouly saved layout
+	 */
+	function switch_layout( $layout )
+	{
+		if( $layout == NULL )
+		{ // we want to restore previous layout:
+			$this->layout = $this->saved_layout;
+			$this->saved_layout = NULL;
+		}
+		else
+		{ // We want to switch to a new layout
+			$this->saved_layout = $this->layout;
+			$this->layout = $layout;
+		}
 
 		switch( $this->layout )
 		{
@@ -151,6 +169,7 @@ class Form extends Widget
 				$this->buttonsend = "\n";
 				$this->formend = '';
 		}
+
 	}
 
 

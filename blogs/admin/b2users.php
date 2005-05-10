@@ -419,9 +419,9 @@ else
 			$edited_Group->set( 'perm_blogs', param( 'edited_grp_perm_blogs', 'string', true ) );
 			$edited_Group->set( 'perm_stats', param( 'edited_grp_perm_stats', 'string', true ) );
 			$edited_Group->set( 'perm_spamblacklist', param( 'edited_grp_perm_spamblacklist', 'string', true ) );
+			$edited_Group->set( 'perm_templates', param( 'edited_grp_perm_templates', 'integer', 0 ) );
 			$edited_Group->set( 'perm_options', param( 'edited_grp_perm_options', 'string', true ) );
 			$edited_Group->set( 'perm_files', param( 'edited_grp_perm_files', 'string', true ) );
-			$edited_Group->set( 'perm_templates', param( 'edited_grp_perm_templates', 'integer', 0 ) );
 
 			if( $edited_grp_ID != 1 )
 			{ // Groups others than #1 can be prevented from logging in or editing users
@@ -584,6 +584,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.90  2005/05/10 18:40:07  fplanque
+ * normalizing
+ *
  * Revision 1.89  2005/05/09 19:06:54  fplanque
  * bugfixes + global access permission
  *

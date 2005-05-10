@@ -150,11 +150,6 @@ class Group extends DataObject
 
 		switch( $permname )
 		{
-			case 'templates':
-				if( $permvalue )
-					return true;	// Permission granted
-				break;
-
 			case 'admin':
 				switch( $permvalue )
 				{	// Depending on current group permission:
@@ -168,6 +163,11 @@ class Group extends DataObject
 						if(( $permlevel == 'hidden' ) || ( $permlevel == 'any' ))
 							return true;	// Permission granted
 				}
+				break;
+
+			case 'templates':
+				if( $permvalue )
+					return true;	// Permission granted
 				break;
 
 			case 'blogs':
@@ -249,6 +249,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2005/05/10 18:40:08  fplanque
+ * normalizing
+ *
  * Revision 1.7  2005/05/09 19:07:04  fplanque
  * bugfixes + global access permission
  *

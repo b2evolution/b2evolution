@@ -208,7 +208,7 @@ require_once dirname(__FILE__).'/_hit.class.php';
 /**
  * @global Hit The Hit object
  */
-$Hit =& new Hit();
+$Hit = & new Hit();
 
 
 /**
@@ -501,6 +501,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.34  2005/05/10 18:40:08  fplanque
+ * normalizing
+ *
  * Revision 1.33  2005/04/28 20:44:20  fplanque
  * normalizing, doc
  *

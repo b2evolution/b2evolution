@@ -125,9 +125,9 @@ else
 		echo '<div class="error">' . T_('Note: default locale is not enabled.') . '</div>';
 	}
 
-	$Form = & new Form( 'b2options.php?tab=regional', 'form' );
+	$Form = & new Form( 'b2options.php?tab=regional' );
 
-	$Form->begin_form( 'fform',T_('Regional Settings') );
+	$Form->begin_form( 'fform', T_('Regional Settings') );
 
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'loc_transinfo', $loc_transinfo );
@@ -207,32 +207,24 @@ else
 				{
 					echo '</a>';
 				}
-				echo '</strong>
-			</td>
-			<td class="center">
-				<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />
-			</td>
-			<td>
-				<input type="text" name="loc_'.$i.'_name" value="'.format_to_output( $locales[$lkey]['name'], 'formvalue' ).'" maxlength="40" size="17" />
-			</td>
-			<td>
-				<input type="text" name="loc_'.$i.'_datefmt" value="'.format_to_output( $locales[$lkey]['datefmt'], 'formvalue' ).'" maxlength="10" size="6" />
-			</td>
-			<td>
-				<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locales[$lkey]['timefmt'], 'formvalue' ).'" maxlength="10" size="6" />
-			</td>
-			<td>
-				';
-				// bad hack to avoid fieldstart/fieldend
-				$old_fieldstart = $Form->fieldstart;
-				$old_fieldend = $Form->fieldend;
-				$Form->fieldstart = '';
-				$Form->fieldend = '';
+				echo '</strong></td>
+					<td class="center">
+						<input type="checkbox" name="loc_'.$i.'_enabled" value="1"'. ( $locales[$lkey]['enabled'] ? 'checked="checked"' : '' ).' />
+					</td>
+					<td>
+						<input type="text" name="loc_'.$i.'_name" value="'.format_to_output( $locales[$lkey]['name'], 'formvalue' ).'" maxlength="40" size="17" />
+					</td>
+					<td>
+						<input type="text" name="loc_'.$i.'_datefmt" value="'.format_to_output( $locales[$lkey]['datefmt'], 'formvalue' ).'" maxlength="10" size="6" />
+					</td>
+					<td>
+						<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locales[$lkey]['timefmt'], 'formvalue' ).'" maxlength="10" size="6" />
+					</td>
+					<td>';
+				$Form->switch_layout( 'none' );
 				$Form->dayOfWeek( 'loc_'.$i.'_startofweek', $locales[$lkey]['startofweek'], '', '' );
-				$Form->fieldstart = $old_fieldstart;
-				$Form->fieldend = $old_fieldend;
-				echo '
-			</td>';
+				$Form->switch_layout( NULL ); // Restore layout
+				echo '</td>';
 
 			if( $current_User->check_perm( 'options', 'edit' ) )
 			{
@@ -245,7 +237,7 @@ else
 				}
 				else
 				{
-					echo '<img src="img/blank.gif" width="14" alt="" />';
+					echo '<img src="img/blank.gif" width="14" height="14" class="middle" alt="" />';
 				}
 
 				if( $i < count($locales) )
@@ -256,7 +248,7 @@ else
 				}
 				else
 				{
-					echo '<img src="img/blank.gif" width="14" alt="" />';
+					echo '<img src="img/blank.gif" width="14" height="14" class="middle" alt="" />';
 				}
 				echo '
 				<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '')

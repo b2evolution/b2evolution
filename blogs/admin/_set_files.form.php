@@ -24,7 +24,7 @@ if( false )
 
 $Form = & new Form( 'fileset.php', 'filesform' );
 
-$Form->begin_form( 'fform' );
+$Form->begin_form( 'fform', T_('File Settings') );
 $Form->hidden( 'action', 'update' );
 
 $Form->fieldset( T_('Filemanager options') );
