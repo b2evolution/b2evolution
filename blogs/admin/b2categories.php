@@ -7,6 +7,8 @@
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
+ *
+ * $Id$
  */
 
 /**
@@ -15,67 +17,26 @@
 require_once( dirname(__FILE__).'/_header.php' );
 $AdminUI->setPath( 'cats' );
 $AdminUI->title = $AdminUI->title_titlearea = T_('Categories for blog:');
-param( 'action', 'string' );
-param( 'blog', 'integer', 0 );
+param( 'action', 'string', 'list' );
+param( 'blog', 'integer', 0, true );
 
-
-if( $action != 'addcat' && $action != 'editedcat' )
-{ // Blog list
-	$blog = autoselect_blog( $blog, 'blog_cats', '' );
-
-	// Generate available blogs list:
-	$blogListButtons = $AdminUI->getCollectionList( 'blog_cats', '', $pagenow.'?blog=%d' );
-
-	require dirname(__FILE__).'/_menutop.php';
-}
-
-
-switch($action)
+/**
+ * Perform action:
+ */
+switch( $action )
 {
-	case 'newcat':
+	case 'new':
+		$blog = autoselect_blog( $blog, 'blog_cats', '' );
 		// New category form:
 		param( 'parent_cat_ID', 'integer' );
 		if( !empty($parent_cat_ID) )
 		{
 			$blog = get_catblog($parent_cat_ID);
 		}
-
-		// check permissions:
-		$current_User->check_perm( 'blog_cats', '', true, $blog );
-
-		echo "<div class=\"panelblock\">\n";
-
-		if( !empty($parent_cat_ID) )
-		{ // We are creating a subcat
-			$parent_cat_name = get_catname($parent_cat_ID);
-			?>
-		<h2><?php printf( T_('New sub-category in category: %s'), $parent_cat_name ); ?></h2>
-		<form name="addcat" action="b2categories.php" method="post">
-			<input type="hidden" name="parent_cat_ID" value="<?php echo $parent_cat_ID ?>" />
-			<?php
-		}
-		else
-		{ // We are creating a new base cat
-			$blogparams = get_blogparams_by_ID( $blog );
-			?>
-		<h2><?php printf( T_('New category in blog: %s'), $blogparams->blog_name ); ?></h2>
-		<form name="addcat" action="b2categories.php" method="post">
-			<input type="hidden" name="cat_blog_ID" value="<?php echo $blog ?>" />
-			<?php
-		}
-		?>
-			<input type="hidden" name="action" value="addcat" />
-			<p><?php echo T_('New category name') ?>: <input type="text" name="cat_name" /></p>
-			<input type="submit" name="submit" value="<?php echo T_('Create category') ?>" class="search" />
-		</form>
-		</div>
-		<?php
-		// List the cats:
-		require dirname(__FILE__).'/_cats_list.php';
 		break;
 
 
-	case 'addcat':
+	case 'create':
 		// INSERT new cat into db
 		param( 'cat_name', 'string', true );
 		param( 'parent_cat_ID', 'integer' );
@@ -95,19 +56,78 @@ switch($action)
 		{ // We are creating a subcat
 			// INSERT INTO DB
 			$new_cat_ID = cat_create( $cat_name, $parent_cat_ID );
+			$blog = get_catblog($parent_cat_ID);
 		}
 		else
 		{ // We are creating a new base cat
 			// INSERT INTO DB
 			$new_cat_ID = cat_create( $cat_name, 'NULL', $cat_blog_ID );
+			$blog = $cat_blog_ID;
 		}
 
-		header("Location: b2categories.php?blog=$cat_blog_ID");
+ 		$Messages->add( T_('New category created.'), 'success' );
 
+		unset( $cache_categories );
 		break;
 
 
-	case 'Delete':
+	case 'edit':
+		// ---------- Cat edit form: ----------
+		param( 'cat_ID', 'integer' );
+		$blog = get_catblog($cat_ID);
+
+		// check permissions:
+		$current_User->check_perm( 'blog_cats', '', true, $blog );
+		break;
+
+
+	case 'update':
+		//
+		// Update cat in db:
+		//
+		param( 'cat_name', 'string', true );
+
+		param( 'cat_ID', 'integer', true );
+		//echo $cat_ID;
+		$cat_blog_ID = get_catblog($cat_ID);
+
+		param( 'cat_parent_ID', 'string', true );
+		$cat_parent_ID_parts = explode( '_', $cat_parent_ID );
+		$cat_parent_ID = $cat_parent_ID_parts[0];
+		settype( $cat_parent_ID, 'integer' );
+		if( $cat_parent_ID != 0 )
+		{ // We have a new parent cat
+			$parent_cat_blog_ID = get_catblog($cat_parent_ID);
+		}
+		else
+		{ // We are moving to a blog root
+			$parent_cat_blog_ID = $cat_parent_ID_parts[1];
+			settype( $parent_cat_blog_ID, 'integer' );
+		}
+
+		// check permissions on source:
+		$current_User->check_perm( 'blog_cats', '', true, $cat_blog_ID );
+
+		if( $cat_blog_ID != $parent_cat_blog_ID )
+		{ // We are moving to a different blog
+			if( ! $allow_moving_chapters )
+			{
+				die( 'Moving chapters between blogs is disabled. Cat and parent must be in the same blog!' );
+			}
+			// check permissions on destination:
+			$current_User->check_perm( 'blog_cats', '', true, $parent_cat_blog_ID );
+		}
+
+		cat_update( $cat_ID, $cat_name, $cat_parent_ID, $parent_cat_blog_ID );
+
+		$Messages->add( T_('Category updated.'), 'success' );
+
+		$blog = $cat_blog_ID;
+		unset( $cache_categories );
+		break;
+
+
+	case 'delete':
 		// Delete cat from DB:
 		param( 'cat_ID', 'integer' );
 		$blog = get_catblog($cat_ID);
@@ -117,46 +137,98 @@ switch($action)
 
 		$cat_name = get_catname($cat_ID);
 
-		echo "<div class=\"panelinfo\">\n";
-		echo '<h3>', sprintf( T_('Deleting category #%d : %s ...') ,$cat_ID, format_to_output( $cat_name, 'htmlbody') ), "</h3>\n";
-
 		// DELETE FROM DB:
 		$result = cat_delete( $cat_ID );
 		if( $result !== 1 )
 		{ // We got an error message!
-			echo '<p class="error">', T_('ERROR'), ': ', $result, "</p>\n";
+			$Messages->add( T_('ERROR').': '.$result, 'error' );
 		}
 		else
 		{
-			echo '<p>'.T_('Category deleted.').'</p>';
+			$Messages->add( T_('Category deleted.'), 'note' );
 		}
 		echo "</div>\n";
-		// List the cats:
-		require dirname(__FILE__).'/_cats_list.php';
-
 		break;
 
 
-	case 'Edit':
+	case 'list':
+	  $blog = autoselect_blog( $blog, 'blog_cats', '' );
+
+}
+
+
+/**
+ * Display page header, menus & messages:
+ */
+// Generate available blogs list:
+$blogListButtons = $AdminUI->getCollectionList( 'blog_cats', '', $pagenow.'?blog=%d' );
+require dirname(__FILE__).'/_menutop.php';
+
+
+
+/**
+ * Display payload:
+ */
+switch($action)
+{
+	case 'new':
+		// New category form:
+		$AdminUI->dispPayloadBegin();
+
+		$Form = & new Form( 'b2categories.php' );
+
+		$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,parent_cat_ID' ) );
+
+		if( !empty($parent_cat_ID) )
+		{ // We are creating a subcat
+			$parent_cat_name = get_catname($parent_cat_ID);
+
+			$Form->begin_form( 'fform', sprintf( T_('New sub-category in category: %s'), $parent_cat_name ) );
+
+			$Form->hidden( 'parent_cat_ID', $parent_cat_ID );
+		}
+		else
+		{ // We are creating a new base cat
+			$blogparams = get_blogparams_by_ID( $blog );
+
+			$Form->begin_form( 'fform', sprintf( T_('New category in blog: %s'), $blogparams->blog_name ) );
+
+			$Form->hidden( 'cat_blog_ID', $blog );
+		}
+
+		$Form->hidden( 'action', 'create' );
+
+    $Form->text( 'cat_name', '', 40, T_('New category name'), '', 80 );
+
+		$Form->end_form( array( array( 'submit', 'submit', T_('Create category'), 'SaveButton' ),
+														array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+
+		$AdminUI->dispPayloadEnd();
+		break;
+
+
+
+
+	case 'edit':
 		// ---------- Cat edit form: ----------
-		param( 'cat_ID', 'integer' );
-		$blog = get_catblog($cat_ID);
-
-		// check permissions:
-		$current_User->check_perm( 'blog_cats', '', true, $blog );
-
 		$cat_name = get_catname($cat_ID);
 		$cat_parent_ID = get_catparent($cat_ID);
-		?>
-		<div class="panelblock">
-		<h2><?php echo T_('Properties for category:'), ' ', format_to_output( $cat_name, 'htmlbody' ) ?></h2>
-		<form name="renamecat" action="b2categories.php" method="post">
-			<?php echo T_('Name') ?>:
-			<input type="hidden" name="action" value="editedcat" />
-			<input type="hidden" name="cat_ID" value="<?php echo $cat_ID ?>" />
-			<input type="text" name="cat_name" value="<?php echo format_to_output( $cat_name, 'formvalue' ) ?>" />
-			<h3><?php echo T_('New parent category') ?>:</h3>
-		<?php
+
+		$AdminUI->dispPayloadBegin();
+
+		$Form = & new Form( 'b2categories.php' );
+
+		$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,cat_ID' ) );
+
+		$Form->begin_form( 'fform', T_('Properties for category:').' '.format_to_output( $cat_name, 'htmlbody' ) );
+
+		$Form->hidden( 'action', 'update' );
+		$Form->hidden( 'cat_ID', $cat_ID );
+
+    $Form->text( 'cat_name', $cat_name, 40, T_('New category name'), '', 80 );
+
+		echo '<h3>'.T_('New parent category').':</h3>';
+
 		// ----------------- START RECURSIVE CAT LIST ----------------
 		cat_query( false );	// make sure the caches are loaded
 
@@ -240,57 +312,11 @@ switch($action)
 		}
 
 		// ----------------- END RECURSIVE CAT LIST ----------------
-		?>
-			<input type="submit" name="submit" value="<?php echo T_('Edit category!') ?>" class="search" />
-		</form>
-		</div>
 
-		<?php
-		// List the cats:
-		require dirname(__FILE__).'/_cats_list.php';
-		break;
+		$Form->end_form( array( array( 'submit', 'submit', T_('Edit category'), 'SaveButton' ),
+														array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
-
-	case 'editedcat':
-		//
-		// Update cat in db:
-		//
-		param( 'cat_name', 'string', true );
-
-		param( 'cat_ID', 'integer', true );
-		//echo $cat_ID;
-		$cat_blog_ID = get_catblog($cat_ID);
-
-		param( 'cat_parent_ID', 'string', true );
-		$cat_parent_ID_parts = explode( '_', $cat_parent_ID );
-		$cat_parent_ID = $cat_parent_ID_parts[0];
-		settype( $cat_parent_ID, 'integer' );
-		if( $cat_parent_ID != 0 )
-		{ // We have a new parent cat
-			$parent_cat_blog_ID = get_catblog($cat_parent_ID);
-		}
-		else
-		{ // We are moving to a blog root
-			$parent_cat_blog_ID = $cat_parent_ID_parts[1];
-			settype( $parent_cat_blog_ID, 'integer' );
-		}
-
-		// check permissions on source:
-		$current_User->check_perm( 'blog_cats', '', true, $cat_blog_ID );
-
-		if( $cat_blog_ID != $parent_cat_blog_ID )
-		{ // We are moving to a different blog
-			if( ! $allow_moving_chapters )
-			{
-				die( 'Moving chapters between blogs is disabled. Cat and parent must be in the same blog!' );
-			}
-			// check permissions on destination:
-			$current_User->check_perm( 'blog_cats', '', true, $parent_cat_blog_ID );
-		}
-
-		cat_update( $cat_ID, $cat_name, $cat_parent_ID, $parent_cat_blog_ID );
-
-		header("Location: b2categories.php?blog=$cat_blog_ID");
+		$AdminUI->dispPayloadEnd();
 		break;
 
 
@@ -312,4 +338,11 @@ switch($action)
 
 require dirname(__FILE__).'/_footer.php';
 
+/*
+ * $Log$
+ * Revision 1.43  2005/05/10 18:35:37  fplanque
+ * refactored/normalized category handling
+ * (though there's still a lot to do before this gets as clean as desired...)
+ *
+ */
 ?>

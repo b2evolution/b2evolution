@@ -108,20 +108,18 @@ function cat_update(
 }
 
 
-/*
- * cat_delete(-)
- *
+/**
  * Delete a category
+ *
  * This funtion has to handle all needed DB dependencies!
  *
- * fplanque: created
- * TODO: A LOT !!!!!
+ * @todo BUG: it is possible to create loops and lose branch in some situations :(
  */
 function cat_delete( $cat_ID )
 {
 	global $DB, $query, $cache_categories, $cache_postcats;
 
-	// TODO: START TRANSACTION
+	$DB->begin();
 
 	// check there are no subcats
 	$sql = "SELECT COUNT(*)
@@ -135,12 +133,14 @@ function cat_delete( $cat_ID )
 					FROM T_categories
 					WHERE cat_ID = $cat_ID";
 	if( ! ($row = $DB->get_row( $sql )) )
+	{
+  	$DB->rollback(); // done nothing anyway...
 		return 1; // Success: category already deleted!!
+	}
 
 	$remap_cat_ID = $row->cat_parent_ID;
 	$cat_blog_ID = $row->cat_blog_ID;
 
-	// Get the list of posts in this category
 	$sql = "SELECT ID
 					FROM T_posts
 					WHERE post_main_cat_ID = $cat_ID";
@@ -160,6 +160,7 @@ function cat_delete( $cat_ID )
 
 		if( !$remap_cat_ID && !empty($IDarray) )
 		{
+	  	$DB->rollback(); // done nothing anyway...
 			return T_("Cannot delete last category if there are posts inside!");
 		}
 	}
@@ -182,6 +183,7 @@ function cat_delete( $cat_ID )
 	{ // We are moving posts to parent or other category
 
 		// remap the posts to new category:
+		// Get the list of posts in this category
 		$sql = "UPDATE T_posts
 							SET post_main_cat_ID = $remap_cat_ID
 							WHERE post_main_cat_ID = $cat_ID";
@@ -217,13 +219,12 @@ function cat_delete( $cat_ID )
 					WHERE cat_ID = $cat_ID";
 	$DB->query( $sql );
 
-	// TODO: END TRANSACTION
+	$DB->commit();
 
 	// If we had a cache we'd better forget it!
 	// TODO: reset other caches!
 	unset( $GLOBALS['cache_categories'] );
 	unset( $GLOBALS['cache_postcats'] );
-
 
 	return 1; // success
 }
@@ -820,6 +821,10 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.17  2005/05/10 18:35:38  fplanque
+ * refactored/normalized category handling
+ * (though there's still a lot to do before this gets as clean as desired...)
+ *
  * Revision 1.16  2005/03/14 20:22:19  fplanque
  * refactoring, some cacheing optimization
  *
