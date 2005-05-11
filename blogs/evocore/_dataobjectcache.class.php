@@ -150,6 +150,19 @@ class DataObjectCache
 	}
 
 
+	function get_ID_array()
+	{
+		$IDs = array();
+
+		foreach( $this->cache as $obj )
+		{
+			$IDs[] = $obj->ID;
+		}
+
+		return $IDs;
+	}
+
+
 	/**
 	 * Add a dataobject to the cache
 	 *
@@ -321,6 +334,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.17  2005/05/11 13:21:38  fplanque
+ * allow disabling of mediua dir for specific blogs
+ *
  * Revision 1.16  2005/04/19 16:23:02  fplanque
  * cleanup
  * added FileCache

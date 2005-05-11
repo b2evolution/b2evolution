@@ -1227,34 +1227,31 @@ function debug_info( $force = false )
 																		'string' => '<h3>Debug messages</h3>',
 																		'template' => false ),
 																	'all' => array(
-																		'string' => '<h4>Level &laquo;%s&raquo;:</h4>',
+																		'string' => '<h4>%s:</h4>',
 																		'template' => false ) ),
 													'',
 													false,
 													array( 'error', 'note', 'all' ) ),
 			'htmlbody' );
 		?>
+		<div class="log_container">
+		<h3>DB</h3>
+
+		<?php
+
+		if( !isset($DB) )
+		{
+			echo 'No DB object.';
+		}
+		else
+		{
+			echo 'DB queries: ', $DB->num_queries, '<br />';
+
+			$DB->dump_queries();
+		}
+
+		?>
 		</div>
-
-
-		<div class="panelinfo">
-			<h3>DB</h3>
-
-			<?php
-
-			if( !isset($DB) )
-			{
-				echo 'No DB object.';
-			}
-			else
-			{
-				echo 'DB queries: ', $DB->num_queries, '<br />';
-
-				$DB->dump_queries();
-			}
-
-			?>
-
 		</div>
 
 		<?php
@@ -1871,6 +1868,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.67  2005/05/11 13:21:38  fplanque
+ * allow disabling of mediua dir for specific blogs
+ *
  * Revision 1.66  2005/04/28 20:44:20  fplanque
  * normalizing, doc
  *

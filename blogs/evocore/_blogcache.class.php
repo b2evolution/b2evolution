@@ -165,18 +165,17 @@ class BlogCache extends DataObjectCache
 		switch( $criterion )
 		{
 			case 'member':
-				$where = 'bloguser_user_ID = '.$user_ID;
+				$where = 'WHERE bloguser_user_ID = '.$user_ID;
 				break;
 
 			case 'browse':
-				$where = 'bloguser_user_ID = '.$user_ID
+				$where = 'WHERE bloguser_user_ID = '.$user_ID
 									.' AND bloguser_perm_media_browse = 1';
 				break;
 		}
-
 		$bloglist = $DB->get_col( 'SELECT bloguser_blog_ID
 																FROM T_blogusers
-																WHERE '.$where );
+																'.$where, 0, 'Get user log list' );
 
 		$this->load_list( implode( ',', $bloglist ) );
 
@@ -225,6 +224,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.9  2005/05/11 13:21:38  fplanque
+ * allow disabling of mediua dir for specific blogs
+ *
  * Revision 1.8  2005/03/16 19:58:23  fplanque
  * small AdminUI cleanup tasks
  *

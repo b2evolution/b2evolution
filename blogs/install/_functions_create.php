@@ -78,13 +78,13 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Users... ';
 	$query = "CREATE TABLE T_users (
-		ID int(10) unsigned NOT NULL auto_increment,
+		ID int(11) unsigned NOT NULL auto_increment,
 		user_login varchar(20) NOT NULL,
 		user_pass CHAR(32) NOT NULL,
 		user_firstname varchar(50) NOT NULL,
 		user_lastname varchar(50) NOT NULL,
 		user_nickname varchar(50) NOT NULL,
-		user_icq int(10) unsigned DEFAULT '0' NOT NULL,
+		user_icq int(11) unsigned DEFAULT '0' NOT NULL,
 		user_email varchar(100) NOT NULL,
 		user_url varchar(100) NOT NULL,
 		user_ip varchar(15) NOT NULL,
@@ -139,7 +139,7 @@ function create_b2evo_tables()
 		blog_in_bloglist TINYINT(1) NOT NULL DEFAULT 1,
 		blog_links_blog_ID INT(4) NOT NULL DEFAULT 0,
 		blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
-		blog_media_location ENUM( 'default', 'subdir', 'custom' ) DEFAULT 'default' NOT NULL,
+		blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL,
 		blog_media_subdir VARCHAR( 255 ) NOT NULL,
 		blog_media_fullpath VARCHAR( 255 ) NOT NULL,
 		blog_media_url VARCHAR( 255 ) NOT NULL,
@@ -370,7 +370,7 @@ function create_groups()
 	$Group_Admins->set( 'perm_blogs', 'editall' );
 	$Group_Admins->set( 'perm_stats', 'edit' );
 	$Group_Admins->set( 'perm_spamblacklist', 'edit' );
-	$Group_Admins->set( 'files', 'edit' );
+	$Group_Admins->set( 'perm_files', 'edit' );
 	$Group_Admins->set( 'perm_options', 'edit' );
 	$Group_Admins->set( 'perm_templates', 1 );
 	$Group_Admins->set( 'perm_users', 'edit' );
@@ -382,7 +382,7 @@ function create_groups()
 	$Group_Priviledged->set( 'perm_blogs', 'viewall' );
 	$Group_Priviledged->set( 'perm_stats', 'view' );
 	$Group_Priviledged->set( 'perm_spamblacklist', 'edit' );
-	$Group_Priviledged->set( 'files', 'add' );
+	$Group_Priviledged->set( 'perm_files', 'add' );
 	$Group_Priviledged->set( 'perm_options', 'view' );
 	$Group_Priviledged->set( 'perm_templates', 0 );
 	$Group_Priviledged->set( 'perm_users', 'view' );
@@ -394,7 +394,7 @@ function create_groups()
 	$Group_Bloggers->set( 'perm_blogs', 'user' );
 	$Group_Bloggers->set( 'perm_stats', 'none' );
 	$Group_Bloggers->set( 'perm_spamblacklist', 'view' );
-	$Group_Bloggers->set( 'files', 'view' );
+	$Group_Bloggers->set( 'perm_files', 'view' );
 	$Group_Bloggers->set( 'perm_options', 'none' );
 	$Group_Bloggers->set( 'perm_templates', 0 );
 	$Group_Bloggers->set( 'perm_users', 'none' );
@@ -406,7 +406,7 @@ function create_groups()
 	$Group_Users->set( 'perm_blogs', 'user' );
 	$Group_Users->set( 'perm_stats', 'none' );
 	$Group_Users->set( 'perm_spamblacklist', 'none' );
-	$Group_Users->set( 'files', 'none' );
+	$Group_Users->set( 'perm_files', 'none' );
 	$Group_Users->set( 'perm_options', 'none' );
 	$Group_Users->set( 'perm_templates', 0 );
 	$Group_Users->set( 'perm_users', 'none' );
@@ -1020,8 +1020,8 @@ function create_b2evo_tables_092()
 								link_ID                 int(11) unsigned  not null AUTO_INCREMENT,
 								link_datecreated        datetime          not null default '0000-00-00 00:00:00',
 								link_datemodified       datetime          not null default '0000-00-00 00:00:00',
-								link_creator_user_ID    int(11) unsigned  not null default 0,
-								link_lastedit_user_ID   int(11) unsigned  not null default 0,
+								link_creator_user_ID    int(11) unsigned  not null,
+								link_lastedit_user_ID   int(11) unsigned  not null,
 								link_item_ID    		    int(11) unsigned  NOT NULL,
 								link_dest_item_ID		    int(11) unsigned  NULL,
 								link_file_ID				    int(11) unsigned  NULL,
@@ -1158,31 +1158,35 @@ function create_b2evo_relations()
 											on update restrict' );
 
 	$DB->query( 'alter table T_links
+								add constraint FK_link_creator_user_ID
+											foreign key (link_creator_user_ID)
+	 										references T_users (ID)
+											on delete restrict on
+											update restrict' );
+	$DB->query( 'alter table T_links
+								add constraint FK_link_lastedit_user_ID
+											foreign key (link_lastedit_user_ID)
+											references T_users (ID)
+											on delete restrict
+											on update restrict' );
+	$DB->query( 'alter table T_links
 								add constraint FK_link_dest_item_ID
 											foreign key (link_dest_item_ID)
       								references T_posts (ID)
       								on delete restrict
-      								on update restrict,
+      								on update restrict' );
+	$DB->query( 'alter table T_links
 							 	add constraint FK_link_file_ID
 							 				foreign key (link_file_ID)
 								      references T_files (file_ID)
 								      on delete restrict
-								      on update restrict,
+								      on update restrict' );
+	$DB->query( 'alter table T_links
 							 	add constraint FK_link_item_ID
 							 				foreign key (link_item_ID)
 								      references T_posts (ID)
 								      on delete restrict
-								      on update restrict,
-								add constraint FK_link_creator_user_ID 
-											foreign key (link_creator_user_ID)
-	 										references gsb_users (ID) 
-											on delete restrict on 
-											update restrict,
-								add constraint FK_link_lastedit_user_ID 
-											foreign key (link_lastedit_user_ID)
-											references gsb_users (ID) 
-											on delete restrict 
-											on update restrict' );
+								      on update restrict' );
 
 	$DB->query( 'alter table T_users
 								add constraint FK_user_grp_ID

@@ -219,9 +219,7 @@ class FileManager extends Filelist
 												$filterString = NULL, $filterIsRegexp = NULL, $flatmode = NULL )
 	{
 		global $basepath, $baseurl, $media_subdir, $admin_subdir, $admin_url;
-		global $BlogCache, $UserCache;
-		global $Debuglog, $AdminUI;
-		global $Messages;
+		global $BlogCache, $UserCache, $Debuglog, $AdminUI, $Messages;
 
 		// Global params to remember:
 		global $mode, $item_ID;
@@ -773,12 +771,14 @@ class FileManager extends Filelist
 
 			if( $blog_media_dir = $Blog->getMediaDir() )
 			{ // we got a blog media dir:
+ 				// echo '<br>got blog media dir for blog #'.$blog_ID;
 				$r[] = array( 'type' => 'blog',
 											'id'   => 'blog_'.$blog_ID,
 											'name' => $Blog->get( 'shortname' ),
 											'path' => $blog_media_dir,
 											'url'  => $Blog->get( 'mediaurl' ) );
 			}
+			// else echo '<br>NO blog media dir for blog #'.$blog_ID;
 		}
 
 		// the user's root
@@ -1434,6 +1434,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.40  2005/05/11 13:21:38  fplanque
+ * allow disabling of mediua dir for specific blogs
+ *
  * Revision 1.39  2005/05/09 16:09:42  fplanque
  * implemented file manager permissions through Groups
  *

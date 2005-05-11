@@ -56,15 +56,17 @@ $Form->fieldset_end();
 $Form->fieldset( T_('Media library') );
 $Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 									array(
+										array( 'none',
+														T_('None') ),
 										array( 'default',
 														T_('Default'),
 														sprintf( T_('subdirectory &quot;%s&quot; (URL blog name) of %s'), $edited_Blog->urlname, $basepath.$media_subdir ) ),
 										array( 'subdir',
-														T_('Subdirectory of media folder'),
+														T_('Subdirectory of media folder').':',
 														'',
 														' <span class="nobr"><code>'.$basepath.$media_subdir.'</code><input type="text" name="blog_media_subdir" size="20" maxlength="255" value="'.$edited_Blog->dget( 'media_subdir', 'formvalue' ).'" /></span>', '' ),
 										array( 'custom',
-														T_('Custom location'),
+														T_('Custom location').':',
 														'',
 														'<fieldset>'
 															.'<div class="label">'.T_('directory').':</div><div class="input"><input type="text" name="blog_media_fullpath" size="50" maxlength="255" value="'.$edited_Blog->dget( 'media_fullpath', 'formvalue' ).'" /></div>'

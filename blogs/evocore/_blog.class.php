@@ -333,12 +333,16 @@ class Blog extends DataObject
 
  		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 		{	// User directories are disabled:
-			$Debuglog->add( 'Attempt to access blog media dir, but this feature is disabled' );
+			$Debuglog->add( 'Attempt to access blog media dir, but this feature is globally disabled' );
 			return false;
 		}
 
 		switch( $this->media_location )
 		{
+			case 'none':
+				$Debuglog->add( 'Attempt to access blog media dir, but this feature is disabled for this blog' );
+				return false;
+
 			case 'default':
 				$mediadir = $basepath.$media_subdir.'blogs/'.$this->urlname.'/';
 				break;
@@ -687,6 +691,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2005/05/11 13:21:38  fplanque
+ * allow disabling of mediua dir for specific blogs
+ *
  * Revision 1.17  2005/05/06 20:04:48  fplanque
  * added contribs
  * fixed filemanager settings

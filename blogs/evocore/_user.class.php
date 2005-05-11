@@ -378,7 +378,7 @@ class User extends DataObject
 	 */
 	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
 	{
-		// echo "<br>Checking user perm $permname:$permlevel on target $perm_target";
+		global $Debuglog;
 
 		$perm = false;
 
@@ -429,6 +429,9 @@ class User extends DataObject
 		{ // We can't let this go on!
 			die( "Permission denied! ($permname:$permlevel:$perm_target)" );
 		}
+
+		// echo "<br>Checking user perm $permname:$permlevel:$perm_target";
+		$Debuglog->add( "User perm $permname:$permlevel:$perm_target => ".($perm?'granted':'denied'), 'perms' );
 
 		return $perm;
 	}
@@ -875,6 +878,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2005/05/11 13:21:38  fplanque
+ * allow disabling of mediua dir for specific blogs
+ *
  * Revision 1.29  2005/05/10 18:40:08  fplanque
  * normalizing
  *

@@ -588,6 +588,7 @@ function upgrade_b2evo_tables()
 
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
+								MODIFY COLUMN blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL,
 								ADD COLUMN blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post',
 								ADD COLUMN blog_allowblogcss TINYINT(1) NOT NULL default 1,
 								ADD COLUMN blog_allowusercss TINYINT(1) NOT NULL default 1
