@@ -169,12 +169,12 @@ else
 		if( count($rootlist) > 1 )
 		{ // provide list of roots to choose from
 			echo '<div id="fmbar_roots">';
-			echo '<select name="rootIDAndPath" onchange="this.form.submit()">';
+			echo '<select name="root_and_path" onchange="this.form.submit()">';
 			foreach( $rootlist as $lroot )
 			{
-				echo '<option value="'.format_to_output( serialize( array( 'id' => $lroot['id'], 'path' => '' ) ), 'formvalue' ).'"';
+				echo '<option value="'.format_to_output( serialize( array( 'root' => $lroot['id'], 'path' => '' ) ), 'formvalue' ).'"';
 
-				if( $Fileman->root == $lroot['id'] || ($Fileman->root === NULL && $lroot['id'] == 'user') )
+				if( $Fileman->root == $lroot['id'] )
 				{
 					echo ' selected="selected"';
 				}
@@ -789,6 +789,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.31  2005/05/11 15:58:30  fplanque
+ * cleanup
+ *
  * Revision 1.30  2005/05/09 16:09:37  fplanque
  * implemented file manager permissions through Groups
  *

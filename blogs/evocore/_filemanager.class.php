@@ -60,109 +60,122 @@ require_once dirname(__FILE__).'/_filelist.class.php';
  */
 class FileManager extends Filelist
 {
-	// {{{ class variables
 	/**
-	 * root ('user', 'user_X' or 'blog_X' - X is id)
+	 * Root ID ('user' or 'blog_X' - X is an integer ID)
 	 * @param string
 	 */
 	var $root;
 
 	/**
-	 * root directory
-	 * @param string
+	 * Remember the Filemanager mode we're in ('fm_upload', 'fm_cmr')
+	 * @var string
 	 */
-	var $root_dir;
-
-	/**
-	 * root URL
-	 * @param string
-	 */
-	var $root_url;
+	var $fm_mode;
 
 	/**
 	 * Current working directory WITH trailing slash.
+	 *
+	 * $root_dir/$path
+	 *
 	 * @param string
 	 */
 	var $cwd;
 
-
 	/**
-	 * User preference: show permissions like "ls -l" (true) or octal (false)?
+	 * Flat mode? (all files recursive without dirs)
 	 * @var boolean
 	 */
-	var $permlikelsl = true;
-
-	// --- going to user options ---
-	var $default_chmod_file = 664;
-	var $default_chmod_dir = 664;
-
-
-	/* ----- PRIVATE ----- */
-	/**
-	 * order files by what? (name/path/type/size/lastmod/perms)
-	 * 'name' as default.
-	 * @var string
-	 * @access protected
-	 */
-	var $order;
+	var $flatmode;
 
 	/**
-	 * files ordered ascending?
-	 * NULL is default and means ascending for 'name', descending for the rest
-	 * @var boolean
+	 * Force display of Filemanager also when in file_upload mode etc.?
+	 *
+	 * Is also a usersetting.
+	 *
+	 * @var integer
+	 */
+	var $forceFM;
+
+	/**
+	 * root directory
+	 * @param string
 	 * @access protected
 	 */
-	var $orderasc;
+	var $_root_dir;
+
+	/**
+	 * root URL
+	 * @param string
+	 * @access protected
+	 */
+	var $_root_url;
 
 	/**
 	 * relative path
 	 * @var string
 	 * @access protected
 	 */
-	var $path = '';
+	var $_rel_path = '';
+
+	/**
+	 * User preference: show permissions like "ls -l" (true) or octal (false)?
+	 * @var boolean
+	 * @access protected
+	 */
+	var $_disp_permslikelsl = true;
+
+	/**
+	 * Obtain & Display size (width, height) for images?
+	 * @var boolean
+	 * @access protected
+	 */
+	var $_use_image_sizes = false;
+
+	/**
+	 * Default perms for files
+	 * @todo move to user options
+	 * @access protected
+	 */
+	var $_default_chmod_file = 664;
+
+	/**
+	 * Default perms for dirs
+	 * @todo move to user options
+	 * @access protected
+	 */
+	var $_default_chmod_dir = 664;
 
 	/**
 	 * Evo Display mode (upload, bookmarklet, etc..)
-	 * @var string
-	 */
-	var $mode;
-
-	/**
-	 * Remember the Filemanager mode we're in ('fm_upload', 'fm_cmr')
+	 * @todo get rid of this, along with $_url_params
 	 * @var string
 	 * @access protected
 	 */
-	var $fm_mode;
-
-
-	/**
-	 * Flat mode? (all files recursive without dirs)
-	 * @var boolean
-	 * @access protected
-	 */
-	var $flatmode;
-
-
-	/**
-	 * Display size (width, height) for images?
-	 *
-	 * @var boolean
-	 */
-	var $getImageSizes = false;
-
-
-	/**
-	 * Force display of Filemanager also when in file_upload mode etc.?
-	 * // Is also a usersetting.
-	 * @var integer
-	 * @access protected
-	 */
-	var $forceFM;
+	var $_evo_mode;
 
 	/**
 	 * Item to link on...
+	 * @todo get rid of this, along with $_url_params
+	 * @var integer
+	 * @access protected
 	 */
-	var $item_ID;
+	var $_item_ID;
+
+	/**
+	 * A list of selected files. Gets build on first call to
+	 * {@link getFilelistSelected()}.
+	 *
+	 * @var Filelist
+	 * @access protected
+	 */
+	var $_selected_Filelist;
+
+	/**
+	 * Display template cache
+	 * @var array
+	 * @access protected
+	 */
+	var $_result_params;
 
 	/**
 	 * These are variables that get considered when regenerating an URL
@@ -170,35 +183,21 @@ class FileManager extends Filelist
 	 * @var array
 	 * @access private
 	 */
-	var $_internalGlobals = array(
+	var $_url_params = array(
 			'root'           => 'root',
-			'path'           => 'path',
+			'path'           => '_rel_path',
 			'filterString'   => '_filter',
 			'filterIsRegexp' => '_filter_is_regexp',
-			'order'          => 'order',
-			'orderasc'       => 'orderasc',
-			'mode'           => 'mode',
+			'order'          => '_order',
+			'orderasc'       => '_order_asc',
+			'mode'           => '_evo_mode',
 			'fm_mode'        => 'fm_mode',
 			'fm_sources'     => 'fm_sources',
 			'cmr_keepsource' => 'cmr_keepsource',
 			'flatmode'       => 'flatmode',
 			'forceFM'        => 'forceFM',
-			'item_ID'	       => 'item_ID'	             // Used in fm_mode=link_item
+			'item_ID'	       => '_item_ID'	             // Used in fm_mode=link_item
 		);
-
-	/**
-	 * A list of selected files. Gets build on first call to
-	 * {@link getFilelistSelected()}.
-	 *
-	 * @var Filelist
-	 * @access private
-	 */
-	var $_selectedFiles;
-
-
-	var $result_params;
-
-	// }}}
 
 
 	/**
@@ -223,49 +222,21 @@ class FileManager extends Filelist
 
 		// Global params to remember:
 		global $mode, $item_ID;
-		$this->mode = $mode;
-		$this->item_ID = $item_ID;
+		$this->_evo_mode = $mode;
+		$this->_item_ID = $item_ID;
 
 		$this->User = & $cUser;
 
-		$this->result_params = $AdminUI->getMenuTemplate('Results');
+		$this->_result_params = $AdminUI->getMenuTemplate('Results');
 
-		// {{{ -- get/translate root directory ----
-		$root_A = explode( '_', $root );
-
-		if( count($root_A) == 2 && $root_A[1] !== '' )
-		{	// We have requested a specific root folder:
-			switch( $root_A[0] )
-			{
-				case 'blog':
-					$tBlog = $BlogCache->get_by_ID( $root_A[1] );
-					$this->root_dir = $tBlog->get( 'mediadir' );
-					$this->root_url = $tBlog->get( 'mediaurl' );
-					$this->root = 'blog_'.$root_A[1];
-					break;
-
-				case 'user':
-					$tUser = & $UserCache->get_by_ID($root_A[1]);
-					$this->root_dir = $tUser->getMediaDir();
-					$this->root_url = $tUser->getMediaUrl();
-					$this->root = 'user_'.$root_A[1];
-					break;
-			}
-
-			if( !$this->root_dir )
-			{
-				$Messages->add( T_('You don\'t have access to the requested root directory.'), 'error' );
-				$this->cwd = NULL;
-			}
-		}
-		else
+		if( empty($root) )
 		{	// NO folder requested, get the first one available:
 			$root_array = $this->getRootList();
 
 			if( count($root_array) )
 			{	// We found at least one media dir:
-				$this->root_dir = $root_array[0]['path'];
-				$this->root_url = $root_array[0]['url'];
+				$this->_root_dir = $root_array[0]['path'];
+				$this->_root_url = $root_array[0]['url'];
 				$this->root = $root_array[0]['id'];
 			}
 			else
@@ -274,30 +245,54 @@ class FileManager extends Filelist
 				$this->cwd = NULL;
 			}
 		}
+		else
+		{	// We have requested a root folder:
+			$root_parts = explode( '_', $root );
 
-		if( $this->root_dir )
+			if( $root_parts[0] == 'user' )
+			{
+				$this->_root_dir = $this->User->getMediaDir();
+				$this->_root_url = $this->User->getMediaUrl();
+				$this->root = 'user';
+			}
+			elseif( $root_parts[0] == 'blog' && isset($root_parts[1]) )
+			{
+				$tBlog = $BlogCache->get_by_ID( $root_parts[1] );
+				$this->_root_dir = $tBlog->get( 'mediadir' );
+				$this->_root_url = $tBlog->get( 'mediaurl' );
+				$this->root = 'blog_'.$root_parts[1];
+			}
+
+			if( !$this->_root_dir )
+			{
+				$Messages->add( T_('You don\'t have access to the requested root directory.'), 'error' );
+				$this->cwd = NULL;
+			}
+		}
+
+		if( $this->_root_dir )
 		{	// We have access to a/requested root dir:
 
-			list( $real_root_dir, $real_root_dir_exists ) = str2path( $this->root_dir );
+			list( $real_root_dir, $real_root_dir_exists ) = str2path( $this->_root_dir );
 			$Debuglog->add( 'real_root_dir: '.var_export( $real_root_dir, true ), 'filemanager' );
 
 			if( !$real_root_dir_exists )
 			{
-				$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $this->root_dir ), 'error' );
+				$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $this->_root_dir ), 'error' );
 				$this->cwd = NULL;
 			}
 			else
 			{
-				$this->cwd = trailing_slash( $this->root_dir.$path );
+				$this->cwd = trailing_slash( $this->_root_dir.$path );
 				// get real cwd
 
 				list( $realpath, $realpath_exists ) = str2path( $this->cwd );
 
 
-				if( !preg_match( '#^'.$this->root_dir.'#', $realpath ) )
+				if( !preg_match( '#^'.$this->_root_dir.'#', $realpath ) )
 				{ // cwd is not below root!
 					$Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
-					$this->cwd = $this->root_dir;
+					$this->cwd = $this->_root_dir;
 				}
 				else
 				{ // allowed
@@ -314,9 +309,8 @@ class FileManager extends Filelist
 			}
 
 			// Get the subpath relative to root
-			$this->path = preg_replace( '#^'.$this->root_dir.'#', '', $this->cwd );
+			$this->_rel_path = preg_replace( '#^'.$this->_root_dir.'#', '', $this->cwd );
 		}
-		// }}}
 
 
 		/**
@@ -364,10 +358,10 @@ class FileManager extends Filelist
 		$this->loadSettings();
 
 		$Debuglog->add( 'root: '.var_export( $this->root, true ), 'filemanager' );
-		$Debuglog->add( 'root_dir: '.var_export( $this->root_dir, true ), 'filemanager' );
-		$Debuglog->add( 'root_url: '.var_export( $this->root_url, true ), 'filemanager' );
+		$Debuglog->add( 'root_dir: '.var_export( $this->_root_dir, true ), 'filemanager' );
+		$Debuglog->add( 'root_url: '.var_export( $this->_root_url, true ), 'filemanager' );
 		$Debuglog->add( 'cwd: '.var_export( $this->cwd, true ), 'filemanager' );
-		$Debuglog->add( 'path: '.var_export( $this->path, true ), 'filemanager' );
+		$Debuglog->add( '_rel_path: '.var_export( $this->_rel_path, true ), 'filemanager' );
 
 		$this->flatmode = $flatmode;
 
@@ -379,13 +373,18 @@ class FileManager extends Filelist
 
 
 	/**
-	 * Load current directory contents:
+	 * Load current directory contents.
 	 *
-	 * Calls the parent constructor, loads and rewinds the filelist.
+	 * Calls the parent constructor, loads and rewinds the filelist, loads meta data.
+	 *
+	 * fplanque>> This is B.A.D. design. The parent constructor should never be called from anywhere else
+	 * as from the derived constructor. The Filelist here should probabmy be a property and not a baseclass.
 	 */
 	function load()
 	{
 		parent::Filelist( $this->cwd );
+
+		// Load files from current working dir:
 		parent::load( $this->flatmode );
 		parent::restart();
 		#debug: pre_dump( $this->_entries );
@@ -433,12 +432,12 @@ class FileManager extends Filelist
 	 */
 	function dispButtonParent()
 	{
-		if( empty($this->path) )
+		if( empty($this->_rel_path) )
 		{ // cannot go higher
 			return '&nbsp;';	// for IE
 		}
 
-		echo '<a title="'.T_('Go to parent folder').'" href="'.$this->getCurUrl( array( 'path' => $this->path.'..' ) ).'">'
+		echo '<a title="'.T_('Go to parent folder').'" href="'.$this->getCurUrl( array( 'path' => $this->_rel_path.'..' ) ).'">'
 						.get_icon( 'folder_parent' ).'</a>';
 	}
 
@@ -454,9 +453,9 @@ class FileManager extends Filelist
 		{
 			$File = $this->curFile;
 		}
-		if( $link = $this->getLinkFileEdit() )
+		if( ! $this->curFile->is_dir() )
 		{
-			echo '<a title="'.T_('Edit the file').'" href="'.$link.'">'.get_icon( 'file_edit' ).'</a>';
+			echo '<a title="'.T_('Edit the file').'" href="'.$this->getLinkFile( $this->curFile, 'edit' ).'">'.get_icon( 'file_edit' ).'</a>';
 		}
 	}
 
@@ -469,33 +468,20 @@ class FileManager extends Filelist
 		if( $this->User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
 			echo '<a title="'.T_('Edit permissions').'" href="'.$this->getLinkFile( $this->curFile, 'editperm' ).'">'
-						.$this->curFile->get_perms( $this->permlikelsl ? 'lsl' : '' ).'</a>';
+						.$this->curFile->get_perms( $this->_disp_permslikelsl ? 'lsl' : '' ).'</a>';
 		}
 		else
 		{
-			echo $this->curFile->get_perms( $this->permlikelsl ? 'lsl' : '' );
+			echo $this->curFile->get_perms( $this->_disp_permslikelsl ? 'lsl' : '' );
 		}
 	}
 
 
-	/**
+	/*
 	 * Displays a button to enter upload mode.
 	 *
-	 * @param string title for the button
-	 * @param string optional HTML attribs for the input button
+	 * Removed because it's really overkill to instantiate a whole filemanager just to pop up a window!!!
 	 */
-	function dispButtonUploadPopup( $title = NULL, $attribs = '' )
-	{
-		if( $title === NULL )
-		{
-			$title = T_('Upload a file/image');
-		}
-
-		$url = $this->getCurUrl( array( 'fm_mode' => 'file_upload', 'mode' => 'upload' ) );
-
-		echo '<input type="button" name="fm_upload_popup" value="'.$title.'" class="ActionButton" onclick="'
-					.$this->getJsPopupCode( $url, 'fileman_upload' ).'; return false;" />';
-	}
 
 
 	/**
@@ -613,20 +599,17 @@ class FileManager extends Filelist
 			$File = $this->curFile;
 		}
 
-		if( $url = $this->getLinkFileDelete( $File ) )
-		{
-			echo '<a title="'.T_('Delete').'" href="'.$url.'">'.get_icon( 'file_delete' ).'</a>';
-			/* No JS: we need to check DB integrity!
-				.'" onclick="if( confirm(\''
-				.sprintf( TS_('Do you really want to delete &laquo;%s&raquo;?'),
-				format_to_output( $File->get_name(), 'formvalue' ) ).'\') )
-				{
-					this.href += \'&amp;confirmed=1\';
-					return true;
-				}
-				else return false;">'
-			*/
-		}
+		echo '<a title="'.T_('Delete').'" href="'.$this->getLinkFile( $File, 'delete' ).'">'.get_icon( 'file_delete' ).'</a>';
+		/* No JS: we need to check DB integrity!
+			.'" onclick="if( confirm(\''
+			.sprintf( TS_('Do you really want to delete &laquo;%s&raquo;?'),
+			format_to_output( $File->get_name(), 'formvalue' ) ).'\') )
+			{
+				this.href += \'&amp;confirmed=1\';
+				return true;
+			}
+			else return false;">'
+		*/
 	}
 
 
@@ -644,8 +627,8 @@ class FileManager extends Filelist
 	 *
 	 * @todo get rid of this and use regenerate_url() instead !!
 	 *
-	 * @uses $_internalGlobals
-	 * @param array override/disable internal globals {@link $_internalGlobals} or
+	 * @uses $_url_params
+	 * @param array override/disable internal globals {@link $_url_params} or
 	 *              add own key => value pairs as URL params
 	 * @return string the resulting URL
 	 */
@@ -654,7 +637,7 @@ class FileManager extends Filelist
 		$r = $this->url;
 
 		$toAppend = array();
-		foreach( $this->_internalGlobals as $check => $var )
+		foreach( $this->_url_params as $check => $var )
 		{
 			if( isset( $override[$check] ) )
 			{
@@ -726,11 +709,6 @@ class FileManager extends Filelist
 	}
 
 
-		function getmicrotime(){
-			 list($usec, $sec) = explode(" ",microtime());
-			 return ((float)$usec + (float)$sec);
-			 }
-
 	/**
 	 * Generate hidden input fields for the selected files.
 	 *
@@ -740,11 +718,11 @@ class FileManager extends Filelist
 	{
 		$r = '';
 
-		reset( $this->_selectedFiles->_entries );
-		while( list($lKey, $lFile) = each($this->_selectedFiles->_entries) )
+		reset( $this->_selected_Filelist->_entries );
+		while( list($lKey, $lFile) = each($this->_selected_Filelist->_entries) )
 		{
 			$r .= '<input type="hidden" name="fm_selected[]" value="'
-						.$this->_selectedFiles->_entries[$lKey]->get_md5_ID()."\" />\n";
+						.$this->_selected_Filelist->_entries[$lKey]->get_md5_ID()."\" />\n";
 		}
 
 		return $r;
@@ -754,6 +732,7 @@ class FileManager extends Filelist
 	/**
 	 * Get an array of available roots.
 	 *
+	 * @todo Cache this!
 	 * @return array of arrays for each root: array( type [blog/user], id, name )
 	 */
 	function getRootList()
@@ -812,15 +791,15 @@ class FileManager extends Filelist
 		// Sorting icon:
 		if( $this->translate_order($this->_order) != $type )
 		{	// Not sorted on this column:
-			$r .= ' class="basic_sort_link">'.$this->result_params['basic_sort_off'];
+			$r .= ' class="basic_sort_link">'.$this->_result_params['basic_sort_off'];
 		}
 		elseif( $this->is_sorting_asc($type) )
 		{ // We are sorting on this column , in ascneding order:
-			$r .=	' class="basic_current">'.$this->result_params['basic_sort_asc'];
+			$r .=	' class="basic_current">'.$this->_result_params['basic_sort_asc'];
 		}
 		else
 		{ // Descending order:
-			$r .=	' class="basic_current">'.$this->result_params['basic_sort_desc'];
+			$r .=	' class="basic_current">'.$this->_result_params['basic_sort_desc'];
 		}
 
 		$r .= ' '.$atext;
@@ -836,9 +815,9 @@ class FileManager extends Filelist
 	 * @param string can be used to query only 'file's or 'dir's.
 	 * @return boolean File object on success, false on end of list
 	 */
-	function &get_next( $type = '' )
+	function & get_next( $type = '' )
 	{
-		$this->curFile =& parent::get_next( $type );
+		$this->curFile = & parent::get_next( $type );
 
 		return $this->curFile;
 	}
@@ -856,7 +835,7 @@ class FileManager extends Filelist
 			$File = $this->curFile;
 		}
 
-		return $this->root_url.$this->get_relative_path( $File );
+		return $this->_root_url.$this->get_relative_path( $File );
 	}
 
 
@@ -864,12 +843,12 @@ class FileManager extends Filelist
 	 * Get the image size of a file.
 	 *
 	 * @uses File::get_image_size()
-	 * @return false|mixed Either false (@see $getImageSizes} or the result
+	 * @return false|mixed Either false (@link Filemanager::_use_image_sizes} or the result
 	 *                     from {@link File::get_image_size()}
 	 */
 	function getFileImageSize( $param = 'widthxheight', $File = NULL )
 	{
-		if( !$this->getImageSizes )
+		if( !$this->_use_image_sizes )
 		{
 			return false;
 		}
@@ -892,7 +871,7 @@ class FileManager extends Filelist
 	 */
 	function get_relative_path( &$File, $withName = true )
 	{
-		return parent::get_relative_path( $File, $withName, $this->root_dir );
+		return parent::get_relative_path( $File, $withName, $this->_root_dir );
 	}
 
 
@@ -923,41 +902,6 @@ class FileManager extends Filelist
 	}
 
 
-	function getLinkFileEdit()
-	{
-		if( $this->curFile->is_dir() )
-		{
-			return false;
-		}
-		return $this->getLinkFile( $this->curFile, 'edit' );
-	}
-
-
-	/**
-	 * Get link to delete a file or folder.
-	 *
-	 * @return string the URL
-	 */
-	function getLinkFileDelete( $File = NULL )
-	{
-		if( $File === NULL )
-		{
-			$File = $this->curFile;
-		}
-		return $this->getLinkFile( $File, 'delete' );
-	}
-
-
-	/**
-	 * Get the link to current root's home directory
-	 */
-	function getLinkHome()
-	{
-		return $this->getCurUrl( array( 'root' => 'user',
-																		'path' => false ) );
-	}
-
-
 	/**
 	 * Get a list of selected files, by using the 'fm_selected' param.
 	 *
@@ -965,9 +909,9 @@ class FileManager extends Filelist
 	 */
 	function & getFilelistSelected()
 	{
-		if( is_null($this->_selectedFiles) )
+		if( is_null($this->_selected_Filelist) )
 		{
-			$this->_selectedFiles = new Filelist();
+			$this->_selected_Filelist = new Filelist();
 
 			$fm_selected = param( 'fm_selected', 'array', array() );
 
@@ -975,12 +919,12 @@ class FileManager extends Filelist
 			{
 				if( $File =& $this->get_by_md5_ID( $lSelectedID ) )
 				{
-					$this->_selectedFiles->add( $File );
+					$this->_selected_Filelist->add( $File );
 				}
 			}
 		}
 
-		return $this->_selectedFiles;
+		return $this->_selected_Filelist;
 	}
 
 
@@ -1025,14 +969,14 @@ class FileManager extends Filelist
 		$Nodelist->load();
 
 
-		$rootIDAndPath = format_to_output( serialize( array( 'id' => $rootID, 'path' => $rootSubpath ) ), 'formvalue' );
+		$root_and_path = format_to_output( serialize( array( 'root' => $rootID, 'path' => $rootSubpath ) ), 'formvalue' );
 		$id_path = md5( $path );
 
 		$r['string'] = '<input type="radio"
-														name="rootIDAndPath"
-														value="'.$rootIDAndPath.'"
+														name="root_and_path"
+														value="'.$root_and_path.'"
 														id="radio_'.$id_path.'"
-														'.( $rootID == $this->root && $rootSubpath == $this->path ? ' checked="checked"' : '' ).'
+														'.( $rootID == $this->root && $rootSubpath == $this->_rel_path ? ' checked="checked"' : '' ).'
 														/> ';
 
 		$label = '<label for="radio_'.$id_path.'">'
@@ -1042,9 +986,7 @@ class FileManager extends Filelist
 							.'</a>'
 							.'</label>';
 
-		$r['opened'] = ( $rootID == $this->root && $rootSubpath == $this->path ) ?
-										true :
-										NULL;
+		$r['opened'] = ( $rootID == $this->root && $rootSubpath == $this->_rel_path ) ? true : NULL;
 
 
 
@@ -1093,7 +1035,7 @@ class FileManager extends Filelist
 	 */
 	function isSelected( $File )
 	{
-		return $this->_selectedFiles->contains( $File );
+		return $this->_selected_Filelist->contains( $File );
 	}
 
 
@@ -1134,9 +1076,7 @@ class FileManager extends Filelist
 
 		if( $chmod == NULL )
 		{ // No perms were supplied:
-			$chmod = $type == 'dir' ?
-								$this->default_chmod_dir :
-								$this->default_chmod_file;
+			$chmod = $type == 'dir' ? $this->_default_chmod_dir : $this->_default_chmod_file;
 		}
 
 		if( empty($name) )
@@ -1204,7 +1144,7 @@ class FileManager extends Filelist
 			return ' -- '.T_('No directory.').' -- ';
 		}
 		// not clickable
-		$r = substr( $this->root_dir, 0, strrpos( substr($this->root_dir, 0, -1), '/' )+1 );
+		$r = substr( $this->_root_dir, 0, strrpos( substr($this->_root_dir, 0, -1), '/' )+1 );
 
 		// get the part that is clickable
 		$clickabledirs = explode( '/', substr( $this->cwd, strlen($r) ) );
@@ -1257,15 +1197,10 @@ class FileManager extends Filelist
 			$height = 800;
 		}
 
-		$r = "opened = window.open('$href','$target','scrollbars=yes,"  // ."status=yes,toolbar=1,location=yes,"
+		$r = "pop_up_window( '$href', '$target', '"
 					.( $width ? "width=$width," : '' )
 					.( $height ? "height=$height," : '' )
-					.'resizable=yes'
-					."'); opened.focus();"
-					."if( typeof(openedWindows) == 'undefined' )"
-					."{ openedWindows = new Array(opened); }"
-					."else"
-					."{ openedWindows.push(opened); }";
+					."scrollbars=yes,status=yes,resizable=yes' );";
 
 		return $r;
 	}
@@ -1281,11 +1216,11 @@ class FileManager extends Filelist
 		global $UserSettings;
 
 		$UserSettings->get_cond( $this->_dirs_not_at_top,       'fm_dirsnotattop',     $this->User->ID );
-		$UserSettings->get_cond( $this->permlikelsl,      'fm_permlikelsl',      $this->User->ID );
-		$UserSettings->get_cond( $this->getImageSizes,    'fm_getimagesizes',    $this->User->ID );
+		$UserSettings->get_cond( $this->_disp_permslikelsl,     'fm_permlikelsl',      $this->User->ID );
+		$UserSettings->get_cond( $this->_use_image_sizes,       'fm_getimagesizes',    $this->User->ID );
 		$UserSettings->get_cond( $this->_use_recursive_dirsize, 'fm_recursivedirsize', $this->User->ID ); // TODO: check for permission (Server load)
 		$UserSettings->get_cond( $this->_show_hidden_files,     'fm_showhidden',       $this->User->ID );
-		$UserSettings->get_cond( $this->forceFM,          'fm_forceFM',          $this->User->ID );
+		$UserSettings->get_cond( $this->forceFM,                'fm_forceFM',          $this->User->ID );
 	}
 
 
@@ -1434,6 +1369,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.41  2005/05/11 15:58:30  fplanque
+ * cleanup
+ *
  * Revision 1.40  2005/05/11 13:21:38  fplanque
  * allow disabling of mediua dir for specific blogs
  *

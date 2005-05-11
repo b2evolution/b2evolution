@@ -166,11 +166,16 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		$edited_Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
 	}
 
-	if( $Settings->get( 'fm_enabled' ) && $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
+	if( $Settings->get( 'fm_enabled' ) )
 	{ // ---------- UPLOAD ----------
-		require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php' );
-		$Fileman = new Filemanager( $current_User, 'files.php', 'user' );
-		$Fileman->dispButtonUploadPopup( T_('File upload') );
+		echo '<input type="button" value="Files" class="ActionButton"
+						onclick="pop_up_window( \'files.php?mode=upload\', \'fileman_upload\' );"> ';
+
+		if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
+		{
+			echo '<input type="button" value="Upload" class="ActionButton"
+							onclick="pop_up_window( \'files.php?mode=upload&amp;fm_mode=file_upload\', \'fileman_upload\' );"> ';
+		}
 	}
 
 	// CALL PLUGINS NOW:
@@ -391,6 +396,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.23  2005/05/11 15:58:30  fplanque
+ * cleanup
+ *
  * Revision 1.22  2005/05/09 16:09:38  fplanque
  * implemented file manager permissions through Groups
  *

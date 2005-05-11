@@ -157,10 +157,7 @@ if( false )
 
 		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
 
-		// we'll use $rootIDAndPath only
-		echo $Fileman->getFormHiddenInputs( array( 'root' => false, 'path' => false ) );
-		$Form->hidden( 'rootIDAndPath', serialize( array( 'id' => $Fileman->root, 'path' => $Fileman->path ) ) );
-
+		echo $Fileman->getFormHiddenInputs();
 
 		if( count( $failedFiles ) )
 		{
@@ -273,6 +270,9 @@ if( false )
 
 /*
  * $Log$
+ * Revision 1.8  2005/05/11 15:58:30  fplanque
+ * cleanup
+ *
  * Revision 1.7  2005/05/06 20:04:47  fplanque
  * added contribs
  * fixed filemanager settings

@@ -33,10 +33,35 @@
  * @package main
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER.
+ * @author blueyed: Daniel HAHLER
+ * @author fplanque: Francois PLANQUE
  *
  * @version $Id$
  */
+
+
+/**
+ * Opens a window and makes sure it gets focus.
+ */
+function pop_up_window( href, target, params )
+{
+	if( typeof(params) == 'undefined' )
+	{
+		params = 'width=750,height=550,scrollbars=yes,status=yes,resizable=yes';
+	}
+
+	opened = window.open( href, target, params );
+	opened.focus();
+	if( typeof(openedWindows) == 'undefined' )
+	{
+		openedWindows = new Array(opened);
+	}
+	else
+	{
+		openedWindows.push(opened);
+	}
+}
+
 
 
 /**
@@ -81,4 +106,3 @@ function toggle_clickopen( id, hide, displayVisible )
 		return false;
 	}
 }
-

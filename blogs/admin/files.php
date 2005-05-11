@@ -84,11 +84,11 @@ if( !$Settings->get( 'fm_enabled' ) )
 $current_User->check_perm( 'files', 'view', true );
 
 
-if( param( 'rootIDAndPath', 'string', '', true ) )
-{ // root and path together: decode and override
-	$rootIDAndPath = unserialize( $rootIDAndPath );
-	$root = $rootIDAndPath['id'];
-	$path = $rootIDAndPath['path'];
+if( param( 'root_and_path', 'string', '', true ) )
+{ // root and path together: decode and override (overriding is especially used in root switch select)
+	$root_and_path = unserialize( $root_and_path );
+	$root = $root_and_path['root'];
+	$path = $root_and_path['path'];
 }
 else
 {
@@ -1196,6 +1196,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.104  2005/05/11 15:58:30  fplanque
+ * cleanup
+ *
  * Revision 1.103  2005/05/10 18:38:15  fplanque
  * cleaned up log message display (part 1)
  *
