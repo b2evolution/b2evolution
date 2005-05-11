@@ -274,7 +274,7 @@ class FileManager extends Filelist
 		{	// We have access to a/requested root dir:
 
 			list( $real_root_dir, $real_root_dir_exists ) = str2path( $this->_root_dir );
-			$Debuglog->add( 'real_root_dir: '.var_export( $real_root_dir, true ), 'filemanager' );
+			$Debuglog->add( 'FM: real_root_dir: '.var_export( $real_root_dir, true ), 'files' );
 
 			if( !$real_root_dir_exists )
 			{
@@ -357,11 +357,11 @@ class FileManager extends Filelist
 
 		$this->loadSettings();
 
-		$Debuglog->add( 'root: '.var_export( $this->root, true ), 'filemanager' );
-		$Debuglog->add( 'root_dir: '.var_export( $this->_root_dir, true ), 'filemanager' );
-		$Debuglog->add( 'root_url: '.var_export( $this->_root_url, true ), 'filemanager' );
-		$Debuglog->add( 'cwd: '.var_export( $this->cwd, true ), 'filemanager' );
-		$Debuglog->add( '_rel_path: '.var_export( $this->_rel_path, true ), 'filemanager' );
+		$Debuglog->add( 'FM root: '.var_export( $this->root, true ), 'files' );
+		$Debuglog->add( 'FM root_dir: '.var_export( $this->_root_dir, true ), 'files' );
+		$Debuglog->add( 'FM root_url: '.var_export( $this->_root_url, true ), 'files' );
+		$Debuglog->add( 'FM cwd: '.var_export( $this->cwd, true ), 'files' );
+		$Debuglog->add( 'FM _rel_path: '.var_export( $this->_rel_path, true ), 'files' );
 
 		$this->flatmode = $flatmode;
 
@@ -1369,6 +1369,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.42  2005/05/11 17:53:47  fplanque
+ * started multiple roots handling in file meta data
+ *
  * Revision 1.41  2005/05/11 15:58:30  fplanque
  * cleanup
  *

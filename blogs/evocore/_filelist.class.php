@@ -64,6 +64,20 @@ require_once dirname(__FILE__).'/_file.class.php';
 class Filelist
 {
 	/**
+	 * Root type: 'user', 'group', 'collection' or 'absolute'
+	 * @var string
+	 * @access protected
+	 */
+	var $_root_type = 'absolute';
+
+	/**
+	 * Root ID: ID of the user, the group or the collection the file belongs to...
+	 * @var integer
+	 * @access protected
+	 */
+	var $_root_ID = 0;
+
+	/**
 	 * Path to list with trailing slash.
 	 *
 	 * false if we are constructing an arbitraty list (i-e not tied to a single directory)
@@ -314,6 +328,16 @@ class Filelist
 		if( !is_a( $File, 'file' ) )
 		{	// Passed object is not a File!! :(
 			return false;
+		}
+
+		if( $File->_root_type != $this->_root_type )
+		{
+			die( 'Adding file to filelist: root_type mismatch!' );
+		}
+
+		if( $File->_root_ID != $this->_root_ID )
+		{
+			die( 'Adding file to filelist: root_ID mismatch!' );
 		}
 
 		if( $mustExist && !$File->exists() )
@@ -861,11 +885,11 @@ class Filelist
 			return false;
 		}
 
-		if( ! $rows = $DB->get_results( 'SELECT *
+		if( ! $rows = $DB->get_results( "SELECT *
 																			 FROM T_files
-																			WHERE file_root_type = \'absolute\'
-																				AND file_root_ID = 0
-																				AND file_path IN ('.implode( ',', $to_load ).')',
+																			WHERE file_root_type = '$this->_root_type'
+																				AND file_root_ID = $this->_root_ID
+																				AND file_path IN (".implode( ',', $to_load ).')',
 																			OBJECT, 'Load FileList meta data' ) )
 		{ // We haven't found any meta data...
 			return false;
@@ -887,6 +911,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.26  2005/05/11 17:53:47  fplanque
+ * started multiple roots handling in file meta data
+ *
  * Revision 1.25  2005/04/29 18:49:32  fplanque
  * Normalizing, doc, cleanup
  *

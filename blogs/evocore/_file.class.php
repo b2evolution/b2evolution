@@ -77,6 +77,26 @@ class File extends DataObject
 	 */
 	var $desc;
 
+	/**
+	 * Root type: 'user', 'group', 'collection' or 'absolute'
+	 * @var string
+	 * @access protected
+	 */
+	var $_root_type;
+
+	/**
+	 * Root ID: ID of the user, the group or the collection the file belongs to...
+	 * @var integer
+	 * @access protected
+	 */
+	var $_root_ID;
+
+	/**
+	 * Subpath for this file/folder, relative the associated root, including trailing slash.
+	 * @var string
+	 * @access protected
+	 */
+	var $_rel_path;
 
 	/**
 	 * Full path for this file/folder, including trailing slash.
@@ -187,6 +207,10 @@ class File extends DataObject
 	 */
 	function File( $path, $load_meta = false )
 	{
+		global $Debuglog;
+
+		$Debuglog->add( "new File( $path, load_meta=$load_meta)", 'files' );
+
 		// Call parent constructor
 		parent::DataObject( 'T_files', 'file_', 'file_ID', '', '', '', '' );
 
@@ -195,7 +219,10 @@ class File extends DataObject
 			);
 
 		// Memorize filepath:
-		$this->_full_path = str_replace( '\\', '/', $path );
+		$this->_root_type = 'absolute';
+		$this->_root_ID = 0;
+		$this->_rel_path = str_replace( '\\', '/', $path );
+		$this->_full_path = $this->_rel_path;
 		$this->_posix_path = no_trailing_slash( $this->_full_path );
 		$this->_name = basename( $this->_posix_path );
 		$this->_dir = dirname( $this->_posix_path ).'/';
@@ -228,16 +255,16 @@ class File extends DataObject
 		{ // We haven't tried loading yet:
 			if( is_null( $row )	)
 			{	// No DB data has been provided:
-				$row = $DB->get_row( 'SELECT * FROM T_files
-																WHERE file_root_type = \'absolute\'
-																	AND file_root_ID = 0
-																	AND file_path = '.$DB->quote($this->_full_path),
+				$row = $DB->get_row( "SELECT * FROM T_files
+																WHERE file_root_type = '$this->_root_type'
+																	AND file_root_ID = $this->_root_ID
+																	AND file_path = ".$DB->quote($this->_rel_path),
 																OBJECT, 0, 'Load file meta data' );
 			}
 
 			if( $row )
 			{ // We found meta data
-				$Debuglog->add('Loaded metadata for '.$this->_full_path);
+				$Debuglog->add( "Loaded metadata for $this->_root_type:$this->_root_ID:$this->_rel_path", 'files' );
 				$this->meta  = 'loaded';
 				$this->ID    = $row->file_ID;
 				$this->title = $row->file_title;
@@ -249,6 +276,7 @@ class File extends DataObject
 			}
 			else
 			{ // No meta data...
+				$Debuglog->add( "No metadata could be loaded for $this->_root_type:$this->_root_ID:$this->_rel_path", 'files' );
 				$this->meta = 'notfound';
 
 				if( $force_creation )
@@ -303,9 +331,13 @@ class File extends DataObject
 			// If there was meta data for this file in the DB:
 			// (maybe the file had existed before?)
 			// Let's recycle it! :
-			$this->load_meta();
-			// TODO: make path relative to a root.
-			$this->set( 'path', $this->_full_path );
+			if( ! $this->load_meta() )
+			{ // No meta data could be loaded, let's make sure localization info gets recorded:
+				$this->set( 'root_type', $this->_root_type );
+				$this->set( 'root_ID', $this->_root_ID );
+				$this->set( 'path', $this->_rel_path );
+			}
+
 			// Record to DB:
 			$this->dbsave();
 		}
@@ -732,13 +764,19 @@ class File extends DataObject
 		if( rename( $this->_full_path, $this->_dir.$newname ) )
 		{
 			$this->_name = $newname;
+
+			$this->_rel_posix_path = no_trailing_slash( $this->_rel_path );	// lazy filled
+			$this->_rel_dir = dirname( $this->_rel_posix_path ).'/';				// lazy filled
+			$this->_rel_path = $this->_rel_dir.$this->_name;
+
 			$this->_posix_path = $this->_dir.$this->_name;
 			$this->_full_path = $this->_posix_path.'/';
 			$this->_md5ID = md5( $this->_posix_path );
 
 			// Meta data...:
-			// TODO: make path relative to a root.
-			$this->set( 'path', $this->_full_path );
+			// unchanged : $this->set( 'root_type', $this->_root_type );
+			// unchanged : $this->set( 'root_ID', $this->_root_ID );
+			$this->set( 'path', $this->_rel_path );
 			// Record to DB:
 			$this->dbupdate();
 
@@ -830,8 +868,10 @@ class File extends DataObject
 
 		if( ($this->ID != 0) || ($this->meta != 'notfound') ) die( 'Existing file object cannot be inserted!' );
 
-		// We need to track filepath:
-		$this->set_param( 'path', 'string', $this->_full_path );
+		// Let's make sure the bare minimum gets saved to DB:
+		$this->set_param( 'root_type', 'string', $this->_root_type );
+		$this->set_param( 'root_ID', 'integer', $this->_root_ID );
+		$this->set_param( 'path', 'string', $this->_rel_path );
 
 		// Let parent do the insert:
 		parent::dbinsert();
@@ -859,6 +899,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2005/05/11 17:53:47  fplanque
+ * started multiple roots handling in file meta data
+ *
  * Revision 1.31  2005/04/29 18:49:32  fplanque
  * Normalizing, doc, cleanup
  *
