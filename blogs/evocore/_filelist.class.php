@@ -64,7 +64,11 @@ require_once dirname(__FILE__).'/_file.class.php';
 class Filelist
 {
 	/**
-	 * Root type: 'user', 'group', 'collection' or 'absolute'
+	 * Root type: 'user', 'group', 'collection' or 'absolute'.
+	 *
+	 * All files in this list MUST have that same root type. Adding will fail otherwise.
+	 *
+	 * Note: do not override in constructor because of BAD call to constructor in FileManager
 	 * @var string
 	 * @access protected
 	 */
@@ -72,10 +76,24 @@ class Filelist
 
 	/**
 	 * Root ID: ID of the user, the group or the collection the file belongs to...
+	 *
+	 * All files in this list MUST have that same root ID. Adding will fail otherwise.
+	 *
+	 * Note: do not override in constructor because of BAD call to constructor in FileManager
 	 * @var integer
 	 * @access protected
 	 */
 	var $_root_ID = 0;
+
+	/**
+	 * root directory with ending slash, except for absolute.
+	 *
+	 * Note: do not override in constructor because of BAD call to constructor in FileManager
+	 * @todo remove exception for absolute
+	 * @param string
+	 * @access protected
+	 */
+	var $_root_dir;
 
 	/**
 	 * Path to list with trailing slash.
@@ -233,8 +251,10 @@ class Filelist
 	 * Constructor
 	 *
 	 * @param boolean|string the default path for the files, false if you want to create an arbitraty list
+	 * @param string Optional Root type: 'user', 'group', 'collection' or 'absolute'
+	 * @param integer Optional ID of the user, the group or the collection the file belongs to...
 	 */
-	function Filelist( $path = false )
+	function Filelist( $path = false, $root_type = NULL, $root_ID = NULL )
 	{
 		if( empty($path) )
 		{
@@ -245,24 +265,31 @@ class Filelist
 			$this->_list_full_path = trailing_slash( $path );
 		}
 
+		if( !is_null($root_type) )
+		{	// We want to set a root different from default:
+			$this->_root_type = $root_type;
+			$this->_root_ID = $root_ID;
+			$this->_root_dir = get_root_dir( $root_type, $root_ID );
+		}
 	}
 
 
 	/**
-	 * Loads the filelist entries.
+	 * Loads or reloads the filelist entries from the current working dir.
 	 *
 	 * @param boolean use flat mode (all files recursive without directories)
 	 */
 	function load( $flatmode = false )
 	{
 		global $Messages;
-	
+
 		if( !$this->_list_full_path )
 		{	// We have no path to load from:
-			return false;
+			die( 'Cannot load a filelist with no root path' );
+			// return false;
 		}
 
-		// Clears the list:
+		// Clears the list (for RE-loads):
 		$this->_total_entries = 0;
 		$this->_total_bytes = 0;
 		$this->_total_files = 0;
@@ -280,10 +307,10 @@ class Filelist
 		}
 
 		// Loop through file list:
-		foreach( $filepath_array as $filepath )
+		foreach( $filepath_array as $adfp_path )
 		{
 			// Extract the filename from the full path
-			$name = basename( $filepath );
+			$name = basename( $adfp_path );
 
 			// Check for hidden status...
 			if( (! $this->_show_hidden_files) && (substr($name, 0, 1) == '.') )
@@ -310,8 +337,11 @@ class Filelist
 				}
 			}
 
+			// Extract the file's relative path to the root
+			$rdfs_rel_path = substr( $adfp_path, strlen($this->_root_dir) );
+
 			// Add the file into current list:
-			$this->add_by_path( $filepath, true );
+			$this->add_by_subpath( $rdfs_rel_path, true );
 		}
 	}
 
@@ -330,14 +360,10 @@ class Filelist
 			return false;
 		}
 
-		if( $File->_root_type != $this->_root_type )
+		// Integrity check:
+		if( $File->_root_type != $this->_root_type || $File->_root_ID != $this->_root_ID )
 		{
-			die( 'Adding file to filelist: root_type mismatch!' );
-		}
-
-		if( $File->_root_ID != $this->_root_ID )
-		{
-			die( 'Adding file to filelist: root_ID mismatch!' );
+			die( 'Adding file '.$File->_root_type.':'.$File->_root_ID.':'.$File->_rel_path.' to filelist '.$this->_root_type.':'.$this->_root_ID.' : root mismatch!' );
 		}
 
 		if( $mustExist && !$File->exists() )
@@ -383,17 +409,17 @@ class Filelist
 	 *
 	 * This is a stub for {@link Filelist::add()}.
 	 *
-	 * @param string|File file name / full path or {@link File} object
+	 * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
 	 * @param boolean Has the file to exist to get added?
 	 * @return boolean true on success, false on failure (path not allowed,
 	 *                 file does not exist)
 	 * @todo optimize (blueyed)
 	 */
-	function add_by_path( $path, $mustExist = false )
+	function add_by_subpath( $rel_path, $mustExist = false )
 	{
 		global $FileCache;
 
-		$NewFile = & $FileCache->get_by_path( $path );
+		$NewFile = & $FileCache->get_by_root_and_path( $this->_root_type, $this->_root_ID, $rel_path );
 
 		return $this->add( $NewFile, $mustExist );
 	}
@@ -753,8 +779,7 @@ class Filelist
 	/**
 	 * Get the path (and name) of a {@link File} relative to the {@link Filelist::_list_full_path} list's path.
 	 *
-	 * @todo fplanque>> optimize withName by calliong File::get_full_path tight away
-	 * @todo fplanque>> check that the rootDir matches!
+	 * @todo fplanque>> optimize withName by calling File::get_full_path tight away
 	 *
 	 * @param File the File object
 	 * @param boolean appended with name? (folders will get an ending slash)
@@ -862,7 +887,7 @@ class Filelist
 	 *
 	 * Will attempt only once per file and cache the result.
 	 */
-	function load_meta( $force_creation = false )
+	function load_meta()
 	{
 		global $DB, $Debuglog, $FileCache;
 
@@ -873,11 +898,11 @@ class Filelist
 			// echo $loop_File->get_full_path();
 
 			if( $loop_File->meta != 'unknown' )
-			{ // We have already loading meta data:
+			{ // We have already loaded meta data:
 				continue;
 			}
 
-			$to_load[] = $DB->quote( $loop_File->get_full_path() );
+			$to_load[] = $DB->quote( $loop_File->get_rel_path() );
 		}
 
 		if( ! count( $to_load ) )
@@ -899,7 +924,7 @@ class Filelist
 		foreach( $rows as $row )
 		{
 			// Retrieve matching File object:
-			$loop_File = & $FileCache->get_by_path( $row->file_path );
+			$loop_File = & $FileCache->get_by_root_and_path( $row->file_root_type, $row->file_root_ID, $row->file_path );
 
 			// Associate meta data to File object:
 			$loop_File->load_meta( false, $row );
@@ -911,6 +936,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.27  2005/05/12 18:39:24  fplanque
+ * storing multi homed/relative pathnames for file meta data
+ *
  * Revision 1.26  2005/05/11 17:53:47  fplanque
  * started multiple roots handling in file meta data
  *

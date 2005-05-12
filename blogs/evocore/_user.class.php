@@ -267,7 +267,7 @@ class User extends DataObject
 
 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
 		{	// User directories are disabled:
-			$Debuglog->add( 'Attempt to access user media dir, but this feature is disabled' );
+			$Debuglog->add( 'Attempt to access user media dir, but this feature is disabled', 'files' );
 			return false;
 		}
 
@@ -299,7 +299,7 @@ class User extends DataObject
 
  		if( ! $Settings->get( 'fm_enable_roots_user' ) )
 		{	// User directories are disabled:
-			$Debuglog->add( 'Attempt to access user media URL, but this feature is disabled' );
+			$Debuglog->add( 'Attempt to access user media URL, but this feature is disabled', 'files' );
 			return false;
 		}
 
@@ -878,6 +878,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2005/05/12 18:39:24  fplanque
+ * storing multi homed/relative pathnames for file meta data
+ *
  * Revision 1.30  2005/05/11 13:21:38  fplanque
  * allow disabling of mediua dir for specific blogs
  *

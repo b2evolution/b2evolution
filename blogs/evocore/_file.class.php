@@ -201,15 +201,17 @@ class File extends DataObject
 	 * instead, which provides caching and checks that only one object for
 	 * a unique file exists (references).
 	 *
-	 * @param string path to the file / directory (with trailing slash if directory).
+	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
+	 * @param integer ID of the user, the group or the collection the file belongs to...
+	 * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
 	 * @param boolean check for meta data?
 	 * @return mixed false on failure, File object on success
 	 */
-	function File( $path, $load_meta = false )
+	function File( $root_type, $root_ID, $rel_path, $load_meta = false )
 	{
 		global $Debuglog;
 
-		$Debuglog->add( "new File( $path, load_meta=$load_meta)", 'files' );
+		$Debuglog->add( "new File( $root_type, $root_ID, $rel_path, load_meta=$load_meta)", 'files' );
 
 		// Call parent constructor
 		parent::DataObject( 'T_files', 'file_', 'file_ID', '', '', '', '' );
@@ -219,10 +221,10 @@ class File extends DataObject
 			);
 
 		// Memorize filepath:
-		$this->_root_type = 'absolute';
-		$this->_root_ID = 0;
-		$this->_rel_path = str_replace( '\\', '/', $path );
-		$this->_full_path = $this->_rel_path;
+		$this->_root_type = $root_type;
+		$this->_root_ID = $root_ID;
+		$this->_rel_path = str_replace( '\\', '/', $rel_path );
+		$this->_full_path = get_root_dir( $root_type, $root_ID ).$this->_rel_path;
 		$this->_posix_path = no_trailing_slash( $this->_full_path );
 		$this->_name = basename( $this->_posix_path );
 		$this->_dir = dirname( $this->_posix_path ).'/';
@@ -463,6 +465,19 @@ class File extends DataObject
 	function get_dir()
 	{
 		return $this->_dir;
+	}
+
+
+	/**
+	 * Get the file path relative to it's root.
+	 *
+	 * If the File is a directory, the Path ends with a /
+	 *
+	 * @return string full path
+	 */
+	function get_rel_path()
+	{
+		return $this->_rel_path;
 	}
 
 
@@ -899,6 +914,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2005/05/12 18:39:24  fplanque
+ * storing multi homed/relative pathnames for file meta data
+ *
  * Revision 1.32  2005/05/11 17:53:47  fplanque
  * started multiple roots handling in file meta data
  *

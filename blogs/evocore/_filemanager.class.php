@@ -68,7 +68,7 @@ class FileManager extends Filelist
 
 	/**
 	 * Remember the Filemanager mode we're in ('fm_upload', 'fm_cmr')
-	 * @var string
+	 * @param string
 	 */
 	var $fm_mode;
 
@@ -83,7 +83,7 @@ class FileManager extends Filelist
 
 	/**
 	 * Flat mode? (all files recursive without dirs)
-	 * @var boolean
+	 * @param boolean
 	 */
 	var $flatmode;
 
@@ -92,16 +92,9 @@ class FileManager extends Filelist
 	 *
 	 * Is also a usersetting.
 	 *
-	 * @var integer
+	 * @param integer
 	 */
 	var $forceFM;
-
-	/**
-	 * root directory
-	 * @param string
-	 * @access protected
-	 */
-	var $_root_dir;
 
 	/**
 	 * root URL
@@ -112,21 +105,21 @@ class FileManager extends Filelist
 
 	/**
 	 * relative path
-	 * @var string
+	 * @param string
 	 * @access protected
 	 */
 	var $_rel_path = '';
 
 	/**
 	 * User preference: show permissions like "ls -l" (true) or octal (false)?
-	 * @var boolean
+	 * @param boolean
 	 * @access protected
 	 */
 	var $_disp_permslikelsl = true;
 
 	/**
 	 * Obtain & Display size (width, height) for images?
-	 * @var boolean
+	 * @param boolean
 	 * @access protected
 	 */
 	var $_use_image_sizes = false;
@@ -148,7 +141,7 @@ class FileManager extends Filelist
 	/**
 	 * Evo Display mode (upload, bookmarklet, etc..)
 	 * @todo get rid of this, along with $_url_params
-	 * @var string
+	 * @param string
 	 * @access protected
 	 */
 	var $_evo_mode;
@@ -156,7 +149,7 @@ class FileManager extends Filelist
 	/**
 	 * Item to link on...
 	 * @todo get rid of this, along with $_url_params
-	 * @var integer
+	 * @param integer
 	 * @access protected
 	 */
 	var $_item_ID;
@@ -165,14 +158,14 @@ class FileManager extends Filelist
 	 * A list of selected files. Gets build on first call to
 	 * {@link getFilelistSelected()}.
 	 *
-	 * @var Filelist
+	 * @param Filelist
 	 * @access protected
 	 */
 	var $_selected_Filelist;
 
 	/**
 	 * Display template cache
-	 * @var array
+	 * @param array
 	 * @access protected
 	 */
 	var $_result_params;
@@ -180,7 +173,7 @@ class FileManager extends Filelist
 	/**
 	 * These are variables that get considered when regenerating an URL
 	 *
-	 * @var array
+	 * @param array
 	 * @access private
 	 */
 	var $_url_params = array(
@@ -251,6 +244,8 @@ class FileManager extends Filelist
 
 			if( $root_parts[0] == 'user' )
 			{
+				$this->_root_type = 'user';
+				$this->_root_ID = $this->User->ID;
 				$this->_root_dir = $this->User->getMediaDir();
 				$this->_root_url = $this->User->getMediaUrl();
 				$this->root = 'user';
@@ -258,9 +253,11 @@ class FileManager extends Filelist
 			elseif( $root_parts[0] == 'blog' && isset($root_parts[1]) )
 			{
 				$tBlog = $BlogCache->get_by_ID( $root_parts[1] );
+				$this->_root_type = 'collection';
+				$this->_root_ID = $tBlog->ID;
 				$this->_root_dir = $tBlog->get( 'mediadir' );
 				$this->_root_url = $tBlog->get( 'mediaurl' );
-				$this->root = 'blog_'.$root_parts[1];
+				$this->root = 'blog_'.$tBlog->ID;
 			}
 
 			if( !$this->_root_dir )
@@ -909,19 +906,25 @@ class FileManager extends Filelist
 	 */
 	function & getFilelistSelected()
 	{
+		global $Debuglog;
+
 		if( is_null($this->_selected_Filelist) )
 		{
-			$this->_selected_Filelist = new Filelist();
+			$this->_selected_Filelist = new Filelist( false, $this->_root_type, $this->_root_ID );
 
 			$fm_selected = param( 'fm_selected', 'array', array() );
 
+			$Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
+
 			foreach( $fm_selected as $lSelectedID )
 			{
-				if( $File =& $this->get_by_md5_ID( $lSelectedID ) )
+				// echo 'selected: looking for md5: '.$lSelectedID;
+				if( $File = & $this->get_by_md5_ID( $lSelectedID ) )
 				{
 					$this->_selected_Filelist->add( $File );
 				}
 			}
+
 		}
 
 		return $this->_selected_Filelist;
@@ -1044,11 +1047,9 @@ class FileManager extends Filelist
 	 *
 	 * @param string type; 'dir' or 'file'
 	 * @param string name of the directory or file
-	 * @param string path of the directory or file, defaults to cwd
-	 * @param integer permissions for the new directory/file (octal format)
 	 * @return false|File false on failure, File on success
 	 */
-	function createDirOrFile( $type, $name, $path = NULL, $chmod = NULL )
+	function createDirOrFile( $type, $name )
 	{
 		global $FileCache, $Settings, $Messages;
 
@@ -1072,12 +1073,6 @@ class FileManager extends Filelist
 		{
 			return false;
 		}
-		$path = ($path === NULL ? $this->cwd : trailing_slash( $path ));
-
-		if( $chmod == NULL )
-		{ // No perms were supplied:
-			$chmod = $type == 'dir' ? $this->_default_chmod_dir : $this->_default_chmod_file;
-		}
 
 		if( empty($name) )
 		{	// No name was supplied:
@@ -1094,8 +1089,11 @@ class FileManager extends Filelist
 			return false;
 		}
 
+		// Extract the cwd's relative path to the root:
+		$rds_rel_path = substr( $this->cwd, strlen($this->_root_dir) );
+
 		// Try to get File object:
-		$newFile = & $FileCache->get_by_path( $path.$name );
+		$newFile = & $FileCache->get_by_root_and_path( $this->_root_type, $this->_root_ID, $rds_rel_path.$name );
 
 		if( $newFile->exists() )
 		{
@@ -1103,6 +1101,7 @@ class FileManager extends Filelist
 			return false;
 		}
 
+		// not used... $chmod = $type == 'dir' ? $this->_default_chmod_dir : $this->_default_chmod_file;
 		if( $newFile->create( $type ) )
 		{
 			if( $type == 'file' )
@@ -1120,11 +1119,11 @@ class FileManager extends Filelist
 		{
 			if( $type == 'file' )
 			{
-				$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $path ) );
+				$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $rds_rel_path ) );
 			}
 			else
 			{
-				$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $path ) );
+				$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $rds_rel_path ) );
 			}
 		}
 
@@ -1369,6 +1368,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.43  2005/05/12 18:39:24  fplanque
+ * storing multi homed/relative pathnames for file meta data
+ *
  * Revision 1.42  2005/05/11 17:53:47  fplanque
  * started multiple roots handling in file meta data
  *

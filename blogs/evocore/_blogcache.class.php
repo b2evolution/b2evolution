@@ -175,7 +175,7 @@ class BlogCache extends DataObjectCache
 		}
 		$bloglist = $DB->get_col( 'SELECT bloguser_blog_ID
 																FROM T_blogusers
-																'.$where, 0, 'Get user log list' );
+																'.$where, 0, 'Get user blog list' );
 
 		$this->load_list( implode( ',', $bloglist ) );
 
@@ -224,6 +224,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.10  2005/05/12 18:39:24  fplanque
+ * storing multi homed/relative pathnames for file meta data
+ *
  * Revision 1.9  2005/05/11 13:21:38  fplanque
  * allow disabling of mediua dir for specific blogs
  *

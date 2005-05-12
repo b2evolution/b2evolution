@@ -107,6 +107,8 @@ function bytesreadable( $bytes )
  * directory, either flat (one-dimensional array) or multi-dimensional (then
  * dirs are the keys and hold subdirs/files).
  *
+ * Note: there is no ending slash on dir names returned.
+ *
  * @param string the path to start
  * @param boolean include files (not only directories)
  * @param boolean include directories (not the directory itself!)
@@ -424,8 +426,39 @@ function isFilename( $filename )
 	return (boolean)preg_match( ':'.str_replace( ':', '\:', $Settings->get( 'regexp_filename' ) ).':', $filename );
 }
 
+
+/**
+ * @param string Root type: 'user', 'group', 'collection' or 'absolute'
+ * @param integer ID of the user, the group or the collection the file belongs to...
+ * @return
+ */
+function get_root_dir( $root_type, $root_ID )
+{
+	global $UserCache, $BlogCache;
+
+	switch( $root_type )
+	{
+		case 'user':
+			$User = & $UserCache->get_by_ID( $root_ID );
+			return $User->getMediaDir();
+
+		case 'collection':
+			$Blog = & $BlogCache->get_by_ID( $root_ID );
+			return $Blog->get( 'mediadir' );
+
+		case 'absolute':
+			return '';
+	}
+
+	die( "Root dir for type=$root_type not supported" );
+}
+
+
 /*
  * $Log$
+ * Revision 1.16  2005/05/12 18:39:24  fplanque
+ * storing multi homed/relative pathnames for file meta data
+ *
  * Revision 1.15  2005/04/29 18:49:32  fplanque
  * Normalizing, doc, cleanup
  *

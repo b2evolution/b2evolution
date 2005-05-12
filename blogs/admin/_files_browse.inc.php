@@ -169,10 +169,10 @@ else
 		if( count($rootlist) > 1 )
 		{ // provide list of roots to choose from
 			echo '<div id="fmbar_roots">';
-			echo '<select name="root_and_path" onchange="this.form.submit()">';
+			echo '<select name="new_root" onchange="this.form.submit();">';
 			foreach( $rootlist as $lroot )
 			{
-				echo '<option value="'.format_to_output( serialize( array( 'root' => $lroot['id'], 'path' => '' ) ), 'formvalue' ).'"';
+				echo '<option value="'.$lroot['id'].'"';
 
 				if( $Fileman->root == $lroot['id'] )
 				{
@@ -789,6 +789,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.32  2005/05/12 18:39:24  fplanque
+ * storing multi homed/relative pathnames for file meta data
+ *
  * Revision 1.31  2005/05/11 15:58:30  fplanque
  * cleanup
  *

@@ -46,11 +46,11 @@ require_once dirname(__FILE__).'/_dataobjectcache.class.php';
 class FileCache extends DataObjectCache
 {
 	/**
-	 * Cache for path -> File object reference
+	 * Cache for 'root_type:root_ID:relative_path' -> File object reference
 	 * @access private
 	 * @var array
 	 */
-	var $cache_path = array();
+	var $cache_root_and_path = array();
 
 	/**
 	 * Constructor
@@ -65,22 +65,28 @@ class FileCache extends DataObjectCache
 	 * Creates an object of the {@link File} class, while providing caching
 	 * and making sure that only one reference to a file exists.
 	 *
-	 * @param string pathname of the file or directory (with trailing slash if directory)
+	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
+	 * @param integer ID of the user, the group or the collection the file belongs to...
+	 * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
 	 * @param boolean check for meta data?
 	 * @return File an {@link File} object
 	 */
-	function & get_by_path( $path, $load_meta = false )
+	function & get_by_root_and_path( $root_type, $root_ID, $rel_path, $load_meta = false )
 	{
 		global $Debuglog, $cache_File;
 
-		$path = str_replace( '\\', '/', $path );
+		if( is_windows() )
+		{
+			$rel_path = strtolower(str_replace( '\\', '/', $rel_path ));
+		}
 
-		$cacheindex = is_windows() ? strtolower($path) : $path;
+		// Generate cahce key for this file:
+		$cacheindex = $root_type.':'.$root_ID.':'.$rel_path;
 
-		if( isset( $this->cache_path[$cacheindex] ) )
+		if( isset( $this->cache_root_and_path[$cacheindex] ) )
 		{	// Already in cache
-			$Debuglog->add( 'File retrieved from cache: '.$path );
-			$File = & $this->cache_path[$cacheindex];
+			$Debuglog->add( 'File retrieved from cache: '.$cacheindex, 'files' );
+			$File = & $this->cache_root_and_path[$cacheindex];
 			if( $load_meta )
 			{	// Make sure meta is loaded:
 				$File->load_meta();
@@ -88,9 +94,9 @@ class FileCache extends DataObjectCache
 		}
 		else
 		{	// Not in cache
-			$Debuglog->add( 'File not in cache: '.$path );
-			$File = & new File( $path, $load_meta );
-			$this->cache_path[$cacheindex] = & $File;
+			$Debuglog->add( 'File not in cache: '.$cacheindex, 'files' );
+			$File = new File( $root_type, $root_ID, $rel_path, $load_meta ); // COPY !!
+			$this->cache_root_and_path[$cacheindex] = & $File;
 		}
 		return $File;
 	}
@@ -99,6 +105,9 @@ class FileCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.3  2005/05/12 18:39:24  fplanque
+ * storing multi homed/relative pathnames for file meta data
+ *
  * Revision 1.2  2005/04/26 18:19:25  fplanque
  * no message
  *

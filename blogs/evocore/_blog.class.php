@@ -340,7 +340,7 @@ class Blog extends DataObject
 		switch( $this->media_location )
 		{
 			case 'none':
-				$Debuglog->add( 'Attempt to access blog media dir, but this feature is disabled for this blog' );
+				$Debuglog->add( 'Attempt to access blog media dir, but this feature is disabled for this blog', 'files' );
 				return false;
 
 			case 'default':
@@ -390,7 +390,7 @@ class Blog extends DataObject
 			case 'mediaurl':
 		 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 				{	// User directories are disabled:
-					$Debuglog->add( 'Attempt to access blog media URL, but this feature is disabled' );
+					$Debuglog->add( 'Attempt to access blog media URL, but this feature is disabled', 'files' );
 					return false;
 				}
 
@@ -691,6 +691,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2005/05/12 18:39:24  fplanque
+ * storing multi homed/relative pathnames for file meta data
+ *
  * Revision 1.18  2005/05/11 13:21:38  fplanque
  * allow disabling of mediua dir for specific blogs
  *

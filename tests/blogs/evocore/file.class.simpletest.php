@@ -43,7 +43,7 @@ class FileTestCase extends FilemanUnitTestCase
 	{
 		$filePath = $this->createTempFile( '1234' );
 
-		$File = new File( basename( $filePath ), dirname( $filePath ) );
+		$File = new File( 'absolute', 0, basename( $filePath ), dirname( $filePath ) );
 
 		$this->assertTrue( $File->exists(), 'File exists' );
 
@@ -58,7 +58,7 @@ class FileTestCase extends FilemanUnitTestCase
 	{
 		@unlink( TMPDIR.'tempfile.tmp' );
 
-		$File = new File( 'tempfile.tmp', TMPDIR );
+		$File = new File( 'absolute', 0, 'tempfile.tmp', TMPDIR );
 		$this->assertFalse( $File->exists(), 'File does not exist.' );
 
 		$File->create();
@@ -78,11 +78,11 @@ class FileTestCase extends FilemanUnitTestCase
 	 */
 	function testIsDir()
 	{
-		$Dir = new File( basename(TMPDIR), dirname(TMPDIR) );
+		$Dir = new File( 'absolute', 0, basename(TMPDIR), dirname(TMPDIR) );
 		$this->assertTrue( $Dir->is_dir(), 'Dir is dir.' );
 
 		$this->tempName = tempnam( 'temp', 'TMP' );
-		$File = new File( basename( $this->tempName ), TMPDIR );
+		$File = new File( 'absolute', 0, basename( $this->tempName ), TMPDIR );
 		$this->assertFalse( $File->is_dir(), 'File is no dir.' );
 	}
 
@@ -92,10 +92,10 @@ class FileTestCase extends FilemanUnitTestCase
 	 */
 	function testGetExt()
 	{
-		$File =& new File( 'abc.def', TMPDIR );
+		$File =& new File( 'absolute', 0, 'abc.def', TMPDIR );
 		$this->assertEqual( $File->get_ext(), 'def', 'Simple file extension recognized.' );
 
-		$File =& new File( 'abc.noext.def', TMPDIR );
+		$File =& new File( 'absolute', 0, 'abc.noext.def', TMPDIR );
 		$this->assertEqual( $File->get_ext(), 'def', 'File extension recognized.' );
 	}
 }

@@ -94,6 +94,12 @@ else
 {
 	param( 'root', 'string', NULL, true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
 	param( 'path', 'string', '/', true );  // the path relative to the root dir
+	if( param( 'new_root', 'string', '' )
+		&& $new_root != $root )
+	{	// We have changed root in the select list
+		$root = $new_root;
+		$path = '';
+	}
 }
 
 param( 'order', 'string', NULL, true );
@@ -103,7 +109,7 @@ param( 'filterIsRegexp', 'integer', NULL, true );
 param( 'flatmode', '', NULL, true );
 param( 'action', 'string', '', true );     // 3.. 2.. 1.. action :)
 if( empty($action) )
-{ // check f*cking IE syntax, which send input[image] submits without value, only name.x and name.y
+{ // TODO: check f*cking IE syntax, which send input[image] submits without value, only name.x and name.y
 	$action = array_pop( array_keys( param( 'actionArray', 'array', array(), true ) ) );
 }
 
@@ -191,7 +197,7 @@ $Fileman->load();
 /**
  * @var Filelist the selected files
  */
-$SelectedFiles =& $Fileman->getFilelistSelected();
+$selected_Filelist = & $Fileman->getFilelistSelected();
 
 
 if( !empty($action) )
@@ -218,7 +224,7 @@ if( !empty($action) )
 		/*
 		case T_('Send by mail'):
 			// TODO: implement
-			if( !$SelectedFiles->count() )
+			if( !$selected_Filelist->count() )
 			{
 				$Messages->add( T_('Nothing selected.') );
 				break;
@@ -233,7 +239,7 @@ if( !empty($action) )
 			// TODO: provide optional zip formats
 			$action_title = T_('Download');
 
-			if( !$SelectedFiles->count() )
+			if( !$selected_Filelist->count() )
 			{
 				$Messages->add( T_('Nothing selected.') );
 				break;
@@ -250,7 +256,7 @@ if( !empty($action) )
 					."\n"
 					.T_('You want to download:')
 					.'<ul>'
-					.'<li>'.implode( "</li>\n<li>", $SelectedFiles->get_array( 'get_prefixed_name' ) )."</li>\n"
+					.'<li>'.implode( "</li>\n<li>", $selected_Filelist->get_array( 'get_prefixed_name' ) )."</li>\n"
 					.'</ul>
 
 					<form action="files.php" class="fform" method="post">
@@ -263,7 +269,7 @@ if( !empty($action) )
 						<legend>'.T_('Download options').'</legend>
 						'
 						.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the name of the file which will get sent to you."), 80, '', 'text', false )."\n"
-						.( $SelectedFiles->count_dirs() ?
+						.( $selected_Filelist->count_dirs() ?
 								form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n" :
 								'' )
 						.'
@@ -280,7 +286,7 @@ if( !empty($action) )
 			{ // Downloading
 				require dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php';
 
-				$arraylist = $SelectedFiles->get_array( 'getname' );
+				$arraylist = $selected_Filelist->get_array( 'getname' );
 
 				$options = array (
 					'basedir' => $Fileman->cwd,
@@ -304,8 +310,8 @@ if( !empty($action) )
 			// Check permission:
 			$current_User->check_perm( 'files', 'edit', true );
 
-			// delete a file/dir {{{
-			if( !$SelectedFiles->count() )
+			// delete a file/dir
+			if( ! $selected_Filelist->count() )
 			{
 				$Messages->add( T_('Nothing selected.') );
 				break;
@@ -327,7 +333,7 @@ if( !empty($action) )
 						.$Fileman->getFormHiddenInputs()."\n";
 
 
-				$action_msg .= $SelectedFiles->count() > 1 ?
+				$action_msg .= $selected_Filelist->count() > 1 ?
 												T_('Do you really want to delete the following files?') :
 												T_('Do you really want to delete the following file?');
 
@@ -339,9 +345,9 @@ if( !empty($action) )
 				$can_confirm = true;
 
 				// make sure we have loaded metas for all files in selection!
-				$SelectedFiles->load_meta();
+				$selected_Filelist->load_meta();
 
-				foreach( $SelectedFiles->_entries as $lFile )
+				foreach( $selected_Filelist->_entries as $lFile )
 				{
 					$action_msg .= '<li>'.$lFile->get_prefixed_name();
 
@@ -395,8 +401,8 @@ if( !empty($action) )
 			}
 			else
 			{
-				$SelectedFiles->restart();
-				while( $lFile =& $SelectedFiles->get_next() )
+				$selected_Filelist->restart();
+				while( $lFile =& $selected_Filelist->get_next() )
 				{
 					if( !$Fileman->unlink( $lFile, isset( $delsubdirs[$lFile->get_md5_ID()] ) ) ) // handles Messages
 					{
@@ -404,8 +410,6 @@ if( !empty($action) )
 					}
 				}
 			}
-
-			// }}}
 			break;
 
 
@@ -415,7 +419,7 @@ if( !empty($action) )
 			// Check permission:
 			$current_User->check_perm( 'files', 'view', true );
 
-			$selectedFile = & $SelectedFiles->getFileByIndex(0);
+			$selectedFile = & $selected_Filelist->getFileByIndex(0);
 			// Load meta data:
 			$selectedFile->load_meta();
 
@@ -429,7 +433,7 @@ if( !empty($action) )
 			// Check permission:
 			$current_User->check_perm( 'files', 'edit', true );
 
-			$selectedFile = & $SelectedFiles->getFileByIndex(0);
+			$selectedFile = & $selected_Filelist->getFileByIndex(0);
 			// Load meta data:
 			$selectedFile->load_meta();
 
@@ -449,7 +453,7 @@ if( !empty($action) )
 			// TODO: check perm!!
 
 			// Link File to Item:
-			if( !$SelectedFiles->count() )
+			if( !$selected_Filelist->count() )
 			{
 				$Messages->add( T_('Nothing selected.') );
 				break;
@@ -463,7 +467,7 @@ if( !empty($action) )
 
 			// TODO: check item EDIT permissions!
 
-			$selectedFile = & $SelectedFiles->getFileByIndex(0);
+			$selectedFile = & $selected_Filelist->getFileByIndex(0);
 
 			$DB->begin();
 
@@ -512,7 +516,7 @@ if( !empty($action) )
 			// fplanque>> TODO: as long as we use fm_modes this thing should at least work like a mode or at the bare minimun, turn off any active mode.
 			$action_title = T_('Change permissions');
 
-			if( !$SelectedFiles->count() )
+			if( !$selected_Filelist->count() )
 			{
 				$Messages->add( T_('Nothing selected.') );
 				break;
@@ -522,8 +526,8 @@ if( !empty($action) )
 
 			if( count( $perms ) )
 			{ // Change perms
-				$SelectedFiles->restart();
-				while( $lFile = & $SelectedFiles->get_next() )
+				$selected_Filelist->restart();
+				while( $lFile = & $selected_Filelist->get_next() )
 				{
 					$chmod = $perms[ $lFile->get_md5_ID() ];
 
@@ -559,11 +563,11 @@ if( !empty($action) )
 
 				if( is_windows() )
 				{ // WINDOWS read/write permissons:
-					if( $SelectedFiles->count() > 1 )
+					if( $selected_Filelist->count() > 1 )
 					{ // more than one file, provide default
 
 					}
-					foreach( $SelectedFiles->get_array() as $lFile )
+					foreach( $selected_Filelist->get_array() as $lFile )
 					{
 						$action_msg .= "\n".$Fileman->get_relative_path( $lFile ).':<br />
 						<input id="perms_readonly_'.$lFile->get_md5_ID().'"
@@ -606,7 +610,7 @@ if( !empty($action) )
 
 		case 'file_cmr':
 			// copy/move/rename - we come here from the "with selected" toolbar {{{
-			#pre_dump( $SelectedFiles );
+			#pre_dump( $selected_Filelist );
 
 			// }}}
 			break;
@@ -616,13 +620,13 @@ if( !empty($action) )
 			// ------------------------
 			// default action (view):
 			// ------------------------
-			if( !$SelectedFiles->count() )
+			if( !$selected_Filelist->count() )
 			{
 				$Messages->add( T_('Nothing selected.') );
 				break;
 			}
 
-			$selectedFile = & $SelectedFiles->getFileByIndex(0);
+			$selectedFile = & $selected_Filelist->getFileByIndex(0);
 
 			// Load meta data:
 			$selectedFile->load_meta();
@@ -1061,7 +1065,7 @@ switch( $Fileman->fm_mode )
 		function file_exp( & $row )
 		{
 			// Instantiate a File object for this line:
-			$current_File = & new File( $row->file_path );
+			$current_File = & new File( $row->root_type, $row->root_ID, $row->file_path );
 			// Flow meta data into File object:
 			$current_File->load_meta( false, $row );
 
@@ -1196,6 +1200,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.105  2005/05/12 18:39:24  fplanque
+ * storing multi homed/relative pathnames for file meta data
+ *
  * Revision 1.104  2005/05/11 15:58:30  fplanque
  * cleanup
  *

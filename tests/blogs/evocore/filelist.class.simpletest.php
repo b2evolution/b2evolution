@@ -46,7 +46,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 
 		$this->assertEqual( $this->Filelist->count(), 1, 'Filecount matches.' );
 
-		$File = & $this->Filelist->get_by_path( TMPDIR.'a' );
+		$File = & $this->Filelist->get_by_root_and_path( 'absolute', 0, TMPDIR.'a' );
 		$this->assertIsA( $File, 'file', 'We got a File.' );
 
 		$this->assertEqual( $File->get_name(), 'a', 'File has the same name.' );
@@ -58,7 +58,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 	 */
 	function testFileReference()
 	{
-		$File = new File( 'a', TMPDIR );
+		$File = new File( 'absolute', 0, 'a', TMPDIR );
 		$id = $File->get_md5_ID();
 
 		$r = $this->Filelist->add( $File );
@@ -77,7 +77,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 	 */
 	function testRemoveFromList()
 	{
-		$File =& new File( 'a', TMPDIR );
+		$File =& new File( 'absolute', 0, 'a', TMPDIR );
 		$r = $this->Filelist->add( $File );
 
 		$this->assertEqual( $r, true, 'File added.' );
@@ -92,8 +92,8 @@ class FilelistTestCase extends FilemanUnitTestCase
 	 */
 	function testRemoveFromListOrder()
 	{
-		$FileA = new File( 'a', TMPDIR );
-		$FileB = new File( 'b', TMPDIR );
+		$FileA = new File( 'absolute', 0, 'a', TMPDIR );
+		$FileB = new File( 'absolute', 0, 'b', TMPDIR );
 		$r = $this->Filelist->add( $FileA );
 		$r = $this->Filelist->add( $FileB );
 
@@ -114,11 +114,11 @@ class FilelistTestCase extends FilemanUnitTestCase
 	 */
 	function testSort()
 	{
-		$FileA = new File( 'a', TMPDIR );
+		$FileA = new File( 'absolute', 0, 'a', TMPDIR );
 		$this->Filelist->add( $FileA );
-		$FileB = new File( 'b', TMPDIR );
+		$FileB = new File( 'absolute', 0, 'b', TMPDIR );
 		$this->Filelist->add( $FileB );
-		$FileC = new File( 'c', TMPDIR );
+		$FileC = new File( 'absolute', 0, 'c', TMPDIR );
 		$this->Filelist->add( $FileC );
 
 
