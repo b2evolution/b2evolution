@@ -134,7 +134,7 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 <form action="files.php#FM_anchor" name="FilesForm" id="FilesForm" method="post">
 <input type="hidden" name="confirmed" value="0" />
 <input type="hidden" name="md5_filelist" value="<?php echo $Fileman->md5_checksum() ?>" />
-<input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->cwd) ?>" />
+<input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->get_ads_list_path()) ?>" />
 <?php echo $Fileman->getFormHiddenInputs(); ?>
 
 
@@ -311,7 +311,7 @@ while( $lFile = & $Fileman->get_next() )
 	if( $Fileman->flatmode )
 	{
 		echo '<td class="filepath">';
-		echo $Fileman->get_relative_path( $lFile, false );
+		echo $Fileman->get_rdfs_path_relto_root( $lFile, false );
 		echo '</td>';
 	}
 
@@ -354,7 +354,7 @@ while( $lFile = & $Fileman->get_next() )
 	/*
 	if( $Fileman->flatmode && $Fileman->get_sort_order() != 'name' )
 	{	// Display directory name
-		echo './'.$Fileman->get_relative_path( $lFile );
+		echo './'.$Fileman->get_rdfs_path_relto_root( $lFile );
 	}
 	else
 	*/
@@ -383,7 +383,7 @@ while( $lFile = & $Fileman->get_next() )
 	{
 		?>
 		<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
-		$subPath = $Fileman->get_relative_path( $lFile, false );
+		$subPath = $Fileman->get_rdfs_path_relto_root( $lFile, false );
 		if( empty( $subPath ) )
 		{
 			$subPath = './';
@@ -789,6 +789,11 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.33  2005/05/13 16:49:17  fplanque
+ * Finished handling of multiple roots in storing file data.
+ * Also removed many full paths passed through URL requests.
+ * No full path should ever be seen by the user (only the admins).
+ *
  * Revision 1.32  2005/05/12 18:39:24  fplanque
  * storing multi homed/relative pathnames for file meta data
  *

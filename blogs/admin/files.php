@@ -289,7 +289,7 @@ if( !empty($action) )
 				$arraylist = $selected_Filelist->get_array( 'getname' );
 
 				$options = array (
-					'basedir' => $Fileman->cwd,
+					'basedir' => $Fileman->get_ads_list_path(),
 					'inmemory' => 1,
 					'recurse' => 1-$exclude_sd,
 				);
@@ -569,7 +569,7 @@ if( !empty($action) )
 					}
 					foreach( $selected_Filelist->get_array() as $lFile )
 					{
-						$action_msg .= "\n".$Fileman->get_relative_path( $lFile ).':<br />
+						$action_msg .= "\n".$lFile->get_rel_path().':<br />
 						<input id="perms_readonly_'.$lFile->get_md5_ID().'"
 							name="perms['.$lFile->get_md5_ID().']"
 							type="radio"
@@ -793,7 +793,8 @@ switch( $Fileman->fm_mode )
 				}
 
 				// Get File object for requested target location:
-				$newFile = & $FileCache->get_by_path( $Fileman->cwd.$newName, true );
+				$newFile = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(),
+																												$Fileman->get_rds_list_path().$newName, true );
 
 				if( $newFile->exists() )
 				{	// The file already exists in the target location!
@@ -895,7 +896,8 @@ switch( $Fileman->fm_mode )
 				{
 					$LogCmr->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $newname ) );
 				}
-				elseif( ($TargetFile = & $FileCache->get_by_path( $Fileman->cwd.$newname ))
+				elseif( ($TargetFile = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(),
+																																		$Fileman->get_rds_list_path().$newname ))
 								&& $TargetFile->exists() )
 				{ // target filename already given to another file
 					if( $TargetFile === $SourceFile )
@@ -931,7 +933,7 @@ switch( $Fileman->fm_mode )
 						{ // move/rename
 							if( $Fileman->unlink( $SourceFile ) )
 							{
-								if( $SourceFile->get_dir() == $Fileman->cwd )
+								if( $SourceFile->get_dir() == $Fileman->get_ads_list_path() )
 								{ // successfully renamed
 									$Messages->add( sprintf( T_('Renamed &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																										basename($oldpath),
@@ -948,7 +950,7 @@ switch( $Fileman->fm_mode )
 							else
 							{
 								$LogCmr->add( sprintf( T_('Could not remove &laquo;%s&raquo;, but the file has been copied to &laquo;%s&raquo;.'),
-																			($SourceFile->get_dir() == $Fileman->cwd ?
+																			($SourceFile->get_dir() == $Fileman->get_ads_list_path() ?
 																				basename($oldpath) :
 																				$oldpath ),
 																			$TargetFile->get_name() ) );
@@ -958,7 +960,7 @@ switch( $Fileman->fm_mode )
 						{ // copy only
 							$Messages->add( sprintf(
 								T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-								( $SourceFile->get_dir() == $Fileman->cwd ?
+								( $SourceFile->get_dir() == $Fileman->get_ads_list_path() ?
 										$SourceFile->get_name() :
 										$SourceFile->get_full_path() ),
 								$TargetFile->get_name() ), 'note' );
@@ -1115,7 +1117,7 @@ switch( $Fileman->fm_mode )
 			&& opener.document.FilesForm
 			&& typeof(opener.document.FilesForm.md5_filelist.value) != 'undefined'
 			&& typeof(opener.document.FilesForm.md5_cwd.value) != 'undefined'
-			&& opener.document.FilesForm.md5_cwd.value == '<?php echo md5($Fileman->cwd); ?>'
+			&& opener.document.FilesForm.md5_cwd.value == '<?php echo md5($Fileman->get_ads_list_path()); ?>'
 		)
 	{
 		opener.document.getElementById( 'fm_reloadhint' ).style.display =
@@ -1200,6 +1202,11 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.106  2005/05/13 16:49:17  fplanque
+ * Finished handling of multiple roots in storing file data.
+ * Also removed many full paths passed through URL requests.
+ * No full path should ever be seen by the user (only the admins).
+ *
  * Revision 1.105  2005/05/12 18:39:24  fplanque
  * storing multi homed/relative pathnames for file meta data
  *

@@ -209,7 +209,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	else
 	{
 		Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'),
-																		$Fileman->get_relative_path( $selectedFile ) ), 'error' );
+																		$Fileman->get_rdfs_path_relto_root( $selectedFile ) ), 'error' );
 	}
 
 	debug_info();

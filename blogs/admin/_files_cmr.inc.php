@@ -78,7 +78,7 @@ $Form->begin_form( 'fform', T_('Copy / Move / Rename') );
 
 	while( $lSourceFile = & $Fileman->SourceList->get_next() )
 	{
-		if( $sourcesInSameDir && $lSourceFile->get_dir() != $Fileman->cwd )
+		if( $sourcesInSameDir && $lSourceFile->get_dir() != $Fileman->get_ads_list_path() )
 		{
 			$sourcesInSameDir = false;
 		}
@@ -171,6 +171,11 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.5  2005/05/13 16:49:17  fplanque
+ * Finished handling of multiple roots in storing file data.
+ * Also removed many full paths passed through URL requests.
+ * No full path should ever be seen by the user (only the admins).
+ *
  * Revision 1.4  2005/04/29 18:49:32  fplanque
  * Normalizing, doc, cleanup
  *

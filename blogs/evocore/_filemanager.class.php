@@ -50,6 +50,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 require_once dirname(__FILE__).'/_filelist.class.php';
 
+if( false )
+{	/**
+	 * This is ugly, sorry, but I temporarily need this until NuSphere fixes their CodeInsight :'(
+	 */
+	include('_header.php');
+}
 
 /**
  * Extends {@link Filelist} and provides file management functionality.
@@ -73,15 +79,6 @@ class FileManager extends Filelist
 	var $fm_mode;
 
 	/**
-	 * Current working directory WITH trailing slash.
-	 *
-	 * $root_dir/$path
-	 *
-	 * @param string
-	 */
-	var $cwd;
-
-	/**
 	 * Flat mode? (all files recursive without dirs)
 	 * @param boolean
 	 */
@@ -102,13 +99,6 @@ class FileManager extends Filelist
 	 * @access protected
 	 */
 	var $_root_url;
-
-	/**
-	 * relative path
-	 * @param string
-	 * @access protected
-	 */
-	var $_rel_path = '';
 
 	/**
 	 * User preference: show permissions like "ls -l" (true) or octal (false)?
@@ -178,7 +168,7 @@ class FileManager extends Filelist
 	 */
 	var $_url_params = array(
 			'root'           => 'root',
-			'path'           => '_rel_path',
+			'path'           => '_rds_list_path',
 			'filterString'   => '_filter',
 			'filterIsRegexp' => '_filter_is_regexp',
 			'order'          => '_order',
@@ -228,14 +218,16 @@ class FileManager extends Filelist
 
 			if( count($root_array) )
 			{	// We found at least one media dir:
-				$this->_root_dir = $root_array[0]['path'];
+				$this->_root_type = $root_array[0]['type'];
+				$this->_root_ID = $root_array[0]['IDn'];
+				$this->_ads_root_path = $root_array[0]['path'];
 				$this->_root_url = $root_array[0]['url'];
 				$this->root = $root_array[0]['id'];
 			}
 			else
 			{
 				$Messages->add( T_('You don\'t have access to any root directory.'), 'error' );
-				$this->cwd = NULL;
+				$this->_ads_list_path = false;
 			}
 		}
 		else
@@ -246,7 +238,7 @@ class FileManager extends Filelist
 			{
 				$this->_root_type = 'user';
 				$this->_root_ID = $this->User->ID;
-				$this->_root_dir = $this->User->getMediaDir();
+				$this->_ads_root_path = $this->User->getMediaDir();
 				$this->_root_url = $this->User->getMediaUrl();
 				$this->root = 'user';
 			}
@@ -255,58 +247,59 @@ class FileManager extends Filelist
 				$tBlog = $BlogCache->get_by_ID( $root_parts[1] );
 				$this->_root_type = 'collection';
 				$this->_root_ID = $tBlog->ID;
-				$this->_root_dir = $tBlog->get( 'mediadir' );
+				$this->_ads_root_path = $tBlog->get( 'mediadir' );
 				$this->_root_url = $tBlog->get( 'mediaurl' );
 				$this->root = 'blog_'.$tBlog->ID;
 			}
 
-			if( !$this->_root_dir )
+			if( ! $this->_ads_root_path )
 			{
 				$Messages->add( T_('You don\'t have access to the requested root directory.'), 'error' );
-				$this->cwd = NULL;
+				$this->_ads_list_path = false;
 			}
 		}
 
-		if( $this->_root_dir )
+		if( $this->_ads_root_path )
 		{	// We have access to a/requested root dir:
 
-			list( $real_root_dir, $real_root_dir_exists ) = str2path( $this->_root_dir );
-			$Debuglog->add( 'FM: real_root_dir: '.var_export( $real_root_dir, true ), 'files' );
+			list( $_ads_real_root_path, $real_root_path_exists ) = check_canonical_path( $this->_ads_root_path );
+			$Debuglog->add( 'FM: real_root_dir: '.var_export( $_ads_real_root_path, true ), 'files' );
 
-			if( !$real_root_dir_exists )
+			if( !$real_root_path_exists )
 			{
-				$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $this->_root_dir ), 'error' );
-				$this->cwd = NULL;
+				$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $this->_ads_root_path ), 'error' );
+				$this->_ads_list_path = false;
 			}
 			else
-			{
-				$this->cwd = trailing_slash( $this->_root_dir.$path );
+			{	// Root exists
+				// Let's get into requested list dir...
+				$this->_ads_list_path = trailing_slash( $this->_ads_root_path.$path );
+
 				// get real cwd
+				list( $_ads_real_list_path, $realpath_exists ) = check_canonical_path( $this->_ads_list_path );
 
-				list( $realpath, $realpath_exists ) = str2path( $this->cwd );
 
-
-				if( !preg_match( '#^'.$this->_root_dir.'#', $realpath ) )
+				if( ! preg_match( '#^'.$this->_ads_root_path.'#', $_ads_real_list_path ) )
 				{ // cwd is not below root!
 					$Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
-					$this->cwd = $this->_root_dir;
+					$this->_ads_list_path = $this->_ads_root_path;
 				}
 				else
 				{ // allowed
 					if( !$realpath_exists )
 					{ // does not exist
-						$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $this->cwd ) );
-						$this->cwd = NULL;
+						$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $this->_ads_list_path ) );
+						$this->_ads_list_path = NULL;
 					}
 					else
-					{
-						$this->cwd = $realpath;
+					{ // Okay we can list this directory...
+						$this->_ads_list_path = $_ads_real_list_path;
 					}
 				}
 			}
 
-			// Get the subpath relative to root
-			$this->_rel_path = preg_replace( '#^'.$this->_root_dir.'#', '', $this->cwd );
+			// Finish initializing:
+			parent::Filelist( NULL, NULL, NULL ); // Do not override anuthing
 		}
 
 
@@ -324,12 +317,13 @@ class FileManager extends Filelist
 
 		if( $this->fm_mode && $this->fm_sources = param( 'fm_sources', 'array', array() ) )
 		{
-			if( $this->SourceList = & new Filelist() )
+			if( $this->SourceList = & new Filelist( $this->_ads_root_path, $this->_root_type, $this->_root_ID ) )
 			{ // TODO: should fail for non-existant sources, or sources where no read-perm
 
 				foreach( $this->fm_sources as $lSourcePath )
 				{
-					$this->SourceList->add_by_path( urldecode($lSourcePath) );
+					// echo '<br>'.$lSourcePath;
+					$this->SourceList->add_by_subpath( urldecode($lSourcePath) );
 				}
 				$this->cmr_keepsource = param( 'cmr_keepsource', 'integer', 0 );
 			}
@@ -355,10 +349,10 @@ class FileManager extends Filelist
 		$this->loadSettings();
 
 		$Debuglog->add( 'FM root: '.var_export( $this->root, true ), 'files' );
-		$Debuglog->add( 'FM root_dir: '.var_export( $this->_root_dir, true ), 'files' );
+		$Debuglog->add( 'FM _ads_root_path: '.var_export( $this->_ads_root_path, true ), 'files' );
 		$Debuglog->add( 'FM root_url: '.var_export( $this->_root_url, true ), 'files' );
-		$Debuglog->add( 'FM cwd: '.var_export( $this->cwd, true ), 'files' );
-		$Debuglog->add( 'FM _rel_path: '.var_export( $this->_rel_path, true ), 'files' );
+		$Debuglog->add( 'FM _ads_list_path: '.var_export( $this->_ads_list_path, true ), 'files' );
+		$Debuglog->add( 'FM _rds_list_path: '.var_export( $this->_rds_list_path, true ), 'files' );
 
 		$this->flatmode = $flatmode;
 
@@ -372,15 +366,10 @@ class FileManager extends Filelist
 	/**
 	 * Load current directory contents.
 	 *
-	 * Calls the parent constructor, loads and rewinds the filelist, loads meta data.
-	 *
-	 * fplanque>> This is B.A.D. design. The parent constructor should never be called from anywhere else
-	 * as from the derived constructor. The Filelist here should probabmy be a property and not a baseclass.
+	 * Loads and rewinds the filelist, loads meta data.
 	 */
 	function load()
 	{
-		parent::Filelist( $this->cwd );
-
 		// Load files from current working dir:
 		parent::load( $this->flatmode );
 		parent::restart();
@@ -429,12 +418,12 @@ class FileManager extends Filelist
 	 */
 	function dispButtonParent()
 	{
-		if( empty($this->_rel_path) )
+		if( empty($this->_rds_list_path) )
 		{ // cannot go higher
 			return '&nbsp;';	// for IE
 		}
 
-		echo '<a title="'.T_('Go to parent folder').'" href="'.$this->getCurUrl( array( 'path' => $this->_rel_path.'..' ) ).'">'
+		echo '<a title="'.T_('Go to parent folder').'" href="'.$this->getCurUrl( array( 'path' => $this->_rds_list_path.'..' ) ).'">'
 						.get_icon( 'folder_parent' ).'</a>';
 	}
 
@@ -496,7 +485,7 @@ class FileManager extends Filelist
 		$url = $this->getCurUrl( array( 'fm_mode' => 'file_cmr',
 																		'fm_sources' => false,
 																		'cmr_keepsource' => (int)($mode == 'copy') ) );
-		$url .= '&amp;fm_sources[]='.urlencode( $this->curFile->get_full_path() );
+		$url .= '&amp;fm_sources[]='.urlencode( $this->curFile->get_rel_path() );
 
 		echo '<a href="'.$url
 					#.'" target="fileman_copymoverename" onclick="'
@@ -689,8 +678,7 @@ class FileManager extends Filelist
 	function getFormHiddenInputs( $override = array() )
 	{
 		// get current Url, remove leading URL and '?'
-		$params = preg_split( '/&amp;/',
-														substr( $this->getCurUrl( $override ), strlen( $this->url )+1 ) );
+		$params = preg_split( '/&amp;/', substr( $this->getCurUrl( $override ), strlen( $this->url )+1 ) );
 
 		$r = '';
 		foreach( $params as $lparam )
@@ -748,7 +736,8 @@ class FileManager extends Filelist
 			if( $blog_media_dir = $Blog->getMediaDir() )
 			{ // we got a blog media dir:
  				// echo '<br>got blog media dir for blog #'.$blog_ID;
-				$r[] = array( 'type' => 'blog',
+				$r[] = array( 'type' => 'collection',
+											'IDn'  => $blog_ID,
 											'id'   => 'blog_'.$blog_ID,
 											'name' => $Blog->get( 'shortname' ),
 											'path' => $blog_media_dir,
@@ -761,6 +750,7 @@ class FileManager extends Filelist
 		if( $user_media_dir = $this->User->getMediaDir() )
 		{	// We got a user media dir:
 			$r[] = array( 'type' => 'user',
+										'IDn'  => $this->User->ID,
 										'id'   => 'user',
 										'name' => T_('My folder'),
 										'path' => $user_media_dir,
@@ -832,7 +822,7 @@ class FileManager extends Filelist
 			$File = $this->curFile;
 		}
 
-		return $this->_root_url.$this->get_relative_path( $File );
+		return $this->_root_url.$File->get_rel_path();
 	}
 
 
@@ -860,19 +850,6 @@ class FileManager extends Filelist
 
 
 	/**
-	 * Get the path (and name) of a {@link File} relative to the {@link $root_dir root dir}.
-	 *
-	 * @param File the File object
-	 * @param boolean appended with name? (folders will get an ending slash)
-	 * @return string path (and optionally name)
-	 */
-	function get_relative_path( &$File, $withName = true )
-	{
-		return parent::get_relative_path( $File, $withName, $this->_root_dir );
-	}
-
-
-	/**
 	 * Get the link to access a file or folder.
 	 *
 	 * @param File file object
@@ -884,7 +861,7 @@ class FileManager extends Filelist
 		{	// Link to open this directory:
 			if( !isset( $File->cache['linkFile_1'] ) )
 			{
-				$File->cache['linkFile_1'] = $this->getCurUrl( array( 'path' => $this->get_relative_path( $File ) ) );
+				$File->cache['linkFile_1'] = $this->getCurUrl( array( 'path' => $File->get_rel_path() ) );
 			}
 			return $File->cache['linkFile_1'];
 		}
@@ -934,16 +911,16 @@ class FileManager extends Filelist
 	/**
 	 * Get the directories of the supplied path as a radio button tree.
 	 *
-	 * @param string the root path to use
 	 * @param NULL|array list of root IDs (defaults to all)
+	 * @param string the root path to use
 	 * @return string
 	 */
-	function getDirectoryTreeRadio( $rootID = NULL, $path = NULL, $rootSubpath = NULL, $rootName = NULL )
+	function getDirectoryTreeRadio( $Root = NULL , $path = NULL, $rootSubpath = NULL )
 	{
 		static $js_closeClickIDs; // clickopen IDs that should get closed
 
-		if( $rootID === NULL )
-		{
+		if( $Root === NULL )
+		{	// This is the top level call:
 			$js_closeClickIDs = array();
 
 			$_roots = $this->getRootList();
@@ -951,7 +928,7 @@ class FileManager extends Filelist
 			$r = '<ul class="clicktree">';
 			foreach( $_roots as $lRoot )
 			{
-				$subR = $this->getDirectoryTreeRadio( $lRoot['id'], $lRoot['path'], '', $lRoot['name'] );
+				$subR = $this->getDirectoryTreeRadio( $lRoot, $lRoot['path'], '' );
 				if( !empty( $subR['string'] ) )
 				{
 					$r .= '<li>'.$subR['string'].'</li>';
@@ -968,28 +945,28 @@ class FileManager extends Filelist
 			return $r;
 		}
 
-		$Nodelist = new Filelist( $path );
+		// We'll go through files in current dir:
+		$Nodelist = new Filelist( trailing_slash($path), $Root['type'], $Root['IDn'] );
 		$Nodelist->load();
 
-
-		$root_and_path = format_to_output( serialize( array( 'root' => $rootID, 'path' => $rootSubpath ) ), 'formvalue' );
+		$root_and_path = format_to_output( serialize( array( 'root' => $Root['id'], 'path' => $rootSubpath ) ), 'formvalue' );
 		$id_path = md5( $path );
 
 		$r['string'] = '<input type="radio"
 														name="root_and_path"
 														value="'.$root_and_path.'"
-														id="radio_'.$id_path.'"
-														'.( $rootID == $this->root && $rootSubpath == $this->_rel_path ? ' checked="checked"' : '' ).'
+														id="radio_'.$id_path.'"'
+														.( $Root['id'] == $this->root && $rootSubpath == $this->_rds_list_path ? ' checked="checked"' : '' ).'
 														/> ';
 
 		$label = '<label for="radio_'.$id_path.'">'
-							.'<a href="'.$this->getCurUrl( array( 'root' => $rootID, 'path' => $rootSubpath, 'forceFM' => 1 ) ).'"
+							.'<a href="'.$this->getCurUrl( array( 'root' => $Root['id'], 'path' => $rootSubpath, 'forceFM' => 1 ) ).'"
 								title="'.T_('Open this directory in the Filemanager').'">'
-							.( is_string( $rootName ) ? $rootName : basename( $path ) )
+							.( empty($path) ? $Root['name'] : basename( $path ) )
 							.'</a>'
 							.'</label>';
 
-		$r['opened'] = ( $rootID == $this->root && $rootSubpath == $this->_rel_path ) ? true : NULL;
+		$r['opened'] = ( $Root['id'] == $this->root && $rootSubpath == $this->_rds_list_path ) ? true : NULL;
 
 
 
@@ -1010,7 +987,7 @@ class FileManager extends Filelist
 
 			while( $lFile =& $Nodelist->get_next( 'dir' ) )
 			{
-				$rSub = $this->getDirectoryTreeRadio( $rootID, $lFile->get_full_path(), $rootSubpath.$Nodelist->get_relative_path( $lFile ) );
+				$rSub = $this->getDirectoryTreeRadio( $Root, $lFile->get_full_path(), $lFile->get_rel_path() );
 
 				if( $rSub['opened'] )
 				{
@@ -1089,11 +1066,8 @@ class FileManager extends Filelist
 			return false;
 		}
 
-		// Extract the cwd's relative path to the root:
-		$rds_rel_path = substr( $this->cwd, strlen($this->_root_dir) );
-
 		// Try to get File object:
-		$newFile = & $FileCache->get_by_root_and_path( $this->_root_type, $this->_root_ID, $rds_rel_path.$name );
+		$newFile = & $FileCache->get_by_root_and_path( $this->_root_type, $this->_root_ID, $this->_rds_list_path.$name );
 
 		if( $newFile->exists() )
 		{
@@ -1119,11 +1093,11 @@ class FileManager extends Filelist
 		{
 			if( $type == 'file' )
 			{
-				$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $rds_rel_path ) );
+				$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $this->_rds_list_path ) );
 			}
 			else
 			{
-				$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $rds_rel_path ) );
+				$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $this->_rds_list_path ) );
 			}
 		}
 
@@ -1138,15 +1112,15 @@ class FileManager extends Filelist
 	 */
 	function getCwdClickable( $clickableOnly = true )
 	{
-		if( !$this->cwd )
+		if( !$this->_ads_list_path )
 		{
 			return ' -- '.T_('No directory.').' -- ';
 		}
 		// not clickable
-		$r = substr( $this->_root_dir, 0, strrpos( substr($this->_root_dir, 0, -1), '/' )+1 );
+		$r = substr( $this->_ads_root_path, 0, strrpos( substr($this->_ads_root_path, 0, -1), '/' )+1 );
 
 		// get the part that is clickable
-		$clickabledirs = explode( '/', substr( $this->cwd, strlen($r) ) );
+		$clickabledirs = explode( '/', substr( $this->_ads_list_path, strlen($r) ) );
 
 		if( $clickableOnly )
 		{
@@ -1368,6 +1342,11 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.44  2005/05/13 16:49:17  fplanque
+ * Finished handling of multiple roots in storing file data.
+ * Also removed many full paths passed through URL requests.
+ * No full path should ever be seen by the user (only the admins).
+ *
  * Revision 1.43  2005/05/12 18:39:24  fplanque
  * storing multi homed/relative pathnames for file meta data
  *

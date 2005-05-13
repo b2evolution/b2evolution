@@ -68,7 +68,6 @@ class Filelist
 	 *
 	 * All files in this list MUST have that same root type. Adding will fail otherwise.
 	 *
-	 * Note: do not override in constructor because of BAD call to constructor in FileManager
 	 * @var string
 	 * @access protected
 	 */
@@ -79,21 +78,19 @@ class Filelist
 	 *
 	 * All files in this list MUST have that same root ID. Adding will fail otherwise.
 	 *
-	 * Note: do not override in constructor because of BAD call to constructor in FileManager
 	 * @var integer
 	 * @access protected
 	 */
 	var $_root_ID = 0;
 
 	/**
-	 * root directory with ending slash, except for absolute.
+	 * path to root directory with ending slash, except for absolute.
 	 *
-	 * Note: do not override in constructor because of BAD call to constructor in FileManager
 	 * @todo remove exception for absolute
 	 * @param string
 	 * @access protected
 	 */
-	var $_root_dir;
+	var $_ads_root_path;
 
 	/**
 	 * Path to list with trailing slash.
@@ -103,7 +100,17 @@ class Filelist
 	 * @var boolean|string
 	 * @access protected
 	 */
-	var $_list_full_path = false;
+	var $_ads_list_path = false;
+
+	/**
+	 * Path to list reltive to root, with trailing slash
+	 *
+	 * false if we are constructing an arbitraty list (i-e not tied to a single directory)
+	 *
+	 * @param boolean|string
+	 * @access protected
+	 */
+	var $_rds_list_path = false;
 
 	/**
 	 * Filename filter pattern
@@ -250,26 +257,28 @@ class Filelist
 	/**
 	 * Constructor
 	 *
-	 * @param boolean|string the default path for the files, false if you want to create an arbitraty list
+	 * @param boolean|string Default path for the files, false if you want to create an arbitraty list
 	 * @param string Optional Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer Optional ID of the user, the group or the collection the file belongs to...
 	 */
-	function Filelist( $path = false, $root_type = NULL, $root_ID = NULL )
+	function Filelist( $path, $root_type = NULL, $root_ID = NULL )
 	{
-		if( empty($path) )
+		if( !is_null($path) )
 		{
-			$this->_list_full_path = false;
-		}
-		else
-		{
-			$this->_list_full_path = trailing_slash( $path );
+			$this->_ads_list_path = $path;
 		}
 
 		if( !is_null($root_type) )
 		{	// We want to set a root different from default:
 			$this->_root_type = $root_type;
 			$this->_root_ID = $root_ID;
-			$this->_root_dir = get_root_dir( $root_type, $root_ID );
+			$this->_ads_root_path = get_root_dir( $root_type, $root_ID );
+		}
+
+		if( !empty($this->_ads_list_path) )
+		{
+			// Get the subpath relative to root
+			$this->_rds_list_path = $this->rdfs_relto_root_from_adfs( $this->_ads_list_path );
 		}
 	}
 
@@ -283,9 +292,9 @@ class Filelist
 	{
 		global $Messages;
 
-		if( !$this->_list_full_path )
+		if( !$this->_ads_list_path )
 		{	// We have no path to load from:
-			die( 'Cannot load a filelist with no root path' );
+			die( 'Cannot load a filelist with no list path' );
 			// return false;
 		}
 
@@ -300,9 +309,9 @@ class Filelist
 		$this->_order_index = array();
 
 		// Attempt list files for requested directory: (recursively if flat mode):
-		if( ($filepath_array = retrieveFiles( $this->_list_full_path, true, true, true, $flatmode )) === false )
+		if( ($filepath_array = retrieveFiles( $this->_ads_list_path, true, true, true, $flatmode )) === false )
 		{
-			$Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->_list_full_path ), 'fl_error' );
+			$Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->_ads_list_path ), 'fl_error' );
 			return false;
 		}
 
@@ -338,10 +347,11 @@ class Filelist
 			}
 
 			// Extract the file's relative path to the root
-			$rdfs_rel_path = substr( $adfp_path, strlen($this->_root_dir) );
-
+			$rdfs_path_relto_root = $this->rdfs_relto_root_from_adfs( trailing_slash($adfp_path) );
+			// echo '<br>'.$rdfp_rel_path;
+			
 			// Add the file into current list:
-			$this->add_by_subpath( $rdfs_rel_path, true );
+			$this->add_by_subpath( $rdfs_path_relto_root, true );
 		}
 	}
 
@@ -776,33 +786,51 @@ class Filelist
 	}
 
 
-	/**
-	 * Get the path (and name) of a {@link File} relative to the {@link Filelist::_list_full_path} list's path.
-	 *
-	 * @todo fplanque>> optimize withName by calling File::get_full_path tight away
-	 *
-	 * @param File the File object
-	 * @param boolean appended with name? (folders will get an ending slash)
-	 * @return string path (and optionally name)
-	 */
-	function get_relative_path( & $File, $withName = true, $rootDir = NULL )
+	function get_root_type()
 	{
-		if( $rootDir === NULL )
-		{
-			$rootDir = $this->_list_full_path;
-		}
-		$path = substr( $File->get_dir(), strlen($rootDir) );
+		return $this->_root_type;
+	}
 
-		if( $withName )
+
+	function get_root_ID()
+	{
+		return $this->_root_ID;
+	}
+
+
+	/**
+	 * Get absolute path to list.
+	 */
+	function get_ads_list_path()
+	{
+		return $this->_ads_list_path;
+	}
+
+	/**
+	 * Get path to list relative to root.
+	 */
+	function get_rds_list_path()
+	{
+		return $this->_rds_list_path;
+	}
+
+
+	/**
+	 * Get the path (and name) of a {@link File} relative to the {@link Filelist::_ads_root_path}.
+	 *
+	 * @param string
+	 * @return string
+	 */
+	function rdfs_relto_root_from_adfs( $adfs_path )
+	{
+		// Check that the file is inside root:
+		if( substr( $adfs_path, 0, strlen($this->_ads_root_path) ) != $this->_ads_root_path )
 		{
-			$path .= $File->get_name();
-			if( $File->is_dir() )
-			{
-				$path .= '/';
-			}
+			die( 'rdfs_relto_root_from_adfs: Path is NOT inside of root!' );
 		}
 
-		return $path;
+		// Return only the relative part:
+ 		return substr( $adfs_path, strlen($this->_ads_root_path) );
 	}
 
 
@@ -936,6 +964,11 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.28  2005/05/13 16:49:17  fplanque
+ * Finished handling of multiple roots in storing file data.
+ * Also removed many full paths passed through URL requests.
+ * No full path should ever be seen by the user (only the admins).
+ *
  * Revision 1.27  2005/05/12 18:39:24  fplanque
  * storing multi homed/relative pathnames for file meta data
  *

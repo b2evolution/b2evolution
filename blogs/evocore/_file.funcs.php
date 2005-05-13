@@ -365,13 +365,13 @@ function no_trailing_slash( $path )
 
 
 /**
- * Does the same thing as the function realpath(), except it will
+ * Returns canonicalized absolute pathname as with realpath(), except it will
  * also translate paths that don't exist on the system.
  *
  * @param string the path to be translated
  * @return array [0] = the translated path (with trailing slash); [1] = TRUE|FALSE (path exists?)
  */
-function str2path( $path )
+function check_canonical_path( $path )
 {
 	$path = str_replace( '\\', '/', $path );
 	$pwd = realpath( $path );
@@ -456,6 +456,11 @@ function get_root_dir( $root_type, $root_ID )
 
 /*
  * $Log$
+ * Revision 1.17  2005/05/13 16:49:17  fplanque
+ * Finished handling of multiple roots in storing file data.
+ * Also removed many full paths passed through URL requests.
+ * No full path should ever be seen by the user (only the admins).
+ *
  * Revision 1.16  2005/05/12 18:39:24  fplanque
  * storing multi homed/relative pathnames for file meta data
  *

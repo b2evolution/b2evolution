@@ -26,7 +26,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 	{
 		parent::setUp();
 
-		$this->Filelist = new Filelist();
+		$this->Filelist = new Filelist( false );
 	}
 
 
