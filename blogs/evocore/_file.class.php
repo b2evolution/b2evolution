@@ -493,6 +493,15 @@ class File extends DataObject
 		return $this->_full_path;
 	}
 
+	function get_url()
+	{
+		if( ! $root_url = get_root_url( $this->_root_type, $this->_root_ID ) )
+		{ // could not get a root url
+			return false;
+		}
+
+		return $root_url.$this->_rel_path;
+	}
 
 	/**
 	 * Get the file's extension.
@@ -909,11 +918,45 @@ class File extends DataObject
 		// Let parent do the update:
 		parent::dbupdate();
 	}
+
+
+	/**
+	 * Template function
+	 */
+	function url( $text = NULL, $title = NULL, $no_access_text = NULL )
+	{
+		if( is_null( $text ) )
+		{	// Use file relpath+name by default
+			$text = $this->get_rel_path();
+		}
+
+		if( is_null( $title ) )
+		{	// Default link title
+			$this->load_meta();
+			$title = $this->title;
+		}
+
+		if( is_null( $no_access_text ) )
+		{	// Default text when no access:
+			$no_access_text = $text;
+		}
+
+		if( ! $url = $this->get_url() )
+		{
+			return $no_access_text;
+		}
+
+		return '<a href="'.$url.'" title="'.$title.'">'.$text.'</a>';
+	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.34  2005/05/13 18:41:28  fplanque
+ * made file links clickable... finally ! :P
+ *
  * Revision 1.33  2005/05/12 18:39:24  fplanque
  * storing multi homed/relative pathnames for file meta data
  *

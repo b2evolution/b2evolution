@@ -1050,11 +1050,23 @@ switch( $Fileman->fm_mode )
 							);
 		*/
 
+		function file_path( & $row )
+		{
+			global $current_File;
+
+			// Instantiate a File object for this line:
+			$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY!
+			// Flow meta data into File object:
+			$current_File->load_meta( false, $row );
+
+			// File relative path & name:
+			return $current_File->url();
+		}
  		$Results->cols[] = array(
 								'th' => T_('Path'),
 								'order' => 'file_path',
 								'td_start' => '<td class="firstcol left">',
-								'td' => '$file_path$',
+								'td' => '%file_path( {row} )%',
 							);
 
  		$Results->cols[] = array(
@@ -1064,25 +1076,17 @@ switch( $Fileman->fm_mode )
 								'td' => '$file_title$',
 							);
 
-		function file_exp( & $row )
+		function file_type()
 		{
-			// Instantiate a File object for this line:
-			$current_File = & new File( $row->root_type, $row->root_ID, $row->file_path );
-			// Flow meta data into File object:
-			$current_File->load_meta( false, $row );
-
-			// File title
-			$r = $current_File->title;
+			global $current_File;
 
 			// File type:
-			$r .= ' '.$current_File->get_icon().' '.$current_File->get_type();
-
-			return $r;
+			return $current_File->get_icon().' '.$current_File->get_type();
 		}
  		$Results->cols[] = array(
-								'th' => T_('Exp'),
+								'th' => T_('Type'),
 								'td_start' => '<td class="left">',
-								'td' => '%file_exp( {row} )%',
+								'td' => '%file_type()%',
 							);
 
 	 	$Results->cols[] = array(
@@ -1202,6 +1206,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.107  2005/05/13 18:41:28  fplanque
+ * made file links clickable... finally ! :P
+ *
  * Revision 1.106  2005/05/13 16:49:17  fplanque
  * Finished handling of multiple roots in storing file data.
  * Also removed many full paths passed through URL requests.

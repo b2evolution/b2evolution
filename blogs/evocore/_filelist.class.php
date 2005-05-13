@@ -347,11 +347,11 @@ class Filelist
 			}
 
 			// Extract the file's relative path to the root
-			$rdfs_path_relto_root = $this->rdfs_relto_root_from_adfs( trailing_slash($adfp_path) );
+			$rdfp_path_relto_root = $this->rdfs_relto_root_from_adfs( $adfp_path );
 			// echo '<br>'.$rdfp_rel_path;
 			
 			// Add the file into current list:
-			$this->add_by_subpath( $rdfs_path_relto_root, true );
+			$this->add_by_subpath( $rdfp_path_relto_root, true );
 		}
 	}
 
@@ -964,6 +964,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.29  2005/05/13 18:41:28  fplanque
+ * made file links clickable... finally ! :P
+ *
  * Revision 1.28  2005/05/13 16:49:17  fplanque
  * Finished handling of multiple roots in storing file data.
  * Also removed many full paths passed through URL requests.

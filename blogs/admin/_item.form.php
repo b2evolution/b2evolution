@@ -341,6 +341,9 @@ $AdminUI->dispPayloadBegin();
 
  	// ####################### LINKS #########################
 
+require dirname(__FILE__).'/_item_links.inc.php';
+
+
 	if( $next_action == 'update' )
 	{ // Editing post
 		$Results = & new Results(
@@ -350,26 +353,6 @@ $AdminUI->dispPayloadBegin();
 								20, 'link_' );
 
 		$Results->title = T_('Linked to...');
-
-		/*
-		$Results->cols[] = array(
-								'th' => T_('Link ID'),
-								'order' => 'link_ID',
-								'td' => '$link_ID$',
-							);
-
-		$Results->cols[] = array(
-								'th' => T_('Type'),
-								'order' => 'link_ltype_ID',
-								'td' => '$link_ltype_ID$',
-							);
-
- 		$Results->cols[] = array(
-								'th' => T_('File ID'),
-								'order' => 'file_ID',
-								'td' => '$file_ID$',
-							);
-		*/
 
  		$Results->cols[] = array(
 								'th' => T_('Path'),
@@ -384,7 +367,6 @@ $AdminUI->dispPayloadBegin();
 								'td' => '$file_title$',
 							);
 
-
 		$Results->global_icon( T_('Link a file...'), 'link',
 														'files.php?fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('File') );
 
@@ -396,6 +378,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.24  2005/05/13 18:41:28  fplanque
+ * made file links clickable... finally ! :P
+ *
  * Revision 1.23  2005/05/11 15:58:30  fplanque
  * cleanup
  *

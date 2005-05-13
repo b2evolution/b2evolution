@@ -453,9 +453,37 @@ function get_root_dir( $root_type, $root_ID )
 	die( "Root dir for type=$root_type not supported" );
 }
 
+/**
+ * @param string Root type: 'user', 'group', 'collection' or 'absolute'
+ * @param integer ID of the user, the group or the collection the file belongs to...
+ * @return
+ */
+function get_root_url( $root_type, $root_ID )
+{
+	global $UserCache, $BlogCache;
+
+	switch( $root_type )
+	{
+		case 'user':
+			$User = & $UserCache->get_by_ID( $root_ID );
+			return $User->getMediaUrl();
+
+		case 'collection':
+			$Blog = & $BlogCache->get_by_ID( $root_ID );
+			return $Blog->get( 'mediaurl' );
+
+		case 'absolute':
+			return '';
+	}
+
+	die( "Root url for type=$root_type not supported" );
+}
 
 /*
  * $Log$
+ * Revision 1.18  2005/05/13 18:41:28  fplanque
+ * made file links clickable... finally ! :P
+ *
  * Revision 1.17  2005/05/13 16:49:17  fplanque
  * Finished handling of multiple roots in storing file data.
  * Also removed many full paths passed through URL requests.

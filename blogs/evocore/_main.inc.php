@@ -228,6 +228,7 @@ require_once dirname(__FILE__).'/_filecache.class.php';
 require_once dirname(__FILE__).'/_usercache.class.php';
 require_once dirname(__FILE__).'/_link.class.php';
 require_once dirname(__FILE__).'/_linkcache.class.php';
+require_once dirname(__FILE__).'/_file.class.php';
 // Object caches init:
 
 // fplanque>>jwedgeco: I cannot commit this: $BlogCache = array();
@@ -501,6 +502,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.35  2005/05/13 18:41:28  fplanque
+ * made file links clickable... finally ! :P
+ *
  * Revision 1.34  2005/05/10 18:40:08  fplanque
  * normalizing
  *
