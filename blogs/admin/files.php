@@ -200,450 +200,446 @@ $Fileman->load();
 $selected_Filelist = & $Fileman->getFilelistSelected();
 
 
-if( !empty($action) )
+switch( $action )
 {
-	switch( $action )
-	{
-		case 'open_in_new_windows':
-			// catch JS-only actions
-			$Messages->add( T_('You have to enable JavaScript to use this feature.') );
+	case 'open_in_new_windows':
+		// catch JS-only actions
+		$Messages->add( T_('You have to enable JavaScript to use this feature.') );
+		break;
+
+
+	case 'createnew':
+		// Check permission:
+		$current_User->check_perm( 'files', 'add', true );
+
+		// create new file/dir
+		param( 'createnew', 'string', '' ); // 'file', 'dir'
+		param( 'createname', 'string', '' );
+
+		$Fileman->createDirOrFile( $createnew, $createname ); // handles messages
+		break;
+
+	/*
+	case T_('Send by mail'):
+		// TODO: implement
+		if( !$selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.') );
 			break;
+		}
 
+		echo 'TODO: Send selected by mail, query email address..';
+		break;
+	*/
 
-		case 'createnew':
-			// Check permission:
-			$current_User->check_perm( 'files', 'add', true );
+	/*
+	case 'download':
+		// TODO: provide optional zip formats
+		$action_title = T_('Download');
 
-			// create new file/dir
-			param( 'createnew', 'string', '' ); // 'file', 'dir'
-			param( 'createname', 'string', '' );
-
-			$Fileman->createDirOrFile( $createnew, $createname ); // handles messages
+		if( !$selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.') );
 			break;
+		}
 
-		/*
-		case T_('Send by mail'):
-			// TODO: implement
-			if( !$selected_Filelist->count() )
-			{
-				$Messages->add( T_('Nothing selected.') );
-				break;
-			}
+		param( 'zipname', 'string', '' );
+		param( 'exclude_sd', 'integer', 0 );
 
-			echo 'TODO: Send selected by mail, query email address..';
-			break;
-		*/
+		if( empty($zipname) )
+		{
+			$action_msg =
+				"\n"
+				.'<div class="panelblock">'
+				."\n"
+				.T_('You want to download:')
+				.'<ul>'
+				.'<li>'.implode( "</li>\n<li>", $selected_Filelist->get_array( 'get_prefixed_name' ) )."</li>\n"
+				.'</ul>
 
-		/*
-		case 'download':
-			// TODO: provide optional zip formats
-			$action_title = T_('Download');
-
-			if( !$selected_Filelist->count() )
-			{
-				$Messages->add( T_('Nothing selected.') );
-				break;
-			}
-
-			param( 'zipname', 'string', '' );
-			param( 'exclude_sd', 'integer', 0 );
-
-			if( empty($zipname) )
-			{
-				$action_msg =
-					"\n"
-					.'<div class="panelblock">'
-					."\n"
-					.T_('You want to download:')
-					.'<ul>'
-					.'<li>'.implode( "</li>\n<li>", $selected_Filelist->get_array( 'get_prefixed_name' ) )."</li>\n"
-					.'</ul>
-
-					<form action="files.php" class="fform" method="post">
-					' // TODO: use Form class
-					.$Fileman->getFormHiddenInputs()
-					.$Fileman->getFormHiddenSelectedFiles()
-					.form_hidden( 'action', 'download', false )
+				<form action="files.php" class="fform" method="post">
+				' // TODO: use Form class
+				.$Fileman->getFormHiddenInputs()
+				.$Fileman->getFormHiddenSelectedFiles()
+				.form_hidden( 'action', 'download', false )
+				.'
+				<fieldset>
+					<legend>'.T_('Download options').'</legend>
+					'
+					.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the name of the file which will get sent to you."), 80, '', 'text', false )."\n"
+					.( $selected_Filelist->count_dirs() ?
+							form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n" :
+							'' )
 					.'
-					<fieldset>
-						<legend>'.T_('Download options').'</legend>
-						'
-						.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the name of the file which will get sent to you."), 80, '', 'text', false )."\n"
-						.( $selected_Filelist->count_dirs() ?
-								form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n" :
-								'' )
-						.'
-						<div class="input">
-							<input class="ActionButton" type="submit" value="'
-						.format_to_output( T_('Download'), 'formvalue' ).'" />
-						</div>
-					</fieldset>
-					</form>
+					<div class="input">
+						<input class="ActionButton" type="submit" value="'
+					.format_to_output( T_('Download'), 'formvalue' ).'" />
 					</div>
-					';
-			}
-			else
-			{ // Downloading
-				require dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php';
-
-				$arraylist = $selected_Filelist->get_array( 'getname' );
-
-				$options = array (
-					'basedir' => $Fileman->get_ads_list_path(),
-					'inmemory' => 1,
-					'recurse' => 1-$exclude_sd,
-				);
-
-				$zipfile = new zip_file( $zipname );
-				$zipfile->set_options( $options );
-				$zipfile->add_files( $arraylist );
-				$zipfile->create_archive();
-				$zipfile->download_file();
-				exit;
-				#$Messages->add( sprintf(T_('Zipfile &laquo;%s&raquo; sent to you!'), $zipname), 'note' );
-			}
-
-			break;
-		*/
-
-		case 'delete':
-			// Check permission:
-			$current_User->check_perm( 'files', 'edit', true );
-
-			// delete a file/dir
-			if( ! $selected_Filelist->count() )
-			{
-				$Messages->add( T_('Nothing selected.') );
-				break;
-			}
-
-			param( 'confirmed', 'integer', 0 );
-			param( 'delsubdirs', 'array', array() );
-
-			if( !$confirmed )
-			{
-				$action_msg = '<div class="panelinfo">';
-				$action_msg .= '<h2>'.T_('Delete file(s)?').'</h2>';
-
-				$action_msg .= '
-					<form action="files.php" class="inline">
-						<input type="hidden" name="confirmed" value="1" />
-						<input type="hidden" name="action" value="delete" />
-						'.$Fileman->getFormHiddenSelectedFiles()
-						.$Fileman->getFormHiddenInputs()."\n";
-
-
-				$action_msg .= $selected_Filelist->count() > 1 ?
-												T_('Do you really want to delete the following files?') :
-												T_('Do you really want to delete the following file?');
-
-				$action_msg .= '
-				<ul>
-				';
-
-				// So far there is no problem with confirming...
-				$can_confirm = true;
-
-				// make sure we have loaded metas for all files in selection!
-				$selected_Filelist->load_meta();
-
-				foreach( $selected_Filelist->_entries as $lFile )
-				{
-					$action_msg .= '<li>'.$lFile->get_prefixed_name();
-
-					/* fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB integrity for these...
-					if( $lFile->is_dir() )
-					{	// This is a directory
-							$action_msg .= '
-							<br />
-							<input title="'.sprintf( T_('Check to include subdirectories of &laquo;%s&raquo;'), $lFile->get_name() ).'"
-								type="checkbox"
-								name="delsubdirs['.$lFile->get_md5_ID().']"
-								id="delsubdirs_'.$lFile->get_md5_ID().'"
-								value="1" />
-								<label for="delsubdirs_'.$lFile->get_md5_ID().'">'
-									.T_( 'Including subdirectories' ).'</label>';
-					}
-					*/
-
-					// Check if there are delete restrictions on this file:
-					$lFile->check_relations( 'delete_restrictions' );
-
-					if( $Messages->count('restrict') )
-					{	// There are restrictions:
-						$action_msg .= ': <strong>'.T_('cannot be deleted because of the following relations').'</strong> :'; 
-						$action_msg .= $Messages->display( NULL, NULL, false, 'restrict', '', 'ul', false );
-						$Messages->clear( 'restrict' );
-						// We won't be able to continue with deletion...
-						$can_confirm = false;
-					}
-
-					$action_msg .= '</li>';
-				}
-
-				$action_msg .= "</ul>\n";
-
-
-				if( $can_confirm )
-				{	// No integrity problem detected...
-					$action_msg .= '
-						<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
-						</form>
-						<form action="files.php" class="inline">
-							'.$Fileman->getFormHiddenInputs().'
-							<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
-						</form>
-						';
-				}
-
-				$action_msg .= '</div>';
-
-			}
-			else
-			{
-				$selected_Filelist->restart();
-				while( $lFile =& $selected_Filelist->get_next() )
-				{
-					if( !$Fileman->unlink( $lFile, isset( $delsubdirs[$lFile->get_md5_ID()] ) ) ) // handles Messages
-					{
-						// TODO: offer file again, allowing to include subdirs..
-					}
-				}
-			}
-			break;
-
-
-		case 'edit_properties':
-			// Edit File properties (Meta Data):
-
-			// Check permission:
-			$current_User->check_perm( 'files', 'view', true );
-
-			$selectedFile = & $selected_Filelist->getFileByIndex(0);
-			// Load meta data:
-			$selectedFile->load_meta();
-
-			$Fileman->fm_mode = 'File_properties';
-			break;
-
-
-		case 'update_properties':
-			// Update File properties (Meta Data):
-
-			// Check permission:
-			$current_User->check_perm( 'files', 'edit', true );
-
-			$selectedFile = & $selected_Filelist->getFileByIndex(0);
-			// Load meta data:
-			$selectedFile->load_meta();
-
-			$selectedFile->set( 'title', param( 'title', 'string', '' ) );
-			$selectedFile->set( 'alt', param( 'alt', 'string', '' ) );
-			$selectedFile->set( 'desc', param( 'desc', 'string', '' ) );
-
-			// Store File object into DB:
-			$selectedFile->dbsave();
-
-			// Leave special display mode:
- 			$Fileman->fm_mode = 'NULL';
-			break;
-
-
-		case 'link':
-			// TODO: check perm!!
-
-			// Link File to Item:
-			if( !$selected_Filelist->count() )
-			{
-				$Messages->add( T_('Nothing selected.') );
-				break;
-			}
-
-			if( !isset($edited_Item) )
-			{	// No Item to link to...
-				$Fileman->fm_mode = NULL;
-				break;
-			}
-
-			// TODO: check item EDIT permissions!
-
-			$selectedFile = & $selected_Filelist->getFileByIndex(0);
-
-			$DB->begin();
-
-			// Load meta data AND MAKE SURE IT IS CREATED IN DB:
-			$selectedFile->load_meta( true );
-
-			// Let's make the link!
-			$edited_Link = & new Link();
-			$edited_Link->set( 'item_ID', $edited_Item->ID );
-			$edited_Link->set( 'file_ID', $selectedFile->ID );
-			$edited_Link->dbinsert();
-
-			$DB->commit();
-
-			$Messages->add( T_('Selected file has been linked to item.'), 'note' );
-			break;
-
-
-		case 'unlink':
-			// TODO: check perm!
-
-			// Unlink File from Item:
-			if( !isset( $edited_Link ) )
-			{
-				$Messages->add( T_('Nothing selected.') );
-				break;
-			}
-
-			// TODO: get Item from Link to check perm
-
-			// TODO: check item EDIT permissions!
-
-			// Delete from DB:
-			$msg = sprintf( T_('Link from &laquo;%s&raquo; deleted.'), $edited_Link->Item->dget('title') );
-			$edited_Link->dbdelete( true );
-			unset($edited_Link);
-			$Messages->add( $msg, 'note' );
-			break;
-
-
-		case 'editperm':
-			// Check permission:
-			$current_User->check_perm( 'files', 'edit', true );
-
-			// edit permissions {{{
-			// fplanque>> TODO: as long as we use fm_modes this thing should at least work like a mode or at the bare minimun, turn off any active mode.
-			$action_title = T_('Change permissions');
-
-			if( !$selected_Filelist->count() )
-			{
-				$Messages->add( T_('Nothing selected.') );
-				break;
-			}
-
-			param( 'perms', 'array', array() );
-
-			if( count( $perms ) )
-			{ // Change perms
-				$selected_Filelist->restart();
-				while( $lFile = & $selected_Filelist->get_next() )
-				{
-					$chmod = $perms[ $lFile->get_md5_ID() ];
-
-					$oldperms = $lFile->get_perms( 'raw' );
-					$newperms = $lFile->chmod( $chmod );
-
-					if( $newperms === false )
-					{
-						$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $lFile->get_name(), $chmod ) );
-					}
-					elseif( $newperms === $oldperms )
-					{
-						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; not changed.'), $lFile->get_name() ), 'note' );
-					}
-					else
-					{
-						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->get_perms() ), 'note' );
-					}
-				}
-			}
-			else
-			{	// Display dialog:
-				// TODO: use Form class, finish non-Windows
-				// TODO: move to a file called _file_permissions.form.php
-				$action_msg = '
-				<div class="panelblock">
-				<form name="form_chmod" action="files.php">
-				'.$Fileman->getFormHiddenSelectedFiles()
-				.$Fileman->getFormHiddenInputs().'
-
-				<input type="hidden" name="action" value="editperm" />
-				';
-
-				if( is_windows() )
-				{ // WINDOWS read/write permissons:
-					if( $selected_Filelist->count() > 1 )
-					{ // more than one file, provide default
-
-					}
-					foreach( $selected_Filelist->get_array() as $lFile )
-					{
-						$action_msg .= "\n".$lFile->get_rel_path().':<br />
-						<input id="perms_readonly_'.$lFile->get_md5_ID().'"
-							name="perms['.$lFile->get_md5_ID().']"
-							type="radio"
-							value="444"'
-							.( $lFile->get_perms( 'octal' ) == 444 ?
-									' checked="checked"' :
-									'' ).' />
-						<label for="perms_readonly_'.$lFile->get_md5_ID().'">'.T_('Read-only').'</label>
-
-						<input id="perms_readwrite_'.$lFile->get_md5_ID().'"
-							name="perms['.$lFile->get_md5_ID().']"
-							type="radio"
-							value="666"'
-							.( $lFile->get_perms( 'octal' ) == 666 || $lFile->get_perms( 'octal' ) == 777 ?
-									'checked="checked"' :
-									'' ).' />
-						<label for="perms_readwrite_'.$lFile->get_md5_ID().'">'.T_('Read and write').'</label>
-						<br />';
-					}
-				}
-				else
-				{	// UNIX permissions:
-					$action_msg .= '<input type="text" name="chmod" value="'
-													.$lFile->get_perms( 'octal' ).'" maxlength="3" size="3" /><br />';
-					$js_focus = 'document.form_chmod.chmod';
-				}
-
-				$action_msg .= '
-				<input type="submit" value="'.format_to_output( T_('Set new permissions'), 'formvalue' ).'" />
+				</fieldset>
 				</form>
 				</div>
 				';
-			}
+		}
+		else
+		{ // Downloading
+			require dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php';
 
-			// }}}
-			break;
+			$arraylist = $selected_Filelist->get_array( 'getname' );
 
+			$options = array (
+				'basedir' => $Fileman->get_ads_list_path(),
+				'inmemory' => 1,
+				'recurse' => 1-$exclude_sd,
+			);
 
-		case 'file_cmr':
-			// copy/move/rename - we come here from the "with selected" toolbar {{{
-			#pre_dump( $selected_Filelist );
-
-			// }}}
-			break;
-
-
-		case 'default':
-			// ------------------------
-			// default action (view):
-			// ------------------------
-			if( !$selected_Filelist->count() )
-			{
-				$Messages->add( T_('Nothing selected.') );
-				break;
-			}
-
-			$selectedFile = & $selected_Filelist->getFileByIndex(0);
-
-			// Load meta data:
-			$selectedFile->load_meta();
-
-			// TODO: check if available
-
-			require dirname(__FILE__).'/_file_view.inc.php';
-
+			$zipfile = new zip_file( $zipname );
+			$zipfile->set_options( $options );
+			$zipfile->add_files( $arraylist );
+			$zipfile->create_archive();
+			$zipfile->download_file();
 			exit;
+			#$Messages->add( sprintf(T_('Zipfile &laquo;%s&raquo; sent to you!'), $zipname), 'note' );
+		}
 
+		break;
+	*/
 
-		case 'leaveMode':
-			// leave mode (upload, ..)
-			$Fileman->fm_mode = NULL;
-			header( 'Location: '.$Fileman->getCurUrl() );
+	case 'delete':
+		// Check permission:
+		$current_User->check_perm( 'files', 'edit', true );
+
+		// delete a file/dir
+		if( ! $selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.') );
 			break;
-	}
+		}
+
+		param( 'confirmed', 'integer', 0 );
+		param( 'delsubdirs', 'array', array() );
+
+		if( !$confirmed )
+		{
+			$action_msg = '<div class="panelinfo">';
+			$action_msg .= '<h2>'.T_('Delete file(s)?').'</h2>';
+
+			$action_msg .= '
+				<form action="files.php" class="inline">
+					<input type="hidden" name="confirmed" value="1" />
+					<input type="hidden" name="action" value="delete" />
+					'.$Fileman->getFormHiddenSelectedFiles()
+					.$Fileman->getFormHiddenInputs()."\n";
+
+
+			$action_msg .= $selected_Filelist->count() > 1 ?
+											T_('Do you really want to delete the following files?') :
+											T_('Do you really want to delete the following file?');
+
+			$action_msg .= '
+			<ul>
+			';
+
+			// So far there is no problem with confirming...
+			$can_confirm = true;
+
+			// make sure we have loaded metas for all files in selection!
+			$selected_Filelist->load_meta();
+
+			foreach( $selected_Filelist->_entries as $lFile )
+			{
+				$action_msg .= '<li>'.$lFile->get_prefixed_name();
+
+				/* fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB integrity for these...
+				if( $lFile->is_dir() )
+				{	// This is a directory
+						$action_msg .= '
+						<br />
+						<input title="'.sprintf( T_('Check to include subdirectories of &laquo;%s&raquo;'), $lFile->get_name() ).'"
+							type="checkbox"
+							name="delsubdirs['.$lFile->get_md5_ID().']"
+							id="delsubdirs_'.$lFile->get_md5_ID().'"
+							value="1" />
+							<label for="delsubdirs_'.$lFile->get_md5_ID().'">'
+								.T_( 'Including subdirectories' ).'</label>';
+				}
+				*/
+
+				// Check if there are delete restrictions on this file:
+				$lFile->check_relations( 'delete_restrictions' );
+
+				if( $Messages->count('restrict') )
+				{	// There are restrictions:
+					$action_msg .= ': <strong>'.T_('cannot be deleted because of the following relations').'</strong> :';
+					$action_msg .= $Messages->display( NULL, NULL, false, 'restrict', '', 'ul', false );
+					$Messages->clear( 'restrict' );
+					// We won't be able to continue with deletion...
+					$can_confirm = false;
+				}
+
+				$action_msg .= '</li>';
+			}
+
+			$action_msg .= "</ul>\n";
+
+
+			if( $can_confirm )
+			{	// No integrity problem detected...
+				$action_msg .= '
+					<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
+					</form>
+					<form action="files.php" class="inline">
+						'.$Fileman->getFormHiddenInputs().'
+						<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
+					</form>
+					';
+			}
+
+			$action_msg .= '</div>';
+
+		}
+		else
+		{
+			$selected_Filelist->restart();
+			while( $lFile =& $selected_Filelist->get_next() )
+			{
+				if( !$Fileman->unlink( $lFile, isset( $delsubdirs[$lFile->get_md5_ID()] ) ) ) // handles Messages
+				{
+					// TODO: offer file again, allowing to include subdirs..
+				}
+			}
+		}
+		break;
+
+
+	case 'edit_properties':
+		// Edit File properties (Meta Data):
+
+		// Check permission:
+		$current_User->check_perm( 'files', 'view', true );
+
+		$selectedFile = & $selected_Filelist->getFileByIndex(0);
+		// Load meta data:
+		$selectedFile->load_meta();
+
+		$Fileman->fm_mode = 'File_properties';
+		break;
+
+
+	case 'update_properties':
+		// Update File properties (Meta Data):
+
+		// Check permission:
+		$current_User->check_perm( 'files', 'edit', true );
+
+		$selectedFile = & $selected_Filelist->getFileByIndex(0);
+		// Load meta data:
+		$selectedFile->load_meta();
+
+		$selectedFile->set( 'title', param( 'title', 'string', '' ) );
+		$selectedFile->set( 'alt', param( 'alt', 'string', '' ) );
+		$selectedFile->set( 'desc', param( 'desc', 'string', '' ) );
+
+		// Store File object into DB:
+		$selectedFile->dbsave();
+
+		// Leave special display mode:
+		$Fileman->fm_mode = 'NULL';
+		break;
+
+
+	case 'link':
+		// TODO: check perm!!
+
+		// Link File to Item:
+		if( !$selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.') );
+			break;
+		}
+
+		if( !isset($edited_Item) )
+		{	// No Item to link to...
+			$Fileman->fm_mode = NULL;
+			break;
+		}
+
+		// TODO: check item EDIT permissions!
+
+		$selectedFile = & $selected_Filelist->getFileByIndex(0);
+
+		$DB->begin();
+
+		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
+		$selectedFile->load_meta( true );
+
+		// Let's make the link!
+		$edited_Link = & new Link();
+		$edited_Link->set( 'item_ID', $edited_Item->ID );
+		$edited_Link->set( 'file_ID', $selectedFile->ID );
+		$edited_Link->dbinsert();
+
+		$DB->commit();
+
+		$Messages->add( T_('Selected file has been linked to item.'), 'note' );
+		break;
+
+
+	case 'unlink':
+		// TODO: check perm!
+
+		// Unlink File from Item:
+		if( !isset( $edited_Link ) )
+		{
+			break;
+		}
+
+		// TODO: get Item from Link to check perm
+
+		// TODO: check item EDIT permissions!
+
+		// Delete from DB:
+		$msg = sprintf( T_('Link from &laquo;%s&raquo; deleted.'), $edited_Link->Item->dget('title') );
+		$edited_Link->dbdelete( true );
+		unset($edited_Link);
+		$Messages->add( $msg, 'note' );
+		break;
+
+
+	case 'editperm':
+		// Check permission:
+		$current_User->check_perm( 'files', 'edit', true );
+
+		// edit permissions {{{
+		// fplanque>> TODO: as long as we use fm_modes this thing should at least work like a mode or at the bare minimun, turn off any active mode.
+		$action_title = T_('Change permissions');
+
+		if( !$selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.') );
+			break;
+		}
+
+		param( 'perms', 'array', array() );
+
+		if( count( $perms ) )
+		{ // Change perms
+			$selected_Filelist->restart();
+			while( $lFile = & $selected_Filelist->get_next() )
+			{
+				$chmod = $perms[ $lFile->get_md5_ID() ];
+
+				$oldperms = $lFile->get_perms( 'raw' );
+				$newperms = $lFile->chmod( $chmod );
+
+				if( $newperms === false )
+				{
+					$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $lFile->get_name(), $chmod ) );
+				}
+				elseif( $newperms === $oldperms )
+				{
+					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; not changed.'), $lFile->get_name() ), 'note' );
+				}
+				else
+				{
+					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->get_perms() ), 'note' );
+				}
+			}
+		}
+		else
+		{	// Display dialog:
+			// TODO: use Form class, finish non-Windows
+			// TODO: move to a file called _file_permissions.form.php
+			$action_msg = '
+			<div class="panelblock">
+			<form name="form_chmod" action="files.php">
+			'.$Fileman->getFormHiddenSelectedFiles()
+			.$Fileman->getFormHiddenInputs().'
+
+			<input type="hidden" name="action" value="editperm" />
+			';
+
+			if( is_windows() )
+			{ // WINDOWS read/write permissons:
+				if( $selected_Filelist->count() > 1 )
+				{ // more than one file, provide default
+
+				}
+				foreach( $selected_Filelist->get_array() as $lFile )
+				{
+					$action_msg .= "\n".$lFile->get_rel_path().':<br />
+					<input id="perms_readonly_'.$lFile->get_md5_ID().'"
+						name="perms['.$lFile->get_md5_ID().']"
+						type="radio"
+						value="444"'
+						.( $lFile->get_perms( 'octal' ) == 444 ?
+								' checked="checked"' :
+								'' ).' />
+					<label for="perms_readonly_'.$lFile->get_md5_ID().'">'.T_('Read-only').'</label>
+
+					<input id="perms_readwrite_'.$lFile->get_md5_ID().'"
+						name="perms['.$lFile->get_md5_ID().']"
+						type="radio"
+						value="666"'
+						.( $lFile->get_perms( 'octal' ) == 666 || $lFile->get_perms( 'octal' ) == 777 ?
+								'checked="checked"' :
+								'' ).' />
+					<label for="perms_readwrite_'.$lFile->get_md5_ID().'">'.T_('Read and write').'</label>
+					<br />';
+				}
+			}
+			else
+			{	// UNIX permissions:
+				$action_msg .= '<input type="text" name="chmod" value="'
+												.$lFile->get_perms( 'octal' ).'" maxlength="3" size="3" /><br />';
+				$js_focus = 'document.form_chmod.chmod';
+			}
+
+			$action_msg .= '
+			<input type="submit" value="'.format_to_output( T_('Set new permissions'), 'formvalue' ).'" />
+			</form>
+			</div>
+			';
+		}
+
+		// }}}
+		break;
+
+
+	case 'file_cmr':
+		// copy/move/rename - we come here from the "with selected" toolbar {{{
+		#pre_dump( $selected_Filelist );
+
+		// }}}
+		break;
+
+
+	case 'default':
+		// ------------------------
+		// default action (view):
+		// ------------------------
+		if( !$selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.') );
+			break;
+		}
+
+		$selectedFile = & $selected_Filelist->getFileByIndex(0);
+
+		// Load meta data:
+		$selectedFile->load_meta();
+
+		// TODO: check if available
+
+		require dirname(__FILE__).'/_file_view.inc.php';
+
+		exit;
+
+
+	case 'leaveMode':
+		// leave mode (upload, ..)
+		$Fileman->fm_mode = NULL;
+		header( 'Location: '.$Fileman->getCurUrl() );
+		break;
 }
 
 
@@ -1030,26 +1026,6 @@ switch( $Fileman->fm_mode )
 
 		$Results->title = T_('Existing links');
 
-		/*
-		$Results->cols[] = array(
-								'th' => T_('Link ID'),
-								'order' => 'link_ID',
-								'td' => '$link_ID$',
-							);
-
-		$Results->cols[] = array(
-								'th' => T_('Type'),
-								'order' => 'link_ltype_ID',
-								'td' => '$link_ltype_ID$',
-							);
-
- 		$Results->cols[] = array(
-								'th' => T_('File ID'),
-								'order' => 'file_ID',
-								'td' => '$file_ID$',
-							);
-		*/
-
 		function file_path( & $row )
 		{
 			global $current_File;
@@ -1206,6 +1182,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.108  2005/05/16 15:17:12  fplanque
+ * minor
+ *
  * Revision 1.107  2005/05/13 18:41:28  fplanque
  * made file links clickable... finally ! :P
  *

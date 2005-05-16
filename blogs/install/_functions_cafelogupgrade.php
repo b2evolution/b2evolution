@@ -42,7 +42,7 @@ function upgrade_cafelog_tables()
 									('db_version', '$new_db_version'),
 									('default_locale', '$default_locale'),
 									('posts_per_page', '5'),
-									('what_to_show', 'pages'),
+									('what_to_show', 'posts'),
 									('archive_mode', '".$q['archive_mode']."'),
 									('time_difference', '".$q['time_difference']."'),
 									('AutoBR', '".$q['AutoBR']."'),

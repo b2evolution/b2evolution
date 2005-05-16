@@ -20,9 +20,43 @@ param( 'action', 'string', '', true );
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
 
+/*
+ * Load editable objects:
+ */
+if( param( 'link_ID', 'integer', NULL, false, false, false ) )
+{
+	if( ($edited_Link = $LinkCache->get_by_ID( $link_ID, false )) === false )
+	{	// We could not find the linke to edit:
+		$Messages->head = T_('Cannot edit link!');
+		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
+		unset( $edited_Link );
+		unset( $link_ID );
+	}
+}
+
 
 switch($action)
 {
+	case 'delete_link':
+		// Delete a link:
+
+		// TODO: check perm!
+
+		// Unlink File from Item:
+		if( isset( $edited_Link ) )
+		{
+			// TODO: get Item from Link to check perm
+
+			// TODO: check item EDIT permissions!
+
+			// Delete from DB:
+			$msg = sprintf( T_('Link from &laquo;%s&raquo; deleted.'), $edited_Link->Item->dget('title') );
+			$edited_Link->dbdelete( true );
+			unset($edited_Link);
+			$Messages->add( $msg, 'note' );
+		}
+		// This will eventually boil down to editing, so we need to prepare...
+
 	case 'edit':
 		/*
 		 * --------------------------------------------------------------------
@@ -37,28 +71,11 @@ switch($action)
 
 		$AdminUI->title = T_('Editing post').': '.$edited_Item->dget( 'title', 'htmlhead' );
 		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
-		require (dirname(__FILE__). '/_menutop.php');
 
 		$post_status = $edited_Item->get( 'status' );
 		// Check permission:
 		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
-
-		$post_title = $edited_Item->get( 'title' );
-		$post_urltitle = $edited_Item->get( 'urltitle' );
-		$post_url = $edited_Item->get( 'url' );
-		$content = format_to_edit( $edited_Item->get( 'content' ) );
-		$post_pingback = 0;
-		$post_trackbacks = '';
-		$post_comments = $edited_Item->get( 'comments' );
-		$post_extracats = postcats_get_byID( $post );
-
-		// Display edit form:
-		$form_action = 'edit_actions.php';
-		$next_action = 'update';
-		require(dirname(__FILE__).'/_item.form.php');
-
 		break;
-
 
 	case 'editcomment':
 		/*
@@ -69,15 +86,12 @@ switch($action)
 		$edited_Comment = Comment_get_by_ID( $comment );
 
 		$AdminUI->title = T_('Editing comment').' #'.$edited_Comment->ID;
-		require (dirname(__FILE__).'/_menutop.php');
 
 		$blog = $edited_Comment->Item->blog_ID;
 		$Blog = Blog_get_by_ID( $blog );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_comments', 'any', true, $blog );
-
-		require(dirname(__FILE__).'/_comment.form.php');
 
 		break;
 
@@ -99,15 +113,9 @@ switch($action)
 												: '' /* Current blog has no cats, we can't be posting */ ) );
 		// TODO: edit_reload params handling is far from complete..
 
-		require (dirname(__FILE__).'/_menutop.php');
-
 		if( !$blog )
 		{
-			?>
-			<div class="panelblock">
-			<?php printf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.$admin_email.'?subject=b2-promotion"' ); ?>
-			</div>
-			<?php
+			$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.$admin_email.'?subject=b2-promotion"' ), 'note' );
 			break;
 		}
 
@@ -115,14 +123,7 @@ switch($action)
 
 		if( ! blog_has_cats( $blog ) )
 		{
-			?>
-			<div class="panelinfo">
-				<?php
-				Log::display( '', '', T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), 'error' );
-				?>
-			</div>
-			<?php
-
+			$Messages->add( T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), 'note' );
 			break;
 		}
 
@@ -173,8 +174,56 @@ switch($action)
 		param( 'renderers', 'array', array( 'default' ) );
 
 		param( 'edit_date', 'integer', 0 );
+}
 
 
+/**
+ * Display page header:
+ */
+require dirname(__FILE__).'/_menutop.php';
+
+
+/**
+ * Display payload:
+ */
+switch( $action )
+{
+	case 'delete_link':
+	case 'edit':
+		/*
+		 * --------------------------------------------------------------------
+		 * Display post editing form
+		 */
+		$post_title = $edited_Item->get( 'title' );
+		$post_urltitle = $edited_Item->get( 'urltitle' );
+		$post_url = $edited_Item->get( 'url' );
+		$content = format_to_edit( $edited_Item->get( 'content' ) );
+		$post_pingback = 0;
+		$post_trackbacks = '';
+		$post_comments = $edited_Item->get( 'comments' );
+		$post_extracats = postcats_get_byID( $post );
+
+		// Display edit form:
+		$form_action = 'edit_actions.php';
+		$next_action = 'update';
+		require(dirname(__FILE__).'/_item.form.php');
+
+		break;
+
+	case 'editcomment':
+		/*
+		 * --------------------------------------------------------------------
+		 * Display comment in edit form
+		 */
+		require(dirname(__FILE__).'/_comment.form.php');
+
+		break;
+
+	default:
+		/*
+		 * --------------------------------------------------------------------
+		 * New post form  (can be a bookmarklet form if mode == bookmarklet )
+		 */
 		// Display edit form:
 		$form_action = 'edit_actions.php';
 		$next_action = 'create';

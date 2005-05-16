@@ -69,8 +69,8 @@ $Form->begin_form( 'fform', T_('Copy / Move / Rename') );
 	echo $Fileman->getFormHiddenInputs();
 	$Form->hidden( 'cmr_doit', 1 );
 
-	echo '<div class="notes"><strong>'.T_('You are in copy-move-rename mode.')
-					.'</strong><br />'.T_('Please navigate to the desired location.').'</div>';
+	echo '<p class="notes"><strong>'.T_('You are in copy-move-rename mode.')
+					.'</strong> '.T_('Please navigate to the desired target location.').'</p>';
 
 	$LogCmr->display( '', '', true, 'all' );
 
@@ -95,8 +95,9 @@ $Form->begin_form( 'fform', T_('Copy / Move / Rename') );
 												sprintf( T_('The existing file &laquo;%s&raquo; will be replaced with this file.'),
 																	$TargetFile->get_full_path() ) );
 			}
-			?>
 
+			// $Form->checkbox( 'cmr_keepsource_'.$lSourceFile->get_md5_ID(), )
+			?>
 			<div class="label">
 				<label for="cmr_keepsource_<?php $lSourceFile->get_md5_ID(); ?>"><?php echo T_('Keep source file') ?>:</label>
 			</div>
@@ -171,6 +172,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.6  2005/05/16 15:17:12  fplanque
+ * minor
+ *
  * Revision 1.5  2005/05/13 16:49:17  fplanque
  * Finished handling of multiple roots in storing file data.
  * Also removed many full paths passed through URL requests.

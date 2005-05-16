@@ -94,7 +94,7 @@ class DataObjectCache
 		if( $this->all_loaded )
 			return	false;	// Already loaded;
 
-		$Debuglog->add( get_class($this).' - Loading <strong>'.$this->objtype.'(ALL)</strong> into cache' );
+		$Debuglog->add( get_class($this).' - Loading <strong>'.$this->objtype.'(ALL)</strong> into cache', 'dataobjects' );
 		$sql = "SELECT * FROM $this->dbtablename";
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
@@ -129,7 +129,7 @@ class DataObjectCache
 	{
 		global $DB, $Debuglog;
 
-		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache", 'dataobjects' );
 
 		if( empty( $req_list ) )
 		{
@@ -215,7 +215,7 @@ class DataObjectCache
 
 		if( !empty( $this->cache[ $req_ID ] ) )
 		{ // Already in cache
-			// $Debuglog->add( "Accessing $this->objtype($req_ID) from cache" );
+			// $Debuglog->add( "Accessing $this->objtype($req_ID) from cache", 'dataobjects' );
 			return $this->cache[ $req_ID ];
 		}
 		elseif( !$this->all_loaded )
@@ -226,27 +226,27 @@ class DataObjectCache
 			}
 			else
 			{ // Load just the requested object:
-				$Debuglog->add( "Loading <strong>$this->objtype($req_ID)</strong> into cache" );
+				$Debuglog->add( "Loading <strong>$this->objtype($req_ID)</strong> into cache", 'dataobjects' );
 				$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname = $req_ID";
 
 				if( $row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_ID()' ) )
 				{
-					//$Debuglog->add( 'success' );
+					//$Debuglog->add( 'success', 'dataobjects' );
 					if( ! $this->add( new $this->objtype( $row ) ) )
 					{
-						$Debuglog->add( 'Could not add() object to cache!' );
+						$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
 					}
 				}
 				else
 				{
-					$Debuglog->add( 'Could not get DataObject by ID. Query: '.$sql, 'error' );
+					$Debuglog->add( 'Could not get DataObject by ID. Query: '.$sql, 'dataobjects' );
 				}
 			}
 		}
 
 		if( empty( $this->cache[ $req_ID ] ) )
 		{ // Requested object does not exist
-			// $Debuglog->add( 'failure' );
+			// $Debuglog->add( 'failure', 'dataobjects' );
 			if( $halt_on_error )
 			{
 				die( "Requested $this->objtype does not exist!" );
@@ -334,6 +334,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.18  2005/05/16 15:17:13  fplanque
+ * minor
+ *
  * Revision 1.17  2005/05/11 13:21:38  fplanque
  * allow disabling of mediua dir for specific blogs
  *

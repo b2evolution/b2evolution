@@ -3,9 +3,11 @@
  * Global lang file
  * This file was generated automatically from messages.po
  */
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+
 
 $trans['fr_FR'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2005-01-26 20:52+0100\nPO-Revision-Date: 2005-01-28 20:23+0100\nLast-Translator: Francois PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\nX-Poedit-Language: French\nX-Poedit-Country: FRANCE\nX-Poedit-SourceCharset: iso-8859-1\n",
+	'' => "Project-Id-Version: b2evolution 0.9\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2005-01-26 20:52+0100\nPO-Revision-Date: 2005-05-16 14:53+0100\nLast-Translator: Francois PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\nX-Poedit-Language: French\nX-Poedit-Country: FRANCE\nX-Poedit-SourceCharset: iso-8859-1\n",
 	'Selected' => "Sélectionné",
 	'Categories' => "Catégories",
 	'Permanent link to full entry' => "Lien permanent vers l'article complet",
@@ -735,7 +737,7 @@ $trans['fr_FR'] = array(
 	'Regular expression' => "Expression régulière",
 	'Default user rights' => "Droits utilisateurs par défaut",
 	'New users can register' => "Inscriptions possibles",
-	'Check to allow new users to register themselves.' => "Cochez cette case pour autoriser de nouveaux utilisateurs à s'inscire.",
+	'Check to allow new users to register themselves.' => "Cochez cette case pour autoriser de nouveaux utilisateurs à s'inscrire.",
 	'Group for new users' => "Groupe par défaut",
 	'Groups determine user roles and permissions.' => "Les groupes déterminent les rôles et les permissions des utilisateurs.",
 	'Level for new users' => "Niveau par défaut",
@@ -1235,7 +1237,7 @@ $trans['fr_FR'] = array(
 	'login/password no longer valid.' => "cet identifiant/mot de passe n'est plus valide",
 	'You must log in!' => "Vous devez vous identifier!",
 	'Login if you have an account...' => "Identifiez vous si vous avez un compte...",
-	'Register...' => "S'inscire...",
+	'Register...' => "S'inscrire...",
 	'Register to open an account...' => "Inscrivez vous pour ouvrir un compte...",
 	'Logout (%s)' => "Déconnexion (%s)",
 	'Logout from your account' => "Déconnexion de votre compte",
@@ -1372,7 +1374,7 @@ $trans['fr_FR'] = array(
 	'(twice)' => "(deux fois)",
 	'Minimum %d characters, please.' => "%d caractères minimum, SVP.",
 	'Preferred language' => "Langue préférrée",
-	'Register!' => "S'inscire!",
+	'Register!' => "S'inscrire!",
 	'Log into existing account...' => "S'identifier sur un compte existant...",
 	'b2evo installer' => "Installation de b2evo",
 	'Installer for version ' => "Installateur de la version",

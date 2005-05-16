@@ -488,7 +488,7 @@ class DataObject
 
 		// Set value:
 		$this->$parname = ($make_null && empty($parvalue)) ? NULL : $parvalue;
-		$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname );
+		$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname, 'dataobjects' );
 
 		// Remember change for later db update:
 		$this->dbchange( $dbfield, $fieldtype, $parname );
@@ -527,6 +527,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.16  2005/05/16 15:17:12  fplanque
+ * minor
+ *
  * Revision 1.15  2005/04/19 18:04:37  fplanque
  * implemented nested transactions for MySQL
  *

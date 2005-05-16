@@ -328,56 +328,33 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 <div class="clear"></div>
 
 <?php
-
 // ================================== END OF EDIT FORM ==================================
 $Form->end_form();
 
-// End payload block:
-$AdminUI->dispPayloadEnd();
-
-
-// Begin payload block:
-$AdminUI->dispPayloadBegin();
-
- 	// ####################### LINKS #########################
-
-require dirname(__FILE__).'/_item_links.inc.php';
-
-
-	if( $next_action == 'update' )
-	{ // Editing post
-		$Results = & new Results(
-							'SELECT link_ID, link_ltype_ID, file_ID, file_path, file_title
-								 FROM T_links INNER JOIN T_files ON link_file_ID = file_ID
-								WHERE link_item_ID = '.$edited_Item->ID,
-								20, 'link_' );
-
-		$Results->title = T_('Linked to...');
-
- 		$Results->cols[] = array(
-								'th' => T_('Path'),
-								'order' => 'file_path',
-								'td' => '$file_path$',
-							);
-
- 		$Results->cols[] = array(
-								'th' => T_('Title'),
-								'order' => 'file_title',
-								'td_start' => '<td class="left">',
-								'td' => '$file_title$',
-							);
-
-		$Results->global_icon( T_('Link a file...'), 'link',
-														'files.php?fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('File') );
-
-		$Results->display();
-	}
 
 // End payload block:
 $AdminUI->dispPayloadEnd();
+
+
+// ####################### LINKS #########################
+
+if( $next_action == 'update' )
+{ // Editing post
+	// End payload block:
+	$AdminUI->dispPayloadBegin();
+
+	require dirname(__FILE__).'/_item_links.inc.php';
+
+	// End payload block:
+	$AdminUI->dispPayloadEnd();
+}
+
 
 /*
  * $Log$
+ * Revision 1.25  2005/05/16 15:17:12  fplanque
+ * minor
+ *
  * Revision 1.24  2005/05/13 18:41:28  fplanque
  * made file links clickable... finally ! :P
  *

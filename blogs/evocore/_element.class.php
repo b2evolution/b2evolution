@@ -85,7 +85,7 @@ class Element extends DataObject
 			$this->name = $db_row->$namefield;
 		}
 
- 		$Debuglog->add( "Created element <strong>$this->name</strong>" );
+ 		$Debuglog->add( "Created element <strong>$this->name</strong>", 'dataobjects' );
 
 	}
 
@@ -122,6 +122,9 @@ class Element extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2005/05/16 15:17:13  fplanque
+ * minor
+ *
  * Revision 1.4  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

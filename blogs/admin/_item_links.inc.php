@@ -78,7 +78,7 @@ if( false )
 			$current_File->load_meta( false, $row );
 
 			// File relative path & name:
-			return T_('File').': '.$current_File->url().' - '.$current_File->dget('title');
+			return T_('File').': '.$current_File->url().'<span class="filemeta"> - '.$current_File->dget('title').'</span>';
 		}
 
 		return '?';
@@ -92,18 +92,31 @@ if( false )
 
  	$Results->cols[] = array(
 							'th' => T_('Unlink'),
+							'td_start' => '<td class="lastcol shrinkwrap">',
 							'td' => action_icon( T_('Delete this link!'), 'unlink',
                         '%regenerate_url( \'tsk_ID,action\', \'link_ID=$link_ID$&amp;action=delete_link\')%' ),
 						);
 
-	$Results->global_icon( T_('Link an existing firm...'), 'link',
+	if( isset( $db_aliases['T_firms'] ) )
+	{	// This application handles firms:
+		$Results->global_icon( T_('Link an existing firm...'), 'link',
 													'?tsk_ID='.$edited_Item->ID.'&amp;action=link_firm', T_('Firm') );
-	$Results->global_icon( T_('Link an existing establishment...'), 'link',
-													'?tsk_ID='.$edited_Item->ID.'&amp;action=link_establishment', T_('Establishment') );
-	$Results->global_icon( T_('Link an existing contact...'), 'link',
+	}
+	if( isset( $db_aliases['T_contacts'] ) )
+	{	// This application handles contacts:
+		$Results->global_icon( T_('Link an existing contact...'), 'link',
 													'?tsk_ID='.$edited_Item->ID.'&amp;action=link_contact', T_('Contact') );
-	$Results->global_icon( T_('Link an existing task...'), 'link',
+	}
+	if( isset( $db_aliases['T_establishments'] ) )
+	{	// This application handles estabs:
+		$Results->global_icon( T_('Link an existing establishment...'), 'link',
+													'?tsk_ID='.$edited_Item->ID.'&amp;action=link_establishment', T_('Establishment') );
+	}
+	if( isset( $db_aliases['T_tasks'] ) )
+	{	// This application handles tasks:
+		$Results->global_icon( T_('Link an existing task...'), 'link',
 													'?tsk_ID='.$edited_Item->ID.'&amp;action=link_task', T_('Task') );
+	}
 	$Results->global_icon( T_('Link a file...'), 'link',
 													'files.php?fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('File') );
 

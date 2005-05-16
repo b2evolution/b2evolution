@@ -173,14 +173,14 @@ class UserCache extends DataObjectCache
 
 		if( isset( $this->alreadyCached['blogmembers'] ) && isset( $this->alreadyCached['blogmembers'][$blog_ID] ) )
 		{
-			$Debuglog->add( "Already loaded <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache" );
+			$Debuglog->add( "Already loaded <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache", 'dataobjects' );
 			return false;
 		}
 
 		// Remember this special load:
 		$this->alreadyCached['blogmembers'][$blog_ID] = true;
 
-		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache", 'dataobjects' );
 
 		foreach( $DB->get_results( 'SELECT *
 																	FROM T_users INNER JOIN T_blogusers ON ID = bloguser_user_ID
@@ -253,6 +253,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.17  2005/05/16 15:17:13  fplanque
+ * minor
+ *
  * Revision 1.16  2005/03/14 20:22:20  fplanque
  * refactoring, some cacheing optimization
  *

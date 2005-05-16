@@ -82,7 +82,7 @@ class BlogCache extends DataObjectCache
 		global $DB, $Debuglog, $baseurl;
 
 		// Load just the requested object:
-		$Debuglog->add( "Loading <strong>$this->objtype($req_url)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype($req_url)</strong> into cache", 'dataobjects' );
 
 		$sql = "SELECT *
 						FROM $this->dbtablename
@@ -131,7 +131,7 @@ class BlogCache extends DataObjectCache
 		global $DB, $Debuglog;
 
 		// Load just the requested object:
-		$Debuglog->add( "Loading <strong>$this->objtype($req_urlname)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype($req_urlname)</strong> into cache", 'dataobjects' );
 		$sql = "SELECT *
 						FROM $this->dbtablename
 						WHERE blog_urlname = ".$DB->quote($req_urlname);
@@ -160,7 +160,7 @@ class BlogCache extends DataObjectCache
 	{
 		global $DB, $Debuglog;
 
-		$Debuglog->add( "Loading <strong>$this->objtype(criterion: $criterion)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype(criterion: $criterion)</strong> into cache", 'dataobjects' );
 
 		switch( $criterion )
 		{
@@ -224,6 +224,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.11  2005/05/16 15:17:12  fplanque
+ * minor
+ *
  * Revision 1.10  2005/05/12 18:39:24  fplanque
  * storing multi homed/relative pathnames for file meta data
  *

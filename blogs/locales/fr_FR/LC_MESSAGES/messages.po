@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2005-01-26 20:52+0100\n"
-"PO-Revision-Date: 2005-04-20 21:57+0100\n"
+"PO-Revision-Date: 2005-05-16 14:53+0100\n"
 "Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -3633,7 +3633,7 @@ msgstr "Inscriptions possibles"
 
 #: ..\..\..\admin\_set_general.form.php:24
 msgid "Check to allow new users to register themselves."
-msgstr "Cochez cette case pour autoriser de nouveaux utilisateurs à s'inscire."
+msgstr "Cochez cette case pour autoriser de nouveaux utilisateurs à s'inscrire."
 
 #: ..\..\..\admin\_set_general.form.php:26
 msgid "Group for new users"
@@ -5851,7 +5851,7 @@ msgstr "Identifiez vous si vous avez un compte..."
 
 #: ..\..\..\evocore\_user.funcs.php:417
 msgid "Register..."
-msgstr "S'inscire..."
+msgstr "S'inscrire..."
 
 #: ..\..\..\evocore\_user.funcs.php:418
 msgid "Register to open an account..."
@@ -6465,7 +6465,7 @@ msgstr "Langue préférrée"
 
 #: ..\..\..\htsrv\_reg_form.php:48
 msgid "Register!"
-msgstr "S'inscire!"
+msgstr "S'inscrire!"
 
 #: ..\..\..\htsrv\_reg_form.php:55
 msgid "Log into existing account..."
