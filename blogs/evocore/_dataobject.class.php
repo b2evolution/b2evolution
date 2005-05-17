@@ -253,10 +253,12 @@ class DataObject
 	{
 		if( $this->ID == 0 )
 		{	// Object not serialized yet, let's insert!
+			// echo 'INSERT';
 			$this->dbinsert();
 		}
 		else
 		{	// Object already serialized, let's update!
+			// echo 'UPDATE';
 			$this->dbupdate();
 		}
 	}
@@ -519,14 +521,16 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 		$modified = sprintf( T_('Last modified on %s by %s'), mysql2localedate( $pos_datemodified ), $User->dget('preferedname') );
 
-		return '<img src="img/clock.png" width="17" height="17" class="middle" alt="'.$modified.
-														'" title="'.$modified.'" /> ';
+		return '<img src="img/clock.png" width="17" height="17" class="middle" alt="'.$modified.'" title="'.$modified.'" /> ';
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.17  2005/05/17 19:26:07  fplanque
+ * FM: copy / move debugging
+ *
  * Revision 1.16  2005/05/16 15:17:12  fplanque
  * minor
  *

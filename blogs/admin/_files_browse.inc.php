@@ -427,11 +427,15 @@ while( $lFile = & $Fileman->get_next() )
 	echo '<td class="actions lastcol">';
 	// Not implemented yet: $Fileman->dispButtonFileEdit();
 	$Fileman->dispButtonFileProperties();
+
 	if( $current_User->check_perm( 'files', 'edit' ) )
 	{ // User can edit:
-		$Fileman->dispButtonFileRename();
-		$Fileman->dispButtonFileCopy();
+
+		// Rename (NEW):
+		echo '<a title="'.T_('Rename').'" href="'.$Fileman->getLinkFile( $Fileman->curFile, 'rename' ).'">'.get_icon( 'file_rename' ).'</a>';
+
 		$Fileman->dispButtonFileMove();
+		$Fileman->dispButtonFileCopy();
 		$Fileman->dispButtonFileDelete();
 	}
 	echo '</td>';
@@ -477,19 +481,27 @@ else
 			?></a>
 		&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
 
+		<input class="ActionButton"
+			title="<?php echo T_('Open in new windows'); ?>"
+			name="actionArray[open_in_new_windows]"
+			value="open_in_new_windows"
+			type="image"
+			src="<?php echo get_icon( 'window_new', 'url' ) ?>"
+			onclick="openselectedfiles(); return false;" />
+
 		<?php
     if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
 			?>
-			<input class="DeleteButton"
+			<input class="ActionButton" type="image" name="actionArray[rename]"
+				title="<?php echo T_('Rename the selected files'); ?>"
+				src="<?php echo get_icon( 'file_rename', 'url' ); ?>" />
+
+			<input class="DeleteButton" type="image" name="actionArray[delete]"
 				title="<?php echo T_('Delete the selected files') ?>"
-				name="actionArray[delete]"
-				value="delete"
-				type="image"
 				src="<?php echo get_icon( 'file_delete', 'url' ) ?>" />
 		<?php
 		}
-
 			/* No delete javascript, we need toi check DB integrity:
 
 			onclick="if( r = openselectedfiles(true) )
@@ -518,23 +530,7 @@ else
 						This would create <img> or <a href> tags depending on file types.
 			*/
 
-		?>
-
-		<input class="ActionButton"
-			title="<?php echo T_('Open in new windows'); ?>"
-			name="actionArray[open_in_new_windows]"
-			value="open_in_new_windows"
-			type="image"
-			src="<?php echo get_icon( 'window_new', 'url' ) ?>"
-			onclick="openselectedfiles(); return false;" />
-
-	<?php
 	/* Not fully functional
-		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
-			title="<?php echo T_('Rename the selected files'); ?>"
-			onclick="return openselectedfiles(true);"
-			src="<?php echo get_icon( 'file_rename', 'url' ); ?>" />
-
 		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
 			title="<?php echo T_('Copy the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
@@ -789,6 +785,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.34  2005/05/17 19:26:05  fplanque
+ * FM: copy / move debugging
+ *
  * Revision 1.33  2005/05/13 16:49:17  fplanque
  * Finished handling of multiple roots in storing file data.
  * Also removed many full paths passed through URL requests.

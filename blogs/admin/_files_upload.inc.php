@@ -161,7 +161,7 @@ if( false )
 
 		if( count( $failedFiles ) )
 		{
-			$LogUpload->add( T_('Some file uploads failed. Please check the errors below.'), 'note' );
+			$LogUpload->add( T_('Some file uploads failed. Please check the errors below.'), 'error' );
 		}
 		$LogUpload->display( '', '', true, 'all' ); ?>
 
@@ -173,9 +173,9 @@ if( false )
 				<?php
 				$restrictNotes = array();
 
-				if( $allowedFileExtensions )
+				if( $Settings->get( 'upload_allowedext' ) )
 				{	// We want to restrict on file extensions:
-					$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.implode( ', ', $allowedFileExtensions );
+					$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.$Settings->get( 'upload_allowedext' );
 				}
 				if( $Settings->get( 'upload_maxkb' ) )
 				{	// We want to restrict on file size:
@@ -270,6 +270,9 @@ if( false )
 
 /*
  * $Log$
+ * Revision 1.9  2005/05/17 19:26:06  fplanque
+ * FM: copy / move debugging
+ *
  * Revision 1.8  2005/05/11 15:58:30  fplanque
  * cleanup
  *

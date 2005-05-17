@@ -13,28 +13,28 @@ if( false )
 
 	if( isset( $db_aliases['T_contacts'] ) )
 	{	// This application handles contacts:
-		$SQL->SELECT_add( 'cont_ID, cont_firstname, cont_lastname' );
+		$SQL->SELECT_add( ', cont_ID, cont_firstname, cont_lastname' );
 		$SQL->FROM_add( 'LEFT JOIN T_contacts ON link_cont_ID = cont_ID' );
 		$order_fields[] = 'cont_lastname, cont_firstname';
 	}
 
 	if( isset( $db_aliases['T_establishments'] ) )
 	{	// This application handles estabs:
-		$SQL->SELECT_add( 'etab_ID, etab_name' );
+		$SQL->SELECT_add( ', etab_ID, etab_name' );
 		$SQL->FROM_add( 'LEFT JOIN T_establishments ON link_etab_ID = etab_ID' );
 		$order_fields[] = 'etab_name';
 	}
 
 	if( isset( $db_aliases['T_firms'] ) )
 	{	// This application handles firms:
-		$SQL->SELECT_add( 'firm_ID, firm_name' );
+		$SQL->SELECT_add( ', firm_ID, firm_name' );
 		$SQL->FROM_add( 'LEFT JOIN T_firms ON link_firm_ID = firm_ID' );
 		$order_fields[] = 'firm_name';
 	}
 
 	if( isset( $db_aliases['T_tasks'] ) )
 	{	// This application handles tasks:
-		$SQL->SELECT_add( 'tsk_ID, tsk_title' );
+		$SQL->SELECT_add( ', tsk_ID, tsk_title' );
 		$SQL->FROM_add( 'LEFT JOIN T_tasks ON link_dest_item_ID = tsk_ID' );
 		$order_fields[] = 'tsk_title';
 	}

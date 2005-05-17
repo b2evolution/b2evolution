@@ -783,33 +783,140 @@ class File extends DataObject
 	 * @param string new name (without path!)
 	 * @return boolean true on success, false on failure
 	 */
-	function rename( $newname )
+	function rename_to( $newname )
 	{
-		if( rename( $this->_full_path, $this->_dir.$newname ) )
+		// echo "newname= $newname ";
+
+		if( ! @rename( $this->_posix_path, $this->_dir.$newname ) )
 		{
-			$this->_name = $newname;
+			return false;
+		}
 
-			$this->_rel_posix_path = no_trailing_slash( $this->_rel_path );	// lazy filled
-			$this->_rel_dir = dirname( $this->_rel_posix_path ).'/';				// lazy filled
-			$this->_rel_path = $this->_rel_dir.$this->_name;
+		// Get Meta data (before we change name) (we may need to update it later):
+		$this->load_meta();
 
-			$this->_posix_path = $this->_dir.$this->_name;
-			$this->_full_path = $this->_posix_path.'/';
-			$this->_md5ID = md5( $this->_posix_path );
+		$this->_name = $newname;
 
-			// Meta data...:
+		$rel_posix_path = no_trailing_slash( $this->_rel_path );
+		$rel_dir = dirname( $rel_posix_path ).'/';
+		if( $rel_dir == './' )
+		{
+			$rel_dir = '';
+		}
+		$this->_rel_path = $rel_dir.$this->_name;
+
+		$this->_posix_path = $this->_dir.$this->_name;
+		$this->_full_path = $this->_posix_path.( $this->_is_dir ? '/' : '' );
+		$this->_md5ID = md5( $this->_posix_path );
+
+		if( $this->meta == 'loaded' )
+		{	// We have meta data, we need to deal with it:
 			// unchanged : $this->set( 'root_type', $this->_root_type );
 			// unchanged : $this->set( 'root_ID', $this->_root_ID );
 			$this->set( 'path', $this->_rel_path );
 			// Record to DB:
 			$this->dbupdate();
-
-			return true;
 		}
 		else
+		{	// There migth be some old neta dat to recyle in the DB...
+			$this->load_meta();
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Move the file to another location
+	 *
+	 * Also updates meta data in DB
+	 *
+	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
+	 * @param integer ID of the user, the group or the collection the file belongs to...
+	 * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
+	 * @return boolean true on success, false on failure
+	 */
+	function move_to( $root_type, $root_ID, $rel_path )
+	{
+		// echo "relpath= $rel_path ";
+
+		$rel_path = str_replace( '\\', '/', $rel_path );
+		$adfp_posix_path = get_root_dir( $root_type, $root_ID ).$rel_path;
+
+		if( ! @rename( $this->_posix_path, $adfp_posix_path ) )
 		{
 			return false;
 		}
+
+		// Get Meta data (before we change name) (we may need to update it later):
+		$this->load_meta();
+
+		// Memorize new filepath:
+		$this->_root_type = $root_type;
+		$this->_root_ID = $root_ID;
+		$this->_rel_path= $rel_path.( $this->_is_dir ? '/' : '' );
+		$this->_posix_path = $adfp_posix_path;
+		$this->_full_path = $adfp_posix_path.( $this->_is_dir ? '/' : '' );
+		$this->_name = basename( $this->_posix_path );
+		$this->_dir = dirname( $this->_posix_path ).'/';
+		$this->_md5ID = md5( $this->_posix_path );
+
+		if( $this->meta == 'loaded' )
+		{	// We have meta data, we need to deal with it:
+			$this->set( 'root_type', $this->_root_type );
+			$this->set( 'root_ID', $this->_root_ID );
+			$this->set( 'path', $this->_rel_path );
+			// Record to DB:
+			$this->dbupdate();
+		}
+		else
+		{	// There migth be some old neta dat to recyle in the DB...
+			$this->load_meta();
+		}
+
+		return true;
+	}
+
+
+ 	/**
+	 * Copy this file to a new location
+	 *
+	 * Also copy meta data in Object
+	 *
+	 * @param File the target file (expected to not exist)
+	 * @return boolean true on success, false on failure
+	 */
+	function copy_to( & $dest_File )
+	{
+		if( ! $this->exists() || $dest_File->exists() )
+		{
+			return false;
+		}
+
+		if( ! copy( $this->get_full_path(), $dest_File->get_full_path() ) )
+		{
+			return false;
+		}
+
+		// Initializes file properties (type, size, perms...)
+		$dest_File->load_properties();
+
+		// Meta data...:
+		if( $this->load_meta() )
+		{	// We have source meta data, we need to copy it:
+			// Try to load DB meta info dor destination file:
+			$dest_File->load_meta();
+
+			// Copy meta data:
+			$dest_File->set( 'title', $this->title );
+	    $dest_File->set( 'alt'  , $this->alt );
+	    $dest_File->set( 'desc' , $this->desc );
+
+	    // Save meta data:
+			$dest_File->dbsave();
+		}
+
+		return true;
 	}
 
 
@@ -887,10 +994,14 @@ class File extends DataObject
 	 */
 	function dbinsert( )
 	{
+		global $Debuglog;
+
 		if( $this->meta == 'unknown' )
 			die( 'cannot insert File if meta data has not been checked before' );
 
 		if( ($this->ID != 0) || ($this->meta != 'notfound') ) die( 'Existing file object cannot be inserted!' );
+
+		$Debuglog->add( 'Inserting meta data for new file into db', 'files' );
 
 		// Let's make sure the bare minimum gets saved to DB:
 		$this->set_param( 'root_type', 'string', $this->_root_type );
@@ -954,6 +1065,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2005/05/17 19:26:07  fplanque
+ * FM: copy / move debugging
+ *
  * Revision 1.34  2005/05/13 18:41:28  fplanque
  * made file links clickable... finally ! :P
  *

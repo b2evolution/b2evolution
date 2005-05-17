@@ -428,6 +428,39 @@ function isFilename( $filename )
 
 
 /**
+ * @param filename to check
+ * @param string by ref, returns extension
+ * @return boolean
+ */
+function validate_file_extension( $filename, & $extension )
+{
+	global $Settings, $Messages;
+	static $allowedFileExtensions;
+
+	if( !isset($allowedFileExtensions) )
+	{
+		$allowedFileExtensions = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedext' ) ), -1, PREG_SPLIT_NO_EMPTY );
+	}
+
+	if( !empty($allowedFileExtensions) )
+	{ // check extension
+		if( preg_match( '#\.([a-zA-Z0-9\-_]+)$#', $filename, $match ) )
+		{
+			$extension = $match[1];
+
+			if( !in_array( $extension, $allowedFileExtensions ) )
+			{
+				return false;
+			}
+		}
+		// NOTE: Files with no extension are allowed..
+	}
+
+	return true;
+}
+
+
+/**
  * @param string Root type: 'user', 'group', 'collection' or 'absolute'
  * @param integer ID of the user, the group or the collection the file belongs to...
  * @return
@@ -481,6 +514,9 @@ function get_root_url( $root_type, $root_ID )
 
 /*
  * $Log$
+ * Revision 1.19  2005/05/17 19:26:07  fplanque
+ * FM: copy / move debugging
+ *
  * Revision 1.18  2005/05/13 18:41:28  fplanque
  * made file links clickable... finally ! :P
  *

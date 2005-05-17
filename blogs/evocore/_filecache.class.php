@@ -80,7 +80,7 @@ class FileCache extends DataObjectCache
 			$rel_path = strtolower(str_replace( '\\', '/', $rel_path ));
 		}
 
-		// Generate cahce key for this file:
+		// Generate cache key for this file:
 		$cacheindex = $root_type.':'.$root_ID.':'.$rel_path;
 
 		if( isset( $this->cache_root_and_path[$cacheindex] ) )
@@ -105,6 +105,9 @@ class FileCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.4  2005/05/17 19:26:07  fplanque
+ * FM: copy / move debugging
+ *
  * Revision 1.3  2005/05/12 18:39:24  fplanque
  * storing multi homed/relative pathnames for file meta data
  *

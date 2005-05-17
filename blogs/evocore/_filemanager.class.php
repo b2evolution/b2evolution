@@ -478,11 +478,11 @@ class FileManager extends Filelist
 	 */
 	function dispButtonFileCopyMoveRename( $mode, $linkTitle = NULL )
 	{
-		if( $mode != 'copy' && $mode != 'move' && $mode != 'rename' )
+		if( $mode != 'copy' && $mode != 'move' )
 		{
 			return false;
 		}
-		$url = $this->getCurUrl( array( 'fm_mode' => 'file_cmr',
+		$url = $this->getCurUrl( array( 'fm_mode' => 'file_'.$mode,
 																		'fm_sources' => false,
 																		'cmr_keepsource' => (int)($mode == 'copy') ) );
 		$url .= '&amp;fm_sources[]='.urlencode( $this->curFile->get_rel_path() );
@@ -525,17 +525,6 @@ class FileManager extends Filelist
 	function dispButtonFileMove()
 	{
 		$this->dispButtonFileCopyMoveRename( 'move' );
-	}
-
-
-	/**
-	 * Display a button to rename the current File.
-	 *
-	 * @param string Title to display for the link (default is 'Rename')
-	 */
-	function dispButtonFileRename( $linkTitle = NULL )
-	{
-		$this->dispButtonFileCopyMoveRename( 'rename', $linkTitle );
 	}
 
 
@@ -586,6 +575,7 @@ class FileManager extends Filelist
 		}
 
 		echo '<a title="'.T_('Delete').'" href="'.$this->getLinkFile( $File, 'delete' ).'">'.get_icon( 'file_delete' ).'</a>';
+
 		/* No JS: we need to check DB integrity!
 			.'" onclick="if( confirm(\''
 			.sprintf( TS_('Do you really want to delete &laquo;%s&raquo;?'),
@@ -1312,36 +1302,56 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Moves a File object physically
+	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
+	 * @param integer ID of the user, the group or the collection the file belongs to...
+	 * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
+	 * @return boolean true on success, false on failure
+	 */
+	function move_File( & $File, $root_type, $root_ID, $rel_path )
+	{
+		if( ! $File->move_to( $root_type, $root_ID, $rel_path ) )
+		{	// failed
+			return false;
+		}
+
+		if( $this->contains( $File ) === false )
+		{ // File not in filelist (expected)
+			$this->add( $File );
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Copies a File object physically to another File object
 	 *
 	 * @param File the source file (expected to exist)
 	 * @param File the target file (expected to not exist)
 	 * @return boolean true on success, false on failure
 	 */
-	function copyFileToFile( $SourceFile, &$TargetFile )
+	function copy_File( & $SourceFile, & $TargetFile )
 	{
-		if( !$SourceFile->exists() || $TargetFile->exists() )
+		if( ! $SourceFile->copy_to( $TargetFile ) )
 		{
 			return false;
 		}
-		else
-		{
-			if( $r = copy( $SourceFile->get_full_path(), $TargetFile->get_full_path() ) )
-			{
-				// Initializes file properties (type, size, perms...)
-				$TargetFile->load_properties();
-				if( $this->contains( $TargetFile ) === false )
-				{ // File not in filelist (expected)
-					$this->add( $TargetFile );
-				}
-			}
-			return $r;
+
+		if( $this->contains( $TargetFile ) === false )
+		{ // File not in filelist (expected)
+			$this->add( $TargetFile );
 		}
+
+		return true;
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.45  2005/05/17 19:26:07  fplanque
+ * FM: copy / move debugging
+ *
  * Revision 1.44  2005/05/13 16:49:17  fplanque
  * Finished handling of multiple roots in storing file data.
  * Also removed many full paths passed through URL requests.

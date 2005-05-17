@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UI for file copy / move / rename.
+ * This file implements the UI for file copy / move
  *
  * fplanque>> This whole thing is flawed:
  * 1) only geeks can possibly like to use the same interface for renaming, moving and copying
@@ -62,118 +62,42 @@ $AdminUI->dispPayloadBegin();
 
 $Form = & new Form( 'files.php' );
 
-$Form->global_icon( T_('Quit copy/move/rename mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
+$Form->global_icon( T_('Quit copy/move mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
 
-$Form->begin_form( 'fform', T_('Copy / Move / Rename') );
+$Form->begin_form( 'fform', $Fileman->fm_mode == 'file_copy' ? T_('Copy') : T_('Move') );
 
 	echo $Fileman->getFormHiddenInputs();
-	$Form->hidden( 'cmr_doit', 1 );
+	$Form->hidden( 'confirm', 1 );
 
-	echo '<p class="notes"><strong>'.T_('You are in copy-move-rename mode.')
-					.'</strong> '.T_('Please navigate to the desired target location.').'</p>';
-
-	$LogCmr->display( '', '', true, 'all' );
-
-	$sourcesInSameDir = true;
-
-	while( $lSourceFile = & $Fileman->SourceList->get_next() )
+	$Fileman->SourceList->restart();
+	while( $loop_src_File = & $Fileman->SourceList->get_next() )
 	{
-		if( $sourcesInSameDir && $lSourceFile->get_dir() != $Fileman->get_ads_list_path() )
+		$Form->fieldset( T_('Source').': '.$loop_src_File->get_rel_path() );
+
+		if( isset( $overwrite[$loop_src_File->get_md5_ID()] ) )
 		{
-			$sourcesInSameDir = false;
+			$Form->checkbox( 'overwrite['.$loop_src_File->get_md5_ID().']', $overwrite[$loop_src_File->get_md5_ID()], T_('Overwrite'), T_('Check to overwrite the existing file') );
 		}
-		?>
 
-		<fieldset>
-			<legend><?php echo T_('Source').': '.$lSourceFile->get_full_path(); ?></legend>
+		$Form->text( 'new_names['.$loop_src_File->get_md5_ID().']', $new_names[$loop_src_File->get_md5_ID()], 32,
+									T_('New name'), $loop_src_File->dget('title'), 128 );
 
-			<?php
-			if( isset( $cmr_overwrite[$lSourceFile->get_md5_ID()] )
-					&& $cmr_overwrite[$lSourceFile->get_md5_ID()] === 'ask' )
-			{
-				form_checkbox( 'overwrite', 0, '<span class="error">'.T_('Overwrite existing file').'</span>',
-												sprintf( T_('The existing file &laquo;%s&raquo; will be replaced with this file.'),
-																	$TargetFile->get_full_path() ) );
-			}
-
-			// $Form->checkbox( 'cmr_keepsource_'.$lSourceFile->get_md5_ID(), )
-			?>
-			<div class="label">
-				<label for="cmr_keepsource_<?php $lSourceFile->get_md5_ID(); ?>"><?php echo T_('Keep source file') ?>:</label>
-			</div>
-			<div class="input">
-				<input class="checkbox" type="checkbox" value="1"
-					name="cmr_keepsource[<?php echo $lSourceFile->get_md5_ID(); ?>]"
-					id="cmr_keepsource_<?php $lSourceFile->get_md5_ID(); ?>"
-					onclick="setCmrSubmitButtonValue( this.form );"<?php
-					if( $cmr_keepsource )
-					{
-						echo ' checked="checked"';
-					} ?> />
-				<span class="notes"><?php echo T_('Copy instead of move.') ?></span>
-			</div>
-			<div class="clear"></div>
-
-
-			<div class="label">
-				<label for="cmr_newname_<?php $lSourceFile->get_md5_ID(); ?>">New name:</label>
-			</div>
-			<div class="input">
-				<input type="text" name="cmr_newname[<?php $lSourceFile->get_md5_ID(); ?>]"
-					id="cmr_newname_<?php $lSourceFile->get_md5_ID(); ?>" value="<?php
-					echo isset( $cmr_newname[$lSourceFile->get_md5_ID()] ) ?
-									$cmr_newname[$lSourceFile->get_md5_ID()] :
-									$lSourceFile->get_name() ?>" />
-			</div>
-
-		</fieldset>
-
-	<?php
+		$Form->fieldset_end();
 	}
 
-	// text and value for JS dynamic fields, when referring to move/rename
-	if( $sourcesInSameDir )
-	{
-		$submitMoveOrRenameText = T_('Rename');
-		$submitMoveOrRenameText_JS = TS_('Rename');
-	}
-	else
-	{
-		$submitMoveOrRenameText = T_('Move');
-		$submitMoveOrRenameText_JS = TS_('Move');
-	}
-
-
-$Form->end_form( array( array( 'submit', 'cmr_submit', $cmr_keepsource ?  T_('Copy') : $submitMoveOrRenameText, 'SaveButton' ),
+$Form->end_form( array( array( 'submit', 'submit', $Fileman->fm_mode == 'file_copy' ? T_('Copy') : T_('Move'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
-?>
-<script type="text/javascript">
-	<!--
-	function setCmrSubmitButtonValue()
-	{
-		if( document.getElementById( 'cmr_keepsource' ).checked )
-		{
-			text = '<?php echo TS_('Copy') ?>';
-		}
-		else
-		{
-			text = '<?php echo $submitMoveOrRenameText_JS ?>';
-		}
-		document.getElementById( 'cmr_submit' ).value = text;
-	}
-	setCmrSubmitButtonValue(); // init call
-	// -->
-</script>
-<?php
+echo '<p class="notes"><strong>'.T_('You are in copy/move mode.')
+				.'</strong> '.T_('Please navigate to the desired target location.').'</p>';
 
 // End payload block:
 $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
- * Revision 1.6  2005/05/16 15:17:12  fplanque
- * minor
+ * Revision 1.7  2005/05/17 19:26:06  fplanque
+ * FM: copy / move debugging
  *
  * Revision 1.5  2005/05/13 16:49:17  fplanque
  * Finished handling of multiple roots in storing file data.

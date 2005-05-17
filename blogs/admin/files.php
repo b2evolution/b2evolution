@@ -304,6 +304,85 @@ switch( $action )
 		break;
 	*/
 
+	case 'rename':
+		// Rename a file:
+		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		{	// We do not have permission to edit files
+			$Messages->add( T_('You have no permission to edit/modify files.') );
+			$action = 'list';
+			break;
+		}
+
+		if( ! $selected_Filelist->count() )
+		{	// There is nothing to rename
+			$Messages->add( T_('Nothing selected.') );
+			$action = 'list';
+			break;
+		}
+
+		param( 'confirm', 'integer', 0 );
+		param( 'new_names', 'array', array() );
+
+		// Check params for each file to rename:
+		while( $loop_src_File = & $selected_Filelist->get_next() )
+		{
+			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
+			{	// We have not yet provided a name to rename to...
+				$confirm = 0;
+				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get_name();
+				continue;
+			}
+
+			// Check if provided name is okay:
+			$new_names[$loop_src_File->get_md5_ID()] = trim(strip_tags($new_names[$loop_src_File->get_md5_ID()]));
+			if( !isFilename($new_names[$loop_src_File->get_md5_ID()]) )
+			{
+				$confirm = 0;
+				$Messages->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ), 'error' );
+				continue;
+			}
+
+			// Check file extension:
+			$extension = '';
+			if( ! validate_file_extension( $new_names[$loop_src_File->get_md5_ID()], $extension ) )
+			{	// Extension invalid:
+				$Messages->add( sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ), 'error' );
+				$confirm = 0;
+				continue;
+			}
+		}
+
+		if( $confirm )
+		{	// Rename is confirmed, let's proceed:
+			$selected_Filelist->restart();
+			while( $loop_src_File = & $selected_Filelist->get_next() )
+			{
+				$old_name = $loop_src_File->get_name();
+				$new_name = $new_names[$loop_src_File->get_md5_ID()];
+
+				if( $new_name == $old_name )
+				{	// Name has not changed...
+					$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been renamed'), $old_name ), 'note' );
+					continue;
+				}
+				// Perform rename:
+				if( ! $loop_src_File->rename_to( $new_name ) )
+				{
+					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to  &laquo;%s&raquo;'),
+													$old_name, $new_name ), 'error' );
+					continue;
+				}
+
+				$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
+													$old_name, $new_name ), 'success' );
+			}
+
+			$action = 'list';
+		}
+
+		break;
+
+
 	case 'delete':
 		// Check permission:
 		$current_User->check_perm( 'files', 'edit', true );
@@ -318,7 +397,7 @@ switch( $action )
 		param( 'confirmed', 'integer', 0 );
 		param( 'delsubdirs', 'array', array() );
 
-		if( !$confirmed )
+		if( ! $confirmed )
 		{
 			$action_msg = '<div class="panelinfo">';
 			$action_msg .= '<h2>'.T_('Delete file(s)?').'</h2>';
@@ -605,6 +684,8 @@ switch( $action )
 		break;
 
 
+	case 'file_copy':
+	case 'file_move':
 	case 'file_cmr':
 		// copy/move/rename - we come here from the "with selected" toolbar {{{
 		#pre_dump( $selected_Filelist );
@@ -677,7 +758,6 @@ switch( $Fileman->fm_mode )
 		}
 
 		$LogUpload = new Log( 'error' );
-		$allowedFileExtensions = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedext' ) ), -1, PREG_SPLIT_NO_EMPTY );
 
 		/**
 		 * @var array Remember failed files (and the error messages)
@@ -686,7 +766,7 @@ switch( $Fileman->fm_mode )
 
 		// Process uploaded files:
 		if( isset($_FILES) && count( $_FILES ) )
-		{{{	// Some files have been uploaded:
+		{	// Some files have been uploaded:
 
 			param( 'uploadfile_title', 'array', array() );
 			param( 'uploadfile_alt', 'array', array() );
@@ -772,20 +852,12 @@ switch( $Fileman->fm_mode )
 				}
 
 				// Check file extension:
-				if( !empty($allowedFileExtensions) )
-				{ // check extension
-					if( preg_match( '#\.([^.]+)$#', $newName, $match ) )
-					{
-						$extension = $match[1];
-
-						if( !in_array( $extension, $allowedFileExtensions ) )
-						{
-							$failedFiles[$lKey] = sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension );
-							// Abort upload for this file:
-							continue;
-						}
-					}
-					// NOTE: Files with no extension are allowed..
+				$extension = '';
+				if( ! validate_file_extension( $newName, $extension ) )
+				{	// Extension invalid, message already output.
+					$failedFiles[$lKey] = sprintf( T_('The file extension is not allowed.'), $extension );
+					// Abort upload for this file:
+					continue;
 				}
 
 				// Get File object for requested target location:
@@ -833,7 +905,7 @@ switch( $Fileman->fm_mode )
 				// Tell the filamanager about the new file:
 				$Fileman->add( $newFile );
 			}
-		}}}
+		}
 
 
 		// Upload dialog:
@@ -843,9 +915,11 @@ switch( $Fileman->fm_mode )
 		break;
 
 
+	case 'file_copy':
+	case 'file_move':
 	case 'file_cmr':
 		// ------------------------
-		// copy/move/rename a file:
+		// copy/move a file:
 		// ------------------------
 		/*
 		 * fplanque>> This whole thing is flawed:
@@ -856,8 +930,6 @@ switch( $Fileman->fm_mode )
 		 * 4) For Move and Copy, this should use a "destination directory tree" on the right (same as for upload)
 		 * 5) Given all the reasons above copy, move and rename should be clearly separated into 3 different interfaces.
 		 */
-		// {{{
-
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{	// We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.') );
@@ -865,126 +937,154 @@ switch( $Fileman->fm_mode )
 			break;
 		}
 
+		// TODO: get rid of this:
 		$LogCmr = new Log( 'error' );  // Log for copy/move/rename mode
 
 		if( !$Fileman->SourceList->count() )
 		{
-			$Messages->add( sprintf( T_('No source files!') ) );
+			$Messages->add(T_('No source files!') );
 			$Fileman->fm_mode = NULL;
 			break;
 		}
 
-		param( 'cmr_keepsource', 'integer', 0 );
-		param( 'cmr_newname', 'array', array() );
-		param( 'cmr_overwrite', 'array', array() );
-		param( 'cmr_doit', 'integer', 0 );
+		param( 'confirm', 'integer', 0 );
+		param( 'new_names', 'array', array() );
+		param( 'overwrite', 'array', array() );
 
+		// Check params for each file to rename:
+		while( $loop_src_File = & $Fileman->SourceList->get_next() )
+		{
+			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
+			{	// We have not yet provided a name to rename to...
+				$confirm = 0;
+				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get_name();
+				continue;
+			}
 
-		$Fileman->SourceList->restart();
-
-		$file_count = 0;
-		if( $cmr_doit )
-		{{{ // we want Action!
-			while( $SourceFile = & $Fileman->SourceList->get_next() )
+			// Check if provided name is okay:
+			$new_names[$loop_src_File->get_md5_ID()] = trim(strip_tags($new_names[$loop_src_File->get_md5_ID()]));
+			if( !isFilename($new_names[$loop_src_File->get_md5_ID()]) )
 			{
-				$newname = trim(strip_tags($cmr_newname[$file_count]));
-				if( !isFilename($newname) )
+				$confirm = 0;
+				$Messages->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ), 'error' );
+				continue;
+			}
+
+			// Check file extension:
+			$extension = '';
+			if( ! validate_file_extension( $new_names[$loop_src_File->get_md5_ID()], $extension ) )
+			{	// Extension invalid:
+				$Messages->add( sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ), 'error' );
+				$confirm = 0;
+				continue;
+			}
+
+			// Check if destination file exists:
+			if( ($dest_File = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(),
+																								$Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] ))
+							&& $dest_File->exists() )
+			{ // Target exists
+				if( $dest_File === $loop_src_File )
 				{
-					$LogCmr->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $newname ) );
-				}
-				elseif( ($TargetFile = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(),
-																																		$Fileman->get_rds_list_path().$newname ))
-								&& $TargetFile->exists() )
-				{ // target filename already given to another file
-					if( $TargetFile === $SourceFile )
-					{
-						$LogCmr->add( T_('Source- and target file are the same. Please choose another name or directory.') );
-						$overwrite = false;
-					}
-					elseif( !$overwrite )
-					{
-						$LogCmr->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newname ) );
-						$overwrite = 'ask';
-					}
-					else
-					{ // unlink existing file
-						if( !$Fileman->unlink( $TargetFile ) )
-						{
-							$LogCmr->add( sprintf( T_('Could not delete &laquo;%s&raquo;.'), $newname ) );
-						}
-						else
-						{
-							$Messages->add( sprintf( T_('Deleted file &laquo;%s&raquo;.'), $newname ), 'note' );
-						}
-					}
+					$LogCmr->add( T_('Source and target files are the same. Please choose another name or directory.') );
+					$confirm = 0;
+					continue;
 				}
 
-				if( !$LogCmr->count( 'error' ) )
-				{ // no errors, safe for action
-					$oldpath = $SourceFile->get_full_path();
+				if( ! isset( $overwrite[$loop_src_File->get_md5_ID()] ) )
+				{	// We have not yet asked to overwrite:
+					$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rel_path() ) );
+					$overwrite[$loop_src_File->get_md5_ID()] = 0;
+					$confirm = 0;
+					continue;
+				}
 
-					if( $Fileman->copyFileToFile( $SourceFile, $TargetFile ) )
-					{
-						if( !$cmr_keepsource )
-						{ // move/rename
-							if( $Fileman->unlink( $SourceFile ) )
-							{
-								if( $SourceFile->get_dir() == $Fileman->get_ads_list_path() )
-								{ // successfully renamed
-									$Messages->add( sprintf( T_('Renamed &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																										basename($oldpath),
-																										$TargetFile->get_name() ), 'note' );
-								}
-								else
-								{ // successfully moved
-									$Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																										$oldpath,
-																										$TargetFile->get_name() ), 'note' );
+				// We have asked to overwite...
+				if( $Fileman->fm_mode == 'file_copy' )
+				{	// We are making a copy: no problem, we'll recycle the file ID anyway.
+					continue;
+				}
 
-								}
-							}
-							else
-							{
-								$LogCmr->add( sprintf( T_('Could not remove &laquo;%s&raquo;, but the file has been copied to &laquo;%s&raquo;.'),
-																			($SourceFile->get_dir() == $Fileman->get_ads_list_path() ?
-																				basename($oldpath) :
-																				$oldpath ),
-																			$TargetFile->get_name() ) );
-							}
-						}
-						else
-						{ // copy only
-							$Messages->add( sprintf(
-								T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-								( $SourceFile->get_dir() == $Fileman->get_ads_list_path() ?
-										$SourceFile->get_name() :
-										$SourceFile->get_full_path() ),
-								$TargetFile->get_name() ), 'note' );
-						}
-					}
-					else
-					{
-						$LogCmr->add( sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																		$SourceFile->get_full_path(),
-																		$TargetFile->get_full_path() ), 'error' );
-					}
+				// We are moving, we'll need to unlink the target file and drop it's meta data:
+				// Check if there are delete restrictions on this file:
+				$dest_File->check_relations( 'delete_restrictions' );
+
+				if( $Messages->count('restrict') )
+				{	// There are restrictions:
+					// TODO: work on a better output display here...
+					$Messages->add( sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'),
+																			 $dest_File->get_rel_path() ), 'error' );
+
+					$confirm = 0;
+					break;	// stop whole file list processing
 				}
 			}
-			$file_count++;
-		}}}
-
-
-		if( !$cmr_doit || $LogCmr->count( 'all' ) )
-		{
-			// CMR dialog:
-			require dirname(__FILE__).'/_files_cmr.inc.php';
 		}
-		else
-		{ // successfully finished, leave mode
+
+		if( $confirm )
+		{	// Copy/move is confirmed, let's proceed:
+
+			// Loop through files:
+			$Fileman->SourceList->restart();
+			while( $loop_src_File = & $Fileman->SourceList->get_next() )
+			{
+				// Get a pointer on dest file
+				$dest_File = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(),
+																								$Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
+
+				if( $Fileman->fm_mode == 'file_copy' )
+				{	// COPY
+
+					// Do the copy
+					if( $Fileman->copy_File( $loop_src_File, $dest_File ) )
+					{	// Success:
+						$Messages->add( sprintf( T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
+																		$loop_src_File->get_rel_path(), $dest_File->get_rel_path() ), 'success' );
+					}
+					else
+					{	// Failure:
+						$Messages->add( sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
+																		$loop_src_File->get_rel_path(), $dest_File->get_rel_path() ), 'error' );
+					}
+				}
+				elseif( $Fileman->fm_mode == 'file_move' )
+				{	// MOVE
+
+					$DB->begin();
+
+					if( isset( $overwrite[$loop_src_File->get_md5_ID()] )
+							&& $overwrite[$loop_src_File->get_md5_ID()] )
+					{	// We want to overwrite, let's unlink the old file:
+						if( ! $Fileman->unlink( $dest_File, false ) )	// Will NOT delete recursively
+						{	// Unlink failed:
+							$DB->rollback();
+							// Move on to next file:
+							continue;
+						}
+					}
+
+					// Do the move:
+					$rdfp_oldpath = $loop_src_File->get_rel_path();
+					$rdfp_newpath = $Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
+					if( $Fileman->move_File( $loop_src_File, $Fileman->get_root_type(), $Fileman->get_root_ID(), $rdfp_newpath ) )
+					{ // successfully moved
+						$Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ), 'success' );
+					}
+					else
+					{ // moved failed
+						$Messages->add( sprintf( T_('Could not move &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ), 'error' );
+						// Note: we do not rollback, since unlinking is already done on disk :'(
+					}
+
+					$DB->commit();
+				}
+				else die( 'Unhandled file copy/move mode' );
+
+			}
+
+			// Leave mode:
 			$Fileman->fm_mode = NULL;
 		}
-
-		// }}}
 		break;
 
 
@@ -1111,9 +1211,64 @@ switch( $Fileman->fm_mode )
 
 <?php
 
+
+// TODO: remove this!
+// Output errors, notes and action messages
+if( $Messages->count( 'all' ) )
+{
+	$Messages->display( '', '', true, 'all' );
+}
+
+
+/*
+ * Display payload:
+ */
+switch( $action )
+{
+	case 'rename':
+		// Rename files dialog:
+		$AdminUI->dispPayloadBegin();
+		require dirname(__FILE__).'/_files_rename.form.php';
+		$AdminUI->dispPayloadEnd();
+		break;
+
+
+	default:
+		// Deferred action message:
+		if( isset($action_title) )
+		{
+			echo "\n<h2>$action_title</h2>\n";
+		}
+
+		if( isset($action_msg) )
+		{
+			echo $action_msg;
+
+			if( isset( $js_focus ) )
+			{ // we want to auto-focus a field
+				echo '
+				<script type="text/javascript">
+					<!--
+					'.$js_focus.'.focus();
+					// -->
+				</script>';
+			}
+		}
+}
+
+// FM modes displays:
+switch( $Fileman->fm_mode )
+{
+	case 'file_copy':
+	case 'file_move':
+	case 'file_cmr':
+		// CMR dialog:
+		require dirname(__FILE__).'/_files_cmr.inc.php';
+		break;
+}
+
 // "Display/hide Filemanager"
 // TODO: do not display this after a successful rename...
-
 $showFilemanager = !$Fileman->fm_mode || $UserSettings->get('fm_forceFM') || $Fileman->forceFM ;
 
 $toggleButtons = array();
@@ -1129,35 +1284,6 @@ if( $Fileman->fm_mode )
 		echo '</div>';
 	}
 }
-
-if( isset($action_title) )
-{
-	echo "\n<h2>$action_title</h2>\n";
-}
-
-// TODO: remove this!
-// Output errors, notes and action messages {{{
-if( $Messages->count( 'all' ) )
-{
-	$Messages->display( '', '', true, 'all' );
-}
-
-if( isset($action_msg) )
-{
-	echo $action_msg;
-
-	if( isset( $js_focus ) )
-	{ // we want to auto-focus a field
-		echo '
-		<script type="text/javascript">
-			<!--
-			'.$js_focus.'.focus();
-			// -->
-		</script>';
-	}
-}
-
-// }}}
 
 ?><div id="filemanmain"><?php
 
@@ -1182,6 +1308,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.109  2005/05/17 19:26:06  fplanque
+ * FM: copy / move debugging
+ *
  * Revision 1.108  2005/05/16 15:17:12  fplanque
  * minor
  *
