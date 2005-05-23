@@ -31,7 +31,7 @@ $Form->hidden( 'login', $login );
 $Form->hidden( 'redirect_to', $redirect_to );
 
 echo $Form->fieldstart;
-$Form->text( 'login', '', 16, T_('Login'), '', 20 , 'large' );
+$Form->text( 'login', '', 16, T_('Login'), '', 20 , 'input_text' );
 
 echo $Form->fieldstart;
 echo $Form->inputstart;

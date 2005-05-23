@@ -48,9 +48,9 @@ echo $Form->fieldstart;
 
 <?php
 
-$Form->text( 'login', $login, 16, T_('Login'), '', 20 , 'large' );
+$Form->text( 'login', $login, 16, T_('Login'), '', 20 , 'input_text' );
 
-$Form->password( 'pwd', '', 16, T_('Password'), '', 20, 'large' );
+$Form->password( 'pwd', '', 16, T_('Password'), '', 20, 'input_text' );
 
 echo $Form->fieldstart;
 echo $Form->inputstart;

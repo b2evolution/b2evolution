@@ -36,16 +36,6 @@ body {
 	background-color: #efede0;
 	border: 1px solid #e1ddce;
 }
-h1.logintitle {
-	padding:0;
-	margin:0;
-}
-h2.logintitle {
-	color: #000;
-	font-size: 120%;
-	padding: 0;
-	margin: .5ex;
-}
 h2 {
 	margin-top: 0ex;
 	margin-bottom: 1ex;
@@ -464,20 +454,6 @@ div.tabbedpanelblock fieldset {
 div.tabbedpanelblock fieldset fieldset {
 	border: none;
 }
-
-/* Login screen: */
-div.loginblock {
-	border: 1px solid #CCCCCC;
-	padding: 2ex;
-	margin: 3ex auto;
-	width: 30em;
-	clear: both;
-}
-div.loginblock fieldset {
-	margin: 0;
-	padding: 1ex 0;
-}
-
 
 /* browse/ Edit Screen: */
 div.NavBar {
