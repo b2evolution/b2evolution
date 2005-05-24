@@ -156,6 +156,11 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			// this includes the profile form if requested
 			require( dirname(__FILE__).'/_profile.php');
 			break;
+
+		case 'subs':
+			// this includes the subscription form if requested
+			require( dirname(__FILE__).'/_subscriptions.php');
+			break;
 	}
 // ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 
@@ -255,6 +260,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		user_register_link( '<li>', '</li>' );
 		user_admin_link( '<li>', '</li>' );
 		user_profile_link( '<li>', '</li>' );
+		user_subs_link( '<li>', '</li>' );
 		user_logout_link( '<li>', '</li>' );
 	?>
 	<li><a href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>">RSS 0.92 (Userland)</a></li>

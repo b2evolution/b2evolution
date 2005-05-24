@@ -1,12 +1,11 @@
 <?php
 /**
- * This file updates the current user's profile!
+ * This file updates the current user's subscriptions!
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -34,18 +33,10 @@
  * not wish to do so, delete this exception statement from your version.
  * }}
  *
- * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
- *
  * @package htsrv
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE
- * @author blueyed: Daniel HAHLER
- *
  *
  * @todo integrate it into the skins to avoid ugly die() on error and confusing redirect on success.
  *
@@ -58,22 +49,10 @@
 require_once dirname(__FILE__).'/../evocore/_main.inc.php';
 
 // Getting GET or POST parameters:
-param( 'checkuser_id', 'integer', '' );
-param( 'newuser_firstname', 'string', '' );
-param( 'newuser_lastname', 'string', '' );
-param( 'newuser_nickname', 'string', '' );
-param( 'newuser_idmode', 'string', '' );
-param( 'newuser_locale', 'string', $default_locale );
-param( 'newuser_icq', 'string', '' );
-param( 'newuser_aim', 'string', '' );
-param( 'newuser_msn', 'string', '' );
-param( 'newuser_yim', 'string', '' );
-param( 'newuser_url', 'string', '' );
-param( 'newuser_email', 'string', '' );
+param( 'checkuser_id', 'integer', true );
+param( 'newuser_email', 'string', true );
 param( 'newuser_notify', 'integer', 0 );
-param( 'newuser_showonline', 'integer', 0 );
-param( 'pass1', 'string', '' );
-param( 'pass2', 'string', '' );
+param( 'subs_blog_IDs', 'string', true );
 
 /**
  * Basic security checks:
@@ -97,52 +76,44 @@ if( $demo_mode && ($current_User->login == 'demouser') )
 /**
  * Additional checks:
  */
-profile_check_params( array( 'nickname' => $newuser_nickname,
-															'icq' => $newuser_icq,
-															'email' => $newuser_email,
-															'url' => $newuser_url,
-															'pass1' => $pass1,
-															'pass2' => $pass2,
-															'pass_required' => false ) );
+profile_check_params( array( 'email' => $newuser_email ) );
 
 
 if( $Messages->count( 'error' ) )
 {
 	$Messages->display( T_('Cannot update profile. Please correct the following errors:'),
-		'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
+			'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
 	die();
 }
 
 
-// Do the update:
-
-$updatepassword = '';
-if( !empty($pass1) )
-{
-	$newuser_pass = md5($pass1);
-	$current_User->set( 'pass', $newuser_pass );
-
-	if( !setcookie( $cookie_pass, $newuser_pass, $cookie_expires, $cookie_path, $cookie_domain) )
-	{
-		printf( T_('setcookie &laquo;%s&raquo; failed!'), $cookie_pass );
-	}
-}
-
-$current_User->set( 'firstname', $newuser_firstname );
-$current_User->set( 'lastname', $newuser_lastname );
-$current_User->set( 'nickname', $newuser_nickname );
-$current_User->set( 'icq', $newuser_icq );
+// Do the profile update:
 $current_User->set( 'email', $newuser_email );
-$current_User->set( 'url', $newuser_url );
-$current_User->set( 'aim', $newuser_aim );
-$current_User->set( 'msn', $newuser_msn );
-$current_User->set( 'yim', $newuser_yim );
-$current_User->set( 'idmode', $newuser_idmode );
-$current_User->set( 'locale', $newuser_locale );
 $current_User->set( 'notify', $newuser_notify );
-$current_User->set( 'showonline', $newuser_showonline );
+
 $current_User->dbupdate();
 
+
+// Work the blogs:
+$values = array();
+$subs_blog_IDs = explode( ',', $subs_blog_IDs );
+foreach( $subs_blog_IDs as $loop_blog_ID )
+{
+	// Make sure no dirty hack is coming in here:
+	$loop_blog_ID = intval( $loop_blog_ID );
+
+	// Get checkbox values:
+	$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
+	$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
+
+	$values[] = "( $loop_blog_ID, $current_User->ID, $sub_items, $sub_comments )";
+}
+
+if( count($values) )
+{	// We need to record vales:
+	$DB->query( 'REPLACE INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_subs_items, bloguser_subs_comments )
+								VALUES '.implode( ', ', $values ) );
+}
 
 // TODO: Redirect is confusing, as it gives no feedback to the user..
 header_nocache();

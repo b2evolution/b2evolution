@@ -260,6 +260,30 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 
 
 /**
+ * Template tag: Provide a link to subscription screen
+ */
+function user_subs_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+{
+	global $current_User, $pagenow, $Blog;
+
+	if( ! is_logged_in() )
+	{
+		return false;
+	}
+
+	if( $link_text == '' ) $link_text = T_('Subscribe (%s)');
+	if( $link_title == '#' ) $link_title = T_('Subscribe to email notifications');
+
+	echo $before;
+	echo '<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=subs&amp;redirect_to='.urlencode(regenerate_url()) )
+			.'" title="', $link_title, '">';
+	printf( $link_text, $current_User->login );
+	echo '</a>';
+	echo $after;
+}
+
+
+/**
  * Template tag: Display the user's prefered name
  *
  * Used in result lists.
@@ -379,6 +403,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.23  2005/05/24 18:46:26  fplanque
+ * implemented blog email subscriptions (part 1)
+ *
  * Revision 1.22  2005/05/09 19:07:05  fplanque
  * bugfixes + global access permission
  *

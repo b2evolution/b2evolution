@@ -131,7 +131,7 @@ if( $allowed_to_edit )
 	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when visiting the site.') );
 	$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
 	$Form->text( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, 100 );
-	$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
+	$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
 	$Form->text( 'edited_user_url', $edited_User->url, 30, T_('URL'), $url_fieldnote, 100 );
 	$Form->text( 'edited_user_icq', $edited_User->icq, 30, T_('ICQ'), $icq_fieldnote, 10 );
 	$Form->text( 'edited_user_aim', $edited_User->aim, 30, T_('AIM'), $aim_fieldnote, 50 );
@@ -193,6 +193,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.57  2005/05/24 18:46:26  fplanque
+ * implemented blog email subscriptions (part 1)
+ *
  * Revision 1.56  2005/04/06 13:33:28  fplanque
  * minor changes
  *

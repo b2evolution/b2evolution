@@ -189,6 +189,11 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 			// this includes the profile form if requested
 			require( dirname(__FILE__).'/_profile.php');
 			break;
+
+		case 'subs':
+			// this includes the subscription form if requested
+			require( dirname(__FILE__).'/_subscriptions.php');
+			break;
 	}
 // ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 
@@ -247,6 +252,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	user_register_link( '', '<br />' );
 	user_admin_link( '', '<br />' );
 	user_profile_link( '', '<br />' );
+	user_subs_link( '<li>', '</li>' );
 	user_logout_link( '', '<br />' );
 ?>
 <br />

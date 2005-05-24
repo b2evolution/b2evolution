@@ -83,7 +83,7 @@ $ProfileForm->select( 'newuser_idmode', $current_User->get('idmode'), array( &$c
 $ProfileForm->checkbox( 'newuser_showonline', $current_User->get( 'showonline' ), T_('Online'), T_('Check this to be displayed as online when visiting the site.') );
 $ProfileForm->select( 'newuser_locale', $current_User->get( 'locale' ), 'locale_options_return', T_('Locale'), '', 'bComment' );
 $ProfileForm->text( 'newuser_email', $current_User->get( 'email' ), 40, T_('Email'), '', 100, 'bComment' );
-$ProfileForm->checkbox( 'newuser_notify', $current_User->get( 'notify' ), T_('Notifications'), T_('Check this to receive notification whenever one of your posts receives comments, trackbacks, etc.') );
+$ProfileForm->checkbox( 'newuser_notify', $current_User->get( 'notify' ), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
 $ProfileForm->text( 'newuser_url', $current_User->get( 'url' ), 40, T_('URL'), '', 100, 'bComment' );
 $ProfileForm->text( 'newuser_icq', $current_User->get( 'icq' ), 40, T_('ICQ'), '', 10, 'bComment' );
 $ProfileForm->text( 'newuser_aim', $current_User->get( 'aim' ), 40, T_('AOL I.M.'), '', 50, 'bComment' );

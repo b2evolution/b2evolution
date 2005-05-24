@@ -417,6 +417,8 @@ function create_groups()
 	$query = "CREATE TABLE T_blogusers (
 		bloguser_blog_ID int(11) unsigned NOT NULL default 0,
 		bloguser_user_ID int(11) unsigned NOT NULL default 0,
+		bloguser_subs_items        tinyint(4) not null default 0,
+		bloguser_subs_comments     tinyint(4) not null default 0,
 		bloguser_ismember tinyint NOT NULL default 0,
 		bloguser_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
 		bloguser_perm_delpost tinyint NOT NULL default 0,

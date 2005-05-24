@@ -104,6 +104,11 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			$r[] = T_('User profile');
 			break;
 			
+		case 'subs':
+			// We are requesting the subscriptions screen:
+			$r[] = T_('Subscriptions');
+			break;
+			
 		case 'msgform':
 			// We are requesting the message form:
 			$r[] = T_('Send an email message');
@@ -279,6 +284,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.7  2005/05/24 18:46:26  fplanque
+ * implemented blog email subscriptions (part 1)
+ *
  * Revision 1.6  2005/03/15 19:19:48  fplanque
  * minor, moved/centralized some includes
  *

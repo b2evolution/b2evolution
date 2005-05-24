@@ -580,6 +580,8 @@ function upgrade_b2evo_tables()
 		$DB->query( 'ALTER TABLE T_blogusers
 									MODIFY COLUMN bloguser_blog_ID int(11) unsigned NOT NULL default 0,
 									MODIFY COLUMN bloguser_user_ID int(11) unsigned NOT NULL default 0,
+									ADD COLUMN bloguser_subs_items        tinyint(4) not null default 0,
+									ADD COLUMN bloguser_subs_comments     tinyint(4) not null default 0,
 									ADD COLUMN bloguser_perm_media_upload tinyint NOT NULL default 0,
 									ADD COLUMN bloguser_perm_media_browse tinyint NOT NULL default 0,
 									ADD COLUMN bloguser_perm_media_change tinyint NOT NULL default 0' );

@@ -127,8 +127,11 @@ function blog_update_user_perms( $blog )
 {
 	global $DB;
 	// Delete old perms for this blog:
+	// Note: we only want to delete user riows if they are not subscrived to the blog!
 	$DB->query( 'DELETE FROM T_blogusers
-								WHERE bloguser_blog_ID = '.$blog );
+								WHERE bloguser_blog_ID = '.$blog.'
+								  AND bloguser_subs_items = 0
+									AND bloguser_subs_comments = 0' );
 
 	// Now we need a full user list:
 	$inserted_values = array();
@@ -181,7 +184,8 @@ function blog_update_user_perms( $blog )
 
 			// Update those permissions in DB:
 
-			if( $ismember || count($perm_post) || $perm_delpost || $perm_comments || $perm_cats || $perm_properties )
+			if( $ismember || count($perm_post) || $perm_delpost || $perm_comments || $perm_cats || $perm_properties
+										|| $perm_media_upload || $perm_media_browse || $perm_media_change )
 			{ // There are some permissions for this user:
 				$ismember = 1;	// Must have this permission
 
@@ -193,10 +197,10 @@ function blog_update_user_perms( $blog )
 		}
 	}
 
-	// Proceed insertions:
+	// Proceed with insertions:
 	if( count( $inserted_values ) )
 	{
-		$DB->query( "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+		$DB->query( "REPLACE INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 											bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 											bloguser_perm_cats, bloguser_perm_properties,
 											bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change)
@@ -549,6 +553,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.12  2005/05/24 18:46:26  fplanque
+ * implemented blog email subscriptions (part 1)
+ *
  * Revision 1.11  2005/03/09 19:23:33  blueyed
  * doc
  *

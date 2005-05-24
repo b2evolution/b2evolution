@@ -244,9 +244,9 @@ $Form->fieldset( T_('User permissions') );
 													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
 													bloguser_perm_properties, bloguser_perm_media_upload,
 													bloguser_perm_media_browse, bloguser_perm_media_change
-									FROM T_users INNER JOIN T_blogusers
-													ON ID = bloguser_user_ID
+									FROM T_users INNER JOIN T_blogusers ON ID = bloguser_user_ID
 									WHERE bloguser_blog_ID = '.$blog.'
+									  AND bloguser_ismember <> 0
 									ORDER BY user_login' );
 			?>
 
@@ -284,9 +284,9 @@ $Form->fieldset( T_('User permissions') );
 												bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
 												bloguser_perm_properties, bloguser_perm_media_upload,
 												bloguser_perm_media_browse, bloguser_perm_media_change
-								FROM T_users INNER JOIN T_blogusers
-												ON ID = bloguser_user_ID
+								FROM T_users INNER JOIN T_blogusers ON ID = bloguser_user_ID
 								WHERE bloguser_blog_ID = '.$blog.'
+								  AND bloguser_ismember <> 0
 								ORDER BY user_login' );
 
 		?>

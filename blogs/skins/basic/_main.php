@@ -170,6 +170,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 				// this includes the profile form if requested
 				require( dirname(__FILE__).'/_profile.php');
 				break;
+
+			case 'subs':
+				// this includes the subscription form if requested
+				require( dirname(__FILE__).'/_subscriptions.php');
+				break;
+
 		}
 		// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 
@@ -187,6 +193,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			user_register_link( ' [', '] ' );
 			user_admin_link( ' [', '] ' );
 			user_profile_link( ' [', '] ' );
+			user_subs_link( '[', ']' );
 			user_logout_link( ' [', '] ' );
 		?></p>
 	</div>
