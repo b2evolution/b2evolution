@@ -56,8 +56,7 @@ function conditional( $condition, $on_true, $on_false = '' )
 }
 
 
-param( 'results_cont_order', 'string', '-A', true );
-$Results = & new Results( $sql, 20, 'cont_' );
+$Results = & new Results( $sql, 'cont_', '-A' );
 
 $Results->title = T_('Groups &amp; Users');
 
@@ -185,6 +184,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.46  2005/05/24 15:26:51  fplanque
+ * cleanup
+ *
  * Revision 1.45  2005/05/04 18:16:55  fplanque
  * Normalizing
  *

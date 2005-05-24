@@ -373,7 +373,7 @@ class Filelist
 		// Integrity check:
 		if( $File->_root_type != $this->_root_type || $File->_root_ID != $this->_root_ID )
 		{
-			die( 'Adding file '.$File->_root_type.':'.$File->_root_ID.':'.$File->_rel_path.' to filelist '.$this->_root_type.':'.$this->_root_ID.' : root mismatch!' );
+			die( 'Adding file '.$File->_root_type.':'.$File->_root_ID.':'.$File->get_rdfs_rel_path().' to filelist '.$this->_root_type.':'.$this->_root_ID.' : root mismatch!' );
 		}
 
 		if( $mustExist && !$File->exists() )
@@ -411,6 +411,27 @@ class Filelist
 		$this->_total_bytes += $File->get_size();
 
 		return true;
+	}
+
+
+	/**
+	 * Update the name dependent caches
+	 *
+	 * This is especially useful after a name change of one of the files in the list
+	 */
+	function update_caches()
+	{
+		$this->_md5_ID_index = array();
+		$this->_full_path_index = array();
+
+		$count = 0;
+  	foreach( $this->_entries as $loop_File )
+		{
+			$this->_md5_ID_index[$loop_File->get_md5_ID()] = $count;
+			$this->_full_path_index[$loop_File->get_full_path()] = $count;
+			$count++;
+		}
+
 	}
 
 
@@ -930,7 +951,7 @@ class Filelist
 				continue;
 			}
 
-			$to_load[] = $DB->quote( $loop_File->get_rel_path() );
+			$to_load[] = $DB->quote( $loop_File->get_rdfp_rel_path() );
 		}
 
 		if( ! count( $to_load ) )
@@ -964,6 +985,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.30  2005/05/24 15:26:52  fplanque
+ * cleanup
+ *
  * Revision 1.29  2005/05/13 18:41:28  fplanque
  * made file links clickable... finally ! :P
  *

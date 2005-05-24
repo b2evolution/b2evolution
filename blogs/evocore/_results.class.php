@@ -142,12 +142,11 @@ class Results extends Widget
 	 * @todo we might not want to count total rows when not needed...
 	 *
 	 * @param string SQL query
-	 * @param integer number of lines displayed on one screen
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
-	 * @param integer current page to display
-	 * @param string ordering of columns (special syntax)
+	 * @param string default ordering of columns (special syntax) if not URL specified
+	 * @param integer number of lines displayed on one screen
 	 */
-	function Results( $sql, $limit = 20, $param_prefix = '', $page = NULL, $order = NULL )
+	function Results( $sql, $param_prefix = '', $default_order = '', $limit = 20 )
 	{
 		global $DB;
 		$this->DB = & $DB;
@@ -161,17 +160,12 @@ class Results extends Widget
 
 		$this->total_pages = ceil($this->total_rows / $this->limit);
 
-		if( is_null($page) )
-		{ //attribution of a page number
-			$page = param( $this->page_param, 'integer', 1, true );
-		}
+		//attribution of a page number
+		$page = param( $this->page_param, 'integer', 1, true );
 		$this->page = min( $page, $this->total_pages ) ;
 
-		if( is_null($order) )
-		{ //attribution of an order type
-			$order = param( $this->order_param, 'string', '', true );
-		}
-		$this->order = $order;
+		//attribution of an order type
+ 		$this->order = param( $this->order_param, 'string', $default_order, true );
 	}
 
 
@@ -602,11 +596,14 @@ class Results extends Widget
 				}
 
 				// Contents to output:
-				$output .= $this->parse_col_content( $col['td'] );
+				$output .= $col['td'];
+
+				$output .= $this->params['col_end'];
+
+				$output = $this->parse_col_content($output);
 				//echo $output;
 				eval( "echo '$output';" );
 
-				echo $this->params['col_end'];
 				$col_count++;
 			}
 			echo $this->params['line_end'];
@@ -1004,6 +1001,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.24  2005/05/24 15:26:53  fplanque
+ * cleanup
+ *
  * Revision 1.23  2005/05/09 19:07:04  fplanque
  * bugfixes + global access permission
  *

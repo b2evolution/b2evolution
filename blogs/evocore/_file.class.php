@@ -92,26 +92,18 @@ class File extends DataObject
 	var $_root_ID;
 
 	/**
-	 * Subpath for this file/folder, relative the associated root, including trailing slash.
+	 * Posix subpath for this file/folder, relative the associated root (No trailing slash)
 	 * @var string
 	 * @access protected
 	 */
-	var $_rel_path;
-
-	/**
-	 * Full path for this file/folder, including trailing slash.
-	 * @var string
-	 * @see get_full_path()
-	 * @access protected
-	 */
-	var $_full_path;
+	var $_rdfp_rel_path;
 
 	/**
 	 * Full path for this file/folder, WITHOUT trailing slash.
 	 * @var string
 	 * @access protected
 	 */
-	var $_posix_path;
+	var $_adfp_full_path;
 
 	/**
 	 * Directory path for this file/folder, including trailing slash.
@@ -203,15 +195,15 @@ class File extends DataObject
 	 *
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
-	 * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
+	 * @param string Posix ubpath for this file/folder, relative the associated root (no trailing slash)
 	 * @param boolean check for meta data?
 	 * @return mixed false on failure, File object on success
 	 */
-	function File( $root_type, $root_ID, $rel_path, $load_meta = false )
+	function File( $root_type, $root_ID, $rdfp_rel_path, $load_meta = false )
 	{
 		global $Debuglog;
 
-		$Debuglog->add( "new File( $root_type, $root_ID, $rel_path, load_meta=$load_meta)", 'files' );
+		$Debuglog->add( "new File( $root_type, $root_ID, $rdfp_rel_path, load_meta=$load_meta)", 'files' );
 
 		// Call parent constructor
 		parent::DataObject( 'T_files', 'file_', 'file_ID', '', '', '', '' );
@@ -223,12 +215,11 @@ class File extends DataObject
 		// Memorize filepath:
 		$this->_root_type = $root_type;
 		$this->_root_ID = $root_ID;
-		$this->_rel_path = str_replace( '\\', '/', $rel_path );
-		$this->_full_path = get_root_dir( $root_type, $root_ID ).$this->_rel_path;
-		$this->_posix_path = no_trailing_slash( $this->_full_path );
-		$this->_name = basename( $this->_posix_path );
-		$this->_dir = dirname( $this->_posix_path ).'/';
-		$this->_md5ID = md5( $this->_posix_path );
+		$this->_rdfp_rel_path = no_trailing_slash(str_replace( '\\', '/', $rdfp_rel_path ));
+		$this->_adfp_full_path = get_root_dir( $root_type, $root_ID ).$this->_rdfp_rel_path;
+		$this->_name = basename( $this->_adfp_full_path );
+		$this->_dir = dirname( $this->_adfp_full_path ).'/';
+		$this->_md5ID = md5( $this->_adfp_full_path );
 
 		// Initializes file properties (type, size, perms...)
 		$this->load_properties();
@@ -260,13 +251,13 @@ class File extends DataObject
 				$row = $DB->get_row( "SELECT * FROM T_files
 																WHERE file_root_type = '$this->_root_type'
 																	AND file_root_ID = $this->_root_ID
-																	AND file_path = ".$DB->quote($this->_rel_path),
+																	AND file_path = ".$DB->quote($this->_rdfp_rel_path),
 																OBJECT, 0, 'Load file meta data' );
 			}
 
 			if( $row )
 			{ // We found meta data
-				$Debuglog->add( "Loaded metadata for $this->_root_type:$this->_root_ID:$this->_rel_path", 'files' );
+				$Debuglog->add( "Loaded metadata for $this->_root_type:$this->_root_ID:$this->_rdfp_rel_path", 'files' );
 				$this->meta  = 'loaded';
 				$this->ID    = $row->file_ID;
 				$this->title = $row->file_title;
@@ -278,7 +269,7 @@ class File extends DataObject
 			}
 			else
 			{ // No meta data...
-				$Debuglog->add( "No metadata could be loaded for $this->_root_type:$this->_root_ID:$this->_rel_path", 'files' );
+				$Debuglog->add( "No metadata could be loaded for $this->_root_type:$this->_root_ID:$this->_rdfp_rel_path", 'files' );
 				$this->meta = 'notfound';
 
 				if( $force_creation )
@@ -308,16 +299,16 @@ class File extends DataObject
 		{ // Create an empty directory:
 			if( $chmod === NULL )
 			{ // Create dir with default permissions (777)
-				$success = @mkdir( $this->_posix_path );
+				$success = @mkdir( $this->_adfp_full_path );
 			}
 			else
 			{ // Create directory with specific permissions:
-				$success = @mkdir( $this->_posix_path, octdec($chmod) );
+				$success = @mkdir( $this->_adfp_full_path, octdec($chmod) );
 			}
 		}
 		else
 		{ // Create an empty file:
-			$success = touch( $this->_posix_path );
+			$success = touch( $this->_adfp_full_path );
 			if( $chmod !== NULL )
 			{
 				$this->chmod( $chmod );
@@ -337,7 +328,7 @@ class File extends DataObject
 			{ // No meta data could be loaded, let's make sure localization info gets recorded:
 				$this->set( 'root_type', $this->_root_type );
 				$this->set( 'root_ID', $this->_root_ID );
-				$this->set( 'path', $this->_rel_path );
+				$this->set( 'path', $this->_rdfp_rel_path );
 			}
 
 			// Record to DB:
@@ -356,9 +347,9 @@ class File extends DataObject
 		// Unset values that will be determined (and cached) upon request
 		$this->_is_image = NULL;
 
-		$this->_exists = file_exists( $this->_posix_path );
+		$this->_exists = file_exists( $this->_adfp_full_path );
 
-		if( is_dir( $this->_posix_path ) )
+		if( is_dir( $this->_adfp_full_path ) )
 		{	// The File is a directory:
 			$this->_is_dir = true;
 			$this->_size = NULL;
@@ -366,12 +357,12 @@ class File extends DataObject
 		else
 		{	// The File is a regular file:
 			$this->_is_dir = false;
-			$this->_size = @filesize( $this->_posix_path );
+			$this->_size = @filesize( $this->_adfp_full_path );
 		}
 
 		// for files and dirs:
-		$this->_lastmod_ts = @filemtime( $this->_posix_path );
-		$this->_perms = @fileperms( $this->_posix_path );
+		$this->_lastmod_ts = @filemtime( $this->_adfp_full_path );
+		$this->_perms = @fileperms( $this->_adfp_full_path );
 	}
 
 
@@ -469,15 +460,24 @@ class File extends DataObject
 
 
 	/**
-	 * Get the file path relative to it's root.
-	 *
-	 * If the File is a directory, the Path ends with a /
+	 * Get the file posix path relative to it's root (no trailing /)
 	 *
 	 * @return string full path
 	 */
-	function get_rel_path()
+	function get_rdfp_rel_path()
 	{
-		return $this->_rel_path;
+		return $this->_rdfp_rel_path;
+	}
+
+
+	/**
+	 * Get the file path relative to it's root, WITH trailing slash.
+	 *
+	 * @return string full path
+	 */
+	function get_rdfs_rel_path()
+	{
+		return $this->_rdfp_rel_path.( $this->_is_dir ? '/' : '' );
 	}
 
 
@@ -490,9 +490,12 @@ class File extends DataObject
 	 */
 	function get_full_path()
 	{
-		return $this->_full_path;
+		return $this->_adfp_full_path.( $this->_is_dir ? '/' : '' );
 	}
 
+  /**
+	 * Get the file url
+	 */
 	function get_url()
 	{
 		if( ! $root_url = get_root_url( $this->_root_type, $this->_root_ID ) )
@@ -500,7 +503,7 @@ class File extends DataObject
 			return false;
 		}
 
-		return $root_url.$this->_rel_path;
+		return $root_url.$this->_rdfp_rel_path.( $this->_is_dir ? '/' : '' );
 	}
 
 	/**
@@ -734,7 +737,7 @@ class File extends DataObject
 	 */
 	function get_image_size( $param = 'widthxheight' )
 	{
-		return imgsize( $this->_full_path, $param );
+		return imgsize( $this->_adfp_full_path, $param );
 	}
 
 
@@ -787,7 +790,7 @@ class File extends DataObject
 	{
 		// echo "newname= $newname ";
 
-		if( ! @rename( $this->_posix_path, $this->_dir.$newname ) )
+		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{
 			return false;
 		}
@@ -797,23 +800,21 @@ class File extends DataObject
 
 		$this->_name = $newname;
 
-		$rel_posix_path = no_trailing_slash( $this->_rel_path );
-		$rel_dir = dirname( $rel_posix_path ).'/';
+		$rel_dir = dirname( $this->_rdfp_rel_path ).'/';
 		if( $rel_dir == './' )
 		{
 			$rel_dir = '';
 		}
-		$this->_rel_path = $rel_dir.$this->_name;
+		$this->_rdfp_rel_path = $rel_dir.$this->_name;
 
-		$this->_posix_path = $this->_dir.$this->_name;
-		$this->_full_path = $this->_posix_path.( $this->_is_dir ? '/' : '' );
-		$this->_md5ID = md5( $this->_posix_path );
+		$this->_adfp_full_path = $this->_dir.$this->_name;
+		$this->_md5ID = md5( $this->_adfp_full_path );
 
 		if( $this->meta == 'loaded' )
 		{	// We have meta data, we need to deal with it:
 			// unchanged : $this->set( 'root_type', $this->_root_type );
 			// unchanged : $this->set( 'root_ID', $this->_root_ID );
-			$this->set( 'path', $this->_rel_path );
+			$this->set( 'path', $this->_rdfp_rel_path );
 			// Record to DB:
 			$this->dbupdate();
 		}
@@ -833,17 +834,17 @@ class File extends DataObject
 	 *
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
-	 * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
+	 * @param string Subpath for this file/folder, relative the associated root (no trailing slash)
 	 * @return boolean true on success, false on failure
 	 */
-	function move_to( $root_type, $root_ID, $rel_path )
+	function move_to( $root_type, $root_ID, $rdfp_rel_path )
 	{
 		// echo "relpath= $rel_path ";
 
-		$rel_path = str_replace( '\\', '/', $rel_path );
-		$adfp_posix_path = get_root_dir( $root_type, $root_ID ).$rel_path;
+		$rdfp_rel_path = str_replace( '\\', '/', $rdfp_rel_path );
+		$adfp_posix_path = get_root_dir( $root_type, $root_ID ).$rdfp_rel_path;
 
-		if( ! @rename( $this->_posix_path, $adfp_posix_path ) )
+		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )
 		{
 			return false;
 		}
@@ -854,18 +855,17 @@ class File extends DataObject
 		// Memorize new filepath:
 		$this->_root_type = $root_type;
 		$this->_root_ID = $root_ID;
-		$this->_rel_path= $rel_path.( $this->_is_dir ? '/' : '' );
-		$this->_posix_path = $adfp_posix_path;
-		$this->_full_path = $adfp_posix_path.( $this->_is_dir ? '/' : '' );
-		$this->_name = basename( $this->_posix_path );
-		$this->_dir = dirname( $this->_posix_path ).'/';
-		$this->_md5ID = md5( $this->_posix_path );
+		$this->_rdfp_rel_path = $rdfp_rel_path;
+		$this->_adfp_full_path = $adfp_posix_path;
+		$this->_name = basename( $this->_adfp_full_path );
+		$this->_dir = dirname( $this->_adfp_full_path ).'/';
+		$this->_md5ID = md5( $this->_adfp_full_path );
 
 		if( $this->meta == 'loaded' )
 		{	// We have meta data, we need to deal with it:
 			$this->set( 'root_type', $this->_root_type );
 			$this->set( 'root_ID', $this->_root_ID );
-			$this->set( 'path', $this->_rel_path );
+			$this->set( 'path', $this->_rdfp_rel_path );
 			// Record to DB:
 			$this->dbupdate();
 		}
@@ -893,7 +893,7 @@ class File extends DataObject
 			return false;
 		}
 
-		if( ! copy( $this->get_full_path(), $dest_File->get_full_path() ) )
+		if( ! @copy( $this->get_full_path(), $dest_File->get_full_path() ) )
 		{
 			return false;
 		}
@@ -942,11 +942,11 @@ class File extends DataObject
 
 		if( $this->is_dir() )
 		{
-			$unlinked =	@rmdir( $this->_posix_path );
+			$unlinked =	@rmdir( $this->_adfp_full_path );
 		}
 		else
 		{
-			$unlinked =	@unlink( $this->_posix_path );
+			$unlinked =	@unlink( $this->_adfp_full_path );
 		}
 
 		if( !$unlinked )
@@ -974,11 +974,11 @@ class File extends DataObject
 	function chmod( $chmod )
 	{
 		$chmod = octdec( $chmod );
-		if( chmod( $this->_posix_path, $chmod ) )
+		if( chmod( $this->_adfp_full_path, $chmod ) )
 		{
 			clearstatcache();
 			// update current entry
-			$this->_perms = fileperms( $this->_posix_path );
+			$this->_perms = fileperms( $this->_adfp_full_path );
 
 			return $this->_perms;
 		}
@@ -1006,7 +1006,7 @@ class File extends DataObject
 		// Let's make sure the bare minimum gets saved to DB:
 		$this->set_param( 'root_type', 'string', $this->_root_type );
 		$this->set_param( 'root_ID', 'integer', $this->_root_ID );
-		$this->set_param( 'path', 'string', $this->_rel_path );
+		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );
 
 		// Let parent do the insert:
 		parent::dbinsert();
@@ -1038,7 +1038,7 @@ class File extends DataObject
 	{
 		if( is_null( $text ) )
 		{	// Use file relpath+name by default
-			$text = $this->get_rel_path();
+			$text = $this->get_rdfs_rel_path();
 		}
 
 		if( is_null( $title ) )
@@ -1065,6 +1065,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2005/05/24 15:26:52  fplanque
+ * cleanup
+ *
  * Revision 1.35  2005/05/17 19:26:07  fplanque
  * FM: copy / move debugging
  *

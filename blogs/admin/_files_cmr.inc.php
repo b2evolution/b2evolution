@@ -72,7 +72,7 @@ $Form->begin_form( 'fform', $Fileman->fm_mode == 'file_copy' ? T_('Copy') : T_('
 	$Fileman->SourceList->restart();
 	while( $loop_src_File = & $Fileman->SourceList->get_next() )
 	{
-		$Form->fieldset( T_('Source').': '.$loop_src_File->get_rel_path() );
+		$Form->fieldset( T_('Source').': '.$loop_src_File->get_rdfp_rel_path() );
 
 		if( isset( $overwrite[$loop_src_File->get_md5_ID()] ) )
 		{
@@ -96,6 +96,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.8  2005/05/24 15:26:50  fplanque
+ * cleanup
+ *
  * Revision 1.7  2005/05/17 19:26:06  fplanque
  * FM: copy / move debugging
  *

@@ -428,6 +428,10 @@ function isFilename( $filename )
 
 
 /**
+ * Check that the file extension is allowed.
+ *
+ * Case independant.
+ *
  * @param filename to check
  * @param string by ref, returns extension
  * @return boolean
@@ -439,14 +443,14 @@ function validate_file_extension( $filename, & $extension )
 
 	if( !isset($allowedFileExtensions) )
 	{
-		$allowedFileExtensions = preg_split( '#\s+#', trim( $Settings->get( 'upload_allowedext' ) ), -1, PREG_SPLIT_NO_EMPTY );
+		$allowedFileExtensions = preg_split( '#\s+#', strtolower( trim( $Settings->get( 'upload_allowedext' ) ) ), -1, PREG_SPLIT_NO_EMPTY );
 	}
 
 	if( !empty($allowedFileExtensions) )
 	{ // check extension
 		if( preg_match( '#\.([a-zA-Z0-9\-_]+)$#', $filename, $match ) )
 		{
-			$extension = $match[1];
+			$extension = strtolower($match[1]);
 
 			if( !in_array( $extension, $allowedFileExtensions ) )
 			{
@@ -514,6 +518,9 @@ function get_root_url( $root_type, $root_ID )
 
 /*
  * $Log$
+ * Revision 1.20  2005/05/24 15:26:52  fplanque
+ * cleanup
+ *
  * Revision 1.19  2005/05/17 19:26:07  fplanque
  * FM: copy / move debugging
  *

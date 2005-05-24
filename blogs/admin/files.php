@@ -645,7 +645,7 @@ switch( $action )
 				}
 				foreach( $selected_Filelist->get_array() as $lFile )
 				{
-					$action_msg .= "\n".$lFile->get_rel_path().':<br />
+					$action_msg .= "\n".$lFile->get_rdfp_rel_path().':<br />
 					<input id="perms_readonly_'.$lFile->get_md5_ID().'"
 						name="perms['.$lFile->get_md5_ID().']"
 						type="radio"
@@ -855,7 +855,7 @@ switch( $Fileman->fm_mode )
 				$extension = '';
 				if( ! validate_file_extension( $newName, $extension ) )
 				{	// Extension invalid, message already output.
-					$failedFiles[$lKey] = sprintf( T_('The file extension is not allowed.'), $extension );
+					$failedFiles[$lKey] = sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension );
 					// Abort upload for this file:
 					continue;
 				}
@@ -993,7 +993,7 @@ switch( $Fileman->fm_mode )
 
 				if( ! isset( $overwrite[$loop_src_File->get_md5_ID()] ) )
 				{	// We have not yet asked to overwrite:
-					$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rel_path() ) );
+					$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ) );
 					$overwrite[$loop_src_File->get_md5_ID()] = 0;
 					$confirm = 0;
 					continue;
@@ -1013,7 +1013,7 @@ switch( $Fileman->fm_mode )
 				{	// There are restrictions:
 					// TODO: work on a better output display here...
 					$Messages->add( sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'),
-																			 $dest_File->get_rel_path() ), 'error' );
+																			 $dest_File->get_rdfp_rel_path() ), 'error' );
 
 					$confirm = 0;
 					break;	// stop whole file list processing
@@ -1039,12 +1039,12 @@ switch( $Fileman->fm_mode )
 					if( $Fileman->copy_File( $loop_src_File, $dest_File ) )
 					{	// Success:
 						$Messages->add( sprintf( T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																		$loop_src_File->get_rel_path(), $dest_File->get_rel_path() ), 'success' );
+																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ), 'success' );
 					}
 					else
 					{	// Failure:
 						$Messages->add( sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																		$loop_src_File->get_rel_path(), $dest_File->get_rel_path() ), 'error' );
+																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ), 'error' );
 					}
 				}
 				elseif( $Fileman->fm_mode == 'file_move' )
@@ -1064,7 +1064,7 @@ switch( $Fileman->fm_mode )
 					}
 
 					// Do the move:
-					$rdfp_oldpath = $loop_src_File->get_rel_path();
+					$rdfp_oldpath = $loop_src_File->get_rdfp_rel_path();
 					$rdfp_newpath = $Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
 					if( $Fileman->move_File( $loop_src_File, $Fileman->get_root_type(), $Fileman->get_root_ID(), $rdfp_newpath ) )
 					{ // successfully moved
@@ -1122,7 +1122,7 @@ switch( $Fileman->fm_mode )
 							'SELECT link_ID, link_ltype_ID, T_files.*
 								 FROM T_links INNER JOIN T_files ON link_file_ID = file_ID
 								WHERE link_item_ID = '.$edited_Item->ID,
-								20, 'link_' );
+							'link_' );
 
 		$Results->title = T_('Existing links');
 
@@ -1308,6 +1308,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.110  2005/05/24 15:26:51  fplanque
+ * cleanup
+ *
  * Revision 1.109  2005/05/17 19:26:06  fplanque
  * FM: copy / move debugging
  *

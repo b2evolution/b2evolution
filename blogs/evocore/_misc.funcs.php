@@ -1397,7 +1397,7 @@ function url_add_tail( $url, $tail )
  */
 function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 {
-	global $app_name, $app_version, $current_locale, $locales, $Debuglog;
+	global $debug, $app_name, $app_version, $current_locale, $locales, $Debuglog;
 
 	if( !is_array( $headers ) )
 	{ // Make sure $headers is an array
@@ -1436,11 +1436,20 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 
 	$message = str_replace( array( "\r\n", "\r" ), "\n", $message );
 
-
-	if( !@mail( $to, $subject, $message, $headerstring ) )
-	{
-		$Debuglog->add( "Sending mail from &laquo;$from&raquo; to &laquo;$to&raquo;, Subject &laquo;$subject&raquo; FAILED." );
-		return false;
+	if( $debug > 1 )
+	{	// We agree to die for debugging...
+		if( ! mail( $to, $subject, $message, $headerstring ) )
+		{
+			die("Sending mail from &laquo;$from&raquo; to &laquo;$to&raquo;, Subject &laquo;$subject&raquo; FAILED.");
+		}
+	}
+	else
+	{	// Soft debugging only....
+		if( ! @mail( $to, $subject, $message, $headerstring ) )
+		{
+			$Debuglog->add( "Sending mail from &laquo;$from&raquo; to &laquo;$to&raquo;, Subject &laquo;$subject&raquo; FAILED." );
+			return false;
+		}
 	}
 
 	$Debuglog->add( "Sent mail from &laquo;$from&raquo; to &laquo;$to&raquo;, Subject &laquo;$subject&raquo;." );
@@ -1868,6 +1877,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.68  2005/05/24 15:26:53  fplanque
+ * cleanup
+ *
  * Revision 1.67  2005/05/11 13:21:38  fplanque
  * allow disabling of mediua dir for specific blogs
  *

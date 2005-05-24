@@ -38,9 +38,14 @@ function NT_( $string )
 
 /**
  * Display debugging informations?
- * @global boolean Default: false
+ *
+ * 0 = no
+ * 1 = yes
+ * 2 = yes and potentially die() to display debug info (needed before redirects, e-g message_send.php)
+ *
+ * @global integer
  */
-$debug = false;
+$debug = 0;
 
 /**
  * Display elements that are different on each request (Page processing time, ..)

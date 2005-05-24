@@ -84,7 +84,7 @@ switch( $action )
 			// Upload
 			$Settings->setByParam( 'upload_enabled',         'upload_enabled', 'integer', 0 );
 			param( 'upload_allowedext', 'string', true );
-			$Settings->set( 'upload_allowedext', trim($upload_allowedext) );
+			$Settings->set( 'upload_allowedext', strtolower(trim($upload_allowedext)));
 			$Settings->setByParam( 'upload_maxkb', 'upload_maxkb', 'integer', true );
 
 			// Advanced settings

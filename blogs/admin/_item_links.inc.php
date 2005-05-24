@@ -41,7 +41,7 @@ if( false )
 
 	$SQL->WHERE( 'link_item_ID = '.$edited_Item->ID );
 
-	$Results = & new Results( $SQL->get(), 20, 'link_' );
+	$Results = & new Results( $SQL->get(), 'link_' );
 
 	$Results->title = T_('Linked to...');
 

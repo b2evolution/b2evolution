@@ -72,8 +72,6 @@ class DataObjectList extends Results
 	 *
 	 * If provided, executes SQL query via parent Results object
 	 *
-	 * {@internal DataObjectList::DataObjectList(-) }}
-	 *
 	 * @param string Name of table in database
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
@@ -81,11 +79,10 @@ class DataObjectList extends Results
 	 * @param string SQL query
 	 * @param integer number of lines displayed on one screen
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
-	 * @param integer current page to display
-	 * @param string ordering of columns (special syntax)
+	 * @param string default ordering of columns (special syntax)
 	 */
 	function DataObjectList( $tablename, $prefix = '', $dbIDname = 'ID', $objType = 'Item', $sql = NULL,
-														$limit = 20, $param_prefix = '',	$page = NULL, $order = NULL )
+														$limit = 20, $param_prefix = '', $default_order = NULL )
 	{
 		$this->dbtablename = $tablename;
 		$this->dbprefix = $prefix;
@@ -96,12 +93,12 @@ class DataObjectList extends Results
 
 		if( !is_null( $sql ) )
 		{	// We have an SQL query to execute:
-			parent::Results( $sql, $limit, $param_prefix, $page, $order );
+			parent::Results( $sql, $param_prefix, $default_order, $limit );
 		}
 		else
 		{	// TODO: do we want to autogenerate a query here???
 			// Temporary...
-			parent::Results( $sql, $limit, $param_prefix, $page, $order );
+			parent::Results( $sql, $param_prefix, $default_order, $limit );
 		}
 	}
 
@@ -124,6 +121,9 @@ class DataObjectList extends Results
 
 /*
  * $Log$
+ * Revision 1.9  2005/05/24 15:26:52  fplanque
+ * cleanup
+ *
  * Revision 1.8  2005/04/28 20:44:20  fplanque
  * normalizing, doc
  *

@@ -179,7 +179,7 @@ class ArchiveList extends Results
 													ORDER BY '.$this->dbprefix.'datestart DESC';
 		}
 
-		parent::Results( $sql, $limit, 'archivelist_', 1 );
+		parent::Results( $sql, 'archivelist_', '', $limit );
 
 		$this->restart();
 	}
@@ -297,6 +297,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.10  2005/05/24 15:26:52  fplanque
+ * cleanup
+ *
  * Revision 1.9  2005/03/08 20:32:07  fplanque
  * small fixes; slightly enhanced WEEK() handling
  *

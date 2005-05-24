@@ -485,7 +485,7 @@ class FileManager extends Filelist
 		$url = $this->getCurUrl( array( 'fm_mode' => 'file_'.$mode,
 																		'fm_sources' => false,
 																		'cmr_keepsource' => (int)($mode == 'copy') ) );
-		$url .= '&amp;fm_sources[]='.urlencode( $this->curFile->get_rel_path() );
+		$url .= '&amp;fm_sources[]='.urlencode( $this->curFile->get_rdfp_rel_path() );
 
 		echo '<a href="'.$url
 					#.'" target="fileman_copymoverename" onclick="'
@@ -812,7 +812,7 @@ class FileManager extends Filelist
 			$File = $this->curFile;
 		}
 
-		return $this->_root_url.$File->get_rel_path();
+		return $File->get_url();
 	}
 
 
@@ -851,7 +851,7 @@ class FileManager extends Filelist
 		{	// Link to open this directory:
 			if( !isset( $File->cache['linkFile_1'] ) )
 			{
-				$File->cache['linkFile_1'] = $this->getCurUrl( array( 'path' => $File->get_rel_path() ) );
+				$File->cache['linkFile_1'] = $this->getCurUrl( array( 'path' => $File->get_rdfs_rel_path() ) );
 			}
 			return $File->cache['linkFile_1'];
 		}
@@ -977,7 +977,7 @@ class FileManager extends Filelist
 
 			while( $lFile =& $Nodelist->get_next( 'dir' ) )
 			{
-				$rSub = $this->getDirectoryTreeRadio( $Root, $lFile->get_full_path(), $lFile->get_rel_path() );
+				$rSub = $this->getDirectoryTreeRadio( $Root, $lFile->get_full_path(), $lFile->get_rdfs_rel_path() );
 
 				if( $rSub['opened'] )
 				{
@@ -1315,8 +1315,11 @@ class FileManager extends Filelist
 			return false;
 		}
 
+		// We may have moved in same dir, update caches:
+		$this->update_caches();
+
 		if( $this->contains( $File ) === false )
-		{ // File not in filelist (expected)
+		{ // File not in filelist (expected if not same dir)
 			$this->add( $File );
 		}
 
@@ -1349,6 +1352,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.46  2005/05/24 15:26:52  fplanque
+ * cleanup
+ *
  * Revision 1.45  2005/05/17 19:26:07  fplanque
  * FM: copy / move debugging
  *
