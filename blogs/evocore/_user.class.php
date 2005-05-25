@@ -116,7 +116,8 @@ class User extends DataObject
    	$this->delete_cascades = array(
 				array( 'table'=>'T_usersettings', 'fk'=>'uset_user_ID', 'msg'=>T_('%d user settings on collections') ),
 				array( 'table'=>'T_sessions', 'fk'=>'sess_user_ID', 'msg'=>T_('%d sessions opened by this user') ),
-				array( 'table'=>'T_blogusers', 'fk'=>'bloguser_user_ID', 'msg'=>T_('%d user permissions on blogs') ),
+				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_user_ID', 'msg'=>T_('%d user permissions on blogs') ),
+				array( 'table'=>'T_subscriptions', 'fk'=>'sub_user_ID', 'msg'=>T_('%d subscriptions') ),
 				array( 'table'=>'T_posts', 'fk'=>'post_creator_user_ID', 'msg'=>T_('%d posts created by this user') ),
 			);
 
@@ -520,7 +521,7 @@ class User extends DataObject
 			// Load now:
 			// echo 'loading allowed statuses';
 			$query = "SELECT *
-								FROM T_blogusers
+								FROM T_coll_user_perms
 								WHERE bloguser_blog_ID = $perm_target_blog
 								  AND bloguser_user_ID = $this->ID";
 			// echo $query, '<br />';
@@ -878,6 +879,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2005/05/25 17:13:33  fplanque
+ * implemented email notifications on new comments/trackbacks
+ *
  * Revision 1.31  2005/05/12 18:39:24  fplanque
  * storing multi homed/relative pathnames for file meta data
  *

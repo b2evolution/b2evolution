@@ -414,11 +414,9 @@ function create_groups()
 	echo "OK.<br />\n";
 
 	echo 'Creating table for Blog-User permissions... ';
-	$query = "CREATE TABLE T_blogusers (
+	$query = "CREATE TABLE T_coll_user_perms (
 		bloguser_blog_ID int(11) unsigned NOT NULL default 0,
 		bloguser_user_ID int(11) unsigned NOT NULL default 0,
-		bloguser_subs_items        tinyint(4) not null default 0,
-		bloguser_subs_comments     tinyint(4) not null default 0,
 		bloguser_ismember tinyint NOT NULL default 0,
 		bloguser_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
 		bloguser_perm_delpost tinyint NOT NULL default 0,
@@ -911,7 +909,7 @@ function populate_main_tables()
 
 	echo 'Creating user blog permissions... ';
 	// Admin for blog A:
-	$query = "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+	$query = "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 							bloguser_perm_cats, bloguser_perm_properties,
 							bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
@@ -1058,6 +1056,17 @@ function create_b2evo_tables_092()
 	echo "OK.<br />\n";
 
 
+
+	echo 'Creating table for subscriptions... ';
+	$DB->query( "CREATE TABLE T_subscriptions (
+							   sub_coll_ID     int(11) unsigned    not null,
+							   sub_user_ID     int(11) unsigned    not null,
+							   sub_items       tinyint(1)          not null,
+							   sub_comments    tinyint(1)          not null,
+							   primary key (sub_coll_ID, sub_user_ID) )" );
+	echo "OK.<br />\n";
+
+
 	/*
 			evo_linktypes tables:
 			-ltype_ID    INT     PK
@@ -1079,7 +1088,7 @@ function create_b2evo_relations()
 
 	echo 'Creating relations... ';
 
-	$DB->query( 'alter table T_blogusers
+	$DB->query( 'alter table T_coll_user_perms
 								add constraint FK_bloguser_blog_ID
 								 			foreign key (bloguser_blog_ID)
 											references T_blogs (blog_ID)
@@ -1200,6 +1209,20 @@ function create_b2evo_relations()
 	$DB->query( 'alter table T_usersettings
 								add constraint FK_uset_user_ID
 											foreign key (uset_user_ID)
+											references T_users (ID)
+											on delete restrict
+											on update restrict' );
+
+	$DB->query( 'alter table T_subscriptions
+								add constraint FK_sub_coll_ID
+											foreign key (sub_coll_ID)
+											references T_blogs (blog_ID)
+											on delete restrict
+											on update restrict' );
+
+	$DB->query( 'alter table T_subscriptions
+								add constraint FK_sub_user_ID
+											foreign key (sub_user_ID)
 											references T_users (ID)
 											on delete restrict
 											on update restrict' );

@@ -15,7 +15,7 @@
 require_once (dirname(__FILE__). '/_header.php');
 
 $AdminUI->setPath( 'new' );
-param( 'action', 'string', '', true );
+param( 'action', 'string', 'new', true );
 
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
@@ -116,6 +116,7 @@ switch($action)
 		if( !$blog )
 		{
 			$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.$admin_email.'?subject=b2-promotion"' ), 'note' );
+			$action = 'nil';
 			break;
 		}
 
@@ -124,6 +125,7 @@ switch($action)
 		if( ! blog_has_cats( $blog ) )
 		{
 			$Messages->add( T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), 'note' );
+			$action = 'nil';
 			break;
 		}
 
@@ -188,6 +190,9 @@ require dirname(__FILE__).'/_menutop.php';
  */
 switch( $action )
 {
+	case 'nil':
+		break;
+
 	case 'delete_link':
 	case 'edit':
 		/*

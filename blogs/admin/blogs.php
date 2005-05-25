@@ -250,12 +250,11 @@ switch($action)
 
 			// Set default user permissions for this blog
 			// Proceed insertions:
-			$DB->query( "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
-												bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
-												bloguser_perm_cats, bloguser_perm_properties )
+			$DB->query( "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+															bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
+															bloguser_perm_cats, bloguser_perm_properties )
 										VALUES ( $edited_Blog->ID, $current_User->ID, 1,
-														 'published,protected,private,draft,deprecated',
-															1, 1, 1, 1 )" );
+														 'published,protected,private,draft,deprecated', 1, 1, 1, 1 )" );
 
 			// Commit changes in cache:
 			$BlogCache->add( $edited_Blog );
@@ -551,6 +550,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.36  2005/05/25 17:13:32  fplanque
+ * implemented email notifications on new comments/trackbacks
+ *
  * Revision 1.35  2005/03/16 19:58:17  fplanque
  * small AdminUI cleanup tasks
  *

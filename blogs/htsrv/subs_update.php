@@ -111,7 +111,7 @@ foreach( $subs_blog_IDs as $loop_blog_ID )
 
 if( count($values) )
 {	// We need to record vales:
-	$DB->query( 'REPLACE INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_subs_items, bloguser_subs_comments )
+	$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
 								VALUES '.implode( ', ', $values ) );
 }
 

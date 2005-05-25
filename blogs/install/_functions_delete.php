@@ -53,8 +53,11 @@ function db_delete()
  	echo "Dropping User sessions...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_sessions' );
 
-	echo "Dropping Blogusers...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_blogusers' );
+	echo "Dropping User permissions on Blogs...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_coll_user_perms' );
+
+	echo "Dropping User subscriptions on Blogs...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_subscriptions' );
 
 	echo "Dropping Users...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_users' );

@@ -63,7 +63,7 @@ class Comment extends DataObject
 	var	$author;
 	var	$author_email;
 	var	$author_url;
-	var	$author_ip;
+	var	$author_IP;
 	var	$date;
 	var	$content;
 
@@ -81,14 +81,14 @@ class Comment extends DataObject
 
 		if( $db_row == NULL )
 		{
-			echo 'null comment';
+			// echo 'null comment';
 		}
 		else
 		{
 			$this->ID = $db_row['comment_ID'];
 
 			// Get parent Item
-			$this->Item = $ItemCache->get_by_ID(  $db_row['comment_post_ID'] );
+			$this->Item = & $ItemCache->get_by_ID(  $db_row['comment_post_ID'] );
 
 			// Get Author User
 			$author_ID = $db_row['comment_author_ID'];
@@ -104,28 +104,43 @@ class Comment extends DataObject
 			$url = trim( $db_row['comment_author_url'] );
 			$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);	// Escape &
 			$this->author_url = (!stristr($url, '://')) ? 'http://'.$url : $url;
-			$this->author_ip = $db_row['comment_author_IP'];
+			$this->author_IP = $db_row['comment_author_IP'];
 			$this->date = $db_row['comment_date'];
 			$this->content = $db_row['comment_content'];
 		}
 	}
 
+
 	/**
-	 * Comment::set(-)
-	 *
 	 * Set param value
 	 */
 	function set( $parname, $parvalue )
 	{
 		switch( $parname )
 		{
-			case 'Item':
-				die ('coment->Post assignement not handled');
-			break;
-
 			default:
 				parent::set_param( $parname, 'string', $parvalue );
 		}
+	}
+
+
+	/**
+	 * Set Item this comment relates to
+	 */
+	function set_Item( & $Item )
+	{
+		$this->Item = & $Item;
+		parent::set_param( 'post_ID', 'number', $Item->ID );
+	}
+
+
+	/**
+	 * Set author User of this comment
+	 */
+	function set_author_User( & $author_User )
+	{
+		$this->author_User = & $author_User;
+		parent::set_param( 'author_ID', 'number', $author_User->ID );
 	}
 
 
@@ -178,17 +193,15 @@ class Comment extends DataObject
 	/**
 	 * Template function: display comment's author's IP
 	 *
-	 * {@internal Comment::author_ip(-) }}
-	 *
 	 * @param string String to display before IP, if IP exists
 	 * @param string String to display after IP, if IP exists
 	 */
 	function author_ip( $before='', $after='' )
 	{
-		if( !empty( $this->author_ip ) )
+		if( !empty( $this->author_IP ) )
 		{
 			echo $before;
-			echo $this->author_ip;
+			echo $this->author_IP;
 			echo $after;
 		}
 	}
@@ -399,14 +412,12 @@ class Comment extends DataObject
 
 
 	/**
-	 * Template function: display permalink to this comment
-	 *
-	 * {@internal Comment::permalink(-) }}
+	 * Generate permalink to this comment
 	 *
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
-	function permalink( $mode = '', $blogurl='' )
+	function gen_permalink( $mode = '', $blogurl='' )
 	{
 		global $Settings;
 
@@ -422,8 +433,21 @@ class Comment extends DataObject
 		}
 
 		$post_permalink = $this->Item->gen_permalink( $mode, $blogurl );
-		echo $post_permalink.'#c'.$this->ID;
+		return $post_permalink.'#c'.$this->ID;
 	}
+
+
+	/**
+	 * Template function: display permalink to this comment
+	 *
+	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
+	 * @param string url to use
+	 */
+	function permalink( $mode = '', $blogurl='' )
+	{
+		echo $this->gen_permalink( $mode, $blogurl );
+	}
+
 
 	/**
 	 * Template function: display content of comment
@@ -474,8 +498,136 @@ class Comment extends DataObject
 	}
 
 
+	/**
+	 * Send email notifications to subscribed users:
+	 *
+	 * @todo shall we notify suscribers of blog were this is in extra-cat?
+	 * @todo cache message by locale
+	 */
+	function send_email_notifications()
+	{
+		global $DB, $admin_url, $debug;
+
+		// Get list of users who want to be notfied:
+		// TODO: also use extra cats/blogs??
+		$sql = 'SELECT DISTINCT user_email, user_locale
+							FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = ID
+						 WHERE sub_coll_ID = '.$this->Item->blog_ID.'
+						   AND sub_comments <> 0
+						   AND LENGTH(TRIM(user_email)) > 0';
+		$notify_list = $DB->get_results( $sql );
+
+		// Preprocess list:
+		$notify_array = array();
+		foreach( $notify_list as $notification )
+		{
+			$notify_array[$notification->user_email] = $notification->user_locale;
+		}
+
+		// Check if we need to add the author:
+		$item_author_User = & $this->Item->Author;
+		if( $item_author_User->notify
+				&& ( ! empty( $item_author_User->email ) ) )
+		{	// Author wants to be notified:
+			$notify_array[$item_author_User->email] = $item_author_User->locale;
+		}
+
+		if( ! count($notify_array) )
+		{	// No-one to notify:
+			return false;
+		}
+
+		/*
+		 * We have a list of email addresses to notify:
+		 */
+		if( !is_null( $this->author_User ) )
+		{	// Comment from a registered user:
+			$mail_from = $this->author_User->get('email');
+		}
+		elseif( empty( $email ) )
+		{
+			global $notify_from;
+			$mail_from = $notify_from;
+		}
+		else
+		{
+			$mail_from = "\"$this->author\" <$this->author_email>";
+		}
+
+		$Blog = & $this->Item->getBlog();
+
+		// Send emails:
+		foreach( $notify_array as $notify_email => $notify_locale )
+		{
+			locale_temp_switch($notify_locale);
+
+			switch( $this->type )
+			{
+				case 'trackback':
+					$subject = T_('[%s] New trackback on "%s"');
+					break;
+
+				default:
+					$subject = T_('[%s] New comment on "%s"');
+			}
+
+			$subject = sprintf( $subject, $Blog->get('shortname'), $this->Item->get('title') );
+
+			$notify_message  = T_('Blog').': '.$Blog->get('shortname')
+												.' ( '.str_replace('&amp;', '&', $Blog->get('blogurl'))." )\n";
+			$notify_message .= T_('Post').': '.$this->Item->get('title')
+												.' ( '.str_replace('&amp;', '&', $this->Item->gen_permalink( 'pid' ))." )\n";
+												// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+
+			switch( $this->type )
+			{
+				case 'trackback':
+					$user_domain = gethostbyaddr($this->author_IP);
+					$notify_message .= T_('Website').": $this->author (IP: $this->author_IP, $user_domain)\n";
+					$notify_message .= T_('Url').": $this->author_url\n";
+					break;
+
+				default:
+					if( !is_null( $this->author_User ) )
+					{	// Comment from a registered user:
+						$notify_message .= T_('Author').': '.$this->author_User->get('preferedname').' ('.$this->author_User->get('login').")\n";
+					}
+					else
+					{	// Comment from visitor:
+						$user_domain = gethostbyaddr($this->author_IP);
+						$notify_message .= T_('Author').": $this->author (IP: $this->author_IP, $user_domain)\n";
+						$notify_message .= T_('Email').": $this->author_email\n";
+						$notify_message .= T_('Url').": $this->author_url\n";
+					}
+			}
+
+			$notify_message .= T_('Comment').': '.str_replace('&amp;', '&', $this->gen_permalink( 'pid' ))."\n";
+												// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+
+			$notify_message .= $this->content."\n\n";
+
+			$notify_message .= T_('Edit/Delete').': '.$admin_url.'b2browse.php?blog='.$this->Item->blog_ID.'&p='.$this->Item->ID."&c=1\n\n";
+
+			$notify_message .= T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
+
+			if( $debug >= 2 )
+			{
+				echo "<p>Sending notification to $notify_email:<pre>$notify_message</pre>";
+			}
+
+			send_mail( $notify_email, $subject, $notify_message, $mail_from );
+
+			locale_restore_previous();
+		}
+
+	}
+
+}
 /*
  * $Log$
+ * Revision 1.9  2005/05/25 17:13:33  fplanque
+ * implemented email notifications on new comments/trackbacks
+ *
  * Revision 1.8  2005/04/28 20:44:20  fplanque
  * normalizing, doc
  *
@@ -507,5 +659,4 @@ class Comment extends DataObject
  * Edited code documentation.
  *
  */
-}
 ?>

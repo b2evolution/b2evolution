@@ -60,7 +60,7 @@ class DbUnitTestCase extends EvoUnitTestCase
 		$testDbTables = array( 'T_antispam', 'T_hitlog', 'T_comments', 'T_postcats',
 														'T_links', 'T_files', 'T_posts', 'T_categories',
 														'T_poststatuses', 'T_posttypes', 'T_usersettings',
-														'T_sessions', 'T_blogusers', 'T_users', 'T_groups',
+														'T_sessions', 'T_coll_user_perms', 'T_users', 'T_groups',
 														'T_blogs', 'T_settings', 'T_locales', 'T_usersettings',
 														'T_plugins' );
 

@@ -183,7 +183,7 @@ class UserCache extends DataObjectCache
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache", 'dataobjects' );
 
 		foreach( $DB->get_results( 'SELECT *
-																	FROM T_users INNER JOIN T_blogusers ON ID = bloguser_user_ID
+																	FROM T_users INNER JOIN T_coll_user_perms ON ID = bloguser_user_ID
 																 WHERE bloguser_blog_ID = '.$blog_ID.'
 																	 AND bloguser_ismember <> 0' ) as $row )
 		{
@@ -253,6 +253,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.18  2005/05/25 17:13:34  fplanque
+ * implemented email notifications on new comments/trackbacks
+ *
  * Revision 1.17  2005/05/16 15:17:13  fplanque
  * minor
  *

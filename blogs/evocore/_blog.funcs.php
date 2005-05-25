@@ -127,11 +127,8 @@ function blog_update_user_perms( $blog )
 {
 	global $DB;
 	// Delete old perms for this blog:
-	// Note: we only want to delete user riows if they are not subscrived to the blog!
-	$DB->query( 'DELETE FROM T_blogusers
-								WHERE bloguser_blog_ID = '.$blog.'
-								  AND bloguser_subs_items = 0
-									AND bloguser_subs_comments = 0' );
+	$DB->query( 'DELETE FROM T_coll_user_perms
+								WHERE bloguser_blog_ID = '.$blog );
 
 	// Now we need a full user list:
 	$inserted_values = array();
@@ -200,7 +197,7 @@ function blog_update_user_perms( $blog )
 	// Proceed with insertions:
 	if( count( $inserted_values ) )
 	{
-		$DB->query( "REPLACE INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+		$DB->query( "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 											bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 											bloguser_perm_cats, bloguser_perm_properties,
 											bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change)
@@ -218,7 +215,7 @@ function blog_update_user_perms( $blog )
  * - administrator (editor+edit cats+edit blog)
  * - custom
  *
- * @param array indexed, as the result row from "SELECT * FROM T_blogusers"
+ * @param array indexed, as the result row from "SELECT * FROM T_coll_user_perms"
  * @return string one of the five groups (nomember, member, editor, admin, custom)
  */
 function blogperms_get_easy( $perms )
@@ -271,7 +268,7 @@ function blogperms_get_easy( $perms )
 /**
  *
  * @param string "easy group": 'admin', 'editor', 'member'
- * @return array indexed, as the result row from "SELECT * FROM T_blogusers"
+ * @return array indexed, as the result row from "SELECT * FROM T_coll_user_perms"
  */
 function blogperms_from_easy( $easy_group )
 {
@@ -553,6 +550,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.13  2005/05/25 17:13:33  fplanque
+ * implemented email notifications on new comments/trackbacks
+ *
  * Revision 1.12  2005/05/24 18:46:26  fplanque
  * implemented blog email subscriptions (part 1)
  *

@@ -125,7 +125,8 @@ class Blog extends DataObject
 
    	$this->delete_cascades = array(
  				// b2evo only:
- 				array( 'table'=>'T_blogusers', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user rights defintions') ),
+ 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user rights defintions') ),
+ 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
 				// progidistri only: (those won't hurt)
  				array( 'table'=>'T_colluserrights', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user rights defintions') ),
 			);
@@ -609,8 +610,14 @@ class Blog extends DataObject
 
 		// Delete blogusers
 		if( $echo ) echo '<br />Deleting user-blog permissions... ';
-		$ret = $DB->query( "DELETE FROM T_blogusers
+		$ret = $DB->query( "DELETE FROM T_coll_user_perms
 												WHERE bloguser_blog_ID = $this->ID" );
+		if( $echo ) printf( '(%d rows)', $ret );
+
+		// Delete subscriptions
+		if( $echo ) echo '<br />Deleting subscriptions... ';
+		$ret = $DB->query( "DELETE FROM T_subscriptions
+												WHERE sub_coll_ID = $this->ID" );
 		if( $echo ) printf( '(%d rows)', $ret );
 
 		// Delete hitlogs
@@ -691,6 +698,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2005/05/25 17:13:33  fplanque
+ * implemented email notifications on new comments/trackbacks
+ *
  * Revision 1.19  2005/05/12 18:39:24  fplanque
  * storing multi homed/relative pathnames for file meta data
  *

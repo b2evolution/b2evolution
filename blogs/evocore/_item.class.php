@@ -1846,12 +1846,12 @@ class Item extends DataObject
 	 *
 	 * @return Blog
 	 */
-	function &getBlog()
+	function & getBlog()
 	{
 		if( is_null($this->Blog) )
 		{
 			global $BlogCache;
-			$this->Blog =& $BlogCache->get_by_ID( $this->blog_ID );
+			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
 		}
 
 		return $this->Blog;
@@ -1861,6 +1861,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2005/05/25 17:13:33  fplanque
+ * implemented email notifications on new comments/trackbacks
+ *
  * Revision 1.38  2005/04/28 20:44:20  fplanque
  * normalizing, doc
  *

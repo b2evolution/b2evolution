@@ -262,7 +262,7 @@ function upgrade_b2evo_tables()
 
 		echo 'Creating user blog permissions... ';
 		// Admin: full rights for all blogs (look 'ma, doing a natural join! :>)
-		$query = "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+		$query = "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 								bloguser_perm_cats, bloguser_perm_properties)
 							SELECT blog_ID, ID, 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
@@ -271,7 +271,7 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 
 		// Normal users: basic rights for all blogs (can't stop doing joins :P)
-		$query = "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+		$query = "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 								bloguser_perm_cats, bloguser_perm_properties)
 							SELECT blog_ID, ID, 1, 'published,protected,private,draft', 0, 1, 0, 0
@@ -443,13 +443,13 @@ function upgrade_b2evo_tables()
 		if( !isset( $tableblogusers_isuptodate ) )
 		{
 			echo 'Upgrading Blog-User permissions table... ';
-			$query = "ALTER TABLE T_blogusers
+			$query = "ALTER TABLE T_coll_user_perms
 								ADD COLUMN bloguser_ismember tinyint NOT NULL default 0 AFTER bloguser_user_ID";
 			$DB->query( $query );
 
 			// Any row that is created holds at least one permission,
 			// minimum permsission is to be a member, so we add that one too, to all existing rows.
-			$DB->query( "UPDATE T_blogusers
+			$DB->query( "UPDATE T_coll_user_perms
 											SET bloguser_ismember = 1" );
 			echo "OK.<br />\n";
 		}
@@ -577,11 +577,9 @@ function upgrade_b2evo_tables()
 
 
 		echo 'Altering table for Blog-User permissions... ';
-		$DB->query( 'ALTER TABLE T_blogusers
+		$DB->query( 'ALTER TABLE T_coll_user_perms
 									MODIFY COLUMN bloguser_blog_ID int(11) unsigned NOT NULL default 0,
 									MODIFY COLUMN bloguser_user_ID int(11) unsigned NOT NULL default 0,
-									ADD COLUMN bloguser_subs_items        tinyint(4) not null default 0,
-									ADD COLUMN bloguser_subs_comments     tinyint(4) not null default 0,
 									ADD COLUMN bloguser_perm_media_upload tinyint NOT NULL default 0,
 									ADD COLUMN bloguser_perm_media_browse tinyint NOT NULL default 0,
 									ADD COLUMN bloguser_perm_media_change tinyint NOT NULL default 0' );

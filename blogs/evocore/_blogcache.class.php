@@ -174,7 +174,7 @@ class BlogCache extends DataObjectCache
 				break;
 		}
 		$bloglist = $DB->get_col( 'SELECT bloguser_blog_ID
-																FROM T_blogusers
+																FROM T_coll_user_perms
 																'.$where, 0, 'Get user blog list' );
 
 		$this->load_list( implode( ',', $bloglist ) );
@@ -224,6 +224,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.12  2005/05/25 17:13:33  fplanque
+ * implemented email notifications on new comments/trackbacks
+ *
  * Revision 1.11  2005/05/16 15:17:12  fplanque
  * minor
  *

@@ -64,7 +64,7 @@ function upgrade_cafelog_tables()
 
 	echo 'Creating user blog permissions... ';
 	// Admin for all blogs:
-	$query = "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+	$query = "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 							bloguser_perm_cats, bloguser_perm_properties)
 						SELECT blog_ID, ID, 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1
@@ -73,7 +73,7 @@ function upgrade_cafelog_tables()
 	$DB->query( $query );
 
 	// Normal users for upgraded blog:
-	$query = "INSERT INTO T_blogusers( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+	$query = "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 							bloguser_perm_cats, bloguser_perm_properties)
 						SELECT $blog_a_ID, ID, 1, 'published,protected,private,draft', 0, 1, 0, 0

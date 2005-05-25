@@ -67,9 +67,8 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 	@header('Content-Type: text/xml');
 
 	$comment_post_ID = $tb_id;
-	$postdata = get_postdata($comment_post_ID);
-	$blog = $postdata['Blog'];
-	if( !( $Blog =& $BlogCache->get_by_ID( $blog ) ) )
+	$commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
+	if( !( $Blog = & $commented_Item->getBlog() ) )
 	{
 		trackback_response( 1, 'Sorry, could not get the post\'s weblog.' );
 	}
@@ -107,17 +106,22 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 		die();
 	}
 
-	$comment_author = $blog_name;
-	$comment_author_email = '';
-	$comment_author_url = $url;
 
-	$query = "INSERT INTO T_comments( comment_post_ID, comment_type, comment_author,
-																				comment_author_email, comment_author_url, comment_author_IP,
-																				comment_date, comment_content)
-						VALUES( $comment_post_ID, 'trackback', '".$DB->escape($comment_author)."',
-										'".$DB->escape($comment_author_email)."', '".$DB->escape($comment_author_url)."', '".$DB->escape($user_ip)."',
-										'$now', '".$DB->escape($comment)."' )";
-	if( !$DB->query( $query ) )
+	/*
+	 * ----------------------------
+	 * Create and record trackback:
+	 * ----------------------------
+	 */
+	$Comment = & new Comment();
+	$Comment->set( 'type', 'trackback' );
+	$Comment->set_Item( $commented_Item );
+	$Comment->set( 'author', $blog_name );
+	$Comment->set( 'author_url', $url );
+	$Comment->set( 'author_IP', $user_ip );
+	$Comment->set( 'date', $now );
+	$Comment->set( 'content', $comment );
+
+	if( ! $Comment->dbinsert() )
 	{
 		trackback_response(2, "There is an error with the database, it can't store your comment...<br />Contact the <a href=\"mailto:$admin_email\">webmaster</a>");	// TODO: check that error code 2 is ok
 		die ();
@@ -125,28 +129,17 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 
 
 	/*
+	 * ----------------------------
 	 * New trackback notification:
+	 * ----------------------------
 	 */
-	$AuthorUser =& $UserCache->get_by_ID( $postdata['Author_ID'] );
-	if( $AuthorUser->notify )
-	{ // Author wants to be notified:
-		locale_temp_switch( $AuthorUser->get( 'locale' ) );
-		$recipient = $AuthorUser->get( 'email' );
-		$subject = sprintf( T_('New trackback on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] );
+	$Comment->send_email_notifications();
 
-		$notify_message = sprintf( T_('New trackback on your post #%d "%s"'), $comment_post_ID, $postdata['Title'] )."\n";
-											.url_add_param( $Blog->get('blogurl'), "p=$comment_post_ID&tb=1\n\n", '&' );
-											.T_('Website').": $comment_author (IP: $user_ip , $user_domain)\n";
-											.T_('Url').": $comment_author_url\n";
-											.T_('Excerpt').": \n".$original_comment."\n\n";
-											.T_('Edit/Delete').': '.$admin_url.'b2browse.php?blog='.$blog.'&p='.$comment_post_ID."&c=1\n\n";
 
-		send_mail( $recipient, $subject, $notify_message, $notify_from );
 
-		locale_restore_previous();
-	}
+ 	trackback_response( 0, 'ok' );
 
-	trackback_response( 0, 'ok' );
+
 }
 
 ?>

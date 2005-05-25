@@ -124,7 +124,7 @@ class DataObject
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
-	 * {@internal DataObject::dbupdate(-)}}
+	 * @return boolean true on success
 	 */
 	function dbupdate( )
 	{
@@ -168,17 +168,22 @@ class DataObject
 						 WHERE $this->dbIDname = $this->ID";
 		//echo $sql;
 
-		$DB->query( $sql, 'DataObject::dbupdate()' );
+		if( ! $DB->query( $sql, 'DataObject::dbupdate()' ) )
+		{
+			return false;
+		}
 
 		// Reset changes in object:
 		$this->dbchanges = array();
+
+		return true;
 	}
 
 
 	/**
 	 * Insert object into DB based on previously recorded changes
 	 *
-	 * {@internal DataObject::dbinsert(-)}}
+	 * @return boolean true on success
 	 */
 	function dbinsert( )
 	{
@@ -236,13 +241,18 @@ class DataObject
 		$sql = "INSERT INTO {$this->dbtablename} (". implode( ', ', $sql_fields ). ") VALUES (". implode( ', ', $sql_values ). ")";
 		// echo $sql;
 
-		$DB->query( $sql, 'DataObject::dbinsert()' );
+		if( ! $DB->query( $sql, 'DataObject::dbinsert()' ) )
+		{
+			return false; 
+		}
 
 		// store ID for newly created db record
 		$this->ID = $DB->insert_id;
 
 		// Reset changes in object:
 		$this->dbchanges = array();
+
+		return true;
 	}
 
 
@@ -266,8 +276,6 @@ class DataObject
 
 	/**
 	 * Delete object from DB
-	 *
-	 * {@internal DataObject::dbdelete(-)}}
 	 */
 	function dbdelete( )
 	{
@@ -295,9 +303,9 @@ class DataObject
 		}
 
 		// Delete this (main/parent) object:
-		$DB->query( "DELETE FROM $this->dbtablename
+		if( ! $DB->query( "DELETE FROM $this->dbtablename
 									WHERE $this->dbIDname = $this->ID",
-								'Main delete' );
+								'Main delete' ) )
 
 		if( count($this->delete_cascades ) )
 		{	// The were cascading deletes
@@ -528,6 +536,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.18  2005/05/25 17:13:33  fplanque
+ * implemented email notifications on new comments/trackbacks
+ *
  * Revision 1.17  2005/05/17 19:26:07  fplanque
  * FM: copy / move debugging
  *
