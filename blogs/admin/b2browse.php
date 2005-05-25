@@ -14,29 +14,19 @@
  */
 require_once (dirname(__FILE__). '/_header.php');
 
-$AdminUI->setPath( 'edit', param( 'tab', 'string', 'postlist', true /* memorize */ ) );
 $AdminUI->title = $AdminUI->title_titlearea = T_('Browse blog:');
 
 $blog = autoselect_blog( param( 'blog', 'integer', 0 ), 'blog_ismember', 1 );
 
-if( $blog != 0 )
-{ // We could select a blog:
-	$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
-	$AdminUI->title .= ' '.$Blog->dget( 'shortname' );
-}
-else
+if( ! $blog  )
 { // No blog could be selected
 	$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'. $admin_email. '?subject=b2-promotion"' ) );
 }
-
-
-// Generate available blogs list:
-$blogListButtons = $AdminUI->getCollectionList( 'blog_ismember', 1, $pagenow.'?tab='.$tab.'&amp;blog=%d' );
-
-require dirname(__FILE__).'/_menutop.php';
-
-if( $blog )
+else
 { // We could select a valid blog which we have permission to access:
+	$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
+	$AdminUI->title .= ' '.$Blog->dget( 'shortname' );
+
 	// Show the posts:
 	$add_item_url = 'b2edit.php?blog='.$blog;
 	$edit_item_url = 'b2edit.php?action=edit&amp;post=';
@@ -46,10 +36,7 @@ if( $blog )
 	$dbprefix = 'post_';
 	$dbIDname = 'ID';
 
-	// Begin payload block:
-	$AdminUI->dispPayloadBegin();
-
-
+	param( 'tab', 'string', 'postlist', true /* memorize */ );
 	param( 'safe_mode', 'integer', 0 );         // Blogger style
 	param( 'p', 'integer' );                    // Specific post number to display
 	param( 'm', 'integer', '', true );          // YearMonth(Day) to display
@@ -94,6 +81,26 @@ if( $blog )
 
 	$postIDlist = & $MainList->postIDlist;
 	$postIDarray = & $MainList->postIDarray;
+
+	if( $p )
+	{	// We are requesting a specific post, force mode to post display:
+		$tab = 'posts';
+	}
+}
+
+
+$AdminUI->setPath( 'edit', $tab );
+
+// Generate available blogs list:
+$blogListButtons = $AdminUI->getCollectionList( 'blog_ismember', 1, $pagenow.'?tab='.$tab.'&amp;blog=%d' );
+
+require dirname(__FILE__).'/_menutop.php';
+
+
+if( $blog )
+{ // We could select a valid blog which we have permission to access:
+	// Begin payload block:
+	$AdminUI->dispPayloadBegin();
 
 	echo '<div class="left_col">';
 		switch( $tab )
