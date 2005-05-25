@@ -1699,7 +1699,7 @@ class Item extends DataObject
 		$item_typ_ID = 0,
 		$item_st_ID = 0 )
 	{
-		global $DB, $query;
+		global $DB, $query, $UserCache;
 		global $localtimenow, $default_locale;
 
 		if( $post_locale == '#' ) $post_locale = $default_locale;
@@ -1722,12 +1722,14 @@ class Item extends DataObject
 
 		$this->creator_user_ID = $author_user_ID;
 		$this->lastedit_user_ID = $author_user_ID;
+		$this->Author = & $UserCache->get_by_ID( $this->creator_user_ID );
 		$this->set( 'title', $post_title );
 		$this->set( 'urltitle', $post_urltitle );
 		$this->set( 'content', $post_content );
 		$this->set( 'datestart', $post_timestamp );
 		$this->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
 		$this->set( 'main_cat_ID', $main_cat_ID );
+		$this->blog_ID = get_catblog( $this->main_cat_ID ); // This is a derived var
 		$this->set( 'status', $post_status );
 		$this->set( 'locale', $post_locale );
 		$this->set( 'url', $post_url );
@@ -1751,6 +1753,7 @@ class Item extends DataObject
 		if( ! $DB->query( $query, 'Associate new post with extra categories' ) ) return 0;
 
 		// TODO: END TRANSACTION
+
 
 		return $this->ID;
 	}
@@ -1857,10 +1860,96 @@ class Item extends DataObject
 		return $this->Blog;
 	}
 
+
+	/**
+	 * Send email notifications to subscribed users
+	 *
+	 * @todo shall we notify suscribers of blog were this is in extra-cat?
+	 * @todo cache message by locale
+	 */
+	function send_email_notifications( $display = true )
+	{
+		global $DB, $admin_url, $debug;
+
+		// Get list of users who want to be notfied:
+		// TODO: also use extra cats/blogs??
+		$sql = 'SELECT DISTINCT user_email, user_locale
+							FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = ID
+						 WHERE sub_coll_ID = '.$this->blog_ID.'
+						   AND sub_items <> 0
+						   AND LENGTH(TRIM(user_email)) > 0';
+		$notify_list = $DB->get_results( $sql );
+
+		// Preprocess list: (this comes form Comment::send_email_notifications() )
+		$notify_array = array();
+		foreach( $notify_list as $notification )
+		{
+			$notify_array[$notification->user_email] = $notification->user_locale;
+		}
+
+		if( ! count($notify_array) )
+		{	// No-one to notify:
+			return false;
+		}
+
+		/*
+		 * We have a list of email addresses to notify:
+		 */
+		if( $display )
+		{
+			echo "<div class=\"panelinfo\">\n";
+			echo '<h3>', T_('Notifying subscribed users...'), "</h3>\n";
+		}
+
+		$mail_from = '"'.$this->Author->get('preferedname').'" <'.$this->Author->get('email').'>';
+
+		$Blog = & $this->getBlog();
+
+		// Send emails:
+		foreach( $notify_array as $notify_email => $notify_locale )
+		{
+			locale_temp_switch($notify_locale);
+
+			$subject = sprintf( T_('[%s] New post: "%s"'), $Blog->get('shortname'), $this->get('title') );
+
+			$notify_message  = T_('Blog').': '.$Blog->get('shortname')
+												.' ( '.str_replace('&amp;', '&', $Blog->get('blogurl'))." )\n";
+
+			$notify_message .= T_('Author').': '.$this->Author->get('preferedname').' ('.$this->Author->get('login').")\n";
+
+			$notify_message .= T_('Title').': '.$this->get('title')."\n";
+
+			$notify_message .= T_('Url').': '.str_replace('&amp;', '&', $this->get('url'))."\n";
+
+			$notify_message .= T_('Content').': '.str_replace('&amp;', '&', $this->gen_permalink( 'pid' ))."\n";
+												// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+
+			$notify_message .= $this->get('content')."\n\n";
+
+			$notify_message .= T_('Edit/Delete').': '.$admin_url.'b2browse.php?blog='.$this->blog_ID.'&p='.$this->ID."\n\n";
+
+			$notify_message .= T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
+
+			if( $display ) echo T_('Notifying:').$notify_email."<br />\n";
+			if( $debug >= 2 )
+			{
+				echo "<p>Sending notification to $notify_email:<pre>$notify_message</pre>";
+			}
+
+			send_mail( $notify_email, $subject, $notify_message, $mail_from );
+
+			locale_restore_previous();
+		}
+
+		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.40  2005/05/25 18:31:01  fplanque
+ * implemented email notifications for new posts
+ *
  * Revision 1.39  2005/05/25 17:13:33  fplanque
  * implemented email notifications on new comments/trackbacks
  *

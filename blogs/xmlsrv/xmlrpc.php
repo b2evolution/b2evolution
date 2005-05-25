@@ -144,6 +144,11 @@ function b2newpost($m)
 	}
 
 	// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
+		
+	// Send email notifications now!
+	logIO("O","Sending email notifications...");
+	$edited_Item->send_email_notifications( false );
+		
 	logIO("O","Pinging b2evolution.net...");
 	pingb2evonet( $blogparams, $post_ID, $post_title, false );
 	logIO("O","Pinging Weblogs...");
@@ -397,6 +402,10 @@ function bloggernewpost( $m )
 	{ // If post is publicly published:
 		// logIO("O","Doing pingbacks...");
 		// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
+
+		logIO("O","Sending email notifications...");
+		$edited_Item->send_email_notifications( false );
+
 		logIO("O","Pinging b2evolution.net...");
 		pingb2evonet( $blogparams, $post_ID, $post_title, false );
 		logIO("O","Pinging Weblogs...");
@@ -565,6 +574,10 @@ function bloggereditpost($m)
 			// only pingback once, at the same time we do the pings!
 			// logIO("O","Doing pingbacks...");
 			// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
+
+			logIO("O","Sending email notifications...");
+			$edited_Item->send_email_notifications( false );
+
 			logIO("O","Pinging b2evolution.net...");
 			pingb2evonet( $blogparams, $post_ID, $post_title, false );
 			logIO("O","Pinging Weblogs...");
@@ -1938,7 +1951,10 @@ function mwnewpost($m)
 
 	// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false); // bug here in 9.0.11
 
-	logIO("O","Pinging b2evolution.net...");
+//		logIO("O","Sending email notifications...");
+//		$edited_Item->send_email_notifications( false );
+
+//	logIO("O","Pinging b2evolution.net...");
 
 //	New error is here somewhere - and of course with ecto these functions are not needed
 

@@ -144,6 +144,10 @@ switch($action)
 			trackbacks( $post_trackbacks, $content, $post_title, $post_ID);
 			// pingback
 			pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $blogparams);
+		
+			// Send email notifications now!
+			$edited_Item->send_email_notifications();
+		
 			pingb2evonet($blogparams, $post_ID, $post_title);
 			pingWeblogs($blogparams);
 			pingBlogs($blogparams);
@@ -268,6 +272,10 @@ switch($action)
 			}
 			else
 			{ // We'll ping now
+		
+				// Send email notifications now!
+				$edited_Item->send_email_notifications();
+			
 				pingb2evonet( $blogparams, $post_ID, $post_title );
 				pingWeblogs( $blogparams );
 				pingBlogs( $blogparams );
@@ -352,6 +360,10 @@ switch($action)
 			}
 			else
 			{ // We'll ping now
+		
+				// Send email notifications now!
+				$edited_Item->send_email_notifications();
+			
 				pingb2evonet( $blogparams, $post_ID, $post_title);
 				pingWeblogs($blogparams);
 				pingBlogs($blogparams);

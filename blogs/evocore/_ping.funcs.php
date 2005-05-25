@@ -44,8 +44,6 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
- * pingb2evonet(-)
- *
  * pings b2evolution.net
  */
 function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
@@ -246,6 +244,9 @@ function pingTechnorati(& $blogparams, $display = true )
 
 /*
  * $Log$
+ * Revision 1.4  2005/05/25 18:31:01  fplanque
+ * implemented email notifications for new posts
+ *
  * Revision 1.3  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

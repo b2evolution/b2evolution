@@ -715,6 +715,10 @@ writeBackSendConf( $md );
 /* Pinging turned off for now because of causing invalid server response
 $blogparams = get_blogparams_by_ID( $blog );
 pingback( true, $content, $post_title, '', $post_ID, $blogparams, false );
+
+// Send email notifications now!
+$edited_Item->send_email_notifications( false );
+		
 pingb2evonet( $blogparams, $post_ID, $post_title, false );
 pingWeblogs( $blogparams, false );
 pingBlogs( $blogparams );

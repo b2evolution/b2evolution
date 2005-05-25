@@ -542,7 +542,7 @@ class Comment extends DataObject
 		 */
 		if( !is_null( $this->author_User ) )
 		{	// Comment from a registered user:
-			$mail_from = $this->author_User->get('email');
+			$mail_from = '"'.$this->author_User->get('preferedname').'" <'.$this->author_User->get('email').'>';
 		}
 		elseif( empty( $email ) )
 		{
@@ -604,7 +604,7 @@ class Comment extends DataObject
 			$notify_message .= T_('Comment').': '.str_replace('&amp;', '&', $this->gen_permalink( 'pid' ))."\n";
 												// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
-			$notify_message .= $this->content."\n\n";
+			$notify_message .= $this->get('content')."\n\n";
 
 			$notify_message .= T_('Edit/Delete').': '.$admin_url.'b2browse.php?blog='.$this->Item->blog_ID.'&p='.$this->Item->ID."&c=1\n\n";
 
@@ -625,6 +625,9 @@ class Comment extends DataObject
 }
 /*
  * $Log$
+ * Revision 1.10  2005/05/25 18:31:01  fplanque
+ * implemented email notifications for new posts
+ *
  * Revision 1.9  2005/05/25 17:13:33  fplanque
  * implemented email notifications on new comments/trackbacks
  *
