@@ -71,6 +71,16 @@ else
 	$timestamp_min = ( $show_past == 0 ) ? 'now' : '';
 	$timestamp_max = ( $show_future == 0 ) ? 'now' : '';
 
+	if( $p )
+	{	// We are requesting a specific post, force mode to post display:
+		$tab = 'posts';
+	}
+
+	if( $posts == 0 && $tab == 'postlist' )
+	{
+		$posts = 20;
+	}
+
 	// Get the posts to display:
 	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
 															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
@@ -82,10 +92,6 @@ else
 	$postIDlist = & $MainList->postIDlist;
 	$postIDarray = & $MainList->postIDarray;
 
-	if( $p )
-	{	// We are requesting a specific post, force mode to post display:
-		$tab = 'posts';
-	}
 }
 
 

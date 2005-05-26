@@ -1722,7 +1722,10 @@ class Item extends DataObject
 
 		$this->creator_user_ID = $author_user_ID;
 		$this->lastedit_user_ID = $author_user_ID;
-		$this->Author = & $UserCache->get_by_ID( $this->creator_user_ID );
+		if( isset( $UserCache ) )
+		{	// If not in install procedure...
+			$this->Author = & $UserCache->get_by_ID( $this->creator_user_ID );
+		}
 		$this->set( 'title', $post_title );
 		$this->set( 'urltitle', $post_urltitle );
 		$this->set( 'content', $post_content );
@@ -1947,6 +1950,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2005/05/26 19:11:11  fplanque
+ * no message
+ *
  * Revision 1.40  2005/05/25 18:31:01  fplanque
  * implemented email notifications for new posts
  *

@@ -106,7 +106,7 @@ echo '<th>'.T_('Status')."</th>\n";
 echo '<th>'.T_('Title')."</th>\n";
 if( $Blog->allowcomments != 'never' )
 {
-	echo '<th>'.T_('Com')."</th>\n";
+	echo '<th>'.T_('Com.')."</th>\n";
 }
 echo '<th>'.T_('Actions')."</th>\n";
 echo "</tr>\n";
@@ -124,8 +124,6 @@ while( $Item = $MainList->get_item() )
 	echo '" title="'.T_('Permanent link to full entry').'">'.get_icon( 'permalink' ).'</a> ';
 	echo '<span class="date">';
 	$Item->issue_date();
-	echo '</span> <span class="time">';
-	$Item->issue_time();
 	echo "</span></td>\n";
 
 	echo '<td>';
@@ -140,22 +138,25 @@ while( $Item = $MainList->get_item() )
 
 	echo '<td>';
 	locale_flag( $Item->locale, 'w16px' );
-	$Item->title();
-	echo "</td>\n";
+	echo '<a href="b2browse.php?tab=posts&amp;blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1" class="">';
+	$Item->title( '', '', false );
+	echo "</a></td>\n";
 
 	if( $Blog->allowcomments != 'never' )
 	{
-		echo '<td>';
-		echo '<a href="b2browse.php?tab=posts&amp;blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1" class="">';
+		echo '<td class="center">';
+		echo '<a href="b2browse.php?tab=posts&amp;blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1" class="">';
 		// TRANS: Link to comments for current post
-		comments_number(T_('0 c'), T_('1 c'), T_('%d c'));
-		trackback_number('', ' &middot; '.T_('1 tb'), ' &middot; '.T_('%d tb'));
-		pingback_number('', ' &middot; '.T_('1 pb'), ' &middot; '.T_('%d pb'));
+		comments_number( '0', '1', '%d' );
+		echo '/';
+		trackback_number( '0', '1', '%d' );
+		echo '/';
+		pingback_number( '0', '1', '%d' );
 		echo '</a>';
 		echo "</td>\n";
 	}
 
-	echo '<td>';
+	echo '<td class="center">';
 	// Display edit button if current user has the rights:
 	$Item->edit_link( ' ', ' ', get_icon( 'edit' ), '#', '', $edit_item_url );
 
@@ -193,6 +194,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.4  2005/05/26 19:11:08  fplanque
+ * no message
+ *
  * Revision 1.3  2005/04/28 20:44:17  fplanque
  * normalizing, doc
  *

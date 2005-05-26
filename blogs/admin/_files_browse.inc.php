@@ -453,13 +453,12 @@ if( $countFiles == 0 )
 	<tr>
 		<td colspan="<?php echo $filetable_cols ?>">
 			<?php
-			if( !$Messages->count( 'fl_error' ) )
-			{ // no Filelist errors, the directory must be empty
-				$Messages->add( T_('No files found.')
-					.( $Fileman->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$Fileman->get_filter().'&raquo;' : '' ), 'fl_error' );
-			}
-			$Messages->display( '', '', true, 'fl_error', 'log_error' );
-
+				if( !$Messages->count( 'fl_error' ) )
+				{ // no Filelist errors, the directory must be empty
+					$Messages->add( T_('No files found.')
+						.( $Fileman->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$Fileman->get_filter().'&raquo;' : '' ), 'fl_error' );
+				}
+				$Messages->display( '', '', true, 'fl_error', 'log_error' );
 			?>
 		</td>
 	</tr>
@@ -785,6 +784,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.35  2005/05/26 19:11:09  fplanque
+ * no message
+ *
  * Revision 1.34  2005/05/17 19:26:05  fplanque
  * FM: copy / move debugging
  *

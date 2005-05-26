@@ -1093,7 +1093,9 @@ function create_b2evo_relations()
 								 			foreign key (bloguser_blog_ID)
 											references T_blogs (blog_ID)
 											on delete restrict
-											on update restrict,
+											on update restrict' );
+
+	$DB->query( 'alter table T_coll_user_perms
 								add constraint FK_bloguser_user_ID
 											foreign key (bloguser_user_ID)
 											references T_users (ID)

@@ -293,9 +293,9 @@ class Filelist
 		global $Messages;
 
 		if( !$this->_ads_list_path )
-		{	// We have no path to load from:
-			die( 'Cannot load a filelist with no list path' );
-			// return false;
+		{	// We have no path to load from: (happens when FM finds no available root)
+			// echo 'Cannot load a filelist with no list path' ;
+			return false;
 		}
 
 		// Clears the list (for RE-loads):
@@ -985,6 +985,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.31  2005/05/26 19:11:11  fplanque
+ * no message
+ *
  * Revision 1.30  2005/05/24 15:26:52  fplanque
  * cleanup
  *

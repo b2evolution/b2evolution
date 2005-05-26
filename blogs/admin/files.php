@@ -368,7 +368,7 @@ switch( $action )
 				// Perform rename:
 				if( ! $loop_src_File->rename_to( $new_name ) )
 				{
-					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to  &laquo;%s&raquo;'),
+					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
 													$old_name, $new_name ), 'error' );
 					continue;
 				}
@@ -729,6 +729,10 @@ switch( $action )
  * The top menu
  */
 require dirname(__FILE__).'/_menutop.php';
+
+// Temporary fix:
+// Messages have already bben displayed:
+$Messages->clear( 'all' );
 
 ?>
 
@@ -1308,6 +1312,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.111  2005/05/26 19:11:09  fplanque
+ * no message
+ *
  * Revision 1.110  2005/05/24 15:26:51  fplanque
  * cleanup
  *

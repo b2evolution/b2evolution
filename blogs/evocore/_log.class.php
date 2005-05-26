@@ -110,7 +110,7 @@ class Log
 	{
 		if( $category == 'all' )
 		{
-			unset( $this->messages );
+			$this->messages = array();
 			$this->_count = array();
 		}
 		else
@@ -570,6 +570,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.15  2005/05/26 19:11:11  fplanque
+ * no message
+ *
  * Revision 1.14  2005/04/19 16:23:03  fplanque
  * cleanup
  * added FileCache

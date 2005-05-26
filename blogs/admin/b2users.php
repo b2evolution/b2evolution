@@ -472,7 +472,7 @@ else
 
 			if( param( 'confirm', 'integer', 0 ) )
 			{ // confirmed, Delete from DB:
-				$msg = sprintf( T_('Group &laquo;%s&raquo;deleted.'), $edited_Group->dget( 'name' ) );
+				$msg = sprintf( T_('Group &laquo;%s&raquo; deleted.'), $edited_Group->dget( 'name' ) );
 				$edited_Group->dbdelete( true );
 				unset($edited_Group);
 				forget_param('grp_ID');
@@ -584,6 +584,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.91  2005/05/26 19:11:09  fplanque
+ * no message
+ *
  * Revision 1.90  2005/05/10 18:40:07  fplanque
  * normalizing
  *
