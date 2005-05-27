@@ -230,7 +230,7 @@ function stats_hit_count( $disp = true )
  */
 function stats_hit_percent(
 	$decimals = 1,
-	$dec_point = ',' )
+	$dec_point = '.' )
 {
 	global $row_stats, $stats_total_hits;
 	$percent = $row_stats['totalHits'] * 100 / $stats_total_hits;
@@ -372,6 +372,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.9  2005/05/27 19:00:56  fplanque
+ * no message
+ *
  * Revision 1.8  2005/03/09 14:54:26  fplanque
  * refactored *_title() galore to requested_title()
  *

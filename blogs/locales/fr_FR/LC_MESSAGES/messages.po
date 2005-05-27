@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2005-01-26 20:52+0100\n"
-"PO-Revision-Date: 2005-05-26 20:45+0100\n"
+"PO-Revision-Date: 2005-05-27 20:54+0100\n"
 "Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -1506,11 +1506,11 @@ msgstr "Voulez vous vraiment supprimer le fichier suivant?"
 
 #: ..\..\..\admin\files.php:451
 msgid "cannot be deleted because of the following relations"
-msgstr ""
+msgstr "ne peut être supprimé à cause des relations suivantes"
 
 #: ..\..\..\admin\files.php:562
 msgid "Selected file has been linked to item."
-msgstr ""
+msgstr "Le fichier sélectionné a été lié à l'objet."
 
 #: ..\..\..\admin\files.php:593
 msgid "Change permissions"
@@ -1553,13 +1553,13 @@ msgstr "Vous n'avez pas la permission d'ajouter/uploader des fichiers."
 
 #: ..\..\..\admin\files.php:791
 msgid "Please select a local file to upload."
-msgstr ""
+msgstr "Veuillez sélectionner un fichier local à uploader."
 
 #. TRANS: %s will be replaced by the difference
 #: ..\..\..\admin\files.php:799
 #, php-format
 msgid "The file is %s too large."
-msgstr ""
+msgstr "Le fichier est trop volumineux de %s."
 
 #: ..\..\..\admin\files.php:811
 #, php-format
@@ -1567,14 +1567,12 @@ msgid "The file is too large. Maximum allowed is: %s."
 msgstr ""
 
 #: ..\..\..\admin\files.php:816
-#, fuzzy
 msgid "The file exceeds the upload_max_filesize directive in php.ini."
-msgstr "Le fichier uploadé &laquo;%s&raquo; dépasse la taille maximale upload_max_filesize définie dans php.ini."
+msgstr "Le fichier uploadé dépasse la taille maximale upload_max_filesize définie dans php.ini."
 
 #: ..\..\..\admin\files.php:820
-#, fuzzy
 msgid "The file was only partially uploaded."
-msgstr "Le fichier uploadé &laquo;%s&raquo; n'a été translis que partiellement."
+msgstr "Le fichier n'a été uploadé que partiellement."
 
 #: ..\..\..\admin\files.php:825
 msgid "No file was uploaded."
@@ -1589,14 +1587,13 @@ msgid "Unknown error."
 msgstr "Erreur inconnue."
 
 #: ..\..\..\admin\files.php:843
-#, fuzzy
 msgid "The file does not seem to be a valid upload!"
-msgstr "Le fichier &laquo;%s&raquo; ne semble pas être un upload valide!"
+msgstr "Le fichier ne semble pas être un upload valide!"
 
 #: ..\..\..\admin\files.php:853
-#, fuzzy, php-format
+#, php-format
 msgid "&laquo;%s&raquo; cannot be used as a valid filename on this server."
-msgstr "&laquo;%s&raquo; n'est pas un nom de fichier valide."
+msgstr "&laquo;%s&raquo; n'est pas un nom de fichier valide sur ce serveur."
 
 #: ..\..\..\admin\files.php:874
 #: ..\..\..\admin\files.php:1000
@@ -1619,7 +1616,6 @@ msgid "No source files!"
 msgstr "Pas de fichiers source!"
 
 #: ..\..\..\admin\files.php:993
-#, fuzzy
 msgid "Source and target files are the same. Please choose another name or directory."
 msgstr "Les fichiers source et cible sont identiques. Veuillez choisir un autre nom ou un autre répertoire."
 
@@ -1644,18 +1640,18 @@ msgid "Moved &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr "&laquo;%s&raquo; déplacé vers &laquo;%s&raquo;."
 
 #: ..\..\..\admin\files.php:1079
-#, fuzzy, php-format
+#, php-format
 msgid "Could not move &laquo;%s&raquo; to &laquo;%s&raquo;."
-msgstr "Impossible de copier &laquo;%s&raquo; vers &laquo;%s&raquo;."
+msgstr "Impossible de déplacer &laquo;%s&raquo; vers &laquo;%s&raquo;."
 
 #: ..\..\..\admin\files.php:1119
 msgid "Quit link mode!"
-msgstr ""
+msgstr "Quitter le mode liaison!"
 
 #: ..\..\..\admin\files.php:1121
-#, fuzzy, php-format
+#, php-format
 msgid "Link files to &laquo;%s&raquo;..."
-msgstr "Fichier &laquo;%s&raquo;"
+msgstr "Lier des fichiers à &laquo;%s&raquo;..."
 
 #: ..\..\..\admin\files.php:1123
 #: ..\..\..\evocore\_item.class.php:1242
@@ -1717,9 +1713,8 @@ msgstr "Afficher le gestionnaire de fichiers"
 
 #: ..\..\..\admin\fileset.php:60
 #: ..\..\..\admin\_set_files.form.php:83
-#, fuzzy
 msgid "Restore defaults"
-msgstr "Définir valeur par défaut"
+msgstr "Restaurer les valeurs par défaut"
 
 #: ..\..\..\admin\fileset.php:105
 msgid "File settings updated."
@@ -1837,9 +1832,8 @@ msgid "Access denied."
 msgstr "Accès refusé."
 
 #: ..\..\..\admin\_access_denied.inc.php:46
-#, fuzzy
 msgid "Sorry, you have no permission to access this section."
-msgstr "Désolé, vous n'avez la permission de modifier/consulter les propriétés d'aucun blog."
+msgstr "Désolé, vous n'avez la permission d'accéder à cette section."
 
 #: ..\..\..\admin\_adminUI_general.class.php:745
 #: ..\..\..\admin\_adminUI_general.class.php:747
@@ -2172,9 +2166,8 @@ msgid "Allow user customized CSS file for this blog"
 msgstr ""
 
 #: ..\..\..\admin\_blogs_general.form.php:171
-#, fuzzy
 msgid "Users will be able to override the blog and skin stylesheet with their own."
-msgstr "Les utilisateurs pourront sélectionner un autre habillage pour voir le blog (et leur habillage préféré sera sauvé dans un cookie)."
+msgstr ""
 
 #: ..\..\..\admin\_blogs_general.form.php:172
 msgid "Display public blog list"
@@ -2189,7 +2182,6 @@ msgid "Include in public blog list"
 msgstr "Inclure dans la liste des blogs publics"
 
 #: ..\..\..\admin\_blogs_general.form.php:174
-#, fuzzy
 msgid "Check this if you want this blog to be displayed in the list of all public blogs."
 msgstr "Cochez si vous voulez que ce blog soit inclus dans la liste des blogs publics."
 
@@ -2522,7 +2514,7 @@ msgstr "Statut"
 
 #: ..\..\..\admin\_browse_posts_list.inc.php:109
 msgid "Com."
-msgstr ""
+msgstr "Com."
 
 #: ..\..\..\admin\_browse_posts_list.inc.php:135
 #: ..\..\..\admin\_edit_showposts.php:133
@@ -2541,9 +2533,8 @@ msgid "New post..."
 msgstr "Nouvel article..."
 
 #: ..\..\..\admin\_browse_posts_sidebar.inc.php:69
-#, fuzzy
 msgid "Posts to show"
-msgstr "Types d'articles"
+msgstr "Articles à afficher"
 
 #: ..\..\..\admin\_browse_posts_sidebar.inc.php:74
 msgid "Past"
@@ -2917,7 +2908,6 @@ msgid "Flat mode"
 msgstr "Mode à plat"
 
 #: ..\..\..\admin\_files_browse.inc.php:78
-#, fuzzy
 msgid "Filter is a regular expression"
 msgstr "Le filtre est une expression régulière"
 
@@ -2937,9 +2927,8 @@ msgid "Apply"
 msgstr "Appliquer"
 
 #: ..\..\..\admin\_files_browse.inc.php:106
-#, fuzzy
 msgid "Unset filter"
-msgstr "Un fichier"
+msgstr "Supprimer le filtre"
 
 #: ..\..\..\admin\_files_browse.inc.php:185
 msgid "Change root"
@@ -3053,9 +3042,8 @@ msgid "Open in new windows"
 msgstr "Ouvrir dans de nouvelles fenêtres"
 
 #: ..\..\..\admin\_files_browse.inc.php:496
-#, fuzzy
 msgid "Rename the selected files"
-msgstr "Supprimer les fichiers sélectionnés"
+msgstr "Renommer les fichiers sélectionnés"
 
 #: ..\..\..\admin\_files_browse.inc.php:500
 msgid "Delete the selected files"
@@ -3082,14 +3070,12 @@ msgid "Create!"
 msgstr "Créer!"
 
 #: ..\..\..\admin\_files_browse.inc.php:662
-#, fuzzy
 msgid "Upload file..."
-msgstr "Charger les fichiers dans:"
+msgstr "Uploader un fichier..."
 
 #: ..\..\..\admin\_files_browse.inc.php:674
-#, fuzzy
 msgid "Quick Upload!"
-msgstr "Charger !"
+msgstr "Upload rapide!"
 
 #: ..\..\..\admin\_files_browse.inc.php:684
 #: ..\..\..\conf\_icons.php:266
@@ -3131,7 +3117,7 @@ msgstr "Cacher"
 
 #: ..\..\..\admin\_files_browse.inc.php:715
 msgid "Show"
-msgstr ""
+msgstr "Montrer"
 
 #: ..\..\..\admin\_files_browse.inc.php:719
 msgid "Sort directories at top"
@@ -3162,38 +3148,33 @@ msgid "Update !"
 msgstr "Mettre à jour !"
 
 #: ..\..\..\admin\_files_cmr.inc.php:65
-#, fuzzy
 msgid "Quit copy/move mode!"
-msgstr "Vous êtes en mode copier / déplacer / renommer."
+msgstr "Quitter le mode copier / déplacer!"
 
 #: ..\..\..\admin\_files_cmr.inc.php:79
 msgid "Overwrite"
-msgstr ""
+msgstr "Ecraser"
 
 #: ..\..\..\admin\_files_cmr.inc.php:79
-#, fuzzy
 msgid "Check to overwrite the existing file"
-msgstr "Ecraser fichier existant"
+msgstr "Cochez pour écraser le fichier existant"
 
 #: ..\..\..\admin\_files_cmr.inc.php:83
 #: ..\..\..\admin\_files_rename.form.php:61
-#, fuzzy
 msgid "New name"
-msgstr "Renommer"
+msgstr "Nouveau nom"
 
 #: ..\..\..\admin\_files_cmr.inc.php:91
-#, fuzzy
 msgid "You are in copy/move mode."
-msgstr "Vous êtes en mode copier / déplacer / renommer."
+msgstr "Vous êtes en mode copier/déplacer."
 
 #: ..\..\..\admin\_files_cmr.inc.php:92
-#, fuzzy
 msgid "Please navigate to the desired target location."
 msgstr "Veuillez naviguer jusqu'à l'endroit désiré."
 
 #: ..\..\..\admin\_files_rename.form.php:46
 msgid "Cancel rename!"
-msgstr ""
+msgstr "Annuler le renommage!"
 
 #: ..\..\..\admin\_files_rename.form.php:58
 #: ..\..\..\admin\_file_view.inc.php:112
@@ -3203,9 +3184,8 @@ msgid "File"
 msgstr "Fichier"
 
 #: ..\..\..\admin\_files_upload.inc.php:154
-#, fuzzy
 msgid "Quit upload mode!"
-msgstr "Quitter le mode upload"
+msgstr "Quitter le mode upload!"
 
 #: ..\..\..\admin\_files_upload.inc.php:156
 msgid "File upload"
@@ -3225,9 +3205,8 @@ msgid "Allowed file extensions"
 msgstr "Extensions de fichiers autorisées"
 
 #: ..\..\..\admin\_files_upload.inc.php:182
-#, fuzzy
 msgid "Maximum allowed file size"
-msgstr "Taille de fichier maximale autorisée: %s"
+msgstr "Taille de fichier maximale autorisée"
 
 #. TRANS: will be displayed as title for failed file uploads
 #: ..\..\..\admin\_files_upload.inc.php:210
@@ -3239,26 +3218,22 @@ msgid "Choose a file"
 msgstr "Choisissez un fichier"
 
 #: ..\..\..\admin\_files_upload.inc.php:223
-#, fuzzy
 msgid "Filename on server (optional)"
-msgstr "Options du gestionnaire de fichiers"
+msgstr "Nom du fichier sur le serveur (optionel)"
 
 #: ..\..\..\admin\_files_upload.inc.php:227
 #: ..\..\..\admin\_file_properties.inc.php:65
 #: ..\..\..\admin\_file_properties.inc.php:71
-#, fuzzy
 msgid "Long title"
-msgstr "Fichier journal"
+msgstr "Titre long"
 
 #: ..\..\..\admin\_files_upload.inc.php:232
-#, fuzzy
 msgid "Alternative text (useful for images)"
-msgstr "Texte Alternatif"
+msgstr "Texte alternatif (utile pour les images)"
 
 #: ..\..\..\admin\_files_upload.inc.php:237
-#, fuzzy
 msgid "Caption/Description of the file"
-msgstr "Description du fichier"
+msgstr "Légende/Description du fichier"
 
 #: ..\..\..\admin\_files_upload.inc.php:250
 msgid "Add another file"
@@ -3282,29 +3257,24 @@ msgid "Update"
 msgstr "Mettre à jour"
 
 #: ..\..\..\admin\_file_properties.inc.php:49
-#, fuzzy
 msgid "Close properties!"
-msgstr "Propriétés de workflow"
+msgstr "Fermer les propriétés!"
 
 #: ..\..\..\admin\_file_properties.inc.php:51
-#, fuzzy
 msgid "File properties"
-msgstr "Propriétés"
+msgstr "Propriétés du fichier"
 
 #: ..\..\..\admin\_file_properties.inc.php:58
-#, fuzzy
 msgid "Filename"
-msgstr "Gestionnaire de fichiers"
+msgstr "Nom du fichier"
 
 #: ..\..\..\admin\_file_properties.inc.php:58
-#, fuzzy
 msgid "This is the name of the file on the server hard drive."
-msgstr "Il s'agit du nom du fichier qui va vous être envoyé."
+msgstr "Il s'agit du nom du fichier sur le disque dur du serveur."
 
 #: ..\..\..\admin\_file_properties.inc.php:62
-#, fuzzy
 msgid "Meta data"
-msgstr "Meta"
+msgstr "Meta données"
 
 #: ..\..\..\admin\_file_properties.inc.php:65
 #: ..\..\..\admin\_file_properties.inc.php:71
@@ -3318,15 +3288,13 @@ msgstr "Texte Alternatif"
 
 #: ..\..\..\admin\_file_properties.inc.php:66
 #: ..\..\..\admin\_file_properties.inc.php:72
-#, fuzzy
 msgid "This is useful for images"
-msgstr "Ceci est un article de plusieurs pages"
+msgstr "Ceci est utile pour les images"
 
 #: ..\..\..\admin\_file_properties.inc.php:67
 #: ..\..\..\admin\_file_properties.inc.php:73
-#, fuzzy
 msgid "Caption/Description"
-msgstr "Description longue"
+msgstr "Lége,de/Description"
 
 #: ..\..\..\admin\_file_view.inc.php:51
 #: ..\..\..\admin\_item.form.php:156
@@ -3334,9 +3302,8 @@ msgid "Preview"
 msgstr "Prévisualiser"
 
 #: ..\..\..\admin\_file_view.inc.php:124
-#, fuzzy
 msgid "Empty file!"
-msgstr "Fichier vide"
+msgstr "Fichier vide!"
 
 #: ..\..\..\admin\_file_view.inc.php:129
 #, php-format
@@ -3344,19 +3311,16 @@ msgid "%d lines"
 msgstr "%d lignes"
 
 #: ..\..\..\admin\_file_view.inc.php:138
-#, fuzzy
 msgid "Hide line numbers"
-msgstr "cacher les numéros de ligne"
+msgstr "Cacher les numéros de ligne"
 
 #: ..\..\..\admin\_file_view.inc.php:138
-#, fuzzy
 msgid "Show line numbers"
-msgstr "montrer les numéros de lignes"
+msgstr "Montrer les numéros de ligne"
 
 #: ..\..\..\admin\_file_view.inc.php:205
-#, fuzzy
 msgid "End Of File"
-msgstr "Edition fichier"
+msgstr "Fin de fichier (EOF)"
 
 #: ..\..\..\admin\_file_view.inc.php:211
 #, php-format
@@ -3364,19 +3328,16 @@ msgid "The file &laquo;%s&raquo; could not be accessed!"
 msgstr "Impossible d'accéder au fichier &laquo;%s&raquo;!"
 
 #: ..\..\..\admin\_header.php:54
-#, fuzzy
 msgid "Browse"
-msgstr "Parcourir le blog:"
+msgstr "Parcourir"
 
 #: ..\..\..\admin\_header.php:59
-#, fuzzy
 msgid "Post list"
-msgstr "Articles"
+msgstr "Liste des articles"
 
 #: ..\..\..\admin\_header.php:62
-#, fuzzy
 msgid "Full posts"
-msgstr "articles"
+msgstr "Articles complets"
 
 #: ..\..\..\admin\_header.php:83
 #: ..\..\..\admin\_header.php:163
@@ -3427,9 +3388,8 @@ msgid "Filemanager"
 msgstr "Gestionnaire de fichiers"
 
 #: ..\..\..\admin\_header.php:148
-#, fuzzy
 msgid "Users & Groups"
-msgstr "Groupe utilisateur"
+msgstr "Groupes & Utilisateurs"
 
 #: ..\..\..\admin\_header.php:149
 msgid "User management"
@@ -3576,25 +3536,22 @@ msgid "Text Renderers"
 msgstr "Formatteurs de texte"
 
 #: ..\..\..\admin\_item_links.inc.php:46
-#, fuzzy
 msgid "Linked to..."
-msgstr "Lien vers url"
+msgstr "Lié a..."
 
 #: ..\..\..\admin\_item_links.inc.php:55
 #: ..\..\..\admin\_item_links.inc.php:108
-#, fuzzy
 msgid "Contact"
-msgstr "contact"
+msgstr "Contact"
 
 #: ..\..\..\admin\_item_links.inc.php:56
-#, fuzzy
 msgid "View this contact..."
-msgstr "Editer cette entrée..."
+msgstr "Voir ce contact..."
 
 #: ..\..\..\admin\_item_links.inc.php:60
 #: ..\..\..\admin\_item_links.inc.php:113
 msgid "Establishment"
-msgstr ""
+msgstr "Etablissement"
 
 #: ..\..\..\admin\_item_links.inc.php:61
 msgid "View this establishment..."
@@ -3602,54 +3559,45 @@ msgstr ""
 
 #: ..\..\..\admin\_item_links.inc.php:65
 #: ..\..\..\admin\_item_links.inc.php:103
-#, fuzzy
 msgid "Firm"
-msgstr "De"
+msgstr "Société"
 
 #: ..\..\..\admin\_item_links.inc.php:66
-#, fuzzy
 msgid "View this firm..."
-msgstr "Editer cette entrée..."
+msgstr "Voir cette société..."
 
 #: ..\..\..\admin\_item_links.inc.php:70
 #: ..\..\..\admin\_item_links.inc.php:118
 msgid "Task"
-msgstr ""
+msgstr "Tâche"
 
 #: ..\..\..\admin\_item_links.inc.php:71
-#, fuzzy
 msgid "View this task..."
-msgstr "Editer cette entrée..."
+msgstr "Voir cette tâche..."
 
 #: ..\..\..\admin\_item_links.inc.php:88
-#, fuzzy
 msgid "Destination"
-msgstr "Description"
+msgstr "Destination"
 
 #: ..\..\..\admin\_item_links.inc.php:102
-#, fuzzy
 msgid "Link an existing firm..."
-msgstr "S'identifier sur un compte existant..."
+msgstr "Lier une société existante..."
 
 #: ..\..\..\admin\_item_links.inc.php:107
-#, fuzzy
 msgid "Link an existing contact..."
-msgstr "S'identifier sur un compte existant..."
+msgstr "Lier un contact existant..."
 
 #: ..\..\..\admin\_item_links.inc.php:112
-#, fuzzy
 msgid "Link an existing establishment..."
-msgstr "S'identifier sur un compte existant..."
+msgstr "Lier un établissement existant..."
 
 #: ..\..\..\admin\_item_links.inc.php:117
-#, fuzzy
 msgid "Link an existing task..."
-msgstr "S'identifier sur un compte existant..."
+msgstr "Lier une tâche existante..."
 
 #: ..\..\..\admin\_item_links.inc.php:120
-#, fuzzy
 msgid "Link a file..."
-msgstr "Fichier langue"
+msgstr "Lier un fichier...."
 
 #: ..\..\..\admin\_listeditor.php:54
 msgid "Cannot edit entry!"
@@ -3723,9 +3671,8 @@ msgid "Record"
 msgstr "Enregistrer"
 
 #: ..\..\..\admin\_set_files.form.php:27
-#, fuzzy
 msgid "File Settings"
-msgstr "Réglages"
+msgstr "Paramètres de fichiers"
 
 #: ..\..\..\admin\_set_files.form.php:30
 msgid "Filemanager options"
@@ -3815,9 +3762,8 @@ msgid "Regular expression"
 msgstr "Expression régulière"
 
 #: ..\..\..\admin\_set_general.form.php:15
-#, fuzzy
 msgid "General Settings"
-msgstr "Paramètres généraux mis à jour."
+msgstr "Paramètres généraux"
 
 #: ..\..\..\admin\_set_general.form.php:22
 msgid "Default user rights"
@@ -3869,9 +3815,8 @@ msgid "posts"
 msgstr "articles"
 
 #: ..\..\..\admin\_set_general.form.php:44
-#, fuzzy
 msgid "Display unit"
-msgstr "Options d'affichage"
+msgstr "Unité d'affichage"
 
 #: ..\..\..\admin\_set_general.form.php:46
 msgid "Posts/Days per page"
@@ -4040,7 +3985,7 @@ msgstr "Format de l'heure"
 #: ..\..\..\admin\_set_regional.form.php:55
 #: ..\..\..\admin\_set_regional.form.php:166
 msgid "Start of week"
-msgstr ""
+msgstr "Début de semaine"
 
 #: ..\..\..\admin\_set_regional.form.php:55
 msgid "Day at the start of the week."
@@ -4229,7 +4174,6 @@ msgid "Note: default locale is not enabled."
 msgstr "Note: la locale par défaut n'est pas activée."
 
 #: ..\..\..\admin\_set_regional.form.php:130
-#, fuzzy
 msgid "Regional Settings"
 msgstr "Paramètres régionaux"
 
@@ -4328,9 +4272,8 @@ msgid "Reset to defaults (delete database table)"
 msgstr "Retour aux valeurs par défaut (suppresssion de la table BD)"
 
 #: ..\..\..\admin\_users_form.php:53
-#, fuzzy
 msgid "Close user profile!"
-msgstr "Fermer profil utilisateur"
+msgstr "Fermer le profil utilisateur!"
 
 #: ..\..\..\admin\_users_form.php:59
 msgid "Create new user profile"
@@ -4439,9 +4382,8 @@ msgstr "Notifications"
 #: ..\..\..\admin\_users_form.php:134
 #: ..\..\..\skins\_profile.php:86
 #: ..\..\..\skins\_subscriptions.php:67
-#, fuzzy
 msgid "Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc."
-msgstr "Cochez pour recevoir une notification à chaque fois que l'un de vos articles reçoit un commentaire, trackback, etc."
+msgstr "Cochez pour recevoir une notification à chaque fois que l'un de <strong>vos</strong> articles reçoit un commentaire, trackback, etc."
 
 #: ..\..\..\admin\_users_form.php:136
 #: ..\..\..\admin\_users_form.php:156
@@ -4551,12 +4493,12 @@ msgstr "Accès interdit"
 
 #: ..\..\..\admin\_users_groupform.php:76
 msgid "Hidden"
-msgstr ""
+msgstr "Caché"
 
 #: ..\..\..\admin\_users_groupform.php:77
 #: ..\..\..\admin\_users_groupform.php:82
 msgid "Visible link"
-msgstr ""
+msgstr "Lien visible"
 
 #: ..\..\..\admin\_users_groupform.php:78
 #: ..\..\..\admin\_users_groupform.php:82
@@ -4590,15 +4532,13 @@ msgid "Check to allow template editing."
 msgstr "Cochez pour autoriser l'édition des gabarits."
 
 #: ..\..\..\admin\_users_groupform.php:103
-#, fuzzy
 msgid "Add/Upload"
-msgstr "Upload"
+msgstr "Ajouter/Uploader"
 
 #: ..\..\..\admin\_users_groupform.php:112
 #: ..\..\..\admin\_users_groupform.php:116
-#, fuzzy
 msgid "Users &amp; Groups"
-msgstr "Groupe utilisateur"
+msgstr "Groupes &amp; Utilisateurs"
 
 #: ..\..\..\admin\_users_list.php:61
 msgid "Groups &amp; Users"
@@ -4609,58 +4549,48 @@ msgid "default group for new users"
 msgstr "groupe par défaut pour les nouveaux utilisateurs"
 
 #: ..\..\..\admin\_users_list.php:81
-#, fuzzy
 msgid "Edit this group..."
-msgstr "Editer cette entrée..."
+msgstr "Editer ce groupe..."
 
 #: ..\..\..\admin\_users_list.php:83
-#, fuzzy
 msgid "Duplicate this group..."
-msgstr "Dupliquer..."
+msgstr "Dupliquer ce groupe..."
 
 #: ..\..\..\admin\_users_list.php:87
-#, fuzzy
 msgid "Delete this group!"
-msgstr "Supprimer ce blog!"
+msgstr "Supprimer ce groupe!"
 
 #: ..\..\..\admin\_users_list.php:156
-#, fuzzy
 msgid "Decrease user level"
 msgstr "Descendre le niveau de l'utilisateur"
 
 #: ..\..\..\admin\_users_list.php:160
-#, fuzzy
 msgid "Increase user level"
 msgstr "Monter le niveau de l'utilisateur"
 
 #: ..\..\..\admin\_users_list.php:167
-#, fuzzy
 msgid "Edit this user..."
-msgstr "Editer cette entrée..."
+msgstr "Editer cet utilisateur..."
 
 #: ..\..\..\admin\_users_list.php:168
-#, fuzzy
 msgid "Duplicate this user..."
-msgstr "Dupliquer..."
+msgstr "Dupliquer cet utilisateur..."
 
 #: ..\..\..\admin\_users_list.php:170
-#, fuzzy
 msgid "Delete this user!"
-msgstr "Supprimer ce hit!"
+msgstr "Supprimer cet utilisateur!"
 
 #: ..\..\..\admin\_users_list.php:178
-#, fuzzy
 msgid "Add a user..."
-msgstr "Nouvel utilisateur..."
+msgstr "Ajouter un utilisateur..."
 
 #: ..\..\..\admin\_users_list.php:179
-#, fuzzy
 msgid "Add a group..."
-msgstr "Nouveau groupe..."
+msgstr "Ajouter un groupe..."
 
 #: ..\..\..\admin\_users_list.php:179
 msgid "Group"
-msgstr ""
+msgstr "Groupe"
 
 #: ..\..\..\admin\skins\legacy\_adminUI.class.php:130
 msgid "Style:"
@@ -4895,15 +4825,15 @@ msgstr "Attention"
 
 #: ..\..\..\conf\_icons.php:212
 msgid "WWW"
-msgstr ""
+msgstr "WWW"
 
 #: ..\..\..\conf\_icons.php:245
 msgid "+"
-msgstr ""
+msgstr "+"
 
 #: ..\..\..\conf\_icons.php:250
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: ..\..\..\conf\_icons.php:256
 msgid "Link"
@@ -4958,9 +4888,8 @@ msgid "Spanish (ES)"
 msgstr "Espagnol (ES)"
 
 #: ..\..\..\conf\_locales.php:164
-#, fuzzy
 msgid "Spanish (MX)"
-msgstr "Espagnol (ES)"
+msgstr "Espagnol (MX)"
 
 #: ..\..\..\conf\_locales.php:172
 msgid "Spanish (VE)"
@@ -4983,9 +4912,8 @@ msgid "French (BE)"
 msgstr "Français (BE)"
 
 #: ..\..\..\conf\_locales.php:212
-#, fuzzy
 msgid "Galician (ES)"
-msgstr "Italien (IT)"
+msgstr ""
 
 #: ..\..\..\conf\_locales.php:220
 msgid "Hungarian (HU)"
@@ -5020,9 +4948,8 @@ msgid "Portuguese (BR)"
 msgstr "Portugais (BR)"
 
 #: ..\..\..\conf\_locales.php:284
-#, fuzzy
 msgid "Portuguese (PT)"
-msgstr "Portugais (BR)"
+msgstr "Portugais (PT)"
 
 #: ..\..\..\conf\_locales.php:292
 msgid "Slovak (SK)"
@@ -5034,15 +4961,15 @@ msgstr "Suédois (SE)"
 
 #: ..\..\..\conf\_locales.php:308
 msgid "Thai (TH)"
-msgstr ""
+msgstr "Thaïlandais (TH)"
 
 #: ..\..\..\conf\_locales.php:316
 msgid "Turkish (TR)"
-msgstr ""
+msgstr "Turc (TR)"
 
 #: ..\..\..\conf\_locales.php:324
 msgid "Turkish utf-8 (TR)"
-msgstr ""
+msgstr "Turc utf-8 (TR)"
 
 #: ..\..\..\conf\_locales.php:332
 msgid "Chinese(S) gb2312 (CN)"
@@ -5248,7 +5175,7 @@ msgstr "[%s] Nouveau commentaire sur \"%s\""
 
 #: ..\..\..\evocore\_comment.class.php:578
 msgid "Post"
-msgstr ""
+msgstr "Article"
 
 #: ..\..\..\evocore\_comment.class.php:586
 #: ..\..\..\xmlsrv\xmlrpc.php:1396
@@ -5390,14 +5317,12 @@ msgid "regular expression"
 msgstr "expression régulière"
 
 #: ..\..\..\evocore\_filemanager.class.php:229
-#, fuzzy
 msgid "You don't have access to any root directory."
-msgstr "Pas d'accès au répertoire racine."
+msgstr "Vous n'avez accès à aucun répertoire racine."
 
 #: ..\..\..\evocore\_filemanager.class.php:257
-#, fuzzy
 msgid "You don't have access to the requested root directory."
-msgstr "Pas d'accès au répertoire racine."
+msgstr "Vous n'avez pas accès au répertoire demandé."
 
 #: ..\..\..\evocore\_filemanager.class.php:270
 #, php-format
@@ -5431,19 +5356,16 @@ msgid "Edit permissions"
 msgstr "Editer permissions"
 
 #: ..\..\..\evocore\_filemanager.class.php:543
-#, fuzzy
 msgid "Edit properties..."
-msgstr "Editer les propriétés de la catégorie"
+msgstr "Editer les propriétés..."
 
 #: ..\..\..\evocore\_filemanager.class.php:560
-#, fuzzy
 msgid "Link this file!"
-msgstr "Sélectionner ce fichier"
+msgstr "Lier ce fichier!"
 
 #: ..\..\..\evocore\_filemanager.class.php:745
-#, fuzzy
 msgid "My folder"
-msgstr "Mon dossier média"
+msgstr "Mon dossier"
 
 #: ..\..\..\evocore\_filemanager.class.php:766
 #: ..\..\..\evocore\_results.class.php:475
@@ -5459,9 +5381,8 @@ msgid "Directory creation is disabled"
 msgstr ""
 
 #: ..\..\..\evocore\_filemanager.class.php:1035
-#, fuzzy
 msgid "File creation is disabled"
-msgstr "Autoriser la création de dossiers."
+msgstr "La création de fichiers est désactivée"
 
 #: ..\..\..\evocore\_filemanager.class.php:1047
 msgid "Cannot create a directory without name."
@@ -5587,9 +5508,8 @@ msgid "Select"
 msgstr "Sélectionner"
 
 #: ..\..\..\evocore\_form.class.php:479
-#, fuzzy
 msgid "heures"
-msgstr "Autres"
+msgstr ""
 
 #: ..\..\..\evocore\_form.class.php:487
 msgid "minutes"
@@ -5816,14 +5736,12 @@ msgid "[%s] New post: \"%s\""
 msgstr ""
 
 #: ..\..\..\evocore\_item.class.php:1927
-#, fuzzy
 msgid "Content"
-msgstr "Commentaire"
+msgstr "Contenu"
 
 #: ..\..\..\evocore\_item.class.php:1936
-#, fuzzy
 msgid "Notifying:"
-msgstr "Notifications"
+msgstr "Notifier:"
 
 #: ..\..\..\evocore\_item.funcs.php:211
 msgid "Next page"
@@ -5876,7 +5794,6 @@ msgid "Category"
 msgstr "Catégorie"
 
 #: ..\..\..\evocore\_item.funcs.php:872
-#, fuzzy
 msgid "Select as an additional category"
 msgstr "Sélectionner en tant que catégorie additionnelle"
 
@@ -5894,9 +5811,8 @@ msgid "name"
 msgstr "nom"
 
 #: ..\..\..\evocore\_main.inc.php:375
-#, fuzzy
 msgid "Wrong login/password."
-msgstr "identifiant ou mot de passe incorrects."
+msgstr "Identifiant/mot de passe incorrects."
 
 #: ..\..\..\evocore\_main.inc.php:385
 #: ..\..\..\evocore\_main.inc.php:389
@@ -5908,9 +5824,8 @@ msgid "setcookie &laquo;%s&raquo; failed!"
 msgstr "Le cookie &laquo;%s&raquo; n'a pas pu être déposé!"
 
 #: ..\..\..\evocore\_main.inc.php:412
-#, fuzzy
 msgid "Login/password no longer valid."
-msgstr "cet identifiant/mot de passe n'est plus valide"
+msgstr "Cet identifiant/mot de passe n'est plus valide."
 
 #: ..\..\..\evocore\_main.inc.php:425
 msgid "You must log in!"
@@ -6132,9 +6047,8 @@ msgid "No description available"
 msgstr "Description non disponible"
 
 #: ..\..\..\evocore\_plugin.class.php:319
-#, fuzzy
 msgid "Open help for this renderer in a new window."
-msgstr "Ouvrir dans une nouvelle fenêtre"
+msgstr "Ouvrir l'aide pour ce renderer dans une nouvelle fenêtre."
 
 #: ..\..\..\evocore\_plugin.class.php:415
 msgid "No such action!"
@@ -6706,9 +6620,8 @@ msgstr "Cause possible: vous avez peut être désactivé la fonction mail()..."
 
 #: ..\..\..\htsrv\login.php:134
 #: ..\..\..\htsrv\login.php:143
-#, fuzzy
 msgid "A link to change your password has been sent to your email address."
-msgstr "Un email contenant votre nouveau mot de passe a été envoyé à votre adresse email."
+msgstr "Un lien permettant de changer votre mot de passe a été envoyé à votre adresse email."
 
 #: ..\..\..\htsrv\login.php:158
 #: ..\..\..\htsrv\login.php:173
@@ -6807,14 +6720,12 @@ msgid "Lost password ?"
 msgstr "Mot de passe perdu?"
 
 #: ..\..\..\htsrv\_lostpass_form.php:22
-#, fuzzy
 msgid "A link to change your password will be sent to you by email."
-msgstr "Un nouveau mot de passe va être généré et vous sera envoyé par email."
+msgstr "Un lien permettant de changer votre mot de passe sera envoyé à votre adresse email."
 
 #: ..\..\..\htsrv\_lostpass_form.php:38
-#, fuzzy
 msgid "Send email to change your password!"
-msgstr "Envoyer un email à l'utilisateur"
+msgstr "Envoyer un email permettant de changer votre mot de passe!"
 
 #: ..\..\..\htsrv\_reg_complete.php:17
 msgid "Registration complete"
@@ -7152,16 +7063,13 @@ msgid "Installation successful!"
 msgstr "Installation terminée avec succès!"
 
 #: ..\..\..\install\index.php:431
-#, fuzzy, php-format
+#, php-format
 msgid "Now you can <a %s>log in</a> with the login \"admin\" and password \"%s\"."
-msgstr "Vous pouvez maintenant <a %s>vous connecter</a> avec vos identifiant et mot de passe %s habituels."
+msgstr "Vous pouvez maintenant <a %s>vous connecter</a> avec l'identifiant \"admin\" et le mot de passe \"%s\"."
 
 #: ..\..\..\install\index.php:438
-#, fuzzy
 msgid "Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew."
-msgstr ""
-"<p>Vous pouvez maintenant <a %s>vous connecter</a> avec l'identifiant \"admin\" et le mot de passe \"%s\".</p>\n"
-"\t<p>Notez ce mot de passe avec soin! Il s'agit d'un mot de passe <em>aléatoire</em> qui vous est donné lorsque vous installez b2evolution. Si vous le perdez, vous devrez supprimer les tables de la base de donnée et recommencer l'installation.</p>"
+msgstr "Notez ce mot de passe avec soin! Il s'agit d'un mot de passe <em>aléatoire</em> qui vous est donné lorsque vous installez b2evolution. Si vous le perdez, vous devrez supprimer les tables de la base de données et recommencer l'installation.</p>"
 
 #: ..\..\..\install\index.php:454
 msgid "Upgrading data in existing b2evolution database"
@@ -7395,7 +7303,6 @@ msgid "This is a multipage post"
 msgstr "Ceci est un article de plusieurs pages"
 
 #: ..\..\..\install\_functions_create.php:703
-#, fuzzy
 msgid ""
 "This is page 1 of a multipage post.\n"
 "\n"
@@ -7807,9 +7714,8 @@ msgid "**bold** \\italics\\ //italics// __underline__ ##tt## %%codeblock%%"
 msgstr "**gras** \\italiques\\ //italiques// __souligné__ ##tt## %%codeblock%%"
 
 #: ..\..\..\plugins\_ldap.plugin.php:94
-#, fuzzy
 msgid "LDAP authentication"
-msgstr "l'autentification a échoué"
+msgstr "Athentification LDAP"
 
 #: ..\..\..\plugins\_ldap.plugin.php:95
 msgid "Creates users if they could be authenticated through LDAP."
@@ -8162,9 +8068,8 @@ msgid "Read more..."
 msgstr "Lire la suite..."
 
 #: ..\..\..\skins\basic\_profile.php:84
-#, fuzzy
 msgid "Check this to receive a notification whenever one of <strong>your</strong> receives comments, trackbacks, etc."
-msgstr "Cochez pour recevoir une notification à chaque fois que l'un de vos articles reçoit un commentaire, trackback, etc."
+msgstr "Cochez pour recevoir une notification à chaque fois que l'un de <strong>vos<strong> articles reçoit un commentaire, trackback, etc."
 
 #: ..\..\..\skins\bluesky\_main.php:208
 #: ..\..\..\skins\guadeloupe\_main.php:208

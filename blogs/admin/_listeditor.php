@@ -122,13 +122,6 @@ switch( $action )
 require dirname(__FILE__).'/_menutop.php';
 
 
-// Display messages:
-if( $Messages->count( 'all' ) )
-{ // we have errors/notes
-	$Messages->display( NULL, NULL, true, 'all', NULL, NULL, 'panelinfo' );
-}
-
-
 /**
  * Display payload:
  */
