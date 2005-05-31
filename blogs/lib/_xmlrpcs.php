@@ -157,8 +157,11 @@ $_xmlrpcs_dmap=array(
 $_xmlrpc_debuginfo="";
 function xmlrpc_debugmsg($m)
 {
-	global $_xmlrpc_debuginfo;
-	$_xmlrpc_debuginfo=$_xmlrpc_debuginfo . $m . "\n";
+	global $_xmlrpc_debuginfo, $xmlrpc_debug_messages;
+	if( $xmlrpc_debug_messages )
+	{
+		$_xmlrpc_debuginfo = $_xmlrpc_debuginfo . $m . "\n";
+	}
 }
 
 /**

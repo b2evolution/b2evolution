@@ -31,6 +31,4 @@ $oldtablesettings   = 'b2settings';
 $oldtablecategories = 'b2categories';
 $oldtablecomments   = 'b2comments';
 /**#@-*/
-
-
-
+?>

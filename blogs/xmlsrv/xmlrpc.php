@@ -18,8 +18,7 @@
  * Initialize everything:
  */
 require_once(dirname(__FILE__).'/../conf/_config.php' );
-require_once(dirname(__FILE__).'/../'.$core_subdir.'_main.inc.php' );
-
+require_once(dirname(__FILE__).'/'.$xmlsrv_dirout.$core_subdir.'_main.inc.php' );
 // We can't display standard error messages. We must return XMLRPC responses.
 $DB->halt_on_error = false;
 
@@ -28,7 +27,9 @@ $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecate
 
 $post_default_title = ''; // posts submitted via the xmlrpc interface get that title
 
-$xmlrpc_logging = 1;		// Set to 1 if you want to enable logging
+$xmlrpc_logging = 0;		// Set to 1 if you want to enable logging
+
+$xmlrpc_debug_messages = 0;		// Set to 1 if you want to enable debug messages (comments inside of the XML responses)
 
 function logIO($io,$msg)
 {
@@ -487,7 +488,8 @@ function bloggereditpost($m)
 
 	$newcontent = $m->getParam(4);
 	$newcontent = $newcontent->scalarval();
-	xmlrpc_debugmsg( 'New content: '.$newcontent  );
+	// WARNING: the following debug MAY produce a non valid response (XML comment containing emebedded <!-- more -->)
+	// xmlrpc_debugmsg( 'New content: '.$newcontent  );
 
 	$publish = $m->getParam(5);
 	$publish = $publish->scalarval();
@@ -2731,16 +2733,13 @@ $s=new xmlrpc_server(
 										 "docstring" => $b2getcategories_doc),
 
 
-
+/*
+	fplanque>>this fails!
 							"mt.getPostCategories" =>
-
 							array("function" => "mt_getPostCategories",
-
 	 								"signature" => $mt_getPostCategories_sig,
-
 	 								"docstring" => $mt_getPostCategories_doc),
-
-
+*/
 
 
 							 "b2.newPost" =>

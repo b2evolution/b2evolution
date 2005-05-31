@@ -25,7 +25,7 @@ switch( $target )
 	case 'local':
 		$test_user = 'admin';
 		$test_pass = 'testpwd';
-		$client = new xmlrpc_client('/b2evolution/blogs/'.$xmlsrv_subdir.'xmlrpc.php', 'localhost', 8088);
+		$client = new xmlrpc_client('/b2evo/blogs/'.$xmlsrv_subdir.'xmlrpc.php', 'localhost', 8088);
 		break;
 		
 	default:
@@ -76,36 +76,85 @@ $bloggerAPIappkey = 'testkey';
 
 
 
-	echo '<h2>blogger.getRecentPosts</h2>';
-	$client->debug = true;
-	$message = new xmlrpcmsg( 'blogger.getRecentPosts', array( 
-														new xmlrpcval($bloggerAPIappkey),	
-														new xmlrpcval(1),
-														new xmlrpcval($test_user),	
-														new xmlrpcval($test_pass),
-														new xmlrpcval(5, "int"),
-													)  );
-	$result = $client->send($message);
-	$ret = xmlrpc_displayresult( $result );
-	
-	
-	
 	echo '<h2>blogger.newPost</h2>';
-	$client->debug = true;
-	$message = new xmlrpcmsg( 'blogger.newPost', array( 
-														new xmlrpcval($bloggerAPIappkey),	
-														new xmlrpcval(1),	
-														new xmlrpcval($test_user),	
+	$post_text = 'Random test : '.rand( 1, 10000 ).'<br />';
+	echo 'Post_text : '.$post_text;
+	$client->debug = false;
+	$message = new xmlrpcmsg( 'blogger.newPost', array(
+														new xmlrpcval($bloggerAPIappkey),
+														new xmlrpcval(1),
+														new xmlrpcval($test_user),
 														new xmlrpcval($test_pass),
-														new xmlrpcval( "<title>FP test</title>
-														<category>123456</category>
-														test content" ),
+														new xmlrpcval( "<title>$post_text</title>
+														<category>1</category>
+														$post_text" ),
 														new xmlrpcval(false	,"boolean")		// DRAFT !!
 													)  );
-//														<category>1</category>
+	$result = $client->send($message);
+	if( ! $ret = xmlrpc_displayresult( $result ) )
+	{
+		die( "ERROR" );
+	}
+	$msg_ID = xmlrpc_decode_recurse($result->value());
+	echo '<p>Message ID: '.$msg_ID.'</p>';
+
+
+	echo '<h2>blogger.getRecentPosts</h2>';
+	$client->debug = false;
+	$message = new xmlrpcmsg( 'blogger.getRecentPosts', array(
+														new xmlrpcval($bloggerAPIappkey),
+														new xmlrpcval(1),
+														new xmlrpcval($test_user),
+														new xmlrpcval($test_pass),
+														new xmlrpcval(3, "int"),
+													)  );
 	$result = $client->send($message);
 	$ret = xmlrpc_displayresult( $result );
 
+	$value = xmlrpc_decode_recurse($result->value());
 
+	// Get latest message:
+	$latest = $value[0];
+	// pre_dump( $latest );
+
+	echo '<p>Message ID: '.$latest['postid'];
+	if( $latest['postid'] == $msg_ID )
+	{
+		echo ' OK';
+	}
+	else
+	{
+		die( 'ERROR' );
+	}
+	echo '</p>';
+
+	echo '<p>Content: '.htmlspecialchars($latest['content']);
+	if( strpos( $latest['content'], $post_text ) )
+	{
+		echo ' OK';
+	}
+	else
+	{
+		die( 'ERROR' );
+	}
+	echo '</p>';
+
+
+	// Add something to message:
+	$post_content = $latest['content'].'* This has been edited! *';
+
+
+	echo '<h2>blogger.editPost</h2>';
+	$client->debug = true;
+	$message = new xmlrpcmsg( 'blogger.editPost', array(
+														new xmlrpcval($bloggerAPIappkey),
+														new xmlrpcval($msg_ID),
+														new xmlrpcval($test_user),
+														new xmlrpcval($test_pass),
+														new xmlrpcval( $post_content ),
+														new xmlrpcval(true, 'boolean')		// PUBLISH !!
+													)  );
+	$result = $client->send($message);
+	$ret = xmlrpc_displayresult( $result );
 
 ?>
