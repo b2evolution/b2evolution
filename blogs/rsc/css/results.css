@@ -87,6 +87,7 @@ table.grouped th a.basic_sort_link:hover {
 	background-color:#ccc;
 }
 
+
 /* Table SINGLE sort buttons/headers: */
 table.grouped th a.single_current {
 	font-weight : bold;
@@ -101,13 +102,12 @@ table.grouped th a.single_sort_link:hover {
 /*
  * Results navigation:
  */
-/*
 .results {
 	text-align: center;
 	margin: 0 auto;
-	width:100%;
-	border: 1px solid black;
-}*/
+	width: 100%;
+	/* border: 1px solid black; */
+}
 .results_nav {
 	text-align: center;
 }

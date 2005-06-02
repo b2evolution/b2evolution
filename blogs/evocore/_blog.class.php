@@ -124,11 +124,9 @@ class Blog extends DataObject
 			);
 
    	$this->delete_cascades = array(
- 				// b2evo only:
  				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user rights defintions') ),
+ 				// b2evo only:
  				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
-				// progidistri only: (those won't hurt)
- 				array( 'table'=>'T_colluserrights', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user rights defintions') ),
 			);
 
 		if( $db_row == NULL )
@@ -698,6 +696,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2005/06/02 18:50:52  fplanque
+ * no message
+ *
  * Revision 1.20  2005/05/25 17:13:33  fplanque
  * implemented email notifications on new comments/trackbacks
  *

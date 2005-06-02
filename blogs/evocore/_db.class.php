@@ -512,7 +512,7 @@ class DB
 			return $values[$x];
 		}
 
-		return false;
+		return NULL;
 	}
 
 
@@ -847,7 +847,7 @@ class DB
 
 
 	/**
-	 * @todo implement transactions!
+	 * Commit current transaction
 	 */
 	function commit()
 	{
@@ -894,6 +894,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.16  2005/06/02 18:50:52  fplanque
+ * no message
+ *
  * Revision 1.15  2005/04/21 12:10:50  blueyed
  * minor
  *

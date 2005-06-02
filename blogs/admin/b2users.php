@@ -79,12 +79,6 @@ elseif( param( 'grp_ID', 'integer', NULL, true, false, false ) )
 }
 
 
-// show the top menu
-// TODO: move this downwards AFTER the actions (which means after the cookie setting as well)
-if( $action != 'userupdate' )
-{ // perhaps we'll have to set a cookie later
-	require dirname(__FILE__).'/_menutop.php';
-}
 
 
 $user_profile_only = 0;
@@ -151,9 +145,6 @@ else
 			if( $user_profile_only && $edited_user_ID != $current_User->ID )
 			{ // user is only allowed to update him/herself
 				$Messages->add( T_('You are only allowed to update your own profile!') );
-
-				// display menu
-				require dirname(__FILE__).'/_menutop.php';
 				break;
 			}
 
@@ -286,9 +277,6 @@ else
 				}
 
 			}
-
-			// display menu
-			require( dirname(__FILE__).'/_menutop.php' );
 			break;
 
 
@@ -494,25 +482,12 @@ else
 /**
  * Display page header:
  */
-// TODO: THIS is the *right* place for the page header...
-// require dirname(__FILE__).'/_menutop.php';
-
-
-/*
- * Display messages:
- * TODO: fplanque>> This might go into the page header (which already displays error messages),
- * however, I still have issues with those overly complex Message handlers...
- */
-if( $Messages->count( 'all' ) )
-{ // we have errors/notes
-	$Messages->display( NULL, NULL, true, 'all', NULL, NULL, 'panelinfo' );
-}
+require dirname(__FILE__).'/_menutop.php';
 
 
 /*
  * Display payload:
  */
-
 if( ! $current_User->check_perm( 'users', 'view', false ) )
 { // User is NOT allowed to view users
 	// TODO: move this check upward
@@ -584,6 +559,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.92  2005/06/02 18:50:52  fplanque
+ * no message
+ *
  * Revision 1.91  2005/05/26 19:11:09  fplanque
  * no message
  *

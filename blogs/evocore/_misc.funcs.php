@@ -1707,43 +1707,6 @@ function make_valid_date( $date, $time = '', $req_date = true, $req_time = true 
 
 
 /**
- * Display a checkbox allowing to add the item to a selection
- *
- * Only one checkbox will be displayed for each ID.
- * IDs which are already in the selection will be pre-checked.
- *
- * @param integer item id
- * @param string item name
- * @return string the correct input tag
- */
-function selection_checkbox( $item_ID, $item_name )
-{
-	// List of checkboxes to pre-check:
-	global $cols_check;
-	// List of already displayed checkboxes (can be used outside to get a list of checkboxes which have been displayed)
-	global $item_ID_array;
-
-	if( in_array( $item_ID, $item_ID_array ) )
-	{	// We have already displayed a checkbox for this ID
-		return '&nbsp;';	// nbsp is for IE...
-	}
-
-	$item_ID_array[] = $item_ID; //construction of the ID list
-
-	$r = '<input type="checkbox" class="checkbox" name="'.$item_name.'_items[]" value='.$item_ID;
-
-	if( in_array( $item_ID, $cols_check ) )
-	{	// already in selection:
-		$r .= ' checked="checked" ';
-	}
-
-	$r .= ' />';
-
-	return $r;
-}
-
-
-/**
  * Displays an empty or a full bullet based on boolean
  *
  * @param boolean true for full bullet, false for empty bullet
@@ -1877,6 +1840,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.69  2005/06/02 18:50:52  fplanque
+ * no message
+ *
  * Revision 1.68  2005/05/24 15:26:53  fplanque
  * cleanup
  *

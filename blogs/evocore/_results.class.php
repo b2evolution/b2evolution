@@ -131,6 +131,7 @@ class Results extends Widget
 	/**
 	 * URL param names
 	 */
+	var $param_prefix;
 	var $page_param;
 	var $order_param;
 
@@ -152,6 +153,7 @@ class Results extends Widget
 		$this->DB = & $DB;
 		$this->sql = $sql;
 		$this->limit = $limit;
+		$this->param_prefix = $param_prefix;
 		$this->page_param = 'results_'.$param_prefix.'page';
 		$this->order_param = 'results_'.$param_prefix.'order';
 
@@ -302,23 +304,23 @@ class Results extends Widget
 	 */
 	function display( $display_params = NULL )
 	{
+		// Make sure we have display parameters:
 		if( !is_null($display_params) )
 		{ // Use passed params:
 			$this->params = & $display_params;
 		}
 		elseif( empty( $this->params ) )
-		{ // Set default params from Admin Skin:
+		{ // Use default params from Admin Skin:
 			global $AdminUI;
 			$this->params = $AdminUI->getMenuTemplate( 'Results' );
 		}
-
-		echo $this->params['before'];
 
 
 		// Make sure query has executed and we're at the top of the resultset:
 		$this->restart();
 
 
+		// Make sure we have colum definitions:
 		if( is_null( $this->cols ) )
 		{ // Let's create default column definitions:
 			$this->cols = array();
@@ -338,167 +340,229 @@ class Results extends Widget
 			}
 		}
 
+		// -------------------------
+		// Proceed with display:
+		// -------------------------
+		echo $this->params['before'];
 
-		echo $this->params['header_start'];
-		$this->nav_text( $this->params['header_text'], $this->params['header_text_single'] );
-		echo $this->params['header_end'];
+			if( $this->total_pages == 0 )
+			{ // There are no results! Nothing to display!
+				echo $this->replace_vars( $this->params['no_results'] );
+			}
+			else
+			{	// We have rows to display:
 
-		/*
-		echo $this->params['title_start'];
-		echo $this->title;
-		echo $this->params['title_end'];
-		*/
+				// GLOBAL (NAV) HEADER:
+				$this->display_nav( 'header' );
 
-		if( $this->total_pages == 0 )
-		{ // There are no results! Nothing to display!
-			echo $this->replace_vars( $this->params['no_results'] );
-			echo $this->params['after'];
-			return 0;
-		}
+				// START OF LIST/TABLE:
+				$this->display_list_start();
 
-		echo $this->params['list_start'];
+					// COLUMN HEADERS:
+					$this->display_head();
 
-		// -----------------------------
-		// COLUMN HEADERS:
-		// -----------------------------
-		if( $this->col_headers )
-		{ // We want to display headers:
-			echo $this->params['head_start'];
+					// GROUP & DATA ROWS:
+					$this->display_body();
 
-			if( isset($this->title) )
-			{ // A title has been defined for this result set:
-				echo $this->replace_vars( $this->params['head_title'] );
+				// END OF LIST/TABLE:
+				$this->display_list_end();
+
+				// GLOBAL (NAV) FOOTER:
+				$this->display_nav( 'footer' );
 			}
 
-			$col_count = 0;
-			$col_names = array();
-			foreach( $this->cols as $col )
-			{ // For each column:
+		echo $this->params['after'];
 
-				if( isset( $col['th_start'] ) )
-				{ // We have a customized column start for this one:
-					echo $col['th_start'];
-				}
-				elseif( ($col_count==0) && isset($this->params['colhead_start_first']) )
-				{ // First column can get special formatting:
-					echo $this->params['colhead_start_first'];
-				}
-				elseif( ($col_count==count($this->cols)-1) && isset($this->params['colhead_start_last']) )
-				{ // Last column can get special formatting:
-					echo $this->params['colhead_start_last'];
-				}
-				else
-				{ // Regular columns:
-					echo $this->params['colhead_start'];
-				}
+		// Return number of rows diplayed:
+		return $this->current_idx;
+	}
 
-				if( isset( $col['order'] ) )
-				{ //the column can be ordered
 
-					$order_asc = '';
-					$order_desc = '';
-					$color_asc = '';
-					$color_desc = '';
+	/**
+	 * Display list/table start.
+	 *
+	 * Typically outputs <ul> or <table>
+	 *
+	 * @access protected
+	 */
+	function display_list_start()
+	{
+		echo $this->params['list_start'];
+	}
 
-					for( $i = 0, $icount = count($this->cols); $i < $icount; $i++)
-					{ //construction of the values which can be taken by $order
-						if( !empty( $this->default_col ) && !strcasecmp( $col['order'], $this->default_col ) )
-						{ // there is a default order
-							$order_asc.='A';
-							$order_desc.='D';
-						}
-						elseif(	$i == $col_count )
-						{ //link ordering the current column
-							$order_asc.='A';
-							$order_desc.='D';
-						}
-						else
-						{
-							$order_asc.='-';
-							$order_desc.='-';
-						}
+
+	/**
+	 * Display list/table end.
+	 *
+	 * Typically outputs </ul> or </table>
+	 *
+	 * @access protected
+	 */
+	function display_list_end()
+	{
+		echo $this->params['list_end'];
+	}
+
+
+	/**
+	 * Display list/table head.
+	 *
+	 * This includes list head/title and column headers.
+	 * This is optional and will only produce output if column headers are defined.
+	 * EXPERIMENTAL: also dispays <tfoot>
+	 *
+	 * @access protected
+	 */
+	function display_head()
+	{
+		if( ! $this->col_headers )
+		{ // We do not want to display headers:
+			return false;
+		}
+
+		echo $this->params['head_start'];
+
+		if( isset($this->title) )
+		{ // A title has been defined for this result set:
+			echo $this->replace_vars( $this->params['head_title'] );
+		}
+
+		$col_count = 0;
+		$col_names = array();
+		foreach( $this->cols as $col )
+		{ // For each column:
+
+			if( isset( $col['th_start'] ) )
+			{ // We have a customized column start for this one:
+				echo $col['th_start'];
+			}
+			elseif( ($col_count==0) && isset($this->params['colhead_start_first']) )
+			{ // First column can get special formatting:
+				echo $this->params['colhead_start_first'];
+			}
+			elseif( ($col_count==count($this->cols)-1) && isset($this->params['colhead_start_last']) )
+			{ // Last column can get special formatting:
+				echo $this->params['colhead_start_last'];
+			}
+			else
+			{ // Regular columns:
+				echo $this->params['colhead_start'];
+			}
+
+			if( isset( $col['order'] ) )
+			{ //the column can be ordered
+
+				$order_asc = '';
+				$order_desc = '';
+				$color_asc = '';
+				$color_desc = '';
+
+				for( $i = 0, $icount = count($this->cols); $i < $icount; $i++)
+				{ //construction of the values which can be taken by $order
+					if( !empty( $this->default_col ) && !strcasecmp( $col['order'], $this->default_col ) )
+					{ // there is a default order
+						$order_asc.='A';
+						$order_desc.='D';
 					}
-
-					$style = $this->params['sort_type'];
-
-					$asc_status = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? 'on' : 'off' ;
-					$desc_status = ( strstr( $this->order, 'D' ) && $col_count == strpos( $this->order, 'D') ) ? 'on' : 'off' ;
-					$sort_type = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? $order_desc : $order_asc;
-					$title = strstr( $sort_type, 'A' ) ? T_('Ascending order') : T_('Descending order');
-					$title = ' title="'.$title.'" ';
-
-					$pos =  strpos( $this->order, 'D');
-
-					if( strstr( $this->order, 'A' ) )
-					{
-						$pos = strpos( $this->order, 'A' );
-					}
-
-					if( $col_count == $pos )
-					{ //the column header must be displayed in bold
-						$class = ' class="'.$style.'_current" ';
+					elseif(	$i == $col_count )
+					{ //link ordering the current column
+						$order_asc.='A';
+						$order_desc.='D';
 					}
 					else
 					{
-						$class = ' class="'.$style.'_sort_link" ';
-					}
-
-					if( $this->params['sort_type'] == 'single' )
-					{ // single sort mode:
-
-						echo '<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$sort_type )
-									.'" '.$title.$class.' >'
-									.$col['th'].'</a>'
-									.'<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$order_asc )
-									.'" title="'.T_('Ascending order')
-									.'" '.$class.' >'.$this->params['sort_asc_'.$asc_status].'</a>'
-									.'<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$order_desc )
-									.'" title="'.T_('Descending order')
-									.'" '.$class.' >'.$this->params['sort_desc_'.$desc_status].'</a> ';
-					}
-					elseif( $this->params['sort_type'] == 'basic' )
-					{ // basic sort mode:
-
-						if( $asc_status == 'off' && $desc_status == 'off' )
-						{ // the sorting is not made on the current column
-							$sort_item = $this->params['basic_sort_off'];
-						}
-						elseif( $asc_status == 'on' )
-						{ // the sorting is ascending and made on the current column
-							$sort_item = $this->params['basic_sort_asc'];
-						}
-						elseif( $desc_status == 'on' )
-						{ // the sorting is descending and made on the current column
-							$sort_item = $this->params['basic_sort_desc'];
-						}
-
-						echo '<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$sort_type ).'" title="'.T_('Change Order')
-									.'" '.$class.' >'.$sort_item.' '.$col['th'].'</a>';
+						$order_asc.='-';
+						$order_desc.='-';
 					}
 				}
-				elseif( isset($col['th']) )
-				{ // the column can't be ordered, but we still have a header defined:
-					echo $col['th'];
+
+				$style = $this->params['sort_type'];
+
+				$asc_status = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? 'on' : 'off' ;
+				$desc_status = ( strstr( $this->order, 'D' ) && $col_count == strpos( $this->order, 'D') ) ? 'on' : 'off' ;
+				$sort_type = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? $order_desc : $order_asc;
+				$title = strstr( $sort_type, 'A' ) ? T_('Ascending order') : T_('Descending order');
+				$title = ' title="'.$title.'" ';
+
+				$pos =  strpos( $this->order, 'D');
+
+				if( strstr( $this->order, 'A' ) )
+				{
+					$pos = strpos( $this->order, 'A' );
 				}
-				$col_count++;
 
-				echo $this->params['colhead_end'];
+				if( $col_count == $pos )
+				{ //the column header must be displayed in bold
+					$class = ' class="'.$style.'_current" ';
+				}
+				else
+				{
+					$class = ' class="'.$style.'_sort_link" ';
+				}
 
+				if( $this->params['sort_type'] == 'single' )
+				{ // single sort mode:
+
+					echo '<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$sort_type )
+								.'" '.$title.$class.' >'
+								.$col['th'].'</a>'
+								.'<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$order_asc )
+								.'" title="'.T_('Ascending order')
+								.'" '.$class.' >'.$this->params['sort_asc_'.$asc_status].'</a>'
+								.'<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$order_desc )
+								.'" title="'.T_('Descending order')
+								.'" '.$class.' >'.$this->params['sort_desc_'.$desc_status].'</a> ';
+				}
+				elseif( $this->params['sort_type'] == 'basic' )
+				{ // basic sort mode:
+
+					if( $asc_status == 'off' && $desc_status == 'off' )
+					{ // the sorting is not made on the current column
+						$sort_item = $this->params['basic_sort_off'];
+					}
+					elseif( $asc_status == 'on' )
+					{ // the sorting is ascending and made on the current column
+						$sort_item = $this->params['basic_sort_asc'];
+					}
+					elseif( $desc_status == 'on' )
+					{ // the sorting is descending and made on the current column
+						$sort_item = $this->params['basic_sort_desc'];
+					}
+
+					echo '<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$sort_type ).'" title="'.T_('Change Order')
+								.'" '.$class.' >'.$sort_item.' '.$col['th'].'</a>';
+				}
 			}
+			elseif( isset($col['th']) )
+			{ // the column can't be ordered, but we still have a header defined:
+				echo $col['th'];
+			}
+			$col_count++;
 
-			echo $this->params['head_end'];
+			echo $this->params['colhead_end'];
+
 		}
 
+		echo $this->params['head_end'];
+
+
+		// experimental:
 		echo $this->params['tfoot_start'];
-
 		echo $this->params['tfoot_end'];
+	}
 
+
+	/**
+	 * Display list/table body.
+	 *
+	 * This includes groups and data rows.
+	 *
+	 * @access protected
+	 */
+	function display_body()
+	{
 		echo $this->params['body_start'];
 
-
-		// -----------------------------
-		// GROUP & DATA ROWS:
-		// -----------------------------
 		$line_count = 0;
 		foreach( $this->rows as $row )
 		{ // For each row/line:
@@ -601,7 +665,7 @@ class Results extends Widget
 				$output .= $this->params['col_end'];
 
 				$output = $this->parse_col_content($output);
-				//echo $output;
+				// echo '{'.$output.'}';
 				eval( "echo '$output';" );
 
 				$col_count++;
@@ -609,17 +673,32 @@ class Results extends Widget
 			echo $this->params['line_end'];
 			$this->current_idx++;
 		}
+
 		echo $this->params['body_end'];
+	}
 
-		echo $this->params['list_end'];
 
-		echo $this->params['footer_start'];
-		$this->nav_text( $this->params['footer_text'], $this->params['footer_text_single'] );
-		echo $this->params['footer_end'];
+	/**
+	 * Display navigation text, based on template.
+	 *
+	 * @param string template: 'header' or 'footer'
+	 *
+	 * @access protected
+	 */
+	function display_nav( $template )
+	{
+		echo $this->params[$template.'_start'];
 
-		echo $this->params['after'];
+		if( ( $this->total_pages <= 1 ) )
+		{
+			echo $this->params[$template.'_text_single'];
+		}
+		else
+		{
+			echo $this->replace_vars( $this->params[$template.'_text'] );
+		}
 
-		return $this->current_idx;
+		echo $this->params[$template.'_end'];
 	}
 
 
@@ -662,28 +741,6 @@ class Results extends Widget
 		}
 
 		return $prefix.implode(',',$orders).' ';
-	}
-
-
-	/**
-	 * Displays navigation text, based on template:
-	 *
-	 * @param string template
-	 * @param string to display if there is only one page
-	 */
-	function nav_text( $template, $single = NULL )
-	{
-		if( empty( $template ) )
-			return;
-
-		if( ( $this->total_pages <= 1 ) && !is_null( $single ) )
-		{
-			echo $single;
-		}
-		else
-		{ //preg_replace_callback is used to avoid calculating unecessary values
-			echo $this->replace_vars( $template );
-		}
 	}
 
 
@@ -1001,6 +1058,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.25  2005/06/02 18:50:53  fplanque
+ * no message
+ *
  * Revision 1.24  2005/05/24 15:26:53  fplanque
  * cleanup
  *

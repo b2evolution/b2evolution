@@ -476,7 +476,7 @@ class Form extends Widget
 		{
 			$r .= '<option value="'.$i.'"'.( $i == $hours ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
 		}
-		$r .= '</select>'.T_('heures')."\n";
+		$r .= '</select>'.T_('hours')."\n";
 
 		$minutes = floor( $duration / 60 ) % 60;
 		$r .= "\n".'<select name="'.$field_prefix.'_minutes" id="'.$field_prefix.'_minutes">';

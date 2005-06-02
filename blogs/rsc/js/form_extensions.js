@@ -37,20 +37,20 @@ function get_form( object )
 function check( object, action )
 { 
 
-	object = get_form( object );
+	form = get_form( object );
 
 	//checks or unchecks all checkboxes in the form
 	i = 0;
-	while( i < object.length )
+	while( i < form.length )
 	{
-		if( object.elements[i].type == 'checkbox' )
+		if( form.elements[i].type == 'checkbox' )
 		{
-			object.elements[i].checked = action;
+			form.elements[i].checked = action;
 		}
 		i++;
 	}
 	
-	return object;
+	return form;
 	
 } 
 
@@ -77,4 +77,3 @@ function clear_form( object )
 	
 	return object;
 }
-

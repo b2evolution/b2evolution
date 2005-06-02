@@ -729,11 +729,9 @@ class AdminUI_general
 				return array(
 				'before' => '<div class="results">',
 					'header_start' => '<div class="results_nav">',
-					'header_text' => '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$',
-					'header_text_single' => '',
+						'header_text' => '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$',
+						'header_text_single' => '',
 					'header_end' => '</div>',
-					'title_start' => "<div>\n",
-					'title_end' => "</div>\n",
 					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
 						'head_start' => "<thead><tr>\n",
 							'head_title' => '<th colspan="$nb_cols$"><span style="float:right">$global_icons$</span>$title$</th></tr>'
@@ -1077,6 +1075,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.23  2005/06/02 18:50:52  fplanque
+ * no message
+ *
  * Revision 1.22  2005/05/02 19:06:44  fplanque
  * started paging of user list..
  *

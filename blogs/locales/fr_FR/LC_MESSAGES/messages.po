@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2005-01-26 20:52+0100\n"
-"PO-Revision-Date: 2005-05-27 20:54+0100\n"
+"POT-Creation-Date: 2005-05-31 20:09+0200\n"
+"PO-Revision-Date: 2005-05-31 20:13+0100\n"
 "Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -527,7 +527,7 @@ msgstr "Re-chercher"
 #: ..\..\..\admin\_browse_posts_list.inc.php:111
 #: ..\..\..\admin\_files_browse.inc.php:251
 #: ..\..\..\admin\_files_browse.inc.php:689
-#: ..\..\..\admin\_listeditor.php:197
+#: ..\..\..\admin\_listeditor.php:190
 #: ..\..\..\admin\_set_plugins.form.php:49
 #: ..\..\..\admin\_users_list.php:166
 msgid "Actions"
@@ -1157,7 +1157,7 @@ msgstr "Vous ne pouvez pas supprimer le groupe utilisé par défaut pour les nouve
 
 #: ..\..\..\admin\b2users.php:475
 #, php-format
-msgid "Group &laquo;%s&raquo;deleted."
+msgid "Group &laquo;%s&raquo; deleted."
 msgstr "Le groupe &laquo;%s&raquo; a été supprimé."
 
 #: ..\..\..\admin\b2users.php:484
@@ -1281,7 +1281,7 @@ msgid "Deleting this blog will also delete all its categories, posts and comment
 msgstr "Supprimer ce blog supprimera également toutes ses catégories, articles et commentaires!"
 
 #: ..\..\..\admin\blogs.php:399
-#: ..\..\..\admin\_listeditor.php:141
+#: ..\..\..\admin\_listeditor.php:134
 #: ..\..\..\evocore\_dataobject.class.php:392
 msgid "THIS CANNOT BE UNDONE!"
 msgstr "CETTE OPERATION N'EST PAS REVERSIBLE!"
@@ -1298,14 +1298,14 @@ msgstr "Tenter de supprimer également le fichier statique [<strong><a %s>%s</a><
 
 #: ..\..\..\admin\blogs.php:430
 #: ..\..\..\admin\files.php:467
-#: ..\..\..\admin\_listeditor.php:152
+#: ..\..\..\admin\_listeditor.php:145
 #: ..\..\..\evocore\_dataobject.class.php:400
 msgid "I am sure!"
 msgstr "Je suis sûr!"
 
 #: ..\..\..\admin\blogs.php:436
 #: ..\..\..\admin\files.php:471
-#: ..\..\..\admin\_listeditor.php:156
+#: ..\..\..\admin\_listeditor.php:149
 #: ..\..\..\evocore\_dataobject.class.php:405
 msgid "CANCEL"
 msgstr "ANNULER"
@@ -1356,7 +1356,7 @@ msgstr "Ajout du nouvel article..."
 #: ..\..\..\evocore\_user.funcs.php:372
 #: ..\..\..\htsrv\comment_post.php:61
 #: ..\..\..\htsrv\trackback.php:99
-#: ..\..\..\xmlsrv\xmlrpc.php:1360
+#: ..\..\..\xmlsrv\xmlrpc.php:1362
 msgid "Supplied URL is invalid: "
 msgstr "L'URL fournie est invalide:"
 
@@ -1484,8 +1484,8 @@ msgstr "Le fichier &laquo;%s&raquo; n'a pas été renommé."
 
 #: ..\..\..\admin\files.php:371
 #, php-format
-msgid "&laquo;%s&raquo; could not be renamed to  &laquo;%s&raquo;"
-msgstr "&laquo;%s&raquo; n'a pas pu être renommé en &laquo;%s&raquo;."
+msgid "&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;"
+msgstr "&laquo;%s&raquo; n'a pas pu être renommé en &laquo;%s&raquo;"
 
 #: ..\..\..\admin\files.php:376
 #, php-format
@@ -1564,7 +1564,7 @@ msgstr "Le fichier est trop volumineux de %s."
 #: ..\..\..\admin\files.php:811
 #, php-format
 msgid "The file is too large. Maximum allowed is: %s."
-msgstr ""
+msgstr "Le fichier est trop gros. La taille maximale autorisée est: %s."
 
 #: ..\..\..\admin\files.php:816
 msgid "The file exceeds the upload_max_filesize directive in php.ini."
@@ -1580,7 +1580,7 @@ msgstr "Aucun fichier n'a été uploadé."
 
 #: ..\..\..\admin\files.php:831
 msgid "Missing a temporary folder (upload_tmp_dir in php.ini)."
-msgstr ""
+msgstr "Répertoire temporaire manquant (upload_tmp_dir dans php.ini)."
 
 #: ..\..\..\admin\files.php:835
 msgid "Unknown error."
@@ -1604,7 +1604,7 @@ msgstr "Le fichier &laquo;%s&raquo; existe déjà."
 
 #: ..\..\..\admin\files.php:882
 msgid "An unknown error occurred when moving the uploaded file on the server."
-msgstr ""
+msgstr "Une erreur inconnue s'est produite en déplaçant le fichier sur le serveur."
 
 #: ..\..\..\admin\files.php:887
 #, php-format
@@ -1622,7 +1622,7 @@ msgstr "Les fichiers source et cible sont identiques. Veuillez choisir un autre 
 #: ..\..\..\admin\files.php:1019
 #, php-format
 msgid "Cannot overwrite the file &laquo;%s&raquo; because of the following relations"
-msgstr ""
+msgstr "Impossible d'écraser le fichier &laquo;%s&raquo; à cause des relations suivantes"
 
 #: ..\..\..\admin\files.php:1045
 #, php-format
@@ -1701,7 +1701,7 @@ msgstr "Supprimer ce lien!"
 #: ..\..\..\admin\files.php:1181
 #, php-format
 msgid "Click on a link icon %s below to link an additional file to this item."
-msgstr ""
+msgstr "Cliquez sur une icône de lien %s ci-dessous pour lier un fichier supplémentaire à cet objet."
 
 #: ..\..\..\admin\files.php:1287
 msgid "Hide Filemanager"
@@ -1777,8 +1777,8 @@ msgstr "Infos plug-in"
 #: ..\..\..\admin\plugins.php:86
 #: ..\..\..\admin\_comment.form.php:52
 #: ..\..\..\admin\_files_browse.inc.php:246
-#: ..\..\..\admin\_listeditor.php:190
-#: ..\..\..\admin\_listeditor.php:232
+#: ..\..\..\admin\_listeditor.php:183
+#: ..\..\..\admin\_listeditor.php:225
 #: ..\..\..\admin\_set_regional.form.php:50
 #: ..\..\..\admin\_set_regional.form.php:162
 #: ..\..\..\admin\_users_groupform.php:67
@@ -2155,19 +2155,19 @@ msgstr "Les utilisateurs pourront sélectionner un autre habillage pour voir le b
 
 #: ..\..\..\admin\_blogs_general.form.php:170
 msgid "Allow customized blog CSS file"
-msgstr ""
+msgstr "Autoriser CSS personnalisé pour ce blog"
 
 #: ..\..\..\admin\_blogs_general.form.php:170
 msgid "A CSS file in the blog media directory will override the default skin stylesheet."
-msgstr ""
+msgstr "Un fichier CSS dans le répertoire média du blog prendra l'ascendant sur le style par défaut de l'habillage."
 
 #: ..\..\..\admin\_blogs_general.form.php:171
 msgid "Allow user customized CSS file for this blog"
-msgstr ""
+msgstr "Autoriser CSS personnalisé par utilisateur"
 
 #: ..\..\..\admin\_blogs_general.form.php:171
 msgid "Users will be able to override the blog and skin stylesheet with their own."
-msgstr ""
+msgstr "Les utilisateurs pourront remplacer les feuilles de style du blog ou de l'habillage avec leur propre CSS."
 
 #: ..\..\..\admin\_blogs_general.form.php:172
 msgid "Display public blog list"
@@ -3093,7 +3093,7 @@ msgstr "Un clic sur le nom d'un fichier appelle l'action par défaut (les images 
 #: ..\..\..\admin\_files_browse.inc.php:688
 #, php-format
 msgid "Clicking on the %s icon invokes the default action in a new window."
-msgstr ""
+msgstr "Un click sur l'icône %s invoque l'action par défaut dans une nouvelle fenêtre."
 
 #: ..\..\..\admin\_files_browse.inc.php:693
 #: ..\..\..\admin\_files_cmr.inc.php:67
@@ -3193,7 +3193,7 @@ msgstr "Upload de fichier"
 
 #: ..\..\..\admin\_files_upload.inc.php:164
 msgid "Some file uploads failed. Please check the errors below."
-msgstr ""
+msgstr "Certains upload de fichier ont échoué. Veuillez vérifier les erreurs ci-dessous."
 
 #: ..\..\..\admin\_files_upload.inc.php:170
 msgid "Files to upload"
@@ -3245,9 +3245,9 @@ msgstr "Charger les fichiers dans:"
 
 #: ..\..\..\admin\_files_upload.inc.php:265
 #: ..\..\..\admin\_file_properties.inc.php:79
-#: ..\..\..\admin\_listeditor.php:237
-#: ..\..\..\admin\_listeditor.php:241
-#: ..\..\..\admin\_listeditor.php:242
+#: ..\..\..\admin\_listeditor.php:230
+#: ..\..\..\admin\_listeditor.php:234
+#: ..\..\..\admin\_listeditor.php:235
 #: ..\..\..\admin\_set_files.form.php:81
 #: ..\..\..\admin\_set_regional.form.php:68
 #: ..\..\..\skins\_profile.php:95
@@ -3279,7 +3279,7 @@ msgstr "Meta données"
 #: ..\..\..\admin\_file_properties.inc.php:65
 #: ..\..\..\admin\_file_properties.inc.php:71
 msgid "This is a longer descriptive title"
-msgstr ""
+msgstr "Ceci est un titre descriptif plus long"
 
 #: ..\..\..\admin\_file_properties.inc.php:66
 #: ..\..\..\admin\_file_properties.inc.php:72
@@ -3555,7 +3555,7 @@ msgstr "Etablissement"
 
 #: ..\..\..\admin\_item_links.inc.php:61
 msgid "View this establishment..."
-msgstr ""
+msgstr "Voir cet établissement..."
 
 #: ..\..\..\admin\_item_links.inc.php:65
 #: ..\..\..\admin\_item_links.inc.php:103
@@ -3626,13 +3626,13 @@ msgstr "Impossible de supprimer l'entrée!"
 msgid "Entry #%d deleted."
 msgstr "Entrée #%d supprimée."
 
-#: ..\..\..\admin\_listeditor.php:139
+#: ..\..\..\admin\_listeditor.php:132
 #, php-format
 msgid "Delete entry #%d?"
 msgstr "Supprimer l'entrée n°%d?"
 
-#: ..\..\..\admin\_listeditor.php:182
-#: ..\..\..\admin\_listeditor.php:229
+#: ..\..\..\admin\_listeditor.php:175
+#: ..\..\..\admin\_listeditor.php:222
 #: ..\..\..\admin\_users_form.php:175
 #: ..\..\..\admin\_users_groupform.php:58
 #: ..\..\..\admin\_users_list.php:101
@@ -3642,31 +3642,31 @@ msgstr "Supprimer l'entrée n°%d?"
 msgid "ID"
 msgstr "Idx"
 
-#: ..\..\..\admin\_listeditor.php:193
+#: ..\..\..\admin\_listeditor.php:186
 msgid "Edit this entry..."
 msgstr "Editer cette entrée..."
 
-#: ..\..\..\admin\_listeditor.php:198
+#: ..\..\..\admin\_listeditor.php:191
 msgid "Edit..."
 msgstr "Editer..."
 
-#: ..\..\..\admin\_listeditor.php:200
+#: ..\..\..\admin\_listeditor.php:193
 msgid "Duplicate..."
 msgstr "Dupliquer..."
 
-#: ..\..\..\admin\_listeditor.php:202
+#: ..\..\..\admin\_listeditor.php:195
 msgid "Delete!"
 msgstr "Supprimer!"
 
-#: ..\..\..\admin\_listeditor.php:222
+#: ..\..\..\admin\_listeditor.php:215
 msgid "New entry"
 msgstr "Nouvelle entrée"
 
-#: ..\..\..\admin\_listeditor.php:222
+#: ..\..\..\admin\_listeditor.php:215
 msgid "Edit entry"
 msgstr "Editer entrée"
 
-#: ..\..\..\admin\_listeditor.php:236
+#: ..\..\..\admin\_listeditor.php:229
 msgid "Record"
 msgstr "Enregistrer"
 
@@ -3749,9 +3749,8 @@ msgid "Maximal allowed filesize"
 msgstr "Taille de fichier maximale autorisée"
 
 #: ..\..\..\admin\_set_files.form.php:61
-#: ..\..\..\evocore\_file.funcs.php:63
-msgid "KB"
-msgstr "Ko"
+msgid "KB (This cannot be higher than your PHP/Webserver setting!)"
+msgstr "Ko (Ne peut être supérieur à votre paramétrage PHP/serveur web!)"
 
 #: ..\..\..\admin\_set_files.form.php:70
 msgid "Valid filename"
@@ -3985,11 +3984,11 @@ msgstr "Format de l'heure"
 #: ..\..\..\admin\_set_regional.form.php:55
 #: ..\..\..\admin\_set_regional.form.php:166
 msgid "Start of week"
-msgstr "Début de semaine"
+msgstr "Début Semaine"
 
 #: ..\..\..\admin\_set_regional.form.php:55
 msgid "Day at the start of the week."
-msgstr ""
+msgstr "Premier jour de la semaine."
 
 #: ..\..\..\admin\_set_regional.form.php:56
 #: ..\..\..\admin\_set_regional.form.php:194
@@ -4220,7 +4219,7 @@ msgstr "Fmt heure"
 
 #: ..\..\..\admin\_set_regional.form.php:165
 msgid "Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc"
-msgstr ""
+msgstr "Premier jour de la semaine: 0 for dimanche, 1 pour Lundi, 2 pour Mardi, etc..."
 
 #: ..\..\..\admin\_set_regional.form.php:175
 msgid "Strings"
@@ -4503,7 +4502,7 @@ msgstr "Lien visible"
 #: ..\..\..\admin\_users_groupform.php:78
 #: ..\..\..\admin\_users_groupform.php:82
 msgid "Access to Admin area"
-msgstr ""
+msgstr "Accès à l'administration"
 
 #: ..\..\..\admin\_users_groupform.php:86
 msgid "View all"
@@ -4559,14 +4558,6 @@ msgstr "Dupliquer ce groupe..."
 #: ..\..\..\admin\_users_list.php:87
 msgid "Delete this group!"
 msgstr "Supprimer ce groupe!"
-
-#: ..\..\..\admin\_users_list.php:156
-msgid "Decrease user level"
-msgstr "Descendre le niveau de l'utilisateur"
-
-#: ..\..\..\admin\_users_list.php:160
-msgid "Increase user level"
-msgstr "Monter le niveau de l'utilisateur"
 
 #: ..\..\..\admin\_users_list.php:167
 msgid "Edit this user..."
@@ -4913,7 +4904,7 @@ msgstr "Français (BE)"
 
 #: ..\..\..\conf\_locales.php:212
 msgid "Galician (ES)"
-msgstr ""
+msgstr "Galicien (ES)"
 
 #: ..\..\..\conf\_locales.php:220
 msgid "Hungarian (HU)"
@@ -5045,7 +5036,7 @@ msgstr "%d catégories liées"
 #: ..\..\..\evocore\_blog.class.php:131
 #, php-format
 msgid "%d user rights defintions"
-msgstr ""
+msgstr "%d définitions de permissions utilisateur"
 
 #: ..\..\..\evocore\_blog.class.php:129
 #: ..\..\..\evocore\_user.class.php:120
@@ -5116,12 +5107,12 @@ msgstr "Mois précédent (%04d-%02d)"
 #: ..\..\..\evocore\_calendar.class.php:762
 #, php-format
 msgid "Next month (%04d-%02d)"
-msgstr ""
+msgstr "Mois suivant (%04d-%02d)"
 
 #: ..\..\..\evocore\_calendar.class.php:784
 #, php-format
 msgid "Next year (%04d-%02d)"
-msgstr ""
+msgstr "Année suivante (%04d-%02d)"
 
 #: ..\..\..\evocore\_calendar.class.php:785
 #, php-format
@@ -5178,14 +5169,14 @@ msgid "Post"
 msgstr "Article"
 
 #: ..\..\..\evocore\_comment.class.php:586
-#: ..\..\..\xmlsrv\xmlrpc.php:1396
+#: ..\..\..\xmlsrv\xmlrpc.php:1398
 msgid "Website"
 msgstr "Site web"
 
 #: ..\..\..\evocore\_comment.class.php:587
 #: ..\..\..\evocore\_comment.class.php:600
 #: ..\..\..\evocore\_item.class.php:1925
-#: ..\..\..\xmlsrv\xmlrpc.php:1397
+#: ..\..\..\xmlsrv\xmlrpc.php:1399
 msgid "Url"
 msgstr "Url"
 
@@ -5195,14 +5186,14 @@ msgstr "Commentaire"
 
 #: ..\..\..\evocore\_comment.class.php:609
 #: ..\..\..\evocore\_item.class.php:1932
-#: ..\..\..\xmlsrv\xmlrpc.php:1399
+#: ..\..\..\xmlsrv\xmlrpc.php:1401
 msgid "Edit/Delete"
 msgstr "Editer/Supprimer"
 
 #: ..\..\..\evocore\_comment.class.php:611
 #: ..\..\..\evocore\_item.class.php:1934
 msgid "Edit your subscriptions/notifications"
-msgstr ""
+msgstr "Editer vos abonnements/notifications"
 
 #: ..\..\..\evocore\_commentlist.class.php:175
 #: ..\..\..\skins\_lastcomments.php:25
@@ -5211,15 +5202,15 @@ msgstr "Pas de commentaire pour l'instant..."
 
 #: ..\..\..\evocore\_dataobject.class.php:363
 msgid "The following relations prevent deletion:"
-msgstr ""
+msgstr "Les relations suivantes empêchent la suppression:"
 
 #: ..\..\..\evocore\_dataobject.class.php:365
 msgid "Please delete related objects before you proceed."
-msgstr ""
+msgstr "Veuillez supprimer les objets liés avant de continuer."
 
 #: ..\..\..\evocore\_dataobject.class.php:388
 msgid "WARNING: Deleting this object will also delete:"
-msgstr ""
+msgstr "ATTENTION: Supprimer cet objet supprimera également:"
 
 #: ..\..\..\evocore\_dataobject.class.php:530
 #, php-format
@@ -5274,6 +5265,10 @@ msgstr "o."
 #: ..\..\..\evocore\_file.funcs.php:60
 msgid "Bytes"
 msgstr "Octets"
+
+#: ..\..\..\evocore\_file.funcs.php:63
+msgid "KB"
+msgstr "Ko"
 
 #: ..\..\..\evocore\_file.funcs.php:64
 msgid "Kilobytes"
@@ -5378,7 +5373,7 @@ msgstr "Ouvrir ce répertoire dans le gestionnaire de fichiers."
 
 #: ..\..\..\evocore\_filemanager.class.php:1027
 msgid "Directory creation is disabled"
-msgstr ""
+msgstr "La création de répertoires est désactivée."
 
 #: ..\..\..\evocore\_filemanager.class.php:1035
 msgid "File creation is disabled"
@@ -5508,17 +5503,17 @@ msgid "Select"
 msgstr "Sélectionner"
 
 #: ..\..\..\evocore\_form.class.php:479
-msgid "heures"
-msgstr ""
+msgid "hours"
+msgstr "heures"
 
 #: ..\..\..\evocore\_form.class.php:487
 msgid "minutes"
-msgstr ""
+msgstr "minutes"
 
 #: ..\..\..\evocore\_group.class.php:74
 #, php-format
 msgid "%d users in this group"
-msgstr ""
+msgstr "%d utilisateurs dans ce groupe"
 
 #: ..\..\..\evocore\_group.class.php:83
 msgid "New group"
@@ -5581,23 +5576,23 @@ msgstr "%d liens vers des objets source"
 #: ..\..\..\evocore\_item.class.php:182
 #, php-format
 msgid "%d links to child items"
-msgstr ""
+msgstr "%d liens vers des objets enfants"
 
 #: ..\..\..\evocore\_item.class.php:183
 #, php-format
 msgid "%d mission assignment embodied by this task"
-msgstr ""
+msgstr "%d assignations de mission incarnées par cette tâche"
 
 #: ..\..\..\evocore\_item.class.php:187
 #, php-format
 msgid "%d links to destination items"
-msgstr ""
+msgstr "%d liens vers des objets destination"
 
 #: ..\..\..\evocore\_item.class.php:189
 #: ..\..\..\evocore\_item.class.php:192
 #, php-format
 msgid "%d links to extra categories"
-msgstr ""
+msgstr "%d liens vers des catégories supplémentaires"
 
 #: ..\..\..\evocore\_item.class.php:193
 #, php-format
@@ -5728,12 +5723,12 @@ msgstr "Aucun plugin de formattage n'est installé."
 
 #: ..\..\..\evocore\_item.class.php:1904
 msgid "Notifying subscribed users..."
-msgstr ""
+msgstr "Notification des utilisateurs abonnés..."
 
 #: ..\..\..\evocore\_item.class.php:1916
 #, php-format
 msgid "[%s] New post: \"%s\""
-msgstr ""
+msgstr "[%s] Nouvel article: \"%s\""
 
 #: ..\..\..\evocore\_item.class.php:1927
 msgid "Content"
@@ -5833,7 +5828,7 @@ msgstr "Vous devez vous identifier!"
 
 #: ..\..\..\evocore\_misc.funcs.php:311
 msgid "Hello"
-msgstr ""
+msgstr "Bonjour"
 
 #: ..\..\..\evocore\_misc.funcs.php:593
 msgid "No response!"
@@ -6076,7 +6071,7 @@ msgstr "Abonnements"
 
 #: ..\..\..\evocore\_template.funcs.php:153
 msgid "All but "
-msgstr ""
+msgstr "Toutes sauf"
 
 #: ..\..\..\evocore\_trackback.funcs.php:59
 msgid "Sending trackbacks..."
@@ -6121,32 +6116,32 @@ msgstr "Réponse:"
 #: ..\..\..\evocore\_user.class.php:110
 #, php-format
 msgid "%d posts last edited by this user"
-msgstr ""
+msgstr "%d articles modifiés en dernier par cet utilisateur"
 
 #: ..\..\..\evocore\_user.class.php:111
 #, php-format
 msgid "%d posts assigned to this user"
-msgstr ""
+msgstr "%d articles assignés à cet utilisateur"
 
 #: ..\..\..\evocore\_user.class.php:112
 #, php-format
 msgid "%d links created by this user"
-msgstr ""
+msgstr "%d liens créés par cet utilisateur"
 
 #: ..\..\..\evocore\_user.class.php:113
 #, php-format
 msgid "%d links last edited by this user"
-msgstr ""
+msgstr "%d liens modifiés en dernier par cet utilisateur"
 
 #: ..\..\..\evocore\_user.class.php:117
 #, php-format
 msgid "%d user settings on collections"
-msgstr ""
+msgstr "%d préférences utilisateur sur des collections"
 
 #: ..\..\..\evocore\_user.class.php:118
 #, php-format
 msgid "%d sessions opened by this user"
-msgstr ""
+msgstr "%d sessions ouvertes par cet utilisateur"
 
 #: ..\..\..\evocore\_user.class.php:119
 #, php-format
@@ -6156,7 +6151,7 @@ msgstr "%d permissions utilisateur sur les blogs"
 #: ..\..\..\evocore\_user.class.php:121
 #, php-format
 msgid "%d posts created by this user"
-msgstr ""
+msgstr "%d articles créés par cet utilisateur"
 
 #: ..\..\..\evocore\_user.class.php:280
 #, php-format
@@ -6213,7 +6208,7 @@ msgstr "S'abonner (%s)"
 
 #: ..\..\..\evocore\_user.funcs.php:275
 msgid "Subscribe to email notifications"
-msgstr ""
+msgstr "S'abonner aux notifications par email"
 
 #: ..\..\..\evocore\_user.funcs.php:336
 msgid "Please enter a login."
@@ -6576,39 +6571,39 @@ msgid "You cannot reset this account in demo mode."
 msgstr "Vous ne pouvez pas réinitialisze ce compte en mode démo."
 
 #: ..\..\..\htsrv\login.php:99
-msgid "You have no email address with your profile, therefor we cannot reset your password."
-msgstr ""
+msgid "You have no email address with your profile, therefore we cannot reset your password."
+msgstr "Vous n'avez pas d'adresses email associées à votre profil, en conséquence nous ne pouvons pas réinitialiser votre mot de passe."
 
 #: ..\..\..\htsrv\login.php:100
 msgid "Please try contacting the admin."
-msgstr ""
+msgstr "Essayez de contacter l'administrateur."
 
 #: ..\..\..\htsrv\login.php:106
 msgid "Somebody (presumably you) has requested a password change for your account."
-msgstr ""
+msgstr "Quelqu'un (théoriquement vous) a fait une demande de changement de mot de passe pour votre compte."
 
 #: ..\..\..\htsrv\login.php:109
 msgid "Link to change your password:"
-msgstr ""
+msgstr "Lien pour changer votre mot de passe:"
 
 #: ..\..\..\htsrv\login.php:115
 msgid "Please note:"
-msgstr ""
+msgstr "Veuillez noter:"
 
 #: ..\..\..\htsrv\login.php:116
 #: ..\..\..\htsrv\login.php:174
 #, php-format
 msgid "For security reasons the link is only valid once for %d hours with the same IP address."
-msgstr ""
+msgstr "Pour des raisons de sécurité, le lien n'est valide qu'une seule fois en %d heures avec la même adresse IP."
 
 #: ..\..\..\htsrv\login.php:118
 msgid "If it was not you that requested this password change, simply ignore this mail."
-msgstr ""
+msgstr "Si vous n'avez pas demandé ce changement de mot de passe, vous pouvez simplement ignorer ce mail."
 
 #: ..\..\..\htsrv\login.php:120
 #, php-format
 msgid "Password change request for %s"
-msgstr ""
+msgstr "Demande de changement de mot de passe pour %s"
 
 #: ..\..\..\htsrv\login.php:122
 msgid "The email could not be sent."
@@ -6626,16 +6621,16 @@ msgstr "Un lien permettant de changer votre mot de passe a été envoyé à votre ad
 #: ..\..\..\htsrv\login.php:158
 #: ..\..\..\htsrv\login.php:173
 msgid "Invalid password change request!"
-msgstr ""
+msgstr "Demande de changement de mot de passe invalide!"
 
 #: ..\..\..\htsrv\login.php:175
 #, php-format
 msgid "You can <a href=\"%s\">send yourself a new link</a>."
-msgstr ""
+msgstr "Vous pouvez <a href=\"%s\">vous envoyez un nouveau lien</a>."
 
 #: ..\..\..\htsrv\login.php:191
 msgid "Please change your password to something you remember now."
-msgstr ""
+msgstr "Veuillez changer votre mot de passe."
 
 #: ..\..\..\htsrv\login.php:225
 #, php-format
@@ -7719,7 +7714,7 @@ msgstr "Athentification LDAP"
 
 #: ..\..\..\plugins\_ldap.plugin.php:95
 msgid "Creates users if they could be authenticated through LDAP."
-msgstr ""
+msgstr "Crée des utilisateurs dès lors qu'ils ont pu être authentifiés par LDAP."
 
 #: ..\..\..\plugins\_linklogger.plugin.php:38
 msgid "Adds all external links to the blog's Autolinkblog"
@@ -8047,7 +8042,7 @@ msgstr "Paramètres généraux"
 
 #: ..\..\..\skins\_subscriptions.php:71
 msgid "Blog subscriptions"
-msgstr ""
+msgstr "Abonnements à des blogs"
 
 #: ..\..\..\skins\basic\_bloglist.php:23
 msgid "Select blog:"
@@ -8214,13 +8209,13 @@ msgstr "Afin d'assurer une compatibilité maximale avec les fichiers CSS WP, les 
 msgid "[...] Read more!"
 msgstr "[...] Lire la suite!"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1390
-#: ..\..\..\xmlsrv\xmlrpc.php:1394
+#: ..\..\..\xmlsrv\xmlrpc.php:1392
+#: ..\..\..\xmlsrv\xmlrpc.php:1396
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Nouveau pingback sur votre article n°%d \"%s\""
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1398
+#: ..\..\..\xmlsrv\xmlrpc.php:1400
 msgid "Excerpt"
 msgstr "Extrait"
 

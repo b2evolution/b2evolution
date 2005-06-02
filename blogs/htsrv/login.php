@@ -96,7 +96,7 @@ switch( $action )
 
 				if( empty( $ForgetfulUser->email ) )
 				{
-					$Messages->add( T_('You have no email address with your profile, therefor we cannot reset your password.')
+					$Messages->add( T_('You have no email address with your profile, therefore we cannot reset your password.')
 													.' '.T_('Please try contacting the admin.') );
 				}
 				else

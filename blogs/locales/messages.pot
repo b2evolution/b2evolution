@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2005-05-26 20:21+0200\n"
+"POT-Creation-Date: 2005-05-31 20:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -511,7 +511,7 @@ msgstr ""
 #: ..\..\..\admin\_browse_posts_list.inc.php:111
 #: ..\..\..\admin\_files_browse.inc.php:251
 #: ..\..\..\admin\_files_browse.inc.php:689
-#: ..\..\..\admin\_listeditor.php:197
+#: ..\..\..\admin\_listeditor.php:190
 #: ..\..\..\admin\_set_plugins.form.php:49
 #: ..\..\..\admin\_users_list.php:166
 msgid "Actions"
@@ -1141,7 +1141,7 @@ msgstr ""
 
 #: ..\..\..\admin\b2users.php:475
 #, possible-php-format
-msgid "Group &laquo;%s&raquo;deleted."
+msgid "Group &laquo;%s&raquo; deleted."
 msgstr ""
 
 #: ..\..\..\admin\b2users.php:484
@@ -1265,7 +1265,7 @@ msgid "Deleting this blog will also delete all its categories, posts and comment
 msgstr ""
 
 #: ..\..\..\admin\blogs.php:399
-#: ..\..\..\admin\_listeditor.php:141
+#: ..\..\..\admin\_listeditor.php:134
 #: ..\..\..\evocore\_dataobject.class.php:392
 msgid "THIS CANNOT BE UNDONE!"
 msgstr ""
@@ -1282,14 +1282,14 @@ msgstr ""
 
 #: ..\..\..\admin\blogs.php:430
 #: ..\..\..\admin\files.php:467
-#: ..\..\..\admin\_listeditor.php:152
+#: ..\..\..\admin\_listeditor.php:145
 #: ..\..\..\evocore\_dataobject.class.php:400
 msgid "I am sure!"
 msgstr ""
 
 #: ..\..\..\admin\blogs.php:436
 #: ..\..\..\admin\files.php:471
-#: ..\..\..\admin\_listeditor.php:156
+#: ..\..\..\admin\_listeditor.php:149
 #: ..\..\..\evocore\_dataobject.class.php:405
 msgid "CANCEL"
 msgstr ""
@@ -1340,7 +1340,7 @@ msgstr ""
 #: ..\..\..\evocore\_user.funcs.php:372
 #: ..\..\..\htsrv\comment_post.php:61
 #: ..\..\..\htsrv\trackback.php:99
-#: ..\..\..\xmlsrv\xmlrpc.php:1360
+#: ..\..\..\xmlsrv\xmlrpc.php:1362
 msgid "Supplied URL is invalid: "
 msgstr ""
 
@@ -1468,7 +1468,7 @@ msgstr ""
 
 #: ..\..\..\admin\files.php:371
 #, possible-php-format
-msgid "&laquo;%s&raquo; could not be renamed to  &laquo;%s&raquo;"
+msgid "&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;"
 msgstr ""
 
 #: ..\..\..\admin\files.php:376
@@ -1761,8 +1761,8 @@ msgstr ""
 #: ..\..\..\admin\plugins.php:86
 #: ..\..\..\admin\_comment.form.php:52
 #: ..\..\..\admin\_files_browse.inc.php:246
-#: ..\..\..\admin\_listeditor.php:190
-#: ..\..\..\admin\_listeditor.php:232
+#: ..\..\..\admin\_listeditor.php:183
+#: ..\..\..\admin\_listeditor.php:225
 #: ..\..\..\admin\_set_regional.form.php:50
 #: ..\..\..\admin\_set_regional.form.php:162
 #: ..\..\..\admin\_users_groupform.php:67
@@ -3219,9 +3219,9 @@ msgstr ""
 
 #: ..\..\..\admin\_files_upload.inc.php:265
 #: ..\..\..\admin\_file_properties.inc.php:79
-#: ..\..\..\admin\_listeditor.php:237
-#: ..\..\..\admin\_listeditor.php:241
-#: ..\..\..\admin\_listeditor.php:242
+#: ..\..\..\admin\_listeditor.php:230
+#: ..\..\..\admin\_listeditor.php:234
+#: ..\..\..\admin\_listeditor.php:235
 #: ..\..\..\admin\_set_files.form.php:81
 #: ..\..\..\admin\_set_regional.form.php:68
 #: ..\..\..\skins\_profile.php:95
@@ -3600,13 +3600,13 @@ msgstr ""
 msgid "Entry #%d deleted."
 msgstr ""
 
-#: ..\..\..\admin\_listeditor.php:139
+#: ..\..\..\admin\_listeditor.php:132
 #, possible-php-format
 msgid "Delete entry #%d?"
 msgstr ""
 
-#: ..\..\..\admin\_listeditor.php:182
-#: ..\..\..\admin\_listeditor.php:229
+#: ..\..\..\admin\_listeditor.php:175
+#: ..\..\..\admin\_listeditor.php:222
 #: ..\..\..\admin\_users_form.php:175
 #: ..\..\..\admin\_users_groupform.php:58
 #: ..\..\..\admin\_users_list.php:101
@@ -3616,31 +3616,31 @@ msgstr ""
 msgid "ID"
 msgstr ""
 
-#: ..\..\..\admin\_listeditor.php:193
+#: ..\..\..\admin\_listeditor.php:186
 msgid "Edit this entry..."
 msgstr ""
 
-#: ..\..\..\admin\_listeditor.php:198
+#: ..\..\..\admin\_listeditor.php:191
 msgid "Edit..."
 msgstr ""
 
-#: ..\..\..\admin\_listeditor.php:200
+#: ..\..\..\admin\_listeditor.php:193
 msgid "Duplicate..."
 msgstr ""
 
-#: ..\..\..\admin\_listeditor.php:202
+#: ..\..\..\admin\_listeditor.php:195
 msgid "Delete!"
 msgstr ""
 
-#: ..\..\..\admin\_listeditor.php:222
+#: ..\..\..\admin\_listeditor.php:215
 msgid "New entry"
 msgstr ""
 
-#: ..\..\..\admin\_listeditor.php:222
+#: ..\..\..\admin\_listeditor.php:215
 msgid "Edit entry"
 msgstr ""
 
-#: ..\..\..\admin\_listeditor.php:236
+#: ..\..\..\admin\_listeditor.php:229
 msgid "Record"
 msgstr ""
 
@@ -3723,8 +3723,7 @@ msgid "Maximal allowed filesize"
 msgstr ""
 
 #: ..\..\..\admin\_set_files.form.php:61
-#: ..\..\..\evocore\_file.funcs.php:63
-msgid "KB"
+msgid "KB (This cannot be higher than your PHP/Webserver setting!)"
 msgstr ""
 
 #: ..\..\..\admin\_set_files.form.php:70
@@ -4532,14 +4531,6 @@ msgstr ""
 msgid "Delete this group!"
 msgstr ""
 
-#: ..\..\..\admin\_users_list.php:156
-msgid "Decrease user level"
-msgstr ""
-
-#: ..\..\..\admin\_users_list.php:160
-msgid "Increase user level"
-msgstr ""
-
 #: ..\..\..\admin\_users_list.php:167
 msgid "Edit this user..."
 msgstr ""
@@ -5151,14 +5142,14 @@ msgid "Post"
 msgstr ""
 
 #: ..\..\..\evocore\_comment.class.php:586
-#: ..\..\..\xmlsrv\xmlrpc.php:1396
+#: ..\..\..\xmlsrv\xmlrpc.php:1398
 msgid "Website"
 msgstr ""
 
 #: ..\..\..\evocore\_comment.class.php:587
 #: ..\..\..\evocore\_comment.class.php:600
 #: ..\..\..\evocore\_item.class.php:1925
-#: ..\..\..\xmlsrv\xmlrpc.php:1397
+#: ..\..\..\xmlsrv\xmlrpc.php:1399
 msgid "Url"
 msgstr ""
 
@@ -5168,7 +5159,7 @@ msgstr ""
 
 #: ..\..\..\evocore\_comment.class.php:609
 #: ..\..\..\evocore\_item.class.php:1932
-#: ..\..\..\xmlsrv\xmlrpc.php:1399
+#: ..\..\..\xmlsrv\xmlrpc.php:1401
 msgid "Edit/Delete"
 msgstr ""
 
@@ -5246,6 +5237,10 @@ msgstr ""
 
 #: ..\..\..\evocore\_file.funcs.php:60
 msgid "Bytes"
+msgstr ""
+
+#: ..\..\..\evocore\_file.funcs.php:63
+msgid "KB"
 msgstr ""
 
 #: ..\..\..\evocore\_file.funcs.php:64
@@ -5481,7 +5476,7 @@ msgid "Select"
 msgstr ""
 
 #: ..\..\..\evocore\_form.class.php:479
-msgid "heures"
+msgid "hours"
 msgstr ""
 
 #: ..\..\..\evocore\_form.class.php:487
@@ -6541,7 +6536,7 @@ msgid "You cannot reset this account in demo mode."
 msgstr ""
 
 #: ..\..\..\htsrv\login.php:99
-msgid "You have no email address with your profile, therefor we cannot reset your password."
+msgid "You have no email address with your profile, therefore we cannot reset your password."
 msgstr ""
 
 #: ..\..\..\htsrv\login.php:100
@@ -8095,12 +8090,12 @@ msgstr ""
 msgid "[...] Read more!"
 msgstr ""
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1390
-#: ..\..\..\xmlsrv\xmlrpc.php:1394
+#: ..\..\..\xmlsrv\xmlrpc.php:1392
+#: ..\..\..\xmlsrv\xmlrpc.php:1396
 #, possible-php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr ""
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1398
+#: ..\..\..\xmlsrv\xmlrpc.php:1400
 msgid "Excerpt"
 msgstr ""

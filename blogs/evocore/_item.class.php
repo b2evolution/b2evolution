@@ -146,6 +146,10 @@ class Item extends DataObject
 	 */
 	var $Links = NULL;
 
+
+	var $priorities;
+
+
 	/**
 	 * Constructor
 	 *
@@ -166,6 +170,14 @@ class Item extends DataObject
 												$creator_field = 'creator_user_ID', $lasteditor_field = '' )
 	{
 		global $UserCache, $object_def, $localtimenow;
+
+		$this->priorities = array(
+							1 => T_('1 - Highest'),
+							2 => T_('2 - High'),
+							3 => T_('3 - Medium'),
+							4 => T_('4 - Low'),
+							5 => T_('5 - Lowest')
+					);
 
 		// Dereference db cols definition for this object:
 		$db_cols =  & $object_def[$objtype]['db_cols'];
@@ -1300,15 +1312,9 @@ class Item extends DataObject
 	 */
 	function priority_options()
 	{
-		$priorities = array(	1 => T_('1 - Highest'),
-													2 => T_('2 - High'),
-													3 => T_('3 - Medium'),
-													4 => T_('4 - Low'),
-													5 => T_('5 - Lowest') );
-
 		$r = '';
 
-		foreach( $priorities as $i => $name )
+		foreach( $this->priorities as $i => $name )
 		{
 			$r .= '<option value="'.$i.'"';
 			if( $this->priority == $i )
@@ -1437,7 +1443,7 @@ class Item extends DataObject
 		}
 		else
 		{
-			echo format_to_output( T_( $post_statuses[$this->status] ), $format );
+			echo format_to_output( $this->get('t_status'), $format );
 		}
 	}
 
@@ -1453,23 +1459,13 @@ class Item extends DataObject
 	 */
 	function extra_status( $before = '', $after = '', $format = 'htmlbody' )
 	{
-		global $itemStatusCache, $object_def;
-
-		if( ! ($Element = $itemStatusCache->get_by_ID( $this->st_ID, true,
-					/* Do we allow NULL statuses for this object?: */ !$object_def[$this->objtype]['allow_null']['st_ID'] ) ) )
-		{ // No status:
-			return;
-		}
-
-		$extra_status = $Element->get('name');
-
 		if( $format == 'raw' )
 		{
-			$this->disp( $extra_status, 'raw' );
+			$this->disp( $this->get('t_extra_status'), 'raw' );
 		}
 		else
 		{
-			echo $before.format_to_output( T_( $extra_status ), $format ).$after;
+			echo $before.format_to_output( $this->get('t_extra_status'), $format ).$after;
 		}
 	}
 
@@ -1946,10 +1942,50 @@ class Item extends DataObject
 
 		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
 	}
+
+
+	/**
+	 * Get a member param by its name
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		global $itemTypeCache, $itemStatusCache, $object_def, $post_statuses;
+
+		switch( $parname )
+		{
+			case 't_status':
+				// Text status:
+				return T_( $post_statuses[$this->status] );
+
+			case 't_extra_status':
+				if( ! ($Element = $itemStatusCache->get_by_ID( $this->st_ID, true,
+							/* Do we allow NULL statuses for this object?: */ !$object_def[$this->objtype]['allow_null']['st_ID'] ) ) )
+				{ // No status:
+					return '';
+				}
+				return $Element->name_return();
+
+			case 't_type':
+				// Item type (name):
+     		$type_Element = & $itemTypeCache->get_by_ID( $this->typ_ID );
+				return $type_Element->name_return();
+
+			case 't_priority':
+				return $this->priorities[ $this->priority ];
+		}
+
+		return parent::get( $parname );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.42  2005/06/02 18:50:52  fplanque
+ * no message
+ *
  * Revision 1.41  2005/05/26 19:11:11  fplanque
  * no message
  *

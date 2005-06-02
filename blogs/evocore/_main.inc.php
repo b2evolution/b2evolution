@@ -166,7 +166,7 @@ require_once dirname(__FILE__).'/_db.class.php';
  */
 $DB = new DB( $EvoConfig->DB['user'], $EvoConfig->DB['password'], $EvoConfig->DB['name'], $EvoConfig->DB['host'], $db_aliases, $db_use_transactions, $db_table_options );
 
-require_once dirname(__FILE__).'/_results.class.php';
+require_once dirname(__FILE__).'/_resultsel.class.php';
 
 
 /**#@+
@@ -502,6 +502,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.36  2005/06/02 18:50:52  fplanque
+ * no message
+ *
  * Revision 1.35  2005/05/13 18:41:28  fplanque
  * made file links clickable... finally ! :P
  *

@@ -153,11 +153,11 @@ else
 						'td_start' => '<td class="right">',
 						'order' => 'user_level',
 						'td' => '¤conditional( (#user_level# > 0), \''
-											.action_icon( T_('Decrease user level'), 'arrow_down',
+											.action_icon( TS_('Decrease user level'), 'arrow_down',
 												'%regenerate_url( \'action\', \'action=promote&amp;prom=down&amp;id=$ID$\' )%' ).'\' )¤'
 										.'$user_level$ '
 										.'¤conditional( (#user_level# < 10), \''
-											.action_icon( T_('Increase user level'), 'arrow_up',
+											.action_icon( TS_('Increase user level'), 'arrow_up',
 												'%regenerate_url( \'action\', \'action=promote&amp;prom=up&amp;id=$ID$\' )%' ).'\' )¤',
 					);
 
@@ -184,6 +184,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.47  2005/06/02 18:50:52  fplanque
+ * no message
+ *
  * Revision 1.46  2005/05/24 15:26:51  fplanque
  * cleanup
  *
