@@ -281,14 +281,14 @@ class FileManager extends Filelist
 
 				if( ! preg_match( '#^'.$this->_ads_root_path.'#', $_ads_real_list_path ) )
 				{ // cwd is not below root!
-					$Messages->add( T_( 'You are not allowed to go outside your root directory!' ) );
+					$Messages->add( T_( 'You are not allowed to go outside your root directory!' ), 'error' );
 					$this->_ads_list_path = $this->_ads_root_path;
 				}
 				else
 				{ // allowed
 					if( !$realpath_exists )
 					{ // does not exist
-						$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $this->_ads_list_path ) );
+						$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $this->_ads_list_path ), 'error' );
 						$this->_ads_list_path = NULL;
 					}
 					else
@@ -394,7 +394,7 @@ class FileManager extends Filelist
 
 		if( $this->_filter_is_regexp && !isRegexp( $filterString ) )
 		{
-			$Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $filterString ) );
+			$Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $filterString ), 'error' );
 			$filterString = '.*';
 		}
 
@@ -1024,7 +1024,7 @@ class FileManager extends Filelist
 		{
 			if( !$Settings->get( 'fm_enable_create_dir' ) )
 			{	// Directory creation is gloablly disabled:
-				$Messages->add( T_('Directory creation is disabled') );
+				$Messages->add( T_('Directory creation is disabled'), 'error' );
 				return false;
 			}
 		}
@@ -1032,7 +1032,7 @@ class FileManager extends Filelist
 		{
 			if( !$Settings->get( 'fm_enable_create_file' ) )
 			{	// File creation is gloablly disabled:
-				$Messages->add( T_('File creation is disabled') );
+				$Messages->add( T_('File creation is disabled'), 'error' );
 				return false;
 			}
 		}
@@ -1043,16 +1043,16 @@ class FileManager extends Filelist
 
 		if( empty($name) )
 		{	// No name was supplied:
-			$Messages->add( $type == 'dir' ?
+			$Messages->add( ($type == 'dir' ?
 														T_('Cannot create a directory without name.') :
-														T_('Cannot create a file without name.') );
+														T_('Cannot create a file without name.') ), 'error' );
 			return false;
 		}
 		elseif( !isFilename($name) )
 		{
 			$Messages->add( sprintf( ($type == 'dir' ?
 																			T_('&laquo;%s&raquo; is not a valid directory.') :
-																			T_('&laquo;%s&raquo; is not a valid filename.') ), $name) );
+																			T_('&laquo;%s&raquo; is not a valid filename.') ), $name), 'error' );
 			return false;
 		}
 
@@ -1061,7 +1061,7 @@ class FileManager extends Filelist
 
 		if( $newFile->exists() )
 		{
-			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $name ) );
+			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $name ), 'error' );
 			return false;
 		}
 
@@ -1070,11 +1070,11 @@ class FileManager extends Filelist
 		{
 			if( $type == 'file' )
 			{
-				$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been created.'), $name ), 'note' );
+				$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been created.'), $name ), 'success' );
 			}
 			else
 			{
-				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been created.'), $name ), 'note' );
+				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been created.'), $name ), 'success' );
 			}
 
 			$this->add( $newFile );
@@ -1083,11 +1083,11 @@ class FileManager extends Filelist
 		{
 			if( $type == 'file' )
 			{
-				$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $this->_rds_list_path ) );
+				$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $this->_rds_list_path ), 'error' );
 			}
 			else
 			{
-				$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $this->_rds_list_path ) );
+				$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $name, $this->_rds_list_path ), 'error' );
 			}
 		}
 
@@ -1272,11 +1272,11 @@ class FileManager extends Filelist
 			if( $unlinked = deldir_recursive( $File->get_full_path() ) )
 			{
 				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'), 
-															$File->get_name() ), 'note' );
+															$File->get_name() ), 'success' );
 			}
 			else
 			{
-				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'), $File->get_name() ) );
+				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'), $File->get_name() ), 'error' );
 			}
 			$this->load(); // Reload!
 		}
@@ -1285,8 +1285,7 @@ class FileManager extends Filelist
 			$Messages->add( sprintf( ( $File->is_dir() ?
 																					T_('The directory &laquo;%s&raquo; has been deleted.') :
 																					T_('The file &laquo;%s&raquo; has been deleted.') ),
-																			$File->get_name() ),
-														'note' );
+																			$File->get_name() ), 'success' );
 			$this->remove( $File );
 		}
 		else
@@ -1294,7 +1293,7 @@ class FileManager extends Filelist
 			$Messages->add( sprintf( ( $File->is_dir() ?
 																				T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') :
 																				T_('Could not delete the file &laquo;%s&raquo;.') ),
-																				$File->get_name() ) );
+																				$File->get_name() ), 'error' );
 		}
 
 		return $unlinked;
@@ -1352,6 +1351,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.47  2005/06/03 15:12:33  fplanque
+ * error/info message cleanup
+ *
  * Revision 1.46  2005/05/24 15:26:52  fplanque
  * cleanup
  *

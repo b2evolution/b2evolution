@@ -145,7 +145,7 @@ switch( $action )
 		}
 		else
 		{
-			$Messages->add( T_('Category deleted.'), 'note' );
+			$Messages->add( T_('Category deleted.'), 'success' );
 		}
 		echo "</div>\n";
 		break;
@@ -340,6 +340,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.44  2005/06/03 15:12:30  fplanque
+ * error/info message cleanup
+ *
  * Revision 1.43  2005/05/10 18:35:37  fplanque
  * refactored/normalized category handling
  * (though there's still a lot to do before this gets as clean as desired...)

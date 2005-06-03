@@ -104,7 +104,7 @@ switch($action)
 		$post_title = format_to_post($post_title,0,0);
 		if( $error = validate_url( $post_url, $allowed_uri_scheme ) )
 		{
-			$Messages->add( T_('Supplied URL is invalid: ').$error );
+			$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 		}
 		$content = format_to_post( $content );
 
@@ -210,7 +210,7 @@ switch($action)
 		$post_title = format_to_post( $post_title, 0, 0 );
 		if( $error = validate_url( $post_url, $allowed_uri_scheme ) )
 		{
-			$Messages->add( T_('Supplied URL is invalid: ').$error );
+			$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 		}
 		$content = format_to_post( $content );
 
@@ -435,7 +435,7 @@ switch($action)
 		// CHECK and FORMAT content
 		if( $error = validate_url( $newcomment_author_url, $allowed_uri_scheme ) )
 		{
-			$Messages->add( T_('Supplied URL is invalid: ').$error );
+			$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 		}
 		$content = format_to_post( $content, $post_autobr, 0); // We are faking this NOT to be a comment
 

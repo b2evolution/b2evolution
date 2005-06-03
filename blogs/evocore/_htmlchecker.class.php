@@ -243,7 +243,7 @@ class SafeHtmlChecker
 	{
 		global $Messages;
 		$this->error = true;
-		$Messages->add( $string );
+		$Messages->add( $string, 'error' );
 	}
 
 	/**
@@ -258,6 +258,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.5  2005/06/03 15:12:33  fplanque
+ * error/info message cleanup
+ *
  * Revision 1.4  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

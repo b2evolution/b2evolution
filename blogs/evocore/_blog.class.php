@@ -362,7 +362,7 @@ class Blog extends DataObject
 			}
 			else
 			{ // add note
-				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $mediadir, '777' ), 'note' );
+				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $mediadir, '777' ), 'success' );
 			}
 		}
 
@@ -696,6 +696,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2005/06/03 15:12:32  fplanque
+ * error/info message cleanup
+ *
  * Revision 1.21  2005/06/02 18:50:52  fplanque
  * no message
  *

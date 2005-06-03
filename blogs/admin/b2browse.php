@@ -20,7 +20,8 @@ $blog = autoselect_blog( param( 'blog', 'integer', 0 ), 'blog_ismember', 1 );
 
 if( ! $blog  )
 { // No blog could be selected
-	$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'. $admin_email. '?subject=b2-promotion"' ) );
+	$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'),
+									 'href="mailto:'. $admin_email. '?subject=b2-promotion"' ), 'error' );
 }
 else
 { // We could select a valid blog which we have permission to access:

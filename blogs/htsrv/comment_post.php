@@ -27,7 +27,7 @@ $commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
 
 if( ! $commented_Item->can_comment( '', '', '', '' ) )
 {
-	$Messages->add( T_('You cannot leave comments on this post!') );
+	$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
 }
 
 param( 'comment' , 'html' );
@@ -42,13 +42,13 @@ if( ! is_logged_in() )
 
 	if ($require_name_email)
 	{ // Blog wants Name and EMail with comments
-		if( empty($author) ) $Messages->add( T_('Please fill in the name field') );
-		if( empty($email) ) $Messages->add( T_('Please fill in the email field') );
+		if( empty($author) ) $Messages->add( T_('Please fill in the name field'), 'error' );
+		if( empty($email) ) $Messages->add( T_('Please fill in the email field'), 'error' );
 	}
 
 	if( (!empty($email)) && (!is_email($email)) )
 	{
-		$Messages->add( T_('Supplied email address is invalid') );
+		$Messages->add( T_('Supplied email address is invalid'), 'error' );
 	}
 
 	// add 'http://' if no protocol defined for URL
@@ -58,7 +58,7 @@ if( ! is_logged_in() )
 	}
 	if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
 	{
-		$Messages->add( T_('Supplied URL is invalid: ') . $error );
+		$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 	}
 }
 
@@ -72,7 +72,7 @@ $comment = format_to_post($original_comment, $comment_autobr, 1);
 
 if( empty($comment) )
 { // comment should not be empty!
-	$Messages->add( T_('Please do not send empty comment') );
+	$Messages->add( T_('Please do not send empty comment'), 'error' );
 }
 
 
@@ -92,7 +92,7 @@ if( $then = $DB->get_var( $query ) )
 }
 if( !$ok )
 {
-	$Messages->add( sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ) );
+	$Messages->add( sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ), 'error' );
 }
 /* end flood-protection */
 

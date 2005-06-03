@@ -77,7 +77,7 @@ switch( $action )
 
 		if( $UserCache->get_by_login( $login ) )
 		{ // The login is already registered
-			$Messages->add( sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ) );
+			$Messages->add( sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ), 'error' );
 			break;
 		}
 

@@ -59,7 +59,6 @@ switch( $action )
 		param( 'submit', 'string', '' );
 		if( $submit == T_('Restore defaults') )
 		{
-			$Messages->add( 'Restoring default values.', 'note' );
 			$Settings->deleteArray( array( 'fm_enabled',
 																			'fm_enable_roots_blog',
 																			// 'fm_enable_roots_group',
@@ -70,6 +69,7 @@ switch( $action )
 																			'upload_allowedext',
 																			'upload_maxkb',
 																			'regexp_filename' ) );
+			$Messages->add( T_('Restored default values.'), 'success' );
 		}
 		else
 		{
@@ -91,7 +91,7 @@ switch( $action )
 			param( 'regexp_filename', 'string', '' );
 			if( !isRegexp( $regexp_filename ) )
 			{
-				$Messages->add( sprintf( '&laquo;%s&raquo; is not a regular expression!', $regexp_filename ) );
+				$Messages->add( sprintf( T_('&laquo;%s&raquo; is not a regular expression!'), $regexp_filename ), 'error' );
 			}
 			else
 			{
@@ -102,7 +102,7 @@ switch( $action )
 
 		if( $Settings->updateDB() )
 		{
-			$Messages->add( T_('File settings updated.'), 'note' );
+			$Messages->add( T_('File settings updated.'), 'success' );
 		}
 
 		break;

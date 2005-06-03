@@ -282,7 +282,7 @@ class User extends DataObject
 			}
 			else
 			{ // add note
-				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; has been created with permissions %s."), $userdir, '777' ), 'note' );
+				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; has been created with permissions %s."), $userdir, '777' ), 'success' );
 			}
 		}
 		return $userdir;
@@ -879,6 +879,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2005/06/03 15:12:33  fplanque
+ * error/info message cleanup
+ *
  * Revision 1.32  2005/05/25 17:13:33  fplanque
  * implemented email notifications on new comments/trackbacks
  *

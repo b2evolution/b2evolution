@@ -95,7 +95,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 
 			if( $Settings->updateDB() )
 			{
-				$Messages->add( T_('General settings updated.'), 'note' );
+				$Messages->add( T_('General settings updated.'), 'success' );
 			}
 
 			break;
@@ -114,7 +114,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 					$Settings->set( 'time_difference', $newtime_difference );
 					$Settings->updateDB();
 
-					$Messages->add( T_('Regional settings updated.'), 'note' );
+					$Messages->add( T_('Regional settings updated.'), 'success' );
 					break;
 
 
@@ -143,7 +143,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 																		WHERE loc_locale = "'.$oldloc_locale.'"' );
 								if( mysql_affected_rows() )
 								{
-									$Messages->add( sprintf(T_('Deleted settings for locale &laquo;%s&raquo; in database.'), $oldloc_locale), 'note' );
+									$Messages->add( sprintf(T_('Deleted settings for locale &laquo;%s&raquo; in database.'), $oldloc_locale), 'success' );
 								}
 							}
 						}
@@ -159,12 +159,12 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 							if( $oldloc_locale != $newloc_locale )
 							{ // disable old locale
 								$query .= ' 0)';
-								$Messages->add( sprintf(T_('Inserted (and disabled) locale &laquo;%s&raquo; into database.'), $oldloc_locale), 'note' );
+								$Messages->add( sprintf(T_('Inserted (and disabled) locale &laquo;%s&raquo; into database.'), $oldloc_locale), 'success' );
 							}
 							else
 							{ // keep old state
 								$query .= ' '.$locales[$oldloc_locale]['enabled'].')';
-								$Messages->add( sprintf(T_('Inserted locale &laquo;%s&raquo; into database.'), $oldloc_locale), 'note' );
+								$Messages->add( sprintf(T_('Inserted locale &laquo;%s&raquo; into database.'), $oldloc_locale), 'success' );
 							}
 							$q = $DB->query($query);
 						}
@@ -175,7 +175,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 										VALUES ( '$newloc_locale', '$newloc_charset', '$newloc_datefmt',
 										'$newloc_timefmt', '$newloc_startofweek', '$newloc_name', '$newloc_messages', '1', '$newloc_enabled')";
 					$q = $DB->query($query);
-					$Messages->add( sprintf(T_('Saved locale &laquo;%s&raquo;.'), $newloc_locale), 'note' );
+					$Messages->add( sprintf(T_('Saved locale &laquo;%s&raquo;.'), $newloc_locale), 'success' );
 
 					// reload locales: an existing one could have been renamed
 					unset( $locales );
@@ -204,7 +204,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 					$Settings->set( 'default_locale', $default_locale );
 					$Settings->updateDB();
 
-					$Messages->add( T_('Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded.'), 'note' );
+					$Messages->add( T_('Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded.'), 'success' );
 					break;
 
 
@@ -341,7 +341,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 					// --- DELETE locale from DB
 					if( $DB->query( 'DELETE FROM T_locales WHERE loc_locale = "'.$DB->escape( $edit_locale ).'"' ) )
 					{
-						$Messages->add( sprintf(T_('Deleted locale &laquo;%s&raquo; from database.'), $edit_locale), 'note' );
+						$Messages->add( sprintf(T_('Deleted locale &laquo;%s&raquo; from database.'), $edit_locale), 'success' );
 					}
 
 					// reload locales
@@ -388,7 +388,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 								( '$lswitchwith', '{$locales[ $lswitchwith ]['charset']}', '{$locales[ $lswitchwith ]['datefmt']}', '{$locales[ $lswitchwith ]['timefmt']}', '{$locales[ $lswitchwith ]['name']}', '{$locales[ $lswitchwith ]['messages']}', '{$locales[ $lswitchwith ]['priority']}', '{$locales[ $lswitchwith ]['enabled']}')";
 							$q = $DB->query( $query );
 
-							$Messages->add( T_('Switched priorities.'), 'note' );
+							$Messages->add( T_('Switched priorities.'), 'success' );
 						}
 
 					}
@@ -426,6 +426,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.92  2005/06/03 15:12:31  fplanque
+ * error/info message cleanup
+ *
  * Revision 1.91  2005/03/16 19:58:14  fplanque
  * small AdminUI cleanup tasks
  *

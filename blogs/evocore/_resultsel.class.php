@@ -467,7 +467,7 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 											.' AND '.$sel_table_item.' IN ('.$item_ID_list.')'; // deletion of the former db entries
 				$DB->query( $sql_delete );
 
-				$Messages->add( T_('Obsolete selection entries deleted'), 'note' );
+				$Messages->add( T_('Obsolete selection entries deleted'), 'success' );
 			}
 
 			if( !empty( $items ) )
@@ -482,7 +482,7 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 				$sql_sel .= implode( $sel_array, ',' );
 				$DB->query( $sql_sel ); // insertion of the relation between selections and items in the database
 
-				$Messages->add( T_('New selections entries inserted'), 'note' );
+				$Messages->add( T_('New selections entries inserted'), 'success' );
 			}
 
 			$DB->commit();
@@ -494,7 +494,7 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 			$sql_selections = 'INSERT INTO '.$selections_table.'('.$selections_table_name.
 												') VALUES( "'.$selection_name.'" )';
 			$DB->query( $sql_selections );
-			$Messages->add( T_('Selection copied'), 'note' );
+			$Messages->add( T_('Selection copied'), 'success' );
 
 			$new_selection_ID = mysql_insert_id();// gets the new selection id
 
@@ -503,7 +503,7 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 								 .'SELECT '.$sel_table_item.', '.$new_selection_ID.' FROM '.$sel_table.' WHERE '
 												.$sel_table_selection.'='.$selection_ID;
 			$DB->query( $sql_sel );
-			$Messages->add( T_('Selection links copied'), 'note' );
+			$Messages->add( T_('Selection links copied'), 'success' );
 
 			$selection_ID = $new_selection_ID;
 
@@ -551,11 +551,11 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 			{ // the deletion has been confermed
 				$sql_sel = 'DELETE FROM '.$sel_table.' WHERE '.$sel_table_selection.'='.$selection_ID;
 				$DB->query( $sql_sel );// deletion of the links between the selection and the selected items
-				$Messages->add( T_('Selection attachments deleted'), 'note' );
+				$Messages->add( T_('Selection attachments deleted'), 'success' );
 
 				$sql_selections = 'DELETE FROM '.$selections_table.' WHERE '.$selections_table_id.'='.$selection_ID;
 				$DB->query( $sql_selections );// deletion of the selection
-				$Messages->add( T_('Selection deleted'), 'note' );
+				$Messages->add( T_('Selection deleted'), 'success' );
 			}
 
 			$selection_ID = -1;
@@ -573,6 +573,9 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
 /*
  * $Log$
+ * Revision 1.2  2005/06/03 15:12:33  fplanque
+ * error/info message cleanup
+ *
  * Revision 1.1  2005/06/02 18:50:53  fplanque
  * no message
  *

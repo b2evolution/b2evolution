@@ -333,13 +333,13 @@ function profile_check_params( $params )
 	// checking login has been typed:
 	if( isset($params['login']) && empty($params['login']) )
 	{
-		$Messages->add( T_('Please enter a login.') );
+		$Messages->add( T_('Please enter a login.'), 'error' );
 	}
 
 	// checking the nickname has been typed
 	if( isset($params['nickname']) && empty($params['nickname']) )
 	{
-		$Messages->add( T_('Please enter a nickname (can be the same as your login).') );
+		$Messages->add( T_('Please enter a nickname (can be the same as your login).'), 'error' );
 	}
 
 	// if the ICQ UIN has been entered, check to see if it has only numbers
@@ -347,7 +347,7 @@ function profile_check_params( $params )
 	{
 		if( !preg_match( '#^[0-9]+$#', $params['icq']) )
 		{
-			$Messages->add( T_('The ICQ UIN can only be a number, no letters allowed.') );
+			$Messages->add( T_('The ICQ UIN can only be a number, no letters allowed.'), 'error' );
 		}
 	}
 
@@ -356,11 +356,11 @@ function profile_check_params( $params )
 	{
 		if( empty($params['email']) )
 		{
-			$Messages->add( T_('Please enter an e-mail address.') );
+			$Messages->add( T_('Please enter an e-mail address.'), 'error' );
 		}
 		elseif( !is_email($params['email']) )
 		{
-			$Messages->add( T_('The email address is invalid.') );
+			$Messages->add( T_('The email address is invalid.'), 'error' );
 		}
 	}
 
@@ -369,7 +369,7 @@ function profile_check_params( $params )
 	{
 		if( $error = validate_url( $params['url'], $comments_allowed_uri_scheme ) )
 		{
-			$Messages->add( T_('Supplied URL is invalid: ') . $error );
+			$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 		}
 	}
 
@@ -384,18 +384,18 @@ function profile_check_params( $params )
 			// checking the password has been typed twice
 			if( empty($params['pass1']) || empty($params['pass2']) )
 			{
-				$Messages->add( T_('Please enter your password twice.') );
+				$Messages->add( T_('Please enter your password twice.'), 'error' );
 			}
 
 			// checking the password has been typed twice the same:
 			if( $params['pass1'] != $params['pass2'] )
 			{
-				$Messages->add( T_('You typed two different passwords.') );
+				$Messages->add( T_('You typed two different passwords.'), 'error' );
 			}
 			elseif( strlen($params['pass1']) < $Settings->get('user_minpwdlen')
 							|| strlen($params['pass2']) < $Settings->get('user_minpwdlen') )
 			{
-				$Messages->add( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen')) );
+				$Messages->add( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen')), 'error' );
 			}
 		}
 	}
@@ -403,6 +403,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.24  2005/06/03 15:12:33  fplanque
+ * error/info message cleanup
+ *
  * Revision 1.23  2005/05/24 18:46:26  fplanque
  * implemented blog email subscriptions (part 1)
  *

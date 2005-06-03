@@ -65,7 +65,7 @@ switch( $action )
 		$DB->query( "INSERT INTO $edited_table( $edited_table_namecol )
 									VALUES( ".$DB->quote($name).' )' );
 
-		$Messages->add( T_('Entry created.'), 'note' );
+		$Messages->add( T_('Entry created.'), 'success' );
 		unset( $ID );
 		$name = '';
 		break;
@@ -80,7 +80,7 @@ switch( $action )
 										SET $edited_table_namecol = ".$DB->quote($name)."
 									WHERE	$edited_table_IDcol = $ID" );
 
-		$Messages->add( sprintf( T_('Entry #%d updated.'), $ID ), 'note' );
+		$Messages->add( sprintf( T_('Entry #%d updated.'), $ID ), 'success' );
 		unset( $ID );
 		$name = '';
 		break;
@@ -103,7 +103,7 @@ switch( $action )
 			}
 			else
 			{
-				$Messages->add( sprintf( T_('Entry #%d deleted.'), $ID ), 'note' );
+				$Messages->add( sprintf( T_('Entry #%d deleted.'), $ID ), 'success' );
 			}
 			unset( $ID );
 			$action = 'list';

@@ -80,7 +80,7 @@ switch( $action )
 
 		if( $demo_mode && ($login == 'demouser' || $login == 'admin') )
 		{
-			$Messages->add( T_('You cannot reset this account in demo mode.') );
+			$Messages->add( T_('You cannot reset this account in demo mode.'), 'error' );
 		}
 		else
 		{
@@ -97,7 +97,7 @@ switch( $action )
 				if( empty( $ForgetfulUser->email ) )
 				{
 					$Messages->add( T_('You have no email address with your profile, therefore we cannot reset your password.')
-													.' '.T_('Please try contacting the admin.') );
+													.' '.T_('Please try contacting the admin.'), 'error' );
 				}
 				else
 				{
@@ -120,7 +120,7 @@ switch( $action )
 					if( !send_mail( $ForgetfulUser->email, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
 					{
 						$Messages->add( T_('The email could not be sent.')
-														.'<br />'.T_('Possible reason: your host may have disabled the mail() function...') );
+														.'<br />'.T_('Possible reason: your host may have disabled the mail() function...'), 'error' );
 					}
 					else
 					{
@@ -155,7 +155,7 @@ switch( $action )
 
 		if( !$ForgetfulUser || empty($reqId) )
 		{ // This was not requested
-			$Messages->add( T_('Invalid password change request!') );
+			$Messages->add( T_('Invalid password change request!'), 'error' );
 			break;
 		}
 
@@ -171,9 +171,9 @@ switch( $action )
 				|| !isset($verifyData['time']) || $verifyData['time'] < ( $servertimenow - 7200 ) )
 		{
 			$Messages->add( sprintf( T_('Invalid password change request!')
-																.' '.T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 ) );
+																.' '.T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 ), 'error' );
 			$Messages->add( sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
-																$htsrv_url.'login.php?action=retrievepassword&amp;login='.$login.'&amp;redirect_to='.urlencode( $redirect_to ) ) );
+																$htsrv_url.'login.php?action=retrievepassword&amp;login='.$login.'&amp;redirect_to='.urlencode( $redirect_to ) ), 'note' );
 			break;
 		}
 

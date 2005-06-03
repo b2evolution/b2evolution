@@ -124,7 +124,7 @@ if( $action == 'update_settings' )
 
 	if( $UserSettings->updateDB() )
 	{
-		$Messages->add( T_('Your user settings have been updated.'), 'note' );
+		$Messages->add( T_('Your user settings have been updated.'), 'success' );
 	}
 
 	$action = '';
@@ -204,7 +204,7 @@ switch( $action )
 {
 	case 'open_in_new_windows':
 		// catch JS-only actions
-		$Messages->add( T_('You have to enable JavaScript to use this feature.') );
+		$Messages->add( T_('You have to enable JavaScript to use this feature.'), 'error' );
 		break;
 
 
@@ -224,7 +224,7 @@ switch( $action )
 		// TODO: implement
 		if( !$selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.') );
+			$Messages->add( T_('Nothing selected.'), 'error' );
 			break;
 		}
 
@@ -239,7 +239,7 @@ switch( $action )
 
 		if( !$selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.') );
+			$Messages->add( T_('Nothing selected.'), 'error' );
 			break;
 		}
 
@@ -298,7 +298,7 @@ switch( $action )
 			$zipfile->create_archive();
 			$zipfile->download_file();
 			exit;
-			#$Messages->add( sprintf(T_('Zipfile &laquo;%s&raquo; sent to you!'), $zipname), 'note' );
+			#$Messages->add( sprintf(T_('Zipfile &laquo;%s&raquo; sent to you!'), $zipname), 'success' );
 		}
 
 		break;
@@ -308,14 +308,14 @@ switch( $action )
 		// Rename a file:
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{	// We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.') );
+			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
 			break;
 		}
 
 		if( ! $selected_Filelist->count() )
 		{	// There is nothing to rename
-			$Messages->add( T_('Nothing selected.') );
+			$Messages->add( T_('Nothing selected.'), 'error' );
 			$action = 'list';
 			break;
 		}
@@ -390,7 +390,7 @@ switch( $action )
 		// delete a file/dir
 		if( ! $selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.') );
+			$Messages->add( T_('Nothing selected.'), 'error' );
 			break;
 		}
 
@@ -532,7 +532,7 @@ switch( $action )
 		// Link File to Item:
 		if( !$selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.') );
+			$Messages->add( T_('Nothing selected.'), 'error' );
 			break;
 		}
 
@@ -559,7 +559,7 @@ switch( $action )
 
 		$DB->commit();
 
-		$Messages->add( T_('Selected file has been linked to item.'), 'note' );
+		$Messages->add( T_('Selected file has been linked to item.'), 'success' );
 		break;
 
 
@@ -580,7 +580,7 @@ switch( $action )
 		$msg = sprintf( T_('Link from &laquo;%s&raquo; deleted.'), $edited_Link->Item->dget('title') );
 		$edited_Link->dbdelete( true );
 		unset($edited_Link);
-		$Messages->add( $msg, 'note' );
+		$Messages->add( $msg, 'success' );
 		break;
 
 
@@ -594,7 +594,7 @@ switch( $action )
 
 		if( !$selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.') );
+			$Messages->add( T_('Nothing selected.'), 'error' );
 			break;
 		}
 
@@ -612,7 +612,7 @@ switch( $action )
 
 				if( $newperms === false )
 				{
-					$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $lFile->get_name(), $chmod ) );
+					$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $lFile->get_name(), $chmod ), 'error' );
 				}
 				elseif( $newperms === $oldperms )
 				{
@@ -620,7 +620,8 @@ switch( $action )
 				}
 				else
 				{
-					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->get_perms() ), 'note' );
+					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), 
+													$lFile->get_name(), $lFile->get_perms() ), 'success' );
 				}
 			}
 		}
@@ -700,7 +701,7 @@ switch( $action )
 		// ------------------------
 		if( !$selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.') );
+			$Messages->add( T_('Nothing selected.'), 'error' );
 			break;
 		}
 
@@ -749,14 +750,14 @@ switch( $Fileman->fm_mode )
 		// Check permissions:
 		if( ! $Settings->get('upload_enabled') )
 		{	// Upload is globally disabled
-			$Messages->add( T_('Upload is disabled.') );
+			$Messages->add( T_('Upload is disabled.'), 'error' );
 			$Fileman->fm_mode = NULL;
 			break;
 		}
 
 		if( ! $current_User->check_perm( 'files', 'add' ) )
 		{	// We do not have permission to add files
-			$Messages->add( T_('You have no permission to add/upload files.') );
+			$Messages->add( T_('You have no permission to add/upload files.'), 'error' );
 			$Fileman->fm_mode = NULL;
 			break;
 		}
@@ -936,7 +937,7 @@ switch( $Fileman->fm_mode )
 		 */
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{	// We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.') );
+			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$Fileman->fm_mode = NULL;
 			break;
 		}
@@ -946,7 +947,7 @@ switch( $Fileman->fm_mode )
 
 		if( !$Fileman->SourceList->count() )
 		{
-			$Messages->add(T_('No source files!') );
+			$Messages->add( T_('No source files!'), 'error' );
 			$Fileman->fm_mode = NULL;
 			break;
 		}
@@ -997,7 +998,7 @@ switch( $Fileman->fm_mode )
 
 				if( ! isset( $overwrite[$loop_src_File->get_md5_ID()] ) )
 				{	// We have not yet asked to overwrite:
-					$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ) );
+					$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ), 'error' );
 					$overwrite[$loop_src_File->get_md5_ID()] = 0;
 					$confirm = 0;
 					continue;
@@ -1312,6 +1313,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.112  2005/06/03 15:12:32  fplanque
+ * error/info message cleanup
+ *
  * Revision 1.111  2005/05/26 19:11:09  fplanque
  * no message
  *

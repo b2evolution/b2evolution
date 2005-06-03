@@ -200,13 +200,13 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 			|| preg_match ('#=["\'\s]*(javascript|vbscript|about):#i', $check, $matches)
 			|| preg_match ('#\<\/?\s*(frame|iframe|applet|object)#i', $check, $matches) )
 		{
-			$Messages->add( 'Illegal markup found: '.htmlspecialchars($matches[1]) );
+			$Messages->add( T_('Illegal markup found: ').htmlspecialchars($matches[1]), 'error' );
 		}
 		// Styling restictions:
 		$matches = array();
 		if( $is_comment && preg_match ('#\s(style|class|id)\s*=#i', $check, $matches) )
 		{
-			$Messages->add( 'Unallowed CSS markup found: '.htmlspecialchars($matches[1]) );
+			$Messages->add( T_('Unallowed CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
 		}
 	}
 	return($content);
@@ -1840,6 +1840,9 @@ function header_redirect( $redirectTo = NULL )
 
 /*
  * $Log$
+ * Revision 1.70  2005/06/03 15:12:33  fplanque
+ * error/info message cleanup
+ *
  * Revision 1.69  2005/06/02 18:50:52  fplanque
  * no message
  *

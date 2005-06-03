@@ -106,7 +106,8 @@ function set_edited_Blog_from_params( $for )
 				$blog_siteurl = & $blog_siteurl_absolute;
 				if( !preg_match( '#^https?://.+#', $blog_siteurl ) )
 				{
-					$Messages->add( T_('Blog Folder URL').': '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
+					$Messages->add( T_('Blog Folder URL').': '
+													.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!'), 'error' );
 				}
 			}
 			else
@@ -114,7 +115,8 @@ function set_edited_Blog_from_params( $for )
 				$blog_siteurl = & $blog_siteurl_relative;
 				if( preg_match( '#^https?://#', $blog_siteurl ) )
 				{
-					$Messages->add( T_('Blog Folder URL').': '.T_('You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!') );
+					$Messages->add( T_('Blog Folder URL').': '
+													.T_('You must provide a relative URL (without <code>http://</code> or <code>https://</code>)!'), 'error' );
 				}
 			}
 			$edited_Blog->set( 'siteurl', $blog_siteurl );
@@ -122,7 +124,7 @@ function set_edited_Blog_from_params( $for )
 			// check urlname
 			if( '' == $edited_Blog->get( 'urlname' ) )
 			{ // urlname is empty
-				$Messages->add( T_('You must provide an URL blog name!') );
+				$Messages->add( T_('You must provide an URL blog name!'), 'error' );
 			}
 			elseif( $DB->get_var( 'SELECT COUNT(*)
 															FROM T_blogs
@@ -130,7 +132,7 @@ function set_edited_Blog_from_params( $for )
 															.( $for != 'new' ? ' AND blog_ID <> '.$edited_Blog->ID : '' )
 													) )
 			{ // urlname is already in use
-				$Messages->add( T_('This URL blog name is already in use by another blog. Please choose another name.') );
+				$Messages->add( T_('This URL blog name is already in use by another blog. Please choose another name.'), 'error' );
 			}
 
 			break;
@@ -155,18 +157,19 @@ function set_edited_Blog_from_params( $for )
 				case 'custom': // custom path and URL
 					if( '' == $edited_Blog->get( 'media_fullpath' ) )
 					{
-						$Messages->add( T_('Media dir location').': '.T_('You must provide the full path of the media directory.') );
+						$Messages->add( T_('Media dir location').': '.T_('You must provide the full path of the media directory.'), 'error' );
 					}
 					if( !preg_match( '#https?://#', $edited_Blog->get( 'media_url' ) ) )
 					{
-						$Messages->add( T_('Media dir location').': '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!') );
+						$Messages->add( T_('Media dir location').': '
+														.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!'), 'error' );
 					}
 					break;
 
 				case 'subdir':
 					if( '' == $edited_Blog->get( 'media_subdir' ) )
 					{
-						$Messages->add( T_('Media dir location').': '.T_('You must provide the media subdirectory.') );
+						$Messages->add( T_('Media dir location').': '.T_('You must provide the media subdirectory.'), 'error' );
 					}
 					break;
 			}
@@ -550,6 +553,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.37  2005/06/03 15:12:31  fplanque
+ * error/info message cleanup
+ *
  * Revision 1.36  2005/05/25 17:13:32  fplanque
  * implemented email notifications on new comments/trackbacks
  *

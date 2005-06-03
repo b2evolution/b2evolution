@@ -63,7 +63,7 @@ switch( $action )
 		$current_User->check_perm( 'options', 'edit', true );
 		// Install plugin:
 		param( 'plugin', 'string', true );
-		$Messages->add( T_('Installing plugin:').' '.$plugin, 'note' );
+		$Messages->add( T_('Installing plugin:').' '.$plugin, 'success' );
 		$Plugins->install( $plugin );
 		break;
 
@@ -72,7 +72,7 @@ switch( $action )
 		$current_User->check_perm( 'options', 'edit', true );
 		// Uninstall plugin:
 		param( 'plugin_ID', 'int', true );
-		$Messages->add( T_('Uninstalling plugin #').$plugin_ID, 'note' );
+		$Messages->add( T_('Uninstalling plugin #').$plugin_ID, 'success' );
 		$Plugins->uninstall( $plugin_ID );
 		break;
 

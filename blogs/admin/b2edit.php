@@ -53,7 +53,7 @@ switch($action)
 			$msg = sprintf( T_('Link from &laquo;%s&raquo; deleted.'), $edited_Link->Item->dget('title') );
 			$edited_Link->dbdelete( true );
 			unset($edited_Link);
-			$Messages->add( $msg, 'note' );
+			$Messages->add( $msg, 'success' );
 		}
 		// This will eventually boil down to editing, so we need to prepare...
 
@@ -115,7 +115,8 @@ switch($action)
 
 		if( !$blog )
 		{
-			$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 'href="mailto:'.$admin_email.'?subject=b2-promotion"' ), 'note' );
+			$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 
+											'href="mailto:'.$admin_email.'?subject=b2-promotion"' ), 'error' );
 			$action = 'nil';
 			break;
 		}
@@ -124,7 +125,7 @@ switch($action)
 
 		if( ! blog_has_cats( $blog ) )
 		{
-			$Messages->add( T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), 'note' );
+			$Messages->add( T_('Since this blog has no categories, you cannot post to it. You must create categories first.'), 'error' );
 			$action = 'nil';
 			break;
 		}

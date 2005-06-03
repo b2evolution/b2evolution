@@ -89,13 +89,13 @@ if( !$current_User->check_perm( 'users', 'edit', false ) )
 	$user_profile_only = 1;
 
 	if( $action && $action != 'userupdate' )
-	{ // This should be prevented un the UI
-		$Messages->add( 'You have no permission to edit other users or groups!' );
+	{ // This should be prevented in the UI
+		$Messages->add( 'You have no permission to edit other users or groups!', 'error' );
 		$action = ''; // don't show group form (we have no group ID)
 	}
 	elseif( $demo_mode && $action && $current_User->login == 'demouser' )
 	{
-		$Messages->add( T_('You cannot change the demouser profile in demo mode!') );
+		$Messages->add( T_('You cannot change the demouser profile in demo mode!'), 'error' );
 	}
 }
 
@@ -144,7 +144,7 @@ else
 
 			if( $user_profile_only && $edited_user_ID != $current_User->ID )
 			{ // user is only allowed to update him/herself
-				$Messages->add( T_('You are only allowed to update your own profile!') );
+				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
 				break;
 			}
 
@@ -154,7 +154,7 @@ else
 
 			if( empty($edited_user_login) )
 			{
-				$Messages->add( T_('You must provide an unique login!') );
+				$Messages->add( T_('You must provide an unique login!'), 'error' );
 			}
 
 			if( !$user_profile_only )
@@ -162,7 +162,7 @@ else
 				param( 'edited_user_level', 'integer', true );
 				if( $edited_user_level < 0 || $edited_user_level > 10 )
 				{
-					$Messages->add( sprintf( T_('User level must be between %d and %d.'), 0, 10 ) );
+					$Messages->add( sprintf( T_('User level must be between %d and %d.'), 0, 10 ), 'error' );
 				}
 				else
 				{
@@ -189,7 +189,7 @@ else
 
 			if( $q = $DB->get_var( $query ) )
 			{
-				$Messages->add( sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'), 'href="?user='.$q.'"' ));
+				$Messages->add( sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'), 'href="?user='.$q.'"' ), 'error' );
 			}
 
 			param( 'edited_user_firstname', 'string', true );
@@ -251,12 +251,12 @@ else
 				if( $edited_User->ID != 0 )
 				{ // Commit update to the DB:
 					$edited_User->dbupdate();
-					$Messages->add( T_('User updated.'), 'note' );
+					$Messages->add( T_('User updated.'), 'success' );
 				}
 				else
 				{ // Insert user into DB
 					$edited_User->dbinsert();
-					$Messages->add( T_('New user created.'), 'note' );
+					$Messages->add( T_('New user created.'), 'success' );
 				}
 
 				if( $edited_user_ID == $current_User->ID )
@@ -294,7 +294,7 @@ else
 					|| ($prom == 'down' && $usertopromote_level < 1)
 				)
 			{
-				$Messages->add( T_('Invalid promotion.') );
+				$Messages->add( T_('Invalid promotion.'), 'error' );
 			}
 			else
 			{
@@ -309,11 +309,11 @@ else
 
 				if( $DB->query( $sql ) )
 				{
-					$Messages->add( T_('User level changed.'), 'note' );
+					$Messages->add( T_('User level changed.'), 'success' );
 				}
 				else
 				{
-					$Messages->add( sprintf( 'Couldn\'t change %s\'s level.', $UserToPromote->login ) );
+					$Messages->add( sprintf( 'Couldn\'t change %s\'s level.', $UserToPromote->login ), 'error' );
 				}
 			}
 			break;
@@ -328,13 +328,13 @@ else
 
 			if( $edited_User->ID == $current_User->ID )
 			{
-				$Messages->add( T_('You can\'t delete yourself!') );
+				$Messages->add( T_('You can\'t delete yourself!'), 'error' );
 				$action = 'view_user';
 				break;
 			}
 			if( $edited_User->ID == 1 )
 			{
-				$Messages->add( T_('You can\'t delete User #1!') );
+				$Messages->add( T_('You can\'t delete User #1!'), 'error' );
 				$action = 'view_user';
 				break;
 			}
@@ -345,7 +345,7 @@ else
 				$edited_User->dbdelete( true );
 				unset($edited_User);
 				forget_param('user_ID');
-				$Messages->add( $msg, 'note' );
+				$Messages->add( $msg, 'success' );
 				$action = 'list';
 			}
 			else
@@ -382,7 +382,7 @@ else
 
 			if( empty($edited_grp_name) )
 			{
-				$Messages->add( T_('You must provide a group name!') );
+				$Messages->add( T_('You must provide a group name!'), 'error' );
 			}
 
 			// check if the group name already exists for another group
@@ -390,7 +390,8 @@ else
 
 			if( $q = $DB->get_var( $query ) )
 			{
-				$Messages->add( sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'), 'href="?group='.$q.'"' ));
+				$Messages->add( sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'), 
+												'href="?group='.$q.'"' ), 'error' );
 			}
 
 			if( $edited_grp_ID == 0 )
@@ -426,12 +427,12 @@ else
 			if( $edited_grp_ID == 0 )
 			{ // Insert into the DB:
 				$edited_Group->dbinsert();
-				$Messages->add( T_('New group created.'), 'note' );
+				$Messages->add( T_('New group created.'), 'success' );
 			}
 			else
 			{ // Commit update to the DB:
 				$edited_Group->dbupdate();
-				$Messages->add( T_('Group updated.'), 'note' );
+				$Messages->add( T_('Group updated.'), 'success' );
 			}
 			// Commit changes in cache:
 			$GroupCache->add( $edited_Group );
@@ -447,13 +448,13 @@ else
 
 			if( $edited_Group->ID == 1 )
 			{
-				$Messages->add( T_('You can\'t delete Group #1!') );
+				$Messages->add( T_('You can\'t delete Group #1!'), 'error' );
 				$action = 'view_group';
 				break;
 			}
 			if( $edited_Group->ID == $Settings->get('newusers_grp_ID' ) )
 			{
-				$Messages->add( T_('You can\'t delete the default group for new users!') );
+				$Messages->add( T_('You can\'t delete the default group for new users!'), 'error' );
 				$action = 'view_group';
 				break;
 			}
@@ -464,7 +465,7 @@ else
 				$edited_Group->dbdelete( true );
 				unset($edited_Group);
 				forget_param('grp_ID');
-				$Messages->add( $msg, 'note' );
+				$Messages->add( $msg, 'success' );
 				$action = 'list';
 			}
 			else
@@ -559,6 +560,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.93  2005/06/03 15:12:31  fplanque
+ * error/info message cleanup
+ *
  * Revision 1.92  2005/06/02 18:50:52  fplanque
  * no message
  *
