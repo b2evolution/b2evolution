@@ -134,33 +134,28 @@ class Sessions extends Widget
 	 *               the second the link to his mail form - if he has an email address)
 	 * @return array containing number of registered users and guests
 	 */
-	function displayOnlineUsers( $beforeEach = '<li class="onlineUser">', $afterEach = '</li>', $beforeAll = '<ul class="onlineUsers">', $afterAll = '</ul>' )
+	function displayOnlineUsers( $beforeEach = '<li class="onlineUser">', $afterEach = '</li>',
+																$beforeAll = '<ul class="onlineUsers">', $afterAll = '</ul>' )
 	{
 		global $DB, $Blog, $UserCache;
 
 		$this->init();
 
+		echo $beforeAll;
 		foreach( $this->_registeredUsers as $User )
 		{
 			if( $User->showonline )
 			{
-				echo $beforeAll;
-				$beforeAll = '';
-
-
 				echo $beforeEach;
 				echo $User->get('preferedname');
-
 				if( isset($Blog) )
 				{
 					$User->msgform_link( $Blog->get('msgformurl') );
 				}
 				echo $afterEach;
-
-				echo $afterAll;
-				$afterAll = '';
 			}
 		}
+		echo $afterAll;
 	}
 
 
