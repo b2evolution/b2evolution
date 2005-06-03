@@ -102,12 +102,24 @@ require_once dirname(__FILE__).'/_log.class.php';
  * Debug message log for debugging only (initialized here)
  * @global Log $Debuglog
  */
-$Debuglog = new Log( 'note' );
+$Debuglog = & new Log( 'note' );
 /**
  * Info & error message log for end user (initialized here)
  * @global Log $Messages
  */
-$Messages = new Log( 'error' );
+$Messages = & new Log( 'error' );
+
+
+/**
+ * Load Request class
+ */
+require_once dirname(__FILE__).'/_request.class.php';
+/**
+ * Debug message log for debugging only (initialized here)
+ * @global Request $Request
+ */
+$Request = & new Request( $Messages );
+
 
 
 /**
@@ -502,6 +514,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.37  2005/06/03 20:14:39  fplanque
+ * started input validation framework
+ *
  * Revision 1.36  2005/06/02 18:50:52  fplanque
  * no message
  *

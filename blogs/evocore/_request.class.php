@@ -42,30 +42,110 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 class Request
 {
 	/**
-	 * Constructor.
-	 *
-	 * {@internal Request::Request(-)}}
+	 * @var Array of values, indexed by param name
 	 */
-	function Request()
-	{
+	var $params = array();
 
+	/**
+	 * @var Array of strings, indexed by param name
+	 */
+	var $err_messages = array();
+
+	var $Messages;
+
+	/**
+	 * Constructor.
+	 */
+	function Request( & $Messages )
+	{
+		$this->Messages = & $Messages;
 	}
 
-}
 
+	/**
+	 * Sets a parameter with values from the request or to provided default,
+	 * except if param is already set!
+	 *
+	 * Also removes magic quotes if they are set automatically by PHP.
+	 * Also forces type.
+	 * Priority order: POST, GET, COOKIE, DEFAULT.
+	 *
+	 * {@internal param(-) }}
+	 *
+	 * @author fplanque
+	 * @param string Variable to set
+	 * @param string Force value type to one of:
+	 * - boolean
+	 * - integer
+	 * - float
+	 * - string
+	 * - array
+	 * - object
+	 * - null
+	 * - html (does nothing)
+	 * - '' (does nothing)
+	 * Value type will be forced only if resulting value (probably from default then) is !== NULL
+	 * @param mixed Default value or TRUE if user input required
+	 * @param boolean Do we need to memorize this to regenerate the URL for this page?
+	 * @param boolean Override if variable already set
+	 * @param boolean Force setting of variable to default?
+	 * @return mixed Final value of Variable, or false if we don't force setting and did not set
+	 */
+	function param( $var, $type = '', $default = '', $memorize = false,
+									$override = false, $forceset = true )
+	{
+    $this->params[$var] = param( $var, $type, $default, $memorize, $override, $forceset );
+	}
+
+
+	/**
+	 * @param string param name
+	 * @param string error message
+	 * @return boolean true if OK
+	 */
+	function param_check_not_empty( $var, $err_msg )
+	{
+		if( empty( $this->params[$var] ) )
+		{
+			$this->param_error( $var, $err_msg );
+			return false;
+		}
+		return true;
+	}
+
+
+	/**
+	 * @param string param name
+	 * @param integer
+	 * @param integer
+	 * @param string error message
+	 * @return boolean true if OK
+	 */
+	function param_check_range( $var, $min, $max, $err_msg )
+	{
+		if( $this->params[$var] < $min || $this->params[$var] > $max )
+		{
+			$this->param_error( $var, sprintf( $err_msg, $min, $max ) );
+			return false;
+		}
+		return true;
+	}
+
+
+	/**
+	 * @param string param name
+	 * @param string error message
+	 */
+	function param_error( $var, $err_msg )
+	{
+		$this->err_messages[$var] = $err_msg;
+		$this->Messages->add( $err_msg, 'error' );
+	}
+}
 /*
  * $Log$
- * Revision 1.3  2005/02/28 09:06:33  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.2  2005/02/21 00:34:34  blueyed
- * check for defined DB_USER!
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.2  2004/10/12 17:22:29  fplanque
- * Edited code documentation.
+ * Revision 1.4  2005/06/03 20:14:39  fplanque
+ * started input validation framework
  *
  */
 ?>

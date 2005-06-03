@@ -27,11 +27,18 @@ fieldset.input {
 	color: #999;
 	font-weight:normal;
 }
+span.field_error {
+	color: #f00;
+}
 
 fieldset div.notes {
 	margin: 0 0 1ex 3ex;
 }
 
+input.field_error {
+	background:#fbf2ee;
+	border-color: #d99;
+}
 input.large,
 textarea.large {
 	width: 97%;

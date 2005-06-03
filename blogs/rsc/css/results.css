@@ -103,8 +103,7 @@ table.grouped th a.single_sort_link:hover {
  * Results navigation:
  */
 .results {
-	text-align: center;
-	margin: 0 auto;
+	margin: 0;
 	width: 100%;
 	/* border: 1px solid black; */
 }

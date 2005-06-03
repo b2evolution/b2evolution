@@ -67,7 +67,6 @@ else
 
 $Form->hidden( 'action', 'userupdate' );
 $Form->hidden( 'edited_user_ID', $edited_User->ID );
-$Form->hidden( 'edited_user_oldlogin', $edited_User->dget('login', 'formvalue') );
 
 
 $Form->fieldset( T_('User rights'), 'fieldset clear' );
@@ -193,6 +192,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.58  2005/06/03 20:14:38  fplanque
+ * started input validation framework
+ *
  * Revision 1.57  2005/05/24 18:46:26  fplanque
  * implemented blog email subscriptions (part 1)
  *

@@ -44,7 +44,6 @@
 require_once dirname(__FILE__).'/_header.php';
 $AdminUI->setPath( 'users' );
 
-// "new standard" params:
 param( 'action', 'string', 'list' );
 
 
@@ -148,34 +147,18 @@ else
 				break;
 			}
 
-			param( 'edited_user_oldlogin', 'string', true );
-			param( 'edited_user_login', 'string', true );
+			$Request->param( 'edited_user_login', 'string', true );
+			$Request->param_check_not_empty( 'edited_user_login', T_('You must provide a login!') );
 			$edited_user_login = strtolower( $edited_user_login );
-
-			if( empty($edited_user_login) )
-			{
-				$Messages->add( T_('You must provide an unique login!'), 'error' );
-			}
 
 			if( !$user_profile_only )
 			{ // allow changing level/group not for profile mode
-				param( 'edited_user_level', 'integer', true );
-				if( $edited_user_level < 0 || $edited_user_level > 10 )
-				{
-					$Messages->add( sprintf( T_('User level must be between %d and %d.'), 0, 10 ), 'error' );
-				}
-				else
-				{
-					$edited_User->set( 'level', $edited_user_level );
-				}
+				$Request->param( 'edited_user_level', 'integer', true );
+				$Request->param_check_range( 'edited_user_level', 0, 10, T_('User level must be between %d and %d.') );
+				$edited_User->set( 'level', $edited_user_level );
 
 				param( 'edited_user_grp_ID', 'integer', true );
-				if( $edited_user_grp_ID > 0 )
-				{
-					$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
-				}
-				else $edited_user_Group = & new Group();
-
+				$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
 				$edited_User->setGroup( $edited_user_Group );
 				// echo 'new group = ';
 				// $edited_User->Group->disp('name');
@@ -186,10 +169,10 @@ else
 									FROM T_users
 								 WHERE user_login = '$edited_user_login'
 								   AND ID != $edited_user_ID";
-
 			if( $q = $DB->get_var( $query ) )
 			{
-				$Messages->add( sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'), 'href="?user='.$q.'"' ), 'error' );
+				$Request->param_error( 'edited_user_login',
+					sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'), 'href="?user_ID='.$q.'"' ), 'error' );
 			}
 
 			param( 'edited_user_firstname', 'string', true );
@@ -376,22 +359,18 @@ else
 
 
 		case 'groupupdate':
-			param( 'edited_grp_ID', 'integer', true );
-			param( 'edited_grp_oldname', 'string', true );
-			param( 'edited_grp_name', 'string', true );
+			$Request->param( 'edited_grp_ID', 'integer', true );
+			$Request->param( 'edited_grp_name', 'string', true );
 
-			if( empty($edited_grp_name) )
-			{
-				$Messages->add( T_('You must provide a group name!'), 'error' );
-			}
+			$Request->param_check_not_empty( 'edited_grp_name', T_('You must provide a group name!') );
 
 			// check if the group name already exists for another group
-			$query = "SELECT grp_ID FROM T_groups WHERE grp_name = '$edited_grp_name' AND grp_ID != $edited_grp_ID";
-
+			$query = "SELECT grp_ID FROM T_groups
+														 WHERE grp_name = '$edited_grp_name' AND grp_ID != $edited_grp_ID";
 			if( $q = $DB->get_var( $query ) )
 			{
-				$Messages->add( sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'), 
-												'href="?group='.$q.'"' ), 'error' );
+				$Request->param_error( 'edited_grp_name',
+							sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'), 'href="?grp_ID='.$q.'"' ) );
 			}
 
 			if( $edited_grp_ID == 0 )
@@ -560,6 +539,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.94  2005/06/03 20:14:38  fplanque
+ * started input validation framework
+ *
  * Revision 1.93  2005/06/03 15:12:31  fplanque
  * error/info message cleanup
  *

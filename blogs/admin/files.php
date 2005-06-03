@@ -620,8 +620,7 @@ switch( $action )
 				}
 				else
 				{
-					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), 
-													$lFile->get_name(), $lFile->get_perms() ), 'success' );
+					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->get_perms() ), 'success' );
 				}
 			}
 		}
@@ -1313,6 +1312,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.113  2005/06/03 20:14:38  fplanque
+ * started input validation framework
+ *
  * Revision 1.112  2005/06/03 15:12:32  fplanque
  * error/info message cleanup
  *

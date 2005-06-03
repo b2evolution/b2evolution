@@ -61,7 +61,6 @@ else
 
 $Form->hidden( 'action', 'groupupdate' );
 $Form->hidden( 'edited_grp_ID', $edited_Group->ID );
-$Form->hidden( 'edited_grp_oldname', isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->dget('name','formvalue') );
 
 $Form->fieldset( T_('General') );
 	$Form->text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
@@ -136,6 +135,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.31  2005/06/03 20:14:38  fplanque
+ * started input validation framework
+ *
  * Revision 1.30  2005/05/09 19:06:53  fplanque
  * bugfixes + global access permission
  *

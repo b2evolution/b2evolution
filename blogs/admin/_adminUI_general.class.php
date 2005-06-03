@@ -113,7 +113,7 @@ class AdminUI_general
 	 * @var string
 	 */
 	var $title_titlearea;
-
+	var $title_titlearea_appendix = '';
 
 	/**
 	 * Constructor.
@@ -156,7 +156,7 @@ class AdminUI_general
 
 
 	/**
-	 * Get the title of the page.
+	 * Get the <title> of the page.
 	 *
 	 * @return string
 	 */
@@ -166,6 +166,7 @@ class AdminUI_general
 		{ // Explicit title has been set:
 			return $this->title;
 		}
+		/* fplanque: is there any real point in this?:
 		elseif( $title = $this->getPathProperty( 'last', array( 'title' ) ) )
 		{ // Title property of the path
 			return $title;
@@ -174,6 +175,7 @@ class AdminUI_general
 		{ // Title property for the node of the current path
 			return $title;
 		}
+		*/
 		else
 		{ // Fallback: implode title/text properties of the path
 			$titles = $this->getPropertiesForPath( $this->path, array( 'title', 'text' ) );
@@ -187,28 +189,40 @@ class AdminUI_general
 
 
 	/**
-	 * Get the title for the titlearea (<h1>). Falls back to {@link getTitle()}.
+	 * Get the title for the titlearea (<h1>).
 	 *
 	 * @return string
 	 */
 	function getTitleForTitlearea()
 	{
-		$r = $this->pathSeperator;
+		if( ! isset( $this->title_titlearea ) )
+		{ // Construct path:
+			$titles = array();
+			foreach( $this->path as $i => $lPath )
+			{
+				if( false !== ($title_text = $this->getPathProperty( $i, array( 'title', 'text' ) )) )
+				{
+					$titles[] = '<a href="'.$this->getPathProperty( $i, array( 'href' ) ).'">'.$title_text.'</a>';
+				}
+			}
 
-		if( isset( $this->title_titlearea ) )
-		{ // Explicit title has been set:
-			$r .= $this->title_titlearea;
-		}
-		elseif( $titleForTitlearea = $this->getPropertyForNode( $this->path, array( 'title' ) ) )
-		{ // Title property for the node of the current path
-			$r .= $titleForTitlearea;
-		}
-		else
-		{ // Fallback to {@link getTitle()}
-			$r .= $this->getTitle();
+			$this->title_titlearea = implode( $this->pathSeperator, $titles );
 		}
 
-		return $r;
+		return $this->title_titlearea.$this->title_titlearea_appendix;
+	}
+
+
+	/**
+	 * Append a string at the end of the existing titlearea.
+	 *
+	 * We actually keep the appended stuff separate from the main title, because the main title
+	 * might in some occasions not be known immediately.
+	 */
+	function append_to_titlearea( $string )
+	{
+		$this->title_titlearea_appendix .= $this->pathSeperator.$string;
+
 	}
 
 
@@ -1075,6 +1089,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.24  2005/06/03 20:14:37  fplanque
+ * started input validation framework
+ *
  * Revision 1.23  2005/06/02 18:50:52  fplanque
  * no message
  *

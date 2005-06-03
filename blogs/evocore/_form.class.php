@@ -303,6 +303,13 @@ class Form extends Widget
 	function text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
 											$field_maxlength = 0 , $field_class = '', $inputtype = 'text' )
 	{
+		global $Request;
+		if( isset($Request->err_messages[$field_name]) )
+		{	// There is an error message for this field:
+			$field_class .= ' field_error';
+			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
+		}
+
 		if( $field_maxlength == 0 )
 			$field_maxlength = $field_size;
 
