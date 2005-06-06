@@ -157,14 +157,14 @@ $AdminUI->addMenuEntries(
 									'text' => T_('Settings'),
 									'perm_name' => 'options',
 									'perm_level' => 'view',
-									'href' => 'b2options.php',
+									'href' => 'settings.php',
 									'entries' => array(
 										'general' => array(
 											'text' => T_('General'),
-											'href' => 'b2options.php?tab=general' ),
+											'href' => 'settings.php' ),
 										'regional' => array(
 											'text' => T_('Regional'),
-											'href' => 'b2options.php?tab=regional'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
+											'href' => 'locales.php'.( (isset($loc_transinfo) && $loc_transinfo) ? '?loc_transinfo=1' : '' ) ),
 										'files' => array(
 											'text' => T_('Files'),
 											'href' =>'fileset.php' ),

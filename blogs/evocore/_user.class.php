@@ -142,7 +142,7 @@ class User extends DataObject
 			$this->ip = '';
 			$this->domain = '';
 			$this->browser = '';
-			$this->level = 0;
+			$this->set( 'level', $Settings->get('newusers_level') );
 			$this->notify = 1 ;
 			$this->showonline = 1;
 			if( isset($servertimenow) )
@@ -879,6 +879,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2005/06/06 17:59:39  fplanque
+ * user dialog enhancements
+ *
  * Revision 1.33  2005/06/03 15:12:33  fplanque
  * error/info message cleanup
  *

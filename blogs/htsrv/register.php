@@ -94,7 +94,6 @@ switch( $action )
 			$new_User->set( 'domain', $Hit->getRemoteHost() );
 			$new_User->set( 'browser', $Hit->getUserAgent();
 			$new_User->set_datecreated( $localtimenow );
-			$new_User->set( 'level', $Settings->get('newusers_level') );
 			$new_User->set( 'locale', $locale );
 			$newusers_grp_ID = $Settings->get('newusers_grp_ID');
 			// echo $newusers_grp_ID;

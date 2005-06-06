@@ -60,29 +60,31 @@ switch( $action )
 
 	case 'create':
 		// Insert into database...:
-		param( 'name', 'string', true );
+		$Request->param( 'name', 'string', true );
+		if( $Request->param_check_not_empty( 'name', T_('Please enter a string.') ) )
+		{
+			$DB->query( "INSERT INTO $edited_table( $edited_table_namecol )
+										VALUES( ".$DB->quote($name).' )' );
 
-		$DB->query( "INSERT INTO $edited_table( $edited_table_namecol )
-									VALUES( ".$DB->quote($name).' )' );
-
-		$Messages->add( T_('Entry created.'), 'success' );
-		unset( $ID );
-		$name = '';
+			$Messages->add( T_('Entry created.'), 'success' );
+			$name = '';
+		}
 		break;
 
 
 	case 'update':
 		// Update in database...:
-		param( 'ID', 'integer', true );
-		param( 'name', 'string', true );
+		$Request->param( 'ID', 'integer', true );
+		$Request->param_string_not_empty( 'name', T_('Please enter a string.') );
+		{
+			$DB->query( "UPDATE $edited_table
+											SET $edited_table_namecol = ".$DB->quote($name)."
+										WHERE	$edited_table_IDcol = $ID" );
 
-		$DB->query( "UPDATE $edited_table
-										SET $edited_table_namecol = ".$DB->quote($name)."
-									WHERE	$edited_table_IDcol = $ID" );
-
-		$Messages->add( sprintf( T_('Entry #%d updated.'), $ID ), 'success' );
-		unset( $ID );
-		$name = '';
+			$Messages->add( sprintf( T_('Entry #%d updated.'), $ID ), 'success' );
+			unset( $ID );
+			$name = '';
+		}
 		break;
 
 

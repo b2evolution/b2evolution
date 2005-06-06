@@ -513,12 +513,8 @@ function postcats_get_byID( $post_ID )
 }
 
 
-/*
- * cat_children(-)
- *
+/**
  * Taking a recursive walk in the category park...
- *
- * fplanque: created
  */
 function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache_categories array in order to be able to perform foreach on it
 	$blog_ID, $parent_ID,
@@ -539,7 +535,10 @@ function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache
 				{ // this is the first child
 						$r .= $callback_before_first( $parent_ID, $level );
 				}
-				// was: if( $callback_before_each( $icat_ID, $level ) ) continue;
+				if( $callback_before_each( $icat_ID, $level ) === true )
+				{	// callback function has requested that we stop recursing for this branch
+					continue;
+				}
 				$r .= $callback_before_each( $icat_ID, $level );
 				$r .= cat_children( $ccats, $blog_ID, $icat_ID, $callback_before_first, $callback_before_each,
 														$callback_after_each, $callback_after_last, $level+1 );
@@ -821,6 +820,9 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.18  2005/06/06 17:59:39  fplanque
+ * user dialog enhancements
+ *
  * Revision 1.17  2005/05/10 18:35:38  fplanque
  * refactored/normalized category handling
  * (though there's still a lot to do before this gets as clean as desired...)

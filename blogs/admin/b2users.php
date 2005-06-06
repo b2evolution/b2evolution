@@ -153,8 +153,7 @@ else
 
 			if( !$user_profile_only )
 			{ // allow changing level/group not for profile mode
-				$Request->param( 'edited_user_level', 'integer', true );
-				$Request->param_check_range( 'edited_user_level', 0, 10, T_('User level must be between %d and %d.') );
+				$Request->param_integer_range( 'edited_user_level', 0, 10, T_('User level must be between %d and %d.') );
 				$edited_User->set( 'level', $edited_user_level );
 
 				param( 'edited_user_grp_ID', 'integer', true );
@@ -177,28 +176,35 @@ else
 
 			param( 'edited_user_firstname', 'string', true );
 			param( 'edited_user_lastname', 'string', true );
-			param( 'edited_user_nickname', 'string', true );
+
+			$Request->param( 'edited_user_nickname', 'string', true );
+			$Request->param_check_not_empty( 'edited_user_nickname', T_('Please enter a nickname (can be the same as your login).') );
+
 			param( 'edited_user_idmode', 'string', true );
 			param( 'edited_user_locale', 'string', true );
-			param( 'edited_user_email', 'string', true );
-			param( 'edited_user_url', 'string', true );
-			param( 'edited_user_icq', 'string', true );
+
+			$Request->param( 'edited_user_email', 'string', true );
+			$Request->param_check_not_empty( 'edited_user_email', T_('Please enter an e-mail address.') );
+			$Request->param_check_email( 'edited_user_email', true );
+
+			$Request->param( 'edited_user_url', 'string', true );
+			$Request->param_check_url( 'edited_user_url', $comments_allowed_uri_scheme );
+
+			$Request->param( 'edited_user_icq', 'string', true );
+			$Request->param_check_number( 'edited_user_icq', T_('The ICQ UIN can only be a number, no letters allowed.') );
+
 			param( 'edited_user_aim', 'string', true );
-			param( 'edited_user_msn', 'string', true );
+
+			$Request->param( 'edited_user_msn', 'string', true );
+			$Request->param_check_email( 'edited_user_msn', false );
+
 			param( 'edited_user_yim', 'string', true );
 			param( 'edited_user_notify', 'integer', 0 );
 			param( 'edited_user_showonline', 'integer', 0 );
-			param( 'edited_user_pass1', 'string', true );
-			param( 'edited_user_pass2', 'string', true );
 
-			// Perfom check on parameters:
-			profile_check_params( array( 'nickname' => $edited_user_nickname,
-																		'icq' => $edited_user_icq,
-																		'email' => $edited_user_email,
-																		'url' => $edited_user_url,
-																		'pass1' => $edited_user_pass1,
-																		'pass2' => $edited_user_pass2,
-																		'pass_required' => ($edited_user_ID == 0) ) );
+			$Request->param( 'edited_user_pass1', 'string', true );
+			$Request->param( 'edited_user_pass2', 'string', true );
+			$Request->param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', ($edited_user_ID == 0) );
 
 			$edited_User->set( 'login', $edited_user_login );
 			$edited_User->set( 'firstname', $edited_user_firstname );
@@ -539,6 +545,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.95  2005/06/06 17:59:38  fplanque
+ * user dialog enhancements
+ *
  * Revision 1.94  2005/06/03 20:14:38  fplanque
  * started input validation framework
  *

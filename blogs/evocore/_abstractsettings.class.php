@@ -426,35 +426,6 @@ class AbstractSettings
 
 
 	/**
-	 * The purpose is to catch a setting from a form value.
-	 * @uses param()
-	 */
-	function setByParam()
-	{
-		global $Debuglog;
-
-		$args = func_get_args();
-		$paramArgs = array_slice( $args, $this->count_colKeyNames );
-
-		$param = call_user_func_array( 'param', $paramArgs );
-
-		if( $param !== NULL )
-		{
-			$setArgs = array_slice( $args, 0, $this->count_colKeyNames );
-			$setArgs[] = $param;
-
-			call_user_func_array( array( &$this, 'set' ), $setArgs );
-		}
-
-
-		$Debuglog->add( get_class($this).'::setByParam(): param( '.implode( ', ', $paramArgs ).' ): '.var_export($param, true)
-										.' => '.( is_null($param) ? 'NOT set!' : 'note' ) );
-
-		return true;
-	}
-
-
-	/**
 	 * Set an array of values.
 	 *
 	 * @param array Array of parameters for {@link set()}
@@ -618,6 +589,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.15  2005/06/06 17:59:39  fplanque
+ * user dialog enhancements
+ *
  * Revision 1.14  2005/05/04 19:40:41  fplanque
  * cleaned up file settings a little bit
  *

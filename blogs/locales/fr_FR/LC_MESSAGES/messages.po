@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2005-05-31 20:09+0200\n"
-"PO-Revision-Date: 2005-05-31 20:13+0100\n"
+"PO-Revision-Date: 2005-06-06 16:18+0100\n"
 "Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -3907,7 +3907,7 @@ msgstr "Timeout de reload"
 
 #: ..\..\..\admin\_set_general.form.php:85
 msgid "Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit."
-msgstr "Temps (en seconde) devant s'écouler avant qu'une requête sur une même URI depuis la même IP et le même User Agent soit considérée comme un nouveau hit."
+msgstr "Durée (en secondes) devant s'écouler avant qu'une requête sur une même URI depuis la même IP et le même User Agent soit considérée comme un nouveau hit."
 
 #: ..\..\..\admin\_set_plugins.form.php:14
 msgid "Installed plug-ins"

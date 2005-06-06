@@ -48,7 +48,6 @@ require( dirname(__FILE__).'/_header.php' );
 $AdminUI->setPath( 'options', 'files' );
 
 param( 'action', 'string' );
-require( dirname(__FILE__).'/_menutop.php' );
 
 switch( $action )
 {
@@ -57,6 +56,7 @@ switch( $action )
 		$current_User->check_perm( 'options', 'edit', true );
 
 		param( 'submit', 'string', '' );
+
 		if( $submit == T_('Restore defaults') )
 		{
 			$Settings->deleteArray( array( 'fm_enabled',
@@ -69,46 +69,72 @@ switch( $action )
 																			'upload_allowedext',
 																			'upload_maxkb',
 																			'regexp_filename' ) );
-			$Messages->add( T_('Restored default values.'), 'success' );
+			if( $Settings->updateDB() )
+			{
+				$Messages->add( T_('Restored default values.'), 'success' );
+			}
+			else
+			{
+				$Messages->add( T_('Settings have not changed.'), 'note' );
+			}
 		}
 		else
 		{
 			// Filemanager
-			$Settings->setByParam( 'fm_enabled',            'fm_enabled', 'integer', 0 );
-			$Settings->setByParam( 'fm_enable_roots_blog',  'fm_enable_roots_blog',  'integer', 0 );
-			// $Settings->setByParam( 'fm_enable_roots_group', 'fm_enable_roots_group', 'integer', 0 );
-			$Settings->setByParam( 'fm_enable_roots_user',  'fm_enable_roots_user',  'integer', 0 );
-			$Settings->setByParam( 'fm_enable_create_dir',  'fm_enable_create_dir',  'integer', 0 );
-			$Settings->setByParam( 'fm_enable_create_file', 'fm_enable_create_file', 'integer', 0 );
+			$Request->param( 'fm_enabled', 'integer', 0 );
+			$Settings->set( 'fm_enabled', $fm_enabled );
+
+			$Request->param( 'fm_enable_roots_blog', 'integer', 0 );
+			$Settings->set( 'fm_enable_roots_blog', $fm_enable_roots_blog );
+
+			// $Request->param( 'fm_enable_roots_group', 'fm_enable_roots_group', 'integer', 0 );
+
+			$Request->param( 'fm_enable_roots_user', 'integer', 0 );
+			$Settings->set( 'fm_enable_roots_user', $fm_enable_roots_user );
+
+			$Request->param( 'fm_enable_create_dir', 'integer', 0 );
+			$Settings->set( 'fm_enable_create_dir', $fm_enable_create_dir );
+
+			$Request->param( 'fm_enable_create_file', 'integer', 0 );
+			$Settings->set( 'fm_enable_create_file', $fm_enable_create_file );
 
 			// Upload
-			$Settings->setByParam( 'upload_enabled',         'upload_enabled', 'integer', 0 );
-			param( 'upload_allowedext', 'string', true );
+			$Request->param( 'upload_enabled', 'integer', 0 );
+			$Settings->set( 'upload_enabled', $upload_enabled );
+
+			$Request->param( 'upload_allowedext', 'string', true );
 			$Settings->set( 'upload_allowedext', strtolower(trim($upload_allowedext)));
-			$Settings->setByParam( 'upload_maxkb', 'upload_maxkb', 'integer', true );
+
+			$Request->param_integer_range( 'upload_maxkb', 1, 9999999, T_('Maximum allowed filesize must be between %d and %d KB.') );
+			$Settings->set( 'upload_maxkbd', $upload_maxkb );
 
 			// Advanced settings
-			param( 'regexp_filename', 'string', '' );
-			if( !isRegexp( $regexp_filename ) )
-			{
-				$Messages->add( sprintf( T_('&laquo;%s&raquo; is not a regular expression!'), $regexp_filename ), 'error' );
-			}
-			else
+			$Request->param( 'regexp_filename', 'string', '' );
+			if( $Request->param_check_regexp( 'regexp_filename', T_('Valid filename pattern is not a regular expression!') ) )
 			{
 				$Settings->set( 'regexp_filename', $regexp_filename );
 			}
 
-		}
-
-		if( $Settings->updateDB() )
-		{
-			$Messages->add( T_('File settings updated.'), 'success' );
+			if( ! $Messages->count('error') )
+			{
+				if( $Settings->updateDB() )
+				{
+					$Messages->add( T_('File settings updated.'), 'success' );
+				}
+				else
+				{
+					$Messages->add( T_('Settings have not changed.'), 'note' );
+				}
+			}
 		}
 
 		break;
 }
 
-$Messages->displayParagraphs( 'all' );
+/**
+ * Display page header:
+ */
+require dirname(__FILE__).'/_menutop.php';
 
 // Check permission to view:
 $current_User->check_perm( 'options', 'view', true );

@@ -763,10 +763,27 @@ class Form extends Widget
 	 */
 	function checklist( $options, $field_name, $field_label )
 	{
+		global $Request;
+
 		$r = $this->begin_field( $field_name, $field_label );
 		foreach( $options as $option )
 		{ //loop to construct the list of 'input' tags
-			$r .= "\t".'<input type="checkbox" name="'.$option[0].'" value="'.$option[1].'" ';
+
+			$loop_field_name = $option[0];
+			$loop_field_note = isset($option[5]) ? $option[5] : '';
+
+			if( isset($Request->err_messages[$loop_field_name]) )
+			{	// There is an error message for this field:
+				$after_field = '</span>';
+				$loop_field_note .= ' <span class="field_error">'.$Request->err_messages[$loop_field_name].'</span>';
+				$r .= '<span class="checkbox_error">';
+			}
+			else
+			{
+				$after_field = '';
+			}
+
+			$r .= "\t".'<input type="checkbox" name="'.$loop_field_name.'" value="'.$option[1].'" ';
 			if( $option[3] )
 			{ //the checkbox has to be checked by default
 				$r .= ' checked="checked" ';
@@ -775,10 +792,14 @@ class Form extends Widget
 			{ // the checkbox has to be disabled
 				$r .= ' disabled="disabled" ';
 			}
-			$r .= ' class="checkbox" />'.$option[2];
-			if( !empty($option[5]) )
+			$r .= ' class="checkbox" />';
+
+			$r .= $after_field;
+
+			$r .= $option[2];
+			if( !empty($loop_field_note) )
 			{	// We want to display a note:
-				$r .= ' <span class="notes">'.$option[5].'</span>';
+				$r .= ' <span class="notes">'.$loop_field_note.'</span>';
 			}
 			$r .= "<br />\n";
 		}

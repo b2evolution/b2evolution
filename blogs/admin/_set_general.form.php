@@ -10,7 +10,7 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
-$Form = & new Form( 'b2options.php', 'form' );
+$Form = & new Form( 'settings.php', 'form' );
 
 $Form->begin_form( 'fform', T_('General Settings') );
 

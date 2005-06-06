@@ -38,35 +38,46 @@ switch( $action )
 
 	case 'create':
 		// INSERT new cat into db
-		param( 'cat_name', 'string', true );
-		param( 'parent_cat_ID', 'integer' );
+		$Request->param_string_not_empty( 'cat_name', T_('Please enter a category name.') );
+
+		$Request->param( 'parent_cat_ID', 'integer' );
 		if( !empty($parent_cat_ID) )
 		{ // We are creating a subcat
-			$cat_blog_ID = get_catblog($parent_cat_ID);
+			$cat_blog_ID = get_catblog( $parent_cat_ID );
 		}
 		else
 		{
-			param( 'cat_blog_ID', 'integer', true );
+			$Request->param( 'cat_blog_ID', 'integer', true );
 		}
 
 		// check permissions:
 		$current_User->check_perm( 'blog_cats', '', true, $cat_blog_ID );
 
+		if( ! $Messages->count('error') )
+		{
+			if( !empty($parent_cat_ID) )
+			{ // We are creating a subcat
+				// INSERT INTO DB
+				$new_cat_ID = cat_create( $cat_name, $parent_cat_ID );
+			}
+			else
+			{ // We are creating a new base cat
+				// INSERT INTO DB
+				$new_cat_ID = cat_create( $cat_name, 'NULL', $cat_blog_ID );
+			}
+
+	 		$Messages->add( T_('New category created.'), 'success' );
+	 		$action = 'list';
+		}
+
 		if( !empty($parent_cat_ID) )
 		{ // We are creating a subcat
-			// INSERT INTO DB
-			$new_cat_ID = cat_create( $cat_name, $parent_cat_ID );
-			$blog = get_catblog($parent_cat_ID);
+			$blog = get_catblog( $parent_cat_ID );
 		}
 		else
 		{ // We are creating a new base cat
-			// INSERT INTO DB
-			$new_cat_ID = cat_create( $cat_name, 'NULL', $cat_blog_ID );
 			$blog = $cat_blog_ID;
 		}
-
- 		$Messages->add( T_('New category created.'), 'success' );
-
 		unset( $cache_categories );
 		break;
 
@@ -85,13 +96,13 @@ switch( $action )
 		//
 		// Update cat in db:
 		//
-		param( 'cat_name', 'string', true );
+		$Request->param_string_not_empty( 'cat_name', T_('Please enter a category name.') );
 
-		param( 'cat_ID', 'integer', true );
+		$Request->param( 'cat_ID', 'integer', true );
 		//echo $cat_ID;
 		$cat_blog_ID = get_catblog($cat_ID);
 
-		param( 'cat_parent_ID', 'string', true );
+		$Request->param( 'cat_parent_ID', 'string', true );
 		$cat_parent_ID_parts = explode( '_', $cat_parent_ID );
 		$cat_parent_ID = $cat_parent_ID_parts[0];
 		settype( $cat_parent_ID, 'integer' );
@@ -118,12 +129,15 @@ switch( $action )
 			$current_User->check_perm( 'blog_cats', '', true, $parent_cat_blog_ID );
 		}
 
-		cat_update( $cat_ID, $cat_name, $cat_parent_ID, $parent_cat_blog_ID );
-
-		$Messages->add( T_('Category updated.'), 'success' );
+		if( ! $Messages->count('error') )
+		{
+			cat_update( $cat_ID, $cat_name, $cat_parent_ID, $parent_cat_blog_ID );
+			$Messages->add( T_('Category updated.'), 'success' );
+			unset( $cache_categories );
+			$action = 'list';
+		}
 
 		$blog = $cat_blog_ID;
-		unset( $cache_categories );
 		break;
 
 
@@ -172,6 +186,7 @@ require dirname(__FILE__).'/_menutop.php';
 switch($action)
 {
 	case 'new':
+	case 'create': // in case of an error
 		// New category form:
 		$AdminUI->dispPayloadBegin();
 
@@ -210,6 +225,7 @@ switch($action)
 
 
 	case 'edit':
+	case 'update': // in case of an error
 		// ---------- Cat edit form: ----------
 		$cat_name = get_catname($cat_ID);
 		$cat_parent_ID = get_catparent($cat_ID);
@@ -227,14 +243,12 @@ switch($action)
 
     $Form->text( 'cat_name', $cat_name, 40, T_('New category name'), '', 80 );
 
-		echo '<h3>'.T_('New parent category').':</h3>';
-
 		// ----------------- START RECURSIVE CAT LIST ----------------
 		cat_query( false );	// make sure the caches are loaded
 
 		function cat_move_before_first( $parent_cat_ID, $level )
 		{ // callback to start sublist
-			echo "\n<ul>\n";
+			return "\n<ul>\n";
 		}
 
 		function cat_move_before_each( $curr_cat_ID, $level )
@@ -244,74 +258,86 @@ switch($action)
 			if( $curr_cat_ID == $cat_ID )
 			{ // We have reached current category.
 				// This branch cannot become a parent!
-				return -1;
+				return true;
 			}
 			$cat = get_the_category_by_ID( $curr_cat_ID );
-			echo "<li>"; ?>
-			<input type="radio" id="cat_parent_ID<?php echo $curr_cat_ID; ?>" name="cat_parent_ID" value="<?php echo $curr_cat_ID ?>"
-			<?php
-				if( $cat_parent_ID == $curr_cat_ID ) echo 'checked="checked"';
-			?>
-			/>
-			<label for="cat_parent_ID<?php echo $curr_cat_ID; ?>"><strong><?php echo $cat['cat_name']; ?></strong></label>
-			<?php
-			if( $cat_parent_ID == $curr_cat_ID ) echo ' &lt;= ', T_('Old Parent');
+			$r = '<li>';
+			$r .= '<input type="radio" id="cat_parent_ID'.$curr_cat_ID.'" name="cat_parent_ID" value="'.$curr_cat_ID.'"';
+			if( $cat_parent_ID == $curr_cat_ID )
+			{
+				$r .= ' checked="checked"';
+			}
+			$r .= '/><label for="cat_parent_ID'.$curr_cat_ID.'"><strong>'.$cat['cat_name'].'</strong></label>';
+			if( $cat_parent_ID == $curr_cat_ID )
+			{
+				$r .= ' &lt;= '.T_('Old Parent');
+			}
+			return $r;
 		}
 
 		function cat_move_after_each( $curr_cat_ID, $level )
 		{ // callback after each sublist element
-			echo "</li>\n";
+			return "</li>\n";
 		}
 
 		function cat_move_after_last( $parent_cat_ID, $level )
 		{ // callback to end sublist
-			echo "</ul>\n";
+			return "</ul>\n";
 		}
+
+		$r = '';
 
 		if( $allow_moving_chapters )
 		{ // If moving cats between blogs is allowed:
 			foreach( $cache_blogs as $i_blog )
 			{ // run recursively through the cats of each blog
 				$current_blog_ID = $i_blog->blog_ID;
-				if( ! $current_User->check_perm( 'blog_cats', '', false, $current_blog_ID ) ) continue;
-				echo "<h4>".$i_blog->blog_name."</h4>\n";
+				if( ! $current_User->check_perm( 'blog_cats', '', false, $current_blog_ID ) )
+					continue;
 
-				?>
-				<input type="radio" id="cat_parent_none_<?php echo $current_blog_ID ?>" name="cat_parent_ID" value="0_<?php echo $current_blog_ID ?>"
-				<?php
-					if( (! $cat_parent_ID) && ($current_blog_ID == $blog) ) echo 'checked="checked"';
-				?>
-				/>
-				<label for="cat_parent_none_<?php echo $current_blog_ID ?>"><strong><?php echo T_('Root (No parent)') ?></strong></label>
-				<?php
+				$r .= "<h4>".$i_blog->blog_name."</h4>\n";
+
+				$r .= '<input type="radio" id="cat_parent_none_'.$current_blog_ID.'" name="cat_parent_ID" value="0_'.$current_blog_ID.'"';
 				if( (! $cat_parent_ID) && ($current_blog_ID == $blog) )
 				{
-					echo ' &lt;= ', T_('Old Parent');
+					$r .= ' checked="checked"';
+				}
+				$r .= '/><label for="cat_parent_none_'.$current_blog_ID.'"><strong>'.T_('Root (No parent)').'</strong></label>';
+				if( (! $cat_parent_ID) && ($current_blog_ID == $blog) )
+				{
+					$r .= ' &lt;= '.T_('Old Parent');
 				}
 				// RECURSE:
-				cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_move_before_first', 'cat_move_before_each', 'cat_move_after_each', 'cat_move_after_last' );
+				$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_move_before_first', 'cat_move_before_each', 'cat_move_after_each', 'cat_move_after_last' );
 			}
 
-			echo '<p class="extracatnote">'.T_('Note: Moving categories across blogs is enabled. Use with caution.').'</p> ';
+			$r .= '<p class="extracatnote">'.T_('Note: Moving categories across blogs is enabled. Use with caution.').'</p> ';
 		}
 		else
 		{ // Moving cats between blogs is disabled
-			?>
-			<input type="radio" id="cat_parent_none_<?php echo $blog ?>" name="cat_parent_ID" value="0_<?php echo $blog ?>"
-			<?php
-				if( ! $cat_parent_ID ) echo 'checked="checked"';
-			?>
-			/>
-			<label for="cat_parent_none_<?php echo $blog ?>"><strong><?php echo T_('Root (No parent)') ?></strong></label>
-			<?php
-			if( ! $cat_parent_ID ) echo ' &lt;= ', T_('Old Parent');
+			$r .= '<input type="radio" id="cat_parent_none_'.$blog.'" name="cat_parent_ID" value="0_'.$blog.'"';
+			if( ! $cat_parent_ID )
+			{
+				$r .= ' checked="checked"';
+			}
+			$r .= '/><label for="cat_parent_none_'.$blog.'"><strong>'.T_('Root (No parent)').'</strong></label>';
+			if( ! $cat_parent_ID )
+			{
+				$r .= ' &lt;= '.T_('Old Parent');
+			}
 			// RECURSE:
-			cat_children( $cache_categories, $blog, NULL, 'cat_move_before_first', 'cat_move_before_each', 'cat_move_after_each', 'cat_move_after_last' );
+			$r .= cat_children( $cache_categories, $blog, NULL, 'cat_move_before_first', 'cat_move_before_each', 'cat_move_after_each', 'cat_move_after_last' );
 
-			echo '<p class="extracatnote">'.T_('Note: Moving categories across blogs is disabled.').'</p> ';
+			if( ! is_null( $allow_moving_chapters ) )
+			{
+				$r .= '<p class="extracatnote">'.T_('Note: Moving categories across blogs is disabled.').'</p> ';
+			}
 		}
 
 		// ----------------- END RECURSIVE CAT LIST ----------------
+
+		$Form->info( T_('New parent category'), $r );
+
 
 		$Form->end_form( array( array( 'submit', 'submit', T_('Edit category'), 'SaveButton' ),
 														array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -340,6 +366,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.45  2005/06/06 17:59:37  fplanque
+ * user dialog enhancements
+ *
  * Revision 1.44  2005/06/03 15:12:30  fplanque
  * error/info message cleanup
  *

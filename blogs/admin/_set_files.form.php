@@ -57,7 +57,7 @@ $Form->fieldset( T_('Upload options') );
 	$Form->text( 'upload_maxkb',
 										$Settings->get('upload_maxkb'),
 										6,
-										T_('Maximal allowed filesize'),
+										T_('Maximum allowed filesize'),
 										T_('KB (This cannot be higher than your PHP/Webserver setting!)'),
 										7 );
 $Form->fieldset_end();

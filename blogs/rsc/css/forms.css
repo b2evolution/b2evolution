@@ -22,6 +22,11 @@ fieldset.input {
 	border: 0;
 }
 
+input[type=checkbox]
+{
+	margin:1px;
+}
+
 .notes {
 	font-size: 84%;
 	color: #999;
@@ -30,6 +35,10 @@ fieldset.input {
 span.field_error {
 	color: #f00;
 }
+span.checkbox_error {
+	background:#fbf2ee;
+	border: 1px solid #d99;
+}
 
 fieldset div.notes {
 	margin: 0 0 1ex 3ex;
@@ -37,8 +46,12 @@ fieldset div.notes {
 
 input.field_error {
 	background:#fbf2ee;
-	border-color: #d99;
+	border: 1px solid #d99;
 }
+span.checkbox_error input.checkbox {
+	background:#fbf2ee;
+}
+
 input.large,
 textarea.large {
 	width: 97%;
