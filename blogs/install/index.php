@@ -226,10 +226,7 @@ switch( $action )
 				<p><?php echo T_('This is how your _config.php should look like:') ?></p>
 				<blockquote>
 				<pre><?php
-					foreach( $conf as $conf_line )
-					{
-						echo htmlspecialchars( $conf_line );
-					}
+					echo htmlspecialchars( $conf );
 				?></pre>
 				</blockquote>
 				<?php
