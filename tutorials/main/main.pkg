@@ -1,0 +1,34 @@
+<refentry id="{@id}">
+
+ <refnamediv>
+  <refname>b2evolution technical documentation</refname>
+  <refpurpose>Work in progress...</refpurpose>
+ </refnamediv>
+
+ <refsynopsisdiv>
+  <author>
+   François PLANQUE
+   <authorblurb>
+    {@link http://fplanque.net/}
+   </authorblurb>
+  </author>
+ </refsynopsisdiv>
+
+ <refsect1 id="{@id purpose}">
+  <title>Purpose of this documentation</title>
+  
+  <para>This is the <strong>technical</strong> documentation for {@link http://b2evolution.net b2evolution}. It is mainly aimed at contributing developpers. However, documentation for template/skin functions will also be useful to anyone customizing/desigining user interface templates/skins for b2evolution.</para>
+  
+  <para>End user documentation can be found at {@link http://wiki.b2evolution.net/}.</para>
+ </refsect1>
+
+ <refsect1 id="{@id status}">
+  <title>Status of this documentation</title>
+  
+  <para>This documentation is generated automatically from the source code. Since all the source code is not yet commented in PhpDocumentor format, you should expect this documentation to be incomplete.</para>
+
+  <para>Be sure however to check out the other modules of this doc, especially evocore.</para>
+ </refsect1>
+
+</refentry>
+
