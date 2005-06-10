@@ -124,7 +124,7 @@ if( $allowed_to_edit )
 { // We can edit the values:
 	$Form->text( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', 20 );
 	$Form->text( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), '', 50 );
-	$Form->text( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', 50 );
+	$Form->text( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', 50, '', 'text', 'UpperCase' );
 	$Form->text( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', 50 );
 	$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when visiting the site.') );
@@ -192,6 +192,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.59  2005/06/10 18:25:42  fplanque
+ * refactoring
+ *
  * Revision 1.58  2005/06/03 20:14:38  fplanque
  * started input validation framework
  *

@@ -144,8 +144,8 @@ function format_to_edit( $content, $autobr = false )
 }
 
 
-/*
- * format_to_post(-)
+/**
+ * Format raw HTML input to cleaned up and validated HTML
  */
 function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'ISO-8859-1' )
 {
@@ -1537,8 +1537,12 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  */
 function action_icon( $title, $icon, $url, $word = '' )
 {
-	$r = '<a href="'.$url.'" title="'.$title.'">'
-				.get_icon( $icon, 'imgtag', array( 'title'=>$title ) );
+	$r = '<a href="'.$url.'" title="'.$title.'"';
+	if( get_icon( $icon, 'rollover' ) )
+		$r .= ' class="rollover"';
+	{
+	}
+	$r .= '>'.get_icon( $icon, 'imgtag', array( 'title'=>$title ) );
 	if( !empty( $word) )
 	{
 		$r .= $word;
@@ -1586,12 +1590,18 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL )
 
 	switch( $what )
 	{
+		case 'rollover':
+			if( isset( $map_iconfiles[$iconKey]['rollover'] ) )
+			{	// Image has rollover available
+				return $map_iconfiles[$iconKey]['rollover'];
+			}
+			return false;
+
 		case 'file':
 			return $basepath.$iconfile;
 
 		case 'imgtag':
 			$params['size'] = 'string';
-
 		case 'size':
 			if( !isset( $map_iconfiles[$iconKey]['size'] ) )
 			{
@@ -1634,7 +1644,20 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL )
 			}
 
 			$r = '<img '
-						.'class="'.( isset( $params['class'] ) ? $params['class'] : 'middle' ).'" '
+						.'class="';
+			if( isset( $params['class'] ) )
+			{
+				$r .= $params['class'];
+			}
+			elseif( isset($map_iconfiles[$iconKey]['class']) )
+			{	// This icon has a rollover
+				$r .= $map_iconfiles[$iconKey]['class'];
+			}
+			else
+			{
+				$r .= 'middle';
+			}
+			$r .=	'" '
 						.'src="'.$iconurl.'" '
 						.$size
 						.( isset( $params['title'] ) ? ' title="'.$params['title'].'"' : '' )
@@ -1838,8 +1861,34 @@ function header_redirect( $redirectTo = NULL )
 	exit();
 }
 
+
+function is_create_action( $action )
+{
+	$action_parts = explode( '_', $action );
+
+	switch( $action_parts[0] )
+	{
+		case 'new':
+		case 'copy':
+		case 'create':	// we return in this state after a validation error
+			return true;
+
+		case 'edit':
+		case 'update':	// we return in this state after a validation error
+		case 'delete':
+			return false;
+
+		default:
+			die( 'Unhandled action in form' );
+	}
+}
+
+
 /*
  * $Log$
+ * Revision 1.71  2005/06/10 18:25:44  fplanque
+ * refactoring
+ *
  * Revision 1.70  2005/06/03 15:12:33  fplanque
  * error/info message cleanup
  *

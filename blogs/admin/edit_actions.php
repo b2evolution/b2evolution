@@ -26,7 +26,6 @@ $AdminUI->setPath( 'edit' );
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
 
-param( 'edit_date', 'integer', 0 );
 param( 'aa', 'integer', 2000 );
 param( 'mm', 'integer', 1 );
 param( 'jj', 'integer', 1 );
@@ -48,9 +47,19 @@ switch($action)
 		 * --------------------------------------------------------------------
 		 * INSERT POST & more
 		 */
-		param( 'post_category', 'integer', true );
+		// We need early decoding of these in order to check permissions:
+		$Request->param( 'post_status', 'string', 'published' );
+		$Request->param( 'post_category', 'integer', true );
+		$Request->param( 'post_extracats', 'array', array() );
+		// make sure main cat is in extracat list and there are no duplicates
+		$post_extracats[] = $post_category;
+		$post_extracats = array_unique( $post_extracats );
+		// Check permission on statuses:
+		$current_User->check_perm( 'cats_post_statuses', $post_status, true, $post_extracats );
+
+
+		// Mumby funky old style navigation stuff:
 		$blog = get_catblog( $post_category );
-		$blogparams = get_blogparams_by_ID( $blog );
 		param( 'mode', 'string', '' );
 		switch($mode)
 		{
@@ -62,51 +71,78 @@ switch($action)
 				$location="b2browse.php?blog=$blog";
 				break;
 		}
-
 		$AdminUI->title = T_('Adding new post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
 
-		param( 'post_status', 'string', 'published' );
-		param( 'post_extracats', 'array', array() );
-		// make sure main cat is in extracat list and there are no duplicates
-		$post_extracats[] = $post_category;
-		$post_extracats = array_unique( $post_extracats );
-		// Check permission on statuses:
-		$current_User->check_perm( 'cats_post_statuses', $post_status, true, $post_extracats );
 
+		// CREATE NEW POST:
 		$edited_Item = & new Item();
 
-		$edited_Item->assign_to( param( 'item_assigned_user_ID', 'integer', 0 ) );
+		// Set the params we already got:
+		$edited_Item->set( 'status', $post_status );
+		$edited_Item->set( 'main_cat_ID', $post_category );
+		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
+
+
+
 
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;
-		param( 'content', 'html' );
-		param( 'post_title', 'html' );
-		param( 'post_urltitle', 'string' );
-		param( 'post_url', 'string' );
-		param( 'item_issue_date', 'string' );
-		param( 'item_issue_time', 'string' );
-		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
-		param( 'post_locale', 'string', $default_locale );
-		param( 'renderers', 'array', array() );
 
-		param( 'item_typ_ID', 'integer', true );
-		param( 'item_st_ID', 'integer', true );
 
+		$Request->param( 'post_title', 'html' );
+		$edited_Item->set( 'title', format_to_post( $post_title, 0, 0 ) );
+
+		$Request->param( 'post_locale', 'string', $default_locale );
+		$edited_Item->set( 'locale', $post_locale );
+
+		$Request->param( 'item_typ_ID', 'integer', true );
+		$edited_Item->set( 'typ_ID', $item_typ_ID );
+
+		$Request->param( 'post_url', 'string' );
+		$Request->param_check_url( 'post_url', $allowed_uri_scheme );
+		$edited_Item->set( 'url', $post_url );
+
+    $Request->param( 'content', 'html' );
+		$edited_Item->set( 'content', format_to_post( $content ) );
+
+		$Request->param( 'edit_date', 'integer', 0 );
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 		{ // We can use user date:
-			$edited_Item->issue_date = make_valid_date( $item_issue_date, $item_issue_time );
+			$Request->param( 'item_issue_date', 'string', true );
+			$Request->param_check_date( 'item_issue_date', T_('Please enter a valid issue date.'), true );
+			$Request->param( 'item_issue_time', 'string', true );
+			$edited_Item->set( 'issue_date', make_valid_date( $item_issue_date, $item_issue_time ) );
 		}
 
-		// CHECK and FORMAT content
-		$post_renderers = $Plugins->validate_list( $renderers );
-		$post_title = format_to_post($post_title,0,0);
-		if( $error = validate_url( $post_url, $allowed_uri_scheme ) )
-		{
-			$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
-		}
-		$content = format_to_post( $content );
+		$Request->param( 'post_urltitle', 'string', '' );
+		$edited_Item->set( 'urltitle', $post_urltitle );
+
+		// Workflow stuff:
+		$Request->param( 'item_st_ID', 'integer', true );
+		$edited_Item->set( 'st_ID', $item_st_ID );
+
+		$Request->param( 'item_assigned_user_ID', 'integer', true );
+ 		$edited_Item->assign_to( $item_assigned_user_ID );
+
+		$Request->param( 'item_priority', 'integer', true );
+		$edited_Item->set_from_Request( 'priority', 'item_priority' );
+
+  	$Request->param( 'item_deadline', 'string', true );
+		$Request->param_check_date( 'item_deadline', T_('Please enter a valid deadline.'), false );
+		$edited_Item->set_from_Request( 'deadline', 'item_deadline', true );
+
+ 		// Comment stuff:
+		$Request->param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
+		$edited_Item->set( 'comments', $post_comments );
+
+		$Request->param( 'renderers', 'array', array() );
+		$renderers = $Plugins->validate_list( $renderers );
+		$edited_Item->set( 'renderers', implode('.',$renderers) );
+
+
+
 
 		if( $Messages->count() )
 		{
@@ -121,17 +157,18 @@ switch($action)
 		echo '<h3>', T_('Recording post...'), "</h3>\n";
 
 		// Are we going to do the pings or not?
-		$pingsdone = ( $post_status == 'published' ) ? true : false;
+		$pingsdone = ( $edited_Item->status == 'published' ) ? true : false;
 
 		// INSERT NEW POST INTO DB:
-		$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $edited_Item->issue_date, $post_category,
-															$post_extracats, $post_status, $post_locale, '', 0,
-															$pingsdone, $post_urltitle, $post_url, $post_comments,
-															$post_renderers, $item_typ_ID, $item_st_ID );
+		$post_ID = $edited_Item->insert( $current_User->ID, $edited_Item->title, $edited_Item->content,
+															$edited_Item->issue_date, $edited_Item->main_cat_ID,
+															$edited_Item->extra_cat_IDs, $edited_Item->status, $edited_Item->locale, '', 0,
+															$pingsdone, $edited_Item->urltitle, $edited_Item->url, $edited_Item->comments,
+															explode('.',$edited_Item->renderers), $edited_Item->typ_ID, $edited_Item->st_ID );
 
 		echo "</div>\n";
 
-		if( $post_status != 'published' )
+		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
 			echo '<p>', T_('Post not publicly published: skipping trackback, pingback and blog pings...'), "</p>\n";
@@ -141,14 +178,14 @@ switch($action)
 		{ // We do all the pinging now!
 			$blogparams = get_blogparams_by_ID( $blog );
 			// trackback
-			trackbacks( $post_trackbacks, $content, $post_title, $post_ID);
+			trackbacks( $post_trackbacks, $edited_Item->content, $edited_Item->title, $post_ID);
 			// pingback
-			pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $blogparams);
-		
+			pingback( $post_pingback, $edited_Item->content, $edited_Item->title, $edited_Item->url, $post_ID, $blogparams);
+
 			// Send email notifications now!
 			$edited_Item->send_email_notifications();
 		
-			pingb2evonet($blogparams, $post_ID, $post_title);
+			pingb2evonet($blogparams, $post_ID, $edited_Item->title);
 			pingWeblogs($blogparams);
 			pingBlogs($blogparams);
 			pingTechnorati($blogparams);
@@ -162,57 +199,87 @@ switch($action)
 		 * --------------------------------------------------------------------
 		 * UPDATE POST
 		 */
-		param( 'post_category', 'integer', true );
-		$blog = get_catblog($post_category);
-		$blogparams = get_blogparams_by_ID( $blog );
-		$location = 'b2browse.php?blog='. $blog;
-
-		$AdminUI->title = T_('Updating post...');
-		require( dirname(__FILE__) . '/_menutop.php' );
-
-		param( 'post_status', 'string', 'published' );
-		param( 'post_extracats', 'array', array() );
+		// We need early decoding of these in order to check permissions:
+		$Request->param( 'post_status', 'string', 'published' );
+		$Request->param( 'post_category', 'integer', true );
+		$Request->param( 'post_extracats', 'array', array() );
 		// make sure main cat is in extracat list and there are no duplicates
 		$post_extracats[] = $post_category;
 		$post_extracats = array_unique( $post_extracats );
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post_statuses', $post_status, true, $post_extracats );
 
-		param( 'post_ID', 'integer', true );
 
+		// Mumby funky old style navigation stuff:
+		$blog = get_catblog($post_category);
+		$location = 'b2browse.php?blog='. $blog;
+		$AdminUI->title = T_('Updating post...');
+		require( dirname(__FILE__) . '/_menutop.php' );
+
+
+		// UPDATE POST:
+		$Request->param( 'post_ID', 'integer', true );
 		$edited_Item = $ItemCache->get_by_ID( $post_ID );
 
-		$edited_Item->assign_to( param( 'item_assigned_user_ID', 'integer', 0 ) );
+		// Set the params we already got:
+		$edited_Item->set( 'status', $post_status );
+		$edited_Item->set( 'main_cat_ID', $post_category );
+		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
+
 
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = $trackback_url;
-		param( 'content', 'html' );
-		param( 'post_title', 'html' );
-		param( 'post_urltitle', 'string' );
-		param( 'post_url', 'string' );
-		param( 'item_issue_date', 'string' );
-		param( 'item_issue_time', 'string' );
-		param( 'post_comments', 'string',  'open' );		// 'open' or 'closed' or ...
-		param( 'post_locale', 'string', $default_locale );
-		param( 'renderers', 'array', array() );
-		$post_renderers = $Plugins->validate_list( $renderers );
 
-		param( 'item_typ_ID', 'integer', true );
-		param( 'item_st_ID', 'integer', true );
+
+		$Request->param( 'post_title', 'html' );
+		$edited_Item->set( 'title', format_to_post( $post_title, 0, 0 ) );
+
+		$Request->param( 'post_locale', 'string', $default_locale );
+		$edited_Item->set( 'locale', $post_locale );
+
+		$Request->param( 'item_typ_ID', 'integer', true );
+		$edited_Item->set( 'typ_ID', $item_typ_ID );
+
+		$Request->param( 'post_url', 'string' );
+		$Request->param_check_url( 'post_url', $allowed_uri_scheme );
+		$edited_Item->set( 'url', $post_url );
+
+    $Request->param( 'content', 'html' );
+		$edited_Item->set( 'content', format_to_post( $content ) );
 
 		if( $current_User->check_perm( 'edit_timestamp' ))
-		{ // We use user date
-			$edited_Item->issue_date = make_valid_date( $item_issue_date, $item_issue_time );
+		{ // We can use user date:
+			$Request->param( 'item_issue_date', 'string', true );
+			$Request->param_check_date( 'item_issue_date', T_('Please enter a valid issue date.'), true );
+			$Request->param( 'item_issue_time', 'string', true );
+			$edited_Item->set( 'issue_date', make_valid_date( $item_issue_date, $item_issue_time ) );
 		}
 
-		// CHECK and FORMAT content
-		$post_title = format_to_post( $post_title, 0, 0 );
-		if( $error = validate_url( $post_url, $allowed_uri_scheme ) )
-		{
-			$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
-		}
-		$content = format_to_post( $content );
+		$Request->param( 'post_urltitle', 'string', '' );
+		$edited_Item->set( 'urltitle', $post_urltitle );
+
+		// Workflow stuff:
+		$Request->param( 'item_st_ID', 'integer', true );
+		$edited_Item->set( 'st_ID', $item_st_ID );
+
+		$Request->param( 'item_assigned_user_ID', 'integer', true );
+ 		$edited_Item->assign_to( $item_assigned_user_ID );
+
+		$Request->param( 'item_priority', 'integer', true );
+		$edited_Item->set_from_Request( 'priority', 'item_priority' );
+
+  	$Request->param( 'item_deadline', 'string', true );
+		$Request->param_check_date( 'item_deadline', T_('Please enter a valid deadline.'), false );
+		$edited_Item->set_from_Request( 'deadline', 'item_deadline', true );
+
+ 		// Comment stuff:
+		$Request->param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
+		$edited_Item->set( 'comments', $post_comments );
+
+		$Request->param( 'renderers', 'array', array() );
+		$renderers = $Plugins->validate_list( $renderers );
+		$edited_Item->set( 'renderers', implode('.',$renderers) );
 
 		if( $Messages->count() )
 		{
@@ -232,7 +299,7 @@ switch($action)
 		{ // pings have been done before
 			$pingsdone = true;
 		}
-		elseif( $post_status != 'published' )
+		elseif( $edited_Item->status != 'published' )
 		{ // still not publishing
 			$pingsdone = false;
 		}
@@ -242,13 +309,16 @@ switch($action)
 		}
 
 		// UPDATE POST IN DB:
-		$edited_Item->update( $post_title, $content, $edited_Item->issue_date, $post_category, $post_extracats,
-													$post_status, $post_locale, '',	0, $pingsdone, $post_urltitle,
-													$post_url, $post_comments, $post_renderers, $item_typ_ID, $item_st_ID );
+		$edited_Item->update( $edited_Item->title, $edited_Item->content, $edited_Item->issue_date,
+													$edited_Item->main_cat_ID, $edited_Item->extra_cat_IDs,
+													$edited_Item->status, $edited_Item->locale, '',	0,
+													$pingsdone, $edited_Item->urltitle,
+													$edited_Item->url, $edited_Item->comments,
+													explode('.',$edited_Item->renderers), $edited_Item->typ_ID, $edited_Item->st_ID );
 
 		echo '<p>'.T_('Done.').'</p></div>';
 
-		if( $post_status != 'published' )
+		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
 			echo '<p>', T_('Post not publicly published: skipping trackback, pingback and blog pings...'), "</p>\n";
@@ -259,9 +329,9 @@ switch($action)
 			$blogparams = get_blogparams_by_ID( $blog );
 
 			// trackback
-			trackbacks( $post_trackbacks, $content,  $post_title, $post_ID );
+			trackbacks( $post_trackbacks, $edited_Item->content,  $edited_Item->title, $post_ID );
 			// pingback
-			pingback( $post_pingback, $content, $post_title, $post_url, $post_ID, $blogparams);
+			pingback( $post_pingback, $edited_Item->content, $edited_Item->title, $edited_Item->url, $post_ID, $blogparams);
 
 			// ping ?
 			if( in_array( 'pingsdone', $post_flags ) )
@@ -276,7 +346,7 @@ switch($action)
 				// Send email notifications now!
 				$edited_Item->send_email_notifications();
 			
-				pingb2evonet( $blogparams, $post_ID, $post_title );
+				pingb2evonet( $blogparams, $post_ID, $edited_Item->title );
 				pingWeblogs( $blogparams );
 				pingBlogs( $blogparams );
 				pingTechnorati( $blogparams );
@@ -292,8 +362,9 @@ switch($action)
 		 * --------------------------------------------------------------------
 		 * PUBLISH POST NOW
 		 */
-		param( 'post_ID', 'integer', true );
+		$Request->param( 'post_ID', 'integer', true );
 		$edited_Item = $ItemCache->get_by_ID( $post_ID );
+
 		$post_cat = $edited_Item->main_cat_ID;
 		$blog = get_catblog($post_cat);
 		$blogparams = get_blogparams_by_ID( $blog );
@@ -308,9 +379,9 @@ switch($action)
 		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
 		$current_User->check_perm( 'edit_timestamp', 'any', true ) ;
 
+		$edited_Item->set( 'status', $post_status );
+
 		$post_date = date('Y-m-d H:i:s', $localtimenow);
-		$post_title = $edited_Item->title;
-		$post_url = $edited_Item->url;
 
 		echo "<div class=\"panelinfo\">\n";
 		echo '<h3>'.T_('Updating post status...')."</h3>\n";
@@ -321,7 +392,7 @@ switch($action)
 		{ // pings have been done before
 			$pingsdone = true;
 		}
-		elseif( $post_status != 'published' )
+		elseif( $edited_Item->status != 'published' )
 		{ // still not publishing
 			$pingsdone = false;
 		}
@@ -333,7 +404,6 @@ switch($action)
 
 		$edited_Item->set( 'datestart', $post_date );
 		$edited_Item->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
-		$edited_Item->set( 'status', $post_status );
 
 		// UPDATE POST IN DB:
 		$edited_Item->dbupdate();
@@ -341,7 +411,7 @@ switch($action)
 		echo '<p>', T_('Done.'), "</p>\n";
 		echo "</div>\n";
 
-		if( $post_status != 'published' )
+		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
 			echo '<p>', T_('Post not publicly published: skipping trackback, pingback and blog pings...'), "</p>\n";
@@ -364,7 +434,7 @@ switch($action)
 				// Send email notifications now!
 				$edited_Item->send_email_notifications();
 			
-				pingb2evonet( $blogparams, $post_ID, $post_title);
+				pingb2evonet( $blogparams, $post_ID, $edited_Item->title);
 				pingWeblogs($blogparams);
 				pingBlogs($blogparams);
 				pingTechnorati($blogparams);
@@ -454,6 +524,7 @@ switch($action)
 			$edited_Comment->set( 'author_url', $newcomment_author_url );
 		}
 
+		$Request->param( 'edit_date', 'integer', 0 );
 		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
 		{ // We use user date
 			$edited_Comment->set( 'date', date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) ) );

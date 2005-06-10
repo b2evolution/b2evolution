@@ -301,7 +301,7 @@ class Form extends Widget
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
-											$field_maxlength = 0 , $field_class = '', $inputtype = 'text' )
+											$field_maxlength = 0 , $field_class = '', $inputtype = 'text', $force_to = '' )
 	{
 		global $Request;
 		if( isset($Request->err_messages[$field_name]) )
@@ -320,6 +320,10 @@ class Form extends Widget
 		if( !empty($field_class) )
 		{
 			$r .= ' class="'.$field_class.'"';
+		}
+		if( $force_to == 'UpperCase' )
+		{	// Force input to uppercase
+			$r .= ' onchange="this.value = this.value.toUpperCase();"';
 		}
 		$r .= " />\n";
 
@@ -376,6 +380,12 @@ class Form extends Widget
 	function date( $field_name, $field_value, $field_label, $date_format = 'yyyy-MM-dd' )
 	{
 		global $month, $weekday_letter;
+		global $Request;
+		if( isset($Request->err_messages[$field_name]) )
+		{	// There is an error message for this field:
+			$field_class = 'field_error';
+			$field_note = '<span class="field_error">'.$Request->err_messages[$field_name].'</span>';
+		}
 
 		$field_size = strlen( $date_format );
 
@@ -415,11 +425,20 @@ class Form extends Widget
 						// -->
 					</script>\n"
 				.'<input type="text" name="'.$field_name.'" id="'.$field_name.'"
-					size="'.$field_size.'" maxlength="'.$field_size.'" value="'.format_to_output($field_value, 'formvalue').'"'
-				." />\n"
+					size="'.$field_size.'" maxlength="'.$field_size.'" value="'.format_to_output($field_value, 'formvalue').'"';
+		if( isset( $field_class ) )
+		{
+			$r .= ' class="'.$field_class.'"';
+		}
+		$r .= " />\n"
 				.'<a href="#" onClick="cal_'.$field_name.'.select('.$this->form_name.'.'.$field_name.",'anchor_".$field_name."', '".$date_format."' );"
 				.' return false;" name="anchor_'.$field_name.'" ID="anchor_'.$field_name.'">'.T_('Select').'</a>'
-				.' <span class="notes">('.$date_format.')</span>'
+				.' <span class="notes">('.$date_format.')';
+		if( isset( $field_note ) )
+		{
+			$r .= ' '.$field_note;
+		}
+		$r .= '</span>'
 				.$this->end_field();
 
 		if( $this->output )
@@ -770,12 +789,20 @@ class Form extends Widget
 		{ //loop to construct the list of 'input' tags
 
 			$loop_field_name = $option[0];
+			if( substr( $loop_field_name, -2 ) == '[]' )
+			{
+				$error_name = substr( $loop_field_name, 0, strlen($loop_field_name)-2 );
+			}
+			else
+			{
+				$error_name = $loop_field_name;
+			}
 			$loop_field_note = isset($option[5]) ? $option[5] : '';
 
-			if( isset($Request->err_messages[$loop_field_name]) )
+			if( isset($Request->err_messages[$error_name]) )
 			{	// There is an error message for this field:
 				$after_field = '</span>';
-				$loop_field_note .= ' <span class="field_error">'.$Request->err_messages[$loop_field_name].'</span>';
+				$loop_field_note .= ' <span class="field_error">'.$Request->err_messages[$error_name].'</span>';
 				$r .= '<span class="checkbox_error">';
 			}
 			else
@@ -835,9 +862,14 @@ class Form extends Widget
 		$field_note = '',
 		$field_class = '' )
 	{
-		$r = $this->begin_field( $field_name, $field_label )
-					."\n"
-					.'<select';
+		global $Request;
+		if( isset($Request->err_messages[$field_name]) )
+		{	// There is an error message for this field:
+			$field_class .= ' field_error';
+			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
+		}
+
+		$r = $this->begin_field( $field_name, $field_label )."\n<select";
 		if( !empty($field_name) )
 		{
 			$r .= ' name="'.$field_name.'" id="'.$field_name.'"';
@@ -846,9 +878,7 @@ class Form extends Widget
 		{
 			$r.= ' class="'.$field_class.'"';
 		}
-		$r .= ">\n"
-					.call_user_func( $field_list_callback, $field_value )
-					."</select>\n";
+		$r .= ">\n".call_user_func( $field_list_callback, $field_value )."</select>\n";
 
 		if( !empty($field_note) )
 		{
@@ -891,6 +921,13 @@ class Form extends Widget
 		$field_class = '',
 		$field_object_callback = 'option_list_return' )
 	{
+		global $Request;
+		if( isset($Request->err_messages[$field_name]) )
+		{	// There is an error message for this field:
+			$field_class .= ' field_error';
+			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
+		}
+
 		$r = $this->begin_field( $field_name, $field_label )
 					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
 
@@ -935,6 +972,13 @@ class Form extends Widget
 		$field_note = NULL,
 		$field_class = NULL )
 	{
+		global $Request;
+		if( isset($Request->err_messages[$field_name]) )
+		{	// There is an error message for this field:
+			$field_class .= ' field_error';
+			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
+		}
+
 		$r = $this->begin_field( $field_name, $field_label )
 					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
 
@@ -979,7 +1023,12 @@ class Form extends Widget
 	function textarea( $field_name, $field_value, $field_rows, $field_label,
 												$field_note = '', $field_cols = 50 , $field_class = '' )
 	{
-		global $img_url;
+		global $img_url, $Request;
+		if( isset($Request->err_messages[$field_name]) )
+		{	// There is an error message for this field:
+			$field_class .= ' field_error';
+			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
+		}
 
 		$r = $this->begin_field( $field_name, $field_label );
 
@@ -1003,7 +1052,7 @@ class Form extends Widget
 
 		if( !empty($field_note) )
 		{
-			$r .= '  <span class="notes">'.$field_note.'</span>';
+			$r .= '<br/><span class="notes">'.$field_note.'</span>';
 		}
 
 		$r .= $this->end_field();

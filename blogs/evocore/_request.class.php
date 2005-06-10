@@ -93,7 +93,7 @@ class Request
 	 */
 	function param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
 	{
-    $this->params[$var] = param( $var, $type, $default, $memorize, $override, $forceset );
+    return $this->params[$var] = param( $var, $type, $default, $memorize, $override, $forceset );
 	}
 
 	/**
@@ -105,6 +105,12 @@ class Request
 		{
 			$this->param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true );
 		}
+	}
+
+
+	function get( $var )
+	{
+		return $this->params[$var];
 	}
 
 
@@ -164,10 +170,10 @@ class Request
 	 * @param string error message
 	 * @return boolean true if OK
 	 */
-	function param_integer_range( $var, $min, $max, $err_msg )
+	function param_integer_range( $var, $min, $max, $err_msg, $required = true )
 	{
-		$this->param( $var, 'integer', true );
-		return $this->param_check_range( $var, $min, $max, $err_msg );
+		$this->param( $var, 'integer', $required ? true : '' );
+		return $this->param_check_range( $var, $min, $max, $err_msg, $required );
 	}
 
 
@@ -178,8 +184,13 @@ class Request
 	 * @param string error message
 	 * @return boolean true if OK
 	 */
-	function param_check_range( $var, $min, $max, $err_msg )
+	function param_check_range( $var, $min, $max, $err_msg, $required = true )
 	{
+		if( empty( $this->params[$var] ) && ! $required )
+		{ // empty is OK:
+			return true;
+		}
+
 		if( $this->params[$var] < $min || $this->params[$var] > $max )
 		{
 			$this->param_error( $var, sprintf( $err_msg, $min, $max ) );
@@ -211,6 +222,26 @@ class Request
 
 	/**
 	 * @param string param name
+	 * @return boolean true if OK
+	 */
+	function param_check_phone( $var, $required = false )
+	{
+		if( empty( $this->params[$var] ) && ! $required )
+		{ // empty is OK:
+			return true;
+		}
+
+		if( ! preg_match( '|^\+?[\-*#/(). 0-9]+$|', $this->params[$var] ) )
+		{
+			$this->param_error( $var, T_('The phone number is invalid.') );
+			return false;
+		}
+		return true;
+	}
+
+
+	/**
+	 * @param string param name
 	 * @param string error message
 	 * @return boolean true if OK
 	 */
@@ -222,6 +253,37 @@ class Request
 			return false;
 		}
 		return true;
+	}
+
+
+
+	/**
+	 * Check if param is an ISO date
+	 *
+	 * @param string param name
+	 * @param string error message
+	 * @return boolean true if OK
+	 */
+	function param_check_date( $var, $err_msg, $required = false )
+	{
+		if( empty( $this->params[$var] ) && ! $required )
+		{ // empty is OK:
+			return true;
+		}
+
+		if( preg_match( '#^(\d\d\d\d)-(\d\d)-(\d\d)$#', $this->params[$var], $matches ) )
+		{
+			$year = intval($matches[1]);
+			$month = intval($matches[2]);
+			$day = intval($matches[3]);
+			if( checkdate( $month, $day, $year ) )
+			{	// all clean! :)
+				return true;
+			}
+		}
+
+		$this->param_error( $var, $err_msg );
+		return false;
 	}
 
 
@@ -355,8 +417,12 @@ class Request
 		$this->Messages->add( $err_msg, 'error' );
 	}
 }
+
 /*
  * $Log$
+ * Revision 1.6  2005/06/10 18:25:44  fplanque
+ * refactoring
+ *
  * Revision 1.5  2005/06/06 17:59:39  fplanque
  * user dialog enhancements
  *

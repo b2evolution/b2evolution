@@ -151,15 +151,22 @@ class DataObject
 			// Get changed value:
 			eval('$loop_value = $this->'. $loop_dbchange['value'].';');
 			// Prepare matching statement:
-			switch( $loop_dbchange['type'] )
+			if( is_null($loop_value) )
 			{
-				case 'date':
-				case 'string':
-					$sql_changes[] = $loop_dbfieldname." = '".$DB->escape( $loop_value )."' ";
-					break;
+				$sql_changes[] = $loop_dbfieldname.' = NULL ';
+			}
+			else
+			{
+				switch( $loop_dbchange['type'] )
+				{
+					case 'date':
+					case 'string':
+						$sql_changes[] = $loop_dbfieldname." = '".$DB->escape( $loop_value )."' ";
+						break;
 
-				default:
-					$sql_changes[] = $loop_dbfieldname." = ".$DB->null($loop_value).' ';
+					default:
+						$sql_changes[] = $loop_dbfieldname." = ".$DB->null($loop_value).' ';
+				}
 			}
 		}
 
@@ -225,15 +232,22 @@ class DataObject
 			eval('$loop_value = $this->'. $loop_dbchange['value'].';');
 			// Prepare matching statement:
 			$sql_fields[] = $loop_dbfieldname;
-			switch( $loop_dbchange['type'] )
+			if( is_null($loop_value) )
 			{
-				case 'date':
-				case 'string':
-					$sql_values[] = $DB->quote( $loop_value );
-					break;
+				$sql_values[] = 'NULL';
+			}
+			else
+			{
+				switch( $loop_dbchange['type'] )
+				{
+					case 'date':
+					case 'string':
+						$sql_values[] = $DB->quote( $loop_value );
+						break;
 
-				default:
-					$sql_values[] = $DB->null( $loop_value );
+					default:
+						$sql_values[] = $DB->null( $loop_value );
+				}
 			}
 		}
 
@@ -498,12 +512,27 @@ class DataObject
 
 		// Set value:
 		$this->$parname = ($make_null && empty($parvalue)) ? NULL : $parvalue;
+		//echo '<br/>'.$this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname;
 		$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname, 'dataobjects' );
 
 		// Remember change for later db update:
 		$this->dbchange( $dbfield, $fieldtype, $parname );
 	}
 
+
+	/**
+	 * Set a parameter from a Request form value
+	 */
+	function set_from_Request( $parname, $var = NULL, $make_null = false )
+	{
+		global $Request;
+
+		if( empty($var) )
+		{
+			$var = $this->dbprefix.$parname;
+		}
+		$this->set( $parname, $Request->get($var), $make_null );
+	}
 
 	/**
 	 * Template function: Displays object ID
@@ -536,6 +565,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.19  2005/06/10 18:25:43  fplanque
+ * refactoring
+ *
  * Revision 1.18  2005/05/25 17:13:33  fplanque
  * implemented email notifications on new comments/trackbacks
  *

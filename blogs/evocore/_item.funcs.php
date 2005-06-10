@@ -748,7 +748,7 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
 function cat_select( $display_info = true )
 {
 	global $default_main_cat, $allow_cross_posting, $cache_blogs, $cache_categories,
-					$blog, $current_blog_ID, $current_User;
+					$blog, $current_blog_ID, $current_User, $edited_Item;
 
 	$r = '<div class="extracats">';
 
@@ -759,7 +759,7 @@ function cat_select( $display_info = true )
 				.'</p>';
 	}
 
-	$default_main_cat = 0;
+	$default_main_cat = $edited_Item->main_cat_ID;
 
 	cat_query( false ); // make sure the caches are loaded
 
@@ -768,8 +768,10 @@ function cat_select( $display_info = true )
 		foreach( $cache_blogs as $i_blog )
 		{ // run recursively through the cats
 			$current_blog_ID = $i_blog->blog_ID;
-			if( ! blog_has_cats( $current_blog_ID ) ) continue;
-			if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
+			if( ! blog_has_cats( $current_blog_ID ) )
+				continue;
+			if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) )
+				continue;
 			$r .= '<h4>'.format_to_output($i_blog->blog_name)."</h4>\n";
 			$r .= '<table cellspacing="0" class="catselect">'.cat_select_header();
 			$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
@@ -839,11 +841,12 @@ function cat_select_before_first( $parent_cat_ID, $level )
  */
 function cat_select_before_each( $cat_ID, $level )
 { // callback to display sublist element
-	global $current_blog_ID, $blog, $cat, $edited_Item, $post_extracats, $default_main_cat, $next_action, $creating, $allow_cross_posting, $cat_select_level;
+	global $current_blog_ID, $blog, $cat, $post_extracats, $default_main_cat, $next_action;
+	global $creating, $allow_cross_posting, $cat_select_level;
 	$this_cat = get_the_category_by_ID( $cat_ID );
 	$r = "\n<tr>";
 
-	// Radio for main cat:
+	// RADIO for main cat:
 	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
 	{ // This is current blog or we allow moving posts accross blogs
 		if( ($default_main_cat == 0)
@@ -854,23 +857,24 @@ function cat_select_before_each( $cat_ID, $level )
 		}
 		$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
 					.T_('Select as MAIN category').'" value="'.$cat_ID.'"';
-		if( ($cat_ID == $edited_Item->main_cat_ID) || ($cat_ID == $default_main_cat) )
+		if( $cat_ID == $default_main_cat )
 		{ // main cat of the Item or set as default main cat above
 			$r .= ' checked="checked"';
 		}
 		$r .= ' id="sel_maincat_'.$cat_ID.'"';
-		$r .= ' /></td>';
+		$r .= ' onclick="check_extracat(this);" /></td>';
 	}
 	else
 	{ // Don't allow to select this cat as a main cat
 		$r .= '<td class="selector">&nbsp;</td>';
 	}
 
+	// CHECKBOX:
 	if( $allow_cross_posting )
 	{ // We allow cross posting, display checkbox:
 		$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
 					.T_('Select as an additional category').'" value="'.$cat_ID.'"';
-		if( ($cat_ID == $edited_Item->main_cat_ID) || (in_array( $cat_ID, $post_extracats )) )
+		if( ($cat_ID == $default_main_cat) || (in_array( $cat_ID, $post_extracats )) )
 		{
 			$r .= ' checked="checked"';
 		}
@@ -907,6 +911,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.24  2005/06/10 18:25:44  fplanque
+ * refactoring
+ *
  * Revision 1.23  2005/03/09 20:29:39  fplanque
  * added 'unit' param to allow choice between displaying x days or x posts
  * deprecated 'paged' mode (ultimately, everything should be pageable)

@@ -38,6 +38,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/popupwindow.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/calendarpopup.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/functions.js"></script>
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/rollovers.js"></script>
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/extracats.js"></script>
 
 	<?php
 
@@ -342,7 +344,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 <body>
 <?php
-
 // Include title, menu, messages, etc.
 echo $AdminUI->getBodyTop();
 

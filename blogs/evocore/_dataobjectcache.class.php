@@ -209,7 +209,7 @@ class DataObjectCache
 
 		if( empty($req_ID) )
 		{
-			if($halt_on_empty) die( "Requested $this->objtype without ID!" );
+			if($halt_on_empty) die( "Requested $this->objtype from $this->dbtablename without ID!" );
 			return NULL;
 		}
 
@@ -334,6 +334,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.19  2005/06/10 18:25:44  fplanque
+ * refactoring
+ *
  * Revision 1.18  2005/05/16 15:17:13  fplanque
  * minor
  *

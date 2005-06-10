@@ -163,7 +163,7 @@ class ArchiveList extends Results
 				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
 				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, '.
 															$DB->week( $this->dbprefix.'datestart', locale_startofweek() ).' AS week,
-															COUNT(DISTINCT postcat_'.$this->dbprefix.'ID) AS count '
+															COUNT(DISTINCT postcat_post_ID) AS count '
 													.$this->from
 													.$this->where.'
 													GROUP BY year, week
@@ -192,6 +192,8 @@ class ArchiveList extends Results
 	 */
 	function count_total_rows()
 	{
+		global $DB;
+
 		switch( $this->archive_mode )
 		{
 			case 'monthly':
@@ -297,6 +299,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.11  2005/06/10 18:25:43  fplanque
+ * refactoring
+ *
  * Revision 1.10  2005/05/24 15:26:52  fplanque
  * cleanup
  *

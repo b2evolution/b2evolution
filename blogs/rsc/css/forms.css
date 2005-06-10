@@ -44,7 +44,9 @@ fieldset div.notes {
 	margin: 0 0 1ex 3ex;
 }
 
-input.field_error {
+input.field_error,
+select.field_error,
+textarea.field_error {
 	background:#fbf2ee;
 	border: 1px solid #d99;
 }

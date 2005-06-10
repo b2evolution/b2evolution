@@ -47,6 +47,13 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 require_once dirname(__FILE__).'/_dataobject.class.php';
 
+if( false )
+{	/**
+	 * This is ugly, sorry, but I temporarily need this until NuSphere fixes their CodeInsight :'(
+	 */
+	include('_main.inc.php');
+}
+
 /**
  * Object definition:
  */
@@ -135,6 +142,10 @@ class Item extends DataObject
 	 */
 	var $Blog;
 
+	/**
+	 * @var NULL|array of IDs or NULL if we don't know...
+	 */
+	var $extra_cat_IDs = NULL;
 
 	/**
 	 * Array of Links attached to this item.
@@ -169,7 +180,7 @@ class Item extends DataObject
 												$datecreated_field = '', $datemodified_field = 'datemodified',
 												$creator_field = 'creator_user_ID', $lasteditor_field = '' )
 	{
-		global $UserCache, $object_def, $localtimenow;
+		global $UserCache, $object_def, $localtimenow, $default_locale;
 
 		$this->priorities = array(
 							1 => T_('1 - Highest'),
@@ -216,6 +227,7 @@ class Item extends DataObject
 			$this->flags = array();
 			$this->renderers = array();
 			$this->status = 'published';
+			$this->locale = $default_locale;
 		}
 		else
 		{
@@ -271,6 +283,27 @@ class Item extends DataObject
 		{ // Record ID for DB:
 			$this->set_param( 'assigned_user_ID', 'number', $this->AssignedUser->ID, true );
 		}
+	}
+
+
+
+	/**
+	 * Load data from Request form fields.
+	 *
+	 * @return boolean true if loaded data seems valid.
+	 */
+	function load_from_Request()
+	{
+		global $Request;
+
+		/* todo like this:
+
+		$Request->param_string_not_empty( 'cont_lastname', T_('Please enter a name.') );
+		$this->set_from_Request( 'lastname' );
+
+		*/
+
+		return ! $Request->validation_errors();
 	}
 
 
@@ -1643,6 +1676,8 @@ class Item extends DataObject
 	 *
 	 * By default, all values will be considered strings
 	 *
+	 * @todo extra_cat_IDs recording
+	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
 	 * @param boolean true to set to NULL if empty value
@@ -1652,8 +1687,20 @@ class Item extends DataObject
 		switch( $parname )
 		{
 			case 'main_cat_ID':
-			case 'wordcount':
-				$this->set_param( $parname, 'number', $parvalue, false );
+				$this->set_param( 'main_cat_ID', 'number', $parvalue, false );
+				// make sure main cat is in extracat list and there are no duplicates
+				$this->extra_cat_IDs[] = $this->main_cat_ID;
+				$this->extra_cat_IDs = array_unique( $this->extra_cat_IDs );
+				// Update derived property:
+     		$this->blog_ID = get_catblog( $this->main_cat_ID ); // This is a derived var
+				break;
+
+			case 'extra_cat_IDs':
+				// ARRAY! We do not record this change (yet)
+				$this->extra_cat_IDs = $parvalue;
+				// make sure main cat is in extracat list and there are no duplicates
+				$this->extra_cat_IDs[] = $this->main_cat_ID;
+				$this->extra_cat_IDs = array_unique( $this->extra_cat_IDs );
 				break;
 
 			case 'typ_ID':
@@ -1661,9 +1708,37 @@ class Item extends DataObject
 				$this->set_param( $parname, 'number', $parvalue, true );
 				break;
 
+			case 'content':
+				$this->set_param( 'content', 'string', $parvalue, $make_null );
+				// Update wordcount as well:
+				$this->set_param( 'wordcount', 'number', bpost_count_words($this->content), false );
+				break;
+
+			case 'wordcount':
+				$this->set_param( 'wordcount', 'number', $parvalue, false );
+				break;
+
+			case 'issue_date':
+			case 'datestart':
+				$this->issue_date = $parvalue;
+				$this->set_param( 'datestart', 'date', $parvalue, false );
+				break;
+
+			case 'deadline':
+				$this->set_param( 'deadline', 'date', $parvalue, true );
+				echo 'deadline'.$this->deadline;
+				break;
+
 			default:
 				$this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
+	}
+
+
+	function set_author_User( & $author_User )
+	{
+		$this->Author = & $author_User;
+		$this->set( $this->creator_field, $author_User->ID );
 	}
 
 
@@ -1700,61 +1775,72 @@ class Item extends DataObject
 
 		if( $post_locale == '#' ) $post_locale = $default_locale;
 
-		// Handle the flags:
-		$post_flags = array();
-		if( $pingsdone ) $post_flags[] = 'pingsdone';
-
-		// make sure main cat is in extracat list and there are no duplicates
-		$extra_cat_IDs[] = $main_cat_ID;
-		$extra_cat_IDs = array_unique( $extra_cat_IDs );
-
-		// TODO: START TRANSACTION
-
-		// validate url title
-		$post_urltitle = urltitle_validate( $post_urltitle, $post_title, 0,
-																				false, $this->dbprefix, $this->dbIDname, $this->dbtablename);
-
 		// echo 'INSERTING NEW POST ';
 
-		$this->creator_user_ID = $author_user_ID;
-		$this->lastedit_user_ID = $author_user_ID;
 		if( isset( $UserCache ) )
 		{	// If not in install procedure...
-			$this->Author = & $UserCache->get_by_ID( $this->creator_user_ID );
+			$this->set_author_User( $UserCache->get_by_ID( $author_user_ID ) );
 		}
+		else
+		{
+			$this->creator_user_ID = $author_user_ID;
+		}
+		$this->lastedit_user_ID = $this->creator_user_ID;
 		$this->set( 'title', $post_title );
 		$this->set( 'urltitle', $post_urltitle );
 		$this->set( 'content', $post_content );
 		$this->set( 'datestart', $post_timestamp );
 		$this->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
 		$this->set( 'main_cat_ID', $main_cat_ID );
-		$this->blog_ID = get_catblog( $this->main_cat_ID ); // This is a derived var
 		$this->set( 'status', $post_status );
 		$this->set( 'locale', $post_locale );
 		$this->set( 'url', $post_url );
-		$this->set( 'flags', implode(',',$post_flags) );
-		$this->set( 'wordcount', bpost_count_words($post_content) );
+		$this->set( 'flags', $pingsdone ? 'pingsdone' : '' );
 		$this->set( 'comments', $post_comments );
 		$this->set( 'renderers', implode('.',$post_renderers) );
 		$this->set( 'typ_ID', $item_typ_ID );
 		$this->set( 'st_ID', $item_st_ID );
 
+		// INSERT INTO DB:
+		$this->extra_cat_IDs = & $extra_cat_IDs;
 		$this->dbinsert();
-
-		// insert new extracats
-		$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
-		foreach( $extra_cat_IDs as $extra_cat_ID )
-		{
-			// echo "extracat: $extra_cat_ID <br />";
-			$query .= "( $this->ID, $extra_cat_ID ),";
-		}
-		$query = substr( $query, 0, strlen( $query ) - 1 );
-		if( ! $DB->query( $query, 'Associate new post with extra categories' ) ) return 0;
-
-		// TODO: END TRANSACTION
 
 
 		return $this->ID;
+	}
+
+
+	/**
+	 * Insert object into DB based on previously recorded changes
+	 *
+	 * @return boolean true on success
+	 */
+	function dbinsert( )
+	{
+		global $DB, $current_User;
+
+		$DB->begin();
+
+		if( empty($this->creator_user_ID) )
+		{	// No creator assigned yet, use current user:
+   		$this->Author = & $current_User;
+			$this->creator_user_ID = $current_User->ID;
+		}
+
+		// validate url title
+		$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, 0,
+															false, $this->dbprefix, $this->dbIDname, $this->dbtablename) );
+
+		if( $result = parent::dbinsert() )
+		{	// We could insert the main object..
+
+			// Let's handle the extracats:
+			$this->insert_update_extracats( 'insert' );
+		}
+
+ 		$DB->commit();
+
+		return $result;
 	}
 
 
@@ -1783,32 +1869,16 @@ class Item extends DataObject
 		$item_typ_ID = 0,
 		$item_st_ID = 0 )
 	{
-		global $DB, $query;
 		global $localtimenow, $default_locale;
-
-		// Handle the flags:
-		$post_flags = array();
-		if( $pingsdone ) $post_flags[] = 'pingsdone';
-
-		// make sure main cat is in extracat list and there are no duplicates
-		$extra_cat_IDs[] = $main_cat_ID;
-		$extra_cat_IDs = array_unique( $extra_cat_IDs );
-
-		// TODO: START TRANSACTION
-
-		// validate url title
-		$post_urltitle = urltitle_validate( $post_urltitle, $post_title, $this->ID,
-																				false, $this->dbprefix, $this->dbIDname, $this->dbtablename );
 
 		$this->set( 'title', $post_title );
 		$this->set( 'urltitle', $post_urltitle );
 		$this->set( 'url', $post_url );
 		$this->set( 'content', $post_content );
-		$this->set( 'datemodified', date('Y-m-d H:i:s', $localtimenow ) );
+		// this is automatic $this->set( 'datemodified', date('Y-m-d H:i:s', $localtimenow ) );
 		$this->set( 'main_cat_ID', $main_cat_ID );
 		$this->set( 'status', $post_status );
-		$this->set( 'flags', implode( ',', $post_flags) );
-		$this->set( 'wordcount', bpost_count_words($post_content) );
+		$this->set( 'flags', $pingsdone ? 'pingsdone' : '' );
 		$this->set( 'comments', $post_comments );
 		$this->set( 'renderers', implode('.',$post_renderers) );
 		$this->set( 'typ_ID', $item_typ_ID );
@@ -1823,23 +1893,73 @@ class Item extends DataObject
 		}
 
 		// UPDATE DB:
+		$this->extra_cat_IDs = & $extra_cat_IDs;
 		$this->dbupdate();
+	}
 
-		// delete previous extracats
-		$query = 'DELETE FROM T_postcats WHERE postcat_post_ID = '.$this->ID;
-		$DB->query( $query );
 
-		// insert new extracats
-		$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
-		foreach( $extra_cat_IDs as $extra_cat_ID )
-		{
-			//echo "extracat: $extracat_ID <br />";
-			$query .= "( $this->ID, $extra_cat_ID ),";
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * @return boolean true on success
+	 */
+	function dbupdate( )
+	{
+		global $DB;
+
+		$DB->begin();
+
+		// validate url title
+		if( empty($this->urltitle) || isset($this->dbchanges['urltitle']) )
+		{	// Url title has changed or is empty
+			// echo 'updating url title';
+			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID,
+																false, $this->dbprefix, $this->dbIDname, $this->dbtablename ) );
 		}
-		$query = substr( $query, 0, strlen( $query ) - 1 );
-		$DB->query( $query );
 
-		// TODO: END TRANSACTION
+		if( $result = parent::dbupdate() )
+		{	// We could update the main object..
+
+			// Let's handle the extracats:
+			$this->insert_update_extracats( 'update' );
+		}
+
+ 		$DB->commit();
+
+		return $result;
+	}
+
+
+	/**
+	 * @param string 'insert' | 'update'
+	 */
+	function insert_update_extracats( $mode )
+	{
+		global $DB;
+
+		$DB->begin();
+
+		if( ! is_null( $this->extra_cat_IDs ) )
+		{	// Okay the extra cats are defined:
+
+			if( $mode == 'update' )
+			{
+				// delete previous extracats:
+				$DB->query( 'DELETE FROM T_postcats WHERE postcat_post_ID = '.$this->ID, 'delete previous extracats' );
+			}
+
+			// insert new extracats:
+			$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
+			foreach( $this->extra_cat_IDs as $extra_cat_ID )
+			{
+				//echo "extracat: $extracat_ID <br />";
+				$query .= "( $this->ID, $extra_cat_ID ),";
+			}
+			$query = substr( $query, 0, strlen( $query ) - 1 );
+			$DB->query( $query, 'insert new extracats' );
+		}
+
+ 		$DB->commit();
 	}
 
 
@@ -1983,6 +2103,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2005/06/10 18:25:44  fplanque
+ * refactoring
+ *
  * Revision 1.42  2005/06/02 18:50:52  fplanque
  * no message
  *

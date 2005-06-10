@@ -9,7 +9,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Map of filenames for icons and their respective alt tag.
  *
- * @global array icon name => array( 'file', 'alt' )
+ * @global array icon name => array( 'file', 'alt', 'size', 'class', 'rollover' )
  */
 $map_iconfiles = array(
 	'folder' => array(        // icon for folders
@@ -235,6 +235,7 @@ $map_iconfiles = array(
 	),
 	'close' => array(
 		'file' => $admin_subdir.'img/close.gif',
+		'rollover' => true,
 		'alt' => T_('Close'),
 		'size' => array( 14, 14 ),
 	),
