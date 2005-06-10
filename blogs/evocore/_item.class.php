@@ -1726,7 +1726,6 @@ class Item extends DataObject
 
 			case 'deadline':
 				$this->set_param( 'deadline', 'date', $parvalue, true );
-				echo 'deadline'.$this->deadline;
 				break;
 
 			default:
@@ -1792,6 +1791,7 @@ class Item extends DataObject
 		$this->set( 'datestart', $post_timestamp );
 		$this->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
 		$this->set( 'main_cat_ID', $main_cat_ID );
+		$this->set( 'extra_cat_IDs', $extra_cat_IDs );
 		$this->set( 'status', $post_status );
 		$this->set( 'locale', $post_locale );
 		$this->set( 'url', $post_url );
@@ -1802,7 +1802,6 @@ class Item extends DataObject
 		$this->set( 'st_ID', $item_st_ID );
 
 		// INSERT INTO DB:
-		$this->extra_cat_IDs = & $extra_cat_IDs;
 		$this->dbinsert();
 
 
@@ -1877,6 +1876,7 @@ class Item extends DataObject
 		$this->set( 'content', $post_content );
 		// this is automatic $this->set( 'datemodified', date('Y-m-d H:i:s', $localtimenow ) );
 		$this->set( 'main_cat_ID', $main_cat_ID );
+    $this->set( 'extra_cat_IDs', $extra_cat_IDs );
 		$this->set( 'status', $post_status );
 		$this->set( 'flags', $pingsdone ? 'pingsdone' : '' );
 		$this->set( 'comments', $post_comments );
@@ -1893,7 +1893,6 @@ class Item extends DataObject
 		}
 
 		// UPDATE DB:
-		$this->extra_cat_IDs = & $extra_cat_IDs;
 		$this->dbupdate();
 	}
 
@@ -2103,6 +2102,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2005/06/10 23:21:12  fplanque
+ * minor bugfixes
+ *
  * Revision 1.43  2005/06/10 18:25:44  fplanque
  * refactoring
  *
