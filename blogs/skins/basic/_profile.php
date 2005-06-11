@@ -81,7 +81,7 @@
 			form_text_tr( 'newuser_msn', $current_User->get('msn'), 40, T_('MSN I.M.'), '', 100, 'bComment' );
 			form_text_tr( 'newuser_yim', $current_User->get('yim'), 40, T_('Yahoo I.M.'), '', 50, 'bComment' );
 
-			form_checkbox_tr( 'newuser_notify', $current_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> receives comments, trackbacks, etc.') );
+			form_checkbox_tr( 'newuser_notify', $current_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
 		?>
 
 		<tr>
