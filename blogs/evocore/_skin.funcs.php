@@ -90,17 +90,36 @@ function skin_exists( $name )
  */
 function skin_options( $default = '' )
 {
+	echo skin_options_return( $default );
+}
+
+
+/**
+ * Returns an <option> set with default skin selected
+ *
+ * @return string
+ */
+function skin_options_return( $default = '' )
+{
+	$r = '';
+
 	for( skin_list_start(); skin_list_next(); )
 	{
-		echo '<option value="';
-		skin_list_iteminfo( 'name' );
-		echo '"';
-		if( skin_list_iteminfo( 'name',false ) == $default ) echo ' selected="selected" ';
-		echo '>';
-		skin_list_iteminfo( 'name' );
-		echo "</option>\n";
+		$r .= '<option value="';
+		skin_list_iteminfo( 'name', false );
+		$r .=  '"';
+		if( skin_list_iteminfo( 'name',false ) == $default )
+		{
+			$r .= ' selected="selected" ';
+		}
+		$r .=  '>';
+		$r .= skin_list_iteminfo( 'name', false );
+		$r .=  "</option>\n";
 	}
+
+	return $r;
 }
+
 
 /**
  * Initializes skin list iterator
@@ -166,9 +185,9 @@ function skin_list_iteminfo( $what='', $display = true )
 			$info = $skin_name;
 	}
 
-	if( $display ) echo $skin_name;
+	if( $display ) echo $info;
 
-	return $skin_name;
+	return $info;
 }
 
 
@@ -192,6 +211,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.4  2005/06/12 07:02:51  blueyed
+ * Added skin_options_return()
+ *
  * Revision 1.3  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
