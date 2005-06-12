@@ -1046,7 +1046,8 @@ class Form extends Widget
 			$r .= ' class="'.$field_class.'"';
 		}
 		$r .= ' rows="'.$field_rows.'" cols="'.$field_cols.'">'
-					.$field_value.'</textarea>'
+					.format_to_output( $field_value, 'formvalue' )
+					.'</textarea>'
 					// NOTE: this one is for compensating the previous pixel in case of center aligns.
 					.'<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />';
 
