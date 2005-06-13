@@ -297,7 +297,7 @@ class DataObject
 
 		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
 
-		if( count($this->delete_cascades ) )
+		if( count($this->delete_cascades) )
 		{	// The are cascading deletes to be performed
 
 			// Start transaction:
@@ -317,11 +317,11 @@ class DataObject
 		}
 
 		// Delete this (main/parent) object:
-		if( ! $DB->query( "DELETE FROM $this->dbtablename
+		$DB->query( "DELETE FROM $this->dbtablename
 									WHERE $this->dbIDname = $this->ID",
-								'Main delete' ) )
+								'Main delete' );
 
-		if( count($this->delete_cascades ) )
+		if( count($this->delete_cascades) )
 		{	// The were cascading deletes
 
 			// End transaction:
@@ -565,6 +565,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.20  2005/06/13 19:20:54  fplanque
+ * fix
+ *
  * Revision 1.19  2005/06/10 18:25:43  fplanque
  * refactoring
  *
