@@ -64,11 +64,23 @@ function starify( $string )
 $b2newpost_doc='Adds a post, blogger-api like, +title +category +postdate';
 $b2newpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcBoolean, $xmlrpcString, $xmlrpcString, $xmlrpcString));
 /**
- * b2.newPost
+ * b2.newPost. Adds a post, blogger-api like, +title +category +postdate.
  *
  * b2 API
  *
  * {@internal b2newpost(-) }}
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 ?
+ *					1 ?
+ *					2 username (string): Login for a Blogger user who is member of the blog.
+ *					3 password (string): Password for said username.
+ *					4 content (string): The content of the post.
+ *					5 publish (boolean): If set to true, the post will be published immediately.
+ *					6 title (string): The title of the post.
+ *					7 category (string): The internal name of the category you want to post the post into.
+ *					8 date (string): This is the date that will be shown in the post, give "" for current date.
+ * @return xmlrpcresp XML-RPC Response
  */
 function b2newpost($m)
 {
