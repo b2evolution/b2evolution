@@ -85,24 +85,24 @@ if( $action == 'edit' )
 	$form_action .= '?action=edit&amp;blog='.$blog;
 }
 
-$a_Form = new Form( $form_action, 'blog_general', 'post' );
+$Form = new Form( $form_action );
 
-$a_Form->begin_form( 'fform' );
+$Form->begin_form( 'fform' );
 
-$a_Form->hidden( 'action', $next_action );
-$a_Form->hidden( 'blog', $blog );
-$a_Form->hidden( 'blogtemplate', $blogtemplate );
+$Form->hidden( 'action', $next_action );
+$Form->hidden( 'blog', $blog );
+$Form->hidden( 'blogtemplate', $blogtemplate );
 
-$a_Form->fieldset( T_('General parameters'), 'fieldset clear' );
-	$a_Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Full Name'), T_('Will be displayed on top of the blog.') );
-	$a_Form->text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 12, T_('Short Name'), T_('Will be used in selection menus and throughout the admin interface.') );
-	$a_Form->select( 'blog_locale', $edited_Blog->get( 'locale' ), 'locale_options_return', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
-$a_Form->fieldset_end();
+$Form->fieldset( T_('General parameters') );
+	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Full Name'), T_('Will be displayed on top of the blog.') );
+	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 12, T_('Short Name'), T_('Will be used in selection menus and throughout the admin interface.') );
+	$Form->select( 'blog_locale', $edited_Blog->get( 'locale' ), 'locale_options_return', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
+$Form->fieldset_end();
 
 
-$a_Form->fieldset( T_('Access parameters') );
+$Form->fieldset( T_('Access parameters') );
 
-	$a_Form->radio( 'blog_siteurl_type', $blog_siteurl_type,
+	$Form->radio( 'blog_siteurl_type', $blog_siteurl_type,
 		array(
 			array( 'relative',
 							T_('Relative to baseurl').':',
@@ -130,7 +130,7 @@ $a_Form->fieldset( T_('Access parameters') );
 			$defblog = $default_Blog->dget('shortname');
 		}
 	}
-	$a_Form->radio( 'blog_access_type', $edited_Blog->get( 'access_type' ),
+	$Form->radio( 'blog_access_type', $edited_Blog->get( 'access_type' ),
 		array(
 			array( 'default', T_('Automatic detection by index.php'),
 							T_('Match absolute URL or use default blog').
@@ -155,43 +155,43 @@ $a_Form->fieldset( T_('Access parameters') );
 			),
 		), T_('Preferred access type'), true );
 
-	$a_Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL blog name'), T_('Used to uniquely identify this blog. Appears in URLs when using extra-path info.'), $maxlength_urlname_stub );
+	$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL blog name'), T_('Used to uniquely identify this blog. Appears in URLs when using extra-path info.'), $maxlength_urlname_stub );
 
-	$a_Form->info( T_('URL preview'), '<span id="urlpreview">'.$edited_Blog->dget( 'baseurl', 'entityencoded' ).$blog_urlappend.'</span>' );
-$a_Form->fieldset_end();
-
-
-$a_Form->fieldset( T_('Default display options') );
-	$a_Form->select( 'blog_default_skin', $edited_Blog->get( 'default_skin' ), 'skin_options_return', T_('Default skin') , T_('This is the default skin that will be used to display this blog.') );
-
-	$a_Form->checkbox( 'blog_force_skin', 1-$edited_Blog->get( 'force_skin' ), T_('Allow skin switching'), T_('Users will be able to select another skin to view the blog (and their prefered skin will be saved in a cookie).') );
-	$a_Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('A CSS file in the blog media directory will override the default skin stylesheet.') );
-	$a_Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to override the blog and skin stylesheet with their own.') );
-	$a_Form->checkbox( 'blog_disp_bloglist', $edited_Blog->get( 'disp_bloglist' ), T_('Display public blog list'), T_('Check this if you want to display the list of all blogs on your blog page (if your skin supports this).') );
-
-	$a_Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be displayed in the list of all public blogs.') );
-
-	$a_Form->select_object( 'blog_links_blog_ID', $edited_Blog->get( 'links_blog_ID' ), $BlogCache, T_('Default linkblog'), T_('Will be displayed next to this blog (if your skin supports this).'), true );
-$a_Form->fieldset_end();
+	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$edited_Blog->dget( 'baseurl', 'entityencoded' ).$blog_urlappend.'</span>' );
+$Form->fieldset_end();
 
 
-$a_Form->fieldset( T_('Description') );
-	$a_Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template.'), 250 );
+$Form->fieldset( T_('Default display options') );
+	$Form->select( 'blog_default_skin', $edited_Blog->get( 'default_skin' ), 'skin_options_return', T_('Default skin') , T_('This is the default skin that will be used to display this blog.') );
 
-	$a_Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 8, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
+	$Form->checkbox( 'blog_force_skin', 1-$edited_Blog->get( 'force_skin' ), T_('Allow skin switching'), T_('Users will be able to select another skin to view the blog (and their prefered skin will be saved in a cookie).') );
+	$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('A CSS file in the blog media directory will override the default skin stylesheet.') );
+	$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to override the blog and skin stylesheet with their own.') );
+	$Form->checkbox( 'blog_disp_bloglist', $edited_Blog->get( 'disp_bloglist' ), T_('Display public blog list'), T_('Check this if you want to display the list of all blogs on your blog page (if your skin supports this).') );
 
-	$a_Form->text( 'blog_description', $edited_Blog->get( 'description' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
+	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be displayed in the list of all public blogs.') );
 
-	$a_Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
-
-	$a_Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 8, T_('Notes'), T_('Additional info.'), 50, 'large' );
-$a_Form->fieldset_end();
+	$Form->select_object( 'blog_links_blog_ID', $edited_Blog->get( 'links_blog_ID' ), $BlogCache, T_('Default linkblog'), T_('Will be displayed next to this blog (if your skin supports this).'), true );
+$Form->fieldset_end();
 
 
-$a_Form->buttons( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
+$Form->fieldset( T_('Description') );
+	$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template.'), 250 );
+
+	$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 8, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
+
+	$Form->text( 'blog_description', $edited_Blog->get( 'description' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
+
+	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
+
+	$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 8, T_('Notes'), T_('Additional info.'), 50, 'large' );
+$Form->fieldset_end();
+
+
+$Form->buttons( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
-$a_Form->end_form();
+$Form->end_form();
 
 ?>
 
