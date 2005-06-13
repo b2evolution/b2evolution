@@ -83,65 +83,13 @@ switch($action)
 		$edited_Item->set( 'main_cat_ID', $post_category );
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
+		// Set object params:
+		$edited_Item->load_from_Request();
 
-
-
+		// Post post-publishing stuff:
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;
-
-
-		$Request->param( 'post_title', 'html' );
-		$edited_Item->set( 'title', format_to_post( $post_title, 0, 0 ) );
-
-		$Request->param( 'post_locale', 'string', $default_locale );
-		$edited_Item->set( 'locale', $post_locale );
-
-		$Request->param( 'item_typ_ID', 'integer', true );
-		$edited_Item->set( 'typ_ID', $item_typ_ID );
-
-		$Request->param( 'post_url', 'string' );
-		$Request->param_check_url( 'post_url', $allowed_uri_scheme );
-		$edited_Item->set( 'url', $post_url );
-
-    $Request->param( 'content', 'html' );
-		$edited_Item->set( 'content', format_to_post( $content ) );
-
-		$Request->param( 'edit_date', 'integer', 0 );
-		if( $edit_date && $current_User->check_perm( 'edit_timestamp' ))
-		{ // We can use user date:
-			$Request->param( 'item_issue_date', 'string', true );
-			$Request->param_check_date( 'item_issue_date', T_('Please enter a valid issue date.'), true );
-			$Request->param( 'item_issue_time', 'string', true );
-			$edited_Item->set( 'issue_date', make_valid_date( $item_issue_date, $item_issue_time ) );
-		}
-
-		$Request->param( 'post_urltitle', 'string', '' );
-		$edited_Item->set( 'urltitle', $post_urltitle );
-
-		// Workflow stuff:
-		$Request->param( 'item_st_ID', 'integer', true );
-		$edited_Item->set( 'st_ID', $item_st_ID );
-
-		$Request->param( 'item_assigned_user_ID', 'integer', true );
- 		$edited_Item->assign_to( $item_assigned_user_ID );
-
-		$Request->param( 'item_priority', 'integer', true );
-		$edited_Item->set_from_Request( 'priority', 'item_priority' );
-
-  	$Request->param( 'item_deadline', 'string', true );
-		$Request->param_check_date( 'item_deadline', T_('Please enter a valid deadline.'), false );
-		$edited_Item->set_from_Request( 'deadline', 'item_deadline', true );
-
- 		// Comment stuff:
-		$Request->param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
-		$edited_Item->set( 'comments', $post_comments );
-
-		$Request->param( 'renderers', 'array', array() );
-		$renderers = $Plugins->validate_list( $renderers );
-		$edited_Item->set( 'renderers', implode('.',$renderers) );
-
-
 
 
 		if( $Messages->count() )
@@ -153,21 +101,19 @@ switch($action)
 			break;
 		}
 
-		echo '<div class="panelinfo">'."\n";
-		echo '<h3>', T_('Recording post...'), "</h3>\n";
 
 		// Are we going to do the pings or not?
-		$pingsdone = ( $edited_Item->status == 'published' ) ? true : false;
+		$edited_Item->set( 'pingsdone', $edited_Item->status == 'published' );
+
 
 		// INSERT NEW POST INTO DB:
-		$post_ID = $edited_Item->insert( $current_User->ID, $edited_Item->title, $edited_Item->content,
-															$edited_Item->issue_date, $edited_Item->main_cat_ID,
-															$edited_Item->extra_cat_IDs, $edited_Item->status, $edited_Item->locale, '', 0,
-															$pingsdone, $edited_Item->urltitle, $edited_Item->url, $edited_Item->comments,
-															explode('.',$edited_Item->renderers), $edited_Item->typ_ID, $edited_Item->st_ID );
-
+		echo '<div class="panelinfo">'."\n";
+		echo '<h3>', T_('Recording post...'), "</h3>\n";
+		$edited_Item->dbinsert();
 		echo "</div>\n";
 
+
+		// post post-publishing operations:
 		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
@@ -178,14 +124,14 @@ switch($action)
 		{ // We do all the pinging now!
 			$blogparams = get_blogparams_by_ID( $blog );
 			// trackback
-			trackbacks( $post_trackbacks, $edited_Item->content, $edited_Item->title, $post_ID);
+			trackbacks( $post_trackbacks, $edited_Item->content, $edited_Item->title, $edited_Item->ID);
 			// pingback
-			pingback( $post_pingback, $edited_Item->content, $edited_Item->title, $edited_Item->url, $post_ID, $blogparams);
+			pingback( $post_pingback, $edited_Item->content, $edited_Item->title, $edited_Item->url, $edited_Item->ID, $blogparams);
 
 			// Send email notifications now!
 			$edited_Item->send_email_notifications();
 		
-			pingb2evonet($blogparams, $post_ID, $edited_Item->title);
+			pingb2evonet($blogparams, $edited_Item->ID, $edited_Item->title);
 			pingWeblogs($blogparams);
 			pingBlogs($blogparams);
 			pingTechnorati($blogparams);
@@ -226,60 +172,14 @@ switch($action)
 		$edited_Item->set( 'main_cat_ID', $post_category );
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
+		// Set object params:
+		$edited_Item->load_from_Request( true );
 
+		// Post post-publishing stuff:
 		param( 'post_pingback', 'integer', 0 );
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = $trackback_url;
 
-
-		$Request->param( 'post_title', 'html' );
-		$edited_Item->set( 'title', format_to_post( $post_title, 0, 0 ) );
-
-		$Request->param( 'post_locale', 'string', $default_locale );
-		$edited_Item->set( 'locale', $post_locale );
-
-		$Request->param( 'item_typ_ID', 'integer', true );
-		$edited_Item->set( 'typ_ID', $item_typ_ID );
-
-		$Request->param( 'post_url', 'string' );
-		$Request->param_check_url( 'post_url', $allowed_uri_scheme );
-		$edited_Item->set( 'url', $post_url );
-
-    $Request->param( 'content', 'html' );
-		$edited_Item->set( 'content', format_to_post( $content ) );
-
-		if( $current_User->check_perm( 'edit_timestamp' ))
-		{ // We can use user date:
-			$Request->param( 'item_issue_date', 'string', true );
-			$Request->param_check_date( 'item_issue_date', T_('Please enter a valid issue date.'), true );
-			$Request->param( 'item_issue_time', 'string', true );
-			$edited_Item->set( 'issue_date', make_valid_date( $item_issue_date, $item_issue_time ) );
-		}
-
-		$Request->param( 'post_urltitle', 'string', '' );
-		$edited_Item->set( 'urltitle', $post_urltitle );
-
-		// Workflow stuff:
-		$Request->param( 'item_st_ID', 'integer', true );
-		$edited_Item->set( 'st_ID', $item_st_ID );
-
-		$Request->param( 'item_assigned_user_ID', 'integer', true );
- 		$edited_Item->assign_to( $item_assigned_user_ID );
-
-		$Request->param( 'item_priority', 'integer', true );
-		$edited_Item->set_from_Request( 'priority', 'item_priority' );
-
-  	$Request->param( 'item_deadline', 'string', true );
-		$Request->param_check_date( 'item_deadline', T_('Please enter a valid deadline.'), false );
-		$edited_Item->set_from_Request( 'deadline', 'item_deadline', true );
-
- 		// Comment stuff:
-		$Request->param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
-		$edited_Item->set( 'comments', $post_comments );
-
-		$Request->param( 'renderers', 'array', array() );
-		$renderers = $Plugins->validate_list( $renderers );
-		$edited_Item->set( 'renderers', implode('.',$renderers) );
 
 		if( $Messages->count() )
 		{
@@ -290,34 +190,21 @@ switch($action)
 			break;
 		}
 
-		echo "<div class=\"panelinfo\">\n";
-		echo '<h3>'.T_('Updating post...')."</h3>\n";
 
-		// We need to check the previous flags...
-		$post_flags = explode(',', $edited_Item->flags );
-		if( in_array( 'pingsdone', $post_flags ) )
-		{ // pings have been done before
-			$pingsdone = true;
-		}
-		elseif( $edited_Item->status != 'published' )
-		{ // still not publishing
-			$pingsdone = false;
-		}
-		else
-		{ // We'll be pinging now
-			$pingsdone = true;
-		}
+		// Check the previous ping state...
+		$pings_already_done = $edited_Item->get( 'pingsdone' );
+		// Will we have pinged in a minute?
+		$edited_Item->set( 'pingsdone', ($pings_already_done || $edited_Item->status == 'published' ) );
+
 
 		// UPDATE POST IN DB:
-		$edited_Item->update( $edited_Item->title, $edited_Item->content, $edited_Item->issue_date,
-													$edited_Item->main_cat_ID, $edited_Item->extra_cat_IDs,
-													$edited_Item->status, $edited_Item->locale, '',	0,
-													$pingsdone, $edited_Item->urltitle,
-													$edited_Item->url, $edited_Item->comments,
-													explode('.',$edited_Item->renderers), $edited_Item->typ_ID, $edited_Item->st_ID );
-
+		echo "<div class=\"panelinfo\">\n";
+		echo '<h3>'.T_('Updating post...')."</h3>\n";
+		$edited_Item->dbupdate();
 		echo '<p>'.T_('Done.').'</p></div>';
 
+
+		// post post-publishing operations:
 		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
@@ -329,12 +216,12 @@ switch($action)
 			$blogparams = get_blogparams_by_ID( $blog );
 
 			// trackback
-			trackbacks( $post_trackbacks, $edited_Item->content,  $edited_Item->title, $post_ID );
+			trackbacks( $post_trackbacks, $edited_Item->content,  $edited_Item->title, $edited_Item->ID );
 			// pingback
-			pingback( $post_pingback, $edited_Item->content, $edited_Item->title, $edited_Item->url, $post_ID, $blogparams);
+			pingback( $post_pingback, $edited_Item->content, $edited_Item->title, $edited_Item->url, $edited_Item->ID, $blogparams);
 
 			// ping ?
-			if( in_array( 'pingsdone', $post_flags ) )
+			if( $pings_already_done )
 			{ // pings have been done before
 				echo "<div class=\"panelinfo\">\n";
 				echo '<p>', T_('Post had already pinged: skipping blog pings...'), "</p>\n";
@@ -346,13 +233,12 @@ switch($action)
 				// Send email notifications now!
 				$edited_Item->send_email_notifications();
 			
-				pingb2evonet( $blogparams, $post_ID, $edited_Item->title );
+				pingb2evonet( $blogparams, $edited_Item->post_ID, $edited_Item->title );
 				pingWeblogs( $blogparams );
 				pingBlogs( $blogparams );
 				pingTechnorati( $blogparams );
 			}
 		}
-
 		echo '<div class="panelinfo"><p>', T_('Updating done...'), "</p></div>\n";
 		break;
 
@@ -402,15 +288,14 @@ switch($action)
 			$edited_Item->set( 'flags', 'pingsdone' );
 		}
 
+		// UPDATE POST IN DB:
 		$edited_Item->set( 'datestart', $post_date );
 		$edited_Item->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
-
-		// UPDATE POST IN DB:
 		$edited_Item->dbupdate();
-
 		echo '<p>', T_('Done.'), "</p>\n";
 		echo "</div>\n";
 
+		// pOST POST6PUBLISHING OPERATIONS/
 		if( $edited_Item->status != 'published' )
 		{
 			echo "<div class=\"panelinfo\">\n";
@@ -467,13 +352,12 @@ switch($action)
 		// Check permission:
 		$current_User->check_perm( 'blog_del_post', '', true, $blog );
 
-		echo "<div class=\"panelinfo\">\n";
-		echo '<h3>', T_('Deleting post...'), "</h3>\n";
 
 		// DELETE POST FROM DB:
+		echo "<div class=\"panelinfo\">\n";
+		echo '<h3>', T_('Deleting post...'), "</h3>\n";
 		$edited_Item->dbdelete();
 		echo '<p>'.T_('Deleting Done...')."</p>\n";
-
 		echo '</div>';
 
 		break;

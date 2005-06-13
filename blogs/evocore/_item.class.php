@@ -177,8 +177,8 @@ class Item extends DataObject
 	 * @param string User ID field name
 	 */
 	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID', $objtype = 'Item',
-												$datecreated_field = '', $datemodified_field = 'datemodified',
-												$creator_field = 'creator_user_ID', $lasteditor_field = '' )
+												$datecreated_field = 'datecreated', $datemodified_field = 'datemodified',
+												$creator_field = 'creator_user_ID', $lasteditor_field = 'lastedit_user_ID' )
 	{
 		global $UserCache, $object_def, $localtimenow, $default_locale;
 
@@ -223,7 +223,7 @@ class Item extends DataObject
 		if( $db_row == NULL )
 		{ // New item:
 			$this->ID = 0;
-			$this->issue_date = date('Y-m-d H:i:s', $localtimenow);
+			$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
 			$this->flags = array();
 			$this->renderers = array();
 			$this->status = 'published';
@@ -290,18 +290,63 @@ class Item extends DataObject
 	/**
 	 * Load data from Request form fields.
 	 *
+	 * @param boolean true to force edit date (as long as perms permit)
 	 * @return boolean true if loaded data seems valid.
 	 */
-	function load_from_Request()
+	function load_from_Request( $force_edit_date = false )
 	{
-		global $Request;
+		global $Request, $default_locale, $allowed_uri_scheme, $Plugins, $current_User;
 
-		/* todo like this:
+		$Request->param( 'post_title', 'html' );
+		$this->set( 'title', format_to_post( $Request->get('post_title'), 0, 0 ) );
 
-		$Request->param_string_not_empty( 'cont_lastname', T_('Please enter a name.') );
-		$this->set_from_Request( 'lastname' );
+		$Request->param( 'post_locale', 'string', $default_locale );
+		$this->set_from_Request( 'locale' );
 
-		*/
+		$Request->param( 'item_typ_ID', 'integer', true );
+		$this->set_from_Request( 'typ_ID', 'item_typ_ID' );
+
+		$Request->param( 'post_url', 'string' );
+		$Request->param_check_url( 'post_url', $allowed_uri_scheme );
+		$this->set_from_Request( 'url' );
+
+    $Request->param( 'content', 'html' );
+		$this->set( 'content', format_to_post( $Request->get('content') ) );
+
+		if( ( $force_edit_date || $Request->param( 'edit_date', 'integer', 0 ) )
+				&& $current_User->check_perm( 'edit_timestamp' ) )
+		{ // We can use user date:
+			$Request->param( 'item_issue_date', 'string', true );
+			$Request->param_check_date( 'item_issue_date', T_('Please enter a valid issue date.'), true );
+			$Request->param( 'item_issue_time', 'string', true );
+			$this->set( 'issue_date', make_valid_date( $Request->get('item_issue_date'), $Request->get('item_issue_time') ) );
+		}
+
+		$Request->param( 'post_urltitle', 'string', '' );
+		$this->set_from_Request( 'urltitle' );
+
+		// Workflow stuff:
+		$Request->param( 'item_st_ID', 'integer', true );
+		$this->set_from_Request( 'st_ID', 'item_st_ID' );
+
+		$Request->param( 'item_assigned_user_ID', 'integer', true );
+ 		$this->assign_to( $Request->get('item_assigned_user_ID') );
+
+		$Request->param( 'item_priority', 'integer', true );
+		$this->set_from_Request( 'priority', 'item_priority' );
+
+  	$Request->param( 'item_deadline', 'string', true );
+		$Request->param_check_date( 'item_deadline', T_('Please enter a valid deadline.'), false );
+		$this->set_from_Request( 'deadline', 'item_deadline', true );
+
+ 		// Comment stuff:
+		$Request->param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
+		$this->set_from_Request( 'comments' );
+
+		$Request->param( 'renderers', 'array', array() );
+		$renderers = $Plugins->validate_list( $Request->get('renderers') );
+		$this->set( 'renderers', implode('.',$renderers) );
+
 
 		return ! $Request->validation_errors();
 	}
@@ -1728,6 +1773,10 @@ class Item extends DataObject
 				$this->set_param( 'deadline', 'date', $parvalue, true );
 				break;
 
+			case 'pingsdone':
+      		$this->set_param( 'flags', 'string', $parvalue ? 'pingsdone' : '' );
+				break;
+
 			default:
 				$this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
@@ -2094,6 +2143,9 @@ class Item extends DataObject
 
 			case 't_priority':
 				return $this->priorities[ $this->priority ];
+
+			case 'pingsdone':
+				return ($this->flags == 'pingsdone');
 		}
 
 		return parent::get( $parname );
@@ -2102,6 +2154,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2005/06/13 19:53:50  fplanque
+ * refactoring
+ *
  * Revision 1.44  2005/06/10 23:21:12  fplanque
  * minor bugfixes
  *
