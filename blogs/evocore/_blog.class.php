@@ -64,15 +64,15 @@ require_once dirname(__FILE__).'/_dataobject.class.php';
 class Blog extends DataObject
 {
 	/**
-	 * Short name for use in navigation menus
+	 * @var string Short name for use in navigation menus
 	 */
 	var $shortname;
 	/**
-	 * Complete name
+	 * @var string Complete name
 	 */
 	var $name;
 	/**
-	 * Tagline to be displayed on template
+	 * @var string Tagline to be displayed on template
 	 */
 	var $tagline;
 	var $shortdesc; // description
@@ -123,10 +123,10 @@ class Blog extends DataObject
 				array( 'table'=>'T_categories', 'fk'=>'cat_blog_ID', 'msg'=>T_('%d related categories') ),
 			);
 
-   	$this->delete_cascades = array(
- 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user rights defintions') ),
- 				// b2evo only:
- 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
+		$this->delete_cascades = array(
+				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user rights defintions') ),
+				// b2evo only:
+				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
 			);
 
 		if( $db_row == NULL )
@@ -330,8 +330,8 @@ class Blog extends DataObject
 	{
 		global $basepath, $media_subdir, $Messages, $Settings, $Debuglog;
 
- 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
-		{	// User directories are disabled:
+		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
+		{ // User directories are disabled:
 			$Debuglog->add( 'Attempt to access blog media dir, but this feature is globally disabled' );
 			return false;
 		}
@@ -353,16 +353,25 @@ class Blog extends DataObject
 				break;
 		}
 
+		// TODO: use a File object here (to access perms, ..) when FileCache::get_by_path() is provided.
 		if( !is_dir( $mediadir ) )
 		{
-			if( !mkdir( $mediadir ) ) // defaults to 0777
+			// TODO: Link to some help page(s) with errors!
+			if( !is_writable( dirname($mediadir) ) )
+			{ // add error
+				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; cannot be created, because the parent directory &laquo;%s&raquo; is not writable."), $mediadir, dirname($mediadir) ), 'error' );
+				return false;
+			}
+			elseif( !@mkdir( $mediadir ) ) // default chmod?!
 			{ // add error
 				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), $mediadir ), 'error' );
 				return false;
 			}
 			else
 			{ // add note
-				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $mediadir, '777' ), 'success' );
+				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $mediadir,
+					'777' // FIXME: get perms of the File object - mkdir() does not default to 0777 really.
+					), 'success' );
 			}
 		}
 
@@ -388,7 +397,7 @@ class Blog extends DataObject
 
 			case 'mediaurl':
 		 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
-				{	// User directories are disabled:
+				{ // User directories are disabled:
 					$Debuglog->add( 'Attempt to access blog media URL, but this feature is disabled', 'files' );
 					return false;
 				}
@@ -422,14 +431,14 @@ class Blog extends DataObject
 
 			case 'baseurl':
 				if( preg_match( '#^https?://#', $this->siteurl ) )
-				{	// We have a specific URL for this blog:
+				{ // We have a specific URL for this blog:
 					return $this->siteurl;
 				}
 				else
-				{	// This blog is located under b2evo's baseurl
+				{ // This blog is located under b2evo's baseurl
 					$r = $baseurl;
 					if( !empty($this->siteurl) )
-					{	// We have a subfolder:
+					{ // We have a subfolder:
 						$r .= $this->siteurl;
 					}
 					return $r;
@@ -496,11 +505,11 @@ class Blog extends DataObject
 			 * override earlier stylesheets.
 			 */
 			case 'blog_css':
-				if ( $this->allowblogcss 
+				if ( $this->allowblogcss
 					&& file_exists( $this->get('mediadir').'style.css' ) )
 				{
 					return '<link rel="stylesheet" href="'.$this->get( 'mediaurl' ).'style.css" type="text/css" />';
-				} 
+				}
 				else
 				{
 					return '';
@@ -514,7 +523,7 @@ class Blog extends DataObject
 			 */
 			case 'user_css':
 				if( $this->allowusercss
-		      && isset( $current_User ) 
+					&& isset( $current_User )
 					&& file_exists( $current_User->getMediaDir().'style.css' ) )
 				{
 					return '<link rel="stylesheet" href="'.$current_User->getMediaUrl().'style.css" type="text/css" />';
@@ -557,11 +566,11 @@ class Blog extends DataObject
 																WHERE cat_blog_ID = $this->ID" );
 
 		if( empty( $cat_list ) )
-		{	// There are no cats to delete
+		{ // There are no cats to delete
 			echo 'None!';
 		}
 		else
-		{	// Delete the cats & dependencies
+		{ // Delete the cats & dependencies
 
 			// Get list of posts that are going to be deleted (3.23)
 			if( $echo ) echo '<br />Getting post list to delete... ';
@@ -570,11 +579,11 @@ class Blog extends DataObject
 																		WHERE postcat_cat_ID IN ($cat_list)" );
 
 			if( empty( $post_list ) )
-			{	// There are no posts to delete
+			{ // There are no posts to delete
 				echo 'None!';
 			}
 			else
-			{	// Delete the posts & dependencies
+			{ // Delete the posts & dependencies
 
 				// Delete postcats
 				if( $echo ) echo '<br />Deleting post-categories... ';
@@ -681,7 +690,7 @@ class Blog extends DataObject
 	}
 
 
- 	/**
+	/**
 	 * Template function: return name of item
 	 *
 	 * @param string Output format, see {@link format_to_output()}
@@ -696,6 +705,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2005/06/16 21:52:10  blueyed
+ * mkdir fixed, todos, doc
+ *
  * Revision 1.22  2005/06/03 15:12:32  fplanque
  * error/info message cleanup
  *
