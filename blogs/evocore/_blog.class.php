@@ -64,14 +64,17 @@ require_once dirname(__FILE__).'/_dataobject.class.php';
 class Blog extends DataObject
 {
 	/**
+	 * Short name for use in navigation menus
 	 * @var string Short name for use in navigation menus
 	 */
 	var $shortname;
 	/**
+	 * Complete name
 	 * @var string Complete name
 	 */
 	var $name;
 	/**
+	 * Tagline to be displayed on template
 	 * @var string Tagline to be displayed on template
 	 */
 	var $tagline;
@@ -505,7 +508,7 @@ class Blog extends DataObject
 			 * override earlier stylesheets.
 			 */
 			case 'blog_css':
-				if ( $this->allowblogcss
+				if( $this->allowblogcss
 					&& file_exists( $this->get('mediadir').'style.css' ) )
 				{
 					return '<link rel="stylesheet" href="'.$this->get( 'mediaurl' ).'style.css" type="text/css" />';
@@ -705,6 +708,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2005/06/17 16:19:24  fplanque
+ * doc
+ *
  * Revision 1.23  2005/06/16 21:52:10  blueyed
  * mkdir fixed, todos, doc
  *
