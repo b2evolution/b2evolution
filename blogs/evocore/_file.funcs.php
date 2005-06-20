@@ -84,19 +84,9 @@ function bytesreadable( $bytes )
 	}
 
 	$r = round($bytes, 2).'&nbsp;';
-
-	if( !isset( $types[$i]['used'] ) )
-	{
-		$r .= '<abbr title="'.$types[$i]['text'].'">';
-	}
-
+	$r .= '<abbr title="'.$types[$i]['text'].'">';
 	$r .= $types[$i]['abbr'];
-
-	if( !isset( $types[$i]['used'] ) )
-	{
-		$r .= '</abbr>';
-		$types[$i]['used'] = true;
-	}
+	$r .= '</abbr>';
 
 	return $r;
 }
@@ -518,6 +508,9 @@ function get_root_url( $root_type, $root_ID )
 
 /*
  * $Log$
+ * Revision 1.21  2005/06/20 17:40:23  fplanque
+ * minor
+ *
  * Revision 1.20  2005/05/24 15:26:52  fplanque
  * cleanup
  *

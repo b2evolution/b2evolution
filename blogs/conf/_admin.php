@@ -41,7 +41,9 @@ $allow_cross_posting = 1;
 /**
  * Moving chapters between blogs?
  *
- * @global bool $allow_moving_chapters
+ * Special value: NULL and we won't even talk about moving
+ *
+ * @global bool|NULL $allow_moving_chapters
  */
 $allow_moving_chapters = false;
 

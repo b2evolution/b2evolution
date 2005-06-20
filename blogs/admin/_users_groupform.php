@@ -66,6 +66,18 @@ $Form->fieldset( T_('General') );
 	$Form->text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
 $Form->fieldset_end();
 
+$perm_none_option = array( 'none', '<acronym title="'.T_('No Access').'">'.T_('None').'</acronym>' );
+$perm_list_option = array( 'list', '<acronym title="'.T_('View list only').'">'.T_('List').'</acronym>' );
+$perm_view_option = array( 'view', '<acronym title="'.T_('View details').'">'.T_('View').'</acronym>' );
+$perm_edit_option = array( 'edit', '<acronym title="'.T_('Edit/delete all').'">'.T_('Edit').'</acronym>' );
+$standard_perm_options = array(
+							$perm_none_option,
+							$perm_list_option,
+							$perm_view_option,
+							array( 'add',  '<acronym title="'.T_('Add &amp; edit/delete self created').'">'.T_('Add').'</acronym>' ),
+							$perm_edit_option
+						);
+
 $Form->fieldset( T_('Permissons for members of this group') );
 
 	if( $edited_Group->get('ID') != 1 )
@@ -86,27 +98,27 @@ $Form->fieldset( T_('Permissons for members of this group') );
 							array( 'editall', T_('Full Access') )
 						), T_('Blogs') );
 	$Form->radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'),
-			array(  array( 'none', T_('No Access') ),
+			array(  $perm_none_option,
 							array( 'view', T_('View only') ),
 							array( 'edit', T_('Full Access') )
 						), T_('Stats') );
 	$Form->radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'),
-			array(  array( 'none', T_('No Access') ),
+			array(  $perm_none_option,
 							array( 'view', T_('View only') ),
 							array( 'edit', T_('Full Access') )
 						), T_('Antispam') );
 	$Form->checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Templates'), T_('Check to allow template editing.') );
 	$Form->radio( 'edited_grp_perm_files', $edited_Group->get('perm_files'),
-			array(  array( 'none', T_('No Access') ),
-							array( 'view', T_('View only') ),
+			array(	$perm_none_option,
+							$perm_view_option,
 							array( 'add', T_('Add/Upload') ),
 							array( 'edit', T_('Full Access') )
 						), T_('Files') );
 	if( $edited_Group->get('ID') != 1 )
 	{	// Groups others than #1 can be prevented from editing users
 		$Form->radio( 'edited_grp_perm_users', $edited_Group->get('perm_users'),
-				array(  array( 'none', T_('No Access') ),
-								array( 'view', T_('View only') ),
+				array(	$perm_none_option,
+								$perm_view_option,
 								array( 'edit', T_('Full Access') )
 							), T_('Users &amp; Groups') );
 	}
@@ -115,8 +127,8 @@ $Form->fieldset( T_('Permissons for members of this group') );
 		$Form->info( T_('Users &amp; Groups'), T_('Full Access') );
 	}
 	$Form->radio( 'edited_grp_perm_options', $edited_Group->get('perm_options'),
-			array(  array( 'none', T_('No Access') ),
-							array( 'view', T_('View only') ),
+			array(	$perm_none_option,
+							$perm_view_option,
 							array( 'edit', T_('Full Access') )
 						), T_('Settings') );
 
@@ -135,6 +147,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.32  2005/06/20 17:40:14  fplanque
+ * minor
+ *
  * Revision 1.31  2005/06/03 20:14:38  fplanque
  * started input validation framework
  *

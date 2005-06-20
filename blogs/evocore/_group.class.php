@@ -140,9 +140,10 @@ class Group extends DataObject
 	 *									- users
 	 *									- blogs
 	 * @param string Permission level
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
 	 * @return strind Permission value
 	 */
-	function check_perm( $permname, $permlevel = 'any' )
+	function check_perm( $permname, $permlevel = 'any', $perm_target = NULL )
 	{
 		// Check group permission:
 		eval( '$permvalue = $this->perm_'.$permname.';' );
@@ -198,14 +199,20 @@ class Group extends DataObject
 						return true;	// Permission granted
 
 					case 'add':
-						// We can ask for add perm...
+						// User can ask for add perm...
 						if( $permlevel == 'add' )
 							return true;	// Permission granted
 						// ... or for any lower priority perm... (no break)
 
 					case 'view':
-						// User can only ask for view perm
+						// User can ask for view perm...
 						if( $permlevel == 'view' )
+							return true;	// Permission granted
+						// ... or for any lower priority perm... (no break)
+
+					case 'list':
+						// User can only ask for list perm
+						if( $permlevel == 'list' )
 							return true;	// Permission granted
 				}
 				break;
@@ -249,6 +256,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2005/06/20 17:40:23  fplanque
+ * minor
+ *
  * Revision 1.8  2005/05/10 18:40:08  fplanque
  * normalizing
  *

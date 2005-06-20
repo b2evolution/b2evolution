@@ -47,6 +47,13 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 require_once dirname(__FILE__).'/_results.class.php';
 
 
+if( false )
+{	/**
+	 * This is ugly, sorry, but I temporarily need this until NuSphere fixes their CodeInsight :'(
+	 */
+	include('_main.inc.php');
+}
+
 /**
  * ResultSel class: displays Results and provides Selection capabilities
  *
@@ -84,8 +91,16 @@ class ResultSel extends Results
 											$table_objsel, $field_selected, $field_selection, $current_selection_ID,
 											$sql, $param_prefix = '', $default_order = '', $limit = 20 )
 	{
+		global $current_User;
+
 		// Call parent:
 		parent::Results( $sql, $param_prefix, $default_order, $limit );
+
+		if( ! $current_User->check_perm( 'selections', 'view' ) )
+		{	// User is NOT allowed to view selections
+			// Don't do any more then base class:
+			return;
+		}
 
 		$this->current_selection_ID = $current_selection_ID;
 		$this->table_selections     = $table_selections;
@@ -101,7 +116,6 @@ class ResultSel extends Results
 						'td_start' => '<td class="firstcol shrinkwrap">',
 						'td' => '%selection_checkbox( #'.$field_ID.'#, \''.$param_prefix.'\' )%',
 					);
-
 	}
 
 
@@ -110,15 +124,19 @@ class ResultSel extends Results
 	 */
 	function display_list_start()
 	{
-		#global $firm_items, $selection_firm_ID;
-		global $item_ID_array;
+		global $item_ID_array, $current_User;
 
-		#$this->Form = new Form( regenerate_url( 'firm_items', $firm_items ), 'firms_form', 'post', 'none' ); // COPY!!
+		if( ! $current_User->check_perm( 'selections', 'view' ) )
+		{	// User is NOT allowed to view selections
+			// Don't do any more then base class:
+			parent::display_list_start();
+			return;
+		}
+
 		$this->Form = new Form( regenerate_url(), $this->param_prefix.'form', 'post', 'none' ); // COPY!!
 
 		$this->Form->begin_form( '' );
 
-		#$this->Form->hidden( 'category', 'firms' );
 		$this->Form->hidden( $this->param_prefix.'update_selection', 1 );// the database has to be updated :
 
 		// Sets the cols_check global variable to verify if checkboxes
@@ -141,25 +159,39 @@ class ResultSel extends Results
 	 */
 	function display_list_end()
 	{
-		global $item_ID_array;
+		global $item_ID_array, $current_User;
+
+		if( ! $current_User->check_perm( 'selections', 'view' ) )
+		{	// User is NOT allowed to view selections
+			// Don't do any more then base class:
+			parent::display_list_end();
+			return;
+		}
 
 		echo $this->replace_vars( $this->params['functions_start'] );
 
-			echo '<a href="'.regenerate_url().'" onclick="check( this, true );return false;">'.T_('Check all')
-					.'</a> | <a href="'.regenerate_url().'" onclick="check( this, false );return false;">'.T_('Uncheck all').'</a> ';
+			$can_edit = $current_User->check_perm( 'selections', 'edit' );
+
+			if( $can_edit )
+			{
+				echo '<a href="'.regenerate_url().'" onclick="check( this, true );return false;">'.T_('Check all')
+						.'</a> | <a href="'.regenerate_url().'" onclick="check( this, false );return false;">'.T_('Uncheck all').'</a> ';
+			}
 
 			// construction of the select menu :
 			$selection_name = selection_select_tag( $this->param_prefix, $this->table_selections, $this->field_sel_name, $this->field_sel_ID, $this->current_selection_ID );
 
-			$this->Form->text( 'selection_'.$this->param_prefix.'name', $selection_name, 25, T_('New selection name') );
+			if( $can_edit )
+			{
+				$this->Form->text( 'selection_'.$this->param_prefix.'name', $selection_name, 25, T_('New selection name') );
 
-			// List of IDs displayed on this page (needed for deletes):
-			$this->Form->hidden( 'item_ID_list', implode( $item_ID_array, ',' ) );
+				// List of IDs displayed on this page (needed for deletes):
+				$this->Form->hidden( 'item_ID_list', implode( $item_ID_array, ',' ) );
 
-			$this->Form->submit( array( '', T_('Update selection'), 'SaveButton' ) );
+				$this->Form->submit( array( '', T_('Update selection'), 'SaveButton' ) );
+			}
 
 		echo $this->replace_vars( $this->params['functions_end'] );
-
 
 		// list/table end:
 		parent::display_list_end();
@@ -211,6 +243,7 @@ function cols_check( $selection_ID, $sel_table, $sel_table_item, $sel_table_sele
  */
 function selection_checkbox( $item_ID, $param_prefix )
 {
+	global $current_User;
 	// List of checkboxes to pre-check:
 	global $cols_check;
 	// List of already displayed checkboxes (can be used outside to get a list of checkboxes which have been displayed)
@@ -223,14 +256,24 @@ function selection_checkbox( $item_ID, $param_prefix )
 
 	$item_ID_array[] = $item_ID; //construction of the ID list
 
-	$r = '<input type="checkbox" class="checkbox" name="'.$param_prefix.'items[]" value='.$item_ID;
+	$r = '';
 
-	if( in_array( $item_ID, $cols_check ) )
-	{	// already in selection:
-		$r .= ' checked="checked" ';
+	if( $current_User->check_perm( 'selections', 'edit' ) )
+	{	// User is allowed to edit
+		$r .= '<input type="checkbox" class="checkbox" name="'.$param_prefix.'items[]" value='.$item_ID;
+		if( in_array( $item_ID, $cols_check ) )
+		{	// already in selection:
+			$r .= ' checked="checked" ';
+		}
+		$r .= ' />';
 	}
-
-	$r .= ' />';
+	else
+	{	// User CANNOT edit:
+		if( in_array( $item_ID, $cols_check ) )
+		{	// already in selection:
+			$r .= '*';
+		}
+	}
 
 	return $r;
 }
@@ -253,13 +296,21 @@ function selection_select_tag(
 															$selection_ID
 															)
 {
-	global $DB, $selection_name;
+	global $DB, $selection_name, $current_User;
 
 	$r = T_('Selection');
 	$r .= ' <select name="selection_'.$category_prefix.'ID"
 					onchange="selform = get_form( this );selform.elements[\''.$category_prefix.'update_selection\'].value=0;selform.submit()" >'."\n";
 	// in the onchange attribute, option_db is set to 0 to avoid updating the database
-	$r .= '<option value="0">'.T_('New selection')."</option>\n";
+
+	if( $current_User->check_perm( 'selections', 'edit' ) )
+	{	// User is allowed to edit
+		$r .= '<option value="0">'.T_('New selection')."</option>\n";
+	}
+	else
+	{	// User CANNOT edit:
+		$r .= '<option value="0">'.T_('None')."</option>\n";
+	}
 
 	$sql = 'SELECT * FROM '.$selections_table.' ORDER BY '.$selections_table_name;
 	$rows = $DB->get_results( $sql );
@@ -300,7 +351,9 @@ function selection_select_tag(
 function selection_action( $category, $action, $selection_ID, $selection_name, $items )
 { // the form has been submitted to act on the database and not only to change the display
 
-	global $DB, $Messages, $confirm, $item_ID_list;
+	global $DB, $Messages, $confirm, $item_ID_list, $current_User;
+
+	$current_User->check_perm( 'selections', 'edit', true );
 
 	switch( $category )
 	{ // definition of the table and column names depending on the selection category
@@ -573,6 +626,9 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
 /*
  * $Log$
+ * Revision 1.3  2005/06/20 17:40:23  fplanque
+ * minor
+ *
  * Revision 1.2  2005/06/03 15:12:33  fplanque
  * error/info message cleanup
  *

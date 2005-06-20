@@ -423,7 +423,7 @@ class User extends DataObject
 				// Other global permissions (see if the group can handle them), includes:
 				// files
 				// Forward request to group:
-				$perm = $this->Group->check_perm( $permname, $permlevel );
+				$perm = $this->Group->check_perm( $permname, $permlevel, $perm_target );
 		}
 
 		if( !$perm && $assert )
@@ -879,6 +879,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2005/06/20 17:40:23  fplanque
+ * minor
+ *
  * Revision 1.35  2005/06/10 23:21:12  fplanque
  * minor bugfixes
  *

@@ -138,7 +138,6 @@ if( $allowed_to_edit )
 	$Form->text( 'edited_user_yim', $edited_User->yim, 30, T_('YahooIM'), '', 50 );
 	$Form->text( 'edited_user_pass1', '', 20, T_('New password'), '', 50, T_('Leave empty if you don\'t want to change the password.'), 'password' );
 	$Form->text( 'edited_user_pass2', '', 20, T_('Confirm new password'), '', 50, '', 'password' );
-
 }
 else
 { // display only
@@ -192,6 +191,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.60  2005/06/20 17:40:13  fplanque
+ * minor
+ *
  * Revision 1.59  2005/06/10 18:25:42  fplanque
  * refactoring
  *
