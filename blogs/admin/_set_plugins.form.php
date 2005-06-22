@@ -10,7 +10,7 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 ?>
-<fieldset>
+<fieldset class="clear">
 	<legend><?php echo T_('Installed plug-ins') ?></legend>
 	<table class="grouped" cellspacing="0">
 		<thead>
