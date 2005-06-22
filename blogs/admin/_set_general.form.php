@@ -75,13 +75,13 @@ $Form->fieldset_end();
 
 $Form->fieldset( T_('Security options') );
 
-$Form->text( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 1, T_('Minimum password length'), T_('for users.'), 2 );
+$Form->text( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'), T_('for users.'), 2 );
 
 $Form->fieldset_end();
 
 $Form->fieldset( T_('Miscellaneous options') );
 
-$Form->text( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 2,
+$Form->text( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 5,
 								T_('Reload-page timeout'), T_('Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit.'), 5 );
 
 $Form->fieldset_end();
