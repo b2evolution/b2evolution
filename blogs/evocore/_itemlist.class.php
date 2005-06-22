@@ -80,10 +80,22 @@ class ItemList extends DataObjectList
 	var $objType;
 
 	var $preview;
+	/**
+	 * Blog ID to restrict to. 1 means "all blogs".
+	 * @var integer
+	 */
 	var $blog;
+	/**
+	 * Specific post number to display. '' means don't restrict to single post.
+	 * @todo Might support list of IDs (array).
+	 * @var string|integer
+	 */
 	var $p;
 	var $unit;
-	var $result_num_rows;			// Number of rows in result set
+	/**
+	 * @var integer Number of rows in result set
+	 */
+	var $result_num_rows;
 	var $postIDlist;
 	var $postIDarray;
 
@@ -183,7 +195,7 @@ class ItemList extends DataObjectList
 		global $Settings;
 
 		if( $cache_name == '#' )
-		{	// Let's use the default cache:
+		{ // Let's use the default cache:
 			$cache_name = 'ItemCache';
 		}
 
@@ -348,7 +360,7 @@ class ItemList extends DataObjectList
 				if( ! in_array( $cat_ID, $cat_array ) )
 				{ // Not already in list
 					$cat_array[] = $cat_ID;
-					cat_children( $cache_categories, ($blog==1)?0:$blog, $cat_ID, 'cat_req_dummy', 'cat_req',
+					cat_children( $cache_categories, ( $this->blog == 1 ? 0 : $this->blog ), $cat_ID, 'cat_req_dummy', 'cat_req',
 												'cat_req_dummy', 'cat_req_dummy', 1 );
 				}
 			}
@@ -365,7 +377,7 @@ class ItemList extends DataObjectList
 
 		if( empty($cat_array) )
 		{
-			$whichcat='';
+			$whichcat = '';
 		}
 		else
 		{
@@ -494,13 +506,13 @@ class ItemList extends DataObjectList
 			// echo 'LIMIT POSTS ';
 			$pgstrt = '';
 			if( $page_number )
-			{	// We have requested a specific page number
+			{ // We have requested a specific page number
 				$pgstrt = (intval($page_number) -1) * $posts_per_page. ', ';
 			}
 			$limits = 'LIMIT '. $pgstrt.$posts_per_page;
 		}
 		elseif( $unit == 'days' )
-		{	// We are going to limit to x days:
+		{ // We are going to limit to x days:
 			// echo 'LIMIT DAYS ';
 			if( empty( $dstart ) )
 			{ // We have no start date, we'll display the last x days:
@@ -519,7 +531,7 @@ class ItemList extends DataObjectList
 				}
 			}
 			else
-			{	// We have a start date, we'll display x days starting from that point:
+			{ // We have a start date, we'll display x days starting from that point:
 				// $dstart_mysql has been calculated earlier
 				$dstart_ts = mysql2timestamp( $dstart_mysql );
 				// go forward x days
@@ -529,7 +541,7 @@ class ItemList extends DataObjectList
 		}
 		else
 			die( 'Unhandled LIMITING mode in ItemList (paged mode is obsolete)' );
-			
+
 
 		/*
 		 * ----------------------------------------------------
@@ -571,20 +583,20 @@ class ItemList extends DataObjectList
 								.' FROM ('.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 												INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 
-		if( $blog == 1 )
+		if( $this->blog == 1 )
 		{ // Special case: we aggregate all cats from all blogs
 			$this->sql .= 'WHERE 1 ';
 		}
 		else
 		{
-			$this->sql .= 'WHERE cat_blog_ID = '. $blog;
+			$this->sql .= 'WHERE cat_blog_ID = '. $this->blog;
 		}
 
 		$this->sql .= $where. ' ORDER BY '.$this->dbprefix.$orderby.' '.$limits;
 		// echo '<br />where=',$where;
 
 		if ($preview)
-		{	// PREVIEW MODE:
+		{ // PREVIEW MODE:
 			$this->sql = $this->preview_request();
 		}
 
@@ -1003,7 +1015,7 @@ class ItemList extends DataObjectList
 	function display_if_empty( $message = '' )
 	{
 		if( empty($message) )
-		{	// Default message:
+		{ // Default message:
 			$message = T_('Sorry, there is no post to display...');
 		}
 
@@ -1013,6 +1025,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.25  2005/06/22 14:51:43  blueyed
+ * doc; use $this->blog after copying from $blog param
+ *
  * Revision 1.24  2005/03/14 20:22:19  fplanque
  * refactoring, some cacheing optimization
  *
