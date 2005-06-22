@@ -694,6 +694,7 @@ if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add
 				<li><?php echo get_icon( 'file_delete' ).' '.T_('Delete'); ?></li>
 			</ul>
 		</li>
+	</ul>
 </fieldset>
 <?php
 
@@ -784,6 +785,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.36  2005/06/22 17:23:23  blueyed
+ * html fix: closing <ul>
+ *
  * Revision 1.35  2005/05/26 19:11:09  fplanque
  * no message
  *
