@@ -56,8 +56,6 @@ if( false )
 	 * Mighty cool function to append an input or textarea element onto another element.
 	 *
 	 * @usedby addAnotherFileInput()
-	 *
-	 * @author proud daniel hahler :)
 	 */
 	function appendLabelAndInputElements( appendTo, labelText, labelBr, inputOrTextarea, inputName,
 																				inputSizeOrCols, inputMaxLengthOrRows, inputType, inputClass )
@@ -76,7 +74,7 @@ if( false )
 		appendTo.appendChild( fileLabel );
 
 		if( labelBr )
-		{	// We want a BR after the label:
+		{ // We want a BR after the label:
 			appendTo.appendChild( document.createElement('br') );
 		}
 		else
@@ -119,8 +117,6 @@ if( false )
 
 	/**
 	 * Add a new fileinput area to the upload form.
-	 *
-	 * @author proud daniel hahler :)
 	 */
 	function addAnotherFileInput()
 	{
@@ -135,10 +131,10 @@ if( false )
 																	'input', 'uploadfile[]', '20', '0', 'file', '' );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Filename on server (optional)'); ?>:', false,
 																	'input', 'uploadfile_name[]', '20', '80', 'text', '' );
- 		appendLabelAndInputElements( newLI, '<?php echo TS_('Long title'); ?>:', true,
- 																	'input', 'uploadfile_title[]', '50', '255', 'text', 'large' );
- 		appendLabelAndInputElements( newLI, '<?php echo TS_('Alternative text (useful for images)'); ?>:', true,
- 																	'input', 'uploadfile_alt[]', '50', '255', 'text', 'large' );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Long title'); ?>:', true,
+																	'input', 'uploadfile_title[]', '50', '255', 'text', 'large' );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Alternative text (useful for images)'); ?>:', true,
+																	'input', 'uploadfile_alt[]', '50', '255', 'text', 'large' );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Caption/Description of the file'); ?>:', true,
 																	'textarea', 'uploadfile_desc[]', '38', '3', '', 'large' );
 	}
@@ -174,11 +170,11 @@ if( false )
 				$restrictNotes = array();
 
 				if( $Settings->get( 'upload_allowedext' ) )
-				{	// We want to restrict on file extensions:
+				{ // We want to restrict on file extensions:
 					$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.$Settings->get( 'upload_allowedext' );
 				}
 				if( $Settings->get( 'upload_maxkb' ) )
-				{	// We want to restrict on file size:
+				{ // We want to restrict on file size:
 					$restrictNotes[] = '<strong>'.T_('Maximum allowed file size').'</strong>: '.bytesreadable( $Settings->get( 'upload_maxkb' )*1024 );
 				}
 
@@ -193,16 +189,16 @@ if( false )
 			<ul id="uploadfileinputs">
 				<?php
 					if( empty($failedFiles) )
-					{	// No failed failes, display one empty input block:
+					{ // No failed failes, display one empty input block:
 						$displayFiles[] = NULL;
 					}
 					else
-					{	// Display failed files:
+					{ // Display failed files:
 						$displayFiles = & $failedFiles;
 					}
 
 					foreach( $displayFiles as $lKey => $lMessage )
-					{	// For each file upload block to display:
+					{ // For each file upload block to display:
 
 						if( $lMessage !== NULL )
 						{ // This is a failed upload:
@@ -211,7 +207,7 @@ if( false )
 							Log::display( '', '', $lMessage, 'error' );
 						}
 						else
-						{	// Not a failed upload, display normal block:
+						{ // Not a failed upload, display normal block:
 							echo '<li>';
 						}
 
@@ -247,7 +243,7 @@ if( false )
 				?>
 			</ul>
 
-			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput();"><?php echo T_('Add another file'); ?></a></p>
+			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput(); return false;"><?php echo T_('Add another file'); ?></a></p>
 
 		</fieldset>
 
@@ -270,6 +266,9 @@ if( false )
 
 /*
  * $Log$
+ * Revision 1.10  2005/06/22 17:44:52  blueyed
+ * Fix onclick for "Add another file input"
+ *
  * Revision 1.9  2005/05/17 19:26:06  fplanque
  * FM: copy / move debugging
  *
