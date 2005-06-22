@@ -316,7 +316,7 @@ class Plugin
 		if( !empty($this->help_url) )
 		{ // Link to the help for this renderer plugin
 			echo ' <a href="'.$this->help_url.'"'
-						.' target="_blank" title="'.T_('Open help for this renderer in a new window.').'">'
+						.' target="_blank" title="'.T_('Open help for this plugin in a new window.').'">'
 						.get_icon( 'help' )
 						.'</a>';
 			return true;
@@ -466,7 +466,7 @@ class Plugin
 		}
 	}
 
-	
+
  	/**
 	 * Event handler: Called when displaying the tool menu.
 	 *
@@ -488,6 +488,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.9  2005/06/22 14:46:31  blueyed
+ * help_link(): "renderer" => "plugin"
+ *
  * Revision 1.8  2005/04/28 20:44:20  fplanque
  * normalizing, doc
  *
