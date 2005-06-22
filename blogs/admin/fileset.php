@@ -106,7 +106,7 @@ switch( $action )
 			$Settings->set( 'upload_allowedext', strtolower(trim($upload_allowedext)));
 
 			$Request->param_integer_range( 'upload_maxkb', 1, 9999999, T_('Maximum allowed filesize must be between %d and %d KB.') );
-			$Settings->set( 'upload_maxkbd', $upload_maxkb );
+			$Settings->set( 'upload_maxkb', $upload_maxkb );
 
 			// Advanced settings
 			$Request->param( 'regexp_filename', 'string', '' );
