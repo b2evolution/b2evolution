@@ -1492,7 +1492,9 @@ class Item extends DataObject
 
 		if( !$atLeastOneRenderer )
 		{
-			echo T_('No renderer plugins are installed.');
+			global $admin_url;
+			echo '<a title="Configure plugins" href="'
+				.$admin_url.'plugins.php">'.T_('No renderer plugins are installed.').'</a>';
 		}
 	}
 
@@ -1541,9 +1543,9 @@ class Item extends DataObject
 		{
 			$this->disp( $this->get('t_extra_status'), 'raw' );
 		}
-		else
+		elseif( $extra_status = $this->get('t_extra_status') )
 		{
-			echo $before.format_to_output( $this->get('t_extra_status'), $format ).$after;
+			echo $before.format_to_output( $extra_status, $format ).$after;
 		}
 	}
 
@@ -2154,6 +2156,10 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.46  2005/06/22 14:49:34  blueyed
+ * extra_status(): display only, if t_extra_status is not empty (for type != 'raw').
+ * renderer_checkboxes(): Link 'No renderer plugins are installed.' to plugin setup.
+ *
  * Revision 1.45  2005/06/13 19:53:50  fplanque
  * refactoring
  *
