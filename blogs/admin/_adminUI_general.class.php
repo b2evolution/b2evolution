@@ -801,7 +801,7 @@ class AdminUI_general
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
-					'no_results' => '<table class="grouped" cellspacing="0">'."\n\n"
+					'no_results' => '<table class="grouped clear" cellspacing="0">'."\n\n"
 																.'<th><span style="float:right">$global_icons$</span>'
 																.'$title$</th></tr>'."\n\n<tr>\n"
 																.'<tr class="lastline"><td class="firstcol lastcol">'.T_('No results.').'</td></tr>'
@@ -1089,6 +1089,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.25  2005/06/22 17:21:39  blueyed
+ * css fix for khtml
+ *
  * Revision 1.24  2005/06/03 20:14:37  fplanque
  * started input validation framework
  *
