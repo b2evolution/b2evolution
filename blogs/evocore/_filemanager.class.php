@@ -213,11 +213,11 @@ class FileManager extends Filelist
 		$this->_result_params = $AdminUI->getMenuTemplate('Results');
 
 		if( empty($root) )
-		{	// NO folder requested, get the first one available:
+		{ // NO folder requested, get the first one available:
 			$root_array = $this->getRootList();
 
 			if( count($root_array) )
-			{	// We found at least one media dir:
+			{ // We found at least one media dir:
 				$this->_root_type = $root_array[0]['type'];
 				$this->_root_ID = $root_array[0]['IDn'];
 				$this->_ads_root_path = $root_array[0]['path'];
@@ -231,7 +231,7 @@ class FileManager extends Filelist
 			}
 		}
 		else
-		{	// We have requested a root folder:
+		{ // We have requested a root folder:
 			$root_parts = explode( '_', $root );
 
 			if( $root_parts[0] == 'user' )
@@ -260,7 +260,7 @@ class FileManager extends Filelist
 		}
 
 		if( $this->_ads_root_path )
-		{	// We have access to a/requested root dir:
+		{ // We have access to a/requested root dir:
 
 			list( $_ads_real_root_path, $real_root_path_exists ) = check_canonical_path( $this->_ads_root_path );
 			$Debuglog->add( 'FM: real_root_dir: '.var_export( $_ads_real_root_path, true ), 'files' );
@@ -271,7 +271,7 @@ class FileManager extends Filelist
 				$this->_ads_list_path = false;
 			}
 			else
-			{	// Root exists
+			{ // Root exists
 				// Let's get into requested list dir...
 				$this->_ads_list_path = trailing_slash( $this->_ads_root_path.$path );
 
@@ -738,7 +738,7 @@ class FileManager extends Filelist
 
 		// the user's root
 		if( $user_media_dir = $this->User->getMediaDir() )
-		{	// We got a user media dir:
+		{ // We got a user media dir:
 			$r[] = array( 'type' => 'user',
 										'IDn'  => $this->User->ID,
 										'id'   => 'user',
@@ -767,7 +767,7 @@ class FileManager extends Filelist
 
 		// Sorting icon:
 		if( $this->translate_order($this->_order) != $type )
-		{	// Not sorted on this column:
+		{ // Not sorted on this column:
 			$r .= ' class="basic_sort_link">'.$this->_result_params['basic_sort_off'];
 		}
 		elseif( $this->is_sorting_asc($type) )
@@ -848,7 +848,7 @@ class FileManager extends Filelist
 	function getLinkFile( & $File, $action = 'default' )
 	{
 		if( $File->is_dir() && ($action == 'default') )
-		{	// Link to open this directory:
+		{ // Link to open this directory:
 			if( !isset( $File->cache['linkFile_1'] ) )
 			{
 				$File->cache['linkFile_1'] = $this->getCurUrl( array( 'path' => $File->get_rdfs_rel_path() ) );
@@ -856,7 +856,7 @@ class FileManager extends Filelist
 			return $File->cache['linkFile_1'];
 		}
 		else
-		{	// Link to perform given $action on directory or file:
+		{ // Link to perform given $action on directory or file:
 			if( !isset( $File->cache['linkFile_2'] ) )
 			{
 				$File->cache['linkFile_2'] = $this->getCurUrl().'&amp;fm_selected[]='.$File->get_md5_ID();
@@ -910,7 +910,7 @@ class FileManager extends Filelist
 		static $js_closeClickIDs; // clickopen IDs that should get closed
 
 		if( $Root === NULL )
-		{	// This is the top level call:
+		{ // This is the top level call:
 			$js_closeClickIDs = array();
 
 			$_roots = $this->getRootList();
@@ -925,12 +925,14 @@ class FileManager extends Filelist
 				}
 			}
 
-			$r .= '</ul>
-						<script type="text/javascript">
-						toggle_clickopen( \''
-						.implode( "' );\ntoggle_clickopen( '", $js_closeClickIDs )
-						."' );\n
-						</script>";
+			$r .= '</ul>';
+
+			if( !empty($js_closeClickIDs) )
+			{
+				$r .= "\n".'<script type="text/javascript">toggle_clickopen( \''
+							.implode( "' );\ntoggle_clickopen( '", $js_closeClickIDs )
+							."' );\n</script>";
+			}
 
 			return $r;
 		}
@@ -1023,7 +1025,7 @@ class FileManager extends Filelist
 		if( $type == 'dir' )
 		{
 			if( !$Settings->get( 'fm_enable_create_dir' ) )
-			{	// Directory creation is gloablly disabled:
+			{ // Directory creation is gloablly disabled:
 				$Messages->add( T_('Directory creation is disabled'), 'error' );
 				return false;
 			}
@@ -1031,7 +1033,7 @@ class FileManager extends Filelist
 		elseif( $type == 'file' )
 		{
 			if( !$Settings->get( 'fm_enable_create_file' ) )
-			{	// File creation is gloablly disabled:
+			{ // File creation is gloablly disabled:
 				$Messages->add( T_('File creation is disabled'), 'error' );
 				return false;
 			}
@@ -1042,7 +1044,7 @@ class FileManager extends Filelist
 		}
 
 		if( empty($name) )
-		{	// No name was supplied:
+		{ // No name was supplied:
 			$Messages->add( ($type == 'dir' ?
 														T_('Cannot create a directory without name.') :
 														T_('Cannot create a file without name.') ), 'error' );
@@ -1271,7 +1273,7 @@ class FileManager extends Filelist
 		{
 			if( $unlinked = deldir_recursive( $File->get_full_path() ) )
 			{
-				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'), 
+				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'),
 															$File->get_name() ), 'success' );
 			}
 			else
@@ -1310,7 +1312,7 @@ class FileManager extends Filelist
 	function move_File( & $File, $root_type, $root_ID, $rel_path )
 	{
 		if( ! $File->move_to( $root_type, $root_ID, $rel_path ) )
-		{	// failed
+		{ // failed
 			return false;
 		}
 
@@ -1351,6 +1353,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.48  2005/06/22 14:50:47  blueyed
+ * getDirectoryTreeRadio(): fix JS error for empty clickopen list
+ *
  * Revision 1.47  2005/06/03 15:12:33  fplanque
  * error/info message cleanup
  *
