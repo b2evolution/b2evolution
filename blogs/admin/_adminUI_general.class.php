@@ -118,7 +118,7 @@ class AdminUI_general
 	/**
 	 * Constructor.
 	 */
-	function AdminUI()
+	function AdminUI_general()
 	{
 		global $mode; // TODO: make it a real property
 		global $htsrv_url, $baseurl;
@@ -1089,6 +1089,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.26  2005/06/23 18:43:06  blueyed
+ * Fixed constructor's name.
+ *
  * Revision 1.25  2005/06/22 17:21:39  blueyed
  * css fix for khtml
  *
