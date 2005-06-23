@@ -105,8 +105,12 @@ echo '<th>'.T_('Author')."</th>\n";
 echo '<th>'.T_('Status')."</th>\n";
 echo '<th>'.T_('Title')."</th>\n";
 if( $Blog->allowcomments != 'never' )
-{
+{ // FIXME: will fail for Blog ID 1 (all blogs) -> build table body and remember if any post allows comments.
 	echo '<th>'.T_('Com.')."</th>\n";
+}
+if( $Blog->ID == 1 )
+{ // "All blogs": display name of blog
+	echo '<th>'.T_('Blog')."</th>\n";
 }
 echo '<th>'.T_('Actions')."</th>\n";
 echo "</tr>\n";
@@ -143,7 +147,7 @@ while( $Item = $MainList->get_item() )
 	echo "</a></td>\n";
 
 	if( $Blog->allowcomments != 'never' )
-	{
+	{ // FIXME: should use $Item->getBlog() for $Blog == 1 (see also <th> for this).
 		echo '<td class="center">';
 		echo '<a href="b2browse.php?tab=posts&amp;blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1" class="">';
 		// TRANS: Link to comments for current post
@@ -156,6 +160,18 @@ while( $Item = $MainList->get_item() )
 		echo "</td>\n";
 	}
 
+	if( $Blog->ID == 1 )
+	{ // "All blogs": display name of blog, linked to browse this blog.
+		echo '<td>';
+		$Item_Blog =& $Item->getBlog();
+
+		echo '<a href="'.regenerate_url( 'blog', 'blog='.$Item_Blog->ID )
+			.'" title="'.$Item_Blog->dget( 'name', 'htmlattr' )
+			.'">'.$Item_Blog->dget( 'shortname', 'htmlattr' ).'</a>';
+		echo "</td>\n";
+	}
+
+	// Actions:
 	echo '<td class="center">';
 	// Display edit button if current user has the rights:
 	$Item->edit_link( ' ', ' ', get_icon( 'edit' ), '#', '', $edit_item_url );
@@ -168,7 +184,7 @@ while( $Item = $MainList->get_item() )
 
 	echo "</td>\n";
 
- 	echo '</tr>';
+	echo '</tr>';
 
 }
 echo '</table>';
@@ -183,8 +199,8 @@ if( $MainList->get_total_num_posts() )
 ?>
 
 <p class="center">
-  <a href="<?php echo $add_item_url ?>"><img src="img/new.gif" width="13" height="13" class="middle" alt="" />
-    <?php echo T_('New post...') ?></a>
+	<a href="<?php echo $add_item_url ?>"><img src="img/new.gif" width="13" height="13" class="middle" alt="" />
+		<?php echo T_('New post...') ?></a>
 </p>
 
 <?php
@@ -194,6 +210,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.5  2005/06/23 20:05:15  blueyed
+ * For Blog 1 display the blog where the post is really from. Doc.
+ *
  * Revision 1.4  2005/05/26 19:11:08  fplanque
  * no message
  *
