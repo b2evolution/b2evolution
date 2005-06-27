@@ -333,7 +333,11 @@ class Results extends Widget
 			// Split requested columns by commata
 			foreach( preg_split( '#\s*,\s*#', $matches[1] ) as $l_select )
 			{
-				if( preg_match( '#^([a-z][a-z0-9._-]*)$#i', $l_select, $match ) )
+				if( is_numeric( $l_select ) )
+				{ // just a single value (would produce parse error as '$x$')
+					$this->cols[] = array( 'td' => $l_select );
+				}
+				elseif( preg_match( '#^(\w+)$#i', $l_select, $match ) )
 				{ // regular column
 					$this->cols[] = array( 'td' => '$'.$match[1].'$' );
 				}
@@ -1067,7 +1071,7 @@ class Results extends Widget
 
 /*
  * $Log$
- * Revision 1.26  2005/06/27 23:57:22  blueyed
+ * Revision 1.27  2005/06/27 23:59:25  blueyed
  * display(): fixes parse error for selecting straight value, supports "x AS y" selects
  *
  * Revision 1.25  2005/06/02 18:50:53  fplanque
