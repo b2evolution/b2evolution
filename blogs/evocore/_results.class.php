@@ -204,7 +204,7 @@ class Results extends Widget
 				$this->asc = strstr( $this->order, 'A' ) ? ' ASC' : ' DESC';
 			}
 			elseif( isset( $this->cols ) )
-			{	// We still have columns specified (may not be the case, example: ArchievList)
+			{	// We still have columns specified (may not be the case, example: ArchiveList)
 				// We'll have to find the first order:
 
 				foreach( $this->cols as $col )
@@ -325,18 +325,27 @@ class Results extends Widget
 		{ // Let's create default column definitions:
 			$this->cols = array();
 
-			if( !preg_match( '#SELECT \s+ (.+?) \s+ FROM#six', $this->sql, $matches ) ) die( 'No SELECT clause!' );
-
-			$select = $matches[1].',';	// Add a , to normalize list
-
-			if( !($nb_cols = preg_match_all( '#(\w+) \s* ,#six', $select, $matches )) )
-				die( 'No columns selected!' );
-
-			for( $i=0; $i<$nb_cols; $i++ )
+			if( !preg_match( '#SELECT \s+ (.+?) \s+ FROM#six', $this->sql, $matches ) )
 			{
-			 	$col = $matches[1][$i];
+				die( 'No SELECT clause!' );
+			}
 
-				$this->cols[] = array( 'td' => '$'.$col.'$' );
+			// Split requested columns by commata
+			foreach( preg_split( '#\s*,\s*#', $matches[1] ) as $l_select )
+			{
+				if( preg_match( '#^([a-z][a-z0-9._-]*)$#i', $l_select, $match ) )
+				{ // regular column
+					$this->cols[] = array( 'td' => '$'.$match[1].'$' );
+				}
+				elseif( preg_match( '#^(.*?) AS (\w+)#i', $l_select, $match ) )
+				{ // aliased column
+					$this->cols[] = array( 'td' => '$'.$match[2].'$' );
+				}
+			}
+
+			if( !isset($this->cols[0]) )
+			{
+				die( 'No columns selected!' );
 			}
 		}
 
@@ -604,7 +613,7 @@ class Results extends Widget
 						//echo $output;
 						eval( "echo '$output';" );
 
-          	echo '</td>';
+						echo '</td>';
 						$col_count++;
 					}
 
@@ -1058,6 +1067,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.26  2005/06/27 23:57:22  blueyed
+ * display(): fixes parse error for selecting straight value, supports "x AS y" selects
+ *
  * Revision 1.25  2005/06/02 18:50:53  fplanque
  * no message
  *
