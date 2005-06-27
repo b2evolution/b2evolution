@@ -98,26 +98,26 @@ $AdminUI->addMenuEntries(
 									'text'=>T_('Stats'),
 									'perm_name'=>'stats',
 									'perm_level'=>'view',
-									'href'=>'b2stats.php',
+									'href'=>'stats.php',
 									'entries' => array(
 										'summary' => array(
 											'text' => T_('Summary'),
-											'href' => 'b2stats.php?tab=summary&amp;blog='.$blog ),
+											'href' => 'stats.php?tab=summary&amp;blog='.$blog ),
 										'other' => array(
 											'text' => T_('Direct Accesses'),
-											'href' => 'b2stats.php?tab=other&amp;blog='.$blog ),
+											'href' => 'stats.php?tab=other&amp;blog='.$blog ),
 										'referers' => array(
 											'text' => T_('Referers'),
-											'href' => 'b2stats.php?tab=referers&amp;blog='.$blog ),
+											'href' => 'stats.php?tab=referers&amp;blog='.$blog ),
 										'refsearches' => array(
 											'text' => T_('Refering Searches'),
-											'href' => 'b2stats.php?tab=refsearches&amp;blog='.$blog ),
+											'href' => 'stats.php?tab=refsearches&amp;blog='.$blog ),
 										'syndication' => array(
 											'text' => T_('Syndication'),
-											'href' => 'b2stats.php?tab=syndication&amp;blog='.$blog ),
+											'href' => 'stats.php?tab=syndication&amp;blog='.$blog ),
 										'useragents' => array(
 											'text' => T_('User Agents'),
-											'href' => 'b2stats.php?tab=useragents&amp;blog='.$blog ),
+											'href' => 'stats.php?tab=useragents&amp;blog='.$blog ),
 									)
 								),
 
