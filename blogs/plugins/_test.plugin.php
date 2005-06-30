@@ -74,10 +74,10 @@ class test_plugin extends Plugin
 	 * Constructor.
 	 *
 	 * Should set name and description in a localizable fashion.
-	 * NOTE FOR PLUGIN DEVELOPPERS UNFAMILIAR WITH OBJECT ORIENTED DEV:
+	 * NOTE FOR PLUGIN DEVELOPERS UNFAMILIAR WITH OBJECT ORIENTED DEV:
 	 * This function has the same name as the class, this makes it a "constructor".
 	 * This means that this function will be called automagically by PHP when this
-	 * plugin class is instanciated ("loaded").
+	 * plugin class is instantiated ("loaded").
 	 *
 	 * {@internal test_plugin::test_plugin(-)}}
 	 */
