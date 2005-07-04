@@ -197,11 +197,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			require( dirname(__FILE__).'/_profile.php');
 			break;
 
-		case 'subs':
-			// this includes the subscription form if requested
-			require( dirname(__FILE__).'/_subscriptions.php');
-			break;
-
 		case 'msgform':
 			// this includes the email form if requested
 			require( dirname(__FILE__).'/_msgform.php');
