@@ -105,7 +105,7 @@ echo '<th>'.T_('Author')."</th>\n";
 echo '<th>'.T_('Status')."</th>\n";
 echo '<th>'.T_('Title')."</th>\n";
 if( $Blog->allowcomments != 'never' )
-{ // FIXME: will fail for Blog ID 1 (all blogs) -> build table body and remember if any post allows comments.
+{ // TODO: will fail for Blog ID 1 (all blogs) -> build table body and remember if any post allows comments.
 	echo '<th>'.T_('Com.')."</th>\n";
 }
 if( $Blog->ID == 1 )
@@ -147,7 +147,7 @@ while( $Item = $MainList->get_item() )
 	echo "</a></td>\n";
 
 	if( $Blog->allowcomments != 'never' )
-	{ // FIXME: should use $Item->getBlog() for $Blog == 1 (see also <th> for this).
+	{ // TODO: should use $Item->getBlog() for $Blog == 1 (see also <th> for this).
 		echo '<td class="center">';
 		echo '<a href="b2browse.php?tab=posts&amp;blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1" class="">';
 		// TRANS: Link to comments for current post
@@ -210,6 +210,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.6  2005/07/04 13:41:38  fplanque
+ * use TODO: instead of FIXME: in order to be consistent...
+ *
  * Revision 1.5  2005/06/23 20:05:15  blueyed
  * For Blog 1 display the blog where the post is really from. Doc.
  *
