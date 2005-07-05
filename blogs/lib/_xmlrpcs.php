@@ -2,11 +2,13 @@
 /**
  * @package evocore
  * @subpackage xmlrpc {@link http://xmlrpc.usefulinc.com/doc/}
- * @copyright Edd Dumbill <edd@usefulinc.com> (C) 1999-2001
+ * @copyright Edd Dumbill <edd@usefulinc.com> (C) 1999-2002
  */
-// additional fixes for case of missing xml extension file by Michel Valdrighi <m@tidakada.com>
-//
-// Copyright (c) 1999,2000,2001 Edd Dumbill.
+// by Edd Dumbill (C) 1999-2002
+// <edd@usefulinc.com>
+// $Id$
+
+// Copyright (c) 1999,2000,2002 Edd Dumbill.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -40,317 +42,489 @@
 
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
-// XML RPC Server class
-// requires: xmlrpc.php
+	// XML RPC Server class
+	// requires: _xmlrpc.php
 
-$_xmlrpcs_listMethods_sig=array(array($xmlrpcArray, $xmlrpcString),
-																array($xmlrpcArray));
-$_xmlrpcs_listMethods_doc='This method lists all the methods that the XML-RPC server knows how to dispatch';
-/**
- * listMethods: either a string, or nothing
- */
-function _xmlrpcs_listMethods($server, $m)
-{
-	global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
-	$v=new xmlrpcval();
-	$dmap=$server->dmap;
-	$outAr=array();
-	for(reset($dmap); list($key, $val)=each($dmap); ) {
-		$outAr[]=new xmlrpcval($key, "string");
-	}
-	$dmap=$_xmlrpcs_dmap;
-	for(reset($dmap); list($key, $val)=each($dmap); ) {
-		$outAr[]=new xmlrpcval($key, "string");
-	}
-	$v->addArray($outAr);
-	return new xmlrpcresp($v);
-}
-
-$_xmlrpcs_methodSignature_sig=array(array($xmlrpcArray, $xmlrpcString));
-$_xmlrpcs_methodSignature_doc='Returns an array of known signatures (an array of arrays) for the method name passed. If no signatures are known, returns a none-array (test for type != array to detect missing signature)';
-/**
- * {@internal _xmlrpcs_methodSignature(-)}}
- */
-function _xmlrpcs_methodSignature($server, $m)
-{
-	global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
-
-	$methName=$m->getParam(0);
-	$methName=$methName->scalarval();
-	if (ereg("^system\.", $methName)) {
-		$dmap=$_xmlrpcs_dmap; $sysCall=1;
-	} else {
-		$dmap=$server->dmap; $sysCall=0;
-	}
-	//	print "<!-- ${methName} -->\n";
-	if (isset($dmap[$methName])) {
-		if ($dmap[$methName]["signature"]) {
-			$sigs=array();
-			$thesigs=$dmap[$methName]["signature"];
-			for($i=0; $i<sizeof($thesigs); $i++) {
-				$cursig=array();
-				$inSig=$thesigs[$i];
-				for($j=0; $j<sizeof($inSig); $j++) {
-					$cursig[]=new xmlrpcval($inSig[$j], "string");
-				}
-				$sigs[]=new xmlrpcval($cursig, "array");
-			}
-			$r=new xmlrpcresp(new xmlrpcval($sigs, "array"));
-		} else {
-			$r=new xmlrpcresp(new xmlrpcval("undef", "string"));
-		}
-	} else {
-			$r=new xmlrpcresp(0,
-						  $xmlrpcerr["introspect_unknown"],
-						  $xmlrpcstr["introspect_unknown"]);
-	}
-	return $r;
-}
-
-$_xmlrpcs_methodHelp_sig=array(array($xmlrpcString, $xmlrpcString));
-$_xmlrpcs_methodHelp_doc='Returns help text if defined for the method passed, otherwise returns an empty string';
-function _xmlrpcs_methodHelp($server, $m)
-{
-	global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
-
-	$methName=$m->getParam(0);
-	$methName=$methName->scalarval();
-	if (ereg("^system\.", $methName)) {
-		$dmap=$_xmlrpcs_dmap; $sysCall=1;
-	} else {
-		$dmap=$server->dmap; $sysCall=0;
-	}
-	//	print "<!-- ${methName} -->\n";
-	if (isset($dmap[$methName])) {
-		if ($dmap[$methName]["docstring"]) {
-			$r=new xmlrpcresp(new xmlrpcval($dmap[$methName]["docstring"]),
-												"string");
-		} else {
-			$r=new xmlrpcresp(new xmlrpcval("", "string"));
-		}
-	} else {
-			$r=new xmlrpcresp(0,
-						  $xmlrpcerr["introspect_unknown"],
-						  $xmlrpcstr["introspect_unknown"]);
-	}
-	return $r;
-}
-
-$_xmlrpcs_dmap=array(
-										 "system.listMethods" =>
-										 array("function" => "_xmlrpcs_listMethods",
-													 "signature" => $_xmlrpcs_listMethods_sig,
-													 "docstring" => $_xmlrpcs_listMethods_doc),
-										 "system.methodHelp" =>
-										 array("function" => "_xmlrpcs_methodHelp",
-													 "signature" => $_xmlrpcs_methodHelp_sig,
-													 "docstring" => $_xmlrpcs_methodHelp_doc),
-										 "system.methodSignature" =>
-										 array("function" => "_xmlrpcs_methodSignature",
-													 "signature" => $_xmlrpcs_methodSignature_sig,
-													 "docstring" => $_xmlrpcs_methodSignature_doc)
-										 );
-
-/**
- * Register a debugging message to be sent back in output
- */
-$_xmlrpc_debuginfo="";
-function xmlrpc_debugmsg($m)
-{
-	global $_xmlrpc_debuginfo, $xmlrpc_debug_messages;
-	if( $xmlrpc_debug_messages )
-	{
-		$_xmlrpc_debuginfo = $_xmlrpc_debuginfo . $m . "\n";
-	}
-}
-
-/**
- * @package evocore
- * @subpackage xmlrpc
- */
-class xmlrpc_server
-{
-  var $dmap=array();
-
-	/*
-	 * Constructor:
+	// listMethods: either a string, or nothing
+	$_xmlrpcs_listMethods_sig=array(array($xmlrpcArray, $xmlrpcString), array($xmlrpcArray));
+	$_xmlrpcs_listMethods_doc='This method lists all the methods that the XML-RPC server knows how to dispatch';
+	/**
+	 * listMethods: either a string, or nothing
 	 */
-  function xmlrpc_server($dispMap, $serviceNow=1)
+	function _xmlrpcs_listMethods($server, $m)
 	{
-		global $HTTP_RAW_POST_DATA;
-		// dispMap is a despatch array of methods
-		// mapped to function names and signatures
-		// if a method
-		// doesn't appear in the map then an unknown
-		// method error is generated
-		$this->dmap=$dispMap;
-		if ($serviceNow)
+		global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
+		$v=new xmlrpcval();
+		$dmap=$server->dmap;
+		$outAr=array();
+		for(reset($dmap); list($key, $val)=each($dmap); )
 		{
-			$this->service();
+			$outAr[]=new xmlrpcval($key, 'string');
 		}
-  }
+		$dmap=$_xmlrpcs_dmap;
+		for(reset($dmap); list($key, $val)=each($dmap); )
+		{
+			$outAr[]=new xmlrpcval($key, 'string');
+		}
+		$v->addArray($outAr);
+		return new xmlrpcresp($v);
+	}
 
-	function serializeDebug()
+	$_xmlrpcs_methodSignature_sig=array(array($xmlrpcArray, $xmlrpcString));
+	$_xmlrpcs_methodSignature_doc='Returns an array of known signatures (an array of arrays) for the method name passed. If no signatures are known, returns a none-array (test for type != array to detect missing signature)';
+	/**
+	 * {@internal _xmlrpcs_methodSignature(-)}}
+	 */
+	function _xmlrpcs_methodSignature($server, $m)
 	{
-		global $_xmlrpc_debuginfo;
-		if ($_xmlrpc_debuginfo!="")
-			return "<!-- DEBUG INFO:\n\n" .
-				$_xmlrpc_debuginfo . "\n-->\n";
+		global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
+
+		$methName=$m->getParam(0);
+		$methName=$methName->scalarval();
+		if (ereg("^system\.", $methName))
+		{
+			$dmap=$_xmlrpcs_dmap; $sysCall=1;
+		}
 		else
-			return "";
-	}
-
-	function service()
-	{
-		$r=$this->parseRequest();
-		// TODO: charset:  encoding=\"iso-8859-1\"
-		$payload="<?xml version=\"1.0\"?>\n" .
-			$this->serializeDebug() .							// Include debug info as comments
-			$r->serialize();
-		Header("Content-type: text/xml\r\nContent-length: " .
-					 strlen(trim($payload)));
-		print trim($payload);
-	}
-
-	function verifySignature($in, $sig)
-	{
-		for($i=0; $i < sizeof($sig); $i++)
 		{
-			// check each possible signature in turn
-			$cursig=$sig[$i];
-			if (sizeof($cursig)==$in->getNumParams()+1)
-			{
-				$itsOK=1;
-				for($n=0; $n<$in->getNumParams(); $n++) {
-					$p=$in->getParam($n);
-					// print "<!-- $p -->\n";
-					if ($p->kindOf() == "scalar") {
-						$pt=$p->scalartyp();
-					} else {
-						$pt=$p->kindOf();
-					}
-					// $n+1 as first type of sig is return type
-					if ($pt != $cursig[$n+1]) {
-						$itsOK=0;
-						$pno=$n+1; $wanted=$cursig[$n+1]; $got=$pt;
-						break;
-					}
-				}
-				if ($itsOK) return array(1);
-			}
-			else return array(0, "Signature size does not match");
+			$dmap=$server->dmap; $sysCall=0;
 		}
-		return array(0, "Wanted $wanted, got $got at param $pno)");
+		//	print "<!-- ${methName} -->\n";
+		if (isset($dmap[$methName]))
+		{
+			if ($dmap[$methName]['signature'])
+			{
+				$sigs=array();
+				$thesigs=$dmap[$methName]['signature'];
+				for($i=0; $i<sizeof($thesigs); $i++)
+				{
+					$cursig=array();
+					$inSig=$thesigs[$i];
+					for($j=0; $j<sizeof($inSig); $j++)
+					{
+						$cursig[]=new xmlrpcval($inSig[$j], 'string');
+					}
+					$sigs[]=new xmlrpcval($cursig, 'array');
+				}
+				$r=new xmlrpcresp(new xmlrpcval($sigs, 'array'));
+			}
+			else
+			{
+				$r=new xmlrpcresp(new xmlrpcval('undef', 'string'));
+			}
+		}
+		else
+		{
+			$r=new xmlrpcresp(0,$xmlrpcerr['introspect_unknown'], $xmlrpcstr['introspect_unknown']);
+		}
+		return $r;
+	}
+
+	$_xmlrpcs_methodHelp_sig=array(array($xmlrpcString, $xmlrpcString));
+	$_xmlrpcs_methodHelp_doc='Returns help text if defined for the method passed, otherwise returns an empty string';
+	function _xmlrpcs_methodHelp($server, $m)
+	{
+		global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
+
+		$methName=$m->getParam(0);
+		$methName=$methName->scalarval();
+		if (ereg("^system\.", $methName))
+		{
+			$dmap=$_xmlrpcs_dmap; $sysCall=1;
+		}
+		else
+		{
+			$dmap=$server->dmap; $sysCall=0;
+		}
+		// print "<!-- ${methName} -->\n";
+		if (isset($dmap[$methName]))
+		{
+			if ($dmap[$methName]['docstring'])
+			{
+				$r=new xmlrpcresp(new xmlrpcval($dmap[$methName]['docstring']), 'string');
+			}
+			else
+			{
+				$r=new xmlrpcresp(new xmlrpcval('', 'string'));
+			}
+		}
+		else
+		{
+			$r=new xmlrpcresp(0, $xmlrpcerr['introspect_unknown'], $xmlrpcstr['introspect_unknown']);
+		}
+		return $r;
+	}
+
+	$_xmlrpcs_multicall_sig = array(array($xmlrpcArray, $xmlrpcArray));
+	$_xmlrpcs_multicall_doc = 'Boxcar multiple RPC calls in one request. See http://www.xmlrpc.com/discuss/msgReader$1208 for details';
+
+	function _xmlrpcs_multicall_error($err)
+	{
+		if (is_string($err))
+		{
+			global $xmlrpcerr, $xmlrpcstr;
+			$str  = $xmlrpcstr["multicall_${err}"];
+			$code = $xmlrpcerr["multicall_${err}"];
+		}
+		else
+		{
+			$code = $err->faultCode();
+			$str = $err->faultString();
+		}
+		$struct['faultCode'] = new xmlrpcval($code, 'int');
+		$struct['faultString'] = new xmlrpcval($str, 'string');
+		return new xmlrpcval($struct, 'struct');
+	}
+
+	function _xmlrpcs_multicall_do_call($server, $call)
+	{
+		if ($call->kindOf() != 'struct')
+		{
+			return _xmlrpcs_multicall_error('notstruct');
+		}
+		$methName = $call->structmem('methodName');
+		if (!$methName)
+		{
+			return _xmlrpcs_multicall_error('nomethod');
+		}
+		if ($methName->kindOf() != 'scalar' || $methName->scalartyp() != 'string')
+		{
+			return _xmlrpcs_multicall_error('notstring');
+		}
+		if ($methName->scalarval() == 'system.multicall')
+		{
+			return _xmlrpcs_multicall_error('recursion');
+		}
+
+		$params = $call->structmem('params');
+		if (!$params)
+		{
+			return _xmlrpcs_multicall_error('noparams');
+		}
+		if ($params->kindOf() != 'array')
+		{
+			return _xmlrpcs_multicall_error('notarray');
+		}
+		$numParams = $params->arraysize();
+
+		$msg = new xmlrpcmsg($methName->scalarval());
+		for ($i = 0; $i < $numParams; $i++)
+		{
+			$msg->addParam($params->arraymem($i));
+		}
+
+		$result = $server->execute($msg);
+
+		if ($result->faultCode() != 0)
+		{
+			return _xmlrpcs_multicall_error($result);    // Method returned fault.
+		}
+
+		return new xmlrpcval(array($result->value()), 'array');
+	}
+
+	function _xmlrpcs_multicall($server, $m)
+	{
+		$calls = $m->getParam(0);
+		$numCalls = $calls->arraysize();
+		$result = array();
+
+		for ($i = 0; $i < $numCalls; $i++)
+		{
+			$call = $calls->arraymem($i);
+			$result[$i] = _xmlrpcs_multicall_do_call($server, $call);
+		}
+
+		return new xmlrpcresp(new xmlrpcval($result, 'array'));
+	}
+
+	$_xmlrpcs_dmap=array(
+		'system.listMethods' => array(
+			'function' => '_xmlrpcs_listMethods',
+			'signature' => $_xmlrpcs_listMethods_sig,
+			'docstring' => $_xmlrpcs_listMethods_doc),
+		'system.methodHelp' => array(
+			'function' => '_xmlrpcs_methodHelp',
+			'signature' => $_xmlrpcs_methodHelp_sig,
+			'docstring' => $_xmlrpcs_methodHelp_doc),
+		'system.methodSignature' => array(
+			'function' => '_xmlrpcs_methodSignature',
+			'signature' => $_xmlrpcs_methodSignature_sig,
+			'docstring' => $_xmlrpcs_methodSignature_doc),
+		'system.multicall' => array(
+			'function' => '_xmlrpcs_multicall',
+			'signature' => $_xmlrpcs_multicall_sig,
+			'docstring' => $_xmlrpcs_multicall_doc
+		)
+	);
+
+	/**
+	 * Register a debugging message to be sent back in output
+	 *
+	 * evocore addition: make debug output optional
+	 */
+	$_xmlrpc_debuginfo='';
+	function xmlrpc_debugmsg($m)
+	{
+		global $_xmlrpc_debuginfo, $xmlrpc_debug_messages;
+		if( $xmlrpc_debug_messages )
+		{
+			$_xmlrpc_debuginfo = $_xmlrpc_debuginfo . $m . "\n";
+		}
 	}
 
 	/**
-	 *
-	 *
-	 * {@internal parseRequest(-) }}
+	 * @package evocore
+	 * @subpackage xmlrpc
 	 */
-  function parseRequest($data="")
+	class xmlrpc_server
 	{
-		global $_xh,$HTTP_RAW_POST_DATA;
-		global $xmlrpcerr, $xmlrpcstr, $xmlrpcerrxml, $xmlrpc_defencoding,
-			$_xmlrpcs_dmap;
+		var $dmap=array();
 
-		if ($data=="")
+		/*
+		 * Constructor:
+		 */
+		function xmlrpc_server($dispMap='', $serviceNow=1)
 		{
-			$data=$HTTP_RAW_POST_DATA;
-		}
-		// xmlrpc_debugmsg( 'Data received: ['.$data.']' );
-
-
-		$parser = xml_parser_create($xmlrpc_defencoding);
-
-		$_xh[$parser]=array();
-		$_xh[$parser]['st']="";
-		$_xh[$parser]['cm']=0;
-		$_xh[$parser]['isf']=0;
-		$_xh[$parser]['params']=array();
-		$_xh[$parser]['method']="";
-
-		// decompose incoming XML into request structure:
-		xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, true);
-		xml_set_element_handler($parser, "xmlrpc_se", "xmlrpc_ee");
-		xml_set_character_data_handler($parser, "xmlrpc_cd");
-		xml_set_default_handler($parser, "xmlrpc_dh");
-		if (!xml_parse($parser, $data, 1))
-		{
-			// return XML error as a faultCode
-			$r=new xmlrpcresp(0,
-							$xmlrpcerrxml+xml_get_error_code($parser),
-							sprintf("XML error: %s at line %d",
-						xml_error_string(xml_get_error_code($parser)),
-						xml_get_current_line_number($parser)));
-			xml_parser_free($parser);
-		}
-		else
-		{	// XML parsing succeeded:
-			xml_parser_free($parser);
-			$m=new xmlrpcmsg($_xh[$parser]['method']);
-			// now add parameters in
-			$plist="";
-			for($i=0; $i<sizeof($_xh[$parser]['params']); $i++) {
-				//print "<!-- " . $_xh[$parser]['params'][$i]. "-->\n";
-				$plist.="$i - " .  $_xh[$parser]['params'][$i]. " \n";
-				eval('$m->addParam(' . $_xh[$parser]['params'][$i]. ");");
-			}
-			// uncomment this to really see what the server's getting!
-			// xmlrpc_debugmsg($plist);
-
-			// now to deal with the method:
-			$methName = $_xh[$parser]['method'];
-			logIO( 'I', 'Called method:'.$methName );
-
-			if (ereg("^system\.", $methName))
+			global $HTTP_RAW_POST_DATA;
+			// dispMap is a dispatch array of methods
+			// mapped to function names and signatures
+			// if a method
+			// doesn't appear in the map then an unknown
+			// method error is generated
+			/* milosch - changed to make passing dispMap optional.
+			 * instead, you can use the class add_to_map() function
+			 * to add functions manually (borrowed from SOAPX4)
+			 */
+			if($dispMap)
 			{
-				$dmap=$_xmlrpcs_dmap; $sysCall=1;
-			} else {
-				$dmap=$this->dmap; $sysCall=0;
-			}
-			if (isset($dmap[$methName]['function'])) {
-				// dispatch if exists
-				if (isset($dmap[$methName]['signature'])) {
-					$sr=$this->verifySignature($m,
-																		$dmap[$methName]['signature'] );
+				$this->dmap = $dispMap;
+				if($serviceNow)
+				{
+					$this->service();
 				}
-				if ( (!isset($dmap[$methName]['signature']))
-						 || $sr[0]) {
-					// if no signature or correct signature
-					if ($sysCall) {
-						eval('$r=' . $dmap[$methName]['function'] .
-								 '($this, $m);');
-					} else {
-						eval('$r=' . $dmap[$methName]['function'] .
-								 '($m);');
-					}
-				} else {
-					$r=new xmlrpcresp(0,
-								$xmlrpcerr["incorrect_params"],
-								$xmlrpcstr["incorrect_params"].": ". $sr[1]);
-				}
-			} else {
-			// else prepare error response
-			$r=new xmlrpcresp(0,
-								$xmlrpcerr["unknown_method"],
-								$xmlrpcstr["unknown_method"]);
 			}
 		}
-		return $r;
-  }
 
-  function echoInput()
-	{
-	global $HTTP_RAW_POST_DATA;
+		function serializeDebug()
+		{
+			global $_xmlrpc_debuginfo;
+			if ($_xmlrpc_debuginfo!='')
+			{
+				return "<!-- DEBUG INFO:\n\n" . xmlrpc_encode_entitites($_xmlrpc_debuginfo) . "\n-->\n";
+			}
+			else
+			{
+				return '';
+			}
+		}
 
-	// a debugging routine: just echos back the input
-	// packet as a string value
+		function service()
+		{
+			//global $xmlrpc_defencoding;
 
-	$r=new xmlrpcresp;
-	$r->xv=new xmlrpcval( "'Aha said I: '" . $HTTP_RAW_POST_DATA, "string");
-	print $r->serialize();
-  }
-}
+			$r=$this->parseRequest();
+			//$payload='<?xml version="1.0" encoding="' . $xmlrpc_defencoding . '"?' . '>' . "\n"
+			// TODO: charset:  encoding=\"iso-8859-1\"
+			$payload='<?xml version="1.0" ?' . '>' . "\n"
+				. $this->serializeDebug()							// Include debug info as comments
+				. $r->serialize();
+			header('Content-Type: text/xml');
+			header('Content-Length: ' . (int)strlen($payload));
+			print trim($payload);
+		}
 
+		/**
+		 * add a method to the dispatch map
+		 */
+		function add_to_map($methodname,$function,$sig,$doc)
+		{
+			$this->dmap[$methodname] = array(
+				'function'  => $function,
+				'signature' => $sig,
+				'docstring' => $doc
+			);
+		}
+
+		function verifySignature($in, $sig)
+		{
+			for($i=0; $i<sizeof($sig); $i++)
+			{
+				// check each possible signature in turn
+				$cursig=$sig[$i];
+				if (sizeof($cursig)==$in->getNumParams()+1)
+				{
+					$itsOK=1;
+					for($n=0; $n<$in->getNumParams(); $n++)
+					{
+						$p=$in->getParam($n);
+						// print "<!-- $p -->\n";
+						if ($p->kindOf() == 'scalar')
+						{
+							$pt=$p->scalartyp();
+						}
+						else
+						{
+							$pt=$p->kindOf();
+						}
+						// $n+1 as first type of sig is return type
+						if ($pt != $cursig[$n+1])
+						{
+							$itsOK=0;
+							$pno=$n+1; $wanted=$cursig[$n+1]; $got=$pt;
+							break;
+						}
+					}
+					if ($itsOK)
+					{
+						return array(1,'');
+					}
+				}
+			}
+			if (isset($wanted))
+				return array(0, "Wanted ${wanted}, got ${got} at param ${pno})");
+			else
+				return array(0, "No method signature matches number of parameters");
+		}
+
+		/**
+		 *
+		 *
+		 * {@internal parseRequest(-) }}
+		 */
+		function parseRequest($data='')
+		{
+			global $_xh,$HTTP_RAW_POST_DATA;
+			global $xmlrpcerr, $xmlrpcstr, $xmlrpcerrxml, $xmlrpc_defencoding,
+			$_xmlrpcs_dmap, $xmlrpc_internalencoding;
+
+			if ($data=='')
+			{
+				$data=$HTTP_RAW_POST_DATA;
+			}
+			// xmlrpc_debugmsg( 'Data received: ['.$data.']' );
+
+            // G. Giunta 2005/02/13: we do NOT expect to receive html entities
+            // so we do not try to convert them into xml character entities
+			//$data = xmlrpc_html_entity_xlate($data);
+			$parser = xml_parser_create($xmlrpc_defencoding);
+
+			$_xh[$parser]=array();
+			$_xh[$parser]['st']='';
+			$_xh[$parser]['cm']=0;
+			$_xh[$parser]['isf']=0;
+			$_xh[$parser]['params']=array();
+			$_xh[$parser]['method']='';
+
+			// decompose incoming XML into request structure
+
+			xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, true);
+            // G. Giunta 2005/02/13: PHP internally uses ISO-8859-1, so we have to tell
+            // the xml parser to give us back data in the expected charset
+            xml_parser_set_option($parser, XML_OPTION_TARGET_ENCODING, $xmlrpc_internalencoding);
+
+			xml_set_element_handler($parser, 'xmlrpc_se', 'xmlrpc_ee');
+			xml_set_character_data_handler($parser, 'xmlrpc_cd');
+			xml_set_default_handler($parser, 'xmlrpc_dh');
+			if (!xml_parse($parser, $data, 1))
+			{
+				// return XML error as a faultCode
+				$r=new xmlrpcresp(0,
+				$xmlrpcerrxml+xml_get_error_code($parser),
+				sprintf('XML error: %s at line %d',
+					xml_error_string(xml_get_error_code($parser)),
+					xml_get_current_line_number($parser)));
+				xml_parser_free($parser);
+			}
+			else
+			{	// XML parsing succeeded:
+				xml_parser_free($parser);
+				$m=new xmlrpcmsg($_xh[$parser]['method']);
+				// now add parameters in
+				$plist='';
+				$allOK = 1;
+				for($i=0; $i<sizeof($_xh[$parser]['params']); $i++)
+				{
+					//print "<!-- " . $_xh[$parser]['params'][$i]. "-->\n";
+					$plist.="$i - " .  $_xh[$parser]['params'][$i]. ";\n";
+					$allOK = 0;
+					@eval('$m->addParam(' . $_xh[$parser]['params'][$i]. '); $allOK=1;');
+					if (!$allOK)
+					{
+						break;
+					}
+				}
+				// uncomment this to really see what the server's getting!
+				// xmlrpc_debugmsg($plist);
+				if (!$allOK)
+				{
+					$r = new xmlrpcresp(0,
+  						$xmlrpcerr['incorrect_params'],
+						$xmlrpcstr['incorrect_params'] . ": xml error in param " . $i);
+				}
+				else
+				{
+					$r = $this->execute($m);
+				}
+			}
+			return $r;
+		}
+
+		function execute ($m)
+		{
+			global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
+			// now to deal with the method
+			$methName = $m->method();
+			logIO( 'I', 'Called method:'.$methName );
+			$sysCall = ereg("^system\.", $methName);
+			$dmap = $sysCall ? $_xmlrpcs_dmap : $this->dmap;
+
+			if (!isset($dmap[$methName]['function']))
+			{
+				// No such method
+				return new xmlrpcresp(0,
+					$xmlrpcerr['unknown_method'],
+					$xmlrpcstr['unknown_method']);
+			}
+
+			// Check signature.
+			if (isset($dmap[$methName]['signature']))
+			{
+				$sig = $dmap[$methName]['signature'];
+				list($ok, $errstr) = $this->verifySignature($m, $sig);
+				if(!$ok)
+				{
+					// Didn't match.
+					return new xmlrpcresp(
+						0,
+						$xmlrpcerr['incorrect_params'],
+						$xmlrpcstr['incorrect_params'] . ": ${errstr}"
+					);
+				}
+			}
+
+			$func = $dmap[$methName]['function'];
+
+			if ($sysCall)
+			{
+				return call_user_func($func, $this, $m);
+			}
+			else
+			{
+				return call_user_func($func, $m);
+			}
+		}
+
+		function echoInput()
+		{
+			global $HTTP_RAW_POST_DATA;
+
+			// a debugging routine: just echos back the input
+			// packet as a string value
+
+			$r=new xmlrpcresp;
+			$r->xv=new xmlrpcval( "'Aha said I: '" . $HTTP_RAW_POST_DATA, 'string');
+			print $r->serialize();
+		}
+	}
 ?>
