@@ -1,6 +1,6 @@
 <?php
 /**
- * This is b2evolution's formatting config file
+ * This is b2evolution's formatting config file.
  *
  * This file sets how b2evolution will parse and format texts (posts, comments, etc.)
  * Last significant changes to this file: version 0.9.0.6
@@ -9,6 +9,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * @todo Move as much as possible to $Settings / $UserSettings
  * @package conf
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
@@ -16,10 +17,15 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 // ** Formatting **
 
-# Choose the formatting options for your posts:
-# 0 to disable
-# 1 to ensable
-$use_balanceTags = 1;		// 0,1 automatically balance unmatched tags in posts and comments.
+/**
+ * Automatically balance unmatched tags in posts and comments.
+ *
+ * Choose the formatting options for your posts:
+ *  0 to disable
+ *  1 to ensable
+ * @global integer 0|1
+ */
+$use_balanceTags = 1;
 
 
 # Choose formatting options for comments
@@ -348,7 +354,10 @@ define('C_A_attrs', C_A_coreattrs.' '.C_A_i18n);
 define('C_A_cellhalign', 'align char charoff');
 define('C_A_cellvalign', 'valign');
 
-// Array showing what tags are allowed and what their allowed subtags are.
+/**
+ * Array showing what tags are allowed and what their allowed subtags are.
+ * @global array
+ */
 $comments_allowed_tags = array
 (
 	'body' => E_Flow, // Remember this is not a true body, just a comment body
@@ -389,7 +398,11 @@ $comments_allowed_tags = array
 	'small' => C_E_Iinline
 );
 
-// Array showing allowed attributes for tags
+
+/**
+ * Array showing allowed attributes for tags.
+ * @global array
+ */
 $comments_allowed_attribues = array
 (
 	'p' => C_A_attrs,
@@ -427,8 +440,10 @@ $comments_allowed_attribues = array
 	'small' => C_A_attrs,
 );
 
+
 /**
  * URI schemes allowed for URLs in comments and user profiles:
+ * @global array
  */
 $comments_allowed_uri_scheme = array
 (
@@ -463,7 +478,10 @@ $uri_attrs = array
 );
 
 
-# Translation of HTML entities and special characters
+/**
+ * Translation of HTML entities and special characters.
+ * @global array
+ */
 $b2_htmltrans = array(
 	// '&#8211;' => ' ', '&#8212;' => ' ', '&#8216;' => ' ', '&#8217;' => ' ',
 	// '&#8220;' => ' ', '&#8221;' => ' ', '&#8226;' => ' ', '&#8364;' => ' ',
@@ -563,10 +581,14 @@ $b2_htmltrans = array(
 	'&hearts;' => '&#9829;', '&diams;' => '&#9830;'
 );
 
-# Translation of invalid Unicode references range to valid range
-# these are Windows CP1252 specific characters
-# they would look weird on non-Windows browsers
-# if you've ever pasted text from MSWord, you'll understand
+
+/**
+ * Translation of invalid Unicode references range to valid range.
+ * These are Windows CP1252 specific characters.
+ * They would look weird on non-Windows browsers.
+ * If you've ever pasted text from MSWord, you'll understand.
+ * @global array
+ */
 $b2_htmltranswinuni = array(
 	'&#128;' => '&#8364;', // the Euro sign
 	'&#130;' => '&#8218;',
