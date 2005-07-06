@@ -19,6 +19,13 @@
  */
 require_once(dirname(__FILE__).'/../conf/_config.php' );
 require_once(dirname(__FILE__).'/'.$xmlsrv_dirout.$core_subdir.'_main.inc.php' );
+
+if( true !== CANUSEXMLRPC )
+{ // We cannot use XML-RPC: send a error response ( "1 Unknown method" ).
+	$errResponse = new xmlrpcresp( 0, 1, 'Cannot use XML-RPC. Probably the server is missing the XML extension. Error: '.CANUSEXMLRPC );
+	die( $errResponse->serialize() );
+}
+
 // We can't display standard error messages. We must return XMLRPC responses.
 $DB->halt_on_error = false;
 
@@ -157,11 +164,11 @@ function b2newpost($m)
 	}
 
 	// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false);
-		
+
 	// Send email notifications now!
 	logIO("O","Sending email notifications...");
 	$edited_Item->send_email_notifications( false );
-		
+
 	logIO("O","Pinging b2evolution.net...");
 	pingb2evonet( $blogparams, $post_ID, $post_title, false );
 	logIO("O","Pinging Weblogs...");
@@ -954,7 +961,7 @@ function bloggergetrecentposts( $m )
 	// Get the posts to display:
 	$MainList = & new ItemList( $blog_ID, $show_statuses, '', '', '', '', array(), '', 'DESC', '', $numposts,
 															'', '', '', '', '', '', '', 'posts' );
-															
+
 	if( !empty($DB->last_error) )
 	{ // DB error
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9

@@ -45,6 +45,11 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	// XML RPC Server class
 	// requires: _xmlrpc.php
 
+	if( true !== CANUSEXMLRPC )
+	{
+		return;
+	}
+
 	// listMethods: either a string, or nothing
 	$_xmlrpcs_listMethods_sig=array(array($xmlrpcArray, $xmlrpcString), array($xmlrpcArray));
 	$_xmlrpcs_listMethods_doc='This method lists all the methods that the XML-RPC server knows how to dispatch';

@@ -61,51 +61,56 @@
 	// Original fix for missing extension file by "Michel Valdrighi" <m@tidakada.com>
 	if(function_exists('xml_parser_create'))
 	{
-		define("CANUSEXMLRPC", 1);
+		/**
+		 * Can we use XML-RPC functionality?
+		 *
+		 * @constant CANUSEXMLRPC true|string Either === true or holds the error message.
+		 */
+		define( 'CANUSEXMLRPC', true );
 	}
 	elseif( !(bool)ini_get('enable_dl') || (bool)ini_get('safe_mode'))
 	{ // We'll not be able to do dynamic loading (fix by Sakichan)
 		/**
 		 * @ignore
 		 */
-		define("CANUSEXMLRPC", 0);
+		define( 'CANUSEXMLRPC', 'XML extension not loaded, but we cannot dynamically load.' );
 	}
-	elseif($WINDIR)
+	elseif( !empty($WINDIR) )
 	{	// Win 32 fix. From: "Leo West" <lwest@imaginet.fr>
 		if (@dl("php3_xml.dll"))
 		{
 			/**
 			 * @ignore
 			 */
-			define("CANUSEXMLRPC", 1);
+			define( 'CANUSEXMLRPC', true );
 		}
 		else
 		{
 			/**
 			 * @ignore
 			 */
-			define("CANUSEXMLRPC", 0);
+			define( 'CANUSEXMLRPC', 'Could not load php3_xml.dll!' );
 		}
 	}
 	else
 	{
-		if (@dl("xml.so"))
+		if (@dl('xml.so'))
 		{
 			/**
 			 * @ignore
 			 */
-			define("CANUSEXMLRPC", 1);
+			define( 'CANUSEXMLRPC', true );
 		}
 		else
 		{
 			/**
 			 * @ignore
 			 */
-			define("CANUSEXMLRPC", 0);
+			define( 'CANUSEXMLRPC', 'Could not load xml.so!' );
 		}
 	}
 
-	if( ! CANUSEXMLRPC == 1 )
+	if( true !== CANUSEXMLRPC )
 	{
 		return;
 	}
