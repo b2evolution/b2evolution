@@ -322,7 +322,7 @@ class Form extends Widget
 			$r .= ' class="'.$field_class.'"';
 		}
 		if( $force_to == 'UpperCase' )
-		{	// Force input to uppercase
+		{ // Force input to uppercase
 			$r .= ' onchange="this.value = this.value.toUpperCase();"';
 		}
 		$r .= " />\n";
@@ -649,10 +649,10 @@ class Form extends Widget
 
 
 	/**
-	 * Ends the form field
+	 * Ends the form and optionally displays buttons.
 	 *
-	 * @param array optional array to display the buttons before the end of the form
-	 * @return mixed true (if output) or the generated HTML if not outputting
+	 * @param array Optional array to display the buttons before the end of the form, see {@link buttons()}
+	 * @return true|string true (if output) or the generated HTML if not outputting.
 	 */
 	function end_form( $buttons = array() )
 	{
@@ -852,6 +852,7 @@ class Form extends Widget
 	 * @param string field label to be display before the field
 	 * @param string note to be displayed after the field
 	 * @param string CSS class for select
+	 * @param string Javascript to add for onchange event (trailing ";").
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function select(
@@ -860,47 +861,19 @@ class Form extends Widget
 		$field_list_callback,
 		$field_label,
 		$field_note = '',
-		$field_class = '' )
+		$field_class = '',
+		$field_onchange = NULL )
 	{
-		global $Request;
-		if( isset($Request->err_messages[$field_name]) )
-		{	// There is an error message for this field:
-			$field_class .= ' field_error';
-			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
-		}
+		$field_options = call_user_func( $field_list_callback, $field_value );
 
-		$r = $this->begin_field( $field_name, $field_label )."\n<select";
-		if( !empty($field_name) )
-		{
-			$r .= ' name="'.$field_name.'" id="'.$field_name.'"';
-		}
-		if( !empty($field_class) )
-		{
-			$r.= ' class="'.$field_class.'"';
-		}
-		$r .= ">\n".call_user_func( $field_list_callback, $field_value )."</select>\n";
-
-		if( !empty($field_note) )
-		{
-			$r .= '<span class="notes">'.$field_note.'</span>';
-		}
-
-		$r .= $this->end_field();
-
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->select_options( $field_name, $field_options, $field_label, $field_name, $field_class, $field_onchange );
 	}
 
 
 	/**
 	 * Display a select field and populate it with a cache object.
+	 *
+	 * @todo Refactor to put $field_onchange after $field_class(?)
 	 *
 	 * @param string field name
 	 * @param string default field value
@@ -909,6 +882,8 @@ class Form extends Widget
 	 * @param string note to be displayed after the field
 	 * @param boolean allow to select [none] in list
 	 * @param string CSS class for select
+	 * @param string Object's callback method name.
+	 * @param string Javascript to add for onchange event (trailing ";").
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function select_object(
@@ -919,38 +894,12 @@ class Form extends Widget
 		$field_note = '',
 		$allow_none = false,
 		$field_class = '',
-		$field_object_callback = 'option_list_return' )
+		$field_object_callback = 'option_list_return',
+		$field_onchange = NULL )
 	{
-		global $Request;
-		if( isset($Request->err_messages[$field_name]) )
-		{	// There is an error message for this field:
-			$field_class .= ' field_error';
-			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
-		}
+		$field_options = $field_object->$field_object_callback( $field_value, $allow_none );
 
-		$r = $this->begin_field( $field_name, $field_label )
-					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
-
-		if( !empty($field_class) )
-		{
-			$r .= ' class="'.$field_class.'"';
-		}
-		$r .= '>';
-		$r .= $field_object->$field_object_callback( $field_value, $allow_none )
-			 		."</select>\n"
-					.'<span class="notes">'.$field_note.'</span>';
-
-		$r .= $this->end_field();
-
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->select_options( $field_name, $field_options, $field_label, $field_note, $field_class, $field_onchange );
 	}
 
 
@@ -963,6 +912,7 @@ class Form extends Widget
 	 * @param string note to be displayed after the field
 	 * @param boolean allow to select [none] in list
 	 * @param string CSS class for select
+	 * @param string Javascript to add for onchange event (trailing ";").
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function select_options(
@@ -970,21 +920,30 @@ class Form extends Widget
 		& $field_options,
 		$field_label,
 		$field_note = NULL,
-		$field_class = NULL )
+		$field_class = NULL,
+		$field_onchange = NULL )
 	{
 		global $Request;
 		if( isset($Request->err_messages[$field_name]) )
-		{	// There is an error message for this field:
+		{ // There is an error message for this field:
 			$field_class .= ' field_error';
 			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
 		}
 
 		$r = $this->begin_field( $field_name, $field_label )
-					."\n".'<select name="'.$field_name.'" id="'.$field_name.'"';
+					."\n<select";
 
+		if( !empty($field_name) )
+		{
+			$r .= ' name="'.$field_name.'" id="'.$field_name.'"';
+		}
 		if( !empty($field_class) )
 		{
 			$r .= ' class="'.$field_class.'"';
+		}
+		if( !empty( $field_onchange ) )
+		{
+			$r .= ' onchange="'.format_to_output( $field_onchange, 'htmlattr' ).'"';
 		}
 		$r .= '>'
 					.$field_options
@@ -1006,6 +965,55 @@ class Form extends Widget
 		{
 			return $r;
 		}
+	}
+
+
+	/**
+	 * This is a stub for {@link select_options()} which builds the required list
+	 * of <option> elements from a given list of options ($field_options) and
+	 * the selected value ($field_value).
+	 *
+	 * @param string field name
+	 * @param array Options. If an associative key (string) is used, this gets the value attribute.
+	 * @param mixed The selected value - if it's NULL, use the global variable named $field_name
+	 * @param string field label to be display before the field
+	 * @param string note to be displayed after the field
+	 * @param boolean allow to select [none] in list
+	 * @param string CSS class for select
+	 * @param string Javascript to add for onchange event (trailing ";").
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function select_array(
+		$field_name,
+		$field_options,
+		$field_value = NULL,
+		$field_label = NULL,
+		$field_note = NULL,
+		$field_class = NULL,
+		$field_onchange = NULL )
+	{
+		if( NULL === $field_value )
+		{
+			$field_value = isset( $GLOBALS[$field_name] ) ? $GLOBALS[$field_name] : NULL;
+		}
+
+		$options_list = '';
+
+		foreach( $field_options as $l_key => $l_option )
+		{
+			$value = is_string($l_key) ? $l_key : $l_option;
+
+			$options_list .= '<option value="'.format_to_output($value, 'formvalue').'"';
+
+			if( $l_option == $field_value )
+			{
+				$options_list .= ' selected="selected"';
+			}
+
+			$options_list .= '>'.format_to_output($l_option).'</option>';
+		}
+
+		return $this->select_options( $field_name, $options_list, $field_label, $field_note, $field_class, $field_onchange );
 	}
 
 
