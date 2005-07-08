@@ -55,7 +55,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		param( 'submit', 'string', '' );
+		param( 'submit', 'string', '' ); // TODO: use array based submit value like name="submit[set_defaults]"
 
 		if( $submit == T_('Restore defaults') )
 		{
