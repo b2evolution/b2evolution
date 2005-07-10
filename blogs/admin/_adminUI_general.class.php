@@ -115,6 +115,7 @@ class AdminUI_general
 	var $title_titlearea;
 	var $title_titlearea_appendix = '';
 
+
 	/**
 	 * Constructor.
 	 */
@@ -261,7 +262,7 @@ class AdminUI_general
 	 *
 	 * The property names must be given in $propertyByPreference, ordered by preference.
 	 *
-	 * @param string|array The path. See {@link getNode()}.
+	 * @param string|array The path. See {@link get_node_by_path()}.
 	 * @param array Alternative names of the property to receive (ordered by priority).
 	 * @return array List of the properties.
 	 */
@@ -291,13 +292,13 @@ class AdminUI_general
 	/**
 	 * Get a property of a node, given by path.
 	 *
-	 * @param string|array The path. See {@link getNode()}.
+	 * @param string|array The path. See {@link get_node_by_path()}.
 	 * @param array Alternative names of the property to receive (ordered by priority).
 	 * @return mixed|false False if property is not set for the node, otherwise its value.
 	 */
 	function getPropertyForNode( $path, $propertyByPreference )
 	{
-		$node =& $this->getNode( $path );
+		$node =& $this->get_node_by_path( $path );
 
 		foreach( $propertyByPreference as $lProp )
 		{
@@ -331,7 +332,7 @@ class AdminUI_general
 	/**
 	 * Displays a menu, any level.
 	 *
-	 * @param NULL|string|array The path. See {@link getNode()}.
+	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
 	 * @param string The template name, see {@link getMenuTemplate()}.
 	 */
 	function getMenu( $path = NULL, $template = 'main' )
@@ -353,7 +354,7 @@ class AdminUI_general
 	 *
 	 * @access protected
 	 *
-	 * @param NULL|string|array The path (NULL defaults to first path entry). See {@link getNode()}.
+	 * @param NULL|string|array The path (NULL defaults to first path entry). See {@link get_node_by_path()}.
 	 */
 	function dispSubmenu( $path = NULL )
 	{
@@ -459,7 +460,7 @@ class AdminUI_general
 	/**
 	 * Get the HTML for the menu entries of a specific path.
 	 *
-	 * @param NULL|string|array The path. See {@link getNode()}.
+	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
 	 * @param string Template name, see {@link getMenuTemplate()}.
 	 * @return string The HTML for the menu.
 	 */
@@ -552,12 +553,12 @@ class AdminUI_general
 	/**
 	 * Add menu entries to a given path.
 	 *
-	 * @param NULL|string|array The path. See {@link getNode()}.
+	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
 	 * @param array Menu entries to add.
 	 */
 	function addMenuEntries( $path, $entries )
 	{
-		$node =& $this->getNode( $path, true );
+		$node =& $this->get_node_by_path( $path, true );
 
 		foreach( $entries as $lKey => $lMenuProps )
 		{
@@ -572,12 +573,12 @@ class AdminUI_general
 	/**
 	 * Get menu entries for a given path.
 	 *
-	 * @param NULL|string|array The path. See {@link getNode()}.
+	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
 	 * @return array The menu entries (may be empty).
 	 */
 	function getMenuEntries( $path )
 	{
-		$node =& $this->getNode( $path );
+		$node =& $this->get_node_by_path( $path );
 
 		return isset( $node['entries'] ) ? $node['entries'] : array();
 	}
@@ -586,12 +587,12 @@ class AdminUI_general
 	/**
 	 * Get the key of a selected entry for a path.
 	 *
-	 * @param NULL|string|array The path. See {@link getNode()}.
+	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
 	 * @return string|false
 	 */
 	function getSelected( $path )
 	{
-		$node =& $this->getNode($path);
+		$node =& $this->get_node_by_path($path);
 
 		if( isset($node['selected']) )
 		{
@@ -608,9 +609,10 @@ class AdminUI_general
 	 * @param array|string|NULL The path. NULL means root, string means child of root,
 	 *                          array means path below root.
 	 *                          (eg <code>array('options', 'general')</code>).
+	 * @param boolean Should the node be created if it does not exist already?
 	 * @return array
 	 */
-	function & getNode( $path, $createIfNotExisting = false )
+	function & get_node_by_path( $path, $createIfNotExisting = false )
 	{
 		if( is_null($path) )
 		{ // root element
@@ -937,11 +939,11 @@ class AdminUI_general
 		}
 		if( $nr === 0 )
 		{
-			$parentNode =& $this->getNode(NULL);
+			$parentNode =& $this->get_node_by_path(NULL);
 		}
 		else
 		{
-			$parentNode =& $this->getNode($this->getPathRange( 0, $nr-1 ));
+			$parentNode =& $this->get_node_by_path($this->getPathRange( 0, $nr-1 ));
 		}
 		$parentNode['selected'] = $pathKey;
 
@@ -960,7 +962,7 @@ class AdminUI_general
 	function addPath( $path, $pathProps = array() )
 	{
 		// auto-detect path props from menu entries
-		if( $node =& $this->getNode( array_merge( $this->path, $path ) ) )
+		if( $node =& $this->get_node_by_path( array_merge( $this->path, $path ) ) )
 		{
 			$pathProps = array_merge( $pathProps, $node );
 		}
@@ -984,23 +986,23 @@ class AdminUI_general
 		$args = func_get_args();
 
 		$i = 0;
-		$prevPath = array();
+		$prevPath = array();  // Remember the path we have walked through
 
 		foreach( $args as $arg )
 		{
 			if( is_array($arg) )
-			{
+			{ // Path name and properties given
 				list( $pathName, $pathProps ) = $arg;
 			}
 			else
-			{
+			{ // Just the path name
 				$pathName = $arg;
 				$pathProps = array();
 			}
 
-			if( $node =& $this->getNode( array_merge($prevPath, $pathName) ) )
-			{
-				$pathProps = $node;
+			if( $node =& $this->get_node_by_path( array_merge( $prevPath, array($pathName) ) ) )
+			{ // the node exists in the menu entries: merge the properties
+				$pathProps = array_merge( $node, $pathProps );
 			}
 
 			$this->setPathByNr( $i++, $pathName, $pathProps );
@@ -1089,6 +1091,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.27  2005/07/10 00:09:06  blueyed
+ * renamed getNode() to get_node_by_path(), fixed array_merge() notice for PHP5
+ *
  * Revision 1.26  2005/06/23 18:43:06  blueyed
  * Fixed constructor's name.
  *
