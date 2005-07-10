@@ -48,7 +48,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 require_once dirname(__FILE__).'/_dataobject.class.php';
 
 if( false )
-{	/**
+{ /**
 	 * This is ugly, sorry, but I temporarily need this until NuSphere fixes their CodeInsight :'(
 	 */
 	include('_main.inc.php');
@@ -103,7 +103,12 @@ class Item extends DataObject
 	 * @access public
 	 */
 	var $Author;
-	var $AssignedUser;
+	/**
+	 * The assigned {@link User} to the item.
+	 * @var User|NULL
+	 * @access public
+	 */
+	var $assigned_User;
 	var $issue_date;
 	var $mod_date;
 	var $status;
@@ -199,20 +204,20 @@ class Item extends DataObject
 
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_links', 'fk'=>'link_dest_item_ID', 'msg'=>T_('%d links to source items') ),
- 				// b2evo only:
- 				array( 'table'=>'T_posts', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
+				// b2evo only:
+				array( 'table'=>'T_posts', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
 				// progidistri only: (those won't hurt)
 				array( 'table'=>'T_tasks', 'fk'=>'tsk_parent_tsk_ID', 'msg'=>T_('%d links to child items') ),
- 				array( 'table'=>'T_mission_assignments', 'fk'=>'ma_tsk_ID', 'msg'=>T_('%d mission assignment embodied by this task') ),
+				array( 'table'=>'T_mission_assignments', 'fk'=>'ma_tsk_ID', 'msg'=>T_('%d mission assignment embodied by this task') ),
 			);
 
-   	$this->delete_cascades = array(
+		$this->delete_cascades = array(
 				array( 'table'=>'T_links', 'fk'=>'link_item_ID', 'msg'=>T_('%d links to destination items') ),
- 				// b2evo only:
- 				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
- 				array( 'table'=>'T_comments', 'fk'=>'comment_post_ID', 'msg'=>T_('%d comments') ),
+				// b2evo only:
+				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
+				array( 'table'=>'T_comments', 'fk'=>'comment_post_ID', 'msg'=>T_('%d comments') ),
 				// progidistri only: (those won't hurt)
- 				array( 'table'=>'T_taskcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
+				array( 'table'=>'T_taskcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
 				array( 'table'=>'T_tsk_tsel', 'fk'=>'tkts_tsk_ID', 'msg'=>T_('%d task selections') ),
 			);
 
@@ -272,18 +277,28 @@ class Item extends DataObject
 		// echo 'assigning user #'.$user_ID;
 		if( $user_ID )
 		{
-			$this->AssignedUser = $UserCache->get_by_ID( $user_ID );
-			$assigned_ID =& $this->AssignedUser->ID;
+			$this->assigned_User = & $UserCache->get_by_ID( $user_ID );
 		}
 		else
 		{
-			$this->AssignedUser = $assigned_ID = NULL;
+			$this->assigned_User = NULL;
 		}
 
 		if( $dbupdate )
 		{ // Record ID for DB:
-			$this->set_param( 'assigned_user_ID', 'number', $assigned_ID, true );
+			$this->set_param( 'assigned_user_ID', 'number', $this->get_assigned_user_ID(), true );
 		}
+	}
+
+
+	/**
+	 * Get the ID of the assigned user.
+	 *
+	 * @return NULL|integer
+	 */
+	function get_assigned_user_ID()
+	{
+		return empty($this->assigned_User) ? NULL : $this->assigned_User->ID;
 	}
 
 
@@ -311,7 +326,7 @@ class Item extends DataObject
 		$Request->param_check_url( 'post_url', $allowed_uri_scheme );
 		$this->set_from_Request( 'url' );
 
-    $Request->param( 'content', 'html' );
+		$Request->param( 'content', 'html' );
 		$this->set( 'content', format_to_post( $Request->get('content') ) );
 
 		if( ( $force_edit_date || $Request->param( 'edit_date', 'integer', 0 ) )
@@ -331,16 +346,16 @@ class Item extends DataObject
 		$this->set_from_Request( 'st_ID', 'item_st_ID' );
 
 		$Request->param( 'item_assigned_user_ID', 'integer', true );
- 		$this->assign_to( $Request->get('item_assigned_user_ID') );
+		$this->assign_to( $Request->get('item_assigned_user_ID') );
 
 		$Request->param( 'item_priority', 'integer', true );
 		$this->set_from_Request( 'priority', 'item_priority' );
 
-  	$Request->param( 'item_deadline', 'string', true );
+		$Request->param( 'item_deadline', 'string', true );
 		$Request->param_check_date( 'item_deadline', T_('Please enter a valid deadline.'), false );
 		$this->set_from_Request( 'deadline', 'item_deadline', true );
 
- 		// Comment stuff:
+		// Comment stuff:
 		$Request->param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
 		$this->set_from_Request( 'comments' );
 
@@ -534,7 +549,7 @@ class Item extends DataObject
 		if( isset($this->AssignedUser) )
 		{
 			echo $before;
-			$this->AssignedUser->prefered_name( $format );
+			$this->assigned_User->prefered_name( $format );
 			echo $after;
 		}
 	}
@@ -549,7 +564,7 @@ class Item extends DataObject
 	{
 		global $UserCache, $object_def;
 
-		$UserCache->blog_member_list( $this->blog_ID, $this->AssignedUser->ID,
+		$UserCache->blog_member_list( $this->blog_ID, $this->get_assigned_user_ID(),
 						$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
 						($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
 						true );
@@ -565,7 +580,7 @@ class Item extends DataObject
 	{
 		global $UserCache, $object_def;
 
-		return $UserCache->blog_member_list( $this->blog_ID, $this->AssignedUser->ID,
+		return $UserCache->blog_member_list( $this->blog_ID, $this->get_assigned_user_ID(),
 							$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
 							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
 							false );
@@ -1016,7 +1031,7 @@ class Item extends DataObject
 	function load_links()
 	{
 		if( is_null( $this->Links ) )
-		{	// Links have not been loaded yet:
+		{ // Links have not been loaded yet:
 			global $LinkCache;
 			$this->Links = & $LinkCache->get_by_item_ID( $this->ID );
 		}
@@ -1740,7 +1755,7 @@ class Item extends DataObject
 				$this->extra_cat_IDs[] = $this->main_cat_ID;
 				$this->extra_cat_IDs = array_unique( $this->extra_cat_IDs );
 				// Update derived property:
-     		$this->blog_ID = get_catblog( $this->main_cat_ID ); // This is a derived var
+				$this->blog_ID = get_catblog( $this->main_cat_ID ); // This is a derived var
 				break;
 
 			case 'extra_cat_IDs':
@@ -1777,7 +1792,7 @@ class Item extends DataObject
 				break;
 
 			case 'pingsdone':
-      		$this->set_param( 'flags', 'string', $parvalue ? 'pingsdone' : '' );
+				$this->set_param( 'flags', 'string', $parvalue ? 'pingsdone' : '' );
 				break;
 
 			default:
@@ -1829,7 +1844,7 @@ class Item extends DataObject
 		// echo 'INSERTING NEW POST ';
 
 		if( isset( $UserCache ) )
-		{	// If not in install procedure...
+		{ // If not in install procedure...
 			$this->set_author_User( $UserCache->get_by_ID( $author_user_ID ) );
 		}
 		else
@@ -1873,8 +1888,8 @@ class Item extends DataObject
 		$DB->begin();
 
 		if( empty($this->creator_user_ID) )
-		{	// No creator assigned yet, use current user:
-   		$this->Author = & $current_User;
+		{ // No creator assigned yet, use current user:
+			$this->Author = & $current_User;
 			$this->creator_user_ID = $current_User->ID;
 		}
 
@@ -1883,13 +1898,13 @@ class Item extends DataObject
 															false, $this->dbprefix, $this->dbIDname, $this->dbtablename) );
 
 		if( $result = parent::dbinsert() )
-		{	// We could insert the main object..
+		{ // We could insert the main object..
 
 			// Let's handle the extracats:
 			$this->insert_update_extracats( 'insert' );
 		}
 
- 		$DB->commit();
+		$DB->commit();
 
 		return $result;
 	}
@@ -1928,7 +1943,7 @@ class Item extends DataObject
 		$this->set( 'content', $post_content );
 		// this is automatic $this->set( 'datemodified', date('Y-m-d H:i:s', $localtimenow ) );
 		$this->set( 'main_cat_ID', $main_cat_ID );
-    $this->set( 'extra_cat_IDs', $extra_cat_IDs );
+		$this->set( 'extra_cat_IDs', $extra_cat_IDs );
 		$this->set( 'status', $post_status );
 		$this->set( 'flags', $pingsdone ? 'pingsdone' : '' );
 		$this->set( 'comments', $post_comments );
@@ -1962,20 +1977,20 @@ class Item extends DataObject
 
 		// validate url title
 		if( empty($this->urltitle) || isset($this->dbchanges['urltitle']) )
-		{	// Url title has changed or is empty
+		{ // Url title has changed or is empty
 			// echo 'updating url title';
 			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID,
 																false, $this->dbprefix, $this->dbIDname, $this->dbtablename ) );
 		}
 
 		if( $result = parent::dbupdate() )
-		{	// We could update the main object..
+		{ // We could update the main object..
 
 			// Let's handle the extracats:
 			$this->insert_update_extracats( 'update' );
 		}
 
- 		$DB->commit();
+		$DB->commit();
 
 		return $result;
 	}
@@ -1991,7 +2006,7 @@ class Item extends DataObject
 		$DB->begin();
 
 		if( ! is_null( $this->extra_cat_IDs ) )
-		{	// Okay the extra cats are defined:
+		{ // Okay the extra cats are defined:
 
 			if( $mode == 'update' )
 			{
@@ -2010,7 +2025,7 @@ class Item extends DataObject
 			$DB->query( $query, 'insert new extracats' );
 		}
 
- 		$DB->commit();
+		$DB->commit();
 	}
 
 
@@ -2045,9 +2060,9 @@ class Item extends DataObject
 		// TODO: also use extra cats/blogs??
 		$sql = 'SELECT DISTINCT user_email, user_locale
 							FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = ID
-						 WHERE sub_coll_ID = '.$this->blog_ID.'
-						   AND sub_items <> 0
-						   AND LENGTH(TRIM(user_email)) > 0';
+						WHERE sub_coll_ID = '.$this->blog_ID.'
+							AND sub_items <> 0
+							AND LENGTH(TRIM(user_email)) > 0';
 		$notify_list = $DB->get_results( $sql );
 
 		// Preprocess list: (this comes form Comment::send_email_notifications() )
@@ -2058,7 +2073,7 @@ class Item extends DataObject
 		}
 
 		if( ! count($notify_array) )
-		{	// No-one to notify:
+		{ // No-one to notify:
 			return false;
 		}
 
@@ -2141,7 +2156,7 @@ class Item extends DataObject
 
 			case 't_type':
 				// Item type (name):
-     		$type_Element = & $itemTypeCache->get_by_ID( $this->typ_ID );
+				$type_Element = & $itemTypeCache->get_by_ID( $this->typ_ID );
 				return $type_Element->name_return();
 
 			case 't_priority':
@@ -2157,6 +2172,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.48  2005/07/10 00:55:11  blueyed
+ * Fixed more PHP5 notices with ->AssignedUser and renamed it to ->assigned_User.
+ *
  * Revision 1.47  2005/07/10 00:16:43  blueyed
  * Fixed PHP5 notice with assign_to().
  *
