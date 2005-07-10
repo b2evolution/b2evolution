@@ -273,15 +273,16 @@ class Item extends DataObject
 		if( $user_ID )
 		{
 			$this->AssignedUser = $UserCache->get_by_ID( $user_ID );
+			$assigned_ID =& $this->AssignedUser->ID;
 		}
 		else
 		{
-			$this->AssignedUser = NULL;
+			$this->AssignedUser = $assigned_ID = NULL;
 		}
 
 		if( $dbupdate )
 		{ // Record ID for DB:
-			$this->set_param( 'assigned_user_ID', 'number', $this->AssignedUser->ID, true );
+			$this->set_param( 'assigned_user_ID', 'number', $assigned_ID, true );
 		}
 	}
 
@@ -2156,6 +2157,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.47  2005/07/10 00:16:43  blueyed
+ * Fixed PHP5 notice with assign_to().
+ *
  * Revision 1.46  2005/06/22 14:49:34  blueyed
  * extra_status(): display only, if t_extra_status is not empty (for type != 'raw').
  * renderer_checkboxes(): Link 'No renderer plugins are installed.' to plugin setup.
