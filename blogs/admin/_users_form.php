@@ -136,25 +136,26 @@ if( $allowed_to_edit )
 	$Form->text( 'edited_user_aim', $edited_User->aim, 30, T_('AIM'), $aim_fieldnote, 50 );
 	$Form->text( 'edited_user_msn', $edited_User->msn, 30, T_('MSN IM'), '', 100 );
 	$Form->text( 'edited_user_yim', $edited_User->yim, 30, T_('YahooIM'), '', 50 );
-	$Form->text( 'edited_user_pass1', '', 20, T_('New password'), '', 50, T_('Leave empty if you don\'t want to change the password.'), 'password' );
-	$Form->text( 'edited_user_pass2', '', 20, T_('Confirm new password'), '', 50, '', 'password' );
+	$Form->password( 'edited_user_pass1', '', 20, T_('New password'), T_('Leave empty if you don\'t want to change the password.'), 50 );
+	$Form->password( 'edited_user_pass2', '', 20, T_('Confirm new password'), '', 50 );
+	$Form->info( '', sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen') ) );
 }
 else
 { // display only
-	$Form->_info( T_('Login'), $edited_User->dget('login') );
-	$Form->_info( T_('First name'), $edited_User->dget('firstname') );
-	$Form->_info( T_('Last name'), $edited_User->dget('lastname') );
-	$Form->_info( T_('Nickname'), $edited_User->dget('nickname') );
-	$Form->_info( T_('Identity shown'), $edited_User->dget('preferedname') );
-	$Form->_info( T_('Show Online'), ($edited_User->dget('showonline')) ? T_('yes') : T_('no') );
-	$Form->_info( T_('Locale'), $edited_User->dget('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
-	$Form->_info( T_('Email'), $edited_User->dget('email'), $email_fieldnote );
-	$Form->_info( T_('Notifications'), ($edited_User->dget('notify')) ? T_('yes') : T_('no') );
-	$Form->_info( T_('URL'), $edited_User->dget('url'), $url_fieldnote );
-	$Form->_info( T_('ICQ'), $edited_User->dget('icq', '$Form->value'), $icq_fieldnote );
-	$Form->_info( T_('AIM'), $edited_User->dget('aim'), $aim_fieldnote );
-	$Form->_info( T_('MSN IM'), $edited_User->dget('msn') );
-	$Form->_info( T_('YahooIM'), $edited_User->dget('yim') );
+	$Form->info( T_('Login'), $edited_User->dget('login') );
+	$Form->info( T_('First name'), $edited_User->dget('firstname') );
+	$Form->info( T_('Last name'), $edited_User->dget('lastname') );
+	$Form->info( T_('Nickname'), $edited_User->dget('nickname') );
+	$Form->info( T_('Identity shown'), $edited_User->dget('preferedname') );
+	$Form->info( T_('Show Online'), ($edited_User->dget('showonline')) ? T_('yes') : T_('no') );
+	$Form->info( T_('Locale'), $edited_User->dget('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
+	$Form->info( T_('Email'), $edited_User->dget('email'), $email_fieldnote );
+	$Form->info( T_('Notifications'), ($edited_User->dget('notify')) ? T_('yes') : T_('no') );
+	$Form->info( T_('URL'), $edited_User->dget('url'), $url_fieldnote );
+	$Form->info( T_('ICQ'), $edited_User->dget('icq', 'formvalue'), $icq_fieldnote );
+	$Form->info( T_('AIM'), $edited_User->dget('aim'), $aim_fieldnote );
+	$Form->info( T_('MSN IM'), $edited_User->dget('msn') );
+	$Form->info( T_('YahooIM'), $edited_User->dget('yim') );
 }
 
 $Form->fieldset_end();
@@ -191,6 +192,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.61  2005/07/11 22:18:07  blueyed
+ * Added info about password min length, fixed display of readonly profiles and password note.
+ *
  * Revision 1.60  2005/06/20 17:40:13  fplanque
  * minor
  *
