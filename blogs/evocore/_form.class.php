@@ -27,10 +27,10 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants FranÃ§ois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * PROGIDISTRI grants François PLANQUE the right to license
+ * PROGIDISTRI grants FranÃ§ois PLANQUE the right to license
  * PROGIDISTRI's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -79,9 +79,22 @@ class Form extends Widget
 	var $_fieldsets = array();
 
 	/**
+	 * Remember number of open tags that need to be handled in {@link end_form()}.
+	 *
+	 * @var array
+	 */
+	var $_opentags = array( 'fieldset' => 0 );
+
+	/**
 	 * @var string
 	 */
 	var $label_suffix = ':';
+
+	/**
+	 * Display order of <label> and <input>.
+	 * @var boolean Defaults to true
+	 */
+	var $label_to_the_left = true;
 
 
 	/**
@@ -169,7 +182,6 @@ class Form extends Widget
 				$this->buttonsend = "\n";
 				$this->formend = '';
 		}
-
 	}
 
 
@@ -178,25 +190,21 @@ class Form extends Widget
 	 *
 	 * A field is a fielset containing a label div and an input div.
 	 *
-	 * @param string the name of the field
-	 * @param string the field label
-	 * @return the generated HTML
+	 * @param string The name of the field
+	 * @param string The field label
+	 * @return The generated HTML
 	 */
 	function begin_field( $field_name = '', $field_label = '' )
 	{
+		// Remember these, to make them available to get_label() for !$label_to_the_left
+		$this->field_name = $field_name;
+		$this->field_label = $field_label;
+
 		$r = $this->fieldstart;
 
-		if( !empty($field_label) )
+		if( $this->label_to_the_left )
 		{
-			// $this->empty_label = true;	// Memorize this
-			$r .= $this->labelstart
-						.'<label for="'.$field_name.'">'.$field_label.$this->label_suffix.'</label>'
-						.$this->labelend;
-		}
-		else
-		{ // Empty label:
-			// $this->empty_label = false;	// Memorize this
-			$r .= $this->labelempty;
+			$r .= $this->get_label();
 		}
 
 		$r .= $this->inputstart;
@@ -210,12 +218,26 @@ class Form extends Widget
 	 *
 	 * A field is a fielset containing a label div and an input div.
 	 *
-	 * @return the generated HTML
+	 * @param string Field's note to display.
+	 * @param string Format of the field's note (%s gets replaced with the note).
+	 * @return The generated HTML
 	 */
-	function end_field()
+	function end_field( $field_note = NULL, $field_note_format = ' <span class="notes">%s</span>' )
 	{
-		return $this->inputend
-					.$this->fieldend;
+		$field_note = empty($field_note) ? '' : sprintf( $field_note_format, $field_note );
+
+		if( $this->label_to_the_left )
+		{ // label displayed in begin_field()
+			$r = $field_note.$this->inputend;
+		}
+		else
+		{ // label to the right:
+			$r = $this->get_label().$field_note;
+		}
+
+		$r .= $this->fieldend;
+
+		return $r;
 	}
 
 
@@ -305,7 +327,7 @@ class Form extends Widget
 	{
 		global $Request;
 		if( isset($Request->err_messages[$field_name]) )
-		{	// There is an error message for this field:
+		{ // There is an error message for this field:
 			$field_class .= ' field_error';
 			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
 		}
@@ -327,12 +349,7 @@ class Form extends Widget
 		}
 		$r .= " />\n";
 
-		if( !empty( $field_note ) )
-		{
-			$r .= '<span class="notes">'.$field_note.'</span>';
-		}
-
-		$r .= $this->end_field();
+		$r .= $this->end_field( $field_note );
 
 		if( $this->output )
 		{
@@ -382,7 +399,7 @@ class Form extends Widget
 		global $month, $weekday_letter;
 		global $Request;
 		if( isset($Request->err_messages[$field_name]) )
-		{	// There is an error message for this field:
+		{ // There is an error message for this field:
 			$field_class = 'field_error';
 			$field_note = '<span class="field_error">'.$Request->err_messages[$field_name].'</span>';
 		}
@@ -432,14 +449,11 @@ class Form extends Widget
 		}
 		$r .= " />\n"
 				.'<a href="#" onClick="cal_'.$field_name.'.select('.$this->form_name.'.'.$field_name.",'anchor_".$field_name."', '".$date_format."' );"
-				.' return false;" name="anchor_'.$field_name.'" ID="anchor_'.$field_name.'">'.T_('Select').'</a>'
-				.' <span class="notes">('.$date_format.')';
-		if( isset( $field_note ) )
-		{
-			$r .= ' '.$field_note;
-		}
-		$r .= '</span>'
-				.$this->end_field();
+				.' return false;" name="anchor_'.$field_name.'" ID="anchor_'.$field_name.'">'.T_('Select').'</a> ';
+
+		$field_note = empty($field_note) ? '('.$date_format.')' : '('.$date_format.') '.$field_note;
+
+		$r .= $this->end_field( $field_note );
 
 		if( $this->output )
 		{
@@ -569,6 +583,7 @@ class Form extends Widget
 		$r = $this->begin_field( $field_name, $field_label )
 				.'<input type="checkbox" class="checkbox"'
 				.' value="'.format_to_output($field_value,'formvalue').'"';
+
 		if( !empty($field_class) )
 		{
 			$r .= ' class="'.$field_class.'"';
@@ -581,9 +596,7 @@ class Form extends Widget
 		{
 			$r .= ' checked="checked" ';
 		}
-		$r .= " />\n"
-				.'<span class="notes">'.$field_note."</span>\n"
-				.$this->end_field();
+		$r .= " />\n".$this->end_field( $field_note );
 
 		if( $this->output )
 		{
@@ -612,8 +625,8 @@ class Form extends Widget
 	/**
 	 * Builds the form field
 	 *
-	 * @param string title to display on top of the form
 	 * @param string the class to use for the form tag
+	 * @param string title to display on top of the form
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function begin_form( $form_class = NULL, $form_title = '' )
@@ -666,6 +679,12 @@ class Form extends Widget
 
 			$this->output = $output;
 		}
+
+		while( $this->_opentags['fieldset']-- )
+		{
+			$r .= "\n</fieldset>\n";
+		}
+
 		$r .= $this->formend
 					."\n</form>\n\n";
 
@@ -720,6 +739,8 @@ class Form extends Widget
 				{ // there is a legend tag to display
 					$r .= '<legend>'.$title."</legend>\n";
 				}
+
+				$this->_opentags['fieldset']++;
 		}
 
 
@@ -750,6 +771,7 @@ class Form extends Widget
 
 			default:
 				$r = "</fieldset>\n";
+				$this->_opentags['fieldset']--;
 		}
 
 		if( $this->output )
@@ -800,7 +822,7 @@ class Form extends Widget
 			$loop_field_note = isset($option[5]) ? $option[5] : '';
 
 			if( isset($Request->err_messages[$error_name]) )
-			{	// There is an error message for this field:
+			{ // There is an error message for this field:
 				$after_field = '</span>';
 				$loop_field_note .= ' <span class="field_error">'.$Request->err_messages[$error_name].'</span>';
 				$r .= '<span class="checkbox_error">';
@@ -825,12 +847,14 @@ class Form extends Widget
 
 			$r .= $option[2];
 			if( !empty($loop_field_note) )
-			{	// We want to display a note:
+			{ // We want to display a note:
 				$r .= ' <span class="notes">'.$loop_field_note.'</span>';
 			}
 			$r .= "<br />\n";
 		}
+
 		$r .= $this->end_field();
+
 		if( $this->output )
 		{
 			echo $r;
@@ -866,7 +890,7 @@ class Form extends Widget
 	{
 		$field_options = call_user_func( $field_list_callback, $field_value );
 
-		return $this->select_options( $field_name, $field_options, $field_label, $field_name, $field_class, $field_onchange );
+		return $this->select_options( $field_name, $field_options, $field_label, $field_note, $field_class, $field_onchange );
 	}
 
 
@@ -949,12 +973,7 @@ class Form extends Widget
 					.$field_options
 					."</select>\n";
 
-		if( !empty( $field_note ) )
-		{
-			$r .= ' <span class="notes">'.$field_note.'</span>';
-		}
-
-		$r .= $this->end_field();
+		$r .= $this->end_field( $field_note );
 
 		if( $this->output )
 		{
@@ -1033,7 +1052,7 @@ class Form extends Widget
 	{
 		global $img_url, $Request;
 		if( isset($Request->err_messages[$field_name]) )
-		{	// There is an error message for this field:
+		{ // There is an error message for this field:
 			$field_class .= ' field_error';
 			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
 		}
@@ -1059,12 +1078,7 @@ class Form extends Widget
 					// NOTE: this one is for compensating the previous pixel in case of center aligns.
 					.'<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />';
 
-		if( !empty($field_note) )
-		{
-			$r .= '<br/><span class="notes">'.$field_note.'</span>';
-		}
-
-		$r .= $this->end_field();
+		$r .= $this->end_field( $field_note, '<br/><span class="notes">%s</span>' );
 
 		if( $this->output )
 		{
@@ -1080,12 +1094,17 @@ class Form extends Widget
 
 	/**
 	 * Builds an info field.
+	 * An info field is a fieldset containing a label div and an info div.
+	 *
+	 * {@internal
+	 * NOTE: we don't use {@link begin_field()} here, because the label is meant
+	 * to be always on the left and this avoids fiddling with the <label> tag.
+	 * }}
 	 *
 	 * @param string the field label
 	 * @param string the field info
 	 * @param string see {@see format_to_output()}
 	 * @return mixed true (if output) or the generated HTML if not outputting
-	 * An info field is a fieldset containing a label div and an info div.
 	 */
 	function info( $field_label, $field_info, $field_note = NULL, $format = 'htmlbody' )
 	{
@@ -1107,13 +1126,11 @@ class Form extends Widget
 		// PAYLOAD:
 		$r .= format_to_output( $field_info, $format );
 
-		if( !empty($field_note) )
-		{
-			$r .= ' <small class="notes">'.$field_note.'</small>';
-		}
-
-		$r .= $this->inputend
-				.$this->fieldend;
+		// end field (Label always to the left!)
+		$old_label_to_the_left = $this->label_to_the_left;
+		$this->label_to_the_left = true;
+		$r .= $this->end_field( $field_note, ' <small class="notes">%s</small>' );
+		$this->label_to_the_left = $old_label_to_the_left;
 
 		if( $this->output )
 		{
@@ -1313,6 +1330,8 @@ class Form extends Widget
 	 *  - the onclick attribute (optional)
 	 *  - the style (optional)
 	 *
+	 * @todo inconsistent parameters!
+	 * @todo Use <div class="input"> for layout == 'fieldset' (property).
 	 * @param array an array containing the elements of the input tags
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
@@ -1365,7 +1384,7 @@ class Form extends Widget
 		$field_options,
 		$field_label,
 		$field_lines = false,
-		$field_notes = '' )
+		$field_note = '' )
 	{
 		$r = $this->begin_field( $field_name, $field_label );
 
@@ -1392,11 +1411,8 @@ class Form extends Widget
 
 			if( $field_lines ) $r .= "</div>\n";
 		}
-		if( !empty( $field_notes ) )
-		{
-			$r .= '<div><span class="notes">'.$field_notes.'</span></div>';
-		}
-		$r .= $this->end_field();
+
+		$r .= $this->end_field( $field_note, '<div><span class="notes">%s</span></div>' );
 
 		if( $this->output )
 		{
@@ -1410,6 +1426,32 @@ class Form extends Widget
 	}
 
 
+	/**
+	 * Get the label of a field. This is used by {@link begin_field()} or {@link end_field()},
+	 * according to {@link $label_to_the_left}
+	 *
+	 * @access protected
+	 * @return string
+	 */
+	function get_label()
+	{
+		$r = '';
+
+		if( !empty($this->field_label) )
+		{
+			// $this->empty_label = true; // Memorize this
+			$r .= $this->labelstart
+						.'<label for="'.$this->field_name.'">'.$this->field_label.$this->label_suffix.'</label>'
+						.$this->labelend;
+		}
+		else
+		{ // Empty label:
+			// $this->empty_label = false; // Memorize this
+			$r .= $this->labelempty;
+		}
+
+		return $r;
+	}
 }
 
 ?>
