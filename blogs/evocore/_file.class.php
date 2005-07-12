@@ -974,7 +974,7 @@ class File extends DataObject
 	function chmod( $chmod )
 	{
 		$chmod = octdec( $chmod );
-		if( chmod( $this->_adfp_full_path, $chmod ) )
+		if( @chmod( $this->_adfp_full_path, $chmod ) )
 		{
 			clearstatcache();
 			// update current entry
@@ -1065,6 +1065,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2005/07/12 22:58:31  blueyed
+ * Suppress php's chmod() warnings.
+ *
  * Revision 1.36  2005/05/24 15:26:52  fplanque
  * cleanup
  *
