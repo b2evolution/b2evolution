@@ -28,40 +28,38 @@ $Form = & new Form( $location, '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
-if( !empty($mode) )
-{ // We're in the process of bookmarkletting something, we don't want to loose it:
-	param( 'text', 'html', '' );
-	param( 'popupurl', 'html', '' );
-	param( 'popuptitle', 'html', '' );
+	if( !empty($mode) )
+	{ // We're in the process of bookmarkletting something, we don't want to loose it:
+		param( 'text', 'html', '' );
+		param( 'popupurl', 'html', '' );
+		param( 'popuptitle', 'html', '' );
 
-	$Form->hidden( 'mode', $mode );
-	$Form->hidden( 'text', $text );
-	$Form->hidden( 'popupurl', $popupurl );
-	$Form->hidden( 'popuptitle', $popuptitle );
-}
+		$Form->hidden( 'mode', $mode );
+		$Form->hidden( 'text', $text );
+		$Form->hidden( 'popupurl', $popupurl );
+		$Form->hidden( 'popuptitle', $popuptitle );
+	}
 
-echo $Form->fieldstart;
+	echo $Form->fieldstart;
 
-?>
+	?>
 
-<div class="center"><span class="notes"><?php printf( T_('You will have to accept cookies in order to log in.') ) ?></span></div>
+	<div class="center"><span class="notes"><?php printf( T_('You will have to accept cookies in order to log in.') ) ?></span></div>
 
-<?php
+	<?php
+	$Form->text_input( 'login', $login, 16, T_('Login'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
 
-$Form->text( 'login', $login, 16, T_('Login'), '', 20 , 'input_text' );
+	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
 
-$Form->password( 'pwd', '', 16, T_('Password'), '', 20, 'input_text' );
+	echo $Form->fieldstart;
+	echo $Form->inputstart;
+	$Form->submit( array( 'submit', T_('Log in!'), 'search' ) );
+	echo $Form->inputend;
+	echo $Form->fieldend;
 
-echo $Form->fieldstart;
-echo $Form->inputstart;
-$Form->submit( array( 'submit', T_('Log in!'), 'search' ) );
-echo $Form->inputend;
-echo $Form->fieldend;
-
-echo $Form->fieldend;
+	echo $Form->fieldend;
 
 $Form->end_form();
-
 ?>
 
 <div class="login_actions" style="text-align:right">

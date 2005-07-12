@@ -78,7 +78,7 @@ if( $user_profile_only )
 }
 else
 {
-	$Form->text( 'edited_user_level', $edited_User->level, 2, T_('Level'), $field_note, 2 );
+	$Form->text_input( 'edited_user_level', $edited_User->level, 2, T_('Level'), array( 'note' => $field_note ) );
 }
 if( $edited_User->get('ID') != 1 && !$user_profile_only )
 {	// This is not Admin and we're not restricted: we're allowed to change the user group:
@@ -122,22 +122,22 @@ else
 
 if( $allowed_to_edit )
 { // We can edit the values:
-	$Form->text( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', 20 );
-	$Form->text( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), '', 50 );
-	$Form->text( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', 50, '', 'text', 'UpperCase' );
-	$Form->text( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', 50 );
+	$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login') );
+	$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), array( 'maxlength' => 50 ) );
+	$Form->text_input( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), array( 'maxlength' => 50, 'force_to' => 'UpperCase' ) );
+	$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), array( 'maxlength' => 50 ) );
 	$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when visiting the site.') );
 	$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
-	$Form->text( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, 100 );
+	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), array( 'note' => $email_fieldnote, 'maxlength' => 100 ) );
 	$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
-	$Form->text( 'edited_user_url', $edited_User->url, 30, T_('URL'), $url_fieldnote, 100 );
-	$Form->text( 'edited_user_icq', $edited_User->icq, 30, T_('ICQ'), $icq_fieldnote, 10 );
-	$Form->text( 'edited_user_aim', $edited_User->aim, 30, T_('AIM'), $aim_fieldnote, 50 );
-	$Form->text( 'edited_user_msn', $edited_User->msn, 30, T_('MSN IM'), '', 100 );
-	$Form->text( 'edited_user_yim', $edited_User->yim, 30, T_('YahooIM'), '', 50 );
-	$Form->password( 'edited_user_pass1', '', 20, T_('New password'), T_('Leave empty if you don\'t want to change the password.'), 50 );
-	$Form->password( 'edited_user_pass2', '', 20, T_('Confirm new password'), '', 50 );
+	$Form->text_input( 'edited_user_url', $edited_User->url, 30, T_('URL'), array( 'note' => $url_fieldnote, 'maxlength' => 100 ) );
+	$Form->text_input( 'edited_user_icq', $edited_User->icq, 30, T_('ICQ'), array( 'note' => $icq_fieldnote, 'maxlength' => 10 ) );
+	$Form->text_input( 'edited_user_aim', $edited_User->aim, 30, T_('AIM'), array( 'note' => $aim_fieldnote, 'maxlength' => 50 ) );
+	$Form->text_input( 'edited_user_msn', $edited_User->msn, 30, T_('MSN IM'), array( 'maxlength' => 100 ) );
+	$Form->text_input( 'edited_user_yim', $edited_User->yim, 30, T_('YahooIM'), array( 'maxlength' => 50 ) );
+	$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => T_('Leave empty if you don\'t want to change the password.'), 'maxlength' => 50 ) );
+	$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'maxlength' => 50 ) );
 	$Form->info( '', sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen') ) );
 }
 else
@@ -192,6 +192,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.62  2005/07/12 17:10:55  blueyed
+ * replaced Form::text() with Form::text_input(), Form::password() with Form::password_input()
+ *
  * Revision 1.61  2005/07/11 22:18:07  blueyed
  * Added info about password min length, fixed display of readonly profiles and password note.
  *
