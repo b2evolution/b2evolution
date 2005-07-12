@@ -202,7 +202,7 @@ class ldap_plugin extends Plugin
 				$NewUser->set( 'showonline', 1 );
 
 				$UsersGroup =& $GroupCache->get_by_ID($Settings->get('newusers_grp_ID'));
-				$NewUser->setGroup( &$UsersGroup );
+				$NewUser->setGroup( $UsersGroup );
 
 				$NewUser->dbinsert();
 
