@@ -314,6 +314,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 		// --- SWITCH PRIORITIES -----------------
 		case 'prioup':
 		case 'priodown':
+			$switchcond = '';
 			if( $action == 'prioup' )
 			{
 				$switchcond = 'return ($lval[\'priority\'] > $i && $lval[\'priority\'] < $locales[ $edit_locale ][\'priority\']);';
@@ -325,7 +326,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 				$i = 256;
 			}
 
-			if( isset($switchcond) )
+			if( !empty($switchcond) )
 			{ // we want to switch priorities
 
 				foreach( $locales as $lkey => $lval )
@@ -379,6 +380,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.2  2005/07/12 00:22:46  blueyed
+ * Fixed minor eval() injection with register_globals on.
+ *
  * Revision 1.1  2005/06/06 17:59:39  fplanque
  * user dialog enhancements
  *
