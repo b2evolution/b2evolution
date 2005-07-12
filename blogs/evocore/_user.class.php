@@ -426,13 +426,13 @@ class User extends DataObject
 				$perm = $this->Group->check_perm( $permname, $permlevel, $perm_target );
 		}
 
+		// echo "<br>Checking user perm $permname:$permlevel:$perm_target";
+		$Debuglog->add( "User perm $permname:$permlevel:$perm_target => ".($perm?'granted':'DENIED'), 'perms' );
+
 		if( !$perm && $assert )
 		{ // We can't let this go on!
 			die( "Permission denied! ($permname:$permlevel:$perm_target)" );
 		}
-
-		// echo "<br>Checking user perm $permname:$permlevel:$perm_target";
-		$Debuglog->add( "User perm $permname:$permlevel:$perm_target => ".($perm?'granted':'denied'), 'perms' );
 
 		return $perm;
 	}
@@ -879,6 +879,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2005/07/12 00:29:58  blueyed
+ * Moved call to $Debuglog up, so that it may be logged however later before die()ing.
+ *
  * Revision 1.36  2005/06/20 17:40:23  fplanque
  * minor
  *
