@@ -30,10 +30,11 @@ require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_item.class.php
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_item.funcs.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_form.funcs.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_user.funcs.php';
+require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_timer.class.php';
 require_once dirname(__FILE__).'/_functions_install.php';
 require_once dirname(__FILE__).'/_functions_create.php';
 
-timer_start();
+$Timer = & new Timer('install');
 
 param( 'action', 'string', 'default' );
 param( 'locale', 'string' );
