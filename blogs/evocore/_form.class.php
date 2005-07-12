@@ -27,10 +27,10 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants FranÃ§ois PLANQUE the right to license
+ * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * PROGIDISTRI grants FranÃ§ois PLANQUE the right to license
+ * PROGIDISTRI grants François PLANQUE the right to license
  * PROGIDISTRI's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -316,47 +316,74 @@ class Form extends Widget
 	/**
 	 * Builds a text (or password) input field.
 	 *
-	 * Note: please use {@link Form::password()} for password fields
+	 * Note: please use {@link Form::password_input()} for password fields.
 	 *
-	 * @param string the name of the input field
-	 * @param string initial value
-	 * @param integer size of the input field
-	 * @param string label displayed in front of the field
-	 * @param string note displayed with field
-	 * @param integer max length of the value (if 0 field_size will be used!)
-	 * @param string the CSS class to use
-	 * @param string input type (only 'text' or 'password' makes sense)
-	 * @return mixed true (if output) or the generated HTML if not outputting
+	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
+	 * @param string Initial value
+	 * @param integer Size of the input field
+	 * @param string Label displayed with the field (in front by default, see {@link $label_to_the_left}).
+	 * @param array Extended attributes/params.
+	 *                 - 'maxlength': if not given or === 0 $field_size gets used
+	 *                 - 'class': the CSS class to use for the <input> element
+	 *                 - 'type': 'text', 'password' (defaults to 'text')
+	 *                 - 'force_to': 'UpperCase' (JS onchange handler)
+	 *                 - NOTE: any other attributes will be used as is (onchange, onkeyup, id, ..).
+	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
-	function text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
-											$field_maxlength = 0 , $field_class = '', $inputtype = 'text', $force_to = '', $onchange = NULL )
+	function text_input( $field_name, $field_value, $field_size, $field_label, $field_params = array() )
 	{
 		global $Request;
+
+		if( !isset($field_params['maxlength']) || $field_params['maxlength'] === 0 )
+		{ // maxlength defaults to size
+			$field_params['maxlength'] = $field_size;
+		}
+
+		$field_params['class'] = isset( $extra_attribs['class'] ) ? $extra_attribs['class'] : '';
+
+		$field_note = isset($field_params['note']) ? $field_params['note'] : NULL;
+		unset($field_params['note']);
+
+		if( !isset($field_params['type']) )
+		{ // type defaults to "text"
+			$field_params['type'] = 'text';
+		}
+
+		if( isset($ext_attr['force_to']) && $ext_attr['force_to'] == 'UpperCase' )
+		{ // Force input to uppercase (at front of onchange event)
+			$field_params['onchange'] = 'this.value = this.value.toUpperCase();'
+				.( empty($field_params['onchange']) ? '' : ' '.$field_params['onchange'] );
+		}
+
+		if( !isset($field_params['id']) )
+		{
+			$field_params['id'] = $this->get_valid_id($field_name);
+		}
+
+		// Error handling:
 		if( isset($Request->err_messages[$field_name]) )
 		{ // There is an error message for this field:
-			$field_class .= ' field_error';
+			$field_params['class'] = isset( $field_params['class'] )
+				? $field_params['class'].' field_error'
+				: 'field_error';
+
 			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
 		}
 
-		if( $field_maxlength == 0 )
-			$field_maxlength = $field_size;
-
 		$r = $this->begin_field( $field_name, $field_label )
-				.'<input type="'.$inputtype.'" name="'.$field_name
-				.'" id="'.$this->get_valid_id($field_name).'" size="'.$field_size.'" maxlength="'.$field_maxlength
-				.'" value="'.format_to_output($field_value, 'formvalue').'"';
-		if( !empty($field_class) )
+				.'<input name="'.$field_name
+				.'" value="'.format_to_output($field_value, 'formvalue')
+				.'" size="'.$field_size
+				.'"';
+
+		foreach( $field_params as $l_attr => $l_value )
 		{
-			$r .= ' class="'.$field_class.'"';
+			if( $l_value !== false )
+			{ // skip values that are very equal to false.
+				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
+			}
 		}
-		if( $force_to == 'UpperCase' )
-		{ // Force input to uppercase
-			$onchange = 'this.value = this.value.toUpperCase();'.$onchange; // put at front
-		}
-		if( !empty($onchange) )
-		{
-			$r .= ' onchange="'.format_to_output( $onchange, 'htmlattr' ).'"';
-		}
+
 		$r .= " />\n";
 
 		$r .= $this->end_field( $field_note );
@@ -376,7 +403,78 @@ class Form extends Widget
 	/**
 	 * Builds a password input field.
 	 *
-	 * Calls the text() method with a 'password' parameter
+	 * Calls the text_input() method with type == 'password'.
+	 *
+	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
+	 * @param string Initial value
+	 * @param integer Size of the input field
+	 * @param string Label displayed in front of the field
+	 * @param string Note displayed with field
+	 * @param integer Max length of the value (if 0 field_size will be used!)
+	 * @param string Extended attributes, see {@link text_input()}.
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function password_input( $field_name, $field_value, $field_size, $field_label, $field_params = array() )
+	{
+		$field_params['type'] = 'password';
+
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_params );
+	}
+
+
+	/**
+	 * Builds a text (or password) input field.
+	 *
+	 * Note: please use {@link Form::password()} for password fields
+	 *
+	 * @deprecated Deprecated by text_input().
+	 *
+	 * @param string the name of the input field
+	 * @param string initial value
+	 * @param integer size of the input field
+	 * @param string label displayed in front of the field
+	 * @param string note displayed with field
+	 * @param integer max length of the value (if 0 field_size will be used!)
+	 * @param string the CSS class to use
+	 * @param string input type (only 'text' or 'password' makes sense)
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
+											$field_maxlength = 0 , $field_class = '', $inputtype = 'text', $force_to = '' )
+	{
+		$field_params = array();
+
+		if( $field_note !== '' )
+		{
+			$field_params['note'] = $field_note;
+		}
+		if( $field_maxlength !== 0 )
+		{
+			$field_params['maxlength'] = $field_maxlength;
+		}
+		if( $field_class !== '' )
+		{
+			$field_params['class'] = $field_class;
+		}
+		if( $inputtype !== 'text' )
+		{
+			$field_params['type'] = $inputtype;
+		}
+		if( $force_to !== '' )
+		{
+			$field_params['force_to'] = $force_to;
+		}
+
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_params );
+	}
+
+
+	/**
+	 * Builds a password input field.
+	 *
+	 * Calls the text() method with a 'password' parameter.
+	 *
+	 * @deprecated Deprecated by password_input(). Not used in the core anymore!
 	 *
 	 * @param string the name of the input field
 	 * @param string initial value
@@ -390,8 +488,22 @@ class Form extends Widget
 	function password( $field_name, $field_value, $field_size, $field_label, $field_note = '',
 											$field_maxlength = 0 , $field_class = '' )
 	{
-		$this->text( $field_name, $field_value, $field_size, $field_label, $field_note,
-											$field_maxlength, $field_class, 'password' );
+		$field_params = array( 'type' => 'password' );
+
+		if( !empty($field_note) )
+		{
+			$field_params['note'] = $field_note;
+		}
+		if( $field_maxlength !== 0 )
+		{
+			$field_params['maxlength'] = $field_maxlength;
+		}
+		if( !empty($field_class) )
+		{
+			$field_params['class'] = $field_class;
+		}
+
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_params );
 	}
 
 
