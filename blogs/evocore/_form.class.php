@@ -42,6 +42,12 @@
  * @author fplanque: Francois PLANQUE.
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
+ * @todo We should use a general associative array parameter for functions like {@link text()},
+ *       where we already have 10(!) arguments now.
+ *       This should include things like 'onchange' or 'force_to' as a key. When we won't do this,
+ *       it really gets messy if you want to add this like onkeyup or other special attributes.
+ *       IMHO we should move everything beyond $field_class into this array.
+ *
  * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
@@ -323,7 +329,7 @@ class Form extends Widget
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
-											$field_maxlength = 0 , $field_class = '', $inputtype = 'text', $force_to = '' )
+											$field_maxlength = 0 , $field_class = '', $inputtype = 'text', $force_to = '', $onchange = NULL )
 	{
 		global $Request;
 		if( isset($Request->err_messages[$field_name]) )
@@ -337,7 +343,7 @@ class Form extends Widget
 
 		$r = $this->begin_field( $field_name, $field_label )
 				.'<input type="'.$inputtype.'" name="'.$field_name
-				.'" id="'.$field_name.'" size="'.$field_size.'" maxlength="'.$field_maxlength
+				.'" id="'.$this->get_valid_id($field_name).'" size="'.$field_size.'" maxlength="'.$field_maxlength
 				.'" value="'.format_to_output($field_value, 'formvalue').'"';
 		if( !empty($field_class) )
 		{
@@ -345,7 +351,11 @@ class Form extends Widget
 		}
 		if( $force_to == 'UpperCase' )
 		{ // Force input to uppercase
-			$r .= ' onchange="this.value = this.value.toUpperCase();"';
+			$onchange = 'this.value = this.value.toUpperCase();'.$onchange; // put at front
+		}
+		if( !empty($onchange) )
+		{
+			$r .= ' onchange="'.format_to_output( $onchange, 'htmlattr' ).'"';
 		}
 		$r .= " />\n";
 
@@ -441,15 +451,15 @@ class Form extends Widget
 						cal_'.$field_name.".setTodayText('".TS_('Today')."');
 						// -->
 					</script>\n"
-				.'<input type="text" name="'.$field_name.'" id="'.$field_name.'"
+				.'<input type="text" name="'.$field_name.'" id="'.$this->get_valid_id($field_name).'"
 					size="'.$field_size.'" maxlength="'.$field_size.'" value="'.format_to_output($field_value, 'formvalue').'"';
 		if( isset( $field_class ) )
 		{
 			$r .= ' class="'.$field_class.'"';
 		}
 		$r .= " />\n"
-				.'<a href="#" onClick="cal_'.$field_name.'.select('.$this->form_name.'.'.$field_name.",'anchor_".$field_name."', '".$date_format."' );"
-				.' return false;" name="anchor_'.$field_name.'" ID="anchor_'.$field_name.'">'.T_('Select').'</a> ';
+				.'<a href="#" onclick="cal_'.$field_name.'.select('.$this->form_name.'.'.$field_name.",'anchor_".$field_name."', '".$date_format."');"
+				.' return false;" name="anchor_'.$field_name.'" id="anchor_'.$this->get_valid_id($field_name).'">'.T_('Select').'</a>';
 
 		$field_note = empty($field_note) ? '('.$date_format.')' : '('.$date_format.') '.$field_note;
 
@@ -501,7 +511,7 @@ class Form extends Widget
 		$r = $this->begin_field( $field_prefix, $field_label );
 
 		$days = floor( $duration / 86400 ); // 24 hours
-		$r .= "\n".'<select name="'.$field_prefix.'_days" id="'.$field_prefix.'_days">';
+		$r .= "\n".'<select name="'.$field_prefix.'_days" id="'.$this->get_valid_id($field_prefix).'_days">';
 		$r .= '<option value="0"'.( 0 == $days ? ' selected="selected"' : '' ).">---</option>\n";
 		for( $i = 1; $i <= 30; $i++ )
 		{
@@ -510,7 +520,7 @@ class Form extends Widget
 		$r .= '</select>'.T_('days')."\n";
 
 		$hours = floor( $duration / 3600 ) % 24;
-		$r .= "\n".'<select name="'.$field_prefix.'_hours" id="'.$field_prefix.'_hours">';
+		$r .= "\n".'<select name="'.$field_prefix.'_hours" id="'.$this->get_valid_id($field_prefix).'_hours">';
 		$r .= '<option value="0"'.( 0 == $hours ? ' selected="selected"' : '' ).">---</option>\n";
 		for( $i = 1; $i <= 24; $i++ )
 		{
@@ -519,7 +529,7 @@ class Form extends Widget
 		$r .= '</select>'.T_('hours')."\n";
 
 		$minutes = floor( $duration / 60 ) % 60;
-		$r .= "\n".'<select name="'.$field_prefix.'_minutes" id="'.$field_prefix.'_minutes">';
+		$r .= "\n".'<select name="'.$field_prefix.'_minutes" id="'.$this->get_valid_id($field_prefix).'_minutes">';
 		$r .= '<option value="0"'.( ($minutes<15) ? ' selected="selected"' : '' ).">00</option>\n";
 		$r .= '<option value="15"'.( ($minutes>=15 && $minutes<30) ? ' selected="selected"' : '' ).">15</option>\n";
 		$r .= '<option value="30"'.( ($minutes>=30 && $minutes<45) ? ' selected="selected"' : '' ).">30</option>\n";
@@ -590,7 +600,7 @@ class Form extends Widget
 		}
 		if( !empty($field_name) )
 		{
-			$r .= 'name="'.$field_name.'" id="'.$field_name.'"';
+			$r .= 'name="'.$field_name.'" id="'.$this->get_valid_id($field_name).'"';
 		}
 		if( $field_checked )
 		{
@@ -634,7 +644,7 @@ class Form extends Widget
 		$r = "\n\n"
 					.'<form'
 					.( !empty( $this->form_name ) ? ' name="'.$this->form_name.'"' : '' )
-					.( !empty( $this->form_name ) ? ' id="'.$this->form_name.'"' : '' )
+					.( !empty( $this->form_name ) ? ' id="'.$this->get_valid_id($this->form_name).'"' : '' )
 					.( !empty( $this->enctype ) ? ' enctype="'.$this->enctype.'"' : '' )
 					.' method="'.$this->form_method
 					.'" action="'.$this->form_action.'"'
@@ -959,7 +969,7 @@ class Form extends Widget
 
 		if( !empty($field_name) )
 		{
-			$r .= ' name="'.$field_name.'" id="'.$field_name.'"';
+			$r .= ' name="'.$field_name.'" id="'.$this->get_valid_id($field_name).'"';
 		}
 		if( !empty($field_class) )
 		{
@@ -1066,7 +1076,7 @@ class Form extends Widget
 		$r .= '<textarea';
 		if( !empty($field_name) )
 		{
-			$r .= ' name="'.$field_name.'" id="'.$field_name.'"';
+			$r .= ' name="'.$field_name.'" id="'.$this->get_valid_id($field_name).'"';
 		}
 		if( !empty($field_class) )
 		{
@@ -1231,7 +1241,7 @@ class Form extends Widget
 
 		if( !empty($options[1]) )
 		{ //a name has been specified
-			$r .= ' id="'.$options[1].'" ';
+			$r .= ' id="'.$this->get_valid_id($options[1]).'" ';
 			$r .= ' name="'.$options[1].'" ';
 		}
 
@@ -1423,6 +1433,17 @@ class Form extends Widget
 		{
 			return $r;
 		}
+	}
+
+
+	/**
+	 * Convert a given string (e.g. fieldname) to a valid HTML id.
+	 *
+	 * @return string
+	 */
+	function get_valid_id( $id )
+	{
+		return str_replace( array( '[', ']' ), '_', $id );
 	}
 
 
