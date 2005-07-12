@@ -130,59 +130,83 @@ class Group extends DataObject
 
 
 	/**
-	 * Check a permission for this group
+	 * Check a permission for this group.
 	 *
 	 * @param string Permission name:
-	 *									- templates
-	 *									- stats
-	 *									- spamblacklist
-	 *									- options
-	 *									- users
-	 *									- blogs
+	 *                - templates
+	 *                - stats
+	 *                - spamblacklist
+	 *                - options
+	 *                - users
+	 *                - blogs
 	 * @param string Permission level
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
-	 * @return strind Permission value
+	 * @return boolean True on success (permission is granted), false if permission is not granted
 	 */
 	function check_perm( $permname, $permlevel = 'any', $perm_target = NULL )
 	{
-		// Check group permission:
-		eval( '$permvalue = $this->perm_'.$permname.';' );
+		global $Debuglog;
+
+		$perm = false; // Default is false!
+
 		// echo "<br>Checking group perm $permname:$permlevel against $permvalue";
 
+		if( isset($this->{'perm_'.$permname}) )
+		{
+			$permvalue = $this->{'perm_'.$permname};
+		}
+		else
+		{ // Object's perm-property not set!
+			$Debuglog->add( 'Group permission perm_'.$permname.' not defined!', 'perms' );
+
+			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
+		}
+
+		// Check group permission:
 		switch( $permname )
 		{
 			case 'admin':
 				switch( $permvalue )
-				{	// Depending on current group permission:
+				{ // Depending on current group permission:
 
 					case 'visible':
 						// All permissions granted
-						return true;	// Permission granted
+						$perm = true; // Permission granted
+						break;
 
 					case 'hidden':
 						// User can only ask for hidden perm
 						if(( $permlevel == 'hidden' ) || ( $permlevel == 'any' ))
-							return true;	// Permission granted
+						{ // Permission granted
+							$perm = true;
+							break;
+						}
 				}
 				break;
 
 			case 'templates':
 				if( $permvalue )
-					return true;	// Permission granted
+				{ // Permission granted
+					$perm = true;
+				}
 				break;
 
 			case 'blogs':
 				switch( $permvalue )
-				{	// Depending on current group permission:
+				{ // Depending on current group permission:
 
 					case 'editall':
 						// All permissions granted
-						return true;	// Permission granted
+						$perm = true;
+						break;
 
 					case 'viewall':
 						// User can only ask for view perm
 						if(( $permlevel == 'view' ) || ( $permlevel == 'any' ))
-							return true;	// Permission granted
+						{ // Permission granted
+							$perm = true;
+							break;
+						}
 				}
 				break;
 
@@ -192,34 +216,45 @@ class Group extends DataObject
 			case 'files':
 			case 'users':
 				switch( $permvalue )
-				{	// Depending on current group permission:
+				{ // Depending on current group permission:
 
 					case 'edit':
 						// All permissions granted
-						return true;	// Permission granted
+						$perm = true;
+						break;
 
 					case 'add':
 						// User can ask for add perm...
 						if( $permlevel == 'add' )
-							return true;	// Permission granted
+						{
+							$perm = true;
+							break;
+						}
 						// ... or for any lower priority perm... (no break)
 
 					case 'view':
 						// User can ask for view perm...
 						if( $permlevel == 'view' )
-							return true;	// Permission granted
+						{
+							$perm = true;
+							break;
+						}
 						// ... or for any lower priority perm... (no break)
 
 					case 'list':
 						// User can only ask for list perm
 						if( $permlevel == 'list' )
-							return true;	// Permission granted
+						{
+							$perm = true;
+							break;
+						}
 				}
 				break;
 		}
 
-		// echo 'DENIED';
-		return false;	// Permission denied!
+		$Debuglog->add( "Group perm $permname:$permlevel:$perm_target => ".($perm?'granted':'DENIED'), 'perms' );
+
+		return $perm;
 	}
 
 
@@ -256,6 +291,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2005/07/12 00:29:00  blueyed
+ * check_perm(): added $Debuglog, removed unneeded eval(), doc
+ *
  * Revision 1.9  2005/06/20 17:40:23  fplanque
  * minor
  *
