@@ -1233,6 +1233,32 @@ function redirect_js($url,$title="...") {
 	exit();
 }
 
+
+// functions to count the page generation time (from phpBB2)
+// ( or just any time between timer_start() and timer_stop() )
+
+function timer_start() {
+		global $timestart;
+		$mtime = microtime();
+		$mtime = explode(" ",$mtime);
+		$mtime = $mtime[1] + $mtime[0];
+		$timestart = $mtime;
+		return true;
+	}
+
+function timer_stop($display=0,$precision=3) { //if called like timer_stop(1), will echo $timetotal
+		global $timestart,$timeend;
+		$mtime = microtime();
+		$mtime = explode(" ",$mtime);
+		$mtime = $mtime[1] + $mtime[0];
+		$timeend = $mtime;
+		$timetotal = $timeend-$timestart;
+		if ($display)
+			echo number_format($timetotal,$precision);
+		return($timetotal);
+	}
+
+
 // _misc.funcs.php }}}
 
 
@@ -1607,6 +1633,9 @@ $fileupload_allowedusers = '';
 
 /*
  * $Log$
+ * Revision 1.13  2005/07/12 23:05:36  blueyed
+ * Added Timer class with categories 'main' and 'sql_queries' for now.
+ *
  * Revision 1.12  2005/05/09 16:09:42  fplanque
  * implemented file manager permissions through Groups
  *

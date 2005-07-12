@@ -131,13 +131,14 @@ if( !function_exists( 'gzencode' ) )
 	$use_gzipcompression = false;
 }
 
+if( !isset( $use_html_checker ) ) $use_html_checker = 1;
+
 /**
  * Includes:
  */
 require_once dirname(__FILE__).'/_misc.funcs.php';
-timer_start();
-
-if( !isset( $use_html_checker ) ) $use_html_checker = 1;
+require_once dirname(__FILE__).'/_timer.class.php';
+$Timer = & new Timer('main');
 
 require_once dirname(__FILE__).'/_antispam.funcs.php';
 require_once dirname(__FILE__).'/_blog.funcs.php';
@@ -246,7 +247,7 @@ require_once dirname(__FILE__).'/_file.class.php';
 // fplanque>>jwedgeco: I cannot commit this: $BlogCache = array();
 $response = NULL;
 
-if ( $use_memcached ) 
+if ( $use_memcached )
 {
 	// TODO: fplanque>>jwedgeco: please document why you set a dummy here ;)
 	$response = $memcache->set( 'dummy' , 0);
@@ -260,7 +261,7 @@ if ( $use_memcached )
 //	echo "<pre>\n";
 //	print_r($response);
 //	echo "</pre>\n";
-	
+
 }
 
 // TODO FIXME test for null on each object.
@@ -277,7 +278,7 @@ if ( $response == null )
 }
 else
 {
-	$BlogCache = & $response;	
+	$BlogCache = & $response;
 //		$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
 //	$ItemCache = & new ItemCache();
 //	$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
@@ -514,6 +515,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.38  2005/07/12 23:05:36  blueyed
+ * Added Timer class with categories 'main' and 'sql_queries' for now.
+ *
  * Revision 1.37  2005/06/03 20:14:39  fplanque
  * started input validation framework
  *

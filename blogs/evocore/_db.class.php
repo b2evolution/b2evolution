@@ -389,6 +389,8 @@ class DB
 	 */
 	function query( $query, $title = '' )
 	{
+		global $Timer;
+
 		// initialise return
 		$return_val = 0;
 
@@ -417,7 +419,9 @@ class DB
 																									'sql' => $query,
 																									'rows' => -1 );
 
+		$Timer->resume( 'sql_queries' );
 		$this->result = @mysql_query($query,$this->dbh);
+		$Timer->pause( 'sql_queries' );
 
 		// If there is an error then take note of it..
 		if ( mysql_error() )
@@ -824,13 +828,13 @@ class DB
 	/**
 	 * BEGIN A TRANSCATION
 	 *
-	 * Note:  By default, MySQL runs with autocommit mode enabled. 
-	 * This means that as soon as you execute a statement that updates (modifies) 
+	 * Note:  By default, MySQL runs with autocommit mode enabled.
+	 * This means that as soon as you execute a statement that updates (modifies)
 	 * a table, MySQL stores the update on disk.
-	 * Once you execute a BEGIN, the updates are "pending" until you execute a 
+	 * Once you execute a BEGIN, the updates are "pending" until you execute a
 	 * COMMIT {@see DB::commit()} or a ROLLBACK {@see DB:rollback()}
 	 *
-	 * Note 2: standard syntax would be START TRANSACTION but it's not supported by older 
+	 * Note 2: standard syntax would be START TRANSACTION but it's not supported by older
 	 * MySQL versions whereas BEGIN is...
 	 *
 	 * Note 3: The default isolation level is REPEATABLE READ.
@@ -894,6 +898,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.17  2005/07/12 23:05:36  blueyed
+ * Added Timer class with categories 'main' and 'sql_queries' for now.
+ *
  * Revision 1.16  2005/06/02 18:50:52  fplanque
  * no message
  *

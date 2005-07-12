@@ -1178,7 +1178,7 @@ param( 'mode', 'string', 'normal' );
 			<li><?php echo $count_userscreated ?> user(s) created.</li>
 			<li><?php echo $count_commentscreated ?> comment(s) imported.</li>
 			<li><?php echo $count_trackbackscreated ?> trackback(s) imported.</li>
-			<li>in <?php echo number_format(timer_stop(), 3) ?> seconds.</li>
+			<li>in <?php $Timer->display_time( 'main', 3 ) ?> seconds.</li>
 		</ul>
 		<?php
 		if( $simulate )

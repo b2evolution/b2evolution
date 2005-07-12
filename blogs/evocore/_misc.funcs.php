@@ -517,31 +517,6 @@ function is_windows()
 }
 
 
-// functions to count the page generation time (from phpBB2)
-// ( or just any time between timer_start() and timer_stop() )
-
-function timer_start() {
-		global $timestart;
-		$mtime = microtime();
-		$mtime = explode(" ",$mtime);
-		$mtime = $mtime[1] + $mtime[0];
-		$timestart = $mtime;
-		return true;
-	}
-
-function timer_stop($display=0,$precision=3) { //if called like timer_stop(1), will echo $timetotal
-		global $timestart,$timeend;
-		$mtime = microtime();
-		$mtime = explode(" ",$mtime);
-		$mtime = $mtime[1] + $mtime[0];
-		$timeend = $mtime;
-		$timetotal = $timeend-$timestart;
-		if ($display)
-			echo number_format($timetotal,$precision);
-		return($timetotal);
-	}
-
-
 function xmlrpc_getposttitle($content)
 {
 	global $post_default_title;
@@ -1197,6 +1172,7 @@ function debug_info( $force = false )
 	global $DB;
 	global $obhandler_debug;
 	global $cache_imgsize, $cache_File;
+	global $Timer;
 
 	if( $debug || $force )
 	{
@@ -1219,7 +1195,11 @@ function debug_info( $force = false )
 
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
-			echo 'Page processing time: ', number_format(timer_stop(),3), ' seconds<br/>';
+			$time_page = $Timer->get_duration( 'main' );
+			$time_queries = $Timer->get_duration( 'sql_queries' );
+			$percent_queries = $time_page > 0 ? number_format( 100/$time_page * $time_queries, 2 ) : 0;
+			echo 'Page processing time: '.$time_page.' seconds.<br/>';
+			echo 'SQL processing time: '.$time_queries.' seconds, '.$percent_queries.'%.<br/>';
 		}
 
 		echo format_to_output(
@@ -1886,6 +1866,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.72  2005/07/12 23:05:36  blueyed
+ * Added Timer class with categories 'main' and 'sql_queries' for now.
+ *
  * Revision 1.71  2005/06/10 18:25:44  fplanque
  * refactoring
  *
