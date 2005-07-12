@@ -357,8 +357,8 @@ class AbstractSettings
 
 		$result = call_user_func_array( array( &$this, 'get' ), $args );
 
-		if( $result !== false )
-		{
+		if( $result !== NULL && $result !== false )
+		{ // No error and value retrieved
 			$toset = $result;
 			return true;
 		}
@@ -589,6 +589,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.16  2005/07/12 22:54:14  blueyed
+ * Fixed get_cond(): respect NULL and false return value of get()
+ *
  * Revision 1.15  2005/06/06 17:59:39  fplanque
  * user dialog enhancements
  *
