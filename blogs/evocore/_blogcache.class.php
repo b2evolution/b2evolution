@@ -71,7 +71,7 @@ class BlogCache extends DataObjectCache
 	 * Load the cache if necessary
 	 *
 	 * @todo use cache
-	 * @todo check/enhance for other domains then $baseurl
+	 * @todo check/enhance for other domains than $baseurl
 	 *
 	 * @param string URL of object to load
 	 * @param boolean false if you want to return false on error
@@ -105,7 +105,8 @@ class BlogCache extends DataObjectCache
 		{ // Requested object does not exist
 			if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
 
-			return false;
+			$r = false;
+			return $r; // we return by reference!
 		}
 
 		$Blog = new Blog( $row );
@@ -224,6 +225,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.13  2005/07/13 23:44:18  blueyed
+ * Fixed notice with not returning reference (since PHP 4.4.0?).
+ *
  * Revision 1.12  2005/05/25 17:13:33  fplanque
  * implemented email notifications on new comments/trackbacks
  *
