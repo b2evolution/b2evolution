@@ -42,11 +42,12 @@
  * @author fplanque: Francois PLANQUE.
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
- * @todo We should use a general associative array parameter for functions like {@link text()},
- *       where we already have 10(!) arguments now.
- *       This should include things like 'onchange' or 'force_to' as a key. When we won't do this,
- *       it really gets messy if you want to add this like onkeyup or other special attributes.
- *       IMHO we should move everything beyond $field_class into this array.
+ * @todo Provide buffering of whole Form to be able to add onsubmit-JS to enable/disabled
+ *       (group) checkboxes again and other useful stuff.
+ *
+ * NOTE: we use an member array ($_common_params) for exchanging params between functions.
+ * This will most probably cause problems, when nesting inputs. This should be refactored
+ * to use a field_name-based member array. (blueyed)
  *
  * @version $Id$
  */
@@ -67,7 +68,7 @@ class Form extends Widget
 	/**
 	 * Number of fieldsets currently defined.
 	 * If greater then 0, output will be buffered.
-	 * @todo Why don't we explicitely request buffering if we need it ? :/
+	 * @deprecated
 	 * @see begin_fieldset()
 	 * @see end_fieldset()
 	 * @var integer
@@ -102,11 +103,31 @@ class Form extends Widget
 	 */
 	var $label_to_the_left = true;
 
+	/**
+	 * Common params shared between methods.
+	 *
+	 * These can all be used with the $field_params argument of the functions.
+	 *
+	 * - 'note': The note associated with the field.
+	 * - 'note_format': The format of the note. %s gets replaced by the note.
+	 * - 'label': The label for the field.
+	 *
+	 * @see handle_common_params()
+	 * @var array
+	 */
+	var $_common_params = array();
+
+	/**
+	 * This is the default note format, where {@link handle_common_params()} falls
+	 * back to, when not given with $field_params.
+	 * @todo This might be used in switch_layout().
+	 * @var string
+	 */
+	var $note_format = ' <span class="notes">%s</span>';
+
 
 	/**
 	 * Constructor
-	 *
-	 * @todo Provide buffering of whole Form to be able to add onsubmit-JS to enable disabled (group) checkboxes again
 	 *
 	 * @param string the name of the form
 	 * @param string the action to execute when the form is submitted
@@ -122,6 +143,7 @@ class Form extends Widget
 		$this->saved_layout = $layout;
 		$this->switch_layout( NULL );	// "restore" saved layout.
 	}
+
 
 	/**
 	 * @param string|NULL the form layout : 'fieldset', 'table' or ''; NULL to restore previsouly saved layout
@@ -196,15 +218,22 @@ class Form extends Widget
 	 *
 	 * A field is a fielset containing a label div and an input div.
 	 *
+	 * @uses $_common_params
 	 * @param string The name of the field
 	 * @param string The field label
 	 * @return The generated HTML
 	 */
-	function begin_field( $field_name = '', $field_label = '' )
+	function begin_field( $field_name = NULL, $field_label = NULL )
 	{
 		// Remember these, to make them available to get_label() for !$label_to_the_left
-		$this->field_name = $field_name;
-		$this->field_label = $field_label;
+		if( NULL !== $field_name )
+		{
+			$this->_common_params['name'] = $field_name;
+		}
+		if( NULL !== $field_label )
+		{
+			$this->_common_params['label'] = $field_label;
+		}
 
 		$r = $this->fieldstart;
 
@@ -224,16 +253,32 @@ class Form extends Widget
 	 *
 	 * A field is a fielset containing a label div and an input div.
 	 *
-	 * @param string Field's note to display.
-	 * @param string Format of the field's note (%s gets replaced with the note).
+	 * @param string Field's note to display. (deprecated)
+	 * @param string Format of the field's note (%s gets replaced with the note). (deprecated)
 	 * @return The generated HTML
 	 */
-	function end_field( $field_note = NULL, $field_note_format = ' <span class="notes">%s</span>' )
+	function end_field( $field_note = NULL, $field_note_format = NULL )
 	{
-		$field_note = empty($field_note) ? '' : sprintf( $field_note_format, $field_note );
+		if( NULL !== $field_note )
+		{ // deprecated - should get set by calling handle_common_params()
+			$this->_common_params['note'] = $field_note;
+		}
+		if( NULL !== $field_note_format )
+		{ // deprecated - should get set by calling handle_common_params()
+			$this->_common_params['note_format'] = $field_note_format;
+		}
+
+		if( !empty($this->_common_params['note']) )
+		{
+			$field_note = sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
+		}
+		else
+		{
+			$field_note = '';
+		}
 
 		if( $this->label_to_the_left )
-		{ // label displayed in begin_field()
+		{ // label has been displayed in begin_field()
 			$r = $field_note.$this->inputend;
 		}
 		else
@@ -250,7 +295,7 @@ class Form extends Widget
 	/**
 	 * Begin fieldset (with legend).
 	 *
-	 * @deprecated by ::fieldset but all functionality is not available
+	 * @deprecated by ::fieldset() but all functionality is not available
 	 * @author blueyed
 	 * @see end_fieldset()
 	 * @param string The fieldset legend
@@ -277,7 +322,7 @@ class Form extends Widget
 	 * End a fieldset (and output/return it).
 	 *
 	 * This handles
-	 * @deprecated by ::fieldset_end but all functionality is not available
+	 * @deprecated by ::fieldset_end() but all functionality is not available
 	 * @author blueyed
 	 */
 	function end_fieldset()
@@ -301,15 +346,7 @@ class Form extends Widget
 		$r = str_replace( '%disableByOnclick%', $onclick, $r )
 					."\n</fieldset>\n";
 
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->display_or_return( $r );
 	}
 
 
@@ -332,93 +369,35 @@ class Form extends Widget
 	 */
 	function text_input( $field_name, $field_value, $field_size, $field_label, $field_params = array() )
 	{
-		global $Request;
+		$field_params['value'] = $field_value;
 
-		if( !isset($field_params['maxlength']) || $field_params['maxlength'] === 0 )
-		{ // maxlength defaults to size
-			$field_params['maxlength'] = $field_size;
+		if( !empty($field_size) )
+		{
+			if( !isset($field_params['maxlength']) )
+			{ // maxlength defaults to size
+				$field_params['maxlength'] = $field_size;
+			}
+
+			$field_params['size'] = $field_size;
 		}
-
-		$field_params['class'] = isset( $extra_attribs['class'] ) ? $extra_attribs['class'] : '';
-
-		$field_note = isset($field_params['note']) ? $field_params['note'] : NULL;
-		unset($field_params['note']);
 
 		if( !isset($field_params['type']) )
 		{ // type defaults to "text"
 			$field_params['type'] = 'text';
 		}
 
-		if( isset($ext_attr['force_to']) && $ext_attr['force_to'] == 'UpperCase' )
-		{ // Force input to uppercase (at front of onchange event)
-			$field_params['onchange'] = 'this.value = this.value.toUpperCase();'
-				.( empty($field_params['onchange']) ? '' : ' '.$field_params['onchange'] );
-		}
-
-		if( !isset($field_params['id']) )
+		if( isset($field_params['force_to']) )
 		{
-			$field_params['id'] = $this->get_valid_id($field_name);
-		}
-
-		// Error handling:
-		if( isset($Request->err_messages[$field_name]) )
-		{ // There is an error message for this field:
-			$field_params['class'] = isset( $field_params['class'] )
-				? $field_params['class'].' field_error'
-				: 'field_error';
-
-			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
-		}
-
-		$r = $this->begin_field( $field_name, $field_label )
-				.'<input name="'.$field_name
-				.'" value="'.format_to_output($field_value, 'formvalue')
-				.'" size="'.$field_size
-				.'"';
-
-		foreach( $field_params as $l_attr => $l_value )
-		{
-			if( $l_value !== false )
-			{ // skip values that are very equal to false.
-				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
+			if( $field_params['force_to'] == 'UpperCase' )
+			{ // Force input to uppercase (at front of onchange event)
+				$field_params['onchange'] = 'this.value = this.value.toUpperCase();'
+					.( empty($field_params['onchange']) ? '' : ' '.$field_params['onchange'] );
 			}
 		}
 
-		$r .= " />\n";
-
-		$r .= $this->end_field( $field_note );
-
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
-	}
-
-
-	/**
-	 * Builds a password input field.
-	 *
-	 * Calls the text_input() method with type == 'password'.
-	 *
-	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
-	 * @param string Initial value
-	 * @param integer Size of the input field
-	 * @param string Label displayed in front of the field
-	 * @param string Note displayed with field
-	 * @param integer Max length of the value (if 0 field_size will be used!)
-	 * @param string Extended attributes, see {@link text_input()}.
-	 * @return mixed true (if output) or the generated HTML if not outputting
-	 */
-	function password_input( $field_name, $field_value, $field_size, $field_label, $field_params = array() )
-	{
-		$field_params['type'] = 'password';
-
-		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_params );
+		$field_params['name'] = $field_name;
+		$field_params['label'] = $field_label;
+		return $this->input_field( $field_params );
 	}
 
 
@@ -442,6 +421,9 @@ class Form extends Widget
 	function text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
 											$field_maxlength = 0 , $field_class = '', $inputtype = 'text', $force_to = '' )
 	{
+		global $Debuglog;
+		$Debuglog->add( 'Form::text()', 'deprecated function calls' );
+
 		$field_params = array();
 
 		if( $field_note !== '' )
@@ -472,6 +454,28 @@ class Form extends Widget
 	/**
 	 * Builds a password input field.
 	 *
+	 * Calls the text_input() method with type == 'password'.
+	 *
+	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
+	 * @param string Initial value
+	 * @param integer Size of the input field
+	 * @param string Label displayed in front of the field
+	 * @param string Note displayed with field
+	 * @param integer Max length of the value (if 0 field_size will be used!)
+	 * @param string Extended attributes, see {@link text_input()}.
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function password_input( $field_name, $field_value, $field_size, $field_label, $field_params = array() )
+	{
+		$field_params['type'] = 'password';
+
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_params );
+	}
+
+
+	/**
+	 * Builds a password input field.
+	 *
 	 * Calls the text() method with a 'password' parameter.
 	 *
 	 * @deprecated Deprecated by password_input(). Not used in the core anymore!
@@ -488,6 +492,9 @@ class Form extends Widget
 	function password( $field_name, $field_value, $field_size, $field_label, $field_note = '',
 											$field_maxlength = 0 , $field_class = '' )
 	{
+		global $Debuglog;
+		$Debuglog->add( 'Form::password()', 'deprecated function calls' );
+
 		$field_params = array( 'type' => 'password' );
 
 		if( !empty($field_note) )
@@ -513,25 +520,37 @@ class Form extends Widget
 	 * @param string the name of the input field
 	 * @param string initial value (ISO datetime)
 	 * @param string label displayed in front of the field
-	 * @param string date format
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - date_format: Format of the date (string, default 'yyyy-MM-dd')
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function date( $field_name, $field_value, $field_label, $date_format = 'yyyy-MM-dd' )
+	function date_input( $field_name, $field_value, $field_label, $field_params = array() )
 	{
 		global $month, $weekday_letter;
-		global $Request;
-		if( isset($Request->err_messages[$field_name]) )
-		{ // There is an error message for this field:
-			$field_class = 'field_error';
-			$field_note = '<span class="field_error">'.$Request->err_messages[$field_name].'</span>';
+
+		if( !isset($field_params['date_format']) )
+		{
+			$date_format = 'yyyy-MM-dd';
 		}
+		else
+		{ // no attrib:
+			$date_format = $field_params['date_format'];
+			unset( $field_params['date_format'] );
+		}
+
+		// Prepend $date_format to note
+		$field_params['note'] = empty($field_params['note'])
+			? '('.$date_format.')'
+			: '('.$date_format.') '.$field_params['note'];
+
+		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$field_size = strlen( $date_format );
 
 		// Get date part of datetime:
 		$field_value = substr( $field_value, 0, 10 );
 
-		$r = $this->begin_field( $field_name, $field_label )
+		$r = $this->begin_field()
 				.'<script type="text/javascript">
 						<!--
 						var cal_'.$field_name.' = new CalendarPopup();
@@ -565,32 +584,85 @@ class Form extends Widget
 					</script>\n"
 				.'<input type="text" name="'.$field_name.'" id="'.$this->get_valid_id($field_name).'"
 					size="'.$field_size.'" maxlength="'.$field_size.'" value="'.format_to_output($field_value, 'formvalue').'"';
-		if( isset( $field_class ) )
-		{
-			$r .= ' class="'.$field_class.'"';
-		}
-		$r .= " />\n"
+
+		$r .= $this->get_field_params_as_string( $field_params )
+				." />\n"
 				.'<a href="#" onclick="cal_'.$field_name.'.select('.$this->form_name.'.'.$field_name.",'anchor_".$field_name."', '".$date_format."');"
 				.' return false;" name="anchor_'.$field_name.'" id="anchor_'.$this->get_valid_id($field_name).'">'.T_('Select').'</a>';
 
-		$field_note = empty($field_note) ? '('.$date_format.')' : '('.$date_format.') '.$field_note;
+		$r .= $this->end_field();
 
-		$r .= $this->end_field( $field_note );
+		return $this->display_or_return( $r );
+	}
 
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+
+	/**
+	 * Builds a date input field.
+	 *
+	 * @deprecated Deprecated by date_input()
+	 *
+	 * @param string the name of the input field
+	 * @param string initial value (ISO datetime)
+	 * @param string label displayed in front of the field
+	 * @param string date format
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function date( $field_name, $field_value, $field_label, $date_format = 'yyyy-MM-dd' )
+	{
+		global $Debuglog;
+		$Debuglog->add( 'Form::date()', 'deprecated function calls' );
+
+		$field_params = array( 'date_format' => $date_format );
+
+		return $this->date_input( $field_name, $field_value, $field_label, $field_params );
 	}
 
 
 	/**
 	 * Builds a time input field.
+	 *
+	 * @param string The name of the input field
+	 * @param string Initial value (ISO datetime)
+	 * @param string Label displayed in front of the field
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - 'time_format': Format of the time (string, default 'hh:mm:ss')
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function time_input( $field_name, $field_value, $field_label, $field_params = array() )
+	{
+		if( isset($field_params['time_format']) )
+		{
+			$field_format = '('.$field_params['time_format'].')';
+			unset( $field_params['time_format'] ); // not an attribute
+		}
+		else
+		{
+			$field_format = '(hh:mm:ss)';
+		}
+
+		// Prepend format to note
+		if( isset($field_params['note']) )
+		{
+			$field_params['note'] = $field_format.' '.$field_params['note'];
+		}
+		else
+		{
+			$field_params['note'] = $field_format;
+		}
+
+		$field_size = strlen($field_format);
+
+		// Get time part of datetime:
+		$field_value = substr( $field_value, 11, 8 );
+
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_params );
+	}
+
+
+	/**
+	 * Builds a time input field.
+	 *
+	 * @deprecated Deprecated by time_input()
 	 *
 	 * @param string the name of the input field
 	 * @param string initial value (ISO datetime)
@@ -599,28 +671,32 @@ class Form extends Widget
 	 */
 	function time( $field_name, $field_value, $field_label, $field_format = 'hh:mm:ss' )
 	{
-		$field_size = strlen($field_format);
+		global $Debuglog;
+		$Debuglog->add( 'Form::time()', 'deprecated function calls' );
 
-		// Get time part of datetime:
-		$field_value = substr( $field_value, 11, 8 );
+		$field_params = array( 'time_format' => $field_format );
 
-		return $this->text( $field_name, $field_value, $field_size, $field_label,
-											'('.$field_format.')', $field_size );
+		return $this->time_input( $field_name, $field_value, $field_label, $field_params );
 	}
 
 
 	/**
 	 * Builds a duration input field.
 	 *
+	 * @todo @Francois: please check API and change as appropriate.
+	 *
 	 * @param string the name of the input field
 	 * @param string initial value (seconds)
 	 * @param string label displayed in front of the field
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              nothing yet.
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function duration( $field_prefix, $duration, $field_label )
+	function duration_input( $field_prefix, $duration, $field_label, $field_params = array() )
 	{
+		$this->handle_common_params( $field_params, $field_prefix, $field_label );
 
-		$r = $this->begin_field( $field_prefix, $field_label );
+		$r = $this->begin_field();
 
 		$days = floor( $duration / 86400 ); // 24 hours
 		$r .= "\n".'<select name="'.$field_prefix.'_days" id="'.$this->get_valid_id($field_prefix).'_days">';
@@ -650,24 +726,37 @@ class Form extends Widget
 
 		$r .= $this->end_field();
 
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Builds a duration input field.
+	 *
+	 * @deprecated Deprecated by duration_input()
+	 *
+	 * @param string the name of the input field
+	 * @param string initial value (seconds)
+	 * @param string label displayed in front of the field
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function duration( $field_prefix, $duration, $field_label )
+	{
+		global $Debuglog;
+		$Debuglog->add( 'Form::duration()', 'deprecated function calls' );
+
+		return $this->duration_input( $field_prefix, $duration, $field_label );
 	}
 
 
 	/**
 	 * Build a select to choose a weekday.
 	 *
+	 * @uses select_input_options()
+	 *
 	 * @return true|string
 	 */
-	function dayOfWeek( $field_name, $field_value, $field_label, $field_note = NULL, $field_class = NULL )
+	function dayOfWeek_input( $field_name, $field_value, $field_label, $field_params = array() )
 	{
 		global $weekday_abbrev;
 
@@ -684,12 +773,74 @@ class Form extends Widget
 			$field_options .= ' value="'.$lNumber.'">'.T_($lWeekday).'</option>';
 		}
 
-		return $this->select_options( $field_name, $field_options, $field_label, $field_note, $field_class );
+		return $this->select_input_options( $field_name, $field_options, $field_label, $field_params );
+	}
+
+
+	/**
+	 * Build a select to choose a weekday.
+	 *
+	 * @return true|string
+	 */
+	function dayOfWeek( $field_name, $field_value, $field_label, $field_note = NULL, $field_class = NULL )
+	{
+		global $Debuglog;
+		$Debuglog->add( 'Form::dayOfWeek()', 'deprecated function calls' );
+
+		$field_params = array();
+		if( NULL !== $field_note )
+		{
+			$field_params['note'] = $field_note;
+		}
+
+		if( NULL !== $field_class )
+		{
+			$field_params['class'] = $field_class;
+		}
+
+		return $this->dayOfWeek_input( $field_name, $field_value, $field_label, $field_params );
 	}
 
 
 	/**
 	 * Builds a checkbox field
+	 *
+	 * @param string the name of the checkbox
+	 * @param boolean indicating if the checkbox must be checked by default
+	 * @param string label
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              'value': the value attribute of the checkbox (default 1)
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function checkbox_input( $field_name, $field_checked, $field_label, $field_params = array() )
+	{
+		$field_params['name'] = $field_name;
+		$field_params['label'] = $field_label;
+		$field_params['type'] = 'checkbox';
+
+		if( !isset($field_params['value']) )
+		{
+			$field_params['value'] = 1;
+		}
+
+		if( $field_checked )
+		{
+			$field_params['checked'] = 'checked';
+		}
+
+		if( !isset($field_params['class']) )
+		{
+			$field_params['class'] = 'checkbox';
+		}
+
+		return $this->input_field( $field_params );
+	}
+
+
+	/**
+	 * Builds a checkbox field
+	 *
+	 * @deprecated Deprecated by checkbox_input()
 	 *
 	 * @param string the name of the checkbox
 	 * @param boolean indicating if the checkbox must be checked
@@ -702,33 +853,25 @@ class Form extends Widget
 	function checkbox( $field_name, $field_checked, $field_label, $field_note = '',
 											$field_class = '', $field_value = 1 )
 	{
-		$r = $this->begin_field( $field_name, $field_label )
-				.'<input type="checkbox" class="checkbox"'
-				.' value="'.format_to_output($field_value,'formvalue').'"';
+		global $Debuglog;
+		$Debuglog->add( 'Form::checkbox()', 'deprecated function calls' );
 
-		if( !empty($field_class) )
-		{
-			$r .= ' class="'.$field_class.'"';
-		}
-		if( !empty($field_name) )
-		{
-			$r .= 'name="'.$field_name.'" id="'.$this->get_valid_id($field_name).'"';
-		}
-		if( $field_checked )
-		{
-			$r .= ' checked="checked" ';
-		}
-		$r .= " />\n".$this->end_field( $field_note );
+		$field_params = array();
 
-		if( $this->output )
+		if( $field_note !== '' )
 		{
-			echo $r;
-			return true;
+			$field_params['note'] = $field_note;
 		}
-		else
+		if( $field_class !== '' )
 		{
-			return $r;
+			$field_params['class'] = $field_class;
 		}
+		if( $field_value !== 1 )
+		{
+			$field_params['value'] = $field_value;
+		}
+
+		return $this->checkbox_input( $field_name, $field_checked, $field_label, $field_params );
 	}
 
 
@@ -747,6 +890,7 @@ class Form extends Widget
 	/**
 	 * Builds the form field
 	 *
+	 * @todo Use $form_params like $field_params for the other methods.
 	 * @param string the class to use for the form tag
 	 * @param string title to display on top of the form
 	 * @return mixed true (if output) or the generated HTML if not outputting
@@ -771,15 +915,7 @@ class Form extends Widget
 			$r .= $this->replace_vars( $this->title_fmt );
 		}
 
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->display_or_return( $r );
 	}
 
 
@@ -794,15 +930,15 @@ class Form extends Widget
 		$r = '';
 		if( !empty( $buttons ) )
 		{
-			$output = $this->output;
+			$save_output = $this->output;
 			$this->output = 0;
 
 			$r .= $this->buttons( $buttons );
 
-			$this->output = $output;
+			$this->output = $save_output;
 		}
 
-		while( $this->_opentags['fieldset']-- )
+		while( $this->_opentags['fieldset']-- > 0 )
 		{
 			$r .= "\n</fieldset>\n";
 		}
@@ -810,20 +946,14 @@ class Form extends Widget
 		$r .= $this->formend
 					."\n</form>\n\n";
 
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->display_or_return( $r );
 	}
 
 
 	/**
 	 * Builds the fieldset tag
+	 *
+	 * @todo Refactor to $field_params scheme (make this a stub for begin_fieldset())
 	 *
 	 * @param string the title of the fieldset
 	 * @param string the class of the fieldset
@@ -865,21 +995,14 @@ class Form extends Widget
 				$this->_opentags['fieldset']++;
 		}
 
-
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->display_or_return( $r );
 	}
 
 
 	/**
 	 * Ends the fieldset tag
+	 *
+	 * @todo Refactor to $field_params scheme (make this a stub for end_fieldset())
 	 *
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
@@ -896,15 +1019,7 @@ class Form extends Widget
 				$this->_opentags['fieldset']--;
 		}
 
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->display_or_return( $r );
 	}
 
 
@@ -919,6 +1034,7 @@ class Form extends Widget
 	 *  - an optional boolean indicating whether the box is disabled or not
 	 *  - an optional note
 	 *
+	 * @todo Transform to $field_params schema.
 	 * @param array a two-dimensional array containing the parameters of the input tag
 	 * @param string name
 	 * @param string label
@@ -977,20 +1093,33 @@ class Form extends Widget
 
 		$r .= $this->end_field();
 
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->display_or_return( $r );
 	}
 
 
 	/**
 	 * Display a select field and populate it with a callback function.
+	 *
+	 * @param string field name
+	 * @param string default field value
+	 * @param callback callback function
+	 * @param string field label to be display before the field
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              Nothing yet.
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function select_input( $field_name, $field_value, $field_list_callback, $field_label, $field_params = array() )
+	{
+		$field_options = call_user_func( $field_list_callback, $field_value );
+
+		return $this->select_input_options( $field_name, $field_options, $field_label, $field_params );
+	}
+
+
+	/**
+	 * Display a select field and populate it with a callback function.
+	 *
+	 * @deprecated Deprecated by {@link select_input()}
 	 *
 	 * @param string field name
 	 * @param string default field value
@@ -1010,17 +1139,75 @@ class Form extends Widget
 		$field_class = '',
 		$field_onchange = NULL )
 	{
-		$field_options = call_user_func( $field_list_callback, $field_value );
+		global $Debuglog;
+		$Debuglog->add( 'Form::select()', 'deprecated function calls' );
 
-		return $this->select_options( $field_name, $field_options, $field_label, $field_note, $field_class, $field_onchange );
+		$field_params = array();
+		if( $field_note !== '' )
+		{
+			$field_params['note'] = $field_note;
+		}
+		if( $field_class !== '' )
+		{
+			$field_params['class'] = $field_class;
+		}
+		if( $field_onchange !== NULL )
+		{
+			$field_params['onchange'] = $field_onchange;
+		}
+
+		return $this->select_input( $field_name, $field_value, $field_list_callback, $field_label, $field_params );
+	}
+
+
+	/**
+	 * Display a select field and populate it with a cache object by using a callback
+	 * method.
+	 *
+	 * @uses select_input_options()
+	 * @param string Field name
+	 * @param string Default field value
+	 * @param DataObjectCache Cache containing values for list
+	 * @param string Field label to be display with the field
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - 'allow_none': allow to select [none] in list (boolean, default false)
+	 *              - 'object_callback': Object's callback method name (string, default 'option_list_return')
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function select_input_object( $field_name, $field_value, & $field_object, $field_label, $field_params = array() )
+	{
+		if( isset($field_params['allow_none']) )
+		{
+			$allow_none = $field_params['allow_none'];
+			unset( $field_params['allow_none'] );
+		}
+		else
+		{
+			$allow_none = false;
+		}
+
+		if( isset($field_params['object_callback']) )
+		{
+			$field_object_callback = $field_params['object_callback'];
+			unset( $field_params['object_callback'] );
+		}
+		else
+		{
+			$field_object_callback = 'option_list_return';
+		}
+
+		$field_options = $field_object->$field_object_callback( $field_value, $allow_none );
+
+		return $this->select_input_options( $field_name, $field_options, $field_label, $field_params );
 	}
 
 
 	/**
 	 * Display a select field and populate it with a cache object.
 	 *
-	 * @todo Refactor to put $field_onchange after $field_class(?)
+	 * @deprecated Deprecated by {@link select_input_object()}
 	 *
+	 * @uses select_input_object()
 	 * @param string field name
 	 * @param string default field value
 	 * @param DataObjectCache Cache containing values for list
@@ -1043,9 +1230,17 @@ class Form extends Widget
 		$field_object_callback = 'option_list_return',
 		$field_onchange = NULL )
 	{
-		$field_options = $field_object->$field_object_callback( $field_value, $allow_none );
+		global $Debuglog;
+		$Debuglog->add( 'Form::select_object()', 'deprecated function calls' );
 
-		return $this->select_options( $field_name, $field_options, $field_label, $field_note, $field_class, $field_onchange );
+		$field_params = array(
+			'note' => $field_note,
+			'allow_none' => $allow_none,
+			'class' => $field_class,
+			'object_callback' => $field_object_callback,
+			'onchange' => $field_onchange );
+
+		return $this->select_input_object( $field_name, $field_value, $field_object, $field_label, $field_params  );
 	}
 
 
@@ -1055,8 +1250,36 @@ class Form extends Widget
 	 * @param string field name
 	 * @param string string containing options
 	 * @param string field label to be display before the field
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - 'label': Field label to be display before the field
+	 *              - 'class': CSS class for select
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function select_input_options( $field_name, & $field_options, $field_label, $field_params = array() )
+	{
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		$r = $this->begin_field()
+			."\n<select"
+			.$this->get_field_params_as_string($field_params).'>'
+			.$field_options
+			."</select>\n"
+			.$this->end_field();
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Display a select field and populate it with a cache object.
+	 *
+	 * @deprecated Deprecated by {@link select_input_options()}
+	 *
+	 * @uses select_input_options()
+	 * @param string field name
+	 * @param string string containing options
+	 * @param string field label to be display before the field
 	 * @param string note to be displayed after the field
-	 * @param boolean allow to select [none] in list
 	 * @param string CSS class for select
 	 * @param string Javascript to add for onchange event (trailing ";").
 	 * @return mixed true (if output) or the generated HTML if not outputting
@@ -1069,75 +1292,45 @@ class Form extends Widget
 		$field_class = NULL,
 		$field_onchange = NULL )
 	{
-		global $Request;
-		if( isset($Request->err_messages[$field_name]) )
-		{ // There is an error message for this field:
-			$field_class .= ' field_error';
-			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
-		}
+		global $Debuglog;
+		$Debuglog->add( 'Form::select_options()', 'deprecated function calls' );
 
-		$r = $this->begin_field( $field_name, $field_label )
-					."\n<select";
+		$field_params = array(
+			'note' => $field_note,
+			'class' => $field_class,
+			'onchange' => $field_onchange );
 
-		if( !empty($field_name) )
-		{
-			$r .= ' name="'.$field_name.'" id="'.$this->get_valid_id($field_name).'"';
-		}
-		if( !empty($field_class) )
-		{
-			$r .= ' class="'.$field_class.'"';
-		}
-		if( !empty( $field_onchange ) )
-		{
-			$r .= ' onchange="'.format_to_output( $field_onchange, 'htmlattr' ).'"';
-		}
-		$r .= '>'
-					.$field_options
-					."</select>\n";
-
-		$r .= $this->end_field( $field_note );
-
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->select_input_options( $field_name, $field_options, $field_label, $field_params );
 	}
 
 
 	/**
-	 * This is a stub for {@link select_options()} which builds the required list
+	 * This is a stub for {@link select_input_options()} which builds the required list
 	 * of <option> elements from a given list of options ($field_options) and
 	 * the selected value ($field_value).
 	 *
+	 * @uses select_input_options()
 	 * @param string field name
 	 * @param array Options. If an associative key (string) is used, this gets the value attribute.
-	 * @param mixed The selected value - if it's NULL, use the global variable named $field_name
-	 * @param string field label to be display before the field
-	 * @param string note to be displayed after the field
-	 * @param boolean allow to select [none] in list
-	 * @param string CSS class for select
-	 * @param string Javascript to add for onchange event (trailing ";").
+	 * @param string Field label to be display before the field
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - 'value': The selected value
+	 *              - Plus all of {@link select_input_options()}.
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function select_array(
-		$field_name,
-		$field_options,
-		$field_value = NULL,
-		$field_label = NULL,
-		$field_note = NULL,
-		$field_class = NULL,
-		$field_onchange = NULL )
+	function select_input_array( $field_name, $field_options, $field_label, $field_params = array() )
 	{
-		if( NULL === $field_value )
+		if( isset($field_params['value']) )
 		{
-			$field_value = isset( $GLOBALS[$field_name] ) ? $GLOBALS[$field_name] : NULL;
+			$field_value = $field_params['value'];
+			unset($field_params['value']); // not an attribute to <select>
+		}
+		else
+		{
+			$field_value = NULL;
 		}
 
+		// Build $options_list
 		$options_list = '';
 
 		foreach( $field_options as $l_key => $l_option )
@@ -1154,12 +1347,59 @@ class Form extends Widget
 			$options_list .= '>'.format_to_output($l_option).'</option>';
 		}
 
-		return $this->select_options( $field_name, $options_list, $field_label, $field_note, $field_class, $field_onchange );
+		return $this->select_input_options( $field_name, $options_list, $field_label, $field_params );
 	}
 
 
 	/**
 	 * Build a text area.
+	 *
+	 * @param string Name of the field
+	 * @param string Value of the field
+	 * @param integer Number of rows
+	 * @param string Label for the field
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - 'cols': Number of columns (integer, default 50)
+	 */
+	function textarea_input( $field_name, $field_value, $field_rows, $field_label, $field_params = array() )
+	{
+		global $img_url;
+
+		if( !isset($field_params['cols']) )
+		{
+			$field_params['cols'] = 50;
+		}
+
+		if( !isset($field_params['note_format']) )
+		{ // Default note_format for <textarea>:
+			$field_params['note_format'] = '<br/><span class="notes">%s</span>';
+		}
+
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		$r = $this->begin_field()
+			// NOTE: The following pixel is needed to avoid the dity IE textarea expansion bug
+			// see http://fplanque.net/2003/Articles/iecsstextarea/index.html
+			.'<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />'
+			.'<textarea'
+			.$this->get_field_params_as_string( $field_params )
+			.' rows="'.$field_rows.'">'
+			.format_to_output( $field_value, 'formvalue' )
+			.'</textarea>'
+			// NOTE: this one is for compensating the previous pixel in case of center aligns.
+			.'<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />'
+			.$this->end_field();
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Build a text area.
+	 *
+	 * @deprecated Deprecated by {@link textarea_input()}
+	 *
+	 * @uses {@link textarea_input()}
 	 *
 	 * @param string
 	 * @param string
@@ -1172,45 +1412,15 @@ class Form extends Widget
 	function textarea( $field_name, $field_value, $field_rows, $field_label,
 												$field_note = '', $field_cols = 50 , $field_class = '' )
 	{
-		global $img_url, $Request;
-		if( isset($Request->err_messages[$field_name]) )
-		{ // There is an error message for this field:
-			$field_class .= ' field_error';
-			$field_note .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
-		}
+		global $Debuglog;
+		$Debuglog->add( 'Form::textarea()', 'deprecated function calls' );
 
-		$r = $this->begin_field( $field_name, $field_label );
+		$field_params = array(
+			'note' => $field_note,
+			'cols' => $field_cols,
+			'class' => $field_class );
 
-		// NOTE: The following pixel is needed to avoid the dity IE textarea expansion bug
-		// see http://fplanque.net/2003/Articles/iecsstextarea/index.html
-		$r .= '<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />';
-
-		$r .= '<textarea';
-		if( !empty($field_name) )
-		{
-			$r .= ' name="'.$field_name.'" id="'.$this->get_valid_id($field_name).'"';
-		}
-		if( !empty($field_class) )
-		{
-			$r .= ' class="'.$field_class.'"';
-		}
-		$r .= ' rows="'.$field_rows.'" cols="'.$field_cols.'">'
-					.format_to_output( $field_value, 'formvalue' )
-					.'</textarea>'
-					// NOTE: this one is for compensating the previous pixel in case of center aligns.
-					.'<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />';
-
-		$r .= $this->end_field( $field_note, '<br/><span class="notes">%s</span>' );
-
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->textarea_input( $field_name, $field_value, $field_rows, $field_label, $field_params );
 	}
 
 
@@ -1225,11 +1435,28 @@ class Form extends Widget
 	 *
 	 * @param string the field label
 	 * @param string the field info
-	 * @param string see {@see format_to_output()}
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - 'format_info': Format of info content, see {@link format_to_output()} (string, default 'htmlbody')
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function info( $field_label, $field_info, $field_note = NULL, $format = 'htmlbody' )
+	function info_field( $field_label, $field_info, $field_params = array() )
 	{
+		if( isset($field_params['format_info']) )
+		{
+			$format_info = $field_params['format_info'];
+			unset($field_params['format_info']); // not an HTML element
+		}
+		else
+		{
+			$format_info = 'htmlbody';
+		}
+		if( !isset($field_params['note_format']) )
+		{ // Default field_note for info:
+			$field_params['note_format'] = ' <small class="notes">%s</small>';
+		}
+
+		$this->handle_common_params( $field_params, NULL, $field_label );
+
 		$r = $this->fieldstart;
 
 		if( !empty($field_label) )
@@ -1246,23 +1473,39 @@ class Form extends Widget
 		$r .= $this->inputstart;
 
 		// PAYLOAD:
-		$r .= format_to_output( $field_info, $format );
+		$r .= format_to_output( $field_info, $format_info );
 
 		// end field (Label always to the left!)
 		$old_label_to_the_left = $this->label_to_the_left;
 		$this->label_to_the_left = true;
-		$r .= $this->end_field( $field_note, ' <small class="notes">%s</small>' );
+		$r .= $this->end_field();
 		$this->label_to_the_left = $old_label_to_the_left;
 
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Builds an info field.
+	 * An info field is a fieldset containing a label div and an info div.
+	 *
+	 * @deprecated Deprecated by {@link info_field()}
+	 *
+	 * @param string the field label
+	 * @param string the field info
+	 * @param string see {@link format_to_output()}
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function info( $field_label, $field_info, $field_note = NULL, $format = 'htmlbody' )
+	{
+		global $Debuglog;
+		$Debuglog->add( 'Form::info()', 'deprecated function calls' );
+
+		$field_params = array(
+			'note' => $field_note,
+			'format_info' => $format );
+
+		return $this->info_field( $field_label, $field_info, $field_params );
 	}
 
 
@@ -1311,15 +1554,27 @@ class Form extends Widget
 			$r = $this->buttonsstart.$r.$this->buttonsend;
 		}
 
-		if( $this->output )
-		{
-			echo $r;
-			return true;
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Builds a button.
+	 *
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - type: The type attribute (string, default 'submit')
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function button_input( $field_params = array() )
+	{
+		if( !isset($field_params['type']) )
+		{ // set default type
+			$field_params['type'] = 'submit';
 		}
-		else
-		{
-			return $r;
-		}
+
+		$field_params['input_prefix'] = "\t\t\t";
+
+		return $this->display_or_return( $this->get_input_element( $field_params ) );
 	}
 
 
@@ -1334,111 +1589,92 @@ class Form extends Widget
 	 *  - the onclick attribute (optional)
 	 *  - the style (optional)
 	 *
+	 * @deprecated Deprecated by {@link button_input()}
+	 *
 	 * @param array a two-dimension array containing the elements of the input tags
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function button( $options )
 	{
+		global $Debuglog;
+		$Debuglog->add( 'Form::button()', 'deprecated function calls' );
 
-		$r = "\t\t\t".'<input type="';
+		$field_params = array();
 
-		if( !empty($options[0]) )
-		{ //a type has been specified
-			$r .= $options[0].'" ';
-		}
-		else
-		{ //set default type
-			$r .= 'submit" ';
-		}
-
-		if( !empty($options[1]) )
-		{ //a name has been specified
-			$r .= ' id="'.$this->get_valid_id($options[1]).'" ';
-			$r .= ' name="'.$options[1].'" ';
-		}
-
-		if( !empty($options[2]) )
-		{ //a value has been specified
-			$r .= ' value="'.$options[2].'" ';
-		}
-
-		if( !empty($options[3]) )
-		{ //a class has been specified
-			$r .= ' class="'.$options[3].'" ';
-		}
-
-		if( !empty($options[4]) )
-		{ //an onclick action has been specified
-			$r .= ' onclick="'.$options[4].'" ';
-		}
-
-		if( !empty($options[5]) )
-		{ // style supplied
-			$r .= ' style="'.$options[5].'" ';
-		}
-		$r .= " />\n";
-
-		if( $this->output )
+		if( empty($options[0]) )
 		{
-			echo $r;
-			return true;
+			$field_params['type'] = 'submit';
 		}
 		else
 		{
-			return $r;
+			$field_params['type'] = $options[0];
 		}
+		if( isset($options[1]) )
+		{
+			$field_params['name'] = $options[1];
+		}
+		if( isset($options[2]) )
+		{
+			$field_params['value'] = $options[2];
+		}
+		if( isset($options[3]) )
+		{
+			$field_params['class'] = $options[3];
+		}
+		if( isset($options[4]) )
+		{
+			$field_params['onclick'] = $options[4];
+		}
+		if( isset($options[5]) )
+		{
+			$field_params['style'] = $options[5];
+		}
+
+		return $this->button_input( $field_params );
 	}
 
 
 	/**
-	 * Builds an hidden input tag
+	 * Builds an hidden input tag.
 	 *
-	 * the array must contain :
-	 *  - the name (optional)
-	 *  - the value (optional)
-	 *  - the class (optional)
-	 *  - the onclick attribute (optional)
-	 *  - the style (optional)
-	 *
+	 * @param string Field name
+	 * @param string Field value
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              Nothing yet.
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function hidden( $field_name, $field_value )
+	function hidden( $field_name, $field_value, $field_params = array() )
 	{
-		$r = '<input type="hidden" name="'.$field_name.'" value="'.$field_value.'" />';
+		$field_params['name'] = $field_name;
+		$field_params['type'] = 'hidden';
+		$field_params['value'] = $field_value;
 
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->display_or_return( $this->get_input_element( $field_params ) );
 	}
 
 
 	/**
+	 * Builds a list of hidden inputs.
 	 *
+	 * @param array Array of parameters to {@link hidden()}:
+	 *               - 0: field_name
+	 *               - 1: field_value
+	 *               - 2: field_params
+	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function hiddens( $hiddens )
 	{
 		$r = '';
 
+		$save_output = $this->output;
+		$this->output = false;
 		foreach( $hiddens as $hidden )
 		{
-			$r .= '<input type="hidden" name="'.$hidden[0].'" value="'.$hidden[1].'" />';
+			$r .= $this->hidden( $hidden[0], $hidden[1], isset($hidden[2]) ? $hidden[2] : array() );
 		}
+		$this->output = $save_output;
 
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->display_or_return( $r );
 	}
 
 
@@ -1452,46 +1688,143 @@ class Form extends Widget
 	 *  - the onclick attribute (optional)
 	 *  - the style (optional)
 	 *
-	 * @todo inconsistent parameters!
 	 * @todo Use <div class="input"> for layout == 'fieldset' (property).
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              Nothing yet.
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function submit_input( $field_params = array() )
+	{
+		$field_params['type'] = 'submit';
+
+		return $this->button_input( $field_params );
+	}
+
+
+	/**
+	 * Builds a submit input tag
+	 *
+	 * the array must contain :
+	 *  - the name (optional)
+	 *  - the value (optional)
+	 *  - the class (optional)
+	 *  - the onclick attribute (optional)
+	 *  - the style (optional)
+	 *
+	 * @deprecated Deprecated by {@link submit_input()}
 	 * @param array an array containing the elements of the input tags
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function submit( $options )
 	{
-		$hidden_fields = array();
-		$i = 1;
-		$r = '';
+		global $Debuglog;
+		$Debuglog->add( 'Form::submit()', 'deprecated function calls' );
 
-		$submit_fields[0] = '';
+		array_unshift( $options, 'submit' );
 
-		foreach( $options as $option )
-		{ // construction of the option array for the button method
-			$submit_fields[$i] = $option;
-			$i++;
-		}
-
-		$output = $this->output;
-		$this->output = 0;
-		$r .= $this->button( $submit_fields ); //call to the button method to build input tags
-		$this->output = $output;
-
-		if( $this->output )
-		{
-			echo $r;
-			return true;
-		}
-		else
-		{
-			return $r;
-		}
+		return $this->button( $options );
 	}
 
 
 	/**
 	 * Generate set of radio options.
 	 *
-	 * {@internal form_radio(-)}}
+	 * @param string The name of the radio options
+	 * @param string The checked option
+	 * @param array of arrays The radio options (keys: 'value', 'label', 'params' (array)).
+	 *                        - 'params':
+	 *                          - 'note': Note for the option (string)
+	 *                          - 'input_suffix' (additional HTML [input field, ..])
+	 *                          - Plus everything for {@link get_input_element()} )
+	 * @param string Label
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - lines: Options on seperate lines (DIVs) (boolean, default false)
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function radio_input( $field_name, $field_value, $field_options, $field_label, $field_params = array() )
+	{
+		if( isset($field_params['lines']) )
+		{
+			$field_lines = $field_params['lines'];
+			unset($field_params['lines']); // no HTML attribute
+		}
+		else
+		{
+			$field_lines = false;
+		}
+
+		if( !isset($field_params['note_format']) )
+		{ // Default field_note for radios:
+			$field_params['note_format'] = '<div><span class="notes">%s</span></div>';
+		}
+
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		$r = $this->begin_field();
+
+		foreach( $field_options as $loop_field_option )
+		{
+			if( $field_lines ) $r .= "<div>\n";
+
+			$input_params = isset( $loop_field_option['params'] )
+				? $loop_field_option['params']
+				: array();
+
+			$input_params = array_merge(
+				array(
+					'type' => 'radio',
+					'class' => 'radio',
+					'name' => $field_name,
+					'value' => $loop_field_option['value'],
+					'id' => '', // no ID for radio inputs
+				),
+				$input_params );
+
+			if( $field_value == $loop_field_option['value'] )
+			{ // Current selection:
+				$input_params['checked'] = 'checked';
+			}
+
+			if( isset($input_params['radio_suffix']) )
+			{
+				$radio_suffix = ' '.$input_params['radio_suffix'];
+				unset($input_params['radio_suffix']); // no HTML attribute
+			}
+			else
+			{
+				$radio_suffix = '';
+			}
+
+			$input_params['input_suffix'] = ' '.$loop_field_option['label'];
+
+			$r .= '<label class="radiooption">'
+				.$this->get_input_element( $input_params )
+				.'</label>'
+				.$radio_suffix;
+
+			if( !empty( $loop_field_option['note'] ) )
+			{ // notes for radio option
+				$r .= '<span class="notes">'.$loop_field_option['note'].'</span>';
+			}
+			if( !empty( $loop_field_option['suffix'] ) )
+			{ // optional text for radio option (like additional fieldsets or input boxes)
+				$r .= $loop_field_option['suffix'];
+			}
+
+			if( $field_lines ) $r .= "</div>\n";
+		}
+
+		$r .= $this->end_field();
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Generate set of radio options.
+	 *
+	 * @deprecated Deprecated by {@link radio_input()}
+	 *
 	 * @param string the name of the radio options
 	 * @param string the checked option
 	 * @param array of arrays the radio options (0: value, 1: label, 2: notes, 3: additional HTML [input field, ..], 4: attribs for <input tag> )
@@ -1508,43 +1841,102 @@ class Form extends Widget
 		$field_lines = false,
 		$field_note = '' )
 	{
-		$r = $this->begin_field( $field_name, $field_label );
+		$new_field_options = array();
 
-		foreach( $field_options as $loop_field_option )
+		foreach( $field_options as $l_key => $l_options )
 		{
-			if( $field_lines ) $r .= "<div>\n";
+			$l_params = array();
 
-			$r .= '<label class="radiooption"><input type="radio" class="radio" name="'.$field_name.'" value="'.format_to_output( $loop_field_option[0], 'formvalue' ).'"';
-			if( $field_value == $loop_field_option[0] )
-			{ // Current selection:
-				$r .= ' checked="checked"';
+			if( isset($l_options[2]) )
+			{
+				$l_params['note'] = $l_options[2];
 			}
-			if( !empty( $loop_field_option[4] ) )
-				$r .= ' '.$loop_field_option[4];
-			$r .= ' /> '.$loop_field_option[1].'</label>';
-			if( !empty( $loop_field_option[2] ) )
-			{ // notes for radio option
-				$r .= '<span class="notes">'.$loop_field_option[2].'</span>';
+			if( isset($l_options[3]) )
+			{
+				$l_params['radio_suffix'] = $l_options[3];
 			}
-			if( !empty( $loop_field_option[3] ) )
-			{ // optional text for radio option (like additional fieldsets or input boxes)
-				$r .= $loop_field_option[3];
+			if( isset($l_options[4]) )
+			{ // Convert "inline attribs" to params array
+				preg_match_all( '#(\w+)=[\'"](.*)[\'"]#', $l_options[4], $matches, PREG_SET_ORDER );
+
+				foreach( $matches as $l_set_nr => $l_match )
+				{
+					$l_params[$l_match[1]] = $l_match[2];
+				}
 			}
 
-			if( $field_lines ) $r .= "</div>\n";
+			$new_field_options[$l_key] = array(
+				'value' => $l_options[0],
+				'label' => $l_options[1],
+				'params' => $l_params );
 		}
 
-		$r .= $this->end_field( $field_note, '<div><span class="notes">%s</span></div>' );
+		$field_params = array( 'lines' => $field_lines );
 
-		if( $this->output )
+		return $this->radio_input( $field_name, $field_value, $new_field_options, $field_label, $field_params );
+	}
+
+
+	/**
+	 * Generate a general input field.
+	 *
+	 * This is the base function for text_input(), checkbox_input(), ..
+	 *
+	 * @uses get_input_element() to generate the <input> element
+	 *
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - see {@link get_input_element()}
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function input_field( $field_params = array() )
+	{
+		$element = $this->get_input_element($field_params);
+
+		$r = $this->begin_field()
+				.$element
+				.$this->end_field();
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Generate a general input element.
+	 *
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - input_prefix: Text before <input /> (string, default '')
+	 *              - input_suffix: Text after <input /> (string, default "\n")
+	 * @return string The <input /> element.
+	 */
+	function get_input_element( $field_params = array(), $depr_attribs = '' )
+	{
+		$this->handle_common_params( $field_params );
+
+		if( isset($field_params['input_prefix']) )
 		{
-			echo $r;
-			return true;
+			$input_prefix = $field_params['input_prefix'];
+			unset($field_params['input_prefix']); // no HTML attribute
 		}
 		else
 		{
-			return $r;
+			$input_prefix = '';
 		}
+
+		if( isset($field_params['input_suffix']) )
+		{
+			$input_suffix = $field_params['input_suffix'];
+			unset($field_params['input_suffix']); // no HTML attribute
+		}
+		else
+		{
+			$input_suffix = "\n";
+		}
+
+		$r = $input_prefix
+			.'<input'.$this->get_field_params_as_string( $field_params ).' />'
+			.$input_suffix;
+
+		return $r;
 	}
 
 
@@ -1570,11 +1962,18 @@ class Form extends Widget
 	{
 		$r = '';
 
-		if( !empty($this->field_label) )
+		if( !empty($this->_common_params['label']) )
 		{
 			// $this->empty_label = true; // Memorize this
 			$r .= $this->labelstart
-						.'<label for="'.$this->field_name.'">'.$this->field_label.$this->label_suffix.'</label>'
+						.'<label'
+						.( !empty($this->_common_params['id'])
+							? ' for="'.$this->_common_params['id'].'"'
+							: '' )
+						.'">'
+						.$this->_common_params['label']
+						.$this->label_suffix
+						.'</label>'
 						.$this->labelend;
 		}
 		else
@@ -1584,6 +1983,125 @@ class Form extends Widget
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Extract common params out of $field_params into {@link $_common_params} and unsets them in $field_params.
+	 *
+	 * Also handles adding errors from {@link $Request} to the note.
+	 *
+	 * @access protected
+	 * @param array An array passed to a field generating function like {@link text_input()}. By reference!
+	 * @param string|NULL The name of the field. If not empty it gets used to build the id attribute.
+	 */
+	function handle_common_params( & $field_params, $field_name = NULL, $field_label = NULL )
+	{
+		global $Request;
+
+		#pre_dump( 'handle_common_params (before)', $field_params );
+
+		$this->_common_params = array(); // Reset
+
+		// Copy optional variables, if given:
+		if( NULL !== $field_name )
+		{
+			$field_params['name'] = $field_name;
+		}
+		if( NULL !== $field_label )
+		{
+			$field_params['label'] = $field_label;
+		}
+
+		if( isset($field_params['note']) )
+		{
+			$this->_common_params['note'] = $field_params['note'];
+			unset($field_params['note']); // no HTML attribute
+		}
+		else
+		{
+			$this->_common_params['note'] = NULL;
+		}
+
+		if( isset($field_params['note_format']) )
+		{
+			$this->_common_params['note_format'] = $field_params['note_format'];
+			unset($field_params['note_format']); // no HTML attribute
+		}
+		else
+		{
+			$this->_common_params['note_format'] = $this->note_format;
+		}
+
+		if( isset($field_params['label']) )
+		{
+			$this->_common_params['label'] = $field_params['label'];
+			unset($field_params['label']); // no HTML attribute
+		}
+		else
+		{
+			$this->_common_params['label'] = '';
+		}
+
+		if( !empty($field_params['name']) )
+		{
+			if( !isset($field_params['id'])
+					&& ( empty($field_params['type']) || $field_params['type'] != 'hidden' ) )
+			{ // Save ID with field_params and _common_params (for get_label())
+				$field_params['id'] = $this->_common_params['id'] = $this->get_valid_id($field_params['name']);
+			}
+		}
+
+		// Error handling:
+		if( isset($Request->err_messages[$field_name]) )
+		{ // There is an error message for this field:
+			$field_params['class'] = isset( $field_params['class'] )
+				? $field_params['class'].' field_error'
+				: 'field_error';
+
+			$this->_common_params['note'] .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
+		}
+
+		#pre_dump( 'handle_common_params (after)', $field_params );
+	}
+
+
+	/**
+	 * Build a string out of $field_params, with each attribute
+	 * prefixed by a space character.
+	 *
+	 * @param array Array of field params.
+	 * @return string
+	 */
+	function get_field_params_as_string( $field_params )
+	{
+		$r = '';
+
+		foreach( $field_params as $l_attr => $l_value )
+		{
+			$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
+		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Display or return, according to {@link $output}.
+	 *
+	 * @return true|string True, if we want to display, the string if not.
+	 */
+	function display_or_return( $r )
+	{
+		if( $this->output )
+		{
+			echo $r;
+			return true;
+		}
+		else
+		{
+			return $r;
+		}
 	}
 }
 
