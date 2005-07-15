@@ -961,7 +961,7 @@ class AdminUI_general
 	 */
 	function addPath( $path, $pathProps = array() )
 	{
-		$search_patch = $this->path;
+		$search_path = $this->path;
 		$search_path[] = $path;
 		// auto-detect path props from menu entries
 		if( $node =& $this->get_node_by_path( $search_path ) )
@@ -1093,6 +1093,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.29  2005/07/15 16:41:50  fplanque
+ * fixed typo
+ *
  * Revision 1.28  2005/07/14 21:03:31  blueyed
  * Fixed notice with array_merge() again.
  *
