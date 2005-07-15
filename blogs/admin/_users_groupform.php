@@ -69,12 +69,13 @@ $Form->fieldset_end();
 $perm_none_option = array( 'none', '<acronym title="'.T_('No Access').'">'.T_('None').'</acronym>' );
 $perm_list_option = array( 'list', '<acronym title="'.T_('View list only').'">'.T_('List').'</acronym>' );
 $perm_view_option = array( 'view', '<acronym title="'.T_('View details').'">'.T_('View').'</acronym>' );
+$perm_add_option = array( 'add',  '<acronym title="'.T_('Add &amp; edit/delete self created').'">'.T_('Add').'</acronym>' );
 $perm_edit_option = array( 'edit', '<acronym title="'.T_('Edit/delete all').'">'.T_('Edit').'</acronym>' );
 $standard_perm_options = array(
 							$perm_none_option,
 							$perm_list_option,
 							$perm_view_option,
-							array( 'add',  '<acronym title="'.T_('Add &amp; edit/delete self created').'">'.T_('Add').'</acronym>' ),
+							$perm_add_option,
 							$perm_edit_option
 						);
 
@@ -147,6 +148,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.33  2005/07/15 18:12:33  fplanque
+ * no message
+ *
  * Revision 1.32  2005/06/20 17:40:14  fplanque
  * minor
  *
