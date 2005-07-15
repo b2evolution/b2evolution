@@ -291,7 +291,7 @@ class DB
 	/**
 	 * Print SQL/DB error.
 	 */
-	function print_error( $str = '' )
+	function print_error( $str = '', $query_title = '' )
 	{
 		// All errors go to the global error array $EZSQL_ERROR..
 		global $EZSQL_ERROR;
@@ -315,7 +315,7 @@ class DB
 			echo '<div class="error">';
 			echo '<p class="error">', T_('MySQL error!'), '</p>';
 			echo '<p>', $this->last_error, '</p>';
-			if( !empty($this->last_query) ) echo '<p class="error">Your query:<br /><code>'. $this->last_query. '</code></p>';
+			if( !empty($this->last_query) ) echo '<p class="error">Your query: '.$query_title.'<br /><code>'. $this->last_query. '</code></p>';
 
 			if( function_exists( 'xdebug_is_enabled' ) && xdebug_is_enabled() )
 			{
@@ -426,7 +426,7 @@ class DB
 		// If there is an error then take note of it..
 		if ( mysql_error() )
 		{
-			$this->print_error();
+			$this->print_error( '', $title );
 			return false;
 		}
 
@@ -898,6 +898,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.18  2005/07/15 18:11:16  fplanque
+ * output debug context
+ *
  * Revision 1.17  2005/07/12 23:05:36  blueyed
  * Added Timer class with categories 'main' and 'sql_queries' for now.
  *
