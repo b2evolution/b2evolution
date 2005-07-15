@@ -582,11 +582,7 @@ class Form extends Widget
 						cal_'.$field_name.".setTodayText('".TS_('Today')."');
 						// -->
 					</script>\n"
-				.'<input type="text" name="'.$field_name.'" id="'.$this->get_valid_id($field_name).'"
-					size="'.$field_size.'" maxlength="'.$field_size.'" value="'.format_to_output($field_value, 'formvalue').'"';
-
-		$r .= $this->get_field_params_as_string( $field_params )
-				." />\n"
+				.$this->get_input_element($field_params)
 				.'<a href="#" onclick="cal_'.$field_name.'.select('.$this->form_name.'.'.$field_name.",'anchor_".$field_name."', '".$date_format."');"
 				.' return false;" name="anchor_'.$field_name.'" id="anchor_'.$this->get_valid_id($field_name).'">'.T_('Select').'</a>';
 
@@ -1776,7 +1772,6 @@ class Form extends Widget
 					'class' => 'radio',
 					'name' => $field_name,
 					'value' => $loop_field_option['value'],
-					'id' => '', // no ID for radio inputs
 				),
 				$input_params );
 
@@ -2043,10 +2038,13 @@ class Form extends Widget
 			$this->_common_params['label'] = '';
 		}
 
-		if( !empty($field_params['name']) )
-		{
-			if( !isset($field_params['id'])
-					&& ( empty($field_params['type']) || $field_params['type'] != 'hidden' ) )
+		if( !empty($field_params['name']) && !isset($field_params['id']) )
+		{ // Autogenerate id attrib (not for hidden, radio and submit types)
+			if( empty($field_params['type'])
+					|| ( $field_params['type'] != 'hidden'
+								&& $field_params['type'] != 'radio'
+								&& $field_params['type'] != 'submit'
+								) )
 			{ // Save ID with field_params and _common_params (for get_label())
 				$field_params['id'] = $this->_common_params['id'] = $this->get_valid_id($field_params['name']);
 			}
@@ -2079,7 +2077,10 @@ class Form extends Widget
 
 		foreach( $field_params as $l_attr => $l_value )
 		{
-			$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
+			if( $l_value !== '' )
+			{ // don't generate empty attributes
+				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
+			}
 		}
 
 		return $r;
