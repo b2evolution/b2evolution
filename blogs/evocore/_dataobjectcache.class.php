@@ -170,12 +170,30 @@ class DataObjectCache
 	 */
 	function add( & $Obj )
 	{
-		if( isset($Obj->ID) && $Obj->ID != 0 )
-		{	// If the object wasn't already cached and is valid:
+		if( !empty($Obj->ID) && !isset($this->cache[$Obj->ID]) )
+		{	// If the object is valid and not already cached:
 			$this->cache[$Obj->ID] = & $Obj;
 			return true;
 		}
 		return false;
+	}
+
+
+	/**
+	 * Instantiate a DataObject from a table row and then cache it.
+	 *
+	 * @param Object Database row
+	 */
+	function instantiate( & $db_row )
+	{
+		// Get ID of the object we'ere preparing to instantiate...
+		$obj_ID = $db_row->{$this->dbIDname};
+
+ 		if( !empty($obj_ID) && !isset($this->cache[$obj_ID]) )
+		{	// If the object ID is valid and not already cached:
+			$Obj = new $this->objtype( $db_row ); // COPY !!
+			$this->add( $Obj );
+		}
 	}
 
 
@@ -334,6 +352,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.20  2005/07/15 18:10:07  fplanque
+ * allow instantiating of member objects (used for preloads)
+ *
  * Revision 1.19  2005/06/10 18:25:44  fplanque
  * refactoring
  *
