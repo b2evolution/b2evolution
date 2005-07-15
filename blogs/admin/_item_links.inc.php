@@ -90,12 +90,20 @@ if( false )
 							'td' => '%display_link( {row} )%',
 						);
 
- 	$Results->cols[] = array(
-							'th' => T_('Unlink'),
-							'td_start' => '<td class="lastcol shrinkwrap">',
-							'td' => action_icon( T_('Delete this link!'), 'unlink',
-                        '%regenerate_url( \'tsk_ID,action\', \'link_ID=$link_ID$&amp;action=delete_link\')%' ),
-						);
+	if( $current_User->check_perm( $perm_name, 'edit', false, $edited_Item->ID ) )
+	{	// Check that we have permission to edit item:
+	 	$Results->cols[] = array(
+								'th' => T_('Unlink'),
+								'td_start' => '<td class="lastcol shrinkwrap">',
+								'td' => action_icon( T_('Delete this link!'), 'unlink',
+	                        '%regenerate_url( \'tsk_ID,action\', \'link_ID=$link_ID$&amp;action=delete_link\')%' ),
+							);
+	}
+	else
+	{
+		$Results->cols[0]['th_start'] = '<th class="firstcol lastcol">';
+		$Results->cols[0]['td_start'] = '<td class="firstcol lastcol">';
+	}
 
 	if( isset( $db_aliases['T_firms'] ) )
 	{	// This application handles firms:
@@ -112,13 +120,16 @@ if( false )
 		$Results->global_icon( T_('Link an existing establishment...'), 'link',
 													'?tsk_ID='.$edited_Item->ID.'&amp;action=link_establishment', T_('Establishment') );
 	}
-	if( isset( $db_aliases['T_tasks'] ) )
+	if( isset( $db_aliases['T_tasks'] ) && $current_User->check_perm( 'tasks', 'list', false, NULL ) )
 	{	// This application handles tasks:
 		$Results->global_icon( T_('Link an existing task...'), 'link',
 													'?tsk_ID='.$edited_Item->ID.'&amp;action=link_task', T_('Task') );
 	}
-	$Results->global_icon( T_('Link a file...'), 'link',
-													'files.php?fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('File') );
+	if( $current_User->check_perm( 'files', 'view' ) )
+	{
+		$Results->global_icon( T_('Link a file...'), 'link',
+														'files.php?fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('File') );
+	}
 
 	$Results->display();
 
