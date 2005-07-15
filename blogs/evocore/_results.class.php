@@ -61,6 +61,13 @@ class Results extends Widget
 	var $rows = NULL;
 
 	/**
+	 * Cache to use to instantiate an object and cache it for each line of results.
+	 *
+	 * For this to work, all columns of the related table must be selected n the query
+	 */
+	var $Cache = NULL;
+
+	/**
 	 * Definitions for each column:
 	 * -th
 	 * -td
@@ -197,6 +204,41 @@ class Results extends Widget
 		if( is_null( $this->rows ) )
 		{ // Query has not executed yet:
 
+			// Make sure we have colum definitions:
+			if( is_null( $this->cols ) )
+			{ // Let's create default column definitions:
+				$this->cols = array();
+
+				if( !preg_match( '#SELECT \s+ (.+?) \s+ FROM#six', $this->sql, $matches ) )
+				{
+					die( 'No SELECT clause!' );
+				}
+
+				// Split requested columns by commata
+				foreach( preg_split( '#\s*,\s*#', $matches[1] ) as $l_select )
+				{
+					if( is_numeric( $l_select ) )
+					{ // just a single value (would produce parse error as '$x$')
+						$this->cols[] = array( 'td' => $l_select );
+					}
+					elseif( preg_match( '#^(\w+)$#i', $l_select, $match ) )
+					{ // regular column
+						$this->cols[] = array( 'td' => '$'.$match[1].'$' );
+					}
+					elseif( preg_match( '#^(.*?) AS (\w+)#i', $l_select, $match ) )
+					{ // aliased column
+						$this->cols[] = array( 'td' => '$'.$match[2].'$' );
+					}
+				}
+
+				if( !isset($this->cols[0]) )
+				{
+					die( 'No columns selected!' );
+				}
+			}
+
+
+
 			$this->asc = ' ASC ';
 
 			if( $this->order !== '' )
@@ -296,6 +338,26 @@ class Results extends Widget
 
 
 	/**
+	 * @params DataObjectCache
+	 */
+	function instantiate_page_to_Cache( & $Cache )
+	{
+		$this->Cache = & $Cache;
+
+		// Make sure query has executed and we're at the top of the resultset:
+		$this->restart();
+
+		foreach( $this->rows as $row )
+		{ // For each row/line:
+
+			// Instantiate an object for the row and cache it:
+			$this->Cache->instantiate( $row );
+		}
+
+	}
+
+
+	/**
 	 * Display paged list/table based on object parameters
 	 *
 	 * This is the meat of this class!
@@ -319,39 +381,6 @@ class Results extends Widget
 		// Make sure query has executed and we're at the top of the resultset:
 		$this->restart();
 
-
-		// Make sure we have colum definitions:
-		if( is_null( $this->cols ) )
-		{ // Let's create default column definitions:
-			$this->cols = array();
-
-			if( !preg_match( '#SELECT \s+ (.+?) \s+ FROM#six', $this->sql, $matches ) )
-			{
-				die( 'No SELECT clause!' );
-			}
-
-			// Split requested columns by commata
-			foreach( preg_split( '#\s*,\s*#', $matches[1] ) as $l_select )
-			{
-				if( is_numeric( $l_select ) )
-				{ // just a single value (would produce parse error as '$x$')
-					$this->cols[] = array( 'td' => $l_select );
-				}
-				elseif( preg_match( '#^(\w+)$#i', $l_select, $match ) )
-				{ // regular column
-					$this->cols[] = array( 'td' => '$'.$match[1].'$' );
-				}
-				elseif( preg_match( '#^(.*?) AS (\w+)#i', $l_select, $match ) )
-				{ // aliased column
-					$this->cols[] = array( 'td' => '$'.$match[2].'$' );
-				}
-			}
-
-			if( !isset($this->cols[0]) )
-			{
-				die( 'No columns selected!' );
-			}
-		}
 
 		// -------------------------
 		// Proceed with display:
@@ -471,7 +500,7 @@ class Results extends Widget
 				$color_desc = '';
 
 				for( $i = 0, $icount = count($this->cols); $i < $icount; $i++)
-				{ //construction of the values which can be taken by $order
+				{ // construction of the values which can be taken by $order
 					if( !empty( $this->default_col ) && !strcasecmp( $col['order'], $this->default_col ) )
 					{ // there is a default order
 						$order_asc.='A';
@@ -528,7 +557,6 @@ class Results extends Widget
 				}
 				elseif( $this->params['sort_type'] == 'basic' )
 				{ // basic sort mode:
-
 					if( $asc_status == 'off' && $desc_status == 'off' )
 					{ // the sorting is not made on the current column
 						$sort_item = $this->params['basic_sort_off'];
@@ -631,8 +659,14 @@ class Results extends Widget
 			 * Data row stuff:
 			 */
 			if( !empty($this->ID_col) && empty($row->{$this->ID_col}) )
-			{	// We have detected an empty data row which we want to ignore...
+			{	// We have detected an empty data row which we want to ignore... (happens with empty groups)
 				continue;
+			}
+
+
+			if( ! is_null( $this->Cache ) )
+			{ // We want to instantiate an object for the row and cache it:
+				$this->Cache->instantiate( $row );
 			}
 
 
@@ -757,6 +791,9 @@ class Results extends Widget
 	}
 
 
+	/**
+	 * Handle variable subtitutions for column contents:
+	 */
 	function parse_col_content( $content )
 	{
 		// Make variable substitution for STRINGS:
@@ -1071,6 +1108,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.28  2005/07/15 18:12:01  fplanque
+ * option to preload results objects to cache
+ *
  * Revision 1.27  2005/06/27 23:59:25  blueyed
  * display(): fixes parse error for selecting straight value, supports "x AS y" selects
  *
