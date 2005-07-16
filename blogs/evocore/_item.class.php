@@ -1508,9 +1508,11 @@ class Item extends DataObject
 
 		if( !$atLeastOneRenderer )
 		{
-			global $admin_url;
-			echo '<a title="Configure plugins" href="'
-				.$admin_url.'plugins.php">'.T_('No renderer plugins are installed.').'</a>';
+			global $admin_url, $mode;
+			echo '<a title="'.T_('Configure plugins').'" href="'
+				.$admin_url.'plugins.php"'
+				.( $mode == 'sidebar' ? ' onclick="pop_up_window(\''.$admin_url.'plugins.php\'); return false;"' : '' )
+				.'>'.T_('No renderer plugins are installed.').'</a>';
 		}
 	}
 
@@ -2172,6 +2174,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.49  2005/07/16 19:00:21  blueyed
+ * Open 'Configure plugins' in a new JS popup window when in sidebar-mode.
+ *
  * Revision 1.48  2005/07/10 00:55:11  blueyed
  * Fixed more PHP5 notices with ->AssignedUser and renamed it to ->assigned_User.
  *
