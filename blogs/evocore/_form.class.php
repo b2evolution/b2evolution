@@ -1506,44 +1506,46 @@ class Form extends Widget
 
 
 	/**
-	 * Builds a button list
+	 * Builds a button list.
 	 *
-	 * the two-dimension array must contain :
-	 *  - the button type
-	 *  - the name (optional)
-	 *  - the value (optional)
-	 *  - the class (optional)
-	 *  - the onclick attribute (optional)
+	 * The array contains an associative array for each button (params to {@link button_input()}.
 	 *
 	 * @param array a two-dimension array containing the elements of the input tags
-	 * @param boolean to select or not the default display
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function buttons( $options = '' )
+	function buttons_input( $buttons = array() )
 	{
 		$r = '';
-		$hidden = 1; // boolean that tests if the buttons are all hidden
+		$hidden = true; // boolean that tests if the buttons are all hidden
 
-		if( !empty( $options ) )
+		$save_output = $this->output;
+		$this->output = false;
+
+		foreach( $buttons as $l_button )
 		{
-			foreach( $options as $options )
-			{
-				if( $options[0] != 'hidden' )
-				{ //test if the current button is hidden and sets $hidden to 0 if not
-					$hidden = 0;
-				}
-				$output = $this->output;
-				$this->output = 0;
-				$r .= $this->button( $options ); //call to the button method to build input tags
-				$this->output = $output;
+			if( !isset($l_button['type']) || $l_button['type'] != 'hidden' )
+			{ // not a hidden button
+				$hidden = false;
 			}
+
+			$r .= $this->button_input( $l_button );
 		}
 		/*
 		else
-		{
-			$r .= "\t\t\t".'<input type="submit" value="'.T_('Save !').'" class="SaveButton"/>'."\n";
-			$r .= "\t\t\t".'<input type="reset" value="'.T_('Reset').'" class="ResetButton"/>'."\n";
+		{ // Default: Save and Reset
+			$r .= $this->get_input_element( array(
+				'type' => 'submit',
+				'value' => T_('Save !'),
+				'class' => 'SaveButton',
+				'input_prefix => "\t\t\t" );
+			$r .= $this->get_input_element( array(
+				'type' => 'reset',
+				'value' => T_('Reset'),
+				'class' => 'ResetButton',
+				'input_prefix => "\t\t\t" );
 		}*/
+
+		$this->output = $save_output;
 
 		if( ! $hidden )
 		{ // there are not only hidden buttons : additional tags
@@ -1555,7 +1557,41 @@ class Form extends Widget
 
 
 	/**
+	 * Builds a button list.
+	 *
+	 * Array entries with numeric (deprecated) keys are converted to their equivalent string indexes.
+	 *
+	 * @deprecated Deprecated by {@link buttons_input()}
+	 *
+	 * the two-dimension array must contain :
+	 *  - the button type
+	 *  - the name (optional)
+	 *  - the value (optional)
+	 *  - the class (optional)
+	 *  - the onclick attribute (optional)
+	 *  - the style (optional)
+	 *
+	 * @param array a two-dimension array containing the elements of the input tags
+	 * @param boolean to select or not the default display
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function buttons( $buttons = array() )
+	{
+		$buttons_list = array();
+
+		foreach( $buttons as $l_button )
+		{
+			$buttons_list[] = $this->convert_button_to_field_params( $l_button );
+		}
+
+		return $this->buttons_input( $buttons_list );
+	}
+
+
+	/**
 	 * Builds a button.
+	 *
+	 * Array entries with numeric (deprecated) keys are converted to their equivalent string indexes.
 	 *
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - type: The type attribute (string, default 'submit')
@@ -1564,11 +1600,14 @@ class Form extends Widget
 	function button_input( $field_params = array() )
 	{
 		if( !isset($field_params['type']) )
-		{ // set default type
+		{ // default type
 			$field_params['type'] = 'submit';
 		}
 
-		$field_params['input_prefix'] = "\t\t\t";
+		if( !isset($field_params['input_prefix']) )
+		{ // default prefix
+			$field_params['input_prefix'] = "\t\t\t";
+		}
 
 		return $this->display_or_return( $this->get_input_element( $field_params ) );
 	}
@@ -1595,38 +1634,49 @@ class Form extends Widget
 		global $Debuglog;
 		$Debuglog->add( 'Form::button()', 'deprecated function calls' );
 
-		$field_params = array();
+		$field_params = $this->convert_button_to_field_params( $options );
 
-		if( empty($options[0]) )
+		if( !isset($field_params['type']) )
 		{
-			$field_params['type'] = 'submit';
-		}
-		else
-		{
-			$field_params['type'] = $options[0];
-		}
-		if( isset($options[1]) )
-		{
-			$field_params['name'] = $options[1];
-		}
-		if( isset($options[2]) )
-		{
-			$field_params['value'] = $options[2];
-		}
-		if( isset($options[3]) )
-		{
-			$field_params['class'] = $options[3];
-		}
-		if( isset($options[4]) )
-		{
-			$field_params['onclick'] = $options[4];
-		}
-		if( isset($options[5]) )
-		{
-			$field_params['style'] = $options[5];
+			$field_params['type'] = 'submit'; // default type
 		}
 
 		return $this->button_input( $field_params );
+	}
+
+
+	/**
+	 * Convert a deprecated, numeric button array to a field_params array.
+	 *
+	 * @deprecated
+	 * @param array A button array like button() and buttons() are getting.
+	 * @return array The button array converted to a string indexed button array (field_params).
+	 */
+	function convert_button_to_field_params( $options )
+	{
+		$field_params = array();
+
+		foreach( array_keys($options) as $l_key )
+		{
+			if( is_int($l_key) )
+			{
+				switch( $l_key )
+				{
+					case 0: $field_params['type'] = $options[0]; break;
+					case 1: $field_params['name'] = $options[1]; break;
+					case 2: $field_params['value'] = $options[2]; break;
+					case 3: $field_params['class'] = $options[3]; break;
+					case 4: $field_params['onclick'] = $options[4]; break;
+					case 5: $field_params['style'] = $options[5]; break;
+				}
+			}
+			else
+			{
+				$field_params[$l_key] = $options[$l_key];
+			}
+		}
+
+		return $field_params;
 	}
 
 
@@ -2051,13 +2101,13 @@ class Form extends Widget
 		}
 
 		// Error handling:
-		if( isset($Request->err_messages[$field_name]) )
+		if( isset($Request->err_messages[$field_params['name']]) )
 		{ // There is an error message for this field:
 			$field_params['class'] = isset( $field_params['class'] )
 				? $field_params['class'].' field_error'
 				: 'field_error';
 
-			$this->_common_params['note'] .= ' <span class="field_error">'.$Request->err_messages[$field_name].'</span>';
+			$this->_common_params['note'] .= ' <span class="field_error">'.$Request->err_messages[$field_params['name']].'</span>';
 		}
 
 		#pre_dump( 'handle_common_params (after)', $field_params );
