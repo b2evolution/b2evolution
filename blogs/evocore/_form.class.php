@@ -1599,7 +1599,7 @@ class Form extends Widget
 	 */
 	function button_input( $field_params = array() )
 	{
-		if( !isset($field_params['type']) )
+		if( empty($field_params['type']) )
 		{ // default type
 			$field_params['type'] = 'submit';
 		}
@@ -1636,7 +1636,7 @@ class Form extends Widget
 
 		$field_params = $this->convert_button_to_field_params( $options );
 
-		if( !isset($field_params['type']) )
+		if( empty($field_params['type']) )
 		{
 			$field_params['type'] = 'submit'; // default type
 		}
@@ -2101,7 +2101,7 @@ class Form extends Widget
 		}
 
 		// Error handling:
-		if( isset($Request->err_messages[$field_params['name']]) )
+		if( isset($field_params['name']) && isset($Request->err_messages[$field_params['name']]) )
 		{ // There is an error message for this field:
 			$field_params['class'] = isset( $field_params['class'] )
 				? $field_params['class'].' field_error'
