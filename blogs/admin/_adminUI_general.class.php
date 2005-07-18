@@ -812,6 +812,14 @@ class AdminUI_general
 				'sort_type' => 'basic'
 				);
 
+			case 'Form':
+				// Default Form settings:
+				return array(
+					'layout' => 'fieldset',
+				);
+
+			// TODO: add default settings for 'table', 'fieldset', etc...
+
 			default:
 				die( 'Unknown $name for AdminUI::getMenuTemplate(): '.var_export($name, true) /* PHP 4.2 ! */ );
 		}
@@ -1093,6 +1101,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.30  2005/07/18 14:21:37  fplanque
+ * Use a default Form layout which can be skin dependant
+ *
  * Revision 1.29  2005/07/15 16:41:50  fplanque
  * fixed typo
  *

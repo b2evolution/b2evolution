@@ -134,12 +134,21 @@ class Form extends Widget
 	 * @param string the method used to send data
 	 * @param string the form layout : 'fieldset', 'table' or ''
 	 */
-	function Form( $form_action = '', $form_name = '', $form_method = 'post', $layout = 'fieldset', $enctype = '' )
+	function Form( $form_action = '', $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '' )
 	{
+		global $AdminUI;
+
 		$this->form_name = $form_name;
 		$this->form_action = $form_action;
 		$this->form_method = $form_method;
 		$this->enctype = $enctype;
+
+		if( is_null( $layout ) )
+		{	// Get default skin setting:
+			$template = $AdminUI->getMenuTemplate( 'Form' );
+			$layout = $template['layout'];
+		}
+
 		$this->saved_layout = $layout;
 		$this->switch_layout( NULL );	// "restore" saved layout.
 	}
