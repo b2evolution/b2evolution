@@ -546,7 +546,7 @@ class Item extends DataObject
 	 */
 	function assigned_to( $before = '', $after = '', $format = 'htmlbody' )
 	{
-		if( isset($this->AssignedUser) )
+		if( isset($this->assigned_User) )
 		{
 			echo $before;
 			$this->assigned_User->prefered_name( $format );
@@ -2174,6 +2174,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.50  2005/07/18 14:20:24  fplanque
+ * bugfix
+ *
  * Revision 1.49  2005/07/16 19:00:21  blueyed
  * Open 'Configure plugins' in a new JS popup window when in sidebar-mode.
  *
