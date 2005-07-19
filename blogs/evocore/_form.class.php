@@ -903,10 +903,10 @@ class Form extends Widget
 	/**
 	 * Builds the form field
 	 *
-	 * @todo Use $form_params like $field_params for the other methods.
 	 * @param string the class to use for the form tag
 	 * @param string title to display on top of the form
 	 * @param array Additional params to the form element. See {@link $_common_params}.
+	 *              These may override class members.
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function begin_form( $form_class = NULL, $form_title = '', $form_params = array() )
