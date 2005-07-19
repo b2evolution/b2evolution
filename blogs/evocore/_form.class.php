@@ -552,12 +552,20 @@ class Form extends Widget
 			? '('.$date_format.')'
 			: '('.$date_format.') '.$field_params['note'];
 
-		$this->handle_common_params( $field_params, $field_name, $field_label );
+		if( !isset($field_params['size']) )
+		{ // Get size (and maxlength) out of $date_format if not explicitly set
+			$field_params['size'] = strlen( $date_format );
 
-		$field_size = strlen( $date_format );
+			if( !isset($field_params['maxlength']) )
+			{
+				$field_params['maxlength'] = $field_params['size'];
+			}
+		}
 
 		// Get date part of datetime:
-		$field_value = substr( $field_value, 0, 10 );
+		$field_params['value'] = substr( $field_value, 0, 10 );
+
+		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$r = $this->begin_field()
 				.'<script type="text/javascript">
@@ -898,19 +906,35 @@ class Form extends Widget
 	 * @todo Use $form_params like $field_params for the other methods.
 	 * @param string the class to use for the form tag
 	 * @param string title to display on top of the form
+	 * @param array Additional params to the form element. See {@link $_common_params}.
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function begin_form( $form_class = NULL, $form_title = '' )
+	function begin_form( $form_class = NULL, $form_title = '', $form_params = array() )
 	{
-		$r = "\n\n"
-					.'<form'
-					.( !empty( $this->form_name ) ? ' name="'.$this->form_name.'"' : '' )
-					.( !empty( $this->form_name ) ? ' id="'.$this->get_valid_id($this->form_name).'"' : '' )
-					.( !empty( $this->enctype ) ? ' enctype="'.$this->enctype.'"' : '' )
-					.' method="'.$this->form_method
-					.'" action="'.$this->form_action.'"'
-					.( !empty( $form_class ) ? ' class="'.$form_class : '' )
-					.'">'."\n"
+		$this->handle_common_params( $form_params, $this->form_name );
+
+		// Set non-mandatory attributes if given in $form_params
+		if( !isset($form_params['enctype']) && !empty( $this->enctype ) )
+		{
+			$form_params['enctype'] = $this->enctype;
+		}
+
+		if( !isset($form_params['class']) && !empty( $form_class ) )
+		{
+			$form_params['class'] = $form_class;
+		}
+
+		if( !isset($form_params['method']) )
+		{
+			$form_params['method'] = $this->form_method;
+		}
+
+		if( !isset($form_params['action']) )
+		{
+			$form_params['action'] = $this->form_action;
+		}
+
+		$r = "\n\n<form".$this->get_field_params_as_string($form_params).">\n"
 					.$this->formstart;
 
 		if( !empty($form_title) )
