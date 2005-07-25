@@ -553,13 +553,14 @@ class Form extends Widget
 			: '('.$date_format.') '.$field_params['note'];
 
 		if( !isset($field_params['size']) )
-		{ // Get size (and maxlength) out of $date_format if not explicitly set
+		{ // Get size out of $date_format if not explicitly set
 			$field_params['size'] = strlen( $date_format );
+		}
 
-			if( !isset($field_params['maxlength']) )
-			{
-				$field_params['maxlength'] = $field_params['size'];
-			}
+
+		if( !isset($field_params['maxlength']) )
+		{
+			$field_params['maxlength'] = $field_params['size'];
 		}
 
 		// Get date part of datetime:
@@ -1364,11 +1365,12 @@ class Form extends Widget
 
 		foreach( $field_options as $l_key => $l_option )
 		{
-			$value = is_string($l_key) ? $l_key : $l_option;
+			// Get the value attribute from key if is_string():
+			$l_value = is_string($l_key) ? $l_key : $l_option;
 
-			$options_list .= '<option value="'.format_to_output($value, 'formvalue').'"';
+			$options_list .= '<option value="'.format_to_output($l_value, 'formvalue').'"';
 
-			if( $l_option == $field_value )
+			if( $l_value == $field_value )
 			{
 				$options_list .= ' selected="selected"';
 			}
