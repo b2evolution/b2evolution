@@ -863,8 +863,18 @@ function param( $var, $type = '', $default = '', $memorize = false,
 				break;
 
 			default:
-				settype( $$var, $type );
-				$Debuglog->add( 'param(-): '.$var.' typed to '.$type.', new value='.$$var, 'params' );
+				if( $$var === '' )
+				{
+					// fplanque: note: there might be side effects to this, but we need
+					// this to distinguish between 0 and 'no input'
+					$$var = NULL;
+					$Debuglog->add( 'param(-): '.$var.' set to NULL' );
+				}
+				else
+				{
+					settype( $$var, $type );
+					$Debuglog->add( 'param(-): '.$var.' typed to '.$type.', new value='.$$var, 'params' );
+				}
 		}
 	}
 
@@ -1856,16 +1866,20 @@ function is_create_action( $action )
 		case 'edit':
 		case 'update':	// we return in this state after a validation error
 		case 'delete':
+		case 'view': 		// This one's a bit far fetched, but can happen if we have no sheet display
 			return false;
 
 		default:
-			die( 'Unhandled action in form' );
+			die( 'Unhandled action in form: '.strip_tags($action_parts[0]) );
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.73  2005/07/26 18:57:34  fplanque
+ * changed handling of empty params. We do need to differentiate between empty input ''=>NULL and 0=>0 in some situations!
+ *
  * Revision 1.72  2005/07/12 23:05:36  blueyed
  * Added Timer class with categories 'main' and 'sql_queries' for now.
  *

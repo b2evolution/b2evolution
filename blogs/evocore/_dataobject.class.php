@@ -493,7 +493,7 @@ class DataObject
 	 * @param string Name of parameter
 	 * @param string DB field type ('string', 'number', 'date' )
 	 * @param mixed Value of parameter
-	 * @param boolean true to set to NULL if empty value
+	 * @param boolean true to set to NULL if empty string value
 	 */
 	function set_param( $parname, $fieldtype, $parvalue, $make_null = false )
 	{
@@ -511,7 +511,10 @@ class DataObject
 		}
 
 		// Set value:
-		$this->$parname = ($make_null && empty($parvalue)) ? NULL : $parvalue;
+		// fplanque: Note: I am changing the "make NULL" test to differentiate between 0 and NULL .
+		// There might be side effects. In this case it would be better to fix them before coming here.
+		// i-e: transform 0 to ''
+		$this->$parname = ($make_null && ($parvalue === '')) ? NULL : $parvalue;
 		//echo '<br/>'.$this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname;
 		$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname, 'dataobjects' );
 
@@ -565,6 +568,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.21  2005/07/26 18:57:34  fplanque
+ * changed handling of empty params. We do need to differentiate between empty input ''=>NULL and 0=>0 in some situations!
+ *
  * Revision 1.20  2005/06/13 19:20:54  fplanque
  * fix
  *
