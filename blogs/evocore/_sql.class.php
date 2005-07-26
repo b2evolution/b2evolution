@@ -110,7 +110,7 @@ class SQL
 	 */
 	function WHERE_and( $where_and )
 	{
-		if( empty($where_and ) )
+		if( empty($where_and) )
 		{	// Nothing to append:
 			return false;
 		}
@@ -139,6 +139,9 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.2  2005/07/26 18:58:00  fplanque
+ * minor
+ *
  * Revision 1.1  2005/04/26 18:19:25  fplanque
  * no message
  *

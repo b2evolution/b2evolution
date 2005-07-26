@@ -138,9 +138,9 @@ if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 {
 	if( ($edited_Link = $LinkCache->get_by_ID( $link_ID, false )) === false )
 	{	// We could not find the linke to edit:
+		unset( $edited_Link );
 		$Messages->head = T_('Cannot edit link!');
 		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
-		unset( $edited_Link );
 		unset( $link_ID );
 	}
 }
@@ -153,9 +153,9 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 { // Load Requested iem:
 	if( ($edited_Item = $ItemCache->get_by_ID( $item_ID, false )) === false )
 	{	// We could not find the contact to link:
+		unset( $edited_Item );
 		$Messages->head = T_('Cannot link Item!');
 		$Messages->add( T_('Requested item does not exist any longer.'), 'error' );
-		unset( $edited_Item );
 		unset( $item_ID );
 	}
 }
@@ -1243,6 +1243,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.115  2005/07/26 18:56:21  fplanque
+ * minor
+ *
  * Revision 1.114  2005/07/26 18:50:48  fplanque
  * enhanced attached file handling
  *
