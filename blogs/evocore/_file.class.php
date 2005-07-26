@@ -506,6 +506,16 @@ class File extends DataObject
 		return $root_url.$this->_rdfp_rel_path.( $this->_is_dir ? '/' : '' );
 	}
 
+
+	/**
+	 * Get location of file with its root (for display)
+	 */
+	function get_root_and_rel_path()
+	{
+		return get_root_name( $this->_root_type, $this->_root_ID ).':'.$this->get_rdfs_rel_path();
+	}
+
+
 	/**
 	 * Get the file's extension.
 	 *
@@ -1037,8 +1047,8 @@ class File extends DataObject
 	function url( $text = NULL, $title = NULL, $no_access_text = NULL )
 	{
 		if( is_null( $text ) )
-		{	// Use file relpath+name by default
-			$text = $this->get_rdfs_rel_path();
+		{	// Use file root+relpath+name by default
+			$text = $this->get_root_and_rel_path();
 		}
 
 		if( is_null( $title ) )
@@ -1065,6 +1075,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2005/07/26 18:50:39  fplanque
+ * enhanced attached file handling
+ *
  * Revision 1.37  2005/07/12 22:58:31  blueyed
  * Suppress php's chmod() warnings.
  *

@@ -45,52 +45,102 @@ if( false )
 
 	$Results->title = T_('Linked to...');
 
-	/**
-	 * Display link
-	 */
-	function display_link( & $row )
+	// TYPE
+	function display_type( & $row )
 	{
 		if( !empty($row->cont_ID) )
 		{
-			return T_('Contact').': <a href="'.regenerate_url( 'action,pos_ID,cont_ID', 'cont_ID='.$row->cont_ID, 'contacts.php' )
-						.'" title="'.T_('View this contact...').'">'.$row->cont_firstname.' '.$row->cont_lastname.'</a>';
+			return T_('Contact');
 		}
 		elseif( !empty($row->etab_ID) )
 		{
-			return T_('Establishment').': <a href="'.regenerate_url( 'action,etab_ID', 'etab_ID='.$row->etab_ID, 'establishments.php' )
-						.'" title="'.T_('View this establishment...').'">'.$row->etab_name.'</a>';
+			return T_('Establishment');
 		}
 		elseif( !empty($row->firm_ID) )
 		{
-			return T_('Firm').': <a href="'.regenerate_url( 'action,firm_ID', 'firm_ID='.$row->firm_ID, 'firms.php' )
-						.'" title="'.T_('View this firm...').'">'.$row->firm_name.'</a>';
+			return T_('Firm');
 		}
 		elseif( !empty($row->tsk_ID) )
 		{
-			return T_('Task').': <a href="'.regenerate_url( 'action,tsk_ID', 'tsk_ID='.$row->tsk_ID, 'tasks.php' )
-						.'" title="'.T_('View this task...').'">'.$row->tsk_title.'</a>';
+			return T_('Task');
 		}
 		elseif( !empty($row->file_ID) )
 		{
-			// Instantiate a File object for this line:
-			$current_File = & new File( $row->file_root_type, $row->file_root_ID, $row->file_path );
-			// Flow meta data into File object:
-			$current_File->load_meta( false, $row );
-
-			// File relative path & name:
-			return T_('File').': '.$current_File->url().'<span class="filemeta"> - '.$current_File->dget('title').'</span>';
+			return T_('File');
 		}
 
 		return '?';
 	}
+	$Results->cols[] = array(
+							'th' => T_('Type'),
+							'th_start' => '<th class="firstcol shrinkwrap">',
+							'order' => implode( ', ', $order_fields ),
+							'td_start' => '<td class="firstcol shrinkwrap">',
+							'td' => '%display_type( {row} )%',
+						);
 
+
+	// Sub Type column
+	function display_subtype( & $row )
+	{
+		if( !empty($row->file_ID) )
+		{
+			global $current_File;
+			// Instantiate a File object for this line:
+			$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY!
+			// Flow meta data into File object:
+			$current_File->load_meta( false, $row );
+
+			// File type:
+			return $current_File->url( $current_File->get_icon(), T_('Let browser handle this file!')  ).' '.$current_File->get_type();
+		}
+	}
+	$Results->cols[] = array(
+							'th' => T_('Sub-Type'),
+							'td_start' => '<td class="shrinkwrap">',
+							'td' => '%display_subtype( {row} )%',
+						);
+
+
+	// LINK column
+	function display_link( & $row )
+	{
+		if( !empty($row->cont_ID) )
+		{
+			return '<a href="'.regenerate_url( 'action,pos_ID,cont_ID', 'cont_ID='.$row->cont_ID, 'contacts.php' )
+						.'" title="'.T_('View this contact...').'">'.$row->cont_firstname.' '.$row->cont_lastname.'</a>';
+		}
+		elseif( !empty($row->etab_ID) )
+		{
+			return '<a href="'.regenerate_url( 'action,etab_ID', 'etab_ID='.$row->etab_ID, 'establishments.php' )
+						.'" title="'.T_('View this establishment...').'">'.$row->etab_name.'</a>';
+		}
+		elseif( !empty($row->firm_ID) )
+		{
+			return '<a href="'.regenerate_url( 'action,firm_ID', 'firm_ID='.$row->firm_ID, 'firms.php' )
+						.'" title="'.T_('View this firm...').'">'.$row->firm_name.'</a>';
+		}
+		elseif( !empty($row->tsk_ID) )
+		{
+			return '<a href="'.regenerate_url( 'action,tsk_ID', 'tsk_ID='.$row->tsk_ID, 'tasks.php' )
+						.'" title="'.T_('View this task...').'">'.$row->tsk_title.'</a>';
+		}
+		elseif( !empty($row->file_ID) )
+		{
+			global $current_File;
+
+			// File relative path & name:
+			return $current_File->url().'<span class="filemeta"> - '.$current_File->dget('title').'</span>';
+		}
+
+		return '?';
+	}
 	$Results->cols[] = array(
 							'th' => T_('Destination'),
-							'order' => implode( ', ', $order_fields ),
 							'td' => '%display_link( {row} )%',
 						);
 
-	if( $current_User->check_perm( $perm_name, 'edit', false, $edited_Item->ID ) )
+	if( $edit_allowed )
 	{	// Check that we have permission to edit item:
 	 	$Results->cols[] = array(
 								'th' => T_('Unlink'),
@@ -98,11 +148,6 @@ if( false )
 								'td' => action_icon( T_('Delete this link!'), 'unlink',
 	                        '%regenerate_url( \'tsk_ID,action\', \'link_ID=$link_ID$&amp;action=delete_link\')%' ),
 							);
-	}
-	else
-	{
-		$Results->cols[0]['th_start'] = '<th class="firstcol lastcol">';
-		$Results->cols[0]['td_start'] = '<td class="firstcol lastcol">';
 	}
 
 	if( isset( $db_aliases['T_firms'] ) )

@@ -506,8 +506,41 @@ function get_root_url( $root_type, $root_ID )
 	die( "Root url for type=$root_type not supported" );
 }
 
+
+/**
+ * @param string Root type: 'user', 'group', 'collection' or 'absolute'
+ * @param integer ID of the user, the group or the collection the file belongs to...
+ * @return
+ */
+function get_root_name( $root_type, $root_ID )
+{
+	global $UserCache, $BlogCache;
+
+	switch( $root_type )
+	{
+		case 'user':
+			$User = & $UserCache->get_by_ID( $root_ID );
+			// return sprintf( 'User %s', $User->get( 'preferedname' ) );
+			return $User->get( 'preferedname' );
+
+		case 'collection':
+			$Blog = & $BlogCache->get_by_ID( $root_ID );
+			// return sprintf( 'Blog %s', $Blog->get( 'shortname' ) );
+			return $Blog->get( 'shortname' );
+
+		case 'absolute':
+			return 'Absolute';
+	}
+
+	die( "Root name for type=$root_type not supported" );
+}
+
+
 /*
  * $Log$
+ * Revision 1.22  2005/07/26 18:50:47  fplanque
+ * enhanced attached file handling
+ *
  * Revision 1.21  2005/06/20 17:40:23  fplanque
  * minor
  *

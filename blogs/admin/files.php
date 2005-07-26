@@ -1111,78 +1111,9 @@ switch( $Fileman->fm_mode )
 
 		// TODO: check EDIT permissions!
 
-		// Begin payload block:
+		// Links dialog:
 		$AdminUI->dispPayloadBegin();
-
-		$Form = & new Form( 'files.php', '', 'post', 'fieldset' );
-
-		$Form->global_icon( T_('Quit link mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
-
-		$Form->begin_form( 'fform', sprintf( T_('Link files to &laquo;%s&raquo;...'), $edited_Item->dget( 'title') ) );
-
-		$edited_Item->edit_link( '<p>', '</p>', T_('Edit this post') );
-
-		$Results = & new Results(
-							'SELECT link_ID, link_ltype_ID, T_files.*
-								 FROM T_links INNER JOIN T_files ON link_file_ID = file_ID
-								WHERE link_item_ID = '.$edited_Item->ID,
-							'link_' );
-
-		$Results->title = T_('Existing links');
-
-		function file_path( & $row )
-		{
-			global $current_File;
-
-			// Instantiate a File object for this line:
-			$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY!
-			// Flow meta data into File object:
-			$current_File->load_meta( false, $row );
-
-			// File relative path & name:
-			return $current_File->url();
-		}
- 		$Results->cols[] = array(
-								'th' => T_('Path'),
-								'order' => 'file_path',
-								'td_start' => '<td class="firstcol left">',
-								'td' => '%file_path( {row} )%',
-							);
-
- 		$Results->cols[] = array(
-								'th' => T_('Title'),
-								'order' => 'file_title',
-								'td_start' => '<td class="left">',
-								'td' => '$file_title$',
-							);
-
-		function file_type()
-		{
-			global $current_File;
-
-			// File type:
-			return $current_File->get_icon().' '.$current_File->get_type();
-		}
- 		$Results->cols[] = array(
-								'th' => T_('Type'),
-								'td_start' => '<td class="left">',
-								'td' => '%file_type()%',
-							);
-
-	 	$Results->cols[] = array(
-								'th' => T_('Unlink'),
-								'td_start' => '<td class="lastcol center">',
-								'td' => action_icon( T_('Delete this link!'), 'unlink',
-	                        '%regenerate_url( \'action\', \'link_ID=$link_ID$&amp;action=unlink\')%' ),
-							);
-
-		$Results->display();
-
-		printf( '<p>'.T_('Click on a link icon %s below to link an additional file to this item.').'</p>', get_icon( 'link' ) );
-
-		$Form->end_form( );
-
-		// End payload block:
+		require dirname(__FILE__).'/_files_links.inc.php';
 		$AdminUI->dispPayloadEnd();
 
 		$Fileman->forceFM = 1;
@@ -1312,6 +1243,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.114  2005/07/26 18:50:48  fplanque
+ * enhanced attached file handling
+ *
  * Revision 1.113  2005/06/03 20:14:38  fplanque
  * started input validation framework
  *
