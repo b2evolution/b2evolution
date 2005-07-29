@@ -241,7 +241,7 @@ switch($action)
 		$Form->hidden( 'action', 'update' );
 		$Form->hidden( 'cat_ID', $cat_ID );
 
-    $Form->text( 'cat_name', $cat_name, 40, T_('New category name'), '', 80 );
+		$Form->text( 'cat_name', $cat_name, 40, T_('New category name'), '', 80 );
 
 		// ----------------- START RECURSIVE CAT LIST ----------------
 		cat_query( false );	// make sure the caches are loaded
@@ -267,7 +267,7 @@ switch($action)
 			{
 				$r .= ' checked="checked"';
 			}
-			$r .= '/><label for="cat_parent_ID'.$curr_cat_ID.'"><strong>'.$cat['cat_name'].'</strong></label>';
+			$r .= '/> <label for="cat_parent_ID'.$curr_cat_ID.'"><strong>'.$cat['cat_name'].'</strong></label>';
 			if( $cat_parent_ID == $curr_cat_ID )
 			{
 				$r .= ' &lt;= '.T_('Old Parent');
@@ -302,7 +302,7 @@ switch($action)
 				{
 					$r .= ' checked="checked"';
 				}
-				$r .= '/><label for="cat_parent_none_'.$current_blog_ID.'"><strong>'.T_('Root (No parent)').'</strong></label>';
+				$r .= '/> <label for="cat_parent_none_'.$current_blog_ID.'"><strong>'.T_('Root (No parent)').'</strong></label>';
 				if( (! $cat_parent_ID) && ($current_blog_ID == $blog) )
 				{
 					$r .= ' &lt;= '.T_('Old Parent');
@@ -320,7 +320,7 @@ switch($action)
 			{
 				$r .= ' checked="checked"';
 			}
-			$r .= '/><label for="cat_parent_none_'.$blog.'"><strong>'.T_('Root (No parent)').'</strong></label>';
+			$r .= '/> <label for="cat_parent_none_'.$blog.'"><strong>'.T_('Root (No parent)').'</strong></label>';
 			if( ! $cat_parent_ID )
 			{
 				$r .= ' &lt;= '.T_('Old Parent');
@@ -366,6 +366,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.46  2005/07/29 19:46:10  blueyed
+ * Important whitespace between <input> and <label>.
+ *
  * Revision 1.45  2005/06/06 17:59:37  fplanque
  * user dialog enhancements
  *
