@@ -46,7 +46,7 @@ $AdminUI->dispPayloadBegin();
 
 $Form = & new Form( 'files.php' );
 
-$Form->global_icon( T_('Close properties!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
+$Form->global_icon( T_('Close properties!'), 'close', $Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
 
 $Form->begin_form( 'fform', T_('File properties') );
 
@@ -62,15 +62,15 @@ $Form->begin_form( 'fform', T_('File properties') );
 	$Form->fieldset( T_('Meta data') );
 		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
-		  $Form->text( 'title', $selectedFile->title, 50, T_('Long title'), T_('This is a longer descriptive title'), 255 );
-		  $Form->text( 'alt', $selectedFile->alt, 50, T_('Alternative text'), T_('This is useful for images'), 255 );
-		  $Form->textarea( 'desc', $selectedFile->desc, 10, T_('Caption/Description') );
+			$Form->text( 'title', $selectedFile->title, 50, T_('Long title'), T_('This is a longer descriptive title'), 255 );
+			$Form->text( 'alt', $selectedFile->alt, 50, T_('Alternative text'), T_('This is useful for images'), 255 );
+			$Form->textarea( 'desc', $selectedFile->desc, 10, T_('Caption/Description') );
 		}
 		else
-		{	// Use rcan view only:
-		  $Form->info( T_('Long title'), $selectedFile->dget('title'), T_('This is a longer descriptive title') );
-		  $Form->info( T_('Alternative text'), $selectedFile->dget('alt'), T_('This is useful for images') );
-		  $Form->info( T_('Caption/Description'), $selectedFile->dget('desc') );
+		{ // Use rcan view only:
+			$Form->info( T_('Long title'), $selectedFile->dget('title'), T_('This is a longer descriptive title') );
+			$Form->info( T_('Alternative text'), $selectedFile->dget('alt'), T_('This is useful for images') );
+			$Form->info( T_('Caption/Description'), $selectedFile->dget('desc') );
 		}
 	$Form->fieldset_end();
 
@@ -80,7 +80,7 @@ if( $current_User->check_perm( 'files', 'edit' ) )
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 else
-{	// Use rcan view only:
+{ // User can view only:
 	$Form->end_form();
 }
 
@@ -89,6 +89,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.7  2005/07/29 19:43:53  blueyed
+ * minor: forceFM is a user setting!; typo in comment.
+ *
  * Revision 1.6  2005/05/09 16:09:31  fplanque
  * implemented file manager permissions through Groups
  *
