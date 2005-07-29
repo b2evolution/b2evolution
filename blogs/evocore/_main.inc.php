@@ -242,6 +242,7 @@ require_once dirname(__FILE__).'/_usercache.class.php';
 require_once dirname(__FILE__).'/_link.class.php';
 require_once dirname(__FILE__).'/_linkcache.class.php';
 require_once dirname(__FILE__).'/_file.class.php';
+require_once dirname(__FILE__).'/_filerootcache.class.php';
 // Object caches init:
 
 // fplanque>>jwedgeco: I cannot commit this: $BlogCache = array();
@@ -269,6 +270,7 @@ if ( $response == null )
 {
 	$BlogCache = & new BlogCache();
 	$FileCache = & new fileCache();
+	$FileRootCache = & new FileRootCache();
 	$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
 	$ItemCache = & new ItemCache();
 	$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
@@ -515,6 +517,10 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.39  2005/07/29 17:56:18  fplanque
+ * Added functionality to locate files when they're attached to a post.
+ * permission checking remains to be done.
+ *
  * Revision 1.38  2005/07/12 23:05:36  blueyed
  * Added Timer class with categories 'main' and 'sql_queries' for now.
  *

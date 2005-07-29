@@ -80,10 +80,10 @@ $Results->cols[] = array(
 // PATH COLUMN:
 function file_path()
 {
-	global $current_File;
+	global $current_File, $edited_Item;
 
 	// File relative path & name:
-	return $current_File->url();
+	return $current_File->edit_link( $edited_Item->ID );
 }
 $Results->cols[] = array(
 						'th' => T_('Path'),
@@ -100,11 +100,21 @@ $Results->cols[] = array(
 					);
 
 
+function file_actions( $link_ID )
+{
+	global $current_File, $edited_Item;
+
+	$title = T_('Locate this file!');
+
+	$r = $current_File->edit_link( $edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
+
+	return $r.' '.action_icon( T_('Delete this link!'), 'unlink',
+                      regenerate_url( 'action', 'link_ID='.$link_ID.'&amp;action=unlink') );
+}
 $Results->cols[] = array(
-						'th' => T_('Unlink'),
+						'th' => T_('Actions'),
 						'td_start' => '<td class="lastcol center">',
-						'td' => action_icon( T_('Delete this link!'), 'unlink',
-                      '%regenerate_url( \'action\', \'link_ID=$link_ID$&amp;action=unlink\')%' ),
+						'td' => '%file_actions( #link_ID# )%',
 					);
 
 $Results->display();
@@ -116,6 +126,10 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.2  2005/07/29 17:56:16  fplanque
+ * Added functionality to locate files when they're attached to a post.
+ * permission checking remains to be done.
+ *
  * Revision 1.1  2005/07/26 18:50:48  fplanque
  * enhanced attached file handling
  *

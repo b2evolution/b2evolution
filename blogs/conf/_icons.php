@@ -228,6 +228,11 @@ $map_iconfiles = array(
 		'alt' => T_('Edit'),
 		'size' => array( 18, 13 ),
 	),
+	'locate' => array(
+		'file' => $rsc_subdir.'icons/target.gif',
+		'alt' => T_('Locate'),
+		'size' => array( 15, 15 ),
+	),
 	'delete' => array(
 		'file' => $admin_subdir.'img/xross.gif',
 		'alt' => T_('Del'),

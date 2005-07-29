@@ -127,10 +127,10 @@ if( false )
 		}
 		elseif( !empty($row->file_ID) )
 		{
-			global $current_File;
+			global $current_File, $edited_Item;
 
 			// File relative path & name:
-			return $current_File->url().'<span class="filemeta"> - '.$current_File->dget('title').'</span>';
+			return $current_File->edit_link( $edited_Item->ID ).'<span class="filemeta"> - '.$current_File->dget('title').'</span>';
 		}
 
 		return '?';
@@ -142,11 +142,25 @@ if( false )
 
 	if( $edit_allowed )
 	{	// Check that we have permission to edit item:
-	 	$Results->cols[] = array(
-								'th' => T_('Unlink'),
+		function file_actions( $link_ID )
+		{
+			global $current_File, $edited_Item;
+
+			$r = '';
+
+			if( isset($current_File) )
+			{
+				$title = T_('Locate this file!');
+				$r = $current_File->edit_link($edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title ).' ';
+			}
+
+			return $r.action_icon( T_('Delete this link!'), 'unlink',
+		                      regenerate_url(  'tsk_ID,action', "link_ID=$link_ID&amp;action=delete_link" ) );
+		}
+		$Results->cols[] = array(
+								'th' => T_('Actions'),
 								'td_start' => '<td class="lastcol shrinkwrap">',
-								'td' => action_icon( T_('Delete this link!'), 'unlink',
-	                        '%regenerate_url( \'tsk_ID,action\', \'link_ID=$link_ID$&amp;action=delete_link\')%' ),
+								'td' => '%file_actions( #link_ID# )%',
 							);
 	}
 

@@ -78,9 +78,17 @@ class File extends DataObject
 	var $desc;
 
 	/**
+	 * FileRoot of this file
+	 * @var Fileroot
+	 * @access protected
+	 */
+	var $_FileRoot;
+
+	/**
 	 * Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @var string
 	 * @access protected
+	 * @todo replace by $_FileRoot
 	 */
 	var $_root_type;
 
@@ -88,6 +96,7 @@ class File extends DataObject
 	 * Root ID: ID of the user, the group or the collection the file belongs to...
 	 * @var integer
 	 * @access protected
+	 * @todo replace by $_FileRoot
 	 */
 	var $_root_ID;
 
@@ -201,7 +210,7 @@ class File extends DataObject
 	 */
 	function File( $root_type, $root_ID, $rdfp_rel_path, $load_meta = false )
 	{
-		global $Debuglog;
+		global $FileRootCache, $Debuglog;
 
 		$Debuglog->add( "new File( $root_type, $root_ID, $rdfp_rel_path, load_meta=$load_meta)", 'files' );
 
@@ -215,6 +224,7 @@ class File extends DataObject
 		// Memorize filepath:
 		$this->_root_type = $root_type;
 		$this->_root_ID = $root_ID;
+		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
 		$this->_rdfp_rel_path = no_trailing_slash(str_replace( '\\', '/', $rdfp_rel_path ));
 		$this->_adfp_full_path = get_root_dir( $root_type, $root_ID ).$this->_rdfp_rel_path;
 		$this->_name = basename( $this->_adfp_full_path );
@@ -494,7 +504,7 @@ class File extends DataObject
 	}
 
   /**
-	 * Get the file url
+	 * Get the absolute file url
 	 */
 	function get_url()
 	{
@@ -865,6 +875,7 @@ class File extends DataObject
 		// Memorize new filepath:
 		$this->_root_type = $root_type;
 		$this->_root_ID = $root_ID;
+		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
 		$this->_rdfp_rel_path = $rdfp_rel_path;
 		$this->_adfp_full_path = $adfp_posix_path;
 		$this->_name = basename( $this->_adfp_full_path );
@@ -1042,7 +1053,7 @@ class File extends DataObject
 
 
 	/**
-	 * Template function
+	 * Template function. Display link to absolute file URL.
 	 */
 	function url( $text = NULL, $title = NULL, $no_access_text = NULL )
 	{
@@ -1070,11 +1081,64 @@ class File extends DataObject
 		return '<a href="'.$url.'" title="'.$title.'">'.$text.'</a>';
 	}
 
+
+	/**
+	 * Template function. Display link to edit file.
+	 *
+	 * @param integer ID of item to link to => will open the FM in link mode
+	 * @param string link text
+	 * @param string link title
+	 * @param string text to display if access denied
+	 * @param string page url for the edit action
+	 */
+	function edit_link( $link_item_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
+											$actionurl = 'files.php' )
+	{
+		if( is_null( $text ) )
+		{	// Use file root+relpath+name by default
+			$text = $this->get_root_and_rel_path();
+		}
+
+		if( is_null( $title ) )
+		{	// Default link title
+			$this->load_meta();
+			$title = $this->title;
+		}
+
+		if( is_null( $no_access_text ) )
+		{	// Default text when no access:
+			$no_access_text = $text;
+		}
+
+		if( $this->is_dir() )
+		{
+			$rdfp_path = $this->_rdfp_rel_path;
+		}
+		else
+		{
+			$rdfp_path = dirname( $this->_rdfp_rel_path );
+		}
+
+		$url_params = 'root='.$this->_FileRoot->ID.'&amp;path='.$rdfp_path.'/';
+
+		if( ! is_null($link_item_ID) )
+		{	// We want to open the filemanager in link mode:
+			$url_params .= '&amp;fm_mode=link_item&amp;item_ID='.$link_item_ID;
+		}
+
+		$url = url_add_param( $actionurl, $url_params );
+
+		return '<a href="'.$url.'" title="'.$title.'">'.$text.'</a>';
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.39  2005/07/29 17:56:17  fplanque
+ * Added functionality to locate files when they're attached to a post.
+ * permission checking remains to be done.
+ *
  * Revision 1.38  2005/07/26 18:50:39  fplanque
  * enhanced attached file handling
  *
