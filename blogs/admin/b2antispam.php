@@ -70,9 +70,7 @@ $current_User->check_perm( 'spamblacklist', 'view', true );
 /**
  * Not fully functional..
  */
-Log::display( '', '', 'This is not working due to hitlog refactoring, sorry.', 'note' );
-require dirname(__FILE__).'/_footer.php';
-return;
+Log::display( '', '', 'This has been broken since Feb 2005. Daniel, we\'ve kinda been expecting you to check back here... (What remains to be done?)', 'error' );
 
 
 
@@ -395,7 +393,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
   $Results->cols[] = array(
 							'th' => T_('Source'),
 							'order' => 'aspm_source',
-							'td' => '%antispam_source2($row)%',
+							'td' => '%antispam_source2({row})%',
 						);
 
 	// Check if we need to display more:
@@ -414,9 +412,10 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 
 		// Add CHECK to 1st column:
 		$Results->cols[0]['td'] = '<a href="b2antispam.php?action=remove&amp;hit_ID=$aspm_ID$" title="'.
-												T_('Allow keyword back (Remove it from the blacklist)').
+												TS_('Allow keyword back (Remove it from the blacklist)').
 												'"><img src="img/tick.gif" width="13" height="13" class="middle" alt="'.
-												T_('Allow Back').'" /></a> '.
+												TS_('Allow Back').
+												'" /></a> '.
 												$Results->cols[0]['td'];
 
 		// Add a column for actions:
@@ -439,7 +438,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 		}
     $Results->cols[] = array(
 								'th' => T_('Actions'),
-								'td' => '%antispam_actions($row)%',
+								'td' => '%antispam_actions({row})%',
 							);
 	}
 

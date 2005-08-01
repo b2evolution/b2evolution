@@ -275,8 +275,8 @@ table.grouped th a.basic_sort_link:hover {
 	/* clear: both; */
 	margin: 1ex 1em 1ex 1em;
 	padding: .5ex;
-	background-color:#69f;
-	border: 1px solid #36c;	/* force moz to display float before */
+	background-color: #efede0;
+	border: 1px solid #e1ddce; /* force moz to display float before */
 }
 #evologo {
 	float: left;
@@ -800,6 +800,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.7  2005/08/01 19:36:55  fplanque
+ * no message
+ *
  * Revision 1.6  2005/05/23 14:32:19  fplanque
  * isolated login (htsrv) CSS styles
  *

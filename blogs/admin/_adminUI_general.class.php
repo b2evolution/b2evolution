@@ -1090,7 +1090,7 @@ class AdminUI_general
 			$r .= "\n".T_('Time:').' <strong>'.date_i18n( locale_timefmt(), $localtimenow ).'</strong>'
 						.' &middot; <acronym title="'.T_('Greenwich Mean Time ').'">'
 						./* TRANS: short for Greenwich Mean Time */ T_('GMT:').'</acronym> <strong>'.gmdate( locale_timefmt(), $servertimenow).'</strong>'
-						.' &middot; '.T_('Logged in as:').' <strong>'.$current_User->dget('login').'</strong>'
+						.' &middot; '.T_('Logged in as:').' <strong><a href="b2users.php?user_ID='.$current_User->ID.'">'.$current_User->dget('login').'</a></strong>'
 						."\n";
 		}
 
@@ -1101,6 +1101,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.31  2005/08/01 19:36:54  fplanque
+ * no message
+ *
  * Revision 1.30  2005/07/18 14:21:37  fplanque
  * Use a default Form layout which can be skin dependant
  *
