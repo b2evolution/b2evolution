@@ -54,6 +54,7 @@ if( param( 'user_ID', 'integer', NULL, true, false, false ) )
 {
 	if( ($edited_User = $UserCache->get_by_ID( $user_ID, false )) === false )
 	{	// We could not find the User to edit:
+		unset( $edited_User );
 		$Messages->head = T_('Cannot edit user!');
 		$Messages->add( T_('Requested user does not exist any longer.'), 'error' );
 		$action = 'list';
@@ -67,6 +68,7 @@ elseif( param( 'grp_ID', 'integer', NULL, true, false, false ) )
 {
 	if( ($edited_Group = $GroupCache->get_by_ID( $grp_ID, false )) === false )
 	{	// We could not find the User to edit:
+		unset( $edited_Group );
 		$Messages->head = T_('Cannot edit group!');
 		$Messages->add( T_('Requested group does not exist any longer.'), 'error' );
 		$action = 'list';
@@ -87,10 +89,10 @@ if( !$current_User->check_perm( 'users', 'edit', false ) )
 	// allow profile editing/viewing only
 	$user_profile_only = 1;
 
-	if( $action && $action != 'userupdate' )
+	if( $action != 'list' && $action != 'edit_user' && $action != 'userupdate' )
 	{ // This should be prevented in the UI
 		$Messages->add( 'You have no permission to edit other users or groups!', 'error' );
-		$action = ''; // don't show group form (we have no group ID)
+		$action = 'list';
 	}
 	elseif( $demo_mode && $action && $current_User->login == 'demouser' )
 	{
@@ -138,7 +140,9 @@ else
 			}
 			else
 			{ // we edit an existing user:
-				$edited_User = $UserCache->get_by_ID( $edited_user_ID ); // Copy! (because we'll compare later the login to $current_User)
+				$edited_User = & $UserCache->get_by_ID( $edited_user_ID );
+				// We need to remember the current login in order to later update login cookie if necessary...
+				$saved_login = $edited_User->login;
 			}
 
 			if( $user_profile_only && $edited_user_ID != $current_User->ID )
@@ -250,19 +254,17 @@ else
 
 				if( $edited_user_ID == $current_User->ID )
 				{ // current user updates him/herself - we have to set cookies to keep him logged in
+
 					if( !empty($new_pass) && $current_User->pass != $new_pass )
 					{ // The user changed his password, update login cookie!
 						setcookie( $cookie_pass, $new_pass, $cookie_expires, $cookie_path, $cookie_domain);
 					}
 
-					if( $edited_User->login != $current_User->login )
+					if( $edited_User->login != $saved_login )
 					{ // The user changed his own login, update login cookie!
 						setcookie( $cookie_user, $edited_User->login, $cookie_expires, $cookie_path, $cookie_domain );
 					}
 
-					// add to cache and get updated $current_User
-					$UserCache->add( $edited_User );
-					$current_User =& $UserCache->get_by_ID( $edited_user_ID );
 				}
 
 			}
@@ -545,6 +547,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.96  2005/08/01 14:51:46  fplanque
+ * Fixed: updating an user was not displaying changes right away (there's still an issue with locale changing though)
+ *
  * Revision 1.95  2005/06/06 17:59:38  fplanque
  * user dialog enhancements
  *
