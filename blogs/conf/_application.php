@@ -12,8 +12,7 @@
 
 $app_name = 'b2evolution';
 $app_shortname = 'b2evo';
-$app_version = '0.9.2-CVS';
-
+$app_version = '1.6-CVS';
 
 $admin_path_seprator = ' :: ';
 $app_admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website").
