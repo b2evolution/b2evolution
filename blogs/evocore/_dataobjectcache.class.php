@@ -284,7 +284,7 @@ class DataObjectCache
 	 * {@internal DataObjectCache::option_list(-) }}
 	 *
 	 * @param integer selected ID
-	 * @param boolean provide a choice for "none" with ID 0
+	 * @param boolean provide a choice for "none" with ID ''
 	 */
 	function option_list( $default = 0, $allow_none = false, $method ='name' )
 	{
@@ -295,8 +295,8 @@ class DataObjectCache
 
 		if( $allow_none )
 		{
-			echo '<option value="0"';
-			if( 0 == $default ) echo ' selected="selected"';
+			echo '<option value=""';
+			if( empty($default) ) echo ' selected="selected"';
 			echo '>', T_('None') ,'</option>'."\n";
 		}
 
@@ -319,7 +319,7 @@ class DataObjectCache
 	 * {@internal DataObjectCache::option_list_return(-) }}
 	 *
 	 * @param integer selected ID
-	 * @param boolean provide a choice for "none" with ID 0
+	 * @param boolean provide a choice for "none" with ID ''
 	 */
 	function option_list_return( $default = 0, $allow_none = false, $method = 'name_return' )
 	{
@@ -332,8 +332,8 @@ class DataObjectCache
 
 		if( $allow_none )
 		{
-			$r .= '<option value="0"';
-			if( 0 == $default ) $r .= ' selected="selected"';
+			$r .= '<option value=""';
+			if( empty($default) ) $r .= ' selected="selected"';
 			$r .= '>'.T_('None').'</option>'."\n";
 		}
 
@@ -352,6 +352,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.21  2005/08/02 18:15:14  fplanque
+ * fix for correct NULL handling
+ *
  * Revision 1.20  2005/07/15 18:10:07  fplanque
  * allow instantiating of member objects (used for preloads)
  *
