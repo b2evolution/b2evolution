@@ -160,6 +160,9 @@ while( $Item = $MainList->get_item() )
 			// Display publish NOW button if current user has the rights:
 			$Item->publish_link( ' ', ' ', '#', '#', 'PublishButton');
 
+			// Display deprecate button if current user has the rights:
+			$Item->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton');
+
 			// Display delete button if current user has the rights:
 			$Item->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, $delete_item_url );
 
@@ -340,6 +343,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.99  2005/08/02 18:15:59  fplanque
+ * cosmetic enhancements
+ *
  * Revision 1.98  2005/04/28 20:44:17  fplanque
  * normalizing, doc
  *

@@ -228,6 +228,21 @@ $map_iconfiles = array(
 		'alt' => T_('Edit'),
 		'size' => array( 18, 13 ),
 	),
+	'properties' => array(
+		'file' => $admin_subdir.'img/properties.png',
+		'alt' => T_('Properties'),
+		'size' => array( 18, 13 ),
+	),
+	'publish' => array(
+		'file' => $rsc_subdir.'icons/publish.gif',
+		'alt' => T_('Publish'),
+		'size' => array( 15, 15 ),
+	),
+	'deprecate' => array(
+		'file' => $rsc_subdir.'icons/deprecate.gif',
+		'alt' => T_('Deprecate'),
+		'size' => array( 15, 15 ),
+	),
 	'locate' => array(
 		'file' => $rsc_subdir.'icons/target.gif',
 		'alt' => T_('Locate'),
@@ -266,6 +281,12 @@ $map_iconfiles = array(
 		'file' => $rsc_subdir.'icons/chain_unlink.gif',
 		'alt' => T_('Unlink'),
 		'size' => array( 14, 14 ),
+	),
+
+	'calendar' => array(
+		'file' => $rsc_subdir.'icons/calendar.gif',
+		'alt' => T_('Calendar'),
+		'size' => array( 16, 15 ),
 	),
 	'help' => array(
 		'file' => $img_subdir.'smilies/icon_question.gif',

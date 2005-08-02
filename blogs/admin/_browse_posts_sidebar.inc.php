@@ -34,7 +34,7 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
-echo '<div class="bSideItem">';
+echo '<div class="browse_side_item">';
 
 	echo '<h2>'.$Blog->dget( 'name', 'htmlbody' ).'</h2>';
 
@@ -53,7 +53,7 @@ echo '<div class="bSideItem">';
 
 echo '</div>';
 
-echo '<div class="bSideItem">';
+echo '<div class="browse_side_item">';
 
 	$Form = & new Form( $pagenow, 'searchform', 'get', 'none' );
 
@@ -281,6 +281,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.3  2005/08/02 18:15:59  fplanque
+ * cosmetic enhancements
+ *
  * Revision 1.2  2005/05/09 19:06:53  fplanque
  * bugfixes + global access permission
  *

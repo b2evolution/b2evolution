@@ -602,7 +602,8 @@ class Form extends Widget
 					</script>\n"
 				.$this->get_input_element($field_params)
 				.'<a href="#" onclick="cal_'.$field_name.'.select('.$this->form_name.'.'.$field_name.",'anchor_".$field_name."', '".$date_format."');"
-				.' return false;" name="anchor_'.$field_name.'" id="anchor_'.$this->get_valid_id($field_name).'">'.T_('Select').'</a>';
+				.' return false;" name="anchor_'.$field_name.'" id="anchor_'.$this->get_valid_id($field_name).'" title="'.T_('Select date').'">'
+				.get_icon( 'calendar', 'imgtag', array( 'title'=>T_('Select date') ) ).'</a>';
 
 		$r .= $this->end_field();
 

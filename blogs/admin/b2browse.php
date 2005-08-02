@@ -109,7 +109,11 @@ if( $blog )
 	// Begin payload block:
 	$AdminUI->dispPayloadBegin();
 
-	echo '<div class="left_col">';
+	// fplanque> Note: this is depressing, but I have to put a table back here
+	// just because IE supports standards really badly! :'(
+  echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>';
+
+	echo '<td class="browse_left_col">';
 		switch( $tab )
 		{
 			case 'postlist':
@@ -123,13 +127,13 @@ if( $blog )
 			default;
 				echo 'unhandled display mode';
 		}
-	echo '</div>';
+	echo '</td>';
 
-  echo '<div class="right_col">';
-	 	require dirname(__FILE__).'/_browse_posts_sidebar.inc.php';
-	echo '</div>';
+  echo '<td class="browse_right_col">';
+	 require dirname(__FILE__).'/_browse_posts_sidebar.inc.php';
+	echo '</td>';
 
-	echo '<div class="clear"></div>';
+	echo '</tr></table>';
 
 	// End payload block:
 	$AdminUI->dispPayloadEnd();

@@ -45,7 +45,8 @@ h2 {
 h3 {
 	font-size: 120%;
 }
-div.bSideItem h3 {
+div.bSideItem h3,
+div.browse_side_item h3 {
 	color: #9e9286;
 	margin: .5ex 0;
 }
@@ -307,6 +308,7 @@ table.grouped tr.odd .firstcol {
 	padding: 0;
 	/* border:	1px solid #f00; */
 }
+
 .left_col {
 	vertical-align: top;
 	float: left;
@@ -456,11 +458,30 @@ div.tabbedpanelblock fieldset fieldset {
 }
 
 /* browse/ Edit Screen: */
+table.browse {
+	width: 100%;
+}
+td.browse_left_col {
+	vertical-align:top;
+	padding: 1ex 0 0 0;
+}
+td.browse_right_col {
+	width: 20em;
+	vertical-align:top;
+	padding: 1ex 0 0 0;
+}
+.browse_side_item {
+	border: 1px solid #eee7e0;
+	background-color: #fff;
+	padding: 1ex;
+	margin: 0 0 1em 1em;
+}
+
 div.NavBar {
 	background-color: #efede0;
 	border: 1px solid #e1ddce;
 	padding: 1ex;
-	margin: 0 0 1ex 1em;
+	margin: 0 0 1ex 0;
 }
 div.NavBar table {
 	width: 100%;
@@ -479,7 +500,6 @@ div.bSideItem {
 	border: 1px solid #eee7e0;
 	padding: 1ex;
 	margin: 0 1em 1ex 0;
-	margin-left: 0ex;
 }
 
 .bSmallHead {
@@ -497,7 +517,7 @@ div.bSideItem {
 div.bPostpublished {
 	border: 1px solid #e1ddce;
 	padding: 0;
-	margin: 0 0 1ex 1em;
+	margin: 0 0 1ex 0;
 	margin-right: 0ex;
 }
 .bPostpublished span.Status {
@@ -506,7 +526,7 @@ div.bPostpublished {
 .bPostprotected {
 	clear: both;
 	padding: 0;
-	margin: 0 0 1ex 1em;
+	margin: 0 0 1ex 0;
 	margin-right: 0ex;
 	border: 1px solid #fc9;
 	/* background-color: #fff7e7; */
@@ -521,7 +541,7 @@ div.bPostpublished {
 .bPostprivate {
 	clear: both;
 	padding: 0;
-	margin: 0 0 1ex 1em;
+	margin: 0 0 1ex 0;
 	margin-right: 0ex;
 	border: 1px solid #f99;
 	/* background-color: #fee; */
@@ -536,7 +556,7 @@ div.bPostpublished {
 .bPostdraft {
 	clear: both;
 	padding: 0;
-	margin: 0 0 1ex 1em;
+	margin: 0 0 1ex 0;
 	margin-right: 0ex;
 	border: 1px dashed #ccc;
 	background-color: #f4f4f4;
@@ -551,7 +571,7 @@ div.bPostpublished {
 .bPostdeprecated {
 	clear: both;
 	padding: 0;
-	margin: 0 0 1ex 1em;
+	margin: 0 0 1ex 0;
 	margin-right: 0ex;
 	border: 1px dashed #000;
 	background-color: #d8d8d8;
@@ -591,6 +611,7 @@ form.bComment /* New comment form */
 }
 
 .bSideItem ul,
+.browse_side_item ul,
 .right_col ul {
 	margin-left: 0ex;
 	padding-left: 0ex;
@@ -599,6 +620,7 @@ form.bComment /* New comment form */
 	list-style-type:none;
 }
 .bSideItem ul ul,
+.browse_side_item ul ul,
 .right_col ul ul {
 	margin-left: 1ex;
 	padding-left: 1ex;
@@ -652,7 +674,8 @@ th.bCalendarHeaderCell {
 	padding: 0 1ex 1ex 1ex;
 }
 
-.bSideItem fieldset div {
+.bSideItem fieldset div,
+.browse_side_item fieldset div {
 	margin: 1ex 0ex;
 }
 
@@ -661,7 +684,8 @@ th.bCalendarHeaderCell {
 	margin: 0 1em 1ex 0;
 	padding: 0 1ex 1ex 1ex;
 }
-.bSideItem fieldset
+.bSideItem fieldset,
+.browse_side_item fieldset
 {
 	margin: 1ex 0;
 	clear: both;
