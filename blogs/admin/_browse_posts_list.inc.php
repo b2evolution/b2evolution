@@ -177,7 +177,10 @@ while( $Item = $MainList->get_item() )
 	$Item->edit_link( ' ', ' ', get_icon( 'edit' ), '#', '', $edit_item_url );
 
 	// Display publish NOW button if current user has the rights:
-	$Item->publish_link( ' ', ' ', '#', '#', '');
+	$Item->publish_link( ' ', ' ', get_icon( 'publish' ), '#', '');
+
+	// Display deprecate if current user has the rights:
+	$Item->deprecate_link( ' ', ' ', get_icon( 'deprecate' ), '#', '');
 
 	// Display delete button if current user has the rights:
 	$Item->delete_link( ' ', ' ', get_icon( 'delete' ), '#', '', false, $delete_item_url );
@@ -210,6 +213,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.7  2005/08/02 18:13:55  fplanque
+ * added "Deprecate now" function
+ *
  * Revision 1.6  2005/07/04 13:41:38  fplanque
  * use TODO: instead of FIXME: in order to be consistent...
  *

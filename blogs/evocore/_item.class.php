@@ -1290,7 +1290,17 @@ class Item extends DataObject
 			return false;
 		}
 
-		if( $text == '#' ) $text = T_('Delete');
+		if( $text == '#' )
+		{
+			if( ! $button )
+			{
+				$text = get_icon( 'delete', 'imgtag' ).' '.T_('Delete!');
+			}
+			else
+			{
+				$text = T_('Delete!');
+			}
+		}
 		if( $title == '#' ) $title = T_('Delete this post');
 
 		$url = $admin_url.$actionurl.$this->ID;
@@ -1344,8 +1354,8 @@ class Item extends DataObject
 			return false;
 		}
 
-		if( $text == '#' ) $text = T_('Edit');
-		if( $title == '#' ) $title = T_('Edit this post');
+		if( $text == '#' ) $text = get_icon( 'edit', 'imgtag' ).' '.T_('Edit...');
+		if( $title == '#' ) $title = T_('Edit this post...');
 
 		echo $before;
 		echo '<a href="'.$admin_url.$actionurl.$this->ID;
@@ -1385,11 +1395,47 @@ class Item extends DataObject
 			return false;
 		}
 
-		if( $text == '#' ) $text = T_('Publish NOW!');
+		if( $text == '#' ) $text = get_icon( 'publish', 'imgtag' ).' '.T_('Publish NOW!');
 		if( $title == '#' ) $title = T_('Publish now using current date and time.');
 
 		echo $before;
 		echo '<a href="'.$admin_url.'edit_actions.php?action=publish'.$glue.'post_ID='.$this->ID;
+		echo '" title="'.$title.'"';
+		if( !empty( $class ) ) echo ' class="'.$class.'"';
+		echo '>'.$text.'</a>';
+		echo $after;
+
+		return true;
+	}
+
+
+	/**
+	 * Provide link to deprecate a post if user has edit rights
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param string glue between url params
+	 */
+	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
+	{
+		global $current_User, $admin_url;
+
+		if( ! is_logged_in() ) return false;
+
+		if( ($this->status == 'deprecated') // Already deprecateded!
+			|| ! ($current_User->check_perm( 'blog_post_statuses', 'deprecated', false, $this->blog_ID )) )
+		{ // User has no right to publish this post now:
+			return false;
+		}
+
+		if( $text == '#' ) $text = get_icon( 'deprecate', 'imgtag' ).' '.T_('Deprecate!');
+		if( $title == '#' ) $title = T_('Deprecate this post now!');
+
+		echo $before;
+		echo '<a href="'.$admin_url.'edit_actions.php?action=deprecate'.$glue.'post_ID='.$this->ID;
 		echo '" title="'.$title.'"';
 		if( !empty( $class ) ) echo ' class="'.$class.'"';
 		echo '>'.$text.'</a>';
@@ -2174,6 +2220,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2005/08/02 18:13:56  fplanque
+ * added "Deprecate now" function
+ *
  * Revision 1.50  2005/07/18 14:20:24  fplanque
  * bugfix
  *

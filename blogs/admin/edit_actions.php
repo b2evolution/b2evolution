@@ -315,7 +315,7 @@ switch($action)
 			}
 			else
 			{ // We'll ping now
-		
+
 				// Send email notifications now!
 				$edited_Item->send_email_notifications();
 			
@@ -325,6 +325,43 @@ switch($action)
 				pingTechnorati($blogparams);
 			}
 		}
+
+		echo '<div class="panelinfo"><p>'.T_('Updating done...').'</p></div>';
+
+		break;
+
+
+	case 'deprecate':
+		/*
+		 * --------------------------------------------------------------------
+		 * DEPRECATE POST
+		 */
+		$Request->param( 'post_ID', 'integer', true );
+		$edited_Item = $ItemCache->get_by_ID( $post_ID );
+
+		$post_cat = $edited_Item->main_cat_ID;
+		$blog = get_catblog($post_cat);
+		$blogparams = get_blogparams_by_ID( $blog );
+		$location = 'b2browse.php?blog=' . $blog;
+
+		$AdminUI->title = T_('Updating post status...');
+		require(dirname(__FILE__).'/_menutop.php');
+
+		$post_status = 'deprecated';
+		// Check permissions:
+		/* TODO: Check extra categories!!! */
+		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
+
+		$edited_Item->set( 'status', $post_status );
+
+		echo "<div class=\"panelinfo\">\n";
+		echo '<h3>'.T_('Updating post status...')."</h3>\n";
+
+		// UPDATE POST IN DB:
+		$edited_Item->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
+		$edited_Item->dbupdate();
+		echo '<p>', T_('Done.'), "</p>\n";
+		echo "</div>\n";
 
 		echo '<div class="panelinfo"><p>'.T_('Updating done...').'</p></div>';
 
