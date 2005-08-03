@@ -81,19 +81,19 @@ echo '<div class="browse_side_item">';
 		<div>
 
 		<input type="checkbox" name="show_status[]" value="published" id="sh_published" class="checkbox" <?php if( in_array( "published", $show_status ) ) echo 'checked="checked" '?> />
-		<label for="sh_published"><?php echo T_('Published (Public)') ?></label><br />
+		<label for="sh_published"><?php echo T_('Published') ?> <span class="notes">(<?php echo T_('Public') ?>)</span></label><br />
 
 		<input type="checkbox" name="show_status[]" value="protected" id="sh_protected" class="checkbox" <?php if( in_array( "protected", $show_status ) ) echo 'checked="checked" '?> />
-		<label for="sh_protected"><?php echo T_('Protected (Members only)') ?></label><br />
+		<label for="sh_protected"><?php echo T_('Protected') ?> <span class="notes">(<?php echo T_('Members only') ?>)</span></label><br />
 
 		<input type="checkbox" name="show_status[]" value="private" id="sh_private" class="checkbox" <?php if( in_array( "private", $show_status ) ) echo 'checked="checked" '?> />
-		<label for="sh_private"><?php echo T_('Private (You only)') ?></label><br />
+		<label for="sh_private"><?php echo T_('Private') ?> <span class="notes">(<?php echo T_('You only') ?>)</span></label><br />
 
 		<input type="checkbox" name="show_status[]" value="draft" id="sh_draft" class="checkbox" <?php if( in_array( "draft", $show_status ) ) echo 'checked="checked" '?> />
-		<label for="sh_draft"><?php echo T_('Draft (Not published!)') ?></label><br />
+		<label for="sh_draft"><?php echo T_('Draft') ?> <span class="notes">(<?php echo T_('Not published!') ?>)</span></label><br />
 
 		<input type="checkbox" name="show_status[]" value="deprecated" id="sh_deprecated" class="checkbox" <?php if( in_array( "deprecated", $show_status ) ) echo 'checked="checked" '?> />
-		<label for="sh_deprecated"><?php echo T_('Deprecated (Not published!)') ?></label><br />
+		<label for="sh_deprecated"><?php echo T_('Deprecated') ?> <span class="notes">(<?php echo T_('Not published!') ?>)</span></label><br />
 
 	 	</div>
 
@@ -104,12 +104,11 @@ echo '<div class="browse_side_item">';
 		$Form->fieldset( T_('Title / Text contains'), 'Text' );
 
 		echo $Form->inputstart;
-
 		?>
-		<input type="text" name="s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" />
+		<div><input type="text" name="s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /></div>
 		<?php
 		echo $Form->inputend;
-		echo T_('Words').' : ';
+		// echo T_('Words').' : ';
 		?>
 
 		<input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
@@ -153,7 +152,7 @@ echo '<div class="browse_side_item">';
 					echo ' /> ';
 					echo '<a href="'. $arc_link_start. 'm='. $arc_m. '">';
 					echo T_($month[zeroise($arc_month,2)]), ' ', $arc_year;
-					echo "</a> ($arc_count)";
+					echo "</a> <span class=\"notes\">($arc_count)</span>";
 					break;
 
 				case 'daily':
@@ -164,14 +163,14 @@ echo '<div class="browse_side_item">';
 					echo ' /> ';
 					echo '<a href="'. $arc_link_start. 'm='. $arc_m. '">';
 					echo mysql2date($archive_day_date_format, $arc_year. '-'. zeroise($arc_month,2). '-'. zeroise($arc_dayofmonth,2). ' 00:00:00');
-					echo "</a> ($arc_count)";
+					echo "</a> <span class=\"notes\">($arc_count)</span>";
 					break;
 
 				case 'weekly':
 					// --------------------------------- WEEKLY ARCHIVES ---------------------------------
 					echo '<a href="'. $arc_link_start. 'm='. $arc_year. '&amp;w='. $arc_w. '">';
 					echo $arc_year.', '.T_('week').' '.$arc_w;
-					echo "</a> ($arc_count)";
+					echo "</a> <span class=\"notes\">($arc_count)</span>";
 				break;
 
 				case 'postbypost':
@@ -214,40 +213,46 @@ echo '<div class="browse_side_item">';
 			function cat_list_before_first( $parent_cat_ID, $level )
 			{ // callback to start sublist
 				global $cat_group_start;
-				if( $level > 0 ) echo "\n",$cat_group_start,"\n";
+				$r = '';
+				if( $level > 0 ) $r .= "\n".$cat_group_start."\n";
+				return $r;
 			}
 			function cat_list_before_each( $cat_ID, $level )
 			{ // callback to display sublist element
 				global $tab, $blog, $cat_array, $cat_line_start, $pagenow;
 				$cat = get_the_category_by_ID( $cat_ID );
-				echo $cat_line_start;
-				echo '<label><input type="checkbox" name="catsel[]" value="'. $cat_ID. '" class="checkbox"';
+				$r = $cat_line_start;
+				$r .= '<label><input type="checkbox" name="catsel[]" value="'. $cat_ID. '" class="checkbox"';
 				if( in_array( $cat_ID, $cat_array ) )
 				{ // This category is in the current selection
-					echo ' checked="checked"';
+					$r .= ' checked="checked"';
 				}
-				echo ' /> ';
-				echo '<a href="'.$pagenow.'?tab='.$tab.'&amp;blog='.$blog.'&amp;cat='.$cat_ID.'">'.$cat['cat_name'].'</a> ('.$cat['cat_postcount'].')';
+				$r .= ' /> ';
+				$r .= '<a href="'.$pagenow.'?tab='.$tab.'&amp;blog='.$blog.'&amp;cat='.$cat_ID.'">'.$cat['cat_name']
+							.'</a> <span class="notes">('.$cat['cat_postcount'].')</span>';
 				if( in_array( $cat_ID, $cat_array ) )
 				{ // This category is in the current selection
-					echo "*";
+					$r .= "*";
 				}
-				echo '</label>';
+				$r .= '</label>';
+				return $r;
 			}
 			function cat_list_after_each( $cat_ID, $level )
 			{ // callback to display sublist element
 				global $cat_line_end;
-				echo $cat_line_end,"\n";
+				return $cat_line_end."\n";
 			}
 			function cat_list_after_last( $parent_cat_ID, $level )
 			{ // callback to end sublist
 				global  $cat_group_end;
-				if( $level > 0 ) echo $cat_group_end,"\n";
+				$r = '';
+				if( $level > 0 ) $r .= $cat_group_end."\n";
+				return $r;
 			}
 
 			if( $blog > 1 )
 			{ // We want to display cats for one blog
-				cat_children( $cache_categories, $blog, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 0 );
+				echo cat_children( $cache_categories, $blog, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 0 );
 			}
 			else
 			{ // We want to display cats for all blogs
@@ -263,7 +268,7 @@ echo '<div class="browse_side_item">';
 					echo $cat_blog_end;
 
 					// run recursively through the cats
-					cat_children( $cache_categories, $curr_blog_ID, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 1 );
+					echo cat_children( $cache_categories, $curr_blog_ID, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 1 );
 				}
 			}
 			// ----------------- END RECURSIVE CAT LIST ----------------
@@ -281,6 +286,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.4  2005/08/03 21:05:01  fplanque
+ * cosmetic cleanup
+ *
  * Revision 1.3  2005/08/02 18:15:59  fplanque
  * cosmetic enhancements
  *

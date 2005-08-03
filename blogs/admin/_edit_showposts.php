@@ -93,7 +93,7 @@ echo '</div>';
 while( $Item = $MainList->get_item() )
 {
 	?>
-	<div class="bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
+	<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
 		<?php
 		// We don't switch locales in the backoffice, since we use the user pref anyway
 		$Item->anchor(); ?>
@@ -343,6 +343,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.100  2005/08/03 21:05:01  fplanque
+ * cosmetic cleanup
+ *
  * Revision 1.99  2005/08/02 18:15:59  fplanque
  * cosmetic enhancements
  *

@@ -79,7 +79,7 @@ else
 
 	if( $posts == 0 && $tab == 'postlist' )
 	{
-		$posts = 20;
+		$posts = 50;
 	}
 
 	// Get the posts to display:

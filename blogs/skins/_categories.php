@@ -44,7 +44,9 @@
 	function cat_list_before_first( $parent_cat_ID, $level )
 	{	// callback to start sublist
 		global $cat_group_start;
-		if( $level > 0 ) echo "\n",$cat_group_start,"\n";
+		$r = '';
+		if( $level > 0 ) $r .= "\n".$cat_group_start."\n";
+		return $r;
 	}
 
 	/**
@@ -54,25 +56,26 @@
 	{	// callback to display sublist element
 		global $blogfilename, $cat_array, $cat_line_start, $cat_line_checkbox;
 		$cat = get_the_category_by_ID( $cat_ID );
-		echo $cat_line_start;
+		$r = $cat_line_start;
 		if( $cat_line_checkbox )
 		{
-			echo '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'"';
+			$r .= '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'"';
 			if( in_array( $cat_ID, $cat_array ) )
 			{	// This category is in the current selection
-				echo ' checked="checked"';
+				$r .= ' checked="checked"';
 			}
-			echo ' />';
+			$r .= ' />';
 		}
-		echo '<a href="'.url_add_param( get_bloginfo('blogurl'), 'cat='.$cat_ID ).'">'.format_to_output($cat['cat_name'], 'htmlbody').'</a> <span class="dimmed">('.$cat['cat_postcount'].')</span>';
+		$r .= '<a href="'.url_add_param( get_bloginfo('blogurl'), 'cat='.$cat_ID ).'">'.format_to_output($cat['cat_name'], 'htmlbody').'</a> <span class="dimmed">('.$cat['cat_postcount'].')</span>';
 		if( in_array( $cat_ID, $cat_array ) )
 		{	// This category is in the current selection
-			echo "*";
+			$r .= "*";
 		}
 		if( $cat_line_checkbox )
 		{
-			echo '</label>';
+			$r .= '</label>';
 		}
+		return $r;
 	}
 
 	/**
@@ -81,7 +84,7 @@
 	function cat_list_after_each( $cat_ID, $level )
 	{	// callback to display sublist element
 		global $cat_line_end;
-		echo $cat_line_end,"\n";
+		return $cat_line_end."\n";
 	}
 
 	/**
@@ -90,7 +93,9 @@
 	function cat_list_after_last( $parent_cat_ID, $level )
 	{	// callback to end sublist
 		global  $cat_group_end;
-		if( $level > 0 ) echo $cat_group_end,"\n";
+ 		$r = '';
+		if( $level > 0 ) $r .= $cat_group_end."\n";
+		return $r;
 	}
 
 	// Start global list:
@@ -106,7 +111,7 @@
 			echo $cat_line_end,"\n";
 		}
 
-		cat_children( $cache_categories, $blog, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 0 );
+		echo cat_children( $cache_categories, $blog, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 0 );
 
 		echo "\n",$cat_group_end,"\n";
 	}
@@ -126,7 +131,7 @@
 			echo $cat_blog_end;
 
 			// run recursively through the cats
-			cat_children( $cache_categories, $curr_blog_ID, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 1 );
+			echo cat_children( $cache_categories, $curr_blog_ID, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 1 );
 		}
 	}
 

@@ -115,11 +115,17 @@ if( $Blog->ID == 1 )
 echo '<th>'.T_('Actions')."</th>\n";
 echo "</tr>\n";
 
+$line_count = 0;
 while( $Item = $MainList->get_item() )
 {
 	echo '<tr lang="';
 	$Item->lang();
-	echo '">';
+	echo '"';
+	if( $line_count % 2 )
+	{
+		echo ' class="odd"';
+	}
+	echo '>';
 	// We don't switch locales in the backoffice, since we use the user pref anyway
 
 	echo '<td class="nowrap">';
@@ -137,7 +143,7 @@ while( $Item = $MainList->get_item() )
 	echo '<td>';
 	$Item->status();
 	$Item->extra_status( ' - '.T_('Extra').':' );
-	$Item->assigned_to( ' - '.T_('Assigned to').':');
+	$Item->assigned_to( ' '.get_icon( 'assign', 'imgtag', array('title'=>T_('Assigned to')) ) );
 	echo "</td>\n";
 
 	echo '<td>';
@@ -172,7 +178,7 @@ while( $Item = $MainList->get_item() )
 	}
 
 	// Actions:
-	echo '<td class="center">';
+	echo '<td class="shrinkwrap">';
 	// Display edit button if current user has the rights:
 	$Item->edit_link( ' ', ' ', get_icon( 'edit' ), '#', '', $edit_item_url );
 
@@ -188,7 +194,7 @@ while( $Item = $MainList->get_item() )
 	echo "</td>\n";
 
 	echo '</tr>';
-
+	$line_count++;
 }
 echo '</table>';
 
@@ -213,6 +219,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.8  2005/08/03 21:05:00  fplanque
+ * cosmetic cleanup
+ *
  * Revision 1.7  2005/08/02 18:13:55  fplanque
  * added "Deprecate now" function
  *

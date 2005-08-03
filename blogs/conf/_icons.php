@@ -260,6 +260,11 @@ $map_iconfiles = array(
 		'size' => array( 14, 14 ),
 	),
 
+	'assign' => array(
+		'file' => $rsc_subdir.'icons/handpoint13.gif',
+		'alt' => T_('Assigned to'),
+		'size' => array( 27, 13 ),
+	),
 
  	'arrow_up' => array(
 		'file' => $admin_subdir.'img/arrowup.png',

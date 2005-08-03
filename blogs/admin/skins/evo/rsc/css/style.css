@@ -514,7 +514,7 @@ td.browse_left_col {
 	padding: 1ex 0 0 0;
 }
 td.browse_right_col {
-	width: 20em;
+	width: 19em;
 	vertical-align:top;
 	padding: 1ex 0 0 0;
 }
@@ -562,21 +562,22 @@ div.bSideItem {
 	text-align: right;
 }
 
-div.bPostpublished {
-	border: 1px solid #e1ddce;
+/* Post colors on browse page */
+div.bPost {
+	clear: both;
 	padding: 0;
 	margin: 0 0 1ex 0;
-	margin-right: 0ex;
+}
+div.bPostpublished {
+	border: 1px solid #e1ddce;
+	background-color: #fff;
 }
 .bPostpublished span.Status {
 	color: #0b0;
 }
 .bPostprotected {
-	clear: both;
-	padding: 0;
-	margin: 0 0 1ex 0;
-	margin-right: 0ex;
 	border: 1px solid #fc9;
+	background-color: #fff;
 	/* background-color: #fff7e7; */
 }
 .bPostprotected span.Status {
@@ -587,11 +588,8 @@ div.bPostpublished {
 	border-bottom: 1px solid #fc9;
 }
 .bPostprivate {
-	clear: both;
-	padding: 0;
-	margin: 0 0 1ex 0;
-	margin-right: 0ex;
 	border: 1px solid #f99;
+	background-color: #fff;
 	/* background-color: #fee; */
 }
 .bPostprivate span.Status {
@@ -602,10 +600,6 @@ div.bPostpublished {
 	border-bottom: 1px solid #f99;
 }
 .bPostdraft {
-	clear: both;
-	padding: 0;
-	margin: 0 0 1ex 0;
-	margin-right: 0ex;
 	border: 1px dashed #ccc;
 	background-color: #f4f4f4;
 }
@@ -617,10 +611,6 @@ div.bPostpublished {
 	border-bottom: 1px dashed #ccc;
 }
 .bPostdeprecated {
-	clear: both;
-	padding: 0;
-	margin: 0 0 1ex 0;
-	margin-right: 0ex;
 	border: 1px dashed #000;
 	background-color: #d8d8d8;
 	color: #888;
@@ -632,6 +622,7 @@ div.bPostpublished {
 {
 	border-bottom: 1px dashed #000;
 }
+
 .bContent,
 .bCommentContent,
 .bFeedback {
@@ -823,6 +814,9 @@ th.checkright {
 
 /*
  * $Log$
+ * Revision 1.9  2005/08/03 21:05:02  fplanque
+ * cosmetic cleanup
+ *
  * Revision 1.8  2005/08/02 18:16:00  fplanque
  * cosmetic enhancements
  *
