@@ -167,7 +167,7 @@ class Results extends Widget
 		// Count total rows:
 		$this->count_total_rows();
 
-		$this->total_pages = ceil($this->total_rows / $this->limit);
+		$this->total_pages = empty($this->limit) ? 1 : ceil($this->total_rows / $this->limit);
 
 		//attribution of a page number
 		$page = param( $this->page_param, 'integer', 1, true );
@@ -266,8 +266,10 @@ class Results extends Widget
 			// Append ORDER clause if necessary:
 			$this->sql .= $this->order();
 
-			// Limit to requested page
-			$sql = $this->sql.' LIMIT '.max(0, ($this->page-1)*$this->limit).', '.$this->limit;
+			if( !empty($this->limit) )
+			{	// Limit lien range to requested page
+				$sql = $this->sql.' LIMIT '.max(0, ($this->page-1)*$this->limit).', '.$this->limit;
+			}
 
 			// Execute query and store results
 			$this->rows = $this->DB->get_results( $sql );
@@ -1108,6 +1110,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.29  2005/08/04 13:25:16  fplanque
+ * fixed bug when there was no limit
+ *
  * Revision 1.28  2005/07/15 18:12:01  fplanque
  * option to preload results objects to cache
  *
