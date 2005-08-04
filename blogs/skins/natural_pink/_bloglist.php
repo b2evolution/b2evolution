@@ -7,12 +7,12 @@
 	 *
 	 * b2evolution - {@link http://b2evolution.net/}
 	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
-	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
 	 *
 	 * @package evoskins
 	 * @subpackage custom
 	 */
-	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+	if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 	if( ! $display_blog_list )
 	{	// We do *not* want the blog list to be displayed
@@ -20,30 +20,30 @@
 	}
 
 	# this is what will start and end your blog links
-	if(!isset($blog_list_start)) $blog_list_start = '<ul id="bloglist">';				
-	if(!isset($blog_list_end)) $blog_list_end = '</ul>';				
+	if(!isset($blog_list_start)) $blog_list_start = '<ul id="bloglist">';
+	if(!isset($blog_list_end)) $blog_list_end = '</ul>';
 	# this is what will separate your blog links
-	if(!isset($blog_item_start)) $blog_item_start = '<li>';				
+	if(!isset($blog_item_start)) $blog_item_start = '<li>';
 	if(!isset($blog_item_end)) $blog_item_end = "</li>\n";
 	# This is the class of for the selected blog link:
 	if(!isset($blog_selected_link_class)) $blog_selected_link_class = 'BlogButtonCurr';
 	# This is the class of for the other blog links:
 	if(!isset($blog_other_link_class)) $blog_other_link_class = 'BlogButton';
 	# This is additionnal markup before and after the selected blog name
-	if(!isset($blog_selected_name_before)) $blog_selected_name_before = '';				
+	if(!isset($blog_selected_name_before)) $blog_selected_name_before = '';
 	if(!isset($blog_selected_name_after)) $blog_selected_name_after = '';
 	# This is additionnal markup before and after the other blog names
-	if(!isset($blog_other_name_before)) $blog_other_name_before = '';				
+	if(!isset($blog_other_name_before)) $blog_other_name_before = '';
 	if(!isset($blog_other_name_after)) $blog_other_name_after = '';
 	# This is the blogparam that will be displayed as the name:
 	if(!isset($blog_name_param)) $blog_name_param = 'shortname';
 	# This is the blogparam that will be displayed as the link title:
 	if(!isset($blog_title_param)) $blog_title_param = 'name';
-	
+
 	/**
 	 * We now call the default bloglist handler...
 	 * However you can replace this file with the full handler (in /blogs) and customize it!
 	 */
-	require get_path('skins').'/_bloglist.php';
+	require get_path('skins').'_bloglist.php';
 
 ?>

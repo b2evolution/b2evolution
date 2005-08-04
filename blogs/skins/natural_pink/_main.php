@@ -14,7 +14,7 @@
 	 * @package evoskins
 	 * @subpackage custom
 	 */
-if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -196,12 +196,10 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 
 	<div class="bSideItem">
 		<h3><?php echo T_('Archives') ?></h3>
-		<ul>
-			<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-				require( dirname(__FILE__).'/_archives.php' );
-				// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
-				<li><a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
-		</ul>
+		<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+			// Call the Archives plugin:
+			$Plugins->call_by_code( 'evo_Arch', array() );
+			// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 	</div>
 
 	<?php if( ! $Blog->get('force_skin') )
@@ -271,7 +269,7 @@ if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
 		Original <a href="http://b2evolution.net/">b2evolution</a> template design by <a href="http://severinelandrieu.com/">S&eacute;verine LANDRIEU</a> &amp; <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a>.
 	</p>
 	<?php
-		log_hit();	// log the hit on this page
+		$Hit->log();	// log the hit on this page
 		debug_info(); // output debug info if requested
 	?>
 </div>

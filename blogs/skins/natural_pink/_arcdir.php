@@ -1,4 +1,4 @@
-<?php 
+<?php
 	/**
 	 * This is the template that displays the archive directory for a blog
 	 *
@@ -9,26 +9,16 @@
 	 *
 	 * b2evolution - {@link http://b2evolution.net/}
 	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
-	 * @copyright (c)2003-2004 by Francois PLANQUE - {@link http://fplanque.net/}
+	 * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
 	 *
 	 * @package evoskins
 	 * @subpackage custom
 	 */
-	if( !defined('DB_USER') ) die( 'Please, do not access this page directly.' );
+	if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
-	if($disp == 'arcdir')  
-	{ // We have asked to display full archives:
-		echo '<ul>';
-		/*
-		 * This file is basically just a trick where we set the number of entries to display
-		 * to "no limit"...
-		 */
-		$archive_limit = '';
-		/**
-		 * And then... call the default archive include.
-		 */
-		require dirname(__FILE__).'/_archives.php';
-		unset( $archive_limit );
-		echo '</ul>';
-	}
+	/**
+	 * We now call the default arcdir handler...
+	 * However you can replace this file with the full handler (in /blogs) and customize it!
+	 */
+	require get_path('skins').'_arcdir.php';
 ?>
