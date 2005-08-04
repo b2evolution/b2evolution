@@ -10,6 +10,7 @@
 
 @import url(../../../../../rsc/css/basic.css);            /* Import basic styles */
 @import url(../../../../../rsc/css/img.css);              /* Import standard image styles */
+@import url(../../../../../rsc/css/results.css);          /* Import results/tables styles */
 @import url(../../../../../rsc/css/blog_elements.css);    /* Import standard blog elements styles */
 @import url(../../../../../rsc/css/forms.css);            /* Import default form styles */
 @import url(../../../../../rsc/css/comments.css);         /* Import default comment styles */
@@ -207,57 +208,59 @@ div.edit_actions input.DeleteButton:hover {
 
 
 /*
- * Tables: 
- * TODO: factorize with results.css
+ * Results tables OVERRIDES:
  */
 
-table.grouped
-{
+/* Table rows: */
+table.grouped {
 	border: 1px solid #9e9286;
-	margin: 1ex auto;
-	border-collapse: collapse;
-	clear:both;
 }
-
 table.grouped tr {
 	background-color: #f5f3ef;
 }
-table.grouped tr:hover,
-table.grouped tr.odd:hover {
-	background-color:#e3dfd0;
-	cursor: default;
-}
-
-table.grouped td {
-	border-left: 1px solid #9e9286;
-	padding: .3ex 1ex;
-}
-
 table.grouped tr.odd {
 	background-color: #efede0;
 }
-
-table.grouped th {
-	border-bottom: 1px solid #9e9286;
-	border-left: 1px solid #9e9286;
-	color: #9e9286;
-	background-color: #efede0;
-	padding: .3ex 1ex;
-}
-tr.group td {
-	font-weight: bold;
+table.grouped tr.group td {
 	color: #8e8276;
 	background-color: #e3dfd0;
 	border-top: 1px solid #9e9286;
 	border-bottom: 1px solid #9e9286;
-	border-left: 0;
 }
-table.grouped .firstcol,
-table.grouped tr.odd .firstcol {
-	border-left: 0;
+table.grouped td {
+	border-left: 1px solid #9e9286;
+}
+table.grouped tr:hover,
+table.grouped tr.odd:hover {
+	background-color:#e3dfd0;
 }
 
-/* Page layout: */
+/* Table headers/footers: */
+table.grouped th,
+table.grouped thead td,
+table.grouped tfoot td {
+	border-bottom: 1px solid #9e9286;
+	border-left: 1px solid #9e9286;
+	background-color: #efede0;
+}
+table.grouped th {
+	color: #9e9286;
+}
+
+/* Table BASIC sort buttons/headers: */
+table.grouped th a.basic_current {
+	background-color:#e3dfd0;
+}
+table.grouped th a.basic_sort_link:hover {
+	background-color:#e3dfd0;
+}
+
+/* / Results tables */
+
+
+/*
+ * Page layout: 
+ */
 #header {
 	float:left;
 	width:100%;
@@ -366,7 +369,7 @@ div.panelblock {
 ul.tabs {
 	margin:0;
 	clear: both;
-	padding: 0.1ex 1em 0;
+	padding: 0 1em 0;
 	list-style: none;
 }
 ul.tabs li {
@@ -416,10 +419,10 @@ ul.tabs li.current a:hover {
 }
 
 /* Sub-tabs */
-ul.hack {
+ul.hack { /* fplanque: note: I'm not sure the hack is still needed now we have removed decimal ex paddings */
 	margin:0;
 	clear: both;
-	padding: 0.1ex 1em 0;
+	padding: 2px 1em 0;
 	list-style: none;
 }
 ul.hack li {

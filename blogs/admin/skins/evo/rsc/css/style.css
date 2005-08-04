@@ -413,7 +413,7 @@ div.panelblock {
 ul.tabs {
 	margin:0;
 	/* clear: both; */
-	padding: 0.1ex 1em 0;
+	padding: 0 1em 0;
 	list-style: none;
 }
 ul.tabs li {
@@ -463,10 +463,10 @@ ul.tabs li.current a:hover {
 }
 
 /* Sub-tabs */
-ul.hack {
+ul.hack { /* fplanque: note: I'm not sure the hack is still needed now we have removed decimal ex paddings */
 	margin:0;
 	/* clear: both; */
-	padding: 0.1ex 1em 0;
+	padding: 2px 1em 0;
 	list-style: none;
 }
 ul.hack li {
@@ -704,6 +704,7 @@ th.bCalendarHeaderCell {
 }
 #bCalendarToday {
 	background-color: #efede0;
+	border: 1px solid #900;
 }
 
 /* Write/compose Screen */
@@ -799,88 +800,3 @@ span.checkall,
 th.checkright {
 	font-size: 84%;
 }
-
-/* Tasks */
-
-.tskst_5 /* Finished */,
-.tskst_6 /* Canceled */ {
-	text-decoration: line-through;
-}
-
-.past_deadline {
-	color: #c00;
-	font-weight: bold;
-}
-
-/*
- * $Log$
- * Revision 1.9  2005/08/03 21:05:02  fplanque
- * cosmetic cleanup
- *
- * Revision 1.8  2005/08/02 18:16:00  fplanque
- * cosmetic enhancements
- *
- * Revision 1.7  2005/08/01 19:36:55  fplanque
- * no message
- *
- * Revision 1.6  2005/05/23 14:32:19  fplanque
- * isolated login (htsrv) CSS styles
- *
- * Revision 1.5  2005/05/10 18:38:16  fplanque
- * cleaned up log message display (part 1)
- *
- * Revision 1.4  2005/05/03 14:38:14  fplanque
- * finished multipage userlist
- *
- * Revision 1.3  2005/04/21 18:01:30  fplanque
- * CSS styles refactoring
- *
- * Revision 1.2  2005/04/20 20:04:14  fplanque
- * visual cleanup of FM
- *
- * Revision 1.1  2005/04/20 18:37:58  fplanque
- * Relocation of javascripts and CSS files to their proper places...
- *
- * Revision 1.20  2005/03/21 17:37:57  fplanque
- * results/table layout refactoring
- *
- * Revision 1.19  2005/03/02 18:30:53  fplanque
- * tedious merging... :/
- *
- * Revision 1.18  2005/03/02 17:04:15  blueyed
- * submenus not bold
- *
- * Revision 1.17  2005/02/28 22:16:24  blueyed
- * AdminUI refactoring (recurse into submenus)
- *
- * Revision 1.16  2005/02/23 04:49:40  blueyed
- * no borders for fieldsets in fieldset.fieldset
- *
- * Revision 1.15  2005/02/20 23:02:56  blueyed
- * horizontal padding for th
- *
- * Revision 1.14  2005/02/10 22:59:00  blueyed
- * start of CSS refactoring
- *
- * Revision 1.13  2005/01/25 18:07:45  fplanque
- * CSS/style cleanup
- *
- * Revision 1.12  2005/01/20 14:00:42  fplanque
- * no message
- *
- * Revision 1.11  2005/01/13 19:53:48  fplanque
- * Refactoring... mostly by Fabrice... not fully checked :/
- *
- * Revision 1.10  2005/01/03 15:17:52  fplanque
- * no message
- *
- * Revision 1.9  2004/12/29 03:16:00  blueyed
- * clear:both-Hack removed
- *
- * Revision 1.8  2004/12/03 15:13:16  fplanque
- * removed my own bugs from CSS
- *
- * Revision 1.7  2004/12/03 11:57:17  fplanque
- * no message
- *
- */
