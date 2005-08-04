@@ -106,7 +106,7 @@ function skin_options_return( $default = '' )
 	for( skin_list_start(); skin_list_next(); )
 	{
 		$r .= '<option value="';
-		skin_list_iteminfo( 'name', false );
+		$r .= skin_list_iteminfo( 'name', false );
 		$r .=  '"';
 		if( skin_list_iteminfo( 'name',false ) == $default )
 		{
@@ -211,6 +211,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.5  2005/08/04 13:05:10  fplanque
+ * bugfix
+ *
  * Revision 1.4  2005/06/12 07:02:51  blueyed
  * Added skin_options_return()
  *
