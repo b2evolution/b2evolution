@@ -884,7 +884,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 	}
 
 	// echo $var, '(', gettype($$var), ')=', $$var, '<br />';
-	return ($$var === NULL) && ($default !== '')?$default:$$var;
+	return $$var;
 }
 
 
@@ -1877,9 +1877,8 @@ function is_create_action( $action )
 
 /*
  * $Log$
- * Revision 1.74  2005/08/04 16:24:03  tny
- * Added a modification to param() function that caused the param function not to return the default values if the input was set, but empty (eg from a form submit). Now the function returns the default value if the POST/GET/etc value is NULL;
- * (this causes the add blog function to work if no 'Default linkblog' was selected).
+ * Revision 1.75  2005/08/04 17:22:15  fplanque
+ * better fix for "no linkblog": allow storage of NULL value.
  *
  * Revision 1.73  2005/07/26 18:57:34  fplanque
  * changed handling of empty params. We do need to differentiate between empty input ''=>NULL and 0=>0 in some situations!

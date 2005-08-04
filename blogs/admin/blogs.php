@@ -85,7 +85,7 @@ function set_edited_Blog_from_params( $for )
 			$edited_Blog->set( 'disp_bloglist', param( 'blog_disp_bloglist', 'integer', $req ? 0 : 1 ) );
 			$edited_Blog->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', $req ? 0 : 1 ) );
 
-			$edited_Blog->set( 'links_blog_ID', param( 'blog_links_blog_ID', 'integer', $req ? true : 0 ) );
+			$edited_Blog->set( 'links_blog_ID', param( 'blog_links_blog_ID', 'integer', $req ? true : '' ) );
 
 			$edited_Blog->set( 'description',   param( 'blog_description',   'string', $req ? true : '' ) );
 			$edited_Blog->set( 'keywords',      param( 'blog_keywords',      'string', $req ? true : '' ) );
@@ -553,6 +553,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.38  2005/08/04 17:22:14  fplanque
+ * better fix for "no linkblog": allow storage of NULL value.
+ *
  * Revision 1.37  2005/06/03 15:12:31  fplanque
  * error/info message cleanup
  *

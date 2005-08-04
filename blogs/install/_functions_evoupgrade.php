@@ -488,7 +488,7 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 8070 )
-	{ // ---------------------------------- upgrade to 0.9.2
+	{ // ---------------------------------- upgrade to 0.9.2 a.k.a 1.6 "phoenix"
 
 		// New tables:
 		create_b2evo_tables_092();
@@ -496,6 +496,7 @@ function upgrade_b2evo_tables()
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
 							MODIFY COLUMN blog_ID int unsigned NOT NULL auto_increment,
+							MODIFY COLUMN blog_links_blog_ID INT(11) NULL DEFAULT NULL,
 							ADD blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
 							ADD blog_media_location ENUM( 'default', 'subdir', 'custom' ) DEFAULT 'default' NOT NULL AFTER blog_commentsexpire,
 							ADD blog_media_subdir VARCHAR( 255 ) NOT NULL AFTER blog_media_location,

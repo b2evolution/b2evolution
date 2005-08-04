@@ -137,7 +137,7 @@ function create_b2evo_tables()
 		blog_force_skin TINYINT(1) NOT NULL default 0,
 		blog_disp_bloglist TINYINT(1) NOT NULL DEFAULT 1,
 		blog_in_bloglist TINYINT(1) NOT NULL DEFAULT 1,
-		blog_links_blog_ID INT(4) NOT NULL DEFAULT 0,
+		blog_links_blog_ID INT(11) NULL DEFAULT NULL,
 		blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
 		blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL,
 		blog_media_subdir VARCHAR( 255 ) NOT NULL,
