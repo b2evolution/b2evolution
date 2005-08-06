@@ -352,7 +352,7 @@ function create_groups()
 		grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible',
 		grp_perm_blogs enum('user','viewall','editall') NOT NULL default 'user',
 		grp_perm_stats enum('none','view','edit') NOT NULL default 'none',
-		grp_perm_spamblacklist enum('none','view','edit') NOT NULL default 'none',
+		grp_perm_spamblacklist enum('none','view','add','edit') NOT NULL default 'none',
 		grp_perm_options enum('none','view','edit') NOT NULL default 'none',
 		grp_perm_users enum('none','view','edit') NOT NULL default 'none',
 		grp_perm_templates TINYINT NOT NULL DEFAULT 0,

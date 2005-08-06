@@ -106,6 +106,7 @@ $Form->fieldset( T_('Permissons for members of this group') );
 	$Form->radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'),
 			array(  $perm_none_option,
 							array( 'view', T_('View only') ),
+							$perm_add_option,
 							array( 'edit', T_('Full Access') )
 						), T_('Antispam') );
 	$Form->checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Templates'), T_('Check to allow template editing.') );
@@ -148,6 +149,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.34  2005/08/06 21:20:32  blueyed
+ * Adding 'add' perm option for 'antispam' permission level. This is meant to allow suggesting a keyword/domain/.. which is added into a queue and must be approved.
+ *
  * Revision 1.33  2005/07/15 18:12:33  fplanque
  * no message
  *
