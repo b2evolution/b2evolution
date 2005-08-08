@@ -178,7 +178,7 @@ class Comment extends DataObject
 			echo $after_user;
 		}
 		else
-		{	// Display info recorded at edit time:
+		{ // Display info recorded at edit time:
 			if( strlen( $this->author_url ) <= 10 ) $makelink = false;
 			if( $after == '#' ) $after = ' ['.T_('Visitor').']';
 			echo $before;
@@ -229,7 +229,7 @@ class Comment extends DataObject
 		}
 
 		if( strlen( $email ) > 5 )
-		{	// If email exists:
+		{ // If email exists:
 			echo $before;
 			if( $makelink ) echo '<a href="mailto:'.$email.'">';
 			echo ($linktext != '') ? $linktext : $email;
@@ -262,7 +262,7 @@ class Comment extends DataObject
 		}
 
 		if( strlen( $url ) > 10 )
-		{	// If URL exists:
+		{ // If URL exists:
 			echo $before;
 			if( $makelink ) echo '<a href="'.$url.'">';
 			echo ($linktext != '') ? $linktext : $url;
@@ -293,7 +293,7 @@ class Comment extends DataObject
 		if( ! is_logged_in() ) return false;
 
 		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
-		{	// If User has no permission to edit comments:
+		{ // If User has no permission to edit comments:
 			return false;
 		}
 
@@ -330,7 +330,7 @@ class Comment extends DataObject
  		if( ! is_logged_in() ) return false;
 
 	 	if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
-		{	// If User has permission to edit comments:
+		{ // If User has permission to edit comments:
 			return false;
 		}
 
@@ -341,7 +341,7 @@ class Comment extends DataObject
 
 		echo $before;
 		if( $button )
-		{	// Display as button
+		{ // Display as button
 			echo '<input type="button"';
 			echo ' value="'.$text.'" title="'.$title.'" onclick="if ( confirm(\'';
 			echo TS_('You are about to delete this comment!\\n\'Cancel\' to stop, \'OK\' to delete.');
@@ -350,7 +350,7 @@ class Comment extends DataObject
 			echo '/>';
 		}
 		else
-		{	// Display as link
+		{ // Display as link
 			echo '<a href="'.$url.'" title="'.$title.'" onclick="return confirm(\'';
 			echo TS_('You are about to delete this comment!\\n\'Cancel\' to stop, \'OK\' to delete.');
 			echo '\')"';
@@ -380,17 +380,17 @@ class Comment extends DataObject
 		global $img_url;
 
 		if( $this->author_User !== NULL )
-		{	// This comment is from a registered user:
+		{ // This comment is from a registered user:
 			if( empty($this->author_User->email) )
-			{	// We have no email for this Author :(
+			{ // We have no email for this Author :(
 				return false;
 			}
 			$form_url = url_add_param( $form_url, 'recipient_id='.$this->author_User->ID );
 		}
 		else
-		{	// This comment is from a visitor:
+		{ // This comment is from a visitor:
 			if( empty($this->author_email) )
-			{	// We have no email for this comment :(
+			{ // We have no email for this comment :(
 				return false;
 			}
 		}
@@ -503,18 +503,19 @@ class Comment extends DataObject
 	 *
 	 * @todo shall we notify suscribers of blog were this is in extra-cat?
 	 * @todo cache message by locale
+	 * @todo Indicator in url to see where the user came from (&from=subnote ["subscription notification") - Problem: too long urls.
 	 */
 	function send_email_notifications()
 	{
-		global $DB, $admin_url, $debug;
+		global $DB, $admin_url, $debug, $Debuglog;
 
 		// Get list of users who want to be notfied:
 		// TODO: also use extra cats/blogs??
 		$sql = 'SELECT DISTINCT user_email, user_locale
 							FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = ID
-						 WHERE sub_coll_ID = '.$this->Item->blog_ID.'
-						   AND sub_comments <> 0
-						   AND LENGTH(TRIM(user_email)) > 0';
+						WHERE sub_coll_ID = '.$this->Item->blog_ID.'
+							AND sub_comments <> 0
+							AND LENGTH(TRIM(user_email)) > 0';
 		$notify_list = $DB->get_results( $sql );
 
 		// Preprocess list:
@@ -528,12 +529,12 @@ class Comment extends DataObject
 		$item_author_User = & $this->Item->Author;
 		if( $item_author_User->notify
 				&& ( ! empty( $item_author_User->email ) ) )
-		{	// Author wants to be notified:
+		{ // Author wants to be notified:
 			$notify_array[$item_author_User->email] = $item_author_User->locale;
 		}
 
 		if( ! count($notify_array) )
-		{	// No-one to notify:
+		{ // No-one to notify:
 			return false;
 		}
 
@@ -541,7 +542,7 @@ class Comment extends DataObject
 		 * We have a list of email addresses to notify:
 		 */
 		if( !is_null( $this->author_User ) )
-		{	// Comment from a registered user:
+		{ // Comment from a registered user:
 			$mail_from = '"'.$this->author_User->get('preferedname').'" <'.$this->author_User->get('email').'>';
 		}
 		elseif( empty( $email ) )
@@ -573,11 +574,11 @@ class Comment extends DataObject
 
 			$subject = sprintf( $subject, $Blog->get('shortname'), $this->Item->get('title') );
 
-			$notify_message  = T_('Blog').': '.$Blog->get('shortname')
-												.' ( '.str_replace('&amp;', '&', $Blog->get('blogurl'))." )\n";
-			$notify_message .= T_('Post').': '.$this->Item->get('title')
-												.' ( '.str_replace('&amp;', '&', $this->Item->gen_permalink( 'pid' ))." )\n";
-												// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+			$notify_message = T_('Blog').': '.$Blog->get('shortname')
+				.' ( '.str_replace('&amp;', '&', $Blog->get('blogurl'))." )\n"
+				.T_('Post').': '.$this->Item->get('title')
+				.' ( '.str_replace('&amp;', '&', $this->Item->gen_permalink( 'pid' ))." )\n";
+				// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
 			switch( $this->type )
 			{
@@ -589,11 +590,11 @@ class Comment extends DataObject
 
 				default:
 					if( !is_null( $this->author_User ) )
-					{	// Comment from a registered user:
+					{ // Comment from a registered user:
 						$notify_message .= T_('Author').': '.$this->author_User->get('preferedname').' ('.$this->author_User->get('login').")\n";
 					}
 					else
-					{	// Comment from visitor:
+					{ // Comment from visitor:
 						$user_domain = gethostbyaddr($this->author_IP);
 						$notify_message .= T_('Author').": $this->author (IP: $this->author_IP, $user_domain)\n";
 						$notify_message .= T_('Email').": $this->author_email\n";
@@ -601,18 +602,22 @@ class Comment extends DataObject
 					}
 			}
 
-			$notify_message .= T_('Comment').': '.str_replace('&amp;', '&', $this->gen_permalink( 'pid' ))."\n";
-												// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+			$notify_message .=
+				T_('Comment').': '.str_replace('&amp;', '&', $this->gen_permalink( 'pid' ))."\n" // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+				.$this->get('content')."\n\n"
+				.T_('Edit/Delete').': '.$admin_url.'b2browse.php?blog='.$this->Item->blog_ID.'&p='.$this->Item->ID."&c=1\n\n"
+				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
 
-			$notify_message .= $this->get('content')."\n\n";
-
-			$notify_message .= T_('Edit/Delete').': '.$admin_url.'b2browse.php?blog='.$this->Item->blog_ID.'&p='.$this->Item->ID."&c=1\n\n";
-
-			$notify_message .= T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
-
-			if( $debug >= 2 )
+			if( $debug )
 			{
-				echo "<p>Sending notification to $notify_email:<pre>$notify_message</pre>";
+				$mail_dump = "Sending notification to $notify_email:<pre>Subject: $subject\n$notify_message</pre>";
+
+				if( $debug >= 2 )
+				{ // output mail content - NOTE: this will kill sending of headers.
+					echo "<p>$mail_dump</p>";
+				}
+
+				$Debuglog->add( $mail_dump, 'notification' );
 			}
 
 			send_mail( $notify_email, $subject, $notify_message, $mail_from );
@@ -625,6 +630,9 @@ class Comment extends DataObject
 }
 /*
  * $Log$
+ * Revision 1.11  2005/08/08 22:35:56  blueyed
+ * DEbuglog for send_email_notifications(), whitespace/code layout.
+ *
  * Revision 1.10  2005/05/25 18:31:01  fplanque
  * implemented email notifications for new posts
  *
