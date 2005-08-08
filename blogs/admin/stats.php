@@ -42,6 +42,7 @@
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER
  * @author fplanque: François PLANQUE
  * @author vegarg: Vegar BERG GULDAL
  *
@@ -74,24 +75,6 @@ for( $curr_blog_ID = blog_list_start('stub');
 }
 
 
-require( dirname(__FILE__).'/_menutop.php' );
-
-// Check permission:
-$current_User->check_perm( 'stats', 'view', true );
-
-
-/*
- * Not fully functional..
-Log::display( '', '', 'This is not working due to hitlog refactoring, sorry.', 'note' );
-
-// End payload block:
-$AdminUI->dispPayloadEnd();
-
-require dirname(__FILE__).'/_footer.php';
-return;
- */
-
-
 switch( $action )
 {
 	case 'changetype': // Change the type of a hit
@@ -116,14 +99,15 @@ switch( $action )
 		$current_User->check_perm( 'stats', 'edit', true );
 
 		param( 'hit_ID', 'integer', true ); // Required!
-		?>
-		<div class="panelinfo">
-			<p><?php printf( T_('Deleting hit #%d...'), $hit_ID )?></p>
-			<?php
-			Hitlist::delete( $hit_ID );
-			?>
-		</div>
-		<?php
+
+		if( Hitlist::delete( $hit_ID ) )
+		{
+			$Messages->add( sprintf( T_('Deleted hit #%d...'), $hit_ID ), 'note' );
+		}
+		else
+		{
+			$Messages->add( sprintf( T_('Could not delete hit #%d...'), $hit_ID ), 'note' );
+		}
 		break;
 
 
@@ -132,16 +116,22 @@ switch( $action )
 		$current_User->check_perm( 'stats', 'edit', true );
 
 		param( 'date', 'integer', true ); // Required!
-		?>
-		<div class="panelinfo">
-			<p><?php printf( T_('Pruning hits for %s...'), date( locale_datefmt(), $date) ) ?></p>
-			<?php
-			Hitlist::prune( $date );
-			?>
-		</div>
-		<?php
+		if( $r = Hitlist::prune( $date ) )
+		{
+			$Messages->add( sprintf( T_('Deleted %d hits for %s.'), $r, date( locale_datefmt(), $date) ), 'note' );
+		}
+		else
+		{
+			$Messages->add( sprintf( T_('No hits deleted for %s.'), date( locale_datefmt(), $date) ), 'note' );
+		}
 		break;
 }
+
+
+require( dirname(__FILE__).'/_menutop.php' );
+
+// Check permission:
+$current_User->check_perm( 'stats', 'view', true );
 
 
 // Begin payload block:
@@ -174,16 +164,16 @@ switch( $AdminUI->getPath(1) )
 		{
 			$last_date = 0;
 
-			$chart [ 'chart_data' ][ 0 ][ 0 ] = '';
-			$chart [ 'chart_data' ][ 1 ][ 0 ] = T_('Direct Accesses');
-			$chart [ 'chart_data' ][ 2 ][ 0 ] = T_('Referers');
-			$chart [ 'chart_data' ][ 3 ][ 0 ] = T_('Refering Searches');
-			$chart [ 'chart_data' ][ 4 ][ 0 ] = T_('Syndication');
-			$chart [ 'chart_data' ][ 5 ][ 0 ] = T_('Indexing Robots');
-			$chart [ 'chart_data' ][ 6 ][ 0 ] = T_('Blacklisted');
+			$chart[ 'chart_data' ][ 0 ][ 0 ] = '';
+			$chart[ 'chart_data' ][ 1 ][ 0 ] = T_('Direct Accesses');
+			$chart[ 'chart_data' ][ 2 ][ 0 ] = T_('Referers');
+			$chart[ 'chart_data' ][ 3 ][ 0 ] = T_('Refering Searches');
+			$chart[ 'chart_data' ][ 4 ][ 0 ] = T_('Syndication');
+			$chart[ 'chart_data' ][ 5 ][ 0 ] = T_('Indexing Robots');
+			$chart[ 'chart_data' ][ 6 ][ 0 ] = T_('Blacklisted');
 
 			$col_mapping = array(
-														'invalid' => 1,
+														'direct' => 1,
 														'no' => 2,
 														'search' => 3,
 														'rss' => 4,
@@ -479,7 +469,7 @@ switch( $AdminUI->getPath(1) )
 			{
 				$Results->cols[] = array(
 										'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
-										'td' => '<a href="b2antispam.php?action=ban&amp;keyword=%urlencode( \'$dom_name$\' )%" title="'
+										'td' => '<a href="antispam.php?action=ban&amp;keyword=%urlencode( \'$dom_name$\' )%" title="'
 											.T_('Ban this domain!').'"><img src="img/noicon.gif" class="middle" alt="'
 											./* TRANS: Abbrev. */ T_('Ban').'" title="'.T_('Ban this domain!').'" /></a>',
 									);
@@ -651,7 +641,7 @@ switch( $AdminUI->getPath(1) )
 						<td class="firstcol"><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 						<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ ?>
-						<td><a href="b2antispam.php?action=ban&amp;keyword=<?php echo urlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a></td>
+						<td><a href="antispam.php?action=ban&amp;keyword=<?php echo urlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a></td>
 						<?php } ?>
 						<td class="right"><?php stats_hit_count() ?></td>
 						<td class="right"><?php stats_hit_percent() ?></td>
