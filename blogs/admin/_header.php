@@ -38,9 +38,7 @@ require_once dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_adminUI.cla
  */
 $AdminUI = & new AdminUI();
 
-
-// TODO: we might move this to some file and include it, but OTOH the call of a method allows to dismiss entries
-//       based on permissions or user options/profile.
+// Construct the menu:
 $AdminUI->addMenuEntries(
 		NULL, // root
 		array(
@@ -125,7 +123,7 @@ $AdminUI->addMenuEntries(
 									'text'=>T_('Antispam'),
 									'perm_name'=>'spamblacklist',
 									'perm_level'=>'view',
-									'href'=>'b2antispam.php'
+									'href'=>'antispam.php'
 								),
 
 			'templates' => array(

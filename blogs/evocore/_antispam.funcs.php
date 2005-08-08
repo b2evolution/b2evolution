@@ -178,29 +178,25 @@ function antispam_ip( $ip )
 			return $blacklist . ": " . $results;
 		}
 	}
-	
+
 	return false;
-*/	
+*/
 }
 
 
 // -------------------- XML-RPC callers ---------------------------
 
-/*
- * b2evonet_report_abuse(-)
+/**
+ * Pings b2evolution.net to report abuse from a particular domain.
  *
- * pings b2evolution.net to report abuse from a particular domain
+ * @param string The keyword to report as abuse.
+ * @return boolean True on success, false on failure.
  */
-function b2evonet_report_abuse( $abuse_string, $display = true )
+function antispam_report_abuse( $abuse_string )
 {
 	global $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
+	global $baseurl, $Messages;
 
-	global $baseurl;
-	if( $display )
-	{
-		echo "<div class=\"panelinfo\">\n";
-		echo '<h3>', T_('Reporting abuse to b2evolution.net...'), "</h3>\n";
-	}
 	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || ( $evonetsrv_host == 'localhost' ) )
 	{ // Local install can only report to local test server
 		// Construct XML-RPC client:
@@ -220,99 +216,99 @@ function b2evonet_report_abuse( $abuse_string, $display = true )
 								);
 		$result = $client->send($message);
 		if( $ret = xmlrpc_displayresult( $result ) )
-		{	// Remote operation successful:
+		{ // Remote operation successful:
 			antispam_update_source( $abuse_string, 'reported' );
+
+			$Messages->add( T_('Reported abuse to b2evolution.net.'), 'note' );
+		}
+		else
+		{
+			$Messages->add( T_('Failed to report abuse to b2evolution.net.'), 'error' );
 		}
 
-		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
 		return($ret);
 	}
 	else
 	{
-		if( $display ) echo "<p>", T_('Aborted (Running on localhost).'), "</p>\n</div>\n";
+		$Messages->add( T_('Reporting abuse to b2evolution aborted (Running on localhost).'), 'note' );
 		return(false);
 	}
 }
 
 
-/*
- * b2evonet_poll_abuse(-)
+/**
+ * Request abuse list from central blacklist.
  *
- * request abuse list from central blacklist
+ * @param boolean Display while fetching it?
  */
-function b2evonet_poll_abuse( $display = true )
+function antispam_poll_abuse( $display = true )
 {
-	global $Settings, $baseurl, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
+	global $Messages, $Settings, $baseurl, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
 
-	if( $display )
-	{
-		echo "<div class=\"panelinfo\">\n";
-		echo '<h3>', T_('Requesting abuse list from b2evolution.net...'), "</h3>\n";
-	}
+	$Messages->add( T_('Requesting abuse list from b2evolution.net...'), 'note' );
 
 	// Construct XML-RPC client:
 	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
 	$client->debug = $debug;
 
 	// Get datetime from last update, because we only want newer stuff...
-	$m = $Settings->get( 'antispam_last_update' );
+	$last_update = $Settings->get( 'antispam_last_update' );
 	// Encode it in the XML-RPC format
-	echo '<p>', T_('Latest update timestamp'), ': ', $m, '</p>';
-	$startat = mysql2date( 'Ymd\TH:i:s', $m );
+	$Messages->add( T_('Latest update timestamp').': '.$last_update, 'note' );
+	$startat = mysql2date( 'Ymd\TH:i:s', $last_update );
 	//$startat = iso8601_encode( mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4)) );
 
 	// Construct XML-RPC message:
 	$message = new xmlrpcmsg(
-								'b2evo.pollabuse',	 													// Function to be called
+								'b2evo.pollabuse',                            // Function to be called
 								array(
-									new xmlrpcval(0,'int'),											// Reserved
-									new xmlrpcval('annonymous','string'),				// Reserved
-									new xmlrpcval('nopassrequired','string'),		// Reserved
-									new xmlrpcval($startat,'dateTime.iso8601'),	// Datetime to start at
-									new xmlrpcval(0,'int')											// Reserved
+									new xmlrpcval(0,'int'),                     // Reserved
+									new xmlrpcval('annonymous','string'),       // Reserved
+									new xmlrpcval('nopassrequired','string'),   // Reserved
+									new xmlrpcval($startat,'dateTime.iso8601'), // Datetime to start at
+									new xmlrpcval(0,'int')                      // Reserved
 								)
 							);
 	$result = $client->send($message);
 
 	if( $ret = xmlrpc_displayresult( $result ) )
-	{	// Response is not an error, let's process it:
+	{ // Response is not an error, let's process it:
 		$response = $result->value();
 		if( $response->kindOf() == 'struct' )
-		{	// Decode struct:
+		{ // Decode struct:
 			$response = xmlrpc_decode_recurse($response);
 			if( !isset( $response['strings'] ) || !isset( $response['lasttimestamp'] ) )
 			{
-				echo T_('Incomplete reponse.')."\n";
+				$Messages->add( T_('Incomplete reponse.'), 'error' );
 				$ret = false;
 			}
 			else
-			{	// Start registering strings:
+			{ // Start registering strings:
 				$value = $response['strings'];
 				if( count($value) == 0 )
 				{
-					echo '<p>', T_('No new blacklisted strings are available.'), '</p>';
+					$Messages->add( T_('No new blacklisted strings are available.'), 'note' );
 				}
 				else
-				{	// We got an array of strings:
-					echo '<p>', T_('Adding strings to local blacklist'), ':</p><ul>';
+				{ // We got an array of strings:
+					$Messages->add( T_('Adding strings to local blacklist'), 'note' );
 					foreach($value as $banned_string)
 					{
-						echo '<li>', T_('Adding:'), ' [', $banned_string, '] : ';
 						if( antispam_create( $banned_string, 'central' ) )
-						{	// Creation successed
-							echo T_('OK.');
+						{ // Creation successed
+							$Messages->add( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
+								.T_('OK.'), 'note' );
 						}
 						else
 						{ // Was already handled
-							echo T_('Not necessary! (Already handled)');
+							$Messages->add( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
+								.T_('Not necessary! (Already handled)'), 'note' );
 							antispam_update_source( $banned_string, 'central' );
 						}
-						echo '</li>';
 					}
-					echo '</ul>';
 					// Store latest timestamp:
 					$endedat = date('Y-m-d H:i:s', iso8601_decode($response['lasttimestamp']) );
-					echo '<p>', T_('New latest update timestamp'), ': ', $endedat, '</p>';
+					$Messages->add( T_('New latest update timestamp').': '.$endedat, 'note' );
 
 					$Settings->set( 'antispam_last_update', $endedat );
 					$Settings->updateDB();
@@ -321,17 +317,20 @@ function b2evonet_poll_abuse( $display = true )
 		}
 		else
 		{
-			echo T_('Invalid reponse.')."\n";
+			$Messages->add( T_('Invalid reponse.'), 'error' );
 			$ret = false;
 		}
 	}
 
-	if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
+	$Messages->add( T_('Done.'), 'success' );
 	return($ret);
 }
 
 /*
  * $Log$
+ * Revision 1.10  2005/08/08 22:54:41  blueyed
+ * Re-activated /admin/antispam, with slight improvements. Still needs a lot more love.
+ *
  * Revision 1.9  2005/04/20 18:37:59  fplanque
  * Relocation of javascripts and CSS files to their proper places...
  *

@@ -209,7 +209,7 @@ while( $Item = $MainList->get_item() )
 						{ // There is an URL and we have permission to ban...
 							// TODO: really ban the base domain! - not by keyword
 							?>
-							<a href="b2antispam.php?action=ban&amp;keyword=<?php
+							<a href="antispam.php?action=ban&amp;keyword=<?php
 								echo urlencode(getBaseDomain($Comment->author_url))
 								?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>&nbsp;
 							<?php
@@ -343,6 +343,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.101  2005/08/08 22:54:40  blueyed
+ * Re-activated /admin/antispam, with slight improvements. Still needs a lot more love.
+ *
  * Revision 1.100  2005/08/03 21:05:01  fplanque
  * cosmetic cleanup
  *
