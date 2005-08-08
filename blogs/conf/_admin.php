@@ -73,16 +73,6 @@ $use_post_url = 1;  // 1 to enable, 0 to disable
 
 
 /**
- * When banning referrers/comment URLs, do you want to remove
- * any referrers and comments containing the banned domain?
- *
- * (you will be asked to confirm the ban if you enable this)
- *
- * @global boolean $deluxe_ban
- */
-$deluxe_ban = 1;  // 1 to enable, 0 to disable
-
-/**
  * When banning, do you want to report abuse to the
  * centralized ban list at b2evolution.net?
  *
