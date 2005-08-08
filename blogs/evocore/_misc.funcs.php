@@ -59,7 +59,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * - htmlbody: display in HTML page body: allow full HTML
  * - entityencoded: Special mode for RSS 0.92: allow full HTML but escape it
  * - htmlhead: strips out HTML (mainly for use in Title)
- * - htmlattr: use as an attribute: strips tags and escapes quotes
+ * - htmlattr: use as an attribute: escapes quotes, strip tags
  * - formvalue: use as a form value: escapes quotes and < > but leaves code alone
  * - xml: use in an XML file: strip HTML tags
  * - xmlattr: use as an attribute: strips tags and escapes quotes
@@ -1877,6 +1877,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.76  2005/08/08 18:30:50  fplanque
+ * allow inserting of files as IMG or A HREFs from the filemanager
+ *
  * Revision 1.75  2005/08/04 17:22:15  fplanque
  * better fix for "no linkblog": allow storage of NULL value.
  *

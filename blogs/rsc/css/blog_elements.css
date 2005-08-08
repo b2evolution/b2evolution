@@ -50,6 +50,13 @@
 .FigZone a:active {
 	color: #fff;
 }
+.Figure img {
+	border: none;
+}
+.FigLegend {
+	font-size: 84%;
+	color: #aaa;
+}
 
 a.permalink_right,
 span.bIcons

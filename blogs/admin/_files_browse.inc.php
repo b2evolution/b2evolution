@@ -287,7 +287,18 @@ while( $lFile = & $Fileman->get_next() )
 		echo ' checked="checked"';
 	}
 	echo ' />';
+
+	/*
+	 * Hidden info used by Javascript:
+	 */
+	if( $mode == 'upload' )
+	{
+		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles
+						.'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
+	}
+
 	echo '</td>';
+
 
 	/*
 	 * File type Icon:
@@ -489,6 +500,19 @@ else
 			onclick="openselectedfiles(); return false;" />
 
 		<?php
+		if( $mode == 'upload' )
+		{	// We are uploading in a popup opened by an edit screen
+			?>
+    	<input class="ActionButton"
+				title="<?php echo T_('Insert IMG tags for selected files'); ?>"
+				name="actionArray[img_tag]"
+				value="img"
+				type="submit"
+				onclick="insert_tag_for_selected_files(); return false;" />
+			<?php
+		}
+
+
     if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
 			?>
@@ -564,6 +588,9 @@ if( $countFiles )
 	?>
 	<script type="text/javascript">
 		<!--
+		/**
+		 * Open selected files in new popup windows:
+		 */
 		function openselectedfiles( checkonly )
 		{
 			elems = document.getElementsByName( 'fm_selected[]' );
@@ -588,6 +615,72 @@ if( $countFiles )
 			}
 			else
 			{
+				return true;
+			}
+		}
+
+		/**
+		 * Textarea insertion code
+		 */
+		function textarea_replace_selection( myField, snippet )
+		{
+			if (document.selection)
+			{ // IE support:
+				myField.focus();
+				sel = document.selection.createRange();
+				sel.text = snippet;
+				myField.focus();
+			}
+			else if (myField.selectionStart || myField.selectionStart == '0')
+			{ // MOZILLA/NETSCAPE support:
+				var startPos = myField.selectionStart;
+				var endPos = myField.selectionEnd;
+				var cursorPos;
+				myField.value = myField.value.substring(0, startPos)
+												+ snippet
+												+ myField.value.substring(endPos, myField.value.length);
+				cursorPos = startPos+snippet.length;
+				myField.focus();
+				myField.selectionStart = cursorPos;
+				myField.selectionEnd = cursorPos;
+			}
+			else
+			{ // Default browser support:
+				myField.value += snippet;
+				myField.focus();
+			}
+		}
+
+		/**
+		 * Insert IMG tags into parent window for selected files:
+		 */
+		function insert_tag_for_selected_files()
+		{
+			elems = document.getElementsByName( 'fm_selected[]' );
+			fm_popup_type = 'selected';
+			var snippet = '';
+			for( i = 0; i < elems.length; i++ )
+			{
+				if( elems[i].checked )
+				{
+					id = elems[i].id.substring( elems[i].id.lastIndexOf('_')+1, elems[i].id.length );
+					img_tag_info_field = document.getElementById( 'img_tag_'+id );
+					snippet += img_tag_info_field.value + ' ';
+				}
+			}
+			if( ! snippet.length )
+			{
+				alert( '<?php echo TS_('You must select at least one file!') ?>' );
+				return false;
+			}
+			else
+			{
+				if (! (window.focus && window.opener))
+				{
+					return true;
+				}
+				window.opener.focus();
+				textarea_replace_selection( window.opener.document.post.content, snippet );
 				return true;
 			}
 		}
@@ -785,6 +878,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.37  2005/08/08 18:30:48  fplanque
+ * allow inserting of files as IMG or A HREFs from the filemanager
+ *
  * Revision 1.36  2005/06/22 17:23:23  blueyed
  * html fix: closing <ul>
  *

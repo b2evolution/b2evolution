@@ -781,6 +781,35 @@ class File extends DataObject
 
 
 	/**
+	 * Get a complete tag (IMG or A HREF) pointing to this file.
+	 */
+	function get_tag()
+	{
+		if( $this->is_dir() )
+		{	// We can't reference a directory
+			return '';
+		}
+
+		if( $this->is_image() )
+		{ // Make an IMG link:
+			$r = '<span class="Figure"><img src="'.$this->get_url().'" '
+						.'alt="'.$this->dget('alt', 'htmlattr').'" '
+						.'title="'.$this->dget('title', 'htmlattr').'" '
+						.$this->get_image_size( 'string' ).' /> '
+						.'<span class="FigLegend">'.$this->dget('desc').'</span></span>';
+		}
+		else
+		{	// Make an A HREF link:
+			$r = '<a href="'.$this->get_url()
+						.'" title="'.$this->dget('desc', 'htmlattr').'">'
+						.$this->dget('title').'</a>';
+		}
+
+		return $r;
+	}
+
+
+	/**
 	 * Internally sets the file/directory size
 	 *
 	 * This is used when the FileList wants to set the recursive size of a directory!
@@ -1135,6 +1164,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2005/08/08 18:30:49  fplanque
+ * allow inserting of files as IMG or A HREFs from the filemanager
+ *
  * Revision 1.39  2005/07/29 17:56:17  fplanque
  * Added functionality to locate files when they're attached to a post.
  * permission checking remains to be done.
