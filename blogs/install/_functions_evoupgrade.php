@@ -625,8 +625,7 @@ function upgrade_b2evo_tables()
 		echo 'Altering Groups table... ';
 		$DB->query( "ALTER TABLE T_groups
 									ADD COLUMN grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible',
-									ADD COLUMN grp_perm_files enum('none','view','add','edit') NOT NULL default 'none',
-									MODIFY COLUMN grp_perm_spamblacklist enum('none','view','add','edit') NOT NULL default 'none'" );
+								  ADD COLUMN grp_perm_files enum('none','view','add','edit') NOT NULL default 'none'" );
 		echo "OK.<br />\n";
 
 		// TODO: alter T_hitlog!
