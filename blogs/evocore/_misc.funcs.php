@@ -556,21 +556,42 @@ function xmlrpc_removepostdata($content)
 }
 
 
-/*
- * xmlrpc_displayresult(-)
+/**
  *
- * fplanque: created
+ * @param object XMLRPC response object
+ * @param mixed File resource or == '' for no file logging.
+ * @param boolean|Log false/true to display or not or a Log message to add messages
  */
 function xmlrpc_displayresult( $result, $log = '', $display = true )
 {
 	if( ! $result )
 	{
-		if( $display ) echo T_('No response!'),"<br />\n";
+		if( $display )
+		{
+			if( is_a( $display, 'log' ) )
+			{
+				$display->add( T_('No response!'), 'error' );
+			}
+			else
+			{
+				echo T_('No response!'),"<br />\n";
+			}
+		}
 		return false;
 	}
 	elseif( $result->faultCode() )
 	{ // We got a remote error:
-		if( $display ) echo T_('Remote error'), ': ', $result->faultString(), ' (', $result->faultCode(), ")<br />\n";
+		if( $display )
+		{
+			if( is_a( $display, 'log' ) )
+			{
+				$display->add( T_('Remote error').': '.$result->faultString().' ('.$result->faultCode(), 'error' );
+			}
+			else
+			{
+				echo T_('Remote error'), ': ', $result->faultString(), ' (', $result->faultCode(), ")<br />\n";
+			}
+		}
 		debug_fwrite($log, $result->faultCode().' -- '.$result->faultString());
 		return false;
 	}
@@ -578,22 +599,37 @@ function xmlrpc_displayresult( $result, $log = '', $display = true )
 	// We'll display the response:
 	$val = $result->value();
 	$value = xmlrpc_decode_recurse($result->value());
-	if (is_array($value))
+	if( $display || $log )
 	{
-		$value_arr = '';
-		foreach($value as $blah)
-		{
-			$value_arr .= ' ['.$blah.'] ';
-		}
-		if( $display ) echo T_('Response'), ': ', $value_arr, "<br />\n";
-		debug_fwrite($log, $value_arr);
-	}
-	else
-	{
-		if( $display ) echo T_('Response'), ': ', $value ,"<br />\n";
-		debug_fwrite($log, $value);
-	}
+		$out = '';
 
+		if( is_array($value) )
+		{
+			foreach($value as $l_value)
+			{
+				$out .= ' ['.$l_value.'] ';
+			}
+		}
+		else
+		{
+			$out = $value;
+		}
+		debug_fwrite($log, $out);
+
+		if( $display )
+		{
+			$out = T_('Response').': '.$out;
+
+			if( is_a( $display, 'log' ) )
+			{
+				$display->add( $out, 'success' );
+			}
+			else
+			{
+				echo $out."<br />\n";
+			}
+		}
+	}
 	return true;
 }
 
@@ -1819,8 +1855,10 @@ function header_nocache()
 
 /**
  * Sends HTTP header to redirect to the previous location (which
- * can be given as function parameter, GET parameter (redirecto_to),
- * is taken from {@link Hit::referer} or {@link $baseurl})
+ * can be given as function parameter, GET parameter (redirec_to),
+ * is taken from {@link Hit::referer} or {@link $baseurl}).
+ *
+ * NOTE: This function {@link exit() exits} the php script execution.
  */
 function header_redirect( $redirectTo = NULL )
 {
@@ -1846,7 +1884,7 @@ function header_redirect( $redirectTo = NULL )
 		}
 	}
 
-	header('Refresh:0;url='.$location);
+	header('Location: '.$location);
 
 	exit();
 }
@@ -1877,6 +1915,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.77  2005/08/08 22:50:42  blueyed
+ * refactored xmlrpc_displayresult() to "display into" Log object.
+ *
  * Revision 1.76  2005/08/08 18:30:50  fplanque
  * allow inserting of files as IMG or A HREFs from the filemanager
  *
