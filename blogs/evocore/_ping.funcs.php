@@ -39,6 +39,9 @@
  * @author fplanque: Francois PLANQUE.
  * @author vegarg
  *
+ * @todo Make these plugins
+ * @todo Link messages to HTML-Anchor tags, e.g. "Pinging <a href="%s">b2evolution.net</a>", to the site where the update can be seen.
+ *
  * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
@@ -244,6 +247,9 @@ function pingTechnorati(& $blogparams, $display = true )
 
 /*
  * $Log$
+ * Revision 1.5  2005/08/08 22:51:57  blueyed
+ * todo
+ *
  * Revision 1.4  2005/05/25 18:31:01  fplanque
  * implemented email notifications for new posts
  *
