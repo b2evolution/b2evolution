@@ -75,6 +75,10 @@ for( $curr_blog_ID = blog_list_start('stub');
 }
 
 
+// Check permission:
+$current_User->check_perm( 'stats', 'view', true );
+
+
 switch( $action )
 {
 	case 'changetype': // Change the type of a hit
@@ -129,9 +133,6 @@ switch( $action )
 
 
 require( dirname(__FILE__).'/_menutop.php' );
-
-// Check permission:
-$current_User->check_perm( 'stats', 'view', true );
 
 
 // Begin payload block:

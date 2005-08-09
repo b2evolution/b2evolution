@@ -513,9 +513,9 @@ class Comment extends DataObject
 		// TODO: also use extra cats/blogs??
 		$sql = 'SELECT DISTINCT user_email, user_locale
 							FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = ID
-						WHERE sub_coll_ID = '.$this->Item->blog_ID.'
-							AND sub_comments <> 0
-							AND LENGTH(TRIM(user_email)) > 0';
+						 WHERE sub_coll_ID = '.$this->Item->blog_ID.'
+						   AND sub_comments <> 0
+						   AND LENGTH(TRIM(user_email)) > 0';
 		$notify_list = $DB->get_results( $sql );
 
 		// Preprocess list:
@@ -630,6 +630,9 @@ class Comment extends DataObject
 }
 /*
  * $Log$
+ * Revision 1.12  2005/08/09 15:22:40  fplanque
+ * no message
+ *
  * Revision 1.11  2005/08/08 22:35:56  blueyed
  * DEbuglog for send_email_notifications(), whitespace/code layout.
  *

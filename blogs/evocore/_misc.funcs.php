@@ -560,7 +560,7 @@ function xmlrpc_removepostdata($content)
  *
  * @param object XMLRPC response object
  * @param mixed File resource or == '' for no file logging.
- * @param boolean|Log false/true to display or not or a Log message to add messages
+ * @param boolean|Log false/true to display or not or a Log object to add messages to
  */
 function xmlrpc_displayresult( $result, $log = '', $display = true )
 {
@@ -1884,8 +1884,10 @@ function header_redirect( $redirectTo = NULL )
 		}
 	}
 
-	header('Location: '.$location);
-
+	header('Refresh:0;url='.$location);
+	// fplanque> Note: I am not sure using this is cacheing safe: header('Location: '.$location);
+	// Current "Refresh" version works fine.
+	// Please provide link to relevant material before changing it.
 	exit();
 }
 
@@ -1915,6 +1917,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.78  2005/08/09 15:22:40  fplanque
+ * no message
+ *
  * Revision 1.77  2005/08/08 22:50:42  blueyed
  * refactored xmlrpc_displayresult() to "display into" Log object.
  *
