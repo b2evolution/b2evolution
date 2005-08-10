@@ -104,7 +104,26 @@ class Request
 	 */
 	function param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
 	{
-    return $this->params[$var] = param( $var, $type, $default, $memorize, $override, $forceset );
+		if( $type == 'boolean' )
+		{ // we handle 'boolean' special, because 'false' also means: nothing set (if not forcing)
+			$r = param( $var, 'integer', $default, $memorize, $override, $forceset );
+			if( $r !== false )
+			{
+				settype( $this->params[$var], 'boolean' );
+				$this->params[$var] = $r;
+			}
+		}
+		else
+		{
+			$r = param( $var, $type, $default, $memorize, $override, $forceset );
+
+			if( $r !== false )
+			{ // Return value !== false (false means it has not been set here)
+				$this->params[$var] = $r;
+			}
+		}
+
+		return $r;
 	}
 
 	/**
@@ -473,9 +492,11 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.8  2005/08/10 13:19:49  blueyed
+ * param(): only set/remember param if it has been set (which must not be the case for !$forceset) [forgotten with the last commit]
+ *
  * Revision 1.7  2005/08/10 13:18:03  blueyed
  * Added property $link_log_messages_to_field_IDs;
- * param(): only set/remember param if it has been set (which must not be the case for !$forceset);
  * get(): explicitly return NULL if param is not set;
  * added optional $field_msg param to param_error()/param_error_multiple();
  * doc
