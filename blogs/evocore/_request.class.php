@@ -51,7 +51,18 @@ class Request
 	 */
 	var $err_messages = array();
 
+	/**
+	 * @var Log Reference to a Log object that gets used to add (error) messages to.
+	 */
 	var $Messages;
+
+	/**
+	 * If true, the internal function {@link _add_message_to_Log()} will create links to IDs
+	 * of the fields where the error occurred.
+	 * @var boolean
+	 */
+	var $link_log_messages_to_field_IDs = false;
+
 
 	/**
 	 * Constructor.
@@ -108,9 +119,14 @@ class Request
 	}
 
 
+	/**
+	 * Get the value of a param.
+	 *
+	 * @return NULL|mixed The value of the param, if set. NULL otherwise.
+	 */
 	function get( $var )
 	{
-		return $this->params[$var];
+		return isset($this->params[$var]) ? $this->params[$var] : NULL;
 	}
 
 
@@ -277,7 +293,7 @@ class Request
 			$month = intval($matches[2]);
 			$day = intval($matches[3]);
 			if( checkdate( $month, $day, $year ) )
-			{	// all clean! :)
+			{ // all clean! :)
 				return true;
 			}
 		}
@@ -288,8 +304,10 @@ class Request
 
 
 	/**
+	 * Check if the value of a param is a regular expression (syntax).
+	 *
 	 * @param string param name
-	 * @param array
+	 * @param string error message
 	 * @return boolean true if OK
 	 */
 	function param_check_regexp( $var, $err_msg )
@@ -359,7 +377,7 @@ class Request
 		foreach( $vars as $var )
 		{
 			if( !empty( $this->params[$var] ) )
-			{	// Okay, we got at least one:
+			{ // Okay, we got at least one:
 				return true;
 			}
 		}
@@ -388,13 +406,19 @@ class Request
 	 *
 	 * @param string param name
 	 * @param string error message
+	 * @param string|NULL error message for form field ($err_msg gets used if === NULL).
 	 */
-	function param_error( $var, $err_msg )
+	function param_error( $var, $err_msg, $field_msg = NULL )
 	{
 		if( ! isset( $this->err_messages[$var] ) )
-		{	// We haven't already recorded an error for this field:
-			$this->err_messages[$var] = $err_msg;
-			$this->Messages->add( $err_msg, 'error' );
+		{ // We haven't already recorded an error for this field:
+			if( $field_msg === NULL )
+			{
+				$field_msg = $err_msg;
+			}
+			$this->err_messages[$var] = $field_msg;
+
+			$this->_add_message_to_Log( $var, $err_msg, 'error' );
 		}
 	}
 
@@ -404,22 +428,58 @@ class Request
 	 *
 	 * @param array of param names
 	 * @param string error message
+	 * @param string|NULL error message for form fields ($err_msg gets used if === NULL).
 	 */
-	function param_error_multiple( $vars, $err_msg )
+	function param_error_multiple( $vars, $err_msg, $field_msg = NULL )
 	{
+		if( $field_msg === NULL )
+		{
+			$field_msg = $err_msg;
+		}
+
 		foreach( $vars as $var )
 		{
 			if( ! isset( $this->err_messages[$var] ) )
-			{	// We haven't already recorded an error for this field:
+			{ // We haven't already recorded an error for this field:
 				$this->err_messages[$var] = $err_msg;
 			}
 		}
-		$this->Messages->add( $err_msg, 'error' );
+
+		$this->_add_message_to_Log( $var, $err_msg, 'error' );
+	}
+
+
+	/**
+	 * This function is used by {@link param_error()} and {@link param_error_multiple()}.
+	 *
+	 * @access protected
+	 *
+	 * @param string param name
+	 * @param string error message
+	 */
+	function _add_message_to_Log( $var, $err_msg, $log_category = 'error' )
+	{
+		if( $this->link_log_messages_to_field_IDs )
+		{
+			$var_id = Form::get_valid_id($var);
+			$this->Messages->add( '<a href="#'.$var_id.'" onclick="var form_elem = document.getElementById(\''.$var_id.'\'); if( form_elem ) { form_elem.select(); }">'.$err_msg.'</a>', $log_category );
+		}
+		else
+		{
+			$this->Messages->add( $err_msg, $log_category );
+		}
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.7  2005/08/10 13:18:03  blueyed
+ * Added property $link_log_messages_to_field_IDs;
+ * param(): only set/remember param if it has been set (which must not be the case for !$forceset);
+ * get(): explicitly return NULL if param is not set;
+ * added optional $field_msg param to param_error()/param_error_multiple();
+ * doc
+ *
  * Revision 1.6  2005/06/10 18:25:44  fplanque
  * refactoring
  *
