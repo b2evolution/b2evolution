@@ -75,11 +75,11 @@ class User extends DataObject
 	var $showonline;
 
 	/**
-	 * Number of posts by this user. Use getNumPosts() to access this (lazy filled).
+	 * Number of posts by this user. Use get_num_posts() to access this (lazy filled).
 	 * @var integer|NULL
 	 * @access protected
 	 */
-	var $_numPosts;
+	var $_num_posts;
 
 	/**
 	* @var NULL|Group Reference to group
@@ -204,10 +204,10 @@ class User extends DataObject
 				return $this->firstname.' '.$this->lastname;
 
 			case 'preferedname':
-				return $this->getPreferedName();
+				return $this->get_prefered_name();
 
 			case 'num_posts':
-				return $this->getNumPosts();
+				return $this->get_num_posts();
 
 			default:
 			// All other params:
@@ -221,7 +221,7 @@ class User extends DataObject
 	 *
 	 * @return string
 	 */
-	function getPreferedName()
+	function get_prefered_name()
 	{
 		switch( $this->idmode )
 		{
@@ -242,18 +242,18 @@ class User extends DataObject
 	 *
 	 * @return integer
 	 */
-	function getNumPosts()
+	function get_num_posts()
 	{
 		global $DB;
 
-		if( is_null( $this->_numPosts ) )
+		if( is_null( $this->_num_posts ) )
 		{
-			$this->_numPosts = $DB->get_var( "SELECT count(*)
+			$this->_num_posts = $DB->get_var( "SELECT count(*)
 																				FROM T_posts
 																				WHERE post_creator_user_ID = $this->ID" );
 		}
 
-		return $this->_numPosts;
+		return $this->_num_posts;
 	}
 
 
@@ -577,13 +577,9 @@ class User extends DataObject
 	 *
 	 * Includes WAY TOO MANY requests because we try to be compatible with MySQL 3.23, bleh!
 	 *
-	 * {@internal User::dbdelete(-) }}
-	 *
-	 * @todo delete comments on user's posts
-	 *
-	 * @param boolean true if you want to echo progress
+	 * @param Log Log object where output gets added (by reference).
 	 */
-	function dbdelete( $echo = false )
+	function dbdelete( &$Log )
 	{
 		global $DB;
 
@@ -591,49 +587,59 @@ class User extends DataObject
 
 		$DB->begin();
 
-
 		// Transform registered user comments to unregistered:
-		if( $echo ) echo '<br />Transforming user\'s comments to unregistered comments... ';
 		$ret = $DB->query( 'UPDATE T_comments
 												SET comment_author_ID = NULL,
 														comment_author = '.$DB->quote( $this->get('preferedname') ).',
 														comment_author_email = '.$DB->quote( $this->get('email') ).',
 														comment_author_url = '.$DB->quote( $this->get('url') ).'
 												WHERE comment_author_ID = '.$this->ID );
-		if( $echo ) printf( '(%d rows)', $ret );
+		if( is_a( $Log, 'log' ) )
+		{
+			$Log->add( 'Transforming user\'s comments to unregistered comments... '.sprintf( '(%d rows)', $ret ), 'note' );
+		}
 
 		// Get list of posts that are going to be deleted (3.23)
-		if( $echo ) echo '<br />Getting post list to delete... ';
 		$post_list = $DB->get_list( "SELECT ID
 																	FROM T_posts
 																	WHERE post_creator_user_ID = $this->ID" );
 
-		if( empty( $post_list ) )
-		{
-			echo 'None!';
-		}
-		else
+		if( !empty( $post_list ) )
 		{
 			// Delete comments
-			if( $echo ) echo '<br />Deleting comments on user\'s posts... ';
 			$ret = $DB->query( "DELETE FROM T_comments
 													WHERE comment_post_ID IN ($post_list)" );
-			if( $echo ) printf( '(%d rows)', $ret );
+			if( is_a( $Log, 'log' ) )
+			{
+				$Log->add( sprintf( 'Deleted %d comments on user\'s posts.', $ret ), 'note' );
+			}
 
 			// Delete post extracats
-			if( $echo ) echo '<br />Deleting user\'s posts\' extracats... ';
 			$ret = $DB->query(	"DELETE FROM T_postcats
 													WHERE postcat_post_ID IN ($post_list)" );
-			if( $echo ) printf( '(%d rows)', $ret );
+			if( is_a( $Log, 'log' ) )
+			{
+				$Log->add( sprintf( 'Deleted %d extracats of user\'s posts\'.', $ret ) ); // TODO: geeky wording.
+			}
 
 			// Posts will we auto-deleted by parent method
-		} // no posts
+		}
+		else
+		{ // no posts
+			if( is_a( $Log, 'log' ) )
+			{
+				$Log->add( 'No posts to delete.', 'note' );
+			}
+		}
 
 		// Delete main object:
-		if( $echo ) echo '<br />Deleting User... ';
 		parent::dbdelete();
 
-		echo '<br />Done.</p>';
+		if( is_a( $Log, 'log' ) )
+		{
+			$Log->add( 'Deleted User.', 'note' );
+		}
+
 		$DB->commit();
 	}
 
@@ -794,16 +800,16 @@ class User extends DataObject
 	/**
 	 * Template function: display number of user's posts
 	 */
-	function numPosts( $format = 'htmlbody' )
+	function num_posts( $format = 'htmlbody' )
 	{
-		echo format_to_output( $this->getNumPosts(), $format );
+		echo format_to_output( $this->get_num_posts(), $format );
 	}
 
 
 	/**
 	 * Template function: display first name of the user
 	 */
-	function firstName( $format = 'htmlbody' )
+	function first_name( $format = 'htmlbody' )
 	{
 		$this->disp( 'firstname', $format );
 	}
@@ -812,7 +818,7 @@ class User extends DataObject
 	/**
 	 * Template function: display last name of the user
 	 */
-	function lastName( $format = 'htmlbody' )
+	function last_name( $format = 'htmlbody' )
 	{
 		$this->disp( 'lastname', $format );
 	}
@@ -821,7 +827,7 @@ class User extends DataObject
 	/**
 	 * Template function: display nickname of the user
 	 */
-	function nickName( $format = 'htmlbody' )
+	function nick_name( $format = 'htmlbody' )
 	{
 		$this->disp( 'nickname', $format );
 	}
@@ -879,6 +885,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2005/08/10 21:14:34  blueyed
+ * Enhanced $demo_mode (user editing); layout fixes; some function names normalized
+ *
  * Revision 1.37  2005/07/12 00:29:58  blueyed
  * Moved call to $Debuglog up, so that it may be logged however later before die()ing.
  *

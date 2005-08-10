@@ -38,8 +38,17 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 // Begin payload block:
 $AdminUI->dispPayloadBegin();
 
-$allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
-											|| ($user_profile_only && $edited_User->ID == $current_User->ID) );
+if( $demo_mode )
+{
+	$allowed_to_edit = $current_User->check_perm( 'users', 'edit' )
+											&& $edited_User->ID != 1
+											&& $edited_User->login != 'demouser';
+}
+else
+{
+	$allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
+												|| ($user_profile_only && $edited_User->ID == $current_User->ID) );
+}
 
 /*
  * fplanque>>blueyed: Daniel I am removing the user switch code because it doesn't fit in
@@ -175,7 +184,7 @@ if( ! $creating )
 
 	if( $app_shortname == 'b2evo' )
 	{ // TODO: move this out of the core
-		$Form->info( T_('Posts'), ( $action != 'newtemplate' ) ? $edited_User->getNumPosts() : '-' );
+		$Form->info( T_('Posts'), ( $action != 'newtemplate' ) ? $edited_User->get_num_posts() : '-' );
 	}
 	$Form->info( T_('Created on'), $edited_User->dget('datecreated') );
 	$Form->info( T_('From IP'), $edited_User->dget('ip') );
@@ -192,6 +201,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.63  2005/08/10 21:14:34  blueyed
+ * Enhanced $demo_mode (user editing); layout fixes; some function names normalized
+ *
  * Revision 1.62  2005/07/12 17:10:55  blueyed
  * replaced Form::text() with Form::text_input(), Form::password() with Form::password_input()
  *

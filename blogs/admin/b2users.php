@@ -46,6 +46,7 @@ $AdminUI->setPath( 'users' );
 
 param( 'action', 'string', 'list' );
 
+$edited_User = NULL; // reset/init
 
 /*
  * Load editable objects:
@@ -80,8 +81,6 @@ elseif( param( 'grp_ID', 'integer', NULL, true, false, false ) )
 }
 
 
-
-
 $user_profile_only = 0;
 // Check permission:
 if( !$current_User->check_perm( 'users', 'edit', false ) )
@@ -94,11 +93,20 @@ if( !$current_User->check_perm( 'users', 'edit', false ) )
 		$Messages->add( 'You have no permission to edit other users or groups!', 'error' );
 		$action = 'list';
 	}
-	elseif( $demo_mode && $action && $current_User->login == 'demouser' )
-	{
-		$Messages->add( T_('You cannot change the demouser profile in demo mode!'), 'error' );
-	}
 }
+
+if( $demo_mode && $edited_User && ( $edited_User->ID == 1 || $edited_User->login == 'demouser' ) )
+{ // User may edit - but demo mode restrictions apply!
+	$Messages->add( T_('You cannot edit the admin and demouser profile in demo mode!'), 'error' );
+
+	if( strpos( $action, 'delete_' ) === 0 )
+	{
+		$action = 'list';
+	}
+
+	$user_profile_only = 1;
+}
+
 
 /*
  * Perform actions:
@@ -333,7 +341,7 @@ else
 			if( param( 'confirm', 'integer', 0 ) )
 			{ // confirmed, Delete from DB:
 				$msg = sprintf( T_('User &laquo;%s&raquo; [%s] deleted.'), $edited_User->dget( 'fullname' ), $edited_User->dget( 'login' ) );
-				$edited_User->dbdelete( true );
+				$edited_User->dbdelete( $Messages );
 				unset($edited_User);
 				forget_param('user_ID');
 				$Messages->add( $msg, 'success' );
@@ -449,7 +457,7 @@ else
 			if( param( 'confirm', 'integer', 0 ) )
 			{ // confirmed, Delete from DB:
 				$msg = sprintf( T_('Group &laquo;%s&raquo; deleted.'), $edited_Group->dget( 'name' ) );
-				$edited_Group->dbdelete( true );
+				$edited_Group->dbdelete( $Messages );
 				unset($edited_Group);
 				forget_param('grp_ID');
 				$Messages->add( $msg, 'success' );
@@ -547,6 +555,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.97  2005/08/10 21:14:34  blueyed
+ * Enhanced $demo_mode (user editing); layout fixes; some function names normalized
+ *
  * Revision 1.96  2005/08/01 14:51:46  fplanque
  * Fixed: updating an user was not displaying changes right away (there's still an issue with locale changing though)
  *

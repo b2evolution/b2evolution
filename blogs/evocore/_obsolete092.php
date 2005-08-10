@@ -291,14 +291,14 @@ function trackback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 
 /**
  * the_author_posts(-)
- * @deprecated by User::getNumPosts() - not used in the core anymore
+ * @deprecated by User::get_num_posts() - not used in the core anymore
  */
 function the_author_posts()
 {
 	global $postdata, $UserCache;
 
 	$User =& $UserCache->get_by_ID($postdata['Author_ID']);
-	echo $User->getNumPosts();
+	echo $User->get_num_posts();
 }
 
 
@@ -1633,6 +1633,9 @@ $fileupload_allowedusers = '';
 
 /*
  * $Log$
+ * Revision 1.14  2005/08/10 21:14:34  blueyed
+ * Enhanced $demo_mode (user editing); layout fixes; some function names normalized
+ *
  * Revision 1.13  2005/07/12 23:05:36  blueyed
  * Added Timer class with categories 'main' and 'sql_queries' for now.
  *
