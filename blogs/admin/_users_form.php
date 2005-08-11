@@ -39,7 +39,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 $AdminUI->dispPayloadBegin();
 
 if( $demo_mode )
-{
+{ // Prevent users from killing access to the demo...
 	$allowed_to_edit = $current_User->check_perm( 'users', 'edit' )
 											&& $edited_User->ID != 1
 											&& $edited_User->login != 'demouser';
@@ -201,6 +201,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.64  2005/08/11 19:41:10  fplanque
+ * no message
+ *
  * Revision 1.63  2005/08/10 21:14:34  blueyed
  * Enhanced $demo_mode (user editing); layout fixes; some function names normalized
  *

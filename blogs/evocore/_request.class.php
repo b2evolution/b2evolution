@@ -104,6 +104,11 @@ class Request
 	 */
 	function param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
 	{
+    return $this->params[$var] = param( $var, $type, $default, $memorize, $override, $forceset );
+
+	// fplanque> I don't see why we need this. We need to discuss it. Is it reasonable to try to pass booleans through an URL?
+	// Seems to me that this code makes the function behave in ways that you can't predict
+	// If there's a real issue, it's probably better to have a param_boolean() with special stuff and leave the param() unchanged (zillions of pages depend on param...)
 		if( $type == 'boolean' )
 		{ // we handle 'boolean' special, because 'false' also means: nothing set (if not forcing)
 			$r = param( $var, 'integer', $default, $memorize, $override, $forceset );
@@ -492,6 +497,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.9  2005/08/11 19:41:11  fplanque
+ * no message
+ *
  * Revision 1.8  2005/08/10 13:19:49  blueyed
  * param(): only set/remember param if it has been set (which must not be the case for !$forceset) [forgotten with the last commit]
  *

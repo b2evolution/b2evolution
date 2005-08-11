@@ -579,7 +579,7 @@ class User extends DataObject
 	 *
 	 * @param Log Log object where output gets added (by reference).
 	 */
-	function dbdelete( &$Log )
+	function dbdelete( & $Log )
 	{
 		global $DB;
 
@@ -885,6 +885,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2005/08/11 19:41:11  fplanque
+ * no message
+ *
  * Revision 1.38  2005/08/10 21:14:34  blueyed
  * Enhanced $demo_mode (user editing); layout fixes; some function names normalized
  *

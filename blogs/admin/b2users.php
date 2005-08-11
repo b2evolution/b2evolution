@@ -46,7 +46,8 @@ $AdminUI->setPath( 'users' );
 
 param( 'action', 'string', 'list' );
 
-$edited_User = NULL; // reset/init
+// fplanque> the rule that should be consistent accross the app, is that if no object is requested then $edited_Object remains unset! use isset() !
+# $edited_User = NULL; // reset/init
 
 /*
  * Load editable objects:
@@ -95,7 +96,7 @@ if( !$current_User->check_perm( 'users', 'edit', false ) )
 	}
 }
 
-if( $demo_mode && $edited_User && ( $edited_User->ID == 1 || $edited_User->login == 'demouser' ) )
+if( $demo_mode && isset($edited_User) && ( $edited_User->ID == 1 || $edited_User->login == 'demouser' ) )
 { // User may edit - but demo mode restrictions apply!
 	$Messages->add( T_('You cannot edit the admin and demouser profile in demo mode!'), 'error' );
 
@@ -555,6 +556,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.98  2005/08/11 19:41:10  fplanque
+ * no message
+ *
  * Revision 1.97  2005/08/10 21:14:34  blueyed
  * Enhanced $demo_mode (user editing); layout fixes; some function names normalized
  *

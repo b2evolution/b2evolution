@@ -113,14 +113,14 @@ $Form->fieldset( T_('Permissons for members of this group') );
 			array(	$perm_none_option,
 							$perm_view_option,
 							array( 'add', T_('Add/Upload') ),
-							array( 'edit', T_('Full Access') )
+							$perm_edit_option
 						), T_('Files') );
 	if( $edited_Group->get('ID') != 1 )
 	{	// Groups others than #1 can be prevented from editing users
 		$Form->radio( 'edited_grp_perm_users', $edited_Group->get('perm_users'),
 				array(	$perm_none_option,
 								$perm_view_option,
-								array( 'edit', T_('Full Access') )
+								$perm_edit_option
 							), T_('Users &amp; Groups') );
 	}
 	else
@@ -130,7 +130,7 @@ $Form->fieldset( T_('Permissons for members of this group') );
 	$Form->radio( 'edited_grp_perm_options', $edited_Group->get('perm_options'),
 			array(	$perm_none_option,
 							$perm_view_option,
-							array( 'edit', T_('Full Access') )
+							$perm_edit_option
 						), T_('Settings') );
 
 $Form->fieldset_end();
@@ -148,6 +148,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.36  2005/08/11 19:41:10  fplanque
+ * no message
+ *
  * Revision 1.35  2005/08/08 13:58:51  fplanque
  * rollback
  *
