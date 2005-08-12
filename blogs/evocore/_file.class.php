@@ -783,7 +783,10 @@ class File extends DataObject
 	/**
 	 * Get a complete tag (IMG or A HREF) pointing to this file.
 	 */
-	function get_tag()
+	function get_tag( $before_image = '<div class="image_block">',
+										$before_image_legend = '<div class="image_legend">',
+										$after_image_legend = '</div>',
+										$after_image = '</div>' )
 	{
 		if( $this->is_dir() )
 		{	// We can't reference a directory
@@ -792,11 +795,19 @@ class File extends DataObject
 
 		if( $this->is_image() )
 		{ // Make an IMG link:
-			$r = '<span class="Figure"><img src="'.$this->get_url().'" '
+			$r = $before_image
+						.'<img src="'.$this->get_url().'" '
 						.'alt="'.$this->dget('alt', 'htmlattr').'" '
 						.'title="'.$this->dget('title', 'htmlattr').'" '
-						.$this->get_image_size( 'string' ).' /> '
-						.'<span class="FigLegend">'.$this->dget('desc').'</span></span>';
+						.$this->get_image_size( 'string' ).' />';
+			$desc = $this->dget('desc');
+			if( !empty($desc) )
+			{
+				$r .= $before_image_legend
+								.$this->dget('desc')
+							.$after_image_legend;
+			}
+			$r .= $after_image;
 		}
 		else
 		{	// Make an A HREF link:
@@ -1164,6 +1175,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2005/08/12 17:41:10  fplanque
+ * cleanup
+ *
  * Revision 1.40  2005/08/08 18:30:49  fplanque
  * allow inserting of files as IMG or A HREFs from the filemanager
  *

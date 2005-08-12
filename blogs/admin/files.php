@@ -137,7 +137,7 @@ if( $action == 'update_settings' )
 if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 {
 	if( ($edited_Link = $LinkCache->get_by_ID( $link_ID, false )) === false )
-	{	// We could not find the linke to edit:
+	{	// We could not find the link to edit:
 		unset( $edited_Link );
 		$Messages->head = T_('Cannot edit link!');
 		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
@@ -151,7 +151,7 @@ if( param( 'link_ID', 'integer', NULL, false, false, false ) )
  */
 if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 { // Load Requested iem:
-	if( ($edited_Item = $ItemCache->get_by_ID( $item_ID, false )) === false )
+	if( ($edited_Item = & $ItemCache->get_by_ID( $item_ID, false )) === false )
 	{	// We could not find the contact to link:
 		unset( $edited_Item );
 		$Messages->head = T_('Cannot link Item!');
@@ -536,30 +536,51 @@ switch( $action )
 			break;
 		}
 
-		if( !isset($edited_Item) )
-		{	// No Item to link to...
-			$Fileman->fm_mode = NULL;
-			break;
-		}
-
-		// TODO: check item EDIT permissions!
-
 		$selectedFile = & $selected_Filelist->getFileByIndex(0);
 
-		$DB->begin();
+		if( isset($edited_Item) )
+		{
+			// TODO: check item EDIT permissions!
+			$DB->begin();
 
-		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
-		$selectedFile->load_meta( true );
+			// Load meta data AND MAKE SURE IT IS CREATED IN DB:
+			$selectedFile->load_meta( true );
 
-		// Let's make the link!
-		$edited_Link = & new Link();
-		$edited_Link->set( 'item_ID', $edited_Item->ID );
-		$edited_Link->set( 'file_ID', $selectedFile->ID );
-		$edited_Link->dbinsert();
+			// Let's make the link!
+			$edited_Link = & new Link();
+			$edited_Link->set( 'item_ID', $edited_Item->ID );
+			$edited_Link->set( 'file_ID', $selectedFile->ID );
+			$edited_Link->dbinsert();
 
-		$DB->commit();
+			$DB->commit();
 
-		$Messages->add( T_('Selected file has been linked to item.'), 'success' );
+			$Messages->add( T_('Selected file has been linked to item.'), 'success' );
+		}
+		// Plug extensions here!
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// ONgsb only:
+		elseif( isset($edited_Product) )
+		{
+			// TODO: check product EDIT permissions!
+			$DB->begin();
+
+			// Load meta data AND MAKE SURE IT IS CREATED IN DB:
+			$selectedFile->load_meta( true );
+
+			// Let's make the link!
+			$DB->query( "INSERT INTO T_prod_files( pf_prod_ID, pf_file_ID )
+										VALUES( $edited_Product->ID, $selectedFile->ID )",
+									'Insert product-file link' );
+
+			$DB->commit();
+
+			$Messages->add( T_('Selected file has been linked to product.'), 'success' );
+		}
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		else
+		{	// No Item to link to...
+			$Fileman->fm_mode = NULL;
+		}
 		break;
 
 
@@ -575,11 +596,13 @@ switch( $action )
 		// TODO: get Item from Link to check perm
 
 		// TODO: check item EDIT permissions!
+		// Check that we have permission to edit item:
+		// $current_User->check_perm( $perm_name, 'edit', true, $edited_Item->ID );
 
 		// Delete from DB:
 		$msg = sprintf( T_('Link from &laquo;%s&raquo; deleted.'), $edited_Link->Item->dget('title') );
 		$edited_Link->dbdelete( true );
-		unset($edited_Link);
+		unset( $edited_Link );
 		$Messages->add( $msg, 'success' );
 		break;
 
@@ -734,10 +757,9 @@ require dirname(__FILE__).'/_menutop.php';
 // Messages have already bben displayed:
 $Messages->clear( 'all' );
 
-?>
 
+// echo 'fm mode:'.$Fileman->fm_mode;
 
-<?php
 switch( $Fileman->fm_mode )
 { // handle modes {{{
 
@@ -1210,8 +1232,8 @@ $toggleButtons = array();
 
 if( $Fileman->fm_mode )
 {
-	if( !$UserSettings->get('fm_forceFM') )
-	{ // FM is not forced - link to hide/display
+	if( ! $Fileman->forceFM )
+	{ // FM is not forced (by user or by special function) - link to hide/display
 		echo '<div class="panelinfo" id="FM_anchor">';
 		echo '[<a '
 				.' href="'.$Fileman->getCurUrl( array( 'forceFM' => 1-$Fileman->forceFM ) ).'">'
@@ -1243,6 +1265,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.116  2005/08/12 17:37:14  fplanque
+ * cleanup
+ *
  * Revision 1.115  2005/07/26 18:56:21  fplanque
  * minor
  *

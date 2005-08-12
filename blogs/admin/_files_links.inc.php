@@ -45,7 +45,7 @@ $Form = & new Form( 'files.php', '', 'post', 'fieldset' );
 
 $Form->global_icon( T_('Quit link mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
 
-$Form->begin_form( 'fform', sprintf( T_('Link files to &laquo;%s&raquo;...'), $edited_Item->dget( 'title') ) );
+$Form->begin_form( 'fform', sprintf( T_('Link files to &laquo;%s&raquo;...'), $edited_Item->dget('title') ) );
 
 $edited_Item->edit_link( '<p>', '</p>', T_('Edit this post') );
 
@@ -83,7 +83,7 @@ function file_path()
 	global $current_File, $edited_Item;
 
 	// File relative path & name:
-	return $current_File->edit_link( $edited_Item->ID );
+	return $current_File->edit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID );
 }
 $Results->cols[] = array(
 						'th' => T_('Path'),
@@ -106,7 +106,7 @@ function file_actions( $link_ID )
 
 	$title = T_('Locate this file!');
 
-	$r = $current_File->edit_link( $edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
+	$r = $current_File->edit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
 
 	return $r.' '.action_icon( T_('Delete this link!'), 'unlink',
                       regenerate_url( 'action', 'link_ID='.$link_ID.'&amp;action=unlink') );
@@ -126,6 +126,9 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.3  2005/08/12 17:41:10  fplanque
+ * cleanup
+ *
  * Revision 1.2  2005/07/29 17:56:16  fplanque
  * Added functionality to locate files when they're attached to a post.
  * permission checking remains to be done.

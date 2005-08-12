@@ -130,7 +130,7 @@ if( false )
 			global $current_File, $edited_Item;
 
 			// File relative path & name:
-			return $current_File->edit_link( $edited_Item->ID ).'<span class="filemeta"> - '.$current_File->dget('title').'</span>';
+			return $current_File->edit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID ).'<span class="filemeta"> - '.$current_File->dget('title').'</span>';
 		}
 
 		return '?';
@@ -151,7 +151,7 @@ if( false )
 			if( isset($current_File) )
 			{
 				$title = T_('Locate this file!');
-				$r = $current_File->edit_link($edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title ).' ';
+				$r = $current_File->edit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title ).' ';
 			}
 
 			return $r.action_icon( T_('Delete this link!'), 'unlink',
