@@ -179,7 +179,7 @@ class FileManager extends Filelist
 			'cmr_keepsource' => 'cmr_keepsource',
 			'flatmode'       => 'flatmode',
 			'forceFM'        => 'forceFM',
-			'item_ID'	       => '_item_ID'	             // Used in fm_mode=link_item
+			'item_ID'	       => '_item_ID',	             // Used in fm_mode=link_item
 		);
 
 
@@ -1353,6 +1353,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.50  2005/08/12 17:35:29  fplanque
+ * minor
+ *
  * Revision 1.49  2005/07/29 17:56:18  fplanque
  * Added functionality to locate files when they're attached to a post.
  * permission checking remains to be done.

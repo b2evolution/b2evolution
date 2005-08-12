@@ -36,6 +36,7 @@
 .FigZone img {
 	border: none;
 	margin-bottom: 8px;
+	text-align: center;
 }
 .FigZone a {
 	color: #fff;
@@ -49,13 +50,6 @@
 }
 .FigZone a:active {
 	color: #fff;
-}
-.Figure img {
-	border: none;
-}
-.FigLegend {
-	font-size: 84%;
-	color: #aaa;
 }
 
 a.permalink_right,

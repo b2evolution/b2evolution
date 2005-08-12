@@ -101,10 +101,43 @@ class FileCache extends DataObjectCache
 		return $File;
 	}
 
+
+	/**
+	 * Instantiate a DataObject from a table row and then cache it.
+	 *
+	 * @param Object Database row
+	 */
+	/* fpanque> we migth need something like this at some point in time...
+	function instantiate( & $db_row )
+	{
+		// Get ID of the object we'ere preparing to instantiate...
+		$obj_ID = $db_row->{$this->dbIDname};
+
+ 		if( !empty($obj_ID) )
+		{	// If the object ID is valid:
+	 		if( !isset($this->cache[$obj_ID]) )
+			{	// If not already cached:
+				// Instantiate a File object for this line:
+				$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY!
+				// Flow meta data into File object:
+				$current_File->load_meta( false, $row );
+				$this->add( $File );
+			}
+			else
+			{	// Already cached:
+			// Flow meta data into File object:
+			$current_File->load_meta( false, $row );
+			}
+		}
+	}
+	*/
 }
 
 /*
  * $Log$
+ * Revision 1.5  2005/08/12 17:32:37  fplanque
+ * minor
+ *
  * Revision 1.4  2005/05/17 19:26:07  fplanque
  * FM: copy / move debugging
  *

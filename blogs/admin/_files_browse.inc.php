@@ -352,7 +352,9 @@ while( $lFile = & $Fileman->get_next() )
 	/*
 	 * Link ("chain") icon:
 	 */
-	if( $Fileman->fm_mode == 'link_item' )
+	if( $Fileman->fm_mode == 'link_item'
+			// Plug extensions here!
+		)
 	{	// Offer option to link the file to an Item:
 		$Fileman->dispButtonFileLink();
 		echo ' ';
@@ -752,7 +754,7 @@ if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add
 <form action="files.php" method="post" class="toolbaritem">
 	<div>
 		<?php echo $Fileman->getFormHiddenInputs( array( 'fm_mode' => 'file_upload' ) ); ?>
-		<input class="ActionButton" type="submit" value="<?php echo T_('Upload file...'); ?>" />
+		<input class="ActionButton" type="submit" value="<?php echo T_('Advanced upload...'); ?>" />
 	</div>
 </form>
 
@@ -878,6 +880,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.38  2005/08/12 17:31:06  fplanque
+ * minor
+ *
  * Revision 1.37  2005/08/08 18:30:48  fplanque
  * allow inserting of files as IMG or A HREFs from the filemanager
  *
