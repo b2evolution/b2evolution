@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 0.9.2-CVS\n"
-"POT-Creation-Date: 2004-12-15 01:51+0100\n"
-"PO-Revision-Date: 2005-05-29 20:17+0900\n"
-"Last-Translator: Jun MUTO <jmuto2@saku2.com>\n"
+"POT-Creation-Date: 2005-05-31 20:09+0200\n"
+"PO-Revision-Date: 2005-08-12 15:27+0900\n"
+"Last-Translator: Jun MUTO <jmuto9@saku2.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -518,12 +518,12 @@ msgstr "hitログとコメントをこのキーワードでチェックします
 msgid "Re-check"
 msgstr "再チェック"
 
-#  TRANS: file actions; edit, rename, copy, ..
+#. TRANS: file actions; edit, rename, copy, ..
 #: ..\..\..\admin\b2antispam.php:441
 #: ..\..\..\admin\_browse_posts_list.inc.php:111
 #: ..\..\..\admin\_files_browse.inc.php:251
 #: ..\..\..\admin\_files_browse.inc.php:689
-#: ..\..\..\admin\_listeditor.php:197
+#: ..\..\..\admin\_listeditor.php:190
 #: ..\..\..\admin\_set_plugins.form.php:49
 #: ..\..\..\admin\_users_list.php:166
 msgid "Actions"
@@ -831,7 +831,7 @@ msgstr "総計"
 msgid "Prune this date!"
 msgstr "この日付を除去!"
 
-#  TRANS: Abbrev. for Prune (stats)
+#. TRANS: Abbrev. for Prune (stats)
 #: ..\..\..\admin\b2stats.php:364
 #: ..\..\..\admin\b2stats.php:396
 #: ..\..\..\admin\_set_plugins.form.php:33
@@ -864,8 +864,8 @@ msgstr "日時"
 msgid "Delete this hit!"
 msgstr "このhitを削除する!"
 
-#  TRANS: Abbrev. for Delete (stats)
-#  TRANS: Abbrev. for Delete
+#. TRANS: Abbrev. for Delete (stats)
+#. TRANS: Abbrev. for Delete
 #: ..\..\..\admin\b2stats.php:465
 #: ..\..\..\admin\b2stats.php:687
 #: ..\..\..\admin\b2stats.php:786
@@ -881,12 +881,12 @@ msgstr "削除"
 msgid "Log as a search instead"
 msgstr "代わりに検索としてログ記録する"
 
-#  TRANS: Abbrev. for "move to searches" (stats)
+#. TRANS: Abbrev. for "move to searches" (stats)
 #: ..\..\..\admin\b2stats.php:471
 msgid "-&gt;S"
 msgstr "-&gt;S"
 
-#  TRANS: Abbrev. for Spam
+#. TRANS: Abbrev. for Spam
 #: ..\..\..\admin\b2stats.php:485
 #, fuzzy
 msgid "S"
@@ -899,7 +899,7 @@ msgstr "スパム"
 msgid "Ban this domain!"
 msgstr "このドメインを拒否!"
 
-#  TRANS: Abbrev.
+#. TRANS: Abbrev.
 #: ..\..\..\admin\b2stats.php:488
 #: ..\..\..\admin\b2stats.php:655
 #: ..\..\..\admin\_edit_showposts.php:211
@@ -983,7 +983,7 @@ msgstr "無効なファイル名!"
 
 #: ..\..\..\admin\b2template.php:64
 msgid "Oops, no such file !"
-msgstr "あれ、そんなファイルはありません!"
+msgstr "おっと、そんなファイルはありません!"
 
 #: ..\..\..\admin\b2template.php:75
 msgid "File edited!"
@@ -993,7 +993,7 @@ msgstr "ファイルを編集しました!"
 msgid "Be careful what you do, editing this file could break your template! Do not edit what's between <code>&lt;?php</code> and <code>?&gt;</code> if you don't know what you're doing!"
 msgstr "何をしているか注意しましょう。このファイルを編集するとテンプレートが壊れる可能性があります! 何をしているのか分らなければ、<code>&lt;?php</code> と <code>?&gt;</code> の間のものは編集しないで!"
 
-#  TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp;
+#. TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp;
 #: ..\..\..\admin\b2template.php:88
 #: ..\..\..\admin\_comment.form.php:86
 #: ..\..\..\admin\_item.form.php:160
@@ -1156,7 +1156,7 @@ msgstr "新規ユーザのデフォルト グループは削除できません!"
 
 #: ..\..\..\admin\b2users.php:475
 #, php-format
-msgid "Group &laquo;%s&raquo;deleted."
+msgid "Group &laquo;%s&raquo; deleted."
 msgstr "グループ &laquo;%s&raquo; を削除しました。"
 
 #: ..\..\..\admin\b2users.php:484
@@ -1280,7 +1280,7 @@ msgid "Deleting this blog will also delete all its categories, posts and comment
 msgstr "このブログを削除すると、その全てのカテゴリ、投稿、コメントも削除されます!"
 
 #: ..\..\..\admin\blogs.php:399
-#: ..\..\..\admin\_listeditor.php:141
+#: ..\..\..\admin\_listeditor.php:134
 #: ..\..\..\evocore\_dataobject.class.php:392
 msgid "THIS CANNOT BE UNDONE!"
 msgstr "これは元に戻すことができません!"
@@ -1297,14 +1297,14 @@ msgstr "静的ファイル [<strong><a %s>%s</a></strong>] の削除も試みま
 
 #: ..\..\..\admin\blogs.php:430
 #: ..\..\..\admin\files.php:467
-#: ..\..\..\admin\_listeditor.php:152
+#: ..\..\..\admin\_listeditor.php:145
 #: ..\..\..\evocore\_dataobject.class.php:400
 msgid "I am sure!"
 msgstr "了解!"
 
 #: ..\..\..\admin\blogs.php:436
 #: ..\..\..\admin\files.php:471
-#: ..\..\..\admin\_listeditor.php:156
+#: ..\..\..\admin\_listeditor.php:149
 #: ..\..\..\evocore\_dataobject.class.php:405
 msgid "CANCEL"
 msgstr "キャンセル"
@@ -1355,7 +1355,7 @@ msgstr "新規投稿の追加..."
 #: ..\..\..\evocore\_user.funcs.php:372
 #: ..\..\..\htsrv\comment_post.php:61
 #: ..\..\..\htsrv\trackback.php:99
-#: ..\..\..\xmlsrv\xmlrpc.php:1360
+#: ..\..\..\xmlsrv\xmlrpc.php:1362
 msgid "Supplied URL is invalid: "
 msgstr "提供されたURLは無効です"
 
@@ -1378,7 +1378,7 @@ msgstr "投稿を記録しています..."
 #: ..\..\..\admin\edit_actions.php:254
 #: ..\..\..\admin\edit_actions.php:347
 msgid "Post not publicly published: skipping trackback, pingback and blog pings..."
-msgstr "投稿は公開されていません: トラックバック、ピンバック、ブログ ピン をスキップします..."
+msgstr "投稿は公開されていません: トラックバック、ピンバック、ブログPings をスキップします..."
 
 #: ..\..\..\admin\edit_actions.php:156
 msgid "Posting Done..."
@@ -1392,7 +1392,7 @@ msgstr "投稿を更新しています..."
 #: ..\..\..\admin\edit_actions.php:270
 #: ..\..\..\admin\edit_actions.php:358
 msgid "Post had already pinged: skipping blog pings..."
-msgstr "投稿はすでにピンがうたれています。ブログ ピン をスキップします..."
+msgstr "投稿はすでにPingが送信されています。ブログPings をスキップします..."
 
 #: ..\..\..\admin\edit_actions.php:286
 #: ..\..\..\admin\edit_actions.php:374
@@ -1411,7 +1411,7 @@ msgstr "投稿を削除しています..."
 
 #: ..\..\..\admin\edit_actions.php:391
 msgid "Oops, no post with this ID!"
-msgstr "あれ、このIDの投稿はありません!"
+msgstr "おっと、このIDの投稿はありません!"
 
 #: ..\..\..\admin\edit_actions.php:405
 msgid "Deleting Done..."
@@ -1454,7 +1454,7 @@ msgstr "この機能を使用するにはJavaScriptを有効にする必要が�
 msgid "You have no permission to edit/modify files."
 msgstr "ファイルを編集/修正する権限がありません。"
 
-#  TRANS: Warning this is a javascript string
+#. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\files.php:318
 #: ..\..\..\admin\files.php:393
 #: ..\..\..\admin\files.php:535
@@ -1484,7 +1484,7 @@ msgstr "&laquo;%s&raquo; は名前変更されませんでした"
 
 #: ..\..\..\admin\files.php:371
 #, php-format
-msgid "&laquo;%s&raquo; could not be renamed to  &laquo;%s&raquo;"
+msgid "&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; を &laquo;%s&raquo; に名前変更できませんでした"
 
 #: ..\..\..\admin\files.php:376
@@ -1496,12 +1496,12 @@ msgstr "&laquo;%s&raquo; を &laquo;%s&raquo; に名前変更しました"
 msgid "Delete file(s)?"
 msgstr "ファイルを削除しますか?"
 
-#  TRANS: Warning this is a javascript string
+#. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\files.php:414
 msgid "Do you really want to delete the following files?"
 msgstr "以下のファイルを本当に削除しますか?"
 
-#  TRANS: Warning this is a javascript string
+#. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\files.php:415
 msgid "Do you really want to delete the following file?"
 msgstr "以下のファイルを本当に削除しますか?"
@@ -1558,7 +1558,7 @@ msgstr "ファイルを追加/アップロードする権限がありません�
 msgid "Please select a local file to upload."
 msgstr "アップロードするローカル ファイルを選択してください。"
 
-#  TRANS: %s will be replaced by the difference
+#. TRANS: %s will be replaced by the difference
 #: ..\..\..\admin\files.php:799
 #, php-format
 msgid "The file is %s too large."
@@ -1667,7 +1667,7 @@ msgstr "この投稿を編集"
 msgid "Existing links"
 msgstr "存在するリンク"
 
-#  TRANS: file/directory path
+#. TRANS: file/directory path
 #: ..\..\..\admin\files.php:1146
 #: ..\..\..\admin\_files_browse.inc.php:244
 msgid "Path"
@@ -1682,7 +1682,7 @@ msgstr "パス"
 msgid "Title"
 msgstr "タイトル"
 
-#  TRANS: file type
+#. TRANS: file type
 #: ..\..\..\admin\files.php:1167
 #: ..\..\..\admin\_comment.form.php:167
 #: ..\..\..\admin\_edit_showposts.php:129
@@ -1716,7 +1716,7 @@ msgstr "ファイルマネージャーを隠す"
 msgid "Display Filemanager"
 msgstr "ファイルマネージャーを表示"
 
-#  TRANS: current default blog
+#. TRANS: current default blog
 #: ..\..\..\admin\fileset.php:60
 #: ..\..\..\admin\_set_files.form.php:83
 msgid "Restore defaults"
@@ -1780,12 +1780,12 @@ msgstr "アンインストールするプラグイン #"
 msgid "Plugin info"
 msgstr "プラグイン情報"
 
-#  TRANS: file name
+#. TRANS: file name
 #: ..\..\..\admin\plugins.php:86
 #: ..\..\..\admin\_comment.form.php:52
 #: ..\..\..\admin\_files_browse.inc.php:246
-#: ..\..\..\admin\_listeditor.php:190
-#: ..\..\..\admin\_listeditor.php:232
+#: ..\..\..\admin\_listeditor.php:183
+#: ..\..\..\admin\_listeditor.php:225
 #: ..\..\..\admin\_set_regional.form.php:50
 #: ..\..\..\admin\_set_regional.form.php:162
 #: ..\..\..\admin\_users_groupform.php:67
@@ -1860,13 +1860,13 @@ msgstr "降順"
 msgid "1 page"
 msgstr "1 ページ"
 
-#  TRANS: previous page (of posts)
+#. TRANS: previous page (of posts)
 #: ..\..\..\admin\_adminUI_general.class.php:785
 #: ..\..\..\skins\custom\_main.php:226
 msgid "Previous"
 msgstr "前"
 
-#  TRANS: next page (of posts)
+#. TRANS: next page (of posts)
 #: ..\..\..\admin\_adminUI_general.class.php:786
 #: ..\..\..\skins\custom\_main.php:227
 msgid "Next"
@@ -1887,12 +1887,12 @@ msgstr "時刻:"
 
 #: ..\..\..\admin\_adminUI_general.class.php:1067
 msgid "Greenwich Mean Time "
-msgstr "グリニッジ平均時"
+msgstr "グリニッジ平均時 "
 
-#  TRANS: short for Greenwich Mean Time
+#. TRANS: short for Greenwich Mean Time
 #: ..\..\..\admin\_adminUI_general.class.php:1068
 msgid "GMT:"
-msgstr "グリニッジ平均時:"
+msgstr "GMT:"
 
 #: ..\..\..\admin\_adminUI_general.class.php:1069
 msgid "Logged in as:"
@@ -1954,7 +1954,7 @@ msgstr "新規投稿後に..."
 
 #: ..\..\..\admin\_blogs_advanced.form.php:79
 msgid "Ping b2evolution.net"
-msgstr "b2evolution.net にピンする"
+msgstr "b2evolution.net にPing送信する"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:79
 msgid "to get listed on the \"recently updated\" list on b2evolution.net"
@@ -1962,7 +1962,7 @@ msgstr "b2evolution.net の \"recently updated\" (最近の更新) リストに�
 
 #: ..\..\..\admin\_blogs_advanced.form.php:80
 msgid "Ping technorati.com"
-msgstr "technorati.com にピンする"
+msgstr "technorati.com にPing送信する"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:80
 #: ..\..\..\admin\_blogs_advanced.form.php:81
@@ -1972,11 +1972,11 @@ msgstr "新規投稿の通知をします。"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:81
 msgid "Ping weblogs.com"
-msgstr "weblogs.com にピンする"
+msgstr "weblogs.com にPing送信する"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:82
 msgid "Ping blo.gs"
-msgstr "blo.gs にピンする"
+msgstr "blo.gs にPing送信する"
 
 #: ..\..\..\admin\_blogs_advanced.form.php:85
 #: ..\..\..\admin\_set_files.form.php:66
@@ -2093,12 +2093,12 @@ msgstr "index.php による自動検出"
 msgid "Match absolute URL or use default blog"
 msgstr "絶対URLと一致しなければ、デフォルト ブログを使用"
 
-#  TRANS: NO current default blog
+#. TRANS: NO current default blog
 #: ..\..\..\admin\_blogs_general.form.php:137
 msgid "No default blog is currently set"
 msgstr "現在、デフォルトのブログが設定されていません"
 
-#  TRANS: current default blog
+#. TRANS: current default blog
 #: ..\..\..\admin\_blogs_general.form.php:138
 msgid "Current default :"
 msgstr "現在のデフォルトは :"
@@ -2279,7 +2279,7 @@ msgstr "静的ファイル"
 msgid "Locale"
 msgstr "言語・地域設定"
 
-#  TRANS: Abbrev. for Copy
+#. TRANS: Abbrev. for Copy
 #: ..\..\..\admin\_blogs_list.php:53
 #: ..\..\..\admin\_blogs_list.php:112
 #: ..\..\..\admin\_blogs_list.php:113
@@ -2304,7 +2304,7 @@ msgstr "プロパティ"
 msgid "Default blog on index.php"
 msgstr "index.php のデフォルト ブログ"
 
-#  TRANS: abbrev. for "generate !"
+#. TRANS: abbrev. for "generate !"
 #: ..\..\..\admin\_blogs_list.php:95
 msgid "Gen!"
 msgstr "生成!"
@@ -2342,7 +2342,7 @@ msgstr "このブログへ保護付き状態での投稿をする権限"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:74
 msgid "Permission to post into this blog with draft status"
-msgstr "このブログへドラフト状態での投稿をする権限"
+msgstr "このブログへ下書き状態での投稿をする権限"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:80
 msgid "Permission to post into this blog with deprecated status"
@@ -2416,42 +2416,42 @@ msgstr "ユーザ権限"
 msgid "Layout"
 msgstr "レイアウト"
 
-#  TRANS: table header for user list
+#. TRANS: table header for user list
 #: ..\..\..\admin\_blogs_permissions.form.php:213
 msgid "Login "
 msgstr "ログイン"
 
-#  TRANS: SHORT table header on TWO lines
+#. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_permissions.form.php:214
 msgid "Is<br />member"
 msgstr "メンバー<br />であるか"
 
-#  TRANS: SHORT table header on TWO lines
+#. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_permissions.form.php:215
 msgid "Can post/edit with following statuses:"
 msgstr "次の状態で投稿/編集できます:"
 
-#  TRANS: SHORT table header on TWO lines
+#. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_permissions.form.php:216
 msgid "Delete<br />posts"
 msgstr "投稿<br />削除"
 
-#  TRANS: SHORT table header on TWO lines
+#. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_permissions.form.php:217
 msgid "Edit<br />comts"
 msgstr "コメント<br />編集"
 
-#  TRANS: SHORT table header on TWO lines
+#. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_permissions.form.php:218
 msgid "Edit<br />cats"
 msgstr "カテゴリ<br />編集"
 
-#  TRANS: SHORT table header on TWO lines
+#. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_permissions.form.php:219
 msgid "Edit<br />blog"
 msgstr "ブログ<br />編集"
 
-#  TRANS: SHORT table header on TWO lines
+#. TRANS: SHORT table header on TWO lines
 #: ..\..\..\admin\_blogs_permissions.form.php:220
 msgid "Media directory"
 msgstr "メディア ディレクトリ"
@@ -2474,7 +2474,7 @@ msgstr "私用"
 #: ..\..\..\admin\_blogs_permissions.form.php:227
 #: ..\..\..\evocore\_vars.inc.php:239
 msgid "Draft"
-msgstr "ドラフト"
+msgstr "下書き"
 
 #: ..\..\..\admin\_blogs_permissions.form.php:228
 #: ..\..\..\evocore\_vars.inc.php:236
@@ -2569,7 +2569,7 @@ msgstr "私用 (自分のみ)"
 #: ..\..\..\admin\_browse_posts_sidebar.inc.php:93
 #: ..\..\..\admin\_item.form.php:286
 msgid "Draft (Not published!)"
-msgstr "ドラフト (公開されません!)"
+msgstr "下書き (公開されません!)"
 
 #: ..\..\..\admin\_browse_posts_sidebar.inc.php:96
 #: ..\..\..\admin\_item.form.php:288
@@ -2685,13 +2685,13 @@ msgstr "前の %d 日"
 msgid "Next %d"
 msgstr "次の %d 個"
 
-#  TRANS: x TO y OF z
+#. TRANS: x TO y OF z
 #: ..\..\..\admin\_edit_navbar.php:58
 #: ..\..\..\admin\_edit_navbar.php:64
 msgid " to "
 msgstr " から "
 
-#  TRANS: x TO y OF z
+#. TRANS: x TO y OF z
 #: ..\..\..\admin\_edit_navbar.php:66
 msgid " of "
 msgstr " 全体は "
@@ -2708,7 +2708,7 @@ msgstr "はじめから"
 msgid "OK"
 msgstr "OK"
 
-#  TRANS: backoffice: each post is prefixed by "date BY author IN categories"
+#. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 #: ..\..\..\admin\_edit_showposts.php:111
 msgid "by"
 msgstr "著者:"
@@ -2732,7 +2732,7 @@ msgstr "担当者:"
 msgid "Pages:"
 msgstr "ページ:"
 
-#  TRANS: Link to comments for current post
+#. TRANS: Link to comments for current post
 #: ..\..\..\admin\_edit_showposts.php:170
 msgid "no comment"
 msgstr "コメントがありません"
@@ -2925,7 +2925,7 @@ msgstr "フィルタは正規表現"
 msgid "Filter"
 msgstr "フィルタ"
 
-#  TRANS: short for "is regular expression"
+#. TRANS: short for "is regular expression"
 #: ..\..\..\admin\_files_browse.inc.php:95
 msgid "RegExp"
 msgstr "正規表現"
@@ -2984,17 +2984,17 @@ msgstr "%d ファイル"
 msgid "No files"
 msgstr "ファイルがありません"
 
-#  TRANS: file size
+#. TRANS: file size
 #: ..\..\..\admin\_files_browse.inc.php:248
 msgid "Size"
 msgstr "サイズ"
 
-#  TRANS: file's last change / timestamp
+#. TRANS: file's last change / timestamp
 #: ..\..\..\admin\_files_browse.inc.php:249
 msgid "Last change"
 msgstr "最終更新"
 
-#  TRANS: file's permissions (short)
+#. TRANS: file's permissions (short)
 #: ..\..\..\admin\_files_browse.inc.php:250
 msgid "Perms"
 msgstr "権限"
@@ -3033,12 +3033,12 @@ msgstr "名前の変更"
 msgid "No files found."
 msgstr "ファイルが見つかりません。"
 
-#  TRANS: Warning this is a javascript string
+#. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_files_browse.inc.php:479
 msgid "uncheck all"
 msgstr "全てのチェックを解除"
 
-#  TRANS: Warning this is a javascript string
+#. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_files_browse.inc.php:479
 msgid "check all"
 msgstr "全てにチェック"
@@ -3198,7 +3198,7 @@ msgstr "名前変更をキャンセル!"
 msgid "File"
 msgstr "ファイル"
 
-#  TRANS: Button to leave the upload mode
+#. TRANS: Button to leave the upload mode
 #: ..\..\..\admin\_files_upload.inc.php:154
 msgid "Quit upload mode!"
 msgstr "アップロード モードを終了!"
@@ -3224,7 +3224,7 @@ msgstr "許可する拡張子"
 msgid "Maximum allowed file size"
 msgstr "許可される最大ファイルサイズ"
 
-#  TRANS: will be displayed as title for failed file uploads
+#. TRANS: will be displayed as title for failed file uploads
 #: ..\..\..\admin\_files_upload.inc.php:210
 #, fuzzy
 msgid "Invalid submission."
@@ -3262,9 +3262,9 @@ msgstr "ファイルのアップロード先:"
 
 #: ..\..\..\admin\_files_upload.inc.php:265
 #: ..\..\..\admin\_file_properties.inc.php:79
-#: ..\..\..\admin\_listeditor.php:237
-#: ..\..\..\admin\_listeditor.php:241
-#: ..\..\..\admin\_listeditor.php:242
+#: ..\..\..\admin\_listeditor.php:230
+#: ..\..\..\admin\_listeditor.php:234
+#: ..\..\..\admin\_listeditor.php:235
 #: ..\..\..\admin\_set_files.form.php:81
 #: ..\..\..\admin\_set_regional.form.php:68
 #: ..\..\..\skins\_profile.php:95
@@ -3327,12 +3327,12 @@ msgstr "空のファイル!"
 msgid "%d lines"
 msgstr "%d 行"
 
-#  TRANS: Warning this is a javascript string
+#. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_file_view.inc.php:138
 msgid "Hide line numbers"
 msgstr "行数を隠す"
 
-#  TRANS: Warning this is a javascript string
+#. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_file_view.inc.php:138
 msgid "Show line numbers"
 msgstr "行数を表示"
@@ -3664,13 +3664,13 @@ msgstr "エントリを削除できません!"
 msgid "Entry #%d deleted."
 msgstr "エントリ #%d を削除しました。"
 
-#: ..\..\..\admin\_listeditor.php:139
+#: ..\..\..\admin\_listeditor.php:132
 #, php-format
 msgid "Delete entry #%d?"
 msgstr "エントリ #%d を削除しますか?"
 
-#: ..\..\..\admin\_listeditor.php:182
-#: ..\..\..\admin\_listeditor.php:229
+#: ..\..\..\admin\_listeditor.php:175
+#: ..\..\..\admin\_listeditor.php:222
 #: ..\..\..\admin\_users_form.php:175
 #: ..\..\..\admin\_users_groupform.php:58
 #: ..\..\..\admin\_users_list.php:101
@@ -3680,31 +3680,31 @@ msgstr "エントリ #%d を削除しますか?"
 msgid "ID"
 msgstr "ID"
 
-#: ..\..\..\admin\_listeditor.php:193
+#: ..\..\..\admin\_listeditor.php:186
 msgid "Edit this entry..."
 msgstr "このエントリを編集..."
 
-#: ..\..\..\admin\_listeditor.php:198
+#: ..\..\..\admin\_listeditor.php:191
 msgid "Edit..."
 msgstr "編集..."
 
-#: ..\..\..\admin\_listeditor.php:200
+#: ..\..\..\admin\_listeditor.php:193
 msgid "Duplicate..."
 msgstr "複製..."
 
-#: ..\..\..\admin\_listeditor.php:202
+#: ..\..\..\admin\_listeditor.php:195
 msgid "Delete!"
 msgstr "削除!"
 
-#: ..\..\..\admin\_listeditor.php:222
+#: ..\..\..\admin\_listeditor.php:215
 msgid "New entry"
 msgstr "新規エントリ"
 
-#: ..\..\..\admin\_listeditor.php:222
+#: ..\..\..\admin\_listeditor.php:215
 msgid "Edit entry"
 msgstr "エントリ編集"
 
-#: ..\..\..\admin\_listeditor.php:236
+#: ..\..\..\admin\_listeditor.php:229
 msgid "Record"
 msgstr "登録"
 
@@ -3776,7 +3776,7 @@ msgstr "空白で分けます。"
 msgid "Leave it empty to disable this check."
 msgstr "このチェックを無効にするには、空のままにしてください。"
 
-#  TRANS: %s gets replaced with an example setting
+#. TRANS: %s gets replaced with an example setting
 #: ..\..\..\admin\_set_files.form.php:55
 #, php-format
 msgid "E.g. &laquo;%s&raquo;"
@@ -3787,9 +3787,8 @@ msgid "Maximal allowed filesize"
 msgstr "許可される最大ファイルサイズ"
 
 #: ..\..\..\admin\_set_files.form.php:61
-#: ..\..\..\evocore\_file.funcs.php:63
-msgid "KB"
-msgstr "KB"
+msgid "KB (This cannot be higher than your PHP/Webserver setting!)"
+msgstr "KB (これはあなたのPHP/ウェブサーバの設定以上に大きくできません!)"
 
 #: ..\..\..\admin\_set_files.form.php:70
 #, fuzzy
@@ -3806,7 +3805,7 @@ msgstr "一般設定"
 
 #: ..\..\..\admin\_set_general.form.php:22
 msgid "Default user rights"
-msgstr "デフォルト ユーザ権限"
+msgstr "デフォルト ユーザ権利"
 
 #: ..\..\..\admin\_set_general.form.php:24
 msgid "New users can register"
@@ -3822,7 +3821,7 @@ msgstr "新規ユーザのグループ"
 
 #: ..\..\..\admin\_set_general.form.php:26
 msgid "Groups determine user roles and permissions."
-msgstr "グループはユーザの役割と許可を規定します。"
+msgstr "グループはユーザの役割と権限を規定します。"
 
 #: ..\..\..\admin\_set_general.form.php:28
 msgid "Level for new users"
@@ -4019,7 +4018,7 @@ msgstr "下記参照。"
 
 #: ..\..\..\admin\_set_regional.form.php:54
 msgid "Time format"
-msgstr "時間フォーマット"
+msgstr "時刻フォーマット"
 
 #: ..\..\..\admin\_set_regional.form.php:55
 #: ..\..\..\admin\_set_regional.form.php:166
@@ -4254,8 +4253,9 @@ msgid "Date fmt"
 msgstr "日付フォーマット"
 
 #: ..\..\..\admin\_set_regional.form.php:164
+#, fuzzy
 msgid "Time fmt"
-msgstr "時間フォーマット"
+msgstr "時刻フォーマット"
 
 #: ..\..\..\admin\_set_regional.form.php:165
 msgid "Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc"
@@ -4324,7 +4324,7 @@ msgstr "プロフィール:"
 
 #: ..\..\..\admin\_users_form.php:73
 msgid "User rights"
-msgstr "ユーザ権限"
+msgstr "ユーザ権利"
 
 #: ..\..\..\admin\_users_form.php:100
 msgid "Send an email"
@@ -4599,14 +4599,6 @@ msgstr "このグループを複製..."
 #: ..\..\..\admin\_users_list.php:87
 msgid "Delete this group!"
 msgstr "このグループを削除する!"
-
-#: ..\..\..\admin\_users_list.php:156
-msgid "Decrease user level"
-msgstr "ユーザレベル減少"
-
-#: ..\..\..\admin\_users_list.php:160
-msgid "Increase user level"
-msgstr "ユーザレベル増加"
 
 #: ..\..\..\admin\_users_list.php:167
 msgid "Edit this user..."
@@ -5088,7 +5080,7 @@ msgstr "%d 関連カテゴリ"
 #: ..\..\..\evocore\_blog.class.php:131
 #, php-format
 msgid "%d user rights defintions"
-msgstr "%d ユーザ権限定義"
+msgstr "%d ユーザ権利定義"
 
 #: ..\..\..\evocore\_blog.class.php:129
 #: ..\..\..\evocore\_user.class.php:120
@@ -5185,8 +5177,8 @@ msgstr "投稿があると最後のカテゴリは削除できません"
 msgid "Requested category %s does not exist!"
 msgstr "要求されたカテゴリ %s は存在しません"
 
-#  TRANS: When the categories for a specific post are displayed, the user can click
-#  on these cats to browse them, this is the default href title displayed there
+#. TRANS: When the categories for a specific post are displayed, the user can click
+#. on these cats to browse them, this is the default href title displayed there
 #: ..\..\..\evocore\_category.funcs.php:655
 #: ..\..\..\evocore\_item.class.php:527
 msgid "Browse category"
@@ -5223,14 +5215,14 @@ msgid "Post"
 msgstr "投稿"
 
 #: ..\..\..\evocore\_comment.class.php:586
-#: ..\..\..\xmlsrv\xmlrpc.php:1396
+#: ..\..\..\xmlsrv\xmlrpc.php:1398
 msgid "Website"
 msgstr "ウェブサイト"
 
 #: ..\..\..\evocore\_comment.class.php:587
 #: ..\..\..\evocore\_comment.class.php:600
 #: ..\..\..\evocore\_item.class.php:1925
-#: ..\..\..\xmlsrv\xmlrpc.php:1397
+#: ..\..\..\xmlsrv\xmlrpc.php:1399
 msgid "Url"
 msgstr "URL"
 
@@ -5240,7 +5232,7 @@ msgstr "コメント"
 
 #: ..\..\..\evocore\_comment.class.php:609
 #: ..\..\..\evocore\_item.class.php:1932
-#: ..\..\..\xmlsrv\xmlrpc.php:1399
+#: ..\..\..\xmlsrv\xmlrpc.php:1401
 msgid "Edit/Delete"
 msgstr "編集/削除"
 
@@ -5309,7 +5301,7 @@ msgstr "ディレクトリ"
 msgid "Unknown"
 msgstr "不明"
 
-#  TRANS: short for '<directory>'
+#. TRANS: short for '<directory>'
 #: ..\..\..\evocore\_file.class.php:754
 msgid "&lt;dir&gt;"
 msgstr "&lt;dir&gt;"
@@ -5321,6 +5313,10 @@ msgstr "B."
 #: ..\..\..\evocore\_file.funcs.php:60
 msgid "Bytes"
 msgstr "バイト"
+
+#: ..\..\..\evocore\_file.funcs.php:63
+msgid "KB"
+msgstr "KB"
 
 #: ..\..\..\evocore\_file.funcs.php:64
 msgid "Kilobytes"
@@ -5561,7 +5557,7 @@ msgstr "選択"
 
 #: ..\..\..\evocore\_form.class.php:479
 #, fuzzy
-msgid "heures"
+msgid "hours"
 msgstr "時間"
 
 #: ..\..\..\evocore\_form.class.php:487
@@ -5665,13 +5661,13 @@ msgstr "この投稿へのコメントは締め切られています。"
 msgid "This post is not published. You cannot leave comments."
 msgstr "この投稿は発行されていません。コメントを残すことはできません。"
 
-#  TRANS: this is the default text for the extended post "more" link
+#. TRANS: this is the default text for the extended post "more" link
 #: ..\..\..\evocore\_item.class.php:701
 #: ..\..\..\evocore\_obsolete092.php:504
 msgid "Read more!"
 msgstr "続きを読む!"
 
-#  TRANS: this is the default text displayed once the more link has been activated
+#. TRANS: this is the default text displayed once the more link has been activated
 #: ..\..\..\evocore\_item.class.php:706
 #: ..\..\..\evocore\_obsolete092.php:509
 msgid "More:"
@@ -5945,7 +5941,7 @@ msgstr "プレビュー"
 
 #: ..\..\..\evocore\_obsolete092.php:1175
 msgid "Oops, MySQL error!"
-msgstr "あれ、MySQL エラー!"
+msgstr "おっと、MySQL エラー!"
 
 #: ..\..\..\evocore\_obsolete092.php:1197
 msgid "go back"
@@ -6079,7 +6075,7 @@ msgstr "ページのリンク元:"
 #: ..\..\..\evocore\_pingback.funcs.php:263
 #, php-format
 msgid "Pinging %s..."
-msgstr "%s へピン..."
+msgstr "%s へPing送信..."
 
 #: ..\..\..\evocore\_pingback.funcs.php:273
 msgid "END"
@@ -6114,7 +6110,7 @@ msgstr "そのような動作はありません!"
 msgid "Pages"
 msgstr "ページ"
 
-#  TRANS: x TO y OF z
+#. TRANS: x TO y OF z
 #: ..\..\..\evocore\_results.class.php:938
 msgid "to"
 msgstr "から"
@@ -6335,72 +6331,72 @@ msgstr "金曜日"
 msgid "Saturday"
 msgstr "土曜日"
 
-#  TRANS: abbrev. for Sunday
+#. TRANS: abbrev. for Sunday
 #: ..\..\..\evocore\_vars.inc.php:162
 msgid "Sun"
 msgstr "日"
 
-#  TRANS: abbrev. for Monday
+#. TRANS: abbrev. for Monday
 #: ..\..\..\evocore\_vars.inc.php:164
 msgid "Mon"
 msgstr "月"
 
-#  TRANS: abbrev. for Tuesday
+#. TRANS: abbrev. for Tuesday
 #: ..\..\..\evocore\_vars.inc.php:166
 msgid "Tue"
 msgstr "火"
 
-#  TRANS: abbrev. for Wednesday
+#. TRANS: abbrev. for Wednesday
 #: ..\..\..\evocore\_vars.inc.php:168
 msgid "Wed"
 msgstr "水"
 
-#  TRANS: abbrev. for Thursday
+#. TRANS: abbrev. for Thursday
 #: ..\..\..\evocore\_vars.inc.php:170
 msgid "Thu"
 msgstr "木"
 
-#  TRANS: abbrev. for Friday
+#. TRANS: abbrev. for Friday
 #: ..\..\..\evocore\_vars.inc.php:172
 msgid "Fri"
 msgstr "金"
 
-#  TRANS: abbrev. for Saturday
+#. TRANS: abbrev. for Saturday
 #: ..\..\..\evocore\_vars.inc.php:174
 msgid "Sat"
 msgstr "土"
 
-#  TRANS: abbrev. for Sunday
+#. TRANS: abbrev. for Sunday
 #: ..\..\..\evocore\_vars.inc.php:178
 msgid " S "
 msgstr " 日 "
 
-#  TRANS: abbrev. for Monday
+#. TRANS: abbrev. for Monday
 #: ..\..\..\evocore\_vars.inc.php:180
 msgid " M "
 msgstr " 月 "
 
-#  TRANS: abbrev. for Tuesday
+#. TRANS: abbrev. for Tuesday
 #: ..\..\..\evocore\_vars.inc.php:182
 msgid " T "
 msgstr " 火 "
 
-#  TRANS: abbrev. for Wednesday
+#. TRANS: abbrev. for Wednesday
 #: ..\..\..\evocore\_vars.inc.php:184
 msgid " W "
 msgstr " 水 "
 
-#  TRANS: abbrev. for Thursday
+#. TRANS: abbrev. for Thursday
 #: ..\..\..\evocore\_vars.inc.php:186
 msgid " T  "
 msgstr " 木 "
 
-#  TRANS: abbrev. for Friday
+#. TRANS: abbrev. for Friday
 #: ..\..\..\evocore\_vars.inc.php:188
 msgid " F "
 msgstr " 金 "
 
-#  TRANS: abbrev. for Saturday
+#. TRANS: abbrev. for Saturday
 #: ..\..\..\evocore\_vars.inc.php:190
 msgid " S  "
 msgstr " 土 "
@@ -6421,7 +6417,7 @@ msgstr "3月"
 msgid "April"
 msgstr "4月"
 
-#  TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
+#. TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
 #: ..\..\..\evocore\_vars.inc.php:198
 msgid "May "
 msgstr "5月"
@@ -6454,62 +6450,62 @@ msgstr "11月"
 msgid "December"
 msgstr "12月"
 
-#  TRANS: abbrev. for January
+#. TRANS: abbrev. for January
 #: ..\..\..\evocore\_vars.inc.php:209
 msgid "Jan"
 msgstr "1月"
 
-#  TRANS: abbrev. for February
+#. TRANS: abbrev. for February
 #: ..\..\..\evocore\_vars.inc.php:211
 msgid "Feb"
 msgstr "2月"
 
-#  TRANS: abbrev. for March
+#. TRANS: abbrev. for March
 #: ..\..\..\evocore\_vars.inc.php:213
 msgid "Mar"
 msgstr "3月"
 
-#  TRANS: abbrev. for April
+#. TRANS: abbrev. for April
 #: ..\..\..\evocore\_vars.inc.php:215
 msgid "Apr"
 msgstr "4月"
 
-#  TRANS: abbrev. for May
+#. TRANS: abbrev. for May
 #: ..\..\..\evocore\_vars.inc.php:217
 msgid "May"
 msgstr "5月"
 
-#  TRANS: abbrev. for June
+#. TRANS: abbrev. for June
 #: ..\..\..\evocore\_vars.inc.php:219
 msgid "Jun"
 msgstr "6月"
 
-#  TRANS: abbrev. for July
+#. TRANS: abbrev. for July
 #: ..\..\..\evocore\_vars.inc.php:221
 msgid "Jul"
 msgstr "7月"
 
-#  TRANS: abbrev. for August
+#. TRANS: abbrev. for August
 #: ..\..\..\evocore\_vars.inc.php:223
 msgid "Aug"
 msgstr "8月"
 
-#  TRANS: abbrev. for September
+#. TRANS: abbrev. for September
 #: ..\..\..\evocore\_vars.inc.php:225
 msgid "Sep"
 msgstr "9月"
 
-#  TRANS: abbrev. for October
+#. TRANS: abbrev. for October
 #: ..\..\..\evocore\_vars.inc.php:227
 msgid "Oct"
 msgstr "10月"
 
-#  TRANS: abbrev. for November
+#. TRANS: abbrev. for November
 #: ..\..\..\evocore\_vars.inc.php:229
 msgid "Nov"
 msgstr "11月"
 
-#  TRANS: abbrev. for December
+#. TRANS: abbrev. for December
 #: ..\..\..\evocore\_vars.inc.php:231
 msgid "Dec"
 msgstr "12月"
@@ -6628,7 +6624,7 @@ msgid "You cannot reset this account in demo mode."
 msgstr "デモモード中にこのアカウントをリセットすることはできません。"
 
 #: ..\..\..\htsrv\login.php:99
-msgid "You have no email address with your profile, therefor we cannot reset your password."
+msgid "You have no email address with your profile, therefore we cannot reset your password."
 msgstr "あなたのプロフィールにメールアドレスが登録されていないので、あなたのパスワードをリセットすることができません。"
 
 #: ..\..\..\htsrv\login.php:100
@@ -7941,7 +7937,7 @@ msgstr "Wikiリンク変換"
 msgid "WikiWord links ((link)) [[link ]]"
 msgstr "WikiWord リンク ((link)) [[link ]]"
 
-#  TRANS: All categories, skin's categories list
+#. TRANS: All categories, skin's categories list
 #: ..\..\..\skins\_categories.php:17
 #: ..\..\..\skins\bluesky\_categories.php:18
 #: ..\..\..\skins\custom\_categories.php:18
@@ -7957,7 +7953,7 @@ msgstr "全て"
 msgid "Trackback address for this post:"
 msgstr "この記事へのトラックバック アドレス"
 
-#  TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
+#. TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
 #: ..\..\..\skins\_feedback.php:95
 #: ..\..\..\skins\basic\_feedback.php:96
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:97
@@ -8031,7 +8027,7 @@ msgstr "宛先"
 
 #: ..\..\..\skins\_msgform.php:103
 msgid "From"
-msgstr "送信者"
+msgstr "差出人"
 
 #: ..\..\..\skins\_msgform.php:103
 msgid "Your name."
@@ -8270,13 +8266,13 @@ msgstr "WP CSSファイルと最大限の互換性を確保するために、WP 
 msgid "[...] Read more!"
 msgstr "[...] 続きを読む!"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1390
-#: ..\..\..\xmlsrv\xmlrpc.php:1394
+#: ..\..\..\xmlsrv\xmlrpc.php:1392
+#: ..\..\..\xmlsrv\xmlrpc.php:1396
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "あなたの投稿 #%d \"%s\" に新しいピンバックです"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1398
+#: ..\..\..\xmlsrv\xmlrpc.php:1400
 msgid "Excerpt"
 msgstr "抜粋"
 
