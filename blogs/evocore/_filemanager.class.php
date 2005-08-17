@@ -60,7 +60,7 @@ if( false )
 /**
  * Extends {@link Filelist} and provides file management functionality.
  *
- * @todo fplanque>> This object doesn't really make sense, we may get rid of it and move the functionnality back to files.php
+ * @todo fplanque>> This object doesn't make sense, we should get rid of it and move the functionnality back to files.php
  * @author blueyed
  * @package evocore
  */
@@ -1108,7 +1108,8 @@ class FileManager extends Filelist
 		{
 			return ' -- '.T_('No directory.').' -- ';
 		}
-		// not clickable
+
+		// Get the part of the path which is not clickable:
 		$r = substr( $this->_ads_root_path, 0, strrpos( substr($this->_ads_root_path, 0, -1), '/' )+1 );
 
 		// get the part that is clickable
@@ -1353,6 +1354,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.51  2005/08/17 16:22:16  fplanque
+ * no message
+ *
  * Revision 1.50  2005/08/12 17:35:29  fplanque
  * minor
  *
