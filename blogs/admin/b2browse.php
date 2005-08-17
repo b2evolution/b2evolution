@@ -38,7 +38,6 @@ else
 	$dbIDname = 'ID';
 
 	param( 'tab', 'string', 'postlist', true /* memorize */ );
-	param( 'safe_mode', 'integer', 0 );         // Blogger style
 	param( 'p', 'integer' );                    // Specific post number to display
 	param( 'm', 'integer', '', true );          // YearMonth(Day) to display
 	param( 'w', 'integer', '', true );          // Week number
@@ -130,7 +129,7 @@ if( $blog )
 	echo '</td>';
 
   echo '<td class="browse_right_col">';
-	 require dirname(__FILE__).'/_browse_posts_sidebar.inc.php';
+		require dirname(__FILE__).'/_browse_posts_sidebar.inc.php';
 	echo '</td>';
 
 	echo '</tr></table>';

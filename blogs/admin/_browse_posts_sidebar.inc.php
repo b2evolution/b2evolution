@@ -222,7 +222,7 @@ echo '<div class="browse_side_item">';
 				global $tab, $blog, $cat_array, $cat_line_start, $pagenow;
 				$cat = get_the_category_by_ID( $cat_ID );
 				$r = $cat_line_start;
-				$r .= '<label><input type="checkbox" name="catsel[]" value="'. $cat_ID. '" class="checkbox"';
+				$r .= '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'" class="checkbox"';
 				if( in_array( $cat_ID, $cat_array ) )
 				{ // This category is in the current selection
 					$r .= ' checked="checked"';
@@ -244,7 +244,7 @@ echo '<div class="browse_side_item">';
 			}
 			function cat_list_after_last( $parent_cat_ID, $level )
 			{ // callback to end sublist
-				global  $cat_group_end;
+				global $cat_group_end;
 				$r = '';
 				if( $level > 0 ) $r .= $cat_group_end."\n";
 				return $r;
@@ -286,6 +286,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.5  2005/08/17 18:23:47  fplanque
+ * minor changes
+ *
  * Revision 1.4  2005/08/03 21:05:01  fplanque
  * cosmetic cleanup
  *

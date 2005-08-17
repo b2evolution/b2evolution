@@ -52,8 +52,8 @@ $use_html_checker = 1;
 $use_security_checker = 0;
 # WARNING: disabling both $use_html_checker and $use_security_checker is suicidal !
 
-// Use XHTML strict, set to false to use XHTML transitional
-$use_strict =  true;
+// Set this to true if you want to enforce XHTML strict
+$use_strict =  false;
 
 
 /*
