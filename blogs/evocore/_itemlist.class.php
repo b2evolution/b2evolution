@@ -332,39 +332,53 @@ class ItemList extends DataObjectList
 		 * ----------------------------------------------------
 		 */
 		$eq = 'IN'; // default
+		$cat_combine = false; // default
 
 		$cat_array = array();		// this is a global var
 
 		// Check for cat string (which will be handled recursively)
-		if( ! ((empty($cat)) || ($cat == 'all') || ($cat == '0')) )
+		if( $cat != 'all' && ! empty($cat) )
 		{ // specified a category string:
-			$cat = str_replace(',', ' ', $cat);
-			if( strstr($cat, '-') )
-			{ // We want to exclude cats
+			$first_char = substr($cat, 0, 1 );
+			// echo 'cats['.$first_char.']';
+			if( $first_char == '*' )
+			{	// List starts with * : We'll want to combine later on: (SEE LATER IN THIS FILE)
+				$cat_combine = true;
+				// echo 'combine cats';
+				$cats = substr( $cat, 1 );
+			}
+			elseif( $first_char == '-' )
+			{	// List starts with MINUS sign:
+				// We want to exclude cats
 				$eq = 'NOT IN';
-				$cats = explode('-', $cat);
-				$req_cat_array = explode(' ', $cats[1]);
+				$cats = substr( $cat, 1 );
 			}
 			else
 			{ // We want to include cats
-				$req_cat_array = explode(' ', $cat);
+				$cats = $cat;
 			}
+			//echo $cats;
 
-			// Getting required sub-categories:
-			// and add everything to cat array
-			// ----------------- START RECURSIVE CAT LIST ----------------
-			cat_query( false );	// make sure the caches are loaded
-			foreach( $req_cat_array as $cat_ID )
-			{ // run recursively through the cats
-				settype( $cat_ID, 'integer' ); // make sure
-				if( ! in_array( $cat_ID, $cat_array ) )
-				{ // Not already in list
-					$cat_array[] = $cat_ID;
-					cat_children( $cache_categories, ( $this->blog == 1 ? 0 : $this->blog ), $cat_ID, 'cat_req_dummy', 'cat_req',
-												'cat_req_dummy', 'cat_req_dummy', 1 );
+ 			// Check that the string is valid (digits and comas only)
+			if( preg_match( '#^[0-9]+(,[0-9]+)*$#', $cats ) )
+			{	// Okay, there is no sql injection risk
+				$req_cat_array = explode(',', $cats);
+
+				// Getting required sub-categories:
+				// and add everything to cat array
+				// ----------------- START RECURSIVE CAT LIST ----------------
+				cat_query( false );	// make sure the caches are loaded
+				foreach( $req_cat_array as $cat_ID )
+				{ // run recursively through the cats
+					if( ! in_array( $cat_ID, $cat_array ) )
+					{ // Not already in list
+						$cat_array[] = $cat_ID;
+						cat_children( $cache_categories, ( $this->blog == 1 ? 0 : $this->blog ), $cat_ID, 'cat_req_dummy', 'cat_req',
+													'cat_req_dummy', 'cat_req_dummy', 1 );
+					}
 				}
+				// ----------------- END RECURSIVE CAT LIST ----------------
 			}
-			// ----------------- END RECURSIVE CAT LIST ----------------
 		}
 
 		// Add explicit selections:
@@ -381,9 +395,9 @@ class ItemList extends DataObjectList
 		}
 		else
 		{
-			$whichcat .= ' AND postcat_cat_ID '. $eq.' ('.implode(",", $cat_array). ') ';
-			// echo $whichcat;
+			$whichcat .= ' AND postcat_cat_ID '. $eq.' ('.implode(',', $cat_array). ') ';
 		}
+		// echo $whichcat;
 
 		/*
 		 * ----------------------------------------------------
@@ -392,27 +406,27 @@ class ItemList extends DataObjectList
 		 */
 		if((empty($author)) || ($author == 'all'))
 		{
-			$whichauthor='';
+			$whichauthor = '';
 		}
-		elseif (intval($author))
+		else
 		{
-			$author = intval($author);
-			if (stristr($author, '-'))
-			{
-				$eq = '!=';
-				$andor = 'AND';
-				$author = explode('-', $author);
-				$author = $author[1];
-			} else {
-				$eq = '=';
-				$andor = 'OR';
+			if( substr($author, 0, 1 ) == '-' )
+			{	// List starts with MINUS sign:
+				$eq = 'NOT IN';
+				$author_list = substr( $author, 1 );
 			}
-			$author_array = explode(' ', $author);
-			$whichauthor .= ' AND '.$this->dbprefix.'creator_user_ID '. $eq.' '. $author_array[0];
-			for ($i = 1; $i < (count($author_array)); $i = $i + 1) {
-				$whichauthor .= ' '. $andor.' '.$this->dbprefix.'creator_user_ID '. $eq.' '. $author_array[$i];
+			else
+			{
+				$eq = 'IN';
+				$author_list = $author;
+			}
+			// Check that the string is valid (digits and comas only)
+			if( preg_match( '#^[0-9]+(,[0-9]+)*$#', $author_list ) )
+			{	// Okay, there is no sql injection risk
+				$whichauthor = ' AND '.$this->dbprefix.'creator_user_ID '.$eq.' ('.$author_list.')';
 			}
 		}
+
 
 		$where .= $search. $whichcat . $whichauthor;
 
@@ -579,8 +593,12 @@ class ItemList extends DataObjectList
 			$where .= ' AND '.$this->dbprefix.'datestart <= \''. $date_max.'\'';
 		}
 
+
+
+
+
 		$this->sql = 'SELECT DISTINCT '.implode( ', ', $object_def[ $this->objType ]['db_cols'] )
-								.' FROM ('.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+								.' FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
 												INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 
 		if( $this->blog == 1 )
@@ -592,7 +610,16 @@ class ItemList extends DataObjectList
 			$this->sql .= 'WHERE cat_blog_ID = '. $this->blog;
 		}
 
-		$this->sql .= $where. ' ORDER BY '.$this->dbprefix.$orderby.' '.$limits;
+		$this->sql .= $where;
+
+		if( $cat_combine && count($cat_array) )
+		{ // We want the categories combined! (i-e posts must be in ALL requested cats)
+			//echo 'combining now';
+			$this->sql .= ' GROUP BY T_posts.ID
+											HAVING COUNT(*) = '.count($cat_array).' ';
+		}
+
+ 		$this->sql .= ' ORDER BY '.$this->dbprefix.$orderby.' '.$limits;
 		// echo '<br />where=',$where;
 
 		if ($preview)
@@ -1025,6 +1052,10 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.26  2005/08/17 21:01:34  fplanque
+ * Selection of multiple authors with (-) option.
+ * Selection of multiple categories with (-) and (*) options.
+ *
  * Revision 1.25  2005/06/22 14:51:43  blueyed
  * doc; use $this->blog after copying from $blog param
  *

@@ -156,12 +156,7 @@ while( $Item = $MainList->get_item() )
 	{ // TODO: should use $Item->getBlog() for $Blog == 1 (see also <th> for this).
 		echo '<td class="center">';
 		echo '<a href="b2browse.php?tab=posts&amp;blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1" class="">';
-		// TRANS: Link to comments for current post
-		comments_number( '0', '1', '%d' );
-		echo '/';
-		trackback_number( '0', '1', '%d' );
-		echo '/';
-		pingback_number( '0', '1', '%d' );
+		echo generic_ctp_number($Item->ID, 'feedback');
 		echo '</a>';
 		echo "</td>\n";
 	}
@@ -219,6 +214,10 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.9  2005/08/17 21:01:34  fplanque
+ * Selection of multiple authors with (-) option.
+ * Selection of multiple categories with (-) and (*) options.
+ *
  * Revision 1.8  2005/08/03 21:05:00  fplanque
  * cosmetic cleanup
  *

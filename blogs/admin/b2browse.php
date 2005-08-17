@@ -43,7 +43,7 @@ else
 	param( 'w', 'integer', '', true );          // Week number
 	param( 'cat', 'string', '', true );         // List of cats to restrict to
 	param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
-	param( 'author', 'integer', '', true );     // List of authors to restrict to
+	param( 'author', 'string', '', true );     // List of authors to restrict to
 	param( 'order', 'string', 'DESC', true );   // ASC or DESC
 	param( 'orderby', 'string', '', true );     // list of fields to order by
 	param( 'dstart', 'integer', '', true );     // YearMonth(Day) to start at

@@ -194,7 +194,7 @@ echo '<div class="browse_side_item">';
 			$Form->fieldset_end();
 		?>
 
-		<fieldset title="Categories">
+		<fieldset>
 			<legend><?php echo T_('Categories') ?></legend>
 			<ul>
 			<?php
@@ -277,6 +277,30 @@ echo '<div class="browse_side_item">';
 		</fieldset>
 		<?php
 
+
+		/*
+		 * Authors:
+		 */
+		echo '<fieldset>';
+		echo '<legend>'.T_('Authors').'</legend>';
+		// Load current blog members into cache:
+		$UserCache->load_blogmembers( $blog );
+		if( count($UserCache->cache) )
+		{
+			echo '<ul>';
+			foreach( $UserCache->cache as $loop_Obj )
+			{
+				echo '<li><input type="radio" name="author" value="'.$loop_Obj->ID.'" class="radio"';
+				if( $loop_Obj->ID == $author ) echo ' checked="checked"';
+				echo '> <a href="'.$pagenow.'?tab='.$tab.'&amp;blog='.$blog.'&amp;author='.$loop_Obj->ID.'">';
+				$loop_Obj->prefered_name();
+				echo '</a></li>';
+			}
+			echo '</ul>';
+		}
+		echo '</fieldset>';
+
+
 		$Form->submit( array( 'submit', T_('Search'), 'search' ) );
 		$Form->button( array( 'button', '', T_('Reset'), 'search', 'document.location.href='.$pagenow.'?blog='.$blog.';' ) );
 
@@ -286,6 +310,10 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.6  2005/08/17 21:01:34  fplanque
+ * Selection of multiple authors with (-) option.
+ * Selection of multiple categories with (-) and (*) options.
+ *
  * Revision 1.5  2005/08/17 18:23:47  fplanque
  * minor changes
  *
