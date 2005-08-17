@@ -516,7 +516,7 @@ class DB
 			return $values[$x];
 		}
 
-		return false;
+		return NULL;
 	}
 
 
@@ -898,6 +898,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.20  2005/08/17 16:20:54  fplanque
+ * rollback! I can't see a damn good reason to break existing code just because it happens that MySQL does not have a real boolean type!
+ *
  * Revision 1.19  2005/07/22 13:54:45  blueyed
  * Better format for queries in print_error(); return value of get_var() is false, if nothing found (a DB cannot return false [boolean], but NULL?!)
  *
