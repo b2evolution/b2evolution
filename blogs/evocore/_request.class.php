@@ -27,6 +27,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
@@ -38,6 +39,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * Request class: handles the current HTTP request
  *
  * @todo (fplanque)
+ * @todo Add $field_msg param to param_check_*() galore (should be directly after $err_msg - perhaps using a $func_params array right away?).
  */
 class Request
 {
@@ -109,6 +111,9 @@ class Request
 	// fplanque> I don't see why we need this. We need to discuss it. Is it reasonable to try to pass booleans through an URL?
 	// Seems to me that this code makes the function behave in ways that you can't predict
 	// If there's a real issue, it's probably better to have a param_boolean() with special stuff and leave the param() unchanged (zillions of pages depend on param...)
+
+	// blueyed> The idea is to not set $this->params[$var] if we do not force setting it! The check for boolean type was just to not change param()'s behaviour.
+	// We might want to leave the workaround for boolean out and NOTE in the function's doc that you should use param_boolean() if you really want to pass booleans.
 		if( $type == 'boolean' )
 		{ // we handle 'boolean' special, because 'false' also means: nothing set (if not forcing)
 			$r = param( $var, 'integer', $default, $memorize, $override, $forceset );
@@ -300,29 +305,59 @@ class Request
 	/**
 	 * Check if param is an ISO date
 	 *
+	 * @deprecated by param_check_date_format()
 	 * @param string param name
 	 * @param string error message
+	 * @param boolean Is a non-empty date required?
 	 * @return boolean true if OK
 	 */
 	function param_check_date( $var, $err_msg, $required = false )
 	{
+		return (bool)$this->param_check_date_format( $var, $err_msg, array( 'required' => $required ) );
+	}
+
+
+	/**
+	 * Check if param is a valid date (format wise).
+	 *
+	 * @param string param name
+	 * @param string error message
+	 * @param array|boolean Additional params:
+ 	 *        - 'required': Is non-empty date required? Default: true.
+	 *        - 'date_pattern': Pattern for the date, using named capturing groups ('day', 'month', 'year'). Default: '#^(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)$#' (ISO).
+	 *        - 'field_msg': Error for the form field
+	 * @return boolean|array true if empty, but OK. False if not valid. Matching array if ok.
+	 */
+	function param_check_date_format( $var, $err_msg, $func_params = array() )
+	{
+		$required = ( !isset($func_params['required']) || $func_params['required'] );
+
 		if( empty( $this->params[$var] ) && ! $required )
 		{ // empty is OK:
 			return true;
 		}
 
-		if( preg_match( '#^(\d\d\d\d)-(\d\d)-(\d\d)$#', $this->params[$var], $matches ) )
+		if( !isset($func_params['date_pattern']) )
+		{ // ISO by default
+			//$func_params['date_pattern'] = '#^(?P<year>\d\d\d\d)-(?P<month>[01]?\d)-(?P<day>[0123]?\d)$#'; // This may be useful, when taking care of leading zeros afterwards again, eg date('Y-m-d').
+			//$func_params['date_pattern'] = '#^(?P<year>\d\d\d\d)-(?P<month>[01]\d)-(?P<day>[0123]\d)$#';
+			$func_params['date_pattern'] = '#^(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)$#';
+		}
+
+		if( preg_match( $func_params['date_pattern'], $this->params[$var], $match ) )
 		{
-			$year = intval($matches[1]);
-			$month = intval($matches[2]);
-			$day = intval($matches[3]);
-			if( checkdate( $month, $day, $year ) )
+			if( checkdate( $match['month'], $match['day'], $match['year'] ) )
 			{ // all clean! :)
-				return true;
+				return $match;
 			}
 		}
 
-		$this->param_error( $var, $err_msg );
+		if( !isset($func_params['field_msg']) )
+		{
+			$func_params['field_msg'] = NULL;
+		}
+
+		$this->param_error( $var, $err_msg, $func_params['field_msg'] );
 		return false;
 	}
 
@@ -497,8 +532,8 @@ class Request
 
 /*
  * $Log$
- * Revision 1.9  2005/08/11 19:41:11  fplanque
- * no message
+ * Revision 1.10  2005/08/18 16:15:12  blueyed
+ * Added param_check_date_format(), which allows better refining of date checks if needed later
  *
  * Revision 1.8  2005/08/10 13:19:49  blueyed
  * param(): only set/remember param if it has been set (which must not be the case for !$forceset) [forgotten with the last commit]
