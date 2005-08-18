@@ -164,11 +164,9 @@ switch($action)
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;
 		param( 'content', 'html', $text );
-		$content = format_to_edit( $content, false );
 		param( 'post_title', 'html', $popuptitle );
 		param( 'post_urltitle', 'string', '' );
 		param( 'post_url', 'string', $popupurl );
-		$post_url = format_to_edit( $post_url, false );
 		param( 'item_issue_date', 'string' );
 		param( 'item_issue_time', 'string' );
 		param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
@@ -203,7 +201,7 @@ switch( $action )
 		$post_title = $edited_Item->get( 'title' );
 		$post_urltitle = $edited_Item->get( 'urltitle' );
 		$post_url = $edited_Item->get( 'url' );
-		$content = format_to_edit( $edited_Item->get( 'content' ) );
+		$content = $edited_Item->get( 'content' );
 		$post_pingback = 0;
 		$post_trackbacks = '';
 		$post_comments = $edited_Item->get( 'comments' );

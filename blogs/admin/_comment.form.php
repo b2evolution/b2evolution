@@ -32,8 +32,11 @@
  * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+
+$Form = & new Form( 'edit_actions.php', 'post', 'post', 'linespan' );
+
+$Form->begin_form( 'eform' );
 ?>
-<form name="post" id="post" action="edit_actions.php" target="_self" method="post">
 
 <div class="left_col">
 
@@ -47,19 +50,9 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		<?php
 		if( $edited_Comment->author_User === NULL )
 		{ // This is not a member comment
-			?>
-			<span class="line">
-			<label for="name"><strong><?php echo T_('Name') ?>:</strong></label><input type="text" name="newcomment_author" size="20" value="<?php echo format_to_edit($edited_Comment->author) ?>" id="name" tabindex="1" />
-			</span>
-
-			<span class="line">
-			<label for="email"><strong><?php echo T_('Email') ?>:</strong></label><input type="text" name="newcomment_author_email" size="20" value="<?php echo format_to_edit($edited_Comment->author_email) ?>" id="email" tabindex="2" />
-			</span>
-
-			<span class="line">
-			<label for="URL"><strong><?php echo T_('URL') ?>:</strong></label><input type="text" name="newcomment_author_url" size="20" value="<?php echo format_to_edit($edited_Comment->author_url) ?>" id="URL" tabindex="3" />
-			</span>
-		<?php
+			$Form->text( 'newcomment_author', $edited_Comment->author, 20, T_('Name'), '', 100 );
+			$Form->text( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), '', 100 );
+			$Form->text( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('URL'), '', 100 );
 		}
 		?>
 
@@ -71,9 +64,19 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	</div>
 
 	<?php // ---------------------------- TEXTAREA -------------------------------------
-	// Note: the pixel images are here for an IE layout bug
+	$content = $edited_Comment->content;
+	if( $comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out' )
+	{
+		// echo 'unBR:',htmlspecialchars(str_replace( ' ', '*', $content) );
+		$content = unautobrize($content);
+	}
+
+	$Form->fieldstart = '<div class="edit_area">';
+	$Form->fieldend = "</div>\n";
+	$Form->textarea( 'content', $content, 16, '', '', 40 , '' );
+	$Form->fieldstart = '<span class="line">';
+	$Form->fieldend = '</span>';
 	?>
-	<div class="edit_area"><img src="img/blank.gif" width="1" height="1" alt="" /><textarea rows="16" cols="40" name="content" id="content" tabindex="4"><?php echo format_to_edit($edited_Comment->content, ($comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out') ) ?></textarea><img src="img/blank.gif" width="1" height="1" alt="" /></div>
 	<script type="text/javascript" language="JavaScript">
 		<!--
 		// This is for toolbar plugins
@@ -166,18 +169,21 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		<p><strong><?php echo T_('Author') ?>:</strong> <?php echo $edited_Comment->author() ?></p>
 		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
 		<p><strong><?php echo T_('Status') ?>:</strong> <?php echo $edited_Comment->status; ?></p>
-		<p><strong><?php echo T_('IP address') ?>:</strong> <?php echo $edited_Comment->author_ip; ?></p>
+		<p><strong><?php echo T_('IP address') ?>:</strong> <?php echo $edited_Comment->author_IP; ?></p>
 	</fieldset>
 
 </div>
 
 <div class="clear"></div>
 
-</form>
-
 <?php
+$Form->end_form();
+
 /*
  * $Log$
+ * Revision 1.3  2005/08/18 15:06:18  fplanque
+ * got rid of format_to_edit(). This functionnality is being taken care of by the Form class.
+ *
  * Revision 1.2  2005/02/28 09:06:37  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

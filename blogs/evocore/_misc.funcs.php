@@ -128,22 +128,6 @@ function format_to_output( $content, $format = 'htmlbody' )
 }
 
 
-/*
- * format_to_edit(-)
- */
-function format_to_edit( $content, $autobr = false )
-{
-	if( $autobr )
-	{
-		// echo 'unBR:',htmlspecialchars(str_replace( ' ', '*', $content) );
-		$content = unautobrize($content);
-	}
-
-	$content = htmlspecialchars($content);
-	return($content);
-}
-
-
 /**
  * Format raw HTML input to cleaned up and validated HTML
  */
@@ -1917,6 +1901,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.79  2005/08/18 15:06:18  fplanque
+ * got rid of format_to_edit(). This functionnality is being taken care of by the Form class.
+ *
  * Revision 1.78  2005/08/09 15:22:40  fplanque
  * no message
  *

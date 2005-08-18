@@ -204,6 +204,21 @@ class Form extends Widget
 				$this->formend = '';
 				break;
 
+			case 'linespan':
+				$this->formstart = '';
+				$this->title_fmt = '$title$'."\n";
+				$this->fieldstart = '<span class="line">';
+				$this->labelstart = '';
+				$this->labelend = "\n";
+				$this->labelempty = '';
+				$this->inputstart = '';
+				$this->inputend = "\n";
+				$this->fieldend = "</span>\n";
+				$this->buttonsstart = '';
+				$this->buttonsend = "\n";
+				$this->formend = '';
+				break;
+
 			default:
 				// "none" (no layout)
 				$this->formstart = '';

@@ -65,6 +65,12 @@ label.radiooption {
 	margin-right: 1em;
 }
 
+/* Enhanced form */
+.eform label {
+	font-weight:bold;
+}
+
+
 /* 24/75% forms - Fast Forms */
 .fform fieldset {
 	border: 1px solid #ddd;
