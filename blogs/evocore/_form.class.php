@@ -261,6 +261,11 @@ class Form extends Widget
 
 		$r = $this->fieldstart;
 
+		if( isset($this->_common_params['field_prefix']) )
+		{
+			$r .= $this->_common_params['field_prefix'];
+		}
+
 		if( $this->label_to_the_left )
 		{
 			$r .= $this->get_label();
@@ -292,25 +297,26 @@ class Form extends Widget
 			$this->_common_params['note_format'] = $field_note_format;
 		}
 
-		if( !empty($this->_common_params['note']) )
-		{
-			$field_note = sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
-		}
-		else
-		{
-			$field_note = '';
-		}
-
-		if( $this->label_to_the_left )
-		{ // label has been displayed in begin_field()
-			$r = $field_note.$this->inputend;
-		}
-		else
+		if( !$this->label_to_the_left )
 		{ // label to the right:
-			$r = $this->get_label().$field_note;
+			$r = $this->get_label();
+		}
+		else
+		{ // label has been displayed in begin_field()
+			$r = '';
 		}
 
-		$r .= $this->fieldend;
+		if( !empty($this->_common_params['note']) )
+		{ // We have a note
+			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
+		}
+
+		if( isset($this->_common_params['field_suffix']) )
+		{
+			$r .= $this->_common_params['field_suffix'];
+		}
+
+		$r .= $this->inputend.$this->fieldend;
 
 		return $r;
 	}
@@ -546,6 +552,7 @@ class Form extends Widget
 	 * @param string label displayed in front of the field
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - date_format: Format of the date (string, default 'yyyy-MM-dd')
+	 *              - no_date_format_note: If true, no date format note gets appended to the field's note
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function date_input( $field_name, $field_value, $field_label, $field_params = array() )
@@ -562,10 +569,13 @@ class Form extends Widget
 			unset( $field_params['date_format'] );
 		}
 
-		// Prepend $date_format to note
-		$field_params['note'] = empty($field_params['note'])
-			? '('.$date_format.')'
-			: '('.$date_format.') '.$field_params['note'];
+		if( !isset($field_params['no_date_format_note']) || !$field_params['no_date_format_note'] )
+		{ // Prepend $date_format to note
+			$field_params['note'] = empty($field_params['note'])
+				? '('.$date_format.')'
+				: '('.$date_format.') '.$field_params['note'];
+		}
+		unset( $field_params['no_date_format_note'] );
 
 		if( !isset($field_params['size']) )
 		{ // Get size out of $date_format if not explicitly set
@@ -615,7 +625,7 @@ class Form extends Widget
 						cal_'.$field_name.".setTodayText('".TS_('Today')."');
 						// -->
 					</script>\n"
-				.$this->get_input_element($field_params)
+				.$this->get_input_element($field_params, false)
 				.'<a href="#" onclick="cal_'.$field_name.'.select('.$this->form_name.'.'.$field_name.",'anchor_".$field_name."', '".$date_format."');"
 				.' return false;" name="anchor_'.$field_name.'" id="anchor_'.$this->get_valid_id($field_name).'" title="'.T_('Select date').'">'
 				.get_icon( 'calendar', 'imgtag', array( 'title'=>T_('Select date') ) ).'</a>';
@@ -2004,9 +2014,12 @@ class Form extends Widget
 	 *              - input_suffix: Text after <input /> (string, default "\n")
 	 * @return string The <input /> element.
 	 */
-	function get_input_element( $field_params = array(), $depr_attribs = '' )
+	function get_input_element( $field_params = array(), $parse_common = true )
 	{
-		$this->handle_common_params( $field_params );
+		if( $parse_common )
+		{
+			$this->handle_common_params( $field_params );
+		}
 
 		if( isset($field_params['input_prefix']) )
 		{
@@ -2064,7 +2077,7 @@ class Form extends Widget
 			$r .= $this->labelstart
 						.'<label'
 						.( !empty($this->_common_params['id'])
-							? ' for="'.$this->_common_params['id'].'"'
+							? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
 							: '' )
 						.'">'
 						.$this->_common_params['label']
@@ -2138,6 +2151,19 @@ class Form extends Widget
 		{
 			$this->_common_params['label'] = '';
 		}
+
+		if( isset($field_params['field_prefix']) )
+		{
+			$this->_common_params['field_prefix'] = $field_params['field_prefix'];
+			unset( $field_params['field_prefix'] );
+		}
+
+		if( isset($field_params['field_suffix']) )
+		{
+			$this->_common_params['field_suffix'] = $field_params['field_suffix'];
+			unset( $field_params['field_suffix'] );
+		}
+
 
 		if( !empty($field_params['name']) && !isset($field_params['id']) )
 		{ // Autogenerate id attrib (not for hidden, radio and submit types)
