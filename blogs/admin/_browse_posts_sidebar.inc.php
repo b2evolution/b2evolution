@@ -110,13 +110,22 @@ echo '<div class="browse_side_item">';
 		echo $Form->inputend;
 		// echo T_('Words').' : ';
 		?>
-
-		<input type="radio" name="sentence" value="AND" id="sentAND" class="checkbox" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
-		<label for="sentAND"><?php echo T_('AND') ?></label>
-		<input type="radio" name="sentence" value="OR" id="sentOR" class="checkbox" <?php if( $sentence=='OR' ) echo 'checked="checked" '?> />
-		<label for="sentOR"><?php echo T_('OR') ?></label>
-		<input type="radio" name="sentence" value="sentence" class="checkbox" id="sentence" <?php if( $sentence=='sentence' ) echo 'checked="checked" '?> />
-		<label for="sentence"><?php echo T_('Entire phrase') ?></label>
+		<span class="line">
+			<input type="radio" name="sentence" value="AND" id="sentAND" class="radio" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
+			<label for="sentAND"><?php echo T_('AND') ?></label>
+		</span>
+		<span class="line">
+			<input type="radio" name="sentence" value="OR" id="sentOR" class="radio" <?php if( $sentence=='OR' ) echo 'checked="checked" '?> />
+			<label for="sentOR"><?php echo T_('OR') ?></label>
+		</span>
+		<span class="line">
+			<input type="radio" name="sentence" value="sentence" id="sentence" class="radio" <?php if( $sentence=='sentence' ) echo 'checked="checked" '?> />
+			<label for="sentence"><?php echo T_('Entire phrase') ?></label>
+		</span>
+		<span class="line">
+			<input type="checkbox" name="exact" value="1" id="exact" class="checkbox" <?php if( $exact ) echo 'checked="checked" '?> />
+			<label for="exact"><?php echo T_('Exact match') ?></label>
+		</span>
 		<?php
 		$Form->fieldset_end();
 
@@ -274,6 +283,21 @@ echo '<div class="browse_side_item">';
 			// ----------------- END RECURSIVE CAT LIST ----------------
 			?>
 			</ul>
+
+			<?php $cat_modifier = substr( $cat, 0, 1 ) ?>
+			<span class="line">
+				<input type="radio" name="cat" value="" id="catANY" class="radio" <?php if( $cat_modifier != '-' && $cat_modifier != '*' ) echo 'checked="checked" '?> />
+				<label for="catANY"><?php echo T_('ANY') ?></label>
+			</span>
+			<span class="line">
+				<input type="radio" name="cat" value="-" id="catANYBUT" class="radio" <?php if( $cat_modifier == '-' ) echo 'checked="checked" '?> />
+				<label for="catANYBUT"><?php echo T_('ANY BUT') ?></label>
+			</span>
+			<span class="line">
+				<input type="radio" name="cat" value="*" id="catALL" class="radio" <?php if( $cat_modifier == '*' ) echo 'checked="checked" '?> />
+				<label for="catALL"><?php echo T_('ALL') ?></label>
+			</span>
+
 		</fieldset>
 		<?php
 
@@ -310,6 +334,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.7  2005/08/18 17:49:51  fplanque
+ * New search options
+ *
  * Revision 1.6  2005/08/17 21:01:34  fplanque
  * Selection of multiple authors with (-) option.
  * Selection of multiple categories with (-) and (*) options.
