@@ -63,27 +63,10 @@ require_once dirname(__FILE__).'/_widget.class.php';
  */
 class Form extends Widget
 {
+	/**
+	 * @var boolean Output HTML or just return it?
+	 */
 	var $output = true;
-
-	/**
-	 * Number of fieldsets currently defined.
-	 * If greater then 0, output will be buffered.
-	 * @deprecated
-	 * @see begin_fieldset()
-	 * @see end_fieldset()
-	 * @var integer
-	 * @access protected
-	 */
-	var $_count_fieldsets = 0;
-
-	/**
-	 * Buffer for fieldsets.
-	 * @see begin_fieldset()
-	 * @see end_fieldset()
-	 * @var array
-	 * @access protected
-	 */
-	var $_fieldsets = array();
 
 	/**
 	 * Remember number of open tags that need to be handled in {@link end_form()}.
@@ -144,7 +127,7 @@ class Form extends Widget
 		$this->enctype = $enctype;
 
 		if( is_null( $layout ) )
-		{	// Get default skin setting:
+		{ // Get default skin setting:
 			$template = $AdminUI->getMenuTemplate( 'Form' );
 			$layout = $template['layout'];
 		}
@@ -250,11 +233,11 @@ class Form extends Widget
 	function begin_field( $field_name = NULL, $field_label = NULL )
 	{
 		// Remember these, to make them available to get_label() for !$label_to_the_left
-		if( NULL !== $field_name )
+		if( isset($field_name) )
 		{
 			$this->_common_params['name'] = $field_name;
 		}
-		if( NULL !== $field_label )
+		if( isset($field_label) )
 		{
 			$this->_common_params['label'] = $field_label;
 		}
@@ -288,11 +271,11 @@ class Form extends Widget
 	 */
 	function end_field( $field_note = NULL, $field_note_format = NULL )
 	{
-		if( NULL !== $field_note )
+		if( isset($field_note) )
 		{ // deprecated - should get set by calling handle_common_params()
 			$this->_common_params['note'] = $field_note;
 		}
-		if( NULL !== $field_note_format )
+		if( isset($field_note_format) )
 		{ // deprecated - should get set by calling handle_common_params()
 			$this->_common_params['note_format'] = $field_note_format;
 		}
@@ -323,58 +306,65 @@ class Form extends Widget
 
 
 	/**
-	 * Begin fieldset (with legend).
+	 * Builds a fieldset tag. This is a fieldset element by default, but a th element
+	 * for table layout.
 	 *
-	 * @deprecated by ::fieldset() but all functionality is not available
-	 * @author blueyed
-	 * @see end_fieldset()
-	 * @param string The fieldset legend
-	 * @param string fieldname of a checkbox that controls .disable of all
-	 *               elements in the fieldset group (checkbox and text only for now).
+	 * @param string the title of the fieldset
+	 * @param string the class of the fieldset
+	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
-	function begin_fieldset( $legend, $disableBy = NULL )
+	function begin_fieldset( $title = '', $field_params = array() )
 	{
-		$r = "\n<fieldset>\n";
-		if( !empty($legend) )
+		if( !isset($field_params['class']) )
 		{
-			$r .= "\t<legend>$legend</legend>\n";
+			$field_params['class'] = 'fieldset';
 		}
 
-		$this->_count_fieldsets++;
-		$this->_fieldsets[$this->_count_fieldsets]['html'] = $r;
+		switch( $this->layout )
+		{
+			case 'table':
+				$r = '<tr'.$this->get_field_params_as_string($field_params).'><th colspan="2">'."\n";
 
-		$this->_fieldsets[$this->_count_fieldsets]['disableBy'] = $disableBy;
-		$this->_fieldsets[$this->_count_fieldsets]['disableTags'] = array();
+				if( $title != '' )
+				{ // there is a legend tag to display
+					$r .= $title;
+				}
+
+				$r .= "</th></tr>\n";
+				break;
+
+			default:
+				$r = '<fieldset'.$this->get_field_params_as_string($field_params).'>'."\n";
+
+				if( $title != '' )
+				{ // there is a legend tag to display
+					$r .= '<legend>'.$title."</legend>\n";
+				}
+
+				$this->_opentags['fieldset']++;
+		}
+
+		return $this->display_or_return( $r );
 	}
 
 
 	/**
-	 * End a fieldset (and output/return it).
+	 * Ends a fieldset.
 	 *
-	 * This handles
-	 * @deprecated by ::fieldset_end() but all functionality is not available
-	 * @author blueyed
+	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
 	function end_fieldset()
 	{
-		$fieldset = array_pop( $this->_fieldsets );
-		$this->_count_fieldsets--;
-
-		$r = $fieldset['html'];
-
-		// Create onclick-JS to control the groups' elements
-		$onclick = '';
-		foreach( $fieldset['disableTags'] as $lFieldName )
+		switch( $this->layout )
 		{
-			$onclick .= $this->form_name.".$lFieldName.disabled = !this.checked; ";
-		}
-		if( !empty($onclick) )
-		{
-			$onclick = ' onclick="'.$onclick.'"';
-		}
+			case 'table':
+				$r = '';
+				break;
 
-		$r = str_replace( '%disableByOnclick%', $onclick, $r )
-					."\n</fieldset>\n";
+			default:
+				$r = "</fieldset>\n";
+				$this->_opentags['fieldset']--;
+		}
 
 		return $this->display_or_return( $r );
 	}
@@ -828,12 +818,12 @@ class Form extends Widget
 		$Debuglog->add( 'Form::dayOfWeek()', 'deprecated function calls' );
 
 		$field_params = array();
-		if( NULL !== $field_note )
+		if( isset($field_note) )
 		{
 			$field_params['note'] = $field_note;
 		}
 
-		if( NULL !== $field_class )
+		if( isset($field_class) )
 		{
 			$field_params['class'] = $field_class;
 		}
@@ -1009,7 +999,7 @@ class Form extends Widget
 	/**
 	 * Builds the fieldset tag
 	 *
-	 * @todo Refactor to $field_params scheme (make this a stub for begin_fieldset())
+	 * @deprecated This is a stub for begin_fieldset(). (More consistent naming scheme!)
 	 *
 	 * @param string the title of the fieldset
 	 * @param string the class of the fieldset
@@ -1017,65 +1007,22 @@ class Form extends Widget
 	 */
 	function fieldset( $title = '', $class = 'fieldset' )
 	{
-		switch( $this->layout )
-		{
-			case 'table':
-				$r = '<tr ';
-				if( $class != '' )
-				{ //there is a class option to display in the fieldset tag
-					$r .= 'class="'.$class.'" ';
-				}
-				$r .= '><th colspan="2">'."\n";
+		$params = array( 'class' => $class );
 
-				if( $title != '' )
-				{ // there is a legend tag to display
-					$r .= $title;
-				}
-
-				$r .= "</th></tr>\n";
-				break;
-
-			default:
-				$r = '<fieldset ';
-				if( $class != '' )
-				{ //there is a class option to display in the fieldset tag
-					$r .= 'class="'.$class.'" ';
-				}
-				$r .= '>'."\n";
-
-				if( $title != '' )
-				{ // there is a legend tag to display
-					$r .= '<legend>'.$title."</legend>\n";
-				}
-
-				$this->_opentags['fieldset']++;
-		}
-
-		return $this->display_or_return( $r );
+		return $this->begin_fieldset( $title );
 	}
 
 
 	/**
 	 * Ends the fieldset tag
 	 *
-	 * @todo Refactor to $field_params scheme (make this a stub for end_fieldset())
+	 * @deprecated This is a stub for end_fieldset(). (More consistent naming scheme!)
 	 *
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function fieldset_end()
 	{
-		switch( $this->layout )
-		{
-			case 'table':
-				$r = '';
-				break;
-
-			default:
-				$r = "</fieldset>\n";
-				$this->_opentags['fieldset']--;
-		}
-
-		return $this->display_or_return( $r );
+		return $this->end_fieldset();
 	}
 
 
@@ -1207,7 +1154,7 @@ class Form extends Widget
 		{
 			$field_params['class'] = $field_class;
 		}
-		if( $field_onchange !== NULL )
+		if( isset($field_onchange) )
 		{
 			$field_params['onchange'] = $field_onchange;
 		}
@@ -2113,11 +2060,11 @@ class Form extends Widget
 		$this->_common_params = array(); // Reset
 
 		// Copy optional variables, if given:
-		if( NULL !== $field_name )
+		if( isset($field_name) )
 		{
 			$field_params['name'] = $field_name;
 		}
-		if( NULL !== $field_label )
+		if( isset($field_label) )
 		{
 			$field_params['label'] = $field_label;
 		}
