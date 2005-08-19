@@ -100,4 +100,29 @@ span.error {
 p.error {
 	margin: 1ex;
 }
+
+pre{
+background:#fff;
+border:1px solid;
+width:90%;
+height:20em;
+overflow:auto;
+margin:0 auto;
+}
+
+.code_number{
+width:2em;
+text-align:right;
+margin-right:1em;
+float:left;
+}
+
+.code_line1{
+background:#eee;
+border:solid #000;
+border-width:1px 0;
+}
+
+.hack{clear:both;line-height:1px}
+
 /* }}} */
