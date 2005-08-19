@@ -104,6 +104,10 @@ function format_to_output( $content, $format = 'htmlbody' )
 			// use as a form value: escapes &, quotes and < > but leaves code alone
 			$content = htmlspecialchars( $content );           // Handles &, ", < and >
 			$content = str_replace("'", '&#039;', $content );  // Handles '
+			// need to restore all [lt] [gt] tags to < >
+			// this is going in an input/textarea so they're safe
+			$content= str_replace( array( '[lt]' , '[gt]' ) , array( '<' , '>' ) , $content );
+
 			break;
 
 		case 'xml':
@@ -124,6 +128,10 @@ function format_to_output( $content, $format = 'htmlbody' )
 			die( 'Output format ['.$format.'] not supported.' );
 	}
 
+	// need to restore all remaining [lt] [gt] tags
+	// These aren't going into an input/textarea so use entities instead
+	$content= str_replace( array( '[lt]' , '[gt]' ) , array( '&lt;' , '&gt;' ) , $content );
+
 	return $content;
 }
 
@@ -136,6 +144,12 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 	global $use_balanceTags, $use_html_checker, $use_security_checker;
 	global $allowed_tags, $allowed_attribues, $uri_attrs, $allowed_uri_scheme;
 	global $comments_allowed_tags, $comments_allowed_attribues, $comments_allowed_uri_scheme;
+
+	// need to change all < > between <pre> tags and change <pre> to [pre] so that they don't get validated.
+	$match = '#\<pre\>(.*?)\<\/pre\>#se';
+	$replace = "'[pre]'.stripslashes( str_replace( array( '<' , '>' ) , array( '[lt]' , '[gt]' ) , '$1' ) ).'[/pre]'";
+	$content = preg_replace( $match , $replace , $content );
+
 
 	// Replace any & that is not a character or entity reference with &amp;
 	$content= preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
@@ -193,6 +207,10 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 			$Messages->add( T_('Unallowed CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
 		}
 	}
+	
+	// need to restore all [pre] tags so other formatters (auto p etc) ignore code segments
+	$content= str_replace( array( '[pre]' , '[/pre]' ) , array( '<pre>' , '</pre>' ) , $content );
+
 	return($content);
 }
 
@@ -1901,6 +1919,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.80  2005/08/19 09:56:15  yabs
+ * Amended format to post and format to output to allow code to be poste between pre tags without validation errors
+ *
  * Revision 1.79  2005/08/18 15:06:18  fplanque
  * got rid of format_to_edit(). This functionnality is being taken care of by the Form class.
  *
