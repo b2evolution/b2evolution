@@ -145,6 +145,8 @@ class DB
 	 * DB Constructor
 	 *
 	 * connects to the server and selects a database
+	 *
+	 * @todo Too many parameters (and without default). Should be accessed through members. $halt_on_error is relevant to the connect procedure and should be put after $dbhost.
 	 */
 	function DB( $dbuser, $dbpassword, $dbname, $dbhost, $dbaliases, $db_use_transactions, $dbtableoptions = '', $halt_on_error = true )
 	{
@@ -209,7 +211,7 @@ class DB
 	{
 		if ( !@mysql_select_db($db,$this->dbh))
 		{
-			$this->print_error( '<strong>'.sprintf( T_('Error selecting database [%s]!'), $db ).'</strong>
+			$this->print_error( '<strong>'.sprintf( 'Error selecting database [%s]!', $db ).'</strong>
 				<ol>
 					<li>Are you sure the database exists?</li>
 					<li>Are you sure there is a valid database connection?</li>
@@ -313,7 +315,7 @@ class DB
 		{
 			// If there is an error then take note of it
 			echo '<div class="error">';
-			echo '<p class="error">', T_('MySQL error!'), '</p>';
+			echo '<p class="error">', 'MySQL error!', '</p>';
 			echo '<p>', $this->last_error, '</p>';
 			if( !empty($this->last_query) ) echo '<p class="error">Your query: '.$query_title.'<br /><pre>'.htmlspecialchars( str_replace("\t", '  ', $this->last_query) ).'</pre></p>';
 
@@ -419,9 +421,16 @@ class DB
 																									'sql' => $query,
 																									'rows' => -1 );
 
-		$Timer->resume( 'sql_queries' );
-		$this->result = @mysql_query($query,$this->dbh);
-		$Timer->pause( 'sql_queries' );
+		if( is_object( $Timer ) )
+		{
+			$Timer->resume( 'sql_queries' );
+			$this->result = @mysql_query($query,$this->dbh);
+			$Timer->pause( 'sql_queries' );
+		}
+		else
+		{
+			$this->result = @mysql_query($query,$this->dbh);
+		}
 
 		// If there is an error then take note of it..
 		if ( mysql_error() )
@@ -898,6 +907,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.21  2005/08/21 22:44:32  blueyed
+ * Removed dependencies on T_() and $Timer.
+ *
  * Revision 1.20  2005/08/17 16:20:54  fplanque
  * rollback! I can't see a damn good reason to break existing code just because it happens that MySQL does not have a real boolean type!
  *
