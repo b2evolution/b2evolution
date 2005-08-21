@@ -207,6 +207,98 @@ function blog_update_user_perms( $blog )
 
 
 /**
+ * Update the group permissions for edited blog
+ *
+ * {@internal blog_update_group_perms(-) }}
+ *
+ * @param int Blog ID
+ */
+function blog_update_group_perms( $blog )
+{
+	global $DB;
+	// Delete old perms for this blog:
+	$DB->query( 'DELETE FROM T_coll_group_perms
+								WHERE bloggroup_blog_ID = '.$blog );
+
+	// Now we need a full group list:
+	$inserted_values = array();
+	foreach( $DB->get_col( 'SELECT grp_ID FROM T_groups' ) as $loop_group_ID )
+	{ // Check new permissions for each group:
+		// echo "getting perms for group : $loop_group_ID <br />";
+
+		$easy_mode = param( 'blog_perm_easy_'.$loop_group_ID, 'string', 'nomember' );
+
+		if( $easy_mode != 'nomember' && $easy_mode != 'custom' )
+		{
+			$easy_perms = blogperms_from_easy( $easy_mode );
+
+			$inserted_values[] = " ( $blog, $loop_group_ID, ".$easy_perms['bloguser_ismember']
+														.', "'.$easy_perms['bloguser_perm_poststatuses']
+														.'", '.$easy_perms['bloguser_perm_delpost'].', '.$easy_perms['bloguser_perm_comments']
+														.', '.$easy_perms['bloguser_perm_cats'].', '.$easy_perms['bloguser_perm_properties']
+														.', '.$easy_perms['bloguser_perm_media_upload'].', '.$easy_perms['bloguser_perm_media_browse']
+														.', '.$easy_perms['bloguser_perm_media_change'].' ) ';
+		}
+		else
+		{
+			$perm_post = array();
+
+			$ismember = param( 'blog_ismember_'.$loop_group_ID, 'integer', 0 );
+
+			$perm_published = param( 'blog_perm_published_'.$loop_group_ID, 'string', '' );
+			if( !empty($perm_published) ) $perm_post[] = 'published';
+
+			$perm_protected = param( 'blog_perm_protected_'.$loop_group_ID, 'string', '' );
+			if( !empty($perm_protected) ) $perm_post[] = 'protected';
+
+			$perm_private = param( 'blog_perm_private_'.$loop_group_ID, 'string', '' );
+			if( !empty($perm_private) ) $perm_post[] = 'private';
+
+			$perm_draft = param( 'blog_perm_draft_'.$loop_group_ID, 'string', '' );
+			if( !empty($perm_draft) ) $perm_post[] = 'draft';
+
+			$perm_deprecated = param( 'blog_perm_deprecated_'.$loop_group_ID, 'string', '' );
+			if( !empty($perm_deprecated) ) $perm_post[] = 'deprecated';
+
+			$perm_delpost = param( 'blog_perm_delpost_'.$loop_group_ID, 'integer', 0 );
+			$perm_comments = param( 'blog_perm_comments_'.$loop_group_ID, 'integer', 0 );
+			$perm_cats = param( 'blog_perm_cats_'.$loop_group_ID, 'integer', 0 );
+			$perm_properties = param( 'blog_perm_properties_'.$loop_group_ID, 'integer', 0 );
+
+			$perm_media_upload = param( 'blog_perm_media_upload_'.$loop_group_ID, 'integer', 0 );
+			$perm_media_browse = param( 'blog_perm_media_browse_'.$loop_group_ID, 'integer', 0 );
+			$perm_media_change = param( 'blog_perm_media_change_'.$loop_group_ID, 'integer', 0 );
+
+			// Update those permissions in DB:
+
+			if( $ismember || count($perm_post) || $perm_delpost || $perm_comments || $perm_cats || $perm_properties
+										|| $perm_media_upload || $perm_media_browse || $perm_media_change )
+			{ // There are some permissions for this group:
+				$ismember = 1;	// Must have this permission
+
+				// insert new perms:
+				$inserted_values[] = " ( $blog, $loop_group_ID, $ismember, '".implode(',',$perm_post)."',
+																	$perm_delpost, $perm_comments, $perm_cats, $perm_properties,
+																	$perm_media_upload, $perm_media_browse, $perm_media_change )";
+			}
+		}
+	}
+
+	// Proceed with insertions:
+	if( count( $inserted_values ) )
+	{
+		$DB->query( "INSERT INTO T_coll_group_perms( bloggroup_blog_ID, bloggroup_group_ID, bloggroup_ismember,
+											bloggroup_perm_poststatuses, bloggroup_perm_delpost, bloggroup_perm_comments,
+											bloggroup_perm_cats, bloggroup_perm_properties,
+											bloggroup_perm_media_upload, bloggroup_perm_media_browse, bloggroup_perm_media_change)
+									VALUES ".implode( ',', $inserted_values ) );
+	}
+}
+
+
+
+
+/**
  * Translates an given array of permissions to an "easy group".
  *
  * - nomember
@@ -218,25 +310,25 @@ function blog_update_user_perms( $blog )
  * @param array indexed, as the result row from "SELECT * FROM T_coll_user_perms"
  * @return string one of the five groups (nomember, member, editor, admin, custom)
  */
-function blogperms_get_easy( $perms )
+function blogperms_get_easy( $perms, $context='user' )
 {
-	if( !isset($perms['bloguser_ismember']) )
+	if( !isset($perms['blog' . $context . '_ismember']) )
 	{
 		return 'nomember';
 	}
 
-	$perms_post = explode( ',', $perms['bloguser_perm_poststatuses'] );
+	$perms_post = explode( ',', $perms['blog' . $context . '_perm_poststatuses'] );
 	sort( $perms_post );
 
 	$perms_editor = (int)( count($perms_post) ) // permissions for all statuses
-									+ (int)$perms['bloguser_perm_delpost']
-									+ (int)$perms['bloguser_perm_comments']
-									+ (int)$perms['bloguser_perm_media_upload']
-									+ (int)$perms['bloguser_perm_media_browse']
-									+ (int)$perms['bloguser_perm_media_change'];
+									+ (int)$perms['blog' . $context . '_perm_delpost']
+									+ (int)$perms['blog' . $context . '_perm_comments']
+									+ (int)$perms['blog' . $context . '_perm_media_upload']
+									+ (int)$perms['blog' . $context . '_perm_media_browse']
+									+ (int)$perms['blog' . $context . '_perm_media_change'];
 
-	$perms_admin = (int)$perms['bloguser_perm_properties']
-									+ (int)$perms['bloguser_perm_cats'];
+	$perms_admin = (int)$perms['blog' . $context . '_perm_properties']
+									+ (int)$perms['blog' . $context . '_perm_cats'];
 
 	if( $perms_editor == 10 )
 	{ // has full editor rights
@@ -550,6 +642,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.14  2005/08/21 16:20:13  halton
+ * Added group based blogging permissions (new tab under blog). Required schema change
+ *
  * Revision 1.13  2005/05/25 17:13:33  fplanque
  * implemented email notifications on new comments/trackbacks
  *

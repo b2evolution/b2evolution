@@ -22,6 +22,7 @@ if( ! $blog  )
 { // No blog could be selected
 	$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'),
 									 'href="mailto:'. $admin_email. '?subject=b2-promotion"' ), 'error' );
+	$tab = 'postlist';
 }
 else
 { // We could select a valid blog which we have permission to access:

@@ -431,6 +431,24 @@ function create_groups()
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
+	echo 'Creating table for Blog-Group permissions... ';
+	$query = "CREATE TABLE T_coll_group_perms (
+		bloggroup_blog_ID int(11) unsigned NOT NULL default 0,
+		bloggroup_group_ID int(11) unsigned NOT NULL default 0,
+		bloggroup_ismember tinyint NOT NULL default 0,
+		bloggroup_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
+		bloggroup_perm_delpost tinyint NOT NULL default 0,
+		bloggroup_perm_comments tinyint NOT NULL default 0,
+		bloggroup_perm_cats tinyint NOT NULL default 0,
+		bloggroup_perm_properties tinyint NOT NULL default 0,
+		bloggroup_perm_media_upload tinyint NOT NULL default 0,
+		bloggroup_perm_media_browse tinyint NOT NULL default 0,
+		bloggroup_perm_media_change tinyint NOT NULL default 0,
+		PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID)
+	)";
+	$DB->query( $query );
+	echo "OK.<br />\n";
+
 }
 
 

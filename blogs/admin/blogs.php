@@ -306,7 +306,9 @@ switch($action)
 			case 'perm':
 				blog_update_user_perms( $blog );
 				break;
-
+			case 'permgroup':
+				blog_update_group_perms( $blog );
+				break;
 			case 'advanced':
 				set_edited_Blog_from_params( 'advanced' );
 				break;
@@ -367,7 +369,9 @@ switch($action)
 			case 'perm':
 				require dirname(__FILE__).'/_blogs_permissions.form.php';
 				break;
-
+			case 'permgroup':
+				require dirname(__FILE__).'/_blogs_permissions_group.form.php';
+				break;
 			case 'advanced':
 				require dirname(__FILE__).'/_blogs_advanced.form.php';
 				break;
@@ -553,6 +557,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.39  2005/08/21 16:20:12  halton
+ * Added group based blogging permissions (new tab under blog). Required schema change
+ *
  * Revision 1.38  2005/08/04 17:22:14  fplanque
  * better fix for "no linkblog": allow storage of NULL value.
  *

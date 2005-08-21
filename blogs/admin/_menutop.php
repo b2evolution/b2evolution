@@ -46,7 +46,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	$Debuglog->add( 'Admin-Path: '.var_export($AdminUI->path, true) );
 
 	if( $AdminUI->getPath(0) == 'files'
-			|| ($AdminUI->getPathRange(0,1) == array('blogs', 'perm') ) )
+			|| ($AdminUI->getPathRange(0,1) == array('blogs', 'perm') )
+			|| ($AdminUI->getPathRange(0,1) == array('blogs', 'permgroup') ) )
 	{{{ // -- Inject javascript ----------------
 		// gets initialized in _footer.php
 		?>

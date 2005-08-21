@@ -85,6 +85,10 @@ $AdminUI->addMenuEntries(
 											'text' => T_('Permissions'),
 											'href' => 'blogs.php?tab=perm&amp;action=edit&amp;blog='.$blog,
 											'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
+										'permgroup' => array(
+											'text' => T_('Group Permissions'),
+											'href' => 'blogs.php?tab=permgroup&amp;action=edit&amp;blog='.$blog,
+											'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?											
 										'advanced' => array(
 											'text' => T_('Advanced'),
 											'href' => 'blogs.php?tab=advanced&amp;action=edit&amp;blog='.$blog,

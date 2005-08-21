@@ -201,6 +201,7 @@ $db_aliases = array(
 		'T_blogs'            => $tableprefix.'blogs',
 		'T_categories'       => $tableprefix.'categories',
 		'T_coll_user_perms'  => $tableprefix.'blogusers',
+		'T_coll_group_perms' => $tableprefix.'bloggroups',		
 		'T_comments'         => $tableprefix.'comments',
 		'T_files'            => $tableprefix.'files',
 		'T_groups'           => $tableprefix.'groups',

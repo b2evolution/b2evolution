@@ -57,6 +57,10 @@ class Group extends DataObject
 	 */
 	var	$name;
 
+	/**
+	 * Blog posts statuses permissions
+	 */
+	var $blog_post_statuses = array();
 
 	/**
 	 * Constructor
@@ -257,6 +261,141 @@ class Group extends DataObject
 		return $perm;
 	}
 
+		/**
+	 * Check permission for this group on a set of specified categories
+	 *
+	 * This is not for direct use, please call {@link User::check_perm()} instead
+	 *
+	 * {@internal User::check_perm_catsgroups(-) }}
+	 *
+	 * @see User::check_perm()
+	 * @param string Permission name, can be one of the following:
+	 *                  - cat_post_statuses
+	 *                  - more to come later...
+	 * @param string Permission level
+	 * @param array Array of target cat IDs
+	 * @return boolean 0 if permission denied
+	 */
+	function check_perm_catsgroups( $permname, $permlevel, & $perm_target_cats )
+	{
+		// Check if permission is granted:
+		switch( $permname )
+		{
+			case 'cats_post_statuses':
+				// We'll actually pass this on to blog permissions
+				// First we need to create an array of blogs, not cats
+				$perm_target_blogs = array();
+				foreach( $perm_target_cats as $loop_cat_ID )
+				{
+					$loop_cat_blog_ID = get_catblog( $loop_cat_ID );
+					// echo "cat $loop_cat_ID -> blog $loop_cat_blog_ID <br />";
+					if( ! in_array( $loop_cat_blog_ID, $perm_target_blogs ) )
+					{ // not already in list: add it:
+						$perm_target_blogs[] = $loop_cat_blog_ID;
+					}
+				}
+				// Now we'll check permissions for each blog:
+				foreach( $perm_target_blogs as $loop_blog_ID )
+				{
+					if( ! $this->check_perm_bloggroups( 'blog_post_statuses', $permlevel, $loop_blog_ID ) )
+					{ // If at least one blog is denied:
+						return false;	// permission denied
+					}
+				}
+				return true;	// Permission granted
+		}
+
+		return false; 	// permission denied
+	}
+
+	
+	/**
+	 * Check permission for this group on a specified blog
+	 *
+	 * This is not for direct use, please call {@link User::check_perm()} instead
+	 * user is checked for privileges first, group lookup only performed on a false result
+	 *
+	 * {@internal Group::check_perm_bloggroups(-) }}
+	 *
+	 * @see User::check_perm()
+	 * @param string Permission name, can be one of the following:
+	 *                  - blog_ismember
+	 *                  - blog_post_statuses
+	 *                  - blog_del_post
+	 *                  - blog_comments
+	 *                  - blog_cats
+	 *                  - blog_properties
+	 *                  - blog_genstatic
+	 * @param string Permission level
+	 * @param integer Permission target blog ID
+	 * @return boolean 0 if permission denied
+	 */
+	function check_perm_bloggroups( $permname, $permlevel, $perm_target_blog )
+	{
+		global $DB;
+		// echo "checkin for $permname >= $permlevel on blog $perm_target_blog<br />";
+
+		if( !isset( $this->blog_post_statuses[$perm_target_blog] ) )
+		{ // Allowed blog post statuses have not been loaded yet:
+			if( $this->ID == 0 )
+			{ // User not in DB, nothing to load!:
+				return false;	// Permission denied
+			}
+
+			// Load now:
+			// echo 'loading allowed statuses';
+			$query = "SELECT *
+								FROM T_coll_group_perms
+								WHERE bloggroup_blog_ID = $perm_target_blog
+								  AND bloggroup_group_ID = $this->ID";
+
+			if( ($row = $DB->get_row( $query, ARRAY_A )) == NULL )
+			{ // No rights set for this Blog/User
+				return false;	// Permission denied
+			}
+			else
+			{ // OK, rights found:
+				$this->blog_post_statuses[$perm_target_blog] = array();
+
+				$this->blog_post_statuses[$perm_target_blog]['blog_ismember'] = $row['bloggroup_ismember'];
+
+				$bloggroup_perm_post = $row['bloggroup_perm_poststatuses'];
+				if( empty($bloggroup_perm_post ) )
+					$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = array();
+				else
+					$this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] = explode( ',', $bloggroup_perm_post );
+
+				$this->blog_post_statuses[$perm_target_blog]['blog_del_post'] = $row['bloggroup_perm_delpost'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloggroup_perm_comments'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloggroup_perm_cats'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_properties'] = $row['bloggroup_perm_properties'];
+			}
+		}
+
+		// Check if permission is granted:
+		switch( $permname )
+		{
+			case 'blog_genstatic':
+				// generate static pages is not currently a group permission.  if you are here user is denied already anyway 
+				return (false);
+
+			case 'blog_post_statuses':
+				if( $permlevel == 'any' )
+				{ // Any prermission will do:
+					// echo count($this->blog_post_statuses);
+					return ( count($this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']) > 0 );
+				}
+
+				// We want a specific permission:
+				// echo 'checking :', implode( ',', $this->blog_post_statuses  ), '<br />';
+				return in_array( $permlevel, $this->blog_post_statuses[$perm_target_blog]['blog_post_statuses'] );
+
+			default:
+				// echo $permname, '=', $this->blog_post_statuses[$perm_target_blog][$permname], ' ';
+				return $this->blog_post_statuses[$perm_target_blog][$permname];
+		}
+	}
+	
 
 	/**
 	 * Template function: display name of blog
@@ -291,6 +430,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2005/08/21 16:20:13  halton
+ * Added group based blogging permissions (new tab under blog). Required schema change
+ *
  * Revision 1.10  2005/07/12 00:29:00  blueyed
  * check_perm(): added $Debuglog, removed unneeded eval(), doc
  *

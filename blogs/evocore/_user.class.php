@@ -113,7 +113,7 @@ class User extends DataObject
 				array( 'table'=>'T_links', 'fk'=>'link_lastedit_user_ID', 'msg'=>T_('%d links last edited by this user') ),
 			);
 
-   	$this->delete_cascades = array(
+		$this->delete_cascades = array(
 				array( 'table'=>'T_usersettings', 'fk'=>'uset_user_ID', 'msg'=>T_('%d user settings on collections') ),
 				array( 'table'=>'T_sessions', 'fk'=>'sess_user_ID', 'msg'=>T_('%d sessions opened by this user') ),
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_user_ID', 'msg'=>T_('%d user permissions on blogs') ),
@@ -393,19 +393,27 @@ class User extends DataObject
 			case 'cats_post_statuses':
 				// Category permissions...
 				$perm = $this->check_perm_catsusers( $permname, $permlevel, $perm_target );
+				if ( $perm == false )
+				{ // Check groups category permissions...
+					$perm = $this->Group->check_perm_catsgroups( $permname, $permlevel, $perm_target );	
+				}
 				break;
 
 			case 'blog_properties':
 				// Blog permission to edit its properties... (depending on user AND its group)
 				// Forward request to group:
 				if( $this->Group->check_perm( 'blogs', $permlevel ) )
-				{ // If group says yes
+				{ // Check groups 'global blog' setting
 					$perm = true;
 					break;
 				}
 				if( $perm_target > 0 )
 				{ // Check user perm for this blog
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
+				}
+				if ( $perm == false )
+				{ // Check groups for permissions to this specific blog
+					$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 				}
 				break;
 
@@ -417,6 +425,11 @@ class User extends DataObject
 			case 'blog_genstatic':
 				// Blog permission to this or that... (depending on this user only)
 				$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
+				if ( $perm == false )
+				{ // Check groups blog specific perm
+					$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
+				}
+				
 				break;
 
 			default:
@@ -885,6 +898,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2005/08/21 16:20:13  halton
+ * Added group based blogging permissions (new tab under blog). Required schema change
+ *
  * Revision 1.39  2005/08/11 19:41:11  fplanque
  * no message
  *

@@ -20,7 +20,7 @@ echo '<p class="footer">'.$app_footer_text."</p>\n\n";
 $Plugins->trigger_event( 'AdminAfterPageFooter', array() );
 
 
-if( $AdminUI->getPath(0) == 'files' || $AdminUI->getPathRange(0,1) == array( 'blogs', 'perm' ) )
+if( $AdminUI->getPath(0) == 'files' || $AdminUI->getPathRange(0,1) == array( 'blogs', 'perm' ) || $AdminUI->getPathRange(0,1) == array( 'blogs', 'permgroup' ) )
 { // init checkall JS functions
 	?>
 	<script type="text/javascript">
