@@ -20,13 +20,13 @@ require dirname(__FILE__).'/_header.php';
 
 
 $Form =& new Form( $htsrv_url.'login.php', 'login', 'post', 'fieldset' );
-$Form->hidden( 'login', $login );
+$Form->hidden( 'login', $yourname );
 $Form->hidden( 'redirect_to', $redirect_to );
 
 $Form->begin_form( 'fform' );
 
 $Form->fieldset();
-$Form->info( T_('Login'), $login );
+$Form->info( T_('Login'), $yourname );
 $Form->info( T_('Email'), $email );
 $Form->fieldset_end();
 
