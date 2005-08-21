@@ -501,7 +501,10 @@ class DB
 	/**
 	 * Get one variable from the DB - see docs for more detail
 	 *
-	 * @return false|mixed false if not found, the value otherwise
+	 * Note: To be sure that you received NULL from the DB and not "no rows" check
+	 *       for {@link $num_rows}.
+	 *
+	 * @return mixed NULL if not found, the value otherwise (which may also be NULL).
 	 */
 	function get_var( $query = NULL, $x = 0, $y = 0, $title = '' )
 	{
@@ -907,6 +910,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.22  2005/08/21 22:54:18  blueyed
+ * Updated documentation for get_var().
+ *
  * Revision 1.21  2005/08/21 22:44:32  blueyed
  * Removed dependencies on T_() and $Timer.
  *
