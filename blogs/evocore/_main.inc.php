@@ -357,13 +357,13 @@ if( isset($_POST['login'] ) && isset($_POST['pwd'] ) )
 { // Trying to log in with a POST
 	$login = $_POST['login'];
 	$pass = $_POST['pwd'];
-	unset($_POST['pwd']); // password is hashed from now on
+	unset($_POST['pwd']); // password will be hashed below
 }
-elseif( isset($_GET['login'] ) && isset($_GET['pwd'] ))
-{ // Trying to log in with a GET
+elseif( isset($_GET['login'] ) )
+{ // Trying to log in with a GET; we might only provide a user here.
 	$login = $_GET['login'];
-	$pass = $_GET['pwd'];
-	unset($_GET['pwd']); // password is hashed from now on
+	$pass = isset($_GET['pwd']) ? $_GET['pwd'] : '';
+	unset($_GET['pwd']); // password will be hashed below
 }
 
 if( !empty($login) && !empty($pass) )
@@ -405,7 +405,7 @@ if( !empty($login) && !empty($pass) )
 		}
 	}
 }
-elseif( isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
+elseif( empty($login) && isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
 { /*
 	 * ---------------------------------------------------------
 	 * User was not trying to log in, but he already was logged in: check validity
@@ -457,7 +457,8 @@ if( $Messages->count( 'login_error' ) )
 	header_nocache();
 
 	require dirname(__FILE__).'/'.$core_dirout.$htsrv_subdir.'login.php';
-	exit();
+
+	die;
 }
 
 
@@ -517,6 +518,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.40  2005/08/22 18:08:20  blueyed
+ * Reworked login logic to allow providing a username (without password) override cookie login
+ *
  * Revision 1.39  2005/07/29 17:56:18  fplanque
  * Added functionality to locate files when they're attached to a post.
  * permission checking remains to be done.
