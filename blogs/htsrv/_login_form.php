@@ -60,7 +60,15 @@ $Form->begin_form( 'fform' );
 	echo $Form->fieldend;
 
 $Form->end_form();
+
+
+// Autoselect login text input:
 ?>
+
+<script type="text/javascript">
+	document.getElementById( 'login' ).focus();
+</script>
+
 
 <div class="login_actions" style="text-align:right">
 	<?php user_register_link( '', ' &middot; ' )?>
