@@ -62,6 +62,9 @@ function db_delete()
 	echo "Dropping Users...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_users' );
 
+	echo "Dropping Group permissions on Blogs...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_coll_group_perms' );
+
 	echo "Dropping Groups...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_groups' );
 
