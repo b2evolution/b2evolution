@@ -457,8 +457,7 @@ if( $Messages->count( 'login_error' ) )
 	header_nocache();
 
 	require dirname(__FILE__).'/'.$core_dirout.$htsrv_subdir.'login.php';
-
-	die;
+	exit();
 }
 
 
@@ -518,6 +517,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.42  2005/08/22 19:22:23  fplanque
+ * minor
+ *
  * Revision 1.41  2005/08/22 18:27:37  blueyed
  * Allow empty login to force login form.
  *
