@@ -45,6 +45,13 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+
+/**
+ * Dependencies
+ */
+require_once( dirname(__FILE__).'/_locale.funcs.php' );
+
+
 /***** Formatting functions *****/
 
 /**
@@ -1919,6 +1926,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.81  2005/08/22 01:31:11  blueyed
+ * Added dependency to _locale.funcs.php
+ *
  * Revision 1.80  2005/08/19 09:56:15  yabs
  * Amended format to post and format to output to allow code to be poste between pre tags without validation errors
  *
