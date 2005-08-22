@@ -14,7 +14,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Include page header:
  */
-$page_title = T_('Continue registration form');
+( $Settings->get('use_mail') ) ? $page_title = T_('Continue registration form'):$page_title = T_('Registration form');
 $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_header.php';
 
@@ -44,9 +44,18 @@ $Form->text( 'yourname', format_to_output($yourname, 'formvalue'), 16,  T_('Logi
 	</fieldset>
 
 <?php
-$Form->text( 'email', format_to_output($email, 'formvalue'), 16,  T_('Email'), T_('This must be the email address that the activation link was sent to') , 100, 'input_text' );
+$Form->text( 'email', format_to_output($email, 'formvalue'), 16,  T_('Email'), ( $Settings->get( 'use_mail') ) ? T_('This must be the email address that the activation link was sent to'):'' , 100, 'input_text' );
 
 $Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
+
+if ( $Settings->get('use_rules') )
+{
+	echo '<fieldset>
+	<div class="label">'.T_('The rules').' :</div>
+	<div class="input"><pre>'.file_get_contents('_rules.txt').'</pre></div>
+	</fieldset>';
+	$Form->checkbox( 'rules', $rules, T_('I agree') );
+}
 ?>
 
 	<fieldset>

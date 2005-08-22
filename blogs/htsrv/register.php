@@ -46,7 +46,9 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.inc.php';
 
+if ( $Settings->get('use_mail') )
 
+{
 param( 'action', 'string', '' );
 param( 'yourname', 'string', '' );
 param( 'email', 'string', '' );
@@ -101,16 +103,9 @@ switch( $action )
 		{	// We have a unique login and email
 			// Build and send confirmation email
 
-			// Get activation key seed
-			
-			if ( ! ( $activation_key = $Settings->get('activation_key') ) )
-			{	// no activation key so create one
-				$Settings->set('activation_key' , md5( $yourname ) );
-			}
-
 			//	build the email
-			$theMessage = $Settings->get('conf_email');
-			$theMessage = str_replace( array( '[name]' , '[link]' ) ,array( $yourname , $htsrv_url.'/confirm.php?action=activate&key='.md5($activation_key.$email) ) ,$theMessage);
+			$theMessage = file_get_contents( '_email.txt' );
+			$theMessage = str_replace( array( '[name]' , '[link]' ) ,array( $yourname , $htsrv_url.'/confirm.php?action=activate&key='.md5($Settings->get('activation_key').$email) ) ,$theMessage);
 		
 			//	send the email
 			send_mail( $email , T_('Confirm your blog registration' ) , $theMessage , $notify_from );
@@ -139,4 +134,11 @@ param( 'redirect_to', 'string', $admin_url.'b2edit.php' );
 // Display reg form:
 require( dirname(__FILE__).'/_reg_form.php' );
 
+}
+
+else
+
+{
+require( dirname(__FILE__).'/confirm.php' );
+}
 ?>

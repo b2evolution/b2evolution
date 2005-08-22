@@ -22,6 +22,7 @@ param( 'redirect_to', 'string', $admin_url.'b2edit.php' );
 param( 'pass1', 'string', '' );
 param( 'pass2', 'string', '' );
 param( 'blogname', 'string', '' );
+param( 'rules' , 'integer' , 0 );
 param( 'key', 'string', '' );
 $next_action = 'create';
 
@@ -56,7 +57,7 @@ switch( $action )
 		if ( $UserCache->get_by_email( $email ) )
 		{ //	The email is already registered
 
-			$Messages->add( sprintf( T_( 'The email &quote;%s&quote; is already registered, if you have forgotten your password use the link below.' ) , $email ), 'error' );
+			$Messages->add( sprintf( T_( 'The email &laquo;%s&raquo; is already registered, if you have forgotten your password use the link below.' ) , $email ), 'error' );
 			break;
 		}
 		
@@ -68,14 +69,26 @@ switch( $action )
 																FROM T_users
 																	WHERE user_email = "'.$DB->escape($email).'"', 0, 0, 'Get User email' ) )
 		{ 
-			$Messages->add( sprintf( T_( 'The email &quote;%s&quote; is already registered, if you have forgotten your password use the link below.' ) , $email ), 'error' );
+			$Messages->add( sprintf( T_( 'The email &laquo;%s&raquo; is already registered, if you have forgotten your password use the link below.' ) , $email ), 'error' );
 			break;
 		}
 		
-		if ( ! ( md5( $Settings->get('activation_key').$email == $key ) ) )
-		{	//	email does not match activation key, possible spam attempt
-			$Messages->add( sprintf( T_( 'The email &quote;%s&quote does not match the email that this activation key was sent to.' ) , $email ) , 'error' );
-			break;
+		if ( $Settings->get('use_mail'))
+		{
+			if ( ! ( md5( $Settings->get('activation_key').$email ) == $key ) )
+			{	//	email does not match activation key, possible spam attempt
+				$Messages->add( sprintf( T_( 'The email &laquo;%s&raquo; does not match the email that this activation key was sent to.' ) , $email ) , 'error' );
+				break;
+			}
+		}
+		
+		if ( $Settings->get('use_rules') )
+		{
+			if ( !$rules )
+			{	//	They haven't agreed to the rules
+				$Messages->add( T_( 'You must agree to our rules.' ) , 'error' ) ;
+				break;
+			}
 		}
 		
 		if ( !$blogname )
@@ -91,7 +104,7 @@ switch( $action )
 		elseif ( $BlogCache->get_by_urlname( $blogname , false ) )
 		{ //	A blog of this name already exists
 			//	Should this also be checked against the blacklist ?
-			$Messages->add( sprintf( T_('A blog already exists called &quote;%s&quote, please choose another name.' ) , $blogname ) , 'error' );
+			$Messages->add( sprintf( T_('A blog already exists called &laquo;%s&raquo;, please choose another name.' ) , $blogname ) , 'error' );
 		}
 		
 		if( !$Messages->count( 'error' ) )
@@ -116,6 +129,7 @@ switch( $action )
 
 			$UserCache->add( $new_User );
 
+			$Messages->add(T_('Account created') , 'success' );
 
 			//	Create the blog , if default blog exists then use it's settings and posts
 
@@ -129,7 +143,7 @@ switch( $action )
 			}
 			$new_Blog->name = $blogname;
 			$new_Blog->shortname = substr( $blogname , 0 , 12 );
-			$new_Blog->siteurl = $blogname;
+			$new_Blog->siteurl = '';
 			$new_Blog->stub = $blogname;
 			
 			if ( ! isset( $new_Blog->links_blog_ID ) )
@@ -159,6 +173,9 @@ switch( $action )
 										$new_Blog->disp_bloglist ,
 										$new_Blog->in_bloglist
 										);
+	
+			$Messages->add(T_('Blog created') , 'success' );
+
 			if ( $default_Blog )
 			{	//	Create the default categories
 
@@ -172,6 +189,8 @@ switch( $action )
 						$the_Cats .= "or post_main_cat_ID='".$default_cat['cat_ID']."'";
 					}
 
+					$Messages->add(T_('Categories created') , 'success' );
+
 					//	Create the default posts
 
 					//	Don't know if there's a function I can call, so once again use a sledgehammer to crack a nut
@@ -180,19 +199,12 @@ switch( $action )
 						foreach ( $default_posts as $default_post)
 						{	//	don't forget to change the category , author and date
 							$temp_item = new Item();
-							$temp_item->creator_user_ID = $new_User->ID;
-							$temp_item->lastedit_user_ID = $new_User-> ID;
-							$temp_item->status = $default_post['post_status'];
-							$temp_item->locale = $default_post['post_locale'];
-							$temp_item->content = str_replace( '[name]' , $yourname , $default_post['post_content'] );
-							$temp_item->title = $default_post['post_title'];
-							$temp_item->main_cat_ID = $new_cat_list[$default_post['post_main_cat_ID']];
-							$temp_item->flags = $default_post['post_flags'];
-							$temp_item->wordcount = $default_post['post_wordcount'];
-							$temp_item->renderers = $default_post['post_renderers'];
-							$temp_item->dbinsert();
+							$temp_item->insert( $new_User->ID , $default_post['post_title'], str_replace( '[name]' , $yourname , $default_post['post_content'] ) , date('Y-m-d H:i:s',$localtimenow)
+							, $new_cat_list[$default_post['post_main_cat_ID']], '' , $default_post['post_status'] , $default_post['post_locale'] );
 						}
+					$Messages->add(T_('Posts created') , 'success' );
 					}
+
 					//	Create the default permissions based on default user
 					if ( $default_user = $UserCache->get_by_login('default') )
 					{
@@ -217,10 +229,29 @@ switch( $action )
 																												'".$a_perm['bloguser_perm_media_browse']."' ,
 																												'".$a_perm['bloguser_perm_media_change']."')" );
 							}
+						$Messages->add(T_('Permissions created') , 'success' );
 						}
 					}
 				}
 			}
+
+			// switch to admins locale
+			$AdminUser =& $UserCache->get_by_ID( 1 );
+			locale_temp_switch( $AdminUser->get( 'locale' ) );
+
+			$message  = T_('New user registration on your blog').":\n"
+									."\n"
+									.T_('Login:')." $login\n"
+									.T_('Email').": $email\n"
+									.T_('Blog').": $blogname\n"
+									."\n"
+									.T_('Manage users').': '.$admin_url."b2users.php\n"
+									.T_('Manage blogs').': '.$admin_url."b2blogs.php\n";
+
+			send_mail( $admin_email, T_('New user registration on your blog'), $message, $notify_from );
+
+			locale_restore_previous();
+
 			// Display registration completed screen 
 			require( dirname(__FILE__).'/_reg_complete.php' );
 			exit();
