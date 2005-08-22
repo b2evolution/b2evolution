@@ -403,17 +403,17 @@ class User extends DataObject
 				// Blog permission to edit its properties... (depending on user AND its group)
 				// Forward request to group:
 				if( $this->Group->check_perm( 'blogs', $permlevel ) )
-				{ // Check groups 'global blog' setting
+				{ // If group says yes
 					$perm = true;
 					break;
 				}
 				if( $perm_target > 0 )
 				{ // Check user perm for this blog
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
-				}
-				if ( $perm == false )
-				{ // Check groups for permissions to this specific blog
-					$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
+					if ( $perm == false )
+					{ // Check groups for permissions to this specific blog
+						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
+					}
 				}
 				break;
 
@@ -898,6 +898,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2005/08/22 19:19:26  fplanque
+ * minor fix
+ *
  * Revision 1.40  2005/08/21 16:20:13  halton
  * Added group based blogging permissions (new tab under blog). Required schema change
  *
