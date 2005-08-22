@@ -32,6 +32,11 @@ if( $action == 'update' )
 
 	// UPDATE registration settings:
 
+	if ( ! $Settings->get('activation_key') ) 
+			{	// no activation key so create one
+				$Settings->set('activation_key' , md5( date('U') ) );
+			}
+
 	param( 'newusers_canregister', 'integer', 0 );
 	$Settings->set( 'newusers_canregister', $newusers_canregister );
 
@@ -45,10 +50,15 @@ if( $action == 'update' )
 	$Settings->set( 'use_rules' , $use_rules );
 
 	param( 'the_rules' , 'string' , '' );
-	$Settings->set( 'the_rules' , $the_rules );
+	//	Moved to file - settings max length is 255
+	fileWrite( $admin_dirout.$htsrv_subdir.'_rules.txt' , format_to_post( $the_rules ) );
+
+	param( 'use_mail' , 'integer' , 0 );
+	$Settings->set( 'use_mail' , $use_mail );
 
 	param( 'confmail' , 'string' , '' );
-	$Settings->set( 'conf_email' , $confmail );
+	//	moved to file
+	fileWrite( $admin_dirout.$htsrv_subdir.'_email.txt' , format_to_post( $confmail ) );
 
 	if( ! $Messages->count('error') )
 	{
@@ -76,15 +86,14 @@ $AdminUI->dispPayloadBegin();
 <h3>Info</h3>
 <p>I didn't want to mess with the installer, so here's how to make it all happen for now</p>
 <ol>
-<li>Create a new blog name = default stub = default</li>
+<li>Create a new blog name : = default stub = default</li>
 <li>Create any categories for blog (not got sub cats working yet)</li>
 <li>Create any "welcome" posts you want [name] will be replaced by the users name</li>
-<li>Create a new user name = default</li>
-<li>Assign default user rights to default blog - this will be used to assign new user rights to new blog</li>
-<li>Assign default user rights to any other blogs - new user will be given same rights to same blogs</li>
+<li>Create a new user : name = default</li>
+<li>Assign 'default user' rights to 'default blog' - this will be used to assign 'new user' rights to 'new blog'</li>
+<li>Assign 'default user' rights to any other blogs - 'new user' will be given same rights to same blogs</li>
 <li>Cross your fingers and register</li>
 </ol>
-<p>I'm still working on this so it's not 100% - I still need to work out how to update the posts cache etc</p>
 <?php
 require dirname(__FILE__).'/_set_reg.form.php';
 
@@ -92,4 +101,26 @@ require dirname(__FILE__).'/_set_reg.form.php';
 $AdminUI->dispPayloadEnd();
 
 require dirname(__FILE__).'/_footer.php';
+
+function fileWrite( $filename , $filecontents )
+{
+	global $Messages;
+	
+	if (!$handle = fopen($filename, 'w'))
+	{
+		$Messages->add( sprintf( T_( 'Unable to write %s , please check your permissions on this file' ) , $filename ) , 'error' );
+		exit;
+	}
+
+	if ( fwrite( $handle , $filecontents) === FALSE)
+	{
+		$Messages->add( sprintf( T_( 'Unable to write %s , please check your permissions on this file' ) , $filename ) , 'error' );
+		exit;
+	}
+
+	$Messages->add( sprintf( T_( '%s updated' ) , $filename ) , 'success' );
+
+	fclose($handle);
+}
+
 ?>
