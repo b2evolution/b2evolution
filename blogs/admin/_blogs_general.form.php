@@ -93,14 +93,14 @@ $Form->hidden( 'action', $next_action );
 $Form->hidden( 'blog', $blog );
 $Form->hidden( 'blogtemplate', $blogtemplate );
 
-$Form->fieldset( T_('General parameters'), 'fieldset clear' );
+$Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear' ) );
 	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Full Name'), T_('Will be displayed on top of the blog.') );
 	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 12, T_('Short Name'), T_('Will be used in selection menus and throughout the admin interface.') );
 	$Form->select( 'blog_locale', $edited_Blog->get( 'locale' ), 'locale_options_return', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
-$Form->fieldset_end();
+$Form->end_fieldset();
 
 
-$Form->fieldset( T_('Access parameters') );
+$Form->begin_fieldset( T_('Access parameters') );
 
 	$Form->radio( 'blog_siteurl_type', $blog_siteurl_type,
 		array(
@@ -158,10 +158,10 @@ $Form->fieldset( T_('Access parameters') );
 	$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL blog name'), T_('Used to uniquely identify this blog. Appears in URLs when using extra-path info.'), $maxlength_urlname_stub );
 
 	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$edited_Blog->dget( 'baseurl', 'entityencoded' ).$blog_urlappend.'</span>' );
-$Form->fieldset_end();
+$Form->end_fieldset();
 
 
-$Form->fieldset( T_('Default display options') );
+$Form->begin_fieldset( T_('Default display options') );
 	$Form->select( 'blog_default_skin', $edited_Blog->get( 'default_skin' ), 'skin_options_return', T_('Default skin') , T_('This is the default skin that will be used to display this blog.') );
 
 	$Form->checkbox( 'blog_force_skin', 1-$edited_Blog->get( 'force_skin' ), T_('Allow skin switching'), T_('Users will be able to select another skin to view the blog (and their prefered skin will be saved in a cookie).') );
@@ -172,10 +172,10 @@ $Form->fieldset( T_('Default display options') );
 	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be displayed in the list of all public blogs.') );
 
 	$Form->select_object( 'blog_links_blog_ID', $edited_Blog->get( 'links_blog_ID' ), $BlogCache, T_('Default linkblog'), T_('Will be displayed next to this blog (if your skin supports this).'), true );
-$Form->fieldset_end();
+$Form->end_fieldset();
 
 
-$Form->fieldset( T_('Description') );
+$Form->begin_fieldset( T_('Description') );
 	$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template.'), 250 );
 
 	$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 8, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
@@ -185,7 +185,7 @@ $Form->fieldset( T_('Description') );
 	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
 
 	$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 8, T_('Notes'), T_('Additional info.'), 50, 'large' );
-$Form->fieldset_end();
+$Form->end_fieldset();
 
 
 $Form->buttons( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),

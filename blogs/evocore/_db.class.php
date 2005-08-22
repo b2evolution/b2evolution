@@ -146,7 +146,7 @@ class DB
 	 *
 	 * connects to the server and selects a database
 	 *
-	 * @todo Too many parameters (and without default). Should be accessed through members. $halt_on_error is relevant to the connect procedure and should be put after $dbhost.
+	 * blueyed> Note: Too many parameters (and without default). Should be accessed through members. $halt_on_error is relevant to the connect procedure and should be put after $dbhost.
 	 */
 	function DB( $dbuser, $dbpassword, $dbname, $dbhost, $dbaliases, $db_use_transactions, $dbtableoptions = '', $halt_on_error = true )
 	{
@@ -211,7 +211,7 @@ class DB
 	{
 		if ( !@mysql_select_db($db,$this->dbh))
 		{
-			$this->print_error( '<strong>'.sprintf( 'Error selecting database [%s]!', $db ).'</strong>
+			$this->print_error( '<strong>Error selecting database ['.$db.']!</strong>
 				<ol>
 					<li>Are you sure the database exists?</li>
 					<li>Are you sure there is a valid database connection?</li>
@@ -315,7 +315,7 @@ class DB
 		{
 			// If there is an error then take note of it
 			echo '<div class="error">';
-			echo '<p class="error">', 'MySQL error!', '</p>';
+			echo '<p class="error">MySQL error!</p>';
 			echo '<p>', $this->last_error, '</p>';
 			if( !empty($this->last_query) ) echo '<p class="error">Your query: '.$query_title.'<br /><pre>'.htmlspecialchars( str_replace("\t", '  ', $this->last_query) ).'</pre></p>';
 
@@ -910,6 +910,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.23  2005/08/22 18:30:29  fplanque
+ * minor
+ *
  * Revision 1.22  2005/08/21 22:54:18  blueyed
  * Updated documentation for get_var().
  *
