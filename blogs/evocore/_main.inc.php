@@ -351,7 +351,7 @@ if( !isset($login_required) )
 
 // TODO: prevent brute force attacks! (timeout - based on coming Session or Hit object?)
 
-$login = $pass = $pass_md5 = '';
+$login = $pass = $pass_md5 = NULL;
 
 if( isset($_POST['login'] ) && isset($_POST['pwd'] ) )
 { // Trying to log in with a POST
@@ -405,7 +405,7 @@ if( !empty($login) && !empty($pass) )
 		}
 	}
 }
-elseif( empty($login) && isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
+elseif( !isset($login) && isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
 { /*
 	 * ---------------------------------------------------------
 	 * User was not trying to log in, but he already was logged in: check validity
@@ -518,6 +518,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.41  2005/08/22 18:27:37  blueyed
+ * Allow empty login to force login form.
+ *
  * Revision 1.40  2005/08/22 18:08:20  blueyed
  * Reworked login logic to allow providing a username (without password) override cookie login
  *
