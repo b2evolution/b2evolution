@@ -103,7 +103,11 @@ function user_pass_ok( $login, $pass, $pass_is_md5 = false )
 {
 	global $UserCache;
 
-	$User =& $UserCache->get_by_login( $login );
+	$User = & $UserCache->get_by_login( $login );
+	if( !$User )
+	{
+		return false;
+	}
 	// echo 'got data for: ', $User->login;
 
 	if( !$pass_is_md5 )
@@ -403,6 +407,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.25  2005/08/22 18:43:34  blueyed
+ * Handle non-existing user in user_pass_ok() correctly.
+ *
  * Revision 1.24  2005/06/03 15:12:33  fplanque
  * error/info message cleanup
  *
