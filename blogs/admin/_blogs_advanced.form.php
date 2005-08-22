@@ -48,7 +48,7 @@ $Form->hidden( 'tab', 'advanced' );
 $Form->hidden( 'blog',$edited_Blog->ID );
 
 
-$Form->fieldset( T_('Static file generation') );
+$Form->fieldset( T_('Static file generation'), 'fieldset clear' );
 $Form->text( 'blog_staticfilename', $edited_Blog->get( 'staticfilename' ), 30, T_('Static filename'), T_('This is the .html file that will be created when you generate a static version of the blog homepage.') );
 $Form->fieldset_end();
 

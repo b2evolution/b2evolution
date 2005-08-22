@@ -93,7 +93,7 @@ $Form->hidden( 'action', $next_action );
 $Form->hidden( 'blog', $blog );
 $Form->hidden( 'blogtemplate', $blogtemplate );
 
-$Form->fieldset( T_('General parameters') );
+$Form->fieldset( T_('General parameters'), 'fieldset clear' );
 	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Full Name'), T_('Will be displayed on top of the blog.') );
 	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 12, T_('Short Name'), T_('Will be used in selection menus and throughout the admin interface.') );
 	$Form->select( 'blog_locale', $edited_Blog->get( 'locale' ), 'locale_options_return', T_('Main Locale'), T_('Determines the language of the navigation links on the blog.') );
