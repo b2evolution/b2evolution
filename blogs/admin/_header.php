@@ -82,7 +82,7 @@ $AdminUI->addMenuEntries(
 											'href' => 'blogs.php?tab=general&amp;action=edit&amp;blog='.$blog,
 											'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
 										'perm' => array(
-											'text' => T_('Permissions'),
+											'text' => T_('User Permissions'),
 											'href' => 'blogs.php?tab=perm&amp;action=edit&amp;blog='.$blog,
 											'perm_eval' => 'return $GLOBALS["blog"];' ), // hack!?
 										'permgroup' => array(

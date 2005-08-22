@@ -54,12 +54,12 @@ $Form->begin_form( 'fform', T_('File properties') );
 	echo $Fileman->getFormHiddenSelectedFiles();
 	$Form->hidden( 'action', 'update_properties' );
 
-	$Form->fieldset( T_('Properties') );
+	$Form->begin_fieldset( T_('Properties') );
 		$Form->info( T_('Filename'), $selectedFile->get_name(), T_('This is the name of the file on the server hard drive.') );
 		$Form->info( T_('Type'), $selectedFile->get_icon().' '.$selectedFile->get_type() );
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 
-	$Form->fieldset( T_('Meta data') );
+	$Form->begin_fieldset( T_('Meta data') );
 		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
 			$Form->text( 'title', $selectedFile->title, 50, T_('Long title'), T_('This is a longer descriptive title'), 255 );
@@ -72,7 +72,7 @@ $Form->begin_form( 'fform', T_('File properties') );
 			$Form->info( T_('Alternative text'), $selectedFile->dget('alt'), T_('This is useful for images') );
 			$Form->info( T_('Caption/Description'), $selectedFile->dget('desc') );
 		}
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 
 if( $current_User->check_perm( 'files', 'edit' ) )
 { // User can edit:
@@ -89,6 +89,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.8  2005/08/22 18:42:25  fplanque
+ * minor
+ *
  * Revision 1.7  2005/07/29 19:43:53  blueyed
  * minor: forceFM is a user setting!; typo in comment.
  *

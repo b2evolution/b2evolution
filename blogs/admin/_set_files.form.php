@@ -27,7 +27,7 @@ $Form = & new Form( 'fileset.php', 'filesform' );
 $Form->begin_form( 'fform', T_('File Settings') );
 $Form->hidden( 'action', 'update' );
 
-$Form->fieldset( T_('Filemanager options') );
+$Form->begin_fieldset( T_('Filemanager options') );
 	$Form->checkbox( 'fm_enabled', $Settings->get('fm_enabled'),
 											T_('Enable Filemanager'), T_('Check to enable the Filemanager.' ) );
 	$Form->checkbox( 'fm_enable_roots_blog', $Settings->get('fm_enable_roots_blog'),
@@ -40,10 +40,10 @@ $Form->fieldset( T_('Filemanager options') );
 											T_('Enable creation of dirs'), T_('Check to enable creation of directories.' ) );
 	$Form->checkbox( 'fm_enable_create_file', $Settings->get('fm_enable_create_file'),
 											T_('Enable creation of files'), T_('Check to enable creation of files.' ) );
-$Form->fieldset_end();
+$Form->end_fieldset();
 
 
-$Form->fieldset( T_('Upload options') );
+$Form->begin_fieldset( T_('Upload options') );
 	$Form->checkbox( 'upload_enabled', $Settings->get('upload_enabled'),
 												T_('Enable upload'), T_('Check to allow uploading files in general.' ) );
 	$Form->text( 'upload_allowedext',
@@ -60,17 +60,17 @@ $Form->fieldset( T_('Upload options') );
 										T_('Maximum allowed filesize'),
 										T_('KB (This cannot be higher than your PHP/Webserver setting!)'),
 										7 );
-$Form->fieldset_end();
+$Form->end_fieldset();
 
 
-$Form->fieldset( T_('Advanced options') );
+$Form->begin_fieldset( T_('Advanced options') );
 	$Form->text( 'regexp_filename',
 										$Settings->get('regexp_filename'),
 										40,
 										T_('Valid filename'),
 										T_('Regular expression'),
 										255 );
-$Form->fieldset_end();
+$Form->end_fieldset();
 
 
 // TODO: check/transform $upload_url

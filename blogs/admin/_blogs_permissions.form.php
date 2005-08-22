@@ -182,7 +182,7 @@ $Form->hidden( 'tab', 'perm' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 $Form->hidden( 'layout', $layout );
 
-$Form->fieldset( T_('User permissions') );
+$Form->begin_fieldset( T_('User permissions') );
 
 // Display layout selector:
 ?>
@@ -312,7 +312,7 @@ $Form->fieldset( T_('User permissions') );
 
 
 <?php
-$Form->fieldset_end();
+$Form->end_fieldset();
 // warning if a user withdraws own permission to edit the blog's properties
 form_submit( ( $current_User->ID != 1 ) ? 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''.TS_('Warning! You are about to remove your own permission to edit this blog!\nYou won\'t have access to its properties any longer if you do that!').'\') );"' : '' );
 

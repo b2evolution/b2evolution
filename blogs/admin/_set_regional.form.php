@@ -127,12 +127,12 @@ else
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'loc_transinfo', $loc_transinfo );
 
-	$Form->fieldset( T_('Regional settings') );
+	$Form->begin_fieldset( T_('Regional settings') );
 	$Form->text( 'newtime_difference', $Settings->get('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );
 	$Form->select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options_return', T_('Default locale'), T_('Overridden by browser config, user locale or blog locale (in this order).'));
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 
-	$Form->fieldset( T_('Available locales') );
+	$Form->begin_fieldset( T_('Available locales') );
 
 	echo $Form->begin_field( 'available_locales', T_('Locales') );
 
@@ -368,7 +368,7 @@ else
 
 	echo $Form->end_field();
 
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{

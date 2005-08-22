@@ -72,7 +72,7 @@ $Form->begin_form( 'fform', $Fileman->fm_mode == 'file_copy' ? T_('Copy') : T_('
 	$Fileman->SourceList->restart();
 	while( $loop_src_File = & $Fileman->SourceList->get_next() )
 	{
-		$Form->fieldset( T_('Source').': '.$loop_src_File->get_rdfp_rel_path() );
+		$Form->begin_fieldset( T_('Source').': '.$loop_src_File->get_rdfp_rel_path() );
 
 		if( isset( $overwrite[$loop_src_File->get_md5_ID()] ) )
 		{
@@ -82,7 +82,7 @@ $Form->begin_form( 'fform', $Fileman->fm_mode == 'file_copy' ? T_('Copy') : T_('
 		$Form->text( 'new_names['.$loop_src_File->get_md5_ID().']', $new_names[$loop_src_File->get_md5_ID()], 32,
 									T_('New name'), $loop_src_File->dget('title'), 128 );
 
-		$Form->fieldset_end();
+		$Form->end_fieldset();
 	}
 
 $Form->end_form( array( array( 'submit', 'submit', $Fileman->fm_mode == 'file_copy' ? T_('Copy') : T_('Move'), 'SaveButton' ),
@@ -96,6 +96,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.9  2005/08/22 18:42:25  fplanque
+ * minor
+ *
  * Revision 1.8  2005/05/24 15:26:50  fplanque
  * cleanup
  *

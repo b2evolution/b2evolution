@@ -58,7 +58,7 @@ $Form->begin_form( 'bComment' );
 	$Form->hidden( 'checkuser_id', $current_User->ID );
 	$Form->hidden( 'redirect_to', $redirect_to );
 
-	$Form->fieldset( T_('Global settings') );
+	$Form->begin_fieldset( T_('Global settings') );
 
 		$Form->info( T_('Login'), $current_User->get('login'), T_('ID').': '.$current_User->ID );
 
@@ -66,9 +66,9 @@ $Form->begin_form( 'bComment' );
 
 		$Form->checkbox( 'newuser_notify', $current_User->get( 'notify' ), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
 
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 
-	$Form->fieldset( T_('Blog subscriptions') );
+	$Form->begin_fieldset( T_('Blog subscriptions') );
 
 		$sql = 'SELECT blog_ID, blog_shortname, sub_items, sub_comments
 							FROM T_blogs LEFT JOIN T_subscriptions ON ( blog_ID = sub_coll_ID AND sub_user_ID = '.$current_User->ID.' )
@@ -86,7 +86,7 @@ $Form->begin_form( 'bComment' );
 
 		$Form->hidden( 'subs_blog_IDs', implode( ',', $subs_blog_IDs ) );
 
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 
 $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );

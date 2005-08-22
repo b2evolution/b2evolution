@@ -66,7 +66,7 @@ echo '<div class="browse_side_item">';
 		$Form->hidden( 'tab', $tab );
 		$Form->hidden( 'blog', $blog );
 
-		$Form->fieldset( T_('Posts to show') );
+		$Form->begin_fieldset( T_('Posts to show') );
 		?>
 		<div>
 
@@ -98,10 +98,10 @@ echo '<div class="browse_side_item">';
 	 	</div>
 
 		<?php
-		$Form->fieldset_end();
+		$Form->end_fieldset();
 
 
-		$Form->fieldset( T_('Title / Text contains'), 'Text' );
+		$Form->begin_fieldset( T_('Title / Text contains'), array( 'class'=>'Text' ) );
 
 		echo $Form->inputstart;
 		?>
@@ -127,9 +127,9 @@ echo '<div class="browse_side_item">';
 			<label for="exact"><?php echo T_('Exact match') ?></label>
 		</span>
 		<?php
-		$Form->fieldset_end();
+		$Form->end_fieldset();
 
-		$Form->fieldset( 'Archives', T_('Archives') );
+		$Form->begin_fieldset( T_('Archives'), array( 'class'=>'Archives' ) );
 		?>
 		<ul>
 		<?php
@@ -200,7 +200,7 @@ echo '<div class="browse_side_item">';
 
 		</ul>
 		<?php
-			$Form->fieldset_end();
+			$Form->end_fieldset();
 		?>
 
 		<fieldset>
@@ -334,6 +334,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.8  2005/08/22 18:42:25  fplanque
+ * minor
+ *
  * Revision 1.7  2005/08/18 17:49:51  fplanque
  * New search options
  *

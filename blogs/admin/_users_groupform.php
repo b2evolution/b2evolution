@@ -62,9 +62,9 @@ else
 $Form->hidden( 'action', 'groupupdate' );
 $Form->hidden( 'edited_grp_ID', $edited_Group->ID );
 
-$Form->fieldset( T_('General') );
+$Form->begin_fieldset( T_('General') );
 	$Form->text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
-$Form->fieldset_end();
+$Form->end_fieldset();
 
 $perm_none_option = array( 'none', '<acronym title="'.T_('No Access').'">'.T_('None').'</acronym>' );
 $perm_list_option = array( 'list', '<acronym title="'.T_('View list only').'">'.T_('List').'</acronym>' );
@@ -79,7 +79,7 @@ $standard_perm_options = array(
 							$perm_edit_option
 						);
 
-$Form->fieldset( T_('Permissons for members of this group') );
+$Form->begin_fieldset( T_('Permissons for members of this group') );
 
 	if( $edited_Group->get('ID') != 1 )
 	{	// Groups others than #1 can be prevented from editing users
@@ -133,7 +133,7 @@ $Form->fieldset( T_('Permissons for members of this group') );
 							$perm_edit_option
 						), T_('Settings') );
 
-$Form->fieldset_end();
+$Form->end_fieldset();
 
 if( $current_User->check_perm( 'users', 'edit' ) )
 {
@@ -148,6 +148,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.37  2005/08/22 18:42:25  fplanque
+ * minor
+ *
  * Revision 1.36  2005/08/11 19:41:10  fplanque
  * no message
  *

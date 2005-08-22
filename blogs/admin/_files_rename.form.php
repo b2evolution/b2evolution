@@ -55,12 +55,12 @@ $Form->begin_form( 'fform', T_('Rename') );
 	$selected_Filelist->restart();
 	while( $loop_src_File = & $selected_Filelist->get_next() )
 	{
-		$Form->fieldset( T_('File').': '.$loop_src_File->get_name() );
+		$Form->begin_fieldset( T_('File').': '.$loop_src_File->get_name() );
 
 		$Form->text( 'new_names['.$loop_src_File->get_md5_ID().']', $new_names[$loop_src_File->get_md5_ID()], 32,
 									T_('New name'), $loop_src_File->dget('title'), 128 );
 
-		$Form->fieldset_end();
+		$Form->end_fieldset();
 	}
 
 
@@ -69,6 +69,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Rename'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.2  2005/08/22 18:42:25  fplanque
+ * minor
+ *
  * Revision 1.1  2005/05/17 19:26:06  fplanque
  * FM: copy / move debugging
  *

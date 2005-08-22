@@ -111,7 +111,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	<?php
 	// ############################ POST CONTENTS #############################
 
-	$Form->fieldset( T_('Post contents') );
+	$Form->begin_fieldset( T_('Post contents') );
 
 	$Form->text( 'post_title', $post_title, 48, T_('Title'), '', 255 );
 
@@ -183,12 +183,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	echo '</div>';
 
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 
 
 	// ############################ ADVANCED #############################
 
-	$Form->fieldset( T_('Advanced properties') );
+	$Form->begin_fieldset( T_('Advanced properties') );
 
 	if( $current_User->check_perm( 'edit_timestamp' ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
@@ -203,12 +203,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->text( 'post_urltitle', $post_urltitle, 40, T_('URL Title'),
 							 T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
 
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 
 
 	// ############################ WORKFLOW #############################
 
-	$Form->fieldset( T_('Workflow properties') );
+	$Form->begin_fieldset( T_('Workflow properties') );
 
 	$Form->select_options( 'item_st_ID',
 												$itemStatusCache->option_list_return( $edited_Item->st_ID, ! $edited_Item->st_required ),
@@ -222,14 +222,14 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->date( 'item_deadline', $edited_Item->get('deadline'), T_('Deadline') );
 
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 
 
 	// ####################### ADDITIONAL ACTIONS #########################
 
 	if( isset( $Blog ) && ( $Blog->get('allowpingbacks') || $Blog->get('allowtrackbacks') ) )
 	{
-		$Form->fieldset( T_('Additional actions') );
+		$Form->begin_fieldset( T_('Additional actions') );
 
 		if( $Blog->get('allowpingbacks') )
 		{ // --------------------------- PINGBACK --------------------------------------
@@ -252,7 +252,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		<?php
 		}
 
-		$Form->fieldset_end();
+		$Form->end_fieldset();
 
 	}
 	?>
@@ -264,16 +264,16 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	<?php
 	// ################### CATEGORIES ###################
 
-	$Form->fieldset( T_('Categories'), 'extracats' );
+	$Form->begin_fieldset( T_('Categories'), array( 'class'=>'extracats' ) );
 
 	echo cat_select();
 
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 
 
 	// ################### VISIBILITY / SHARING ###################
 
-	$Form->fieldset( T_('Visibility / Sharing') );
+	$Form->begin_fieldset( T_('Visibility / Sharing') );
 
 	$sharing_options = array();
 	if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
@@ -289,14 +289,14 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->radio( 'post_status', $post_status, $sharing_options, '', true );
 
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 
 
 	// ################### COMMENT STATUS ###################
 
 	if( $Blog->allowcomments == 'post_by_post' )
 	{
-		$Form->fieldset( T_('Comments') );
+		$Form->begin_fieldset( T_('Comments') );
 
 		?>
 			<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?> />
@@ -309,17 +309,17 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 			<?php echo T_('Disabled') ?></label><br />
 		<?php
 
-		$Form->fieldset_end();
+		$Form->end_fieldset();
 	}
 
 
 	// ################### TEXT RENDERERS ###################
 
-	$Form->fieldset( T_('Text Renderers') );
+	$Form->begin_fieldset( T_('Text Renderers') );
 
 	$edited_Item->renderer_checkboxes();
 
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 
 	?>
 
@@ -355,6 +355,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.27  2005/08/22 18:42:25  fplanque
+ * minor
+ *
  * Revision 1.26  2005/07/26 18:50:48  fplanque
  * enhanced attached file handling
  *

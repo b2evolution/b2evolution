@@ -295,7 +295,7 @@ while( $Item = $MainList->get_item() )
 				echo $Form->inputstart;
 				$Form->checkbox( 'comment_autobr', 1, T_('Auto-BR'), T_('(Line breaks become &lt;br&gt;)'), 'checkbox' );
 				echo $Form->inputend;
-				$Form->fieldset_end();
+				$Form->end_fieldset();
 
 			}
 
@@ -303,7 +303,7 @@ while( $Item = $MainList->get_item() )
 				echo $Form->inputstart;
 				$Form->submit( array ('submit', T_('Send comment'), 'SaveButton' ) );
 				echo $Form->inputend;
-				$Form->fieldset_end();
+				$Form->end_fieldset();
 
 			?>
 
@@ -343,6 +343,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.102  2005/08/22 18:42:25  fplanque
+ * minor
+ *
  * Revision 1.101  2005/08/08 22:54:40  blueyed
  * Re-activated /admin/antispam, with slight improvements. Still needs a lot more love.
  *

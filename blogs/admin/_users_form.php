@@ -78,7 +78,7 @@ $Form->hidden( 'action', 'userupdate' );
 $Form->hidden( 'edited_user_ID', $edited_User->ID );
 
 
-$Form->fieldset( T_('User rights'), 'fieldset clear' );
+$Form->begin_fieldset( T_('User rights'), array( 'class'=>'fieldset clear' ) );
 
 $field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' );
 if( $user_profile_only )
@@ -100,10 +100,10 @@ else
 	$Form->info( T_('User group'), $edited_User->Group->dget('name') );
 }
 
-$Form->fieldset_end();
+$Form->end_fieldset();
 
 
-$Form->fieldset( T_('User') );
+$Form->begin_fieldset( T_('User') );
 
 $email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Send an email').'" class="middle" /></a>';
 
@@ -167,7 +167,7 @@ else
 	$Form->info( T_('YahooIM'), $edited_User->dget('yim') );
 }
 
-$Form->fieldset_end();
+$Form->end_fieldset();
 
 
 if( $allowed_to_edit )
@@ -178,7 +178,7 @@ if( $allowed_to_edit )
 
 if( ! $creating )
 { // We're NOT creating a new user:
-	$Form->fieldset( T_('User information') );
+	$Form->begin_fieldset( T_('User information') );
 
 	$Form->info( T_('ID'), $edited_User->dget('ID') );
 
@@ -191,7 +191,7 @@ if( ! $creating )
 	$Form->info( T_('From Domain'), $edited_User->dget('domain') );
 	$Form->info( T_('With Browser'), $edited_User->dget('browser') );
 
-	$Form->fieldset_end();
+	$Form->end_fieldset();
 }
 
 $Form->end_form();
@@ -201,6 +201,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.65  2005/08/22 18:42:25  fplanque
+ * minor
+ *
  * Revision 1.64  2005/08/11 19:41:10  fplanque
  * no message
  *

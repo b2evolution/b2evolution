@@ -331,7 +331,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 	$add_Form = & new Form( 'antispam.php', 'antispam_add', 'get', 'fieldset' );
 	$add_Form->begin_form('fform');
 	$add_Form->hidden( 'action', 'ban' );
-	$add_Form->fieldset();
+	$add_Form->begin_fieldset();
 	$add_Form->text( 'keyword', $keyword, 30, T_('Add a banned keyword'), 'note..', 80 ); // TODO: add note
 	/*
 	 * TODO: explicitly add a domain?
