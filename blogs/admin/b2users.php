@@ -46,8 +46,6 @@ $AdminUI->setPath( 'users' );
 
 param( 'action', 'string', 'list' );
 
-// fplanque> the rule that should be consistent accross the app, is that if no object is requested then $edited_Object remains unset! use isset() !
-# $edited_User = NULL; // reset/init
 
 /*
  * Load editable objects:
@@ -556,6 +554,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.99  2005/08/22 01:26:54  blueyed
+ * Removed "init" of $edited_User - it was meant to for security with register_global, would probably cause only a notice now.
+ *
  * Revision 1.98  2005/08/11 19:41:10  fplanque
  * no message
  *
