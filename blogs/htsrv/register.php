@@ -46,11 +46,9 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.inc.php';
 
-if ( $Settings->get('use_mail') )
 
-{
 param( 'action', 'string', '' );
-param( 'yourname', 'string', '' );
+param( 'login', 'string', '' );
 param( 'email', 'string', '' );
 param( 'locale', 'string', $Settings->get('default_locale') );
 
@@ -71,51 +69,69 @@ switch( $action )
 		param( 'pass1', 'string', '' );
 		param( 'pass2', 'string', '' );
 
-		if( $UserCache->get_by_login( $yourname ) )
+		profile_check_params( array( 'login' => $login,
+																	'pass1' => $pass1,
+																	'pass2' => $pass2,
+																	'email' => $email,
+																	'pass_required' => true ) );
+
+		if( $UserCache->get_by_login( $login ) )
 		{ // The login is already registered
-			$Messages->add( sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $yourname ), 'error' );
+			$Messages->add( sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ), 'error' );
 			break;
 		}
 
-		/* I don't want to mess with your user cache so the following doesn't exists
-		
-		if ( $UserCache->get_by_email( $email ) )
-		{ //	The email is already registered
-			//	Should email be checked against the blacklist ?
-
-			$Messages->add( sprintf( T_('The email &quote;%s&quote; is already registered, if you have forgotten your password use the link below.') , $email ), 'error' );
-			break;
-		}
-		
-		*/
-		
-		// Replicate above function
-		global $DB;
-		if( $row = $DB->get_row( 'SELECT *
-																FROM T_users
-																	WHERE user_email = "'.$DB->escape($email).'"', 0, 0, 'Get User email' ) )
-		{ 
-			$Messages->add( sprintf( T_('The email &quote;%s&quote; is already registered, if you have forgotten your password use the link below.') , $email ), 'error' ) ;
-			break;
-		}
-		
 		if( !$Messages->count( 'error' ) )
-		{	// We have a unique login and email
-			// Build and send confirmation email
+		{
+			// TODO: START TRANSACTION !!
 
-			//	build the email
-			$theMessage = file_get_contents( '_email.txt' );
-			$theMessage = str_replace( array( '[name]' , '[link]' ) ,array( $yourname , $htsrv_url.'/confirm.php?action=activate&key='.md5($Settings->get('activation_key').$email) ) ,$theMessage);
-		
-			//	send the email
-			send_mail( $email , T_('Confirm your blog registration' ) , $theMessage , $notify_from );
+			$new_User = & new User();
+			$new_User->set( 'login', $login );
+			$new_User->set( 'pass', md5($pass1) ); // encrypted
+			$new_User->set( 'nickname', $login );
+			$new_User->set( 'email', $email );
+			$new_User->set( 'ip', getIpList( true ) );
+			$new_User->set( 'domain', $Hit->getRemoteHost() );
+			$new_User->set( 'browser', $Hit->getUserAgent() );
+			$new_User->set_datecreated( $localtimenow );
+			$new_User->set( 'locale', $locale );
+			$newusers_grp_ID = $Settings->get('newusers_grp_ID');
+			// echo $newusers_grp_ID;
+			$new_user_Group = $GroupCache->get_by_ID( $newusers_grp_ID );
+			// echo $new_user_Group->disp('name');
+			$new_User->setGroup( $new_user_Group );
+			$new_User->dbinsert();
+
+			$UserCache->add( $new_User );
+
+			// TODO: Optionally auto create a blog
+
+			// TODO: Optionally auto assign rights
+
+			// TODO: END TRANSACTION !!
+
+			// switch to admins locale
+			$AdminUser =& $UserCache->get_by_ID( 1 );
+			locale_temp_switch( $AdminUser->get( 'locale' ) );
+
+			$message  = T_('New user registration on your blog').":\n"
+									."\n"
+									.T_('Login:')." $login\n"
+									.T_('Email').": $email\n"
+									."\n"
+									.T_('Manage users').': '.$admin_url."b2users.php\n";
+
+			send_mail( $admin_email, T_('New user registration on your blog'), $message, $notify_from );
+
+			locale_restore_previous();
 
 			// Display confirmation screen:
-			require( dirname(__FILE__).'/_wait_confirmation.php' );
+			require( dirname(__FILE__).'/_reg_complete.php' );
+
 			exit();
 		}
-		
 		break;
+
 
 	case 'disabled':
 		/*
@@ -134,11 +150,4 @@ param( 'redirect_to', 'string', $admin_url.'b2edit.php' );
 // Display reg form:
 require( dirname(__FILE__).'/_reg_form.php' );
 
-}
-
-else
-
-{
-require( dirname(__FILE__).'/confirm.php' );
-}
 ?>

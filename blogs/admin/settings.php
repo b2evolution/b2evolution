@@ -61,6 +61,15 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 
 	// UPDATE general settings:
 
+	param( 'newusers_canregister', 'integer', 0 );
+	$Settings->set( 'newusers_canregister', $newusers_canregister );
+
+	param( 'newusers_grp_ID', 'integer', true );
+	$Settings->set( 'newusers_grp_ID', $newusers_grp_ID );
+
+	$Request->param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
+	$Settings->set( 'newusers_level', $newusers_level );
+
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	/* b2evo only:
 	param( 'default_blog_ID', 'integer', true );
@@ -125,6 +134,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.3  2005/08/22 19:14:12  fplanque
+ * rollback of incomplete registration module
+ *
  * Revision 1.2  2005/08/21 09:23:03  yabs
  * Moved registration settings to own tab and increased options
  *

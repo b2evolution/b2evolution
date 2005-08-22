@@ -23,17 +23,17 @@ $Form =& new Form( $htsrv_url.'login.php', 'login', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
-$Form->hidden( 'login', $yourname );
+$Form->hidden( 'login', $login );
 $Form->hidden( 'redirect_to', $redirect_to );
 
-$Form->fieldset();
-$Form->info( T_('Login'), $yourname );
+$Form->begin_fieldset();
+$Form->info( T_('Login'), $login );
 $Form->info( T_('Email'), $email );
-$Form->fieldset_end();
+$Form->end_fieldset();
 
-$Form->fieldset( '', 'submit' );
+$Form->begin_fieldset( '', array( 'class'=>'submit' ) );
 $Form->submit( array( '', T_('Log in!'), 'ActionButton' ) );
-$Form->fieldset_end();
+$Form->end_fieldset();
 
 $Form->end_form();
 
