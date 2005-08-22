@@ -1009,7 +1009,7 @@ class Form extends Widget
 	{
 		$params = array( 'class' => $class );
 
-		return $this->begin_fieldset( $title );
+		return $this->begin_fieldset( $title, $params );
 	}
 
 
