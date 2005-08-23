@@ -366,8 +366,16 @@ elseif( isset($_GET['login'] ) )
 	unset($_GET['pwd']); // password will be hashed below
 }
 
+
+$Debuglog->add( 'login: '.var_export($login, true), 'login' );
+$Debuglog->add( 'pass: '.( empty($pass) ? '' : 'not' ).' empty', 'login' );
+$Debuglog->add( 'cookie_user: '.var_export(@$_COOKIE[$cookie_user], true), 'login' );
+
+
 if( !empty($login) && !empty($pass) )
 { // User is trying to login right now
+	$Debuglog->add( 'User is trying to login right now.', 'login' );
+
 	$login = strtolower(strip_tags(get_magic_quotes_gpc() ? stripslashes($login) : $login));
 	$pass = strip_tags(get_magic_quotes_gpc() ? stripslashes($pass) : $pass);
 	$pass_md5 = md5( $pass );
@@ -380,9 +388,9 @@ if( !empty($login) && !empty($pass) )
 	// Check login and password
 	if( !user_pass_ok( $login, $pass_md5, true ) )
 	{ // Login failed
-		$login_debug = 'Login failed';
+		$Debuglog->add( 'user_pass_ok() returned false!', 'login' );
 
-		$login = '';
+		$login = NULL;
 
 		if( $login_required )
 		{
@@ -392,7 +400,7 @@ if( !empty($login) && !empty($pass) )
 	}
 	else
 	{ // Login succeeded, set cookies
-		$login_debug = 'Login succeeded, set cookies';
+		$Debuglog->add( 'Ok. Setting cookies.', 'login' );
 
 		//echo $login, $pass_is_md5, $user_pass,  $cookie_domain;
 		if( !setcookie( $cookie_user, $login, $cookie_expires, $cookie_path, $cookie_domain ) )
@@ -412,7 +420,7 @@ elseif( !isset($login) && isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cooki
 	 * ---------------------------------------------------------
 	 */
 	// echo 'Was already logged in...';
-	$login_debug = 'Was already logged in...';
+	$Debuglog->add( 'Was already logged in... ['.$login.']', 'login' );
 
 	$login = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_user]) : $_COOKIE[$cookie_user]));
 	$pass_md5 = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_pass]) : $_COOKIE[$cookie_pass]));
@@ -420,10 +428,13 @@ elseif( !isset($login) && isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cooki
 
 	if( !user_pass_ok( $login, $pass_md5, true ) )
 	{ // login is NOT OK:
-		$login = '';
+		$Debuglog->add( 'user_pass_ok() returned false!', 'login' );
+
+		$login = NULL;
 
 		if( $login_required )
 		{
+			$Debuglog->add( 'Login is required!', 'login' );
 			$Messages->add( T_('Login/password no longer valid.'), 'login_error' );
 		}
 	}
@@ -435,7 +446,7 @@ elseif( $login_required )
 	 * ---------------------------------------------------------
 	 */
 	// echo ' NOT logged in...';
-	$login_debug = 'NOT logged in...';
+	$Debuglog->add( 'NOT logged in...', 'login' );
 
 	$Messages->add( T_('You must log in!'), 'login_error' );
 }
@@ -517,6 +528,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.43  2005/08/23 00:08:16  blueyed
+ * Added debug level "login". Unsetting $login
+ *
  * Revision 1.42  2005/08/22 19:22:23  fplanque
  * minor
  *
