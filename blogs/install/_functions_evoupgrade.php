@@ -439,7 +439,6 @@ function upgrade_b2evo_tables()
 		// insert defaults and use transformed settings
 		create_default_settings( $trans );
 
-
 		if( !isset( $tableblogusers_isuptodate ) )
 		{
 			echo 'Upgrading Blog-User permissions table... ';
@@ -568,9 +567,9 @@ function upgrade_b2evo_tables()
 							';
 		$DB->query( $query );
 
-		// Replace "paged" mode with "pages":
+		// Replace "paged" mode with "posts"
 		$DB->query( 'UPDATE T_settings
-										SET set_value = "pages"
+										SET set_value = "posts"
 									WHERE set_name = "what_to_show"
 									  AND set_value = "paged"' );
 
