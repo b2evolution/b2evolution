@@ -158,11 +158,6 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 			require get_path('skins').'_lastcomments.php';
 			break;
 
-		case 'stats':
-			// this includes the statistics if requested:
-			require get_path('skins').'_stats.php';
-			break;
-
 		case 'arcdir':
 			// this includes the archive directory if requested
 			require get_path('skins').'_arcdir.php';

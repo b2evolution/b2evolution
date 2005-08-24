@@ -194,13 +194,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
 	</div>
 
-	<div class="bSideItem">
-		<h3><?php echo T_('Archives') ?></h3>
-		<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-			// Call the Archives plugin:
-			$Plugins->call_by_code( 'evo_Arch', array() );
-			// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
-	</div>
+
+	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+		// Call the Archives plugin:
+		$Plugins->call_by_code( 'evo_Arch', array() );
+		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
+
 
 	<?php if( ! $Blog->get('force_skin') )
 	{	// Skin switching is allowed for this blog: ?>

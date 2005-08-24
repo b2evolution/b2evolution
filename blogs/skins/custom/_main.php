@@ -182,11 +182,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			require( dirname(__FILE__).'/_lastcomments.php' );
 			break;
 
-		case 'stats':
-			// this includes the statistics if requested:
-			require( dirname(__FILE__).'/_stats.php');
-			break;
-
 		case 'arcdir':
 			// this includes the archive directory if requested
 			require( dirname(__FILE__).'/_arcdir.php');
@@ -232,7 +227,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			// -------------------------------- END OF CALENDAR ---------------------------------- ?>
 		<ul>
 			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
-			<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><strong><?php echo T_('Some viewing statistics') ?></strong></a></li>
 		</ul>
 	</div>
 
@@ -258,13 +252,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		</form>
 	</div>
 
-	<div class="bSideItem">
-		<h3><?php echo T_('Archives') ?></h3>
-		<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-			// Call the Archives plugin:
-			$Plugins->call_by_code( 'evo_Arch', array() );
-			// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
-	</div>
+
+	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+		// Call the Archives plugin:
+		$Plugins->call_by_code( 'evo_Arch', array() );
+		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
+
 
 	<?php if( ! $Blog->get('force_skin') )
 	{	// Skin switching is allowed for this blog: ?>
@@ -277,30 +270,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 				<?php } // ------------------------------ END OF SKIN LIST ------------------------------ ?>
 			</ul>
 		</div>
-	<?php } ?>
-
-	<?php if( $disp != 'stats' )
-	{ ?>
-	<div class="bSideItem">
-		<h3><?php echo T_('Recent Referers') ?></h3>
-			<?php refererList(5, 'global', 0, 0, 'no', '', ($blog > 1) ? $blog : ''); ?>
-			<ul>
-				<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
-				<?php } // End stat loop ?>
-				<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
-			</ul>
-		<br />
-		<h3><?php echo T_('Top Referers') ?></h3>
-			<?php refererList(5, 'global', 0, 0, 'no', 'dom_name', ($blog > 1) ? $blog : ''); ?>
-			<ul>
-				<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
-				<?php } // End stat loop ?>
-				<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
-			</ul>
-	</div>
-
 	<?php } ?>
 
 

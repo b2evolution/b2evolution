@@ -175,11 +175,6 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 			require( dirname(__FILE__).'/_lastcomments.php' );
 			break;
 
-		case 'stats':
-			// this includes the statistics if requested:
-			require( dirname(__FILE__).'/_stats.php');
-			break;
-
 		case 'arcdir':
 			// this includes the archive directory if requested
 			require( dirname(__FILE__).'/_arcdir.php');
@@ -223,15 +218,17 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 </form>
 
 
-<h4><?php echo T_('archives') ?>:</h4>
-	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-		// Call the Archives plugin:
-		$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
-				'limit'=>'',                           // No limit
-				'more_link'=>'',                       // No more link
-				'list_start'=>'<ul class="compress">', // Special list start
-			)	);
-		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
+<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+	// Call the Archives plugin:
+	$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
+			'block_start'=>'',
+			'block_end'=>'',
+			'title'=>'<h4>'.T_('Archives').':</h4>',
+			'limit'=>'',                           // No limit
+			'more_link'=>'',                       // No more link
+			'list_start'=>'<ul class="compress">', // Special list start
+		)	);
+	// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 
 
 <?php if( ! $Blog->get('force_skin') )

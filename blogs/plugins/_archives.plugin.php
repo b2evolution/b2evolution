@@ -69,6 +69,10 @@ class archives_plugin extends Plugin
 	{
 		$this->short_desc = T_('This skin tag displays a list of post archives.');
 		$this->long_desc = T_('Archives can be grouped monthly, daily, weekly or post by post.');
+
+		$this->dbtable = 'T_posts';
+		$this->dbprefix = 'post_';
+		$this->dbIDname = 'ID';
 	}
 
 
@@ -78,7 +82,13 @@ class archives_plugin extends Plugin
 	 * {@internal archives_plugin::SkinTag(-)}}
 	 *
 	 * @param array Associative array of parameters. Valid keys are:
+	 *                - 'block_start' : (Default: '<div class="bSideItem">')
+	 *                - 'block_end' : (Default: '</div>')
+	 *                - 'title' : (Default: '<h3>'.T_('Archives').'</h3>')
 	 *                - 'mode' : 'monthly'|'daily'|'weekly'|'postbypost' (Default: conf.)
+	 *                - 'link_type' : 'canonic'|'context' (default: canonic)
+	 *                - 'context_isolation' : what params need override when changing date/range (Default: 'm,w,p,unit,dstart' )
+	 *                - 'form' : true|false (default: false)
 	 *                - 'limit' : # of archive entries to display or '' (Default: 12)
 	 *                - 'more_link' : more link text or '' (Default: 12)
 	 *                - 'list_start' : (Default '<ul>')
@@ -95,14 +105,30 @@ class archives_plugin extends Plugin
 		/**
 		 * @todo get rid of these globals:
 		 */
-		global $blog, $Blog;
+		global $blog, $Blog, $m;
 
 		/**
 		 * Default params:
 		 */
+		// This is what will enclose the block in the skin:
+		if(!isset($params['block_start'])) $params['block_start'] = '<div class="bSideItem">';
+		if(!isset($params['block_end'])) $params['block_end'] = "</div>\n";
+
+		// Title:
+		if(!isset($params['title']))
+			$params['title'] = '<h3>'.T_('Archives').'</h3>';
+
 		// Archive mode:
 		if(!isset($params['mode']))
 			$params['mode'] = $Settings->get('archive_mode');
+
+		// Link type:
+		if(!isset($params['link_type'])) $params['link_type'] = 'canonic';
+		if(!isset($params['context_isolation'])) $params['context_isolation'] = 'm,w,p,unit,dstart';
+
+		// Add form fields?:
+		if(!isset($params['form']))
+			$params['form'] = false;
 
 		// Number of archive entries to display:
 		if(!isset($params['limit'])) $params['limit'] = 12;
@@ -112,11 +138,11 @@ class archives_plugin extends Plugin
 
 		// This is what will enclose the list:
 		if(!isset($params['list_start'])) $params['list_start'] = '<ul>';
-		if(!isset($params['list_end'])) $params['list_end'] = '</ul>';
+		if(!isset($params['list_end'])) $params['list_end'] = "</ul>\n";
 
 		// This is what will separate the archive links:
 		if(!isset($params['line_start'])) $params['line_start'] = '<li>';
-		if(!isset($params['line_end'])) $params['line_end'] = '</li>';
+		if(!isset($params['line_end'])) $params['line_end'] = "</li>\n";
 
 		// Daily archive date format?
 		if( (!isset($params['day_date_format'])) || ($params['day_date_format'] == '') )
@@ -125,9 +151,13 @@ class archives_plugin extends Plugin
 			$params['day_date_format'] = $dateformat;
 		}
 
-
 		$ArchiveList = & new ArchiveList( $blog, $params['mode'], $show_statuses,
-																			$timestamp_min, $timestamp_max, $params['limit'] );
+																			$timestamp_min, $timestamp_max, $params['limit'],
+																			$this->dbtable, $this->dbprefix, $this->dbIDname );
+
+		echo $params['block_start'];
+
+		echo $params['title'];
 
 		echo $params['list_start'];
 		while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
@@ -137,18 +167,49 @@ class archives_plugin extends Plugin
 			{
 				case 'monthly':
 					// --------------------------------- MONTHLY ARCHIVES -------------------------------------
+					$arc_m = $arc_year.zeroise($arc_month,2);
+
+					if( $params['form'] )
+					{ // We want a radio button:
+						echo '<input type="radio" name="m" value="'.$arc_m.'" class="checkbox"';
+						if( $m == $arc_m ) echo ' checked="checked"' ;
+						echo ' /> ';
+					}
+
 					echo '<a href="';
-					archive_link( $arc_year, $arc_month );
+					if( $params['link_type'] == 'context' )
+					{	// We want to preserve current browsing context:
+						echo regenerate_url( $params['context_isolation'], 'm='.$arc_m );
+					}
+					else
+					{	// We want to link to the absolute canonical URL for this archive:
+						archive_link( $arc_year, $arc_month );
+					}
 					echo '">';
+
 					echo T_($month[zeroise($arc_month,2)]),' ',$arc_year;
 					echo '</a> <span class="dimmed">('.$arc_count.')</span>';
 					break;
 
 				case 'daily':
 					// --------------------------------- DAILY ARCHIVES ---------------------------------------
+					$arc_m = $arc_year.zeroise($arc_month,2).zeroise($arc_dayofmonth,2);
+
+					echo '<input type="radio" name="m" value="'. $arc_m. '" class="checkbox"';
+					if( $m == $arc_m ) echo ' checked="checked"' ;
+					echo ' /> ';
+
 					echo '<a href="';
-					archive_link( $arc_year, $arc_month, $arc_dayofmonth );
+					if( $params['link_type'] == 'context' )
+					{	// We want to preserve current browsing context:
+						echo regenerate_url( $params['context_isolation'], 'm='.$arc_m );
+					}
+					else
+					{	// We want to link to the absolute canonical URL for this archive:
+						archive_link( $arc_year, $arc_month, $arc_dayofmonth );
+					}
 					echo '">';
+
 					echo mysql2date($params['day_date_format'], $arc_year.'-'.zeroise($arc_month,2).'-'.zeroise($arc_dayofmonth,2).' 00:00:00');
 					echo '</a> <span class="dimmed">('.$arc_count.')</span>';
 					break;
@@ -156,7 +217,14 @@ class archives_plugin extends Plugin
 				case 'weekly':
 					// --------------------------------- WEEKLY ARCHIVES --------------------------------------
 					echo '<a href="';
-					archive_link( $arc_year, '', '', $arc_w );
+					if( $params['link_type'] == 'context' )
+					{	// We want to preserve current browsing context:
+						echo regenerate_url( $params['context_isolation'], 'm='.$arc_year.'&amp;w='.$arc_w );
+					}
+					else
+					{	// We want to link to the absolute canonical URL for this archive:
+						archive_link( $arc_year, '', '', $arc_w );
+					}
 					echo '">';
 					echo $arc_year.', '.T_('week').' '.$arc_w;
 					echo '</a> <span class="dimmed">('.$arc_count.')</span>';
@@ -166,17 +234,27 @@ class archives_plugin extends Plugin
 				default:
 					// -------------------------------- POST BY POST ARCHIVES ---------------------------------
 					echo '<a href="';
-					permalink_link( '', 'id', $post_ID );
+					if( $params['link_type'] == 'context' )
+					{	// We want to preserve current browsing context:
+						echo regenerate_url( $params['context_isolation'], 'p'.$post_ID );
+					}
+					else
+					{	// We want to link to the absolute canonical URL for this archive:
+						permalink_link( '', 'id', $post_ID );
+					}
 					echo '">';
-					if ($post_title) {
+					if ($post_title)
+					{
 						echo strip_tags($post_title);
-					} else {
+					}
+					else
+					{
 						echo $post_ID;
 					}
 					echo '</a>';
 			}
 
-			echo $params['line_end']."\n";
+			echo $params['line_end'];
 		}
 
 		// Display more link:
@@ -186,10 +264,12 @@ class archives_plugin extends Plugin
      	echo '<a href="';
      	$Blog->disp( 'arcdirurl', 'raw' );
      	echo '">'.format_to_output($params['more_link']).'</a>';
-			echo $params['line_end']."\n";
+			echo $params['line_end'];
     }
 
 		echo $params['list_end'];
+
+ 		echo $params['block_end'];
 
 		return true;
 	}

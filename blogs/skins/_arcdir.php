@@ -19,6 +19,10 @@
 	{ // We have asked to display full archives:
 
 		// Call the Archives plugin WITH NO LIMIT & NO MORE LINK:
-		$Plugins->call_by_code( 'evo_Arch', array( 'limit'=>'', 'more_link'=>'' ) );
+		$Plugins->call_by_code( 'evo_Arch', array( 'title'=>'',
+																								'block_start'=>'',
+																								'block_end'=>'',
+																								'limit'=>'',
+																								'more_link'=>'' ) );
 	}
 ?>

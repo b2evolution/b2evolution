@@ -455,7 +455,7 @@ class Blog extends DataObject
 				return preg_replace( '#https?://[^/]+#', '', $this->get('baseurl') );
 
 			case 'blogstatsurl':
-				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=stats' );
+				return ''; 						// Deprecated!
 
 			case 'lastcommentsurl':
 				return url_add_param( $this->gen_blogurl( 'default' ), 'disp=comments' );
@@ -708,6 +708,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2005/08/24 18:43:09  fplanque
+ * Removed public stats to prevent spamfests.
+ * Added context browsing to Archives plugin.
+ *
  * Revision 1.24  2005/06/17 16:19:24  fplanque
  * doc
  *

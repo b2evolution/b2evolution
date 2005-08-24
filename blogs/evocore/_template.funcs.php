@@ -218,7 +218,7 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 
 
 /**
- * Create a link to archive
+ * Create a link to archive, using either params or extra path info.
  *
  * {@internal archive_link(-)}}
  *
@@ -284,6 +284,10 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.8  2005/08/24 18:43:09  fplanque
+ * Removed public stats to prevent spamfests.
+ * Added context browsing to Archives plugin.
+ *
  * Revision 1.7  2005/05/24 18:46:26  fplanque
  * implemented blog email subscriptions (part 1)
  *

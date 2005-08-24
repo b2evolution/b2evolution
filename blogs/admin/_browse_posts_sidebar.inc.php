@@ -129,78 +129,17 @@ echo '<div class="browse_side_item">';
 		<?php
 		$Form->end_fieldset();
 
-		$Form->begin_fieldset( T_('Archives'), array( 'class'=>'Archives' ) );
-		?>
-		<ul>
-		<?php
-		// this is what will separate your archive links
-		$archive_line_start = '<li>';
-		$archive_line_end = '</li>';
-		// this is what will separate dates on weekly archive links
-		$archive_week_separator = ' - ';
-
-		$dateformat = locale_datefmt();
-		$archive_day_date_format = $dateformat;
-		$archive_week_start_date_format = $dateformat;
-		$archive_week_end_date_format   = $dateformat;
-
-		$arc_link_start = $pagenow.'?tab='.$tab.'&amp;blog='.$blog.'&amp;';
-
-		$ArchiveList = & new ArchiveList( $blog, $Settings->get('archive_mode'), $show_statuses,	$timestamp_min,
-																			$timestamp_max, 36, $dbtable, $dbprefix, $dbIDname );
-		while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
-		{
-			echo $archive_line_start;
-			switch( $Settings->get('archive_mode') )
-			{
-				case 'monthly':
-					// --------------------------------- MONTHLY ARCHIVES ---------------------------------
-					$arc_m = $arc_year.zeroise($arc_month,2);
-					echo '<input type="radio" name="m" value="'. $arc_m. '" class="checkbox"';
-					if( $m == $arc_m ) echo ' checked="checked"' ;
-					echo ' /> ';
-					echo '<a href="'. $arc_link_start. 'm='. $arc_m. '">';
-					echo T_($month[zeroise($arc_month,2)]), ' ', $arc_year;
-					echo "</a> <span class=\"notes\">($arc_count)</span>";
-					break;
-
-				case 'daily':
-					// --------------------------------- DAILY ARCHIVES -----------------------------------
-					$arc_m = $arc_year.zeroise($arc_month,2).zeroise($arc_dayofmonth,2);
-					echo '<input type="radio" name="m" value="'. $arc_m. '" class="checkbox"';
-					if( $m == $arc_m ) echo ' checked="checked"' ;
-					echo ' /> ';
-					echo '<a href="'. $arc_link_start. 'm='. $arc_m. '">';
-					echo mysql2date($archive_day_date_format, $arc_year. '-'. zeroise($arc_month,2). '-'. zeroise($arc_dayofmonth,2). ' 00:00:00');
-					echo "</a> <span class=\"notes\">($arc_count)</span>";
-					break;
-
-				case 'weekly':
-					// --------------------------------- WEEKLY ARCHIVES ---------------------------------
-					echo '<a href="'. $arc_link_start. 'm='. $arc_year. '&amp;w='. $arc_w. '">';
-					echo $arc_year.', '.T_('week').' '.$arc_w;
-					echo "</a> <span class=\"notes\">($arc_count)</span>";
-				break;
-
-				case 'postbypost':
-				default:
-					// ------------------------------- POSY BY POST ARCHIVES -----------------------------
-					echo '<a href="'. $arc_link_start. 'p='. $post_ID. '">';
-					if ($post_title) {
-						echo strip_tags($post_title);
-					} else {
-						echo $post_ID;
-					}
-					echo '</a>';
-			}
-
-			echo $archive_line_end."\n";
-		}
-		?>
-
-		</ul>
-		<?php
-			$Form->end_fieldset();
+		// ARCHIVES:
+		// Call the Archives plugin:
+		$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
+				'block_start'=>'<fieldset>',
+				'block_end'=>"</fieldset>\n",
+				'title'=>'<legend>'.T_('Archives')."</legend>\n",
+				'link_type'=>'context', 							// Preserve page context
+				'form'=>true,                         // add form fields (radio buttons)
+				'limit'=>'',                          // No limit
+				'more_link'=>'',                      // No more link
+			)	);
 		?>
 
 		<fieldset>
@@ -334,6 +273,10 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.9  2005/08/24 18:43:09  fplanque
+ * Removed public stats to prevent spamfests.
+ * Added context browsing to Archives plugin.
+ *
  * Revision 1.8  2005/08/22 18:42:25  fplanque
  * minor
  *

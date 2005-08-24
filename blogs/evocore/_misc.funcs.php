@@ -1023,9 +1023,11 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 		// Special cases:
 		switch( $var )
 		{
+			/*
+			fplanque> This is a wrong solution to a true problem
 			case 'catsel':
 			{
-				global $catsel;
+				global $catsel, $cat;
 				if( (! empty($catsel)) && (strpos( $cat, '-' ) === false) )
 				{ // It's worthwhile retransmitting the catsels
 					foreach( $catsel as $value )
@@ -1035,6 +1037,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 				}
 				break;
 			}
+			*/
 
 			case 'show_status':
 			{
@@ -1057,18 +1060,17 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 				if( (!empty($value)) && ($value != $defval) )
 				{ // Value exists and is not set to default value:
 					// echo "adding $var \n";
+
 					if( $type === 'array' )
-					{ //there is a special formatting in case of arrays
+					{ // there is a special formatting in case of arrays
 						$url_array = array();
-						$i = 0;
 						foreach( $value as $value )
 						{
-							$params[] = $var.'['.$i.']='.$value;
-							$i++;
+							$params[] = $var.'%5B%5D='.$value;
 						}
 					}
 					else
-					{	// no array : normal formatting
+					{	// not an array : normal formatting
 						$params[] = $var.'='.$value;
 					}
 				}
@@ -1910,8 +1912,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
- * Revision 1.83  2005/08/24 14:02:33  fplanque
- * minor changes
+ * Revision 1.84  2005/08/24 18:43:09  fplanque
+ * Removed public stats to prevent spamfests.
+ * Added context browsing to Archives plugin.
  *
  * Revision 1.82  2005/08/22 18:05:46  fplanque
  * rollback of code plugin. This should be posted on plugins.b2evolution.net.

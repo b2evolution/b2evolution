@@ -55,7 +55,10 @@ if(!isset($archive_day_date_format)) $archive_day_date_format = 'Y/m/d';
 
 // Call the Archives plugin WITH NO MORE LINK AND NO LIST DELIMITERS:
 $Plugins->call_by_code( 'evo_Arch', array(
-                'limit'=>$archive_limit,
+                'title'=>'',
+								'block_start'=>'',
+								'block_end'=>'',
+								'limit'=>$archive_limit,
 								'more_link'=>'',
 								'list_start'=>'',
 								'list_end'=>'',

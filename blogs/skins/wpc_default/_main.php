@@ -166,15 +166,18 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	</form>
  </li>
 
-	<li><?php echo T_('Archives') ?>:
-		<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-			// Call the Archives plugin:
-			$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
-					'limit'=>'',                           // No limit
-					'more_link'=>'',                       // No more link
-				)	);
-			// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
-	</li>
+ 
+	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+		// Call the Archives plugin:
+		$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
+				'block_start'=>'<li>',
+				'block_end'=>'</li>',
+				'title'=>T_('Archives').':',
+				'limit'=>'',                           // No limit
+				'more_link'=>'',                       // No more link
+			)	);
+		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
+
 
 	<li id="calendar">
 	<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------

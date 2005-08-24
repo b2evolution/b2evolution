@@ -143,11 +143,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			require( dirname(__FILE__).'/_lastcomments.php' );
 			break;
 
-		case 'stats':
-			// this includes the statistics if requested:
-			require( dirname(__FILE__).'/_stats.php');
-			break;
-
 		case 'arcdir':
 			// this includes the archive directory if requested
 			require( dirname(__FILE__).'/_arcdir.php');
@@ -178,7 +173,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 </ul>
 <ul>
 	<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
-	<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><strong>Stats</strong></a></li>
 </ul>
 
 
@@ -224,35 +218,17 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 </form>
 
 
-<h4><?php echo T_('Archives') ?>&nbsp;:</h4>
-	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
-		// Call the Archives plugin:
-		$Plugins->call_by_code( 'evo_Arch', array() );
-		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
+<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+	// Call the Archives plugin:
+	$Plugins->call_by_code( 'evo_Arch', array(
+													'block_start'=>'',
+													'block_end'=>'',
+													'title'=>'<h4>'.T_('Archives').'&nbsp;:</h4>',
+												) );
+	// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 
-<?php if ($disp != 'stats') { ?>
 
-	<h4><?php echo T_('Recent Referers') ?></h4>
-	<?php refererList(5, 'global', 0, 0, 'no', '', ($blog > 1) ? $blog : ''); ?>
-	<ul>
-		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-			<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
-		<?php } // End stat loop ?>
-		<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
-	</ul>
-	<br />
-	<h4><?php echo T_('Top Referers') ?></h4>
-	<?php refererList(5, 'global', 0, 0, 'no', 'dom_name', ($blog > 1) ? $blog : ''); ?>
-	<ul>
-		<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-			<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
-		<?php } // End stat loop ?>
-		<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
-	</ul>
-
-<?php } ?>
-
-<h4><?php echo T_('Misc') ?></h4>
+<h4><?php echo T_('Misc') ?>&nbsp;:</h4>
 <ul>
 	<?php
 		// Administrative links:

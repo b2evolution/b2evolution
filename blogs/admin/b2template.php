@@ -139,9 +139,6 @@ default:
 					case '_main.php':
 						echo '- ', T_('This is the main template. It displays the blog.');
 						break;
-					case '_stats.php':
-						echo '- ', T_('This is the template that displays stats for a blog');
-						break;
 					case 'comment_popup.php':
 						echo '- ', T_('This is the page displayed in the comment popup');
 						break;

@@ -181,11 +181,6 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 			require( get_path('skins').'_lastcomments.php' );
 			break;
 
-		case 'stats':
-			// this includes the statistics if requested:
-			require( get_path('skins').'_stats.php');
-			break;
-
 		case 'arcdir':
 			// this includes the archive directory if requested
 			require( get_path('skins').'_arcdir.php');
@@ -223,8 +218,7 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 			require( get_path('skins').'_calendar.php');
 			// -------------------------------- END OF CALENDAR ---------------------------------- ?>
 		<ul>
-			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
-			<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><strong><?php echo T_('Some viewing statistics') ?></strong></a></li>
+			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>			<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><strong><?php echo T_('Some viewing statistics') ?></strong></a></li>
 		</ul>
 	</div>
 
@@ -261,31 +255,6 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 				<li><a href="<?php $Blog->disp( 'arcdirurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
 		</ul>
 	</div>
-
-	<?php if (! $stats)
-	{ ?>
-	<div class="bSideItem">
-		<h3><?php echo T_('Recent Referers') ?></h3>
-			<?php refererList(5,'global'); ?>
-			<ul>
-				<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
-				<?php } // End stat loop ?>
-				<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
-			</ul>
-		<br />
-		<h3><?php echo T_('Top Referers') ?></h3>
-			<?php refererList(5,'global',0,0,'no','dom_name'); ?>
-			<ul>
-				<?php if( count( $res_stats ) ) foreach( $res_stats as $row_stats ) { ?>
-					<li><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></li>
-				<?php } // End stat loop ?>
-				<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><?php echo T_('more...') ?></a></li>
-			</ul>
-	</div>
-
-	<?php } ?>
-
 
 	<?php // -------------------------- LINKBLOG INCLUDED HERE -----------------------------
 		require( get_path('skins').'_linkblog.php' );
