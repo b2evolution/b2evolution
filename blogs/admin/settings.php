@@ -70,8 +70,6 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	$Request->param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
 	$Settings->set( 'newusers_level', $newusers_level );
 
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	/* b2evo only: */
 	param( 'default_blog_ID', 'integer', true );
 	$Settings->set( 'default_blog_ID', $default_blog_ID );
 
@@ -93,7 +91,6 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 
 	param( 'permalink_type', 'string', true );
 	$Settings->set( 'permalink_type', $permalink_type );
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	$Request->param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimun password length must be between %d and %d.') );
 	$Settings->set( 'user_minpwdlen', $user_minpwdlen );
@@ -133,6 +130,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.5  2005/08/24 13:24:27  fplanque
+ * no message
+ *
  * Revision 1.4  2005/08/24 10:24:21  blueyed
  * Fixed saving of b2evo-only settings
  *
