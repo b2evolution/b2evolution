@@ -343,7 +343,7 @@ if( $next_action == 'update' )
 	// End payload block:
 	$AdminUI->dispPayloadBegin();
 
-	// Consider that id we are here, we're allowed to edit.
+	// Consider that if we are here, we're allowed to edit.
 	$edit_allowed = true;
 
 	require dirname(__FILE__).'/_item_links.inc.php';
@@ -355,6 +355,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.28  2005/08/24 10:38:53  blueyed
+ * typo
+ *
  * Revision 1.27  2005/08/22 18:42:25  fplanque
  * minor
  *
