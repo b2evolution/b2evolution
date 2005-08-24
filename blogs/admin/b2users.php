@@ -148,6 +148,8 @@ else
 			else
 			{ // we edit an existing user:
 				$edited_User = & $UserCache->get_by_ID( $edited_user_ID );
+				// We need to remember the current login in order to later update login cookie if necessary...
+				$saved_login = $edited_User->login;
 			}
 
 			if( $user_profile_only && $edited_user_ID != $current_User->ID )
@@ -552,8 +554,8 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
- * Revision 1.100  2005/08/24 10:48:23  blueyed
- * $saved_login is not needed anymore
+ * Revision 1.101  2005/08/24 10:51:24  blueyed
+ * Rollback stupid last commit.
  *
  * Revision 1.99  2005/08/22 01:26:54  blueyed
  * Removed "init" of $edited_User - it was meant to for security with register_global, would probably cause only a notice now.
