@@ -744,11 +744,13 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
  *
  * @todo Allow to use a dropdown (select) to switch between blogs ( CSS / JS onchange - no submit.. )
  *
+ * @param boolean
+ * @param boolean tru: use form fields, false: display only
  */
-function cat_select( $display_info = true )
+function cat_select( $display_info = true, $form_fields = true )
 {
 	global $default_main_cat, $allow_cross_posting, $cache_blogs, $cache_categories,
-					$blog, $current_blog_ID, $current_User, $edited_Item;
+					$blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
 
 	$r = '<div class="extracats">';
 
@@ -759,6 +761,7 @@ function cat_select( $display_info = true )
 				.'</p>';
 	}
 
+	$cat_select_form_fields = $form_fields;
 	$default_main_cat = $edited_Item->main_cat_ID;
 
 	cat_query( false ); // make sure the caches are loaded
@@ -842,7 +845,7 @@ function cat_select_before_first( $parent_cat_ID, $level )
 function cat_select_before_each( $cat_ID, $level )
 { // callback to display sublist element
 	global $current_blog_ID, $blog, $cat, $post_extracats, $default_main_cat, $next_action;
-	global $creating, $allow_cross_posting, $cat_select_level;
+	global $creating, $allow_cross_posting, $cat_select_level, $cat_select_form_fields;
 	$this_cat = get_the_category_by_ID( $cat_ID );
 	$r = "\n<tr>";
 
@@ -855,31 +858,45 @@ function cat_select_before_each( $cat_ID, $level )
 		{ // Assign default cat for new post
 			$default_main_cat = $cat_ID;
 		}
-		$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
-					.T_('Select as MAIN category').'" value="'.$cat_ID.'"';
-		if( $cat_ID == $default_main_cat )
-		{ // main cat of the Item or set as default main cat above
-			$r .= ' checked="checked"';
+		if( $cat_select_form_fields )
+		{	// We want a form field:
+			$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
+						.T_('Select as MAIN category').'" value="'.$cat_ID.'"';
+			if( $cat_ID == $default_main_cat )
+			{ // main cat of the Item or set as default main cat above
+				$r .= ' checked="checked"';
+			}
+			$r .= ' id="sel_maincat_'.$cat_ID.'"';
+			$r .= ' onclick="check_extracat(this);" /></td>';
 		}
-		$r .= ' id="sel_maincat_'.$cat_ID.'"';
-		$r .= ' onclick="check_extracat(this);" /></td>';
+		else
+		{	// We just want info:
+			$r .= '<td class="selector catsel_main">'.bullet( $cat_ID == $default_main_cat ).'</td>';
+		}
 	}
 	else
 	{ // Don't allow to select this cat as a main cat
-		$r .= '<td class="selector">&nbsp;</td>';
+		$r .= '<td class="selector catsel_main">&nbsp;</td>';
 	}
 
 	// CHECKBOX:
 	if( $allow_cross_posting )
 	{ // We allow cross posting, display checkbox:
-		$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
-					.T_('Select as an additional category').'" value="'.$cat_ID.'"';
-		if( ($cat_ID == $default_main_cat) || (in_array( $cat_ID, $post_extracats )) )
-		{
-			$r .= ' checked="checked"';
+		if( $cat_select_form_fields )
+		{	// We want a form field:
+			$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
+						.T_('Select as an additional category').'" value="'.$cat_ID.'"';
+			if( ($cat_ID == $default_main_cat) || (in_array( $cat_ID, $post_extracats )) )
+			{
+				$r .= ' checked="checked"';
+			}
+			$r .= ' id="sel_extracat_'.$cat_ID.'"';
+			$r .= ' /></td>';
 		}
-		$r .= ' id="sel_extracat_'.$cat_ID.'"';
-		$r .= ' /></td>';
+		else
+		{	// We just want info:
+			$r .= '<td class="selector catsel_main">'.bullet( ($cat_ID == $default_main_cat) || (in_array( $cat_ID, $post_extracats )) ).'</td>';
+		}
 	}
 
 	$r .= '<td class="catsel_name"><label'
@@ -911,6 +928,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.25  2005/08/24 14:02:33  fplanque
+ * minor changes
+ *
  * Revision 1.24  2005/06/10 18:25:44  fplanque
  * refactoring
  *

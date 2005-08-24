@@ -1897,7 +1897,9 @@ function is_create_action( $action )
 		case 'edit':
 		case 'update':	// we return in this state after a validation error
 		case 'delete':
-		case 'view': 		// This one's a bit far fetched, but can happen if we have no sheet display
+		// The following one's a bit far fetched, but can happen if we have no sheet display:
+		case 'delete_link':
+		case 'view':
 			return false;
 
 		default:
@@ -1908,6 +1910,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.83  2005/08/24 14:02:33  fplanque
+ * minor changes
+ *
  * Revision 1.82  2005/08/22 18:05:46  fplanque
  * rollback of code plugin. This should be posted on plugins.b2evolution.net.
  * This should also be documented a little more.

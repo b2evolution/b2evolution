@@ -286,10 +286,16 @@ class ItemList extends DataObjectList
 		if( !empty($keywords) )
 		{
 			$search = ' AND (';
-			if( $exact ) // We want exact match of title or contents
+
+			if( $exact )
+			{	// We want exact match of title or contents
 				$n = '';
-			else // The words/sentence are/is to be included in in the title or the contents
+			}
+			else
+			{ // The words/sentence are/is to be included in in the title or the contents
 				$n = '%';
+			}
+
 			if( ($phrase == '1') or ($phrase == 'sentence') )
 			{ // Sentence search
 				$keywords = $DB->escape(trim($keywords));
@@ -615,7 +621,7 @@ class ItemList extends DataObjectList
 		if( $cat_combine && count($cat_array) )
 		{ // We want the categories combined! (i-e posts must be in ALL requested cats)
 			//echo 'combining now';
-			$this->sql .= ' GROUP BY T_posts.ID
+			$this->sql .= ' GROUP BY '.$this->dbIDname.'
 											HAVING COUNT(*) = '.count($cat_array).' ';
 		}
 
@@ -1052,6 +1058,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.27  2005/08/24 14:02:33  fplanque
+ * minor changes
+ *
  * Revision 1.26  2005/08/17 21:01:34  fplanque
  * Selection of multiple authors with (-) option.
  * Selection of multiple categories with (-) and (*) options.

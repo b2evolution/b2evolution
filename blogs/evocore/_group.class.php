@@ -261,7 +261,7 @@ class Group extends DataObject
 		return $perm;
 	}
 
-		/**
+	/**
 	 * Check permission for this group on a set of specified categories
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()} instead
@@ -430,6 +430,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2005/08/24 14:02:33  fplanque
+ * minor changes
+ *
  * Revision 1.11  2005/08/21 16:20:13  halton
  * Added group based blogging permissions (new tab under blog). Required schema change
  *
