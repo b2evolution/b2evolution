@@ -71,7 +71,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	$Settings->set( 'newusers_level', $newusers_level );
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	/* b2evo only:
+	/* b2evo only: */
 	param( 'default_blog_ID', 'integer', true );
 	$Settings->set( 'default_blog_ID', $default_blog_ID );
 
@@ -93,7 +93,6 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 
 	param( 'permalink_type', 'string', true );
 	$Settings->set( 'permalink_type', $permalink_type );
-	*/
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	$Request->param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimun password length must be between %d and %d.') );
@@ -134,6 +133,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.4  2005/08/24 10:24:21  blueyed
+ * Fixed saving of b2evo-only settings
+ *
  * Revision 1.3  2005/08/22 19:14:12  fplanque
  * rollback of incomplete registration module
  *
