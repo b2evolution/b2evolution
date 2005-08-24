@@ -35,7 +35,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 $Form = & new Form( 'edit_actions.php', 'post', 'post', 'linespan' );
 
-$Form->begin_form( 'eform' );
+$Form->begin_form( 'eform', '', array( 'target' => '_self' ) ); // don't know if the target attribute is really needed, but was in the old form tag.
 ?>
 
 <div class="left_col">
@@ -181,6 +181,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.4  2005/08/24 10:39:48  blueyed
+ * target="_self" attribute for <form>. Was used in the old-style-form-tag before.
+ *
  * Revision 1.3  2005/08/18 15:06:18  fplanque
  * got rid of format_to_edit(). This functionnality is being taken care of by the Form class.
  *
