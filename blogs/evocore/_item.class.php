@@ -1881,8 +1881,8 @@ class Item extends DataObject
 		$post_url = '',
 		$post_comments = 'open',
 		$post_renderers = array('default'),
-		$item_typ_ID = 0,
-		$item_st_ID = 0 )
+		$item_typ_ID = 1,
+		$item_st_ID = NULL )
 	{
 		global $DB, $query, $UserCache;
 		global $localtimenow, $default_locale;
@@ -2220,6 +2220,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.52  2005/08/24 13:40:21  fplanque
+ * Changed defaults in order to fix install process.
+ *
  * Revision 1.51  2005/08/02 18:13:56  fplanque
  * added "Deprecate now" function
  *
