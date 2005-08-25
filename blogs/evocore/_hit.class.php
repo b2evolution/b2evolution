@@ -164,7 +164,7 @@ class Hit
 
 
 		$Debuglog->add( 'IP: '.$this->IP, 'hit' );
-		$Debuglog->add( 'userAgent: '.$this->userAgent, 'hit' );
+		$Debuglog->add( 'Useragent: '.$this->userAgent, 'hit' );
 		$Debuglog->add( 'Referrer: '.$this->referer, 'hit' );
 		$Debuglog->add( 'Remote Host: '.$this->getRemoteHost(), 'hit' );
 	}
@@ -347,8 +347,6 @@ class Hit
 			}
 		}
 		$this->is_IE = (($this->is_macIE) || ($this->is_winIE));
-
-		$Debuglog->add( 'detectUseragent(): User Agent: '.var_export( $this->userAgent, true ) );
 
 
 		/*
