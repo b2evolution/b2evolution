@@ -51,23 +51,6 @@ require_once dirname(__FILE__).'/_dataobjectlist.class.php';
 require_once dirname(__FILE__).'/_item.class.php';
 require_once dirname(__FILE__).'/_item.funcs.php';
 
-function cat_req( $parent_cat_ID, $level )
-{
-	global $cat_array;
-	// echo "[$parent_cat_ID] ";
-	if( ! in_array( $parent_cat_ID, $cat_array ) )
-	{ // Not already visited
-		$cat_array[] = $parent_cat_ID;
-	}
-	else
-	{
-		// echo "STOP! ALREADY VISITED THIS ONE!";
-		return -1;		// STOP going through that branch
-	}
-}
-
-function cat_req_dummy() {}
-
 /**
  * Item List Class
  *
@@ -122,6 +105,8 @@ class ItemList extends DataObjectList
 	var $show_statuses;
 	var $cat;
 	var $catsel;
+	var $cat_array;
+	var $cat_modifier;
 	var $timestamp_min;
 	var $timestamp_max;
 
@@ -190,8 +175,6 @@ class ItemList extends DataObjectList
 		$cache_name = '#' )
 	{
 		global $DB, $object_def;
-		global $cache_categories;
-		global $cat_array; // communication with recursive callback funcs
 		global $Settings;
 
 		if( $cache_name == '#' )
@@ -337,73 +320,29 @@ class ItemList extends DataObjectList
 		 * Category stuff:
 		 * ----------------------------------------------------
 		 */
-		$eq = 'IN'; // default
-		$cat_combine = false; // default
+		// Compile the real category list to use:
+		// TODO: allow to pass the compiled vars diretcly tyo this class
+		compile_cat_array( $this->cat, $this->catsel, /* by ref */ $this->cat_array, /* by ref */ $this->cat_modifier, $this->blog );
 
-		$cat_array = array();		// this is a global var
-
-		// Check for cat string (which will be handled recursively)
-		if( $cat != 'all' && ! empty($cat) )
-		{ // specified a category string:
-			$first_char = substr($cat, 0, 1 );
-			// echo 'cats['.$first_char.']';
-			if( $first_char == '*' )
-			{	// List starts with * : We'll want to combine later on: (SEE LATER IN THIS FILE)
-				$cat_combine = true;
-				// echo 'combine cats';
-				$cats = substr( $cat, 1 );
-			}
-			elseif( $first_char == '-' )
-			{	// List starts with MINUS sign:
-				// We want to exclude cats
-				$eq = 'NOT IN';
-				$cats = substr( $cat, 1 );
-			}
-			else
-			{ // We want to include cats
-				$cats = $cat;
-			}
-			//echo $cats;
-
- 			// Check that the string is valid (digits and comas only)
-			if( preg_match( '#^[0-9]+(,[0-9]+)*$#', $cats ) )
-			{	// Okay, there is no sql injection risk
-				$req_cat_array = explode(',', $cats);
-
-				// Getting required sub-categories:
-				// and add everything to cat array
-				// ----------------- START RECURSIVE CAT LIST ----------------
-				cat_query( false );	// make sure the caches are loaded
-				foreach( $req_cat_array as $cat_ID )
-				{ // run recursively through the cats
-					if( ! in_array( $cat_ID, $cat_array ) )
-					{ // Not already in list
-						$cat_array[] = $cat_ID;
-						cat_children( $cache_categories, ( $this->blog == 1 ? 0 : $this->blog ), $cat_ID, 'cat_req_dummy', 'cat_req',
-													'cat_req_dummy', 'cat_req_dummy', 1 );
-					}
-				}
-				// ----------------- END RECURSIVE CAT LIST ----------------
-			}
-		}
-
-		// Add explicit selections:
-		if( ! empty( $catsel ))
-		{
-			// echo "Explicit selections!<br />";
-			$cat_array = array_merge( $cat_array, $catsel );
-			array_unique( $cat_array );
-		}
-
-		if( empty($cat_array) )
+		if( empty($this->cat_array) )
 		{
 			$whichcat = '';
 		}
 		else
-		{
-			$whichcat .= ' AND postcat_cat_ID '. $eq.' ('.implode(',', $cat_array). ') ';
+		{	// We want to restict to some cats:
+			if( $this->cat_modifier == '-' )
+			{
+				$eq = 'NOT IN';
+			}
+			else
+			{
+				$eq = 'IN';
+			}
+			$whichcat .= ' AND postcat_cat_ID '. $eq.' ('.implode(',', $this->cat_array). ') ';
+			// Also see GROUP BY later in this file...
 		}
 		// echo $whichcat;
+
 
 		/*
 		 * ----------------------------------------------------
@@ -618,11 +557,11 @@ class ItemList extends DataObjectList
 
 		$this->sql .= $where;
 
-		if( $cat_combine && count($cat_array) )
+		if( $this->cat_modifier == '*' && count($this->cat_array) )
 		{ // We want the categories combined! (i-e posts must be in ALL requested cats)
 			//echo 'combining now';
 			$this->sql .= ' GROUP BY '.$this->dbIDname.'
-											HAVING COUNT(*) = '.count($cat_array).' ';
+											HAVING COUNT(*) = '.count($this->cat_array).' ';
 		}
 
  		$this->sql .= ' ORDER BY '.$this->dbprefix.$orderby.' '.$limits;
@@ -1058,6 +997,10 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.28  2005/08/25 16:06:45  fplanque
+ * Isolated compilation of categories to use in an ItemList.
+ * This was one of the oldest bugs on the list! :>
+ *
  * Revision 1.27  2005/08/24 14:02:33  fplanque
  * minor changes
  *

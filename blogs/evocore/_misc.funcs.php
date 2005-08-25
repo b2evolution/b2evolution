@@ -807,12 +807,8 @@ function remove_magic_quotes( $mixed )
  * Also forces type.
  * Priority order: POST, GET, COOKIE, DEFAULT.
  *
- * {@internal param(-) }}
- *
- * @author fplanque
  * @param string Variable to set
  * @param string Force value type to one of:
- * - boolean
  * - integer
  * - float
  * - string
@@ -821,6 +817,8 @@ function remove_magic_quotes( $mixed )
  * - null
  * - html (does nothing)
  * - '' (does nothing)
+ * - '/^...$/' check regexp pattern match (string)
+ * - boolean (will force type to boolean, but you can't use 'true' as a default since it has special meaning. There is no real reason to pass booleans on a URL though. Passing 0 and 1 as integers seems to be best practice).
  * Value type will be forced only if resulting value (probably from default then) is !== NULL
  * @param mixed Default value or TRUE if user input required
  * @param boolean Do we need to memorize this to regenerate the URL for this page?
@@ -892,15 +890,29 @@ function param( $var, $type = '', $default = '', $memorize = false,
 			default:
 				if( $$var === '' )
 				{
-					// fplanque: note: there might be side effects to this, but we need
+					// fplanque> note: there might be side effects to this, but we need
 					// this to distinguish between 0 and 'no input'
 					$$var = NULL;
-					$Debuglog->add( 'param(-): '.$var.' set to NULL' );
+					$Debuglog->add( 'param(-): <strong>'.$var.'</strong> set to NULL', 'params' );
+				}
+				elseif( substr( $type, 0, 1 ) == '/' )
+				{	// We want to match against a regexp:
+					if( preg_match( $type, $$var ) )
+					{	// Okay, match
+						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> matched against '.$type, 'params' );
+					}
+					else
+					{
+						$$var = $default;
+						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> DID NOT match '.$type.' set to default value='.$$var, 'params' );
+					}
+					// From now on, consider this as a string: (we need this when memorizing)
+					$type = 'string';
 				}
 				else
 				{
 					settype( $$var, $type );
-					$Debuglog->add( 'param(-): '.$var.' typed to '.$type.', new value='.$$var, 'params' );
+					$Debuglog->add( 'param(-): <strong>'.$var.'</strong> typed to '.$type.', new value='.$$var, 'params' );
 				}
 		}
 	}
@@ -956,7 +968,7 @@ function forget_param( $var )
  * This may clean it up
  * But it is also useful when generating static pages: you cannot rely on $_REQUEST[]
  *
- * @param mixed string or array of params to ignore
+ * @param mixed string or array of params to ignore (can be regexps in /.../)
  * @param mixed string or array of params to set
  * @param mixed string
  */
@@ -964,6 +976,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 {
 	global $Debuglog, $global_param_list, $ReqPath, $basehost;
 
+	// Transform ignore paran into an array:
 	if( empty($ignore) )
 	{
 		$ignore = array();
@@ -973,22 +986,15 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 		$ignore = explode( ',', $ignore );
 	}
 
-	if( empty($set) )
-	{
-		$set = array();
-	}
-	elseif( !is_array($set) )
-	{
-		$set = array( $set );
-	}
-
+	// Construct array of all params that have been memorized:
+	// (Note: we only include values if they differ from the default and they are not in the ignore list)
 	$params = array();
 	if( isset($global_param_list) ) foreach( $global_param_list as $var => $thisparam )
 	{	// For each saved param...
 		$type = $thisparam['type'];
 		$defval = $thisparam['default'];
 
-		// Check if the param needs to be ignored:
+		// Check if the param should to be ignored:
 		$skip = false;
 		foreach( $ignore as $ignore_pattern )
 		{
@@ -1010,91 +1016,51 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 			}
 		}
 		if( $skip )
-		{ // we don't want to include that one
-			// $Debuglog->add( 'regenerate_url(): ignoring '.$var, 'params' );
+		{ // we don't want to include that param
+			// $Debuglog->add( 'regenerate_url(): EXPLICIT IGNORE '.$var, 'params' );
 			continue;
 		}
 
-		// else
-		// {
-		//	$Debuglog->add( 'regenerate_url(): recycling '.$var, 'params' );
-		// }
+		global $$var;
+		$value = $$var;
+		if( (!empty($value)) && ($value != $defval) )
+		{ // Value exists and is not set to default value:
+			// echo "adding $var \n";
+			// $Debuglog->add( "regenerate_url(): Using var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
 
-		// Special cases:
-		switch( $var )
-		{
-			/*
-			fplanque> This is a wrong solution to a true problem
-			case 'catsel':
-			{
-				global $catsel, $cat;
-				if( (! empty($catsel)) && (strpos( $cat, '-' ) === false) )
-				{ // It's worthwhile retransmitting the catsels
-					foreach( $catsel as $value )
-					{
-						$params[] = 'catsel%5B%5D='.$value;
-					}
-				}
-				break;
-			}
-			*/
-
-			case 'show_status':
-			{
-				global $show_status;
-				if( ! empty($show_status) )
+			if( $type === 'array' )
+			{ // there is a special formatting in case of arrays
+				$url_array = array();
+				foreach( $value as $value )
 				{
-					foreach( $show_status as $value )
-					{
-						$params[] = 'show_status%5B%5D='.$value;
-					}
+					$params[] = $var.'%5B%5D='.$value;
 				}
-				break;
 			}
-
-			default:
-			{
-				global $$var;
-				$value = $$var;
-				// $Debuglog->add( "var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
-				if( (!empty($value)) && ($value != $defval) )
-				{ // Value exists and is not set to default value:
-					// echo "adding $var \n";
-
-					if( $type === 'array' )
-					{ // there is a special formatting in case of arrays
-						$url_array = array();
-						foreach( $value as $value )
-						{
-							$params[] = $var.'%5B%5D='.$value;
-						}
-					}
-					else
-					{	// not an array : normal formatting
-						$params[] = $var.'='.$value;
-					}
-				}
-				// else echo "ignoring $var \n";
+			else
+			{	// not an array : normal formatting
+				$params[] = $var.'='.$value;
 			}
+		}
+		else
+		{
+			// $Debuglog->add( "regenerate_url(): DEFAULT ignore var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
 		}
 	}
 
+	// Merge in  the params we want to force to a specifoc value:
 	if( !empty( $set ) )
-	{
+	{	// We got some forced params:
+		// Transform set param into an array:
+		if( !is_array($set) )
+		{
+			$set = array( $set );
+		}
+		// Merge them in:
 		$params = array_merge( $params, $set );
 	}
 
+	// Construct URL:
 	$url = empty($pagefileurl) ? $ReqPath : $pagefileurl;
-
-	/*
-   * fplanque: who added this? what for? why prevent relative paths?
-   *
-	if( $basehost != $_SERVER['HTTP_HOST'] && !preg_match( '#^https?://#', $url ) )
-	{
-		$url = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '').'://'.$_SERVER['HTTP_HOST'].( substr( $url, 0, 1 ) == '/' ? '' : '/' ).$url;
-	}
-	*/
-
 	if( !empty( $params ) )
 	{
 		$url = url_add_param( $url, implode( '&amp;', $params ) );
@@ -1912,6 +1878,10 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.85  2005/08/25 16:06:45  fplanque
+ * Isolated compilation of categories to use in an ItemList.
+ * This was one of the oldest bugs on the list! :>
+ *
  * Revision 1.84  2005/08/24 18:43:09  fplanque
  * Removed public stats to prevent spamfests.
  * Added context browsing to Archives plugin.

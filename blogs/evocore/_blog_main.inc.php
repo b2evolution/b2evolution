@@ -61,35 +61,50 @@
 require_once (dirname(__FILE__). '/_main.inc.php');
 
 // Getting GET or POST parameters:
-param( 'blog', 'integer', 0, true );  // Can't use $default_to_blog because the param must always be included in regenerate_url() when present
-param( 'p', 'integer', '', true );              // Specific post number to display
-param( 'm', 'integer', '', true );              // YearMonth(Day) to display
-param( 'w', 'integer', -1, true );              // Week number
-param( 'cat', 'string', '', true );             // List of cats to restrict to
-param( 'catsel', 'array', array(), true );      // Array of cats to restrict to
-param( 'author', 'integer', '', true );         // List of authors to restrict to
-param( 'order', 'string', 'DESC', true );       // ASC or DESC
-param( 'orderby', 'string', '', true );         // list of fields to order by
-param( 'dstart', 'integer', '', true );         // YearMonth(Day) to start at
-param( 'unit', 'string', '', true );            // list unit: 'posts' or 'days'
-param( 'posts', 'integer', 0, true );           // # of units to display on the page
-param( 'paged', 'integer', '', true );          // List page number in paged display
-param( 'poststart', 'integer', '', true );      // Start results at this position
-param( 'postend', 'integer', '', true );        // End results at this position
-// param( 'search', 'string' );                 // obsolete (dangerous!)
-param( 's', 'string', '', true );               // Search string
-param( 'sentence', 'string', 'AND', true );     // Search for sentence or for words
-param( 'exact', 'integer', '', true );          // Require exact match of title or contents
-param( 'preview', 'integer', 0, true );         // Is this preview ?
-param( 'calendar', 'string', '', true );        // Display a specific month in the calendar
-param( 'c', 'string', '', true );
-param( 'page', 'integer', '', true );
-param( 'more', 'integer', 0, true );
-param( 'title', 'string', '', true );						// urtitle of post to display
-param( 'tb', 'integer', 0, true );
-param( 'pb', 'integer', 0, true );
-param( 'disp', 'string', 'posts', true );
-param( 'stats', 'integer', 0 );                 // deprecated
+$Request->param( 'blog', 'integer', 0, true );  // Can't use $default_to_blog because the param must always be included in regenerate_url() when present
+$Request->param( 'p', 'integer', '', true );              // Specific post number to display
+$Request->param( 'title', 'string', '', true );						// urtitle of post to display
+$Request->param( 'm', 'integer', '', true );              // YearMonth(Day) to display
+$Request->param( 'w', 'integer', -1, true );              // Week number
+$Request->param( 'dstart', 'integer', '', true );         // YearMonth(Day) to start at
+$Request->param( 'unit', 'string', '', true );            // list unit: 'posts' or 'days'
+
+$Request->param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', '', true ); // List of cats to restrict to
+$Request->param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
+// Let's compile those values right away (we use them in several different places):
+$cat_array = array();
+$cat_modifier = '';
+compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $blog );
+
+$Request->param( 'author', 'integer', '', true );         // List of authors to restrict to
+
+$Request->param( 'order', 'string', 'DESC', true );       // ASC or DESC
+$Request->param( 'orderby', 'string', '', true );         // list of fields to order by
+
+$Request->param( 'posts', 'integer', 0, true );           // # of units to display on the page
+$Request->param( 'paged', 'integer', '', true );          // List page number in paged display
+
+$Request->param( 'poststart', 'integer', '', true );      // Start results at this position
+$Request->param( 'postend', 'integer', '', true );        // End results at this position
+
+$Request->param( 's', 'string', '', true );               // Search string
+$Request->param( 'sentence', 'string', 'AND', true );     // Search for sentence or for words
+$Request->param( 'exact', 'integer', '', true );          // Require exact match of title or contents
+
+$Request->param( 'preview', 'integer', 0, true );         // Is this preview ?
+
+$Request->param( 'calendar', 'string', '', true );        // Display a specific month in the calendar
+
+$Request->param( 'page', 'integer', '', true );
+$Request->param( 'more', 'integer', 0, true );
+
+$Request->param( 'c', 'string', '', true );
+$Request->param( 'tb', 'integer', 0, true );
+$Request->param( 'pb', 'integer', 0, true );
+
+$Request->param( 'disp', 'string', 'posts', true );
+$Request->param( 'stats', 'integer', 0 );                 // deprecated
+
 if( !isset($timestamp_min) ) $timestamp_min = '';
 if( !isset($timestamp_max) ) $timestamp_max = '';
 
@@ -271,17 +286,17 @@ if( !isset( $skin ) )
 	}
 	else
 	{ // Get the saved skin in cookie or default:
-		param( $cookie_state, 'string', $default_skin );
+		$Request->param( $cookie_state, 'string', $default_skin );
 		// Get skin by params or default to cookie
 		// (if cookie was not set, the $$cookie_state contains default skin!)
-		param( 'skin', 'string', $$cookie_state );
+		$Request->param( 'skin', 'string', $$cookie_state );
 	}
 }
 
 // At this point $skin holds the name of the skin we want to use, or '' for no skin!
 
 // check to see if we want to display the popup or the main template
-param( 'template', 'string', 'main', true );
+$Request->param( 'template', 'string', 'main', true );
 
 if( !empty( $skin ) )
 { // We want to display now:
@@ -342,6 +357,10 @@ if ( $use_memcached )
 
 /*
  * $Log$
+ * Revision 1.13  2005/08/25 16:06:45  fplanque
+ * Isolated compilation of categories to use in an ItemList.
+ * This was one of the oldest bugs on the list! :>
+ *
  * Revision 1.12  2005/04/06 13:33:29  fplanque
  * minor changes
  *

@@ -78,7 +78,7 @@ function imgbase()
 function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'htmlbody',
 												$display = true, $linktoyeararchive = true, $blogurl = '', $params = '' )
 {
-	global $cat, $cat_array, $m, $w, $month, $p, $title, $preview, $ItemCache, $disp;
+	global $cat_modifier, $cat_array, $m, $w, $month, $p, $title, $preview, $ItemCache, $disp;
 
 	$r = array();
 
@@ -93,12 +93,7 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			// We are requesting the last comments:
 			$r[] = T_('Last comments');
 			break;
-			
-		case 'stats':
-			// We are requesting the stats:
-			$r[] = T_('Statistics');
-			break;
-			
+
 		case 'profile':
 			// We are requesting the user profile:
 			$r[] = T_('User profile');
@@ -145,18 +140,28 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 						$my_cat = get_the_category_by_ID($cat_ID);
 						$cat_names[] = $my_cat['cat_name'];
 					}
-					$cat_names_string = implode( ", ", $cat_names );
+					if( $cat_modifier == '*' )
+					{
+						$cat_names_string = implode( ' + ', $cat_names );
+					}
+					else
+					{
+						$cat_names_string = implode( ', ', $cat_names );
+					}
 					if( !empty( $cat_names_string ) )
 					{
-						if( strstr($cat,'-') )
+						if( $cat_modifier == '-' )
 						{
 							$cat_names_string = T_('All but ').$cat_names_string;
-						}
-			
-						if( count($cat_array) > 1 )
 							$r[] = T_('Categories').': '.$cat_names_string;
-						else 
-							$r[] = T_('Category').': '.$cat_names_string;
+						}
+						else
+						{
+							if( count($cat_array) > 1 )
+								$r[] = T_('Categories').': '.$cat_names_string;
+							else
+								$r[] = T_('Category').': '.$cat_names_string;
+						}
 					}
 				}
 			}			
@@ -284,6 +289,10 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.9  2005/08/25 16:06:45  fplanque
+ * Isolated compilation of categories to use in an ItemList.
+ * This was one of the oldest bugs on the list! :>
+ *
  * Revision 1.8  2005/08/24 18:43:09  fplanque
  * Removed public stats to prevent spamfests.
  * Added context browsing to Archives plugin.

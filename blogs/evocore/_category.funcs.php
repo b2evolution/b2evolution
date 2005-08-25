@@ -817,9 +817,102 @@ function cat_copy_after_last( $parent_cat_ID, $level )
 { // callback to end sublist
 }
 
+/**
+ * Compiles the cat array from $cat (recursive + optional modifiers) and $catsel[] (non recursive)
+ *
+ * @param strinf
+ * @param array
+ * @param array by ref, will be modified
+ * @param string by ref, will be modified
+ * @param integer blog number to restrict to
+ */
+function compile_cat_array( $cat, $catsel, & $cat_array, & $cat_modifier, $restrict_to_blog = 0  )
+{
+	global $cache_categories;
+
+	// echo '$cat='.$cat;
+	// pre_dump( $catsel );
+	// echo '$restrict_to_blog'.$restrict_to_blog;
+
+	$cat_array = array();
+	$cat_modifier = '';
+
+	// Check for cat string (which will be handled recursively)
+	if( $cat != 'all' && !empty($cat) )
+	{ // specified a category string:
+		$cat_modifier = substr($cat, 0, 1 );
+		// echo 'cats['.$first_char.']';
+		if( ($cat_modifier == '*')
+			|| ($cat_modifier == '-') )
+		{
+			$cat = substr( $cat, 1 );
+		}
+		else
+		{
+			$cat_modifier = '';
+		}
+
+		if( strlen( $cat ) )
+		{	// There are some values to explode...
+			$req_cat_array = explode(',', $cat);
+
+			// Getting required sub-categories:
+			// and add everything to cat array
+			// ----------------- START RECURSIVE CAT LIST ----------------
+			cat_query( false );	// make sure the caches are loaded
+			foreach( $req_cat_array as $cat_ID )
+			{ // run recursively through the cats
+				if( ! in_array( $cat_ID, $cat_array ) )
+				{ // Not already in list
+					$cat_array[] = $cat_ID;
+					cat_children( $cache_categories, $restrict_to_blog, $cat_ID, 'cat_req_dummy', 'cat_req',
+												'cat_req_dummy', 'cat_req_dummy', 1 );
+				}
+			}
+			// ----------------- END RECURSIVE CAT LIST ----------------
+		}
+	}
+
+	// Add explicit selections:
+	if( ! empty( $catsel ))
+	{
+		// echo "Explicit selections!<br />";
+		$cat_array = array_merge( $cat_array, $catsel );
+		$cat_array = array_unique( $cat_array );
+	}
+
+	// echo '$cat_modifier='.$cat_modifier;
+	// pre_dump( $cat_array );
+
+}
+
+
+
+function cat_req( $parent_cat_ID, $level )
+{
+	global $cat_array;
+	// echo "[$parent_cat_ID] ";
+	if( ! in_array( $parent_cat_ID, $cat_array ) )
+	{ // Not already visited
+		$cat_array[] = $parent_cat_ID;
+	}
+	else
+	{
+		// echo "STOP! ALREADY VISITED THIS ONE!";
+		return -1;		// STOP going through that branch
+	}
+}
+
+
+function cat_req_dummy() {}
+
 
 /*
  * $Log$
+ * Revision 1.19  2005/08/25 16:06:45  fplanque
+ * Isolated compilation of categories to use in an ItemList.
+ * This was one of the oldest bugs on the list! :>
+ *
  * Revision 1.18  2005/06/06 17:59:39  fplanque
  * user dialog enhancements
  *

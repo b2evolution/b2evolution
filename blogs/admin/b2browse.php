@@ -16,7 +16,7 @@ require_once (dirname(__FILE__). '/_header.php');
 
 $AdminUI->title = $AdminUI->title_titlearea = T_('Browse blog:');
 
-$blog = autoselect_blog( param( 'blog', 'integer', 0 ), 'blog_ismember', 1 );
+$blog = autoselect_blog( $Request->param( 'blog', 'integer', 0 ), 'blog_ismember', 1 );
 
 if( ! $blog  )
 { // No blog could be selected
@@ -38,37 +38,53 @@ else
 	$dbprefix = 'post_';
 	$dbIDname = 'ID';
 
-	param( 'tab', 'string', 'postlist', true /* memorize */ );
-	param( 'p', 'integer' );                    // Specific post number to display
-	param( 'm', 'integer', '', true );          // YearMonth(Day) to display
-	param( 'w', 'integer', '', true );          // Week number
-	param( 'cat', 'string', '', true );         // List of cats to restrict to
-	param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
-	param( 'author', 'string', '', true );     // List of authors to restrict to
-	param( 'order', 'string', 'DESC', true );   // ASC or DESC
-	param( 'orderby', 'string', '', true );     // list of fields to order by
-	param( 'dstart', 'integer', '', true );     // YearMonth(Day) to start at
-	param( 'unit', 'string', '', true );    		// list unit: 'posts' or 'days'
-	param( 'posts', 'integer', 0, true );       // # of units to display on the page
-	param( 'paged', 'integer', '', true );      // List page number in paged display
-	param( 'poststart', 'integer', 1, true );   // Start results at this position
-	param( 'postend', 'integer', '', true );    // End results at this position
-	param( 's', 'string', '', true );           // Search string
-	param( 'sentence', 'string', 'AND', true ); // Search for sentence or for words
-	param( 'exact', 'integer', '', true );      // Require exact match of title or contents
+	$Request->param( 'tab', 'string', 'postlist', true /* memorize */ );
+
+	$Request->param( 'p', 'integer' );                    // Specific post number to display
+	$Request->param( 'm', 'integer', '', true );          // YearMonth(Day) to display
+	$Request->param( 'w', 'integer', '', true );          // Week number
+	$Request->param( 'dstart', 'integer', '', true );     // YearMonth(Day) to start at
+	$Request->param( 'unit', 'string', '', true );    		// list unit: 'posts' or 'days'
+
+	$Request->param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', '', true ); // List of cats to restrict to
+	$Request->param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
+	// Let's compile those values right away (we use them in several different places):
+	$cat_array = array();
+	$cat_modifier = '';
+	compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $Blog->ID );
+
+	$Request->param( 'author', 'string', '', true );     // List of authors to restrict to
+
+	$Request->param( 'order', 'string', 'DESC', true );   // ASC or DESC
+	$Request->param( 'orderby', 'string', '', true );     // list of fields to order by
+
+	$Request->param( 'posts', 'integer', 0, true );       // # of units to display on the page
+	$Request->param( 'paged', 'integer', '', true );      // List page number in paged display
+
+	$Request->param( 'poststart', 'integer', 1, true );   // Start results at this position
+	$Request->param( 'postend', 'integer', '', true );    // End results at this position
+
+	$Request->param( 's', 'string', '', true );           // Search string
+	$Request->param( 'sentence', 'string', 'AND', true ); // Search for sentence or for words
+	$Request->param( 'exact', 'integer', '', true );      // Require exact match of title or contents
+
 	$preview = 0;
-	param( 'c', 'string' );
-	param( 'tb', 'integer', 0 );
-	param( 'pb', 'integer', 0 );
-	param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of cats to restrict to
+
+	$Request->param( 'c', 'string' );
+	$Request->param( 'tb', 'integer', 0 );
+	$Request->param( 'pb', 'integer', 0 );
+
+	$Request->param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of cats to restrict to
 	$show_statuses = $show_status;
-	param( 'show_past', 'integer', '0', true );
-	param( 'show_future', 'integer', '0', true );
+
+	$Request->param( 'show_past', 'integer', '0', true );
+	$Request->param( 'show_future', 'integer', '0', true );
 	if( ($show_past == 0) && ( $show_future == 0 ) )
 	{
 		$show_past = 1;
 		$show_future = 1;
 	}
+
 	$timestamp_min = ( $show_past == 0 ) ? 'now' : '';
 	$timestamp_max = ( $show_future == 0 ) ? 'now' : '';
 

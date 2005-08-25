@@ -87,7 +87,7 @@ class archives_plugin extends Plugin
 	 *                - 'title' : (Default: '<h3>'.T_('Archives').'</h3>')
 	 *                - 'mode' : 'monthly'|'daily'|'weekly'|'postbypost' (Default: conf.)
 	 *                - 'link_type' : 'canonic'|'context' (default: canonic)
-	 *                - 'context_isolation' : what params need override when changing date/range (Default: 'm,w,p,unit,dstart' )
+	 *                - 'context_isolation' : what params need override when changing date/range (Default: 'm,w,p,title,unit,dstart' )
 	 *                - 'form' : true|false (default: false)
 	 *                - 'limit' : # of archive entries to display or '' (Default: 12)
 	 *                - 'more_link' : more link text or '' (Default: 12)
@@ -124,7 +124,7 @@ class archives_plugin extends Plugin
 
 		// Link type:
 		if(!isset($params['link_type'])) $params['link_type'] = 'canonic';
-		if(!isset($params['context_isolation'])) $params['context_isolation'] = 'm,w,p,unit,dstart';
+		if(!isset($params['context_isolation'])) $params['context_isolation'] = 'm,w,p,title,unit,dstart';
 
 		// Add form fields?:
 		if(!isset($params['form']))

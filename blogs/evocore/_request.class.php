@@ -83,12 +83,8 @@ class Request
 	 * Also forces type.
 	 * Priority order: POST, GET, COOKIE, DEFAULT.
 	 *
-	 * {@internal param(-) }}
-	 *
-	 * @author fplanque
 	 * @param string Variable to set
 	 * @param string Force value type to one of:
-	 * - boolean
 	 * - integer
 	 * - float
 	 * - string
@@ -97,6 +93,8 @@ class Request
 	 * - null
 	 * - html (does nothing)
 	 * - '' (does nothing)
+	 * - '/^...$/' check regexp pattern match (string)
+	 * - boolean (will force type to boolean, but you can't use 'true' as a default since it has special meaning. There is no real reason to pass booleans on a URL though. Passing 0 and 1 as integers seems to be best practice).
 	 * Value type will be forced only if resulting value (probably from default then) is !== NULL
 	 * @param mixed Default value or TRUE if user input required
 	 * @param boolean Do we need to memorize this to regenerate the URL for this page?
@@ -107,36 +105,11 @@ class Request
 	function param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
 	{
     return $this->params[$var] = param( $var, $type, $default, $memorize, $override, $forceset );
-
-	// fplanque> I don't see why we need this. We need to discuss it. Is it reasonable to try to pass booleans through an URL?
-	// Seems to me that this code makes the function behave in ways that you can't predict
-	// If there's a real issue, it's probably better to have a param_boolean() with special stuff and leave the param() unchanged (zillions of pages depend on param...)
-
-	// blueyed> The idea is to not set $this->params[$var] if we do not force setting it! The check for boolean type was just to not change param()'s behaviour.
-	// We might want to leave the workaround for boolean out and NOTE in the function's doc that you should use param_boolean() if you really want to pass booleans.
-		if( $type == 'boolean' )
-		{ // we handle 'boolean' special, because 'false' also means: nothing set (if not forcing)
-			$r = param( $var, 'integer', $default, $memorize, $override, $forceset );
-			if( $r !== false )
-			{
-				settype( $this->params[$var], 'boolean' );
-				$this->params[$var] = $r;
-			}
-		}
-		else
-		{
-			$r = param( $var, $type, $default, $memorize, $override, $forceset );
-
-			if( $r !== false )
-			{ // Return value !== false (false means it has not been set here)
-				$this->params[$var] = $r;
-			}
-		}
-
-		return $r;
 	}
 
 	/**
+	 * Sets several similar parameters at once.
+	 *
 	 * @param array
 	 */
 	function params( $vars, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
@@ -145,6 +118,61 @@ class Request
 		{
 			$this->param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true );
 		}
+	}
+
+
+  /**
+	 * Extend a parameter with an array of params.
+	 *
+	 * Will be used for author/authorsel[], etc.
+	 * Note: cannot be used for catsel[], because catsel is NON-recursive
+	 *
+	 * @param string Variable to extend
+	 * @param string Name of array Variable to use as an extension
+	 * @param boolean Save non numeric prefix?
+	 */
+	function param_extend( $var, $var_ext_array, $save_prefix = true )
+	{
+		// Make sure original var exists:
+		if( !isset($this->params[$var]) )
+		{
+			die( 'Cannot extend non existing param : '.$var );
+		}
+		$original_val = $this->params[$var];
+
+		// Get extension array:
+		$ext_values_array = $this->param( $var_ext_array, 'array', array(), false );
+		if( empty($ext_values_array) )
+		{	// No extension required:
+			return $original_val;
+		}
+
+		// Handle prefix:
+		$prefix = '';
+		if( $save_prefix )
+		{	// We might want to save a prefix:
+			$prefix = substr( $original_val, 0, 1 );
+			if( is_numeric( $prefix ) )
+			{	// The prefix is numeric, so it's NOT a prefix
+				$prefix = '';
+			}
+			else
+			{	// We save the prefix, we must crop if off from the values:
+				$original_val = substr( $original_val, 1 );
+			}
+		}
+
+		// Merge values:
+		$original_values_array = empty($original_val) ? array() : explode( ',', $original_val );
+		$new_values = array_merge( $original_values_array, $ext_values_array );
+		$new_values = array_unique( $new_values );
+		$this->params[$var] = $prefix.implode( ',', $new_values );
+
+		// Save into global var:
+		global $$var;
+		$$var = $this->params[$var];
+
+		return $this->params[$var];
 	}
 
 
@@ -532,6 +560,10 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.11  2005/08/25 16:06:45  fplanque
+ * Isolated compilation of categories to use in an ItemList.
+ * This was one of the oldest bugs on the list! :>
+ *
  * Revision 1.10  2005/08/18 16:15:12  blueyed
  * Added param_check_date_format(), which allows better refining of date checks if needed later
  *

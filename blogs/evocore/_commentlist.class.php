@@ -73,7 +73,6 @@ class CommentList extends DataObjectList
 	{
 		global $DB;
 		global $cache_categories;
-		global $cat_array; // communication with recursive callback funcs
 		global $pagenow;		// Bleh !
 
 		// Call parent constructor:
@@ -182,6 +181,10 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.8  2005/08/25 16:06:45  fplanque
+ * Isolated compilation of categories to use in an ItemList.
+ * This was one of the oldest bugs on the list! :>
+ *
  * Revision 1.7  2005/04/07 17:55:50  fplanque
  * minor changes
  *

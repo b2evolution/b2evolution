@@ -164,7 +164,7 @@ class Hit
 
 
 		$Debuglog->add( 'IP: '.$this->IP, 'hit' );
-		$Debuglog->add( 'Useragent: '.$this->userAgent, 'hit' );
+		$Debuglog->add( 'UserAgent: '.$this->userAgent, 'hit' );
 		$Debuglog->add( 'Referrer: '.$this->referer, 'hit' );
 		$Debuglog->add( 'Remote Host: '.$this->getRemoteHost(), 'hit' );
 	}
