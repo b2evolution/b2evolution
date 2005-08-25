@@ -213,13 +213,16 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 		<ul>
 			<li><a href="<?php $Blog->disp( 'staticurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(cached)') ?></span></li>
 			<li><a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(no cache)') ?></span></li>
+			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
 		</ul>
 		<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------
-			require( get_path('skins').'_calendar.php');
+			// Call the Calendar plugin:
+			$Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
+					'block_start'=>'',
+					'block_end'=>'',
+					'title'=>'',			// No title.
+				) );
 			// -------------------------------- END OF CALENDAR ---------------------------------- ?>
-		<ul>
-			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>			<li><a href="<?php $Blog->disp( 'blogstatsurl', 'raw' ) ?>"><strong><?php echo T_('Some viewing statistics') ?></strong></a></li>
-		</ul>
 	</div>
 
 	<div class="bSideItem">

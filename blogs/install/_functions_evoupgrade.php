@@ -632,6 +632,8 @@ function upgrade_b2evo_tables()
 		// Create relations:
 		create_b2evo_relations();
 
+		// INSTALL PLUGINS:
+		install_basic_plugins();
 	}
 
 

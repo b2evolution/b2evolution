@@ -1247,5 +1247,15 @@ function create_b2evo_relations()
 	echo "OK.<br />\n";
 }
 
-
+function install_basic_plugins()
+{
+	echo 'Installing default plugins... ';
+	$Plugins = & new Plugins();
+	$Plugins->install( 'archives_plugin' );
+	$Plugins->install( 'auto_p_plugin' );
+	$Plugins->install( 'calendar_plugin' );
+	$Plugins->install( 'quicktags_plugin' );
+	$Plugins->install( 'texturize_plugin' );
+	echo "OK.<br />\n";
+}
 ?>

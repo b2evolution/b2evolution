@@ -219,15 +219,19 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		<!--?php next_post(); // activate this if you want a link to the next post in single page mode ?-->
 		<!--?php previous_post(); // activate this if you want a link to the previous post in single page mode ?-->
 		<ul>
-			<li><a href="<?php $Blog->disp( 'staticurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(cached)') ?></span></li>
-			<li><a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(no cache)') ?></span></li>
-		</ul>
-		<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------
-			require( dirname(__FILE__).'/_calendar.php' );
-			// -------------------------------- END OF CALENDAR ---------------------------------- ?>
-		<ul>
+			<!-- <li><a href="<?php $Blog->disp( 'staticurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <span class="dimmed"><?php echo T_('(cached)') ?></span></li> -->
+			<li><a href="<?php $Blog->disp( 'dynurl', 'raw' ) ?>"><strong><?php echo T_('Recently') ?></strong></a> <!-- <span class="dimmed"><?php echo T_('(no cache)') ?></span> --></li>
 			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
 		</ul>
+
+	<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------
+		// Call the Calendar plugin:
+		$Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
+				'block_start'=>'',
+				'block_end'=>'',
+				'title'=>'',			// No title.
+			) );
+		// -------------------------------- END OF CALENDAR ---------------------------------- ?>
 	</div>
 
 	<div class="bSideItem">

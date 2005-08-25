@@ -258,6 +258,8 @@ class Calendar
 			$this->browseyears = ($this->mode == 'year');  // browsing years from Calendar's navigation
 		}
 
+		$this->navigation = 'tfoot';
+
 		/**#@+
 		 * Display number of posts with days/months
 		 *
@@ -268,7 +270,6 @@ class Calendar
 		$this->postcount_month_cell_one = '';                       //  -- " -- [for single post]
 		$this->postcount_month_atitle = T_('%d posts'); 						// in archive links title tag
 		$this->postcount_month_atitle_one = T_('1 post');  					//  -- " -- [for single post]
-		#$this->postcount_year_cell = ' (%d)';                      // in table cell (behind abbr of month)
 		$this->postcount_year_cell   = '';
 		$this->postcount_year_cell_one   = '';
 		$this->postcount_year_atitle = T_('%d posts'); 							// in archive links title tag
@@ -801,6 +802,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.14  2005/08/25 11:02:11  fplanque
+ * moved calendar to a skintag plugin
+ *
  * Revision 1.13  2005/05/09 19:07:03  fplanque
  * bugfixes + global access permission
  *

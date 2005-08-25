@@ -31,6 +31,7 @@ require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_item.funcs.php
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_form.funcs.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_user.funcs.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_timer.class.php';
+require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_plugins.class.php';
 require_once dirname(__FILE__).'/_functions_install.php';
 require_once dirname(__FILE__).'/_functions_create.php';
 
@@ -421,6 +422,7 @@ to
 		<?php
 		create_b2evo_tables();
 		populate_main_tables();
+		install_basic_plugins();
 		?>
 		<h2><?php echo T_('Installation successful!')?></h2>
 
@@ -474,6 +476,7 @@ to
 		<?php
 			create_b2evo_tables();
 			upgrade_cafelog_tables();
+			install_basic_plugins();
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
 		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'b2')?></p>
@@ -493,6 +496,7 @@ to
 		<?php
 			create_b2evo_tables();
 			upgrade_miniblog_tables();
+			install_basic_plugins();
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
 		<?php printf( T_('<p>Now you can <a %s>log in</a> with your usual Miniblog email login cropped at 20 chars. All passwords have been reset to "%s".</p>
@@ -513,6 +517,7 @@ to
 		<?php
 			create_b2evo_tables();
 			upgrade_cafelog_tables();
+			install_basic_plugins();
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
 		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'WordPress')?></p>

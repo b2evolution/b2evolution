@@ -174,11 +174,23 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			)	);
 		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 
-	<li id="calendar">
+
 	<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------
-		require( dirname(__FILE__).'/_calendar.php' );
+		// Call the Calendar plugin:
+		$Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
+				'block_start'=>'<li id="calendar">',
+				'block_end'=>'</li>',
+				'title'=>'',			// No title.
+				'linktomontharchive'=>false,
+        'monthstart'=>'<caption>',
+        'monthend'=>"</caption>\n",
+				'tablestart'=>'<table id="wp-calendar" summary="Monthly calendar with links to each day\'s posts">',
+				'headerdisplay'=>'e',	 // One letter header
+				'headercellstart'=>'<th abbr="[abbr]" scope="col" title="[abbr]">',
+				'headercellend'=>"</th>\n",
+				'todaycellstart'=>'<td id="today">',
+			) );
 		// -------------------------------- END OF CALENDAR ---------------------------------- ?>
-	</li>
 
 
 	<?php if( ! $Blog->get('force_skin') )

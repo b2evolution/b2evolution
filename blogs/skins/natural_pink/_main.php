@@ -160,11 +160,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 <div class="bSideBar">
 
-	<div class="bSideItem">
-		<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------
-			require( dirname(__FILE__).'/_calendar.php' );
-			// -------------------------------- END OF CALENDAR ---------------------------------- ?>
-	</div>
+	<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------
+		// Call the Calendar plugin:
+		$Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
+				'title'=>'',			// No title.
+			) );
+		// -------------------------------- END OF CALENDAR ---------------------------------- ?>
 
 	<div class="bSideItem">
 		<h3><?php $Blog->disp( 'name', 'htmlbody' ) ?></h3>
