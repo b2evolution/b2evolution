@@ -91,7 +91,7 @@ class categories_plugin extends Plugin
 		/**
 		 * @todo get rid of these globals:
 		 */
-		global $blog, $cat_modifier;
+		global $blog, $cat_modifier, $pagenow;
 
 		/**
 		 * Default params:
@@ -105,11 +105,11 @@ class categories_plugin extends Plugin
 			$params['title'] = '<h3>'.T_('Categories').'</h3>';
 
 		// Link type:
-		// if(!isset($params['link_type'])) $params['link_type'] = 'canonic';
+		if(!isset($params['link_type'])) $params['link_type'] = 'canonic';
 		// if(!isset($params['context_isolation'])) $params['context_isolation'] = 'm,w,p,title,unit,dstart';
 
 		// Add form fields?:
-		// if(!isset($params['form'])) $params['form'] = false;
+		if(!isset($params['form'])) $params['form'] = false;
 
 
 		// This is what will enclose the category list:
@@ -125,12 +125,15 @@ class categories_plugin extends Plugin
 		if(!isset($params['group_end'])) $params['group_end'] = "</ul>\n";
 
 		// This is what will enclose the global list if several blogs are listed on the same page:
-		if(!isset($params['collist_start'])) $params['collist_start'] = '<ul>';
-		if(!isset($params['collist_end'])) $params['collist_end'] = "</ul>\n";
+		if(!isset($params['collist_start'])) $params['collist_start'] = '';
+		if(!isset($params['collist_end'])) $params['collist_end'] = "\n";
 
 		// This is what will separate blogs/collections when several of them are listed on the same page:
-		if(!isset($params['coll_start'])) $params['coll_start'] = '<li><strong>';
-		if(!isset($params['coll_end'])) $params['coll_end'] = "</strong></li>\n";
+		if(!isset($params['coll_start'])) $params['coll_start'] = '<h4>';
+		if(!isset($params['coll_end'])) $params['coll_end'] = "</h4>\n";
+
+
+ 		if(!isset($params['option_all'])) $params['option_all'] = T_('All');
 
 
 		// Save params for others functions:
@@ -145,6 +148,22 @@ class categories_plugin extends Plugin
 		if( $blog > 1 )
 		{ // We want to display cats for one blog
 			echo $params['list_start'];
+
+			if( $params['option_all'] )
+			{	// We want to display a link to all cats:
+				echo $this->params['line_start'].'<a href="';
+				if( $this->params['link_type'] == 'context' )
+				{	// We want to preserve current browsing context:
+					echo regenerate_url( 'cats,catsel' );
+				}
+				else
+				{
+					echo get_bloginfo('blogurl');
+				}
+				echo '">'.$params['option_all'].'</a>';
+				echo $this->params['line_end'];
+			}
+
 			echo cat_children( $cache_categories, $blog, NULL,
 							array( $this, 'callback_before_first' ), array( $this, 'callback_before_each' ),
 							array( $this, 'callback_after_each' ), array( $this, 'callback_after_last' ), 0 );
@@ -161,7 +180,14 @@ class categories_plugin extends Plugin
 
 				echo $params['coll_start'];
 				echo '<a href="';
-				blog_list_iteminfo('blogurl');
+				if( $this->params['link_type'] == 'context' )
+				{	// We want to preserve current browsing context:
+					echo regenerate_url( 'blog,cats,catsel', 'blog='.$curr_blog_ID );
+				}
+				else
+				{
+					blog_list_iteminfo('blogurl');
+				}
 				echo '">';
 				blog_list_iteminfo('name');
 				echo '</a>';
@@ -171,13 +197,15 @@ class categories_plugin extends Plugin
 				echo $params['list_start'];
 				echo cat_children( $cache_categories, $curr_blog_ID, NULL,
 							array( $this, 'callback_before_first' ), array( $this, 'callback_before_each' ),
-							array( $this, 'callback_after_each' ), array( $this, 'callback_after_last' ), 1 );
+							array( $this, 'callback_after_each' ), array( $this, 'callback_after_last' ), 0 );
 				echo $params['list_end'];
 			}
 
 			echo $params['collist_end'];
 		}
 
+		if( $params['form'] )
+		{	// We want to add form fields:
 		?>
 			<span class="line">
 				<input type="radio" name="cat" value="" id="catANY" class="radio" <?php if( $cat_modifier != '-' && $cat_modifier != '*' ) echo 'checked="checked" '?> />
@@ -192,6 +220,7 @@ class categories_plugin extends Plugin
 				<label for="catALL"><?php echo T_('ALL') ?></label>
 			</span>
 		<?php
+		}
 
  		echo $params['block_end'];
 
@@ -212,19 +241,39 @@ class categories_plugin extends Plugin
 		global $tab, $blog, $cat_array, $pagenow;
 		$cat = get_the_category_by_ID( $cat_ID );
 		$r = $this->params['line_start'];
-		$r .= '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'" class="checkbox"';
+
+		if( $this->params['form'] )
+		{	// We want to add form fields:
+			$r .= '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'" class="checkbox"';
+			if( in_array( $cat_ID, $cat_array ) )
+			{ // This category is in the current selection
+				$r .= ' checked="checked"';
+			}
+			$r .= ' /> ';
+		}
+
+		$r .= '<a href="';
+
+		if( $this->params['link_type'] == 'context' )
+		{	// We want to preserve current browsing context:
+			$r .= regenerate_url( 'cats,catsel', 'cat='.$cat_ID );
+		}
+		else
+		{
+			$r .= url_add_param( get_bloginfo('blogurl'), 'cat='.$cat_ID );
+		}
+
+		$r .= '">'.$cat['cat_name'].'</a> <span class="notes">('.$cat['cat_postcount'].')</span>';
+
 		if( in_array( $cat_ID, $cat_array ) )
 		{ // This category is in the current selection
-			$r .= ' checked="checked"';
+			$r .= '*';
 		}
-		$r .= ' /> ';
-		$r .= '<a href="'.$pagenow.'?tab='.$tab.'&amp;blog='.$blog.'&amp;cat='.$cat_ID.'">'.$cat['cat_name']
-					.'</a> <span class="notes">('.$cat['cat_postcount'].')</span>';
-		if( in_array( $cat_ID, $cat_array ) )
-		{ // This category is in the current selection
-			$r .= "*";
+
+		if( $this->params['form'] )
+		{	// We want to add form fields:
+			$r .= '</label>';
 		}
-		$r .= '</label>';
 		return $r;
 	}
 

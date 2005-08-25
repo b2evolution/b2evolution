@@ -74,7 +74,7 @@ $Request->param( 'catsel', 'array', array(), true );  // Array of cats to restri
 // Let's compile those values right away (we use them in several different places):
 $cat_array = array();
 $cat_modifier = '';
-compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $blog );
+compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $blog == 1 ? 0 : $blog );
 
 $Request->param( 'author', 'integer', '', true );         // List of authors to restrict to
 
@@ -357,6 +357,9 @@ if ( $use_memcached )
 
 /*
  * $Log$
+ * Revision 1.14  2005/08/25 19:02:10  fplanque
+ * categories plugin phase 2
+ *
  * Revision 1.13  2005/08/25 16:06:45  fplanque
  * Isolated compilation of categories to use in an ItemList.
  * This was one of the oldest bugs on the list! :>

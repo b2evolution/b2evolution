@@ -322,7 +322,7 @@ class ItemList extends DataObjectList
 		 */
 		// Compile the real category list to use:
 		// TODO: allow to pass the compiled vars diretcly tyo this class
-		compile_cat_array( $this->cat, $this->catsel, /* by ref */ $this->cat_array, /* by ref */ $this->cat_modifier, $this->blog );
+		compile_cat_array( $this->cat, $this->catsel, /* by ref */ $this->cat_array, /* by ref */ $this->cat_modifier, $this->blog == 1 ? 0 : $this->blog );
 
 		if( empty($this->cat_array) )
 		{
@@ -997,6 +997,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.29  2005/08/25 19:02:10  fplanque
+ * categories plugin phase 2
+ *
  * Revision 1.28  2005/08/25 16:06:45  fplanque
  * Isolated compilation of categories to use in an ItemList.
  * This was one of the oldest bugs on the list! :>

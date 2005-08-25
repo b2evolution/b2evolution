@@ -51,7 +51,7 @@ else
 	// Let's compile those values right away (we use them in several different places):
 	$cat_array = array();
 	$cat_modifier = '';
-	compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $Blog->ID );
+	compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $Blog->ID == 1 ? 0 : $Blog->ID );
 
 	$Request->param( 'author', 'string', '', true );     // List of authors to restrict to
 

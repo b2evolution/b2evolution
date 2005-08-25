@@ -148,8 +148,12 @@ echo '<div class="browse_side_item">';
 				'block_start'=>'<fieldset>',
 				'block_end'=>"</fieldset>\n",
 				'title'=>'<legend>'.T_('Categories')."</legend>\n",
-				#'link_type'=>'context', 							// Preserve page context
-				#'form'=>true,                         // add form fields (radio buttons)
+        'collist_start'=>'<ul>',
+				'collist_end'=>"</ul>\n",
+				'coll_start'=>'<li><strong>',
+				'coll_end'=>"</strong></li>\n",
+				'link_type'=>'context', 							// Preserve page context
+				'form'=>true,                         // add form fields (radio buttons)
 			)	);
 
 
@@ -185,6 +189,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.11  2005/08/25 19:02:10  fplanque
+ * categories plugin phase 2
+ *
  * Revision 1.10  2005/08/25 17:45:19  fplanque
  * started categories plugin
  *

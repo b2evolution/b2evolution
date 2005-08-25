@@ -245,16 +245,11 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		</form>
 	</div>
 
-	<div class="bSideItem">
-		<h3><?php echo T_('Categories') ?></h3>
-		<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ) ) ?>
-		<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
-			require( dirname(__FILE__).'/_categories.php' );
-			// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
-		<br />
-		<input type="submit" class="submit" value="<?php echo T_('Get selection') ?>" />
-		</form>
-	</div>
+
+	<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
+		// Call the Archives plugin:
+		$Plugins->call_by_code( 'evo_Cats', array() );
+		// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
 
 
 	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
