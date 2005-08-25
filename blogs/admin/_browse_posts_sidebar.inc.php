@@ -140,105 +140,17 @@ echo '<div class="browse_side_item">';
 				'limit'=>'',                          // No limit
 				'more_link'=>'',                      // No more link
 			)	);
-		?>
-
-		<fieldset>
-			<legend><?php echo T_('Categories') ?></legend>
-			<ul>
-			<?php
-			$cat_line_start = '<li>';
-			$cat_line_end = '</li>';
-			$cat_group_start = '<ul>';
-			$cat_group_end = '</ul>';
-			# When multiple blogs are listed on same page:
-			$cat_blog_start = '<li><strong>';
-			$cat_blog_end = '</strong></li>';
 
 
-			// ----------------- START RECURSIVE CAT LIST ----------------
-			cat_query( true );	// make sure the caches are loaded
-			if( ! isset( $cat_array ) ) $cat_array = array();
-			function cat_list_before_first( $parent_cat_ID, $level )
-			{ // callback to start sublist
-				global $cat_group_start;
-				$r = '';
-				if( $level > 0 ) $r .= "\n".$cat_group_start."\n";
-				return $r;
-			}
-			function cat_list_before_each( $cat_ID, $level )
-			{ // callback to display sublist element
-				global $tab, $blog, $cat_array, $cat_line_start, $pagenow;
-				$cat = get_the_category_by_ID( $cat_ID );
-				$r = $cat_line_start;
-				$r .= '<label><input type="checkbox" name="catsel[]" value="'.$cat_ID.'" class="checkbox"';
-				if( in_array( $cat_ID, $cat_array ) )
-				{ // This category is in the current selection
-					$r .= ' checked="checked"';
-				}
-				$r .= ' /> ';
-				$r .= '<a href="'.$pagenow.'?tab='.$tab.'&amp;blog='.$blog.'&amp;cat='.$cat_ID.'">'.$cat['cat_name']
-							.'</a> <span class="notes">('.$cat['cat_postcount'].')</span>';
-				if( in_array( $cat_ID, $cat_array ) )
-				{ // This category is in the current selection
-					$r .= "*";
-				}
-				$r .= '</label>';
-				return $r;
-			}
-			function cat_list_after_each( $cat_ID, $level )
-			{ // callback to display sublist element
-				global $cat_line_end;
-				return $cat_line_end."\n";
-			}
-			function cat_list_after_last( $parent_cat_ID, $level )
-			{ // callback to end sublist
-				global $cat_group_end;
-				$r = '';
-				if( $level > 0 ) $r .= $cat_group_end."\n";
-				return $r;
-			}
-
-			if( $blog > 1 )
-			{ // We want to display cats for one blog
-				echo cat_children( $cache_categories, $blog, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 0 );
-			}
-			else
-			{ // We want to display cats for all blogs
-				for( $curr_blog_ID=blog_list_start('stub');
-							$curr_blog_ID!=false;
-							 $curr_blog_ID=blog_list_next('stub') )
-				{
-
-					echo $cat_blog_start;
-					?>
-					<a href="<?php blog_list_iteminfo('blogurl') ?>"><?php blog_list_iteminfo('name') ?></a>
-					<?php
-					echo $cat_blog_end;
-
-					// run recursively through the cats
-					echo cat_children( $cache_categories, $curr_blog_ID, NULL, 'cat_list_before_first', 'cat_list_before_each', 'cat_list_after_each', 'cat_list_after_last', 1 );
-				}
-			}
-			// ----------------- END RECURSIVE CAT LIST ----------------
-			?>
-			</ul>
-
-			<?php $cat_modifier = substr( $cat, 0, 1 ) ?>
-			<span class="line">
-				<input type="radio" name="cat" value="" id="catANY" class="radio" <?php if( $cat_modifier != '-' && $cat_modifier != '*' ) echo 'checked="checked" '?> />
-				<label for="catANY"><?php echo T_('ANY') ?></label>
-			</span>
-			<span class="line">
-				<input type="radio" name="cat" value="-" id="catANYBUT" class="radio" <?php if( $cat_modifier == '-' ) echo 'checked="checked" '?> />
-				<label for="catANYBUT"><?php echo T_('ANY BUT') ?></label>
-			</span>
-			<span class="line">
-				<input type="radio" name="cat" value="*" id="catALL" class="radio" <?php if( $cat_modifier == '*' ) echo 'checked="checked" '?> />
-				<label for="catALL"><?php echo T_('ALL') ?></label>
-			</span>
-
-		</fieldset>
-		<?php
+		// CATEGORIES:
+		// Call the Categories plugin:
+		$Plugins->call_by_code( 'evo_Cats', array( // Parameters follow:
+				'block_start'=>'<fieldset>',
+				'block_end'=>"</fieldset>\n",
+				'title'=>'<legend>'.T_('Categories')."</legend>\n",
+				#'link_type'=>'context', 							// Preserve page context
+				#'form'=>true,                         // add form fields (radio buttons)
+			)	);
 
 
 		/*
@@ -255,7 +167,7 @@ echo '<div class="browse_side_item">';
 			{
 				echo '<li><input type="radio" name="author" value="'.$loop_Obj->ID.'" class="radio"';
 				if( $loop_Obj->ID == $author ) echo ' checked="checked"';
-				echo '> <a href="'.$pagenow.'?tab='.$tab.'&amp;blog='.$blog.'&amp;author='.$loop_Obj->ID.'">';
+				echo '> <a href="'.regenerate_url( 'author', 'author='.$loop_Obj->ID, $pagenow ).'">';
 				$loop_Obj->prefered_name();
 				echo '</a></li>';
 			}
@@ -273,6 +185,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.10  2005/08/25 17:45:19  fplanque
+ * started categories plugin
+ *
  * Revision 1.9  2005/08/24 18:43:09  fplanque
  * Removed public stats to prevent spamfests.
  * Added context browsing to Archives plugin.

@@ -52,9 +52,6 @@ class calendar_plugin extends Plugin
 	var $author = 'The b2evo Group';
 	var $help_url = 'http://b2evolution.net/';
 
-	/**
-	 * Variables below MAY be overriden.
-	 */
 
 
 	/**

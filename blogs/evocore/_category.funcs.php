@@ -533,21 +533,37 @@ function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache
 			{ // this cat is in the blog and is a child of the parent
 				if( $child_count++ == 0 )
 				{ // this is the first child
+					if( is_array( $callback_before_first ) )
+  					$r .= $callback_before_first[0]->{$callback_before_first[1]}( $parent_ID, $level );
+					else
 						$r .= $callback_before_first( $parent_ID, $level );
 				}
-				if( $callback_before_each( $icat_ID, $level ) === true )
+
+				if( is_array( $callback_before_each ) )
+					$r2 = $callback_before_each[0]->{$callback_before_each[1]}( $icat_ID, $level );
+				else
+					$r2 = $callback_before_each( $icat_ID, $level );
+				if( $r2 === true )
 				{	// callback function has requested that we stop recursing for this branch
 					continue;
 				}
-				$r .= $callback_before_each( $icat_ID, $level );
+				$r .= $r2;
+
 				$r .= cat_children( $ccats, $blog_ID, $icat_ID, $callback_before_first, $callback_before_each,
 														$callback_after_each, $callback_after_last, $level+1 );
-				$r .= $callback_after_each( $icat_ID, $level );
+
+  			if( is_array( $callback_after_each ) )
+					$r .= $callback_after_each[0]->{$callback_after_each[1]}( $icat_ID, $level );
+				else
+					$r .= $callback_after_each( $icat_ID, $level );
 			}
 		}
 		if( $child_count )
 		{ // There have been children
-			$r .= $callback_after_last( $parent_ID, $level );
+			if( is_array( $callback_after_last ) )
+				$r .= $callback_after_last[0]->{$callback_after_last[1]}( $parent_ID, $level );
+			else
+				$r .= $callback_after_last( $parent_ID, $level );
 		}
 	}
 
@@ -909,6 +925,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.20  2005/08/25 17:45:19  fplanque
+ * started categories plugin
+ *
  * Revision 1.19  2005/08/25 16:06:45  fplanque
  * Isolated compilation of categories to use in an ItemList.
  * This was one of the oldest bugs on the list! :>
