@@ -281,7 +281,7 @@ if ( $response == null )
 else
 {
 	$BlogCache = & $response;
-//		$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
+//	$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
 //	$ItemCache = & new ItemCache();
 //	$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
 //	$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
@@ -528,6 +528,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.44  2005/08/26 16:52:58  fplanque
+ * no message
+ *
  * Revision 1.43  2005/08/23 00:08:16  blueyed
  * Added debug level "login". Unsetting $login
  *

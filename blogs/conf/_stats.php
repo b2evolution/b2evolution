@@ -137,6 +137,7 @@ $user_agents = array(
 	array('robot', 'Googlebot/', 'Google (Googlebot)' ),
 	array('robot', 'Slurp/', 'Inktomi (Slurp)' ),
 	array('robot', 'Yahoo! Slurp;', 'Yahoo (Slurp)' ),
+	array('robot', 'msnbot/', 'MSN Search (msnbot)' ),
 	array('robot', 'Frontier/',	'Userland (Frontier)' ),
 	array('robot', 'ping.blo.gs/', 'blo.gs' ),
 	array('robot', 'organica/',	'Organica' ),
