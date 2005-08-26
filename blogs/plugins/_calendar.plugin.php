@@ -135,8 +135,8 @@ class calendar_plugin extends Plugin
 
 
 		$Calendar = & new Calendar( $Blog->ID, (empty($calendar) ? $m : $calendar), $show_statuses, $timestamp_min, $timestamp_max );
-		// TODO: add $dbtable, $dbprefix, $dbIDname );
 
+		
 		// TODO: automate with a table inside of Calendatr object. Table should also contain descriptions and default values to display in help screen.
 		if( isset($params['displaycaption']) ) $Calendar->set( 'displaycaption', $params['displaycaption'] );
 		if( isset($params['monthformat']) ) $Calendar->set( 'monthformat', $params['monthformat'] );

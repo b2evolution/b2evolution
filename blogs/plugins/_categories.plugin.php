@@ -64,6 +64,10 @@ class categories_plugin extends Plugin
 	{
 		$this->short_desc = T_('This skin tag displays the list of avilable categories for the blog.');
 		$this->long_desc = T_('Categories are indeed chapters and sub-chapters in the blog.');
+
+ 		$this->dbtable = 'T_posts';
+		$this->dbprefix = 'post_';
+		$this->dbIDname = 'ID';
 	}
 
 
@@ -139,8 +143,10 @@ class categories_plugin extends Plugin
 		// Save params for others functions:
 		$this->params = $params;
 
+
 		// make sure the caches are loaded:
-		cat_query( true );
+		cat_query( true, $this->dbtable, $this->dbprefix, $this->dbIDname );
+
 
 		// START DISPLAY:
 		echo $params['block_start'];

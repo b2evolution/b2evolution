@@ -137,17 +137,15 @@ class Calendar
 		$m = '',
 		$show_statuses = array(),
 		$timestamp_min = '',
-		$timestamp_max = 'now',
-		$dbtable = 'T_posts',
-		$dbprefix = 'post_',
-		$dbIDname = 'ID' )
+		$timestamp_max = 'now' )
 	{
 		global $Settings;
 
 		$this->blog = $blog;
-		$this->dbtable = $dbtable;
-		$this->dbprefix = $dbprefix;
-		$this->dbIDname = $dbIDname;
+
+		$this->dbtable = 'T_posts';
+		$this->dbprefix = 'post_';
+		$this->dbIDname = 'ID';
 
 		// Find out which month to display:
 		if( empty($m) )
@@ -193,7 +191,7 @@ class Calendar
 		/**
 		 * @var array Used to narrow posts (status, blog)
 		 */
-		$this->where_narrow = ' AND '.statuses_where_clause( $show_statuses, $dbprefix );
+		$this->where_narrow = ' AND '.statuses_where_clause( $show_statuses, $this->dbprefix );
 
 		// Do we need to restrict categories:
 		if( $blog > 1 )
@@ -835,6 +833,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.16  2005/08/26 17:52:02  fplanque
+ * abstraction
+ *
  * Revision 1.15  2005/08/26 16:15:08  fplanque
  * made the whole calendar contextual (wow am I happy about this functionality! :)
  *

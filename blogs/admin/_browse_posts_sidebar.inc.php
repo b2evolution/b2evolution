@@ -47,13 +47,6 @@ echo '<div class="browse_side_item">';
 			'link_type'=>'context', 		// Preserve page context
 		) );
 
-/*
-	// ---------- CALENDAR ----------
-	$Calendar = & new Calendar( $blog, ( empty($calendar) ? $m : $calendar ), '',
-															$timestamp_min, $timestamp_max, $dbtable, $dbprefix, $dbIDname );
-	$Calendar->display( $pagenow, 'tab='.$tab.'&amp;blog='.$blog );
-*/
-
 	if( $Blog->get( 'notes' ) )
 	{
 		echo '<h3>'.T_('Notes').'</h3>';
@@ -138,6 +131,7 @@ echo '<div class="browse_side_item">';
 		<?php
 		$Form->end_fieldset();
 
+
 		// ARCHIVES:
 		// Call the Archives plugin:
 		$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
@@ -198,6 +192,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.13  2005/08/26 17:52:02  fplanque
+ * abstraction
+ *
  * Revision 1.12  2005/08/26 16:15:08  fplanque
  * made the whole calendar contextual (wow am I happy about this functionality! :)
  *
