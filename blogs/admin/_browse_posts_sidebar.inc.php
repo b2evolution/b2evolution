@@ -38,15 +38,24 @@ echo '<div class="browse_side_item">';
 
 	echo '<h2>'.$Blog->dget( 'name', 'htmlbody' ).'</h2>';
 
+	// CALENDAR:
+	// Call the Calendar plugin:
+	$Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
+			'block_start'=>'',
+			'block_end'=>'',
+			'title'=>'',								// No title.
+			'link_type'=>'context', 		// Preserve page context
+		) );
+
+/*
 	// ---------- CALENDAR ----------
 	$Calendar = & new Calendar( $blog, ( empty($calendar) ? $m : $calendar ), '',
 															$timestamp_min, $timestamp_max, $dbtable, $dbprefix, $dbIDname );
-	$Calendar->set( 'browseyears', 1 );  // allow browsing years in the calendar's caption
-	$Calendar->set( 'navigation', 'tfoot' );
 	$Calendar->display( $pagenow, 'tab='.$tab.'&amp;blog='.$blog );
+*/
 
-	if( isset( $Blog ) && ( $Blog->get( 'notes' ) ) )
-	{ // We might use this file outside of a blog...
+	if( $Blog->get( 'notes' ) )
+	{
 		echo '<h3>'.T_('Notes').'</h3>';
 		$Blog->disp( 'notes', 'htmlbody' );
 	}
@@ -189,6 +198,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.12  2005/08/26 16:15:08  fplanque
+ * made the whole calendar contextual (wow am I happy about this functionality! :)
+ *
  * Revision 1.11  2005/08/25 19:02:10  fplanque
  * categories plugin phase 2
  *

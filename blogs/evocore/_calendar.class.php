@@ -40,6 +40,8 @@
  * @author cafelog (team)
  *
  * @todo Optimize queries! (cache)
+ * @todo move a lot of stuff to the calendar plugin, but keep a Calendar class to display generic calendars.
+ * The plugin would need to prefill an array with the values.
  *
  * @version $Id$
  */
@@ -111,6 +113,9 @@ class Calendar
 	 * @access protected
 	 */
 	var $todayIsVisible;
+
+
+	var $link_type;
 
 
 	/**
@@ -275,6 +280,10 @@ class Calendar
 		$this->postcount_year_atitle = T_('%d posts'); 							// in archive links title tag
 		$this->postcount_year_atitle_one = T_('1 post'); 						// in archive links title tag
 		/**#@-*/
+
+		// Link type:
+		$this->link_type = 'canonic';
+
 	}
 
 
@@ -293,19 +302,12 @@ class Calendar
 	 * Display the calendar.
 	 *
 	 * @todo If a specific day (mode == month) or month (mode == year) is selected, apply another class (default to some border)
-	 *
-	 * @uses archive_link()
-	 * @param string file to use for links
-	 * @param string GET params for file
 	 */
-	function display( $file = '', $params = '' )
+	function display()
 	{
 		global $DB;
 		global $weekday, $weekday_abbrev, $weekday_letter, $month, $month_abbrev;
 		global $Settings;
-
-		$this->file = $file;
-		$this->params = $params;
 
 		if( $this->mode == 'month' )
 		{
@@ -432,7 +434,7 @@ class Calendar
 			{ // MONTH CAPTION:
 				if( $this->linktomontharchive )
 				{ // chosen month with link to archives
-					echo '<a href="'.archive_link( $this->year, $this->month, '', '', false, $this->file, $this->params ).'" title="'.T_('go to month\'s archive').'">';
+					echo '<a href="'.$this->archive_link( $this->year, $this->month, '', '' ).'" title="'.T_('go to month\'s archive').'">';
 				}
 
 				echo date_i18n($this->monthformat, mktime(0, 0, 0, $this->month, 1, $this->year));
@@ -505,8 +507,8 @@ class Calendar
 			else
 			{
 				echo '<td colspan="'.( $this->mode == 'month' ? '3' : '2' ).'" class="center"><a href="'
-							.archive_link( date('Y'), ( $this->mode == 'month' ? date('m') : '' ), '', '', false, $this->file, $this->params )
-							.'">'.T_('Today') // TODO: not really "Today", but where today is included.. better name? title attrib..
+							.$this->archive_link( date('Y'), ( $this->mode == 'month' ? date('m') : '' ), '', '' )
+							.'">'.T_('Current')
 							.'</a></td>';
 			}
 			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->todayIsVisible ).'" id="next">';
@@ -534,9 +536,7 @@ class Calendar
 					{
 						echo $this->linkpostcellstart;
 					}
-					echo '<a href="';
-					archive_link( $this->year, $i, '', '', true, $this->file, $this->params );
-					echo '"';
+					echo '<a href="'.$this->archive_link( $this->year, $i, '', '' ).'"';
 					if( $monthswithposts[ $i ] > 1 && !empty($this->postcount_year_atitle) )
 					{ // display postcount
 						echo ' title="'.sprintf($this->postcount_year_atitle, $monthswithposts[ $i ]).'"';
@@ -616,9 +616,7 @@ class Calendar
 						{
 							echo $this->linkpostcellstart;
 						}
-						echo '<a href="';
-						archive_link( $this->year, $this->month, date('d',$i), '', true, $this->file, $this->params );
-						echo '"';
+						echo '<a href="'.$this->archive_link( $this->year, $this->month, date('d',$i), '' ).'"';
 						if( $daysinmonthwithposts[ date('j', $i) ] > 1 && !empty($this->postcount_month_atitle) )
 						{ // display postcount
 							echo ' title="'.sprintf($this->postcount_month_atitle, $daysinmonthwithposts[ date('j', $i) ]).'"';
@@ -667,6 +665,41 @@ class Calendar
 	}  // display(-)
 
 
+	/**
+	 * Create a link to archive, using either URL params or extra path info.
+	 *
+	 * Can make contextual links.
+	 *
+	 * @param string year
+	 * @param string month
+	 * @param string day
+	 * @param string week
+	 */
+	function archive_link( $year, $month, $day = '', $week = '' )
+	{
+		if( $this->link_type == 'context' )
+		{	// We want to preserve context:
+			$url_params = 'm='.$year;
+			if( !empty( $month ) )
+			{
+				$url_params .= zeroise($month,2);
+				if( !empty( $day ) )
+				{
+					$url_params .= zeroise($day,2);
+				}
+			}
+			elseif( $week !== '' )  // Note: week # can be 0 !
+			{
+				$url_params .= '&amp;w='.$week;
+			}
+			return regenerate_url( 'm,w', $url_params );
+		}
+		else
+		{	// We want a canonic link:
+			return archive_link( $year, $month, $day, $week, false );
+		}
+	}
+
 
 	/**
 	 * Get links to navigate between month / year.
@@ -695,7 +728,7 @@ class Calendar
 					)
 				{
 					$r[] = '<a href="'
-									.archive_link( $row->year, ($this->mode == 'month') ? $row->month : '', '', '', false, $this->file, $this->params )
+									.$this->archive_link( $row->year, ($this->mode == 'month') ? $row->month : '', '', '' )
 									.'" title="'.sprintf(
 																( $this->mode == 'month'
 																		? /* Calendar link title to a month in a previous year with posts */ T_('Previous year (%04d-%02d)')
@@ -728,7 +761,7 @@ class Calendar
 																				'Calendar: Find prev month with posts' ) ) )
 				{
 					$r[] = '<a href="'
-									.archive_link( $row->year, $row->month, '', '', false, $this->file, $this->params )
+									.$this->archive_link( $row->year, $row->month, '', '' )
 									.'" title="'.sprintf( T_('Previous month (%04d-%02d)'), $row->year, $row->month ).'">&lt;</a>';
 				}
 				else
@@ -759,7 +792,7 @@ class Calendar
 																				'Calendar: Find next month with posts' ) ) )
 				{
 					$r[] = '<a href="'
-									.archive_link( $row->year, $row->month, '', '', false, $this->file, $this->params )
+									.$this->archive_link( $row->year, $row->month, '', '' )
 									.'" title="'.sprintf( T_('Next month (%04d-%02d)'), $row->year, $row->month ).'">&gt;</a>';
 				}
 				else
@@ -779,7 +812,7 @@ class Calendar
 					)
 				{
 					$r[] = '<a href="'
-									.archive_link( $row->year, ($this->mode == 'month') ? $row->month : '', '', '', false, $this->file, $this->params )
+									.$this->archive_link( $row->year, ($this->mode == 'month') ? $row->month : '', '', '' )
 									.'" title="'.sprintf(
 																( $this->mode == 'month'
 																		? /* Calendar link title to a month in a following year with posts */ T_('Next year (%04d-%02d)')
@@ -802,6 +835,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.15  2005/08/26 16:15:08  fplanque
+ * made the whole calendar contextual (wow am I happy about this functionality! :)
+ *
  * Revision 1.14  2005/08/25 11:02:11  fplanque
  * moved calendar to a skintag plugin
  *

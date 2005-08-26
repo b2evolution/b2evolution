@@ -110,6 +110,7 @@ class calendar_plugin extends Plugin
 	 *                - 'postcount_year_cell_one'
 	 *                - 'postcount_year_atitle'
 	 *                - 'postcount_year_atitle_one'
+	 *                - 'link_type' : 'canonic'|'context' (default: canonic)
 	 * @return boolean did we display?
 	 */
 	function SkinTag( $params )
@@ -132,7 +133,9 @@ class calendar_plugin extends Plugin
 		if(!isset($params['title']))
 			$params['title'] = '<h3>'.T_('Calendar').'</h3>';
 
+
 		$Calendar = & new Calendar( $Blog->ID, (empty($calendar) ? $m : $calendar), $show_statuses, $timestamp_min, $timestamp_max );
+		// TODO: add $dbtable, $dbprefix, $dbIDname );
 
 		// TODO: automate with a table inside of Calendatr object. Table should also contain descriptions and default values to display in help screen.
 		if( isset($params['displaycaption']) ) $Calendar->set( 'displaycaption', $params['displaycaption'] );
@@ -169,6 +172,8 @@ class calendar_plugin extends Plugin
 		if( isset($params['postcount_year_cell_one']) ) $Calendar->set( 'postcount_year_cell_one', $params['postcount_year_cell_one'] );
 		if( isset($params['postcount_year_atitle']) ) $Calendar->set( 'postcount_year_atitle', $params['postcount_year_atitle'] );
 		if( isset($params['postcount_year_atitle_one']) ) $Calendar->set( 'postcount_year_atitle_one', $params['postcount_year_atitle_one'] );
+		// Link type:
+		if( isset($params['link_type']) ) $Calendar->set( 'link_type', $params['link_type'] );
 
 		echo $params['block_start'];
 
