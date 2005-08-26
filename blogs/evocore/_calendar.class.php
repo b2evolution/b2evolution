@@ -207,14 +207,14 @@ class Calendar
 		if( !empty($timestamp_min) )
 		{ // Hide posts before
 			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
-			$where_time[] = $dbprefix.'datestart >= \''.$date_min.'\'';
+			$where_time[] = $this->dbprefix.'datestart >= \''.$date_min.'\'';
 		}
 
 		if( $timestamp_max == 'now' ) $timestamp_max = time();
 		if( !empty($timestamp_max) )
 		{ // Hide posts after
 			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
-			$where_time[] = $dbprefix.'datestart <= \''.$date_max.'\'';
+			$where_time[] = $this->dbprefix.'datestart <= \''.$date_max.'\'';
 		}
 		$this->where_time = $where_time ? (' AND '.implode( ' AND ', $where_time)) : '';
 
@@ -833,6 +833,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.17  2005/08/26 18:41:31  fplanque
+ * bugfix
+ *
  * Revision 1.16  2005/08/26 17:52:02  fplanque
  * abstraction
  *
