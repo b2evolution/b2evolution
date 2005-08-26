@@ -56,7 +56,7 @@ echo '<div class="NavBar">';
 	 */
 
 	// Display title depending on selection params:
-	request_title( '<h2>', '</h2>', '<br />', 'htmlbody', true, true, 'b2browse.php', 'blog='.$blog );
+	request_title( '<h2>', '</h2>', '<br />', 'htmlbody', true, false /* does not handle context */ );
 
 	if( !$posts )
 	{
@@ -214,6 +214,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.10  2005/08/26 16:34:51  fplanque
+ * no message
+ *
  * Revision 1.9  2005/08/17 21:01:34  fplanque
  * Selection of multiple authors with (-) option.
  * Selection of multiple categories with (-) and (*) options.

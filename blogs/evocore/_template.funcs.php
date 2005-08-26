@@ -67,6 +67,7 @@ function imgbase()
  * @todo single month: Respect locales datefmt
  * @todo single post: posts do no get proper checking (wether they are in the requested blog or wether their permissions match user rights,
  * thus the title sometimes gets displayed even when it should not. We need to pre-query the ItemList instead!!
+ * @todo make it complete with all possible params!
  *
  * @param string prefix to display if a title is generated
  * @param string suffix to display if a title is generated
@@ -78,7 +79,7 @@ function imgbase()
 function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'htmlbody',
 												$display = true, $linktoyeararchive = true, $blogurl = '', $params = '' )
 {
-	global $cat_modifier, $cat_array, $m, $w, $month, $p, $title, $preview, $ItemCache, $disp;
+	global $cat_modifier, $cat_array, $m, $w, $month, $p, $title, $preview, $ItemCache, $disp, $s, $author;
 
 	$r = array();
 
@@ -131,7 +132,8 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			}
 			else
 			{	// Multiple messages...
-			
+
+				// CATEGORIES:
 				if( !empty($cat_array) )
 				{ // We have requested specific categories...
 					$cat_names = array();
@@ -164,41 +166,58 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 						}
 					}
 				}
-			}			
 
-			if( !empty($m) )
-			{	// We have asked for a specific timeframe:
-			
-				$my_year = substr($m,0,4);
-				if( strlen($m) > 4 )
-				{ // We have requested a month too:
-					$my_month = T_($month[substr($m,4,2)]);
+
+				// TIMEFRAME:
+				if( !empty($m) )
+				{	// We have asked for a specific timeframe:
+
+					$my_year = substr($m,0,4);
+					if( strlen($m) > 4 )
+					{ // We have requested a month too:
+						$my_month = T_($month[substr($m,4,2)]);
+					}
+					else
+					{
+						$my_month = '';
+					}
+					// Requested a day?
+					$my_day = substr($m,6,2);
+
+					if( $format == 'htmlbody' && !empty( $my_month ) && $linktoyeararchive )
+					{ // display year as link to year's archive
+						$my_year = '<a href="' . archive_link( $my_year, '', '', '', false, $blogurl, $params ) . '">' . $my_year . '</a>';
+					}
+
+					$arch = T_('Archives for').': '.$my_month.' '.$my_year;
+
+					if( !empty( $my_day ) )
+					{	// We also want to display a day
+						$arch .= ", $my_day";
+					}
+
+					if( !empty($w) && ($w>=0) ) // Note: week # can be 0
+					{	// We also want to display a week number
+						$arch .= ", week $w";
+					}
+
+					$r[] = $arch;
 				}
-				else
+
+
+				// KEYWORDS:
+				if( !empty($s) )
 				{
-					$my_month = '';
+					$r[] = T_('Keyword(s)').': '.$s;
 				}
-				// Requested a day?
-				$my_day = substr($m,6,2);
-		
-				if( $format == 'htmlbody' && !empty( $my_month ) && $linktoyeararchive )
-				{ // display year as link to year's archive
-					$my_year = '<a href="' . archive_link( $my_year, '', '', '', false, $blogurl, $params ) . '">' . $my_year . '</a>';
+
+
+				// AUTHORS:
+				if( !empty($author) )
+				{
+					$r[] = T_('Author(s)').': '.$author;
 				}
-		
-				$arch = T_('Archives for').': '.$my_month.' '.$my_year;
-		
-				if( !empty( $my_day ) )
-				{	// We also want to display a day
-					$arch .= ", $my_day";
-				}
-		
-				if( !empty($w) && ($w>=0) ) // Note: week # can be 0
-				{	// We also want to display a week number
-					$arch .= ", week $w";
-				}
-				
-				$r[] = $arch;
+
 			}
 	}
 
@@ -289,6 +308,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.10  2005/08/26 16:34:51  fplanque
+ * no message
+ *
  * Revision 1.9  2005/08/25 16:06:45  fplanque
  * Isolated compilation of categories to use in an ItemList.
  * This was one of the oldest bugs on the list! :>
