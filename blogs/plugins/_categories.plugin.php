@@ -139,6 +139,8 @@ class categories_plugin extends Plugin
 		// Save params for others functions:
 		$this->params = $params;
 
+		// make sure the caches are loaded:
+		cat_query( true );
 
 		// START DISPLAY:
 		echo $params['block_start'];

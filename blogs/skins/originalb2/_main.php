@@ -203,11 +203,13 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 
 <p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
 
-<h4>categories:</h4>
-<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ) ) ?>
-<?php	require( dirname(__FILE__).'/_categories.php' ); ?>
-<input type="submit" value="<?php echo T_('Get selection') ?>" />
-</form>
+
+<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
+	// Call the Categories plugin:
+	$Plugins->call_by_code( 'evo_Cats', array(	// Add parameters below:
+			'title'=>'<h4>'.T_('categories').':</h4>',
+		) );
+	// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
 
 
 <h4>search:</h4>

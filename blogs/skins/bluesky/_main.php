@@ -180,23 +180,23 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	require( dirname(__FILE__).'/_bloglist.php' );
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 
-<div id=categories>
-<h4>Categories&nbsp;:</h4>
-<!-- ========== START OF CATEGORIES ========== -->
-<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ) ) ?>
-<?php	require( dirname(__FILE__).'/_categories.php'); ?>
-<input type="submit" value="<?php echo T_('Get selection') ?>" />
-<input type="reset" value="<?php echo T_('Reset form') ?>" />
-</form>
-<!-- ========== END OF CATEGORIES ========== -->
-</div>
+
+<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
+	// Call the Categories plugin:
+	$Plugins->call_by_code( 'evo_Cats', array(	// Add parameters below:
+			'block_start'=>'<div id=categories>',
+			'block_end'=>'</div>',
+			'title'=>'<h4>'.T_('Categories').'&nbsp;:</h4>',
+		) );
+	// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
+
 
 <h4>Search&nbsp;:</h4>
 <?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), '', '', 'get', 'searchform' ) ?>
 	<input id="rechercher" size="15" name="s" />
 	<input type="submit" value="envoyer" name="submit" />
 </form>
-
+<br />
 
 <?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), '', '', 'get', 'switcher' ) ?>
 	<fieldset><label for=set><h4><?php echo T_('Choose a skin') ?>&nbsp;:</h4></label>

@@ -147,12 +147,17 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 		require( dirname(__FILE__).'/_linkblog.php' );
 		// -------------------------------- END OF LINKBLOG ---------------------------------- ?>
 
- <li id="categories"><?php echo T_('Categories'); ?>:
-	<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
-		require( dirname(__FILE__).'/_categories.php' );
-		// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
- </li>
 
+	<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
+		// Call the Categories plugin:
+		$Plugins->call_by_code( 'evo_Cats', array(	// Add parameters below:
+				'block_start'=>'<li id="categories">',
+				'block_end'=>'<li>',
+				'title'=>T_('categories').' :',
+			) );
+		// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
+
+		
  <li id="search">
    <label for="s"><?php echo T_('Search') ?>:</label>
 	<?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), '', 'searchform' ) ?>

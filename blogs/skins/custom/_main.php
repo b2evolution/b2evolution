@@ -247,14 +247,16 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 
 	<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
-		// Call the Archives plugin:
-		$Plugins->call_by_code( 'evo_Cats', array() );
+		// Call the Categories plugin:
+		$Plugins->call_by_code( 'evo_Cats', array(	// Add parameters below:
+			) );
 		// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
 
 
 	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
 		// Call the Archives plugin:
-		$Plugins->call_by_code( 'evo_Arch', array() );
+		$Plugins->call_by_code( 'evo_Arch', array(	// Add parameters below:
+			) );
 		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
 
 
