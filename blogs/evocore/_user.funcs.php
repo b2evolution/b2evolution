@@ -65,12 +65,7 @@ function logout()
 	// Note: unset is bugguy on globals
 	$current_User = false;
 
-	setcookie( 'cafeloguser' );		// OLD
-	setcookie( 'cafeloguser', '', $cookie_expired, $cookie_path, $cookie_domain); // OLD
 	setcookie( $cookie_user, '', $cookie_expired, $cookie_path, $cookie_domain);
-
-	setcookie( 'cafelogpass' );		// OLD
-	setcookie( 'cafelogpass', '', $cookie_expired, $cookie_path, $cookie_domain);	// OLD
 	setcookie( $cookie_pass, '', $cookie_expired, $cookie_path, $cookie_domain);
 }
 
@@ -407,6 +402,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.26  2005/08/26 14:17:15  fplanque
+ * removed obsolete cookie cleaners
+ *
  * Revision 1.25  2005/08/22 18:43:34  blueyed
  * Handle non-existing user in user_pass_ok() correctly.
  *
