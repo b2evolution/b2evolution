@@ -447,9 +447,25 @@ class Blog extends DataObject
 					return $r;
 				}
 
+			case 'basehost':
+				$baseurl = $this->get('baseurl');
+				if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $baseurl, $matches ) )
+				{
+					$baseurlroot = $matches[1];
+					// echo "baseurlroot=$baseurlroot <br />";
+					$basehost = $matches[2];
+					// echo "basehost=$basehost <br />";
+				}
+				else
+				{
+					die( 'Your baseurl ('.$baseurl.') set in _config.php seems invalid. You probably missed the "http://" prefix or the trailing slash. Please correct that.' );
+				}
+				return $basehost;
+
 			case 'cookie_domain':
-				preg_match( '#(https?://(.+?)(:.+?)?)/#', $this->get('baseurl'), $match );
-				return '.'.$match[2];
+				$basehost = $this->get('basehost');
+				// Note: we need special treatment for localhost!
+				return ($basehost == 'localhost') ? '' : '.'. $basehost;
 
 			case 'cookie_path':
 				return preg_replace( '#https?://[^/]+#', '', $this->get('baseurl') );
@@ -708,6 +724,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2005/08/26 14:29:29  fplanque
+ * fixed cookie domains for localhost (needed to remember the current skin)
+ *
  * Revision 1.25  2005/08/24 18:43:09  fplanque
  * Removed public stats to prevent spamfests.
  * Added context browsing to Archives plugin.
