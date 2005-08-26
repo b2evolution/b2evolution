@@ -9,72 +9,77 @@
 	<img src="../blogs/img/b2evolution_logo_360.gif" alt="b2evolution" />
 	<p>Only public releases are listed here.</p>
 
-	<h2>&quot;phoenix&quot; - CVS</h2>
-	<ul>
-		<li>Mailing list Subscriptions for new posts and/or new comments (fplanque) </li>
-		<li>Extended group permissions (fplanque)</li>
-		<li>Added experimental memcached support. Use at your own risk! Change $use_memcached in conf/advanced.php to activate. Requires phpca memcached client and memcached server. See <a href="http://www.danga.com/memcached/">Memcached Homepage</a> for more info.</li>
-		<li>New URL parameter 'dstart' allows to start browsing at specified date (same fprmat as 'm'). useful with unit = 'days'.</li>
-		<li>New URL parameter 'unit' allows overriding of configuration to select what to display: 'posts' or 'days' (fplanque)</li>
-		<li>Slightly enhanced week handling (weeks start on sunday or monday depending on user locale) (requires MySQL >= 4) (fplanque)</li>
-		<li>Added options to allow a blog stylesheet or a user stylesheet to override the skin stylesheet. Only the "custom" skin works with the options at the moment. Other skins must be modified.  (edgester)</li>
-		<li>Email form to contact authors without revealing their email address (jeffbearer, blueyed, fplanque)</li>
-		<li>Who's online? (jeffbearer, blueyed, fplanque)</li>
-		<li>Counting number of views for each item (template tag $Item->views()) (jeffbearer, blueyed, fplanque)</li>
-		<li>Improved hit logging (fplanque)</li> <!-- TODO: hit class / hitlog class / DB refactoring (blueyed) -->
-		<li>Subpaths now include trailing slashes (that was another odd b2 legacy...) (blueyed, fplanque)</li>
-		<li>User profile validity checking (fplanque, blueyed)</li>
-		<li>Stats enhanced with Flash charts (fplanque)</li>
-		<li>Paged display in antispam (fplanque)</li>
-		<li>Lost password: sends a (login-)link to allow password changing instead of new password (blueyed)</li>
-		<li>Multiple domain support (blueyed, fplanque)</li>
-<!-- TODO: (cookie/admin) Debugging! -->
-<li>Filemanager (blueyed)</li>
-<!-- TODO: permissions, file/copy/rename, image handling,  -->
-
-		<li>New setting in the blog's advanced tab for choosing the comment's policy on a per blog basis. You can now choose if you want to allow comments on a blog, if you want to be able to disable them on each post, or if you don't want any comments at all (gorgeb)</li>
-<li>Blog permissions presets; Member, Editor, Admin (blueyed, fplanque)</li>
-<li>Group based blog permissions (halton)</li>
-<!-- TODO: custom mode -->
-
-		<li>Post extensions (fplanque)
-			<ul>
-				<li>Extra status</li>
-<li>Post type</li>
-<li>Popup calendar for dates</li>
-<li>Assigned to</li>
-<li>Priority</li>
-<li>Deadline</li>
-</ul>
-</li>
-<li>Alternative backoffice layout(s) (fplanque)</li>
-<li>evoCore abstraction (fplanque)</li>
-<li>Day at the start of the week moved to properties of the locales (blueyed)</li>
-<li>Post editing extensions:
+	<h2>&quot;phoenix&quot; - CVS / ALPHA release </h2>
+<p>The main focus of this new version was to remove the b2 legacy code from the evoCore framework in order to move to a more stable, reliable and scalable architecture (with Objects and all the rest...). This was mostly behind the scenes work without immediate features to show off for gratification. However, the new evoCore now allows to add functionnality more quickly and more efficiently.</p>
+<p>Anyway, there are already quite a few new features available: </p>
 <ul>
-<li>Deprecate now function (fplanque) </li>
+	<li>File manager (blueyed)</li>
+	<li>Multiple domain support (blueyed, fplanque) (TODO: (cookie/admin) Debugging!)</li>
+	<li>Mailing lists: Subscriptions for new posts and/or new comments (fplanque)</li>
+	<li>Who's online? (jeffbearer, blueyed, fplanque)</li>
+	<li>Email form to contact authors without revealing their email address (jeffbearer, blueyed, fplanque)</li>
+	<li>Paged display in antispam (fplanque)</li>
+	<li>Improved hit logging (bluyed, fplanque)</li>
+	<li>Stats enhanced with Flash charts (fplanque)</li>
+	<li>Added options to allow a blog stylesheet or a user stylesheet to override the skin stylesheet.  (edgester) (TODO: Only the "custom" skin works with the options at the moment. Other skins must be modified.)</li>
+	<li>Lost password: sends a link to allow password changing instead of generating a new password right away (blueyed)</li>
+	<li>New setting in the blog's advanced tab for choosing the comment's policy on a per blog basis. You can now choose if you want to allow comments on a blog, if you want to be able to disable them on each post, or if you don't want any comments at all (gorgeb)</li>
+	<li>Post editing extensions:
+		<ul>
+			<li>Alternative backoffice layout(s) (fplanque) (TODO: get this out of the conf files and make it available in the UI).</li>
+			<li>&quot;Deprecate now&quot; function (fplanque) </li>
+		</ul>
+	<li>Post browsing extensions:
+		<ul>
+			<li>Browse by author (fplanque) </li>
+			<li>Calendar: Links to next/prev month/year are only provided if there are posts in that direction (blueyed)</li>
+			<li>Fixed ability to select multiple authors at once (via URL params) (fplanque) </li>
+			<li>Added ability to combine categories in search (fplanque) </li>
+			<li>New URL parameter 'dstart' allows to start browsing at specified date (same fprmat as 'm'). useful with unit = 'days'.</li>
+			<li>New URL parameter 'unit' allows overriding of configuration to select what to display: 'posts' or 'days' (fplanque)</li>
+			<li>Slightly enhanced week handling (weeks start on sunday or monday depending on user locale) (requires MySQL >= 4) (fplanque)</li>
+		</ul>
+	</li>
+	<li>Post extensions (fplanque)
+		<ul>
+			<li>Extra status</li>
+			<li>Post type</li>
+			<li>Popup calendar for dates</li>
+			<li>Assigned to</li>
+			<li>Priority</li>
+			<li>Deadline</li>
+			<li>Counting number of views for each item (template tag $Item->views()) (jeffbearer, blueyed, fplanque)</li>
+		</ul>
+	</li>
+	<li>Permissions:
+		<ul>
+			<li>Group based blog permissions (halton)</li>
+			<li>Extended group permissions (fplanque)</li>
+			<li>Blog permissions presets; Member, Editor, Admin (blueyed, fplanque)</li>
+		</ul>
+	</li>
+	<li>Packaged plugins:
+		<ul>
+			<li>Wacko markup plugin (fplanque)</li>
+			<li>WikiLinks plugin (fplanque)</li>
+			<li>LDAP authentification plugin (blueyed) (TODO: finish)</li>
+			<li>&quot;poplog&quot; (change name) plugin (blueyed)</li>
+			<li>Some previously built-in features have been moved to plugins (fplanque)</li>
+		</ul>
+	</li>
+	<li>Code:
+		<ul>
+			<li>Day at the start of the week moved to properties of the locales (blueyed)</li>
+			<li>Subpaths now include trailing slashes (that was another odd b2 legacy...) (blueyed, fplanque)</li>
+			<li>User profile validity checking (fplanque, blueyed)</li>
+		</ul>
+	</li>
+	<li>Experimental:
+		<ul>
+			<li>Added experimental memcached support. Use at your own risk! Change $use_memcached in conf/advanced.php to activate. Requires phpca memcached client and memcached server. See <a href="http://www.danga.com/memcached/">Memcached Homepage</a> for more info.</li>
+		</ul>
+	</li>
 </ul>
-</li>
-<li>Post browsing extensions:
-<ul>
-<li>Browse by author (fplanque) </li>
-<li>Calendar: Links to next/prev month/year are only provided if there are posts in that direction (blueyed)</li>
-<li>Fixed ability to select multiple authors at once (via URL params) (fplanque) </li>
-<li>Added ability to combine categories in search (fplanque) </li>
-</ul>
-</li>
-<li>Packaged plugins:
-<ul>
-<li>Wacko markup plugin (fplanque)</li>
-<li>WikiLinks plugin (fplanque)</li>
-<li>LDAP authentification plugin (blueyed)</li>
-<!-- TODO: finish -->
-<li>&quot;poplog&quot; (change name) plugin (blueyed)</li>
-<!-- TODO: finish.. could need plugin settings! -->
-</ul>
-</li>
-</ul>
-
 
 	<h2>0.9.0.11 "Paris"</h2>
 	<ul>
