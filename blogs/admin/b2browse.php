@@ -111,6 +111,29 @@ else
 
 }
 
+// Update Menus:
+$AdminUI->addMenuEntries(
+		'edit',
+		array(
+						'postlist' => array(
+							'text' => T_('Post list'),
+							'href' => regenerate_url( 'tab', 'tab=postlist' ),
+							//'href' => 'b2browse.php?tab=postlist&amp;blog='.$blog ),
+							),
+						'posts' => array(
+							'text' => T_('Full posts'),
+							'href' => regenerate_url( 'tab', 'tab=posts' ),
+							//'href' => 'b2browse.php?tab=posts&amp;blog='.$blog ),
+							),
+					/*	'commentlist' => array(
+							'text' => T_('Comment list'),
+							'href' => 'b2browse.php?tab=commentlist&amp;blog='.$blog ),
+						'comments' => array(
+							'text' => T_('Comments'),
+							'href' => 'b2browse.php?tab=comments&amp;blog='.$blog ), */
+				)
+	);
+
 
 $AdminUI->setPath( 'edit', $tab );
 

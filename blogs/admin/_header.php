@@ -53,18 +53,7 @@ $AdminUI->addMenuEntries(
 									'href'=>'b2browse.php?blog='.$blog,
 									'style'=>'font-weight: bold;',
 									'entries' => array(
-										'postlist' => array(
-											'text' => T_('Post list'),
-											'href' => 'b2browse.php?tab=postlist&amp;blog='.$blog ),
-										'posts' => array(
-											'text' => T_('Full posts'),
-											'href' => 'b2browse.php?tab=posts&amp;blog='.$blog ),
-									/*	'commentlist' => array(
-											'text' => T_('Comment list'),
-											'href' => 'b2browse.php?tab=commentlist&amp;blog='.$blog ),
-										'comments' => array(
-											'text' => T_('Comments'),
-											'href' => 'b2browse.php?tab=comments&amp;blog='.$blog ), */
+										// Entries will be added here dynamically (and CONTEXTTUALLY) on the browsing page.
 									)
 								),
 
