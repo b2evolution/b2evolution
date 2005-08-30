@@ -2026,7 +2026,7 @@ class Form extends Widget
 						.( !empty($this->_common_params['id'])
 							? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
 							: '' )
-						.'">'
+						.'>'
 						.$this->_common_params['label']
 						.$this->label_suffix
 						.'</label>'
