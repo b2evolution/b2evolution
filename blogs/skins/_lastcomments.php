@@ -20,7 +20,7 @@
 		return false;		// Nothing to do here!
 	}
 
-	$CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'DESC',	'',	20 );
+	$CommentList = & new CommentList( $blog, "'comment','trackback','pingback'", $show_statuses, '',	'',	'DESC',	'',	20 );
 
 	$CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No comment yet...').'</p></div>' );
 

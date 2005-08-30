@@ -194,8 +194,7 @@
 			<tr valign="top" bgcolor="#eeeeee">
 				<td align="right"><label for="comment"><strong><?php echo T_('Comment text') ?>:</strong></label></td>
 				<td align="left" width="450"><textarea cols="50" rows="12" name="comment" id="comment" tabindex="4"></textarea><br />
-					<small><?php echo T_('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?><br />
-					<?php echo T_('URLs, email, AIM and ICQs will be converted automatically.') ?></small>
+					<small><?php echo T_('Allowed XHTML tags'), ': ', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?></small>
 				</td>
 			</tr>
 

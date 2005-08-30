@@ -281,7 +281,8 @@ while( $Item = $MainList->get_item() )
 						</div>
 				</fieldset>
 			<?php
-			$Form->textarea( 'comment', '', 12, T_('Comment text'), T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)).'<br />'.T_('URLs, email, AIM and ICQs will be converted automatically.'), 40, 'bComment' );
+			$Form->textarea( 'comment', '', 12, T_('Comment text'),
+												T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), 40, 'bComment' );
 
 			if(substr($comments_use_autobr,0,4) == 'opt-')
 			{
@@ -343,6 +344,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.103  2005/08/30 18:26:04  fplanque
+ * comment spam issues
+ *
  * Revision 1.102  2005/08/22 18:42:25  fplanque
  * minor
  *

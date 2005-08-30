@@ -145,8 +145,7 @@
 		?>
 		<h2 id="postcomment"><?php echo T_('Leave a comment') ?></h2>
 
-		<p><?php echo T_('Allowed XHTML tags'), ': <code>', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?></code><br />
-		<?php echo T_('URLs, email, AIM and ICQs will be converted automatically.') ?></p>
+		<p><?php echo T_('Allowed XHTML tags'), ': <code>', htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)) ?></code></p>
 
 		<?php
 			$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';

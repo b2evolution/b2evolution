@@ -264,7 +264,7 @@ class Comment extends DataObject
 		if( strlen( $url ) > 10 )
 		{ // If URL exists:
 			echo $before;
-			if( $makelink ) echo '<a href="'.$url.'">';
+			if( $makelink ) echo '<a href="'.$url.'" rel="nofollow">';
 			echo ($linktext != '') ? $linktext : $url;
 			if( $makelink ) echo '</a>';
 			echo $after;
@@ -630,6 +630,9 @@ class Comment extends DataObject
 }
 /*
  * $Log$
+ * Revision 1.13  2005/08/30 18:26:04  fplanque
+ * comment spam issues
+ *
  * Revision 1.12  2005/08/09 15:22:40  fplanque
  * no message
  *

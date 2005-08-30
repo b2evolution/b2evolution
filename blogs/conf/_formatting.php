@@ -404,7 +404,7 @@ $allowed_uri_scheme = array
 
 # here is a list of the tags that are allowed in the comments.
 # all tags not in this list will be filtered out anyway before we do any checking
-$comment_allowed_tags = '<p><ul><ol><li><dl><dt><dd><address><blockquote><ins><del><a><span><bdo><br><em><strong><dfn><code><samp><kdb><var><cite><abbr><acronym><q><sub><sup><tt><i><b><big><small>';
+$comment_allowed_tags = '<p><ul><ol><li><dl><dt><dd><address><blockquote><ins><del><span><bdo><br><em><strong><dfn><code><samp><kdb><var><cite><abbr><acronym><q><sub><sup><tt><i><b><big><small>';
 
 // Allowed Entity classes
 define('C_E_special_pre', 'br span bdo');
@@ -466,7 +466,7 @@ $comments_allowed_tags += array
 (
 	'ins' => C_E_Flow,
 	'del' => C_E_Flow,
-	'a' => C_E_a_content,
+//	'a' => C_E_a_content,  // Allowing this will call for a whole lot of comment spam!!!
 	'span' => C_E_Iinline,
 	'bdo' => C_E_Iinline,
 	'br' => '',
