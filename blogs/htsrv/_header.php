@@ -26,7 +26,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 <div style="float:left"><h1 class="logintitle"><a href="http://b2evolution.net/"><img src="../img/b2evolution_minilogo.png" width="231" height="50" alt="b2evolution" /></a></h1></div>
 
 <?php if( isset($page_icon) ) { ?>
-<img src="<?php echo $htsrv_url.'rsc/icons/'.$page_icon ?>" width="24" height="24" style="float:right;" alt="icon" />
+<img src="<?php echo $htsrv_url.'rsc/icons/'.$page_icon ?>" width="24" height="24" style="float:right;" alt="" />
 <?php } ?>
 <div style="float:right">
 <h2 class="logintitle"><?php echo $page_title ?></h2>
