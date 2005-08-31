@@ -637,6 +637,7 @@ class Calendar
 	 * Get links to navigate between month / year.
 	 *
 	 * @todo fplanque>> I think there's a query-waste-fest going on inside here!
+	 * @todo fplanque>> Poor factorization.
 	 *
 	 * @param string 'prev' / 'next'
 	 * @return array
@@ -776,6 +777,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.19  2005/08/31 20:11:55  fplanque
+ * no message
+ *
  * Revision 1.18  2005/08/31 19:08:51  fplanque
  * Factorized Item query WHERE clause.
  * Fixed calendar contextual accuracy.
