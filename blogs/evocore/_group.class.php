@@ -261,6 +261,7 @@ class Group extends DataObject
 		return $perm;
 	}
 
+
 	/**
 	 * Check permission for this group on a set of specified categories
 	 *
@@ -430,6 +431,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2005/08/31 19:06:41  fplanque
+ * minor
+ *
  * Revision 1.12  2005/08/24 14:02:33  fplanque
  * minor changes
  *

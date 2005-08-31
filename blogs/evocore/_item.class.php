@@ -185,7 +185,7 @@ class Item extends DataObject
 												$datecreated_field = 'datecreated', $datemodified_field = 'datemodified',
 												$creator_field = 'creator_user_ID', $lasteditor_field = 'lastedit_user_ID' )
 	{
-		global $UserCache, $object_def, $localtimenow, $default_locale;
+		global $UserCache, $object_def, $localtimenow, $default_locale, $current_User;
 
 		$this->priorities = array(
 							1 => T_('1 - Highest'),
@@ -228,6 +228,7 @@ class Item extends DataObject
 		if( $db_row == NULL )
 		{ // New item:
 			$this->ID = 0;
+			$this->Author = & $current_User;
 			$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
 			$this->flags = array();
 			$this->renderers = array();
@@ -2220,6 +2221,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.53  2005/08/31 19:06:41  fplanque
+ * minor
+ *
  * Revision 1.52  2005/08/24 13:40:21  fplanque
  * Changed defaults in order to fix install process.
  *

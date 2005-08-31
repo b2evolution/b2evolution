@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -184,7 +184,7 @@ echo '<div class="browse_side_item">';
 
 
 		$Form->submit( array( 'submit', T_('Search'), 'search' ) );
-		$Form->button( array( 'button', '', T_('Reset'), 'search', 'document.location.href='.$pagenow.'?blog='.$blog.';' ) );
+		$Form->button( array( 'button', '', T_('Full Reset'), 'search', 'document.location.href=\''.$pagenow.'?blog='.$blog.'\';' ) );
 
 	$Form->end_form();
 
@@ -192,6 +192,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.14  2005/08/31 19:06:41  fplanque
+ * minor
+ *
  * Revision 1.13  2005/08/26 17:52:02  fplanque
  * abstraction
  *
