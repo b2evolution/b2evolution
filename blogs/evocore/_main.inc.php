@@ -296,7 +296,7 @@ require_once dirname(__FILE__).'/_calendar.class.php';
 require_once dirname(__FILE__).'/_hitlog.funcs.php';     // referer logging
 require_once dirname(__FILE__).'/_form.funcs.php';
 require_once dirname(__FILE__).'/_form.class.php';
-require_once dirname(__FILE__).'/_sql.class.php';
+require_once dirname(__FILE__).'/_itemquery.class.php';
 require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_swfcharts.php';
 
 /**
@@ -528,6 +528,10 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.45  2005/08/31 19:08:51  fplanque
+ * Factorized Item query WHERE clause.
+ * Fixed calendar contextual accuracy.
+ *
  * Revision 1.44  2005/08/26 16:52:58  fplanque
  * no message
  *

@@ -99,9 +99,8 @@ class calendar_plugin extends Plugin
 	 *                - 'linkposttodaycellstart'
 	 *                - 'todaycellstart'
 	 *                - 'todaycellstartpost'
-	 *                - 'searchframe'
-	 *                - 'browseyears'
-	 *                - 'navigation'
+	 *                - 'navigation' : Where do we want to have the navigation arrows? (Default: 'tfoot')
+	 *                - 'browseyears' : boolean  Do we want arrows to move one year at a time?
 	 *                - 'postcount_month_cell'
 	 *                - 'postcount_month_cell_one'
 	 *                - 'postcount_month_atitle'
@@ -116,11 +115,11 @@ class calendar_plugin extends Plugin
 	function SkinTag( $params )
 	{
 	 	global $Settings, $month;
-	 	global $show_statuses, $timestamp_min, $timestamp_max;
-		/**
-		 * @todo get rid of these globals:
-		 */
-		global $Blog, $calendar, $m;
+		global $blog, $cat, $catsel;
+	 	global $show_statuses;
+	 	global $author;
+	 	global $m, $w, $dstart, $timestamp_min, $timestamp_max;
+	 	global $s, $phrase, $exact;
 
 		/**
 		 * Default params:
@@ -134,7 +133,22 @@ class calendar_plugin extends Plugin
 			$params['title'] = '<h3>'.T_('Calendar').'</h3>';
 
 
-		$Calendar = & new Calendar( $Blog->ID, (empty($calendar) ? $m : $calendar), $show_statuses, $timestamp_min, $timestamp_max );
+		$Calendar = & new Calendar( $m );
+		// CONSTRUCT THE WHERE CLAUSE:
+		// * - - Restrict to selected blog/categories:
+		$Calendar->ItemQuery->where_chapter( $blog, $cat, $catsel );
+
+		// * Restrict to the statuses we want to show:
+		$Calendar->ItemQuery->where_status( $show_statuses );
+
+		// Restrict to selected authors:
+		$Calendar->ItemQuery->where_author( $author );
+
+		// - - - + * * if a month is specified in the querystring, load that month:
+		$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', $dstart, '', $timestamp_min, $timestamp_max );
+
+		// Keyword search stuff:
+		$Calendar->ItemQuery->where_keywords( $s, $phrase, $exact );
 
 		
 		// TODO: automate with a table inside of Calendatr object. Table should also contain descriptions and default values to display in help screen.
@@ -161,9 +175,8 @@ class calendar_plugin extends Plugin
 		if( isset($params['linkposttodaycellstart']) ) $Calendar->set( 'linkposttodaycellstart', $params['linkposttodaycellstart'] );
 		if( isset($params['todaycellstart']) ) $Calendar->set( 'todaycellstart', $params['todaycellstart'] );
 		if( isset($params['todaycellstartpost']) ) $Calendar->set( 'todaycellstartpost', $params['todaycellstartpost'] );
-		if( isset($params['searchframe']) ) $Calendar->set( 'searchframe', $params['searchframe'] );
-		if( isset($params['browseyears']) ) $Calendar->set( 'browseyears', $params['browseyears'] );
 		if( isset($params['navigation']) ) $Calendar->set( 'navigation', $params['navigation'] );
+		if( isset($params['browseyears']) ) $Calendar->set( 'browseyears', $params['browseyears'] );
 		if( isset($params['postcount_month_cell']) ) $Calendar->set( 'postcount_month_cell', $params['postcount_month_cell'] );
 		if( isset($params['postcount_month_cell_one']) ) $Calendar->set( 'postcount_month_cell_one', $params['postcount_month_cell_one'] );
 		if( isset($params['postcount_month_atitle']) ) $Calendar->set( 'postcount_month_atitle', $params['postcount_month_atitle'] );
@@ -174,6 +187,7 @@ class calendar_plugin extends Plugin
 		if( isset($params['postcount_year_atitle_one']) ) $Calendar->set( 'postcount_year_atitle_one', $params['postcount_year_atitle_one'] );
 		// Link type:
 		if( isset($params['link_type']) ) $Calendar->set( 'link_type', $params['link_type'] );
+		if( isset($params['context_isolation']) ) $Calendar->set( 'context_isolation', $params['context_isolation'] );
 
 		echo $params['block_start'];
 

@@ -117,8 +117,6 @@ class ItemList extends DataObjectList
 	/**
 	 * Constructor
 	 *
-	 * {@internal ItemList::ItemList(-)}}
-	 *
 	 * @param integer Blog ID to query
 	 * @param array Restrict to these statuses
 	 * @param mixed Specific post number to display
@@ -214,166 +212,35 @@ class ItemList extends DataObjectList
 		$this->unit = $unit;
 
 		// First let's clear some variables
-		$whichcat = '';
-		$whichauthor = '';
 		$result = '';
 		$where = '';
 		$limits = '';
 		$distinct = '';
 
-		// WE ARE GOING TO CONSTRUCT THE "AND" CLOSE
-		// THIS IS GOING TO LAST FOR MANY MANY LINES...
-
-		// if a month is specified in the querystring, load that month
-		if( $m != '' )
-		{
-			$m = '' . intval($m);
-			$where .= ' AND YEAR('.$this->dbprefix.'datestart)='.intval(substr($m,0,4));
-			if( strlen($m) > 5 )
-				$where .= ' AND MONTH('.$this->dbprefix.'datestart)='.intval(substr($m,4,2));
-			if( strlen($m) > 7 )
-				$where .= ' AND DAYOFMONTH('.$this->dbprefix.'datestart)='.intval(substr($m,6,2));
-			if( strlen($m) > 9 )
-				$where .= ' AND HOUR('.$this->dbprefix.'datestart)='.intval(substr($m,8,2));
-			if( strlen($m) > 11 )
-				$where .= ' AND MINUTE('.$this->dbprefix.'datestart)='.intval(substr($m,10,2));
-			if( strlen($m) > 13 )
-				$where .= ' AND SECOND('.$this->dbprefix.'datestart)='.intval(substr($m,12,2));
-		}
-
-		// If a week number is specified
-		if( !empty($w) && ($w>=0) ) // Note: week # can be 0
-		{
-			$where .= ' AND '.$DB->week( $this->dbprefix.'datestart', locale_startofweek() ).'='.intval($w);
-		}
-
-		// if a post number is specified, load that post
-		if( ($p != '') && ($p != 'all') )
-		{
-			$p = intval($p);
-			$where .= ' AND ID = '. $p;
-		}
-
-		// if a post urltitle is specified, load that post
-		if( !empty( $title ) )
-		{
-			$where .= ' AND post_urltitle = '.$DB->quote($title);
-		}
-
-
 		/*
-		 * ----------------------------------------------------
-		 * Search stuff:
-		 * ----------------------------------------------------
+		 * WE ARE GOING TO CONSTRUCT THE WHERE CLOSE...
 		 */
-		if( !empty($keywords) )
-		{
-			$search = ' AND (';
 
-			if( $exact )
-			{	// We want exact match of title or contents
-				$n = '';
-			}
-			else
-			{ // The words/sentence are/is to be included in in the title or the contents
-				$n = '%';
-			}
+		$this->ItemQuery = new ItemQuery( $this->DataObjectCache->dbtablename, $this->DataObjectCache->dbprefix,
+																			$this->DataObjectCache->dbIDname );	// COPY!!
 
-			if( ($phrase == '1') or ($phrase == 'sentence') )
-			{ // Sentence search
-				$keywords = $DB->escape(trim($keywords));
-				$search .= '('.$this->dbprefix.'title LIKE \''. $n. $keywords. $n. '\') OR ('.$this->dbprefix.'content LIKE \''. $n. $keywords. $n.'\')';
-			}
-			else
-			{ // Word search
-				if( strtoupper( $phrase ) == 'OR' )
-					$swords = 'OR';
-				else
-					$swords = 'AND';
+		// Select a specific Item:
+		$this->ItemQuery->where_ID( $p, $title );
 
-				// puts spaces instead of commas
-				$keywords = preg_replace('/, +/', '', $keywords);
-				$keywords = str_replace(',', ' ', $keywords);
-				$keywords = str_replace('"', ' ', $keywords);
-				$keywords = trim($keywords);
-				$keyword_array = explode(' ',$keywords);
-				$join = '';
-				for ( $i = 0; $i < count($keyword_array); $i++)
-				{
-					$search .= ' '. $join. ' ( ('.$this->dbprefix.'title LIKE \''. $n. $DB->escape($keyword_array[$i]). $n. '\')
-																	OR ('.$this->dbprefix.'content LIKE \''. $n. $DB->escape($keyword_array[$i]). $n.'\') ) ';
-					$join = $swords;
-				}
-			}
+		// Restrict to selected blog/categories:
+		$this->ItemQuery->where_chapter( $blog, $cat, $catsel );
 
-			$search .= ')';
+		// Restrict to the statuses we want to show:
+		$this->ItemQuery->where_status( $show_statuses );
 
-			//echo $search;
-		}
-		else
-		{
-			$search = '';
-		}
+		// Restrict to selected authors:
+		$this->ItemQuery->where_author( $author );
 
-		/*
-		 * ----------------------------------------------------
-		 * Category stuff:
-		 * ----------------------------------------------------
-		 */
-		// Compile the real category list to use:
-		// TODO: allow to pass the compiled vars diretcly tyo this class
-		compile_cat_array( $this->cat, $this->catsel, /* by ref */ $this->cat_array, /* by ref */ $this->cat_modifier, $this->blog == 1 ? 0 : $this->blog );
+		// if a month is specified in the querystring, load that month:
+		$this->ItemQuery->where_datestart( $m, $w, $dstart, '', $timestamp_min, $timestamp_max );
 
-		if( empty($this->cat_array) )
-		{
-			$whichcat = '';
-		}
-		else
-		{	// We want to restict to some cats:
-			if( $this->cat_modifier == '-' )
-			{
-				$eq = 'NOT IN';
-			}
-			else
-			{
-				$eq = 'IN';
-			}
-			$whichcat .= ' AND postcat_cat_ID '. $eq.' ('.implode(',', $this->cat_array). ') ';
-			// Also see GROUP BY later in this file...
-		}
-		// echo $whichcat;
-
-
-		/*
-		 * ----------------------------------------------------
-		 * Author stuff:
-		 * ----------------------------------------------------
-		 */
-		if((empty($author)) || ($author == 'all'))
-		{
-			$whichauthor = '';
-		}
-		else
-		{
-			if( substr($author, 0, 1 ) == '-' )
-			{	// List starts with MINUS sign:
-				$eq = 'NOT IN';
-				$author_list = substr( $author, 1 );
-			}
-			else
-			{
-				$eq = 'IN';
-				$author_list = $author;
-			}
-			// Check that the string is valid (digits and comas only)
-			if( preg_match( '#^[0-9]+(,[0-9]+)*$#', $author_list ) )
-			{	// Okay, there is no sql injection risk
-				$whichauthor = ' AND '.$this->dbprefix.'creator_user_ID '.$eq.' ('.$author_list.')';
-			}
-		}
-
-
-		$where .= $search. $whichcat . $whichauthor;
+		// Keyword search stuff:
+		$this->ItemQuery->where_keywords( $keywords, $phrase, $exact );
 
 
 		/*
@@ -401,21 +268,6 @@ class ItemList extends DataObjectList
 					$orderby .= ', '.$this->dbprefix.$orderby_array[$i]. ' '. $order;
 				}
 			}
-		}
-
-
-		/*
-		 * if a start date is specified in the querystring, crop anything before
-		 */
-		if( !empty($dstart) )
-		{
-			// Add trailing 0s: YYYYMMDDHHMMSS
-			$dstart0 = $dstart.'00000000000000';
-
-			$dstart_mysql = substr($dstart0,0,4).'-'.substr($dstart0,4,2).'-'.substr($dstart0,6,2).' '
-											.substr($dstart0,8,2).':'.substr($dstart0,10,2).':'.substr($dstart0,12,2);
-
-			$where .= ' AND '.$this->dbprefix.'datestart >= \''.$dstart_mysql.'\'';
 		}
 
 
@@ -502,66 +354,25 @@ class ItemList extends DataObjectList
 			die( 'Unhandled LIMITING mode in ItemList (paged mode is obsolete)' );
 
 
-		/*
-		 * ----------------------------------------------------
-		 *	Restrict to the statuses we want to show:
-		 * ----------------------------------------------------
-		 */
-		$where .= ' AND ' . statuses_where_clause( $show_statuses, $this->dbprefix );
-
-		/*
-		 * ----------------------------------------------------
-		 * Timestamp limits:
-		 * ----------------------------------------------------
-		 */
-		if( $timestamp_min == 'now' )
-		{
-			// echo 'hide past';
-			$timestamp_min = time();
-		}
-		if( !empty($timestamp_min) )
-		{ // Hide posts before
-			// echo 'hide before '.$timestamp_min;
-			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
-			$where .= ' AND '.$this->dbprefix.'datestart >= \''. $date_min.'\'';
-		}
-
-		if( $timestamp_max == 'now' )
-		{
-			// echo 'hide future';
-			$timestamp_max = time();
-		}
-		if( !empty($timestamp_max) )
-		{ // Hide posts after
-			// echo 'after';
-			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
-			$where .= ' AND '.$this->dbprefix.'datestart <= \''. $date_max.'\'';
-		}
-
-
-
-
 
 		$this->sql = 'SELECT DISTINCT '.implode( ', ', $object_def[ $this->objType ]['db_cols'] )
 								.' FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
 												INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 
-		if( $this->blog == 1 )
-		{ // Special case: we aggregate all cats from all blogs
-			$this->sql .= 'WHERE 1 ';
+
+		if( !empty($this->ItemQuery->where) )
+		{
+			$this->sql .= 'WHERE '.$this->ItemQuery->where;
 		}
 		else
 		{
-			$this->sql .= 'WHERE cat_blog_ID = '. $this->blog;
+			$this->sql .= 'WHERE 1 ';
 		}
-
 		$this->sql .= $where;
 
-		if( $this->cat_modifier == '*' && count($this->cat_array) )
-		{ // We want the categories combined! (i-e posts must be in ALL requested cats)
-			//echo 'combining now';
-			$this->sql .= ' GROUP BY '.$this->dbIDname.'
-											HAVING COUNT(*) = '.count($this->cat_array).' ';
+		if( !empty($this->ItemQuery->group_by) )
+		{
+			$this->sql .= ' GROUP BY '.$this->ItemQuery->group_by;
 		}
 
  		$this->sql .= ' ORDER BY '.$this->dbprefix.$orderby.' '.$limits;
@@ -997,6 +808,10 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.30  2005/08/31 19:08:51  fplanque
+ * Factorized Item query WHERE clause.
+ * Fixed calendar contextual accuracy.
+ *
  * Revision 1.29  2005/08/25 19:02:10  fplanque
  * categories plugin phase 2
  *

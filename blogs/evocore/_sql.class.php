@@ -47,6 +47,7 @@ class SQL
 	var $group_by = '';
 	var $order_by = '';
 
+
 	/**
 	 * Constructor.
 	 */
@@ -54,22 +55,58 @@ class SQL
 	{
 	}
 
+
+  /**
+	 * Get whole query
+	 */
 	function get()
 	{
 		$sql = '';
 		if( !empty($this->select) ) $sql .= ' SELECT '.$this->select;
 		if( !empty($this->from) ) $sql .= ' FROM '.$this->from;
-		if( !empty($this->where) ) $sql .= ' WHERE '.$this->where;
-		if( !empty($this->group_by) ) $sql .= ' GROUP BY '.$this->group_by;
+		$sql .= $this->get_where();
+		$sql .= $this->get_group_by();
 		if( !empty($this->order_by) ) $sql .= ' ORDER BY '.$this->order_by;
 		return $sql;
 	}
 
 
+  /**
+	 * Get WHERE clause if there is something inside
+	 */
+	function get_where( $prefix = ' WHERE ' )
+	{
+		if( !empty($this->where) )
+		{
+			return $prefix.$this->where;
+		}
+
+		return '';
+	}
+
+
+  /**
+	 * Get GROUP BY clause if there is something inside
+	 */
+	function get_group_by( $prefix = ' GROUP BY ' )
+	{
+		if( !empty($this->group_by) )
+		{
+			return $prefix.$this->group_by;
+		}
+
+		return '';
+	}
+
+
+  /**
+	 * Set SELECT clause
+	 */
 	function SELECT( $select )
 	{
 		$this->select = $select;
 	}
+
 
 	/**
 	 * Extends the SELECT clause.
@@ -139,6 +176,10 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.3  2005/08/31 19:08:51  fplanque
+ * Factorized Item query WHERE clause.
+ * Fixed calendar contextual accuracy.
+ *
  * Revision 1.2  2005/07/26 18:58:00  fplanque
  * minor
  *

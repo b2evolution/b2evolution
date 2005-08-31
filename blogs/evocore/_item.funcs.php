@@ -685,13 +685,17 @@ function bpost_count_words($string)
 /**
  * Construct the where clause to limit retrieved posts on their status
  *
- * {@internal statuses_where_clause(-)}}
- *
  * @param Array statuses of posts we want to get
  */
-function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
+function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_', $req_blog = NULL )
 {
 	global $current_User, $blog;
+
+	if( is_null($req_blog ) )
+	{
+		global $blog;
+		$req_blog = $blog;
+	}
 
 	if( empty($show_statuses) )
 		$show_statuses = array( 'published', 'protected', 'private' );
@@ -712,8 +716,8 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_' )
 	if( $key = array_search( 'protected', $show_statuses ) )
 	{ // Special handling for Protected status:
 		if( (!is_logged_in())
-			|| ($blog == 0) // No blog specified (ONgsb)
-			|| (!$current_User->check_perm( 'blog_ismember', 1, false, $blog )) )
+			|| ($req_blog == 0) // No blog specified (ONgsb)
+			|| (!$current_User->check_perm( 'blog_ismember', 1, false, $req_blog )) )
 		{ // we are not allowed to see this if we are not a member of the current blog:
 			unset( $show_statuses[$key] );
 		}
@@ -928,6 +932,10 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.26  2005/08/31 19:08:51  fplanque
+ * Factorized Item query WHERE clause.
+ * Fixed calendar contextual accuracy.
+ *
  * Revision 1.25  2005/08/24 14:02:33  fplanque
  * minor changes
  *

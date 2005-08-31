@@ -54,9 +54,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 class Calendar
 {
-	var $blog;
 	var $year, $month;
-	var $specific;					// WE ASKED FOR A SPECIFIC MONTH
 
 	var $mode;  						// 'month' or 'year'
 
@@ -99,8 +97,6 @@ class Calendar
 
 	var $emptycellcontent;
 
-	var $searchframe;
-
 	/**
 	 * Do we want to browse years in the caption? True by default for mode == year,
 	 * false for mode == month (gets set in constructor).
@@ -116,6 +112,7 @@ class Calendar
 
 
 	var $link_type;
+	var $context_isolation;
 
 
 	/**
@@ -123,29 +120,19 @@ class Calendar
 	 *
 	 * Constructor
 	 *
-	 * @param int Blog ID
 	 * @param string Month ('YYYYMM'), year ('YYYY'), current ('')
-	 * @param array
-	 * @param string Do not show posts _before_ this timestamp.
-	 * @param string Do not show posts _after_ this timestamp.
-	 * @param string DB table name to use.
-	 * @param string Column name prefix.
-	 * @param string Name of the DB ID.
 	 */
-	function Calendar(
-		$blog = 1,
-		$m = '',
-		$show_statuses = array(),
-		$timestamp_min = '',
-		$timestamp_max = 'now' )
+	function Calendar( $m = '' )
 	{
 		global $Settings;
-
-		$this->blog = $blog;
 
 		$this->dbtable = 'T_posts';
 		$this->dbprefix = 'post_';
 		$this->dbIDname = 'ID';
+
+		// OBJECT THAT WILL BE USED TO CONSTRUCT THE WHERE CLAUSE:
+		$this->ItemQuery = new ItemQuery( $this->dbtable, $this->dbprefix, $this->dbIDname );	// COPY!!
+
 
 		// Find out which month to display:
 		if( empty($m) )
@@ -158,7 +145,6 @@ class Calendar
 		}
 		else
 		{
-			$this->specific = true;
 			$this->year = substr($m, 0, 4);
 			if (strlen($m) < 6)
 			{ // no month provided
@@ -181,42 +167,6 @@ class Calendar
 
 			$this->todayIsVisible = ( $this->month == date('m') && $this->year == date('Y') );
 		}
-
-		// CONSTRUCT THE WHERE CLAUSE:
-		/*
-		 * ----------------------------------------------------
-		 *  Restrict to the statuses we want to show:
-		 * ----------------------------------------------------
-		 */
-		/**
-		 * @var array Used to narrow posts (status, blog)
-		 */
-		$this->where_narrow = ' AND '.statuses_where_clause( $show_statuses, $this->dbprefix );
-
-		// Do we need to restrict categories:
-		if( $blog > 1 )
-		{ // Blog #1 aggregates all
-			$this->where_narrow .= ' AND cat_blog_ID = '.$blog;
-		}
-
-
-		$where_time = array();
-
-		// Restrict to timestamp limits:
-		if( $timestamp_min == 'now' ) $timestamp_min = time();
-		if( !empty($timestamp_min) )
-		{ // Hide posts before
-			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
-			$where_time[] = $this->dbprefix.'datestart >= \''.$date_min.'\'';
-		}
-
-		if( $timestamp_max == 'now' ) $timestamp_max = time();
-		if( !empty($timestamp_max) )
-		{ // Hide posts after
-			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
-			$where_time[] = $this->dbprefix.'datestart <= \''.$date_max.'\'';
-		}
-		$this->where_time = $where_time ? (' AND '.implode( ' AND ', $where_time)) : '';
 
 
 		// Default styling:
@@ -254,14 +204,13 @@ class Calendar
 		$this->todaycellstart = '<td id="bCalendarToday">';
 		$this->todaycellstartpost = '<td id="bCalendarToday" class="bCalendarLinkPost">';
 
-		$this->searchframe = 12;	// How many month will we search back for a post before we give up
-
-		if( is_null( $this->browseyears ) )
-		{
-			$this->browseyears = ($this->mode == 'year');  // browsing years from Calendar's navigation
-		}
-
+		// Where do we want to have the navigation arrows?
 		$this->navigation = 'tfoot';
+		// Do we want to check if there are posts behind the navigation arrows?
+		// WARNING: this will slow things down...
+		// TODO: $this->check_navigation = false;
+		// Do we want arrows to move one year at a time?
+		$this->browseyears = ($this->mode == 'year');
 
 		/**#@+
 		 * Display number of posts with days/months
@@ -281,6 +230,7 @@ class Calendar
 
 		// Link type:
 		$this->link_type = 'canonic';
+		$this->context_isolation = 'm,w,p,title,unit,dstart';
 
 	}
 
@@ -311,50 +261,34 @@ class Calendar
 		{
 			$end_of_week = ((locale_startofweek() + 7) % 7);
 
-			// Find a month with posts
-			$searchmonth = $this->month;
-			$searchyear = $this->year;
-			for( $i = 0; $i < $this->searchframe; $i++ )
+			// fplanque>> note: I am removing the searchframe thing because 1) I don't think it's of any use
+			// and 2) it's brutally inefficient! If someone needs this it should be implemented with A SINGLE
+			// QUERY which gets the last available post (BTW, I think there is already a function for that somwhere)
+
+			$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.') AS item_count,
+													YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart),
+													DAYOFMONTH('.$this->dbprefix.'datestart) AS myday
+									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+										INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+									WHERE YEAR('.$this->dbprefix.'datestart) = "'.$this->year.'"
+										AND MONTH('.$this->dbprefix.'datestart) = "'.$this->month.'"
+										'.$this->ItemQuery->get_where( ' AND ' ).'
+									GROUP BY myday '.$this->ItemQuery->get_group_by( ', ' ).'
+									ORDER BY '.$this->dbprefix.'datestart DESC';
+			// echo $arc_sql;
+			// echo $this->ItemQuery->where;
+			$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
+
+			foreach( $arc_result as $arc_row )
 			{
-				$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.') AS item_count,
-														YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart),
-														DAYOFMONTH('.$this->dbprefix.'datestart) AS myday
-										FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
-											INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-										WHERE MONTH('.$this->dbprefix.'datestart) = "'.$searchmonth.'"
-											AND YEAR('.$this->dbprefix.'datestart) = "'.$searchyear.'" '
-											.$this->where_narrow
-											.$this->where_time.'
-										GROUP BY myday
-										ORDER BY '.$this->dbprefix.'datestart DESC';
-				$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
-
-				if( $DB->num_rows > 0 )
-				{ // OK we have a month with posts!
-					foreach( $arc_result as $arc_row )
-					{
-						$daysinmonthwithposts[ $arc_row['myday'] ] = $arc_row['item_count'];
-					}
-					$this->month = $searchmonth;
-					$this->year = $searchyear;
-					break; // Don't search any further!
+				if( !isset( $daysinmonthwithposts[ $arc_row['myday'] ] ) )
+				{
+					$daysinmonthwithposts[ $arc_row['myday'] ] = 0;
 				}
-				elseif ($this->specific)
-				{ // No post, but we asked for a specific month to be displayed
-					break; // Don't search any further!
-				}
-				else
-				{ // No, post, let's search in previous month!
-					$searchmonth = zeroise(intval($searchmonth)-1,2);
-					if ($searchmonth == '00')
-					{ // handle year change
-						$searchmonth = '12';
-						$searchyear = ''.(intval($searchyear)-1);
-					}
-				}
+				// The '+' soituation actually only happens when we have a complex GROUP BY above
+				// (multiple categories wcombined with "ALL")
+				$daysinmonthwithposts[ $arc_row['myday'] ] += $arc_row['item_count'];
 			}
-
-			// echo $this->month,'.',$this->year;
 
 			$daysinmonth = intval(date('t', mktime(0, 0, 0, $this->month, 1, $this->year)));
 			// echo 'days in month=', $daysinmonth;
@@ -690,7 +624,7 @@ class Calendar
 			{
 				$url_params .= '&amp;w='.$week;
 			}
-			return regenerate_url( 'm,w', $url_params );
+			return regenerate_url( $this->context_isolation, $url_params );
 		}
 		else
 		{	// We want a canonic link:
@@ -701,6 +635,8 @@ class Calendar
 
 	/**
 	 * Get links to navigate between month / year.
+	 *
+	 * @todo fplanque>> I think there's a query-waste-fest going on inside here!
 	 *
 	 * @param string 'prev' / 'next'
 	 * @return array
@@ -714,33 +650,35 @@ class Calendar
 		switch( $direction )
 		{
 			case 'prev':
-				if( $this->browseyears
-						&& ( $row = $DB->get_row( 'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
-																							MONTH('.$this->dbprefix.'datestart) AS month
-																				FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
-																					INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-																				WHERE YEAR('.$this->dbprefix.'datestart) < '.$this->year.'
-																				'.$this->where_narrow.'
-																				ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
-																				LIMIT 1', OBJECT, 0, 'Calendar: find prev year with posts' ) )
-					)
-				{
-					$r[] = '<a href="'
-									.$this->archive_link( $row->year, ($this->mode == 'month') ? $row->month : '', '', '' )
-									.'" title="'.sprintf(
-																( $this->mode == 'month'
-																		? /* Calendar link title to a month in a previous year with posts */ T_('Previous year (%04d-%02d)')
-																		: /* Calendar link title to a previous year with posts */ T_('Previous year (%04d)') ),
-																$row->year, $row->month )
-									.'">&lt;&lt;</a>';
+				if( $this->browseyears )
+				{	// We want arrows to move one year at a time
+					if( $row = $DB->get_row( 'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
+																								MONTH('.$this->dbprefix.'datestart) AS month
+																					FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+																						INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+																					WHERE YEAR('.$this->dbprefix.'datestart) < '.$this->year.'
+																					'.$this->ItemQuery->get_where( ' AND ' )
+																					.$this->ItemQuery->get_group_by( ' GROUP BY ' ).'
+																					ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
+																					LIMIT 1', OBJECT, 0, 'Calendar: find prev year with posts' )
+						)
+					{
+						$r[] = '<a href="'
+										.$this->archive_link( $row->year, ($this->mode == 'month') ? $row->month : '', '', '' )
+										.'" title="'.sprintf(
+																	( $this->mode == 'month'
+																			? /* Calendar link title to a month in a previous year with posts */ T_('Previous year (%04d-%02d)')
+																			: /* Calendar link title to a previous year with posts */ T_('Previous year (%04d)') ),
+																	$row->year, $row->month )
+										.'">&lt;&lt;</a>';
+					}
+ 					else $r[] = '';
 				}
-				else
-				{
-					$r[] = '';
-				}
+				else $r[] = '';
 
-				if( $this->mode == 'month'
-						&& ( $row = $DB->get_row( 'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
+				if( $this->mode == 'month' )
+				{ // We are browsing months, we'll display arrows to move one month at a time:
+					if( $row = $DB->get_row( 'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
 																								YEAR('.$this->dbprefix.'datestart) AS year
 																				FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 																					INNER JOIN T_categories ON postcat_cat_ID = cat_ID
@@ -751,27 +689,31 @@ class Calendar
 																								AND MONTH('.$this->dbprefix.'datestart) < '.($this->month).'
 																							)
 																				)
-																				'.$this->where_narrow.'
+                     										'.$this->ItemQuery->get_where( ' AND ' )
+ 																				 .$this->ItemQuery->get_group_by( ' GROUP BY ' ).'
 																				ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, MONTH('.$this->dbprefix.'datestart) DESC
 																				LIMIT 1',
 																				OBJECT,
 																				0,
-																				'Calendar: Find prev month with posts' ) ) )
-				{
-					$r[] = '<a href="'
-									.$this->archive_link( $row->year, $row->month, '', '' )
-									.'" title="'.sprintf( T_('Previous month (%04d-%02d)'), $row->year, $row->month ).'">&lt;</a>';
+																				'Calendar: Find prev month with posts' )
+						)
+					{
+						$r[] = '<a href="'
+										.$this->archive_link( $row->year, $row->month, '', '' )
+										.'" title="'.sprintf( T_('Previous month (%04d-%02d)'), $row->year, $row->month ).'">&lt;</a>';
+					}
+					else $r[] = '';
 				}
-				else
-				{
-					$r[] = '';
-				}
+				else $r[] = '';
 				break;
 
 
 			case 'next':
-				if( $this->mode == 'month'
-						&& ( $row = $DB->get_row( 'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
+				$r[] = '';
+
+				if( $this->mode == 'month' )
+				{ // We are browsing months, we'll display arrows to move one month at a time:
+					if( $row = $DB->get_row( 'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
 																								YEAR('.$this->dbprefix.'datestart) AS year
 																				FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 																					INNER JOIN T_categories ON postcat_cat_ID = cat_ID
@@ -782,47 +724,48 @@ class Calendar
 																								AND MONTH('.$this->dbprefix.'datestart) > '.($this->month).'
 																							)
 																				)
-																				'.$this->where_narrow.'
+                     										'.$this->ItemQuery->get_where( ' AND ' )
+ 																				 .$this->ItemQuery->get_group_by( ' GROUP BY ' ).'
 																				ORDER BY YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart) ASC
 																				LIMIT 1',
 																				OBJECT,
 																				0,
-																				'Calendar: Find next month with posts' ) ) )
-				{
-					$r[] = '<a href="'
-									.$this->archive_link( $row->year, $row->month, '', '' )
-									.'" title="'.sprintf( T_('Next month (%04d-%02d)'), $row->year, $row->month ).'">&gt;</a>';
+																				'Calendar: Find next month with posts' )
+						)
+					{
+						$r[] = '<a href="'
+										.$this->archive_link( $row->year, $row->month, '', '' )
+										.'" title="'.sprintf( T_('Next month (%04d-%02d)'), $row->year, $row->month ).'">&gt;</a>';
+					}
+					else $r[] = '';
 				}
-				else
-				{
-					$r[] = '';
-				}
+				else $r[] = '';
 
-				if( $this->browseyears
-						&& ( $row = $DB->get_row( 'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
+				if( $this->browseyears )
+				{ // We want arrows to move one year at a time
+					if( $row = $DB->get_row( 'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
 																							MONTH('.$this->dbprefix.'datestart) AS month
 																				FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 																					INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 																				WHERE YEAR('.$this->dbprefix.'datestart) > '.$this->year.'
-																				'.$this->where_narrow.'
+                     										'.$this->ItemQuery->get_where( ' AND ' )
+																				 .$this->ItemQuery->get_group_by( ' GROUP BY ' ).'
 																				ORDER BY YEAR('.$this->dbprefix.'datestart) ASC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
-																				LIMIT 1', OBJECT, 0, 'Calendar: find next year with posts' ) )
-					)
-				{
-					$r[] = '<a href="'
-									.$this->archive_link( $row->year, ($this->mode == 'month') ? $row->month : '', '', '' )
-									.'" title="'.sprintf(
-																( $this->mode == 'month'
-																		? /* Calendar link title to a month in a following year with posts */ T_('Next year (%04d-%02d)')
-																		: /* Calendar link title to a following year with posts */ T_('Next year (%04d)') ),
-																$row->year, $row->month )
-									.'">&gt;&gt;</a>';
+																				LIMIT 1', OBJECT, 0, 'Calendar: find next year with posts' )
+						)
+					{
+						$r[] = '<a href="'
+										.$this->archive_link( $row->year, ($this->mode == 'month') ? $row->month : '', '', '' )
+										.'" title="'.sprintf(
+																	( $this->mode == 'month'
+																			? /* Calendar link title to a month in a following year with posts */ T_('Next year (%04d-%02d)')
+																			: /* Calendar link title to a following year with posts */ T_('Next year (%04d)') ),
+																	$row->year, $row->month )
+										.'">&gt;&gt;</a>';
+					}
+					else $r[] = '';
 				}
-				else
-				{
-					$r[] = '';
-				}
-
+				else $r[] = '';
 				break;
 		}
 
@@ -833,6 +776,10 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.18  2005/08/31 19:08:51  fplanque
+ * Factorized Item query WHERE clause.
+ * Fixed calendar contextual accuracy.
+ *
  * Revision 1.17  2005/08/26 18:41:31  fplanque
  * bugfix
  *
