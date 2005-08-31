@@ -271,11 +271,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 	$_xmlrpc_debuginfo='';
 	function xmlrpc_debugmsg($m)
 	{
-		global $_xmlrpc_debuginfo, $xmlrpc_debug_messages;
-		if( $xmlrpc_debug_messages )
-		{
-			$_xmlrpc_debuginfo = $_xmlrpc_debuginfo . $m . "\n";
-		}
+		global $_xmlrpc_debuginfo;
+		$_xmlrpc_debuginfo=$_xmlrpc_debuginfo . $m . "\n";
 	}
 
 	/**
@@ -336,7 +333,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 				. $r->serialize();
 			header('Content-Type: text/xml');
 			header('Content-Length: ' . (int)strlen($payload));
-			print trim($payload);
+			print $payload;
 		}
 
 		/**
@@ -415,10 +412,13 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 			$parser = xml_parser_create($xmlrpc_defencoding);
 
 			$_xh[$parser]=array();
-			$_xh[$parser]['st']='';
-			$_xh[$parser]['cm']=0;
+			//$_xh[$parser]['st']='';
+			//$_xh[$parser]['cm']=0;
 			$_xh[$parser]['isf']=0;
+			$_xh[$parser]['isf_reason']='';
 			$_xh[$parser]['params']=array();
+			$_xh[$parser]['stack']=array();
+			$_xh[$parser]['valuestack'] = array();
 			$_xh[$parser]['method']='';
 
 			// decompose incoming XML into request structure
@@ -442,35 +442,45 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 				xml_parser_free($parser);
 			}
 			else
-			{	// XML parsing succeeded:
+			if ($_xh[$parser]['isf'])
+			{
 				xml_parser_free($parser);
+				$r=new xmlrpcresp(0,
+					$xmlrpcerr['invalid_request'],
+					$xmlrpcstr['invalid_request'] . ' ' . $_xh[$parser]['isf_reason']);
+			}
+			else
+			{
+				xml_parser_free($parser);
+
 				$m=new xmlrpcmsg($_xh[$parser]['method']);
 				// now add parameters in
 				$plist='';
-				$allOK = 1;
+				//$allOK = 1;
 				for($i=0; $i<sizeof($_xh[$parser]['params']); $i++)
 				{
 					//print "<!-- " . $_xh[$parser]['params'][$i]. "-->\n";
 					$plist.="$i - " .  $_xh[$parser]['params'][$i]. ";\n";
-					$allOK = 0;
-					@eval('$m->addParam(' . $_xh[$parser]['params'][$i]. '); $allOK=1;');
-					if (!$allOK)
-					{
-						break;
-					}
+					//$allOK = 0;
+					//@eval('$m->addParam(' . $_xh[$parser]['params'][$i]. '); $allOK=1;');
+					@$m->addParam($_xh[$parser]['params'][$i]);
+					//if (!$allOK)
+					//{
+					//	break;
+					//}
 				}
 				// uncomment this to really see what the server's getting!
 				// xmlrpc_debugmsg($plist);
-				if (!$allOK)
-				{
-					$r = new xmlrpcresp(0,
-  						$xmlrpcerr['incorrect_params'],
-						$xmlrpcstr['incorrect_params'] . ": xml error in param " . $i);
-				}
-				else
-				{
+				//if (!$allOK)
+				//{
+				//	$r = new xmlrpcresp(0,
+  				//		$xmlrpcerr['incorrect_params'],
+				//		$xmlrpcstr['incorrect_params'] . ": xml error in param " . $i);
+				//}
+				//else
+				//{
 					$r = $this->execute($m);
-				}
+				//}
 			}
 			return $r;
 		}
