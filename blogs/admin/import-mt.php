@@ -251,7 +251,7 @@ param( 'mode', 'string', 'normal' );
 
 	// load caches
 	blog_load_cache();
-	cat_load_cache( false );
+	cat_load_cache( 'none' );
 
 	$i_user = -1;
 
@@ -1264,7 +1264,7 @@ function fieldset_cats()
 		$blog = 1;
 
 		// ----------------- START RECURSIVE CAT LIST ----------------
-		cat_query( false );	// make sure the caches are loaded
+		cat_query( 'none' );	// make sure the caches are loaded
 		function cat_select_before_first( $parent_cat_ID, $level )
 		{	// callback to start sublist
 			echo "\n<ul>\n";

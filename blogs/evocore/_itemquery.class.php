@@ -62,6 +62,9 @@ class ItemQuery extends SQL
 		$this->dbtablename = $dbtablename;
 		$this->dbprefix = $dbprefix;
 		$this->dbIDname = $dbIDname;
+
+		$this->FROM( $this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
+									INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
 	}
 
 
@@ -324,6 +327,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.2  2005/09/01 17:11:46  fplanque
+ * no message
+ *
  * Revision 1.1  2005/08/31 19:08:51  fplanque
  * Factorized Item query WHERE clause.
  * Fixed calendar contextual accuracy.

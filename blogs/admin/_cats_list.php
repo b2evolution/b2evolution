@@ -19,7 +19,7 @@ if( isset($Blog ) )
 }
 
 // ----------------- START RECURSIVE CAT LIST ----------------
-cat_query( false );	// make sure the caches are loaded
+cat_query( 'none' );	// make sure the caches are loaded
 
 /**
  * callback to start sublist

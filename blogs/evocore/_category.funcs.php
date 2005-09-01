@@ -250,7 +250,7 @@ function get_the_category_by_ID( $cat_ID, $die = true )
 	global $cache_categories;
 	if( empty($cache_categories[$cat_ID]) )
 	{
-		cat_load_cache( false );
+		cat_load_cache( 'none' );
 	}
 	if( !isset( $cache_categories[$cat_ID] ) )
 	{
@@ -320,15 +320,15 @@ function get_catname($cat_ID)
 }
 
 
-/*
- * cat_load_cache()
- *
+/**
  * Load cache for category definitions.
  *
  * TODO: replace LEFT JOIN with UNION when switching to MySQL 4
  * This will prevent empty cats from displaying "(1)" as postcount.
+ *
+ * @param string 'none'|'context'|'canonic'
  */
-function cat_load_cache( $cat_load_postcounts = false, $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
+function cat_load_cache( $cat_load_postcounts = 'none', $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
 													$dbIDname_items = 'ID' )
 {
 	global $DB, $cache_categories;
@@ -379,63 +379,82 @@ function cat_load_cache( $cat_load_postcounts = false, $dbtable_items = 'T_posts
 		// echo 'Number of cats=', count($cache_categories);
 	}
 
-	if( $cat_load_postcounts )
-	{
-		cat_load_postcounts( $dbtable_items, $dbprefix_items, $dbIDname_items );
-	}
+	cat_load_postcounts( $cat_load_postcounts, $dbtable_items, $dbprefix_items, $dbIDname_items );
 }
 
 
 /**
  * Load the post counts
+ *
+ * @param string 'context'|'canonic'
  */
-function cat_load_postcounts( $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
-															$dbIDname_items = 'ID' )
+function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID' )
 {
 	global $DB, $cache_categories;
-	global $show_statuses, $timestamp_min, $timestamp_max;
-	global $cat_postcounts_loaded, $blog;
+	global $blog, $show_statuses, $author;
+	global $m, $w, $dstart, $timestamp_min, $timestamp_max;
+	global $s, $phrase, $exact;
+	global $cat_postcounts_loaded;
 	global $Settings;
+
+	if( $cat_load_postcounts == 'none' )
+	{
+		return;
+	}
 
 	if( !isset($cat_postcounts_loaded) && $blog > 0 )
 	{ // Postcounts are not loaded and we have a blog for which to load the counts:
 
-		// CONSTRUCT THE WHERE CLAUSE:
-
 		/*
-		 * ----------------------------------------------------
-		 *  Restrict to the statuses we want to show:
-		 * ----------------------------------------------------
+		 * WE ARE GOING TO CONSTRUCT THE WHERE CLOSE...
 		 */
-		$where = ' WHERE '.statuses_where_clause( $show_statuses, $dbprefix_items );
-		$where_link = ' AND ';
 
-		// Restrict to timestamp limits:
-		if( $timestamp_min == 'now' ) $timestamp_min = time();
-		if( !empty($timestamp_min) )
-		{ // Hide posts before
-			$date_min = date('Y-m-d H:i:s', $timestamp_min + ($Settings->get('time_difference') * 3600) );
-			$where .= $where_link.' '.$dbprefix_items.'datestart >= \''.$date_min.'\'';
-			$where_link = ' AND ';
+		$this->ItemQuery = & new ItemQuery( $dbtable, $dbprefix, $dbIDname ); // TEMPORARY OBJ
+
+		// - - Select a specific Item:
+		// $this->ItemQuery->where_ID( $p, $title );
+		if( $cat_load_postcounts == 'context' )
+		{	// We want to preserve the current context:
+			// - - - Restrict to selected blog/categories:
+			$this->ItemQuery->where_chapter( $blog, '', array() );
+
+			// * Restrict to the statuses we want to show:
+			$this->ItemQuery->where_status( $show_statuses );
+
+			// Restrict to selected authors:
+			$this->ItemQuery->where_author( $author );
+
+			// - - - + * * timestamp restrictions:
+			$this->ItemQuery->where_datestart( $m, $w, $dstart, '', $timestamp_min, $timestamp_max );
+
+			// Keyword search stuff:
+			$this->ItemQuery->where_keywords( $s, $phrase, $exact );
 		}
-		if( $timestamp_max == 'now' ) $timestamp_max = time();
-		if( !empty($timestamp_max) )
-		{ // Hide posts after
-			$date_max = date('Y-m-d H:i:s', $timestamp_max + ($Settings->get('time_difference') * 3600) );
-			$where .= $where_link.' '.$dbprefix_items.'datestart <= \''.$date_max.'\'';
-			$where_link = ' AND ';
+		else
+		{	// We want to preserve only the minimal context:
+			// - - - Restrict to selected blog/categories:
+			$this->ItemQuery->where_chapter( $blog, '', array() );
+
+			// * Restrict to the statuses we want to show:
+			$this->ItemQuery->where_status( $show_statuses );
+
+			// - - - + * * timestamp restrictions:
+			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
 		}
 
-		$sql = "SELECT postcat_cat_ID AS cat_ID, COUNT(*) AS cat_postcount
-						FROM T_postcats INNER JOIN $dbtable_items ON postcat_post_ID = $dbIDname_items
-						$where
+		$sql = 'SELECT postcat_cat_ID AS cat_ID, COUNT(*) AS cat_postcount'
+						// OLD: FROM T_postcats INNER JOIN $dbtable ON postcat_post_ID = $dbIDname
+						// fplanque>> note: there was no restriction to current blog!!
+						.$this->ItemQuery->get_from()
+						.$this->ItemQuery->get_where()
+						.$this->ItemQuery->get_group_by()."
 						GROUP BY cat_ID";
 
 		foreach( $DB->get_results( $sql, ARRAY_A ) as $myrow )
 		{
 			$cat_ID = $myrow['cat_ID'];
 			if( !isset($cache_categories[$cat_ID]) )
-				echo '<p>*** WARNING: There are ', $myrow['cat_postcount'], ' posts attached to inexistant category #', $cat_ID, '. You must fix the database! ***</p>';
+				echo '<p>*** WARNING: There are '.$myrow['cat_postcount'].' posts attached to non existant category #'.$cat_ID.'. You must fix the database! ***</p>';
 			// echo 'Postcount for cat #', $cat_ID, ' is ', $myrow['cat_postcount'], '<br />';
 			$cache_categories[$cat_ID]['cat_postcount'] = $myrow['cat_postcount'];
 		}
@@ -580,7 +599,7 @@ function blog_has_cats( $blog_ID )
 {
 	global $cache_categories;
 
-	cat_load_cache( false );
+	cat_load_cache( 'none' );
 
 	if( count($cache_categories) ) foreach( $cache_categories as $icat_ID => $i_cat )
 	{
@@ -607,8 +626,10 @@ function blog_has_cats( $blog_ID )
  *
  * Query for the cats
  *
+ *
+ * @param string 'none'|'context'|'canonic'
  */
-function cat_query( $load_postcounts = false, $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
+function cat_query( $load_postcounts = 'none', $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
 										$dbIDname_items = 'ID' )
 {
 	// global $cache_categories; // $cache_blogs,
@@ -789,7 +810,7 @@ function blog_copy_cats($srcblog, $destblog)
 	$edited_Blog = & $BlogCache->get_by_ID( $destblog );
 
 	// ----------------- START RECURSIVE CAT LIST ----------------
-	cat_query( false );	// make sure the caches are loaded
+	cat_query( 'none' );	// make sure the caches are loaded
 	$cat_parents[0]='NULL';
 
 	// run recursively through the cats
@@ -875,7 +896,7 @@ function compile_cat_array( $cat, $catsel, & $cat_array, & $cat_modifier, $restr
 			// Getting required sub-categories:
 			// and add everything to cat array
 			// ----------------- START RECURSIVE CAT LIST ----------------
-			cat_query( false );	// make sure the caches are loaded
+			cat_query( 'none' );	// make sure the caches are loaded
 			foreach( $req_cat_array as $cat_ID )
 			{ // run recursively through the cats
 				if( ! in_array( $cat_ID, $cat_array ) )
@@ -925,6 +946,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.21  2005/09/01 17:11:46  fplanque
+ * no message
+ *
  * Revision 1.20  2005/08/25 17:45:19  fplanque
  * started categories plugin
  *

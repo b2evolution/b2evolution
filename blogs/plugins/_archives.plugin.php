@@ -7,6 +7,7 @@
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
@@ -25,9 +26,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package plugins
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER.
  * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
  * @author cafelog (group)
  *
@@ -97,7 +105,7 @@ class archives_plugin extends Plugin
 	function SkinTag( $params )
 	{
 	 	global $Settings, $month;
-	 	global $show_statuses, $timestamp_min, $timestamp_max;
+
 		/**
 		 * @todo get rid of these globals:
 		 */
@@ -147,8 +155,7 @@ class archives_plugin extends Plugin
 			$params['day_date_format'] = $dateformat;
 		}
 
-		$ArchiveList = & new ArchiveList( $blog, $params['mode'], $show_statuses,
-																			$timestamp_min, $timestamp_max, $params['limit'],
+		$ArchiveList = & new ArchiveList( $params['mode'], $params['limit'], ($params['link_type'] == 'context'),
 																			$this->dbtable, $this->dbprefix, $this->dbIDname );
 
 		echo $params['block_start'];
@@ -232,7 +239,7 @@ class archives_plugin extends Plugin
 					echo '<a href="';
 					if( $params['link_type'] == 'context' )
 					{	// We want to preserve current browsing context:
-						echo regenerate_url( $params['context_isolation'], 'p'.$post_ID );
+						echo regenerate_url( $params['context_isolation'], 'p='.$post_ID );
 					}
 					else
 					{	// We want to link to the absolute canonical URL for this archive:
@@ -270,4 +277,305 @@ class archives_plugin extends Plugin
 		return true;
 	}
 }
+
+
+/**
+ * Archive List Class
+ *
+ * @package evocore
+ */
+class ArchiveList extends Results
+{
+	var $archive_mode;
+	var $arc_w_last;
+
+	/**
+	 * Constructor
+   *
+   * Note: Weekly archives use MySQL's week numbering and MySQL default if applicable.
+   * In MySQL < 4.0.14, WEEK() always uses mode 0: Week starts on Sunday;
+   * Value range is 0 to 53; week 1 is the first week that starts in this year
+   * {@see http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html}
+   *
+	 * @todo categories combined with 'ALL' are not supported (will output too many archives,
+	 * some of which will resolve to no results). We need subqueries to support this efficiently.
+	 *
+   * @param string
+   * @param integer
+   * @param boolean
+	 */
+	function ArchiveList(
+		$archive_mode = 'monthly',
+		$limit = 100,
+		$preserve_context = false,
+		$dbtable = 'T_posts',
+ 		$dbprefix = 'post_',
+		$dbIDname = 'ID' )
+	{
+		global $DB, $Settings;
+		global $blog, $cat, $catsel;
+		global $show_statuses;
+		global $author;
+		global $timestamp_min, $timestamp_max;
+		global $s, $phrase, $exact;
+
+		$this->dbtable = $dbtable;
+		$this->dbprefix = $dbprefix;
+		$this->dbIDname = $dbIDname;
+		$this->archive_mode = $archive_mode;
+
+
+		/*
+		 * WE ARE GOING TO CONSTRUCT THE WHERE CLOSE...
+		 */
+		$this->ItemQuery = & new ItemQuery( $this->dbtable, $this->dbprefix, $this->dbIDname ); // TEMPORARY OBJ
+
+		// - - Select a specific Item:
+		// $this->ItemQuery->where_ID( $p, $title );
+
+		if( $preserve_context )
+		{	// We want to preserve the current context:
+			// * - - Restrict to selected blog/categories:
+			$this->ItemQuery->where_chapter( $blog, $cat, $catsel );
+
+			// * Restrict to the statuses we want to show:
+			$this->ItemQuery->where_status( $show_statuses );
+
+			// Restrict to selected authors:
+			$this->ItemQuery->where_author( $author );
+
+			// - - - + * * timestamp restrictions:
+			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
+
+			// Keyword search stuff:
+			$this->ItemQuery->where_keywords( $s, $phrase, $exact );
+		}
+		else
+		{	// We want to preserve only the minimal context:
+			// * - - Restrict to selected blog/categories:
+			$this->ItemQuery->where_chapter( $blog, '', array() );
+
+			// * Restrict to the statuses we want to show:
+			$this->ItemQuery->where_status( $show_statuses );
+
+			// - - - + * * timestamp restrictions:
+			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
+		}
+
+
+		$this->from = $this->ItemQuery->get_from();
+		$this->where = $this->ItemQuery->get_where();
+		$this->group_by = $this->ItemQuery->get_group_by();
+
+		switch( $this->archive_mode )
+		{
+			case 'monthly':
+				// ------------------------------ MONTHLY ARCHIVES ------------------------------------
+				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, MONTH('.$this->dbprefix.'datestart) AS month,
+																	COUNT(DISTINCT postcat_post_ID) AS count '
+													.$this->from
+													.$this->where.'
+													GROUP BY year, month
+													ORDER BY year DESC, month DESC';
+				break;
+
+			case 'daily':
+				// ------------------------------- DAILY ARCHIVES -------------------------------------
+				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, MONTH('.$this->dbprefix.'datestart) AS month,
+																	DAYOFMONTH('.$this->dbprefix.'datestart) AS day,
+																	COUNT(DISTINCT postcat_post_ID) AS count '
+													.$this->from
+													.$this->where.'
+													GROUP BY year, month, day
+													ORDER BY year DESC, month DESC, day DESC';
+				break;
+
+			case 'weekly':
+				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
+				$sql = 'SELECT YEAR('.$this->dbprefix.'datestart) AS year, '.
+															$DB->week( $this->dbprefix.'datestart', locale_startofweek() ).' AS week,
+															COUNT(DISTINCT postcat_post_ID) AS count '
+													.$this->from
+													.$this->where.'
+													GROUP BY year, week
+													ORDER BY year DESC, week DESC';
+				break;
+
+			case 'postbypost':
+			default:
+				// ----------------------------- POSY BY POST ARCHIVES --------------------------------
+				$sql = 'SELECT DISTINCT '.$this->dbIDname.', '.$this->dbprefix.'datestart, '.$this->dbprefix.'title '
+													.$this->from
+													.$this->where
+													.$this->group_by.'
+													ORDER BY '.$this->dbprefix.'datestart DESC';
+		}
+
+		parent::Results( $sql, 'archivelist_', '', $limit );
+
+		$this->restart();
+	}
+
+
+	/**
+	 * Count the number of rows of the SQL result
+	 *
+	 * These queries are complex enough for us not to have to rewrite them:
+	 */
+	function count_total_rows()
+	{
+		global $DB;
+
+		switch( $this->archive_mode )
+		{
+			case 'monthly':
+				// ------------------------------ MONTHLY ARCHIVES ------------------------------------
+				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart) ) '
+													.$this->from
+													.$this->where;
+				break;
+
+			case 'daily':
+				// ------------------------------- DAILY ARCHIVES -------------------------------------
+				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart),
+																	DAYOFMONTH('.$this->dbprefix.'datestart) ) '
+													.$this->from
+													.$this->where;
+				break;
+
+			case 'weekly':
+				// ------------------------------- WEEKLY ARCHIVES -------------------------------------
+				$sql_count = 'SELECT COUNT( DISTINCT YEAR('.$this->dbprefix.'datestart), '
+													.$DB->week( $this->dbprefix.'datestart', locale_startofweek() ).' ) '
+													.$this->from
+													.$this->where;
+				break;
+
+			case 'postbypost':
+			default:
+				// ----------------------------- POSY BY POST ARCHIVES --------------------------------
+				$sql_count = 'SELECT COUNT( DISTINCT '.$this->dbIDname.' ) '
+													.$this->from
+													.$this->where
+													.$this->group_by;
+		}
+
+		// echo $sql_count;
+
+		$this->total_rows = $this->DB->get_var( $sql_count ); //count total rows
+
+		// echo 'total rows='.$this->total_rows;
+	}
+
+
+	/**
+	 * Rewind resultset
+	 *
+	 * {@internal DataObjectList::restart(-) }}
+	 */
+	function restart()
+	{
+		// Make sure query has executed at least once:
+		$this->query( $this->sql );
+
+		$this->current_idx = 0;
+		$this->arc_w_last = '';
+	}
+
+	/**
+	 * Getting next item in archive list
+	 *
+	 * WARNING: these are *NOT* Item objects!
+	 *
+	 * {@internal ArchiveList->get_item(-)}}
+	 */
+	function get_item( & $arc_year, & $arc_month, & $arc_dayofmonth, & $arc_w, & $arc_count, & $post_ID, & $post_title )
+	{
+		// echo 'getting next item<br />';
+
+ 		if( $this->current_idx >= $this->result_num_rows )
+		{	// No more entry
+			return false;
+		}
+
+		$arc_row = $this->rows[ $this->current_idx++ ];
+
+		switch( $this->archive_mode )
+		{
+			case 'monthly':
+				$arc_year  = $arc_row->year;
+				$arc_month = $arc_row->month;
+				$arc_count = $arc_row->count;
+				return true;
+
+			case 'daily':
+				$arc_year  = $arc_row->year;
+				$arc_month = $arc_row->month;
+				$arc_dayofmonth = $arc_row->day;
+				$arc_count = $arc_row->count;
+				return true;
+
+			case 'weekly':
+				$arc_year  = $arc_row->year;
+				$arc_w = $arc_row->week;
+				$arc_count = $arc_row->count;
+				return true;
+
+			case 'postbypost':
+			default:
+				$post_ID = $arc_row->ID;
+				$post_title = $arc_row->{$this->dbprefix.'title'};
+				return true;
+		}
+	}
+}
+
+
+/*
+ * $Log$
+ * Revision 1.8  2005/09/01 17:11:46  fplanque
+ * no message
+ *
+ *
+ * Merged in the contents of _archivelist.class.php; history below:
+ *
+ * Revision 1.11  2005/06/10 18:25:43  fplanque
+ * refactoring
+ *
+ * Revision 1.10  2005/05/24 15:26:52  fplanque
+ * cleanup
+ *
+ * Revision 1.9  2005/03/08 20:32:07  fplanque
+ * small fixes; slightly enhanced WEEK() handling
+ *
+ * Revision 1.8  2005/03/07 17:36:10  fplanque
+ * made more generic
+ *
+ * Revision 1.7  2005/02/28 09:06:32  blueyed
+ * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
+ *
+ * Revision 1.6  2005/01/03 15:17:52  fplanque
+ * no message
+ *
+ * Revision 1.5  2004/12/27 18:37:58  fplanque
+ * changed class inheritence
+ *
+ * Changed parent to Results!!
+ *
+ * Revision 1.4  2004/12/13 21:29:58  fplanque
+ * refactoring
+ *
+ * Revision 1.3  2004/11/09 00:25:11  blueyed
+ * minor translation changes (+MySQL spelling :/)
+ *
+ * Revision 1.2  2004/10/14 18:31:24  blueyed
+ * granting copyright
+ *
+ * Revision 1.1  2004/10/13 22:46:32  fplanque
+ * renamed [b2]evocore/*
+ *
+ * Revision 1.19  2004/10/11 19:02:04  fplanque
+ * Edited code documentation.
+ *
+ */
 ?>

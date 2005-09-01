@@ -46,8 +46,6 @@ if( false )
  * Includes:
  */
 require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_itemlist.class.php' );
-require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_calendar.class.php' );
-require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_archivelist.class.php' );
 
 echo '<div class="NavBar">';
 
@@ -214,6 +212,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.12  2005/09/01 17:11:46  fplanque
+ * no message
+ *
  * Revision 1.11  2005/08/31 19:06:41  fplanque
  * minor
  *

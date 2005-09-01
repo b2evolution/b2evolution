@@ -63,11 +63,25 @@ class SQL
 	{
 		$sql = '';
 		if( !empty($this->select) ) $sql .= ' SELECT '.$this->select;
-		if( !empty($this->from) ) $sql .= ' FROM '.$this->from;
+		$sql .= $this->get_from();
 		$sql .= $this->get_where();
 		$sql .= $this->get_group_by();
 		if( !empty($this->order_by) ) $sql .= ' ORDER BY '.$this->order_by;
 		return $sql;
+	}
+
+
+  /**
+	 * Get FROM clause if there is something inside
+	 */
+	function get_from( $prefix = ' FROM ' )
+	{
+		if( !empty($this->from) )
+		{
+			return $prefix.$this->from;
+		}
+
+		return '';
 	}
 
 
@@ -120,6 +134,10 @@ class SQL
 		$this->select .= ' '.$select_add;
 	}
 
+
+  /**
+	 *
+	 */
 	function FROM( $from )
 	{
 		$this->from = $from;
@@ -137,6 +155,10 @@ class SQL
 		$this->from .= ' '.$from_add;
 	}
 
+
+  /**
+	 *
+	 */
 	function WHERE( $where )
 	{
 		$this->where = $where;
@@ -176,6 +198,9 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.4  2005/09/01 17:11:46  fplanque
+ * no message
+ *
  * Revision 1.3  2005/08/31 19:08:51  fplanque
  * Factorized Item query WHERE clause.
  * Fixed calendar contextual accuracy.

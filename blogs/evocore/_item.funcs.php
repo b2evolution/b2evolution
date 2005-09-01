@@ -768,7 +768,7 @@ function cat_select( $display_info = true, $form_fields = true )
 	$cat_select_form_fields = $form_fields;
 	$default_main_cat = $edited_Item->main_cat_ID;
 
-	cat_query( false ); // make sure the caches are loaded
+	cat_query( 'none' ); // make sure the caches are loaded
 
 	if( $allow_cross_posting >= 2 )
 	{ // If BLOG cross posting enabled, go through all blogs with cats:
@@ -932,6 +932,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.27  2005/09/01 17:11:46  fplanque
+ * no message
+ *
  * Revision 1.26  2005/08/31 19:08:51  fplanque
  * Factorized Item query WHERE clause.
  * Fixed calendar contextual accuracy.

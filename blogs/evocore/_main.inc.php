@@ -234,7 +234,6 @@ require_once dirname(__FILE__).'/_blog.class.php';
 require_once dirname(__FILE__).'/_itemlist.class.php';
 require_once dirname(__FILE__).'/_itemcache.class.php';
 require_once dirname(__FILE__).'/_commentlist.class.php';
-require_once dirname(__FILE__).'/_archivelist.class.php';
 require_once dirname(__FILE__).'/_dataobjectcache.class.php';
 require_once dirname(__FILE__).'/_element.class.php';
 require_once dirname(__FILE__).'/_filecache.class.php';
@@ -292,7 +291,6 @@ else
 
 
 
-require_once dirname(__FILE__).'/_calendar.class.php';
 require_once dirname(__FILE__).'/_hitlog.funcs.php';     // referer logging
 require_once dirname(__FILE__).'/_form.funcs.php';
 require_once dirname(__FILE__).'/_form.class.php';
@@ -528,6 +526,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.46  2005/09/01 17:11:46  fplanque
+ * no message
+ *
  * Revision 1.45  2005/08/31 19:08:51  fplanque
  * Factorized Item query WHERE clause.
  * Fixed calendar contextual accuracy.

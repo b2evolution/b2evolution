@@ -244,7 +244,7 @@ switch($action)
 		$Form->text( 'cat_name', $cat_name, 40, T_('New category name'), '', 80 );
 
 		// ----------------- START RECURSIVE CAT LIST ----------------
-		cat_query( false );	// make sure the caches are loaded
+		cat_query( 'none' );	// make sure the caches are loaded
 
 		function cat_move_before_first( $parent_cat_ID, $level )
 		{ // callback to start sublist
@@ -366,6 +366,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.47  2005/09/01 17:11:46  fplanque
+ * no message
+ *
  * Revision 1.46  2005/07/29 19:46:10  blueyed
  * Important whitespace between <input> and <label>.
  *

@@ -145,7 +145,7 @@ class categories_plugin extends Plugin
 
 
 		// make sure the caches are loaded:
-		cat_query( true, $this->dbtable, $this->dbprefix, $this->dbIDname );
+		cat_query( $params['link_type'], $this->dbtable, $this->dbprefix, $this->dbIDname );
 
 
 		// START DISPLAY:
