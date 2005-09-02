@@ -9,6 +9,7 @@
  * - query log
  * - get_list
  * - dynamic extension loading
+ * - Debug features (EXPLAIN...)
  * and more...
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
@@ -92,8 +93,16 @@ if( ! function_exists( 'mysql_real_escape_string' ) )
  */
 class DB
 {
-	var $trace = false;      // same as $debug_all
-	var $debug_all = false;  // same as $trace
+	/**
+	 * Do we want to explain joins?
+	 */
+	var $debug_explain_joins = true;
+
+  /**
+	 * Number of rows we want to dump in debug output:
+	 */
+	var $debug_dump_rows = 20;
+
 	var $show_errors = true;
 	var $halt_on_error = true;
 	var $error = false;		// no error yet
@@ -101,7 +110,7 @@ class DB
 	var $last_query = '';		// last query SQL string
 	var $last_error = '';			// last DB error string
 	var $col_info;
-	var $debug_called;
+
 	var $vardump_called;
 	var $insert_id = 0;
 	var $num_rows = 0;
@@ -419,12 +428,21 @@ class DB
 		$this->queries[ $this->num_queries - 1 ] = array(
 																									'title' => $title,
 																									'sql' => $query,
-																									'rows' => -1 );
+																									'rows' => -1,
+																									'time' => 'unknown',
+																									'results' => 'unknown' );
 
 		if( is_object( $Timer ) )
 		{
+			// Resume global query timer
 			$Timer->resume( 'sql_queries' );
-			$this->result = @mysql_query($query,$this->dbh);
+			// Start a timer fot this paritcular query:
+			$Timer->start( 'query' );
+			// Run query:
+			$this->result = @mysql_query( $query, $this->dbh );
+			// Get duration fpor last query:
+			$this->queries[ $this->num_queries - 1 ]['time'] = $Timer->get_duration( 'query' );
+			// Pause global query timer:
 			$Timer->pause( 'sql_queries' );
 		}
 		else
@@ -442,8 +460,6 @@ class DB
 		if( preg_match( '#^ \s* (insert|delete|update|replace) \s #ix', $query) )
 		{ // Query was an insert, delete, update, replace:
 
-			// echo 'insert, delete, update, replace';
-
 			$this->rows_affected = mysql_affected_rows();
 			$this->queries[ $this->num_queries - 1 ]['rows'] = $this->rows_affected;
 
@@ -457,9 +473,7 @@ class DB
 			$return_val = $this->rows_affected;
 		}
 		else
-		{ // Query was a select:
-
-			// echo 'select';
+		{ // Query was a select, alter, etc...:
 
 			// Take note of column info
 			$i = 0;
@@ -488,10 +502,56 @@ class DB
 			$return_val = $this->num_rows;
 		}
 
+
+		// EXPLAIN JOINS ??
+		if( $this->debug_explain_joins && preg_match( '#^ \s* select \s #ix', $query) )
+		{ // Query was a select, let's try to explain joins...
+
+			// save values:
+			$saved_last_result = $this->last_result;
+			$saved_col_info = $this->col_info;
+			$saved_num_rows = $this->num_rows;
+
+			$this->last_result = NULL;
+			$this->col_info = NULL;
+			$this->num_rows = 0;
+
+			$this->result = @mysql_query( 'EXPLAIN '.$query, $this->dbh );
+			// Take note of column info
+			$i = 0;
+			while( $i < @mysql_num_fields($this->result) )
+			{
+				$this->col_info[$i] = @mysql_fetch_field($this->result);
+				$i++;
+			}
+
+			// Store Query Results
+			$num_rows = 0;
+			while( $row = @mysql_fetch_object($this->result) )
+			{
+				// Store results as an objects within main array
+				$this->last_result[$num_rows] = $row;
+				$num_rows++;
+			}
+
+			@mysql_free_result($this->result);
+
+			// Log number of rows the query returned
+			$this->num_rows = $num_rows;
+
+			$this->queries[ $this->num_queries - 1 ]['explain'] = $this->debug_dump_rows( 100, true );
+
+			// Retsore:
+ 			$this->last_result = $saved_last_result;
+			$this->col_info = $saved_col_info;
+			$this->num_rows = $saved_num_rows;
+		}
+
+
 		// If debug ALL queries
-		if( $this->trace || $this->debug_all )
+		if( $this->debug_dump_rows )
 		{
-			$this->debug();
+			$this->queries[ $this->num_queries - 1 ]['results'] = $this->debug_dump_rows( $this->debug_dump_rows );
 		}
 
 		return $return_val;
@@ -610,9 +670,9 @@ class DB
 	 * @param integer Column of the result set
 	 * @return string
 	 */
-	function get_list( $query = NULL, $x = 0 )
+	function get_list( $query = NULL, $x = 0, $title = '' )
 	{
-		return implode( ',', $this->get_col( $query, $x = 0 ) );
+		return implode( ',', $this->get_col( $query, $x, $title ) );
 	}
 
 
@@ -739,75 +799,86 @@ class DB
 	 * table listing results (if there were any).
 	 * (abstracted into a seperate file to save server overhead).
 	 */
-	function debug()
+	function debug_dump_rows( $max_lines, $break_at_comma = false )
 	{
-		echo '<blockquote>';
-
-		// Only show ezSQL credits once..
-		if ( ! $this->debug_called )
-		{
-			echo "<font color=800080 face=arial size=2><b>ezSQL</b> (v".EZSQL_VERSION.") <b>Debug..</b></font><p>\n";
-		}
-		echo "<font face=arial size=2 color=000099><b>Query</b> [$this->num_queries] <b>--</b> ";
-		echo "[<font color=000000><b>$this->last_query</b></font>]</font><p>";
-
-			echo "<font face=arial size=2 color=000099><b>Query Result..</b></font>";
-			echo "<blockquote>";
+		$r = '';
 
 		if ( $this->col_info )
 		{
 			// =====================================================
 			// Results top rows
-
-			echo "<table cellpadding=5 cellspacing=1 bgcolor=555555>";
-			echo "<tr bgcolor=eeeeee><td nowrap valign=bottom><font color=555599 face=arial size=2><b>(row)</b></font></td>";
-
-
+			$r .= '<table cellspacing="0">';
 			for( $i = 0, $count = count($this->col_info); $i < $count; $i++ )
 			{
-				echo "<td nowrap align=left valign=top><font size=1 color=555599 face=arial>{$this->col_info[$i]->type} {$this->col_info[$i]->max_length}</font><br><span style='font-family: arial; font-size: 10pt; font-weight: bold;'>{$this->col_info[$i]->name}</span></td>";
+				$r .= '<th><span class="type">'.$this->col_info[$i]->type.' '.$this->col_info[$i]->max_length.'</span><br />'
+							.$this->col_info[$i]->name.'</th>';
 			}
+			$r .= '</tr>';
 
-			echo "</tr>";
+			$i=0;
 
 			// ======================================================
 			// print main results
-
-		if( $this->last_result )
-		{
-
-			$i=0;
-			foreach( $this->get_results(NULL,ARRAY_N) as $one_row )
+			if( $this->last_result )
 			{
-				$i++;
-				echo "<tr bgcolor=ffffff><td bgcolor=eeeeee nowrap align=middle><font size=2 color=555599 face=arial>$i</font></td>";
-
-				foreach ( $one_row as $item )
+				foreach( $this->get_results(NULL,ARRAY_N) as $one_row )
 				{
-					echo "<td nowrap><font face=arial size=2>$item</font></td>";
+					$i++;
+					if( $i >= $max_lines )
+					{
+						break;
+					}
+					foreach( $one_row as $item )
+					{
+						if( $i % 2 )
+						{
+							$r .= '<td class="odd">';
+						}
+						else
+						{
+							$r .= '<td>';
+						}
+
+						if( $break_at_comma )
+						{
+							$item = str_replace( ',', '<br />', $item );
+							$item = str_replace( ';', '<br />', $item );
+							$r .= $item;
+						}
+						else
+						{
+							if( strlen( $item ) > 50 )
+							{
+								$item = substr( $item, 0, 50 ).'...';
+							}
+							$r .= htmlspecialchars($item);
+						}
+						$r .= '</td>';
+					}
+
+					$r .= '</tr>';
 				}
 
-				echo "</tr>";
+			} // if last result
+			else
+			{
+				$r .= '<tr><td colspan="'.(count($this->col_info)+1).'">No Results</td></tr>';
+			}
+			if( $i >= $max_lines )
+			{
+				$r .= '<tr><td colspan="'.(count($this->col_info)+1).'">Max number of dumped rows has been reached.</td></tr>';
 			}
 
-		} // if last result
-		else
-		{
-			echo "<tr bgcolor=ffffff><td colspan=".(count($this->col_info)+1)."><font face=arial size=2>No Results</font></td></tr>";
-		}
-
-		echo "</table>";
+			$r .= '</table>';
 
 		} // if col_info
 		else
 		{
-			echo "<font face=arial size=2>No Results</font>";
+			$r .= 'No Results';
 		}
 
-		echo '</blockquote></blockquote><hr style="border:none;height:1px;border-top:1px solid #ebebd8;margin:2ex 0;">';
 
-
-		$this->debug_called = true;
+		return $r;
 	}
 
 
@@ -818,9 +889,19 @@ class DB
 	 */
 	function dump_queries()
 	{
+		global $Timer;
+		if( is_object( $Timer ) )
+		{
+			$time_queries = $Timer->get_duration( 'sql_queries' );
+		}
+		else
+		{
+			$time_queries = 0;
+		}
+
 		foreach( $this->queries as $query )
 		{
-			echo '<p><strong>Query: '.$query['title'].'</strong></p>';
+			echo '<h4>Query: '.$query['title'].'</h4>';
 			echo '<code>';
 			$sql = str_replace( 'FROM', '<br />FROM', htmlspecialchars($query['sql']) );
 			$sql = str_replace( 'WHERE', '<br />WHERE', $sql );
@@ -831,8 +912,25 @@ class DB
 			$sql = str_replace( 'OR ', '<br />&nbsp; OR ', $sql );
 			$sql = str_replace( 'VALUES', '<br />VALUES', $sql );
 			echo $sql;
-			echo '</code><br />';
-			echo 'Rows: ', $query['rows'];
+			echo '</code>';
+			echo '<p class="rows">Rows: '.$query['rows'].' - Time: '.$query['time'].'s';
+			if( $time_queries > 0 )
+			{	// We have a total time we can use to calculate percentage:
+				echo ' ('.number_format( 100/$time_queries * $query['time'], 2 ).'%)';
+			}
+			echo '</p>';
+
+			// Explain:
+			if( isset($query['explain']) )
+			{
+				echo $query['explain'];
+			}
+
+			// Results:
+			if( $query['results'] != 'unknown' )
+			{
+				echo $query['results'];
+			}
 		}
 	}
 
@@ -910,6 +1008,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.24  2005/09/02 21:31:34  fplanque
+ * enhanced query debugging features
+ *
  * Revision 1.23  2005/08/22 18:30:29  fplanque
  * minor
  *

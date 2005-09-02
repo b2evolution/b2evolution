@@ -101,3 +101,58 @@ p.error {
 	margin: 1ex;
 }
 /* }}} */
+
+/*
+ * Debug output formatting:
+ */
+div.debug {
+	border: 2px solid #000;
+	padding: 1ex;
+	background-color: #ccc;
+	text-align: left;
+	color: #000;
+}
+
+div.debug h2,
+div.debug h3,
+div.debug h4 {
+	color:#0033FF;
+}
+
+div.debug code {
+	font-family: "Courier New", Courier, mono;
+	font-size: 11px;
+}
+
+div.debug p.rows {
+	background-color: #fff;
+	font-size: 12px;
+}
+
+div.debug table {
+	border: 1px solid #000;
+	border-collapse:collapse;
+	font-family: "Courier New", Courier, mono;
+	font-size:11px;
+	margin: 1ex;
+}
+div.debug th {
+	background-color: #fff;
+	border: 1px solid #000;
+	padding: 2px;
+	white-space:nowrap;
+}
+div.debug th span.type {
+	font-weight: normal;
+	color: #999;
+}
+div.debug td {
+	background-color: #ddd;
+	border: 1px solid #000;
+	padding: 2px;
+	vertical-align:top;
+	white-space:nowrap;
+}
+div.debug td.odd {
+	background-color: #eee;
+}

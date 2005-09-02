@@ -1181,14 +1181,7 @@ function debug_info( $force = false )
 
 	if( $debug || $force )
 	{
-		?>
-
-		<hr class="clear" />
-		<div class="panelblock">
-
-		<h2>Debug info</h2>
-
-		<?php
+ 		echo '<div class="debug"><h2>Debug info</h2>';
 
 		$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
 		$Debuglog->add( 'Len of serialized $cache_File: '.strlen(serialize($cache_File)), 'memory' );
@@ -1218,11 +1211,10 @@ function debug_info( $force = false )
 													false,
 													array( 'error', 'note', 'all' ) ),
 			'htmlbody' );
-		?>
-		<div class="log_container">
-		<h3>DB</h3>
 
-		<?php
+
+		echo '<div class="log_container">';
+		echo '<h3>DB</h3>';
 
 		if( !isset($DB) )
 		{
@@ -1234,12 +1226,9 @@ function debug_info( $force = false )
 
 			$DB->dump_queries();
 		}
+		echo '</div>';
 
-		?>
-		</div>
-		</div>
-
-		<?php
+		echo '</div>';
 	}
 }
 
@@ -1878,6 +1867,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.86  2005/09/02 21:31:34  fplanque
+ * enhanced query debugging features
+ *
  * Revision 1.85  2005/08/25 16:06:45  fplanque
  * Isolated compilation of categories to use in an ItemList.
  * This was one of the oldest bugs on the list! :>
