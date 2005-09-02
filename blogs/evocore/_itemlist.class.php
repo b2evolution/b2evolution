@@ -354,37 +354,65 @@ class ItemList extends DataObjectList
 			die( 'Unhandled LIMITING mode in ItemList (paged mode is obsolete)' );
 
 
-
-		$this->sql = 'SELECT DISTINCT '.implode( ', ', $object_def[ $this->objType ]['db_cols'] )
-								.' FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
-												INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
-
-
+		// FINALIZE WHERE CLAUSE:
 		if( !empty($this->ItemQuery->where) )
 		{
-			$this->sql .= 'WHERE '.$this->ItemQuery->where;
+			$where = 'WHERE '.$this->ItemQuery->where.$where;
 		}
 		else
 		{
-			$this->sql .= 'WHERE 1 ';
-		}
-		$this->sql .= $where;
-
-		if( !empty($this->ItemQuery->group_by) )
-		{
-			$this->sql .= ' GROUP BY '.$this->ItemQuery->group_by;
+			$where = 'WHERE 1 '.$where;
 		}
 
- 		$this->sql .= ' ORDER BY '.$this->dbprefix.$orderby.' '.$limits;
-		// echo '<br />where=',$where;
 
+		/*
+		 * RUN QUERY NOW:
+		 */
 		if ($preview)
 		{ // PREVIEW MODE:
 			$this->sql = $this->preview_request();
 		}
+		else
+		{	// NORMAL MODE:
+
+			// We are going to proceed in two steps (we simulate a subquery)
+			// 1) we get the IDs we need
+			// 2) we get all the other fields matching these IDs
+			// This is more efficient than manipulating all fields at once.
+			$step1_sql = 'SELECT DISTINCT ID
+											FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
+													INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
+			$step1_sql .= $where;
+			if( !empty($this->ItemQuery->group_by) )
+			{
+				$step1_sql .= ' GROUP BY '.$this->ItemQuery->group_by;
+			}
+			$step1_sql .= ' ORDER BY '.$this->dbprefix.$orderby;
+			$step1_sql .= ' '.$limits;
+
+			// Get list of the IDs we need:
+			$ID_list = $DB->get_list( $step1_sql, 0, 'Get ID list for Item List (Main|Lastpostdate) Query' );
+
+			$this->sql = 'SELECT *
+											FROM '.$this->dbtablename;
+			if( !empty($ID_list) )
+			{
+				$this->sql .= ' WHERE ID IN ('.$ID_list.')
+										    ORDER BY '.$this->dbprefix.$orderby;
+			}
+			else
+			{
+				$this->sql .= ' WHERE 0';
+			}
+
+			$this->count_request = 'SELECT COUNT(ID)
+                                FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
+																		INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+															'.$where;
+		}
 
 		//echo $this->sql;
-		$this->rows = $DB->get_results( $this->sql, OBJECT, 'Item List (Main|Lastpostdate) Query' );
+		$this->rows = $DB->get_results( $this->sql, OBJECT, 'Get data for Item List (Main|Lastpostdate) Query' );
 
 		$this->result_num_rows = $DB->num_rows;
 		// echo $this->result_num_rows, ' items';
@@ -617,15 +645,8 @@ class ItemList extends DataObjectList
 		if( $this->preview )
 			return 1;	// 1 row in preview mode
 
-		$nxt_request = $this->sql;
-		if( $pos = strpos(strtoupper($this->sql), 'LIMIT'))
-		{ // Remove the limit form the request
-			$nxt_request = substr($this->sql, 0, $pos);
-		}
-		//echo $nxt_request;
+		$this->total_rows = $DB->get_var( $this->count_request, 0, 0, 'Get result count' );
 
-		$DB->query( $nxt_request );
-		$this->total_rows = $DB->num_rows;
 		$this->total_pages = intval( ($this->total_rows-1) / max($this->posts_per_page, $this->result_num_rows)) +1;
 		if( $this->total_pages < 1 )
 			$this->total_pages = 1;
@@ -808,6 +829,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.31  2005/09/02 23:37:10  fplanque
+ * Optimized ItemList querying
+ *
  * Revision 1.30  2005/08/31 19:08:51  fplanque
  * Factorized Item query WHERE clause.
  * Fixed calendar contextual accuracy.
