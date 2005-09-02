@@ -450,7 +450,7 @@ function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_po
 						.$this->ItemQuery->get_group_by()."
 						GROUP BY cat_ID";
 
-		foreach( $DB->get_results( $sql, ARRAY_A ) as $myrow )
+		foreach( $DB->get_results( $sql, ARRAY_A, 'Load postcounts' ) as $myrow )
 		{
 			$cat_ID = $myrow['cat_ID'];
 			if( !isset($cache_categories[$cat_ID]) )
@@ -946,6 +946,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.22  2005/09/02 21:46:40  fplanque
+ * doc
+ *
  * Revision 1.21  2005/09/01 17:11:46  fplanque
  * no message
  *
