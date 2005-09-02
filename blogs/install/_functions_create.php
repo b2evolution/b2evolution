@@ -215,8 +215,9 @@ function create_b2evo_tables()
 	$query = "CREATE TABLE T_postcats (
 		postcat_post_ID int(11) unsigned NOT NULL,
 		postcat_cat_ID int(11) unsigned NOT NULL,
-		PRIMARY KEY postcat_pk (postcat_post_ID,postcat_cat_ID)
-	)"; // We might want to add an index on cat_ID here...
+		PRIMARY KEY postcat_pk (postcat_post_ID,postcat_cat_ID),
+		UNIQUE catpost ( postcat_cat_ID, postcat_post_ID )
+	)";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 

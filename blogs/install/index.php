@@ -32,6 +32,7 @@ require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_form.funcs.php
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_user.funcs.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_timer.class.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_plugins.class.php';
+require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_results.class.php'; // needed to install default plugins
 require_once dirname(__FILE__).'/_functions_install.php';
 require_once dirname(__FILE__).'/_functions_create.php';
 
