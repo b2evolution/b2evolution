@@ -409,45 +409,45 @@ function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_po
 		 * WE ARE GOING TO CONSTRUCT THE WHERE CLOSE...
 		 */
 
-		$this->ItemQuery = & new ItemQuery( $dbtable, $dbprefix, $dbIDname ); // TEMPORARY OBJ
+		$ItemQuery = & new ItemQuery( $dbtable, $dbprefix, $dbIDname ); // TEMPORARY OBJ
 
 		// - - Select a specific Item:
-		// $this->ItemQuery->where_ID( $p, $title );
+		// $ItemQuery->where_ID( $p, $title );
 		if( $cat_load_postcounts == 'context' )
 		{	// We want to preserve the current context:
 			// - - - Restrict to selected blog/categories:
-			$this->ItemQuery->where_chapter( $blog, '', array() );
+			$ItemQuery->where_chapter( $blog, '', array() );
 
 			// * Restrict to the statuses we want to show:
-			$this->ItemQuery->where_status( $show_statuses );
+			$ItemQuery->where_status( $show_statuses );
 
 			// Restrict to selected authors:
-			$this->ItemQuery->where_author( $author );
+			$ItemQuery->where_author( $author );
 
 			// - - - + * * timestamp restrictions:
-			$this->ItemQuery->where_datestart( $m, $w, $dstart, '', $timestamp_min, $timestamp_max );
+			$ItemQuery->where_datestart( $m, $w, $dstart, '', $timestamp_min, $timestamp_max );
 
 			// Keyword search stuff:
-			$this->ItemQuery->where_keywords( $s, $phrase, $exact );
+			$ItemQuery->where_keywords( $s, $phrase, $exact );
 		}
 		else
 		{	// We want to preserve only the minimal context:
 			// - - - Restrict to selected blog/categories:
-			$this->ItemQuery->where_chapter( $blog, '', array() );
+			$ItemQuery->where_chapter( $blog, '', array() );
 
 			// * Restrict to the statuses we want to show:
-			$this->ItemQuery->where_status( $show_statuses );
+			$ItemQuery->where_status( $show_statuses );
 
 			// - - - + * * timestamp restrictions:
-			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
+			$ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
 		}
 
 		$sql = 'SELECT postcat_cat_ID AS cat_ID, COUNT(*) AS cat_postcount'
 						// OLD: FROM T_postcats INNER JOIN $dbtable ON postcat_post_ID = $dbIDname
 						// fplanque>> note: there was no restriction to current blog!!
-						.$this->ItemQuery->get_from()
-						.$this->ItemQuery->get_where()
-						.$this->ItemQuery->get_group_by()."
+						.$ItemQuery->get_from()
+						.$ItemQuery->get_where()
+						.$ItemQuery->get_group_by()."
 						GROUP BY cat_ID";
 
 		foreach( $DB->get_results( $sql, ARRAY_A, 'Load postcounts' ) as $myrow )
@@ -946,6 +946,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.23  2005/09/03 00:21:48  fplanque
+ * bugfixes
+ *
  * Revision 1.22  2005/09/02 21:46:40  fplanque
  * doc
  *
