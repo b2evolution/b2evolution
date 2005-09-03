@@ -486,6 +486,14 @@ function upgrade_b2evo_tables()
 	}}}
 
 
+	if( $old_db_version < 8066 )
+	{	// upgrade to 0.9.1
+		echo 'Adding catpost index... ';
+		$DB->query( 'ALTER TABLE T_postcats ADD UNIQUE catpost ( postcat_cat_ID, postcat_post_ID )' );
+		echo "OK.<br />\n";
+	}
+
+	
 	if( $old_db_version < 8070 )
 	{ // ---------------------------------- upgrade to 0.9.2 a.k.a 1.6 "phoenix"
 
