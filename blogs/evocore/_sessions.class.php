@@ -141,12 +141,20 @@ class Sessions extends Widget
 
 		$this->init();
 
-		echo $beforeAll;
+		$firstUser = true;
+
 		foreach( $this->_registeredUsers as $User )
 		{
 			if( $User->showonline )
 			{
-				echo $beforeEach;
+				if ( $firstUser )
+				{ 
+					// fails validation if we echo this with an empty list
+					echo $beforeAll;
+					$firstUser = false;
+				}
+
+ 				echo $beforeEach;
 				echo $User->get('preferedname');
 				if( isset($Blog) )
 				{
@@ -155,7 +163,10 @@ class Sessions extends Widget
 				echo $afterEach;
 			}
 		}
-		echo $afterAll;
+		if ( ! $firstUser )
+		{ // we need to close the list
+			echo $afterAll;
+		}
 	}
 
 

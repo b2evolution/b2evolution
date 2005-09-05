@@ -514,7 +514,8 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 	echo '>';
 
 	if( isset($getparams) )
-	{
+	{ // These need to be wrapped in a div to validate xhtml strict
+		echo '<div>';
 		foreach( $getparams as $param)
 		{
 			$param = explode( '=', $param );
@@ -523,6 +524,8 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 				echo '<input type="hidden" name="'.$param[0].'" value="'.$param[1].'" />';
 			}
 		}
+		// close the div
+		echo '</div>';
 	}
 }
 
@@ -546,6 +549,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.12  2005/09/05 10:58:15  yabs
+ * minor changes - correcting validation errors
+ *
  * Revision 1.11  2005/02/28 09:06:33  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
