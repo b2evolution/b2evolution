@@ -344,6 +344,13 @@ class ItemList extends DataObjectList
 			else
 			{ // We have a start date, we'll display x days starting from that point:
 				// $dstart_mysql has been calculated earlier
+
+				// TODO: this is redundant with previous dstart processing:
+				// Add trailing 0s: YYYYMMDDHHMMSS
+				$dstart0 = $dstart.'00000000000000';
+
+				$dstart_mysql = substr($dstart0,0,4).'-'.substr($dstart0,4,2).'-'.substr($dstart0,6,2).' '
+												.substr($dstart0,8,2).':'.substr($dstart0,10,2).':'.substr($dstart0,12,2);
 				$dstart_ts = mysql2timestamp( $dstart_mysql );
 				// go forward x days
 				$enddate_ts = date('Y-m-d H:i:s', ($dstart_ts + ($posts_per_page * 86400)));
@@ -379,7 +386,7 @@ class ItemList extends DataObjectList
 			// 1) we get the IDs we need
 			// 2) we get all the other fields matching these IDs
 			// This is more efficient than manipulating all fields at once.
-			$step1_sql = 'SELECT DISTINCT ID
+			$step1_sql = 'SELECT DISTINCT '.$this->dbIDname.'
 											FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
 													INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
 			$step1_sql .= $where;
@@ -397,7 +404,7 @@ class ItemList extends DataObjectList
 											FROM '.$this->dbtablename;
 			if( !empty($ID_list) )
 			{
-				$this->sql .= ' WHERE ID IN ('.$ID_list.')
+				$this->sql .= ' WHERE '.$this->dbIDname.' IN ('.$ID_list.')
 										    ORDER BY '.$this->dbprefix.$orderby;
 			}
 			else
@@ -829,6 +836,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.33  2005/09/06 19:38:29  fplanque
+ * bugfixes
+ *
  * Revision 1.32  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

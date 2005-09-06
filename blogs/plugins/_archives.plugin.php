@@ -317,7 +317,7 @@ class ArchiveList extends Results
 		global $show_statuses;
 		global $author;
 		global $timestamp_min, $timestamp_max;
-		global $s, $phrase, $exact;
+		global $s, $sentence, $exact;
 
 		$this->dbtable = $dbtable;
 		$this->dbprefix = $dbprefix;
@@ -348,7 +348,7 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
 
 			// Keyword search stuff:
-			$this->ItemQuery->where_keywords( $s, $phrase, $exact );
+			$this->ItemQuery->where_keywords( $s, $sentence, $exact );
 		}
 		else
 		{	// We want to preserve only the minimal context:
@@ -533,6 +533,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.10  2005/09/06 19:38:29  fplanque
+ * bugfixes
+ *
  * Revision 1.9  2005/09/06 17:14:12  fplanque
  * stop processing early if referer spam has been detected
  *

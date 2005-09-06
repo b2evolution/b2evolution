@@ -129,7 +129,7 @@ class calendar_plugin extends Plugin
 	 	global $show_statuses;
 	 	global $author;
 	 	global $m, $w, $dstart, $timestamp_min, $timestamp_max;
-	 	global $s, $phrase, $exact;
+	 	global $s, $sentence, $exact;
 
 		/**
 		 * Default params:
@@ -207,7 +207,7 @@ class calendar_plugin extends Plugin
 			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', $dstart, '', $timestamp_min, $timestamp_max );
 
 			// Keyword search stuff:
-			$Calendar->ItemQuery->where_keywords( $s, $phrase, $exact );
+			$Calendar->ItemQuery->where_keywords( $s, $sentence, $exact );
 		}
 		else
 		{	// We want to preserve only the minimal context:
@@ -229,6 +229,7 @@ class calendar_plugin extends Plugin
 		return true;
 	}
 }
+
 
 /**
  * Calendar
@@ -316,7 +317,6 @@ class Calendar
 		// OBJECT THAT WILL BE USED TO CONSTRUCT THE WHERE CLAUSE:
 		$this->ItemQuery = new ItemQuery( $this->dbtable, $this->dbprefix, $this->dbIDname );	// COPY!!
 
-
 		// Find out which month to display:
 		if( empty($m) )
 		{ // Current month (monthly)
@@ -393,7 +393,7 @@ class Calendar
 		// WARNING: this will slow things down...
 		// TODO: $this->check_navigation = false;
 		// Do we want arrows to move one year at a time?
-		$this->browseyears = ($this->mode == 'year');
+		$this->browseyears = true;
 
 		/**#@+
 		 * Display number of posts with days/months
@@ -830,20 +830,34 @@ class Calendar
 
 		$r = array();
 
+		// WE NEED SPECIAL QUERY PARAMS WHEN MOVING THOUGH MONTHS ( NO dstart especially! )
+		$nav_ItemQuery = & new ItemQuery( $this->dbtable, $this->dbprefix, $this->dbIDname );	// TEMP object
+		// Restrict to selected blog/categories:
+		$nav_ItemQuery->where_chapter( $this->ItemQuery->blog, $this->ItemQuery->cat, $this->ItemQuery->catsel );
+		// Restrict to the statuses we want to show:
+		$nav_ItemQuery->where_status( $this->ItemQuery->show_statuses );
+		// Restrict to selected authors:
+		$nav_ItemQuery->where_author( $this->ItemQuery->author );
+		// if a month is specified in the querystring, load that month:
+		$nav_ItemQuery->where_datestart( /* NO m */'', /* NO w */'', /* NO dstart */'', '', $this->ItemQuery->timestamp_min, $this->ItemQuery->timestamp_max );
+		// Keyword search stuff:
+		$nav_ItemQuery->where_keywords( $this->ItemQuery->keywords, $this->ItemQuery->phrase, $this->ItemQuery->exact );
+
 		switch( $direction )
 		{
 			case 'prev':
 				if( $this->browseyears )
 				{	// We want arrows to move one year at a time
-					if( $row = $DB->get_row( 'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
-																								MONTH('.$this->dbprefix.'datestart) AS month
-																					FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
-																						INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-																					WHERE YEAR('.$this->dbprefix.'datestart) < '.$this->year.'
-																					'.$this->ItemQuery->get_where( ' AND ' )
-																					.$this->ItemQuery->get_group_by( ' GROUP BY ' ).'
-																					ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
-																					LIMIT 1', OBJECT, 0, 'Calendar: find prev year with posts' )
+					if( $row = $DB->get_row(
+							'SELECT YEAR('.$this->dbprefix.'datestart) AS year,
+											MONTH('.$this->dbprefix.'datestart) AS month
+								FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+									INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+								WHERE YEAR('.$this->dbprefix.'datestart) < '.$this->year.'
+								'.$nav_ItemQuery->get_where( ' AND ' )
+								.$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
+								ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
+								LIMIT 1', OBJECT, 0, 'Calendar: find prev year with posts' )
 						)
 					{
 						$r[] = '<a href="'
@@ -861,24 +875,25 @@ class Calendar
 
 				if( $this->mode == 'month' )
 				{ // We are browsing months, we'll display arrows to move one month at a time:
-					if( $row = $DB->get_row( 'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
-																								YEAR('.$this->dbprefix.'datestart) AS year
-																				FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
-																					INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-																				WHERE
-																				(
-																					YEAR('.$this->dbprefix.'datestart) < '.($this->year).'
-																					OR ( YEAR('.$this->dbprefix.'datestart) = '.($this->year).'
-																								AND MONTH('.$this->dbprefix.'datestart) < '.($this->month).'
-																							)
-																				)
-                     										'.$this->ItemQuery->get_where( ' AND ' )
- 																				 .$this->ItemQuery->get_group_by( ' GROUP BY ' ).'
-																				ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, MONTH('.$this->dbprefix.'datestart) DESC
-																				LIMIT 1',
-																				OBJECT,
-																				0,
-																				'Calendar: Find prev month with posts' )
+					if( $row = $DB->get_row(
+							'SELECT MONTH('.$this->dbprefix.'datestart) AS month,
+											YEAR('.$this->dbprefix.'datestart) AS year
+							FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+								INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+							WHERE
+							(
+								YEAR('.$this->dbprefix.'datestart) < '.($this->year).'
+								OR ( YEAR('.$this->dbprefix.'datestart) = '.($this->year).'
+											AND MONTH('.$this->dbprefix.'datestart) < '.($this->month).'
+										)
+							)
+							'.$nav_ItemQuery->get_where( ' AND ' )
+							 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
+							ORDER BY YEAR('.$this->dbprefix.'datestart) DESC, MONTH('.$this->dbprefix.'datestart) DESC
+							LIMIT 1',
+							OBJECT,
+							0,
+							'Calendar: Find prev month with posts' )
 						)
 					{
 						$r[] = '<a href="'
@@ -907,8 +922,8 @@ class Calendar
 																								AND MONTH('.$this->dbprefix.'datestart) > '.($this->month).'
 																							)
 																				)
-                     										'.$this->ItemQuery->get_where( ' AND ' )
- 																				 .$this->ItemQuery->get_group_by( ' GROUP BY ' ).'
+                     										'.$nav_ItemQuery->get_where( ' AND ' )
+ 																				 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
 																				ORDER BY YEAR('.$this->dbprefix.'datestart), MONTH('.$this->dbprefix.'datestart) ASC
 																				LIMIT 1',
 																				OBJECT,
@@ -931,8 +946,8 @@ class Calendar
 																				FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 																					INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 																				WHERE YEAR('.$this->dbprefix.'datestart) > '.$this->year.'
-                     										'.$this->ItemQuery->get_where( ' AND ' )
-																				 .$this->ItemQuery->get_group_by( ' GROUP BY ' ).'
+                     										'.$nav_ItemQuery->get_where( ' AND ' )
+																				 .$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
 																				ORDER BY YEAR('.$this->dbprefix.'datestart) ASC, ABS( '.intval($this->month).' - MONTH('.$this->dbprefix.'datestart) ) ASC
 																				LIMIT 1', OBJECT, 0, 'Calendar: find next year with posts' )
 						)
@@ -959,6 +974,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.8  2005/09/06 19:38:29  fplanque
+ * bugfixes
+ *
  * Revision 1.7  2005/09/06 17:14:12  fplanque
  * stop processing early if referer spam has been detected
  *

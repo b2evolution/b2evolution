@@ -393,7 +393,7 @@ function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_po
 	global $DB, $cache_categories;
 	global $blog, $show_statuses, $author;
 	global $m, $w, $dstart, $timestamp_min, $timestamp_max;
-	global $s, $phrase, $exact;
+	global $s, $sentence, $exact;
 	global $cat_postcounts_loaded;
 	global $Settings;
 
@@ -428,7 +428,7 @@ function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_po
 			$ItemQuery->where_datestart( $m, $w, $dstart, '', $timestamp_min, $timestamp_max );
 
 			// Keyword search stuff:
-			$ItemQuery->where_keywords( $s, $phrase, $exact );
+			$ItemQuery->where_keywords( $s, $sentence, $exact );
 		}
 		else
 		{	// We want to preserve only the minimal context:
@@ -946,6 +946,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.25  2005/09/06 19:38:29  fplanque
+ * bugfixes
+ *
  * Revision 1.24  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

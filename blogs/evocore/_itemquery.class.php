@@ -44,10 +44,20 @@ require_once dirname(__FILE__).'/_sql.class.php';
  */
 class ItemQuery extends SQL
 {
-	/**
-	 * We must save thsi value because several restrictions depend on it to check permissions.
-	 */
+	var $p;
+	var $title;
 	var $blog;
+	var $cat;
+	var $catsel;
+	var $show_statuses;
+	var $author;
+	var $dstart;
+	var $dstop;
+	var $timestamp_min;
+	var $timestamp_max;
+	var $keywords;
+	var $phrase;
+	var $exact;
 
 
 	/**
@@ -71,8 +81,11 @@ class ItemQuery extends SQL
   /**
 	 * Restrict to a specific post
 	 */
-	function where_ID( $p, $title )
+	function where_ID( $p = '', $title = '' )
 	{
+		$this->p = $p;
+		$this->title = $title;
+
 		// if a post number is specified, load that post
 		if( !empty($p) && ($p != 'all') )
 		{
@@ -97,7 +110,7 @@ class ItemQuery extends SQL
 	 * @param string List of cats to restrict to
 	 * @param array Array of cats to restrict to
 	 */
-	function where_chapter( $blog, $cat, $catsel )
+	function where_chapter( $blog, $cat = '', $catsel = array() )
 	{
 		$blog = intval($blog);	// Extra security
 
@@ -146,6 +159,8 @@ class ItemQuery extends SQL
 	 */
 	function where_status( $show_statuses )
 	{
+		$this->show_statuses = $show_statuses;
+
 		if( !isset( $this->blog ) )
 		{
 			die( 'Status restriction requires to work with aspecific blog first.' );
@@ -160,8 +175,10 @@ class ItemQuery extends SQL
 	 *
 	 * @param string List of authors to restrict to
 	 */
-	function where_author( $author )
+	function where_author( $author = '' )
 	{
+		$this->author = $author;
+
 		if( empty($author) || ($author == 'all'))
 		{
 			return;
@@ -195,9 +212,16 @@ class ItemQuery extends SQL
 	 * @param mixed Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Do not show posts after this timestamp, can be 'now'
 	 */
-	function where_datestart( $m, $w, $dstart, $dstop, $timestamp_min = '', $timestamp_max = 'now' )
+	function where_datestart( $m = '', $w = '', $dstart = '', $dstop = '', $timestamp_min = '', $timestamp_max = 'now' )
 	{
 		global $Settings;
+
+		$this->m = $m;
+		$this->w = $w;
+		$this->dstart = $dstart;
+		$this->dstop = $dstop;
+		$this->timestamp_min = $timestamp_min;
+		$this->timestamp_max = $timestamp_max;
 
 		if( !empty($m) )
 		{
@@ -275,6 +299,10 @@ class ItemQuery extends SQL
 	{
 		global $DB;
 
+		$this->keywords = $keywords;
+		$this->phrase = $phrase;
+		$this->exact = $exact;
+
 		if( empty($keywords) )
 		{
 			return;
@@ -327,6 +355,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.4  2005/09/06 19:38:29  fplanque
+ * bugfixes
+ *
  * Revision 1.3  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
