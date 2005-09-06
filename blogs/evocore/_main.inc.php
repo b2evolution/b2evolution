@@ -77,6 +77,29 @@ define( 'EVO_MAIN_INIT', true );
 
 
 /**
+ * Load logging class
+ */
+require_once dirname(__FILE__).'/_log.class.php';
+/**
+ * Debug message log for debugging only (initialized here)
+ * @global Log $Debuglog
+ */
+$Debuglog = & new Log( 'note' );
+/**
+ * Info & error message log for end user (initialized here)
+ * @global Log $Messages
+ */
+$Messages = & new Log( 'error' );
+
+
+/**
+ * Start timer:
+ */
+require_once dirname(__FILE__).'/_timer.class.php';
+$Timer = & new Timer('main');
+
+
+/**
  * Load base + advanced configuration:
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
@@ -95,81 +118,13 @@ if( isset( $error_message ) )
 
 
 /**
- * Load logging class
- */
-require_once dirname(__FILE__).'/_log.class.php';
-/**
- * Debug message log for debugging only (initialized here)
- * @global Log $Debuglog
- */
-$Debuglog = & new Log( 'note' );
-/**
- * Info & error message log for end user (initialized here)
- * @global Log $Messages
- */
-$Messages = & new Log( 'error' );
-
-
-/**
- * Load Request class
- */
-require_once dirname(__FILE__).'/_request.class.php';
-/**
- * Debug message log for debugging only (initialized here)
- * @global Request $Request
- */
-$Request = & new Request( $Messages );
-
-
-
-/**
- * Check conf...
- */
-if( !function_exists( 'gzencode' ) )
-{ // when there is no function to gzip, we won't do it
-	$Debuglog->add( '$use_gzipcompression is true, but the function gzencode() does not exist. Disabling gzip compression.' );
-	$use_gzipcompression = false;
-}
-
-if( !isset( $use_html_checker ) ) $use_html_checker = 1;
-
-/**
- * Includes:
- */
-require_once dirname(__FILE__).'/_misc.funcs.php';
-require_once dirname(__FILE__).'/_timer.class.php';
-$Timer = & new Timer('main');
-
-require_once dirname(__FILE__).'/_antispam.funcs.php';
-require_once dirname(__FILE__).'/_blog.funcs.php';
-require_once dirname(__FILE__).'/_item.funcs.php';
-require_once dirname(__FILE__).'/_category.funcs.php';
-require_once dirname(__FILE__).'/_comment.funcs.php';
-require_once dirname(__FILE__).'/_file.funcs.php';
-if( $use_html_checker ) require_once dirname(__FILE__).'/_htmlchecker.class.php';
-require_once dirname(__FILE__).'/_item.funcs.php';
-require_once dirname(__FILE__).'/_message.funcs.php';
-require_once dirname(__FILE__).'/_pingback.funcs.php';
-require_once dirname(__FILE__).'/_ping.funcs.php';
-require_once dirname(__FILE__).'/_skin.funcs.php';
-require_once dirname(__FILE__).'/_trackback.funcs.php';
-require_once dirname(__FILE__).'/_user.funcs.php';
-
-
-/**
- * Optionnaly include obsolete functions
- */
-@include_once dirname(__FILE__).'/_obsolete092.php';
-
-
-/**
  * Sets various arrays and vars
  */
 require_once dirname(__FILE__).'/_vars.inc.php';
 
 
 /**
- * DB class
+ * Load DB class
  */
 require_once dirname(__FILE__).'/_db.class.php';
 /**
@@ -179,15 +134,12 @@ require_once dirname(__FILE__).'/_db.class.php';
  */
 $DB = new DB( $EvoConfig->DB['user'], $EvoConfig->DB['password'], $EvoConfig->DB['name'], $EvoConfig->DB['host'], $db_aliases, $db_use_transactions, $db_table_options );
 
-require_once dirname(__FILE__).'/_resultsel.class.php';
 
-
-/**#@+
+/**
  * Load settings class
  */
 require_once dirname(__FILE__).'/_generalsettings.class.php';
 require_once dirname(__FILE__).'/_usersettings.class.php';
-/**#@-*/
 /**
  * Interface to general settings
  *
@@ -222,6 +174,56 @@ require_once dirname(__FILE__).'/_hit.class.php';
  * @global Hit The Hit object
  */
 $Hit = & new Hit();
+
+
+/**
+ * Load Request class
+ */
+require_once dirname(__FILE__).'/_request.class.php';
+/**
+ * Debug message log for debugging only (initialized here)
+ * @global Request $Request
+ */
+$Request = & new Request( $Messages );
+
+
+/**
+ * Check conf...
+ */
+if( !function_exists( 'gzencode' ) )
+{ // when there is no function to gzip, we won't do it
+	$Debuglog->add( '$use_gzipcompression is true, but the function gzencode() does not exist. Disabling gzip compression.' );
+	$use_gzipcompression = false;
+}
+
+if( !isset( $use_html_checker ) ) $use_html_checker = 1;
+
+
+/**
+ * Includes:
+ */
+require_once dirname(__FILE__).'/_blog.funcs.php';
+require_once dirname(__FILE__).'/_item.funcs.php';
+require_once dirname(__FILE__).'/_category.funcs.php';
+require_once dirname(__FILE__).'/_comment.funcs.php';
+require_once dirname(__FILE__).'/_file.funcs.php';
+if( $use_html_checker ) require_once dirname(__FILE__).'/_htmlchecker.class.php';
+require_once dirname(__FILE__).'/_item.funcs.php';
+require_once dirname(__FILE__).'/_message.funcs.php';
+require_once dirname(__FILE__).'/_pingback.funcs.php';
+require_once dirname(__FILE__).'/_ping.funcs.php';
+require_once dirname(__FILE__).'/_skin.funcs.php';
+require_once dirname(__FILE__).'/_trackback.funcs.php';
+require_once dirname(__FILE__).'/_user.funcs.php';
+
+
+/**
+ * Optionnaly include obsolete functions
+ */
+@include_once dirname(__FILE__).'/_obsolete092.php';
+
+
+require_once dirname(__FILE__).'/_resultsel.class.php';
 
 
 /**
@@ -526,6 +528,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.47  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.46  2005/09/01 17:11:46  fplanque
  * no message
  *

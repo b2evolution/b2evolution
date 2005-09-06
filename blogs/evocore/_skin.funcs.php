@@ -39,7 +39,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Template function: output base URL to current skin
@@ -211,6 +211,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.6  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.5  2005/08/04 13:05:10  fplanque
  * bugfix
  *

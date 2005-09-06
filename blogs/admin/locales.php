@@ -278,7 +278,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 				fwrite( $fp, " * Global lang file\n" );
 				fwrite( $fp, " * This file was generated automatically from messages.po\n" );
 				fwrite( $fp, " */\n" );
-				fwrite( $fp, "if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );" );
+				fwrite( $fp, "if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );" );
 				fwrite( $fp, "\n\n" );
 
 
@@ -380,6 +380,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.3  2005/09/06 17:13:53  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.2  2005/07/12 00:22:46  blueyed
  * Fixed minor eval() injection with register_globals on.
  *

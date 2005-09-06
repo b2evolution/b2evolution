@@ -12,7 +12,7 @@
  * TODO: links to result's pages, not only stoopid 'forward'/'backward'
  * ...FP: change buttons into parameter-links
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 ?>
 <table cellpadding="0" cellspacing="0" border="0">
 	<tr>

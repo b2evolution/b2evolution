@@ -39,7 +39,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes:
@@ -626,6 +626,9 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
 /*
  * $Log$
+ * Revision 1.4  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.3  2005/06/20 17:40:23  fplanque
  * minor
  *

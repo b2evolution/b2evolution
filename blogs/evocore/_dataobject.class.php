@@ -31,7 +31,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Data Object Base Class
@@ -568,6 +568,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.22  2005/09/06 17:13:54  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.21  2005/07/26 18:57:34  fplanque
  * changed handling of empty params. We do need to differentiate between empty input ''=>NULL and 0=>0 in some situations!
  *

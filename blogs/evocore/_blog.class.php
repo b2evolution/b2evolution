@@ -47,7 +47,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes:
@@ -724,6 +724,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2005/09/06 17:13:54  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.26  2005/08/26 14:29:29  fplanque
  * fixed cookie domains for localhost (needed to remember the current skin)
  *

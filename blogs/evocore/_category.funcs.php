@@ -49,7 +49,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * cat_create(-)
@@ -946,6 +946,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.24  2005/09/06 17:13:54  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.23  2005/09/03 00:21:48  fplanque
  * bugfixes
  *

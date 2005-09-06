@@ -32,7 +32,7 @@
  * @version $Id$
  *
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -140,6 +140,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.2  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.1  2005/07/29 17:56:18  fplanque
  * Added functionality to locate files when they're attached to a post.
  * permission checking remains to be done.

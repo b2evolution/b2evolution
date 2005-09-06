@@ -40,7 +40,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -308,6 +308,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.11  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.10  2005/08/26 16:34:51  fplanque
  * no message
  *

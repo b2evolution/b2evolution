@@ -39,7 +39,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Class to handle the global settings.
@@ -589,6 +589,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.17  2005/09/06 17:13:54  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.16  2005/07/12 22:54:14  blueyed
  * Fixed get_cond(): respect NULL and false return value of get()
  *

@@ -9,7 +9,7 @@
  * @todo Move to {@link AdminUI_general AdminUI} object.
  * @package admin
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Close open divs, etc...
 echo $AdminUI->getBodyBottom();

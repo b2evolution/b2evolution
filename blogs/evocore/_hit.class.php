@@ -40,7 +40,13 @@
  * @version $Id$
  *
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+/**
+ *
+ */
+require_once dirname(__FILE__).'/_misc.funcs.php';
 
 
 /**
@@ -129,11 +135,11 @@ class Hit
 	{
 		global $Debuglog, $DB;
 		global $comments_allowed_uri_scheme;
-		global $localtimenow;
 
+		// Get list of client IP addresses from REMOTE_ADDR and HTTP_X_FORWARDED_FOR
 		$this->IP = getIpList( true );
-		$this->localtimenow = $localtimenow;
 
+		// Check the referer:
 		$this->detectReferrer();
 		$this->refererBasedomain = getBaseDomain($this->referer);
 
@@ -175,7 +181,7 @@ class Hit
 	 */
 	function detectReload()
 	{
-		global $DB, $Debuglog, $Settings, $ReqURI;
+		global $DB, $Debuglog, $Settings, $ReqURI, $localtimenow;
 
 		/*
 		 * Check for reloads (if the URI has been requested from same IP/useragent
@@ -184,7 +190,7 @@ class Hit
 		if( $DB->get_var(
 					'SELECT hit_ID FROM T_hitlog, T_useragents
 						WHERE hit_uri = "'.$DB->escape( $ReqURI ).'"
-							AND hit_datetime > "'.date( 'Y-m-d H:i:s', $this->localtimenow - $Settings->get('reloadpage_timeout') ).'"
+							AND hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
 							AND hit_remote_addr = '.$DB->quote( getIpList( true ) ).'
 							AND agnt_ID = hit_agnt_ID
 							AND agnt_signature = '.$DB->quote($this->userAgent),
@@ -208,7 +214,7 @@ class Hit
 		global $blackList, $search_engines;  // used to detect $refererType
 
 		if( isset( $HTTP_REFERER ) )
-		{
+		{	// Referer provided by PHP:
 			$this->referer = $HTTP_REFERER;
 		}
 		else
@@ -224,41 +230,25 @@ class Hit
 		}
 
 
-		/*
-		 * Check if we have a valid referer:
-		 * minimum length: http://az.fr/
-		 */
-		if( strlen($this->referer) < 13 )
-		{ // this will be considered direct access
-			$Debuglog->add( 'detectReferrer(): invalid referer / direct access?', 'hit' );
-			$this->refererType = 'direct';
-			return;
-		}
-
-
-		/*
-		 * Check if the referer is clean:
-		 */
-		if( ( $this->referer != strip_tags($this->referer)
-					&& $error = 'bad char in referer' )
-				|| ( $error = validate_url( $this->referer, $comments_allowed_uri_scheme ) ) )
-		{ // then they have tried something funny (putting HTML or PHP into the HTTP_REFERER)
+		// Check if the referer is valid and is not blacklisted:
+		if( $error = validate_url( $this->referer, $comments_allowed_uri_scheme ) )
+		{
 			$Debuglog->add( 'detectReferrer(): '.$error, 'hit');
-
 			$this->refererType = 'spam'; // Hazardous
 			$this->referer = false;
-
 			// QUESTION: add domain to T_basedomains, type 'blacklist' ?
 
-			return;
+			// This is most probably referer spam,
+			// In order order to preserve server resources, we're going to stop processing immediatly!!
+			require dirname(__FILE__).'/_referer_spam.page.php';	// error & exit
+			// THIS IS THE END!!
 		}
 
 
-		/*
-		 * Check blacklist, see {@link $blackList}
-		 * fplanque: we log these again, because if we didn't we woudln't detect
-		 * reloads on these... and that would be a problem!
-		 */
+		// Check blacklist, see {@link $blackList}
+		// NOTE: This is NOT the antispam!!
+		// fplanque: we log these again, because if we didn't we woudln't detect
+		// reloads on these... and that would be a problem!
 		foreach( $blackList as $lBlacklist )
 		{
 			if( strpos( $this->referer, $lBlacklist ) !== false )
@@ -270,9 +260,7 @@ class Hit
 		}
 
 
-		/*
-		 * Is the referer a search engine?
-		 */
+		// Is the referer a search engine?
 		foreach( $search_engines as $lSearchEngine )
 		{
 			if( stristr($this->referer, $lSearchEngine) )
@@ -447,7 +435,7 @@ class Hit
 	 */
 	function recordTheHit()
 	{
-		global $DB, $Session, $ReqURI, $Blog;
+		global $DB, $Session, $ReqURI, $Blog, $localtimenow;
 
 		$refererBasedomain = getBaseDomain( $this->referer );
 
@@ -455,7 +443,7 @@ class Hit
 		$sql = 'INSERT INTO T_hitlog( hit_sess_ID, hit_datetime, hit_uri,
 																	hit_agnt_ID, hit_referer_type, hit_referer,
 																	hit_referer_dom_ID, hit_blog_ID, hit_remote_addr )
-						VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$this->localtimenow.'), "'.$DB->escape($ReqURI).'",
+						VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'",
 										"'.$this->agentID.'", "'.$this->refererType.'", "'.$DB->escape($this->referer).'",
 										"'.$this->refererDomainID.'", "'.$Blog->ID.'", "'.$DB->escape( $this->IP ).'"
 									)';

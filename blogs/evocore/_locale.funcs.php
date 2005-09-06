@@ -43,7 +43,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') && !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -699,6 +699,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.13  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.12  2005/04/27 19:05:46  fplanque
  * normalizing, cleanup, documentaion
  *

@@ -41,7 +41,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -1101,6 +1101,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.33  2005/09/06 17:13:53  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.32  2005/08/31 19:06:41  fplanque
  * minor
  *

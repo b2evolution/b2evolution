@@ -31,7 +31,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 if( false )
 {	/**
@@ -69,6 +69,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Rename'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.3  2005/09/06 17:13:53  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.2  2005/08/22 18:42:25  fplanque
  * minor
  *

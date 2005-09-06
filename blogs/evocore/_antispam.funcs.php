@@ -52,7 +52,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -62,7 +62,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 function antispam_create( $abuse_string, $aspm_source = 'local' )
 {
-	global $DB, $cache_antispam;
+	global $DB;
 
 	// Cut the crap if the string is empty:
 	$abuse_string = trim( $abuse_string );
@@ -75,9 +75,6 @@ function antispam_create( $abuse_string, $aspm_source = 'local' )
 	$sql = "INSERT INTO T_antispam( aspm_string, aspm_source )
 					VALUES( '".$DB->escape($abuse_string)."', '$aspm_source' )";
 	$DB->query( $sql );
-
-	// Insert into cache:
-	$cache_antispam[] = $abuse_string;
 
 	return true;
 }
@@ -117,40 +114,38 @@ function antispam_delete( $string_ID )
 /**
  * Check if an URL contains abusive substrings
  *
- * antispam_url(-)
+ * Note: Letting the database do the LIKE %% match is a little faster than doing in it PHP,
+ * not to mention the incredibly long overhead of preloading the list into PHP
  */
 function antispam_url( $url )
 {
-	global $DB, $cache_antispam, $Debuglog;
-/*
+	global $DB, $Debuglog, $Timer;
+
+	/*
 	// check for blacklisted IP first
 	// TODO: move this into _main or somewhere early and stop processing if matched. don't check with EVERY SINGLE URL!!
 	if ( $results = antispam_ip($_SERVER["REMOTE_ADDR"]) ) {
 		return $results;
 	}
-*/
+	*/
 
 	// TODO: 'SELECT COUNT(*) FROM T_antispam WHERE aspm_string LIKE "%'.$url.'%" ?
 	// TODO: Check basedomain against T_basedomains (dom_status = 'blacklist')
 
-	if( !isset($cache_antispam))
-	{ // Cache not loaded, load now:
-		$cache_antispam = $DB->get_col( 'SELECT aspm_string FROM T_antispam' );
-	}
-
-	// Check URL for abuse:
-	foreach( $cache_antispam as $block )
+	$Timer->start( 'antispam_url' );
+	if( $block = $DB->get_var( "SELECT aspm_string
+					  		 	FROM  T_antispam
+					       WHERE ".$DB->quote($url)." LIKE CONCAT('%',aspm_string,'%')
+					       LIMIT 0, 1", 0, 0, 'Check URL against antispam balcklist' ) )
 	{
-		if( stristr($url, $block) !== false)
-		{
 			$Debuglog->add( 'Spam block: '.$block );
 			return $block;	// SPAM detected!
-		}
 	}
+	$Timer->stop( 'antispam_url' );
 
 	return false;	// no problem.
-
 }
+
 
 /**
  * Check if an IP is blacklisted
@@ -328,6 +323,9 @@ function antispam_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.11  2005/09/06 17:13:54  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.10  2005/08/08 22:54:41  blueyed
  * Re-activated /admin/antispam, with slight improvements. Still needs a lot more love.
  *

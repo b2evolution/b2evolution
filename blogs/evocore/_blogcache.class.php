@@ -39,7 +39,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes:
@@ -225,6 +225,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.14  2005/09/06 17:13:54  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.13  2005/07/13 23:44:18  blueyed
  * Fixed notice with not returning reference (since PHP 4.4.0?).
  *

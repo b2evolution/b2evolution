@@ -40,7 +40,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes:
@@ -641,6 +641,9 @@ function sort_Plugin_name( & $a, & $b )
 
 /*
  * $Log$
+ * Revision 1.10  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.9  2005/03/02 18:44:27  fplanque
  * comments
  *

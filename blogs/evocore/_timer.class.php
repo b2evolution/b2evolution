@@ -38,7 +38,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * This is a simple class to allow timing/profiling of code portions.
@@ -81,10 +81,10 @@ class Timer
 	/**
 	 * Start a timer.
 	 */
-	function start( $category )
+	function start( $category, $log = true )
 	{
 		global $Debuglog;
-		$Debuglog->add( 'Starting timer '.$category, 'timer' );
+		if( $log ) $Debuglog->add( 'Starting timer '.$category, 'timer' );
 		$this->reset( $category );
 		$this->resume( $category );
 	}
@@ -97,7 +97,14 @@ class Timer
 	 */
 	function stop( $category )
 	{
-		return $this->pause( $category );
+		global $Debuglog;
+
+		if( ! $this->pause( $category ) )
+			return false;
+
+		$Debuglog->add( 'Stopped timer '.$category.' at '.$this->get_duration( $category, 3 ), 'timer' );
+
+		return true;
 	}
 
 
@@ -114,9 +121,8 @@ class Timer
 		{ // Timer has not been started!
 			return false;
 		}
-		$since_pause = $this->get_current_microtime() - $this->_times[$category]['resumed'];
-		$this->_times[$category]['total'] += $since_pause;
-
+		$since_resume = $this->get_current_microtime() - $this->_times[$category]['resumed'];
+		$this->_times[$category]['total'] += $since_resume;
 		$this->_times[$category]['state'] = 'paused';
 
 		return true;
@@ -218,6 +224,9 @@ class Timer
 
 /*
  * $Log$
+ * Revision 1.2  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.1  2005/07/12 23:05:36  blueyed
  * Added Timer class with categories 'main' and 'sql_queries' for now.
  *

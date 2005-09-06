@@ -18,7 +18,7 @@
  *
  * @package evocore
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Class Archive
@@ -708,6 +708,9 @@ class zip_file extends archive
 
 /*
  * $Log$
+ * Revision 1.5  2005/09/06 17:14:12  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.4  2005/08/19 17:20:52  blueyed
  * Merged from upstream.
  *

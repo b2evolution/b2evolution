@@ -32,7 +32,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 echo '<div class="browse_side_item">';
 
@@ -192,6 +192,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.15  2005/09/06 17:13:53  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.14  2005/08/31 19:06:41  fplanque
  * minor
  *

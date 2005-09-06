@@ -46,7 +46,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
 
@@ -1485,16 +1485,8 @@ function last_comments_title( $prefix = ' ', $display = 'htmlbody' )
  */
 function stats_title( $prefix = ' ', $display = 'htmlbody' )
 {
-	global $disp;
-
-	if( $disp == 'stats' )
-	{
-		$info = $prefix. T_('Statistics');
-		if ($display)
-			echo format_to_output( $info, $display );
-		else
-			return $info;
-	}
+	if( ! $display )
+		return '';
 }
 
 /**
@@ -1633,6 +1625,9 @@ $fileupload_allowedusers = '';
 
 /*
  * $Log$
+ * Revision 1.15  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.14  2005/08/10 21:14:34  blueyed
  * Enhanced $demo_mode (user editing); layout fixes; some function names normalized
  *

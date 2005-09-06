@@ -32,7 +32,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes:
@@ -342,6 +342,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.106  2005/09/06 17:13:53  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.105  2005/09/01 17:11:46  fplanque
  * no message
  *

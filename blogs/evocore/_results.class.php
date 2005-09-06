@@ -39,7 +39,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes:
@@ -1110,6 +1110,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.30  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.29  2005/08/04 13:25:16  fplanque
  * fixed bug when there was no limit
  *

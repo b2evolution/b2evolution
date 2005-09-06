@@ -43,7 +43,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * An RFC 1939 compliant wrapper class for the POP3 protocol.
@@ -738,6 +738,9 @@ class POP3 {
 
 /*
  * $Log$
+ * Revision 1.4  2005/09/06 17:14:12  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.3  2005/02/28 09:06:44  blueyed
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *

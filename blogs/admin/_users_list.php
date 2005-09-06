@@ -31,7 +31,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // query which groups have users (in order to prevent deletion of groups which have users)
 $usedgroups = $DB->get_col( 'SELECT grp_ID FROM T_groups, T_users
@@ -184,6 +184,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.48  2005/09/06 17:13:53  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.47  2005/06/02 18:50:52  fplanque
  * no message
  *

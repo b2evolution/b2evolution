@@ -11,7 +11,7 @@
 	 *
 	 * @package evoskins
 	 */
-	if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+	if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 	# You can customize the following as you wish:
 	if(!isset($cat_all)) $cat_all = /* TRANS: All categories, skin's categories list */ T_('All');	// Set to empty to hide

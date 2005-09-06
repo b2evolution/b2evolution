@@ -3,7 +3,7 @@
  * Global lang file
  * This file was generated automatically from messages.po
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
 $trans['fr_FR'] = array(

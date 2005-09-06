@@ -31,7 +31,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes:
@@ -40,6 +40,9 @@ require_once dirname(__FILE__).'/_group.class.php';
 
 /*
  * $Log$
+ * Revision 1.5  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.4  2005/03/15 19:19:47  fplanque
  * minor, moved/centralized some includes
  *

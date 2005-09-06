@@ -49,7 +49,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 //get most linked to pages on site
 //select count(hit_uri) as count, hit_uri from T_hitlog group by hit_uri order by count desc
@@ -372,6 +372,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.10  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.9  2005/05/27 19:00:56  fplanque
  * no message
  *

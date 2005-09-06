@@ -12,7 +12,7 @@
 	 * @package evoskins
 	 * @subpackage custom
 	 */
-	if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+	if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 	# maximum number of linkblog entries to display:
 	if(!isset($linkblog_limit)) $linkblog_limit = 20;

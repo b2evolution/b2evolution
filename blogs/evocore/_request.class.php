@@ -32,7 +32,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -560,6 +560,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.12  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.11  2005/08/25 16:06:45  fplanque
  * Isolated compilation of categories to use in an ItemList.
  * This was one of the oldest bugs on the list! :>

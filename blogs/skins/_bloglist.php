@@ -11,7 +11,7 @@
 	 *
 	 * @package evoskins
 	 */
-	if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+	if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 if( ! $display_blog_list )
 { // We do *not* want the blog list to be displayed

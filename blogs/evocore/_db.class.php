@@ -68,7 +68,7 @@
  * @version $Id$
  * @todo transaction support
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * ezSQL Constants
@@ -101,7 +101,7 @@ class DB
   /**
 	 * Number of rows we want to dump in debug output:
 	 */
-	var $debug_dump_rows = 20;
+	var $debug_dump_rows = 0;
 
 	var $show_errors = true;
 	var $halt_on_error = true;
@@ -437,7 +437,7 @@ class DB
 			// Resume global query timer
 			$Timer->resume( 'sql_queries' );
 			// Start a timer fot this paritcular query:
-			$Timer->start( 'query' );
+			$Timer->start( 'query', false );
 			// Run query:
 			$this->result = @mysql_query( $query, $this->dbh );
 			// Get duration fpor last query:
@@ -1008,6 +1008,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.25  2005/09/06 17:13:54  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.24  2005/09/02 21:31:34  fplanque
  * enhanced query debugging features
  *

@@ -11,7 +11,7 @@
  * TODO: if $this->destformat changes all links would show up again.. :/ Prefix it?
  * NOTE: we could link to the original post in linkloggers post's content.. :)
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 class linklogger_plugin extends Plugin
 {

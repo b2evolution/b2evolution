@@ -41,7 +41,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
 /**
@@ -533,6 +533,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.9  2005/09/06 17:14:12  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.8  2005/09/01 17:11:46  fplanque
  * no message
  *

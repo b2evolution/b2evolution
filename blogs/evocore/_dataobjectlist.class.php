@@ -31,7 +31,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes
@@ -121,6 +121,9 @@ class DataObjectList extends Results
 
 /*
  * $Log$
+ * Revision 1.10  2005/09/06 17:13:54  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.9  2005/05/24 15:26:52  fplanque
  * cleanup
  *

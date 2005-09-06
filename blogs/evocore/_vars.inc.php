@@ -42,7 +42,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes
@@ -241,6 +241,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.21  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.20  2005/04/28 20:44:20  fplanque
  * normalizing, doc
  *

@@ -43,7 +43,7 @@
  * @todo Performance
  * @todo favorite folders/bookmarks
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Includes
@@ -1354,6 +1354,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.52  2005/09/06 17:13:54  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.51  2005/08/17 16:22:16  fplanque
  * no message
  *

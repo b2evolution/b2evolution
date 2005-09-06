@@ -39,7 +39,7 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 if( false )
 {	/**
@@ -266,6 +266,9 @@ if( false )
 
 /*
  * $Log$
+ * Revision 1.11  2005/09/06 17:13:53  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.10  2005/06/22 17:44:52  blueyed
  * Fix onclick for "Add another file input"
  *

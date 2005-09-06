@@ -43,13 +43,14 @@
  *
  * @version $Id$
  */
-if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
 /**
  * Dependencies
  */
-require_once( dirname(__FILE__).'/_locale.funcs.php' );
+require_once dirname(__FILE__).'/_locale.funcs.php';
+require_once dirname(__FILE__).'/_antispam.funcs.php';
 
 
 /***** Formatting functions *****/
@@ -1122,6 +1123,17 @@ function validate_url( $url, & $allowed_uri_scheme )
 		return false;
 	}
 
+	// minimum length: http://az.fr/
+	if( strlen($url) < 13 )
+	{ // URL too short!
+		return T_('Invalid URL');
+	}
+
+	if( $url != strip_tags($url) )
+	{ // URL contains tags:
+		return T_('Invalid URL');
+	}
+
 	if( ! preg_match('/^([a-zA-Z][a-zA-Z0-9+-.]*):[0-9]*/', $url, $matches) )
 	{ // Cannot find URI scheme
 		return T_('Invalid URL');
@@ -1867,6 +1879,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.87  2005/09/06 17:13:55  fplanque
+ * stop processing early if referer spam has been detected
+ *
  * Revision 1.86  2005/09/02 21:31:34  fplanque
  * enhanced query debugging features
  *
