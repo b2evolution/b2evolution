@@ -1146,7 +1146,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 	}
 
 	// Search for blocked URLs:
-	if( $block = antispam_url($url) )
+	if( $block = antispam_check($url) )
 	{
 		if( $debug ) return 'Url refused. Debug info: blacklisted word: ['.$block.']';
 		return T_('URL not allowed');
@@ -1879,6 +1879,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.88  2005/09/07 17:40:22  fplanque
+ * enhanced antispam
+ *
  * Revision 1.87  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

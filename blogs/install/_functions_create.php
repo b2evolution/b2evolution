@@ -126,7 +126,7 @@ function create_b2evo_tables()
 		blog_keywords tinytext,
 		blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post',
 		blog_allowtrackbacks TINYINT(1) NOT NULL default 1,
-		blog_allowpingbacks TINYINT(1) NOT NULL default 1,
+		blog_allowpingbacks TINYINT(1) NOT NULL default 0,
 		blog_allowblogcss TINYINT(1) NOT NULL default 1,
 		blog_allowusercss TINYINT(1) NOT NULL default 1,
 		blog_pingb2evonet TINYINT(1) NOT NULL default 0,

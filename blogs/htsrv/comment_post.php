@@ -46,7 +46,13 @@ if( ! is_logged_in() )
 		if( empty($email) ) $Messages->add( T_('Please fill in the email field'), 'error' );
 	}
 
-	if( (!empty($email)) && (!is_email($email)) )
+	if( !empty($author) && antispam_check( $author ) )
+	{
+		$Messages->add( T_('Supplied name is invalid'), 'error' );
+	}
+
+	if( !empty($email)
+		&& ( !is_email($email)|| antispam_check( $email ) ) )
 	{
 		$Messages->add( T_('Supplied email address is invalid'), 'error' );
 	}
@@ -73,6 +79,10 @@ $comment = format_to_post($original_comment, $comment_autobr, 1);
 if( empty($comment) )
 { // comment should not be empty!
 	$Messages->add( T_('Please do not send empty comment'), 'error' );
+}
+elseif( antispam_check( strip_tags($comment) ) )
+{
+	$Messages->add( T_('Supplied comment is invalid'), 'error' );
 }
 
 

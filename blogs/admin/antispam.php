@@ -69,7 +69,6 @@ switch( $action )
 		$current_User->check_perm( 'spamblacklist', 'edit', true ); // TODO: This should become different for 'edit'/'add' perm level - check for 'add' here.
 
 		$keyword = substr( $keyword, 0, 80 );
-		$dbkeyword = $DB->escape( $keyword );
 		param( 'delhits', 'integer', 0 );
 		param( 'delcomments', 'integer', 0 );
 		param( 'blacklist_locally', 'integer', 0 );
@@ -79,30 +78,32 @@ switch( $action )
 		// it has to be a minimum of 5 characters to avoid being too generic
 		if( strlen($keyword) < 5 )
 		{
-			$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 characters!'), $keyword ), 'error' );
+			$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 characters!'), htmlspecialchars($keyword) ), 'error' );
 			break;
 		}
 
 		if( $delhits )
 		{ // Delete all banned hit-log entries
-			$r = $DB->query( "DELETE FROM T_hitlog WHERE hit_referer LIKE '%$dbkeyword%'" );
+			$r = $DB->query('DELETE FROM T_hitlog
+												WHERE hit_referer LIKE '.$DB->quote('%'.$keyword.'%') );
 
-			$Messages->add( sprintf( T_('Deleted %d log hits matching &laquo;%s&raquo;.'), $r, $keyword ), 'note' );
+			$Messages->add( sprintf( T_('Deleted %d log hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'note' );
 		}
 
 		if( $delcomments )
 		{ // Then all banned comments
-			$r = $DB->query( "DELETE FROM T_comments
-												WHERE comment_author_url LIKE '%$dbkeyword%'
-												OR comment_content LIKE '%$dbkeyword%'" );
-			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&laquo;.'), $r, $keyword ), 'note' );
+			$r = $DB->query('DELETE FROM T_comments
+												WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
+													 OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
+					      				   OR comment_content LIKE '.$DB->quote('%'.$keyword.'%') );
+			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&laquo;.'), $r, htmlspecialchars($keyword) ), 'note' );
 		}
 
 		if( $blacklist_locally )
 		{ // Local blacklist:
 			if( antispam_create( $keyword ) )
 			{
-				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), $keyword ), 'note' );
+				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars($keyword) ), 'note' );
 			}
 			else
 			{ // TODO: message?
@@ -177,23 +178,23 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 	<div class="panelblock">
 		<form action="antispam.php" method="post">
 		<input type="hidden" name="confirm" value="confirm" />
-		<input type="hidden" name="keyword" value="<?php echo $keyword ?>" />
+		<input type="hidden" name="keyword" value="<?php echo format_to_output( $keyword, 'formvalue' ) ?>" />
 		<input type="hidden" name="action" value="ban" />
 		<h2><?php echo T_('Confirm ban &amp; delete') ?></h2>
 
 		<?php
 		// Check for junk:
 		// Check for potentially affected log hits:
-		$sql = "SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime), hit_uri, hit_referer, dom_name
+		$sql = 'SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime), hit_uri, hit_referer, dom_name
 										hit_blog_ID, hit_remote_addr
-						FROM T_hitlog, T_basedomains
+						 FROM T_hitlog, T_basedomains
 						WHERE hit_referer_dom_ID = dom_ID
-							AND hit_referer LIKE '%$dbkeyword%'
-						ORDER BY dom_name ASC";
+							AND hit_referer LIKE '.$DB->quote('%'.$keyword.'%').'
+						ORDER BY dom_name ASC';
 		$res_affected_hits = $DB->get_results( $sql, ARRAY_A );
 		if( $DB->num_rows == 0 )
 		{ // No matching hits.
-			printf( '<p><strong>'.T_('No log-hits match the keyword [%s].').'</strong></p>', format_to_output( $keyword, 'htmlbody' ) );
+			printf( '<p><strong>'.T_('No log-hits match the keyword [%s].').'</strong></p>', htmlspecialchars($keyword) );
 		}
 		else
 		{
@@ -233,16 +234,17 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 		}
 
 		// Check for potentially affected comments:
-		$sql = "SELECT comment_ID, comment_date, comment_author, comment_author_url,
+		$sql = 'SELECT comment_ID, comment_date, comment_author, comment_author_url,
 										comment_author_IP, comment_content
 						FROM T_comments
-						WHERE comment_author_url LIKE '%$dbkeyword%'
-							OR comment_content LIKE '%$dbkeyword%'
-						ORDER BY comment_date ASC";
+						WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
+							 OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
+    				   OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').'
+						ORDER BY comment_date ASC';
 		$res_affected_comments = $DB->get_results( $sql, ARRAY_A );
 		if( $DB->num_rows == 0 )
 		{ // No matching hits.
-			printf( '<p><strong>'.T_('No comments match the keyword [%s].').'</strong></p>', format_to_output( $keyword, 'htmlbody' ) );
+			printf( '<p><strong>'.T_('No comments match the keyword [%s].').'</strong></p>', htmlspecialchars($keyword) );
 		}
 		else
 		{
@@ -293,15 +295,15 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 		}
 
 		// Check if the string is already in the blacklist:
-		if( antispam_url($keyword) )
+		if( antispam_check($keyword) )
 		{ // Already there:
-			printf( '<p><strong>'.T_('The keyword [%s] is already handled by the blacklist.').'</strong></p>', $keyword );
+			printf( '<p><strong>'.T_('The keyword [%s] is already handled by the blacklist.').'</strong></p>', htmlspecialchars($keyword) );
 		}
 		else
 		{ // Not in blacklist
 			?>
 			<p><strong><input type="checkbox" name="blacklist_locally" value="1" checked="checked" />
-			<?php printf ( T_('Blacklist the keyword [%s] locally.'), format_to_output( $keyword, 'htmlbody' ) ) ?>
+			<?php printf ( T_('Blacklist the keyword [%s] locally.'), htmlspecialchars($keyword) ) ?>
 			</strong></p>
 
 			<?php
@@ -310,7 +312,7 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 				?>
 				<p>
 				<strong><input type="checkbox" name="report" value="1" checked="checked" />
-				<?php printf ( T_('Report the keyword [%s] as abuse to b2evolution.net.'), format_to_output( $keyword, 'htmlbody' ) ) ?>
+				<?php printf ( T_('Report the keyword [%s] as abuse to b2evolution.net.'), htmlspecialchars($keyword) ) ?>
 				</strong>
 				[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
 				</p>
@@ -326,20 +328,23 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 }}}
 
 
+// ADD KEYWORD FORM:
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'add' here once it's mature.
 { // add keyword or domain
-	$add_Form = & new Form( 'antispam.php', 'antispam_add', 'get', 'fieldset' );
-	$add_Form->begin_form('fform');
-	$add_Form->hidden( 'action', 'ban' );
-	$add_Form->begin_fieldset();
-	$add_Form->text( 'keyword', $keyword, 30, T_('Add a banned keyword'), 'note..', 80 ); // TODO: add note
+	echo '<div class="panelblock">';
+	$Form = & new Form( 'antispam.php', 'antispam_add', 'get', '' );
+	$Form->begin_form('fform');
+	$Form->hidden( 'action', 'ban' );
+	$Form->text( 'keyword', $keyword, 30, T_('Add a banned keyword'), '', 80 ); // TODO: add note
 	/*
 	 * TODO: explicitly add a domain?
 	 * $add_Form->text( 'domain', $domain, 30, T_('Add a banned domain'), 'note..', 80 ); // TODO: add note
 	 */
-	$add_Form->end_form( array( array( 'submit', 'submit', T_('Check &amp; ban...'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveButton' ) ) );
+	echo '</div>';
 }
 ?>
+
 
 <div class="panelblock">
 	<h2><?php echo T_('Banned domains blacklist') ?></h2>
@@ -359,7 +364,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 	$Results->cols[] = array(
 							'th' => T_('Keyword'),
 							'order' => 'aspm_string',
-							'td' => '$aspm_string$',
+							'td' => '%htmlspecialchars(#aspm_string#)%',
 						);
 
 	// Set columns:

@@ -2153,7 +2153,17 @@ class Form extends Widget
 		{
 			if( $l_value !== '' )
 			{ // don't generate empty attributes
-				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
+				if( $l_attr == 'value' )
+				{
+					// fplanque>>blueyed: note: having to dig in through a zillion function calls to add
+					// this hack in order to fix your refactoring is really really making me nervous! :/
+					// This is OVER FACTORIZATION !!! ONCE AGAIN !!! I am not taking this any longer!
+					$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
+				}
+				else
+				{
+					$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
+				}
 			}
 		}
 

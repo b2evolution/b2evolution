@@ -246,7 +246,7 @@ function upgrade_b2evo_tables()
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
 							ADD COLUMN blog_allowtrackbacks tinyint(1) NOT NULL default 1,
-							ADD COLUMN blog_allowpingbacks tinyint(1) NOT NULL default 1,
+							ADD COLUMN blog_allowpingbacks tinyint(1) NOT NULL default 0,
 							ADD COLUMN blog_pingb2evonet tinyint(1) NOT NULL default 0,
 							ADD COLUMN blog_pingtechnorati tinyint(1) NOT NULL default 0,
 							ADD COLUMN blog_pingweblogs tinyint(1) NOT NULL default 0,

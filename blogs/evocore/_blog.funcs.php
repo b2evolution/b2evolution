@@ -72,7 +72,7 @@ function blog_create(
 	$blog_UID = '',
 	$blog_allowcomments = 'post_by_post',
 	$blog_allowtrackbacks = 1,
-	$blog_allowpingbacks = 1,
+	$blog_allowpingbacks = 0,
 	$blog_pingb2evonet = 0,
 	$blog_pingtechnorati = 0,
 	$blog_pingweblogs = 1,
@@ -642,6 +642,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.16  2005/09/07 17:40:22  fplanque
+ * enhanced antispam
+ *
  * Revision 1.15  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

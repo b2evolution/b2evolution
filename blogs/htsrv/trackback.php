@@ -96,9 +96,18 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 	// CHECK and FORMAT content
 	if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
 	{
-		$Messages->add( T_('Supplied URL is invalid: ').$error );
+		$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 	}
+
 	$comment = format_to_post($comment,1,1);
+	if( empty($comment) )
+	{ // comment should not be empty!
+		$Messages->add( T_('Please do not send empty comment'), 'error' );
+	}
+	elseif( antispam_check( strip_tags($comment) ) )
+	{
+		$Messages->add( T_('Supplied comment is invalid'), 'error' );
+	}
 
 	if( $errstring = $Messages->getString( 'Cannot insert trackback, please correct these errors:', '' ) )
 	{

@@ -69,7 +69,7 @@ function antispam_create( $abuse_string, $aspm_source = 'local' )
 	if( empty( $abuse_string ) ) return false;
 
 	// Check if the string already is in the blacklist:
-	if( antispam_url($abuse_string) ) return false;
+	if( antispam_check($abuse_string) ) return false;
 
 	// Insert new string into DB:
 	$sql = "INSERT INTO T_antispam( aspm_string, aspm_source )
@@ -112,12 +112,14 @@ function antispam_delete( $string_ID )
 
 
 /**
- * Check if an URL contains abusive substrings
+ * Check if a string contains abusive substrings
  *
  * Note: Letting the database do the LIKE %% match is a little faster than doing in it PHP,
  * not to mention the incredibly long overhead of preloading the list into PHP
+ *
+ * @return string balcklisted keyword found or false if no spam detected
  */
-function antispam_url( $url )
+function antispam_check( $haystack )
 {
 	global $DB, $Debuglog, $Timer;
 
@@ -135,7 +137,7 @@ function antispam_url( $url )
 	$Timer->start( 'antispam_url' );
 	if( $block = $DB->get_var( "SELECT aspm_string
 					  		 	FROM  T_antispam
-					       WHERE ".$DB->quote($url)." LIKE CONCAT('%',aspm_string,'%')
+					       WHERE ".$DB->quote($haystack)." LIKE CONCAT('%',aspm_string,'%')
 					       LIMIT 0, 1", 0, 0, 'Check URL against antispam balcklist' ) )
 	{
 			$Debuglog->add( 'Spam block: '.$block );
@@ -323,6 +325,9 @@ function antispam_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.12  2005/09/07 17:40:22  fplanque
+ * enhanced antispam
+ *
  * Revision 1.11  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *
