@@ -257,8 +257,10 @@ function create_b2evo_tables()
 							hit_referer_dom_ID INT UNSIGNED DEFAULT NULL,
 							hit_blog_ID        int(11) UNSIGNED NULL DEFAULT NULL,
 							hit_remote_addr    VARCHAR(40) DEFAULT NULL,
-							PRIMARY KEY (hit_ID)
-						)"; // TODO: indexes!
+							PRIMARY KEY (hit_ID),
+							INDEX hit_datetime ( hit_datetime ),
+           		INDEX hit_blog_ID (hit_blog_ID)
+						)"; // TODO: more indexes?
 	$DB->query( $query );
 	echo "OK.<br />\n";
 

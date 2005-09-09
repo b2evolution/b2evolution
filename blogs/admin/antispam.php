@@ -85,7 +85,8 @@ switch( $action )
 		if( $delhits )
 		{ // Delete all banned hit-log entries
 			$r = $DB->query('DELETE FROM T_hitlog
-												WHERE hit_referer LIKE '.$DB->quote('%'.$keyword.'%') );
+												WHERE hit_referer LIKE '.$DB->quote('%'.$keyword.'%'),
+												'Delete all banned hit-log entries' );
 
 			$Messages->add( sprintf( T_('Deleted %d log hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'note' );
 		}
@@ -172,7 +173,7 @@ $AdminUI->dispPayloadBegin();
 
 
 if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomments || $blacklist_locally || $report ) )
-{{{ // Nothing to do, ask user:
+{ // Nothing to do, ask user:
 	?>
 
 	<div class="panelblock">
@@ -325,7 +326,7 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 		</form>
 	</div>
 	<?php
-}}}
+}
 
 
 // ADD KEYWORD FORM:

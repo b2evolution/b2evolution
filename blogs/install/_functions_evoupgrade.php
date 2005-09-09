@@ -635,7 +635,8 @@ function upgrade_b2evo_tables()
 								  ADD COLUMN grp_perm_files enum('none','view','add','edit') NOT NULL default 'none'" );
 		echo "OK.<br />\n";
 
-		// TODO: alter T_hitlog!
+		// TODO: alter T_hitlog: fplanque>> or just replace it with new one (that would be acceptable)
+		// waiting for daniel...
 
 		// Create relations:
 		create_b2evo_relations();

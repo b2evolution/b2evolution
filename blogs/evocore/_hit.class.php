@@ -188,11 +188,10 @@ class Hit
 		 * in past reloadpage_timeout seconds.)
 		 */
 		if( $DB->get_var(
-					'SELECT hit_ID FROM T_hitlog, T_useragents
+					'SELECT hit_ID FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 						WHERE hit_uri = "'.$DB->escape( $ReqURI ).'"
 							AND hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
 							AND hit_remote_addr = '.$DB->quote( getIpList( true ) ).'
-							AND agnt_ID = hit_agnt_ID
 							AND agnt_signature = '.$DB->quote($this->userAgent),
 					0, 0, 'Hit: Check for reload' ) )
 		{
@@ -452,7 +451,7 @@ class Hit
 										#'".$DB->escape($this->referer)."', '".$DB->escape($baseDomain)."', $blog,
 										#'".$DB->escape( getIpList( true ) )."', '".$DB->escape($HTTP_USER_AGENT)."')";
 
-		$DB->query( $sql );
+		$DB->query( $sql, 'Record the hit' );
 	}
 
 

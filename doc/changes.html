@@ -84,10 +84,20 @@
 	</li>
 </ul>
 
-	<h2>0.9.1 - CVS</h2>
+<h2>0.9.1 "Dawn" - CVS</h2>
 	<ul>
+		<li>Scalability: Speed improvements, especially on loaded systems. </li>
+		<li>Referer spam gets detected early and triggers an error message in order to save resources on the server. </li>
+		<li>Antispam: complete comment text will be searched for blacklisted keywords.</li>
+		<li>Antispam: HTML entities can now be used in keywords. </li>
 		<li>Extended browsing capabilities (fplanque) </li>
-		<li> Tracbkacks &amp; Pingbacks will be shown on the &quot;last comments&quot; page </li>
+		<li>Trackbacks &amp; Pingbacks will be shown on the &quot;last comments&quot; page </li>
+		<li>Restricted URL input into feedback to defeat comment spam </li>
+		<li>Use of rel=&quot;nofollow&quot; for feedback author URLs to defeat comment spam </li>
+		<li>Removed public statistics in order not to attract referer spam. </li>
+		<li>The antispam blacklist is not displayed by default anylonger if it gets longer than 100 entries (and it will indeed get much longer than that...) </li>
+		<li>Wacko markup plugin (fplanque)</li>
+		<li>WikiLinks plugin (fplanque)</li>
 	</ul>
 
 	<h2>0.9.0.12 "Amsterdam"</h2>

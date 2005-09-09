@@ -61,14 +61,12 @@ class Hitlist
 	{
 		global $DB;
 
-		$sql = "DELETE FROM T_hitlog WHERE hit_ID = $hit_ID";
-
-		return $DB->query( $sql );
+		return $DB->query( "DELETE FROM T_hitlog WHERE hit_ID = $hit_ID", 'Delete a hit' );
 	}
 
 
 	/**
-	 * Delete all hits from a certain date
+	 * Delete all hits for a specific date
 	 *
 	 * @static
 	 * @param int unix timestamp to delete hits for
@@ -82,7 +80,7 @@ class Hitlist
 		$sql = "DELETE FROM T_hitlog
 						WHERE DATE_FORMAT(hit_datetime,'%Y-%m-%d') = '$iso_date'";
 
-		return $DB->query( $sql );
+		return $DB->query( $sql, 'Prune hits for a specific date' );
 	}
 
 
@@ -102,7 +100,7 @@ class Hitlist
 						SET hit_referer_type = '$type',
 								hit_datetime = hit_datetime " // prevent mySQL from updating timestamp
 						." WHERE hit_ID = $hit_ID";
-		return $DB->query( $sql );
+		return $DB->query( $sql, 'Change type for a specific hit' );
 	}
 
 
@@ -114,14 +112,13 @@ class Hitlist
 	 */
 	function autoPrune()
 	{
-		/*if( $Settings->get( 'auto_prune' ) )
+		if( $Settings->get( 'auto_prune' ) )
 		{ // Autopruning is requested
-			if( $
 			$sql = "DELETE FROM T_hitlog
 							WHERE hit_datetime < '".date( 'Y-m-d', $localtimenow - ($stats_autoprune * 86400) )."'";
 																															// 1 day = 86400 seconds
-			$rows_affected = $DB->query( $sql );
+			$rows_affected = $DB->query( $sql, 'Autopruning hit log' );
 			$Debuglog->add( 'log_hit: autopruned '.$rows_affected.' rows.', 'hit' );
-		}*/
+		}
 	}
 }

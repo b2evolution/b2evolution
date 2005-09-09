@@ -649,7 +649,8 @@ class Blog extends DataObject
 		// Delete hitlogs
 		if( $echo ) echo '<br />Deleting blog hitlogs... ';
 		$ret = $DB->query( "DELETE FROM T_hitlog
-												WHERE hit_blog_ID = $this->ID" );
+												WHERE hit_blog_ID = $this->ID",
+												'Deleting blog hitlogs' );
 		if( $echo ) printf( '(%d rows)', $ret );
 
 		if( $delete_stub_file )
@@ -724,6 +725,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2005/09/09 19:24:54  fplanque
+ * documentation
+ *
  * Revision 1.27  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *
