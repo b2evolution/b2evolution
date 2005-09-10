@@ -120,7 +120,7 @@ div.debug h4 {
 }
 
 div.debug code {
-	font-family: "Courier New", Courier, mono;
+	font-family: "Courier New", Courier, monospace;
 	font-size: 11px;
 }
 
@@ -132,7 +132,7 @@ div.debug p.rows {
 div.debug table {
 	border: 1px solid #000;
 	border-collapse:collapse;
-	font-family: "Courier New", Courier, mono;
+	font-family: "Courier New", Courier, monospace;
 	font-size:11px;
 	margin: 1ex;
 }
