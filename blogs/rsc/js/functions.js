@@ -60,6 +60,9 @@ function pop_up_window( href, target, params )
 	{
 		openedWindows.push(opened);
 	}
+
+	// Tell the caller there is no need to process href="" :
+	return false;
 }
 
 

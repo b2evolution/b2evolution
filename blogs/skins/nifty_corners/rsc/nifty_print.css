@@ -1,0 +1,4 @@
+/* 
+ * No nifty corners when printing 
+ */
+.rtop,.rbottom,.artop,.arbottom{display: none}

@@ -1,0 +1,280 @@
+/* Designed by Francois PLANQUE - http://fplanque.net/ */
+
+@import url(../../../rsc/css/basic.css);	/* Import basic styles */
+@import url(../../../rsc/css/img.css);	/* Import standard image styles */
+@import url(../../../rsc/css/blog_elements.css);	/* Import standard blog elements styles */
+@import url(../../../rsc/css/forms.css);	/* Import default form styles */
+@import url(../../../rsc/css/comments.css);	/* Import default comment styles */
+
+/*
+ * Main page construct:
+ */
+body {
+	background: #82cdac url(img/bg.jpg) repeat-x fixed left top;
+	padding: 1ex 2ex;
+	margin: 0;
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 84%;
+
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Trebuchet MS", "Lucida Grande", Arial, Helvetica, sans-serif;
+}
+
+div.wrapper /* Main centered zone */
+{
+	width: 105ex;
+	margin: 0 auto;
+}
+div.outerwrap /* Main rounded content zone */
+{
+	margin: 1ex 0;
+	padding: 5px 0;
+	/* border: 1px solid #000;  */
+}
+div.innerwrap /* Main white content zone */
+{
+	padding: 0;
+	border: 1px solid #fff; /* needed to force inner paddings */ 
+	background-color:#fff;
+}
+div.pageHeader /* Title zone */
+{
+	margin: 0 1ex;
+	padding: 0;
+	background-image: url(img/squares.gif);
+	background-repeat: no-repeat;
+	background-position: right center;
+	/* border: 1px solid #f00; */
+}
+
+
+.posts /* Left column */
+{
+	width: 75ex;
+	float: left;
+	overflow: hidden;
+}
+
+.bSideBar /* Right column */
+{
+	width: 29ex;
+	float: right;
+	overflow: hidden;
+}
+div.clear {
+	clear: both;
+}
+div#pageFooter {
+	margin: 1ex;
+	padding:0;
+	border-top: 1px dotted #000;
+}
+p.baseline {
+	font-size: 70%;
+	text-align: center;
+	margin:1ex;
+}
+
+
+/*
+ * General styles:
+ */
+a,
+a:visited {
+	color: #666;
+	text-decoration:none;
+}
+a:hover {
+	color: #c0c;
+	text-decoration:underline;
+}
+
+h2 {
+	color: #06a3c4;
+	font-size: 160%;
+	margin: 1ex;
+}
+h3 {
+	color: #06a3c4;
+	font-size: 110%;
+}
+h4 {
+	color: #06a3c4;
+	font-size: 105%;
+}
+
+/*
+ * Blog list on top:
+ */
+ul#bloglist {
+	border-bottom: 2px solid #06a3c4;
+	margin: 0 1ex 2px 1ex;
+	padding: 0 0 2px 0;
+	list-style-type:none;
+}
+ul#bloglist li {
+	display: inline;
+	padding-right: 1em;
+}
+a.BlogButtonCurr {
+	color: #06a3c4;
+	font-weight:bold;
+}
+
+
+/*
+ * Header styles:
+ */
+h1#pageTitle {
+	font-size: 250%;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	color:#06a3c4;
+}
+.pageSubtitle {
+	letter-spacing: 4px;
+	padding: 0 0 3px 0;
+	font: 109%;
+}
+
+
+/* 
+ * Styles for foms 
+ */
+.bPost, .bPostpublished
+{
+	clear: both;
+	margin: 0 1ex 3ex 1ex;
+	padding: 0;
+	/* border: 1px solid #e2f1f4; */
+}
+.bSmallHead {
+	font-size: 78%;
+	margin: 1ex;
+}
+div.bTitle {
+	clear: both;
+	margin: 1ex 1ex 0 1ex;
+	padding: 5px 0 4px 0;
+	background-color:#06a3c4;
+}
+h3.bTitle {
+	color: #fff;
+	margin: 0 1ex;
+}
+.bText {
+	margin: 0 1ex 0;
+}
+.bSmallPrint
+{
+	clear: both;
+	font-size: 78%;
+	margin: 1ex;
+}
+
+input.bComment, 
+textarea.bComment
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	width: 97%;
+	padding: 2px;
+	margin: 0ex;
+}
+select.bComment		/* Used by the profile form */
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: 1px;
+	margin: 0ex;
+}
+
+
+/*
+ * Styles for sidebar (right) 
+ */
+.bSideItem {
+	margin: 2ex;
+	padding: 0 0 2ex 0;
+}
+.bSideItem ul {
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	list-style-type:square;
+}
+.bSideItem ul ul{
+	margin-left: 8px;
+	padding-left: 8px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.bSideItem form {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.dimmed
+{
+	color: #aaa;
+	font-size: 84%;
+}
+input.SearchField
+{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: .5ex;
+	width: 96%;
+	margin: 0ex;
+}
+
+/* Calendar: */
+caption.bCalendarCaption {
+	border: 1px solid #ccc;
+	background-color: #eee;
+	border-bottom: 0;
+}
+table.bCalendarTable {
+	border: solid 1px #ccc;
+	border-collapse: separate; 
+}
+table.bCalendarTable a {
+	color: #06a3c4;
+}
+table.bCalendarTable tfoot td {
+	background-color: #eee;
+	border-top: 1px solid #ccc;
+}
+table.bCalendarTable tfoot a {
+	text-decoration: none;
+}
+table.bCalendarTable tfoot a:hover {
+	background-color: #fac;
+}
+th.bCalendarHeaderCell {
+	color: #ccc;
+	font-weight:normal;
+}
+#bCalendarToday {
+	background-color: #E2F1F4;
+}
+
+/*
+ * Styles for comment screen:
+ */
+form.bComment fieldset div.label,
+form.bComment fieldset div.input,
+form.bComment fieldset div.info
+{
+	padding-top: 0;
+	/* font-size: 84%; */
+}
+textarea.bComment,
+input.bComment,
+input.SearchField {
+	background-color: #E2F1F4;
+}

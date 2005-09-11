@@ -96,7 +96,7 @@ class DB
 	/**
 	 * Do we want to explain joins?
 	 */
-	var $debug_explain_joins = true;
+	var $debug_explain_joins = false;
 
   /**
 	 * Number of rows we want to dump in debug output:
@@ -1008,6 +1008,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.26  2005/09/11 23:46:31  fplanque
+ * no message
+ *
  * Revision 1.25  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *
