@@ -14,6 +14,9 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+// DITY HACK JUST TO FIX THE DEMO SITE!! :(((((((((((((((((
+if( !defined('EVO_MAIN_INIT') ) define( 'EVO_MAIN_INIT', true );
+
 
 // ** Formatting **
 

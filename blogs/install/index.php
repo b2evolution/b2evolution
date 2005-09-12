@@ -19,7 +19,10 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 
 // Make the includes believe they are being called in the right place...
-define( 'EVO_MAIN_INIT', true );
+# define( 'EVO_MAIN_INIT', true );
+// DITY HACK JUST TO FIX THE DEMO SITE!! :(((((((((((((((((
+if( !defined('EVO_MAIN_INIT') ) define( 'EVO_MAIN_INIT', true );
+
 
 require_once dirname(__FILE__).'/'.$install_dirout.$conf_subdir.'_upgrade.php';
 require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_log.class.php';

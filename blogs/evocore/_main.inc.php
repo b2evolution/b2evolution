@@ -71,9 +71,16 @@
  */
 if( defined( 'EVO_MAIN_INIT' ) )
 {
-	return;
+	# return;
+
+	// DITY HACK JUST TO FIX THE DEMO SITE!! :(((((((((((((((((
+	if( defined('EVO_MAIN_INIT2') ) 	return;
+	define( 'EVO_MAIN_INIT2', true );
+
 }
-define( 'EVO_MAIN_INIT', true );
+#define( 'EVO_MAIN_INIT', true );
+// DITY HACK JUST TO FIX THE DEMO SITE!! :(((((((((((((((((
+if( !defined('EVO_MAIN_INIT') ) define( 'EVO_MAIN_INIT', true );
 
 
 /**
@@ -528,6 +535,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.48  2005/09/12 19:03:00  fplanque
+ * DIRTY HACK JUST TO FIX THE DEMO SITE :(((
+ *
  * Revision 1.47  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
