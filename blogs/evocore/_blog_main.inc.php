@@ -125,6 +125,11 @@ if( empty($disp) )
 	}
 }
 
+if( $disp == 'stats' )
+{
+ 	require dirname(__FILE__).'/_410_stats_gone.page.php';	// error & exit
+}
+
 // Getting current blog info:
 $Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 
@@ -144,12 +149,13 @@ if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 	$Debuglog->add( 'Extra path info found! path_string=' . $path_string , 'params' );
 		// echo "path=$path_string <br>";
 	$path_elements = explode( '/', $path_string, 20 );  // slice it
+	$path_error = 0;
 	$i=0;
 	// echo $path_elements[$i];
-	if( isset( $path_elements[$i] ) && $path_elements[$i] == 'index.php' )
-	{ // Ignore index.html
+	if( isset( $path_elements[$i] ) && preg_match( '#.+\.php[0-9]?#', $path_elements[$i] ) )
+	{ // Ignore *.php
 		$i++;
-		$Debuglog->add( 'Ignoring index.php in extra path info' , 'params' );
+		$Debuglog->add( 'Ignoring *.php in extra path info' , 'params' );
 	}
 
 	if( isset( $path_elements[$i] ) && preg_match( '#^'.$Blog->get( 'stub' ).'(\.php)?$#', $path_elements[$i] )  )
@@ -159,48 +165,60 @@ if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 	}
 
 	// echo $path_elements[$i];
-	if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
-	{ // We'll consider this to be the year
-		$m = $path_elements[$i++];
-		$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
-
-		if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
-		{ // We'll consider this to be the month
-			$m .= $path_elements[$i++];
-			$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'params' );
+	if( isset( $path_elements[$i] ) )
+	{
+		if( is_numeric( $path_elements[$i] ) )
+		{ // We'll consider this to be the year
+			$m = $path_elements[$i++];
+			$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
 
 			if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
-			{ // We'll consider this to be the day
+			{ // We'll consider this to be the month
 				$m .= $path_elements[$i++];
-				$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'params' );
+				$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'params' );
 
-				if( isset( $path_elements[$i] ) && (!empty( $path_elements[$i] )) )
-				{ // We'll consider this to be a ref to a post
-					// We are accessing a post by permalink
-					// Set a lot of defaults as if we had received a complex URL:
-					$m = '';
-					$more = 1; // Display the extended entries' text
-					$c = 1;    // Display comments
-					$tb = 1;   // Display trackbacks
-					$pb = 1;   // Display pingbacks
+				if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
+				{ // We'll consider this to be the day
+					$m .= $path_elements[$i++];
+					$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'params' );
 
-					if( preg_match( "#^p([0-9]+)$#", $path_elements[$i], $req_post ) )
-					{ // The last param is of the form p000
-						// echo 'post number';
-						$p = $req_post[1];		// Post to display
-					}
-					else
-					{ // Last param is a string, we'll consider this to be a post urltitle
-						$title = $path_elements[$i];
-						// echo 'post title : ', $title;
+					if( isset( $path_elements[$i] ) && (!empty( $path_elements[$i] )) )
+					{ // We'll consider this to be a ref to a post
+						// We are accessing a post by permalink
+						// Set a lot of defaults as if we had received a complex URL:
+						$m = '';
+						$more = 1; // Display the extended entries' text
+						$c = 1;    // Display comments
+						$tb = 1;   // Display trackbacks
+						$pb = 1;   // Display pingbacks
+
+						if( preg_match( "#^p([0-9]+)$#", $path_elements[$i], $req_post ) )
+						{ // The last param is of the form p000
+							// echo 'post number';
+							$p = $req_post[1];		// Post to display
+						}
+						else
+						{ // Last param is a string, we'll consider this to be a post urltitle
+							$title = $path_elements[$i];
+							// echo 'post title : ', $title;
+						}
 					}
 				}
 			}
+			elseif( isset( $path_elements[$i] ) && substr( $path_elements[$i], 0, 1 ) == 'w' )
+			{ // We consider this a week number
+				$w = substr( $path_elements[$i], 1, 2 );
+			}
 		}
-		elseif( isset( $path_elements[$i] ) && substr( $path_elements[$i], 0, 1 ) == 'w' )
-		{ // We consider this a week number
-			$w = substr( $path_elements[$i], 1, 2 );
+		else
+		{	// We did not get a number/year...
+			$path_error = 404;
 		}
+	}
+
+	if( $path_error == 404 )
+	{	// The request points to something we won't be able to resolve:
+   	require dirname(__FILE__).'/_404_not_found.page.php';	// error & exit
 	}
 }
 
@@ -357,6 +375,9 @@ if ( $use_memcached )
 
 /*
  * $Log$
+ * Revision 1.15  2005/09/13 20:36:42  fplanque
+ * a little more antispam
+ *
  * Revision 1.14  2005/08/25 19:02:10  fplanque
  * categories plugin phase 2
  *
