@@ -94,7 +94,7 @@ class archives_plugin extends Plugin
 	 *                - 'context_isolation' : what params need override when changing date/range (Default: 'm,w,p,title,unit,dstart' )
 	 *                - 'form' : true|false (default: false)
 	 *                - 'limit' : # of archive entries to display or '' (Default: 12)
-	 *                - 'more_link' : more link text or '' (Default: 12)
+	 *                - 'more_link' : more link text (Default: 'More...')
 	 *                - 'list_start' : (Default '<ul>')
 	 *                - 'list_end' : (Default '</ul>')
 	 *                - 'line_start' : (Default '<li>')
@@ -533,6 +533,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.11  2005/09/14 19:23:45  fplanque
+ * doc
+ *
  * Revision 1.10  2005/09/06 19:38:29  fplanque
  * bugfixes
  *

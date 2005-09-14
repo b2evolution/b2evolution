@@ -87,6 +87,13 @@ class categories_plugin extends Plugin
 	 *                - 'list_end' : (Default '</ul>')
 	 *                - 'line_start' : (Default '<li>')
 	 *                - 'line_end' : (Default '</li>')
+   *                - 'group_start' : (Default '<ul>') - (for BLOG 1 Categories)
+   *                - 'group_end' : (Default "</ul>\n") - (for BLOG 1 Categories)
+   *                - 'collist_start' : (Default '') - (for BLOG 1 Categories)
+   *                - 'collist_end' : (Default "\n") - (for BLOG 1 Categories)
+   *                - 'coll_start' : (Default '<h4>') - (for BLOG 1 Categories)
+   *                - 'coll_end' : (Default "</h4>\n") - (for BLOG 1 Categories)
+   *                - 'option_all' : (Default T_('All'))
 	 * @return boolean did we display?
 	 */
 	function SkinTag( $params )
