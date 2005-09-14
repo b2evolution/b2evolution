@@ -17,6 +17,7 @@
 	/**
 	 * Initialize everything:
 	 */
+	$resolve_extra_path = false;	// We don't want extra path resolution on this page
 	require dirname(__FILE__).'/../evocore/_blog_main.inc.php' ;
 	header("Content-type: application/xml");
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?".">";

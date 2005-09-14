@@ -16,6 +16,7 @@
 	/**
 	 * Initialize everything:
 	 */
+	$resolve_extra_path = false;	// We don't want extra path resolution on this page
 	require dirname(__FILE__).'/../evocore/_blog_main.inc.php';
 	$CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'DESC',	'',	20 );
 	header("Content-type: application/atom+xml");
