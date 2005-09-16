@@ -19,7 +19,7 @@
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  * }}
- * 
+ *
  * @package conf
  *
  * @version $Id$
@@ -143,6 +143,8 @@ $notify_from = $instance_name.'@'.$basehost;
 
 // ** Configuration for htsrv/getmail.php **
 // (skip this if you don't intend to blog via email)
+// TODO: remove this if features.php is accepted
+/*
 # mailserver settings
 $mailserver_url = 'mail.example.com';
 $mailserver_login = 'login@example.com';
@@ -163,7 +165,7 @@ $thisisforfunonly = 0;
 # then you type your login:password, then the separator, then content
 $use_phoneemail = 0;
 $phoneemail_separator = ':::';
-
+*/
 
 /**
  * When pinging http://blo.gs, use extended ping to RSS?
@@ -200,7 +202,7 @@ $db_aliases = array(
 		'T_basedomains'      => $tableprefix.'basedomains',
 		'T_blogs'            => $tableprefix.'blogs',
 		'T_categories'       => $tableprefix.'categories',
-		'T_coll_group_perms' => $tableprefix.'bloggroups',		
+		'T_coll_group_perms' => $tableprefix.'bloggroups',
 		'T_coll_user_perms'  => $tableprefix.'blogusers',
 		'T_comments'         => $tableprefix.'comments',
 		'T_files'            => $tableprefix.'files',
@@ -484,8 +486,8 @@ if ($use_memcached) {
 	include_once 'memcached-client.php';
 	$memcache = new memcached(
 		array( 'servers' => array('127.0.0.1:11211'),
-		'debug' => false, 
-		'compress_threshold' => 10240, 
+		'debug' => false,
+		'compress_threshold' => 10240,
 		'persistant' => true));
 	$memcache_expire = 3600; //  how long objects stay cached. Default one hour
 }
@@ -493,7 +495,7 @@ if ($use_memcached) {
 /**
  * Use a Real-time DNS blacklist
  * Provide an array of dns blacklists to use.
- * For example to use spamhaus xbl, use 
+ * For example to use spamhaus xbl, use
  * $rbl_config = array(
  *	'sbl-xbl.spamhaus.org'
  * );
