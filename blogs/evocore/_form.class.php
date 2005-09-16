@@ -1471,7 +1471,7 @@ class Form extends Widget
 		}
 		else
 		{ // Empty label:
-			$r = $this->labelempty;
+			$r .= $this->labelempty;
 		}
 
 		$r .= $this->inputstart;
@@ -1481,8 +1481,8 @@ class Form extends Widget
 
 		// end field (Label always to the left!)
 		$old_label_to_the_left = $this->label_to_the_left;
-		$this->label_to_the_left = true;
-		$r .= $this->end_field();
+		$this->label_to_the_left = true;	
+		$r .= $this->end_field();		
 		$this->label_to_the_left = $old_label_to_the_left;
 
 		return $this->display_or_return( $r );
@@ -2111,6 +2111,12 @@ class Form extends Widget
 			unset( $field_params['field_suffix'] );
 		}
 
+		if( isset($field_params['onclick']) )
+		{
+			$this->_common_params['onclick'] = $field_params['onclick'];
+			unset( $field_params['field_suffix'] );
+			
+		}
 
 		if( !empty($field_params['name']) && !isset($field_params['id']) )
 		{ // Autogenerate id attrib (not for hidden, radio and submit types)
