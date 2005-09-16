@@ -182,12 +182,12 @@ function TS_( $string, $req_locale = '' )
 function locale_temp_switch( $locale )
 {
 	global $saved_locales, $current_locale;
-	if( !isset( $saved_locale ) || !is_array( $saved_locale ) )
+	if( !isset( $saved_locales ) || !is_array( $saved_locales ) )
 	{
-		$saved_locale = array();
+		$saved_locales = array();
 	}
 
-	array_push( $saved_locale, $current_locale );
+	array_push( $saved_locales, $current_locale );
 	locale_activate( $locale );
 }
 
@@ -205,7 +205,7 @@ function locale_restore_previous()
 
 	if( !empty( $saved_locales ) && is_array( $saved_locales ) )
 	{
-		locale_activate( array_pop( $saved_locale ) );
+		locale_activate( array_pop( $saved_locales ) );
 		return true;
 	}
 	return false;
@@ -699,6 +699,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.14  2005/09/16 10:36:19  yabs
+ * minor changes - correcting temp locale
+ *
  * Revision 1.13  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
