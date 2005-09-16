@@ -153,6 +153,9 @@ $AdminUI->addMenuEntries(
 										'general' => array(
 											'text' => T_('General'),
 											'href' => 'settings.php' ),
+										'features' => array(
+										  'text' => T_('Features'),
+										  'href' => 'features.php' ),											
 										'regional' => array(
 											'text' => T_('Regional'),
 											'href' => 'locales.php'.( (isset($loc_transinfo) && $loc_transinfo) ? '?loc_transinfo=1' : '' ) ),
