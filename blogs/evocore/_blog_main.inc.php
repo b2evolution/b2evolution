@@ -150,8 +150,22 @@ if( $resolve_extra_path )
 		$path_string = substr( $ReqPath, $pos+strlen( $blog_baseurl ) );
 
 		$Debuglog->add( 'Extra path info found! path_string=' . $path_string , 'params' );
-			// echo "path=$path_string <br>";
-		$path_elements = explode( '/', $path_string, 20 );  // slice it
+		//echo "path=[$path_string]<br />";
+
+		// Slice the path:
+		$path_split = explode( '/', $path_string, 20 );
+
+		// Remove empty slots:
+		$path_elements = array();
+		foreach( $path_split as $path_element )
+		{
+			if( !empty( $path_element ) )
+			{
+				$path_elements[] = $path_element;
+			}
+		}
+		// echo count( $path_elements );
+
 		$path_error = 0;
 		$i=0;
 		// echo $path_elements[$i];
@@ -379,6 +393,9 @@ if ( $use_memcached )
 
 /*
  * $Log$
+ * Revision 1.17  2005/09/16 13:38:20  fplanque
+ * bugfix
+ *
  * Revision 1.16  2005/09/14 18:10:47  fplanque
  * bugfix
  *
