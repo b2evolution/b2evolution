@@ -426,12 +426,12 @@ elseif( !isset($login) && isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cooki
 	 * User was not trying to log in, but he already was logged in: check validity
 	 * ---------------------------------------------------------
 	 */
-	// echo 'Was already logged in...';
-	$Debuglog->add( 'Was already logged in... ['.$login.']', 'login' );
-
 	$login = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_user]) : $_COOKIE[$cookie_user]));
 	$pass_md5 = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_pass]) : $_COOKIE[$cookie_pass]));
+
+	// echo 'Was already logged in...';
 	// echo 'pass=', $pass_md5;
+	$Debuglog->add( 'Was already logged in... ['.$login.']', 'login' );
 
 	if( !user_pass_ok( $login, $pass_md5, true ) )
 	{ // login is NOT OK:
@@ -535,6 +535,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.49  2005/09/17 23:14:02  blueyed
+ * Fixed debug logging of already logged in user login
+ *
  * Revision 1.48  2005/09/12 19:03:00  fplanque
  * DIRTY HACK JUST TO FIX THE DEMO SITE :(((
  *
