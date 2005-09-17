@@ -117,7 +117,7 @@ function antispam_delete( $string_ID )
  * Note: Letting the database do the LIKE %% match is a little faster than doing in it PHP,
  * not to mention the incredibly long overhead of preloading the list into PHP
  *
- * @return string balcklisted keyword found or false if no spam detected
+ * @return string blacklisted keyword found or false if no spam detected
  */
 function antispam_check( $haystack )
 {
@@ -135,10 +135,12 @@ function antispam_check( $haystack )
 	// TODO: Check basedomain against T_basedomains (dom_status = 'blacklist')
 
 	$Timer->start( 'antispam_url' );
-	if( $block = $DB->get_var( "SELECT aspm_string
-					  		 	FROM  T_antispam
-					       WHERE ".$DB->quote($haystack)." LIKE CONCAT('%',aspm_string,'%')
-					       LIMIT 0, 1", 0, 0, 'Check URL against antispam balcklist' ) )
+	$block = $DB->get_var(
+		"SELECT aspm_string
+		FROM  T_antispam
+		WHERE ".$DB->quote($haystack)." LIKE CONCAT('%',aspm_string,'%')
+		LIMIT 0, 1", 0, 0, 'Check URL against antispam blacklist' );
+	if( $block )
 	{
 			$Debuglog->add( 'Spam block: '.$block );
 			return $block;	// SPAM detected!
@@ -325,6 +327,9 @@ function antispam_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.13  2005/09/17 18:13:21  blueyed
+ * Typo, whitespace.
+ *
  * Revision 1.12  2005/09/07 17:40:22  fplanque
  * enhanced antispam
  *
