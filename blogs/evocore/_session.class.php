@@ -79,18 +79,17 @@ class Session
 		 */
 		global $online_session_timeout;
 
-		if( $sessionByCookie = param( $cookie_session, 'string', '' ) )
+		if( !empty( $_COOKIE[$cookie_session] ) )
 		{ // session ID sent by cookie
-			$this->ID = $sessionByCookie;
-
-			// TODO: validate key.
+			$session_id_by_cookie = remove_magic_quotes($_COOKIE[$cookie_session]);
 
 			$Debuglog->add( 'ID (from cookie): '.$this->ID, 'session' );
 
-			if( $row = $DB->get_row( 'SELECT sess_data, sess_key FROM T_sessions
-																	WHERE sess_ID = "'.$this->ID.'"' ) )
+			if( $row = $DB->get_row( 'SELECT sess_ID, sess_data, sess_key FROM T_sessions
+																	WHERE sess_ID = '.$DB->quote($session_id_by_cookie) ) )
 			{
 				$Debuglog->add( 'Session data loaded.', 'session' );
+				$this->ID = $row->sess_ID;
 				$this->key = $row->sess_key;
 				$this->data = $row->sess_data;
 			}
@@ -150,7 +149,7 @@ class Session
 	 *
 	 * @return boolean
 	 */
-	function isValidByKey()
+	function is_valid_by_key()
 	{
 		return !empty($this->key);
 	}
