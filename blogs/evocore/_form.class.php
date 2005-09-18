@@ -291,7 +291,7 @@ class Form extends Widget
 
 		if( !empty($this->_common_params['note']) )
 		{ // We have a note
-			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
+			$r .= sprintf( $this->_common_params['note_format'], format_to_output($this->_common_params['note']) );
 		}
 
 		if( isset($this->_common_params['field_suffix']) )
@@ -1481,8 +1481,8 @@ class Form extends Widget
 
 		// end field (Label always to the left!)
 		$old_label_to_the_left = $this->label_to_the_left;
-		$this->label_to_the_left = true;	
-		$r .= $this->end_field();		
+		$this->label_to_the_left = true;
+		$r .= $this->end_field();
 		$this->label_to_the_left = $old_label_to_the_left;
 
 		return $this->display_or_return( $r );
@@ -1857,7 +1857,7 @@ class Form extends Widget
 
 			if( !empty( $loop_field_option['note'] ) )
 			{ // notes for radio option
-				$r .= '<span class="notes">'.$loop_field_option['note'].'</span>';
+				$r .= '<span class="notes">'.format_to_output($loop_field_option['note']).'</span>';
 			}
 			if( !empty( $loop_field_option['suffix'] ) )
 			{ // optional text for radio option (like additional fieldsets or input boxes)
@@ -2111,12 +2111,6 @@ class Form extends Widget
 			unset( $field_params['field_suffix'] );
 		}
 
-		if( isset($field_params['onclick']) )
-		{
-			$this->_common_params['onclick'] = $field_params['onclick'];
-			unset( $field_params['onclick'] );
-		}
-
 		if( !empty($field_params['name']) && !isset($field_params['id']) )
 		{ // Autogenerate id attrib (not for hidden, radio and submit types)
 			if( empty($field_params['type'])
@@ -2136,7 +2130,7 @@ class Form extends Widget
 				? $field_params['class'].' field_error'
 				: 'field_error';
 
-			$this->_common_params['note'] .= ' <span class="field_error">'.$Request->err_messages[$field_params['name']].'</span>';
+			$this->_common_params['note'] .= ' <span class="field_error">'.format_to_output($Request->err_messages[$field_params['name']]).'</span>';
 		}
 
 		#pre_dump( 'handle_common_params (after)', $field_params );
@@ -2156,19 +2150,18 @@ class Form extends Widget
 
 		foreach( $field_params as $l_attr => $l_value )
 		{
-			if( $l_value !== '' )
+			if( $l_value === '' )
 			{ // don't generate empty attributes
-				if( $l_attr == 'value' )
-				{
-					// fplanque>>blueyed: note: having to dig in through a zillion function calls to add
-					// this hack in order to fix your refactoring is really really making me nervous! :/
-					// This is OVER FACTORIZATION !!! ONCE AGAIN !!! I am not taking this any longer!
-					$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
-				}
-				else
-				{
-					$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
-				}
+				continue;
+			}
+
+			if( $l_attr == 'value' )
+			{
+				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
+			}
+			else
+			{
+				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
 			}
 		}
 
