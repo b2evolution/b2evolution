@@ -71,16 +71,9 @@
  */
 if( defined( 'EVO_MAIN_INIT' ) )
 {
-	# return;
-
-	// DITY HACK JUST TO FIX THE DEMO SITE!! :(((((((((((((((((
-	if( defined('EVO_MAIN_INIT2') ) 	return;
-	define( 'EVO_MAIN_INIT2', true );
-
+	return;
 }
-#define( 'EVO_MAIN_INIT', true );
-// DITY HACK JUST TO FIX THE DEMO SITE!! :(((((((((((((((((
-if( !defined('EVO_MAIN_INIT') ) define( 'EVO_MAIN_INIT', true );
+define( 'EVO_MAIN_INIT', true );
 
 
 /**
@@ -535,6 +528,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.50  2005/09/18 00:54:25  blueyed
+ * Removed hack to fix the demo site
+ *
  * Revision 1.49  2005/09/17 23:14:02  blueyed
  * Fixed debug logging of already logged in user login
  *
