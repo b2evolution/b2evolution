@@ -2114,8 +2114,7 @@ class Form extends Widget
 		if( isset($field_params['onclick']) )
 		{
 			$this->_common_params['onclick'] = $field_params['onclick'];
-			unset( $field_params['field_suffix'] );
-			
+			unset( $field_params['onclick'] );
 		}
 
 		if( !empty($field_params['name']) && !isset($field_params['id']) )
