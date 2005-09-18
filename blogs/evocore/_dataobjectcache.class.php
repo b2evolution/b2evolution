@@ -228,7 +228,8 @@ class DataObjectCache
 		if( empty($req_ID) )
 		{
 			if($halt_on_empty) die( "Requested $this->objtype from $this->dbtablename without ID!" );
-			return NULL;
+			$r = NULL;
+			return $r;
 		}
 
 		if( !empty( $this->cache[ $req_ID ] ) )
@@ -352,6 +353,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.23  2005/09/18 01:46:55  blueyed
+ * Fixed E_NOTICE for return by reference (PHP 4.4.0)
+ *
  * Revision 1.22  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

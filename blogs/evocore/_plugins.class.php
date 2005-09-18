@@ -365,7 +365,8 @@ class Plugins
 
 		if( $this->current_idx >= count( $this->Plugins ) )
 		{
-			return false;
+			$r = false;
+			return $r;
 		}
 
 		return $this->Plugins[ $this->current_idx++ ];
@@ -641,6 +642,9 @@ function sort_Plugin_name( & $a, & $b )
 
 /*
  * $Log$
+ * Revision 1.11  2005/09/18 01:46:55  blueyed
+ * Fixed E_NOTICE for return by reference (PHP 4.4.0)
+ *
  * Revision 1.10  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
