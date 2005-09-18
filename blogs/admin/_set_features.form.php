@@ -60,7 +60,7 @@ $Form->begin_fieldset( T_('Blog by email') . WH('FeatureBlogByEmail') );
 					'onclick'=>'this.checked==true?document.getElementById("eblog_section").style.display="":document.getElementById("eblog_section").style.display="none";' ) );
 
 	$tmpstyle = $Settings->get('eblog_enabled')==1?'':'display:none';
-	echo '<div name="eblog_section" id="eblog_section" style="'. $tmpstyle .'">';
+	echo '<div id="eblog_section" style="'. $tmpstyle .'">';
 		echo $Form->begin_field( 'eblog_method', T_('Email retrieval method') );
 
 		function fselected($value1,$value2)
