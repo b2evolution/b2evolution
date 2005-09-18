@@ -316,6 +316,17 @@ $use_etags = 0;
 
 // ** Cookies **
 
+/*
+TODO:
+- Cookie needs hash of domain name in its name, eg:
+	$cookie_user = 'cookie'.small_hash($Cookies->domain).$instancename.'user'
+	(Because: cookies for .domain.tld have higher priority over .sub.domain.tld, with the same cookie name,
+		the hash would put that into the name)
+	- Transform: catch existing cookies, transform to new format
+- Use object to handle cookies
+	- We need to know for example if a cookie is about to be sent (because then we don't want to send a 304 response).
+*/
+
 /**
  * This is the path that will be associated to cookies
  *
