@@ -120,6 +120,9 @@ $search_engines = array(
 	'reacteur.com/',
 	'http://www.lmi.fr/',
 	'kartoo.com/',
+	'brisbane.t-online.de/',
+	'suche.freenet.de/',
+	'icq.com/search',
 );
 
 
