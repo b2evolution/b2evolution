@@ -98,7 +98,7 @@ class DB
 	 */
 	var $debug_explain_joins = false;
 
-  /**
+	/**
 	 * Number of rows we want to dump in debug output:
 	 */
 	var $debug_dump_rows = 0;
@@ -155,14 +155,14 @@ class DB
 	 *
 	 * connects to the server and selects a database
 	 *
-	 * blueyed> Note: Too many parameters (and without default). Should be accessed through members. $halt_on_error is relevant to the connect procedure and should be put after $dbhost.
+	 * blueyed> Note: Too many parameters (and without default). Should be accessed through members. $halt_on_error is (also) relevant to the connect procedure and should be put after $dbhost.
 	 */
 	function DB( $dbuser, $dbpassword, $dbname, $dbhost, $dbaliases, $db_use_transactions, $dbtableoptions = '', $halt_on_error = true )
 	{
 		$this->halt_on_error = $halt_on_error;
 
 		if( !extension_loaded('mysql') )
-		{	// The mysql extension is not loaded, try to dynamically load it:
+		{ // The mysql extension is not loaded, try to dynamically load it:
 			if (strtoupper(substr(PHP_OS, 0, 3) == 'WIN'))
 			{
 				@dl('php_mysql.dll');
@@ -238,6 +238,11 @@ class DB
 	}
 
 
+	/**
+	 * Quote a value, either in single quotes (and escaped) or if it's NULL as 'NULL'.
+	 *
+	 * @return string Quoted (and escaped) value or 'NULL'.
+	 */
 	function quote($str)
 	{
 		if( $str === NULL )
@@ -247,6 +252,9 @@ class DB
 	}
 
 
+	/**
+	 * @return string Return the given value or 'NULL', if it's === NULL.
+	 */
 	function null($val)
 	{
 		if( $val === NULL )
@@ -268,13 +276,14 @@ class DB
 	function week( $date, $startofweek )
 	{
 		if( $startofweek == 1 )
-		{	// Week starts on Monday:
+		{ // Week starts on Monday:
 			return ' WEEK( '.$date.', 5 ) ';
 		}
 
 		// Week starts on Sunday:
 		return ' WEEK( '.$date.', 0 ) ';
 	}
+
 
 	/**
 	 * Returns the appropriate string to compare $val in a WHERE clause.
@@ -416,7 +425,7 @@ class DB
 		$query = preg_replace( $this->dbaliases, $this->dbreplaces, $query );
 
 		if( preg_match( '#^ \s* create \s* table \s #ix', $query) )
-		{	// Query is a table creation, we add table options:
+		{ // Query is a table creation, we add table options:
 			$query .= $this->dbtableoptions;
 		}
 
@@ -436,11 +445,11 @@ class DB
 		{
 			// Resume global query timer
 			$Timer->resume( 'sql_queries' );
-			// Start a timer fot this paritcular query:
+			// Start a timer for this paritcular query:
 			$Timer->start( 'query', false );
 			// Run query:
 			$this->result = @mysql_query( $query, $this->dbh );
-			// Get duration fpor last query:
+			// Get duration for last query:
 			$this->queries[ $this->num_queries - 1 ]['time'] = $Timer->get_duration( 'query' );
 			// Pause global query timer:
 			$Timer->pause( 'sql_queries' );
@@ -883,7 +892,7 @@ class DB
 
 
 	/**
-	 * Displays all queries that have been exectuted
+	 * Displays all queries that have been executed
 	 *
 	 * {@internal DB::dump_queries(-) }}
 	 */
@@ -915,7 +924,7 @@ class DB
 			echo '</code>';
 			echo '<p class="rows">Rows: '.$query['rows'].' - Time: '.$query['time'].'s';
 			if( $time_queries > 0 )
-			{	// We have a total time we can use to calculate percentage:
+			{ // We have a total time we can use to calculate percentage:
 				echo ' ('.number_format( 100/$time_queries * $query['time'], 2 ).'%)';
 			}
 			echo '</p>';
@@ -942,7 +951,7 @@ class DB
 	 * This means that as soon as you execute a statement that updates (modifies)
 	 * a table, MySQL stores the update on disk.
 	 * Once you execute a BEGIN, the updates are "pending" until you execute a
-	 * COMMIT {@see DB::commit()} or a ROLLBACK {@see DB:rollback()}
+	 * {@link DB::commit() COMMIT} or a {@link DB:rollback() ROLLBACK}
 	 *
 	 * Note 2: standard syntax would be START TRANSACTION but it's not supported by older
 	 * MySQL versions whereas BEGIN is...
@@ -968,7 +977,7 @@ class DB
 		if( $this->use_transactions )
 		{
 			if( $this->transaction_nesting_level == 1 )
-			{	// Only COMMIT if there are no remaining nested transactions:
+			{ // Only COMMIT if there are no remaining nested transactions:
 				if( $this->rollback_nested_transaction )
 				{
 					$this->query( 'ROLLBACK', 'ROLLBACK transaction because there was a failure somewhere in the nesting of transactions' );
@@ -992,12 +1001,12 @@ class DB
 		if( $this->use_transactions )
 		{
 			if( $this->transaction_nesting_level == 1 )
-			{	// Only ROLLBACK if there are no remaining nested transactions:
+			{ // Only ROLLBACK if there are no remaining nested transactions:
 				$this->query( 'ROLLBACK', 'ROLLBACK transaction' );
 				$this->rollback_nested_transaction = false;
 			}
 			else
-			{	// Remember we'll have to roll back at the end!
+			{ // Remember we'll have to roll back at the end!
 				$this->rollback_nested_transaction = true;
 			}
 			$this->transaction_nesting_level--;
@@ -1008,6 +1017,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.27  2005/09/18 01:49:41  blueyed
+ * Doc, whitespace.
+ *
  * Revision 1.26  2005/09/11 23:46:31  fplanque
  * no message
  *
