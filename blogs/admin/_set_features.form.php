@@ -93,6 +93,12 @@ $Form->begin_fieldset( T_('Blog by email') . WH('FeatureBlogByEmail') );
 		$Form->text_input ( 'eblog_subject_prefix', $Settings->get('eblog_subject_prefix'),15,T_('Subject Prefix'),
 												array( 'maxlength' => 255, 'note' => T_('Email subject must start with this prefix to be imported.')  )  );
 
+		// eblog test links
+		$Form->info_field ('','<a id="eblog_test" href="#eblog_test" onclick=\'pop_up_window( "' . $htsrv_url . 'getmail.php?test=connection", "getmail" );\'>' . T_('Test connection') . '</a>',array());
+
+//		<input type="button" value="Files" class="ActionButton"
+	//					onclick="pop_up_window( 'files.php?mode=upload', 'fileman_upload' );">
+
 		// special show / hide link
 		$Form->info_field ('','<a id="eblog_show_more" href="#eblog_show_more" onclick=\'if(document.getElementById("eblog_section_more").style.display==""){document.getElementById("eblog_show_more").innerHTML="' . T_('show extra options...') . '";document.getElementById("eblog_section_more").style.display="none";}else{document.getElementById("eblog_show_more").innerHTML="' . T_('hide extra options') . '";document.getElementById("eblog_section_more").style.display="";}\'>' . T_('show extra options...') . '</a>',array());
 

@@ -19,539 +19,550 @@ require_once( dirname(__FILE__).'/../conf/_config.php' );
 require_once( dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.inc.php' );
 require_once( dirname(__FILE__).'/'.$htsrv_dirout.$lib_subdir.'_pop3.class.php' );
 
-if ( $Settings->get('eblog_enabled') == 1 )
+if( !$Settings->get('eblog_enabled') )
 {
-	switch ( $Settings->get('eblog_method') )
-	{
-		case "pop3":
-			//--------------------------------------------------------------------
-			// eblog_method = POP3 (original)
-			//--------------------------------------------------------------------
+ echo T_('Blog by email feature not enabled');
+ exit();
+}
 
-			if( $Settings->get('eblog_phonemail') )
-			{ // if you're using phone email, the email will already be in your timezone
-				$Settings->set('time_difference', 0);
-			}
+// Get test settings
+$test_connection = false;
+$test_connection_only = false;
 
-			// error_reporting( E_ALL );
+if ( $_GET['test']=='connection' )
+{
+	// set error reporting to none
+	error_reporting (0);
+
+	$page_title = T_('Blog by email');
+	require( dirname(__FILE__).'/_header.php' );
+	$test_connection = true;
+	$test_connection_only = true;
+}
 
 
-			$pop3 = new POP3();
+switch ( $Settings->get('eblog_method') )
+{
+	case "pop3":
+		//--------------------------------------------------------------------
+		// eblog_method = POP3 (original)
+		//--------------------------------------------------------------------
 
-			echo T_('Connecting to pop server...'), "<br />\n";
-			if( !$pop3->connect( $Settings->get('eblog_server_host'), $Settings->get('eblog_server_port')) )
+		if( $Settings->get('eblog_phonemail') )
+		{ // if you're using phone email, the email will already be in your timezone
+			$Settings->set('time_difference', 0);
+		}
+
+		// error_reporting( E_ALL );
+
+
+		$pop3 = new POP3();
+
+		echo T_('Connecting to pop server...'), "<br />\n";
+		if( !$pop3->connect( $Settings->get('eblog_server_host'), $Settings->get('eblog_server_port')) )
+		{
+			echo T_('Connection failed: ').$pop3->ERROR." <br />\n";
+			exit;
+		}
+
+		echo T_('Logging into pop server...'), "<br />\n";
+		$Count = $pop3->login( $Settings->get('eblog_username'), $Settings->get('eblog_password') );
+		if( (!$Count) || ($Count == -1) )
+		{
+			echo T_('No mail or Login Failed:'), " $pop3->ERROR <br />\n";
+			$pop3->quit();
+			exit;
+		}
+
+
+		// ONLY USE THIS IF YOUR PHP VERSION SUPPORTS IT! (PHP >= 3.0.4)
+		#register_shutdown_function( $pop3->quit() );
+
+		for( $iCount = 1; $iCount <= $Count; $iCount++)
+		{
+			printf( T_('Getting message #%d...')."<br />\n", $iCount );
+			$MsgOne = $pop3->get($iCount);
+			if((!$MsgOne) || (gettype($MsgOne) != 'array'))
 			{
-				echo T_('Connection failed: ').$pop3->ERROR." <br />\n";
-				exit;
-			}
-
-			echo T_('Logging into pop server...'), "<br />\n";
-			$Count = $pop3->login( $Settings->get('eblog_username'), $Settings->get('eblog_password') );
-			if( (!$Count) || ($Count == -1) )
-			{
-				echo T_('No mail or Login Failed:'), " $pop3->ERROR <br />\n";
+				echo $pop3->ERROR, "<br />\n";
 				$pop3->quit();
 				exit;
 			}
 
+			echo T_('Processing...'), "<br />\n";
+			$content = '';
+			$content_type = '';
+			$boundary = '';
+			$bodysignal = 0;
+			$dmonths = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 
-			// ONLY USE THIS IF YOUR PHP VERSION SUPPORTS IT! (PHP >= 3.0.4)
-			#register_shutdown_function( $pop3->quit() );
-
-			for( $iCount = 1; $iCount <= $Count; $iCount++)
+			while( list( $lineNum, $line ) = each ($MsgOne) )
 			{
-				printf( T_('Getting message #%d...')."<br />\n", $iCount );
-				$MsgOne = $pop3->get($iCount);
-				if((!$MsgOne) || (gettype($MsgOne) != 'array'))
-				{
-					echo $pop3->ERROR, "<br />\n";
-					$pop3->quit();
-					exit;
+				if( strlen($line) < 3 ) {
+					$bodysignal = 1;
 				}
-
-				echo T_('Processing...'), "<br />\n";
-				$content = '';
-				$content_type = '';
-				$boundary = '';
-				$bodysignal = 0;
-				$dmonths = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-
-				while( list( $lineNum, $line ) = each ($MsgOne) )
-				{
-					if( strlen($line) < 3 ) {
-						$bodysignal = 1;
+				if ($bodysignal) {
+					$content .= $line;
+				} else {
+					if (preg_match('/Content-Type: /', $line)) {
+						$content_type = trim($line);
+						$content_type = substr($content_type, 14, strlen($content_type)-14);
+						$content_type = explode(';', $content_type);
+						$content_type = $content_type[0];
 					}
-					if ($bodysignal) {
-						$content .= $line;
-					} else {
-						if (preg_match('/Content-Type: /', $line)) {
-							$content_type = trim($line);
-							$content_type = substr($content_type, 14, strlen($content_type)-14);
-							$content_type = explode(';', $content_type);
-							$content_type = $content_type[0];
-						}
-						if (($content_type == 'multipart/alternative') && (preg_match('/boundary="/', $line)) && ($boundary == ''))
-						{
-							$boundary = trim($line);
-							$boundary = explode('"', $boundary);
-							$boundary = $boundary[1];
-						}
-						if (preg_match('/Subject: /', $line))
-						{
-							$subject = trim($line);
-							$subject = substr($subject, 9, strlen($subject)-9);
-							if ( $Settings->get('eblog_phonemail') )
-							{
-								$subject = explode( $Settings->get('eblog_phonemail_separator'), $subject );
-								$subject = trim($subject[0]);
-							}
-							if (!ereg($Settings->get('eblog_subject_prefix'), $subject))
-							{
-								continue;
-							}
-						}
-						if (preg_match('/Date: /', $line))
-						{ // of the form '20 Mar 2002 20:32:37'
-							$ddate = trim($line);
-							$ddate = str_replace('Date: ', '', $ddate);
-							if (strpos($ddate, ',')) {
-								$ddate = trim(substr($ddate, strpos($ddate, ',')+1, strlen($ddate)));
-							}
-							$date_arr = explode(' ', $ddate);
-							$date_time = explode(':', $date_arr[3]);
-
-							$ddate_H = $date_time[0];
-							$ddate_i = $date_time[1];
-							$ddate_s = $date_time[2];
-
-							$ddate_m = $date_arr[1];
-							$ddate_d = $date_arr[0];
-							$ddate_Y = $date_arr[2];
-							for ($i=0; $i<12; $i++) {
-								if ($ddate_m == $dmonths[$i]) {
-									$ddate_m = $i+1;
-								}
-							}
-							$ddate_U = mktime($ddate_H, $ddate_i, $ddate_s, $ddate_m, $ddate_d, $ddate_Y);
-							$ddate_U = $ddate_U + ($Settings->get('time_difference') * 3600);
-							$post_date = date('Y-m-d H:i:s', $ddate_U);
-						}
-					}
-				}
-
-				$ddate_today = $localtimenow;
-				$ddate_difference_days = ($ddate_today - $ddate_U) / 86400;
-
-
-				# starts buffering the output
-				ob_start();
-
-				if ($ddate_difference_days > 14)
-				{
-					echo T_('Too old'), '<br />';
-					continue;
-				}
-
-				if( !preg_match('/'.$Settings->get('eblog_subject_prefix').'/', $subject))
-				{
-					echo T_('Subject prefix does not match').'.<br />';
-					continue;
-				}
-
-				$userpassstring = '';
-
-				echo '<div style="border: 1px dashed #999; padding: 10px; margin: 10px;">';
-				echo "<p><strong>$iCount</strong></p><p><strong>Subject: </strong>$subject</p>\n";
-
-				$subject = trim(str_replace($Settings->get('eblog_subject_prefix'), '', $subject));
-
-				if ($content_type == 'multipart/alternative') {
-					$content = explode('--'.$boundary, $content);
-					$content = $content[2];
-					$content = explode('Content-Transfer-Encoding: quoted-printable', $content);
-					$content = strip_tags($content[1], '<img><p><br><i><b><u><em><strong><strike><font><span><div>');
-				}
-				$content = trim($content);
-
-				echo "<p><strong>Content-type:</strong> $content_type, <strong>boundary:</strong> $boundary</p>\n";
-				echo '<p><strong>', T_('Raw content:'), '</strong><br /><xmp>', $content, '</xmp></p>';
-
-				$btpos = strpos( $content, $Settings->get('eblog_body_terminator') );
-				if ($btpos) {
-					$content = substr($content, 0, $btpos);
-				}
-				$content = trim($content);
-
-				$blah = explode("\n", $content);
-				$firstline = $blah[0];
-
-				if ( $Settings->get('eblog_phonemail') )
-				{
-					$btpos = strpos($firstline, $Settings->get('eblog_phonemail_separator') );
-					if ($btpos) {
-						$userpassstring = trim(substr($firstline, 0, $btpos));
-						$content = trim(substr($content, $btpos+strlen($Settings->get('eblog_phonemail_separator')), strlen($content)));
-						$btpos = strpos($content, $Settings->get('eblog_phonemail_separator') );
-						if ($btpos) {
-							$userpassstring = trim(substr($content, 0, $btpos));
-							$content = trim(substr($content, $btpos+strlen($Settings->get('eblog_phonemail_separator')), strlen($content)));
-						}
-					}
-					$contentfirstline = $blah[1];
-				}
-				else
-				{
-					$userpassstring = $firstline;
-					$contentfirstline = '';
-				}
-
-				$blah = explode(':', $userpassstring);
-				$user_login = trim($blah[0]);
-				$user_pass = @trim($blah[1]);
-
-				$content = $contentfirstline.str_replace($firstline, '', $content);
-				$content = trim($content);
-
-				echo '<p><strong>', T_('Login:'), '</strong> ', $user_login, ', <strong>', T_('Pass:'), '</strong> ', $user_pass, '</p>';
-
-				if( !user_pass_ok( $user_login, $user_pass ) )
-				{
-					echo '<p><strong>', T_('Wrong login or password.'), '</strong></p></div>';
-					continue;
-				}
-
-				$loop_User = & $UserCache->get_by_login( $user_login );
-
-				// --- get infos from content -----------
-				$post_title = xmlrpc_getposttitle($content);
-				if ($post_title == '')
-				{
-					$post_title = $subject;
-				}
-
-				if( ! ($post_category = xmlrpc_getpostcategory($content) ) )
-				{
-					$post_category = $Settings->get('eblog_default_category');
-				}
-				echo '<p><strong>', T_('Category ID'), ':</strong> ',$post_category,'</p>';
-
-				$content = xmlrpc_removepostdata( $content );
-
-				$blog_ID = get_catblog($post_category); // TODO: should not die, if cat does not exist!
-				echo '<p><strong>', T_('Blog ID'), ':</strong> ',$blog_ID,'</p>';
-
-				// Check permission:
-				if( ! $loop_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
-				{
-					echo "\n", T_('Permission denied.'), '<br />';
-					continue;
-				}
-
-				if (!$Settings->get('eblog_test_mode'))
-				{
-					// CHECK and FORMAT content
-					$post_title = format_to_post( trim($post_title), 0, 0 );
-					$content = format_to_post( trim($content), $Settings->get('AutoBR'), 0);
-
-					if( $Messages->display( T_('Cannot post, please correct these errors:'), '' ) )
+					if (($content_type == 'multipart/alternative') && (preg_match('/boundary="/', $line)) && ($boundary == ''))
 					{
-						$Messages->reset();
-						echo '</div>';
-						continue;
+						$boundary = trim($line);
+						$boundary = explode('"', $boundary);
+						$boundary = $boundary[1];
 					}
+					if (preg_match('/Subject: /', $line))
+					{
+						$subject = trim($line);
+						$subject = substr($subject, 9, strlen($subject)-9);
+						if ( $Settings->get('eblog_phonemail') )
+						{
+							$subject = explode( $Settings->get('eblog_phonemail_separator'), $subject );
+							$subject = trim($subject[0]);
+						}
+						if (!ereg($Settings->get('eblog_subject_prefix'), $subject))
+						{
+							continue;
+						}
+					}
+					if (preg_match('/Date: /', $line))
+					{ // of the form '20 Mar 2002 20:32:37'
+						$ddate = trim($line);
+						$ddate = str_replace('Date: ', '', $ddate);
+						if (strpos($ddate, ',')) {
+							$ddate = trim(substr($ddate, strpos($ddate, ',')+1, strlen($ddate)));
+						}
+						$date_arr = explode(' ', $ddate);
+						$date_time = explode(':', $date_arr[3]);
 
-					// INSERT NEW POST INTO DB:
-					$edited_Item = & new Item();
-					$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
+						$ddate_H = $date_time[0];
+						$ddate_i = $date_time[1];
+						$ddate_s = $date_time[2];
 
-					$blogparams = get_blogparams_by_ID( $blog_ID );
-					pingback( true, $content, $post_title, '', $post_ID, $blogparams, true);
-
-					// Send email notifications now!
-					$edited_Item->send_email_notifications( false );
-
-					pingb2evonet( $blogparams, $post_ID, $post_title);
-					pingWeblogs($blogparams);
-					pingBlogs($blogparams);
-					pingTechnorati($blogparams);
-				}
-				echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
-				echo "\n<strong>", T_('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
-			/*
-				if(!$pop3->delete($iCount))
-				{
-					echo '<p>', $pop3->ERROR, '</p></div>';
-					$pop3->reset();
-					exit;
-				}
-				else
-				{
-					echo '<p>', T_('Mission complete, message deleted.'), '</p>';
-				}
-			*/
-				echo '</div>';
-				if ($output_debugging_info)
-				{
-					ob_end_flush();
-				}
-				else
-				{
-					ob_end_clean();
+						$ddate_m = $date_arr[1];
+						$ddate_d = $date_arr[0];
+						$ddate_Y = $date_arr[2];
+						for ($i=0; $i<12; $i++) {
+							if ($ddate_m == $dmonths[$i]) {
+								$ddate_m = $i+1;
+							}
+						}
+						$ddate_U = mktime($ddate_H, $ddate_i, $ddate_s, $ddate_m, $ddate_d, $ddate_Y);
+						$ddate_U = $ddate_U + ($Settings->get('time_difference') * 3600);
+						$post_date = date('Y-m-d H:i:s', $ddate_U);
+					}
 				}
 			}
 
-			echo T_('OK.'), "<br />\n";
-
-			$pop3->quit();
-
-			timer_stop($output_debugging_info);
-			exit;
-
-		break;
+			$ddate_today = $localtimenow;
+			$ddate_difference_days = ($ddate_today - $ddate_U) / 86400;
 
 
-		case "pop3a":
-			//--------------------------------------------------------------------
-			// eblog_method = POP3 (experimental)
-			//--------------------------------------------------------------------
-
-			if( !extension_loaded('imap') )
-			{
-			  echo T_('The php_imap extension is not available to php on this server. Please configure a different email retrieval method on the Features tab.');
-				exit;
-			}
-			// starts buffering the output
+			# starts buffering the output
 			ob_start();
 
-
-			// Prepare the connection string
-			$mailserver = '{' . $Settings->get('eblog_server_host') . ':' . $Settings->get('eblog_server_port') . '/pop3}INBOX';
-
-			// Connect to mail server
-			$mbox = imap_open( $mailserver, $Settings->get('eblog_username'), $Settings->get('eblog_password') ) or die( T_('Connection failed: ') . imap_last_error() );
-
-			// damn gmail... grr
-			//$mbox = imap_open ("{pop.gmail.com:995/pop3/ssl/novalidate-cert}INBOX", "xxx@gmail.com", "xxx") or die( T_('Connection failed: ') . imap_last_error() );
-
-			// Read messages from server
-			$imap_obj = imap_check($mbox);
-			//echo var_dump($imap_obj);
-
-			for ( $index=1; $index<= $imap_obj->Nmsgs; $index++ )
+			if ($ddate_difference_days > 14)
 			{
+				echo T_('Too old'), '<br />';
+				continue;
+			}
 
-				echo "<hr />\n\n\n\n\n<h3> Message #$index</h3>\n";
-				printf( T_('Getting message #%d...')."<br />\n", $index );
+			if( !preg_match('/'.$Settings->get('eblog_subject_prefix').'/', $subject))
+			{
+				echo T_('Subject prefix does not match').'.<br />';
+				continue;
+			}
 
-				//retrieve and process header
-				$imap_header = imap_headerinfo($mbox,$index);
-				$subject = $imap_header->subject;
-				if( !preg_match( '/'.$Settings->get('eblog_subject_prefix') .'/', $subject ) )
-				{
-					echo T_('Subject prefix does not match').'.<br />';
-					continue;
-				}
+			$userpassstring = '';
 
-				// of the form '20 Mar 2002 20:32:37'
-				$ddate = trim($imap_header->Date);
-				if (strpos($ddate, ',')) {
-					$ddate = trim(substr($ddate, strpos($ddate, ',')+1, strlen($ddate)));
-				}
-				$date_arr = explode(' ', $ddate);
-				$date_time = explode(':', $date_arr[3]);
+			echo '<div style="border: 1px dashed #999; padding: 10px; margin: 10px;">';
+			echo "<p><strong>$iCount</strong></p><p><strong>Subject: </strong>$subject</p>\n";
 
-				$ddate_H = $date_time[0];
-				$ddate_i = $date_time[1];
-				$ddate_s = $date_time[2];
+			$subject = trim(str_replace($Settings->get('eblog_subject_prefix'), '', $subject));
 
-				$ddate_m = $date_arr[1];
-				$ddate_d = $date_arr[0];
-				$ddate_Y = $date_arr[2];
-				
-				$dmonths = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-				
-				for ($i=0; $i<12; $i++) {
-					
-					if ($ddate_m == $dmonths[$i]) {
-						$ddate_m = $i+1;
+			if ($content_type == 'multipart/alternative') {
+				$content = explode('--'.$boundary, $content);
+				$content = $content[2];
+				$content = explode('Content-Transfer-Encoding: quoted-printable', $content);
+				$content = strip_tags($content[1], '<img><p><br><i><b><u><em><strong><strike><font><span><div>');
+			}
+			$content = trim($content);
+
+			echo "<p><strong>Content-type:</strong> $content_type, <strong>boundary:</strong> $boundary</p>\n";
+			echo '<p><strong>', T_('Raw content:'), '</strong><br /><xmp>', $content, '</xmp></p>';
+
+			$btpos = strpos( $content, $Settings->get('eblog_body_terminator') );
+			if ($btpos) {
+				$content = substr($content, 0, $btpos);
+			}
+			$content = trim($content);
+
+			$blah = explode("\n", $content);
+			$firstline = $blah[0];
+
+			if ( $Settings->get('eblog_phonemail') )
+			{
+				$btpos = strpos($firstline, $Settings->get('eblog_phonemail_separator') );
+				if ($btpos) {
+					$userpassstring = trim(substr($firstline, 0, $btpos));
+					$content = trim(substr($content, $btpos+strlen($Settings->get('eblog_phonemail_separator')), strlen($content)));
+					$btpos = strpos($content, $Settings->get('eblog_phonemail_separator') );
+					if ($btpos) {
+						$userpassstring = trim(substr($content, 0, $btpos));
+						$content = trim(substr($content, $btpos+strlen($Settings->get('eblog_phonemail_separator')), strlen($content)));
 					}
 				}
-				$ddate_U = mktime($ddate_H, $ddate_i, $ddate_s, $ddate_m, $ddate_d, $ddate_Y);
-				$ddate_U = $ddate_U + ($Settings->get('time_difference') * 3600);
-				$post_date = date('Y-m-d H:i:s', $ddate_U);
-				
-				//fetch structure
-				$imap_structure = imap_fetchstructure ($mbox, $index);
-				//echo var_dump($imap_structure), "<br /><br />\n\n";
+				$contentfirstline = $blah[1];
+			}
+			else
+			{
+				$userpassstring = $firstline;
+				$contentfirstline = '';
+			}
 
-				$strbody = "";
+			$blah = explode(':', $userpassstring);
+			$user_login = trim($blah[0]);
+			$user_pass = @trim($blah[1]);
 
-				/* part types
-				0 text
-				1 multipart
-				2 message
-				3 application
-				4 audio
-				5 image
-				6 video
-				7 other
-				*/
+			$content = $contentfirstline.str_replace($firstline, '', $content);
+			$content = trim($content);
 
-				if ( $imap_structure->type == 1 )
+			echo '<p><strong>', T_('Login:'), '</strong> ', $user_login, ', <strong>', T_('Pass:'), '</strong> ', $user_pass, '</p>';
+
+			if( !user_pass_ok( $user_login, $user_pass ) )
+			{
+				echo '<p><strong>', T_('Wrong login or password.'), '</strong></p></div>';
+				continue;
+			}
+
+			$loop_User = & $UserCache->get_by_login( $user_login );
+
+			// --- get infos from content -----------
+			$post_title = xmlrpc_getposttitle($content);
+			if ($post_title == '')
+			{
+				$post_title = $subject;
+			}
+
+			if( ! ($post_category = xmlrpc_getpostcategory($content) ) )
+			{
+				$post_category = $Settings->get('eblog_default_category');
+			}
+			echo '<p><strong>', T_('Category ID'), ':</strong> ',$post_category,'</p>';
+
+			$content = xmlrpc_removepostdata( $content );
+
+			$blog_ID = get_catblog($post_category); // TODO: should not die, if cat does not exist!
+			echo '<p><strong>', T_('Blog ID'), ':</strong> ',$blog_ID,'</p>';
+
+			// Check permission:
+			if( ! $loop_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
+			{
+				echo "\n", T_('Permission denied.'), '<br />';
+				continue;
+			}
+
+			if (!$Settings->get('eblog_test_mode'))
+			{
+				// CHECK and FORMAT content
+				$post_title = format_to_post( trim($post_title), 0, 0 );
+				$content = format_to_post( trim($content), $Settings->get('AutoBR'), 0);
+
+				if( $Messages->display( T_('Cannot post, please correct these errors:'), '' ) )
 				{
-					// multipart message
-					for ( $ix=0; $ix< count($imap_structure->parts); $ix++ )
-					{
-						//foreach ( $imap_structure->parts as $part )
-						switch ( $imap_structure->parts[$ix]->type )
-						{
-							case 0 : // text
-							  $strbody = imap_fetchbody($mbox,$index,$ix);
-							break;
-							case 5 : // image
-								// awww yeah ;)
-							break;
-							default:
-								echo "unhandled part type \n" . var_dump($part) . "\n";
-							break;
-						}
-
-		  		}
-				}
-				else
-				{
-				 	// single part
-					$strbody = imap_fetchbody ($mbox, $index,1);
-				}
-
-				// process body
-				$a_body = split(chr(13),$strbody,2);
-				$a_authentication = split(':',$a_body[0]);
-				$content = $a_body[1];
-				$user_login = trim($a_authentication[0]);
-				$user_pass = @trim($a_authentication[1]);
-
-				// authenticate user
-				if( !user_pass_ok( $user_login, $user_pass ) )
-				{
-					echo '<p><strong>', T_('Wrong login or password.'), '</strong></p></div>';
+					$Messages->reset();
+					echo '</div>';
 					continue;
 				}
 
-				$subject = trim(str_replace($Settings->get('eblog_subject_prefix'), '', $subject));
+				// INSERT NEW POST INTO DB:
+				$edited_Item = & new Item();
+				$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
 
-				// remove content after terminator
-				$os_terminator = strpos( $content, $Settings->get('eblog_body_terminator') );
-				if ($os_terminator) {
-					$content = substr($content, 0, $os_terminator);
+				$blogparams = get_blogparams_by_ID( $blog_ID );
+				pingback( true, $content, $post_title, '', $post_ID, $blogparams, true);
+
+				// Send email notifications now!
+				$edited_Item->send_email_notifications( false );
+
+				pingb2evonet( $blogparams, $post_ID, $post_title);
+				pingWeblogs($blogparams);
+				pingBlogs($blogparams);
+				pingTechnorati($blogparams);
+			}
+			echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
+			echo "\n<strong>", T_('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
+		/*
+			if(!$pop3->delete($iCount))
+			{
+				echo '<p>', $pop3->ERROR, '</p></div>';
+				$pop3->reset();
+				exit;
+			}
+			else
+			{
+				echo '<p>', T_('Mission complete, message deleted.'), '</p>';
+			}
+		*/
+			echo '</div>';
+			if ($output_debugging_info)
+			{
+				ob_end_flush();
+			}
+			else
+			{
+				ob_end_clean();
+			}
+		}
+
+		echo T_('OK.'), "<br />\n";
+
+		$pop3->quit();
+
+		timer_stop($output_debugging_info);
+		exit;
+
+	break;
+
+
+	case "pop3a":
+		//--------------------------------------------------------------------
+		// eblog_method = POP3 (experimental)
+		//--------------------------------------------------------------------
+
+		if( !extension_loaded('imap') )
+		{
+		  echo T_('The php_imap extension is not available to php on this server. Please configure a different email retrieval method on the Features tab.');
+			exit;
+		}
+
+		if ( $test_connection )
+		{
+			echo T_('Testing username, password and connection to mail server:<br/>');
+		}
+
+		// Prepare the connection string
+		$mailserver = '{' . $Settings->get('eblog_server_host') . ':' . $Settings->get('eblog_server_port') . '/pop3}INBOX';
+
+		// Connect to mail server
+		$mbox = imap_open( $mailserver, $Settings->get('eblog_username'), $Settings->get('eblog_password') ) or die( 	'<div class="action_messages"><div class="log_error">' . T_('Connection failed: ') . imap_last_error() . '</div></div>' );
+
+		// damn gmail... grr
+		//$mbox = imap_open ("{pop.gmail.com:995/pop3/ssl/novalidate-cert}INBOX", "xxx@gmail.com", "xxx") or die( T_('Connection failed: ') . imap_last_error() );
+
+		if ( $test_connection_only )
+		{
+			echo '<div class="action_messages"><div class="log_success">' . T_('Test completed successfully') . '</div></div>';
+			imap_close($mbox);
+			exit();
+		}
+
+
+		// Read messages from server
+		$imap_obj = imap_check($mbox);
+		//echo var_dump($imap_obj);
+
+		for ( $index=1; $index<= $imap_obj->Nmsgs; $index++ )
+		{
+
+			echo "<hr />\n\n\n\n\n<h3> Message #$index</h3>\n";
+			printf( T_('Getting message #%d...')."<br />\n", $index );
+
+			//retrieve and process header
+			$imap_header = imap_headerinfo($mbox,$index);
+			$subject = $imap_header->subject;
+			if( !preg_match( '/'.$Settings->get('eblog_subject_prefix') .'/', $subject ) )
+			{
+				echo T_('Subject prefix does not match').'.<br />';
+				continue;
+			}
+
+			// of the form '20 Mar 2002 20:32:37'
+			$ddate = trim($imap_header->Date);
+			if (strpos($ddate, ',')) {
+				$ddate = trim(substr($ddate, strpos($ddate, ',')+1, strlen($ddate)));
+			}
+			$date_arr = explode(' ', $ddate);
+			$date_time = explode(':', $date_arr[3]);
+
+			$ddate_H = $date_time[0];
+			$ddate_i = $date_time[1];
+			$ddate_s = $date_time[2];
+
+			$ddate_m = $date_arr[1];
+			$ddate_d = $date_arr[0];
+			$ddate_Y = $date_arr[2];
+
+			$dmonths = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+
+			for ($i=0; $i<12; $i++) {
+
+				if ($ddate_m == $dmonths[$i]) {
+					$ddate_m = $i+1;
 				}
-				$content = trim($content);
+			}
+			$ddate_U = mktime($ddate_H, $ddate_i, $ddate_s, $ddate_m, $ddate_d, $ddate_Y);
+			$ddate_U = $ddate_U + ($Settings->get('time_difference') * 3600);
+			$post_date = date('Y-m-d H:i:s', $ddate_U);
 
+			//fetch structure
+			$imap_structure = imap_fetchstructure ($mbox, $index);
+			//echo var_dump($imap_structure), "<br /><br />\n\n";
 
-				$loop_User = & $UserCache->get_by_login( $user_login );
+			$strbody = "";
 
-				// --- get infos from content -----------
-				$post_title = xmlrpc_getposttitle($content);
-				if ($post_title == '')
+			/* part types
+			0 text
+			1 multipart
+			2 message
+			3 application
+			4 audio
+			5 image
+			6 video
+			7 other
+			*/
+
+			if ( $imap_structure->type == 1 )
+			{
+				// multipart message
+				for ( $ix=0; $ix< count($imap_structure->parts); $ix++ )
 				{
-					$post_title = $subject;
-				}
-
-				if( ! ($post_category = xmlrpc_getpostcategory($content) ) )
-				{
-					$post_category = $Settings->get('eblog_default_category');
-				}
-				echo '<p><strong>', T_('Category ID'), ':</strong> ',$post_category,'</p>';
-
-				$content = xmlrpc_removepostdata( $content );
-
-				$blog_ID = get_catblog($post_category); // TODO: should not die, if cat does not exist!
-				echo '<p><strong>', T_('Blog ID'), ':</strong> ',$blog_ID,'</p>';
-
-				// Check permission:
-				if( ! $loop_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
-				{
-					echo "\n", T_('Permission denied.'), '<br />';
-					continue;
-				}
-
-				if (!$Settings->get('eblog_test_mode'))
-				{
-					// CHECK and FORMAT content
-					$post_title = format_to_post( trim($post_title), 0, 0 );
-					$content = format_to_post( trim($content), $Settings->get('AutoBR'), 0);
-
-					if( $Messages->display( T_('Cannot post, please correct these errors:'), '' ) )
+					//foreach ( $imap_structure->parts as $part )
+					switch ( $imap_structure->parts[$ix]->type )
 					{
-						$Messages->reset();
-						echo '</div>';
-						continue;
+						case 0 : // text
+						  $strbody = imap_fetchbody($mbox,$index,$ix);
+						break;
+						case 5 : // image
+							// awww yeah ;)
+						break;
+						default:
+							echo "unhandled part type \n" . var_dump($part) . "\n";
+						break;
 					}
 
-					// INSERT NEW POST INTO DB:
-					$edited_Item = & new Item();
-					$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
+	  		}
+			}
+			else
+			{
+			 	// single part
+				$strbody = imap_fetchbody ($mbox, $index,1);
+			}
 
-					$blogparams = get_blogparams_by_ID( $blog_ID );
-					pingback( true, $content, $post_title, '', $post_ID, $blogparams, true);
+			// process body
+			$a_body = split(chr(13),$strbody,2);
+			$a_authentication = split(':',$a_body[0]);
+			$content = $a_body[1];
+			$user_login = trim($a_authentication[0]);
+			$user_pass = @trim($a_authentication[1]);
 
-					// Send email notifications now!
-					$edited_Item->send_email_notifications( false );
+			// authenticate user
+			if( !user_pass_ok( $user_login, $user_pass ) )
+			{
+				echo '<p><strong>', T_('Wrong login or password.'), '</strong></p></div>';
+				continue;
+			}
+
+			$subject = trim(str_replace($Settings->get('eblog_subject_prefix'), '', $subject));
+
+			// remove content after terminator
+			$os_terminator = strpos( $content, $Settings->get('eblog_body_terminator') );
+			if ($os_terminator) {
+				$content = substr($content, 0, $os_terminator);
+			}
+			$content = trim($content);
+
+
+			$loop_User = & $UserCache->get_by_login( $user_login );
+
+			// --- get infos from content -----------
+			$post_title = xmlrpc_getposttitle($content);
+			if ($post_title == '')
+			{
+				$post_title = $subject;
+			}
+
+			if( ! ($post_category = xmlrpc_getpostcategory($content) ) )
+			{
+				$post_category = $Settings->get('eblog_default_category');
+			}
+			echo '<p><strong>', T_('Category ID'), ':</strong> ',$post_category,'</p>';
+
+			$content = xmlrpc_removepostdata( $content );
+
+			$blog_ID = get_catblog($post_category); // TODO: should not die, if cat does not exist!
+			echo '<p><strong>', T_('Blog ID'), ':</strong> ',$blog_ID,'</p>';
+
+			// Check permission:
+			if( ! $loop_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
+			{
+				echo "\n", T_('Permission denied.'), '<br />';
+				continue;
+			}
+
+			if (!$Settings->get('eblog_test_mode'))
+			{
+				// CHECK and FORMAT content
+				$post_title = format_to_post( trim($post_title), 0, 0 );
+				$content = format_to_post( trim($content), $Settings->get('AutoBR'), 0);
+
+				if( $Messages->display( T_('Cannot post, please correct these errors:'), '' ) )
+				{
+					$Messages->reset();
+					echo '</div>';
+					continue;
+				}
+
+				// INSERT NEW POST INTO DB:
+				$edited_Item = & new Item();
+				$post_ID = $edited_Item->insert( $loop_User->ID, $post_title, $content, $post_date, $post_category,	array(), 'published', $loop_User->locale, '',	$Settings->get('AutoBR'), true );
+
+				$blogparams = get_blogparams_by_ID( $blog_ID );
+				pingback( true, $content, $post_title, '', $post_ID, $blogparams, true);
+
+				// Send email notifications now!
+				$edited_Item->send_email_notifications( false );
 
 //					pingb2evonet( $blogparams, $post_ID, $post_title);
-					//pingWeblogs($blogparams);
-					//pingBlogs($blogparams);
-					//pingTechnorati($blogparams);
-				}
-				echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
-				echo "\n<strong>", T_('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
-			/*
-				if(!$pop3->delete($iCount))
-				{
-					echo '<p>', $pop3->ERROR, '</p></div>';
-					$pop3->reset();
-					exit;
-				}
-				else
-				{
-					echo '<p>', T_('Mission complete, message deleted.'), '</p>';
-				}
-			*/
-				echo '</div>';
-				if ($output_debugging_info)
-				{
-					ob_end_flush();
-				}
-				else
-				{
-					ob_end_clean();
-				}
-
-
-
-
-
+				//pingWeblogs($blogparams);
+				//pingBlogs($blogparams);
+				//pingTechnorati($blogparams);
 			}
-			imap_close($mbox);
+			echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
+			echo "\n<strong>", T_('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
+		/*
+			if(!$pop3->delete($iCount))
+			{
+				echo '<p>', $pop3->ERROR, '</p></div>';
+				$pop3->reset();
+				exit;
+			}
+			else
+			{
+				echo '<p>', T_('Mission complete, message deleted.'), '</p>';
+			}
+		*/
+			echo '</div>';
+
+
+		}
+		imap_close($mbox);
 
 
 
 
 
+	break;
 
 
-		break;
-
-
-		default:
-			echo T_('Blog by email feature not configured');
-		break;
-	}
-
-
+	default:
+		echo T_('Blog by email feature not configured');
+	break;
 }
-else
-{
-	echo T_('Blog by email feature not enabled');
-}
+
 ?>
