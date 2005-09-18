@@ -83,7 +83,7 @@ class Session
 		{ // session ID sent by cookie
 			$session_id_by_cookie = remove_magic_quotes($_COOKIE[$cookie_session]);
 
-			$Debuglog->add( 'ID (from cookie): '.$this->ID, 'session' );
+			$Debuglog->add( 'ID (from cookie): '.$session_id_by_cookie, 'session' );
 
 			if( $row = $DB->get_row( 'SELECT sess_ID, sess_data, sess_key FROM T_sessions
 																	WHERE sess_ID = '.$DB->quote($session_id_by_cookie) ) )
