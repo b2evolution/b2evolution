@@ -997,36 +997,6 @@ class Form extends Widget
 
 
 	/**
-	 * Builds the fieldset tag
-	 *
-	 * @deprecated This is a stub for begin_fieldset(). (More consistent naming scheme!)
-	 *
-	 * @param string the title of the fieldset
-	 * @param string the class of the fieldset
-	 * @return mixed true (if output) or the generated HTML if not outputting
-	 */
-	function fieldset( $title = '', $class = 'fieldset' )
-	{
-		$params = array( 'class' => $class );
-
-		return $this->begin_fieldset( $title, $params );
-	}
-
-
-	/**
-	 * Ends the fieldset tag
-	 *
-	 * @deprecated This is a stub for end_fieldset(). (More consistent naming scheme!)
-	 *
-	 * @return mixed true (if output) or the generated HTML if not outputting
-	 */
-	function fieldset_end()
-	{
-		return $this->end_fieldset();
-	}
-
-
-	/**
 	 * Builds a checkbox list
 	 *
 	 * the two-dimension array must indicate, for each checkbox:
@@ -2190,6 +2160,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.70  2005/09/19 14:31:38  fplanque
+ * removed deprecated fieldset() and fieldset_end()
+ *
  * Revision 1.69  2005/09/19 14:24:55  fplanque
  * no message
  *
