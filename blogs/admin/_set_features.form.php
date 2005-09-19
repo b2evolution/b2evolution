@@ -26,11 +26,12 @@ function web_help_link( $topic )
 	// write url suffix dynamically based on topic and language
 	// discuss with Francois where on his server the docco can go ;)
 	// launch new window with javascript maybe?
-	global $Settings, $current_locale;
+	global $Settings, $current_locale, $app_shortname, $app_version;
 
 	if ( $Settings->get('webhelp_enabled') )
 	{
-		$webhelp = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/'.$topic.'?lang='.$current_locale.'">[?]</a>';
+		$webhelp = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/'.$topic
+							.'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version.'">[?]</a>';
 		return $webhelp;
 	}
 	else
