@@ -291,7 +291,7 @@ class Form extends Widget
 
 		if( !empty($this->_common_params['note']) )
 		{ // We have a note
-			$r .= sprintf( $this->_common_params['note_format'], format_to_output($this->_common_params['note']) );
+			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
 		}
 
 		if( isset($this->_common_params['field_suffix']) )
@@ -1857,7 +1857,7 @@ class Form extends Widget
 
 			if( !empty( $loop_field_option['note'] ) )
 			{ // notes for radio option
-				$r .= '<span class="notes">'.format_to_output($loop_field_option['note']).'</span>';
+				$r .= '<span class="notes">'.$loop_field_option['note'].'</span>';
 			}
 			if( !empty( $loop_field_option['suffix'] ) )
 			{ // optional text for radio option (like additional fieldsets or input boxes)
@@ -2130,7 +2130,7 @@ class Form extends Widget
 				? $field_params['class'].' field_error'
 				: 'field_error';
 
-			$this->_common_params['note'] .= ' <span class="field_error">'.format_to_output($Request->err_messages[$field_params['name']]).'</span>';
+			$this->_common_params['note'] .= ' <span class="field_error">'.$Request->err_messages[$field_params['name']].'</span>';
 		}
 
 		#pre_dump( 'handle_common_params (after)', $field_params );
@@ -2188,4 +2188,7 @@ class Form extends Widget
 	}
 }
 
+/*
+ * $log$
+ */
 ?>
