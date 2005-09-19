@@ -137,9 +137,9 @@ function antispam_check( $haystack )
 	$Timer->start( 'antispam_url' );
 	$block = $DB->get_var(
 		"SELECT aspm_string
-		FROM  T_antispam
-		WHERE ".$DB->quote($haystack)." LIKE CONCAT('%',aspm_string,'%')
-		LIMIT 0, 1", 0, 0, 'Check URL against antispam blacklist' );
+		   FROM  T_antispam
+		  WHERE ".$DB->quote($haystack)." LIKE CONCAT('%',aspm_string,'%')
+		  LIMIT 0, 1", 0, 0, 'Check URL against antispam blacklist' );
 	if( $block )
 	{
 			$Debuglog->add( 'Spam block: '.$block );
@@ -327,6 +327,9 @@ function antispam_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.14  2005/09/19 14:13:03  fplanque
+ * no message
+ *
  * Revision 1.13  2005/09/17 18:13:21  blueyed
  * Typo, whitespace.
  *
