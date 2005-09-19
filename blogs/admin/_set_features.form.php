@@ -19,18 +19,18 @@ $Form->hidden( 'tab', 'features' );
 // --------------------------------------------
 // testing the concept of online help (aka webhelp).
 // this function should be relocated somewhere better if it is taken onboard by the project
-function WH($topic)
+function web_help_link( $topic )
 {
 	//todo:
 	// replace [?] with icon,
 	// write url suffix dynamically based on topic and language
 	// discuss with Francois where on his server the docco can go ;)
 	// launch new window with javascript maybe?
-	global $Settings;
+	global $Settings, $current_locale;
 
 	if ( $Settings->get('webhelp_enabled') )
 	{
-		$webhelp = "<a target='newwindow' href='http://b2evolution.net/man/2004/09/26/writing_a_plugin_howto'>[?]</a>";
+		$webhelp = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/'.$topic.'?lang='.$current_locale.'">[?]</a>';
 		return $webhelp;
 	}
 	else
@@ -44,7 +44,7 @@ function WH($topic)
 
 
 // --------------------------------------------
-$Form->begin_fieldset( T_('Online Help') . WH('FeatureOnlineHelp'));
+$Form->begin_fieldset( T_('Online Help') . web_help_link('features_online_help'));
 	$Form->checkbox_input( 'webhelp_enabled', $Settings->get('webhelp_enabled'), T_('Enable Online Help links'),
 	array(	'note' => T_('Online help links provide context sensitive help to certain features.' ) ) );
 
@@ -52,8 +52,7 @@ $Form->begin_fieldset( T_('Online Help') . WH('FeatureOnlineHelp'));
 $Form->end_fieldset();
 
 // --------------------------------------------
-$Form->begin_fieldset( T_('Blog by email') . WH('FeatureBlogByEmail') );
-
+$Form->begin_fieldset( T_('Blog by email') . web_help_link('features_blog_by_email') );
 
 	$Form->checkbox_input( 'eblog_enabled', $Settings->get('eblog_enabled'), T_('Enable Blog by email'),
 	array(	'note' => T_('Check to enable the Blog by email feature.' ),
@@ -61,6 +60,9 @@ $Form->begin_fieldset( T_('Blog by email') . WH('FeatureBlogByEmail') );
 
 	$tmpstyle = $Settings->get('eblog_enabled')==1?'':'display:none';
 	echo '<div id="eblog_section" style="'. $tmpstyle .'">';
+// fplanque>>TODO: there is something VERY broken with the page structure here. Please make it a priority to fix this or I'll remove everything weird until it works.
+
+		// fplanque>>TODO: use $Form->select* , do NOT construct a funky SELECT here.
 		echo $Form->begin_field( 'eblog_method', T_('Email retrieval method') );
 
 		function fselected($value1,$value2)
@@ -95,11 +97,11 @@ $Form->begin_fieldset( T_('Blog by email') . WH('FeatureBlogByEmail') );
 
 		// eblog test links
 		$Form->info_field ('','<a id="eblog_test" href="#eblog_test" onclick=\'pop_up_window( "' . $htsrv_url . 'getmail.php?test=connection", "getmail" );\'>' . T_('Test connection') . '</a>',array());
-
-//		<input type="button" value="Files" class="ActionButton"
-	//					onclick="pop_up_window( 'files.php?mode=upload', 'fileman_upload' );">
+		//		<input type="button" value="Files" class="ActionButton"
+		//					onclick="pop_up_window( 'files.php?mode=upload', 'fileman_upload' );">
 
 		// special show / hide link
+		// fplanque>> TODO: this is totally impossible to read and maintain. Get an indented javascript function here!
 		$Form->info_field ('','<a id="eblog_show_more" href="#eblog_show_more" onclick=\'if(document.getElementById("eblog_section_more").style.display==""){document.getElementById("eblog_show_more").innerHTML="' . T_('show extra options...') . '";document.getElementById("eblog_section_more").style.display="none";}else{document.getElementById("eblog_show_more").innerHTML="' . T_('hide extra options') . '";document.getElementById("eblog_section_more").style.display="";}\'>' . T_('show extra options...') . '</a>',array());
 
 		//		$Form->checkbox_input( 'eblog_show_more', 0, T_('More Configuration... '),
@@ -119,11 +121,11 @@ $Form->begin_fieldset( T_('Blog by email') . WH('FeatureBlogByEmail') );
  												<br/> when you compose your message, you'll type your subject then the separator string
                         <br/> then you type your login:password, then the separator, then content." ) );
 
-		$Form->text_input ( 'eblog_phonemail_separator', $Settings->get('eblog_phonemail_separator'),15,T_('Phonemail Separator'),
+			$Form->text_input ( 'eblog_phonemail_separator', $Settings->get('eblog_phonemail_separator'),15,T_('Phonemail Separator'),
 												array( 'maxlength' => 255 )  );
 
-
 		echo '</div>';
+
 
   echo '</div>';
 

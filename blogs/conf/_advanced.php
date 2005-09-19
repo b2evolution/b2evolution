@@ -141,31 +141,6 @@ $instance_name = 'b2evo'; // MUST BE A SINGLE WORD! NO SPACES!!
 $notify_from = $instance_name.'@'.$basehost;
 
 
-// ** Configuration for htsrv/getmail.php **
-// (skip this if you don't intend to blog via email)
-// TODO: remove this if features.php is accepted
-/*
-# mailserver settings
-$mailserver_url = 'mail.example.com';
-$mailserver_login = 'login@example.com';
-$mailserver_pass = 'password';
-$mailserver_port = 110;
-# by default posts will have this category
-$default_category = 1;
-# subject prefix
-$subjectprefix = 'blog:';
-# body terminator string (starting from this string, everything will be ignored, including this string)
-$bodyterminator = "___";
-# set this to 1 to run in test mode
-$thisisforfunonly = 0;
-### Special Configuration for some phone email services
-# some mobile phone email services will send identical subject & content on the same line
-# if you use such a service, set $use_phoneemail to 1, and indicate a separator string
-# when you compose your message, you'll type your subject then the separator string
-# then you type your login:password, then the separator, then content
-$use_phoneemail = 0;
-$phoneemail_separator = ':::';
-*/
 
 /**
  * When pinging http://blo.gs, use extended ping to RSS?
@@ -317,14 +292,19 @@ $use_etags = 0;
 // ** Cookies **
 
 /*
-TODO:
+blueyed>>TODO:
 - Cookie needs hash of domain name in its name, eg:
 	$cookie_user = 'cookie'.small_hash($Cookies->domain).$instancename.'user'
 	(Because: cookies for .domain.tld have higher priority over .sub.domain.tld, with the same cookie name,
 		the hash would put that into the name)
 	- Transform: catch existing cookies, transform to new format
+
+fplanque>>What's a real world scenario where this is a problem?
+
 - Use object to handle cookies
 	- We need to know for example if a cookie is about to be sent (because then we don't want to send a 304 response).
+
+fplanque>>What's a real world scenario where this is a problem?
 */
 
 /**
