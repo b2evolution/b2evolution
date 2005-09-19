@@ -2189,6 +2189,9 @@ class Form extends Widget
 }
 
 /*
- * $log$
+ * $Log$
+ * Revision 1.69  2005/09/19 14:24:55  fplanque
+ * no message
+ *
  */
 ?>
