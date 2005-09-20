@@ -149,6 +149,18 @@ class DB
 	 */
 	var $rollback_nested_transaction = false;
 
+	/**
+	 * @var float Time in seconds that is considered a fast query (green).
+	 * @see dump_queries()
+	 */
+	var $query_duration_fast = 0.05;
+
+	/**
+	 * @var float Time in seconds that is considered a slow query (red).
+	 * @see dump_queries()
+	 */
+	var $query_duration_slow = 0.3;
+
 
 	/**
 	 * DB Constructor
@@ -908,9 +920,14 @@ class DB
 			$time_queries = 0;
 		}
 
+		$count_queries = $count_rows = 0;
+
+		echo '<strong>DB queries:</strong> '.$this->num_queries.'<br />';
+
 		foreach( $this->queries as $query )
 		{
-			echo '<h4>Query: '.$query['title'].'</h4>';
+			$count_queries++;
+			echo '<h4>Query #'.$count_queries.': '.$query['title'].'</h4>';
 			echo '<code>';
 			$sql = str_replace( 'FROM', '<br />FROM', htmlspecialchars($query['sql']) );
 			$sql = str_replace( 'WHERE', '<br />WHERE', $sql );
@@ -922,12 +939,51 @@ class DB
 			$sql = str_replace( 'VALUES', '<br />VALUES', $sql );
 			echo $sql;
 			echo '</code>';
-			echo '<p class="rows">Rows: '.$query['rows'].' - Time: '.$query['time'].'s';
+
+			// Color-Format duration: long => red, fast => green, normal => black
+			if( $query['time'] > $this->query_duration_slow )
+			{
+				$style_time_text = 'color:red;font-weight:bold;';
+				$style_time_graph = 'background-color:red;';
+			}
+			elseif( $query['time'] < $this->query_duration_fast )
+			{
+				$style_time_text = 'color:green;';
+				$style_time_graph = 'background-color:green;';
+			}
+			else
+			{
+				$style_time_text = '';
+				$style_time_graph = 'background-color:black;';
+			}
+
+			// Number of rows with time (percentage and graph, if total time available)
+			echo '<div class="query_info">';
+			echo 'Rows: '.$query['rows'];
+
+			echo ' &ndash; Time: ';
+			if( $style_time_text )
+			{
+				echo '<span style="'.$style_time_text.'">';
+			}
+			echo $query['time'].'s';
+
 			if( $time_queries > 0 )
 			{ // We have a total time we can use to calculate percentage:
 				echo ' ('.number_format( 100/$time_queries * $query['time'], 2 ).'%)';
 			}
-			echo '</p>';
+
+			if( $style_time_text )
+			{
+				echo '</span>';
+			}
+
+			if( $time_queries > 0 )
+			{ // We have a total time we can use to display a graph/bar:
+				echo '<div style="margin:0; padding:0; height:12px; width:'.( round( 100/$time_queries * $query['time'] ) ).'%;'.$style_time_graph.'"></div>';
+			}
+			echo '</div>';
+
 
 			// Explain:
 			if( isset($query['explain']) )
@@ -940,7 +996,10 @@ class DB
 			{
 				echo $query['results'];
 			}
+
+			$count_rows += $query['rows'];
 		}
+		echo '<strong>Total rows:</strong> '.$count_rows.'<br />';
 	}
 
 
@@ -1017,6 +1076,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.28  2005/09/20 23:23:56  blueyed
+ * Added colorization of query durations (graph bar).
+ *
  * Revision 1.27  2005/09/18 01:49:41  blueyed
  * Doc, whitespace.
  *

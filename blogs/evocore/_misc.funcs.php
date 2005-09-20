@@ -1225,7 +1225,6 @@ function debug_info( $force = false )
 			'htmlbody' );
 
 
-		echo '<div class="log_container">';
 		echo '<h3>DB</h3>';
 
 		if( !isset($DB) )
@@ -1234,12 +1233,8 @@ function debug_info( $force = false )
 		}
 		else
 		{
-			echo 'DB queries: ', $DB->num_queries, '<br />';
-
 			$DB->dump_queries();
 		}
-		echo '</div>';
-
 		echo '</div>';
 	}
 }
@@ -1879,6 +1874,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.89  2005/09/20 23:23:56  blueyed
+ * Added colorization of query durations (graph bar).
+ *
  * Revision 1.88  2005/09/07 17:40:22  fplanque
  * enhanced antispam
  *
