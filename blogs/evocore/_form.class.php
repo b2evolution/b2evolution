@@ -115,7 +115,7 @@ class Form extends Widget
 	 * @param string the name of the form
 	 * @param string the action to execute when the form is submitted
 	 * @param string the method used to send data
-	 * @param string the form layout : 'fieldset', 'table' or ''
+	 * @param string the form layout : 'fieldset', 'table' or '' (NULL means: if there is an {@link $AdminUI} object get it from there, otherwise use 'fieldset')
 	 */
 	function Form( $form_action = '', $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '' )
 	{
@@ -127,9 +127,16 @@ class Form extends Widget
 		$this->enctype = $enctype;
 
 		if( is_null( $layout ) )
-		{ // Get default skin setting:
-			$template = $AdminUI->getMenuTemplate( 'Form' );
-			$layout = $template['layout'];
+		{
+			if( isset($AdminUI) )
+			{ // Get default skin setting:
+				$template = $AdminUI->getMenuTemplate( 'Form' );
+				$layout = $template['layout'];
+			}
+			else
+			{
+				$layout = 'fieldset';
+			}
 		}
 
 		$this->saved_layout = $layout;
@@ -2160,6 +2167,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.71  2005/09/20 19:53:07  blueyed
+ * Removed dependency on $AdminUI
+ *
  * Revision 1.70  2005/09/19 14:31:38  fplanque
  * removed deprecated fieldset() and fieldset_end()
  *
