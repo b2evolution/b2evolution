@@ -117,7 +117,7 @@ $Form->begin_fieldset( T_('Blog by email') . web_help_link('features_blog_by_ema
 											array(	'note' => T_('Check to run Blog by Email in test mode.' ) ) );
 
 			$Form->checkbox_input( 	'eblog_phonemail', $Settings->get('eblog_phonemail'), T_('Phone Email *'),
-											array(	'note' => "<br/>some mobile phone email services will send identical subject & content on the same line
+											array(	'note' => "<br/>some mobile phone email services will send identical subject &amp; content on the same line
 												<br/> if you use such a service, check this option, and indicate a separator string
  												<br/> when you compose your message, you'll type your subject then the separator string
                         <br/> then you type your login:password, then the separator, then content." ) );
