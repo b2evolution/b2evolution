@@ -136,8 +136,12 @@ div.debug table {
 	border: 1px solid #000;
 	border-collapse:collapse;
 	font-family: "Courier New", Courier, monospace;
-	font-size:11px;
 	margin: 1ex;
+}
+div.debug table,
+div.debug th,
+div.debug td {
+	font-size:11px;
 }
 div.debug th {
 	background-color: #fff;
