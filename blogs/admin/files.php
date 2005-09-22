@@ -96,7 +96,7 @@ else
 	param( 'path', 'string', '/', true );  // the path relative to the root dir
 	if( param( 'new_root', 'string', '' )
 		&& $new_root != $root )
-	{	// We have changed root in the select list
+	{ // We have changed root in the select list
 		$root = $new_root;
 		$path = '';
 	}
@@ -110,7 +110,8 @@ param( 'flatmode', '', NULL, true );
 param( 'action', 'string', '', true );     // 3.. 2.. 1.. action :)
 if( empty($action) )
 { // TODO: check f*cking IE syntax, which send input[image] submits without value, only name.x and name.y
-	$action = array_pop( array_keys( param( 'actionArray', 'array', array(), true ) ) );
+	param( 'actionArray', 'array', array(), true );
+	$action = array_pop($actionArray); // we must pass this by variable, because it's passed by reference
 }
 
 if( $action == 'update_settings' )
@@ -137,10 +138,10 @@ if( $action == 'update_settings' )
 if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 {
 	if( ($edited_Link = $LinkCache->get_by_ID( $link_ID, false )) === false )
-	{	// We could not find the link to edit:
-		unset( $edited_Link );
+	{ // We could not find the linke to edit:
 		$Messages->head = T_('Cannot edit link!');
 		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
+		unset( $edited_Link );
 		unset( $link_ID );
 	}
 }
@@ -153,13 +154,12 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 { // Load Requested iem:
 	if( ($edited_Item = & $ItemCache->get_by_ID( $item_ID, false )) === false )
 	{	// We could not find the contact to link:
-		unset( $edited_Item );
 		$Messages->head = T_('Cannot link Item!');
 		$Messages->add( T_('Requested item does not exist any longer.'), 'error' );
+		unset( $edited_Item );
 		unset( $item_ID );
 	}
 }
-
 
 
 /**
@@ -307,14 +307,14 @@ switch( $action )
 	case 'rename':
 		// Rename a file:
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
-		{	// We do not have permission to edit files
+		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
 			break;
 		}
 
 		if( ! $selected_Filelist->count() )
-		{	// There is nothing to rename
+		{ // There is nothing to rename
 			$Messages->add( T_('Nothing selected.'), 'error' );
 			$action = 'list';
 			break;
@@ -327,7 +327,7 @@ switch( $action )
 		while( $loop_src_File = & $selected_Filelist->get_next() )
 		{
 			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
-			{	// We have not yet provided a name to rename to...
+			{ // We have not yet provided a name to rename to...
 				$confirm = 0;
 				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get_name();
 				continue;
@@ -345,7 +345,7 @@ switch( $action )
 			// Check file extension:
 			$extension = '';
 			if( ! validate_file_extension( $new_names[$loop_src_File->get_md5_ID()], $extension ) )
-			{	// Extension invalid:
+			{ // Extension invalid:
 				$Messages->add( sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ), 'error' );
 				$confirm = 0;
 				continue;
@@ -353,7 +353,7 @@ switch( $action )
 		}
 
 		if( $confirm )
-		{	// Rename is confirmed, let's proceed:
+		{ // Rename is confirmed, let's proceed:
 			$selected_Filelist->restart();
 			while( $loop_src_File = & $selected_Filelist->get_next() )
 			{
@@ -361,7 +361,7 @@ switch( $action )
 				$new_name = $new_names[$loop_src_File->get_md5_ID()];
 
 				if( $new_name == $old_name )
-				{	// Name has not changed...
+				{ // Name has not changed...
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been renamed'), $old_name ), 'note' );
 					continue;
 				}
@@ -430,7 +430,7 @@ switch( $action )
 
 				/* fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB integrity for these...
 				if( $lFile->is_dir() )
-				{	// This is a directory
+				{ // This is a directory
 						$action_msg .= '
 						<br />
 						<input title="'.sprintf( T_('Check to include subdirectories of &laquo;%s&raquo;'), $lFile->get_name() ).'"
@@ -447,7 +447,7 @@ switch( $action )
 				$lFile->check_relations( 'delete_restrictions' );
 
 				if( $Messages->count('restrict') )
-				{	// There are restrictions:
+				{ // There are restrictions:
 					$action_msg .= ': <strong>'.T_('cannot be deleted because of the following relations').'</strong> :';
 					$action_msg .= $Messages->display( NULL, NULL, false, 'restrict', '', 'ul', false );
 					$Messages->clear( 'restrict' );
@@ -462,7 +462,7 @@ switch( $action )
 
 
 			if( $can_confirm )
-			{	// No integrity problem detected...
+			{ // No integrity problem detected...
 				$action_msg .= '
 					<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
 					</form>
@@ -648,7 +648,7 @@ switch( $action )
 			}
 		}
 		else
-		{	// Display dialog:
+		{ // Display dialog:
 			// TODO: use Form class, finish non-Windows
 			// TODO: move to a file called _file_permissions.form.php
 			$action_msg = '
@@ -770,14 +770,14 @@ switch( $Fileman->fm_mode )
 		 */
 		// Check permissions:
 		if( ! $Settings->get('upload_enabled') )
-		{	// Upload is globally disabled
+		{ // Upload is globally disabled
 			$Messages->add( T_('Upload is disabled.'), 'error' );
 			$Fileman->fm_mode = NULL;
 			break;
 		}
 
 		if( ! $current_User->check_perm( 'files', 'add' ) )
-		{	// We do not have permission to add files
+		{ // We do not have permission to add files
 			$Messages->add( T_('You have no permission to add/upload files.'), 'error' );
 			$Fileman->fm_mode = NULL;
 			break;
@@ -792,7 +792,7 @@ switch( $Fileman->fm_mode )
 
 		// Process uploaded files:
 		if( isset($_FILES) && count( $_FILES ) )
-		{	// Some files have been uploaded:
+		{ // Some files have been uploaded:
 
 			param( 'uploadfile_title', 'array', array() );
 			param( 'uploadfile_alt', 'array', array() );
@@ -802,13 +802,13 @@ switch( $Fileman->fm_mode )
 			foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
 			{
 				if( empty( $lName ) )
-				{	// No file name
+				{ // No file name
 
 					if( !empty( $uploadfile_title[$lKey] )
 						|| !empty( $uploadfile_alt[$lKey] )
 						|| !empty( $uploadfile_desc[$lKey] )
 						|| !empty( $uploadfile_name[$lKey] ) )
-					{	// User specified params but NO file!!!
+					{ // User specified params but NO file!!!
 						// Remember the file as failed when additional info provided.
 						$failedFiles[$lKey] = T_( 'Please select a local file to upload.' );
 					}
@@ -825,7 +825,7 @@ switch( $Fileman->fm_mode )
 				}
 
 				if( $_FILES['uploadfile']['error'][$lKey] )
-				{	// PHP has detected an error!:
+				{ // PHP has detected an error!:
 					switch( $_FILES['uploadfile']['error'][$lKey] )
 					{
 						case UPLOAD_ERR_FORM_SIZE:
@@ -861,7 +861,7 @@ switch( $Fileman->fm_mode )
 				}
 
 				if( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
-				{	// Ensure that a malicious user hasn't tried to trick the script into working on files upon which it should not be working.
+				{ // Ensure that a malicious user hasn't tried to trick the script into working on files upon which it should not be working.
 					$failedFiles[$lKey] = T_('The file does not seem to be a valid upload!');
 					// Abort upload for this file:
 					continue;
@@ -880,7 +880,7 @@ switch( $Fileman->fm_mode )
 				// Check file extension:
 				$extension = '';
 				if( ! validate_file_extension( $newName, $extension ) )
-				{	// Extension invalid, message already output.
+				{ // Extension invalid, message already output.
 					$failedFiles[$lKey] = sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension );
 					// Abort upload for this file:
 					continue;
@@ -891,7 +891,7 @@ switch( $Fileman->fm_mode )
 																												$Fileman->get_rds_list_path().$newName, true );
 
 				if( $newFile->exists() )
-				{	// The file already exists in the target location!
+				{ // The file already exists in the target location!
 					// TODO: Rename/Overwriting
 					$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->get_name() );
 					// Abort upload for this file:
@@ -913,15 +913,15 @@ switch( $Fileman->fm_mode )
 
 				// Store extra info about the file into File Object:
 				if( isset( $uploadfile_title[$lKey] ) )
-				{	// If a title text has been passed... (does not happen in quick upload mode)
+				{ // If a title text has been passed... (does not happen in quick upload mode)
 					$newFile->set( 'title', trim( strip_tags($uploadfile_title[$lKey])) );
 				}
 				if( isset( $uploadfile_alt[$lKey] ) )
-				{	// If an alt text has been passed... (does not happen in quick upload mode)
+				{ // If an alt text has been passed... (does not happen in quick upload mode)
 					$newFile->set( 'alt', trim( strip_tags($uploadfile_alt[$lKey])) );
 				}
 				if( isset( $uploadfile_desc[$lKey] ) )
-				{	// If a desc text has been passed... (does not happen in quick upload mode)
+				{ // If a desc text has been passed... (does not happen in quick upload mode)
 					$newFile->set( 'desc', trim( strip_tags($uploadfile_desc[$lKey])) );
 				}
 
@@ -957,7 +957,7 @@ switch( $Fileman->fm_mode )
 		 * 5) Given all the reasons above copy, move and rename should be clearly separated into 3 different interfaces.
 		 */
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
-		{	// We do not have permission to edit files
+		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$Fileman->fm_mode = NULL;
 			break;
@@ -981,7 +981,7 @@ switch( $Fileman->fm_mode )
 		while( $loop_src_File = & $Fileman->SourceList->get_next() )
 		{
 			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
-			{	// We have not yet provided a name to rename to...
+			{ // We have not yet provided a name to rename to...
 				$confirm = 0;
 				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get_name();
 				continue;
@@ -999,7 +999,7 @@ switch( $Fileman->fm_mode )
 			// Check file extension:
 			$extension = '';
 			if( ! validate_file_extension( $new_names[$loop_src_File->get_md5_ID()], $extension ) )
-			{	// Extension invalid:
+			{ // Extension invalid:
 				$Messages->add( sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ), 'error' );
 				$confirm = 0;
 				continue;
@@ -1018,7 +1018,7 @@ switch( $Fileman->fm_mode )
 				}
 
 				if( ! isset( $overwrite[$loop_src_File->get_md5_ID()] ) )
-				{	// We have not yet asked to overwrite:
+				{ // We have not yet asked to overwrite:
 					$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ), 'error' );
 					$overwrite[$loop_src_File->get_md5_ID()] = 0;
 					$confirm = 0;
@@ -1027,7 +1027,7 @@ switch( $Fileman->fm_mode )
 
 				// We have asked to overwite...
 				if( $Fileman->fm_mode == 'file_copy' )
-				{	// We are making a copy: no problem, we'll recycle the file ID anyway.
+				{ // We are making a copy: no problem, we'll recycle the file ID anyway.
 					continue;
 				}
 
@@ -1036,7 +1036,7 @@ switch( $Fileman->fm_mode )
 				$dest_File->check_relations( 'delete_restrictions' );
 
 				if( $Messages->count('restrict') )
-				{	// There are restrictions:
+				{ // There are restrictions:
 					// TODO: work on a better output display here...
 					$Messages->add( sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'),
 																			 $dest_File->get_rdfp_rel_path() ), 'error' );
@@ -1048,7 +1048,7 @@ switch( $Fileman->fm_mode )
 		}
 
 		if( $confirm )
-		{	// Copy/move is confirmed, let's proceed:
+		{ // Copy/move is confirmed, let's proceed:
 
 			// Loop through files:
 			$Fileman->SourceList->restart();
@@ -1059,30 +1059,30 @@ switch( $Fileman->fm_mode )
 																								$Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
 
 				if( $Fileman->fm_mode == 'file_copy' )
-				{	// COPY
+				{ // COPY
 
 					// Do the copy
 					if( $Fileman->copy_File( $loop_src_File, $dest_File ) )
-					{	// Success:
+					{ // Success:
 						$Messages->add( sprintf( T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ), 'success' );
 					}
 					else
-					{	// Failure:
+					{ // Failure:
 						$Messages->add( sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ), 'error' );
 					}
 				}
 				elseif( $Fileman->fm_mode == 'file_move' )
-				{	// MOVE
+				{ // MOVE
 
 					$DB->begin();
 
 					if( isset( $overwrite[$loop_src_File->get_md5_ID()] )
 							&& $overwrite[$loop_src_File->get_md5_ID()] )
-					{	// We want to overwrite, let's unlink the old file:
+					{ // We want to overwrite, let's unlink the old file:
 						if( ! $Fileman->unlink( $dest_File, false ) )	// Will NOT delete recursively
-						{	// Unlink failed:
+						{ // Unlink failed:
 							$DB->rollback();
 							// Move on to next file:
 							continue;
@@ -1126,7 +1126,7 @@ switch( $Fileman->fm_mode )
 		// TODO: check perms. ??
 
 		if( !isset($edited_Item) )
-		{	// No Item to link to...
+		{ // No Item to link to...
 			$Fileman->fm_mode = NULL;
 			break;
 		}
@@ -1265,6 +1265,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.117  2005/09/22 21:35:26  blueyed
+ * Fixed another "Only variables can be passed by reference" notice (php4) / fatal error (php5)
+ *
  * Revision 1.116  2005/08/12 17:37:14  fplanque
  * cleanup
  *
