@@ -1235,7 +1235,7 @@ class Form extends Widget
 	 *              - 'class': CSS class for select
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function select_input_options( $field_name, & $field_options, $field_label, $field_params = array() )
+	function select_input_options( $field_name, $field_options, $field_label, $field_params = array() )
 	{
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -1266,7 +1266,7 @@ class Form extends Widget
 	 */
 	function select_options(
 		$field_name,
-		& $field_options,
+		$field_options,
 		$field_label,
 		$field_note = NULL,
 		$field_class = NULL,
@@ -2167,6 +2167,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.72  2005/09/22 21:09:31  blueyed
+ * Don't pass $field_options by reference. This fixes issues were we pass function return values and was used because of performance only. PHP5 would pass it by "reference" (and not value) anyway.
+ *
  * Revision 1.71  2005/09/20 19:53:07  blueyed
  * Removed dependency on $AdminUI
  *
