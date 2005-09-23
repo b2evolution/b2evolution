@@ -138,7 +138,7 @@ if( $action == 'update_settings' )
 if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 {
 	if( ($edited_Link = $LinkCache->get_by_ID( $link_ID, false )) === false )
-	{ // We could not find the linke to edit:
+	{	// We could not find the link to edit:
 		$Messages->head = T_('Cannot edit link!');
 		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
 		unset( $edited_Link );
@@ -1265,6 +1265,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.118  2005/09/23 18:28:17  fplanque
+ * no message
+ *
  * Revision 1.117  2005/09/22 21:35:26  blueyed
  * Fixed another "Only variables can be passed by reference" notice (php4) / fatal error (php5)
  *
