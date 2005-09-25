@@ -365,9 +365,11 @@ class Hit
 		}
 
 
-		if( $agnt_data = $DB->get_row( 'SELECT agnt_ID, agnt_type FROM T_useragents
-																		WHERE agnt_signature = "'.$DB->escape( $this->user_agent ).'"' ) )
-		{ // this agent hit us once before
+		if( $agnt_data = $DB->get_row(
+			'SELECT agnt_ID, agnt_type FROM T_useragents
+			 WHERE agnt_signature = "'.$DB->escape( $this->user_agent ).'"
+			   AND agnt_type = "'.$this->agent_type.'"' ) )
+		{ // this agent (with that type) hit us once before
 			$this->agent_type = $agnt_data->agnt_type;
 			$this->agentID = $agnt_data->agnt_ID;
 		}
@@ -491,7 +493,7 @@ class Hit
 				// Get the refering page's content
 				$content_ref_page = '';
 				$bytes_read = 0;
-				while( $l_byte = fgetc($fp) )
+				while( ($l_byte = fgetc($fp)) !== false )
 				{
 					$content_ref_page .= $l_byte;
 					if( ++$bytes_read > 512000 )
@@ -510,13 +512,14 @@ class Hit
 				$full_req_url = $IDNA->decode($full_req_url);
 
 
+				// TODO: match <a href="...">!?
 				if( strstr($content_ref_page, $full_req_url) )
 				{
 					$Debuglog->add( 'double_check_referers(): found current url in page ('.bytesreadable($bytes_read).' read)', 'hit' );
 				}
 				else
 				{
-					$Debuglog->add( 'double_check_referers(): '.sprintf('did not find &laquo;%s&raquo; in &laquo;%s&raquo;', $full_req_url.' ('.bytesreadable($bytes_read).' read)', $this->referer ), 'hit' );
+					$Debuglog->add( 'double_check_referers(): '.sprintf('did not find &laquo;%s&raquo; in &laquo;%s&raquo; (%s bytes read)', $full_req_url, $this->referer, bytesreadable($bytes_read) ), 'hit' );
 					$this->referer_type = 'spam';
 				}
 				unset( $content_ref_page );
