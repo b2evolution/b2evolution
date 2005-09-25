@@ -137,6 +137,11 @@ switch( $action )
 			$Request->param( 'eblog_phonemail_separator', 'string', true );
 			$Settings->set( 'eblog_phonemail_separator', trim($eblog_phonemail_separator) );
 
+			// Statistics
+			$Request->param( 'hit_doublecheck_referer', 'integer', 0 );
+			$Settings->set( 'hit_doublecheck_referer', $hit_doublecheck_referer );
+
+
 			if( ! $Messages->count('error') )
 			{
 				if( $Settings->updateDB() )

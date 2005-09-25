@@ -104,7 +104,7 @@ class Session
 
 		if( !$this->key )
 		{ // start new session
-			$this->key = md5( $Hit->IP.$Hit->getUseragent() );
+			$this->key = md5( $Hit->IP.$Hit->get_user_agent() );
 
 			// fplanque>> I'm changing INSERT into REPLACE because this fails all the time on duplicate entry! :(((
 			$DB->query( 'REPLACE INTO T_sessions

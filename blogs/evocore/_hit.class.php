@@ -51,6 +51,11 @@ require_once dirname(__FILE__).'/_misc.funcs.php';
 
 /**
  * A hit to a blog.
+ *
+ * {@internal
+ * NOTE: The internal function double_check_referers() uses the class Net_IDNA_php4 from /blogs/lib/_idna_convert.class.php.
+ *       It's required() only, when needed.
+ * }}
  */
 class Hit
 {
@@ -61,18 +66,18 @@ class Hit
 	var $logged = false;
 
 	/**
-	 * The type of referrer.
+	 * The type of referer.
 	 *
 	 * @var string 'search'|'blacklist'|'referer'|'direct'|'spam'
 	 */
-	var $refererType;
+	var $referer_type;
 
 	/**
 	 * The ID of the referer's base domain in T_basedomains
 	 *
 	 * @var integer
 	 */
-	var $refererDomainID = 0;
+	var $referer_domain = 0;
 
 	/**
 	 * Is this a reload?
@@ -96,11 +101,11 @@ class Hit
 	 * The user agent.
 	 * @var string
 	 */
-	var $userAgent;
+	var $user_agent;
 
 	/**
 	 * The user's remote host.
-	 * Use {@link getRemoteHost()} to access it (lazy filled).
+	 * Use {@link get_remote_host()} to access it (lazy filled).
 	 * @var string
 	 * @access protected
 	 */
@@ -114,7 +119,7 @@ class Hit
 	 *
 	 * @var string 'rss'|'robot'|'browser'|'unknown'
 	 */
-	var $agentType = 'unknown';
+	var $agent_type = 'unknown';
 
 	/**#@+
 	 * @var integer|NULL Detected browser.
@@ -140,46 +145,46 @@ class Hit
 		$this->IP = getIpList( true );
 
 		// Check the referer:
-		$this->detectReferrer();
-		$this->refererBasedomain = getBaseDomain($this->referer);
+		$this->detect_referer();
+		$this->referer_basedomain = getBaseDomain($this->referer);
 
-		if( $this->refererBasedomain )
+		if( $this->referer_basedomain )
 		{
 			$basedomain = $DB->get_row( 'SELECT dom_ID, dom_status FROM T_basedomains
-																		WHERE dom_name = "'.$DB->escape($this->refererBasedomain).'"' );
+																		WHERE dom_name = "'.$DB->escape($this->referer_basedomain).'"' );
 			if( $basedomain )
 			{
-				$this->refererDomainID = $basedomain->dom_ID;
+				$this->referer_domain = $basedomain->dom_ID;
 				if( $basedomain->dom_status == 'blacklist' )
 				{
-					$this->refererType = 'blacklist';
+					$this->referer_type = 'blacklist';
 				}
 			}
 			else
 			{
 				$DB->query( 'INSERT INTO T_basedomains (dom_name, dom_status)
-											VALUES( "'.$DB->escape($this->refererBasedomain).'",
-												"'.( $this->refererType == 'blacklist' ? 'blacklist' : 'unknown' ).'" )' );
-				$this->refererDomainID = $DB->insert_id;
+											VALUES( "'.$DB->escape($this->referer_basedomain).'",
+												"'.( $this->referer_type == 'blacklist' ? 'blacklist' : 'unknown' ).'" )' );
+				$this->referer_domain = $DB->insert_id;
 			}
 		}
 
 
-		$this->detectUseragent();
-		$this->detectReload();
+		$this->detect_useragent();
+		$this->detect_reload();
 
 
 		$Debuglog->add( 'IP: '.$this->IP, 'hit' );
-		$Debuglog->add( 'UserAgent: '.$this->userAgent, 'hit' );
-		$Debuglog->add( 'Referrer: '.$this->referer, 'hit' );
-		$Debuglog->add( 'Remote Host: '.$this->getRemoteHost(), 'hit' );
+		$Debuglog->add( 'UserAgent: '.$this->user_agent, 'hit' );
+		$Debuglog->add( 'Referer: '.$this->referer, 'hit' );
+		$Debuglog->add( 'Remote Host: '.$this->get_remote_host(), 'hit' );
 	}
 
 
 	/**
 	 * Detect a reload.
 	 */
-	function detectReload()
+	function detect_reload()
 	{
 		global $DB, $Debuglog, $Settings, $ReqURI, $localtimenow;
 
@@ -192,7 +197,7 @@ class Hit
 						WHERE hit_uri = "'.$DB->escape( $ReqURI ).'"
 							AND hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
 							AND hit_remote_addr = '.$DB->quote( getIpList( true ) ).'
-							AND agnt_signature = '.$DB->quote($this->userAgent),
+							AND agnt_signature = '.$DB->quote($this->user_agent),
 					0, 0, 'Hit: Check for reload' ) )
 		{
 			$Debuglog->add( 'Reload!', 'hit' );
@@ -202,18 +207,18 @@ class Hit
 
 
 	/**
-	 * Detect Referrer (sic!).
+	 * Detect Referer (sic!).
 	 * Due to potential non-thread safety with getenv() (fallback), we'd better do this early.
 	 */
-	function detectReferrer()
+	function detect_referer()
 	{
 		global $HTTP_REFERER; // might be set by PHP (give highest priority)
 		global $Debuglog;
 		global $comments_allowed_uri_scheme; // used to validate the Referer
-		global $blackList, $search_engines;  // used to detect $refererType
+		global $blackList, $search_engines;  // used to detect $referer_type
 
 		if( isset( $HTTP_REFERER ) )
-		{	// Referer provided by PHP:
+		{ // Referer provided by PHP:
 			$this->referer = $HTTP_REFERER;
 		}
 		else
@@ -232,13 +237,13 @@ class Hit
 		// Check if the referer is valid and is not blacklisted:
 		if( $error = validate_url( $this->referer, $comments_allowed_uri_scheme ) )
 		{
-			$Debuglog->add( 'detectReferrer(): '.$error, 'hit');
-			$this->refererType = 'spam'; // Hazardous
+			$Debuglog->add( 'detect_referer(): '.$error, 'hit');
+			$this->referer_type = 'spam'; // Hazardous
 			$this->referer = false;
 			// QUESTION: add domain to T_basedomains, type 'blacklist' ?
 
 			// This is most probably referer spam,
-			// In order order to preserve server resources, we're going to stop processing immediatly!!
+			// In order to preserve server resources, we're going to stop processing immediatly!!
 			require dirname(__FILE__).'/_referer_spam.page.php';	// error & exit
 			// THIS IS THE END!!
 		}
@@ -252,8 +257,8 @@ class Hit
 		{
 			if( strpos( $this->referer, $lBlacklist ) !== false )
 			{
-				$Debuglog->add( 'detectReferrer(): blacklist ('.$lBlacklist.')', 'hit' );
-				$this->refererType = 'blacklist';
+				$Debuglog->add( 'detect_referer(): blacklist ('.$lBlacklist.')', 'hit' );
+				$this->referer_type = 'blacklist';
 				return;
 			}
 		}
@@ -264,21 +269,24 @@ class Hit
 		{
 			if( stristr($this->referer, $lSearchEngine) )
 			{
-				$Debuglog->add( 'detectReferrer(): search engine ('.$lSearchEngine.')', 'hit' );
-				$this->refererType = 'search';
-				break;
+				$Debuglog->add( 'detect_referer(): search engine ('.$lSearchEngine.')', 'hit' );
+				$this->referer_type = 'search';
+				return;
 			}
 		}
 
-		$this->refererType = 'referer';
+		if( !empty($this->referer) )
+		{
+			$this->referer_type = 'referer';
+		}
 	}
 
 
 	/**
-	 * Set {@link $userAgent} and detect the browser.
-	 * This function also handles the relations with T_useragents and sets {@link $agentType}.
+	 * Set {@link $user_agent} and detect the browser.
+	 * This function also handles the relations with T_useragents and sets {@link $agent_type}.
 	 */
-	function detectUseragent()
+	function detect_useragent()
 	{
 		global $HTTP_USER_AGENT; // might be set by PHP, give highest priority
 		global $DB, $Debuglog;
@@ -287,50 +295,50 @@ class Hit
 
 		if( isset($HTTP_USER_AGENT) )
 		{
-			$this->userAgent = $HTTP_USER_AGENT;
+			$this->user_agent = $HTTP_USER_AGENT;
 		}
 		elseif( isset($_SERVER['HTTP_USER_AGENT']) )
 		{
-			$this->userAgent = $_SERVER['HTTP_USER_AGENT'];
+			$this->user_agent = $_SERVER['HTTP_USER_AGENT'];
 		}
 
-		if( !empty($this->userAgent) )
+		if( !empty($this->user_agent) )
 		{ // detect browser
-			if(strpos($this->userAgent, 'Lynx') !== false)
+			if(strpos($this->user_agent, 'Lynx') !== false)
 			{
 				$this->is_lynx = 1;
-				$this->agentType = 'browser';
+				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->userAgent, 'Gecko') !== false)
+			elseif(strpos($this->user_agent, 'Gecko') !== false)
 			{
 				$this->is_gecko = 1;
-				$this->agentType = 'browser';
+				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->userAgent, 'MSIE') !== false && strpos($this->userAgent, 'Win') !== false)
+			elseif(strpos($this->user_agent, 'MSIE') !== false && strpos($this->user_agent, 'Win') !== false)
 			{
 				$this->is_winIE = 1;
-				$this->agentType = 'browser';
+				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->userAgent, 'MSIE') !== false && strpos($this->userAgent, 'Mac') !== false)
+			elseif(strpos($this->user_agent, 'MSIE') !== false && strpos($this->user_agent, 'Mac') !== false)
 			{
 				$this->is_macIE = 1;
-				$this->agentType = 'browser';
+				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->userAgent, 'Opera') !== false)
+			elseif(strpos($this->user_agent, 'Opera') !== false)
 			{
 				$this->is_opera = 1;
-				$this->agentType = 'browser';
+				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->userAgent, 'Nav') !== false || preg_match('/Mozilla\/4\./', $this->userAgent))
+			elseif(strpos($this->user_agent, 'Nav') !== false || preg_match('/Mozilla\/4\./', $this->user_agent))
 			{
 				$this->is_NS4 = 1;
-				$this->agentType = 'browser';
+				$this->agent_type = 'browser';
 			}
 
-			if( $this->userAgent != strip_tags($this->userAgent) )
+			if( $this->user_agent != strip_tags($this->user_agent) )
 			{ // then they have tried something funky, putting HTML or PHP into the user agent
-				$Debuglog->add( 'detectUseragent(): '.T_('bad char in User Agent'), 'hit');
-				$this->userAgent = '';
+				$Debuglog->add( 'detect_useragent(): '.T_('bad char in User Agent'), 'hit');
+				$this->user_agent = '';
 			}
 		}
 		$this->is_IE = (($this->is_macIE) || ($this->is_winIE));
@@ -341,32 +349,32 @@ class Hit
 		 */
 		if( stristr($ReqPath, 'rss') || stristr($ReqPath, 'rdf') || stristr($ReqPath, 'atom') )
 		{
-			$Debuglog->add( 'detectUseragent(): RSS', 'hit' );
-			$this->agentType = 'rss';
+			$Debuglog->add( 'detect_useragent(): RSS', 'hit' );
+			$this->agent_type = 'rss';
 		}
 		else
 		{ // Lookup robots
 			foreach( $user_agents as $lUserAgent )
 			{
-				if( ($lUserAgent[0] == 'robot') && (strstr($this->userAgent, $lUserAgent[1])) )
+				if( ($lUserAgent[0] == 'robot') && (strstr($this->user_agent, $lUserAgent[1])) )
 				{
-					$Debuglog->add( 'detectUseragent(): robot', 'hit' );
-					$this->agentType = 'robot';
+					$Debuglog->add( 'detect_useragent(): robot', 'hit' );
+					$this->agent_type = 'robot';
 				}
 			}
 		}
 
 
 		if( $agnt_data = $DB->get_row( 'SELECT agnt_ID, agnt_type FROM T_useragents
-																		WHERE agnt_signature = "'.$DB->escape( $this->userAgent ).'"' ) )
+																		WHERE agnt_signature = "'.$DB->escape( $this->user_agent ).'"' ) )
 		{ // this agent hit us once before
-			$this->agentType = $agnt_data->agnt_type;
+			$this->agent_type = $agnt_data->agnt_type;
 			$this->agentID = $agnt_data->agnt_ID;
 		}
 		else
 		{ // create new user agent entry
 			$DB->query( 'INSERT INTO T_useragents ( agnt_signature, agnt_type )
-										VALUES ( "'.$DB->escape( $this->userAgent ).'", "'.$this->agentType.'" )' );
+										VALUES ( "'.$DB->escape( $this->user_agent ).'", "'.$this->agent_type.'" )' );
 
 			$this->agentID = $DB->insert_id;
 		}
@@ -378,13 +386,11 @@ class Hit
 	 *
 	 * This function should be called at the end of the page, otherwise if the page
 	 * is displaying previous hits, it may display the current one too.
-	 * The hit will not be logged in special occasions, see {@link isNewView()} and {@link isGoodHit()}.
+	 * The hit will not be logged in special occasions, see {@link is_new_view()} and {@link is_good_hit()}.
 	 */
 	function log()
 	{
 		global $Debuglog, $DB, $blog;
-		global $doubleCheckReferers, $page, $ReqURI;
-		global $stats_autoprune;
 		global $Settings;
 
 		if( $this->logged )
@@ -392,21 +398,21 @@ class Hit
 			return false;
 		}
 
-		if( !$this->isNewView() || !$this->isGoodHit() )
+		if( !$this->is_new_view() || !$this->is_good_hit() )
 		{ // We don't want to log this hit!
-			$Debuglog->add( 'log(): Hit NOT Logged ('.var_export($this->refererType, true)
-																							.', '.var_export($this->agentType, true).')', 'hit' );
+			$Debuglog->add( 'log(): Hit NOT Logged ('.var_export($this->referer_type, true)
+																							.', '.var_export($this->agent_type, true).')', 'hit' );
 			return false;
 		}
 
-		if( $doubleCheckReferers )
+		if( $this->referer_type == 'referer' && $Settings->get('hit_doublecheck_referer') )
 		{
 			$Debuglog->add( 'log(): double check: loading referering page', 'hit' );
 
 			if( $Settings->get('use_register_shutdown_function')
 					&& function_exists( 'register_shutdown_function' ) )
 			{ // register it as a shutdown function, because it will be slow!
-				register_shutdown_function( array( &$this, 'doubleCheckReferers' ) );
+				register_shutdown_function( array( &$this, 'double_check_referers' ) ); // this will also call _record_the_hit()
 			}
 			else
 			{
@@ -414,12 +420,12 @@ class Hit
 				// back against the refering URL.
 				flush();
 
-				$this->doubleCheckReferers();
+				$this->double_check_referers(); // this will also call _record_the_hit()
 			}
 		}
 		else
 		{
-			$this->recordTheHit();
+			$this->_record_the_hit();
 		}
 
 		// Remember we have logged already:
@@ -430,21 +436,25 @@ class Hit
 
 
 	/**
-	 * This records the hit. You should not call this directly, but {@link log()}
+	 * This records the hit. You should not call this directly, but {@link log()}!
+	 *
+	 * It gets called either by {@link log()} or by {@link double_check_referers()} when this is used.
+	 *
+	 * @access protected
 	 */
-	function recordTheHit()
+	function _record_the_hit()
 	{
 		global $DB, $Session, $ReqURI, $Blog, $localtimenow;
 
-		$refererBasedomain = getBaseDomain( $this->referer );
+		$referer_basedomain = getBaseDomain( $this->referer );
 
 		// insert hit into DB table:
 		$sql = 'INSERT INTO T_hitlog( hit_sess_ID, hit_datetime, hit_uri,
 																	hit_agnt_ID, hit_referer_type, hit_referer,
 																	hit_referer_dom_ID, hit_blog_ID, hit_remote_addr )
 						VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'",
-										"'.$this->agentID.'", "'.$this->refererType.'", "'.$DB->escape($this->referer).'",
-										"'.$this->refererDomainID.'", "'.$Blog->ID.'", "'.$DB->escape( $this->IP ).'"
+										"'.$this->agentID.'", "'.$this->referer_type.'", "'.$DB->escape($this->referer).'",
+										"'.$this->referer_domain.'", "'.$Blog->ID.'", "'.$DB->escape( $this->IP ).'"
 									)';
 
 						#VALUES( , '".$DB->escape($ReqURI)."', '$hit_type',
@@ -456,49 +466,64 @@ class Hit
 
 
 	/**
-	 * This function gets called (as a shutdown function, if possible) and checks
-	 * if the referering URL includes the current URL - if not it is probably spam!
+	 * This function gets called (as a {@link register_shutdown_function() shutdown function}, if possible) and checks
+	 * if the referering URL's content includes the current URL - if not it is probably spam!
 	 *
 	 * On success, this methods records the hit.
 	 *
-	 * @uses recordTheHit()
+	 * @uses _record_the_hit()
 	 */
-	function doubleCheckReferers()
+	function double_check_referers()
 	{
 		global $ReqURI, $Debuglog;
+		global $core_dirout, $lib_subdir;
 
 		if( !empty($this->referer) )
 		{
-			$fullCurrentURL = 'http://'.$_SERVER['HTTP_HOST'].$ReqURI;
-			// $Debuglog->add( 'Hit Log: '. "full current url: ".$fullCurrentURL, 'hit');
-
 			if( ($fp = @fopen( $this->referer, 'r' )) ) // QUESTION: use file_get_contents()? (PHP > 4.3.0)
 			{
-				// timeout after 5 seconds
-				socket_set_timeout($fp, 5);
-				while( !feof($fp) )
+				socket_set_timeout($fp, 5); // timeout after 5 seconds
+				// Get the refering page's content
+				$content_ref_page = '';
+				$bytes_read = 0;
+				while( $l_byte = fgetc($fp) )
 				{
-					$page .= trim(fgets($fp));
+					$content_ref_page .= $l_byte;
+					if( ++$bytes_read > 512000 )
+					{ // do not pull more than 500kb of data!
+						break;
+					}
 				}
 
-				if( strstr($page, $fullCurrentURL) )
+				$full_req_url = 'http://'.$_SERVER['HTTP_HOST'].$ReqURI;
+				// $Debuglog->add( 'Hit Log: '. "full current url: ".$full_req_url, 'hit');
+
+
+				// IDNA-convert
+				require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_idna_convert.class.php';
+				$IDNA = new Net_IDNA_php4();
+				$full_req_url = $IDNA->decode($full_req_url);
+
+
+				if( strstr($content_ref_page, $full_req_url) )
 				{
-					$Debuglog->add( 'doubleCheckReferers(): found current url in page', 'hit' );
+					$Debuglog->add( 'double_check_referers(): found current url in page ('.bytesreadable($bytes_read).' read)', 'hit' );
 				}
 				else
 				{
-					$Debuglog->add( 'doubleCheckReferers(): '.sprintf('did not find &laquo;%s&raquo; in &laquo;%s&raquo;', $fullCurrentURL, $this->referer ), 'hit' );
-					$this->refererType = 'spam';
+					$Debuglog->add( 'double_check_referers(): '.sprintf('did not find &laquo;%s&raquo; in &laquo;%s&raquo;', $full_req_url.' ('.bytesreadable($bytes_read).' read)', $this->referer ), 'hit' );
+					$this->referer_type = 'spam';
 				}
+				unset( $content_ref_page );
 			}
 			else
 			{ // This was probably spam!
-				$Debuglog->add( 'doubleCheckReferers(): could not access &laquo;'.$this->referer.'&raquo;', 'hit' );
-				$this->refererType = 'spam';
+				$Debuglog->add( 'double_check_referers(): could not access &laquo;'.$this->referer.'&raquo;', 'hit' );
+				$this->referer_type = 'spam';
 			}
 		}
 
-		$this->recordTheHit();
+		$this->_record_the_hit();
 
 		return true;
 	}
@@ -509,9 +534,9 @@ class Hit
 	 *
 	 * @return string
 	 */
-	function getUserAgent()
+	function get_user_agent()
 	{
-		return $this->userAgent;
+		return $this->user_agent;
 	}
 
 
@@ -520,7 +545,7 @@ class Hit
 	 *
 	 * @return string
 	 */
-	function getRemoteHost()
+	function get_remote_host()
 	{
 		if( is_null($this->_remoteHost) )
 		{
@@ -543,10 +568,10 @@ class Hit
 	 *
 	 * @return boolean
 	 */
-	function isNewView()
+	function is_new_view()
 	{
-		#pre_dump( 'isNewView:', !$this->reloaded,  !$this->ignore,   $this->agentType != 'robot' );
-		return ( !$this->reloaded && !$this->ignore && $this->agentType != 'robot' );
+		#pre_dump( 'is_new_view:', !$this->reloaded,  !$this->ignore,   $this->agent_type != 'robot' );
+		return ( !$this->reloaded && !$this->ignore && $this->agent_type != 'robot' );
 	}
 
 
@@ -555,9 +580,9 @@ class Hit
 	 *
 	 * @return boolean
 	 */
-	function isGoodHit()
+	function is_good_hit()
 	{
-		return !in_array( $this->refererType, array( 'spam' ) );
+		return !in_array( $this->referer_type, array( 'spam' ) );
 	}
 }
 ?>

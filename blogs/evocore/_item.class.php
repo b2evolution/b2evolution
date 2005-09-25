@@ -769,7 +769,7 @@ class Item extends DataObject
 	 * Template function: display content of item
 	 *
 	 * Calling this with "MORE" (i-e displaying full content) will increase
-	 * the view counter, except on special occasions, see {@link Hit::isNewView()}.
+	 * the view counter, except on special occasions, see {@link Hit::is_new_view()}.
 	 *
 	 * WARNING: parameter order is different from deprecated the_content(...)
 	 *
@@ -825,10 +825,10 @@ class Item extends DataObject
 		}
 
 		/*
-		 * Check if we want to increment view count, see {@link Hit::isNewView()}
+		 * Check if we want to increment view count, see {@link Hit::is_new_view()}
 		 */
-		#pre_dump( 'incViews', $dispmore, !$preview, $Hit->isNewView() );
-		if( $dispmore && !$preview && $Hit->isNewView() )
+		#pre_dump( 'incViews', $dispmore, !$preview, $Hit->is_new_view() );
+		if( $dispmore && !$preview && $Hit->is_new_view() )
 		{ // Increment view counter
 			$this->set_param( 'views', 'number', $this->views+1 );
 			$this->dbupdate();  // move to end of method, if we should have more params to be changed someday
@@ -1773,7 +1773,7 @@ class Item extends DataObject
 	 *
 	 * Note: viewcount is incremented whenever the Item's content is displayed with "MORE"
 	 * (i-e full content), see {@link Item::content()}
-	 * Viewcount is NOT incremented on page reloads and other special cases, see {@link Hit::isNewView()}
+	 * Viewcount is NOT incremented on page reloads and other special cases, see {@link Hit::is_new_view()}
 	 *
 	 * {@internal Item::views(-) }}
 	 */
@@ -2221,6 +2221,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.55  2005/09/25 03:50:45  blueyed
+ * Hit class: Fixes, normalized; moved $doubleCheckReferers to $Settings ("feature" admin tab)
+ *
  * Revision 1.54  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

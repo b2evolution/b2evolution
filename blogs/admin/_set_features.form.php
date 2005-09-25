@@ -129,9 +129,11 @@ $Form->begin_fieldset( T_('Blog by email') . web_help_link('features_blog_by_ema
 
 
   echo '</div>';
+$Form->end_fieldset();
 
 
-
+$Form->begin_fieldset( T_('Statistics') );
+	$Form->checkbox_input( 'hit_doublecheck_referer', $Settings->get('hit_doublecheck_referer'), T_('Double-check Referer'), array( 'note' => 'Activating this will search the requested (your) URL in the content of the referring page. This is against referer spam, but creates additional webserver traffic.' ) );
 $Form->end_fieldset();
 
 

@@ -126,7 +126,8 @@ function upgrade_b2evo_tables()
 
 	// used for defaults, when upgrading to 0.9.2
 	global $use_fileupload, $fileupload_allowedtypes, $fileupload_maxk,
-					$fileupload_minlevel, $fileupload_allowedusers;
+					$fileupload_minlevel, $fileupload_allowedusers,
+					$doubleCheckReferers;
 
 	// Check DB version:
 	check_db_version();
@@ -493,7 +494,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 	}
 
-	
+
 	if( $old_db_version < 8070 )
 	{ // ---------------------------------- upgrade to 0.9.2 a.k.a 1.6 "phoenix"
 
@@ -569,9 +570,10 @@ function upgrade_b2evo_tables()
 		$query = 'INSERT INTO T_settings (set_name, set_value)
 							VALUES
 								( "reloadpage_timeout", "300" ),
-								( "upload_enabled", "'.(isset($use_fileupload) ? $use_fileupload : '1').'" ),
+								( "upload_enabled", "'.(isset($use_fileupload) ? (int)$use_fileupload : '1').'" ),
 								( "upload_allowedext", "'.(isset($fileupload_allowedtypes) ? $fileupload_allowedtypes : 'jpg gif png').'" ),
-								( "upload_maxkb", "'.(isset($fileupload_maxk) ? $fileupload_maxk : '96').'" )
+								( "upload_maxkb", "'.(isset($fileupload_maxk) ? (int)$fileupload_maxk : '96').'" ),
+								( "hit_doublecheck_referer", "'.(isset($doubleCheckReferers) ? (int)$doubleCheckReferers : '0').'" )
 							';
 		$DB->query( $query );
 

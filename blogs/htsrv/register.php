@@ -91,7 +91,7 @@ switch( $action )
 			$new_User->set( 'nickname', $login );
 			$new_User->set( 'email', $email );
 			$new_User->set( 'ip', getIpList( true ) );
-			$new_User->set( 'domain', $Hit->getRemoteHost() );
+			$new_User->set( 'domain', $Hit->get_remote_host() );
 			$new_User->set( 'browser', $Hit->getUserAgent() );
 			$new_User->set_datecreated( $localtimenow );
 			$new_User->set( 'locale', $locale );

@@ -164,16 +164,4 @@ $user_agents = array(
 );
 
 
-/**
- * Do you want to check if referers really do refer to you before logging them
- *
- * WARNING: this is very time consuming!
- *
- * @todo use $Settings
- *
- * @global boolean $doubleCheckReferers
- */
-$doubleCheckReferers = 0;		// Set to 1 to enable double checking
-
-
 ?>

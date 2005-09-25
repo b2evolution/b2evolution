@@ -60,6 +60,8 @@ class GeneralSettings extends AbstractSettings
 										'fm_enable_create_dir' => '1',			// handled
 										'fm_enable_create_file' => '0',			// handled
 
+										'hit_doublecheck_referer' => '0',  // handled
+
                     'upload_enabled' => '1',						// handled
 										'upload_allowedext' => 'jpg gif png txt',	// handled
 										'upload_maxkb' => '100',
@@ -93,6 +95,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.17  2005/09/25 03:50:45  blueyed
+ * Hit class: Fixes, normalized; moved $doubleCheckReferers to $Settings ("feature" admin tab)
+ *
  * Revision 1.16  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
