@@ -390,7 +390,7 @@ class Hit
 	 */
 	function log()
 	{
-		global $Debuglog, $DB, $blog;
+		global $Debuglog, $DB, $blog, $debug_no_register_shutdown;
 		global $Settings;
 
 		if( $this->logged )
@@ -400,18 +400,19 @@ class Hit
 
 		if( !$this->is_new_view() || !$this->is_good_hit() )
 		{ // We don't want to log this hit!
-			$Debuglog->add( 'log(): Hit NOT Logged ('.var_export($this->referer_type, true)
-																							.', '.var_export($this->agent_type, true).')', 'hit' );
+			$hit_info = 'referer_type: '.var_export($this->referer_type, true)
+				.', agent_type: '.var_export($this->agent_type, true)
+				.', is'.( $this->is_new_view() ? ' NOT a' : '' ).' new view'
+				.', is'.( $this->is_good_hit() ? ' NOT a' : '' ).' good hit';
+			$Debuglog->add( 'log(): Hit NOT logged, ('.$hit_info.')', 'hit' );
 			return false;
 		}
 
 		if( $this->referer_type == 'referer' && $Settings->get('hit_doublecheck_referer') )
 		{
-			$Debuglog->add( 'log(): double check: loading referering page', 'hit' );
-
-			if( $Settings->get('use_register_shutdown_function')
-					&& function_exists( 'register_shutdown_function' ) )
+			if( !$debug_no_register_shutdown && function_exists( 'register_shutdown_function' ) )
 			{ // register it as a shutdown function, because it will be slow!
+				$Debuglog->add( 'log(): double check: loading referering page.. (register_shutdown_function())', 'hit' );
 				register_shutdown_function( array( &$this, 'double_check_referers' ) ); // this will also call _record_the_hit()
 			}
 			else
@@ -419,6 +420,8 @@ class Hit
 				// flush now, so that the meat of the page will get shown before it tries to check
 				// back against the refering URL.
 				flush();
+
+				$Debuglog->add( 'log(): double check: loading referering page..', 'hit' );
 
 				$this->double_check_referers(); // this will also call _record_the_hit()
 			}
@@ -470,6 +473,8 @@ class Hit
 	 * if the referering URL's content includes the current URL - if not it is probably spam!
 	 *
 	 * On success, this methods records the hit.
+	 *
+	 * NOTE: when used as PHP shutdown_function all output has been sent already!
 	 *
 	 * @uses _record_the_hit()
 	 */

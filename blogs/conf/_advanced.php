@@ -297,14 +297,23 @@ blueyed>>TODO:
 	$cookie_user = 'cookie'.small_hash($Cookies->domain).$instancename.'user'
 	(Because: cookies for .domain.tld have higher priority over .sub.domain.tld, with the same cookie name,
 		the hash would put that into the name)
+	[ Related to PHP bug #32802 (http://bugs.php.net/bug.php?id=32802 - fixed in 5.0.5 (also backported)), but which only affects paths.
+		Also see http://www.faqs.org/rfcs/rfc2965:
+		"If multiple cookies satisfy the criteria above, they are ordered in
+		the Cookie header such that those with more specific Path attributes
+		precede those with less specific.  Ordering with respect to other
+		attributes (e.g., Domain) is unspecified."
+	]
 	- Transform: catch existing cookies, transform to new format
 
 fplanque>>What's a real world scenario where this is a problem?
+blueyed>> e.g. demo.b2evolution.net and b2evolution.net; or example.com and private.example.com (both running (different) b2evo instances (but with same $instancename)
 
 - Use object to handle cookies
 	- We need to know for example if a cookie is about to be sent (because then we don't want to send a 304 response).
 
 fplanque>>What's a real world scenario where this is a problem?
+blueyed>>When we detect that the content hasn't changed and are about to send a 304 response code we won't do it if we now that (login) cookies should be sent.
 */
 
 /**
@@ -545,6 +554,14 @@ $fm_filetypes = array(
 	'\.xml'               => NT_('XML file'),
 	'\.zip'               => NT_('ZIP archive'),
 );
+
+
+/**
+ * Set this to 1 to disable using PHP's register_shutdown_function().
+ * This is NOT recommened, because it affects things that should be done after delivering the page.
+ * @global int $debug_no_register_shutdown
+ */
+$debug_no_register_shutdown = 0;
 
 
 // ----- CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
