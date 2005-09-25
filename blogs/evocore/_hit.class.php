@@ -402,8 +402,8 @@ class Hit
 		{ // We don't want to log this hit!
 			$hit_info = 'referer_type: '.var_export($this->referer_type, true)
 				.', agent_type: '.var_export($this->agent_type, true)
-				.', is'.( $this->is_new_view() ? ' NOT a' : '' ).' new view'
-				.', is'.( $this->is_good_hit() ? ' NOT a' : '' ).' good hit';
+				.', is'.( $this->is_new_view() ? '' : ' NOT' ).' a new view'
+				.', is'.( $this->is_good_hit() ? '' : ' NOT' ).' a good hit';
 			$Debuglog->add( 'log(): Hit NOT logged, ('.$hit_info.')', 'hit' );
 			return false;
 		}
