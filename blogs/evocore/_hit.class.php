@@ -506,14 +506,16 @@ class Hit
 				// $Debuglog->add( 'Hit Log: '. "full current url: ".$full_req_url, 'hit');
 
 
-				// IDNA-convert
+				/**
+				 * IDNA converter class
+				 */
 				require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_idna_convert.class.php';
 				$IDNA = new Net_IDNA_php4();
-				$full_req_url = $IDNA->decode($full_req_url);
-
 
 				// TODO: match <a href="...">!?
-				if( strstr($content_ref_page, $full_req_url) )
+				// TODO: http://demo.b2evolution.net links "HEAD/blogs/index.php?blog=2", but we search for "http://demo.b2evolution.net/HEAD/blogs/index.php?blog=2"!
+				if( strstr($content_ref_page, $IDNA->decode($full_req_url)) // the decoded xn--name
+					  || strstr($content_ref_page, $IDNA->decode($full_req_url)) ) // the xn--name
 				{
 					$Debuglog->add( 'double_check_referers(): found current url in page ('.bytesreadable($bytes_read).' read)', 'hit' );
 				}
