@@ -93,16 +93,6 @@ if( ! function_exists( 'mysql_real_escape_string' ) )
  */
 class DB
 {
-	/**
-	 * Do we want to explain joins?
-	 */
-	var $debug_explain_joins = false;
-
-	/**
-	 * Number of rows we want to dump in debug output:
-	 */
-	var $debug_dump_rows = 0;
-
 	var $show_errors = true;
 	var $halt_on_error = true;
 	var $error = false;		// no error yet
@@ -149,14 +139,44 @@ class DB
 	 */
 	var $rollback_nested_transaction = false;
 
+
+	// DEBUG:
+
 	/**
-	 * @var float Time in seconds that is considered a fast query (green).
+	 * Do we want to explain joins?
+	 * @var bool (Default: false)
+	 */
+	var $debug_explain_joins = false;
+
+	/**
+	 * Do we want to output a function backtrace for every query?
+	 * @var integer Number of stack entries to show (from last to first) (Default: 0)
+	 */
+	var $debug_dump_function_trace_for_queries = 0;
+
+	/**
+	 * Do we want to output a function backtrace for errors?
+	 * NOTE: This is only used when {@link $show_errors} is enabled.
+	 * @var bool (Default: 100)
+	 */
+	var $debug_dump_function_trace_for_errors = 100;
+
+	/**
+	 * Number of rows we want to dump in debug output (0 disables it)
+	 * @var integer (Default: 100)
+	 */
+	var $debug_dump_rows = 100;
+
+	/**
+	 * Time in seconds that is considered a fast query (green).
+	 * @var float
 	 * @see dump_queries()
 	 */
 	var $query_duration_fast = 0.05;
 
 	/**
-	 * @var float Time in seconds that is considered a slow query (red).
+	 * Time in seconds that is considered a slow query (red).
+	 * @var float
 	 * @see dump_queries()
 	 */
 	var $query_duration_slow = 0.3;
@@ -349,45 +369,9 @@ class DB
 			echo '<p>', $this->last_error, '</p>';
 			if( !empty($this->last_query) ) echo '<p class="error">Your query: '.$query_title.'<br /><pre>'.htmlspecialchars( str_replace("\t", '  ', $this->last_query) ).'</pre></p>';
 
-			if( function_exists( 'xdebug_is_enabled' ) && xdebug_is_enabled() )
+			if( $this->debug_dump_function_trace_for_errors )
 			{
-				?>
-				<table class="grouped">
-					<thead>
-						<tr>
-							<th>Function / Include</th>
-							<th>File</th>
-							<th>Line</th>
-						</tr>
-					</thead>
-
-				<?php
-				foreach( xdebug_get_function_stack() as $lStack )
-				{
-					?>
-					<tr>
-						<td>
-							<?php
-							if( isset( $lStack['include_filename'] ) )
-							{
-								echo '<strong>=&gt;</strong> '.$lStack['include_filename'];
-							}
-							else
-							{
-								if( isset( $lStack['class'] ) )
-								{
-									echo $lStack['class'].'::';
-								}
-								echo $lStack['function'].'()';
-							}
-							?>
-						</td>
-						<td><?php echo $lStack['file'] ?></td>
-						<td><?php echo $lStack['line'] ?></td>
-					</tr>
-					<?php
-				}
-				echo '</table>';
+				$this->queries[ $this->num_queries - 1 ]['function_trace'] = $this->debug_get_xdebug_function_stack( $this->debug_dump_function_trace_for_errors );
 			}
 
 			echo '</div>';
@@ -524,6 +508,12 @@ class DB
 		}
 
 
+		if( $this->debug_dump_function_trace_for_queries )
+		{
+			$this->queries[ $this->num_queries - 1 ]['function_trace'] = $this->debug_get_xdebug_function_stack( $this->debug_dump_function_trace_for_queries );
+		}
+
+
 		// EXPLAIN JOINS ??
 		if( $this->debug_explain_joins && preg_match( '#^ \s* select \s #ix', $query) )
 		{ // Query was a select, let's try to explain joins...
@@ -560,10 +550,10 @@ class DB
 			// Log number of rows the query returned
 			$this->num_rows = $num_rows;
 
-			$this->queries[ $this->num_queries - 1 ]['explain'] = $this->debug_dump_rows( 100, true );
+			$this->queries[ $this->num_queries - 1 ]['explain'] = $this->debug_get_rows_table( 100, true );
 
-			// Retsore:
- 			$this->last_result = $saved_last_result;
+			// Restore:
+			$this->last_result = $saved_last_result;
 			$this->col_info = $saved_col_info;
 			$this->num_rows = $saved_num_rows;
 		}
@@ -572,7 +562,7 @@ class DB
 		// If debug ALL queries
 		if( $this->debug_dump_rows )
 		{
-			$this->queries[ $this->num_queries - 1 ]['results'] = $this->debug_dump_rows( $this->debug_dump_rows );
+			$this->queries[ $this->num_queries - 1 ]['results'] = $this->debug_get_rows_table( $this->debug_dump_rows );
 		}
 
 		return $return_val;
@@ -816,11 +806,11 @@ class DB
 
 
 	/**
-	 * Displays the last query string that was sent to the database & a
-	 * table listing results (if there were any).
-	 * (abstracted into a seperate file to save server overhead).
+	 * Get a table (or "No Results") for the SELECT query results.
+	 *
+	 * @return string HTML table or "No Results" if the
 	 */
-	function debug_dump_rows( $max_lines, $break_at_comma = false )
+	function debug_get_rows_table( $max_lines, $break_at_comma = false )
 	{
 		$r = '';
 
@@ -898,6 +888,86 @@ class DB
 			$r .= 'No Results';
 		}
 
+		return $r;
+	}
+
+
+	/**
+	 * Get a function trace from {@link http://www.xdebug.org xdebug (PHP Extension)}
+	 * as html table.
+	 *
+	 * {@internal NOTE: This should become probably a generic function in evocore/_debug.funcs.php.}}
+	 *
+	 * @param integer|NULL Get the last x entries from the stack (after $ignore_from is applied). NULL means "all".
+	 * @param array After a key/value pair matches a stack entry, this and the rest is ignored.
+	 * @return string HTML table
+	 */
+	function debug_get_xdebug_function_stack( $last = 1, $ignore_from = array( 'class' => 'DB') )
+	{
+		$r = '';
+
+		if( function_exists( 'xdebug_is_enabled' ) && xdebug_is_enabled() )
+		{
+			$r = '
+			<table class="grouped">
+				<thead>
+					<tr>
+						<th>Function / Include</th>
+						<th>File</th>
+						<th>Line</th>
+					</tr>
+				</thead>';
+
+			$stack = xdebug_get_function_stack();
+
+			if( $ignore_from )
+			{
+				$stack_length = 0;
+				foreach( $stack as $l_stack )
+				{
+					foreach( $ignore_from as $l_ignore_key => $l_ignore_value )
+					{
+						if( isset($l_stack[$l_ignore_key]) && $l_stack[$l_ignore_key] == $l_ignore_value )
+						{
+							break 2;
+						}
+					}
+					$stack_length++;
+				}
+				$stack = array_slice( $stack, 0, $stack_length );
+			}
+
+			if( $last !== NULL )
+			{
+				$stack = array_slice( $stack, 0 - $last );
+			}
+
+			foreach( $stack as $l_stack )
+			{
+				if( isset($l_stack['class']) && $l_stack['class'] == 'DB' )
+				{
+					break;
+				}
+
+				$r .= "\n<tr><td>";
+
+				if( isset( $l_stack['class'] ) )
+				{
+					$r .= $l_stack['class'].'::'.$l_stack['function'].'()';
+				}
+				elseif( isset( $l_stack['function'] ) )
+				{
+					$r .= $l_stack['function'].'()';
+				}
+				else
+				{
+					$r .= '<strong>=&gt;</strong> '.$l_stack['file'];
+				}
+
+				$r .= '</td><td>'.$l_stack['file'].'</td><td>'.$l_stack['line'].'</td></tr>';
+			}
+			$r .= '</table>';
+		}
 
 		return $r;
 	}
@@ -997,6 +1067,12 @@ class DB
 				echo $query['results'];
 			}
 
+			// Function trace:
+			if( isset($query['function_trace']) )
+			{
+				echo $query['function_trace'];
+			}
+
 			$count_rows += $query['rows'];
 		}
 		echo '<strong>Total rows:</strong> '.$count_rows.'<br />';
@@ -1076,6 +1152,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.29  2005/09/25 16:17:59  blueyed
+ * Debugging enhanced: $debug_dump_function_trace_for_queries / $debug_dump_function_trace_for_errors (that was there before, but is now configurable)
+ *
  * Revision 1.28  2005/09/20 23:23:56  blueyed
  * Added colorization of query durations (graph bar).
  *
