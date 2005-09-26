@@ -800,74 +800,71 @@ if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add
 // and only by advanced users
 // ------------------
 param( 'options_show', 'integer', 0 );
-?>
-<form action="files.php#FM_anchor" id="options_form" method="post">
-	<fieldset>
-	<legend><?php echo T_('Options') ?>
-	[<a id="options_toggle" href="<?php
-	echo url_add_param( $Fileman->getCurUrl(), ( !$options_show ?
+
+$options_Form = & new Form( 'files.php#FM_anchor', 'options_form', 'get', 'none' );
+	$options_Form->label_to_the_left = false;
+	$options_Form->label_suffix = '';
+	$options_Form->fieldend = '<br />';
+	$options_Form->begin_form( 'fform' );
+	$options_Form->hidden( 'options_show', 1 );
+	echo $Fileman->getFormHiddenInputs();
+
+	// Link to toggle the display of the form
+	$toggle_link = '[<a id="options_toggle" href="'
+		.url_add_param( $Fileman->getCurUrl(), ( !$options_show ?
 																									'options_show=1' :
 																									'' ) )
-	?>" onclick="return toggle_options();"><?php echo $options_show ? T_('Hide') : T_('Show'); ?></a>]</legend>
+		.'" onclick="return toggle_options();">'.( $options_show ? T_('Hide') : T_('Show') ).'</a>]';
+
+	$options_Form->begin_fieldset( T_('Options').$toggle_link );
+
+	?>
 
 	<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
-		<input type="checkbox" id="option_dirsattop" name="option_dirsattop" value="1"<?php if( !$UserSettings->get('fm_dirsnotattop') ) echo ' checked="checked"' ?> />
-		<label for="option_dirsattop"><?php echo T_('Sort directories at top') ?></label>
-		<br />
-		<input type="checkbox" id="option_showhidden" name="option_showhidden" value="1"<?php if( $UserSettings->get('fm_showhidden') ) echo ' checked="checked"' ?> />
-		<label for="option_showhidden"><?php echo T_('Show hidden files') ?></label>
-		<br />
-		<input type="checkbox" id="option_permlikelsl" name="option_permlikelsl" value="1"<?php if( $UserSettings->get('fm_permlikelsl') ) echo ' checked="checked"' ?> />
-		<label for="option_permlikelsl"><?php echo T_('File permissions like &quot;ls -l&quot;') ?></label>
-		<br />
-		<input type="checkbox" id="option_getimagesizes" name="option_getimagesizes" value="1"<?php if( $UserSettings->get('fm_getimagesizes') ) echo ' checked="checked"' ?> />
-		<label for="option_getimagesizes"><?php echo T_('Display the image size of image files') ?></label>
-		<br />
-		<input type="checkbox" id="option_recursivedirsize" name="option_recursivedirsize" value="1"<?php if( $UserSettings->get('fm_recursivedirsize') ) echo ' checked="checked"' ?> />
-		<label for="option_recursivedirsize"><?php echo T_('Recursive size of directories') ?></label>
-		<br />
-		<input type="checkbox" id="option_forceFM" name="option_forceFM" value="1"<?php if( $UserSettings->get('fm_forceFM') ) echo ' checked="checked"' ?> />
-		<label for="option_forceFM"><?php echo T_('Always show the Filemanager (upload mode, ..)') ?></label>
-		<br />
+		<?php
+		$options_Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Sort directories at top') );
+		$options_Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Show hidden files') );
+		$options_Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), T_('File permissions like &quot;ls -l&quot;') );
+		$options_Form->checkbox( 'option_getimagesizes', $UserSettings->get('fm_getimagesizes'), T_('Display the image size of image files') );
+		$options_Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Recursive size of directories') );
+		$options_Form->checkbox( 'option_forceFM', $UserSettings->get('fm_forceFM'), T_('Always show the Filemanager'), 'Display the Filemanager also in modes like upload.' );
 
-		<?php echo $Fileman->getFormHiddenInputs() ?>
-		<input type="hidden" name="options_show" value="1" />
-
-		<div class="input">
-			<input type="submit" name="actionArray[update_settings]" value="<?php echo T_('Update !') ?>" />
-		</div>
+		$options_Form->submit( array('actionArray[update_settings]', T_('Update !'), 'ActionButton') );
+		?>
 	</div>
-	</fieldset>
 
-	<script type="text/javascript">
-	<!--
-		showoptions = <?php echo ($options_show) ? 'true' : 'false' ?>;
+	<?php
+	$options_Form->end_fieldset();
+$options_Form->end_form();
+?>
 
-		/**
-		 * Toggles the display of the filemanager options.
-		 */
-		function toggle_options()
+<script type="text/javascript">
+<!--
+	showoptions = <?php echo ($options_show) ? 'true' : 'false' ?>;
+
+	/**
+	 * Toggles the display of the filemanager options.
+	 */
+	function toggle_options()
+	{
+		if( showoptions )
 		{
-			if( showoptions )
-			{
-				var replace = document.createTextNode('<?php echo TS_('Show') ?>');
-				var display_list = 'none';
-				showoptions = false;
-			}
-			else
-			{
-				var replace = document.createTextNode('<?php echo TS_('Hide') ?>');
-				var display_list = 'inline';
-				showoptions = true;
-			}
-			document.getElementById('options_list').style.display = display_list;
-			document.getElementById('options_toggle').replaceChild(replace, document.getElementById( 'options_toggle' ).firstChild);
-			return false;
+			var replace = document.createTextNode('<?php echo TS_('Show') ?>');
+			var display_list = 'none';
+			showoptions = false;
 		}
-	// -->
-	</script>
-</form>
-
+		else
+		{
+			var replace = document.createTextNode('<?php echo TS_('Hide') ?>');
+			var display_list = 'inline';
+			showoptions = true;
+		}
+		document.getElementById('options_list').style.display = display_list;
+		document.getElementById('options_toggle').replaceChild(replace, document.getElementById( 'options_toggle' ).firstChild);
+		return false;
+	}
+// -->
+</script>
 
 
 </div>
@@ -880,6 +877,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.40  2005/09/26 23:06:53  blueyed
+ * Converted options fieldset to Form class
+ *
  * Revision 1.39  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
  *
