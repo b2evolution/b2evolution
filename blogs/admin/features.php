@@ -1,13 +1,13 @@
 <?php
 /**
- * This file implements the UI controller for file settings management.
+ * This file implements the UI controller for Global Features.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
- *
+ * Parts of this file are copyright (c)2005 by Halton STEWART - {@link http://hstewart.net/}.
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
  * b2evolution is free software; you can redistribute it and/or modify
@@ -26,6 +26,9 @@
  * }}
  *
  * {@internal
+ * Halton STEWART grants François PLANQUE the right to license
+ * Halton STEWART's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -34,6 +37,7 @@
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author halton: Halton STEWART.
  * @author fplanque: François PLANQUE.
  * @author blueyed: Daniel HAHLER.
  *

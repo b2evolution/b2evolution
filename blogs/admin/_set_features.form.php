@@ -6,16 +6,42 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * {@internal
+ * Halton STEWART grants François PLANQUE the right to license
+ * Halton STEWART's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
+ * @author halton: Halton STEWART
+ *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$Form = & new Form( 'features.php', 'form' );
 
-$Form->begin_form( 'fform', T_('Global Features') );
+?>
+<script type="text/javascript">
+<!--
+/**
+ * Shows/Hides target_id, and updates text_id object with either text_when_displayed or text_when_hidden
+**/
+function showhide( text_id, target_id , text_when_displayed , text_when_hidden )
+{
+	if( document.getElementById(target_id).style.display=="" )
+	{
+		document.getElementById( text_id ).innerHTML = text_when_hidden;
+		document.getElementById( target_id ).style.display="none";
+	}
+	else
+	{
+		document.getElementById( text_id ).innerHTML = text_when_displayed;
+		document.getElementById( target_id ).style.display="";
+	}
+}
+//-->
+</script>
+<?php
 
-$Form->hidden( 'action', 'update' );
-$Form->hidden( 'tab', 'features' );
 // --------------------------------------------
 // testing the concept of online help (aka webhelp).
 // this function should be relocated somewhere better if it is taken onboard by the project
@@ -42,9 +68,25 @@ function web_help_link( $topic )
 }
 
 // --------------------------------------------
+function link_showhide ( $link_id, $target_id, $text_when_displayed , $text_when_hidden )
+{
+	$html = "<a id='$link_id' href='#$link_id' onclick='showhide(\"$link_id\",\"$target_id\",\"$text_when_displayed\",\"$text_when_hidden\")'>";
+	$html .= $text_when_hidden;
+	$html .= '</a>';
+	return $html;
+}
 
 
 // --------------------------------------------
+
+
+
+$Form = & new Form( 'features.php', 'form' );
+
+$Form->begin_form( 'fform', T_('Global Features') );
+
+$Form->hidden( 'action', 'update' );
+$Form->hidden( 'tab', 'features' );
 $Form->begin_fieldset( T_('Online Help') . web_help_link('features_online_help'));
 	$Form->checkbox_input( 'webhelp_enabled', $Settings->get('webhelp_enabled'), T_('Enable Online Help links'),
 	array(	'note' => T_('Online help links provide context sensitive help to certain features.' ) ) );
@@ -63,19 +105,7 @@ $Form->begin_fieldset( T_('Blog by email') . web_help_link('features_blog_by_ema
 	echo '<div id="eblog_section" style="'. $tmpstyle .'">';
 // fplanque>>TODO: there is something VERY broken with the page structure here. Please make it a priority to fix this or I'll remove everything weird until it works.
 
-		// fplanque>>TODO: use $Form->select* , do NOT construct a funky SELECT here.
-		echo $Form->begin_field( 'eblog_method', T_('Email retrieval method') );
-
-		function fselected($value1,$value2)
-		{
-			if ($value1==$value2)
-			{
-
-				return " selected ";
-			}
-		}
-		echo '<select name="eblog_method"><option value="pop3"' . fselected('pop3',$Settings->get('eblog_method')) . '>'. T_('POP3') . '</option><option value="pop3a"' . fselected( 'pop3a',$Settings->get('eblog_method') ). '>'. T_('POP3 (experimental)') . '</option></select>';
-		echo $Form->end_field('');
+		$Form->select_input_array( 'eblog_method', array( 'pop3'=>T_('POP3'), 'pop3a'=>T_('POP3 (experimental)') ), T_('Email retrieval method'), array('value' => $Settings->get('eblog_method')) );
 
 		$Form->text_input	( 'eblog_server_host', $Settings->get('eblog_server_host'),40,T_('Mail Server'),
 												array( 'maxlength' => 255, 'note' => T_('Hostname or IP Address of your incomming mail server.')  )  );
@@ -98,21 +128,14 @@ $Form->begin_fieldset( T_('Blog by email') . web_help_link('features_blog_by_ema
 
 		// eblog test links
 		$Form->info_field ('','<a id="eblog_test" href="#eblog_test" onclick=\'pop_up_window( "' . $htsrv_url . 'getmail.php?test=connection", "getmail" );\'>' . T_('Test connection') . '</a>',array());
-		//		<input type="button" value="Files" class="ActionButton"
-		//					onclick="pop_up_window( 'files.php?mode=upload', 'fileman_upload' );">
 
 		// special show / hide link
-		// fplanque>> TODO: this is totally impossible to read and maintain. Get an indented javascript function here!
-		$Form->info_field ('','<a id="eblog_show_more" href="#eblog_show_more" onclick=\'if(document.getElementById("eblog_section_more").style.display==""){document.getElementById("eblog_show_more").innerHTML="' . T_('show extra options...') . '";document.getElementById("eblog_section_more").style.display="none";}else{document.getElementById("eblog_show_more").innerHTML="' . T_('hide extra options') . '";document.getElementById("eblog_section_more").style.display="";}\'>' . T_('show extra options...') . '</a>',array());
+		$Form->info_field ('', link_showhide( 'eblog_show_more','eblog_section_more', T_('hide extra options'), T_('show extra options...') ) ,array());
 
-		//		$Form->checkbox_input( 'eblog_show_more', 0, T_('More Configuration... '),
-		//		array(	'onclick'=>'this.checked==true?document.getElementById("eblog_section_more").style.display="":document.getElementById("eblog_section_more").style.display="none";' ) );
-		//TODO... make prettier, maybe: echo '<a name="eblog_show_more" href="#eblog_show_more" onclick=\'document.getElementById("eblog_section_more").style.display=""\'>x</a>';
 		echo '<div name="eblog_section_more" id="eblog_section_more" style="display:none">';
 			$Form->text_input(	'eblog_body_terminator', $Settings->get('eblog_body_terminator'),15,T_('Body Terminator'),
 													array( 'maxlength' => 255, 'note' => T_('starting from this string, everything will be ignored, including this string.')  )  );
 
-			//TODO:provide a test button on this page, rather than a test mode.
 			$Form->checkbox_input( 	'eblog_test_mode', $Settings->get('eblog_test_mode'), T_('Test Mode'),
 											array(	'note' => T_('Check to run Blog by Email in test mode.' ) ) );
 
