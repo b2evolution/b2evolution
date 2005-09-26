@@ -412,7 +412,7 @@ class Hit
 		{
 			if( !$debug_no_register_shutdown && function_exists( 'register_shutdown_function' ) )
 			{ // register it as a shutdown function, because it will be slow!
-				$Debuglog->add( 'log(): double check: loading referering page.. (register_shutdown_function())', 'hit' );
+				$Debuglog->add( 'log(): double-check: loading referering page.. (register_shutdown_function())', 'hit' );
 				register_shutdown_function( array( &$this, 'double_check_referers' ) ); // this will also call _record_the_hit()
 			}
 			else
@@ -421,7 +421,7 @@ class Hit
 				// back against the refering URL.
 				flush();
 
-				$Debuglog->add( 'log(): double check: loading referering page..', 'hit' );
+				$Debuglog->add( 'log(): double-check: loading referering page..', 'hit' );
 
 				$this->double_check_referers(); // this will also call _record_the_hit()
 			}
@@ -447,9 +447,11 @@ class Hit
 	 */
 	function _record_the_hit()
 	{
-		global $DB, $Session, $ReqURI, $Blog, $localtimenow;
+		global $DB, $Session, $ReqURI, $Blog, $localtimenow, $Debuglog;
 
 		$referer_basedomain = getBaseDomain( $this->referer );
+
+		$Debuglog->add( 'log(): Recording the hit.', 'hit' );
 
 		// insert hit into DB table:
 		$sql = 'INSERT INTO T_hitlog( hit_sess_ID, hit_datetime, hit_uri,
