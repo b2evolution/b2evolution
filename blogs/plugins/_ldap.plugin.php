@@ -194,7 +194,7 @@ class ldap_plugin extends Plugin
 				#$NewUser->set( 'msn', '' );
 				#$NewUser->set( 'yim', '' );
 				$NewUser->set( 'ip', $Hit->IP );
-				$NewUser->set( 'domain', $Hit->getRemoteHost() );
+				$NewUser->set( 'domain', $Hit->get_remote_host() );
 				$NewUser->set( 'browser', $Hit->getUserAgent() );
 				$NewUser->set_datecreated( $localtimenow );
 				$NewUser->set( 'level', 1 );
