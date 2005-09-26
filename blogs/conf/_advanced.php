@@ -308,12 +308,13 @@ blueyed>>TODO:
 
 fplanque>>What's a real world scenario where this is a problem?
 blueyed>> e.g. demo.b2evolution.net and b2evolution.net; or example.com and private.example.com (both running (different) b2evo instances (but with same $instancename)
-
+fplanque>>that's what I thought. This is exactly why we have instance names in the first place. So we won't add a second mecanism. We can however use one of these two enhancements: 1) have the default conf use a $baseurl hash for instance name instead of 'b2evo' or 2) generate a random instance name at install and have it saved in the global params in the DB. NOTE: we also need to check if this can be broken when using b2evo in multiple domain mode.
 - Use object to handle cookies
 	- We need to know for example if a cookie is about to be sent (because then we don't want to send a 304 response).
 
 fplanque>>What's a real world scenario where this is a problem?
 blueyed>>When we detect that the content hasn't changed and are about to send a 304 response code we won't do it if we now that (login) cookies should be sent.
+fplanque>>ok. If you do it, please do it in a generic $Response object which will not only handle cookies but also stuff like charset translations, format_to_output(), etc.
 */
 
 /**

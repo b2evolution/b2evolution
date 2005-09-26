@@ -52,10 +52,8 @@ require_once dirname(__FILE__).'/_misc.funcs.php';
 /**
  * A hit to a blog.
  *
- * {@internal
  * NOTE: The internal function double_check_referers() uses the class Net_IDNA_php4 from /blogs/lib/_idna_convert.class.php.
  *       It's required() only, when needed.
- * }}
  */
 class Hit
 {
@@ -367,8 +365,8 @@ class Hit
 
 		if( $agnt_data = $DB->get_row(
 			'SELECT agnt_ID, agnt_type FROM T_useragents
-			 WHERE agnt_signature = "'.$DB->escape( $this->user_agent ).'"
-			   AND agnt_type = "'.$this->agent_type.'"' ) )
+			  WHERE agnt_signature = "'.$DB->escape( $this->user_agent ).'"
+			    AND agnt_type = "'.$this->agent_type.'"' ) )
 		{ // this agent (with that type) hit us once before
 			$this->agent_type = $agnt_data->agnt_type;
 			$this->agentID = $agnt_data->agnt_ID;

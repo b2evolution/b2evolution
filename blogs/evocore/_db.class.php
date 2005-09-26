@@ -165,7 +165,7 @@ class DB
 	 * Number of rows we want to dump in debug output (0 disables it)
 	 * @var integer (Default: 100)
 	 */
-	var $debug_dump_rows = 100;
+	var $debug_dump_rows = 0;
 
 	/**
 	 * Time in seconds that is considered a fast query (green).
@@ -1152,6 +1152,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.30  2005/09/26 18:15:25  fplanque
+ * no message
+ *
  * Revision 1.29  2005/09/25 16:17:59  blueyed
  * Debugging enhanced: $debug_dump_function_trace_for_queries / $debug_dump_function_trace_for_errors (that was there before, but is now configurable)
  *
