@@ -257,7 +257,7 @@ class DataObject
 
 		if( ! $DB->query( $sql, 'DataObject::dbinsert()' ) )
 		{
-			return false; 
+			return false;
 		}
 
 		// store ID for newly created db record
@@ -293,7 +293,7 @@ class DataObject
 	 */
 	function dbdelete( )
 	{
-		global $DB, $Messages, $db_aliases;
+		global $DB, $Messages, $EvoConfig;
 
 		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
 
@@ -305,7 +305,7 @@ class DataObject
 
 			foreach( $this->delete_cascades as $restriction )
 			{
-				if( !isset( $db_aliases[$restriction['table']] ) )
+				if( !isset( $EvoConfig->DB['aliases'][$restriction['table']] ) )
 				{	// We have no declaration for this table, we consider we don't deal with this table in this app:
 					continue;
 				}
@@ -338,11 +338,11 @@ class DataObject
 	 */
 	function check_relations( $what )
 	{
-		global $DB, $Messages, $db_aliases;
+		global $DB, $Messages, $EvoConfig;
 
 		foreach( $this->$what as $restriction )
 		{
-			if( !isset( $db_aliases[$restriction['table']] ) )
+			if( !isset( $EvoConfig->DB['aliases'][$restriction['table']] ) )
 			{	// We have no declaration for this table, we consider we don't deal with this table in this app:
 				continue;
 			}
@@ -568,6 +568,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.23  2005/09/26 23:09:10  blueyed
+ * Use $EvoConfig->DB for $DB parameters.
+ *
  * Revision 1.22  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

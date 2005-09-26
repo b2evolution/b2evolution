@@ -132,7 +132,7 @@ require_once dirname(__FILE__).'/_db.class.php';
  *
  * @global DB $DB
  */
-$DB = new DB( $EvoConfig->DB['user'], $EvoConfig->DB['password'], $EvoConfig->DB['name'], $EvoConfig->DB['host'], $db_aliases, $db_use_transactions, $db_table_options );
+$DB = new DB( $EvoConfig->DB );
 
 
 /**
@@ -528,6 +528,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.51  2005/09/26 23:09:10  blueyed
+ * Use $EvoConfig->DB for $DB parameters.
+ *
  * Revision 1.50  2005/09/18 00:54:25  blueyed
  * Removed hack to fix the demo site
  *

@@ -170,9 +170,8 @@ $redirect_to_postblog = false;
  * (You should not need to change them.
  *  If you want to have multiple b2evo installations in a single database you should
  *  change $tableprefix in _config.php)
- * @global array
  */
-$db_aliases = array(
+$EvoConfig->DB['aliases'] = array(
 		'T_antispam'         => $tableprefix.'antispam',
 		'T_basedomains'      => $tableprefix.'basedomains',
 		'T_blogs'            => $tableprefix.'blogs',
@@ -204,24 +203,22 @@ $db_aliases = array(
  *
  * Edit those if you have control over you MySQL server and want a more professional
  * database than what is commonly offered by popular hosting providers.
- *
- * @global string $db_table_options
  */
-$db_table_options = ''; 	// Low ranking MySQL hosting compatibility Default
+$EvoConfig->DB['table_options'] = ''; 	// Low ranking MySQL hosting compatibility Default
 // Recommended settings:
-# $db_table_options = ' ENGINE=InnoDB ';
+# $EvoConfig->DB['table_options'] = ' ENGINE=InnoDB ';
 // Development settings:
-# $db_table_options = ' ENGINE=InnoDB DEFAULT CHARSET=utf8 ';
+# $EvoConfig->DB['table_options'] = ' ENGINE=InnoDB DEFAULT CHARSET=utf8 ';
 
 
 /**
  * Use transactions in DB?
  *
- * You need to use InnoDB in order to enable this. {@see $db_table_options}
+ * You need to use InnoDB in order to enable this. {@see $EvoConfig->DB['table_options']}
  */
-$db_use_transactions = false;
+$EvoConfig->DB['use_transactions'] = false;
 // Recommended settings:
-# $db_use_transactions = true;
+# $EvoConfig->DB['use_transactions'] = true;
 
 
 /**
@@ -229,7 +226,7 @@ $db_use_transactions = false;
  *
  * Set this to true if your MySQL supports Foreign keys.
  * Recommended for professional use.
- * Typically requires InnoDB to be set in $db_table_options.
+ * Typically requires InnoDB to be set in $EvoConfig->DB['table_options'].
  *
  * @global boolean $db_use_fkeys
  */

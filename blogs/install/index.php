@@ -97,14 +97,15 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 	// present available locales on first screen
 	foreach( $locales as $lkey => $lvalue )
 	{
-		echo '<li>';
+		echo "\n<li>";
 		if( $default_locale == $lkey ) echo '<strong>';
 		echo ' <a href="?action='.$action.'&amp;locale='.$lkey.'">';
 		locale_flag( $lkey, 'w16px', 'flag', '', true, $install_dirout.$img_subdir.'flags' );
 		echo T_( $lvalue['name'] );
-		echo '</a></li>';
-
+		echo '</a>';
 		if( $default_locale == $lkey ) echo '</strong>';
+		echo '</li>';
+
 	}
 	?>
 	</ul>
@@ -114,7 +115,11 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 
 if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
 { // Connect to DB:
-	$DB = new DB( $EvoConfig->DB['user'], $EvoConfig->DB['password'], $EvoConfig->DB['name'], $EvoConfig->DB['host'], $db_aliases, $db_use_transactions, $db_table_options, false );
+	$tmp_evoconf_db = $EvoConfig->DB;
+	$tmp_evoconf_db['halt_on_error'] = false;
+	$DB = new DB( $tmp_evoconf_db );
+	unset($tmp_evoconf_db);
+
 	if( $DB->error )
 	{ // restart conf
 		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
@@ -159,7 +164,15 @@ switch( $action )
 		param( 'conf_admin_email', 'string', true );
 
 		// Connect to DB:
-		$DB = new DB( $conf_db_user, $conf_db_password, $conf_db_name, $conf_db_host, $db_aliases, $db_use_transactions, $db_table_options, false );
+		$DB = new DB( array(
+			'user' => $conf_db_user,
+			'password' => $conf_db_password,
+			'name' => $conf_db_name,
+			'host' => $conf_db_host,
+			'aliases' => $EvoConfig->DB['aliases'],
+			'use_transactions' => $EvoConfig->DB['use_transactions'],
+			'table_options' => $EvoConfig->DB['table_options'],
+			'halt_on_error' => false ) );
 		if( $DB->error )
 		{ // restart conf
 			echo '<p class="error">'.T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...').'</p>';

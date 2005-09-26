@@ -117,7 +117,7 @@ function convert_lang_to_locale( $table, $columnlang, $columnID )
  */
 function upgrade_b2evo_tables()
 {
-	global $db_aliases;
+	global $EvoConfig;
 	global $baseurl, $old_db_version, $new_db_version;
 	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
 	global $locales, $default_locale;
@@ -334,7 +334,7 @@ function upgrade_b2evo_tables()
 			echo '<div class="error"><p class="error">';
 			printf( T_("It appears that the following blog stub names are used more than once: ['%s']" ), implode( "','", $stub_list ) );
 			echo '</p><p>';
-			printf( T_("I can't upgrade until you make them unique. DB field: [%s]" ), $db_aliases['T_blogs'].'.blog_stub' );
+			printf( T_("I can't upgrade until you make them unique. DB field: [%s]" ), $EvoConfig->DB['aliases']['T_blogs'].'.blog_stub' );
 			echo '</p></div>';
 			return false;
 		}

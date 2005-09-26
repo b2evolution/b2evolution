@@ -33,6 +33,8 @@ $EvoConfig->DB = array(
 	'password' => 'demopass',     // ...and password
 	'name'     => 'b2evolution',  // the name of the database
 	'host'     => 'localhost',    // MySQL Server (typically 'localhost')
+	#'show_errors' => false,       // Show MySQL errors? (default: true)
+	#'halt_on_error' => false,     // Halt on error? (default: true)
 	);
 
 

@@ -121,13 +121,22 @@ class DB
 
 	/**
 	 * CREATE TABLE options.
+	 *
+	 * Edit those if you have control over you MySQL server and want a more professional
+	 * database than what is commonly offered by popular hosting providers.
+	 *
+	 * Recommended settings: ' ENGINE=InnoDB '
+	 * Development settings: ' ENGINE=InnoDB DEFAULT CHARSET=utf8 '
+	 * @var string Default: ''
 	 */
-	var $dbtableoptions;
+	var $table_options = '';
 
 	/**
-	 * Do we want to use transactions:
+	 * Use transactions in DB?
+	 *
+	 * You need to use InnoDB in order to enable this. {@see $table_options}
 	 */
-	var $use_transactions;
+	var $use_transactions = false;
 
 	/**
 	 * How many transactions are currently nested?
@@ -138,6 +147,33 @@ class DB
 	 * Rememeber if we have to rollback at the end of a nested transaction construct
 	 */
 	var $rollback_nested_transaction = false;
+
+	/**
+	 * @var object MySQL Database handle
+	 */
+	var $dbhandle;
+
+
+	/**
+	 * @var string Database username
+	 */
+	var $dbuser;
+
+	/**
+	 * @var string Database username's password
+	 */
+	var $dbpassword;
+
+	/**
+	 * @var string Database name
+	 * @see {@link select()}
+	 */
+	var $dbname;
+
+	/**
+	 * @var string Database hostname
+	 */
+	var $dbhost = 'localhost';
 
 
 	// DEBUG:
@@ -157,13 +193,13 @@ class DB
 	/**
 	 * Do we want to output a function backtrace for errors?
 	 * NOTE: This is only used when {@link $show_errors} is enabled.
-	 * @var bool (Default: 100)
+	 * @var bool (Default: true)
 	 */
-	var $debug_dump_function_trace_for_errors = 100;
+	var $debug_dump_function_trace_for_errors = true;
 
 	/**
 	 * Number of rows we want to dump in debug output (0 disables it)
-	 * @var integer (Default: 100)
+	 * @var integer (Default: 0)
 	 */
 	var $debug_dump_rows = 0;
 
@@ -185,13 +221,38 @@ class DB
 	/**
 	 * DB Constructor
 	 *
-	 * connects to the server and selects a database
+	 * Connects to the server and selects a database.
 	 *
-	 * blueyed> Note: Too many parameters (and without default). Should be accessed through members. $halt_on_error is (also) relevant to the connect procedure and should be put after $dbhost.
+	 * @param array An array of parameters.
+	 *   Manadatory:
+	 *    - 'user': username to connect with
+	 *    - 'password': password to connect with
+	 *    - 'name': the name of the default database, see {@link select()}
+	 *   Optional:
+	 *    - 'host': host of the database; Default: 'localhost'
+	 *    - 'show_errors': Display SQL errors? (true/false); Default: don't change member default ({@link $show_errors})
+	 *    - 'halt_on_error': Halt on error? (true/false); Default: don't change member default ({@link $halt_on_error})
+	 *    - 'table_options': sets {@link $table_options}
+	 *    - 'use_transactions': sets {@link $use_transactions}
+	 *    - 'aliases': Aliases for tables (array( alias => table name )); Default: no aliases.
 	 */
-	function DB( $dbuser, $dbpassword, $dbname, $dbhost, $dbaliases, $db_use_transactions, $dbtableoptions = '', $halt_on_error = true )
+	function DB( $params )
 	{
-		$this->halt_on_error = $halt_on_error;
+		// Mandatory parameters:
+		$this->dbuser = $params['user'];
+		$this->dbpassword = $params['password'];
+		$this->dbname = $params['name'];
+
+		// Optional parameters (Allow overriding through $params, because we cannot hack the $DB object after creation without using a "@include"):
+		if( isset($params['host']) ) $this->dbhost = $params['host'];
+		if( isset($params['show_errors']) ) $this->show_errors = $params['show_errors'];
+		if( isset($params['halt_on_error']) ) $this->halt_on_error = $params['halt_on_error'];
+		if( isset($params['table_options']) ) $this->table_options = $params['table_options'];
+		if( isset($params['use_transactions']) ) $this->use_transactions = $params['use_transactions'];
+		if( isset($params['debug_dump_rows']) ) $this->debug_dump_rows = $params['debug_dump_rows'];
+		if( isset($params['debug_explain_joins']) ) $this->debug_explain_joins = $params['debug_explain_joins'];
+		if( isset($params['debug_dump_function_trace_for_errors']) ) $this->debug_dump_function_trace_for_errors = $params['debug_dump_function_trace_for_errors'];
+		if( isset($params['debug_dump_function_trace_for_queries']) ) $this->debug_dump_function_trace_for_queries = $params['debug_dump_function_trace_for_queries'];
 
 		if( !extension_loaded('mysql') )
 		{ // The mysql extension is not loaded, try to dynamically load it:
@@ -214,9 +275,9 @@ class DB
 		}
 
 		// Connect to the Database:
-		$this->dbh = @mysql_connect($dbhost,$dbuser,$dbpassword);
+		$this->dbhandle = @mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword );
 
-		if( ! $this->dbh )
+		if( ! $this->dbhandle )
 		{
 			$this->print_error( '<p><strong>Error establishing a database connection!</strong></p>
 				<p>('.mysql_error().')</p>
@@ -228,20 +289,19 @@ class DB
 		}
 		else
 		{
-			$this->select($dbname);
+			$this->select($this->dbname);
 		}
 
-		// Prepare aliases for replacements:
-		foreach( $dbaliases as $dbalias => $dbreplace )
-		{
-			$this->dbaliases[] = '#\b'.$dbalias.'\b#'; // \b = word boundary
-			$this->dbreplaces[] = $dbreplace;
-			// echo '<br />'.'#\b'.$dbalias.'\b#';
+		if( isset($params['aliases']) )
+		{ // Prepare aliases for replacements:
+			foreach( $params['aliases'] as $dbalias => $dbreplace )
+			{
+				$this->dbaliases[] = '#\b'.$dbalias.'\b#'; // \b = word boundary
+				$this->dbreplaces[] = $dbreplace;
+				// echo '<br />'.'#\b'.$dbalias.'\b#';
+			}
+			// echo count($this->dbaliases);
 		}
-		// echo count($this->dbaliases);
-
-		$this->use_transactions = $db_use_transactions;
-		$this->dbtableoptions = $dbtableoptions;
 	}
 
 
@@ -250,7 +310,7 @@ class DB
 	 */
 	function select($db)
 	{
-		if ( !@mysql_select_db($db,$this->dbh))
+		if( !@mysql_select_db($db, $this->dbhandle) )
 		{
 			$this->print_error( '<strong>Error selecting database ['.$db.']!</strong>
 				<ol>
@@ -366,12 +426,12 @@ class DB
 			// If there is an error then take note of it
 			echo '<div class="error">';
 			echo '<p class="error">MySQL error!</p>';
-			echo '<p>', $this->last_error, '</p>';
+			echo '<div style="padding:1ex">'.$this->last_error.'</div>';
 			if( !empty($this->last_query) ) echo '<p class="error">Your query: '.$query_title.'<br /><pre>'.htmlspecialchars( str_replace("\t", '  ', $this->last_query) ).'</pre></p>';
 
 			if( $this->debug_dump_function_trace_for_errors )
 			{
-				$this->queries[ $this->num_queries - 1 ]['function_trace'] = $this->debug_get_xdebug_function_stack( $this->debug_dump_function_trace_for_errors );
+				echo $this->debug_get_xdebug_function_stack( NULL, array( 'function' => 'print_error' ) );
 			}
 
 			echo '</div>';
@@ -422,7 +482,7 @@ class DB
 
 		if( preg_match( '#^ \s* create \s* table \s #ix', $query) )
 		{ // Query is a table creation, we add table options:
-			$query .= $this->dbtableoptions;
+			$query .= $this->table_options;
 		}
 
 		// Keep track of the last query for debug..
@@ -444,15 +504,15 @@ class DB
 			// Start a timer for this paritcular query:
 			$Timer->start( 'query', false );
 			// Run query:
-			$this->result = @mysql_query( $query, $this->dbh );
+			$this->result = @mysql_query( $query, $this->dbhandle );
 			// Get duration for last query:
-			$this->queries[ $this->num_queries - 1 ]['time'] = $Timer->get_duration( 'query' );
+			$this->queries[ $this->num_queries - 1 ]['time'] = $Timer->get_duration( 'query', 10 );
 			// Pause global query timer:
 			$Timer->pause( 'sql_queries' );
 		}
 		else
 		{
-			$this->result = @mysql_query($query,$this->dbh);
+			$this->result = @mysql_query($query,$this->dbhandle);
 		}
 
 		// If there is an error then take note of it..
@@ -471,7 +531,7 @@ class DB
 			// Take note of the insert_id
 			if ( preg_match("/^\\s*(insert|replace) /i",$query) )
 			{
-				$this->insert_id = mysql_insert_id($this->dbh);
+				$this->insert_id = mysql_insert_id($this->dbhandle);
 			}
 
 			// Return number fo rows affected
@@ -527,7 +587,7 @@ class DB
 			$this->col_info = NULL;
 			$this->num_rows = 0;
 
-			$this->result = @mysql_query( 'EXPLAIN '.$query, $this->dbh );
+			$this->result = @mysql_query( 'EXPLAIN '.$query, $this->dbhandle );
 			// Take note of column info
 			$i = 0;
 			while( $i < @mysql_num_fields($this->result) )
@@ -806,7 +866,7 @@ class DB
 
 
 	/**
-	 * Get a table (or "No Results") for the SELECT query results.
+	 * Get a table (or "<p>No Results.</p>") for the SELECT query results.
 	 *
 	 * @return string HTML table or "No Results" if the
 	 */
@@ -818,7 +878,7 @@ class DB
 		{
 			// =====================================================
 			// Results top rows
-			$r .= '<table cellspacing="0">';
+			$r .= '<table cellspacing="0"><tr>';
 			for( $i = 0, $count = count($this->col_info); $i < $count; $i++ )
 			{
 				$r .= '<th><span class="type">'.$this->col_info[$i]->type.' '.$this->col_info[$i]->max_length.'</span><br />'
@@ -839,6 +899,7 @@ class DB
 					{
 						break;
 					}
+					$r .= '<tr>';
 					foreach( $one_row as $item )
 					{
 						if( $i % 2 )
@@ -885,7 +946,7 @@ class DB
 		} // if col_info
 		else
 		{
-			$r .= 'No Results';
+			$r .= '<p>No Results.</p>';
 		}
 
 		return $r;
@@ -944,11 +1005,6 @@ class DB
 
 			foreach( $stack as $l_stack )
 			{
-				if( isset($l_stack['class']) && $l_stack['class'] == 'DB' )
-				{
-					break;
-				}
-
 				$r .= "\n<tr><td>";
 
 				if( isset( $l_stack['class'] ) )
@@ -1036,7 +1092,7 @@ class DB
 			{
 				echo '<span style="'.$style_time_text.'">';
 			}
-			echo $query['time'].'s';
+			echo number_format( $query['time'], 4 ).'s';
 
 			if( $time_queries > 0 )
 			{ // We have a total time we can use to calculate percentage:
@@ -1152,6 +1208,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.31  2005/09/26 23:09:10  blueyed
+ * Use $EvoConfig->DB for $DB parameters.
+ *
  * Revision 1.30  2005/09/26 18:15:25  fplanque
  * no message
  *

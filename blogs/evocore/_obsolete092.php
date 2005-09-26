@@ -1574,7 +1574,7 @@ $start_of_week = 1;
 /**#@+
  * database tables' names
  *
- * @deprecated by {@link $db_aliases}
+ * @deprecated by {@link $EvoConfig}, see /conf/_advanced.php.
  */
 $tableposts        = $tableprefix.'posts';
 $tableusers        = $tableprefix.'users';
@@ -1625,6 +1625,9 @@ $fileupload_allowedusers = '';
 
 /*
  * $Log$
+ * Revision 1.16  2005/09/26 23:09:10  blueyed
+ * Use $EvoConfig->DB for $DB parameters.
+ *
  * Revision 1.15  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
