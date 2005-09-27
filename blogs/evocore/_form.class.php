@@ -128,7 +128,7 @@ class Form extends Widget
 
 		if( is_null( $layout ) )
 		{
-			if( isset($AdminUI) )
+			if( is_object($AdminUI) )
 			{ // Get default skin setting:
 				$template = $AdminUI->getMenuTemplate( 'Form' );
 				$layout = $template['layout'];
@@ -2167,6 +2167,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.73  2005/09/27 14:56:30  blueyed
+ * use is_object() instead of isset() for $AdminUI check
+ *
  * Revision 1.72  2005/09/22 21:09:31  blueyed
  * Don't pass $field_options by reference. This fixes issues were we pass function return values and was used because of performance only. PHP5 would pass it by "reference" (and not value) anyway.
  *
