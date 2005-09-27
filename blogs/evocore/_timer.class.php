@@ -84,7 +84,7 @@ class Timer
 	function start( $category, $log = true )
 	{
 		global $Debuglog;
-		if( $log ) $Debuglog->add( 'Starting timer '.$category, 'timer' );
+		if( $log && is_object( $Debuglog ) ) $Debuglog->add( 'Starting timer '.$category, 'timer' );
 		$this->reset( $category );
 		$this->resume( $category );
 	}
@@ -102,7 +102,10 @@ class Timer
 		if( ! $this->pause( $category ) )
 			return false;
 
-		$Debuglog->add( 'Stopped timer '.$category.' at '.$this->get_duration( $category, 3 ), 'timer' );
+		if( is_object( $Debuglog ) )
+		{
+			$Debuglog->add( 'Stopped timer '.$category.' at '.$this->get_duration( $category, 3 ), 'timer' );
+		}
 
 		return true;
 	}
@@ -224,6 +227,9 @@ class Timer
 
 /*
  * $Log$
+ * Revision 1.3  2005/09/27 14:57:22  blueyed
+ * Removed dependency on $Debuglog
+ *
  * Revision 1.2  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
