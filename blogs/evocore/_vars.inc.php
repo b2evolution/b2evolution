@@ -81,9 +81,22 @@ elseif( isset($_SERVER['PATH_INFO']) )
 { // CGI/FastCGI
 	if( isset($_SERVER['SCRIPT_NAME']) )
 	{
+
 		$Debuglog->add( 'Getting ReqPath from PATH_INFO and SCRIPT_NAME', 'vars' );
 
-		$ReqPath = $_SERVER['SCRIPT_NAME'].$_SERVER['PATH_INFO'];
+		if ($_SERVER['SCRIPT_NAME'] == $_SERVER['PATH_INFO'] )
+		{	/* both the same so just use one of them
+			 * this happens on a windoze 2003 box
+			 * gotta love microdoft
+			 */
+			$Debuglog->add( 'PATH_INFO and SCRIPT_NAME are the same', 'vars' );
+			$Debuglog->add( 'Getting ReqPath from PATH_INFO only instead', 'vars' );
+			$ReqPath = $_SERVER['PATH_INFO'];
+		}
+		else
+		{
+			$ReqPath = $_SERVER['SCRIPT_NAME'].$_SERVER['PATH_INFO'];
+		}
 	}
 	else
 	{ // does this happen??
@@ -241,6 +254,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.22  2005/09/28 12:28:19  yabs
+ * minor changes
+ *
  * Revision 1.21  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
