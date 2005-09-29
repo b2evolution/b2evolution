@@ -283,19 +283,19 @@ function user_subs_link( $before = '', $after = '', $link_text = '', $link_title
 
 
 /**
- * Template tag: Display the user's prefered name
+ * Template tag: Display the user's preferred name
  *
  * Used in result lists.
  *
  * @param integer user ID
  */
-function user_preferedname( $user_ID )
+function user_preferredname( $user_ID )
 {
 	global $UserCache;
 
 	if( !empty( $user_ID ) && $User =& $UserCache->get_by_ID( $user_ID ) )
 	{
-		$User->disp('preferedname');
+		$User->disp('preferredname');
 	}
 }
 
@@ -402,6 +402,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.28  2005/09/29 15:07:30  fplanque
+ * spelling
+ *
  * Revision 1.27  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
@@ -474,7 +477,7 @@ function profile_check_params( $params )
  * cosmetics
  *
  * Revision 1.3  2004/10/15 17:51:38  fplanque
- * added user_preferedname()
+ * added user_preferredname()
  *
  * Revision 1.2  2004/10/14 18:31:25  blueyed
  * granting copyright

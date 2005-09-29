@@ -225,11 +225,11 @@ class UserCache extends DataObjectCache
 
 		if( $disp )
 		{
-			parent::option_list( $default, $allow_none, 'prefered_name' );
+			parent::option_list( $default, $allow_none, 'preferred_name' );
 		}
 		else
 		{
-			return parent::option_list_return( $default, $allow_none, 'prefered_name_return' );
+			return parent::option_list_return( $default, $allow_none, 'preferred_name_return' );
 		}
 	}
 
@@ -246,13 +246,16 @@ class UserCache extends DataObjectCache
 	 */
 	function option_list( $default = 0, $allow_none = false )
 	{
-		parent::option_list( $default, $allow_none, 'prefered_name' );
+		parent::option_list( $default, $allow_none, 'preferred_name' );
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.20  2005/09/29 15:07:30  fplanque
+ * spelling
+ *
  * Revision 1.19  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

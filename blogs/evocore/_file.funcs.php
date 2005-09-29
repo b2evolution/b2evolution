@@ -520,8 +520,8 @@ function get_root_name( $root_type, $root_ID )
 	{
 		case 'user':
 			$User = & $UserCache->get_by_ID( $root_ID );
-			// return sprintf( 'User %s', $User->get( 'preferedname' ) );
-			return $User->get( 'preferedname' );
+			// return sprintf( 'User %s', $User->get( 'preferredname' ) );
+			return $User->get( 'preferredname' );
 
 		case 'collection':
 			$Blog = & $BlogCache->get_by_ID( $root_ID );
@@ -538,6 +538,9 @@ function get_root_name( $root_type, $root_ID )
 
 /*
  * $Log$
+ * Revision 1.24  2005/09/29 15:07:30  fplanque
+ * spelling
+ *
  * Revision 1.23  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

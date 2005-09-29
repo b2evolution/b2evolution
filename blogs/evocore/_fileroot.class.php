@@ -100,7 +100,7 @@ class FileRoot
 		{
 			case 'user':
 				$User = & $UserCache->get_by_ID( $root_in_type_ID );
-				$this->name = $User->get( 'preferedname' );
+				$this->name = $User->get( 'preferredname' );
 				$this->ads_path = $User->getMediaDir();
 				$this->ads_url = $User->getMediaUrl();
 				return;
@@ -140,6 +140,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.3  2005/09/29 15:07:30  fplanque
+ * spelling
+ *
  * Revision 1.2  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

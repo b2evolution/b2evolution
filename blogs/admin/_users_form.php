@@ -155,7 +155,7 @@ else
 	$Form->info( T_('First name'), $edited_User->dget('firstname') );
 	$Form->info( T_('Last name'), $edited_User->dget('lastname') );
 	$Form->info( T_('Nickname'), $edited_User->dget('nickname') );
-	$Form->info( T_('Identity shown'), $edited_User->dget('preferedname') );
+	$Form->info( T_('Identity shown'), $edited_User->dget('preferredname') );
 	$Form->info( T_('Show Online'), ($edited_User->dget('showonline')) ? T_('yes') : T_('no') );
 	$Form->info( T_('Locale'), $edited_User->dget('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
 	$Form->info( T_('Email'), $edited_User->dget('email'), $email_fieldnote );
@@ -201,6 +201,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.67  2005/09/29 15:07:29  fplanque
+ * spelling
+ *
  * Revision 1.66  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
  *

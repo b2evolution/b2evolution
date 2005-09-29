@@ -135,7 +135,7 @@ while( $Item = $MainList->get_item() )
 	echo "</span></td>\n";
 
 	echo '<td>';
-	$Item->Author->prefered_name();
+	$Item->Author->preferred_name();
 	echo "</td>\n";
 
 	echo '<td>';
@@ -212,6 +212,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.14  2005/09/29 15:07:29  fplanque
+ * spelling
+ *
  * Revision 1.13  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
  *

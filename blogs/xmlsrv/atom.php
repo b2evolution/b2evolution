@@ -37,7 +37,7 @@
 		<title type="text/plain" mode="xml"><?php $Item->title( '', '', false, 'xml' ) ?></title>
 		<link rel="alternate" type="text/html" href="<?php $Item->permalink( 'single' ) ?>" />
 		<author>
-			<name><?php $Item->Author->prefered_name( 'xml' ) ?></name>
+			<name><?php $Item->Author->preferred_name( 'xml' ) ?></name>
 			<?php $Item->Author->url( '<url>', "</url>\n", 'xml' ) ?>
 		</author>
 		<id><?php $Item->permalink( 'single' ) ?></id>

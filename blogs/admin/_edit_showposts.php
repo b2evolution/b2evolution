@@ -107,7 +107,7 @@ while( $Item = $MainList->get_item() )
 				echo '</strong>';
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' ';
-				$Item->Author->prefered_name();
+				$Item->Author->preferred_name();
 				echo ' (';
 				$Item->Author->login();
 				echo ', ', T_('level:');
@@ -274,7 +274,7 @@ while( $Item = $MainList->get_item() )
 				<fieldset>
 					<div class="label"><?php echo T_('User') ?>:</div>
 					<div class="info">
-						<strong><?php $current_User->prefered_name()?></strong>
+						<strong><?php $current_User->preferred_name()?></strong>
 						<?php user_profile_link( ' [', ']', T_('Edit profile') ) ?>
 						</div>
 				</fieldset>
@@ -342,6 +342,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.107  2005/09/29 15:07:29  fplanque
+ * spelling
+ *
  * Revision 1.106  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
  *

@@ -160,7 +160,7 @@
 				<tr valign="top" bgcolor="#eeeeee">
 					<td align="right"><strong><?php echo T_('User') ?>:</strong></td>
 					<td align="left">
-						<strong><?php $current_User->prefered_name()?></strong>
+						<strong><?php $current_User->preferred_name()?></strong>
 						<?php user_profile_link( ' [', ']', T_('Edit profile') ) ?>
 						</td>
 				</tr>

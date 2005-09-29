@@ -19,7 +19,7 @@ function upgrade_cafelog_tables()
 	global $baseurl, $old_db_version, $new_db_version;
 	global $default_locale;
 	global $timestamp, $admin_email;
-	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
+	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
 	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
 	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
 	global $DB, $wp_prefix;

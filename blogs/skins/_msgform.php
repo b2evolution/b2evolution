@@ -40,7 +40,7 @@ if ( empty($redirect_to) )
 if(!empty($recipient_id))
 { // If the email is to a registerd user get the email address from the users table
 	$User = & $UserCache->get_by_ID( $recipient_id );
-	$recipient_name = $User->get('preferedname');
+	$recipient_name = $User->get('preferredname');
 	$recipient_address = $User->get('email');
 }
 elseif(!empty($comment_id))
@@ -87,7 +87,7 @@ if( !empty($comment_id) || !empty($post_id) )
 	if( is_logged_in() )
 	{ // If the user is logged in default the from address to that info.
 
-		$email_author = $current_User->get('preferedname');
+		$email_author = $current_User->get('preferredname');
 		$email_author_address = $current_User->email;
 
 	}

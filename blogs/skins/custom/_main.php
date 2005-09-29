@@ -117,7 +117,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		<?php
 			$Item->issue_time();
 			echo ', by ';
-			$Item->Author->prefered_name();
+			$Item->Author->preferred_name();
 			$Item->msgform_link( $Blog->get('msgformurl') );
 			echo ', ';
 			$Item->wordcount();

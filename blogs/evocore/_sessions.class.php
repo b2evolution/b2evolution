@@ -130,7 +130,7 @@ class Sessions extends Widget
 	/**
 	 * Display the registered users who are online
 	 *
-	 * @param string Template to display each user (the first %s gets the user's prefered name,
+	 * @param string Template to display each user (the first %s gets the user's preferred name,
 	 *               the second the link to his mail form - if he has an email address)
 	 * @return array containing number of registered users and guests
 	 */
@@ -155,7 +155,7 @@ class Sessions extends Widget
 				}
 
  				echo $beforeEach;
-				echo $User->get('preferedname');
+				echo $User->get('preferredname');
 				if( isset($Blog) )
 				{
 					$User->msgform_link( $Blog->get('msgformurl') );

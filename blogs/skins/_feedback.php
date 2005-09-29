@@ -166,7 +166,7 @@
 				<fieldset>
 					<div class="label"><?php echo T_('User') ?>:</div>
 					<div class="info">
-						<strong><?php $current_User->prefered_name()?></strong>
+						<strong><?php $current_User->preferred_name()?></strong>
 						<?php user_profile_link( ' [', ']', T_('Edit profile') ) ?>
 						</div>
 				</fieldset>

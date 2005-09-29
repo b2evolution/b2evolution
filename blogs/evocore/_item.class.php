@@ -550,7 +550,7 @@ class Item extends DataObject
 		if( isset($this->assigned_User) )
 		{
 			echo $before;
-			$this->assigned_User->prefered_name( $format );
+			$this->assigned_User->preferred_name( $format );
 			echo $after;
 		}
 	}
@@ -2135,7 +2135,7 @@ class Item extends DataObject
 			echo '<h3>', T_('Notifying subscribed users...'), "</h3>\n";
 		}
 
-		$mail_from = '"'.$this->Author->get('preferedname').'" <'.$this->Author->get('email').'>';
+		$mail_from = '"'.$this->Author->get('preferredname').'" <'.$this->Author->get('email').'>';
 
 		$Blog = & $this->getBlog();
 
@@ -2149,7 +2149,7 @@ class Item extends DataObject
 			$notify_message  = T_('Blog').': '.$Blog->get('shortname')
 												.' ( '.str_replace('&amp;', '&', $Blog->get('blogurl'))." )\n";
 
-			$notify_message .= T_('Author').': '.$this->Author->get('preferedname').' ('.$this->Author->get('login').")\n";
+			$notify_message .= T_('Author').': '.$this->Author->get('preferredname').' ('.$this->Author->get('login').")\n";
 
 			$notify_message .= T_('Title').': '.$this->get('title')."\n";
 
@@ -2221,6 +2221,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.56  2005/09/29 15:07:30  fplanque
+ * spelling
+ *
  * Revision 1.55  2005/09/25 03:50:45  blueyed
  * Hit class: Fixes, normalized; moved $doubleCheckReferers to $Settings ("feature" admin tab)
  *

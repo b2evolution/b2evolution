@@ -119,7 +119,7 @@ function upgrade_b2evo_tables()
 {
 	global $EvoConfig;
 	global $baseurl, $old_db_version, $new_db_version;
-	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
+	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
 	global $locales, $default_locale;
 	global $DB;
 	global $admin_url;

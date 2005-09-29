@@ -983,7 +983,7 @@ function bloggergetrecentposts( $m )
 		$content .= '<category>'.$Item->main_cat_ID.'</category>';
 		$content .= $Item->content;
 
-		$authorname = $Item->Author->get('preferedname');
+		$authorname = $Item->Author->get('preferredname');
 
 		$data[] = new xmlrpcval(array(
 									"authorName" => new xmlrpcval($authorname),
@@ -2430,7 +2430,7 @@ function metawebloggetrecentposts( $m )
 
 
 
-		$authorname = $Item->Author->get('preferedname');
+		$authorname = $Item->Author->get('preferredname');
 
 
 

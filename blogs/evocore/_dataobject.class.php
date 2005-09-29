@@ -257,7 +257,7 @@ class DataObject
 
 		if( ! $DB->query( $sql, 'DataObject::dbinsert()' ) )
 		{
-			return false;
+			return false; 
 		}
 
 		// store ID for newly created db record
@@ -559,7 +559,7 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 	{
 		$User = & $UserCache->get_by_ID( $pos_lastedit_user_ID );
 
-		$modified = sprintf( T_('Last modified on %s by %s'), mysql2localedate( $pos_datemodified ), $User->dget('preferedname') );
+		$modified = sprintf( T_('Last modified on %s by %s'), mysql2localedate( $pos_datemodified ), $User->dget('preferredname') );
 
 		return '<img src="img/clock.png" width="17" height="17" class="middle" alt="'.$modified.'" title="'.$modified.'" /> ';
 	}
@@ -568,6 +568,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.24  2005/09/29 15:07:30  fplanque
+ * spelling
+ *
  * Revision 1.23  2005/09/26 23:09:10  blueyed
  * Use $EvoConfig->DB for $DB parameters.
  *

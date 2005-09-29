@@ -38,7 +38,7 @@ $recipient_address = '';
 if( !empty( $recipient_id ) )
 { // Get the email address for the recipient if a member.
 	$user = & $UserCache->get_by_ID( $recipient_id );
-	$recipient_address = trim($user->get('preferedname')) . ' <' . $user->get('email') . '>';
+	$recipient_address = trim($user->get('preferredname')) . ' <' . $user->get('email') . '>';
 	// $recipient_address = $user->get('email');
 	// Change the locale so the email is in the recipients language
 	locale_temp_switch($user->locale);

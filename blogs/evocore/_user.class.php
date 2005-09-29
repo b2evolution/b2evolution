@@ -203,8 +203,8 @@ class User extends DataObject
 			case 'fullname':
 				return $this->firstname.' '.$this->lastname;
 
-			case 'preferedname':
-				return $this->get_prefered_name();
+			case 'preferredname':
+				return $this->get_preferred_name();
 
 			case 'num_posts':
 				return $this->get_num_posts();
@@ -217,11 +217,11 @@ class User extends DataObject
 
 
 	/**
-	 * Get prefered name for the user.
+	 * Get preferred name for the user.
 	 *
 	 * @return string
 	 */
-	function get_prefered_name()
+	function get_preferred_name()
 	{
 		switch( $this->idmode )
 		{
@@ -603,7 +603,7 @@ class User extends DataObject
 		// Transform registered user comments to unregistered:
 		$ret = $DB->query( 'UPDATE T_comments
 												SET comment_author_ID = NULL,
-														comment_author = '.$DB->quote( $this->get('preferedname') ).',
+														comment_author = '.$DB->quote( $this->get('preferredname') ).',
 														comment_author_email = '.$DB->quote( $this->get('email') ).',
 														comment_author_url = '.$DB->quote( $this->get('url') ).'
 												WHERE comment_author_ID = '.$this->ID );
@@ -758,35 +758,35 @@ class User extends DataObject
 
 
 	/**
-	 * Template function: display user's prefered name
+	 * Template function: display user's preferred name
 	 *
-	 * {@internal User::prefered_name(-) }}
+	 * {@internal User::preferred_name(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function prefered_name( $format = 'htmlbody', $disp = true )
+	function preferred_name( $format = 'htmlbody', $disp = true )
 	{
 		if( $disp )
 		{
-			$this->disp( 'preferedname', $format );
+			$this->disp( 'preferredname', $format );
 		}
 		else
 		{
-			return $this->dget( 'preferedname', $format );
+			return $this->dget( 'preferredname', $format );
 		}
 	}
 
 
 	/**
-	 * Return user's prefered name
+	 * Return user's preferred name
 	 *
-	 * {@internal User::prefered_name(-) }}
+	 * {@internal User::preferred_name(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function prefered_name_return( $format = 'htmlbody' )
+	function preferred_name_return( $format = 'htmlbody' )
 	{
-		return $this->prefered_name( $format, false );
+		return $this->preferred_name( $format, false );
 	}
 
 
@@ -898,6 +898,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2005/09/29 15:07:30  fplanque
+ * spelling
+ *
  * Revision 1.42  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

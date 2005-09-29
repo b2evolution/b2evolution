@@ -426,7 +426,7 @@ class DB
 			// If there is an error then take note of it
 			echo '<div class="error">';
 			echo '<p class="error">MySQL error!</p>';
-			echo '<div style="padding:1ex">'.$this->last_error.'</div>';
+			echo '<p>'.$this->last_error.'</p>';
 			if( !empty($this->last_query) ) echo '<p class="error">Your query: '.$query_title.'<br /><pre>'.htmlspecialchars( str_replace("\t", '  ', $this->last_query) ).'</pre></p>';
 
 			if( $this->debug_dump_function_trace_for_errors )
@@ -1208,6 +1208,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.32  2005/09/29 15:07:30  fplanque
+ * spelling
+ *
  * Revision 1.31  2005/09/26 23:09:10  blueyed
  * Use $EvoConfig->DB for $DB parameters.
  *

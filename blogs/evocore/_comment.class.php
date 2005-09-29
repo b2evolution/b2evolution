@@ -174,7 +174,7 @@ class Comment extends DataObject
 		{ // Author is a user
 			if( $after_user == '#' ) $after_user = ' ['.T_('Member').']';
 			echo $before_user;
-			$this->author_User->prefered_name( $format );
+			$this->author_User->preferred_name( $format );
 			echo $after_user;
 		}
 		else
@@ -543,7 +543,7 @@ class Comment extends DataObject
 		 */
 		if( !is_null( $this->author_User ) )
 		{ // Comment from a registered user:
-			$mail_from = '"'.$this->author_User->get('preferedname').'" <'.$this->author_User->get('email').'>';
+			$mail_from = '"'.$this->author_User->get('preferredname').'" <'.$this->author_User->get('email').'>';
 		}
 		elseif( empty( $email ) )
 		{
@@ -591,7 +591,7 @@ class Comment extends DataObject
 				default:
 					if( !is_null( $this->author_User ) )
 					{ // Comment from a registered user:
-						$notify_message .= T_('Author').': '.$this->author_User->get('preferedname').' ('.$this->author_User->get('login').")\n";
+						$notify_message .= T_('Author').': '.$this->author_User->get('preferredname').' ('.$this->author_User->get('login').")\n";
 					}
 					else
 					{ // Comment from visitor:
@@ -630,6 +630,9 @@ class Comment extends DataObject
 }
 /*
  * $Log$
+ * Revision 1.15  2005/09/29 15:07:30  fplanque
+ * spelling
+ *
  * Revision 1.14  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

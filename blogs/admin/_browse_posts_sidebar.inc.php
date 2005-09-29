@@ -175,7 +175,7 @@ echo '<div class="browse_side_item">';
 				echo '<li><input type="radio" name="author" value="'.$loop_Obj->ID.'" class="radio"';
 				if( $loop_Obj->ID == $author ) echo ' checked="checked"';
 				echo '> <a href="'.regenerate_url( 'author', 'author='.$loop_Obj->ID, $pagenow ).'">';
-				$loop_Obj->prefered_name();
+				$loop_Obj->preferred_name();
 				echo '</a></li>';
 			}
 			echo '</ul>';
@@ -192,6 +192,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.16  2005/09/29 15:07:29  fplanque
+ * spelling
+ *
  * Revision 1.15  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
  *

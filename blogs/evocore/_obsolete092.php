@@ -642,7 +642,7 @@ function the_time($d='', $echo = 1, $useGM = 0)
 /**
  * the_author(-)
  *
- * @deprecated deprecated by {@link User::prefered_name()}
+ * @deprecated deprecated by {@link User::preferred_name()}
  */
 function the_author( $format = 'htmlbody' )
 {
@@ -1625,6 +1625,9 @@ $fileupload_allowedusers = '';
 
 /*
  * $Log$
+ * Revision 1.17  2005/09/29 15:07:30  fplanque
+ * spelling
+ *
  * Revision 1.16  2005/09/26 23:09:10  blueyed
  * Use $EvoConfig->DB for $DB parameters.
  *

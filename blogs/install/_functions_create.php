@@ -345,7 +345,7 @@ function create_locales()
  */
 function create_groups()
 {
-	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
+	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
 	global $DB;
 
 	echo 'Creating table for Groups... ';
@@ -379,17 +379,17 @@ function create_groups()
 	$Group_Admins->set( 'perm_users', 'edit' );
 	$Group_Admins->dbinsert();
 
-	$Group_Priviledged = new Group(); // COPY !
-	$Group_Priviledged->set( 'name', 'Priviledged Bloggers' );
-	$Group_Priviledged->set( 'perm_admin', 'visible' );
-	$Group_Priviledged->set( 'perm_blogs', 'viewall' );
-	$Group_Priviledged->set( 'perm_stats', 'view' );
-	$Group_Priviledged->set( 'perm_spamblacklist', 'edit' );
-	$Group_Priviledged->set( 'perm_files', 'add' );
-	$Group_Priviledged->set( 'perm_options', 'view' );
-	$Group_Priviledged->set( 'perm_templates', 0 );
-	$Group_Priviledged->set( 'perm_users', 'view' );
-	$Group_Priviledged->dbinsert();
+	$Group_Privileged = new Group(); // COPY !
+	$Group_Privileged->set( 'name', 'Privileged Bloggers' );
+	$Group_Privileged->set( 'perm_admin', 'visible' );
+	$Group_Privileged->set( 'perm_blogs', 'viewall' );
+	$Group_Privileged->set( 'perm_stats', 'view' );
+	$Group_Privileged->set( 'perm_spamblacklist', 'edit' );
+	$Group_Privileged->set( 'perm_files', 'add' );
+	$Group_Privileged->set( 'perm_options', 'view' );
+	$Group_Privileged->set( 'perm_templates', 0 );
+	$Group_Privileged->set( 'perm_users', 'view' );
+	$Group_Privileged->dbinsert();
 
 	$Group_Bloggers = new Group(); // COPY !
 	$Group_Bloggers->set( 'name', 'Bloggers' );
@@ -812,7 +812,7 @@ function populate_main_tables()
 	global $baseurl, $new_db_version;
 	global $random_password, $query;
 	global $timestamp, $admin_email;
-	global $Group_Admins, $Group_Priviledged, $Group_Bloggers, $Group_Users;
+	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
 	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
 	global $cat_ann_a, $cat_news, $cat_bg, $cat_ann_b, $cat_fun, $cat_life, $cat_web, $cat_sports, $cat_movies, $cat_music, $cat_b2evo, $cat_linkblog_b2evo, $cat_linkblog_contrib;
 	global $DB;
