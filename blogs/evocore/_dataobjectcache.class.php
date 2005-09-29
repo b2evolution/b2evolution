@@ -59,7 +59,9 @@ class DataObjectCache
 	var $cache = array();
 	var $load_add = false;
 	var $all_loaded = false;
+	var $name_field;
 	/**#@-*/
+
 
 	/**
 	 * Constructor
@@ -72,13 +74,14 @@ class DataObjectCache
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID' )
+	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL )
 	{
 		$this->objtype = $objtype;
 		$this->load_all = $load_all;
 		$this->dbtablename = $tablename;
 		$this->dbprefix = $prefix;
 		$this->dbIDname = $dbIDname;
+		$this->name_field = $name_field;
 	}
 
 
@@ -170,12 +173,23 @@ class DataObjectCache
 	 */
 	function add( & $Obj )
 	{
-		if( !empty($Obj->ID) && !isset($this->cache[$Obj->ID]) )
-		{	// If the object is valid and not already cached:
-			$this->cache[$Obj->ID] = & $Obj;
-			return true;
+		global $Debuglog;
+		
+		if( empty($Obj->ID) )
+		{
+			$Debuglog->add( 'No object to add!', 'dataobjects' );
+			return false;	
 		}
-		return false;
+		
+		if( isset($this->cache[$Obj->ID]) )
+		{
+			$Debuglog->add( 'Object is already cached', 'dataobjects' );
+			return false;	
+		}
+		
+		// If the object is valid and not already cached:
+		$this->cache[$Obj->ID] = & $Obj;
+		return true;
 	}
 
 
@@ -228,8 +242,7 @@ class DataObjectCache
 		if( empty($req_ID) )
 		{
 			if($halt_on_empty) die( "Requested $this->objtype from $this->dbtablename without ID!" );
-			$r = NULL;
-			return $r;
+			return NULL;
 		}
 
 		if( !empty( $this->cache[ $req_ID ] ) )
@@ -274,6 +287,64 @@ class DataObjectCache
 		}
 
 		return $this->cache[ $req_ID ];
+	}
+
+
+	/**
+	 * Get an object from cache by name
+	 *
+	 * Load the cache if necessary (all at once if allowed).
+	 *
+	 * @param integer ID of object to load
+	 * @param boolean true if function should die on error
+	 * @param boolean true if function should die on empty/null
+	 * @return reference on cached object
+	 */
+	function & get_by_name( $req_name, $halt_on_error = true, $halt_on_empty = true )
+	{
+		global $DB, $Debuglog;
+
+		if( empty( $this->name_field ) )
+		{
+			die( 'DataObjectCache::get_by_name() : No name field to query on' );
+		}
+
+		if( empty($req_name) )
+		{
+			if($halt_on_empty) die( "Requested $this->objtype from $this->dbtablename without name!" );
+			return NULL;
+		}
+
+		// Load just the requested object:
+		$Debuglog->add( "Loading <strong>$this->objtype($req_name)</strong>", 'dataobjects' );
+		$sql = "SELECT * 
+						  FROM $this->dbtablename 
+						 WHERE $this->name_field = ".$DB->quote($req_name);
+
+		if( $row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_name()' ) )
+		{
+			$resolved_ID = $row->{$this->dbIDname};
+			$Debuglog->add( 'success; ID = '.$resolved_ID, 'dataobjects' );
+			if( ! isset( $this->cache[$resolved_ID] ) )
+			{	// Object is not already in cache:
+				$Debuglog->add( 'Adding to cache...', 'dataobjects' );
+				$Obj = new $this->objtype( $row ); // COPY !!
+				if( ! $this->add( $Obj ) )
+				{	// could not add
+					$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
+				}
+			}
+			return $this->cache[$resolved_ID];
+		}
+		else
+		{
+			$Debuglog->add( 'Could not get DataObject by name.', 'dataobjects' );
+			if( $halt_on_error )
+			{
+				die( "Requested $this->objtype does not exist!" );
+			}
+			return NULL;
+		}
 	}
 
 
@@ -353,6 +424,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.24  2005/09/29 15:26:15  fplanque
+ * added get_by_name()
+ *
  * Revision 1.23  2005/09/18 01:46:55  blueyed
  * Fixed E_NOTICE for return by reference (PHP 4.4.0)
  *
