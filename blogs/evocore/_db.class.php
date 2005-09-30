@@ -312,7 +312,7 @@ class DB
 	{
 		if( !@mysql_select_db($db, $this->dbhandle) )
 		{
-			$this->print_error( '<strong>Error selecting database ['.$db.']!</strong>
+			$this->print_error( '<p><strong>Error selecting database ['.$db.']!</strong></p>
 				<ol>
 					<li>Are you sure the database exists?</li>
 					<li>Are you sure there is a valid database connection?</li>
@@ -411,7 +411,7 @@ class DB
 		$this->error = true;
 
 		// If no special error string then use mysql default..
-		$this->last_error = empty($str) ? ( mysql_error().'(Errno='.mysql_errno().')' ) : $str;
+		$this->last_error = empty($str) ? ( '<p>'.mysql_error().'(Errno='.mysql_errno().')</p>' ) : $str;
 
 		// Log this error to the global array..
 		$EZSQL_ERROR[] = array
@@ -426,7 +426,7 @@ class DB
 			// If there is an error then take note of it
 			echo '<div class="error">';
 			echo '<p class="error">MySQL error!</p>';
-			echo '<p>'.$this->last_error.'</p>';
+			echo '<div>'.$this->last_error.'</div>';
 			if( !empty($this->last_query) ) echo '<p class="error">Your query: '.$query_title.'<br /><pre>'.htmlspecialchars( str_replace("\t", '  ', $this->last_query) ).'</pre></p>';
 
 			if( $this->debug_dump_function_trace_for_errors )
@@ -704,7 +704,7 @@ class DB
 		// If invalid output type was specified..
 		else
 		{
-			$this->print_error(" \$db->get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N");
+			$this->print_error('<p>DB::get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N</p>');
 		}
 	}
 
@@ -1208,6 +1208,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.33  2005/09/30 18:48:54  fplanque
+ * xhtml validity
+ *
  * Revision 1.32  2005/09/29 15:07:30  fplanque
  * spelling
  *
