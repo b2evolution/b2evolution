@@ -34,8 +34,8 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // query which groups have users (in order to prevent deletion of groups which have users)
-$usedgroups = $DB->get_col( 'SELECT grp_ID FROM T_groups, T_users
-															WHERE user_grp_ID = grp_ID
+$usedgroups = $DB->get_col( 'SELECT grp_ID 
+															 FROM T_groups INNER JOIN T_users ON user_grp_ID = grp_ID
 															GROUP BY grp_ID');
 
 // get the userlist
@@ -61,7 +61,7 @@ $Results = & new Results( $sql, 'cont_', '-A' );
 $Results->title = T_('Groups &amp; Users');
 
 $Results->group_by = 'grp_ID';
-$Results->ID_col = 'ID';
+$Results->ID_col = 'user_ID';
 
 /*
  * Group columns:
@@ -101,14 +101,14 @@ $Results->cols[] = array(
 						'th' => T_('ID'),
 						'th_start' => '<th class="firstcol shrinkwrap">',
 						'td_start' => '<td class="firstcol shrinkwrap">',
-						'order' => 'ID',
-						'td' => '$ID$',
+						'order' => 'user_ID',
+						'td' => '$user_ID$',
 					);
 
 $Results->cols[] = array(
 						'th' => T_('Login'),
 						'order' => 'user_login',
-						'td' => '<a href="b2users.php?user_ID=$ID$">$user_login$</a>',
+						'td' => '<a href="b2users.php?user_ID=$user_ID$">$user_login$</a>',
 					);
 
 $Results->cols[] = array(
@@ -154,20 +154,20 @@ else
 						'order' => 'user_level',
 						'td' => '¤conditional( (#user_level# > 0), \''
 											.action_icon( TS_('Decrease user level'), 'arrow_down',
-												'%regenerate_url( \'action\', \'action=promote&amp;prom=down&amp;id=$ID$\' )%' ).'\' )¤'
+												'%regenerate_url( \'action\', \'action=promote&amp;prom=down&amp;id=$user_ID$\' )%' ).'\' )¤'
 										.'$user_level$ '
 										.'¤conditional( (#user_level# < 10), \''
 											.action_icon( TS_('Increase user level'), 'arrow_up',
-												'%regenerate_url( \'action\', \'action=promote&amp;prom=up&amp;id=$ID$\' )%' ).'\' )¤',
+												'%regenerate_url( \'action\', \'action=promote&amp;prom=up&amp;id=$user_ID$\' )%' ).'\' )¤',
 					);
 
 
 	$Results->cols[] = array(
 						'th' => T_('Actions'),
-						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'action\', \'user_ID=$ID$\' )%' )
-										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'action\', \'action=new_user&amp;user_ID=$ID$\' )%' )
-										.'¤conditional( (#ID# != 1) && (#ID# != '.$current_User->ID.'), \''
-											.action_icon( T_('Delete this user!'), 'delete', '%regenerate_url( \'action\', \'action=delete_user&amp;user_ID=$ID$\' )%' ).'\' )¤'
+						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'action\', \'user_ID=$user_ID$\' )%' )
+										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'action\', \'action=new_user&amp;user_ID=$user_ID$\' )%' )
+										.'¤conditional( (#user_ID# != 1) && (#user_ID# != '.$current_User->ID.'), \''
+											.action_icon( T_('Delete this user!'), 'delete', '%regenerate_url( \'action\', \'action=delete_user&amp;user_ID=$user_ID$\' )%' ).'\' )¤'
 
 					);
 }
@@ -184,6 +184,10 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.49  2005/10/03 17:26:43  fplanque
+ * synched upgrade with fresh DB;
+ * renamed user_ID field
+ *
  * Revision 1.48  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
  *

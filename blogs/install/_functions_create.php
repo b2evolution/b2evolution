@@ -78,13 +78,13 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Users... ';
 	$query = "CREATE TABLE T_users (
-		ID int(11) unsigned NOT NULL auto_increment,
+		user_ID int(11) unsigned NOT NULL auto_increment,
 		user_login varchar(20) NOT NULL,
 		user_pass CHAR(32) NOT NULL,
 		user_firstname varchar(50) NOT NULL,
 		user_lastname varchar(50) NOT NULL,
 		user_nickname varchar(50) NOT NULL,
-		user_icq int(11) unsigned DEFAULT '0' NOT NULL,
+		user_icq int(11) unsigned DEFAULT 0 NOT NULL,
 		user_email varchar(100) NOT NULL,
 		user_url varchar(100) NOT NULL,
 		user_ip varchar(15) NOT NULL,
@@ -339,7 +339,6 @@ function create_groups()
 		grp_perm_users enum('none','view','edit') NOT NULL default 'none',
 		grp_perm_templates TINYINT NOT NULL DEFAULT 0,
 		grp_perm_files enum('none','view','add','edit') NOT NULL default 'none',
-		grp_perm_upload TINYINT NOT NULL DEFAULT 0,
 		PRIMARY KEY grp_ID (grp_ID)
 	)";
 	$DB->query( $query );
@@ -1115,7 +1114,7 @@ function create_b2evo_relations()
 	$DB->query( 'alter table T_coll_user_perms
 								add constraint FK_bloguser_user_ID
 											foreign key (bloguser_user_ID)
-											references T_users (ID)
+											references T_users (user_ID)
 											on delete restrict
 											on update restrict' );
 
@@ -1153,17 +1152,17 @@ function create_b2evo_relations()
 	$DB->query( 'alter table T_posts
 								add constraint FK_post_assigned_user_ID
 											foreign key (post_assigned_user_ID)
-											references T_users (ID)
+											references T_users (user_ID)
 											on delete restrict
 											on update restrict,
 								add constraint FK_post_lastedit_user_ID
 											foreign key (post_lastedit_user_ID)
-      								references T_users (ID)
+      								references T_users (user_ID)
       								on delete restrict
       								on update restrict,
       					add constraint FK_post_creator_user_ID
 											foreign key (post_creator_user_ID)
-											references T_users (ID)
+											references T_users (user_ID)
 											on delete restrict
 											on update restrict,
 								add constraint FK_post_main_cat_ID
@@ -1190,13 +1189,13 @@ function create_b2evo_relations()
 	$DB->query( 'alter table T_links
 								add constraint FK_link_creator_user_ID
 											foreign key (link_creator_user_ID)
-	 										references T_users (ID)
+	 										references T_users (user_ID)
 											on delete restrict on
 											update restrict' );
 	$DB->query( 'alter table T_links
 								add constraint FK_link_lastedit_user_ID
 											foreign key (link_lastedit_user_ID)
-											references T_users (ID)
+											references T_users (user_ID)
 											on delete restrict
 											on update restrict' );
 	$DB->query( 'alter table T_links
@@ -1228,7 +1227,7 @@ function create_b2evo_relations()
 	$DB->query( 'alter table T_usersettings
 								add constraint FK_uset_user_ID
 											foreign key (uset_user_ID)
-											references T_users (ID)
+											references T_users (user_ID)
 											on delete restrict
 											on update restrict' );
 
@@ -1242,7 +1241,7 @@ function create_b2evo_relations()
 	$DB->query( 'alter table T_subscriptions
 								add constraint FK_sub_user_ID
 											foreign key (sub_user_ID)
-											references T_users (ID)
+											references T_users (user_ID)
 											on delete restrict
 											on update restrict' );
 
@@ -1267,6 +1266,10 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.144  2005/10/03 17:26:44  fplanque
+ * synched upgrade with fresh DB;
+ * renamed user_ID field
+ *
  * Revision 1.143  2005/10/03 16:30:42  fplanque
  * fixed hitlog upgrade because daniel didn't do it :((
  *

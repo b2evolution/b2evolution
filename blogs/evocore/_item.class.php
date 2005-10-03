@@ -2108,7 +2108,7 @@ class Item extends DataObject
 		// Get list of users who want to be notfied:
 		// TODO: also use extra cats/blogs??
 		$sql = 'SELECT DISTINCT user_email, user_locale
-							FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = ID
+							FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
 						WHERE sub_coll_ID = '.$this->blog_ID.'
 							AND sub_items <> 0
 							AND LENGTH(TRIM(user_email)) > 0';
@@ -2221,6 +2221,10 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.57  2005/10/03 17:26:44  fplanque
+ * synched upgrade with fresh DB;
+ * renamed user_ID field
+ *
  * Revision 1.56  2005/09/29 15:07:30  fplanque
  * spelling
  *

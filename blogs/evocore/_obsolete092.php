@@ -159,12 +159,12 @@ function get_userdata( $userid )
 
 	if( empty($cache_userdata[$userid] ) )
 	{ // We do a progressive cache load because there can be many many users!
-		$sql = "SELECT *
+		$sql = 'SELECT *
 						FROM T_users
-						WHERE ID = $userid";
+						WHERE user_ID = '.$userid;
 		if( $myrow = $DB->get_row( $sql, ARRAY_A ) )
 		{
-			$cache_userdata[ $myrow['ID'] ] = $myrow;
+			$cache_userdata[ $myrow['user_ID'] ] = $myrow;
 		}
 	}
 
@@ -1625,6 +1625,10 @@ $fileupload_allowedusers = '';
 
 /*
  * $Log$
+ * Revision 1.18  2005/10/03 17:26:44  fplanque
+ * synched upgrade with fresh DB;
+ * renamed user_ID field
+ *
  * Revision 1.17  2005/09/29 15:07:30  fplanque
  * spelling
  *

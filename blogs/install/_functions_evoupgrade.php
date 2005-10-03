@@ -507,29 +507,34 @@ function upgrade_b2evo_tables()
 
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
-							MODIFY COLUMN blog_ID int unsigned NOT NULL auto_increment,
+							MODIFY COLUMN blog_ID int(11) unsigned NOT NULL auto_increment,
 							MODIFY COLUMN blog_links_blog_ID INT(11) NULL DEFAULT NULL,
-							ADD blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
-							ADD blog_media_location ENUM( 'default', 'subdir', 'custom' ) DEFAULT 'default' NOT NULL AFTER blog_commentsexpire,
-							ADD blog_media_subdir VARCHAR( 255 ) NOT NULL AFTER blog_media_location,
-							ADD blog_media_fullpath VARCHAR( 255 ) NOT NULL AFTER blog_media_subdir,
-							ADD blog_media_url VARCHAR(255) NOT NULL AFTER blog_media_fullpath,
 							CHANGE COLUMN blog_stub blog_urlname VARCHAR(255) NOT NULL DEFAULT 'urlname',
-							ADD blog_stub VARCHAR(255) NOT NULL DEFAULT 'stub' AFTER blog_urlname,
+							ADD COLUMN blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post' AFTER blog_keywords,
+							ADD COLUMN blog_allowblogcss TINYINT(1) NOT NULL default 1 AFTER blog_allowpingbacks,
+							ADD COLUMN blog_allowusercss TINYINT(1) NOT NULL default 1 AFTER blog_allowblogcss,
+							ADD COLUMN blog_stub VARCHAR(255) NOT NULL DEFAULT 'stub' AFTER blog_staticfilename,
+							ADD COLUMN blog_commentsexpire INT(4) NOT NULL DEFAULT 0 AFTER blog_links_blog_ID,
+							ADD COLUMN blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL AFTER blog_commentsexpire,
+							ADD COLUMN blog_media_subdir VARCHAR( 255 ) NOT NULL AFTER blog_media_location,
+							ADD COLUMN blog_media_fullpath VARCHAR( 255 ) NOT NULL AFTER blog_media_subdir,
+							ADD COLUMN blog_media_url VARCHAR(255) NOT NULL AFTER blog_media_fullpath,
 							DROP INDEX blog_stub,
 							ADD UNIQUE blog_urlname ( blog_urlname )";
 		$DB->query( $query );
 		echo "OK.<br />\n";
-
+		
 		echo 'Copying urlnames to stub names... ';
 		$query = 'UPDATE T_blogs
 							SET blog_stub = blog_urlname';
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
+		
 		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE T_posts
 							DROP COLUMN post_karma,
+							DROP COLUMN post_autobr,
 							DROP INDEX post_author,
 							DROP INDEX post_issue_date,
 							DROP INDEX post_category,
@@ -564,12 +569,16 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
+		
 		echo 'Upgrading users table... ';
 		$query = 'ALTER TABLE T_users
+							CHANGE COLUMN ID user_ID int(11) unsigned NOT NULL auto_increment,
+							MODIFY COLUMN user_icq int(11) unsigned DEFAULT 0 NOT NULL,
 							ADD COLUMN user_showonline tinyint(1) NOT NULL default 1 AFTER user_notify';
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
+		
 		echo 'Setting new defaults... ';
 		$query = 'INSERT INTO T_settings (set_name, set_value)
 							VALUES
@@ -580,13 +589,11 @@ function upgrade_b2evo_tables()
 								( "hit_doublecheck_referer", "'.(isset($doubleCheckReferers) ? (int)$doubleCheckReferers : '0').'" )
 							';
 		$DB->query( $query );
-
 		// Replace "paged" mode with "posts"
 		$DB->query( 'UPDATE T_settings
 										SET set_value = "posts"
 									WHERE set_name = "what_to_show"
 									  AND set_value = "paged"' );
-
 		echo "OK.<br />\n";
 
 
@@ -600,27 +607,19 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
-		echo 'Upgrading blogs table... ';
-		$query = "ALTER TABLE T_blogs
-								MODIFY COLUMN blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL,
-								ADD COLUMN blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post',
-								ADD COLUMN blog_allowblogcss TINYINT(1) NOT NULL default 1,
-								ADD COLUMN blog_allowusercss TINYINT(1) NOT NULL default 1
-								";
-		$DB->query( $query );
-		echo "OK.<br />\n";
-
 		echo 'Altering comments table... ';
 		$DB->query( "ALTER TABLE T_comments
 									MODIFY COLUMN comment_post_ID		int(11) unsigned NOT NULL default '0'" );
 		echo "OK.<br />\n";
 
+		
 		echo 'Altering Posts to Categories table... ';
 		$DB->query( "ALTER TABLE T_postcats
 									MODIFY COLUMN postcat_post_ID int(11) unsigned NOT NULL,
 									MODIFY COLUMN postcat_cat_ID int(11) unsigned NOT NULL" );
 		echo "OK.<br />\n";
 
+		
 		echo 'Altering Categories table... ';
 		$DB->query( "ALTER TABLE T_categories
 									MODIFY COLUMN cat_ID int(11) unsigned NOT NULL auto_increment,
@@ -637,7 +636,7 @@ function upgrade_b2evo_tables()
 
 		echo 'Altering Groups table... ';
 		$DB->query( "ALTER TABLE T_groups
-									ADD COLUMN grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible',
+									ADD COLUMN grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible' AFTER grp_name,
 								  ADD COLUMN grp_perm_files enum('none','view','add','edit') NOT NULL default 'none'" );
 		echo "OK.<br />\n";
 
@@ -668,6 +667,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.106  2005/10/03 17:26:44  fplanque
+ * synched upgrade with fresh DB;
+ * renamed user_ID field
+ *
  * Revision 1.105  2005/10/03 16:30:42  fplanque
  * fixed hitlog upgrade because daniel didn't do it :((
  *

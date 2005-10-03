@@ -69,7 +69,7 @@ class UserCache extends DataObjectCache
 	 */
 	function UserCache()
 	{
-		parent::DataObjectCache( 'User', false, 'T_users', 'user_', 'ID' );
+		parent::DataObjectCache( 'User', false, 'T_users', 'user_', 'user_ID' );
 	}
 
 	/* this is for debugging only:
@@ -183,7 +183,7 @@ class UserCache extends DataObjectCache
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache", 'dataobjects' );
 
 		foreach( $DB->get_results( 'SELECT *
-																	FROM T_users INNER JOIN T_coll_user_perms ON ID = bloguser_user_ID
+																	FROM T_users INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID
 																 WHERE bloguser_blog_ID = '.$blog_ID.'
 																	 AND bloguser_ismember <> 0' ) as $row )
 		{
@@ -253,6 +253,10 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.21  2005/10/03 17:26:44  fplanque
+ * synched upgrade with fresh DB;
+ * renamed user_ID field
+ *
  * Revision 1.20  2005/09/29 15:07:30  fplanque
  * spelling
  *

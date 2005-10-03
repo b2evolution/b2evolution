@@ -175,7 +175,7 @@ else
 			}
 
 			// check if new login already exists for another user_ID
-			$query = "SELECT ID
+			$query = "SELECT user_ID
 									FROM T_users
 								 WHERE user_login = '$edited_user_login'
 								   AND ID != $edited_user_ID";
@@ -298,11 +298,11 @@ else
 			{
 				if( $prom == 'up' )
 				{
-					$sql = "UPDATE T_users SET user_level=user_level+1 WHERE ID = $id";
+					$sql = "UPDATE T_users SET user_level = user_level+1 WHERE user_ID = $id";
 				}
 				elseif( $prom == 'down' )
 				{
-					$sql = "UPDATE T_users SET user_level=user_level-1 WHERE ID = $id";
+					$sql = "UPDATE T_users SET user_level = user_level-1 WHERE user_ID = $id";
 				}
 
 				if( $DB->query( $sql ) )
@@ -554,6 +554,10 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.102  2005/10/03 17:26:43  fplanque
+ * synched upgrade with fresh DB;
+ * renamed user_ID field
+ *
  * Revision 1.101  2005/08/24 10:51:24  blueyed
  * Rollback stupid last commit.
  *

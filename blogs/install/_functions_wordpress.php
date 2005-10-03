@@ -30,7 +30,7 @@ function upgrade_cafelog_tables()
 	create_default_settings();
 
 	echo 'Copying WordPress users... ';
-	$query = "INSERT INTO T_users( ID, user_login, user_pass, user_firstname, user_lastname,
+	$query = "INSERT INTO T_users( user_ID, user_login, user_pass, user_firstname, user_lastname,
 							user_nickname, user_icq, user_email, user_url, user_ip, user_domain, user_browser,
 							dateYMDhour, user_level,	user_aim, user_msn, user_yim, user_idmode )
 						SELECT ID, user_login, user_pass, user_firstname, user_lastname, user_nickname,
@@ -43,7 +43,7 @@ function upgrade_cafelog_tables()
 	echo 'Make sure user #1 is at level 10... ';
 	$query = "UPDATE T_users
 						SET user_level = 10
-						WHERE ID = 1";
+						WHERE user_ID = 1";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 

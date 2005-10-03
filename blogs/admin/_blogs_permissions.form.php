@@ -32,7 +32,7 @@ function list_users( $layout, $query )
 
 	foreach( $DB->get_results( $query, ARRAY_A ) as $lKey => $lrow )
 	{ // Go through users:
-		$displayed[] = $lrow['ID'];
+		$displayed[] = $lrow['user_ID'];
 		switch( $layout )
 		{
 			case 'wide':
@@ -44,86 +44,86 @@ function list_users( $layout, $query )
 				<tr<?php if( $lKey % 2 ) echo ' class="odd"'; ?>>
 					<td><?php echo format_to_output( $lrow['user_login'], 'htmlbody' ); ?></td>
 					<td class="center">
-						<input id="checkallspan_state_<?php echo $lrow['ID'] ?>" type="checkbox" name="blog_ismember_<?php echo $lrow['ID'] ?>"
+						<input id="checkallspan_state_<?php echo $lrow['user_ID'] ?>" type="checkbox" name="blog_ismember_<?php echo $lrow['user_ID'] ?>"
 							<?php if( isset( $lrow['bloguser_ismember'] ) && $lrow['bloguser_ismember'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to read protected posts') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_published_<?php echo $lrow['ID'] ?>"
+						<input type="checkbox" name="blog_perm_published_<?php echo $lrow['user_ID'] ?>"
 							<?php if( in_array( 'published', $perm_post ) ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to post into this blog with private status') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_protected_<?php echo $lrow['ID'] ?>"
+						<input type="checkbox" name="blog_perm_protected_<?php echo $lrow['user_ID'] ?>"
 							<?php if( in_array( 'protected', $perm_post ) ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to post into this blog with protected status') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_private_<?php echo $lrow['ID'] ?>"
+						<input type="checkbox" name="blog_perm_private_<?php echo $lrow['user_ID'] ?>"
 							<?php if( in_array( 'private', $perm_post ) ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to post into this blog with private status') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_draft_<?php echo $lrow['ID'] ?>"
+						<input type="checkbox" name="blog_perm_draft_<?php echo $lrow['user_ID'] ?>"
 							<?php if( in_array( 'draft', $perm_post ) ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to post into this blog with draft status') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_deprecated_<?php echo $lrow['ID'] ?>"
+						<input type="checkbox" name="blog_perm_deprecated_<?php echo $lrow['user_ID'] ?>"
 							<?php if( in_array( 'deprecated', $perm_post ) ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to post into this blog with deprecated status') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_delpost_<?php echo $lrow['ID'] ?>"
+						<input type="checkbox" name="blog_perm_delpost_<?php echo $lrow['user_ID'] ?>"
 							<?php if( isset($lrow['bloguser_perm_delpost']) && $lrow['bloguser_perm_delpost'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to delete posts in this blog') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_comments_<?php echo $lrow['ID'] ?>"
+						<input type="checkbox" name="blog_perm_comments_<?php echo $lrow['user_ID'] ?>"
 							<?php if( isset( $lrow['bloguser_perm_comments'] ) && $lrow['bloguser_perm_comments'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to edit comments in this blog') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_cats_<?php echo $lrow['ID'] ?>"
+						<input type="checkbox" name="blog_perm_cats_<?php echo $lrow['user_ID'] ?>"
 							<?php if( isset( $lrow['bloguser_perm_cats'] ) && $lrow['bloguser_perm_cats'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to edit categories for this blog') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_properties_<?php echo $lrow['ID'] ?>"
+						<input type="checkbox" name="blog_perm_properties_<?php echo $lrow['user_ID'] ?>"
 							<?php if( isset( $lrow['bloguser_perm_properties'] ) && $lrow['bloguser_perm_properties'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to edit blog properties') ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_media_upload_<?php echo $lrow['ID'] ?>"
+						<input type="checkbox" name="blog_perm_media_upload_<?php echo $lrow['user_ID'] ?>"
 							<?php if( isset( $lrow['bloguser_perm_media_upload'] ) && $lrow['bloguser_perm_media_upload'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_("Permission to upload into blog's media folder") ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_media_browse_<?php echo $lrow['ID'] ?>"
+						<input type="checkbox" name="blog_perm_media_browse_<?php echo $lrow['user_ID'] ?>"
 							<?php if( isset( $lrow['bloguser_perm_media_browse'] ) && $lrow['bloguser_perm_media_browse'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_("Permission to browse blog's media folder") ?>" />
 					</td>
 					<td class="center">
-						<input type="checkbox" name="blog_perm_media_change_<?php echo $lrow['ID'] ?>"
+						<input type="checkbox" name="blog_perm_media_change_<?php echo $lrow['user_ID'] ?>"
 							<?php if( isset( $lrow['bloguser_perm_media_change'] ) && $lrow['bloguser_perm_media_change'] != 0  ) { ?> checked="checked" <?php } ?>
-							onclick="merge_from_wide( this, <?php echo $lrow['ID'] ?>);" class="checkbox"
+							onclick="merge_from_wide( this, <?php echo $lrow['user_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_("Permission to change the blog's media folder content") ?>" />
 					</td>
 					<td class="center">
-						<a href="javascript:toggleall_wide(document.FormPerm, <?php echo $lrow['ID'] ?>);merge_from_wide( document.FormPerm, <?php echo $lrow['ID'] ?>); setcheckallspan(<?php echo $lrow['ID'] ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
-							<span id="checkallspan_<?php echo $lrow['ID'] ?>"><?php echo T_('(un)check all')?></span>
+						<a href="javascript:toggleall_wide(document.FormPerm, <?php echo $lrow['user_ID'] ?>);merge_from_wide( document.FormPerm, <?php echo $lrow['user_ID'] ?>); setcheckallspan(<?php echo $lrow['user_ID'] ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
+							<span id="checkallspan_<?php echo $lrow['user_ID'] ?>"><?php echo T_('(un)check all')?></span>
 						</a>
 					</td>
 				</tr>
@@ -153,13 +153,13 @@ function list_users( $layout, $query )
 												) as $lkey => $easy_group )
 						{
 							?>
-							<input type="radio" id="blog_perm_easy_<?php echo $lrow['ID'].'_'.$lkey ?>" name="blog_perm_easy_<?php echo $lrow['ID'] ?>" value="<?php echo $easy_group[0] ?>"<?php
+							<input type="radio" id="blog_perm_easy_<?php echo $lrow['user_ID'].'_'.$lkey ?>" name="blog_perm_easy_<?php echo $lrow['user_ID'] ?>" value="<?php echo $easy_group[0] ?>"<?php
 							if( $easy_group[0] == $user_easy_group )
 							{
 								echo ' checked="checked"';
 							}
-							?> onclick="merge_from_easy( this, <?php echo $lrow['ID'] ?> )" class="radio" />
-							<label for="blog_perm_easy_<?php echo $lrow['ID'].'_'.$lkey ?>"><?php echo $easy_group[1] ?></label>
+							?> onclick="merge_from_easy( this, <?php echo $lrow['user_ID'] ?> )" class="radio" />
+							<label for="blog_perm_easy_<?php echo $lrow['user_ID'].'_'.$lkey ?>"><?php echo $easy_group[1] ?></label>
 							<?php
 						}
 						?>
@@ -241,11 +241,11 @@ $Form->begin_fieldset( T_('User permissions') );
 
 			<?php
 			$members = list_users( 'wide', 
-								'SELECT ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
+								'SELECT user_ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
 													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
 													bloguser_perm_properties, bloguser_perm_media_upload,
 													bloguser_perm_media_browse, bloguser_perm_media_change
-									 FROM T_users INNER JOIN T_coll_user_perms ON ID = bloguser_user_ID
+									 FROM T_users INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID
 									WHERE bloguser_blog_ID = '.$blog.'
 									  AND bloguser_ismember <> 0
 									ORDER BY user_login' );
@@ -258,9 +258,9 @@ $Form->begin_fieldset( T_('User permissions') );
 			</tr>
 
 			<?php
-			list_users( 'wide', 'SELECT ID, user_login
+			list_users( 'wide', 'SELECT user_ID, user_login
 										FROM T_users'
-									.( count( $members ) ? ' WHERE ID NOT IN ('.implode( ',', $members ) .') ' : '' )
+									.( count( $members ) ? ' WHERE user_ID NOT IN ('.implode( ',', $members ) .') ' : '' )
 									.' ORDER BY user_login' );
 			?>
 		</tbody>
@@ -282,11 +282,11 @@ $Form->begin_fieldset( T_('User permissions') );
 		<?php
 
 		$members = list_users( 'default', 
-							'SELECT ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
+							'SELECT user_ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
 												bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
 												bloguser_perm_properties, bloguser_perm_media_upload,
 												bloguser_perm_media_browse, bloguser_perm_media_change
-								 FROM T_users INNER JOIN T_coll_user_perms ON ID = bloguser_user_ID
+								 FROM T_users INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID
 								WHERE bloguser_blog_ID = '.$blog.'
 								  AND bloguser_ismember <> 0
 								ORDER BY user_login' );
@@ -300,9 +300,9 @@ $Form->begin_fieldset( T_('User permissions') );
 		</tr>
 
 		<?php
-		list_users( 'default', 'SELECT ID, user_login
+		list_users( 'default', 'SELECT user_ID, user_login
 									FROM T_users'
-								.( count( $members ) ? ' WHERE ID NOT IN ('.implode( ',', $members ) .') ' : '' )
+								.( count( $members ) ? ' WHERE user_ID NOT IN ('.implode( ',', $members ) .') ' : '' )
 								.' ORDER BY user_login' );
 
 		?>

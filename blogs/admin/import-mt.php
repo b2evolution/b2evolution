@@ -355,7 +355,7 @@ param( 'mode', 'string', 'normal' );
 		<?php if( $mode != 'easy' )	{ ?>
 		<fieldset><legend>Author mapping</legend>
 			<?php
-				$evousers = $DB->get_results('SELECT * FROM T_users ORDER BY ID');
+				$evousers = $DB->get_results('SELECT * FROM T_users ORDER BY user_ID');
 				foreach ($authors as $author)
 				{
 					++$i_user;
@@ -369,7 +369,7 @@ param( 'mode', 'string', 'normal' );
 							<?php
 							foreach( $evousers as $user )
 							{
-								?><option value="<?php echo $user->ID ?>"<?php if( strtolower($author) == strtolower( $user->user_login ) ) echo ' selected="selected"';
+								?><option value="<?php echo $user->user_ID ?>"<?php if( strtolower($author) == strtolower( $user->user_login ) ) echo ' selected="selected"';
 								echo '>'.format_to_output(strtolower($user->user_login), 'formvalue').'</option>';
 							}
 						?></select>

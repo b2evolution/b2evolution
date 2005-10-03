@@ -132,7 +132,7 @@ function blog_update_user_perms( $blog )
 
 	// Now we need a full user list:
 	$inserted_values = array();
-	foreach( $DB->get_col( 'SELECT ID FROM T_users' ) as $loop_user_ID )
+	foreach( $DB->get_col( 'SELECT user_ID FROM T_users' ) as $loop_user_ID )
 	{ // Check new permissions for each user:
 		// echo "getting perms for user : $loop_user_ID <br />";
 
@@ -642,6 +642,10 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.17  2005/10/03 17:26:44  fplanque
+ * synched upgrade with fresh DB;
+ * renamed user_ID field
+ *
  * Revision 1.16  2005/09/07 17:40:22  fplanque
  * enhanced antispam
  *

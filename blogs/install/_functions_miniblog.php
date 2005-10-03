@@ -41,21 +41,21 @@ function upgrade_miniblog_tables()
 		$random_password = $install_password;
 	}
 	// Admins:
-	$query = "INSERT INTO T_users( ID, user_login, user_pass, user_firstname, user_lastname,
+	$query = "INSERT INTO T_users( user_ID, user_login, user_pass, user_firstname, user_lastname,
 							user_nickname, user_email, user_url, user_level, user_locale, user_idmode, user_notify, user_grp_ID )
 						SELECT id, email, '".md5($random_password)."', '', '', name, email, homePage, 10, '$default_locale', 'nickname', 1, $Group_Admins->ID
 						FROM user
 						WHERE role = 'admin'";
 	$DB->query( $query );
 	// Bloggers:
-	$query = "INSERT INTO T_users( ID, user_login, user_pass, user_firstname, user_lastname,
+	$query = "INSERT INTO T_users( user_ID, user_login, user_pass, user_firstname, user_lastname,
 							user_nickname, user_email, user_url, user_level, user_locale, user_idmode, user_notify, user_grp_ID )
 						SELECT id, email, '".md5($random_password)."', '', '', name, email, homePage, 1, '$default_locale', 'nickname', 1, $Group_Bloggers->ID
 						FROM user
 						WHERE role = 'user'";
 	$DB->query( $query );
 	// Regular users:
-	$query = "INSERT INTO T_users( ID, user_login, user_pass, user_firstname, user_lastname,
+	$query = "INSERT INTO T_users( user_ID, user_login, user_pass, user_firstname, user_lastname,
 							user_nickname, user_email, user_url, user_level, user_locale, user_idmode, user_notify, user_grp_ID )
 						SELECT id, email, '".md5($random_password)."', '', '', name, email, homePage, 1, '$default_locale', 'nickname', 1, $Group_Users->ID
 						FROM user
@@ -66,7 +66,7 @@ function upgrade_miniblog_tables()
 	echo 'Make sure user #1 is at level 10... ';
 	$query = 'UPDATE T_users
 						SET user_level = 10
-						WHERE ID = 1';
+						WHERE user_ID = 1';
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
@@ -84,7 +84,7 @@ function upgrade_miniblog_tables()
 	$query = "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 							bloguser_perm_cats, bloguser_perm_properties)
-						SELECT $blog_a_ID, ID, 1, 'published,protected,private,draft', 0, 1, 0, 0
+						SELECT $blog_a_ID, user_ID, 1, 'published,protected,private,draft', 0, 1, 0, 0
 						FROM T_users
 						WHERE user_level > 0 AND user_level < 10";
 	$DB->query( $query );

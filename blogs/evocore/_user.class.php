@@ -104,7 +104,7 @@ class User extends DataObject
 		global $GroupCache, $default_locale, $Settings, $servertimenow;
 
 		// Call parent constructor:
-		parent::DataObject( 'T_users', 'user_' );
+		parent::DataObject( 'T_users', 'user_', 'user_ID' );
 
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_posts', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
@@ -162,7 +162,7 @@ class User extends DataObject
 		else
 		{
 			// echo 'Instanciating existing user';
-			$this->ID = $db_row->ID;
+			$this->ID = $db_row->user_ID;
 			$this->login =$db_row->user_login;
 			$this->pass = $db_row->user_pass;
 			$this->firstname = $db_row->user_firstname;
@@ -248,9 +248,9 @@ class User extends DataObject
 
 		if( is_null( $this->_num_posts ) )
 		{
-			$this->_num_posts = $DB->get_var( "SELECT count(*)
+			$this->_num_posts = $DB->get_var( 'SELECT count(*)
 																				FROM T_posts
-																				WHERE post_creator_user_ID = $this->ID" );
+																				WHERE post_creator_user_ID = '.$this->ID );
 		}
 
 		return $this->_num_posts;
@@ -898,6 +898,10 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2005/10/03 17:26:44  fplanque
+ * synched upgrade with fresh DB;
+ * renamed user_ID field
+ *
  * Revision 1.43  2005/09/29 15:07:30  fplanque
  * spelling
  *
