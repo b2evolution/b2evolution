@@ -174,19 +174,19 @@ class DataObjectCache
 	function add( & $Obj )
 	{
 		global $Debuglog;
-		
+
 		if( empty($Obj->ID) )
 		{
 			$Debuglog->add( 'No object to add!', 'dataobjects' );
-			return false;	
+			return false;
 		}
-		
+
 		if( isset($this->cache[$Obj->ID]) )
 		{
 			$Debuglog->add( 'Object is already cached', 'dataobjects' );
-			return false;	
+			return false;
 		}
-		
+
 		// If the object is valid and not already cached:
 		$this->cache[$Obj->ID] = & $Obj;
 		return true;
@@ -242,7 +242,8 @@ class DataObjectCache
 		if( empty($req_ID) )
 		{
 			if($halt_on_empty) die( "Requested $this->objtype from $this->dbtablename without ID!" );
-			return NULL;
+			$r = NULL;
+			return $r;
 		}
 
 		if( !empty( $this->cache[ $req_ID ] ) )
@@ -283,7 +284,8 @@ class DataObjectCache
 			{
 				die( "Requested $this->objtype does not exist!" );
 			}
-			return false;
+			$r = false;
+			return $r;
 		}
 
 		return $this->cache[ $req_ID ];
@@ -312,13 +314,14 @@ class DataObjectCache
 		if( empty($req_name) )
 		{
 			if($halt_on_empty) die( "Requested $this->objtype from $this->dbtablename without name!" );
-			return NULL;
+			$r = NULL;
+			return $r;
 		}
 
 		// Load just the requested object:
 		$Debuglog->add( "Loading <strong>$this->objtype($req_name)</strong>", 'dataobjects' );
-		$sql = "SELECT * 
-						  FROM $this->dbtablename 
+		$sql = "SELECT *
+						  FROM $this->dbtablename
 						 WHERE $this->name_field = ".$DB->quote($req_name);
 
 		if( $row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_name()' ) )
@@ -343,7 +346,8 @@ class DataObjectCache
 			{
 				die( "Requested $this->objtype does not exist!" );
 			}
-			return NULL;
+			$r = NULL;
+			return $r;
 		}
 	}
 
@@ -424,6 +428,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.25  2005/10/03 22:50:53  blueyed
+ * Fixed E_NOTICE for PHP 4.4.0 and probably 5.1.x (again). Functions that return by reference must not return values!
+ *
  * Revision 1.24  2005/09/29 15:26:15  fplanque
  * added get_by_name()
  *
