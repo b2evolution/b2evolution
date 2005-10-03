@@ -227,6 +227,7 @@ $EvoConfig->DB['use_transactions'] = false;
  * Set this to true if your MySQL supports Foreign keys.
  * Recommended for professional use.
  * Typically requires InnoDB to be set in $EvoConfig->DB['table_options'].
+ * This is used during table CREATION only.
  *
  * @global boolean $db_use_fkeys
  */

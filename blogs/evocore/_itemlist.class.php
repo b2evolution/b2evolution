@@ -412,7 +412,7 @@ class ItemList extends DataObjectList
 				$this->sql .= ' WHERE 0';
 			}
 
-			$this->count_request = 'SELECT COUNT(ID)
+			$this->count_request = 'SELECT COUNT('.$this->dbIDname.')
                                 FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
 																		INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 															'.$where;
@@ -836,6 +836,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.34  2005/10/03 18:10:07  fplanque
+ * renamed post_ID field
+ *
  * Revision 1.33  2005/09/06 19:38:29  fplanque
  * bugfixes
  *

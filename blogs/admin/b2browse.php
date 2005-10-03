@@ -36,7 +36,7 @@ else
 	$objType = 'Item';
 	$dbtable = 'T_posts';
 	$dbprefix = 'post_';
-	$dbIDname = 'ID';
+	$dbIDname = 'post_ID';
 
 	$Request->param( 'tab', 'string', 'postlist', true /* memorize */ );
 

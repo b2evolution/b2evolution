@@ -92,27 +92,27 @@ function upgrade_cafelog_tables()
 
 	echo 'Copying Cafelog posts... ';
 	// Warning: This will copy a lot of categories to 0. We need to fix those later!
-	$query = "INSERT INTO T_posts( ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content,post_title, post_main_cat_ID, post_flags)
+	$query = "INSERT INTO T_posts( post_ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content,post_title, post_main_cat_ID, post_flags)
 						SELECT ID, post_author, post_date, post_date, 'published', '$default_locale', post_content, post_title, post_category, 'pingsdone,imported'
 						FROM $wp_prefix"."posts";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
 	echo 'Generating wordcounts... ';
-	$query = 'SELECT ID, post_content FROM T_posts';
+	$query = 'SELECT post_ID, post_content FROM T_posts';
 	$i = 0;
 	foreach( $DB->get_results( $query, ARRAY_A ) as $row )
 	{
 		$query_update_wordcount = 'UPDATE T_posts'
 															.' SET post_wordcount = '.bpost_count_words($row['post_content'])
-															.' WHERE ID = '.$row['ID'];
+															.' WHERE post_ID = '.$row['post_ID'];
 		$DB->query($query_update_wordcount);
 		$i++;
 	}
 	echo "OK. ($i rows updated)<br />\n";
 
 	echo 'Generating postcats... ';
-	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) SELECT ID, post_main_cat_ID FROM T_posts";
+	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) SELECT post_ID, post_main_cat_ID FROM T_posts";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 

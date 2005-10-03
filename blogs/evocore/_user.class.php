@@ -613,9 +613,9 @@ class User extends DataObject
 		}
 
 		// Get list of posts that are going to be deleted (3.23)
-		$post_list = $DB->get_list( "SELECT ID
+		$post_list = $DB->get_list( 'SELECT post_ID
 																	FROM T_posts
-																	WHERE post_creator_user_ID = $this->ID" );
+																	WHERE post_creator_user_ID = '.$this->ID );
 
 		if( !empty( $post_list ) )
 		{
@@ -898,6 +898,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2005/10/03 18:10:07  fplanque
+ * renamed post_ID field
+ *
  * Revision 1.44  2005/10/03 17:26:44  fplanque
  * synched upgrade with fresh DB;
  * renamed user_ID field

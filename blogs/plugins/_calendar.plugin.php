@@ -76,7 +76,7 @@ class calendar_plugin extends Plugin
 
 		$this->dbtable = 'T_posts';
 		$this->dbprefix = 'post_';
-		$this->dbIDname = 'ID';
+		$this->dbIDname = 'post_ID';
 	}
 
 
@@ -312,7 +312,7 @@ class Calendar
 
 		$this->dbtable = 'T_posts';
 		$this->dbprefix = 'post_';
-		$this->dbIDname = 'ID';
+		$this->dbIDname = 'post_ID';
 
 		// OBJECT THAT WILL BE USED TO CONSTRUCT THE WHERE CLAUSE:
 		$this->ItemQuery = new ItemQuery( $this->dbtable, $this->dbprefix, $this->dbIDname );	// COPY!!
@@ -974,6 +974,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.9  2005/10/03 18:10:08  fplanque
+ * renamed post_ID field
+ *
  * Revision 1.8  2005/09/06 19:38:29  fplanque
  * bugfixes
  *

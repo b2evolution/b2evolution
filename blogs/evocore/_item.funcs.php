@@ -58,7 +58,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @return string validated url title
  */
 function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
-															$dbprefix = 'post_', $dbIDname = 'ID', $dbtable = 'T_posts' )
+															$dbprefix = 'post_', $dbIDname = 'post_ID', $dbtable = 'T_posts' )
 {
 	global $DB;
 
@@ -147,11 +147,11 @@ function get_postdata($postid)
 
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
-	$sql = "SELECT ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content, post_title,
+	$sql = 'SELECT post_ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content, post_title,
 											post_url, post_main_cat_ID, post_flags, post_wordcount, post_comments, post_views, cat_blog_ID
 					FROM T_posts
 					INNER JOIN T_categories ON post_main_cat_ID = cat_ID
-					WHERE ID = $postid";
+					WHERE post_ID = '.$postid;
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
 	// fplanque: 2004-04-04: this should not be needed here. (and is indeed problematic when we want to
@@ -164,7 +164,7 @@ function get_postdata($postid)
 	if( $myrow = $DB->get_row( $sql ) )
 	{
 		$mypostdata = array (
-			'ID' => $myrow->ID,
+			'ID' => $myrow->post_ID,
 			'Author_ID' => $myrow->post_creator_user_ID,
 			'Date' => $myrow->post_datestart,
 			'Status' => $myrow->post_status,
@@ -280,7 +280,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 		}
 
 		$limitprev--;
-		$sql = "SELECT ID,post_title
+		$sql = "SELECT post_ID, post_title
 						FROM T_posts
 						WHERE post_datestart < '$current_post_date'
 							$sqlcat
@@ -291,7 +291,7 @@ function previous_post($format='%', $previous='#', $title='yes', $in_same_cat='n
 		if( $p_info = $DB->get_row( $sql ) )
 		{
 			$p_title = $p_info->post_title;
-			$p_id = $p_info->ID;
+			$p_id = $p_info->post_ID;
 			$string = '<a href="'.url_add_param( get_bloginfo('blogurl'), 'p='.$p_id.'&amp;more=1&amp;c=1').'">'.$previous;
 			if (!($title!='yes')) {
 				$string .= $p_title;
@@ -335,7 +335,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 		$now = date('Y-m-d H:i:s', $localtimenow );
 
 		$limitnext--;
-		$sql = "SELECT ID, post_title
+		$sql = "SELECT post_ID, post_title
 						FROM T_posts
 						WHERE post_datestart > '$current_post_date'
 							AND post_datestart < '$now'
@@ -347,7 +347,7 @@ function next_post($format='%', $next='#', $title='yes', $in_same_cat='no', $lim
 		if( $p_info = $DB->get_row( $sql ) )
 		{
 			$p_title = $p_info->post_title;
-			$p_id = $p_info->ID;
+			$p_id = $p_info->post_ID;
 			$string = '<a href="'.url_add_param( get_bloginfo('blogurl'), 'p='.$p_id.'&amp;more=1&amp;c=1' ).'">'.$next;
 			if ($title=='yes') {
 				$string .= $p_title;
@@ -932,6 +932,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.29  2005/10/03 18:10:07  fplanque
+ * renamed post_ID field
+ *
  * Revision 1.28  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

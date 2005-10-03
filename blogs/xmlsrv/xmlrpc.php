@@ -1273,7 +1273,7 @@ function pingback_ping( $m )
 			elseif (is_string($urltest['fragment']))
 			{ // ...or a string #title, a little more complicated
 				$title = preg_replace('/[^a-zA-Z0-9]/', '.', $urltest['fragment']);
-				$sql = "SELECT ID
+				$sql = "SELECT post_ID
 								FROM T_posts
 								WHERE post_title RLIKE '$title'";
 				$blah = $DB->get_row( $sql, ARRAY_A );
@@ -1281,7 +1281,7 @@ function pingback_ping( $m )
 				{ // DB error
 					return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
 				}
-				$post_ID = $blah['ID'];
+				$post_ID = $blah['post_ID'];
 				$way = 'from the fragment (title)';
 			}
 		}
@@ -1306,7 +1306,7 @@ function pingback_ping( $m )
 		// Check that post exists
 		$sql = 'SELECT post_creator_user_ID
 						FROM T_posts
-						WHERE ID = '.$post_ID;
+						WHERE post_ID = '.$post_ID;
 		$rows = $DB->get_results( $sql );
 		if( !empty($DB->last_error) )
 		{ // DB error

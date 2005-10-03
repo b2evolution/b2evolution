@@ -181,7 +181,7 @@ class Item extends DataObject
 	 * @param string User ID field name
 	 * @param string User ID field name
 	 */
-	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID', $objtype = 'Item',
+	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'Item',
 												$datecreated_field = 'datecreated', $datemodified_field = 'datemodified',
 												$creator_field = 'creator_user_ID', $lasteditor_field = 'lastedit_user_ID' )
 	{
@@ -2221,6 +2221,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.58  2005/10/03 18:10:07  fplanque
+ * renamed post_ID field
+ *
  * Revision 1.57  2005/10/03 17:26:44  fplanque
  * synched upgrade with fresh DB;
  * renamed user_ID field

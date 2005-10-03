@@ -141,9 +141,9 @@ function cat_delete( $cat_ID )
 	$remap_cat_ID = $row->cat_parent_ID;
 	$cat_blog_ID = $row->cat_blog_ID;
 
-	$sql = "SELECT ID
-					FROM T_posts
-					WHERE post_main_cat_ID = $cat_ID";
+	$sql = "SELECT post_ID
+					  FROM T_posts
+					 WHERE post_main_cat_ID = $cat_ID";
 	$IDarray = $DB->get_col( $sql );
 
 	if( ! $remap_cat_ID )
@@ -185,8 +185,8 @@ function cat_delete( $cat_ID )
 		// remap the posts to new category:
 		// Get the list of posts in this category
 		$sql = "UPDATE T_posts
-							SET post_main_cat_ID = $remap_cat_ID
-							WHERE post_main_cat_ID = $cat_ID";
+							 SET post_main_cat_ID = $remap_cat_ID
+						 WHERE post_main_cat_ID = $cat_ID";
 		$DB->query( $sql );
 
 		// Before remapping the extracats we need to get rid of mappings that would become duplicates
@@ -329,7 +329,7 @@ function get_catname($cat_ID)
  * @param string 'none'|'context'|'canonic'
  */
 function cat_load_cache( $cat_load_postcounts = 'none', $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
-													$dbIDname_items = 'ID' )
+													$dbIDname_items = 'post_ID' )
 {
 	global $DB, $cache_categories;
 	global $show_statuses, $timestamp_min, $timestamp_max;
@@ -388,7 +388,7 @@ function cat_load_cache( $cat_load_postcounts = 'none', $dbtable_items = 'T_post
  *
  * @param string 'context'|'canonic'
  */
-function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID' )
+function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'post_ID' )
 {
 	global $DB, $cache_categories;
 	global $blog, $show_statuses, $author;
@@ -630,7 +630,7 @@ function blog_has_cats( $blog_ID )
  * @param string 'none'|'context'|'canonic'
  */
 function cat_query( $load_postcounts = 'none', $dbtable_items = 'T_posts', $dbprefix_items = 'post_',
-										$dbIDname_items = 'ID' )
+										$dbIDname_items = 'post_ID' )
 {
 	// global $cache_categories; // $cache_blogs,
 	global $blog;
@@ -946,6 +946,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.26  2005/10/03 18:10:07  fplanque
+ * renamed post_ID field
+ *
  * Revision 1.25  2005/09/06 19:38:29  fplanque
  * bugfixes
  *

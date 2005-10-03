@@ -538,11 +538,12 @@ function upgrade_b2evo_tables()
 							DROP INDEX post_author,
 							DROP INDEX post_issue_date,
 							DROP INDEX post_category,
+							CHANGE COLUMN ID post_ID int(11) unsigned NOT NULL auto_increment,
 							CHANGE COLUMN post_author	post_creator_user_ID int(11) unsigned NOT NULL,
 							CHANGE COLUMN post_issue_date	post_datestart datetime NOT NULL,
 							CHANGE COLUMN post_mod_date	post_datemodified datetime NOT NULL,
 							CHANGE COLUMN post_category post_main_cat_ID int(11) unsigned NOT NULL,
-							ADD post_parent_ID				int(11) unsigned NULL AFTER ID,
+							ADD post_parent_ID				int(11) unsigned NULL AFTER post_ID,
 							ADD post_lastedit_user_ID	int(11) unsigned NULL AFTER post_creator_user_ID,
 							ADD post_assigned_user_ID	int(11) unsigned NULL AFTER post_lastedit_user_ID,
 							ADD post_datedeadline 		datetime NULL AFTER post_datestart,
@@ -667,6 +668,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.107  2005/10/03 18:10:08  fplanque
+ * renamed post_ID field
+ *
  * Revision 1.106  2005/10/03 17:26:44  fplanque
  * synched upgrade with fresh DB;
  * renamed user_ID field

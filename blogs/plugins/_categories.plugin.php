@@ -67,7 +67,7 @@ class categories_plugin extends Plugin
 
  		$this->dbtable = 'T_posts';
 		$this->dbprefix = 'post_';
-		$this->dbIDname = 'ID';
+		$this->dbIDname = 'post_ID';
 	}
 
 

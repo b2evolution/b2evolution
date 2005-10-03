@@ -29,13 +29,11 @@
  * Fill in your database details (check carefully or nothing will work!)
  */
 $EvoConfig->DB = array(
-	'user'     => 'demouser',     // your MySQL username
-	'password' => 'demopass',     // ...and password
-	'name'     => 'b2evolution',  // the name of the database
-	'host'     => 'localhost',    // MySQL Server (typically 'localhost')
-	#'show_errors' => false,       // Show MySQL errors? (default: true)
-	#'halt_on_error' => false,     // Halt on error? (default: true)
-	);
+	'user'          => 'demouser',     // your MySQL username
+	'password'      => 'demopass',     // ...and password
+	'name'          => 'b2evolution',  // the name of the database
+	'host'          => 'localhost',    // MySQL Server (typically 'localhost')
+);
 
 
 /**

@@ -65,7 +65,7 @@ class ItemCache extends DataObjectCache
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function ItemCache( $objType = 'Item', $dbtablename = 'T_posts', $dbprefix = 'post_', $dbIDname = 'ID' )
+	function ItemCache( $objType = 'Item', $dbtablename = 'T_posts', $dbprefix = 'post_', $dbIDname = 'post_ID' )
 	{
 		parent::DataObjectCache( $objType, false, $dbtablename, $dbprefix, $dbIDname );
 	}
@@ -159,6 +159,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.10  2005/10/03 18:10:07  fplanque
+ * renamed post_ID field
+ *
  * Revision 1.9  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

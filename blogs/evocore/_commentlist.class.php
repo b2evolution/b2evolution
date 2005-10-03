@@ -83,20 +83,20 @@ class CommentList extends DataObjectList
 		if( !empty($posts) )
 			$this->posts_per_page = $posts;
 
-		$this->request = "SELECT DISTINCT T_comments.*
-											FROM ((T_comments INNER JOIN T_posts ON comment_post_ID = ID) ";
+		$this->request = 'SELECT DISTINCT T_comments.*
+											FROM T_comments INNER JOIN T_posts ON comment_post_ID = post_ID ';
 
 		if( !empty( $p ) )
 		{	// Restrict to comments on selected post
-			$this->request .= ") WHERE comment_post_ID = $p AND ";
+			$this->request .= " WHERE comment_post_ID = $p AND ";
 		}
 		elseif( $blog > 1 )
 		{	// Restrict to viewable posts/cats on current blog
-			$this->request .= "INNER JOIN T_postcats ON ID = postcat_post_ID) INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID WHERE othercats.cat_blog_ID = $blog AND ";
+			$this->request .= "INNER JOIN T_postcats ON post_ID = postcat_post_ID INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID WHERE othercats.cat_blog_ID = $blog AND ";
 		}
 		else
 		{	// This is blog 1, we don't care, we can include all comments:
-			$this->request .= ') WHERE ';
+			$this->request .= ' WHERE ';
 		}
 
 		$this->request .= "comment_type IN ($comment_types) ";
@@ -181,6 +181,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.10  2005/10/03 18:10:07  fplanque
+ * renamed post_ID field
+ *
  * Revision 1.9  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

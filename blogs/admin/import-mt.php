@@ -898,7 +898,11 @@ param( 'mode', 'string', 'normal' );
 			}
 
 			// Let's check to see if it's in already
-			if( $post_ID = $DB->get_var("SELECT ID FROM T_posts WHERE post_title = ".$DB->quote($post_title)." AND post_datestart = '$post_date'")) {
+			if( $post_ID = $DB->get_var( "SELECT post_ID 
+																			FROM T_posts 
+																		 WHERE post_title = ".$DB->quote($post_title)." 
+																		   AND post_datestart = '$post_date'")) 
+			{
 				$message .= '<li style="color:blue">Post already imported.</li>';
 			}
 			else

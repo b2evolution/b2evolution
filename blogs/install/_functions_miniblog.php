@@ -95,7 +95,7 @@ function upgrade_miniblog_tables()
 	echo "OK.<br />\n";
 
 	echo 'Copying Miniblog posts... ';
-	$query = "INSERT INTO T_posts( ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content, post_title, post_main_cat_ID, post_flags, post_comments )
+	$query = "INSERT INTO T_posts( post_ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content, post_title, post_main_cat_ID, post_flags, post_comments )
 						SELECT id, authorId, created, modified, 'published', '$default_locale', content, title, $cat_imported, 'pingsdone,imported', 'open'
 						FROM miniblog
 						WHERE parentId = 0";
@@ -103,13 +103,13 @@ function upgrade_miniblog_tables()
 	echo "OK.<br />\n";
 
 	echo 'Generating wordcounts... ';
-	$query = 'SELECT ID, post_content FROM T_posts';
+	$query = 'SELECT post_ID, post_content FROM T_posts';
 	$i = 0;
 	foreach( $DB->get_results( $query, ARRAY_A ) as $row )
 	{
 		$query_update_wordcount = "UPDATE T_posts
 															SET post_wordcount = " . bpost_count_words($row['post_content']) . "
-															WHERE ID = " . $row['ID'];
+															WHERE post_ID = " . $row['post_ID'];
 		$DB->query($query_update_wordcount);
 		$i++;
 	}
@@ -117,7 +117,7 @@ function upgrade_miniblog_tables()
 
 	echo 'Generating postcats... ';
 	$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID )
-						SELECT ID, post_main_cat_ID FROM T_posts";
+						SELECT post_ID, post_main_cat_ID FROM T_posts";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 

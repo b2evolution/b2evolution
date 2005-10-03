@@ -64,9 +64,9 @@ if( empty($recipient_address) )
 // Get the subject of the email
 if( !empty($comment_id) || !empty($post_id) )
 {
-	$sql = "SELECT post_title
+	$sql = 'SELECT post_title
 					FROM T_posts
-					WHERE ID = '$post_id'";
+					WHERE post_ID = '.$post_id;
 	$row = $DB->get_row( $sql );
 	$subject = T_('Re:').' '.$row->post_title;
 }

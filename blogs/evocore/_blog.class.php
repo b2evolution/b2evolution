@@ -621,7 +621,7 @@ class Blog extends DataObject
 				// Delete posts
 				if( $echo ) echo '<br />Deleting blog\'s posts... ';
 				$ret = $DB->query(	"DELETE FROM T_posts
-															WHERE ID  IN ($post_list)" );
+															WHERE post_ID IN ($post_list)" );
 				if( $echo ) printf( '(%d rows)', $ret );
 
 			} // / are there posts?
@@ -725,6 +725,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2005/10/03 18:10:07  fplanque
+ * renamed post_ID field
+ *
  * Revision 1.28  2005/09/09 19:24:54  fplanque
  * documentation
  *

@@ -76,7 +76,7 @@ class archives_plugin extends Plugin
 
 		$this->dbtable = 'T_posts';
 		$this->dbprefix = 'post_';
-		$this->dbIDname = 'ID';
+		$this->dbIDname = 'post_ID';
 	}
 
 
@@ -533,6 +533,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.12  2005/10/03 18:10:08  fplanque
+ * renamed post_ID field
+ *
  * Revision 1.11  2005/09/14 19:23:45  fplanque
  * doc
  *

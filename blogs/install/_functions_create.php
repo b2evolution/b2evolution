@@ -100,7 +100,7 @@ function create_b2evo_tables()
 		user_notify tinyint(1) NOT NULL default 1,
 		user_showonline tinyint(1) NOT NULL default 1,
 		user_grp_ID int(4) NOT NULL default 1,
-		PRIMARY KEY user_ID (ID),
+		PRIMARY KEY user_ID (user_ID),
 		UNIQUE user_login (user_login),
 		KEY user_grp_ID (user_grp_ID)
 	)";
@@ -170,7 +170,7 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Posts... ';
 	$query = "CREATE TABLE T_posts (
-		ID 										int(10) unsigned NOT NULL auto_increment,
+		post_ID								int(11) unsigned NOT NULL auto_increment,
 		post_parent_ID				int(11) unsigned NULL,
 		post_creator_user_ID	int(11) unsigned NOT NULL,
 		post_lastedit_user_ID	int(11) unsigned NULL,
@@ -196,7 +196,7 @@ function create_b2evo_tables()
 		post_commentsexpire 	DATETIME DEFAULT NULL,
 		post_renderers 				VARCHAR(179) NOT NULL default 'default',
 		post_priority					int(11) unsigned null,
-		PRIMARY KEY post_ID( ID ),
+		PRIMARY KEY post_ID( post_ID ),
 		UNIQUE post_urltitle( post_urltitle ),
 		INDEX post_datestart( post_datestart ),
 		INDEX post_main_cat_ID( post_main_cat_ID ),
@@ -1133,7 +1133,7 @@ function create_b2evo_relations()
 	$DB->query( 'alter table T_comments
 								add constraint FK_comment_post_ID
 											foreign key (comment_post_ID)
-											references T_posts (ID)
+											references T_posts (post_ID)
 											on delete restrict
 											on update restrict' );
 
@@ -1145,7 +1145,7 @@ function create_b2evo_relations()
 											on update restrict,
 								add constraint FK_postcat_post_ID
 											foreign key (postcat_post_ID)
-											references T_posts (ID)
+											references T_posts (post_ID)
 											on delete restrict
 											on update restrict' );
 
@@ -1172,7 +1172,7 @@ function create_b2evo_relations()
 											on update restrict,
 								add constraint FK_post_parent_ID
 											foreign key (post_parent_ID)
-											references T_posts (ID)
+											references T_posts (post_ID)
 											on delete restrict
 											on update restrict,
 								add constraint FK_post_pst_ID
@@ -1201,7 +1201,7 @@ function create_b2evo_relations()
 	$DB->query( 'alter table T_links
 								add constraint FK_link_dest_item_ID
 											foreign key (link_dest_item_ID)
-      								references T_posts (ID)
+      								references T_posts (post_ID)
       								on delete restrict
       								on update restrict' );
 	$DB->query( 'alter table T_links
@@ -1213,7 +1213,7 @@ function create_b2evo_relations()
 	$DB->query( 'alter table T_links
 							 	add constraint FK_link_item_ID
 							 				foreign key (link_item_ID)
-								      references T_posts (ID)
+								      references T_posts (post_ID)
 								      on delete restrict
 								      on update restrict' );
 
@@ -1266,6 +1266,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.145  2005/10/03 18:10:08  fplanque
+ * renamed post_ID field
+ *
  * Revision 1.144  2005/10/03 17:26:44  fplanque
  * synched upgrade with fresh DB;
  * renamed user_ID field
