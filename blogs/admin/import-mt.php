@@ -3,53 +3,11 @@
  * This file implements importing of Movable Type entries into b2evolution.
  *
  * {@internal
- * TODO: {{{
+ * TODO:
  *  - Wrap this by an abstract import class!
  *  - list of all posts, editable (overkill?)
- *  - assign comment_author_ID to comments if user exist?! }}}
+ *  - assign comment_author_ID to comments if user exist?! }}
  *
- * CHANGES: {{{
- *  0.9.0.10:
- *   - bugfixes (regarding post parsing, author mapping)
- *   - "convert ugly html" puts quotes around href attributes, if missing
- *   Thanks to Ben Franske (http://ben.franske.com) for reporting and idea
- *  0.9.0.9:
- *   + Simulate the import before performing it for real
- *   + Redesign of output and parsing
- *   - Fixes
- *     - Post status is now compared case insensitive
- *     - Format of imported pings (trackbacks)
- *     - some small ones, for sure.
- *  0.9.0.6:
- *   - Fixes..
- *   - Auto-P more flexible.
- *  0.9.0.5: released with b2evo
- *   - minor UI changes
- *   - fixed mode links
- *   - modes renamed: easy, normal, expert
- *   - modes as tabs, info tab gone
- *  0.4b:
- *   - 3 modes: simple, normal, advanced
- *   - huge rewrite of the whole code
- *   - fixed unnessecary addslashes()!
- *   - comments/trackbacks now get checked for importing, even if the post was already inserted
- *   - fix with comments importing
- *   - more fixes
- *  0.3:
- *   - lots of bugfixes!
- *   - some redesign
- *   - categories can be ignored
- *   - optionally convert ugly html
- *   - security check if user is logged in and member of group #1 (admins)
- *   - dropdown list for all .txt files in the script's directory
- *  0.2:
- *   - fixed comments/trackbacks (still not thoroughly tested) [thanks to chris]
- *   - new user password must be confirmed [thanks to chris]
- *   - we preselect the b2evo default renderers now (especially Auto-P)
- *   - fixed user mapping from select box
- *  0.1:
- *   - first release }}}
- * }}
  *
  * This script was developed and tested with b2evolution 0.9.0.4 (on Sourceforge CVS)
  * and Movable Type 2.64 and 2.661.
@@ -231,6 +189,7 @@ param( 'mode', 'string', 'normal' );
 	param( 'simulate', 'integer', 0 );
 	param( 'default_password', 'string', 'changeme' );
 	param( 'default_password2', 'string', 'changeme' );
+	param( 'post_locale', 'string', $Settings->get( 'default_locale' ) );
 
 	if( $default_password != $default_password2 )
 	{
@@ -429,7 +388,7 @@ param( 'mode', 'string', 'normal' );
 		<fieldset><legend>Post/Entry defaults</legend>
 			<?php
 			form_checkbox( 'default_convert_breaks', $default_convert_breaks, 'Convert-Breaks default', 'will be used for posts with empty CONVERT BREAKS or "__default__"' );
-			form_select( 'default_locale', $Settings->get('default_locale'), 'locale_options', T_('Default locale'), 'Locale for posts.' );
+			form_select( 'post_locale', $Settings->get('default_locale'), 'locale_options', T_('Default locale'), 'Locale for posts.' );
 			form_checkbox( 'convert_html_tags', $convert_html_tags, 'Convert ugly HTML', 'this will lowercase all html tags and add a XHTML compliant closing tag to &lt;br&gt;, &lt;img&gt;, &lt;hr&gt; (you\'ll get notes)' );
 
 			if( $mode != 'easy' )
@@ -785,8 +744,6 @@ param( 'mode', 'string', 'normal' );
 			{
 				debug_dump($line);
 
-				$post_locale = $default_locale;
-
 				if( !preg_match("/^(.*?):(.*)/", $line, $token) )
 				{
 					$message .= "<li class=\"notes\">Unknown meta-data: [$line] (ignoring)</li>";
@@ -898,10 +855,10 @@ param( 'mode', 'string', 'normal' );
 			}
 
 			// Let's check to see if it's in already
-			if( $post_ID = $DB->get_var( "SELECT post_ID 
-																			FROM T_posts 
-																		 WHERE post_title = ".$DB->quote($post_title)." 
-																		   AND post_datestart = '$post_date'")) 
+			if( $post_ID = $DB->get_var( "SELECT post_ID
+																			FROM T_posts
+																		 WHERE post_title = ".$DB->quote($post_title)."
+																		   AND post_datestart = '$post_date'"))
 			{
 				$message .= '<li style="color:blue">Post already imported.</li>';
 			}
