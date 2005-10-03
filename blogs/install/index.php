@@ -357,7 +357,7 @@ switch( $action )
 				<label for="newdb"><?php echo T_('<strong>New Install</strong>: Install b2evolution database tables with sample data.')?></label></p>
 
 			<p><input type="radio" name="action" id="evoupgrade" value="evoupgrade" />
-				<label for="evoupgrade"><?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!')?></label></p>
+				<label for="evoupgrade"><?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup.').' '.T_('<strong>NOTE:</strong> Your stats will be reset.')?></label></p>
 
 			<p><input type="radio" name="action" id="cafelogupgrade" value="cafelogupgrade" />
 				<label for="cafelogupgrade"><?php echo T_('<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them.')?></label></p>

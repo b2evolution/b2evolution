@@ -50,7 +50,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once  dirname(__FILE__).'/'.$core_dirout.$conf_subdir.'_application.php';    // application settings
 
 
-$new_db_version = 8070;				// next time: 8080
+$new_db_version = 9000;				// next time: 9010
 
 
 // Investigation for following code by Isaac - http://isaac.beigetower.org/
@@ -254,6 +254,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.23  2005/10/03 16:30:43  fplanque
+ * fixed hitlog upgrade because daniel didn't do it :((
+ *
  * Revision 1.22  2005/09/28 12:28:19  yabs
  * minor changes
  *

@@ -245,31 +245,10 @@ function create_b2evo_tables()
 	echo "OK.<br />\n";
 
 
-	echo 'Creating table for Hit-Logs... ';
-	$query = "CREATE TABLE T_hitlog (
-							hit_ID             bigint(11) NOT NULL AUTO_INCREMENT,
-							hit_sess_ID        INT UNSIGNED,
-							hit_datetime       DATETIME NOT NULL,
-							hit_uri            VARCHAR(250) DEFAULT NULL,
-							hit_agnt_ID        INT UNSIGNED,
-							hit_referer_type   ENUM('search','blacklist','referer','direct','spam') NOT NULL,
-							hit_referer        VARCHAR(250) DEFAULT NULL,
-							hit_referer_dom_ID INT UNSIGNED DEFAULT NULL,
-							hit_blog_ID        int(11) UNSIGNED NULL DEFAULT NULL,
-							hit_remote_addr    VARCHAR(40) DEFAULT NULL,
-							PRIMARY KEY (hit_ID),
-							INDEX hit_datetime ( hit_datetime ),
-           		INDEX hit_blog_ID (hit_blog_ID)
-						)"; // TODO: more indexes?
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
 	// Additionnal tables:
 	create_antispam();
 	create_locales();
-	create_b2evo_tables_092();
-
+	create_b2evo_tables_phoenix();
 
 	// Create relations:
 	create_b2evo_relations();
@@ -938,9 +917,9 @@ function populate_main_tables()
 
 
 /**
- * Create new tables for version 0.9.2
+ * Create new tables for "Phoenix" version
  */
-function create_b2evo_tables_092()
+function create_b2evo_tables_phoenix()
 {
 	global $DB;
 
@@ -1059,6 +1038,25 @@ function create_b2evo_tables_092()
 	echo "OK.<br />\n";
 
 
+	echo 'Creating table for Hit-Logs... ';
+	$query = "CREATE TABLE T_hitlog (
+							hit_ID             bigint(11) NOT NULL AUTO_INCREMENT,
+							hit_sess_ID        INT UNSIGNED,
+							hit_datetime       DATETIME NOT NULL,
+							hit_uri            VARCHAR(250) DEFAULT NULL,
+							hit_agnt_ID        INT UNSIGNED,
+							hit_referer_type   ENUM('search','blacklist','referer','direct','spam') NOT NULL,
+							hit_referer        VARCHAR(250) DEFAULT NULL,
+							hit_referer_dom_ID INT UNSIGNED DEFAULT NULL,
+							hit_blog_ID        int(11) UNSIGNED NULL DEFAULT NULL,
+							hit_remote_addr    VARCHAR(40) DEFAULT NULL,
+							PRIMARY KEY (hit_ID),
+							INDEX hit_datetime ( hit_datetime ),
+           		INDEX hit_blog_ID (hit_blog_ID)
+						)"; // TODO: more indexes?
+	$DB->query( $query );
+	echo "OK.<br />\n";
+
 
 	echo 'Creating table for subscriptions... ';
 	$DB->query( "CREATE TABLE T_subscriptions (
@@ -1069,6 +1067,7 @@ function create_b2evo_tables_092()
 							   primary key (sub_coll_ID, sub_user_ID) )" );
 	echo "OK.<br />\n";
 
+	
 	echo 'Creating table for blog-group permissions... ';
 	$DB->query( "CREATE TABLE T_coll_group_perms (
 									bloggroup_blog_ID int(11) unsigned NOT NULL default 0,
@@ -1265,4 +1264,11 @@ function install_basic_plugins()
 	$Plugins->install( 'categories_plugin' );
 	echo "OK.<br />\n";
 }
+
+/*
+ * $Log$
+ * Revision 1.143  2005/10/03 16:30:42  fplanque
+ * fixed hitlog upgrade because daniel didn't do it :((
+ *
+ */
 ?>

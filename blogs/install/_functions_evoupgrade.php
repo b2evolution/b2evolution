@@ -495,11 +495,15 @@ function upgrade_b2evo_tables()
 	}
 
 
-	if( $old_db_version < 8070 )
+	if( $old_db_version < 9000 )
 	{ // ---------------------------------- upgrade to 0.9.2 a.k.a 1.6 "phoenix"
 
+		echo 'Dropping old Hitlog table... ';
+		$DB->query( 'DROP TABLE T_hitlog' );
+		echo "OK.<br />\n";
+
 		// New tables:
-		create_b2evo_tables_092();
+		create_b2evo_tables_phoenix();
 
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
@@ -637,8 +641,6 @@ function upgrade_b2evo_tables()
 								  ADD COLUMN grp_perm_files enum('none','view','add','edit') NOT NULL default 'none'" );
 		echo "OK.<br />\n";
 
-		// TODO: alter T_hitlog: fplanque>> or just replace it with new one (that would be acceptable)
-		// waiting for daniel...
 
 		// Create relations:
 		create_b2evo_relations();
@@ -648,7 +650,7 @@ function upgrade_b2evo_tables()
 	}
 
 
-	if( $old_db_version < 8080 )
+	if( $old_db_version < 9010 )
 	{
 		/*
 		 * CONTRIBUTORS: If you need changes and we haven't started a block for next release yet, put them here!
@@ -664,4 +666,10 @@ function upgrade_b2evo_tables()
 }
 
 
+/*
+ * $Log$
+ * Revision 1.105  2005/10/03 16:30:42  fplanque
+ * fixed hitlog upgrade because daniel didn't do it :((
+ *
+ */
 ?>

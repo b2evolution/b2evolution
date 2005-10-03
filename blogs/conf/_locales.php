@@ -249,6 +249,7 @@ $locales = array(
 										'messages' => 'lt_LT',
 										'enabled' => 1,
 									),
+/* Flags don't work
 	'lv-LV' => array( 'name' => NT_('Latvian (LV)'),
 										'charset' => 'utf-8',
 										'datefmt' => 'd.m.y',
@@ -257,6 +258,7 @@ $locales = array(
 										'messages' => 'lv_LV',
 										'enabled' => 1,
 									),
+*/
 	'nb-NO' => array( 'name' => NT_('Bokm&aring;l (NO)'),
 										'charset' => 'iso-8859-1',
 										'datefmt' => 'd.m.y',
