@@ -41,6 +41,30 @@
 
 
 /**
+ * Cross browser event handling for IE5+, NS6+ an Mozilla/Gecko
+ * @author Scott Andrew
+ */
+function addEvent( elm, evType, fn, useCapture )
+{
+	if( elm.addEventListener )
+	{ // Standard & Mozilla way:
+		elm.addEventListener( evType, fn, useCapture );
+		return true;
+	}
+	else if( elm.attachEvent )
+	{ // IE way:
+		var r = elm.attachEvent( 'on'+evType, fn );
+		return r;
+	}
+	else
+	{ // "dirty" way (IE Mac for example):
+		// Will overwrite any previous handler! :((
+		elm['on'+evType] = fn;
+	}
+}
+ 
+
+/**
  * Opens a window and makes sure it gets focus.
  */
 function pop_up_window( href, target, params )

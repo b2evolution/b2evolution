@@ -102,4 +102,4 @@ function mouseout(e)
 /**
  * When the page loads, set up the rollovers
  */
-window.addEventListener( 'load', setupRollovers, false );
+addEvent( window, 'load', setupRollovers, false );
