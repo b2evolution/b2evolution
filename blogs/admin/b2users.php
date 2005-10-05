@@ -178,7 +178,7 @@ else
 			$query = "SELECT user_ID
 									FROM T_users
 								 WHERE user_login = '$edited_user_login'
-								   AND ID != $edited_user_ID";
+								   AND user_ID != $edited_user_ID";
 			if( $q = $DB->get_var( $query ) )
 			{
 				$Request->param_error( 'edited_user_login',
@@ -554,6 +554,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.103  2005/10/05 11:22:48  yabs
+ * minor changes - correcting ID to user_ID
+ *
  * Revision 1.102  2005/10/03 17:26:43  fplanque
  * synched upgrade with fresh DB;
  * renamed user_ID field
