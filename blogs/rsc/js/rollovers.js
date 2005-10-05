@@ -4,7 +4,7 @@
  */
 
 /**
- * Automagically set up rollover even thandlers for all IMGs within links with the rollover class
+ * Automagically set up rollover event handlers for all IMGs within links with the rollover class
  *
  * This is executed once after page load
  *
@@ -31,7 +31,7 @@ function setupRollovers()
 					link.childNodes.length == 1 &&
 					link.childNodes[0].nodeName.toLowerCase() == 'img')
 			{ // There is an image within the link,
-				// Set up event handlers
+				// Set up event handlers:
 				link.onmouseover = mouseover;
 				link.onmouseout = mouseout;
 			}
@@ -101,5 +101,7 @@ function mouseout(e)
 
 /**
  * When the page loads, set up the rollovers
+ *
+ * Note: I fear that this doesn't append and actually overrides other onload handlers?
  */
 window.onload = setupRollovers;

@@ -1133,7 +1133,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 										([a-z][a-z0-9+.\-]*):[0-9]*		# scheme
 										//														# authority absolute URLs only
 										[a-z][a-z0-9~+.\-_,:;/\\\\]* 	# Don t allow anything too funky like entities
-										([?#][a-z][a-z0-9~+.\-_,;%&=#;]*)?
+										([?#][a-z0-9~+.\-_,:;/\\\\%&=#]*)?
 										$¤ix', $url, $matches) )
 	{	// Cannot vaidate URL structure
 		return T_('Invalid URL');
@@ -1874,6 +1874,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.91  2005/10/05 14:22:29  fplanque
+ * no message
+ *
  * Revision 1.90  2005/09/23 18:28:17  fplanque
  * no message
  *
