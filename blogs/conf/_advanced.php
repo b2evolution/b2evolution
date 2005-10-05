@@ -2,7 +2,7 @@
 /**
  * This file includes advanced settings for b2evolution.
  *
- * Last significant changes to this file: version 0.9.1
+ * Last significant changes to this file: version 1.6
  *
  * Please NOTE: You should not comment variables out to prevent
  * URL overrides.

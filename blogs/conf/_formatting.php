@@ -3,7 +3,7 @@
  * This is b2evolution's formatting config file.
  *
  * This file sets how b2evolution will parse and format texts (posts, comments, etc.)
- * Last significant changes to this file: version 0.9.0.6
+ * Last significant changes to this file: version 1.6
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

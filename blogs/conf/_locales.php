@@ -5,7 +5,7 @@
  * This file sets the default configuration for locales.
  * IMPORTANT: Most of these settings can be overriden in the admin (regional settings) and will then
  * be saved to the database. The database settings superseede settings in this file.
- * Last significant changes to this file: version 0.9.0.10
+ * Last significant changes to this file: version 1.6
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

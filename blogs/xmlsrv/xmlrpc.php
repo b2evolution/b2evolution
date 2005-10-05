@@ -12,6 +12,8 @@
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package xmlsrv
+ *
+ * @version $Id$
  */
 
 /**
@@ -1449,13 +1451,13 @@ function pingback_ping( $m )
 }
 
 
+
+
 //---------- Tor Jan 2005 Metaweblog experimental API ----------------
 //
 //---------- NB! This implementation is still rather lax with some of the security
 
-
-
-
+/* fplanque>> If it's lax, I'm commenting it out!
 
 
 //	Tor Dec 2004
@@ -1719,7 +1721,7 @@ $mwnewpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcS
 
  * Tor 2004
 
- */
+ *
 
 function mwnewpost($m)
 
@@ -2023,7 +2025,7 @@ $mweditpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpc
 
  * {@internal mweditpost(-) }}
 
- */
+ *
 
 function mweditpost($m)
 
@@ -2546,7 +2548,7 @@ $mwgetpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrp
 
  * @return xmlrpcresp XML-RPC Response
 
- */
+ *
 
 function mwgetpost($m)
 
@@ -2657,13 +2659,7 @@ function mwgetpost($m)
 }
 
 
-
-
-
-
-
-
-
+*/
 
 
 
@@ -2673,7 +2669,7 @@ $s=new xmlrpc_server(
 				array(
 
 
-
+/*
 
 							 "metaWeblog.newMediaObject" =>
 
@@ -2750,7 +2746,7 @@ $s=new xmlrpc_server(
 										 "signature" => $b2getcategories_sig,
 
 										 "docstring" => $b2getcategories_doc),
-
+*/
 
 /*
 	fplanque>>this fails!
@@ -2831,4 +2827,10 @@ $s=new xmlrpc_server(
 						)
 				);
 
+/*
+ * $Log$
+ * Revision 1.76  2005/10/05 20:26:12  fplanque
+ * cleanup
+ *
+ */
 ?>

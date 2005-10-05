@@ -3,7 +3,7 @@
  * This is b2evolution's admin config file
  *
  * This sets how the back-office works
- * Last significant changes to this file: version 0.9.1
+ * Last significant changes to this file: version 1.6
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -81,7 +81,7 @@ $use_post_url = 1;  // 1 to enable, 0 to disable
 $report_abuse = 1;
 
 
-// ** Image upload ** {{{ @deprecated moved to admin interface, but used for upgrading to 0.9.2
+// ** Image upload ** {{{ @deprecated moved to admin interface, but used for upgrading to 1.6
 /**
  * Set this to 0 to disable file upload, or 1 to enable it
  * @global boolean $use_fileupload
@@ -100,6 +100,7 @@ $use_fileupload = 1;
  *
  * @global string $fileupload_realpath
  * @deprecated 0.9.2: the user uploads to his own media folder (or somewhere else with write permissions)
+ * This is still used by MMS and XMLRPC though.
  */
 $fileupload_realpath = $basepath.'media/';	# WARNING: slashes moved!
 
@@ -112,28 +113,10 @@ $fileupload_realpath = $basepath.'media/';	# WARNING: slashes moved!
  *
  * @global string $fileupload_url
  * @deprecated 0.9.2: the user uploads to his own media folder (or somewhere else with write permissions)
+ * This is still used by MMS and the MT importer though.
  */
 $fileupload_url = $baseurl.'media/';				# WARNING: slashes moved!
 
-/**
- * Accepted file types, you can add to that list if you want.
- *
- * Note: add a space before and after each file type.
- * Example: $fileupload_allowedtypes = ' jpg gif png ';
- *
- * @global string $fileupload_allowedtypes
- * @deprecated 0.9.2: this is only used for creating the defaults when upgrading
- */
-$fileupload_allowedtypes = ' jpg gif png txt ';
-
-/**
- * by default, most servers limit the size of uploads to 2048 KB
- * if you want to set it to a lower value, here it is (you cannot set a higher value)
- *
- * @global int $fileupload_maxk
- * @deprecated 0.9.2: this is only used for creating the defaults when upgrading
- */
-$fileupload_maxk = '96'; // in kilo bytes
 // }}}
 
 

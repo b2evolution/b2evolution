@@ -5,7 +5,7 @@
  * @deprecated TODO: It holds now just things that should be move around due to hitlog refactoring.
  *
  * This file sets how b2evolution will log hits and stats
- * Last significant changes to this file: version 0.9.1
+ * Last significant changes to this file: version 1.6
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}

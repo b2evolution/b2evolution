@@ -3,7 +3,7 @@
  * This is b2evolution's main config file
  *
  * You need to edit this file to your settings before attempting to install the database!
- * Last significant changes to this file: version 0.9.1
+ * Last significant changes to this file: version 1.6
  *
  *
  * Reminder: every line starting with # or // is a comment, multiline comments are
@@ -71,7 +71,7 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
  *
  * @global string $baseurl
  */
-$baseurl = 'http://localhost/b2evolution/blogs/';  // WITH ending slash! (NEW in 0.9.1!)
+$baseurl = 'http://localhost/b2evolution/blogs/';
 
 
 /**

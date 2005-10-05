@@ -12,7 +12,8 @@
  * @copyright (c)2004 by Hans Reinders - {@link http://hansreinders.com}
  *
  * @package htsrv
- * @todo MOVE THIS FILE TO /htsrv
+ *
+ * @version $Id$
  */
 
 /**
@@ -727,4 +728,10 @@ pingTechnorati($blogparams);
 
 exit;
 
+/*
+ * $Log$
+ * Revision 1.8  2005/10/05 20:26:12  fplanque
+ * cleanup
+ *
+ */
 ?>
