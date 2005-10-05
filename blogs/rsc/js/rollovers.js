@@ -101,7 +101,5 @@ function mouseout(e)
 
 /**
  * When the page loads, set up the rollovers
- *
- * Note: I fear that this doesn't append and actually overrides other onload handlers?
  */
-window.onload = setupRollovers;
+window.addEventListener( 'load', setupRollovers, false );
