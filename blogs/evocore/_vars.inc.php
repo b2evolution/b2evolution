@@ -135,7 +135,7 @@ else
 	containing this to the <a href="http://forums.b2evolution.net">forum</a>. Also specify what webserver
 	you're running on.
 	<br />
-	(If you have deleted your install folder &ndash; what is recommened after successful setup &ndash;
+	(If you have deleted your install folder &ndash; what is recommended after successful setup &ndash;
 	you have to upload it again before doing this).
 	</p>
 	<?php
@@ -254,6 +254,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.24  2005/10/06 21:15:24  blueyed
+ * Spelling
+ *
  * Revision 1.23  2005/10/03 16:30:43  fplanque
  * fixed hitlog upgrade because daniel didn't do it :((
  *
