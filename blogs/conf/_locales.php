@@ -38,17 +38,17 @@ $dbcharset = 'iso-8859-1';
 
 /**
  * Request a specific charset for the client connection.
- * 
+ *
  * This will issue a MySQL SET NAMES command. This must be a MySQL charset.
- * 
- * If left empty, the default charset will be used. The default here is 
- * the default set your MySQL Server.
- * 
+ *
+ * If left empty, the default charset will be used. The default here is
+ * the default set of your MySQL server.
+ *
  * This should match the charset you are using internally in b2evolution.
- */ 
+ */
 $EvoConfig->DB['connection_charset'] = '';
 
- 
+
 /**
  * Default locale used for backoffice (when we cannot autodetect) and fallback.
  * This will be overwritten from database settings, if configured there.
@@ -62,7 +62,7 @@ $default_locale = 'en-EU';
 
 
 /**
- * Load locale related functions: (we need NT_(-) here)
+ * Load locale related functions: (we need NT_() here)
  */
 require_once dirname(__FILE__).'/'.$conf_dirout.$core_subdir.'_locale.funcs.php';
 
@@ -374,7 +374,7 @@ $locales = array(
 										'timefmt' => 'H:i:s',
 										'messages' => 'zh_TW',
 										'enabled' => 1,
-									), 
+									),
 */
 	'zh-TW' => array( 'name' => NT_('Trad. Chinese (TW)'),
 										'charset' => 'utf-8',
