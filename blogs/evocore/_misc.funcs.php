@@ -1102,8 +1102,8 @@ function autoquote( & $string )
 /**
  * Check the validity of a given URL
  *
- * Checks allowed URI schemes and URL ban list
- * URL can be empty
+ * Checks allowed URI schemes and URL ban list.
+ * URL can be empty.
  *
  * fplanque: 0.8.5: changed return values
  * vegarg: 0.8.6.2: switched to MySQL antispam list
@@ -1112,7 +1112,7 @@ function autoquote( & $string )
  *
  * @param string Url to validate
  * @param array Allowed URI schemes (see /conf/_formatting.php)
- * @return mixed false or error message
+ * @return mixed false (which means OK) or error message
  */
 function validate_url( $url, & $allowed_uri_scheme )
 {
@@ -1126,33 +1126,33 @@ function validate_url( $url, & $allowed_uri_scheme )
 	// minimum length: http://az.fr/
 	if( strlen($url) < 13 )
 	{ // URL too short!
-		return T_('Invalid URL');
+		return T_('Invalid URL').': &laquo;'.$url.'&raquo;';
 	}
 
-	if( ! preg_match('¤^														# start
-										([a-z][a-z0-9+.\-]*):[0-9]*		# scheme
-										//														# authority absolute URLs only
-										[a-z][a-z0-9~+.\-_,:;/\\\\]* 	# Don t allow anything too funky like entities
+	if( ! preg_match('¤^                            # start
+										([a-z][a-z0-9+.\-]*):[0-9]*   # scheme
+										//                            # authority absolute URLs only
+										[a-z][a-z0-9~+.\-_,:;/\\\\]*  # Don t allow anything too funky like entities
 										([?#][a-z0-9~+.\-_,:;/\\\\%&=#]*)?
 										$¤ix', $url, $matches) )
-	{	// Cannot vaidate URL structure
-		return T_('Invalid URL');
+	{ // Cannot vaidate URL structure
+		return T_('Invalid URL').': &laquo;'.$url.'&raquo;';
 	}
 
 	$scheme = strtolower($matches[1]);
-	if(!in_array( $scheme, $allowed_uri_scheme ))
+	if( !in_array( $scheme, $allowed_uri_scheme ) )
 	{ // Scheme not allowed
-		return T_('URI scheme not allowed');
+		return T_('URI scheme not allowed').': &laquo;'.$scheme.'&raquo;';
 	}
 
 	// Search for blocked URLs:
 	if( $block = antispam_check($url) )
 	{
 		if( $debug ) return 'Url refused. Debug info: blacklisted word: ['.$block.']';
-		return T_('URL not allowed');
+		return T_('URL not allowed').': &laquo;'.$url.'&raquo;';
 	}
 
-	return false;		// OK
+	return false; // OK
 }
 
 
@@ -1874,6 +1874,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.92  2005/10/06 21:04:33  blueyed
+ * Made validate_url() more verbose - thanks to stk (http://forums.b2evolution.net/viewtopic.php?p=26984#26984)
+ *
  * Revision 1.91  2005/10/05 14:22:29  fplanque
  * no message
  *
