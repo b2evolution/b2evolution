@@ -141,13 +141,13 @@ $instance_name = 'b2evo'; // MUST BE A SINGLE WORD! NO SPACES!!
 $notify_from = $instance_name.'@'.$basehost;
 
 
-
 /**
  * When pinging http://blo.gs, use extended ping to RSS?
  *
  * @var integer Default: 1
  */
 $use_rss = 1;
+
 
 /**
  * If a particular post is requested (by id or title) but on the wrong blog,
@@ -162,14 +162,30 @@ $use_rss = 1;
 $redirect_to_postblog = false;
 
 
-// ** DB table names **
+// ** DB options **
 
 /**
- * Aliases for class DB:
+ * Show MySQL errors? (default: true)
+ *
+ * This is recommended on production environments.
+ */
+$EvoConfig->DB['show_errors'] = true;
+
+
+/**
+ * Halt on MySQL errors? (default: true)
+ *
+ * Setting this to false is not recommended,
+ */
+$EvoConfig->DB['halt_on_error'] = true;
+
+
+/**
+ * Aliases for table names:
  *
  * (You should not need to change them.
  *  If you want to have multiple b2evo installations in a single database you should
- *  change $tableprefix in _config.php)
+ *  change {@link $tableprefix} in _config.php)
  */
 $EvoConfig->DB['aliases'] = array(
 		'T_antispam'         => $tableprefix.'antispam',
