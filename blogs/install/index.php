@@ -172,6 +172,7 @@ switch( $action )
 			'aliases' => $EvoConfig->DB['aliases'],
 			'use_transactions' => $EvoConfig->DB['use_transactions'],
 			'table_options' => $EvoConfig->DB['table_options'],
+			'connection_charset' => $EvoConfig->DB['connection_charset'],
 			'halt_on_error' => false ) );
 		if( $DB->error )
 		{ // restart conf

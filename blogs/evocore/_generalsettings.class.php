@@ -85,8 +85,8 @@ class GeneralSettings extends AbstractSettings
 		{ // Database is not up to date:
 			$error_message = 'Database schema is not up to date!'
 												.'<br />'
-												.'You have schema version &laquo;<em>'.(integer)$this->get( 'db_version' ).'</em>&raquo;, '
-												.'but we would need &laquo;<em>'.(integer)$new_db_version.'</em>&raquo;.';
+												.'You have schema version &laquo;'.(integer)$this->get( 'db_version' ).'&raquo;, '
+												.'but we would need &laquo;'.(integer)$new_db_version.'&raquo;.';
 			require dirname(__FILE__).'/_conf_error.inc.php'; // error & exit
 		}
 	}
@@ -95,6 +95,10 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.18  2005/10/06 17:03:02  fplanque
+ * allow to set a specific charset for the MySQL connection.
+ * This allows b2evo to work internally in a charset different from the database charset.
+ *
  * Revision 1.17  2005/09/25 03:50:45  blueyed
  * Hit class: Fixes, normalized; moved $doubleCheckReferers to $Settings ("feature" admin tab)
  *

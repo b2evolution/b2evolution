@@ -30,13 +30,25 @@ $use_l10n = 2;
 
 
 /**
- * To be used for m17n support.
+ * To be used for m17n support. Not used yet.
  *
  * If you don't know, don't change this setting.
  */
 $dbcharset = 'iso-8859-1';
 
+/**
+ * Request a specific charset for the client connection.
+ * 
+ * This will issue a MySQL SET NAMES command. This must be a MySQL charset.
+ * 
+ * If left empty, the default charset will be used. The default here is 
+ * the default set your MySQL Server.
+ * 
+ * This should match the charset you are using internally in b2evolution.
+ */ 
+$EvoConfig->DB['connection_charset'] = '';
 
+ 
 /**
  * Default locale used for backoffice (when we cannot autodetect) and fallback.
  * This will be overwritten from database settings, if configured there.

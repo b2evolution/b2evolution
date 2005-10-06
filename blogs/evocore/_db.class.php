@@ -238,6 +238,8 @@ class DB
 	 */
 	function DB( $params )
 	{
+		//pre_dump( $params );
+
 		// Mandatory parameters:
 		$this->dbuser = $params['user'];
 		$this->dbpassword = $params['password'];
@@ -292,6 +294,21 @@ class DB
 			$this->select($this->dbname);
 		}
 
+
+		if( !empty($params['connection_charset']) )
+		{	// Specify which charset we are using on the client:
+			$this->query( 'SET NAMES '.$params['connection_charset'] );
+		}
+		
+		/*
+		echo '<br />Server: '.$this->get_var( 'SELECT @@character_set_server' );
+		echo '<br />Database: '.$this->get_var( 'SELECT @@character_set_database' );
+		echo '<br />Connection: '.$this->get_var( 'SELECT @@character_set_connection' );
+		echo '<br />Client: '.$this->get_var( 'SELECT @@character_set_client' );
+		echo '<br />Results: '.$this->get_var( 'SELECT @@character_set_results' );
+		*/
+
+		
 		if( isset($params['aliases']) )
 		{ // Prepare aliases for replacements:
 			foreach( $params['aliases'] as $dbalias => $dbreplace )
@@ -1208,6 +1225,10 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.34  2005/10/06 17:03:02  fplanque
+ * allow to set a specific charset for the MySQL connection.
+ * This allows b2evo to work internally in a charset different from the database charset.
+ *
  * Revision 1.33  2005/09/30 18:48:54  fplanque
  * xhtml validity
  *
