@@ -524,6 +524,14 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 		
+		echo 'Updating relative URLs... ';
+		// We need to move the slashes to the end:
+		$query = "UPDATE T_blogs
+								 SET blog_siteurl = CONCAT( SUBSTRING(blog_siteurl,2) , '/' )
+							 WHERE blog_siteurl LIKE '/%'";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+
 		echo 'Copying urlnames to stub names... ';
 		$query = 'UPDATE T_blogs
 							SET blog_stub = blog_urlname';
@@ -668,6 +676,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.108  2005/10/07 19:34:49  fplanque
+ * no message
+ *
  * Revision 1.107  2005/10/03 18:10:08  fplanque
  * renamed post_ID field
  *

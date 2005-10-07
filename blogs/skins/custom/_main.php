@@ -58,8 +58,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<title><?php
 		$Blog->disp('name', 'htmlhead');
 		request_title( ' - ', '', ' - ', 'htmlhead' );
-	?>
-	</title>
+	?></title>
 	<base href="<?php skinbase(); /* Base URL for this skin. You need this to fix relative links! */ ?>" />
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
@@ -76,31 +75,34 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	?>
 </head>
 
-
 <body>
 <div id="wrapper">
 
 <?php
-	/**
-	 * --------------------------- BLOG LIST INCLUDED HERE -----------------------------
-	 */
+	// --------------------------- BLOG LIST INCLUDED HERE -----------------------------
 	require( dirname(__FILE__).'/_bloglist.php' );
-	// ----------------------------- END OF BLOG LIST ---------------------------- ?>
+	// ------------------------------- END OF BLOG LIST --------------------------------
+?>
 
 <div class="pageHeader">
 
-<h1 id="pageTitle"><?php $Blog->disp( 'name', 'htmlbody' ) ?></h1>
+	<h1 id="pageTitle"><?php $Blog->disp( 'name', 'htmlbody' ) ?></h1>
 
-<div class="pageSubTitle"><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></div>
+	<div class="pageSubTitle"><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></div>
 
 </div>
 
 <div class="bPosts">
-<?php request_title( '<h2>', '</h2>' ) ?>
+<?php 
+	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+	request_title( '<h2>', '</h2>' ) 
+	// ------------------------------ END OF REQUEST TITLE -----------------------------
+?>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 
-<?php // ------------------------------------ START OF POSTS ----------------------------------------
+<?php 
+	// ------------------------------------ START OF POSTS ----------------------------------------
 	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
 
 	if( isset($MainList) ) while( $Item = $MainList->get_item() )
@@ -149,7 +151,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>
-			<?php // ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
+		<?php 
+			// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
 			$disp_comments = 1;					// Display the comments if requested
 			$disp_comment_form = 1;			// Display the comments form if comments requested
 			$disp_trackbacks = 1;				// Display the trackbacks if requested
@@ -160,7 +163,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			// ---------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
 
 			locale_restore_previous();	// Restore previous locale (Blog locale)
-			?>
+		?>
 	</div>
 	<?php
 	} // ---------------------------------- END OF POSTS ------------------------------------
@@ -174,7 +177,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		?>
 	</strong></p>
 
-<?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
+<?php 
+	// ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
 	switch( $disp )
 	{
 		case 'comments':
@@ -202,7 +206,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			require( dirname(__FILE__).'/_subscriptions.php');
 			break;
 	}
-// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
+	// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- 
+?>
 </div>
 <!-- =================================== START OF SIDEBAR =================================== -->
 
@@ -213,8 +218,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		<p><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></p>
 		<p class="center"><strong><?php
 			posts_nav_link( ' | ',
-											/* TRANS: previous page (of posts) */ '< '.T_('Previous'),
-											/* TRANS: next page (of posts) */ T_('Next').' >' );
+				/* TRANS: previous page (of posts) */ '< '.T_('Previous'),
+				/* TRANS: next page (of posts) */ T_('Next').' >' );
 			?></strong></p>
 		<!--?php next_post(); // activate this if you want a link to the next post in single page mode ?-->
 		<!--?php previous_post(); // activate this if you want a link to the previous post in single page mode ?-->
@@ -224,14 +229,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
 		</ul>
 
-	<?php // -------------------------- CALENDAR INCLUDED HERE -----------------------------
-		// Call the Calendar plugin:
-		$Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
-				'block_start'=>'',
-				'block_end'=>'',
-				'title'=>'',			// No title.
-			) );
-		// -------------------------------- END OF CALENDAR ---------------------------------- ?>
+		<?php 
+			// -------------------------- CALENDAR INCLUDED HERE -----------------------------
+			// Call the Calendar plugin:
+			$Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
+					'block_start'=>'',
+					'block_end'=>'',
+					'title'=>'',			// No title.
+				) );
+			// -------------------------------- END OF CALENDAR ---------------------------------- 
+		?>
 	</div>
 
 	<div class="bSideItem">
@@ -246,18 +253,22 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	</div>
 
 
-	<?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
+	<?php 
+		// -------------------------- CATEGORIES INCLUDED HERE -----------------------------
 		// Call the Categories plugin:
 		$Plugins->call_by_code( 'evo_Cats', array(	// Add parameters below:
 			) );
-		// -------------------------------- END OF CATEGORIES ---------------------------------- ?>
+		// -------------------------------- END OF CATEGORIES ---------------------------------- 
+	?>
 
 
-	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
+	<?php 
+		// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
 		// Call the Archives plugin:
 		$Plugins->call_by_code( 'evo_Arch', array(	// Add parameters below:
 			) );
-		// -------------------------------- END OF ARCHIVES ---------------------------------- ?>
+		// -------------------------------- END OF ARCHIVES ---------------------------------- 
+	?>
 
 
 	<?php if( ! $Blog->get('force_skin') )
@@ -274,9 +285,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<?php } ?>
 
 
-	<?php // -------------------------- LINKBLOG INCLUDED HERE -----------------------------
+	<?php 
+		// -------------------------- LINKBLOG INCLUDED HERE -----------------------------
 		require( dirname(__FILE__).'/_linkblog.php' );
-		// -------------------------------- END OF LINKBLOG ---------------------------------- ?>
+		// -------------------------------- END OF LINKBLOG ---------------------------------- 
+	?>
 
 
 	<div class="bSideItem">
@@ -293,6 +306,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		</ul>
 	</div>
 
+	
 	<div class="bSideItem">
 		<h3><?php echo T_('Syndicate this blog') ?> <img src="../../img/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
 			<ul>
