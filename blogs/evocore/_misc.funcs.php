@@ -1126,33 +1126,33 @@ function validate_url( $url, & $allowed_uri_scheme )
 	// minimum length: http://az.fr/
 	if( strlen($url) < 13 )
 	{ // URL too short!
-		return T_('Invalid URL').': &laquo;'.$url.'&raquo;';
+		return T_('Invalid URL');
 	}
 
-	if( ! preg_match('¤^                            # start
-										([a-z][a-z0-9+.\-]*):[0-9]*   # scheme
-										//                            # authority absolute URLs only
-										[a-z][a-z0-9~+.\-_,:;/\\\\]*  # Don t allow anything too funky like entities
+	if( ! preg_match('¤^														# start
+										([a-z][a-z0-9+.\-]*):[0-9]*		# scheme
+										//														# authority absolute URLs only
+										[a-z][a-z0-9~+.\-_,:;/\\\\]* 	# Don t allow anything too funky like entities
 										([?#][a-z0-9~+.\-_,:;/\\\\%&=#]*)?
 										$¤ix', $url, $matches) )
-	{ // Cannot vaidate URL structure
-		return T_('Invalid URL').': &laquo;'.$url.'&raquo;';
+	{	// Cannot vaidate URL structure
+		return T_('Invalid URL');
 	}
 
 	$scheme = strtolower($matches[1]);
-	if( !in_array( $scheme, $allowed_uri_scheme ) )
+	if(!in_array( $scheme, $allowed_uri_scheme ))
 	{ // Scheme not allowed
-		return T_('URI scheme not allowed').': &laquo;'.$scheme.'&raquo;';
+		return T_('URI scheme not allowed');
 	}
 
 	// Search for blocked URLs:
 	if( $block = antispam_check($url) )
 	{
 		if( $debug ) return 'Url refused. Debug info: blacklisted word: ['.$block.']';
-		return T_('URL not allowed').': &laquo;'.$url.'&raquo;';
+		return T_('URL not allowed');
 	}
 
-	return false; // OK
+	return false;		// OK
 }
 
 
@@ -1874,6 +1874,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.93  2005/10/07 19:34:06  fplanque
+ * javascript injection!!! damn it!!
+ *
  * Revision 1.92  2005/10/06 21:04:33  blueyed
  * Made validate_url() more verbose - thanks to stk (http://forums.b2evolution.net/viewtopic.php?p=26984#26984)
  *
