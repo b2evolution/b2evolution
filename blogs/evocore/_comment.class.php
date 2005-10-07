@@ -565,10 +565,12 @@ class Comment extends DataObject
 			switch( $this->type )
 			{
 				case 'trackback':
+					/* TRANS: Subject of the mail to send on new trackbacks. First %s is the blog's shortname, the second %s is the item's title. */
 					$subject = T_('[%s] New trackback on "%s"');
 					break;
 
 				default:
+					/* TRANS: Subject of the mail to send on new comments. First %s is the blog's shortname, the second %s is the item's title. */
 					$subject = T_('[%s] New comment on "%s"');
 			}
 
@@ -630,6 +632,9 @@ class Comment extends DataObject
 }
 /*
  * $Log$
+ * Revision 1.17  2005/10/07 20:18:57  blueyed
+ * Added TRANS comments
+ *
  * Revision 1.16  2005/10/03 17:26:44  fplanque
  * synched upgrade with fresh DB;
  * renamed user_ID field
