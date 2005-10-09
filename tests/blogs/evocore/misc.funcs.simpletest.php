@@ -53,6 +53,18 @@ class MiscFuncsTestCase extends UnitTestCase
 	}
 
 
+	function testFormat_to_post_handles_lt_gt_in_code_and_pre_blocks()
+	{
+		$this->assertEqual(
+			format_to_post("Here is some code:\n<code>if( 1 < 2 || 2 > 1 ) echo 'fine';</code>"),
+			"Here is some code:\n<code>if( 1 &lt; 2 || 2 &gt; 1 ) echo 'fine';</code>" );
+
+		$this->assertEqual(
+			format_to_post("Here is some pre-formatted text:\n<pre>if( 1 < 2 || 2 > 1 ) echo 'fine';</pre>"),
+			"Here is some pre-formatted text:\n<pre>if( 1 &lt; 2 || 2 &gt; 1 ) echo 'fine';</pre>" );
+	}
+
+
 }
 
 

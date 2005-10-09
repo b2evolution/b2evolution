@@ -137,7 +137,13 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 
 /**
- * Format raw HTML input to cleaned up and validated HTML
+ * Format raw HTML input to cleaned up and validated HTML.
+ *
+ * @param string The content to format
+ * @param integer Create automated <br /> tags? (Deprecated??!)
+ * @param integer Is this a comment? (Used for balanceTags(), SafeHtmlChecker()'s URI scheme, styling restrictions)
+ * @param string Encoding (used for SafeHtmlChecker())
+ * @return string
  */
 function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'ISO-8859-1' )
 {
@@ -146,7 +152,15 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 	global $comments_allowed_tags, $comments_allowed_attributes, $comments_allowed_uri_scheme;
 
 	// Replace any & that is not a character or entity reference with &amp;
-	$content= preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
+	$content = preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
+
+
+	// Replace '<' and '>' in <code> and <pre> blocks to '&lt;' and '&gt;'
+	$content = preg_replace(
+		array( '~(<code[^>]*>)(.*?)(</code>)~eis', '~(<pre[^>]*>)(.*?)(</pre>)~eis' ),
+		"'\$1'.str_replace( array( '<', '>' ), array( '&lt;', '&gt;' ), '\$2' ).'\$3'",
+		$content );
+
 
 	if( $autobr )
 	{ // Auto <br />:
@@ -1874,6 +1888,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.95  2005/10/09 20:21:52  blueyed
+ * format_to_output(): Automagically replace '<' and '>' in <code> and <pre> blocks.
+ *
  * Revision 1.94  2005/10/09 19:31:15  blueyed
  * Spelling (*allowed_attribues => *allowed_attributes)
  *
