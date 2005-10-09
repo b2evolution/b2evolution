@@ -75,10 +75,10 @@ class SafeHtmlChecker
 	/**
 	 * SafeHtmlChecker(-)
 	 */
-	function SafeHtmlChecker( & $allowed_tags, & $allowed_attribues, & $uri_attrs, & $allowed_uri_scheme, $encoding = 'ISO-8859-1' )
+	function SafeHtmlChecker( & $allowed_tags, & $allowed_attributes, & $uri_attrs, & $allowed_uri_scheme, $encoding = 'ISO-8859-1' )
 	{
 		$this->tags = & $allowed_tags;
-		$this->tagattrs = & $allowed_attribues;
+		$this->tagattrs = & $allowed_attributes;
 		$this->uri_attrs = & $uri_attrs;
 		$this->allowed_uri_scheme = & $allowed_uri_scheme;
 		$this->encoding = $encoding;
@@ -258,6 +258,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.7  2005/10/09 19:31:15  blueyed
+ * Spelling (*allowed_attribues => *allowed_attributes)
+ *
  * Revision 1.6  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

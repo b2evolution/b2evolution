@@ -142,8 +142,8 @@ function format_to_output( $content, $format = 'htmlbody' )
 function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'ISO-8859-1' )
 {
 	global $use_balanceTags, $use_html_checker, $use_security_checker;
-	global $allowed_tags, $allowed_attribues, $uri_attrs, $allowed_uri_scheme;
-	global $comments_allowed_tags, $comments_allowed_attribues, $comments_allowed_uri_scheme;
+	global $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme;
+	global $comments_allowed_tags, $comments_allowed_attributes, $comments_allowed_uri_scheme;
 
 	// Replace any & that is not a character or entity reference with &amp;
 	$content= preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
@@ -163,12 +163,12 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 	{ // Check the code:
 		if( ! $is_comment )
 		{
-			$checker = & new SafeHtmlChecker( $allowed_tags, $allowed_attribues,
+			$checker = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes,
 																			$uri_attrs, $allowed_uri_scheme, $encoding );
 		}
 		else
 		{
-			$checker = & new SafeHtmlChecker( $comments_allowed_tags, $comments_allowed_attribues,
+			$checker = & new SafeHtmlChecker( $comments_allowed_tags, $comments_allowed_attributes,
 																			$uri_attrs, $comments_allowed_uri_scheme, $encoding );
 		}
 
@@ -1129,18 +1129,18 @@ function validate_url( $url, & $allowed_uri_scheme )
 		return T_('Invalid URL');
 	}
 
-	if( ! preg_match('¤^														# start
-										([a-z][a-z0-9+.\-]*):[0-9]*		# scheme
-										//														# authority absolute URLs only
-										[a-z][a-z0-9~+.\-_,:;/\\\\]* 	# Don t allow anything too funky like entities
+	if( ! preg_match('¤^                            # start
+										([a-z][a-z0-9+.\-]*):[0-9]*   # scheme
+										//                            # authority absolute URLs only
+										[a-z][a-z0-9~+.\-_,:;/\\\\]*  # Don t allow anything too funky like entities
 										([?#][a-z0-9~+.\-_,:;/\\\\%&=#]*)?
 										$¤ix', $url, $matches) )
-	{	// Cannot vaidate URL structure
+	{ // Cannot vaidate URL structure
 		return T_('Invalid URL');
 	}
 
 	$scheme = strtolower($matches[1]);
-	if(!in_array( $scheme, $allowed_uri_scheme ))
+	if( !in_array( $scheme, $allowed_uri_scheme ) )
 	{ // Scheme not allowed
 		return T_('URI scheme not allowed');
 	}
@@ -1152,7 +1152,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 		return T_('URL not allowed');
 	}
 
-	return false;		// OK
+	return false; // OK
 }
 
 
@@ -1874,6 +1874,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.94  2005/10/09 19:31:15  blueyed
+ * Spelling (*allowed_attribues => *allowed_attributes)
+ *
  * Revision 1.93  2005/10/07 19:34:06  fplanque
  * javascript injection!!! damn it!!
  *

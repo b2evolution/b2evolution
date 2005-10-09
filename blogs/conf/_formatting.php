@@ -282,7 +282,7 @@ $allowed_tags += array
 // Array showing allowed attributes for tags
 if( $use_strict )
 {
-	$allowed_attribues = array
+	$allowed_attributes = array
 	(
 		'div' => A_attrs,								// Strict
 		'p' => A_attrs,								// Strict
@@ -311,7 +311,7 @@ if( $use_strict )
 }
 else
 {
-	$allowed_attribues = array
+	$allowed_attributes = array
 	(
 		'div' => A_attrs.' '.A_TextAlign,		// Transitional
 		'p' => A_attrs.' '.A_TextAlign,		// Transitional
@@ -345,7 +345,7 @@ else
 		'td' => A_attrs.' abbr axis headers scope rowspan colspan'.A_cellhalign.' '.A_cellvalign.' nowrap bgcolor width height',	// Transitional
 	);
 }
-$allowed_attribues += array
+$allowed_attributes += array
 (
 	'fieldset' => A_attrs,
 
@@ -495,7 +495,7 @@ $comments_allowed_tags += array
  * Array showing allowed attributes for tags.
  * @global array
  */
-$comments_allowed_attribues = array
+$comments_allowed_attributes = array
 (
 	'p' => C_A_attrs,
 	'ul' => C_A_attrs,
