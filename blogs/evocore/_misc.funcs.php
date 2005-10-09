@@ -156,9 +156,11 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 
 
 	// Replace '<' and '>' in <code> and <pre> blocks to '&lt;' and '&gt;'
-	$content = preg_replace(
-		array( '~(<code[^>]*>)(.*?)(</code>)~eis', '~(<pre[^>]*>)(.*?)(</pre>)~eis' ),
-		"'\$1'.str_replace( array( '<', '>' ), array( '&lt;', '&gt;' ), '\$2' ).'\$3'",
+	$content = preg_replace_callback(
+		array( '~(<code[^>]*?>)(.*?)(</code>)~is', '~(<pre[^>]*?>)(.*?)(</pre>)~is' ),
+		create_function(
+			'$match',
+			'return $match[1].str_replace( array( "<", ">" ), array( "&lt;", "&gt;" ), $match[2] ).$match[3];' ),
 		$content );
 
 
@@ -1888,6 +1890,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.96  2005/10/09 23:22:09  blueyed
+ * format_to_post(): Use preg_replace_callback() to avoid using stripslashes() in replacement function. Also fix regexp.
+ *
  * Revision 1.95  2005/10/09 20:21:52  blueyed
  * format_to_output(): Automagically replace '<' and '>' in <code> and <pre> blocks.
  *
