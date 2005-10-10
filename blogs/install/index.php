@@ -40,7 +40,7 @@ require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_results.class.
 require_once dirname(__FILE__).'/_functions_install.php';
 require_once dirname(__FILE__).'/_functions_create.php';
 
-$Timer = & new Timer('install');
+$Timer = & new Timer('main');
 
 param( 'action', 'string', 'default' );
 param( 'locale', 'string' );
@@ -194,29 +194,29 @@ switch( $action )
 			// File loaded...
 			// Update conf:
 			$conf = preg_replace(
-														array(
-																		'#\$EvoConfig->DB\s*=\s*array\(
-																			\s*[\'"]user[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
-																			\s*[\'"]password[\'"]\s*=>\s*[\'"].*?[\'"], ([^\n\r]*\r?\n)
-																			\s*[\'"]name[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
-																			\s*[\'"]host[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
-																			#ixs',
-																		"#tableprefix\s*=\s*'.*?';#",
-																		"#baseurl\s*=\s*'.*?';#",
-																		"#admin_email\s*=\s*'.*?';#",
-																		"#config_is_done\s*=.*?;#",
-																	),
-														array(
-																		"\$EvoConfig->DB = array(\n"
-																			."\t'user'     => '$conf_db_user',\$1"
-																			."\t'password' => '$conf_db_password',\$2"
-																			."\t'name'     => '$conf_db_name',\$3"
-																			."\t'host'     => '$conf_db_host',\$4",
-																		"tableprefix = '$conf_db_tableprefix';",
-																		"baseurl = '$conf_baseurl';",
-																		"admin_email = '$conf_admin_email';",
-																		'config_is_done = 1;',
-																	), $conf );
+				array(
+					'#\$EvoConfig->DB\s*=\s*array\(
+						\s*[\'"]user[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
+						\s*[\'"]password[\'"]\s*=>\s*[\'"].*?[\'"], ([^\n\r]*\r?\n)
+						\s*[\'"]name[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
+						\s*[\'"]host[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
+						#ixs',
+					"#tableprefix\s*=\s*'.*?';#",
+					"#baseurl\s*=\s*'.*?';#",
+					"#admin_email\s*=\s*'.*?';#",
+					"#config_is_done\s*=.*?;#",
+				),
+				array(
+					"\$EvoConfig->DB = array(\n"
+						."\t'user'     => '$conf_db_user',\$1"
+						."\t'password' => '$conf_db_password',\$2"
+						."\t'name'     => '$conf_db_name',\$3"
+						."\t'host'     => '$conf_db_host',\$4",
+					"tableprefix = '$conf_db_tableprefix';",
+					"baseurl = '$conf_baseurl';",
+					"admin_email = '$conf_admin_email';",
+					'config_is_done = 1;',
+				), $conf );
 
 			$f = @fopen( $conf_filepath , 'w' );
 			if( $f == false )
