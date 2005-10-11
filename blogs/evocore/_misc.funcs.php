@@ -154,16 +154,6 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 	// Replace any & that is not a character or entity reference with &amp;
 	$content = preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
 
-
-	// Replace '<' and '>' in <code> and <pre> blocks to '&lt;' and '&gt;'
-	$content = preg_replace_callback(
-		array( '~(<code[^>]*?>)(.*?)(</code>)~is', '~(<pre[^>]*?>)(.*?)(</pre>)~is' ),
-		create_function(
-			'$match',
-			'return $match[1].str_replace( array( "<", ">" ), array( "&lt;", "&gt;" ), $match[2] ).$match[3];' ),
-		$content );
-
-
 	if( $autobr )
 	{ // Auto <br />:
 		// may put brs in the middle of multiline tags...
@@ -1145,11 +1135,11 @@ function validate_url( $url, & $allowed_uri_scheme )
 		return T_('Invalid URL');
 	}
 
-	if( ! preg_match('¤^                            # start
-										([a-z][a-z0-9+.\-]*):[0-9]*   # scheme
-										//                            # authority absolute URLs only
-										[a-z][a-z0-9~+.\-_,:;/\\\\]*  # Don t allow anything too funky like entities
-										([?#][a-z0-9~+.\-_,:;/\\\\%&=#]*)?
+	if( ! preg_match('¤^														# start
+										([a-z][a-z0-9+.\-]*):[0-9]*		# scheme
+										//														# authority absolute URLs only
+										[a-z][a-z0-9~+.\-_,:;/\\\\*]* 	# Don t allow anything too funky like entities
+										([?#][a-z0-9~+.\-_,:;/\\\\%&=#*]*)?
 										$¤ix', $url, $matches) )
 	{ // Cannot vaidate URL structure
 		return T_('Invalid URL');
@@ -1890,6 +1880,10 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.97  2005/10/11 18:29:56  fplanque
+ * It is perfectly valid to have <strong> inside of <code>.
+ * Make a plugin for [code]...[/code] if you want to escape tags arbitrarily.
+ *
  * Revision 1.96  2005/10/09 23:22:09  blueyed
  * format_to_post(): Use preg_replace_callback() to avoid using stripslashes() in replacement function. Also fix regexp.
  *
