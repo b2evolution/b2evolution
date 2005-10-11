@@ -143,6 +143,10 @@ require_once dirname(__FILE__).'/_usersettings.class.php';
 /**
  * Interface to general settings
  *
+ * Keep this below the creation of the {@link $DB DB object}, because it checks for the
+ * correct db_version and catches "table does not exist" errors, providing a link to the
+ * install script.
+ *
  * @global GeneralSettings $Settings
  */
 $Settings = & new GeneralSettings();
@@ -528,6 +532,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.52  2005/10/11 19:28:57  blueyed
+ * Added decent error message if tables do not exist yet (not installed).
+ *
  * Revision 1.51  2005/09/26 23:09:10  blueyed
  * Use $EvoConfig->DB for $DB parameters.
  *

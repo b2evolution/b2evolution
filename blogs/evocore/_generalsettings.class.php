@@ -53,48 +53,73 @@ require_once dirname(__FILE__).'/_abstractsettings.class.php';
 class GeneralSettings extends AbstractSettings
 {
 	var $_defaults = array(
-										'fm_enabled' => '1',			          // handled
-										'fm_enable_roots_blog' => '1',			// handled
-										// 'fm_enable_roots_group' => '0',	// TO DO
-										'fm_enable_roots_user' => '0',			// handled
-										'fm_enable_create_dir' => '1',			// handled
-										'fm_enable_create_file' => '0',			// handled
+		'fm_enabled' => '1',                // handled
+		'fm_enable_roots_blog' => '1',      // handled
+		// 'fm_enable_roots_group' => '0',  // TO DO
+		'fm_enable_roots_user' => '0',      // handled
+		'fm_enable_create_dir' => '1',      // handled
+		'fm_enable_create_file' => '0',     // handled
 
-										'hit_doublecheck_referer' => '0',  // handled
+		'hit_doublecheck_referer' => '0',  // handled
 
-                    'upload_enabled' => '1',						// handled
-										'upload_allowedext' => 'jpg gif png txt',	// handled
-										'upload_maxkb' => '100',
+		'upload_enabled' => '1',            // handled
+		'upload_allowedext' => 'jpg gif png txt', // handled
+		'upload_maxkb' => '100',
 
-										'regexp_filename' => '^[a-zA-Z0-9\-_.]+$'
-									);
+		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$'
+	);
+
+
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
-	 * loads settings, checks db_version
+	 * This loads the general settings and checks db_version.
+	 *
+	 * It will also turn off error-reporting/halting of the {@link $DB DB object}
+	 * temporarily to present a more decent error message if tables do not exist yet.
+	 *
+	 * Because the {@link $DB DB object} itself creates a connection when it gets
+	 * created "Error selecting database" occurs before we can check for it here.
 	 */
 	function GeneralSettings()
 	{
-		global $new_db_version;
+		global $new_db_version, $DB;
 
+		$save_DB_show_errors = $DB->show_errors;
+		$save_DB_halt_on_error = $DB->halt_on_error;
+		$DB->halt_on_error = $DB->show_errors = false;
+
+		// Init through the abstract constructor. This should be the first DB connection.
 		parent::AbstractSettings( 'T_settings', array( 'set_name' ), 'set_value' );
 
 
 		// check DB version:
 		if( $this->get( 'db_version' ) != $new_db_version )
 		{ // Database is not up to date:
-			$error_message = 'Database schema is not up to date!'
-												.'<br />'
-												.'You have schema version &laquo;'.(integer)$this->get( 'db_version' ).'&raquo;, '
-												.'but we would need &laquo;'.(integer)$new_db_version.'&raquo;.';
+			if( $DB->last_error )
+			{
+				$error_message = '<p>MySQL error:</p>'.$DB->last_error;
+			}
+			else
+			{
+				$error_message = '<p>Database schema is not up to date!</p>'
+					.'<p>You have schema version &laquo;'.(integer)$this->get( 'db_version' ).'&raquo;, '
+					.'but we would need &laquo;'.(integer)$new_db_version.'&raquo;.</p>';
+			}
 			require dirname(__FILE__).'/_conf_error.inc.php'; // error & exit
 		}
+
+		$DB->halt_on_error = $save_DB_halt_on_error;
+		$DB->show_errors = $save_DB_show_errors;
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.19  2005/10/11 19:28:57  blueyed
+ * Added decent error message if tables do not exist yet (not installed).
+ *
  * Revision 1.18  2005/10/06 17:03:02  fplanque
  * allow to set a specific charset for the MySQL connection.
  * This allows b2evo to work internally in a charset different from the database charset.
