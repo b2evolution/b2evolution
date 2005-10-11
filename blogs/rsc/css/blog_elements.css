@@ -95,6 +95,7 @@ tr.bCalendarRow {
 	text-align: center;
 }
 th.bCalendarHeaderCell {
+	color: #999;
 	font-size: 84%;
 	width: 4ex;
 }
@@ -115,7 +116,7 @@ td#next {
 }
 td#prev a,
 td#next a {
-	padding: 0;
+	padding: .5ex;
 }
 td#prev {
 	text-align:left;

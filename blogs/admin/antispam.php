@@ -97,7 +97,7 @@ switch( $action )
 												WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
 													 OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
 					      				   OR comment_content LIKE '.$DB->quote('%'.$keyword.'%') );
-			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&laquo;.'), $r, htmlspecialchars($keyword) ), 'note' );
+			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'note' );
 		}
 
 		if( $blacklist_locally )

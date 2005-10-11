@@ -1139,7 +1139,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 										([a-z][a-z0-9+.\-]*):[0-9]*		# scheme
 										//														# authority absolute URLs only
 										[a-z][a-z0-9~+.\-_,:;/\\\\*]* 	# Don t allow anything too funky like entities
-										([?#][a-z0-9~+.\-_,:;/\\\\%&=#*]*)?
+										([?#][a-z0-9~+.\-_,:;/\\\\%&=?#*]*)?
 										$¤ix', $url, $matches) )
 	{ // Cannot vaidate URL structure
 		return T_('Invalid URL');
@@ -1880,6 +1880,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.98  2005/10/11 20:36:38  fplanque
+ * minor changes
+ *
  * Revision 1.97  2005/10/11 18:29:56  fplanque
  * It is perfectly valid to have <strong> inside of <code>.
  * Make a plugin for [code]...[/code] if you want to escape tags arbitrarily.

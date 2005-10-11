@@ -21,7 +21,7 @@ class smilies_plugin extends Plugin
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
 	var $priority = 80;
-	var $apply_when = 'always';
+	var $apply_when = 'opt-out';
 	var $apply_to_html = true;
 	var $apply_to_xml = false; // Leave the smilies alone
 
