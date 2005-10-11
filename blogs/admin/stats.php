@@ -146,39 +146,40 @@ switch( $AdminUI->getPath(1) )
 		<h2><?php echo T_('Summary') ?>:</h2>
 
 		<?php
-		$sql = 'SELECT COUNT(*) AS hits, hit_referer_type, YEAR(hit_datetime) AS year,
+		// fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
+		// Bug report: http://lists.mysql.com/bugs/36
+		// Solution : CAST to string
+		$sql = 'SELECT COUNT(*) AS hits, CONCAT(hit_referer_type) AS referer_type, YEAR(hit_datetime) AS year,
 										MONTH(hit_datetime) AS month, DAYOFMONTH(hit_datetime) AS day
 							FROM T_hitlog ';
 		if( $blog > 0 )
 		{
 			$sql .= ' WHERE hit_blog_ID = '.$blog;
 		}
-		$sql .= ' GROUP BY hit_datetime, hit_referer_type
-							ORDER BY hit_datetime';
-		$res_hits = $DB->get_results( $sql, ARRAY_A );
+		$sql .= ' GROUP BY year, month, day, referer_type
+							ORDER BY year DESC, month DESC, day DESC, referer_type';
+		$res_hits = $DB->get_results( $sql, ARRAY_A, 'Get hit summary' );
 
 
 		/*
 		 * Chart
 		 */
-		if( $DB->num_rows )
+		if( count($res_hits) )
 		{
 			$last_date = 0;
 
 			$chart[ 'chart_data' ][ 0 ][ 0 ] = '';
-			$chart[ 'chart_data' ][ 1 ][ 0 ] = T_('Direct Accesses');
-			$chart[ 'chart_data' ][ 2 ][ 0 ] = T_('Referers');
-			$chart[ 'chart_data' ][ 3 ][ 0 ] = T_('Refering Searches');
-			$chart[ 'chart_data' ][ 4 ][ 0 ] = T_('Syndication');
-			$chart[ 'chart_data' ][ 5 ][ 0 ] = T_('Indexing Robots');
-			$chart[ 'chart_data' ][ 6 ][ 0 ] = T_('Blacklisted');
+			$chart[ 'chart_data' ][ 1 ][ 0 ] = 'Direct Accesses';	// Translations nned to be UTF-8
+			$chart[ 'chart_data' ][ 2 ][ 0 ] = 'Referers';
+			$chart[ 'chart_data' ][ 3 ][ 0 ] = 'Refering Searches';
+			$chart[ 'chart_data' ][ 4 ][ 0 ] = 'Syndication';
+			$chart[ 'chart_data' ][ 5 ][ 0 ] = 'Indexing Robots';
+			$chart[ 'chart_data' ][ 6 ][ 0 ] = 'Blacklisted';
 
 			$col_mapping = array(
 														'direct' => 1,
-														'no' => 2,
+														'referer' => 2,
 														'search' => 3,
-														'rss' => 4,
-														'robot' => 5,
 														'blacklist' => 6
 													);
 
@@ -198,7 +199,7 @@ switch( $AdminUI->getPath(1) )
 						$chart [ 'chart_data' ][ 5 ][ $count ] = 0;
 						$chart [ 'chart_data' ][ 6 ][ $count ] = 0;
 				}
-				$col = $col_mapping[$row_stats['hit_referer_type']];
+				$col = $col_mapping[$row_stats['referer_type']];
 				$chart [ 'chart_data' ][$col][$count] = $row_stats['hits'];
 			}
 
@@ -231,7 +232,7 @@ switch( $AdminUI->getPath(1) )
 																							'y'        => 6,
 																							'width'    => 700,
 																							'height'   => 50,
-																							'text'     => T_('Access summary'),
+																							'text'     => 'Access summary', // Needs UTF-8
 																							'h_align'  => "right",
 																							'v_align'  => "bottom" )
 																			);
@@ -317,12 +318,11 @@ switch( $AdminUI->getPath(1) )
 			 * Table:
 			 */
 			$hits = array();
-			$hits['no'] = 0;
-			$hits['invalid'] = 0;
-			$hits['blacklist'] = 0;
-			$hits['rss'] = 0;
-			$hits['robot'] = 0;
+			$hits['direct'] = 0;
+			$hits['referer'] = 0;
 			$hits['search'] = 0;
+			$hits['blacklist'] = 0;
+			$hits['spam'] = 0;
 			$last_date = 0;
 			?>
 			<table class="grouped" cellspacing="0">
@@ -331,9 +331,8 @@ switch( $AdminUI->getPath(1) )
 					<th><?php echo T_('Direct Accesses') ?></th>
 					<th><?php echo T_('Referers') ?></th>
 					<th><?php echo T_('Refering Searches') ?></th>
-					<th><?php echo T_('Syndication') ?></th>
-					<th><?php echo T_('Indexing Robots') ?></th>
 					<th><?php echo T_('Blacklisted') ?></th>
+					<th><?php echo T_('Spam') ?></th>
 					<th><?php echo T_('Total') ?></th>
 				</tr>
 				<?php
@@ -353,25 +352,23 @@ switch( $AdminUI->getPath(1) )
 								}
 								echo date( locale_datefmt(), $last_date ) ?>
 							</td>
-							<td class="right"><?php echo $hits['invalid'] ?></td>
-							<td class="right"><?php echo $hits['no'] ?></td>
+							<td class="right"><?php echo $hits['direct'] ?></td>
+							<td class="right"><?php echo $hits['referer'] ?></td>
 							<td class="right"><?php echo $hits['search'] ?></td>
-							<td class="right"><?php echo $hits['rss'] ?></td>
-							<td class="right"><?php echo $hits['robot'] ?></td>
 							<td class="right"><?php echo $hits['blacklist'] ?></td>
+							<td class="right"><?php echo $hits['spam'] ?></td>
 							<td class="right"><?php echo array_sum($hits) ?></td>
 						</tr>
 						<?php
-							$hits['no'] = 0;
-							$hits['invalid'] = 0;
-							$hits['blacklist'] = 0;
-							$hits['rss'] = 0;
-							$hits['robot'] = 0;
+							$hits['direct'] = 0;
+							$hits['referer'] = 0;
 							$hits['search'] = 0;
+							$hits['blacklist'] = 0;
+							$hits['spam'] = 0;
 							$last_date = $this_date;	// that'll be the next one
 							$count ++;
 					}
-					$hits[$row_stats['hit_referer_type']] = $row_stats['hits'];
+					$hits[$row_stats['referer_type']] = $row_stats['hits'];
 				}
 
 				if( $last_date != 0 )
@@ -385,12 +382,11 @@ switch( $AdminUI->getPath(1) )
 							}
 							echo date( locale_datefmt(), $this_date ) ?>
 						</td>
-						<td class="right"><?php echo $hits['invalid'] ?></td>
-						<td class="right"><?php echo $hits['no'] ?></td>
+						<td class="right"><?php echo $hits['direct'] ?></td>
+						<td class="right"><?php echo $hits['referer'] ?></td>
 						<td class="right"><?php echo $hits['search'] ?></td>
-						<td class="right"><?php echo $hits['rss'] ?></td>
-						<td class="right"><?php echo $hits['robot'] ?></td>
 						<td class="right"><?php echo $hits['blacklist'] ?></td>
+						<td class="right"><?php echo $hits['spam'] ?></td>
 						<td class="right"><?php echo array_sum($hits) ?></td>
 					</tr>
 					<?php
@@ -807,7 +803,7 @@ switch( $AdminUI->getPath(1) )
 		case 'useragents':
 			?>
 			<h2><?php echo T_('Top User Agents') ?>:</h2>
-			<?php refererList(50,'global',0,0,"'no','invalid','badchar','blacklist','search'",'agnt_signature',$blog,true,true);
+			<?php refererList(50,'global',0,0,"'search', 'blacklist', 'referer', 'direct'",'agnt_signature',$blog,true,true);
 			if( count( $res_stats ) )
 			{
 				?>

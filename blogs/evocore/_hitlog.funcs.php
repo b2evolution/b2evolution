@@ -132,10 +132,10 @@ function refererList(
 		$sql .= ", agnt_signature";
 	}
 
-	$sql_from_where = ' FROM T_hitlog, T_basedomains'.( $get_user_agent ? ', T_useragents' : '' ).'
-											WHERE dom_ID = hit_referer_dom_ID ' // TODO: Left join?
-											.( $get_user_agent ? ' AND hit_agnt_ID = agnt_ID' : '' )
-											.' AND hit_referer_type IN ('.$type.')';
+	$sql_from_where = ' FROM T_hitlog '
+											.( $get_user_agent ? 'INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID' : '' )
+											.' LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID 
+											WHERE hit_referer_type IN ('.$type.')';
 	if( !empty($blog_ID) )
 	{
 		$sql_from_where .= " AND hit_blog_ID = '$blog_ID'";
@@ -372,6 +372,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.11  2005/10/11 20:35:58  fplanque
+ * Oh man! This is SO full of crap, it's pathetic!! :-(((
+ *
  * Revision 1.10  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

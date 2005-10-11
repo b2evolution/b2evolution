@@ -207,6 +207,8 @@ class Hit
 	/**
 	 * Detect Referer (sic!).
 	 * Due to potential non-thread safety with getenv() (fallback), we'd better do this early.
+	 * 
+	 * referer_type: enum('search', 'blacklist', 'referer', 'direct', 'spam')
 	 */
 	function detect_referer()
 	{
@@ -276,6 +278,10 @@ class Hit
 		if( !empty($this->referer) )
 		{
 			$this->referer_type = 'referer';
+		}
+		else
+		{
+			$this->referer_type = 'direct';
 		}
 	}
 
