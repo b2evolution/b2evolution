@@ -148,13 +148,15 @@ class Results extends Widget
 	 *
 	 *
 	 * @todo we might not want to count total rows when not needed...
+	 * @todo fplanque: I am seriously considering putting $count_sqlinto 2nd or 3rd position. Any prefs?
 	 *
 	 * @param string SQL query
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param string default ordering of columns (special syntax) if not URL specified
 	 * @param integer number of lines displayed on one screen
+	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
 	 */
-	function Results( $sql, $param_prefix = '', $default_order = '', $limit = 20 )
+	function Results( $sql, $param_prefix = '', $default_order = '', $limit = 20, $count_sql = NULL )
 	{
 		global $DB;
 		$this->DB = & $DB;
@@ -165,7 +167,7 @@ class Results extends Widget
 		$this->order_param = 'results_'.$param_prefix.'order';
 
 		// Count total rows:
-		$this->count_total_rows();
+		$this->count_total_rows( $count_sql );
 
 		$this->total_pages = empty($this->limit) ? 1 : ceil($this->total_rows / $this->limit);
 
@@ -290,7 +292,7 @@ class Results extends Widget
 	 * @todo allow overriding?
 	 * @todo handle problem of empty groups!
 	 */
-	function count_total_rows()
+	function count_total_rows( $sql_count = NULL )
 	{
 		if( is_null($this->sql) )
 		{ // We may want to remove this later...
@@ -298,43 +300,46 @@ class Results extends Widget
 			return;
 		}
 
- 		$sql_count = $this->sql;
-		// echo $sql_count;
+		if( empty( $sql_count ) )
+		{
+ 			$sql_count = $this->sql;
+			// echo $sql_count;
 
-		/*
-		 *
-		 * On a un problème avec la recherche sur les sociétés
-		 * si on fait un select count(*), ça sort un nombre de réponses énorme
-		 * mais on ne sait pas pourquoi... la solution est de lister des champs dans le COUNT()
-		 * MAIS malheureusement ça ne fonctionne pas pour d'autres requêtes.
-		 * L'idéal serait de réussir à isoler qu'est-ce qui, dans la requête SQL, provoque le comportement
-		 * bizarre....
-		 */
-		// Tentative 1:
-		// if( !preg_match( '#FROM(.*?)((WHERE|ORDER BY|GROUP BY) .*)?$#si', $sql_count, $matches ) )
-		//  die( "Can't understand query..." );
-		// if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
-		// { // there was a coma or a JOIN clause in the FROM clause of the original query,
-		// Tentative 2:
-		// fplanque: je pense que la différence est sur la présence de DISTINCT ou non.
-		// if( preg_match( '#\s DISTINCT \s#six', $sql_count, $matches ) )
-		if( preg_match( '#\s DISTINCT \s+ ([A-Za-z_]+)#six', $sql_count, $matches ) )
-		{ //
-			// Get rid of any Aliases in colmun names:
-			// $sql_count = preg_replace( '#\s AS \s+ ([A-Za-z_]+) #six', ' ', $sql_count );
-			// ** We must use field names in the COUNT **
-			//$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $sql_count );
+			/*
+			 *
+			 * On a un problème avec la recherche sur les sociétés
+			 * si on fait un select count(*), ça sort un nombre de réponses énorme
+			 * mais on ne sait pas pourquoi... la solution est de lister des champs dans le COUNT()
+			 * MAIS malheureusement ça ne fonctionne pas pour d'autres requêtes.
+			 * L'idéal serait de réussir à isoler qu'est-ce qui, dans la requête SQL, provoque le comportement
+			 * bizarre....
+			 */
+			// Tentative 1:
+			// if( !preg_match( '#FROM(.*?)((WHERE|ORDER BY|GROUP BY) .*)?$#si', $sql_count, $matches ) )
+			//  die( "Can't understand query..." );
+			// if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
+			// { // there was a coma or a JOIN clause in the FROM clause of the original query,
+			// Tentative 2:
+			// fplanque: je pense que la différence est sur la présence de DISTINCT ou non.
+			// if( preg_match( '#\s DISTINCT \s#six', $sql_count, $matches ) )
+			if( preg_match( '#\s DISTINCT \s+ ([A-Za-z_]+)#six', $sql_count, $matches ) )
+			{ //
+				// Get rid of any Aliases in colmun names:
+				// $sql_count = preg_replace( '#\s AS \s+ ([A-Za-z_]+) #six', ' ', $sql_count );
+				// ** We must use field names in the COUNT **
+				//$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $sql_count );
 
-			//Tentative 3: we do a distinct on the first field only when counting:
-			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( DISTINCT '.$matches[1].' ) FROM', $sql_count );
+				//Tentative 3: we do a distinct on the first field only when counting:
+				$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( DISTINCT '.$matches[1].' ) FROM', $sql_count );
+			}
+			else
+			{ // Single table request: we must NOT use field names in the count.
+				$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( * ) FROM', $sql_count );
+			}
+
+			// echo $sql_count;
 		}
-		else
-		{ // Single table request: we must NOT use field names in the count.
-			$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( * ) FROM', $sql_count );
-		}
-
-		// echo $sql_count;
-
+		
 		$this->total_rows = $this->DB->get_var( $sql_count ); //count total rows
 	}
 
@@ -1110,6 +1115,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.31  2005/10/11 18:31:11  fplanque
+ * no message
+ *
  * Revision 1.30  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
