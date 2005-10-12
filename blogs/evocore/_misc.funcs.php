@@ -88,6 +88,11 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = convert_chars($content, 'html');
 			break;
 
+		case 'urlencoded':
+			// Encode string to be passed as part of an URL
+			$content = urlencode( $content );
+			break;
+
 		case 'entityencoded':
 			// Special mode for RSS 0.92: apply renders and allow full HTML but escape it
 			$content = convert_chars($content, 'html');
@@ -887,11 +892,13 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		{
 			case 'html':
 				// do nothing
+				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as HTML', 'params' );
 				break;
 
 			case 'string':
 				// echo $var, '=', $$var, '<br />';
 				$$var = trim( strip_tags($$var) );
+				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
 				break;
 
 			default:
@@ -1880,6 +1887,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.99  2005/10/12 18:24:37  fplanque
+ * bugfixes
+ *
  * Revision 1.98  2005/10/11 20:36:38  fplanque
  * minor changes
  *

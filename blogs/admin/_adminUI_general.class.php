@@ -745,7 +745,7 @@ class AdminUI_general
 				return array(
 				'before' => '<div class="results">',
 					'header_start' => '<div class="results_nav">',
-						'header_text' => '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$',
+						'header_text' => '<strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
 						'header_text_single' => '',
 					'header_end' => '</div>',
 					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
@@ -792,8 +792,9 @@ class AdminUI_general
 						'body_end' => "</tbody>\n\n",
 					'list_end' => "</table>\n\n",
 					'footer_start' => '<div class="results_nav">',
-					'footer_text' => /* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
-														'<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$'
+					'footer_text' => '<strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$'
+														/* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
+														/* '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$' */
 														/* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
 					'footer_text_single' => T_('1 page'),
 						'prev_text' => T_('Previous'),
@@ -1101,6 +1102,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.34  2005/10/12 18:24:37  fplanque
+ * bugfixes
+ *
  * Revision 1.33  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
  *

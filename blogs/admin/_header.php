@@ -183,6 +183,4 @@ $AdminUI->addMenuEntries(
 		)
 	);
 
-
-
 ?>

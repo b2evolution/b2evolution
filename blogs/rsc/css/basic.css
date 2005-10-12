@@ -90,6 +90,7 @@ div.error {
 	border:1px solid #d99;
 	background:#fbf2ee;
 	color:#e00;
+	margin-bottom: 1ex;	/* might be followed by debug info */
 }
 
 p.error,

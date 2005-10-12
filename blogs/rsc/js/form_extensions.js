@@ -13,17 +13,19 @@
  */
 function get_form( object )
 {
- 	while( object.nodeName != 'FORM' )
+ 	while( object.tagName != 'FORM' )
 	{	// loop which goes from the checkbox to the form
+		// alert( object.nodeName );
 		if( typeof( object ) != 'undefined' ) // make sure that we have not gone too far
 		{
 			object = object.parentNode;
 		}
 		else
 		{
-			return 0;
+			return false;
 		}
 	}
+	// alert( 'ok:'+object.tagName );
 	return object;
 }
 
@@ -37,21 +39,27 @@ function get_form( object )
 function check( object, action )
 { 
 
-	form = get_form( object );
+	form_obj = get_form( object );
+
+	if( ! form_obj )
+	{
+		alert( 'Could not find form' );
+		return false;
+	}
 
 	//checks or unchecks all checkboxes in the form
 	i = 0;
-	while( i < form.length )
+	while( i < form_obj.length )
 	{
-		if( form.elements[i].type == 'checkbox' )
+		if( form_obj.elements[i].type == 'checkbox' )
 		{
-			form.elements[i].checked = action;
+			form_obj.elements[i].checked = action;
 		}
 		i++;
 	}
 	
-	return form;
-	
+	// Cancel default action:
+	return false;
 } 
 
 

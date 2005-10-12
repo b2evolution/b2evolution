@@ -83,18 +83,19 @@ class ResultSel extends Results
 	 * @param string
 	 * @param integer current selection ID
 	 * @param string SQL query
+	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param string default ordering of columns (special syntax) if not URL specified
 	 * @param integer number of lines displayed on one screen
 	 */
 	function ResultSel( $field_ID, $table_selections, $field_sel_ID, $field_sel_name,
 											$table_objsel, $field_selected, $field_selection, $current_selection_ID,
-											$sql, $param_prefix = '', $default_order = '', $limit = 20 )
+											$sql, $count_sql = NULL, $param_prefix = '', $default_order = '', $limit = 20 )
 	{
 		global $current_User;
 
 		// Call parent:
-		parent::Results( $sql, $param_prefix, $default_order, $limit );
+		parent::Results( $sql, $param_prefix, $default_order, $limit, $count_sql );
 
 		if( ! $current_User->check_perm( 'selections', 'view' ) )
 		{	// User is NOT allowed to view selections
@@ -147,6 +148,15 @@ class ResultSel extends Results
 		// TODO: put this into object
 		$item_ID_array = array();
 
+
+		// EXPERIMENTAL:
+		if( !empty($this->top_callback) )
+		{
+			$func = $this->top_callback;
+			$func( $this->Form );
+		}
+		
+
 		// list/table start:
 		parent::display_list_start();
 	}
@@ -174,8 +184,8 @@ class ResultSel extends Results
 
 			if( $can_edit )
 			{
-				echo '<a href="'.regenerate_url().'" onclick="check( this, true );return false;">'.T_('Check all')
-						.'</a> | <a href="'.regenerate_url().'" onclick="check( this, false );return false;">'.T_('Uncheck all').'</a> ';
+				echo '<a href="'.regenerate_url().'" onclick="return check( this, true );">'.T_('Check all')
+						.'</a> | <a href="'.regenerate_url().'" onclick="return check( this, false );">'.T_('Uncheck all').'</a> ';
 			}
 
 			// construction of the select menu :
@@ -439,7 +449,8 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
 			if( empty($selection_name) )
 			{	// No name provided:
-				$Messages->add( T_('Cannot create a selection with an empty name'), 'error' );
+				// $Messages->add( T_('Cannot create a selection with an empty name'), 'error' );
+				// Abord creation!
 				break;
 			}
 
@@ -601,7 +612,7 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 				<?php
 			}
 			else
-			{ // the deletion has been confermed
+			{ // the deletion has been confirmed
 				$sql_sel = 'DELETE FROM '.$sel_table.' WHERE '.$sel_table_selection.'='.$selection_ID;
 				$DB->query( $sql_sel );// deletion of the links between the selection and the selected items
 				$Messages->add( T_('Selection attachments deleted'), 'success' );
@@ -626,6 +637,9 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
 /*
  * $Log$
+ * Revision 1.5  2005/10/12 18:24:37  fplanque
+ * bugfixes
+ *
  * Revision 1.4  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

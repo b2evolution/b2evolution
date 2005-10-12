@@ -116,7 +116,7 @@ class Request
 	{
 		foreach( $vars as $var )
 		{
-			$this->param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true );
+			$this->param( $var, $type, $default, $memorize, $override, $forceset );
 		}
 	}
 
@@ -560,6 +560,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.13  2005/10/12 18:24:37  fplanque
+ * bugfixes
+ *
  * Revision 1.12  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

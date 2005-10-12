@@ -805,13 +805,15 @@ class Results extends Widget
 	{
 		// Make variable substitution for STRINGS:
 		$content = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $content );
+		// Make variable substitution for URL STRINGS:
+		$content = preg_replace( '#\£ (\w+) \£#ix', "'.format_to_output(\$row->$1, 'urlencoded').'", $content );
 		// Make variable substitution for RAWS:
 		$content = preg_replace( '!\# (\w+) \#!ix', "\$row->$1", $content );
 		// Make variable substitution for full ROW:
 		$content = str_replace( '{row}', '$row', $content );
 		// Make callback function substitution:
 		$content = preg_replace( '#% (.+?) %#ix', "'.$1.'", $content );
-		// Make callback function substitution:
+		// Sometimes we need embedded function call, so we provide a second sign:
 		$content = preg_replace( '#¤ (.+?) ¤#ix', "'.$1.'", $content );
 
 		return $content;
@@ -1115,6 +1117,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.32  2005/10/12 18:24:37  fplanque
+ * bugfixes
+ *
  * Revision 1.31  2005/10/11 18:31:11  fplanque
  * no message
  *
