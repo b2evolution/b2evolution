@@ -168,21 +168,21 @@ switch( $AdminUI->getPath(1) )
 		{
 			$last_date = 0;
 
-			$chart[ 'chart_data' ][ 0 ][ 0 ] = '';
-			$chart[ 'chart_data' ][ 1 ][ 0 ] = 'Direct Accesses';	// Translations nned to be UTF-8
-			$chart[ 'chart_data' ][ 2 ][ 0 ] = 'Referers';
-			$chart[ 'chart_data' ][ 3 ][ 0 ] = 'Refering Searches';
-			$chart[ 'chart_data' ][ 4 ][ 0 ] = 'Syndication';
-			$chart[ 'chart_data' ][ 5 ][ 0 ] = 'Indexing Robots';
-			$chart[ 'chart_data' ][ 6 ][ 0 ] = 'Blacklisted';
-
 			$col_mapping = array(
 														'direct' => 1,
 														'referer' => 2,
 														'search' => 3,
-														'blacklist' => 6
+														'blacklist' => 4,
+														'spam' => 5,
 													);
 
+			$chart[ 'chart_data' ][ 0 ] = array();
+			$chart[ 'chart_data' ][ 1 ] = array();
+			$chart[ 'chart_data' ][ 2 ] = array();
+			$chart[ 'chart_data' ][ 3 ] = array();
+			$chart[ 'chart_data' ][ 4 ] = array();
+			$chart[ 'chart_data' ][ 5 ] = array();
+													
 			$count = 0;
 			foreach( $res_hits as $row_stats )
 			{
@@ -191,17 +191,23 @@ switch( $AdminUI->getPath(1) )
 				{ // We just hit a new day, let's display the previous one:
 						$last_date = $this_date;	// that'll be the next one
 						$count ++;
-						$chart [ 'chart_data' ][ 0 ][ $count ] = date( locale_datefmt(), $last_date );
-						$chart [ 'chart_data' ][ 1 ][ $count ] = 0;
-						$chart [ 'chart_data' ][ 2 ][ $count ] = 0;
-						$chart [ 'chart_data' ][ 3 ][ $count ] = 0;
-						$chart [ 'chart_data' ][ 4 ][ $count ] = 0;
-						$chart [ 'chart_data' ][ 5 ][ $count ] = 0;
-						$chart [ 'chart_data' ][ 6 ][ $count ] = 0;
+						array_unshift( $chart[ 'chart_data' ][ 0 ], date( locale_datefmt(), $last_date ) );
+						array_unshift( $chart[ 'chart_data' ][ 1 ], 0 );
+						array_unshift( $chart[ 'chart_data' ][ 2 ], 0 );
+						array_unshift( $chart[ 'chart_data' ][ 3 ], 0 );
+						array_unshift( $chart[ 'chart_data' ][ 4 ], 0 );
+						array_unshift( $chart[ 'chart_data' ][ 5 ], 0 );
 				}
 				$col = $col_mapping[$row_stats['referer_type']];
-				$chart [ 'chart_data' ][$col][$count] = $row_stats['hits'];
+				$chart [ 'chart_data' ][$col][0] = $row_stats['hits'];
 			}
+
+			array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
+			array_unshift( $chart[ 'chart_data' ][ 1 ], 'Direct Accesses' );	// Translations need to be UTF-8
+			array_unshift( $chart[ 'chart_data' ][ 2 ], 'Referers' );
+			array_unshift( $chart[ 'chart_data' ][ 3 ], 'Refering Searches' );
+			array_unshift( $chart[ 'chart_data' ][ 4 ], 'Blacklisted' );
+			array_unshift( $chart[ 'chart_data' ][ 5 ], 'Spam' );
 
 			$chart[ 'canvas_bg' ] = array (		'width'  => 780,
 																				'height' => 400,

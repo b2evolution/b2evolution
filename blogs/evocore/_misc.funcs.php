@@ -1118,10 +1118,8 @@ function autoquote( & $string )
  * Checks allowed URI schemes and URL ban list.
  * URL can be empty.
  *
- * fplanque: 0.8.5: changed return values
- * vegarg: 0.8.6.2: switched to MySQL antispam list
- *
- * {@internal validate_url(-) }}
+ * Note: We have a problem when trying to "antispam" a keyword which is already blacklisted
+ * If that keyword appears in the URL... then the next page has a bad referer! :/
  *
  * @param string Url to validate
  * @param array Allowed URI schemes (see /conf/_formatting.php)
@@ -1146,7 +1144,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 										([a-z][a-z0-9+.\-]*):[0-9]*		# scheme
 										//														# authority absolute URLs only
 										[a-z][a-z0-9~+.\-_,:;/\\\\*]* 	# Don t allow anything too funky like entities
-										([?#][a-z0-9~+.\-_,:;/\\\\%&=?#*]*)?
+										([?#][a-z0-9~+.\-_,:;/\\\\%&=?#*\ ]*)?
 										$¤ix', $url, $matches) )
 	{ // Cannot vaidate URL structure
 		return T_('Invalid URL');
@@ -1887,6 +1885,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.100  2005/10/12 21:14:17  fplanque
+ * bugfixes
+ *
  * Revision 1.99  2005/10/12 18:24:37  fplanque
  * bugfixes
  *

@@ -333,7 +333,7 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'add' here once it's mature.
 { // add keyword or domain
 	echo '<div class="panelblock">';
-	$Form = & new Form( 'antispam.php', 'antispam_add', 'get', '' );
+	$Form = & new Form( 'antispam.php', 'antispam_add', 'post', '' );
 	$Form->begin_form('fform');
 	$Form->hidden( 'action', 'ban' );
 	$Form->text( 'keyword', $keyword, 30, T_('Add a banned keyword'), '', 80 ); // TODO: add note
