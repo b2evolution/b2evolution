@@ -30,7 +30,7 @@ if( true !== CANUSEXMLRPC )
 
 // We can't display standard error messages. We must return XMLRPC responses.
 $DB->halt_on_error = false;
-// blueyed>> QUESTION: Also set $DB->show_errors = false; here?
+$DB->show_errors = false;
 
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
@@ -2830,6 +2830,9 @@ $s=new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.78  2005/10/12 12:21:01  fplanque
+ * answer: yes :)
+ *
  * Revision 1.77  2005/10/11 21:29:21  blueyed
  * Question
  *
