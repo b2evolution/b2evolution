@@ -190,25 +190,27 @@ class Request
 	/**
 	 * @param string param name
 	 * @param string error message
+	 * @param string|NULL error message for form field ($err_msg gets used if === NULL).
 	 * @return boolean true if OK
 	 */
-	function param_string_not_empty( $var, $err_msg )
+	function param_string_not_empty( $var, $err_msg, $field_msg = NULL )
 	{
 		$this->param( $var, 'string', true );
-		return $this->param_check_not_empty( $var, $err_msg );
+		return $this->param_check_not_empty( $var, $err_msg, $field_msg );
 	}
 
 
 	/**
 	 * @param string param name
 	 * @param string error message
+	 * @param string|NULL error message for form field ($err_msg gets used if === NULL).
 	 * @return boolean true if OK
 	 */
-	function param_check_not_empty( $var, $err_msg )
+	function param_check_not_empty( $var, $err_msg, $field_msg = NULL )
 	{
 		if( empty( $this->params[$var] ) )
 		{
-			$this->param_error( $var, $err_msg );
+			$this->param_error( $var, $err_msg, $field_msg );
 			return false;
 		}
 		return true;
@@ -395,9 +397,10 @@ class Request
 	 *
 	 * @param string param name
 	 * @param string error message
+	 * @param string|NULL error message for form field ($err_msg gets used if === NULL).
 	 * @return boolean true if OK
 	 */
-	function param_check_regexp( $var, $err_msg )
+	function param_check_regexp( $var, $err_msg, $field_msg = NULL )
 	{
 		if( ! isRegexp( $this->params[$var] ) )
 		{
@@ -411,7 +414,7 @@ class Request
 	/**
 	 * @param string param name
 	 * @param string param name
-	 * @param boolean
+	 * @param boolean Is a password required? (non-empty)
 	 * @return boolean true if OK
 	 */
 	function param_check_passwords( $var1, $var2, $required = false )
@@ -457,9 +460,10 @@ class Request
 	/**
 	 * @param array of param names
 	 * @param string error message
+	 * @param string|NULL error message for form field ($err_msg gets used if === NULL).
 	 * @return boolean true if OK
 	 */
-	function params_check_at_least_one( $vars, $err_msg )
+	function params_check_at_least_one( $vars, $err_msg, $field_msg = NULL )
 	{
 		foreach( $vars as $var )
 		{
@@ -470,7 +474,7 @@ class Request
 		}
 
 		// Error!
-		$this->param_error_multiple( $vars, $err_msg );
+		$this->param_error_multiple( $vars, $err_msg, $field_msg );
 		return false;
 	}
 
@@ -489,7 +493,7 @@ class Request
 
 
 	/**
-	 * @access protected
+	 * @access protected blueyed >> Why? This is very useful for custom validation and throwing errors then!
 	 *
 	 * @param string param name
 	 * @param string error message
@@ -511,7 +515,7 @@ class Request
 
 
 	/**
-	 * @access protected
+	 * @access protected blueyed >> Why? This is very useful for custom validation and throwing errors then!
 	 *
 	 * @param array of param names
 	 * @param string error message
@@ -560,6 +564,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.14  2005/10/13 22:00:48  blueyed
+ * Added $field_msg parameter where appropriate; doc
+ *
  * Revision 1.13  2005/10/12 18:24:37  fplanque
  * bugfixes
  *
