@@ -44,12 +44,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- *
- */
-require_once dirname(__FILE__).'/_misc.funcs.php';
-
-
-/**
  * A hit to a blog.
  *
  * NOTE: The internal function double_check_referers() uses the class Net_IDNA_php4 from /blogs/lib/_idna_convert.class.php.

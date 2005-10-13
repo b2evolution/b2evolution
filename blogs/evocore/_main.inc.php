@@ -124,6 +124,12 @@ require_once dirname(__FILE__).'/_vars.inc.php';
 
 
 /**
+ * Miscellaneous functions
+ */
+require_once dirname(__FILE__).'/_misc.funcs.php';
+
+
+/**
  * Load DB class
  */
 require_once dirname(__FILE__).'/_db.class.php';
@@ -532,6 +538,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.53  2005/10/13 22:17:30  blueyed
+ * Moved include of _misc.funcs.inc.php to _main.inc.php
+ *
  * Revision 1.52  2005/10/11 19:28:57  blueyed
  * Added decent error message if tables do not exist yet (not installed).
  *
