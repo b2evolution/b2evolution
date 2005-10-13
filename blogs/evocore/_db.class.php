@@ -299,7 +299,7 @@ class DB
 		{	// Specify which charset we are using on the client:
 			$this->query( 'SET NAMES '.$params['connection_charset'] );
 		}
-		
+
 		/*
 		echo '<br />Server: '.$this->get_var( 'SELECT @@character_set_server' );
 		echo '<br />Database: '.$this->get_var( 'SELECT @@character_set_database' );
@@ -308,7 +308,7 @@ class DB
 		echo '<br />Results: '.$this->get_var( 'SELECT @@character_set_results' );
 		*/
 
-		
+
 		if( isset($params['aliases']) )
 		{ // Prepare aliases for replacements:
 			foreach( $params['aliases'] as $dbalias => $dbreplace )
@@ -327,6 +327,13 @@ class DB
 	 */
 	function select($db)
 	{
+		global $Timer;
+
+		if( is_object($Timer) )
+		{
+			$Timer->resume( 'sql_queries' );
+		}
+
 		if( !@mysql_select_db($db, $this->dbhandle) )
 		{
 			$this->print_error( '<p><strong>Error selecting database ['.$db.']!</strong></p>
@@ -334,6 +341,11 @@ class DB
 					<li>Are you sure the database exists?</li>
 					<li>Are you sure there is a valid database connection?</li>
 				</ol>' );
+		}
+
+		if( is_object($Timer) )
+		{
+			$Timer->pause( 'sql_queries' );
 		}
 	}
 
@@ -849,7 +861,7 @@ class DB
 	 */
 	function vardump( $mixed = '' )
 	{
-		echo '<p><table><tr><td bgcolor="fff"><blockquote style="color:#000090">';
+		echo '<p><table summary="Variable Dump"><tr><td bgcolor="fff"><blockquote style="color:#000090">';
 		echo '<pre style="font-family:Arial">';
 
 		if ( ! $this->vardump_called )
@@ -891,11 +903,11 @@ class DB
 	{
 		$r = '';
 
-		if ( $this->col_info )
+		if( $this->col_info )
 		{
 			// =====================================================
 			// Results top rows
-			$r .= '<table cellspacing="0"><tr>';
+			$r .= '<table cellspacing="0" summary="Results for query"><tr>';
 			for( $i = 0, $count = count($this->col_info); $i < $count; $i++ )
 			{
 				$r .= '<th><span class="type">'.$this->col_info[$i]->type.' '.$this->col_info[$i]->max_length.'</span><br />'
@@ -1225,6 +1237,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.35  2005/10/13 22:02:37  blueyed
+ * Summary for tables; select() included in query timer.
+ *
  * Revision 1.34  2005/10/06 17:03:02  fplanque
  * allow to set a specific charset for the MySQL connection.
  * This allows b2evo to work internally in a charset different from the database charset.
