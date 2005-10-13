@@ -26,7 +26,7 @@
 /*
 header('HTTP/1.0 503 Service Unavailable');
 echo '<h1>503 Service Unavailable</h1>';
-die( 'The site is temporarily down for maintainance.' );
+die( 'The site is temporarily down for maintenance.' );
 */
 
 /**
