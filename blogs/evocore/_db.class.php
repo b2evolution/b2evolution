@@ -460,7 +460,7 @@ class DB
 
 			if( $this->debug_dump_function_trace_for_errors )
 			{
-				echo $this->debug_get_xdebug_function_stack( NULL, array( 'function' => 'print_error' ) );
+				echo debug_get_backtrace();
 			}
 
 			echo '</div>';
@@ -599,7 +599,7 @@ class DB
 
 		if( $this->debug_dump_function_trace_for_queries )
 		{
-			$this->queries[ $this->num_queries - 1 ]['function_trace'] = $this->debug_get_xdebug_function_stack( $this->debug_dump_function_trace_for_queries );
+			$this->queries[ $this->num_queries - 1 ]['function_trace'] = debug_get_backtrace( $this->debug_dump_function_trace_for_queries, array( array( 'class' => 'DB', 'function' => 'query' ) ) );
 		}
 
 
@@ -983,82 +983,6 @@ class DB
 
 
 	/**
-	 * Get a function trace from {@link http://www.xdebug.org xdebug (PHP Extension)}
-	 * as html table.
-	 *
-	 * {@internal NOTE: This should become probably a generic function in evocore/_debug.funcs.php.}}
-	 *
-	 * @param integer|NULL Get the last x entries from the stack (after $ignore_from is applied). NULL means "all".
-	 * @param array After a key/value pair matches a stack entry, this and the rest is ignored.
-	 * @return string HTML table
-	 */
-	function debug_get_xdebug_function_stack( $last = 1, $ignore_from = array( 'class' => 'DB') )
-	{
-		$r = '';
-
-		if( function_exists( 'xdebug_is_enabled' ) && xdebug_is_enabled() )
-		{
-			$r = '
-			<table class="grouped">
-				<thead>
-					<tr>
-						<th>Function / Include</th>
-						<th>File</th>
-						<th>Line</th>
-					</tr>
-				</thead>';
-
-			$stack = xdebug_get_function_stack();
-
-			if( $ignore_from )
-			{
-				$stack_length = 0;
-				foreach( $stack as $l_stack )
-				{
-					foreach( $ignore_from as $l_ignore_key => $l_ignore_value )
-					{
-						if( isset($l_stack[$l_ignore_key]) && $l_stack[$l_ignore_key] == $l_ignore_value )
-						{
-							break 2;
-						}
-					}
-					$stack_length++;
-				}
-				$stack = array_slice( $stack, 0, $stack_length );
-			}
-
-			if( $last !== NULL )
-			{
-				$stack = array_slice( $stack, 0 - $last );
-			}
-
-			foreach( $stack as $l_stack )
-			{
-				$r .= "\n<tr><td>";
-
-				if( isset( $l_stack['class'] ) )
-				{
-					$r .= $l_stack['class'].'::'.$l_stack['function'].'()';
-				}
-				elseif( isset( $l_stack['function'] ) )
-				{
-					$r .= $l_stack['function'].'()';
-				}
-				else
-				{
-					$r .= '<strong>=&gt;</strong> '.$l_stack['file'];
-				}
-
-				$r .= '</td><td>'.$l_stack['file'].'</td><td>'.$l_stack['line'].'</td></tr>';
-			}
-			$r .= '</table>';
-		}
-
-		return $r;
-	}
-
-
-	/**
 	 * Displays all queries that have been executed
 	 *
 	 * {@internal DB::dump_queries(-) }}
@@ -1237,6 +1161,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.36  2005/10/13 22:32:30  blueyed
+ * Use debug_get_backtrace(); Remove obsolete method which used xdebug for that.
+ *
  * Revision 1.35  2005/10/13 22:02:37  blueyed
  * Summary for tables; select() included in query timer.
  *
