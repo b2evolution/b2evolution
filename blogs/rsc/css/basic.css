@@ -112,6 +112,9 @@ div.debug {
 	background-color: #ccc;
 	text-align: left;
 	color: #000;
+	position:absolute; /* Use full width */
+	left:0;
+	right:0;
 }
 
 div.debug h2,
