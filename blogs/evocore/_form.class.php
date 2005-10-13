@@ -94,6 +94,7 @@ class Form extends Widget
 	 * - 'note': The note associated with the field.
 	 * - 'note_format': The format of the note. %s gets replaced by the note.
 	 * - 'label': The label for the field.
+	 * - 'required': is the element required to be filled/checked? This will add a visual hint (boolean; default: false)
 	 *
 	 * @see handle_common_params()
 	 * @var array
@@ -1013,6 +1014,7 @@ class Form extends Widget
 	 *  - a boolean indicating whether the box must be checked or not
 	 *  - an optional boolean indicating whether the box is disabled or not
 	 *  - an optional note
+	 *  - 'required': is the box required to be checked (boolean; default: false)
 	 *
 	 * @todo Transform to $field_params schema.
 	 * @param array a two-dimensional array containing the parameters of the input tag
@@ -1044,6 +1046,11 @@ class Form extends Widget
 				$after_field = '</span>';
 				$loop_field_note .= ' <span class="field_error">'.$Request->err_messages[$error_name].'</span>';
 				$r .= '<span class="checkbox_error">';
+			}
+			elseif( isset($option['required']) && $option['required'] )
+			{ // visually indicate that the field is required:
+				$after_field = '</span>';
+				$r .= '<span class="checkbox_required">';
 			}
 			else
 			{
@@ -2003,7 +2010,6 @@ class Form extends Widget
 
 		if( !empty($this->_common_params['label']) )
 		{
-			// $this->empty_label = true; // Memorize this
 			$r .= $this->labelstart
 						.'<label'
 						.( !empty($this->_common_params['id'])
@@ -2012,12 +2018,12 @@ class Form extends Widget
 						.'>'
 						.$this->_common_params['label']
 						.$this->label_suffix
+						#.( isset($this->_common_params['required']) && $this->_common_params['required'] ? ' <small class="required">[*]</small>' : '' )
 						.'</label>'
 						.$this->labelend;
 		}
 		else
 		{ // Empty label:
-			// $this->empty_label = false; // Memorize this
 			$r .= $this->labelempty;
 		}
 
@@ -2094,6 +2100,13 @@ class Form extends Widget
 			unset( $field_params['field_suffix'] );
 		}
 
+		if( isset($field_params['required']) )
+		{
+			$this->_common_params['required'] = $field_params['required'];
+			unset($field_params['required']);
+		}
+
+
 		if( !empty($field_params['name']) )
 		{
 			if( !isset($field_params['id']) )
@@ -2116,11 +2129,25 @@ class Form extends Widget
 		// Error handling:
 		if( isset($field_params['name']) && isset($Request->err_messages[$field_params['name']]) )
 		{ // There is an error message for this field:
-			$field_params['class'] = isset( $field_params['class'] )
-				? $field_params['class'].' field_error'
-				: 'field_error';
+			if( $field_params['type'] == 'checkbox' )
+			{ // checkboxes need a span
+				$field_params['input_suffix'] = '</span>'.( isset($field_params['input_suffix']) ? $field_params['input_suffix'] : '' );
+				$field_params['input_prefix'] = ( isset($field_params['input_prefix']) ? $field_params['input_prefix'] : '' ).'<span class="checkbox_required">';
+			}
+			else
+			{
+				$field_params['class'] = isset( $field_params['class'] )
+					? $field_params['class'].' field_error'
+					: 'field_error';
+			}
 
 			$this->_common_params['note'] .= ' <span class="field_error">'.$Request->err_messages[$field_params['name']].'</span>';
+		}
+		elseif( isset($this->_common_params['required']) && $this->_common_params['required'])
+		{
+			$field_params['class'] = isset( $field_params['class'] )
+				? $field_params['class'].' field_required'
+				: 'field_required';
 		}
 
 		#pre_dump( 'handle_common_params (after)', $field_params );
@@ -2180,6 +2207,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.75  2005/10/13 22:07:55  blueyed
+ * Added 'required' parameter handling
+ *
  * Revision 1.74  2005/10/13 09:29:00  blueyed
  * Fix/automate id-attribute handling for radio_input()
  *
