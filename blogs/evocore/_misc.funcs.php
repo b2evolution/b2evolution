@@ -494,10 +494,16 @@ function antispambot($emailaddy, $mailto = 0) {
 
 /**
  * Check that email address looks valid
+ *
+ * @return bool
  */
 function is_email( $email )
 {
 	#$chars = "/^([a-z0-9_]|\\-|\\.)+@(([a-z0-9_]|\\-)+\\.)+[a-z]{2,4}\$/i";
+
+	# Converted from: http://www.regexlib.com/REDetails.aspx?regexp_id=711
+	/*$pattern_email_rfc2822 = 'ß^((?>[a-zA-Z\d!#$%&\'*+\-/=?^_`{|}~]+\x20*|"((?=[\x01-\x7f])[^"\\]|\\[\x01-\x7f])*"\x20*)*(?P<angle_nr_three><))?((?!\.)(?>\.?[a-zA-Z\d!#$%&\'*+\-/=?^_`{|}~]+)+|"((?=[\x01-\x7f])[^"\\]|\\[\x01-\x7f])*")@(((?!-)[a-zA-Z\d\-]+(?<!-)\.)+[a-zA-Z]{2,}|\[(((?(?<!\[)\.)(25[0-5]|2[0-4]\d|[01]?\d?\d)){4}|[a-zA-Z\d\-]*[a-zA-Z\d]:((?=[\x01-\x7f])[^\\\[\]]|\\[\x01-\x7f])+)\])(?(3)>)$ß';*/
+
 	$chars = '/^.+@[^\.].*\.[a-z]{2,}$/i';
 
 	if( strpos( $email, '@' ) !== false && strpos( $email, '.' ) !== false )
@@ -1204,7 +1210,7 @@ function debug_info( $force = false )
 
 	if( $debug || $force )
 	{
- 		echo '<div class="debug"><h2>Debug info</h2>';
+		echo '<div class="debug"><h2>Debug info</h2>';
 
 		$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
 		$Debuglog->add( 'Len of serialized $cache_File: '.strlen(serialize($cache_File)), 'memory' );
@@ -1381,15 +1387,23 @@ function url_add_tail( $url, $tail )
  *
  * {@link $current_locale} will be used to set the charset.
  *
- * @param string Recipient, either email only or in "Name <example@example.com>" format
+ * Note: we use a single \n as line ending, though it does not comply to
+ * {@link http://www.faqs.org/rfcs/rfc2822 RFC2822}, but seems to be safer,
+ * because some mail transfer agents replace \n by \r\n automatically.
+ *
+ * @param string Recipient, either email only or in "Name <example@example.com>" format (RFC2822).
+ *               Can be multiple comma-seperated addresses.
  * @param string Subject of the mail
  * @param string The message text
- * @param string From address, being added to headers
- * @param array Additional headers ( headername => value )
+ * @param string From address, being added to headers (we'll prevent injections);
+ *               see {@link http://securephp.damonkohler.com/index.php/Email_Injection}.
+ * @param array Additional headers ( headername => value ). Take care of injection!
  */
 function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 {
 	global $debug, $app_name, $app_version, $current_locale, $locales, $Debuglog;
+
+	$NL = "\n";
 
 	if( !is_array( $headers ) )
 	{ // Make sure $headers is an array
@@ -1403,30 +1417,21 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 	// -- Build headers ----
 	if( !empty($from) )
 	{ // From has to go into headers
-		$headerstring = "From: $from\n";
+		$from = preg_replace( '~(\r|\n).*$~s', '', $from ); // Prevent injection! (remove everything after \n or \r)
+		$headerstring = "From: $from$NL";
 	}
 	else
 	{
 		$headerstring = '';
 	}
 
-	if( preg_match( '#^.*?\s*<(.*?)>$#', $to, $match ) )
-	{ // Handle "Name <example@example.com>" format
-		$to = $match[1]; // email address only!
-
-		if( !isset( $headers['To'] ) )
-		{ // Add it as To-header, if none given in headers array.
-			$headers['To'] = $match[0];
-		}
-	}
-
 	reset( $headers );
 	while( list( $lKey, $lValue ) = each( $headers ) )
 	{ // Add additional headers
-		$headerstring .= $lKey.': '.$lValue."\n";
+		$headerstring .= $lKey.': '.$lValue.$NL;
 	}
 
-	$message = str_replace( array( "\r\n", "\r" ), "\n", $message );
+	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
 
 	if( $debug > 1 )
 	{	// We agree to die for debugging...
@@ -1885,6 +1890,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.101  2005/10/13 20:11:05  blueyed
+ * Fixed send_mail()! added a funky regexp to validate emails according to rfc2822 (not activated).
+ *
  * Revision 1.100  2005/10/12 21:14:17  fplanque
  * bugfixes
  *
