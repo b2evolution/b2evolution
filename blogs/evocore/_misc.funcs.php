@@ -1193,6 +1193,193 @@ function pre_dump( $vars )
 
 
 /**
+ * Get a function trace from {@link debug_backtrace()} as html table.
+ *
+ * Adopted from {@link http://us2.php.net/manual/de/function.debug-backtrace.php#47644}.
+ *
+ * @param integer|NULL Get the last x entries from the stack (after $ignore_from is applied). NULL means "all".
+ * @param array After a key/value pair matches a stack entry, this and the rest is ignored.
+ *              For example, array('class' => 'DB') would exclude everything after the stack
+ *              "enters" class DB and everything that got called afterwards.
+ *              You can also give an array of arrays which means that every condition in one of the given array must match.
+ * @return string HTML table
+ */
+function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'function' => 'debug_get_backtrace' ) )
+{
+	$r = '';
+
+	if( function_exists( 'debug_backtrace' ) ) // PHP 4.3.0
+	{
+		$backtrace = debug_backtrace();
+		$count_ignored = 0; // remember how many have been ignored
+		$limited = false;   // remember if we have limited to $limit_to_last
+
+		if( $ignore_from )
+		{	// we want to ignore from a certain point
+			$trace_length = 0;
+
+			for( $i = count($backtrace); $i > 0; $i-- )
+			{	// Search the backtrace from behind (first call).
+				$l_stack =& $backtrace[$i-1];
+
+				foreach( $ignore_from as $l_ignore_key => $l_ignore_value )
+				{	// Check if we want to ignore from here
+					if( is_array($l_ignore_value) )
+					{	// It's an array - all must match
+						foreach( $l_ignore_value as $l_ignore_mult_key => $l_ignore_mult_val )
+						{
+							if( !isset($l_stack[$l_ignore_mult_key]) /* not set with this stack entry */
+								|| $l_stack[$l_ignore_mult_key] != $l_ignore_mult_val /* not this value */ )
+							{
+								continue 2; // next ignore setting, because not all match.
+							}
+						}
+						break 2; // ignore from here
+					}
+					if( isset($l_stack[$l_ignore_key]) && $l_stack[$l_ignore_key] == $l_ignore_value )
+					{
+						break 2; // ignore from here
+					}
+				}
+				$trace_length++;
+			}
+
+			$count_ignored = count($backtrace) - $trace_length;
+
+			$backtrace = array_slice( $backtrace, 0-$trace_length ); // cut off ignored ones
+		}
+
+		if( $limit_to_last !== NULL )
+		{	// we want to limit to a maximum number
+			$limited = true;
+			$backtrace = array_slice( $backtrace, 0, $limit_to_last );
+		}
+
+		$count_backtrace = count($backtrace);
+		$r .= '<div style="padding:1ex; text-align:left; font-family:monospace; font-size:small; color:#000; background-color:#ddf"><h3>Backtrace:</h3>'."\n";
+		if( $count_backtrace )
+		{
+			$r .= '<ol>';
+
+			$i = 0;
+			foreach( $backtrace as $l_trace )
+			{
+				if( ++$i == $count_backtrace )
+				{
+					$r .= '<li style="padding:0.5ex 0;">';
+				}
+				else
+				{
+					$r .= '<li style="padding:0.5ex 0; border-bottom:1px solid #77d;">';
+				}
+				$args = array();
+				if( is_array( $l_trace['args'] ) )
+				{	// Prepare args:
+					foreach( $l_trace['args'] as $l_arg )
+					{
+						$l_arg_type = gettype($l_arg);
+						switch( $l_arg_type )
+						{
+							case 'integer':
+							case 'double':
+								$args[] = $l_arg;
+								break;
+							case 'string':
+								$args[] = '"'.htmlspecialchars(str_replace("\n", '', substr($l_arg, 0, 64))).((strlen($l_arg) > 64) ? '...' : '').'"';
+								break;
+							case 'array':
+								$args[] = 'Array('.count($l_arg).')';
+								break;
+							case 'object':
+								$args[] = 'Object('.get_class($l_arg).')';
+								break;
+							case 'resource':
+								$args[] = 'Resource('.strstr($l_arg, '#').')';
+								break;
+							case 'boolean':
+								$args[] = $l_arg ? 'true' : 'false';
+								break;
+							default:
+								$args[] = $l_arg_type;
+						}
+					}
+				}
+
+				$call = '<strong>';
+				if( isset($l_trace['class']) )
+				{
+					$call .= $l_trace['class'];
+				}
+				if( isset($l_trace['type']) )
+				{
+					$call .= $l_trace['type'];
+				}
+				$call .= $l_trace['function'].'(</strong>';
+				if( $args )
+				{
+					$call .= ' '.implode( ', ', $args ).' ';
+				}
+				$call .='<strong>)</strong>';
+
+				$r .= $call."<br />\n<strong>File: </strong>{$l_trace['file']}:{$l_trace['line']}";
+				$r .= "</li>\n";
+			}
+			$r .= '</ol>';
+		}
+		else
+		{
+			$r .= '<p>No backtrace available.</p>';
+		}
+
+		// Extra notes, might be to much, but explains why we stopped at some point. Feel free to comment it out or remove it.
+		$notes = array();
+		if( $count_ignored )
+		{
+			$notes[] = 'Ignored last: '.$count_ignored;
+		}
+		if( $limited )
+		{
+			$notes[] = 'Limited to'.( $count_ignored ? ' remaining' : '' ).': '.$limit_to_last;
+		}
+		if( $notes )
+		{
+			$r .= '<p class="small">'.implode( ' - ', $notes ).'</p>';
+		}
+
+		$r .= "</div>\n";
+	}
+
+	return $r;
+}
+
+
+/**
+ * When in debug mode, output a function backtrace after the dying message (and {@link die()}).
+ *
+ * @param string Message to output
+ * @param boolean|NULL If set it overrides the setting of {@link $debug} to decide if we want a backtrace.
+ */
+function debug_die( $last_words, $backtrace = NULL )
+{
+	global $debug;
+
+	echo $last_words;
+
+	if( !isset($backtrace) )
+	{
+		$backtrace = $debug;
+	}
+
+	if( $backtrace )
+	{
+		echo debug_get_backtrace();
+	}
+
+	die();
+}
+
+
+/**
  * Outputs debug info. (Typically at the end of the page)
  *
  * {@internal debug_info(-) }}
@@ -1890,6 +2077,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.102  2005/10/13 22:30:59  blueyed
+ * Added debug_get_backtrace() and debug_die()
+ *
  * Revision 1.101  2005/10/13 20:11:05  blueyed
  * Fixed send_mail()! added a funky regexp to validate emails according to rfc2822 (not activated).
  *
