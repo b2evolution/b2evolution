@@ -1789,12 +1789,16 @@ class Form extends Widget
 			$field_params['note_format'] = '<div><span class="notes">%s</span></div>';
 		}
 
+		$field_params['id'] = false; // No ID attribute for the label
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$r = $this->begin_field();
 
+		$count_options = 0; // used for unique IDs (label/radio)
 		foreach( $field_options as $loop_field_option )
 		{
+			$count_options++;
+
 			if( $field_lines ) $r .= "<div>\n";
 
 			$input_params = isset( $loop_field_option['params'] )
@@ -1825,12 +1829,14 @@ class Form extends Widget
 				$radio_suffix = '';
 			}
 
-			$input_params['input_suffix'] = ' '.$loop_field_option['label'];
+			// build unique id:
+			$input_params['id'] = $this->get_valid_id( $field_params['name'].'_'.md5($count_options.$input_params['value']) );
 
-			$r .= '<label class="radiooption">'
-				.$this->get_input_element( $input_params )
+			$r .= $this->get_input_element( $input_params ) // the radio element
+				.'<label class="radiooption" for="'.$input_params['id'].'">'
+				.$loop_field_option['label']
 				.'</label>'
-				.$radio_suffix;
+				.$radio_suffix; // might be HTML!
 
 			if( !empty( $loop_field_option['note'] ) )
 			{ // notes for radio option
@@ -2088,15 +2094,22 @@ class Form extends Widget
 			unset( $field_params['field_suffix'] );
 		}
 
-		if( !empty($field_params['name']) && !isset($field_params['id']) )
-		{ // Autogenerate id attrib (not for hidden, radio and submit types)
-			if( empty($field_params['type'])
-					|| ( $field_params['type'] != 'hidden'
-								&& $field_params['type'] != 'radio'
-								&& $field_params['type'] != 'submit'
-								) )
-			{ // Save ID with field_params and _common_params (for get_label())
-				$field_params['id'] = $this->_common_params['id'] = $this->get_valid_id($field_params['name']);
+		if( !empty($field_params['name']) )
+		{
+			if( !isset($field_params['id']) )
+			{ // Autogenerate id attrib (not for hidden, radio and submit types)
+				if( empty($field_params['type'])
+						|| ( $field_params['type'] != 'hidden'
+									&& $field_params['type'] != 'radio'
+									&& $field_params['type'] != 'submit'
+									) )
+				{ // Save ID with field_params and _common_params (for get_label())
+					$field_params['id'] = $this->_common_params['id'] = $this->get_valid_id($field_params['name']);
+				}
+			}
+			else
+			{
+				$this->_common_params['id'] = $field_params['id'];
 			}
 		}
 
@@ -2167,6 +2180,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.74  2005/10/13 09:29:00  blueyed
+ * Fix/automate id-attribute handling for radio_input()
+ *
  * Revision 1.73  2005/09/27 14:56:30  blueyed
  * use is_object() instead of isset() for $AdminUI check
  *
