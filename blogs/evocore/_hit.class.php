@@ -174,7 +174,7 @@ class Hit
 
 		$Debuglog->add( 'IP: '.$this->IP, 'hit' );
 		$Debuglog->add( 'UserAgent: '.$this->user_agent, 'hit' );
-		$Debuglog->add( 'Referer: '.$this->referer, 'hit' );
+		$Debuglog->add( 'Referer: '.var_export($this->referer, true).'; type='.$this->referer_type, 'hit' );
 		$Debuglog->add( 'Remote Host: '.$this->get_remote_host(), 'hit' );
 	}
 
@@ -207,7 +207,7 @@ class Hit
 	/**
 	 * Detect Referer (sic!).
 	 * Due to potential non-thread safety with getenv() (fallback), we'd better do this early.
-	 * 
+	 *
 	 * referer_type: enum('search', 'blacklist', 'referer', 'direct', 'spam')
 	 */
 	function detect_referer()
@@ -527,7 +527,7 @@ class Hit
 				}
 				else
 				{
-					$Debuglog->add( 'double_check_referers(): '.sprintf('did not find &laquo;%s&raquo; in &laquo;%s&raquo; (%s bytes read)', $full_req_url, $this->referer, bytesreadable($bytes_read) ), 'hit' );
+					$Debuglog->add( 'double_check_referers(): '.sprintf('did not find &laquo;%s&raquo; in &laquo;%s&raquo; (%s bytes read). -> referer_type=spam!', $full_req_url, $this->referer, bytesreadable($bytes_read) ), 'hit' );
 					$this->referer_type = 'spam';
 				}
 				unset( $content_ref_page );
