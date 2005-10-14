@@ -25,20 +25,55 @@ if( !$Settings->get('eblog_enabled') )
  exit();
 }
 
-// Get test settings
-$test_connection = false;
-$test_connection_only = false;
 
-if ( $_GET['test']=='connection' )
+// Get test settings
+@$test_type = $_GET['test'];
+$show_messages = false;
+$test_connection_only = false;
+$str_failure = '';
+
+if ( $Settings->get('eblog_test_mode') )
 {
-	// set error reporting to none
+	$test_type = 2;
+}
+
+if ( $test_type > 0 )
+{
 	error_reporting (0);
 
 	$page_title = T_('Blog by email');
-	require( dirname(__FILE__).'/_header.php' );
-	$test_connection = true;
-	$test_connection_only = true;
+	require_once( dirname(__FILE__).'/_header.php' );
+	$show_messages = true;
+  $str_failure = ' <font color="red">[ ' . T_('Failed') . ' ]</font>';
+  $str_warning = ' <font color="orange">[ ' . T_('Warning') . ' ]</font>';
 }
+
+//---------------------------------------
+function echo_message( $strmessage , $color = '', $level = 0 )
+{
+	global $show_messages;
+	global $test_type;
+
+	if ( $show_messages )
+	{
+		if ($level <= $test_type)
+		{
+			if ( $color )
+			{
+				echo "<font color='$color'>";
+			}
+
+			echo $strmessage;
+
+			if ( $color )
+			{
+			  echo "</font>";
+			}
+		}
+	}
+}
+//---------------------------------------
+
 
 
 switch ( $Settings->get('eblog_method') )
@@ -74,6 +109,12 @@ switch ( $Settings->get('eblog_method') )
 			exit;
 		}
 
+		if ( $test_type == 1 )
+		{
+			echo '<br /><br />' . T_('All Tests complete');
+			$pop3->quit();
+			exit;
+		}
 
 		// ONLY USE THIS IF YOUR PHP VERSION SUPPORTS IT! (PHP >= 3.0.4)
 		#register_shutdown_function( $pop3->quit() );
@@ -341,47 +382,54 @@ switch ( $Settings->get('eblog_method') )
 			exit;
 		}
 
-		if ( $test_connection )
-		{
-			echo T_('Testing username, password and connection to mail server:<br/>');
-		}
+		echo_message ( '&bull; ' . T_('Connecting and authenticating to mail server') );
 
 		// Prepare the connection string
 		$mailserver = '{' . $Settings->get('eblog_server_host') . ':' . $Settings->get('eblog_server_port') . '/pop3}INBOX';
 
 		// Connect to mail server
-		$mbox = imap_open( $mailserver, $Settings->get('eblog_username'), $Settings->get('eblog_password') ) or die( 	'<div class="action_messages"><div class="log_error">' . T_('Connection failed: ') . imap_last_error() . '</div></div>' );
+		$mbox = imap_open( $mailserver, $Settings->get('eblog_username'), $Settings->get('eblog_password') ) or die( 	$str_failure . '<div class="action_messages"><div class="log_error">' . T_('Connection failed: ') . imap_last_error() . '</div></div>' );
 
 		// damn gmail... grr
 		//$mbox = imap_open ("{pop.gmail.com:995/pop3/ssl/novalidate-cert}INBOX", "xxx@gmail.com", "xxx") or die( T_('Connection failed: ') . imap_last_error() );
 
-		if ( $test_connection_only )
+		echo_message ( ' [ ' . T_('Success') . ' ]<br />' , 'green' );
+		if ( $test_type == 1 )
 		{
-			echo '<div class="action_messages"><div class="log_success">' . T_('Test completed successfully') . '</div></div>';
+			echo '<br /><br />' . T_('All Tests complete');
 			imap_close($mbox);
 			exit();
 		}
 
 
 		// Read messages from server
+		echo_message ( '&bull; ' . T_('Reading messages from server') );
 		$imap_obj = imap_check($mbox);
-		//echo var_dump($imap_obj);
+		echo_message ( ' [ ' . $imap_obj->Nmsgs . ' ' . T_('messages') .' ] <br />', 'green' );
 
 		for ( $index=1; $index<= $imap_obj->Nmsgs; $index++ )
 		{
+			echo_message ( '<br /><b>' . T_('Message') . " #$index" . '</b><br />' );
 
-			echo "<hr />\n\n\n\n\n<h3> Message #$index</h3>\n";
-			printf( T_('Getting message #%d...')."<br />\n", $index );
 
 			//retrieve and process header
 			$imap_header = imap_headerinfo($mbox,$index);
 			$subject = $imap_header->subject;
+
+			//echo_message ( '<b>' . T_('Subject') . ':</b>' . $subject . '<br />', "green");
+			echo_message ('&bull;<b>' . T_('Subject') . ':</b>' . $subject );
 			if( !preg_match( '/'.$Settings->get('eblog_subject_prefix') .'/', $subject ) )
 			{
-				echo T_('Subject prefix does not match').'.<br />';
+				echo_message ( ' [ ' . T_('Warning') . ' ] <br />', 'orange' );
+				echo_message ( '&bull; ' . T_('The subject prefix is not ') . '"' . $Settings->get('eblog_subject_prefix') . '"<br/>', 'orange' );
 				continue;
 			}
+			else
+			{
+				echo_message ( ' [ ' . T_('Pass') . ' ] <br />', 'green' );
+			}
 
+			// todo: review the post_date code
 			// of the form '20 Mar 2002 20:32:37'
 			$ddate = trim($imap_header->Date);
 			if (strpos($ddate, ',')) {
@@ -409,6 +457,7 @@ switch ( $Settings->get('eblog_method') )
 			$ddate_U = mktime($ddate_H, $ddate_i, $ddate_s, $ddate_m, $ddate_d, $ddate_Y);
 			$ddate_U = $ddate_U + ($Settings->get('time_difference') * 3600);
 			$post_date = date('Y-m-d H:i:s', $ddate_U);
+
 
 			//fetch structure
 			$imap_structure = imap_fetchstructure ($mbox, $index);
@@ -440,9 +489,11 @@ switch ( $Settings->get('eblog_method') )
 						break;
 						case 5 : // image
 							// awww yeah ;)
+							// todo: add code to save attachments *safely*.  refer to files.php case 'file_upload'
+
 						break;
 						default:
-							echo "unhandled part type \n" . var_dump($part) . "\n";
+							echo_message ( '&bull; ' . T_('Unhandled email part type') . "\n" . var_dump($part) . "\n<br/>", 'orange');
 						break;
 					}
 
@@ -461,11 +512,17 @@ switch ( $Settings->get('eblog_method') )
 			$user_login = trim($a_authentication[0]);
 			$user_pass = @trim($a_authentication[1]);
 
+			echo_message ('&bull;<b>' . T_('Authenticating User') . ":</b> $user_login ");
 			// authenticate user
 			if( !user_pass_ok( $user_login, $user_pass ) )
 			{
-				echo '<p><strong>', T_('Wrong login or password.'), '</strong></p></div>';
+				echo_message ('[ ' . T_('Fail') .' ]<br />','orange');
+				echo_message ( '&bull; ' . T_('Wrong login or password.') . ' ' . T_('First line of text in email must be in the format "username:password"') . '<br />','orange');
 				continue;
+			}
+			else
+			{
+				echo_message ('[ ' . T_('Pass') .' ]<br />','green');
 			}
 
 			$subject = trim(str_replace($Settings->get('eblog_subject_prefix'), '', $subject));
@@ -491,21 +548,27 @@ switch ( $Settings->get('eblog_method') )
 			{
 				$post_category = $Settings->get('eblog_default_category');
 			}
-			echo '<p><strong>', T_('Category ID'), ':</strong> ',$post_category,'</p>';
+			echo_message ( '&bull;<b>' . T_('Category ID') . ':</b> ' . $post_category . '<br />','',3);
 
 			$content = xmlrpc_removepostdata( $content );
 
 			$blog_ID = get_catblog($post_category); // TODO: should not die, if cat does not exist!
-			echo '<p><strong>', T_('Blog ID'), ':</strong> ',$blog_ID,'</p>';
+			echo_message ( '&bull;<b>' . T_('Blog ID') . ':</b> ' . $blog_ID . '<br />','',3);
 
 			// Check permission:
-			if( ! $loop_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
+			echo_message ( '&bull;' . T_('Checking permissions for user') . " '$user_login' " . T_('to post to Blog') . " #$blog_ID ");
+			if(  !$loop_User->check_perm( 'blog_post_statuses', 'published', false, $blog_ID ) )
 			{
-				echo "\n", T_('Permission denied.'), '<br />';
+				echo_message ( '[ ' . T_('Permission denied') . ' ]','red' );
 				continue;
 			}
+			else
+			{
+				echo_message ( '[ ' . T_('Pass') . ' ]<br />' , 'green');
+			}
 
-			if (!$Settings->get('eblog_test_mode'))
+			// todo: finish this last section
+			if ( !$test_type > 0 )
 			{
 				// CHECK and FORMAT content
 				$post_title = format_to_post( trim($post_title), 0, 0 );
@@ -514,7 +577,6 @@ switch ( $Settings->get('eblog_method') )
 				if( $Messages->display( T_('Cannot post, please correct these errors:'), '' ) )
 				{
 					$Messages->reset();
-					echo '</div>';
 					continue;
 				}
 
@@ -528,13 +590,17 @@ switch ( $Settings->get('eblog_method') )
 				// Send email notifications now!
 				$edited_Item->send_email_notifications( false );
 
-//					pingb2evonet( $blogparams, $post_ID, $post_title);
+				//pingb2evonet( $blogparams, $post_ID, $post_title);
 				//pingWeblogs($blogparams);
 				//pingBlogs($blogparams);
 				//pingTechnorati($blogparams);
 			}
-			echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
-			echo "\n<strong>", T_('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
+			echo_message ( '&bull;<b>' . T_('Post title') . ":</b> $post_title<br/>",'',3 );
+			echo_message ( '&bull;<b>' . T_('Post content') . ":</b> $content<br/>",'',3 );
+			echo_message ( '&bull;<b>' . T_('Blog by Email'). ':</b> ');
+			echo_message ( '<b>[ ' . T_('Success') . ' ]</b><br/>', 'green');
+
+			// todo : enable deletion
 		/*
 			if(!$pop3->delete($iCount))
 			{
@@ -547,10 +613,11 @@ switch ( $Settings->get('eblog_method') )
 				echo '<p>', T_('Mission complete, message deleted.'), '</p>';
 			}
 		*/
-			echo '</div>';
 
 
 		}
+		echo '</div>';
+
 		imap_close($mbox);
 
 
