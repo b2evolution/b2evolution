@@ -60,6 +60,15 @@ require_once( dirname(__FILE__).'/_header.php' );
 require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_hitlist.class.php' );
 
 
+/**
+ * Return a formatted percentage (should probably go to _misc.funcs)
+ */
+function percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '.' )
+{
+	return number_format( $hit_count * 100 / $hit_total, $decimals, $dec_point, '' ).'&nbsp;%';
+}
+
+
 $AdminUI->setPath( 'stats', param( 'tab', 'string', 'summary', true ) );
 $AdminUI->title = T_('View Stats for Blog:');
 
@@ -410,35 +419,20 @@ switch( $AdminUI->getPath(1) )
 			<p><?php echo T_('These are hits from external web pages refering to this blog') ?>.</p>
 			<?php
 			// Create result set:
-			$Results = & new Results( "SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime), hit_referer,
-																			dom_name, hit_blog_ID, hit_uri
-																FROM T_hitlog, T_basedomains
-																WHERE hit_referer_type != 'blacklist' " // QUESTION: correct?
-																	.' AND dom_ID = hit_referer_dom_ID '
-																	.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).
-																"ORDER BY hit_ID DESC" );
+			$Results = & new Results( "SELECT hit_ID, hit_datetime, hit_referer,
+																			dom_name, hit_blog_ID, hit_uri, blog_shortname
+																FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
+																			LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
+																WHERE hit_referer_type = 'referer' "
+																	.( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
 
 			$Results->title = T_('Last referers');
-
-			function stats_blog_name2( $blog_ID )
-			{
-				global $BlogCache;
-				if( !empty($blog_ID) )
-				{
-					$Blog = $BlogCache->get_by_ID( $blog_ID );
-					echo format_to_output( $Blog->name );
-				}
-				else
-				{
-					echo T_('None');
-				}
-			}
 
 			// datetime:
 			$Results->cols[0] = array(
 									'th' => T_('Date Time'),
 									'order' => 'hit_datetime',
-									'td' => '%date_i18n( locale_datefmt().\' \'.locale_timefmt(), \'$hit_datetime$\' )%',
+									'td' => '%mysql2localedatetime( \'$hit_datetime$\' )%',
 								);
 
 			// Referer:
@@ -454,7 +448,7 @@ switch( $AdminUI->getPath(1) )
 																	/* TRANS: Abbrev. for Delete (stats) */ T_('Del').
 																	'" title="'.T_('Delete this hit!').'" /></a> '.
 
-																	'<a href="%regenerate_url( \'action\', \'action=changetype&amp;new_hit_type=search&amp;hit_ID=$visitID$\')%" title="'.
+																	'<a href="%regenerate_url( \'action\', \'action=changetype&amp;new_hit_type=search&amp;hit_ID=$hit_ID$\')%" title="'.
 																	T_('Log as a search instead').
 																	'"><img src="img/magnifier.png" width="14" height="13" class="middle" alt="'.
 																	/* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S').
@@ -484,7 +478,7 @@ switch( $AdminUI->getPath(1) )
 				$Results->cols[] = array(
 										'th' => T_('Target Blog'),
 										'order' => 'hit_blog_ID',
-										'td' => '%stats_blog_name2( \'$hit_blog_ID$\' )%',
+										'td' => '$blog_shortname$',
 									);
 			}
 
@@ -507,7 +501,7 @@ switch( $AdminUI->getPath(1) )
 			if( count( $res_stats ) )
 			{
 				$chart [ 'chart_data' ][ 0 ][ 0 ] = "";
-				$chart [ 'chart_data' ][ 1 ][ 0 ] = T_('Top referers');
+				$chart [ 'chart_data' ][ 1 ][ 0 ] = 'Top referers'; // Needs UTF-8
 
 				$count = 0;
 				foreach( $res_stats as $row_stats )
@@ -519,7 +513,7 @@ switch( $AdminUI->getPath(1) )
 					}
 					else
 					{
-						$chart [ 'chart_data' ][ 0 ][ $count ] = T_('Others');
+						$chart [ 'chart_data' ][ 0 ][ $count ] = 'Others';
 					}
 					$chart [ 'chart_data' ][ 1 ][ $count ] = stats_hit_count( false );
 				} // End stat loop
@@ -553,7 +547,7 @@ switch( $AdminUI->getPath(1) )
 																								'y'        => 6,
 																								'width'    => 700,
 																								'height'   => 50,
-																								'text'     => T_('Top referers'),
+																								'text'     => 'Top referers',
 																								'h_align'  => "right",
 																								'v_align'  => "bottom" )
 																				);
@@ -665,36 +659,73 @@ switch( $AdminUI->getPath(1) )
 			?>
 			<h2><?php echo T_('Last refering searches') ?>:</h2>
 			<p><?php echo T_('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)') ?></p>
-			<?php refererList(20,'global',1,1,"'search'",'',$blog);
-			if( count( $res_stats ) )
-			{
-				?>
-				<table class="grouped" cellspacing="0">
-					<?php
-					$count = 0;
-					foreach( $res_stats as $row_stats )
-					{
-						?>
-						<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
-							<td class="firstcol"><?php stats_time() ?></td>
-							<td>
-								<?php if( $current_User->check_perm( 'stats', 'edit' ) )
-								{ ?>
-								<a href="stats.php?action=delete&amp;hit_ID=<?php stats_hit_ID() ?>&amp;show=refsearches&amp;blog=<?php echo $blog ?>" title="<?php echo T_('Delete this hit!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
-								<?php
-								}
-								stats_basedomain() ?></td>
-							<td><a href="<?php stats_referer() ?>"><?php stats_search_keywords() ?></a></td>
-							<td><?php stats_blog_name() ?></td>
-							<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
-						</tr>
-						<?php
-						$count++;
-					}
-					?>
-				</table>
-			<?php } ?>
+			<?php
+			// Create result set:
+			$Results = & new Results( "SELECT hit_ID, hit_datetime, hit_referer,
+																			dom_name, hit_blog_ID, hit_uri, blog_shortname
+																FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
+																			LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
+																WHERE hit_referer_type = 'search' "
+																	.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 'lstsrch', 'D' );
 
+			$Results->title = T_('Last refering searches');
+
+			// datetime:
+			$Results->cols[0] = array(
+									'th' => T_('Date Time'),
+									'order' => 'hit_datetime',
+									'td' => '%mysql2localedatetime( \'$hit_datetime$\' )%',
+								);
+
+			// Referer:
+			$Results->cols[1] = array(
+									'th' => T_('Referer'),
+									'order' => 'dom_name',
+								);
+			if( $current_User->check_perm( 'stats', 'edit' ) )
+			{
+				$Results->cols[1]['td'] = '<a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$hit_ID$\')%" title="'.
+																	T_('Delete this hit!').
+																	'"><img src="img/xross.gif" width="13" height="13" class="middle" alt="'.
+																	/* TRANS: Abbrev. for Delete (stats) */ T_('Del').
+																	'" title="'.T_('Delete this hit!').'" /></a> '.
+
+																	'<a href="$hit_referer$">$dom_name$</a>';
+			}
+			else
+			{
+				$Results->cols[1]['td'] = '<a href="$hit_referer$">$dom_name$</a>';
+			}
+
+			// Keywords:
+			$Results->cols[] = array(
+									'th' => T_('Search keywords'),
+									'td' => '%stats_search_keywords( #hit_referer# )%',
+								);
+
+			// Target Blog:
+			if( empty($blog) )
+			{
+				$Results->cols[] = array(
+										'th' => T_('Target Blog'),
+										'order' => 'hit_blog_ID',
+										'td' => '$blog_shortname$',
+									);
+			}
+
+			// Requested URI:
+			$Results->cols[] = array(
+									'th' => T_('Requested URI'),
+									'order' => 'hit_uri',
+									'td' => '<a href="$hit_uri$">$hit_uri$</a>',
+								);
+
+
+			// Display results:
+			$Results->display();
+			?>
+			
+			
 			<h3><?php echo T_('Top refering search engines') ?>:</h3>
 			<?php
 			refererList(20,'global',0,0,"'search'",'dom_name',$blog,true);
@@ -746,31 +777,50 @@ switch( $AdminUI->getPath(1) )
 			}
 			break;
 
+			
 		case 'syndication':
 			?>
 			<h2><?php echo T_('Top Aggregators') ?>:</h2>
 			<p><?php echo T_('These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)') ?></p>
-			<?php refererList(40, 'global', 0, 0, "'rss'", 'agnt_signature', $blog, true, true);
-			if( count( $res_stats ) )
-			{ ?>
-			<table class="grouped" cellspacing="0">
-				<?php
-					$count = 0;
-					foreach( $res_stats as $row_stats ) { ?>
-					<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
-						<td class="firstcol"><?php stats_user_agent( true ) ?></td>
-						<td class="right"><?php stats_hit_count() ?></td>
-						<td class="right"><?php stats_hit_percent() ?></td>
-					</tr>
-				<?php
-				$count++;
-				}
-				?>
-			</table>
-			<?php } ?>
-			<p><?php echo T_('Total RSS hits') ?>: <?php stats_total_hit_count() ?></p>
-
 			<?php
+			$total_hit_count = $DB->get_var( "SELECT COUNT(*) AS hit_count
+																				FROM T_useragents INNER JOIN T_hitlog ON hit_agnt_ID = agnt_ID
+																				WHERE agnt_type = 'rss' ".
+																				( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
+			
+			
+			echo '<p>'.T_('Total RSS hits').': '.$total_hit_count.'</p>';
+			
+			// Create result set:
+			$Results = & new Results( "SELECT agnt_signature, COUNT(*) AS hit_count
+																FROM T_useragents INNER JOIN T_hitlog ON hit_agnt_ID = agnt_ID
+																WHERE agnt_type = 'rss' ".
+																( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
+																GROUP BY agnt_ID ', 'topagg_', '--D' );
+
+			$Results->title = T_('Top Aggregators');
+
+			$Results->cols[] = array(
+									'th' => T_('Agent signature'),
+									'order' => 'agnt_signature',
+									'td' => '²agnt_signature²',
+								);
+
+			$Results->cols[] = array(
+									'th' => T_('Hit count'),
+									'order' => 'hit_count',
+									'td' => '$hit_count$',
+								);
+
+			$Results->cols[] = array(
+									'th' => T_('Hit %'),
+									'order' => 'hit_count',
+									'td' => '%percentage( #hit_count#, '.$total_hit_count.' )%',
+								);
+
+			// Display results:
+			$Results->display();
+
 			break;
 
 
@@ -778,59 +828,103 @@ switch( $AdminUI->getPath(1) )
 			?>
 			<h2><?php echo T_('Last direct accesses') ?>:</h2>
 			<p><?php echo T_('These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)') ?></p>
-			<?php refererList(10,'global',1,1,"'invalid'",'',$blog);
-			if( count( $res_stats ) )
-			{ ?>
-			<table class="grouped" cellspacing="0">
-				<?php
-				$count = 0;
-				foreach( $res_stats as $row_stats ) { ?>
-					<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
-						<td class="firstcol"><?php stats_time() ?></td>
-						<?php if( $current_User->check_perm( 'stats', 'edit' ) )
-						{ ?>
-						<td>
-							<a href="stats.php?action=delete&amp;hit_ID=<?php stats_hit_ID() ?>&amp;show=other&amp;blog=<?php echo $blog ?>" title="<?php echo T_('Delete this hit!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Delete (stats) */ T_('Del') ?>" /></a>
-						</td>
-						<?php } ?>
-						<td><?php stats_blog_name() ?></td>
-						<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
-					</tr>
-					<?php
-					$count++;
-				}
-				?>
-			</table>
 			<?php
+			// Create result set:
+			$Results = & new Results( "SELECT hit_ID, hit_datetime, hit_blog_ID, hit_uri, blog_shortname
+																FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
+																			LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
+																WHERE hit_referer_type = 'direct'
+																  AND agnt_type = 'browser'"
+																	.( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
+
+			$Results->title = T_('Last referers');
+
+			// datetime:
+			$Results->cols[] = array(
+									'th' => T_('Date Time'),
+									'order' => 'hit_datetime',
+									'td' => '%mysql2localedatetime( \'$hit_datetime$\' )%',
+								);
+
+			// Referer:
+			if( $current_User->check_perm( 'stats', 'edit' ) )
+			{
+				$Results->cols[] = array(
+									'th' => /* TRANS: Abbrev. for Delete (stats) */ T_('Del'),
+									'td'=>' <a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$hit_ID$\')%" title="'.
+																	T_('Delete this hit!').
+																	'"><img src="img/xross.gif" width="13" height="13" class="middle" alt="'.
+																	/* TRANS: Abbrev. for Delete (stats) */ T_('Del').
+																	'" title="'.T_('Delete this hit!').'" /></a>',
+													);
 			}
+
+			// Target Blog:
+			if( empty($blog) )
+			{
+				$Results->cols[] = array(
+										'th' => T_('Target Blog'),
+										'order' => 'hit_blog_ID',
+										'td' => '$blog_shortname$',
+									);
+			}
+
+			// Requested URI:
+			$Results->cols[] = array(
+									'th' => T_('Requested URI'),
+									'order' => 'hit_uri',
+									'td' => '<a href="$hit_uri$">$hit_uri$</a>',
+								);
+
+
+			// Display results:
+			$Results->display();
+
 			break;
 
 
 		case 'useragents':
 			?>
 			<h2><?php echo T_('Top User Agents') ?>:</h2>
-			<?php refererList(50,'global',0,0,"'search', 'blacklist', 'referer', 'direct'",'agnt_signature',$blog,true,true);
-			if( count( $res_stats ) )
-			{
-				?>
-				<table class="grouped" cellspacing="0">
-					<?php
-					$count = 0;
-					foreach( $res_stats as $row_stats )
-					{
-						?>
-						<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
-							<td class="firstcol"><?php stats_user_agent( false ) ?></td>
-							<td class="right"><?php stats_hit_count() ?></td>
-							<td class="right"><?php stats_hit_percent() ?></td>
-						</tr>
-						<?php
-						$count++;
-					}
-					?>
-				</table>
-				<?php
-			}
+			<?php
+			$total_hit_count = $DB->get_var( "SELECT COUNT(*) AS hit_count
+																				FROM T_useragents INNER JOIN T_hitlog ON hit_agnt_ID = agnt_ID
+																				WHERE agnt_type <> 'rss' ".
+																				( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
+			
+			
+			echo '<p>'.T_('Total hits').': '.$total_hit_count.'</p>';
+			
+			// Create result set:
+			$Results = & new Results( "SELECT agnt_signature, COUNT(*) AS hit_count
+																FROM T_useragents INNER JOIN T_hitlog ON hit_agnt_ID = agnt_ID
+																WHERE agnt_type <> 'rss' ".
+																( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
+																GROUP BY agnt_ID ', 'topua_', '--D' );
+
+			$Results->title = T_('Top User Agents');
+
+			$Results->cols[] = array(
+									'th' => T_('Agent signature'),
+									'order' => 'agnt_signature',
+									'td' => '²agnt_signature²',
+								);
+
+			$Results->cols[] = array(
+									'th' => T_('Hit count'),
+									'order' => 'hit_count',
+									'td' => '$hit_count$',
+								);
+
+			$Results->cols[] = array(
+									'th' => T_('Hit %'),
+									'order' => 'hit_count',
+									'td' => '%percentage( #hit_count#, '.$total_hit_count.' )%',
+								);
+
+			// Display results:
+			$Results->display();
+			
 			break;
 }
 
@@ -838,4 +932,12 @@ switch( $AdminUI->getPath(1) )
 $AdminUI->dispPayloadEnd();
 
 require dirname(__FILE__).'/_footer.php';
+
+/*
+ * $Log$
+ * Revision 1.6  2005/10/14 21:00:08  fplanque
+ * Stats & antispam have obviously been modified with ZERO testing.
+ * Fixed a sh**load of bugs...
+ *
+ */ 
 ?>

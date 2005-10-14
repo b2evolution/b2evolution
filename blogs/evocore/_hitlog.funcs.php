@@ -82,7 +82,7 @@ function refererList(
 	$disp_blog = 0,
 	$disp_uri = 0,
 	$type = "'referer'",		// was: 'referer' normal refer, 'invalid', 'badchar', 'blacklist', 'rss', 'robot', 'search'
-													// new: 'search', 'blacklist', 'referer', 'direct', 'spam'
+													// new: 'search', 'blacklist', 'referer', 'direct', ('spam' but spam is not logged)
 	$groupby = '', 	// dom_name
 	$blog_ID = '',
 	$get_total_hits = false, // Get total number of hits (needed for percentages)
@@ -289,25 +289,31 @@ function stats_basedomain( $disp = true )
 
 
 /**
- * stats_search_keywords(-)
- *
  * Displays keywords used for search leading to this page
+ *
+ * @todo link keyword param tio search engine
  */
-function stats_search_keywords()
+function stats_search_keywords( $ref )
 {
-	global $row_stats;
 	$kwout = '';
-	$ref = $row_stats['referingURL'];
 	if( ($pos_question = strpos( $ref, '?' )) == false )
 	{
-		echo '[', T_('not a query - no params!'), ']';
-		return;
+		return '['.T_('not a query - no params!').']';
 	}
 	$ref_params = explode( '&', substr( $ref, $pos_question+1 ) );
 	foreach( $ref_params as $ref_param )
 	{
 		$param_parts = explode( '=', $ref_param );
-		if( $param_parts[0] == 'q' or $param_parts[0] == 'query' or $param_parts[0] == 'p' or $param_parts[0] == 'kw' or $param_parts[0] == 'qs' )
+		if( $param_parts[0] == 'q' 
+				or $param_parts[0] == 'as_q' 		// Google Advanced Search Query
+				or $param_parts[0] == 'query' 
+				or $param_parts[0] == 'search' 
+				or $param_parts[0] == 'p' 
+				or $param_parts[0] == 'kw' 
+				or $param_parts[0] == 'qs'
+				or $param_parts[0] == 'r'
+				or $param_parts[0] == 'rdata'				// search.ke.voila.fr
+			)
 		{ // found "q" query parameter
 			$q = urldecode($param_parts[1]);
 			if( strpos( $q, 'Ã' ) !== false )
@@ -321,11 +327,10 @@ function stats_search_keywords()
 				if( strlen( $qw ) > 30 ) $qw = substr( $qw, 0, 30 )."...";	// word too long, crop it
 				$kwout .= $qw.' ';
 			}
-			echo htmlentities($kwout);
-			return;
+			return htmlentities($kwout);
 		}
 	}
-	echo '[', T_('no query string found'), ']';
+	return '['.T_('no query string found').']';
 }
 
 
@@ -372,6 +377,10 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.12  2005/10/14 21:00:08  fplanque
+ * Stats & antispam have obviously been modified with ZERO testing.
+ * Fixed a sh**load of bugs...
+ *
  * Revision 1.11  2005/10/11 20:35:58  fplanque
  * Oh man! This is SO full of crap, it's pathetic!! :-(((
  *

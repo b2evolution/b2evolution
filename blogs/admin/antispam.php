@@ -186,11 +186,11 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 		<?php
 		// Check for junk:
 		// Check for potentially affected log hits:
-		$sql = 'SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime), hit_uri, hit_referer, dom_name
-										hit_blog_ID, hit_remote_addr
-						 FROM T_hitlog, T_basedomains
-						WHERE hit_referer_dom_ID = dom_ID
-							AND hit_referer LIKE '.$DB->quote('%'.$keyword.'%').'
+		$sql = 'SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime) as hit_datetime, hit_uri, hit_referer, dom_name,
+										hit_blog_ID, hit_remote_addr, blog_shortname
+						 FROM T_hitlog INNER JOIN T_basedomains ON hit_referer_dom_ID = dom_ID
+						 			LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
+						WHERE hit_referer LIKE '.$DB->quote('%'.$keyword.'%').'
 						ORDER BY dom_name ASC';
 		$res_affected_hits = $DB->get_results( $sql, ARRAY_A );
 		if( $DB->num_rows == 0 )
@@ -223,7 +223,7 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 						<td class="firstcol"><?php stats_time() ?></td>
 						<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 						<td><?php stats_hit_remote_addr() ?></td>
-						<td><?php stats_blog_name() ?></td>
+						<td><?php echo format_to_output( $row_stats['blog_shortname'], 'htmlbody' ); ?></td>
 						<td><a href="<?php stats_req_URI() ?>"><?php stats_req_URI() ?></a></td>
 					</tr>
 					<?php

@@ -341,19 +341,22 @@ class Blog extends DataObject
 
 		switch( $this->media_location )
 		{
-			case 'none':
-				$Debuglog->add( 'Attempt to access blog media dir, but this feature is disabled for this blog', 'files' );
-				return false;
-
 			case 'default':
 				$mediadir = $basepath.$media_subdir.'blogs/'.$this->urlname.'/';
 				break;
+
 			case 'subdir':
-				$mediadir = $basepath.$media_subdir.'blogs/'.$this->media_subdir;
+				$mediadir = $basepath.$media_subdir.$this->media_subdir;
 				break;
+
 			case 'custom':
 				$mediadir = $this->media_fullpath;
 				break;
+
+			case 'none':
+			default:
+				$Debuglog->add( 'Attempt to access blog media dir, but this feature is disabled for this blog', 'files' );
+				return false;
 		}
 
 		// TODO: use a File object here (to access perms, ..) when FileCache::get_by_path() is provided.
@@ -378,6 +381,7 @@ class Blog extends DataObject
 			}
 		}
 
+		// fplanque>> TODO: non absolute return IS FLAWED if case != default. DO we need it?
 		return $absolute ?
 						$mediadir :
 						preg_replace( '#^'.$basepath.$media_subdir.'blogs/#', '', $mediadir );
@@ -405,9 +409,23 @@ class Blog extends DataObject
 					return false;
 				}
 
-				return ($this->media_location == 'custom')
-								? $this->media_url
-								: $media_url.'blogs/'.$this->getMediaDir( false );
+				switch( $this->media_location )
+				{
+					case 'default':
+						return $media_url.'blogs/'.$this->urlname.'/';
+
+					case 'subdir':
+						return $media_url.$this->media_subdir;
+						break;
+
+					case 'custom':
+						return $this->media_url;
+						
+					case 'none':
+					default:
+						$Debuglog->add( 'Attempt to access blog media url, but this feature is disabled for this blog', 'files' );
+						return false;
+				}
 
 			case 'subdir':
 				return $this->siteurl;
@@ -725,6 +743,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2005/10/14 21:00:08  fplanque
+ * Stats & antispam have obviously been modified with ZERO testing.
+ * Fixed a sh**load of bugs...
+ *
  * Revision 1.29  2005/10/03 18:10:07  fplanque
  * renamed post_ID field
  *

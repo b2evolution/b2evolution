@@ -349,6 +349,11 @@ function mysql2localedate( $mysqlstring )
 	return mysql2date( locale_datefmt(), $mysqlstring );
 }
 
+function mysql2localedatetime( $mysqlstring )
+{
+	return mysql2date( locale_datefmt().' '.locale_timefmt(), $mysqlstring );
+}
+
 
 /**
  * Format a MYSQL date.
@@ -2077,6 +2082,10 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.103  2005/10/14 21:00:08  fplanque
+ * Stats & antispam have obviously been modified with ZERO testing.
+ * Fixed a sh**load of bugs...
+ *
  * Revision 1.102  2005/10/13 22:30:59  blueyed
  * Added debug_get_backtrace() and debug_die()
  *
