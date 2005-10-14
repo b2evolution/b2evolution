@@ -127,8 +127,12 @@ $Form->begin_fieldset( T_('Blog by email') . web_help_link('features_blog_by_ema
 												array( 'maxlength' => 255, 'note' => T_('Email subject must start with this prefix to be imported.')  )  );
 
 		// eblog test links
-		$Form->info_field ('','<a id="eblog_test" href="#eblog_test" onclick=\'pop_up_window( "' . $htsrv_url . 'getmail.php?test=connection", "getmail" );\'>' . T_('Test connection') . '</a>',array());
+		$Form->info_field (T_('Perform Server Test'),' <a id="eblog_test" href="#eblog_test" onclick=\'pop_up_window( "' . $htsrv_url . 'getmail.php?test=1", "getmail" );\'>[ ' . T_('connection') . ' ]</a>' .
+																	' <a id="eblog_test" href="#eblog_test" onclick=\'pop_up_window( "' . $htsrv_url . 'getmail.php?test=2", "getmail" );\'>[ ' . T_('messages') . ' ]</a>' .
+																	' <a id="eblog_test" href="#eblog_test" onclick=\'pop_up_window( "' . $htsrv_url . 'getmail.php?test=3", "getmail" );\'>[ ' . T_('verbose') . ' ]</a>',
+																	array());
 
+//		$Form->info_field ('','<a id="eblog_test_email" href="#eblog_test_emails" onclick=\'pop_up_window( "' . $htsrv_url . 'getmail.php?test=email", "getmail" );\'>' . T_('Test email') . '</a>',array());
 		// special show / hide link
 		$Form->info_field ('', link_showhide( 'eblog_show_more','eblog_section_more', T_('hide extra options'), T_('show extra options...') ) ,array());
 
