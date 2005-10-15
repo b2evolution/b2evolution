@@ -171,129 +171,141 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 		// EXTRACT locale
 		case 'extract':
 			// Get PO file for that edit_locale:
-			echo '<div class="panelinfo">';
-			echo '<h3>Extracting language file for ', $edit_locale, '...</h3>';
+			$AdminUI->append_to_titlearea( 'Extracting language file for '.$edit_locale.'...' );
+
 			$po_file = dirname(__FILE__).'/'.$core_dirout.$locales_subdir.$locales[$edit_locale]['messages'].'/LC_MESSAGES/messages.po';
 			if( ! is_file( $po_file ) )
 			{
-				echo '<p class="error">'.sprintf(T_('File <code>%s</code> not found.'), '/'.$locales_subdir.$locales[$edit_locale]['messages'].'/LC_MESSAGES/messages.po').'</p>';
+				$Messages->add( sprintf(T_('File <code>%s</code> not found.'), '/'.$locales_subdir.$locales[$edit_locale]['messages'].'/LC_MESSAGES/messages.po'), 'error' );
+				break;
 			}
-			else
-			{ // File exists:
-				// Get PO file for that edit_locale:
-				$lines = file( $po_file);
-				$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
-				$all = 0;
-				$fuzzy=0;
-				$untranslated=0;
-				$translated=0;
-				$status='-';
-				$matches = array();
-				$sources = array();
-				$loc_vars = array();
-				$ttrans = array();
-				foreach ($lines as $line)
-				{
-					// echo 'LINE:', $line, '<br />';
-					if(trim($line) == '' )
-					{ // Blank line, go back to base status:
-						if( $status == 't' )
-						{ // ** End of a translation **:
-							if( $msgstr == '' )
-							{
-								$untranslated++;
-								// echo 'untranslated: ', $msgid, '<br />';
-							}
-							else
-							{
-								$translated++;
 
-								// Inspect where the string is used
-								$sources = array_unique( $sources );
-								// echo '<p>sources: ', implode( ', ', $sources ), '</p>';
-								foreach( $sources as $source )
-								{
-									if( !isset( $loc_vars[$source]  ) ) $loc_vars[$source] = 1;
-									else $loc_vars[$source] ++;
-								}
+			$outfile = dirname(__FILE__).'/'.$core_dirout.$locales_subdir.$locales[$edit_locale]['messages'].'/_global.php';
+			if( !is_writable($outfile) )
+			{
+				$Messages->add( sprintf( 'The file &laquo;%s&raquo; is not writable.', $outfile ) );
+				break;
+			}
 
-								// Save the string
-								// $ttrans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => '".str_replace( "'", "\'", str_replace( '\"', '"', $msgstr ))."',";
-								// $ttrans[] = "\n\t\"$msgid\" => \"$msgstr\",";
-								$ttrans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => \"".str_replace( '$', '\$', $msgstr)."\",";
 
-							}
-						}
-						$status = '-';
-						$msgid = '';
-						$msgstr = '';
-						$sources = array();
-					}
-					elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches))
-					{ // Encountered an original text
-						$status = 'o';
-						$msgid = $matches[1];
-						// echo 'original: "', $msgid, '"<br />';
-						$all++;
-					}
-					elseif( ($status=='o') && preg_match( '#^msgstr "(.*)"#', $line, $matches))
-					{ // Encountered a translated text
-						$status = 't';
-						$msgstr = $matches[1];
-						// echo 'translated: "', $msgstr, '"<br />';
-					}
-					elseif( preg_match( '#^"(.*)"#', $line, $matches))
-					{ // Encountered a followup line
-						if ($status=='o')
-							$msgid .= $matches[1];
-						elseif ($status=='t')
-							$msgstr .= $matches[1];
-					}
-					elseif( ($status=='-') && preg_match( '@^#:(.*)@', $line, $matches))
-					{ // Encountered a source code location comment
-						// echo $matches[0],'<br />';
-						$sourcefiles = preg_replace( '@\\\\@', '/', $matches[1] );
-						// $c = preg_match_all( '@ ../../../([^:]*):@', $sourcefiles, $matches);
-						$c = preg_match_all( '@ ../../../([^/:]*)@', $sourcefiles, $matches);
-						for( $i = 0; $i < $c; $i++ )
+			// File exists:
+			// Get PO file for that edit_locale:
+			$lines = file( $po_file);
+			$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
+			$all = 0;
+			$fuzzy=0;
+			$untranslated=0;
+			$translated=0;
+			$status='-';
+			$matches = array();
+			$sources = array();
+			$loc_vars = array();
+			$ttrans = array();
+			foreach ($lines as $line)
+			{
+				// echo 'LINE:', $line, '<br />';
+				if(trim($line) == '' )
+				{ // Blank line, go back to base status:
+					if( $status == 't' )
+					{ // ** End of a translation **:
+						if( $msgstr == '' )
 						{
-							$sources[] = $matches[1][$i];
+							$untranslated++;
+							// echo 'untranslated: ', $msgid, '<br />';
 						}
-						// echo '<br />';
-					}
-					elseif(strpos($line,'#, fuzzy') === 0)
-						$fuzzy++;
-				}
+						else
+						{
+							$translated++;
 
+							// Inspect where the string is used
+							$sources = array_unique( $sources );
+							// echo '<p>sources: ', implode( ', ', $sources ), '</p>';
+							foreach( $sources as $source )
+							{
+								if( !isset( $loc_vars[$source]  ) ) $loc_vars[$source] = 1;
+								else $loc_vars[$source] ++;
+							}
+
+							// Save the string
+							// $ttrans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => '".str_replace( "'", "\'", str_replace( '\"', '"', $msgstr ))."',";
+							// $ttrans[] = "\n\t\"$msgid\" => \"$msgstr\",";
+							$ttrans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => \"".str_replace( '$', '\$', $msgstr)."\",";
+
+						}
+					}
+					$status = '-';
+					$msgid = '';
+					$msgstr = '';
+					$sources = array();
+				}
+				elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches))
+				{ // Encountered an original text
+					$status = 'o';
+					$msgid = $matches[1];
+					// echo 'original: "', $msgid, '"<br />';
+					$all++;
+				}
+				elseif( ($status=='o') && preg_match( '#^msgstr "(.*)"#', $line, $matches))
+				{ // Encountered a translated text
+					$status = 't';
+					$msgstr = $matches[1];
+					// echo 'translated: "', $msgstr, '"<br />';
+				}
+				elseif( preg_match( '#^"(.*)"#', $line, $matches))
+				{ // Encountered a followup line
+					if ($status=='o')
+						$msgid .= $matches[1];
+					elseif ($status=='t')
+						$msgstr .= $matches[1];
+				}
+				elseif( ($status=='-') && preg_match( '@^#:(.*)@', $line, $matches))
+				{ // Encountered a source code location comment
+					// echo $matches[0],'<br />';
+					$sourcefiles = preg_replace( '@\\\\@', '/', $matches[1] );
+					// $c = preg_match_all( '@ ../../../([^:]*):@', $sourcefiles, $matches);
+					$c = preg_match_all( '@ ../../../([^/:]*/?)@', $sourcefiles, $matches);
+					for( $i = 0; $i < $c; $i++ )
+					{
+						$sources[] = $matches[1][$i];
+					}
+					// echo '<br />';
+				}
+				elseif(strpos($line,'#, fuzzy') === 0)
+					$fuzzy++;
+			}
+
+			if( $loc_vars )
+			{
 				ksort( $loc_vars );
+
+				$list_counts = '';
 				foreach( $loc_vars as $source => $c )
 				{
-					echo $source, ' = ', $c, '<br />';
+					$list_counts .= "\n<li>$source = $c";
 				}
-
-				$outfile = dirname(__FILE__).'/'.$core_dirout.$locales_subdir.$locales[$edit_locale]['messages'].'/_global.php';
-				$fp = fopen( $outfile, 'w+' );
-				fwrite( $fp, "<?php\n" );
-				fwrite( $fp, "/*\n" );
-				fwrite( $fp, " * Global lang file\n" );
-				fwrite( $fp, " * This file was generated automatically from messages.po\n" );
-				fwrite( $fp, " */\n" );
-				fwrite( $fp, "if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );" );
-				fwrite( $fp, "\n\n" );
-
-
-				fwrite( $fp, "\n\$trans['".$locales[$edit_locale]['messages']."'] = array(" );
-				// echo '<pre>';
-				foreach( $ttrans as $line )
-				{
-					// echo htmlspecialchars( $line );
-					fwrite( $fp, $line );
-				}
-				// echo '</pre>';
-				fwrite( $fp, "\n);\n?>" );
-				fclose( $fp );
+				$Messages->add( 'Sources and number of strings: <ul>'.$list_counts.'</ul>', 'note' );
 			}
-			echo '</div>';
+
+			$fp = fopen( $outfile, 'w+' );
+			fwrite( $fp, "<?php\n" );
+			fwrite( $fp, "/*\n" );
+			fwrite( $fp, " * Global lang file\n" );
+			fwrite( $fp, " * This file was generated automatically from messages.po\n" );
+			fwrite( $fp, " */\n" );
+			fwrite( $fp, "if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );" );
+			fwrite( $fp, "\n\n" );
+
+
+			fwrite( $fp, "\n\$trans['".$locales[$edit_locale]['messages']."'] = array(" );
+			// echo '<pre>';
+			foreach( $ttrans as $line )
+			{
+				// echo htmlspecialchars( $line );
+				fwrite( $fp, $line );
+			}
+			// echo '</pre>';
+			fwrite( $fp, "\n);\n?>" );
+			fclose( $fp );
 
 			break;
 
@@ -380,6 +392,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.4  2005/10/15 22:23:40  blueyed
+ * Beautified .po extraction
+ *
  * Revision 1.3  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
  *
