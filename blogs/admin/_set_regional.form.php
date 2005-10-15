@@ -147,7 +147,7 @@ else
 		}
 		else
 		{
-			echo '<a href="locales.php?tab=regional&amp;loc_transinfo=1">' . T_('Show translation info'), '</a>';
+			echo '<a href="locales.php?loc_transinfo=1">' . T_('Show translation info'), '</a>';
 		}
 		?>
 		</p>
@@ -196,8 +196,8 @@ else
 				<strong>';
 				if( $current_User->check_perm( 'options', 'edit' ) )
 				{
-					echo '<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
-								.'&amp;action=edit&amp;edit_locale='.$lkey.'" title="'.T_('Edit locale').'">';
+					echo '<a href="?action=edit&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
+								.'" title="'.T_('Edit locale').'">';
 				}
 				echo $lkey;
 				if( $current_User->check_perm( 'options', 'edit' ) )
@@ -228,9 +228,7 @@ else
 				echo '<td class="left">';
 				if( $i > 1 )
 				{ // show "move prio up"
-					echo '<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
-								.'&amp;edit_locale='.$lkey
-								.'&amp;action=prioup"><img src="img/arrowup.png" alt="'.T_('up').'" title="'.T_('Move priority up').'" width="14" height="14" class="middle" /></a>';
+					echo '<a href="?action=prioup&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'"><img src="img/arrowup.png" alt="'.T_('up').'" title="'.T_('Move priority up').'" width="14" height="14" class="middle" /></a>';
 				}
 				else
 				{
@@ -239,25 +237,21 @@ else
 
 				if( $i < count($locales) )
 				{ // show "move prio down"
-					echo '<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
-								.'&amp;edit_locale='.$lkey
-								.'&amp;action=priodown"><img src="img/arrowdown.png" alt="'.T_('down').'" title="'.T_('Move priority down').'" width="14" height="14" class="middle" /></a>';
+					echo '<a href="?action=priodown&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'"><img src="img/arrowdown.png" alt="'.T_('down').'" title="'.T_('Move priority down').'" width="14" height="14" class="middle" /></a>';
 				}
 				else
 				{
 					echo '<img src="img/blank.gif" width="14" height="14" class="middle" alt="" />';
 				}
 				echo '
-				<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
-					.'&amp;action=edit&amp;edit_locale=_new_&amp;template='.$lkey.'" title="'.T_('Copy locale').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" title="'.T_('Copy locale').'" /></a>
+				<a href="?action=edit&amp;edit_locale=_new_&amp;template='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'" title="'.T_('Copy locale').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" title="'.T_('Copy locale').'" /></a>
 
-				<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
-					.'&amp;action=edit&amp;edit_locale='.$lkey.'" title="'.T_('Edit locale').'"><img src="img/properties.png" width="18" height="13" alt="'.T_('Edit').'" title="'.T_('Edit locale').'" class="middle" /></a>
+				<a href="?action=edit&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'" title="'.T_('Edit locale').'"><img src="img/properties.png" width="18" height="13" alt="'.T_('Edit').'" title="'.T_('Edit locale').'" class="middle" /></a>
 				';
 				if( isset($lval[ 'fromdb' ]) )
 				{ // allow to delete locales loaded from db
 					$l_atleastonefromdb = 1;
-					echo '<a href="?tab=regional'.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'&amp;delete='.$lkey.'"><img src="img/xross.gif" height="13" width="13" class="middle" alt="'.T_('Reset').'" title="'.T_('Reset custom settings').'" /></a>';
+					echo '<a href="?delete='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'"><img src="img/xross.gif" height="13" width="13" class="middle" alt="'.T_('Reset').'" title="'.T_('Reset custom settings').'" /></a>';
 				}
 				echo '</td>';
 			}
@@ -268,7 +262,7 @@ else
 				$po_file = dirname(__FILE__).'/'.$core_dirout.$locales_subdir.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
 				if( ! is_file( $po_file ) )
 				{
-					echo '<td class="center" colspan="'.(2 + (int)$allow_po_extraction).'">'.T_('No language file...').'</td>';
+					echo '<td class="center" colspan="'.(2 + (int)($current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction)).'">'.T_('No language file...').'</td>';
 				}
 				else
 				{	// File exists:
@@ -344,7 +338,7 @@ else
 				{ // Translator options:
 					if( is_file( $po_file ) )
 					{
-						echo "\n\t<td>".'[<a href="b2options.php?tab=regional&amp;action=extract&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'" title="'.T_('Extract .po file into b2evo-format').'">'.T_('Extract').'</a>]</td>';
+						echo "\n\t<td>".'[<a href="locales.php?action=extract&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'" title="'.T_('Extract .po file into b2evo-format').'">'.T_('Extract').'</a>]</td>';
 					}
 				}
 			} // show message file percentage/extraction
@@ -361,7 +355,7 @@ else
 			<p class="center"><a href="locales.php&amp;action=edit<?php if( $loc_transinfo ) echo '&amp;loc_transinfo=1'?>&amp;edit_locale=_new_"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('Create new locale');?></a></p>
 			<?php if( isset($l_atleastonefromdb) )
 			{ ?>
-				<p class="center"><a href="locales.php?tab=regional<?php if( $loc_transinfo ) echo '&amp;loc_transinfo=1'?>&amp;action=reset" onclick="return confirm('<?php echo TS_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" class="middle" alt="" /> <?php echo T_('Reset to defaults (delete database table)');?></a></p>
+				<p class="center"><a href="locales.php?action=reset<?php if( $loc_transinfo ) echo '&amp;loc_transinfo=1'?>" onclick="return confirm('<?php echo TS_('Are you sure you want to reset?');?>')"><img src="img/xross.gif" height="13" width="13" class="middle" alt="" /> <?php echo T_('Reset to defaults (delete database table)');?></a></p>
 				<?php
 			}
 		}
