@@ -39,7 +39,7 @@ require_once dirname(__FILE__).'/evocore/_main.inc.php';
 <p>
 	<?php echo T_('This is the default homepage for b2evolution. It will be displayed as long as you don\'t select a default blog in the general settings.');
 	?>
-	( <a href="<?php echo $admin_url ?>b2options.php?tab=general#default_blog_ID"><?php echo T_( 'Edit config' ) ?></a> )
+	( <a href="<?php echo $admin_url ?>settings.php?tab=general#default_blog_ID"><?php echo T_( 'Edit config' ) ?></a> )
 </p>
 
 
