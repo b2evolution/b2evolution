@@ -1151,12 +1151,12 @@ function validate_url( $url, & $allowed_uri_scheme )
 		return T_('Invalid URL');
 	}
 
-	if( ! preg_match('¤^														# start
-										([a-z][a-z0-9+.\-]*):[0-9]*		# scheme
-										//														# authority absolute URLs only
-										[a-z][a-z0-9~+.\-_,:;/\\\\*]* 	# Don t allow anything too funky like entities
-										([?#][a-z0-9~+.\-_,:;/\\\\%&=?#*\ ]*)?
-										$¤ix', $url, $matches) )
+	if( ! preg_match('|^			# start
+		([a-z][a-z0-9+.\-]*):[0-9]*		# scheme
+		//								# authority absolute URLs only
+		[a-z][a-z0-9~+.\-_,:;/\\\\*]* 	# Don t allow anything too funky like entities
+		([?#][a-z0-9~+.\-_,:;/\\\\%&=?#*\ ]*)?
+		$|ix', $url, $matches) )
 	{ // Cannot vaidate URL structure
 		return T_('Invalid URL');
 	}
@@ -2082,6 +2082,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.104  2005/10/16 09:03:57  marian
+ * Changed delimiter for preg_match because the old one did not work in the Windows environment.
+ *
  * Revision 1.103  2005/10/14 21:00:08  fplanque
  * Stats & antispam have obviously been modified with ZERO testing.
  * Fixed a sh**load of bugs...
