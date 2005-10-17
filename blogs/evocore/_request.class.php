@@ -196,7 +196,7 @@ class Request
 	function param_string_not_empty( $var, $err_msg, $field_msg = NULL )
 	{
 		$this->param( $var, 'string', true );
-		return $this->param_check_not_empty( $var, $err_msg, $field_msg );
+		return $this->param_check_not_empty( $var, $err_msg, $field_err_msg );
 	}
 
 
@@ -206,11 +206,11 @@ class Request
 	 * @param string|NULL error message for form field ($err_msg gets used if === NULL).
 	 * @return boolean true if OK
 	 */
-	function param_check_not_empty( $var, $err_msg, $field_msg = NULL )
+	function param_check_not_empty( $var, $err_msg, $field_err_msg = NULL )
 	{
 		if( empty( $this->params[$var] ) )
 		{
-			$this->param_error( $var, $err_msg, $field_msg );
+			$this->param_error( $var, $err_msg, $field_err_msg );
 			return false;
 		}
 		return true;
@@ -400,11 +400,11 @@ class Request
 	 * @param string|NULL error message for form field ($err_msg gets used if === NULL).
 	 * @return boolean true if OK
 	 */
-	function param_check_regexp( $var, $err_msg, $field_msg = NULL )
+	function param_check_regexp( $var, $err_msg, $field_err_msg = NULL )
 	{
 		if( ! isRegexp( $this->params[$var] ) )
 		{
-			$this->param_error( $var, $err_msg );
+			$this->param_error( $var, $field_err_msg );
 			return false;
 		}
 		return true;
@@ -463,7 +463,7 @@ class Request
 	 * @param string|NULL error message for form field ($err_msg gets used if === NULL).
 	 * @return boolean true if OK
 	 */
-	function params_check_at_least_one( $vars, $err_msg, $field_msg = NULL )
+	function params_check_at_least_one( $vars, $err_msg, $field_err_msg = NULL )
 	{
 		foreach( $vars as $var )
 		{
@@ -474,7 +474,7 @@ class Request
 		}
 
 		// Error!
-		$this->param_error_multiple( $vars, $err_msg, $field_msg );
+		$this->param_error_multiple( $vars, $err_msg, $field_err_msg );
 		return false;
 	}
 
@@ -493,21 +493,20 @@ class Request
 
 
 	/**
-	 * @access protected blueyed >> Why? This is very useful for custom validation and throwing errors then!
 	 *
 	 * @param string param name
 	 * @param string error message
 	 * @param string|NULL error message for form field ($err_msg gets used if === NULL).
 	 */
-	function param_error( $var, $err_msg, $field_msg = NULL )
+	function param_error( $var, $err_msg, $field_err_msg = NULL )
 	{
 		if( ! isset( $this->err_messages[$var] ) )
 		{ // We haven't already recorded an error for this field:
-			if( $field_msg === NULL )
+			if( $field_err_msg === NULL )
 			{
-				$field_msg = $err_msg;
+				$field_err_msg = $err_msg;
 			}
-			$this->err_messages[$var] = $field_msg;
+			$this->err_messages[$var] = $field_err_msg;
 
 			$this->_add_message_to_Log( $var, $err_msg, 'error' );
 		}
@@ -515,24 +514,23 @@ class Request
 
 
 	/**
-	 * @access protected blueyed >> Why? This is very useful for custom validation and throwing errors then!
 	 *
 	 * @param array of param names
 	 * @param string error message
 	 * @param string|NULL error message for form fields ($err_msg gets used if === NULL).
 	 */
-	function param_error_multiple( $vars, $err_msg, $field_msg = NULL )
+	function param_error_multiple( $vars, $err_msg, $field_err_msg = NULL )
 	{
-		if( $field_msg === NULL )
+		if( $field_err_msg === NULL )
 		{
-			$field_msg = $err_msg;
+			$field_err_msg = $err_msg;
 		}
 
 		foreach( $vars as $var )
 		{
 			if( ! isset( $this->err_messages[$var] ) )
 			{ // We haven't already recorded an error for this field:
-				$this->err_messages[$var] = $err_msg;
+				$this->err_messages[$var] = $field_err_msg;
 			}
 		}
 
@@ -564,6 +562,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.17  2005/10/17 19:35:57  fplanque
+ * no message
+ *
  * Revision 1.16  2005/10/17 12:43:38  marian
  * changed my "bugfix" back due to a too old PHP-Version that I used while testing. Sorry about that
  *

@@ -239,7 +239,7 @@ class POFile // {{{
 	/**
 	 * reads .po file
 	 *
-	 * this is quite the same as in b2options for the extract part.
+	 * this is quite the same as in locales.php for the extract part.
 	 *
 	 * @return array with msgids
 	 */

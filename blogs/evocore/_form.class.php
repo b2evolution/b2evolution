@@ -1837,6 +1837,7 @@ class Form extends Widget
 			}
 
 			// build unique id:
+// fplanque>> why can't we just use [name]_$count? This md5 frenzy really does no good to anyone...
 			$input_params['id'] = $this->get_valid_id( $field_params['name'].'_'.md5($count_options.$input_params['value']) );
 
 			$r .= $this->get_input_element( $input_params ) // the radio element
@@ -2018,6 +2019,7 @@ class Form extends Widget
 						.'>'
 						.$this->_common_params['label']
 						.$this->label_suffix
+// fplanque>> <small> is not strict xhtml, so we should avoid using it!
 						#.( isset($this->_common_params['required']) && $this->_common_params['required'] ? ' <small class="required">[*]</small>' : '' )
 						.'</label>'
 						.$this->labelend;
@@ -2207,6 +2209,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.76  2005/10/17 19:35:57  fplanque
+ * no message
+ *
  * Revision 1.75  2005/10/13 22:07:55  blueyed
  * Added 'required' parameter handling
  *
