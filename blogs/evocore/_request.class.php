@@ -376,7 +376,7 @@ class Request
 
 		if( preg_match( $func_params['date_pattern'], $this->params[$var], $match ) )
 		{
-			if( checkdate( $match[2], $match[3], $match[1] ) )
+			if( checkdate( $match['month'], $match['day'], $match['year'] ) )
 			{ // all clean! :)
 				return $match;
 			}
@@ -564,6 +564,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.16  2005/10/17 12:43:38  marian
+ * changed my "bugfix" back due to a too old PHP-Version that I used while testing. Sorry about that
+ *
  * Revision 1.15  2005/10/16 18:02:12  marian
  * bugfix in param_check_date_format
  *
