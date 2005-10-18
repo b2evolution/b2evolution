@@ -144,6 +144,7 @@ if( !isset( $resolve_extra_path ) ) $resolve_extra_path = true;
 if( $resolve_extra_path )
 {
 	// Check and Remove blog baseurl from ReqPath:
+// fplanque>> TODO: comment this code!!
 	if ($Blog->get( 'siteurl' ) > '')
 	{
     	$blog_baseurl = substr( $Blog->get( 'siteurl' ), strlen( $baseurlroot ) );
@@ -300,26 +301,6 @@ if( !isset($display_blog_list) )
 }
 
 
-
-// M.H.
-if (!empty($_GET['template']))
-{
-    $template_file =  get_path( 'skins' ).
-        'rss/' .
-        $_GET['template'] . '.php';
-    // echo 'get template: ' . $template_file . '<br />';
-    // echo 'core root: ' . $core_root . '<br />';
-    unset($_GET['template']);
-    require($template_file);
-    // include ('c:/cvsfiles/new_rentatut/www/b2evo/blogs/skins/rss/rss2.php');
-    exit;
-
-}
-// =============================
-
-
-
-
 /*
  * Now, we'll jump to displaying!
  */
@@ -418,6 +399,9 @@ if ( $use_memcached )
 
 /*
  * $Log$
+ * Revision 1.19  2005/10/18 18:45:58  fplanque
+ * some rollbacks...
+ *
  * Revision 1.18  2005/10/18 11:04:16  marian
  * Added extra functionality to support multi-domain feature.
  *

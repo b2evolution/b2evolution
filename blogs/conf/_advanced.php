@@ -425,6 +425,7 @@ $xmlsrv_subdir = 'xmlsrv/';              // Subdirectory relative to base
 $xmlsrv_dirout = '../';                  // Relative path to go back to base
 $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
 // M.H.
+// fplanque>> TODO: Those $_SERVER variables HAVE TO GO AWAY!
 $rss_subdir = 'http://' . $_SERVER['HTTP_HOST'] .
     dirname($_SERVER['PHP_SELF']) . '/';              // Subdirectory relative to base
 $rss_dirout = '../';                  // Relative path to go back to base

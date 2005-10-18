@@ -267,27 +267,6 @@ switch( $action )
 				$config_is_done = 1;
 				$action = 'menu';
 			}
-			
-			// M.H.
-			// Create a new config file for inclusion with Multi-Domains
-			$conf_domain_filepath = $conf_path.'_domain_config.inc.php';
-			$f = @fopen( $conf_domain_filepath , 'w' );
-			if( $f == false )
-			{
-                print('error creating file: ' . $conf_domain_filepath . '<br>');
-            } else {
-                fputs($f, '<?php
-// This is the Core directory where the core files
-// are located
-
-$core_root = \''.$conf_rootpath.'\';
-
-?>');
-                print('file written: ' . $conf_domain_filepath . '<br>');
-                fclose($f);
-            }
-
-
 		}
 		// ATTENTION: we continue here...
 
@@ -306,17 +285,6 @@ $core_root = \''.$conf_rootpath.'\';
 			param( 'conf_db_name', 'string', $EvoConfig->DB['name'] );
 			param( 'conf_db_host', 'string', $EvoConfig->DB['host'] );
 			param( 'conf_db_tableprefix', 'string', $tableprefix );
-
-
-            // M.H.
-            // Guess rootpath:
-			$rootpath = $_SERVER['PATH_TRANSLATED'];
-			$rootpath = str_replace('\\\\', '/', $rootpath);
-			$rootpath = substr($rootpath, 0, strpos($rootpath, '/install/'));
-			param( 'conf_rootpath', 'string', $rootpath);
-			// ======================================
-			
-			
 			// Guess baseurl:
 			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
 			if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
@@ -351,10 +319,6 @@ $core_root = \''.$conf_rootpath.'\';
 					<legend><?php echo T_('Additional settings') ?></legend>
 					<?php
 						form_text( 'conf_baseurl', $conf_baseurl, 50, T_('Base URL'), sprintf( T_('This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine\'s name!' ) ), 120 );
-						
-                        // M.H.
-                        form_text ( 'conf_rootpath', $conf_rootpath, 50, T_('Root Path'), sprintf( T_('This is where b2evo will store the core skript code. This is important if you use the Multi-Domain Feature, so make sure you enter the absolute path where the software will be installed. Normally it is something like /home/username/b2evolution/blogs' ) ), 120 );
-                        // =============
 
 						form_text( 'conf_admin_email', $conf_admin_email, 50, T_('Your email'), sprintf( T_('Will be used in severe error messages so that users can contact you. You will also receive notifications for new user registrations.' ) ), 80 );
 					?>

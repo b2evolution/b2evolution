@@ -450,8 +450,8 @@ class Blog extends DataObject
 			case 'staticfilepath':
 				return $basepath.$this->siteurl.$this->staticfilename;
 
-            // M.H.
-            case 'siteurl':
+      // M.H.
+      case 'siteurl':
 				if( preg_match( '#^https?://#', $this->siteurl ) )
 				{ // We have a specific URL for this blog:
 					return $this->siteurl;
@@ -467,9 +467,9 @@ class Blog extends DataObject
 				}
 
 			case 'baseurl':
-                // M.H.
-                return $baseurl;
-                /*
+        // M.H.
+        return $baseurl;
+        /*
 				if( preg_match( '#^https?://#', $this->siteurl ) )
 				{ // We have a specific URL for this blog:
 					return $this->siteurl;
@@ -808,6 +808,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2005/10/18 18:45:58  fplanque
+ * some rollbacks...
+ *
  * Revision 1.31  2005/10/18 11:04:16  marian
  * Added extra functionality to support multi-domain feature.
  *

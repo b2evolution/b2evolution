@@ -1,5 +1,5 @@
 <?php
- /**
+/**
  * pop3-2-b2 mail to blog
  *
  * b2evolution - {@link http://b2evolution.net/}
