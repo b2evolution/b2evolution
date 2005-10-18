@@ -32,6 +32,9 @@
  * Vegar BERG GULDAL grants François PLANQUE the right to license
  * Vegar BERG GULDAL's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * Halton STEWART grants François PLANQUE the right to license
+ * Halton STEWART's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package admin
@@ -40,6 +43,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: François PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
+ * @author halton: Halton STEWART.
  *
  * @todo Allow applying / re-checking of the known data, not just after an update!
  *
@@ -357,10 +361,35 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 	?></p>
 
 	<?php
+	// Build sql string with filter
+	@$filteron = trim($_GET["filteron"]);
+	@$filter = $_GET["filter"];
+	if ( ( $filter != T_('Clear') ) && ( strlen($filteron) > 0 ) )
+	{
+		$filtered = true;
+		$afilter = split(' ', $filteron);
+		$swhere = '';
+		foreach ($afilter as $sfilter)
+		{
+
+			$swhere .= 'aspm_string like "%' . mysql_real_escape_string($sfilter) . '%" and ';
+		}
+		$sql = 'SELECT aspm_ID, aspm_string, aspm_source
+															FROM T_antispam
+															WHERE ' . $swhere . ' 1
+															ORDER BY aspm_string ASC';
+	}
+	else
+	{
+		$filteron = '';
+		$filtered = false;
+		$sql = 'SELECT aspm_ID, aspm_string, aspm_source
+															FROM T_antispam
+															ORDER BY aspm_string ASC';
+	}
+
 	// Create result set:
-	$Results = & new Results( 'SELECT aspm_ID, aspm_string, aspm_source
-														FROM T_antispam
-														ORDER BY aspm_string ASC' );
+	$Results = & new Results( $sql );
 
 	$Results->cols[] = array(
 							'th' => T_('Keyword'),
@@ -439,6 +468,18 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 								'td' => '%antispam_actions({row})%',
 							);
 	}
+
+	//Display filter/search block
+	echo '<center>';
+	$Form = & new Form( 'antispam.php', 'filter', 'get', '' );
+	$Form->begin_form('fform');
+	$Form->text( 'filteron', $filteron, 30, '', '', 80 );
+	$Form->end_form( array( array( 'submit', 'filter', T_('Filter'), 'SaveButton' ),array('submit','filter',T_('Clear'),'SaveButton' ) ) );
+	echo '</center>';
+	//TODO: include filteron in the column sorting link querystring, and page number link querystring
+	//TODO: include column sort tag in filter GET
+	//clues: _results.class.php: case 'prev'   _misc.funcs.php: regenerate_url
+
 
 	// Display results:
 	$Results->display();
