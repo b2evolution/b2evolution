@@ -48,7 +48,24 @@
 $localesToMerge = array( 'de_DE' );
 
 
-// check that all external tools are available:
+/*** You should not have to modify anything below. ***/
+
+// The blogs directory:
+$dir_blogs = dirname(__FILE__).'/../blogs/';
+if( !realpath($dir_blogs) )
+{
+	die( 'Fatal error: The path "'.$dir_blogs.'" was not found!' );
+}
+$dir_blogs = realpath($dir_blogs).'/';
+
+// The messages.pot (template) file:
+$file_pot = $dir_blogs.'locales/messages.pot';
+if( !is_writable($file_pot) )
+{
+	die( 'Fatal error: The file "'.$file_pot.'" is not writable.' );
+}
+
+// Check that all external tools are available:
 foreach( array( 'xgettext', 'msgmerge', 'find', 'xargs', 'sed' ) as $testtool )
 {
 	exec( $testtool.' --version', $output, $return );
@@ -58,45 +75,53 @@ foreach( array( 'xgettext', 'msgmerge', 'find', 'xargs', 'sed' ) as $testtool )
 	}
 }
 
-# extract T_() and NT_() strings from all .php files below ../blogs
-system( 'find ../blogs/ -iname "*.php"'
-				.' | xargs xgettext -D ../blogs/ -o ../blogs/locales/messages.pot --no-wrap --add-comments=TRANS --copyright-holder="Francois PLANQUE" --msgid-bugs-address=http://fplanque.net/ --keyword=T_ --keyword=NT_ -F' );
+
+// The locales dir is our working dir:
+chdir( $dir_blogs.'locales' );
+
+echo 'Extracting T_() and NT_() strings from all .php files below "blogs" into ."blogs/locales/messages.pot".. ';
+system( 'find ../ -iname "*.php"'
+				.' | xargs xgettext  -o '.escapeshellarg($file_pot).' --no-wrap --add-comments=TRANS --copyright-holder="Francois PLANQUE" --msgid-bugs-address=http://fplanque.net/ --keyword=T_ --keyword=NT_ -F' );
+echo "[ok]\n";
 
 
-# replace various things (see comments)
+// Replace various things (see comments)
+echo 'Automagically search&replace in messages.pot.. ';
 system( 'sed -i "'
 				# remove \r:
 				.'s!\\\\\\\\r!!g;'
-				# make paths relative to the .po files:\
-				.'s! ../blogs/! ../../../!g;'
-				.'" ../blogs/locales/messages.pot' );
+				# make paths relative to the .po files:
+				.'s!^#: ../!#:../../../!g;'
+				.'" '.escapeshellarg($file_pot) );
 
-# Replace header "vars" in first 20 lines:
+// Replace header "vars" in first 20 lines:
 system( 'sed -i 1,20"'
 				.'s/PACKAGE/b2evolution/;'
-				.'s/VERSION/0.9.2-CVS/;'
+				.'s/VERSION/1.6-CVS/;'
 				.'s/# SOME DESCRIPTIVE TITLE./# b2evolution - Language file/;'
-				.'s/YEAR/2004/;'
+				.'s/(C) YEAR/(C) 2003-'.date('Y').'/;'
+				.'s/YEAR(?!-MO)/'.date('Y').'/;'
 				.'s/CHARSET/iso-8859-1/;'
-				.'" ../blogs/locales/messages.pot' );
+				.'" '.escapeshellarg($file_pot) );
+echo "[ok]\n";
 
 
-# Merge with existing .po files:
-foreach( $localesToMerge as $llocale )
+// Merge with existing .po files:
+foreach( $localesToMerge as $l_locale )
 {
-	$pofile = '../blogs/locales/'.$llocale.'/LC_MESSAGES/messages.po';
+	$l_file_po = $dir_blogs.'/locales/'.$l_locale.'/LC_MESSAGES/messages.po';
 
-	echo 'Merging with '.$llocale;
+	echo 'Merging with '.$l_locale.'.. ';
 
-	if( !file_exists( $pofile ) )
+	if( !file_exists( $l_file_po ) )
 	{
-		echo "PO file $pofile not found!\n";
+		echo "PO file $l_file_po not found!\n";
 		continue;
 	}
 
-	system( "msgmerge -U -F --no-wrap $pofile ../blogs/locales/messages.pot" );
+	system( 'msgmerge -U -F --no-wrap '.escapeshellarg($l_file_po).' '.escapeshellarg($file_pot) );
 	# delete old TRANS comments and make automatic ones valid comments:
-	system( 'sed -i -r "/^#\\s+TRANS:/d; s/^#\\. TRANS:/# TRANS:/;" '.$pofile );
+	system( 'sed -i -r "/^#\\s+TRANS:/d; s/^#\\. TRANS:/# TRANS:/;" '.$l_file_po );
 	echo "\n";
 }
 
