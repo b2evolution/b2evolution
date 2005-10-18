@@ -62,6 +62,14 @@ param( 'action', 'string' );
 param( 'confirm', 'string' );
 param( 'keyword', 'string' );
 param( 'domain', 'string' );
+param( 'filteron', 'string', '', true );
+param( 'filter', 'string' );
+
+if( $filter == T_('Clear') )
+{
+	unset( $filteron );
+	forget_param( 'filteron' );
+}
 
 // Check permission:
 $current_User->check_perm( 'spamblacklist', 'view', true );
@@ -362,9 +370,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 
 	<?php
 	// Build sql string with filter
-	@$filteron = trim($_GET["filteron"]);
-	@$filter = $_GET["filter"];
-	if ( ( $filter != T_('Clear') ) && ( strlen($filteron) > 0 ) )
+	if( !empty( $filteron ) )
 	{
 		$filtered = true;
 		$afilter = split(' ', $filteron);
@@ -376,16 +382,14 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 		}
 		$sql = 'SELECT aspm_ID, aspm_string, aspm_source
 															FROM T_antispam
-															WHERE ' . $swhere . ' 1
-															ORDER BY aspm_string ASC';
+															WHERE ' . $swhere . ' 1';
 	}
 	else
 	{
 		$filteron = '';
 		$filtered = false;
 		$sql = 'SELECT aspm_ID, aspm_string, aspm_source
-															FROM T_antispam
-															ORDER BY aspm_string ASC';
+															FROM T_antispam';
 	}
 
 	// Create result set:
