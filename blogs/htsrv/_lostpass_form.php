@@ -30,16 +30,14 @@ $Form->hidden( 'action', 'retrievepassword' );
 $Form->hidden( 'login', $login );
 $Form->hidden( 'redirect_to', $redirect_to );
 
-echo $Form->fieldstart;
+$Form->begin_fieldset();
 $Form->text( 'login', '', 16, T_('Login'), '', 20 , 'input_text' );
 
-echo $Form->fieldstart;
-echo $Form->inputstart;
-$Form->submit( array( '', T_('Send email to change your password!'), 'ActionButton' ) );
-echo $Form->inputend;
-echo $Form->fieldend;
+echo $Form->fieldstart.$Form->inputstart;
+$Form->submit_input( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Request email!'), 'class' => 'ActionButton' ) );
+echo $Form->inputend.$Form->fieldend;
 
-echo $Form->fieldend;
+$Form->end_fieldset();;
 
 $Form->end_form();
 
