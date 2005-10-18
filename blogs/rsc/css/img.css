@@ -44,7 +44,8 @@ div.multi_image_zone {
 }
 
 div.image_block {
-	overflow: hidden;
+	/* WARNING: this will screw out backoffice layout (fulltext edit screen) in firefox! 
+		overflow: hidden; */
 	text-align: center;
 	background-color: #fff;
 	border: 1px solid #999;
