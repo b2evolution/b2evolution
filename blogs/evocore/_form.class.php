@@ -2018,7 +2018,7 @@ class Form extends Widget
 						.'>'
 						.$this->_common_params['label']
 						.$this->label_suffix
-						#.( isset($this->_common_params['required']) && $this->_common_params['required'] ? ' <span class="small required">[*]</span>' : '' )
+						#.( isset($this->_common_params['required']) && $this->_common_params['required'] ? ' <span class="required">[*]</span>' : '' )
 						.'</label>'
 						.$this->labelend;
 		}
@@ -2207,6 +2207,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.78  2005/10/18 18:24:25  fplanque
+ * no good reason to combine styles here. one unique style for required is enough.
+ *
  * Revision 1.77  2005/10/17 22:59:05  blueyed
  * Do not use <small> and md5() (which was meant for more uniqueness, if there would be radio groups with the same name - not necessary probably. We might use get_valid_id() later to prepend the form's ID everywhere if it should become necessary.)
  *
