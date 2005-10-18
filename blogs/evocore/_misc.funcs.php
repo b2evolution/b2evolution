@@ -513,7 +513,7 @@ function is_email( $email )
 	#$chars = '/^.+@[^\.].*\.[a-z]{2,}$/i';
 
 	# Converted from: http://www.regexlib.com/REDetails.aspx?regexp_id=711
-	$pattern_email_rfc2822 = 'ß^((?>[a-zA-Z\d!#$%&\'*+\-/=?^_`{|}~]+\x20*|"((?=[\x01-\x7f])[^"\\]|\\[\x01-\x7f])*"\x20*)*(?P<angle_nr_three><))?((?!\.)(?>\.?[a-zA-Z\d!#$%&\'*+\-/=?^_`{|}~]+)+|"((?=[\x01-\x7f])[^"\\]|\\[\x01-\x7f])*")@(((?!-)[a-zA-Z\d\-]+(?<!-)\.)+[a-zA-Z]{2,}|\[(((?(?<!\[)\.)(25[0-5]|2[0-4]\d|[01]?\d?\d)){4}|[a-zA-Z\d\-]*[a-zA-Z\d]:((?=[\x01-\x7f])[^\\\[\]]|\\[\x01-\x7f])+)\])(?(3)>)$ß';
+	$pattern_email_rfc2822 = '§^((?>[a-zA-Z\d!#$%&\'*+\-/=?^_`{|}~]+\x20*|"((?=[\x01-\x7f])[^"\\]|\\[\x01-\x7f])*"\x20*)*(?P<angle_nr_three><))?((?!\.)(?>\.?[a-zA-Z\d!#$%&\'*+\-/=?^_`{|}~]+)+|"((?=[\x01-\x7f])[^"\\]|\\[\x01-\x7f])*")@(((?!-)[a-zA-Z\d\-]+(?<!-)\.)+[a-zA-Z]{2,}|\[(((?(?<!\[)\.)(25[0-5]|2[0-4]\d|[01]?\d?\d)){4}|[a-zA-Z\d\-]*[a-zA-Z\d]:((?=[\x01-\x7f])[^\\\[\]]|\\[\x01-\x7f])+)\])(?(3)>)$§';
 
 	if( strpos( $email, '@' ) !== false && strpos( $email, '.' ) !== false )
 	{
@@ -2116,6 +2116,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.107  2005/10/18 14:03:55  marian
+ * changed pattern delimiter due to problems with PHP on Windows Machines
+ *
  * Revision 1.106  2005/10/18 02:27:13  blueyed
  * Fixes to debug_get_backtrace()
  *
