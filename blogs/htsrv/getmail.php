@@ -1,5 +1,5 @@
 <?php
-/**
+ /**
  * pop3-2-b2 mail to blog
  *
  * b2evolution - {@link http://b2evolution.net/}
@@ -35,6 +35,14 @@ $str_failure = '';
 if ( $Settings->get('eblog_test_mode') )
 {
 	$test_type = 2;
+}
+elseif ( !isset( $current_User ) )
+{
+	$test_type = 0;
+}
+elseif ( !$current_User->check_perm( 'options', 'edit', true ) )
+{
+	$test_type = 0;
 }
 
 if ( $test_type > 0 )
@@ -528,9 +536,14 @@ switch ( $Settings->get('eblog_method') )
 			$subject = trim(str_replace($Settings->get('eblog_subject_prefix'), '', $subject));
 
 			// remove content after terminator
-			$os_terminator = strpos( $content, $Settings->get('eblog_body_terminator') );
-			if ($os_terminator) {
-				$content = substr($content, 0, $os_terminator);
+			$eblog_terminator = $Settings->get('eblog_body_terminator');
+			if ( !empty( $eblog_terminator ) )
+			{
+				$os_terminator = strpos( $content, $Settings->get($eblog_terminator) );
+				if ($os_terminator)
+				{
+					$content = substr($content, 0, $os_terminator);
+				}
 			}
 			$content = trim($content);
 
