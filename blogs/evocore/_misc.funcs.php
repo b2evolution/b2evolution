@@ -1258,13 +1258,14 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 			$backtrace = array_slice( $backtrace, 0-$trace_length ); // cut off ignored ones
 		}
 
-		if( $limit_to_last !== NULL )
+		$count_backtrace = count($backtrace);
+		if( $limit_to_last !== NULL && $limit_to_last < $count_backtrace )
 		{	// we want to limit to a maximum number
 			$limited = true;
 			$backtrace = array_slice( $backtrace, 0, $limit_to_last );
+			$count_backtrace = $limit_to_last;
 		}
 
-		$count_backtrace = count($backtrace);
 		$r .= '<div style="padding:1ex; text-align:left; font-family:monospace; font-size:small; color:#000; background-color:#ddf"><h3>Backtrace:</h3>'."\n";
 		if( $count_backtrace )
 		{
@@ -1330,7 +1331,22 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 				}
 				$call .='<strong>)</strong>';
 
-				$r .= $call."<br />\n<strong>File: </strong>{$l_trace['file']}:{$l_trace['line']}";
+				$r .= $call."<br />\n";
+
+				$r .= '<strong>';
+				if( isset($l_trace['file']) )
+				{
+					$r .= 'File: </strong> '.$l_trace['file'];
+				}
+				else
+				{
+					$r .= '[runtime created function]</strong>';
+				}
+				if( isset($l_trace['line']) )
+				{
+					$r .= ':'.$l_trace['line'];
+				}
+
 				$r .= "</li>\n";
 			}
 			$r .= '</ol>';
@@ -2100,6 +2116,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.106  2005/10/18 02:27:13  blueyed
+ * Fixes to debug_get_backtrace()
+ *
  * Revision 1.105  2005/10/18 02:04:21  blueyed
  * Tightened is_email(), allowing RFC2822 format, which includes "name <email@example.com>"; send_mail(): fix $from after injection fix, enhanced debugging
  *
