@@ -39,7 +39,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Request class: handles the current HTTP request
  *
  * @todo (fplanque)
- * @todo Add $field_msg param to param_check_*() galore (should be directly after $err_msg - perhaps using a $func_params array right away?).
  */
 class Request
 {
@@ -193,7 +192,7 @@ class Request
 	 * @param string|NULL error message for form field ($err_msg gets used if === NULL).
 	 * @return boolean true if OK
 	 */
-	function param_string_not_empty( $var, $err_msg, $field_msg = NULL )
+	function param_string_not_empty( $var, $err_msg, $field_err_msg = NULL )
 	{
 		$this->param( $var, 'string', true );
 		return $this->param_check_not_empty( $var, $err_msg, $field_err_msg );
@@ -353,9 +352,15 @@ class Request
 	 * @param string param name
 	 * @param string error message
 	 * @param array|boolean Additional params:
- 	 *        - 'required': Is non-empty date required? Default: true.
-	 *        - 'date_pattern': Pattern for the date, using named capturing groups ('day', 'month', 'year'). Default: '#^(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)$#' (ISO).
-	 *        - 'field_msg': Error for the form field
+	 *        - 'required': Is non-empty date required? Default: true.
+	 *        - 'date_pattern': Pattern for the date, using named capturing groups ('day', 'month', 'year').
+	 *           Default: '#^(\d\d\d\d)-(\d\d)-(\d\d)$#' (ISO)
+	 *           You can also use "Named Capturing Groups" and write it like this:
+	 *           '#^(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)$#' (ISO).
+	 *           This allows to use for example '#^(?P<day>\d\d)-(?P<month>\d\d)-(?P<year>\d\d\d\d)$#'
+	 *           NOTE: "Named Capturing Groups" require PHP 4.3.3! If no named groups are given we'll use
+	 *           (1 == year, 2 == month, 3 == day).
+	 *        - 'field_err_msg': Error for the form field
 	 * @return boolean|array true if empty, but OK. False if not valid. Matching array if ok.
 	 */
 	function param_check_date_format( $var, $err_msg, $func_params = array() )
@@ -371,23 +376,34 @@ class Request
 		{ // ISO by default
 			//$func_params['date_pattern'] = '#^(?P<year>\d\d\d\d)-(?P<month>[01]?\d)-(?P<day>[0123]?\d)$#'; // This may be useful, when taking care of leading zeros afterwards again, eg date('Y-m-d').
 			//$func_params['date_pattern'] = '#^(?P<year>\d\d\d\d)-(?P<month>[01]\d)-(?P<day>[0123]\d)$#';
-			$func_params['date_pattern'] = '#^(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)$#';
+			//$func_params['date_pattern'] = '#^(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)$#';
+			$func_params['date_pattern'] = '#^(\d\d\d\d)-(\d\d)-(\d\d)$#';
 		}
 
 		if( preg_match( $func_params['date_pattern'], $this->params[$var], $match ) )
 		{
-			if( checkdate( $match['month'], $match['day'], $match['year'] ) )
-			{ // all clean! :)
-				return $match;
+			if( isset( $match['month'], $match['day'], $match['year'] ) )
+			{ // extended/preferred format (PHP >= 4.3.3)
+				if( checkdate( $match['month'], $match['day'], $match['year'] ) )
+				{ // all clean! :)
+					return $match;
+				}
+			}
+			elseif( isset( $match[1], $match[2], $match[3] ) )
+			{ // Fallback to numeric format ( 1 == year, 2 == month, 3 == day )
+				if( checkdate( $match[2], $match[3], $match[1] ) )
+				{ // all clean! :)
+					return $match;
+				}
 			}
 		}
 
-		if( !isset($func_params['field_msg']) )
+		if( !isset($func_params['field_err_msg']) )
 		{
-			$func_params['field_msg'] = NULL;
+			$func_params['field_err_msg'] = NULL;
 		}
 
-		$this->param_error( $var, $err_msg, $func_params['field_msg'] );
+		$this->param_error( $var, $err_msg, $func_params['field_err_msg'] );
 		return false;
 	}
 
@@ -562,6 +578,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.18  2005/10/18 01:57:13  blueyed
+ * param_check_date_format(): use failsafe pattern for PHP < 4.3.3; doc
+ *
  * Revision 1.17  2005/10/17 19:35:57  fplanque
  * no message
  *
