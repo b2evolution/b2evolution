@@ -498,22 +498,26 @@ function antispambot($emailaddy, $mailto = 0) {
 
 
 /**
- * Check that email address looks valid
+ * Check that email address looks valid (according to RFC 2822).
+ *
+ * That may be:
+ *  - example@example.org
+ *  - Me <example@example.org>
+ *  - "Me" <example@example.org>
  *
  * @return bool
  */
 function is_email( $email )
 {
 	#$chars = "/^([a-z0-9_]|\\-|\\.)+@(([a-z0-9_]|\\-)+\\.)+[a-z]{2,4}\$/i";
+	#$chars = '/^.+@[^\.].*\.[a-z]{2,}$/i';
 
 	# Converted from: http://www.regexlib.com/REDetails.aspx?regexp_id=711
-	/*$pattern_email_rfc2822 = 'ß^((?>[a-zA-Z\d!#$%&\'*+\-/=?^_`{|}~]+\x20*|"((?=[\x01-\x7f])[^"\\]|\\[\x01-\x7f])*"\x20*)*(?P<angle_nr_three><))?((?!\.)(?>\.?[a-zA-Z\d!#$%&\'*+\-/=?^_`{|}~]+)+|"((?=[\x01-\x7f])[^"\\]|\\[\x01-\x7f])*")@(((?!-)[a-zA-Z\d\-]+(?<!-)\.)+[a-zA-Z]{2,}|\[(((?(?<!\[)\.)(25[0-5]|2[0-4]\d|[01]?\d?\d)){4}|[a-zA-Z\d\-]*[a-zA-Z\d]:((?=[\x01-\x7f])[^\\\[\]]|\\[\x01-\x7f])+)\])(?(3)>)$ß';*/
-
-	$chars = '/^.+@[^\.].*\.[a-z]{2,}$/i';
+	$pattern_email_rfc2822 = 'ß^((?>[a-zA-Z\d!#$%&\'*+\-/=?^_`{|}~]+\x20*|"((?=[\x01-\x7f])[^"\\]|\\[\x01-\x7f])*"\x20*)*(?P<angle_nr_three><))?((?!\.)(?>\.?[a-zA-Z\d!#$%&\'*+\-/=?^_`{|}~]+)+|"((?=[\x01-\x7f])[^"\\]|\\[\x01-\x7f])*")@(((?!-)[a-zA-Z\d\-]+(?<!-)\.)+[a-zA-Z]{2,}|\[(((?(?<!\[)\.)(25[0-5]|2[0-4]\d|[01]?\d?\d)){4}|[a-zA-Z\d\-]*[a-zA-Z\d]:((?=[\x01-\x7f])[^\\\[\]]|\\[\x01-\x7f])+)\])(?(3)>)$ß';
 
 	if( strpos( $email, '@' ) !== false && strpos( $email, '.' ) !== false )
 	{
-		return (bool)(preg_match($chars, $email));
+		return (bool)(preg_match($pattern_email_rfc2822, $email));
 	}
 	else
 	{
@@ -1589,6 +1593,7 @@ function url_add_tail( $url, $tail )
  * @param string The message text
  * @param string From address, being added to headers (we'll prevent injections);
  *               see {@link http://securephp.damonkohler.com/index.php/Email_Injection}.
+ *               Might be just an email address or of the same form as {@link $to}.
  * @param array Additional headers ( headername => value ). Take care of injection!
  */
 function send_mail( $to, $subject, $message, $from = '', $headers = array() )
@@ -1607,9 +1612,22 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 	$headers['X-Mailer'] = $app_name.' '.$app_version.' - PHP/'.phpversion();
 
 	// -- Build headers ----
+	$from = trim($from);
 	if( !empty($from) )
 	{ // From has to go into headers
-		$from = preg_replace( '~(\r|\n).*$~s', '', $from ); // Prevent injection! (remove everything after \n or \r)
+		$from_save = preg_replace( '~(\r|\n).*$~s', '', $from ); // Prevent injection! (remove everything after (and including) \n or \r)
+
+		if( $from != $from_save )
+		{
+			if( strpos( $from_save, '<' ) !== false && !strpos( $from_save, '>' ) )
+			{ // We have probably stripped the '>' at the end!
+				$from_save .= '>';
+			}
+			$Debuglog->add( 'Detected email injection! Fixed &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($from_save).'&raquo;.', 'security' );
+
+			$from = $from_save;
+		}
+
 		$headerstring = "From: $from$NL";
 	}
 	else
@@ -1629,19 +1647,19 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 	{	// We agree to die for debugging...
 		if( ! mail( $to, $subject, $message, $headerstring ) )
 		{
-			die("Sending mail from &laquo;$from&raquo; to &laquo;$to&raquo;, Subject &laquo;$subject&raquo; FAILED.");
+			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
 		}
 	}
 	else
 	{	// Soft debugging only....
 		if( ! @mail( $to, $subject, $message, $headerstring ) )
 		{
-			$Debuglog->add( "Sending mail from &laquo;$from&raquo; to &laquo;$to&raquo;, Subject &laquo;$subject&raquo; FAILED." );
+			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
 			return false;
 		}
 	}
 
-	$Debuglog->add( "Sent mail from &laquo;$from&raquo; to &laquo;$to&raquo;, Subject &laquo;$subject&raquo;." );
+	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
 	return true;
 }
 
@@ -2082,6 +2100,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.105  2005/10/18 02:04:21  blueyed
+ * Tightened is_email(), allowing RFC2822 format, which includes "name <email@example.com>"; send_mail(): fix $from after injection fix, enhanced debugging
+ *
  * Revision 1.104  2005/10/16 09:03:57  marian
  * Changed delimiter for preg_match because the old one did not work in the Windows environment.
  *
