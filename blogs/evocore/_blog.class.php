@@ -395,7 +395,7 @@ class Blog extends DataObject
 	 */
 	function get( $parname )
 	{
-		global $xmlsrv_url, $admin_email, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
+		global $xmlsrv_url, $admin_email, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog, $rss_url, $rss_multidomain;
 
 		switch( $parname )
 		{
@@ -450,7 +450,8 @@ class Blog extends DataObject
 			case 'staticfilepath':
 				return $basepath.$this->siteurl.$this->staticfilename;
 
-			case 'baseurl':
+            // M.H.
+            case 'siteurl':
 				if( preg_match( '#^https?://#', $this->siteurl ) )
 				{ // We have a specific URL for this blog:
 					return $this->siteurl;
@@ -464,6 +465,25 @@ class Blog extends DataObject
 					}
 					return $r;
 				}
+
+			case 'baseurl':
+                // M.H.
+                return $baseurl;
+                /*
+				if( preg_match( '#^https?://#', $this->siteurl ) )
+				{ // We have a specific URL for this blog:
+					return $this->siteurl;
+				}
+				else
+				{ // This blog is located under b2evo's baseurl
+					$r = $baseurl;
+					if( !empty($this->siteurl) )
+					{ // We have a subfolder:
+						$r .= $this->siteurl;
+					}
+					return $r;
+				}
+				*/
 
 			case 'basehost':
 				$baseurl = $this->get('baseurl');
@@ -506,31 +526,76 @@ class Blog extends DataObject
 				break;
 
 			case 'rdf_url':
-				return $xmlsrv_url.'rdf.php?blog='.$this->ID;
+                if ($rss_multidomain)
+                {
+    				return $rss_url.'?template=rdf&amp;blog='.$this->ID;
+                } else {
+    				return $xmlsrv_url.'rdf.php?blog='.$this->ID;
+                }
 
 			case 'rss_url':
-				return $xmlsrv_url.'rss.php?blog='.$this->ID;
+                if ($rss_multidomain)
+                {
+    				return $rss_url.'?template=rss&amp;blog='.$this->ID;
+                } else {
+    				return $xmlsrv_url.'rss.php?blog='.$this->ID;
+			    }
 
 			case 'rss2_url':
-				return $xmlsrv_url.'rss2.php?blog='.$this->ID;
+                if ($rss_multidomain)
+                {
+    				return $rss_url.'?template=rss2&amp;blog='.$this->ID;
+                } else {
+				    return $xmlsrv_url.'rss2.php?blog='.$this->ID;
+				}
 
 			case 'atom_url':
-				return $xmlsrv_url.'atom.php?blog='.$this->ID;
+                if ($rss_multidomain)
+                {
+    				return $rss_url.'?template=atom&amp;blog='.$this->ID;
+                } else {
+				    return $xmlsrv_url.'atom.php?blog='.$this->ID;
+				}
 
 			case 'comments_rdf_url':
-				return $xmlsrv_url.'rdf.comments.php?blog='.$this->ID;
+                if ($rss_multidomain)
+                {
+    				return $rss_url.'?template=rdf.comments&amp;blog='.$this->ID;
+                } else {
+				    return $xmlsrv_url.'rdf.comments.php?blog='.$this->ID;
+				}
 
 			case 'comments_rss_url':
-				return $xmlsrv_url.'rss.comments.php?blog='.$this->ID;
+                if ($rss_multidomain)
+                {
+    				return $rss_url.'?template=rss.comments&amp;blog='.$this->ID;
+                } else {
+				    return $xmlsrv_url.'rss.comments.php?blog='.$this->ID;
+				}
 
 			case 'comments_rss2_url':
-				return $xmlsrv_url.'rss2.comments.php?blog='.$this->ID;
+                if ($rss_multidomain)
+                {
+    				return $rss_url.'?template=rss2.comments&amp;blog='.$this->ID;
+                } else {
+				    return $xmlsrv_url.'rss2.comments.php?blog='.$this->ID;
+				}
 
 			case 'comments_atom_url':
-				return $xmlsrv_url.'atom.comments.php?blog='.$this->ID;
+                if ($rss_multidomain)
+                {
+    				return $rss_url.'?template=atom.comments&amp;blog='.$this->ID;
+                } else {
+				    return $xmlsrv_url.'atom.comments.php?blog='.$this->ID;
+				}
 
 			case 'pingback_url':
-				return $xmlsrv_url.'xmlrpc.php';
+                if ($rss_multidomain)
+                {
+    				return $rss_url.'?template=xmlrpc';
+                } else {
+				    return $xmlsrv_url.'xmlrpc.php';
+				}
 
 			case 'admin_email':
 				return $admin_email;
@@ -743,6 +808,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2005/10/18 11:04:16  marian
+ * Added extra functionality to support multi-domain feature.
+ *
  * Revision 1.30  2005/10/14 21:00:08  fplanque
  * Stats & antispam have obviously been modified with ZERO testing.
  * Fixed a sh**load of bugs...

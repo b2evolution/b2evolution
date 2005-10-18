@@ -438,6 +438,9 @@ function next_posts_link($label='#', $max_page=0, $page='')
 	if (empty($p) && (empty($paged) || $nextpage <= $max_page))
 	{
 		echo '<a href="';
+		// M.H.
+		echo 'http://' . $_SERVER['HTTP_HOST'];
+		// ================
 		echo next_posts($max_page, $page);
 		echo '">'. htmlspecialchars($label) .'</a>';
 	}
@@ -460,6 +463,9 @@ function previous_posts_link($label='#', $page='')
 	if( empty($p) && ($paged > 1) )
 	{
 		echo '<a href="';
+		// M.H.
+		echo 'http://' . $_SERVER['HTTP_HOST'];
+		// ================
 		echo previous_posts( $page );
 		echo '">'.htmlspecialchars($label).'</a>';
 	}
@@ -932,6 +938,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.30  2005/10/18 11:04:16  marian
+ * Added extra functionality to support multi-domain feature.
+ *
  * Revision 1.29  2005/10/03 18:10:07  fplanque
  * renamed post_ID field
  *
