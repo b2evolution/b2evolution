@@ -480,10 +480,6 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 	$Form->text( 'filteron', $filteron, 30, '', '', 80 );
 	$Form->end_form( array( array( 'submit', 'filter', T_('Filter'), 'SaveButton' ),array('submit','filter',T_('Clear'),'SaveButton' ) ) );
 	echo '</center>';
-	//TODO: include filteron in the column sorting link querystring, and page number link querystring
-	//TODO: include column sort tag in filter GET
-	//clues: _results.class.php: case 'prev'   _misc.funcs.php: regenerate_url
-
 
 	// Display results:
 	$Results->display();
