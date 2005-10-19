@@ -144,7 +144,8 @@ if( !isset( $resolve_extra_path ) ) $resolve_extra_path = true;
 if( $resolve_extra_path )
 {
 	// Check and Remove blog baseurl from ReqPath:
-// fplanque>> TODO: comment this code!!
+	// if Blog is installed on separate domain
+	// use this domain setting as base for the actual path
 	if ($Blog->get( 'siteurl' ) > '')
 	{
     	$blog_baseurl = substr( $Blog->get( 'siteurl' ), strlen( $baseurlroot ) );
@@ -304,6 +305,8 @@ if( !isset($display_blog_list) )
 /*
  * Now, we'll jump to displaying!
  */
+// question: should $skin not better be $_GET['skin']?
+// it seems that this piece of code relies on register_globals=On
 if( !isset( $skin ) )
 { // No skin forced in stub (not even '' for no-skin)...
 
@@ -399,6 +402,9 @@ if ( $use_memcached )
 
 /*
  * $Log$
+ * Revision 1.20  2005/10/19 09:07:15  marian
+ * Changes regarding multi-domain feature
+ *
  * Revision 1.19  2005/10/18 18:45:58  fplanque
  * some rollbacks...
  *

@@ -526,73 +526,73 @@ class Blog extends DataObject
 				break;
 
 			case 'rdf_url':
-                if ($rss_multidomain)
+                if ($this->siteurl > '')
                 {
-    				return $rss_url.'?template=rdf&amp;blog='.$this->ID;
+    				return $rss_url.'?tempskin=rdf&amp;blog='.$this->ID;
                 } else {
     				return $xmlsrv_url.'rdf.php?blog='.$this->ID;
                 }
 
 			case 'rss_url':
-                if ($rss_multidomain)
+                if ($this->siteurl > '')
                 {
-    				return $rss_url.'?template=rss&amp;blog='.$this->ID;
+    				return $rss_url.'?tempskin=rss&amp;blog='.$this->ID;
                 } else {
     				return $xmlsrv_url.'rss.php?blog='.$this->ID;
 			    }
 
 			case 'rss2_url':
-                if ($rss_multidomain)
+                if ($this->siteurl > '')
                 {
-    				return $rss_url.'?template=rss2&amp;blog='.$this->ID;
+    				return $rss_url.'?tempskin=rss2&amp;blog='.$this->ID;
                 } else {
 				    return $xmlsrv_url.'rss2.php?blog='.$this->ID;
 				}
 
 			case 'atom_url':
-                if ($rss_multidomain)
+                if ($this->siteurl > '')
                 {
-    				return $rss_url.'?template=atom&amp;blog='.$this->ID;
+    				return $rss_url.'?tempskin=atom&amp;blog='.$this->ID;
                 } else {
 				    return $xmlsrv_url.'atom.php?blog='.$this->ID;
 				}
 
 			case 'comments_rdf_url':
-                if ($rss_multidomain)
+                if ($this->siteurl > '')
                 {
-    				return $rss_url.'?template=rdf.comments&amp;blog='.$this->ID;
+    				return $rss_url.'?tempskin=rdf.comments&amp;blog='.$this->ID;
                 } else {
 				    return $xmlsrv_url.'rdf.comments.php?blog='.$this->ID;
 				}
 
 			case 'comments_rss_url':
-                if ($rss_multidomain)
+                if ($this->siteurl > '')
                 {
-    				return $rss_url.'?template=rss.comments&amp;blog='.$this->ID;
+    				return $rss_url.'?tempskin=rss.comments&amp;blog='.$this->ID;
                 } else {
 				    return $xmlsrv_url.'rss.comments.php?blog='.$this->ID;
 				}
 
 			case 'comments_rss2_url':
-                if ($rss_multidomain)
+                if ($this->siteurl > '')
                 {
-    				return $rss_url.'?template=rss2.comments&amp;blog='.$this->ID;
+    				return $rss_url.'?tempskin=rss2.comments&amp;blog='.$this->ID;
                 } else {
 				    return $xmlsrv_url.'rss2.comments.php?blog='.$this->ID;
 				}
 
 			case 'comments_atom_url':
-                if ($rss_multidomain)
+                if ($this->siteurl > '')
                 {
-    				return $rss_url.'?template=atom.comments&amp;blog='.$this->ID;
+    				return $rss_url.'?tempskin=atom.comments&amp;blog='.$this->ID;
                 } else {
 				    return $xmlsrv_url.'atom.comments.php?blog='.$this->ID;
 				}
 
 			case 'pingback_url':
-                if ($rss_multidomain)
+                if ($this->siteurl > '')
                 {
-    				return $rss_url.'?template=xmlrpc';
+    				return $rss_url.'?tempskin=xmlrpc';
                 } else {
 				    return $xmlsrv_url.'xmlrpc.php';
 				}
@@ -808,6 +808,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2005/10/19 09:07:15  marian
+ * Changes regarding multi-domain feature
+ *
  * Revision 1.32  2005/10/18 18:45:58  fplanque
  * some rollbacks...
  *

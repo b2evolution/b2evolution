@@ -47,7 +47,9 @@
 		</rdf:Seq>
 	</items>
 </channel>
-<?php $CommentList->restart();
+<?php
+$CommentList->restart();
+// marian>> todo: this generates a 'No SELECT clause!' abort if not comments are available. Should be checked
 while( $Comment = $CommentList->get_next() )
 { // Loop through comments: ?>
 <item rdf:about="<?php $Comment->permalink() ?>">
