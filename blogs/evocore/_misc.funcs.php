@@ -1159,7 +1159,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 		([a-z][a-z0-9+.\-]*):[0-9]*		# scheme
 		//								# authority absolute URLs only
 		[a-z][a-z0-9~+.\-_,:;/\\\\*]* 	# Don t allow anything too funky like entities
-		([?#][a-z0-9~+.\-_,:;/\\\\%&=?#*\ ]*)?
+	   ([?#][a-z0-9~+.\-_,:;/\\\\%&=?#*\ \[\]]*)?
 		$|ix', $url, $matches) )
 	{ // Cannot vaidate URL structure
 		return T_('Invalid URL');
@@ -2116,6 +2116,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.108  2005/10/19 19:40:22  marian
+ * small fix for pattern matching with validate_url
+ *
  * Revision 1.107  2005/10/18 14:03:55  marian
  * changed pattern delimiter due to problems with PHP on Windows Machines
  *
