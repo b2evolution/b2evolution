@@ -378,7 +378,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 		foreach ($afilter as $sfilter)
 		{
 
-			$swhere .= 'aspm_string like "%' . mysql_real_escape_string($sfilter) . '%" and ';
+			$swhere .= 'aspm_string like "%' . $DB->escape($sfilter) . '%" and ';
 		}
 		$sql = 'SELECT aspm_ID, aspm_string, aspm_source
 															FROM T_antispam
