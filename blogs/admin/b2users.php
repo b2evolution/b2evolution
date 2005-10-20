@@ -46,6 +46,14 @@ $AdminUI->setPath( 'users' );
 
 param( 'action', 'string', 'list' );
 
+param( 'filteron', 'string', '', true );
+param( 'filter', 'string' );
+
+if( $filter == T_('Clear') )
+{
+	unset( $filteron );
+	forget_param( 'filteron' );
+}
 
 /*
  * Load editable objects:
@@ -554,6 +562,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.104  2005/10/20 16:35:18  halton
+ * added search / filtering to user list
+ *
  * Revision 1.103  2005/10/05 11:22:48  yabs
  * minor changes - correcting ID to user_ID
  *

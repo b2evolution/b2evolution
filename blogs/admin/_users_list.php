@@ -34,14 +34,34 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // query which groups have users (in order to prevent deletion of groups which have users)
-$usedgroups = $DB->get_col( 'SELECT grp_ID 
+$usedgroups = $DB->get_col( 'SELECT grp_ID
 															 FROM T_groups INNER JOIN T_users ON user_grp_ID = grp_ID
 															GROUP BY grp_ID');
 
 // get the userlist
-$sql = "SELECT T_users.*, grp_ID, grp_name
+if( !empty( $filteron ) )
+{
+	$filtered = true;
+	$afilter = split(' ', $filteron);
+	$swhere = '';
+	foreach ($afilter as $sfilter)
+	{
+
+		$swhere .= 'concat(user_login, user_firstname, user_lastname, user_nickname, user_email) like "%' . $DB->escape($sfilter) . '%" and ';
+	}
+	$sql = "SELECT T_users.*, grp_ID, grp_name
 					FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
-				 ORDER BY grp_name";
+					WHERE $swhere 1
+					ORDER BY grp_name";
+}
+else
+{
+	$filteron = '';
+	$filtered = false;
+	$sql = "SELECT T_users.*, grp_ID, grp_name
+					FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
+					ORDER BY grp_name";
+}
 
 function conditional( $condition, $on_true, $on_false = '' )
 {
@@ -179,11 +199,22 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 	$Results->global_icon( T_('Add a group...'), 'new', '?action=new_group', T_('Group') );
 }
 
+//Display filter/search block
+echo '<center>';
+$Form = & new Form( 'b2users.php', 'filter', 'get', '' );
+$Form->begin_form('fform');
+$Form->text( 'filteron', $filteron, 30, '', '', 80 );
+$Form->end_form( array( array( 'submit', 'filter', T_('Filter'), 'SaveButton' ),array('submit','filter',T_('Clear'),'SaveButton' ) ) );
+echo '</center>';
+
 // Display result :
 $Results->display();
 
 /*
  * $Log$
+ * Revision 1.50  2005/10/20 16:35:18  halton
+ * added search / filtering to user list
+ *
  * Revision 1.49  2005/10/03 17:26:43  fplanque
  * synched upgrade with fresh DB;
  * renamed user_ID field
