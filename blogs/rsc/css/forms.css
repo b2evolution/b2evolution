@@ -63,11 +63,11 @@ textarea.field_required {
 	background:#f4ffe8;
 }
 span.checkbox_required {
-	background:#fdfddd; /* does this make sense? - same question applies for span.checkbox_error  */
-	border: 1px solid #fdfddd; /* very light */
+	background:#f4ffe8; /* does this make sense? - same question applies for span.checkbox_error  */
+	border: 1px solid #f4ffe8; /* very light */
 }
 span.checkbox_required input.checkbox {
-	background:#fdfddd; /* very light */
+	background:#f4ffe8; /* very light */
 }
 
 
