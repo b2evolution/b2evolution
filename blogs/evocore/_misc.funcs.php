@@ -305,17 +305,18 @@ function convert_chars( $content, $flag='html' )
  */
 function make_clickable( $text, $moredelim = '&amp;' )
 {
-	$text = preg_replace( array( '#(^|\s)(https?|mailto)://(([^<>{}\s,]|,(?!\s))+)#i',
-																'#(^|\s)aim:([^,<\s]+)#i',
-																'#(^|\s)icq:(\d+)#i',
-																'#(^|\s)www\.([a-z0-9\-]+)\.([a-z0-9\-.\~]+)((?:/[^,<\s]*)?)#i',
-																'#(^|\s)([a-z0-9\-_.]+?)@([^,<\s]+)#i', ),
-												array( '$1<a href="$2://$3">$2://$3</a>',
-																'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.urlencode(T_('Hello')).'">$2$3</a>',
-																'$1<a href="http://wwp.icq.com/scripts/search.dll?to=$2">$2</a>',
-																'$1<a href="http://www.$2.$3$4">www.$2.$3$4</a>',
-																'$1<a href="mailto:$2@$3">$2@$3</a>', ),
-												$text );
+	$text = preg_replace(
+		array( '#(^|\s)(https?|mailto)://(([^<>{}\s,]|,(?!\s))+)#i',
+			'#(^|\s)aim:([^,<\s]+)#i',
+			'#(^|\s)icq:(\d+)#i',
+			'#(^|\s)www\.([a-z0-9\-]+)\.([a-z0-9\-.\~]+)((?:/[^,<\s]*)?)#i',
+			'#(^|\s)([a-z0-9\-_.]+?)@([^,<\s]+)#i', ),
+		array( '$1<a href="$2://$3">$2://$3</a>',
+			'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.urlencode(T_('Hello')).'">$2$3</a>',
+			'$1<a href="http://wwp.icq.com/scripts/search.dll?to=$2">$2</a>',
+			'$1<a href="http://www.$2.$3$4">www.$2.$3$4</a>',
+			'$1<a href="mailto:$2@$3">$2@$3</a>', ),
+		$text );
 
 	return $text;
 }
@@ -2164,6 +2165,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.110  2005/10/23 18:19:42  blueyed
+ * Indent of make_clickable()
+ *
  * Revision 1.109  2005/10/23 14:56:32  blueyed
  * is_email(): added $format parameter (defaults to 'single'). Formatted fixed email_pattern for rfc2822. Added test.
  *
