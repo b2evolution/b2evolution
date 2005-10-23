@@ -498,30 +498,78 @@ function antispambot($emailaddy, $mailto = 0) {
 
 
 /**
- * Check that email address looks valid (according to RFC 2822).
+ * Check that email address looks valid.
  *
- * That may be:
- *  - example@example.org
- *  - Me <example@example.org>
- *  - "Me" <example@example.org>
+ * @param string email address to check
+ * @param string Format to use ('single', 'rfc')
+ *    'single':
+ *      Single email address.
+ *    'rfc':
+ *      Full email address, may include name (RFC2822)
+ *      - example@example.org
+ *      - Me <example@example.org>
+ *      - "Me" <example@example.org>
+ * @param boolean Return the match or boolean
  *
- * @return bool
+ * @return bool|array Either true/false or the match (see {@link $return_match})
  */
-function is_email( $email )
+function is_email( $email, $format = 'single', $return_match = false )
 {
 	#$chars = "/^([a-z0-9_]|\\-|\\.)+@(([a-z0-9_]|\\-)+\\.)+[a-z]{2,4}\$/i";
-	#$chars = '/^.+@[^\.].*\.[a-z]{2,}$/i';
 
-	# Converted from: http://www.regexlib.com/REDetails.aspx?regexp_id=711
-	$pattern_email_rfc2822 = '§^((?>[a-zA-Z\d!#$%&\'*+\-/=?^_`{|}~]+\x20*|"((?=[\x01-\x7f])[^"\\]|\\[\x01-\x7f])*"\x20*)*(?P<angle_nr_three><))?((?!\.)(?>\.?[a-zA-Z\d!#$%&\'*+\-/=?^_`{|}~]+)+|"((?=[\x01-\x7f])[^"\\]|\\[\x01-\x7f])*")@(((?!-)[a-zA-Z\d\-]+(?<!-)\.)+[a-zA-Z]{2,}|\[(((?(?<!\[)\.)(25[0-5]|2[0-4]\d|[01]?\d?\d)){4}|[a-zA-Z\d\-]*[a-zA-Z\d]:((?=[\x01-\x7f])[^\\\[\]]|\\[\x01-\x7f])+)\])(?(3)>)$§';
+	switch( $format )
+	{
+		case 'rfc':
+		case 'rfc2822':
+			/**
+			 * Regexp pattern converted from: http://www.regexlib.com/REDetails.aspx?regexp_id=711
+			 * Extended to allow escaped quotes.
+			 */
+			$pattern_email = '§^
+				(
+					(?>[a-zA-Z\d!\#$%&\'*+\-/=?^_`{|}~]+\x20*
+						|"( \\\" | (?=[\x01-\x7f])[^"\\\] | \\[\x01-\x7f] )*"\x20*)* # Name
+					(<)
+				)?
+				(
+					(?!\.)(?>\.?[a-zA-Z\d!\#$%&\'*+\-/=?^_`{|}~]+)+
+					|"( \\\" | (?=[\x01-\x7f])[^"\\\] | \\[\x01-\x7f] )* " # quoted mailbox name
+				)
+				@
+				(
+					((?!-)[a-zA-Z\d\-]+(?<!-)\.)+[a-zA-Z]{2,}
+					|
+					\[(
+						( (?(?<!\[)\.)(25[0-5] | 2[0-4]\d | [01]?\d?\d) ){4}
+						|
+						[a-zA-Z\d\-]*[a-zA-Z\d]:( (?=[\x01-\x7f])[^\\\[\]] | \\[\x01-\x7f] )+
+					)\]
+				)
+				(?(3)>) # match ">" if it was there
+				$§x';
+			break;
+
+		case 'simple':
+		default:
+			$pattern_email = '/^\S+@[^\.\s]\S*\.[a-z]{2,}$/i';
+			break;
+	}
 
 	if( strpos( $email, '@' ) !== false && strpos( $email, '.' ) !== false )
 	{
-		return (bool)(preg_match($pattern_email_rfc2822, $email));
+		if( $return_match )
+		{
+			preg_match( $pattern_email, $email, $match );
+			return $match;
+		}
+		else
+		{
+			return (bool)preg_match( $pattern_email, $email );
+		}
 	}
 	else
 	{
-		return false;
+		return $return_match ? array() : false;
 	}
 }
 
@@ -2116,6 +2164,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.109  2005/10/23 14:56:32  blueyed
+ * is_email(): added $format parameter (defaults to 'single'). Formatted fixed email_pattern for rfc2822. Added test.
+ *
  * Revision 1.108  2005/10/19 19:40:22  marian
  * small fix for pattern matching with validate_url
  *

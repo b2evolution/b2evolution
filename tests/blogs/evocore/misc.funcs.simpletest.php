@@ -53,6 +53,84 @@ class MiscFuncsTestCase extends UnitTestCase
 	}
 
 
+	function test_is_email()
+	{
+		$must_match = array(
+			'single' => array(),
+			'rfc2822' => array(
+				'My Name <my.name@example.org>',
+
+				// taken from http://www.regexlib.com/REDetails.aspx?regexp_id=711
+				'name.surname@blah.com',
+				'Name Surname <name.surname@blah.com>',
+				'"b. blah"@blah.co.nz',
+				// taken from RFC (http://rfc.net/rfc2822.html#sA.1.2.)
+				'"Joe Q. Public" <john.q.public@example.com>',
+				'Mary Smith <mary@x.test>',
+				'jdoe@example.org',
+				'Who? <one@y.test>',
+				'<boss@nil.test>',
+				'"Giant; \"Big\" Box" <sysservices@example.net>',
+				),
+			'all' => array(
+				'my.name@example.org',
+				),
+			);
+
+		$must_not_match = array(
+			'single' => array(
+				'My Name <my.name@example.org>', // no single address
+				),
+			'rfc2822' => array(
+				' me@example.org',
+
+				// taken from http://www.regexlib.com/REDetails.aspx?regexp_id=711
+				'name surname@blah.com',
+				'name."surname"@blah.com',
+				'name@bla-.com',
+				),
+			'all' => array(
+				'',
+				'a@b',
+				'abc',
+				'a @ b',
+				'a @ example.org',
+				'a@example.org ',
+				' example.org',
+				),
+			);
+
+		// must match:
+		foreach( $must_match['single'] as $l_email )
+		{
+			$this->assertTrue( is_email( $l_email, 'single' ), 'single: '.$l_email );
+		}
+		foreach( $must_match['rfc2822'] as $l_email )
+		{
+			$this->assertTrue( is_email( $l_email, 'rfc2822' ), 'rfc2822: '.$l_email );
+		}
+		foreach( $must_match['all'] as $l_email )
+		{
+			$this->assertTrue( is_email( $l_email, 'single' ), 'single: '.$l_email );
+			$this->assertTrue( is_email( $l_email, 'rfc2822' ), 'rfc2822: '.$l_email );
+		}
+
+		// must not match
+		foreach( $must_not_match['single'] as $l_email )
+		{
+			$this->assertFalse( is_email( $l_email, 'single' ), 'single: '.$l_email );
+		}
+		foreach( $must_not_match['rfc2822'] as $l_email )
+		{
+			$this->assertFalse( is_email( $l_email, 'rfc2822' ), 'rfc2822: '.$l_email );
+		}
+		foreach( $must_not_match['all'] as $l_email )
+		{
+			$this->assertFalse( is_email( $l_email, 'single' ), 'single: '.$l_email );
+			$this->assertFalse( is_email( $l_email, 'rfc2822' ), 'rfc2822: '.$l_email );
+		}
+	}
+
 }
 
 
