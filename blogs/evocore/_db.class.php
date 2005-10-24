@@ -443,11 +443,10 @@ class DB
 		$this->last_error = empty($str) ? ( '<p>'.mysql_error().'(Errno='.mysql_errno().')</p>' ) : $str;
 
 		// Log this error to the global array..
-		$EZSQL_ERROR[] = array
-						(
-							'query' => $this->last_query,
-							'error_str'  => $this->last_error
-						);
+		$EZSQL_ERROR[] = array(
+			'query' => $this->last_query,
+			'error_str'  => $this->last_error
+		);
 
 		// Is error output turned on or not..
 		if ( $this->show_errors )
@@ -456,7 +455,10 @@ class DB
 			echo '<div class="error">';
 			echo '<p class="error">MySQL error!</p>';
 			echo '<div>'.$this->last_error.'</div>';
-			if( !empty($this->last_query) ) echo '<p class="error">Your query: '.$query_title.'<br /><pre>'.htmlspecialchars( str_replace("\t", '  ', $this->last_query) ).'</pre></p>';
+			if( !empty($this->last_query) )
+			{
+				echo '<p class="error">Your query: '.$query_title.'<br /><pre>'.htmlspecialchars( str_replace("\t", '  ', $this->last_query) ).'</pre></p>';
+			}
 
 			if( $this->debug_dump_function_trace_for_errors )
 			{
@@ -520,11 +522,11 @@ class DB
 		// Perform the query via std mysql_query function..
 		$this->num_queries++;
 		$this->queries[ $this->num_queries - 1 ] = array(
-																									'title' => $title,
-																									'sql' => $query,
-																									'rows' => -1,
-																									'time' => 'unknown',
-																									'results' => 'unknown' );
+			'title' => $title,
+			'sql' => $query,
+			'rows' => -1,
+			'time' => 'unknown',
+			'results' => 'unknown' );
 
 		if( is_object( $Timer ) )
 		{
@@ -713,22 +715,22 @@ class DB
 		if ( $output == OBJECT )
 		{
 			return $this->last_result[$y]
-							? $this->last_result[$y]
-							: array();
+				? $this->last_result[$y]
+				: array();
 		}
 		// If the output is an associative array then return row as such..
 		elseif ( $output == ARRAY_A )
 		{
 			return $this->last_result[$y]
-							? get_object_vars( $this->last_result[$y] )
-							: array();
+				? get_object_vars( $this->last_result[$y] )
+				: array();
 		}
 		// If the output is an numerical array then return row as such..
 		elseif ( $output == ARRAY_N )
 		{
 			return $this->last_result[$y]
-							? array_values( get_object_vars($this->last_result[$y]) )
-							: array();
+				? array_values( get_object_vars($this->last_result[$y]) )
+				: array();
 		}
 		// If invalid output type was specified..
 		else
@@ -1161,6 +1163,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.37  2005/10/24 15:36:12  blueyed
+ * Code layout / whitespace
+ *
  * Revision 1.36  2005/10/13 22:32:30  blueyed
  * Use debug_get_backtrace(); Remove obsolete method which used xdebug for that.
  *
