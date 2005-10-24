@@ -6,6 +6,8 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * @deprecated This file should get removed in favour of the file manager that should also handle editing evoskin files!
+ *
  * @package admin
  * @author This file built upon code from original b2 - http://cafelog.com/
  */
@@ -85,7 +87,7 @@ default:
 				<?php
 				if( is_writable($edit_folder.$file) )
 				{
-					echo '<input type="submit" name="submit" class="SaveButton" value="', T_('&nbsp; Save ! &nbsp;'), '" tabindex="2" />';
+					echo '<input type="submit" name="submit" class="SaveButton" value="', T_('Save !'), '" tabindex="2" />';
 				}
 				else
 				{

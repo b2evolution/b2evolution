@@ -157,7 +157,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	}
 
 	// ---------- SAVE ----------
-	$Form->submit( array( '',/* TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp; */ T_('&nbsp; Save ! &nbsp;'), 'SaveButton' ) );
+	$Form->submit( array( '', /* TRANS: This is the value of an input submit button */ T_('Save !'), 'SaveButton' ) );
 
 	// ---------- DELETE ----------
 	if( $next_action == 'update' )
@@ -355,6 +355,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.30  2005/10/24 23:20:32  blueyed
+ * Removed &nbsp; in submit button value.
+ *
  * Revision 1.29  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
  *

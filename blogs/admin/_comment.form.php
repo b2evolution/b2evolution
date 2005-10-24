@@ -86,7 +86,7 @@ $Form->begin_form( 'eform' );
 
 	<div class="edit_actions">
 
-	<input type="submit" value="<?php /* TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp; */ echo T_('&nbsp; Save ! &nbsp;'); ?>" class="SaveButton" tabindex="10" />
+	<input type="submit" value="<?php /* TRANS: This is the value of an input submit button */ echo T_('Save !'); ?>" class="SaveButton" tabindex="10" />
 
 	<?php
 	// ---------- DELETE ----------
@@ -181,6 +181,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.7  2005/10/24 23:20:32  blueyed
+ * Removed &nbsp; in submit button value.
+ *
  * Revision 1.6  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
  *
