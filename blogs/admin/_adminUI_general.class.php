@@ -39,6 +39,8 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: François PLANQUE.
  *
+ * @todo Normalize code / refactor to allow easier contributions! (blueyed)
+ *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -983,11 +985,16 @@ class AdminUI_general
 
 
 	/**
-	 * Set the paths beginning at all the paths passed as arguments.
+	 * Set the full selected path.
+	 *
+	 * For example, this selects the tab/submenu 'plugins' in the main menu 'options':
+	 * <code>
+	 * setPath( 'options', 'plugins' );
+	 * </code>
+	 *
+	 * Use {@link addPath()} to append a single path.
 	 *
 	 * This is an easy stub for {@link setPathByNr()}.
-	 *
-	 * @todo DOCUMENTATION!!
 	 *
 	 * @param string|array,... Either the key of the path or an array(keyname, propsArray).
 	 * @uses setPathByNr()
@@ -1102,6 +1109,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.35  2005/10/26 23:08:28  blueyed
+ * doc; todo
+ *
  * Revision 1.34  2005/10/12 18:24:37  fplanque
  * bugfixes
  *
