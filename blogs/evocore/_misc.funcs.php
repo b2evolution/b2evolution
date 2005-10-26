@@ -1429,12 +1429,15 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 
 
 /**
- * When in debug mode, output a function backtrace after the dying message (and {@link die()}).
+ * Outputs last words. When in debug mode it also prints a backtrace.
+ *
+ * After this, it prints by default '</body></html>' to keep the output probably valid.
  *
  * @param string Message to output
  * @param boolean|NULL If set it overrides the setting of {@link $debug} to decide if we want a backtrace.
+ * @param string This gets output at the very end (after backtrace and last words)
  */
-function debug_die( $last_words = '', $backtrace = NULL )
+function debug_die( $last_words = '', $backtrace = NULL, $very_last = '</body></html>' )
 {
 	global $debug;
 
@@ -1450,7 +1453,7 @@ function debug_die( $last_words = '', $backtrace = NULL )
 		echo debug_get_backtrace();
 	}
 
-	die();
+	die( $very_last );
 }
 
 
@@ -2166,6 +2169,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.113  2005/10/26 22:32:58  blueyed
+ * debug_die(): added $very_last parameter that defaults to '</body></html>'
+ *
  * Revision 1.112  2005/10/26 22:22:44  blueyed
  * debug_die(): $last_words is optional; doc
  *
