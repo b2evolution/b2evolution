@@ -47,6 +47,10 @@
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
+ *
+ * Matt FOLLETT grants François PLANQUE the right to license
+ * Matt FOLLETT's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evocore
@@ -54,6 +58,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE
  * @author blueyed: Daniel HAHLER
+ * @author mfollett: Matt FOLLETT.
  *
  * {@internal Below is a list of former authors whose contributions to this file have been
  *            either removed or redesigned and rewritten anew:
@@ -351,6 +356,15 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true ))
 locale_activate( $default_locale );
 
 /**
+ * The Session class
+ */
+require_once dirname(__FILE__).'/_session.class.php';
+/**
+ * @global Session The Session object
+ */
+$Session =& new Session();
+
+/**
  * Login procedure: {{{
  */
 if( !isset($login_required) )
@@ -400,8 +414,6 @@ if( !empty($login) && !empty($pass) )
 	{ // Login failed
 		$Debuglog->add( 'user_pass_ok() returned false!', 'login' );
 
-		$login = NULL;
-
 		if( $login_required )
 		{
 			// echo 'login failed!!';
@@ -410,44 +422,26 @@ if( !empty($login) && !empty($pass) )
 	}
 	else
 	{ // Login succeeded, set cookies
-		$Debuglog->add( 'Ok. Setting cookies.', 'login' );
-
-		//echo $login, $pass_is_md5, $user_pass,  $cookie_domain;
-		if( !setcookie( $cookie_user, $login, $cookie_expires, $cookie_path, $cookie_domain ) )
-		{
-			printf( T_('setcookie &laquo;%s&raquo; failed!'). '<br />', $cookie_user );
-		}
-		if( !setcookie( $cookie_pass, $pass_md5, $cookie_expires, $cookie_path, $cookie_domain) )
-		{
-			printf( T_('setcookie &laquo;%s&raquo; failed!'). '<br />', $cookie_user );
-		}
+	
+		$Debuglog->add( 'User successfully logged in with username and password...', 'login');
+		// set the user from the login that succeeded
+		$current_User =& $UserCache->get_by_login($login);
+		// save the user for later hits
+		$Session->set_user( $current_User );
 	}
 }
-elseif( !isset($login) && isset($_COOKIE[$cookie_user]) && isset($_COOKIE[$cookie_pass]) )
+// if the session has a user assigned to it
+elseif( $Session->session_has_user() ) 
 { /*
 	 * ---------------------------------------------------------
 	 * User was not trying to log in, but he already was logged in: check validity
 	 * ---------------------------------------------------------
 	 */
-	$login = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_user]) : $_COOKIE[$cookie_user]));
-	$pass_md5 = trim(strip_tags(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookie_pass]) : $_COOKIE[$cookie_pass]));
 
-	// echo 'Was already logged in...';
-	// echo 'pass=', $pass_md5;
 	$Debuglog->add( 'Was already logged in... ['.$login.']', 'login' );
+  // get the user ID from the session and set up the user again
+	$current_User =& $UserCache->get_by_ID( $Session->userID );
 
-	if( !user_pass_ok( $login, $pass_md5, true ) )
-	{ // login is NOT OK:
-		$Debuglog->add( 'user_pass_ok() returned false!', 'login' );
-
-		$login = NULL;
-
-		if( $login_required )
-		{
-			$Debuglog->add( 'Login is required!', 'login' );
-			$Messages->add( T_('Login/password no longer valid.'), 'login_error' );
-		}
-	}
 }
 elseif( $login_required )
 { /*
@@ -462,17 +456,6 @@ elseif( $login_required )
 }
 unset($pass);
 
-
-if( !empty($login) && !$Messages->count('login_error') )
-{
-	$current_User =& $UserCache->get_by_login($login);
-
-	if( !$current_User )
-	{
-		$Messages->add( 'Error while loading user data!', 'login_error' );
-	}
-}
-
 if( $Messages->count( 'login_error' ) )
 {
 	header_nocache();
@@ -485,16 +468,6 @@ if( $Messages->count( 'login_error' ) )
 #echo $current_User->disp('login');
 
 // Login procedure }}}
-
-
-/**
- * The Session class
- */
-require_once dirname(__FILE__).'/_session.class.php';
-/**
- * @global Session The Session object
- */
-$Session =& new Session();
 
 /**
  * The Sessions class
@@ -538,6 +511,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.54  2005/10/26 22:42:38  mfollett
+ * Modified user retrieval process from using user cookie and password cookie to using session key and session ID to retrieve user information from the sessions table
+ *
  * Revision 1.53  2005/10/13 22:17:30  blueyed
  * Moved include of _misc.funcs.inc.php to _main.inc.php
  *
