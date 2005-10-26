@@ -186,14 +186,14 @@ class DB
 
 	/**
 	 * Do we want to output a function backtrace for every query?
-	 * @var integer Number of stack entries to show (from last to first) (Default: 0)
+	 * @var integer|boolean Number of stack entries to show (from last to first) (Default: 0); true means 'all'.
 	 */
 	var $debug_dump_function_trace_for_queries = 0;
 
 	/**
 	 * Do we want to output a function backtrace for errors?
 	 * NOTE: This is only used when {@link $show_errors} is enabled.
-	 * @var bool (Default: true)
+	 * @var integer|boolean Number of stack entries to show (from last to first) (Default: true); true means 'all'.
 	 */
 	var $debug_dump_function_trace_for_errors = true;
 
@@ -462,7 +462,7 @@ class DB
 
 			if( $this->debug_dump_function_trace_for_errors )
 			{
-				echo debug_get_backtrace();
+				echo debug_get_backtrace( $this->debug_dump_function_trace_for_errors );
 			}
 
 			echo '</div>';
@@ -1163,6 +1163,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.38  2005/10/26 11:25:38  blueyed
+ * Slightly changed behaviour of $debug_dump_function_trace_for_*
+ *
  * Revision 1.37  2005/10/24 15:36:12  blueyed
  * Code layout / whitespace
  *
