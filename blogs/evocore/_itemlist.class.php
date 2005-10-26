@@ -437,10 +437,7 @@ class ItemList extends DataObjectList
 			$this->DataObjectCache->add( $this->Obj[$i] );
 
 			// Make a list of posts for future queries!
-			if (isset($row->{$this->dbIDname}))
-			{
-				array_unshift( $this->postIDarray, $row->{$this->dbIDname} );	// new row at beginning (fplanque>>why?)
-			}
+			array_unshift( $this->postIDarray, $row->{$this->dbIDname} );	// new row at beginning (fplanque>>why?)
 
 			$i++;
 		}
@@ -463,7 +460,7 @@ class ItemList extends DataObjectList
 	 */
 	function preview_request()
 	{
-		// we need globals for the param function
+		// we need globals for the param function (we could also assign them directly!)
 		global $preview_userid, $preview_date, $post_status, $post_locale, $content,
 						$post_title, $post_url, $post_category, $post_views, $edit_date,
 						$aa, $mm, $jj, $hh, $mn, $ss, $renderers;
@@ -479,6 +476,17 @@ class ItemList extends DataObjectList
 		param( 'post_category', 'integer', true );
 		param( 'post_views', 'integer', 0 );
 		param( 'renderers', 'array', array() );
+		$post_comments = param( 'post_comments', 'string', true );
+
+		if( !($item_typ_ID = param( 'item_typ_ID', 'integer', true )) )
+			$item_typ_ID = NULL;
+		if( !($item_st_ID = param( 'item_st_ID', 'integer', true )) )
+			$item_st_ID = NULL;
+		if( !($item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', true )) )
+			$item_assigned_user_ID = NULL;
+		if( !($item_deadline = param( 'item_deadline', 'string', true )) )
+			$item_deadline = NULL;
+		$item_priority = param( 'item_priority', 'integer', true ); // QUESTION: can this be also empty/NULL?
 
 		$post_title = format_to_post( $post_title, 0 );
 		$content = format_to_post( $content );
@@ -509,38 +517,30 @@ class ItemList extends DataObjectList
 			$content = preg_replace('/\%u([0-9A-F]{4,4})/e', "'&#'.base_convert('\\1',16,10). ';'", $content);
 		}
 
-		/*
-			TODO: new post params not recognized! (Produces notices in preview)
-
-			post form param          Add to query
-			------------------------------------------------
-			item_assigned_user_ID => (post_)assigned_user_ID
-			item_priority         => (post_)priority
-			item_deadline         => (post_)datedeadline
-
-			???                   => (post_)ptyp_ID
-			???                   => (post_)pst_ID
-		*/
-
+		#pre_dump( $_POST );
 		return "SELECT
-										0 AS ID,
-										$preview_userid AS ".$this->dbprefix."creator_user_ID,
-										'$post_date' AS ".$this->dbprefix."datestart,
-										'$post_date' AS ".$this->dbprefix."datemodified,
-										'".$DB->escape($post_status)."' AS ".$this->dbprefix."status,
-										'".$DB->escape($post_locale)."' AS ".$this->dbprefix."locale,
-										'".$DB->escape($content)."' AS ".$this->dbprefix."content,
-										'".$DB->escape($post_title)."' AS ".$this->dbprefix."title,
-										NULL AS ".$this->dbprefix."urltitle,
-										'".$DB->escape($post_url)."' AS ".$this->dbprefix."url,
-										$post_category AS ".$this->dbprefix."main_cat_ID,
-										$post_views AS ".$this->dbprefix."views,
-										'' AS ".$this->dbprefix."flags,
-										".bpost_count_words( $content )." AS ".$this->dbprefix."wordcount,
-										'open' AS ".$this->dbprefix."comments,
-										'".$DB->escape( $post_renderers )."' AS ".$this->dbprefix.'renderers';
+			0 AS {$this->dbprefix}ID,
+			$preview_userid AS {$this->dbprefix}creator_user_ID,
+			'$post_date' AS {$this->dbprefix}datestart,
+			'$post_date' AS {$this->dbprefix}datemodified,
+			'".$DB->escape($post_status)."' AS {$this->dbprefix}status,
+			'".$DB->escape($post_locale)."' AS {$this->dbprefix}locale,
+			'".$DB->escape($content)."' AS {$this->dbprefix}content,
+			'".$DB->escape($post_title)."' AS {$this->dbprefix}title,
+			NULL AS {$this->dbprefix}urltitle,
+			'".$DB->escape($post_url)."' AS {$this->dbprefix}url,
+			$post_category AS {$this->dbprefix}main_cat_ID,
+			$post_views AS {$this->dbprefix}views,
+			'' AS {$this->dbprefix}flags,
+			".bpost_count_words( $content )." AS {$this->dbprefix}wordcount,
+			".$DB->quote($post_comments)." AS {$this->dbprefix}comments,
+			'".$DB->escape( $post_renderers )."' AS {$this->dbprefix}renderers,
+			".$DB->quote($item_assigned_user_ID)." AS {$this->dbprefix}assigned_user_ID,
+			".$DB->quote($item_typ_ID)." AS {$this->dbprefix}ptyp_ID,
+			".$DB->quote($item_st_ID)." AS {$this->dbprefix}pst_ID,
+			".$DB->quote($item_deadline)." AS {$this->dbprefix}datedeadline,
+			".$DB->quote($item_priority)." AS {$this->dbprefix}priority";
 	}
-
 
 
 	/**
@@ -839,6 +839,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.36  2005/10/26 22:52:30  blueyed
+ * Fix preview notices by fixing Itemlist::preview_request()
+ *
  * Revision 1.35  2005/10/26 09:02:17  marian
  * Fixed Notice Messages on the preview screen.
  *
