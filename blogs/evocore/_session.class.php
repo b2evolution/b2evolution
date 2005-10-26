@@ -94,10 +94,10 @@ class Session
 		if( !empty( $_COOKIE[$cookie_session] ) )
 		{ // session ID sent by cookie
 			$session_id_by_cookie = remove_magic_quotes($_COOKIE[$cookie_session]);
-
+			$session_key_by_cookie = remove_magic_quotes($_COOKIE[$cookie_key]);
 			$Debuglog->add( 'ID (from cookie): '.$session_id_by_cookie, 'session' );
 			if( $row = $DB->get_row( 'SELECT sess_ID, sess_data, sess_user_ID, sess_key FROM T_sessions
-																	WHERE sess_ID = '.$DB->quote($session_id_by_cookie) ) )
+																	WHERE sess_ID = '.$DB->quote($session_id_by_cookie) . ' AND sess_key = ' . $DB->quote($session_key_by_cookie) ) )
 			{
 				$Debuglog->add( 'Session data loaded.', 'session' );
 				$this->ID = $row->sess_ID;
