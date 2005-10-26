@@ -62,8 +62,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		<p>Please use the installer to finish your configuration/installation now.</p>
 		<p>On most installations, the installer will probably be either <a href="install/">here</a> or <a href="../install/">here</a>... (but I can't be sure since I have no config info available! :P)</p>
 	</div>
-</body>
-</html>
+
 <?php
-	debug_die();
+	@require_once dirname(__FILE__).'/_misc.funcs.php';
+
+	if( function_exists('debug_die') )
+	{
+		debug_die();
+	}
+	else
+	{
+		die( '</body></html>' );
+	}
 ?>
