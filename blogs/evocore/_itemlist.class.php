@@ -437,7 +437,10 @@ class ItemList extends DataObjectList
 			$this->DataObjectCache->add( $this->Obj[$i] );
 
 			// Make a list of posts for future queries!
-			array_unshift( $this->postIDarray, $row->{$this->dbIDname} );	// new row at beginning (fplanque>>why?)
+			if (isset($row->{$this->dbIDname}))
+			{
+				array_unshift( $this->postIDarray, $row->{$this->dbIDname} );	// new row at beginning (fplanque>>why?)
+			}
 
 			$i++;
 		}
@@ -836,6 +839,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.35  2005/10/26 09:02:17  marian
+ * Fixed Notice Messages on the preview screen.
+ *
  * Revision 1.34  2005/10/03 18:10:07  fplanque
  * renamed post_ID field
  *

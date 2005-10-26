@@ -237,9 +237,11 @@ class Item extends DataObject
 		}
 		else
 		{
-			$this->ID = $db_row->$dbIDname;
+			$this->ID = isset($db_row->$dbIDname) ? $db_row->$dbIDname : '';
 			$this->Author = & $UserCache->get_by_ID( $db_row->$db_cols['creator_user_ID'] );
-			$this->assign_to( $db_row->$db_cols['assigned_user_ID'], false );
+			if (isset ($db_row->$db_cols['assigned_user_ID'])){
+				$this->assign_to( $db_row->$db_cols['assigned_user_ID'], false );
+			}
 			$this->issue_date = $db_row->$db_cols['datestart'];
 			$this->mod_date =$db_row->$db_cols['datemodified'];
 			$this->status = $db_row->$db_cols['status'];
@@ -251,10 +253,10 @@ class Item extends DataObject
 			$this->main_cat_ID = $db_row->$db_cols['main_cat_ID'];
 			$this->flags = $db_row->$db_cols['flags'];
 			$this->comments = $db_row->$db_cols['comments'];			// Comments status
-			$this->typ_ID = $db_row->$db_cols['typ_ID'];
-			$this->st_ID = $db_row->$db_cols['st_ID'];
-			$this->deadline = $db_row->$db_cols['deadline'];
-			$this->priority = $db_row->$db_cols['priority'];
+			$this->typ_ID = isset($db_row->$db_cols['typ_ID']) ? $db_row->$db_cols['typ_ID'] : '';
+			$this->st_ID = isset($db_row->$db_cols['st_ID']) ? $db_row->$db_cols['st_ID'] : '';
+			$this->deadline = isset($db_row->$db_cols['deadline']) ? $db_row->$db_cols['deadline'] : '';
+			$this->priority = isset($db_row->$db_cols['priority']) ? $db_row->$db_cols['priority'] : '';
 
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = explode( '.', $db_row->$db_cols['renderers'] );
@@ -2221,6 +2223,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.59  2005/10/26 09:02:17  marian
+ * Fixed Notice Messages on the preview screen.
+ *
  * Revision 1.58  2005/10/03 18:10:07  fplanque
  * renamed post_ID field
  *
