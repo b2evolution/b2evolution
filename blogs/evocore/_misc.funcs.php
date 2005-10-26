@@ -1255,7 +1255,7 @@ function pre_dump( $vars )
  *
  * Adopted from {@link http://us2.php.net/manual/de/function.debug-backtrace.php#47644}.
  *
- * @param integer|NULL Get the last x entries from the stack (after $ignore_from is applied). NULL means "all".
+ * @param integer|NULL Get the last x entries from the stack (after $ignore_from is applied). Anything non-numeric means "all".
  * @param array After a key/value pair matches a stack entry, this and the rest is ignored.
  *              For example, array('class' => 'DB') would exclude everything after the stack
  *              "enters" class DB and everything that got called afterwards.
@@ -1287,14 +1287,15 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 						foreach( $l_ignore_value as $l_ignore_mult_key => $l_ignore_mult_val )
 						{
 							if( !isset($l_stack[$l_ignore_mult_key]) /* not set with this stack entry */
-								|| $l_stack[$l_ignore_mult_key] != $l_ignore_mult_val /* not this value */ )
+								|| strcasecmp($l_stack[$l_ignore_mult_key], $l_ignore_mult_val) /* not this value (case-insensitive) */ )
 							{
 								continue 2; // next ignore setting, because not all match.
 							}
 						}
 						break 2; // ignore from here
 					}
-					if( isset($l_stack[$l_ignore_key]) && $l_stack[$l_ignore_key] == $l_ignore_value )
+					if( isset($l_stack[$l_ignore_key])
+						&& !strcasecmp($l_stack[$l_ignore_key], $l_ignore_value) /* is equal case-insensitive */ )
 					{
 						break 2; // ignore from here
 					}
@@ -1308,7 +1309,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 		}
 
 		$count_backtrace = count($backtrace);
-		if( $limit_to_last !== NULL && $limit_to_last < $count_backtrace )
+		if( is_numeric($limit_to_last) && $limit_to_last < $count_backtrace )
 		{	// we want to limit to a maximum number
 			$limited = true;
 			$backtrace = array_slice( $backtrace, 0, $limit_to_last );
@@ -1332,7 +1333,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 					$r .= '<li style="padding:0.5ex 0; border-bottom:1px solid #77d;">';
 				}
 				$args = array();
-				if( is_array( $l_trace['args'] ) )
+				if( isset($l_trace['args']) && is_array( $l_trace['args'] ) )
 				{	// Prepare args:
 					foreach( $l_trace['args'] as $l_arg )
 					{
@@ -2165,6 +2166,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.111  2005/10/26 11:30:42  blueyed
+ * Made $ignore_from case insensitive; slightly changed behaviour of $limit_to_last (only limit if numeric)
+ *
  * Revision 1.110  2005/10/23 18:19:42  blueyed
  * Indent of make_clickable()
  *
