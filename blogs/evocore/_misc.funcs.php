@@ -887,7 +887,7 @@ function remove_magic_quotes( $mixed )
  * @param string Force value type to one of:
  * - integer
  * - float
- * - string
+ * - string (strips (HTML-)Tags, trims whitespace)
  * - array
  * - object
  * - null
@@ -1434,7 +1434,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
  * @param string Message to output
  * @param boolean|NULL If set it overrides the setting of {@link $debug} to decide if we want a backtrace.
  */
-function debug_die( $last_words, $backtrace = NULL )
+function debug_die( $last_words = '', $backtrace = NULL )
 {
 	global $debug;
 
@@ -2166,6 +2166,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.112  2005/10/26 22:22:44  blueyed
+ * debug_die(): $last_words is optional; doc
+ *
  * Revision 1.111  2005/10/26 11:30:42  blueyed
  * Made $ignore_from case insensitive; slightly changed behaviour of $limit_to_last (only limit if numeric)
  *
