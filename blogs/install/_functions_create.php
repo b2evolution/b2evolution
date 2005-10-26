@@ -37,6 +37,10 @@
  * Jason EDGECOMBE grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ *
+ * Matt FOLLETT grants Francois PLANQUE the right to license
+ * Matt FOLLETT contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package install
@@ -46,6 +50,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
  * @author edgester: Jason EDGECOMBE.
+ * @author mfollett: Matt Follett.
  *
  * @version $Id$
  */
@@ -931,7 +936,6 @@ function create_b2evo_tables_phoenix()
 									sess_user_ID   INT(10) DEFAULT NULL,
 									sess_data      TEXT DEFAULT NULL,
 									PRIMARY KEY( sess_ID ),
-									UNIQUE KEY ip_user_ID ( sess_ipaddress, sess_user_ID )
 								)" );
 	echo "OK.<br />\n";
 
@@ -1266,6 +1270,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.146  2005/10/26 22:49:03  mfollett
+ * Removed the unique requirement for IP and user ID on the sessions table.
+ *
  * Revision 1.145  2005/10/03 18:10:08  fplanque
  * renamed post_ID field
  *
