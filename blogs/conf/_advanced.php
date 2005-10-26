@@ -18,6 +18,10 @@
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
+ *
+ * Matt FOLLETT grants François PLANQUE the right to license
+ * Matt FOLLETT's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package conf
@@ -360,6 +364,7 @@ $cookie_name    = 'cookie'.$instance_name.'name';
 $cookie_email   = 'cookie'.$instance_name.'email';
 $cookie_url     = 'cookie'.$instance_name.'url';
 $cookie_session = 'cookie'.$instance_name.'session';
+$cookie_key     = 'cookie'.$instance_name.'key';
 /**#@-*/
 
 /**
