@@ -29,6 +29,10 @@
  * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ *
+ * Matt FOLLETT grants François PLANQUE the right to license
+ * Matt FOLLETT's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package htsrv
@@ -36,6 +40,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
  * @author fplanque: François PLANQUE
+ * @author mfollett: Matt FOLLETT.
  *
  * @version $Id$
  */
@@ -61,6 +66,8 @@ switch( $action )
 {
 	case 'logout':
 		logout();
+		//  this will remove the user from the session
+		$Session->remove_user();
 
 		header_nocache();
 		header_redirect(); // exits
