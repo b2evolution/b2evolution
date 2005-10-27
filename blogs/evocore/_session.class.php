@@ -151,10 +151,10 @@ class Session
 		*/
 		// mafolle:  I left this in for now till the other method is written or else session tables could get clogged.
 		// Delete deprecated session info:
-		$DB->query( 'DELETE FROM T_sessions
+		/*$DB->query( 'DELETE FROM T_sessions
 									WHERE sess_lastseen < "'.date( 'Y-m-d H:i:s', ($servertimenow - $online_session_timeout) ).'"
 										OR ( sess_ipaddress = "'.getIpList( true ).'"
-													AND sess_user_ID is NULL )' );
+													AND sess_user_ID is NULL )' );*/
 	}
 
 
