@@ -935,7 +935,7 @@ function create_b2evo_tables_phoenix()
 									sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
 									sess_user_ID   INT(10) DEFAULT NULL,
 									sess_data      TEXT DEFAULT NULL,
-									PRIMARY KEY( sess_ID ),
+									PRIMARY KEY( sess_ID )
 								)" );
 	echo "OK.<br />\n";
 
@@ -1270,6 +1270,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.147  2005/10/27 00:11:12  mfollett
+ * fixed my own error which would disallow installation because of an extra comma in the create table for the sessions table
+ *
  * Revision 1.146  2005/10/26 22:49:03  mfollett
  * Removed the unique requirement for IP and user ID on the sessions table.
  *
