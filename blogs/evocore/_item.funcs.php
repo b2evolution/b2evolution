@@ -428,7 +428,7 @@ function previous_posts( $page='' )
  */
 function next_posts_link($label='#', $max_page=0, $page='')
 {
-	global $p, $paged, $result, $Settings, $MainList;
+	global $p, $paged, $result, $Settings, $MainList, $Blog;
 
 	if( $label == '#' ) $label = T_('Next Page').' >>';
 
@@ -439,8 +439,8 @@ function next_posts_link($label='#', $max_page=0, $page='')
 	{
 		echo '<a href="';
 		// M.H.
-		// fplanque>> TODO: use a global variable which can be tweaked once for all ( for example to force http://domain instead of http://www.domain despite what the user has typed in )
-		echo 'http://' . $_SERVER['HTTP_HOST'];
+		$url = parse_url($Blog->get('siteurl', 'raw'));
+		echo $url['scheme'] . '://' . $url['host'];
 		// ================
 		echo next_posts($max_page, $page);
 		echo '">'. htmlspecialchars($label) .'</a>';
@@ -457,7 +457,7 @@ function next_posts_link($label='#', $max_page=0, $page='')
  */
 function previous_posts_link($label='#', $page='')
 {
-	global $Settings, $p, $paged;
+	global $Settings, $p, $paged, $Blog;
 
 	if( $label == '#' ) $label = '<< '.T_('Previous Page');
 
@@ -465,8 +465,8 @@ function previous_posts_link($label='#', $page='')
 	{
 		echo '<a href="';
 		// M.H.
-		// fplanque>> TODO: use a global variable which can be tweaked once for all ( for example to force http://domain instead of http://www.domain despite what the user has typed in )
-		echo 'http://' . $_SERVER['HTTP_HOST'];
+		$url = parse_url($Blog->get('siteurl', 'raw'));
+		echo $url['scheme'] . '://' . $url['host'];
 		// ================
 		echo previous_posts( $page );
 		echo '">'.htmlspecialchars($label).'</a>';
@@ -940,6 +940,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.32  2005/10/27 15:47:25  marian
+ * Removed $_SERVER Variables for the multi-domain feature.
+ *
  * Revision 1.31  2005/10/18 18:45:58  fplanque
  * some rollbacks...
  *

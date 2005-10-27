@@ -395,7 +395,12 @@ class Blog extends DataObject
 	 */
 	function get( $parname )
 	{
-		global $xmlsrv_url, $admin_email, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog, $rss_url, $rss_multidomain;
+		global $xmlsrv_url, $admin_email, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
+
+		if ($this->siteurl > '')
+		{
+			$rss_url =  $this->siteurl;
+  		}
 
 		switch( $parname )
 		{
@@ -450,8 +455,7 @@ class Blog extends DataObject
 			case 'staticfilepath':
 				return $basepath.$this->siteurl.$this->staticfilename;
 
-      // M.H.
-      case 'siteurl':
+			case 'siteurl':
 				if( preg_match( '#^https?://#', $this->siteurl ) )
 				{ // We have a specific URL for this blog:
 					return $this->siteurl;
@@ -467,9 +471,8 @@ class Blog extends DataObject
 				}
 
 			case 'baseurl':
-        // M.H.
-        return $baseurl;
-        /*
+				return $baseurl;
+
 				if( preg_match( '#^https?://#', $this->siteurl ) )
 				{ // We have a specific URL for this blog:
 					return $this->siteurl;
@@ -483,7 +486,6 @@ class Blog extends DataObject
 					}
 					return $r;
 				}
-				*/
 
 			case 'basehost':
 				$baseurl = $this->get('baseurl');
@@ -808,6 +810,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2005/10/27 15:47:25  marian
+ * Removed $_SERVER Variables for the multi-domain feature.
+ *
  * Revision 1.33  2005/10/19 09:07:15  marian
  * Changes regarding multi-domain feature
  *
