@@ -460,23 +460,21 @@ class ItemList extends DataObjectList
 	 */
 	function preview_request()
 	{
-		// we need globals for the param function (we could also assign them directly! -> please do! :)
-		global $preview_userid, $preview_date, $post_status, $post_locale, $content,
-						$post_title, $post_url, $post_category, $post_views, $edit_date,
-						$aa, $mm, $jj, $hh, $mn, $ss, $renderers;
 		global $DB, $localtimenow, $Messages;
 
 		$id = 0;
-		param( 'preview_userid', 'integer', true );
-		param( 'post_status', 'string', true );
-		param( 'post_locale', 'string', true );
-		param( 'content', 'html', true );
-		param( 'post_title', 'html', true );
-		param( 'post_url', 'string', true );
-		param( 'post_category', 'integer', true );
-		param( 'post_views', 'integer', 0 );
-		param( 'renderers', 'array', array() );
+		$preview_userid = param( 'preview_userid', 'integer', true );
+		$post_status = param( 'post_status', 'string', true );
+		$post_locale = param( 'post_locale', 'string', true );
+		$content = param( 'content', 'html', true );
+		$post_title = param( 'post_title', 'html', true );
+		$post_url = param( 'post_url', 'string', true );
+		$post_category = param( 'post_category', 'integer', true );
+		$post_views = param( 'post_views', 'integer', 0 );
+		$renderers = param( 'renderers', 'array', array() );
 		$post_comments = param( 'post_comments', 'string', true );
+		$item_issue_date = param( 'item_issue_date', 'string', true );
+		$item_issue_time = param( 'item_issue_time', 'string', true );
 
 		if( !($item_typ_ID = param( 'item_typ_ID', 'integer', true )) )
 			$item_typ_ID = NULL;
@@ -492,17 +490,21 @@ class ItemList extends DataObjectList
 		$content = format_to_post( $content );
 		$post_renderers = implode( '.', $renderers );
 
-		param( 'aa', 'integer', 2000 );
-		param( 'mm', 'integer', 1 );
-		param( 'jj', 'integer', 1 );
-		param( 'hh', 'integer', 20 );
-		param( 'mn', 'integer', 30 );
-		param( 'ss', 'integer', 0 );
-		$jj = ($jj > 31) ? 31 : $jj;
+		preg_match( '~(\d\d\d\d)-(\d\d)-(\d\d)~', $item_issue_date, $match );
+		$yyyy = isset($match[1]) ? (int)$match[1] : 2000;
+		$mm = isset($match[2]) ? (int)$match[2] : 1;
+		$dd = isset($match[3]) ? (int)$match[3] : 1;
+
+		preg_match( '~(\d\d):(\d\d):(\d\d)~', $item_issue_time, $match );
+		$hh = isset($match[1]) ? (int)$match[1] : 20;
+		$mn = isset($match[2]) ? (int)$match[2] : 30;
+		$ss = isset($match[3]) ? (int)$match[3] : 0;
+
+		$dd = ($dd > 31) ? 31 : $dd;
 		$hh = ($hh > 23) ? $hh - 24 : $hh;
 		$mn = ($mn > 59) ? $mn - 60 : $mn;
 		$ss = ($ss > 59) ? $ss - 60 : $ss;
-		$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) );
+		$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $dd, $yyyy ) );
 
 
 		if( $errcontent = $Messages->display( T_('Invalid post, please correct these errors:'), '', false ) )
@@ -839,6 +841,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.38  2005/10/27 17:16:29  blueyed
+ * preview_request(): removed globals, handle item issue date/time
+ *
  * Revision 1.37  2005/10/27 15:25:03  fplanque
  * Normalization; doc; comments.
  *
