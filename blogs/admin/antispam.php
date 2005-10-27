@@ -193,7 +193,7 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 		<input type="hidden" name="confirm" value="confirm" />
 		<input type="hidden" name="keyword" value="<?php echo format_to_output( $keyword, 'formvalue' ) ?>" />
 		<input type="hidden" name="action" value="ban" />
-		<h2><?php echo T_('Confirm ban &amp; delete') ?></h2>
+		<h2><?php echo T_('Confirm ban & delete') ?></h2>
 
 		<?php
 		// Check for junk:

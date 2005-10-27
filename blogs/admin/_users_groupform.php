@@ -69,7 +69,7 @@ $Form->end_fieldset();
 $perm_none_option = array( 'none', '<acronym title="'.T_('No Access').'">'.T_('None').'</acronym>' );
 $perm_list_option = array( 'list', '<acronym title="'.T_('View list only').'">'.T_('List').'</acronym>' );
 $perm_view_option = array( 'view', '<acronym title="'.T_('View details').'">'.T_('View').'</acronym>' );
-$perm_add_option = array( 'add',  '<acronym title="'.T_('Add &amp; edit/delete self created').'">'.T_('Add').'</acronym>' );
+$perm_add_option = array( 'add',  '<acronym title="'.T_('Add & edit/delete self created').'">'.T_('Add').'</acronym>' );
 $perm_edit_option = array( 'edit', '<acronym title="'.T_('Edit/delete all').'">'.T_('Edit').'</acronym>' );
 $standard_perm_options = array(
 							$perm_none_option,
@@ -121,11 +121,11 @@ $Form->begin_fieldset( T_('Permissons for members of this group') );
 				array(	$perm_none_option,
 								$perm_view_option,
 								$perm_edit_option
-							), T_('Users &amp; Groups') );
+							), T_('Users & Groups') );
 	}
 	else
 	{	// Group #1 always has user management right:
-		$Form->info( T_('Users &amp; Groups'), T_('Full Access') );
+		$Form->info( T_('Users & Groups'), T_('Full Access') );
 	}
 	$Form->radio( 'edited_grp_perm_options', $edited_Group->get('perm_options'),
 			array(	$perm_none_option,
@@ -148,6 +148,9 @@ $AdminUI->dispPayloadEnd();
 
 /*
  * $Log$
+ * Revision 1.39  2005/10/27 15:25:03  fplanque
+ * Normalization; doc; comments.
+ *
  * Revision 1.38  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
  *

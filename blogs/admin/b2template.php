@@ -6,7 +6,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @deprecated This file should get removed in favour of the file manager that should also handle editing evoskin files!
+ * @todo This file should get removed in favour of the file manager that should also handle editing evoskin files!
  *
  * @package admin
  * @author This file built upon code from original b2 - http://cafelog.com/

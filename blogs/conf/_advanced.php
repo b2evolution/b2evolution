@@ -357,12 +357,19 @@ $cookie_domain = ($basehost == 'localhost') ? '' : '.'. $basehost;
 /**#@+
  * Names for cookies.
  */
+// fplanque>> TODO: Matt, the user and pass cookies should be useless now that you have changed the session management,
+// Please clean them uo throughout the whole app and make sure the new system doesn't break any previous usage of these cookies.
 $cookie_user    = 'cookie'.$instance_name.'user';
 $cookie_pass    = 'cookie'.$instance_name.'pass';
+// This is mainly used for storing the prefered skin:
+// Note: This is not a SESSION variable. It is a user pref that works even for non registered users.
 $cookie_state   = 'cookie'.$instance_name.'state';
+// The following remember the comment meta data for non registered users:
 $cookie_name    = 'cookie'.$instance_name.'name';
 $cookie_email   = 'cookie'.$instance_name.'email';
 $cookie_url     = 'cookie'.$instance_name.'url';
+// The following handle the session.
+// Note: key could be appendended to the session ID with a _ separator in order to save a cookie.
 $cookie_session = 'cookie'.$instance_name.'session';
 $cookie_key     = 'cookie'.$instance_name.'key';
 /**#@-*/

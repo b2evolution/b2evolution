@@ -67,6 +67,7 @@ switch( $action )
 	case 'logout':
 		logout();
 		//  this will remove the user from the session
+		// fplanque>> TODO: Killing a session should work by erasing the cookie and clearing the session key in the DB for security.
 		$Session->remove_user();
 
 		header_nocache();

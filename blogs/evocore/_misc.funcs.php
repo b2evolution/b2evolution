@@ -502,7 +502,7 @@ function antispambot($emailaddy, $mailto = 0) {
  * Check that email address looks valid.
  *
  * @param string email address to check
- * @param string Format to use ('single', 'rfc')
+ * @param string Format to use ('simple', 'rfc')
  *    'single':
  *      Single email address.
  *    'rfc':
@@ -514,7 +514,7 @@ function antispambot($emailaddy, $mailto = 0) {
  *
  * @return bool|array Either true/false or the match (see {@link $return_match})
  */
-function is_email( $email, $format = 'single', $return_match = false )
+function is_email( $email, $format = 'simple', $return_match = false )
 {
 	#$chars = "/^([a-z0-9_]|\\-|\\.)+@(([a-z0-9_]|\\-)+\\.)+[a-z]{2,4}\$/i";
 
@@ -2169,6 +2169,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.114  2005/10/27 15:25:03  fplanque
+ * Normalization; doc; comments.
+ *
  * Revision 1.113  2005/10/26 22:32:58  blueyed
  * debug_die(): added $very_last parameter that defaults to '</body></html>'
  *

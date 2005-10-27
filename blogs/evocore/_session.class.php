@@ -71,6 +71,8 @@ class Session
 
 	/**
 	 * The user of the session
+	 *
+	 * fplanque>> please change this to $user_ID for consistency
 	 * @var integer
 	 */
 	 var $userID;
@@ -150,6 +152,7 @@ class Session
 
 		*/
 		// mafolle:  I left this in for now till the other method is written or else session tables could get clogged.
+		 // fplanque>> session tables WILL get clogged and need to be pruned with the hitlogs table
 		// Delete deprecated session info:
 		/*$DB->query( 'DELETE FROM T_sessions
 									WHERE sess_lastseen < "'.date( 'Y-m-d H:i:s', ($servertimenow - $online_session_timeout) ).'"
@@ -206,9 +209,10 @@ class Session
 		return $key;
 	}
 
+
 	/*
-	*
 	* Set the user of the session by the user
+	 * fplanque>> please split this in 2 functions: set_user_ID( $user_ID ) and set_User( $User ) one for ID and one for object.
 	* @param $User is the User class variable relating to the current person
 	* @return boolean whether the action was successfully performed
 	*/
@@ -243,9 +247,10 @@ class Session
 		return true;
 	}
 	
+
 	/*
-	*
 	* Remove the user from the current session (for logout or timeout)
+	 * fplanque> No, we want to keep the user in the session log. To invalidate a session, we should on clear its key.
 	* @return boolean whether this was successfully executed
 	*/
 	function remove_user()
@@ -265,7 +270,6 @@ class Session
 	}
 
 	/*
-	*
 	* Check if session has a user
 	* @return boolean
 	*/
@@ -274,6 +278,7 @@ class Session
 		//  this has so many possibilities because when MySQL first sets it
 		//  it sets it to null, when I attempt to set it to null though it sets
 		//  it to 0 so I just set it to 0, then I checked '' just because
+		// fplanque>> I thin return !empty( $this->user_ID ) should do the job
 		return( $this->userID != 0 && $this->userID != 'NULL' && $this->userID != '' );
 	}
 }

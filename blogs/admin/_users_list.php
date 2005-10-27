@@ -78,7 +78,7 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 $Results = & new Results( $sql, 'cont_', '-A' );
 
-$Results->title = T_('Groups &amp; Users');
+$Results->title = T_('Groups & Users');
 
 $Results->group_by = 'grp_ID';
 $Results->ID_col = 'user_ID';
@@ -212,6 +212,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.51  2005/10/27 15:25:03  fplanque
+ * Normalization; doc; comments.
+ *
  * Revision 1.50  2005/10/20 16:35:18  halton
  * added search / filtering to user list
  *

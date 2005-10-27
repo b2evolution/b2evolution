@@ -305,8 +305,8 @@ if( !isset($display_blog_list) )
 /*
  * Now, we'll jump to displaying!
  */
-// question: should $skin not better be $_GET['skin']?
-// it seems that this piece of code relies on register_globals=On
+// Let's check if a skin has been forced in the stub file:
+// Note: URL skin requests are handled with param() 20 lines below
 if( !isset( $skin ) )
 { // No skin forced in stub (not even '' for no-skin)...
 
@@ -402,6 +402,9 @@ if ( $use_memcached )
 
 /*
  * $Log$
+ * Revision 1.21  2005/10/27 15:25:03  fplanque
+ * Normalization; doc; comments.
+ *
  * Revision 1.20  2005/10/19 09:07:15  marian
  * Changes regarding multi-domain feature
  *

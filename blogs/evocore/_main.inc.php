@@ -362,7 +362,7 @@ require_once dirname(__FILE__).'/_session.class.php';
 /**
  * @global Session The Session object
  */
-$Session =& new Session();
+$Session = & new Session();
 
 /**
  * Login procedure: {{{
@@ -430,17 +430,14 @@ if( !empty($login) && !empty($pass) )
 		$Session->set_user( $current_User );
 	}
 }
-// if the session has a user assigned to it
 elseif( $Session->session_has_user() ) 
-{ /*
-	 * ---------------------------------------------------------
-	 * User was not trying to log in, but he already was logged in: check validity
-	 * ---------------------------------------------------------
+{ /* if the session has a user assigned to it:
+	 * User was not trying to log in, but he was already logged in:
 	 */
 
 	$Debuglog->add( 'Was already logged in... ['.$login.']', 'login' );
   // get the user ID from the session and set up the user again
-	$current_User =& $UserCache->get_by_ID( $Session->userID );
+	$current_User = & $UserCache->get_by_ID( $Session->userID );
 
 }
 elseif( $login_required )
@@ -511,6 +508,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.55  2005/10/27 15:25:03  fplanque
+ * Normalization; doc; comments.
+ *
  * Revision 1.54  2005/10/26 22:42:38  mfollett
  * Modified user retrieval process from using user cookie and password cookie to using session key and session ID to retrieve user information from the sessions table
  *

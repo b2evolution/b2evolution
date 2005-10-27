@@ -460,7 +460,7 @@ class ItemList extends DataObjectList
 	 */
 	function preview_request()
 	{
-		// we need globals for the param function (we could also assign them directly!)
+		// we need globals for the param function (we could also assign them directly! -> please do! :)
 		global $preview_userid, $preview_date, $post_status, $post_locale, $content,
 						$post_title, $post_url, $post_category, $post_views, $edit_date,
 						$aa, $mm, $jj, $hh, $mn, $ss, $renderers;
@@ -519,7 +519,7 @@ class ItemList extends DataObjectList
 
 		#pre_dump( $_POST );
 		return "SELECT
-			0 AS {$this->dbprefix}ID,
+			0 AS {$this->dbIDname},
 			$preview_userid AS {$this->dbprefix}creator_user_ID,
 			'$post_date' AS {$this->dbprefix}datestart,
 			'$post_date' AS {$this->dbprefix}datemodified,
@@ -839,6 +839,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.37  2005/10/27 15:25:03  fplanque
+ * Normalization; doc; comments.
+ *
  * Revision 1.36  2005/10/26 22:52:30  blueyed
  * Fix preview notices by fixing Itemlist::preview_request()
  *

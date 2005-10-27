@@ -46,7 +46,7 @@
 	</items>
 </channel>
 <?php
-// marian>> todo: this generates a 'No SELECT clause!' abort if not comments are available. Should be checked
+// marian>> TODO: this generates a 'No SELECT clause!' abort if not comments are available. Should be checked
 $CommentList->restart();
 while( $Comment = $CommentList->get_next() )
 { // Loop through comments: ?>

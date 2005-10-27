@@ -360,12 +360,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 		<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="../../img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
 	</div>
-
-	<?php
-		$Hit->log();	// log the hit on this page
-		debug_info(); // output debug info if requested
-	?>
 </div>
 </div>
+<?php
+	$Hit->log();	// log the hit on this page
+	debug_info(); // output debug info if requested
+?>
 </body>
 </html>

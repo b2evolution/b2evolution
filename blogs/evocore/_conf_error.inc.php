@@ -56,22 +56,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	</head>
 <body>
 	<div style="background-color:#fee; border: 1px solid red; text-align:center; ">
-		<p>This is b2evolution version <?php global $app_version; echo $app_version ?>.</p>
+		<p>This is <?php global $app_name; echo $app_name ?> version <?php global $app_version; echo $app_version ?>.</p>
 		<p><strong>You cannot use the application before you finish configuration and installation.</strong></p>
 		<div style="font-weight:bold; color:red;"><?php echo $error_message; ?></div>
 		<p>Please use the installer to finish your configuration/installation now.</p>
 		<p>On most installations, the installer will probably be either <a href="install/">here</a> or <a href="../install/">here</a>... (but I can't be sure since I have no config info available! :P)</p>
 	</div>
-
+</body>
+</html>
 <?php
-	@require_once dirname(__FILE__).'/_misc.funcs.php';
-
-	if( function_exists('debug_die') )
-	{
-		debug_die();
-	}
-	else
-	{
-		die( '</body></html>' );
-	}
+ 	exit;
 ?>

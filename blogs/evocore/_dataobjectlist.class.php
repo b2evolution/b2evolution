@@ -112,7 +112,8 @@ class DataObjectList extends Results
 	{
 		if( $this->current_idx >= $this->result_num_rows )
 		{	// No more comment in list
-			return false;
+			$r = false;
+			return $r;
 		}
 		return $this->Obj[$this->current_idx++];
 	}
@@ -121,6 +122,9 @@ class DataObjectList extends Results
 
 /*
  * $Log$
+ * Revision 1.11  2005/10/27 15:25:03  fplanque
+ * Normalization; doc; comments.
+ *
  * Revision 1.10  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *
