@@ -79,7 +79,7 @@ if( isset($Blog) )
 
 
 // Begin payload block:
-$AdminUI->dispPayloadBegin();
+$AdminUI->disp_payload_begin();
 
 
 $Form = & new Form( $form_action, 'post', 'post', 'none' );
@@ -333,7 +333,7 @@ $Form->end_form();
 
 
 // End payload block:
-$AdminUI->dispPayloadEnd();
+$AdminUI->disp_payload_end();
 
 
 // ####################### LINKS #########################
@@ -341,7 +341,7 @@ $AdminUI->dispPayloadEnd();
 if( $next_action == 'update' )
 { // Editing post
 	// End payload block:
-	$AdminUI->dispPayloadBegin();
+	$AdminUI->disp_payload_begin();
 
 	// Consider that if we are here, we're allowed to edit.
 	$edit_allowed = true;
@@ -349,12 +349,15 @@ if( $next_action == 'update' )
 	require dirname(__FILE__).'/_item_links.inc.php';
 
 	// End payload block:
-	$AdminUI->dispPayloadEnd();
+	$AdminUI->disp_payload_end();
 }
 
 
 /*
  * $Log$
+ * Revision 1.31  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.30  2005/10/24 23:20:32  blueyed
  * Removed &nbsp; in submit button value.
  *

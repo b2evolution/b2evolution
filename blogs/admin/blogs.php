@@ -36,7 +36,7 @@
 require_once dirname(__FILE__).'/_header.php'; // this will actually load blog params for the requested blog
 
 param( 'tab', 'string', 'general' );
-$AdminUI->setPath( 'blogs' );
+$AdminUI->set_path( 'blogs' );
 
 param( 'action', 'string', '' );
 param( 'blogtemplate', 'integer', -1 );
@@ -184,17 +184,17 @@ switch( $action )
 {
 	case 'new':
 	case 'create':
-		$AdminUI->addPath( 'new', array( 'text' => T_('New') ) );
+		$AdminUI->add_path( 'new', array( 'text' => T_('New') ) );
 		break;
 
 	case 'update':
 	case 'edit':
-		$AdminUI->addPath( $tab );
-		$AdminUI->addPath( 'blog', array( 'text' => '&laquo;'.$edited_Blog->dget('shortname').'&raquo;' ) );
+		$AdminUI->add_path( $tab );
+		$AdminUI->add_path( 'blog', array( 'text' => '&laquo;'.$edited_Blog->dget('shortname').'&raquo;' ) );
 
 		// Generate available blogs list:
-		$blogListButtons = $AdminUI->getCollectionList( 'blog_properties', 'edit',
-													'blogs.php?action=edit&amp;blog=%d&amp;tab='.$AdminUI->getPath(1),
+		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_properties', 'edit',
+													'blogs.php?action=edit&amp;blog=%d&amp;tab='.$AdminUI->get_path(1),
 													T_('List'), 'blogs.php' );
 }
 
@@ -297,7 +297,7 @@ switch($action)
 			<h3><?php printf( T_('Updating Blog [%s]...'), $edited_Blog->dget( 'name' ) )?></h3>
 		<?php
 
-		switch( $AdminUI->getPath(1) )
+		switch( $AdminUI->get_path(1) )
 		{
 			case 'general':
 				set_edited_Blog_from_params( 'general' );
@@ -339,10 +339,10 @@ switch($action)
 		}
 
 		// Begin payload block:
-		$AdminUI->dispPayloadBegin();
+		$AdminUI->disp_payload_begin();
 
 
-		switch( $AdminUI->getPath(1) )
+		switch( $AdminUI->get_path(1) )
 		{
 			case 'general':
 
@@ -378,7 +378,7 @@ switch($action)
 		}
 
 		// End payload block:
-		$AdminUI->dispPayloadEnd();
+		$AdminUI->disp_payload_end();
 
 		break;
 
@@ -557,6 +557,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.40  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.39  2005/08/21 16:20:12  halton
  * Added group based blogging permissions (new tab under blog). Required schema change
  *

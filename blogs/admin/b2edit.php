@@ -14,7 +14,7 @@
  */
 require_once (dirname(__FILE__). '/_header.php');
 
-$AdminUI->setPath( 'new' );
+$AdminUI->set_path( 'new' );
 param( 'action', 'string', 'new', true );
 
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
@@ -108,14 +108,14 @@ switch($action)
 		$blog = autoselect_blog( $blog, 'blog_post_statuses', 'any' );
 
 		// Generate available blogs list:
-		$blogListButtons = $AdminUI->getCollectionList( 'blog_post_statuses', 'any', $pagenow.'?blog=%d', NULL, '',
+		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_post_statuses', 'any', $pagenow.'?blog=%d', NULL, '',
 												( blog_has_cats( $blog ) ? 'return edit_reload(this.ownerDocument.forms.namedItem(\'post\'), %d )'
 												: '' /* Current blog has no cats, we can't be posting */ ) );
 		// TODO: edit_reload params handling is far from complete..
 
 		if( !$blog )
 		{
-			$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'), 
+			$Messages->add( sprintf( T_('Since you\'re a newcomer, you\'ll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you\'re promoted, just reload this page and you\'ll be able to blog. :)'),
 											'href="mailto:'.$admin_email.'?subject=b2-promotion"' ), 'error' );
 			$action = 'nil';
 			break;

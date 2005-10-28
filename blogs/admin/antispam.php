@@ -56,7 +56,7 @@
 require_once (dirname(__FILE__).'/_header.php');
 require_once (dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_antispam.funcs.php');
 
-$AdminUI->setPath( 'antispam' );
+$AdminUI->set_path( 'antispam' );
 
 param( 'action', 'string' );
 param( 'confirm', 'string' );
@@ -181,7 +181,7 @@ switch( $action )
 require(dirname(__FILE__).'/_menutop.php');
 
 
-$AdminUI->dispPayloadBegin();
+$AdminUI->disp_payload_begin();
 
 
 if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomments || $blacklist_locally || $report ) )
@@ -488,7 +488,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 
 <?php
 
-$AdminUI->dispPayloadEnd();
+$AdminUI->disp_payload_end();
 
 require( dirname(__FILE__).'/_footer.php' );
 ?>

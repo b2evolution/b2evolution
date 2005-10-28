@@ -112,7 +112,7 @@ else
 }
 
 // Update Menus:
-$AdminUI->addMenuEntries(
+$AdminUI->add_menu_entries(
 		'edit',
 		array(
 						'postlist' => array(
@@ -135,10 +135,10 @@ $AdminUI->addMenuEntries(
 	);
 
 
-$AdminUI->setPath( 'edit', $tab );
+$AdminUI->set_path( 'edit', $tab );
 
 // Generate available blogs list:
-$blogListButtons = $AdminUI->getCollectionList( 'blog_ismember', 1, $pagenow.'?tab='.$tab.'&amp;blog=%d' );
+$blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', 1, $pagenow.'?tab='.$tab.'&amp;blog=%d' );
 
 require dirname(__FILE__).'/_menutop.php';
 
@@ -146,7 +146,7 @@ require dirname(__FILE__).'/_menutop.php';
 if( $blog )
 { // We could select a valid blog which we have permission to access:
 	// Begin payload block:
-	$AdminUI->dispPayloadBegin();
+	$AdminUI->disp_payload_begin();
 
 	// fplanque> Note: this is depressing, but I have to put a table back here
 	// just because IE supports standards really badly! :'(
@@ -175,7 +175,7 @@ if( $blog )
 	echo '</tr></table>';
 
 	// End payload block:
-	$AdminUI->dispPayloadEnd();
+	$AdminUI->disp_payload_end();
 }
 
 require dirname(__FILE__).'/_footer.php';

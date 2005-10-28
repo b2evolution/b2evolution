@@ -62,7 +62,7 @@ class AdminUI extends AdminUI_general
 	 * @param string The template name ('main', 'sub').
 	 * @return array
 	 */
-	function getMenuTemplate( $name, $depth = 0 )
+	function get_menu_template( $name, $depth = 0 )
 	{
 		switch( $name )
 		{
@@ -70,20 +70,21 @@ class AdminUI extends AdminUI_general
 				switch( $depth )
 				{
 					default: // just one level for now (might provide dropdown later)
-						return array( 'before' => '<ul class="tabs">',
-													'after' => '</ul>',
-													'beforeEach' => '<li>',
-													'afterEach' => '</li>',
-													'beforeEachSel' => '<li class="current">',
-													'afterEachSel' => '</li>',
-												);
+						return array(
+							'before' => '<ul class="tabs">',
+							'after' => '</ul>',
+							'beforeEach' => '<li>',
+							'afterEach' => '</li>',
+							'beforeEachSel' => '<li class="current">',
+							'afterEachSel' => '</li>',
+						);
 				}
 				break;
 
 
 			default:
 				// Delegate to parent class:
-				return parent::getMenuTemplate( $name, $depth );
+				return parent::get_menu_template( $name, $depth );
 		}
 	}
 
@@ -91,7 +92,7 @@ class AdminUI extends AdminUI_general
 	/**
 	 * Get links (to CSS files especially).
 	 */
-	function getHeadlinks()
+	function get_head_links()
 	{
 		global $mode, $rsc_url;
 
@@ -120,7 +121,7 @@ class AdminUI extends AdminUI_general
 	 *
 	 * @return string
 	 */
-	function getPageHead()
+	function get_page_head()
 	{
 		$r = '
 		<div id="header">
@@ -137,10 +138,10 @@ class AdminUI extends AdminUI_general
 				'.$this->exit_links.'
 			</div>
 
-			<div id="headinfo">'.$this->getHeadInfo().'</div>'
+			<div id="headinfo">'.$this->get_head_info().'</div>'
 
 			// Display MAIN menu:
-			.$this->getMenu().'
+			.$this->get_html_menu().'
 		</div>
 		';
 
@@ -153,7 +154,7 @@ class AdminUI extends AdminUI_general
 	 *
 	 * @return string
 	 */
-	function getBodyTop()
+	function get_body_top()
 	{
 		global $Messages;
 
@@ -161,13 +162,13 @@ class AdminUI extends AdminUI_general
 
 		if( empty($this->mode) )
 		{ // We're not running in an special mode (bookmarklet, sidebar...)
-			$r .= $this->getPageHead();
+			$r .= $this->get_page_head();
 		}
 
 		$r .= '
 			<div id="TitleArea">
-				<h1><strong>'.$this->getTitleForTitlearea().'</strong>
-				'.$this->getBloglistButtons( '', '' ).'
+				<h1><strong>'.$this->get_title_for_titlearea().'</strong>
+				'.$this->get_bloglist_buttons( '', '' ).'
 				</h1>
 			</div>
 
@@ -186,7 +187,7 @@ class AdminUI extends AdminUI_general
 	 *
 	 * @return string
 	 */
-	function getBodyBottom()
+	function get_body_bottom()
 	{
 		return "\n</div>\n";
 	}

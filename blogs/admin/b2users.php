@@ -42,7 +42,7 @@
  * Includes:
  */
 require_once dirname(__FILE__).'/_header.php';
-$AdminUI->setPath( 'users' );
+$AdminUI->set_path( 'users' );
 
 param( 'action', 'string', 'list' );
 
@@ -550,10 +550,10 @@ else
 			if( $current_User->check_perm( 'users', 'view', false ) )
 			{ // Display user list:
 				// Begin payload block:
-				$AdminUI->dispPayloadBegin();
+				$AdminUI->disp_payload_begin();
 				require dirname(__FILE__).'/_users_list.php';
 				// End payload block:
-				$AdminUI->dispPayloadEnd();
+				$AdminUI->disp_payload_end();
 			}
 	}
 }
@@ -562,6 +562,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.105  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.104  2005/10/20 16:35:18  halton
  * added search / filtering to user list
  *

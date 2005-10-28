@@ -43,7 +43,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Begin payload block:
-$AdminUI->dispPayloadBegin();
+$AdminUI->disp_payload_begin();
 
 
 ?>
@@ -873,10 +873,13 @@ $options_Form->end_form();
 
 <?php
 // End payload block:
-$AdminUI->dispPayloadEnd();
+$AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.41  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.40  2005/09/26 23:06:53  blueyed
  * Converted options fieldset to Form class
  *

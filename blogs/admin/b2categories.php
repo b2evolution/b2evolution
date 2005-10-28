@@ -15,7 +15,7 @@
  * Includes:
  */
 require_once( dirname(__FILE__).'/_header.php' );
-$AdminUI->setPath( 'cats' );
+$AdminUI->set_path( 'cats' );
 $AdminUI->title = $AdminUI->title_titlearea = T_('Categories for blog:');
 param( 'action', 'string', 'list' );
 param( 'blog', 'integer', 0, true );
@@ -175,7 +175,7 @@ switch( $action )
  * Display page header, menus & messages:
  */
 // Generate available blogs list:
-$blogListButtons = $AdminUI->getCollectionList( 'blog_cats', '', $pagenow.'?blog=%d' );
+$blogListButtons = $AdminUI->get_html_collection_list( 'blog_cats', '', $pagenow.'?blog=%d' );
 require dirname(__FILE__).'/_menutop.php';
 
 
@@ -188,7 +188,7 @@ switch($action)
 	case 'new':
 	case 'create': // in case of an error
 		// New category form:
-		$AdminUI->dispPayloadBegin();
+		$AdminUI->disp_payload_begin();
 
 		$Form = & new Form( 'b2categories.php' );
 
@@ -218,7 +218,7 @@ switch($action)
 		$Form->end_form( array( array( 'submit', 'submit', T_('Create category'), 'SaveButton' ),
 														array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
-		$AdminUI->dispPayloadEnd();
+		$AdminUI->disp_payload_end();
 		break;
 
 
@@ -230,7 +230,7 @@ switch($action)
 		$cat_name = get_catname($cat_ID);
 		$cat_parent_ID = get_catparent($cat_ID);
 
-		$AdminUI->dispPayloadBegin();
+		$AdminUI->disp_payload_begin();
 
 		$Form = & new Form( 'b2categories.php' );
 
@@ -342,7 +342,7 @@ switch($action)
 		$Form->end_form( array( array( 'submit', 'submit', T_('Edit category'), 'SaveButton' ),
 														array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
-		$AdminUI->dispPayloadEnd();
+		$AdminUI->disp_payload_end();
 		break;
 
 
@@ -366,6 +366,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.48  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.47  2005/09/01 17:11:46  fplanque
  * no message
  *

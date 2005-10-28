@@ -69,7 +69,7 @@ function percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '.' )
 }
 
 
-$AdminUI->setPath( 'stats', param( 'tab', 'string', 'summary', true ) );
+$AdminUI->set_path( 'stats', param( 'tab', 'string', 'summary', true ) );
 $AdminUI->title = T_('View Stats for Blog:');
 
 param( 'action', 'string' );
@@ -145,10 +145,10 @@ require( dirname(__FILE__).'/_menutop.php' );
 
 
 // Begin payload block:
-$AdminUI->dispPayloadBegin();
+$AdminUI->disp_payload_begin();
 
 
-switch( $AdminUI->getPath(1) )
+switch( $AdminUI->get_path(1) )
 {
 	case 'summary':
 		?>
@@ -191,7 +191,7 @@ switch( $AdminUI->getPath(1) )
 			$chart[ 'chart_data' ][ 3 ] = array();
 			$chart[ 'chart_data' ][ 4 ] = array();
 			$chart[ 'chart_data' ][ 5 ] = array();
-													
+
 			$count = 0;
 			foreach( $res_hits as $row_stats )
 			{
@@ -724,8 +724,8 @@ switch( $AdminUI->getPath(1) )
 			// Display results:
 			$Results->display();
 			?>
-			
-			
+
+
 			<h3><?php echo T_('Top refering search engines') ?>:</h3>
 			<?php
 			refererList(20,'global',0,0,"'search'",'dom_name',$blog,true);
@@ -777,7 +777,7 @@ switch( $AdminUI->getPath(1) )
 			}
 			break;
 
-			
+
 		case 'syndication':
 			?>
 			<h2><?php echo T_('Top Aggregators') ?>:</h2>
@@ -787,10 +787,10 @@ switch( $AdminUI->getPath(1) )
 																				FROM T_useragents INNER JOIN T_hitlog ON hit_agnt_ID = agnt_ID
 																				WHERE agnt_type = 'rss' ".
 																				( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
-			
-			
+
+
 			echo '<p>'.T_('Total RSS hits').': '.$total_hit_count.'</p>';
-			
+
 			// Create result set:
 			$Results = & new Results( "SELECT agnt_signature, COUNT(*) AS hit_count
 																FROM T_useragents INNER JOIN T_hitlog ON hit_agnt_ID = agnt_ID
@@ -891,10 +891,10 @@ switch( $AdminUI->getPath(1) )
 																				FROM T_useragents INNER JOIN T_hitlog ON hit_agnt_ID = agnt_ID
 																				WHERE agnt_type <> 'rss' ".
 																				( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
-			
-			
+
+
 			echo '<p>'.T_('Total hits').': '.$total_hit_count.'</p>';
-			
+
 			// Create result set:
 			$Results = & new Results( "SELECT agnt_signature, COUNT(*) AS hit_count
 																FROM T_useragents INNER JOIN T_hitlog ON hit_agnt_ID = agnt_ID
@@ -924,20 +924,23 @@ switch( $AdminUI->getPath(1) )
 
 			// Display results:
 			$Results->display();
-			
+
 			break;
 }
 
 // End payload block:
-$AdminUI->dispPayloadEnd();
+$AdminUI->disp_payload_end();
 
 require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.7  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.6  2005/10/14 21:00:08  fplanque
  * Stats & antispam have obviously been modified with ZERO testing.
  * Fixed a sh**load of bugs...
  *
- */ 
+ */
 ?>

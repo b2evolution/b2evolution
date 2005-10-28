@@ -12,7 +12,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Close open divs, etc...
-echo $AdminUI->getBodyBottom();
+echo $AdminUI->get_body_bottom();
 
 echo '<p class="footer">'.$app_footer_text."</p>\n\n";
 
@@ -20,13 +20,13 @@ echo '<p class="footer">'.$app_footer_text."</p>\n\n";
 $Plugins->trigger_event( 'AdminAfterPageFooter', array() );
 
 
-if( $AdminUI->getPath(0) == 'files' || $AdminUI->getPathRange(0,1) == array( 'blogs', 'perm' ) || $AdminUI->getPathRange(0,1) == array( 'blogs', 'permgroup' ) )
+if( $AdminUI->get_path(0) == 'files' || $AdminUI->get_path_range(0,1) == array( 'blogs', 'perm' ) || $AdminUI->get_path_range(0,1) == array( 'blogs', 'permgroup' ) )
 { // init checkall JS functions
 	?>
 	<script type="text/javascript">
 		initcheckall();
 		<?php
-		if( $AdminUI->getPath(0) == 'files' )
+		if( $AdminUI->get_path(0) == 'files' )
 		{
 			?> setcheckallspan(0<?php if( isset($checkall) ) echo ', '.(int)$checkall; ?>); <?php
 		}

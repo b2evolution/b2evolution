@@ -16,7 +16,7 @@
  * Includes:
  */
 require_once dirname(__FILE__).'/_header.php';
-$AdminUI->setPath( 'templates' );
+$AdminUI->set_path( 'templates' );
 
 // Check permission:
 $current_User->check_perm( 'templates', '', true );

@@ -21,7 +21,7 @@
  * Includes:
  */
 require_once( dirname(__FILE__) . '/_header.php' );
-$AdminUI->setPath( 'edit' );
+$AdminUI->set_path( 'edit' );
 
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
@@ -130,7 +130,7 @@ switch($action)
 
 			// Send email notifications now!
 			$edited_Item->send_email_notifications();
-		
+
 			pingb2evonet($blogparams, $edited_Item->ID, $edited_Item->title);
 			pingWeblogs($blogparams);
 			pingBlogs($blogparams);
@@ -229,10 +229,10 @@ switch($action)
 			}
 			else
 			{ // We'll ping now
-		
+
 				// Send email notifications now!
 				$edited_Item->send_email_notifications();
-			
+
 				pingb2evonet( $blogparams, $edited_Item->post_ID, $edited_Item->title );
 				pingWeblogs( $blogparams );
 				pingBlogs( $blogparams );
@@ -318,7 +318,7 @@ switch($action)
 
 				// Send email notifications now!
 				$edited_Item->send_email_notifications();
-			
+
 				pingb2evonet( $blogparams, $post_ID, $edited_Item->title);
 				pingWeblogs($blogparams);
 				pingBlogs($blogparams);

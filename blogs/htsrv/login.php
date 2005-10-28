@@ -208,7 +208,7 @@ switch( $action )
 		 */
 		require_once dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'_header.php';
 
-		$AdminUI->addHeadline( '<base href="'.$admin_url.'" />' );
+		$AdminUI->add_headline( '<base href="'.$admin_url.'" />' );
 		require( dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'b2users.php' );
 
 		#header( 'Location: '.$baseurl.$admin_subdir.'b2users.php' ); // does not allow to leave a Message and IIS is known to cause problems with setcookie() and redirect.

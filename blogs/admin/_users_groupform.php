@@ -36,7 +36,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Begin payload block:
-$AdminUI->dispPayloadBegin();
+$AdminUI->disp_payload_begin();
 
 /*
  * fplanque>> Switch code removed, see users_form
@@ -144,10 +144,13 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 $Form->end_form();
 
 // End payload block:
-$AdminUI->dispPayloadEnd();
+$AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.40  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.39  2005/10/27 15:25:03  fplanque
  * Normalization; doc; comments.
  *

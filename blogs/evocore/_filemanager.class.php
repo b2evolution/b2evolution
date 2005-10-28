@@ -210,7 +210,7 @@ class FileManager extends Filelist
 
 		$this->User = & $cUser;
 
-		$this->_result_params = $AdminUI->getMenuTemplate('Results');
+		$this->_result_params = $AdminUI->get_menu_template('Results');
 
 		if( empty($root) )
 		{ // NO folder requested, get the first one available:
@@ -1354,6 +1354,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.53  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.52  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

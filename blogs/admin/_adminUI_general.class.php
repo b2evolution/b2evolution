@@ -1,7 +1,7 @@
 <?php
 /**
  * This file implements the Admin UI class.
- * Admin skins should derive from this class and override {@link getMenuTemplate()}
+ * Admin skins should derive from this class and override {@link get_menu_template()}
  * for example.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
@@ -39,7 +39,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: François PLANQUE.
  *
- * @todo Normalize code / refactor to allow easier contributions! (blueyed)
+ * @todo Refactor to allow easier contributions! (blueyed)
  *
  * @version $Id$
  */
@@ -50,7 +50,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * The general Admin UI class. It provides functions to handle the UI part of the
  * Backoffice.
  *
- * Admin skins should derive from this class and override {@link getMenuTemplate()}
+ * Admin skins should derive from this class and override {@link get_menu_template()}
  * for example.
  *
  * @package admin
@@ -72,16 +72,16 @@ class AdminUI_general
 
 	/**
 	 * The path of the selected menu.
-	 * Use {@link setPath()}, {@link setPathArray()} or
-	 * {@link setPathByNr()} to set it.
+	 * Use {@link set_path()}, {@link setPathArray()} or
+	 * {@link set_path_by_nr()} to set it.
 	 * @var array
 	 */
 	var $path = array();
 
 	/**
 	 * The properties of the path entries.
-	 * Use {@link setPath()}, {@link setPathArray()} or
-	 * {@link setPathByNr()} to set it.
+	 * Use {@link set_path()}, {@link setPathArray()} or
+	 * {@link set_path_by_nr()} to set it.
 	 * @var array
 	 */
 	var $pathProps = array();
@@ -146,14 +146,14 @@ class AdminUI_general
 			$this->pathSeperator = $admin_path_seprator;
 		}
 
-		$this->initTemplates();
+		$this->init_templates();
 	}
 
 
 	/**
-	 * This function should init the templates - like adding Javascript through the {@link addHeadline()} method.
+	 * This function should init the templates - like adding Javascript through the {@link add_headline()} method.
 	 */
-	function initTemplates()
+	function init_templates()
 	{
 	}
 
@@ -163,25 +163,25 @@ class AdminUI_general
 	 *
 	 * @return string
 	 */
-	function getTitle( $reversedDefault = false )
+	function get_title( $reversedDefault = false )
 	{
 		if( isset($this->title) )
 		{ // Explicit title has been set:
 			return $this->title;
 		}
 		/* fplanque: is there any real point in this?:
-		elseif( $title = $this->getPathProperty( 'last', array( 'title' ) ) )
+		elseif( $title = $this->get_path_property( 'last', array( 'title' ) ) )
 		{ // Title property of the path
 			return $title;
 		}
-		elseif( $title = $this->getPropertyForNode( $this->path, array( 'title' ) ) )
+		elseif( $title = $this->get_property_for_node( $this->path, array( 'title' ) ) )
 		{ // Title property for the node of the current path
 			return $title;
 		}
 		*/
 		else
 		{ // Fallback: implode title/text properties of the path
-			$titles = $this->getPropertiesForPath( $this->path, array( 'title', 'text' ) );
+			$titles = $this->get_properties_for_path( $this->path, array( 'title', 'text' ) );
 			if( $reversedDefault )
 			{	// We have asked for reverse order of the path elements:
 				$titles = array_reverse($titles);
@@ -196,16 +196,16 @@ class AdminUI_general
 	 *
 	 * @return string
 	 */
-	function getTitleForTitlearea()
+	function get_title_for_titlearea()
 	{
 		if( ! isset( $this->title_titlearea ) )
 		{ // Construct path:
 			$titles = array();
 			foreach( $this->path as $i => $lPath )
 			{
-				if( false !== ($title_text = $this->getPathProperty( $i, array( 'title', 'text' ) )) )
+				if( false !== ($title_text = $this->get_path_property( $i, array( 'title', 'text' ) )) )
 				{
-					$titles[] = '<a href="'.$this->getPathProperty( $i, array( 'href' ) ).'">'.$title_text.'</a>';
+					$titles[] = '<a href="'.$this->get_path_property( $i, array( 'href' ) ).'">'.$title_text.'</a>';
 				}
 			}
 
@@ -221,11 +221,12 @@ class AdminUI_general
 	 *
 	 * We actually keep the appended stuff separate from the main title, because the main title
 	 * might in some occasions not be known immediately.
+	 *
+	 * @param string What to append to the titlearea
 	 */
 	function append_to_titlearea( $string )
 	{
 		$this->title_titlearea_appendix .= $this->pathSeperator.$string;
-
 	}
 
 
@@ -236,20 +237,20 @@ class AdminUI_general
 	 *
 	 * @return string
 	 */
-	function getHtmlTitle()
+	function get_html_title()
 	{
 		global $app_shortname;
 
 		$r = $app_shortname.$this->pathSeperator;
 
-		if( $htmltitle = $this->getPropertyForNode( $this->path, array( 'htmltitle' ) ) )
+		if( $htmltitle = $this->get_property_for_node( $this->path, array( 'htmltitle' ) ) )
 		{ // Explicit htmltitle set:
 			$r .= $htmltitle;
 		}
 		else
 		{	// No explicit title set, construct Title from path
 			$r .= #preg_replace( '/:$/', '',
-						$this->getTitle()
+						$this->get_title()
 						#)
 						;
 		}
@@ -268,7 +269,7 @@ class AdminUI_general
 	 * @param array Alternative names of the property to receive (ordered by priority).
 	 * @return array List of the properties.
 	 */
-	function getPropertiesForPath( $path, $propertyByPreference )
+	function get_properties_for_path( $path, $propertyByPreference )
 	{
 		if( !is_array($path) )
 		{
@@ -279,7 +280,7 @@ class AdminUI_general
 		$prevPath = array();
 		foreach( $path as $i => $lPath )
 		{
-			if( false !== ($prop = $this->getPathProperty( $i, $propertyByPreference )) )
+			if( false !== ($prop = $this->get_path_property( $i, $propertyByPreference )) )
 			{
 				$r[] = $prop;
 			}
@@ -298,7 +299,7 @@ class AdminUI_general
 	 * @param array Alternative names of the property to receive (ordered by priority).
 	 * @return mixed|false False if property is not set for the node, otherwise its value.
 	 */
-	function getPropertyForNode( $path, $propertyByPreference )
+	function get_property_for_node( $path, $propertyByPreference )
 	{
 		$node =& $this->get_node_by_path( $path );
 
@@ -314,9 +315,9 @@ class AdminUI_general
 	}
 
 
-	function getPathProperty( $nr, $propertyByPreference )
+	function get_path_property( $nr, $propertyByPreference )
 	{
-		if( $pathWithProps = $this->getPath( $nr, true ) )
+		if( $pathWithProps = $this->get_path( $nr, true ) )
 		{
 			foreach( $propertyByPreference as $lProp )
 			{
@@ -332,20 +333,20 @@ class AdminUI_general
 
 
 	/**
-	 * Displays a menu, any level.
+	 * Get a menu, any level.
 	 *
 	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
-	 * @param string The template name, see {@link getMenuTemplate()}.
+	 * @param string The template name, see {@link get_menu_template()}.
 	 */
-	function getMenu( $path = NULL, $template = 'main' )
+	function get_html_menu( $path = NULL, $template = 'main' )
 	{
 		/* debug:
 		$r = ' dispMenu-BEGIN ';
-		$r .= $this->getHtmlMenuEntries( $path, $template );
+		$r .= $this->get_html_menu_entries( $path, $template );
 		$r .= ' dispMenu-END ';
 		return $r;
 		*/
-		return $this->getHtmlMenuEntries( $path, $template );
+		return $this->get_html_menu_entries( $path, $template );
 	}
 
 
@@ -358,28 +359,28 @@ class AdminUI_general
 	 *
 	 * @param NULL|string|array The path (NULL defaults to first path entry). See {@link get_node_by_path()}.
 	 */
-	function dispSubmenu( $path = NULL )
+	function disp_submenu( $path = NULL )
 	{
-		//echo ' dispSubmenu-BEGIN ';
+		//echo ' disp_submenu-BEGIN ';
 
 		if( is_null($path) )
 		{
-			$path = array( $this->getPath(0) );
+			$path = array( $this->get_path(0) );
 		}
 
-		echo $this->getMenu( $path, 'sub' );
+		echo $this->get_html_menu( $path, 'sub' );
 
-		//echo ' dispSubmenu-END ';
+		//echo ' disp_submenu-END ';
 	}
 
 
 	/**
 	 * Display the start of the payload block
 	 */
-	function dispPayloadBegin()
+	function disp_payload_begin()
 	{
 		// Display submenu (this also opens a div class="panelblock" or class="panelblocktabs")
-		$this->dispSubmenu();
+		$this->disp_submenu();
 	}
 
 
@@ -388,7 +389,7 @@ class AdminUI_general
 	 *
 	 * Was: _sub_end.inc.php
 	 */
-	function dispPayloadEnd()
+	function disp_payload_end()
 	{
 		echo "</div>\n";	// class="panelblock*"
 	}
@@ -397,11 +398,8 @@ class AdminUI_general
 	/**
 	 * Returns the list of available Collections (aka Blogs) to work on.
 	 *
-	 * fplanque>>I'm trying to hack this in and get a feeling of the AdminUI stuff at the same time :/
-	 *
 	 * @todo Use BlogCache(?)
 	 * @todo Use a template (i wanna make an UL/LI/A list structure in newer skins)
-	 * @todo maybe rename to getHtmlCollectionList
 	 *
 	 * @param string name of required permission needed to display the blog in the list
  	 * @param string level of required permission needed to display the blog in the list
@@ -411,12 +409,11 @@ class AdminUI_general
 	 * @param string onclick attribute format string, with %d for blog number.
 	 * @return string HTML
 	 */
-	function getCollectionList( $permname = 'blog_ismember', $permlevel = 1, $url_format = '?blog=%d',
-															$all_title = NULL, $all_url = '', $onclick = NULL )
+	function get_html_collection_list( $permname = 'blog_ismember', $permlevel = 1, $url_format = '?blog=%d', $all_title = NULL, $all_url = '', $onclick = NULL )
 	{
 		global $current_User, $blog;
 
-		$template = $this->getMenuTemplate( 'CollectionList' );
+		$template = $this->get_menu_template( 'CollectionList' );
 
 		$r = $template['before'];
 
@@ -463,18 +460,18 @@ class AdminUI_general
 	 * Get the HTML for the menu entries of a specific path.
 	 *
 	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
-	 * @param string Template name, see {@link getMenuTemplate()}.
+	 * @param string Template name, see {@link get_menu_template()}.
 	 * @return string The HTML for the menu.
 	 */
-	function getHtmlMenuEntries( $path, $template, $depth = 0 )
+	function get_html_menu_entries( $path, $template, $depth = 0 )
 	{
 		global $current_User;
 
 		$r = '';
 
-		$templateForLevel = $this->getMenuTemplate( $template, $depth );
+		$templateForLevel = $this->get_menu_template( $template, $depth );
 
-		if( !( $menuEntries = $this->getMenuEntries($path) ) )
+		if( !( $menuEntries = $this->get_menu_entries($path) ) )
 		{
 			if( isset($templateForLevel['empty']) )
 			{
@@ -485,7 +482,7 @@ class AdminUI_general
 		{
 			$r .= $templateForLevel['before'];
 
-			$selected = $this->getSelected($path);
+			$selected = $this->get_selected($path);
 
 			foreach( $menuEntries as $loop_tab => $loop_details )
 			{
@@ -517,14 +514,14 @@ class AdminUI_general
 					{
 						if( !empty( $templateForLevel['_props']['recurseSelected'] )
 								&& ( $recursePath = array_merge( $path, $loop_tab ) )
-								&& ($this->getMenuEntries($recursePath) ) )
+								&& ($this->get_menu_entries($recursePath) ) )
 						{
 							$r .= isset($templateForLevel['beforeEachSelWithSub'])
 										? $templateForLevel['beforeEachSelWithSub']
 										: $templateForLevel['beforeEachSel'];
 							$r .= $anchor;
 
-							$r .= $this->getHtmlMenuEntries( $recursePath, $template, $depth+1 );
+							$r .= $this->get_html_menu_entries( $recursePath, $template, $depth+1 );
 
 							$r .= isset($templateForLevel['afterEachSelWithSub'])
 										? $templateForLevel['afterEachSelWithSub']
@@ -558,13 +555,13 @@ class AdminUI_general
 	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
 	 * @param array Menu entries to add.
 	 */
-	function addMenuEntries( $path, $entries )
+	function add_menu_entries( $path, $entries )
 	{
 		$node =& $this->get_node_by_path( $path, true );
 
 		foreach( $entries as $lKey => $lMenuProps )
 		{
-			if( 1 ) // TODO: check perms/user settings, ...
+			if( 1 ) // TODO: check perms/user settings, ... (this gets mainly done in get_html_menu_entries() for now)
 			{
 				$node['entries'][$lKey] = $lMenuProps;
 			}
@@ -578,7 +575,7 @@ class AdminUI_general
 	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
 	 * @return array The menu entries (may be empty).
 	 */
-	function getMenuEntries( $path )
+	function get_menu_entries( $path )
 	{
 		$node =& $this->get_node_by_path( $path );
 
@@ -592,7 +589,7 @@ class AdminUI_general
 	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
 	 * @return string|false
 	 */
-	function getSelected( $path )
+	function get_selected( $path )
 	{
 		$node =& $this->get_node_by_path($path);
 
@@ -658,7 +655,7 @@ class AdminUI_general
 	 * @param integer Nesting level (start at 0)
 	 * @return array Associative array which defines layout and optionally properties.
 	 */
-	function getMenuTemplate( $name, $depth = 0 )
+	function get_menu_template( $name, $depth = 0 )
 	{
 		switch( $name )
 		{
@@ -669,33 +666,33 @@ class AdminUI_general
 						// main level
 						global $app_shortname, $app_version;
 
-						return array( 'before' => '<div id="mainmenu"><ul>',
-													'after' => '</ul>
-																			<p class="center">'.$app_shortname.' v <strong>'.$app_version.'</strong></p>
-																			</div>',
-													'beforeEach' => '<li>',
-													'afterEach' => '</li>',
-													'beforeEachSel' => '<li class="current">',
-													'afterEachSel' => '</li>',
-													'beforeEachSelWithSub' => '<li class="parent">',
-													'afterEachSelWithSub' => '</li>',
-													'_props' => array(
-															/**
-															 * @todo Move to new skin (recurse for subentries if an entry is selected)
-															'recurseSelected' => true,
-															*/
-														),
-												);
+						return array(
+							'before' => '<div id="mainmenu"><ul>',
+							'after' => "</ul>\n<p class=\"center\">$app_shortname v <strong>$app_version</strong></p>\n</div>",
+							'beforeEach' => '<li>',
+							'afterEach' => '</li>',
+							'beforeEachSel' => '<li class="current">',
+							'afterEachSel' => '</li>',
+							'beforeEachSelWithSub' => '<li class="parent">',
+							'afterEachSelWithSub' => '</li>',
+							'_props' => array(
+								/**
+								 * @todo Move to new skin (recurse for subentries if an entry is selected)
+								'recurseSelected' => true,
+								*/
+							),
+						);
 
 					default:
 						// any sublevel
-						return array( 'before' => '<ul class="submenu">',
-													'after' => '</ul>',
-													'beforeEach' => '<li>',
-													'afterEach' => '</li>',
-													'beforeEachSel' => '<li class="current">',
-													'afterEachSel' => '</li>',
-												);
+						return array(
+							'before' => '<ul class="submenu">',
+							'after' => '</ul>',
+							'beforeEach' => '<li>',
+							'afterEach' => '</li>',
+							'beforeEachSel' => '<li class="current">',
+							'afterEachSel' => '</li>',
+						);
 				}
 
 				break;
@@ -705,14 +702,14 @@ class AdminUI_general
 				// submenu, we support just one sub-level
 				return array(
 						'before' => '<div class="pt">'
-												."\n".'<ul class="hack">'
-												."\n<li><!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display --></li>"
-												// Note: this hack MAY NOT be needed when not using pixels instead of decimal ems or exs in the CSS
-												."\n</ul>"
-												."\n".'<div class="panelblocktabs">'
-												."\n".'<ul class="tabs">',
+							."\n".'<ul class="hack">'
+							."\n<li><!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display --></li>"
+							// Note: this hack MAY NOT be needed when not using pixels instead of decimal ems or exs in the CSS
+							."\n</ul>"
+							."\n".'<div class="panelblocktabs">'
+							."\n".'<ul class="tabs">',
 						'after' => "</ul>\n</div>\n</div>"
-												."\n".'<div class="tabbedpanelblock">',
+							."\n".'<div class="tabbedpanelblock">',
 						'empty' => '<div class="panelblock">',
 						'beforeEach' => '<li>',
 						'afterEach'  => '</li>',
@@ -824,7 +821,7 @@ class AdminUI_general
 			// TODO: add default settings for 'table', 'fieldset', etc...
 
 			default:
-				die( 'Unknown $name for AdminUI::getMenuTemplate(): '.var_export($name, true) /* PHP 4.2 ! */ );
+				die( 'Unknown $name for AdminUI::get_menu_template(): '.var_export($name, true) /* PHP 4.2 ! */ );
 		}
 	}
 
@@ -832,7 +829,7 @@ class AdminUI_general
 	/**
 	 * Add a headline for HTML <head>.
 	 */
-	function addHeadline( $headline )
+	function add_headline( $headline )
 	{
 		$this->headlines[] = $headline;
 	}
@@ -841,7 +838,7 @@ class AdminUI_general
 	/**
 	 * Get the headlines for HTML <head>.
 	 */
-	function getHeadlines()
+	function get_headlines()
 	{
 		$r = '';
 
@@ -854,7 +851,7 @@ class AdminUI_general
 	/**
 	 * Get links (to CSS files especially).
 	 */
-	function getHeadlinks()
+	function get_head_links()
 	{
 		return '';
 	}
@@ -866,7 +863,7 @@ class AdminUI_general
 	 *
 	 * @return string
 	 */
-	function getBloglistButtons( $before = '', $after = '' )
+	function get_bloglist_buttons( $before = '', $after = '' )
 	{
 		global $blogListButtons;
 
@@ -884,7 +881,7 @@ class AdminUI_general
 	 * @param boolean Also return properties?
 	 * @return string|array|false (depends on $withProps)
 	 */
-	function getPath( $which, $withProps = false )
+	function get_path( $which, $withProps = false )
 	{
 		if( $which === 'last' )
 		{
@@ -898,11 +895,9 @@ class AdminUI_general
 		if( $withProps )
 		{
 			return array(
-					'path' => $this->path[$which],
-					'props' => isset( $this->pathProps[$which] )
-											? $this->pathProps[$which]
-											: array(),
-				);
+				'path' => $this->path[$which],
+				'props' => isset( $this->pathProps[$which] ) ? $this->pathProps[$which] : array(),
+			);
 		}
 
 		return $this->path[$which];
@@ -916,7 +911,7 @@ class AdminUI_general
 	 * @param integer|NULL end index (NULL means same as start index)
 	 * @return array List of path keys.
 	 */
-	function getPathRange( $start, $end = NULL )
+	function get_path_range( $start, $end = NULL )
 	{
 		if( is_null($end) )
 		{
@@ -942,7 +937,7 @@ class AdminUI_general
 	 * @param array Either the key of the path or an array(keyname, propsArray).
 	 * @param array Properties for this path entry.
 	 */
-	function setPathByNr( $nr, $pathKey, $pathProps = array() )
+	function set_path_by_nr( $nr, $pathKey, $pathProps = array() )
 	{
 		if( is_null($nr) )
 		{ // append
@@ -954,7 +949,7 @@ class AdminUI_general
 		}
 		else
 		{
-			$parentNode =& $this->get_node_by_path($this->getPathRange( 0, $nr-1 ));
+			$parentNode =& $this->get_node_by_path($this->get_path_range( 0, $nr-1 ));
 		}
 		$parentNode['selected'] = $pathKey;
 
@@ -970,7 +965,7 @@ class AdminUI_general
 	 *
 	 * @param string|array Either the key of the path or an array(keyname, propsArray).
 	 */
-	function addPath( $path, $pathProps = array() )
+	function add_path( $path, $pathProps = array() )
 	{
 		$search_path = $this->path;
 		$search_path[] = $path;
@@ -980,7 +975,7 @@ class AdminUI_general
 			$pathProps = array_merge( $pathProps, $node );
 		}
 
-		$this->setPathByNr( NULL, $path, $pathProps );
+		$this->set_path_by_nr( NULL, $path, $pathProps );
 	}
 
 
@@ -989,17 +984,17 @@ class AdminUI_general
 	 *
 	 * For example, this selects the tab/submenu 'plugins' in the main menu 'options':
 	 * <code>
-	 * setPath( 'options', 'plugins' );
+	 * set_path( 'options', 'plugins' );
 	 * </code>
 	 *
-	 * Use {@link addPath()} to append a single path.
+	 * Use {@link add_path()} to append a single path.
 	 *
-	 * This is an easy stub for {@link setPathByNr()}.
+	 * This is an easy stub for {@link set_path_by_nr()}.
 	 *
 	 * @param string|array,... Either the key of the path or an array(keyname, propsArray).
-	 * @uses setPathByNr()
+	 * @uses set_path_by_nr()
 	 */
-	function setPath()
+	function set_path()
 	{
 		$args = func_get_args();
 
@@ -1023,7 +1018,7 @@ class AdminUI_general
 				$pathProps = array_merge( $node, $pathProps );
 			}
 
-			$this->setPathByNr( $i++, $pathName, $pathProps );
+			$this->set_path_by_nr( $i++, $pathName, $pathProps );
 
 			$prevPath[] = $pathName;
 		}
@@ -1035,7 +1030,7 @@ class AdminUI_general
 	 *
 	 * @return string
 	 */
-	function getBodyTop()
+	function get_body_top()
 	{
 		return '';
 	}
@@ -1046,7 +1041,7 @@ class AdminUI_general
 	 *
 	 * @return string
 	 */
-	function getBodyBottom()
+	function get_body_bottom()
 	{
 		return '';
 	}
@@ -1057,7 +1052,7 @@ class AdminUI_general
 	 *
 	 * @return string
 	 */
-	function getPageHead()
+	function get_page_head()
 	{
 		global $app_version, $current_User;
 
@@ -1071,10 +1066,10 @@ class AdminUI_general
 				</span>
 
 				b2evo v <strong>'.$app_version.'</strong>
-				&middot; '.$this->getHeadInfo().'
+				&middot; '.$this->get_head_info().'
 			</div>
 
-			<h1>'.$this->getTitleForTitlearea().'</h1>
+			<h1>'.$this->get_title_for_titlearea().'</h1>
 		</div>
 		';
 
@@ -1087,7 +1082,7 @@ class AdminUI_general
 	 *
 	 * @return string
 	 */
-	function getHeadInfo()
+	function get_head_info()
 	{
 		global $obhandler_debug, $localtimenow, $servertimenow, $current_User;
 
@@ -1096,10 +1091,10 @@ class AdminUI_general
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
 			$r .= "\n".T_('Time:').' <strong>'.date_i18n( locale_timefmt(), $localtimenow ).'</strong>'
-						.' &middot; <acronym title="'.T_('Greenwich Mean Time ').'">'
-						./* TRANS: short for Greenwich Mean Time */ T_('GMT:').'</acronym> <strong>'.gmdate( locale_timefmt(), $servertimenow).'</strong>'
-						.' &middot; '.T_('Logged in as:').' <strong><a href="b2users.php?user_ID='.$current_User->ID.'">'.$current_User->dget('login').'</a></strong>'
-						."\n";
+				.' &middot; <acronym title="'.T_('Greenwich Mean Time ').'">'
+				./* TRANS: short for Greenwich Mean Time */ T_('GMT:').'</acronym> <strong>'.gmdate( locale_timefmt(), $servertimenow).'</strong>'
+				.' &middot; '.T_('Logged in as:').' <strong><a href="b2users.php?user_ID='.$current_User->ID.'">'.$current_User->dget('login').'</a></strong>'
+				."\n";
 		}
 
 		return $r;
@@ -1109,6 +1104,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.36  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.35  2005/10/26 23:08:28  blueyed
  * doc; todo
  *

@@ -58,7 +58,7 @@ if( false )
 }
 
 // Begin payload block:
-$AdminUI->dispPayloadBegin();
+$AdminUI->disp_payload_begin();
 
 $Form = & new Form( 'files.php' );
 
@@ -92,10 +92,13 @@ echo '<p class="notes"><strong>'.T_('You are in copy/move mode.')
 				.'</strong> '.T_('Please navigate to the desired target location.').'</p>';
 
 // End payload block:
-$AdminUI->dispPayloadEnd();
+$AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.11  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.10  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
  *

@@ -49,7 +49,7 @@ class spellcheck_plugin extends Plugin
 	{
 		global $AdminUI, $admin_url;
 
-		if( $AdminUI->getPath(1) != 'new' )
+		if( $AdminUI->get_path(1) != 'new' )
 		{ // We won't need the spellchecker
 			return false;
 		}

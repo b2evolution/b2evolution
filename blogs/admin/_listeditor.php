@@ -136,22 +136,22 @@ if( ($action == 'delete') && !$confirm )
 		<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
 		<p>
-		
+
 		<?php
 		$Form = & new Form( '', 'form', 'get' );
-	
-		$Form->begin_form( 'inline' );		
+
+		$Form->begin_form( 'inline' );
 		$Form->hidden( 'action', 'delete' );
 		$Form->hidden( 'ID', $ID );
 		$Form->hidden( 'confirm', 1 );
 		$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
-		
+
 		$Form->begin_form( 'inline' );
 		$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 		$Form->end_form()
 		?>
-		
+
 		</p>
 
 	</div>
@@ -160,7 +160,7 @@ if( ($action == 'delete') && !$confirm )
 
 
 // Begin payload block:
-$AdminUI->dispPayloadBegin();
+$AdminUI->disp_payload_begin();
 
 
 // Create result set:
@@ -238,7 +238,7 @@ else
 }
 
 // End payload block:
-$AdminUI->dispPayloadEnd();
+$AdminUI->disp_payload_end();
 
 /**
  * Display page footer:

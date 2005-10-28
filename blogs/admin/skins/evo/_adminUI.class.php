@@ -60,7 +60,7 @@ class AdminUI extends AdminUI_general
 	/**
 	 * Get links (to CSS files especially).
 	 */
-	function getHeadlinks()
+	function get_head_links()
 	{
 		global $mode;
 
@@ -78,10 +78,10 @@ class AdminUI extends AdminUI_general
 	/**
 	 * Get the top of the HTML <body>.
 	 *
-	 * @uses getPageHead()
+	 * @uses get_page_head()
 	 * @return string
 	 */
-	function getBodyTop()
+	function get_body_top()
 	{
 		global $Messages;
 
@@ -90,10 +90,10 @@ class AdminUI extends AdminUI_general
 		if( empty($this->mode) )
 		{ // We're not running in an special mode (bookmarklet, sidebar...)
 
-			$r .= $this->getPageHead();
+			$r .= $this->get_page_head();
 
 			// Display MAIN menu:
-			$r .= $this->getMenu().'
+			$r .= $this->get_html_menu().'
 
 			<div class="panelbody">
 			';
@@ -104,7 +104,7 @@ class AdminUI extends AdminUI_general
 		<div id="payload">
 		';
 
-		$r .= $this->getBloglistButtons( '<div id="TitleArea">', '</div>' );
+		$r .= $this->get_bloglist_buttons( '<div id="TitleArea">', '</div>' );
 
 		// Display info & error messages
 		$r .= $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
@@ -118,7 +118,7 @@ class AdminUI extends AdminUI_general
 	 *
 	 * @return string
 	 */
-	function getBodyBottom()
+	function get_body_bottom()
 	{
 		$r = '';
 

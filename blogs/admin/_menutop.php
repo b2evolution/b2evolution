@@ -16,14 +16,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo $AdminUI->getHtmlTitle(); ?></title>
+	<title><?php echo $AdminUI->get_html_title(); ?></title>
 
 	<?php
 	// AFAICS, This is used for <base> only..
-	echo $AdminUI->getHeadlines();
+	echo $AdminUI->get_headlines();
 
 	// Include links (to CSS...)
-	echo $AdminUI->getHeadlinks();
+	echo $AdminUI->get_head_links();
 	?>
 
 	<script type="text/javascript">
@@ -45,16 +45,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 	$Debuglog->add( 'Admin-Path: '.var_export($AdminUI->path, true) );
 
-	if( $AdminUI->getPath(0) == 'files'
-			|| ($AdminUI->getPathRange(0,1) == array('blogs', 'perm') )
-			|| ($AdminUI->getPathRange(0,1) == array('blogs', 'permgroup') ) )
+	if( $AdminUI->get_path(0) == 'files'
+			|| ($AdminUI->get_path_range(0,1) == array('blogs', 'perm') )
+			|| ($AdminUI->get_path_range(0,1) == array('blogs', 'permgroup') ) )
 	{{{ // -- Inject javascript ----------------
 		// gets initialized in _footer.php
 		?>
 		<script type="text/javascript">
 		<!--
 			<?php
-			switch( $AdminUI->getPath(0) )
+			switch( $AdminUI->get_path(0) )
 			{
 				case 'blogs': // {{{
 					?>
@@ -346,6 +346,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <body>
 <?php
 // Include title, menu, messages, etc.
-echo $AdminUI->getBodyTop();
+echo $AdminUI->get_body_top();
 
 ?>

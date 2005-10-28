@@ -339,7 +339,7 @@ class Results extends Widget
 
 			// echo $sql_count;
 		}
-		
+
 		$this->total_rows = $this->DB->get_var( $sql_count ); //count total rows
 	}
 
@@ -381,7 +381,7 @@ class Results extends Widget
 		elseif( empty( $this->params ) )
 		{ // Use default params from Admin Skin:
 			global $AdminUI;
-			$this->params = $AdminUI->getMenuTemplate( 'Results' );
+			$this->params = $AdminUI->get_menu_template( 'Results' );
 		}
 
 
@@ -1119,6 +1119,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.34  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.33  2005/10/14 21:00:08  fplanque
  * Stats & antispam have obviously been modified with ZERO testing.
  * Fixed a sh**load of bugs...

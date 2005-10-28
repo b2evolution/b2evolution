@@ -131,7 +131,7 @@ class Form extends Widget
 		{
 			if( is_object($AdminUI) )
 			{ // Get default skin setting:
-				$template = $AdminUI->getMenuTemplate( 'Form' );
+				$template = $AdminUI->get_menu_template( 'Form' );
 				$layout = $template['layout'];
 			}
 			else
@@ -2207,6 +2207,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.79  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.78  2005/10/18 18:24:25  fplanque
  * no good reason to combine styles here. one unique style for required is enough.
  *

@@ -36,7 +36,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Begin payload block:
-$AdminUI->dispPayloadBegin();
+$AdminUI->disp_payload_begin();
 
 if( $demo_mode )
 { // Prevent users from killing access to the demo...
@@ -197,10 +197,13 @@ if( ! $creating )
 $Form->end_form();
 
 // End payload block:
-$AdminUI->dispPayloadEnd();
+$AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.68  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.67  2005/09/29 15:07:29  fplanque
  * spelling
  *

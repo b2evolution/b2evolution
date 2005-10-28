@@ -11,7 +11,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Begin payload block:
-$AdminUI->dispPayloadBegin();
+$AdminUI->disp_payload_begin();
 
 if( isset($Blog ) )
 {
@@ -86,5 +86,5 @@ echo "</ul>\n";
 Log::display( '', '', T_('<strong>Note:</strong> Deleting a category does not delete items from that category. It will just assign them to the parent category. When deleting a root category, items will be assigned to the oldest remaining category in the same collection (smallest category number).'), 'note' );
 
 // End payload block:
-$AdminUI->dispPayloadEnd();
+$AdminUI->disp_payload_end();
 ?>

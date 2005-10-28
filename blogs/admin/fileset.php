@@ -45,7 +45,7 @@
  */
 require( dirname(__FILE__).'/_header.php' );
 
-$AdminUI->setPath( 'options', 'files' );
+$AdminUI->set_path( 'options', 'files' );
 
 param( 'action', 'string' );
 
@@ -140,12 +140,12 @@ require dirname(__FILE__).'/_menutop.php';
 $current_User->check_perm( 'options', 'view', true );
 
 // Begin payload block:
-$AdminUI->dispPayloadBegin();
+$AdminUI->disp_payload_begin();
 
 require dirname(__FILE__).'/_set_files.form.php';
 
 // End payload block:
-$AdminUI->dispPayloadEnd();
+$AdminUI->disp_payload_end();
 
 require dirname(__FILE__).'/_footer.php';
 ?>

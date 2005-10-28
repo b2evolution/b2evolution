@@ -70,7 +70,7 @@ if( false )
  */
 require_once dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_filemanager.class.php';
 
-$AdminUI->setPath( 'files' );
+$AdminUI->set_path( 'files' );
 
 
 /**
@@ -1134,9 +1134,9 @@ switch( $Fileman->fm_mode )
 		// TODO: check EDIT permissions!
 
 		// Links dialog:
-		$AdminUI->dispPayloadBegin();
+		$AdminUI->disp_payload_begin();
 		require dirname(__FILE__).'/_files_links.inc.php';
-		$AdminUI->dispPayloadEnd();
+		$AdminUI->disp_payload_end();
 
 		$Fileman->forceFM = 1;
 		break;
@@ -1184,9 +1184,9 @@ switch( $action )
 {
 	case 'rename':
 		// Rename files dialog:
-		$AdminUI->dispPayloadBegin();
+		$AdminUI->disp_payload_begin();
 		require dirname(__FILE__).'/_files_rename.form.php';
-		$AdminUI->dispPayloadEnd();
+		$AdminUI->disp_payload_end();
 		break;
 
 
@@ -1265,6 +1265,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.120  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.119  2005/10/28 02:37:37  blueyed
  * Normalized AbstractSettings API
  *

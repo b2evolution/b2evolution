@@ -45,7 +45,7 @@
  */
 require dirname(__FILE__).'/_header.php';
 
-$AdminUI->setPath( 'options', 'general' );
+$AdminUI->set_path( 'options', 'general' );
 
 param( 'action', 'string' );
 param( 'edit_locale', 'string' );
@@ -119,17 +119,20 @@ require dirname(__FILE__).'/_menutop.php';
 $current_User->check_perm( 'options', 'view', true );
 
 // Begin payload block:
-$AdminUI->dispPayloadBegin();
+$AdminUI->disp_payload_begin();
 
 require dirname(__FILE__).'/_set_general.form.php';
 
 // End payload block:
-$AdminUI->dispPayloadEnd();
+$AdminUI->disp_payload_end();
 
 require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.7  2005/10/28 20:08:46  blueyed
+ * Normalized AdminUI
+ *
  * Revision 1.6  2005/10/28 02:37:37  blueyed
  * Normalized AbstractSettings API
  *

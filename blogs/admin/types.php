@@ -33,7 +33,7 @@
  */
 require_once dirname(__FILE__). '/_header.php';
 
-$AdminUI->setPath( 'options', 'types' );
+$AdminUI->set_path( 'options', 'types' );
 $edited_table = 'T_posttypes';
 $edited_table_IDcol = 'ptyp_ID';
 $edited_table_namecol = 'ptyp_name';
