@@ -270,7 +270,7 @@ function antispam_poll_abuse( $display = true )
 							);
 	$result = $client->send($message);
 
-	if( $ret = xmlrpc_displayresult( $result ) )
+	if( $ret = xmlrpc_displayresult( $result, '', $Messages ) )
 	{ // Response is not an error, let's process it:
 		$response = $result->value();
 		if( $response->kindOf() == 'struct' )
@@ -312,6 +312,7 @@ function antispam_poll_abuse( $display = true )
 					$Settings->set( 'antispam_last_update', $endedat );
 					$Settings->dbupdate();
 				}
+				$Messages->add( T_('Done.'), 'success' );
 			}
 		}
 		else
@@ -321,12 +322,14 @@ function antispam_poll_abuse( $display = true )
 		}
 	}
 
-	$Messages->add( T_('Done.'), 'success' );
 	return($ret);
 }
 
 /*
  * $Log$
+ * Revision 1.16  2005/10/28 20:26:43  blueyed
+ * Handle failed update of antispam strings correctly.
+ *
  * Revision 1.15  2005/10/28 02:37:37  blueyed
  * Normalized AbstractSettings API
  *

@@ -503,7 +503,7 @@ function antispambot($emailaddy, $mailto = 0) {
  *
  * @param string email address to check
  * @param string Format to use ('simple', 'rfc')
- *    'single':
+ *    'simple':
  *      Single email address.
  *    'rfc':
  *      Full email address, may include name (RFC2822)
@@ -652,7 +652,7 @@ function xmlrpc_displayresult( $result, $log = '', $display = true )
 		{
 			if( is_a( $display, 'log' ) )
 			{
-				$display->add( T_('Remote error').': '.$result->faultString().' ('.$result->faultCode(), 'error' );
+				$display->add( T_('Remote error').': '.$result->faultString().' ('.$result->faultCode().')', 'error' );
 			}
 			else
 			{
@@ -2169,6 +2169,9 @@ function is_create_action( $action )
 
 /*
  * $Log$
+ * Revision 1.115  2005/10/28 20:26:43  blueyed
+ * Handle failed update of antispam strings correctly.
+ *
  * Revision 1.114  2005/10/27 15:25:03  fplanque
  * Normalization; doc; comments.
  *
