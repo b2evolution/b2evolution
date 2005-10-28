@@ -52,7 +52,7 @@ $Form->begin_fieldset( T_('Upload options') );
 										T_('Allowed file extensions'),
 										T_('Seperated by space.' )
 										.' '.T_('Leave it empty to disable this check.')
-										.' '.sprintf( /* TRANS: %s gets replaced with an example setting */ T_('E.g. &laquo;%s&raquo;'), $Settings->getDefault( 'upload_allowedext' ) ),
+										.' '.sprintf( /* TRANS: %s gets replaced with an example setting */ T_('E.g. &laquo;%s&raquo;'), $Settings->get_default( 'upload_allowedext' ) ),
 										255 );
 	$Form->text( 'upload_maxkb',
 										$Settings->get('upload_maxkb'),

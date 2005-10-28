@@ -246,7 +246,7 @@ class Blog extends DataObject
 				if( $parvalue == 'default' )
 				{
 					$Settings->set('default_blog_ID', $this->ID);
-					$Settings->updateDB();
+					$Settings->dbupdate();
 				}
 			*/
 
@@ -425,7 +425,7 @@ class Blog extends DataObject
 
 					case 'custom':
 						return $this->media_url;
-						
+
 					case 'none':
 					default:
 						$Debuglog->add( 'Attempt to access blog media url, but this feature is disabled for this blog', 'files' );
@@ -810,6 +810,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2005/10/28 02:37:37  blueyed
+ * Normalized AbstractSettings API
+ *
  * Revision 1.34  2005/10/27 15:47:25  marian
  * Removed $_SERVER Variables for the multi-domain feature.
  *

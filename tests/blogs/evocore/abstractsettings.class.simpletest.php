@@ -58,7 +58,7 @@ class AbstractSettingsTestCase extends FilemanUnitTestCase
 		);
 
 		$this->TestSettings->load();
-		$this->assertEqual( 'abc', $this->TestSettings->getDefault( 'default_abc' ) );
+		$this->assertEqual( 'abc', $this->TestSettings->get_default( 'default_abc' ) );
 	}
 
 

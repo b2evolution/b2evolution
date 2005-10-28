@@ -86,9 +86,9 @@ switch( $action )
 			$phoneemail_separator = ':::';
 			*/
 
-			$Settings->deleteArray( array( 'eblog_enabled', 'eblog_method', 'eblog_server_host', 'eblog_server_port', 'eblog_username', 'eblog_password', 'eblog_default_category', 'eblog_subject_prefix','webhelp_enabled' ) );
+			$Settings->delete_array( array( 'eblog_enabled', 'eblog_method', 'eblog_server_host', 'eblog_server_port', 'eblog_username', 'eblog_password', 'eblog_default_category', 'eblog_subject_prefix','webhelp_enabled' ) );
 
-			if( $Settings->updateDB() )
+			if( $Settings->dbupdate() )
 			{
 				$Messages->add( T_('Restored default values.'), 'success' );
 			}
@@ -148,7 +148,7 @@ switch( $action )
 
 			if( ! $Messages->count('error') )
 			{
-				if( $Settings->updateDB() )
+				if( $Settings->dbupdate() )
 				{
 					$Messages->add( T_('Settings updated.'), 'success' );
 				}

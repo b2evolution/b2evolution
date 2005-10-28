@@ -86,7 +86,7 @@ class UserSettings extends AbstractSettings
 
 
 	/**
-	 * Temporarily sets a user setting ({@link updateDB()} writes it to DB)
+	 * Temporarily sets a user setting ({@link dbupdate()} writes it to DB)
 	 *
 	 * @param string name of setting
 	 * @param mixed new value
@@ -108,7 +108,7 @@ class UserSettings extends AbstractSettings
 
 
 	/**
-	 * Mark a setting for deletion ({@link updateDB()} writes it to DB).
+	 * Mark a setting for deletion ({@link dbupdate()} writes it to DB).
 	 *
 	 * @param string name of setting
 	 * @param integer User ID (by default $current_User->ID will be used)
@@ -128,6 +128,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.8  2005/10/28 02:37:37  blueyed
+ * Normalized AbstractSettings API
+ *
  * Revision 1.7  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

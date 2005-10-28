@@ -310,7 +310,7 @@ function antispam_poll_abuse( $display = true )
 					$Messages->add( T_('New latest update timestamp').': '.$endedat, 'note' );
 
 					$Settings->set( 'antispam_last_update', $endedat );
-					$Settings->updateDB();
+					$Settings->dbupdate();
 				}
 			}
 		}
@@ -327,6 +327,9 @@ function antispam_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.15  2005/10/28 02:37:37  blueyed
+ * Normalized AbstractSettings API
+ *
  * Revision 1.14  2005/09/19 14:13:03  fplanque
  * no message
  *

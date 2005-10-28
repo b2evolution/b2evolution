@@ -72,7 +72,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 			if( ! $Messages->count('error') )
 			{
 				locale_updateDB();
-				$Settings->updateDB();
+				$Settings->dbupdate();
 				$Messages->add( T_('Regional settings updated.'), 'success' );
 			}
 			break;
@@ -162,7 +162,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 
 			// reset default_locale
 			$Settings->set( 'default_locale', $default_locale );
-			$Settings->updateDB();
+			$Settings->dbupdate();
 
 			$Messages->add( T_('Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded.'), 'success' );
 			break;
@@ -392,6 +392,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.5  2005/10/28 02:37:37  blueyed
+ * Normalized AbstractSettings API
+ *
  * Revision 1.4  2005/10/15 22:23:40  blueyed
  * Beautified .po extraction
  *

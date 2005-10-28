@@ -146,7 +146,7 @@ class AbstractSettings
 	 * {@link $cacheByColKeys} - useful if you know that you want to get
 	 * all user settings for example.
 	 */
-	function loadAll()
+	function load_all()
 	{
 		return $this->load();
 	}
@@ -255,7 +255,7 @@ class AbstractSettings
 	/**
 	 * Get a setting from the DB settings table.
 	 *
-	 * @uses getDefault()
+	 * @uses get_default()
 	 * @param string $args,... the values for the column keys (depends on
 	 *                         $this->colKeyNames and must match its count and order)
 	 * @return string|false|NULL value as string on success;
@@ -286,7 +286,7 @@ class AbstractSettings
 				{
 					$r = $this->cache[ $args[0] ]->value;
 				}
-				elseif( NULL !== ($default = $this->getDefault( $args[0] )) )
+				elseif( NULL !== ($default = $this->get_default( $args[0] )) )
 				{
 					$r = $default;
 					$debugMsg .= '[DEFAULT]: ';
@@ -298,7 +298,7 @@ class AbstractSettings
 				{
 					$r = $this->cache[ $args[0] ][ $args[1] ]->value;
 				}
-				elseif( NULL !== ($default = $this->getDefault( $args[1] )) )
+				elseif( NULL !== ($default = $this->get_default( $args[1] )) )
 				{
 					$r = $default;
 					$debugMsg .= '[DEFAULT]: ';
@@ -310,7 +310,7 @@ class AbstractSettings
 				{
 					$r = $this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->value;
 				}
-				elseif( NULL !== ($default = $this->getDefault( $args[2] )) )
+				elseif( NULL !== ($default = $this->get_default( $args[2] )) )
 				{
 					$r = $default;
 					$debugMsg .= '[DEFAULT]: ';
@@ -330,7 +330,7 @@ class AbstractSettings
 	 * @param string The last column key
 	 * @return NULL|mixed NULL if no default is set, otherwise the value (should be string).
 	 */
-	function getDefault( $lastKey )
+	function get_default( $lastKey )
 	{
 		if( isset($this->_defaults[ $lastKey ]) )
 		{
@@ -370,7 +370,7 @@ class AbstractSettings
 
 
 	/**
-	 * Temporarily sets a setting ({@link updateDB()} writes it to DB).
+	 * Temporarily sets a setting ({@link dbupdate()} writes it to DB).
 	 *
 	 * @param string $args,... the values for the {@link $colKeyNames column keys}
 	 *                         and {@link $colValueName column value}. Must match order and count!
@@ -430,7 +430,7 @@ class AbstractSettings
 	 *
 	 * @param array Array of parameters for {@link set()}
 	 */
-	function setArray( $array )
+	function set_array( $array )
 	{
 		foreach( $array as $lSet )
 		{
@@ -477,7 +477,7 @@ class AbstractSettings
 	 *
 	 * @param array Array of parameters for {@link delete()}
 	 */
-	function deleteArray( $array )
+	function delete_array( $array )
 	{
 		foreach( $array as $lDel )
 		{
@@ -491,7 +491,7 @@ class AbstractSettings
 	 *
 	 * @return boolean true, if settings have been updated; false otherwise
 	 */
-	function updateDB()
+	function dbupdate()
 	{
 		if( !$this->cache )
 		{
@@ -589,6 +589,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.18  2005/10/28 02:37:37  blueyed
+ * Normalized AbstractSettings API
+ *
  * Revision 1.17  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

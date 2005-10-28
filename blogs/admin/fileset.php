@@ -59,7 +59,7 @@ switch( $action )
 
 		if( $submit == T_('Restore defaults') )
 		{
-			$Settings->deleteArray( array( 'fm_enabled',
+			$Settings->delete_array( array( 'fm_enabled',
 																			'fm_enable_roots_blog',
 																			// 'fm_enable_roots_group',
 																			'fm_enable_roots_user',
@@ -69,7 +69,7 @@ switch( $action )
 																			'upload_allowedext',
 																			'upload_maxkb',
 																			'regexp_filename' ) );
-			if( $Settings->updateDB() )
+			if( $Settings->dbupdate() )
 			{
 				$Messages->add( T_('Restored default values.'), 'success' );
 			}
@@ -117,7 +117,7 @@ switch( $action )
 
 			if( ! $Messages->count('error') )
 			{
-				if( $Settings->updateDB() )
+				if( $Settings->dbupdate() )
 				{
 					$Messages->add( T_('File settings updated.'), 'success' );
 				}

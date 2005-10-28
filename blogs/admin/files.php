@@ -123,7 +123,7 @@ if( $action == 'update_settings' )
 	$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
 	$UserSettings->set( 'fm_forceFM',          param( 'option_forceFM',          'integer', 0 ) );
 
-	if( $UserSettings->updateDB() )
+	if( $UserSettings->dbupdate() )
 	{
 		$Messages->add( T_('Your user settings have been updated.'), 'success' );
 	}
@@ -1265,6 +1265,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.119  2005/10/28 02:37:37  blueyed
+ * Normalized AbstractSettings API
+ *
  * Revision 1.118  2005/09/23 18:28:17  fplanque
  * no message
  *
