@@ -101,9 +101,9 @@ class Request
 	 * @param boolean Force setting of variable to default?
 	 * @return mixed Final value of Variable, or false if we don't force setting and did not set
 	 */
-	function param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
+	function param( $var, $type = '', $default = '', $memorize = false, $override = true, $forceset = true )
 	{
-    return $this->params[$var] = param( $var, $type, $default, $memorize, $override, $forceset );
+		return $this->params[$var] = param( $var, $type, $default, $memorize, $override, $forceset );
 	}
 
 	/**
@@ -578,6 +578,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.19  2005/10/28 22:24:22  blueyed
+ * DEfault to override for param(), because it handles requests and should not respect a previously set global with the same name. I know that this is bad, because the global param() function will override this global, but this is a design flaw, because the Request object should not handle globals.
+ *
  * Revision 1.18  2005/10/18 01:57:13  blueyed
  * param_check_date_format(): use failsafe pattern for PHP < 4.3.3; doc
  *
