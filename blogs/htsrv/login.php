@@ -137,7 +137,7 @@ switch( $action )
 																									'IP' => md5(serialize(getIpList())),
 																									'time' => $servertimenow ) ),
 																$ForgetfulUser->ID );
-						$UserSettings->updateDB();
+						$UserSettings->dbupdate();
 
 						$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'note' );
 					}
@@ -170,7 +170,7 @@ switch( $action )
 		$verifyData = $UserSettings->get( 'password_change_request', $ForgetfulUser->ID );
 		$UserSettings->delete( 'password_change_request', $ForgetfulUser->ID );
 
-		$UserSettings->updateDB();
+		$UserSettings->dbupdate();
 
 		if( !$verifyData
 				|| !($verifyData = unserialize($verifyData))
