@@ -124,10 +124,8 @@ function upgrade_b2evo_tables()
 	global $DB;
 	global $admin_url;
 
-	// used for defaults, when upgrading to 0.9.2
-	global $use_fileupload, $fileupload_allowedtypes, $fileupload_maxk,
-					$fileupload_minlevel, $fileupload_allowedusers,
-					$doubleCheckReferers;
+	// used for defaults, when upgrading to 1.6
+	global $use_fileupload, $fileupload_allowedtypes, $fileupload_maxk, $doubleCheckReferers;
 
 	// Check DB version:
 	check_db_version();
@@ -523,7 +521,7 @@ function upgrade_b2evo_tables()
 							ADD UNIQUE blog_urlname ( blog_urlname )";
 		$DB->query( $query );
 		echo "OK.<br />\n";
-		
+
 		echo 'Updating relative URLs... ';
 		// We need to move the slashes to the end:
 		$query = "UPDATE T_blogs
@@ -538,7 +536,7 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
-		
+
 		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE T_posts
 							DROP COLUMN post_karma,
@@ -578,7 +576,7 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
-		
+
 		echo 'Upgrading users table... ';
 		$query = 'ALTER TABLE T_users
 							CHANGE COLUMN ID user_ID int(11) unsigned NOT NULL auto_increment,
@@ -587,7 +585,7 @@ function upgrade_b2evo_tables()
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
-		
+
 		echo 'Setting new defaults... ';
 		$query = 'INSERT INTO T_settings (set_name, set_value)
 							VALUES
@@ -621,14 +619,14 @@ function upgrade_b2evo_tables()
 									MODIFY COLUMN comment_post_ID		int(11) unsigned NOT NULL default '0'" );
 		echo "OK.<br />\n";
 
-		
+
 		echo 'Altering Posts to Categories table... ';
 		$DB->query( "ALTER TABLE T_postcats
 									MODIFY COLUMN postcat_post_ID int(11) unsigned NOT NULL,
 									MODIFY COLUMN postcat_cat_ID int(11) unsigned NOT NULL" );
 		echo "OK.<br />\n";
 
-		
+
 		echo 'Altering Categories table... ';
 		$DB->query( "ALTER TABLE T_categories
 									MODIFY COLUMN cat_ID int(11) unsigned NOT NULL auto_increment,
@@ -676,6 +674,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.109  2005/10/28 22:33:54  blueyed
+ * Removed not used globals for upgrade to 1.6
+ *
  * Revision 1.108  2005/10/07 19:34:49  fplanque
  * no message
  *
