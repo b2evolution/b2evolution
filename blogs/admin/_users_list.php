@@ -47,7 +47,7 @@ if( !empty( $filteron ) )
 	foreach ($afilter as $sfilter)
 	{
 
-		$swhere .= 'concat(user_login, user_firstname, user_lastname, user_nickname, user_email) like "%' . $DB->escape($sfilter) . '%" and ';
+		$swhere .= 'concat(user_login, \' \', user_firstname, \' \', user_lastname, \' \', user_nickname, \' \', user_email) like "%' . $DB->escape($sfilter) . '%" and ';
 	}
 	$sql = "SELECT T_users.*, grp_ID, grp_name
 					FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
@@ -212,6 +212,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.52  2005/10/28 21:02:00  fplanque
+ * prevent filter matches on loginfirstname for example
+ *
  * Revision 1.51  2005/10/27 15:25:03  fplanque
  * Normalization; doc; comments.
  *
