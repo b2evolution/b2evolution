@@ -19,17 +19,9 @@ class DbUnitTestCase extends EvoUnitTestCase
 	 */
 	function DbUnitTestCase()
 	{
-		global $testDB_conf, $db_aliases;
+		global $testDB_conf;
 
-		$this->DB =& new DB( $testDB_conf['DB_USER'],
-													$testDB_conf['DB_PASSWORD'],
-													$testDB_conf['DB_NAME'],
-													$testDB_conf['DB_HOST'],
-													$db_aliases,
-													true, 
-													$testDB_conf['db_table_options'],
-													true // halt_on_error
-												);
+		$this->DB =& new DB( $testDB_conf );
 	}
 
 
@@ -53,21 +45,17 @@ class DbUnitTestCase extends EvoUnitTestCase
 
 
 	/**
-	 * DROPS all tables in the test DB that might be there.
+	 * DROPS all tables in the test DB that might be there from previous tests.
 	 */
 	function dropTestDbTables()
 	{
-		$testDbTables = array( 'T_antispam', 'T_hitlog', 'T_comments', 'T_postcats',
-														'T_links', 'T_files', 'T_posts', 'T_categories',
-														'T_poststatuses', 'T_posttypes', 'T_usersettings',
-														'T_sessions', 'T_coll_user_perms', 'T_users', 'T_groups',
-														'T_blogs', 'T_settings', 'T_locales', 'T_usersettings',
-														'T_plugins' );
+		global $EvoConfig;
 
-		foreach( $testDbTables as $lTableName )
-		{
-			$this->DB->query( 'DROP TABLE IF EXISTS '.$lTableName );
-		}
+		$testDbTables = array_keys($EvoConfig->DB['aliases']);
+
+		$drop_query = 'DROP TABLE IF EXISTS '.implode( ', ', $testDbTables );
+
+		$this->DB->query( $drop_query );
 	}
 
 

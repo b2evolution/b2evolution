@@ -1,6 +1,6 @@
 <?php
 /**
-* Tests for upgrading to b2 0.9.2.
+ * Tests for upgrading to b2 0.9.2, a.k.a 1.6 "Phoenix".
  */
 
 /**
@@ -20,7 +20,7 @@ class UpgradeTo092TestCase extends InstallUnitTestCase
 {
 	function UpgradeTo092TestCase()
 	{
-		$this->InstallUnitTestCase( 'Upgrade to 0.9.2 tests' );
+		$this->InstallUnitTestCase( 'Upgrade to version 1.6 tests' );
 	}
 
 
@@ -32,7 +32,8 @@ class UpgradeTo092TestCase extends InstallUnitTestCase
 
 	function tearDown()
 	{
-		// $this->assertEqual( '8070', $this->DB->get_var('SELECT set_value FROM T_settings WHERE set_name = "db_version"') );
+		$this->assertEqual( '9000', $this->DB->get_var('SELECT set_value FROM T_settings WHERE set_name = "db_version"') );
+		$this->dropTestDbTables();
 	}
 
 
@@ -45,6 +46,7 @@ class UpgradeTo092TestCase extends InstallUnitTestCase
 
 		require_once( EVODIR.'blogs/install/_functions_evoupgrade.php' );
 
+		$GLOBALS['DB'] = $this->DB;
 		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 0.9.0.11 to 0.9.2 successful!' );
 	}
 }
