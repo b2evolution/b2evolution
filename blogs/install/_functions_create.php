@@ -1101,9 +1101,9 @@ function create_b2evo_tables_phoenix()
  */
 function create_b2evo_relations()
 {
-	global $DB, $db_use_fkeys;
+	global $DB;
 
-	if( !$db_use_fkeys )
+	if( !$DB->use_fkeys )
 		return false;
 
 	echo 'Creating relations... ';
@@ -1270,6 +1270,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.148  2005/10/29 21:00:01  blueyed
+ * Moved $db_use_fkeys to $EvoConfig->DB['use_fkeys'].
+ *
  * Revision 1.147  2005/10/27 00:11:12  mfollett
  * fixed my own error which would disallow installation because of an extra comma in the create table for the sessions table
  *

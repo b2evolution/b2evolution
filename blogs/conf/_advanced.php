@@ -249,9 +249,9 @@ $EvoConfig->DB['use_transactions'] = false;
  * Typically requires InnoDB to be set in $EvoConfig->DB['table_options'].
  * This is used during table CREATION only.
  *
- * @global boolean $db_use_fkeys
+ * Default: false
  */
-$db_use_fkeys = false;
+$EvoConfig->DB['use_fkeys'] = false;
 
 
 // ** Saving bandwidth **
