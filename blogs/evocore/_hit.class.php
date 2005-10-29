@@ -386,6 +386,7 @@ class Hit
 	 *
 	 * This function should be called at the end of the page, otherwise if the page
 	 * is displaying previous hits, it may display the current one too.
+	 *
 	 * The hit will not be logged in special occasions, see {@link is_new_view()} and {@link is_good_hit()}.
 	 */
 	function log()
@@ -477,6 +478,8 @@ class Hit
 	 * On success, this methods records the hit.
 	 *
 	 * NOTE: when used as PHP shutdown_function all output has been sent already!
+	 *
+	 * TODO: use DB cache to avoid checking the same page again and again!
 	 *
 	 * @uses _record_the_hit()
 	 */
