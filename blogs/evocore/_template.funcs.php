@@ -139,8 +139,10 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 					$cat_names = array();
 					foreach( $cat_array as $cat_ID )
 					{
-						$my_cat = get_the_category_by_ID($cat_ID);
-						$cat_names[] = $my_cat['cat_name'];
+						if( ($my_cat = get_the_category_by_ID( $cat_ID, false ) ) !== false )
+						{ // It is almost never meaningful to die over an invalid cat when generating title
+							$cat_names[] = $my_cat['cat_name'];
+						}
 					}
 					if( $cat_modifier == '*' )
 					{
@@ -308,6 +310,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.12  2005/10/29 20:49:39  matthiasmiller
+ * An invalid category previously resulted in either a blank page (with the error indicated in the title) or an incorrectly formed feed. It is almost never meaningful to die over an invalid category when generating a title.
+ *
  * Revision 1.11  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
