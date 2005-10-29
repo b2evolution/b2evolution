@@ -82,6 +82,10 @@ class Request
 	 * Also forces type.
 	 * Priority order: POST, GET, COOKIE, DEFAULT.
 	 *
+	 * @todo Respect $forceset (not setting $this->params[$var], when !$forceset
+	 * @todo A previous set global should not be used as default ($override) (because this is "Request").
+	 * @todo With register_globals on there will be no sanitizing of the param!
+	 *
 	 * @param string Variable to set
 	 * @param string Force value type to one of:
 	 * - integer
@@ -101,7 +105,7 @@ class Request
 	 * @param boolean Force setting of variable to default?
 	 * @return mixed Final value of Variable, or false if we don't force setting and did not set
 	 */
-	function param( $var, $type = '', $default = '', $memorize = false, $override = true, $forceset = true )
+	function param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
 	{
 		return $this->params[$var] = param( $var, $type, $default, $memorize, $override, $forceset );
 	}
@@ -578,6 +582,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.20  2005/10/29 18:23:25  blueyed
+ * Rollback changed default of $override; added todos.
+ *
  * Revision 1.19  2005/10/28 22:24:22  blueyed
  * DEfault to override for param(), because it handles requests and should not respect a previously set global with the same name. I know that this is bad, because the global param() function will override this global, but this is a design flaw, because the Request object should not handle globals.
  *
