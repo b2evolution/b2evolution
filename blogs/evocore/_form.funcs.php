@@ -145,6 +145,10 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 	if( $field_maxlength == 0 )
 		$field_maxlength = $field_size;
 
+	// question: is it necessary to enclose each field in a fieldset.
+	// shouldn't there be a fieldset for a set of field (i.e. all fields
+	// in the form)?
+
 	$r = "<fieldset>\n"
 			.'<div class="label"><label for="'.$field_name.'">'.$field_label.":</label></div>\n"
 			.'<div class="input"><input type="'.$inputtype.'" name="'.$field_name
@@ -549,6 +553,10 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.14  2005/10/30 10:44:23  marian
+ * changes regarding multi-domain
+ * question about fieldset for each form-field
+ *
  * Revision 1.13  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
