@@ -141,6 +141,7 @@ switch( $action )
 			$Request->param( 'eblog_phonemail_separator', 'string', true );
 			$Settings->set( 'eblog_phonemail_separator', trim($eblog_phonemail_separator) );
 
+
 			// Statistics
 			$Request->param( 'hit_doublecheck_referer', 'integer', 0 );
 			$Settings->set( 'hit_doublecheck_referer', $hit_doublecheck_referer );
@@ -157,11 +158,10 @@ switch( $action )
 					$Messages->add( T_('Settings have not changed.'), 'note' );
 				}
 			}
-
 		}
-
 		break;
 }
+
 
 /**
  * Display page header:

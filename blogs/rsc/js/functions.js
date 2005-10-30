@@ -62,7 +62,7 @@ function addEvent( elm, evType, fn, useCapture )
 		elm['on'+evType] = fn;
 	}
 }
- 
+
 
 /**
  * Opens a window and makes sure it gets focus.
@@ -90,11 +90,37 @@ function pop_up_window( href, target, params )
 }
 
 
+/**
+ * Shows/Hides target_id, and updates text_id object with either
+ * text_when_displayed or text_when_hidden.
+ *
+ * It simply uses the value of the elements display attribute and toggles it.
+ *
+ * @return false
+ */
+function toggle_display_by_id( text_id, target_id, text_when_displayed, text_when_hidden )
+{
+	if( document.getElementById(target_id).style.display=="" )
+	{
+		document.getElementById( text_id ).innerHTML = text_when_hidden;
+		document.getElementById( target_id ).style.display="none";
+	}
+	else
+	{
+		document.getElementById( text_id ).innerHTML = text_when_displayed;
+		document.getElementById( target_id ).style.display="";
+	}
+	return false;
+}
+
 
 /**
  * Open or close a clickopen area (by use of CSS style).
  *
- * @param string id des Menus
+ * You have to define a div with id clickdiv_<ID> and a img with clickimg_<ID>,
+ * where <ID> is the first param to the function.
+ *
+ * @param string html id of the element to toggle
  * @param string CSS display property to use when visible ('inline', 'block')
  * @return false
  */

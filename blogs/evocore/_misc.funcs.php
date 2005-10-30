@@ -33,6 +33,8 @@
  *
  * @package evocore
  *
+ * @todo Refactor into smaller chunks/files. We should avoid using a "huge" misc early!
+ *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author cafelog (team)
  * @author blueyed: Daniel HAHLER.
@@ -2167,8 +2169,66 @@ function is_create_action( $action )
 }
 
 
+/**
+ * Generate a link that toggles display of an element on clicking.
+ *
+ * @todo Provide functionality to make those links accessible without JS (using GET parameter)
+ * @uses toggle_display_by_id() (JS)
+ * @param string ID (html) of the link
+ * @param string ID (html) of the target to toggle displaying
+ * @return string
+ */
+function get_link_showhide( $link_id, $target_id, $text_when_displayed, $text_when_hidden, $display_hidden = true )
+{
+	$html = "<a id='$link_id' href='#' onclick='return toggle_display_by_id(\"$link_id\",\"$target_id\",\"".str_replace( '"', '\"', $text_when_displayed ).'","'.str_replace( '"', '\"', $text_when_hidden ).'")\'>'
+		.( $display_hidden ? $text_when_hidden : $text_when_displayed )
+		.'</a>';
+
+	return $html;
+}
+
+
+/**
+ * Generate a link to a online help resource.
+ * testing the concept of online help (aka webhelp).
+ * this function should be relocated somewhere better if it is taken onboard by the project
+ *
+ * @todo replace [?] with icon,
+ * @todo write url suffix dynamically based on topic and language
+ * @todo discuss with Francois where on his server the docco can go ;)
+ *       blueyed>> The URL below (http://manual.b2evolution.net/redirect/) is not installed yet.
+ *
+ * QUESTION: launch new window with javascript maybe?
+ * @param string Topic
+ *        The topic should be in a format like [\w]+(/[\w]+)*, e.g features/online_help.
+ * @return string
+ */
+function get_web_help_link( $topic )
+{
+	global $Settings, $current_locale, $app_shortname, $app_version;
+
+	if( $Settings->get('webhelp_enabled') )
+	{
+		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/'.$topic
+			.'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version.'">[?]</a>';
+
+		return $webhelp_link;
+	}
+	else
+	{
+		return '';
+	}
+
+}
+
+
 /*
  * $Log$
+ * Revision 1.116  2005/10/30 03:51:24  blueyed
+ * Refactored showhide-JS functionality.
+ * Moved showhide() from the features form to functions.js, and renamed to toggle_display_by_id();
+ * Moved web_help_link() to get_web_help_link() in _misc.funcs.php, doc
+ *
  * Revision 1.115  2005/10/28 20:26:43  blueyed
  * Handle failed update of antispam strings correctly.
  *

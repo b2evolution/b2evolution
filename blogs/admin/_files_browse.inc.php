@@ -810,14 +810,9 @@ $options_Form = & new Form( 'files.php#FM_anchor', 'options_form', 'get', 'none'
 	echo $Fileman->getFormHiddenInputs();
 
 	// Link to toggle the display of the form
-	$toggle_link = '[<a id="options_toggle" href="'
-		.url_add_param( $Fileman->getCurUrl(), ( !$options_show ?
-																									'options_show=1' :
-																									'' ) )
-		.'" onclick="return toggle_options();">'.( $options_show ? T_('Hide') : T_('Show') ).'</a>]';
+	$toggle_link = '['.get_link_showhide( 'options_toggle', 'options_list', T_('Hide menu'), T_('Show menu'), !$options_show ).']';
 
 	$options_Form->begin_fieldset( T_('Options').$toggle_link );
-
 	?>
 
 	<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
@@ -838,35 +833,6 @@ $options_Form = & new Form( 'files.php#FM_anchor', 'options_form', 'get', 'none'
 $options_Form->end_form();
 ?>
 
-<script type="text/javascript">
-<!--
-	showoptions = <?php echo ($options_show) ? 'true' : 'false' ?>;
-
-	/**
-	 * Toggles the display of the filemanager options.
-	 */
-	function toggle_options()
-	{
-		if( showoptions )
-		{
-			var replace = document.createTextNode('<?php echo TS_('Show') ?>');
-			var display_list = 'none';
-			showoptions = false;
-		}
-		else
-		{
-			var replace = document.createTextNode('<?php echo TS_('Hide') ?>');
-			var display_list = 'inline';
-			showoptions = true;
-		}
-		document.getElementById('options_list').style.display = display_list;
-		document.getElementById('options_toggle').replaceChild(replace, document.getElementById( 'options_toggle' ).firstChild);
-		return false;
-	}
-// -->
-</script>
-
-
 </div>
 
 <div class="clear"></div>
@@ -877,6 +843,11 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.42  2005/10/30 03:51:24  blueyed
+ * Refactored showhide-JS functionality.
+ * Moved showhide() from the features form to functions.js, and renamed to toggle_display_by_id();
+ * Moved web_help_link() to get_web_help_link() in _misc.funcs.php, doc
+ *
  * Revision 1.41  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *
