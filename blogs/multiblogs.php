@@ -41,29 +41,33 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
-<!-- InstanceBeginEditable name="doctitle" -->
-<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-<title>Multiblog demo<?php request_title( ' - ', '', ' - ', 'htmlhead' ) ?></title>
-<!-- InstanceEndEditable -->
-<!-- InstanceBeginEditable name="head" -->
-<base href="<?php skinbase(); // You're not using any skin here but this won't hurt. However it will be very helpfull to have this here when you make the switch to a skin! ?>" />
-<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
-<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
-<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
-<link rel="alternate" type="text/xml" title="RDF" href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>" />
-<link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>" />
-<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
-<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
-<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
-<!-- InstanceEndEditable -->
-<link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
+	<!-- InstanceBeginEditable name="doctitle" -->
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<title>Multiblog demo<?php request_title( ' - ', '', ' - ', 'htmlhead' ) ?></title>
+	<!-- InstanceEndEditable -->
+	<!-- InstanceBeginEditable name="head" -->
+
+	<base href="<?php
+		// You're not using any skin here but this won't hurt. However it will be very helpfull to have this here when you make the switch to a skin!
+		skinbase(); ?>" />
+	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
+	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
+	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
+	<link rel="alternate" type="text/xml" title="RDF" href="<?php $Blog->disp( 'rdf_url', 'raw' ) ?>" />
+	<link rel="alternate" type="text/xml" title="RSS .92" href="<?php $Blog->disp( 'rss_url', 'raw' ) ?>" />
+	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
+	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
+	<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
+	<!-- InstanceEndEditable -->
+	<link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 </head>
 <body>
 <div class="pageHeader">
-<div class="pageHeaderContent">
+	<div class="pageHeaderContent">
 
-<!-- InstanceBeginEditable name="NavBar2" -->
-<?php // --------------------------- BLOG LIST INCLUDED HERE -----------------------------
+	<!-- InstanceBeginEditable name="NavBar2" -->
+	<?php
+	// --------------------------- BLOG LIST INCLUDED HERE -----------------------------
 	# this is what will start and end your blog links
 	$blog_list_start = '<div class="NavBar">';
 	$blog_list_end = '</div>';
@@ -82,19 +86,19 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 	$blog_other_name_after = '</span>';
 	// Include the bloglist
 	require get_path('skins').'_bloglist.php';
-	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
-<!-- InstanceEndEditable -->
+	// ---------------------------------- END OF BLOG LIST ---------------------------------
+	?>
+	<!-- InstanceEndEditable -->
 
-<div class="NavBar">
-<div id="Logo">&nbsp;</div>
-<div class="pageTitle">
-<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php echo T_('Multiblog demo') ?><!-- InstanceEndEditable --></h1>
-</div>
-</div>
+	<div class="NavBar">
+		<div id="Logo">&nbsp;</div>
+		<div class="pageTitle">
+			<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php echo T_('Multiblog demo') ?><!-- InstanceEndEditable --></h1>
+			</div>
+		</div>
 
-<div class="pageHeaderEnd"></div>
-
-</div>
+		<div class="pageHeaderEnd"></div>
+	</div>
 </div>
 
 
@@ -114,8 +118,9 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 
 	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
-	$MainList->date_if_changed();
-	?>
+		$MainList->date_if_changed();
+		?>
+
 	<div class="bPost" lang="<?php $Item->lang() ?>">
 		<?php $Item->anchor(); ?>
 		<div class="bSmallHead">
@@ -128,27 +133,40 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 			<?php link_pages() ?>
 		</div>
 		<div class="bSmallPrint">
-			<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) // Link to comments ?>
-			<?php $Item->feedback_link( 'trackbacks', '', ' &bull; ' ) // Link to trackbacks ?>
-			<?php $Item->feedback_link( 'pingbacks', '', ' &bull; ' ) // Link to trackbacks ?>
+			<?php
+			// Link to comments:
+			$Item->feedback_link( 'comments', '', ' &bull; ' ) ?>
+			<?php
+			// Link to trackbacks:
+			$Item->feedback_link( 'trackbacks', '', ' &bull; ' ) 	?>
+			<?php
+			// Link to trackbacks
+			$Item->feedback_link( 'pingbacks', '', ' &bull; ' ) ?>
 
-			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+			<?php
+			// trackback autodiscovery information
+			$Item->trackback_rdf() ?>
 
 			<a href="<?php $Item->permalink() ?>" title="Permanent link to full entry"><?php echo T_('Permalink') ?></a>
 		</div>
-		<?php // ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
-		$disp_comments = 1;					// Display the comments if requested
-		$disp_comment_form = 1;			// Display the comments form if comments requested
-		$disp_trackbacks = 1;				// Display the trackbacks if requested
 
-		$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-		$disp_pingbacks = 1;				// Display the pingbacks if requested
+		<?php
+		// ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
+		$disp_comments = 1;          // Display the comments if requested
+		$disp_comment_form = 1;      // Display the comments form if comments requested
+		$disp_trackbacks = 1;        // Display the trackbacks if requested
+
+		$disp_trackback_url = 1;   // Disp  lay the trackbal URL if trackbacks requested
+		$disp_pingbacks = 1;       // Disp  lay the pingbacks if requested
 		require get_path('skins').'_feedback.php';
-		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ------------------- ?>
+		// ------------------- END OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------------
+		?>
 	</div>
-<?php } // ---------------------------------- END OF POSTS ------------------------------------ ?>
+<?php
+	} // ---------------------------------- END OF POSTS ------------------------------------
+?>
 
-	<p class="center"><strong><?php posts_nav_link(); ?></strong></p>
+<p class="center"><strong><?php posts_nav_link(); ?></strong></p>
 
 <?php // ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
 	switch( $disp )
@@ -172,9 +190,9 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 			// this includes the subscription form if requested
 			require get_path('skins').'/_subscriptions.php';
 			break;
-
 	}
-// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
+// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. -------------------
+?>
 </div>
 
 <!-- =================================== START OF SIDEBAR =================================== -->
@@ -184,14 +202,15 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 	<!-- =================================== START OF BLOG B =================================== -->
 
 	<div class="bSideItem">
-	<?php
+		<?php
 		// Dirty trick until we get everything into objects:
 		$saved_blog = $blog;
 		$blog = 3;	// Blog B now
-		$Blog_B = Blog_get_by_ID( 3 );	// Blog B
-	?>
+		$Blog_B = $BlogCache->get_by_ID( 3 ); // Blog B
+		?>
+
 		<h3>#2: <a href="<?php $Blog_B->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_B->disp( 'name', 'htmlbody' ) ?></a></h3>
-	<?php
+		<?php
 		// You can restrict to specific categories by listing them in the two params below: '', array()
 		// '', array(9,15) will restrict to cats 9 and 15
 		// '9,15', array() will restrict to cats 9,15 and all their subcats
@@ -199,74 +218,74 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 
 		while( $Item = $BlogBList->get_item() )
 		{
-		?>
-		<div class="bPostSide" lang="<?php $Item->lang() ?>">
-			<?php $Item->anchor(); ?>
+			?>
+			<div class="bPostSide" lang="<?php $Item->lang() ?>">
+				<?php $Item->anchor(); ?>
 
-			<h3 class="bTitle"><a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php $Item->title(); ?></h3>
-			<div class="bText">
-				<?php $Item->content( 1, false ); ?>
-				<?php link_pages() ?>
+				<h3 class="bTitle"><a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php $Item->title(); ?></h3>
+				<div class="bText">
+					<?php $Item->content( 1, false ); ?>
+					<?php link_pages() ?>
+				</div>
 			</div>
-		</div>
-		<?php
+			<?php
 		}
 
 		// Restore after dirty trick:
 		$blog = $saved_blog;
-	?>
+		?>
 	</div>
 
 	<!-- =================================== START OF BLOG C =================================== -->
 
 	<div class="bSideItem">
-	<?php
+		<?php
 		// Dirty trick until we get everything into objects:
 		$saved_blog = $blog;
 		$blog = 4;		// Linkblog now
 		$Blog_roll = Blog_get_by_ID( 4 ); // Blog roll
-	?>
+		?>
 		<h3>#3: <a href="<?php $Blog_roll->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_roll->disp( 'name', 'htmlbody' ) ?></a></h3>
-	<?php
+		<?php
 		// You can restrict to specific categories by listing them in the two params below: '', array()
 		// '', array(9,15) will restrict to cats 9 and 15
 		// '9,15', array() will restrict to cats 9,15 and all their subcats
+
 		$LinkblogList = & new ItemList( $blog,	$show_statuses, '', $m, $w, '', array(), $author, $order, $orderby, $posts, '', '', '', '', '', '', '', $unit, $timestamp_min, $timestamp_max );
 
 		while( $Item = $LinkblogList->get_item() )
 		{
-?>
-		<div class="bPostSide" lang="<?php $Item->lang() ?>">
-			<?php $Item->anchor(); ?>
+			?>
+			<div class="bPostSide" lang="<?php $Item->lang() ?>">
+				<?php $Item->anchor(); ?>
 
-			<h3 class="bTitle"><a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php $Item->title(); ?></h3>
-			<div class="bText">
-				<?php $Item->content( 1, false ); ?>
-				<?php link_pages() ?>
+				<h3 class="bTitle"><a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php $Item->title(); ?></h3>
+				<div class="bText">
+					<?php $Item->content( 1, false ); ?>
+					<?php link_pages() ?>
+				</div>
 			</div>
-		</div>
-		<?php
+			<?php
 		}
 
 		// Restore after dirty trick:
 		$blog = $saved_blog;
-	?>
+		?>
 	</div>
 
 	<!-- =================================== END OF BLOG C =================================== -->
-
 
 	<div class="bSideItem">
 		<h3><?php echo T_('Misc') ?></h3>
 		<ul>
 			<?php
-				// Administrative links:
-				user_login_link( '<li>', '</li>' );
-				user_register_link( '<li>', '</li>' );
-				user_admin_link( '<li>', '</li>' );
-				user_profile_link( '<li>', '</li>' );
-				user_subs_link( '<li>', '</li>' );
-				user_logout_link( '<li>', '</li>' );
+			// Administrative links:
+			user_login_link( '<li>', '</li>' );
+			user_register_link( '<li>', '</li>' );
+			user_admin_link( '<li>', '</li>' );
+			user_profile_link( '<li>', '</li>' );
+			user_subs_link( '<li>', '</li>' );
+			user_logout_link( '<li>', '</li>' );
 			?>
 		</ul>
 	</div>
@@ -277,32 +296,33 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 </div>
 <!-- InstanceEndEditable --></div>
 <table cellspacing="3" class="wide">
-  <tr>
-  <td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
+	<tr>
+	<td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
 
 	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
-  </tr>
+	</tr>
 </table>
+
 <p class="baseline">
-
 	<a href="http://validator.w3.org/check/referer"><img style="border:0;width:88px;height:31px" src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" class="middle" /></a>
-
 	<a href="http://jigsaw.w3.org/css-validator/"><img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!" class="middle" /></a>
-
-	<?php if( isset($Blog) )
-	{ ?>
-
-	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
-
-	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
-
-	<?php } ?>
+	<?php
+	if( isset($Blog) )
+	{
+		?>
+		<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
+		<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
+		<?php
+	}
+	?>
 
 	&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
+
+	<!-- InstanceEndEditable -->
+</p>
 <?php
-	$Hit->log();  // log the hit on this page
-	debug_info(); // output debug info if requested
+$Hit->log();  // log the hit on this page
+debug_info(); // output debug info if requested
 ?>
-<!-- InstanceEndEditable --></p>
 </body>
 <!-- InstanceEnd --></html>
