@@ -35,12 +35,12 @@ $Form->begin_form( 'fform', T_('Global Features') );
 
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
-$Form->begin_fieldset( T_('Online Help') . web_help_link('features/online_help'));
+$Form->begin_fieldset( T_('Online Help') . get_web_help_link('online help'));
 	$Form->checkbox_input( 'webhelp_enabled', $Settings->get('webhelp_enabled'), T_('Enable Online Help links'), array( 'note' => T_('Online help links provide context sensitive help to certain features.' ) ) );
 $Form->end_fieldset();
 
 // --------------------------------------------
-$Form->begin_fieldset( T_('Blog by email') . web_help_link('features/blog_by_email') );
+$Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') );
 
 	$Form->checkbox_input( 'eblog_enabled', $Settings->get('eblog_enabled'), T_('Enable Blog by email'),
 		array( 'note' => T_('Check to enable the Blog by email feature.' ), 'onclick' => 'this.checked==true?document.getElementById("eblog_section").style.display="":document.getElementById("eblog_section").style.display="none";' ) );

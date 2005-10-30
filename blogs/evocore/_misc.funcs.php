@@ -2209,8 +2209,11 @@ function get_web_help_link( $topic )
 
 	if( $Settings->get('webhelp_enabled') )
 	{
-		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/'.$topic
-			.'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version.'">[?]</a>';
+		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/help.php/'.str_replace(" ","_",strtolower($topic))
+							.'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version.'">[?]</a>';
+
+//		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/'.$topic
+//			.'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version.'">[?]</a>';
 
 		return $webhelp_link;
 	}
@@ -2224,6 +2227,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.117  2005/10/30 05:28:30  halton
+ * updated get_web_help_link code to point to server
+ *
  * Revision 1.116  2005/10/30 03:51:24  blueyed
  * Refactored showhide-JS functionality.
  * Moved showhide() from the features form to functions.js, and renamed to toggle_display_by_id();
