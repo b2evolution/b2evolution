@@ -127,11 +127,11 @@ if( empty($disp) )
 
 if( $disp == 'stats' )
 {
- 	require dirname(__FILE__).'/_410_stats_gone.page.php';	// error & exit
+	require dirname(__FILE__).'/_410_stats_gone.page.php'; // error & exit
 }
 
 // Getting current blog info:
-$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
+$Blog = Blog_get_by_ID( $blog ); /* TODO: TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 
 // Activate matching locale:
 $Debuglog->add( 'Activating blog locale: '.$Blog->get('locale'), 'locale' );
@@ -176,7 +176,7 @@ if( $resolve_extra_path )
 		$path_error = 0;
 		$i=0;
 		// echo $path_elements[$i];
-		if( isset( $path_elements[$i] ) && preg_match( '#.+\.php[0-9]?#', $path_elements[$i] ) )
+		if( isset( $path_elements[$i] ) && preg_match( '#.+\.php[0-9]?#', $path_elements[$i] ) ) // QUESTION: add "$" at the end of the pattern to avoid false matches?
 		{ // Ignore *.php
 			$i++;
 			$Debuglog->add( 'Ignoring *.php in extra path info' , 'params' );
@@ -242,7 +242,7 @@ if( $resolve_extra_path )
 
 		if( $path_error == 404 )
 		{	// The request points to something we won't be able to resolve:
-	   	require dirname(__FILE__).'/_404_not_found.page.php';	// error & exit
+			require dirname(__FILE__).'/_404_not_found.page.php'; // error & exit
 		}
 	}
 }
@@ -271,16 +271,17 @@ if( ($disp == 'posts') || ($disp == 'single') )
 		if( ($Item !== false) && ($Item->blog_ID != $blog) )
 		{ // We're on the wrong blog (probably an old permalink) let's redirect
 			$new_permalink = $Item->gen_permalink( '', '', false, '&' );
-      # echo $new_permalink;
+
 			header ("Location: $new_permalink");
 			exit();
 		}
 	}
 
 	// Note: even if we request the same post, the following will do more restrictions (dates, etc.)
-	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
-															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
-															$preview, $unit, $timestamp_min, $timestamp_max, $title, $dstart );
+	$MainList = & new ItemList(
+		$blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
+		$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
+		$preview, $unit, $timestamp_min, $timestamp_max, $title, $dstart );
 
 	// $posts_per_page = $MainList->posts_per_page;
 	// $result = & $MainList->result;
@@ -311,13 +312,13 @@ if( !isset( $skin ) )
 { // No skin forced in stub (not even '' for no-skin)...
 
 	// We're going to need a default skin:
-	if(  ( !isset( $default_skin ) ) 					// No default skin forced in stub
-		|| ( !skin_exists( $default_skin ) ) )	// Or the forced default does not exist
-	{ // Use default from the datatabse
+	if(  ( !isset( $default_skin ) )          // No default skin forced in stub
+		|| ( !skin_exists( $default_skin ) ) )  // Or the forced default does not exist
+	{ // Use default from the datatbase
 		$default_skin = $Blog->get('default_skin');
 	}
 
-	if( !skin_exists( $default_skin )	|| empty( $default_skin ) )
+	if( !skin_exists( $default_skin ) || empty( $default_skin ) )
 	{ // blog's default skin does not exist
 		// Because a lot of bloggers will set themseleves a cookie and delete the default skin,
 		// we have to make this fool proof extra checking!
@@ -389,7 +390,7 @@ else
 
 // TODO: fplanque>>jwedgeco: I think these should actually go into evocore/_main.php near the code that instanciates all those xxxCache objects.
 //global $use_memcached, $memcache, $memcache_expire;
-if ( $use_memcached ) 
+if ( $use_memcached )
 {
 	$response = $memcache->set( 'BlogCache' , $BlogCache );
 	$response = $memcache->set( 'GroupCache' , $GroupCache );
@@ -397,11 +398,14 @@ if ( $use_memcached )
 	$response = $memcache->set( 'itemTypeCache' , $itemTypeCache );
 	$response = $memcache->set( 'itemStatusCache' , $itemStatusCache );
 	$response = $memcache->set( 'LinkCache' , $LinkCache );
-	$response = $memcache->set( 'UserCache' , $UserCache );	
+	$response = $memcache->set( 'UserCache' , $UserCache );
 }
 
 /*
  * $Log$
+ * Revision 1.22  2005/10/30 03:47:43  blueyed
+ * todo, question, indent
+ *
  * Revision 1.21  2005/10/27 15:25:03  fplanque
  * Normalization; doc; comments.
  *
