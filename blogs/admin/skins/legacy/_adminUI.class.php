@@ -90,29 +90,31 @@ class AdminUI extends AdminUI_general
 
 
 	/**
-	 * Get links (to CSS files especially).
+	 * Get HTML head lines, links (to CSS files especially).
+	 *
+	 * @return string Calls parent::get_headlines()
 	 */
-	function get_head_links()
+	function get_headlines()
 	{
 		global $mode, $rsc_url;
 
-		$r ='<link href="skins/legacy/rsc/css/variation.css" rel="stylesheet" type="text/css" title="Variation" />
-				<link href="skins/legacy/rsc/css/desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
-				<link href="skins/legacy/rsc/css/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />';
+		$this->headlines[] = '<link href="skins/legacy/rsc/css/variation.css" rel="stylesheet" type="text/css" title="Variation" />';
+		$this->headlines[] = '<link href="skins/legacy/rsc/css/desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />';
+		$this->headlines[] = '<link href="skins/legacy/rsc/css/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />';
 
 		if( is_file( dirname(__FILE__).'/rsc/css/custom.css' ) )
 		{
-			$r .= '<link href="skins/legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
+			$this->headlines[] = '<link href="skins/legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
 		}
 
-		$r .= '<script type="text/javascript" src="'.$rsc_url.'js/styleswitcher.js"></script>';
+		$this->headlines[] = '<script type="text/javascript" src="'.$rsc_url.'js/styleswitcher.js"></script>';
 
 		if( $mode == 'sidebar' )
 		{ // Include CSS overrides for sidebar:
-			$r .= '<link href="skins/legacy/rsc/css/sidebar.css" rel="stylesheet" type="text/css" />';
+			$this->headlines[] = '<link href="skins/legacy/rsc/css/sidebar.css" rel="stylesheet" type="text/css" />';
 		}
 
-		return $r;
+		return parent::get_headlines();
 	}
 
 

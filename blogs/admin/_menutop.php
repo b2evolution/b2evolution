@@ -19,11 +19,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<title><?php echo $AdminUI->get_html_title(); ?></title>
 
 	<?php
-	// AFAICS, This is used for <base> only..
+	// Include head lines, links (to CSS...), sets <base>, ..
 	echo $AdminUI->get_headlines();
-
-	// Include links (to CSS...)
-	echo $AdminUI->get_head_links();
 	?>
 
 	<script type="text/javascript">

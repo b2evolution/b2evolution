@@ -72,16 +72,16 @@ class AdminUI_general
 
 	/**
 	 * The path of the selected menu.
-	 * Use {@link set_path()}, {@link setPathArray()} or
-	 * {@link set_path_by_nr()} to set it.
+	 * Use {@link get_path()} or {@link get_path_range()} to access it.
+	 * Use {@link set_path()}, {@link add_path()} or {@link set_path_by_nr()} to set it.
 	 * @var array
 	 */
 	var $path = array();
 
 	/**
 	 * The properties of the path entries.
-	 * Use {@link set_path()}, {@link setPathArray()} or
-	 * {@link set_path_by_nr()} to set it.
+	 * Use {@link get_prop_for_path()} or {@link get_properties_for_path()} to access it
+	 * Use {@link set_path()}, {@link add_path()} or {@link set_path_by_nr()} to set it.
 	 * @var array
 	 */
 	var $pathProps = array();
@@ -161,6 +161,10 @@ class AdminUI_general
 	/**
 	 * Get the <title> of the page.
 	 *
+	 * This is either {@link $title} or will be constructed from title/text properties
+	 * of the path entries.
+	 *
+	 * @param boolean If true, the fallback will be in reversed order
 	 * @return string
 	 */
 	function get_title( $reversedDefault = false )
@@ -169,21 +173,11 @@ class AdminUI_general
 		{ // Explicit title has been set:
 			return $this->title;
 		}
-		/* fplanque: is there any real point in this?:
-		elseif( $title = $this->get_path_property( 'last', array( 'title' ) ) )
-		{ // Title property of the path
-			return $title;
-		}
-		elseif( $title = $this->get_property_for_node( $this->path, array( 'title' ) ) )
-		{ // Title property for the node of the current path
-			return $title;
-		}
-		*/
 		else
 		{ // Fallback: implode title/text properties of the path
 			$titles = $this->get_properties_for_path( $this->path, array( 'title', 'text' ) );
 			if( $reversedDefault )
-			{	// We have asked for reverse order of the path elements:
+			{ // We have asked for reverse order of the path elements:
 				$titles = array_reverse($titles);
 			}
 			return implode( $this->pathSeperator, $titles );
@@ -203,9 +197,9 @@ class AdminUI_general
 			$titles = array();
 			foreach( $this->path as $i => $lPath )
 			{
-				if( false !== ($title_text = $this->get_path_property( $i, array( 'title', 'text' ) )) )
+				if( false !== ($title_text = $this->get_prop_for_path( $i, array( 'title', 'text' ) )) )
 				{
-					$titles[] = '<a href="'.$this->get_path_property( $i, array( 'href' ) ).'">'.$title_text.'</a>';
+					$titles[] = '<a href="'.$this->get_prop_for_path( $i, array( 'href' ) ).'">'.$title_text.'</a>';
 				}
 			}
 
@@ -243,7 +237,7 @@ class AdminUI_general
 
 		$r = $app_shortname.$this->pathSeperator;
 
-		if( $htmltitle = $this->get_property_for_node( $this->path, array( 'htmltitle' ) ) )
+		if( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
 		{ // Explicit htmltitle set:
 			$r .= $htmltitle;
 		}
@@ -263,13 +257,13 @@ class AdminUI_general
 	 * Get a list of properties for a given path for a set of property names to check.
 	 * The result is a list of properties for each node down the path.
 	 *
-	 * The property names must be given in $propertyByPreference, ordered by preference.
+	 * The property names must be given in $prop_by_ref, ordered by preference.
 	 *
 	 * @param string|array The path. See {@link get_node_by_path()}.
 	 * @param array Alternative names of the property to receive (ordered by priority).
 	 * @return array List of the properties.
 	 */
-	function get_properties_for_path( $path, $propertyByPreference )
+	function get_properties_for_path( $path, $prop_by_ref )
 	{
 		if( !is_array($path) )
 		{
@@ -280,7 +274,7 @@ class AdminUI_general
 		$prevPath = array();
 		foreach( $path as $i => $lPath )
 		{
-			if( false !== ($prop = $this->get_path_property( $i, $propertyByPreference )) )
+			if( false !== ($prop = $this->get_prop_for_path( $i, $prop_by_ref )) )
 			{
 				$r[] = $prop;
 			}
@@ -299,11 +293,11 @@ class AdminUI_general
 	 * @param array Alternative names of the property to receive (ordered by priority).
 	 * @return mixed|false False if property is not set for the node, otherwise its value.
 	 */
-	function get_property_for_node( $path, $propertyByPreference )
+	function get_prop_for_node( $path, $prop_by_ref )
 	{
 		$node =& $this->get_node_by_path( $path );
 
-		foreach( $propertyByPreference as $lProp )
+		foreach( $prop_by_ref as $lProp )
 		{
 			if( isset($node[$lProp]) )
 			{
@@ -315,11 +309,18 @@ class AdminUI_general
 	}
 
 
-	function get_path_property( $nr, $propertyByPreference )
+	/**
+	 * Get a property for a specific path entry.
+	 *
+	 * @param int The numeric index of the path entry to query (0 is first).
+	 * @param array A list of properties to check, ordered by priority.
+	 * @return mixed|false The first found property or false if it does not exist
+	 */
+	function get_prop_for_path( $nr, $prop_by_ref )
 	{
 		if( $pathWithProps = $this->get_path( $nr, true ) )
 		{
-			foreach( $propertyByPreference as $lProp )
+			foreach( $prop_by_ref as $lProp )
 			{
 				if( isset($pathWithProps['props'][$lProp]) )
 				{
@@ -511,21 +512,21 @@ class AdminUI_general
 
 
 					if( $loop_tab == $selected )
-					{
+					{ // Highlight selected entry
 						if( !empty( $templateForLevel['_props']['recurseSelected'] )
 								&& ( $recursePath = array_merge( $path, $loop_tab ) )
 								&& ($this->get_menu_entries($recursePath) ) )
 						{
 							$r .= isset($templateForLevel['beforeEachSelWithSub'])
-										? $templateForLevel['beforeEachSelWithSub']
-										: $templateForLevel['beforeEachSel'];
+								? $templateForLevel['beforeEachSelWithSub']
+								: $templateForLevel['beforeEachSel'];
 							$r .= $anchor;
 
 							$r .= $this->get_html_menu_entries( $recursePath, $template, $depth+1 );
 
 							$r .= isset($templateForLevel['afterEachSelWithSub'])
-										? $templateForLevel['afterEachSelWithSub']
-										: $templateForLevel['afterEachSel'];
+								? $templateForLevel['afterEachSelWithSub']
+								: $templateForLevel['afterEachSel'];
 						}
 						else
 						{
@@ -699,12 +700,12 @@ class AdminUI_general
 
 
 			case 'sub':
-				// submenu, we support just one sub-level
+				// submenu, we support just one sub-level (by default)
 				return array(
 						'before' => '<div class="pt">'
 							."\n".'<ul class="hack">'
 							."\n<li><!-- Yes, this empty UL is needed! It's a DOUBLE hack for correct CSS display --></li>"
-							// Note: this hack MAY NOT be needed when not using pixels instead of decimal ems or exs in the CSS
+							// TODO: this hack MAY NOT be needed when not using pixels instead of decimal ems or exs in the CSS
 							."\n</ul>"
 							."\n".'<div class="panelblocktabs">'
 							."\n".'<ul class="tabs">',
@@ -719,7 +720,7 @@ class AdminUI_general
 
 
 			case 'CollectionList':
-				// fp>>daniel: is it a bad idea to put this here??
+				// Template for a list of Collections (Blogs)
 				return array(
 						'before' => '',
 						'after' => '',
@@ -828,6 +829,8 @@ class AdminUI_general
 
 	/**
 	 * Add a headline for HTML <head>.
+	 *
+	 * @param string The line that should be added to <head>.
 	 */
 	function add_headline( $headline )
 	{
@@ -836,24 +839,18 @@ class AdminUI_general
 
 
 	/**
-	 * Get the headlines for HTML <head>.
+	 * Get the headlines for HTML <head> (CSS files especially).
+	 *
+	 * To define headlines for a derived skin, add entries to
+	 * {@link $headlines} and "return parent::get_headlines();".
+	 *
+	 * @return string The concatenated headlines to output in HTML <head>.
 	 */
 	function get_headlines()
 	{
-		$r = '';
-
-		$r .= implode( "\n", $this->headlines );
+		$r = implode( "\n\t", $this->headlines );
 
 		return $r;
-	}
-
-
-	/**
-	 * Get links (to CSS files especially).
-	 */
-	function get_head_links()
-	{
-		return '';
 	}
 
 
@@ -875,9 +872,9 @@ class AdminUI_general
 
 
 	/**
-	 * Get a path key by numeric key.
+	 * Get a path key by numeric key. Starts with 0.
 	 *
-	 * @param integer The numeric index of the path.
+	 * @param integer The numeric index of the path (0 is first).
 	 * @param boolean Also return properties?
 	 * @return string|array|false (depends on $withProps)
 	 */
@@ -1104,6 +1101,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.37  2005/10/30 23:42:46  blueyed
+ * Refactored get_head_links() into existing get_headlines(); doc
+ *
  * Revision 1.36  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *

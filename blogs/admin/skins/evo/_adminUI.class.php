@@ -58,20 +58,22 @@ class AdminUI extends AdminUI_general
 {
 
 	/**
-	 * Get links (to CSS files especially).
+	 * Get HTML head lines, links (to CSS files especially).
+	 *
+	 * @return string Calls parent::get_headlines()
 	 */
-	function get_head_links()
+	function get_headlines()
 	{
 		global $mode;
 
-		$r ='<link href="skins/evo/rsc/css/style.css" rel="stylesheet" type="text/css" title="Blue" />';
+		$this->headlines[] = '<link href="skins/evo/rsc/css/style.css" rel="stylesheet" type="text/css" title="Blue" />';
 
 		if( $mode == 'sidebar' )
 		{ // Include CSS overrides for sidebar:
-			$r .= '<link href="skins/evo/rsc/css/sidebar.css" rel="stylesheet" type="text/css" />';
+			$this->headlinnes[] = '<link href="skins/evo/rsc/css/sidebar.css" rel="stylesheet" type="text/css" />';
 		}
 
-		return $r;
+		return parent::get_headlines();
 	}
 
 
