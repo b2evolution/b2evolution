@@ -162,7 +162,12 @@ else
 /**
  * Translate and escape single quotes.
  *
- * This is to used mainly for Javascript stings
+ * This is to be used mainly for Javascript stings.
+ *
+ * @uses T_()
+ * @param string String to translate
+ * @param string Locale to use
+ * @return string
  */
 function TS_( $string, $req_locale = '' )
 {
@@ -699,6 +704,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.15  2005/10/30 03:44:20  blueyed
+ * doc for TS_()
+ *
  * Revision 1.14  2005/09/16 10:36:19  yabs
  * minor changes - correcting temp locale
  *
