@@ -438,6 +438,8 @@ function next_posts_link($label='#', $max_page=0, $page='')
 	if (empty($p) && (empty($paged) || $nextpage <= $max_page))
 	{
 		echo '<a href="';
+		$url = parse_url($Blog->get('siteurl', 'raw'));
+		echo $url['scheme'] . '://' . $url['host'];
 		echo next_posts($max_page, $page);
 		echo '">'. htmlspecialchars($label) .'</a>';
 	}
@@ -460,6 +462,8 @@ function previous_posts_link($label='#', $page='')
 	if( empty($p) && ($paged > 1) )
 	{
 		echo '<a href="';
+		$url = parse_url($Blog->get('siteurl', 'raw'));
+		echo $url['scheme'] . '://' . $url['host'];
 		echo previous_posts( $page );
 		echo '">'.htmlspecialchars($label).'</a>';
 	}
@@ -932,9 +936,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
- * Revision 1.33  2005/10/30 10:44:23  marian
- * changes regarding multi-domain
- * question about fieldset for each form-field
+ * Revision 1.34  2005/10/30 11:16:43  marian
+ * rollback of regenerate_url
+ * fixing the form-problem in skins/_feedback.php
  *
  * Revision 1.32  2005/10/27 15:47:25  marian
  * Removed $_SERVER Variables for the multi-domain feature.

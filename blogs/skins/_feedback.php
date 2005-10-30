@@ -157,7 +157,16 @@
 		<form action="<?php echo $htsrv_url ?>comment_post.php" method="post" class="bComment">
 
 			<input type="hidden" name="comment_post_ID" value="<?php $Item->ID() ?>" />
-			<input type="hidden" name="redirect_to" value="<?php echo regenerate_url() ?>" />
+			<input type="hidden" name="redirect_to" value="<?php
+	$url = regenerate_url();
+	$siteurl = $GLOBALS['Blog']->siteurl;
+	if ($siteurl > '')
+	{
+		$url_ary = parse_url($siteurl);
+		$url = $url_ary['scheme'] . '://' . $url_ary['host'] . $url;
+	}
+	echo $url;
+?>" />
 
 			<?php
 			if( is_logged_in() )
