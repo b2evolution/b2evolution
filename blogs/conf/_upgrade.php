@@ -35,12 +35,14 @@ $oldtablecomments   = 'b2comments';
 
 /**
  * Variables to be used to upgrade from previous versions on b2evolution.
- * 
- * These are variables that were previously located in _advanced.php
+ *
+ * These are variables that were previously located in /conf/
  * If you want to preserve those settings copy your values over here
  * before running the upgrade script.
  */
- 
+
+// Moved from /blogs/conf/_advanced.php:
+
 /**
  * Accepted file types, you can add to that list if you want.
  *
@@ -61,5 +63,18 @@ $fileupload_allowedtypes = ' jpg gif png txt ';
  * @deprecated 1.6: this is only used for creating the defaults when upgrading
  */
 $fileupload_maxk = '96'; // in kilo bytes
+
+
+// Moved from /blogs/conf/_stats.php:
+
+/**
+ * How many days of stats do you want to keep before auto pruning them?
+ *
+ * Set to 0 to disable auto pruning
+ *
+ * @global int $stats_autoprune
+ * @deprecated 1.6: this is only used for creating the defaults when upgrading
+ */
+$stats_autoprune = 30; // Default: 30 days
 
 ?>

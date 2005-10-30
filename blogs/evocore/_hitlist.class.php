@@ -104,21 +104,32 @@ class Hitlist
 	}
 
 
-
 	/**
 	 * Auto pruning of old stats.
 	 *
-	 * It uses a general setting to store the day of the last prune.
+	 * It uses a general setting to store the day of the last prune, avoiding multiple prunes per day.
+	 *
+	 * @static
 	 */
-	function autoPrune()
+	function dbprune()
 	{
-		if( $Settings->get( 'auto_prune' ) )
+		global $DB, $Debuglog, $Settings, $servertimenow;
+
+		if( $auto_prune_stats = $Settings->get( 'auto_prune_stats' ) )
 		{ // Autopruning is requested
-			$sql = "DELETE FROM T_hitlog
-							WHERE hit_datetime < '".date( 'Y-m-d', $localtimenow - ($stats_autoprune * 86400) )."'";
-																															// 1 day = 86400 seconds
-			$rows_affected = $DB->query( $sql, 'Autopruning hit log' );
-			$Debuglog->add( 'log_hit: autopruned '.$rows_affected.' rows.', 'hit' );
+			$last_prune = (int)$Settings->get( 'auto_prune_stats_done' );
+
+			if( $last_prune < ($servertimenow-86400) )
+			{ // not pruned since one day
+				$sql =
+					"DELETE FROM T_hitlog
+					WHERE hit_datetime < '".date( 'Y-m-d', $servertimenow - ($auto_prune_stats * 86400) )."'"; // 1 day = 86400 seconds
+				$rows_affected = $DB->query( $sql, 'Autopruning hit log' );
+
+				$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows.', 'hit' );
+				$Settings->set( 'auto_prune_stats_done', $servertimenow );
+				$Settings->dbupdate();
+			}
 		}
 	}
 }

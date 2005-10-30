@@ -146,6 +146,8 @@ switch( $action )
 			$Request->param( 'hit_doublecheck_referer', 'integer', 0 );
 			$Settings->set( 'hit_doublecheck_referer', $hit_doublecheck_referer );
 
+			$Request->param( 'auto_prune_stats', 'integer', $Settings->get_default('auto_prune_stats') );
+			$Settings->set( 'auto_prune_stats', $Request->get('auto_prune_stats') );
 
 			if( ! $Messages->count('error') )
 			{

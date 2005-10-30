@@ -382,12 +382,14 @@ class Hit
 
 
 	/**
-	 * Log a hit on a blog page / rss feed
+	 * Log a hit on a blog page / rss feed.
 	 *
 	 * This function should be called at the end of the page, otherwise if the page
 	 * is displaying previous hits, it may display the current one too.
 	 *
 	 * The hit will not be logged in special occasions, see {@link is_new_view()} and {@link is_good_hit()}.
+	 *
+	 * @return boolean true if the hit gets logged; false if not
 	 */
 	function log()
 	{
@@ -444,6 +446,8 @@ class Hit
 	 *
 	 * It gets called either by {@link log()} or by {@link double_check_referers()} when this is used.
 	 *
+	 * It will call Hitlist::dbprune() to do the automatic pruning of old hits.
+	 *
 	 * @access protected
 	 */
 	function _record_the_hit()
@@ -455,19 +459,19 @@ class Hit
 		$Debuglog->add( 'log(): Recording the hit.', 'hit' );
 
 		// insert hit into DB table:
-		$sql = 'INSERT INTO T_hitlog( hit_sess_ID, hit_datetime, hit_uri,
-																	hit_agnt_ID, hit_referer_type, hit_referer,
-																	hit_referer_dom_ID, hit_blog_ID, hit_remote_addr )
-						VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'",
-										"'.$this->agentID.'", "'.$this->referer_type.'", "'.$DB->escape($this->referer).'",
-										"'.$this->referer_domain.'", "'.$Blog->ID.'", "'.$DB->escape( $this->IP ).'"
-									)';
-
-						#VALUES( , '".$DB->escape($ReqURI)."', '$hit_type',
-										#'".$DB->escape($this->referer)."', '".$DB->escape($baseDomain)."', $blog,
-										#'".$DB->escape( getIpList( true ) )."', '".$DB->escape($HTTP_USER_AGENT)."')";
+		$sql =
+			'INSERT INTO T_hitlog( hit_sess_ID, hit_datetime, hit_uri,
+				hit_agnt_ID, hit_referer_type, hit_referer,
+				hit_referer_dom_ID, hit_blog_ID, hit_remote_addr )
+			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'",
+				"'.$this->agentID.'", "'.$this->referer_type.'", "'.$DB->escape($this->referer).'",
+				"'.$this->referer_domain.'", "'.$Blog->ID.'", "'.$DB->escape( $this->IP ).'"
+			)';
 
 		$DB->query( $sql, 'Record the hit' );
+
+		require_once( dirname(__FILE__).'/_hitlist.class.php' );
+		Hitlist::dbprune(); // will prune once per day, according to Settings
 	}
 
 

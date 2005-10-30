@@ -66,6 +66,8 @@ class GeneralSettings extends AbstractSettings
 		'upload_allowedext' => 'jpg gif png txt', // handled
 		'upload_maxkb' => '100',
 
+		'auto_prune_stats' => '30',         // days
+
 		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$'
 	);
 
@@ -117,6 +119,10 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.20  2005/10/30 04:44:32  blueyed
+ * Moved $stats_autoprune to auto_prune_stats in $Settings.
+ * Automagic pruning of old hits, when a hit gets logged, but just once a day (remembered in $Settings->get(auto_prune_stats_done))
+ *
  * Revision 1.19  2005/10/11 19:28:57  blueyed
  * Added decent error message if tables do not exist yet (not installed).
  *
