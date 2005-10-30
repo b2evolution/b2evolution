@@ -1146,6 +1146,15 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 		$url = url_add_param( $url, implode( '&amp;', $params ) );
 	}
 	// $Debuglog->add( 'regenerate_url(): ['.$url.']', 'params' );
+	
+	$siteurl = $GLOBALS['Blog']->siteurl;
+	if ($siteurl > '')
+	{
+		$url_ary = parse_url($siteurl);
+		$url = $url_ary['scheme'] . '://' . $url_ary['host'] . $url;
+ 	}
+	
+	
 	return $url;
 }
 
@@ -2227,6 +2236,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.118  2005/10/30 10:27:33  marian
+ * changed regenerate_url to get it working with the multi-domain feature
+ *
  * Revision 1.117  2005/10/30 05:28:30  halton
  * updated get_web_help_link code to point to server
  *
