@@ -2212,8 +2212,6 @@ function get_link_showhide( $link_id, $target_id, $text_when_displayed, $text_wh
  *
  * @todo replace [?] with icon,
  * @todo write url suffix dynamically based on topic and language
- * @todo discuss with Francois where on his server the docco can go ;)
- *       blueyed>> The URL below (http://manual.b2evolution.net/redirect/) is not installed yet.
  *
  * QUESTION: launch new window with javascript maybe?
  * @param string Topic
@@ -2227,7 +2225,7 @@ function get_web_help_link( $topic )
 	if( $Settings->get('webhelp_enabled') )
 	{
 		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/help.php/'.str_replace(" ","_",strtolower($topic))
-							.'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version.'">[?]</a>';
+							.'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version.'">' . get_icon('webhelp') . '</a>';
 
 //		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/'.$topic
 //			.'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version.'">[?]</a>';
@@ -2244,6 +2242,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.124  2005/10/31 11:50:46  halton
+ * updated online help with subtle icon
+ *
  * Revision 1.123  2005/10/31 08:19:07  blueyed
  * Refactored getRandomPassword() and Session::generate_key() into generate_random_key()
  *

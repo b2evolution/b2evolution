@@ -93,13 +93,13 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Hit logging') );
+$Form->begin_fieldset( T_('Hit logging') . get_web_help_link('Hit logging') );
 	$Form->checkbox_input( 'hit_doublecheck_referer', $Settings->get('hit_doublecheck_referer'), T_('Double-check Referer'), array( 'note' => 'Activating this will search the requested (your) URL in the content of the referring page. This is against referer spam, but creates additional webserver traffic.' ) );
 	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Auto prune statistics'), array( 'note' => 'How many days of stats do you want to keep before auto pruning them? (Set to 0 to disable auto pruning)' ) );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Sessions') );
+$Form->begin_fieldset( T_('Sessions') . get_web_help_link('Sessions') );
 	$Form->text_input( 'auto_prune_sessions', $Settings->get('auto_prune_sessions'), 5, T_('Session timeout'), array( 'note' => 'Timeout of a session when the user is inactive (in seconds)' ) );
 $Form->end_fieldset();
 

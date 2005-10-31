@@ -298,7 +298,11 @@ $map_iconfiles = array(
 		'alt' => T_('Help'),
 		'size' => array( 15, 15 ),
 	),
-
+	'webhelp' => array(
+		'file' => $img_subdir.'smilies/icon_help.gif',
+		'alt' => T_('Help'),
+		'size' => array( 15, 15 ),
+	),
 	'permalink' => array(
 		'file' => $rsc_subdir.'icons/minipost.gif',
 		'alt' => T_('Permalink'),
