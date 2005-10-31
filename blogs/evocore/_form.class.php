@@ -334,7 +334,8 @@ class Form extends Widget
 				$r = '<tr'.$this->get_field_params_as_string($field_params).'><th colspan="2">'."\n";
 
 				if( $title != '' )
-				{ // there is a legend tag to display
+				{ // there is a title to display
+					// QUESTION: really build a <th> if it's empty?
 					$r .= $title;
 				}
 
@@ -2207,6 +2208,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.80  2005/10/31 02:22:02  blueyed
+ * Added question
+ *
  * Revision 1.79  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *
