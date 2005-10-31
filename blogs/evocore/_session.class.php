@@ -163,7 +163,7 @@ class Session
 		}
 		else
 		{ // create a new session
-			$this->key = $this->generate_key();
+			$this->key = generate_random_key(32);
 
 			$DB->query(
 				'INSERT INTO T_sessions
@@ -188,26 +188,6 @@ class Session
 		$Cron->add_task( array(&$this, 'dbprune') ); // if it's due depends on $Settings
 		*/
 		$this->dbprune();
-	}
-
-
-	/**
-	 * Generate a valid key of size $size
-	 *
-	 * @param integer length of key
-	 * @return string key
-	 */
-	function generate_key( $size = 32 )
-	{
-		static $keychars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-		$key = '';
-
-		for( $i = 0; $i < $size; $i++ )
-		{
-			$key .= $keychars{mt_rand(0, 61 )}; // get a random character out of $keychars
-		}
-
-		return $key;
 	}
 
 
@@ -240,6 +220,8 @@ class Session
 		if( $q !== false )
 		{ // No DB error - query() might return 0 for "0 rows affected"
 			$this->user_ID = $ID;
+
+			$Debuglog->add( 'Set user_ID to '.$this->user_ID, 'session' );
 
 			return true;
 		}

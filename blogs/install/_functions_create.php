@@ -802,7 +802,7 @@ function populate_main_tables()
 	$User_Admin->set( 'login', 'admin' );
 	if( !isset( $install_password ) )
 	{
-		$random_password = getRandomPassword();
+		$random_password = generate_random_key();
 	}
 	else
 	{
@@ -1260,6 +1260,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.150  2005/10/31 08:19:07  blueyed
+ * Refactored getRandomPassword() and Session::generate_key() into generate_random_key()
+ *
  * Revision 1.149  2005/10/31 01:38:45  blueyed
  * create_default_settings(): rely on defaults from $Settings
  *

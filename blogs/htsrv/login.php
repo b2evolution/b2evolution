@@ -101,38 +101,41 @@ switch( $action )
 				if( empty( $ForgetfulUser->email ) )
 				{
 					$Messages->add( T_('You have no email address with your profile, therefore we cannot reset your password.')
-													.' '.T_('Please try contacting the admin.'), 'error' );
+						.' '.T_('Please try contacting the admin.'), 'error' );
 				}
 				else
 				{
-					$requestId = getRandomPassword(22);
+					$requestId = generate_random_key(22);
 
 					$message = T_( 'Somebody (presumably you) has requested a password change for your account.' )
-										."\n\n"
-										.T_('Login:')." $login\n"
-										.T_('Link to change your password:')
-										."\n"
-										.$htsrv_url.'login.php?action=changepwd'
-											.'&login='.rawurlencode( $ForgetfulUser->login )
-											.'&reqId='.$requestId
-										."\n\n"
-										.T_('Please note:')
-										.' '.sprintf( T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 )
-										."\n\n"
-										.T_('If it was not you that requested this password change, simply ignore this mail.');
+						."\n\n"
+						.T_('Login:')." $login\n"
+						.T_('Link to change your password:')
+						."\n"
+						.$htsrv_url.'login.php?action=changepwd'
+							.'&login='.rawurlencode( $ForgetfulUser->login )
+							.'&reqId='.$requestId
+						."\n\n"
+						.T_('Please note:')
+						.' '.sprintf( T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 )
+						."\n\n"
+						.T_('If it was not you that requested this password change, simply ignore this mail.');
 
 					if( !send_mail( $ForgetfulUser->email, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
 					{
 						$Messages->add( T_('The email could not be sent.')
-														.'<br />'.T_('Possible reason: your host may have disabled the mail() function...'), 'error' );
+							.'<br />'.T_('Possible reason: your host may have disabled the mail() function...'), 'error' );
 					}
 					else
 					{
-						$UserSettings->set( 'password_change_request',
-																serialize( array( 'requestId' => $requestId,
-																									'IP' => md5(serialize(getIpList())),
-																									'time' => $servertimenow ) ),
-																$ForgetfulUser->ID );
+						$UserSettings->set(
+								'password_change_request',
+								serialize( array(
+									'requestId' => $requestId,
+									'IP' => md5(serialize(getIpList())),
+									'time' => $servertimenow ) ),
+								$ForgetfulUser->ID );
+
 						$UserSettings->dbupdate();
 
 						$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'note' );
@@ -154,8 +157,7 @@ switch( $action )
 		param( 'redirect_to', 'string', $admin_url );
 		param( 'reqId', 'string', '' );
 
-		$ForgetfulUser =& $UserCache->get_by_login($login);
-
+		$ForgetfulUser = & $UserCache->get_by_login($login);
 
 		if( !$ForgetfulUser || empty($reqId) )
 		{ // This was not requested
@@ -174,10 +176,13 @@ switch( $action )
 				|| !isset($verifyData['IP']) || $verifyData['IP'] != md5(serialize(getIpList()))
 				|| !isset($verifyData['time']) || $verifyData['time'] < ( $servertimenow - 7200 ) )
 		{
-			$Messages->add( sprintf( T_('Invalid password change request!')
-																.' '.T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 ), 'error' );
-			$Messages->add( sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
-																$htsrv_url.'login.php?action=retrievepassword&amp;login='.$login.'&amp;redirect_to='.rawurlencode( $redirect_to ) ), 'note' );
+			$Messages->add(
+				sprintf( T_('Invalid password change request!')
+				.' '.T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 ), 'error' );
+			$Messages->add(
+				sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
+				$htsrv_url.'login.php?action=retrievepassword&amp;login='.$login.'&amp;redirect_to='.rawurlencode( $redirect_to ) ), 'note' );
+
 			break;
 		}
 
@@ -221,7 +226,7 @@ if( is_logged_in() )
 	}
 
 	$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $current_User->login )
-												.' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>', 'note' );
+		.' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>', 'note' );
 }
 
 

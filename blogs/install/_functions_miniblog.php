@@ -34,7 +34,7 @@ function upgrade_miniblog_tables()
 	echo 'Copying Miniblog users... ';
 	if( !isset( $install_password ) )
 	{
-		$random_password = getRandomPassword();
+		$random_password = generate_random_key();
 	}
 	else
 	{

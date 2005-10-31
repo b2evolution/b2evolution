@@ -2080,22 +2080,32 @@ function getBaseDomain( $url )
 
 
 /**
- * Generate a random password, respecting the minimal password length.
+ * Generate a valid key of size $length.
  *
- * @return string
+ * @param integer length of key (defaults to minimal password length)
+ * @return string key
  */
-function getRandomPassword( $length = NULL )
+function generate_random_key( $length = NULL )
 {
+	static $keychars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
 	if( is_null($length) )
 	{
 		global $Settings;
 
 		$length = isset($Settings) // not set during install
-							? $Settings->get( 'user_minpwdlen' )
-							: 6;
+			? $Settings->get( 'user_minpwdlen' )
+			: 6;
 	}
 
-	return substr( md5( uniqid( rand(), true ) ), 0, $length );
+	$key = '';
+
+	for( $i = 0; $i < $length; $i++ )
+	{
+		$key .= $keychars{mt_rand(0, 61 )}; // get a random character out of $keychars
+	}
+
+	return $key;
 }
 
 
@@ -2234,6 +2244,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.123  2005/10/31 08:19:07  blueyed
+ * Refactored getRandomPassword() and Session::generate_key() into generate_random_key()
+ *
  * Revision 1.122  2005/10/31 06:50:33  blueyed
  * send_mail(): Add X-b2evo to notice about email header injection fix
  *
