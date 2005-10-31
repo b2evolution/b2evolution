@@ -394,7 +394,6 @@ elseif( isset($_GET['login'] ) )
 $Debuglog->add( 'login: '.var_export($login, true), 'login' );
 $Debuglog->add( 'pass: '.( empty($pass) ? '' : 'not' ).' empty', 'login' );
 
-
 if( !empty($login) && !empty($pass) )
 { // User is trying to login right now
 	$Debuglog->add( 'User is trying to login.', 'login' );
@@ -423,6 +422,13 @@ if( !empty($login) && !empty($pass) )
 		$current_User =& $UserCache->get_by_login($login);
 		// save the user for later hits
 		$Session->set_user( $current_User );
+
+		// Remove deprecated cookies:
+		// We do not use $cookie_user / $cookie_pass (would be set in _obsolete092.php), because it
+		//  does not harm really (cookies time out) and would allow to set arbitrary cookies through
+		//  register_globals! (272851261 is the birthday of a lovely person ;)
+		setcookie( 'cookie'.$instance_name.'user', '', 272851261, $cookie_path, $cookie_domain );
+		setcookie( 'cookie'.$instance_name.'pass', '', 272851261, $cookie_path, $cookie_domain );
 	}
 }
 elseif( $Session->session_has_user() )
@@ -502,6 +508,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.58  2005/10/31 23:40:47  blueyed
+ * Remove deprecated user/pass cookies
+ *
  * Revision 1.57  2005/10/31 06:46:08  blueyed
  * Fix Debuglog for login procedure
  *
