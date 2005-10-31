@@ -397,7 +397,7 @@ $Debuglog->add( 'pass: '.( empty($pass) ? '' : 'not' ).' empty', 'login' );
 
 if( !empty($login) && !empty($pass) )
 { // User is trying to login right now
-	$Debuglog->add( 'User is trying to login right now.', 'login' );
+	$Debuglog->add( 'User is trying to login.', 'login' );
 
 	$login = strtolower(strip_tags(get_magic_quotes_gpc() ? stripslashes($login) : $login));
 	$pass = strip_tags(get_magic_quotes_gpc() ? stripslashes($pass) : $pass);
@@ -429,11 +429,10 @@ elseif( $Session->session_has_user() )
 { /* if the session has a user assigned to it:
 	 * User was not trying to log in, but he was already logged in:
 	 */
-
-	$Debuglog->add( 'Was already logged in... ['.$login.']', 'login' );
 	// get the user ID from the session and set up the user again
 	$current_User = & $UserCache->get_by_ID( $Session->user_ID );
 
+	$Debuglog->add( 'Was already logged in... ['.$current_User->get('login').']', 'login' );
 }
 elseif( $login_required )
 { /*
@@ -442,7 +441,7 @@ elseif( $login_required )
 	 * ---------------------------------------------------------
 	 */
 	// echo ' NOT logged in...';
-	$Debuglog->add( 'NOT logged in...', 'login' );
+	$Debuglog->add( 'NOT logged in... (did not try)', 'login' );
 
 	$Messages->add( T_('You must log in!'), 'login_error' );
 }
@@ -503,6 +502,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.57  2005/10/31 06:46:08  blueyed
+ * Fix Debuglog for login procedure
+ *
  * Revision 1.56  2005/10/31 06:13:03  blueyed
  * Finally merged my work on $Session in.
  *
