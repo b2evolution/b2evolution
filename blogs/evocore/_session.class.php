@@ -177,6 +177,12 @@ class Session
 
 			$this->ID = $DB->insert_id;
 
+			// TODO: we should use "( $servertimenow + $Settings->get('auto_prune_sessions') )" instead of $cookie_expires.
+			//       but this would require to send the cookie on each request.
+			//       Using $cookie_expires prevents from using auto_prune_sessions > $cookie_expires. (blueyed, 051031)
+			//
+			// Re: man-in-the-middle (MITM): it would make no difference if we'd generate a new key on each request or not IMHO,
+			//     because the MITM could give the user a new/false key (like on timeout of a session) in either case. (blueyed, 051031)
 			setcookie( $cookie_session, $this->ID.'_'.$this->key, $cookie_expires, $cookie_path, $cookie_domain );
 
 			$Debuglog->add( 'ID (generated): '.$this->ID, 'session' );
