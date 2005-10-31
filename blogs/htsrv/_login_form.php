@@ -18,7 +18,7 @@ $page_title = T_('Login form');
 $page_icon = 'icon_login.gif';
 require dirname(__FILE__).'/_header.php';
 
-param( 'redirect_to', 'string', $ReqURI );
+param( 'redirect_to', 'string', str_replace( '&', '&amp;', $ReqURI ) );
 param( 'login', 'string', '' ); // last typed login
 
 $location = $redirect_to;
@@ -58,7 +58,6 @@ $Form->begin_form( 'fform' );
 	echo $Form->fieldend;
 
 	echo $Form->fieldend;
-
 $Form->end_form();
 
 
@@ -72,9 +71,15 @@ $Form->end_form();
 
 <div class="login_actions" style="text-align:right">
 	<?php user_register_link( '', ' &middot; ' )?>
-	<a href="<?php echo $htsrv_url ?>login.php?action=lostpassword&amp;redirect_to=<?php echo urlencode( $redirect_to );
+	<a href="<?php echo $htsrv_url ?>login.php?action=lostpassword&amp;redirect_to=<?php echo rawurlencode( $redirect_to );
 		?>"><?php echo T_('Lost your password ?')
 		?></a>
+	<?php
+	if( empty($login_required) )
+	{ // No login required, allow to pass through
+		echo '<a href="'.$location.'">'./* Gets displayed as link to the location on the login form if no login is required */ T_('Without login..').'</a>';
+	}
+	?>
 </div>
 
 
