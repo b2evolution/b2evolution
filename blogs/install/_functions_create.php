@@ -175,32 +175,32 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Posts... ';
 	$query = "CREATE TABLE T_posts (
-		post_ID								int(11) unsigned NOT NULL auto_increment,
-		post_parent_ID				int(11) unsigned NULL,
-		post_creator_user_ID	int(11) unsigned NOT NULL,
-		post_lastedit_user_ID	int(11) unsigned NULL,
-		post_assigned_user_ID	int(11) unsigned NULL,
-		post_datestart				datetime NOT NULL,
-		post_datedeadline 		datetime NULL,
-		post_datecreated			datetime NULL,
-		post_datemodified			datetime NOT NULL,
-		post_status						enum('published','deprecated','protected','private','draft')
-														NOT NULL default 'published',
-		post_pst_ID						int(11) unsigned NULL,
-		post_ptyp_ID					int(11) unsigned NULL,
-		post_locale						VARCHAR(20) NOT NULL DEFAULT 'en-EU',
-		post_content					text NOT NULL,
-		post_title						text NOT NULL,
-		post_urltitle					VARCHAR(50) NULL DEFAULT NULL,
-		post_url							VARCHAR(250) NULL DEFAULT NULL,
-		post_main_cat_ID			int(11) unsigned NOT NULL,
-		post_flags						SET( 'pingsdone', 'imported'),
-		post_views						INT(11) UNSIGNED NOT NULL DEFAULT 0,
-		post_wordcount				int(11) default NULL,
-		post_comments					ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
-		post_commentsexpire 	DATETIME DEFAULT NULL,
-		post_renderers 				VARCHAR(179) NOT NULL default 'default',
-		post_priority					int(11) unsigned null,
+		post_ID               int(11) unsigned NOT NULL auto_increment,
+		post_parent_ID        int(11) unsigned NULL,
+		post_creator_user_ID  int(11) unsigned NOT NULL,
+		post_lastedit_user_ID int(11) unsigned NULL,
+		post_assigned_user_ID int(11) unsigned NULL,
+		post_datestart        datetime NOT NULL,
+		post_datedeadline     datetime NULL,
+		post_datecreated      datetime NULL,
+		post_datemodified     datetime NOT NULL,
+		post_status           enum('published','deprecated','protected','private','draft')
+		                        NOT NULL default 'published',
+		post_pst_ID           int(11) unsigned NULL,
+		post_ptyp_ID          int(11) unsigned NULL,
+		post_locale           VARCHAR(20) NOT NULL DEFAULT 'en-EU',
+		post_content          text NOT NULL,
+		post_title            text NOT NULL,
+		post_urltitle         VARCHAR(50) NULL DEFAULT NULL,
+		post_url              VARCHAR(250) NULL DEFAULT NULL,
+		post_main_cat_ID      int(11) unsigned NOT NULL,
+		post_flags            SET( 'pingsdone', 'imported'),
+		post_views            INT(11) UNSIGNED NOT NULL DEFAULT 0,
+		post_wordcount        int(11) default NULL,
+		post_comments         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
+		post_commentsexpire   DATETIME DEFAULT NULL,
+		post_renderers        VARCHAR(179) NOT NULL default 'default',
+		post_priority         int(11) unsigned null,
 		PRIMARY KEY post_ID( post_ID ),
 		UNIQUE post_urltitle( post_urltitle ),
 		INDEX post_datestart( post_datestart ),
@@ -229,8 +229,8 @@ function create_b2evo_tables()
 
 	echo 'Creating table for Comments... ';
 	$query = "CREATE TABLE T_comments (
-		comment_ID				int(11) unsigned NOT NULL auto_increment,
-		comment_post_ID		int(11) unsigned NOT NULL default '0',
+		comment_ID        int(11) unsigned NOT NULL auto_increment,
+		comment_post_ID   int(11) unsigned NOT NULL default '0',
 		comment_type enum('comment','linkback','trackback','pingback') NOT NULL default 'comment',
 		comment_status ENUM('published', 'deprecated', 'protected', 'private', 'draft') DEFAULT 'published' NOT NULL,
 		comment_author_ID int unsigned NULL default NULL,
@@ -502,53 +502,52 @@ function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $bl
 	$blog_more_longdesc = "<br />
 <br />
 <strong>".T_("This blog (blog #1) is actually a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by unchecking 'Include in public blog list' in the blogs admin.")."</strong>";
-	$blog_all_ID =	blog_create(
-										sprintf( T_('%s Title'), $blog_shortname ),
-										$blog_shortname,
-										'',
-										$blog_stub,
-										$blog_stub.'.html',
-										sprintf( T_('Tagline for %s'), $blog_shortname ),
-										sprintf( T_('Short description for %s'), $blog_shortname ),
-										sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-										$default_locale,
-										sprintf( T_('Notes for %s'), $blog_shortname ),
-										sprintf( T_('Keywords for %s'), $blog_shortname ),
-										4 );
+	$blog_all_ID = blog_create(
+		sprintf( T_('%s Title'), $blog_shortname ),
+		$blog_shortname,
+		'',
+		$blog_stub,
+		$blog_stub.'.html',
+		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		sprintf( T_('Short description for %s'), $blog_shortname ),
+		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
+		$default_locale,
+		sprintf( T_('Notes for %s'), $blog_shortname ),
+		sprintf( T_('Keywords for %s'), $blog_shortname ),
+		4 );
 
 	$blog_shortname = $blog_a_short;
 	if( $blog_a_long == '#' ) $blog_a_long = sprintf( T_('%s Title'), $blog_shortname );
 	$blog_stub = 'a';
-	$blog_a_ID =	blog_create(
-										$blog_a_long,
-										$blog_shortname,
-										'',
-										$blog_stub,
-										$blog_stub.'.html',
-										sprintf( T_('Tagline for %s'), $blog_shortname ),
-										sprintf( T_('Short description for %s'), $blog_shortname ),
-										sprintf(
-	(($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, '' ),
-										$default_locale,
-										sprintf( T_('Notes for %s'), $blog_shortname ),
-										sprintf( T_('Keywords for %s'), $blog_shortname ),
-										4 );
+	$blog_a_ID = blog_create(
+		$blog_a_long,
+		$blog_shortname,
+		'',
+		$blog_stub,
+		$blog_stub.'.html',
+		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		sprintf( T_('Short description for %s'), $blog_shortname ),
+		sprintf( (($blog_a_longdesc == '#') ? $default_blog_longdesc : $blog_a_longdesc), $blog_shortname, '' ),
+		$default_locale,
+		sprintf( T_('Notes for %s'), $blog_shortname ),
+		sprintf( T_('Keywords for %s'), $blog_shortname ),
+		4 );
 
 	$blog_shortname = 'Blog B';
 	$blog_stub = 'b';
-	$blog_b_ID =	blog_create(
-										sprintf( T_('%s Title'), $blog_shortname ),
-										$blog_shortname,
-										'',
-										$blog_stub,
-										$blog_stub.'.html',
-										sprintf( T_('Tagline for %s'), $blog_shortname ),
-										sprintf( T_('Short description for %s'), $blog_shortname ),
-										sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-										$default_locale,
-										sprintf( T_('Notes for %s'), $blog_shortname ),
-										sprintf( T_('Keywords for %s'), $blog_shortname ),
-										4 );
+	$blog_b_ID = blog_create(
+		sprintf( T_('%s Title'), $blog_shortname ),
+		$blog_shortname,
+		'',
+		$blog_stub,
+		$blog_stub.'.html',
+		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		sprintf( T_('Short description for %s'), $blog_shortname ),
+		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
+		$default_locale,
+		sprintf( T_('Notes for %s'), $blog_shortname ),
+		sprintf( T_('Keywords for %s'), $blog_shortname ),
+		4 );
 
 	$blog_shortname = 'Linkblog';
 	$blog_stub = 'links';
@@ -556,22 +555,22 @@ function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $bl
 <br />
 <strong>'.T_("The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
 	$blog_linkblog_ID = blog_create(
-										sprintf( T_('%s Title'), $blog_shortname ),
-										$blog_shortname,
-										'',
-										$blog_stub,
-										$blog_stub.'.html',
-										sprintf( T_('Tagline for %s'), $blog_shortname ),
-										sprintf( T_('Short description for %s'), $blog_shortname ),
-										sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-										$default_locale,
-										sprintf( T_('Notes for %s'), $blog_shortname ),
-										sprintf( T_('Keywords for %s'), $blog_shortname ),
-										0 /* no Link blog */ );
+		sprintf( T_('%s Title'), $blog_shortname ),
+		$blog_shortname,
+		'',
+		$blog_stub,
+		$blog_stub.'.html',
+		sprintf( T_('Tagline for %s'), $blog_shortname ),
+		sprintf( T_('Short description for %s'), $blog_shortname ),
+		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
+		$default_locale,
+		sprintf( T_('Notes for %s'), $blog_shortname ),
+		sprintf( T_('Keywords for %s'), $blog_shortname ),
+		0 /* no Link blog */ );
 
 	echo "OK.<br />\n";
-
 }
+
 
 /**
  * Create default categories.
@@ -611,7 +610,6 @@ function create_default_categories( $populate_blog_a = true )
 	$cat_linkblog_contrib = cat_create( 'contributors', 'NULL', 4 );
 
 	echo "OK.<br />\n";
-
 }
 
 
@@ -739,6 +737,9 @@ If you wish, you can delete these posts one by one after you have read them. You
 /**
  * Insert default settings into T_settings.
  *
+ * It only writes those to DB, that get overridden (passed as array), or have
+ * no default in {@link _generalsettings.class.php} / {@link GeneralSettings::default}.
+ *
  * @param array associative array (settings name => value to use), allows
  *              overriding of defaults
  */
@@ -747,39 +748,28 @@ function create_default_settings( $override = array() )
 	global $DB, $new_db_version, $default_locale, $Group_Users;
 
 	$defaults = array(
-								'db_version' => $new_db_version,
-								'default_locale' => $default_locale,
-								'posts_per_page' => '5',
-								'what_to_show' => 'posts',
-								'archive_mode' => 'monthly',
-								'time_difference' => '0',
-								'AutoBR' => '0',
-								'antispam_last_update' => '2000-01-01 00:00:00',
-								'newusers_grp_ID' => $Group_Users->get('ID'),
-								'newusers_level' => '1',
-								'newusers_canregister' => '0',
-								'links_extrapath' => '0',
-								'permalink_type' => 'urltitle',
-								'user_minpwdlen' => '5',
-								'reloadpage_timeout' => '300',
-								'upload_enabled' => '1',
-								'upload_allowedext' => 'jpg gif png txt',
-								'upload_maxkb' => '96',
-							);
+		'db_version' => $new_db_version,
+		'default_locale' => $default_locale,
+		'newusers_grp_ID' => $Group_Users->get('ID'),
+	);
 
 	$insertvalues = array();
-	foreach( $defaults as $name => $defaultvalue )
+	foreach( array_merge( array_keys($defaults), array_keys($override) ) as $name )
 	{
-		$insertvalues[] = "('$name', '".$DB->escape( isset( $override[$name] ) ?
-																									$override[$name] :
-																									$defaultvalue )."')";
+		if( isset($override[$name]) )
+		{
+			$insertvalues[] = '('.$DB->quote($name).', '.$DB->quote($override[$name]).')';
+		}
+		else
+		{
+			$insertvalues[] = '('.$DB->quote($name).', '.$DB->quote($defaults[$name]).')';
+		}
 	}
 
-	echo 'Creating default settings'.( count($override) ?
-																			' (with existing values)' :
-																			'' ).'... ';
-	$DB->query( "INSERT INTO T_settings (set_name, set_value)
-								VALUES ".implode( ', ', $insertvalues ) );
+	echo 'Creating default settings'.( count($override) ? ' (with '.count($override).' existing values)' : '' ).'... ';
+	$DB->query(
+		"INSERT INTO T_settings (set_name, set_value)
+		VALUES ".implode( ', ', $insertvalues ) );
 	echo "OK.<br />\n";
 }
 
@@ -1070,7 +1060,7 @@ function create_b2evo_tables_phoenix()
 							   primary key (sub_coll_ID, sub_user_ID) )" );
 	echo "OK.<br />\n";
 
-	
+
 	echo 'Creating table for blog-group permissions... ';
 	$DB->query( "CREATE TABLE T_coll_group_perms (
 									bloggroup_blog_ID int(11) unsigned NOT NULL default 0,
@@ -1270,6 +1260,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.149  2005/10/31 01:38:45  blueyed
+ * create_default_settings(): rely on defaults from $Settings
+ *
  * Revision 1.148  2005/10/29 21:00:01  blueyed
  * Moved $db_use_fkeys to $EvoConfig->DB['use_fkeys'].
  *
