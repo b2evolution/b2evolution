@@ -24,10 +24,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE
+ * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
  */
@@ -70,12 +77,12 @@ class DataObject
 	/**
 	 * Relations that may restrict deletion.
 	 */
- 	var $delete_restrictions = array();
+	var $delete_restrictions = array();
 
 	/**
 	 * Relations that will cascade deletion.
 	 */
- 	var $delete_cascades = array();
+	var $delete_cascades = array();
 
 	/**
 	 * Constructor
@@ -90,9 +97,7 @@ class DataObject
 	 * @param string User ID field name
 	 * @param string User ID field name
 	 */
-	function DataObject( $tablename, $prefix = '', $dbIDname = 'ID',
-												$datecreated_field = '', $datemodified_field = '',
-												$creator_field = '', $lasteditor_field = '' )
+	function DataObject( $tablename, $prefix = '', $dbIDname = 'ID', $datecreated_field = '', $datemodified_field = '', $creator_field = '', $lasteditor_field = '' )
 	{
 		$this->dbtablename        = $tablename;
 		$this->dbprefix           = $prefix;
@@ -126,7 +131,7 @@ class DataObject
 	 *
 	 * @return boolean true on success
 	 */
-	function dbupdate( )
+	function dbupdate()
 	{
 		global $DB, $localtimenow, $current_User;
 
@@ -148,8 +153,8 @@ class DataObject
 		$sql_changes = array();
 		foreach( $this->dbchanges as $loop_dbfieldname => $loop_dbchange )
 		{
-			// Get changed value:
-			eval('$loop_value = $this->'. $loop_dbchange['value'].';');
+			// Get changed value (we use eval() to allow constructs like $loop_dbchange['value'] = 'Group->get(\'ID\')'):
+			eval( '$loop_value = $this->'.$loop_dbchange['value'].';' );
 			// Prepare matching statement:
 			if( is_null($loop_value) )
 			{
@@ -228,8 +233,8 @@ class DataObject
 		$sql_values = array();
 		foreach( $this->dbchanges as $loop_dbfieldname => $loop_dbchange )
 		{
-			// Get changed value:
-			eval('$loop_value = $this->'. $loop_dbchange['value'].';');
+			// Get changed value (we use eval() to allow constructs like $loop_dbchange['value'] = 'Group->get(\'ID\')'):
+			eval( '$loop_value = $this->'. $loop_dbchange['value'].';' );
 			// Prepare matching statement:
 			$sql_fields[] = $loop_dbfieldname;
 			if( is_null($loop_value) )
@@ -257,7 +262,7 @@ class DataObject
 
 		if( ! $DB->query( $sql, 'DataObject::dbinsert()' ) )
 		{
-			return false; 
+			return false;
 		}
 
 		// store ID for newly created db record
@@ -346,10 +351,11 @@ class DataObject
 			{	// We have no declaration for this table, we consider we don't deal with this table in this app:
 				continue;
 			}
-			$count = $DB->get_var( 'SELECT COUNT(*)
-																FROM '.$restriction['table'].'
-															 WHERE '.$restriction['fk'].' = '.$this->ID,
-															0, 0, 'restriction/cascade check' );
+			$count = $DB->get_var(
+				'SELECT COUNT(*)
+					FROM '.$restriction['table'].'
+				 WHERE '.$restriction['fk'].' = '.$this->ID,
+				0, 0, 'restriction/cascade check' );
 			if( $count )
 			{
 				$Messages->add( sprintf( $restriction['msg'], $count ), 'restrict' );
@@ -373,9 +379,9 @@ class DataObject
 		if( $Messages->count('restrict') )
 		{	// There are restrictions:
 			$Messages->head = array(
-					'container' => $restrict_title,
-					'restrict' => T_('The following relations prevent deletion:')
-				);
+				'container' => $restrict_title,
+				'restrict' => T_('The following relations prevent deletion:')
+			);
 			$Messages->foot =	T_('Please delete related objects before you proceed.');
 			return false;	// Can't delete
 		}
@@ -555,6 +561,7 @@ class DataObject
 function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 {
 	global $UserCache;
+
 	if( !empty( $pos_lastedit_user_ID ) )
 	{
 		$User = & $UserCache->get_by_ID( $pos_lastedit_user_ID );
@@ -568,6 +575,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.25  2005/10/31 02:27:31  blueyed
+ * Comments; normalizing
+ *
  * Revision 1.24  2005/09/29 15:07:30  fplanque
  * spelling
  *
