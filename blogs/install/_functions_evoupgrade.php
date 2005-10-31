@@ -400,28 +400,29 @@ function upgrade_b2evo_tables()
 
 		#echo 'oldrow:<br />'; pre_dump($row);
 		$transform = array(
-			'posts_per_page' => array(7),
-			'what_to_show' => array('days'),
-			'archive_mode' => array('weekly'),
+			'posts_per_page' => array(5),
+			'what_to_show' => array('posts'),
+			'archive_mode' => array('monthly'),
 			'time_difference' => array(0),
-			'AutoBR' => array(1),
+			'AutoBR' => array(0),
 			'last_antispam_update' => array('2000-01-01 00:00:00', 'antispam_last_update'),
-			'pref_newusers_grp_ID' => array(4, 'newusers_grp_ID'),
+			'pref_newusers_grp_ID' => array($Group_Users->ID, 'newusers_grp_ID'),
 			'pref_newusers_level'  => array(1, 'newusers_level'),
 			'pref_newusers_canregister' => array(0, 'newusers_canregister'),
 		);
 
+		$_trans = array();
 		foreach( $transform as $oldkey => $newarr )
 		{
-			$newname = (isset($newarr[1])) ? $newarr[1] : $oldkey;
+			$newname = ( isset($newarr[1]) ? $newarr[1] : $oldkey );
 			if( !isset( $row[$oldkey] ) )
 			{
 				echo '&nbsp;&middot;Setting '.$oldkey.' not found, using defaults.<br />';
-				$trans[ $newname ] = $newarr[0];
+				$_trans[ $newname ] = $newarr[0];
 			}
 			else
 			{
-				$trans[ $newname ] = $row[$oldkey];
+				$_trans[ $newname ] = $row[$oldkey];
 			}
 		}
 
@@ -429,14 +430,15 @@ function upgrade_b2evo_tables()
 		$DB->query( 'DROP TABLE IF EXISTS T_settings' );
 
 		// create new table
-		$DB->query( 'CREATE TABLE T_settings (
-									set_name VARCHAR( 30 ) NOT NULL ,
-									set_value VARCHAR( 255 ) NULL ,
-									PRIMARY KEY ( set_name )
-								)');
+		$DB->query(
+			'CREATE TABLE T_settings (
+				set_name VARCHAR( 30 ) NOT NULL ,
+				set_value VARCHAR( 255 ) NULL ,
+				PRIMARY KEY ( set_name )
+			)');
 
 		// insert defaults and use transformed settings
-		create_default_settings( $trans );
+		create_default_settings( $_trans );
 
 		if( !isset( $tableblogusers_isuptodate ) )
 		{
@@ -674,6 +676,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.110  2005/10/31 01:35:47  blueyed
+ * Upgrade to 0.9: adjusted defaults
+ *
  * Revision 1.109  2005/10/28 22:33:54  blueyed
  * Removed not used globals for upgrade to 1.6
  *
