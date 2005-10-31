@@ -457,13 +457,13 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 			if( $row->aspm_source == 'local' )
 			{
 				$output .= '[<a href="antispam.php?action=report&amp;keyword='.
-										urlencode( $row->aspm_string ).'" title="'.
+										rawurlencode( $row->aspm_string ).'" title="'.
 										T_('Report abuse to centralized ban blacklist!').'">'.
 										T_('Report').'</a>]';
 			}
 
 			return $output.'[<a href="antispam.php?action=ban&amp;keyword='.
-										urlencode( $row->aspm_string ).'" title="'.
+										rawurlencode( $row->aspm_string ).'" title="'.
 										T_('Check hit-logs and comments for this keyword!').'">'.
 										T_('Re-check').'</a>]';
 		}

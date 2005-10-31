@@ -466,7 +466,7 @@ switch( $AdminUI->get_path(1) )
 			{
 				$Results->cols[] = array(
 										'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
-										'td' => '<a href="antispam.php?action=ban&amp;keyword=%urlencode( \'$dom_name$\' )%" title="'
+										'td' => '<a href="antispam.php?action=ban&amp;keyword=%rawurlencode( \'$dom_name$\' )%" title="'
 											.T_('Ban this domain!').'"><img src="img/noicon.gif" class="middle" alt="'
 											./* TRANS: Abbrev. */ T_('Ban').'" title="'.T_('Ban this domain!').'" /></a>',
 									);
@@ -638,7 +638,7 @@ switch( $AdminUI->get_path(1) )
 						<td class="firstcol"><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
 						<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ ?>
-						<td><a href="antispam.php?action=ban&amp;keyword=<?php echo urlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a></td>
+						<td><a href="antispam.php?action=ban&amp;keyword=<?php echo rawurlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a></td>
 						<?php } ?>
 						<td class="right"><?php stats_hit_count() ?></td>
 						<td class="right"><?php stats_hit_percent() ?></td>
@@ -935,6 +935,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.8  2005/10/31 05:51:05  blueyed
+ * Use rawurlencode() instead of urlencode()
+ *
  * Revision 1.7  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *

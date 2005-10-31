@@ -485,7 +485,7 @@ class FileManager extends Filelist
 		$url = $this->getCurUrl( array( 'fm_mode' => 'file_'.$mode,
 																		'fm_sources' => false,
 																		'cmr_keepsource' => (int)($mode == 'copy') ) );
-		$url .= '&amp;fm_sources[]='.urlencode( $this->curFile->get_rdfp_rel_path() );
+		$url .= '&amp;fm_sources[]='.rawurlencode( $this->curFile->get_rdfp_rel_path() );
 
 		echo '<a href="'.$url
 					#.'" target="fileman_copymoverename" onclick="'
@@ -1354,6 +1354,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.54  2005/10/31 05:51:06  blueyed
+ * Use rawurlencode() instead of urlencode()
+ *
  * Revision 1.53  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *

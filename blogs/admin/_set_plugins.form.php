@@ -59,8 +59,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				<?php	$loop_Plugin->name(); ?>
 			</td>
 			<td>
-				[<a href="plugins.php?action=info&amp;plugin=<?php echo urlencode($loop_Plugin->classname) ?>">?</a>]
-				[<a href="plugins.php?action=install&amp;plugin=<?php echo urlencode($loop_Plugin->classname) ?>"><?php
+				[<a href="plugins.php?action=info&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname) ?>">?</a>]
+				[<a href="plugins.php?action=install&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname) ?>"><?php
 					 echo T_('Install');
 					 if( $registrations = $Plugins->count_regs($loop_Plugin->classname) )
 					 {	// This plugin is already installed

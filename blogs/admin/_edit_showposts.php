@@ -208,7 +208,7 @@ while( $Item = $MainList->get_item() )
 							// TODO: really ban the base domain! - not by keyword
 							?>
 							<a href="antispam.php?action=ban&amp;keyword=<?php
-								echo urlencode(getBaseDomain($Comment->author_url))
+								echo rawurlencode(getBaseDomain($Comment->author_url))
 								?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>&nbsp;
 							<?php
 						}
@@ -342,6 +342,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.108  2005/10/31 05:51:05  blueyed
+ * Use rawurlencode() instead of urlencode()
+ *
  * Revision 1.107  2005/09/29 15:07:29  fplanque
  * spelling
  *

@@ -95,9 +95,9 @@ function trackback(
 
 	echo '<p>', T_('Sending trackback to:'), ' ', htmlspecialchars($trackback_url), " ...\n";
 
-	$title = urlencode($title);
-	$excerpt = urlencode($excerpt);
-	$blog_name = urlencode(get_bloginfo('name'));
+	$title = rawurlencode($title);
+	$excerpt = rawurlencode($excerpt);
+	$blog_name = rawurlencode(get_bloginfo('name'));
 	$Item = $ItemCache->get_by_ID( $ID );
 	$url = $Item->gen_permalink();
 	// dis is the trackback stuff to be sent:
@@ -220,6 +220,9 @@ function trackback_number( $zero='#', $one='#', $more='#' )
 
 /*
  * $Log$
+ * Revision 1.8  2005/10/31 05:51:06  blueyed
+ * Use rawurlencode() instead of urlencode()
+ *
  * Revision 1.7  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

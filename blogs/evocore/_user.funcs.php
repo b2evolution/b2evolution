@@ -129,11 +129,11 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 
 	if( !isset($generating_static) )
 	{ // We are not generating a static page here:
-		$redirect = '?redirect_to='.urlencode( regenerate_url() );
+		$redirect = '?redirect_to='.rawurlencode( regenerate_url() );
 	}
 	elseif( isset($edited_Blog) )
 	{ // We are generating a static page
-		$redirect = '?redirect_to='.$edited_Blog->get('dynurl');
+		$redirect = '?redirect_to='.rawurlencode( $edited_Blog->get('dynurl') );
 	}
 	else
 	{ // We are in a weird situation
@@ -165,11 +165,11 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 
 	if( !isset($generating_static) )
 	{ // We are not generating a static page here:
-		$redirect = '?redirect_to='.urlencode( regenerate_url() );
+		$redirect = '?redirect_to='.rawurlencode( regenerate_url() );
 	}
 	elseif( isset($edited_Blog) )
 	{ // We are generating a static page
-		$redirect = '?redirect_to='.$edited_Blog->get('dynurl');
+		$redirect = '?redirect_to='.rawurlencode( $edited_Blog->get('dynurl') );
 	}
 	else
 	{ // We are in a weird situation
@@ -200,7 +200,7 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
 
 	echo $before;
-	echo '<a href="'.$htsrv_url.'login.php?action=logout&amp;redirect_to='.urlencode( regenerate_url() ).'" title="'.$link_title.'">';
+	echo '<a href="'.$htsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode( regenerate_url() ).'" title="'.$link_title.'">';
 	printf( $link_text, $current_User->login );
 	echo '</a>';
 	echo $after;
@@ -250,7 +250,7 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 	if( $link_title == '#' ) $link_title = T_('Edit your profile');
 
 	echo $before;
-	echo '<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=profile&amp;redirect_to='.urlencode(regenerate_url()) )
+	echo '<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=profile&amp;redirect_to='.rawurlencode(regenerate_url()) )
 			.'" title="', $link_title, '">';
 	printf( $link_text, $current_User->login );
 	echo '</a>';
@@ -274,7 +274,7 @@ function user_subs_link( $before = '', $after = '', $link_text = '', $link_title
 	if( $link_title == '#' ) $link_title = T_('Subscribe to email notifications');
 
 	echo $before;
-	echo '<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=subs&amp;redirect_to='.urlencode(regenerate_url()) )
+	echo '<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=subs&amp;redirect_to='.rawurlencode(regenerate_url()) )
 			.'" title="', $link_title, '">';
 	printf( $link_text, $current_User->login );
 	echo '</a>';
@@ -402,6 +402,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.29  2005/10/31 05:51:06  blueyed
+ * Use rawurlencode() instead of urlencode()
+ *
  * Revision 1.28  2005/09/29 15:07:30  fplanque
  * spelling
  *

@@ -92,7 +92,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'urlencoded':
 			// Encode string to be passed as part of an URL
-			$content = urlencode( $content );
+			$content = rawurlencode( $content );
 			break;
 
 		case 'entityencoded':
@@ -314,7 +314,7 @@ function make_clickable( $text, $moredelim = '&amp;' )
 			'#(^|\s)www\.([a-z0-9\-]+)\.([a-z0-9\-.\~]+)((?:/[^,<\s]*)?)#i',
 			'#(^|\s)([a-z0-9\-_.]+?)@([^,<\s]+)#i', ),
 		array( '$1<a href="$2://$3">$2://$3</a>',
-			'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.urlencode(T_('Hello')).'">$2$3</a>',
+			'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.rawurlencode(T_('Hello')).'">$2$3</a>',
 			'$1<a href="http://wwp.icq.com/scripts/search.dll?to=$2">$2</a>',
 			'$1<a href="http://www.$2.$3$4">www.$2.$3$4</a>',
 			'$1<a href="mailto:$2@$3">$2@$3</a>', ),
@@ -2111,7 +2111,7 @@ function header_nocache()
 
 /**
  * Sends HTTP header to redirect to the previous location (which
- * can be given as function parameter, GET parameter (redirec_to),
+ * can be given as function parameter, GET parameter (redirect_to),
  * is taken from {@link Hit::referer} or {@link $baseurl}).
  *
  * NOTE: This function {@link exit() exits} the php script execution.
@@ -2231,6 +2231,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.121  2005/10/31 05:51:06  blueyed
+ * Use rawurlencode() instead of urlencode()
+ *
  * Revision 1.120  2005/10/31 02:20:49  blueyed
  * Added memory usage info to the top of debug_info()
  *

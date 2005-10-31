@@ -62,7 +62,7 @@ class Http {
         $urlencoded = "";
 	//lets encode the url
         while (list($key,$value) = each($vars))
-		$urlencoded.= urlencode($key) . "=" . urlencode($value) . "&";
+		$urlencoded.= rawurlencode($key) . "=" . rawurlencode($value) . "&";
 	//lets trim it
         $urlencoded = substr($urlencoded,0,-1);
 	//set the content length
@@ -117,7 +117,7 @@ class Http {
 	$urlencoded = "";
 	//lets encode the url
         while (list($key,$value) = each($vars))
-		$urlencoded.= urlencode($key) . "=" . urlencode($value) . "&";
+		$urlencoded.= rawurlencode($key) . "=" . rawurlencode($value) . "&";
 	//lets trim it
         $urlencoded = substr($urlencoded,0,-1);
 	//set the content length
@@ -221,7 +221,7 @@ class Http {
 	$urlencoded = "";
 	//lets encode the url
         while (list($key,$value) = each($vars))
-		$urlencoded.= urlencode($key) . "=" . urlencode($value) . "&";
+		$urlencoded.= rawurlencode($key) . "=" . rawurlencode($value) . "&";
 	//lets trim it
         $urlencoded = substr($urlencoded,0,-1);
 	//set the content length
@@ -254,6 +254,9 @@ class Http {
 
 /*
  * $Log$
+ * Revision 1.5  2005/10/31 05:51:06  blueyed
+ * Use rawurlencode() instead of urlencode()
+ *
  * Revision 1.4  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
