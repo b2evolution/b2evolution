@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for upgrading to b2 0.9.2, a.k.a 1.6 "Phoenix".
+ * Tests for upgrading to b2evo 1.6 a.k.a. "Phoenix".
  */
 
 /**
@@ -16,9 +16,9 @@ require_once( EVODIR.'blogs/install/_functions_create.php' );
 /**
  *
  */
-class UpgradeTo092TestCase extends InstallUnitTestCase
+class UpgradeTo1_6TestCase extends InstallUnitTestCase
 {
-	function UpgradeTo092TestCase()
+	function UpgradeTo1_6TestCase()
 	{
 		$this->InstallUnitTestCase( 'Upgrade to version 1.6 tests' );
 	}
@@ -47,14 +47,14 @@ class UpgradeTo092TestCase extends InstallUnitTestCase
 		require_once( EVODIR.'blogs/install/_functions_evoupgrade.php' );
 
 		$GLOBALS['DB'] = $this->DB;
-		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 0.9.0.11 to 0.9.2 successful!' );
+		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 0.9.0.11 to 1.6 successful!' );
 	}
 }
 
 
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
-	$test = new UpgradeTo092TestCase();
+	$test = new UpgradeTo1_6TestCase();
 	$test->run( new HtmlReporter() );
 	unset( $test );
 }
