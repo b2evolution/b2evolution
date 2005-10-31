@@ -66,10 +66,6 @@ switch( $action )
 {
 	case 'logout':
 		logout();
-		//  this will remove the user from the session
-		// fplanque>> TODO: Killing a session should work by erasing the cookie and clearing the session key in the DB for security.
-		$Session->remove_user();
-
 		header_nocache();
 		header_redirect(); // exits
 
@@ -117,7 +113,7 @@ switch( $action )
 										.T_('Link to change your password:')
 										."\n"
 										.$htsrv_url.'login.php?action=changepwd'
-											.'&login='.urlencode( $ForgetfulUser->login )
+											.'&login='.rawurlencode( $ForgetfulUser->login )
 											.'&reqId='.$requestId
 										."\n\n"
 										.T_('Please note:')
@@ -181,26 +177,20 @@ switch( $action )
 			$Messages->add( sprintf( T_('Invalid password change request!')
 																.' '.T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 ), 'error' );
 			$Messages->add( sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
-																$htsrv_url.'login.php?action=retrievepassword&amp;login='.$login.'&amp;redirect_to='.urlencode( $redirect_to ) ), 'note' );
+																$htsrv_url.'login.php?action=retrievepassword&amp;login='.$login.'&amp;redirect_to='.rawurlencode( $redirect_to ) ), 'note' );
 			break;
 		}
 
-		// Log the user in:
-		if( !setcookie( $cookie_user, $ForgetfulUser->login, $cookie_expires, $cookie_path, $cookie_domain ) )
-		{
-			printf( T_('setcookie &laquo;%s&raquo; failed!'). '<br />', $cookie_user );
-		}
-		if( !setcookie( $cookie_pass, $ForgetfulUser->pass, $cookie_expires, $cookie_path, $cookie_domain) )
-		{
-			printf( T_('setcookie &laquo;%s&raquo; failed!'). '<br />', $cookie_user );
-		}
 		header_nocache();
+
+		// Log the user in:
+		$Session->set_user_ID( $ForgetfulUser->ID );
 
 		$Messages->add( T_( 'Please change your password to something you remember now.' ), 'note' );
 
 		$action = '';
 
-		$current_User =& $ForgetfulUser;
+		$current_User = & $ForgetfulUser;
 		$user = $current_User->ID; // the selected user in the user admin
 
 		/**

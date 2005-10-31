@@ -393,7 +393,6 @@ elseif( isset($_GET['login'] ) )
 
 $Debuglog->add( 'login: '.var_export($login, true), 'login' );
 $Debuglog->add( 'pass: '.( empty($pass) ? '' : 'not' ).' empty', 'login' );
-$Debuglog->add( 'cookie_user: '.var_export(@$_COOKIE[$cookie_user], true), 'login' );
 
 
 if( !empty($login) && !empty($pass) )
@@ -414,15 +413,11 @@ if( !empty($login) && !empty($pass) )
 	{ // Login failed
 		$Debuglog->add( 'user_pass_ok() returned false!', 'login' );
 
-		if( $login_required )
-		{
-			// echo 'login failed!!';
-			$Messages->add( T_('Wrong login/password.'), 'login_error' );
-		}
+		// This will cause to "popup" the login screen (again)
+		$Messages->add( T_('Wrong login/password.'), 'login_error' );
 	}
 	else
 	{ // Login succeeded, set cookies
-	
 		$Debuglog->add( 'User successfully logged in with username and password...', 'login');
 		// set the user from the login that succeeded
 		$current_User =& $UserCache->get_by_login($login);
@@ -430,14 +425,14 @@ if( !empty($login) && !empty($pass) )
 		$Session->set_user( $current_User );
 	}
 }
-elseif( $Session->session_has_user() ) 
+elseif( $Session->session_has_user() )
 { /* if the session has a user assigned to it:
 	 * User was not trying to log in, but he was already logged in:
 	 */
 
 	$Debuglog->add( 'Was already logged in... ['.$login.']', 'login' );
-  // get the user ID from the session and set up the user again
-	$current_User = & $UserCache->get_by_ID( $Session->userID );
+	// get the user ID from the session and set up the user again
+	$current_User = & $UserCache->get_by_ID( $Session->user_ID );
 
 }
 elseif( $login_required )
@@ -508,6 +503,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.56  2005/10/31 06:13:03  blueyed
+ * Finally merged my work on $Session in.
+ *
  * Revision 1.55  2005/10/27 15:25:03  fplanque
  * Normalization; doc; comments.
  *

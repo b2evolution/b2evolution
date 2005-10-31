@@ -51,22 +51,18 @@ require_once dirname(__FILE__).'/_group.funcs.php';
 require_once dirname(__FILE__).'/_user.class.php';
 
 
-
-
 /**
  * Log the user out
  */
 function logout()
 {
-	global $cookie_user, $cookie_pass, $cookie_expired, $cookie_path, $cookie_domain;
-	global $current_User;
+	global $current_User, $Session;
 
 	// Reset all global variables
 	// Note: unset is bugguy on globals
 	$current_User = false;
 
-	setcookie( $cookie_user, '', $cookie_expired, $cookie_path, $cookie_domain);
-	setcookie( $cookie_pass, '', $cookie_expired, $cookie_path, $cookie_domain);
+	$Session->logout();
 }
 
 
@@ -402,6 +398,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.30  2005/10/31 06:13:03  blueyed
+ * Finally merged my work on $Session in.
+ *
  * Revision 1.29  2005/10/31 05:51:06  blueyed
  * Use rawurlencode() instead of urlencode()
  *

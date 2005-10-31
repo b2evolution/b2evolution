@@ -312,7 +312,7 @@ $use_etags = 0;
 /*
 blueyed>>TODO:
 - Cookie needs hash of domain name in its name, eg:
-	$cookie_user = 'cookie'.small_hash($Cookies->domain).$instancename.'user'
+	$cookie_session = 'cookie'.small_hash($Cookies->domain).$instancename.'user'
 	(Because: cookies for .domain.tld have higher priority over .sub.domain.tld, with the same cookie name,
 		the hash would put that into the name)
 	[ Related to PHP bug #32802 (http://bugs.php.net/bug.php?id=32802 - fixed in 5.0.5 (also backported)), but which only affects paths.
@@ -357,10 +357,6 @@ $cookie_domain = ($basehost == 'localhost') ? '' : '.'. $basehost;
 /**#@+
  * Names for cookies.
  */
-// fplanque>> TODO: Matt, the user and pass cookies should be useless now that you have changed the session management,
-// Please clean them uo throughout the whole app and make sure the new system doesn't break any previous usage of these cookies.
-$cookie_user    = 'cookie'.$instance_name.'user';
-$cookie_pass    = 'cookie'.$instance_name.'pass';
 // This is mainly used for storing the prefered skin:
 // Note: This is not a SESSION variable. It is a user pref that works even for non registered users.
 $cookie_state   = 'cookie'.$instance_name.'state';
@@ -369,9 +365,7 @@ $cookie_name    = 'cookie'.$instance_name.'name';
 $cookie_email   = 'cookie'.$instance_name.'email';
 $cookie_url     = 'cookie'.$instance_name.'url';
 // The following handle the session.
-// Note: key could be appendended to the session ID with a _ separator in order to save a cookie.
 $cookie_session = 'cookie'.$instance_name.'session';
-$cookie_key     = 'cookie'.$instance_name.'key';
 /**#@-*/
 
 /**

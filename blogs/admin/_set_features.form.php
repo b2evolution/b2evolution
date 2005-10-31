@@ -99,6 +99,9 @@ $Form->begin_fieldset( T_('Hit logging') );
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Sessions') );
+	$Form->text_input( 'auto_prune_sessions', $Settings->get('auto_prune_sessions'), 5, T_('Session timeout'), array( 'note' => 'Timeout of a session when the user is inactive (in seconds)' ) );
+$Form->end_fieldset();
 
 
 if( $current_User->check_perm( 'options', 'edit' ) )

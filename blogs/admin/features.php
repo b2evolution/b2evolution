@@ -149,6 +149,11 @@ switch( $action )
 			$Request->param( 'auto_prune_stats', 'integer', $Settings->get_default('auto_prune_stats') );
 			$Settings->set( 'auto_prune_stats', $Request->get('auto_prune_stats') );
 
+
+			// Sessions
+			$Request->param( 'auto_prune_sessions', 'integer', $Settings->get_default('auto_prune_sessions') );
+			$Settings->set( 'auto_prune_sessions', $Request->get('auto_prune_sessions') );
+
 			if( ! $Messages->count('error') )
 			{
 				if( $Settings->dbupdate() )

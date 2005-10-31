@@ -121,11 +121,6 @@ if( !empty($pass1) )
 {
 	$newuser_pass = md5($pass1);
 	$current_User->set( 'pass', $newuser_pass );
-
-	if( !setcookie( $cookie_pass, $newuser_pass, $cookie_expires, $cookie_path, $cookie_domain) )
-	{
-		printf( T_('setcookie &laquo;%s&raquo; failed!'), $cookie_pass );
-	}
 }
 
 $current_User->set( 'firstname', $newuser_firstname );

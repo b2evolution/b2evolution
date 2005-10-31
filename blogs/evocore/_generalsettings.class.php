@@ -75,6 +75,7 @@ class GeneralSettings extends AbstractSettings
 		'upload_maxkb' => '100',
 
 		'auto_prune_stats' => '30',         // days
+		'auto_prune_sessions' => '86400',   // seconds
 
 		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$',
 
@@ -140,6 +141,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.22  2005/10/31 06:13:03  blueyed
+ * Finally merged my work on $Session in.
+ *
  * Revision 1.21  2005/10/31 01:33:38  blueyed
  * Added default settings that were written explicitely into DB before
  *

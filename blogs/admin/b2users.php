@@ -268,22 +268,6 @@ else
 					$edited_User->dbinsert();
 					$Messages->add( T_('New user created.'), 'success' );
 				}
-
-				if( $edited_user_ID == $current_User->ID )
-				{ // current user updates him/herself - we have to set cookies to keep him logged in
-
-					if( !empty($new_pass) && $current_User->pass != $new_pass )
-					{ // The user changed his password, update login cookie!
-						setcookie( $cookie_pass, $new_pass, $cookie_expires, $cookie_path, $cookie_domain);
-					}
-
-					if( $edited_User->login != $saved_login )
-					{ // The user changed his own login, update login cookie!
-						setcookie( $cookie_user, $edited_User->login, $cookie_expires, $cookie_path, $cookie_domain );
-					}
-
-				}
-
 			}
 			break;
 
@@ -565,6 +549,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.107  2005/10/31 06:13:02  blueyed
+ * Finally merged my work on $Session in.
+ *
  * Revision 1.106  2005/10/31 00:21:27  blueyed
  * Made links like "?action=" more explicit by refering to the page (.php file) they link to. This fixes a problem reported by a user. I could not reproduce it, but it was browser independent. He used a mobile card with a laptop (t-online, no wlan).
  *

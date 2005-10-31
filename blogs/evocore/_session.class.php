@@ -1,9 +1,9 @@
 <?php
 /**
- * This file implements functions to track who's online.
+ * This file implements the Session class.
  *
- * Functions to maintain online sessions and
- * displaying who is currently active on the site.
+ * A session can be bound to a user and provides functions to store data in it's
+ * context.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -52,6 +52,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * A session stores data for a certain user.
+ *
+ * When an object gets constructed it will use an ID given by the user through
+ * a cookie to load his/her data or create an empty data set.
  *
  * @package evocore
  */
@@ -70,107 +74,122 @@ class Session
 	var $key;
 
 	/**
-	 * The user of the session
-	 *
-	 * fplanque>> please change this to $user_ID for consistency
+	 * The user of the session.
 	 * @var integer
 	 */
-	 var $userID;
+	var $user_ID;
+
+	/**
+	 * Data stored for the session.
+	 * @access protected
+	 * @var object
+	 */
+	var $_data;
 
 
 	/**
 	 * Keep the session active for the current user.
-	 * // QUESTION: what to use for ID? T_sessions.sess_ID is BIGINT()..
 	 */
 	function Session()
 	{
 		global $DB, $Debuglog, $current_User, $servertimenow;
 		global $Hit;
-		global $cookie_session, $cookie_expires, $cookie_path, $cookie_domain, $cookie_key;
+		global $cookie_session, $cookie_expires, $cookie_path, $cookie_domain;
 
 		/**
 		 * @todo move to $Settings - use only for display of online user, not to prune sessions!
 		 */
 		global $online_session_timeout;
 
-		if( !empty( $_COOKIE[$cookie_session] ) && !empty( $_COOKIE[$cookie_key] ) )
+		if( !empty( $_COOKIE[$cookie_session] ) )
 		{ // session ID sent by cookie
-			$session_id_by_cookie = remove_magic_quotes($_COOKIE[$cookie_session]);
-			$session_key_by_cookie = remove_magic_quotes($_COOKIE[$cookie_key]);
-			$Debuglog->add( 'ID (from cookie): '.$session_id_by_cookie, 'session' );
-			if( $row = $DB->get_row( 'SELECT sess_ID, sess_data, sess_user_ID, sess_key FROM T_sessions
-																 WHERE sess_ID = '.$DB->quote($session_id_by_cookie) . '
-																	 AND sess_key = ' . $DB->quote($session_key_by_cookie) ) )
+			if( preg_match( '~^(\d+)_(\w+)$~', remove_magic_quotes($_COOKIE[$cookie_session]), $match ) )
 			{
-				$Debuglog->add( 'Session data loaded.', 'session' );
-				$this->ID = $row->sess_ID;
-				$this->key = $row->sess_key;
-				$this->data = $row->sess_data;
-				$this->userID = $row->sess_user_ID;
+				$session_id_by_cookie = $match[1];
+				$session_key_by_cookie = $match[2];
+
+				$Debuglog->add( 'ID (from cookie): '.$session_id_by_cookie, 'session' );
+
+				if( $row = $DB->get_row(
+					'SELECT sess_ID, sess_key, sess_data, sess_user_ID FROM T_sessions
+					WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
+						AND sess_key = '.$DB->quote($session_key_by_cookie) ) )
+				{ // ID + key are valid: load data
+					$Debuglog->add( 'ID is valid.', 'session' );
+					$this->ID = $row->sess_ID;
+					$this->user_ID = $row->sess_user_ID;
+
+					$Debuglog->add( 'user_ID: '.var_export($this->user_ID, true), 'session' );
+
+					if( $row->sess_data )
+					{
+						$this->_data = @unserialize($row->sess_data);
+
+						if( $this->_data === false )
+						{
+							$Debuglog->add( 'Session data corrupted!', 'session' );
+							$this->_data = NULL;
+						}
+						else
+						{
+							$Debuglog->add( 'Session data loaded.', 'session' );
+						}
+					}
+					else
+					{
+						$Debuglog->add( 'No session data available.', 'session' );
+						$this->_data = NULL;
+					}
+				}
+				else
+				{
+					$Debuglog->add( 'Session ID/key combination is invalid!', 'session' );
+				}
 			}
 			else
-			{ // No session data in the table
-				$this->key = false;
-
-				$Debuglog->add( 'ID not valid!', 'session' );
+			{
+				$Debuglog->add( 'Invalid cookie data format!', 'session' );
 			}
 		}
 
-		if( !$this->key )
-		{ // start new session
+
+		if( $this->ID )
+		{ // there was a valid session before; update data
+			$DB->query(
+				'UPDATE T_sessions SET
+					sess_lastseen = "'.date( 'Y-m-d H:i:s', $servertimenow ).'",
+					sess_ipaddress = "'.$Hit->IP.'"
+					WHERE sess_ID = '.$this->ID );
+		}
+		else
+		{ // create a new session
 			$this->key = $this->generate_key();
 
-			// fplanque>> I'm changing INSERT into REPLACE because this fails all the time on duplicate entry! :(((
-			$DB->query( 'REPLACE INTO T_sessions
-										(sess_key, sess_lastseen, sess_ipaddress, sess_user_ID)
-										VALUES (
-											"'.$this->key.'",
-											"'.date( 'Y-m-d H:i:s', $servertimenow ).'",
-											"'.getIpList( true ).'",
-											'.( $current_User ? '"'.$current_User->ID.'"' : 'NULL' )
-										.')' );
+			$DB->query(
+				'INSERT INTO T_sessions
+				( sess_key, sess_lastseen, sess_ipaddress )
+				VALUES (
+					"'.$this->key.'",
+					"'.date( 'Y-m-d H:i:s', $servertimenow ).'",
+					"'.$Hit->IP.'"'
+				.')' );
 
 			$this->ID = $DB->insert_id;
 
+			setcookie( $cookie_session, $this->ID.'_'.$this->key, $cookie_expires, $cookie_path, $cookie_domain );
+
 			$Debuglog->add( 'ID (generated): '.$this->ID, 'session' );
+			$Debuglog->add( 'Cookie sent.', 'session' );
 		}
-		else
-		{ // update "Last seen" info
-			$DB->query( 'UPDATE T_sessions
-										SET sess_lastseen = "'.date( 'Y-m-d H:i:s', $servertimenow ).'"
-										WHERE sess_ID = "'.$this->ID.'"' );
-		}
-
-		// Send session ID cookie
-		setcookie( $cookie_session, $this->ID, $cookie_expires, $cookie_path, $cookie_domain );
-		// Send the session key cookie
-		setcookie( $cookie_key, $this->key, $cookie_expires, $cookie_path, $cookie_domain );
-
 
 		/*
-		TODO: - use a new $Setting for this and delete not always (like hitlog autopruning).
-					- respect session timeout setting, instead of $online_session_timeout.
-
+		TODO: (post-phoenix)
+		$Cron->add_task( array(&$this, 'dbsave'), 'always' ); // always save data (no need to call it manually)!
+		$Cron->add_task( array(&$this, 'dbprune') ); // if it's due depends on $Settings
 		*/
-		// mafolle:  I left this in for now till the other method is written or else session tables could get clogged.
-		 // fplanque>> session tables WILL get clogged and need to be pruned with the hitlogs table
-		// Delete deprecated session info:
-		/*$DB->query( 'DELETE FROM T_sessions
-									WHERE sess_lastseen < "'.date( 'Y-m-d H:i:s', ($servertimenow - $online_session_timeout) ).'"
-										OR ( sess_ipaddress = "'.getIpList( true ).'"
-													AND sess_user_ID is NULL )' );*/
+		$this->dbprune();
 	}
 
-
-	/**
-	 * Is the session validated by a key?
-	 *
-	 * @return boolean
-	 */
-	function is_valid_by_key()
-	{
-		return !empty($this->key);
-	}
 
 	/**
 	 * Generate a valid key of size $size
@@ -180,107 +199,132 @@ class Session
 	 */
 	function generate_key( $size = 32 )
 	{
-		$key = "";
-		if( !is_int($key) )
+		static $keychars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+		$key = '';
+
+		for( $i = 0; $i < $size; $i++ )
 		{
-			$size = 32;
+			$key .= $keychars{mt_rand(0, 61 )}; // get a random character out of $keychars
 		}
-		while( strlen( $key ) < $size )
-		{
-			$choice = mt_rand( 1, 3);
-			/**
-			 * To fit the specifications of the security enhancements
-			 * the code had to do [a-zA-Z0-9].
-			 * This does that by randomly picking a-z, A-Z, or 0-9
-			 * and then randomly picking a character in that sequence.
-			 */
-			switch($choice)
-			{
-				case '1':
-					$key .= chr( mt_rand( 48, 57 ) );
-					break;
-				case '2':
-					$key .= chr( mt_rand( 65, 90 ) );
-					break;
-				default:
-					$key .= chr( mt_rand( 97, 122 ) );
-					break;
-			}
-		}
+
 		return $key;
 	}
 
 
-	/*
-	* Set the user of the session by the user
-	 * fplanque>> please split this in 2 functions: set_user_ID( $user_ID ) and set_User( $User ) one for ID and one for object.
-	* @param $User is the User class variable relating to the current person
-	* @return boolean whether the action was successfully performed
-	*/
-	function set_user( $User = 0)
+	/**
+	 * Attach a User object to the session.
+	 *
+	 * @param User The user to attach
+	 * @return boolean true on success, false on failure
+	 */
+	function set_User( $User )
+	{
+		return $this->set_user_ID( $User->get('ID') );
+	}
+
+
+	/**
+	 * Attach a user ID to the session.
+	 *
+	 * @param integer The ID of the user to attach
+	 * @return boolean true on success, false on failure
+	 */
+	function set_user_ID( $ID )
 	{
 		global $DB, $Debuglog;
-		// if the variable is a User object get the user's ID`
-		if( is_a( $User, 'User' ) )
-		{
-			$ID = $User->get('ID');
-		}
-		// else, if the object is an integer, it must be the ID
-		elseif( is_int( $User ) )
-		{
-			$ID = $User;
-		}
-		// else I don't know or care what it is so just leave
-		else
-		{
-			return false;
-		}
 
-		// Set the entry in the database 
-		if(!$DB->query( 'UPDATE T_sessions SET sess_user_ID = "' . $ID . '" ' .
-											'where sess_key = "' . $this->key . 
-											'" AND sess_ID = ' . $this->ID . ';' ))
+		// Set the entry in the database
+		if( !$DB->query(
+			'UPDATE T_sessions SET sess_user_ID = "'.$ID.'"
+			WHERE sess_ID = "'.$this->ID.'"' ) );
 		{
 			$Debuglog->add( 'Setting user of session failed!', 'session' );
+
 			return false;
 		}
-									
+
 		return true;
 	}
-	
 
-	/*
-	* Remove the user from the current session (for logout or timeout)
-	 * fplanque> No, we want to keep the user in the session log. To invalidate a session, we should on clear its key.
-	* @return boolean whether this was successfully executed
-	*/
-	function remove_user()
+
+	/**
+	 * Logout the user, by invalidating the session key and unsetting {@link $user_ID}
+	 *
+	 * We want to keep the user in the session log.
+	 *
+	 * @return boolean whether this was successfully executed
+	 */
+	function logout()
 	{
 		global $Debuglog;
-		// this will set the sess_user_ID field in T_sessions to 0
-		// which will log them out
-		if($this->set_user( 0 ) )
-		{
-			$Debuglog->add( 'Removing user from session failed!', 'session');
-			return false;
-		}
 
-		$self->userID='NULL';
-		return true;
-		
+		$this->key = NULL;
+		$this->user_ID = NULL;
+
+		// TODO: Remove unneeded data from $this->_data once used
+		$this->dbsave();
 	}
 
-	/*
-	* Check if session has a user
-	* @return boolean
-	*/
+
+	/**
+	 * Check if session has a user attached.
+	 *
+	 * @return boolean
+	 */
 	function session_has_user()
 	{
-		//  this has so many possibilities because when MySQL first sets it
-		//  it sets it to null, when I attempt to set it to null though it sets
-		//  it to 0 so I just set it to 0, then I checked '' just because
-		// fplanque>> I thin return !empty( $this->user_ID ) should do the job
-		return( $this->userID != 0 && $this->userID != 'NULL' && $this->userID != '' );
+		return !empty( $this->user_ID );
+	}
+
+
+	/**
+	 * Get the probability that this is spam.
+	 *
+	 * @todo (php5) Move to interface
+	 * @return integer|boolean
+	 */
+	function get_spam_probability()
+	{
+		if( $this->session_has_user() )
+		{
+			return -50;
+		}
+
+		return 0;
+	}
+
+
+	/**
+	 * Updates {@link $_data} and {@link $key} into the database.
+	 */
+	function dbsave()
+	{
+		global $DB;
+
+		$DB->query(
+			'UPDATE T_sessions SET
+				sess_data = '.$DB->quote( serialize($this->_data) ).',
+				sess_key = '.$DB->quote( $this->key ).'
+			WHERE sess_ID = '.$this->ID, 'Session::dbsave' );
+	}
+
+
+	/**
+	 * Prune old sessions according to auto_prune_sessions general setting.
+	 *
+	 * @todo Use a Setting to remember last prune? - see {@link Hitlist::dbprune()}.
+	 */
+	function dbprune()
+	{
+		global $DB, $Settings, $servertimenow;
+
+		if( $Settings->get('auto_prune_sessions') )
+		{
+			$datetime_prune_before = date( 'Y-m-d H:i:s', ($servertimenow - $Settings->get('auto_prune_sessions')) );
+			$DB->query(
+				'DELETE FROM T_sessions
+				WHERE sess_lastseen < "'.$datetime_prune_before.'"', 'Session::dbprune()' );
+		}
 	}
 }
 
