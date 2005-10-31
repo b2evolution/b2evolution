@@ -196,7 +196,7 @@ else
 				<strong>';
 				if( $current_User->check_perm( 'options', 'edit' ) )
 				{
-					echo '<a href="?action=edit&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
+					echo '<a href="locales.php?action=edit&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '')
 								.'" title="'.T_('Edit locale').'">';
 				}
 				echo $lkey;
@@ -228,7 +228,7 @@ else
 				echo '<td class="left">';
 				if( $i > 1 )
 				{ // show "move prio up"
-					echo '<a href="?action=prioup&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'"><img src="img/arrowup.png" alt="'.T_('up').'" title="'.T_('Move priority up').'" width="14" height="14" class="middle" /></a>';
+					echo '<a href="locales.php?action=prioup&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'"><img src="img/arrowup.png" alt="'.T_('up').'" title="'.T_('Move priority up').'" width="14" height="14" class="middle" /></a>';
 				}
 				else
 				{
@@ -237,21 +237,21 @@ else
 
 				if( $i < count($locales) )
 				{ // show "move prio down"
-					echo '<a href="?action=priodown&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'"><img src="img/arrowdown.png" alt="'.T_('down').'" title="'.T_('Move priority down').'" width="14" height="14" class="middle" /></a>';
+					echo '<a href="locales.php?action=priodown&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'"><img src="img/arrowdown.png" alt="'.T_('down').'" title="'.T_('Move priority down').'" width="14" height="14" class="middle" /></a>';
 				}
 				else
 				{
 					echo '<img src="img/blank.gif" width="14" height="14" class="middle" alt="" />';
 				}
 				echo '
-				<a href="?action=edit&amp;edit_locale=_new_&amp;template='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'" title="'.T_('Copy locale').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" title="'.T_('Copy locale').'" /></a>
+				<a href="locales.php?action=edit&amp;edit_locale=_new_&amp;template='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'" title="'.T_('Copy locale').'"><img src="img/copy.gif" width="13" height="13" class="middle" alt="'.T_('Copy').'" title="'.T_('Copy locale').'" /></a>
 
-				<a href="?action=edit&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'" title="'.T_('Edit locale').'"><img src="img/properties.png" width="18" height="13" alt="'.T_('Edit').'" title="'.T_('Edit locale').'" class="middle" /></a>
+				<a href="locales.php?action=edit&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'" title="'.T_('Edit locale').'"><img src="img/properties.png" width="18" height="13" alt="'.T_('Edit').'" title="'.T_('Edit locale').'" class="middle" /></a>
 				';
 				if( isset($lval[ 'fromdb' ]) )
 				{ // allow to delete locales loaded from db
 					$l_atleastonefromdb = 1;
-					echo '<a href="?delete='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'"><img src="img/xross.gif" height="13" width="13" class="middle" alt="'.T_('Reset').'" title="'.T_('Reset custom settings').'" /></a>';
+					echo '<a href="locales.php?delete='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'"><img src="img/xross.gif" height="13" width="13" class="middle" alt="'.T_('Reset').'" title="'.T_('Reset custom settings').'" /></a>';
 				}
 				echo '</td>';
 			}

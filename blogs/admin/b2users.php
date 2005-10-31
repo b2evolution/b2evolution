@@ -183,14 +183,16 @@ else
 			}
 
 			// check if new login already exists for another user_ID
-			$query = "SELECT user_ID
-									FROM T_users
-								 WHERE user_login = '$edited_user_login'
-								   AND user_ID != $edited_user_ID";
+			$query = "
+				SELECT user_ID
+				FROM T_users
+				WHERE user_login = '$edited_user_login'
+				AND user_ID != $edited_user_ID";
 			if( $q = $DB->get_var( $query ) )
 			{
 				$Request->param_error( 'edited_user_login',
-					sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'), 'href="?user_ID='.$q.'"' ), 'error' );
+					sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'),
+						'href="b2users.php?user_ID='.$q.'"' ), 'error' );
 			}
 
 			param( 'edited_user_firstname', 'string', true );
@@ -393,7 +395,8 @@ else
 			if( $q = $DB->get_var( $query ) )
 			{
 				$Request->param_error( 'edited_grp_name',
-							sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'), 'href="?grp_ID='.$q.'"' ) );
+					sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'),
+						'href="b2users.php?grp_ID='.$q.'"' ) );
 			}
 
 			if( $edited_grp_ID == 0 )
@@ -562,6 +565,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.106  2005/10/31 00:21:27  blueyed
+ * Made links like "?action=" more explicit by refering to the page (.php file) they link to. This fixes a problem reported by a user. I could not reproduce it, but it was browser independent. He used a mobile card with a laptop (t-online, no wlan).
+ *
  * Revision 1.105  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *

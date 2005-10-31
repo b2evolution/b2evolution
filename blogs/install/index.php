@@ -99,7 +99,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 	{
 		echo "\n<li>";
 		if( $default_locale == $lkey ) echo '<strong>';
-		echo ' <a href="?action='.$action.'&amp;locale='.$lkey.'">';
+		echo ' <a href="index.php?action='.$action.'&amp;locale='.$lkey.'">';
 		locale_flag( $lkey, 'w16px', 'flag', '', true, $install_dirout.$img_subdir.'flags' );
 		echo T_( $lvalue['name'] );
 		echo '</a>';

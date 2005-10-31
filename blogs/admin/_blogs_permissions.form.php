@@ -189,13 +189,13 @@ $Form->begin_fieldset( T_('User permissions') );
 <div style="float:right">
 	<?php
 	echo T_('Layout').': ';
-	echo '[<a href="?action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=default"
+	echo '[<a href="blogs.php?action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=default"
 					onclick="switch_layout(\'default\'); return false;">Simple</a>] ';
-	echo '[<a href="?action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=wide"
+	echo '[<a href="blogs.php?action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=wide"
 					onclick="switch_layout(\'wide\'); return false;">Wide</a>] ';
 	if( $debug )
 	{
-		echo '[<a href="?action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=all"
+		echo '[<a href="blogs.php?action=edit&amp;tab=perm&amp;blog='.$edited_Blog->ID.'&amp;layout=all"
 						onclick="switch_layout(\'all\'); return false;">Debug</a>] ';
 	}
 	?>
@@ -240,7 +240,7 @@ $Form->begin_fieldset( T_('User permissions') );
 			</tr>
 
 			<?php
-			$members = list_users( 'wide', 
+			$members = list_users( 'wide',
 								'SELECT user_ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
 													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
 													bloguser_perm_properties, bloguser_perm_media_upload,
@@ -281,7 +281,7 @@ $Form->begin_fieldset( T_('User permissions') );
 
 		<?php
 
-		$members = list_users( 'default', 
+		$members = list_users( 'default',
 							'SELECT user_ID, user_login, bloguser_perm_poststatuses, bloguser_ismember,
 												bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
 												bloguser_perm_properties, bloguser_perm_media_upload,

@@ -159,7 +159,7 @@ function list_groups( $layout, $query )
 								echo ' checked="checked"';
 							}
 							?> onclick="merge_from_easy( this, <?php echo $lrow['grp_ID'] ?> )" class="radio" />
-						
+
 							<label for="blog_perm_easy_<?php echo $lrow['grp_ID'].'_'.$lkey ?>"><?php echo $easy_group[1] ?></label>
 							<?php
 						}
@@ -190,13 +190,13 @@ $Form->begin_fieldset( T_('Group permissions') );
 <div style="float:right">
 	<?php
 	echo T_('Layout').': ';
-	echo '[<a href="?action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=default"
+	echo '[<a href="blogs.php?action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=default"
 					onclick="switch_layout(\'default\'); return false;">Simple</a>] ';
-	echo '[<a href="?action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=wide"
+	echo '[<a href="blogs.php?action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=wide"
 					onclick="switch_layout(\'wide\'); return false;">Wide</a>] ';
 	if( $debug )
 	{
-		echo '[<a href="?action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=all"
+		echo '[<a href="blogs.php?action=edit&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'&amp;layout=all"
 						onclick="switch_layout(\'all\'); return false;">Debug</a>] ';
 	}
 	?>
@@ -241,7 +241,7 @@ $Form->begin_fieldset( T_('Group permissions') );
 			</tr>
 
 			<?php
-			$members = list_groups( 'wide', 
+			$members = list_groups( 'wide',
 								'SELECT grp_ID, grp_name, bloggroup_perm_poststatuses, bloggroup_ismember,
 													bloggroup_perm_comments, bloggroup_perm_delpost, bloggroup_perm_cats,
 													bloggroup_perm_properties, bloggroup_perm_media_upload,
@@ -282,7 +282,7 @@ $Form->begin_fieldset( T_('Group permissions') );
 
 		<?php
 
-		$members = list_groups( 'default', 
+		$members = list_groups( 'default',
 							'SELECT grp_ID, grp_name, bloggroup_perm_poststatuses, bloggroup_ismember,
 												bloggroup_perm_comments, bloggroup_perm_delpost, bloggroup_perm_cats,
 												bloggroup_perm_properties, bloggroup_perm_media_upload,

@@ -24,9 +24,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package admin
  *
+ * NOTE: It uses <code>$AdminUI->get_path(1).'.php'</code> to link back to the ID of the entry.
+ *       If that causes problems later, we'd probably need to set a global like $listeditor_url.
+ *
  * @author fplanque: François PLANQUE.
+ * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
  */
@@ -42,13 +52,15 @@ param( 'action', 'string', 'list' );
  */
 switch( $action )
 {
-
 	case 'copy':
 	case 'edit':
 		param( 'ID', 'integer', true );
-		$name = $DB->get_var( "SELECT $edited_table_namecol
-														 FROM $edited_table
-														WHERE $edited_table_IDcol = $ID" );
+
+		$name = $DB->get_var(
+			"SELECT $edited_table_namecol
+			 FROM $edited_table
+			WHERE $edited_table_IDcol = $ID" );
+
 		if( $DB->num_rows != 1 )
 		{
 			$Messages->head = T_('Cannot edit entry!');
@@ -63,8 +75,9 @@ switch( $action )
 		$Request->param( 'name', 'string', true );
 		if( $Request->param_check_not_empty( 'name', T_('Please enter a string.') ) )
 		{
-			$DB->query( "INSERT INTO $edited_table( $edited_table_namecol )
-										VALUES( ".$DB->quote($name).' )' );
+			$DB->query(
+				"INSERT INTO $edited_table( $edited_table_namecol )
+				VALUES( ".$DB->quote($name).' )' );
 
 			$Messages->add( T_('Entry created.'), 'success' );
 			$name = '';
@@ -77,9 +90,10 @@ switch( $action )
 		$Request->param( 'ID', 'integer', true );
 		$Request->param_string_not_empty( 'name', T_('Please enter a string.') );
 		{
-			$DB->query( "UPDATE $edited_table
-											SET $edited_table_namecol = ".$DB->quote($name)."
-										WHERE	$edited_table_IDcol = $ID" );
+			$DB->query(
+				"UPDATE $edited_table
+				SET $edited_table_namecol = ".$DB->quote($name)."
+				WHERE $edited_table_IDcol = $ID" );
 
 			$Messages->add( sprintf( T_('Entry #%d updated.'), $ID ), 'success' );
 			unset( $ID );
@@ -95,8 +109,9 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed
 			// Delete from DB:
-			$DB->query( "DELETE FROM $edited_table
-								 		WHERE $edited_table_IDcol = $ID" );
+			$DB->query(
+				"DELETE FROM $edited_table
+				WHERE $edited_table_IDcol = $ID" );
 
 			if( $DB->rows_affected != 1 )
 			{
@@ -174,29 +189,31 @@ if( isset( $list_title ) )
 }
 
 $Results->cols[] = array(
-						'th' => T_('ID'),
-						'order' => $edited_table_IDcol,
-						'th_start' => '<tr><th class="firstcol shrinkwrap">',
-						'td_start' => '<td class="firstcol shrinkwrap">',
-						'td' => "\$$edited_table_IDcol\$",
-					);
+	'th' => T_('ID'),
+	'order' => $edited_table_IDcol,
+	'th_start' => '<tr><th class="firstcol shrinkwrap">',
+	'td_start' => '<td class="firstcol shrinkwrap">',
+	'td' => "\$$edited_table_IDcol\$",
+	);
 
 $Results->cols[] = array(
-						'th' => T_('Name'),
-						'order' => $edited_table_namecol,
-						'td' => '<strong><a href="?ID=$'.$edited_table_IDcol.'$&amp;action=edit" title="'.
-            T_('Edit this entry...').'">$'.$edited_table_namecol.'$</a></strong>',
-					);
+	'th' => T_('Name'),
+	'order' => $edited_table_namecol,
+	'td' => '<strong><a href="'
+		.$AdminUI->get_path(1).'.php' // this may be 'statuses.php' or 'types.php' atm
+		.'?ID=$'.$edited_table_IDcol.'$&amp;action=edit" title="'.
+	T_('Edit this entry...').'">$'.$edited_table_namecol.'$</a></strong>',
+	);
 
 $Results->cols[] = array(
-						'th' => T_('Actions'),
-						'td' => action_icon( T_('Edit...'), 'edit',
-                      '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=edit\')%' ).
-						        action_icon( T_('Duplicate...'), 'copy',
-                      '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=copy\')%' ).
-						        action_icon( T_('Delete!'), 'delete',
-                      '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=delete\')%' ),
-					);
+	'th' => T_('Actions'),
+	'td' => action_icon( T_('Edit...'), 'edit',
+	          '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=edit\')%' ).
+	        action_icon( T_('Duplicate...'), 'copy',
+	          '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=copy\')%' ).
+	        action_icon( T_('Delete!'), 'delete',
+	          '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=delete\')%' ),
+	);
 
 $Results->display();
 
@@ -228,13 +245,15 @@ $Form->text( 'name', $name, min(40,$edited_name_maxlen), T_('Name'), '', $edited
 
 if( $creating )
 {
-	$Form->end_form( array( array( '', '', T_('Record'), 'SaveButton' ),
-									 array( 'reset', 'reset', T_('Update'), 'SaveButton' ) ) );
+	$Form->end_form( array(
+		array( '', '', T_('Record'), 'SaveButton' ),
+		array( 'reset', 'reset', T_('Update'), 'SaveButton' ) ) );
 }
 else
 {
-	$Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
-									 array( 'reset', 'reset', T_('Update'), 'SaveButton' ) ) );
+	$Form->end_form( array(
+		array( '', '', T_('Update'), 'SaveButton' ),
+		array( 'reset', 'reset', T_('Update'), 'SaveButton' ) ) );
 }
 
 // End payload block:
