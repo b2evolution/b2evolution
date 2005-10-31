@@ -91,19 +91,20 @@ if( $checkuser_id != $current_User->ID )
 if( $demo_mode && ($current_User->login == 'demouser') )
 {
 	die( 'Demo mode: you can\'t edit the demouser profile!<br />[<a href="javascript:history.go(-1)">'
-				. T_('Back to profile') . '</a>]' );
+		. T_('Back to profile') . '</a>]' );
 }
 
 /**
  * Additional checks:
  */
-profile_check_params( array( 'nickname' => $newuser_nickname,
-															'icq' => $newuser_icq,
-															'email' => $newuser_email,
-															'url' => $newuser_url,
-															'pass1' => $pass1,
-															'pass2' => $pass2,
-															'pass_required' => false ) );
+profile_check_params( array(
+	'nickname' => $newuser_nickname,
+	'icq' => $newuser_icq,
+	'email' => $newuser_email,
+	'url' => $newuser_url,
+	'pass1' => $pass1,
+	'pass2' => $pass2,
+	'pass_required' => false ), $current_User );
 
 
 if( $Messages->count( 'error' ) )

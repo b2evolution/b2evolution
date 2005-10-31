@@ -306,19 +306,21 @@ function user_preferredname( $user_ID )
 /**
  * Check profile parameters and add errors to {@link $Messages}.
  *
+ * Only parameters are tested that get set.
+ *
  * @param array associative array
- *              'nickname': is mandatory
+ *              'login': check for non-empty
+ *              'nickname': check for non-empty
  *              'icq': must be a number
  *              'email': mandatory, must be well formed
  *              'url': must be well formed, in allowed scheme, not blacklisted
- *              'pass1' / 'pass2': passwords (twice), must be the same
+ *              'pass1' / 'pass2': passwords (twice), must be the same and not == login (if given)
  *              'pass_required': false/true (default is true)
+ * @param User|NULL A user to use for additional checks (password != login/nick).
  */
-function profile_check_params( $params )
+function profile_check_params( $params, $User = NULL )
 {
-	global $Messages, $Settings;
-	global $comments_allowed_uri_scheme;
-
+	global $Messages, $Settings, $comments_allowed_uri_scheme;
 
 	if( !is_array($params) )
 	{
@@ -387,10 +389,17 @@ function profile_check_params( $params )
 			{
 				$Messages->add( T_('You typed two different passwords.'), 'error' );
 			}
-			elseif( strlen($params['pass1']) < $Settings->get('user_minpwdlen')
-							|| strlen($params['pass2']) < $Settings->get('user_minpwdlen') )
+			elseif( strlen($params['pass1']) < $Settings->get('user_minpwdlen') )
 			{
 				$Messages->add( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen')), 'error' );
+			}
+			elseif( isset($User) && $params['pass1'] == $User->get('login') )
+			{
+				$Messages->add( T_('The password must be different from your login.'), 'error' );
+			}
+			elseif( isset($User) && $params['pass1'] == $User->get('nickname') )
+			{
+				$Messages->add( T_('The password must be different from your nickname.'), 'error' );
 			}
 		}
 	}
@@ -398,6 +407,9 @@ function profile_check_params( $params )
 
 /*
  * $Log$
+ * Revision 1.31  2005/10/31 08:33:31  blueyed
+ * profile_check_params(): Allow passing a User object that can be used for additional tests (password != login/nickname)
+ *
  * Revision 1.30  2005/10/31 06:13:03  blueyed
  * Finally merged my work on $Session in.
  *
