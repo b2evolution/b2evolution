@@ -23,6 +23,7 @@
  */
 require_once(dirname(__FILE__).'/../conf/_config.php' );
 require_once(dirname(__FILE__).'/../conf/_admin.php' ); // TO get extended definitions Tor Oct 2005
+// fplanque>>WHAT IS UPGRADE USED FOR????
 require_once(dirname(__FILE__).'/../conf/_upgrade.php' ); // TO get extended definitions Tor Oct 2005
 require_once(dirname(__FILE__).'/'.$xmlsrv_dirout.$core_subdir.'_main.inc.php' );
 
@@ -34,18 +35,19 @@ if( true !== CANUSEXMLRPC )
 
 // We can't display standard error messages. We must return XMLRPC responses.
 $DB->halt_on_error = false;
-$DB->show_errors = true;
+$DB->show_errors = false;
 
 // All statuses are allowed for display/acting on (including drafts and deprecated posts):
 $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
 
 $post_default_title = ''; // posts submitted via the xmlrpc interface get that title
 
-$xmlrpc_logging = 1;		// Set to 1 if you want to enable logging
+$xmlrpc_logging = 0;		// Set to 1 if you want to enable logging
 
-$xmlrpc_debug_messages = 1;		// Set to 1 if you want to enable debug messages (comments inside of the XML responses)
+$xmlrpc_debug_messages = 0;		// Set to 1 if you want to enable debug messages (comments inside of the XML responses)
 
-$xmlrpc_htmlchecking = 0;  //Set to 1 to do HTML sanity checking as in the browser interface, set to 0 if
+// If you want this functionality, please give it it's own config variable in the config files.
+	//$xmlrpc_htmlchecking = 0;  //Set to 1 to do HTML sanity checking as in the browser interface, set to 0 if
 							// you trust the editing tool to do this (more features than the browser interface)
 
 function logIO($io,$msg)
@@ -657,7 +659,7 @@ function bloggerdeletepost($m)
 
 	$post_ID = $m->getParam(1);
 	$post_ID = $post_ID->scalarval();
-	logIO("O","finished getting post_id ...".$post_ID);	
+	// logIO("O","finished getting post_id ...".$post_ID);	
 
 	$username = $m->getParam(2);
 	$username = $username->scalarval();
@@ -1641,7 +1643,7 @@ function mwnewpost($m)
 	logIO("O","finished getting username ...");
 	$password = $m->getParam(2);
 	$password = $password->scalarval();
-	logIO("O","finished getting password ...".$password);
+	// logIO("O","finished getting password ...".$password);
 	$xcontent = $m->getParam(3);
 //	$xcontent = $xcontent->scalarval();
 	logIO("O","finished getting xcontent ...");
@@ -1666,8 +1668,11 @@ function mwnewpost($m)
 //------------------
 // This code is horribly inefficient, will rewrite soon - Tor dec 2004
 ///
-//	$sql = "SELECT * FROM $tablecategories WHERE cat_blog_ID = $blogid AND cat_name = $categories[0] ";
-	$sql = "SELECT * FROM $tablecategories WHERE cat_blog_ID = $blogid ";
+
+//	$sql = "SELECT * FROM T_categories WHERE cat_blog_ID = $blogid AND cat_name = $categories[0] ";
+
+	$sql = "SELECT * FROM T_categories WHERE cat_blog_ID = $blogid ";
+
 		logIO("O","sql for finding ID ...".$sql);
 	$rows = $DB->get_results( $sql );
 	if( !empty($DB->last_error) )
@@ -1750,6 +1755,9 @@ function mwnewpost($m)
 		sleep( $sleep_after_edit );
 	}
 	// pingback( true, $content, $post_title, '', $post_ID, $blogparams, false); // bug here in 9.0.11
+
+//		logIO("O","Sending email notifications...");
+//		$edited_Item->send_email_notifications( false );
 	logIO("O","Pinging b2evolution.net...");
 //	New error is here somewhere - and of course with ecto these functions are not needed
 // so we will need config option to opt out of all of these
@@ -2119,7 +2127,8 @@ function mwgetcats( $m )
 		return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
-	$sql = "SELECT * FROM $tablecategories ";
+	$sql = "SELECT *
+					FROM T_categories ";
 	if( $blogid > 1 ) $sql .= "WHERE cat_blog_ID = $blogid ";
 	$sql .= "ORDER BY cat_name ASC";
 	$rows = $DB->get_results( $sql );
@@ -2260,7 +2269,11 @@ $mwgetpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrp
 
 function mwgetpost($m)
 {
-	global $xmlrpcerruser,$tableposts;
+
+	global $xmlrpcerruser;
+
+
+
 	$post_ID = $m->getParam(0);
 	$post_ID = $post_ID->scalarval();
 	$username = $m->getParam(1);
@@ -2408,6 +2421,16 @@ $s=new xmlrpc_server(
 
 				
 
+							 "b2.newPost" =>
+							 array("function" => "b2newpost",
+										 "signature" => $b2newpost_sig,
+										 "docstring" => $b2newpost_doc),
+
+							 "b2.getCategories" =>
+							 array("function" => "b2getcategories",
+										 "signature" => $b2getcategories_sig,
+										 "docstring" => $b2getcategories_doc),
+
 							 "b2.getPostURL" =>
 							 array("function" => "pingback_getPostURL",
 										 "signature" => $b2_getPostURL_sig,
@@ -2514,6 +2537,9 @@ $s=new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.81  2005/10/31 21:29:04  fplanque
+ * no message
+ *
  * Revision 1.80  2005/10/29 19:46:45  tor_gisvold
  * Bug fix for all blogger API routines - all of these errored due to lack of global cache definition
  * I also hope that I have fixed the pesky double line spacing done by my CVS frontend - if not I apologise and will fix.

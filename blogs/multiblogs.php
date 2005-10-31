@@ -46,10 +46,7 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 	<title>Multiblog demo<?php request_title( ' - ', '', ' - ', 'htmlhead' ) ?></title>
 	<!-- InstanceEndEditable -->
 	<!-- InstanceBeginEditable name="head" -->
-
-	<base href="<?php
-		// You're not using any skin here but this won't hurt. However it will be very helpfull to have this here when you make the switch to a skin!
-		skinbase(); ?>" />
+	<base href="<?php skinbase(); // You're not using any skin here but this won't hurt. However it will be very helpful to have this here when you make the switch to a skin! ?>" />
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
@@ -133,19 +130,11 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 			<?php link_pages() ?>
 		</div>
 		<div class="bSmallPrint">
-			<?php
-			// Link to comments:
-			$Item->feedback_link( 'comments', '', ' &bull; ' ) ?>
-			<?php
-			// Link to trackbacks:
-			$Item->feedback_link( 'trackbacks', '', ' &bull; ' ) 	?>
-			<?php
-			// Link to trackbacks
-			$Item->feedback_link( 'pingbacks', '', ' &bull; ' ) ?>
+			<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) // Link to comments ?>
+			<?php $Item->feedback_link( 'trackbacks', '', ' &bull; ' ) // Link to trackbacks ?>
+			<?php $Item->feedback_link( 'pingbacks', '', ' &bull; ' ) // Link to trackbacks ?>
 
-			<?php
-			// trackback autodiscovery information
-			$Item->trackback_rdf() ?>
+			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 
 			<a href="<?php $Item->permalink() ?>" title="Permanent link to full entry"><?php echo T_('Permalink') ?></a>
 		</div>
@@ -279,13 +268,13 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 		<h3><?php echo T_('Misc') ?></h3>
 		<ul>
 			<?php
-			// Administrative links:
-			user_login_link( '<li>', '</li>' );
-			user_register_link( '<li>', '</li>' );
-			user_admin_link( '<li>', '</li>' );
-			user_profile_link( '<li>', '</li>' );
-			user_subs_link( '<li>', '</li>' );
-			user_logout_link( '<li>', '</li>' );
+				// Administrative links:
+				user_login_link( '<li>', '</li>' );
+				user_register_link( '<li>', '</li>' );
+				user_admin_link( '<li>', '</li>' );
+				user_profile_link( '<li>', '</li>' );
+				user_subs_link( '<li>', '</li>' );
+				user_logout_link( '<li>', '</li>' );
 			?>
 		</ul>
 	</div>
@@ -317,12 +306,11 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 	?>
 
 	&nbsp;<!-- InstanceBeginEditable name="Baseline" -->
-
-	<!-- InstanceEndEditable -->
 </p>
 <?php
-$Hit->log();  // log the hit on this page
-debug_info(); // output debug info if requested
+	$Hit->log();  // log the hit on this page
+	debug_info(); // output debug info if requested
 ?>
+<p><!-- Note: don't mess with the template here :/ --><!-- InstanceEndEditable --></p>
 </body>
 <!-- InstanceEnd --></html>
