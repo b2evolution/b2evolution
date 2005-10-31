@@ -59,7 +59,7 @@ $AdminUI->add_menu_entries(
 
 			'cats' => array(
 				'text'=>T_('Categories'),
-				'href'=>'b2categories.php?blog='.$blog
+				'href'=>'categories.php?blog='.$blog
 			),
 
 			'blogs' => array(

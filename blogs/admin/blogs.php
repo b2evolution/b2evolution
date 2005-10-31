@@ -266,7 +266,7 @@ switch($action)
 			{
 				echo '<p><strong>';
 				printf( T_('You should <a %s>create categories</a> for this blog now!'),
-							'href="b2categories.php?action=newcat&amp;blog='.$edited_Blog->ID.'"' );
+							'href="categories.php?action=newcat&amp;blog='.$edited_Blog->ID.'"' );
 				echo '</strong></p>';
 			}
 			else
@@ -557,6 +557,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.41  2005/10/31 00:15:27  blueyed
+ * Removed b2categories.php to categories.php
+ *
  * Revision 1.40  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *

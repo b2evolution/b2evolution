@@ -190,7 +190,7 @@ switch($action)
 		// New category form:
 		$AdminUI->disp_payload_begin();
 
-		$Form = & new Form( 'b2categories.php' );
+		$Form = & new Form( 'categories.php' );
 
 		$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,parent_cat_ID' ) );
 
@@ -232,7 +232,7 @@ switch($action)
 
 		$AdminUI->disp_payload_begin();
 
-		$Form = & new Form( 'b2categories.php' );
+		$Form = & new Form( 'categories.php' );
 
 		$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,cat_ID' ) );
 
@@ -339,8 +339,9 @@ switch($action)
 		$Form->info( T_('New parent category'), $r );
 
 
-		$Form->end_form( array( array( 'submit', 'submit', T_('Edit category'), 'SaveButton' ),
-														array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+		$Form->end_form( array(
+			array( 'submit', 'submit', T_('Edit category'), 'SaveButton' ),
+			array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 		$AdminUI->disp_payload_end();
 		break;
@@ -366,6 +367,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.1  2005/10/31 00:15:27  blueyed
+ * Removed b2categories.php to categories.php
+ *
  * Revision 1.48  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *
