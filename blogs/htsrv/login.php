@@ -150,6 +150,7 @@ switch( $action )
 				$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'note' );
 			}
 		}
+		$login_required = true; // Do not display "Without login.." link on the form
 		break;
 
 
@@ -183,6 +184,7 @@ switch( $action )
 				sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
 				$htsrv_url.'login.php?action=retrievepassword&amp;login='.$login.'&amp;redirect_to='.rawurlencode( $redirect_to ) ), 'note' );
 
+			$login_required = true; // Do not display "Without login.." link on the form
 			break;
 		}
 
