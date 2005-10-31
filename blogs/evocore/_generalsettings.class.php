@@ -75,7 +75,7 @@ class GeneralSettings extends AbstractSettings
 		'upload_maxkb' => '100',
 
 		'auto_prune_stats' => '30',         // days
-		'auto_prune_sessions' => '86400',   // seconds
+		'auto_prune_sessions' => '2592000', // seconds (2592000 == 30 days)
 
 		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$',
 
@@ -141,6 +141,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.23  2005/10/31 09:33:21  blueyed
+ * Set session timeout (auto_prune_sessions) to 30 days (old behaviour with cookies); added checks to not allow setting it below 1 hour and give a warning when below 1 day
+ *
  * Revision 1.22  2005/10/31 06:13:03  blueyed
  * Finally merged my work on $Session in.
  *

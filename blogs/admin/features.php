@@ -151,8 +151,18 @@ switch( $action )
 
 
 			// Sessions
-			$Request->param( 'auto_prune_sessions', 'integer', $Settings->get_default('auto_prune_sessions') );
-			$Settings->set( 'auto_prune_sessions', $Request->get('auto_prune_sessions') );
+			$auto_prune_sessions = $Request->param( 'auto_prune_sessions', 'integer', $Settings->get_default('auto_prune_sessions') );
+			if( $auto_prune_sessions < 3600 )
+			{ // lower than 1 hour: not allowed
+				$auto_prune_sessions = 3600;
+				$Messages->add( sprintf( T_( 'You cannot set a session timeout below %d seconds.' ), 3600 ), 'error' );
+			}
+			elseif( $auto_prune_sessions < 86400 )
+			{ // lower than 1 day: notice/warning
+				$Messages->add( sprintf( T_( 'Warning: your global session timeout is just %d seconds. Your users may have to re-login often!' ), 86400 ), 'note' );
+			}
+			$Settings->set( 'auto_prune_sessions', $auto_prune_sessions );
+
 
 			if( ! $Messages->count('error') )
 			{
