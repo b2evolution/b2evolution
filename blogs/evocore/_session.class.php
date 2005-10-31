@@ -92,7 +92,7 @@ class Session
 	 */
 	function Session()
 	{
-		global $DB, $Debuglog, $current_User, $servertimenow;
+		global $DB, $Debuglog, $current_User, $localtimenow;
 		global $Hit;
 		global $cookie_session, $cookie_expires, $cookie_path, $cookie_domain;
 
@@ -158,7 +158,7 @@ class Session
 		{ // there was a valid session before; update data
 			$DB->query(
 				'UPDATE T_sessions SET
-					sess_lastseen = "'.date( 'Y-m-d H:i:s', $servertimenow ).'",
+					sess_lastseen = "'.date( 'Y-m-d H:i:s', $localtimenow ).'",
 					sess_ipaddress = "'.$Hit->IP.'"
 					WHERE sess_ID = '.$this->ID );
 		}
@@ -171,13 +171,13 @@ class Session
 				( sess_key, sess_lastseen, sess_ipaddress )
 				VALUES (
 					"'.$this->key.'",
-					"'.date( 'Y-m-d H:i:s', $servertimenow ).'",
+					"'.date( 'Y-m-d H:i:s', $localtimenow ).'",
 					"'.$Hit->IP.'"'
 				.')' );
 
 			$this->ID = $DB->insert_id;
 
-			// TODO: we should use "( $servertimenow + $Settings->get('auto_prune_sessions') )" instead of $cookie_expires.
+			// TODO: we should use "( $localtimenow + $Settings->get('auto_prune_sessions') )" instead of $cookie_expires.
 			//       but this would require to send the cookie on each request.
 			//       Using $cookie_expires prevents from using auto_prune_sessions > $cookie_expires. (blueyed, 051031)
 			//
@@ -341,11 +341,11 @@ class Session
 	 */
 	function dbprune()
 	{
-		global $DB, $Settings, $servertimenow;
+		global $DB, $Settings, $localtimenow;
 
 		if( $Settings->get('auto_prune_sessions') )
 		{
-			$datetime_prune_before = date( 'Y-m-d H:i:s', ($servertimenow - $Settings->get('auto_prune_sessions')) );
+			$datetime_prune_before = date( 'Y-m-d H:i:s', ($localtimenow - $Settings->get('auto_prune_sessions')) );
 			$DB->query(
 				'DELETE FROM T_sessions
 				WHERE sess_lastseen < "'.$datetime_prune_before.'"', 'Session::dbprune()' );
