@@ -77,7 +77,10 @@ $Form->end_form();
 	<?php
 	if( empty($login_required) )
 	{ // No login required, allow to pass through
-		echo '<a href="'.$location.'">'./* Gets displayed as link to the location on the login form if no login is required */ T_('Without login..').'</a>';
+
+		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
+		$location_without_login = preg_replace( '~(?<=\?|&amp;|&) (login|pwd) = [^&]+ (&(amp;)?|\?)?~x', '', $location );
+		echo '<a href="'.$location_without_login.'">'./* Gets displayed as link to the location on the login form if no login is required */ T_('Without login..').'</a>';
 	}
 	?>
 </div>
