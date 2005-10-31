@@ -1091,9 +1091,9 @@ function create_b2evo_tables_phoenix()
  */
 function create_b2evo_relations()
 {
-	global $DB;
+	global $DB, $db_use_fkeys;
 
-	if( !$DB->use_fkeys )
+	if( !$db_use_fkeys )
 		return false;
 
 	echo 'Creating relations... ';
@@ -1260,6 +1260,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.151  2005/10/31 23:20:45  fplanque
+ * keeping things straight...
+ *
  * Revision 1.150  2005/10/31 08:19:07  blueyed
  * Refactored getRandomPassword() and Session::generate_key() into generate_random_key()
  *

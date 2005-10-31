@@ -335,7 +335,7 @@ class Form extends Widget
 
 				if( $title != '' )
 				{ // there is a title to display
-					// QUESTION: really build a <th> if it's empty?
+					// QUESTION: really build a <th> if it's empty? : YES, empty THs can be rendered and/or are DHTML scriptable
 					$r .= $title;
 				}
 
@@ -2208,6 +2208,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.81  2005/10/31 23:20:45  fplanque
+ * keeping things straight...
+ *
  * Revision 1.80  2005/10/31 02:22:02  blueyed
  * Added question
  *

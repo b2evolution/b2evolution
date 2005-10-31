@@ -471,21 +471,8 @@ class Blog extends DataObject
 				}
 
 			case 'baseurl':
+        // Marian moved previous code to case 'siteurl'
 				return $baseurl;
-
-				if( preg_match( '#^https?://#', $this->siteurl ) )
-				{ // We have a specific URL for this blog:
-					return $this->siteurl;
-				}
-				else
-				{ // This blog is located under b2evo's baseurl
-					$r = $baseurl;
-					if( !empty($this->siteurl) )
-					{ // We have a subfolder:
-						$r .= $this->siteurl;
-					}
-					return $r;
-				}
 
 			case 'basehost':
 				$baseurl = $this->get('baseurl');
@@ -810,6 +797,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2005/10/31 23:20:45  fplanque
+ * keeping things straight...
+ *
  * Revision 1.35  2005/10/28 02:37:37  blueyed
  * Normalized AbstractSettings API
  *

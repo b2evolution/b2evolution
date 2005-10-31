@@ -183,11 +183,10 @@ else
 			}
 
 			// check if new login already exists for another user_ID
-			$query = "
-				SELECT user_ID
-				FROM T_users
-				WHERE user_login = '$edited_user_login'
-				AND user_ID != $edited_user_ID";
+			$query = "SELECT user_ID
+									FROM T_users
+								 WHERE user_login = '$edited_user_login'
+								   AND user_ID != $edited_user_ID";
 			if( $q = $DB->get_var( $query ) )
 			{
 				$Request->param_error( 'edited_user_login',
@@ -549,6 +548,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.108  2005/10/31 23:20:45  fplanque
+ * keeping things straight...
+ *
  * Revision 1.107  2005/10/31 06:13:02  blueyed
  * Finally merged my work on $Session in.
  *

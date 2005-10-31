@@ -67,7 +67,7 @@ $Form->begin_form( 'fform', T_('File properties') );
 			$Form->textarea( 'desc', $selectedFile->desc, 10, T_('Caption/Description') );
 		}
 		else
-		{ // Use rcan view only:
+		{ // User can view only:
 			$Form->info( T_('Long title'), $selectedFile->dget('title'), T_('This is a longer descriptive title') );
 			$Form->info( T_('Alternative text'), $selectedFile->dget('alt'), T_('This is useful for images') );
 			$Form->info( T_('Caption/Description'), $selectedFile->dget('desc') );
@@ -89,6 +89,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.11  2005/10/31 23:20:45  fplanque
+ * keeping things straight...
+ *
  * Revision 1.10  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *

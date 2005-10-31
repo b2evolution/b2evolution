@@ -55,12 +55,9 @@ switch( $action )
 	case 'copy':
 	case 'edit':
 		param( 'ID', 'integer', true );
-
-		$name = $DB->get_var(
-			"SELECT $edited_table_namecol
-			 FROM $edited_table
-			WHERE $edited_table_IDcol = $ID" );
-
+		$name = $DB->get_var( "SELECT $edited_table_namecol
+														 FROM $edited_table
+														WHERE $edited_table_IDcol = $ID" );
 		if( $DB->num_rows != 1 )
 		{
 			$Messages->head = T_('Cannot edit entry!');
@@ -75,9 +72,8 @@ switch( $action )
 		$Request->param( 'name', 'string', true );
 		if( $Request->param_check_not_empty( 'name', T_('Please enter a string.') ) )
 		{
-			$DB->query(
-				"INSERT INTO $edited_table( $edited_table_namecol )
-				VALUES( ".$DB->quote($name).' )' );
+			$DB->query( "INSERT INTO $edited_table( $edited_table_namecol )
+										VALUES( ".$DB->quote($name).' )' );
 
 			$Messages->add( T_('Entry created.'), 'success' );
 			$name = '';
@@ -90,10 +86,9 @@ switch( $action )
 		$Request->param( 'ID', 'integer', true );
 		$Request->param_string_not_empty( 'name', T_('Please enter a string.') );
 		{
-			$DB->query(
-				"UPDATE $edited_table
-				SET $edited_table_namecol = ".$DB->quote($name)."
-				WHERE $edited_table_IDcol = $ID" );
+			$DB->query( "UPDATE $edited_table
+											SET $edited_table_namecol = ".$DB->quote($name)."
+										WHERE	$edited_table_IDcol = $ID" );
 
 			$Messages->add( sprintf( T_('Entry #%d updated.'), $ID ), 'success' );
 			unset( $ID );
@@ -109,9 +104,8 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed
 			// Delete from DB:
-			$DB->query(
-				"DELETE FROM $edited_table
-				WHERE $edited_table_IDcol = $ID" );
+			$DB->query( "DELETE FROM $edited_table
+								 		WHERE $edited_table_IDcol = $ID" );
 
 			if( $DB->rows_affected != 1 )
 			{
@@ -189,30 +183,28 @@ if( isset( $list_title ) )
 }
 
 $Results->cols[] = array(
-	'th' => T_('ID'),
-	'order' => $edited_table_IDcol,
-	'th_start' => '<tr><th class="firstcol shrinkwrap">',
-	'td_start' => '<td class="firstcol shrinkwrap">',
-	'td' => "\$$edited_table_IDcol\$",
+		'th' => T_('ID'),
+		'order' => $edited_table_IDcol,
+		'th_start' => '<tr><th class="firstcol shrinkwrap">',
+		'td_start' => '<td class="firstcol shrinkwrap">',
+		'td' => "\$$edited_table_IDcol\$",
 	);
 
 $Results->cols[] = array(
-	'th' => T_('Name'),
-	'order' => $edited_table_namecol,
-	'td' => '<strong><a href="'
-		.$AdminUI->get_path(1).'.php' // this may be 'statuses.php' or 'types.php' atm
-		.'?ID=$'.$edited_table_IDcol.'$&amp;action=edit" title="'.
-	T_('Edit this entry...').'">$'.$edited_table_namecol.'$</a></strong>',
+		'th' => T_('Name'),
+		'order' => $edited_table_namecol,
+		'td' => '<strong><a href="'.$pagenow.'?ID=$'.$edited_table_IDcol.'$&amp;action=edit" title="'
+		           .T_('Edit this entry...').'">$'.$edited_table_namecol.'$</a></strong>',
 	);
 
 $Results->cols[] = array(
-	'th' => T_('Actions'),
-	'td' => action_icon( T_('Edit...'), 'edit',
-	          '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=edit\')%' ).
-	        action_icon( T_('Duplicate...'), 'copy',
-	          '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=copy\')%' ).
-	        action_icon( T_('Delete!'), 'delete',
-	          '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=delete\')%' ),
+		'th' => T_('Actions'),
+		'td' => action_icon( T_('Edit...'), 'edit',
+		          '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=edit\')%' ).
+		        action_icon( T_('Duplicate...'), 'copy',
+		          '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=copy\')%' ).
+		        action_icon( T_('Delete!'), 'delete',
+		          '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=delete\')%' ),
 	);
 
 $Results->display();

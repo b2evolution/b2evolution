@@ -438,6 +438,7 @@ function next_posts_link($label='#', $max_page=0, $page='')
 	if (empty($p) && (empty($paged) || $nextpage <= $max_page))
 	{
 		echo '<a href="';
+		// fplanque>> TODO: fix regeneate_url for multiple domains instead!
 		$url = parse_url($Blog->get('siteurl', 'raw'));
 		echo $url['scheme'] . '://' . $url['host'];
 		echo next_posts($max_page, $page);
@@ -936,6 +937,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.35  2005/10/31 23:20:45  fplanque
+ * keeping things straight...
+ *
  * Revision 1.34  2005/10/30 11:16:43  marian
  * rollback of regenerate_url
  * fixing the form-problem in skins/_feedback.php

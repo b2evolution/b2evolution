@@ -146,8 +146,10 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 		$field_maxlength = $field_size;
 
 	// question: is it necessary to enclose each field in a fieldset.
+	// fplanque> YES, for CSS
 	// shouldn't there be a fieldset for a set of field (i.e. all fields
 	// in the form)?
+	// fplanque>> Create a new 'simple' layout if this is what you want
 
 	$r = "<fieldset>\n"
 			.'<div class="label"><label for="'.$field_name.'">'.$field_label.":</label></div>\n"
@@ -553,6 +555,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.15  2005/10/31 23:20:45  fplanque
+ * keeping things straight...
+ *
  * Revision 1.14  2005/10/30 10:44:23  marian
  * changes regarding multi-domain
  * question about fieldset for each form-field

@@ -353,8 +353,8 @@ class DataObject
 			}
 			$count = $DB->get_var(
 				'SELECT COUNT(*)
-					FROM '.$restriction['table'].'
-				 WHERE '.$restriction['fk'].' = '.$this->ID,
+				   FROM '.$restriction['table'].'
+				  WHERE '.$restriction['fk'].' = '.$this->ID,
 				0, 0, 'restriction/cascade check' );
 			if( $count )
 			{
@@ -379,9 +379,9 @@ class DataObject
 		if( $Messages->count('restrict') )
 		{	// There are restrictions:
 			$Messages->head = array(
-				'container' => $restrict_title,
-				'restrict' => T_('The following relations prevent deletion:')
-			);
+					'container' => $restrict_title,
+					'restrict' => T_('The following relations prevent deletion:')
+				);
 			$Messages->foot =	T_('Please delete related objects before you proceed.');
 			return false;	// Can't delete
 		}
@@ -561,7 +561,6 @@ class DataObject
 function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 {
 	global $UserCache;
-
 	if( !empty( $pos_lastedit_user_ID ) )
 	{
 		$User = & $UserCache->get_by_ID( $pos_lastedit_user_ID );
@@ -575,6 +574,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.26  2005/10/31 23:20:45  fplanque
+ * keeping things straight...
+ *
  * Revision 1.25  2005/10/31 02:27:31  blueyed
  * Comments; normalizing
  *

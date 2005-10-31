@@ -43,7 +43,7 @@ $AdminUI->add_menu_entries(
 		NULL, // root
 		array(
 			'new' => array(
-				'text'=>T_('Write'),
+				'text' => T_('Write'),
 				'href' => 'b2edit.php?blog='.$blog,
 				'style' => 'font-weight: bold;'
 			),

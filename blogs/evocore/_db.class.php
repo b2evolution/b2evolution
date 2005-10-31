@@ -139,13 +139,6 @@ class DB
 	var $use_transactions = false;
 
 	/**
-	 * Use foreign key constraints?
-	 *
-	 * You need to use InnoDB in order to enable this. {@see $table_options}
-	 */
-	var $use_fkeys = false;
-
-	/**
 	 * How many transactions are currently nested?
 	 */
 	var $transaction_nesting_level = 0;
@@ -240,7 +233,6 @@ class DB
 	 *    - 'show_errors': Display SQL errors? (true/false); Default: don't change member default ({@link $show_errors})
 	 *    - 'halt_on_error': Halt on error? (true/false); Default: don't change member default ({@link $halt_on_error})
 	 *    - 'table_options': sets {@link $table_options}
-	 *    - 'use_fkeys': sets {@link $use_fkeys}
 	 *    - 'use_transactions': sets {@link $use_transactions}
 	 *    - 'aliases': Aliases for tables (array( alias => table name )); Default: no aliases.
 	 */
@@ -258,7 +250,6 @@ class DB
 		if( isset($params['show_errors']) ) $this->show_errors = $params['show_errors'];
 		if( isset($params['halt_on_error']) ) $this->halt_on_error = $params['halt_on_error'];
 		if( isset($params['table_options']) ) $this->table_options = $params['table_options'];
-		if( isset($params['use_fkeys']) ) $this->use_fkeys = $params['use_fkeys'];
 		if( isset($params['use_transactions']) ) $this->use_transactions = $params['use_transactions'];
 		if( isset($params['debug_dump_rows']) ) $this->debug_dump_rows = $params['debug_dump_rows'];
 		if( isset($params['debug_explain_joins']) ) $this->debug_explain_joins = $params['debug_explain_joins'];
@@ -1172,8 +1163,8 @@ class DB
 
 /*
  * $Log$
- * Revision 1.39  2005/10/29 21:34:00  blueyed
- * Assign $DB->use_fkeys
+ * Revision 1.40  2005/10/31 23:20:45  fplanque
+ * keeping things straight...
  *
  * Revision 1.38  2005/10/26 11:25:38  blueyed
  * Slightly changed behaviour of $debug_dump_function_trace_for_*
