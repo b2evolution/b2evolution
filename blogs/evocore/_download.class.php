@@ -48,7 +48,7 @@ require_once dirname(__FILE__).'/_http.class.php';
 class Download
 {
 
- 	function saveToFile ($url, $type, $destination)
+	function saveToFile ($url, $type, $destination)
 	{
     /*
      *   $url = "http://www.wheely-bin.co.uk/facecake.php"
@@ -56,7 +56,7 @@ class Download
      *              post
      *   $destination   = "/tmp/beecat.tar.gz"
      */
-     $data = getToMemory($url, $type)
+     $data = getToMemory($url, $type);
      $fp = fopen($destination, "w");
 
      fclose($fp);
@@ -68,7 +68,8 @@ class Download
    *   $type   =  get
    *              post
    */
-   if (!is_null($url){
+   if( !is_null($url) )
+   {
     /*
      parse_url("http://username:password@hostname:81/path?arg=value#anchor");
      Array
@@ -90,8 +91,13 @@ class Download
       $port = $url_array["port"];
 
     }
-    else { die();};
-   if (!is_null($destination){
+    else
+		{
+			die();
+		};
+
+    if( !is_null($destination) )
+    {
     }
     else { die();};
     switch ($type)
@@ -117,6 +123,9 @@ class Download
 
 /*
  * $Log$
+ * Revision 1.6  2005/10/31 01:20:51  blueyed
+ * Fix parse errors
+ *
  * Revision 1.5  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *
