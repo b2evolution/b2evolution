@@ -2363,182 +2363,159 @@ function mt_getcategoryList($m) {
 	return new xmlrpcresp( new xmlrpcval($data, "array") );			
 }
 
-		
-
-
-
-
 
 
 
 /**** SERVER FUNCTIONS ARRAY ****/
-$s=new xmlrpc_server(
+$s = new xmlrpc_server(
+	array(
+		"metaWeblog.newMediaObject" =>
+			array(
+				"function" => "mwnewmediaobj",
+				"signature" => $mwnewmediaobj_sig,
+				"docstring" => $mwnewmediaobj_doc),
 
-				array( 
-							 "metaWeblog.newMediaObject" =>	 array("function" => "mwnewmediaobj",
-										 "signature" => $mwnewmediaobj_sig,
-										 "docstring" => $mwnewmediaobj_doc),
+		"metaWeblog.newPost" =>
+			array(
+				"function" => "mwnewpost",
+				"signature" => $mwnewpost_sig,
+				"docstring" => $mwnewpost_doc),
 
-							 "metaWeblog.newPost" => array("function" => "mwnewpost",
-										 "signature" => $mwnewpost_sig,
-										 "docstring" => $mwnewpost_doc),
+		"metaWeblog.editPost" =>
+			array(
+				"function" => "mweditpost",
+			 "signature" => $mweditpost_sig,
+			 "docstring" => $mweditpost_doc),
 
+		"metaWeblog.getPost" =>
+			array(
+				"function" => "mwgetpost",
+				"signature" => $mwgetpost_sig,
+				"docstring" => $mwgetpost_doc),
 
-							 "metaWeblog.editPost" =>
-							 array("function" => "mweditpost",
-										 "signature" => $mweditpost_sig,
-										 "docstring" => $mweditpost_doc),
+		"metaWeblog.getCategories" =>
+			array(
+				"function" => "mwgetcats",
+				"signature" => $mwgetcats_sig,
+				"docstring" => $mwgetcats_doc),
 
-										 
+		"metaWeblog.getRecentPosts" =>
+			array(
+				"function" => "metawebloggetrecentposts",
+				"signature" => $metawebloggetrecentposts_sig,
+				"docstring" => $metawebloggetrecentposts_doc),
 
-							"metaWeblog.getPost" =>
-							array("function" => "mwgetpost",
-									 "signature" => $mwgetpost_sig,
-									 "docstring" => $mwgetpost_doc),
+		"mt.getCategoryList" =>
+			array(
+				"function" => "b2getcategories",
+				"signature" => $b2getcategories_sig,
+				"docstring" => $b2getcategories_doc),
 
-									
+		"b2.newPost" =>
+			array(
+		 		"function" => "b2newpost",
+				"signature" => $b2newpost_sig,
+				"docstring" => $b2newpost_doc),
 
-									 							
+		"b2.getCategories" =>
+			array(
+				"function" => "b2getcategories",
+				"signature" => $b2getcategories_sig,
+				"docstring" => $b2getcategories_doc),
 
-							"metaWeblog.getCategories" =>
-							array("function" => "mwgetcats",
-										 "signature" => $mwgetcats_sig,
-										 "docstring" => $mwgetcats_doc),
+		"b2.getPostURL" =>
+			array(
+				"function" => "pingback_getPostURL",
+				"signature" => $b2_getPostURL_sig,
+				"docstring" => $b2_getPostURL_doc),
 
-										 
+		"blogger.newPost" =>
+			array(
+				"function" => "bloggernewpost",
+				"signature" => $bloggernewpost_sig,
+				"docstring" => $bloggernewpost_doc),
 
-							 "metaWeblog.getRecentPosts" =>
-							 array("function" => "metawebloggetrecentposts",
-										 "signature" => $metawebloggetrecentposts_sig,
-										 "docstring" => $metawebloggetrecentposts_doc),
+		"blogger.editPost" =>
+			array(
+				"function" => "bloggereditpost",
+				"signature" => $bloggereditpost_sig,
+				"docstring" => $bloggereditpost_doc),
 
+		"blogger.deletePost" =>
+			array(
+				"function" => "bloggerdeletepost",
+				"signature" => $bloggerdeletepost_sig,
+				"docstring" => $bloggerdeletepost_doc),
 
+		"blogger.getUsersBlogs" =>
+			array(
+		 		"function" => "bloggergetusersblogs",
+				"signature" => $bloggergetusersblogs_sig,
+				"docstring" => $bloggergetusersblogs_doc),
 
-							 "mt.getCategoryList" =>
-							 array("function" => "b2getcategories",
-										 "signature" => $b2getcategories_sig,
-										 "docstring" => $b2getcategories_doc),
+		"blogger.getUserInfo" =>
+			array(
+				"function" => "bloggergetuserinfo",
+				"signature" => $bloggergetuserinfo_sig,
+				"docstring" => $bloggergetuserinfo_doc),
 
-				
+		"blogger.getPost" =>
+			array(
+				"function" => "bloggergetpost",
+				"signature" => $bloggergetpost_sig,
+				"docstring" => $bloggergetpost_doc),
 
-							 "b2.newPost" =>
-							 array("function" => "b2newpost",
-										 "signature" => $b2newpost_sig,
-										 "docstring" => $b2newpost_doc),
+		"blogger.getRecentPosts" =>
+			array(
+				"function" => "bloggergetrecentposts",
+				"signature" => $bloggergetrecentposts_sig,
+				"docstring" => $bloggergetrecentposts_doc),
 
-							 "b2.getCategories" =>
-							 array("function" => "b2getcategories",
-										 "signature" => $b2getcategories_sig,
-										 "docstring" => $b2getcategories_doc),
+		"blogger.getTemplate" =>
+			array(
+				"function" => "bloggergettemplate",
+				"signature" => $bloggergettemplate_sig,
+				"docstring" => $bloggergettemplate_doc),
 
-							 "b2.getPostURL" =>
-							 array("function" => "pingback_getPostURL",
-										 "signature" => $b2_getPostURL_sig,
-										 "docstring" => $b2_getPostURL_doc),
+		"blogger.setTemplate" =>
+			array(
+				"function" => "bloggersettemplate",
+				"signature" => $bloggersettemplate_sig,
+				"docstring" => $bloggersettemplate_doc),
 
+		"pingback.ping" =>
+			array(
+				"function" => "pingback_ping",
+				"signature" => $pingback_ping_sig,
+				"docstring" => $pingback_ping_doc),
 
+		"mt.getPostCategories" =>
+			array(
+				"function" => "mt_getPostCategories",
+	 			"signature" => $mt_getPostCategories_sig,
+	 			"docstring" => $mt_getPostCategories_doc),
 
+		"mt.getCategoryList" =>
+			array(
+				"function" => "mt_getCategorylist",
+				"signature" => $getCategoryList_sig,
+				"docstring" => $getCategoryList_doc),
 
-
-							 "blogger.newPost" =>
-							 array("function" => "bloggernewpost",
-										 "signature" => $bloggernewpost_sig,
-										 "docstring" => $bloggernewpost_doc),
-
-
-
-							 "blogger.editPost" =>
-							 array("function" => "bloggereditpost",
-										 "signature" => $bloggereditpost_sig,
-										 "docstring" => $bloggereditpost_doc),
-
-
-
-							 "blogger.deletePost" =>
-							 array("function" => "bloggerdeletepost",
-										 "signature" => $bloggerdeletepost_sig,
-										 "docstring" => $bloggerdeletepost_doc),
-
-
-
-							 "blogger.getUsersBlogs" =>
-							 array("function" => "bloggergetusersblogs",
-										 "signature" => $bloggergetusersblogs_sig,
-										 "docstring" => $bloggergetusersblogs_doc),
-
-
-
-							 "blogger.getUserInfo" =>
-							 array("function" => "bloggergetuserinfo",
-										 "signature" => $bloggergetuserinfo_sig,
-										 "docstring" => $bloggergetuserinfo_doc),
-
-
-
-							 "blogger.getPost" =>
-							 array("function" => "bloggergetpost",
-										 "signature" => $bloggergetpost_sig,
-										 "docstring" => $bloggergetpost_doc),
-
-
-
-							 "blogger.getRecentPosts" =>
-							 array("function" => "bloggergetrecentposts",
-										 "signature" => $bloggergetrecentposts_sig,
-										 "docstring" => $bloggergetrecentposts_doc),
-
-
-
-							 "blogger.getTemplate" =>
-							 array("function" => "bloggergettemplate",
-										 "signature" => $bloggergettemplate_sig,
-										 "docstring" => $bloggergettemplate_doc),
-
-
-
-							 "blogger.setTemplate" =>
-							 array("function" => "bloggersettemplate",
-										 "signature" => $bloggersettemplate_sig,
-										 "docstring" => $bloggersettemplate_doc),
-
-
-
-							 "pingback.ping" =>
-							 array("function" => "pingback_ping",
-										 "signature" => $pingback_ping_sig,
-										 "docstring" => $pingback_ping_doc),
-										 
-
-							"mt.getPostCategories" =>
-							array("function" => "mt_getPostCategories",
-	 								"signature" => $mt_getPostCategories_sig,
-	 								"docstring" => $mt_getPostCategories_doc),
-
-
-							"mt.getCategoryList" =>
-							array("function" => "mt_getCategorylist",
-	 								"signature" => $getCategoryList_sig,
-	 								"docstring" => $getCategoryList_doc),
-
-
-							"mt.setPostCategories" =>
-							array("function" => "mt_setPostCategories",
-	 								"signature" => $mt_setPostCategories_sig,
-	 								"docstring" => $mt_setPostCategories_doc),
-
-
-
-						)
-
-				);
+		"mt.setPostCategories" =>
+			array(
+				"function" => "mt_setPostCategories",
+	 			"signature" => $mt_setPostCategories_sig,
+	 			"docstring" => $mt_setPostCategories_doc),
+	)
+);
 
 
 
 
 /*
  * $Log$
- * Revision 1.81  2005/10/31 21:29:04  fplanque
- * no message
+ * Revision 1.82  2005/10/31 21:45:05  fplanque
+ * refact
  *
  * Revision 1.80  2005/10/29 19:46:45  tor_gisvold
  * Bug fix for all blogger API routines - all of these errored due to lack of global cache definition
