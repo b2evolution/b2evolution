@@ -1698,6 +1698,9 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 			{ // We have probably stripped the '>' at the end!
 				$from_save .= '>';
 			}
+
+			// Add X-b2evo notification mail header about this
+			$headers['X-b2evo'] = 'Fixed email header injection (From)';
 			$Debuglog->add( 'Detected email injection! Fixed &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($from_save).'&raquo;.', 'security' );
 
 			$from = $from_save;
@@ -2231,6 +2234,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.122  2005/10/31 06:50:33  blueyed
+ * send_mail(): Add X-b2evo to notice about email header injection fix
+ *
  * Revision 1.121  2005/10/31 05:51:06  blueyed
  * Use rawurlencode() instead of urlencode()
  *
