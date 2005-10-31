@@ -234,16 +234,21 @@ class Session
 		global $DB, $Debuglog;
 
 		// Set the entry in the database
-		if( !$DB->query(
+		$q = $DB->query(
 			'UPDATE T_sessions SET sess_user_ID = "'.$ID.'"
-			WHERE sess_ID = "'.$this->ID.'"' ) );
+			WHERE sess_ID = "'.$this->ID.'"' );
+		if( $q !== false )
+		{ // No DB error - query() might return 0 for "0 rows affected"
+			$this->user_ID = $ID;
+
+			return true;
+		}
+		else
 		{
 			$Debuglog->add( 'Setting user of session failed!', 'session' );
 
 			return false;
 		}
-
-		return true;
 	}
 
 
