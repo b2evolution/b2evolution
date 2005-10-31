@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2005-10-17 18:04+0200\n"
-"PO-Revision-Date: 2005-10-17 18:45+0100\n"
+"PO-Revision-Date: 2005-10-31 16:02+0100\n"
 "Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -441,7 +441,7 @@ msgstr "Ajouter un mot clef interdit"
 
 #: ..\..\..\admin\antispam.php:344
 msgid "Check & ban..."
-msgstr "Vérifier &amp; bannir..."
+msgstr "Vérifier & bannir..."
 
 #: ..\..\..\admin\antispam.php:351
 msgid "Banned domains blacklist"
@@ -4826,7 +4826,7 @@ msgstr "Voir"
 
 #: ..\..\..\admin\_users_groupform.php:72
 msgid "Add &amp; edit/delete self created"
-msgstr "Ajouter &amp; editer/supprimer ce qu'on a créé soi-même"
+msgstr "Ajouter & editer/supprimer ce qu'on a créé soi-même"
 
 #: ..\..\..\admin\_users_groupform.php:72
 msgid "Add"
@@ -4881,11 +4881,11 @@ msgstr "Ajouter/Uploader"
 #: ..\..\..\admin\_users_groupform.php:124
 #: ..\..\..\admin\_users_groupform.php:128
 msgid "Users &amp; Groups"
-msgstr "Groupes &amp; Utilisateurs"
+msgstr "Groupes & Utilisateurs"
 
 #: ..\..\..\admin\_users_list.php:61
 msgid "Groups &amp; Users"
-msgstr "Groupes &amp; Utilisateurs"
+msgstr "Groupes & Utilisateurs"
 
 #: ..\..\..\admin\_users_list.php:74
 msgid "default group for new users"
@@ -8552,7 +8552,7 @@ msgstr "Se rappeler de moi"
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:212
 #: ..\..\..\skins\wpc_default\_feedback.php:212
 msgid "(Set cookies for name, email &amp; url)"
-msgstr "(Placer des cookies pour le nom, l'email &amp; l'url)"
+msgstr "(Placer des cookies pour le nom, l'email & l'url)"
 
 #: ..\..\..\skins\_lastcomments.php:33
 #: ..\..\..\xmlsrv\atom.comments.php:36
