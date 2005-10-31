@@ -52,6 +52,14 @@ require_once dirname(__FILE__).'/_abstractsettings.class.php';
  */
 class GeneralSettings extends AbstractSettings
 {
+	/**
+	 * The default settings to get used, when a setting is not given
+	 * in the database.
+	 *
+	 * @todo Allow overriding from /conf/_config_TEST.php?
+	 * @access protected
+	 * @var array
+	 */
 	var $_defaults = array(
 		'fm_enabled' => '1',                // handled
 		'fm_enable_roots_blog' => '1',      // handled
@@ -68,7 +76,20 @@ class GeneralSettings extends AbstractSettings
 
 		'auto_prune_stats' => '30',         // days
 
-		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$'
+		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$',
+
+		'posts_per_page' => '5',
+		'what_to_show' => 'posts',
+		'archive_mode' => 'monthly',
+		'time_difference' => '0',
+		'AutoBR' => '0',
+		'antispam_last_update' => '2000-01-01 00:00:00',
+		'newusers_level' => '1',
+		'newusers_canregister' => '0',
+		'links_extrapath' => '0',
+		'permalink_type' => 'urltitle',
+		'user_minpwdlen' => '5',
+		'reloadpage_timeout' => '300',
 	);
 
 
@@ -119,6 +140,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.21  2005/10/31 01:33:38  blueyed
+ * Added default settings that were written explicitely into DB before
+ *
  * Revision 1.20  2005/10/30 04:44:32  blueyed
  * Moved $stats_autoprune to auto_prune_stats in $Settings.
  * Automagic pruning of old hits, when a hit gets logged, but just once a day (remembered in $Settings->get(auto_prune_stats_done))
