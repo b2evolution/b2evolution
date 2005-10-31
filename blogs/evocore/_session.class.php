@@ -117,6 +117,7 @@ class Session
 				{ // ID + key are valid: load data
 					$Debuglog->add( 'ID is valid.', 'session' );
 					$this->ID = $row->sess_ID;
+					$this->key = $row->sess_key;
 					$this->user_ID = $row->sess_user_ID;
 
 					$Debuglog->add( 'user_ID: '.var_export($this->user_ID, true), 'session' );
@@ -278,6 +279,37 @@ class Session
 		}
 
 		return 0;
+	}
+
+
+	/**
+	 * Get a data value for the session.
+	 *
+	 * @param string Name of the parameter
+	 * @return mixed|false The value, if set; otherwise false
+	 */
+	function get( $param )
+	{
+		if( isset( $this->_data[$param] ) )
+		{
+			return $this->_data[$param];
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Set a data value for the session.
+	 *
+	 * You'll have to call {@link $dbsave()} to save it!
+	 *
+	 * @param string Name of the parameter
+	 * @param mixed The value
+	 */
+	function set( $param, $value )
+	{
+		$this->_data[$param] = $value;
 	}
 
 
