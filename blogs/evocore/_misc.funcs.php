@@ -1482,30 +1482,34 @@ function debug_info( $force = false )
 		$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
 		$Debuglog->add( 'Len of serialized $cache_File: '.strlen(serialize($cache_File)), 'memory' );
 
-		if( function_exists( 'memory_get_usage' ) )
-		{
-			$Debuglog->add( 'Memory usage: '.bytesreadable(memory_get_usage()), 'memory' );
-		}
-
 		if( !$obhandler_debug )
-		{ // don't display changing time when we want to test obhandler
+		{ // don't display changing items when we want to test obhandler
 			$time_page = $Timer->get_duration( 'main' );
 			$time_queries = $Timer->get_duration( 'sql_queries' );
 			$percent_queries = $time_page > 0 ? number_format( 100/$time_page * $time_queries, 2 ) : 0;
 			echo 'Page processing time: '.$time_page.' seconds.<br/>';
 			echo 'SQL processing time: '.$time_queries.' seconds, '.$percent_queries.'%.<br/>';
+
+			foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
+				'memory_get_usage' => array( 'display' => 'Memory usage', 'high' => 8000000 ),
+				'xdebug_peak_memory_usage' => array( 'display' => 'Memory peak usage', 'high' => 8000000 ) ) as $l_func => $l_var )
+			{
+				if( function_exists( $l_func ) )
+				{
+					$_usage = $l_func();
+					if( $_usage > $l_var['high'] ) echo '<span style="color:red; font-weight:bold">';
+					echo $l_var['display'].': '.bytesreadable( $_usage );
+					if( $_usage > $l_var['high'] ) echo '</span>';
+					echo '<br />';
+				}
+			}
 		}
 
 		echo format_to_output(
-			$Debuglog->display( array( 'container' => array(
-																		'string' => '<h3>Debug messages</h3>',
-																		'template' => false ),
-																	'all' => array(
-																		'string' => '<h4>%s:</h4>',
-																		'template' => false ) ),
-													'',
-													false,
-													array( 'error', 'note', 'all' ) ),
+			$Debuglog->display( array(
+					'container' => array( 'string' => '<h3>Debug messages</h3>', 'template' => false ),
+					'all' => array( 'string' => '<h4>%s:</h4>', 'template' => false ) ),
+				'', false, array( 'error', 'note', 'all' ) ),
 			'htmlbody' );
 
 
@@ -2227,6 +2231,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.120  2005/10/31 02:20:49  blueyed
+ * Added memory usage info to the top of debug_info()
+ *
  * Revision 1.119  2005/10/30 11:16:43  marian
  * rollback of regenerate_url
  * fixing the form-problem in skins/_feedback.php
