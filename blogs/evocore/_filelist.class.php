@@ -122,7 +122,7 @@ class Filelist
 	 * @access protected
 	 */
 	var $_filter = NULL;
-	
+
 	/**
 	 * Is the filter a regular expression?
 	 *
@@ -217,8 +217,8 @@ class Filelist
 	var $_order = NULL;
 
 	/**
-	 * Are we sorting ascending (or descending). 
-	 * 
+	 * Are we sorting ascending (or descending).
+	 *
 	 * NULL is default and means ascending for 'name', descending for the rest
 	 *
 	 * @todo fplanque>> document possible values!!
@@ -309,7 +309,7 @@ class Filelist
 		$this->_order_index = array();
 
 		// Attempt list files for requested directory: (recursively if flat mode):
-		if( ($filepath_array = retrieveFiles( $this->_ads_list_path, true, true, true, $flatmode )) === false )
+		if( ($filepath_array = get_filenames( $this->_ads_list_path, true, true, true, $flatmode )) === false )
 		{
 			$Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->_ads_list_path ), 'fl_error' );
 			return false;
@@ -349,7 +349,7 @@ class Filelist
 			// Extract the file's relative path to the root
 			$rdfp_path_relto_root = $this->rdfs_relto_root_from_adfs( $adfp_path );
 			// echo '<br>'.$rdfp_rel_path;
-			
+
 			// Add the file into current list:
 			$this->add_by_subpath( $rdfp_path_relto_root, true );
 		}
@@ -406,7 +406,7 @@ class Filelist
 		{	// Count 1 more file
 			$this->_total_files++;
 		}
-		
+
 		// Count total bytes in this dir
 		$this->_total_bytes += $File->get_size();
 
@@ -985,6 +985,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.33  2005/11/01 21:55:54  blueyed
+ * Renamed retrieveFiles() to get_filenames(), added $basename parameter and fixed inner recursion (wrong params where given)
+ *
  * Revision 1.32  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

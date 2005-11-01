@@ -11,7 +11,7 @@
 require_once( dirname(__FILE__).'/HtmlReporterShowPasses.class.php' );
 
 /**
- * We use {@link retrieveFiles()}
+ * We use {@link get_filenames()}
  */
 require_once( EVODIR.'blogs/evocore/_file.funcs.php' );
 
@@ -26,13 +26,13 @@ class EvoGroupTest extends GroupTest
 	/**
 	 * This method loads all of the *.test.php files it can find.
 	 *
-	 * @uses retrieveFiles()
+	 * @uses get_filenames()
 	 * @param string The path to where to start looking for tests
 	 * @param bool Explore sub-directories for .test.php files
 	 */
 	function loadAllTests( $startDir, $recursive = true )
 	{
-		$files = retrieveFiles( $startDir );
+		$files = get_filenames( $startDir );
 
 		if( !is_array($files) )
 		{

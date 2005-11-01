@@ -94,7 +94,7 @@ function bytesreadable( $bytes )
 
 /**
  * Get an array of all directories (and optionally files) of a given
- * directory, either flat (one-dimensional array) or multi-dimensional (then
+ * directory, either flat (array of one dimension) or multi-dimensional (then
  * dirs are the keys and hold subdirs/files).
  *
  * Note: there is no ending slash on dir names returned.
@@ -103,10 +103,11 @@ function bytesreadable( $bytes )
  * @param boolean include files (not only directories)
  * @param boolean include directories (not the directory itself!)
  * @param boolean flat (return an one-dimension-array)
+ * @param boolean Get the basename only.
  * @return false|array false if the first directory could not be accessed,
  *                     array of entries otherwise
  */
-function retrieveFiles( $path, $includeFiles = true, $includeDirs = true, $flat = true, $recurse = true )
+function get_filenames( $path, $inc_files = true, $inc_dirs = true, $flat = true, $recurse = true, $basename = false )
 {
 	$r = array();
 
@@ -124,13 +125,13 @@ function retrieveFiles( $path, $includeFiles = true, $includeDirs = true, $flat 
 			{
 				if( $flat )
 				{
-					if( $includeDirs )
+					if( $inc_dirs )
 					{
-						$r[] = $path.$file;
+						$r[] = $basename ? $file : $path.$file;
 					}
 					if( $recurse )
 					{
-						$rSub = retrieveFiles( $path.$file, $flat, $includeFiles, $recurse );
+						$rSub = get_filenames( $path.$file, $inc_files, $inc_dirs, $flat, $recurse, $basename );
 						if( $rSub )
 						{
 							$r = array_merge( $r, $rSub );
@@ -139,12 +140,12 @@ function retrieveFiles( $path, $includeFiles = true, $includeDirs = true, $flat 
 				}
 				else
 				{
-					$r[$file] = retrieveFiles( $path.$file, $flat, $includeFiles );
+					$r[$file] = get_filenames( $path.$file, $inc_files, $inc_dirs, $flat, $recurse, $basename );
 				}
 			}
-			elseif( $includeFiles )
+			elseif( $inc_files )
 			{
-				$r[] = $path.$file;
+				$r[] = $basename ? $path.$file : $file;
 			}
 		}
 		closedir($dir);
@@ -215,7 +216,7 @@ function my_fnmatch( $pattern, $file )
  */
 function get_dirsize_recursive( $path )
 {
-	$files = retrieveFiles( $path, true, false );
+	$files = get_filenames( $path, true, false );
 	$total = 0;
 
 	foreach( $files as $lFile )
@@ -234,7 +235,7 @@ function get_dirsize_recursive( $path )
  */
 function deldir_recursive( $dir )
 {
-	$toDelete = retrieveFiles( $dir );
+	$toDelete = get_filenames( $dir );
 	$toDelete = array_reverse( $toDelete );
 	$toDelete[] = $dir;
 
@@ -538,6 +539,9 @@ function get_root_name( $root_type, $root_ID )
 
 /*
  * $Log$
+ * Revision 1.25  2005/11/01 21:55:54  blueyed
+ * Renamed retrieveFiles() to get_filenames(), added $basename parameter and fixed inner recursion (wrong params where given)
+ *
  * Revision 1.24  2005/09/29 15:07:30  fplanque
  * spelling
  *
