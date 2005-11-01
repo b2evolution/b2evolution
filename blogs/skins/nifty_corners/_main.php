@@ -35,8 +35,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
 	<link rel="stylesheet" href="rsc/styles.css" type="text/css" />
-	<link rel="stylesheet" type="text/css" href="rsc/nifty_corners.css">
-	<link rel="stylesheet" type="text/css" href="rsc/nifty_print.css" media="print">
+	<link rel="stylesheet" type="text/css" href="rsc/nifty_corners.css" />
+	<link rel="stylesheet" type="text/css" href="rsc/nifty_print.css" media="print" />
 	<script type="text/javascript" src="rsc/nifty_corners.js"></script>
 	<script type="text/javascript">
 		window.onload=function()
@@ -276,7 +276,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 </div>
 </div>
 
-<div class="clear"><img src="../../img/blank.gif" width="1" height="1" /></div>
+<div class="clear"><img src="../../img/blank.gif" width="1" height="1" alt="layout" /></div>
 
 <div id="pageFooter">
 	<p class="baseline">
@@ -289,7 +289,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 </div>
 
 
-</div></div>
+</div>
 
 </body>
 </html>
