@@ -168,6 +168,23 @@ class Log
 
 
 	/**
+	 * Add an array of messages.
+	 *
+	 * @param array Array of messages where the keys are the categories and hold an array of messages.
+	 */
+	function add_messages( $messages )
+	{
+		foreach( $messages as $l_cat => $l_messages  )
+		{
+			foreach( $l_messages as $l_message )
+			{
+				$this->add( $l_message, $l_cat );
+			}
+		}
+	}
+
+
+	/**
 	 * Get head/foot for a specific category, designed for internal use of {@link display()}
 	 *
 	 * @static
@@ -581,6 +598,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.18  2005/11/01 23:32:30  blueyed
+ * Added add_messages() to add an array of messages. This helps to add messages from a Messages object stored in session data.
+ *
  * Revision 1.17  2005/11/01 21:18:44  blueyed
  * Log::add(): allow adding a message to multiple categories. This allows to keep messages in their category, but additionally tag them as "error" for example.
  *
