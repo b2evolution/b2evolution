@@ -92,7 +92,7 @@ class Session
 	 */
 	function Session()
 	{
-		global $DB, $Debuglog, $current_User, $localtimenow;
+		global $DB, $Debuglog, $current_User, $localtimenow, $Messages;
 		global $Hit;
 		global $cookie_session, $cookie_expires, $cookie_path, $cookie_domain;
 
@@ -110,8 +110,8 @@ class Session
 
 				$Debuglog->add( 'ID (from cookie): '.$session_id_by_cookie, 'session' );
 
-				if( $row = $DB->get_row(
-					'SELECT sess_ID, sess_key, sess_data, sess_user_ID FROM T_sessions
+				if( $row = $DB->get_row( '
+					SELECT sess_ID, sess_key, sess_data, sess_user_ID FROM T_sessions
 					WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
 						AND sess_key = '.$DB->quote($session_key_by_cookie) ) )
 				{ // ID + key are valid: load data
@@ -134,6 +134,14 @@ class Session
 						else
 						{
 							$Debuglog->add( 'Session data loaded.', 'session' );
+
+							if( isset($this->_data['Messages']) && is_a( $this->_data['Messages'], 'log' ) )
+							{
+								$Messages->add_messages( $this->_data['Messages']->messages );
+								$this->delete( 'Messages' );
+								$this->dbsave();
+								$Debuglog->add( 'Added Messages from session data.', 'session' );
+							}
 						}
 					}
 					else
@@ -156,8 +164,8 @@ class Session
 
 		if( $this->ID )
 		{ // there was a valid session before; update data
-			$DB->query(
-				'UPDATE T_sessions SET
+			$DB->query( '
+				UPDATE T_sessions SET
 					sess_lastseen = "'.date( 'Y-m-d H:i:s', $localtimenow ).'",
 					sess_ipaddress = "'.$Hit->IP.'"
 					WHERE sess_ID = '.$this->ID );
@@ -166,8 +174,8 @@ class Session
 		{ // create a new session
 			$this->key = generate_random_key(32);
 
-			$DB->query(
-				'INSERT INTO T_sessions
+			$DB->query( '
+				INSERT INTO T_sessions
 				( sess_key, sess_lastseen, sess_ipaddress )
 				VALUES (
 					"'.$this->key.'",
@@ -221,8 +229,8 @@ class Session
 		global $DB, $Debuglog;
 
 		// Set the entry in the database
-		$q = $DB->query(
-			'UPDATE T_sessions SET sess_user_ID = "'.$ID.'"
+		$q = $DB->query( '
+			UPDATE T_sessions SET sess_user_ID = "'.$ID.'"
 			WHERE sess_ID = "'.$this->ID.'"' );
 		if( $q !== false )
 		{ // No DB error - query() might return 0 for "0 rows affected"
@@ -293,7 +301,7 @@ class Session
 	/**
 	 * Get a data value for the session.
 	 *
-	 * @param string Name of the parameter
+	 * @param string Name of the data's key.
 	 * @return mixed|false The value, if set; otherwise false
 	 */
 	function get( $param )
@@ -310,14 +318,27 @@ class Session
 	/**
 	 * Set a data value for the session.
 	 *
-	 * You'll have to call {@link $dbsave()} to save it!
+	 * You'll have to call {@link $dbsave()} to commit it!
 	 *
-	 * @param string Name of the parameter
+	 * @param string Name of the data's key.
 	 * @param mixed The value
 	 */
 	function set( $param, $value )
 	{
 		$this->_data[$param] = $value;
+	}
+
+
+	/**
+	 * Delete a value from the session data.
+	 *
+	 * You'll have to call {@link $dbsave()} to commit it!
+	 *
+	 * @param string Name of the data's key.
+	 */
+	function delete( $key )
+	{
+		unset( $this->_data[$key] );
 	}
 
 
@@ -328,8 +349,8 @@ class Session
 	{
 		global $DB;
 
-		$DB->query(
-			'UPDATE T_sessions SET
+		$DB->query( '
+			UPDATE T_sessions SET
 				sess_data = '.$DB->quote( serialize($this->_data) ).',
 				sess_key = '.$DB->quote( $this->key ).'
 			WHERE sess_ID = '.$this->ID, 'Session::dbsave' );
@@ -348,8 +369,8 @@ class Session
 		if( $Settings->get('auto_prune_sessions') )
 		{
 			$datetime_prune_before = date( 'Y-m-d H:i:s', ($localtimenow - $Settings->get('auto_prune_sessions')) );
-			$DB->query(
-				'DELETE FROM T_sessions
+			$DB->query( '
+				DELETE FROM T_sessions
 				WHERE sess_lastseen < "'.$datetime_prune_before.'"', 'Session::dbprune()' );
 		}
 	}
