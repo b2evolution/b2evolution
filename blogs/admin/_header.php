@@ -27,6 +27,69 @@ param( 'blog', 'integer', 0, true ); // We may need this for the urls
 param( 'mode', 'string', '' );  // Sidebar, bookmarklet
 
 
+// Get the Admin skin
+// TODO: Allow setting through GET param (dropdown in backoffice), respecting a checkbox "Use different setting on each computer" (if cookie_state handling is ready)
+$admin_skin = $UserSettings->get( 'admin_skin' );
+$admin_skin_path = dirname(__FILE__).'/'.$adminskins_subdir.'%s/_adminUI.class.php';
+
+if( !$admin_skin || !file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
+{ // there's no skin for the user
+	if( !$admin_skin )
+	{
+		$Debuglog->add( 'The user has no admin skin set.', 'skin' );
+	}
+	else
+	{
+		$Debuglog->add( 'The admin skin ['.$admin_skin.'] set by the user does not exist.', 'skin' );
+	}
+
+	$admin_skin = $Settings->get( 'admin_skin' );
+
+	if( !$admin_skin || !file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
+	{ // even the default skin does not exist!
+		if( !$admin_skin )
+		{
+			$Debuglog->add( 'There is no default admin skin set!', 'skin' );
+		}
+		else
+		{
+			$Debuglog->add( 'The default admin skin ['.$admin_skin.'] does not exist!', array('skin','error') );
+		}
+
+		if( file_exists(sprintf( $admin_skin_path, 'legacy' )) )
+		{ // 'legacy' does exist
+			$admin_skin = 'legacy';
+
+			$Debuglog->add( 'Falling back to legacy admin skin.', 'skin' );
+		}
+		else
+		{ // get the first one available one
+			$admin_skin_dirs = get_filenames( dirname(__FILE__).'/'.$adminskins_subdir, false, true, true, false, true );
+
+			if( $admin_skin_dirs === false )
+			{
+				$Debuglog->add( 'No admin skin found! Check that the path '.dirname(__FILE__).'/'.$adminskins_subdir.' exists.', array('skin','error') );
+			}
+			elseif( empty($admin_skin_dirs) )
+			{ // No admin skin directories found
+				$Debuglog->add( 'No admin skin found! Check that there are skins in '.dirname(__FILE__).'/'.$adminskins_subdir.'.', array('skin','error') );
+			}
+			else
+			{
+				$admin_skin = array_shift($admin_skin_dirs);
+				$Debuglog->add( 'Falling back to first available skin.', 'skin' );
+			}
+		}
+	}
+}
+if( !$admin_skin )
+{
+	$Debuglog->display( 'No admin skin available!', '', true, 'skin' );
+	exit();
+}
+
+$Debuglog->add( 'Using admin skin &laquo;'.$admin_skin.'&raquo;', 'skin' );
+
 /**
  * Load the AdminUI class for the skin.
  */
