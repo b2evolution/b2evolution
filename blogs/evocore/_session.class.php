@@ -250,10 +250,12 @@ class Session
 	 */
 	function logout()
 	{
-		global $Debuglog;
+		global $Debuglog, $cookie_session;
 
 		$this->key = NULL;
 		$this->user_ID = NULL;
+
+		setcookie( $cookie_session, '', 272851261, $cookie_path, $cookie_domain ); // 272851261 being the birthday of a lovely person
 
 		// TODO: Remove unneeded data from $this->_data once used
 		$this->dbsave();
