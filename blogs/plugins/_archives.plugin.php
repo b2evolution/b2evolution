@@ -198,9 +198,12 @@ class archives_plugin extends Plugin
 					// --------------------------------- DAILY ARCHIVES ---------------------------------------
 					$arc_m = $arc_year.zeroise($arc_month,2).zeroise($arc_dayofmonth,2);
 
-					echo '<input type="radio" name="m" value="'. $arc_m. '" class="checkbox"';
-					if( $m == $arc_m ) echo ' checked="checked"' ;
-					echo ' /> ';
+					if( $params['form'] )
+					{ // We want a radio button:
+						echo '<input type="radio" name="m" value="'. $arc_m. '" class="checkbox"';
+						if( $m == $arc_m ) echo ' checked="checked"' ;
+						echo ' /> ';
+					}
 
 					echo '<a href="';
 					if( $params['link_type'] == 'context' )
@@ -523,7 +526,7 @@ class ArchiveList extends Results
 
 			case 'postbypost':
 			default:
-				$post_ID = $arc_row->ID;
+				$post_ID = $arc_row->post_ID;
 				$post_title = $arc_row->{$this->dbprefix.'title'};
 				return true;
 		}
@@ -533,6 +536,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.13  2005/11/01 17:47:37  yabs
+ * minor corrections to postbypost
+ *
  * Revision 1.12  2005/10/03 18:10:08  fplanque
  * renamed post_ID field
  *
