@@ -198,13 +198,12 @@ class AbstractSettings
 		}
 
 
-		$result = $this->DB->get_results(
-								'SELECT '.implode( ', ', $this->colKeyNames ).', '.$this->colValueName
-								.' FROM '.$this->dbTableName
-								.( isset( $whereList[0] ) ?
-										' WHERE '.implode( ' AND ', $whereList ) :
-										'' )
-							);
+		$result = $this->DB->get_results( '
+			SELECT '.implode( ', ', $this->colKeyNames ).', '.$this->colValueName.'
+			FROM '.$this->dbTableName.(
+				isset( $whereList[0] )
+				? ' WHERE '.implode( ' AND ', $whereList )
+				: '' ) );
 
 		switch( $this->count_colKeyNames )
 		{
@@ -270,8 +269,7 @@ class AbstractSettings
 
 		if( func_num_args() != $this->count_colKeyNames )
 		{
-			$Debuglog->add( 'Count of arguments for AbstractSettings::get() does not '
-											.'match $colKeyNames (class '.get_class($this).').', 'error' );
+			$Debuglog->add( 'Count of arguments for AbstractSettings::get() does not match $colKeyNames (class '.get_class($this).').', 'error' );
 			return false;
 		}
 
@@ -374,6 +372,7 @@ class AbstractSettings
 	 *
 	 * @param string $args,... the values for the {@link $colKeyNames column keys}
 	 *                         and {@link $colValueName column value}. Must match order and count!
+	 * @return boolean true, if the value has been set, false if it has not changed.
 	 */
 	function set()
 	{
@@ -507,6 +506,10 @@ class AbstractSettings
 			case 1:
 				foreach( $this->cache as $key => $value )
 				{
+					if( $value === NULL )
+					{ // Remembered as not existing
+						continue;
+					}
 					if( $value->dbRemove )
 					{
 						$query_where_delete[] = "{$this->colKeyNames[0]} = '$key'";
@@ -525,6 +528,10 @@ class AbstractSettings
 				{
 					foreach( $value as $key2 => $value2 )
 					{
+						if( $value2 === NULL )
+						{ // Remembered as not existing
+							continue;
+						}
 						if( $value2->dbRemove )
 						{
 							$query_where_delete[] = "{$this->colKeyNames[0]} = '$key' AND {$this->colKeyNames[1]} = '$key2'";
@@ -546,6 +553,10 @@ class AbstractSettings
 					{
 						foreach( $value2 as $key3 => $value3 )
 						{
+							if( $value3 === NULL )
+							{ // Remembered as not existing
+								continue;
+							}
 							if( $value3->dbRemove )
 							{
 								$query_where_delete[] = "{$this->colKeyNames[0]} = '$key' AND {$this->colKeyNames[1]} = '$key2' AND {$this->colKeyNames[2]} = '$key3'";
@@ -589,6 +600,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.19  2005/11/01 23:03:22  blueyed
+ * Fix notice on rare occasion (a setting was remembered as not existing [set to NULL in cache], not changed/set and dbupdate()) called
+ *
  * Revision 1.18  2005/10/28 02:37:37  blueyed
  * Normalized AbstractSettings API
  *
