@@ -61,6 +61,7 @@ class GeneralSettings extends AbstractSettings
 	 * @var array
 	 */
 	var $_defaults = array(
+		'admin_skin' => 'legacy',
 		'fm_enabled' => '1',                // handled
 		'fm_enable_roots_blog' => '1',      // handled
 		// 'fm_enable_roots_group' => '0',  // TO DO
@@ -141,6 +142,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.24  2005/11/01 23:43:35  blueyed
+ * $Settings default admin_skin is 'legacy'
+ *
  * Revision 1.23  2005/10/31 09:33:21  blueyed
  * Set session timeout (auto_prune_sessions) to 30 days (old behaviour with cookies); added checks to not allow setting it below 1 hour and give a warning when below 1 day
  *
