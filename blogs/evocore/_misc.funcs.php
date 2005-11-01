@@ -2153,10 +2153,15 @@ function header_redirect( $redirectTo = NULL )
 		}
 	}
 
-	header('Refresh:0;url='.$location);
+	#header('Refresh:0;url='.$location);
+	#exit();
 	// fplanque> Note: I am not sure using this is cacheing safe: header('Location: '.$location);
 	// Current "Refresh" version works fine.
 	// Please provide link to relevant material before changing it.
+	// blueyed>> The above method fails when you redirect after a POST to the same URL.
+	//   Regarding http://de3.php.net/manual/en/function.header.php#50588 and the other comments
+	//   around, I'd suggest:
+	header('Location: '.$location, true, 303); // true overwrites any previous Location header, 303 is "See Other" (http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html)
 	exit();
 }
 
@@ -2242,6 +2247,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.125  2005/11/01 23:57:24  blueyed
+ * Changed header_redirect() to use HTTP 303 / Location, which allows to reload the same page after POSTing without being prompted for the browser's "page requires POSTed data" dialog.
+ *
  * Revision 1.124  2005/10/31 11:50:46  halton
  * updated online help with subtle icon
  *
