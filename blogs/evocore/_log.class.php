@@ -130,8 +130,9 @@ class Log
 	 * Add a message to the Log.
 	 *
 	 * @param string the message
-	 * @param string the category, default is to use the object's default category
-	 * @param boolean Dump (echo) this directly?
+	 * @param string|array the category, default is to use the object's default category.
+	 *        Can also be an array of categories to add the same message to.
+	 * @param boolean Dump (output) this directly?
 	 */
 	function add( $message, $category = NULL, $dumpThis = false )
 	{
@@ -140,18 +141,28 @@ class Log
 			$category = $this->defaultcategory;
 		}
 
-		$this->messages[$category][] = $message;
-
-		if( empty($this->_count[$category]) )
+		if( is_array($category) )
 		{
-			$this->_count[$category] = 0;
+			foreach( $category as $l_cat )
+			{
+				$this->add( $message, $l_cat, false );
+			}
 		}
-		$this->_count[$category]++;
-
-
-		if( $this->dumpAdds || $dumpThis )
+		else
 		{
-			Log::display( '', '', $message, $category );
+			$this->messages[$category][] = $message;
+
+			if( empty($this->_count[$category]) )
+			{
+				$this->_count[$category] = 0;
+			}
+			$this->_count[$category]++;
+
+
+			if( $this->dumpAdds || $dumpThis )
+			{
+				Log::display( '', '', $message, $category );
+			}
 		}
 	}
 
@@ -570,6 +581,9 @@ class Log
 
 /*
  * $Log$
+ * Revision 1.17  2005/11/01 21:18:44  blueyed
+ * Log::add(): allow adding a message to multiple categories. This allows to keep messages in their category, but additionally tag them as "error" for example.
+ *
  * Revision 1.16  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
