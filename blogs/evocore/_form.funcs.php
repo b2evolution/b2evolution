@@ -33,6 +33,8 @@
  *
  * @package evocore
  *
+ * @deprecated All those functions should be handled by the {@link Form Form class}.
+ *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
@@ -47,7 +49,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * Fieldset with legend.
  *
- * @deprecated Deprecated by (@see Form::fieldset())
+ * @deprecated Deprecated by (@link Form::begin_fieldset())
  */
 function form_groupstart( $title = '' )
 {
@@ -61,7 +63,7 @@ function form_groupstart( $title = '' )
  *
  * Fieldset with legend.
  *
- * @deprecated Deprecated by (@see Form::fieldset_end())
+ * @deprecated Deprecated by (@link Form::end_fieldset())
  */
 function form_groupend( $title = '' )
 {
@@ -74,7 +76,7 @@ function form_groupend( $title = '' )
  *
  * A field is a fielset containing a label div and an input div.
  *
- * @deprecated Deprecated by (@see Form::begin_field())
+ * @deprecated Deprecated by (@link Form::begin_field())
  */
 function form_fieldstart( $field_name, $field_label )
 {
@@ -88,7 +90,7 @@ function form_fieldstart( $field_name, $field_label )
  *
  * A field is a fieldset containing a label div and an input div.
  *
- * @deprecated Deprecated by (@see Form::fieldend())
+ * @deprecated Deprecated by (@link Form::end_field())
  */
 function form_fieldend()
 {
@@ -100,7 +102,7 @@ function form_fieldend()
  *
  * An info field is a fielset containing a label div and an info div.
  *
- * @deprecated Deprecated by (@see Form::info())
+ * @deprecated Deprecated by (@link Form::info_field())
  */
 function form_infostart( $field_label )
 {
@@ -114,7 +116,7 @@ function form_infostart( $field_label )
  *
  * An info field is a fielset containing a label div and an info div.
  *
- * @deprecated Deprecated by (@see Form::info())
+ * @deprecated Deprecated by (@link Form::info_field())
  */
 function form_infoend()
 {
@@ -125,7 +127,7 @@ function form_infoend()
 /**
  * Builds a text (or password) input field.
  *
- * @deprecated Deprecated by (@see Form::text())
+ * @deprecated Deprecated by (@link Form::text_input())
  *
  * {@internal form_text(-)}}
  * @param string the name of the input field
@@ -181,10 +183,10 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 }
 
 
-/*
+/**
  * form_text_tr(-)
  *
- * @deprecated Deprecated by (@see Form::text())
+ * @deprecated Deprecated by (@link Form::text_input())
  */
 function form_text_tr( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_maxlength = 0 , $field_class = '' )
 {
@@ -207,7 +209,7 @@ function form_text_tr( $field_name, $field_value, $field_size, $field_label, $fi
 /**
  * Builds a hidden field.
  *
- * @deprecated Deprecated by (@see Form::button())
+ * @deprecated Deprecated by (@link Form::button_input())
  *
  * {@internal form_hidden(-)}}
  * @param string name
@@ -231,7 +233,7 @@ function form_hidden( $field_name, $field_value, $display = true )
 /**
  * Build a text area.
  *
- * @deprecated Deprecated by (@see Form::textarea())
+ * @deprecated Deprecated by (@link Form::textarea_input())
  *
  * @param string
  * @param string
@@ -262,7 +264,7 @@ function form_textarea( $field_name, $field_value, $field_rows, $field_label,
 /**
  * Display a select field and populate it with a callback function.
  *
- * @deprecated Deprecated by (@see Form::select())
+ * @deprecated Deprecated by (@link Form::select_input())
  *
  * @param string field name
  * @param string default field value
@@ -300,7 +302,7 @@ function form_select(
 /**
  * Display a select field and populate it with a cache object.
  *
- * @deprecated Deprecated by (@see Form::select_object())
+ * @deprecated Deprecated by (@link Form::select_object())
  *
  * @param string field name
  * @param string default field value
@@ -337,7 +339,7 @@ function form_select_object(
 /**
  * Generate set of radio options.
  *
- * @deprecated Deprecated by (@see Form::radio())
+ * @deprecated Deprecated by (@link Form::radio_input())
  *
  * {@internal form_radio(-)}}
  * @param string the name of the radio options
@@ -391,7 +393,7 @@ function form_radio(
 /**
  * form_checkbox(-)
  *
- * @deprecated Deprecated by (@see Form::checkbox())
+ * @deprecated Deprecated by (@link Form::checkbox())
  *
  * @param string the name of the checkbox
  * @param boolean initial value
@@ -435,7 +437,7 @@ function form_checkbox( $field_name, $field_value, $field_label, $field_note = '
 /**
  * form_checkbox_tr(-)
  *
- * @deprecated Deprecated by (@see Form::checkbox())
+ * @deprecated Deprecated by (@link Form::checkbox_input())
  */
 function form_checkbox_tr( $field_name, $field_value, $field_label, $field_note = '', $field_class = '' )
 {
@@ -456,10 +458,10 @@ function form_checkbox_tr( $field_name, $field_value, $field_label, $field_note 
 }
 
 
-/*
+/**
  * form_info(-)
  *
- * @deprecated Deprecated by (@see Form::info())
+ * @deprecated Deprecated by (@link Form::info_field())
  */
 function form_info( $field_label, $field_info, $field_note = '' )
 {
@@ -475,10 +477,10 @@ function form_info( $field_label, $field_info, $field_note = '' )
 }
 
 
-/*
+/**
  * form_info_tr(-)
  *
- * @deprecated Deprecated by (@see Form::info())
+ * @deprecated Deprecated by (@link Form::info_field())
  */
 function form_info_tr( $field_label, $field_info, $field_note = '' )
 {
@@ -495,7 +497,7 @@ function form_info_tr( $field_label, $field_info, $field_note = '' )
 /**
  * Builds a form header and puts GET params of $action into hidden form inputs
  *
- * @deprecated Deprecated by (@see Form::begin_form())
+ * @deprecated Deprecated by (@link Form::begin_form())
  *
  * {@internal form_formstart(-)}}
  */
@@ -537,7 +539,7 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 
 /**
  *
- * @deprecated Deprecated by (@see Form::end_form())
+ * @deprecated Deprecated by (@link Form::end_form())
  */
 function form_submit( $submit_attribs = '' )
 {
@@ -555,6 +557,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.16  2005/11/01 16:29:48  blueyed
+ * Updated info about deprecation. This whole file is deprecated.
+ *
  * Revision 1.15  2005/10/31 23:20:45  fplanque
  * keeping things straight...
  *
