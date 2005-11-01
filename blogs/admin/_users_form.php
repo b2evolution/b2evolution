@@ -170,6 +170,17 @@ else
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Features') );
+	$admin_skin_dirs = get_filenames( dirname(__FILE__).'/'.$adminskins_subdir, false, true, true, false, true );
+	$value = $UserSettings->get( 'admin_skin', $edited_User->ID );
+	if( !$value )
+	{ // Nothing set yet for the user, use the default
+		$value = $Settings->get('admin_skin');
+	}
+	$Form->select_input_array( 'edited_user_admin_skin', $admin_skin_dirs, T_('Admin skin'), array( 'value' => $value, 'note' => T_('The skin defines how the backoffice appears to you.') ) );
+$Form->end_fieldset();
+
+
 if( $allowed_to_edit )
 { // Edit buttons
 	$Form->buttons( array( array( '', '', T_('Save !'), 'SaveButton' ),
@@ -201,6 +212,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.69  2005/11/01 23:50:55  blueyed
+ * UI to set the admin_skin for a user. If the user changes his own profile, we reload the page and save $Messages before, so he gets his "User updated" note.. :)
+ *
  * Revision 1.68  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *

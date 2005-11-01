@@ -241,6 +241,9 @@ else
 			$edited_User->set( 'notify', $edited_user_notify );
 			$edited_User->set( 'showonline', $edited_user_showonline );
 
+			// Features
+			$Request->param( 'edited_user_admin_skin', 'string', true );
+
 
 			if( $Messages->count( 'error' ) )
 			{	// We have found validation errors:
@@ -266,6 +269,17 @@ else
 				{ // Insert user into DB
 					$edited_User->dbinsert();
 					$Messages->add( T_('New user created.'), 'success' );
+				}
+
+				$reload = ($edited_User->ID == $current_User->ID)
+				          && $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID );
+				$UserSettings->dbupdate();
+
+				if( $reload )
+				{
+					$Session->set( 'Messages', $Messages );
+					$Session->dbsave();
+					header_redirect( $ReqURI ); // TODO: this _should_ be full URL, but we have no HTTP_HOST wrapper yet??
 				}
 			}
 			break;
@@ -548,6 +562,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.109  2005/11/01 23:50:55  blueyed
+ * UI to set the admin_skin for a user. If the user changes his own profile, we reload the page and save $Messages before, so he gets his "User updated" note.. :)
+ *
  * Revision 1.108  2005/10/31 23:20:45  fplanque
  * keeping things straight...
  *
