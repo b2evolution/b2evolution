@@ -422,6 +422,7 @@ class Form extends Widget
 				$field_params['onchange'] = 'this.value = this.value.toUpperCase();'
 					.( empty($field_params['onchange']) ? '' : ' '.$field_params['onchange'] );
 			}
+			unset($field_params['force_to']); // not a html attrib
 		}
 
 		$field_params['name'] = $field_name;
@@ -2208,6 +2209,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.82  2005/11/02 00:44:44  blueyed
+ * text_input(): unset 'force_to' field param, because it's no html attrib
+ *
  * Revision 1.81  2005/10/31 23:20:45  fplanque
  * keeping things straight...
  *
