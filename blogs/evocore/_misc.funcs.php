@@ -1054,7 +1054,7 @@ function forget_param( $var )
  */
 function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 {
-	global $Debuglog, $global_param_list, $ReqPath, $basehost;
+	global $Debuglog, $global_param_list, $ReqPath, $basehost, $Blog;
 
 	// Transform ignore paran into an array:
 	if( empty($ignore) )
@@ -1140,7 +1140,20 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 	}
 
 	// Construct URL:
-	$url = empty($pagefileurl) ? $ReqPath : $pagefileurl;
+
+	// marian> is it possible to get rid of all these globals?
+	$ReqPath_local = $ReqPath;
+
+	$siteurl = $Blog->get('siteurl', 'raw');
+	if ( !empty( $siteurl ) )
+	{
+		$url_ary = parse_url($ReqPath_local);
+		$siteurl_ary = parse_url($siteurl);
+		$ReqPath_local = $siteurl_ary['scheme'] . '://' . $siteurl_ary['host'] . $url_ary['path'];
+	}
+
+
+	$url = empty($pagefileurl) ? $ReqPath_local : $pagefileurl;
 	if( !empty( $params ) )
 	{
 		$url = url_add_param( $url, implode( '&amp;', $params ) );
@@ -2247,6 +2260,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.126  2005/11/02 06:52:19  marian
+ * changed regenerate_url to support multiple domains
+ *
  * Revision 1.125  2005/11/01 23:57:24  blueyed
  * Changed header_redirect() to use HTTP 303 / Location, which allows to reload the same page after POSTing without being prompted for the browser's "page requires POSTed data" dialog.
  *

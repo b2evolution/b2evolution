@@ -438,9 +438,6 @@ function next_posts_link($label='#', $max_page=0, $page='')
 	if (empty($p) && (empty($paged) || $nextpage <= $max_page))
 	{
 		echo '<a href="';
-		// fplanque>> TODO: fix regeneate_url for multiple domains instead!
-		$url = parse_url($Blog->get('siteurl', 'raw'));
-		echo $url['scheme'] . '://' . $url['host'];
 		echo next_posts($max_page, $page);
 		echo '">'. htmlspecialchars($label) .'</a>';
 	}
@@ -463,8 +460,6 @@ function previous_posts_link($label='#', $page='')
 	if( empty($p) && ($paged > 1) )
 	{
 		echo '<a href="';
-		$url = parse_url($Blog->get('siteurl', 'raw'));
-		echo $url['scheme'] . '://' . $url['host'];
 		echo previous_posts( $page );
 		echo '">'.htmlspecialchars($label).'</a>';
 	}
@@ -937,6 +932,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.36  2005/11/02 06:52:19  marian
+ * changed regenerate_url to support multiple domains
+ *
  * Revision 1.35  2005/10/31 23:20:45  fplanque
  * keeping things straight...
  *
