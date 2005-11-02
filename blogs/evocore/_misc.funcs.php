@@ -1142,9 +1142,17 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 	// Construct URL:
 
 	// marian> is it possible to get rid of all these globals?
+
+
 	$ReqPath_local = $ReqPath;
 
-	$siteurl = $Blog->get('siteurl', 'raw');
+	// halton>>marian $Blog is null when viewing user managment tab eg /b2users.php?user_ID=1
+	// i've added this hack to stop it from crashing, but i don't understand the consequences
+	if (!empty($Blog) )
+	{
+		$siteurl = $Blog->get('siteurl', 'raw');
+	}
+
 	if ( !empty( $siteurl ) )
 	{
 		$url_ary = parse_url($ReqPath_local);
@@ -2242,7 +2250,7 @@ function get_web_help_link( $topic )
 
 	if( $Settings->get('webhelp_enabled') )
 	{
-		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/help.php/'.str_replace(" ","_",strtolower($topic))
+		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/Help:'.str_replace(" ","_",strtolower($topic))
 							.'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version.'">' . get_icon('webhelp') . '</a>';
 
 //		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/'.$topic
@@ -2260,6 +2268,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.127  2005/11/02 13:05:51  halton
+ * changed online help url back to /redirect.  added workaround for null $Blog object in regenerate_url
+ *
  * Revision 1.126  2005/11/02 06:52:19  marian
  * changed regenerate_url to support multiple domains
  *
