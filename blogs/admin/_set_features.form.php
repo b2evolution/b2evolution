@@ -100,7 +100,8 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Sessions') . get_web_help_link('Sessions') );
-	$Form->text_input( 'auto_prune_sessions', $Settings->get('auto_prune_sessions'), 5, T_('Session timeout'), array( 'note' => 'Timeout of a session when the user is inactive (in seconds)' ) );
+	// TODO: enhance UI with a general Form method
+	$Form->text_input( 'auto_prune_sessions', $Settings->get('auto_prune_sessions'), 9, T_('Session timeout'), array( 'note' => 'Timeout of a session when the user is inactive (in seconds)' ) );
 $Form->end_fieldset();
 
 
@@ -109,7 +110,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$Form->end_form( array(
 		array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 		array( 'reset', '', T_('Reset'), 'ResetButton' ),
-		array( 'submit', 'submit', T_('Restore defaults'), 'ResetButton' ),
+		array( 'submit', 'submit[restore_defaults]', T_('Restore defaults'), 'ResetButton' ),
 		) );
 }
 

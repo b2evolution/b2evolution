@@ -59,8 +59,8 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		param( 'submit', 'string', '' ); // TODO: use array based submit value like name="submit[set_defaults]"
-		if( $submit == T_('Restore defaults') )
+		param( 'submit', 'array', array() );
+		if( isset($submit['restore_defaults']) )
 		{
 			/*
 			// TODO: insert some default settings rather than just delete them all, as per original configuration in the _advanced.php file:
@@ -86,7 +86,11 @@ switch( $action )
 			$phoneemail_separator = ':::';
 			*/
 
-			$Settings->delete_array( array( 'eblog_enabled', 'eblog_method', 'eblog_server_host', 'eblog_server_port', 'eblog_username', 'eblog_password', 'eblog_default_category', 'eblog_subject_prefix','webhelp_enabled' ) );
+			$Settings->delete_array( array(
+				'eblog_enabled', 'eblog_method', 'eblog_server_host', 'eblog_server_port', 'eblog_username', 'eblog_password', 'eblog_default_category', 'eblog_subject_prefix',
+				'hit_doublecheck_referer', 'auto_prune_stats',
+				'auto_prune_sessions',
+				'webhelp_enabled' ) );
 
 			if( $Settings->dbupdate() )
 			{
@@ -159,7 +163,7 @@ switch( $action )
 			}
 			elseif( $auto_prune_sessions < 86400 )
 			{ // lower than 1 day: notice/warning
-				$Messages->add( sprintf( T_( 'Warning: your global session timeout is just %d seconds. Your users may have to re-login often!' ), 86400 ), 'note' );
+				$Messages->add( sprintf( T_( 'Warning: your global session timeout is just %d seconds. Your users may have to re-login often!' ), $auto_prune_sessions ), 'note' );
 			}
 			$Settings->set( 'auto_prune_sessions', $auto_prune_sessions );
 
