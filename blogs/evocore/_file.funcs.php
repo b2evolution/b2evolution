@@ -145,7 +145,7 @@ function get_filenames( $path, $inc_files = true, $inc_dirs = true, $flat = true
 			}
 			elseif( $inc_files )
 			{
-				$r[] = $basename ? $path.$file : $file;
+				$r[] = $basename ? $file : $path.$file;
 			}
 		}
 		closedir($dir);
@@ -539,6 +539,9 @@ function get_root_name( $root_type, $root_ID )
 
 /*
  * $Log$
+ * Revision 1.26  2005/11/02 00:03:46  blueyed
+ * Fixed get_filenames() $basename behaviour.. sorry.
+ *
  * Revision 1.25  2005/11/01 21:55:54  blueyed
  * Renamed retrieveFiles() to get_filenames(), added $basename parameter and fixed inner recursion (wrong params where given)
  *
