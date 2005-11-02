@@ -131,7 +131,7 @@
 			</div>
 			<div class="bCommentSmallPrint">
 				<span class="bIcons">
-					<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment') ?>"><img src="<?php imgbase() ?>chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" class="middle" /></a>
+					<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment') ?>"><img src="<?php imgbase() ?>chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 				</span>
 				<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
 			</div>
@@ -158,8 +158,11 @@
 
 			<input type="hidden" name="comment_post_ID" value="<?php $Item->ID() ?>" />
 			<input type="hidden" name="redirect_to" value="<?php
-	echo regenerate_url();
-?>" />
+					// Make sure we get back to the right page (on the right domain)
+					// fplanque>> TODO: check if we can use the permalink instead but we must check that application wide,
+					// that is to say: check with the comments in a pop-up etc...
+					echo regenerate_url( '', '', $Blog->get('blogurl') );
+				?>" />
 
 			<?php
 			if( is_logged_in() )

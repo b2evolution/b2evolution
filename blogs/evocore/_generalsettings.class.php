@@ -53,7 +53,7 @@ require_once dirname(__FILE__).'/_abstractsettings.class.php';
 class GeneralSettings extends AbstractSettings
 {
 	/**
-	 * The default settings to get used, when a setting is not given
+	 * The default settings to use, when a setting is not given
 	 * in the database.
 	 *
 	 * @todo Allow overriding from /conf/_config_TEST.php?
@@ -142,6 +142,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.25  2005/11/02 20:11:19  fplanque
+ * "containing entropy"
+ *
  * Revision 1.24  2005/11/01 23:43:35  blueyed
  * $Settings default admin_skin is 'legacy'
  *

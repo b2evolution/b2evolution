@@ -985,14 +985,14 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.34  2005/11/02 20:11:19  fplanque
+ * "containing entropy"
+ *
  * Revision 1.33  2005/11/01 21:55:54  blueyed
  * Renamed retrieveFiles() to get_filenames(), added $basename parameter and fixed inner recursion (wrong params where given)
  *
  * Revision 1.32  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
- *
- * Revision 1.31  2005/05/26 19:11:11  fplanque
- * no message
  *
  * Revision 1.30  2005/05/24 15:26:52  fplanque
  * cleanup

@@ -2,8 +2,9 @@
 /**
  * This file implements the Session class.
  *
- * A session can be bound to a user and provides functions to store data in it's
+ * A session can be bound to a user and provides functions to store data in its
  * context.
+ * All Hitlogs are also bound to a Session.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -52,10 +53,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * A session stores data for a certain user.
+ * A session stores data for a given user (not necessarily logged in).
  *
- * When an object gets constructed it will use an ID given by the user through
- * a cookie to load his/her data or create an empty data set.
+ * Sessions are tracked with a cookie containing the session ID.
+ * The cookie also contains a random key to prevent sessions hacking.
  *
  * @package evocore
  */
@@ -110,10 +111,13 @@ class Session
 
 				$Debuglog->add( 'ID (from cookie): '.$session_id_by_cookie, 'session' );
 
+// fplanque>> TODO: TOP PRIORITY: add a WHERE clause in order not to catch any expired session
+// Pruning should only occur MUCH later after session expiration!! Pruning does not guarantee that we only fetch active sessions.
 				if( $row = $DB->get_row( '
-					SELECT sess_ID, sess_key, sess_data, sess_user_ID FROM T_sessions
-					WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
-						AND sess_key = '.$DB->quote($session_key_by_cookie) ) )
+					SELECT sess_ID, sess_key, sess_data, sess_user_ID
+					  FROM T_sessions
+					 WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
+					   AND sess_key = '.$DB->quote($session_key_by_cookie) ) )
 				{ // ID + key are valid: load data
 					$Debuglog->add( 'ID is valid.', 'session' );
 					$this->ID = $row->sess_ID;
@@ -135,6 +139,7 @@ class Session
 						{
 							$Debuglog->add( 'Session data loaded.', 'session' );
 
+// fplanque>> I can guess the purpose, but please document this a little bit...
 							if( isset($this->_data['Messages']) && is_a( $this->_data['Messages'], 'log' ) )
 							{
 								$Messages->add_messages( $this->_data['Messages']->messages );
@@ -202,6 +207,8 @@ class Session
 		$Cron->add_task( array(&$this, 'dbsave'), 'always' ); // always save data (no need to call it manually)!
 		$Cron->add_task( array(&$this, 'dbprune') ); // if it's due depends on $Settings
 		*/
+
+		// fplanque>> This is not the rigth place for pruning
 		$this->dbprune();
 	}
 
@@ -231,7 +238,7 @@ class Session
 		// Set the entry in the database
 		$q = $DB->query( '
 			UPDATE T_sessions SET sess_user_ID = "'.$ID.'"
-			WHERE sess_ID = "'.$this->ID.'"' );
+			 WHERE sess_ID = "'.$this->ID.'"' );
 		if( $q !== false )
 		{ // No DB error - query() might return 0 for "0 rows affected"
 			$this->user_ID = $ID;
@@ -253,6 +260,7 @@ class Session
 	 * Logout the user, by invalidating the session key and unsetting {@link $user_ID}
 	 *
 	 * We want to keep the user in the session log.
+fplanque>> so why are you setting it to NULL ??
 	 *
 	 * @return boolean whether this was successfully executed
 	 */
@@ -261,7 +269,7 @@ class Session
 		global $Debuglog, $cookie_session, $cookie_path, $cookie_domain;
 
 		$this->key = NULL;
-		$this->user_ID = NULL;
+//		$this->user_ID = NULL;
 
 		setcookie( $cookie_session, '', 272851261, $cookie_path, $cookie_domain ); // 272851261 being the birthday of a lovely person
 
@@ -361,6 +369,7 @@ class Session
 	 * Prune old sessions according to auto_prune_sessions general setting.
 	 *
 	 * @todo Use a Setting to remember last prune? - see {@link Hitlist::dbprune()}.
+	 * fplanque>> NO: do both prunes at the same place, they are CLOSELY RELATED
 	 */
 	function dbprune()
 	{

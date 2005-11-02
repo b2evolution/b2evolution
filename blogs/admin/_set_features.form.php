@@ -99,6 +99,7 @@ $Form->begin_fieldset( T_('Hit logging') . get_web_help_link('Hit logging') );
 $Form->end_fieldset();
 
 
+// fplanque>> TODO: Sessions have a TIMEOUT, but they don't have a spearate auto_pruning delay. they should be pruned WITH the hitlogs.
 $Form->begin_fieldset( T_('Sessions') . get_web_help_link('Sessions') );
 	// TODO: enhance UI with a general Form method
 	$Form->text_input( 'auto_prune_sessions', $Settings->get('auto_prune_sessions'), 9, T_('Session timeout'), array( 'note' => 'Timeout of a session when the user is inactive (in seconds)' ) );

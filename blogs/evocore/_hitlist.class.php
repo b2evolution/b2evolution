@@ -79,7 +79,7 @@ class Hitlist
 		$iso_date = date ('Y-m-d', $date);
 		$sql = "
 			DELETE FROM T_hitlog
-			WHERE DATE_FORMAT(hit_datetime,'%Y-%m-%d') = '$iso_date'";
+			 WHERE DATE_FORMAT(hit_datetime,'%Y-%m-%d') = '$iso_date'";
 
 		return $DB->query( $sql, 'Prune hits for a specific date' );
 	}
@@ -97,10 +97,10 @@ class Hitlist
 	{
 		global $DB;
 
-		$sql = "UPDATE T_hitlog SET
-			hit_referer_type = '$type',
-			hit_datetime = hit_datetime " /* prevent mySQL from updating timestamp */."
-			WHERE hit_ID = $hit_ID";
+		$sql = "UPDATE T_hitlog
+						SET hit_referer_type = '$type',
+								hit_datetime = hit_datetime " // prevent mySQL from updating timestamp
+						." WHERE hit_ID = $hit_ID";
 		return $DB->query( $sql, 'Change type for a specific hit' );
 	}
 
@@ -109,6 +109,7 @@ class Hitlist
 	 * Auto pruning of old stats.
 	 *
 	 * It uses a general setting to store the day of the last prune, avoiding multiple prunes per day.
+	 * fplanque>> Check: How much faster is this than DELETING right away with an INDEX on the date field?
 	 *
 	 * Note: we're using {@link $localtime} to log hits, so use this for pruning too.
 	 *
@@ -122,11 +123,12 @@ class Hitlist
 		{ // Autopruning is requested
 			$last_prune = (int)$Settings->get( 'auto_prune_stats_done' );
 
+			// fplanque>> TODO: Prune when $localtime is a NEW day (which will be the 1st request after midnight) instead of pruning at any possible hour in the day.
 			if( $last_prune < ($localtimenow-86400) )
 			{ // not pruned since one day
 				$sql = "
 					DELETE FROM T_hitlog
-					WHERE hit_datetime < '".date( 'Y-m-d', $localtimenow - ($auto_prune_stats * 86400) )."'"; // 1 day = 86400 seconds
+					 WHERE hit_datetime < '".date( 'Y-m-d', $localtimenow - ($auto_prune_stats * 86400) )."'"; // 1 day = 86400 seconds
 				$rows_affected = $DB->query( $sql, 'Autopruning hit log' );
 
 				$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows.', 'hit' );

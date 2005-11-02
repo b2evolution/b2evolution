@@ -306,8 +306,6 @@ function user_preferredname( $user_ID )
 /**
  * Check profile parameters and add errors to {@link $Messages}.
  *
- * Only parameters are tested that get set.
- *
  * @param array associative array
  *              'login': check for non-empty
  *              'nickname': check for non-empty
@@ -389,7 +387,8 @@ function profile_check_params( $params, $User = NULL )
 			{
 				$Messages->add( T_('You typed two different passwords.'), 'error' );
 			}
-			elseif( strlen($params['pass1']) < $Settings->get('user_minpwdlen') )
+			elseif( strlen($params['pass1']) < $Settings->get('user_minpwdlen')
+							|| strlen($params['pass2']) < $Settings->get('user_minpwdlen') )
 			{
 				$Messages->add( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen')), 'error' );
 			}
@@ -407,6 +406,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.32  2005/11/02 20:11:19  fplanque
+ * "containing entropy"
+ *
  * Revision 1.31  2005/10/31 08:33:31  blueyed
  * profile_check_params(): Allow passing a User object that can be used for additional tests (password != login/nickname)
  *

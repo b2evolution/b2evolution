@@ -275,6 +275,7 @@ else
 				          && $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID );
 				$UserSettings->dbupdate();
 
+				// fplanque>> TODO: also reload when changing locale.
 				if( $reload )
 				{
 					$Session->set( 'Messages', $Messages );
@@ -562,6 +563,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.110  2005/11/02 20:11:19  fplanque
+ * "containing entropy"
+ *
  * Revision 1.109  2005/11/01 23:50:55  blueyed
  * UI to set the admin_skin for a user. If the user changes his own profile, we reload the page and save $Messages before, so he gets his "User updated" note.. :)
  *

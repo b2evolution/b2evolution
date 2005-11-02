@@ -396,7 +396,7 @@ $Debuglog->add( 'pass: '.( empty($pass) ? '' : 'not' ).' empty', 'login' );
 
 if( !empty($login) && !empty($pass) )
 { // User is trying to login right now
-	$Debuglog->add( 'User is trying to login.', 'login' );
+	$Debuglog->add( 'User is trying to log in.', 'login' );
 
 	$login = strtolower(strip_tags(get_magic_quotes_gpc() ? stripslashes($login) : $login));
 	$pass = strip_tags(get_magic_quotes_gpc() ? stripslashes($pass) : $pass);
@@ -412,7 +412,7 @@ if( !empty($login) && !empty($pass) )
 	{ // Login failed
 		$Debuglog->add( 'user_pass_ok() returned false!', 'login' );
 
-		// This will cause to "popup" the login screen (again)
+		// This will cause the login screen to "popup" (again)
 		$Messages->add( T_('Wrong login/password.'), 'login_error' );
 	}
 	else
@@ -508,6 +508,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.59  2005/11/02 20:11:19  fplanque
+ * "containing entropy"
+ *
  * Revision 1.58  2005/10/31 23:40:47  blueyed
  * Remove deprecated user/pass cookies
  *

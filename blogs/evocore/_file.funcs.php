@@ -94,7 +94,7 @@ function bytesreadable( $bytes )
 
 /**
  * Get an array of all directories (and optionally files) of a given
- * directory, either flat (array of one dimension) or multi-dimensional (then
+ * directory, either flat (one-dimensional array) or multi-dimensional (then
  * dirs are the keys and hold subdirs/files).
  *
  * Note: there is no ending slash on dir names returned.
@@ -575,6 +575,9 @@ function get_root_name( $root_type, $root_ID )
 
 /*
  * $Log$
+ * Revision 1.28  2005/11/02 20:11:19  fplanque
+ * "containing entropy"
+ *
  * Revision 1.27  2005/11/02 00:42:30  blueyed
  * Added get_admin_skins() and use it to perform additional checks (if there's a _adminUI.class.php file in there). Thinkl "CVS".. :)
  *

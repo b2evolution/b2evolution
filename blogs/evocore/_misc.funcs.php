@@ -1050,13 +1050,13 @@ function forget_param( $var )
  *
  * @param mixed string or array of params to ignore (can be regexps in /.../)
  * @param mixed string or array of params to set
- * @param mixed string
+ * @param mixed string Alternative URL we want to point to if not the current $ReqPath
  */
 function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 {
-	global $Debuglog, $global_param_list, $ReqPath, $basehost, $Blog;
+	global $Debuglog, $global_param_list, $ReqPath, $basehost;
 
-	// Transform ignore paran into an array:
+	// Transform ignore param into an array:
 	if( empty($ignore) )
 	{
 		$ignore = array();
@@ -1140,28 +1140,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 	}
 
 	// Construct URL:
-
-	// marian> is it possible to get rid of all these globals?
-
-
-	$ReqPath_local = $ReqPath;
-
-	// halton>>marian $Blog is null when viewing user managment tab eg /b2users.php?user_ID=1
-	// i've added this hack to stop it from crashing, but i don't understand the consequences
-	if (!empty($Blog) )
-	{
-		$siteurl = $Blog->get('siteurl', 'raw');
-	}
-
-	if ( !empty( $siteurl ) )
-	{
-		$url_ary = parse_url($ReqPath_local);
-		$siteurl_ary = parse_url($siteurl);
-		$ReqPath_local = $siteurl_ary['scheme'] . '://' . $siteurl_ary['host'] . $url_ary['path'];
-	}
-
-
-	$url = empty($pagefileurl) ? $ReqPath_local : $pagefileurl;
+	$url = empty($pagefileurl) ? $ReqPath : $pagefileurl;
 	if( !empty( $params ) )
 	{
 		$url = url_add_param( $url, implode( '&amp;', $params ) );
@@ -2250,7 +2229,7 @@ function get_web_help_link( $topic )
 
 	if( $Settings->get('webhelp_enabled') )
 	{
-		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/Help:'.str_replace(" ","_",strtolower($topic))
+		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/'.str_replace(" ","_",strtolower($topic))
 							.'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version.'">' . get_icon('webhelp') . '</a>';
 
 //		$webhelp_link = ' <a target="_blank" href="http://manual.b2evolution.net/redirect/'.$topic
@@ -2268,6 +2247,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.128  2005/11/02 20:11:19  fplanque
+ * "containing entropy"
+ *
  * Revision 1.127  2005/11/02 13:05:51  halton
  * changed online help url back to /redirect.  added workaround for null $Blog object in regenerate_url
  *
