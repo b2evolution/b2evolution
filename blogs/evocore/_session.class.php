@@ -258,7 +258,7 @@ class Session
 	 */
 	function logout()
 	{
-		global $Debuglog, $cookie_session;
+		global $Debuglog, $cookie_session, $cookie_path, $cookie_domain;
 
 		$this->key = NULL;
 		$this->user_ID = NULL;
