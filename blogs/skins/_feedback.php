@@ -158,15 +158,7 @@
 
 			<input type="hidden" name="comment_post_ID" value="<?php $Item->ID() ?>" />
 			<input type="hidden" name="redirect_to" value="<?php
-	$url = regenerate_url();
-// fplanque>> TODO: move this as an option into regenerate URL
-	$siteurl = $GLOBALS['Blog']->siteurl;
-	if ($siteurl > '')
-	{
-		$url_ary = parse_url($siteurl);
-		$url = $url_ary['scheme'] . '://' . $url_ary['host'] . $url;
-	}
-	echo $url;
+	echo regenerate_url();
 ?>" />
 
 			<?php
