@@ -55,20 +55,20 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		param( 'submit', 'string', '' ); // TODO: use array based submit value like name="submit[set_defaults]"
-
-		if( $submit == T_('Restore defaults') )
+		param( 'submit', 'array', array() );
+		if( isset($submit['restore_defaults']) )
 		{
-			$Settings->delete_array( array( 'fm_enabled',
-																			'fm_enable_roots_blog',
-																			// 'fm_enable_roots_group',
-																			'fm_enable_roots_user',
-																			'fm_enable_create_dir',
-																			'fm_enable_create_file',
-																			'upload_enabled',
-																			'upload_allowedext',
-																			'upload_maxkb',
-																			'regexp_filename' ) );
+			$Settings->delete_array( array(
+					'fm_enabled',
+					'fm_enable_roots_blog',
+					// 'fm_enable_roots_group',
+					'fm_enable_roots_user',
+					'fm_enable_create_dir',
+					'fm_enable_create_file',
+					'upload_enabled',
+					'upload_allowedext',
+					'upload_maxkb',
+					'regexp_filename' ) );
 			if( $Settings->dbupdate() )
 			{
 				$Messages->add( T_('Restored default values.'), 'success' );

@@ -73,14 +73,10 @@ $Form->begin_fieldset( T_('Advanced options') );
 $Form->end_fieldset();
 
 
-// TODO: check/transform $upload_url
-// TODO: check/transform $upload_realpath
-// fplanque->blueyed: are these TODOs real? I don't think they are relevant any more?
-
-
-$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
-												array( 'reset', '', T_('Reset'), 'ResetButton' ),
-												array( 'submit', 'submit', T_('Restore defaults'), 'ResetButton' ),
-											) );
+$Form->end_form( array(
+		array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
+		array( 'reset', '', T_('Reset'), 'ResetButton' ),
+		array( 'submit', 'submit[restore_defaults]', T_('Restore defaults'), 'ResetButton' ),
+	) );
 
 ?>
