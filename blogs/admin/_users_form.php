@@ -171,13 +171,12 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Features') );
-	$admin_skin_dirs = get_filenames( dirname(__FILE__).'/'.$adminskins_subdir, false, true, true, false, true );
 	$value = $UserSettings->get( 'admin_skin', $edited_User->ID );
 	if( !$value )
 	{ // Nothing set yet for the user, use the default
 		$value = $Settings->get('admin_skin');
 	}
-	$Form->select_input_array( 'edited_user_admin_skin', $admin_skin_dirs, T_('Admin skin'), array( 'value' => $value, 'note' => T_('The skin defines how the backoffice appears to you.') ) );
+	$Form->select_input_array( 'edited_user_admin_skin', get_admin_skins(), T_('Admin skin'), array( 'value' => $value, 'note' => T_('The skin defines how the backoffice appears to you.') ) );
 $Form->end_fieldset();
 
 
@@ -212,6 +211,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.70  2005/11/02 00:42:30  blueyed
+ * Added get_admin_skins() and use it to perform additional checks (if there's a _adminUI.class.php file in there). Thinkl "CVS".. :)
+ *
  * Revision 1.69  2005/11/01 23:50:55  blueyed
  * UI to set the admin_skin for a user. If the user changes his own profile, we reload the page and save $Messages before, so he gets his "User updated" note.. :)
  *

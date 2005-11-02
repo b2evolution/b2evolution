@@ -64,7 +64,7 @@ if( !$admin_skin || !file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 		}
 		else
 		{ // get the first one available one
-			$admin_skin_dirs = get_filenames( dirname(__FILE__).'/'.$adminskins_subdir, false, true, true, false, true );
+			$admin_skin_dirs = get_admin_skins();
 
 			if( $admin_skin_dirs === false )
 			{

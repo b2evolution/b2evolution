@@ -160,6 +160,42 @@ function get_filenames( $path, $inc_files = true, $inc_dirs = true, $flat = true
 
 
 /**
+ * Get a list of available admin skins.
+ *
+ * This checks if there's a _adminUI.class.php in there.
+ *
+ * @return array|false List of directory names that hold admin skins or
+ *         false, if the admin skins driectory does not exist.
+ */
+function get_admin_skins()
+{
+	global $core_dirout, $admin_subdir, $adminskins_subdir;
+
+	$skins_dir = dirname(__FILE__).'/'.$core_dirout.$admin_subdir.$adminskins_subdir;
+	$dirs_in_adminskins_dir = get_filenames( $skins_dir, false, true, true, false, true );
+
+	if( $dirs_in_adminskins_dir === false )
+	{
+		return false;
+	}
+
+	$r = array();
+	if( $dirs_in_adminskins_dir )
+	{
+		foreach( $dirs_in_adminskins_dir as $l_dir )
+		{
+			if( !file_exists($skins_dir.$l_dir.'/_adminUI.class.php') )
+			{
+				continue;
+			}
+			$r[] = $l_dir;
+		}
+	}
+	return $r;
+}
+
+
+/**
  * A replacement for fnmatch() which needs PHP 4.3
  *
  * @author jcl [atNOSPAM] jcl [dot] name {@link http://php.net/manual/function.fnmatch.php}
@@ -539,6 +575,9 @@ function get_root_name( $root_type, $root_ID )
 
 /*
  * $Log$
+ * Revision 1.27  2005/11/02 00:42:30  blueyed
+ * Added get_admin_skins() and use it to perform additional checks (if there's a _adminUI.class.php file in there). Thinkl "CVS".. :)
+ *
  * Revision 1.26  2005/11/02 00:03:46  blueyed
  * Fixed get_filenames() $basename behaviour.. sorry.
  *
