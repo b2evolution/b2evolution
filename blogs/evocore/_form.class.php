@@ -2169,8 +2169,8 @@ class Form extends Widget
 
 		foreach( $field_params as $l_attr => $l_value )
 		{
-			if( $l_value === '' )
-			{ // don't generate empty attributes
+			if( $l_value === '' || $l_value === NULL )
+			{ // don't generate empty attributes (it may be NULL if we pass 'value' => NULL as field_param for example, because isset() does not match it!)
 				continue;
 			}
 
@@ -2209,6 +2209,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.83  2005/11/02 01:23:51  blueyed
+ * get_field_params_as_string(): Do not output attribs with value === NULL
+ *
  * Revision 1.82  2005/11/02 00:44:44  blueyed
  * text_input(): unset 'force_to' field param, because it's no html attrib
  *
