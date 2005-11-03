@@ -69,9 +69,11 @@ switch( $action )
 
 	case 'copy':
 	case 'edit':
-		$name = $DB->get_var( "SELECT $edited_table_namecol
-														 FROM $edited_table
-														WHERE $edited_table_IDcol = $ID" );
+		$name = $DB->get_var( "
+				SELECT $edited_table_namecol
+				  FROM $edited_table
+				 WHERE $edited_table_IDcol = $ID" );
+
 		if( $DB->num_rows != 1 )
 		{
 			$Messages->head = T_('Cannot edit entry!');
@@ -86,8 +88,9 @@ switch( $action )
 		$Request->param( 'name', 'string', true );
 		if( $Request->param_check_not_empty( 'name', T_('Please enter a string.') ) )
 		{
-			$DB->query( "INSERT INTO $edited_table( $edited_table_namecol )
-										VALUES( ".$DB->quote($name).' )' );
+			$DB->query( "
+				INSERT INTO $edited_table( $edited_table_namecol )
+				VALUES( ".$DB->quote($name).' )' );
 
 			$Messages->add( T_('Entry created.'), 'success' );
 			$name = '';
@@ -100,9 +103,10 @@ switch( $action )
 		$Request->param( 'ID', 'integer', true );
 		$Request->param_string_not_empty( 'name', T_('Please enter a string.') );
 		{
-			$DB->query( "UPDATE $edited_table
-											SET $edited_table_namecol = ".$DB->quote($name)."
-										WHERE	$edited_table_IDcol = $ID" );
+			$DB->query( "
+				UPDATE $edited_table
+				   SET $edited_table_namecol = ".$DB->quote($name)."
+				 WHERE $edited_table_IDcol = $ID" );
 
 			$Messages->add( sprintf( T_('Entry #%d updated.'), $ID ), 'success' );
 			unset( $ID );
@@ -118,8 +122,9 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed
 			// Delete from DB:
-			$DB->query( "DELETE FROM $edited_table
-								 		WHERE $edited_table_IDcol = $ID" );
+			$DB->query( "
+				DELETE FROM $edited_table
+				WHERE $edited_table_IDcol = $ID" );
 
 			if( $DB->rows_affected != 1 )
 			{
@@ -159,17 +164,17 @@ if( ($action == 'delete') && !$confirm )
 		<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
 		<p>
-		
+
 		<?php
 		$Form = & new Form( '', 'form', 'get' );
-	
-		$Form->begin_form( 'inline' );		
+
+		$Form->begin_form( 'inline' );
 		$Form->hidden( 'action', 'delete' );
 		$Form->hidden( 'ID', $ID );
 		$Form->hidden( 'confirm', 1 );
 		$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
-		
+
 		$Form->begin_form( 'inline' );
 		$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 		$Form->end_form()
