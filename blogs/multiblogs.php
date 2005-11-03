@@ -46,7 +46,7 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 	<title>Multiblog demo<?php request_title( ' - ', '', ' - ', 'htmlhead' ) ?></title>
 	<!-- InstanceEndEditable -->
 	<!-- InstanceBeginEditable name="head" -->
-	<base href="<?php skinbase(); // You're not using any skin here but this won't hurt. However it will be very helpful to have this here when you make the switch to a skin! ?>" />
+	<base href="<?php skinbase(); /* You're not using any skin here but this won't hurt. However it will be very helpful to have this here when you make the switch to a skin! */ ?>" />
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
 	<meta name="keywords" content="<?php $Blog->disp( 'keywords', 'htmlattr' ); ?>" />
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
@@ -130,11 +130,11 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 			<?php link_pages() ?>
 		</div>
 		<div class="bSmallPrint">
-			<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) // Link to comments ?>
-			<?php $Item->feedback_link( 'trackbacks', '', ' &bull; ' ) // Link to trackbacks ?>
-			<?php $Item->feedback_link( 'pingbacks', '', ' &bull; ' ) // Link to trackbacks ?>
+			<?php $Item->feedback_link( 'comments', '', ' &bull; ' ) /* Link to comments */ ?>
+			<?php $Item->feedback_link( 'trackbacks', '', ' &bull; ' ) /* Link to trackbacks */ ?>
+			<?php $Item->feedback_link( 'pingbacks', '', ' &bull; ' ) /* Link to trackbacks */ ?>
 
-			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+			<?php $Item->trackback_rdf() /* trackback autodiscovery information */ ?>
 
 			<a href="<?php $Item->permalink() ?>" title="Permanent link to full entry"><?php echo T_('Permalink') ?></a>
 		</div>
