@@ -1318,7 +1318,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 			$count_backtrace = $limit_to_last;
 		}
 
-		$r .= '<div style="padding:1ex; text-align:left; font-family:monospace; font-size:small; color:#000; background-color:#ddf"><h3>Backtrace:</h3>'."\n";
+		$r .= '<div style="padding:1ex; text-align:left; font-family:monospace; color:#000; background-color:#ddf"><h3>Backtrace:</h3>'."\n";
 		if( $count_backtrace )
 		{
 			$r .= '<ol>';
@@ -2247,6 +2247,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.129  2005/11/03 18:23:44  fplanque
+ * minor
+ *
  * Revision 1.128  2005/11/02 20:11:19  fplanque
  * "containing entropy"
  *

@@ -95,14 +95,16 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Hit logging') . get_web_help_link('Hit logging') );
 	$Form->checkbox_input( 'hit_doublecheck_referer', $Settings->get('hit_doublecheck_referer'), T_('Double-check Referer'), array( 'note' => 'Activating this will search the requested (your) URL in the content of the referring page. This is against referer spam, but creates additional webserver traffic.' ) );
-	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Auto prune statistics'), array( 'note' => 'How many days of stats do you want to keep before auto pruning them? (Set to 0 to disable auto pruning)' ) );
+	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Autoprune stats after'),
+		array( 'note' => 'days. (0 to disable) How many days of stats do you want to keep in the database?' ) );
 $Form->end_fieldset();
 
 
 // fplanque>> TODO: Sessions have a TIMEOUT, but they don't have a spearate auto_pruning delay. they should be pruned WITH the hitlogs.
 $Form->begin_fieldset( T_('Sessions') . get_web_help_link('Sessions') );
 	// TODO: enhance UI with a general Form method
-	$Form->text_input( 'auto_prune_sessions', $Settings->get('auto_prune_sessions'), 9, T_('Session timeout'), array( 'note' => 'Timeout of a session when the user is inactive (in seconds)' ) );
+	$Form->text_input( 'auto_prune_sessions', $Settings->get('auto_prune_sessions'), 9, T_('Session timeout'),
+		array( 'note' => 'seconds. How long can a user stay inactive before automatic logout?' ) );
 $Form->end_fieldset();
 
 

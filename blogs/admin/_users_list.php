@@ -195,8 +195,8 @@ else
 
 if( $current_User->check_perm( 'users', 'edit', false ) )
 { // create new user link
-	$Results->global_icon( T_('Add a user...'), 'new', '?action=new_user', T_('User') );
-	$Results->global_icon( T_('Add a group...'), 'new', '?action=new_group', T_('Group') );
+	$Results->global_icon( T_('Add a user...'), 'new', '?action=new_user', T_('Add user') );
+	$Results->global_icon( T_('Add a group...'), 'new', '?action=new_group', T_('Add group') );
 }
 
 //Display filter/search block
@@ -212,6 +212,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.53  2005/11/03 18:23:43  fplanque
+ * minor
+ *
  * Revision 1.52  2005/10/28 21:02:00  fplanque
  * prevent filter matches on loginfirstname for example
  *

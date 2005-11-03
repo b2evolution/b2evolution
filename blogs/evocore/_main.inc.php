@@ -143,7 +143,7 @@ require_once dirname(__FILE__).'/_db.class.php';
  *
  * @global DB $DB
  */
-$DB = new DB( $EvoConfig->DB );
+$DB = & new DB( $EvoConfig->DB );
 
 
 /**
@@ -508,6 +508,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.60  2005/11/03 18:23:44  fplanque
+ * minor
+ *
  * Revision 1.59  2005/11/02 20:11:19  fplanque
  * "containing entropy"
  *

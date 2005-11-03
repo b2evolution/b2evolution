@@ -578,7 +578,7 @@ class AdminUI_general
 	 */
 	function get_menu_entries( $path )
 	{
-		$node =& $this->get_node_by_path( $path );
+		$node = & $this->get_node_by_path( $path );
 
 		return isset( $node['entries'] ) ? $node['entries'] : array();
 	}
@@ -634,7 +634,8 @@ class AdminUI_general
 				}
 				else
 				{
-					return false;
+					$r = false;
+					return $r;
 				}
 			}
 			$nodes =& $nodes['entries'][$lStep];
@@ -1101,6 +1102,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.38  2005/11/03 18:23:43  fplanque
+ * minor
+ *
  * Revision 1.37  2005/10/30 23:42:46  blueyed
  * Refactored get_head_links() into existing get_headlines(); doc
  *

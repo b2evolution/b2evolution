@@ -46,15 +46,29 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Includes:
  */
 param( 'action', 'string', 'list' );
+param( 'ID', 'integer', 0 );
+
+/**
+ * Check locked elements
+ */
+if( !empty( $locked_IDs )
+		&& in_array( $action, array( 'edit', 'update', 'delete' ) )
+		&& in_array( $ID, $locked_IDs ) )
+{
+	$Messages->add( T_('This element is locked and cannot be edited!') );
+	$action = 'list';
+}
+
+
 
 /**
  * Perform action:
  */
 switch( $action )
 {
+
 	case 'copy':
 	case 'edit':
-		param( 'ID', 'integer', true );
 		$name = $DB->get_var( "SELECT $edited_table_namecol
 														 FROM $edited_table
 														WHERE $edited_table_IDcol = $ID" );
@@ -145,17 +159,17 @@ if( ($action == 'delete') && !$confirm )
 		<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
 		<p>
-
+		
 		<?php
 		$Form = & new Form( '', 'form', 'get' );
-
-		$Form->begin_form( 'inline' );
+	
+		$Form->begin_form( 'inline' );		
 		$Form->hidden( 'action', 'delete' );
 		$Form->hidden( 'ID', $ID );
 		$Form->hidden( 'confirm', 1 );
 		$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
-
+		
 		$Form->begin_form( 'inline' );
 		$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 		$Form->end_form()
@@ -197,14 +211,26 @@ $Results->cols[] = array(
 		           .T_('Edit this entry...').'">$'.$edited_table_namecol.'$</a></strong>',
 	);
 
+function edit_actions( $ID )
+{
+	global $locked_IDs;
+
+	$r = action_icon( T_('Duplicate...'), 'copy', regenerate_url( 'action', 'ID='.$ID.'&amp;action=copy' ) );
+
+	if( empty( $locked_IDs ) || !in_array( $ID, $locked_IDs ) )
+	{ // This element is NOT locked:
+		$r = action_icon( T_('Edit...'), 'edit', regenerate_url( 'action', 'ID='.$ID.'&amp;action=edit' ) )
+					.$r
+					.action_icon( T_('Delete!'), 'delete', regenerate_url( 'action', 'ID='.$ID.'&amp;action=delete' ) );
+
+	}
+
+	return $r;
+}
+
 $Results->cols[] = array(
 		'th' => T_('Actions'),
-		'td' => action_icon( T_('Edit...'), 'edit',
-		          '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=edit\')%' ).
-		        action_icon( T_('Duplicate...'), 'copy',
-		          '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=copy\')%' ).
-		        action_icon( T_('Delete!'), 'delete',
-		          '%regenerate_url( \'action\', \'ID=$'.$edited_table_IDcol.'$&amp;action=delete\')%' ),
+		'td' => '%edit_actions( #'.$edited_table_IDcol.'# )%',
 	);
 
 $Results->display();

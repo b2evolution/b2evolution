@@ -726,7 +726,8 @@ class Filelist
 
 		if( !isset($this->_order_index[$this->_current_idx + 1]) )
 		{	// End of list:
-			return false;
+			$r = false;
+			return $r;
 		}
 		$this->_current_idx++;
 
@@ -985,6 +986,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.35  2005/11/03 18:23:44  fplanque
+ * minor
+ *
  * Revision 1.34  2005/11/02 20:11:19  fplanque
  * "containing entropy"
  *
