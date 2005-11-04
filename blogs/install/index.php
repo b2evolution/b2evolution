@@ -117,6 +117,7 @@ if( $config_is_done || (($action != 'start') && ($action != 'default') && ($acti
 { // Connect to DB:
 	$tmp_evoconf_db = $EvoConfig->DB;
 	$tmp_evoconf_db['halt_on_error'] = false;
+	$tmp_evoconf_db['show_errors'] = false;
 	$DB = new DB( $tmp_evoconf_db );
 	unset($tmp_evoconf_db);
 

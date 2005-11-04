@@ -126,23 +126,23 @@ class User extends DataObject
 			// echo 'Creating blank user';
 			$this->set( 'login', 'login' );
 			$this->set( 'pass', md5('pass') );
-			$this->set( 'firstname', '' );
-			$this->set( 'lastname', '' );
-			$this->set( 'nickname', '' );
+			$this->firstname = '';
+			$this->lastname = '';
+			$this->nickname = '';
 			$this->set( 'idmode', 'login' );
 			$this->set( 'locale',
 				isset( $Settings )
 					? $Settings->get('default_locale') // TODO: (settings) use "new users template setting"
 					: $default_locale );
-			$this->set( 'email', '' );
-			$this->set( 'url', '' );
-			$this->set( 'icq', 0 );
-			$this->set( 'aim', '' );
-			$this->set( 'msn', '' );
-			$this->set( 'yim', '' );
-			$this->set( 'ip', '' );
-			$this->set( 'domain', '' );
-			$this->set( 'browser', '' );
+			$this->email = '';
+			$this->url = '';
+			$this->icq = 0;
+			$this->aim = '';
+			$this->msn = '';
+			$this->yim = '';
+			$this->ip = '';
+			$this->domain = '';
+			$this->browser = '';
 			$this->set( 'level', isset( $Settings ) ? $Settings->get('newusers_level') : 0 );
 			$this->set( 'notify', 1  );
 			$this->set( 'showonline', 1 );
@@ -908,6 +908,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.49  2005/11/04 22:18:03  fplanque
+ * no message
+ *
  * Revision 1.48  2005/11/04 21:42:22  blueyed
  * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
  *
