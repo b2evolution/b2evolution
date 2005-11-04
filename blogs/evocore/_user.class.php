@@ -124,39 +124,40 @@ class User extends DataObject
 		if( $db_row == NULL )
 		{
 			// echo 'Creating blank user';
-			$this->login = 'login';
-			$this->pass = md5('pass');
-			$this->firstname = '';
-			$this->lastname = '';
-			$this->nickname = '';
-			$this->idmode = 'login';
-			$this->locale = (isset( $Settings )
-											? $Settings->get('default_locale') // TODO: (settings) use "new users template setting"
-											: $default_locale );
-			$this->email = '';
-			$this->url = '';
-			$this->icq = 0;
-			$this->aim = '';
-			$this->msn = '';
-			$this->yim = '';
-			$this->ip = '';
-			$this->domain = '';
-			$this->browser = '';
+			$this->set( 'login', 'login' );
+			$this->set( 'pass', md5('pass') );
+			$this->set( 'firstname', '' );
+			$this->set( 'lastname', '' );
+			$this->set( 'nickname', '' );
+			$this->set( 'idmode', 'login' );
+			$this->set( 'locale',
+				isset( $Settings )
+					? $Settings->get('default_locale') // TODO: (settings) use "new users template setting"
+					: $default_locale );
+			$this->set( 'email', '' );
+			$this->set( 'url', '' );
+			$this->set( 'icq', 0 );
+			$this->set( 'aim', '' );
+			$this->set( 'msn', '' );
+			$this->set( 'yim', '' );
+			$this->set( 'ip', '' );
+			$this->set( 'domain', '' );
+			$this->set( 'browser', '' );
 			$this->set( 'level', isset( $Settings ) ? $Settings->get('newusers_level') : 0 );
-			$this->notify = 1 ;
-			$this->showonline = 1;
+			$this->set( 'notify', 1  );
+			$this->set( 'showonline', 1 );
 			if( isset($localtimenow) )
 			{
-				$this->datecreated = date('Y-m-d H:i:s', $localtimenow );
+				$this->set_datecreated( $localtimenow );
 			}
 			else
 			{ // We don't know local time here!
-				$this->datecreated = date('Y-m-d H:i:s', time() );
+				$this->set_datecreated( time() );
 			}
 
-			if( isset( $GroupCache ) )
+			if( isset( $GroupCache ) && isset($Settings) )
 			{ // Group for this user:
-				$this->Group = $GroupCache->get_by_ID( $Settings->get('newusers_grp_ID') );
+				$this->setGroup( $GroupCache->get_by_ID( $Settings->get('newusers_grp_ID') ) );
 			}
 		}
 		else
@@ -322,6 +323,7 @@ class User extends DataObject
 			// case 'icq':		// Dangerous: easy to forget it's not a string
 			case 'level':
 			case 'notify':
+			case 'showonline':
 				return parent::set_param( $parname, 'number', $parvalue );
 
 			default:
@@ -348,16 +350,24 @@ class User extends DataObject
 	}
 
 
-	/*
-	 * User::setGroup(-)
+	/**
+	 * Set new Group.
 	 *
-	 * Set new Group
+	 * @param Group the Group object to put the user into
+	 * @return boolean true if set, false if not changed
 	 */
 	function setGroup( & $Group )
 	{
-		$this->Group = & $Group;
+		if( $Group !== $this->Group )
+		{
+			$this->Group = & $Group;
 
-		$this->dbchange( 'user_grp_ID', 'number', 'Group->get(\'ID\')' );
+			$this->dbchange( 'user_grp_ID', 'number', 'Group->get(\'ID\')' );
+
+			return true;
+		}
+
+		return false;
 	}
 
 
@@ -898,6 +908,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.48  2005/11/04 21:42:22  blueyed
+ * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
+ *
  * Revision 1.47  2005/11/04 16:24:36  blueyed
  * Use $localtimenow instead of $servertimenow.
  *

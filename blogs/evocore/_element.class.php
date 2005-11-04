@@ -53,7 +53,8 @@ class Element extends DataObject
 	 * @var string
 	 * @access protected
 	 */
-	var	$name;
+	var $name;
+
 
 	/**
 	 * Constructor
@@ -75,7 +76,7 @@ class Element extends DataObject
 		if( $db_row == NULL )
 		{
 			// echo 'Creating blank group';
-			$this->name = T_('New element');
+			$this->set( 'name', T_('New element') );
 		}
 		else
 		{
@@ -85,8 +86,7 @@ class Element extends DataObject
 			$this->name = $db_row->$namefield;
 		}
 
- 		$Debuglog->add( "Created element <strong>$this->name</strong>", 'dataobjects' );
-
+		$Debuglog->add( "Created element <strong>$this->name</strong>", 'dataobjects' );
 	}
 
 
@@ -107,6 +107,7 @@ class Element extends DataObject
 		}
 	}
 
+
 	/**
 	 * Template function: return name of item
 	 *
@@ -122,6 +123,9 @@ class Element extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2005/11/04 21:42:22  blueyed
+ * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
+ *
  * Revision 1.6  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

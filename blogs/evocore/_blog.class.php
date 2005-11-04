@@ -136,12 +136,12 @@ class Blog extends DataObject
 		{
 			global $default_locale;
 			// echo 'Creating blank blog';
-			$this->shortname = T_('New blog');
-			$this->name = T_('New weblog');
-			$this->locale = $default_locale;
-			$this->access_type = 'index.php';
-			$this->urlname = 'new';
-			$this->default_skin = 'basic';
+			$this->set( 'shortname', T_('New blog') );
+			$this->set( 'name', T_('New weblog') );
+			$this->set( 'locale', $default_locale );
+			$this->set( 'access_type', 'index.php' );
+			$this->set( 'urlname', 'new' );
+			$this->set( 'default_skin', 'basic' );
 		}
 		else
 		{
@@ -797,6 +797,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2005/11/04 21:42:22  blueyed
+ * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
+ *
  * Revision 1.37  2005/11/04 13:50:57  blueyed
  * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
  *

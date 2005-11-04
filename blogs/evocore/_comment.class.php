@@ -56,16 +56,16 @@ class Comment extends DataObject
 	/**
 	 * @access protected
 	 */
-	var $Item = NULL;
-	var $author_User = NULL;
-	var	$type;
-	var	$status;
-	var	$author;
-	var	$author_email;
-	var	$author_url;
-	var	$author_IP;
-	var	$date;
-	var	$content;
+	var $Item;
+	var $author_User;
+	var $type;
+	var $status;
+	var $author;
+	var $author_email;
+	var $author_url;
+	var $author_IP;
+	var $date;
+	var $content;
 
 	/**
 	 * Comment::Comment(-)
@@ -636,6 +636,9 @@ class Comment extends DataObject
 }
 /*
  * $Log$
+ * Revision 1.20  2005/11/04 21:42:22  blueyed
+ * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
+ *
  * Revision 1.19  2005/11/04 18:30:59  fplanque
  * no message
  *

@@ -127,8 +127,8 @@ class Item extends DataObject
 	var $main_cat_ID = 0;
 	var $flags;
 	var $renderers;
-	var $comments;			// Comments status
-	var $url;					// Should move
+	var $comments;     // Comments status
+	var $url;          // Should move
 	var $typ_ID;
 	var $st_ID;
 	var $deadline = '';
@@ -182,18 +182,18 @@ class Item extends DataObject
 	 * @param string User ID field name
 	 */
 	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'Item',
-												$datecreated_field = 'datecreated', $datemodified_field = 'datemodified',
-												$creator_field = 'creator_user_ID', $lasteditor_field = 'lastedit_user_ID' )
+		              $datecreated_field = 'datecreated', $datemodified_field = 'datemodified',
+		              $creator_field = 'creator_user_ID', $lasteditor_field = 'lastedit_user_ID' )
 	{
 		global $UserCache, $object_def, $localtimenow, $default_locale, $current_User;
 
 		$this->priorities = array(
-							1 => T_('1 - Highest'),
-							2 => T_('2 - High'),
-							3 => T_('3 - Medium'),
-							4 => T_('4 - Low'),
-							5 => T_('5 - Lowest')
-					);
+				1 => /* TRANS: Priority name */ T_('1 - Highest'),
+				2 => /* TRANS: Priority name */ T_('2 - High'),
+				3 => /* TRANS: Priority name */ T_('3 - Medium'),
+				4 => /* TRANS: Priority name */ T_('4 - Low'),
+				5 => /* TRANS: Priority name */ T_('5 - Lowest'),
+			);
 
 		// Dereference db cols definition for this object:
 		$db_cols =  & $object_def[$objtype]['db_cols'];
@@ -230,10 +230,10 @@ class Item extends DataObject
 			$this->ID = 0;
 			$this->set_author_User( $current_User );
 			$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
-			$this->flags = array();
+			$this->set( 'flags', '' );
 			$this->renderers = array();
-			$this->status = 'published';
-			$this->locale = $default_locale;
+			$this->set( 'status', 'published' );
+			$this->set( 'locale', $default_locale );
 		}
 		else
 		{
@@ -2217,6 +2217,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.63  2005/11/04 21:42:22  blueyed
+ * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
+ *
  * Revision 1.62  2005/11/04 15:16:09  blueyed
  * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
  * This commit fixes the "foreign key constraint fails" when creating a new item during install or in edit_actions.

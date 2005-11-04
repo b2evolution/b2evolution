@@ -55,12 +55,13 @@ class Group extends DataObject
 	 * @var string
 	 * @access protected
 	 */
-	var	$name;
+	var $name;
 
 	/**
 	 * Blog posts statuses permissions
 	 */
 	var $blog_post_statuses = array();
+
 
 	/**
 	 * Constructor
@@ -78,21 +79,21 @@ class Group extends DataObject
 				array( 'table'=>'T_users', 'fk'=>'user_grp_ID', 'msg'=>T_('%d users in this group') ),
 			);
 
-   	$this->delete_cascades = array(
+		$this->delete_cascades = array(
 			);
 
 		if( $db_row == NULL )
 		{
 			// echo 'Creating blank group';
-			$this->name = T_('New group');
-			$this->perm_admin = 'visible';
-			$this->perm_blogs = 'user';
-			$this->perm_stats = 'none';
-			$this->perm_spamblacklist = 'none';
-			$this->perm_templates = 0;
-			$this->perm_files = 'none';
-			$this->perm_options = 'none';
-			$this->perm_users = 'none';
+			$this->set( 'name', T_('New group') );
+			$this->set( 'perm_admin', 'visible' );
+			$this->set( 'perm_blogs', 'user' );
+			$this->set( 'perm_stats', 'none' );
+			$this->set( 'perm_spamblacklist', 'none' );
+			$this->set( 'perm_templates', 0 );
+			$this->set( 'perm_files', 'none' );
+			$this->set( 'perm_options', 'none' );
+			$this->set( 'perm_users', 'none' );
 		}
 		else
 		{
@@ -119,7 +120,6 @@ class Group extends DataObject
 	 * @param string Parameter name
 	 * @param mixed Parameter value
 	 * @return boolean true, if a value has been set; false if it has not changed
-
 	 */
 	function set( $parname, $parvalue )
 	{
@@ -432,6 +432,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2005/11/04 21:42:22  blueyed
+ * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
+ *
  * Revision 1.15  2005/11/04 13:50:57  blueyed
  * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
  *

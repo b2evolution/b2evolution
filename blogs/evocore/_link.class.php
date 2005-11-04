@@ -46,11 +46,11 @@ require_once dirname(__FILE__).'/_dataobject.class.php';
 class Link extends DataObject
 {
 	var $ltype_ID = 0;
-	var $Item = NULL;
-	var $Contact = NULL;
-	var $Firm = NULL;
+	var $Item;
+	var $Contact;
+	var $Firm;
 
-	/** 
+	/**
 	 * Constructor
 	 *
 	 * {@internal Link::Link(-) }}
@@ -60,22 +60,21 @@ class Link extends DataObject
 	function Link( $db_row = NULL )
 	{
 		global $ItemCache;
-		
+
 		// Call parent constructor:
 		parent::DataObject( 'T_links', 'link_', 'link_ID',
 													'datecreated', 'datemodified', 'creator_user_ID', 'lastedit_user_ID' );
 
- 		if( $db_row != NULL )
+		if( $db_row != NULL )
 		{
 			$this->ID       = $db_row->link_ID      ;
 			$this->ltype_ID = $db_row->link_ltype_ID;
 
 			// source of link:
 			$this->Item     = & $ItemCache->get_by_ID( $db_row->link_item_ID );
-
-	 	}
-	 	else
-	 	{	// New object:
+		}
+		else
+		{	// New object:
 
 		}
 	}
@@ -115,6 +114,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2005/11/04 21:42:22  blueyed
+ * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
+ *
  * Revision 1.8  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
