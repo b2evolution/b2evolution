@@ -223,14 +223,19 @@ class smilies_plugin extends Plugin
 		return true;
 	}
 
+	/**
+	 * This callback gets called once after every tags+text chunk
+	 */
 	function preg_insert_smilies_callback($s)
 	{
-		return str_replace( $this->search, $this->replace, $s[1]) . $s[2];
+		return  $s[1] // Unmodified tags
+						.str_replace( $this->search, $this->replace, $s[3]); // Text with replaced smilies
 	}
 
 	function ReplaceTagSafe($text)
 	{
-		$search = "/([^<]*)(<[^>]+>)/si";
+		// The pattern catches as many optional tags as possible, then catches as much text as possible without hitting a new tag
+		$search = "/((<[^>]+>)*)([^<]*)/si";
 
 		return preg_replace_callback($search, array($this, 'preg_insert_smilies_callback'), $text);
 	}
