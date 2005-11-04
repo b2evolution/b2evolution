@@ -228,7 +228,7 @@ class Item extends DataObject
 		if( $db_row == NULL )
 		{ // New item:
 			$this->ID = 0;
-			$this->Author = & $current_User;
+			$this->set_author_User( $current_User );
 			$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
 			$this->flags = array();
 			$this->renderers = array();
@@ -1894,9 +1894,9 @@ class Item extends DataObject
 		}
 		else
 		{
-			$this->creator_user_ID = $author_user_ID;
+			$this->set( $this->creator_field, $author_user_ID );
 		}
-		$this->lastedit_user_ID = $this->creator_user_ID;
+		$this->set( $this->lasteditor_field, $this->{$this->creator_field} );
 		$this->set( 'title', $post_title );
 		$this->set( 'urltitle', $post_urltitle );
 		$this->set( 'content', $post_content );
@@ -2217,6 +2217,10 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.62  2005/11/04 15:16:09  blueyed
+ * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
+ * This commit fixes the "foreign key constraint fails" when creating a new item during install or in edit_actions.
+ *
  * Revision 1.61  2005/11/04 13:50:57  blueyed
  * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
  *
