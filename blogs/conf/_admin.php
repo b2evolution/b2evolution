@@ -15,15 +15,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 
 /**
- * The admin skin to use.
- * EXPERMIENTAL!
- *
- * @todo Move this to $UserSettings
- * @var string
- */
-$admin_skin = 'legacy';
-
-/**
  * Cross posting
  *
  * Possible values:
