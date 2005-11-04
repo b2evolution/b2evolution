@@ -1793,19 +1793,20 @@ class Item extends DataObject
 	 * @param string parameter name
 	 * @param mixed parameter value
 	 * @param boolean true to set to NULL if empty value
+	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
 	function set( $parname, $parvalue, $make_null = false )
 	{
 		switch( $parname )
 		{
 			case 'main_cat_ID':
-				$this->set_param( 'main_cat_ID', 'number', $parvalue, false );
+				$r = $this->set_param( 'main_cat_ID', 'number', $parvalue, false );
 				// make sure main cat is in extracat list and there are no duplicates
 				$this->extra_cat_IDs[] = $this->main_cat_ID;
 				$this->extra_cat_IDs = array_unique( $this->extra_cat_IDs );
 				// Update derived property:
 				$this->blog_ID = get_catblog( $this->main_cat_ID ); // This is a derived var
-				break;
+				return $r;
 
 			case 'extra_cat_IDs':
 				// ARRAY! We do not record this change (yet)
@@ -1817,35 +1818,30 @@ class Item extends DataObject
 
 			case 'typ_ID':
 			case 'st_ID':
-				$this->set_param( $parname, 'number', $parvalue, true );
-				break;
+				return $this->set_param( $parname, 'number', $parvalue, true );
 
 			case 'content':
-				$this->set_param( 'content', 'string', $parvalue, $make_null );
+				$r1 = $this->set_param( 'content', 'string', $parvalue, $make_null );
 				// Update wordcount as well:
-				$this->set_param( 'wordcount', 'number', bpost_count_words($this->content), false );
-				break;
+				$r2 = $this->set_param( 'wordcount', 'number', bpost_count_words($this->content), false );
+				return ( $r1 || $r2 ); // return true if one changed
 
 			case 'wordcount':
-				$this->set_param( 'wordcount', 'number', $parvalue, false );
-				break;
+				return $this->set_param( 'wordcount', 'number', $parvalue, false );
 
 			case 'issue_date':
 			case 'datestart':
 				$this->issue_date = $parvalue;
-				$this->set_param( 'datestart', 'date', $parvalue, false );
-				break;
+				return $this->set_param( 'datestart', 'date', $parvalue, false );
 
 			case 'deadline':
-				$this->set_param( 'deadline', 'date', $parvalue, true );
-				break;
+				return $this->set_param( 'deadline', 'date', $parvalue, true );
 
 			case 'pingsdone':
-				$this->set_param( 'flags', 'string', $parvalue ? 'pingsdone' : '' );
-				break;
+				return $this->set_param( 'flags', 'string', $parvalue ? 'pingsdone' : '' );
 
 			default:
-				$this->set_param( $parname, 'string', $parvalue, $make_null );
+				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
 
@@ -2221,6 +2217,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.61  2005/11/04 13:50:57  blueyed
+ * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
+ *
  * Revision 1.60  2005/10/26 22:52:30  blueyed
  * Fix preview notices by fixing Itemlist::preview_request()
  *

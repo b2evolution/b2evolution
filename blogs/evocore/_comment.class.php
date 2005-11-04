@@ -113,14 +113,14 @@ class Comment extends DataObject
 
 	/**
 	 * Set param value
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
 	function set( $parname, $parvalue )
 	{
-		switch( $parname )
-		{
-			default:
-				parent::set_param( $parname, 'string', $parvalue );
-		}
+		return parent::set_param( $parname, 'string', $parvalue );
 	}
 
 
@@ -632,6 +632,9 @@ class Comment extends DataObject
 }
 /*
  * $Log$
+ * Revision 1.18  2005/11/04 13:50:57  blueyed
+ * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
+ *
  * Revision 1.17  2005/10/07 20:18:57  blueyed
  * Added TRANS comments
  *

@@ -484,10 +484,11 @@ class DataObject
 	 * @param string parameter name
 	 * @param mixed parameter value
 	 * @param boolean true to set to NULL if empty value
+	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
 	function set( $parname, $parvalue, $make_null = false )
 	{
-		$this->set_param( $parname, 'string', $parvalue, $make_null );
+		return $this->set_param( $parname, 'string', $parvalue, $make_null );
 	}
 
 
@@ -520,12 +521,25 @@ class DataObject
 		// fplanque: Note: I am changing the "make NULL" test to differentiate between 0 and NULL .
 		// There might be side effects. In this case it would be better to fix them before coming here.
 		// i-e: transform 0 to ''
-		$this->$parname = ($make_null && ($parvalue === '')) ? NULL : $parvalue;
-		//echo '<br/>'.$this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname;
-		$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname, 'dataobjects' );
+		$new_value = ($make_null && ($parvalue === '')) ? NULL : $parvalue;
 
-		// Remember change for later db update:
-		$this->dbchange( $dbfield, $fieldtype, $parname );
+		if( isset($this->$parname) && $this->$parname === $new_value )
+		{
+			$Debuglog->add( $this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' to '.$this->$parname, 'dataobjects' );
+
+			return false;
+		}
+		else
+		{
+			$this->$parname = $new_value;
+			//echo '<br/>'.$this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname;
+			$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname, 'dataobjects' );
+
+			// Remember change for later db update:
+			$this->dbchange( $dbfield, $fieldtype, $parname );
+
+			return true;
+		}
 	}
 
 
@@ -574,6 +588,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.27  2005/11/04 13:50:57  blueyed
+ * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
+ *
  * Revision 1.26  2005/10/31 23:20:45  fplanque
  * keeping things straight...
  *

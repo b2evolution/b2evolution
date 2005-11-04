@@ -117,18 +117,19 @@ class Group extends DataObject
 	 * {@internal Group::set(-) }}
 	 *
 	 * @param string Parameter name
-	 * @return mixed Parameter value
+	 * @param mixed Parameter value
+	 * @return boolean true, if a value has been set; false if it has not changed
+
 	 */
 	function set( $parname, $parvalue )
 	{
 		switch( $parname )
 		{
 			case 'perm_templates':
-				parent::set_param( $parname, 'number', $parvalue );
-			break;
+				return parent::set_param( $parname, 'number', $parvalue );
 
 			default:
-				parent::set_param( $parname, 'string', $parvalue );
+				return parent::set_param( $parname, 'string', $parvalue );
 		}
 	}
 
@@ -309,7 +310,7 @@ class Group extends DataObject
 		return false; 	// permission denied
 	}
 
-	
+
 	/**
 	 * Check permission for this group on a specified blog
 	 *
@@ -377,7 +378,7 @@ class Group extends DataObject
 		switch( $permname )
 		{
 			case 'blog_genstatic':
-				// generate static pages is not currently a group permission.  if you are here user is denied already anyway 
+				// generate static pages is not currently a group permission.  if you are here user is denied already anyway
 				return (false);
 
 			case 'blog_post_statuses':
@@ -396,7 +397,7 @@ class Group extends DataObject
 				return $this->blog_post_statuses[$perm_target_blog][$permname];
 		}
 	}
-	
+
 
 	/**
 	 * Template function: display name of blog
@@ -431,6 +432,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2005/11/04 13:50:57  blueyed
+ * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
+ *
  * Revision 1.14  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

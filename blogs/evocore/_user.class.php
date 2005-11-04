@@ -313,6 +313,7 @@ class User extends DataObject
 	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
+	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
 	function set( $parname, $parvalue )
 	{
@@ -321,11 +322,10 @@ class User extends DataObject
 			// case 'icq':		// Dangerous: easy to forget it's not a string
 			case 'level':
 			case 'notify':
-				parent::set_param( $parname, 'number', $parvalue );
-			break;
+				return parent::set_param( $parname, 'number', $parvalue );
 
 			default:
-				parent::set_param( $parname, 'string', $parvalue );
+				return parent::set_param( $parname, 'string', $parvalue );
 		}
 	}
 
@@ -395,7 +395,7 @@ class User extends DataObject
 				$perm = $this->check_perm_catsusers( $permname, $permlevel, $perm_target );
 				if ( $perm == false )
 				{ // Check groups category permissions...
-					$perm = $this->Group->check_perm_catsgroups( $permname, $permlevel, $perm_target );	
+					$perm = $this->Group->check_perm_catsgroups( $permname, $permlevel, $perm_target );
 				}
 				break;
 
@@ -429,7 +429,7 @@ class User extends DataObject
 				{ // Check groups blog specific perm
 					$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 				}
-				
+
 				break;
 
 			default:
@@ -898,6 +898,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.46  2005/11/04 13:50:57  blueyed
+ * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
+ *
  * Revision 1.45  2005/10/03 18:10:07  fplanque
  * renamed post_ID field
  *

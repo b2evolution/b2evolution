@@ -221,7 +221,7 @@ class Blog extends DataObject
 	 * {@internal Blog::set(-) }}
 	 *
 	 * @param string Parameter name
-	 * @return mixed Parameter value
+	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
 	function set( $parname, $parvalue )
 	{
@@ -238,7 +238,7 @@ class Blog extends DataObject
 			case 'pingblodotgs':
 			case 'disp_bloglist':
 			case 'force_skin':
-				parent::set_param( $parname, 'number', $parvalue );
+				return parent::set_param( $parname, 'number', $parvalue );
 				break;
 
 			/* fplanque: I'm removing this because it's no good when using absolute URL
@@ -251,7 +251,7 @@ class Blog extends DataObject
 			*/
 
 			default:
-				parent::set_param( $parname, 'string', $parvalue );
+				return parent::set_param( $parname, 'string', $parvalue );
 		}
 	}
 
@@ -797,6 +797,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2005/11/04 13:50:57  blueyed
+ * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
+ *
  * Revision 1.36  2005/10/31 23:20:45  fplanque
  * keeping things straight...
  *
