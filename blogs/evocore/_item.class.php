@@ -231,7 +231,8 @@ class Item extends DataObject
 			$this->set_author_User( $current_User );
 			$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
 			$this->set( 'flags', '' );
-			$this->renderers = array();
+			// Set the renderer list to 'default' will trigger all 'opt-out' renderers:
+			$this->renderers = array( 'default' );
 			$this->set( 'status', 'published' );
 			$this->set( 'locale', $default_locale );
 		}
@@ -1494,6 +1495,8 @@ class Item extends DataObject
 
 			echo '<div>';
 
+			// echo $loop_RendererPlugin->apply_when;
+
 			echo '<input type="checkbox" class="checkbox" name="renderers[]" value="';
 			$loop_RendererPlugin->code();
 			echo '" id="renderer_';
@@ -1503,7 +1506,6 @@ class Item extends DataObject
 			switch( $loop_RendererPlugin->apply_when )
 			{
 				case 'always':
-					// echo 'FORCED';
 					echo ' checked="checked"';
 					echo ' disabled="disabled"';
 					break;
@@ -1512,26 +1514,20 @@ class Item extends DataObject
 					if( in_array( $loop_RendererPlugin->code, $this->renderers ) // Option is activated
 						|| in_array( 'default', $this->renderers ) ) // OR we're asking for default renderer set
 					{
-						// echo 'OPT';
 						echo ' checked="checked"';
 					}
-					// else echo 'NO';
 					break;
 
 				case 'opt-in':
 					if( in_array( $loop_RendererPlugin->code, $this->renderers ) ) // Option is activated
 					{
-						// echo 'OPT';
 						echo ' checked="checked"';
 					}
-					// else echo 'NO';
 					break;
 
 				case 'lazy':
-					// cannot select
 					if( in_array( $loop_RendererPlugin->code, $this->renderers ) ) // Option is activated
 					{
-						// echo 'OPT';
 						echo ' checked="checked"';
 					}
 					echo ' disabled="disabled"';
@@ -2217,6 +2213,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.64  2005/11/04 22:40:01  fplanque
+ * fixed pesky default renderers
+ *
  * Revision 1.63  2005/11/04 21:42:22  blueyed
  * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
  *
