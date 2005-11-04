@@ -171,7 +171,11 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Features') );
-	$value = $UserSettings->get( 'admin_skin', $edited_User->ID );
+	$value = $Request->get('edited_user_admin_skin');
+	if( !$value )
+	{ // no value supplied through POST/GET
+		$value = $UserSettings->get( 'admin_skin', $edited_User->ID );
+	}
 	if( !$value )
 	{ // Nothing set yet for the user, use the default
 		$value = $Settings->get('admin_skin');
@@ -211,6 +215,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.71  2005/11/04 14:10:48  blueyed
+ * Use value from $Request for edited_user_admin_skin to display in the form (in case of errors with other fields)
+ *
  * Revision 1.70  2005/11/02 00:42:30  blueyed
  * Added get_admin_skins() and use it to perform additional checks (if there's a _adminUI.class.php file in there). Thinkl "CVS".. :)
  *
