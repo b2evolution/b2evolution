@@ -156,9 +156,9 @@ else
 			else
 			{ // we edit an existing user:
 				$edited_User = & $UserCache->get_by_ID( $edited_user_ID );
-				// We need to remember the current login in order to later update login cookie if necessary...
-				$saved_login = $edited_User->login;
 			}
+			// We set it to true, if a setting changes that needs a page reload (locale, admin skin, ..)
+			$reload_page = false;
 
 			if( $user_profile_only && $edited_user_ID != $current_User->ID )
 			{ // user is only allowed to update him/herself
@@ -183,10 +183,11 @@ else
 			}
 
 			// check if new login already exists for another user_ID
-			$query = "SELECT user_ID
-									FROM T_users
-								 WHERE user_login = '$edited_user_login'
-								   AND user_ID != $edited_user_ID";
+			$query = "
+				SELECT user_ID
+				  FROM T_users
+				 WHERE user_login = '$edited_user_login'
+				   AND user_ID != $edited_user_ID";
 			if( $q = $DB->get_var( $query ) )
 			{
 				$Request->param_error( 'edited_user_login',
@@ -231,7 +232,10 @@ else
 			$edited_User->set( 'lastname', $edited_user_lastname );
 			$edited_User->set( 'nickname', $edited_user_nickname );
 			$edited_User->set( 'idmode', $edited_user_idmode );
-			$edited_User->set( 'locale', $edited_user_locale );
+			if( $edited_User->set( 'locale', $edited_user_locale ) && $edited_User->ID == $current_User->ID )
+			{ // value has changed for the current user
+				$reload_page = true;
+			}
 			$edited_User->set( 'email', $edited_user_email );
 			$edited_User->set( 'url', $edited_user_url );
 			$edited_User->set( 'icq', $edited_user_icq );
@@ -271,12 +275,15 @@ else
 					$Messages->add( T_('New user created.'), 'success' );
 				}
 
-				$reload = ($edited_User->ID == $current_User->ID)
-				          && $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID );
+				if( $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID )
+						&& ($edited_User->ID == $current_User->ID) )
+				{ // admin_skin has changed for the current user
+					$reload_page = true;
+				}
 				$UserSettings->dbupdate();
 
 				// fplanque>> TODO: also reload when changing locale.
-				if( $reload )
+				if( $reload_page )
 				{
 					$Session->set( 'Messages', $Messages );
 					$Session->dbsave();
@@ -563,6 +570,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.111  2005/11/04 13:52:56  blueyed
+ * Reload page for changed locale, so that the new setting applies. Also fixed setting admin_skin for another user.
+ *
  * Revision 1.110  2005/11/02 20:11:19  fplanque
  * "containing entropy"
  *
