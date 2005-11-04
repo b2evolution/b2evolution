@@ -101,7 +101,7 @@ class User extends DataObject
 	 */
 	function User( $db_row = NULL )
 	{
-		global $GroupCache, $default_locale, $Settings, $servertimenow;
+		global $GroupCache, $default_locale, $Settings, $localtimenow;
 
 		// Call parent constructor:
 		parent::DataObject( 'T_users', 'user_', 'user_ID' );
@@ -145,9 +145,9 @@ class User extends DataObject
 			$this->set( 'level', isset( $Settings ) ? $Settings->get('newusers_level') : 0 );
 			$this->notify = 1 ;
 			$this->showonline = 1;
-			if( isset($servertimenow) )
+			if( isset($localtimenow) )
 			{
-				$this->datecreated = date('Y-m-d H:i:s', $servertimenow );
+				$this->datecreated = date('Y-m-d H:i:s', $localtimenow );
 			}
 			else
 			{ // We don't know local time here!
@@ -898,6 +898,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.47  2005/11/04 16:24:36  blueyed
+ * Use $localtimenow instead of $servertimenow.
+ *
  * Revision 1.46  2005/11/04 13:50:57  blueyed
  * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
  *
