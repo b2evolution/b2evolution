@@ -93,14 +93,9 @@ class Session
 	 */
 	function Session()
 	{
-		global $DB, $Debuglog, $current_User, $localtimenow, $Messages;
+		global $DB, $Debuglog, $current_User, $localtimenow, $Messages, $Settings;
 		global $Hit;
 		global $cookie_session, $cookie_expires, $cookie_path, $cookie_domain;
-
-		/**
-		 * @todo move to $Settings - use only for display of online user, not to prune sessions!
-		 */
-		global $online_session_timeout;
 
 		if( !empty( $_COOKIE[$cookie_session] ) )
 		{ // session ID sent by cookie
@@ -111,13 +106,12 @@ class Session
 
 				$Debuglog->add( 'ID (from cookie): '.$session_id_by_cookie, 'session' );
 
-// fplanque>> TODO: TOP PRIORITY: add a WHERE clause in order not to catch any expired session
-// Pruning should only occur MUCH later after session expiration!! Pruning does not guarantee that we only fetch active sessions.
 				if( $row = $DB->get_row( '
 					SELECT sess_ID, sess_key, sess_data, sess_user_ID
 					  FROM T_sessions
 					 WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
-					   AND sess_key = '.$DB->quote($session_key_by_cookie) ) )
+					   AND sess_key = '.$DB->quote($session_key_by_cookie).'
+					   AND sess_lastseen > '.($localtimenow - $DB->quote($Settings->get('timeout_sessions'))) ) )
 				{ // ID + key are valid: load data
 					$Debuglog->add( 'ID is valid.', 'session' );
 					$this->ID = $row->sess_ID;
@@ -139,7 +133,7 @@ class Session
 						{
 							$Debuglog->add( 'Session data loaded.', 'session' );
 
-// fplanque>> I can guess the purpose, but please document this a little bit...
+							// Load a Messages object from session data, if available:
 							if( isset($this->_data['Messages']) && is_a( $this->_data['Messages'], 'log' ) )
 							{
 								$Messages->add_messages( $this->_data['Messages']->messages );
@@ -190,13 +184,8 @@ class Session
 
 			$this->ID = $DB->insert_id;
 
-			// TODO: we should use "( $localtimenow + $Settings->get('auto_prune_sessions') )" instead of $cookie_expires.
-			//       but this would require to send the cookie on each request.
-			//       Using $cookie_expires prevents from using auto_prune_sessions > $cookie_expires. (blueyed, 051031)
-			//
-			// Re: man-in-the-middle (MITM): it would make no difference if we'd generate a new key on each request or not IMHO,
-			//     because the MITM could give the user a new/false key (like on timeout of a session) in either case. (blueyed, 051031)
-			setcookie( $cookie_session, $this->ID.'_'.$this->key, $cookie_expires, $cookie_path, $cookie_domain );
+			// Set a cookie valid for ~ 10 years:
+			setcookie( $cookie_session, $this->ID.'_'.$this->key, 315360000, $cookie_path, $cookie_domain );
 
 			$Debuglog->add( 'ID (generated): '.$this->ID, 'session' );
 			$Debuglog->add( 'Cookie sent.', 'session' );
@@ -205,11 +194,7 @@ class Session
 		/*
 		TODO: (post-phoenix)
 		$Cron->add_task( array(&$this, 'dbsave'), 'always' ); // always save data (no need to call it manually)!
-		$Cron->add_task( array(&$this, 'dbprune') ); // if it's due depends on $Settings
 		*/
-
-		// fplanque>> This is not the rigth place for pruning
-		$this->dbprune();
 	}
 
 
@@ -257,23 +242,21 @@ class Session
 
 
 	/**
-	 * Logout the user, by invalidating the session key and unsetting {@link $user_ID}
+	 * Logout the user, by invalidating the session key and unsetting {@link $user_ID}.
 	 *
-	 * We want to keep the user in the session log.
-fplanque>> so why are you setting it to NULL ??
-	 *
-	 * @return boolean whether this was successfully executed
+	 * We want to keep the user in the session log, but we're unsetting {@link $user_ID}, which refers
+	 * to the current session.
 	 */
 	function logout()
 	{
 		global $Debuglog, $cookie_session, $cookie_path, $cookie_domain;
 
 		$this->key = NULL;
-//		$this->user_ID = NULL;
+		$this->user_ID = NULL;
 
 		setcookie( $cookie_session, '', 272851261, $cookie_path, $cookie_domain ); // 272851261 being the birthday of a lovely person
 
-		// TODO: Remove unneeded data from $this->_data once used
+		$this->_data = NULL; // We don't need to store data
 		$this->dbsave();
 	}
 
@@ -362,26 +345,6 @@ fplanque>> so why are you setting it to NULL ??
 				sess_data = '.$DB->quote( serialize($this->_data) ).',
 				sess_key = '.$DB->quote( $this->key ).'
 			WHERE sess_ID = '.$this->ID, 'Session::dbsave' );
-	}
-
-
-	/**
-	 * Prune old sessions according to auto_prune_sessions general setting.
-	 *
-	 * @todo Use a Setting to remember last prune? - see {@link Hitlist::dbprune()}.
-	 * fplanque>> NO: do both prunes at the same place, they are CLOSELY RELATED
-	 */
-	function dbprune()
-	{
-		global $DB, $Settings, $localtimenow;
-
-		if( $Settings->get('auto_prune_sessions') )
-		{
-			$datetime_prune_before = date( 'Y-m-d H:i:s', ($localtimenow - $Settings->get('auto_prune_sessions')) );
-			$DB->query( '
-				DELETE FROM T_sessions
-				WHERE sess_lastseen < "'.$datetime_prune_before.'"', 'Session::dbprune()' );
-		}
 	}
 }
 

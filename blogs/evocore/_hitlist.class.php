@@ -111,9 +111,10 @@ class Hitlist
 	 * It uses a general setting to store the day of the last prune, avoiding multiple prunes per day.
 	 * fplanque>> Check: How much faster is this than DELETING right away with an INDEX on the date field?
 	 *
-	 * Note: we're using {@link $localtime} to log hits, so use this for pruning too.
+	 * Note: we're using {@link $localtimenow} to log hits, so use this for pruning, too.
 	 *
 	 * @static
+	 * @return boolean true, if purged; false if not purged
 	 */
 	function dbprune()
 	{
@@ -121,20 +122,30 @@ class Hitlist
 
 		if( $auto_prune_stats = $Settings->get( 'auto_prune_stats' ) )
 		{ // Autopruning is requested
-			$last_prune = (int)$Settings->get( 'auto_prune_stats_done' );
+			$last_prune = $Settings->get( 'auto_prune_stats_done' );
 
-			// fplanque>> TODO: Prune when $localtime is a NEW day (which will be the 1st request after midnight) instead of pruning at any possible hour in the day.
-			if( $last_prune < ($localtimenow-86400) )
+			if( $last_prune < date('Y-m-d', $localtimenow) )
 			{ // not pruned since one day
-				$sql = "
-					DELETE FROM T_hitlog
-					 WHERE hit_datetime < '".date( 'Y-m-d', $localtimenow - ($auto_prune_stats * 86400) )."'"; // 1 day = 86400 seconds
-				$rows_affected = $DB->query( $sql, 'Autopruning hit log' );
+				$datetime_prune_before = date( 'Y-m-d', ($localtimenow - ($auto_prune_stats * 86400)) ); // 1 day = 86400 seconds
 
-				$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows.', 'hit' );
-				$Settings->set( 'auto_prune_stats_done', $localtimenow );
+				$rows_affected = $DB->query( "
+					DELETE FROM T_hitlog
+					WHERE hit_datetime < '$datetime_prune_before'", 'Autopruning hit log' );
+				$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_hitlog.', 'hit' );
+
+				// Prune sessions that have timed out and are older than auto_prune_stats
+				$rows_affected = $DB->query( '
+					DELETE FROM T_sessions
+					WHERE sess_lastseen < "'.date( 'Y-m-d H:i:s', ($localtimenow - $Settings->get( 'timeout_sessions' )) ).'"
+						AND sess_lastseen < "'.$datetime_prune_before.'"', 'Autoprune sessions' );
+				$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
+
+				$Settings->set( 'auto_prune_stats_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact date
 				$Settings->dbupdate();
+
+				return true;
 			}
 		}
+		return false;
 	}
 }

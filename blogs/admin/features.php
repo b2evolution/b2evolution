@@ -89,7 +89,7 @@ switch( $action )
 			$Settings->delete_array( array(
 				'eblog_enabled', 'eblog_method', 'eblog_server_host', 'eblog_server_port', 'eblog_username', 'eblog_password', 'eblog_default_category', 'eblog_subject_prefix',
 				'hit_doublecheck_referer', 'auto_prune_stats',
-				'auto_prune_sessions',
+				'timeout_sessions',
 				'webhelp_enabled' ) );
 
 			if( $Settings->dbupdate() )
@@ -155,17 +155,17 @@ switch( $action )
 
 
 			// Sessions
-			$auto_prune_sessions = $Request->param( 'auto_prune_sessions', 'integer', $Settings->get_default('auto_prune_sessions') );
-			if( $auto_prune_sessions < 3600 )
+			$timeout_sessions = $Request->param( 'timeout_sessions', 'integer', $Settings->get_default('timeout_sessions') );
+			if( $timeout_sessions < 3600 )
 			{ // lower than 1 hour: not allowed
-				$auto_prune_sessions = 3600;
+				$timeout_sessions = 3600;
 				$Messages->add( sprintf( T_( 'You cannot set a session timeout below %d seconds.' ), 3600 ), 'error' );
 			}
-			elseif( $auto_prune_sessions < 86400 )
+			elseif( $timeout_sessions < 86400 )
 			{ // lower than 1 day: notice/warning
-				$Messages->add( sprintf( T_( 'Warning: your global session timeout is just %d seconds. Your users may have to re-login often!' ), $auto_prune_sessions ), 'note' );
+				$Messages->add( sprintf( T_( 'Warning: your session timeout is just %d seconds. Your users may have to re-login often!' ), $timeout_sessions ), 'note' );
 			}
-			$Settings->set( 'auto_prune_sessions', $auto_prune_sessions );
+			$Settings->set( 'timeout_sessions', $timeout_sessions );
 
 
 			if( ! $Messages->count('error') )

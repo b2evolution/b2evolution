@@ -75,8 +75,8 @@ class GeneralSettings extends AbstractSettings
 		'upload_allowedext' => 'jpg gif png txt', // handled
 		'upload_maxkb' => '100',
 
-		'auto_prune_stats' => '30',         // days
-		'auto_prune_sessions' => '2592000', // seconds (2592000 == 30 days)
+		'auto_prune_stats' => '30',         // days (T_hitlog and T_sessions)
+		'timeout_sessions' => '604800',     // seconds (604800 == 7 days)
 
 		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$',
 
@@ -142,6 +142,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.26  2005/11/05 00:05:43  blueyed
+ * Moved pruning of T_sessions into Hitlist::dbprune()
+ *
  * Revision 1.25  2005/11/02 20:11:19  fplanque
  * "containing entropy"
  *
