@@ -783,20 +783,26 @@ switch( $AdminUI->get_path(1) )
 			<h2><?php echo T_('Top Aggregators') ?>:</h2>
 			<p><?php echo T_('These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)') ?></p>
 			<?php
-			$total_hit_count = $DB->get_var( "SELECT COUNT(*) AS hit_count
-																				FROM T_useragents INNER JOIN T_hitlog ON hit_agnt_ID = agnt_ID
-																				WHERE agnt_type = 'rss' ".
-																				( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
+			$total_hit_count = $DB->get_var( "
+				SELECT COUNT(*) AS hit_count
+				FROM T_useragents INNER JOIN T_sessions
+					ON sess_agnt_ID = agnt_ID INNER JOIN T_hitlog
+					ON sess_ID = hit_sess_ID
+				WHERE agnt_type = 'rss' "
+					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
 
 
 			echo '<p>'.T_('Total RSS hits').': '.$total_hit_count.'</p>';
 
 			// Create result set:
-			$Results = & new Results( "SELECT agnt_signature, COUNT(*) AS hit_count
-																FROM T_useragents INNER JOIN T_hitlog ON hit_agnt_ID = agnt_ID
-																WHERE agnt_type = 'rss' ".
-																( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
-																GROUP BY agnt_ID ', 'topagg_', '--D' );
+			$Results = & new Results( "
+				SELECT agnt_signature, COUNT(*) AS hit_count
+				FROM T_useragents INNER JOIN T_sessions
+					ON sess_agnt_ID = agnt_ID INNER JOIN T_hitlog
+					ON sess_ID = hit_sess_ID
+				WHERE agnt_type = 'rss' "
+					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
+				GROUP BY agnt_ID ', 'topagg_', '--D' );
 
 			$Results->title = T_('Top Aggregators');
 
@@ -830,12 +836,15 @@ switch( $AdminUI->get_path(1) )
 			<p><?php echo T_('These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)') ?></p>
 			<?php
 			// Create result set:
-			$Results = & new Results( "SELECT hit_ID, hit_datetime, hit_blog_ID, hit_uri, blog_shortname
-																FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-																			LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
-																WHERE hit_referer_type = 'direct'
-																  AND agnt_type = 'browser'"
-																	.( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
+			$Results = & new Results( "
+				SELECT hit_ID, hit_datetime, hit_blog_ID, hit_uri, blog_shortname
+				FROM T_hitlog INNER JOIN T_sessions
+					ON sess_ID = hit_sess_ID INNER JOIN T_useragents
+					ON sess_agnt_ID = agnt_ID
+				LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
+				WHERE hit_referer_type = 'direct'
+				  AND agnt_type = 'browser'"
+				  .( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
 
 			$Results->title = T_('Last referers');
 
@@ -887,20 +896,26 @@ switch( $AdminUI->get_path(1) )
 			?>
 			<h2><?php echo T_('Top User Agents') ?>:</h2>
 			<?php
-			$total_hit_count = $DB->get_var( "SELECT COUNT(*) AS hit_count
-																				FROM T_useragents INNER JOIN T_hitlog ON hit_agnt_ID = agnt_ID
-																				WHERE agnt_type <> 'rss' ".
-																				( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
+			$total_hit_count = $DB->get_var( "
+				SELECT COUNT(*) AS hit_count
+				FROM T_useragents INNER JOIN T_sessions
+					ON sess_agnt_ID = agnt_ID INNER JOIN T_hitlog
+					ON sess_ID = hit_sess_ID
+				WHERE agnt_type <> 'rss' "
+					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
 
 
 			echo '<p>'.T_('Total hits').': '.$total_hit_count.'</p>';
 
 			// Create result set:
-			$Results = & new Results( "SELECT agnt_signature, COUNT(*) AS hit_count
-																FROM T_useragents INNER JOIN T_hitlog ON hit_agnt_ID = agnt_ID
-																WHERE agnt_type <> 'rss' ".
-																( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
-																GROUP BY agnt_ID ', 'topua_', '--D' );
+			$Results = & new Results( "
+				SELECT agnt_signature, COUNT(*) AS hit_count
+				FROM T_useragents INNER JOIN T_sessions
+					ON sess_agnt_ID = agnt_ID INNER JOIN T_hitlog
+					ON sess_ID = hit_sess_ID
+				WHERE agnt_type <> 'rss' "
+					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
+				GROUP BY agnt_ID ', 'topua_', '--D' );
 
 			$Results->title = T_('Top User Agents');
 
@@ -935,6 +950,10 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.9  2005/11/05 01:53:53  blueyed
+ * Linked useragent to a session rather than a hit;
+ * SQL: moved T_hitlog.hit_agnt_ID to T_sessions.sess_agnt_ID
+ *
  * Revision 1.8  2005/10/31 05:51:05  blueyed
  * Use rawurlencode() instead of urlencode()
  *

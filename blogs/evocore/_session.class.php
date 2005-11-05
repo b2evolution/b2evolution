@@ -175,12 +175,13 @@ class Session
 
 			$DB->query( '
 				INSERT INTO T_sessions
-				( sess_key, sess_lastseen, sess_ipaddress )
+				( sess_key, sess_lastseen, sess_ipaddress, sess_agnt_ID )
 				VALUES (
 					"'.$this->key.'",
 					"'.date( 'Y-m-d H:i:s', $localtimenow ).'",
-					"'.$Hit->IP.'"'
-				.')' );
+					"'.$Hit->IP.'",
+					"'.$Hit->agent_ID.'"
+				)' );
 
 			$this->ID = $DB->insert_id;
 

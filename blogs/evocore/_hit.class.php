@@ -113,6 +113,12 @@ class Hit
 	 */
 	var $agent_type = 'unknown';
 
+	/**
+	 * The ID of the user agent entry in T_useragents.
+	 * @var integer
+	 */
+	var $agent_ID;
+
 	/**#@+
 	 * @var integer|NULL Detected browser.
 	 */
@@ -184,12 +190,14 @@ class Hit
 		 * Check for reloads (if the URI has been requested from same IP/useragent
 		 * in past reloadpage_timeout seconds.)
 		 */
-		if( $DB->get_var(
-					'SELECT hit_ID FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-						WHERE hit_uri = "'.$DB->escape( $ReqURI ).'"
-							AND hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
-							AND hit_remote_addr = '.$DB->quote( getIpList( true ) ).'
-							AND agnt_signature = '.$DB->quote($this->user_agent),
+		if( $DB->get_var( '
+			SELECT hit_ID FROM T_hitlog INNER JOIN T_sessions
+			    ON hit_sess_ID = sess_ID INNER JOIN T_useragents
+			    ON sess_agnt_ID = agnt_ID
+			 WHERE hit_uri = "'.$DB->escape( $ReqURI ).'"
+			   AND hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
+			   AND hit_remote_addr = '.$DB->quote( getIpList( true ) ).'
+			   AND agnt_signature = '.$DB->quote($this->user_agent),
 					0, 0, 'Hit: Check for reload' ) )
 		{
 			$Debuglog->add( 'Reload!', 'hit' );
@@ -363,20 +371,21 @@ class Hit
 		}
 
 
-		if( $agnt_data = $DB->get_row(
-			'SELECT agnt_ID, agnt_type FROM T_useragents
-			  WHERE agnt_signature = "'.$DB->escape( $this->user_agent ).'"
-			    AND agnt_type = "'.$this->agent_type.'"' ) )
+		if( $agnt_data = $DB->get_row( '
+			SELECT agnt_ID, agnt_type FROM T_useragents
+			 WHERE agnt_signature = "'.$DB->escape( $this->user_agent ).'"
+			   AND agnt_type = "'.$this->agent_type.'"' ) )
 		{ // this agent (with that type) hit us once before
 			$this->agent_type = $agnt_data->agnt_type;
-			$this->agentID = $agnt_data->agnt_ID;
+			$this->agent_ID = $agnt_data->agnt_ID;
 		}
 		else
 		{ // create new user agent entry
-			$DB->query( 'INSERT INTO T_useragents ( agnt_signature, agnt_type )
-										VALUES ( "'.$DB->escape( $this->user_agent ).'", "'.$this->agent_type.'" )' );
+			$DB->query( '
+				INSERT INTO T_useragents ( agnt_signature, agnt_type )
+				VALUES ( "'.$DB->escape( $this->user_agent ).'", "'.$this->agent_type.'" )' );
 
-			$this->agentID = $DB->insert_id;
+			$this->agent_ID = $DB->insert_id;
 		}
 	}
 
@@ -459,12 +468,11 @@ class Hit
 		$Debuglog->add( 'log(): Recording the hit.', 'hit' );
 
 		// insert hit into DB table:
-		$sql =
-			'INSERT INTO T_hitlog( hit_sess_ID, hit_datetime, hit_uri,
-				hit_agnt_ID, hit_referer_type, hit_referer,
-				hit_referer_dom_ID, hit_blog_ID, hit_remote_addr )
+		$sql = '
+			INSERT INTO T_hitlog( hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
+				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr )
 			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'",
-				"'.$this->agentID.'", "'.$this->referer_type.'", "'.$DB->escape($this->referer).'",
+				"'.$this->referer_type.'", "'.$DB->escape($this->referer).'",
 				"'.$this->referer_domain.'", "'.$Blog->ID.'", "'.$DB->escape( $this->IP ).'"
 			)';
 

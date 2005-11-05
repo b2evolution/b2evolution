@@ -94,11 +94,6 @@ function refererList(
 
 	$type = preg_replace( "#'no'#", "'referer'", $type );
 
-	$ret = array();
-
-	#return $ret;
-
-
 	//if no visitURL, will show links to current page.
 	//if url given, will show links to that page.
 	//if url="global" will show links to all pages
@@ -133,8 +128,8 @@ function refererList(
 	}
 
 	$sql_from_where = ' FROM T_hitlog '
-											.( $get_user_agent ? 'INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID' : '' )
-											.' LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID 
+											.( $get_user_agent ? 'INNER JOIN T_sessions ON hit_sess_ID = sess_ID INNER JOIN T_useragents ON sess_agnt_ID = agnt_ID' : '' )
+											.' LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
 											WHERE hit_referer_type IN ('.$type.')';
 	if( !empty($blog_ID) )
 	{
@@ -304,12 +299,12 @@ function stats_search_keywords( $ref )
 	foreach( $ref_params as $ref_param )
 	{
 		$param_parts = explode( '=', $ref_param );
-		if( $param_parts[0] == 'q' 
+		if( $param_parts[0] == 'q'
 				or $param_parts[0] == 'as_q' 		// Google Advanced Search Query
-				or $param_parts[0] == 'query' 
-				or $param_parts[0] == 'search' 
-				or $param_parts[0] == 'p' 
-				or $param_parts[0] == 'kw' 
+				or $param_parts[0] == 'query'
+				or $param_parts[0] == 'search'
+				or $param_parts[0] == 'p'
+				or $param_parts[0] == 'kw'
 				or $param_parts[0] == 'qs'
 				or $param_parts[0] == 'r'
 				or $param_parts[0] == 'rdata'				// search.ke.voila.fr
@@ -377,6 +372,10 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.13  2005/11/05 01:53:54  blueyed
+ * Linked useragent to a session rather than a hit;
+ * SQL: moved T_hitlog.hit_agnt_ID to T_sessions.sess_agnt_ID
+ *
  * Revision 1.12  2005/10/14 21:00:08  fplanque
  * Stats & antispam have obviously been modified with ZERO testing.
  * Fixed a sh**load of bugs...

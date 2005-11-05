@@ -924,6 +924,7 @@ function create_b2evo_tables_phoenix()
 									sess_lastseen  DATETIME NOT NULL,
 									sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
 									sess_user_ID   INT(10) DEFAULT NULL,
+									sess_agnt_ID   INT UNSIGNED,
 									sess_data      TEXT DEFAULT NULL,
 									PRIMARY KEY( sess_ID )
 								)" );
@@ -971,7 +972,7 @@ function create_b2evo_tables_phoenix()
 	echo 'Creating default Post Types... ';
 	$DB->query( "INSERT INTO T_posttypes ( ptyp_ID, ptyp_name )
 										VALUES ( 1, 'Post' ),
-													 ( 2, 'Link' )" );
+										       ( 2, 'Link' )" );
 	echo "OK.<br />\n";
 
 
@@ -981,7 +982,7 @@ function create_b2evo_tables_phoenix()
 								 file_root_type                 enum('absolute','user','group','collection') not null default 'absolute',
 								 file_root_ID                   int(11) unsigned               not null default 0,
 								 file_path                      varchar(255)                   not null default '',
-							   file_title                     varchar(255),
+								 file_title                     varchar(255),
 								 file_alt                       varchar(255),
 								 file_desc                      text,
 								 primary key (file_ID),
@@ -1037,7 +1038,6 @@ function create_b2evo_tables_phoenix()
 							hit_sess_ID        INT UNSIGNED,
 							hit_datetime       DATETIME NOT NULL,
 							hit_uri            VARCHAR(250) DEFAULT NULL,
-							hit_agnt_ID        INT UNSIGNED,
 							hit_referer_type   ENUM('search','blacklist','referer','direct','spam') NOT NULL,
 							hit_referer        VARCHAR(250) DEFAULT NULL,
 							hit_referer_dom_ID INT UNSIGNED DEFAULT NULL,
@@ -1045,7 +1045,7 @@ function create_b2evo_tables_phoenix()
 							hit_remote_addr    VARCHAR(40) DEFAULT NULL,
 							PRIMARY KEY (hit_ID),
 							INDEX hit_datetime ( hit_datetime ),
-           		INDEX hit_blog_ID (hit_blog_ID)
+							INDEX hit_blog_ID (hit_blog_ID)
 						)"; // TODO: more indexes?
 	$DB->query( $query );
 	echo "OK.<br />\n";
@@ -1260,6 +1260,10 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.152  2005/11/05 01:53:54  blueyed
+ * Linked useragent to a session rather than a hit;
+ * SQL: moved T_hitlog.hit_agnt_ID to T_sessions.sess_agnt_ID
+ *
  * Revision 1.151  2005/10/31 23:20:45  fplanque
  * keeping things straight...
  *
