@@ -282,7 +282,7 @@ class AbstractSettings
 			case 1:
 				if( isset($this->cache[ $args[0] ]) )
 				{
-					$r = $this->cache[ $args[0] ]->value;
+					$r = & $this->cache[ $args[0] ]->value;
 				}
 				elseif( NULL !== ($default = $this->get_default( $args[0] )) )
 				{
@@ -294,7 +294,7 @@ class AbstractSettings
 			case 2:
 				if( isset($this->cache[ $args[0] ][ $args[1] ]) )
 				{
-					$r = $this->cache[ $args[0] ][ $args[1] ]->value;
+					$r = & $this->cache[ $args[0] ][ $args[1] ]->value;
 				}
 				elseif( NULL !== ($default = $this->get_default( $args[1] )) )
 				{
@@ -306,11 +306,11 @@ class AbstractSettings
 			case 3:
 				if( isset($this->cache[ $args[0] ][ $args[1] ][ $args[2] ]) )
 				{
-					$r = $this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->value;
+					$r = & $this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->value;
 				}
 				elseif( NULL !== ($default = $this->get_default( $args[2] )) )
 				{
-					$r = $default;
+					$r = & $default;
 					$debugMsg .= '[DEFAULT]: ';
 				}
 				break;
@@ -600,6 +600,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.20  2005/11/05 00:04:13  blueyed
+ * Optimized get() a bit by assigning the return value by reference.
+ *
  * Revision 1.19  2005/11/01 23:03:22  blueyed
  * Fix notice on rare occasion (a setting was remembered as not existing [set to NULL in cache], not changed/set and dbupdate()) called
  *
