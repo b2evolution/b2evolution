@@ -228,7 +228,10 @@ class Item extends DataObject
 		if( $db_row == NULL )
 		{ // New item:
 			$this->ID = 0;
-			$this->set_author_User( $current_User );
+			if( isset($current_User) )
+			{ // use current user as default, if available
+				$this->set_author_User( $current_User );
+			}
 			$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
 			$this->set( 'flags', '' );
 			// Set the renderer list to 'default' will trigger all 'opt-out' renderers:
@@ -1922,7 +1925,7 @@ class Item extends DataObject
 	 *
 	 * @return boolean true on success
 	 */
-	function dbinsert( )
+	function dbinsert()
 	{
 		global $DB, $current_User;
 
@@ -2213,6 +2216,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.65  2005/11/05 01:01:50  blueyed
+ * Fix noticed during install, when there's no $current_User. Do not assign a user in the constructor then.
+ *
  * Revision 1.64  2005/11/04 22:40:01  fplanque
  * fixed pesky default renderers
  *
