@@ -1488,7 +1488,7 @@ function debug_info( $force = false )
 			$time_queries = $Timer->get_duration( 'sql_queries' );
 			$percent_queries = $time_page > 0 ? number_format( 100/$time_page * $time_queries, 2 ) : 0;
 			echo 'Page processing time: '.$time_page.' seconds.<br/>';
-			echo 'Database queries: '.$DB->num_queries.'.<br/>';
+			echo '<a href="#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br/>';
 			echo 'SQL processing time: '.$time_queries.' seconds, '.$percent_queries.'%.<br/>';
 
 			foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
@@ -1514,7 +1514,7 @@ function debug_info( $force = false )
 			'htmlbody' );
 
 
-		echo '<h3>DB</h3>';
+		echo '<h3 id="evo_debug_queries">DB</h3>';
 
 		if( !isset($DB) )
 		{
@@ -2248,6 +2248,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.132  2005/11/05 08:11:00  blueyed
+ * debug_info(): link to query log from number of queries at the top
+ *
  * Revision 1.131  2005/11/05 07:22:09  blueyed
  * Display number of DB queries at the top of debug_info()
  *
