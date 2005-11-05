@@ -498,6 +498,14 @@ class DB
 	{
 		global $Timer;
 
+		if( is_object($Timer) )
+		{
+			// Resume query timer:
+			$Timer->resume( 'sql_queries' );
+			// Start a timer for this particular query:
+			$Timer->start( 'sql_query', false );
+		}
+
 		// initialise return
 		$return_val = 0;
 
@@ -528,28 +536,17 @@ class DB
 			'time' => 'unknown',
 			'results' => 'unknown' );
 
-		if( is_object( $Timer ) )
-		{
-			// Resume global query timer
-			$Timer->resume( 'sql_queries' );
-			// Start a timer for this paritcular query:
-			$Timer->start( 'query', false );
-			// Run query:
-			$this->result = @mysql_query( $query, $this->dbhandle );
-			// Get duration for last query:
-			$this->queries[ $this->num_queries - 1 ]['time'] = $Timer->get_duration( 'query', 10 );
-			// Pause global query timer:
-			$Timer->pause( 'sql_queries' );
-		}
-		else
-		{
-			$this->result = @mysql_query($query,$this->dbhandle);
-		}
+		// Run query:
+		$this->result = @mysql_query( $query, $this->dbhandle );
 
 		// If there is an error then take note of it..
 		if ( mysql_error() )
 		{
 			$this->print_error( '', $title );
+			if( is_object($Timer) )
+			{ // pause global query timer
+				$Timer->pause( 'sql_queries' );
+			}
 			return false;
 		}
 
@@ -565,7 +562,7 @@ class DB
 				$this->insert_id = mysql_insert_id($this->dbhandle);
 			}
 
-			// Return number fo rows affected
+			// Return number of rows affected
 			$return_val = $this->rows_affected;
 		}
 		else
@@ -656,6 +653,12 @@ class DB
 			$this->queries[ $this->num_queries - 1 ]['results'] = $this->debug_get_rows_table( $this->debug_dump_rows );
 		}
 
+		if( is_object($Timer) )
+		{
+			$Timer->pause( 'sql_queries' );
+			// Get duration for last query:
+			$this->queries[ $this->num_queries - 1 ]['time'] = $Timer->get_duration( 'sql_query', 10 );
+		}
 		return $return_val;
 	}
 
@@ -1163,6 +1166,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.41  2005/11/05 07:16:51  blueyed
+ * Use query timer for whole DB::query(), not just the call to mysql_query therein. Gives a more realistic impression of DB query durations.
+ *
  * Revision 1.40  2005/10/31 23:20:45  fplanque
  * keeping things straight...
  *
