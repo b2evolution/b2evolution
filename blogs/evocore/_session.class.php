@@ -185,7 +185,7 @@ class Session
 			$this->ID = $DB->insert_id;
 
 			// Set a cookie valid for ~ 10 years:
-			setcookie( $cookie_session, $this->ID.'_'.$this->key, 315360000, $cookie_path, $cookie_domain );
+			setcookie( $cookie_session, $this->ID.'_'.$this->key, time()+315360000, $cookie_path, $cookie_domain );
 
 			$Debuglog->add( 'ID (generated): '.$this->ID, 'session' );
 			$Debuglog->add( 'Cookie sent.', 'session' );
