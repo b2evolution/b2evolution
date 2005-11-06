@@ -807,6 +807,7 @@ $options_Form = & new Form( 'files.php#FM_anchor', 'options_form', 'get', 'none'
 	$options_Form->fieldend = '<br />';
 	$options_Form->begin_form( 'fform' );
 	$options_Form->hidden( 'options_show', 1 );
+	$options_Form->hidden( 'action', 'update_settings' );
 	echo $Fileman->getFormHiddenInputs();
 
 	// Link to toggle the display of the form
@@ -843,6 +844,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.43  2005/11/06 11:22:10  yabs
+ * correcting options bug
+ *
  * Revision 1.42  2005/10/30 03:51:24  blueyed
  * Refactored showhide-JS functionality.
  * Moved showhide() from the features form to functions.js, and renamed to toggle_display_by_id();
