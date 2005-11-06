@@ -582,7 +582,8 @@ function is_email( $email, $format = 'simple', $return_match = false )
  */
 function is_windows()
 {
-	return isset( $_SERVER['WINDIR'] );
+	// gotta love microdoft
+	return ( isset( $_SERVER['WINDIR'] ) || isset( $_SERVER['windir'] ) );
 }
 
 
@@ -2249,6 +2250,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.134  2005/11/06 11:36:57  yabs
+ * correcting windows farce
+ *
  * Revision 1.133  2005/11/06 03:19:12  blueyed
  * Do not use third parameter for header(), as it requires PHP 4.3 and is not necessary.
  *
