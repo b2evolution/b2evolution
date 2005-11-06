@@ -428,7 +428,7 @@ function previous_posts( $page='' )
  */
 function next_posts_link($label='#', $max_page=0, $page='')
 {
-	global $p, $paged, $result, $Settings, $MainList, $Blog;
+	global $p, $paged, $result, $Settings, $MainList, $Blog, $Item;
 
 	if( $label == '#' ) $label = T_('Next Page').' >>';
 
@@ -437,6 +437,16 @@ function next_posts_link($label='#', $max_page=0, $page='')
 	$nextpage = intval($paged) + 1;
 	if (empty($p) && (empty($paged) || $nextpage <= $max_page))
 	{
+
+		// marian> TODO: put this into a generic function
+		$siteurl = $Blog->get( 'siteurl', 'raw');
+		if ( !empty( $siteurl ) )
+		{
+			$parsed_url = parse_url( $Blog->get( 'siteurl', 'raw' ) );
+			$page = $parsed_url['scheme'] . '://' .
+					$parsed_url['host'] .
+					$parsed_url['path'];
+		}
 		echo '<a href="';
 		echo next_posts($max_page, $page);
 		echo '">'. htmlspecialchars($label) .'</a>';
@@ -459,6 +469,16 @@ function previous_posts_link($label='#', $page='')
 
 	if( empty($p) && ($paged > 1) )
 	{
+		// marian> TODO: put this into a generic function
+		$siteurl = $Blog->get( 'siteurl', 'raw');
+		if ( !empty( $siteurl ) )
+		{
+			$parsed_url = parse_url( $Blog->get( 'siteurl', 'raw' ) );
+			$page = $parsed_url['scheme'] . '://' .
+					$parsed_url['host'] .
+					$parsed_url['path'];
+		}
+
 		echo '<a href="';
 		echo previous_posts( $page );
 		echo '">'.htmlspecialchars($label).'</a>';
@@ -932,6 +952,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.37  2005/11/06 10:43:19  marian
+ * changes to make the multi-domain feature working
+ *
  * Revision 1.36  2005/11/02 06:52:19  marian
  * changed regenerate_url to support multiple domains
  *

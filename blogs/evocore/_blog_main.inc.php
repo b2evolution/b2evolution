@@ -141,6 +141,11 @@ locale_activate( $Blog->get('locale') );
 // Extra path info decoding:
 // -------------------------
 if( !isset( $resolve_extra_path ) ) $resolve_extra_path = true;
+if ( !empty( $_GET['tempskin'] ) )
+{
+	$resolve_extra_path = false; // We don't want extra path resolution on rss files
+}
+
 if( $resolve_extra_path )
 {
 	// Check and Remove blog baseurl from ReqPath:
@@ -306,6 +311,23 @@ if( !isset($display_blog_list) )
 /*
  * Now, we'll jump to displaying!
  */
+// Check if an rss syndication was requested
+// This will be handled like any other skin except
+// that it will not stored in a cookie
+if ( !empty($_GET['tempskin']) )
+{
+	if ( !empty($_GET['disp']) AND $_GET['disp'] == 'comments' )
+	{
+		require( get_path( 'skins' ).$_GET['tempskin'].'/_lastcomments.php' );
+		exit;
+	}
+	else 
+	{
+		require( get_path( 'skins' ).$_GET['tempskin'].'/_main.php' );
+		exit;
+	}
+}
+
 // Let's check if a skin has been forced in the stub file:
 // Note: URL skin requests are handled with param() 20 lines below
 if( !isset( $skin ) )
@@ -403,6 +425,9 @@ if ( $use_memcached )
 
 /*
  * $Log$
+ * Revision 1.23  2005/11/06 10:43:19  marian
+ * changes to make the multi-domain feature working
+ *
  * Revision 1.22  2005/10/30 03:47:43  blueyed
  * todo, question, indent
  *

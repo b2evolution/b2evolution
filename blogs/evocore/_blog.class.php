@@ -511,80 +511,75 @@ class Blog extends DataObject
 
 			case 'description':			// RSS wording
 			case 'shortdesc':
-					return $this->shortdesc;
+				return $this->shortdesc;
 				break;
 
 			case 'rdf_url':
-                if ($this->siteurl > '')
-                {
-    				return $rss_url.'?tempskin=rdf&amp;blog='.$this->ID;
-                } else {
-    				return $xmlsrv_url.'rdf.php?blog='.$this->ID;
-                }
+			if ( !empty($this->siteurl) )
+			{
+				return $rss_url.'?tempskin=_rdf&amp;blog='.$this->ID;
+			} else {
+				return $xmlsrv_url.'rdf.php?blog='.$this->ID;
+			}
 
 			case 'rss_url':
-                if ($this->siteurl > '')
-                {
-    				return $rss_url.'?tempskin=rss&amp;blog='.$this->ID;
-                } else {
-    				return $xmlsrv_url.'rss.php?blog='.$this->ID;
-			    }
+			if ( !empty($this->siteurl) )
+			{
+				return $rss_url.'?tempskin=_rss&amp;blog='.$this->ID;
+			} else {
+				return $xmlsrv_url.'rss.php?blog='.$this->ID;
+			}
 
 			case 'rss2_url':
-                if ($this->siteurl > '')
-                {
-    				return $rss_url.'?tempskin=rss2&amp;blog='.$this->ID;
-                } else {
-				    return $xmlsrv_url.'rss2.php?blog='.$this->ID;
-				}
+			if ( !empty($this->siteurl) )
+			{
+				return $rss_url.'?tempskin=_rss2&amp;blog='.$this->ID;
+			} else {
+				return $xmlsrv_url.'rss2.php?blog='.$this->ID;
+			}
 
 			case 'atom_url':
-                if ($this->siteurl > '')
-                {
-    				return $rss_url.'?tempskin=atom&amp;blog='.$this->ID;
-                } else {
-				    return $xmlsrv_url.'atom.php?blog='.$this->ID;
-				}
+			if ( !empty($this->siteurl) )
+			{
+				return $rss_url.'?tempskin=_atom&amp;blog='.$this->ID;
+			} else {
+				return $xmlsrv_url.'atom.php?blog='.$this->ID;
+			}
 
 			case 'comments_rdf_url':
-                if ($this->siteurl > '')
-                {
-    				return $rss_url.'?tempskin=rdf.comments&amp;blog='.$this->ID;
-                } else {
-				    return $xmlsrv_url.'rdf.comments.php?blog='.$this->ID;
-				}
+			if ( !empty($this->siteurl) )
+			{
+				return $rss_url.'?tempskin=_rdf&amp;disp=comments&amp;blog='.$this->ID;
+			} else {
+				return $xmlsrv_url.'rdf.comments.php?blog='.$this->ID;
+			}
 
 			case 'comments_rss_url':
-                if ($this->siteurl > '')
-                {
-    				return $rss_url.'?tempskin=rss.comments&amp;blog='.$this->ID;
-                } else {
-				    return $xmlsrv_url.'rss.comments.php?blog='.$this->ID;
-				}
+			if ( !empty($this->siteurl) )
+			{
+				return $rss_url.'?tempskin=_rss&amp;disp=comments&amp;blog='.$this->ID;
+			} else {
+				return $xmlsrv_url.'rss.comments.php?blog='.$this->ID;
+			}
 
 			case 'comments_rss2_url':
-                if ($this->siteurl > '')
-                {
-    				return $rss_url.'?tempskin=rss2.comments&amp;blog='.$this->ID;
-                } else {
-				    return $xmlsrv_url.'rss2.comments.php?blog='.$this->ID;
-				}
+			if ( !empty($this->siteurl) )
+			{
+				return $rss_url.'?tempskin=_rss2&amp;disp=comments&amp;blog='.$this->ID;
+			} else {
+				return $xmlsrv_url.'rss2.comments.php?blog='.$this->ID;
+			}
 
 			case 'comments_atom_url':
-                if ($this->siteurl > '')
-                {
-    				return $rss_url.'?tempskin=atom.comments&amp;blog='.$this->ID;
-                } else {
-				    return $xmlsrv_url.'atom.comments.php?blog='.$this->ID;
-				}
+			if ( !empty($this->siteurl) )
+			{
+				return $rss_url.'?tempskin=_atom&amp;disp=comments&amp;blog='.$this->ID;
+			} else {
+				return $xmlsrv_url.'atom.comments.php?blog='.$this->ID;
+			}
 
 			case 'pingback_url':
-                if ($this->siteurl > '')
-                {
-    				return $rss_url.'?tempskin=xmlrpc';
-                } else {
-				    return $xmlsrv_url.'xmlrpc.php';
-				}
+		    return $xmlsrv_url.'xmlrpc.php';
 
 			case 'admin_email':
 				return $admin_email;
@@ -797,6 +792,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2005/11/06 10:43:19  marian
+ * changes to make the multi-domain feature working
+ *
  * Revision 1.38  2005/11/04 21:42:22  blueyed
  * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
  *
