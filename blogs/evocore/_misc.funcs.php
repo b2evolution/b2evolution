@@ -2162,7 +2162,8 @@ function header_redirect( $redirectTo = NULL )
 	// blueyed>> The above method fails when you redirect after a POST to the same URL.
 	//   Regarding http://de3.php.net/manual/en/function.header.php#50588 and the other comments
 	//   around, I'd suggest:
-	header('Location: '.$location, true, 303); // true overwrites any previous Location header, 303 is "See Other" (http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html)
+	header( 'HTTP/1.1 303 See Other' ); // see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+	header( 'Location: '.$location );
 	exit();
 }
 
@@ -2248,6 +2249,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.133  2005/11/06 03:19:12  blueyed
+ * Do not use third parameter for header(), as it requires PHP 4.3 and is not necessary.
+ *
  * Revision 1.132  2005/11/05 08:11:00  blueyed
  * debug_info(): link to query log from number of queries at the top
  *
