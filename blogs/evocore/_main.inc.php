@@ -431,7 +431,7 @@ if( !empty($login) && !empty($pass) )
 		setcookie( 'cookie'.$instance_name.'pass', '', 272851261, $cookie_path, $cookie_domain );
 	}
 }
-elseif( empty($login) && $Session->session_has_user() )
+elseif( empty($login) && $Session->has_User() )
 { /* if the session has a user assigned to it:
 	 * User was not trying to log in, but he was already logged in:
 	 */
@@ -508,6 +508,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.62  2005/11/07 03:27:42  blueyed
+ * Use $Session to display a note about already logged in User (because $current_User does not get auto-set if 'login' param is given)
+ *
  * Revision 1.61  2005/11/07 03:10:57  blueyed
  * Allow $login to override already logged in user
  *

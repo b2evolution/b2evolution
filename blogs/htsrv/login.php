@@ -217,17 +217,19 @@ switch( $action )
 
 
 // Default: login form
-if( is_logged_in() )
+if( $Session->has_User() )
 { // The user is already logged in...
 
 	// Note: if $redirect_to is already set, param() will not touch it.
-	param( 'redirect_to', 'string', $ReqURI );
+	param( 'redirect_to', 'string', str_replace('&', '&amp;', $ReqURI) );
 	if( preg_match( '#login.php([&?].*)?$#', $redirect_to ) )
 	{ // avoid "endless loops"
-		$redirect_to = $admin_url;
+		$redirect_to = str_replace( '&', '&amp;', $admin_url );
 	}
+	// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
+	$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
 
-	$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $current_User->login )
+	$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $Session->get_User()->login )
 		.' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>', 'note' );
 }
 

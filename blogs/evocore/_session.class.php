@@ -267,7 +267,7 @@ class Session
 	 *
 	 * @return boolean
 	 */
-	function session_has_user()
+	function has_User()
 	{
 		return !empty( $this->user_ID );
 	}
@@ -281,12 +281,30 @@ class Session
 	 */
 	function get_spam_probability()
 	{
-		if( $this->session_has_user() )
+		if( $this->has_User() )
 		{
 			return -50;
 		}
 
 		return 0;
+	}
+
+
+	/**
+	 * Get the attached User.
+	 *
+	 * @return false|User
+	 */
+	function get_User()
+	{
+		global $UserCache;
+
+		if( !empty($this->user_ID) )
+		{
+			return $UserCache->get_by_ID( $this->user_ID );
+		}
+
+		return false;
 	}
 
 
