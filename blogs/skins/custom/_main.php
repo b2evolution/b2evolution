@@ -93,15 +93,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 </div>
 
 <div class="bPosts">
-<?php 
+<?php
 	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-	request_title( '<h2>', '</h2>' ) 
+	request_title( '<h2>', '</h2>' )
 	// ------------------------------ END OF REQUEST TITLE -----------------------------
 ?>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 
-<?php 
+<?php
 	// ------------------------------------ START OF POSTS ----------------------------------------
 	if( isset($MainList) ) $MainList->display_if_empty(); // Display message if no post
 
@@ -151,7 +151,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 		</div>
-		<?php 
+		<?php
 			// ------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. -------------
 			$disp_comments = 1;					// Display the comments if requested
 			$disp_comment_form = 1;			// Display the comments form if comments requested
@@ -177,7 +177,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		?>
 	</strong></p>
 
-<?php 
+<?php
 	// ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
 	switch( $disp )
 	{
@@ -206,7 +206,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			require( dirname(__FILE__).'/_subscriptions.php');
 			break;
 	}
-	// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- 
+	// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. -------------------
 ?>
 </div>
 <!-- =================================== START OF SIDEBAR =================================== -->
@@ -229,7 +229,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			<li><a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><strong><?php echo T_('Last comments') ?></strong></a></li>
 		</ul>
 
-		<?php 
+		<?php
 			// -------------------------- CALENDAR INCLUDED HERE -----------------------------
 			// Call the Calendar plugin:
 			$Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
@@ -237,7 +237,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					'block_end'=>'',
 					'title'=>'',			// No title.
 				) );
-			// -------------------------------- END OF CALENDAR ---------------------------------- 
+			// -------------------------------- END OF CALENDAR ----------------------------------
 		?>
 	</div>
 
@@ -253,21 +253,21 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	</div>
 
 
-	<?php 
+	<?php
 		// -------------------------- CATEGORIES INCLUDED HERE -----------------------------
 		// Call the Categories plugin:
 		$Plugins->call_by_code( 'evo_Cats', array(	// Add parameters below:
 			) );
-		// -------------------------------- END OF CATEGORIES ---------------------------------- 
+		// -------------------------------- END OF CATEGORIES ----------------------------------
 	?>
 
 
-	<?php 
+	<?php
 		// -------------------------- ARCHIVES INCLUDED HERE -----------------------------
 		// Call the Archives plugin:
 		$Plugins->call_by_code( 'evo_Arch', array(	// Add parameters below:
 			) );
-		// -------------------------------- END OF ARCHIVES ---------------------------------- 
+		// -------------------------------- END OF ARCHIVES ----------------------------------
 	?>
 
 
@@ -285,10 +285,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<?php } ?>
 
 
-	<?php 
+	<?php
 		// -------------------------- LINKBLOG INCLUDED HERE -----------------------------
 		require( dirname(__FILE__).'/_linkblog.php' );
-		// -------------------------------- END OF LINKBLOG ---------------------------------- 
+		// -------------------------------- END OF LINKBLOG ----------------------------------
 	?>
 
 
@@ -306,7 +306,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		</ul>
 	</div>
 
-	
+
 	<div class="bSideItem">
 		<h3><?php echo T_('Syndicate this blog') ?> <img src="../../img/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
 			<ul>
@@ -338,7 +338,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<div class="bSideItem">
 		<h3 class="sideItemTitle"><?php echo T_('Who\'s Online?') ?></h3>
 		<?php
-			$Sessions->displayOnliners();
+			$Sessions->display_onliners();
 		?>
 	</div>
 

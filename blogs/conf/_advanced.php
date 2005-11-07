@@ -89,16 +89,15 @@ if( !isset($default_to_blog) )
 	$default_to_blog = 2;
 }
 
+
 /**
  * Set the length of the online session time out (in seconds).
  *
  * This is for the Who's Online block. Default: 5 minutes (300s).
  *
- * @global int $online_session_timeout
- * @todo move to $Settings
- * @todo Rename to "Who's online timeout"
+ * @global integer
  */
-$online_session_timeout = 300;
+$timeout_online_user = 300;
 
 
 // Get hostname out of baseurl

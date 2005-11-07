@@ -47,30 +47,33 @@ class Sessions extends Widget
 	/**
 	 * Number of guests (and users that want to be anonymous)
 	 *
+	 * Gets lazy-filled when needed, through {@link init()}.
+	 *
 	 * @access protected
 	 */
-	var $_countGuests = array();
+	var $_count_guests;
+
+
+	/**
+	 * List of registered users.
+	 *
+	 * Gets lazy-filled when needed, through {@link init()}.
+	 *
+	 * @access protected
+	 */
+	var $_registeredUsers;
 
 
 	var $_initialized = false;
 
 
-	var $_registeredUsers = array();
-
-
-	/**
-	 * Constructor
+	/*
+	 * No constructor yet.
 	 */
-	function Sessions()
-	{
-	}
 
 
 	/**
 	 * Get an array of registered users and guests.
-	 *
-	 * @todo this is not really a method of a single Session
-	 * @todo Cache!
 	 *
 	 * @return array containing number of registered users and guests ('registered' and 'guests')
 	 */
@@ -80,14 +83,15 @@ class Sessions extends Widget
 		{
 			return true;
 		}
+		global $DB, $UserCache, $localtimenow, $timeout_online_user;
 
-		global $DB, $UserCache, $localtimenow, $online_session_timeout;
+		$this->_count_guests = 0;
 
-		$this->_countGuests = 0;
+		$timeout_YMD = date( 'Y-m-d H:i:s', ($localtimenow - $timeout_online_user) );
 
-		foreach( $DB->get_results( 'SELECT sess_user_ID FROM T_sessions
-																WHERE sess_lastseen > "'.date( 'Y-m-d H:i:s', ($localtimenow - $online_session_timeout) ).'"' )
-							as $row )
+		foreach( $DB->get_results( '
+			SELECT sess_user_ID FROM T_sessions
+			WHERE sess_lastseen > "'.$timeout_YMD.'"' ) as $row )
 		{
 			if( !empty( $row->sess_user_ID )
 					&& ( $User = & $UserCache->get_by_ID( $row->sess_user_ID ) ) )
@@ -96,12 +100,12 @@ class Sessions extends Widget
 
 				if( !$User->showonline )
 				{
-					$this->_countGuests++;
+					$this->_count_guests++;
 				}
 			}
 			else
 			{
-				$this->_countGuests++;
+				$this->_count_guests++;
 			}
 		}
 
@@ -114,15 +118,18 @@ class Sessions extends Widget
 	 *
 	 * @param boolean display?
 	 */
-	function numberOfGuests( $display = true )
+	function number_of_guests( $display = true )
 	{
-		$this->init();
+		if( !isset($this->_count_guests) )
+		{
+			$this->init();
+		}
 
 		if( $display )
 		{
-			echo $this->_countGuests;
+			echo $this->_count_guests;
 		}
-		return $this->_countGuests;
+		return $this->_count_guests;
 	}
 
 
@@ -130,88 +137,110 @@ class Sessions extends Widget
 	/**
 	 * Display the registered users who are online
 	 *
-	 * @param string Template to display each user (the first %s gets the user's preferred name,
-	 *               the second the link to his mail form - if he has an email address)
+	 * @param string To be displayed before all users
+	 * @param string To be displayed after all users
+	 * @param string Template to display for each user, see {@link replace_callback()}
 	 * @return array containing number of registered users and guests
 	 */
-	function displayOnlineUsers( $beforeEach = '<li class="onlineUser">', $afterEach = '</li>',
-																$beforeAll = '<ul class="onlineUsers">', $afterAll = '</ul>' )
+	function display_online_users( $beforeAll = '<ul class="onlineUsers">', $afterAll = '</ul>', $templateEach = '<li class="onlineUser">$user_preferredname$ $user_msgformlink$</li>' )
 	{
 		global $DB, $Blog, $UserCache;
 
-		$this->init();
+		if( !isset($this->_registeredUsers) )
+		{
+			$this->init();
+		}
 
-		$firstUser = true;
+		// Note: not all users want to get displayed, so we might have an empty list.
+		$r = '';
 
 		foreach( $this->_registeredUsers as $User )
 		{
 			if( $User->showonline )
 			{
-				if ( $firstUser )
-				{
-					// fails validation if we echo this with an empty list
-					echo $beforeAll;
-					$firstUser = false;
+				if( empty($r) )
+				{ // first user
+					$r .= $beforeAll;
 				}
 
- 				echo $beforeEach;
-				echo $User->get('preferredname');
-				if( isset($Blog) )
-				{
-					$User->msgform_link( $Blog->get('msgformurl') );
-				}
-				echo $afterEach;
+				$r .= $this->replace_vars( $templateEach, array( 'User' => &$User ) );
 			}
 		}
-		if ( ! $firstUser )
+		if( !empty($r) )
 		{ // we need to close the list
-			echo $afterAll;
+			$r .= $afterAll;
 		}
-	}
-
-
-	/**
-	 *
-	 *
-	 * @return string
-	 */
-	function displayOnlineGuests( $before = NULL, $after = NULL)
-	{
-		$this->init();
-
-		if( is_null($before) )
-		{
-			$before = T_('Guest Users:').' ';
-		}
-
-		$r = $before.$this->_countGuests.$after;
 
 		echo $r;
 	}
 
 
-	function displayOnliners()
+	/**
+	 * Display number of online guests.
+	 *
+	 * @return string
+	 */
+	function display_online_guests( $before = '', $after = '' )
 	{
-		$this->displayOnlineUsers();
+		if( !isset($this->_count_guests) )
+		{
+			$this->init();
+		}
 
-		$this->displayOnlineGuests();
+		if( empty($before) )
+		{
+			$before = T_('Guest Users:').' ';
+		}
+
+		$r = $before.$this->_count_guests.$after;
+
+		echo $r;
+	}
+
+
+	/**
+	 * Display onliners, both registered users and guests.
+	 */
+	function display_onliners()
+	{
+		$this->display_online_users();
+
+		$this->display_online_guests();
 	}
 
 
 	/**
 	 * Widget callback for template vars.
 	 *
+	 * This replaces user properties if set through $user_xxx$ and especially $user_msgformlink$.
+	 *
+	 * This allows to replace template vars, see {@link Widget::replace_callback()}.
+	 *
+	 * @param array
+	 * @param User an optional User object
 	 * @return string
 	 */
-	function callback( $matches )
+	function replace_callback( $matches, $User = NULL )
 	{
+		if( isset($this->replace_params['User']) && substr($matches[1], 0, 5) == 'user_' )
+		{ // user properties
+			$prop = substr($matches[1], 5);
+			if( $prop == 'msgformlink' )
+			{
+				return $this->replace_params['User']->get_msgform_link();
+			}
+			elseif( $prop = $this->replace_params['User']->get( $prop ) )
+			{
+				return $prop;
+			}
+
+			return false;
+		}
+
 		switch( $matches[1] )
 		{
-			case '':
-				break;
-
 			default:
-				return parent::callback( $matches );
+				return parent::replace_callback( $matches );
 		}
 	}
 

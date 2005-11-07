@@ -24,10 +24,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
+ * @author fplanque: Francois PLANQUE
+ * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
  */
@@ -35,7 +42,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Widget class
+ * Widget class which provides an interface to widget methods for other classes.
+ *
+ * It provides a method {@link replace_vars()} that can be used to replace object properties in given strings.
+ * You can also register global action icons.
+ *
+ * @access abstract
  */
 class Widget
 {
@@ -44,6 +56,10 @@ class Widget
 	 */
 	var $title;
 
+	/**
+	 * List of registered global action icons that get substituted through '$global_icons$'.
+	 * @see global_icon()
+	 */
 	var $global_icons = array();
 
 
@@ -56,49 +72,89 @@ class Widget
 	 */
 	function global_icon( $title, $icon, $url, $word = '' )
 	{
-		$this->global_icons[] = array( 'title' => $title,
-																	 'icon'  => $icon,
-																	 'url'   => $url,
-																	 'word'  => $word );
+		$this->global_icons[] = array(
+			'title' => $title,
+			'icon'  => $icon,
+			'url'   => $url,
+			'word'  => $word );
 	}
 
 
 	/**
-	 * Replaces $vars$ with appropriate values
+	 * Replaces $vars$ with appropriate values.
+	 *
+	 * You can give an alternative string to display, if the substituted variable
+	 * is empty, like:
+	 * <code>$vars "Display if empty"$</code>
+	 * <code>$vars "Display if empty"$</code>
+	 *
+	 * @param string template
+	 * @param array optional params that are put into {@link $this->replace_params}
+	 *              to be accessible by derived replace_callback() methods
+	 * @return string The substituted string
 	 */
-	function replace_vars( $template )
+	function replace_vars( $template, $replace_params = NULL )
 	{
-		return preg_replace_callback( '#\$([a-z_]+)\$#', array( $this, 'callback' ), $template );
+		$this->replace_params = & $replace_params;
+		return preg_replace_callback(
+			'~\$([a-z_]+)(?:\s+"([^"]*)")?\$~', # pattern
+			array( $this, 'replace_callback_wrapper' ), # callback
+			$template );
 	}
 
 
- 	/**
-	 * Callback function used to replace only necessary values in template
+	/**
+	 * This is an additional wrapper to {@link replace_vars()} that allows to react
+	 * on the return value of it.
 	 *
-	 * @param array preg matches
+	 * @uses replace_callback()
+	 *
+	 * @param array {@link preg_match() preg match}
+	 * @return string
+	 */
+	function replace_callback_wrapper( $match )
+	{
+		$r = $this->replace_callback( $match );
+
+		if( empty($r) && !empty($match[2]) )
+		{
+			return $match[2]; // "display if empty"
+		}
+		return $r;
+	}
+
+
+	/**
+	 * Callback function used to replace only necessary values in template.
+	 *
+	 * This gets used by {@link replace_vars()} to replace $vars$.
+	 *
+	 * @param array {@link preg_match() preg match}. Index 1 is the template variable.
 	 * @return string to be substituted
 	 */
-	function callback( $matches )
+	function replace_callback( $matches )
 	{
 		//echo $matches[1];
 		switch( $matches[1] )
-			{
-				case 'global_icons' :
-					// Icons for the whole result set:
-					return $this->gen_global_icons();
+		{
+			case 'global_icons' :
+				// Icons for the whole result set:
+				return $this->gen_global_icons();
 
-				case 'title':
-					// Results title:
-					return $this->title;
+			case 'title':
+				// Results title:
+				return $this->title;
 
-				default :
-					return $matches[1];
-			}
+			default:
+				return $matches[1];
+		}
 	}
 
 
 	/**
-	 * Generate img tags for icons
+	 * Generate img tags for registered icons, through {@link global_icon()}.
+	 *
+	 * This is used by the default callback to replace '$global_icons$'.
 	 */
 	function gen_global_icons()
 	{

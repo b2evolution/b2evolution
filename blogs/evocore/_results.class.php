@@ -823,74 +823,77 @@ class Results extends Widget
 
 
 	/**
-	 * Callback function used to replace only necessary values in template
+	 * Widget callback for template vars.
 	 *
-	 * @param array preg matches
-	 * @return string to be substituted
+	 * This allows to replace template vars, see {@link Widget::replace_callback()}.
+	 *
+	 * @return string
 	 */
-	function callback( $matches )
+	function replace_callback( $matches )
 	{
 		//echo $matches[1];
 		switch( $matches[1] )
-			{
-				case 'start' :
-					//total number of rows in the sql query
-					return  ( ($this->page-1)*$this->limit+1 );
+		{
+			case 'start' :
+				//total number of rows in the sql query
+				return  ( ($this->page-1)*$this->limit+1 );
 
-				case 'end' :
-					return (	min( $this->total_rows, $this->page*$this->limit ) );
+			case 'end' :
+				return ( min( $this->total_rows, $this->page*$this->limit ) );
 
-				case 'total_rows' :
-					return ( $this->total_rows );
+			case 'total_rows' :
+				return ( $this->total_rows );
 
-				case 'page' :
-					//current page number
-					return ( $this->page );
+			case 'page' :
+				//current page number
+				return ( $this->page );
 
-				case 'total_pages' :
-					//total number of pages
-					return ( $this->total_pages );
+			case 'total_pages' :
+				//total number of pages
+				return ( $this->total_pages );
 
-				case 'prev' :
-					//inits the link to previous page
-					return ( $this->page>1 ) ? '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->page-1) ).'">'.
-																$this->params['prev_text'].'</a>' : $this->params['prev_text'];
+			case 'prev' :
+				//inits the link to previous page
+				return ( $this->page>1 )
+					? '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->page-1) ).'">'.$this->params['prev_text'].'</a>'
+					: $this->params['prev_text'];
 
-				case 'next' :
-					//inits the link to next page
-					return ( $this->page<$this->total_pages ) ? '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->page+1) )
-							.		'">  '.$this->params['next_text'].'</a>' : $this->params['next_text'];
-				case 'list' :
-					//inits the page list
-					return $this->page_list($this->first(),$this->last());
+			case 'next' :
+				//inits the link to next page
+				return ( $this->page<$this->total_pages )
+					? '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->page+1) ).'">  '.$this->params['next_text'].'</a>'
+					: $this->params['next_text'];
+			case 'list' :
+				//inits the page list
+				return $this->page_list($this->first(),$this->last());
 
-				case 'scroll_list' :
-					//inits the scrolling list of pages
-					return $this->page_scroll_list();
+			case 'scroll_list' :
+				//inits the scrolling list of pages
+				return $this->page_scroll_list();
 
-				case 'first' :
-					//inits the link to first page
-					return $this->display_first();
+			case 'first' :
+				//inits the link to first page
+				return $this->display_first();
 
-				case 'last' :
-					//inits the link to last page
-					return $this->display_last();
+			case 'last' :
+				//inits the link to last page
+				return $this->display_last();
 
-				case 'list_prev' :
-					//inits the link to previous page range
-					return $this->display_prev();
+			case 'list_prev' :
+				//inits the link to previous page range
+				return $this->display_prev();
 
-				case 'list_next' :
-					//inits the link to next page range
-					return $this->display_next();
+			case 'list_next' :
+				//inits the link to next page range
+				return $this->display_next();
 
-				case 'nb_cols' :
-					// Number of columns in result:
-					return count($this->cols);
+			case 'nb_cols' :
+				// Number of columns in result:
+				return count($this->cols);
 
-				default :
-					return parent::callback( $matches );
-			}
+			default :
+				return parent::replace_callback( $matches );
+		}
 	}
 
 
@@ -909,7 +912,7 @@ class Results extends Widget
 		}
 		else
 		{ // the current page number can be centered
-			return $this->page-intval($this->params['list_span']/2);
+			return $this->page - intval($this->params['list_span']/2);
 		}
 	}
 
@@ -1119,6 +1122,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.35  2005/11/07 02:13:22  blueyed
+ * Cleaned up Sessions and extended Widget etc
+ *
  * Revision 1.34  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *

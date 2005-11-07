@@ -1816,21 +1816,22 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
 
 
 /**
- * Create IMG tag for an action icon
+ * Create IMG tag for an action icon.
  *
  * @param string TITLE text (IMG and A link)
  * @param string icon code {@see $$map_iconfiles}
  * @param string icon code for {@see get_icon()}
+ * @param string word to be displayed after icon
  */
-function action_icon( $title, $icon, $url, $word = '' )
+function action_icon( $title, $icon, $url, $word = NULL )
 {
 	$r = '<a href="'.$url.'" title="'.$title.'"';
 	if( get_icon( $icon, 'rollover' ) )
-		$r .= ' class="rollover"';
 	{
+		$r .= ' class="rollover"';
 	}
 	$r .= '>'.get_icon( $icon, 'imgtag', array( 'title'=>$title ) );
-	if( !empty( $word) )
+	if( !empty($word) )
 	{
 		$r .= $word;
 	}
@@ -1867,12 +1868,10 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL )
 
 	/**
 	 * debug quite time consuming
-	 * fplanque>> removed <div> tags because they make it even harder to debug :/
 	 */
 	if( $iconfile === false )
 	{
 		return '[no image defined for '.var_export( $iconKey, true ).'!]';
-		return false;
 	}
 
 	switch( $what )
@@ -1930,8 +1929,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL )
 				return $iconurl;
 			}
 
-			$r = '<img '
-						.'class="';
+			$r = '<img class="';
 			if( isset( $params['class'] ) )
 			{
 				$r .= $params['class'];
@@ -1944,11 +1942,10 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL )
 			{
 				$r .= 'middle';
 			}
-			$r .=	'" '
-						.'src="'.$iconurl.'" '
-						.$size
-						.( isset( $params['title'] ) ? ' title="'.$params['title'].'"' : '' )
-						.' alt="';
+			$r .= '" src="'.$iconurl.'" '
+				.$size
+				.( isset( $params['title'] ) ? ' title="'.$params['title'].'"' : '' )
+				.' alt="';
 
 			if( isset( $params['alt'] ) )
 			{
@@ -2250,6 +2247,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.135  2005/11/07 02:13:22  blueyed
+ * Cleaned up Sessions and extended Widget etc
+ *
  * Revision 1.134  2005/11/06 11:36:57  yabs
  * correcting windows farce
  *
