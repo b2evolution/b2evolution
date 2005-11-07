@@ -2,6 +2,10 @@
 /**
  * This file implements the Log class, which logs notes and errors.
  *
+ * It additionally provides the class Log_noop that implements the same (used) methods, but as
+ * no-operation functions. This is useful to create a more resource friendly object when
+ * you don't need it (think Debuglog).
+ *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
@@ -596,8 +600,34 @@ class Log
 
 }
 
+
+/**
+ * This is a no-operation implementation of {@link Log}.
+ *
+ * It just implements the used methods {@link get()} and {@link display()}.
+ */
+class Log_noop {
+	/**
+	 * This is a no-operation method.
+	 */
+	function add()
+	{
+	}
+
+
+	/**
+	 * This is a no-operation method.
+	 */
+	function display()
+	{
+	}
+}
+
 /*
  * $Log$
+ * Revision 1.19  2005/11/07 18:34:38  blueyed
+ * Added class Log_noop, a no-operation implementation of class Log, which gets used if $debug is false.
+ *
  * Revision 1.18  2005/11/01 23:32:30  blueyed
  * Added add_messages() to add an array of messages. This helps to add messages from a Messages object stored in session data.
  *

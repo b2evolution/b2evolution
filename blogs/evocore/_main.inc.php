@@ -86,10 +86,18 @@ define( 'EVO_MAIN_INIT', true );
  */
 require_once dirname(__FILE__).'/_log.class.php';
 /**
- * Debug message log for debugging only (initialized here)
+ * Debug message log for debugging only (initialized here).
+ * When {@link $debug} is off, it will be of class {@link Log_noop} and perform no operations.
  * @global Log $Debuglog
  */
-$Debuglog = & new Log( 'note' );
+if( !$debug )
+{
+	$Debuglog = & new Log_noop( 'note' );
+}
+else
+{
+	$Debuglog = & new Log( 'note' );
+}
 /**
  * Info & error message log for end user (initialized here)
  * @global Log $Messages
@@ -508,6 +516,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.63  2005/11/07 18:34:38  blueyed
+ * Added class Log_noop, a no-operation implementation of class Log, which gets used if $debug is false.
+ *
  * Revision 1.62  2005/11/07 03:27:42  blueyed
  * Use $Session to display a note about already logged in User (because $current_User does not get auto-set if 'login' param is given)
  *
