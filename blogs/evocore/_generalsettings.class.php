@@ -62,36 +62,38 @@ class GeneralSettings extends AbstractSettings
 	 */
 	var $_defaults = array(
 		'admin_skin' => 'legacy',
-		'fm_enabled' => '1',                // handled
-		'fm_enable_roots_blog' => '1',      // handled
-		// 'fm_enable_roots_group' => '0',  // TO DO
-		'fm_enable_roots_user' => '0',      // handled
-		'fm_enable_create_dir' => '1',      // handled
-		'fm_enable_create_file' => '0',     // handled
 
-		'hit_doublecheck_referer' => '0',  // handled
-
-		'upload_enabled' => '1',            // handled
-		'upload_allowedext' => 'jpg gif png txt', // handled
-		'upload_maxkb' => '100',
-
-		'auto_prune_stats' => '30',         // days (T_hitlog and T_sessions)
-		'timeout_sessions' => '604800',     // seconds (604800 == 7 days)
-
-		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$',
-
-		'posts_per_page' => '5',
-		'what_to_show' => 'posts',
-		'archive_mode' => 'monthly',
-		'time_difference' => '0',
-		'AutoBR' => '0',
+		'antispam_block_ip' => '0',         // needs UI
+		'antispam_block_ip_dnsbl'
+			=> 'sbl-xbl.spamhaus.org',        // needs UI
 		'antispam_last_update' => '2000-01-01 00:00:00',
-		'newusers_level' => '1',
-		'newusers_canregister' => '0',
+
+		'archive_mode' => 'monthly',
+		'AutoBR' => '0',
+		'auto_prune_stats' => '30',         // days (T_hitlog and T_sessions)
+
+		'fm_enabled' => '1',
+		'fm_enable_create_dir' => '1',
+		'fm_enable_create_file' => '0',
+		'fm_enable_roots_blog' => '1',
+		// 'fm_enable_roots_group' => '0',  // TO DO
+		'fm_enable_roots_user' => '0',
+
+		'hit_doublecheck_referer' => '0',
 		'links_extrapath' => '0',
+		'newusers_canregister' => '0',
+		'newusers_level' => '1',
 		'permalink_type' => 'urltitle',
-		'user_minpwdlen' => '5',
+		'posts_per_page' => '5',
+		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$',
 		'reloadpage_timeout' => '300',
+		'time_difference' => '0',
+		'timeout_sessions' => '604800',     // seconds (604800 == 7 days)
+		'upload_enabled' => '1',
+		'upload_allowedext' => 'jpg gif png txt',
+		'upload_maxkb' => '100',
+		'user_minpwdlen' => '5',
+		'what_to_show' => 'posts',
 	);
 
 
@@ -142,6 +144,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.27  2005/11/07 02:08:52  blueyed
+ * Added settings antispam_block_ip and antispam_block_ip_dnsbl to defaults and sorted the defaults
+ *
  * Revision 1.26  2005/11/05 00:05:43  blueyed
  * Moved pruning of T_sessions into Hitlist::dbprune()
  *
