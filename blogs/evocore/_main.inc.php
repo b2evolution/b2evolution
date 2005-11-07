@@ -211,7 +211,7 @@ if( !function_exists( 'gzencode' ) )
 	$use_gzipcompression = false;
 }
 
-if( !isset( $use_html_checker ) ) $use_html_checker = 1;
+if( !isset( $use_html_checker ) ) { $use_html_checker = 1; }
 
 
 /**
@@ -222,7 +222,7 @@ require_once dirname(__FILE__).'/_item.funcs.php';
 require_once dirname(__FILE__).'/_category.funcs.php';
 require_once dirname(__FILE__).'/_comment.funcs.php';
 require_once dirname(__FILE__).'/_file.funcs.php';
-if( $use_html_checker ) require_once dirname(__FILE__).'/_htmlchecker.class.php';
+if( $use_html_checker ) { require_once dirname(__FILE__).'/_htmlchecker.class.php'; }
 require_once dirname(__FILE__).'/_item.funcs.php';
 require_once dirname(__FILE__).'/_message.funcs.php';
 require_once dirname(__FILE__).'/_pingback.funcs.php';
@@ -431,7 +431,7 @@ if( !empty($login) && !empty($pass) )
 		setcookie( 'cookie'.$instance_name.'pass', '', 272851261, $cookie_path, $cookie_domain );
 	}
 }
-elseif( $Session->session_has_user() )
+elseif( empty($login) && $Session->session_has_user() )
 { /* if the session has a user assigned to it:
 	 * User was not trying to log in, but he was already logged in:
 	 */
@@ -508,6 +508,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.61  2005/11/07 03:10:57  blueyed
+ * Allow $login to override already logged in user
+ *
  * Revision 1.60  2005/11/03 18:23:44  fplanque
  * minor
  *
