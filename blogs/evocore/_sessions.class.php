@@ -61,7 +61,7 @@ class Sessions extends Widget
 	 *
 	 * @access protected
 	 */
-	var $_registeredUsers;
+	var $_registered_Users;
 
 
 	var $_initialized = false;
@@ -86,6 +86,7 @@ class Sessions extends Widget
 		global $DB, $UserCache, $localtimenow, $timeout_online_user;
 
 		$this->_count_guests = 0;
+		$this->_registered_Users = array();
 
 		$timeout_YMD = date( 'Y-m-d H:i:s', ($localtimenow - $timeout_online_user) );
 
@@ -96,7 +97,7 @@ class Sessions extends Widget
 			if( !empty( $row->sess_user_ID )
 					&& ( $User = & $UserCache->get_by_ID( $row->sess_user_ID ) ) )
 			{
-				$this->_registeredUsers[] =& $User;
+				$this->_registered_Users[] =& $User;
 
 				if( !$User->showonline )
 				{
@@ -146,7 +147,7 @@ class Sessions extends Widget
 	{
 		global $DB, $Blog, $UserCache;
 
-		if( !isset($this->_registeredUsers) )
+		if( !isset($this->_registered_Users) )
 		{
 			$this->init();
 		}
@@ -154,7 +155,7 @@ class Sessions extends Widget
 		// Note: not all users want to get displayed, so we might have an empty list.
 		$r = '';
 
-		foreach( $this->_registeredUsers as $User )
+		foreach( $this->_registered_Users as $User )
 		{
 			if( $User->showonline )
 			{
