@@ -726,9 +726,7 @@ class User extends DataObject
 
 
 	/**
-	 * Template function: display a link to a message form for this user
-	 *
-	 * {@internal User::msgform_link(-)}}
+	 * Template helper function: Get a link to a message form for this user.
 	 *
 	 * @param string url of the message form
 	 * @param string to display before link
@@ -737,7 +735,7 @@ class User extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 */
-	function msgform_link( $form_url = NULL, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
+	function get_msgform_link( $form_url = NULL, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
 		global $img_url;
 
@@ -757,13 +755,35 @@ class User extends DataObject
 		if( $title == '#' ) $title = T_('Send email to user');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
 
-		echo $before;
-		echo '<a href="'.$form_url.'" title="'.$title.'"';
-		if( !empty( $class ) ) echo ' class="'.$class.'"';
-		echo '>'.$text.'</a>';
-		echo $after;
+		$r = '';
+		$r .= $before;
+		$r .= '<a href="'.$form_url.'" title="'.$title.'"';
+		if( !empty( $class ) )
+		{
+			$r .= ' class="'.$class.'"';
+		}
+		$r .= '>'.$text.'</a>';
+		$r .= $after;
 
-		return true;
+		return $r;
+	}
+
+
+	/**
+	 * Template function: display a link to a message form for this user
+	 *
+	 * {@internal User::msgform_link(-)}}
+	 *
+	 * @param string url of the message form
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 */
+	function msgform_link( $form_url = NULL, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
+	{
+		echo get_msgform_link( $form_url, $before, $after, $text, $title, $class );
 	}
 
 
@@ -908,6 +928,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.50  2005/11/07 02:05:49  blueyed
+ * Added get_msgform_link() and made msgform_link() use it
+ *
  * Revision 1.49  2005/11/04 22:18:03  fplanque
  * no message
  *
