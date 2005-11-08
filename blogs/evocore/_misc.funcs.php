@@ -1469,12 +1469,8 @@ function debug_die( $last_words = '', $backtrace = NULL, $very_last = '</body></
  */
 function debug_info( $force = false )
 {
-	global $debug;
-	global $Debuglog;
-	global $DB;
-	global $obhandler_debug;
+	global $debug, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqURI;
 	global $cache_imgsize, $cache_File;
-	global $Timer;
 
 	if( $debug || $force )
 	{
@@ -1489,7 +1485,7 @@ function debug_info( $force = false )
 			$time_queries = $Timer->get_duration( 'sql_queries' );
 			$percent_queries = $time_page > 0 ? number_format( 100/$time_page * $time_queries, 2 ) : 0;
 			echo 'Page processing time: '.$time_page.' seconds.<br/>';
-			echo '<a href="#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br/>';
+			echo '<a href="'.$ReqURI.'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br/>';
 			echo 'SQL processing time: '.$time_queries.' seconds, '.$percent_queries.'%.<br/>';
 
 			foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
@@ -2247,6 +2243,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.136  2005/11/08 19:22:21  blueyed
+ * Fixed link to #evo_debug_queries (using $ReqURI)
+ *
  * Revision 1.135  2005/11/07 02:13:22  blueyed
  * Cleaned up Sessions and extended Widget etc
  *
