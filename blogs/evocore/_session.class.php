@@ -81,6 +81,13 @@ class Session
 	var $user_ID;
 
 	/**
+	 * Is the session validated?
+	 * This means that it was created from a received cookie.
+	 * @var boolean
+	 */
+	var $is_validated = false;
+
+	/**
 	 * Data stored for the session.
 	 * @access protected
 	 * @var object
@@ -117,6 +124,7 @@ class Session
 					$this->ID = $row->sess_ID;
 					$this->key = $row->sess_key;
 					$this->user_ID = $row->sess_user_ID;
+					$this->is_validated = true;
 
 					$Debuglog->add( 'user_ID: '.var_export($this->user_ID, true), 'session' );
 
