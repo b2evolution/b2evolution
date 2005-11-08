@@ -87,17 +87,13 @@ define( 'EVO_MAIN_INIT', true );
 require_once dirname(__FILE__).'/_log.class.php';
 /**
  * Debug message log for debugging only (initialized here).
- * When {@link $debug} is off, it will be of class {@link Log_noop} and perform no operations.
- * @global Log $Debuglog
+ *
+ * If {@link $debug} is off, it will be re-instantiated of class {@link Log_noop} after loading config
+ * and perform no operations.
+ * @global Log|Log_noop $Debuglog
  */
-if( !$debug )
-{
-	$Debuglog = & new Log_noop( 'note' );
-}
-else
-{
-	$Debuglog = & new Log( 'note' );
-}
+$Debuglog = & new Log( 'note' );
+
 /**
  * Info & error message log for end user (initialized here)
  * @global Log $Messages
@@ -127,6 +123,11 @@ elseif( !isset( $locales[$default_locale] ) )
 if( isset( $error_message ) )
 { // error & exit
 	require dirname(__FILE__).'/_conf_error.inc.php';
+}
+
+if( !$debug )
+{
+	$Debuglog = & new Log_noop( 'note' );
 }
 
 
@@ -516,6 +517,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.64  2005/11/08 15:21:55  blueyed
+ * Fix $Debuglog-init when !$debug. We create it now first of class Log and after loading the config it gets re-instantiated of class Log_noop when !$debug. This allows to use $Debuglog during config loading with $debug enabled.
+ *
  * Revision 1.63  2005/11/07 18:34:38  blueyed
  * Added class Log_noop, a no-operation implementation of class Log, which gets used if $debug is false.
  *
