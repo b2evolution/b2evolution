@@ -335,12 +335,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	</div>
 
 
+	<?php if( !isset($generating_static) ) { ?>
 	<div class="bSideItem">
 		<h3 class="sideItemTitle"><?php echo T_('Who\'s Online?') ?></h3>
 		<?php
 			$Sessions->display_onliners();
 		?>
 	</div>
+	<?php } ?>
 
 
 	<p class="center">powered by<br />

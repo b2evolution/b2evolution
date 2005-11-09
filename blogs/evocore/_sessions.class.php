@@ -146,6 +146,8 @@ class Sessions extends Widget
 	function display_online_users( $beforeAll = '<ul class="onlineUsers">', $afterAll = '</ul>', $templateEach = '<li class="onlineUser">$user_preferredname$ $user_msgformlink$</li>' )
 	{
 		global $DB, $Blog, $UserCache;
+		global $generating_static;
+		if( isset($generating_static) ) { return; }
 
 		if( !isset($this->_registered_Users) )
 		{
@@ -183,6 +185,9 @@ class Sessions extends Widget
 	 */
 	function display_online_guests( $before = '', $after = '' )
 	{
+		global $generating_static;
+		if( isset($generating_static) ) { return; }
+
 		if( !isset($this->_count_guests) )
 		{
 			$this->init();
@@ -200,7 +205,7 @@ class Sessions extends Widget
 
 
 	/**
-	 * Display onliners, both registered users and guests.
+	 * Template function: Display onliners, both registered users and guests.
 	 */
 	function display_onliners()
 	{
