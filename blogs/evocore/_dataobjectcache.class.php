@@ -95,7 +95,9 @@ class DataObjectCache
 		global $DB, $Debuglog;
 
 		if( $this->all_loaded )
-			return	false;	// Already loaded;
+		{ // Already loaded
+			return false;
+		}
 
 		$Debuglog->add( get_class($this).' - Loading <strong>'.$this->objtype.'(ALL)</strong> into cache', 'dataobjects' );
 		$sql = "SELECT * FROM $this->dbtablename";
@@ -181,14 +183,15 @@ class DataObjectCache
 			return false;
 		}
 
-		if( isset($this->cache[$Obj->ID]) )
+		if( isset($this->cache[$Obj->ID]) && ( $this->cache[$Obj->ID] === $Obj ) )
 		{
-			$Debuglog->add( 'Object is already cached', 'dataobjects' );
+			$Debuglog->add( get_class($this).': Object with ID '.$Obj->ID.' is already cached', 'dataobjects' );
 			return false;
 		}
 
 		// If the object is valid and not already cached:
 		$this->cache[$Obj->ID] = & $Obj;
+
 		return true;
 	}
 
@@ -203,7 +206,7 @@ class DataObjectCache
 		// Get ID of the object we'ere preparing to instantiate...
 		$obj_ID = $db_row->{$this->dbIDname};
 
- 		if( !empty($obj_ID) && !isset($this->cache[$obj_ID]) )
+		if( !empty($obj_ID) && !isset($this->cache[$obj_ID]) )
 		{	// If the object ID is valid and not already cached:
 			$Obj = new $this->objtype( $db_row ); // COPY !!
 			$this->add( $Obj );
@@ -428,6 +431,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.26  2005/11/09 03:20:05  blueyed
+ * minor
+ *
  * Revision 1.25  2005/10/03 22:50:53  blueyed
  * Fixed E_NOTICE for PHP 4.4.0 and probably 5.1.x (again). Functions that return by reference must not return values!
  *
