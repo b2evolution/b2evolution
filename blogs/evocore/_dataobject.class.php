@@ -135,7 +135,7 @@ class DataObject
 	{
 		global $DB, $localtimenow, $current_User;
 
-		if( $this->ID == 0 ) die( 'New object cannot be updated!' );
+		if( $this->ID == 0 ) { debug_die( 'New object cannot be updated!' ); }
 
 		if( count( $this->dbchanges ) == 0 )
 			return;	// No changes!
@@ -144,8 +144,9 @@ class DataObject
 		{	// We want to track modification date:
 			$this->set_param( $this->datemodified_field, 'date', date('Y-m-d H:i:s',$localtimenow) );
 		}
-		if( !empty($this->lasteditor_field) )
+		if( !empty($this->lasteditor_field) && is_object($current_User) )
 		{	// We want to track last editor:
+			// TODO: the current_User is not necessarily the last editor. Item::dbupdate() gets called after incrementing the view for example!
 			$this->set_param( $this->lasteditor_field, 'number', $current_User->ID );
 		}
 
@@ -277,18 +278,20 @@ class DataObject
 
 	/**
 	 * Inserts or Updates depending on object state
+	 *
+	 * @return boolean true on success, false on failure
 	 */
 	function dbsave()
 	{
 		if( $this->ID == 0 )
 		{	// Object not serialized yet, let's insert!
 			// echo 'INSERT';
-			$this->dbinsert();
+			return $this->dbinsert();
 		}
 		else
 		{	// Object already serialized, let's update!
 			// echo 'UPDATE';
-			$this->dbupdate();
+			return $this->dbupdate();
 		}
 	}
 
@@ -300,7 +303,7 @@ class DataObject
 	{
 		global $DB, $Messages, $EvoConfig;
 
-		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
+		if( $this->ID == 0 ) { debug_die( 'Non persistant object cannot be deleted!' ); }
 
 		if( count($this->delete_cascades) )
 		{	// The are cascading deletes to be performed
@@ -315,19 +318,21 @@ class DataObject
 					continue;
 				}
 
-				$DB->query( 'DELETE FROM '.$restriction['table'].'
-											WHERE '.$restriction['fk'].' = '.$this->ID,
-										'Cascaded delete' );
+				$DB->query( '
+					DELETE FROM '.$restriction['table'].'
+					WHERE '.$restriction['fk'].' = '.$this->ID,
+					'Cascaded delete' );
 			}
 		}
 
 		// Delete this (main/parent) object:
-		$DB->query( "DELETE FROM $this->dbtablename
-									WHERE $this->dbIDname = $this->ID",
-								'Main delete' );
+		$DB->query( "
+			DELETE FROM $this->dbtablename
+			WHERE $this->dbIDname = $this->ID",
+			'Main delete' );
 
 		if( count($this->delete_cascades) )
-		{	// The were cascading deletes
+		{	// There were cascading deletes
 
 			// End transaction:
 			$DB->commit();
@@ -588,6 +593,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.28  2005/11/09 03:28:55  blueyed
+ * BUG: on dbupdate() it should not set the current_User as last editor!; minor other stuff
+ *
  * Revision 1.27  2005/11/04 13:50:57  blueyed
  * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
  *
