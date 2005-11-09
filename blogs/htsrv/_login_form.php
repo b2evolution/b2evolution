@@ -18,10 +18,31 @@ $page_title = T_('Login form');
 $page_icon = 'icon_login.gif';
 require dirname(__FILE__).'/_header.php';
 
-param( 'redirect_to', 'string', str_replace( '&', '&amp;', $ReqURI ) );
+param( 'redirect_to', 'string', str_replace( '&', '&amp;', $ReqURI ) ); // Note: if $redirect_to is already set, param() will not touch it.
 param( 'login', 'string', '' ); // last typed login
 
 $location = $redirect_to;
+
+
+if( preg_match( '#login.php([&?].*)?$#', $location ) )
+{ // avoid "endless loops"
+	$location = str_replace( '&', '&amp;', $admin_url );
+}
+// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
+$location = preg_replace( '~(?<=\?|&amp;|&) (login|pwd) = [^&]+ (&(amp;)?|\?)?~x', '', $location );
+
+if( $Session->has_User() )
+{ // The user is already logged in...
+	$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $Session->get_User()->login )
+		.' <a href="'.$location.'">'.T_('Continue...').'</a>', 'note' );
+}
+
+if( strpos( $location, $admin_url ) !== false )
+{ // don't provide link to bypass
+	$login_required = true;
+}
+
+
 $Debuglog->add( 'location: '.$location );
 
 $Form = & new Form( $location, '', 'post', 'fieldset' );
@@ -73,7 +94,7 @@ $Form->end_form();
 
 <div class="login_actions" style="text-align:right">
 	<?php user_register_link( '', ' &middot; ' )?>
-	<a href="<?php echo $htsrv_url ?>login.php?action=lostpassword&amp;redirect_to=<?php echo rawurlencode( $redirect_to );
+	<a href="<?php echo $htsrv_url ?>login.php?action=lostpassword&amp;redirect_to=<?php echo rawurlencode( $location );
 		?>"><?php echo T_('Lost your password ?')
 		?></a>
 	<?php

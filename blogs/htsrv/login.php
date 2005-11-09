@@ -71,7 +71,7 @@ switch( $action )
 
 
 	case 'lostpassword': // Lost password:
-		param( 'redirect_to', 'string', $admin_url.'b2edit.php' );
+		param( 'redirect_to', 'string', $admin_url );
 
 		// Display retrieval form:
 		require dirname(__FILE__).'/_lostpass_form.php';
@@ -217,24 +217,6 @@ switch( $action )
 
 
 // Default: login form
-if( $Session->has_User() )
-{ // The user is already logged in...
-
-	// Note: if $redirect_to is already set, param() will not touch it.
-	param( 'redirect_to', 'string', str_replace('&', '&amp;', $ReqURI) );
-	if( preg_match( '#login.php([&?].*)?$#', $redirect_to ) )
-	{ // avoid "endless loops"
-		$redirect_to = str_replace( '&', '&amp;', $admin_url );
-	}
-	// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
-	$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
-
-	$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $Session->get_User()->login )
-		.' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>', 'note' );
-}
-
-
-// Display login form:
 require dirname(__FILE__).'/_login_form.php';
 exit();
 
