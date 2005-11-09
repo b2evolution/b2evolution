@@ -230,7 +230,6 @@ require_once dirname(__FILE__).'/_blog.funcs.php';
 require_once dirname(__FILE__).'/_item.funcs.php';
 require_once dirname(__FILE__).'/_category.funcs.php';
 require_once dirname(__FILE__).'/_comment.funcs.php';
-require_once dirname(__FILE__).'/_file.funcs.php';
 if( $use_html_checker ) { require_once dirname(__FILE__).'/_htmlchecker.class.php'; }
 require_once dirname(__FILE__).'/_item.funcs.php';
 require_once dirname(__FILE__).'/_message.funcs.php';
@@ -517,6 +516,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.65  2005/11/09 02:54:42  blueyed
+ * Moved inclusion of _file.funcs.php to _misc.funcs.php, because at least bytesreable() gets used in debug_info()
+ *
  * Revision 1.64  2005/11/08 15:21:55  blueyed
  * Fix $Debuglog-init when !$debug. We create it now first of class Log and after loading the config it gets re-instantiated of class Log_noop when !$debug. This allows to use $Debuglog during config loading with $debug enabled.
  *

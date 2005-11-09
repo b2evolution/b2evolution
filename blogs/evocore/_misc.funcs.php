@@ -53,6 +53,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 require_once dirname(__FILE__).'/_locale.funcs.php';
 require_once dirname(__FILE__).'/_antispam.funcs.php';
+require_once dirname(__FILE__).'/_file.funcs.php';
 
 
 /***** Formatting functions *****/
@@ -1485,7 +1486,7 @@ function debug_info( $force = false )
 			$time_queries = $Timer->get_duration( 'sql_queries' );
 			$percent_queries = $time_page > 0 ? number_format( 100/$time_page * $time_queries, 2 ) : 0;
 			echo 'Page processing time: '.$time_page.' seconds.<br/>';
-			echo '<a href="'.$ReqURI.'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br/>';
+			echo '<a href="'.format_to_output($ReqURI).'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br/>';
 			echo 'SQL processing time: '.$time_queries.' seconds, '.$percent_queries.'%.<br/>';
 
 			foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
@@ -2243,6 +2244,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.137  2005/11/09 02:54:42  blueyed
+ * Moved inclusion of _file.funcs.php to _misc.funcs.php, because at least bytesreable() gets used in debug_info()
+ *
  * Revision 1.136  2005/11/08 19:22:21  blueyed
  * Fixed link to #evo_debug_queries (using $ReqURI)
  *
