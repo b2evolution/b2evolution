@@ -25,7 +25,13 @@
  * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
  * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  *
- * @todo (sessions) When creating a blog, provide "edit options" instead of "New" form (storing the new Blog with the session data).
+ * @todo (sessions) When creating a blog, provide "edit options" (3 tabs) instead of a single long "New" form (storing the new Blog object with the session data).
+ * @todo move to "new standard", i-e:
+ *    1 - init params
+ *    2 - perform actions
+ *    3 - display error messages
+ *    4 - display payload
+ *    Actually if you change the name of a blog it gets not reflected in the blog list buttons!
  *
  * @version $Id$
  */
@@ -557,6 +563,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.42  2005/11/09 00:02:04  blueyed
+ * todo
+ *
  * Revision 1.41  2005/10/31 00:15:27  blueyed
  * Removed b2categories.php to categories.php
  *
