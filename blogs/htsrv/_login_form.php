@@ -28,7 +28,7 @@ $Form = & new Form( $location, '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
-// TODO: handle POSTed data! - just transfer $_POST into hidden fields!?
+	$Form->hiddens_by_key( $_POST ); // passthrough POSTed data (when login is required after posting somewhere)
 
 	if( !empty($mode) )
 	{ // We're in the process of bookmarkletting something, we don't want to loose it:
