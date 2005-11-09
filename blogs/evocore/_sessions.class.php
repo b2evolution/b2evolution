@@ -92,7 +92,8 @@ class Sessions extends Widget
 
 		foreach( $DB->get_results( '
 			SELECT sess_user_ID FROM T_sessions
-			WHERE sess_lastseen > "'.$timeout_YMD.'"' ) as $row )
+			WHERE sess_lastseen > "'.$timeout_YMD.'"
+				AND sess_key IS NOT NULL' ) as $row )
 		{
 			if( !empty( $row->sess_user_ID )
 					&& ( $User = & $UserCache->get_by_ID( $row->sess_user_ID ) ) )
