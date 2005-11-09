@@ -128,7 +128,8 @@ if( $config_is_done || (($action != 'start') && ($action != 'default') && ($acti
 	}
 	else
 	{
-		$DB->halt_on_error = true;	// From now on, halt on errors.
+		$DB->halt_on_error = true;  // From now on, halt on errors.
+		$DB->show_errors = true;    // From now on, show errors (they're helpful in case of errors!).
 
 		// Check MySQL version
 		$mysql_version = $DB->get_var( 'SELECT VERSION()' );
