@@ -978,7 +978,7 @@ class Form extends Widget
 	/**
 	 * Ends the form and optionally displays buttons.
 	 *
-	 * @param array Optional array to display the buttons before the end of the form, see {@link buttons()}
+	 * @param array Optional array to display the buttons before the end of the form, see {@link buttons_input()}
 	 * @return true|string true (if output) or the generated HTML if not outputting.
 	 */
 	function end_form( $buttons = array() )
@@ -989,7 +989,7 @@ class Form extends Widget
 			$save_output = $this->output;
 			$this->output = 0;
 
-			$r .= $this->buttons( $buttons );
+			$r .= $this->buttons( $buttons ); // converts old-style to new style, through convert_button_to_field_params()
 
 			$this->output = $save_output;
 		}
@@ -1043,7 +1043,7 @@ class Form extends Widget
 			}
 			$loop_field_note = isset($option[5]) ? $option[5] : '';
 
-			if( isset($Request->err_messages[$error_name]) )
+			if( isset($Request) && isset($Request->err_messages[$error_name]) )
 			{ // There is an error message for this field:
 				$after_field = '</span>';
 				$loop_field_note .= ' <span class="field_error">'.$Request->err_messages[$error_name].'</span>';
@@ -1719,6 +1719,28 @@ class Form extends Widget
 
 
 	/**
+	 * Builds a list of hidden inputs from an array where the keys are the field names.
+	 *
+	 * @param array associative array ( name => value ) of hidden fields.
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function hiddens_by_key( $hiddens )
+	{
+		$r = '';
+
+		$save_output = $this->output;
+		$this->output = false;
+		foreach( $hiddens as $l_name => $l_value )
+		{
+			$r .= $this->hidden( $l_name, $l_value );
+		}
+		$this->output = $save_output;
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
 	 * Builds a submit input tag
 	 *
 	 * the array must contain :
@@ -2129,7 +2151,7 @@ class Form extends Widget
 		}
 
 		// Error handling:
-		if( isset($field_params['name']) && isset($Request->err_messages[$field_params['name']]) )
+		if( isset($field_params['name']) && isset($Request) && isset($Request->err_messages[$field_params['name']]) )
 		{ // There is an error message for this field:
 			if( $field_params['type'] == 'checkbox' )
 			{ // checkboxes need a span
@@ -2209,6 +2231,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.84  2005/11/09 02:34:23  blueyed
+ * Added hiddens_by_key() which allows to easily pass $_POST to hidden fields.
+ *
  * Revision 1.83  2005/11/02 01:23:51  blueyed
  * get_field_params_as_string(): Do not output attribs with value === NULL
  *
