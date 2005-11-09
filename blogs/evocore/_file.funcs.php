@@ -53,29 +53,14 @@ function bytesreadable( $bytes )
 	static $types = NULL;
 
 	if( !isset($types) )
-	{
+	{ // generate once:
 		$types = array(
-										0 => array(
-													'abbr' => T_('B.'),
-													'text' => T_('Bytes')
-												),
-										1 => array(
-													'abbr' => T_('KB'),
-													'text' => T_('Kilobytes'),
-												),
-										2 => array(
-													'abbr' => T_('MB'),
-													'text' => T_('Megabytes'),
-												),
-										3 => array(
-													'abbr' => T_('GB'),
-													'text' => T_('Gigabytes'),
-												),
-										4 => array(
-													'abbr' => T_('TB'),
-													'text' => T_('Terabytes')
-												)
-									);
+			0 => array( 'abbr' => T_('B.'), 'text' => T_('Bytes') ),
+			1 => array( 'abbr' => T_('KB'), 'text' => T_('Kilobytes') ),
+			2 => array( 'abbr' => T_('MB'), 'text' => T_('Megabytes') ),
+			3 => array( 'abbr' => T_('GB'), 'text' => T_('Gigabytes') ),
+			4 => array( 'abbr' => T_('TB'), 'text' => T_('Terabytes') )
+		);
 	}
 
 	for( $i = 0; $bytes > 1024; $i++ )
@@ -575,6 +560,9 @@ function get_root_name( $root_type, $root_ID )
 
 /*
  * $Log$
+ * Revision 1.29  2005/11/09 02:53:13  blueyed
+ * made bytesreadable() more readable
+ *
  * Revision 1.28  2005/11/02 20:11:19  fplanque
  * "containing entropy"
  *
