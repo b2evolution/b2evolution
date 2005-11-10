@@ -42,6 +42,8 @@
  * @author fplanque: François PLANQUE
  * @author mfollett: Matt FOLLETT.
  *
+ * @todo Actions 'retrievepassword' / 'changepwd': bind this to {@link $Session} rather than to a single IP! (blueyed)
+ *
  * @version $Id$
  */
 
@@ -65,8 +67,8 @@ param( 'login', 'string', '', false, true ); // override
 switch( $action )
 {
 	case 'logout':
-		logout();
-		header_nocache();
+		logout();          // logout $Session and set $current_User = false
+		header_nocache();  // defaults to redirect_to param
 		header_redirect(); // exits
 
 
@@ -138,7 +140,7 @@ switch( $action )
 
 						$UserSettings->dbupdate();
 
-						$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'note' );
+						$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
 					}
 					#pre_dump( $message );
 				}
@@ -147,7 +149,7 @@ switch( $action )
 			}
 			else
 			{ // pretend that the email is sent for avoiding guessing user_login
-				$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'note' );
+				$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
 			}
 		}
 		$login_required = true; // Do not display "Without login.." link on the form
