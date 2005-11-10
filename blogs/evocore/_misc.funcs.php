@@ -2138,15 +2138,11 @@ function header_redirect( $redirectTo = NULL )
 
 	$location = str_replace('&amp;', '&', $location);
 
-	if( strpos($location, $baseurl) === 0 // we're somewhere on $baseurl
-			&& preg_match( '#^(.*?)([?&])action=\w+(&(amp;)?)?(.*)$#', $location, $match ) )
-	{ // remove "action" get param to avoid unwanted actions
-		$location = $match[1];
-
-		if( !empty($match[5]) )
-		{
-			$location .= $match[2].$match[5];
-		}
+	if( strpos($location, $baseurl) === 0 /* we're somewhere on $baseurl */ )
+	{
+		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
+		// Also remove "action" get param to avoid unwanted actions
+		$location = preg_replace( '~(?<=\?|&amp;|&) (login|pwd|action) = [^&]+ (&(amp;)?|\?)?~x', '', $location );
 	}
 
 	#header('Refresh:0;url='.$location);
@@ -2244,6 +2240,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.138  2005/11/10 01:09:47  blueyed
+ * header_redirect(): remove "user" and "login" params (additionally to "action") from location where we redirect to if it's on $baseurl.
+ *
  * Revision 1.137  2005/11/09 02:54:42  blueyed
  * Moved inclusion of _file.funcs.php to _misc.funcs.php, because at least bytesreable() gets used in debug_info()
  *
