@@ -11,13 +11,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-/**
- * Include page header:
- */
-$page_title = T_('Login form');
-$page_icon = 'icon_login.gif';
-require dirname(__FILE__).'/_header.php';
-
 param( 'redirect_to', 'string', str_replace( '&', '&amp;', $ReqURI ) ); // Note: if $redirect_to is already set, param() will not touch it.
 param( 'login', 'string', '' ); // last typed login
 
@@ -33,9 +26,18 @@ $location = preg_replace( '~(?<=\?|&amp;|&) (login|pwd) = [^&]+ (&(amp;)?|\?)?~x
 
 if( $Session->has_User() )
 { // The user is already logged in...
-	$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $Session->get_User()->login )
+	$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $Session->get_User()->get('login') )
 		.' <a href="'.$location.'">'.T_('Continue...').'</a>', 'note' );
 }
+
+
+/**
+ * Include page header (also displays Messages):
+ */
+$page_title = T_('Login form');
+$page_icon = 'icon_login.gif';
+require dirname(__FILE__).'/_header.php';
+
 
 if( strpos( $location, $admin_url ) !== false )
 { // don't provide link to bypass
@@ -100,10 +102,7 @@ $Form->end_form();
 	<?php
 	if( empty($login_required) )
 	{ // No login required, allow to pass through
-
-		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
-		$location_without_login = preg_replace( '~(?<=\?|&amp;|&) (login|pwd) = [^&]+ (&(amp;)?|\?)?~x', '', $location );
-		echo '<a href="'.$location_without_login.'">'./* Gets displayed as link to the location on the login form if no login is required */ T_('Bypass login...').'</a>';
+		echo '<a href="'.$location.'">'./* Gets displayed as link to the location on the login form if no login is required */ T_('Bypass login...').'</a>';
 	}
 	?>
 </div>
