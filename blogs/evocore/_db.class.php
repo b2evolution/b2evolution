@@ -481,7 +481,6 @@ class DB
 		$this->last_result = NULL;
 		$this->col_info = NULL;
 		$this->last_query = NULL;
-		$this->current_idx = 0;
 	}
 
 
@@ -497,14 +496,6 @@ class DB
 	function query( $query, $title = '' )
 	{
 		global $Timer;
-
-		if( is_object($Timer) )
-		{
-			// Resume query timer:
-			$Timer->resume( 'sql_queries' );
-			// Start a timer for this particular query:
-			$Timer->start( 'sql_query', false );
-		}
 
 		// initialise return
 		$return_val = 0;
@@ -536,17 +527,30 @@ class DB
 			'time' => 'unknown',
 			'results' => 'unknown' );
 
-		// Run query:
-		$this->result = @mysql_query( $query, $this->dbhandle );
+		if( is_object($Timer) )
+		{
+			// Resume query timer:
+			$Timer->resume( 'sql_queries' );
+			// Start a timer for this particular query:
+			$Timer->start( 'sql_query', false );
+
+			// Run query:
+			$this->result = @mysql_query( $query, $this->dbhandle );
+
+			$Timer->pause( 'sql_queries' );
+			// Get duration for last query:
+			$this->queries[ $this->num_queries - 1 ]['time'] = $Timer->get_duration( 'sql_query', 10 );
+		}
+		else
+		{
+			// Run query:
+			$this->result = @mysql_query( $query, $this->dbhandle );
+		}
 
 		// If there is an error then take note of it..
-		if ( mysql_error() )
+		if( mysql_error() )
 		{
 			$this->print_error( '', $title );
-			if( is_object($Timer) )
-			{ // pause global query timer
-				$Timer->pause( 'sql_queries' );
-			}
 			return false;
 		}
 
@@ -653,12 +657,6 @@ class DB
 			$this->queries[ $this->num_queries - 1 ]['results'] = $this->debug_get_rows_table( $this->debug_dump_rows );
 		}
 
-		if( is_object($Timer) )
-		{
-			$Timer->pause( 'sql_queries' );
-			// Get duration for last query:
-			$this->queries[ $this->num_queries - 1 ]['time'] = $Timer->get_duration( 'sql_query', 10 );
-		}
 		return $return_val;
 	}
 
@@ -1166,6 +1164,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.42  2005/11/14 17:23:41  blueyed
+ * Moved query timer back around just mysql_query()
+ *
  * Revision 1.41  2005/11/05 07:16:51  blueyed
  * Use query timer for whole DB::query(), not just the call to mysql_query therein. Gives a more realistic impression of DB query durations.
  *
