@@ -493,37 +493,6 @@ $media_subdir = 'media/';                // Subdirectory relative to base
 $media_dirout = '../';                   // Relative path to go back to base
 $media_url = $baseurl.$media_subdir;     // You should not need to change this
 
-/**
- * Memcached support. Very experimental!
- * Must have memcached-client.php in php include path.
- * download memcached from http://www.danga.com/memcached/
- * Download phpca php client for memcached from
- *  http://phpca.cytherianage.net/memcached/
- */
-$use_memcached = 0;
-
-if ($use_memcached) {
-	include_once 'memcached-client.php';
-	$memcache = new memcached(
-		array( 'servers' => array('127.0.0.1:11211'),
-		'debug' => false,
-		'compress_threshold' => 10240,
-		'persistant' => true));
-	$memcache_expire = 3600; //  how long objects stay cached. Default one hour
-}
-
-/**
- * Use a Real-time DNS blacklist
- * Provide an array of dns blacklists to use.
- * For example to use spamhaus xbl, use
- * $rbl_config = array(
- *	'sbl-xbl.spamhaus.org'
- * );
- */
-$rbl_config = array(
-);
-
-
 
 /**
  * These are the filetypes.

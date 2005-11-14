@@ -321,7 +321,7 @@ if ( !empty($_GET['tempskin']) )
 		require( get_path( 'skins' ).$_GET['tempskin'].'/_lastcomments.php' );
 		exit;
 	}
-	else 
+	else
 	{
 		require( get_path( 'skins' ).$_GET['tempskin'].'/_main.php' );
 		exit;
@@ -410,21 +410,12 @@ else
 	// If we end up here the blog file should be a full template, not just a stub...
 }
 
-// TODO: fplanque>>jwedgeco: I think these should actually go into evocore/_main.php near the code that instanciates all those xxxCache objects.
-//global $use_memcached, $memcache, $memcache_expire;
-if ( $use_memcached )
-{
-	$response = $memcache->set( 'BlogCache' , $BlogCache );
-	$response = $memcache->set( 'GroupCache' , $GroupCache );
-	$response = $memcache->set( 'ItemCache' , $ItemCache );
-	$response = $memcache->set( 'itemTypeCache' , $itemTypeCache );
-	$response = $memcache->set( 'itemStatusCache' , $itemStatusCache );
-	$response = $memcache->set( 'LinkCache' , $LinkCache );
-	$response = $memcache->set( 'UserCache' , $UserCache );
-}
 
 /*
  * $Log$
+ * Revision 1.24  2005/11/14 18:23:13  blueyed
+ * Remove experimental memcache support.
+ *
  * Revision 1.23  2005/11/06 10:43:19  marian
  * changes to make the multi-domain feature working
  *

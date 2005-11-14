@@ -269,50 +269,15 @@ require_once dirname(__FILE__).'/_file.class.php';
 require_once dirname(__FILE__).'/_filerootcache.class.php';
 // Object caches init:
 
-// fplanque>>jwedgeco: I cannot commit this: $BlogCache = array();
-$response = NULL;
-
-if ( $use_memcached )
-{
-	// TODO: fplanque>>jwedgeco: please document why you set a dummy here ;)
-	$response = $memcache->set( 'dummy' , 0);
-	$response = $memcache->get( 'BlogCache' );
-	$GroupCache =  $memcache->get( 'GroupCache' );
-	$ItemCache =  $memcache->get( 'ItemCache' );
-	$itemTypeCache =  $memcache->get( 'itemTypeCache' );
-	$itemStatusCache =  $memcache->get( 'itemStatusCache' );
-	$LinkCache =  $memcache->get( 'LinkCache' );
-	$UserCache =  $memcache->get( 'UserCache' );
-//	echo "<pre>\n";
-//	print_r($response);
-//	echo "</pre>\n";
-
-}
-
-// TODO FIXME test for null on each object.
-if ( $response == null )
-{
-	$BlogCache = & new BlogCache();
-	$FileCache = & new fileCache();
-	$FileRootCache = & new FileRootCache();
-	$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
-	$ItemCache = & new ItemCache();
-	$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
-	$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
-	$LinkCache = & new LinkCache();
-	$UserCache = & new UserCache();
-}
-else
-{
-	$BlogCache = & $response;
-//	$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
-//	$ItemCache = & new ItemCache();
-//	$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
-//	$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
-//	$LinkCache = & new LinkCache();
-//	$UserCache = & new UserCache();
-	$Debuglog->add( 'Found key BlogCache in memcache: ' .  $BlogCache , 'note' );
-}
+$BlogCache = & new BlogCache();
+$FileCache = & new fileCache();
+$FileRootCache = & new FileRootCache();
+$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
+$ItemCache = & new ItemCache();
+$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
+$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
+$LinkCache = & new LinkCache();
+$UserCache = & new UserCache();
 
 
 
@@ -516,6 +481,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.66  2005/11/14 18:23:13  blueyed
+ * Remove experimental memcache support.
+ *
  * Revision 1.65  2005/11/09 02:54:42  blueyed
  * Moved inclusion of _file.funcs.php to _misc.funcs.php, because at least bytesreable() gets used in debug_info()
  *
