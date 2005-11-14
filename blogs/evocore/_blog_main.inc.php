@@ -140,23 +140,26 @@ locale_activate( $Blog->get('locale') );
 // -------------------------
 // Extra path info decoding:
 // -------------------------
-if( !isset( $resolve_extra_path ) ) $resolve_extra_path = true;
-if ( !empty( $_GET['tempskin'] ) )
-{
-	$resolve_extra_path = false; // We don't want extra path resolution on rss files
+if( !empty( $_GET['tempskin'] ) || !empty($generating_static) )
+{ // We don't want extra path resolution on rss files and when generating static pages
+	$resolve_extra_path = false;
 }
+if( !isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 
 if( $resolve_extra_path )
 {
 	// Check and Remove blog baseurl from ReqPath:
 	// if Blog is installed on separate domain
 	// use this domain setting as base for the actual path
-	if ($Blog->get( 'siteurl' ) > '')
+	if( $Blog->get( 'siteurl' ) )
 	{
-    	$blog_baseurl = substr( $Blog->get( 'siteurl' ), strlen( $baseurlroot ) );
-    } else {
-    	$blog_baseurl = substr( $Blog->get( 'baseurl' ), strlen( $baseurlroot ) );
-    }
+		$blog_baseurl = substr( $Blog->get( 'siteurl' ), strlen( $baseurlroot ) );
+	}
+	else
+	{
+		$blog_baseurl = substr( $Blog->get( 'baseurl' ), strlen( $baseurlroot ) );
+	}
+
 	if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 	{ // note: $pos will typically be 0
 		$path_string = substr( $ReqPath, $pos+strlen( $blog_baseurl ) );
@@ -413,6 +416,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.25  2005/11/14 18:57:05  blueyed
+ * Do not resolve extra path when generating static pages. This fixes the 404 error when generating static pages from the backoffice, but is not what we want for memcache'd pages really!
+ *
  * Revision 1.24  2005/11/14 18:23:13  blueyed
  * Remove experimental memcache support.
  *
