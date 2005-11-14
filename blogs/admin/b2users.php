@@ -233,7 +233,7 @@ else
 			$edited_User->set( 'nickname', $edited_user_nickname );
 			$edited_User->set( 'idmode', $edited_user_idmode );
 			if( $edited_User->set( 'locale', $edited_user_locale ) && $edited_User->ID == $current_User->ID )
-			{ // value has changed for the current user
+			{ // locale value has changed for the current user
 				$reload_page = true;
 			}
 			$edited_User->set( 'email', $edited_user_email );
@@ -277,14 +277,13 @@ else
 
 				if( $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID )
 						&& ($edited_User->ID == $current_User->ID) )
-				{ // admin_skin has changed for the current user
+				{ // admin_skin has changed or was set the first time for the current user
 					$reload_page = true;
 				}
 				$UserSettings->dbupdate();
 
-				// fplanque>> TODO: also reload when changing locale.
 				if( $reload_page )
-				{
+				{ // save Messages and reload the current page through header redirection
 					$Session->set( 'Messages', $Messages );
 					$Session->dbsave();
 					header_redirect( $ReqURI ); // TODO: this _should_ be full URL, but we have no HTTP_HOST wrapper yet??
@@ -570,6 +569,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.112  2005/11/14 17:59:27  blueyed
+ * Merge from post-phoenix
+ *
  * Revision 1.111  2005/11/04 13:52:56  blueyed
  * Reload page for changed locale, so that the new setting applies. Also fixed setting admin_skin for another user.
  *
