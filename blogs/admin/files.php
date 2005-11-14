@@ -110,7 +110,7 @@ param( 'flatmode', '', NULL, true );
 param( 'action', 'string', '', true );     // 3.. 2.. 1.. action :)
 if( empty($action) )
 { // TODO: check f*cking IE syntax, which send input[image] submits without value, only name.x and name.y
-	param( 'actionArray', 'array', array(), true );
+	$actionArray = array_keys( param( 'actionArray', 'array', array(), true ) );
 	$action = array_pop($actionArray); // we must pass this by variable, because it's passed by reference
 }
 
@@ -1265,6 +1265,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.121  2005/11/14 16:43:43  blueyed
+ * FGix actionArray
+ *
  * Revision 1.120  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *
