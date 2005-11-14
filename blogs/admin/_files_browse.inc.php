@@ -322,7 +322,7 @@ while( $lFile = & $Fileman->get_next() )
 	if( $Fileman->flatmode )
 	{
 		echo '<td class="filepath">';
-		echo $Fileman->get_rdfs_path_relto_root( $lFile, false );
+		echo $lFile->get_rdfs_rel_path();
 		echo '</td>';
 	}
 
@@ -843,8 +843,11 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
- * Revision 1.44  2005/11/14 17:59:27  blueyed
- * Merge from post-phoenix
+ * Revision 1.45  2005/11/14 18:08:14  blueyed
+ * Fix fatal error when displaying paths in flat mode.
+ *
+ * Revision 1.43.2.1  2005/11/14 17:57:18  blueyed
+ * The options bug was another bug (actionArray)
  *
  * Revision 1.43  2005/11/06 11:22:10  yabs
  * correcting options bug
