@@ -92,7 +92,7 @@ switch( $action )
 			$new_User->set( 'email', $email );
 			$new_User->set( 'ip', getIpList( true ) );
 			$new_User->set( 'domain', $Hit->get_remote_host() );
-			$new_User->set( 'browser', $Hit->getUserAgent() );
+			$new_User->set( 'browser', $Hit->user_agent );
 			$new_User->set_datecreated( $localtimenow );
 			$new_User->set( 'locale', $locale );
 			$newusers_grp_ID = $Settings->get('newusers_grp_ID');
@@ -104,7 +104,7 @@ switch( $action )
 
 			$UserCache->add( $new_User );
 
-			// TODO: Optionally auto create a blog
+			// TODO: Optionally auto create a blog (handle this together with the LDAP plugin)
 
 			// TODO: Optionally auto assign rights
 
