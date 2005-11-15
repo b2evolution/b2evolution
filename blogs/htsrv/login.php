@@ -197,10 +197,9 @@ switch( $action )
 
 		$Messages->add( T_( 'Please change your password to something you remember now.' ), 'note' );
 
-		$action = '';
-
+		$action = 'list'; // So that the user will see his profile
 		$current_User = & $ForgetfulUser;
-		$user = $current_User->ID; // the selected user in the user admin
+		$user_ID = $current_User->ID; // the selected user in the user admin
 
 		/**
 		 * Init the backoffice.
