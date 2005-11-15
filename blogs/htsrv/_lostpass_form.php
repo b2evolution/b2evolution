@@ -27,11 +27,10 @@ $Form = & new Form( $htsrv_url.'login.php', '', 'post', 'fieldset' );
 $Form->begin_form( 'fform' );
 
 $Form->hidden( 'action', 'retrievepassword' );
-$Form->hidden( 'login', $login );
 $Form->hidden( 'redirect_to', $redirect_to );
 
 $Form->begin_fieldset();
-$Form->text( 'login', '', 16, T_('Login'), '', 20 , 'input_text' );
+$Form->text( 'login', $login, 16, T_('Login'), '', 20 , 'input_text' );
 
 echo $Form->fieldstart.$Form->inputstart;
 $Form->submit_input( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Request email!'), 'class' => 'ActionButton' ) );
