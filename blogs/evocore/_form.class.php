@@ -436,8 +436,6 @@ class Form extends Widget
 	 *
 	 * Note: please use {@link Form::password()} for password fields
 	 *
-	 * @deprecated Deprecated by text_input().
-	 *
 	 * @param string the name of the input field
 	 * @param string initial value
 	 * @param integer size of the input field
@@ -451,9 +449,6 @@ class Form extends Widget
 	function text( $field_name, $field_value, $field_size, $field_label, $field_note = '',
 											$field_maxlength = 0 , $field_class = '', $inputtype = 'text', $force_to = '' )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::text()', 'deprecated function calls' );
-
 		$field_params = array();
 
 		if( $field_note !== '' )
@@ -508,8 +503,6 @@ class Form extends Widget
 	 *
 	 * Calls the text() method with a 'password' parameter.
 	 *
-	 * @deprecated Deprecated by password_input(). Not used in the core anymore!
-	 *
 	 * @param string the name of the input field
 	 * @param string initial value
 	 * @param integer size of the input field
@@ -522,9 +515,6 @@ class Form extends Widget
 	function password( $field_name, $field_value, $field_size, $field_label, $field_note = '',
 											$field_maxlength = 0 , $field_class = '' )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::password()', 'deprecated function calls' );
-
 		$field_params = array( 'type' => 'password' );
 
 		if( !empty($field_note) )
@@ -639,8 +629,6 @@ class Form extends Widget
 	/**
 	 * Builds a date input field.
 	 *
-	 * @deprecated Deprecated by date_input()
-	 *
 	 * @param string the name of the input field
 	 * @param string initial value (ISO datetime)
 	 * @param string label displayed in front of the field
@@ -649,9 +637,6 @@ class Form extends Widget
 	 */
 	function date( $field_name, $field_value, $field_label, $date_format = 'yyyy-MM-dd' )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::date()', 'deprecated function calls' );
-
 		$field_params = array( 'date_format' => $date_format );
 
 		return $this->date_input( $field_name, $field_value, $field_label, $field_params );
@@ -702,8 +687,6 @@ class Form extends Widget
 	/**
 	 * Builds a time input field.
 	 *
-	 * @deprecated Deprecated by time_input()
-	 *
 	 * @param string the name of the input field
 	 * @param string initial value (ISO datetime)
 	 * @param string label displayed in front of the field
@@ -711,9 +694,6 @@ class Form extends Widget
 	 */
 	function time( $field_name, $field_value, $field_label, $field_format = 'hh:mm:ss' )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::time()', 'deprecated function calls' );
-
 		$field_params = array( 'time_format' => $field_format );
 
 		return $this->time_input( $field_name, $field_value, $field_label, $field_params );
@@ -773,8 +753,6 @@ class Form extends Widget
 	/**
 	 * Builds a duration input field.
 	 *
-	 * @deprecated Deprecated by duration_input()
-	 *
 	 * @param string the name of the input field
 	 * @param string initial value (seconds)
 	 * @param string label displayed in front of the field
@@ -782,9 +760,6 @@ class Form extends Widget
 	 */
 	function duration( $field_prefix, $duration, $field_label )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::duration()', 'deprecated function calls' );
-
 		return $this->duration_input( $field_prefix, $duration, $field_label );
 	}
 
@@ -824,9 +799,6 @@ class Form extends Widget
 	 */
 	function dayOfWeek( $field_name, $field_value, $field_label, $field_note = NULL, $field_class = NULL )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::dayOfWeek()', 'deprecated function calls' );
-
 		$field_params = array();
 		if( isset($field_note) )
 		{
@@ -880,8 +852,6 @@ class Form extends Widget
 	/**
 	 * Builds a checkbox field
 	 *
-	 * @deprecated Deprecated by checkbox_input()
-	 *
 	 * @param string the name of the checkbox
 	 * @param boolean indicating if the checkbox must be checked
 	 * @param string label
@@ -893,9 +863,6 @@ class Form extends Widget
 	function checkbox( $field_name, $field_checked, $field_label, $field_note = '',
 											$field_class = '', $field_value = 1 )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::checkbox()', 'deprecated function calls' );
-
 		$field_params = array();
 
 		if( $field_note !== '' )
@@ -1108,8 +1075,6 @@ class Form extends Widget
 	/**
 	 * Display a select field and populate it with a callback function.
 	 *
-	 * @deprecated Deprecated by {@link select_input()}
-	 *
 	 * @param string field name
 	 * @param string default field value
 	 * @param callback callback function
@@ -1128,9 +1093,6 @@ class Form extends Widget
 		$field_class = '',
 		$field_onchange = NULL )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::select()', 'deprecated function calls' );
-
 		$field_params = array();
 		if( $field_note !== '' )
 		{
@@ -1194,8 +1156,6 @@ class Form extends Widget
 	/**
 	 * Display a select field and populate it with a cache object.
 	 *
-	 * @deprecated Deprecated by {@link select_input_object()}
-	 *
 	 * @uses select_input_object()
 	 * @param string field name
 	 * @param string default field value
@@ -1219,9 +1179,6 @@ class Form extends Widget
 		$field_object_callback = 'option_list_return',
 		$field_onchange = NULL )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::select_object()', 'deprecated function calls' );
-
 		$field_params = array(
 			'note' => $field_note,
 			'allow_none' => $allow_none,
@@ -1262,8 +1219,6 @@ class Form extends Widget
 	/**
 	 * Display a select field and populate it with a cache object.
 	 *
-	 * @deprecated Deprecated by {@link select_input_options()}
-	 *
 	 * @uses select_input_options()
 	 * @param string field name
 	 * @param string string containing options
@@ -1281,9 +1236,6 @@ class Form extends Widget
 		$field_class = NULL,
 		$field_onchange = NULL )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::select_options()', 'deprecated function calls' );
-
 		$field_params = array(
 			'note' => $field_note,
 			'class' => $field_class,
@@ -1387,8 +1339,6 @@ class Form extends Widget
 	/**
 	 * Build a text area.
 	 *
-	 * @deprecated Deprecated by {@link textarea_input()}
-	 *
 	 * @uses {@link textarea_input()}
 	 *
 	 * @param string
@@ -1402,9 +1352,6 @@ class Form extends Widget
 	function textarea( $field_name, $field_value, $field_rows, $field_label,
 												$field_note = '', $field_cols = 50 , $field_class = '' )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::textarea()', 'deprecated function calls' );
-
 		$field_params = array(
 			'note' => $field_note,
 			'cols' => $field_cols,
@@ -1479,8 +1426,6 @@ class Form extends Widget
 	 * Builds an info field.
 	 * An info field is a fieldset containing a label div and an info div.
 	 *
-	 * @deprecated Deprecated by {@link info_field()}
-	 *
 	 * @param string the field label
 	 * @param string the field info
 	 * @param string see {@link format_to_output()}
@@ -1488,9 +1433,6 @@ class Form extends Widget
 	 */
 	function info( $field_label, $field_info, $field_note = NULL, $format = 'htmlbody' )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::info()', 'deprecated function calls' );
-
 		$field_params = array(
 			'note' => $field_note,
 			'format_info' => $format );
@@ -1555,8 +1497,6 @@ class Form extends Widget
 	 *
 	 * Array entries with numeric (deprecated) keys are converted to their equivalent string indexes.
 	 *
-	 * @deprecated Deprecated by {@link buttons_input()}
-	 *
 	 * the two-dimension array must contain :
 	 *  - the button type
 	 *  - the name (optional)
@@ -1618,16 +1558,11 @@ class Form extends Widget
 	 *  - the onclick attribute (optional)
 	 *  - the style (optional)
 	 *
-	 * @deprecated Deprecated by {@link button_input()}
-	 *
 	 * @param array a two-dimension array containing the elements of the input tags
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function button( $options )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::button()', 'deprecated function calls' );
-
 		$field_params = $this->convert_button_to_field_params( $options );
 
 		if( empty($field_params['type']) )
@@ -1773,15 +1708,11 @@ class Form extends Widget
 	 *  - the onclick attribute (optional)
 	 *  - the style (optional)
 	 *
-	 * @deprecated Deprecated by {@link submit_input()}
 	 * @param array an array containing the elements of the input tags
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function submit( $options )
 	{
-		global $Debuglog;
-		$Debuglog->add( 'Form::submit()', 'deprecated function calls' );
-
 		array_unshift( $options, 'submit' );
 
 		return $this->button( $options );
@@ -1889,8 +1820,6 @@ class Form extends Widget
 
 	/**
 	 * Generate set of radio options.
-	 *
-	 * @deprecated Deprecated by {@link radio_input()}
 	 *
 	 * @param string the name of the radio options
 	 * @param string the checked option
@@ -2231,6 +2160,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.85  2005/11/16 21:48:42  fplanque
+ * I never intended to deprecate those functions.
+ *
  * Revision 1.84  2005/11/09 02:34:23  blueyed
  * Added hiddens_by_key() which allows to easily pass $_POST to hidden fields.
  *
