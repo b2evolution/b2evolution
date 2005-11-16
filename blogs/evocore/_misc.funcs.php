@@ -1830,7 +1830,7 @@ function action_icon( $title, $icon, $url, $word = NULL )
 	$r .= '>'.get_icon( $icon, 'imgtag', array( 'title'=>$title ) );
 	if( !empty($word) )
 	{
-		$r .= $word;
+		$r .= ' '.$word;
 	}
 	$r .= '</a> ';
 
@@ -2248,6 +2248,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.140  2005/11/16 01:47:09  blueyed
+ * action_icon(): Add whitespace between icon and word.
+ *
  * Revision 1.139  2005/11/16 00:58:03  blueyed
  * Tightened getIpList()
  *
