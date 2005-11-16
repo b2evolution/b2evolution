@@ -85,12 +85,12 @@ class GeneralSettings extends AbstractSettings
 		'newusers_level' => '1',
 		'permalink_type' => 'urltitle',
 		'posts_per_page' => '5',
-		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$',
+		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$', // TODO: accept spaces and special chars / do full testing on this
 		'reloadpage_timeout' => '300',
 		'time_difference' => '0',
 		'timeout_sessions' => '604800',     // seconds (604800 == 7 days)
 		'upload_enabled' => '1',
-		'upload_allowedext' => 'jpg gif png txt',
+		'upload_allowedext' => 'jpg jpeg gif png txt csv xls doc ppt',
 		'upload_maxkb' => '100',
 		'user_minpwdlen' => '5',
 		'what_to_show' => 'posts',
@@ -144,6 +144,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.28  2005/11/16 21:53:49  fplanque
+ * minor
+ *
  * Revision 1.27  2005/11/07 02:08:52  blueyed
  * Added settings antispam_block_ip and antispam_block_ip_dnsbl to defaults and sorted the defaults
  *

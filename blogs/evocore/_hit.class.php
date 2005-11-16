@@ -181,6 +181,10 @@ class Hit
 
 	/**
 	 * Detect a reload.
+	 *
+	 * What exactly do we need this for?
+	 *
+	 * @todo: if this is only useful to display who's online or view counts, provide option to disable all those resource consuming gadgets. (Those gadgets should be plugins actually, and they should enable this query only if needed)
 	 */
 	function detect_reload()
 	{
@@ -191,9 +195,8 @@ class Hit
 		 * in past reloadpage_timeout seconds.)
 		 */
 		if( $DB->get_var( '
-			SELECT hit_ID FROM T_hitlog INNER JOIN T_sessions
-			    ON hit_sess_ID = sess_ID INNER JOIN T_useragents
-			    ON sess_agnt_ID = agnt_ID
+			SELECT hit_ID FROM T_hitlog INNER JOIN T_sessions ON hit_sess_ID = sess_ID
+			       INNER JOIN T_useragents ON sess_agnt_ID = agnt_ID
 			 WHERE hit_uri = "'.$DB->escape( $ReqURI ).'"
 			   AND hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
 			   AND hit_remote_addr = '.$DB->quote( getIpList( true ) ).'

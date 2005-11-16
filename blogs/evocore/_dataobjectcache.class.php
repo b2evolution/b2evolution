@@ -183,9 +183,10 @@ class DataObjectCache
 			return false;
 		}
 
-		if( isset($this->cache[$Obj->ID]) && ( $this->cache[$Obj->ID] === $Obj ) )
+		if( isset($this->cache[$Obj->ID]) )
+		// fplanque: I don't want an extra (and expensive) comparison here. $this->cache[$Obj->ID] === $Obj. If you need this you're probably misusing the cache.
 		{
-			$Debuglog->add( get_class($this).': Object with ID '.$Obj->ID.' is already cached', 'dataobjects' );
+			$Debuglog->add( $this->objtype.': Object with ID '.$Obj->ID.' is already cached', 'dataobjects' );
 			return false;
 		}
 
@@ -431,6 +432,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.28  2005/11/16 21:53:49  fplanque
+ * minor
+ *
  * Revision 1.27  2005/11/16 12:21:15  blueyed
  * use debug_die()
  *

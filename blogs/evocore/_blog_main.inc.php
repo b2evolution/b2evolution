@@ -317,6 +317,7 @@ if( !isset($display_blog_list) )
 // Check if an rss syndication was requested
 // This will be handled like any other skin except
 // that it will not stored in a cookie
+/* This is FULL of holes!
 if ( !empty($_GET['tempskin']) )
 {
 	if ( !empty($_GET['disp']) AND $_GET['disp'] == 'comments' )
@@ -330,6 +331,7 @@ if ( !empty($_GET['tempskin']) )
 		exit;
 	}
 }
+*/
 
 // Let's check if a skin has been forced in the stub file:
 // Note: URL skin requests are handled with param() 20 lines below
@@ -416,6 +418,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.26  2005/11/16 21:53:49  fplanque
+ * minor
+ *
  * Revision 1.25  2005/11/14 18:57:05  blueyed
  * Do not resolve extra path when generating static pages. This fixes the 404 error when generating static pages from the backoffice, but is not what we want for memcache'd pages really!
  *
