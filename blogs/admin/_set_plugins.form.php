@@ -38,12 +38,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		<?php
 		}
 		?>
+		</tbody>
 	</table>
 </fieldset>
 
 <fieldset>
 	<legend><?php echo T_('Available plug-ins') ?></legend>
 	<table class="grouped" cellspacing="0">
+		<tbody>
 		<tr>
 			<th class="firstcol"><?php echo T_('Plug-in') ?></th>
 			<th><?php echo T_('Actions') ?></th>
