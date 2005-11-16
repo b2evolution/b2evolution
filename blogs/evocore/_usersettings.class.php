@@ -47,7 +47,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_abstractsettings.class.php';
 
 /**
- * Class to handle the global settings
+ * Class to handle the settings for users
  *
  * @package evocore
  */
@@ -55,8 +55,6 @@ class UserSettings extends AbstractSettings
 {
 	/**
 	 * Constructor
-	 *
-	 * loads settings, checks db_version
 	 */
 	function UserSettings()
 	{ // constructor
@@ -128,6 +126,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.9  2005/11/16 22:40:48  blueyed
+ * doc
+ *
  * Revision 1.8  2005/10/28 02:37:37  blueyed
  * Normalized AbstractSettings API
  *
