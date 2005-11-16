@@ -26,10 +26,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants Francois PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE
+ * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
  */
@@ -38,9 +45,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-/*
- * fplanque>> Switch code removed, see users_form
- */
 
 $Form = & new Form( 'b2users.php' );
 
@@ -79,7 +83,7 @@ $standard_perm_options = array(
 							$perm_edit_option
 						);
 
-$Form->begin_fieldset( T_('Permissons for members of this group') );
+$Form->begin_fieldset( T_('Permissions for members of this group') );
 
 	if( $edited_Group->get('ID') != 1 )
 	{	// Groups others than #1 can be prevented from editing users
@@ -148,6 +152,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.41  2005/11/16 04:45:51  blueyed
+ * Typo
+ *
  * Revision 1.40  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *
