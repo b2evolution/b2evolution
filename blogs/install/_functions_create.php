@@ -924,7 +924,7 @@ function create_b2evo_tables_phoenix()
 									sess_lastseen  DATETIME NOT NULL,
 									sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
 									sess_user_ID   INT(10) DEFAULT NULL,
-									sess_agnt_ID   INT UNSIGNED,
+									sess_agnt_ID   INT UNSIGNED NULL,
 									sess_data      TEXT DEFAULT NULL,
 									PRIMARY KEY( sess_ID )
 								)" );
@@ -934,8 +934,8 @@ function create_b2evo_tables_phoenix()
 	echo 'Creating user settings table... ';
 	$DB->query( "CREATE TABLE T_usersettings (
 									uset_user_ID INT(11) UNSIGNED NOT NULL,
-									uset_name VARCHAR( 30 ) NOT NULL,
-									uset_value VARCHAR( 255 ) NULL,
+									uset_name    VARCHAR( 30 ) NOT NULL,
+									uset_value   VARCHAR( 255 ) NULL,
 									PRIMARY KEY ( uset_user_ID, uset_name )
 								)");
 	echo "OK.<br />\n";
@@ -943,19 +943,19 @@ function create_b2evo_tables_phoenix()
 
 	echo 'Creating plugins table... ';
 	$DB->query( "CREATE TABLE T_plugins (
-									plug_ID int NOT NULL auto_increment,
-									plug_priority int NOT NULL default 50,
-									plug_classname varchar(40) NOT NULL default '',
-									PRIMARY KEY (plug_ID)
+									plug_ID        INT(11) NOT NULL auto_increment,
+									plug_priority  INT(11) NOT NULL default 50,
+									plug_classname VARCHAR(40) NOT NULL default '',
+									PRIMARY KEY ( plug_ID )
 								)");
 	echo "OK.<br />\n";
 
 
 	echo 'Creating table for Post Statuses... ';
 	$query="CREATE TABLE T_poststatuses (
-									pst_ID                int(11) unsigned     not null AUTO_INCREMENT,
-									pst_name              varchar(30)          not null,
-									primary key (pst_ID)
+									pst_ID   int(11) unsigned not null AUTO_INCREMENT,
+									pst_name varchar(30)      not null,
+									primary key ( pst_ID )
 								)";
 	$DB->query( $query );
 	echo "OK.<br />\n";
@@ -963,8 +963,8 @@ function create_b2evo_tables_phoenix()
 
 	echo 'Creating table for Post Types... ';
 	$query="CREATE TABLE T_posttypes (
-									ptyp_ID               int(11) unsigned     not null AUTO_INCREMENT,
-									ptyp_name             varchar(30)          not null,
+									ptyp_ID   int(11) unsigned not null AUTO_INCREMENT,
+									ptyp_name varchar(30)      not null,
 									primary key (ptyp_ID)
 								)";
 	$DB->query( $query );
@@ -978,48 +978,49 @@ function create_b2evo_tables_phoenix()
 
 	echo 'Creating table for File Meta Data... ';
 	$DB->query( "CREATE TABLE T_files (
-								 file_ID                        int(11) unsigned               not null AUTO_INCREMENT,
-								 file_root_type                 enum('absolute','user','group','collection') not null default 'absolute',
-								 file_root_ID                   int(11) unsigned               not null default 0,
-								 file_path                      varchar(255)                   not null default '',
-								 file_title                     varchar(255),
-								 file_alt                       varchar(255),
-								 file_desc                      text,
+								 file_ID        int(11) unsigned  not null AUTO_INCREMENT,
+								 file_root_type enum('absolute','user','group','collection') not null default 'absolute',
+								 file_root_ID   int(11) unsigned  not null default 0,
+								 file_path      varchar(255)      not null default '',
+								 file_title     varchar(255),
+								 file_alt       varchar(255),
+								 file_desc      text,
 								 primary key (file_ID),
 								 unique file (file_root_type, file_root_ID, file_path)
-								)" );
+							)" );
 	echo "OK.<br />\n";
 
 
 	echo 'Creating table for Post Links... ';
 	$DB->query( "CREATE TABLE T_links (
-								link_ID                 int(11) unsigned  not null AUTO_INCREMENT,
-								link_datecreated        datetime          not null default '0000-00-00 00:00:00',
-								link_datemodified       datetime          not null default '0000-00-00 00:00:00',
-								link_creator_user_ID    int(11) unsigned  not null,
-								link_lastedit_user_ID   int(11) unsigned  not null,
-								link_item_ID    		    int(11) unsigned  NOT NULL,
-								link_dest_item_ID		    int(11) unsigned  NULL,
-								link_file_ID				    int(11) unsigned  NULL,
-								link_ltype_ID				    int(11) unsigned  NOT NULL default 1,
-								link_external_url       VARCHAR(255)      NULL,
-								link_title          		TEXT              NULL,
+								link_ID               int(11) unsigned  not null AUTO_INCREMENT,
+								link_datecreated      datetime          not null default '0000-00-00 00:00:00',
+								link_datemodified     datetime          not null default '0000-00-00 00:00:00',
+								link_creator_user_ID  int(11) unsigned  not null,
+								link_lastedit_user_ID int(11) unsigned  not null,
+								link_item_ID    		  int(11) unsigned  NOT NULL,
+								link_dest_item_ID		  int(11) unsigned  NULL,
+								link_file_ID				  int(11) unsigned  NULL,
+								link_ltype_ID				  int(11) unsigned  NOT NULL default 1,
+								link_external_url     VARCHAR(255)      NULL,
+								link_title          	TEXT              NULL,
 								PRIMARY KEY (link_ID),
 								INDEX link_item_ID( link_item_ID ),
 								INDEX link_dest_item_ID (link_dest_item_ID),
 								INDEX link_file_ID (link_file_ID)
-								)" );
+							)" );
 	echo "OK.<br />\n";
 
 
 	echo 'Creating table for base domains... ';
 	$DB->query( "CREATE TABLE T_basedomains (
-								dom_ID     INT UNSIGNED NOT NULL AUTO_INCREMENT,
+								dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 								dom_name   VARCHAR(250) NOT NULL DEFAULT '',
 								dom_status ENUM('unknown','whitelist','blacklist') NOT NULL DEFAULT 'unknown',
 								dom_type   ENUM('unknown','normal','searcheng','aggregator') NOT NULL DEFAULT 'unknown',
 								PRIMARY KEY (dom_ID),
-								UNIQUE (dom_name) )" );
+								UNIQUE (dom_name)
+							)" );
 	echo "OK.<br />\n";
 
 
@@ -1034,7 +1035,7 @@ function create_b2evo_tables_phoenix()
 
 	echo 'Creating table for Hit-Logs... ';
 	$query = "CREATE TABLE T_hitlog (
-							hit_ID             bigint(11) NOT NULL AUTO_INCREMENT,
+							hit_ID             INT(11) NOT NULL AUTO_INCREMENT,
 							hit_sess_ID        INT UNSIGNED,
 							hit_datetime       DATETIME NOT NULL,
 							hit_uri            VARCHAR(250) DEFAULT NULL,
@@ -1057,7 +1058,8 @@ function create_b2evo_tables_phoenix()
 							   sub_user_ID     int(11) unsigned    not null,
 							   sub_items       tinyint(1)          not null,
 							   sub_comments    tinyint(1)          not null,
-							   primary key (sub_coll_ID, sub_user_ID) )" );
+							   primary key (sub_coll_ID, sub_user_ID)
+							  )" );
 	echo "OK.<br />\n";
 
 
@@ -1260,6 +1262,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.153  2005/11/16 17:20:23  fplanque
+ * hit_ID moved back to INT for performance reasons.
+ *
  * Revision 1.152  2005/11/05 01:53:54  blueyed
  * Linked useragent to a session rather than a hit;
  * SQL: moved T_hitlog.hit_agnt_ID to T_sessions.sess_agnt_ID
