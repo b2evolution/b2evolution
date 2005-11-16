@@ -195,16 +195,16 @@ else
 			}
 
 			// check if new login already exists for another user_ID
-			$query = "
+			$query = '
 				SELECT user_ID
 				  FROM T_users
-				 WHERE user_login = '$edited_user_login'
-				   AND user_ID != $edited_user_ID";
+				 WHERE user_login = '.$DB->quote($edited_user_login).'
+				   AND user_ID != '.$edited_User->get('ID');
 			if( $q = $DB->get_var( $query ) )
 			{
 				$Request->param_error( 'edited_user_login',
 					sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'),
-						'href="b2users.php?user_ID='.$q.'"' ), 'error' );
+						'href="b2users.php?user_ID='.$q.'"' ) );
 			}
 
 			param( 'edited_user_firstname', 'string', true );
@@ -573,6 +573,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.115  2005/11/16 06:33:48  blueyed
+ * Fix SQL injection; fix Request param error
+ *
  * Revision 1.114  2005/11/16 04:16:53  blueyed
  * Made action "promote" make use of $edited_User; fixed possible SQL injection
  *
