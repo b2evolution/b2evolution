@@ -529,17 +529,17 @@ class DB
 
 		if( is_object($Timer) )
 		{
-			// Resume query timer:
+			// Resume global query timer
 			$Timer->resume( 'sql_queries' );
 			// Start a timer for this particular query:
 			$Timer->start( 'sql_query', false );
 
 			// Run query:
 			$this->result = @mysql_query( $query, $this->dbhandle );
-
-			$Timer->pause( 'sql_queries' );
 			// Get duration for last query:
 			$this->queries[ $this->num_queries - 1 ]['time'] = $Timer->get_duration( 'sql_query', 10 );
+			// Pause global query timer:
+			$Timer->pause( 'sql_queries' );
 		}
 		else
 		{
@@ -1164,6 +1164,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.43  2005/11/16 19:34:19  fplanque
+ * plug_ID should be unsigned
+ *
  * Revision 1.42  2005/11/14 17:23:41  blueyed
  * Moved query timer back around just mysql_query()
  *
