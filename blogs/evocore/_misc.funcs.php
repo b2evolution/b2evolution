@@ -2025,7 +2025,7 @@ function bullet( $bool )
 
 /**
  * Get list of client IP addresses from REMOTE_ADDR and HTTP_X_FORWARDED_FOR,
- * in this order. '' is used when no IP could be detected.
+ * in this order. '' is used when no IP could be found.
  *
  * @param boolean True, to get only the first IP (probably REMOTE_ADDR)
  * @return array|string Depends on first param.
@@ -2034,18 +2034,26 @@ function getIpList( $firstOnly = false )
 {
 	$r = array();
 
-	if( isset( $_SERVER['REMOTE_ADDR'] ) )
+	if( !empty( $_SERVER['REMOTE_ADDR'] ) )
 	{
-		$r[] = $_SERVER['REMOTE_ADDR'];
+		foreach( explode( ',', $_SERVER['REMOTE_ADDR'] ) as $l_ip )
+		{
+			$l_ip = trim($l_ip);
+			if( !empty($l_ip) )
+			{
+				$r[] = $l_ip;
+			}
+		}
 	}
 
-	if( isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] !== 'unknown' )
-	{ // IP(s) behind Proxy
-		foreach( explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] ) as $lIP )
+	if( !empty($_SERVER['HTTP_X_FORWARDED_FOR']) )
+	{ // IP(s) behind Proxy - this can be easily forged!
+		foreach( explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] ) as $l_ip )
 		{
-			if( $lIP != 'unknown' )
+			$l_ip = trim($l_ip);
+			if( !empty($l_ip) && $l_ip != 'unknown' )
 			{
-				$r[] = trim($lIP);
+				$r[] = $l_ip;
 			}
 		}
 	}
@@ -2240,6 +2248,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.139  2005/11/16 00:58:03  blueyed
+ * Tightened getIpList()
+ *
  * Revision 1.138  2005/11/10 01:09:47  blueyed
  * header_redirect(): remove "user" and "login" params (additionally to "action") from location where we redirect to if it's on $baseurl.
  *
