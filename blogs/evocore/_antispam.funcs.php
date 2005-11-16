@@ -123,14 +123,6 @@ function antispam_check( $haystack )
 {
 	global $DB, $Debuglog, $Timer;
 
-	/*
-	// check for blacklisted IP first
-	// TODO: move this into _main or somewhere early and stop processing if matched. don't check with EVERY SINGLE URL!!
-	if ( $results = antispam_ip($_SERVER["REMOTE_ADDR"]) ) {
-		return $results;
-	}
-	*/
-
 	// TODO: 'SELECT COUNT(*) FROM T_antispam WHERE aspm_string LIKE "%'.$url.'%" ?
 	// TODO: Check basedomain against T_basedomains (dom_status = 'blacklist')
 
@@ -148,38 +140,6 @@ function antispam_check( $haystack )
 	$Timer->stop( 'antispam_url' );
 
 	return false;	// no problem.
-}
-
-
-/**
- * Check if an IP is blacklisted
- * Returns false if the ip is OK
- * Returns the value of the lookup is blacklisted
- *
- * antispam_ip(-)
- */
-function antispam_ip( $ip )
-{
-	global $rbl_config, $Debuglog;
-/*
-	// uncomment the following line to test RBL with spamhaus
-	//	$ip="127.0.0.2";
-	// check each blacklist in $rbl_config
-	foreach ($rbl_config as $blacklist) {
-		$Debuglog->add( 'Checking RBL ' . $blacklist );
-		// if ipaddr is 1.2.3.4, then
-		// lookup format is: 4.3.2.1.sbl-xbl.spamhaus.org
-		$rev = array_reverse(explode('.', $ip));
-		$lookup = implode('.', $rev) . '.' . $blacklist;
-		$results = gethostbyname($lookup);
-		if ($lookup != $results) {
-			$Debuglog->add( 'Blacklisted IP: ' . $results );
-			return $blacklist . ": " . $results;
-		}
-	}
-
-	return false;
-*/
 }
 
 
@@ -327,6 +287,9 @@ function antispam_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.17  2005/11/16 22:33:46  blueyed
+ * removed rudimentary dnsrbl feature
+ *
  * Revision 1.16  2005/10/28 20:26:43  blueyed
  * Handle failed update of antispam strings correctly.
  *
