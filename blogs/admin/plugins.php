@@ -92,7 +92,7 @@ switch( $action )
 		break;
 }
 
-$Messages->displayParagraphs( 'note' );
+$Messages->display( '', '', true, 'all' );
 
 
 require dirname(__FILE__).'/_set_plugins.form.php';
