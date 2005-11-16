@@ -24,16 +24,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
- * @todo finish move to "new standard", i-e:
- *    1 - init params
- *    2 - perform actions
- *    3 - display error messages
- *    4 - display payload
+ * {@internal
+ * Daniel HAHLER grants Francois PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
  *
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE
+ * @author blueyed: Daniel HAHLER
+ *
+ * @todo finish move to "new standard", i-e:
+ *    1 - init params
+ *    2 - perform actions
+ *    3 - display error messages
+ *    4 - display payload
  *
  * @version $Id$
  */
@@ -299,30 +306,21 @@ else
 
 		case 'promote':
 			param( 'prom', 'string', true );
-			param( 'id', 'integer', true );
 
-			$edited_user_ID = $id;
-
-			$UserToPromote =& $UserCache->get_by_ID( $id );
-			$usertopromote_level = $UserToPromote->get( 'level' );
-
-			if( ! in_array($prom, array('up', 'down'))
-					|| ($prom == 'up' && $usertopromote_level > 9)
-					|| ($prom == 'down' && $usertopromote_level < 1)
+			if( !isset($edited_User)
+					|| ! in_array( $prom, array('up', 'down') )
+					|| ( $prom == 'up' && $edited_User->get('level') > 9 )
+					|| ( $prom == 'down' && $edited_User->get('level') < 1 )
 				)
 			{
 				$Messages->add( T_('Invalid promotion.'), 'error' );
 			}
 			else
 			{
-				if( $prom == 'up' )
-				{
-					$sql = "UPDATE T_users SET user_level = user_level+1 WHERE user_ID = $id";
-				}
-				elseif( $prom == 'down' )
-				{
-					$sql = "UPDATE T_users SET user_level = user_level-1 WHERE user_ID = $id";
-				}
+				$sql = '
+					UPDATE T_users
+					   SET user_level = user_level '.( $prom == 'up' ? '+' : '-' ).' 1
+					 WHERE user_ID = '.$edited_User->get('ID');
 
 				if( $DB->query( $sql ) )
 				{
@@ -330,7 +328,7 @@ else
 				}
 				else
 				{
-					$Messages->add( sprintf( 'Couldn\'t change %s\'s level.', $UserToPromote->login ), 'error' );
+					$Messages->add( sprintf( 'Couldn\'t change %s\'s level.', $edited_User->login ), 'error' );
 				}
 			}
 			break;
@@ -394,13 +392,14 @@ else
 
 		case 'groupupdate':
 			$Request->param( 'edited_grp_ID', 'integer', true );
-			$Request->param( 'edited_grp_name', 'string', true );
+			$Request->param( 'edited_grp_name', 'string' );
 
 			$Request->param_check_not_empty( 'edited_grp_name', T_('You must provide a group name!') );
 
 			// check if the group name already exists for another group
-			$query = "SELECT grp_ID FROM T_groups
-														 WHERE grp_name = '$edited_grp_name' AND grp_ID != $edited_grp_ID";
+			$query = 'SELECT grp_ID FROM T_groups
+			           WHERE grp_name = '.$DB->quote($edited_grp_name).'
+			             AND grp_ID != '.$edited_grp_ID;
 			if( $q = $DB->get_var( $query ) )
 			{
 				$Request->param_error( 'edited_grp_name',
@@ -574,6 +573,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.114  2005/11/16 04:16:53  blueyed
+ * Made action "promote" make use of $edited_User; fixed possible SQL injection
+ *
  * Revision 1.113  2005/11/16 01:52:35  blueyed
  * Do not allow level editing for admin/demouser in $demo_mode
  *

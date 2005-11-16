@@ -174,11 +174,11 @@ else
 						'order' => 'user_level',
 						'td' => '¤conditional( (#user_level# > 0), \''
 											.action_icon( TS_('Decrease user level'), 'arrow_down',
-												'%regenerate_url( \'action\', \'action=promote&amp;prom=down&amp;id=$user_ID$\' )%' ).'\' )¤'
+												'%regenerate_url( \'action\', \'action=promote&amp;prom=down&amp;user_ID=$user_ID$\' )%' ).'\' )¤'
 										.'$user_level$ '
 										.'¤conditional( (#user_level# < 10), \''
 											.action_icon( TS_('Increase user level'), 'arrow_up',
-												'%regenerate_url( \'action\', \'action=promote&amp;prom=up&amp;id=$user_ID$\' )%' ).'\' )¤',
+												'%regenerate_url( \'action\', \'action=promote&amp;prom=up&amp;user_ID=$user_ID$\' )%' ).'\' )¤',
 					);
 
 
@@ -212,6 +212,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.54  2005/11/16 04:16:53  blueyed
+ * Made action "promote" make use of $edited_User; fixed possible SQL injection
+ *
  * Revision 1.53  2005/11/03 18:23:43  fplanque
  * minor
  *
