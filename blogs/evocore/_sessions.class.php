@@ -91,7 +91,7 @@ class Sessions extends Widget
 		$timeout_YMD = date( 'Y-m-d H:i:s', ($localtimenow - $timeout_online_user) );
 
 		foreach( $DB->get_results( '
-			SELECT sess_user_ID FROM T_sessions
+			SELECT DISTINCT sess_user_ID FROM T_sessions
 			WHERE sess_lastseen > "'.$timeout_YMD.'"
 				AND sess_key IS NOT NULL' ) as $row )
 		{
