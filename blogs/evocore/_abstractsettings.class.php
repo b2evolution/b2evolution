@@ -600,8 +600,12 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.21  2005/11/16 18:19:37  fplanque
+ * no message
+ *
  * Revision 1.20  2005/11/05 00:04:13  blueyed
  * Optimized get() a bit by assigning the return value by reference.
+ * fplanque>> Note: it actually doesn't change anything since PHP copies the variables ONLY on write!
  *
  * Revision 1.19  2005/11/01 23:03:22  blueyed
  * Fix notice on rare occasion (a setting was remembered as not existing [set to NULL in cache], not changed/set and dbupdate()) called
