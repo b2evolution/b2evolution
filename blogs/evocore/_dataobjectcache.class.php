@@ -244,7 +244,7 @@ class DataObjectCache
 
 		if( empty($req_ID) )
 		{
-			if($halt_on_empty) die( "Requested $this->objtype from $this->dbtablename without ID!" );
+			if($halt_on_empty) { debug_die( "Requested $this->objtype from $this->dbtablename without ID!" ); }
 			$r = NULL;
 			return $r;
 		}
@@ -285,7 +285,7 @@ class DataObjectCache
 			// $Debuglog->add( 'failure', 'dataobjects' );
 			if( $halt_on_error )
 			{
-				die( "Requested $this->objtype does not exist!" );
+				debug_die( "Requested $this->objtype does not exist!" );
 			}
 			$r = false;
 			return $r;
@@ -311,12 +311,12 @@ class DataObjectCache
 
 		if( empty( $this->name_field ) )
 		{
-			die( 'DataObjectCache::get_by_name() : No name field to query on' );
+			debug_die( 'DataObjectCache::get_by_name() : No name field to query on' );
 		}
 
 		if( empty($req_name) )
 		{
-			if($halt_on_empty) die( "Requested $this->objtype from $this->dbtablename without name!" );
+			if($halt_on_empty) { debug_die( "Requested $this->objtype from $this->dbtablename without name!" ); }
 			$r = NULL;
 			return $r;
 		}
@@ -347,7 +347,7 @@ class DataObjectCache
 			$Debuglog->add( 'Could not get DataObject by name.', 'dataobjects' );
 			if( $halt_on_error )
 			{
-				die( "Requested $this->objtype does not exist!" );
+				debug_die( "Requested $this->objtype does not exist!" );
 			}
 			$r = NULL;
 			return $r;
@@ -431,6 +431,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.27  2005/11/16 12:21:15  blueyed
+ * use debug_die()
+ *
  * Revision 1.26  2005/11/09 03:20:05  blueyed
  * minor
  *
