@@ -102,16 +102,21 @@ if( !$current_User->check_perm( 'users', 'edit', false ) )
 	}
 }
 
-if( $demo_mode && isset($edited_User) && ( $edited_User->ID == 1 || $edited_User->login == 'demouser' ) )
-{ // User may edit - but demo mode restrictions apply!
-	$Messages->add( T_('You cannot edit the admin and demouser profile in demo mode!'), 'error' );
+if( $demo_mode )
+{
+	if( ( isset($edited_User) && ( $edited_User->ID == 1 || $edited_User->login == 'demouser' ) )
+			|| ( $action == 'promote' )
+	)
+	{ // User may edit - but demo mode restrictions apply!
+		$Messages->add( T_('You cannot edit the admin and demouser profile in demo mode!'), 'error' );
 
-	if( strpos( $action, 'delete_' ) === 0 )
-	{
-		$action = 'list';
+		if( strpos( $action, 'delete_' ) === 0 || $action == 'promote' )
+		{ // Fallback to list/view action
+			$action = 'list';
+		}
+
+		$user_profile_only = 1;
 	}
-
-	$user_profile_only = 1;
 }
 
 
@@ -569,8 +574,11 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
- * Revision 1.112  2005/11/14 17:59:27  blueyed
- * Merge from post-phoenix
+ * Revision 1.113  2005/11/16 01:52:35  blueyed
+ * Do not allow level editing for admin/demouser in $demo_mode
+ *
+ * Revision 1.111.2.1  2005/11/14 15:48:30  blueyed
+ * Removed TODO, doc
  *
  * Revision 1.111  2005/11/04 13:52:56  blueyed
  * Reload page for changed locale, so that the new setting applies. Also fixed setting admin_skin for another user.
