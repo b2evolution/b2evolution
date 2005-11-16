@@ -115,8 +115,8 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
 { // Connect to DB:
 	$tmp_evoconf_db = $EvoConfig->DB;
-	$tmp_evoconf_db['halt_on_error'] = false;
-	$tmp_evoconf_db['show_errors'] = false;
+	$tmp_evoconf_db['halt_on_error'] = false;   // We want a friendly message if we can't connect
+	$tmp_evoconf_db['show_errors'] = false;     // We want a friendly message if we can't connect
 	$DB = new DB( $tmp_evoconf_db );
 	unset($tmp_evoconf_db);
 
