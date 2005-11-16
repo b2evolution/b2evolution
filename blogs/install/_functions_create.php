@@ -943,7 +943,7 @@ function create_b2evo_tables_phoenix()
 
 	echo 'Creating plugins table... ';
 	$DB->query( "CREATE TABLE T_plugins (
-									plug_ID        INT(11) NOT NULL auto_increment,
+									plug_ID        INT(11) UNSIGNED NOT NULL auto_increment,
 									plug_priority  INT(11) NOT NULL default 50,
 									plug_classname VARCHAR(40) NOT NULL default '',
 									PRIMARY KEY ( plug_ID )
@@ -1262,6 +1262,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.154  2005/11/16 21:49:07  fplanque
+ * no message
+ *
  * Revision 1.153  2005/11/16 17:20:23  fplanque
  * hit_ID moved back to INT for performance reasons.
  *
