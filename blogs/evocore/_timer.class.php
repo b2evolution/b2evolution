@@ -214,6 +214,17 @@ class Timer
 
 
 	/**
+	 * Get a list of used categories.
+	 *
+	 * @return array
+	 */
+	function get_categories()
+	{
+		return array_keys( $this->_times );
+	}
+
+
+	/**
 	 * Get the current time in microseconds.
 	 *
 	 * @return float
@@ -227,6 +238,9 @@ class Timer
 
 /*
  * $Log$
+ * Revision 1.4  2005/11/17 01:17:38  blueyed
+ * Replaced main/sql-query times with dynamic timer table in debug_info()
+ *
  * Revision 1.3  2005/09/27 14:57:22  blueyed
  * Removed dependency on $Debuglog
  *

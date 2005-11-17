@@ -1482,12 +1482,41 @@ function debug_info( $force = false )
 
 		if( !$obhandler_debug )
 		{ // don't display changing items when we want to test obhandler
+
+			// Timer table:
 			$time_page = $Timer->get_duration( 'main' );
-			$time_queries = $Timer->get_duration( 'sql_queries' );
-			$percent_queries = $time_page > 0 ? number_format( 100/$time_page * $time_queries, 2 ) : 0;
-			echo 'Page processing time: '.$time_page.' seconds.<br/>';
+			$timer_rows = array();
+			foreach( $Timer->get_categories() as $l_cat )
+			{
+				if( $l_cat == 'sql_query' )
+				{
+					continue;
+				}
+				$timer_rows[ $l_cat ] = $Timer->get_duration( $l_cat );
+			}
+			arsort( $timer_rows );
+			echo '<table><thead><th colspan="3" class="center">Timers</th></thead><tbody>';
+			$count_ignored = 0;
+			foreach( $timer_rows as $l_cat => $l_time )
+			{
+				$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : 0;
+
+				if( $percent_l_cat == 0 )
+				{
+					$count_ignored++;
+					continue;
+				}
+
+				echo '<tr><td>'.$l_cat.'</td><td style="text-align:right">'.$l_time.'</td><td style="text-align:right">'.$percent_l_cat.'%</td></tr>';
+			}
+			echo '</tbody>';
+			if( $count_ignored )
+			{
+				echo '<tfoot><tr><td colspan="3" class="center"> + '.$count_ignored.' with 0% </td></tr></tfoot>';
+			}
+			echo '</table>';
+
 			echo '<a href="'.format_to_output($ReqURI).'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br/>';
-			echo 'SQL processing time: '.$time_queries.' seconds, '.$percent_queries.'%.<br/>';
 
 			foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
 				'memory_get_usage' => array( 'display' => 'Memory usage', 'high' => 8000000 ),
@@ -1845,7 +1874,7 @@ function action_icon( $title, $icon, $url, $word = NULL )
  *
  * @uses $map_iconfiles
  * @param string icon for what?
- * @param string what to return for that icon ('file', 'url', 'size' {@link imgsize()})
+ * @param string what to return for that icon ('imgtag', 'file', 'url', 'size' {@link imgsize()})
  * @param array additional params ( 'class' => class name when getting 'imgtag',
 																		'size' => param for 'size',
 																		'title' => title attribute for imgtag)
@@ -2248,6 +2277,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.141  2005/11/17 01:17:38  blueyed
+ * Replaced main/sql-query times with dynamic timer table in debug_info()
+ *
  * Revision 1.140  2005/11/16 01:47:09  blueyed
  * action_icon(): Add whitespace between icon and word.
  *
