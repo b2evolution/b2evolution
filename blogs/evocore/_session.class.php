@@ -255,8 +255,10 @@ class Session
 	 *
 	 * We want to keep the user in the session log, but we're unsetting {@link $user_ID}, which refers
 	 * to the current session.
-		// What happens on the next page? The session key will be broken -> will it start a new session? It should! 
-		// Note: we MIGHT want to link subsequent sessions together if we want to keep track...
+	 *
+	 * Because the session key is invalid/broken, on the next request a new session will be started.
+	 *
+	 * NOTE: we MIGHT want to link subsequent sessions together if we want to keep track...
 	 */
 	function logout()
 	{
@@ -264,9 +266,10 @@ class Session
 
 		// Invalidate the session key (no one will be able to use this session again)
 		$this->key = NULL;
-		// How is this going to stay in the log if we set it to null? $this->user_ID = NULL;
 		$this->_data = NULL; // We don't need to keep old data
-		$this->dbsave();
+		$this->dbsave(); // this will update $key and $_data in DB, but not user_ID
+
+		$this->user_ID = NULL; // unset this, so calls to has_User() return the right answer!
 
 		// clean up the session cookie:
 		setcookie( $cookie_session, '', 272851261, $cookie_path, $cookie_domain ); // 272851261 being the birthday of a lovely person
