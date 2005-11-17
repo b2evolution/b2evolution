@@ -107,7 +107,7 @@ class Widget
 	 * This is an additional wrapper to {@link replace_vars()} that allows to react
 	 * on the return value of it.
 	 *
-	 * @uses replace_callback()
+	 * Used by replace_callback()
 	 *
 	 * @param array {@link preg_match() preg match}
 	 * @return string
