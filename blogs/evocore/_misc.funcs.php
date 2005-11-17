@@ -1501,7 +1501,7 @@ function debug_info( $force = false )
 			{
 				$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : 0;
 
-				if( $percent_l_cat == 0 )
+				if( $percent_l_cat < 0.5 )
 				{
 					$count_ignored++;
 					continue;
@@ -1512,7 +1512,7 @@ function debug_info( $force = false )
 			echo '</tbody>';
 			if( $count_ignored )
 			{
-				echo '<tfoot><tr><td colspan="3" class="center"> + '.$count_ignored.' with 0% </td></tr></tfoot>';
+				echo '<tfoot><tr><td colspan="3" class="center"> + '.$count_ignored.' &lt; 0.5% </td></tr></tfoot>';
 			}
 			echo '</table>';
 
@@ -2277,6 +2277,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.142  2005/11/17 17:19:38  blueyed
+ * Ignore timers below 0.5% of total time
+ *
  * Revision 1.141  2005/11/17 01:17:38  blueyed
  * Replaced main/sql-query times with dynamic timer table in debug_info()
  *
