@@ -94,14 +94,15 @@ class Sessions extends Widget
 		$timeout_YMD = date( 'Y-m-d H:i:s', ($localtimenow - $timeout_online_user) );
 
 		foreach( $DB->get_results( '
-			SELECT DISTINCT sess_user_ID FROM T_sessions
+			SELECT sess_user_ID FROM T_sessions
 			WHERE sess_lastseen > "'.$timeout_YMD.'"
 				AND sess_key IS NOT NULL' ) as $row )
 		{
 			if( !empty( $row->sess_user_ID )
 					&& ( $User = & $UserCache->get_by_ID( $row->sess_user_ID ) ) )
 			{
-				$this->_registered_Users[] =& $User;
+				// assign by ID so that each user is only counted once (he could use multiple user agents at the same time)
+				$this->_registered_Users[ $User->get('ID') ] = & $User;
 
 				if( !$User->showonline )
 				{
