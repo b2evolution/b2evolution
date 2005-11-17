@@ -863,6 +863,7 @@ class Results extends Widget
 				return ( $this->page<$this->total_pages )
 					? '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->page+1) ).'">  '.$this->params['next_text'].'</a>'
 					: $this->params['next_text'];
+
 			case 'list' :
 				//inits the page list
 				return $this->page_list($this->first(),$this->last());
@@ -1122,6 +1123,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.36  2005/11/17 16:46:08  fplanque
+ * no message
+ *
  * Revision 1.35  2005/11/07 02:13:22  blueyed
  * Cleaned up Sessions and extended Widget etc
  *
