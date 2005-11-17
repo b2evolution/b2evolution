@@ -229,7 +229,7 @@ class Item extends DataObject
 		{ // New item:
 			$this->ID = 0;
 			if( isset($current_User) )
-			{ // use current user as default, if available
+			{ // use current user as default, if available (which won't be the case during install)
 				$this->set_author_User( $current_User );
 			}
 			$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
@@ -2216,6 +2216,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.66  2005/11/17 19:35:26  fplanque
+ * no message
+ *
  * Revision 1.65  2005/11/05 01:01:50  blueyed
  * Fix noticed during install, when there's no $current_User. Do not assign a user in the constructor then.
  *

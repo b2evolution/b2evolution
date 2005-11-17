@@ -383,4 +383,10 @@ class Session
 	}
 }
 
+/*
+ * $Log$
+ * Revision 1.33  2005/11/17 19:35:26  fplanque
+ * no message
+ *
+ */
 ?>

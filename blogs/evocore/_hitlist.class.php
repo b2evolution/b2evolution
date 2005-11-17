@@ -124,6 +124,7 @@ class Hitlist
 		{ // Autopruning is requested
 			$last_prune = $Settings->get( 'auto_prune_stats_done' );
 
+			// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
 			if( $last_prune < date('Y-m-d', $localtimenow) )
 			{ // not pruned since one day
 				$datetime_prune_before = date( 'Y-m-d', ($localtimenow - ($auto_prune_stats * 86400)) ); // 1 day = 86400 seconds
@@ -134,6 +135,7 @@ class Hitlist
 				$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_hitlog.', 'hit' );
 
 				// Prune sessions that have timed out and are older than auto_prune_stats
+					// TODO: the smaller of the 2 dates should be computed in PHP
 				$rows_affected = $DB->query( '
 					DELETE FROM T_sessions
 					WHERE sess_lastseen < "'.date( 'Y-m-d H:i:s', ($localtimenow - $Settings->get( 'timeout_sessions' )) ).'"

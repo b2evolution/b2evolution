@@ -1859,7 +1859,7 @@ function action_icon( $title, $icon, $url, $word = NULL )
 	$r .= '>'.get_icon( $icon, 'imgtag', array( 'title'=>$title ) );
 	if( !empty($word) )
 	{
-		$r .= ' '.$word;
+		$r .= $word;
 	}
 	$r .= '</a> ';
 
@@ -2277,6 +2277,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.143  2005/11/17 19:35:26  fplanque
+ * no message
+ *
  * Revision 1.142  2005/11/17 17:19:38  blueyed
  * Ignore timers below 0.5% of total time
  *

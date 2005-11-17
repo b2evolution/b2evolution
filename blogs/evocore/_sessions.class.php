@@ -94,14 +94,16 @@ class Sessions extends Widget
 		$timeout_YMD = date( 'Y-m-d H:i:s', ($localtimenow - $timeout_online_user) );
 
 		foreach( $DB->get_results( '
-			SELECT sess_user_ID FROM T_sessions
-			WHERE sess_lastseen > "'.$timeout_YMD.'"
-				AND sess_key IS NOT NULL' ) as $row )
+			SELECT sess_user_ID
+			  FROM T_sessions
+			 WHERE sess_lastseen > "'.$timeout_YMD.'"
+				 AND sess_key IS NOT NULL' ) as $row )
 		{
 			if( !empty( $row->sess_user_ID )
 					&& ( $User = & $UserCache->get_by_ID( $row->sess_user_ID ) ) )
 			{
 				// assign by ID so that each user is only counted once (he could use multiple user agents at the same time)
+				// fplanque: what was wrong with DISTINCT?
 				$this->_registered_Users[ $User->get('ID') ] = & $User;
 
 				if( !$User->showonline )
@@ -256,3 +258,11 @@ class Sessions extends Widget
 	}
 
 }
+
+/*
+ * $Log$
+ * Revision 1.18  2005/11/17 19:35:26  fplanque
+ * no message
+ *
+ */
+?>
