@@ -1089,7 +1089,7 @@ class AdminUI_general
 		if( !$obhandler_debug )
 		{ // don't display changing time when we want to test obhandler
 			$r .= "\n".T_('Time:').' <strong>'.date_i18n( locale_timefmt(), $localtimenow ).'</strong>'
-				.' &middot; <acronym title="'.T_('Greenwich Mean Time ').'">'
+				.' &middot; <acronym title="'.T_('Greenwich Mean Time').'">'
 				./* TRANS: short for Greenwich Mean Time */ T_('GMT:').'</acronym> <strong>'.gmdate( locale_timefmt(), $servertimenow).'</strong>'
 				.' &middot; '.T_('Logged in as:').' <strong><a href="b2users.php?user_ID='.$current_User->ID.'">'.$current_User->dget('login').'</a></strong>'
 				."\n";
@@ -1102,6 +1102,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.39  2005/11/17 17:39:55  blueyed
+ * Removed trailing whitespace in T_() for acronym title
+ *
  * Revision 1.38  2005/11/03 18:23:43  fplanque
  * minor
  *
