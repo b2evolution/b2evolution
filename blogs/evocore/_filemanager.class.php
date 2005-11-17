@@ -105,7 +105,7 @@ class FileManager extends Filelist
 	 * @param boolean
 	 * @access protected
 	 */
-	var $_disp_permslikelsl = true;
+	var $_disp_permslikelsl = false;
 
 	/**
 	 * Obtain & Display size (width, height) for images?
@@ -1354,6 +1354,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.55  2005/11/17 18:32:50  blueyed
+ * Fix default for _permslikelsl (the user would have to enable it explicitlly)
+ *
  * Revision 1.54  2005/10/31 05:51:06  blueyed
  * Use rawurlencode() instead of urlencode()
  *
