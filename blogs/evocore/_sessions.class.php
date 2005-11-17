@@ -42,6 +42,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @todo Move to a "who's online" plugin, maybe...
+ */ 
 class Sessions extends Widget
 {
 	/**

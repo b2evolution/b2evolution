@@ -313,7 +313,7 @@ class Session
 
 		if( !empty($this->user_ID) )
 		{
-			return & $UserCache->get_by_ID( $this->user_ID );
+			return $UserCache->get_by_ID( $this->user_ID );
 		}
 
 		$r = false;

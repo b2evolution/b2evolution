@@ -26,8 +26,8 @@ $location = preg_replace( '~(?<=\?|&amp;|&) (login|pwd) = [^&]+ (&(amp;)?|\?)?~x
 
 if( $Session->has_User() )
 { // The user is already logged in...
-	$already_User = & $Session->get_User();
-	$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $already_User->get('login') )
+	$tmp_User = & $Session->get_User();
+	$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
 		.' <a href="'.$location.'">'.T_('Continue...').'</a>', 'note' );
 }
 
