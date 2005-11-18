@@ -701,6 +701,113 @@ class Form extends Widget
 
 
 	/**
+	 * Builds a time select input field
+	 *
+	 * @param string field name
+	 * @param string initial value (ISO datetime)
+	 * @param string precison xmn or xsec (x:integer) for the options minutes or secondes
+	 * @param string field label to be display before the field
+	 * @param string note to be displayed after the field
+	 * @param string CSS class for select
+	 * @param string Javascript to add for onchange event (trailing ";").
+
+	 *
+	 */
+	function time_select( $field_name, $field_value = NULL, $precision = '5mn', $field_label, $field_note = NULL, $field_class = NULL, $field_onchange = NULL )
+	{
+			preg_match( '#([0-9]+)(mn|s)#', $precision, $matches );
+			
+			if( !isset( $matches[1] ) && !isset( $matches[2] ) )
+			{//precison has a bad format 
+			return;
+			}
+			
+			$field_params = array(
+			'note' => $field_note,
+			'class' => $field_class,
+			'onchange' => $field_onchange );
+			
+			$this->handle_common_params( $field_params, $field_name, $field_label );
+			
+			$r = $this->begin_field();
+			
+			/**********   select options for the hours *************/
+						
+			$field_params['name'] = $field_name . '_h';
+			$field_params['id'] = $field_params['name'];	
+			// Get Hour part of datetime:
+			$hour = substr( $field_value, 11, 2 );
+			
+			$r .= $this->_number_select(  $hour, 23 , 1, $field_params);
+
+			/***  instantiate the precison for the minutes and secondes select options  ****/
+			
+			if( $matches[2] == 'mn' )
+			{
+				$precision_mn = $matches[1];
+				$precision_s = 0;
+			}
+			else
+			{
+				$precision_mn = 1;
+				$precision_s = $matches[1];
+			}
+				
+			/*********  select options for the minutes *************/
+			
+			$field_params['name'] = $field_name . '_mn';
+			$field_params['id'] = $field_params['name'];	
+			// Get Minute part of datetime:
+			$minute = substr( $field_value, 14, 2 );	
+			
+			$r .= ':'.$this->_number_select(  $minute, 59, $precision_mn, $field_params);
+			
+			if( $precision_s )
+			{/*********  select options for the minutes  ***********/
+	
+				$field_params['name'] = $field_name . '_s';
+				$field_params['id'] = $field_params['name'];
+				// Get Secondes part of datetime:
+				$seconde = substr( $field_value, 17, 2 );
+				
+				$r .=':'.$this->_number_select(  $seconde, 59, $precision_s, $field_params);
+			}
+			
+			$r .= $this->end_field();
+						
+			return $this->display_or_return( $r );	
+	}
+
+
+	/**
+	 * Buil a select input field number
+	 * @access private
+	 *
+	 * @param string 	field value of selected
+	 * @param integer maximum value for the input select
+	 * @param integer increment for the loop (precision)
+	 * @param array params
+	 */
+	function _number_select( $field_value, $max, $precision = 1, $field_params )
+	{
+			$r	=	'<select'
+						. $this->get_field_params_as_string($field_params);
+	
+			for( $i=0; $i <= $max ; $i += $precision)
+			{
+				$val=sprintf('%02d', $i );	
+				$r .= '<option value="'.$val.'"'.
+								($field_value == $val ? ' selected="selected"' : '') .
+								'>'	.$val.'</option>';
+			} 
+			
+			$r .= '</select>';
+		
+			return $r;
+	}
+
+	
+	/**
 	 * Builds a duration input field.
 	 *
 	 * @todo @Francois: please check API and change as appropriate.
@@ -1797,9 +1904,9 @@ class Form extends Widget
 				.'</label>'
 				.$radio_suffix; // might be HTML!
 
-			if( !empty( $loop_field_option['note'] ) )
+			if( !empty( $loop_field_option['params']['note'] ) )
 			{ // notes for radio option
-				$r .= '<span class="notes">'.$loop_field_option['note'].'</span>';
+				$r .= '<span class="notes">'.$loop_field_option['params']['note'].'</span>';
 			}
 			if( !empty( $loop_field_option['suffix'] ) )
 			{ // optional text for radio option (like additional fieldsets or input boxes)
@@ -1808,7 +1915,9 @@ class Form extends Widget
 
 			if( $field_lines ) $r .= "</div>\n";
 		}
-
+		// do not display note after all radio options
+		$this->_common_params['note'] = NULL;
+		
 		$r .= $this->end_field();
 
 		return $this->display_or_return( $r );
@@ -2157,6 +2266,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.88  2005/11/18 20:59:37  fplanque
+ * time select field bt mb / Progidistri
+ *
  * Revision 1.87  2005/11/18 18:37:42  fplanque
  * merged in error display fix on checklist by Marc/Progidistri.
  *
