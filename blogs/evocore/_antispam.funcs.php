@@ -174,11 +174,11 @@ function antispam_report_abuse( $abuse_string )
 									)
 								);
 		$result = $client->send($message);
-		if( $ret = xmlrpc_displayresult( $result ) )
+		if( $ret = xmlrpc_logresult( $result, $Messages ) )
 		{ // Remote operation successful:
 			antispam_update_source( $abuse_string, 'reported' );
 
-			$Messages->add( T_('Reported abuse to b2evolution.net.'), 'note' );
+			$Messages->add( T_('Reported abuse to b2evolution.net.'), 'success' );
 		}
 		else
 		{
@@ -189,7 +189,7 @@ function antispam_report_abuse( $abuse_string )
 	}
 	else
 	{
-		$Messages->add( T_('Reporting abuse to b2evolution aborted (Running on localhost).'), 'note' );
+		$Messages->add( T_('Reporting abuse to b2evolution aborted (Running on localhost).'), 'error' );
 		return(false);
 	}
 }
@@ -230,7 +230,7 @@ function antispam_poll_abuse( $display = true )
 							);
 	$result = $client->send($message);
 
-	if( $ret = xmlrpc_displayresult( $result, '', $Messages ) )
+	if( $ret = xmlrpc_logresult( $result, $Messages ) )
 	{ // Response is not an error, let's process it:
 		$response = $result->value();
 		if( $response->kindOf() == 'struct' )
@@ -287,6 +287,11 @@ function antispam_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.18  2005/11/18 18:32:42  fplanque
+ * Fixed xmlrpc logging insanity
+ * (object should have been passed by reference but you can't pass NULL by ref)
+ * And the code was geeky/unreadable anyway.
+ *
  * Revision 1.17  2005/11/16 22:33:46  blueyed
  * removed rudimentary dnsrbl feature
  *

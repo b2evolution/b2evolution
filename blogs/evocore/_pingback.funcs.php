@@ -264,7 +264,7 @@ function pingback(
 				$result = $client->send($message);
 
 				// Display response
-				$ret = xmlrpc_displayresult( $result, $log );
+				$ret = xmlrpc_displayresult( $result, true, $log );
 				@fclose($fp);
 			}
 			if( $display )	echo "</p>\n";
@@ -364,6 +364,11 @@ function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 
 /*
  * $Log$
+ * Revision 1.7  2005/11/18 18:32:42  fplanque
+ * Fixed xmlrpc logging insanity
+ * (object should have been passed by reference but you can't pass NULL by ref)
+ * And the code was geeky/unreadable anyway.
+ *
  * Revision 1.6  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

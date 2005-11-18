@@ -80,7 +80,7 @@ function pingb2evonet( & $blogparams, $post_ID, $post_title, $display = true )
 															new xmlrpcval(format_to_output( $post_title, 'xml' ))
 														)  );
 		$result = $client->send($message);
-		$ret = xmlrpc_displayresult( $result, '', $display );
+		$ret = xmlrpc_displayresult( $result, $display );
 		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
 		return($ret);
 	}
@@ -116,7 +116,7 @@ function pingWeblogs( & $blogparams, $display = true )
 															new xmlrpcval(get_bloginfo('name', $blogparams)) ,
 															new xmlrpcval(get_bloginfo('blogurl', $blogparams)) )  );
 		$result = $client->send($message);
-		$ret = xmlrpc_displayresult( $result, '', $display );
+		$ret = xmlrpc_displayresult( $result, $display );
 		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
 		return($ret);
 	}
@@ -193,7 +193,7 @@ function pingBlogs( & $blogparams, $display = true )
 											));
 		}
 		$result = $client->send($message);
-		$ret = xmlrpc_displayresult( $result, '', $display );
+		$ret = xmlrpc_displayresult( $result, $display );
 		if( $display ) echo "<p>", T_('Done.'), "</p>\n</div>\n";
 		return($ret);
 	}
@@ -234,7 +234,7 @@ function pingTechnorati(& $blogparams, $display = true )
 										array(new xmlrpcval(get_bloginfo('name', $blogparams)),
 													new xmlrpcval(get_bloginfo('blogurl', $blogparams)) ));
 		$result = $client->send($message);
-		$ret = xmlrpc_displayresult( $result, '', $display );
+		$ret = xmlrpc_displayresult( $result, $display );
 		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
 		return(true);
 	}
@@ -247,6 +247,11 @@ function pingTechnorati(& $blogparams, $display = true )
 
 /*
  * $Log$
+ * Revision 1.7  2005/11/18 18:32:42  fplanque
+ * Fixed xmlrpc logging insanity
+ * (object should have been passed by reference but you can't pass NULL by ref)
+ * And the code was geeky/unreadable anyway.
+ *
  * Revision 1.6  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

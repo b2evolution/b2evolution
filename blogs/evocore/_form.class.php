@@ -994,38 +994,32 @@ class Form extends Widget
 	function checklist( $options, $field_name, $field_label )
 	{
 		global $Request;
-
+	
+		$field_params = array();
+		$field_params['type'] = 'checkbox';
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+	
 		$r = $this->begin_field( $field_name, $field_label );
+		
 		foreach( $options as $option )
 		{ //loop to construct the list of 'input' tags
 
 			$loop_field_name = $option[0];
-			if( substr( $loop_field_name, -2 ) == '[]' )
-			{
-				$error_name = substr( $loop_field_name, 0, strlen($loop_field_name)-2 );
-			}
-			else
-			{
-				$error_name = $loop_field_name;
-			}
+
 			$loop_field_note = isset($option[5]) ? $option[5] : '';
 
-			if( isset($Request) && isset($Request->err_messages[$error_name]) )
-			{ // There is an error message for this field:
-				$after_field = '</span>';
-				$loop_field_note .= ' <span class="field_error">'.$Request->err_messages[$error_name].'</span>';
+			if( isset($Request->err_messages[$field_name]) )
+			{ // There is an error message for this field, we want to mark the checkboxes with a red border:
 				$r .= '<span class="checkbox_error">';
-			}
-			elseif( isset($option['required']) && $option['required'] )
-			{ // visually indicate that the field is required:
 				$after_field = '</span>';
-				$r .= '<span class="checkbox_required">';
 			}
 			else
 			{
 				$after_field = '';
 			}
 
+			$r .= '<label class="">';
+			
 			$r .= "\t".'<input type="checkbox" name="'.$loop_field_name.'" value="'.$option[1].'" ';
 			if( $option[3] )
 			{ //the checkbox has to be checked by default
@@ -1040,6 +1034,9 @@ class Form extends Widget
 			$r .= $after_field;
 
 			$r .= $option[2];
+
+			$r .='</label>';
+			
 			if( !empty($loop_field_note) )
 			{ // We want to display a note:
 				$r .= ' <span class="notes">'.$loop_field_note.'</span>';
@@ -2160,8 +2157,10 @@ class Form extends Widget
 
 /*
  * $Log$
- * Revision 1.85  2005/11/16 21:48:42  fplanque
- * I never intended to deprecate those functions.
+ * Revision 1.86  2005/11/18 18:32:42  fplanque
+ * Fixed xmlrpc logging insanity
+ * (object should have been passed by reference but you can't pass NULL by ref)
+ * And the code was geeky/unreadable anyway.
  *
  * Revision 1.84  2005/11/09 02:34:23  blueyed
  * Added hiddens_by_key() which allows to easily pass $_POST to hidden fields.

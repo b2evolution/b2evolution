@@ -628,41 +628,23 @@ function xmlrpc_removepostdata($content)
 
 
 /**
+ * Echo the XML-RPC call Result and optionally log into file
  *
  * @param object XMLRPC response object
+ * @param boolean true to echo
  * @param mixed File resource or == '' for no file logging.
- * @param boolean|Log false/true to display or not or a Log object to add messages to
  */
-function xmlrpc_displayresult( $result, $log = '', $display = true )
+function xmlrpc_displayresult( $result, $display = true, $log = '' )
 {
 	if( ! $result )
-	{
-		if( $display )
-		{
-			if( is_a( $display, 'log' ) )
-			{
-				$display->add( T_('No response!'), 'error' );
-			}
-			else
-			{
-				echo T_('No response!'),"<br />\n";
-			}
-		}
+	{ // We got no response:
+		if( $display ) echo T_('No response!')."<br />\n";
 		return false;
 	}
-	elseif( $result->faultCode() )
+
+	if( $result->faultCode() )
 	{ // We got a remote error:
-		if( $display )
-		{
-			if( is_a( $display, 'log' ) )
-			{
-				$display->add( T_('Remote error').': '.$result->faultString().' ('.$result->faultCode().')', 'error' );
-			}
-			else
-			{
-				echo T_('Remote error'), ': ', $result->faultString(), ' (', $result->faultCode(), ")<br />\n";
-			}
-		}
+		if( $display ) echo T_('Remote error'), ': ', $result->faultString(), ' (', $result->faultCode(), ")<br />\n";
 		debug_fwrite($log, $result->faultCode().' -- '.$result->faultString());
 		return false;
 	}
@@ -670,39 +652,70 @@ function xmlrpc_displayresult( $result, $log = '', $display = true )
 	// We'll display the response:
 	$val = $result->value();
 	$value = xmlrpc_decode_recurse($result->value());
-	if( $display || $log )
+
+	if( is_array($value) )
 	{
 		$out = '';
-
-		if( is_array($value) )
+		foreach($value as $l_value)
 		{
-			foreach($value as $l_value)
-			{
-				$out .= ' ['.$l_value.'] ';
-			}
-		}
-		else
-		{
-			$out = $value;
-		}
-		debug_fwrite($log, $out);
-
-		if( $display )
-		{
-			$out = T_('Response').': '.$out;
-
-			if( is_a( $display, 'log' ) )
-			{
-				$display->add( $out, 'success' );
-			}
-			else
-			{
-				echo $out."<br />\n";
-			}
+			$out .= ' ['.$l_value.'] ';
 		}
 	}
+	else
+	{
+		$out = $value;
+	}
+
+	debug_fwrite($log, $out);
+
+	if( $display ) echo T_('Response').': '.$out."<br />\n";
+
 	return true;
 }
+
+
+/**
+ * Log the XML-RPC call Result into LOG object
+ *
+ * @param object XMLRPC response object
+ * @param Log object to add messages to
+ */
+function xmlrpc_logresult( $result, & $message_Log )
+{
+	if( ! $result )
+	{ // We got no response:
+		$message_Log->add( T_('No response!'), 'error' );
+		return false;
+	}
+
+	if( $result->faultCode() )
+	{ // We got a remote error:
+		$display->add( T_('Remote error').': '.$result->faultString().' ('.$result->faultCode().')', 'error' );
+		return false;
+	}
+
+	// We got a response:
+	$val = $result->value();
+	$value = xmlrpc_decode_recurse($result->value());
+
+	if( is_array($value) )
+	{
+		$out = '';
+		foreach($value as $l_value)
+		{
+			$out .= ' ['.$l_value.'] ';
+		}
+	}
+	else
+	{
+		$out = $value;
+	}
+
+	$message_Log->add( T_('Response').': '.$out, 'success' );
+
+	return true;
+}
+
 
 
 function debug_fopen($filename, $mode) {
@@ -2277,6 +2290,11 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.144  2005/11/18 18:32:42  fplanque
+ * Fixed xmlrpc logging insanity
+ * (object should have been passed by reference but you can't pass NULL by ref)
+ * And the code was geeky/unreadable anyway.
+ *
  * Revision 1.143  2005/11/17 19:35:26  fplanque
  * no message
  *
