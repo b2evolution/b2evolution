@@ -476,90 +476,11 @@ function validate_file_extension( $filename, & $extension )
 }
 
 
-/**
- * @param string Root type: 'user', 'group', 'collection' or 'absolute'
- * @param integer ID of the user, the group or the collection the file belongs to...
- * @return
- */
-function get_root_dir( $root_type, $root_ID )
-{
-	global $UserCache, $BlogCache;
-
-	switch( $root_type )
-	{
-		case 'user':
-			$User = & $UserCache->get_by_ID( $root_ID );
-			return $User->getMediaDir();
-
-		case 'collection':
-			$Blog = & $BlogCache->get_by_ID( $root_ID );
-			return $Blog->get( 'mediadir' );
-
-		case 'absolute':
-			return '';
-	}
-
-	die( "Root dir for type=$root_type not supported" );
-}
-
-/**
- * @param string Root type: 'user', 'group', 'collection' or 'absolute'
- * @param integer ID of the user, the group or the collection the file belongs to...
- * @return
- */
-function get_root_url( $root_type, $root_ID )
-{
-	global $UserCache, $BlogCache;
-
-	switch( $root_type )
-	{
-		case 'user':
-			$User = & $UserCache->get_by_ID( $root_ID );
-			return $User->getMediaUrl();
-
-		case 'collection':
-			$Blog = & $BlogCache->get_by_ID( $root_ID );
-			return $Blog->get( 'mediaurl' );
-
-		case 'absolute':
-			return '';
-	}
-
-	die( "Root url for type=$root_type not supported" );
-}
-
-
-/**
- * @param string Root type: 'user', 'group', 'collection' or 'absolute'
- * @param integer ID of the user, the group or the collection the file belongs to...
- * @return
- */
-function get_root_name( $root_type, $root_ID )
-{
-	global $UserCache, $BlogCache;
-
-	switch( $root_type )
-	{
-		case 'user':
-			$User = & $UserCache->get_by_ID( $root_ID );
-			// return sprintf( 'User %s', $User->get( 'preferredname' ) );
-			return $User->get( 'preferredname' );
-
-		case 'collection':
-			$Blog = & $BlogCache->get_by_ID( $root_ID );
-			// return sprintf( 'Blog %s', $Blog->get( 'shortname' ) );
-			return $Blog->get( 'shortname' );
-
-		case 'absolute':
-			return 'Absolute';
-	}
-
-	die( "Root name for type=$root_type not supported" );
-}
-
-
 /*
  * $Log$
+ * Revision 1.30  2005/11/18 07:53:05  blueyed
+ * use $_FileRoot / $FileRootCache for absolute path, url and name of roots.
+ *
  * Revision 1.29  2005/11/09 02:53:13  blueyed
  * made bytesreadable() more readable
  *

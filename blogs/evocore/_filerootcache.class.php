@@ -53,12 +53,12 @@ class FileRootCache
 	var $cache = array();
 
 
-  /**
-	 * Constructor
+	/**
+	 * Get a FileRoot (cached).
 	 *
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
-	 * @return
+	 * @return FileRoot
 	 */
 	function & get_by_type_and_ID( $root_type, $root_in_type_ID )
 	{
@@ -71,11 +71,26 @@ class FileRootCache
 
 		return $this->cache[$root_ID];
 	}
+
+
+	/**
+	 * Get the absolute path (FileRoot::ads_path) to a given root (with ending slash).
+	 *
+	 * @return string
+	 */
+	function get_root_dir( $root_type, $root_in_type_ID )
+	{
+		$tmp_FileRoot = & $this->get_by_type_and_ID( $root_type, $root_in_type_ID );
+		return $tmp_FileRoot->ads_path;
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.3  2005/11/18 07:53:05  blueyed
+ * use $_FileRoot / $FileRootCache for absolute path, url and name of roots.
+ *
  * Revision 1.2  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

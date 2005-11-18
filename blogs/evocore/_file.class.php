@@ -197,6 +197,7 @@ class File extends DataObject
 	 */
 	var $_icon_key;
 
+
 	/**
 	 * Constructor, not meant to be called directly. Use {@link FileCache::get_by_path()}
 	 * instead, which provides caching and checks that only one object for
@@ -204,7 +205,7 @@ class File extends DataObject
 	 *
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
-	 * @param string Posix ubpath for this file/folder, relative the associated root (no trailing slash)
+	 * @param string Posix subpath for this file/folder, relative to the associated root (no trailing slash)
 	 * @param boolean check for meta data?
 	 * @return mixed false on failure, File object on success
 	 */
@@ -226,7 +227,7 @@ class File extends DataObject
 		$this->_root_ID = $root_ID;
 		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
 		$this->_rdfp_rel_path = no_trailing_slash(str_replace( '\\', '/', $rdfp_rel_path ));
-		$this->_adfp_full_path = get_root_dir( $root_type, $root_ID ).$this->_rdfp_rel_path;
+		$this->_adfp_full_path = $this->_FileRoot->ads_path.$this->_rdfp_rel_path;
 		$this->_name = basename( $this->_adfp_full_path );
 		$this->_dir = dirname( $this->_adfp_full_path ).'/';
 		$this->_md5ID = md5( $this->_adfp_full_path );
@@ -503,12 +504,12 @@ class File extends DataObject
 		return $this->_adfp_full_path.( $this->_is_dir ? '/' : '' );
 	}
 
-  /**
+	/**
 	 * Get the absolute file url
 	 */
 	function get_url()
 	{
-		if( ! $root_url = get_root_url( $this->_root_type, $this->_root_ID ) )
+		if( ! $root_url = $this->_FileRoot->ads_url )
 		{ // could not get a root url
 			return false;
 		}
@@ -522,7 +523,7 @@ class File extends DataObject
 	 */
 	function get_root_and_rel_path()
 	{
-		return get_root_name( $this->_root_type, $this->_root_ID ).':'.$this->get_rdfs_rel_path();
+		return $this->_FileRoot->name.':'.$this->get_rdfs_rel_path();
 	}
 
 
@@ -879,7 +880,7 @@ class File extends DataObject
 			$this->dbupdate();
 		}
 		else
-		{	// There migth be some old neta dat to recyle in the DB...
+		{	// There migth be some old meta data to recyle in the DB...
 			$this->load_meta();
 		}
 
@@ -899,10 +900,11 @@ class File extends DataObject
 	 */
 	function move_to( $root_type, $root_ID, $rdfp_rel_path )
 	{
+		global $FileRootCache;
 		// echo "relpath= $rel_path ";
 
 		$rdfp_rel_path = str_replace( '\\', '/', $rdfp_rel_path );
-		$adfp_posix_path = get_root_dir( $root_type, $root_ID ).$rdfp_rel_path;
+		$adfp_posix_path = $FileRootCache->get_root_dir( $root_type, $root_ID ).$rdfp_rel_path;
 
 		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )
 		{
@@ -965,15 +967,15 @@ class File extends DataObject
 		// Meta data...:
 		if( $this->load_meta() )
 		{	// We have source meta data, we need to copy it:
-			// Try to load DB meta info dor destination file:
+			// Try to load DB meta info for destination file:
 			$dest_File->load_meta();
 
 			// Copy meta data:
 			$dest_File->set( 'title', $this->title );
-	    $dest_File->set( 'alt'  , $this->alt );
-	    $dest_File->set( 'desc' , $this->desc );
+			$dest_File->set( 'alt'  , $this->alt );
+			$dest_File->set( 'desc' , $this->desc );
 
-	    // Save meta data:
+			// Save meta data:
 			$dest_File->dbsave();
 		}
 
@@ -1058,9 +1060,10 @@ class File extends DataObject
 		global $Debuglog;
 
 		if( $this->meta == 'unknown' )
-			die( 'cannot insert File if meta data has not been checked before' );
+			{ debug_die( 'cannot insert File if meta data has not been checked before' ); }
 
-		if( ($this->ID != 0) || ($this->meta != 'notfound') ) die( 'Existing file object cannot be inserted!' );
+		if( ($this->ID != 0) || ($this->meta != 'notfound') )
+			{ debug_die( 'Existing file object cannot be inserted!' ); }
 
 		$Debuglog->add( 'Inserting meta data for new file into db', 'files' );
 
@@ -1085,7 +1088,7 @@ class File extends DataObject
 	function dbupdate( )
 	{
 		if( $this->meta == 'unknown' )
-			die( 'cannot update File if meta data has not been checked before' );
+			{ debug_die( 'cannot update File if meta data has not been checked before' ); }
 
 		// Let parent do the update:
 		parent::dbupdate();
@@ -1175,6 +1178,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2005/11/18 07:53:05  blueyed
+ * use $_FileRoot / $FileRootCache for absolute path, url and name of roots.
+ *
  * Revision 1.42  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

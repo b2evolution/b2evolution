@@ -52,11 +52,12 @@ require_once dirname(__FILE__).'/_file.class.php';
 /**
  * Holds a list of File objects.
  *
- * Can hold an arbitraty list of Files.
+ * Can hold an arbitrary list of Files.
  * Can list files in a directory by itself.
  * Can walk recursively down a directory tree to list in "flat mode".
  * Can sort file list.
  * Can iterate through list.
+ * Cannot hold files with different root type/ID.
  *
  * @see File
  * @package evocore
@@ -263,6 +264,8 @@ class Filelist
 	 */
 	function Filelist( $path, $root_type = NULL, $root_ID = NULL )
 	{
+		global $FileRootCache;
+
 		if( !is_null($path) )
 		{
 			$this->_ads_list_path = $path;
@@ -272,7 +275,7 @@ class Filelist
 		{	// We want to set a root different from default:
 			$this->_root_type = $root_type;
 			$this->_root_ID = $root_ID;
-			$this->_ads_root_path = get_root_dir( $root_type, $root_ID );
+			$this->_ads_root_path = $FileRootCache->get_root_dir( $root_type, $root_ID );
 		}
 
 		if( !empty($this->_ads_list_path) )
@@ -293,7 +296,7 @@ class Filelist
 		global $Messages;
 
 		if( !$this->_ads_list_path )
-		{	// We have no path to load from: (happens when FM finds no available root)
+		{	// We have no path to load from: (happens when FM finds no available root OR we have an arbitrary)
 			// echo 'Cannot load a filelist with no list path' ;
 			return false;
 		}
@@ -373,7 +376,7 @@ class Filelist
 		// Integrity check:
 		if( $File->_root_type != $this->_root_type || $File->_root_ID != $this->_root_ID )
 		{
-			die( 'Adding file '.$File->_root_type.':'.$File->_root_ID.':'.$File->get_rdfs_rel_path().' to filelist '.$this->_root_type.':'.$this->_root_ID.' : root mismatch!' );
+			debug_die( 'Adding file '.$File->_root_type.':'.$File->_root_ID.':'.$File->get_rdfs_rel_path().' to filelist '.$this->_root_type.':'.$this->_root_ID.' : root mismatch!' );
 		}
 
 		if( $mustExist && !$File->exists() )
@@ -444,7 +447,6 @@ class Filelist
 	 * @param boolean Has the file to exist to get added?
 	 * @return boolean true on success, false on failure (path not allowed,
 	 *                 file does not exist)
-	 * @todo optimize (blueyed)
 	 */
 	function add_by_subpath( $rel_path, $mustExist = false )
 	{
@@ -848,7 +850,7 @@ class Filelist
 		// Check that the file is inside root:
 		if( substr( $adfs_path, 0, strlen($this->_ads_root_path) ) != $this->_ads_root_path )
 		{
-			die( 'rdfs_relto_root_from_adfs: Path is NOT inside of root!' );
+			debug_die( 'rdfs_relto_root_from_adfs: Path is NOT inside of root!' );
 		}
 
 		// Return only the relative part:
@@ -986,6 +988,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.36  2005/11/18 07:53:05  blueyed
+ * use $_FileRoot / $FileRootCache for absolute path, url and name of roots.
+ *
  * Revision 1.35  2005/11/03 18:23:44  fplanque
  * minor
  *
