@@ -76,9 +76,9 @@ function skinbase()
  * @return boolean true is exists, false if not
  * @param skin name (directory name)
  */
-function skin_exists( $name )
+function skin_exists( $name, $filename = '_main.php' )
 {
-	return is_dir( get_path( 'skins' ).$name );
+	return is_readable( get_path( 'skins' ).$name.'/'.$filename );
 }
 
 
@@ -211,6 +211,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.7  2005/11/18 22:26:07  blueyed
+ * skin_exists(): check for readable filename (_main.php by default), instead of is_dir()
+ *
  * Revision 1.6  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
