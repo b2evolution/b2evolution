@@ -276,14 +276,14 @@ class User extends DataObject
 		$userdir = $basepath.$media_subdir.'users/'.$this->login.'/';
 		if( !is_dir( $userdir ) )
 		{
-			if( !mkdir( $userdir ) ) // defaults to 0777
+			if( !mkdir( $userdir ) )
 			{ // add error
 				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; could not be created."), $userdir ), 'error' );
 				return false;
 			}
 			else
 			{ // add note
-				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; has been created with permissions %s."), $userdir, '777' ), 'success' );
+				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; has been created with permissions %s."), $userdir, substr( sprintf('%o', fileperms($userdir)), -3 ) ), 'success' );
 			}
 		}
 		return $userdir;
@@ -928,6 +928,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2005/11/18 01:36:36  blueyed
+ * Display permissions of created media dirs right.
+ *
  * Revision 1.50  2005/11/07 02:05:49  blueyed
  * Added get_msgform_link() and made msgform_link() use it
  *

@@ -375,9 +375,7 @@ class Blog extends DataObject
 			}
 			else
 			{ // add note
-				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $mediadir,
-					'777' // FIXME: get perms of the File object - mkdir() does not default to 0777 really.
-					), 'success' );
+				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $mediadir, substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
 			}
 		}
 
@@ -792,6 +790,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2005/11/18 01:36:36  blueyed
+ * Display permissions of created media dirs right.
+ *
  * Revision 1.39  2005/11/06 10:43:19  marian
  * changes to make the multi-domain feature working
  *
