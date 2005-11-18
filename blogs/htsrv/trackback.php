@@ -89,8 +89,6 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 
 	$original_comment = $comment;
 
-	$user_ip = getIpList( true );
-	$user_domain = gethostbyaddr($user_ip);
 	$now = date('Y-m-d H:i:s', $localtimenow );
 
 	// CHECK and FORMAT content
@@ -109,7 +107,7 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 		$Messages->add( T_('Supplied comment is invalid'), 'error' );
 	}
 
-	if( $errstring = $Messages->getString( 'Cannot insert trackback, please correct these errors:', '' ) )
+	if( $errstring = $Messages->get_string( 'Cannot insert trackback, please correct these errors:', '' ) )
 	{
 		trackback_response(2, $errstring);	// TODO: check that error code 2 is ok
 		die();
@@ -126,7 +124,7 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 	$Comment->set_Item( $commented_Item );
 	$Comment->set( 'author', $blog_name );
 	$Comment->set( 'author_url', $url );
-	$Comment->set( 'author_IP', $user_ip );
+	$Comment->set( 'author_IP', $Hit->IP );
 	$Comment->set( 'date', $now );
 	$Comment->set( 'content', $comment );
 
@@ -145,8 +143,7 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 	$Comment->send_email_notifications();
 
 
-
- 	trackback_response( 0, 'ok' );
+	trackback_response( 0, 'ok' );
 
 
 }

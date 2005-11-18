@@ -83,7 +83,7 @@ class Log
 	/**
 	 * @var boolean Should {@link add()} automatically output the messages?
 	 */
-	var $dumpAdds = false;
+	var $dump_add = false;
 
 	/**
 	 * @var array Cache for {@link count()}
@@ -138,7 +138,7 @@ class Log
 	 *        Can also be an array of categories to add the same message to.
 	 * @param boolean Dump (output) this directly?
 	 */
-	function add( $message, $category = NULL, $dumpThis = false )
+	function add( $message, $category = NULL, $dump_this_add = false )
 	{
 		if( $category === NULL )
 		{ // By default, we use the default category:
@@ -163,7 +163,7 @@ class Log
 			$this->_count[$category]++;
 
 
-			if( $this->dumpAdds || $dumpThis )
+			if( $this->dump_add || $dump_this_add )
 			{
 				Log::display( '', '', $message, $category );
 			}
@@ -199,7 +199,7 @@ class Log
 	 * @param string the category (or container)
 	 * @param string template, where the head/foot gets used (%s)
 	 */
-	function getHeadFoot( $headfoot, $category, $template = NULL )
+	function get_head_foot( $headfoot, $category, $template = NULL )
 	{
 		if( is_string($headfoot) && $category == 'container' )
 		{ // container head or foot
@@ -256,7 +256,7 @@ class Log
 	 * @param string the category to use (defaults to 'all')
 	 * @return void
 	 */
-	function dumpAll( $category = 'all' )
+	function dump_all( $category = 'all' )
 	{
 		$this->display( '', '', true, $category );
 	}
@@ -269,7 +269,7 @@ class Log
 	 * @param mixed the outer div, see {@link display()}
 	 * @param mixed the css class for inner paragraphs
 	 */
-	function displayParagraphs( $category = NULL, $outerdivclass = 'panelinfo', $cssclass = NULL )
+	function display_paragraphs( $category = NULL, $outerdivclass = 'panelinfo', $cssclass = NULL )
 	{
 		if( is_null($cssclass) )
 		{
@@ -359,7 +359,7 @@ class Log
 			$disp .= "\n<div class=\"$outerdivclass\">";
 		}
 
-		$disp .= Log::getHeadFoot( $head, 'container', '<h2>%s</h2>' );
+		$disp .= Log::get_head_foot( $head, 'container', '<h2>%s</h2>' );
 
 
 		foreach( $messages as $lcategory => $lmessages )
@@ -381,7 +381,7 @@ class Log
 				$disp .= "\t<div class=\"{$lcssclass['divClass']}\">";
 			}
 
-			$disp .= Log::getHeadFoot( $head, $lcategory, '<h3>%s</h3>' );
+			$disp .= Log::get_head_foot( $head, $lcategory, '<h3>%s</h3>' );
 
 			if( $style == NULL )
 			{ // 'br' for a single message, 'ul' for more
@@ -403,14 +403,14 @@ class Log
 			{
 				$disp .= "\t".implode( "\n<br />\t", $lmessages );
 			}
-			$disp .= Log::getHeadFoot( $foot, $lcategory, "\n<p>%s</p>" );
+			$disp .= Log::get_head_foot( $foot, $lcategory, "\n<p>%s</p>" );
 			if( $lcssclass['divClass'] )
 			{
 				$disp .= "\t</div>\n";
 			}
 		}
 
-		$disp .= Log::getHeadFoot( $foot, 'container', "\n<p>%s</p>" );
+		$disp .= Log::get_head_foot( $foot, 'container', "\n<p>%s</p>" );
 
 		if( $outerdivclass )
 		{
@@ -481,7 +481,7 @@ class Log
 	 * @param string the category
 	 * @return string the messages, imploded. Tags stripped.
 	 */
-	function getString( $head = '', $foot = '', $category = NULL, $implodeBy = ', ' )
+	function get_string( $head = '', $foot = '', $category = NULL, $implodeBy = ', ' )
 	{
 		if( !$this->count( $category ) )
 		{
@@ -625,6 +625,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.20  2005/11/18 00:13:55  blueyed
+ * Normalized Log class
+ *
  * Revision 1.19  2005/11/07 18:34:38  blueyed
  * Added class Log_noop, a no-operation implementation of class Log, which gets used if $debug is false.
  *

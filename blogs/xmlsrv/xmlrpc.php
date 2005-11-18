@@ -6,7 +6,7 @@
  * - the B2 API for b2evo (this is used by w.bloggar for example...)
  * - the BLOGGER API for b2evo, see {@link http://www.blogger.com/developers/api/1_docs/}
  * - Metaweblog API
- * - Movable Type API (partial) 
+ * - Movable Type API (partial)
  * - the PINGBACK functions
  *
  * b2evolution - {@link http://b2evolution.net/}
@@ -163,7 +163,7 @@ function b2newpost($m)
 	$post_title = format_to_post($post_title, 0, 0);
 	$content = format_to_post($content, 0, 0);
 
-	if( $errstring = $Messages->getString( 'Cannot post, please correct these errors:', '' ) )
+	if( $errstring = $Messages->get_string( 'Cannot post, please correct these errors:', '' ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
 	}
@@ -416,7 +416,7 @@ function bloggernewpost( $m )
 	$post_title = format_to_post($post_title,0,0);
 	$content = format_to_post($content,0,0);
 
-	if( $errstring = $Messages->getString( 'Cannot post, please correct these errors:', '' ) )
+	if( $errstring = $Messages->get_string( 'Cannot post, please correct these errors:', '' ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
 	}
@@ -569,7 +569,7 @@ function bloggereditpost($m)
 	$post_title = format_to_post($post_title,0,0);
 	$content = format_to_post($content,0,0);
 
-	if( $errstring = $Messages->getString( 'Cannot update post, please correct these errors:', '' ) )
+	if( $errstring = $Messages->get_string( 'Cannot update post, please correct these errors:', '' ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
 	}
@@ -659,7 +659,7 @@ function bloggerdeletepost($m)
 
 	$post_ID = $m->getParam(1);
 	$post_ID = $post_ID->scalarval();
-	// logIO("O","finished getting post_id ...".$post_ID);	
+	// logIO("O","finished getting post_id ...".$post_ID);
 
 	$username = $m->getParam(2);
 	$username = $username->scalarval();
@@ -1400,7 +1400,7 @@ function pingback_ping( $m )
 					}
 					$context = format_to_post($context,1,1);
 
-					if( ! ($message = $Messages->getString( 'Cannot insert pingback, please correct these errors:', '' )) )
+					if( ! ($message = $Messages->get_string( 'Cannot insert pingback, please correct these errors:', '' )) )
 					{ // No validation error:
 						$original_pagelinkedfrom = $pagelinkedfrom;
 						$original_title = $title;
@@ -1473,7 +1473,7 @@ function pingback_ping( $m )
 //
 //	Tor Dec 2004
 //
-// image upload 
+// image upload
 //  image is supplied coded in the info struct as bits
 //
 // To do - do not overwrite existing pics with same name
@@ -1526,16 +1526,16 @@ function mwnewMediaObj($m) {
 		$allowedtypes = explode (' ', $fileupload_allowedtypes); // To work with _admin.php
 		$number_of_allowedtypes = count($allowedtypes);
 					logIO("O", 'Number of allowed types'.$number_of_allowedtypes ."\n");
-		foreach ( $allowedtypes as $type ) 
+		foreach ( $allowedtypes as $type )
 			if (eregi("\." .$type. "$",$filename)) $ok = 1;
-//			if ($fileending == $type)  $ok = 1;  
+//			if ($fileending == $type)  $ok = 1;
 		if (!$ok) {
 				return new xmlrpcresp(0, $xmlrpcerruser+1, // user error 1
 					 'Non legal objecttype for upload '.$fileending.' from '.$fileupload_allowedtypes);
 					}
 		// prefix filename with current date (YYYY-MM-DD-)
 		// this to avoid nameclashes
-//			$filename = strftime("%Y%m%d-", time()) . $filename;	
+//			$filename = strftime("%Y%m%d-", time()) . $filename;
 		// create file
 			logIO("O", 'Ready to create file ->'. "../" . $filename ."\n");
 		$fileupload_realpath = $fileupload_realpath . "/" . $blogid; // To comply with _admin.php
@@ -1546,8 +1546,8 @@ function mwnewMediaObj($m) {
 			$oldumask = umask(0000);
 			if (!@mkdir($fileupload_realpath, 0777))
 				return _ERROR_BADPERMISSIONS;
-			umask($oldumask);				
-		} 
+			umask($oldumask);
+		}
 		// Check for directory name prepended to filename - should we limit the number of levels of directories?
 		$parts = explode("/",$filename);
 				logIO("O", 'filename inc directories ->'. $filename ."\n");
@@ -1568,8 +1568,8 @@ function mwnewMediaObj($m) {
 							$oldumask = umask(0000);
 							if (!@mkdir($fileupload_temp_path, 0777))
 								return _ERROR_BADPERMISSIONS;
-							umask($oldumask);				
-				} 	
+							umask($oldumask);
+				}
 			}
 			$orig_filename = $filename;
 			$filename = $parts[count($parts)-1];
@@ -1577,9 +1577,9 @@ function mwnewMediaObj($m) {
 			$fileupload_realpath = $fileupload_temp_path;
 		}
 		logIO("O", 'Fileupload_realpath ->'. $fileupload_realpath ."\n");
-		$fh = @fopen($fileupload_realpath ."/". $filename, 'wb');		
-		logIO("O", 'Managed  to open file ->'. $filename ."\n");		
-		if (!$fh) 
+		$fh = @fopen($fileupload_realpath ."/". $filename, 'wb');
+		logIO("O", 'Managed  to open file ->'. $filename ."\n");
+		if (!$fh)
 			return _ERROR_UPLOADFAILED;
 		logIO("O", 'Managed  to open file ->'. $fileupload_realpath ."/". $filename."\n");
 		$ok = @fwrite($fh, $data);
@@ -1590,18 +1590,18 @@ function mwnewMediaObj($m) {
 		logIO("O", 'Ready to chmod file ->'. $filename ."\n");
 		// chmod uploaded file
 		$oldumask = umask(0000);
-		@chmod($fileupload_realpath . "/" . $filename, 0644); 
-		umask($oldumask);		
+		@chmod($fileupload_realpath . "/" . $filename, 0644);
+		umask($oldumask);
 		logIO("O", 'Full returned filename ->'. $fileupload_realpath . '/' . $filename ."\n");
-		logIO("O", 'Full returned url ->'. $baseurl . "/media". "/" . $blogid  . "/" . $orig_filename ."\n");		
+		logIO("O", 'Full returned url ->'. $baseurl . "/media". "/" . $blogid  . "/" . $orig_filename ."\n");
 		// - return URL as XML
 		$urlstruct = new xmlrpcval(array(
 			"url" => new xmlrpcval($baseurl . "/media". "/" . $blogid  . "/" . $orig_filename,'string')
-		),'struct');		
+		),'struct');
 		return new xmlrpcresp($urlstruct);
 	}
 
-	
+
 
 	// metaWeblog.newMediaObject
 	$mwnewmediaobj_sig = array(array(
@@ -1620,7 +1620,7 @@ function mwnewMediaObj($m) {
 $mwnewpost_doc='Adds a post, blogger-api like, +title +category +postdate';
 $mwnewpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcStruct,$xmlrpcBoolean));
 
-/** 
+/**
  * mw.newPost
  *
  * mw API
@@ -1650,7 +1650,7 @@ function mwnewpost($m)
 	xmlrpc_debugmsg( 'Getting xcontent'  );
 // getParam(4) should now be a flag for publish or draft
 	$xstatus	=	$m->getParam(4);
-	$xstatus	=	$xstatus->scalarval();	
+	$xstatus	=	$xstatus->scalarval();
 	$status = $xstatus ? 'published' : 'draft';
 	logIO('I',"Publish: $publish -> Status: $status");
 	logIO("O","finished getting xstatus ->". $xstatus);
@@ -1735,13 +1735,13 @@ function mwnewpost($m)
 	logIO("O","finished converting post_title ...",$post_title);
 	//$content = format_to_post($content, 0, 0);  // 25122004 tag - security !!!
 	logIO("O","finished converting content ...".$content); // error occurs before this line
-//	if( $errstring = $Messages->getString( 'Cannot post, please correct these errors:', '' ) )
+//	if( $errstring = $Messages->get_string( 'Cannot post, please correct these errors:', '' ) )
 //	{
 //		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
 //	}
 	logIO("O","finished checking if errors exists, ready to insert into DB ...");
 	// INSERT NEW POST INTO DB:
-	// Tor - comment this out to stop inserts into database 
+	// Tor - comment this out to stop inserts into database
 	$edited_Item = & new Item();
 	$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $now, $category, array( ), $status, $current_User->locale, '', 0, $publish );
 
@@ -1792,9 +1792,9 @@ function mt_setPostCategories($m) {
 
 	logIO("O","finished getting contentstruct ...");
 	$categories = '';
-	if ($iSize > 0) 
+	if ($iSize > 0)
 	{
-		for ($i=0;$i<$iSize;$i++) 
+		for ($i=0;$i<$iSize;$i++)
 		{
 			logIO("O","finished getting - i ...>".$i); // works!
 			$struct = $xcontent->arraymem($i); // get a struct object from array
@@ -1829,7 +1829,7 @@ function mt_setPostCategories($m) {
 			{
 				$now = date('Y-m-d H:i:s', (time() + ($Settings->get('time_difference') * 3600)));
 			}
-			logIO("O","finished checking dates ...".$now);		
+			logIO("O","finished checking dates ...".$now);
 		}
 	}
 	else
@@ -1847,14 +1847,14 @@ function mt_setPostCategories($m) {
 		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$post_ID)."); // user error 7
 	}
 	$edited_Item->update( $post_title, $content, '', $category, $categories, 'published', '#', '', 0, 'pingsdone', '', '', 'open' );
-	
+
 	return new xmlrpcresp(new xmlrpcval(1));
 	if( !empty($DB->last_error) )
 
 	{	// DB error
 
 		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
-		logIO("O","bpost_update - db error occured ...".$category); 
+		logIO("O","bpost_update - db error occured ...".$category);
 		}
 //Return value: on success, boolean true value; on failure, fault
 }
@@ -1897,7 +1897,7 @@ function mt_getPostCategories($m) {
 		for ($i=0;$i<$iSize;$i++)
 		{
 			logIO("O","mt_getPostCategories categories  ...".$categories[$i]);
-// In database cat_ID and cat_name from tablecategories	
+// In database cat_ID and cat_name from tablecategories
 			$sql = "SELECT * FROM $tablecategories WHERE  cat_ID = $categories[$i] ";
 			logIO("O","mt_getgategorylist  sql...".$sql);
 			$rows = $DB->get_results( $sql );
@@ -1922,7 +1922,7 @@ function mt_getPostCategories($m) {
 											"categoryName" => new xmlrpcval($Categoryname),
 											"isPrimary" => new xmlrpcval($isPrimary)
 											),"struct");
-		}				
+		}
 	}
 	return new xmlrpcresp(new xmlrpcval($struct, "array") );
 //		else
@@ -1970,7 +1970,7 @@ function xmlrpc_getcats($blogid)
 
 $mweditpost_doc='Edits a post, blogger-api like, +title +category +postdate';
 $mweditpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcStruct,$xmlrpcBoolean));
-/** 
+/**
  * mw.EditPost
  *
  * mw API
@@ -1992,7 +1992,7 @@ function mweditpost($m)
 	logIO("O","start of mweditpost...");
 	$blogid = $m->getParam(0);
 	$blogid = $blogid->scalarval();
-	logIO("O","finished getting logid ...".$blogid);	
+	logIO("O","finished getting logid ...".$blogid);
 	$username = $m->getParam(1);
 	$username = $username->scalarval();
 	logIO("O","finished getting username ...");
@@ -2054,7 +2054,7 @@ function mweditpost($m)
 			$content = format_to_post($content, 0, 0);  // 25122004 tag - security issue - need to sort !!!
 	}
 	logIO("O","finished converting content ...".$content);
-	if( $errstring = $Messages->getString( 'Cannot post, please correct these errors:', '' ) )
+	if( $errstring = $Messages->get_string( 'Cannot post, please correct these errors:', '' ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+6, $errstring ); // user error 6
 	}
@@ -2360,7 +2360,7 @@ function mt_getcategoryList($m) {
 										'categoryName' => new xmlrpcval( $row->cat_name ),
 														),"struct");
 	}
-	return new xmlrpcresp( new xmlrpcval($data, "array") );			
+	return new xmlrpcresp( new xmlrpcval($data, "array") );
 }
 
 
@@ -2514,6 +2514,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.83  2005/11/18 00:13:56  blueyed
+ * Normalized Log class
+ *
  * Revision 1.82  2005/10/31 21:45:05  fplanque
  * refact
  *
