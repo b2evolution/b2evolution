@@ -24,15 +24,23 @@ class FileTestCase extends FilemanUnitTestCase
 
 	function setUp()
 	{
+		global $Settings;
+
 		parent::setUp();
+
+
+		$this->_old_fm_enable_roots_user = $Settings->get('fm_enable_roots_user');
+		$Settings->set( 'fm_enable_roots_user', 1 );
 	}
 
 
 	function tearDown()
 	{
+		global $Settings;
 		parent::tearDown();
 
-		$this->unlinkTempfiles(); // unlink temp files
+		$Settings->set( 'fm_enable_roots_user', $this->_old_fm_enable_roots_user );
+		$this->unlinkCreatedFiles();
 	}
 
 
@@ -41,9 +49,9 @@ class FileTestCase extends FilemanUnitTestCase
 	 */
 	function testExist()
 	{
-		$filePath = $this->createTempFile( '1234' );
+		$filePath = $this->createUserFile( '1234' );
 
-		$File = new File( 'absolute', 0, basename( $filePath ), dirname( $filePath ) );
+		$File = new File( 'user', 1, basename( $filePath ) );
 
 		$this->assertTrue( $File->exists(), 'File exists' );
 
@@ -56,20 +64,25 @@ class FileTestCase extends FilemanUnitTestCase
 	 */
 	function testCreateAndDelete()
 	{
-		@unlink( TMPDIR.'tempfile.tmp' );
+		global $FileRootCache;
 
-		$File = new File( 'absolute', 0, 'tempfile.tmp', TMPDIR );
+		// create a temporary file and just delete it again:
+		$temp_path = $this->createUserFile();
+		@unlink( $temp_path );
+		$temp_name = basename($temp_path);
+
+		$File = new File( 'user', 1, $temp_name );
 		$this->assertFalse( $File->exists(), 'File does not exist.' );
 
 		$File->create();
 
-		$this->assertTrue( $File->exists(), 'File exists.' );
-		$this->assertTrue( file_exists( TMPDIR.'tempfile.tmp' ), 'File really exists.' );
+		$this->assertTrue( $File->exists(), 'File exists after create().' );
+		$this->assertTrue( file_exists( $temp_path ), 'File really exists.' );
 
 		$File->unlink();
 
-		$this->assertFalse( $File->exists(), 'File think it is unlinked.' );
-		$this->assertFalse( file_exists( TMPDIR.'tempfile.tmp' ), 'File is really unlinked.' );
+		$this->assertFalse( $File->exists(), 'File thinks it is unlinked.' );
+		$this->assertFalse( file_exists( $temp_path ), 'File is really unlinked.' );
 	}
 
 
@@ -78,11 +91,11 @@ class FileTestCase extends FilemanUnitTestCase
 	 */
 	function testIsDir()
 	{
-		$Dir = new File( 'absolute', 0, basename(TMPDIR), dirname(TMPDIR) );
+		$Dir = new File( 'user', 1, '' );
 		$this->assertTrue( $Dir->is_dir(), 'Dir is dir.' );
 
-		$this->tempName = tempnam( 'temp', 'TMP' );
-		$File = new File( 'absolute', 0, basename( $this->tempName ), TMPDIR );
+		$temp_path = $this->createUserFile();
+		$File = new File( 'user', 1, $temp_path );
 		$this->assertFalse( $File->is_dir(), 'File is no dir.' );
 	}
 
@@ -92,10 +105,10 @@ class FileTestCase extends FilemanUnitTestCase
 	 */
 	function testGetExt()
 	{
-		$File =& new File( 'absolute', 0, 'abc.def', TMPDIR );
+		$File =& new File( 'user', 1, 'abc.def' );
 		$this->assertEqual( $File->get_ext(), 'def', 'Simple file extension recognized.' );
 
-		$File =& new File( 'absolute', 0, 'abc.noext.def', TMPDIR );
+		$File =& new File( 'user', 1, 'abc.noext.def' );
 		$this->assertEqual( $File->get_ext(), 'def', 'File extension recognized.' );
 	}
 }

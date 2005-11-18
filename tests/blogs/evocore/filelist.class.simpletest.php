@@ -26,7 +26,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 	{
 		parent::setUp();
 
-		$this->Filelist = new Filelist( false );
+		$this->Filelist = new Filelist( false, 'user', 1 );
 	}
 
 
@@ -41,12 +41,12 @@ class FilelistTestCase extends FilemanUnitTestCase
 	 */
 	function testAddFileByPath()
 	{
-		$r = $this->Filelist->add_by_path( TMPDIR.'a' );
+		$r = $this->Filelist->add_by_subpath( 'a' );
 		$this->assertEqual( $r, true, 'File was added.' );
 
 		$this->assertEqual( $this->Filelist->count(), 1, 'Filecount matches.' );
 
-		$File = & $this->Filelist->get_by_root_and_path( 'absolute', 0, TMPDIR.'a' );
+		$File = & $this->Filelist->get_next();
 		$this->assertIsA( $File, 'file', 'We got a File.' );
 
 		$this->assertEqual( $File->get_name(), 'a', 'File has the same name.' );
@@ -58,7 +58,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 	 */
 	function testFileReference()
 	{
-		$File = new File( 'absolute', 0, 'a', TMPDIR );
+		$File = new File( 'user', 1, 'a' );
 		$id = $File->get_md5_ID();
 
 		$r = $this->Filelist->add( $File );
@@ -77,7 +77,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 	 */
 	function testRemoveFromList()
 	{
-		$File =& new File( 'absolute', 0, 'a', TMPDIR );
+		$File =& new File( 'user', 1, 'a' );
 		$r = $this->Filelist->add( $File );
 
 		$this->assertEqual( $r, true, 'File added.' );
@@ -92,8 +92,8 @@ class FilelistTestCase extends FilemanUnitTestCase
 	 */
 	function testRemoveFromListOrder()
 	{
-		$FileA = new File( 'absolute', 0, 'a', TMPDIR );
-		$FileB = new File( 'absolute', 0, 'b', TMPDIR );
+		$FileA = new File( 'user', 1, 'a' );
+		$FileB = new File( 'user', 1, 'b' );
 		$r = $this->Filelist->add( $FileA );
 		$r = $this->Filelist->add( $FileB );
 
@@ -114,11 +114,11 @@ class FilelistTestCase extends FilemanUnitTestCase
 	 */
 	function testSort()
 	{
-		$FileA = new File( 'absolute', 0, 'a', TMPDIR );
+		$FileA = new File( 'user', 1, 'a' );
 		$this->Filelist->add( $FileA );
-		$FileB = new File( 'absolute', 0, 'b', TMPDIR );
+		$FileB = new File( 'user', 1, 'b' );
 		$this->Filelist->add( $FileB );
-		$FileC = new File( 'absolute', 0, 'c', TMPDIR );
+		$FileC = new File( 'user', 1, 'c' );
 		$this->Filelist->add( $FileC );
 
 
