@@ -476,8 +476,32 @@ function validate_file_extension( $filename, & $extension )
 }
 
 
+/**
+ * Return the basename of a given path (that is to be expected a dirname only).
+ *
+ * If it results to '..', '' will be returned.
+ *
+ * @return string sanitized basename
+ */
+function basename_dironly( $dir )
+{
+	$basename = basename($dir);
+	if( $basename != $dir )
+	{
+		if( $basename == '..' )
+		{
+			return '';
+		}
+	}
+	return $basename;
+}
+
+
 /*
  * $Log$
+ * Revision 1.31  2005/11/18 22:30:53  blueyed
+ * basename_dironly() added to sanitize pathnames from params
+ *
  * Revision 1.30  2005/11/18 07:53:05  blueyed
  * use $_FileRoot / $FileRootCache for absolute path, url and name of roots.
  *
