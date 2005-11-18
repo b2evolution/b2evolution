@@ -457,7 +457,10 @@ class DB
 			echo '<div>'.$this->last_error.'</div>';
 			if( !empty($this->last_query) )
 			{
-				echo '<p class="error">Your query: '.$query_title.'<br /><pre>'.htmlspecialchars( str_replace("\t", '  ', $this->last_query) ).'</pre></p>';
+				echo '<p class="error">Your query: '.$query_title.'</p>';
+				echo '<pre>';
+				echo $this->format_query( $this->last_query );
+				echo '</pre>';
 			}
 
 			if( $this->debug_dump_function_trace_for_errors )
@@ -985,6 +988,21 @@ class DB
 	}
 
 
+	function format_query( $sql )
+	{
+		$sql = htmlspecialchars( str_replace("\t", '  ', $sql ) );
+		$sql = str_replace( 'FROM', '<br />FROM', $sql );
+		$sql = str_replace( 'WHERE', '<br />WHERE', $sql );
+		$sql = str_replace( 'GROUP BY', '<br />GROUP BY', $sql );
+		$sql = str_replace( 'ORDER BY', '<br />ORDER BY', $sql );
+		$sql = str_replace( 'LIMIT', '<br />LIMIT', $sql );
+		$sql = str_replace( 'AND ', '<br />&nbsp; AND ', $sql );
+		$sql = str_replace( 'OR ', '<br />&nbsp; OR ', $sql );
+		$sql = str_replace( 'VALUES', '<br />VALUES', $sql );
+		return $sql;
+	}
+
+
 	/**
 	 * Displays all queries that have been executed
 	 *
@@ -1011,15 +1029,7 @@ class DB
 			$count_queries++;
 			echo '<h4>Query #'.$count_queries.': '.$query['title'].'</h4>';
 			echo '<code>';
-			$sql = str_replace( 'FROM', '<br />FROM', htmlspecialchars($query['sql']) );
-			$sql = str_replace( 'WHERE', '<br />WHERE', $sql );
-			$sql = str_replace( 'GROUP BY', '<br />GROUP BY', $sql );
-			$sql = str_replace( 'ORDER BY', '<br />ORDER BY', $sql );
-			$sql = str_replace( 'LIMIT', '<br />LIMIT', $sql );
-			$sql = str_replace( 'AND ', '<br />&nbsp; AND ', $sql );
-			$sql = str_replace( 'OR ', '<br />&nbsp; OR ', $sql );
-			$sql = str_replace( 'VALUES', '<br />VALUES', $sql );
-			echo $sql;
+			echo $this->format_query( $query['sql'] );
 			echo '</code>';
 
 			// Color-Format duration: long => red, fast => green, normal => black
@@ -1164,6 +1174,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.44  2005/11/18 18:46:27  fplanque
+ * factorized query formatting
+ *
  * Revision 1.43  2005/11/16 19:34:19  fplanque
  * plug_ID should be unsigned
  *
