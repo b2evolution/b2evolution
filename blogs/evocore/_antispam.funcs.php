@@ -204,8 +204,6 @@ function antispam_poll_abuse( $display = true )
 {
 	global $Messages, $Settings, $baseurl, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
 
-	$Messages->add( T_('Requesting abuse list from b2evolution.net...'), 'note' );
-
 	// Construct XML-RPC client:
 	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
 	$client->debug = $debug;
@@ -228,6 +226,10 @@ function antispam_poll_abuse( $display = true )
 									new xmlrpcval(0,'int')                      // Reserved
 								)
 							);
+
+
+	$Messages->add( T_('Requesting abuse list from b2evolution.net...'), 'note' );
+
 	$result = $client->send($message);
 
 	if( $ret = xmlrpc_logresult( $result, $Messages ) )
@@ -250,7 +252,7 @@ function antispam_poll_abuse( $display = true )
 				}
 				else
 				{ // We got an array of strings:
-					$Messages->add( T_('Adding strings to local blacklist'), 'note' );
+					$Messages->add( T_('Adding strings to local blacklist:'), 'note' );
 					foreach($value as $banned_string)
 					{
 						if( antispam_create( $banned_string, 'central' ) )
@@ -287,6 +289,9 @@ function antispam_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.19  2005/11/18 22:05:41  fplanque
+ * no message
+ *
  * Revision 1.18  2005/11/18 18:32:42  fplanque
  * Fixed xmlrpc logging insanity
  * (object should have been passed by reference but you can't pass NULL by ref)

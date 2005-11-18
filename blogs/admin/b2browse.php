@@ -103,6 +103,7 @@ else
 															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
 															$preview, $unit, $timestamp_min, $timestamp_max, '', $dstart );
 
+	// DO we still use those old style globals? :
 	$posts_per_page = $MainList->posts_per_page;
 	$result_num_rows = $MainList->get_num_rows();
 

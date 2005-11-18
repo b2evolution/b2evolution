@@ -711,7 +711,7 @@ function xmlrpc_logresult( $result, & $message_Log )
 		$out = $value;
 	}
 
-	$message_Log->add( T_('Response').': '.$out, 'success' );
+	$message_Log->add( T_('Response').': '.$out, 'note' );
 
 	return true;
 }
@@ -2290,6 +2290,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.145  2005/11/18 22:05:41  fplanque
+ * no message
+ *
  * Revision 1.144  2005/11/18 18:32:42  fplanque
  * Fixed xmlrpc logging insanity
  * (object should have been passed by reference but you can't pass NULL by ref)

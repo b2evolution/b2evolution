@@ -291,8 +291,7 @@ if( ($disp == 'posts') || ($disp == 'single') )
 		$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
 		$preview, $unit, $timestamp_min, $timestamp_max, $title, $dstart );
 
-	// $posts_per_page = $MainList->posts_per_page;
-	// $result = & $MainList->result;
+	// DO we still use those old style globals? :
 	$result_num_rows = $MainList->get_num_rows();
 	$postIDlist = & $MainList->postIDlist;
 	$postIDarray = & $MainList->postIDarray;
@@ -418,6 +417,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.27  2005/11/18 22:05:41  fplanque
+ * no message
+ *
  * Revision 1.26  2005/11/16 21:53:49  fplanque
  * minor
  *

@@ -56,8 +56,6 @@ class CommentList extends DataObjectList
 	var $blog;
 
 	/**
-	 * {@internal CommentList::CommentList(-)}}
-	 *
 	 * Constructor
 	 */
 	function CommentList(
@@ -68,7 +66,7 @@ class CommentList extends DataObjectList
 		$author = '',													// Not used yet
 		$order = 'DESC',											// ASC or DESC
 		$orderby = '',												// list of fields to order by
-		$posts = '' 													// # of comments to display on the page
+		$limit = '' 													// # of comments to display on the page
 		)
 	{
 		global $DB;
@@ -76,12 +74,10 @@ class CommentList extends DataObjectList
 		global $pagenow;		// Bleh !
 
 		// Call parent constructor:
-		parent::DataObjectList( 'T_comments', 'comment_', 'comment_ID' );
+		parent::DataObjectList( 'T_comments', 'comment_', 'comment_ID', 'Item', NULL, $limit );
 
 		$this->blog = $blog;
 
-		if( !empty($posts) )
-			$this->posts_per_page = $posts;
 
 		$this->request = 'SELECT DISTINCT T_comments.*
 											FROM T_comments INNER JOIN T_posts ON comment_post_ID = post_ID ';
@@ -134,7 +130,10 @@ class CommentList extends DataObjectList
 
 
 		$this->request .= "ORDER BY $orderby";
-		if( $this->posts_per_page ) $this->request .= " LIMIT $this->posts_per_page";
+		if( !empty( $this->limit ) )
+		{
+			$this->request .= ' LIMIT '.$this->limit;
+		}
 
 		// echo $this->request;
 
@@ -181,6 +180,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.11  2005/11/18 22:05:41  fplanque
+ * no message
+ *
  * Revision 1.10  2005/10/03 18:10:07  fplanque
  * renamed post_ID field
  *
