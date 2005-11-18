@@ -70,11 +70,6 @@ class Sessions extends Widget
 	var $_initialized = false;
 
 
-	/*
-	 * No constructor yet.
-	 */
-
-
 	/**
 	 * Get an array of registered users and guests.
 	 *
@@ -93,17 +88,18 @@ class Sessions extends Widget
 
 		$timeout_YMD = date( 'Y-m-d H:i:s', ($localtimenow - $timeout_online_user) );
 
+		// We get all sessions that have been seen in $timeout_YMD and that have a session key.
+		// NOTE: we do not use DISTINCT here, because guest users are all "NULL".
 		foreach( $DB->get_results( '
 			SELECT sess_user_ID
 			  FROM T_sessions
 			 WHERE sess_lastseen > "'.$timeout_YMD.'"
-				 AND sess_key IS NOT NULL' ) as $row )
+			   AND sess_key IS NOT NULL' ) as $row )
 		{
 			if( !empty( $row->sess_user_ID )
 					&& ( $User = & $UserCache->get_by_ID( $row->sess_user_ID ) ) )
 			{
 				// assign by ID so that each user is only counted once (he could use multiple user agents at the same time)
-				// fplanque: what was wrong with DISTINCT?
 				$this->_registered_Users[ $User->get('ID') ] = & $User;
 
 				if( !$User->showonline )
@@ -143,7 +139,7 @@ class Sessions extends Widget
 
 
 	/**
-	 * Display the registered users who are online
+	 * Template function: Display the registered users who are online
 	 *
 	 * @param string To be displayed before all users
 	 * @param string To be displayed after all users
@@ -186,7 +182,7 @@ class Sessions extends Widget
 
 
 	/**
-	 * Display number of online guests.
+	 * Template function: Display number of online guests.
 	 *
 	 * @return string
 	 */
@@ -261,6 +257,9 @@ class Sessions extends Widget
 
 /*
  * $Log$
+ * Revision 1.19  2005/11/18 03:37:55  blueyed
+ * doc
+ *
  * Revision 1.18  2005/11/17 19:35:26  fplanque
  * no message
  *
