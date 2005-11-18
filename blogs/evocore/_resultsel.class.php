@@ -149,14 +149,6 @@ class ResultSel extends Results
 		$item_ID_array = array();
 
 
-		// EXPERIMENTAL:
-		if( !empty($this->top_callback) )
-		{
-			$func = $this->top_callback;
-			$func( $this->Form );
-		}
-		
-
 		// list/table start:
 		parent::display_list_start();
 	}
@@ -637,6 +629,9 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
 /*
  * $Log$
+ * Revision 1.6  2005/11/18 21:01:21  fplanque
+ * no message
+ *
  * Revision 1.5  2005/10/12 18:24:37  fplanque
  * bugfixes
  *

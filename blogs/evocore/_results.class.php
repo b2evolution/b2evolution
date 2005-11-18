@@ -437,6 +437,21 @@ class Results extends Widget
 	function display_list_start()
 	{
 		echo $this->params['list_start'];
+		
+		// EXPERIMENTAL:
+		if( !empty($this->top_callback) )
+		{
+			$this->Form = new Form( regenerate_url(), $this->param_prefix.'form_search', 'post', 'none' ); // COPY!!
+	
+			$this->Form->begin_form( '' );
+			
+			$func = $this->top_callback;
+			$func( $this->Form );
+			$this->Form->submit( array( 'submit', T_('Filter list'), 'search' ) );
+			
+			$this->Form->end_form( '' );
+		}
+		
 	}
 
 
@@ -1123,6 +1138,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.37  2005/11/18 21:01:21  fplanque
+ * no message
+ *
  * Revision 1.36  2005/11/17 16:46:08  fplanque
  * no message
  *

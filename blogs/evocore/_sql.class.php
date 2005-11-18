@@ -46,6 +46,7 @@ class SQL
 	var $where = '';
 	var $group_by = '';
 	var $order_by = '';
+	var $search_field = array();
 
 
 	/**
@@ -192,12 +193,63 @@ class SQL
 	{
 		$this->order_by = $order_by;
 	}
-
-
+	
+	/**
+	 * create array of search fields
+	 *
+	 * @param string field to search on
+	 */
+	function add_search_field( $field )
+	{
+		$this->search_field[] = $field;
+	}
+	
+	/**
+	 * create the filter whith the search field array
+	 * @param string search 
+	 * @param string operator( AND , OR , PHRASE ) for the filter
+	 */
+	function WHERE_keyword( $search, $search_kw_combine )
+	{
+		// Concat the list of search fields ( concat(' ',field1,field2,field3...) ) 
+		if (count( $this->search_field ) > 1)
+		{	
+			$search_field = 'CONCAT_WS(\' \',' . implode( ',', $this->search_field).')';
+		}
+		else 
+		{
+			$search_field = $this->search_field[0];
+		}
+		
+		switch( $search_kw_combine )
+		{
+			case 'AND':
+			case 'OR':
+						// create array of key words of the search string
+						$keyword_array = explode( ' ', $search );
+						$keyword_array = array_filter( $keyword_array, 'filter_empty' ); 
+						
+						$twhere = array();
+						foreach($keyword_array as $keyword)
+						{
+							$twhere[] = $search_field.' like \'%'.$keyword.'%\'';
+						}
+						$where = implode( ' '.$search_kw_combine.' ', $twhere);				
+						break;
+						
+			case 'PHRASE':
+						$where = $search_field.' like "%'.$search.'%"';
+		}
+		$this->WHERE_and( $where );
+	}
+	
 }
 
 /*
  * $Log$
+ * Revision 1.6  2005/11/18 21:01:21  fplanque
+ * no message
+ *
  * Revision 1.5  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *

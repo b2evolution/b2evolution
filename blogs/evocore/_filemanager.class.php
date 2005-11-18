@@ -101,7 +101,7 @@ class FileManager extends Filelist
 	var $_root_url;
 
 	/**
-	 * User preference: show permissions like "ls -l" (true) or octal (false)?
+	 * User preference: show permissions like "ls -l" (true) or octal/r+w (false)?
 	 * @param boolean
 	 * @access protected
 	 */
@@ -1354,6 +1354,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.56  2005/11/18 21:01:21  fplanque
+ * no message
+ *
  * Revision 1.55  2005/11/17 18:32:50  blueyed
  * Fix default for _permslikelsl (the user would have to enable it explicitlly)
  *

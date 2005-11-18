@@ -819,7 +819,7 @@ $options_Form = & new Form( 'files.php#FM_anchor', 'options_form', 'get', 'none'
 		<?php
 		$options_Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Sort directories at top') );
 		$options_Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Show hidden files') );
-		$options_Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), T_('File permissions like &quot;ls -l&quot;') );
+		$options_Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), T_('Display file permissions like "rwxr-xr-x" rather than short form') );
 		$options_Form->checkbox( 'option_getimagesizes', $UserSettings->get('fm_getimagesizes'), T_('Display the image size of image files') );
 		$options_Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Recursive size of directories') );
 		$options_Form->checkbox( 'option_forceFM', $UserSettings->get('fm_forceFM'), T_('Always show the Filemanager'), 'Display the Filemanager also in modes like upload.' );
@@ -843,6 +843,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.46  2005/11/18 21:01:21  fplanque
+ * no message
+ *
  * Revision 1.45  2005/11/14 18:08:14  blueyed
  * Fix fatal error when displaying paths in flat mode.
  *
