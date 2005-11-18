@@ -162,8 +162,8 @@ class Hit
 			else
 			{
 				$DB->query( '
-					INSERT INTO T_basedomains (dom_name, dom_status) VALUES(
-						"'.$DB->escape($this->referer_basedomain).'",
+					INSERT INTO T_basedomains (dom_name, dom_status)
+						VALUES( "'.$DB->escape($this->referer_basedomain).'",
 						"'.( $this->referer_type == 'blacklist' ? 'blacklist' : 'unknown' ).'" )' );
 				$this->referer_domain_ID = $DB->insert_id;
 			}

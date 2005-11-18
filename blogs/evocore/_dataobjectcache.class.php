@@ -184,6 +184,7 @@ class DataObjectCache
 		}
 
 		if( isset($this->cache[$Obj->ID]) )
+		// fplanque: I don't want an extra (and expensive) comparison here. $this->cache[$Obj->ID] === $Obj. If you need this you're probably misusing the cache.
 		{
 			$Debuglog->add( $this->objtype.': Object with ID '.$Obj->ID.' is already cached', 'dataobjects' );
 			return false;
@@ -263,7 +264,8 @@ class DataObjectCache
 			else
 			{ // Load just the requested object:
 				$Debuglog->add( "Loading <strong>$this->objtype($req_ID)</strong> into cache", 'dataobjects' );
-				$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname = ".$DB->quote($req_ID);
+				// Note: $req_ID MUST be an unsigned integer. This is how DataObject works.
+				$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname = $req_ID";
 
 				if( $row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_ID()' ) )
 				{
@@ -431,8 +433,8 @@ class DataObjectCache
 
 /*
  * $Log$
- * Revision 1.29  2005/11/17 23:17:50  blueyed
- * get_by_ID(): Allow non-numeric IDs (not used ATM), but fixes a possible SQL injection if we do not take care to query an integer value.
+ * Revision 1.30  2005/11/18 18:26:38  fplanque
+ * no message
  *
  * Revision 1.28  2005/11/16 21:53:49  fplanque
  * minor

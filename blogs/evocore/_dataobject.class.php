@@ -121,6 +121,7 @@ class DataObject
 	 */
 	function dbchange( $dbfieldname, $dbfieldtype, $valuepointer )
 	{
+		//echo '<br />DB change on :'.$dbfieldname;
 		$this->dbchanges[$dbfieldname]['type'] = $dbfieldtype;
 		$this->dbchanges[$dbfieldname]['value'] = $valuepointer ;
 	}
@@ -147,6 +148,7 @@ class DataObject
 		if( !empty($this->lasteditor_field) && is_object($current_User) )
 		{	// We want to track last editor:
 			// TODO: the current_User is not necessarily the last editor. Item::dbupdate() gets called after incrementing the view for example!
+			// fplanque: this should be handled by set() deciding wether the setting changes the last editor or not
 			$this->set_param( $this->lasteditor_field, 'number', $current_User->ID );
 		}
 
@@ -216,17 +218,15 @@ class DataObject
 		{	// We want to track creator:
 			if( empty($this->creator_user_ID) )
 			{	// No creator assigned yet, use current user:
-				$this->creator_user_ID = $current_User->ID;
+				$this->set_param( $this->creator_field, 'number', $current_User->ID );
 			}
-			$this->set_param( $this->creator_field, 'number', $this->creator_user_ID );
 		}
 		if( !empty($this->lasteditor_field) )
 		{	// We want to track last editor:
 			if( empty($this->lastedit_user_ID) )
 			{	// No editor assigned yet, use current user:
-				$this->lastedit_user_ID = $current_User->ID;
+				$this->set_param( $this->lasteditor_field, 'number', $current_User->ID );
 			}
-			$this->set_param( $this->lasteditor_field, 'number', $this->lastedit_user_ID );
 		}
 
 
@@ -531,14 +531,17 @@ class DataObject
 		if( isset($this->$parname) && $this->$parname === $new_value )
 		{
 			$Debuglog->add( $this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' to '.$this->$parname, 'dataobjects' );
+			// echo '<br />'.$this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' to '.$this->$parname;
 
 			return false;
 		}
 		else
 		{
+			// Set the value in the object:
 			$this->$parname = $new_value;
 			//echo '<br/>'.$this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname;
 			$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname, 'dataobjects' );
+			// echo '<br />'.$this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname;
 
 			// Remember change for later db update:
 			$this->dbchange( $dbfield, $fieldtype, $parname );
@@ -593,6 +596,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.29  2005/11/18 18:26:38  fplanque
+ * no message
+ *
  * Revision 1.28  2005/11/09 03:28:55  blueyed
  * BUG: on dbupdate() it should not set the current_User as last editor!; minor other stuff
  *
