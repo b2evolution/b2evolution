@@ -270,7 +270,7 @@ require_once dirname(__FILE__).'/_filerootcache.class.php';
 // Object caches init:
 
 $BlogCache = & new BlogCache();
-$FileCache = & new fileCache();
+$FileCache = & new FileCache();
 $FileRootCache = & new FileRootCache();
 $GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
 $ItemCache = & new ItemCache();
@@ -278,7 +278,6 @@ $itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_',
 $itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
 $LinkCache = & new LinkCache();
 $UserCache = & new UserCache();
-
 
 
 require_once dirname(__FILE__).'/_hitlog.funcs.php';     // referer logging
@@ -481,6 +480,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.67  2005/11/18 22:28:30  blueyed
+ * Fix case for FileCache
+ *
  * Revision 1.66  2005/11/14 18:23:13  blueyed
  * Remove experimental memcache support.
  *
