@@ -2157,10 +2157,8 @@ class Form extends Widget
 
 /*
  * $Log$
- * Revision 1.86  2005/11/18 18:32:42  fplanque
- * Fixed xmlrpc logging insanity
- * (object should have been passed by reference but you can't pass NULL by ref)
- * And the code was geeky/unreadable anyway.
+ * Revision 1.87  2005/11/18 18:37:42  fplanque
+ * merged in error display fix on checklist by Marc/Progidistri.
  *
  * Revision 1.84  2005/11/09 02:34:23  blueyed
  * Added hiddens_by_key() which allows to easily pass $_POST to hidden fields.
