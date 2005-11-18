@@ -145,6 +145,7 @@ class ItemList extends DataObjectList
 	 * @param string urltitle of post to display
 	 * @param string YearMonth(Day) to start at, '' for first available
 	 * @param string name of cache to be used
+	 * @param array List of other params
 	 */
 	function ItemList(
 		$blog = 1,                  // Blog to query
@@ -170,7 +171,8 @@ class ItemList extends DataObjectList
 		$timestamp_max = 'now',     // Do not show posts after this timestamp
 		$title = '',                // urltitle of post to display
 		$dstart = '',               // YearMonth(Day) to start at, '' for first available
-		$cache_name = '#' )
+		$cache_name = '#',					// 
+		$params = array() )					// List of other params ( client_link, ...)
 	{
 		global $DB, $object_def;
 		global $Settings;
@@ -841,6 +843,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.39  2005/11/18 21:00:20  fplanque
+ * extensible param (used by Progidistri)
+ *
  * Revision 1.38  2005/10/27 17:16:29  blueyed
  * preview_request(): removed globals, handle item issue date/time
  *
