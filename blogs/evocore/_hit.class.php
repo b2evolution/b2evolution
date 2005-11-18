@@ -69,7 +69,7 @@ class Hit
 	 *
 	 * @var integer
 	 */
-	var $referer_domain = 0;
+	var $referer_domain_ID = 0;
 
 	/**
 	 * Is this a reload?
@@ -148,11 +148,12 @@ class Hit
 
 		if( $this->referer_basedomain )
 		{
-			$basedomain = $DB->get_row( 'SELECT dom_ID, dom_status FROM T_basedomains
-																		WHERE dom_name = "'.$DB->escape($this->referer_basedomain).'"' );
+			$basedomain = $DB->get_row( '
+				SELECT dom_ID, dom_status FROM T_basedomains
+				 WHERE dom_name = "'.$DB->escape($this->referer_basedomain).'"' );
 			if( $basedomain )
 			{
-				$this->referer_domain = $basedomain->dom_ID;
+				$this->referer_domain_ID = $basedomain->dom_ID;
 				if( $basedomain->dom_status == 'blacklist' )
 				{
 					$this->referer_type = 'blacklist';
@@ -160,10 +161,11 @@ class Hit
 			}
 			else
 			{
-				$DB->query( 'INSERT INTO T_basedomains (dom_name, dom_status)
-											VALUES( "'.$DB->escape($this->referer_basedomain).'",
-												"'.( $this->referer_type == 'blacklist' ? 'blacklist' : 'unknown' ).'" )' );
-				$this->referer_domain = $DB->insert_id;
+				$DB->query( '
+					INSERT INTO T_basedomains (dom_name, dom_status) VALUES(
+						"'.$DB->escape($this->referer_basedomain).'",
+						"'.( $this->referer_type == 'blacklist' ? 'blacklist' : 'unknown' ).'" )' );
+				$this->referer_domain_ID = $DB->insert_id;
 			}
 		}
 
@@ -476,7 +478,7 @@ class Hit
 				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr )
 			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'",
 				"'.$this->referer_type.'", "'.$DB->escape($this->referer).'",
-				"'.$this->referer_domain.'", "'.$Blog->ID.'", "'.$DB->escape( $this->IP ).'"
+				"'.$this->referer_domain_ID.'", "'.$Blog->ID.'", "'.$DB->escape( $this->IP ).'"
 			)';
 
 		$DB->query( $sql, 'Record the hit' );
@@ -492,9 +494,8 @@ class Hit
 	 *
 	 * On success, this methods records the hit.
 	 *
-	 * NOTE: when used as PHP shutdown_function all output has been sent already!
-	 *
 	 * TODO: use DB cache to avoid checking the same page again and again!
+	 * TODO: transform into plugin (blueyed)
 	 *
 	 * @uses _record_the_hit()
 	 */
@@ -505,7 +506,7 @@ class Hit
 
 		if( !empty($this->referer) )
 		{
-			if( ($fp = @fopen( $this->referer, 'r' )) ) // QUESTION: use file_get_contents()? (PHP > 4.3.0)
+			if( ($fp = @fopen( $this->referer, 'r' )) )
 			{
 				socket_set_timeout($fp, 5); // timeout after 5 seconds
 				// Get the refering page's content
@@ -523,7 +524,6 @@ class Hit
 				$full_req_url = 'http://'.$_SERVER['HTTP_HOST'].$ReqURI;
 				// $Debuglog->add( 'Hit Log: '. "full current url: ".$full_req_url, 'hit');
 
-
 				/**
 				 * IDNA converter class
 				 */
@@ -532,14 +532,18 @@ class Hit
 
 				// TODO: match <a href="...">!?
 				// TODO: http://demo.b2evolution.net links "HEAD/blogs/index.php?blog=2", but we search for "http://demo.b2evolution.net/HEAD/blogs/index.php?blog=2"!
-				if( strstr($content_ref_page, $IDNA->decode($full_req_url)) // the decoded xn--name
-					  || strstr($content_ref_page, $IDNA->decode($full_req_url)) ) // the xn--name
+				$idn_decoded_full_req_url = $IDNA->decode($full_req_url);
+
+				if( strstr($content_ref_page, $full_req_url)
+					  || ( ($idn_decoded_full_req_url != $full_req_url) && strstr($content_ref_page, $idn_decoded_full_req_url) ) )
 				{
 					$Debuglog->add( 'double_check_referers(): found current url in page ('.bytesreadable($bytes_read).' read)', 'hit' );
 				}
 				else
 				{
-					$Debuglog->add( 'double_check_referers(): '.sprintf('did not find &laquo;%s&raquo; in &laquo;%s&raquo; (%s bytes read). -> referer_type=spam!', $full_req_url, $this->referer, bytesreadable($bytes_read) ), 'hit' );
+					$Debuglog->add( 'double_check_referers(): '.sprintf('did not find &laquo;%s&raquo; in &laquo;%s&raquo; (%s bytes read). -> referer_type=spam!',
+							$full_req_url.( $idn_decoded_full_req_url != $full_req_url ? ' / '.$idn_decoded_full_req_url : '' ),
+							$this->referer, bytesreadable($bytes_read) ), 'hit' );
 					$this->referer_type = 'spam';
 				}
 				unset( $content_ref_page );
