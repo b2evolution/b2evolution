@@ -1054,16 +1054,22 @@ class File extends DataObject
 
 	/**
 	 * Insert object into DB based on previously recorded changes
+	 *
+	 * @return boolean true on success, false on failure
 	 */
 	function dbinsert( )
 	{
 		global $Debuglog;
 
 		if( $this->meta == 'unknown' )
-			{ debug_die( 'cannot insert File if meta data has not been checked before' ); }
+		{
+			debug_die( 'cannot insert File if meta data has not been checked before' );
+		}
 
 		if( ($this->ID != 0) || ($this->meta != 'notfound') )
-			{ debug_die( 'Existing file object cannot be inserted!' ); }
+		{
+			debug_die( 'Existing file object cannot be inserted!' );
+		}
 
 		$Debuglog->add( 'Inserting meta data for new file into db', 'files' );
 
@@ -1073,25 +1079,29 @@ class File extends DataObject
 		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );
 
 		// Let parent do the insert:
-		parent::dbinsert();
+		$r = parent::dbinsert();
 
 		// We can now consider the meta data has been loaded:
 		$this->meta  = 'loaded';
+
+		return $r;
 	}
 
 
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
-	 * {@internal DataObject::dbupdate(-)}}
+	 * @return boolean true on success, false on failure / no changes
 	 */
 	function dbupdate( )
 	{
 		if( $this->meta == 'unknown' )
-			{ debug_die( 'cannot update File if meta data has not been checked before' ); }
+		{
+			debug_die( 'cannot update File if meta data has not been checked before' );
+		}
 
 		// Let parent do the update:
-		parent::dbupdate();
+		return parent::dbupdate();
 	}
 
 
@@ -1178,6 +1188,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2005/11/19 19:24:19  blueyed
+ * dbupdate(), dbinsert(): propagate changes from parent
+ *
  * Revision 1.43  2005/11/18 07:53:05  blueyed
  * use $_FileRoot / $FileRootCache for absolute path, url and name of roots.
  *
