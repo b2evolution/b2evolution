@@ -67,10 +67,4 @@ $testDB_conf = array_merge( array(
 	),
 	$testDB_conf );
 
-
-if( !isset( $testDB_conf['name'] ) )
-{
-	die( 'Please set the DB name to use for tests in '.__FILE__.'. See $testDB_conf there..' );
-}
-
 ?>

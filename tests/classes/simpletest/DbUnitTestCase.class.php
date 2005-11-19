@@ -21,6 +21,12 @@ class DbUnitTestCase extends EvoUnitTestCase
 	{
 		global $testDB_conf;
 
+		if( !isset( $testDB_conf['name'] ) )
+		{
+			die( 'Please set the DB name to use for tests in /tests/config.php or /tests/config.OVERRIDE.php. See $testDB_conf there..' );
+		}
+
+
 		$this->DB =& new DB( $testDB_conf );
 	}
 
