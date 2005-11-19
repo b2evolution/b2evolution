@@ -84,8 +84,50 @@ class FilelistTestCase extends FilemanUnitTestCase
 		$this->assertEqual( $this->Filelist->count(), 1, 'Count ok.' );
 
 		$this->Filelist->remove( $File );
-		$this->assertEqual( $this->Filelist->count(), 1, 'File removed.' );
+		$this->assertEqual( $this->Filelist->count(), 0, 'File removed.' );
 	}
+
+
+	/**
+	 * Tests, if get_next() works correctly when removing a file
+	 *
+	 * @return
+	 */
+	function testRemoveInsideOfGetNext()
+	{
+		$Files = array(
+				new File( 'user', 1, 'a' ),
+				new File( 'user', 1, 'b' ),
+				new File( 'user', 1, 'c' ),
+				new File( 'user', 1, 'd' ),
+				new File( 'user', 1, 'e' ),
+			);
+		$File_to_be_removed_before_get_next = new File( 'user', 1, 'hmm' );
+
+		$this->Filelist->add( $Files[0] );
+		$this->Filelist->add( $Files[1] );
+		$this->Filelist->add( $File_to_be_removed_before_get_next );
+		$this->Filelist->add( $Files[2] );
+		$this->Filelist->add( $Files[3] );
+		$this->Filelist->add( $Files[4] );
+
+		// we remove the third one even before get_next() loop:
+		$this->Filelist->remove( $File_to_be_removed_before_get_next );
+
+		$loop_count = 0;
+		while( $l_File = & $this->Filelist->get_next() )
+		{
+			$this->assertReference( $l_File, $Files[$loop_count], 'File is the correct one (#'.$loop_count.')' );
+			if( $loop_count == 0 || $loop_count == 2 || $loop_count == 4 )
+			{ // remove the file at the beginning, in the middle and the last one
+				$this->Filelist->remove( $l_File );
+			}
+			$loop_count++;
+		}
+
+		$this->assertEqual( $loop_count, count( $Files ), 'All files traversed.' );
+	}
+
 
 	/**
 	 *
