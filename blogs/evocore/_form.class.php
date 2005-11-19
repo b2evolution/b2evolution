@@ -716,32 +716,32 @@ class Form extends Widget
 	function time_select( $field_name, $field_value = NULL, $precision = '5mn', $field_label, $field_note = NULL, $field_class = NULL, $field_onchange = NULL )
 	{
 			preg_match( '#([0-9]+)(mn|s)#', $precision, $matches );
-			
+
 			if( !isset( $matches[1] ) && !isset( $matches[2] ) )
-			{//precison has a bad format 
+			{//precison has a bad format
 			return;
 			}
-			
+
 			$field_params = array(
 			'note' => $field_note,
 			'class' => $field_class,
 			'onchange' => $field_onchange );
-			
+
 			$this->handle_common_params( $field_params, $field_name, $field_label );
-			
+
 			$r = $this->begin_field();
-			
+
 			/**********   select options for the hours *************/
-						
+
 			$field_params['name'] = $field_name . '_h';
-			$field_params['id'] = $field_params['name'];	
+			$field_params['id'] = $field_params['name'];
 			// Get Hour part of datetime:
 			$hour = substr( $field_value, 11, 2 );
-			
+
 			$r .= $this->_number_select(  $hour, 23 , 1, $field_params);
 
 			/***  instantiate the precison for the minutes and secondes select options  ****/
-			
+
 			if( $matches[2] == 'mn' )
 			{
 				$precision_mn = $matches[1];
@@ -752,30 +752,30 @@ class Form extends Widget
 				$precision_mn = 1;
 				$precision_s = $matches[1];
 			}
-				
+
 			/*********  select options for the minutes *************/
-			
+
 			$field_params['name'] = $field_name . '_mn';
-			$field_params['id'] = $field_params['name'];	
+			$field_params['id'] = $field_params['name'];
 			// Get Minute part of datetime:
-			$minute = substr( $field_value, 14, 2 );	
-			
+			$minute = substr( $field_value, 14, 2 );
+
 			$r .= ':'.$this->_number_select(  $minute, 59, $precision_mn, $field_params);
-			
+
 			if( $precision_s )
 			{/*********  select options for the minutes  ***********/
-	
+
 				$field_params['name'] = $field_name . '_s';
 				$field_params['id'] = $field_params['name'];
 				// Get Secondes part of datetime:
 				$seconde = substr( $field_value, 17, 2 );
-				
+
 				$r .=':'.$this->_number_select(  $seconde, 59, $precision_s, $field_params);
 			}
-			
+
 			$r .= $this->end_field();
-						
-			return $this->display_or_return( $r );	
+
+			return $this->display_or_return( $r );
 	}
 
 
@@ -792,21 +792,21 @@ class Form extends Widget
 	{
 			$r	=	'<select'
 						. $this->get_field_params_as_string($field_params);
-	
+
 			for( $i=0; $i <= $max ; $i += $precision)
 			{
-				$val=sprintf('%02d', $i );	
+				$val=sprintf('%02d', $i );
 				$r .= '<option value="'.$val.'"'.
 								($field_value == $val ? ' selected="selected"' : '') .
 								'>'	.$val.'</option>';
-			} 
-			
+			}
+
 			$r .= '</select>';
-		
+
 			return $r;
 	}
 
-	
+
 	/**
 	 * Builds a duration input field.
 	 *
@@ -1101,13 +1101,13 @@ class Form extends Widget
 	function checklist( $options, $field_name, $field_label )
 	{
 		global $Request;
-	
+
 		$field_params = array();
 		$field_params['type'] = 'checkbox';
 		$this->handle_common_params( $field_params, $field_name, $field_label );
-	
+
 		$r = $this->begin_field( $field_name, $field_label );
-		
+
 		foreach( $options as $option )
 		{ //loop to construct the list of 'input' tags
 
@@ -1126,7 +1126,7 @@ class Form extends Widget
 			}
 
 			$r .= '<label class="">';
-			
+
 			$r .= "\t".'<input type="checkbox" name="'.$loop_field_name.'" value="'.$option[1].'" ';
 			if( $option[3] )
 			{ //the checkbox has to be checked by default
@@ -1143,7 +1143,7 @@ class Form extends Widget
 			$r .= $option[2];
 
 			$r .='</label>';
-			
+
 			if( !empty($loop_field_note) )
 			{ // We want to display a note:
 				$r .= ' <span class="notes">'.$loop_field_note.'</span>';
@@ -1760,6 +1760,8 @@ class Form extends Widget
 	/**
 	 * Builds a list of hidden inputs from an array where the keys are the field names.
 	 *
+	 * It supports array values (one-dimensional) and generates appropriate key-value pairs.
+	 *
 	 * @param array associative array ( name => value ) of hidden fields.
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
@@ -1771,7 +1773,17 @@ class Form extends Widget
 		$this->output = false;
 		foreach( $hiddens as $l_name => $l_value )
 		{
-			$r .= $this->hidden( $l_name, $l_value );
+			if( is_array( $l_value ) )
+			{ // this happens for example when we've POSTed an array (for PHP it's an array then)
+				foreach( $l_value as $ll_key => $ll_value )
+				{
+					$r .= $this->hidden( $l_name.'['.$ll_key.']', $ll_value );
+				}
+			}
+			else
+			{
+				$r .= $this->hidden( $l_name, $l_value );
+			}
 		}
 		$this->output = $save_output;
 
@@ -1898,7 +1910,7 @@ class Form extends Widget
 			// build unique id:
 			$input_params['id'] = $this->get_valid_id( $field_params['name'].'_radio_'.$count_options);
 
-			$r .= $this->get_input_element( $input_params ) // the radio element
+			$r .= $this->get_input_element( $input_params, false ) // the radio element
 				.'<label class="radiooption" for="'.$input_params['id'].'">'
 				.$loop_field_option['label']
 				.'</label>'
@@ -2266,6 +2278,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.89  2005/11/19 22:56:53  blueyed
+ * radio_input(): do not parse common params for the single radio inputs; hiddens_by_key(): support array values (this is needed to passthrough $_POST data for example (-> login))
+ *
  * Revision 1.88  2005/11/18 20:59:37  fplanque
  * time select field bt mb / Progidistri
  *
