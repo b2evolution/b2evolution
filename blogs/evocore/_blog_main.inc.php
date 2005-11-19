@@ -105,6 +105,9 @@ $Request->param( 'pb', 'integer', 0, true );
 $Request->param( 'disp', 'string', 'posts', true );
 $Request->param( 'stats', 'integer', 0 );                 // deprecated
 
+$Request->param( 'tempskin', 'string', '', true );
+
+
 if( !isset($timestamp_min) ) $timestamp_min = '';
 if( !isset($timestamp_max) ) $timestamp_max = '';
 
@@ -140,7 +143,7 @@ locale_activate( $Blog->get('locale') );
 // -------------------------
 // Extra path info decoding:
 // -------------------------
-if( !empty( $_GET['tempskin'] ) || !empty($generating_static) )
+if ( !empty($tempskin) || !empty($generating_static) )
 { // We don't want extra path resolution on rss files and when generating static pages
 	$resolve_extra_path = false;
 }
@@ -313,34 +316,45 @@ if( !isset($display_blog_list) )
 /*
  * Now, we'll jump to displaying!
  */
+
 // Check if an rss syndication was requested
-// This will be handled like any other skin except
-// that it will not stored in a cookie
-/* This is FULL of holes!
-if ( !empty($_GET['tempskin']) )
+
+// This will be handled like any other skin, except that it will not be stored in a cookie
+if( !empty($tempskin) )
 {
-	if ( !empty($_GET['disp']) AND $_GET['disp'] == 'comments' )
+	$tempskin = basename_dironly( $tempskin ); // make sure to have no relative paths in there
+	$Debuglog->add( 'Sanitized $tempskin: '.$tempskin, 'skin' );
+
+	if( !empty($tempskin) )
 	{
-		require( get_path( 'skins' ).$_GET['tempskin'].'/_lastcomments.php' );
-		exit;
+		if( !empty($disp) && $disp == 'comments' && skin_exists( $tempskin, '_lastcomments.php' ) )
+		{
+			$Debuglog->add( 'Including tempskin: '.$tempskin.' (comments)', 'skin' );
+
+			require( get_path( 'skins' ).$tempskin.'/_lastcomments.php' );
+			exit;
+		}
+		elseif( skin_exists( $tempskin, '_main.php' ) )
+		{
+			$Debuglog->add( 'Including tempskin: '.$tempskin.' (main)', 'skin' );
+			require( get_path( 'skins' ).$tempskin.'/_main.php' );
+			exit;
+		}
 	}
-	else
-	{
-		require( get_path( 'skins' ).$_GET['tempskin'].'/_main.php' );
-		exit;
-	}
+	$Debuglog->add( 'tempskin requested, but skin not found ('.$tempskin.')', array( 'skin', 'error' ) );
+	Log::display( '', '', 'tempskin requested, but not found/invalid.', 'error' );
+	debug_die();
 }
-*/
 
 // Let's check if a skin has been forced in the stub file:
 // Note: URL skin requests are handled with param() 20 lines below
 if( !isset( $skin ) )
 { // No skin forced in stub (not even '' for no-skin)...
-
+	$Debuglog->add( 'No skin forced.', 'skin' );
 	// We're going to need a default skin:
-	if(  ( !isset( $default_skin ) )          // No default skin forced in stub
-		|| ( !skin_exists( $default_skin ) ) )  // Or the forced default does not exist
-	{ // Use default from the datatbase
+	if( !isset( $default_skin )             // No default skin forced in stub
+			|| !skin_exists( $default_skin ) )  // Or the forced default does not exist
+	{ // Use default from the database
 		$default_skin = $Blog->get('default_skin');
 	}
 
@@ -349,21 +363,26 @@ if( !isset( $skin ) )
 		// Because a lot of bloggers will set themseleves a cookie and delete the default skin,
 		// we have to make this fool proof extra checking!
 		printf( T_('The default skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file. Contact the <a %s>webmaster</a>...'), $default_skin , $Blog->dget('shortname'), 'href="'.$admin_url.'blogs.php?action=edit&amp;blog='.$Blog->ID.'"', 'href="mailto:'.$admin_email.'"');
-		die();
+		debug_die();
 	}
+	$Debuglog->add( '$default_skin = '.$default_skin, 'skin' );
 
 	if( $Blog->get('force_skin') )
 	{ // Blog params tell us to force the use of default skin
 		$skin = $default_skin;
+		$Debuglog->add( 'Forced skin: '.$skin, 'skin' );
 	}
 	else
 	{ // Get the saved skin in cookie or default:
 		$Request->param( $cookie_state, 'string', $default_skin );
+		$Debuglog->add( 'Skin after looking at cookie: '.$$cookie_state, 'skin' );
 		// Get skin by params or default to cookie
 		// (if cookie was not set, the $$cookie_state contains default skin!)
 		$Request->param( 'skin', 'string', $$cookie_state );
+		$Debuglog->add( 'Skin after looking at params: '.$skin, 'skin' );
 	}
 }
+
 
 // At this point $skin holds the name of the skin we want to use, or '' for no skin!
 
@@ -372,27 +391,26 @@ $Request->param( 'template', 'string', 'main', true );
 
 if( !empty( $skin ) )
 { // We want to display now:
+	$skin = basename_dironly( $skin ); // make sure to have no relative path in there
+	$Debuglog->add( 'Sanitized skin: '.$skin, 'skin' );
 
-	if( (!empty($_GET['skin'])) || (!empty($_POST['skin'])) )
-	{ // We have just asked for the skin explicitely
-		// Set a cookie to remember it:
-		// Including config and functions files   ??
-
-		if( ! setcookie( $cookie_state, $skin, $cookie_expires, $Blog->get('cookie_path'), $Blog->get('cookie_domain')) )
-		{ // This damn failed !
-			echo "<p>setcookie failed!</p>";
-		}
-	}
-
-	if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )
-	{
-		// echo ("<p>Invalid skin name!</p>");
-		$skin = $default_skin;
-	}
-	elseif( !skin_exists($skin) )
+	if( !skin_exists($skin) )
 	{
 		// echo "<p>Oops, no such skin!</p>";
 		$skin = $default_skin;
+		$Debuglog->add( 'Skin does not exist. Using default skin: '.$default_skin, 'skin' );
+	}
+	elseif( !empty($_GET['skin']) || !empty($_POST['skin']) )
+	{ // We have just asked for the skin explicitely (and it is valid)
+		// Set a cookie to remember it:
+		if( !setcookie( $cookie_state, $skin, $cookie_expires, $Blog->get('cookie_path'), $Blog->get('cookie_domain')) )
+		{ // This damn failed !
+			Log::display( '', '', 'setcookie failed (skin)!', 'error' );
+		}
+		else
+		{
+			$Debuglog->add( 'Setting skin cookie: '.$skin, 'skin' );
+		}
 	}
 
 	if( $template == 'popup' )
@@ -411,12 +429,17 @@ else
 		require( get_path( 'skins' ).'_popup.php' );
 		exit();
 	}
+
+	$Debuglog->add( 'No skin or popup requested.', 'skin' );
 	// If we end up here the blog file should be a full template, not just a stub...
 }
 
 
 /*
  * $Log$
+ * Revision 1.28  2005/11/19 01:39:02  blueyed
+ * Fix tempskin handling (patch by marian) and add debugging output (also to skin handling). Also, remove ereg() call that isn't necessary anymore when using basename_dironly()
+ *
  * Revision 1.27  2005/11/18 22:05:41  fplanque
  * no message
  *
