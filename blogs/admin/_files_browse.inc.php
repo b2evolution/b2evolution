@@ -565,12 +565,12 @@ else
 			title="<?php echo T_('Move the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
 			src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
+	*/ ?>
 
-		<input class="ActionButton" type="image" name="actionArray[editperm]"
+		<input class="ActionButton" type="image" name="actionArray[edit_perms]"
 			onclick="return openselectedfiles(true);"
 			title="<?php echo T_('Change permissions for the selected files'); ?>"
 			src="<?php echo get_icon( 'file_perms', 'url' ); ?>" />
-	*/ ?>
 
 		</td>
 	</tr>
@@ -843,6 +843,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.48  2005/11/19 23:48:28  blueyed
+ * "Edit File permissions" action fixed/finished
+ *
  * Revision 1.47  2005/11/19 23:26:18  blueyed
  * Fix call to undefined function
  *

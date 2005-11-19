@@ -453,7 +453,7 @@ class FileManager extends Filelist
 	{
 		if( $this->User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
-			echo '<a title="'.T_('Edit permissions').'" href="'.$this->getLinkFile( $this->curFile, 'editperm' ).'">'
+			echo '<a title="'.T_('Edit permissions').'" href="'.$this->getLinkFile( $this->curFile, 'edit_perms' ).'">'
 						.$this->curFile->get_perms( $this->_disp_permslikelsl ? 'lsl' : '' ).'</a>';
 		}
 		else
@@ -1383,6 +1383,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.59  2005/11/19 23:48:28  blueyed
+ * "Edit File permissions" action fixed/finished
+ *
  * Revision 1.58  2005/11/19 05:27:13  blueyed
  * chmod to default chmod (664) after upload. This should become a general/user Setting later.
  *

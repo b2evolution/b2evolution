@@ -2,6 +2,11 @@
 /**
  * This file implements the UI controller for file management.
  *
+ * NOTE: $Fileman->fm_mode gets used for modes, that allow browsing to some other place or
+ *       take other actions. A good example is "upload" - you can delete other files while
+ *       in upload mode.
+ *       "edit_perms" for example is not a mode, but a action.
+ *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
@@ -494,7 +499,6 @@ switch( $action )
 			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $selectedFile->get_name() ), 'note' );
 		}
 
-
 		// Leave special display mode:
 		$Fileman->fm_mode = NULL;
 		break;
@@ -581,28 +585,58 @@ switch( $action )
 		break;
 
 
-	case 'editperm':
-		// Check permission:
-		$current_User->check_perm( 'files', 'edit', true );
-
-		// edit permissions {{{
-		// fplanque>> TODO: as long as we use fm_modes this thing should at least work like a mode or at the bare minimun, turn off any active mode.
-		$action_title = T_('Change permissions');
-
-		if( !$selected_Filelist->count() )
-		{
-			$Messages->add( T_('Nothing selected.'), 'error' );
+	case 'edit_perms':
+		// edit permissions
+		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		{ // We do not have permission to edit files
+			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
+			$action = 'list';
 			break;
 		}
 
-		param( 'perms', 'array', array() );
+		if( ! $selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.'), 'error' );
+			$action = 'list';
+			break;
+		}
 
-		if( count( $perms ) )
-		{ // Change perms
+
+		param( 'perms', 'array', array() );
+		param( 'edit_perms_default' ); // default value when multiple files are selected
+		param( 'use_default_perms', 'array', array() ); // array of file IDs that should be set to default
+
+		if( count( $use_default_perms ) && $edit_perms_default === '' )
+		{
+			$Request->param_error( 'edit_perms_default', T_('You have to give a default permission!') );
+			break;
+		}
+
+		// form params
+		$perms_read_readonly = is_windows();
+		$field_options_read_readonly = array(
+				array( 'value' => 444, 'label' => T_('Read-only') ),
+				array( 'value' => 666, 'label' => T_('Read and write') ) );
+		$more_than_one_selected_file = ( $selected_Filelist->count() > 1 );
+
+		if( count( $perms ) || count( $use_default_perms ) )
+		{ // New permissions given, change them
 			$selected_Filelist->restart();
 			while( $lFile = & $selected_Filelist->get_next() )
 			{
-				$chmod = $perms[ $lFile->get_md5_ID() ];
+				if( in_array( $lFile->get_md5_ID(), $use_default_perms ) )
+				{ // use default
+					$chmod = $edit_perms_default;
+				}
+				elseif( !isset($perms[ $lFile->get_md5_ID() ]) )
+				{ // happens for an empty text input or when no radio option is selected
+					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not been changed.'), $lFile->get_name() ), 'note' );
+					continue;
+				}
+				else
+				{ // provided for this file
+					$chmod = $perms[ $lFile->get_md5_ID() ];
+				}
 
 				$oldperms = $lFile->get_perms( 'raw' );
 				$newperms = $lFile->chmod( $chmod );
@@ -611,73 +645,27 @@ switch( $action )
 				{
 					$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $lFile->get_name(), $chmod ), 'error' );
 				}
-				elseif( $newperms === $oldperms )
-				{
-					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; not changed.'), $lFile->get_name() ), 'note' );
-				}
 				else
 				{
-					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->get_perms() ), 'success' );
+					// Success, remove the file from the list:
+					$selected_Filelist->remove( $lFile );
+
+					if( $newperms === $oldperms )
+					{
+						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not changed.'), $lFile->get_name() ), 'note' );
+					}
+					else
+					{
+						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->get_perms() ), 'success' );
+					}
 				}
 			}
 		}
-		else
-		{ // Display dialog:
-			// TODO: use Form class, finish non-Windows
-			// TODO: move to a file called _file_permissions.form.php
-			$action_msg = '
-			<div class="panelblock">
-			<form name="form_chmod" action="files.php">
-			'.$Fileman->getFormHiddenSelectedFiles()
-			.$Fileman->getFormHiddenInputs().'
 
-			<input type="hidden" name="action" value="editperm" />
-			';
-
-			if( is_windows() )
-			{ // WINDOWS read/write permissons:
-				if( $selected_Filelist->count() > 1 )
-				{ // more than one file, provide default
-
-				}
-				foreach( $selected_Filelist->get_array() as $lFile )
-				{
-					$action_msg .= "\n".$lFile->get_rdfp_rel_path().':<br />
-					<input id="perms_readonly_'.$lFile->get_md5_ID().'"
-						name="perms['.$lFile->get_md5_ID().']"
-						type="radio"
-						value="444"'
-						.( $lFile->get_perms( 'octal' ) == 444 ?
-								' checked="checked"' :
-								'' ).' />
-					<label for="perms_readonly_'.$lFile->get_md5_ID().'">'.T_('Read-only').'</label>
-
-					<input id="perms_readwrite_'.$lFile->get_md5_ID().'"
-						name="perms['.$lFile->get_md5_ID().']"
-						type="radio"
-						value="666"'
-						.( $lFile->get_perms( 'octal' ) == 666 || $lFile->get_perms( 'octal' ) == 777 ?
-								'checked="checked"' :
-								'' ).' />
-					<label for="perms_readwrite_'.$lFile->get_md5_ID().'">'.T_('Read and write').'</label>
-					<br />';
-				}
-			}
-			else
-			{	// UNIX permissions:
-				$action_msg .= '<input type="text" name="chmod" value="'
-												.$lFile->get_perms( 'octal' ).'" maxlength="3" size="3" /><br />';
-				$js_focus = 'document.form_chmod.chmod';
-			}
-
-			$action_msg .= '
-			<input type="submit" value="'.format_to_output( T_('Set new permissions'), 'formvalue' ).'" />
-			</form>
-			</div>
-			';
+		if( !$selected_Filelist->count() )
+		{
+			$action = 'list';
 		}
-
-		// }}}
 		break;
 
 
@@ -1180,6 +1168,13 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 		break;
 
+	case 'edit_perms':
+		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
+		$AdminUI->disp_payload_begin();
+		require dirname(__FILE__).'/_files_permissions.form.php';
+		$AdminUI->disp_payload_end();
+		break;
+
 	default:
 		// Deferred action message:
 		if( isset($action_title) )
@@ -1256,6 +1251,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{
  * $Log$
+ * Revision 1.125  2005/11/19 23:48:28  blueyed
+ * "Edit File permissions" action fixed/finished
+ *
  * Revision 1.124  2005/11/19 19:25:50  blueyed
  * Add Messages for update_properties
  *
