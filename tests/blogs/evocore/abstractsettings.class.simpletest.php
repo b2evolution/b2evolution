@@ -40,9 +40,9 @@ class AbstractSettingsTestCase extends FilemanUnitTestCase
 
 	function testLoad()
 	{
-		$this->MockDB->expectOnce( 'get_results', array( new WantedPatternExpectation('/SELECT test_name, test_value FROM testtable/i') ), 'DB select ok.' );
-		$this->TestSettings->load();
-		$this->TestSettings->load();
+		$this->MockDB->expectOnce( 'get_results', array( new WantedPatternExpectation('/SELECT test_name, test_value\s+FROM testtable/i') ), 'DB select ok.' );
+		$this->TestSettings->_load();
+		$this->TestSettings->_load();
 		$this->MockDB->tally();
 	}
 
@@ -57,7 +57,7 @@ class AbstractSettingsTestCase extends FilemanUnitTestCase
 			'default_abc' => 'abc',
 		);
 
-		$this->TestSettings->load();
+		$this->TestSettings->_load();
 		$this->assertEqual( 'abc', $this->TestSettings->get_default( 'default_abc' ) );
 	}
 
@@ -67,11 +67,11 @@ class AbstractSettingsTestCase extends FilemanUnitTestCase
 	 */
 	function testPreferExplicitSet()
 	{
-		$this->MockDB->expectOnce( 'get_results', array( new WantedPatternExpectation('/SELECT test_name, test_value FROM testtable/i') ), 'DB select ok.' );
+		$this->MockDB->expectOnce( 'get_results', array( new WantedPatternExpectation('/SELECT test_name, test_value\s+FROM testtable/i') ), 'DB select ok.' );
 		$this->TestSettings->set( 'lala', 1 );
 
 		$this->MockDB->expectNever( 'get_results', false, 'Did not reload settings from DB.' );
-		$this->TestSettings->load();
+		$this->TestSettings->_load();
 
 		$this->assertEqual( $this->TestSettings->get( 'lala' ), 1, 'Prefer setting which was set before explicit load().' );
 		$this->assertNull( $this->TestSettings->get( 'lala_notset' ), 'Return NULL for non-existing setting.' );
