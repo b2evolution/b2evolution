@@ -203,7 +203,7 @@ $selected_Filelist = & $Fileman->getFilelistSelected();
 switch( $action )
 {
 	case 'open_in_new_windows':
-		// catch JS-only actions
+		// catch JS-only actions (they shouldn't arrive here with JS enabled)
 		$Messages->add( T_('You have to enable JavaScript to use this feature.'), 'error' );
 		break;
 
@@ -219,8 +219,10 @@ switch( $action )
 		$Fileman->createDirOrFile( $createnew, $createname ); // handles messages
 		break;
 
+
 	/*
-	case T_('Send by mail'):
+	case 'send_by_mail':
+	{{{ not implemented yet
 		// TODO: implement
 		if( !$selected_Filelist->count() )
 		{
@@ -230,10 +232,13 @@ switch( $action )
 
 		echo 'TODO: Send selected by mail, query email address..';
 		break;
+	}}}
 	*/
+
 
 	/*
 	case 'download':
+	{{{ not implemented yet
 		// TODO: provide optional zip formats
 		$action_title = T_('Download');
 
@@ -302,7 +307,8 @@ switch( $action )
 		}
 
 		break;
-	*/
+	}}}*/
+
 
 	case 'rename':
 		// Rename a file:
@@ -320,7 +326,7 @@ switch( $action )
 			break;
 		}
 
-		param( 'confirm', 'integer', 0 );
+		param( 'confirmed', 'integer', 0 );
 		param( 'new_names', 'array', array() );
 
 		// Check params for each file to rename:
@@ -328,7 +334,7 @@ switch( $action )
 		{
 			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
 			{ // We have not yet provided a name to rename to...
-				$confirm = 0;
+				$confirmed = 0;
 				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get_name();
 				continue;
 			}
@@ -337,8 +343,8 @@ switch( $action )
 			$new_names[$loop_src_File->get_md5_ID()] = trim(strip_tags($new_names[$loop_src_File->get_md5_ID()]));
 			if( !isFilename($new_names[$loop_src_File->get_md5_ID()]) )
 			{
-				$confirm = 0;
-				$Messages->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ), 'error' );
+				$confirmed = 0;
+				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ) );
 				continue;
 			}
 
@@ -346,13 +352,13 @@ switch( $action )
 			$extension = '';
 			if( ! validate_file_extension( $new_names[$loop_src_File->get_md5_ID()], $extension ) )
 			{ // Extension invalid:
-				$Messages->add( sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ), 'error' );
-				$confirm = 0;
+				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ) );
+				$confirmed = 0;
 				continue;
 			}
 		}
 
-		if( $confirm )
+		if( $confirmed )
 		{ // Rename is confirmed, let's proceed:
 			$selected_Filelist->restart();
 			while( $loop_src_File = & $selected_Filelist->get_next() )
@@ -369,12 +375,12 @@ switch( $action )
 				if( ! $loop_src_File->rename_to( $new_name ) )
 				{
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
-													$old_name, $new_name ), 'error' );
+						$old_name, $new_name ), 'error' );
 					continue;
 				}
 
 				$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
-													$old_name, $new_name ), 'success' );
+						$old_name, $new_name ), 'success' );
 			}
 
 			$action = 'list';
@@ -384,109 +390,69 @@ switch( $action )
 
 
 	case 'delete':
-		// Check permission:
-		$current_User->check_perm( 'files', 'edit', true );
-
 		// delete a file/dir
+		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		{ // We do not have permission to edit files
+			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
+			$action = 'list';
+			break;
+		}
+
 		if( ! $selected_Filelist->count() )
 		{
 			$Messages->add( T_('Nothing selected.'), 'error' );
+			$action = 'list';
 			break;
 		}
 
 		param( 'confirmed', 'integer', 0 );
-		param( 'delsubdirs', 'array', array() );
+		// TODO: fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB
+		//param( 'delsubdirs', 'array', array() ); // not implemented yet
+
+
+		// make sure we have loaded metas for all files in selection!
+		$selected_Filelist->load_meta();
+
+		// Check if there are delete restrictions on the files:
+		while( $l_File = & $selected_Filelist->get_next() )
+		{
+			$l_File->check_relations( 'delete_restrictions' );
+
+			if( $Messages->count('restrict') )
+			{ // There are restrictions:
+				$Messages->add( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
+					.$Messages->display( NULL, NULL, false, 'restrict', '', 'ul', false ) );
+				$Messages->clear( 'restrict' );
+
+				// remove it from the list of selected files:
+				$selected_Filelist->remove( $l_File );
+
+				$confirmed = false;  // always un-confirmed then!
+			}
+		}
 
 		if( ! $confirmed )
 		{
-			$action_msg = '<div class="panelinfo">';
-			$action_msg .= '<h2>'.T_('Delete file(s)?').'</h2>';
-
-			$action_msg .= '
-				<form action="files.php" class="inline">
-					<input type="hidden" name="confirmed" value="1" />
-					<input type="hidden" name="action" value="delete" />
-					'.$Fileman->getFormHiddenSelectedFiles()
-					.$Fileman->getFormHiddenInputs()."\n";
-
-
-			$action_msg .= $selected_Filelist->count() > 1 ?
-											T_('Do you really want to delete the following files?') :
-											T_('Do you really want to delete the following file?');
-
-			$action_msg .= '
-			<ul>
-			';
-
-			// So far there is no problem with confirming...
-			$can_confirm = true;
-
-			// make sure we have loaded metas for all files in selection!
-			$selected_Filelist->load_meta();
-
-			foreach( $selected_Filelist->_entries as $lFile )
+			if( ! $selected_Filelist->count() )
 			{
-				$action_msg .= '<li>'.$lFile->get_prefixed_name();
-
-				/* fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB integrity for these...
-				if( $lFile->is_dir() )
-				{ // This is a directory
-						$action_msg .= '
-						<br />
-						<input title="'.sprintf( T_('Check to include subdirectories of &laquo;%s&raquo;'), $lFile->get_name() ).'"
-							type="checkbox"
-							name="delsubdirs['.$lFile->get_md5_ID().']"
-							id="delsubdirs_'.$lFile->get_md5_ID().'"
-							value="1" />
-							<label for="delsubdirs_'.$lFile->get_md5_ID().'">'
-								.T_( 'Including subdirectories' ).'</label>';
-				}
-				*/
-
-				// Check if there are delete restrictions on this file:
-				$lFile->check_relations( 'delete_restrictions' );
-
-				if( $Messages->count('restrict') )
-				{ // There are restrictions:
-					$action_msg .= ': <strong>'.T_('cannot be deleted because of the following relations').'</strong> :';
-					$action_msg .= $Messages->display( NULL, NULL, false, 'restrict', '', 'ul', false );
-					$Messages->clear( 'restrict' );
-					// We won't be able to continue with deletion...
-					$can_confirm = false;
-				}
-
-				$action_msg .= '</li>';
+				$action = 'list';
 			}
-
-			$action_msg .= "</ul>\n";
-
-
-			if( $can_confirm )
-			{ // No integrity problem detected...
-				$action_msg .= '
-					<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
-					</form>
-					<form action="files.php" class="inline">
-						'.$Fileman->getFormHiddenInputs().'
-						<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
-					</form>
-					';
-			}
-
-			$action_msg .= '</div>';
-
+			break;
 		}
-		else
+
+		$selected_Filelist->restart();
+		while( $l_File = & $selected_Filelist->get_next() )
 		{
-			$selected_Filelist->restart();
-			while( $lFile =& $selected_Filelist->get_next() )
+			if( !$Fileman->unlink( $l_File ) ) // handles $Messages
+				/* No recursive deletion yet: , isset( $delsubdirs[$lFile->get_md5_ID()] ) */
 			{
-				if( !$Fileman->unlink( $lFile, isset( $delsubdirs[$lFile->get_md5_ID()] ) ) ) // handles Messages
-				{
-					// TODO: offer file again, allowing to include subdirs..
-				}
+				//if( $lFile->is_dir() && ! isset($delsubdirs[$lFile->get_md5_ID()]) )
+				//{
+					// TODO: offer file again (allowing to include subdirs)
+				//}
 			}
 		}
+		$action = 'list';
 		break;
 
 
@@ -522,7 +488,7 @@ switch( $action )
 		$selectedFile->dbsave();
 
 		// Leave special display mode:
-		$Fileman->fm_mode = 'NULL';
+		$Fileman->fm_mode = NULL;
 		break;
 
 
@@ -1189,6 +1155,12 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 		break;
 
+	case 'delete':
+		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
+		$AdminUI->disp_payload_begin();
+		require dirname(__FILE__).'/_files_delete.form.php';
+		$AdminUI->disp_payload_end();
+		break;
 
 	default:
 		// Deferred action message:
@@ -1264,7 +1236,11 @@ require dirname(__FILE__).'/_footer.php';
 
 
 /*
+ * {{{
  * $Log$
+ * Revision 1.122  2005/11/19 03:45:51  blueyed
+ * Transformed 'delete' to 1-2-3-4 scheme, plus small fixes
+ *
  * Revision 1.121  2005/11/14 16:43:43  blueyed
  * FGix actionArray
  *
@@ -1452,6 +1428,6 @@ require dirname(__FILE__).'/_footer.php';
  *
  * Revision 1.58  2005/01/06 10:15:46  blueyed
  * FM upload and refactoring
- *
+ * }}}
  */
 ?>
