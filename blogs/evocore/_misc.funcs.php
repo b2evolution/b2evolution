@@ -1508,7 +1508,7 @@ function debug_info( $force = false )
 				$timer_rows[ $l_cat ] = $Timer->get_duration( $l_cat );
 			}
 			arsort( $timer_rows );
-			echo '<table><thead><th colspan="3" class="center">Timers</th></thead><tbody>';
+			echo '<table><thead><tr><th colspan="3" class="center">Timers</th></tr></thead><tbody>';
 			$count_ignored = 0;
 			foreach( $timer_rows as $l_cat => $l_time )
 			{
@@ -2290,6 +2290,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.146  2005/11/19 03:43:51  blueyed
+ * html fix in debug_info()
+ *
  * Revision 1.145  2005/11/18 22:05:41  fplanque
  * no message
  *
