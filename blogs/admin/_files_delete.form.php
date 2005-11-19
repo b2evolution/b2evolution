@@ -85,13 +85,15 @@ $Form->end_form( array(
 
 
 /*
- * {{{ $Log$
- * {{{ Revision 1.2  2005/11/19 05:20:40  blueyed
- * {{{ this form needs no reset button at the moment
- * {{{
+ * $Log$
+ * Revision 1.3  2005/11/19 05:23:06  blueyed
+ * omg, just fixing log message
+ *
+ * Revision 1.2  2005/11/19 05:20:40  blueyed
+ * this form needs no reset button at the moment
+ *
  * Revision 1.1  2005/11/19 03:45:51  blueyed
  * Transformed 'delete' to 1-2-3-4 scheme, plus small fixes
  *
- * }}}
  */
 ?>
