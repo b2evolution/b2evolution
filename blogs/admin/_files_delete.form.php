@@ -81,15 +81,17 @@ $Form->begin_form( 'fform', T_('Delete') );
 
 <?php
 $Form->end_form( array(
-		array( 'submit', 'submit', T_('Delete'), 'DeleteButton' ),
-		array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+		array( 'submit', 'submit', T_('Delete'), 'DeleteButton' ) ) );
 
 
 /*
- * $Log$
+ * {{{ $Log$
+ * {{{ Revision 1.2  2005/11/19 05:20:40  blueyed
+ * {{{ this form needs no reset button at the moment
+ * {{{
  * Revision 1.1  2005/11/19 03:45:51  blueyed
  * Transformed 'delete' to 1-2-3-4 scheme, plus small fixes
  *
- *
+ * }}}
  */
 ?>
