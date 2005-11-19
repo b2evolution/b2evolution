@@ -485,7 +485,15 @@ switch( $action )
 		$selectedFile->set( 'desc', param( 'desc', 'string', '' ) );
 
 		// Store File object into DB:
-		$selectedFile->dbsave();
+		if( $selectedFile->dbsave() )
+		{
+			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have been updated.' ), $selectedFile->get_name() ), 'success' );
+		}
+		else
+		{
+			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $selectedFile->get_name() ), 'note' );
+		}
+
 
 		// Leave special display mode:
 		$Fileman->fm_mode = NULL;
@@ -1248,6 +1256,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{
  * $Log$
+ * Revision 1.124  2005/11/19 19:25:50  blueyed
+ * Add Messages for update_properties
+ *
  * Revision 1.123  2005/11/19 05:27:12  blueyed
  * chmod to default chmod (664) after upload. This should become a general/user Setting later.
  *
