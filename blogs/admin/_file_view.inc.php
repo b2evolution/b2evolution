@@ -208,8 +208,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	}}}
 	else
 	{
-		Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'),
-																		$Fileman->get_rdfs_path_relto_root( $selectedFile ) ), 'error' );
+		Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selectedFile->get_rdfs_rel_path() ), 'error' );
 	}
 
 	debug_info();

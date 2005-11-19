@@ -367,7 +367,7 @@ while( $lFile = & $Fileman->get_next() )
 	/*
 	if( $Fileman->flatmode && $Fileman->get_sort_order() != 'name' )
 	{	// Display directory name
-		echo './'.$Fileman->get_rdfs_path_relto_root( $lFile );
+		echo './'.$lFile->get_rdfs_rel_path();
 	}
 	else
 	*/
@@ -396,7 +396,7 @@ while( $lFile = & $Fileman->get_next() )
 	{
 		?>
 		<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
-		$subPath = $Fileman->get_rdfs_path_relto_root( $lFile, false );
+		$subPath = $lFile->get_rdfs_rel_path();
 		if( empty( $subPath ) )
 		{
 			$subPath = './';
@@ -843,6 +843,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.47  2005/11/19 23:26:18  blueyed
+ * Fix call to undefined function
+ *
  * Revision 1.46  2005/11/18 21:01:21  fplanque
  * no message
  *
