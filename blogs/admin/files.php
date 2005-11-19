@@ -858,7 +858,7 @@ switch( $Fileman->fm_mode )
 
 				if( $newFile->exists() )
 				{ // The file already exists in the target location!
-					// TODO: Rename/Overwriting
+					// TODO: Rename/Overwriting (save as filename_<numeric_extension> and provide interface to confirm, rename or overwrite)
 					$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->get_name() );
 					// Abort upload for this file:
 					continue;
@@ -872,7 +872,17 @@ switch( $Fileman->fm_mode )
 					continue;
 				}
 
-				$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() ), 'note' );
+				// change to default chmod settings
+				// TODO: make this a Setting
+				$chmod_to = $Fileman->get_default_chmod( $newFile->is_dir() ? 'dir' : 'file' );
+				$newFile->chmod( $chmod_to );
+
+				if( $chmod_to != $newFile->get_perms('octal') )
+				{
+					$LogUpload->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->get_name() ), 'note' );
+				}
+
+				$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() ), 'success' );
 
 				// Refreshes file properties (type, size, perms...)
 				$newFile->load_properties();
@@ -1238,6 +1248,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{
  * $Log$
+ * Revision 1.123  2005/11/19 05:27:12  blueyed
+ * chmod to default chmod (664) after upload. This should become a general/user Setting later.
+ *
  * Revision 1.122  2005/11/19 03:45:51  blueyed
  * Transformed 'delete' to 1-2-3-4 scheme, plus small fixes
  *

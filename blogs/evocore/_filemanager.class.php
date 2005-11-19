@@ -1356,10 +1356,36 @@ class FileManager extends Filelist
 
 		return true;
 	}
+
+
+	/**
+	 * Get the default chmod value for a dir / file.
+	 *
+	 * NOTE: this is only a wrapper to protected members, because it
+	 * should be a general or user Setting really.
+	 *
+	 * @return integer octal format, e.g. 644
+	 */
+	function get_default_chmod( $type )
+	{
+		if( $type == 'dir' )
+		{
+			return $this->_default_chmod_dir;
+		}
+		if( $type == 'file' )
+		{
+			return $this->_default_chmod_file;
+		}
+
+		debug_die( 'Invalid type for get_default_chmod()!' );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.58  2005/11/19 05:27:13  blueyed
+ * chmod to default chmod (664) after upload. This should become a general/user Setting later.
+ *
  * Revision 1.57  2005/11/19 03:43:00  blueyed
  * doc
  *
