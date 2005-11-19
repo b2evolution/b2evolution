@@ -96,7 +96,7 @@ class Filelist
 	/**
 	 * Path to list with trailing slash.
 	 *
-	 * false if we are constructing an arbitraty list (i-e not tied to a single directory)
+	 * false if we are constructing an arbitrary list (i-e not tied to a single directory)
 	 *
 	 * @var boolean|string
 	 * @access protected
@@ -106,7 +106,7 @@ class Filelist
 	/**
 	 * Path to list reltive to root, with trailing slash
 	 *
-	 * false if we are constructing an arbitraty list (i-e not tied to a single directory)
+	 * false if we are constructing an arbitrary list (i-e not tied to a single directory)
 	 *
 	 * @param boolean|string
 	 * @access protected
@@ -258,7 +258,7 @@ class Filelist
 	/**
 	 * Constructor
 	 *
-	 * @param boolean|string Default path for the files, false if you want to create an arbitraty list
+	 * @param boolean|string Default path for the files, false if you want to create an arbitrary list
 	 * @param string Root type: 'user', 'group' or 'collection' (has to be the same for all files..)
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 */
@@ -287,7 +287,9 @@ class Filelist
 
 
 	/**
-	 * Loads or reloads the filelist entries from the current working dir.
+	 * Loads or reloads the filelist entries.
+	 *
+	 * NOTE: this does not work for arbitrary lists!
 	 *
 	 * @param boolean use flat mode (all files recursive without directories)
 	 */
@@ -858,17 +860,34 @@ class Filelist
 
 
 	/**
-	 * Unsets a {@link File} from the entries list.
+	 * Removes a {@link File} from the entries list.
+	 *
+	 * This handles indexes and number of total entries, bytes, files/dirs.
 	 *
 	 * @return boolean true on success, false if not found in list.
 	 */
 	function remove( & $File )
 	{
 		if( isset( $this->_md5_ID_index[ $File->get_md5_ID() ] ) )
-		{ // unset indexes and entry
-			$index = $this->_full_path_index[ $File->get_full_path() ];
-			unset( $this->_full_path_index[ $File->get_full_path() ] );
+		{
+			$this->_total_entries--;
+			$this->_total_bytes -= $File->get_size();
 
+			if( $File->is_dir() )
+			{
+				$this->_total_files--;
+			}
+			else
+			{
+				$this->_total_dirs--;
+			}
+
+			// unset from indexes
+			$index = $this->_full_path_index[ $File->get_full_path() ]; // current index
+			unset( $this->_entries[ $this->_md5_ID_index[ $File->get_md5_ID() ] ] );
+			unset( $this->_md5_ID_index[ $File->get_md5_ID() ] );
+			unset( $this->_full_path_index[ $File->get_full_path() ] );
+			// get the ordered index right: move all next files downwards
 			foreach( $this->_order_index as $lKey => $lValue )
 			{
 				if( $lValue == $index )
@@ -880,9 +899,13 @@ class Filelist
 					unset( $this->_order_index[$lKey - 1] );
 				}
 			}
-			unset( $this->_entries[ $this->_md5_ID_index[ $File->get_md5_ID() ] ] );
-			unset( $this->_md5_ID_index[ $File->get_md5_ID() ] );
 
+			if( $this->_current_idx > -1 && $this->_current_idx <= $index )
+			{ // we have removed a file before or at the index'th position
+				$this->_current_idx--;
+			}
+
+			$this->load(); // reload counters
 			return true;
 		}
 		return false;
@@ -987,6 +1010,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.38  2005/11/19 23:17:29  blueyed
+ * fixed remove(); doc
+ *
  * Revision 1.37  2005/11/19 03:43:00  blueyed
  * doc
  *
