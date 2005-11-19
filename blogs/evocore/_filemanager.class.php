@@ -1255,6 +1255,7 @@ class FileManager extends Filelist
 	 * Unlinks (deletes!) a file.
 	 *
 	 * @param File file object
+	 * @param boolean delete subdirectories? (we cannot support this yet because of integry checks)
 	 * @return boolean true on success, false on failure
 	 */
 	function unlink( & $File, $delsubdirs = false )
@@ -1275,28 +1276,31 @@ class FileManager extends Filelist
 			if( $unlinked = deldir_recursive( $File->get_full_path() ) )
 			{
 				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'),
-															$File->get_name() ), 'success' );
+					$File->get_name() ), 'success' );
 			}
 			else
 			{
-				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'), $File->get_name() ), 'error' );
+				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'),
+					$File->get_name() ), 'error' );
 			}
 			$this->load(); // Reload!
 		}
 		elseif( $unlinked = $File->unlink() )
 		{ // remove from list
-			$Messages->add( sprintf( ( $File->is_dir() ?
-																					T_('The directory &laquo;%s&raquo; has been deleted.') :
-																					T_('The file &laquo;%s&raquo; has been deleted.') ),
-																			$File->get_name() ), 'success' );
+			$Messages->add( sprintf( (
+				$File->is_dir()
+					? T_('The directory &laquo;%s&raquo; has been deleted.')
+					: T_('The file &laquo;%s&raquo; has been deleted.') ),
+				$File->get_name() ), 'success' );
 			$this->remove( $File );
 		}
 		else
 		{
-			$Messages->add( sprintf( ( $File->is_dir() ?
-																				T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') :
-																				T_('Could not delete the file &laquo;%s&raquo;.') ),
-																				$File->get_name() ), 'error' );
+			$Messages->add( sprintf( (
+				$File->is_dir()
+					? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
+					: T_('Could not delete the file &laquo;%s&raquo;.') ),
+				$File->get_name() ), 'error' );
 		}
 
 		return $unlinked;
@@ -1305,8 +1309,10 @@ class FileManager extends Filelist
 
 	/**
 	 * Moves a File object physically
-	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
-	 * @param integer ID of the user, the group or the collection the file belongs to...
+	 *
+	 * @param File The source file
+	 * @param string Target Root type: 'user', 'group' or 'collection'
+	 * @param integer Target ID of the user, the group or the collection the file belongs to...
 	 * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
 	 * @return boolean true on success, false on failure
 	 */
@@ -1354,6 +1360,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.57  2005/11/19 03:43:00  blueyed
+ * doc
+ *
  * Revision 1.56  2005/11/18 21:01:21  fplanque
  * no message
  *

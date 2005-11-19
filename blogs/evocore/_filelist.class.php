@@ -65,14 +65,14 @@ require_once dirname(__FILE__).'/_file.class.php';
 class Filelist
 {
 	/**
-	 * Root type: 'user', 'group', 'collection' or 'absolute'.
+	 * Root type: 'user', 'group' or 'collection'.
 	 *
 	 * All files in this list MUST have that same root type. Adding will fail otherwise.
 	 *
 	 * @var string
 	 * @access protected
 	 */
-	var $_root_type = 'absolute';
+	var $_root_type;
 
 	/**
 	 * Root ID: ID of the user, the group or the collection the file belongs to...
@@ -259,10 +259,10 @@ class Filelist
 	 * Constructor
 	 *
 	 * @param boolean|string Default path for the files, false if you want to create an arbitraty list
-	 * @param string Optional Root type: 'user', 'group', 'collection' or 'absolute'
-	 * @param integer Optional ID of the user, the group or the collection the file belongs to...
+	 * @param string Root type: 'user', 'group' or 'collection' (has to be the same for all files..)
+	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 */
-	function Filelist( $path, $root_type = NULL, $root_ID = NULL )
+	function Filelist( $path, $root_type, $root_ID )
 	{
 		global $FileRootCache;
 
@@ -428,13 +428,12 @@ class Filelist
 		$this->_full_path_index = array();
 
 		$count = 0;
-  	foreach( $this->_entries as $loop_File )
+		foreach( $this->_entries as $loop_File )
 		{
 			$this->_md5_ID_index[$loop_File->get_md5_ID()] = $count;
 			$this->_full_path_index[$loop_File->get_full_path()] = $count;
 			$count++;
 		}
-
 	}
 
 
@@ -988,6 +987,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.37  2005/11/19 03:43:00  blueyed
+ * doc
+ *
  * Revision 1.36  2005/11/18 07:53:05  blueyed
  * use $_FileRoot / $FileRootCache for absolute path, url and name of roots.
  *
