@@ -99,7 +99,7 @@ function trackback(
 	$excerpt = rawurlencode($excerpt);
 	$blog_name = rawurlencode(get_bloginfo('name'));
 	$Item = $ItemCache->get_by_ID( $ID );
-	$url = $Item->gen_permalink();
+	$url = rawurlencode( $Item->gen_permalink('', '', false, '&') );
 	// dis is the trackback stuff to be sent:
 	$query_string = "title=$title&url=$url&blog_name=$blog_name&excerpt=$excerpt";
 	// echo "url:$trackback_url<br>$sending:$query_string<br />";
@@ -220,6 +220,9 @@ function trackback_number( $zero='#', $one='#', $more='#' )
 
 /*
  * $Log$
+ * Revision 1.9  2005/11/20 18:03:01  blueyed
+ * Fix sending wrong encoded url on trackbacks. Fix by knj (http://forums.b2evolution.net/viewtopic.php?t=5890)
+ *
  * Revision 1.8  2005/10/31 05:51:06  blueyed
  * Use rawurlencode() instead of urlencode()
  *
