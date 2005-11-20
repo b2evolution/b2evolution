@@ -89,6 +89,14 @@ if( !$Settings->get( 'fm_enabled' ) )
 $current_User->check_perm( 'files', 'view', true );
 
 
+// Add hint / help message on first launch from the "Files" or "Upload" button in _item.form.php
+if( $mode == 'upload' && param( 'display_hint_img', 'integer' ) )
+{
+	$Messages->add( /* TRANS: "&laquo;img&raquo;" should not be translated, the button is labeled like this! */ T_('You can use the &laquo;img&raquo; button to insert html tags for selected files into your post.'), 'note' );
+}
+
+
+// INIT params:
 if( param( 'root_and_path', 'string', '', true ) )
 { // root and path together: decode and override (overriding is especially used in root switch select)
 	$root_and_path = unserialize( $root_and_path );
@@ -316,7 +324,7 @@ switch( $action )
 
 
 	case 'rename':
-		// Rename a file:
+		// Rename a file: {{{
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
@@ -390,12 +398,12 @@ switch( $action )
 
 			$action = 'list';
 		}
-
+		// }}}
 		break;
 
 
 	case 'delete':
-		// delete a file/dir
+		// Delete a file or directory: {{{
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
@@ -449,37 +457,47 @@ switch( $action )
 		while( $l_File = & $selected_Filelist->get_next() )
 		{
 			if( !$Fileman->unlink( $l_File ) ) // handles $Messages
-				/* No recursive deletion yet: , isset( $delsubdirs[$lFile->get_md5_ID()] ) */
+				/* No recursive deletion yet: , isset( $delsubdirs[$l_File->get_md5_ID()] ) */
 			{
-				//if( $lFile->is_dir() && ! isset($delsubdirs[$lFile->get_md5_ID()]) )
+				//if( $l_File->is_dir() && ! isset($delsubdirs[$l_File->get_md5_ID()]) )
 				//{
 					// TODO: offer file again (allowing to include subdirs)
 				//}
 			}
 		}
 		$action = 'list';
+		// }}}
 		break;
 
 
 	case 'edit_properties':
-		// Edit File properties (Meta Data):
+		// Edit File properties (Meta Data); this starts the File_properties mode: {{{
 
-		// Check permission:
-		$current_User->check_perm( 'files', 'view', true );
+		if( ! $current_User->check_perm( 'files', 'view' ) )
+		{ // We do not have permission to edit files
+			$Messages->add( T_('You have no permission to view files.'), 'error' );
+			$action = 'list';
+			break;
+		}
 
 		$selectedFile = & $selected_Filelist->getFileByIndex(0);
 		// Load meta data:
 		$selectedFile->load_meta();
 
 		$Fileman->fm_mode = 'File_properties';
+		// }}}
 		break;
 
 
 	case 'update_properties':
-		// Update File properties (Meta Data):
+		// Update File properties (Meta Data); on success this ends the File_properties mode: {{{
 
-		// Check permission:
-		$current_User->check_perm( 'files', 'edit', true );
+		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		{ // We do not have permission to edit files
+			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
+			$action = 'list';
+			break;
+		}
 
 		$selectedFile = & $selected_Filelist->getFileByIndex(0);
 		// Load meta data:
@@ -501,13 +519,20 @@ switch( $action )
 
 		// Leave special display mode:
 		$Fileman->fm_mode = NULL;
+		// }}}
 		break;
 
 
 	case 'link':
-		// TODO: check perm!!
+		// Link File to Item: {{{
+		// TODO: use a more distinct name like 'link_file' to allow easier searching!
+		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		{ // We do not have permission to edit files
+			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
+			$action = 'list';
+			break;
+		}
 
-		// Link File to Item:
 		if( !$selected_Filelist->count() )
 		{
 			$Messages->add( T_('Nothing selected.'), 'error' );
@@ -556,16 +581,22 @@ switch( $action )
 		}
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		else
-		{	// No Item to link to...
+		{	// No Item to link to - end link_item mode.
 			$Fileman->fm_mode = NULL;
 		}
+		// }}}
 		break;
 
 
 	case 'unlink':
-		// TODO: check perm!
+		// Unlink File from Item: {{{
+		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		{ // We do not have permission to edit files
+			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
+			$action = 'list';
+			break;
+		}
 
-		// Unlink File from Item:
 		if( !isset( $edited_Link ) )
 		{
 			break;
@@ -582,11 +613,12 @@ switch( $action )
 		$edited_Link->dbdelete( true );
 		unset( $edited_Link );
 		$Messages->add( $msg, 'success' );
+		// }}}
 		break;
 
 
 	case 'edit_perms':
-		// edit permissions
+		// Edit file or directory permissions: {{{
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
@@ -622,41 +654,41 @@ switch( $action )
 		if( count( $perms ) || count( $use_default_perms ) )
 		{ // New permissions given, change them
 			$selected_Filelist->restart();
-			while( $lFile = & $selected_Filelist->get_next() )
+			while( $l_File = & $selected_Filelist->get_next() )
 			{
-				if( in_array( $lFile->get_md5_ID(), $use_default_perms ) )
+				if( in_array( $l_File->get_md5_ID(), $use_default_perms ) )
 				{ // use default
 					$chmod = $edit_perms_default;
 				}
-				elseif( !isset($perms[ $lFile->get_md5_ID() ]) )
+				elseif( !isset($perms[ $l_File->get_md5_ID() ]) )
 				{ // happens for an empty text input or when no radio option is selected
-					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not been changed.'), $lFile->get_name() ), 'note' );
+					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not been changed.'), $l_File->get_name() ), 'note' );
 					continue;
 				}
 				else
 				{ // provided for this file
-					$chmod = $perms[ $lFile->get_md5_ID() ];
+					$chmod = $perms[ $l_File->get_md5_ID() ];
 				}
 
-				$oldperms = $lFile->get_perms( 'raw' );
-				$newperms = $lFile->chmod( $chmod );
+				$oldperms = $l_File->get_perms( 'raw' );
+				$newperms = $l_File->chmod( $chmod );
 
 				if( $newperms === false )
 				{
-					$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $lFile->get_name(), $chmod ), 'error' );
+					$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $l_File->get_name(), $chmod ), 'error' );
 				}
 				else
 				{
-					// Success, remove the file from the list:
-					$selected_Filelist->remove( $lFile );
+					// Success, remove the file from the list of selected files:
+					$selected_Filelist->remove( $l_File );
 
 					if( $newperms === $oldperms )
 					{
-						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not changed.'), $lFile->get_name() ), 'note' );
+						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not changed.'), $l_File->get_name() ), 'note' );
 					}
 					else
 					{
-						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->get_perms() ), 'success' );
+						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $l_File->get_name(), $l_File->get_perms() ), 'success' );
 					}
 				}
 			}
@@ -666,6 +698,7 @@ switch( $action )
 		{
 			$action = 'list';
 		}
+		// }}}
 		break;
 
 
@@ -1249,8 +1282,11 @@ require dirname(__FILE__).'/_footer.php';
 
 
 /*
- * {{{
+ * {{{ Revision log:
  * $Log$
+ * Revision 1.126  2005/11/20 20:38:19  blueyed
+ * Display hint about "img" tag to insert tags into the post when the file manager is launched in upload mode. Normalisation, doc.
+ *
  * Revision 1.125  2005/11/19 23:48:28  blueyed
  * "Edit File permissions" action fixed/finished
  *
