@@ -298,6 +298,14 @@ class quicktags_plugin extends Plugin
 				var startPos = myField.selectionStart;
 				var endPos = myField.selectionEnd;
 				var cursorPos = endPos;
+
+				var scrollTop, scrollLeft;
+				if( myField.type == 'textarea' && typeof myField.scrollTop != 'undefined' )
+				{ // remember old position
+					scrollTop = myField.scrollTop;
+					scrollLeft = myField.scrollLeft;
+				}
+
 				if (startPos != endPos)
 				{ // some text selected
 					myField.value = myField.value.substring(0, startPos)
@@ -305,17 +313,10 @@ class quicktags_plugin extends Plugin
 												+ myField.value.substring(startPos, endPos)
 												+ b2evoButtons[i].tagEnd
 												+ myField.value.substring(endPos, myField.value.length);
-					cursorPos += b2evoButtons[i].tagStart.length + edButtons[i].tagEnd.length;
+					cursorPos += b2evoButtons[i].tagStart.length + b2evoButtons[i].tagEnd.length;
 				}
 				else
 				{
-					var scrollTop, scrollLeft;
-					if( myField.type == 'textarea' && typeof myField.scrollTop != 'undefined' )
-					{ // remember old position
-						scrollTop = myField.scrollTop;
-						scrollLeft = myField.scrollLeft;
-					}
-
 					if (!b2evoCheckOpenTags(i) || b2evoButtons[i].tagEnd == '')
 					{
 						myField.value = myField.value.substring(0, startPos)
@@ -333,6 +334,7 @@ class quicktags_plugin extends Plugin
 						cursorPos = startPos + b2evoButtons[i].tagEnd.length;
 					}
 				}
+
 				if( typeof scrollTop != 'undefined' )
 				{ // scroll to old position
 					myField.scrollTop = scrollTop;
@@ -344,7 +346,7 @@ class quicktags_plugin extends Plugin
 				myField.selectionEnd = cursorPos;
 			}
 			else
-			{
+			{ // Browser not especially supported
 				if (!b2evoCheckOpenTags(i) || b2evoButtons[i].tagEnd == '') {
 					myField.value += b2evoButtons[i].tagStart;
 					b2evoAddTag(i);
