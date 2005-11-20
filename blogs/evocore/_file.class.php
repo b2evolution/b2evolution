@@ -841,7 +841,7 @@ class File extends DataObject
 	/**
 	 * Rename the file in its current directoty on disk.
 	 *
-	 * Also update meta data in DB
+	 * Also update meta data in DB.
 	 *
 	 * @access public
 	 * @param string new name (without path!)
@@ -850,6 +850,11 @@ class File extends DataObject
 	function rename_to( $newname )
 	{
 		// echo "newname= $newname ";
+
+		if( file_exists($this->_dir.$newname) )
+		{
+			return false;
+		}
 
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{
@@ -880,7 +885,9 @@ class File extends DataObject
 			$this->dbupdate();
 		}
 		else
-		{	// There migth be some old meta data to recyle in the DB...
+		{	// There might be some old meta data to recycle in the DB...
+			// blueyed>> When? There's a UNIQUE index on ( file_root_type, file_root_ID, file_path )
+			//           instead, when overwriting, we'd have to remove the old data!
 			$this->load_meta();
 		}
 
@@ -905,6 +912,11 @@ class File extends DataObject
 
 		$rdfp_rel_path = str_replace( '\\', '/', $rdfp_rel_path );
 		$adfp_posix_path = $FileRootCache->get_root_dir( $root_type, $root_ID ).$rdfp_rel_path;
+
+		if( file_exists($adfp_posix_path) )
+		{
+			return false;
+		}
 
 		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )
 		{
@@ -933,7 +945,9 @@ class File extends DataObject
 			$this->dbupdate();
 		}
 		else
-		{	// There migth be some old neta dat to recyle in the DB...
+		{	// There might be some old meta data to recycle in the DB...
+			// blueyed>> When? There's a UNIQUE index on ( file_root_type, file_root_ID, file_path )
+			//           instead, when overwriting, we'd have to remove the old data!
 			$this->load_meta();
 		}
 
@@ -1188,6 +1202,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2005/11/20 23:13:02  blueyed
+ * Fix rename_to() and move_to() to return false on existing files!; doc
+ *
  * Revision 1.44  2005/11/19 19:24:19  blueyed
  * dbupdate(), dbinsert(): propagate changes from parent
  *
