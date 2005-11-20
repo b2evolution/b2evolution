@@ -113,9 +113,13 @@ class linklogger_plugin extends Plugin
 	}
 
 
+	/**
+	 * Replaces parts of the post that are links by links through the redirect script and
+	 * inserts non-existing posts into the Linkblog.
+	 */
 	function replace_callback( $aopentag, $atext )
 	{
-		global $current_User, $localtimenow, $locales, $Debuglog;
+		global $current_User, $localtimenow, $locales, $Debuglog, $ItemCache;
 
 		$r = $aopentag.$atext.'</a>'; // standard return
 
@@ -130,10 +134,15 @@ class linklogger_plugin extends Plugin
 			return $r;
 		}
 
+		// build the redirect-URL
+		$linklogger_redirurl = sprintf($this->destformat, $url);
+		$r = preg_replace( '#href\s*=\s*".*?"#', 'href="'.$linklogger_redirurl.'"', $aopentag ).$atext.'</a>';
+
+
 		// get title for autolinkblog entry
 		$atext = strip_tags( $atext );
 		if( empty($atext) )
-		{
+		{ // can happen if we just link an img or similar
 			if( preg_match( '# title\s*=\s*"(.*?)"#i', $aopentag, $matches ) )
 			{ // get title out of a-tag
 				$linklogger_title = $matches[1];
@@ -148,24 +157,11 @@ class linklogger_plugin extends Plugin
 			$linklogger_title = $atext;
 		}
 
-		// get lang/locale     QUESTION: are there other ways?
-		if( preg_match( '# lang\s*=\s*"(.*?)"#i', $aopentag, $matches ) )
-		{
-			$urllocale = locale_by_lang( $matches[1] );  // might be sth we don't know though
-		}
-		else
-		{ // locale of posting user by default
-			$urllocale = $current_User->locale;  // TODO: locale by post!
-		}
-
-
-		// build the redirect-URL
-		$linklogger_redirurl = sprintf($this->destformat, $url);
-		$r = preg_replace( '#href\s*=\s*".*?"#', 'href="'.$linklogger_redirurl.'"', $aopentag ).$atext.'</a>';
 
 		#pre_dump( $linklogger_redirurl, 'redir to' );
 		$linklogger_urltitle = urltitle_validate( '', $linklogger_title, 0, true );
 		#pre_dump( $linklogger_urltitle, 'url title' );
+
 
 		// look up if URL exists  TODO: check if it's in the Autolinkblog!
 		if( ($Item = $ItemCache->get_by_urltitle( $linklogger_urltitle, false )) )
@@ -174,6 +170,21 @@ class linklogger_plugin extends Plugin
 			{ // with exact our URL
 				return $r;
 			}
+		}
+
+
+		// not stored yet, insert:
+
+		// get lang/locale     QUESTION: are there other ways?
+		if( preg_match( '# lang\s*=\s*"(.*?)"#i', $aopentag, $matches ) )
+		{
+			$urllocale = locale_by_lang( $matches[1] );  // might be sth we don't know though (locale_by_lang() should return false and we had to check for it)
+		}
+		else
+		{
+			// TODO: get the locale of the post where the link is in!
+			global $default_locale;
+			$urllocale = $default_locale;
 		}
 
 		// the linklogger entry does not exist yet, so create it
@@ -195,6 +206,7 @@ class linklogger_plugin extends Plugin
 			$this->linklogger_comments,
 			array('') // renderers
 		);
+
 
 		return $r;
 	}
