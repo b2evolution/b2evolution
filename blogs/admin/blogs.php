@@ -493,6 +493,7 @@ switch($action)
 		// GENERATION!
 		$static_gen_saved_locale = $current_locale;
 		$generating_static = true;
+		$resolve_extra_path = false;
 		flush();
 		ob_start();
 		switch( $edited_Blog->access_type )
@@ -563,6 +564,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.43  2005/11/20 17:53:21  blueyed
+ * Better fix for generating static pages
+ *
  * Revision 1.42  2005/11/09 00:02:04  blueyed
  * todo
  *

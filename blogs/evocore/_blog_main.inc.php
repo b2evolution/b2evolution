@@ -143,8 +143,8 @@ locale_activate( $Blog->get('locale') );
 // -------------------------
 // Extra path info decoding:
 // -------------------------
-if ( !empty($tempskin) || !empty($generating_static) )
-{ // We don't want extra path resolution on rss files and when generating static pages
+if( !empty($tempskin) )
+{ // We don't want extra path resolution on rss files
 	$resolve_extra_path = false;
 }
 if( !isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
@@ -437,6 +437,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.29  2005/11/20 17:53:21  blueyed
+ * Better fix for generating static pages
+ *
  * Revision 1.28  2005/11/19 01:39:02  blueyed
  * Fix tempskin handling (patch by marian) and add debugging output (also to skin handling). Also, remove ereg() call that isn't necessary anymore when using basename_dironly()
  *
