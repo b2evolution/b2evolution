@@ -53,6 +53,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $Form = & new Form( 'files.php' );
 
+$Form->global_icon( T_('Cancel delete!'), 'close',	$Fileman->getCurUrl( ) );
+
 $Form->begin_form( 'fform', T_('Delete') );
 	echo $Fileman->getFormHiddenInputs();
 	echo $Fileman->getFormHiddenSelectedFiles();
@@ -84,6 +86,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.5  2005/11/20 21:29:07  blueyed
+ * "X" (cancel) global icon back again, to allow canceling the action. Sorry.. ;)
+ *
  * Revision 1.4  2005/11/19 23:45:52  blueyed
  * no "cancel" global icon, because it's no mode
  *
