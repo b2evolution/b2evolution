@@ -505,7 +505,7 @@ else
 		if( $mode == 'upload' )
 		{	// We are uploading in a popup opened by an edit screen
 			?>
-    	<input class="ActionButton"
+			<input class="ActionButton"
 				title="<?php echo T_('Insert IMG tags for selected files'); ?>"
 				name="actionArray[img_tag]"
 				value="img"
@@ -515,7 +515,7 @@ else
 		}
 
 
-    if( $current_User->check_perm( 'files', 'edit' ) )
+		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
 			?>
 			<input class="ActionButton" type="image" name="actionArray[rename]"
@@ -525,19 +525,12 @@ else
 			<input class="DeleteButton" type="image" name="actionArray[delete]"
 				title="<?php echo T_('Delete the selected files') ?>"
 				src="<?php echo get_icon( 'file_delete', 'url' ) ?>" />
-		<?php
+			<?php
+			// NOTE: No delete confirmation by javascript, we need to check DB integrity!
+
 		}
-			/* No delete javascript, we need toi check DB integrity:
 
-			onclick="if( r = openselectedfiles(true) )
-								{
-									if( confirm('<?php echo TS_('Do you really want to delete the selected files?') ?>') )
-									{
-										document.getElementById( 'FilesForm' ).confirmed.value = 1;
-										return true;
-									}
-								}; return false;" />
-
+		/*
 			<!-- Not implemented yet: input class="ActionButton"
 				title="<?php echo T_('Download the selected files') ?>"
 				name="actionArray[download]"
@@ -550,12 +543,7 @@ else
 				name="actionArray[sendbymail]" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
 
 
-			/*
-			TODO: "link these into current post" (that is to say the post that opened the popup window).
-						This would create <img> or <a href> tags depending on file types.
-			*/
-
-	/* Not fully functional
+		/* Not fully functional:
 		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
 			title="<?php echo T_('Copy the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
@@ -565,7 +553,7 @@ else
 			title="<?php echo T_('Move the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
 			src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
-	*/ ?>
+		*/ ?>
 
 		<input class="ActionButton" type="image" name="actionArray[edit_perms]"
 			onclick="return openselectedfiles(true);"
@@ -586,7 +574,8 @@ else
 
 <?php
 if( $countFiles )
-{
+{{{ // include JS
+	// TODO: remove these javascript functions to an external .js file and include them through $AdminUI->add_headline()
 	?>
 	<script type="text/javascript">
 		<!--
@@ -623,6 +612,8 @@ if( $countFiles )
 
 		/**
 		 * Textarea insertion code
+		 *
+		 * TODO: make this a generic b2evo function. The quicktags plugin also uses it.
 		 */
 		function textarea_replace_selection( myField, snippet )
 		{
@@ -638,10 +629,24 @@ if( $countFiles )
 				var startPos = myField.selectionStart;
 				var endPos = myField.selectionEnd;
 				var cursorPos;
+				var scrollTop, scrollLeft;
+				if( myField.type == 'textarea' && typeof myField.scrollTop != 'undefined' )
+				{ // remember old position
+					scrollTop = myField.scrollTop;
+					scrollLeft = myField.scrollLeft;
+				}
+
 				myField.value = myField.value.substring(0, startPos)
-												+ snippet
-												+ myField.value.substring(endPos, myField.value.length);
+				                + snippet
+				                + myField.value.substring(endPos, myField.value.length);
 				cursorPos = startPos+snippet.length;
+
+				if( typeof scrollTop != 'undefined' )
+				{ // scroll to old position
+					myField.scrollTop = scrollTop;
+					myField.scrollLeft = scrollLeft;
+				}
+
 				myField.focus();
 				myField.selectionStart = cursorPos;
 				myField.selectionEnd = cursorPos;
@@ -689,7 +694,8 @@ if( $countFiles )
 		// -->
 	</script>
 	<?php
-}
+}}}
+
 
 /*
  * CREATE:
@@ -843,6 +849,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.50  2005/11/20 20:18:20  blueyed
+ * Added Mozilla scrolling fix to javascript function textarea_replace_selection(), which gets used for inserting img/div tags; doc, todo
+ *
  * Revision 1.49  2005/11/20 00:40:09  blueyed
  * Get the automatic JS selection of checkbox more straight (using cb.checked instead of cb.click()); indeed this hang Konqueror!
  *
