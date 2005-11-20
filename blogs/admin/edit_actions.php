@@ -418,16 +418,18 @@ switch($action)
 			param( 'newcomment_author', 'string', true );
 			param( 'newcomment_author_email', 'string' );
 			param( 'newcomment_author_url', 'string' );
+
+			// CHECK url
+			if( $error = validate_url( $newcomment_author_url, $allowed_uri_scheme ) )
+			{
+				$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
+			}
 		}
 		param( 'content', 'html' );
 		param( 'post_autobr', 'integer', ($comments_use_autobr == 'always')?1:0 );
 
 
 		// CHECK and FORMAT content
-		if( $error = validate_url( $newcomment_author_url, $allowed_uri_scheme ) )
-		{
-			$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
-		}
 		$content = format_to_post( $content, $post_autobr, 0); // We are faking this NOT to be a comment
 
 		if( $Messages->display( T_('Cannot update comment, please correct these errors:'),
