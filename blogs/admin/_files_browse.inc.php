@@ -273,7 +273,8 @@ while( $lFile = & $Fileman->get_next() )
 
 	if( $countFiles%2 ) echo ' class="odd"';
 
-	echo ' onclick="document.getElementById(\'cb_filename_'.$countFiles.'\').click();">';
+	// select the file by default, when clicking on the <tr>; this gets "undone" for the checkbox itself and the filename link
+	echo ' onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">';
 
 	/*
 	 * Checkbox:
@@ -281,7 +282,7 @@ while( $lFile = & $Fileman->get_next() )
 	echo '<td class="checkbox firstcol">';
 	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"
-				onclick="this.click();"';
+				onclick="this.checked = ! this.checked;"'; // undo the <tr>'s onclick checking of this box
 	if( $checkall || $Fileman->isSelected( $lFile ) )
 	{
 		echo ' checked="checked"';
@@ -293,8 +294,7 @@ while( $lFile = & $Fileman->get_next() )
 	 */
 	if( $mode == 'upload' )
 	{
-		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles
-						.'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
+		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles.'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
 	}
 
 	echo '</td>';
@@ -363,7 +363,7 @@ while( $lFile = & $Fileman->get_next() )
 	/*
 	 * Filename:
 	 */
-	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" onclick="document.getElementById(\'cb_filename_'.$countFiles.'\').click();">';
+	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">';
 	/*
 	if( $Fileman->flatmode && $Fileman->get_sort_order() != 'name' )
 	{	// Display directory name
@@ -843,6 +843,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.49  2005/11/20 00:40:09  blueyed
+ * Get the automatic JS selection of checkbox more straight (using cb.checked instead of cb.click()); indeed this hang Konqueror!
+ *
  * Revision 1.48  2005/11/19 23:48:28  blueyed
  * "Edit File permissions" action fixed/finished
  *
