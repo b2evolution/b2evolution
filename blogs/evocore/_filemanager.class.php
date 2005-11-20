@@ -1308,6 +1308,32 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Rename a File object physically
+	 *
+	 * @param File The source file
+	 * @param string The new name (expected to not exist)
+	 * @return boolean true on success, false on failure (e.g. file already exists)
+	 */
+	function rename_File( & $File, $new_name )
+	{
+		if( ! $File->rename_to( $new_name ) )
+		{ // failed
+			return false;
+		}
+
+		// We have moved in same dir, update caches:
+		$this->update_caches();
+
+		if( $this->contains( $File ) === false )
+		{ // File not in filelist (expected if not same dir)
+			$this->add( $File );
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Moves a File object physically
 	 *
 	 * @param File The source file
@@ -1383,6 +1409,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.60  2005/11/20 23:14:08  blueyed
+ * added rename_File()
+ *
  * Revision 1.59  2005/11/19 23:48:28  blueyed
  * "Edit File permissions" action fixed/finished
  *
