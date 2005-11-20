@@ -171,7 +171,7 @@ class ItemList extends DataObjectList
 		$timestamp_max = 'now',     // Do not show posts after this timestamp
 		$title = '',                // urltitle of post to display
 		$dstart = '',               // YearMonth(Day) to start at, '' for first available
-		$cache_name = '#',					// 
+		$cache_name = '#',					//
 		$params = array() )					// List of other params ( client_link, ...)
 	{
 		global $DB, $object_def;
@@ -403,21 +403,30 @@ class ItemList extends DataObjectList
 			$ID_list = $DB->get_list( $step1_sql, 0, 'Get ID list for Item List (Main|Lastpostdate) Query' );
 
 			$this->sql = 'SELECT *
-											FROM '.$this->dbtablename;
+			                FROM '.$this->dbtablename;
 			if( !empty($ID_list) )
 			{
 				$this->sql .= ' WHERE '.$this->dbIDname.' IN ('.$ID_list.')
-										    ORDER BY '.$this->dbprefix.$orderby;
+				                ORDER BY '.$this->dbprefix.$orderby;
 			}
 			else
 			{
 				$this->sql .= ' WHERE 0';
 			}
 
-			$this->count_request = 'SELECT COUNT('.$this->dbIDname.')
-                                FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
-																		INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-															'.$where;
+			/**
+			 * TODO: it's reported on the forums that
+			 *   SELECT COUNT(DISTINCT '.$this->dbIDname.')
+			 * should fix counting of posts, when "messing around" with posts to
+			 * categories assignments.
+			 * However, there's a unique index in T_postcats..
+			 * @see http://forums.b2evolution.net/viewtopic.php?t=6069
+			 */
+			$this->count_request = '
+				SELECT COUNT('.$this->dbIDname.')
+				FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
+					INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+					'.$where;
 		}
 
 		//echo $this->sql;
@@ -462,7 +471,7 @@ class ItemList extends DataObjectList
 	 */
 	function preview_request()
 	{
-		global $DB, $localtimenow, $Messages;
+		global $DB, $localtimenow, $Messages, $current_User;
 
 		$id = 0;
 		$preview_userid = param( 'preview_userid', 'integer', true );
@@ -475,8 +484,16 @@ class ItemList extends DataObjectList
 		$post_views = param( 'post_views', 'integer', 0 );
 		$renderers = param( 'renderers', 'array', array() );
 		$post_comments = param( 'post_comments', 'string', true );
-		$item_issue_date = param( 'item_issue_date', 'string', true );
-		$item_issue_time = param( 'item_issue_time', 'string', true );
+		if( $current_User->check_perm( 'edit_timestamp' ) && param( 'edit_date', 'integer', 0 ) )
+		{ // user is allowed to edit timestamps and has checked the box
+			$item_issue_date = param( 'item_issue_date', 'string', true );
+			$item_issue_time = param( 'item_issue_time', 'string', true );
+		}
+		else
+		{
+			$item_issue_date = date( 'Y-m-d' );
+			$item_issue_time = date( 'H:i:s' );
+		}
 
 		if( !($item_typ_ID = param( 'item_typ_ID', 'integer', true )) )
 			$item_typ_ID = NULL;
@@ -843,6 +860,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.40  2005/11/20 01:30:36  blueyed
+ * Fixed preview for users that are not allowed to edit timestamps; added TODO
+ *
  * Revision 1.39  2005/11/18 21:00:20  fplanque
  * extensible param (used by Progidistri)
  *
