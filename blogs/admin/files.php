@@ -958,6 +958,10 @@ switch( $Fileman->fm_mode )
 		 *   'copy' is just 'move and keep the source', while 'rename' is 'move in the same dir'
 		 *
 		 */
+		// TODO: on error notes use a prefix that describes the source root (if they differ).
+		//       Probably a method of $Fileman, like get_names_realtive_to( $a_File, $b_File, $root_type, $root_ID, $rel_path ),
+		//       because "Copied «test_me.jpg» to «test_me.jpg»." (from one root to another) is not so good.
+
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
@@ -1278,6 +1282,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.129  2005/11/21 04:17:24  blueyed
+ * todo
+ *
  * Revision 1.128  2005/11/21 04:13:08  blueyed
  * file_copy/file_move: ignore non-existing files and remove them from SourceList
  *
