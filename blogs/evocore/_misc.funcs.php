@@ -1448,26 +1448,24 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 /**
  * Outputs last words. When in debug mode it also prints a backtrace.
  *
- * After this, it prints by default '</body></html>' to keep the output probably valid.
+ * After this, it prints by default '</body></html>' to keep the output
+ * probably valid.
  *
  * @param string Message to output
- * @param boolean|NULL If set it overrides the setting of {@link $debug} to decide if we want a backtrace.
+ * @param boolean|NULL If set it overrides the setting of {@link $debug} to
+ *                     decide if we want a backtrace and whole debug_info.
  * @param string This gets output at the very end (after backtrace and last words)
  */
-function debug_die( $last_words = '', $backtrace = NULL, $very_last = '</body></html>' )
+function debug_die( $last_words = '', $force = NULL, $very_last = '</body></html>' )
 {
 	global $debug;
 
 	echo $last_words;
 
-	if( !isset($backtrace) )
-	{
-		$backtrace = $debug;
-	}
-
-	if( $backtrace )
+	if( ( isset($force) && $force ) || ( !isset($force) && $debug ) )
 	{
 		echo debug_get_backtrace();
+		debug_info();
 	}
 
 	die( $very_last );
@@ -2290,6 +2288,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.147  2005/11/21 18:17:26  blueyed
+ * debug_die(): also display debug_info() on $debug (or $force param)
+ *
  * Revision 1.146  2005/11/19 03:43:51  blueyed
  * html fix in debug_info()
  *
