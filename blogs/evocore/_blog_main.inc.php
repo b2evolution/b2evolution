@@ -323,6 +323,9 @@ if( !empty($tempskin) )
 {
 	// This will be handled like any other skin, except that it will not be stored in a cookie:
 	$skin = $tempskin;
+	$default_skin = '_rss'; // That's gonna be the fallback for now.
+	// TODO [post-phoenix]: decide when or when not you are allowed to override a 'force_skin' directive,
+	// and when or when not you are allowed to fall back to $default_skin.
 }
 
 // Let's check if a skin has been forced in the stub file:
@@ -419,6 +422,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.32  2005/11/21 16:52:31  fplanque
+ * okay, a TWO liner :P
+ *
  * Revision 1.31  2005/11/21 16:46:47  fplanque
  * I find it amazing how you guys can get into insanely overly complex overdesigned patterns! :/
  * The $tempskin thing is a one liner!!
