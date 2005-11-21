@@ -437,8 +437,8 @@ function next_posts_link($label='#', $max_page=0, $page='')
 	$nextpage = intval($paged) + 1;
 	if (empty($p) && (empty($paged) || $nextpage <= $max_page))
 	{
-
-		// marian> TODO: put this into a generic function
+		/*
+		// fplanque>> this code was supposed to make this work on multiple domains, but it breaks stub files !
 		$siteurl = $Blog->get( 'siteurl', 'raw');
 		if ( !empty( $siteurl ) )
 		{
@@ -447,6 +447,8 @@ function next_posts_link($label='#', $max_page=0, $page='')
 					$parsed_url['host'] .
 					$parsed_url['path'];
 		}
+		*/
+
 		echo '<a href="';
 		echo next_posts($max_page, $page);
 		echo '">'. htmlspecialchars($label) .'</a>';
@@ -469,7 +471,8 @@ function previous_posts_link($label='#', $page='')
 
 	if( empty($p) && ($paged > 1) )
 	{
-		// marian> TODO: put this into a generic function
+		/*
+		// fplanque>> this code was supposed to make this work on multiple domains, but it breaks stub files !
 		$siteurl = $Blog->get( 'siteurl', 'raw');
 		if ( !empty( $siteurl ) )
 		{
@@ -478,7 +481,8 @@ function previous_posts_link($label='#', $page='')
 					$parsed_url['host'] .
 					$parsed_url['path'];
 		}
-
+		*/
+		
 		echo '<a href="';
 		echo previous_posts( $page );
 		echo '">'.htmlspecialchars($label).'</a>';
@@ -952,6 +956,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.38  2005/11/21 20:51:44  fplanque
+ * this is still broken! I prefer to have single domain working in all configurations.
+ *
  * Revision 1.37  2005/11/06 10:43:19  marian
  * changes to make the multi-domain feature working
  *
