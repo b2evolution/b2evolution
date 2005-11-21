@@ -145,6 +145,7 @@ locale_activate( $Blog->get('locale') );
 // -------------------------
 if( !empty($tempskin) )
 { // We don't want extra path resolution on rss files
+	// fplanque: why not??
 	$resolve_extra_path = false;
 }
 if( !isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
@@ -327,14 +328,7 @@ if( !empty($tempskin) )
 
 	if( !empty($tempskin) )
 	{
-		if( !empty($disp) && $disp == 'comments' && skin_exists( $tempskin, '_lastcomments.php' ) )
-		{
-			$Debuglog->add( 'Including tempskin: '.$tempskin.' (comments)', 'skin' );
-
-			require( get_path( 'skins' ).$tempskin.'/_lastcomments.php' );
-			exit;
-		}
-		elseif( skin_exists( $tempskin, '_main.php' ) )
+		if( skin_exists( $tempskin, '_main.php' ) )
 		{
 			$Debuglog->add( 'Including tempskin: '.$tempskin.' (main)', 'skin' );
 			require( get_path( 'skins' ).$tempskin.'/_main.php' );
@@ -352,8 +346,8 @@ if( !isset( $skin ) )
 { // No skin forced in stub (not even '' for no-skin)...
 	$Debuglog->add( 'No skin forced.', 'skin' );
 	// We're going to need a default skin:
-	if( !isset( $default_skin )             // No default skin forced in stub
-			|| !skin_exists( $default_skin ) )  // Or the forced default does not exist
+	if(  ( !isset( $default_skin ) )          // No default skin forced in stub
+		|| ( !skin_exists( $default_skin ) ) )  // Or the forced default does not exist
 	{ // Use default from the database
 		$default_skin = $Blog->get('default_skin');
 	}
@@ -391,26 +385,27 @@ $Request->param( 'template', 'string', 'main', true );
 
 if( !empty( $skin ) )
 { // We want to display now:
-	$skin = basename_dironly( $skin ); // make sure to have no relative path in there
-	$Debuglog->add( 'Sanitized skin: '.$skin, 'skin' );
 
-	if( !skin_exists($skin) )
+	if( (!empty($_GET['skin'])) || (!empty($_POST['skin'])) )
+	{ // We have just asked for the skin explicitely
+		// Set a cookie to remember it:
+		// Including config and functions files   ??
+
+		if( ! setcookie( $cookie_state, $skin, $cookie_expires, $Blog->get('cookie_path'), $Blog->get('cookie_domain')) )
+		{ // This damn failed !
+			echo "<p>setcookie failed!</p>";
+		}
+	}
+
+	if( ereg( '([^-A-Za-z0-9._]|\.\.)', $skin ) )
+	{
+		// echo ("<p>Invalid skin name!</p>");
+		$skin = $default_skin;
+	}
+	elseif( !skin_exists($skin) )
 	{
 		// echo "<p>Oops, no such skin!</p>";
 		$skin = $default_skin;
-		$Debuglog->add( 'Skin does not exist. Using default skin: '.$default_skin, 'skin' );
-	}
-	elseif( !empty($_GET['skin']) || !empty($_POST['skin']) )
-	{ // We have just asked for the skin explicitely (and it is valid)
-		// Set a cookie to remember it:
-		if( !setcookie( $cookie_state, $skin, $cookie_expires, $Blog->get('cookie_path'), $Blog->get('cookie_domain')) )
-		{ // This damn failed !
-			Log::display( '', '', 'setcookie failed (skin)!', 'error' );
-		}
-		else
-		{
-			$Debuglog->add( 'Setting skin cookie: '.$skin, 'skin' );
-		}
 	}
 
 	if( $template == 'popup' )
@@ -437,17 +432,14 @@ else
 
 /*
  * $Log$
+ * Revision 1.30  2005/11/21 16:30:31  fplanque
+ * rolled back obscure mods (anything not fixing bugs has no reason for being here)
+ *
  * Revision 1.29  2005/11/20 17:53:21  blueyed
  * Better fix for generating static pages
  *
  * Revision 1.28  2005/11/19 01:39:02  blueyed
  * Fix tempskin handling (patch by marian) and add debugging output (also to skin handling). Also, remove ereg() call that isn't necessary anymore when using basename_dironly()
- *
- * Revision 1.27  2005/11/18 22:05:41  fplanque
- * no message
- *
- * Revision 1.26  2005/11/16 21:53:49  fplanque
- * minor
  *
  * Revision 1.25  2005/11/14 18:57:05  blueyed
  * Do not resolve extra path when generating static pages. This fixes the 404 error when generating static pages from the backoffice, but is not what we want for memcache'd pages really!
