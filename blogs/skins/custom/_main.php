@@ -178,7 +178,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	</strong></p>
 
 <?php
-	// ---------------- START OF INCLUDES FOR LAST COMMENTS, STATS ETC. ----------------
+	// ---------------- START OF INCLUDES FOR LAST COMMENTS, ETC. ----------------
 	switch( $disp )
 	{
 		case 'comments':
@@ -206,7 +206,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			require( dirname(__FILE__).'/_subscriptions.php');
 			break;
 	}
-	// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. -------------------
+	// ------------------- END OF INCLUDES FOR LAST COMMENTS, ETC. -------------------
 ?>
 </div>
 <!-- =================================== START OF SIDEBAR =================================== -->

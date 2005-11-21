@@ -213,7 +213,7 @@ class Results extends Widget
 
 				if( !preg_match( '#SELECT \s+ (.+?) \s+ FROM#six', $this->sql, $matches ) )
 				{
-					die( 'No SELECT clause!' );
+					die( 'Results->query() : No SELECT clause!' );
 				}
 
 				// Split requested columns by commata
@@ -1138,6 +1138,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.38  2005/11/21 20:37:39  fplanque
+ * Finished RSS skins; turned old call files into stubs.
+ *
  * Revision 1.37  2005/11/18 21:01:21  fplanque
  * no message
  *

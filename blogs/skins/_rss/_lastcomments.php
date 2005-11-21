@@ -1,11 +1,11 @@
 <?php
 /**
- * This template generates an RSS 0.92 feed for the requested blog's latest posts
+ * This template generates an RSS 0.92 feed for the requested blog's latest comments
  *
  * See {@link http://backend.userland.com/rss092}
  *
  * This file is not meant to be called directly.
- * It is meant to be called automagically by b2evolution.
+ * It is meant to be called automagically by the main template (_main.php).
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
@@ -39,44 +39,18 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-header("Content-type: application/xml");
-echo "<?xml version=\"1.0\"?".">";
-?>
-<!-- generator="<?php echo $app_name; ?>/<?php echo $app_version ?>" -->
-<rss version="0.92">
-  <channel>
-		<title><?php
-			$Blog->disp( 'name', 'xml' );
-			request_title( ' - ', '', ' - ', 'xml' );
-		?></title>
-    <?php
-		switch( $disp )
-		{
-			case 'comments':
-				// this includes the last comments if requested:
-				require( dirname(__FILE__).'/_lastcomments.php' );
-				break;
+$CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'DESC',	'',	20 );
 
-			default:
-				?>
-			  <link><?php $Blog->disp( 'blogurl', 'xml' ) ?></link>
-			  <description><?php $Blog->disp( 'shortdesc' ,'xml' ) ?></description>
-			  <language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
-			  <docs>http://backend.userland.com/rss092</docs>
-			  <?php while( $Item = $MainList->get_item() ) { ?>
-			  <item>
-			    <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
-			    <description><?php
-			      $Item->url_link( '', ' ', 'entityencoded' );
-			      $Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'entityencoded' );
-			    ?></description>
-			    <link><?php $Item->permalink( 'single' ) ?></link>
-			  </item>
-			  <?php }
-		}
-		?>
-  </channel>
-</rss>
-<?php
-$Hit->log();  // log the hit on this page
 ?>
+		<link><?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?></link>
+		<description></description>
+		<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
+		<docs>http://backend.userland.com/rss092</docs>
+		<?php while( $Comment = $CommentList->get_next() )
+		{ // Loop through comments: ?>
+		<item>
+			<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
+			<description><?php $Comment->content( 'entityencoded' ) ?></description>
+			<link><?php $Comment->permalink() ?></link>
+		</item>
+		<?php } // End of comment loop. ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * This template generates an RSS 2.0 feed for the requested blog
+ * This template generates an RSS 2.0 feed for the requested blog's latest posts
  *
  * See {@link http://backend.userland.com/rss}
  *
@@ -58,31 +58,43 @@ echo '<?xml version="1.0"?'.'>';
 			$Blog->disp( 'name', 'xml' );
 			request_title( ' - ', '', ' - ', 'xml' );
 		?></title>
-		<link><?php $Blog->disp( 'blogurl', 'xml' ) ?></link>
-		<description><?php $Blog->disp( 'shortdesc', 'xml' ) ?></description>
-		<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
-		<docs>http://backend.userland.com/rss</docs>
-		<admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $app_version ?>"/>
-		<ttl>60</ttl>
-		<?php while( $Item = $MainList->get_item() ) {	?>
-		<item>
-			<title><?php $Item->title( '', '', false, 'xml' ) ?></title>
-			<link><?php $Item->permalink( 'single' ) ?></link>
-			<pubDate><?php $Item->issue_date( 'r', true ) ?></pubDate>
-			<?php /* Disabled because of spambots: <author><php $Item->Author->email( 'xml' ) ></author> */ ?>
-			<?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml' ) ?>
-			<guid isPermaLink="false"><?php $Item->ID() ?>@<?php echo $baseurl ?></guid>
-			<description><?php
-				$Item->url_link( '', ' ', 'xml' );
-				$Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'xml', $rss_excerpt_length );
-			?></description>
-			<content:encoded><![CDATA[<?php
-				$Item->url_link( '<p>', '</p>' );
-				$Item->content()
-			?>]]></content:encoded>
-			<comments><?php comments_link( '', 1, 1 ) ?></comments>
-		</item>
-		<?php } ?>
+    <?php
+		switch( $disp )
+		{
+			case 'comments':
+				// this includes the last comments if requested:
+				require( dirname(__FILE__).'/_lastcomments.php' );
+				break;
+
+			default:
+				?>
+				<link><?php $Blog->disp( 'blogurl', 'xml' ) ?></link>
+				<description><?php $Blog->disp( 'shortdesc', 'xml' ) ?></description>
+				<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
+				<docs>http://backend.userland.com/rss</docs>
+				<admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $app_version ?>"/>
+				<ttl>60</ttl>
+				<?php while( $Item = $MainList->get_item() ) {	?>
+				<item>
+					<title><?php $Item->title( '', '', false, 'xml' ) ?></title>
+					<link><?php $Item->permalink( 'single' ) ?></link>
+					<pubDate><?php $Item->issue_date( 'r', true ) ?></pubDate>
+					<?php /* Disabled because of spambots: <author><php $Item->Author->email( 'xml' ) ></author> */ ?>
+					<?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml' ) ?>
+					<guid isPermaLink="false"><?php $Item->ID() ?>@<?php echo $baseurl ?></guid>
+					<description><?php
+						$Item->url_link( '', ' ', 'xml' );
+						$Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'xml', $rss_excerpt_length );
+					?></description>
+					<content:encoded><![CDATA[<?php
+						$Item->url_link( '<p>', '</p>' );
+						$Item->content()
+					?>]]></content:encoded>
+					<comments><?php comments_link( '', 1, 1 ) ?></comments>
+				</item>
+				<?php }
+		}
+		?>
 	</channel>
 </rss>
 <?php $Hit->log(); // log the hit on this page ?>

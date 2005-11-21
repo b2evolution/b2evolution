@@ -79,30 +79,30 @@ class CommentList extends DataObjectList
 		$this->blog = $blog;
 
 
-		$this->request = 'SELECT DISTINCT T_comments.*
-											FROM T_comments INNER JOIN T_posts ON comment_post_ID = post_ID ';
+		$this->sql = 'SELECT DISTINCT T_comments.*
+									FROM T_comments INNER JOIN T_posts ON comment_post_ID = post_ID ';
 
 		if( !empty( $p ) )
 		{	// Restrict to comments on selected post
-			$this->request .= " WHERE comment_post_ID = $p AND ";
+			$this->sql .= " WHERE comment_post_ID = $p AND ";
 		}
 		elseif( $blog > 1 )
 		{	// Restrict to viewable posts/cats on current blog
-			$this->request .= "INNER JOIN T_postcats ON post_ID = postcat_post_ID INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID WHERE othercats.cat_blog_ID = $blog AND ";
+			$this->sql .= "INNER JOIN T_postcats ON post_ID = postcat_post_ID INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID WHERE othercats.cat_blog_ID = $blog AND ";
 		}
 		else
 		{	// This is blog 1, we don't care, we can include all comments:
-			$this->request .= ' WHERE ';
+			$this->sql .= ' WHERE ';
 		}
 
-		$this->request .= "comment_type IN ($comment_types) ";
+		$this->sql .= "comment_type IN ($comment_types) ";
 
 		/*
 		 * ----------------------------------------------------
 		 *  Restrict to the statuses we want to show:
 		 * ----------------------------------------------------
 		 */
-		$this->request .= ' AND '.statuses_where_clause( $show_statuses );
+		$this->sql .= ' AND '.statuses_where_clause( $show_statuses );
 
 
 		// order by stuff
@@ -129,22 +129,22 @@ class CommentList extends DataObjectList
 		}
 
 
-		$this->request .= "ORDER BY $orderby";
+		$this->sql .= "ORDER BY $orderby";
 		if( !empty( $this->limit ) )
 		{
-			$this->request .= ' LIMIT '.$this->limit;
+			$this->sql .= ' LIMIT '.$this->limit;
 		}
 
-		// echo $this->request;
+		// echo $this->sql;
 
-		$this->result = $DB->get_results( $this->request, ARRAY_A );
+		$this->rows = $DB->get_results( $this->sql, ARRAY_A );
 
 		// Prebuild and cache objects:
 		if( $this->result_num_rows = $DB->num_rows )
 		{	// fplanque>> why this test??
 
 			$i = 0;
-			foreach( $this->result as $row )
+			foreach( $this->rows as $row )
 			{
 				// Prebuild object:
 				$this->Obj[$i] = new Comment( $row ); // COPY !!??
@@ -180,6 +180,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.12  2005/11/21 20:37:39  fplanque
+ * Finished RSS skins; turned old call files into stubs.
+ *
  * Revision 1.11  2005/11/18 22:05:41  fplanque
  * no message
  *
