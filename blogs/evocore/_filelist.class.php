@@ -654,6 +654,7 @@ class Filelist
 		}
 	}
 
+
 	/**
 	 * Is the current Filter a regexp?
 	 *
@@ -875,11 +876,11 @@ class Filelist
 
 			if( $File->is_dir() )
 			{
-				$this->_total_files--;
+				$this->_total_dir--;
 			}
 			else
 			{
-				$this->_total_dirs--;
+				$this->_total_files--;
 			}
 
 			// unset from indexes
@@ -904,8 +905,6 @@ class Filelist
 			{ // we have removed a file before or at the index'th position
 				$this->_current_idx--;
 			}
-
-			$this->load(); // reload counters
 			return true;
 		}
 		return false;
@@ -1010,6 +1009,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.39  2005/11/21 03:42:39  blueyed
+ * remove(): fixed totals of dirs and files; removed call to load() there becuase it does not work with arbitrary lists (e.g. selectedFiles)
+ *
  * Revision 1.38  2005/11/19 23:17:29  blueyed
  * fixed remove(); doc
  *
