@@ -513,68 +513,28 @@ class Blog extends DataObject
 				break;
 
 			case 'rdf_url':
-			if ( !empty($this->siteurl) )
-			{
-				return $rss_url.'?tempskin=_rdf&amp;blog='.$this->ID;
-			} else {
-				return $xmlsrv_url.'rdf.php?blog='.$this->ID;
-			}
+				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rdf' );
 
 			case 'rss_url':
-			if ( !empty($this->siteurl) )
-			{
-				return $rss_url.'?tempskin=_rss&amp;blog='.$this->ID;
-			} else {
-				return $xmlsrv_url.'rss.php?blog='.$this->ID;
-			}
+				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rss' );
 
 			case 'rss2_url':
-			if ( !empty($this->siteurl) )
-			{
-				return $rss_url.'?tempskin=_rss2&amp;blog='.$this->ID;
-			} else {
-				return $xmlsrv_url.'rss2.php?blog='.$this->ID;
-			}
+				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rss2' );
 
 			case 'atom_url':
-			if ( !empty($this->siteurl) )
-			{
-				return $rss_url.'?tempskin=_atom&amp;blog='.$this->ID;
-			} else {
-				return $xmlsrv_url.'atom.php?blog='.$this->ID;
-			}
+				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_atom' );
 
 			case 'comments_rdf_url':
-			if ( !empty($this->siteurl) )
-			{
-				return $rss_url.'?tempskin=_rdf&amp;disp=comments&amp;blog='.$this->ID;
-			} else {
-				return $xmlsrv_url.'rdf.comments.php?blog='.$this->ID;
-			}
+				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rdf&amp;disp=comments' );
 
 			case 'comments_rss_url':
-			if ( !empty($this->siteurl) )
-			{
-				return $rss_url.'?tempskin=_rss&amp;disp=comments&amp;blog='.$this->ID;
-			} else {
-				return $xmlsrv_url.'rss.comments.php?blog='.$this->ID;
-			}
+				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rss&amp;disp=comments' );
 
 			case 'comments_rss2_url':
-			if ( !empty($this->siteurl) )
-			{
-				return $rss_url.'?tempskin=_rss2&amp;disp=comments&amp;blog='.$this->ID;
-			} else {
-				return $xmlsrv_url.'rss2.comments.php?blog='.$this->ID;
-			}
+				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rss2&amp;disp=comments' );
 
 			case 'comments_atom_url':
-			if ( !empty($this->siteurl) )
-			{
-				return $rss_url.'?tempskin=_atom&amp;disp=comments&amp;blog='.$this->ID;
-			} else {
-				return $xmlsrv_url.'atom.comments.php?blog='.$this->ID;
-			}
+				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_atom&amp;disp=comments' );
 
 			case 'pingback_url':
 		    return $xmlsrv_url.'xmlrpc.php';
@@ -790,6 +750,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2005/11/21 20:54:57  fplanque
+ * fixed calls to RSS feeds for new subscribers
+ *
  * Revision 1.40  2005/11/18 01:36:36  blueyed
  * Display permissions of created media dirs right.
  *
