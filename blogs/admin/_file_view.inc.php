@@ -216,3 +216,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 </body>
 </html>
+
+<?php
+/*
+ * $Log$
+ * Revision 1.17  2005/11/21 18:33:19  fplanque
+ * Too many undiscussed changes all around: Massive rollback! :((
+ * As said before, I am only taking CLEARLY labelled bugfixes.
+ *
+ */
+?>

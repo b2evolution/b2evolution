@@ -50,7 +50,7 @@ $Form->begin_form( 'fform', T_('Rename') );
 	echo $Fileman->getFormHiddenInputs();
 	echo $Fileman->getFormHiddenSelectedFiles();
 	$Form->hidden( 'action', 'rename' );
-	$Form->hidden( 'confirmed', 1 );
+	$Form->hidden( 'confirm', 1 );
 
 	$selected_Filelist->restart();
 	while( $loop_src_File = & $selected_Filelist->get_next() )
@@ -69,8 +69,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Rename'), 'SaveButton' ),
 
 /*
  * $Log$
- * Revision 1.4  2005/11/19 23:46:14  blueyed
- * confirm is confirmed
+ * Revision 1.5  2005/11/21 18:33:19  fplanque
+ * Too many undiscussed changes all around: Massive rollback! :((
+ * As said before, I am only taking CLEARLY labelled bugfixes.
  *
  * Revision 1.3  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected

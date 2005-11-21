@@ -273,8 +273,7 @@ while( $lFile = & $Fileman->get_next() )
 
 	if( $countFiles%2 ) echo ' class="odd"';
 
-	// select the file by default, when clicking on the <tr>; this gets "undone" for the checkbox itself and the filename link
-	echo ' onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">';
+	echo ' onclick="document.getElementById(\'cb_filename_'.$countFiles.'\').click();">';
 
 	/*
 	 * Checkbox:
@@ -282,7 +281,7 @@ while( $lFile = & $Fileman->get_next() )
 	echo '<td class="checkbox firstcol">';
 	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"
-				onclick="this.checked = ! this.checked;"'; // undo the <tr>'s onclick checking of this box
+				onclick="this.click();"';
 	if( $checkall || $Fileman->isSelected( $lFile ) )
 	{
 		echo ' checked="checked"';
@@ -294,7 +293,8 @@ while( $lFile = & $Fileman->get_next() )
 	 */
 	if( $mode == 'upload' )
 	{
-		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles.'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
+		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles
+						.'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
 	}
 
 	echo '</td>';
@@ -363,11 +363,11 @@ while( $lFile = & $Fileman->get_next() )
 	/*
 	 * Filename:
 	 */
-	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">';
+	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" onclick="document.getElementById(\'cb_filename_'.$countFiles.'\').click();">';
 	/*
 	if( $Fileman->flatmode && $Fileman->get_sort_order() != 'name' )
 	{	// Display directory name
-		echo './'.$lFile->get_rdfs_rel_path();
+		echo './'.$Fileman->get_rdfs_path_relto_root( $lFile );
 	}
 	else
 	*/
@@ -396,7 +396,7 @@ while( $lFile = & $Fileman->get_next() )
 	{
 		?>
 		<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
-		$subPath = $lFile->get_rdfs_rel_path();
+		$subPath = $Fileman->get_rdfs_path_relto_root( $lFile, false );
 		if( empty( $subPath ) )
 		{
 			$subPath = './';
@@ -505,7 +505,7 @@ else
 		if( $mode == 'upload' )
 		{	// We are uploading in a popup opened by an edit screen
 			?>
-			<input class="ActionButton"
+    	<input class="ActionButton"
 				title="<?php echo T_('Insert IMG tags for selected files'); ?>"
 				name="actionArray[img_tag]"
 				value="img"
@@ -515,7 +515,7 @@ else
 		}
 
 
-		if( $current_User->check_perm( 'files', 'edit' ) )
+    if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
 			?>
 			<input class="ActionButton" type="image" name="actionArray[rename]"
@@ -525,12 +525,19 @@ else
 			<input class="DeleteButton" type="image" name="actionArray[delete]"
 				title="<?php echo T_('Delete the selected files') ?>"
 				src="<?php echo get_icon( 'file_delete', 'url' ) ?>" />
-			<?php
-			// NOTE: No delete confirmation by javascript, we need to check DB integrity!
-
+		<?php
 		}
+			/* No delete javascript, we need toi check DB integrity:
 
-		/*
+			onclick="if( r = openselectedfiles(true) )
+								{
+									if( confirm('<?php echo TS_('Do you really want to delete the selected files?') ?>') )
+									{
+										document.getElementById( 'FilesForm' ).confirmed.value = 1;
+										return true;
+									}
+								}; return false;" />
+
 			<!-- Not implemented yet: input class="ActionButton"
 				title="<?php echo T_('Download the selected files') ?>"
 				name="actionArray[download]"
@@ -543,22 +550,27 @@ else
 				name="actionArray[sendbymail]" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
 
 
-		/* Not fully functional:
-		<input class="ActionButton" type="image" name="actionArray[file_copy]"
+			/*
+			TODO: "link these into current post" (that is to say the post that opened the popup window).
+						This would create <img> or <a href> tags depending on file types.
+			*/
+
+	/* Not fully functional
+		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
 			title="<?php echo T_('Copy the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
 			src="<?php echo get_icon( 'file_copy', 'url' ); ?>" />
 
-		<input class="ActionButton" type="image" name="actionArray[file_move]"
+		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
 			title="<?php echo T_('Move the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
 			src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
-		*/ ?>
 
-		<input class="ActionButton" type="image" name="actionArray[edit_perms]"
+		<input class="ActionButton" type="image" name="actionArray[editperm]"
 			onclick="return openselectedfiles(true);"
 			title="<?php echo T_('Change permissions for the selected files'); ?>"
 			src="<?php echo get_icon( 'file_perms', 'url' ); ?>" />
+	*/ ?>
 
 		</td>
 	</tr>
@@ -574,8 +586,7 @@ else
 
 <?php
 if( $countFiles )
-{{{ // include JS
-	// TODO: remove these javascript functions to an external .js file and include them through $AdminUI->add_headline()
+{
 	?>
 	<script type="text/javascript">
 		<!--
@@ -612,8 +623,6 @@ if( $countFiles )
 
 		/**
 		 * Textarea insertion code
-		 *
-		 * TODO: make this a generic b2evo function. The quicktags plugin also uses it.
 		 */
 		function textarea_replace_selection( myField, snippet )
 		{
@@ -629,24 +638,10 @@ if( $countFiles )
 				var startPos = myField.selectionStart;
 				var endPos = myField.selectionEnd;
 				var cursorPos;
-				var scrollTop, scrollLeft;
-				if( myField.type == 'textarea' && typeof myField.scrollTop != 'undefined' )
-				{ // remember old position
-					scrollTop = myField.scrollTop;
-					scrollLeft = myField.scrollLeft;
-				}
-
 				myField.value = myField.value.substring(0, startPos)
-				                + snippet
-				                + myField.value.substring(endPos, myField.value.length);
+												+ snippet
+												+ myField.value.substring(endPos, myField.value.length);
 				cursorPos = startPos+snippet.length;
-
-				if( typeof scrollTop != 'undefined' )
-				{ // scroll to old position
-					myField.scrollTop = scrollTop;
-					myField.scrollLeft = scrollLeft;
-				}
-
 				myField.focus();
 				myField.selectionStart = cursorPos;
 				myField.selectionEnd = cursorPos;
@@ -694,8 +689,7 @@ if( $countFiles )
 		// -->
 	</script>
 	<?php
-}}}
-
+}
 
 /*
  * CREATE:
@@ -765,7 +759,6 @@ if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add
 </form>
 
 <form enctype="multipart/form-data" action="files.php" method="post" class="toolbaritem">
-	<?php form_hidden( 'upload_quickmode', 1 ); ?>
 	<!-- The following is mainly a hint to the browser. -->
 	<?php form_hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); ?>
 
@@ -850,20 +843,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
- * Revision 1.51  2005/11/21 04:05:38  blueyed
- * File manager: fm_sources_root to remember the root of fm_sources!, chmod centralized ($Settings), Default for dirs fixed, Normalisation; this is ready for the alpha (except bug fixes of course)
- *
- * Revision 1.50  2005/11/20 20:18:20  blueyed
- * Added Mozilla scrolling fix to javascript function textarea_replace_selection(), which gets used for inserting img/div tags; doc, todo
- *
- * Revision 1.49  2005/11/20 00:40:09  blueyed
- * Get the automatic JS selection of checkbox more straight (using cb.checked instead of cb.click()); indeed this hang Konqueror!
- *
- * Revision 1.48  2005/11/19 23:48:28  blueyed
- * "Edit File permissions" action fixed/finished
- *
- * Revision 1.47  2005/11/19 23:26:18  blueyed
- * Fix call to undefined function
+ * Revision 1.52  2005/11/21 18:33:19  fplanque
+ * Too many undiscussed changes all around: Massive rollback! :((
+ * As said before, I am only taking CLEARLY labelled bugfixes.
  *
  * Revision 1.46  2005/11/18 21:01:21  fplanque
  * no message

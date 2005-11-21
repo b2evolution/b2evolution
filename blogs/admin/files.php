@@ -7,6 +7,11 @@
  *       in upload mode.
  *       "edit_perms" for example is not a mode, but a action.
  *
+ * fplanque>> NOTES:
+ * 1) There should be no $Fileman object!
+ * 2) The mode as well as other context params should be handled by param() / memorize() / regenerate_url()
+ * 3) There should be no modes. Only geeks can understand them. And not all geeks might actually ever find an opportunity to want to use them. All we need is a dir selection tree inside of upload and move.
+ *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
@@ -89,14 +94,6 @@ if( !$Settings->get( 'fm_enabled' ) )
 $current_User->check_perm( 'files', 'view', true );
 
 
-// Add hint / help message on first launch from the "Files" or "Upload" button in _item.form.php
-if( $mode == 'upload' && param( 'display_hint_img', 'integer' ) )
-{
-	$Messages->add( /* TRANS: "&laquo;img&raquo;" should not be translated, the button is labeled like this! */ T_('You can use the &laquo;img&raquo; button to insert html tags for selected files into your post.'), 'note' );
-}
-
-
-// INIT params:
 if( param( 'root_and_path', 'string', '', true ) )
 { // root and path together: decode and override (overriding is especially used in root switch select)
 	$root_and_path = unserialize( $root_and_path );
@@ -122,19 +119,10 @@ param( 'filterIsRegexp', 'integer', NULL, true );
 param( 'flatmode', '', NULL, true );
 param( 'action', 'string', '', true );     // 3.. 2.. 1.. action :)
 if( empty($action) )
-{ // we're checking 'actionArray' param, where the action is the first key. This is needed for multiple inputs in a form where you shouldn't use the input values generated with T_() or cannot (for type="image" - IE ignores the value, but sends X and Y coordinates of the click)
+{ // TODO: check f*cking IE syntax, which send input[image] submits without value, only name.x and name.y
 	$actionArray = array_keys( param( 'actionArray', 'array', array(), true ) );
 	$action = array_pop($actionArray); // we must pass this by variable, because it's passed by reference
-	if( is_string($action) )
-	{
-		$action = substr( strip_tags($action), 0, 50 );  // sanitize it
-	}
-	else
-	{ // this is probably a numeric index from '<input name="actionArray[]" .. />'
-		$action = '';
-	}
 }
-
 
 if( $action == 'update_settings' )
 { // Updating user settings from options list
@@ -225,7 +213,7 @@ $selected_Filelist = & $Fileman->getFilelistSelected();
 switch( $action )
 {
 	case 'open_in_new_windows':
-		// catch JS-only actions (they shouldn't arrive here with JS enabled)
+		// catch JS-only actions
 		$Messages->add( T_('You have to enable JavaScript to use this feature.'), 'error' );
 		break;
 
@@ -241,10 +229,8 @@ switch( $action )
 		$Fileman->createDirOrFile( $createnew, $createname ); // handles messages
 		break;
 
-
 	/*
-	case 'send_by_mail':
-	{{{ not implemented yet
+	case T_('Send by mail'):
 		// TODO: implement
 		if( !$selected_Filelist->count() )
 		{
@@ -254,13 +240,10 @@ switch( $action )
 
 		echo 'TODO: Send selected by mail, query email address..';
 		break;
-	}}}
 	*/
-
 
 	/*
 	case 'download':
-	{{{ not implemented yet
 		// TODO: provide optional zip formats
 		$action_title = T_('Download');
 
@@ -329,12 +312,10 @@ switch( $action )
 		}
 
 		break;
-	}}}*/
-
+	*/
 
 	case 'rename':
-		// Rename a file: {{{
-		// TODO: allow overwriting of existing files (like with copy/move)
+		// Rename a file:
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
@@ -349,7 +330,7 @@ switch( $action )
 			break;
 		}
 
-		param( 'confirmed', 'integer', 0 );
+		param( 'confirm', 'integer', 0 );
 		param( 'new_names', 'array', array() );
 
 		// Check params for each file to rename:
@@ -357,7 +338,7 @@ switch( $action )
 		{
 			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
 			{ // We have not yet provided a name to rename to...
-				$confirmed = 0;
+				$confirm = 0;
 				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get_name();
 				continue;
 			}
@@ -366,8 +347,8 @@ switch( $action )
 			$new_names[$loop_src_File->get_md5_ID()] = trim(strip_tags($new_names[$loop_src_File->get_md5_ID()]));
 			if( !isFilename($new_names[$loop_src_File->get_md5_ID()]) )
 			{
-				$confirmed = 0;
-				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ) );
+				$confirm = 0;
+				$Messages->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ), 'error' );
 				continue;
 			}
 
@@ -375,13 +356,13 @@ switch( $action )
 			$extension = '';
 			if( ! validate_file_extension( $new_names[$loop_src_File->get_md5_ID()], $extension ) )
 			{ // Extension invalid:
-				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ) );
-				$confirmed = 0;
+				$Messages->add( sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ), 'error' );
+				$confirm = 0;
 				continue;
 			}
 		}
 
-		if( $confirmed )
+		if( $confirm )
 		{ // Rename is confirmed, let's proceed:
 			$selected_Filelist->restart();
 			while( $loop_src_File = & $selected_Filelist->get_next() )
@@ -395,119 +376,149 @@ switch( $action )
 					continue;
 				}
 				// Perform rename:
-				if( ! $Fileman->rename_File( $loop_src_File, $new_name ) )
+				if( ! $loop_src_File->rename_to( $new_name ) )
 				{
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
-						$old_name, $new_name ), 'error' );
+													$old_name, $new_name ), 'error' );
 					continue;
 				}
 
 				$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
-						$old_name, $new_name ), 'success' );
+													$old_name, $new_name ), 'success' );
 			}
 
 			$action = 'list';
 		}
-		// }}}
+
 		break;
 
 
 	case 'delete':
-		// Delete a file or directory: {{{
-		if( ! $current_User->check_perm( 'files', 'edit' ) )
-		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
-			$action = 'list';
-			break;
-		}
+		// Check permission:
+		$current_User->check_perm( 'files', 'edit', true );
 
+		// delete a file/dir
 		if( ! $selected_Filelist->count() )
 		{
 			$Messages->add( T_('Nothing selected.'), 'error' );
-			$action = 'list';
 			break;
 		}
 
 		param( 'confirmed', 'integer', 0 );
-		// TODO: fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB
-		//param( 'delsubdirs', 'array', array() ); // not implemented yet
-
-
-		// make sure we have loaded metas for all files in selection!
-		$selected_Filelist->load_meta();
-
-		// Check if there are delete restrictions on the files:
-		while( $l_File = & $selected_Filelist->get_next() )
-		{
-			$l_File->check_relations( 'delete_restrictions' );
-
-			if( $Messages->count('restrict') )
-			{ // There are restrictions:
-				$Messages->add( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
-					.$Messages->display( NULL, NULL, false, 'restrict', '', 'ul', false ) );
-				$Messages->clear( 'restrict' );
-
-				// remove it from the list of selected files:
-				$selected_Filelist->remove( $l_File );
-
-				$confirmed = false;  // always un-confirmed then!
-			}
-		}
+		param( 'delsubdirs', 'array', array() );
 
 		if( ! $confirmed )
 		{
-			if( ! $selected_Filelist->count() )
-			{
-				$action = 'list';
-			}
-			break;
-		}
+			$action_msg = '<div class="panelinfo">';
+			$action_msg .= '<h2>'.T_('Delete file(s)?').'</h2>';
 
-		$selected_Filelist->restart();
-		while( $l_File = & $selected_Filelist->get_next() )
-		{
-			if( !$Fileman->unlink( $l_File ) ) // handles $Messages
-				/* No recursive deletion yet: , isset( $delsubdirs[$l_File->get_md5_ID()] ) */
+			$action_msg .= '
+				<form action="files.php" class="inline">
+					<input type="hidden" name="confirmed" value="1" />
+					<input type="hidden" name="action" value="delete" />
+					'.$Fileman->getFormHiddenSelectedFiles()
+					.$Fileman->getFormHiddenInputs()."\n";
+
+
+			$action_msg .= $selected_Filelist->count() > 1 ?
+											T_('Do you really want to delete the following files?') :
+											T_('Do you really want to delete the following file?');
+
+			$action_msg .= '
+			<ul>
+			';
+
+			// So far there is no problem with confirming...
+			$can_confirm = true;
+
+			// make sure we have loaded metas for all files in selection!
+			$selected_Filelist->load_meta();
+
+			foreach( $selected_Filelist->_entries as $lFile )
 			{
-				//if( $l_File->is_dir() && ! isset($delsubdirs[$l_File->get_md5_ID()]) )
-				//{
-					// TODO: offer file again (allowing to include subdirs)
-				//}
+				$action_msg .= '<li>'.$lFile->get_prefixed_name();
+
+				/* fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB integrity for these...
+				if( $lFile->is_dir() )
+				{ // This is a directory
+						$action_msg .= '
+						<br />
+						<input title="'.sprintf( T_('Check to include subdirectories of &laquo;%s&raquo;'), $lFile->get_name() ).'"
+							type="checkbox"
+							name="delsubdirs['.$lFile->get_md5_ID().']"
+							id="delsubdirs_'.$lFile->get_md5_ID().'"
+							value="1" />
+							<label for="delsubdirs_'.$lFile->get_md5_ID().'">'
+								.T_( 'Including subdirectories' ).'</label>';
+				}
+				*/
+
+				// Check if there are delete restrictions on this file:
+				$lFile->check_relations( 'delete_restrictions' );
+
+				if( $Messages->count('restrict') )
+				{ // There are restrictions:
+					$action_msg .= ': <strong>'.T_('cannot be deleted because of the following relations').'</strong> :';
+					$action_msg .= $Messages->display( NULL, NULL, false, 'restrict', '', 'ul', false );
+					$Messages->clear( 'restrict' );
+					// We won't be able to continue with deletion...
+					$can_confirm = false;
+				}
+
+				$action_msg .= '</li>';
+			}
+
+			$action_msg .= "</ul>\n";
+
+
+			if( $can_confirm )
+			{ // No integrity problem detected...
+				$action_msg .= '
+					<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
+					</form>
+					<form action="files.php" class="inline">
+						'.$Fileman->getFormHiddenInputs().'
+						<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
+					</form>
+					';
+			}
+
+			$action_msg .= '</div>';
+
+		}
+		else
+		{
+			$selected_Filelist->restart();
+			while( $lFile =& $selected_Filelist->get_next() )
+			{
+				if( !$Fileman->unlink( $lFile, isset( $delsubdirs[$lFile->get_md5_ID()] ) ) ) // handles Messages
+				{
+					// TODO: offer file again, allowing to include subdirs..
+				}
 			}
 		}
-		$action = 'list';
-		// }}}
 		break;
 
 
 	case 'edit_properties':
-		// Edit File properties (Meta Data); this starts the File_properties mode: {{{
+		// Edit File properties (Meta Data):
 
-		if( ! $current_User->check_perm( 'files', 'view' ) )
-		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to view files.'), 'error' );
-			$action = 'list';
-			break;
-		}
+		// Check permission:
+		$current_User->check_perm( 'files', 'view', true );
 
 		$selectedFile = & $selected_Filelist->getFileByIndex(0);
 		// Load meta data:
 		$selectedFile->load_meta();
 
 		$Fileman->fm_mode = 'File_properties';
-		// }}}
 		break;
 
 
 	case 'update_properties':
-		// Update File properties (Meta Data); on success this ends the File_properties mode: {{{
+		// Update File properties (Meta Data):
 
-		if( ! $current_User->check_perm( 'files', 'edit' ) )
-		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
-			$action = 'list';
-			break;
-		}
+		// Check permission:
+		$current_User->check_perm( 'files', 'edit', true );
 
 		$selectedFile = & $selected_Filelist->getFileByIndex(0);
 		// Load meta data:
@@ -518,31 +529,17 @@ switch( $action )
 		$selectedFile->set( 'desc', param( 'desc', 'string', '' ) );
 
 		// Store File object into DB:
-		if( $selectedFile->dbsave() )
-		{
-			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have been updated.' ), $selectedFile->get_name() ), 'success' );
-		}
-		else
-		{
-			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $selectedFile->get_name() ), 'note' );
-		}
+		$selectedFile->dbsave();
 
 		// Leave special display mode:
-		$Fileman->fm_mode = NULL;
-		// }}}
+		$Fileman->fm_mode = 'NULL';
 		break;
 
 
 	case 'link':
-		// Link File to Item: {{{
-		// TODO: use a more distinct name like 'link_file' to allow easier searching!
-		if( ! $current_User->check_perm( 'files', 'edit' ) )
-		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
-			$action = 'list';
-			break;
-		}
+		// TODO: check perm!!
 
+		// Link File to Item:
 		if( !$selected_Filelist->count() )
 		{
 			$Messages->add( T_('Nothing selected.'), 'error' );
@@ -571,42 +568,18 @@ switch( $action )
 		}
 		// Plug extensions here!
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// ONgsb only:
-		elseif( isset($edited_Product) )
-		{
-			// TODO: check product EDIT permissions!
-			$DB->begin();
-
-			// Load meta data AND MAKE SURE IT IS CREATED IN DB:
-			$selectedFile->load_meta( true );
-
-			// Let's make the link!
-			$DB->query( "INSERT INTO T_prod_files( pf_prod_ID, pf_file_ID )
-										VALUES( $edited_Product->ID, $selectedFile->ID )",
-									'Insert product-file link' );
-
-			$DB->commit();
-
-			$Messages->add( T_('Selected file has been linked to product.'), 'success' );
-		}
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		else
-		{	// No Item to link to - end link_item mode.
+		{	// No Item to link to...
 			$Fileman->fm_mode = NULL;
 		}
-		// }}}
 		break;
 
 
 	case 'unlink':
-		// Unlink File from Item: {{{
-		if( ! $current_User->check_perm( 'files', 'edit' ) )
-		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
-			$action = 'list';
-			break;
-		}
+		// TODO: check perm!
 
+		// Unlink File from Item:
 		if( !isset( $edited_Link ) )
 		{
 			break;
@@ -623,91 +596,115 @@ switch( $action )
 		$edited_Link->dbdelete( true );
 		unset( $edited_Link );
 		$Messages->add( $msg, 'success' );
+		break;
+
+
+	case 'editperm':
+		// Check permission:
+		$current_User->check_perm( 'files', 'edit', true );
+
+		// edit permissions {{{
+		// fplanque>> TODO: as long as we use fm_modes this thing should at least work like a mode or at the bare minimun, turn off any active mode.
+		$action_title = T_('Change permissions');
+
+		if( !$selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.'), 'error' );
+			break;
+		}
+
+		param( 'perms', 'array', array() );
+
+		if( count( $perms ) )
+		{ // Change perms
+			$selected_Filelist->restart();
+			while( $lFile = & $selected_Filelist->get_next() )
+			{
+				$chmod = $perms[ $lFile->get_md5_ID() ];
+
+				$oldperms = $lFile->get_perms( 'raw' );
+				$newperms = $lFile->chmod( $chmod );
+
+				if( $newperms === false )
+				{
+					$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $lFile->get_name(), $chmod ), 'error' );
+				}
+				elseif( $newperms === $oldperms )
+				{
+					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; not changed.'), $lFile->get_name() ), 'note' );
+				}
+				else
+				{
+					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $lFile->get_name(), $lFile->get_perms() ), 'success' );
+				}
+			}
+		}
+		else
+		{ // Display dialog:
+			// TODO: use Form class, finish non-Windows
+			// TODO: move to a file called _file_permissions.form.php
+			$action_msg = '
+			<div class="panelblock">
+			<form name="form_chmod" action="files.php">
+			'.$Fileman->getFormHiddenSelectedFiles()
+			.$Fileman->getFormHiddenInputs().'
+
+			<input type="hidden" name="action" value="editperm" />
+			';
+
+			if( is_windows() )
+			{ // WINDOWS read/write permissons:
+				if( $selected_Filelist->count() > 1 )
+				{ // more than one file, provide default
+
+				}
+				foreach( $selected_Filelist->get_array() as $lFile )
+				{
+					$action_msg .= "\n".$lFile->get_rdfp_rel_path().':<br />
+					<input id="perms_readonly_'.$lFile->get_md5_ID().'"
+						name="perms['.$lFile->get_md5_ID().']"
+						type="radio"
+						value="444"'
+						.( $lFile->get_perms( 'octal' ) == 444 ?
+								' checked="checked"' :
+								'' ).' />
+					<label for="perms_readonly_'.$lFile->get_md5_ID().'">'.T_('Read-only').'</label>
+
+					<input id="perms_readwrite_'.$lFile->get_md5_ID().'"
+						name="perms['.$lFile->get_md5_ID().']"
+						type="radio"
+						value="666"'
+						.( $lFile->get_perms( 'octal' ) == 666 || $lFile->get_perms( 'octal' ) == 777 ?
+								'checked="checked"' :
+								'' ).' />
+					<label for="perms_readwrite_'.$lFile->get_md5_ID().'">'.T_('Read and write').'</label>
+					<br />';
+				}
+			}
+			else
+			{	// UNIX permissions:
+				$action_msg .= '<input type="text" name="chmod" value="'
+												.$lFile->get_perms( 'octal' ).'" maxlength="3" size="3" /><br />';
+				$js_focus = 'document.form_chmod.chmod';
+			}
+
+			$action_msg .= '
+			<input type="submit" value="'.format_to_output( T_('Set new permissions'), 'formvalue' ).'" />
+			</form>
+			</div>
+			';
+		}
+
 		// }}}
 		break;
 
 
-	case 'edit_perms':
-		// Edit file or directory permissions: {{{
-		if( ! $current_User->check_perm( 'files', 'edit' ) )
-		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
-			$action = 'list';
-			break;
-		}
+	case 'file_copy':
+	case 'file_move':
+	case 'file_cmr':
+		// copy/move/rename - we come here from the "with selected" toolbar {{{
+		#pre_dump( $selected_Filelist );
 
-		if( ! $selected_Filelist->count() )
-		{
-			$Messages->add( T_('Nothing selected.'), 'error' );
-			$action = 'list';
-			break;
-		}
-
-
-		param( 'perms', 'array', array() );
-		param( 'edit_perms_default' ); // default value when multiple files are selected
-		param( 'use_default_perms', 'array', array() ); // array of file IDs that should be set to default
-
-		if( count( $use_default_perms ) && $edit_perms_default === '' )
-		{
-			$Request->param_error( 'edit_perms_default', T_('You have to give a default permission!') );
-			break;
-		}
-
-		// form params
-		$perms_read_readonly = is_windows();
-		$field_options_read_readonly = array(
-				array( 'value' => 444, 'label' => T_('Read-only') ),
-				array( 'value' => 666, 'label' => T_('Read and write') ) );
-		$more_than_one_selected_file = ( $selected_Filelist->count() > 1 );
-
-		if( count( $perms ) || count( $use_default_perms ) )
-		{ // New permissions given, change them
-			$selected_Filelist->restart();
-			while( $l_File = & $selected_Filelist->get_next() )
-			{
-				if( in_array( $l_File->get_md5_ID(), $use_default_perms ) )
-				{ // use default
-					$chmod = $edit_perms_default;
-				}
-				elseif( !isset($perms[ $l_File->get_md5_ID() ]) )
-				{ // happens for an empty text input or when no radio option is selected
-					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not been changed.'), $l_File->get_name() ), 'note' );
-					continue;
-				}
-				else
-				{ // provided for this file
-					$chmod = $perms[ $l_File->get_md5_ID() ];
-				}
-
-				$oldperms = $l_File->get_perms( 'raw' );
-				$newperms = $l_File->chmod( $chmod );
-
-				if( $newperms === false )
-				{
-					$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $l_File->get_name(), $chmod ), 'error' );
-				}
-				else
-				{
-					// Success, remove the file from the list of selected files:
-					$selected_Filelist->remove( $l_File );
-
-					if( $newperms === $oldperms )
-					{
-						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not changed.'), $l_File->get_name() ), 'note' );
-					}
-					else
-					{
-						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $l_File->get_name(), $l_File->get_perms() ), 'success' );
-					}
-				}
-			}
-		}
-
-		if( !$selected_Filelist->count() )
-		{
-			$action = 'list';
-		}
 		// }}}
 		break;
 
@@ -742,6 +739,17 @@ switch( $action )
 }
 
 
+
+/**
+ * The top menu
+ */
+require dirname(__FILE__).'/_menutop.php';
+
+// Temporary fix:
+// Messages have already bben displayed:
+$Messages->clear( 'all' );
+
+
 // echo 'fm mode:'.$Fileman->fm_mode;
 
 switch( $Fileman->fm_mode )
@@ -767,8 +775,7 @@ switch( $Fileman->fm_mode )
 			break;
 		}
 
-		// Quick mode means "just upload and leave mode when successful"
-		$Request->param( 'upload_quickmode', 'integer', 0 );
+		$LogUpload = new Log( 'error' );
 
 		/**
 		 * @var array Remember failed files (and the error messages)
@@ -778,6 +785,7 @@ switch( $Fileman->fm_mode )
 		// Process uploaded files:
 		if( isset($_FILES) && count( $_FILES ) )
 		{ // Some files have been uploaded:
+
 			param( 'uploadfile_title', 'array', array() );
 			param( 'uploadfile_alt', 'array', array() );
 			param( 'uploadfile_desc', 'array', array() );
@@ -876,7 +884,7 @@ switch( $Fileman->fm_mode )
 
 				if( $newFile->exists() )
 				{ // The file already exists in the target location!
-					// TODO: Rename/Overwriting (save as filename_<numeric_extension> and provide interface to confirm, rename or overwrite)
+					// TODO: Rename/Overwriting
 					$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->get_name() );
 					// Abort upload for this file:
 					continue;
@@ -890,13 +898,7 @@ switch( $Fileman->fm_mode )
 					continue;
 				}
 
-				// change to default chmod settings
-				if( $newFile->chmod( NULL ) === false )
-				{ // add a note, this is no error!
-					$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->get_name() ), 'note' );
-				}
-
-				$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() ), 'success' );
+				$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() ), 'note' );
 
 				// Refreshes file properties (type, size, perms...)
 				$newFile->load_properties();
@@ -921,26 +923,19 @@ switch( $Fileman->fm_mode )
 				// Tell the filamanager about the new file:
 				$Fileman->add( $newFile );
 			}
-
-			if( $upload_quickmode && !$failedFiles )
-			{ // we're quick uploading and have no failed files, leave the mode
-				$Fileman->fm_mode = NULL;
-			}
 		}
+
+
+		// Upload dialog:
+		require dirname(__FILE__).'/_files_upload.inc.php';
 
 		// }}}
-		break;
-
-	case 'File_properties':
-		if( empty($selectedFile) )
-		{
-			$Fileman->fm_mode = NULL;
-		}
 		break;
 
 
 	case 'file_copy':
 	case 'file_move':
+	case 'file_cmr':
 		// ------------------------
 		// copy/move a file:
 		// ------------------------
@@ -952,22 +947,16 @@ switch( $Fileman->fm_mode )
 		 * 3) The way this works it breaks the File meta data (I'm working on it).
 		 * 4) For Move and Copy, this should use a "destination directory tree" on the right (same as for upload)
 		 * 5) Given all the reasons above copy, move and rename should be clearly separated into 3 different interfaces.
-		 *
-		 * blueyed>> it was never meant to only use a single interface. The original mode
-		 *   'file_cmr' was just a mode to handle it internally easier/more central.
-		 *   'copy' is just 'move and keep the source', while 'rename' is 'move in the same dir'
-		 *
 		 */
-		// TODO: on error notes use a prefix that describes the source root (if they differ).
-		//       Probably a method of $Fileman, like get_names_realtive_to( $a_File, $b_File, $root_type, $root_ID, $rel_path ),
-		//       because "Copied «test_me.jpg» to «test_me.jpg»." (from one root to another) is not so good.
-
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$Fileman->fm_mode = NULL;
 			break;
 		}
+
+		// TODO: get rid of this:
+		$LogCmr = new Log( 'error' );  // Log for copy/move/rename mode
 
 		if( !$Fileman->SourceList->count() )
 		{
@@ -983,11 +972,6 @@ switch( $Fileman->fm_mode )
 		// Check params for each file to rename:
 		while( $loop_src_File = & $Fileman->SourceList->get_next() )
 		{
-			if( ! $loop_src_File->exists() )
-			{ // this can happen on reloading the page
-				$Fileman->SourceList->remove($loop_src_File);
-				continue;
-			}
 			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
 			{ // We have not yet provided a name to rename to...
 				$confirm = 0;
@@ -1000,7 +984,7 @@ switch( $Fileman->fm_mode )
 			if( !isFilename($new_names[$loop_src_File->get_md5_ID()]) )
 			{
 				$confirm = 0;
-				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ) );
+				$Messages->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ), 'error' );
 				continue;
 			}
 
@@ -1008,7 +992,7 @@ switch( $Fileman->fm_mode )
 			$extension = '';
 			if( ! validate_file_extension( $new_names[$loop_src_File->get_md5_ID()], $extension ) )
 			{ // Extension invalid:
-				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ) );
+				$Messages->add( sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ), 'error' );
 				$confirm = 0;
 				continue;
 			}
@@ -1020,14 +1004,14 @@ switch( $Fileman->fm_mode )
 			{ // Target exists
 				if( $dest_File === $loop_src_File )
 				{
-					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', T_('Source and target files are the same. Please choose another name or directory.') );
+					$LogCmr->add( T_('Source and target files are the same. Please choose another name or directory.') );
 					$confirm = 0;
 					continue;
 				}
 
 				if( ! isset( $overwrite[$loop_src_File->get_md5_ID()] ) )
 				{ // We have not yet asked to overwrite:
-					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ) );
+					$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ), 'error' );
 					$overwrite[$loop_src_File->get_md5_ID()] = 0;
 					$confirm = 0;
 					continue;
@@ -1046,7 +1030,8 @@ switch( $Fileman->fm_mode )
 				if( $Messages->count('restrict') )
 				{ // There are restrictions:
 					// TODO: work on a better output display here...
-					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'), $dest_File->get_rdfp_rel_path() ) );
+					$Messages->add( sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'),
+																			 $dest_File->get_rdfp_rel_path() ), 'error' );
 
 					$confirm = 0;
 					break;	// stop whole file list processing
@@ -1054,65 +1039,76 @@ switch( $Fileman->fm_mode )
 			}
 		}
 
-		if( $confirm && $Fileman->SourceList->count() )
+		if( $confirm )
 		{ // Copy/move is confirmed, let's proceed:
+
 			// Loop through files:
 			$Fileman->SourceList->restart();
 			while( $loop_src_File = & $Fileman->SourceList->get_next() )
 			{
 				// Get a pointer on dest file
-				$dest_File = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(), $Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
+				$dest_File = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(),
+																								$Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
 
 				if( $Fileman->fm_mode == 'file_copy' )
 				{ // COPY
 
 					// Do the copy
-					if( $Fileman->copy_File( $loop_src_File, $dest_File, true ) ) // overwrite
+					if( $Fileman->copy_File( $loop_src_File, $dest_File ) )
 					{ // Success:
 						$Messages->add( sprintf( T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ), 'success' );
-						$Fileman->SourceList->remove( $loop_src_File );
 					}
 					else
 					{ // Failure:
-						$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ) );
+						$Messages->add( sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
+																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ), 'error' );
 					}
 				}
 				elseif( $Fileman->fm_mode == 'file_move' )
 				{ // MOVE
-					// NOTE: DB integrity is handled by the File object itself
+
+					$DB->begin();
+
+					if( isset( $overwrite[$loop_src_File->get_md5_ID()] )
+							&& $overwrite[$loop_src_File->get_md5_ID()] )
+					{ // We want to overwrite, let's unlink the old file:
+						if( ! $Fileman->unlink( $dest_File, false ) )	// Will NOT delete recursively
+						{ // Unlink failed:
+							$DB->rollback();
+							// Move on to next file:
+							continue;
+						}
+					}
+
+					// Do the move:
 					$rdfp_oldpath = $loop_src_File->get_rdfp_rel_path();
 					$rdfp_newpath = $Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
-
-					if( $Fileman->move_File( $loop_src_File, $Fileman->get_root_type(), $Fileman->get_root_ID(), $rdfp_newpath, true ) )
+					if( $Fileman->move_File( $loop_src_File, $Fileman->get_root_type(), $Fileman->get_root_ID(), $rdfp_newpath ) )
 					{ // successfully moved
 						$Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ), 'success' );
-
-						// We remove the file from the source list, after refreshing the cache
-						$Fileman->SourceList->update_caches();
-						$Fileman->SourceList->remove( $loop_src_File );
 					}
 					else
-					{ // move failed
-						$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not move &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ) );
+					{ // moved failed
+						$Messages->add( sprintf( T_('Could not move &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ), 'error' );
+						// Note: we do not rollback, since unlinking is already done on disk :'(
 					}
 
 					$DB->commit();
 				}
-				else debug_die( 'Unhandled file copy/move mode' );
-			}
-		}
+				else die( 'Unhandled file copy/move mode' );
 
-		if( $Fileman->SourceList->count() )
-		{ // we want the file manager in this mode:
-			$Fileman->forceFM = 1;
-		}
-		else
-		{
+			}
+
 			// Leave mode:
 			$Fileman->fm_mode = NULL;
 		}
+		break;
+
+
+	case 'File_properties':
+		// File properties (Meta data) dialog:
+		require dirname(__FILE__).'/_file_properties.inc.php';
 		break;
 
 
@@ -1134,17 +1130,10 @@ switch( $Fileman->fm_mode )
 		require dirname(__FILE__).'/_files_links.inc.php';
 		$AdminUI->disp_payload_end();
 
-		// we want the file manager in this mode:
 		$Fileman->forceFM = 1;
 		break;
 
 } // }}}
-
-
-/**
- * The top menu
- */
-require dirname(__FILE__).'/_menutop.php';
 
 
 // Display reload-icon in the opener window if we're a popup in the same CWD and the
@@ -1170,6 +1159,16 @@ require dirname(__FILE__).'/_menutop.php';
 
 
 <?php
+
+
+// TODO: remove this!
+// Output errors, notes and action messages
+if( $Messages->count( 'all' ) )
+{
+	$Messages->display( '', '', true, 'all' );
+}
+
+
 /*
  * Display payload:
  */
@@ -1182,19 +1181,6 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 		break;
 
-	case 'delete':
-		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
-		$AdminUI->disp_payload_begin();
-		require dirname(__FILE__).'/_files_delete.form.php';
-		$AdminUI->disp_payload_end();
-		break;
-
-	case 'edit_perms':
-		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
-		$AdminUI->disp_payload_begin();
-		require dirname(__FILE__).'/_files_permissions.form.php';
-		$AdminUI->disp_payload_end();
-		break;
 
 	default:
 		// Deferred action message:
@@ -1224,21 +1210,11 @@ switch( $Fileman->fm_mode )
 {
 	case 'file_copy':
 	case 'file_move':
+	case 'file_cmr':
 		// CMR dialog:
 		require dirname(__FILE__).'/_files_cmr.inc.php';
 		break;
-
-	case 'file_upload':
-		// Upload dialog:
-		require dirname(__FILE__).'/_files_upload.inc.php';
-		break;
-
-	case 'File_properties':
-		// File properties (Meta data) dialog:
-		require dirname(__FILE__).'/_file_properties.inc.php';
-		break;
 }
-
 
 // "Display/hide Filemanager"
 // TODO: do not display this after a successful rename...
@@ -1280,31 +1256,10 @@ require dirname(__FILE__).'/_footer.php';
 
 
 /*
- * {{{ Revision log:
  * $Log$
- * Revision 1.129  2005/11/21 04:17:24  blueyed
- * todo
- *
- * Revision 1.128  2005/11/21 04:13:08  blueyed
- * file_copy/file_move: ignore non-existing files and remove them from SourceList
- *
- * Revision 1.127  2005/11/21 04:05:38  blueyed
- * File manager: fm_sources_root to remember the root of fm_sources!, chmod centralized ($Settings), Default for dirs fixed, Normalisation; this is ready for the alpha (except bug fixes of course)
- *
- * Revision 1.126  2005/11/20 20:38:19  blueyed
- * Display hint about "img" tag to insert tags into the post when the file manager is launched in upload mode. Normalisation, doc.
- *
- * Revision 1.125  2005/11/19 23:48:28  blueyed
- * "Edit File permissions" action fixed/finished
- *
- * Revision 1.124  2005/11/19 19:25:50  blueyed
- * Add Messages for update_properties
- *
- * Revision 1.123  2005/11/19 05:27:12  blueyed
- * chmod to default chmod (664) after upload. This should become a general/user Setting later.
- *
- * Revision 1.122  2005/11/19 03:45:51  blueyed
- * Transformed 'delete' to 1-2-3-4 scheme, plus small fixes
+ * Revision 1.130  2005/11/21 18:33:19  fplanque
+ * Too many undiscussed changes all around: Massive rollback! :((
+ * As said before, I am only taking CLEARLY labelled bugfixes.
  *
  * Revision 1.121  2005/11/14 16:43:43  blueyed
  * FGix actionArray
@@ -1493,6 +1448,6 @@ require dirname(__FILE__).'/_footer.php';
  *
  * Revision 1.58  2005/01/06 10:15:46  blueyed
  * FM upload and refactoring
- * }}}
+ *
  */
 ?>

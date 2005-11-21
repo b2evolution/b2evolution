@@ -39,6 +39,7 @@
  *
  * @version $Id$
  *
+ * @todo KILL THIS CLASS!!! It is useless and has no clear boundaries. Most of what's in here should be directly in files.php
  * @todo Permissions!
  * @todo Performance
  * @todo favorite folders/bookmarks
@@ -115,6 +116,20 @@ class FileManager extends Filelist
 	var $_use_image_sizes = false;
 
 	/**
+	 * Default perms for files
+	 * @todo move to user options
+	 * @access protected
+	 */
+	var $_default_chmod_file = 664;
+
+	/**
+	 * Default perms for dirs
+	 * @todo move to user options
+	 * @access protected
+	 */
+	var $_default_chmod_dir = 664;
+
+	/**
 	 * Evo Display mode (upload, bookmarklet, etc..)
 	 * @todo get rid of this, along with $_url_params
 	 * @param string
@@ -149,7 +164,7 @@ class FileManager extends Filelist
 	/**
 	 * These are variables that get considered when regenerating an URL
 	 *
-	 * @param array URL param => member name
+	 * @param array
 	 * @access private
 	 */
 	var $_url_params = array(
@@ -162,17 +177,11 @@ class FileManager extends Filelist
 			'mode'           => '_evo_mode',
 			'fm_mode'        => 'fm_mode',
 			'fm_sources'     => 'fm_sources',
-			'fm_sources_root'=> 'fm_sources_root',
+			'cmr_keepsource' => 'cmr_keepsource',
 			'flatmode'       => 'flatmode',
 			'forceFM'        => 'forceFM',
 			'item_ID'	       => '_item_ID',	             // Used in fm_mode=link_item
 		);
-
-	/**
-	 * Root of the sources (e.g. 'user' or 'blog_X')
-	 * @var string
-	 */
-	var $fm_sources_root;
 
 
 	/**
@@ -204,41 +213,52 @@ class FileManager extends Filelist
 
 		$this->_result_params = $AdminUI->get_menu_template('Results');
 
-		$this->_ads_list_path = false; // false by default, gets set if we have a valid root
-
-		// Get root:
 		if( empty($root) )
-		{ // No folder requested, get the first one available:
+		{ // NO folder requested, get the first one available:
 			$root_array = $this->getRootList();
 
-			if( !isset($root_array[0]) )
-			{
-				$Messages->add( T_('You don\'t have access to any root directory.'), 'error' );
+			if( count($root_array) )
+			{ // We found at least one media dir:
+				$this->_root_type = $root_array[0]['type'];
+				$this->_root_ID = $root_array[0]['IDn'];
+				$this->_ads_root_path = $root_array[0]['path'];
+				$this->_root_url = $root_array[0]['url'];
+				$this->root = $root_array[0]['id'];
 			}
 			else
-			{ // get the first one
-				$root_array = $root_array[0];
+			{
+				$Messages->add( T_('You don\'t have access to any root directory.'), 'error' );
+				$this->_ads_list_path = false;
 			}
 		}
 		else
-		{ // We have requested a root folder by string, decode it:
-			$root_array = $this->decode_root_string($root);
+		{ // We have requested a root folder:
+			$root_parts = explode( '_', $root );
 
-			if( !$root_array )
+			if( $root_parts[0] == 'user' )
+			{
+				$this->_root_type = 'user';
+				$this->_root_ID = $this->User->ID;
+				$this->_ads_root_path = $this->User->getMediaDir();
+				$this->_root_url = $this->User->getMediaUrl();
+				$this->root = 'user';
+			}
+			elseif( $root_parts[0] == 'blog' && isset($root_parts[1]) )
+			{
+				$tBlog = $BlogCache->get_by_ID( $root_parts[1] );
+				$this->_root_type = 'collection';
+				$this->_root_ID = $tBlog->ID;
+				$this->_ads_root_path = $tBlog->get( 'mediadir' );
+				$this->_root_url = $tBlog->get( 'mediaurl' );
+				$this->root = 'blog_'.$tBlog->ID;
+			}
+
+			if( ! $this->_ads_root_path )
 			{
 				$Messages->add( T_('You don\'t have access to the requested root directory.'), 'error' );
+				$this->_ads_list_path = false;
 			}
 		}
-
-		if( $root_array )
-		{
-			$this->_root_type = $root_array['type'];
-			$this->_root_ID = $root_array['IDn'];
-			$this->_ads_root_path = $root_array['path'];
-			$this->_root_url = $root_array['url'];
-			$this->root = $root_array['id'];
-		}
-
 
 		if( $this->_ads_root_path )
 		{ // We have access to a/requested root dir:
@@ -280,7 +300,7 @@ class FileManager extends Filelist
 			}
 
 			// Finish initializing:
-			parent::Filelist( NULL, NULL, NULL ); // Do not override anything
+			parent::Filelist( NULL, NULL, NULL ); // Do not override anuthing
 		}
 
 
@@ -296,29 +316,17 @@ class FileManager extends Filelist
 		$this->fm_mode = param( 'fm_mode', 'string', NULL, true );
 
 
-		// For modes build $this->SourceList
 		if( $this->fm_mode && $this->fm_sources = param( 'fm_sources', 'array', array() ) )
 		{
-			$this->fm_sources_root = param( 'fm_sources_root', 'string', '' );
+			if( $this->SourceList = & new Filelist( $this->_ads_root_path, $this->_root_type, $this->_root_ID ) )
+			{ // TODO: should fail for non-existant sources, or sources where no read-perm
 
-			if( $root_array = $this->decode_root_string( $this->fm_sources_root ) )
-			{ // instantiate the source list for the selected sources
-				$this->SourceList = & new Filelist( $root_array['path'], $root_array['type'], $root_array['IDn'] );
-			}
-			else
-			{ // fallback: source files are considered to be in the current root
-				$this->SourceList = & new Filelist( $this->_ads_root_path, $this->_root_type, $this->_root_ID );
-				echo 'SourceList without explicit root!';
-			}
-
-			if( $this->SourceList )
-			{
-				// TODO: should fail for non-existant sources, or sources where no read-perm
 				foreach( $this->fm_sources as $lSourcePath )
 				{
 					// echo '<br>'.$lSourcePath;
 					$this->SourceList->add_by_subpath( urldecode($lSourcePath) );
 				}
+				$this->cmr_keepsource = param( 'cmr_keepsource', 'integer', 0 );
 			}
 			else
 			{
@@ -329,7 +337,7 @@ class FileManager extends Filelist
 		{
 			$this->SourceList = false;
 			$this->fm_sources = NULL;
-			$this->fm_sources_root = NULL;
+			$this->cmr_keepsource = NULL;
 		}
 
 
@@ -446,7 +454,7 @@ class FileManager extends Filelist
 	{
 		if( $this->User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
-			echo '<a title="'.T_('Edit permissions').'" href="'.$this->getLinkFile( $this->curFile, 'edit_perms' ).'">'
+			echo '<a title="'.T_('Edit permissions').'" href="'.$this->getLinkFile( $this->curFile, 'editperm' ).'">'
 						.$this->curFile->get_perms( $this->_disp_permslikelsl ? 'lsl' : '' ).'</a>';
 		}
 		else
@@ -475,8 +483,10 @@ class FileManager extends Filelist
 		{
 			return false;
 		}
-		$url = $this->getCurUrl( array( 'fm_mode' => 'file_'.$mode, 'fm_sources' => false, 'fm_sources_root' => false ) );
-		$url .= '&amp;fm_sources[]='.rawurlencode( $this->curFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$this->root;
+		$url = $this->getCurUrl( array( 'fm_mode' => 'file_'.$mode,
+																		'fm_sources' => false,
+																		'cmr_keepsource' => (int)($mode == 'copy') ) );
+		$url .= '&amp;fm_sources[]='.rawurlencode( $this->curFile->get_rdfp_rel_path() );
 
 		echo '<a href="'.$url
 					#.'" target="fileman_copymoverename" onclick="'
@@ -635,11 +645,13 @@ class FileManager extends Filelist
 		{
 			if( is_array( $lValue ) )
 			{
-				$strAppend .= ( !empty($strAppend) ? '&amp;' : '' ).$lName.'[]='.implode( '&amp;'.$lName.'[]=', $lValue );
+				$strAppend .= ( !empty($strAppend) ? '&amp;' : '' )
+										.$lName.'[]='.implode( '&amp;'.$lName.'[]=', $lValue );
 			}
 			else
 			{
-				$strAppend .= ( !empty($strAppend) ? '&amp;' : '' ).$lName.'='.$lValue;
+				$strAppend .= ( !empty($strAppend) ? '&amp;' : '' )
+										.$lName.'='.$lValue;
 			}
 		}
 
@@ -934,20 +946,21 @@ class FileManager extends Filelist
 		$id_path = md5( $path );
 
 		$r['string'] = '<input type="radio"
-		                       name="root_and_path"
-		                       value="'.$root_and_path.'"
-		                       id="radio_'.$id_path.'"'
-		                       .( $Root['id'] == $this->root && $rootSubpath == $this->_rds_list_path ? ' checked="checked"' : '' ).'
-		                /> ';
+														name="root_and_path"
+														value="'.$root_and_path.'"
+														id="radio_'.$id_path.'"'
+														.( $Root['id'] == $this->root && $rootSubpath == $this->_rds_list_path ? ' checked="checked"' : '' ).'
+														/> ';
 
 		$label = '<label for="radio_'.$id_path.'">'
-			.'<a href="'.$this->getCurUrl( array( 'root' => $Root['id'], 'path' => $rootSubpath ) ).'"
-			title="'.T_('Open this directory in the Filemanager').'">'
-			.( empty($path) ? $Root['name'] : basename( $path ) )
-			.'</a>'
-			.'</label>';
+							.'<a href="'.$this->getCurUrl( array( 'root' => $Root['id'], 'path' => $rootSubpath, 'forceFM' => 1 ) ).'"
+								title="'.T_('Open this directory in the Filemanager').'">'
+							.( empty($path) ? $Root['name'] : basename( $path ) )
+							.'</a>'
+							.'</label>';
 
 		$r['opened'] = ( $Root['id'] == $this->root && $rootSubpath == $this->_rds_list_path ) ? true : NULL;
+
 
 
 		if( !$Nodelist->count_dirs() )
@@ -958,10 +971,12 @@ class FileManager extends Filelist
 		else
 		{ // Process subdirs
 			$r['string'] .= '<img src="'.get_icon( 'collapse', 'url' ).'"'
-				.' onclick="toggle_clickopen(\''.$id_path.'\');"'
-				.' id="clickimg_'.$id_path.'" alt="+ / -" />
-				'.$label.'
-				<ul class="clicktree" id="clickdiv_'.$id_path.'">'."\n";
+											.' onclick="toggle_clickopen(\''.$id_path.'\');"'
+											.' id="clickimg_'.$id_path.'" alt="+ / -" />
+										'.$label.'
+										<ul class="clicktree" id="clickdiv_'.$id_path.'">
+
+										';
 
 			while( $lFile =& $Nodelist->get_next( 'dir' ) )
 			{
@@ -1031,16 +1046,16 @@ class FileManager extends Filelist
 
 		if( empty($name) )
 		{ // No name was supplied:
-			$Messages->add( ($type == 'dir'
-				? T_('Cannot create a directory without name.')
-				: T_('Cannot create a file without name.') ), 'error' );
+			$Messages->add( ($type == 'dir' ?
+														T_('Cannot create a directory without name.') :
+														T_('Cannot create a file without name.') ), 'error' );
 			return false;
 		}
 		elseif( !isFilename($name) )
 		{
-			$Messages->add( sprintf( ($type == 'dir'
-				? T_('&laquo;%s&raquo; is not a valid directory.')
-				: T_('&laquo;%s&raquo; is not a valid filename.') ), $name), 'error' );
+			$Messages->add( sprintf( ($type == 'dir' ?
+																			T_('&laquo;%s&raquo; is not a valid directory.') :
+																			T_('&laquo;%s&raquo; is not a valid filename.') ), $name), 'error' );
 			return false;
 		}
 
@@ -1053,6 +1068,7 @@ class FileManager extends Filelist
 			return false;
 		}
 
+		// not used... $chmod = $type == 'dir' ? $this->_default_chmod_dir : $this->_default_chmod_file;
 		if( $newFile->create( $type ) )
 		{
 			if( $type == 'file' )
@@ -1240,7 +1256,6 @@ class FileManager extends Filelist
 	 * Unlinks (deletes!) a file.
 	 *
 	 * @param File file object
-	 * @param boolean delete subdirectories? (we cannot support this yet because of DB integrity checks)
 	 * @return boolean true on success, false on failure
 	 */
 	function unlink( & $File, $delsubdirs = false )
@@ -1261,31 +1276,28 @@ class FileManager extends Filelist
 			if( $unlinked = deldir_recursive( $File->get_full_path() ) )
 			{
 				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'),
-					$File->get_name() ), 'success' );
+															$File->get_name() ), 'success' );
 			}
 			else
 			{
-				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'),
-					$File->get_name() ), 'error' );
+				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'), $File->get_name() ), 'error' );
 			}
 			$this->load(); // Reload!
 		}
 		elseif( $unlinked = $File->unlink() )
 		{ // remove from list
-			$Messages->add( sprintf( (
-				$File->is_dir()
-					? T_('The directory &laquo;%s&raquo; has been deleted.')
-					: T_('The file &laquo;%s&raquo; has been deleted.') ),
-				$File->get_name() ), 'success' );
+			$Messages->add( sprintf( ( $File->is_dir() ?
+																					T_('The directory &laquo;%s&raquo; has been deleted.') :
+																					T_('The file &laquo;%s&raquo; has been deleted.') ),
+																			$File->get_name() ), 'success' );
 			$this->remove( $File );
 		}
 		else
 		{
-			$Messages->add( sprintf( (
-				$File->is_dir()
-					? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
-					: T_('Could not delete the file &laquo;%s&raquo;.') ),
-				$File->get_name() ), 'error' );
+			$Messages->add( sprintf( ( $File->is_dir() ?
+																				T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') :
+																				T_('Could not delete the file &laquo;%s&raquo;.') ),
+																				$File->get_name() ), 'error' );
 		}
 
 		return $unlinked;
@@ -1293,45 +1305,15 @@ class FileManager extends Filelist
 
 
 	/**
-	 * Rename a File object physically
-	 *
-	 * @param File The source file
-	 * @param string The new name
-	 * @param boolean Overwrite existing target?
-	 * @return boolean true on success, false on failure (e.g. file already exists)
-	 */
-	function rename_File( & $File, $new_name, $overwrite = false )
-	{
-		if( ! $File->rename_to( $new_name, $overwrite ) )
-		{ // failed
-			return false;
-		}
-
-		// We have moved in same dir, update caches:
-		$this->update_caches();
-
-		if( $this->contains( $File ) === false )
-		{ // File not in filelist (expected if not same dir)
-			$this->add( $File );
-		}
-
-		return true;
-	}
-
-
-	/**
 	 * Moves a File object physically
-	 *
-	 * @param File The source file
-	 * @param string Target Root type: 'user', 'group' or 'collection'
-	 * @param integer Target ID of the user, the group or the collection the file belongs to...
+	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
+	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
-	 * @param boolean Overwrite existing target?
 	 * @return boolean true on success, false on failure
 	 */
-	function move_File( & $File, $root_type, $root_ID, $rel_path, $overwrite = false )
+	function move_File( & $File, $root_type, $root_ID, $rel_path )
 	{
-		if( ! $File->move_to( $root_type, $root_ID, $rel_path, $overwrite ) )
+		if( ! $File->move_to( $root_type, $root_ID, $rel_path ) )
 		{ // failed
 			return false;
 		}
@@ -1353,12 +1335,11 @@ class FileManager extends Filelist
 	 *
 	 * @param File the source file (expected to exist)
 	 * @param File the target file (expected to not exist)
-	 * @param boolean Overwrite existing target?
 	 * @return boolean true on success, false on failure
 	 */
-	function copy_File( & $SourceFile, & $TargetFile, $overwrite = false )
+	function copy_File( & $SourceFile, & $TargetFile )
 	{
-		if( ! $SourceFile->copy_to( $TargetFile, $overwrite ) )
+		if( ! $SourceFile->copy_to( $TargetFile ) )
 		{
 			return false;
 		}
@@ -1370,65 +1351,13 @@ class FileManager extends Filelist
 
 		return true;
 	}
-
-
-	/**
-	 * Decode a given root string.
-	 *
-	 * This is either 'user' for the {@link $User User's} media dir
-	 * or blog_X for the collection X.
-	 *
-	 * @return array|false
-	 */
-	function decode_root_string( $root )
-	{
-		global $BlogCache;
-
-		$root_parts = explode( '_', $root );
-
-		$r = array();
-
-		if( $root_parts[0] == 'user' )
-		{
-			return array(
-				'type' => 'user',
-				'IDn' => $this->User->ID,
-				'path' => $this->User->getMediaDir(),
-				'url' => $this->User->getMediaUrl(),
-				'id' => 'user' );
-		}
-		elseif( $root_parts[0] == 'blog' && isset($root_parts[1]) )
-		{
-			$tmp_Blog = $BlogCache->get_by_ID( $root_parts[1] );
-			return array(
-				'type' => 'collection',
-				'IDn' => $tmp_Blog->ID,
-				'path' => $tmp_Blog->get( 'mediadir' ),
-				'url' => $tmp_Blog->get( 'mediaurl' ),
-				'id' => 'blog_'.$tmp_Blog->ID );
-		}
-
-		return false;
-	}
-
 }
 
 /*
  * $Log$
- * Revision 1.61  2005/11/21 04:05:40  blueyed
- * File manager: fm_sources_root to remember the root of fm_sources!, chmod centralized ($Settings), Default for dirs fixed, Normalisation; this is ready for the alpha (except bug fixes of course)
- *
- * Revision 1.60  2005/11/20 23:14:08  blueyed
- * added rename_File()
- *
- * Revision 1.59  2005/11/19 23:48:28  blueyed
- * "Edit File permissions" action fixed/finished
- *
- * Revision 1.58  2005/11/19 05:27:13  blueyed
- * chmod to default chmod (664) after upload. This should become a general/user Setting later.
- *
- * Revision 1.57  2005/11/19 03:43:00  blueyed
- * doc
+ * Revision 1.62  2005/11/21 18:33:19  fplanque
+ * Too many undiscussed changes all around: Massive rollback! :((
+ * As said before, I am only taking CLEARLY labelled bugfixes.
  *
  * Revision 1.56  2005/11/18 21:01:21  fplanque
  * no message

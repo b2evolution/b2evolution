@@ -43,7 +43,7 @@ if( false )
 
 $Form = & new Form( 'files.php', '', 'post', 'fieldset' );
 
-$Form->global_icon( T_('Quit link mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
+$Form->global_icon( T_('Quit link mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
 
 $Form->begin_form( 'fform', sprintf( T_('Link files to &laquo;%s&raquo;...'), $edited_Item->dget('title') ) );
 
@@ -126,8 +126,9 @@ $Form->end_form( );
 
 /*
  * $Log$
- * Revision 1.5  2005/11/21 04:05:38  blueyed
- * File manager: fm_sources_root to remember the root of fm_sources!, chmod centralized ($Settings), Default for dirs fixed, Normalisation; this is ready for the alpha (except bug fixes of course)
+ * Revision 1.6  2005/11/21 18:33:19  fplanque
+ * Too many undiscussed changes all around: Massive rollback! :((
+ * As said before, I am only taking CLEARLY labelled bugfixes.
  *
  * Revision 1.4  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected

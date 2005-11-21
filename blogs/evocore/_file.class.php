@@ -301,24 +301,30 @@ class File extends DataObject
 	 * Also inserts meta data into DB (if file/folder was successfully created).
 	 *
 	 * @param string type ('dir'|'file')
-	 * @param string optional permissions (octal format), otherwise the default from {@link $Settings} gets used
+	 * @param string optional permissions (octal format)
 	 * @return boolean true if file/folder was created, false on failure
 	 */
 	function create( $type = 'file', $chmod = NULL )
 	{
-		global $Settings;
-
 		if( $type == 'dir' )
 		{ // Create an empty directory:
-			$success = @mkdir( $this->_adfp_full_path );
-			$this->_is_dir = true; // used by chmod
+			if( $chmod === NULL )
+			{ // Create dir with default permissions (777)
+				$success = @mkdir( $this->_adfp_full_path );
+			}
+			else
+			{ // Create directory with specific permissions:
+				$success = @mkdir( $this->_adfp_full_path, octdec($chmod) );
+			}
 		}
 		else
 		{ // Create an empty file:
 			$success = touch( $this->_adfp_full_path );
-			$this->_is_dir = false; // used by chmod
+			if( $chmod !== NULL )
+			{
+				$this->chmod( $chmod );
+			}
 		}
-		$this->chmod( $chmod ); // uses $Settings for NULL
 
 		if( $success )
 		{	// The file/folder has been successfully created:
@@ -833,61 +839,33 @@ class File extends DataObject
 
 
 	/**
-	 * Rename the file in its current directory on disk.
+	 * Rename the file in its current directoty on disk.
 	 *
-	 * Also update meta data in DB.
+	 * Also update meta data in DB
 	 *
-	 * NOTE: this uses move_to() to make handling of meta data more central!
-	 *
-	 * @uses move_to()
 	 * @access public
 	 * @param string new name (without path!)
-	 * @param boolean Overwrite existing target?
 	 * @return boolean true on success, false on failure
 	 */
-	function rename_to( $newname, $overwrite = false )
+	function rename_to( $newname )
 	{
 		// echo "newname= $newname ";
-
-		$rel_dir = dirname( $this->_rdfp_rel_path ).'/';
-		if( $rel_dir == './' )
-		{
-			$rel_dir = '';
-		}
-
-		$newname = basename($newname);
-		if( $newname == '..' || $newname == '.' )
-		{
-			return false;
-		}
-
-		return $this->move_to( $this->_root_type, $this->_root_ID, $rel_dir.$newname, $overwrite );
-
-		/*
-		if( file_exists($this->_dir.$newname) )
-		{
-			if( !$overwrite )
-			{
-				return false;
-			}
-			// we'll have to take care of DB data of existing targets
-			$dest_File = & $FileCache->get_by_root_and_path( $root_type, $root_ID, $rel_dir.$newname );
-		}
 
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{
 			return false;
 		}
 
-		if( isset($dest_File) && $dest_File->load_meta() )
-		{ // Existing target file physically removed, we'll also have to remove at least the filename from DB:
-			$dest_File->dbdelete();
-		}
-
 		// Get Meta data (before we change name) (we may need to update it later):
 		$this->load_meta();
 
 		$this->_name = $newname;
+
+		$rel_dir = dirname( $this->_rdfp_rel_path ).'/';
+		if( $rel_dir == './' )
+		{
+			$rel_dir = '';
+		}
 		$this->_rdfp_rel_path = $rel_dir.$this->_name;
 
 		$this->_adfp_full_path = $this->_dir.$this->_name;
@@ -902,14 +880,11 @@ class File extends DataObject
 			$this->dbupdate();
 		}
 		else
-		{	// There might be some old meta data to recycle in the DB...
-			// blueyed>> When? There's a UNIQUE index on ( file_root_type, file_root_ID, file_path )
-			//           instead, when overwriting, we'd have to remove the old data!
+		{	// There migth be some old meta data to recyle in the DB...
 			$this->load_meta();
 		}
 
 		return true;
-		*/
 	}
 
 
@@ -921,41 +896,25 @@ class File extends DataObject
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 * @param string Subpath for this file/folder, relative the associated root (no trailing slash)
-	 * @param boolean Overwrite existing target?
 	 * @return boolean true on success, false on failure
 	 */
-	function move_to( $root_type, $root_ID, $rdfp_rel_path, $overwrite = false )
+	function move_to( $root_type, $root_ID, $rdfp_rel_path )
 	{
-		global $FileRootCache, $FileCache;
+		global $FileRootCache;
 		// echo "relpath= $rel_path ";
 
 		$rdfp_rel_path = str_replace( '\\', '/', $rdfp_rel_path );
 		$adfp_posix_path = $FileRootCache->get_root_dir( $root_type, $root_ID ).$rdfp_rel_path;
-
-		if( file_exists($adfp_posix_path) )
-		{
-			if( !$overwrite )
-			{
-				return false;
-			}
-			// we'll have to take care of DB data of existing targets
-			$dest_File = & $FileCache->get_by_root_and_path( $root_type, $root_ID, $rdfp_rel_path );
-		}
 
 		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )
 		{
 			return false;
 		}
 
-		if( isset($dest_File) && $dest_File->load_meta() )
-		{ // Existing target file physically removed, we'll also have to remove at least the filename from DB:
-			$dest_File->dbdelete();
-		}
-
 		// Get Meta data (before we change name) (we may need to update it later):
 		$this->load_meta();
 
-		// Memorize new filepath: (couldn't we use $FileCache, after handling meta data ?)
+		// Memorize new filepath:
 		$this->_root_type = $root_type;
 		$this->_root_ID = $root_ID;
 		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
@@ -974,9 +933,7 @@ class File extends DataObject
 			$this->dbupdate();
 		}
 		else
-		{	// There might be some old meta data to recycle in the DB...
-			// blueyed>> When? There's a UNIQUE index on ( file_root_type, file_root_ID, file_path )
-			//           instead, when moving a file, we'll have to remove the old data!
+		{	// There migth be some old neta dat to recyle in the DB...
 			$this->load_meta();
 		}
 
@@ -990,23 +947,17 @@ class File extends DataObject
 	 * Also copy meta data in Object
 	 *
 	 * @param File the target file (expected to not exist)
-	 * @param boolean Overwrite existing target?
 	 * @return boolean true on success, false on failure
 	 */
-	function copy_to( & $dest_File, $overwrite = false )
+	function copy_to( & $dest_File )
 	{
-		if( ! $this->exists() )
-		{
-			return false;
-		}
-
-		if( ! $overwrite && $dest_File->exists() )
+		if( ! $this->exists() || $dest_File->exists() )
 		{
 			return false;
 		}
 
 		if( ! @copy( $this->get_full_path(), $dest_File->get_full_path() ) )
-		{ // this is probably a permission problem then!
+		{
 			return false;
 		}
 
@@ -1080,21 +1031,11 @@ class File extends DataObject
 	 * Change file permissions on disk.
 	 *
 	 * @access public
-	 * @param string|NULL chmod (octal three-digit-format, eg '777'), uses {@link $Settings} for NULL
-	 *                    (fm_default_chmod_dir, fm_default_chmod_file)
+	 * @param string chmod (octal three-digit-format, eg '777')
 	 * @return mixed new permissions on success (octal format), false on failure
 	 */
 	function chmod( $chmod )
 	{
-		if( empty($chmod) )
-		{
-			global $Settings;
-
-			$chmod = $this->is_dir()
-				? $Settings->get( 'fm_default_chmod_dir' )
-				: $Settings->get( 'fm_default_chmod_file' );
-		}
-
 		$chmod = octdec( $chmod );
 		if( @chmod( $this->_adfp_full_path, $chmod ) )
 		{
@@ -1113,22 +1054,16 @@ class File extends DataObject
 
 	/**
 	 * Insert object into DB based on previously recorded changes
-	 *
-	 * @return boolean true on success, false on failure
 	 */
 	function dbinsert( )
 	{
 		global $Debuglog;
 
 		if( $this->meta == 'unknown' )
-		{
-			debug_die( 'cannot insert File if meta data has not been checked before' );
-		}
+			{ debug_die( 'cannot insert File if meta data has not been checked before' ); }
 
 		if( ($this->ID != 0) || ($this->meta != 'notfound') )
-		{
-			debug_die( 'Existing file object cannot be inserted!' );
-		}
+			{ debug_die( 'Existing file object cannot be inserted!' ); }
 
 		$Debuglog->add( 'Inserting meta data for new file into db', 'files' );
 
@@ -1138,29 +1073,25 @@ class File extends DataObject
 		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );
 
 		// Let parent do the insert:
-		$r = parent::dbinsert();
+		parent::dbinsert();
 
 		// We can now consider the meta data has been loaded:
 		$this->meta  = 'loaded';
-
-		return $r;
 	}
 
 
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
-	 * @return boolean true on success, false on failure / no changes
+	 * {@internal DataObject::dbupdate(-)}}
 	 */
 	function dbupdate( )
 	{
 		if( $this->meta == 'unknown' )
-		{
-			debug_die( 'cannot update File if meta data has not been checked before' );
-		}
+			{ debug_die( 'cannot update File if meta data has not been checked before' ); }
 
 		// Let parent do the update:
-		return parent::dbupdate();
+		parent::dbupdate();
 	}
 
 
@@ -1247,14 +1178,9 @@ class File extends DataObject
 
 /*
  * $Log$
- * Revision 1.46  2005/11/21 04:05:40  blueyed
- * File manager: fm_sources_root to remember the root of fm_sources!, chmod centralized ($Settings), Default for dirs fixed, Normalisation; this is ready for the alpha (except bug fixes of course)
- *
- * Revision 1.45  2005/11/20 23:13:02  blueyed
- * Fix rename_to() and move_to() to return false on existing files!; doc
- *
- * Revision 1.44  2005/11/19 19:24:19  blueyed
- * dbupdate(), dbinsert(): propagate changes from parent
+ * Revision 1.47  2005/11/21 18:33:19  fplanque
+ * Too many undiscussed changes all around: Massive rollback! :((
+ * As said before, I am only taking CLEARLY labelled bugfixes.
  *
  * Revision 1.43  2005/11/18 07:53:05  blueyed
  * use $_FileRoot / $FileRootCache for absolute path, url and name of roots.
