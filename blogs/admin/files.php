@@ -979,6 +979,11 @@ switch( $Fileman->fm_mode )
 		// Check params for each file to rename:
 		while( $loop_src_File = & $Fileman->SourceList->get_next() )
 		{
+			if( ! $loop_src_File->exists() )
+			{ // this can happen on reloading the page
+				$Fileman->SourceList->remove($loop_src_File);
+				continue;
+			}
 			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
 			{ // We have not yet provided a name to rename to...
 				$confirm = 0;
@@ -1045,9 +1050,8 @@ switch( $Fileman->fm_mode )
 			}
 		}
 
-		if( $confirm )
+		if( $confirm && $Fileman->SourceList->count() )
 		{ // Copy/move is confirmed, let's proceed:
-
 			// Loop through files:
 			$Fileman->SourceList->restart();
 			while( $loop_src_File = & $Fileman->SourceList->get_next() )
@@ -1274,6 +1278,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.128  2005/11/21 04:13:08  blueyed
+ * file_copy/file_move: ignore non-existing files and remove them from SourceList
+ *
  * Revision 1.127  2005/11/21 04:05:38  blueyed
  * File manager: fm_sources_root to remember the root of fm_sources!, chmod centralized ($Settings), Default for dirs fixed, Normalisation; this is ready for the alpha (except bug fixes of course)
  *
