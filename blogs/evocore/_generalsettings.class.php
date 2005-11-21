@@ -63,9 +63,6 @@ class GeneralSettings extends AbstractSettings
 	var $_defaults = array(
 		'admin_skin' => 'legacy',
 
-		'antispam_block_ip' => '0',         // needs UI
-		'antispam_block_ip_dnsbl'
-			=> 'sbl-xbl.spamhaus.org',        // needs UI
 		'antispam_last_update' => '2000-01-01 00:00:00',
 
 		'archive_mode' => 'monthly',
@@ -78,6 +75,10 @@ class GeneralSettings extends AbstractSettings
 		'fm_enable_roots_blog' => '1',
 		// 'fm_enable_roots_group' => '0',  // TO DO
 		'fm_enable_roots_user' => '0',
+
+		'fm_default_chmod_file' => '664',   // Needs UI
+		'fm_default_chmod_dir' => '775',    // Needs UI
+
 
 		'hit_doublecheck_referer' => '0',
 		'links_extrapath' => '0',
@@ -144,6 +145,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.29  2005/11/21 04:05:40  blueyed
+ * File manager: fm_sources_root to remember the root of fm_sources!, chmod centralized ($Settings), Default for dirs fixed, Normalisation; this is ready for the alpha (except bug fixes of course)
+ *
  * Revision 1.28  2005/11/16 21:53:49  fplanque
  * minor
  *

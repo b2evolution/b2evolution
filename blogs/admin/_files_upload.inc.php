@@ -147,19 +147,20 @@ if( false )
 
 	$Form = & new Form( 'files.php', '', 'post', 'fieldset', 'multipart/form-data' );
 
-	$Form->global_icon( T_('Quit upload mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
+	$Form->global_icon( T_('Quit upload mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
 
 	$Form->begin_form( 'fform', T_('File upload') );
 
 		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
+		$Form->hidden( 'upload_quickmode', $upload_quickmode );
 
 		echo $Fileman->getFormHiddenInputs();
 
 		if( count( $failedFiles ) )
 		{
-			$LogUpload->add( T_('Some file uploads failed. Please check the errors below.'), 'error' );
+			Log::display( '', '', T_('Some file uploads failed. Please check the errors below.'), 'error' );
 		}
-		$LogUpload->display( '', '', true, 'all' ); ?>
+		?>
 
 
 		<fieldset class="files_to_upload">
@@ -266,6 +267,9 @@ if( false )
 
 /*
  * $Log$
+ * Revision 1.13  2005/11/21 04:05:40  blueyed
+ * File manager: fm_sources_root to remember the root of fm_sources!, chmod centralized ($Settings), Default for dirs fixed, Normalisation; this is ready for the alpha (except bug fixes of course)
+ *
  * Revision 1.12  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
  *

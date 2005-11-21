@@ -544,12 +544,12 @@ else
 
 
 		/* Not fully functional:
-		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
+		<input class="ActionButton" type="image" name="actionArray[file_copy]"
 			title="<?php echo T_('Copy the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
 			src="<?php echo get_icon( 'file_copy', 'url' ); ?>" />
 
-		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
+		<input class="ActionButton" type="image" name="actionArray[file_move]"
 			title="<?php echo T_('Move the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
 			src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
@@ -765,6 +765,7 @@ if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add
 </form>
 
 <form enctype="multipart/form-data" action="files.php" method="post" class="toolbaritem">
+	<?php form_hidden( 'upload_quickmode', 1 ); ?>
 	<!-- The following is mainly a hint to the browser. -->
 	<?php form_hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); ?>
 
@@ -849,6 +850,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.51  2005/11/21 04:05:38  blueyed
+ * File manager: fm_sources_root to remember the root of fm_sources!, chmod centralized ($Settings), Default for dirs fixed, Normalisation; this is ready for the alpha (except bug fixes of course)
+ *
  * Revision 1.50  2005/11/20 20:18:20  blueyed
  * Added Mozilla scrolling fix to javascript function textarea_replace_selection(), which gets used for inserting img/div tags; doc, todo
  *

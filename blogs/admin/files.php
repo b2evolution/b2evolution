@@ -122,10 +122,19 @@ param( 'filterIsRegexp', 'integer', NULL, true );
 param( 'flatmode', '', NULL, true );
 param( 'action', 'string', '', true );     // 3.. 2.. 1.. action :)
 if( empty($action) )
-{ // TODO: check f*cking IE syntax, which send input[image] submits without value, only name.x and name.y
+{ // we're checking 'actionArray' param, where the action is the first key. This is needed for multiple inputs in a form where you shouldn't use the input values generated with T_() or cannot (for type="image" - IE ignores the value, but sends X and Y coordinates of the click)
 	$actionArray = array_keys( param( 'actionArray', 'array', array(), true ) );
 	$action = array_pop($actionArray); // we must pass this by variable, because it's passed by reference
+	if( is_string($action) )
+	{
+		$action = substr( strip_tags($action), 0, 50 );  // sanitize it
+	}
+	else
+	{ // this is probably a numeric index from '<input name="actionArray[]" .. />'
+		$action = '';
+	}
 }
+
 
 if( $action == 'update_settings' )
 { // Updating user settings from options list
@@ -325,6 +334,7 @@ switch( $action )
 
 	case 'rename':
 		// Rename a file: {{{
+		// TODO: allow overwriting of existing files (like with copy/move)
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
@@ -385,7 +395,7 @@ switch( $action )
 					continue;
 				}
 				// Perform rename:
-				if( ! $loop_src_File->rename_to( $new_name ) )
+				if( ! $Fileman->rename_File( $loop_src_File, $new_name ) )
 				{
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
 						$old_name, $new_name ), 'error' );
@@ -702,16 +712,6 @@ switch( $action )
 		break;
 
 
-	case 'file_copy':
-	case 'file_move':
-	case 'file_cmr':
-		// copy/move/rename - we come here from the "with selected" toolbar {{{
-		#pre_dump( $selected_Filelist );
-
-		// }}}
-		break;
-
-
 	case 'default':
 		// ------------------------
 		// default action (view):
@@ -742,17 +742,6 @@ switch( $action )
 }
 
 
-
-/**
- * The top menu
- */
-require dirname(__FILE__).'/_menutop.php';
-
-// Temporary fix:
-// Messages have already bben displayed:
-$Messages->clear( 'all' );
-
-
 // echo 'fm mode:'.$Fileman->fm_mode;
 
 switch( $Fileman->fm_mode )
@@ -778,7 +767,8 @@ switch( $Fileman->fm_mode )
 			break;
 		}
 
-		$LogUpload = new Log( 'error' );
+		// Quick mode means "just upload and leave mode when successful"
+		$Request->param( 'upload_quickmode', 'integer', 0 );
 
 		/**
 		 * @var array Remember failed files (and the error messages)
@@ -788,7 +778,6 @@ switch( $Fileman->fm_mode )
 		// Process uploaded files:
 		if( isset($_FILES) && count( $_FILES ) )
 		{ // Some files have been uploaded:
-
 			param( 'uploadfile_title', 'array', array() );
 			param( 'uploadfile_alt', 'array', array() );
 			param( 'uploadfile_desc', 'array', array() );
@@ -902,16 +891,12 @@ switch( $Fileman->fm_mode )
 				}
 
 				// change to default chmod settings
-				// TODO: make this a Setting
-				$chmod_to = $Fileman->get_default_chmod( $newFile->is_dir() ? 'dir' : 'file' );
-				$newFile->chmod( $chmod_to );
-
-				if( $chmod_to != $newFile->get_perms('octal') )
-				{
-					$LogUpload->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->get_name() ), 'note' );
+				if( $newFile->chmod( NULL ) === false )
+				{ // add a note, this is no error!
+					$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->get_name() ), 'note' );
 				}
 
-				$LogUpload->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() ), 'success' );
+				$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() ), 'success' );
 
 				// Refreshes file properties (type, size, perms...)
 				$newFile->load_properties();
@@ -936,19 +921,26 @@ switch( $Fileman->fm_mode )
 				// Tell the filamanager about the new file:
 				$Fileman->add( $newFile );
 			}
+
+			if( $upload_quickmode && !$failedFiles )
+			{ // we're quick uploading and have no failed files, leave the mode
+				$Fileman->fm_mode = NULL;
+			}
 		}
 
-
-		// Upload dialog:
-		require dirname(__FILE__).'/_files_upload.inc.php';
-
 		// }}}
+		break;
+
+	case 'File_properties':
+		if( empty($selectedFile) )
+		{
+			$Fileman->fm_mode = NULL;
+		}
 		break;
 
 
 	case 'file_copy':
 	case 'file_move':
-	case 'file_cmr':
 		// ------------------------
 		// copy/move a file:
 		// ------------------------
@@ -960,6 +952,11 @@ switch( $Fileman->fm_mode )
 		 * 3) The way this works it breaks the File meta data (I'm working on it).
 		 * 4) For Move and Copy, this should use a "destination directory tree" on the right (same as for upload)
 		 * 5) Given all the reasons above copy, move and rename should be clearly separated into 3 different interfaces.
+		 *
+		 * blueyed>> it was never meant to only use a single interface. The original mode
+		 *   'file_cmr' was just a mode to handle it internally easier/more central.
+		 *   'copy' is just 'move and keep the source', while 'rename' is 'move in the same dir'
+		 *
 		 */
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
@@ -967,9 +964,6 @@ switch( $Fileman->fm_mode )
 			$Fileman->fm_mode = NULL;
 			break;
 		}
-
-		// TODO: get rid of this:
-		$LogCmr = new Log( 'error' );  // Log for copy/move/rename mode
 
 		if( !$Fileman->SourceList->count() )
 		{
@@ -997,7 +991,7 @@ switch( $Fileman->fm_mode )
 			if( !isFilename($new_names[$loop_src_File->get_md5_ID()]) )
 			{
 				$confirm = 0;
-				$Messages->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ), 'error' );
+				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ) );
 				continue;
 			}
 
@@ -1005,7 +999,7 @@ switch( $Fileman->fm_mode )
 			$extension = '';
 			if( ! validate_file_extension( $new_names[$loop_src_File->get_md5_ID()], $extension ) )
 			{ // Extension invalid:
-				$Messages->add( sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ), 'error' );
+				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ) );
 				$confirm = 0;
 				continue;
 			}
@@ -1017,14 +1011,14 @@ switch( $Fileman->fm_mode )
 			{ // Target exists
 				if( $dest_File === $loop_src_File )
 				{
-					$LogCmr->add( T_('Source and target files are the same. Please choose another name or directory.') );
+					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', T_('Source and target files are the same. Please choose another name or directory.') );
 					$confirm = 0;
 					continue;
 				}
 
 				if( ! isset( $overwrite[$loop_src_File->get_md5_ID()] ) )
 				{ // We have not yet asked to overwrite:
-					$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ), 'error' );
+					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ) );
 					$overwrite[$loop_src_File->get_md5_ID()] = 0;
 					$confirm = 0;
 					continue;
@@ -1043,8 +1037,7 @@ switch( $Fileman->fm_mode )
 				if( $Messages->count('restrict') )
 				{ // There are restrictions:
 					// TODO: work on a better output display here...
-					$Messages->add( sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'),
-																			 $dest_File->get_rdfp_rel_path() ), 'error' );
+					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'), $dest_File->get_rdfp_rel_path() ) );
 
 					$confirm = 0;
 					break;	// stop whole file list processing
@@ -1060,68 +1053,58 @@ switch( $Fileman->fm_mode )
 			while( $loop_src_File = & $Fileman->SourceList->get_next() )
 			{
 				// Get a pointer on dest file
-				$dest_File = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(),
-																								$Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
+				$dest_File = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(), $Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
 
 				if( $Fileman->fm_mode == 'file_copy' )
 				{ // COPY
 
 					// Do the copy
-					if( $Fileman->copy_File( $loop_src_File, $dest_File ) )
+					if( $Fileman->copy_File( $loop_src_File, $dest_File, true ) ) // overwrite
 					{ // Success:
 						$Messages->add( sprintf( T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ), 'success' );
+						$Fileman->SourceList->remove( $loop_src_File );
 					}
 					else
 					{ // Failure:
-						$Messages->add( sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ), 'error' );
+						$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
+																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ) );
 					}
 				}
 				elseif( $Fileman->fm_mode == 'file_move' )
 				{ // MOVE
-
-					$DB->begin();
-
-					if( isset( $overwrite[$loop_src_File->get_md5_ID()] )
-							&& $overwrite[$loop_src_File->get_md5_ID()] )
-					{ // We want to overwrite, let's unlink the old file:
-						if( ! $Fileman->unlink( $dest_File, false ) )	// Will NOT delete recursively
-						{ // Unlink failed:
-							$DB->rollback();
-							// Move on to next file:
-							continue;
-						}
-					}
-
-					// Do the move:
+					// NOTE: DB integrity is handled by the File object itself
 					$rdfp_oldpath = $loop_src_File->get_rdfp_rel_path();
 					$rdfp_newpath = $Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
-					if( $Fileman->move_File( $loop_src_File, $Fileman->get_root_type(), $Fileman->get_root_ID(), $rdfp_newpath ) )
+
+					if( $Fileman->move_File( $loop_src_File, $Fileman->get_root_type(), $Fileman->get_root_ID(), $rdfp_newpath, true ) )
 					{ // successfully moved
 						$Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ), 'success' );
+
+						// We remove the file from the source list, after refreshing the cache
+						$Fileman->SourceList->update_caches();
+						$Fileman->SourceList->remove( $loop_src_File );
 					}
 					else
-					{ // moved failed
-						$Messages->add( sprintf( T_('Could not move &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ), 'error' );
-						// Note: we do not rollback, since unlinking is already done on disk :'(
+					{ // move failed
+						$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not move &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ) );
 					}
 
 					$DB->commit();
 				}
-				else die( 'Unhandled file copy/move mode' );
-
+				else debug_die( 'Unhandled file copy/move mode' );
 			}
+		}
 
+		if( $Fileman->SourceList->count() )
+		{ // we want the file manager in this mode:
+			$Fileman->forceFM = 1;
+		}
+		else
+		{
 			// Leave mode:
 			$Fileman->fm_mode = NULL;
 		}
-		break;
-
-
-	case 'File_properties':
-		// File properties (Meta data) dialog:
-		require dirname(__FILE__).'/_file_properties.inc.php';
 		break;
 
 
@@ -1143,10 +1126,17 @@ switch( $Fileman->fm_mode )
 		require dirname(__FILE__).'/_files_links.inc.php';
 		$AdminUI->disp_payload_end();
 
+		// we want the file manager in this mode:
 		$Fileman->forceFM = 1;
 		break;
 
 } // }}}
+
+
+/**
+ * The top menu
+ */
+require dirname(__FILE__).'/_menutop.php';
 
 
 // Display reload-icon in the opener window if we're a popup in the same CWD and the
@@ -1172,16 +1162,6 @@ switch( $Fileman->fm_mode )
 
 
 <?php
-
-
-// TODO: remove this!
-// Output errors, notes and action messages
-if( $Messages->count( 'all' ) )
-{
-	$Messages->display( '', '', true, 'all' );
-}
-
-
 /*
  * Display payload:
  */
@@ -1236,11 +1216,21 @@ switch( $Fileman->fm_mode )
 {
 	case 'file_copy':
 	case 'file_move':
-	case 'file_cmr':
 		// CMR dialog:
 		require dirname(__FILE__).'/_files_cmr.inc.php';
 		break;
+
+	case 'file_upload':
+		// Upload dialog:
+		require dirname(__FILE__).'/_files_upload.inc.php';
+		break;
+
+	case 'File_properties':
+		// File properties (Meta data) dialog:
+		require dirname(__FILE__).'/_file_properties.inc.php';
+		break;
 }
+
 
 // "Display/hide Filemanager"
 // TODO: do not display this after a successful rename...
@@ -1284,6 +1274,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.127  2005/11/21 04:05:38  blueyed
+ * File manager: fm_sources_root to remember the root of fm_sources!, chmod centralized ($Settings), Default for dirs fixed, Normalisation; this is ready for the alpha (except bug fixes of course)
+ *
  * Revision 1.126  2005/11/20 20:38:19  blueyed
  * Display hint about "img" tag to insert tags into the post when the file manager is launched in upload mode. Normalisation, doc.
  *
