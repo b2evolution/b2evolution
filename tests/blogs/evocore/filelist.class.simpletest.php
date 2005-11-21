@@ -130,6 +130,27 @@ class FilelistTestCase extends FilemanUnitTestCase
 
 
 	/**
+	 * Tests counters after removing
+	 *
+	 * @return
+	 */
+	function testCountersAfterRemove()
+	{
+		$File = new File( 'user', 1, 'a' );
+		$this->Filelist->add( $File );
+
+		$this->assertEqual( $this->Filelist->count_files(), 1 );
+
+		$get_File = & $this->Filelist->get_next();
+		$this->Filelist->remove( $get_File );
+
+		$this->assertEqual( $this->Filelist->count_files(), 0 );
+
+		$this->assertEqual( $this->Filelist->get_next(), false, 'No file returned.' );
+	}
+
+
+	/**
 	 *
 	 */
 	function testRemoveFromListOrder()
