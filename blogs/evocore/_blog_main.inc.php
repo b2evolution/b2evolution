@@ -318,26 +318,11 @@ if( !isset($display_blog_list) )
  * Now, we'll jump to displaying!
  */
 
-// Check if an rss syndication was requested
-
-// This will be handled like any other skin, except that it will not be stored in a cookie
+// Check if a temporary skin has been requested (used for RSS syndication for example):
 if( !empty($tempskin) )
 {
-	$tempskin = basename_dironly( $tempskin ); // make sure to have no relative paths in there
-	$Debuglog->add( 'Sanitized $tempskin: '.$tempskin, 'skin' );
-
-	if( !empty($tempskin) )
-	{
-		if( skin_exists( $tempskin, '_main.php' ) )
-		{
-			$Debuglog->add( 'Including tempskin: '.$tempskin.' (main)', 'skin' );
-			require( get_path( 'skins' ).$tempskin.'/_main.php' );
-			exit;
-		}
-	}
-	$Debuglog->add( 'tempskin requested, but skin not found ('.$tempskin.')', array( 'skin', 'error' ) );
-	Log::display( '', '', 'tempskin requested, but not found/invalid.', 'error' );
-	debug_die();
+	// This will be handled like any other skin, except that it will not be stored in a cookie:
+	$skin = $tempskin;
 }
 
 // Let's check if a skin has been forced in the stub file:
@@ -386,8 +371,9 @@ $Request->param( 'template', 'string', 'main', true );
 if( !empty( $skin ) )
 { // We want to display now:
 
-	if( (!empty($_GET['skin'])) || (!empty($_POST['skin'])) )
-	{ // We have just asked for the skin explicitely
+	if( empty( $tempskin )
+	 && ( !empty($_GET['skin']) || !empty($_POST['skin'] ) ) )
+	{ // We have just asked for a skin change explicitely
 		// Set a cookie to remember it:
 		// Including config and functions files   ??
 
@@ -408,6 +394,7 @@ if( !empty( $skin ) )
 		$skin = $default_skin;
 	}
 
+	// TODO: sanitize $template and allow any request on _xxx.tpl.php or sth like that.
 	if( $template == 'popup' )
 	{ // Do the popup display
 		require( get_path( 'skins' ).$skin.'/_popup.php' );
@@ -432,6 +419,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.31  2005/11/21 16:46:47  fplanque
+ * I find it amazing how you guys can get into insanely overly complex overdesigned patterns! :/
+ * The $tempskin thing is a one liner!!
+ *
  * Revision 1.30  2005/11/21 16:30:31  fplanque
  * rolled back obscure mods (anything not fixing bugs has no reason for being here)
  *
