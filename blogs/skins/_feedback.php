@@ -106,7 +106,7 @@
 				switch( $Comment->get( 'type' ) )
 				{
 					case 'comment': // Display a comment:
-						echo T_('Comment from:');
+						echo T_('Comment from:').' ';
 						$Comment->author();
 						$Comment->msgform_link( $Blog->get('msgformurl') );
 						$Comment->author_url( '', ' &middot; ', '' );

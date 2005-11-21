@@ -143,11 +143,6 @@ locale_activate( $Blog->get('locale') );
 // -------------------------
 // Extra path info decoding:
 // -------------------------
-if( !empty($tempskin) )
-{ // We don't want extra path resolution on rss files
-	// fplanque: why not??
-	$resolve_extra_path = false;
-}
 if( !isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 
 if( $resolve_extra_path )
@@ -422,6 +417,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.33  2005/11/21 21:39:29  fplanque
+ * no message
+ *
  * Revision 1.32  2005/11/21 16:52:31  fplanque
  * okay, a TWO liner :P
  *
