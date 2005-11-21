@@ -169,12 +169,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	if( $Settings->get( 'fm_enabled' ) )
 	{ // ---------- UPLOAD ----------
 		echo '<input type="button" value="Files" class="ActionButton"
-						onclick="pop_up_window( \'files.php?mode=upload&amp;display_hint_img=1\', \'fileman_upload\' );" /> ';
+						onclick="pop_up_window( \'files.php?mode=upload\', \'fileman_upload\' );"> ';
 
 		if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
 		{
 			echo '<input type="button" value="Upload" class="ActionButton"
-							onclick="pop_up_window( \'files.php?mode=upload&amp;fm_mode=file_upload&amp;display_hint_img=1\', \'fileman_upload\' );" /> ';
+							onclick="pop_up_window( \'files.php?mode=upload&amp;fm_mode=file_upload\', \'fileman_upload\' );"> ';
 		}
 	}
 
@@ -355,11 +355,8 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
- * Revision 1.33  2005/11/20 20:38:19  blueyed
- * Display hint about "img" tag to insert tags into the post when the file manager is launched in upload mode. Normalisation, doc.
- *
- * Revision 1.32  2005/11/20 03:55:39  blueyed
- * Closing input tags
+ * Revision 1.34  2005/11/21 18:30:42  fplanque
+ * no message
  *
  * Revision 1.31  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI
