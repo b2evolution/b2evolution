@@ -479,7 +479,7 @@ function validate_file_extension( $filename, & $extension )
 /**
  * Return the basename of a given path (that is to be expected a dirname only).
  *
- * If it results to '..', '' will be returned.
+ * If it results to '..' or '.', '' will be returned.
  *
  * @return string sanitized basename
  */
@@ -488,7 +488,7 @@ function basename_dironly( $dir )
 	$basename = basename($dir);
 	if( $basename != $dir )
 	{
-		if( $basename == '..' )
+		if( $basename == '..' || $basename == '.' )
 		{
 			return '';
 		}
@@ -499,6 +499,9 @@ function basename_dironly( $dir )
 
 /*
  * $Log$
+ * Revision 1.32  2005/11/21 01:26:33  blueyed
+ * basename_dironly(): also return '' if it results to '.' (the current directory)
+ *
  * Revision 1.31  2005/11/18 22:30:53  blueyed
  * basename_dironly() added to sanitize pathnames from params
  *
