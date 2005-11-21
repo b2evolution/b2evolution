@@ -86,12 +86,12 @@
 
 		<tr>
 			<td align="right"><strong><label for="pass1"><?php echo T_('New password') ?>:</label></strong></td>
-			<td><input type="password" name="pass1" id="pass1" value="" size="16" /></td>
+			<td><input type="password" name="pass1" id="pass1" value="" size="16" maxlength="50" /></td>
 		</tr>
 
 		<tr>
 			<td align="right"><strong><label for="pass2"><?php echo T_('Confirm new password') ?>:</label></strong></td>
-			<td><input type="password" name="pass2" id="pass2" value="" size="16" /></td>
+			<td><input type="password" name="pass2" id="pass2" value="" size="16" maxlength="50" /></td>
 		</tr>
 
 		<tr>

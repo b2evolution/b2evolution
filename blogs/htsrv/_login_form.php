@@ -75,7 +75,7 @@ $Form->begin_form( 'fform' );
 	<?php
 	$Form->text_input( 'login', $login, 16, T_('Login'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
 
-	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'maxlength' => 20, 'class' => 'input_text' ) );
+	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'maxlength' => 50, 'class' => 'input_text' ) );
 
 	echo $Form->fieldstart;
 	echo $Form->inputstart;

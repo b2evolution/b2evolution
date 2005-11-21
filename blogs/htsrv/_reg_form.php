@@ -34,8 +34,8 @@ $Form->text( 'login', format_to_output($login, 'formvalue'), 16,  T_('Login'), '
 	<fieldset>
 		<div class="label"><label for="pass1"><?php echo T_('Password') ?><br /><?php echo T_('(twice)').'<br />' ?></label></div>
 		<div class="input">
-		<input type="password" name="pass1" id="pass1" size="16" maxlength="20" value="" class="input_text" />
-		<input type="password" name="pass2" id="pass2" size="16" maxlength="20" value="" class="input_text" />
+		<input type="password" name="pass1" id="pass1" size="16" maxlength="50" value="" class="input_text" />
+		<input type="password" name="pass2" id="pass2" size="16" maxlength="50" value="" class="input_text" />
 		<span class="notes"><?php printf( T_('Minimum %d characters, please.'), $Settings->get('user_minpwdlen') ) ?></span>
 		</div>
 	</fieldset>

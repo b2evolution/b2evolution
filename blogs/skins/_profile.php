@@ -89,8 +89,8 @@ $ProfileForm->text_input( 'newuser_icq', $current_User->get( 'icq' ), 40, T_('IC
 $ProfileForm->text_input( 'newuser_aim', $current_User->get( 'aim' ), 40, T_('AOL I.M.'), array( 'maxlength' => 50, 'class' => 'bComment' ) );
 $ProfileForm->text_input( 'newuser_msn', $current_User->get( 'msn' ), 40, T_('MSN I.M.'), array( 'maxlength' => 100, 'class' => 'bComment' ) );
 $ProfileForm->text_input( 'newuser_yim', $current_User->get( 'yim' ), 40, T_('Yahoo I.M.'), array( 'maxlength' => 50, 'class' => 'bComment' ) );
-$ProfileForm->password_input( 'pass1', '', 16, T_('New pass'), array( 'note' => T_('Leave blank to leave the password unchanged.'), 'maxlength' => 40, 'class' => 'bComment' ) );
-$ProfileForm->password_input( 'pass2', '', 16, T_('Confirm'), array( 'note' => T_('Confirm new password by typing it again.'), 'maxlength' => 40, 'class' => 'bComment' ) );
+$ProfileForm->password_input( 'pass1', '', 16, T_('New pass'), array( 'note' => T_('Leave blank to leave the password unchanged.'), 'maxlength' => 50, 'class' => 'bComment' ) );
+$ProfileForm->password_input( 'pass2', '', 16, T_('Confirm'), array( 'note' => T_('Confirm new password by typing it again.'), 'maxlength' => 50, 'class' => 'bComment' ) );
 
 $ProfileForm->buttons( array( array( '', '', T_('Update'), 'SaveButton' ),
 															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
