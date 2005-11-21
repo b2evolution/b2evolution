@@ -419,4 +419,11 @@ class quicktags_plugin extends Plugin
 		return true;
 	}
 }
+
+/*
+ * $Log$
+ * Revision 1.11  2005/11/21 18:16:29  fplanque
+ * okay, a TWO liner :P
+ *
+ */
 ?>

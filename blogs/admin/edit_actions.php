@@ -512,4 +512,11 @@ echo '</div>';
 
 
 require( dirname(__FILE__) . '/_footer.php' );
+
+/*
+ * $Log$
+ * Revision 1.80  2005/11/21 18:16:29  fplanque
+ * okay, a TWO liner :P
+ *
+ */
 ?>
