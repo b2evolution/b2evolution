@@ -456,7 +456,7 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Halton', 'Contrib', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', '', 'disabled', array() );
+	$edited_Item->insert( 1, 'Halton', 'Contrib', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 0, true, '', 'http://www.squishymonkey.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -1280,13 +1280,7 @@ function install_basic_plugins()
 
 /*
  * $Log$
- * Revision 1.156  2005/11/22 20:27:38  fplanque
- * no message
- *
- * Revision 1.155  2005/11/22 20:03:24  fplanque
- * no message
- *
- * Revision 1.154  2005/11/16 21:49:07  fplanque
+ * Revision 1.157  2005/11/22 20:51:38  fplanque
  * no message
  *
  * Revision 1.153  2005/11/16 17:20:23  fplanque
