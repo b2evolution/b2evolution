@@ -65,14 +65,14 @@ require_once dirname(__FILE__).'/_file.class.php';
 class Filelist
 {
 	/**
-	 * Root type: 'user', 'group', 'collection' or 'absolute'.
+	 * Root type: 'user', 'group' or 'collection'.
 	 *
 	 * All files in this list MUST have that same root type. Adding will fail otherwise.
 	 *
 	 * @var string
 	 * @access protected
 	 */
-	var $_root_type = 'absolute';
+	var $_root_type;
 
 	/**
 	 * Root ID: ID of the user, the group or the collection the file belongs to...
@@ -258,11 +258,11 @@ class Filelist
 	/**
 	 * Constructor
 	 *
-	 * @param boolean|string Default path for the files, false if you want to create an arbitraty list
-	 * @param string Optional Root type: 'user', 'group', 'collection' or 'absolute'
-	 * @param integer Optional ID of the user, the group or the collection the file belongs to...
+	 * @param boolean|string Default path for the files, false if you want to create an arbitrary list
+	 * @param string Root type: 'user', 'group' or 'collection' (has to be the same for all files..)
+	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 */
-	function Filelist( $path, $root_type = NULL, $root_ID = NULL )
+	function Filelist( $path, $root_type, $root_ID )
 	{
 		global $FileRootCache;
 
@@ -287,7 +287,9 @@ class Filelist
 
 
 	/**
-	 * Loads or reloads the filelist entries from the current working dir.
+	 * Loads or reloads the filelist entries.
+	 *
+	 * NOTE: this does not work for arbitrary lists!
 	 *
 	 * @param boolean use flat mode (all files recursive without directories)
 	 */
@@ -428,13 +430,12 @@ class Filelist
 		$this->_full_path_index = array();
 
 		$count = 0;
-  	foreach( $this->_entries as $loop_File )
+		foreach( $this->_entries as $loop_File )
 		{
 			$this->_md5_ID_index[$loop_File->get_md5_ID()] = $count;
 			$this->_full_path_index[$loop_File->get_full_path()] = $count;
 			$count++;
 		}
-
 	}
 
 
@@ -862,17 +863,34 @@ class Filelist
 
 
 	/**
-	 * Unsets a {@link File} from the entries list.
+	 * Removes a {@link File} from the entries list.
+	 *
+	 * This handles indexes and number of total entries, bytes, files/dirs.
 	 *
 	 * @return boolean true on success, false if not found in list.
 	 */
 	function remove( & $File )
 	{
 		if( isset( $this->_md5_ID_index[ $File->get_md5_ID() ] ) )
-		{ // unset indexes and entry
-			$index = $this->_full_path_index[ $File->get_full_path() ];
-			unset( $this->_full_path_index[ $File->get_full_path() ] );
+		{
+			$this->_total_entries--;
+			$this->_total_bytes -= $File->get_size();
 
+			if( $File->is_dir() )
+			{
+				$this->_total_dir--;
+			}
+			else
+			{
+				$this->_total_files--;
+			}
+
+			// unset from indexes
+			$index = $this->_full_path_index[ $File->get_full_path() ]; // current index
+			unset( $this->_entries[ $this->_md5_ID_index[ $File->get_md5_ID() ] ] );
+			unset( $this->_md5_ID_index[ $File->get_md5_ID() ] );
+			unset( $this->_full_path_index[ $File->get_full_path() ] );
+			// get the ordered index right: move all next files downwards
 			foreach( $this->_order_index as $lKey => $lValue )
 			{
 				if( $lValue == $index )
@@ -884,9 +902,11 @@ class Filelist
 					unset( $this->_order_index[$lKey - 1] );
 				}
 			}
-			unset( $this->_entries[ $this->_md5_ID_index[ $File->get_md5_ID() ] ] );
-			unset( $this->_md5_ID_index[ $File->get_md5_ID() ] );
 
+			if( $this->_current_idx > -1 && $this->_current_idx <= $index )
+			{ // we have removed a file before or at the index'th position
+				$this->_current_idx--;
+			}
 			return true;
 		}
 		return false;
@@ -991,6 +1011,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.41  2005/11/22 04:16:53  blueyed
+ * fixed remove(); root type 'absolute' not supported!
+ *
  * Revision 1.40  2005/11/21 18:33:19  fplanque
  * Too many undiscussed changes all around: Massive rollback! :((
  * As said before, I am only taking CLEARLY labelled bugfixes.
