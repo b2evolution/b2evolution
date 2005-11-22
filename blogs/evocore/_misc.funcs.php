@@ -1221,11 +1221,11 @@ function validate_url( $url, & $allowed_uri_scheme )
 		return T_('Invalid URL');
 	}
 
-	if( ! preg_match('|^			# start
-		([a-z][a-z0-9+.\-]*):[0-9]*		# scheme
-		//								# authority absolute URLs only
-		[a-z][a-z0-9~+.\-_,:;/\\\\*]* 	# Don t allow anything too funky like entities
-	   ([?#][a-z0-9~+.\-_,:;/\\\\%&=?#*\ \[\]]*)?
+	if( ! preg_match('|^               # start
+		([a-z][a-z0-9+.\-]*):[0-9]*      # scheme
+		//                               # authority absolute URLs only
+		[a-z0-9][a-z0-9~+.\-_,:;/\\\\*]* # Don t allow anything too funky like entities
+		([?#][a-z0-9~+.\-_,:;/\\\\%&=?#*\ \[\]]*)?
 		$|ix', $url, $matches) )
 	{ // Cannot vaidate URL structure
 		return T_('Invalid URL');
@@ -2288,6 +2288,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.148  2005/11/22 16:56:31  blueyed
+ * validate_url(): allow URLs that start with a digit after '//' (read: IP addresses).
+ *
  * Revision 1.147  2005/11/21 18:17:26  blueyed
  * debug_die(): also display debug_info() on $debug (or $force param)
  *
