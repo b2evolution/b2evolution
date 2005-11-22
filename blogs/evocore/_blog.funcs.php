@@ -312,23 +312,30 @@ function blog_update_group_perms( $blog )
  */
 function blogperms_get_easy( $perms, $context='user' )
 {
-	if( !isset($perms['blog' . $context . '_ismember']) )
+	if( !isset($perms['blog'.$context.'_ismember']) )
 	{
 		return 'nomember';
 	}
 
-	$perms_post = explode( ',', $perms['blog' . $context . '_perm_poststatuses'] );
-	sort( $perms_post );
+	if( !empty( $perms['blog'.$context.'_perm_poststatuses'] ) )
+	{
+		$perms_post = count( explode( ',', $perms['blog'.$context.'_perm_poststatuses'] ) );
+	}
+	else
+	{
+		$perms_post = 0;
+	}
 
-	$perms_editor = (int)( count($perms_post) ) // permissions for all statuses
-									+ (int)$perms['blog' . $context . '_perm_delpost']
-									+ (int)$perms['blog' . $context . '_perm_comments']
-									+ (int)$perms['blog' . $context . '_perm_media_upload']
-									+ (int)$perms['blog' . $context . '_perm_media_browse']
-									+ (int)$perms['blog' . $context . '_perm_media_change'];
 
-	$perms_admin = (int)$perms['blog' . $context . '_perm_properties']
-									+ (int)$perms['blog' . $context . '_perm_cats'];
+	$perms_editor =  $perms_post
+									+(int)$perms['blog'.$context.'_perm_delpost']
+									+(int)$perms['blog'.$context.'_perm_comments']
+									+(int)$perms['blog'.$context.'_perm_media_upload']
+									+(int)$perms['blog'.$context.'_perm_media_browse']
+									+(int)$perms['blog'.$context.'_perm_media_change'];
+
+	$perms_admin =   (int)$perms['blog'.$context.'_perm_properties']
+									+(int)$perms['blog'.$context.'_perm_cats'];
 
 	if( $perms_editor == 10 )
 	{ // has full editor rights
@@ -642,6 +649,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.18  2005/11/22 19:40:10  fplanque
+ * bugfix
+ *
  * Revision 1.17  2005/10/03 17:26:44  fplanque
  * synched upgrade with fresh DB;
  * renamed user_ID field
