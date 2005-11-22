@@ -167,7 +167,7 @@ switch( $action )
 
 	case 'list':
 	  $blog = autoselect_blog( $blog, 'blog_cats', '' );
-
+		// echo 'selected blog='.$blog;
 }
 
 
@@ -367,6 +367,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.2  2005/11/22 20:03:23  fplanque
+ * no message
+ *
  * Revision 1.1  2005/10/31 00:15:27  blueyed
  * Removed b2categories.php to categories.php
  *

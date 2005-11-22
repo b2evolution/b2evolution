@@ -635,7 +635,8 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 						$curr_blog_ID != false;
 						$curr_blog_ID = blog_list_next() )
 			{
-				if( $current_User->check_perm( 'blog_ismember', 1, false, $curr_blog_ID ) )
+				// not good for demouser>edit_cats: if( $current_User->check_perm( 'blog_ismember', 1, false, $curr_blog_ID ) )
+				if( $current_User->check_perm( $permname, $permlevel, false, $curr_blog_ID ) )
 				{ // Current user is a member of this blog... let's select it:
 					$selectedBlog = $curr_blog_ID;
 					break;
@@ -649,6 +650,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.19  2005/11/22 20:03:24  fplanque
+ * no message
+ *
  * Revision 1.18  2005/11/22 19:40:10  fplanque
  * bugfix
  *

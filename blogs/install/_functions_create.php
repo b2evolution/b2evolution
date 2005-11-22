@@ -66,7 +66,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function create_b2evo_tables()
 {
 	global $baseurl, $new_db_version, $DB;
-
+	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
+	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
 
 	create_groups();
 
@@ -320,9 +321,7 @@ function create_locales()
 }
 
 
-/*
- * create_groups(-)
- *
+/**
  * Create user permissions
  *
  * Used when creating full install and upgrading from earlier versions
@@ -398,6 +397,7 @@ function create_groups()
 	$Group_Users->set( 'perm_users', 'none' );
 	$Group_Users->dbinsert();
 	echo "OK.<br />\n";
+
 
 	echo 'Creating table for Blog-User permissions... ';
 	$query = "CREATE TABLE T_coll_user_perms (
@@ -777,8 +777,6 @@ function create_default_settings( $override = array() )
 /**
  * This is called only for fresh installs and fills the tables with
  * demo/tutorial things.
- *
- * {@internal populate_main_tables(-)}}
  */
 function populate_main_tables()
 {
@@ -883,27 +881,43 @@ function populate_main_tables()
 	echo "OK.<br />\n";
 
 
-	echo 'Creating user blog permissions... ';
+ 	echo 'Creating default group/blog permissions... ';
+	// Admin for blog A:
+	$query = "
+		INSERT INTO T_coll_group_perms( bloggroup_blog_ID, bloggroup_group_ID, bloggroup_ismember,
+			bloggroup_perm_poststatuses, bloggroup_perm_delpost, bloggroup_perm_comments,
+			bloggroup_perm_cats, bloggroup_perm_properties,
+			bloggroup_perm_media_upload, bloggroup_perm_media_browse, bloggroup_perm_media_change )
+		VALUES
+			( $blog_a_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1 ),
+			( $blog_a_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 0, 0, 1, 1, 1 ),
+			( $blog_a_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 1, 1, 0 ),
+			( $blog_a_ID, ".$Group_Users->ID.", 1, '', 0, 0, 0, 0, 0, 0, 0 ),
+			( $blog_b_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1 ),
+			( $blog_b_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 0, 0, 1, 1, 1 ),
+			( $blog_b_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 1, 1, 0 ),
+			( $blog_b_ID, ".$Group_Users->ID.", 1, '', 0, 0, 0, 0, 0, 0, 0 ),
+			( $blog_linkblog_ID, ".$Group_Admins->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1 ),
+			( $blog_linkblog_ID, ".$Group_Privileged->ID.", 1, 'published,deprecated,protected,private,draft', 1, 1, 0, 0, 1, 1, 1 ),
+			( $blog_linkblog_ID, ".$Group_Bloggers->ID.", 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 1, 1, 0 ),
+			( $blog_linkblog_ID, ".$Group_Users->ID.", 1, '', 0, 0, 0, 0, 0, 0, 0 )";
+	$DB->query( $query );
+	echo "OK.<br />\n";
+
+	/*
+	// Note: we don't really need this any longer, but we might use it for a better default setup later...
+	echo 'Creating default user/blog permissions... ';
 	// Admin for blog A:
 	$query = "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
 							bloguser_perm_cats, bloguser_perm_properties,
 							bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
 						VALUES
-							( $blog_all_ID, ".$User_Admin->ID.", 1,
-							'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1 ),
-							( $blog_a_ID, ".$User_Admin->ID.", 1,
-							'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1 ),
-							( $blog_b_ID, ".$User_Admin->ID.", 1,
-							'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1 ),
-							( $blog_linkblog_ID, ".$User_Admin->ID.", 1,
-							'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1 ),
 							( $blog_a_ID, ".$User_Demo->ID.", 1,
-							'draft', 0, 0, 0, 0, 0, 0, 0 )";
+							'published,deprecated,protected,private,draft', 1, 1, 0, 0, 1, 1, 1 )";
 	$DB->query( $query );
-
 	echo "OK.<br />\n";
-
+	*/
 
 	create_default_settings();
 
@@ -1262,6 +1276,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.155  2005/11/22 20:03:24  fplanque
+ * no message
+ *
  * Revision 1.154  2005/11/16 21:49:07  fplanque
  * no message
  *

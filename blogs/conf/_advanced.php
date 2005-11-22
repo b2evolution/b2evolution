@@ -244,10 +244,14 @@ $EvoConfig->DB['use_transactions'] = false;
  * Foreign key options.
  *
  * Set this to true if your MySQL supports Foreign keys.
- * Recommended for professional use.
+ * Recommended for professional use and DEVELOPMENT only.
+ * As of today, upgrading is not guaranteed when foreign keys are enabled.
+ *
  * Typically requires InnoDB to be set in $EvoConfig->DB['table_options'].
+ *
  * This is used during table CREATION only.
  *
+ * @todo provide an advanced install menu allowing to install/remove the foreign keys on an already installed db.
  * @global boolean $db_use_fkeys
  */
 $db_use_fkeys = false;
