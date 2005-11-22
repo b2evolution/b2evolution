@@ -13,7 +13,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 $app_name = 'b2evolution';
 $app_shortname = 'b2evo';
-$app_version = '1.6-CVS';
+$app_version = '1.6-ALPHA';
 
 $admin_path_seprator = ' :: ';
 $app_admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website").

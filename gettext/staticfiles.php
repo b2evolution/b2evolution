@@ -21,6 +21,9 @@
  * Load config
  */
 require( '../blogs/conf/_config.php' );
+
+define( 'EVO_MAIN_INIT', true );
+
 /**#@+
  * Load required functions
  */

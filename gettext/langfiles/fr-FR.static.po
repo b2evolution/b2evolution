@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2004-06-24 02:37+0100\n"
-"Last-Translator: François PLANQUE <http://fplanque.net/>\n"
+"PO-Revision-Date: 2005-11-22 18:51+0100\n"
+"Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -160,58 +160,66 @@ msgid "Welcome!"
 msgstr "Bienvenue!"
 
 #: ../../index.src.html:34
-msgid "b2evolution is probably the most comprehensive blog engine you can find! It includes almost any feature you could expect from a blog tool, and more! Plus, it's free, it's open-source (GPL), it runs virtually anywhere (PHP/mySQL) and it's available in many languages!"
-msgstr "b2evolution est probablement le moteur de blogs le plus complet que vous puissiez trouver! Il inclue pratiquement n'importe quelle fonctionnalité que vous pourriez attendre d'un outil de gestion de blogs, et plus encore! b2evolution est un logiciel libre, gratuit, open-source (GPL), qui peut fonctionner pratiquement n'importe où (PHP/mySQL) et disponible dans de nombreuses langues!"
+msgid "b2evolution is a professional blog engine. It supports multiple blogs, edited by multiple users and in multiple languages.  Plus, it's free, it's open-source (GPL) and it runs virtually anywhere (PHP 4 / MySQL 3.23)!"
+msgstr "b2evolution est un moteur de blogs professionnel. Il supporte de multiples blogs, rédigés par de multiples utilisateurs et dans de multiples langues. De plus b2evolution est un logiciel libre, gratuit, open-source (GPL) et pouvant fonctionner pratiquement n'importe où (PHP 4 / MySQL 3.23)!"
 
 #: ../../index.src.html:35
 msgid "You will find complete information on the official <a %s>b2evolution website</a>."
 msgstr "Vous trouverez des informations complètes sur le <a %s>site web officiel</a>."
 
 #: ../../index.src.html:36
+msgid "<strong>WARNING:</strong> This is an ALPHA release. This means there are still bugs in this release and some features are incomplete. Nethertheless, we manage to use it on a daily basis despite of these limitations. So we made a release. But you have been warned: use at your own risk! :-&gt;"
+msgstr "<strong>ATTENTION:</strong> Ceci est une version ALPHA. Celà signifie qu'il y a encore des bugs et que certaines fonctions sont incomplètes. Ceci dit, nous réussissons à l'utiliser quotidiennement malgré ces limitations. Donc nous avons sorti une release. Mais vous avez été prévenus: Utilisez à vos risques et périls! :-&gt;"
+
+#: ../../index.src.html:37
+msgid "NOTE: This version is and will continue to be fully supported in the upgrading scheme and procedures."
+msgstr "NOTE: Cette version est et continuera a être pleinement supportée dans le modèle et les procédures de mise à jour."
+
+#: ../../index.src.html:38
 msgid "Quickstart instructions:"
 msgstr "Mise en route rapide:"
 
-#: ../../index.src.html:37
+#: ../../index.src.html:39
 msgid "You can set up b2evolution in just a few minutes. Just follow the instructions matching your situation:"
 msgstr "Vous pouvez installer b2evolution en quelques minutes seulement. Suivez simplement les instructions correspondant à votre situation:"
 
-#: ../../index.src.html:40
+#: ../../index.src.html:42
 #: ../../doc/install_new.src.html:6
 #: ../../doc/install_new.src.html:32
 msgid "Installing b2evolution from scratch"
 msgstr "Installer b2evolution à partir de zéro"
 
-#: ../../index.src.html:42
+#: ../../index.src.html:44
 #: ../../doc/upgradefrom_b2evo.src.html:6
 #: ../../doc/upgradefrom_b2evo.src.html:32
 msgid "Upgrading from a previous version of b2evolution"
 msgstr "Upgrader depuis une version précédente de b2evolution"
 
-#: ../../index.src.html:44
+#: ../../index.src.html:46
 msgid "Upgrading from other blog software:"
 msgstr "Upgrader depuis un autre logiciel:"
 
-#: ../../index.src.html:46
+#: ../../index.src.html:48
 msgid "Cafelog/b2"
 msgstr "Cafelog/b2"
 
-#: ../../index.src.html:47
+#: ../../index.src.html:49
 msgid "GeekLog"
 msgstr "GeekLog"
 
-#: ../../index.src.html:48
+#: ../../index.src.html:50
 msgid "Manywhere Miniblog"
 msgstr "Manywhere Miniblog"
 
-#: ../../index.src.html:49
+#: ../../index.src.html:51
 msgid "Movable Type"
 msgstr "Movable Type"
 
-#: ../../index.src.html:50
+#: ../../index.src.html:52
 msgid "WordPress"
 msgstr "WordPress"
 
-#: ../../index.src.html:56
+#: ../../index.src.html:58
 #: ../../doc/install_new.src.html:55
 #: ../../doc/upfrom_miniblog.src.html:68
 #: ../../doc/upfrom_wordpress.src.html:75
@@ -222,7 +230,7 @@ msgstr "WordPress"
 msgid "official website"
 msgstr "site officiel"
 
-#: ../../index.src.html:57
+#: ../../index.src.html:59
 #: ../../doc/install_new.src.html:56
 #: ../../doc/upfrom_miniblog.src.html:69
 #: ../../doc/upfrom_wordpress.src.html:76
@@ -233,7 +241,7 @@ msgstr "site officiel"
 msgid "GNU GPL license"
 msgstr "Licence GNU GPL"
 
-#: ../../index.src.html:58
+#: ../../index.src.html:60
 #: ../../doc/install_new.src.html:57
 #: ../../doc/upfrom_miniblog.src.html:70
 #: ../../doc/upfrom_wordpress.src.html:77
