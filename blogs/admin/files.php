@@ -120,15 +120,19 @@ param( 'filterIsRegexp', 'integer', NULL, true );
 param( 'flatmode', '', NULL, true );
 param( 'action', 'string', '', true );     // 3.. 2.. 1.. action :)
 if( empty($action) )
-{ // we're checking 'actionArray' param, where the action is the first key. This is needed for multiple inputs in a form where you shouldn't use the input values generated with T_() or cannot (for type="image" - IE ignores the value, but sends X and Y coordinates of the click)
+{ // If we got no $action, we'll check for an $actionArray  ( <input type="submit" name="actionArray[real_action]" ...> )
+	// And the real $action will be found in the first key...
+	// When there are multiple submit buttons, this is smarter than checking the value which is a translated string.
+	// When there is an image button, this allows to work around IE not sending the value (it only sends X & Y coords)
 	$actionArray = array_keys( param( 'actionArray', 'array', array(), true ) );
-	$action = array_pop($actionArray); // we must pass this by variable, because it's passed by reference
+	$action = array_pop($actionArray);
 	if( is_string($action) )
 	{
 		$action = substr( strip_tags($action), 0, 50 );  // sanitize it
 	}
 	else
 	{ // this is probably a numeric index from '<input name="actionArray[]" .. />'
+		// fplanque>> can this really happen or should we debug_die() instead?
 		$action = '';
 	}
 }
@@ -223,7 +227,7 @@ $selected_Filelist = & $Fileman->getFilelistSelected();
 switch( $action )
 {
 	case 'open_in_new_windows':
-		// catch JS-only actions (they shouldn't arrive here with JS enabled)
+		// catch JS-only actions (happens when Javascript is disabled on the browser)
 		$Messages->add( T_('You have to enable JavaScript to use this feature.'), 'error' );
 		break;
 
@@ -238,6 +242,7 @@ switch( $action )
 
 		$Fileman->createDirOrFile( $createnew, $createname ); // handles messages
 		break;
+
 
 	/*
 	case 'send_by_mail':
@@ -327,7 +332,7 @@ switch( $action )
 
 	case 'rename':
 		// Rename a file:
-		// TODO: allow overwriting of existing files (like with copy/move)
+		// This will not allow to overwrite existing files, the same way Windows and MacOS do not allow it. Adding an option will only clutter the interface and satisfy geeks only.
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
@@ -550,14 +555,10 @@ switch( $action )
 
 
 	case 'link':
-		// Link File to Item: {{{
-		// TODO: use a more distinct name like 'link_file' to allow easier searching!
-		if( ! $current_User->check_perm( 'files', 'edit' ) )
-		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
-			$action = 'list';
-			break;
-		}
+		// Link File to Item (or other object if extended below):
+
+		// Note: we are not modifying any file here, we're just linking it
+		// we only need read perm on file, but we'll need write perm on destination object (to be checked below)
 
 		if( !$selected_Filelist->count() )
 		{
@@ -592,27 +593,23 @@ switch( $action )
 		{	// No Item to link to - end link_item mode.
 			$Fileman->fm_mode = NULL;
 		}
-		// }}}
 		break;
 
 
 	case 'unlink':
-		// Unlink File from Item: {{{
-		if( ! $current_User->check_perm( 'files', 'edit' ) )
-		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
-			$action = 'list';
-			break;
-		}
+		// Unlink File from Item (or other object if extended):
+
+		// Note: we are not modifying any file here, we're just linking it
+		// we only need read perm on file, but we'll need write perm on destination object (to be checked below)
 
 		if( !isset( $edited_Link ) )
 		{
 			break;
 		}
 
-		// TODO: get Item from Link to check perm
+		// TODO: get Item (or other object) from Link to check perm
 
-		// TODO: check item EDIT permissions!
+		// TODO: check item/object EDIT permissions!
 		// Check that we have permission to edit item:
 		// $current_User->check_perm( $perm_name, 'edit', true, $edited_Item->ID );
 
@@ -621,17 +618,16 @@ switch( $action )
 		$edited_Link->dbdelete( true );
 		unset( $edited_Link );
 		$Messages->add( $msg, 'success' );
-		// }}}
 		break;
 
 
 	case 'edit_perms':
+		// edit filesystem permissions for a specific file  (files?)
+
 		// Check permission:
 		$current_User->check_perm( 'files', 'edit', true );
 
-		// edit permissions {{{
 		// fplanque>> TODO: as long as we use fm_modes this thing should at least work like a mode or at the bare minimun, turn off any active mode.
-		$action_title = T_('Change permissions');
 
 		if( ! $selected_Filelist->count() )
 		{
@@ -702,17 +698,16 @@ switch( $action )
 		}
 
 		if( !$selected_Filelist->count() )
-		{
+		{ // No file left selected... (everything worked fine)
 			$action = 'list';
 		}
 
-		// }}}
 		break;
 
 
 	case 'file_copy':
 	case 'file_move':
-	case 'file_cmr':
+	case 'file_cmr':   // still needed?
 		// copy/move/rename - we come here from the "with selected" toolbar {{{
 		#pre_dump( $selected_Filelist );
 
@@ -943,7 +938,7 @@ switch( $Fileman->fm_mode )
 		break;
 
 
-	case 'File_properties':
+	case 'File_properties':			// TODO: make all lowercase
 		if( empty($selectedFile) )
 		{
 			$Fileman->fm_mode = NULL;
@@ -973,6 +968,7 @@ switch( $Fileman->fm_mode )
 		// TODO: on error notes use a prefix that describes the source root (if they differ).
 		//       Probably a method of $Fileman, like get_names_realtive_to( $a_File, $b_File, $root_type, $root_ID, $rel_path ),
 		//       because "Copied «test_me.jpg» to «test_me.jpg»." (from one root to another) is not so good.
+			// fp>> I don't really understand this (probably missing a verb) but I do think that extending the Fileman object is not the right direction to go on the long term
 
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
@@ -1071,7 +1067,7 @@ switch( $Fileman->fm_mode )
 		}
 
 		if( $confirm && $Fileman->SourceList->count() )
-		{ // Copy/move is confirmed, let's proceed:
+		{ // Copy/move is confirmed (and we still have files to copy/move), let's proceed:
 
 			// Loop through files:
 			$Fileman->SourceList->restart();
@@ -1133,7 +1129,7 @@ switch( $Fileman->fm_mode )
 		}
 
 		if( $Fileman->SourceList->count() )
-		{ // we want the file manager in this mode:
+		{ // There are still uncopied/unmoved files, we want the file manager in this mode:
 			$Fileman->forceFM = 1;
 		}
 		else
@@ -1222,7 +1218,7 @@ switch( $action )
 
 
 	case 'edit_perms':
-		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
+		// Filesystem permissions for specific file  (files?)
 		$AdminUI->disp_payload_begin();
 		require dirname(__FILE__).'/_files_permissions.form.php';
 		$AdminUI->disp_payload_end();
@@ -1304,6 +1300,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.132  2005/11/22 15:17:07  fplanque
+ * doc
+ *
  * Revision 1.131  2005/11/22 04:41:38  blueyed
  * Fix permissions editing again
  *
