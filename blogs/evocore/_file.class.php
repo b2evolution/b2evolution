@@ -880,7 +880,9 @@ class File extends DataObject
 			$this->dbupdate();
 		}
 		else
-		{	// There migth be some old meta data to recyle in the DB...
+		{	// There might be some old meta data to recycle in the DB...
+			// blueyed>> When? There's a UNIQUE index on ( file_root_type, file_root_ID, file_path )
+			//           instead, when overwriting, we'd have to remove the old data!
 			$this->load_meta();
 		}
 
@@ -914,7 +916,7 @@ class File extends DataObject
 		// Get Meta data (before we change name) (we may need to update it later):
 		$this->load_meta();
 
-		// Memorize new filepath:
+		// Memorize new filepath: (couldn't we use $FileCache, after handling meta data ?)
 		$this->_root_type = $root_type;
 		$this->_root_ID = $root_ID;
 		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
@@ -933,7 +935,9 @@ class File extends DataObject
 			$this->dbupdate();
 		}
 		else
-		{	// There migth be some old neta dat to recyle in the DB...
+		{	// There might be some old meta data to recycle in the DB...
+			// blueyed>> When? There's a UNIQUE index on ( file_root_type, file_root_ID, file_path )
+			//           instead, when moving a file, we'll have to remove the old data!
 			$this->load_meta();
 		}
 
@@ -957,7 +961,7 @@ class File extends DataObject
 		}
 
 		if( ! @copy( $this->get_full_path(), $dest_File->get_full_path() ) )
-		{
+		{ // this is probably a permission problem then!
 			return false;
 		}
 
@@ -1054,16 +1058,22 @@ class File extends DataObject
 
 	/**
 	 * Insert object into DB based on previously recorded changes
+	 *
+	 * @return boolean true on success, false on failure
 	 */
 	function dbinsert( )
 	{
 		global $Debuglog;
 
 		if( $this->meta == 'unknown' )
-			{ debug_die( 'cannot insert File if meta data has not been checked before' ); }
+		{
+			debug_die( 'cannot insert File if meta data has not been checked before' );
+		}
 
 		if( ($this->ID != 0) || ($this->meta != 'notfound') )
-			{ debug_die( 'Existing file object cannot be inserted!' ); }
+		{
+			debug_die( 'Existing file object cannot be inserted!' );
+		}
 
 		$Debuglog->add( 'Inserting meta data for new file into db', 'files' );
 
@@ -1073,25 +1083,29 @@ class File extends DataObject
 		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );
 
 		// Let parent do the insert:
-		parent::dbinsert();
+		$r = parent::dbinsert();
 
 		// We can now consider the meta data has been loaded:
 		$this->meta  = 'loaded';
+
+		return $r;
 	}
 
 
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
-	 * {@internal DataObject::dbupdate(-)}}
+	 * @return boolean true on success, false on failure / no changes
 	 */
 	function dbupdate( )
 	{
 		if( $this->meta == 'unknown' )
-			{ debug_die( 'cannot update File if meta data has not been checked before' ); }
+		{
+			debug_die( 'cannot update File if meta data has not been checked before' );
+		}
 
 		// Let parent do the update:
-		parent::dbupdate();
+		return parent::dbupdate();
 	}
 
 
@@ -1178,6 +1192,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.48  2005/11/22 04:15:58  blueyed
+ * doc; dbupdate()/dbinsert(): return value
+ *
  * Revision 1.47  2005/11/21 18:33:19  fplanque
  * Too many undiscussed changes all around: Massive rollback! :((
  * As said before, I am only taking CLEARLY labelled bugfixes.
