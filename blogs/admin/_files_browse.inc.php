@@ -566,7 +566,7 @@ else
 			onclick="return openselectedfiles(true);"
 			src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
 
-		<input class="ActionButton" type="image" name="actionArray[editperm]"
+		<input class="ActionButton" type="image" name="actionArray[edit_perms]"
 			onclick="return openselectedfiles(true);"
 			title="<?php echo T_('Change permissions for the selected files'); ?>"
 			src="<?php echo get_icon( 'file_perms', 'url' ); ?>" />
@@ -843,6 +843,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.53  2005/11/22 04:41:38  blueyed
+ * Fix permissions editing again
+ *
  * Revision 1.52  2005/11/21 18:33:19  fplanque
  * Too many undiscussed changes all around: Massive rollback! :((
  * As said before, I am only taking CLEARLY labelled bugfixes.

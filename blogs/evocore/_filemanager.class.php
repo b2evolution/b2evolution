@@ -455,7 +455,7 @@ class FileManager extends Filelist
 	{
 		if( $this->User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
-			echo '<a title="'.T_('Edit permissions').'" href="'.$this->getLinkFile( $this->curFile, 'editperm' ).'">'
+			echo '<a title="'.T_('Edit permissions').'" href="'.$this->getLinkFile( $this->curFile, 'edit_perms' ).'">'
 						.$this->curFile->get_perms( $this->_disp_permslikelsl ? 'lsl' : '' ).'</a>';
 		}
 		else
@@ -1356,6 +1356,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.64  2005/11/22 04:41:39  blueyed
+ * Fix permissions editing again
+ *
  * Revision 1.63  2005/11/22 04:17:46  blueyed
  * typos,doc, whitespace
  *
