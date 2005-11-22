@@ -164,7 +164,7 @@ class FileManager extends Filelist
 	/**
 	 * These are variables that get considered when regenerating an URL
 	 *
-	 * @param array
+	 * @param array URL param => member name
 	 * @access private
 	 */
 	var $_url_params = array(
@@ -300,7 +300,7 @@ class FileManager extends Filelist
 			}
 
 			// Finish initializing:
-			parent::Filelist( NULL, NULL, NULL ); // Do not override anuthing
+			parent::Filelist( NULL, NULL, NULL ); // Do not override anything
 		}
 
 
@@ -316,6 +316,7 @@ class FileManager extends Filelist
 		$this->fm_mode = param( 'fm_mode', 'string', NULL, true );
 
 
+		// For modes build $this->SourceList
 		if( $this->fm_mode && $this->fm_sources = param( 'fm_sources', 'array', array() ) )
 		{
 			if( $this->SourceList = & new Filelist( $this->_ads_root_path, $this->_root_type, $this->_root_ID ) )
@@ -645,13 +646,11 @@ class FileManager extends Filelist
 		{
 			if( is_array( $lValue ) )
 			{
-				$strAppend .= ( !empty($strAppend) ? '&amp;' : '' )
-										.$lName.'[]='.implode( '&amp;'.$lName.'[]=', $lValue );
+				$strAppend .= ( !empty($strAppend) ? '&amp;' : '' ).$lName.'[]='.implode( '&amp;'.$lName.'[]=', $lValue );
 			}
 			else
 			{
-				$strAppend .= ( !empty($strAppend) ? '&amp;' : '' )
-										.$lName.'='.$lValue;
+				$strAppend .= ( !empty($strAppend) ? '&amp;' : '' ).$lName.'='.$lValue;
 			}
 		}
 
@@ -946,11 +945,11 @@ class FileManager extends Filelist
 		$id_path = md5( $path );
 
 		$r['string'] = '<input type="radio"
-														name="root_and_path"
-														value="'.$root_and_path.'"
-														id="radio_'.$id_path.'"'
-														.( $Root['id'] == $this->root && $rootSubpath == $this->_rds_list_path ? ' checked="checked"' : '' ).'
-														/> ';
+		                       name="root_and_path"
+		                       value="'.$root_and_path.'"
+		                       id="radio_'.$id_path.'"'
+		                       .( $Root['id'] == $this->root && $rootSubpath == $this->_rds_list_path ? ' checked="checked"' : '' ).'
+		                /> ';
 
 		$label = '<label for="radio_'.$id_path.'">'
 							.'<a href="'.$this->getCurUrl( array( 'root' => $Root['id'], 'path' => $rootSubpath, 'forceFM' => 1 ) ).'"
@@ -962,7 +961,6 @@ class FileManager extends Filelist
 		$r['opened'] = ( $Root['id'] == $this->root && $rootSubpath == $this->_rds_list_path ) ? true : NULL;
 
 
-
 		if( !$Nodelist->count_dirs() )
 		{
 			$r['string'] .= $label;
@@ -971,12 +969,10 @@ class FileManager extends Filelist
 		else
 		{ // Process subdirs
 			$r['string'] .= '<img src="'.get_icon( 'collapse', 'url' ).'"'
-											.' onclick="toggle_clickopen(\''.$id_path.'\');"'
-											.' id="clickimg_'.$id_path.'" alt="+ / -" />
-										'.$label.'
-										<ul class="clicktree" id="clickdiv_'.$id_path.'">
-
-										';
+				.' onclick="toggle_clickopen(\''.$id_path.'\');"'
+				.' id="clickimg_'.$id_path.'" alt="+ / -" />
+				'.$label.'
+				<ul class="clicktree" id="clickdiv_'.$id_path.'">'."\n";
 
 			while( $lFile =& $Nodelist->get_next( 'dir' ) )
 			{
@@ -1046,16 +1042,16 @@ class FileManager extends Filelist
 
 		if( empty($name) )
 		{ // No name was supplied:
-			$Messages->add( ($type == 'dir' ?
-														T_('Cannot create a directory without name.') :
-														T_('Cannot create a file without name.') ), 'error' );
+			$Messages->add( ($type == 'dir'
+				? T_('Cannot create a directory without name.')
+				: T_('Cannot create a file without name.') ), 'error' );
 			return false;
 		}
 		elseif( !isFilename($name) )
 		{
-			$Messages->add( sprintf( ($type == 'dir' ?
-																			T_('&laquo;%s&raquo; is not a valid directory.') :
-																			T_('&laquo;%s&raquo; is not a valid filename.') ), $name), 'error' );
+			$Messages->add( sprintf( ($type == 'dir'
+				? T_('&laquo;%s&raquo; is not a valid directory.')
+				: T_('&laquo;%s&raquo; is not a valid filename.') ), $name), 'error' );
 			return false;
 		}
 
@@ -1068,7 +1064,6 @@ class FileManager extends Filelist
 			return false;
 		}
 
-		// not used... $chmod = $type == 'dir' ? $this->_default_chmod_dir : $this->_default_chmod_file;
 		if( $newFile->create( $type ) )
 		{
 			if( $type == 'file' )
@@ -1256,6 +1251,7 @@ class FileManager extends Filelist
 	 * Unlinks (deletes!) a file.
 	 *
 	 * @param File file object
+	 * @param boolean delete subdirectories? (we cannot support this yet because of DB integrity checks)
 	 * @return boolean true on success, false on failure
 	 */
 	function unlink( & $File, $delsubdirs = false )
@@ -1276,28 +1272,31 @@ class FileManager extends Filelist
 			if( $unlinked = deldir_recursive( $File->get_full_path() ) )
 			{
 				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; and its subdirectories have been deleted.'),
-															$File->get_name() ), 'success' );
+					$File->get_name() ), 'success' );
 			}
 			else
 			{
-				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'), $File->get_name() ), 'error' );
+				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be deleted recursively.'),
+					$File->get_name() ), 'error' );
 			}
 			$this->load(); // Reload!
 		}
 		elseif( $unlinked = $File->unlink() )
 		{ // remove from list
-			$Messages->add( sprintf( ( $File->is_dir() ?
-																					T_('The directory &laquo;%s&raquo; has been deleted.') :
-																					T_('The file &laquo;%s&raquo; has been deleted.') ),
-																			$File->get_name() ), 'success' );
+			$Messages->add( sprintf( (
+				$File->is_dir()
+					? T_('The directory &laquo;%s&raquo; has been deleted.')
+					: T_('The file &laquo;%s&raquo; has been deleted.') ),
+				$File->get_name() ), 'success' );
 			$this->remove( $File );
 		}
 		else
 		{
-			$Messages->add( sprintf( ( $File->is_dir() ?
-																				T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') :
-																				T_('Could not delete the file &laquo;%s&raquo;.') ),
-																				$File->get_name() ), 'error' );
+			$Messages->add( sprintf( (
+				$File->is_dir()
+					? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
+					: T_('Could not delete the file &laquo;%s&raquo;.') ),
+				$File->get_name() ), 'error' );
 		}
 
 		return $unlinked;
@@ -1306,8 +1305,10 @@ class FileManager extends Filelist
 
 	/**
 	 * Moves a File object physically
-	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
-	 * @param integer ID of the user, the group or the collection the file belongs to...
+	 *
+	 * @param File The source file
+	 * @param string Target Root type: 'user', 'group' or 'collection'
+	 * @param integer Target ID of the user, the group or the collection the file belongs to...
 	 * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
 	 * @return boolean true on success, false on failure
 	 */
@@ -1355,6 +1356,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.63  2005/11/22 04:17:46  blueyed
+ * typos,doc, whitespace
+ *
  * Revision 1.62  2005/11/21 18:33:19  fplanque
  * Too many undiscussed changes all around: Massive rollback! :((
  * As said before, I am only taking CLEARLY labelled bugfixes.
