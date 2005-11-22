@@ -687,7 +687,7 @@ switch( $action )
 
 					if( $newperms === $oldperms )
 					{
-						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not changed.'), $l_File->get_name() ), 'note' );
+						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not been changed.'), $l_File->get_name() ), 'note' );
 					}
 					else
 					{
@@ -1300,6 +1300,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.133  2005/11/22 16:10:21  fplanque
+ * no message
+ *
  * Revision 1.132  2005/11/22 15:17:07  fplanque
  * doc
  *
