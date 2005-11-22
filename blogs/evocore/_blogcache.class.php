@@ -151,32 +151,45 @@ class BlogCache extends DataObjectCache
 
 
 	/**
-	 * load blogs of a user
+	 * Load blogs of a user.
 	 *
-	 * @param string criterion: 'member'
+	 * @param string criterion: 'member' (default), 'browse'
 	 * @param integer user ID
-	 * @return array the blog IDs
+	 * @return array The blog IDs
 	 */
 	function load_user_blogs( $criterion = 'member', $user_ID )
 	{
-		global $DB, $Debuglog;
+		global $DB, $Debuglog, $UserCache;
 
 		$Debuglog->add( "Loading <strong>$this->objtype(criterion: $criterion)</strong> into cache", 'dataobjects' );
 
-		switch( $criterion )
-		{
-			case 'member':
-				$where = 'WHERE bloguser_user_ID = '.$user_ID;
-				break;
+		$for_User = & $UserCache->get_by_ID( $user_ID );
 
-			case 'browse':
-				$where = 'WHERE bloguser_user_ID = '.$user_ID
-									.' AND bloguser_perm_media_browse = 1';
-				break;
+		if( !$for_User )
+		{
+			debug_die( 'load_user_blogs(): User with ID '.$user_ID.' not found!' );
 		}
-		$bloglist = $DB->get_col( 'SELECT bloguser_blog_ID
-																FROM T_coll_user_perms
-																'.$where, 0, 'Get user blog list' );
+
+		$where_user = 'WHERE bloguser_user_ID = '.$user_ID;
+		$where_group = 'WHERE bloggroup_group_ID = '.$for_User->Group->get('ID');
+
+		if( $criterion == 'browse' )
+		{
+			$where_user .= ' AND bloguser_perm_media_browse = 1';
+			$where_group .= ' AND bloggroup_perm_media_browse = 1';
+		}
+
+		$bloglist_user = $DB->get_col(
+			'SELECT bloguser_blog_ID
+			   FROM T_coll_user_perms
+			'.$where_user, 0, 'Get user blog list (T_coll_user_perms)' );
+
+		$bloglist_group = $DB->get_col(
+			'SELECT bloggroup_blog_ID
+			   FROM T_coll_group_perms
+			'.$where_group, 0, 'Get user blog list (T_coll_group_perms)' );
+
+		$bloglist = array_merge( $bloglist_user, $bloglist_group );
 
 		$this->load_list( implode( ',', $bloglist ) );
 
@@ -225,6 +238,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.15  2005/11/22 23:46:10  blueyed
+ * load_user_blogs(): we have to consider T_coll_group_perms also!
+ *
  * Revision 1.14  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *
