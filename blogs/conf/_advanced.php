@@ -335,9 +335,9 @@ fplanque>>ok. If you do it, please do it in a generic $Response object which wil
 */
 
 /**
- * This is the path that will be associated to cookies
+ * This is the path that will be associated to cookies.
  *
- * That means cookies set by this b2evo install won't be seen outside of this path on the domain below
+ * That means cookies set by this b2evo install won't be seen outside of this path on the domain below.
  *
  * @global string Default: preg_replace( '#https?://[^/]+#', '', $baseurl )
  */
@@ -348,10 +348,15 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  *
  * That means cookies set by this b2evo install won't be seen outside of this domain.
  *
- * @global string Default: ($basehost == 'localhost') ? '' : '.'. $basehost;
+ * We'll take {@link $basehost} by default (the leading dot includes subdomains), but
+ * when there's no dot in it, at least Firefox will not set the cookie. The best
+ * example for having no dot in the host name is 'localhost', but it's the case for
+ * host names in an intranet also.
+ *
+ * @global string Default: ( strpos($basehost, '.') === false ) ? '' : '.'. $basehost;
  */
-$cookie_domain = ($basehost == 'localhost') ? '' : '.'. $basehost;
-//echo 'domain='. $cookie_domain. ' path='. $cookie_path;
+$cookie_domain = ( strpos($basehost, '.') === false ) ? '' : '.'. $basehost;
+//echo 'cookie_domain='. $cookie_domain. ' cookie_path='. $cookie_path;
 
 /**#@+
  * Names for cookies.
