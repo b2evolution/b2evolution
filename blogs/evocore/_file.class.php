@@ -851,13 +851,18 @@ class File extends DataObject
 	{
 		// echo "newname= $newname ";
 
+		// rename() will fail if newname already exists on windows
+		// if it doesn't work that way on linux we need the extra check below
+		// but then we have an integrity issue!! :(
 		if( file_exists($this->_dir.$newname) )
 		{
 			return false;
 		}
 
+		// Note: what happens if someone else creates $newname right at this moment here?
+
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
-		{
+		{ // Rename will fail if $newname already exists (at least on windows)
 			return false;
 		}
 
@@ -885,9 +890,13 @@ class File extends DataObject
 			$this->dbupdate();
 		}
 		else
-		{	// There might be some old meta data to recycle in the DB...
-			// blueyed>> When? There's a UNIQUE index on ( file_root_type, file_root_ID, file_path )
-			//           instead, when overwriting, we'd have to remove the old data!
+		{	// There might be some old meta data to *recycle* in the DB...
+			// This can happen if there has been a file in the same location in the past and if that file
+			// has been manually deleted or moved since then. When the new file arrives here, we'll recover
+			// the zombie meta data and we don't reset it on purpose. Actually, we consider that the meta data
+			// has been *accidentaly* lost and that the user is attempting to recover it by putting back the
+			// file where it was before. Of course the logical way would be to put back the file manually, but
+			// experience proves that users are inconsistent!
 			$this->load_meta();
 		}
 
@@ -921,7 +930,9 @@ class File extends DataObject
 		// Get Meta data (before we change name) (we may need to update it later):
 		$this->load_meta();
 
-		// Memorize new filepath: (couldn't we use $FileCache, after handling meta data ?)
+		// Memorize new filepath:
+		// blueyed>> couldn't we use $FileCache, after handling meta data ?
+		// fplanque>> I don't understand what you mean
 		$this->_root_type = $root_type;
 		$this->_root_ID = $root_ID;
 		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
@@ -940,9 +951,13 @@ class File extends DataObject
 			$this->dbupdate();
 		}
 		else
-		{	// There might be some old meta data to recycle in the DB...
-			// blueyed>> When? There's a UNIQUE index on ( file_root_type, file_root_ID, file_path )
-			//           instead, when moving a file, we'll have to remove the old data!
+		{	// There might be some old meta data to *recycle* in the DB...
+			// This can happen if there has been a file in the same location in the past and if that file
+			// has been manually deleted or moved since then. When the new file arrives here, we'll recover
+			// the zombie meta data and we don't reset it on purpose. Actually, we consider that the meta data
+			// has been *accidentaly* lost and that the user is attempting to recover it by putting back the
+			// file where it was before. Of course the logical way would be to put back the file manually, but
+			// experience proves that users are inconsistent!
 			$this->load_meta();
 		}
 
@@ -965,8 +980,11 @@ class File extends DataObject
 			return false;
 		}
 
+ 		// Note: what happens if someone else creates the destination file right at this moment here?
+
 		if( ! @copy( $this->get_full_path(), $dest_File->get_full_path() ) )
-		{ // this is probably a permission problem then!
+		{	// Note: unlike rename() (at least on Windows), copy() will not fail if destination already exists
+			// this is probably a permission problem
 			return false;
 		}
 
@@ -1197,6 +1215,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.50  2005/11/22 13:43:33  fplanque
+ * doc
+ *
  * Revision 1.49  2005/11/22 04:47:59  blueyed
  * rename_to(): return false if file exists!
  *
