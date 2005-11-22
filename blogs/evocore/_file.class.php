@@ -851,6 +851,11 @@ class File extends DataObject
 	{
 		// echo "newname= $newname ";
 
+		if( file_exists($this->_dir.$newname) )
+		{
+			return false;
+		}
+
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{
 			return false;
@@ -1192,6 +1197,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.49  2005/11/22 04:47:59  blueyed
+ * rename_to(): return false if file exists!
+ *
  * Revision 1.48  2005/11/22 04:15:58  blueyed
  * doc; dbupdate()/dbinsert(): return value
  *
