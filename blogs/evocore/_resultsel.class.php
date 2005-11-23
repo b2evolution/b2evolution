@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * PROGIDISTRI grants FranÃ§ois PLANQUE the right to license
+ * PROGIDISTRI grants François PLANQUE the right to license
  * PROGIDISTRI's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -629,6 +629,9 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
 /*
  * $Log$
+ * Revision 1.8  2005/11/23 23:58:34  blueyed
+ * Sorry, encoding messed up (latin1 again).
+ *
  * Revision 1.7  2005/11/23 22:48:50  blueyed
  * minor (translation strings)
  *

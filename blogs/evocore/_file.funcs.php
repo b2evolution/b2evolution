@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants FranÃ§ois PLANQUE the right to license
+ * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -35,7 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: FranÃ§ois PLANQUE.
+ * @author fplanque: François PLANQUE.
  *
  * @version $Id$
  */
@@ -478,6 +478,9 @@ function validate_file_extension( $filename, & $extension )
 
 /*
  * $Log$
+ * Revision 1.35  2005/11/23 23:53:24  blueyed
+ * Sorry, encoding messed up (latin1 again).
+ *
  * Revision 1.34  2005/11/23 22:52:44  blueyed
  * minor (translation strings)
  *

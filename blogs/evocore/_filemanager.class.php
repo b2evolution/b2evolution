@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants FranÃ§ois PLANQUE the right to license
+ * Daniel HAHLER grants François PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -1356,6 +1356,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.66  2005/11/23 23:54:45  blueyed
+ * Sorry, encoding messed up (latin1 again).
+ *
  * Revision 1.65  2005/11/23 22:51:34  blueyed
  * minor (translation strings)
  *

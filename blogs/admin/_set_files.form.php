@@ -7,7 +7,7 @@
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @author blueyed: Daniel HAHLER
- * @author fplanque: FranÃ§ois PLANQUE / PROGIDISTRI
+ * @author fplanque: François PLANQUE / PROGIDISTRI
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
  * @package admin
