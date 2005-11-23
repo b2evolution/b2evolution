@@ -163,8 +163,7 @@ class UserCache extends DataObjectCache
 	/**
 	 * Load members of a given blog
 	 *
-	 * {@internal UserCache::load_blogmembers(-) }}
-	 *
+	 * @todo make a UNION query when we upgrade to MySQL 4
 	 * @param integer blog ID to load members for
 	 */
 	function load_blogmembers( $blog_ID )
@@ -182,12 +181,30 @@ class UserCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache", 'dataobjects' );
 
-		foreach( $DB->get_results( 'SELECT *
-																	FROM T_users INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID
-																 WHERE bloguser_blog_ID = '.$blog_ID.'
-																	 AND bloguser_ismember <> 0' ) as $row )
+		// User perms:
+		$sql = 'SELECT T_users.*
+					    FROM T_users INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID
+				     WHERE bloguser_blog_ID = '.$blog_ID.'
+					     AND bloguser_ismember <> 0';
+		foreach( $DB->get_results( $sql ) as $row )
 		{
-			$this->add( new User( $row ) );
+			if( !isset($this->cache[$row->user_ID]) )
+			{	// Save reinstatiating User if it's already been added
+				$this->add( new User( $row ) );
+			}
+		}
+
+		// Group perms:
+		$sql = 'SELECT T_users.*
+					    FROM T_users LEFT JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID
+					   WHERE bloggroup_blog_ID = '.$blog_ID.'
+					     AND bloggroup_ismember  <> 0';
+		foreach( $DB->get_results( $sql ) as $row )
+		{
+			if( !isset($this->cache[$row->user_ID]) )
+			{	// Save reinstatiating User if it's already been added
+				$this->add( new User( $row ) );
+			}
 		}
 
 		return true;
@@ -253,6 +270,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.22  2005/11/23 17:28:00  fplanque
+ * also check group permissions
+ *
  * Revision 1.21  2005/10/03 17:26:44  fplanque
  * synched upgrade with fresh DB;
  * renamed user_ID field
