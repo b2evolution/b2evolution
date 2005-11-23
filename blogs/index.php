@@ -27,7 +27,8 @@ if( empty($blog) )
 	$Debuglog->add( 'No blog param received, checking extra path...', 'detectblog' );
 
 	// Construct full requested Host + Path:
-	$ReqHostPath = (isset($_SERVER['HTTPS'])?'https://':'http://').$_SERVER['HTTP_HOST'].$ReqPath;
+	// correcting windoze
+	$ReqHostPath =(  (isset($_SERVER['HTTPS']) AND ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'].$ReqPath;
 	$Debuglog->add( 'Full requested Host + Path: '.$ReqHostPath, 'detectblog' );
 
 	if( preg_match( '#^(.+?)index.php/([^/]+)#', $ReqHostPath, $matches ) )
