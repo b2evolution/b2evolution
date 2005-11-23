@@ -1518,13 +1518,13 @@ function debug_info( $force = false )
 					continue;
 				}
 
-				echo '<tr><td>'.$l_cat.'</td><td style="text-align:right">'.$l_time.'</td><td style="text-align:right">'.$percent_l_cat.'%</td></tr>';
+				echo '<tr><td>'.$l_cat.'</td><td class="right">'.$l_time.'</td><td class="right">'.$percent_l_cat.'%</td></tr>';
 			}
-			echo '</tbody>';
 			if( $count_ignored )
 			{
-				echo '<tfoot><tr><td colspan="3" class="center"> + '.$count_ignored.' &lt; 0.5% </td></tr></tfoot>';
+				echo '<tr><td colspan="3" class="center"> + '.$count_ignored.' &lt; 0.5% </td></tr>';
 			}
+			echo '</tbody>';
 			echo '</table>';
 
 			echo '<a href="'.format_to_output($ReqURI).'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br/>';
@@ -2288,6 +2288,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.149  2005/11/23 01:17:36  blueyed
+ * valid html
+ *
  * Revision 1.148  2005/11/22 16:56:31  blueyed
  * validate_url(): allow URLs that start with a digit after '//' (read: IP addresses).
  *
