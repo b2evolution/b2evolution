@@ -451,7 +451,7 @@ msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:35
-msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, etc..."
+msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, hacks, third party plugins, etc..."
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:36
@@ -459,7 +459,7 @@ msgid "You should also backup your database if you can. This functionality shoul
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:37
-msgid "Delete all your existing b2evolution files from your site before uploading the new ones! This will ensure you don't keep unnecessary files on your server after upgrading. It's also better for security."
+msgid "Delete <strong>all your existing b2evolution files from your site</strong> before uploading the new ones! Some of the old files may not be compatible with this new version and will cause it to fail! This will also ensure you don't keep unnecessary files on your server after upgrading. Plus, it's better for security."
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:38

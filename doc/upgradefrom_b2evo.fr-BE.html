@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>Package b2evo: Upgrader depuis une version précédente de b2evolution</title>
 <link href="../blogs/rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
-		
+	
 	 
 </head>
 <body>
@@ -54,9 +54,9 @@
 <h1>Upgrader depuis une version précédente de b2evolution</h1>
 <p>Avant de commencer, merci de noter que certaines fonctionnalités distribuées de b2evolution nécessitent que vous approuvier nos <a href="http://b2evolution.net/about/terms.html">Conditions d'utilisation</a> (très simples).</p>
 <ol class="expanded">
-	<li>Faites une copie de sauvegarde de tous vos fichiers b2evolution. Prenez spécialement soin des fichiers que vous avez modifié, y compris /conf, les habillages (skins), les gabarits de blogs, les fichiers stub, etc...</li>
+	<li>Faites une copie de sauvegarde de tous vos fichiers b2evolution. Prenez spécialement soin des fichiers que vous avez modifié, y compris /conf, les habillages (skins), les gabarits de blogs, les fichiers stub, les hacks, les plugins tiers, etc...</li>
 	<li>Vous devriez également faire un backup de votre base de données si vous le pouvez. Cette fonctionnalité devrait être proposée par votre hébergeur.</li>
-	<li>Supprimez tous vos fichiers b2evolution existants de votre site avant de télécharger les nouveaux! Ceci vous assurera de ne pas conserver de vieux fichiers non nécessaires sur votre serveur après la mise à jour. C'est également mieux en termes de sécurité. </li>
+	<li>Supprimez <strong>tous vos fichiers b2evolution existants de votre site</strong> avant de télécharger les nouveaux! Certains anciens fichiers risquent de ne pas être compatibles avec cette nouvelle version et provoqueront des erreurs! Ceci vous assurera également de ne pas conserver de vieux fichiers non nécessaires sur votre serveur après la mise à jour. De plus, c'est mieux en termes de sécurité. </li>
 <li>Téléchargez <strong>tous les nouveaux fichiers b2evolution du dossier /blogs</strong> sur votre serveur. Nous ne pouvons insister suffisament sur ce point: <strong>TOUS LES FICHIERS</strong>! Et ceci signifie que vous ne pouvez pas réutiliser vos fichiers personnalisés, y compris /conf, /skins, gabarits, fichiers stub, etc. en l'état!<br /> <br /> Celà signifie que vous allez devoir recommencer la personnalisation pour tous ces fichiers. Nous sommes désolés, mais, à la vitesse où nous développons et ajoutons de nouvelles fonctionnalités, nous ne pouvons pas garantir que tout fonctionnera correctement su vous conservez vos anciens fichiers personnalisés. <stong>Toutefois</strong>, ayant sauvegardé vos fichiers personnalisés à l'étape 1, vous pouvez tenter de les réutiliser partiellement après avoir fini la mise à jour. Voir étape 8 ci-dessous.</li>
 	<li>Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/votredossierblogs/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés et configurera b2evolution pour vous.</li>
 	<li>Vérifiez que la nouvelle installation fonctionne.</li>

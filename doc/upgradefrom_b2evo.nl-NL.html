@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>b2evo pakket: bijwerken vanaf een vorige versie van b2evolution</title>
 <link href="../blogs/rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
-		
+	
 	 
 </head>
 <body>
@@ -54,9 +54,9 @@
 <h1>bijwerken vanaf een vorige versie van b2evolution</h1>
 <p>Voordat je begint, sommige netwerk opties van b2evolution gaan er vanuit dat je het eens bent met onze simpele <a href="http://b2evolution.net/about/terms.html">Algemene Voorwaarden</a>.</p>
 <ol class="expanded">
-	<li>Backup al jouw b2evolution bestanden. Let speciaal op de bestanden die je hebt gewjzigd, inclusief /conf, skins, weblog sjablonen, stubbestanden, etc...</li>
+	<li>Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, hacks, third party plugins, etc...</li>
 	<li>Je zou ook een backup van de database moeten maken als je kan. Deze functie zou beschikbaar moeten zijn via jouw hosting.</li>
-	<li>Verwijder alle bestaande b2evolution bestanden voordat je de nieuwe upload! Dit zal er voor zorgen dat je zeker geen onnodige bestanden op jouw webserver staan na het bijwerken. Het is ook beter voor de veiligheid. </li>
+	<li>Delete <strong>all your existing b2evolution files from your site</strong> before uploading the new ones! Some of the old files may not be compatible with this new version and will cause it to fail! This will also ensure you don't keep unnecessary files on your server after upgrading. Plus, it's better for security. </li>
 <li>Upload <strong>alle nieuwe b2evolution bestanden van de /blogs map</strong> naar jouw site. We kunnen het genoeg zeggen: <strong>ALLE BESTANDEN</strong>!En dat betekent dat je niet jouw aangepaste bestanden kunt hergebruiken, inclusief /conf,skins, weblog sjablonen, stub bestanden zoals ze nu zijn.<br /><br /> Dat betekent dat al deze bestanden opnieuw moet aanpassen. Dit spijt ons, maar door het toevoegen van nieuwe functies e.d., kunnen we niet garanderen dat iets zal werken wanneer je oude bestanden laat staan. <strong>Maar</strong>, omdat je alles hebt gebacked up in stap 1, kan je proberen gedeeltes weer werkend te krijgen nadat het bijwerk proces klaar is. Zie stap 8 hieronder.</li>
 	<li>Start het installatiescript op jouw server. Het bevind zich in <code>http://jouwsite.com/jouwweblogsmap/install</code>. Volg daarna de aanwijzingen.<br /><br /> De installer zal je vragen om je basis configuratie instellingen (tenzij je zelf al het /conf/_config.php bestand hebt bijgewerkt voordat je hebt geupload), daarna kan je de database bijwerken van een vorige versie van b2evolution naar de nieuwe.</li>
 	<li>Controleer of de nieuwe installatie werkt.</li>

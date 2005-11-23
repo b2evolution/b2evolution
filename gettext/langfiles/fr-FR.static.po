@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2005-11-22 18:51+0100\n"
+"PO-Revision-Date: 2005-11-23 18:58+0100\n"
 "Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -449,16 +449,16 @@ msgid "Check the <a %s>manual</a> or the <a %s>forums</a> for notes on upgrading
 msgstr "Consultez le <a %s>manuel</a> ou les <a %s>forums</a> pour obtenir des informations sur la manière d'upgrader votre gabarit &amp; habillage WordPress existants vers b2evolution."
 
 #: ../../doc/upgradefrom_b2evo.src.html:35
-msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, etc..."
-msgstr "Faites une copie de sauvegarde de tous vos fichiers b2evolution. Prenez spécialement soin des fichiers que vous avez modifié, y compris /conf, les habillages (skins), les gabarits de blogs, les fichiers stub, etc..."
+msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, hacks, third party plugins, etc..."
+msgstr "Faites une copie de sauvegarde de tous vos fichiers b2evolution. Prenez spécialement soin des fichiers que vous avez modifié, y compris /conf, les habillages (skins), les gabarits de blogs, les fichiers stub, les hacks, les plugins tiers, etc..."
 
 #: ../../doc/upgradefrom_b2evo.src.html:36
 msgid "You should also backup your database if you can. This functionality should be provided by your host."
 msgstr "Vous devriez également faire un backup de votre base de données si vous le pouvez. Cette fonctionnalité devrait être proposée par votre hébergeur."
 
 #: ../../doc/upgradefrom_b2evo.src.html:37
-msgid "Delete all your existing b2evolution files from your site before uploading the new ones! This will ensure you don't keep unnecessary files on your server after upgrading. It's also better for security."
-msgstr "Supprimez tous vos fichiers b2evolution existants de votre site avant de télécharger les nouveaux! Ceci vous assurera de ne pas conserver de vieux fichiers non nécessaires sur votre serveur après la mise à jour. C'est également mieux en termes de sécurité."
+msgid "Delete <strong>all your existing b2evolution files from your site</strong> before uploading the new ones! Some of the old files may not be compatible with this new version and will cause it to fail! This will also ensure you don't keep unnecessary files on your server after upgrading. Plus, it's better for security."
+msgstr "Supprimez <strong>tous vos fichiers b2evolution existants de votre site</strong> avant de télécharger les nouveaux! Certains anciens fichiers risquent de ne pas être compatibles avec cette nouvelle version et provoqueront des erreurs! Ceci vous assurera également de ne pas conserver de vieux fichiers non nécessaires sur votre serveur après la mise à jour. De plus, c'est mieux en termes de sécurité."
 
 #: ../../doc/upgradefrom_b2evo.src.html:38
 msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you can't reuse your customized files, including  /conf, skins, blog templates, stubfiles, etc. as they are!<br /> <br /> That means you will have to customize all these files again. We're sorry but, due to the pace of development and adding of new features, we cannot guarantee that anything will work if you keep older files in place. <strong>However</strong>, since you have backed up all these files in step 1, you can try to partially reuse them once the upgrade process is done. See step 8 below."

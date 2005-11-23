@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>paquete b2evo: Actualizando una versión anterior de b2evolution</title>
 <link href="../blogs/rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
-		
+	
 	 
 </head>
 <body>
@@ -54,9 +54,9 @@
 <h1>Actualizando una versión anterior de b2evolution</h1>
 <p>Antes de comenzar, por favor note que algunas características de red de b2evolution requieren que acepte nuestros simples <a href="http://b2evolution.net/about/terms.html">Terminos de servicio</a>.</p>
 <ol class="expanded">
-	<li>Respalde todos sus archivos b2evolution. Tenga especial cuidado con los archivos que haya modificado, incluyendo /conf, skins, plantillas de blog, archivos stub, etc...</li>
+	<li>Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, hacks, third party plugins, etc...</li>
 	<li>También debería respaldar la base de datos, si puede. Esta funcionalidad debería ser provista por su host.</li>
-	<li>¡Borre todos sus archivos b2evolution existentes de su sitio antes de subir los nuevos! Esto asegurará que usted no mantendrá archivos innecesarios en su servidor después de la migración. También es mejor para la seguridad. </li>
+	<li>Delete <strong>all your existing b2evolution files from your site</strong> before uploading the new ones! Some of the old files may not be compatible with this new version and will cause it to fail! This will also ensure you don't keep unnecessary files on your server after upgrading. Plus, it's better for security. </li>
 <li>Suba <strong>todos los archivos b2evolution nuevos desde la carpeta /blogs</strong> a su sitio. No podemos hacer suficiente énfasis en esto: ¡<strong>TODOS LOS ARCHIVOS</strong>! Y esto implica que no puede reutilizar sus archivos personalizados, incluyendo /conf, skins, plantillas de blog, archivos stub, etc. así como estén.<br/> <br /> Esto significa que tendrá que personalizar todos esos archivos de nuevo. Lo sentimos, pero debido a la rapidez del desarrollo y de adición de nuevas características, no podemos garantizar que todo funcionará si mantiene archivos viejos en el lugar. <strong>Sin embargo</strong>, como ha respaldado esos archivos en el paso 1, puede intentar reutilizarlos parcialmente una vez que el proceso de migración esté hecho. Mire el paso 8 mas abajo.</li>
 	<li>Ejecute el script de instalación en su servidor. Está localizado en <code>http://elsitio.com/lacarpetablogs/install</code> . Entonces simplemente siga las instrucciones en pantallas.<br /> <br /> El instalador le preguntará sus ajustes de configuración básica (a menos que ya haya actualizado /conf/_config.php antes de subir), entonces le permitirá ejecutar una actualización de la base de datos desde cualquier versión b2evolution a la nueva.</li>
 	<li>Verifique para asegurar que la nueva instalación funciona.</li>

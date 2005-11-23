@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>b2evo-pakken: Oppgradere fra en tidligere versjon av b2evolution</title>
 <link href="../blogs/rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
-		
+	
 	 
 </head>
 <body>
@@ -54,9 +54,9 @@
 <h1>Oppgradere fra en tidligere versjon av b2evolution</h1>
 <p>Før du begynner, merk at noen av online-tjenestene som b2evolution tilbyr, krever at du godtar våre enkle <a href="http://b2evolution.net/about/terms.html">Bruksvilkår</a>.</p>
 <ol class="expanded">
-	<li>Sikkerhetskopier alle dine b2evolution-filer. Husk også å kopiere alle filer du kan ha endret, for eksempel /conf-mappen, skins, blog-maler, stubbfiler, osv...</li>
+	<li>Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, hacks, third party plugins, etc...</li>
 	<li>Du burde også ta en sikkerhetskopi av mysql-databasen din, hvis du kan. Din nettvert burde tilby slik funksjonalitet.</li>
-	<li>Slett alle dine eksisterende b2evolution-filer fra nettstedet ditt før du laster opp de nye! Dette vil forsikre at du ikke beholder unødvendige filer på serveren din etter at du har oppgradert. Det er også sikkerhetsmessig lurere. </li>
+	<li>Delete <strong>all your existing b2evolution files from your site</strong> before uploading the new ones! Some of the old files may not be compatible with this new version and will cause it to fail! This will also ensure you don't keep unnecessary files on your server after upgrading. Plus, it's better for security. </li>
 <li>Last opp <strong>alle nye b2evolution-filer fra /blogs-mappen</strong> til ditt nettsted. Vi kan ikke uttrykke oss klart nok på dette punktet: <strong>ALLE FILER</strong>! Det betyr at du kan ikke gjenbruke filer du har forandret på, verken /conf-mappen, dine skins, blogmaler, stubbfiler, eller lignende, i den tilstanden de er!<br /> <br /> Du må endre disse filene om igjen fra begynnelsen av. Vi beklager det, men grunnet farten vi har utviklet b2evolution og laget nye funksjoner, kan vi ikke garantere at noe som helst vil fungere om du beholder gamle versjoner av de forskjellige filene. <strong>Men</strong>, siden du har tatt sikkerhetskopi av disse filene i steg 1, kan du prøve å gjenbruke deler av dem når oppgraderingsprosessen er ferdig. Se steg 8 nedenfor.</li>
 	<li>Kjør installasjonsskriptet på serveren din. Det finner du i <code>http://dittdomene.no/dinblogsmappe/install</code> . Deretter følger du bare instruksjonene på skjermen.<br /> <br /> Installasjonsskriptet vil stille deg noen spørsmål (hvis du ikke allerede har oppdatert /conf/_config.php før du lastet opp b2evo), og deretter vil det la deg kjøre en databaseoppgradering fra en hvilkensomhelst versjon av b2evolution, til den nye versjonen.</li>
 	<li>Sjekk at den nye installasjonen virker.</li>

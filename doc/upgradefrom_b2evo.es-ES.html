@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>Paquete b2evolution: Actualizar de una versión anterior de b2evolution</title>
 <link href="../blogs/rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
-		
+	
 	 
 </head>
 <body>
@@ -54,9 +54,9 @@
 <h1>Actualizar de una versión anterior de b2evolution</h1>
 <p>Antes de empezar, algunas de las carateríasticas de b2evolution requieren que aceptes nuestros <a href="http://b2evolution.net/about/terms.html">Condiciones de servicio</a></p>
 <ol class="expanded">
-	<li>Haz una copia de seguridad de todos tus archivos de b2evolution. En especial, los archivos que hayas modificado, como /conf, /skins, los archivos stub, etc...</li>
+	<li>Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, hacks, third party plugins, etc...</li>
 	<li>También deberías hacer una copia de seguridad de la base de datos, si es posible. Esto depende de tu servicio de alojamiento.</li>
-	<li>Borra todos los archivos de b2evolution de tu página antes de subir los nuevos. Esto asegurará que no queden archivos inútiles en tu servidor después de la actualización.  </li>
+	<li>Delete <strong>all your existing b2evolution files from your site</strong> before uploading the new ones! Some of the old files may not be compatible with this new version and will cause it to fail! This will also ensure you don't keep unnecessary files on your server after upgrading. Plus, it's better for security. </li>
 <li>SUbe <strong>todos los archivos del directorio /blogs de b2evolution</strong> a tu página. <strong>TODOS LOS ARCHIVOS</strong>. Y esto significa que no puedes reutilizar tus archivos personalizados, incluyendo /conf, skins, plantillas, archivos stub, etc. tal y como están. <br /> <br /> Tendrás que personalizar los archivos de nuevo. Lo sentimos, pero debido al ritmo de desarrollo, y la inclusión de nuevas características, no podemos garantizar the b2evolution siga funcionando si mantienes estos archivos. <strong>De todas formas</strong>, como has hecho una copia de seguridad de todos estos archivos en el paso 1, puedes probar a reutilizarlos cuando la actualización haya terminado (ver paso 8).</li>
 	<li>Ejecuta el script the instalación en tu servidor. Se encuentra en <code>http://tupagina.com/b2evo/install</code>. Luego sigue las instrucciones en pantalla.<br /> <br /> El instalador te hará algunas preguntas (a no ser que ya hayas editado /conf/_config.php antes de actualizar), y después te permitirá ejecutar una actualización de la base de datos de cualquier version de b2evolution a la nueva. </li>
 	<li>Verifica que la nueva instalación funciona.</li>
