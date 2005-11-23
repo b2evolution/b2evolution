@@ -28,7 +28,7 @@
  * @package plugins
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Fran�is PLANQUE - {@link http://fplanque.net/}
+ * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @version $Id$
  */
