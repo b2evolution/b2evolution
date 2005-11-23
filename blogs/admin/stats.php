@@ -115,11 +115,11 @@ switch( $action )
 
 		if( Hitlist::delete( $hit_ID ) )
 		{
-			$Messages->add( sprintf( T_('Deleted hit #%d...'), $hit_ID ), 'note' );
+			$Messages->add( sprintf( T_('Deleted hit #%d.'), $hit_ID ), 'note' );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_('Could not delete hit #%d...'), $hit_ID ), 'note' );
+			$Messages->add( sprintf( T_('Could not delete hit #%d.'), $hit_ID ), 'note' );
 		}
 		break;
 
@@ -131,11 +131,11 @@ switch( $action )
 		param( 'date', 'integer', true ); // Required!
 		if( $r = Hitlist::prune( $date ) )
 		{
-			$Messages->add( sprintf( T_('Deleted %d hits for %s.'), $r, date( locale_datefmt(), $date) ), 'note' );
+			$Messages->add( sprintf( /* TRANS: %s is a date */ T_('Deleted %d hits for %s.'), $r, date( locale_datefmt(), $date) ), 'note' );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_('No hits deleted for %s.'), date( locale_datefmt(), $date) ), 'note' );
+			$Messages->add( sprintf( /* TRANS: %s is a date */ T_('No hits deleted for %s.'), date( locale_datefmt(), $date) ), 'note' );
 		}
 		break;
 }
@@ -950,6 +950,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.10  2005/11/23 23:14:50  blueyed
+ * minor (translation)
+ *
  * Revision 1.9  2005/11/05 01:53:53  blueyed
  * Linked useragent to a session rather than a hit;
  * SQL: moved T_hitlog.hit_agnt_ID to T_sessions.sess_agnt_ID
