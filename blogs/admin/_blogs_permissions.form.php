@@ -314,7 +314,8 @@ $Form->begin_fieldset( T_('User permissions') );
 <?php
 $Form->end_fieldset();
 // warning if a user withdraws own permission to edit the blog's properties
-form_submit( ( $current_User->ID != 1 ) ? 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''.TS_('Warning! You are about to remove your own permission to edit this blog!\nYou won\'t have access to its properties any longer if you do that!').'\') );"' : '' );
+// TODO: simultaneously check group properties (we migth want to do this in PHP and not JS)
+form_submit( ( $current_User->ID != 1 ) ); // ? 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''.TS_('Warning! You are about to remove your own permission to edit this blog!\nYou won\'t have access to its properties any longer if you do that!').'\') );"' : '' );
 
 $Form->end_form();
 ?>
