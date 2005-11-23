@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for upgrading to b2evo 1.6 a.k.a. "Phoenix".
+ * Tests for upgrading from older b2evo versions to the current version (this one).
  */
 
 /**
@@ -32,7 +32,9 @@ class UpgradeTo1_6TestCase extends InstallUnitTestCase
 
 	function tearDown()
 	{
-		$this->assertEqual( '9000', $this->DB->get_var('SELECT set_value FROM T_settings WHERE set_name = "db_version"') );
+		global $new_db_version;
+
+		$this->assertEqual( $new_db_version, $this->DB->get_var('SELECT set_value FROM T_settings WHERE set_name = "db_version"') );
 		$this->dropTestDbTables();
 	}
 
@@ -47,7 +49,7 @@ class UpgradeTo1_6TestCase extends InstallUnitTestCase
 		require_once( EVODIR.'blogs/install/_functions_evoupgrade.php' );
 
 		$GLOBALS['DB'] = $this->DB;
-		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 0.9.0.11 to 1.6 successful!' );
+		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 0.9.0.11 successful!' );
 	}
 }
 
