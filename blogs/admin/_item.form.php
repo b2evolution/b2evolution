@@ -117,7 +117,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Post contents') );
 
-	$Form->text( 'post_title', $post_title, 42, T_('Title'), '', 255 );
+	$Form->text( 'post_title', $post_title, 48, T_('Title'), '', 255 );
 
 	echo ' '; // allow wrapping here! (and below)
 	          // blueyed>> (Opera would additionally need text/&nbsp; here, but that wraps ugly)
@@ -212,7 +212,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		echo ' '; // allow wrapping!
 	}
 
-	$Form->text( 'post_urltitle', $post_urltitle, 30, T_('URL Title'),
+	$Form->text( 'post_urltitle', $post_urltitle, 40, T_('URL Title'),
 	             T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
 
 	$Form->end_fieldset();
@@ -370,6 +370,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.36  2005/11/23 05:29:49  blueyed
+ * Sorry, didn't meant to change input field sizes
+ *
  * Revision 1.35  2005/11/23 04:01:08  blueyed
  * Using div.line with whitespace between elements that are allowed to wrap fixes the issues with Konqueror/Safari in b2edit. It also makes it xhtml valid.
  * Still, using "white-space:nowrap" is not good IMHO. It's better to have a note wrap around than not being able to read it..
