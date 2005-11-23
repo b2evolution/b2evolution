@@ -2,7 +2,7 @@
 /**
  * This template generates an Atom feed for the requested blog's latest posts
  *
- * See {@link http://www.mnot.net/drafts/draft-nottingham-atom-format-02.html}
+ * See {@link http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html}
  *
  * This file is not meant to be called directly.
  * It is meant to be called automagically by b2evolution.
@@ -43,7 +43,7 @@ header("Content-type: application/atom+xml");
 // header("Content-type: text/xml");
 echo '<?xml version="1.0" encoding="utf-8"?'.'>';
 ?>
-<feed version="0.3" xml:lang="<?php $Blog->disp( 'locale', 'xml' ) ?>" xmlns="http://purl.org/atom/ns#">
+<feed xml:lang="<?php $Blog->disp( 'locale', 'xml' ) ?>" xmlns="http://www.w3.org/2005/Atom">
 	<title><?php
 		$Blog->disp( 'name', 'xml' );
 		request_title( ' - ', '', ' - ', 'xml' );
@@ -59,21 +59,23 @@ echo '<?xml version="1.0" encoding="utf-8"?'.'>';
 		default:
 			?>
 			<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'blogurl', 'xml' ) ?>" />
-			<tagline><?php $Blog->disp( 'shortdesc', 'xml' ) ?></tagline>
-			<generator url="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
-			<modified><?php $MainList->mod_date( 'isoZ', true ) ?></modified>
-			<?php while( $Item = $MainList->get_item() ) {	?>
+			<link rel="self" type="text/html" href="<?php $Blog->disp( 'atom_url', 'xmlattr' ) ?>" />
+			<id><?php $Blog->disp( 'atom_url', 'xmlattr' ); /* TODO: may need a regenerate_url() */ ?></id>
+			<subtitle><?php $Blog->disp( 'shortdesc', 'xml' ) ?></subtitle>
+			<generator uri="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
+			<updated><?php $MainList->mod_date( 'isoZ', true ) ?></updated>
+ 			<?php while( $Item = $MainList->get_item() ) {	?>
 			<entry>
-				<title type="text/plain" mode="xml"><?php $Item->title( '', '', false, 'xml' ) ?></title>
+				<title type="text"><?php $Item->title( '', '', false, 'xml' ) ?></title>
 				<link rel="alternate" type="text/html" href="<?php $Item->permalink( 'single' ) ?>" />
 				<author>
 					<name><?php $Item->Author->preferred_name( 'xml' ) ?></name>
-					<?php $Item->Author->url( '<url>', "</url>\n", 'xml' ) ?>
+					<?php $Item->Author->url( '<uri>', "</uri>\n", 'xml' ) ?>
 				</author>
 				<id><?php $Item->permalink( 'single' ) ?></id>
-				<issued><?php $Item->issue_date( 'isoZ', true ) ?></issued>
-				<modified><?php $Item->mod_date( 'isoZ', true ) ?></modified>
-				<content type="text/html" mode="escaped"><![CDATA[<?php
+				<published><?php $Item->issue_date( 'isoZ', true ) ?></published>
+				<updated><?php $Item->mod_date( 'isoZ', true ) ?></updated>
+        <content type="html"><![CDATA[<?php
 					$Item->url_link( '<p>', '</p>' );
 					$Item->content()
 				?>]]></content>

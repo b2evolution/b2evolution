@@ -2,7 +2,7 @@
 /**
  * This template generates an Atom feed for the requested blog's latest comments
  *
- * See {@link http://www.mnot.net/drafts/draft-nottingham-atom-format-02.html}
+ * See {@link http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html}
  *
  * This file is not meant to be called directly.
  * It is meant to be called automagically by the main template (_main.php).
@@ -43,20 +43,22 @@ $CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'D
 
 ?>
 	<link rel="alternate" type="text/html" href="<?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?>" />
-	<generator url="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
-	<modified><?php echo gmdate('Y-m-d\TH:i:s\Z'); ?></modified>
+	<link rel="self" type="text/html" href="<?php $Blog->disp( 'comments_atom_url', 'xmlattr' ) ?>" />
+	<id><?php $Blog->disp( 'comments_atom_url', 'xmlattr' ) /* TODO: may need a regenerate_url() */ ?></id>
+	<generator uri="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
+	<updated><?php echo gmdate('Y-m-d\TH:i:s\Z'); ?></updated>
 	<?php while( $Comment = $CommentList->get_next() )
 	{ // Loop through comments: ?>
 	<entry>
-		<title type="text/plain" mode="xml"><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
+		<title type="text"><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
 		<link rel="alternate" type="text/html" href="<?php $Comment->permalink() ?>" />
 		<author>
 			<name><?php $Comment->author( '', '#', '', '#', 'xml' ) ?></name>
-			<?php $Comment->author_url( '', '<url>', "</url>\n", false ) ?>
+			<?php $Comment->author_url( '', '<uri>', "</uri>\n", false ) ?>
 		</author>
 		<id><?php $Comment->permalink() ?></id>
-		<issued><?php $Comment->date( 'isoZ', true ); ?></issued>
-		<modified><?php $Comment->date( 'isoZ', true ); ?></modified>
-		<content type="text/html" mode="escaped"><![CDATA[<?php $Comment->content() ?>]]></content>
+    <published><?php $Comment->date( 'isoZ', true ); ?></published>
+		<updated><?php $Comment->date( 'isoZ', true ); ?></updated>
+		<content type="html"><![CDATA[<?php $Comment->content() ?>]]></content>
 	</entry>
 	<?php } // End of comment loop. ?>
