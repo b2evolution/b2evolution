@@ -225,14 +225,17 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->select_options( 'item_st_ID',
 												$itemStatusCache->option_list_return( $edited_Item->st_ID, ! $edited_Item->st_required ),
 												 T_('Task status') );
+
 	echo ' '; // allow wrapping!
 
 	$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
 												'', false, '', 'get_assigned_user_options' );
+
 	echo ' '; // allow wrapping!
 
 	$Form->select_object( 'item_priority', NULL, $edited_Item, T_('Priority'),
 												'', false, '', 'priority_options' );
+
 	echo ' '; // allow wrapping!
 
 	$Form->date( 'item_deadline', $edited_Item->get('deadline'), T_('Deadline') );
@@ -370,6 +373,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.37  2005/11/23 17:29:19  fplanque
+ * no message
+ *
  * Revision 1.36  2005/11/23 05:29:49  blueyed
  * Sorry, didn't meant to change input field sizes
  *

@@ -512,6 +512,7 @@ class DB
 
 		// Replace aliases:
 		$query = preg_replace( $this->dbaliases, $this->dbreplaces, $query );
+		// echo '<p>'.$query.'</p>';
 
 		if( preg_match( '#^ \s* create \s* table \s #ix', $query) )
 		{ // Query is a table creation, we add table options:
@@ -1174,6 +1175,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.45  2005/11/23 17:29:19  fplanque
+ * no message
+ *
  * Revision 1.44  2005/11/18 18:46:27  fplanque
  * factorized query formatting
  *

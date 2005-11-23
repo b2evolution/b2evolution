@@ -578,8 +578,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: get list of assigned user options
-	 *
-	 * {@internal Item::get_assigned_user_options(-)}}
 	 */
 	function get_assigned_user_options()
 	{
@@ -2216,6 +2214,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.67  2005/11/23 17:29:19  fplanque
+ * no message
+ *
  * Revision 1.66  2005/11/17 19:35:26  fplanque
  * no message
  *
