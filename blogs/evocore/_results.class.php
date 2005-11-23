@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * PROGIDISTRI grants François PLANQUE the right to license
+ * PROGIDISTRI grants FranÃ§ois PLANQUE the right to license
  * PROGIDISTRI's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -307,11 +307,11 @@ class Results extends Widget
 
 			/*
 			 *
-			 * On a un problème avec la recherche sur les sociétés
-			 * si on fait un select count(*), ça sort un nombre de réponses énorme
+			 * On a un problÃ¨me avec la recherche sur les sociÃ©tÃ©s
+			 * si on fait un select count(*), Ã§a sort un nombre de rÃ©ponses Ã©norme
 			 * mais on ne sait pas pourquoi... la solution est de lister des champs dans le COUNT()
-			 * MAIS malheureusement ça ne fonctionne pas pour d'autres requêtes.
-			 * L'idéal serait de réussir à isoler qu'est-ce qui, dans la requête SQL, provoque le comportement
+			 * MAIS malheureusement Ã§a ne fonctionne pas pour d'autres requÃªtes.
+			 * L'idÃ©al serait de rÃ©ussir Ã  isoler qu'est-ce qui, dans la requÃªte SQL, provoque le comportement
 			 * bizarre....
 			 */
 			// Tentative 1:
@@ -320,7 +320,7 @@ class Results extends Widget
 			// if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
 			// { // there was a coma or a JOIN clause in the FROM clause of the original query,
 			// Tentative 2:
-			// fplanque: je pense que la différence est sur la présence de DISTINCT ou non.
+			// fplanque: je pense que la diffÃ©rence est sur la prÃ©sence de DISTINCT ou non.
 			// if( preg_match( '#\s DISTINCT \s#six', $sql_count, $matches ) )
 			if( preg_match( '#\s DISTINCT \s+ ([A-Za-z_]+)#six', $sql_count, $matches ) )
 			{ //
@@ -821,9 +821,9 @@ class Results extends Widget
 		// Make variable substitution for STRINGS:
 		$content = preg_replace( '#\$ (\w+) \$#ix', "'.format_to_output(\$row->$1).'", $content );
 		// Make variable substitution for URL STRINGS:
-		$content = preg_replace( '#\£ (\w+) \£#ix', "'.format_to_output(\$row->$1, 'urlencoded').'", $content );
+		$content = preg_replace( '#\Â£ (\w+) \Â£#ix', "'.format_to_output(\$row->$1, 'urlencoded').'", $content );
 		// Make variable substitution for escaped strings:
-		$content = preg_replace( '#² (\w+) ²#ix', "'.htmlentities(\$row->$1).'", $content );
+		$content = preg_replace( '#Â² (\w+) Â²#ix', "'.htmlentities(\$row->$1).'", $content );
 		// Make variable substitution for RAWS:
 		$content = preg_replace( '!\# (\w+) \#!ix', "\$row->$1", $content );
 		// Make variable substitution for full ROW:
@@ -831,7 +831,7 @@ class Results extends Widget
 		// Make callback function substitution:
 		$content = preg_replace( '#% (.+?) %#ix', "'.$1.'", $content );
 		// Sometimes we need embedded function call, so we provide a second sign:
-		$content = preg_replace( '#¤ (.+?) ¤#ix', "'.$1.'", $content );
+		$content = preg_replace( '#Â¤ (.+?) Â¤#ix', "'.$1.'", $content );
 
 		return $content;
 	}
@@ -1072,7 +1072,7 @@ class Results extends Widget
 			else
 			{ //inits the ranges inside the list
 				$range_display = '<option value="'.$min.'">'
-													.T_('Pages').' '.$min.' '.T_('to').' '.$max;
+					.T_('Pages').' '.$min.' '. /* TRANS: Pages x _to_ y */ T_('to').' '.$max;
 				$scroll = $scroll.$range_display;
 			}
 
@@ -1138,6 +1138,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.39  2005/11/23 22:48:50  blueyed
+ * minor (translation strings)
+ *
  * Revision 1.38  2005/11/21 20:37:39  fplanque
  * Finished RSS skins; turned old call files into stubs.
  *

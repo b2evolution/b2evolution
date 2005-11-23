@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * PROGIDISTRI grants François PLANQUE the right to license
+ * PROGIDISTRI grants FranÃ§ois PLANQUE the right to license
  * PROGIDISTRI's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -113,7 +113,7 @@ class ResultSel extends Results
 
 		// Presets a selection checkbox:
 		$this->cols[] = array(
-						'th' => T_('Sel'),
+						'th' => /* TRANS: abbr. for "Selection" */ T_('Sel'),
 						'td_start' => '<td class="firstcol shrinkwrap">',
 						'td' => '%selection_checkbox( #'.$field_ID.'#, \''.$param_prefix.'\' )%',
 					);
@@ -507,7 +507,7 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
  			if( empty($selection_name) )
 			{	// No name provided:
-				$Messages->add( T_('Please provide a selection name'), 'error' );
+				$Messages->add( T_('Please provide a selection name.'), 'error' );
 			}
 			else
 			{	// Update name:
@@ -520,10 +520,10 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 			if( preg_match( '#[0-9,]+#', $item_ID_list ) )
 			{ // check the format of the item list to avoid sql injection
 				$sql_delete = 'DELETE FROM '.$sel_table.' WHERE '.$sel_table_selection.' = '.$selection_ID
-											.' AND '.$sel_table_item.' IN ('.$item_ID_list.')'; // deletion of the former db entries
+				            .' AND '.$sel_table_item.' IN ('.$item_ID_list.')'; // deletion of the former db entries
 				$DB->query( $sql_delete );
 
-				$Messages->add( T_('Obsolete selection entries deleted'), 'success' );
+				$Messages->add( T_('Obsolete selection entries deleted.'), 'success' );
 			}
 
 			if( !empty( $items ) )
@@ -538,7 +538,7 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 				$sql_sel .= implode( $sel_array, ',' );
 				$DB->query( $sql_sel ); // insertion of the relation between selections and items in the database
 
-				$Messages->add( T_('New selections entries inserted'), 'success' );
+				$Messages->add( T_('New selections entries inserted.'), 'success' );
 			}
 
 			$DB->commit();
@@ -550,7 +550,7 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 			$sql_selections = 'INSERT INTO '.$selections_table.'('.$selections_table_name.
 												') VALUES( "'.$selection_name.'" )';
 			$DB->query( $sql_selections );
-			$Messages->add( T_('Selection copied'), 'success' );
+			$Messages->add( T_('Selection copied.'), 'success' );
 
 			$new_selection_ID = mysql_insert_id();// gets the new selection id
 
@@ -559,7 +559,7 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 								 .'SELECT '.$sel_table_item.', '.$new_selection_ID.' FROM '.$sel_table.' WHERE '
 												.$sel_table_selection.'='.$selection_ID;
 			$DB->query( $sql_sel );
-			$Messages->add( T_('Selection links copied'), 'success' );
+			$Messages->add( T_('Selection links copied.'), 'success' );
 
 			$selection_ID = $new_selection_ID;
 
@@ -607,11 +607,11 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 			{ // the deletion has been confirmed
 				$sql_sel = 'DELETE FROM '.$sel_table.' WHERE '.$sel_table_selection.'='.$selection_ID;
 				$DB->query( $sql_sel );// deletion of the links between the selection and the selected items
-				$Messages->add( T_('Selection attachments deleted'), 'success' );
+				$Messages->add( T_('Selection attachments deleted.'), 'success' );
 
 				$sql_selections = 'DELETE FROM '.$selections_table.' WHERE '.$selections_table_id.'='.$selection_ID;
 				$DB->query( $sql_selections );// deletion of the selection
-				$Messages->add( T_('Selection deleted'), 'success' );
+				$Messages->add( T_('Selection deleted.'), 'success' );
 			}
 
 			$selection_ID = -1;
@@ -629,6 +629,9 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
 /*
  * $Log$
+ * Revision 1.7  2005/11/23 22:48:50  blueyed
+ * minor (translation strings)
+ *
  * Revision 1.6  2005/11/18 21:01:21  fplanque
  * no message
  *

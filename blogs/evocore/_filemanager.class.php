@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants FranÃ§ois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -1023,7 +1023,7 @@ class FileManager extends Filelist
 		{
 			if( !$Settings->get( 'fm_enable_create_dir' ) )
 			{ // Directory creation is gloablly disabled:
-				$Messages->add( T_('Directory creation is disabled'), 'error' );
+				$Messages->add( T_('Directory creation is disabled.'), 'error' );
 				return false;
 			}
 		}
@@ -1031,7 +1031,7 @@ class FileManager extends Filelist
 		{
 			if( !$Settings->get( 'fm_enable_create_file' ) )
 			{ // File creation is gloablly disabled:
-				$Messages->add( T_('File creation is disabled'), 'error' );
+				$Messages->add( T_('File creation is disabled.'), 'error' );
 				return false;
 			}
 		}
@@ -1356,6 +1356,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.65  2005/11/23 22:51:34  blueyed
+ * minor (translation strings)
+ *
  * Revision 1.64  2005/11/22 04:41:39  blueyed
  * Fix permissions editing again
  *

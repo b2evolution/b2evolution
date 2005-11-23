@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants FranÃ§ois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -35,7 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE.
+ * @author fplanque: FranÃ§ois PLANQUE.
  *
  * @version $Id$
  */
@@ -55,11 +55,11 @@ function bytesreadable( $bytes )
 	if( !isset($types) )
 	{ // generate once:
 		$types = array(
-			0 => array( 'abbr' => T_('B.'), 'text' => T_('Bytes') ),
-			1 => array( 'abbr' => T_('KB'), 'text' => T_('Kilobytes') ),
-			2 => array( 'abbr' => T_('MB'), 'text' => T_('Megabytes') ),
-			3 => array( 'abbr' => T_('GB'), 'text' => T_('Gigabytes') ),
-			4 => array( 'abbr' => T_('TB'), 'text' => T_('Terabytes') )
+			0 => array( 'abbr' => /* TRANS: Abbr. for "Bytes" */ T_('B.'), 'text' => T_('Bytes') ),
+			1 => array( 'abbr' => /* TRANS: Abbr. for "Kilobytes" */ T_('KB'), 'text' => T_('Kilobytes') ),
+			2 => array( 'abbr' => /* TRANS: Abbr. for Megabytes */ T_('MB'), 'text' => T_('Megabytes') ),
+			3 => array( 'abbr' => /* TRANS: Abbr. for Gigabytes */ T_('GB'), 'text' => T_('Gigabytes') ),
+			4 => array( 'abbr' => /* TRANS: Abbr. for Terabytes */ T_('TB'), 'text' => T_('Terabytes') )
 		);
 	}
 
@@ -478,6 +478,9 @@ function validate_file_extension( $filename, & $extension )
 
 /*
  * $Log$
+ * Revision 1.34  2005/11/23 22:52:44  blueyed
+ * minor (translation strings)
+ *
  * Revision 1.33  2005/11/21 18:33:19  fplanque
  * Too many undiscussed changes all around: Massive rollback! :((
  * As said before, I am only taking CLEARLY labelled bugfixes.
