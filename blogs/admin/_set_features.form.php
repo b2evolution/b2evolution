@@ -7,10 +7,10 @@
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal
- * Halton STEWART grants François PLANQUE the right to license
+ * Halton STEWART grants FranÃ§ois PLANQUE the right to license
  * Halton STEWART's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants FranÃ§ois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -36,7 +36,7 @@ $Form->begin_form( 'fform', T_('Global Features') );
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
 $Form->begin_fieldset( T_('Online Help') . get_web_help_link('online help'));
-	$Form->checkbox_input( 'webhelp_enabled', $Settings->get('webhelp_enabled'), T_('Enable Online Help links'), array( 'note' => T_('Online help links provide context sensitive help to certain features.' ) ) );
+	$Form->checkbox_input( 'webhelp_enabled', $Settings->get('webhelp_enabled'), T_('Online Help links'), array( 'note' => T_('Online help links provide context sensitive help to certain features.' ) ) );
 $Form->end_fieldset();
 
 // --------------------------------------------
@@ -46,18 +46,18 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 		array( 'note' => T_('Check to enable the Blog by email feature.' ), 'onclick' => 'this.checked==true?document.getElementById("eblog_section").style.display="":document.getElementById("eblog_section").style.display="none";' ) );
 
 	echo '<div id="eblog_section" style="'.( $Settings->get('eblog_enabled') ? '' : 'display:none' ).'">';
-		$Form->select_input_array( 'eblog_method', array( 'pop3'=>T_('POP3'), 'pop3a'=>T_('POP3 (experimental)') ), T_('Email retrieval method'), array('value' => $Settings->get('eblog_method')) );
+		$Form->select_input_array( 'eblog_method', array( 'pop3'=>T_('POP3'), 'pop3a'=>T_('POP3 (experimental)') ), /* E-Mail retrieval method */ T_('Retrieval method'), array('value' => $Settings->get('eblog_method'), 'note' => T_('Choose a method to retrieve the emails.') ) );
 
-		$Form->text_input( 'eblog_server_host', $Settings->get('eblog_server_host'),40,T_('Mail Server'), array( 'maxlength' => 255, 'note' => T_('Hostname or IP Address of your incomming mail server.')  )  );
+		$Form->text_input( 'eblog_server_host', $Settings->get('eblog_server_host'),40,T_('Mail Server'), array( 'maxlength' => 255, 'note' => T_('Hostname or IP address of your incoming mail server.')  )  );
 
-		$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'),5,T_('Port Number'), array( 'maxlength' => 6, 'note' => T_('Port number of your incomming mail server (defaults pop3:110 imap:143).')  )  );
+		$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'),5,T_('Port Number'), array( 'maxlength' => 6, 'note' => T_('Port number of your incomming mail server (Defaults: pop3:110 imap:143).')  )  );
 
 		$Form->text_input( 'eblog_username', $Settings->get('eblog_username'),15,T_('Account Name'), array( 'maxlength' => 255, 'note' => T_('User name for authenticating to your mail server.')  )  );
 
 		$Form->password_input( 'eblog_password', $Settings->get('eblog_password'),15,T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating to your mail server.')  )  );
 
 		//TODO: have a drop down list of available blogs and categories
-		$Form->text_input( 'eblog_default_category', $Settings->get('eblog_default_category'),5,T_('Default Category'), array( 'maxlength' => 6, 'note' => T_('By default email blogs will have this category.')  )  );
+		$Form->text_input( 'eblog_default_category', $Settings->get('eblog_default_category'),5,T_('Default Category'), array( 'maxlength' => 6, 'note' => T_('By default blogged emails will have this category.')  )  );
 
 		$Form->text_input( 'eblog_subject_prefix', $Settings->get('eblog_subject_prefix'),15,T_('Subject Prefix'), array( 'maxlength' => 255, 'note' => T_('Email subject must start with this prefix to be imported.')  )  );
 
@@ -77,7 +77,7 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 
 		// TODO: provide Non-JS functionality
 		echo '<div id="eblog_section_more" style="display:none">';
-			$Form->text_input( 'eblog_body_terminator', $Settings->get('eblog_body_terminator'), 15, T_('Body Terminator'), array( 'maxlength' => 255, 'note' => T_('starting from this string, everything will be ignored, including this string.')  )  );
+			$Form->text_input( 'eblog_body_terminator', $Settings->get('eblog_body_terminator'), 15, T_('Body Terminator'), array( 'maxlength' => 255, 'note' => T_('Starting from this string, everything will be ignored, including this string.')  )  );
 
 			$Form->checkbox_input( 'eblog_test_mode', $Settings->get('eblog_test_mode'), T_('Test Mode'), array( 'note' => T_('Check to run Blog by Email in test mode.' ) ) );
 
@@ -94,16 +94,16 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Hit logging') . get_web_help_link('Hit logging') );
-	$Form->checkbox_input( 'hit_doublecheck_referer', $Settings->get('hit_doublecheck_referer'), T_('Double-check Referer'), array( 'note' => 'Activating this will search the requested (your) URL in the content of the referring page. This is against referer spam, but creates additional webserver traffic.' ) );
+	$Form->checkbox_input( 'hit_doublecheck_referer', $Settings->get('hit_doublecheck_referer'), T_('Double-check Referer'), array( 'note' => T_('Activating this will search the requested (your) URL in the content of the referring page. This is against referer spam, but creates additional webserver traffic.') ) );
 	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Autoprune stats after'),
-		array( 'note' => 'days. (0 to disable) How many days of stats do you want to keep in the database?' ) );
+		array( 'note' => T_('days. (0 to disable) How many days of stats do you want to keep in the database?') ) );
 $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Sessions') . get_web_help_link('Sessions') );
 	// TODO: enhance UI with a general Form method
 	$Form->text_input( 'timeout_sessions', $Settings->get('timeout_sessions'), 9, T_('Session timeout'),
-		array( 'note' => 'seconds. How long can a user stay inactive before automatic logout?' ) );
+		array( 'note' => T_('seconds. How long can a user stay inactive before automatic logout?') ) );
 $Form->end_fieldset();
 
 
