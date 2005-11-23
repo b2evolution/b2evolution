@@ -32,6 +32,10 @@
  * @author blueyed: Daniel HAHLER
  * @author gorgeb
  *
+ * @todo blueyed>> IMHO it's not good to use CSS class .line here (mainly white-space:nowrap),
+ *                 because on a smaller screen you'll cut things off! (and not every browser
+ *                 allows "marking and moving" of text then).
+ *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -83,8 +87,8 @@ $AdminUI->disp_payload_begin();
 
 
 $Form = & new Form( $form_action, 'post', 'post', 'none' );
-$Form->fieldstart = '<span class="line">';
-$Form->fieldend = '</span>';
+$Form->fieldstart = '<div class="line">';
+$Form->fieldend = '</div>';
 $Form->labelstart = '<strong>';
 $Form->labelend = "</strong>\n";
 
@@ -113,11 +117,18 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Post contents') );
 
-	$Form->text( 'post_title', $post_title, 48, T_('Title'), '', 255 );
+	$Form->text( 'post_title', $post_title, 42, T_('Title'), '', 255 );
+
+	echo ' '; // allow wrapping here! (and below)
+	          // blueyed>> (Opera would additionally need text/&nbsp; here, but that wraps ugly)
 
 	$Form->select( 'post_locale', $post_locale, 'locale_options_return', T_('Language') );
 
+	echo ' ';
+
 	$Form->select_object( 'item_typ_ID', $edited_Item->typ_ID, $itemTypeCache, T_('Type') );
+
+	echo ' ';
 
 	if( $use_post_url )
 	{
@@ -138,8 +149,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
 	$Form->textarea( 'content', $content, 16, '', '', 40 , '' );
-	$Form->fieldstart = '<span class="line">';
-	$Form->fieldend = '</span>';
+	$Form->fieldstart = '<div class="line">';
+	$Form->fieldend = '</div>';
 	?>
 	<script type="text/javascript" language="JavaScript">
 		<!--
@@ -169,12 +180,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	if( $Settings->get( 'fm_enabled' ) )
 	{ // ---------- UPLOAD ----------
 		echo '<input type="button" value="Files" class="ActionButton"
-						onclick="pop_up_window( \'files.php?mode=upload\', \'fileman_upload\' );"> ';
+						onclick="pop_up_window( \'files.php?mode=upload\', \'fileman_upload\' );" /> ';
 
 		if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
 		{
 			echo '<input type="button" value="Upload" class="ActionButton"
-							onclick="pop_up_window( \'files.php?mode=upload&amp;fm_mode=file_upload\', \'fileman_upload\' );"> ';
+							onclick="pop_up_window( \'files.php?mode=upload&amp;fm_mode=file_upload\', \'fileman_upload\' );" /> ';
 		}
 	}
 
@@ -198,10 +209,11 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		{ // If not checked, create time will be used...
 			$Form->checkbox( 'edit_date', 0, '', T_('Edit') );
 		}
+		echo ' '; // allow wrapping!
 	}
 
-	$Form->text( 'post_urltitle', $post_urltitle, 40, T_('URL Title'),
-							 T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
+	$Form->text( 'post_urltitle', $post_urltitle, 30, T_('URL Title'),
+	             T_('(to be used in permalinks)'), $field_maxlength = 50 ) ;
 
 	$Form->end_fieldset();
 
@@ -213,12 +225,15 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->select_options( 'item_st_ID',
 												$itemStatusCache->option_list_return( $edited_Item->st_ID, ! $edited_Item->st_required ),
 												 T_('Task status') );
+	echo ' '; // allow wrapping!
 
 	$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
 												'', false, '', 'get_assigned_user_options' );
+	echo ' '; // allow wrapping!
 
 	$Form->select_object( 'item_priority', NULL, $edited_Item, T_('Priority'),
 												'', false, '', 'priority_options' );
+	echo ' '; // allow wrapping!
 
 	$Form->date( 'item_deadline', $edited_Item->get('deadline'), T_('Deadline') );
 
@@ -355,8 +370,12 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
- * Revision 1.34  2005/11/21 18:30:42  fplanque
- * no message
+ * Revision 1.35  2005/11/23 04:01:08  blueyed
+ * Using div.line with whitespace between elements that are allowed to wrap fixes the issues with Konqueror/Safari in b2edit. It also makes it xhtml valid.
+ * Still, using "white-space:nowrap" is not good IMHO. It's better to have a note wrap around than not being able to read it..
+ *
+ * Revision 1.32  2005/11/20 03:55:39  blueyed
+ * Closing input tags
  *
  * Revision 1.31  2005/10/28 20:08:46  blueyed
  * Normalized AdminUI

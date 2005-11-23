@@ -47,13 +47,19 @@ fieldset.extracats div.extracats /* We'll need at least the same "deepness" as f
 	display: none;
 	color: #f00;
 }
+div.line,
 span.line
 {
 	white-space: normal;
 	display: block;
-	
 }
-span.line input
+/* blueyed>> this is ugly IMHO
+	- in Firefox the checkbox/radio is stretched;
+	- Konqueror does not make it wider (ok)
+	- Opera does also no stretching, but centers it
+	Is this really wanted?
+	The above alone is fine, IMHO - and does not consume two lines (label and input).line input
 {
 	width: 98%;
 }
+*/
