@@ -28,7 +28,7 @@
  * @package plugins
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author fplanque: Franï¿½is PLANQUE - {@link http://fplanque.net/}
  *
  * @version $Id$
  */
@@ -62,7 +62,7 @@ class categories_plugin extends Plugin
 	 */
 	function categories_plugin()
 	{
-		$this->short_desc = T_('This skin tag displays the list of avilable categories for the blog.');
+		$this->short_desc = T_('This skin tag displays the list of available categories for the blog.');
 		$this->long_desc = T_('Categories are indeed chapters and sub-chapters in the blog.');
 
  		$this->dbtable = 'T_posts';
@@ -222,7 +222,7 @@ class categories_plugin extends Plugin
 		if( $params['form'] )
 		{	// We want to add form fields:
 		?>
-			<span class="line">
+			<span class="line"> <?php /* blueyed>> using div.line here makes them "blocks" in Konqueror/Safari(?) */ ?>
 				<input type="radio" name="cat" value="" id="catANY" class="radio" <?php if( $cat_modifier != '-' && $cat_modifier != '*' ) echo 'checked="checked" '?> />
 				<label for="catANY"><?php echo T_('ANY') ?></label>
 			</span>
@@ -237,7 +237,7 @@ class categories_plugin extends Plugin
 		<?php
 		}
 
- 		echo $params['block_end'];
+		echo $params['block_end'];
 
 		return true;
 	}
