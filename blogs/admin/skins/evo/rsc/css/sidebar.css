@@ -34,7 +34,7 @@ fieldset.extracats {
 	margin: 1ex;
 	overflow: visible;
 }
-div.extracats
+fieldset.extracats div.extracats /* We'll need at least the same "deepness" as for the skin's general CSS to override */
 {
 	height: auto;
 	overflow: visible;
