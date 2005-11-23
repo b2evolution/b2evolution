@@ -128,6 +128,7 @@ echo '<div class="browse_side_item">';
 			<input type="checkbox" name="exact" value="1" id="exact" class="checkbox" <?php if( $exact ) echo 'checked="checked" '?> />
 			<label for="exact"><?php echo T_('Exact match') ?></label>
 		</span>
+
 		<?php
 		$Form->end_fieldset();
 
@@ -151,7 +152,7 @@ echo '<div class="browse_side_item">';
 				'block_start'=>'<fieldset>',
 				'block_end'=>"</fieldset>\n",
 				'title'=>'<legend>'.T_('Categories')."</legend>\n",
-        'collist_start'=>'<ul>',
+				'collist_start'=>'<ul>',
 				'collist_end'=>"</ul>\n",
 				'coll_start'=>'<li><strong>',
 				'coll_end'=>"</strong></li>\n",
@@ -174,7 +175,7 @@ echo '<div class="browse_side_item">';
 			{
 				echo '<li><input type="radio" name="author" value="'.$loop_Obj->ID.'" class="radio"';
 				if( $loop_Obj->ID == $author ) echo ' checked="checked"';
-				echo '> <a href="'.regenerate_url( 'author', 'author='.$loop_Obj->ID, $pagenow ).'">';
+				echo ' /> <a href="'.regenerate_url( 'author', 'author='.$loop_Obj->ID, $pagenow ).'">';
 				$loop_Obj->preferred_name();
 				echo '</a></li>';
 			}
@@ -192,6 +193,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.17  2005/11/23 02:22:41  blueyed
+ * Closing input (valid xhtml)
+ *
  * Revision 1.16  2005/09/29 15:07:29  fplanque
  * spelling
  *
