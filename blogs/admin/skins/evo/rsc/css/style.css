@@ -264,7 +264,7 @@ table.grouped th a.basic_sort_link:hover {
 
 
 /*
- * Page layout: 
+ * Page layout:
  */
 #header {
 	font-size:85%;
@@ -401,6 +401,8 @@ div.panelblock {
 #mainmenu li.parent{
 	border: 1px solid #00b;
 	background: #f0f0f0;
+}
+#mainmenu li.parent{ /* highlight parent. Using thin on :hover makes the menu wobbly if it wraps on bold (Firefox) */
 	font-weight: bold;
 }
 #mainmenu li.parent ul.submenu li {
