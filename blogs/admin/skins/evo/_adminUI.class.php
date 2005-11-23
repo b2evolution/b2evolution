@@ -70,7 +70,7 @@ class AdminUI extends AdminUI_general
 
 		if( $mode == 'sidebar' )
 		{ // Include CSS overrides for sidebar:
-			$this->headlinnes[] = '<link href="skins/evo/rsc/css/sidebar.css" rel="stylesheet" type="text/css" />';
+			$this->headlines[] = '<link href="skins/evo/rsc/css/sidebar.css" rel="stylesheet" type="text/css" />';
 		}
 
 		return parent::get_headlines();
