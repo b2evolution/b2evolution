@@ -104,7 +104,7 @@ echo '<th>'.T_('Status')."</th>\n";
 echo '<th>'.T_('Title')."</th>\n";
 if( $Blog->allowcomments != 'never' )
 { // TODO: will fail for Blog ID 1 (all blogs) -> build table body and remember if any post allows comments.
-	echo '<th>'.T_('Com.')."</th>\n";
+	echo '<th>'./* TRANS: abbr. for "comments allowed" */ T_('Com.')."</th>\n";
 }
 if( $Blog->ID == 1 )
 { // "All blogs": display name of blog
@@ -212,6 +212,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.15  2005/11/24 20:23:37  blueyed
+ * minor (translation)
+ *
  * Revision 1.14  2005/09/29 15:07:29  fplanque
  * spelling
  *
