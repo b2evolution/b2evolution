@@ -451,7 +451,7 @@ class Blog extends DataObject
 			case 'staticfilepath':
 				return $basepath.$this->siteurl.$this->staticfilename;
 
-			case 'siteurl': // TODO: This was and should be 'baseurl'
+			case 'baseurl':
 				if( preg_match( '#^https?://#', $this->siteurl ) )
 				{ // We have a specific URL for this blog:
 					return $this->siteurl;
@@ -465,10 +465,6 @@ class Blog extends DataObject
 					}
 					return $r;
 				}
-
-			case 'baseurl': // TODO: Remove this!? global $baseurl has nothing to do with the Blog's base url.
-        // Marian moved previous code to case 'siteurl'
-				return $baseurl;
 
 			case 'basehost':
 				$baseurl = $this->get('baseurl');
@@ -747,6 +743,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2005/11/24 18:12:20  blueyed
+ * old 'siteurl'/'baseurl' behaviour
+ *
  * Revision 1.42  2005/11/24 16:52:59  blueyed
  * getMediaDir(): non-absolute paths are not used;
  * Blog::get(): fix cookie_domain for hosts without dots; doc; todo to fix 'baseurl'/'siteurl' issues
