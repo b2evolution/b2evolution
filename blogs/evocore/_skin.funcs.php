@@ -56,7 +56,7 @@ function skinbase()
 	}
 	else
 	{ // No skin used:
-		if( isset( $blog ) && $blog > 0 )
+		if( !empty( $blog ) )
 		{
 			bloginfo( 'baseurl', 'raw' );
 		}
@@ -211,6 +211,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.8  2005/11/24 16:51:08  blueyed
+ * minor
+ *
  * Revision 1.7  2005/11/18 22:26:07  blueyed
  * skin_exists(): check for readable filename (_main.php by default), instead of is_dir()
  *
