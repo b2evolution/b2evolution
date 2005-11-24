@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de-DE" lang="de-DE">
 <head>
 	
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <title>b2evo Paket: Upgraden von einer älteren b2evolution-Version</title>
 <link href="../blogs/rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
 	
@@ -54,9 +54,9 @@
 <h1>Upgraden von einer älteren b2evolution-Version</h1>
 <p>Bevor du anfängst beachte bitte, dass einige Netzwerk-Funktionen von b2evolution voraussetzen, dass du den einfachen <a href="http://b2evolution.net/about/terms.html">Servicebedingungen</a> zustimmst.</p>
 <ol class="expanded">
-	<li>Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, hacks, third party plugins, etc...</li>
+	<li>Sichere alle Deine b2evolution Dateien. Beachte besonders die Dateien, die du modifiziert hast, einschliesslich /conf, Skins, Blog-Templates (Vorlagen), Stub-Dateien, Hacks, Plugins von Drittanbietern, etc...</li>
 	<li>Du solltest ausserdem deine Datenbank sichern, falls du kannst. Diese Funktionalität sollte von deinem Host angeboten werden.</li>
-	<li>Delete <strong>all your existing b2evolution files from your site</strong> before uploading the new ones! Some of the old files may not be compatible with this new version and will cause it to fail! This will also ensure you don't keep unnecessary files on your server after upgrading. Plus, it's better for security. </li>
+	<li>Lösche <strong>alle vorhandenen b2evolution-Dateien von Deiner Site</strong>, bevor du die neuen hochlädst! Einige der alten Dateien könnten nicht kompatibel zu dieser Version sein und Fehler provozieren! So ist ausserdem sichergestellt, dass du keine unnötigen Dateien nach dem Upgrade auf dem Server hast. Ausserdem ist es besser für die Sicherheit. </li>
 <li>Lade <strong>alle neuen b2evolution Dateien aus dem /blogs-Ordner</strong> auf deine Seite hoch. Wir können es nicht genug betonen: <strong>ALLE DATEIEN</strong>! Und das heisst, du kannst keine Dateien weiterverwenden (auch nicht /conf, Skins, Blog-Templates (Vorlagen), Stub-Dateien, etc)!  Du musst diese (neuen) Dateien nach dem Upload nochmals anpassen.<br /><br />Es tut uns leid, aber durch den Fortschritt der Entwicklung und dem Hinzufügen von neuen Funktionen können wir nicht garantieren, dass irgendetwas funktioniert, wenn du älteren Dateien übernimmst. <strong>Jedoch</strong>, da du die Dateien in Schritt 1 gesichert hast, kannst du versuchen, sie teilweise wiederzuverwenden, nachdem der Upgrade-Prozess beendet ist. Siehe  dazu Schritt 8.</li>
 	<li>Starte das Installations-Skript auf deinem Server. Es befindet sich in <code>http://deineseite.de/deinblogsordner/install</code>. Dann folge einfach den Anweisungen dort.<br /> <br /> Der Installer wird dich nach ein paar grundlegenden Einstellungen fragen (falls du nicht schon die Datei /conf/_config.php vor dem Hochladen angepasst hast) und dich dann das Datenbank-Upgrade zur aktuellen Version durchführen lassen.</li>
 	<li>Überprüfe, ob die neue Installation funktioniert.</li>
