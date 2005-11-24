@@ -932,7 +932,7 @@ class File extends DataObject
 
 		// Memorize new filepath:
 		// blueyed>> couldn't we use $FileCache, after handling meta data ?
-		// fplanque>> I don't understand what you mean
+		// blueyed>> In general, $this = & $FileCache->get_by_root_and_path( $root_type, $root_ID, $rdfp_rel_path, true );
 		$this->_root_type = $root_type;
 		$this->_root_ID = $root_ID;
 		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
@@ -1215,6 +1215,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2005/11/24 08:43:34  blueyed
+ * doc
+ *
  * Revision 1.50  2005/11/22 13:43:33  fplanque
  * doc
  *

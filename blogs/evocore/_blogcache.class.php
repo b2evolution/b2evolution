@@ -153,6 +153,9 @@ class BlogCache extends DataObjectCache
 	/**
 	 * Load blogs of a user.
 	 *
+	 * @todo make a UNION query when we upgrade to MySQL 4
+	 * @todo Use cache!
+	 *
 	 * @param string criterion: 'member' (default), 'browse'
 	 * @param integer user ID
 	 * @return array The blog IDs
@@ -238,6 +241,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.16  2005/11/24 08:43:11  blueyed
+ * doc
+ *
  * Revision 1.15  2005/11/22 23:46:10  blueyed
  * load_user_blogs(): we have to consider T_coll_group_perms also!
  *
