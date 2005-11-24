@@ -87,8 +87,8 @@ $AdminUI->disp_payload_begin();
 
 
 $Form = & new Form( $form_action, 'post', 'post', 'none' );
-$Form->fieldstart = '<div class="line">';
-$Form->fieldend = '</div>';
+$Form->fieldstart = '<span class="line">';
+$Form->fieldend = '</span>';
 $Form->labelstart = '<strong>';
 $Form->labelend = "</strong>\n";
 
@@ -149,8 +149,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
 	$Form->textarea( 'content', $content, 16, '', '', 40 , '' );
-	$Form->fieldstart = '<div class="line">';
-	$Form->fieldend = '</div>';
+	$Form->fieldstart = '<span class="line">';
+	$Form->fieldend = '</span>';
 	?>
 	<script type="text/javascript" language="JavaScript">
 		<!--
@@ -373,6 +373,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.38  2005/11/24 01:07:11  blueyed
+ * simply using span.line again.
+ *
  * Revision 1.37  2005/11/23 17:29:19  fplanque
  * no message
  *

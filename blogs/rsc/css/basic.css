@@ -31,10 +31,6 @@ code {
 {
 	white-space: nowrap;
 }
-div.line {
-	display:inline;
-	white-space: nowrap;
-}
 .left {
 	text-align: left;
 }

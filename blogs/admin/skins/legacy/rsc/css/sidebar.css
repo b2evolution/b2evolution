@@ -47,8 +47,7 @@ fieldset.extracats div.extracats /* We'll need at least the same depth as for th
 	display: none;
 	color: #f00;
 }
-div.line,
-span.line
+.line
 {
 	white-space: normal;
 	display: block;
