@@ -273,7 +273,8 @@ while( $lFile = & $Fileman->get_next() )
 
 	if( $countFiles%2 ) echo ' class="odd"';
 
-	echo ' onclick="document.getElementById(\'cb_filename_'.$countFiles.'\').click();">';
+	// select the file by default, when clicking on the <tr>; this gets "undone" for the checkbox itself and the filename link
+	echo ' onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">';
 
 	/*
 	 * Checkbox:
@@ -281,7 +282,7 @@ while( $lFile = & $Fileman->get_next() )
 	echo '<td class="checkbox firstcol">';
 	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"
-				onclick="this.click();"';
+				onclick="this.checked = ! this.checked;"'; // undo the <tr>'s onclick checking of this box
 	if( $checkall || $Fileman->isSelected( $lFile ) )
 	{
 		echo ' checked="checked"';
@@ -363,7 +364,7 @@ while( $lFile = & $Fileman->get_next() )
 	/*
 	 * Filename:
 	 */
-	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" onclick="document.getElementById(\'cb_filename_'.$countFiles.'\').click();">';
+	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">';
 	/*
 	if( $Fileman->flatmode && $Fileman->get_sort_order() != 'name' )
 	{	// Display directory name
@@ -623,6 +624,8 @@ if( $countFiles )
 
 		/**
 		 * Textarea insertion code
+		 *
+		 * TODO: make this a generic b2evo function. The quicktags plugin also uses it.
 		 */
 		function textarea_replace_selection( myField, snippet )
 		{
@@ -638,10 +641,24 @@ if( $countFiles )
 				var startPos = myField.selectionStart;
 				var endPos = myField.selectionEnd;
 				var cursorPos;
+				var scrollTop, scrollLeft;
+				if( myField.type == 'textarea' && typeof myField.scrollTop != 'undefined' )
+				{ // remember old position
+					scrollTop = myField.scrollTop;
+					scrollLeft = myField.scrollLeft;
+				}
+
 				myField.value = myField.value.substring(0, startPos)
-												+ snippet
-												+ myField.value.substring(endPos, myField.value.length);
+				                + snippet
+				                + myField.value.substring(endPos, myField.value.length);
 				cursorPos = startPos+snippet.length;
+
+				if( typeof scrollTop != 'undefined' )
+				{ // scroll to old position
+					myField.scrollTop = scrollTop;
+					myField.scrollLeft = scrollLeft;
+				}
+
 				myField.focus();
 				myField.selectionStart = cursorPos;
 				myField.selectionEnd = cursorPos;
@@ -843,6 +860,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.55  2005/11/24 18:33:04  blueyed
+ * Konqueror (Safari?) and Firefox fixes
+ *
  * Revision 1.54  2005/11/24 08:53:59  blueyed
  * file_cmr is deprecated
  *
