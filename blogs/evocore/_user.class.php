@@ -276,7 +276,7 @@ class User extends DataObject
 		$userdir = $basepath.$media_subdir.'users/'.$this->login.'/';
 		if( !is_dir( $userdir ) )
 		{
-			if( !mkdir( $userdir ) )
+			if( !@mkdir( $userdir ) )
 			{ // add error
 				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; could not be created."), $userdir ), 'error' );
 				return false;
@@ -928,6 +928,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.52  2005/11/24 15:12:44  blueyed
+ * Suppress notices/warnings on mkdir() for the user's directory.
+ *
  * Revision 1.51  2005/11/18 01:36:36  blueyed
  * Display permissions of created media dirs right.
  *
