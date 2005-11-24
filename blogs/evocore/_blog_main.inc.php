@@ -150,6 +150,7 @@ if( $resolve_extra_path )
 	// Check and Remove blog baseurl from ReqPath:
 	// if Blog is installed on separate domain
 	// use this domain setting as base for the actual path
+	// TODO: $Blog->get( 'siteurl' ) always returns something now!
 	if( $Blog->get( 'siteurl' ) )
 	{
 		$blog_baseurl = substr( $Blog->get( 'siteurl' ), strlen( $baseurlroot ) );
@@ -417,6 +418,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.34  2005/11/24 16:53:45  blueyed
+ * todo about 'siteurl'/'baseurl' issue
+ *
  * Revision 1.33  2005/11/21 21:39:29  fplanque
  * no message
  *
