@@ -112,6 +112,14 @@ $Timer = & new Timer('main');
  * Load base + advanced configuration:
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
+
+
+/**
+ * Sets various arrays and vars, also $app_name!
+ */
+require_once dirname(__FILE__).'/_vars.inc.php';
+
+
 if( !$config_is_done )
 { // base config is not done!
 	$error_message = 'Base configuration is not done! (see /conf/_config.php)';
@@ -129,12 +137,6 @@ if( !$debug )
 {
 	$Debuglog = & new Log_noop( 'note' );
 }
-
-
-/**
- * Sets various arrays and vars
- */
-require_once dirname(__FILE__).'/_vars.inc.php';
 
 
 /**
@@ -480,6 +482,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.68  2005/11/24 00:28:18  blueyed
+ * Include _vars.inc.php before _conf_error.inc.php!
+ *
  * Revision 1.67  2005/11/18 22:28:30  blueyed
  * Fix case for FileCache
  *
