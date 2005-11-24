@@ -125,7 +125,7 @@ class ItemCache extends DataObjectCache
 	 */
 	function load_urltitle_array( $req_array )
 	{
-		global $DB;
+		global $DB, $Debuglog;
 
 		$req_list = "'".implode( "','", $req_array)."'";
 		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache" );
@@ -159,6 +159,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.11  2005/11/24 14:30:38  blueyed
+ * Fatal error fixed (missing global $Debuglog)
+ *
  * Revision 1.10  2005/10/03 18:10:07  fplanque
  * renamed post_ID field
  *
