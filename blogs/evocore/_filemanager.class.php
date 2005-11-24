@@ -118,6 +118,7 @@ class FileManager extends Filelist
 	/**
 	 * Default perms for files
 	 * @todo move to user options
+	 * @deprecated in post-phoenix
 	 * @access protected
 	 */
 	var $_default_chmod_file = 664;
@@ -125,9 +126,10 @@ class FileManager extends Filelist
 	/**
 	 * Default perms for dirs
 	 * @todo move to user options
+	 * @deprecated in post-phoenix
 	 * @access protected
 	 */
-	var $_default_chmod_dir = 664;
+	var $_default_chmod_dir = 775;
 
 	/**
 	 * Evo Display mode (upload, bookmarklet, etc..)
@@ -1356,6 +1358,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.67  2005/11/24 17:57:02  blueyed
+ * fix default perms for dirs, doc
+ *
  * Revision 1.66  2005/11/23 23:54:45  blueyed
  * Sorry, encoding messed up (latin1 again).
  *
