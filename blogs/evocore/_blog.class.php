@@ -390,20 +390,14 @@ class Blog extends DataObject
 	{
 		global $xmlsrv_url, $admin_email, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
 
-		/*
-		blueyed>> This gets not used (anymore?)!
-		if( !empty($this->siteurl) )
-		{
-			$rss_url =  $this->siteurl;
-		}
-		*/
-
 		switch( $parname )
 		{
-			case 'mediadir': // the path to the blog's media directory
+			case 'mediadir':
+				// the path to the blog's media directory:
 				return $this->getMediaDir(); // this takes care of the 'fm_enable_roots_blog' setting
 
-			case 'mediaurl': // the URL to the blog's media directory
+			case 'mediaurl':
+				// the URL to the blog's media directory:
 				if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 				{ // User directories are disabled:
 					$Debuglog->add( 'Attempt to access blog media URL, but this feature is disabled', 'files' );
@@ -743,6 +737,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2005/11/24 19:56:10  fplanque
+ * no message
+ *
  * Revision 1.43  2005/11/24 18:12:20  blueyed
  * old 'siteurl'/'baseurl' behaviour
  *
