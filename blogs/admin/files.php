@@ -974,6 +974,7 @@ switch( $Fileman->fm_mode )
 			// fp>> I don't really understand this (probably missing a verb) but I do think that extending the Fileman object is not the right direction to go on the long term
 			// blueyed>> Tried to make it clearer. If it wasn't a Filemanager method, it has to be a function or
 			//   a method of the File class. IMHO it should be a method of the (to be killed) Filemanager object.
+			// fp>> Okay. It should *definitely* be a method of the File object and we should ask for ONE file at a time. Any question about 'where is the file?' (what/where/when/who, etc) should be asked to the File object itself.
 		*/
 
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
@@ -1306,6 +1307,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.136  2005/11/24 14:43:59  fplanque
+ * no message
+ *
  * Revision 1.135  2005/11/24 13:23:57  blueyed
  * debug_die() for invalid action (only if actionArray given [and invalid])
  *

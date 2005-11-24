@@ -57,7 +57,7 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 		$Form->password_input( 'eblog_password', $Settings->get('eblog_password'),15,T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating to your mail server.')  )  );
 
 		//TODO: have a drop down list of available blogs and categories
-		$Form->text_input( 'eblog_default_category', $Settings->get('eblog_default_category'),5,T_('Default Category'), array( 'maxlength' => 6, 'note' => T_('By default blogged emails will have this category.')  )  );
+		$Form->text_input( 'eblog_default_category', $Settings->get('eblog_default_category'),5,T_('Default Category'), array( 'maxlength' => 6, 'note' => T_('By default emailed posts will have this category.')  )  );
 
 		$Form->text_input( 'eblog_subject_prefix', $Settings->get('eblog_subject_prefix'),15,T_('Subject Prefix'), array( 'maxlength' => 255, 'note' => T_('Email subject must start with this prefix to be imported.')  )  );
 

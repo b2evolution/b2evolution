@@ -40,8 +40,9 @@ $AdminUI->disp_payload_begin();
 
 if( $demo_mode )
 { // Prevent users from killing access to the demo...
-	$allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' ) || $user_profile_only )
-											&& $edited_User->login != 'admin'
+	// PLease document this change (when do I need the extra condition?):	$allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' ) || $user_profile_only )
+	$allowed_to_edit = $current_User->check_perm( 'users', 'edit' )
+											&& $edited_User->ID != 1			// User number 1 is the global admin, even if he's renamed.
 											&& $edited_User->login != 'demouser';
 }
 else
@@ -209,6 +210,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.73  2005/11/24 14:43:59  fplanque
+ * no message
+ *
  * Revision 1.72  2005/11/24 00:45:39  blueyed
  * demo_mode: allow the user to edit his profile, if not admin or demouser. This should work in post-phoenix already.
  *

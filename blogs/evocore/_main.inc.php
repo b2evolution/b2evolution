@@ -116,6 +116,8 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 /**
  * Sets various arrays and vars, also $app_name!
+ *
+ * Needed before the error messages.
  */
 require_once dirname(__FILE__).'/_vars.inc.php';
 
@@ -482,6 +484,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.69  2005/11/24 14:43:59  fplanque
+ * no message
+ *
  * Revision 1.68  2005/11/24 00:28:18  blueyed
  * Include _vars.inc.php before _conf_error.inc.php!
  *
