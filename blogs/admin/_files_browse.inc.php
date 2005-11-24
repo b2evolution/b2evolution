@@ -556,12 +556,12 @@ else
 			*/
 
 	/* Not fully functional
-		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
+		<input class="ActionButton" type="image" name="actionArray[file_copy]"
 			title="<?php echo T_('Copy the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
 			src="<?php echo get_icon( 'file_copy', 'url' ); ?>" />
 
-		<input class="ActionButton" type="image" name="actionArray[file_cmr]"
+		<input class="ActionButton" type="image" name="actionArray[file_move]"
 			title="<?php echo T_('Move the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
 			src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
@@ -843,6 +843,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.54  2005/11/24 08:53:59  blueyed
+ * file_cmr is deprecated
+ *
  * Revision 1.53  2005/11/22 04:41:38  blueyed
  * Fix permissions editing again
  *
