@@ -40,8 +40,8 @@ $AdminUI->disp_payload_begin();
 
 if( $demo_mode )
 { // Prevent users from killing access to the demo...
-	$allowed_to_edit = $current_User->check_perm( 'users', 'edit' )
-											&& $edited_User->ID != 1
+	$allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' ) || $user_profile_only )
+											&& $edited_User->login != 'admin'
 											&& $edited_User->login != 'demouser';
 }
 else
@@ -50,12 +50,6 @@ else
 												|| ($user_profile_only && $edited_User->ID == $current_User->ID) );
 }
 
-/*
- * fplanque>>blueyed: Daniel I am removing the user switch code because it doesn't fit in
- * with the rest of the app (planned move to Widget/Results class), creates extra DB requests and
- * most of all, assumes that users are sorted by ID which obviously won't be the case on
- * large user bases. I hope you won't mind...
- */
 
 $Form = & new Form( 'b2users.php', 'form' );
 
@@ -215,6 +209,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.72  2005/11/24 00:45:39  blueyed
+ * demo_mode: allow the user to edit his profile, if not admin or demouser. This should work in post-phoenix already.
+ *
  * Revision 1.71  2005/11/04 14:10:48  blueyed
  * Use value from $Request for edited_user_admin_skin to display in the form (in case of errors with other fields)
  *
