@@ -242,26 +242,35 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				 *
 				 * @param string the form name
 				 * @param string the checkbox(es) element(s) name
+				 * @param string number/name of the checkall set
 				 */ ?>
-				function toggleCheckboxes(the_form, the_elements)
+				function toggleCheckboxes(the_form, the_elements, nr)
 				{
-					if( allchecked[0] ) allchecked[0] = false;
-					else allchecked[0] = true;
+					if( typeof nr == 'undefined' )
+					{
+						nr = 0;
+					}
+					if( allchecked[nr] ) allchecked[nr] = false;
+					else allchecked[nr] = true;
 
 					var elems = document.forms[the_form].elements[the_elements];
+					if( !elems )
+					{
+						return;
+					}
 					var elems_cnt = (typeof(elems.length) != 'undefined') ? elems.length : 0;
 					if (elems_cnt)
 					{
 						for (var i = 0; i < elems_cnt; i++)
 						{
-							elems[i].checked = allchecked[0];
+							elems[i].checked = allchecked[nr];
 						} // end for
 					}
 					else
 					{
-						elems.checked = allchecked[0];
+						elems.checked = allchecked[nr];
 					}
-					setcheckallspan(0);
+					setcheckallspan( nr );
 				}
 				<?php // }}}
 				break;
