@@ -100,15 +100,15 @@ switch( $action )
 												WHERE hit_referer LIKE '.$DB->quote('%'.$keyword.'%'),
 												'Delete all banned hit-log entries' );
 
-			$Messages->add( sprintf( T_('Deleted %d log hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'note' );
+			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'note' );
 		}
 
 		if( $delcomments )
 		{ // Then all banned comments
 			$r = $DB->query('DELETE FROM T_comments
-												WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
-													 OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
-					      				   OR comment_content LIKE '.$DB->quote('%'.$keyword.'%') );
+			                  WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
+			                     OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
+			                     OR comment_content LIKE '.$DB->quote('%'.$keyword.'%') );
 			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'note' );
 		}
 
@@ -197,7 +197,7 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 
 		<?php
 		// Check for junk:
-		// Check for potentially affected log hits:
+		// Check for potentially affected logged hits:
 		$sql = 'SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime) as hit_datetime, hit_uri, hit_referer, dom_name,
 										hit_blog_ID, hit_remote_addr, blog_shortname
 						 FROM T_hitlog INNER JOIN T_basedomains ON hit_referer_dom_ID = dom_ID
