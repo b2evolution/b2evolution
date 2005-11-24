@@ -55,6 +55,7 @@ if( empty($blog) )
 		if( (($Blog =& $BlogCache->get_by_url( $ReqAbsUrl, false )) !== false) )
 		{ // We found a matching blog:
 			$blog = $Blog->ID;
+			$Debuglog->add( 'Found matching blog: '.$blog, 'detectblog' );
 		}
 	}
 
