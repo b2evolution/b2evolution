@@ -1208,7 +1208,7 @@ function autoquote( & $string )
  */
 function validate_url( $url, & $allowed_uri_scheme )
 {
-	global $debug;
+	global $debug, $Debuglog;
 
 	if( empty($url) )
 	{ // Empty URL, no problem
@@ -1218,6 +1218,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 	// minimum length: http://az.fr/
 	if( strlen($url) < 13 )
 	{ // URL too short!
+		$Debuglog->add( 'URL &laquo;'.$url.';&raquo; is too short!', 'error' );
 		return T_('Invalid URL');
 	}
 
@@ -1228,6 +1229,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 		([?#][a-z0-9~+.\-_,:;/\\\\%&=?#*\ \[\]]*)?
 		$|ix', $url, $matches) )
 	{ // Cannot vaidate URL structure
+		$Debuglog->add( 'URL &laquo;'.$url.';&raquo; does not match url pattern!', 'error' );
 		return T_('Invalid URL');
 	}
 
@@ -2288,6 +2290,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.150  2005/11/24 08:44:01  blueyed
+ * Debuglog
+ *
  * Revision 1.149  2005/11/23 01:17:36  blueyed
  * valid html
  *
