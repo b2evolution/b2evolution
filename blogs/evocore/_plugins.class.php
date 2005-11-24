@@ -116,13 +116,15 @@ class Plugins
 	 */
 	function init()
 	{
-		global $DB, $Debuglog;
+		global $DB, $Debuglog, $Timer;
 
 		if( ! $this->initialized )
 		{
+			$Timer->resume( 'plugin_init' );
 			$Debuglog->add( 'Loading plugins...' );
-			foreach( $DB->get_results( 'SELECT * FROM T_plugins
-																	ORDER BY plug_priority', ARRAY_A ) as $row )
+			foreach( $DB->get_results( '
+					SELECT * FROM T_plugins
+					ORDER BY plug_priority', ARRAY_A ) as $row )
 			{ // Loop through installed plugins:
 				$filename = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $row['plug_classname'] ).'.php';
 				if( ! is_file( $filename ) )
@@ -138,13 +140,14 @@ class Plugins
 				$this->register( $row['plug_classname'], $row['plug_ID'], $row['plug_priority'] );
 			}
 
+			$Timer->pause( 'plugin_init' );
 			$this->initialized = true;
 		}
 	}
 
 
 	/**
-	 * Discover and load all available plugins plugins.
+	 * Discover and load all available plugins.
 	 *
 	 * {@internal Plugins::discover(-)}}
 	 */
@@ -254,7 +257,7 @@ class Plugins
 
 		// Delete from DB
 		if( ! $DB->query( "DELETE FROM T_plugins
-												WHERE plug_ID = $plugin_ID" ) )
+		                    WHERE plug_ID = $plugin_ID" ) )
 		{ // Nothing removed!?
 			return false;
 		}
@@ -314,7 +317,7 @@ class Plugins
 		// Tell him his name :)
 		$Plugin->classname = $classname;
 		// Tell him his priority:
-		if( $priority > -1 ) $Plugin->priority = $priority;
+		if( $priority > -1 ) { $Plugin->priority = $priority; }
 
 		// Memorizes Plugin in sequential array:
 		$this->Plugins[] = & $Plugin;
@@ -394,7 +397,7 @@ class Plugins
 	 */
 	function trigger_event( $event, $params = NULL )
 	{
-		global $Debuglog;
+		global $Debuglog, $Timer;
 
 		$this->init();  // Init if not done yet.
 
@@ -413,8 +416,10 @@ class Plugins
 
 			if( method_exists( $loop_Plugin, $event ) )
 			{
+				$Timer->resume( 'plugin_'.$loop_Plugin->code );
 				$Debuglog->add( 'Calling '.get_class($loop_Plugin).'->'.$event.'( '.var_export( $params, true ).' )', 'plugins' );
 				$loop_Plugin->$event( $params );
+				$Timer->pause( 'plugin_'.$loop_Plugin->code );
 			}
 		}
 	}
@@ -602,7 +607,6 @@ class Plugins
 	 * {@internal Plugins::get_by_name(-)}}
 	 *
 	 * @param string plugin name
-	 * @param Plugin or false
 	 * @return Plugin|false
 	 */
 	function & get_by_name( $plugin_name )
@@ -611,7 +615,7 @@ class Plugins
 
 		$this->init();
 		if( ! isset($this->index_name_Plugins[ $plugin_name ]) )
-		{ // Plugins is not registered
+		{ // Plugin is not registered
 			$Debuglog->add( 'Requested plugin ['.$plugin_name.'] not found!', 'plugins' );
 			return false;
 		}
@@ -642,6 +646,9 @@ function sort_Plugin_name( & $a, & $b )
 
 /*
  * $Log$
+ * Revision 1.12  2005/11/24 20:43:56  blueyed
+ * Timer, doc
+ *
  * Revision 1.11  2005/09/18 01:46:55  blueyed
  * Fixed E_NOTICE for return by reference (PHP 4.4.0)
  *
