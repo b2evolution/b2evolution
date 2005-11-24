@@ -41,6 +41,7 @@
  *    2 - perform actions
  *    3 - display error messages
  *    4 - display payload
+ *    DONE in post-phoenix!
  *
  * @version $Id$
  */
@@ -573,6 +574,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.116  2005/11/24 20:34:56  blueyed
+ * doc
+ *
  * Revision 1.115  2005/11/16 06:33:48  blueyed
  * Fix SQL injection; fix Request param error
  *

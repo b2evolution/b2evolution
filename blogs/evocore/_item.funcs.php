@@ -403,7 +403,7 @@ function previous_posts( $page='' )
 	global $p, $paged, $Settings, $edited_Blog, $generating_static;
 
 	if( empty($p) )
-	{ 
+	{
 		$nextpage = intval($paged) - 1;
 		if ($nextpage < 1) $nextpage = 1;
 		if( !isset($generating_static) )
@@ -439,6 +439,7 @@ function next_posts_link($label='#', $max_page=0, $page='')
 	{
 		/*
 		// fplanque>> this code was supposed to make this work on multiple domains, but it breaks stub files !
+		// blueyed>> it looks like using $Blog->get('url') should do it.
 		$siteurl = $Blog->get( 'siteurl', 'raw');
 		if ( !empty( $siteurl ) )
 		{
@@ -473,6 +474,7 @@ function previous_posts_link($label='#', $page='')
 	{
 		/*
 		// fplanque>> this code was supposed to make this work on multiple domains, but it breaks stub files !
+		// blueyed>> it looks like using $Blog->get('url') should do it.
 		$siteurl = $Blog->get( 'siteurl', 'raw');
 		if ( !empty( $siteurl ) )
 		{
@@ -482,7 +484,7 @@ function previous_posts_link($label='#', $page='')
 					$parsed_url['path'];
 		}
 		*/
-		
+
 		echo '<a href="';
 		echo previous_posts( $page );
 		echo '">'.htmlspecialchars($label).'</a>';
@@ -956,6 +958,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.39  2005/11/24 20:40:06  blueyed
+ * doc
+ *
  * Revision 1.38  2005/11/21 20:51:44  fplanque
  * this is still broken! I prefer to have single domain working in all configurations.
  *

@@ -44,15 +44,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class FileRoot
 {
-  /**
-	 * Type: 'user', 'group', 'collection' or 'absolute'.
+	/**
+	 * Type: 'user', 'group' or 'collection'.
 	 *
 	 * Note: group is not implemented yet. Absolute will probably be deprecated.
 	 */
 	var $type;
 
-  /**
-	 * ID of user, group, collection or absolute.
+	/**
+	 * ID of user, group or collection.
 	 */
 	var $in_type_ID;
 
@@ -78,12 +78,11 @@ class FileRoot
 	var $ads_url;
 
 
-  /**
+	/**
 	 * Constructor
 	 *
-	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
+	 * @param string Root type: 'user', 'group' or 'collection'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
-	 * @return
 	 */
 	function FileRoot( $root_type, $root_in_type_ID )
 	{
@@ -113,7 +112,7 @@ class FileRoot
 				return;
 		}
 
-		die( "Root_type=$root_type not supported" );
+		debug_die( "Root_type=$root_type not supported" );
 	}
 
 
@@ -133,13 +132,19 @@ class FileRoot
 				return 'blog_'.$root_in_type_ID;
 		}
 
-		die( "Root_type=$root_type not supported" );
+		debug_die( "Root_type=$root_type not supported" );
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.4  2005/11/24 20:38:43  blueyed
+ * doc
+ *
+ * Revision 1.3.2.1  2005/11/16 23:01:00  blueyed
+ * use debug_die()
+ *
  * Revision 1.3  2005/09/29 15:07:30  fplanque
  * spelling
  *
