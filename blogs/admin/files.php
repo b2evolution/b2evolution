@@ -130,7 +130,7 @@ if( empty($action) )
 	{
 		$action = substr( strip_tags($action), 0, 50 );  // sanitize it
 	}
-	else
+	elseif( !empty($actionArray) )
 	{ // this is probably a numeric index from '<input name="actionArray[]" .. />'
 		debug_die( 'Invalid action!' );
 	}
@@ -1306,6 +1306,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.135  2005/11/24 13:23:57  blueyed
+ * debug_die() for invalid action (only if actionArray given [and invalid])
+ *
  * Revision 1.134  2005/11/24 08:54:42  blueyed
  * debug_die() for invalid action; doc
  *
