@@ -354,16 +354,16 @@ switch($action)
 
 				if( !isset( $blog_siteurl_type ) )
 				{ // determine siteurl type (if not set from update-action)
-					if( preg_match('#https?://#', $edited_Blog->get( 'siteurl' ) ) )
+					if( preg_match('#https?://#', $edited_Blog->siteurl ) )
 					{ // absolute
 						$blog_siteurl_type = 'absolute';
 						$blog_siteurl_relative = '';
-						$blog_siteurl_absolute = $edited_Blog->get( 'siteurl' );
+						$blog_siteurl_absolute = $edited_Blog->siteurl;
 					}
 					else
 					{ // relative
 						$blog_siteurl_type = 'relative';
-						$blog_siteurl_relative = $edited_Blog->get( 'siteurl' );
+						$blog_siteurl_relative = $edited_Blog->siteurl;
 						$blog_siteurl_absolute = 'http://';
 					}
 				}
@@ -564,6 +564,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.44  2005/11/24 16:13:21  blueyed
+ * Do not use getter for siteurl, because it actually returns $baseurl.. :(
+ *
  * Revision 1.43  2005/11/20 17:53:21  blueyed
  * Better fix for generating static pages
  *
