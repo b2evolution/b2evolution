@@ -132,8 +132,7 @@ if( empty($action) )
 	}
 	else
 	{ // this is probably a numeric index from '<input name="actionArray[]" .. />'
-		// fplanque>> can this really happen or should we debug_die() instead?
-		$action = '';
+		debug_die( 'Invalid action!' );
 	}
 }
 
@@ -622,7 +621,7 @@ switch( $action )
 
 
 	case 'edit_perms':
-		// edit filesystem permissions for a specific file  (files?)
+		// edit filesystem permissions for specific files
 
 		// Check permission:
 		$current_User->check_perm( 'files', 'edit', true );
@@ -707,7 +706,6 @@ switch( $action )
 
 	case 'file_copy':
 	case 'file_move':
-	case 'file_cmr':   // still needed?
 		// copy/move/rename - we come here from the "with selected" toolbar {{{
 		#pre_dump( $selected_Filelist );
 
@@ -965,10 +963,18 @@ switch( $Fileman->fm_mode )
 		 *   'copy' is just 'move and keep the source', while 'rename' is 'move in the same dir'
 		 *
 		 */
-		// TODO: on error notes use a prefix that describes the source root (if they differ).
-		//       Probably a method of $Fileman, like get_names_realtive_to( $a_File, $b_File, $root_type, $root_ID, $rel_path ),
-		//       because "Copied «test_me.jpg» to «test_me.jpg»." (from one root to another) is not so good.
+
+		/*
+		TODO: On error notes use prefixed names, if the roots differ.
+		      Something like $Fileman->get_names_realtive_to( $a_File, $b_File, $root_type, $root_ID, $rel_path )
+		      that returns an array containing the name of $a_File and $b_File relative to the Root path given as
+		      param 3, 4, 5.
+		      This would allow to say "Copied «users/admin/test_me.jpg» to «test_me.jpg»." rather than just
+		      "Copied «test_me.jpg» to «test_me.jpg».".
 			// fp>> I don't really understand this (probably missing a verb) but I do think that extending the Fileman object is not the right direction to go on the long term
+			// blueyed>> Tried to make it clearer. If it wasn't a Filemanager method, it has to be a function or
+			//   a method of the File class. IMHO it should be a method of the (to be killed) Filemanager object.
+		*/
 
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
@@ -1218,7 +1224,7 @@ switch( $action )
 
 
 	case 'edit_perms':
-		// Filesystem permissions for specific file  (files?)
+		// Filesystem permissions for specific files
 		$AdminUI->disp_payload_begin();
 		require dirname(__FILE__).'/_files_permissions.form.php';
 		$AdminUI->disp_payload_end();
@@ -1300,6 +1306,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.134  2005/11/24 08:54:42  blueyed
+ * debug_die() for invalid action; doc
+ *
  * Revision 1.133  2005/11/22 16:10:21  fplanque
  * no message
  *
