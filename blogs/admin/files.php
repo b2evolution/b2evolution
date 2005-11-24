@@ -901,6 +901,9 @@ switch( $Fileman->fm_mode )
 					continue;
 				}
 
+				// chmod the file to default perms! This is important (probably of umask etc). This is handled better in post-phoenix..
+				@chmod( $newFile->get_full_path(), octdec( $newFile->is_dir() ? $Filemanager->_default_chmod_dir : $Filemanager->_default_chmod_file ) );
+
 				$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() ), 'success' );
 
 				// Refreshes file properties (type, size, perms...)
@@ -1307,6 +1310,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.137  2005/11/24 17:56:20  blueyed
+ * chmod() the uploaded file
+ *
  * Revision 1.136  2005/11/24 14:43:59  fplanque
  * no message
  *
