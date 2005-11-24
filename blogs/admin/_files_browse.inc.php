@@ -317,7 +317,7 @@ while( $lFile = & $Fileman->get_next() )
 	echo '">'.$lFile->get_icon().'</a>';
 	echo '</td>';
 
- 	/*
+	/*
 	 * Path (flatmode):
 	 */
 	if( $Fileman->flatmode )
@@ -368,7 +368,7 @@ while( $lFile = & $Fileman->get_next() )
 	/*
 	if( $Fileman->flatmode && $Fileman->get_sort_order() != 'name' )
 	{	// Display directory name
-		echo './'.$Fileman->get_rdfs_path_relto_root( $lFile );
+		echo './'.$lFile->get_rdfs_rel_path();
 	}
 	else
 	*/
@@ -397,7 +397,7 @@ while( $lFile = & $Fileman->get_next() )
 	{
 		?>
 		<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
-		$subPath = $Fileman->get_rdfs_path_relto_root( $lFile, false );
+		$subPath = $lFile->get_rdfs_rel_path();
 		if( empty( $subPath ) )
 		{
 			$subPath = './';
@@ -506,7 +506,7 @@ else
 		if( $mode == 'upload' )
 		{	// We are uploading in a popup opened by an edit screen
 			?>
-    	<input class="ActionButton"
+			<input class="ActionButton"
 				title="<?php echo T_('Insert IMG tags for selected files'); ?>"
 				name="actionArray[img_tag]"
 				value="img"
@@ -516,7 +516,7 @@ else
 		}
 
 
-    if( $current_User->check_perm( 'files', 'edit' ) )
+		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
 			?>
 			<input class="ActionButton" type="image" name="actionArray[rename]"
@@ -566,12 +566,12 @@ else
 			title="<?php echo T_('Move the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
 			src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
+		*/ ?>
 
 		<input class="ActionButton" type="image" name="actionArray[edit_perms]"
 			onclick="return openselectedfiles(true);"
 			title="<?php echo T_('Change permissions for the selected files'); ?>"
 			src="<?php echo get_icon( 'file_perms', 'url' ); ?>" />
-	*/ ?>
 
 		</td>
 	</tr>
@@ -587,7 +587,8 @@ else
 
 <?php
 if( $countFiles )
-{
+{{{ // include JS
+	// TODO: remove these javascript functions to an external .js file and include them through $AdminUI->add_headline()
 	?>
 	<script type="text/javascript">
 		<!--
@@ -706,7 +707,8 @@ if( $countFiles )
 		// -->
 	</script>
 	<?php
-}
+}}}
+
 
 /*
  * CREATE:
@@ -860,6 +862,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.56  2005/11/24 20:29:01  blueyed
+ * minor changes (fixes in commented out code); allow mass-editing of file perms (again)
+ *
  * Revision 1.55  2005/11/24 18:33:04  blueyed
  * Konqueror (Safari?) and Firefox fixes
  *
