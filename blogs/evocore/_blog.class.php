@@ -326,10 +326,8 @@ class Blog extends DataObject
 
 	/**
 	 * Get the blog's media directory (and create it if necessary).
-	 *
-	 * @param boolean absolute path or relative to $basepath.$media_subdir.'blogs/' ?
 	 */
-	function getMediaDir( $absolute = true )
+	function getMediaDir()
 	{
 		global $basepath, $media_subdir, $Messages, $Settings, $Debuglog;
 
@@ -379,34 +377,34 @@ class Blog extends DataObject
 			}
 		}
 
-		// fplanque>> TODO: non absolute return IS FLAWED if case != default. DO we need it?
-		return $absolute ?
-						$mediadir :
-						preg_replace( '#^'.$basepath.$media_subdir.'blogs/#', '', $mediadir );
+		return $mediadir;
 	}
 
 
 	/**
-	 * Get a param
+	 * Get a param.
 	 *
-	 * {@internal Blog::get(-)}}
+	 * @return false|string The value as string or false in case of error (e.g. media dir is disabled).
 	 */
 	function get( $parname )
 	{
 		global $xmlsrv_url, $admin_email, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
 
-		if ($this->siteurl > '')
+		/*
+		blueyed>> This gets not used (anymore?)!
+		if( !empty($this->siteurl) )
 		{
 			$rss_url =  $this->siteurl;
-  		}
+		}
+		*/
 
 		switch( $parname )
 		{
-			case 'mediadir':
-				return $this->getMediaDir();
+			case 'mediadir': // the path to the blog's media directory
+				return $this->getMediaDir(); // this takes care of the 'fm_enable_roots_blog' setting
 
-			case 'mediaurl':
-		 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
+			case 'mediaurl': // the URL to the blog's media directory
+				if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 				{ // User directories are disabled:
 					$Debuglog->add( 'Attempt to access blog media URL, but this feature is disabled', 'files' );
 					return false;
@@ -453,7 +451,7 @@ class Blog extends DataObject
 			case 'staticfilepath':
 				return $basepath.$this->siteurl.$this->staticfilename;
 
-			case 'siteurl':
+			case 'siteurl': // TODO: This was and should be 'baseurl'
 				if( preg_match( '#^https?://#', $this->siteurl ) )
 				{ // We have a specific URL for this blog:
 					return $this->siteurl;
@@ -468,7 +466,7 @@ class Blog extends DataObject
 					return $r;
 				}
 
-			case 'baseurl':
+			case 'baseurl': // TODO: Remove this!? global $baseurl has nothing to do with the Blog's base url.
         // Marian moved previous code to case 'siteurl'
 				return $baseurl;
 
@@ -489,8 +487,8 @@ class Blog extends DataObject
 
 			case 'cookie_domain':
 				$basehost = $this->get('basehost');
-				// Note: we need special treatment for localhost!
-				return ($basehost == 'localhost') ? '' : '.'. $basehost;
+				// Note: we need special treatment for hosts without dots (otherwise cookies won't get set!)
+				return ( strpos( $basehost, '.' ) === false ) ? '' : '.'. $basehost;
 
 			case 'cookie_path':
 				return preg_replace( '#https?://[^/]+#', '', $this->get('baseurl') );
@@ -510,7 +508,6 @@ class Blog extends DataObject
 			case 'description':			// RSS wording
 			case 'shortdesc':
 				return $this->shortdesc;
-				break;
 
 			case 'rdf_url':
 				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_rdf' );
@@ -537,7 +534,7 @@ class Blog extends DataObject
 				return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin=_atom&amp;disp=comments' );
 
 			case 'pingback_url':
-		    return $xmlsrv_url.'xmlrpc.php';
+				return $xmlsrv_url.'xmlrpc.php';
 
 			case 'admin_email':
 				return $admin_email;
@@ -750,6 +747,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.42  2005/11/24 16:52:59  blueyed
+ * getMediaDir(): non-absolute paths are not used;
+ * Blog::get(): fix cookie_domain for hosts without dots; doc; todo to fix 'baseurl'/'siteurl' issues
+ *
  * Revision 1.41  2005/11/21 20:54:57  fplanque
  * fixed calls to RSS feeds for new subscribers
  *
