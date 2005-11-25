@@ -79,9 +79,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <body id="standblog">
 
 <p id="prelude">
-<a title="Sauter la navigation et la recherche" href="<?php echo regenerate_url( '', '#main'); ?>">Skip to content</a>
-| <a title="Aller directement au menu de navigation" href="<?php echo regenerate_url( '', '#menu'); ?>">Skip to menu</a>
-| <a title="Aller directement au formulaire de recherche" href="<?php echo regenerate_url( '', '#searchform'); ?>">Skip to search</a>
+<a title="Sauter la navigation et la recherche" href="<?php echo regenerate_url(); ?>#main">Skip to content</a>
+| <a title="Aller directement au menu de navigation" href="<?php echo regenerate_url(); ?>#menu">Skip to menu</a>
+| <a title="Aller directement au formulaire de recherche" href="<?php echo regenerate_url(); ?>#searchform">Skip to search</a>
 </p>
 
 <h1><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></h1>
