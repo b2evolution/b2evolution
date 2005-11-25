@@ -22,5 +22,9 @@ define the constant SIMPLETEST_DIR, e.g.:
 define( 'SIMPLETEST_DIR', '/your/path/with/trailing/slash/' );
 ?>
 
+Simplest method, to not edit any config files:
+Just put a symlink named "symlink" in this directory (where this file
+is).
+
 Happy testing..
 

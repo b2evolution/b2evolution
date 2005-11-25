@@ -16,10 +16,20 @@ require_once( dirname(__FILE__).'/config.php' );
 
 if( !defined( 'SIMPLETEST_DIR' ) )
 {
-	/**
-	 * The SimpleTest directory.
-	 */
-	define( 'SIMPLETEST_DIR', TESTSDIR.'simpletest/' );
+	if( is_dir( TESTSDIR.'simpletest/symlink' ) )
+	{
+		/**
+		 * The SimpleTest directory.
+		 */
+		define( 'SIMPLETEST_DIR', TESTSDIR.'simpletest/symlink/' );
+	}
+	else
+	{
+		/**
+		 * The SimpleTest directory.
+		 */
+		define( 'SIMPLETEST_DIR', TESTSDIR.'simpletest/' );
+	}
 }
 
 
