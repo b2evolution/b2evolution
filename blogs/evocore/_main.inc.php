@@ -276,7 +276,7 @@ require_once dirname(__FILE__).'/_filerootcache.class.php';
 $BlogCache = & new BlogCache();
 $FileCache = & new FileCache();
 $FileRootCache = & new FileRootCache();
-$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID' );
+$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name' );
 $ItemCache = & new ItemCache();
 $itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
 $itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
@@ -484,6 +484,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.70  2005/11/25 15:02:00  blueyed
+ * $GroupCache: tell him about the name field. This allows to use get_by_name().
+ *
  * Revision 1.69  2005/11/24 14:43:59  fplanque
  * no message
  *
