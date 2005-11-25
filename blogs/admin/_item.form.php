@@ -46,7 +46,9 @@ if( isset($Blog) )
 <script type="text/javascript" language="javascript">
 	<!--
 	/*
-	 * open_preview()
+	 * Open the item in a preview window (a new window with target 'b2evo_preview'), by changing
+	 * the form's action attribute and target temporarily.
+	 *
 	 * fplanque: created
 	 */
 	function open_preview(form)
@@ -54,6 +56,23 @@ if( isset($Blog) )
 		// Stupid thing: having a field called action !
 		var saved_action =  form.attributes.getNamedItem('action').value;
 		form.attributes.getNamedItem('action').value = '<?php $Blog->disp( 'dynurl', 'raw' ) ?>';
+
+		// FIX for Safari (2.0.2, OS X 10.4.3), to not submit the item on "Preview"! - (Konqueror does not fail here)
+		if( form.attributes.getNamedItem('action').value == saved_action )
+		{ // Still old value: Setting form.action failed! (This is the case for Safari)
+			// NOTE: checking "form.action == saved_action" (or through document.getElementById()) does not work - Safari uses the input element then
+			{ // _Setting_ form.action however sets the form's action attribute (not the input element) on Safari
+				form.action = '<?php $Blog->disp( 'dynurl', 'raw' ) ?>';
+			}
+
+			if( form.attributes.getNamedItem('action').value == saved_action )
+			{ // Still old value, did not work.
+				alert( "Preview not supported. Sorry. (Could not set form.action for preview)" );
+				return false;
+			}
+		}
+		// END FIX for Safari
+
 		form.target = 'b2evo_preview';
 		preview_window = window.open( '', 'b2evo_preview' );
 		preview_window.focus();
@@ -373,6 +392,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.39  2005/11/25 13:14:47  blueyed
+ * Javascript open_preview(): Fixed submitting item instead of preview for Safari!
+ *
  * Revision 1.38  2005/11/24 01:07:11  blueyed
  * simply using span.line again.
  *
