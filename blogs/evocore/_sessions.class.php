@@ -81,12 +81,12 @@ class Sessions extends Widget
 		{
 			return true;
 		}
-		global $DB, $UserCache, $localtimenow, $online_session_timeout;
+		global $DB, $UserCache, $localtimenow, $timeout_online_user;
 
 		$this->_count_guests = 0;
 		$this->_registered_Users = array();
 
-		$timeout_YMD = date( 'Y-m-d H:i:s', ($localtimenow - $online_session_timeout) );
+		$timeout_YMD = date( 'Y-m-d H:i:s', ($localtimenow - $timeout_online_user) );
 
 		// We get all sessions that have been seen in $timeout_YMD and that have a session key.
 		// NOTE: we do not use DISTINCT here, because guest users are all "NULL".
@@ -257,8 +257,8 @@ class Sessions extends Widget
 
 /*
  * $Log$
- * Revision 1.20  2005/11/25 00:08:43  blueyed
- * Use $online_session_timeout instead of $timeout_online_user (it was rolled back in /conf/_advanced.php)
+ * Revision 1.21  2005/11/25 14:07:40  fplanque
+ * no message
  *
  * Revision 1.19  2005/11/18 03:37:55  blueyed
  * doc
