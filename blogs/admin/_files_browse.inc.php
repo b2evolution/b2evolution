@@ -566,12 +566,15 @@ else
 			title="<?php echo T_('Move the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
 			src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
-		*/ ?>
-
-		<input class="ActionButton" type="image" name="actionArray[edit_perms]"
+// This is too geeky! Default perms radio options and unchecked radio groups! NO WAY!
+// If you want this feature to be usable by average users you must only have one line per file OR one file for all. You can't mix both.
+// The only way to have both is to have 2 spearate forms: 1 titled "change perms for all files simultaneously"-> submit  and another 1 title "change perms for each file individually" -> another submit
+// POST PHOENIX
+			<input class="ActionButton" type="image" name="actionArray[edit_perms]"
 			onclick="return openselectedfiles(true);"
 			title="<?php echo T_('Change permissions for the selected files'); ?>"
 			src="<?php echo get_icon( 'file_perms', 'url' ); ?>" />
+	*/ ?>
 
 		</td>
 	</tr>
@@ -862,6 +865,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.57  2005/11/25 14:33:35  fplanque
+ * no message
+ *
  * Revision 1.56  2005/11/24 20:29:01  blueyed
  * minor changes (fixes in commented out code); allow mass-editing of file perms (again)
  *

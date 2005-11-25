@@ -87,7 +87,7 @@ class GeneralSettings extends AbstractSettings
 		'time_difference' => '0',
 		'timeout_sessions' => '604800',     // seconds (604800 == 7 days)
 		'upload_enabled' => '1',
-		'upload_allowedext' => 'jpg jpeg gif png txt csv xls doc ppt',
+		'upload_allowedext' => 'jpg jpeg gif png txt csv xls doc ppt css htm html',
 		'upload_maxkb' => '100',
 		'user_minpwdlen' => '5',
 		'what_to_show' => 'posts',
@@ -141,6 +141,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.31  2005/11/25 14:33:36  fplanque
+ * no message
+ *
  * Revision 1.30  2005/11/21 18:33:19  fplanque
  * Too many undiscussed changes all around: Massive rollback! :((
  * As said before, I am only taking CLEARLY labelled bugfixes.
