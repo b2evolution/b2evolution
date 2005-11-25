@@ -416,8 +416,21 @@ class Plugins
 
 			if( method_exists( $loop_Plugin, $event ) )
 			{
+				$debug_params = $params;
+				if( $event == 'LoginAttempt' )
+				{ // Hide passworts for LoginAttempt from Debuglog!
+					if( isset($debug_params['pass']) )
+					{
+						$debug_params['pass'] = '-hidden-';
+					}
+					if( isset($debug_params['pass_md5']) )
+					{
+						$debug_params['pass_md5'] = '-hidden-';
+					}
+				}
+				$Debuglog->add( 'Calling '.get_class($loop_Plugin).'->'.$event.'( '.var_export( $debug_params, true ).' )', 'plugins' );
+
 				$Timer->resume( 'plugin_'.$loop_Plugin->code );
-				$Debuglog->add( 'Calling '.get_class($loop_Plugin).'->'.$event.'( '.var_export( $params, true ).' )', 'plugins' );
 				$loop_Plugin->$event( $params );
 				$Timer->pause( 'plugin_'.$loop_Plugin->code );
 			}
@@ -646,6 +659,9 @@ function sort_Plugin_name( & $a, & $b )
 
 /*
  * $Log$
+ * Revision 1.13  2005/11/25 15:45:39  blueyed
+ * Hide passwords in Debuglog! (for event LoginAttempt)
+ *
  * Revision 1.12  2005/11/24 20:43:56  blueyed
  * Timer, doc
  *
