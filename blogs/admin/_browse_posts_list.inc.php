@@ -100,12 +100,8 @@ echo '<table class="grouped">';
 echo "<tr>\n";
 echo '<th>'.T_('Issue date')."</th>\n";
 echo '<th>'.T_('Author')."</th>\n";
-echo '<th>'.T_('Status')."</th>\n";
+echo '<th colspan="2">'.T_('Status')."</th>\n";
 echo '<th>'.T_('Title')."</th>\n";
-if( $Blog->allowcomments != 'never' )
-{ // TODO: will fail for Blog ID 1 (all blogs) -> build table body and remember if any post allows comments.
-	echo '<th>'./* TRANS: abbr. for "comments allowed" */ T_('Com.')."</th>\n";
-}
 if( $Blog->ID == 1 )
 { // "All blogs": display name of blog
 	echo '<th>'.T_('Blog')."</th>\n";
@@ -138,26 +134,47 @@ while( $Item = $MainList->get_item() )
 	$Item->Author->preferred_name();
 	echo "</td>\n";
 
-	echo '<td>';
-	$Item->status();
-	$Item->extra_status( ' - '.T_('Extra').':' );
-	$Item->assigned_to( ' '.get_icon( 'assign', 'imgtag', array('title'=>T_('Assigned to')) ) );
+	echo '<td class="shrinkwrap">';
+	// Display publish NOW button if current user has the rights:
+	$Item->publish_link( ' ', ' ', get_icon( 'publish' ), '#', '');
+
+	// Display deprecate if current user has the rights:
+	$Item->deprecate_link( ' ', ' ', get_icon( 'deprecate' ), '#', '');
 	echo "</td>\n";
 
 	echo '<td>';
+	$Item->status();
+	echo "</td>\n";
+
+
+	echo '<td>';
 	locale_flag( $Item->locale, 'w16px' );
-	echo '<a href="b2browse.php?tab=posts&amp;blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1" class="">';
-	$Item->title( '', '', false );
-	echo "</a></td>\n";
 
 	if( $Blog->allowcomments != 'never' )
 	{ // TODO: should use $Item->getBlog() for $Blog == 1 (see also <th> for this).
-		echo '<td class="center">';
-		echo '<a href="b2browse.php?tab=posts&amp;blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1" class="">';
-		echo generic_ctp_number($Item->ID, 'feedback');
-		echo '</a>';
-		echo "</td>\n";
+		$nb_comments = generic_ctp_number($Item->ID, 'feedback');
+		echo ' <a href="b2browse.php?tab=posts&amp;blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1"
+						title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'" class="">';
+		if( $nb_comments )
+		{
+			echo get_icon( 'comments' );
+		}
+		else
+		{
+			echo get_icon( 'nocomment' );
+		}
+		echo '</a> ';
 	}
+
+	echo '<a href="b2browse.php?tab=posts&amp;blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1" class="">';
+	$Item->title( '', '', false );
+	echo '</a>';
+
+	$Item->extra_status( ' - '.T_('Extra').':' );
+	$Item->assigned_to( ' '.get_icon( 'assign', 'imgtag', array('title'=>T_('Assigned to')) ) );
+
+	echo "</td>\n";
+
 
 	if( $Blog->ID == 1 )
 	{ // "All blogs": display name of blog, linked to browse this blog.
@@ -174,12 +191,6 @@ while( $Item = $MainList->get_item() )
 	echo '<td class="shrinkwrap">';
 	// Display edit button if current user has the rights:
 	$Item->edit_link( ' ', ' ', get_icon( 'edit' ), '#', '', $edit_item_url );
-
-	// Display publish NOW button if current user has the rights:
-	$Item->publish_link( ' ', ' ', get_icon( 'publish' ), '#', '');
-
-	// Display deprecate if current user has the rights:
-	$Item->deprecate_link( ' ', ' ', get_icon( 'deprecate' ), '#', '');
 
 	// Display delete button if current user has the rights:
 	$Item->delete_link( ' ', ' ', get_icon( 'delete' ), '#', '', false, $delete_item_url );
@@ -212,6 +223,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.16  2005/11/25 22:45:37  fplanque
+ * no message
+ *
  * Revision 1.15  2005/11/24 20:23:37  blueyed
  * minor (translation)
  *

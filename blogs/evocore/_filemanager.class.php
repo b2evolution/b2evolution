@@ -545,7 +545,7 @@ class FileManager extends Filelist
 		}
 
 		echo '<a title="'.T_('Edit properties...').'" href="'
-					.$this->getLinkFile( $File, 'edit_properties' ).'">'.get_icon( 'edit' ).'</a>';
+					.$this->getLinkFile( $File, 'edit_properties' ).'">'.get_icon( 'properties' ).'</a>';
 	}
 
 
@@ -1358,6 +1358,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.68  2005/11/25 22:45:37  fplanque
+ * no message
+ *
  * Revision 1.67  2005/11/24 17:57:02  blueyed
  * fix default perms for dirs, doc
  *

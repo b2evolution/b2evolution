@@ -248,12 +248,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	echo ' '; // allow wrapping!
 
 	$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
-												'', false, '', 'get_assigned_user_options' );
+												'', true, '', 'get_assigned_user_options' );
 
 	echo ' '; // allow wrapping!
 
 	$Form->select_object( 'item_priority', NULL, $edited_Item, T_('Priority'),
-												'', false, '', 'priority_options' );
+												'', true, '', 'priority_options' );
 
 	echo ' '; // allow wrapping!
 
@@ -392,6 +392,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.40  2005/11/25 22:45:37  fplanque
+ * no message
+ *
  * Revision 1.39  2005/11/25 13:14:47  blueyed
  * Javascript open_preview(): Fixed submitting item instead of preview for Safari!
  *

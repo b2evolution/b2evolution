@@ -214,19 +214,19 @@ $map_iconfiles = array(
 	),
 
 	'new' => array(
-		'file' => $admin_subdir.'img/new.gif',
+		'file' => $rsc_subdir.'icons/new.gif',
 		'alt' => T_('New'),
-		'size' => array( 13, 13 ),
+		'size' => array( 16, 15 ),
 	),
 	'copy' => array(
-		'file' => $admin_subdir.'img/copy.gif',
+		'file' => $rsc_subdir.'icons/copy.gif',
 		'alt' => T_('Copy'),
-		'size' => array( 13, 13 ),
+		'size' => array( 14, 15 ),
 	),
 	'edit' => array(
-		'file' => $admin_subdir.'img/properties.png',
+		'file' => $rsc_subdir.'icons/edit.gif',
 		'alt' => T_('Edit'),
-		'size' => array( 18, 13 ),
+		'size' => array( 16, 15 ),
 	),
 	'properties' => array(
 		'file' => $admin_subdir.'img/properties.png',
@@ -236,12 +236,12 @@ $map_iconfiles = array(
 	'publish' => array(
 		'file' => $rsc_subdir.'icons/publish.gif',
 		'alt' => T_('Publish'),
-		'size' => array( 15, 15 ),
+		'size' => array( 12, 15 ),
 	),
 	'deprecate' => array(
 		'file' => $rsc_subdir.'icons/deprecate.gif',
 		'alt' => T_('Deprecate'),
-		'size' => array( 15, 15 ),
+		'size' => array( 12, 15 ),
 	),
 	'locate' => array(
 		'file' => $rsc_subdir.'icons/target.gif',
@@ -249,9 +249,9 @@ $map_iconfiles = array(
 		'size' => array( 15, 15 ),
 	),
 	'delete' => array(
-		'file' => $admin_subdir.'img/xross.gif',
+		'file' => $rsc_subdir.'icons/delete.gif',
 		'alt' => T_('Del'),
-		'size' => array( 13, 13 ),
+		'size' => array( 15, 15 ),
 	),
 	'close' => array(
 		'file' => $admin_subdir.'img/close.gif',
@@ -307,6 +307,16 @@ $map_iconfiles = array(
 		'file' => $rsc_subdir.'icons/minipost.gif',
 		'alt' => T_('Permalink'),
 		'size' => array( 12, 9 ),
+	),
+	'comments' => array(
+		'file' => $rsc_subdir.'icons/comments.gif',
+		'alt' => T_('Comments'),
+		'size' => array( 15, 16 ),
+	),
+	'nocomment' => array(
+		'file' => $rsc_subdir.'icons/nocomment.gif',
+		'alt' => T_('Comments'),
+		'size' => array( 15, 16 ),
 	),
 );
 

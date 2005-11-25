@@ -42,7 +42,7 @@ if( $demo_mode )
 { // Prevent users from killing access to the demo...
 	// Allow editing (this only makes the fields inputs or infos, no check on update), if the user is allowed to edit users or edits his own profile. BUT never if the edited_User is 'admin' or 'demouser'.
 	$allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' ) || $user_profile_only )
-											&& $edited_User->login != 'admin'
+											&& $edited_User->ID != 1			// User number 1 is the global admin, even if he's renamed.
 											&& $edited_User->login != 'demouser';
 }
 else
@@ -210,6 +210,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.75  2005/11/25 22:45:37  fplanque
+ * no message
+ *
  * Revision 1.74  2005/11/25 14:17:21  blueyed
  * Doc; fix users editing themself in demo_mode (if not 'admin' or 'demouser')
  *

@@ -184,6 +184,7 @@ else
 
 	$Results->cols[] = array(
 						'th' => T_('Actions'),
+						'td_start' => '<td class="shrinkwrap">',
 						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'action\', \'user_ID=$user_ID$\' )%' )
 										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'action\', \'action=new_user&amp;user_ID=$user_ID$\' )%' )
 										.'¤conditional( (#user_ID# != 1) && (#user_ID# != '.$current_User->ID.'), \''
@@ -212,6 +213,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.55  2005/11/25 22:45:37  fplanque
+ * no message
+ *
  * Revision 1.54  2005/11/16 04:16:53  blueyed
  * Made action "promote" make use of $edited_User; fixed possible SQL injection
  *

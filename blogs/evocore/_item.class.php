@@ -354,7 +354,7 @@ class Item extends DataObject
 		$this->assign_to( $Request->get('item_assigned_user_ID') );
 
 		$Request->param( 'item_priority', 'integer', true );
-		$this->set_from_Request( 'priority', 'item_priority' );
+		$this->set_from_Request( 'priority', 'item_priority', true );
 
 		$Request->param( 'item_deadline', 'string', true );
 		$Request->param_check_date( 'item_deadline', T_('Please enter a valid deadline.'), false );
@@ -1453,9 +1453,12 @@ class Item extends DataObject
 	 *
 	 * {@internal Item::priority_options(-)}}
 	 */
-	function priority_options()
+	function priority_options( $field_value, $allow_none )
 	{
-		$r = '';
+		if( $allow_none )
+		{
+			$r = '<option value="">'.T_('None').'</option>';
+		}
 
 		foreach( $this->priorities as $i => $name )
 		{
@@ -2214,6 +2217,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.68  2005/11/25 22:45:37  fplanque
+ * no message
+ *
  * Revision 1.67  2005/11/23 17:29:19  fplanque
  * no message
  *

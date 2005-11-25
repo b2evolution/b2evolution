@@ -270,13 +270,13 @@ if( $creating )
 {
 	$Form->end_form( array(
 		array( '', '', T_('Record'), 'SaveButton' ),
-		array( 'reset', 'reset', T_('Update'), 'SaveButton' ) ) );
+		array( 'reset', 'reset', T_('Reset'), 'SaveButton' ) ) );
 }
 else
 {
 	$Form->end_form( array(
 		array( '', '', T_('Update'), 'SaveButton' ),
-		array( 'reset', 'reset', T_('Update'), 'SaveButton' ) ) );
+		array( 'reset', 'reset', T_('Reset'), 'SaveButton' ) ) );
 }
 
 // End payload block:

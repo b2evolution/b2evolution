@@ -119,12 +119,10 @@ $AdminUI->add_menu_entries(
 						'postlist' => array(
 							'text' => T_('Post list'),
 							'href' => regenerate_url( 'tab', 'tab=postlist' ),
-							//'href' => 'b2browse.php?tab=postlist&amp;blog='.$blog ),
 							),
 						'posts' => array(
 							'text' => T_('Full posts'),
 							'href' => regenerate_url( 'tab', 'tab=posts' ),
-							//'href' => 'b2browse.php?tab=posts&amp;blog='.$blog ),
 							),
 					/*	'commentlist' => array(
 							'text' => T_('Comment list'),

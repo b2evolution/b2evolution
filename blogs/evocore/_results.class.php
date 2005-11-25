@@ -345,6 +345,10 @@ class Results extends Widget
 
 
 	/**
+	 * Note: this function might actually not be very useful.
+	 * If you define ->Cache before display, all rows will be instantiated on the fly.
+	 * No need to restart et go through the rows a second time here.
+	 *
 	 * @params DataObjectCache
 	 */
 	function instantiate_page_to_Cache( & $Cache )
@@ -814,7 +818,15 @@ class Results extends Widget
 
 
 	/**
-	 * Handle variable subtitutions for column contents:
+	 * Handle variable subtitutions for column contents.
+	 *
+	 * This is one of the key functions to look at when you want to use the Results class.
+	 * - $var$
+	 * - £var£
+	 * - #var#
+	 * - {row}
+	 * - %func()%
+	 * - ¤func()¤
 	 */
 	function parse_col_content( $content )
 	{
@@ -1138,6 +1150,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.41  2005/11/25 22:45:37  fplanque
+ * no message
+ *
  * Revision 1.40  2005/11/23 23:29:16  blueyed
  * Sorry, encoding messed up.
  *
