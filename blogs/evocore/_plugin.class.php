@@ -391,10 +391,15 @@ class Plugin
  	/**
 	 * Event handler: Called when displaying editor buttons.
 	 *
-	 * {@internal Plugin::DisplayEditorButton(-)}}
+	 * This method, if implemented, should output the buttons
+	 * (probably as html INPUT elements) and return true, if
+	 * button(s) have been displayed.
 	 *
-	 * @param array Associative array of parameters
-	 * @return boolean did we display a toolbar?
+	 * You should provide an unique html ID with your button.
+	 *
+	 * @param array Associative array of parameters.
+	 *              'target_type': either 'Comment' or 'Item.
+	 * @return boolean did we display a button?
 	 */
 	function DisplayEditorButton( & $params )
 	{
@@ -488,6 +493,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.11  2005/11/25 00:28:04  blueyed
+ * doc
+ *
  * Revision 1.10  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
