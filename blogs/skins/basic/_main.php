@@ -49,6 +49,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/2002/REC-xhtml1-20020801/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
@@ -84,16 +85,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		}
 	} // ------------------------------ END OF SKIN LIST ------------------------------ ?>
 
-	<hr>
+	<hr />
 	<div align="center">
 		<h1><?php $Blog->disp( 'name', 'htmlbody' ) ?></h1>
 		<p><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></p>
 	</div>
-	<hr>
+	<hr />
 
   <small><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></small>
 
-	<hr>
+	<hr />
 
 	<?php request_title( '<h2>', '</h2>' ) ?>
 
@@ -179,7 +180,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		}
 		// ------------------- END OF INCLUDES FOR LAST COMMENTS, STATS ETC. ------------------- ?>
 
-	<hr>
+	<hr />
 
 	<div align="center">
 		<strong>
@@ -198,7 +199,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		?></p>
 	</div>
 
-	<hr>
+	<hr />
 
 	<div align="center">Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" align="middle" /></a> <!-- Please help us promote b2evolution and leave this link on your blog. --></div>
 	<?php

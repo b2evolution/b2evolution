@@ -76,18 +76,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		$Blog->disp( 'user_css', 'raw');
 	?>
 </head>
-<body id=standblog>
+<body id="standblog">
 
-<p id=prelude>
-<a title="Sauter la navigation et la recherche" href="<?php echo $ReqURI ?>#main">Skip to content</a>
-| <a title="Aller directement au menu de navigation" href="<?php echo $ReqURI ?>#menu">Skip to menu</a>
-| <a title="Aller directement au formulaire de recherche" href="<?php echo $ReqURI ?>#searchform">Skip to search</a>
+<p id="prelude">
+<a title="Sauter la navigation et la recherche" href="<?php echo regenerate_url( '', '#main'); ?>">Skip to content</a>
+| <a title="Aller directement au menu de navigation" href="<?php echo regenerate_url( '', '#menu'); ?>">Skip to menu</a>
+| <a title="Aller directement au formulaire de recherche" href="<?php echo regenerate_url( '', '#searchform'); ?>">Skip to search</a>
 </p>
 
 <h1><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>"><?php $Blog->disp( 'name', 'htmlbody' ) ?></a></h1>
 <div id="tagline"><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></div>
 
-<div id=main>
+<div id="main">
 <?php request_title( '<h2>', '</h2>' ) ?>
 
 <p class="center"><strong><?php posts_nav_link(); ?></strong></p>
@@ -102,16 +102,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <div class="bPost" lang="<?php $Item->lang() ?>">
 <?php $Item->anchor(); ?>
 <h2><?php $Item->title(); ?></h2>
-<div class=infos>
+<div class="infos">
 <h3><a href="<?php $Item->permalink() ?>" title="Permalink"><?php $Item->issue_date() ?> <?php $Item->issue_time() ?></a></h3>
 &nbsp;
 <h4><?php $Item->categories() ?></h4>
 </div>
-<div class=article>
+<div class="article">
 	<?php $Item->content(); ?>
 	<?php link_pages() ?>
 </div>
-<div class=interaction>
+<div class="interaction">
 	<?php $Item->feedback_link( 'feedbacks' ) // Link to comments ?>
 			<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
 	<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
@@ -163,7 +163,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <p class="center"><strong><?php posts_nav_link(); ?></strong></p>
 
 </div>
-<div id=menu>
+<div id="menu">
 
 <h4><?php $Blog->disp( 'name', 'htmlbody' ) ?>&nbsp;:</h4>
 <?php $Blog->disp('longdesc', 'htmlbody') ?>
@@ -184,7 +184,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <?php // -------------------------- CATEGORIES INCLUDED HERE -----------------------------
 	// Call the Categories plugin:
 	$Plugins->call_by_code( 'evo_Cats', array(	// Add parameters below:
-			'block_start'=>'<div id=categories>',
+			'block_start'=>'<div id="categories">',
 			'block_end'=>'</div>',
 			'title'=>'<h4>'.T_('Categories').'&nbsp;:</h4>',
 		) );
@@ -194,13 +194,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <h4>Search&nbsp;:</h4>
 <?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), '', '', 'get', 'searchform' ) ?>
 	<input id="rechercher" size="15" name="s" />
-	<input type="submit" value="envoyer" name="submit" />
+	<input type="submit" value="<?php echo T_('Search'); ?>" name="submit" />
 </form>
 <br />
 
 <?php form_formstart( $Blog->dget( 'blogurl', 'raw' ), '', '', 'get', 'switcher' ) ?>
-	<fieldset><label for=set><h4><?php echo T_('Choose a skin') ?>&nbsp;:</h4></label>
-	<select id=set name="skin">
+	<fieldset><h4><label for="set"><?php echo T_('Choose a skin') ?>&nbsp;:</label></h4>
+	<select id="set" name="skin">
 		<?php // ---------------------------------- START OF SKIN LIST ----------------------------------
 		for( skin_list_start(); skin_list_next(); )
 		{

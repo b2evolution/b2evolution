@@ -155,7 +155,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		// Call the Categories plugin:
 		$Plugins->call_by_code( 'evo_Cats', array(	// Add parameters below:
 				'block_start'=>'<li id="categories">',
-				'block_end'=>'<li>',
+				'block_end'=>'</li>',
 				'title'=>T_('categories').' :',
 			) );
 		// -------------------------------- END OF CATEGORIES ---------------------------------- ?>

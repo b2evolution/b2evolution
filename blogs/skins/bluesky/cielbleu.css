@@ -57,7 +57,7 @@ A:hover {
 	DISPLAY: inline
 }
 .bPost, .bComment {
-	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; MARGIN-BOTTOM: 15px; PADDING-BOTTOM: 10px; BORDER-LEFT: white 1px dotted; PADDING-TOP: 0px; BORDER-BOTTOM: white 1px dotted; moz-border-radius: 20px
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; MARGIN-BOTTOM: 15px; PADDING-BOTTOM: 10px; BORDER-LEFT: white 1px dotted; PADDING-TOP: 0px; BORDER-BOTTOM: white 1px dotted;
 }
 .article {
 	LINE-HEIGHT: 140%
