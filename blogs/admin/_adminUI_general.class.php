@@ -58,11 +58,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class AdminUI_general
 {
-	/**
-	 * The menus.
-	 * @var array
-	 */
-	var $menus = array();
 
 	/**
 	 * List of the headlines to output.
@@ -71,9 +66,50 @@ class AdminUI_general
 	var $headlines = array();
 
 	/**
+	 * Visual path seperator (used in html title, ..)
+	 *
+	 * @var string
+	 */
+	var $pathSeperator;
+
+	/**
+	 * The Logo for the admin.
+	 *
+	 * Defaults to {@link $app_admin_logo} if not set.
+	 *
+	 * @var string
+	 */
+	var $admin_logo;
+
+	/**
+	 * The Logout/Exit-to-blogs links.
+	 *
+	 * Defaults to {@link $app_exit_links} if not set.
+	 *
+	 * @var string
+	 */
+	var $exit_links;
+
+
+	/*-------------------------------------------------------------------*/
+	/*- The members below should not get overridden in a derived class. -*/
+
+	/**
+	 * The menus.
+	 *
+	 * Use {@link add_menu_entries()} to add them here.
+	 *
+	 * @access protected
+	 * @var array
+	 */
+	var $_menus = array();
+
+	/**
 	 * The path of the selected menu.
 	 * Use {@link get_path()} or {@link get_path_range()} to access it.
 	 * Use {@link set_path()}, {@link add_path()} or {@link set_path_by_nr()} to set it.
+	 *
+	 * @access protected
 	 * @var array
 	 */
 	var $path = array();
@@ -82,27 +118,11 @@ class AdminUI_general
 	 * The properties of the path entries.
 	 * Use {@link get_prop_for_path()} or {@link get_properties_for_path()} to access it
 	 * Use {@link set_path()}, {@link add_path()} or {@link set_path_by_nr()} to set it.
+	 *
+	 * @access protected
 	 * @var array
 	 */
 	var $pathProps = array();
-
-	/**
-	 * Visual path seperator (used in html title, ..)
-	 * @var string
-	 */
-	var $pathSeperator;
-
-	/**
-	 * The Logo for the admin (build in constructor).
-	 * @var string
-	 */
-	var $admin_logo;
-
-	/**
-	 * The Logout/Exit-to-blogs links (build in constructor).
-	 * @var string
-	 */
-	var $exit_links;
 
 	/**
 	 * The explicit title for the page.
@@ -263,7 +283,7 @@ class AdminUI_general
 	 * @param array Alternative names of the property to receive (ordered by priority).
 	 * @return array List of the properties.
 	 */
-	function get_properties_for_path( $path, $prop_by_ref )
+	function get_properties_for_path( $path, $prop_by_pref )
 	{
 		if( !is_array($path) )
 		{
@@ -274,7 +294,7 @@ class AdminUI_general
 		$prevPath = array();
 		foreach( $path as $i => $lPath )
 		{
-			if( false !== ($prop = $this->get_prop_for_path( $i, $prop_by_ref )) )
+			if( false !== ($prop = $this->get_prop_for_path( $i, $prop_by_pref )) )
 			{
 				$r[] = $prop;
 			}
@@ -293,11 +313,11 @@ class AdminUI_general
 	 * @param array Alternative names of the property to receive (ordered by priority).
 	 * @return mixed|false False if property is not set for the node, otherwise its value.
 	 */
-	function get_prop_for_node( $path, $prop_by_ref )
+	function get_prop_for_node( $path, $prop_by_pref )
 	{
-		$node =& $this->get_node_by_path( $path );
+		$node = & $this->get_node_by_path( $path );
 
-		foreach( $prop_by_ref as $lProp )
+		foreach( $prop_by_pref as $lProp )
 		{
 			if( isset($node[$lProp]) )
 			{
@@ -388,7 +408,7 @@ class AdminUI_general
 	/**
 	 * Display the end of the payload block
 	 *
-	 * Was: _sub_end.inc.php
+	 * {@internal Was: _sub_end.inc.php}}
 	 */
 	function disp_payload_end()
 	{
@@ -403,7 +423,7 @@ class AdminUI_general
 	 * @todo Use a template (i wanna make an UL/LI/A list structure in newer skins)
 	 *
 	 * @param string name of required permission needed to display the blog in the list
- 	 * @param string level of required permission needed to display the blog in the list
+	 * @param string level of required permission needed to display the blog in the list
 	 * @param string Url format string for elements, with %d for blog number.
 	 * @param string Title for "all" button
 	 * @param string URL for "all" button
@@ -490,11 +510,11 @@ class AdminUI_general
 				$perm = true; // By default
 
 				if( ( ( !isset($loop_details['perm_name'])
-								|| ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) ) )
-							&& ( !isset($loop_details['perm_eval'])
-										|| $perm = eval($loop_details['perm_eval']) )
-						)
-						|| isset($loop_details['text_noperm']) )
+				        || ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) ) )
+				      && ( !isset($loop_details['perm_eval'])
+				            || $perm = eval($loop_details['perm_eval']) )
+				    )
+				    || isset($loop_details['text_noperm']) )
 				{ // If no permission requested or if perm granted or if we have an alt text, display tab:
 					$anchor = '<a href="';
 					if( isset( $loop_details['href'] ) )
@@ -508,7 +528,7 @@ class AdminUI_general
 					}
 
 					$anchor .= '>'.format_to_output( $perm ? $loop_details['text'] : $loop_details['text_noperm'], 'htmlbody' )
-											."</a>";
+					            ."</a>";
 
 
 					if( $loop_tab == $selected )
@@ -558,14 +578,13 @@ class AdminUI_general
 	 */
 	function add_menu_entries( $path, $entries )
 	{
-		$node =& $this->get_node_by_path( $path, true );
+		// Get a reference to the node in the menu list (creating it, if not existing)
+		$node = & $this->get_node_by_path( $path, true );
 
 		foreach( $entries as $lKey => $lMenuProps )
 		{
-			if( 1 ) // TODO: check perms/user settings, ... (this gets mainly done in get_html_menu_entries() for now)
-			{
-				$node['entries'][$lKey] = $lMenuProps;
-			}
+			// TODO: check perms/user settings, ... (this gets mainly done in get_html_menu_entries() for now)
+			$node['entries'][$lKey] = $lMenuProps;
 		}
 	}
 
@@ -623,7 +642,7 @@ class AdminUI_general
 			$path = array($path);
 		}
 
-		$nodes =& $this->menus;
+		$nodes = & $this->_menus;
 		foreach( $path as $lStep )
 		{
 			if( !isset($nodes['entries'][$lStep]) )
@@ -638,7 +657,7 @@ class AdminUI_general
 					return $r;
 				}
 			}
-			$nodes =& $nodes['entries'][$lStep];
+			$nodes = & $nodes['entries'][$lStep];
 		}
 
 		return $nodes;
@@ -752,19 +771,19 @@ class AdminUI_general
 					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
 						'head_start' => "<thead><tr>\n",
 							'head_title' => '<th colspan="$nb_cols$"><span style="float:right">$global_icons$</span>$title$</th></tr>'
-															."\n\n<tr>\n",
+							                ."\n\n<tr>\n",
 							'colhead_start' => '<th>',
 							'colhead_start_first' => '<th class="firstcol">',
 							'colhead_start_last' => '<th class="lastcol">',
 							'colhead_end' => "</th>\n",
 							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending order')
-																	.'" height="12" width="11" />',
+							                    .'" height="12" width="11" />',
 							'sort_asc_on' => '<img src="../admin/img/black_arrow_up.gif" alt="A" title="'.T_('Ascending order')
-																	.'" height="12" width="11" />',
+							                    .'" height="12" width="11" />',
 							'sort_desc_off' => '<img src="../admin/img/grey_arrow_down.gif" alt="D" title="'.T_('Descending order')
-																	.'" height="12" width="11" />',
+							                    .'" height="12" width="11" />',
 							'sort_desc_on' => '<img src="../admin/img/black_arrow_down.gif" alt="D" title="'.T_('Descending order')
-																	.'" height="12" width="11" />',
+							                    .'" height="12" width="11" />',
 							'basic_sort_off' => '',
 							'basic_sort_asc' => get_icon( 'ascending' ),
 							'basic_sort_desc' => get_icon( 'descending' ),
@@ -794,9 +813,9 @@ class AdminUI_general
 					'list_end' => "</table>\n\n",
 					'footer_start' => '<div class="results_nav">',
 					'footer_text' => '<strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$'
-														/* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
-														/* '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$' */
-														/* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
+					                  /* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
+					                  /* '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$' */
+					                  /* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
 					'footer_text_single' => T_('1 page'),
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
@@ -806,10 +825,10 @@ class AdminUI_general
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
 					'no_results' => '<table class="grouped clear" cellspacing="0">'."\n\n"
-																.'<th><span style="float:right">$global_icons$</span>'
-																.'$title$</th></tr>'."\n\n<tr>\n"
-																.'<tr class="lastline"><td class="firstcol lastcol">'.T_('No results.').'</td></tr>'
-																.'</table>'."\n\n",
+					                .'<th><span style="float:right">$global_icons$</span>'
+					                .'$title$</th></tr>'."\n\n<tr>\n"
+					                .'<tr class="lastline"><td class="firstcol lastcol">'.T_('No results.').'</td></tr>'
+					                .'</table>'."\n\n",
 				'after' => '</div>',
 				'sort_type' => 'basic'
 				);
@@ -1102,6 +1121,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.40  2005/11/25 03:57:57  blueyed
+ * doc, normalization
+ *
  * Revision 1.39  2005/11/17 17:39:55  blueyed
  * Removed trailing whitespace in T_() for acronym title
  *
