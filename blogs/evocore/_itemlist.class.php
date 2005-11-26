@@ -484,7 +484,7 @@ class ItemList extends DataObjectList
 		$post_views = param( 'post_views', 'integer', 0 );
 		$renderers = param( 'renderers', 'array', array() );
 		$post_comments = param( 'post_comments', 'string', true );
-		if( $current_User->check_perm( 'edit_timestamp' ) && param( 'edit_date', 'integer', 0 ) )
+		if( !empty($current_User) && $current_User->check_perm( 'edit_timestamp' ) && param( 'edit_date', 'integer', 0 ) )
 		{ // user is allowed to edit timestamps and has checked the box
 			$item_issue_date = param( 'item_issue_date', 'string', true );
 			$item_issue_time = param( 'item_issue_time', 'string', true );
@@ -860,6 +860,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.41  2005/11/26 09:52:04  blueyed
+ * Fixed possible fatal error (happened on the demo site)
+ *
  * Revision 1.40  2005/11/20 01:30:36  blueyed
  * Fixed preview for users that are not allowed to edit timestamps; added TODO
  *
