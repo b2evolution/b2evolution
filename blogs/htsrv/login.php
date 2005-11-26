@@ -82,77 +82,78 @@ switch( $action )
 
 
 	case 'retrievepassword': // Send passwort change request by mail
+		$login_required = true; // Do not display "Without login.." link on the form
 		param( 'redirect_to', 'string', $admin_url );
 
-		if( $demo_mode && ($login == 'demouser' || $login == 'admin') )
-		{
-			$Messages->add( T_('You cannot reset this account in demo mode.'), 'error' );
-		}
-		else
-		{
-			if( $ForgetfulUser =& $UserCache->get_by_login( $login ) )
-			{ // User exists
-				// echo 'email: ', $ForgetfulUser->email;
-				// echo 'locale: '.$ForgetfulUser->locale;
+		$ForgetfulUser = & $UserCache->get_by_login( $login );
 
-				locale_temp_switch( $ForgetfulUser->locale );
+		if( $ForgetfulUser )
+		{ // User exists
+			// echo 'email: ', $ForgetfulUser->email;
+			// echo 'locale: '.$ForgetfulUser->locale;
 
-				// DEBUG!
-				// echo $message.' (password not set yet, only when sending email does not fail);
+			if( $demo_mode && ($ForgetfulUser->login == 'demouser' || $ForgetfulUser->ID == 1) )
+			{
+				$Messages->add( T_('You cannot reset this account in demo mode.'), 'error' );
+				break;
+			}
 
-				if( empty( $ForgetfulUser->email ) )
+			locale_temp_switch( $ForgetfulUser->locale );
+
+			// DEBUG!
+			// echo $message.' (password not set yet, only when sending email does not fail);
+
+			if( empty( $ForgetfulUser->email ) )
+			{
+				$Messages->add( T_('You have no email address with your profile, therefore we cannot reset your password.')
+					.' '.T_('Please try contacting the admin.'), 'error' );
+			}
+			else
+			{
+				$requestId = generate_random_key(22);
+
+				$message = T_( 'Somebody (presumably you) has requested a password change for your account.' )
+					."\n\n"
+					.T_('Login:')." $login\n"
+					.T_('Link to change your password:')
+					."\n"
+					.$htsrv_url.'login.php?action=changepwd'
+						.'&login='.rawurlencode( $ForgetfulUser->login )
+						.'&reqId='.$requestId
+					."\n\n"
+					.T_('Please note:')
+					.' '.sprintf( T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 )
+					."\n\n"
+					.T_('If it was not you that requested this password change, simply ignore this mail.');
+
+				if( !send_mail( $ForgetfulUser->email, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
 				{
-					$Messages->add( T_('You have no email address with your profile, therefore we cannot reset your password.')
-						.' '.T_('Please try contacting the admin.'), 'error' );
+					$Messages->add( T_('The email could not be sent.')
+						.'<br />'.T_('Possible reason: your host may have disabled the mail() function...'), 'error' );
 				}
 				else
 				{
-					$requestId = generate_random_key(22);
+					$UserSettings->set(
+							'password_change_request',
+							serialize( array(
+								'requestId' => $requestId,
+								'IP' => md5(serialize(getIpList())),
+								'time' => $servertimenow ) ),
+							$ForgetfulUser->ID );
 
-					$message = T_( 'Somebody (presumably you) has requested a password change for your account.' )
-						."\n\n"
-						.T_('Login:')." $login\n"
-						.T_('Link to change your password:')
-						."\n"
-						.$htsrv_url.'login.php?action=changepwd'
-							.'&login='.rawurlencode( $ForgetfulUser->login )
-							.'&reqId='.$requestId
-						."\n\n"
-						.T_('Please note:')
-						.' '.sprintf( T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 )
-						."\n\n"
-						.T_('If it was not you that requested this password change, simply ignore this mail.');
+					$UserSettings->dbupdate();
 
-					if( !send_mail( $ForgetfulUser->email, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
-					{
-						$Messages->add( T_('The email could not be sent.')
-							.'<br />'.T_('Possible reason: your host may have disabled the mail() function...'), 'error' );
-					}
-					else
-					{
-						$UserSettings->set(
-								'password_change_request',
-								serialize( array(
-									'requestId' => $requestId,
-									'IP' => md5(serialize(getIpList())),
-									'time' => $servertimenow ) ),
-								$ForgetfulUser->ID );
-
-						$UserSettings->dbupdate();
-
-						$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
-					}
-					#pre_dump( $message );
+					$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
 				}
+				#pre_dump( $message );
+			}
 
-				locale_restore_previous();
-			}
-			else
-			{ // pretend that the email is sent for avoiding guessing user_login
-				$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
-			}
+			locale_restore_previous();
 		}
-		$login_required = true; // Do not display "Without login.." link on the form
+		else
+		{ // pretend that the email is sent for avoiding guessing user_login
+			$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
+		}
 		break;
 
 
