@@ -91,7 +91,7 @@ class FileRoot
 		// Store type:
 		$this->type = $root_type;
 		// Store ID in type:
-		$rhis->in_type_ID = $root_in_type_ID;
+		$this->in_type_ID = $root_in_type_ID;
 		// Generate unique ID:
 		$this->ID = FileRoot::gen_ID( $root_type, $root_in_type_ID );
 
@@ -139,6 +139,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.5  2005/11/26 16:30:22  blueyed
+ * Fix assigning $this->in_type_ID!
+ *
  * Revision 1.4  2005/11/24 20:38:43  blueyed
  * doc
  *
