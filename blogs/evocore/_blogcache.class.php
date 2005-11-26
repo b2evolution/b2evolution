@@ -192,7 +192,7 @@ class BlogCache extends DataObjectCache
 			   FROM T_coll_group_perms
 			'.$where_group, 0, 'Get user blog list (T_coll_group_perms)' );
 
-		$bloglist = array_merge( $bloglist_user, $bloglist_group );
+		$bloglist = array_unique( array_merge( $bloglist_user, $bloglist_group ) );
 
 		$this->load_list( implode( ',', $bloglist ) );
 
@@ -241,6 +241,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.17  2005/11/26 07:35:20  blueyed
+ * load_user_blogs(): return unique list! This fixes the blog being two times in the root list if the user has permission through his group and user.
+ *
  * Revision 1.16  2005/11/24 08:43:11  blueyed
  * doc
  *
