@@ -956,6 +956,9 @@ switch( $Fileman->fm_mode )
 		{
 			$Fileman->fm_mode = NULL;
 		}
+
+		// File properties (Meta data) dialog:
+		require dirname(__FILE__).'/_file_properties.inc.php';
 		break;
 
 
@@ -1162,12 +1165,6 @@ switch( $Fileman->fm_mode )
 		break;
 
 
-	case 'File_properties':
-		// File properties (Meta data) dialog:
-		require dirname(__FILE__).'/_file_properties.inc.php';
-		break;
-
-
 	case 'link_item':
 		// We want to link file(s) to an item:
 
@@ -1322,6 +1319,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.141  2005/11/27 08:48:41  blueyed
+ * fix editing file properties (there were two 'case's)..
+ *
  * Revision 1.140  2005/11/27 06:36:01  blueyed
  * Use deprecated LogUpload for phoenix, because it's not 1-2-3-4 scheme here.
  *
