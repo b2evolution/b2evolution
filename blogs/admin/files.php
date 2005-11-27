@@ -916,7 +916,7 @@ switch( $Fileman->fm_mode )
 						.'</ul>';
 				}
 
-				$Messages->add( $success_msg, 'success' );
+				$LogUpload->add( $success_msg, 'success' );
 
 				// Refreshes file properties (type, size, perms...)
 				$newFile->load_properties();
@@ -1322,6 +1322,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.140  2005/11/27 06:36:01  blueyed
+ * Use deprecated LogUpload for phoenix, because it's not 1-2-3-4 scheme here.
+ *
  * Revision 1.139  2005/11/27 06:16:02  blueyed
  * Echo code to display uploaded file in 'upload' mode and allow to insert it through JS (0.9.1 behaviour).
  *
