@@ -627,54 +627,6 @@ if( $countFiles )
 		}
 
 		/**
-		 * Textarea insertion code
-		 *
-		 * TODO: make this a generic b2evo function. The quicktags plugin also uses it.
-		 */
-		function textarea_replace_selection( myField, snippet )
-		{
-			if (document.selection)
-			{ // IE support:
-				myField.focus();
-				sel = document.selection.createRange();
-				sel.text = snippet;
-				myField.focus();
-			}
-			else if (myField.selectionStart || myField.selectionStart == '0')
-			{ // MOZILLA/NETSCAPE support:
-				var startPos = myField.selectionStart;
-				var endPos = myField.selectionEnd;
-				var cursorPos;
-				var scrollTop, scrollLeft;
-				if( myField.type == 'textarea' && typeof myField.scrollTop != 'undefined' )
-				{ // remember old position
-					scrollTop = myField.scrollTop;
-					scrollLeft = myField.scrollLeft;
-				}
-
-				myField.value = myField.value.substring(0, startPos)
-				                + snippet
-				                + myField.value.substring(endPos, myField.value.length);
-				cursorPos = startPos+snippet.length;
-
-				if( typeof scrollTop != 'undefined' )
-				{ // scroll to old position
-					myField.scrollTop = scrollTop;
-					myField.scrollLeft = scrollLeft;
-				}
-
-				myField.focus();
-				myField.selectionStart = cursorPos;
-				myField.selectionEnd = cursorPos;
-			}
-			else
-			{ // Default browser support:
-				myField.value += snippet;
-				myField.focus();
-			}
-		}
-
-		/**
 		 * Insert IMG tags into parent window for selected files:
 		 */
 		function insert_tag_for_selected_files()
@@ -865,6 +817,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.58  2005/11/27 06:13:52  blueyed
+ * Moved textarea_replace_selection() to functions.js to allow using it everywhere.
+ *
  * Revision 1.57  2005/11/25 14:33:35  fplanque
  * no message
  *
