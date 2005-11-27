@@ -771,7 +771,8 @@ class Filelist
 		}
 		else
 		{
-			return false;
+			$r = false;
+			return $r;
 		}
 	}
 
@@ -790,7 +791,8 @@ class Filelist
 		}
 		else
 		{
-			return false;
+			$r = false;
+			return $r;
 		}
 	}
 
@@ -809,7 +811,8 @@ class Filelist
 		}
 		else
 		{
-			return false;
+			$r = false;
+			return $r;
 		}
 	}
 
@@ -1011,6 +1014,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.42  2005/11/27 22:52:28  blueyed
+ * Fix returning by reference.
+ *
  * Revision 1.41  2005/11/22 04:16:53  blueyed
  * fixed remove(); root type 'absolute' not supported!
  *
