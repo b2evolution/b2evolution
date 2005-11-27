@@ -904,7 +904,19 @@ switch( $Fileman->fm_mode )
 				// chmod the file to default perms! This is important (probably of umask etc). This is handled better in post-phoenix..
 				@chmod( $newFile->get_full_path(), octdec( $newFile->is_dir() ? $Fileman->_default_chmod_dir : $Fileman->_default_chmod_file ) );
 
-				$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() ), 'success' );
+				$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() );
+				if( $mode == 'upload' )
+				{
+					// TODO: Add plugin hook to allow generating JS insert code(s)
+					$img_tag = format_to_output( $newFile->get_tag(), 'formvalue' );
+					$success_msg .=
+						'<ul>'
+							.'<li>'.T_("Here's the code to display it:").' <input type="text" value="'.$img_tag.'" /></li>'
+							.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_replace_selection( window.opener.document.post.content, \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\' ); } return false;">'.T_('Add the code to your post !').'</a></li>'
+						.'</ul>';
+				}
+
+				$Messages->add( $success_msg, 'success' );
 
 				// Refreshes file properties (type, size, perms...)
 				$newFile->load_properties();
@@ -1310,6 +1322,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.139  2005/11/27 06:16:02  blueyed
+ * Echo code to display uploaded file in 'upload' mode and allow to insert it through JS (0.9.1 behaviour).
+ *
  * Revision 1.138  2005/11/24 18:32:10  blueyed
  * Use $Fileman to get (deprecated) chmod defaults, not $Filemanager, which does not exist.. :/
  *
