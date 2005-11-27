@@ -161,7 +161,7 @@ p.uploadfileinputs {    /* Link to add a new info block */
 	margin:1ex 0;
 	padding:1ex;
 }
-ul#uploadfileinputs li.invalid 
+ul#uploadfileinputs li.invalid
 {	/* Upload block displayed when upload has failed: */
 	border:1px solid #f00;
 }
@@ -174,14 +174,19 @@ div#FM_anchor {
 	text-align:center;
 }
 
-div.panelblock fieldset.files_to_upload {
+div.box_files_to_upload {
 	float:left;
 	width:60%;
+}
+div.box_upload_into {
+	float: right;
+	width: 38%;
+}
+
+div.panelblock fieldset.files_to_upload {
 	padding: 1ex;
 }
 div.panelblock fieldset.upload_into {
-	float: right;
-	width: 35%;
 }
 div.panelblock fieldset.upload_submit,
 div.panelblock fieldset.cmr_submit

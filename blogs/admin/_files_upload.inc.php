@@ -162,6 +162,7 @@ if( false )
 		$LogUpload->display( '', '', true, 'all' ); ?>
 
 
+		<div class="box_files_to_upload">
 		<fieldset class="files_to_upload">
 			<legend><?php echo T_('Files to upload') ?></legend>
 
@@ -244,21 +245,23 @@ if( false )
 			</ul>
 
 			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput(); return false;"><?php echo T_('Add another file'); ?></a></p>
-
 		</fieldset>
+		</div>
 
+		<div class="box_upload_into">
 		<fieldset class="upload_into">
 			<legend><?php echo T_('Upload files into:'); ?></legend>
 			<?php
 				echo $Fileman->getDirectoryTreeRadio();
 			?>
 		</fieldset>
+		</div>
 
 		<div class="clear"></div>
 
 <?php
 
-	$Form->end_form( array( array( 'submit', '', T_('Update'), 'SaveButton' ),
+	$Form->end_form( array( array( 'submit', '', T_('Upload'), 'ActionButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 	// End payload block:
@@ -266,6 +269,9 @@ if( false )
 
 /*
  * $Log$
+ * Revision 1.15  2005/11/27 06:17:52  blueyed
+ * Layout fixes to not cause the "Upload into" fieldset wrap below the "Files to upload" box.
+ *
  * Revision 1.14  2005/11/21 18:33:19  fplanque
  * Too many undiscussed changes all around: Massive rollback! :((
  * As said before, I am only taking CLEARLY labelled bugfixes.
