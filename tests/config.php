@@ -33,6 +33,16 @@ if( !defined( 'TMPDIR' ) )
 }
 
 
+// Load b2evo config:
+/**
+ * TODO: not sure, if we should really load everything. We'd need at least
+ *       to define EVO_MAIN_INIT to load single class files, ...
+ */
+#define( 'EVO_MAIN_INIT', 'SIMPLETEST' );
+#require_once( EVODIR.'blogs/conf/_config.php' );
+require_once( EVODIR.'blogs/evocore/_main.inc.php' );
+
+
 /**
  * MySQL settings for the tests.
  *
@@ -66,5 +76,8 @@ $testDB_conf = array_merge( array(
 		# 'table_options' => ' ENGINE=InnoDB DEFAULT CHARSET=utf8 ',
 	),
 	$testDB_conf );
+
+// Use default aliases, if not set
+$testDB_conf['aliases'] = array_merge( $EvoConfig->DB['aliases'], isset($testDB_conf['aliases']) ? $testDB_conf['aliases'] : array() );
 
 ?>

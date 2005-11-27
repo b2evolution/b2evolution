@@ -33,18 +33,6 @@ if( !defined( 'SIMPLETEST_DIR' ) )
 }
 
 
-// Load b2evo config:
-/**
- * TODO: not sure, if we should really load everything. We'd need at least
- *       to define EVO_MAIN_INIT to load single class files, ...
- */
-#define( 'EVO_MAIN_INIT', 'SIMPLETEST' );
-#require_once( EVODIR.'blogs/conf/_config.php' );
-require_once( EVODIR.'blogs/evocore/_main.inc.php' );
-
-$testDB_conf = array_merge( $EvoConfig->DB, $testDB_conf );
-
-
 if( !file_exists( SIMPLETEST_DIR.'unit_tester.php' ) )
 {
 	die( 'SimpleTest framework not found: File '.SIMPLETEST_DIR.'unit_tester.php does not exist.' );
