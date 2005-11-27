@@ -53,8 +53,12 @@ if( isset($Blog) )
 	 */
 	function open_preview(form)
 	{
+		if( form.target == 'b2evo_preview' )
+		{ // A double-click on the Preview button
+			return false;
+		}
 		// Stupid thing: having a field called action !
-		var saved_action =  form.attributes.getNamedItem('action').value;
+		var saved_action = form.attributes.getNamedItem('action').value;
 		form.attributes.getNamedItem('action').value = '<?php $Blog->disp( 'dynurl', 'raw' ) ?>';
 
 		// FIX for Safari (2.0.2, OS X 10.4.3), to not submit the item on "Preview"! - (Konqueror does not fail here)
@@ -392,6 +396,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.41  2005/11/27 08:54:28  blueyed
+ * open_preview(): catch double-clicks on Preview button
+ *
  * Revision 1.40  2005/11/25 22:45:37  fplanque
  * no message
  *
