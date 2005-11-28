@@ -772,8 +772,6 @@ class User extends DataObject
 	/**
 	 * Template function: display a link to a message form for this user
 	 *
-	 * {@internal User::msgform_link(-)}}
-	 *
 	 * @param string url of the message form
 	 * @param string to display before link
 	 * @param string to display after link
@@ -783,7 +781,7 @@ class User extends DataObject
 	 */
 	function msgform_link( $form_url = NULL, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
-		echo get_msgform_link( $form_url, $before, $after, $text, $title, $class );
+		echo $this->get_msgform_link( $form_url, $before, $after, $text, $title, $class );
 	}
 
 
@@ -928,6 +926,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.53  2005/11/28 17:42:09  blueyed
+ * Fixed msgform_link(): call $this->get_msgform_link()
+ *
  * Revision 1.52  2005/11/24 15:12:44  blueyed
  * Suppress notices/warnings on mkdir() for the user's directory.
  *
