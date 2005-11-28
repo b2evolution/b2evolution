@@ -1068,7 +1068,7 @@ class Item extends DataObject
 
 
 	/**
-	 * Template function: Provide link to message form for this Item's author
+	 * Template function: Provide link to message form for this Item's author.
 	 *
 	 * {@internal Item::msgform_link(-)}}
 	 *
@@ -1078,6 +1078,7 @@ class Item extends DataObject
 	 * @param string link text
 	 * @param string link title
 	 * @param string class name
+	 * @return boolean true, if a link was displayed; false if there's no email address for the Item's author.
 	 */
 	function msgform_link( $form_url, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
@@ -1092,6 +1093,44 @@ class Item extends DataObject
 		$form_url = url_add_param( $form_url, 'post_id='.$this->ID );
 
 		if( $title == '#' ) $title = T_('Send email to post author');
+		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
+
+		echo $before;
+		echo '<a href="'.$form_url.'" title="'.$title.'"';
+		if( !empty( $class ) ) echo ' class="'.$class.'"';
+		echo '>'.$text.'</a>';
+		echo $after;
+
+		return true;
+	}
+
+
+	/**
+	 * Template function: Provide link to message form for this Item's assigned User.
+	 *
+	 * {@internal Item::msgform_link_assigned(-)}}
+	 *
+	 * @param string url of the message form
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @return boolean true, if a link was displayed; false if there's no email address for the assigned User.
+	 */
+	function msgform_link_assigned( $form_url, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
+	{
+		global $img_url;
+
+		if( empty($this->assigned_User) || empty($this->assigned_User->email) )
+		{ // We have no email for this Author :(
+			return false;
+		}
+
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->assigned_User->ID );
+		$form_url = url_add_param( $form_url, 'post_id='.$this->ID );
+
+		if( $title == '#' ) $title = T_('Send email to assigned user');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
 
 		echo $before;
@@ -2261,6 +2300,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.70  2005/11/28 21:06:56  blueyed
+ * Item::msgform_link_assigned() to display link to message form of the assigned User
+ *
  * Revision 1.69  2005/11/28 20:39:46  blueyed
  * Added Items::views_phrase() to allow distinguishing between 0, 1 or more views.
  *
