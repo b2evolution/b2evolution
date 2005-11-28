@@ -498,14 +498,13 @@ class DataObject
 
 
 	/**
-	 * Set param value
-	 *
-	 * {@internal DataObject::set_param(-) }}
+	 * Set param value.
 	 *
 	 * @param string Name of parameter
 	 * @param string DB field type ('string', 'number', 'date' )
 	 * @param mixed Value of parameter
 	 * @param boolean true to set to NULL if empty string value
+	 * @return boolean true, if value has been set/changed, false if not.
 	 */
 	function set_param( $parname, $fieldtype, $parvalue, $make_null = false )
 	{
@@ -552,7 +551,12 @@ class DataObject
 
 
 	/**
-	 * Set a parameter from a Request form value
+	 * Set a parameter from a Request form value.
+	 *
+	 * @param string Dataobject parameter name
+	 * @param string|NULL Request parameter name (NULL means to use Dataobject param name with its prefix)
+	 * @param boolean true to set to NULL if empty string value
+	 * @return boolean true, if value has been set/changed, false if not.
 	 */
 	function set_from_Request( $parname, $var = NULL, $make_null = false )
 	{
@@ -562,13 +566,13 @@ class DataObject
 		{
 			$var = $this->dbprefix.$parname;
 		}
-		$this->set( $parname, $Request->get($var), $make_null );
+
+		return $this->set( $parname, $Request->get($var), $make_null );
 	}
 
+
 	/**
-	 * Template function: Displays object ID
-	 *
-	 * {@internal DataObject::ID(-) }}
+	 * Template function: Displays object ID.
 	 */
 	function ID()
 	{
@@ -596,6 +600,9 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
+ * Revision 1.30  2005/11/28 07:39:43  blueyed
+ * doc, normalization
+ *
  * Revision 1.29  2005/11/18 18:26:38  fplanque
  * no message
  *
