@@ -1769,13 +1769,57 @@ class Item extends DataObject
 
 
 	/**
+	 * Get a phrase about the number of Item views.
+	 *
+	 * @param string Link text to display when there are 0 views
+	 * @param string Link text to display when there is 1 views
+	 * @param string Link text to display when there are >1 views (include %d for # of views)
+	 * @return string The phrase about the number of views.
+	 */
+	function get_views_phrase( $zero = '#', $one = '#', $more = '#' )
+	{
+		if( !$this->views )
+		{
+			return $zero == '#' ? T_( 'No views' ) : $zero;
+		}
+
+		if( $this->views == 1 )
+		{
+			return $one == '#' ? T_( '1 view' ) : $one;
+		}
+
+		if( $more == '#' )
+		{
+			$more = T_( '%d views' );
+		}
+
+		return str_replace( '%d', $this->views, $more );
+	}
+
+
+	/**
+	 * Template function: Display a phrase about the number of Item views.
+	 *
+	 * @param string Link text to display when there are 0 views
+	 * @param string Link text to display when there is 1 views
+	 * @param string Link text to display when there are >1 views (include %d for # of views)
+	 * @return integer Number of views.
+	 */
+	function views_phrase( $zero = '#', $one = '#', $more = '#' )
+	{
+		echo $this->get_views_phrase( $zero, $one, $more );
+
+		return $this->views;
+	}
+
+
+	/**
 	 * Template function: Display the number of times the Item has been viewed
 	 *
 	 * Note: viewcount is incremented whenever the Item's content is displayed with "MORE"
-	 * (i-e full content), see {@link Item::content()}
-	 * Viewcount is NOT incremented on page reloads and other special cases, see {@link Hit::is_new_view()}
+	 * (i-e full content), see {@link Item::content()}.
 	 *
-	 * {@internal Item::views(-) }}
+	 * Viewcount is NOT incremented on page reloads and other special cases, see {@link Hit::is_new_view()}
 	 */
 	function views()
 	{
@@ -2217,6 +2261,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.69  2005/11/28 20:39:46  blueyed
+ * Added Items::views_phrase() to allow distinguishing between 0, 1 or more views.
+ *
  * Revision 1.68  2005/11/25 22:45:37  fplanque
  * no message
  *

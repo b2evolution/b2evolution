@@ -125,8 +125,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			$Item->wordcount();
 			echo ' ', T_('words');
 			echo ', ';
-			$Item->views();
-			echo ' '.T_('views');
+			$Item->views_phrase();
 			echo ' &nbsp; ';
 			locale_flag( $Item->locale, 'h10px' );
 			echo '<br /> ', T_('Categories'), ': ';
