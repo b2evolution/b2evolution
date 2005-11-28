@@ -107,12 +107,10 @@ class spellcheck_plugin extends Plugin
 
 
 	/**
-	 * Display an editor button
-	 *
-	 * {@internal Plugin::DisplayEditorButton(-)}}
+	 * Display an editor button.
 	 *
 	 * @param array Associative array of parameters
-	 * @return boolean did we display a toolbar?
+	 * @return boolean did we display a button?
 	 */
 	function DisplayEditorButton( & $params )
 	{
