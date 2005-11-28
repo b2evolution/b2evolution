@@ -97,7 +97,12 @@ $Form->end_form();
 
 <div class="login_actions" style="text-align:right">
 	<?php user_register_link( '', ' &middot; ' )?>
-	<a href="<?php echo $htsrv_url ?>login.php?action=lostpassword&amp;redirect_to=<?php echo rawurlencode( $location );
+	<a href="<?php echo $htsrv_url ?>login.php?action=lostpassword&amp;redirect_to=<?php
+		echo rawurlencode( $location );
+		if( !empty($login) )
+		{
+			echo '&amp;login='.rawurlencode($login);
+		}
 		?>"><?php echo T_('Lost your password ?')
 		?></a>
 	<?php
