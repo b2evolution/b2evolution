@@ -307,6 +307,7 @@ class Plugins
 
 		if( !class_exists( $classname ) )
 		{ // the given class does not exist
+			// TODO: Add Message to log category 'plugin_errors' that gets displayed in Settings / Plugins (on discover)
 			$Debuglog->add( 'ERROR: Plugin class for ['.$classname.'] not defined - must match the filename.', 'plugins' );
 			return false;
 		}
@@ -659,6 +660,9 @@ function sort_Plugin_name( & $a, & $b )
 
 /*
  * $Log$
+ * Revision 1.14  2005/11/29 14:42:28  blueyed
+ * todo
+ *
  * Revision 1.13  2005/11/25 15:45:39  blueyed
  * Hide passwords in Debuglog! (for event LoginAttempt)
  *
