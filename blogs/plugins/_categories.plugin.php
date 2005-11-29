@@ -192,6 +192,10 @@ class categories_plugin extends Plugin
 						$curr_blog_ID!=false;
 						 $curr_blog_ID=blog_list_next('stub') )
 			{
+				if( ! blog_list_iteminfo('disp_bloglist', false) )
+				{ // Skip Blogs that should not get displayed in public blog list
+					continue;
+				}
 
 				echo $params['coll_start'];
 				echo '<a href="';
