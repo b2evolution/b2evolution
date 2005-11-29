@@ -2259,14 +2259,11 @@ msgstr "Erlaubnis, um die Medienbibliothek des Blogs zu durchsuchen"
 msgid "Permission to change the blog's media folder content"
 msgstr "Erlaubnis, um den Inhalt der Medienbibliothek zu verändern"
 
-# C:\www\b2evo090\blogs\admin\_blogs_permissions.form.php:130
 #: ..\..\..\admin\_blogs_permissions.form.php:125
 #: ..\..\..\admin\_blogs_permissions_group.form.php:125
 msgid "(un)selects all checkboxes using Javascript"
 msgstr "(de)markieren aller Checkboxen mittels Javascript"
 
-# C:\www\b2evo090\blogs\admin\_blogs_permissions.form.php:131
-# C:\www\b2evo090\blogs\admin\_blogs_permissions.form.php:201
 #: ..\..\..\admin\_blogs_permissions.form.php:126
 #: ..\..\..\admin\_blogs_permissions_group.form.php:126
 msgid "(un)check all"
@@ -2937,12 +2934,10 @@ msgstr "Umbenennen"
 msgid "No files found."
 msgstr "Keine Dateien gefunden."
 
-# C:\www\b2evo090\blogs\admin\_menutop.php:106
 #: ..\..\..\admin\_files_browse.inc.php:492
 msgid "uncheck all"
 msgstr "demarkiere alle"
 
-# C:\www\b2evo090\blogs\admin\_menutop.php:108
 #: ..\..\..\admin\_files_browse.inc.php:492
 #: ..\..\..\admin\_files_permissions.form.php:74
 msgid "check all"
@@ -6255,12 +6250,10 @@ msgstr "Sorry, es gibt nichts anzuzeigen..."
 msgid "Sel"
 msgstr "Sel"
 
-# C:\www\b2evo090\blogs\admin\_menutop.php:108
 #: ..\..\..\evocore\_resultsel.class.php:179
 msgid "Check all"
 msgstr "Markiere alle"
 
-# C:\www\b2evo090\blogs\admin\_menutop.php:106
 #: ..\..\..\evocore\_resultsel.class.php:180
 msgid "Uncheck all"
 msgstr "Demarkiere alle"
@@ -8070,7 +8063,6 @@ msgstr "Dieser Skin Tag zeigt eine Liste der verfügbaren Kategorien des Blogs."
 msgid "Categories are indeed chapters and sub-chapters in the blog."
 msgstr "Kategorien sind in der Tat Kapitel und Unterkaptitel im Blog."
 
-# C:\www\b2evo090\blogs\skins\_categories.php:17
 # TRANS: All categories, skin's categories list
 #. TRANS: All categories, skin's categories list
 #: ..\..\..\plugins\_categories.plugin.php:147
@@ -8080,11 +8072,11 @@ msgstr "Alle"
 
 #: ..\..\..\plugins\_categories.plugin.php:227
 msgid "ANY"
-msgstr "EINE"
+msgstr "JEDE"
 
 #: ..\..\..\plugins\_categories.plugin.php:231
 msgid "ANY BUT"
-msgstr "EINE AUSSER"
+msgstr "JEDE AUSSER"
 
 #: ..\..\..\plugins\_categories.plugin.php:235
 msgid "ALL"
