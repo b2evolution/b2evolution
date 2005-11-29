@@ -415,15 +415,12 @@ class ItemList extends DataObjectList
 			}
 
 			/**
-			 * TODO: it's reported on the forums that
-			 *   SELECT COUNT(DISTINCT '.$this->dbIDname.')
-			 * should fix counting of posts, when "messing around" with posts to
-			 * categories assignments.
-			 * However, there's a unique index in T_postcats..
-			 * @see http://forums.b2evolution.net/viewtopic.php?t=6069
+			 * Query to count the number of items.
+			 * This gets used by {@link calc_max()}.
+			 * @var string
 			 */
-			$this->count_request = '
-				SELECT COUNT('.$this->dbIDname.')
+			$this->count_sql = '
+				SELECT COUNT(DISTINCT '.$this->dbIDname.')
 				FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
 					INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 					'.$where;
@@ -674,13 +671,17 @@ class ItemList extends DataObjectList
 		global $DB;
 
 		if( $this->preview )
-			return 1;	// 1 row in preview mode
+		{ // 1 row in preview mode
+			return 1;
+		}
 
-		$this->total_rows = $DB->get_var( $this->count_request, 0, 0, 'Get result count' );
+		$this->total_rows = $DB->get_var( $this->count_sql, 0, 0, 'Get result count' );
 
 		$this->total_pages = intval( ($this->total_rows-1) / max($this->posts_per_page, $this->result_num_rows)) +1;
 		if( $this->total_pages < 1 )
+		{
 			$this->total_pages = 1;
+		}
 	}
 
 
@@ -860,6 +861,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.42  2005/11/29 13:15:59  blueyed
+ * Fixed calc_max() by using DISTINCT for the query it uses.
+ *
  * Revision 1.41  2005/11/26 09:52:04  blueyed
  * Fixed possible fatal error (happened on the demo site)
  *
