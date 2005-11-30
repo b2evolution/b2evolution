@@ -303,17 +303,19 @@ function convert_chars( $content, $flag='html' )
  * {@internal only used with _autolinks.plugin.php - move it there?
  *  NOTE: its tested in the misc.funcs.simpletest.php test case }}
  *
+ * @todo IMHO it would be better to use "\b" (word boundary) to match the beginning of links..
+ *
  * original function: phpBB, extended here for AIM & ICQ
  * fplanque restricted :// to http:// and mailto://
  */
 function make_clickable( $text, $moredelim = '&amp;' )
 {
 	$text = preg_replace(
-		array( '#(^|\s)(https?|mailto)://(([^<>{}\s,]|,(?!\s))+)#i',
-			'#(^|\s)aim:([^,<\s]+)#i',
-			'#(^|\s)icq:(\d+)#i',
-			'#(^|\s)www\.([a-z0-9\-]+)\.([a-z0-9\-.\~]+)((?:/[^,<\s]*)?)#i',
-			'#(^|\s)([a-z0-9\-_.]+?)@([^,<\s]+)#i', ),
+		array( '#(^|[\s>])(https?|mailto)://(([^<>{}\s,]|,(?!\s))+)#i',
+			'#(^|[\s>])aim:([^,<\s]+)#i',
+			'#(^|[\s>])icq:(\d+)#i',
+			'#(^|[\s>])www\.([a-z0-9\-]+)\.([a-z0-9\-.\~]+)((?:/[^,<\s]*)?)#i',
+			'#(^|[\s>])([a-z0-9\-_.]+?)@([^,<\s]+)#i', ),
 		array( '$1<a href="$2://$3">$2://$3</a>',
 			'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.rawurlencode(T_('Hello')).'">$2$3</a>',
 			'$1<a href="http://wwp.icq.com/scripts/search.dll?to=$2">$2</a>',
@@ -2290,6 +2292,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.151  2005/11/30 12:53:12  blueyed
+ * make_clickable(): handle links that follow ">"..
+ *
  * Revision 1.150  2005/11/24 08:44:01  blueyed
  * Debuglog
  *

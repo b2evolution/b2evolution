@@ -41,6 +41,7 @@ class MiscFuncsTestCase extends UnitTestCase
 				'http://www.logitech.com/index.cfm/products/detailsharmony/US/EN,CRID=2084,CONTENTID=8747' => '<a href="http://www.logitech.com/index.cfm/products/detailsharmony/US/EN,CRID=2084,CONTENTID=8747">http://www.logitech.com/index.cfm/products/detailsharmony/US/EN,CRID=2084,CONTENTID=8747</a>',
 				'Please look at http://this.com, and tell me what you think.' => 'Please look at <a href="http://this.com">http://this.com</a>, and tell me what you think.',
 				'https://paypal.com' => '<a href="https://paypal.com">https://paypal.com</a>',
+				'<div>http://b2evolution.net/</div>' => '<div><a href="http://b2evolution.net/">http://b2evolution.net/</a></div>',
 
 				// aim:
 
