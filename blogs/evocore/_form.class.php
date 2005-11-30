@@ -1140,7 +1140,7 @@ class Form extends Widget
 
 			$r .= $after_field;
 
-			$r .= $option[2];
+			$r .= ' '.$option[2];
 
 			$r .='</label>';
 
@@ -1929,7 +1929,7 @@ class Form extends Widget
 		}
 		// do not display note after all radio options
 		$this->_common_params['note'] = NULL;
-		
+
 		$r .= $this->end_field();
 
 		return $this->display_or_return( $r );
@@ -2278,6 +2278,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.90  2005/11/30 10:46:36  blueyed
+ * checklist(): Whitespace between checkbox and label
+ *
  * Revision 1.89  2005/11/19 22:56:53  blueyed
  * radio_input(): do not parse common params for the single radio inputs; hiddens_by_key(): support array values (this is needed to passthrough $_POST data for example (-> login))
  *
