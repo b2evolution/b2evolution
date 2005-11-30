@@ -89,15 +89,16 @@ class ItemCache extends DataObjectCache
 			// Load just the requested object:
 			$Debuglog->add( "Loading <strong>$this->objtype($req_urltitle)</strong> into cache" );
 			$sql = "SELECT *
-							FROM $this->dbtablename
-							WHERE post_urltitle = ".$DB->quote($req_urltitle);
+			          FROM $this->dbtablename
+			         WHERE post_urltitle = ".$DB->quote($req_urltitle);
 			$row = $DB->get_row( $sql );
 			if( empty( $row ) )
 			{	// Requested object does not exist
 				if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
 				// put into index:
 				$this->urltitle_index[$req_urltitle] = false;
-				return false;
+
+				return $this->urltitle_index[$req_urltitle];
 			}
 
 			$dbIDname = $this->dbIDname;
@@ -159,6 +160,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.12  2005/11/30 17:38:06  blueyed
+ * Return by reference fix by balupton (http://forums.b2evolution.net/viewtopic.php?p=29484)
+ *
  * Revision 1.11  2005/11/24 14:30:38  blueyed
  * Fatal error fixed (missing global $Debuglog)
  *
