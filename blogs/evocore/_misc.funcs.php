@@ -1548,11 +1548,22 @@ function debug_info( $force = false )
 			}
 		}
 
+
+		// DEBUGLOG (with list of categories at top):
+		$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
+		$log_cats = array_keys($Debuglog->getMessages( $log_categories )); // the real list (with all replaced and only existing ones)
+		$log_container_head = '<h3>Debug messages</h3>';
+		$log_head_links = array();
+		foreach( $log_cats as $l_cat )
+		{
+			$log_head_links[] .= '<a href="#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+		}
+		$log_container_head .= implode( ' | ', $log_head_links );
 		echo format_to_output(
 			$Debuglog->display( array(
-					'container' => array( 'string' => '<h3>Debug messages</h3>', 'template' => false ),
-					'all' => array( 'string' => '<h4>%s:</h4>', 'template' => false ) ),
-				'', false, array( 'error', 'note', 'all' ) ),
+					'container' => array( 'string' => $log_container_head, 'template' => false ),
+					'all' => array( 'string' => '<h4 id="debug_info_cat_%s">%s:</h4>', 'template' => false ) ),
+				'', false, $log_categories ),
 			'htmlbody' );
 
 
@@ -2292,6 +2303,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.152  2005/11/30 19:53:05  blueyed
+ * Display a list of Debuglog categories with links to the categories messages html ID.
+ *
  * Revision 1.151  2005/11/30 12:53:12  blueyed
  * make_clickable(): handle links that follow ">"..
  *

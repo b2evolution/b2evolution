@@ -229,17 +229,14 @@ class Log
 				$r = $r['string'];
 			}
 
-			if( strstr( $r, '%s' ) )
-			{
-				$r = sprintf( $r, $category );
-			}
+			// Replace '%s' with category:
+			$r = str_replace( '%s', $category, $r );
 		}
 
 		if( empty($r) )
 		{
 			return false;
 		}
-
 
 		if( !empty($template) )
 		{
@@ -341,10 +338,7 @@ class Log
 
 		if( !is_array($cssclass) )
 		{
-			$cssclass = array( 'all' => array( 'class' => is_null($cssclass)
-																											? NULL
-																											: $cssclass,
-																					'divClass' => true ) );
+			$cssclass = array( 'all' => array( 'class' => is_null($cssclass) ? NULL : $cssclass, 'divClass' => true ) );
 		}
 		elseif( !isset($cssclass['all']) )
 		{
@@ -625,6 +619,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.21  2005/11/30 19:53:05  blueyed
+ * Display a list of Debuglog categories with links to the categories messages html ID.
+ *
  * Revision 1.20  2005/11/18 00:13:55  blueyed
  * Normalized Log class
  *
