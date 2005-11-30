@@ -87,13 +87,13 @@ class categories_plugin extends Plugin
 	 *                - 'list_end' : (Default '</ul>')
 	 *                - 'line_start' : (Default '<li>')
 	 *                - 'line_end' : (Default '</li>')
-   *                - 'group_start' : (Default '<ul>') - (for BLOG 1 Categories)
-   *                - 'group_end' : (Default "</ul>\n") - (for BLOG 1 Categories)
-   *                - 'collist_start' : (Default '') - (for BLOG 1 Categories)
-   *                - 'collist_end' : (Default "\n") - (for BLOG 1 Categories)
-   *                - 'coll_start' : (Default '<h4>') - (for BLOG 1 Categories)
-   *                - 'coll_end' : (Default "</h4>\n") - (for BLOG 1 Categories)
-   *                - 'option_all' : (Default T_('All'))
+	 *                - 'group_start' : (Default '<ul>') - (for BLOG 1 Categories)
+	 *                - 'group_end' : (Default "</ul>\n") - (for BLOG 1 Categories)
+	 *                - 'collist_start' : (Default '') - (for BLOG 1 Categories)
+	 *                - 'collist_end' : (Default "\n") - (for BLOG 1 Categories)
+	 *                - 'coll_start' : (Default '<h4>') - (for BLOG 1 Categories)
+	 *                - 'coll_end' : (Default "</h4>\n") - (for BLOG 1 Categories)
+	 *                - 'option_all' : (Default T_('All'))
 	 * @return boolean did we display?
 	 */
 	function SkinTag( $params )
@@ -194,6 +194,18 @@ class categories_plugin extends Plugin
 			{
 				if( ! blog_list_iteminfo('disp_bloglist', false) )
 				{ // Skip Blogs that should not get displayed in public blog list
+					// QUESTION: make this a param?
+					continue;
+				}
+
+				// run recursively through the cats
+				$cat_list = cat_children( $cache_categories, $curr_blog_ID, NULL,
+							array( $this, 'callback_before_first' ), array( $this, 'callback_before_each' ),
+							array( $this, 'callback_after_each' ), array( $this, 'callback_after_last' ), 0 );
+
+				if( empty( $cat_list ) )
+				{ // Skip Blogs that have no categories!
+					// QUESTION: make this a param?
 					continue;
 				}
 
@@ -212,11 +224,8 @@ class categories_plugin extends Plugin
 				echo '</a>';
 				echo $params['coll_end'];
 
-				// run recursively through the cats
 				echo $params['list_start'];
-				echo cat_children( $cache_categories, $curr_blog_ID, NULL,
-							array( $this, 'callback_before_first' ), array( $this, 'callback_before_each' ),
-							array( $this, 'callback_after_each' ), array( $this, 'callback_after_last' ), 0 );
+				echo $cat_list;
 				echo $params['list_end'];
 			}
 
