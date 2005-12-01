@@ -59,35 +59,35 @@ if( false )
  */
 $object_def['Item'] = array( // definition of the object:
 			'db_cols' => array(	// maps properties to colums:
-										'ID'              => 'ID',
-										'creator_user_ID' => 'post_creator_user_ID',
-										'lastedit_user_ID'=> 'post_lastedit_user_ID',
-										'assigned_user_ID'=> 'post_assigned_user_ID',
-										'datecreated'			=> 'post_datecreated',
-										'deadline'        => 'post_datedeadline',
-										'datestart'       => 'post_datestart',
-										'datemodified'    => 'post_datemodified',
-										'status'          => 'post_status',
-										'locale'          => 'post_locale',
-										'content'         => 'post_content',
-										'title'           => 'post_title',
-										'urltitle'        => 'post_urltitle',
-										'url'             => 'post_url',
-										'main_cat_ID'     => 'post_main_cat_ID',
-										'flags'           => 'post_flags',
-										'wordcount'       => 'post_wordcount',
-										'comments'        => 'post_comments',
-										'views'           => 'post_views',
-										'renderers'       => 'post_renderers',
-										'st_ID'           => 'post_pst_ID',
-										'typ_ID'          => 'post_ptyp_ID',
-										'priority'				=> 'post_priority'
-									),
+					'ID'              => 'ID',
+					'creator_user_ID' => 'post_creator_user_ID',
+					'lastedit_user_ID'=> 'post_lastedit_user_ID',
+					'assigned_user_ID'=> 'post_assigned_user_ID',
+					'datecreated'			=> 'post_datecreated',
+					'deadline'        => 'post_datedeadline',
+					'datestart'       => 'post_datestart',
+					'datemodified'    => 'post_datemodified',
+					'status'          => 'post_status',
+					'locale'          => 'post_locale',
+					'content'         => 'post_content',
+					'title'           => 'post_title',
+					'urltitle'        => 'post_urltitle',
+					'url'             => 'post_url',
+					'main_cat_ID'     => 'post_main_cat_ID',
+					'flags'           => 'post_flags',
+					'wordcount'       => 'post_wordcount',
+					'comments'        => 'post_comments',
+					'views'           => 'post_views',
+					'renderers'       => 'post_renderers',
+					'st_ID'           => 'post_pst_ID',
+					'typ_ID'          => 'post_ptyp_ID',
+					'priority'				=> 'post_priority'
+				),
 			'allow_null' => array( // specifies column nullability:
-										'assigned_user_ID'=> true,
-										'st_ID'           => true,
-										'typ_ID'          => true,
-									),
+					'assigned_user_ID'=> true,
+					'st_ID'           => true,
+					'typ_ID'          => true,
+				),
 		);
 
 
@@ -113,9 +113,9 @@ class Item extends DataObject
 	var $mod_date;
 	var $status;
 	/**
-	 * locale code for the Item content
+	 * Locale code for the Item content.
 	 *
-	 * examples: en-US, zh-CN-utf-8
+	 * Examples: en-US, zh-CN-utf-8
 	 *
 	 * @var string
 	 */
@@ -132,7 +132,7 @@ class Item extends DataObject
 	var $typ_ID;
 	var $st_ID;
 	var $deadline = '';
-	var $priority = 3;
+	var $priority;
 
 	/**
 	 * Derived from $main_cat_ID
@@ -238,6 +238,7 @@ class Item extends DataObject
 			$this->renderers = array( 'default' );
 			$this->set( 'status', 'published' );
 			$this->set( 'locale', $default_locale );
+			$this->set( 'priority', 3 );
 		}
 		else
 		{
@@ -2300,6 +2301,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.71  2005/12/01 19:03:15  blueyed
+ * Use set() to set default priority to 3! Otherwise leaving it at the default setting would not call dbchange().
+ *
  * Revision 1.70  2005/11/28 21:06:56  blueyed
  * Item::msgform_link_assigned() to display link to message form of the assigned User
  *
