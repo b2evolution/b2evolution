@@ -667,7 +667,7 @@ class Part
 $md = new MMSDecoder( $HTTP_RAW_POST_DATA );
 $md->parse();
 
-// $from_ip = getIpList( true );
+// $from_ip = $Hit->IP;
 // $recipient = $md->to;
 
 $post_title = $md->subject;
@@ -719,7 +719,7 @@ pingback( true, $content, $post_title, '', $post_ID, $blogparams, false );
 
 // Send email notifications now!
 $edited_Item->send_email_notifications( false );
-		
+
 pingb2evonet( $blogparams, $post_ID, $post_title, false );
 pingWeblogs( $blogparams, false );
 pingBlogs( $blogparams );
@@ -730,6 +730,9 @@ exit;
 
 /*
  * $Log$
+ * Revision 1.9  2005/12/01 19:25:27  blueyed
+ * Use $Hit object for remote address
+ *
  * Revision 1.8  2005/10/05 20:26:12  fplanque
  * cleanup
  *

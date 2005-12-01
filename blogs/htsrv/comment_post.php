@@ -68,7 +68,6 @@ if( ! is_logged_in() )
 	}
 }
 
-$user_ip = getIpList( true );
 $now = date("Y-m-d H:i:s", $localtimenow );
 
 // CHECK and FORMAT content
@@ -89,9 +88,9 @@ elseif( antispam_check( strip_tags($comment) ) )
 /*
  * Flood-protection
  */
-$query = "SELECT max(comment_date)
-					FROM T_comments
-					WHERE comment_author_IP = '$user_ip'";
+$query = 'SELECT MAX(comment_date)
+            FROM T_comments
+           WHERE comment_author_IP = '.$DB->quote($Hit->IP);
 $ok = 1;
 if( $then = $DB->get_var( $query ) )
 {
@@ -135,7 +134,7 @@ else
 	$Comment->set( 'author_email', $email );
 	$Comment->set( 'author_url', $url );
 }
-$Comment->set( 'author_IP', $user_ip );
+$Comment->set( 'author_IP', $Hit->IP );
 $Comment->set( 'date', $now );
 $Comment->set( 'content', $comment );
 

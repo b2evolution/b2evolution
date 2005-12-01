@@ -139,7 +139,7 @@ class Hit
 		global $Debuglog, $DB;
 		global $comments_allowed_uri_scheme;
 
-		// Get list of client IP addresses from REMOTE_ADDR and HTTP_X_FORWARDED_FOR
+		// Get the first IP in the list of REMOTE_ADDR and HTTP_X_FORWARDED_FOR
 		$this->IP = getIpList( true );
 
 		// Check the referer:
@@ -201,7 +201,7 @@ class Hit
 			       INNER JOIN T_useragents ON sess_agnt_ID = agnt_ID
 			 WHERE hit_uri = "'.$DB->escape( $ReqURI ).'"
 			   AND hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
-			   AND hit_remote_addr = '.$DB->quote( getIpList( true ) ).'
+			   AND hit_remote_addr = '.$DB->quote( $this->IP ).'
 			   AND agnt_signature = '.$DB->quote($this->user_agent),
 					0, 0, 'Hit: Check for reload' ) )
 		{

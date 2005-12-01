@@ -90,7 +90,7 @@ switch( $action )
 			$new_User->set( 'pass', md5($pass1) ); // encrypted
 			$new_User->set( 'nickname', $login );
 			$new_User->set( 'email', $email );
-			$new_User->set( 'ip', getIpList( true ) );
+			$new_User->set( 'ip', $Hit->IP );
 			$new_User->set( 'domain', $Hit->get_remote_host() );
 			$new_User->set( 'browser', $Hit->user_agent );
 			$new_User->set_datecreated( $localtimenow );
