@@ -3,8 +3,6 @@
 # This file is distributed under the same license as the b2evolution package.
 #
 # dAniel hAhler <daniel@thequod.de>, 2003-2005.
-# dAniel hAhler <daniel@thequod.de>, 2005.
-# dAniel hAhler <daniel@thequod.de>, 2005.
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
@@ -305,7 +303,7 @@ msgstr "Entferne Eintrag #%d der Verbotsliste..."
 
 #: ..\..\..\admin\antispam.php:196
 msgid "Confirm ban & delete"
-msgstr "Bestätige Verbot &amp; Löschen"
+msgstr "Bestätige Verbot & Löschen"
 
 #: ..\..\..\admin\antispam.php:210
 #, php-format
@@ -401,7 +399,7 @@ msgstr "Füge ein verbotenes Schlüsselwort hinzu"
 
 #: ..\..\..\admin\antispam.php:356
 msgid "Check & ban..."
-msgstr "Überprüfen &amp; Verbieten..."
+msgstr "Überprüfen & Verbieten..."
 
 #: ..\..\..\admin\antispam.php:363
 msgid "Banned domains blacklist"
@@ -3361,7 +3359,7 @@ msgstr "Einstellungen"
 
 #: ..\..\..\admin\_header.php:220 ..\..\..\admin\_users_form.php:168
 msgid "Features"
-msgstr "Fähigkeiten"
+msgstr "Features"
 
 #: ..\..\..\admin\_header.php:223
 msgid "Regional"
@@ -3653,7 +3651,7 @@ msgstr "Eintrag"
 
 #: ..\..\..\admin\_set_features.form.php:34
 msgid "Global Features"
-msgstr "Globale Fähigkeiten"
+msgstr "Globale Features"
 
 #: ..\..\..\admin\_set_features.form.php:38
 msgid "Online Help"
@@ -5857,7 +5855,7 @@ msgstr "Lösche diesen Eintrag"
 
 #: ..\..\..\evocore\_item.class.php:1361
 msgid "Edit this post..."
-msgstr "Editieren diesen Eintrag..."
+msgstr "Editiere diesen Eintrag..."
 
 #: ..\..\..\evocore\_item.class.php:1401
 msgid "Publish NOW!"
