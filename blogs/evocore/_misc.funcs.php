@@ -1739,6 +1739,7 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 	// Specify charset and content-type of email
 	$headers['Content-Type'] = 'text/plain; charset='.$locales[ $current_locale ]['charset'];
 	$headers['X-Mailer'] = $app_name.' '.$app_version.' - PHP/'.phpversion();
+	$headers['X-Remote-Addr'] = implode( ',', get_ip_list() );
 
 	// -- Build headers ----
 	$from = trim($from);
@@ -2303,6 +2304,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.154  2005/12/01 19:32:15  blueyed
+ * send_mail(): add X-Remote-Addr header to mails
+ *
  * Revision 1.153  2005/12/01 19:29:50  blueyed
  * Renamed getIpList() to get_ip_list()
  *
