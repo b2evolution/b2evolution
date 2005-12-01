@@ -140,7 +140,7 @@ class Hit
 		global $comments_allowed_uri_scheme;
 
 		// Get the first IP in the list of REMOTE_ADDR and HTTP_X_FORWARDED_FOR
-		$this->IP = getIpList( true );
+		$this->IP = get_ip_list( true );
 
 		// Check the referer:
 		$this->detect_referer();

@@ -137,7 +137,7 @@ switch( $action )
 							'password_change_request',
 							serialize( array(
 								'requestId' => $requestId,
-								'IP' => md5(serialize(getIpList())),
+								'IP' => md5(serialize(get_ip_list())),
 								'time' => $servertimenow ) ),
 							$ForgetfulUser->ID );
 
@@ -177,7 +177,7 @@ switch( $action )
 		if( !$verifyData
 				|| !($verifyData = unserialize($verifyData))
 				|| !is_array($verifyData)
-				|| !isset($verifyData['IP']) || $verifyData['IP'] != md5(serialize(getIpList()))
+				|| !isset($verifyData['IP']) || $verifyData['IP'] != md5(serialize(get_ip_list()))
 				|| !isset($verifyData['time']) || $verifyData['time'] < ( $servertimenow - 7200 ) )
 		{
 			$Messages->add(

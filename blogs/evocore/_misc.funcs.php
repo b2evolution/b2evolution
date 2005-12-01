@@ -2085,7 +2085,7 @@ function bullet( $bool )
  * @param boolean True, to get only the first IP (probably REMOTE_ADDR)
  * @return array|string Depends on first param.
  */
-function getIpList( $firstOnly = false )
+function get_ip_list( $firstOnly = false )
 {
 	$r = array();
 
@@ -2303,6 +2303,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.153  2005/12/01 19:29:50  blueyed
+ * Renamed getIpList() to get_ip_list()
+ *
  * Revision 1.152  2005/11/30 19:53:05  blueyed
  * Display a list of Debuglog categories with links to the categories messages html ID.
  *
