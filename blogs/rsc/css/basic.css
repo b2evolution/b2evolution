@@ -70,8 +70,7 @@ div.action_messages ol {
 	padding-left:3ex;
 }
 div.log_container div,
-div.action_messages div
- {
+div.action_messages div {
 	border:1px solid #6287c2;
 	background:#ddd;
 	margin:1ex auto;
