@@ -96,14 +96,9 @@ switch( $action )
 
 		param( 'hit_ID', 'integer', true );      // Required!
 		param( 'new_hit_type', 'string', true ); // Required!
-		?>
-		<div class="panelinfo">
-			<p><?php printf( T_('Changing hit #%d type to: %s'), $hit_ID, $new_hit_type) ?></p>
-			<?php
-			Hitlist::change_type( $hit_ID, $new_hit_type );
-			?>
-		</div>
-		<?php
+
+		Hitlist::change_type( $hit_ID, $new_hit_type );
+		$Messages->add( sprintf( T_('Changed hit #%d type to: %s.'), $hit_ID, $new_hit_type), 'success' );
 		break;
 
 
@@ -950,6 +945,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.11  2005/12/03 12:35:02  blueyed
+ * Fix displaying of Message when changing hit type to search. Closes: http://dev.b2evolution.net/todo.php/2005/12/02/changin_hit_type_to_search
+ *
  * Revision 1.10  2005/11/23 23:14:50  blueyed
  * minor (translation)
  *
