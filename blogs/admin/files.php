@@ -91,7 +91,13 @@ if( !$Settings->get( 'fm_enabled' ) )
 	die( 'The filemanager is disabled.' );
 }
 // Check permission:
-$current_User->check_perm( 'files', 'view', true );
+if( ! $current_User->check_perm( 'files', 'view' ) )
+{
+	$Messages->add( T_('You do not have permission to view files.') );
+	require dirname(__FILE__).'/_menutop.php';
+	require dirname(__FILE__).'/_footer.php';
+	return;
+}
 
 
 // INIT params:
@@ -1319,6 +1325,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.142  2005/12/04 15:49:20  blueyed
+ * More descriptive error message when no perms for 'files'/'view'.
+ *
  * Revision 1.141  2005/11/27 08:48:41  blueyed
  * fix editing file properties (there were two 'case's)..
  *
