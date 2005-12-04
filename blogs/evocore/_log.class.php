@@ -321,7 +321,7 @@ class Log
 		}
 		if( is_null( $category ) )
 		{
-			$category = isset( $this->defaultcategory ) ? $this->defaultcategory : 'error';
+			$category = isset( $this, $this->defaultcategory ) ? $this->defaultcategory : 'error';
 		}
 		if( !is_bool($display) )
 		{ // We have just a string - static use case
@@ -385,8 +385,9 @@ class Log
 			// implode messages
 			if( $style == 'ul' )
 			{
-				$disp .= "\t<ul".( $lcssclass['class'] ? " class=\"{$lcssclass['class']}\"" : '' ).'><li>'
-							.implode( "</li>\n<li>", $lmessages )."</li></ul>\n";
+				$disp .= "\t<ul".( $lcssclass['class'] ? " class=\"{$lcssclass['class']}\"" : '' ).'>'
+					.'<li class="clear">' // "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509)
+					.implode( "</li>\n<li>", $lmessages )."</li></ul>\n";
 			}
 			elseif( $style == 'p' )
 			{
@@ -619,6 +620,10 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.22  2005/12/04 15:47:07  blueyed
+ * display(): fix static use without category;
+ * Konqueror fix for first listitem in <ul> mode.
+ *
  * Revision 1.21  2005/11/30 19:53:05  blueyed
  * Display a list of Debuglog categories with links to the categories messages html ID.
  *
