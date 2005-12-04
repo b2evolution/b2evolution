@@ -468,7 +468,7 @@ class ItemList extends DataObjectList
 	 */
 	function preview_request()
 	{
-		global $DB, $localtimenow, $Messages, $current_User;
+		global $DB, $localtimenow, $Messages, $current_User, $BlogCache;
 
 		$id = 0;
 		$preview_userid = param( 'preview_userid', 'integer', true );
@@ -480,7 +480,17 @@ class ItemList extends DataObjectList
 		$post_category = param( 'post_category', 'integer', true );
 		$post_views = param( 'post_views', 'integer', 0 );
 		$renderers = param( 'renderers', 'array', array() );
-		$post_comments = param( 'post_comments', 'string', true );
+
+		$comment_Blog = & $BlogCache->get_by_ID( get_catblog( $post_category ) );
+		if( $comment_Blog->allowcomments == 'post_by_post' )
+		{ // param is required
+			$post_comments = param( 'post_comments', 'string', true );
+		}
+		else
+		{
+			$post_comments = $comment_Blog->allowcomments;
+		}
+
 		if( !empty($current_User) && $current_User->check_perm( 'edit_timestamp' ) && param( 'edit_date', 'integer', 0 ) )
 		{ // user is allowed to edit timestamps and has checked the box
 			$item_issue_date = param( 'item_issue_date', 'string', true );
@@ -861,6 +871,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.43  2005/12/04 00:14:59  blueyed
+ * Fix preview when the target Blog is not set to allowcomments = 'post_by_post'
+ *
  * Revision 1.42  2005/11/29 13:15:59  blueyed
  * Fixed calc_max() by using DISTINCT for the query it uses.
  *
