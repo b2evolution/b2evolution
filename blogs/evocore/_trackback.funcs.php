@@ -91,7 +91,7 @@ function trackback(
 	$excerpt,
 	$ID) // post ID
 {
-	global $ItemCache;
+	global $ItemCache, $app_name, $app_version;
 
 	echo '<p>', T_('Sending trackback to:'), ' ', htmlspecialchars($trackback_url), " ...\n";
 
@@ -130,6 +130,7 @@ function trackback(
 		$http_request .= 'Host: '.$trackback_url['host']."\r\n";
 		$http_request .= 'Content-Type: application/x-www-form-urlencoded'."\r\n";
 		$http_request .= 'Content-Length: '.strlen($query_string)."\r\n";
+		$http_request .= "User-Agent: $app_name/$app_version\r\?";
 		$http_request .= "\r\n";
 		$http_request .= $query_string;
 		flush();
@@ -220,6 +221,9 @@ function trackback_number( $zero='#', $one='#', $more='#' )
 
 /*
  * $Log$
+ * Revision 1.10  2005/12/04 00:23:11  blueyed
+ * trackback(): send User-Agent header. This seems to be good behaviour.
+ *
  * Revision 1.9  2005/11/20 18:03:01  blueyed
  * Fix sending wrong encoded url on trackbacks. Fix by knj (http://forums.b2evolution.net/viewtopic.php?t=5890)
  *
