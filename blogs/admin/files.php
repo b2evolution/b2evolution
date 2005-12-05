@@ -194,8 +194,8 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 /**
  * Filemanager object to work with
  */
-$Fileman = new FileManager( $current_User, 'files.php', $root, $path, $order, $orderasc,
-														$filterString, $filterIsRegexp, $flatmode );
+$Fileman = new FileManager( $current_User, 'files.php', $root, $path, $order, $orderasc, $filterString, $filterIsRegexp, $flatmode );
+
 if( !empty($action) )
 {
 	$oldAction = $action;
@@ -1325,6 +1325,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.143  2005/12/05 21:05:35  blueyed
+ * Whitespace
+ *
  * Revision 1.142  2005/12/04 15:49:20  blueyed
  * More descriptive error message when no perms for 'files'/'view'.
  *
