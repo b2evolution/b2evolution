@@ -616,6 +616,8 @@ class Blog extends DataObject
 			else
 			{ // Delete the posts & dependencies
 
+				// TODO: There's also a constraint FK_post_parent_ID..
+
 				// Delete postcats
 				if( $echo ) echo '<br />Deleting post-categories... ';
 				$ret = $DB->query(	"DELETE FROM T_postcats
@@ -639,10 +641,14 @@ class Blog extends DataObject
 			} // / are there posts?
 
 			// Delete categories
+			// blueyed>> Is "SET FOREIGN_KEY_CHECKS = 0" the only solution? Otherwise we'd have to delete the blog before..
+			$save_foreign_key_checks = $DB->get_var( 'SELECT @@FOREIGN_KEY_CHECKS' );
+			$DB->query( 'SET FOREIGN_KEY_CHECKS = 0' );
 			if( $echo ) echo '<br />Deleting blog\'s categories... ';
 			$ret = $DB->query( "DELETE FROM T_categories
 													WHERE cat_blog_ID = $this->ID" );
 			if( $echo ) printf( '(%d rows)', $ret );
+			$DB->query( 'SET FOREIGN_KEY_CHECKS = '.$save_foreign_key_checks );
 
 		} // / are there cats?
 
@@ -650,6 +656,12 @@ class Blog extends DataObject
 		if( $echo ) echo '<br />Deleting user-blog permissions... ';
 		$ret = $DB->query( "DELETE FROM T_coll_user_perms
 												WHERE bloguser_blog_ID = $this->ID" );
+		if( $echo ) printf( '(%d rows)', $ret );
+
+		// Delete bloggroups
+		if( $echo ) echo '<br />Deleting group-blog permissions... ';
+		$ret = $DB->query( "DELETE FROM T_coll_group_perms
+												WHERE bloggroup_blog_ID = $this->ID" );
 		if( $echo ) printf( '(%d rows)', $ret );
 
 		// Delete subscriptions
@@ -683,6 +695,7 @@ class Blog extends DataObject
 		{ // Delete static file
 			if( $echo ) echo '<br />Trying to delete static file... ';
 			if( ! @unlink( $this->get('staticfilepath') ) )
+			{
 				if( $echo )
 				{
 					echo '<span class="error">';
@@ -690,8 +703,11 @@ class Blog extends DataObject
 									$this->get('staticfilepath') );
 					echo '</span>';
 				}
+			}
 			else
+			{
 				if( $echo ) echo 'OK.';
+			}
 		}
 
 		// Unset cache entry:
@@ -737,6 +753,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2005/12/05 20:04:00  blueyed
+ * dbdelete(): remove perms in T_coll_group_perms (fixes http://dev.b2evolution.net/todo.php/2005/12/05/when_deleting_a_blog_from_the_backoffice)
+ * Additionally deleting the blog's categories failed because of a constraint on blog_ID. I'm not sure if it's fixed correctly.
+ *
  * Revision 1.44  2005/11/24 19:56:10  fplanque
  * no message
  *
