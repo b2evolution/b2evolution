@@ -139,7 +139,7 @@ class Request
 		// Make sure original var exists:
 		if( !isset($this->params[$var]) )
 		{
-			die( 'Cannot extend non existing param : '.$var );
+			debug_die( 'Cannot extend non existing param : '.$var );
 		}
 		$original_val = $this->params[$var];
 
@@ -582,6 +582,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.21  2005/12/05 16:24:09  blueyed
+ * Use debug_die()
+ *
  * Revision 1.20  2005/10/29 18:23:25  blueyed
  * Rollback changed default of $override; added todos.
  *
