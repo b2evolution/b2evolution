@@ -415,11 +415,14 @@ class ItemList extends DataObjectList
 			}
 
 			/**
-			 * Query to count the number of items.
-			 * This gets used by {@link calc_max()}.
-			 * @var string
+			 * TODO: it's reported on the forums that
+			 *   SELECT COUNT(DISTINCT '.$this->dbIDname.')
+			 * should fix counting of posts, when "messing around" with posts to
+			 * categories assignments.
+			 * However, there's a unique index in T_postcats..
+			 * @see http://forums.b2evolution.net/viewtopic.php?t=6069
 			 */
-			$this->count_sql = '
+			$this->count_request = '
 				SELECT COUNT(DISTINCT '.$this->dbIDname.')
 				FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
 					INNER JOIN T_categories ON postcat_cat_ID = cat_ID
@@ -685,7 +688,7 @@ class ItemList extends DataObjectList
 			return 1;
 		}
 
-		$this->total_rows = $DB->get_var( $this->count_sql, 0, 0, 'Get result count' );
+		$this->total_rows = $DB->get_var( $this->count_request, 0, 0, 'Get result count' );
 
 		$this->total_pages = intval( ($this->total_rows-1) / max($this->posts_per_page, $this->result_num_rows)) +1;
 		if( $this->total_pages < 1 )
@@ -871,6 +874,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.44  2005/12/05 15:29:15  fplanque
+ * no message
+ *
  * Revision 1.43  2005/12/04 00:14:59  blueyed
  * Fix preview when the target Blog is not set to allowcomments = 'post_by_post'
  *

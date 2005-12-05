@@ -161,7 +161,7 @@ if( false )
 		}
 		$LogUpload->display( '', '', true, 'all' ); ?>
 
-
+		<?php /* DIV to prevent the "Upload into" fieldset from wrapping below the "Files to upload" box; which browser?? */ ?>
 		<div class="box_files_to_upload">
 		<fieldset class="files_to_upload">
 			<legend><?php echo T_('Files to upload') ?></legend>
@@ -269,8 +269,12 @@ if( false )
 
 /*
  * $Log$
+ * Revision 1.16  2005/12/05 15:29:14  fplanque
+ * no message
+ *
  * Revision 1.15  2005/11/27 06:17:52  blueyed
  * Layout fixes to not cause the "Upload into" fieldset wrap below the "Files to upload" box.
+ * This is the WRONG place for that kind of comment!  + which browser?
  *
  * Revision 1.14  2005/11/21 18:33:19  fplanque
  * Too many undiscussed changes all around: Massive rollback! :((

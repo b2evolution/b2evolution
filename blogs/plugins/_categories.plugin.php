@@ -194,7 +194,6 @@ class categories_plugin extends Plugin
 			{
 				if( ! blog_list_iteminfo('disp_bloglist', false) )
 				{ // Skip Blogs that should not get displayed in public blog list
-					// QUESTION: make this a param?
 					continue;
 				}
 
@@ -203,11 +202,12 @@ class categories_plugin extends Plugin
 							array( $this, 'callback_before_first' ), array( $this, 'callback_before_each' ),
 							array( $this, 'callback_after_each' ), array( $this, 'callback_after_last' ), 0 );
 
+/* Make this a param with default to OFF (NO Skip) because even if there are no cats, the blog name is a clickable root category itself
 				if( empty( $cat_list ) )
 				{ // Skip Blogs that have no categories!
-					// QUESTION: make this a param?
 					continue;
 				}
+*/
 
 				echo $params['coll_start'];
 				echo '<a href="';

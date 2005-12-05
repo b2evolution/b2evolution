@@ -113,7 +113,8 @@ while( $Item = $MainList->get_item() )
 				echo ', ', T_('level:');
 				$Item->Author->level();
 				echo '), ';
-				$Item->views_phrase();
+				$Item->views();
+				echo ' '.T_('views');
 
 				echo '<div class="bSmallHeadRight">';
 				echo T_('Status').': ';
@@ -341,8 +342,8 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
- * Revision 1.109  2005/11/28 20:39:46  blueyed
- * Added Items::views_phrase() to allow distinguishing between 0, 1 or more views.
+ * Revision 1.110  2005/12/05 15:29:14  fplanque
+ * no message
  *
  * Revision 1.108  2005/10/31 05:51:05  blueyed
  * Use rawurlencode() instead of urlencode()
