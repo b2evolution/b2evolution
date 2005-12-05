@@ -149,7 +149,6 @@ if( $resolve_extra_path )
 	// Check and Remove blog baseurl from ReqPath:
 	// if Blog is installed on separate domain
 	// use this domain setting as base for the actual path
-	// TODO: $Blog->get( 'siteurl' ) always returns something now!
 	/* Yet another bug in the multidomain stuff that doesn't work on single domains...
 	if( $Blog->get( 'siteurl' ) )
 	{
@@ -417,6 +416,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.36  2005/12/05 22:03:46  blueyed
+ * REmoved obsolete todo
+ *
  * Revision 1.35  2005/12/05 12:15:32  fplanque
  * bugfix
  *
