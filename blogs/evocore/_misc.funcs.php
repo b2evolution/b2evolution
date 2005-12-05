@@ -692,7 +692,7 @@ function xmlrpc_logresult( $result, & $message_Log )
 
 	if( $result->faultCode() )
 	{ // We got a remote error:
-		$display->add( T_('Remote error').': '.$result->faultString().' ('.$result->faultCode().')', 'error' );
+		$message_Log->add( T_('Remote error').': '.$result->faultString().' ('.$result->faultCode().')', 'error' );
 		return false;
 	}
 
@@ -2304,6 +2304,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.155  2005/12/05 12:15:32  fplanque
+ * bugfix
+ *
  * Revision 1.154  2005/12/01 19:32:15  blueyed
  * send_mail(): add X-Remote-Addr header to mails
  *

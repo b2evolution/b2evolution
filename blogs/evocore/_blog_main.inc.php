@@ -144,21 +144,20 @@ locale_activate( $Blog->get('locale') );
 // Extra path info decoding:
 // -------------------------
 if( !isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
-
 if( $resolve_extra_path )
 {
 	// Check and Remove blog baseurl from ReqPath:
 	// if Blog is installed on separate domain
 	// use this domain setting as base for the actual path
 	// TODO: $Blog->get( 'siteurl' ) always returns something now!
+	/* Yet another bug in the multidomain stuff that doesn't work on single domains...
 	if( $Blog->get( 'siteurl' ) )
 	{
 		$blog_baseurl = substr( $Blog->get( 'siteurl' ), strlen( $baseurlroot ) );
 	}
 	else
-	{
-		$blog_baseurl = substr( $Blog->get( 'baseurl' ), strlen( $baseurlroot ) );
-	}
+	 */
+	$blog_baseurl = substr( $Blog->get( 'baseurl' ), strlen( $baseurlroot ) );
 
 	if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
 	{ // note: $pos will typically be 0
@@ -418,6 +417,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.35  2005/12/05 12:15:32  fplanque
+ * bugfix
+ *
  * Revision 1.34  2005/11/24 16:53:45  blueyed
  * todo about 'siteurl'/'baseurl' issue
  *
