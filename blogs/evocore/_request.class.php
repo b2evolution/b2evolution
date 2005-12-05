@@ -269,7 +269,7 @@ class Request
 			return true;
 		}
 
-		if( $this->params[$var] < $min || $this->params[$var] > $max )
+		if( !is_numeric($this->params[$var]) || $this->params[$var] < $min || $this->params[$var] > $max )
 		{
 			$this->param_error( $var, sprintf( $err_msg, $min, $max ) );
 			return false;
@@ -561,6 +561,9 @@ class Request
 	/**
 	 * This function is used by {@link param_error()} and {@link param_error_multiple()}.
 	 *
+	 * If {@link $link_log_messages_to_field_IDs} is true, it will link those parts of the
+	 * error message that are not already links, to the html IDs of the fields with errors.
+	 *
 	 * @access protected
 	 *
 	 * @param string param name
@@ -571,7 +574,21 @@ class Request
 		if( $this->link_log_messages_to_field_IDs )
 		{
 			$var_id = Form::get_valid_id($var);
-			$this->Messages->add( '<a href="#'.$var_id.'" onclick="var form_elem = document.getElementById(\''.$var_id.'\'); if( form_elem ) { form_elem.select(); }">'.$err_msg.'</a>', $log_category );
+			$start_link = '<a href="#'.$var_id.'" onclick="var form_elem = document.getElementById(\''.$var_id.'\'); if( form_elem ) { form_elem.select(); }">';
+
+			if( strpos( $err_msg, '<a' ) !== false )
+			{ // there is at least one link in $err_msg, link those parts that are no links
+				$err_msg = preg_replace( '~(\s*)(<a\s+[^>]+>[^<]*</a>\s*)~i', '</a>$1&raquo;$2'.$start_link, $err_msg );
+			}
+
+			if( substr($err_msg, 0, 4) == '</a>' )
+			{ // There was a link at the beginning of $err_msg: we do not prepend an emtpy link before it
+				$this->Messages->add( substr( $err_msg, 4 ).'</a>', $log_category );
+			}
+			else
+			{
+				$this->Messages->add( $start_link.$err_msg.'</a>', $log_category );
+			}
 		}
 		else
 		{
@@ -582,8 +599,15 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.22  2005/12/05 18:05:13  blueyed
+ * Merged 1.20.2.2 from post-phoenix
+ *
  * Revision 1.21  2005/12/05 16:24:09  blueyed
  * Use debug_die()
+ *
+ * Revision 1.20.2.2  2005/11/16 07:34:29  blueyed
+ * param_check_range(): check if it's numeric!
+ * _add_message_to_Log(): handle links inside of error messages
  *
  * Revision 1.20  2005/10/29 18:23:25  blueyed
  * Rollback changed default of $override; added todos.
