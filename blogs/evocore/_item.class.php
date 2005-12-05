@@ -1809,56 +1809,10 @@ class Item extends DataObject
 
 
 	/**
-	 * Get a phrase about the number of Item views.
-	 *
-	 * @param string Link text to display when there are 0 views
-	 * @param string Link text to display when there is 1 views
-	 * @param string Link text to display when there are >1 views (include %d for # of views)
-	 * @return string The phrase about the number of views.
-	 */
-	function get_views_phrase( $zero = '#', $one = '#', $more = '#' )
-	{
-		if( !$this->views )
-		{
-			return $zero == '#' ? T_( 'No views' ) : $zero;
-		}
-
-		if( $this->views == 1 )
-		{
-			return $one == '#' ? T_( '1 view' ) : $one;
-		}
-
-		if( $more == '#' )
-		{
-			$more = T_( '%d views' );
-		}
-
-		return str_replace( '%d', $this->views, $more );
-	}
-
-
-	/**
-	 * Template function: Display a phrase about the number of Item views.
-	 *
-	 * @param string Link text to display when there are 0 views
-	 * @param string Link text to display when there is 1 views
-	 * @param string Link text to display when there are >1 views (include %d for # of views)
-	 * @return integer Number of views.
-	 */
-	function views_phrase( $zero = '#', $one = '#', $more = '#' )
-	{
-		echo $this->get_views_phrase( $zero, $one, $more );
-
-		return $this->views;
-	}
-
-
-	/**
 	 * Template function: Display the number of times the Item has been viewed
 	 *
 	 * Note: viewcount is incremented whenever the Item's content is displayed with "MORE"
-	 * (i-e full content), see {@link Item::content()}.
-	 *
+	 * (i-e full content), see {@link Item::content()}
 	 * Viewcount is NOT incremented on page reloads and other special cases, see {@link Hit::is_new_view()}
 	 */
 	function views()
@@ -2301,6 +2255,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.72  2005/12/05 13:49:55  fplanque
+ * no message
+ *
  * Revision 1.71  2005/12/01 19:03:15  blueyed
  * Use set() to set default priority to 3! Otherwise leaving it at the default setting would not call dbchange().
  *

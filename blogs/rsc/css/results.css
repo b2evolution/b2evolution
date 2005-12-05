@@ -25,7 +25,6 @@ table.grouped tr.odd {
 table.grouped td {
 	border-left: 1px solid #bbb;
 	padding: .3ex 1ex;
-	vertical-align:top;
 }
 table.grouped tr.group td {
 	font-weight: bold;
@@ -69,7 +68,6 @@ table.grouped tfoot td {
 }
 table.grouped th {
 	padding: .3ex 1ex;
-	vertical-align:top;
 }
 table.grouped th img {
 	vertical-align: bottom;
