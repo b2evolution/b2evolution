@@ -49,18 +49,23 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class DataObjectCache
 {
-	/**#@+
-	 * @access private
-	 */
-	var	$objtype;
 	var	$dbtablename;
 	var $dbprefix;
 	var $dbIDname;
+
+	/**
+	 * Class name of objects in this cache:
+	 */
+	var	$objtype;
+
+	/**
+	 * Object array
+	 */
 	var $cache = array();
+
 	var $load_add = false;
 	var $all_loaded = false;
 	var $name_field;
-	/**#@-*/
 
 
 	/**
@@ -201,17 +206,26 @@ class DataObjectCache
 	 * Instantiate a DataObject from a table row and then cache it.
 	 *
 	 * @param Object Database row
+	 * @return Object
 	 */
-	function instantiate( & $db_row )
+	function & instantiate( & $db_row )
 	{
 		// Get ID of the object we'ere preparing to instantiate...
 		$obj_ID = $db_row->{$this->dbIDname};
 
-		if( !empty($obj_ID) && !isset($this->cache[$obj_ID]) )
+		if( empty($obj_ID) )
+		{
+			$Obj = NULL;
+			return $Obj;
+		}
+
+		if( !isset($this->cache[$obj_ID]) )
 		{	// If the object ID is valid and not already cached:
 			$Obj = new $this->objtype( $db_row ); // COPY !!
 			$this->add( $Obj );
 		}
+
+		return $this->cache[$obj_ID];
 	}
 
 
@@ -433,6 +447,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.31  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
+ *
  * Revision 1.30  2005/11/18 18:26:38  fplanque
  * no message
  *

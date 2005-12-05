@@ -71,7 +71,9 @@ function generic_ctp_number( $post_id, $mode = 'comments' )
 	if( !isset($cache_ctp_number) )
 	{
 		global $postIDlist, $postIDarray;
+
 		// if( $debug ) echo "LOADING generic_ctp_number CACHE for posts: $postIDlist<br />";
+
 		foreach( $postIDarray as $tmp_post_id)
 		{		// Initializes each post to nocount!
 				$cache_ctp_number[$tmp_post_id] = array( 'comments' => 0, 'trackbacks' => 0, 'pingbacks' => 0, 'ctp' => 0);
@@ -191,20 +193,29 @@ function Comment_get_by_ID( $comment_ID )
  *
  * @deprecated deprecated by {@link Item::feedback_link()}, used in _edit_showposts.php
  */
-function comments_number( $zero='#', $one='#', $more='#' )
+function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 {
 	if( $zero == '#' ) $zero = T_('Leave a comment');
 	if( $one == '#' ) $one = T_('1 comment');
 	if( $more == '#' ) $more = T_('%d comments');
 
 	// original hack by dodo@regretless.com
-	global $id, $postdata, $c, $cache_commentsnumber;
-	$number = generic_ctp_number($id, 'comments');
-	if ($number == 0) {
+	if( empty( $post_ID ) )
+	{
+		global $id;
+		$post_ID = $id;
+	}
+	$number = generic_ctp_number( $post_ID, 'comments' );
+	if ($number == 0)
+	{
 		$blah = $zero;
-	} elseif ($number == 1) {
+	}
+	elseif ($number == 1)
+	{
 		$blah = $one;
-	} elseif ($number  > 1) {
+	}
+	elseif ($number  > 1)
+	{
 		$n = $number;
 		$more = str_replace('%d', $n, $more);
 		$blah = $more;
@@ -321,6 +332,9 @@ function comment_author_url_basedomain( $disp = true )
 
 /*
  * $Log$
+ * Revision 1.13  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
+ *
  * Revision 1.12  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

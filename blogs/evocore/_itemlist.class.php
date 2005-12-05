@@ -60,25 +60,29 @@ require_once dirname(__FILE__).'/_item.funcs.php';
  */
 class ItemList extends DataObjectList
 {
-	var $objType;
-
 	var $preview;
+
 	/**
 	 * Blog ID to restrict to. 1 means "all blogs".
 	 * @var integer
 	 */
 	var $blog;
+
 	/**
 	 * Specific post number to display. '' means don't restrict to single post.
 	 * @todo Might support list of IDs (array).
 	 * @var string|integer
 	 */
 	var $p;
-	var $unit;
+
 	/**
-	 * @var integer Number of rows in result set
+ 	 * 'posts' or 'days'
+ 	 */
+	var $unit;
+
+	/**
+	 * List of IDs in current page
 	 */
-	var $result_num_rows;
 	var $postIDlist;
 	var $postIDarray;
 
@@ -388,9 +392,9 @@ class ItemList extends DataObjectList
 			// 1) we get the IDs we need
 			// 2) we get all the other fields matching these IDs
 			// This is more efficient than manipulating all fields at once.
-			$step1_sql = 'SELECT DISTINCT '.$this->dbIDname.'
-											FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
-													INNER JOIN T_categories ON postcat_cat_ID = cat_ID ';
+			$step1_sql = 'SELECT DISTINCT '.$this->dbIDname.
+										$this->ItemQuery->get_from();
+
 			$step1_sql .= $where;
 			if( !empty($this->ItemQuery->group_by) )
 			{
@@ -414,16 +418,14 @@ class ItemList extends DataObjectList
 				$this->sql .= ' WHERE 0';
 			}
 
-			/**
-			 * TODO: it's reported on the forums that
-			 *   SELECT COUNT(DISTINCT '.$this->dbIDname.')
-			 * should fix counting of posts, when "messing around" with posts to
-			 * categories assignments.
-			 * However, there's a unique index in T_postcats..
-			 * @see http://forums.b2evolution.net/viewtopic.php?t=6069
+			/*
+			 * TODO: The result is incorrect when using AND on categories
+			 * We would need to use a HAVING close and thyen COUNT, which would be a subquery
+			 * This is nto compatible with mysql 3.23
+			 * We need fallback code.
 			 */
 			$this->count_request = '
-				SELECT COUNT(DISTINCT '.$this->dbIDname.')
+				SELECT COUNT( DISTINCT '.$this->dbIDname.' )
 				FROM '.$this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
 					INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 					'.$where;
@@ -659,9 +661,7 @@ class ItemList extends DataObjectList
 	}
 
 
-	/*
-	 * ItemList->get_total_num_posts(-)
-	 *
+	/**
 	 * return total number of posts
 	 */
 	function get_total_num_posts()
@@ -874,6 +874,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.45  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
+ *
  * Revision 1.44  2005/12/05 15:29:15  fplanque
  * no message
  *

@@ -46,6 +46,7 @@ class SQL
 	var $where = '';
 	var $group_by = '';
 	var $order_by = '';
+	var $limit = '';
 	var $search_field = array();
 
 
@@ -67,7 +68,8 @@ class SQL
 		$sql .= $this->get_from();
 		$sql .= $this->get_where();
 		$sql .= $this->get_group_by();
-		if( !empty($this->order_by) ) $sql .= ' ORDER BY '.$this->order_by;
+		$sql .= $this->get_order_by();
+		$sql .= $this->get_limit();
 		return $sql;
 	}
 
@@ -108,6 +110,34 @@ class SQL
 		if( !empty($this->group_by) )
 		{
 			return $prefix.$this->group_by;
+		}
+
+		return '';
+	}
+
+
+  /**
+	 * Get ORDER BY clause if there is something inside
+	 */
+	function get_order_by( $prefix = ' ORDER BY ' )
+	{
+		if( !empty($this->order_by) )
+		{
+			return $prefix.$this->order_by;
+		}
+
+		return '';
+	}
+
+
+  /**
+	 * Get LIMIT clause if there is something inside
+	 */
+	function get_limit( $prefix = ' LIMIT ' )
+	{
+		if( !empty($this->limit) )
+		{
+			return $prefix.$this->limit;
 		}
 
 		return '';
@@ -193,7 +223,29 @@ class SQL
 	{
 		$this->order_by = $order_by;
 	}
-	
+
+ 	function ORDER_BY_prepend( $order_by_prepend )
+	{
+		if( empty( $order_by_prepend ) )
+		{
+			return;
+		}
+
+		if( empty( $this->order_by ) )
+		{
+			$this->order_by = $order_by_prepend;
+		}
+		else
+		{
+			$this->order_by = $order_by_prepend.', '.$this->order_by;
+		}
+	}
+
+	function LIMIT( $limit )
+	{
+		$this->limit = $limit;
+	}
+
 	/**
 	 * create array of search fields
 	 *
@@ -247,6 +299,9 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.7  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
+ *
  * Revision 1.6  2005/11/18 21:01:21  fplanque
  * no message
  *

@@ -308,6 +308,11 @@ $map_iconfiles = array(
 		'alt' => T_('Permalink'),
 		'size' => array( 12, 9 ),
 	),
+	'history' => array(
+		'file' => $rsc_subdir.'icons/clock.png',
+		'alt' => T_('History'),
+		'size' => array( 15, 15 ),
+	),
 	'comments' => array(
 		'file' => $rsc_subdir.'icons/comments.gif',
 		'alt' => T_('Comments'),

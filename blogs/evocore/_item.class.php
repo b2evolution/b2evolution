@@ -243,7 +243,11 @@ class Item extends DataObject
 		else
 		{
 			$this->ID = $db_row->$dbIDname;
-			$this->Author = & $UserCache->get_by_ID( $db_row->$db_cols['creator_user_ID'] );
+			$this->datecreated = $db_row->$db_cols['datecreated']; // Needed for history display
+			$this->datemodified = $db_row->$db_cols['datemodified']; // Needed for history display
+			$this->creator_user_ID = $db_row->$db_cols['creator_user_ID']; // Needed for history display
+			$this->lastedit_user_ID = $db_row->$db_cols['lastedit_user_ID']; // Needed for history display
+			$this->Author = & $UserCache->get_by_ID( $this->creator_user_ID );
 			$this->assign_to( $db_row->$db_cols['assigned_user_ID'], false );
 			$this->issue_date = $db_row->$db_cols['datestart'];
 			$this->mod_date =$db_row->$db_cols['datemodified'];
@@ -1321,8 +1325,8 @@ class Item extends DataObject
 	 * @param boolean true to make this a button instead of a link
 	 * @param string page url for the delete action
 	 */
-	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
-												$button  = false, $actionurl = 'edit_actions.php?action=delete&amp;post=' )
+	function get_delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
+														$button = false, $actionurl = 'edit_actions.php?action=delete&amp;post=' )
 	{
 		global $current_User, $admin_url;
 
@@ -1348,34 +1352,38 @@ class Item extends DataObject
 
 		$url = $admin_url.$actionurl.$this->ID;
 
-		echo $before;
+		$r = $before;
 		if( $button )
 		{ // Display as button
-			echo '<input type="button"';
-			echo ' value="'.$text.'" title="'.$title.'" onclick="if ( confirm(\'';
-			echo TS_('You are about to delete this post!\\n\'Cancel\' to stop, \'OK\' to delete.');
-			echo '\') ) { document.location.href=\''.$url.'\' }"';
-			if( !empty( $class ) ) echo ' class="'.$class.'"';
-			echo '/>';
+			$r .= '<input type="button"';
+			$r .= ' value="'.$text.'" title="'.$title.'" onclick="if ( confirm(\'';
+			$r .= TS_('You are about to delete this post!\\n\'Cancel\' to stop, \'OK\' to delete.');
+			$r .= '\') ) { document.location.href=\''.$url.'\' }"';
+			if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+			$r .= '/>';
 		}
 		else
 		{ // Display as link
-			echo '<a href="'.$url.'" title="'.$title.'" onclick="return confirm(\'';
-			echo TS_('You are about to delete this post!\\n\'Cancel\' to stop, \'OK\' to delete.');
-			echo '\')"';
-			if( !empty( $class ) ) echo ' class="'.$class.'"';
-			echo '>'.$text.'</a>';
+			$r .= '<a href="'.$url.'" title="'.$title.'" onclick="return confirm(\'';
+			$r .= TS_('You are about to delete this post!\\n\'Cancel\' to stop, \'OK\' to delete.');
+			$r .= '\')"';
+			if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+			$r .= '>'.$text.'</a>';
 		}
-		echo $after;
+		$r .= $after;
 
-		return true;
+		return $r;
 	}
 
 
+	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
+												$button = false, $actionurl = 'edit_actions.php?action=delete&amp;post=' )
+	{
+		echo $this->get_delete_link( $before, $after, $text, $title, $class, $button, $actionurl );
+	}
+
 	/**
 	 * Provide link to edit a post if user has edit rights
-	 *
-	 * {@internal Item::edit_link(-)}}
 	 *
 	 * @param string to display before link
 	 * @param string to display after link
@@ -1384,7 +1392,7 @@ class Item extends DataObject
 	 * @param string class name
 	 * @param string page url for the delete action
 	 */
-	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
+	function get_edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
 											$actionurl = 'b2edit.php?action=edit&amp;post=' )
 	{
 		global $current_User, $admin_url;
@@ -1400,14 +1408,25 @@ class Item extends DataObject
 		if( $text == '#' ) $text = get_icon( 'edit', 'imgtag' ).' '.T_('Edit...');
 		if( $title == '#' ) $title = T_('Edit this post...');
 
-		echo $before;
-		echo '<a href="'.$admin_url.$actionurl.$this->ID;
-		echo '" title="'.$title.'"';
-		if( !empty( $class ) ) echo ' class="'.$class.'"';
-		echo '>'.$text.'</a>';
-		echo $after;
+		$r = $before;
+		$r .= '<a href="'.$admin_url.$actionurl.$this->ID;
+		$r .= '" title="'.$title.'"';
+		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+		$r .=  '>'.$text.'</a>';
+		$r .=  $after;
 
-		return true;
+		return $r;
+	}
+
+
+	/**
+	 * @see Item::get_edit_link()
+	 */
+	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
+											$actionurl = 'b2edit.php?action=edit&amp;post=' )
+
+	{
+		echo $this->get_edit_link( $before, $after, $text, $title, $class, $actionurl );
 	}
 
 
@@ -1416,8 +1435,6 @@ class Item extends DataObject
 	 *
 	 * Note: publishing date will be updated
 	 *
-	 * {@internal Item::publish_link(-)}}
-	 *
 	 * @param string to display before link
 	 * @param string to display after link
 	 * @param string link text
@@ -1425,7 +1442,7 @@ class Item extends DataObject
 	 * @param string class name
 	 * @param string glue between url params
 	 */
-	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
+	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
 	{
 		global $current_User, $admin_url;
 
@@ -1441,14 +1458,20 @@ class Item extends DataObject
 		if( $text == '#' ) $text = get_icon( 'publish', 'imgtag' ).' '.T_('Publish NOW!');
 		if( $title == '#' ) $title = T_('Publish now using current date and time.');
 
-		echo $before;
-		echo '<a href="'.$admin_url.'edit_actions.php?action=publish'.$glue.'post_ID='.$this->ID;
-		echo '" title="'.$title.'"';
-		if( !empty( $class ) ) echo ' class="'.$class.'"';
-		echo '>'.$text.'</a>';
-		echo $after;
+		$r = $before;
+		$r .= '<a href="'.$admin_url.'edit_actions.php?action=publish'.$glue.'post_ID='.$this->ID;
+		$r .= '" title="'.$title.'"';
+		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+		$r .= '>'.$text.'</a>';
+		$r .= $after;
 
-		return true;
+		return $r;
+	}
+
+
+	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
+	{
+		echo $this->get_publish_link( $before, $after, $text, $title, $class, $glue );
 	}
 
 
@@ -1462,7 +1485,7 @@ class Item extends DataObject
 	 * @param string class name
 	 * @param string glue between url params
 	 */
-	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
+	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
 	{
 		global $current_User, $admin_url;
 
@@ -1477,14 +1500,20 @@ class Item extends DataObject
 		if( $text == '#' ) $text = get_icon( 'deprecate', 'imgtag' ).' '.T_('Deprecate!');
 		if( $title == '#' ) $title = T_('Deprecate this post now!');
 
-		echo $before;
-		echo '<a href="'.$admin_url.'edit_actions.php?action=deprecate'.$glue.'post_ID='.$this->ID;
-		echo '" title="'.$title.'"';
-		if( !empty( $class ) ) echo ' class="'.$class.'"';
-		echo '>'.$text.'</a>';
-		echo $after;
+		$r = $before;
+		$r .= '<a href="'.$admin_url.'edit_actions.php?action=deprecate'.$glue.'post_ID='.$this->ID;
+		$r .= '" title="'.$title.'"';
+		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+		$r .= '>'.$text.'</a>';
+		$r .= $after;
 
-		return true;
+		return $r;
+	}
+
+
+	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
+	{
+		echo $this->get_deprecate_link( $before, $after, $text, $title, $class, $glue );
 	}
 
 
@@ -2225,6 +2254,14 @@ class Item extends DataObject
 
 		switch( $parname )
 		{
+			case 't_assigned_to':
+				// Text: assignee
+				if( empty($this->assigned_User) )
+				{
+					return '';
+				}
+				return $this->assigned_User->get( 'preferredname' );
+
 			case 't_status':
 				// Text status:
 				return T_( $post_statuses[$this->status] );
@@ -2239,6 +2276,11 @@ class Item extends DataObject
 
 			case 't_type':
 				// Item type (name):
+				if( empty($this->typ_ID) )
+				{
+					return '';
+				}
+
 				$type_Element = & $itemTypeCache->get_by_ID( $this->typ_ID );
 				return $type_Element->name_return();
 
@@ -2255,6 +2297,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.73  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
+ *
  * Revision 1.72  2005/12/05 13:49:55  fplanque
  * no message
  *

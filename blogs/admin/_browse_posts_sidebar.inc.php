@@ -133,19 +133,6 @@ echo '<div class="browse_side_item">';
 		$Form->end_fieldset();
 
 
-		// ARCHIVES:
-		// Call the Archives plugin:
-		$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
-				'block_start'=>'<fieldset>',
-				'block_end'=>"</fieldset>\n",
-				'title'=>'<legend>'.T_('Archives')."</legend>\n",
-				'link_type'=>'context', 							// Preserve page context
-				'form'=>true,                         // add form fields (radio buttons)
-				'limit'=>'',                          // No limit
-				'more_link'=>'',                      // No more link
-			)	);
-
-
 		// CATEGORIES:
 		// Call the Categories plugin:
 		$Plugins->call_by_code( 'evo_Cats', array( // Parameters follow:
@@ -184,6 +171,19 @@ echo '<div class="browse_side_item">';
 		echo '</fieldset>';
 
 
+		// ARCHIVES:
+		// Call the Archives plugin:
+		$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
+				'block_start'=>'<fieldset>',
+				'block_end'=>"</fieldset>\n",
+				'title'=>'<legend>'.T_('Archives')."</legend>\n",
+				'link_type'=>'context', 							// Preserve page context
+				'form'=>true,                         // add form fields (radio buttons)
+				'limit'=>'',                          // No limit
+				'more_link'=>'',                      // No more link
+			)	);
+
+
 		$Form->submit( array( 'submit', T_('Search'), 'search' ) );
 		$Form->button( array( 'button', '', T_('Full Reset'), 'search', 'document.location.href=\''.$pagenow.'?blog='.$blog.'\';' ) );
 
@@ -193,6 +193,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.18  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
+ *
  * Revision 1.17  2005/11/23 02:22:41  blueyed
  * Closing input (valid xhtml)
  *

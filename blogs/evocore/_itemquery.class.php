@@ -74,7 +74,7 @@ class ItemQuery extends SQL
 		$this->dbIDname = $dbIDname;
 
 		$this->FROM( $this->dbtablename.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
-									INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+									INNER JOIN T_categories ON postcat_cat_ID = cat_ID ' );
 	}
 
 
@@ -128,6 +128,47 @@ class ItemQuery extends SQL
 		// Compile the real category list to use:
 		// TODO: allow to pass the compiled vars directly to this class
 		compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $blog == 1 ? 0 : $blog );
+
+		if( ! empty($cat_array) )
+		{	// We want to restict to some cats:
+			if( $cat_modifier == '-' )
+			{
+				$eq = 'NOT IN';
+			}
+			else
+			{
+				$eq = 'IN';
+			}
+			$whichcat = 'postcat_cat_ID '. $eq.' ('.implode(',', $cat_array). ') ';
+
+			// echo $whichcat;
+			$this->WHERE_and( $whichcat );
+
+   		if( $cat_modifier == '*' )
+			{ // We want the categories combined! (i-e posts must be in ALL requested cats)
+				$this->GROUP_BY( $this->dbIDname.' HAVING COUNT(postcat_cat_ID) = '.count($cat_array) );
+			}
+		}
+	}
+
+
+  /**
+	 * Restrict to specific collection/chapters (blog/categories)
+	 *
+	 * @todo get rid of blog #1
+	 *
+	 * @param integer
+	 */
+	function where_chapter2( $blog_ID, $cat_array, $cat_modifier )
+	{
+		// Save for future use (permission checks..)
+		$this->blog = $blog_ID;
+
+		if( $blog_ID != 1 )
+		{ // Not Special case where we aggregate all blogs
+			$this->WHERE_and( 'cat_blog_ID = '.$blog_ID );
+		}
+
 
 		if( ! empty($cat_array) )
 		{	// We want to restict to some cats:
@@ -355,6 +396,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.5  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
+ *
  * Revision 1.4  2005/09/06 19:38:29  fplanque
  * bugfixes
  *

@@ -50,22 +50,24 @@ require_once dirname(__FILE__).'/_results.class.php';
  */
 class DataObjectList extends Results
 {
-	/**#@+
-	 * @access private
-	 */
 
+	/**
+	 * The following should probably be obsoleted by Results::Cache
+	 */
 	var	$dbtablename;
 	var $dbprefix;
 	var $dbIDname;
 
-	var $posts_per_page = 15;
+	/**
+	 * Class name of objects handled in this list
+	 */
+	var $objType;
 
 	/**
 	 * Object array
 	 */
 	var $Obj = array();
 
-	/**#@-*/
 
 	/**
 	 * Constructor
@@ -87,8 +89,6 @@ class DataObjectList extends Results
 		$this->dbtablename = $tablename;
 		$this->dbprefix = $prefix;
 		$this->dbIDname = $dbIDname;
-
-		// Object type handled by this list
 		$this->objType = $objType;
 
 		if( !is_null( $sql ) )
@@ -105,8 +105,6 @@ class DataObjectList extends Results
 
 	/**
 	 * Get next object in list
-	 *
-	 * {@internal CommentList::get_next(-) }}
 	 */
 	function & get_next()
 	{
@@ -122,6 +120,9 @@ class DataObjectList extends Results
 
 /*
  * $Log$
+ * Revision 1.12  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
+ *
  * Revision 1.11  2005/10/27 15:25:03  fplanque
  * Normalization; doc; comments.
  *

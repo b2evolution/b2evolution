@@ -53,19 +53,71 @@ require_once dirname(__FILE__).'/_widget.class.php';
 class Results extends Widget
 {
 	var $DB;
+
+	/**
+	 * SQL query
+	 */
 	var $sql;
+
+	/**
+	 * Total number of rows (if > $limit, it will result in multiple pages)
+	 */
 	var $total_rows;
+
+	/**
+	 * Number of lines per page
+	 */
 	var $limit;
-	var $page;
+
+	/**
+	 * Number of rows in result set for current page.
+	 */
+	var $result_num_rows;
+
+	/**
+	 * Total number of pages
+	 */
 	var $total_pages;
-	var $rows = NULL;
+
+	/**
+	 * Current page
+	 */
+	var $page;
+
+	/**
+	 * Array of DB rows for current page.
+	 */
+	var $rows;
+
+	/**
+	 * List of IDs for current page.
+	 * @uses Results::ID_col
+	 */
+	var $page_ID_list;
+
+	/**
+	 * Array of IDs for current page.
+	 * @uses Results::ID_col
+	 */
+	var $page_ID_array;
+
+ 	/**
+	 * Current object idx in $rows array:
+	 */
+	var $current_idx = 0;
 
 	/**
 	 * Cache to use to instantiate an object and cache it for each line of results.
 	 *
-	 * For this to work, all columns of the related table must be selected n the query
+	 * For this to work, all columns of the related table must be selected in the query
 	 */
-	var $Cache = NULL;
+	var $Cache;
+
+	/**
+	 * This will hold the object instantiated by the Cache for the current line.
+	 */
+	var $current_Obj;
+
 
 	/**
 	 * Definitions for each column:
@@ -78,7 +130,35 @@ class Results extends Widget
 	 *   - $this->params['col_start_last'];
 	 *   - $this->params['col_start'];
 	 */
-	var $cols = NULL;
+	var $cols;
+
+	/**
+	 * Do we want to display column headers?
+	 * @var boolean
+	 */
+	var $col_headers = true;
+
+
+	/**
+	 * Display parameters
+	 */
+	var $params = NULL;
+
+
+	/**
+	 * Fieldname to group on.
+	 *
+	 * Leave empty if you don't want to group.
+	 *
+	 * @var string
+	 */
+	var $group_by = '';
+
+ 	/**
+	 * Current group identifier:
+	 * @var string
+	 */
+	var $current_group_ID = 0;
 
 	/**
 	 * Definitions for each GROUP column:
@@ -92,40 +172,6 @@ class Results extends Widget
 	var $grp_cols = NULL;
 
 	/**
-	 * Do we want to display column headers?
-	 * @var boolean
-	 */
-	var $col_headers = true;
-
-	var $params = NULL;
-
-	/**
-	 * Number of rows in result set for current page.
-	 */
-	var $result_num_rows = NULL;
-
-
- 	/**
-	 * Current object idx in array:
-	 */
-	var $current_idx = 0;
-
-	/**
-	 * Current group identifier:
-	 * @var string
-	 */
-	var $current_group_ID = 0;
-
-	/**
-	 * Fieldname to group on.
-	 *
-	 * Leave empty if you don't want to group.
-	 *
-	 * @var string
-	 */
-	var $group_by = '';
-
-	/**
 	 * Fieldname to detect empty data rows.
 	 *
 	 * Empty data rows can happen when left joining on groups.
@@ -134,6 +180,7 @@ class Results extends Widget
 	 * @var string
 	 */
 	var $ID_col = '';
+
 
 	/**
 	 * URL param names
@@ -153,29 +200,30 @@ class Results extends Widget
 	 * @param string SQL query
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param string default ordering of columns (special syntax) if not URL specified
-	 * @param integer number of lines displayed on one screen
+	 * @param integer number of lines displayed on one page
 	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
 	 */
-	function Results( $sql, $param_prefix = '', $default_order = '', $limit = 20, $count_sql = NULL )
+	function Results( $sql, $param_prefix = '', $default_order = '', $limit = 20, $count_sql = NULL,
+									$init_page = true )
 	{
 		global $DB;
 		$this->DB = & $DB;
 		$this->sql = $sql;
 		$this->limit = $limit;
 		$this->param_prefix = $param_prefix;
-		$this->page_param = 'results_'.$param_prefix.'page';
-		$this->order_param = 'results_'.$param_prefix.'order';
 
 		// Count total rows:
 		$this->count_total_rows( $count_sql );
 
-		$this->total_pages = empty($this->limit) ? 1 : ceil($this->total_rows / $this->limit);
-
-		//attribution of a page number
-		$page = param( $this->page_param, 'integer', 1, true );
-		$this->page = min( $page, $this->total_pages ) ;
+		if( $init_page )
+		{	//attribution of a page number
+			$this->page_param = 'results_'.$param_prefix.'page';
+			$page = param( $this->page_param, 'integer', 1, true );
+			$this->page = min( $page, $this->total_pages );
+		}
 
 		//attribution of an order type
+		$this->order_param = 'results_'.$param_prefix.'order';
  		$this->order = param( $this->order_param, 'string', $default_order, true );
 	}
 
@@ -200,92 +248,121 @@ class Results extends Widget
 	 * Run the query now!
 	 *
 	 * Will only run if it has not executed before.
+	 *
+	 * @todo do we need that $sql param ???
 	 */
-	function query( $sql )
+	function query( $sql, $create_default_cols_if_needed = true, $append_limit = true )
 	{
-		if( is_null( $this->rows ) )
-		{ // Query has not executed yet:
-
-			// Make sure we have colum definitions:
-			if( is_null( $this->cols ) )
-			{ // Let's create default column definitions:
-				$this->cols = array();
-
-				if( !preg_match( '#SELECT \s+ (.+?) \s+ FROM#six', $this->sql, $matches ) )
-				{
-					die( 'Results->query() : No SELECT clause!' );
-				}
-
-				// Split requested columns by commata
-				foreach( preg_split( '#\s*,\s*#', $matches[1] ) as $l_select )
-				{
-					if( is_numeric( $l_select ) )
-					{ // just a single value (would produce parse error as '$x$')
-						$this->cols[] = array( 'td' => $l_select );
-					}
-					elseif( preg_match( '#^(\w+)$#i', $l_select, $match ) )
-					{ // regular column
-						$this->cols[] = array( 'td' => '$'.$match[1].'$' );
-					}
-					elseif( preg_match( '#^(.*?) AS (\w+)#i', $l_select, $match ) )
-					{ // aliased column
-						$this->cols[] = array( 'td' => '$'.$match[2].'$' );
-					}
-				}
-
-				if( !isset($this->cols[0]) )
-				{
-					die( 'No columns selected!' );
-				}
-			}
-
-
-
-			$this->asc = ' ASC ';
-
-			if( $this->order !== '' )
-			{ // $order is not an empty string:
-				$this->asc = strstr( $this->order, 'A' ) ? ' ASC' : ' DESC';
-			}
-			elseif( isset( $this->cols ) )
-			{	// We still have columns specified (may not be the case, example: ArchiveList)
-				// We'll have to find the first order:
-
-				foreach( $this->cols as $col )
-				{
-					if( isset( $col['order'] ) )
-					{ // We have found the first orderable column:
-						$this->order .= strstr( $this->asc, 'A' ) ? 'A' : 'D';
-						break;
-					}
-					else
-					{
-						$this->order .= '-';
-					}
-				}
-			}
-
-			// Append ORDER clause if necessary:
-			$this->sql .= $this->order();
-
-			if( !empty($this->limit) )
-			{	// Limit lien range to requested page
-				$sql = $this->sql.' LIMIT '.max(0, ($this->page-1)*$this->limit).', '.$this->limit;
-			}
-
-			// Execute query and store results
-			$this->rows = $this->DB->get_results( $sql );
-
-			// Store row count
-			$this->result_num_rows = $this->DB->num_rows;
-
-			// echo 'rows on page='.$this->result_num_rows;
+		if( !is_null( $this->rows ) )
+		{ // Query has already executed:
+			return;
 		}
+
+		// Make sure we have colum definitions:
+		if( is_null( $this->cols ) && $create_default_cols_if_needed )
+		{ // Let's create default column definitions:
+			$this->cols = array();
+
+			if( !preg_match( '#SELECT \s+ (.+?) \s+ FROM#six', $this->sql, $matches ) )
+			{
+				die( 'Results->query() : No SELECT clause!' );
+			}
+
+			// Split requested columns by commata
+			foreach( preg_split( '#\s*,\s*#', $matches[1] ) as $l_select )
+			{
+				if( is_numeric( $l_select ) )
+				{ // just a single value (would produce parse error as '$x$')
+					$this->cols[] = array( 'td' => $l_select );
+				}
+				elseif( preg_match( '#^(\w+)$#i', $l_select, $match ) )
+				{ // regular column
+					$this->cols[] = array( 'td' => '$'.$match[1].'$' );
+				}
+				elseif( preg_match( '#^(.*?) AS (\w+)#i', $l_select, $match ) )
+				{ // aliased column
+					$this->cols[] = array( 'td' => '$'.$match[2].'$' );
+				}
+			}
+
+			if( !isset($this->cols[0]) )
+			{
+				die( 'No columns selected!' );
+			}
+		}
+
+
+
+		// Append ORDER clause if necessary:
+		if( $orders = $this->get_order_field_list() )
+		{	// We have orders to append
+
+			if( strpos( $this->sql, 'ORDER BY') === false )
+			{ // there is no ORDER BY clause in the original SQL query
+				$this->sql .= ' ORDER BY '.$orders.' ';
+			}
+			else
+			{ // the chosen order must be appended to an existing ORDER BY clause
+				$this->sql .= ', '.$orders.' ';
+			}
+		}
+
+
+		if( $append_limit && !empty($this->limit) )
+		{	// Limit lien range to requested page
+			$sql = $this->sql.' LIMIT '.max(0, ($this->page-1)*$this->limit).', '.$this->limit;
+		}
+
+		// Execute query and store results
+		$this->rows = $this->DB->get_results( $sql );
+
+		// Store row count
+		$this->result_num_rows = $this->DB->num_rows;
+
+		// echo '<br />rows on page='.$this->result_num_rows;
 	}
 
 
 	/**
-	 * Count the number of rows of the SQL result
+	 * Get a list of IDs for current page
+	 *
+ 	 * @uses Results::ID_col
+	 */
+	function get_page_ID_list()
+	{
+		if( is_null( $this->page_ID_list ) )
+		{
+			$this->page_ID_list = implode( ',', $this->get_page_ID_array() );
+			//echo '<br />'.$this->page_ID_list;
+		}
+
+		return $this->page_ID_list;
+	}
+
+
+	/**
+	 * Get an array of IDs for current page
+	 *
+ 	 * @uses Results::ID_col
+	 */
+	function get_page_ID_array()
+	{
+		if( is_null( $this->page_ID_array ) )
+		{
+			$this->page_ID_array = array();
+
+			foreach( $this->rows as $row )
+			{ // For each row/line:
+				$this->page_ID_array[] = $row->{$this->ID_col};
+			}
+		}
+
+		return $this->page_ID_array;
+	}
+
+
+	/**
+	 * Count the total number of rows of the SQL result (all pages)
 	 *
 	 * This is done by dynamically modifying the SQL query and forging a COUNT() into it.
 	 *
@@ -294,14 +371,15 @@ class Results extends Widget
 	 */
 	function count_total_rows( $sql_count = NULL )
 	{
-		if( is_null($this->sql) )
-		{ // We may want to remove this later...
-			$this->total_rows = 0;
-			return;
-		}
-
 		if( empty( $sql_count ) )
 		{
+			if( is_null($this->sql) )
+			{ // We may want to remove this later...
+				$this->total_rows = 0;
+				$this->total_pages = 0;
+				return;
+			}
+
  			$sql_count = $this->sql;
 			// echo $sql_count;
 
@@ -341,6 +419,8 @@ class Results extends Widget
 		}
 
 		$this->total_rows = $this->DB->get_var( $sql_count ); //count total rows
+
+		$this->total_pages = empty($this->limit) ? 1 : ceil($this->total_rows / $this->limit);
 	}
 
 
@@ -692,7 +772,8 @@ class Results extends Widget
 
 			if( ! is_null( $this->Cache ) )
 			{ // We want to instantiate an object for the row and cache it:
-				$this->Cache->instantiate( $row );
+				// We also keep a local ref in case we want to use it for display:
+				$this->current_Obj = & $this->Cache->instantiate( $row );
 			}
 
 
@@ -776,10 +857,39 @@ class Results extends Widget
 
 
 	/**
-	 * Returns ORDER clause to add to SQL query:
+	 * Returns order field list add to SQL query:
 	 */
-	function order()
+	function get_order_field_list()
 	{
+		if( empty( $this->order ) )
+		{ // We have no user provided order:
+			if( empty( $this->cols ) )
+			{	// We have no columns to pick an automatic order from:
+				// echo 'Can\'t determine automatic order';
+				return '';
+			}
+
+			foreach( $this->cols as $col )
+			{
+				if( isset( $col['order'] ) )
+				{ // We have found the first orderable column:
+					$this->order .= 'A';
+					break;
+				}
+				else
+				{
+					$this->order .= '-';
+				}
+			}
+
+			if( empty( $this->cols ) )
+			{	// We did not find any column to order on...
+				return '';
+			}
+		}
+
+		// echo ' order='.$this->order.' ';
+
 		$orders = array();
 
     for( $i = 0; $i <= strlen( $this->order ); $i++ )
@@ -799,21 +909,7 @@ class Results extends Widget
 			}
 		}
 
-		if( empty($orders) )
-		{	// No order needs to be appended
-			return '';
-		}
-
-		if( strpos( $this->sql, 'ORDER BY') === false )
-		{ // there is no ORDER BY clause in the original SQL query
-			$prefix = ' ORDER BY ';
-		}
-		else
-		{ //the chosen order must be appended to an existing ORDER BY clause
-			$prefix = ', ';
-		}
-
-		return $prefix.implode(',',$orders).' ';
+		return implode(',',$orders);	// May be empty
 	}
 
 
@@ -844,6 +940,10 @@ class Results extends Widget
 		$content = preg_replace( '#% (.+?) %#ix', "'.$1.'", $content );
 		// Sometimes we need embedded function call, so we provide a second sign:
 		$content = preg_replace( '#¤ (.+?) ¤#ix', "'.$1.'", $content );
+		// Make variable substitution for intanciated Object:
+		$content = str_replace( '{Obj}', "\$this->current_Obj", $content );
+		// Make callback for Object method substitution:
+		$content = preg_replace( '#@ (.+?) @#ix', "'.\$this->current_Obj->$1.'", $content );
 
 		return $content;
 	}
@@ -1150,8 +1250,8 @@ class Results extends Widget
 
 /*
  * $Log$
- * Revision 1.41  2005/11/25 22:45:37  fplanque
- * no message
+ * Revision 1.42  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
  *
  * Revision 1.40  2005/11/23 23:29:16  blueyed
  * Sorry, encoding messed up.

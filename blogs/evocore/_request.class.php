@@ -595,10 +595,37 @@ class Request
 			$this->Messages->add( $err_msg, $log_category );
 		}
 	}
+
+
+	/**
+	 * Compiles the cat array from $cat (recursive + optional modifiers) and $catsel[] (non recursive)
+	 * and keeps those values available for future reference
+ 	 */
+	function compile_cat_array( $restrict_to_blog = 0 )
+	{
+		// For now, we'll also need those as globals!
+		global $cat_array, $cat_modifier;
+
+		$cat = $this->param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', '', true ); // List of cats to restrict to
+		$catsel = $this->param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
+
+		$cat_array = array();
+		$cat_modifier = '';
+
+		compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $restrict_to_blog );
+
+		// Also memorize inside of Request:
+		$this->params['cat_array'] = $cat_array;
+		$this->params['cat_modifier'] = $cat_modifier;
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.23  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
+ *
  * Revision 1.22  2005/12/05 18:05:13  blueyed
  * Merged 1.20.2.2 from post-phoenix
  *

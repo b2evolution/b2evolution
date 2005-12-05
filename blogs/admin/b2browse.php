@@ -29,53 +29,11 @@ else
 	$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 	$AdminUI->title .= ' '.$Blog->dget( 'shortname' );
 
-	// Show the posts:
+	// This is used in the display templates
+	// TODO: have a method of some object ?
 	$add_item_url = 'b2edit.php?blog='.$blog;
-	$edit_item_url = 'b2edit.php?action=edit&amp;post=';
-	$delete_item_url = 'edit_actions.php?action=delete&amp;post=';
-	$objType = 'Item';
-	$dbtable = 'T_posts';
-	$dbprefix = 'post_';
-	$dbIDname = 'post_ID';
 
 	$Request->param( 'tab', 'string', 'postlist', true /* memorize */ );
-
-	$Request->param( 'p', 'integer' );                    // Specific post number to display
-	$Request->param( 'm', 'integer', '', true );          // YearMonth(Day) to display
-	$Request->param( 'w', 'integer', '', true );          // Week number
-	$Request->param( 'dstart', 'integer', '', true );     // YearMonth(Day) to start at
-	$Request->param( 'unit', 'string', '', true );    		// list unit: 'posts' or 'days'
-
-	$Request->param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', '', true ); // List of cats to restrict to
-	$Request->param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
-	// Let's compile those values right away (we use them in several different places):
-	$cat_array = array();
-	$cat_modifier = '';
-	compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $Blog->ID == 1 ? 0 : $Blog->ID );
-
-	$Request->param( 'author', 'string', '', true );     // List of authors to restrict to
-
-	$Request->param( 'order', 'string', 'DESC', true );   // ASC or DESC
-	$Request->param( 'orderby', 'string', '', true );     // list of fields to order by
-
-	$Request->param( 'posts', 'integer', 0, true );       // # of units to display on the page
-	$Request->param( 'paged', 'integer', '', true );      // List page number in paged display
-
-	$Request->param( 'poststart', 'integer', 1, true );   // Start results at this position
-	$Request->param( 'postend', 'integer', '', true );    // End results at this position
-
-	$Request->param( 's', 'string', '', true );           // Search string
-	$Request->param( 'sentence', 'string', 'AND', true ); // Search for sentence or for words
-	$Request->param( 'exact', 'integer', '', true );      // Require exact match of title or contents
-
-	$preview = 0;
-
-	$Request->param( 'c', 'string' );
-	$Request->param( 'tb', 'integer', 0 );
-	$Request->param( 'pb', 'integer', 0 );
-
-	$Request->param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of cats to restrict to
-	$show_statuses = $show_status;
 
 	$Request->param( 'show_past', 'integer', '0', true );
 	$Request->param( 'show_future', 'integer', '0', true );
@@ -84,32 +42,129 @@ else
 		$show_past = 1;
 		$show_future = 1;
 	}
-
 	$timestamp_min = ( $show_past == 0 ) ? 'now' : '';
 	$timestamp_max = ( $show_future == 0 ) ? 'now' : '';
 
-	if( $p )
-	{	// We are requesting a specific post, force mode to post display:
-		$tab = 'posts';
-	}
-
-	if( $posts == 0 && $tab == 'postlist' )
+	switch( $tab )
 	{
-		$posts = 50;
+		case 'postlist':
+		case 'posts':
+			/*
+			 * Do it all the OLD way:
+			 */
+			// Show the posts:
+			$edit_item_url = 'b2edit.php?action=edit&amp;post=';
+			$delete_item_url = 'edit_actions.php?action=delete&amp;post=';
+			$objType = 'Item';
+			$dbtable = 'T_posts';
+			$dbprefix = 'post_';
+			$dbIDname = 'post_ID';
+
+			$Request->param( 'p', 'integer' );                    // Specific post number to display
+			$Request->param( 'm', 'integer', '', true );          // YearMonth(Day) to display
+			$Request->param( 'w', 'integer', '', true );          // Week number
+			$Request->param( 'dstart', 'integer', '', true );     // YearMonth(Day) to start at
+			$Request->param( 'unit', 'string', '', true );    		// list unit: 'posts' or 'days'
+
+			$Request->param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', '', true ); // List of cats to restrict to
+			$Request->param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
+			// Let's compile those values right away (we use them in several different places):
+			$cat_array = array();
+			$cat_modifier = '';
+			compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $Blog->ID == 1 ? 0 : $Blog->ID );
+
+			$Request->param( 'author', 'string', '', true );     // List of authors to restrict to
+
+			$Request->param( 'order', 'string', 'DESC', true );   // ASC or DESC
+			$Request->param( 'orderby', 'string', '', true );     // list of fields to order by
+
+			$Request->param( 'posts', 'integer', 0, true );       // # of units to display on the page
+			$Request->param( 'paged', 'integer', '', true );      // List page number in paged display
+
+			$Request->param( 'poststart', 'integer', 1, true );   // Start results at this position
+			$Request->param( 'postend', 'integer', '', true );    // End results at this position
+
+			$Request->param( 's', 'string', '', true );           // Search string
+			$Request->param( 'sentence', 'string', 'AND', true ); // Search for sentence or for words
+			$Request->param( 'exact', 'integer', '', true );      // Require exact match of title or contents
+
+			$preview = 0;
+
+			$Request->param( 'c', 'string' );
+			$Request->param( 'tb', 'integer', 0 );
+			$Request->param( 'pb', 'integer', 0 );
+
+			$Request->param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of cats to restrict to
+			$show_statuses = $show_status;
+
+
+			if( $p )
+			{	// We are requesting a specific post, force mode to post display:
+				$tab = 'posts';
+			}
+
+			if( $posts == 0 && $tab == 'postlist' )
+			{
+				$posts = 20;
+			}
+
+			// Get the posts to display:
+			$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
+																	$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
+																	$preview, $unit, $timestamp_min, $timestamp_max, '', $dstart );
+
+			// DO we still use those old style globals? :
+			$posts_per_page = $MainList->posts_per_page;
+			$result_num_rows = $MainList->get_num_rows();
+
+			$postIDlist = & $MainList->postIDlist;
+			$postIDarray = & $MainList->postIDarray;
+			break;
+
+
+		case 'exp':
+			/*
+			 * Let's go the clean new way...
+			 */
+			require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_itemlist2.class.php' );
+
+			// Create empty List:
+			$MainList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max );
+
+			// Init filter params:
+			$MainList->load_from_Request();
+
+			// Run the query:
+			$MainList->query();
+
+			// Temporary inits:
+      $postIDlist = $MainList->get_page_ID_list();
+      $postIDarray = $MainList->get_page_ID_array();
+
+			$Request->param( 'c', 'string' );
+			$Request->param( 'tb', 'integer', 0 );
+			$Request->param( 'pb', 'integer', 0 );
+			break;
+
+
+		case 'tracker':
+			// This will eventually go the "clean" way....
+
+			require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_itemlist2.class.php' );
+
+			// Create empty List:
+			$Results = & new ItemList2( $Blog, $timestamp_min, $timestamp_max );
+
+			// Init filter params:
+			$Results->load_from_Request();
+
+			// DO **NOT** Run the query yet! (we want column definitions to be loaded and act as ORDER BY fields)
+		break;
+
+
+		default:
+  		debug_die( 'Unhandled content; tab='.$tab );
 	}
-
-	// Get the posts to display:
-	$MainList = & new ItemList( $blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
-															$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
-															$preview, $unit, $timestamp_min, $timestamp_max, '', $dstart );
-
-	// DO we still use those old style globals? :
-	$posts_per_page = $MainList->posts_per_page;
-	$result_num_rows = $MainList->get_num_rows();
-
-	$postIDlist = & $MainList->postIDlist;
-	$postIDarray = & $MainList->postIDarray;
-
 }
 
 // Update Menus:
@@ -123,6 +178,15 @@ $AdminUI->add_menu_entries(
 						'posts' => array(
 							'text' => T_('Full posts'),
 							'href' => regenerate_url( 'tab', 'tab=posts' ),
+							),
+						// EXPERIMENTAL:
+						'exp' => array(
+							'text' => T_('Experimental'),
+							'href' => regenerate_url( 'tab', 'tab=exp' ),
+							),
+						'tracker' => array(
+							'text' => T_('Tracker'),
+							'href' => regenerate_url( 'tab', 'tab=tracker' ),
 							),
 					/*	'commentlist' => array(
 							'text' => T_('Comment list'),
@@ -149,7 +213,7 @@ if( $blog )
 
 	// fplanque> Note: this is depressing, but I have to put a table back here
 	// just because IE supports standards really badly! :'(
-  echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>';
+	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>';
 
 	echo '<td class="browse_left_col">';
 		switch( $tab )
@@ -162,12 +226,17 @@ if( $blog )
 				require dirname(__FILE__).'/_edit_showposts.php';
 				break;
 
-			default;
-				echo 'unhandled display mode';
+			case 'exp':
+				require dirname(__FILE__).'/_browse_posts_exp.inc.php';
+				break;
+
+			case 'tracker':
+				require dirname(__FILE__).'/_browse_tracker.inc.php';
+				break;
 		}
 	echo '</td>';
 
-  echo '<td class="browse_right_col">';
+	echo '<td class="browse_right_col">';
 		require dirname(__FILE__).'/_browse_posts_sidebar.inc.php';
 	echo '</td>';
 

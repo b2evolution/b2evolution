@@ -293,14 +293,18 @@ function pingback(
  * pingback_number(-)
  * @deprecated deprecated by {@link Item::feedback_link()}
  */
-function pingback_number($zero='#', $one='#', $more='#' )
+function pingback_number($zero='#', $one='#', $more='#', $post_ID = NULL )
 {
 	if( $zero == '#' ) $zero = T_('Pingback (0)');
 	if( $one == '#' ) $one = T_('Pingback (1)');
 	if( $more == '#' ) $more = T_('Pingbacks (%d)');
 
-	global $id, $tb, $cache_pingbacknumber;
-	$number = generic_ctp_number($id, 'pingbacks');
+	if( empty( $post_ID ) )
+	{
+		global $id;
+		$post_ID = $id;
+	}
+	$number = generic_ctp_number($post_ID, 'pingbacks');
 	if ($number == 0) {
 		$blah = $zero;
 	} elseif ($number == 1) {
@@ -364,6 +368,9 @@ function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 
 /*
  * $Log$
+ * Revision 1.8  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
+ *
  * Revision 1.7  2005/11/18 18:32:42  fplanque
  * Fixed xmlrpc logging insanity
  * (object should have been passed by reference but you can't pass NULL by ref)

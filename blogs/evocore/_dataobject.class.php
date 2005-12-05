@@ -578,12 +578,65 @@ class DataObject
 	{
 		echo $this->ID;
 	}
+
+	/**
+	 * Create icon with dataobject history
+	 */
+	function history_info_icon()
+	{
+		global $UserCache;
+
+		$history = array();
+
+		// HANDLE CREATOR STUFF
+		if( !empty($this->creator_field) && !empty($this->{$this->creator_field}) )
+		{	// We have a creator:
+			$creator_User = & $UserCache->get_by_ID( $this->{$this->creator_field} );
+
+			if( !empty($this->datecreated_field) && !empty($this->{$this->datecreated_field}) )
+			{	// We also have a create date:
+				$history[0] = sprintf( T_('Created on %s by %s'), mysql2localedate( $this->{$this->datecreated_field} ),
+					$creator_User->dget('preferredname') );
+			}
+			else
+			{	// We only have a cretaor:
+				$history[0] = sprintf( T_('Created by %s'), $creator_User->dget('preferredname') );
+			}
+		}
+		elseif( !empty($this->datecreated_field) && !empty($this->{$this->datecreated_field}) )
+		{	// We only have a create date:
+			$history[0] = sprintf( T_('Created on %s'), mysql2localedate( $this->{$this->datecreated_field} ) );
+		}
+
+		// HANDLE LAST UPDATE STUFF
+		if( !empty($this->lasteditor_field) && !empty($this->{$this->lasteditor_field}) )
+		{	// We have a creator:
+			$creator_User = & $UserCache->get_by_ID( $this->{$this->lasteditor_field} );
+
+			if( !empty($this->datemodified_field) && !empty($this->{$this->datemodified_field}) )
+			{	// We also have a create date:
+				$history[1] = sprintf( T_('Last mod on %s by %s'), mysql2localedate( $this->{$this->datemodified_field} ),
+					$creator_User->dget('preferredname') );
+			}
+			else
+			{	// We only have a cretaor:
+				$history[1] = sprintf( T_('Last mod by %s'), $creator_User->dget('preferredname') );
+			}
+		}
+		elseif( !empty($this->datemodified_field) && !empty($this->{$this->datemodified_field}) )
+		{	// We only have a create date:
+			$history[1] = sprintf( T_('Last mod on %s'), mysql2localedate( $this->{$this->datemodified_field} ) );
+		}
+
+		return get_icon( 'history', $what = 'imgtag', array( 'title'=>implode( ' - ', $history ) ) );
+	}
 }
 
 
 /**
- * {@internal object_history(-)}}
+ * @deprecated and not used in b2evo anyway
  */
+/*
 function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 {
 	global $UserCache;
@@ -593,13 +646,16 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 		$modified = sprintf( T_('Last modified on %s by %s'), mysql2localedate( $pos_datemodified ), $User->dget('preferredname') );
 
-		return '<img src="img/clock.png" width="17" height="17" class="middle" alt="'.$modified.'" title="'.$modified.'" /> ';
+		return get_icon( 'history', $what = 'imgtag', array( 'title'=>$modified ) );
 	}
 }
-
+*/
 
 /*
  * $Log$
+ * Revision 1.31  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
+ *
  * Revision 1.30  2005/11/28 07:39:43  blueyed
  * doc, normalization
  *
