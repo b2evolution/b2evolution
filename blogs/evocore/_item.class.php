@@ -1382,6 +1382,7 @@ class Item extends DataObject
 		echo $this->get_delete_link( $before, $after, $text, $title, $class, $button, $actionurl );
 	}
 
+
 	/**
 	 * Provide link to edit a post if user has edit rights
 	 *
@@ -1841,12 +1842,49 @@ class Item extends DataObject
 	 * Template function: Display the number of times the Item has been viewed
 	 *
 	 * Note: viewcount is incremented whenever the Item's content is displayed with "MORE"
-	 * (i-e full content), see {@link Item::content()}
+	 * (i-e full content), see {@link Item::content()}.
+	 *
 	 * Viewcount is NOT incremented on page reloads and other special cases, see {@link Hit::is_new_view()}
+	 *
+	 * %d gets replaced in all params by the number of views.
+	 *
+	 * @param string Link text to display when there are 0 views
+	 * @param string Link text to display when there is 1 views
+	 * @param string Link text to display when there are >1 views
+	 * @return string The phrase about the number of views.
 	 */
-	function views()
+	function get_views( $zero = '#', $one = '#', $more = '#' )
 	{
-		echo $this->views;
+		if( !$this->views )
+		{
+			$r = ( $zero == '#' ? T_( 'No views' ) : $zero );
+		}
+		elseif( $this->views == 1 )
+		{
+			$r = ( $one == '#' ? T_( '1 view' ) : $one );
+		}
+		else
+		{
+			$r = ( $more == '#' ? T_( '%d views' ) : $more );
+		}
+
+		return str_replace( '%d', $this->views, $r );
+	}
+
+
+	/**
+	 * Template function: Display a phrase about the number of Item views.
+	 *
+	 * @param string Link text to display when there are 0 views
+	 * @param string Link text to display when there is 1 views
+	 * @param string Link text to display when there are >1 views (include %d for # of views)
+	 * @return integer Number of views.
+	 */
+	function views( $zero = '#', $one = '#', $more = '#' )
+	{
+		echo $this->get_views( $zero, $one, $more );
+
+		return $this->views;
 	}
 
 
@@ -2297,29 +2335,17 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.74  2005/12/05 20:54:05  blueyed
+ * Changed Item::views() to take $zero, $one and $more param and default to 'No views', '1 view' and '%d views' (translated). More consistent and easier on the skin.
+ *
  * Revision 1.73  2005/12/05 18:17:19  fplanque
  * Added new browsing features for the Tracker Use Case.
- *
- * Revision 1.72  2005/12/05 13:49:55  fplanque
- * no message
  *
  * Revision 1.71  2005/12/01 19:03:15  blueyed
  * Use set() to set default priority to 3! Otherwise leaving it at the default setting would not call dbchange().
  *
  * Revision 1.70  2005/11/28 21:06:56  blueyed
  * Item::msgform_link_assigned() to display link to message form of the assigned User
- *
- * Revision 1.69  2005/11/28 20:39:46  blueyed
- * Added Items::views_phrase() to allow distinguishing between 0, 1 or more views.
- *
- * Revision 1.68  2005/11/25 22:45:37  fplanque
- * no message
- *
- * Revision 1.67  2005/11/23 17:29:19  fplanque
- * no message
- *
- * Revision 1.66  2005/11/17 19:35:26  fplanque
- * no message
  *
  * Revision 1.65  2005/11/05 01:01:50  blueyed
  * Fix noticed during install, when there's no $current_User. Do not assign a user in the constructor then.
@@ -2393,12 +2419,6 @@ class Item extends DataObject
  * Revision 1.43  2005/06/10 18:25:44  fplanque
  * refactoring
  *
- * Revision 1.42  2005/06/02 18:50:52  fplanque
- * no message
- *
- * Revision 1.41  2005/05/26 19:11:11  fplanque
- * no message
- *
  * Revision 1.40  2005/05/25 18:31:01  fplanque
  * implemented email notifications for new posts
  *
@@ -2431,9 +2451,6 @@ class Item extends DataObject
  * Revision 1.30  2005/03/13 23:28:27  blueyed
  * blog_name() template function added, doc, beautified
  *
- * Revision 1.29  2005/03/10 16:10:26  fplanque
- * no message
- *
  * Revision 1.28  2005/03/08 20:32:07  fplanque
  * small fixes; slightly enhanced WEEK() handling
  *
@@ -2442,9 +2459,6 @@ class Item extends DataObject
  *
  * Revision 1.26  2005/03/04 18:39:41  fplanque
  * handle NULL properties
- *
- * Revision 1.25  2005/03/02 17:07:34  blueyed
- * no message
  *
  * Revision 1.24  2005/03/02 15:27:24  fplanque
  * minor refactoring

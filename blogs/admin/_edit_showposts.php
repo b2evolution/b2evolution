@@ -114,7 +114,6 @@ while( $Item = $MainList->get_item() )
 				$Item->Author->level();
 				echo '), ';
 				$Item->views();
-				echo ' '.T_('views');
 
 				echo '<div class="bSmallHeadRight">';
 				echo T_('Status').': ';
@@ -342,8 +341,8 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
- * Revision 1.110  2005/12/05 15:29:14  fplanque
- * no message
+ * Revision 1.111  2005/12/05 20:54:05  blueyed
+ * Changed Item::views() to take $zero, $one and $more param and default to 'No views', '1 view' and '%d views' (translated). More consistent and easier on the skin.
  *
  * Revision 1.108  2005/10/31 05:51:05  blueyed
  * Use rawurlencode() instead of urlencode()
@@ -353,9 +352,6 @@ if( $MainList->get_total_num_posts() )
  *
  * Revision 1.106  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
- *
- * Revision 1.105  2005/09/01 17:11:46  fplanque
- * no message
  *
  * Revision 1.104  2005/08/31 19:06:41  fplanque
  * minor
