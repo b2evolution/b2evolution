@@ -2200,7 +2200,7 @@ class Form extends Widget
 		// Error handling:
 		if( isset($field_params['name']) && isset($Request) && isset($Request->err_messages[$field_params['name']]) )
 		{ // There is an error message for this field:
-			if( $field_params['type'] == 'checkbox' )
+			if( !empty($field_params['type']) && $field_params['type'] == 'checkbox' )
 			{ // checkboxes need a span
 				$field_params['input_suffix'] = '</span>'.( isset($field_params['input_suffix']) ? $field_params['input_suffix'] : '' );
 				$field_params['input_prefix'] = ( isset($field_params['input_prefix']) ? $field_params['input_prefix'] : '' ).'<span class="checkbox_required">';
@@ -2278,6 +2278,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.91  2005/12/05 16:06:13  blueyed
+ * Fix possible E_NOTICE
+ *
  * Revision 1.90  2005/11/30 10:46:36  blueyed
  * checklist(): Whitespace between checkbox and label
  *
