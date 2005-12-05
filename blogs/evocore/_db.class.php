@@ -721,7 +721,7 @@ class DB
 		{
 			return $this->last_result[$y]
 				? $this->last_result[$y]
-				: array();
+				: NULL;
 		}
 		// If the output is an associative array then return row as such..
 		elseif ( $output == ARRAY_A )
@@ -1175,6 +1175,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.46  2005/12/05 16:04:35  blueyed
+ * get_row(): return NULL on empty results for OBJECT-type return value.
+ *
  * Revision 1.45  2005/11/23 17:29:19  fplanque
  * no message
  *
