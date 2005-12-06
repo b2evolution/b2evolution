@@ -196,30 +196,35 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
  */
 $Fileman = new FileManager( $current_User, 'files.php', $root, $path, $order, $orderasc, $filterString, $filterIsRegexp, $flatmode );
 
+if( ! $Fileman->_ads_list_path )
+{ // We have no Root / list path, there was an error. Unset any action or mode.
+	$action = '';
+	$Fileman->fm_mode = '';
+}
+
+// Check actions that toggle Filelist properties:
 if( !empty($action) )
 {
-	$oldAction = $action;
-	$action = '';
-
-	switch( $oldAction )
+	switch( $action )
 	{
 		case 'filter_unset':
 			$Fileman->setFilter( false, false );
+			$action = '';
 			break;
 
 		case 'noflatmode':
 			$Fileman->flatmode = false;
+			$action = '';
 			break;
 
 		case 'flatmode':
 			$Fileman->flatmode = true;
+			$action = '';
 			break;
-
-		default:
-			$action = $oldAction;
 	}
 }
 
+// Load Filelist (with meta data):
 $Fileman->load();
 
 
@@ -1325,6 +1330,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.144  2005/12/06 00:01:56  blueyed
+ * Unset action/fm_mode when no FileRoot available.
+ *
  * Revision 1.143  2005/12/05 21:05:35  blueyed
  * Whitespace
  *
