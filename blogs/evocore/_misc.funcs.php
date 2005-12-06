@@ -1224,10 +1224,10 @@ function validate_url( $url, & $allowed_uri_scheme )
 		return T_('Invalid URL');
 	}
 
-	if( ! preg_match('|^               # start
-		([a-z][a-z0-9+.\-]*):[0-9]*      # scheme
-		//                               # authority absolute URLs only
-		[a-z0-9][a-z0-9~+.\-_,:;/\\\\*]* # Don t allow anything too funky like entities
+	if( ! preg_match('|^                # start
+		([a-z][a-z0-9+.\-]*):[0-9]*       # scheme
+		//                                # authority absolute URLs only
+		[a-z0-9][a-z0-9~+.\-_,:;/\\\\*=]* # Don t allow anything too funky like entities
 		([?#][a-z0-9~+.\-_,:;/\\\\%&=?#*\ \[\]]*)?
 		$|ix', $url, $matches) )
 	{ // Cannot vaidate URL structure
@@ -2304,6 +2304,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.156  2005/12/06 22:08:26  blueyed
+ * Fix validate_url() to allow "=" also before any "?" or "#". Fixes: http://forums.b2evolution.net/viewtopic.php?p=29817
+ *
  * Revision 1.155  2005/12/05 12:15:32  fplanque
  * bugfix
  *
