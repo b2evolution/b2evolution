@@ -103,22 +103,28 @@ function trackback(
 	// dis is the trackback stuff to be sent:
 	$query_string = "title=$title&url=$url&blog_name=$blog_name&excerpt=$excerpt";
 	// echo "url:$trackback_url<br>$sending:$query_string<br />";
+
+	$result = '';
 	if (strstr($trackback_url, '?'))
 	{
 		echo '[get]';
 		$trackback_url .= "&".$query_string;;
 		flush();
-		$fp = fopen($trackback_url, 'r');
-		$result = fread($fp, 4096);
-		fclose($fp);
-/* debug code
-		$debug_file = 'trackback.log';
-		$fp = fopen($debug_file, 'a');
-		fwrite($fp, "\n*****\nTrackback URL query:\n\n$trackback_url\n\nResponse:\n\n");
-		fwrite($fp, $result);
-		fwrite($fp, "\n\n");
-		fclose($fp);
-*/
+		if( $fp = fopen($trackback_url, 'r') )
+		{
+			// blueyed>> why do we here just read the first 4kb, but in the POSTed response everything?
+			$result = fread($fp, 4096);
+			fclose($fp);
+
+			/* debug code
+			$debug_file = 'trackback.log';
+			$fp = fopen($debug_file, 'a');
+			fwrite($fp, "\n*****\nTrackback URL query:\n\n$trackback_url\n\nResponse:\n\n");
+			fwrite($fp, $result);
+			fwrite($fp, "\n\n");
+			fclose($fp);
+			*/
+		}
 
 	}
 	else
@@ -130,27 +136,32 @@ function trackback(
 		$http_request .= 'Host: '.$trackback_url['host']."\r\n";
 		$http_request .= 'Content-Type: application/x-www-form-urlencoded'."\r\n";
 		$http_request .= 'Content-Length: '.strlen($query_string)."\r\n";
-		$http_request .= "User-Agent: $app_name/$app_version\r\?";
+		$http_request .= "User-Agent: $app_name/$app_version\r\n";
 		$http_request .= "\r\n";
 		$http_request .= $query_string;
 		flush();
-		$fs = fsockopen($trackback_url['host'], $port);
-		fputs($fs, $http_request);
-		$result = '';
-		while(!feof($fs)) {
-			$result .= fgets($fs, 4096);
+		if( $fs = fsockopen($trackback_url['host'], $port) )
+		{
+			fputs($fs, $http_request);
+			$result = '';
+			while(!feof($fs))
+			{
+				$result .= fgets($fs, 4096);
+			}
+
+			/* debug code
+			$debug_file = 'trackback.log';
+			$fp = fopen($debug_file, 'a');
+			fwrite($fp, "\n*****\nRequest:\n\n$http_request\n\nResponse:\n\n$result");
+			while(!@feof($fs)) {
+				fwrite($fp, @fgets($fs, 4096));
+			}
+			fwrite($fp, "\n\n");
+			fclose($fp);
+			*/
+
+			fclose($fs);
 		}
-/* debug code
-		$debug_file = 'trackback.log';
-		$fp = fopen($debug_file, 'a');
-		fwrite($fp, "\n*****\nRequest:\n\n$http_request\n\nResponse:\n\n$result");
-		while(!@feof($fs)) {
-			fwrite($fp, @fgets($fs, 4096));
-		}
-		fwrite($fp, "\n\n");
-		fclose($fp);
-*/
-		fclose($fs);
 	}
 	// extract the error code and message, then make the error code readable
 	if ( preg_match("/<error>[\r\n\t ]*(\d+)[\r\n\t ]*<\/error>/", $result, $error) )
@@ -225,6 +236,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.12  2005/12/06 01:55:40  blueyed
+ * Fix line ending for User-Agent; Also fix the infinite loop it was causing.
+ *
  * Revision 1.11  2005/12/05 18:17:19  fplanque
  * Added new browsing features for the Tracker Use Case.
  *
