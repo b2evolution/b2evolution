@@ -148,7 +148,7 @@ class AbstractSettings
 	 */
 	function load_all()
 	{
-		return $this->load();
+		return $this->_load();
 	}
 
 
@@ -156,10 +156,11 @@ class AbstractSettings
 	 * Loads the settings. Not meant to be called directly, but gets called
 	 * when needed.
 	 *
+	 * @access protected
 	 * @param array|NULL list of key values, used for caching by keys.
 	 * @return boolean always true
 	 */
-	function load( $getArgs = NULL )
+	function _load( $getArgs = NULL )
 	{
 		if( $this->allLoaded )
 		{ // already all loaded
@@ -265,13 +266,13 @@ class AbstractSettings
 		global $Debuglog;
 
 		$args = func_get_args();
-		$this->load( $args );
 
-		if( func_num_args() != $this->count_colKeyNames )
+		if( count($args) != $this->count_colKeyNames )
 		{
-			$Debuglog->add( 'Count of arguments for AbstractSettings::get() does not match $colKeyNames (class '.get_class($this).').', 'error' );
-			return false;
+			debug_die( 'Count of arguments for AbstractSettings::get() does not match $colKeyNames (class '.get_class($this).')! '.count($args).' given, '.$this->count_colKeyNames.' expected.' );
 		}
+
+		$this->_load( $args );
 
 		$debugMsg = get_class($this).'::get( '.implode( ', ', $args ).' ): ';
 
@@ -379,9 +380,14 @@ class AbstractSettings
 		global $Debuglog;
 
 		$args = func_get_args();
-		$count_args = func_num_args();
+		$count_args = count($args);
 
-		$this->load( $args ); // the last Arg is not meant to go to load() but it does no harm AFAICS
+		if( $count_args != ( $this->count_colKeyNames + 1 ) )
+		{
+			debug_die( 'Count of arguments for AbstractSettings::set() does not match $colKeyNames (class '.get_class($this).')! '.count($args).' given, '.($this->count_colKeyNames+1).' expected.' );
+		}
+
+		$this->_load( $args ); // the last Arg is not meant to go to load() but it does no harm AFAICS
 
 		$debugMsg = get_class($this).'::set( '.implode(', ', $args ).' ): ';
 
@@ -600,6 +606,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.23  2005/12/07 18:04:17  blueyed
+ * Normalization
+ *
  * Revision 1.22  2005/11/18 18:26:38  fplanque
  * no message
  *
