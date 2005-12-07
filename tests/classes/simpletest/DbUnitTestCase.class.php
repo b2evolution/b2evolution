@@ -67,8 +67,6 @@ class DbUnitTestCase extends EvoUnitTestCase
 
 	/**
 	 * Create table for the current version.
-	 *
-	 * @return
 	 */
 	function create_current_tables()
 	{
