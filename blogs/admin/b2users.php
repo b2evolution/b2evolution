@@ -82,7 +82,7 @@ elseif( $user_ID !== NULL )
 { // User selected
 	if( $action == 'userupdate' && $user_ID == 0 )
 	{ // we create a new user
-		$edited_User = & new User();
+		$edited_User = new User();
 		$edited_User->set_datecreated( $localtimenow );
 	}
 	elseif( ($edited_User = $UserCache->get_by_ID( $user_ID, false )) === false )
@@ -134,7 +134,7 @@ elseif( $grp_ID !== NULL )
 { // Group selected
 	if( $action == 'groupupdate' && $grp_ID == 0 )
 	{ // New Group:
-		$edited_Group = & new Group();
+		$edited_Group = new Group();
 	}
 	elseif( ($edited_Group = $GroupCache->get_by_ID( $grp_ID, false )) === false )
 	{ // We could not find the Group to edit:
@@ -194,7 +194,7 @@ if( !$Messages->count('error') )
 			}
 			else
 			{ // We use an empty user:
-				$edited_User = & new User();
+				$edited_User = new User();
 			}
 			break;
 
@@ -432,7 +432,7 @@ if( !$Messages->count('error') )
 			}
 			else
 			{ // We use an empty group:
-				$edited_Group = & new Group();
+				$edited_Group = new Group();
 			}
 			break;
 
@@ -595,6 +595,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.118  2005/12/08 22:26:07  blueyed
+ * Fix E_STRICT (assigning "new" by reference is deprecated)
+ *
  * Revision 1.117  2005/12/08 22:23:44  blueyed
  * Merged 1-2-3-4 scheme from post-phoenix
  *
