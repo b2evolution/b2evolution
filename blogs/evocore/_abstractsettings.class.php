@@ -136,7 +136,7 @@ class AbstractSettings
 
 		if( $this->count_colKeyNames > 3 || $this->count_colKeyNames < 1 )
 		{
-			die( 'Settings keycount not supported for class '.get_class() );
+			debug_die( 'Settings keycount not supported for class '.get_class() );
 		}
 	}
 
@@ -492,6 +492,22 @@ class AbstractSettings
 
 
 	/**
+	 * Delete values for {@link $_defaults default settings} in DB.
+	 *
+	 * This will use the default settings on the next {@link get()}
+	 * again.
+	 *
+	 * @return boolean true, if settings have been updated; false otherwise
+	 */
+	function restore_defaults()
+	{
+		$this->delete_array( array_keys( $this->_defaults ) );
+
+		return $this->dbupdate();
+	}
+
+
+	/**
 	 * Commit changed settings to DB.
 	 *
 	 * @return boolean true, if settings have been updated; false otherwise
@@ -606,6 +622,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.24  2005/12/08 22:26:31  blueyed
+ * added restore_defaults(), use debug_die()
+ *
  * Revision 1.23  2005/12/07 18:04:17  blueyed
  * Normalization
  *
