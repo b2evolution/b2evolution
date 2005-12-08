@@ -179,6 +179,61 @@ class AdminUI_general
 
 
 	/**
+	 * Add menu entries to the list of entries for a given path.
+	 *
+	 * @param NULL|string|array The path to add the entries to. See {@link get_node_by_path()}.
+	 * @param array Menu entries to add (key (string) => entry (array)).
+	 *   An entry can have the following keys:
+	 *     'text': Text/Caption for this entry.
+	 *     'href': The link for this entry.
+	 *     'style': CSS style for this entry.
+	 *     'perm_name': permission name to check.
+	 *     'perm_level': permission level that must be granted.
+	 *     'perm_eval': This gets evaluated and must return true for the entry to be accessible.
+	 *     'text_noperm': Text to display if no permission granted.
+	 *     'entries': array of sub-entries
+	 */
+	function add_menu_entries( $path, $entries )
+	{
+		// Get a reference to the node in the menu list.
+		$node = & $this->get_node_by_path( $path, true );
+
+		/*
+		if( !is_array($node) )
+		{
+			debug_die( 'add_menu_entries() with non-existing path!' );
+		}
+		*/
+
+		foreach( $entries as $l_key => $l_menu_props )
+		{
+			// TODO: check perms/user settings, ... (this gets mainly done in get_html_menu_entries() for now)
+			$node['entries'][$l_key] = $l_menu_props;
+		}
+	}
+
+
+	/**
+	 * Add menu entries to the beginning of the list for given path.
+	 *
+	 * @param NULL|string|array The path to add the entries to.
+	 * @param array Menu entries to add (key (string) => entry (array)).
+	 * @uses add_menu_entries()
+	 */
+	function unshift_menu_entries( $path, $entries )
+	{
+		// Get a reference to the node in the menu list.
+		$node = & $this->get_node_by_path( $path, true );
+
+		$node['entries'] = array_reverse( $node['entries'] );
+
+		$this->add_menu_entries( $path, $entries );
+
+		$node['entries'] = array_reverse( $node['entries'] );
+	}
+
+
+	/**
 	 * Get the <title> of the page.
 	 *
 	 * This is either {@link $title} or will be constructed from title/text properties
@@ -518,9 +573,17 @@ class AdminUI_general
 				{ // If no permission requested or if perm granted or if we have an alt text, display tab:
 					$anchor = '<a href="';
 					if( isset( $loop_details['href'] ) )
+					{
 						$anchor .= $loop_details['href'];
-					else
+					}
+					elseif( !empty($loop_details['href_eval']) )
+					{
 						$anchor .= eval( $loop_details['href_eval'] );
+					}
+					else
+					{
+						$anchor .= regenerate_url( 'tab', 'tab='.$loop_tab );
+					}
 					$anchor .= '"';
 					if( isset($loop_details['style']) )
 					{
@@ -571,25 +634,6 @@ class AdminUI_general
 
 
 	/**
-	 * Add menu entries to a given path.
-	 *
-	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
-	 * @param array Menu entries to add.
-	 */
-	function add_menu_entries( $path, $entries )
-	{
-		// Get a reference to the node in the menu list (creating it, if not existing)
-		$node = & $this->get_node_by_path( $path, true );
-
-		foreach( $entries as $lKey => $lMenuProps )
-		{
-			// TODO: check perms/user settings, ... (this gets mainly done in get_html_menu_entries() for now)
-			$node['entries'][$lKey] = $lMenuProps;
-		}
-	}
-
-
-	/**
 	 * Get menu entries for a given path.
 	 *
 	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
@@ -629,7 +673,7 @@ class AdminUI_general
 	 *                          array means path below root.
 	 *                          (eg <code>array('options', 'general')</code>).
 	 * @param boolean Should the node be created if it does not exist already?
-	 * @return array
+	 * @return array|false The node as array or false, if the path does not exist (and we do not $createIfNotExisting).
 	 */
 	function & get_node_by_path( $path, $createIfNotExisting = false )
 	{
@@ -1121,6 +1165,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.41  2005/12/08 22:54:02  blueyed
+ * Doc, Normalization
+ *
  * Revision 1.40  2005/11/25 03:57:57  blueyed
  * doc, normalization
  *
