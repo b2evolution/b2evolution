@@ -476,8 +476,43 @@ function validate_file_extension( $filename, & $extension )
 }
 
 
+/**
+ * Return the path without the leading {@link $basepath}, or if not
+ * below {@link $basepath}, just the basename of it.
+ *
+ * @param string Path
+ * @return string Relative path or even base name.
+ *   NOTE: when $debug, the real path gets appended.
+ *         Do not use this for file handling. but "just" displaying!
+ */
+function rel_path_to_base( $path )
+{
+	global $basepath, $debug;
+
+	// Remove basepath prefix:
+	if( preg_match( '~^('.preg_quote($basepath, '~').')(.+)$~', $path, $match ) )
+	{
+		$r = $match[2];
+	}
+	else
+	{
+		$r = basename($path).( is_dir($path) ? '/' : '' );
+	}
+
+	if( $debug )
+	{
+		$r .= ' [DEBUG: '.$path;
+	}
+
+	return $r;
+}
+
+
 /*
  * $Log$
+ * Revision 1.36  2005/12/08 22:35:23  blueyed
+ * Merged rel_path_to_base() from post-phoenix
+ *
  * Revision 1.35  2005/11/23 23:53:24  blueyed
  * Sorry, encoding messed up (latin1 again).
  *
