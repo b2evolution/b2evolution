@@ -46,7 +46,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $AdminUI->disp_payload_begin();
 
 
-$Form = & new Form( 'b2users.php' );
+$Form = new Form( 'b2users.php' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'grp_ID,action' ) );
 
@@ -56,7 +56,7 @@ if( $edited_Group->get('ID') == 0 )
 }
 else
 {
-	$title = ($current_User->check_perm( 'users', 'edit' ) ? T_('Editing group:') : T_('Viewing group:') )
+	$title = ( $action == 'edit_user' ? T_('Editing group:') : T_('Viewing group:') )
 						.' '.
 						( isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->dget('name') )
 						.' ('.T_('ID').' '.$edited_Group->ID.')';
@@ -64,7 +64,7 @@ else
 }
 
 $Form->hidden( 'action', 'groupupdate' );
-$Form->hidden( 'edited_grp_ID', $edited_Group->ID );
+$Form->hidden( 'grp_ID', $edited_Group->ID );
 
 $Form->begin_fieldset( T_('General') );
 	$Form->text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
@@ -139,10 +139,11 @@ $Form->begin_fieldset( T_('Permissions for members of this group') );
 
 $Form->end_fieldset();
 
-if( $current_User->check_perm( 'users', 'edit' ) )
+if( $action != 'view_group' )
 {
-	$Form->buttons( array( array( '', '', T_('Save !'), 'SaveButton' ),
-												 array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	$Form->buttons( array(
+		array( '', '', T_('Save !'), 'SaveButton' ),
+		array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
 $Form->end_form();
@@ -152,6 +153,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.42  2005/12/08 22:23:44  blueyed
+ * Merged 1-2-3-4 scheme from post-phoenix
+ *
  * Revision 1.41  2005/11/16 04:45:51  blueyed
  * Typo
  *

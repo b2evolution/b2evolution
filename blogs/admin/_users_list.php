@@ -46,7 +46,6 @@ if( !empty( $filteron ) )
 	$swhere = '';
 	foreach ($afilter as $sfilter)
 	{
-
 		$swhere .= 'concat(user_login, \' \', user_firstname, \' \', user_lastname, \' \', user_nickname, \' \', user_email) like "%' . $DB->escape($sfilter) . '%" and ';
 	}
 	$sql = "SELECT T_users.*, grp_ID, grp_name
@@ -200,19 +199,25 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 	$Results->global_icon( T_('Add a group...'), 'new', '?action=new_group', T_('Add group') );
 }
 
-//Display filter/search block
-echo '<center>';
+// Display filter/search block
+// TODO: should get handled by Results class
+echo '<div class="center">';
 $Form = & new Form( 'b2users.php', 'filter', 'get', '' );
 $Form->begin_form('fform');
 $Form->text( 'filteron', $filteron, 30, '', '', 80 );
-$Form->end_form( array( array( 'submit', 'filter', T_('Filter'), 'SaveButton' ),array('submit','filter',T_('Clear'),'SaveButton' ) ) );
-echo '</center>';
+$Form->end_form( array(
+		array( 'type' => 'submit', 'name' => 'filter[on]', 'value' => T_('Filter'), 'class' => 'SaveButton' ),
+		array( 'type' => 'submit', 'name' => 'filter[off]', 'value' => T_('Clear'), 'class' => 'SaveButton' ) ) );
+echo '</div>';
 
 // Display result :
 $Results->display();
 
 /*
  * $Log$
+ * Revision 1.56  2005/12/08 22:23:44  blueyed
+ * Merged 1-2-3-4 scheme from post-phoenix
+ *
  * Revision 1.55  2005/11/25 22:45:37  fplanque
  * no message
  *

@@ -26,10 +26,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * }}
  *
+ * {@internal
+ * Daniel HAHLER grants Francois PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: François PLANQUE
+ * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
  */
@@ -38,24 +45,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-if( $demo_mode )
-{ // Prevent users from killing access to the demo...
-	// Allow editing (this only makes the fields inputs or infos, no check on update), if the user is allowed to edit users or edits his own profile. BUT never if the edited_User is 'admin' or 'demouser'.
-	$allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' ) || $user_profile_only )
-											&& $edited_User->ID != 1			// User number 1 is the global admin, even if he's renamed.
-											&& $edited_User->login != 'demouser';
-}
-else
+
+$Form = new Form( 'b2users.php', 'form' );
+
+if( !$user_profile_only )
 {
-	$allowed_to_edit = ( $current_User->check_perm( 'users', 'edit' )
-												|| ($user_profile_only && $edited_User->ID == $current_User->ID) );
+	$Form->global_icon( ( $action != 'view_user' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action' ) );
 }
-
-
-$Form = & new Form( 'b2users.php', 'form' );
-
-$Form->global_icon( $allowed_to_edit ? T_('Cancel editing!') : T_('Close user profile!'), 'close',
-										regenerate_url( 'user_ID,action' ) );
 
 if( $edited_User->get('ID') == 0 )
 {	// Creating new user:
@@ -65,34 +61,33 @@ if( $edited_User->get('ID') == 0 )
 else
 {	// Editing existing user:
 	$creating = false;
-	$Form->begin_form( 'fform', T_('Profile for:').' '.$edited_User->dget('fullname')
-				.' ['.$edited_User->dget('login').']' );
+	$Form->begin_form( 'fform', T_('Profile for:').' '.$edited_User->dget('fullname').' ['.$edited_User->dget('login').']' );
 }
 
 $Form->hidden( 'action', 'userupdate' );
-$Form->hidden( 'edited_user_ID', $edited_User->ID );
+$Form->hidden( 'user_ID', $edited_User->get('ID') );
 
 
 $Form->begin_fieldset( T_('User rights'), array( 'class'=>'fieldset clear' ) );
 
 $field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://b2evolution.net/man/user_levels.html"' );
-if( $user_profile_only )
+if( $current_User->check_perm( 'users', 'edit' ) )
 {
-	$Form->info( T_('Level'), $edited_User->dget('level'), $field_note );
+	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('Level'), array( 'note' => $field_note, 'required' => true ) );
 }
 else
 {
-	$Form->text_input( 'edited_user_level', $edited_User->level, 2, T_('Level'), array( 'note' => $field_note ) );
+	$Form->info_field( T_('Level'), $edited_User->get('level'), array( 'note' => $field_note ) );
 }
-if( $edited_User->get('ID') != 1 && !$user_profile_only )
-{	// This is not Admin and we're not restricted: we're allowed to change the user group:
+if( $edited_User->get('ID') != 1 && $current_User->check_perm( 'users', 'edit' ) )
+{	// This is not admin and we're not restricted: we're allowed to change the user group:
 	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->get('ID');
-	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
+	$Form->select_input_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group'), array( 'required' => true ) );
 }
 else
 {
-	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->Group->ID.'" />';
-	$Form->info( T_('User group'), $edited_User->Group->dget('name') );
+	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->Group->get('ID').'" />';
+	$Form->info_field( T_('User group'), $edited_User->Group->dget('name') );
 }
 
 $Form->end_fieldset();
@@ -124,81 +119,89 @@ else
 	$aim_fieldnote = '';
 
 
-if( $allowed_to_edit )
+if( $action != 'view_user' )
 { // We can edit the values:
-	$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login') );
+	$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login'), array( 'required' => true ) );
 	$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), array( 'maxlength' => 50 ) );
 	$Form->text_input( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), array( 'maxlength' => 50, 'force_to' => 'UpperCase' ) );
-	$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), array( 'maxlength' => 50 ) );
-	$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
-	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when visiting the site.') );
-	$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
-	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), array( 'note' => $email_fieldnote, 'maxlength' => 100 ) );
-	$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
+	$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), array( 'maxlength' => 50, 'required' => true ) );
+	$Form->select_input( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown'), array( 'required' => true ) );
+	$Form->checkbox_input( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), array( 'note' => T_('Check this to be displayed as online when visiting the site.') ) );
+	$Form->select_input( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), array( 'note' => T_('Preferred locale for admin interface, notifications, etc.'), 'required' => true) );
+	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), array( 'note' => $email_fieldnote, 'maxlength' => 100, 'required' => true ) );
+	$Form->checkbox_input( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), array( 'note' => T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') ) );
 	$Form->text_input( 'edited_user_url', $edited_User->url, 30, T_('URL'), array( 'note' => $url_fieldnote, 'maxlength' => 100 ) );
 	$Form->text_input( 'edited_user_icq', $edited_User->icq, 30, T_('ICQ'), array( 'note' => $icq_fieldnote, 'maxlength' => 10 ) );
 	$Form->text_input( 'edited_user_aim', $edited_User->aim, 30, T_('AIM'), array( 'note' => $aim_fieldnote, 'maxlength' => 50 ) );
 	$Form->text_input( 'edited_user_msn', $edited_User->msn, 30, T_('MSN IM'), array( 'maxlength' => 100 ) );
 	$Form->text_input( 'edited_user_yim', $edited_User->yim, 30, T_('YahooIM'), array( 'maxlength' => 50 ) );
-	$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => T_('Leave empty if you don\'t want to change the password.'), 'maxlength' => 50 ) );
-	$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'maxlength' => 50 ) );
-	$Form->info( '', sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen') ) );
+	$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => ( $edited_User->get('ID') ? T_('Leave empty if you don\'t want to change the password.') : '' ), 'maxlength' => 50, 'required' => ($edited_User->get('ID') == 0) ) );
+	$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'maxlength' => 50, 'required' => ($edited_User->get('ID') == 0) ) );
+	$Form->info_field( '', sprintf( T_('The minimum password length is %d characters.'), $Settings->get('user_minpwdlen') ) );
 }
 else
 { // display only
-	$Form->info( T_('Login'), $edited_User->dget('login') );
-	$Form->info( T_('First name'), $edited_User->dget('firstname') );
-	$Form->info( T_('Last name'), $edited_User->dget('lastname') );
-	$Form->info( T_('Nickname'), $edited_User->dget('nickname') );
-	$Form->info( T_('Identity shown'), $edited_User->dget('preferredname') );
-	$Form->info( T_('Show Online'), ($edited_User->dget('showonline')) ? T_('yes') : T_('no') );
-	$Form->info( T_('Locale'), $edited_User->dget('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
-	$Form->info( T_('Email'), $edited_User->dget('email'), $email_fieldnote );
-	$Form->info( T_('Notifications'), ($edited_User->dget('notify')) ? T_('yes') : T_('no') );
-	$Form->info( T_('URL'), $edited_User->dget('url'), $url_fieldnote );
-	$Form->info( T_('ICQ'), $edited_User->dget('icq', 'formvalue'), $icq_fieldnote );
-	$Form->info( T_('AIM'), $edited_User->dget('aim'), $aim_fieldnote );
-	$Form->info( T_('MSN IM'), $edited_User->dget('msn') );
-	$Form->info( T_('YahooIM'), $edited_User->dget('yim') );
+	$Form->info_field( T_('Login'), $edited_User->dget('login') );
+	$Form->info_field( T_('First name'), $edited_User->dget('firstname') );
+	$Form->info_field( T_('Last name'), $edited_User->dget('lastname') );
+	$Form->info_field( T_('Nickname'), $edited_User->dget('nickname') );
+	$Form->info_field( T_('Identity shown'), $edited_User->dget('preferredname') );
+	$Form->info_field( T_('Show Online'), ($edited_User->dget('showonline')) ? T_('yes') : T_('no') );
+	$Form->info_field( T_('Locale'), $edited_User->dget('locale'), array( 'note' => T_('Preferred locale for admin interface, notifications, etc.') ) );
+	$Form->info_field( T_('Email'), $edited_User->dget('email'), array( 'note' => $email_fieldnote ) );
+	$Form->info_field( T_('Notifications'), ($edited_User->dget('notify')) ? T_('yes') : T_('no') );
+	$Form->info_field( T_('URL'), $edited_User->dget('url'), array( 'note' => $url_fieldnote ) );
+	$Form->info_field( T_('ICQ'), $edited_User->dget('icq', 'formvalue'), array( 'note' => $icq_fieldnote ) );
+	$Form->info_field( T_('AIM'), $edited_User->dget('aim'), array( 'note' => $aim_fieldnote ) );
+	$Form->info_field( T_('MSN IM'), $edited_User->dget('msn') );
+	$Form->info_field( T_('YahooIM'), $edited_User->dget('yim') );
 }
 
 $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Features') );
-	$value = $Request->get('edited_user_admin_skin');
-	if( !$value )
+	$value_admin_skin = $Request->get('edited_user_admin_skin');
+	if( !$value_admin_skin )
 	{ // no value supplied through POST/GET
-		$value = $UserSettings->get( 'admin_skin', $edited_User->ID );
+		$value_admin_skin = $UserSettings->get( 'admin_skin', $edited_User->get('ID') );
 	}
-	if( !$value )
+	if( !$value_admin_skin )
 	{ // Nothing set yet for the user, use the default
-		$value = $Settings->get('admin_skin');
+		$value_admin_skin = $Settings->get('admin_skin');
 	}
-	$Form->select_input_array( 'edited_user_admin_skin', get_admin_skins(), T_('Admin skin'), array( 'value' => $value, 'note' => T_('The skin defines how the backoffice appears to you.') ) );
+	if( $action != 'view_user' )
+	{
+		$Form->select_input_array( 'edited_user_admin_skin', get_admin_skins(), T_('Admin skin'), array( 'value' => $value_admin_skin, 'note' => T_('The skin defines how the backoffice appears to you.') ) );
+	}
+	else
+	{
+		$Form->info_field( T_('Admin skin'), $value_admin_skin, array( 'note' => T_('The skin defines how the backoffice appears to you.') ) );
+	}
 $Form->end_fieldset();
 
 
-if( $allowed_to_edit )
+if( $action != 'view_user' )
 { // Edit buttons
-	$Form->buttons( array( array( '', '', T_('Save !'), 'SaveButton' ),
-												 array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	$Form->buttons( array(
+		array( '', '', T_('Save !'), 'SaveButton' ),
+		array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
 if( ! $creating )
 { // We're NOT creating a new user:
 	$Form->begin_fieldset( T_('User information') );
 
-	$Form->info( T_('ID'), $edited_User->dget('ID') );
+	$Form->info_field( T_('ID'), $edited_User->dget('ID') );
 
 	if( $app_shortname == 'b2evo' )
 	{ // TODO: move this out of the core
-		$Form->info( T_('Posts'), ( $action != 'newtemplate' ) ? $edited_User->get_num_posts() : '-' );
+		$Form->info_field( T_('Posts'), ( $action != 'newtemplate' ) ? $edited_User->get_num_posts() : '-' );
 	}
-	$Form->info( T_('Created on'), $edited_User->dget('datecreated') );
-	$Form->info( T_('From IP'), $edited_User->dget('ip') );
-	$Form->info( T_('From Domain'), $edited_User->dget('domain') );
-	$Form->info( T_('With Browser'), $edited_User->dget('browser') );
+	$Form->info_field( T_('Created on'), $edited_User->dget('datecreated') );
+	$Form->info_field( T_('From IP'), $edited_User->dget('ip') );
+	$Form->info_field( T_('From Domain'), $edited_User->dget('domain') );
+	$Form->info_field( T_('With Browser'), $edited_User->dget('browser') );
 
 	$Form->end_fieldset();
 }
@@ -210,6 +213,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.76  2005/12/08 22:23:44  blueyed
+ * Merged 1-2-3-4 scheme from post-phoenix
+ *
  * Revision 1.75  2005/11/25 22:45:37  fplanque
  * no message
  *

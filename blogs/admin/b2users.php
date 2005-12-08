@@ -36,12 +36,6 @@
  * @author fplanque: François PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @todo finish move to "new standard", i-e:
- *    1 - init params
- *    2 - perform actions
- *    3 - display error messages
- *    4 - display payload
- *    DONE in post-phoenix!
  *
  * @version $Id$
  */
@@ -55,20 +49,43 @@ $AdminUI->set_path( 'users' );
 param( 'action', 'string', 'list' );
 
 param( 'filteron', 'string', '', true );
-param( 'filter', 'string' );
+param( 'filter', 'array', array() );
 
-if( $filter == T_('Clear') )
+if( isset($filter['off']) )
 {
 	unset( $filteron );
 	forget_param( 'filteron' );
 }
 
-/*
- * Load editable objects:
+param( 'user_ID', 'integer', NULL, true, false, false );
+param( 'grp_ID', 'integer', NULL, true, false, false );
+
+/**
+ * @global boolean true, if user is only allowed to edit his profile
  */
-if( param( 'user_ID', 'integer', NULL, true, false, false ) )
-{
-	if( ($edited_User = $UserCache->get_by_ID( $user_ID, false )) === false )
+$user_profile_only = ! $current_User->check_perm( 'users', 'view' );
+
+
+if( $user_profile_only && $user_ID != $current_User->ID )
+{ // User has no permissions to view: he can only edit his profile
+	if( isset($user_ID) || isset($grp_ID) )
+	{ // add error message (Should be prevented by UI)
+		$Messages->add( 'You have no permission to view other users or groups!', 'error' );
+	}
+	$action = 'edit_user';
+	$edited_User = & $current_User;
+}
+/*
+ * Load editable objects and set $action (while checking permissions)
+ */
+elseif( $user_ID !== NULL )
+{ // User selected
+	if( $action == 'userupdate' && $user_ID == 0 )
+	{ // we create a new user
+		$edited_User = & new User();
+		$edited_User->set_datecreated( $localtimenow );
+	}
+	elseif( ($edited_User = $UserCache->get_by_ID( $user_ID, false )) === false )
 	{	// We could not find the User to edit:
 		unset( $edited_User );
 		$Messages->head = T_('Cannot edit user!');
@@ -76,73 +93,97 @@ if( param( 'user_ID', 'integer', NULL, true, false, false ) )
 		$action = 'list';
 	}
 	elseif( $action == 'list' )
-	{
-		$action = 'edit_user';
+	{ // 'list' is default, $user_ID given
+		if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) )
+		{
+			$action = 'edit_user';
+		}
+		else
+		{
+			$action = 'view_user';
+		}
+	}
+
+	if( $action != 'view_user' )
+	{ // check edit permissions
+		if( !$current_User->check_perm( 'users', 'edit' )
+		    && $edited_User->ID != $current_User->ID )
+		{ // user is only allowed to _view_ other user's profiles
+			$Messages->add( 'You have no permission to edit other users!', 'error' );
+			$action = 'view_user';
+		}
+		elseif( $demo_mode )
+		{ // Demo mode restrictions: admin/demouser cannot be edited
+			if( $edited_User->ID == 1 || $edited_User->login == 'demouser' )
+			{
+				$Messages->add( T_('You cannot edit the admin and demouser profile in demo mode!'), 'error' );
+
+				if( strpos( $action, 'delete_' ) === 0 || $action == 'promote' )
+				{ // Fallback to list/view action
+					$action = 'list';
+				}
+				else
+				{
+					$action = 'view_user';
+				}
+			}
+		}
 	}
 }
-elseif( param( 'grp_ID', 'integer', NULL, true, false, false ) )
-{
-	if( ($edited_Group = $GroupCache->get_by_ID( $grp_ID, false )) === false )
-	{	// We could not find the User to edit:
+elseif( $grp_ID !== NULL )
+{ // Group selected
+	if( $action == 'groupupdate' && $grp_ID == 0 )
+	{ // New Group:
+		$edited_Group = & new Group();
+	}
+	elseif( ($edited_Group = $GroupCache->get_by_ID( $grp_ID, false )) === false )
+	{ // We could not find the Group to edit:
 		unset( $edited_Group );
 		$Messages->head = T_('Cannot edit group!');
 		$Messages->add( T_('Requested group does not exist any longer.'), 'error' );
 		$action = 'list';
 	}
 	elseif( $action == 'list' )
-	{
-		$action = 'edit_group';
-	}
-}
-
-
-$user_profile_only = 0;
-// Check permission:
-if( !$current_User->check_perm( 'users', 'edit', false ) )
-{
-	// allow profile editing/viewing only
-	$user_profile_only = 1;
-
-	if( $action != 'list' && $action != 'edit_user' && $action != 'userupdate' )
-	{ // This should be prevented in the UI
-		$Messages->add( 'You have no permission to edit other users or groups!', 'error' );
-		$action = 'list';
-	}
-}
-
-if( $demo_mode )
-{
-	if( ( isset($edited_User) && ( $edited_User->ID == 1 || $edited_User->login == 'demouser' ) )
-			|| ( $action == 'promote' )
-	)
-	{ // User may edit - but demo mode restrictions apply!
-		$Messages->add( T_('You cannot edit the admin and demouser profile in demo mode!'), 'error' );
-
-		if( strpos( $action, 'delete_' ) === 0 || $action == 'promote' )
-		{ // Fallback to list/view action
-			$action = 'list';
+	{ // 'list' is default, $grp_ID given
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{
+			$action = 'edit_group';
 		}
+		else
+		{
+			$action = 'view_group';
+		}
+	}
 
-		$user_profile_only = 1;
+	if( $action != 'view_group' )
+	{ // check edit permissions
+		if( !$current_User->check_perm( 'users', 'edit' ) )
+		{
+			$Messages->add( 'You have no permission to edit groups!', 'error' );
+			$action = 'view_group';
+		}
+		elseif( $demo_mode  )
+		{ // Additional checks for demo mode: no changes to admin's and demouser's group allowed
+			$admin_User = & $UserCache->get_by_ID(1);
+			$demo_User = & $UserCache->get_by_login('demouser');
+			if( $edited_Group->ID == $admin_User->Group->ID
+					|| $edited_Group->ID == $demo_User->Group->ID )
+			{
+				$Messages->add( T_('You cannot edit the groups of user &laquo;admin&raquo; or &laquo;demouser&raquo; in demo mode!'), 'error' );
+				$action = 'view_group';
+			}
+		}
 	}
 }
 
 
 /*
- * Perform actions:
+ * Perform actions, if there were no errors:
  */
-if( $Messages->count() )
-{
-	if( $action == 'userupdate' )
-	{ // display top menu that was suppressed before
-		require dirname(__FILE__).'/_menutop.php';
-	}
-}
-else
-{
-	switch ($action)
-	{ // actions only when editing users is allowed
-
+if( !$Messages->count('error') )
+{ // no errors
+	switch( $action )
+	{
 		case 'new_user':
 			// We want to create a new user:
 			if( isset( $edited_User ) )
@@ -160,31 +201,28 @@ else
 
 		case 'userupdate':
 			// Update existing user OR create new user:
-			param( 'edited_user_ID', 'integer', true );
-			if( $edited_user_ID == 0 )
-			{ // we create a new user
-				$edited_User = & new User();
-				$edited_User->set_datecreated( $localtimenow );
-			}
-			else
-			{ // we edit an existing user:
-				$edited_User = & $UserCache->get_by_ID( $edited_user_ID );
-			}
-			// We set it to true, if a setting changes that needs a page reload (locale, admin skin, ..)
-			$reload_page = false;
-
-			if( $user_profile_only && $edited_user_ID != $current_User->ID )
-			{ // user is only allowed to update him/herself
-				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
+			if( empty($edited_User) || !is_object($edited_User) )
+			{
+				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
+				$action = 'list';
 				break;
 			}
 
-			$Request->param( 'edited_user_login', 'string', true );
+			$reload_page = false; // We set it to true, if a setting changes that needs a page reload (locale, admin skin, ..)
+
+			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
+			{ // user is only allowed to update him/herself
+				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
+				$action = 'view_user';
+				break;
+			}
+
+			$Request->param( 'edited_user_login', 'string' );
 			$Request->param_check_not_empty( 'edited_user_login', T_('You must provide a login!') );
 			$edited_user_login = strtolower( $edited_user_login );
 
-			if( !$user_profile_only )
-			{ // allow changing level/group not for profile mode
+			if( $current_User->check_perm( 'users', 'edit' ) )
+			{ // changing level/group is allowed (not in profile mode)
 				$Request->param_integer_range( 'edited_user_level', 0, 10, T_('User level must be between %d and %d.') );
 				$edited_User->set( 'level', $edited_user_level );
 
@@ -200,7 +238,7 @@ else
 				SELECT user_ID
 				  FROM T_users
 				 WHERE user_login = '.$DB->quote($edited_user_login).'
-				   AND user_ID != '.$edited_User->get('ID');
+				   AND user_ID != '.$edited_User->ID;
 			if( $q = $DB->get_var( $query ) )
 			{
 				$Request->param_error( 'edited_user_login',
@@ -238,7 +276,10 @@ else
 
 			$Request->param( 'edited_user_pass1', 'string', true );
 			$Request->param( 'edited_user_pass2', 'string', true );
-			$Request->param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', ($edited_user_ID == 0) );
+			if( !$Request->param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', ($edited_User->ID == 0) ) ) // required for new users
+			{
+				$edited_user_pass1 = $edited_user_pass2 = ''; // empty it
+			}
 
 			$edited_User->set( 'login', $edited_user_login );
 			$edited_User->set( 'firstname', $edited_user_firstname );
@@ -301,6 +342,11 @@ else
 					$Session->dbsave();
 					header_redirect( $ReqURI ); // TODO: this _should_ be full URL, but we have no HTTP_HOST wrapper yet??
 				}
+
+				if( $user_profile_only )
+				{
+					$action = 'edit_user';
+				}
 			}
 			break;
 
@@ -309,10 +355,10 @@ else
 			param( 'prom', 'string', true );
 
 			if( !isset($edited_User)
-					|| ! in_array( $prom, array('up', 'down') )
-					|| ( $prom == 'up' && $edited_User->get('level') > 9 )
-					|| ( $prom == 'down' && $edited_User->get('level') < 1 )
-				)
+			    || ! in_array( $prom, array('up', 'down') )
+			    || ( $prom == 'up' && $edited_User->get('level') > 9 )
+			    || ( $prom == 'down' && $edited_User->get('level') < 1 )
+			  )
 			{
 				$Messages->add( T_('Invalid promotion.'), 'error' );
 			}
@@ -321,7 +367,7 @@ else
 				$sql = '
 					UPDATE T_users
 					   SET user_level = user_level '.( $prom == 'up' ? '+' : '-' ).' 1
-					 WHERE user_ID = '.$edited_User->get('ID');
+					 WHERE user_ID = '.$edited_User->ID;
 
 				if( $DB->query( $sql ) )
 				{
@@ -392,7 +438,12 @@ else
 
 
 		case 'groupupdate':
-			$Request->param( 'edited_grp_ID', 'integer', true );
+			if( empty($edited_Group) || !is_object($edited_Group) )
+			{
+				$Messages->add( 'No group set!' ); // Needs no translation, should be prevented by UI.
+				$action = 'list';
+				break;
+			}
 			$Request->param( 'edited_grp_name', 'string' );
 
 			$Request->param_check_not_empty( 'edited_grp_name', T_('You must provide a group name!') );
@@ -400,21 +451,12 @@ else
 			// check if the group name already exists for another group
 			$query = 'SELECT grp_ID FROM T_groups
 			           WHERE grp_name = '.$DB->quote($edited_grp_name).'
-			             AND grp_ID != '.$edited_grp_ID;
+			             AND grp_ID != '.$edited_Group->ID;
 			if( $q = $DB->get_var( $query ) )
 			{
 				$Request->param_error( 'edited_grp_name',
 					sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'),
 						'href="b2users.php?grp_ID='.$q.'"' ) );
-			}
-
-			if( $edited_grp_ID == 0 )
-			{
-				$edited_Group = & new Group();
-			}
-			else
-			{
-				$edited_Group = $GroupCache->get_by_ID( $edited_grp_ID );
 			}
 
 			$edited_Group->set( 'name', $edited_grp_name );
@@ -426,7 +468,7 @@ else
 			$edited_Group->set( 'perm_options', param( 'edited_grp_perm_options', 'string', true ) );
 			$edited_Group->set( 'perm_files', param( 'edited_grp_perm_files', 'string', true ) );
 
-			if( $edited_grp_ID != 1 )
+			if( $edited_Group->ID != 1 )
 			{ // Groups others than #1 can be prevented from logging in or editing users
 				$edited_Group->set( 'perm_admin', param( 'edited_grp_perm_admin', 'string', true ) );
 				$edited_Group->set( 'perm_users', param( 'edited_grp_perm_users', 'string', true ) );
@@ -438,7 +480,7 @@ else
 				break;
 			}
 
-			if( $edited_grp_ID == 0 )
+			if( $edited_Group->ID == 0 )
 			{ // Insert into the DB:
 				$edited_Group->dbinsert();
 				$Messages->add( T_('New group created.'), 'success' );
@@ -493,7 +535,6 @@ else
 	}
 }
 
-
 /**
  * Display page header:
  */
@@ -501,79 +542,62 @@ require dirname(__FILE__).'/_menutop.php';
 
 
 /*
- * Display payload:
+ * Display appropriate payload:
  */
-if( ! $current_User->check_perm( 'users', 'view', false ) )
-{ // User is NOT allowed to view users
-	// TODO: move this check upward
-	if( isset( $edited_User ) && ( $edited_User->ID != $current_User->ID ) )
-	{ // another user requested -> error-note
-		Log::display( '', '', T_('You are not allowed to view other users.'), 'error' );
-		$action = 'nil';
-	}
-	else
-	{ // display only current user's form
-		$edited_User = & $current_User;
+switch( $action )
+{
+	case 'nil':
+		// Display NO payload!
+		break;
+
+
+	case 'delete_user':
+		// We need to ask for confirmation:
+		$hiddens = array( array( 'user_ID', $edited_User->ID ) );
+		$edited_User->confirm_delete(
+				sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $edited_User->dget( 'fullname' ), $edited_User->dget( 'login' ) ),
+				$action, $hiddens );
+	case 'new_user':
+	case 'view_user':
+	case 'edit_user':
+		// Display user form:
 		require dirname(__FILE__).'/_users_form.php';
-	}
+		break;
+
+
+	case 'delete_group':
+		// We need to ask for confirmation:
+		$hiddens = array( array( 'grp_ID', $edited_Group->ID ) );
+		$edited_Group->confirm_delete(
+				sprintf( T_('Delete group &laquo;%s&raquo;?'), $edited_Group->dget( 'name' ) ),
+				$action, $hiddens );
+	case 'new_group':
+	case 'edit_group':
+	case 'view_group':
+		// Display group form:
+		require dirname(__FILE__).'/_users_groupform.php';
+		break;
+
+
+	case 'promote':
+	default:
+		// Display user list:
+		// NOTE: we don't want this (potentially very long) list to be displayed again and again)
+		// Begin payload block:
+		$AdminUI->disp_payload_begin();
+		require dirname(__FILE__).'/_users_list.php';
+		// End payload block:
+		$AdminUI->disp_payload_end();
 }
-else
-{ // User is allowed to view users/groups:
 
-	// display appropriate payload:
-	switch( $action )
-	{
-		case 'nil':
-			// Display NO payload!
-			break;
-
-
-		case 'delete_user':
-			// We need to ask for confirmation:
-			$hiddens = array( array( 'user_ID', $edited_User->ID ) );
-			$edited_User->confirm_delete(
-					sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $edited_User->dget( 'fullname' ), $edited_User->dget( 'login' ) ),
-					$action, $hiddens );
-		case 'new_user':
-		case 'view_user':
-		case 'edit_user':
-			// Display user form:
-			require dirname(__FILE__).'/_users_form.php';
-			break;
-
-
-		case 'delete_group':
-			// We need to ask for confirmation:
-			$hiddens = array( array( 'grp_ID', $edited_Group->ID ) );
-			$edited_Group->confirm_delete(
-					sprintf( T_('Delete group &laquo;%s&raquo;?'), $edited_Group->dget( 'name' ) ),
-					$action, $hiddens );
-		case 'new_group':
-		case 'edit_group':
-		case 'view_group':
-			// Display group form:
-			require dirname(__FILE__).'/_users_groupform.php';
-			break;
-
-
-		default:
-			// Users list:
-			// fplanque>> note: we don't want this (potentially very long) list to be displayed again and again)
-			if( $current_User->check_perm( 'users', 'view', false ) )
-			{ // Display user list:
-				// Begin payload block:
-				$AdminUI->disp_payload_begin();
-				require dirname(__FILE__).'/_users_list.php';
-				// End payload block:
-				$AdminUI->disp_payload_end();
-			}
-	}
-}
 
 require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.117  2005/12/08 22:23:44  blueyed
+ * Merged 1-2-3-4 scheme from post-phoenix
+ *
  * Revision 1.116  2005/11/24 20:34:56  blueyed
  * doc
  *
