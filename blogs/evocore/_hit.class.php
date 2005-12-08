@@ -46,7 +46,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * A hit to a blog.
  *
- * NOTE: The internal function double_check_referers() uses the class Net_IDNA_php4 from /blogs/lib/_idna_convert.class.php.
+ * NOTE: The internal function double_check_referer() uses the class Net_IDNA_php4 from /blogs/lib/_idna_convert.class.php.
  *       It's required() only, when needed.
  */
 class Hit
@@ -430,7 +430,7 @@ class Hit
 			if( !$debug_no_register_shutdown && function_exists( 'register_shutdown_function' ) )
 			{ // register it as a shutdown function, because it will be slow!
 				$Debuglog->add( 'log(): double-check: loading referering page.. (register_shutdown_function())', 'hit' );
-				register_shutdown_function( array( &$this, 'double_check_referers' ) ); // this will also call _record_the_hit()
+				register_shutdown_function( array( &$this, 'double_check_referer' ) ); // this will also call _record_the_hit()
 			}
 			else
 			{
@@ -440,7 +440,7 @@ class Hit
 
 				$Debuglog->add( 'log(): double-check: loading referering page..', 'hit' );
 
-				$this->double_check_referers(); // this will also call _record_the_hit()
+				$this->double_check_referer(); // this will also call _record_the_hit()
 			}
 		}
 		else
@@ -458,7 +458,7 @@ class Hit
 	/**
 	 * This records the hit. You should not call this directly, but {@link log()}!
 	 *
-	 * It gets called either by {@link log()} or by {@link double_check_referers()} when this is used.
+	 * It gets called either by {@link log()} or by {@link double_check_referer()} when this is used.
 	 *
 	 * It will call Hitlist::dbprune() to do the automatic pruning of old hits.
 	 *
@@ -499,7 +499,7 @@ class Hit
 	 *
 	 * @uses _record_the_hit()
 	 */
-	function double_check_referers()
+	function double_check_referer()
 	{
 		global $ReqURI, $Debuglog;
 		global $core_dirout, $lib_subdir;
@@ -521,36 +521,66 @@ class Hit
 					}
 				}
 
-				$full_req_url = 'http://'.$_SERVER['HTTP_HOST'].$ReqURI;
-				// $Debuglog->add( 'Hit Log: '. "full current url: ".$full_req_url, 'hit');
-
 				/**
 				 * IDNA converter class
 				 */
 				require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_idna_convert.class.php';
 				$IDNA = new Net_IDNA_php4();
 
-				// TODO: match <a href="...">!?
-				// TODO: http://demo.b2evolution.net links "HEAD/blogs/index.php?blog=2", but we search for "http://demo.b2evolution.net/HEAD/blogs/index.php?blog=2"!
-				$idn_decoded_full_req_url = $IDNA->decode($full_req_url);
-
-				if( strstr($content_ref_page, $full_req_url)
-					  || ( ($idn_decoded_full_req_url != $full_req_url) && strstr($content_ref_page, $idn_decoded_full_req_url) ) )
+				// Build the search pattern.
+				// We match for basically for 'href="[SERVER]|[REQ_URI]', where [SERVER]
+				$search_pattern = '~\shref=["\']?https?://(';
+				$possible_hosts = array( $_SERVER['HTTP_HOST'] );
+				if( $_SERVER['SERVER_NAME'] != $_SERVER['HTTP_HOST'] )
 				{
-					$Debuglog->add( 'double_check_referers(): found current url in page ('.bytesreadable($bytes_read).' read)', 'hit' );
+					$possible_hosts[] = $_SERVER['SERVER_NAME'];
+				}
+				$search_pattern_hosts = array();
+				foreach( $possible_hosts as $l_host )
+				{
+					if( preg_match( '~^([^.]+\.)(.*?)([^.]+\.[^.]+)$~', $l_host, $match ) )
+					{ // we have subdomains in this hostname
+						if( stristr( $match[1], 'www' ) )
+						{ // search also for hostname without 'www.'
+							$search_pattern_hosts[] = $match[2].$match[3];
+						}
+					}
+					$search_pattern_hosts[] = $l_host;
+				}
+				$search_pattern_hosts = array_unique($search_pattern_hosts);
+				foreach( $search_pattern_hosts as $l_host )
+				{ // add IDN, because this is probably linked
+					$l_idn_host = $IDNA->decode( $l_host ); // the decoded puny-code ("xn--..") name (utf8)
+
+					if( $l_idn_host != $l_host )
+					{
+						$search_pattern_hosts[] = $l_idn_host;
+					}
+				}
+
+				// add hosts to pattern, preg_quoted
+				for( $i = 0, $n = count($search_pattern_hosts); $i < $n; $i++ )
+				{
+					$search_pattern_hosts[$i] = preg_quote( $search_pattern_hosts[$i], '~' );
+				}
+				$search_pattern .= implode( '|', $search_pattern_hosts ).')'.$ReqURI.'~i';
+
+
+				// TODO: handle encoding of the refering page (iconv/recode), if we have decoded base name, $content_ref_page must be utf8
+				if( preg_match( $search_pattern, $content_ref_page ) )
+				{
+					$Debuglog->add( 'double_check_referer(): found current url in page ('.bytesreadable($bytes_read).' read)', 'hit' );
 				}
 				else
 				{
-					$Debuglog->add( 'double_check_referers(): '.sprintf('did not find &laquo;%s&raquo; in &laquo;%s&raquo; (%s bytes read). -> referer_type=spam!',
-							$full_req_url.( $idn_decoded_full_req_url != $full_req_url ? ' / '.$idn_decoded_full_req_url : '' ),
-							$this->referer, bytesreadable($bytes_read) ), 'hit' );
+					$Debuglog->add( 'double_check_referer(): '.sprintf('did not find &laquo;%s&raquo; in &laquo;%s&raquo; (%s bytes read). -> referer_type=spam!', $search_pattern, $this->referer, bytesreadable($bytes_read) ), 'hit' );
 					$this->referer_type = 'spam';
 				}
 				unset( $content_ref_page );
 			}
 			else
 			{ // This was probably spam!
-				$Debuglog->add( 'double_check_referers(): could not access &laquo;'.$this->referer.'&raquo;', 'hit' );
+				$Debuglog->add( 'double_check_referer(): could not access &laquo;'.$this->referer.'&raquo;', 'hit' );
 				$this->referer_type = 'spam';
 			}
 		}
