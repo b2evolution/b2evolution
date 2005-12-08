@@ -1900,8 +1900,8 @@ function action_icon( $title, $icon, $url, $word = NULL )
  * Note: to get a file type icon, use {@link File::get_icon()} instead.
  *
  * @uses $map_iconfiles
- * @param string icon for what?
- * @param string what to return for that icon ('imgtag', 'file', 'url', 'size' {@link imgsize()})
+ * @param string icon for what? (key)
+ * @param string what to return for that icon ('imgtag', 'alt', 'file', 'url', 'size' {@link imgsize()})
  * @param array additional params ( 'class' => class name when getting 'imgtag',
 																		'size' => param for 'size',
 																		'title' => title attribute for imgtag)
@@ -1938,6 +1938,26 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL )
 
 		case 'file':
 			return $basepath.$iconfile;
+
+		case 'alt':
+			if( isset( $map_iconfiles[$iconKey]['alt'] ) )
+			{ // alt-tag from $map_iconfiles
+				return $map_iconfiles[$iconKey]['alt'];
+			}
+			else
+			{ // $iconKey as alt-tag
+				return $iconKey;
+			}
+
+		case 'class':
+			if( isset($map_iconfiles[$iconKey]['class']) )
+			{
+				return $map_iconfiles[$iconKey]['class'];
+			}
+			else
+			{
+				return 'middle';
+			}
 
 		case 'imgtag':
 			$params['size'] = 'string';
@@ -1988,7 +2008,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL )
 				$r .= $params['class'];
 			}
 			elseif( isset($map_iconfiles[$iconKey]['class']) )
-			{	// This icon has a rollover
+			{	// This icon has a rollover (blueyed>> rollovers seem to be rather defined by 'rollover' = true in map_iconfiles?!)
 				$r .= $map_iconfiles[$iconKey]['class'];
 			}
 			else
@@ -2304,6 +2324,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.157  2005/12/08 22:30:04  blueyed
+ * Added 'alt' and 'class' to get_icon(); doc
+ *
  * Revision 1.156  2005/12/06 22:08:26  blueyed
  * Fix validate_url() to allow "=" also before any "?" or "#". Fixes: http://forums.b2evolution.net/viewtopic.php?p=29817
  *
