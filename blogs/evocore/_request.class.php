@@ -110,6 +110,7 @@ class Request
 		return $this->params[$var] = param( $var, $type, $default, $memorize, $override, $forceset );
 	}
 
+
 	/**
 	 * Sets several similar parameters at once.
 	 *
@@ -124,7 +125,7 @@ class Request
 	}
 
 
-  /**
+	/**
 	 * Extend a parameter with an array of params.
 	 *
 	 * Will be used for author/authorsel[], etc.
@@ -469,7 +470,7 @@ class Request
 
 		if( strlen($pass1) < $Settings->get('user_minpwdlen') )
 		{
-			$this->param_error_multiple( array( $var1, $var2), sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen') ) );
+			$this->param_error_multiple( array( $var1, $var2), sprintf( T_('The minimum password length is %d characters.'), $Settings->get('user_minpwdlen') ) );
 			return false;
 		}
 
@@ -623,6 +624,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.24  2005/12/08 22:49:18  blueyed
+ * Typo
+ *
  * Revision 1.23  2005/12/05 18:17:19  fplanque
  * Added new browsing features for the Tracker Use Case.
  *

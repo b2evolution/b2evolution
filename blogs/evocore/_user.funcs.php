@@ -390,7 +390,7 @@ function profile_check_params( $params, $User = NULL )
 			elseif( strlen($params['pass1']) < $Settings->get('user_minpwdlen')
 							|| strlen($params['pass2']) < $Settings->get('user_minpwdlen') )
 			{
-				$Messages->add( sprintf( T_('The mimimum password length is %d characters.'), $Settings->get('user_minpwdlen')), 'error' );
+				$Messages->add( sprintf( T_('The minimum password length is %d characters.'), $Settings->get('user_minpwdlen')), 'error' );
 			}
 			elseif( isset($User) && $params['pass1'] == $User->get('login') )
 			{
@@ -406,6 +406,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.33  2005/12/08 22:49:18  blueyed
+ * Typo
+ *
  * Revision 1.32  2005/11/02 20:11:19  fplanque
  * "containing entropy"
  *
