@@ -50,7 +50,7 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 
 		$Form->text_input( 'eblog_server_host', $Settings->get('eblog_server_host'),40,T_('Mail Server'), array( 'maxlength' => 255, 'note' => T_('Hostname or IP address of your incoming mail server.')  )  );
 
-		$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'),5,T_('Port Number'), array( 'maxlength' => 6, 'note' => T_('Port number of your incomming mail server (Defaults: pop3:110 imap:143).')  )  );
+		$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'),5,T_('Port Number'), array( 'maxlength' => 6, 'note' => T_('Port number of your incoming mail server (Defaults: pop3:110 imap:143).')  )  );
 
 		$Form->text_input( 'eblog_username', $Settings->get('eblog_username'),15,T_('Account Name'), array( 'maxlength' => 255, 'note' => T_('User name for authenticating to your mail server.')  )  );
 
