@@ -63,9 +63,9 @@ param( 'confirm', 'string' );
 param( 'keyword', 'string' );
 param( 'domain', 'string' );
 param( 'filteron', 'string', '', true );
-param( 'filter', 'string' );
+param( 'filter', 'array', array() );
 
-if( $filter == T_('Clear') )
+if( isset($filter['off']) )
 {
 	unset( $filteron );
 	forget_param( 'filteron' );
@@ -473,13 +473,16 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 							);
 	}
 
-	//Display filter/search block
-	echo '<center>';
+	// Display filter/search block
+	// TODO: should get handled by Results class
+	echo '<div class="center">';
 	$Form = & new Form( 'antispam.php', 'filter', 'post', '' ); // use POST or you'll generate a GET URL including a spam keyword!!
 	$Form->begin_form('fform');
 	$Form->text( 'filteron', $filteron, 30, '', '', 80 );
-	$Form->end_form( array( array( 'submit', 'filter', T_('Filter'), 'SaveButton' ),array('submit','filter',T_('Clear'),'SaveButton' ) ) );
-	echo '</center>';
+	$Form->end_form( array(
+			array( 'type' => 'submit', 'name' => 'filter[on]', 'value' => T_('Filter'), 'class' => 'SaveButton' ),
+			array( 'type' => 'submit', 'name' => 'filter[off]', 'value' => T_('Clear'), 'class' => 'SaveButton' ) ) );
+	echo '</div>';
 
 	// Display results:
 	$Results->display();
