@@ -283,7 +283,7 @@ class User extends DataObject
 			}
 			else
 			{ // add note
-				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; has been created with permissions %s."), $userdir, substr( sprintf('%o', fileperms($userdir)), -3 ) ), 'success' );
+				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; has been created with permissions %s."), rel_path_to_base($userdir), substr( sprintf('%o', fileperms($userdir)), -3 ) ), 'success' );
 			}
 		}
 		return $userdir;
@@ -926,6 +926,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.54  2005/12/08 22:44:02  blueyed
+ * Use rel_path_to_base() to hide absolute paths in Messages
+ *
  * Revision 1.53  2005/11/28 17:42:09  blueyed
  * Fixed msgform_link(): call $this->get_msgform_link()
  *

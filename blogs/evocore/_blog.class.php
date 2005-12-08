@@ -373,7 +373,7 @@ class Blog extends DataObject
 			}
 			else
 			{ // add note
-				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $mediadir, substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
+				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), rel_path_to_base($mediadir), substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
 			}
 		}
 
@@ -753,6 +753,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.46  2005/12/08 22:44:01  blueyed
+ * Use rel_path_to_base() to hide absolute paths in Messages
+ *
  * Revision 1.45  2005/12/05 20:04:00  blueyed
  * dbdelete(): remove perms in T_coll_group_perms (fixes http://dev.b2evolution.net/todo.php/2005/12/05/when_deleting_a_blog_from_the_backoffice)
  * Additionally deleting the blog's categories failed because of a constraint on blog_ID. I'm not sure if it's fixed correctly.
