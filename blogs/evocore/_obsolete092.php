@@ -1621,10 +1621,20 @@ $fileupload_minlevel = 1;
 $fileupload_allowedusers = '';
 
 
+/**
+ * @global string The application version.
+ * @deprecated
+ */
+$b2_version = $app_version;
+
+
 // globals }}}
 
 /*
  * $Log$
+ * Revision 1.19  2005/12/09 13:48:27  blueyed
+ * Added $b2_version = $app_version, because this is often missed (even on skins.b2evolution.net).
+ *
  * Revision 1.18  2005/10/03 17:26:44  fplanque
  * synched upgrade with fresh DB;
  * renamed user_ID field
