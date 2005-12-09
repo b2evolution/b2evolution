@@ -77,7 +77,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 	 */
 	function testRemoveFromList()
 	{
-		$File =& new File( 'user', 1, 'a' );
+		$File = new File( 'user', 1, 'a' );
 		$r = $this->Filelist->add( $File );
 
 		$this->assertEqual( $r, true, 'File added.' );
