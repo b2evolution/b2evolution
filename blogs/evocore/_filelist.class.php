@@ -893,21 +893,14 @@ class Filelist
 			unset( $this->_entries[ $this->_md5_ID_index[ $File->get_md5_ID() ] ] );
 			unset( $this->_md5_ID_index[ $File->get_md5_ID() ] );
 			unset( $this->_full_path_index[ $File->get_full_path() ] );
-			// get the ordered index right: move all next files downwards
-			foreach( $this->_order_index as $lKey => $lValue )
-			{
-				if( $lValue == $index )
-				{
-					while( isset( $this->_order_index[++$lKey] ) )
-					{
-						$this->_order_index[ $lKey - 1 ] = $this->_order_index[ $lKey ];
-					}
-					unset( $this->_order_index[$lKey - 1] );
-				}
-			}
 
-			if( $this->_current_idx > -1 && $this->_current_idx <= $index )
-			{ // we have removed a file before or at the index'th position
+			// get the ordered index right: move all next files downwards
+			$order_key = array_search( $index, $this->_order_index );
+			unset( $this->_order_index[$order_key] );
+			$this->_order_index = array_values( $this->_order_index );
+
+			if( $this->_current_idx > -1 && $this->_current_idx >= $order_key )
+			{ // We have removed a file before or at the $order_key'th position
 				$this->_current_idx--;
 			}
 			return true;
@@ -1014,6 +1007,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.43  2005/12/09 16:16:03  blueyed
+ * remove(): fix _current_idx decrementing; tightened $_order_index
+ *
  * Revision 1.42  2005/11/27 22:52:28  blueyed
  * Fix returning by reference.
  *
