@@ -277,10 +277,10 @@ class ldap_plugin extends Plugin
 						elseif( !empty($this->template_group_name_for_unmatched_assign) )
 						{ // we want to create a new group matching the assign-by info
 							$Debuglog->add( 'Group with that name does not exist yet.', 'plugin_ldap' );
-							$Debuglog->add( 'Using Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; as template.', 'plugin_ldap' );
 
 							if( $new_Group = $GroupCache->get_by_name($this->template_group_name_for_unmatched_assign) ) // COPY!
 							{ // take a copy of the Group to use as template
+								$Debuglog->add( 'Using Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; as template.', 'plugin_ldap' );
 								$new_Group->set( 'ID', 0 ); // unset ID (to allow inserting)
 								$new_Group->set( 'name', $assign_by_value ); // set the wanted name
 								$new_Group->dbinsert();
@@ -289,6 +289,10 @@ class ldap_plugin extends Plugin
 
 								$NewUser->setGroup( $new_Group );
 								$assigned_group = true;
+							}
+							else
+							{
+								$Debuglog->add( 'Template Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; not found!', 'plugin_ldap' );
 							}
 						}
 					}
