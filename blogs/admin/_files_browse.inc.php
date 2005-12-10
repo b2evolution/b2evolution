@@ -103,7 +103,8 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 	if( $Fileman->is_filtering() )
 	{ // "reset filter" form
 		?>
-		<input title="<?php echo T_('Unset filter'); ?>"
+		<input value="<?php echo T_('Unset filter'); ?>"
+			title="<?php echo T_('Unset filter'); ?>"
 			type="image"
 			name="actionArray[filter_unset]"
 			class="ActionButton"
@@ -294,8 +295,7 @@ while( $lFile = & $Fileman->get_next() )
 	 */
 	if( $mode == 'upload' )
 	{
-		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles
-						.'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
+		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles.'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
 	}
 
 	echo '</td>';
@@ -526,19 +526,12 @@ else
 			<input class="DeleteButton" type="image" name="actionArray[delete]"
 				title="<?php echo T_('Delete the selected files') ?>"
 				src="<?php echo get_icon( 'file_delete', 'url' ) ?>" />
-		<?php
+			<?php
+			// NOTE: No delete confirmation by javascript, we need to check DB integrity!
+
 		}
-			/* No delete javascript, we need toi check DB integrity:
 
-			onclick="if( r = openselectedfiles(true) )
-								{
-									if( confirm('<?php echo TS_('Do you really want to delete the selected files?') ?>') )
-									{
-										document.getElementById( 'FilesForm' ).confirmed.value = 1;
-										return true;
-									}
-								}; return false;" />
-
+		/*
 			<!-- Not implemented yet: input class="ActionButton"
 				title="<?php echo T_('Download the selected files') ?>"
 				name="actionArray[download]"
@@ -551,12 +544,7 @@ else
 				name="actionArray[sendbymail]" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
 
 
-			/*
-			TODO: "link these into current post" (that is to say the post that opened the popup window).
-						This would create <img> or <a href> tags depending on file types.
-			*/
-
-	/* Not fully functional
+		/* Not fully functional:
 		<input class="ActionButton" type="image" name="actionArray[file_copy]"
 			title="<?php echo T_('Copy the selected files'); ?>"
 			onclick="return openselectedfiles(true);"
@@ -733,6 +721,7 @@ if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add
 </form>
 
 <form enctype="multipart/form-data" action="files.php" method="post" class="toolbaritem">
+	<?php form_hidden( 'upload_quickmode', 1 ); ?>
 	<!-- The following is mainly a hint to the browser. -->
 	<?php form_hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); ?>
 
@@ -817,6 +806,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.59  2005/12/10 03:02:49  blueyed
+ * Quick upload mode merged from post-phoenix
+ *
  * Revision 1.58  2005/11/27 06:13:52  blueyed
  * Moved textarea_replace_selection() to functions.js to allow using it everywhere.
  *

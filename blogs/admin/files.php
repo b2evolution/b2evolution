@@ -124,23 +124,7 @@ param( 'orderasc', '', NULL, true );
 param( 'filterString', '', NULL, true );
 param( 'filterIsRegexp', 'integer', NULL, true );
 param( 'flatmode', '', NULL, true );
-param( 'action', 'string', '', true );     // 3.. 2.. 1.. action :)
-if( empty($action) )
-{ // If we got no $action, we'll check for an $actionArray  ( <input type="submit" name="actionArray[real_action]" ...> )
-	// And the real $action will be found in the first key...
-	// When there are multiple submit buttons, this is smarter than checking the value which is a translated string.
-	// When there is an image button, this allows to work around IE not sending the value (it only sends X & Y coords)
-	$actionArray = array_keys( param( 'actionArray', 'array', array(), true ) );
-	$action = array_pop($actionArray);
-	if( is_string($action) )
-	{
-		$action = substr( strip_tags($action), 0, 50 );  // sanitize it
-	}
-	elseif( !empty($actionArray) )
-	{ // this is probably a numeric index from '<input name="actionArray[]" .. />'
-		debug_die( 'Invalid action!' );
-	}
-}
+$action = $Request->param_action();
 
 
 if( $action == 'update_settings' )
@@ -256,6 +240,7 @@ switch( $action )
 
 	/*
 	case 'send_by_mail':
+	{{{ not implemented yet
 		// TODO: implement
 		if( !$selected_Filelist->count() )
 		{
@@ -265,11 +250,13 @@ switch( $action )
 
 		echo 'TODO: Send selected by mail, query email address..';
 		break;
+	}}}
 	*/
 
 
 	/*
 	case 'download':
+	{{{ not implemented yet
 		// TODO: provide optional zip formats
 		$action_title = T_('Download');
 
@@ -338,7 +325,8 @@ switch( $action )
 		}
 
 		break;
-	*/
+	}}}*/
+
 
 	case 'rename':
 		// Rename a file:
@@ -529,24 +517,33 @@ switch( $action )
 
 
 	case 'edit_properties':
-		// Edit File properties (Meta Data):
+		// Edit File properties (Meta Data); this starts the File_properties mode: {{{
 
-		// Check permission:
-		$current_User->check_perm( 'files', 'view', true );
+		if( ! $current_User->check_perm( 'files', 'view' ) )
+		{ // We do not have permission to edit files
+			$Messages->add( T_('You have no permission to view files.'), 'error' );
+			$action = 'list';
+			break;
+		}
 
 		$selectedFile = & $selected_Filelist->getFileByIndex(0);
 		// Load meta data:
 		$selectedFile->load_meta();
 
 		$Fileman->fm_mode = 'File_properties';
+		// }}}
 		break;
 
 
 	case 'update_properties':
-		// Update File properties (Meta Data):
+		// Update File properties (Meta Data); on success this ends the File_properties mode: {{{
 
-		// Check permission:
-		$current_User->check_perm( 'files', 'edit', true );
+		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		{ // We do not have permission to edit files
+			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
+			$action = 'list';
+			break;
+		}
 
 		$selectedFile = & $selected_Filelist->getFileByIndex(0);
 		// Load meta data:
@@ -557,10 +554,18 @@ switch( $action )
 		$selectedFile->set( 'desc', param( 'desc', 'string', '' ) );
 
 		// Store File object into DB:
-		$selectedFile->dbsave();
+		if( $selectedFile->dbsave() )
+		{
+			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have been updated.' ), $selectedFile->get_name() ), 'success' );
+		}
+		else
+		{
+			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $selectedFile->get_name() ), 'note' );
+		}
 
 		// Leave special display mode:
-		$Fileman->fm_mode = 'NULL';
+		$Fileman->fm_mode = NULL;
+		// }}}
 		break;
 
 
@@ -587,7 +592,7 @@ switch( $action )
 			$selectedFile->load_meta( true );
 
 			// Let's make the link!
-			$edited_Link = & new Link();
+			$edited_Link = new Link();
 			$edited_Link->set( 'item_ID', $edited_Item->ID );
 			$edited_Link->set( 'file_ID', $selectedFile->ID );
 			$edited_Link->dbinsert();
@@ -632,12 +637,13 @@ switch( $action )
 
 
 	case 'edit_perms':
-		// edit filesystem permissions for specific files
-
-		// Check permission:
-		$current_User->check_perm( 'files', 'edit', true );
-
-		// fplanque>> TODO: as long as we use fm_modes this thing should at least work like a mode or at the bare minimun, turn off any active mode.
+		// Edit file or directory permissions: {{{
+		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		{ // We do not have permission to edit files
+			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
+			$action = 'list';
+			break;
+		}
 
 		if( ! $selected_Filelist->count() )
 		{
@@ -711,15 +717,6 @@ switch( $action )
 		{ // No file left selected... (everything worked fine)
 			$action = 'list';
 		}
-
-		break;
-
-
-	case 'file_copy':
-	case 'file_move':
-		// copy/move/rename - we come here from the "with selected" toolbar {{{
-		#pre_dump( $selected_Filelist );
-
 		// }}}
 		break;
 
@@ -790,6 +787,9 @@ switch( $Fileman->fm_mode )
 			break;
 		}
 
+		// Quick mode means "just upload and leave mode when successful"
+		$Request->param( 'upload_quickmode', 'integer', 0 );
+
 		$LogUpload = new Log( 'error' );
 
 		/**
@@ -809,11 +809,14 @@ switch( $Fileman->fm_mode )
 			{
 				if( empty( $lName ) )
 				{ // No file name
-
-					if( !empty( $uploadfile_title[$lKey] )
-						|| !empty( $uploadfile_alt[$lKey] )
-						|| !empty( $uploadfile_desc[$lKey] )
-						|| !empty( $uploadfile_name[$lKey] ) )
+					if( $upload_quickmode )
+					{
+						$Messages->add( T_( 'Please select a local file to upload.' ) );
+					}
+					elseif( !empty( $uploadfile_title[$lKey] )
+					     || !empty( $uploadfile_alt[$lKey] )
+					     || !empty( $uploadfile_desc[$lKey] )
+					     || !empty( $uploadfile_name[$lKey] ) )
 					{ // User specified params but NO file!!!
 						// Remember the file as failed when additional info provided.
 						$failedFiles[$lKey] = T_( 'Please select a local file to upload.' );
@@ -893,8 +896,7 @@ switch( $Fileman->fm_mode )
 				}
 
 				// Get File object for requested target location:
-				$newFile = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(),
-																												$Fileman->get_rds_list_path().$newName, true );
+				$newFile = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(), $Fileman->get_rds_list_path().$newName, true );
 
 				if( $newFile->exists() )
 				{ // The file already exists in the target location!
@@ -912,8 +914,11 @@ switch( $Fileman->fm_mode )
 					continue;
 				}
 
-				// chmod the file to default perms! This is important (probably of umask etc). This is handled better in post-phoenix..
-				@chmod( $newFile->get_full_path(), octdec( $newFile->is_dir() ? $Fileman->_default_chmod_dir : $Fileman->_default_chmod_file ) );
+				// change to default chmod settings
+				if( $newFile->chmod( NULL ) === false )
+				{ // add a note, this is no error!
+					$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->get_name() ), 'note' );
+				}
 
 				$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->get_name() );
 				if( $mode == 'upload' )
@@ -952,8 +957,12 @@ switch( $Fileman->fm_mode )
 				// Tell the filamanager about the new file:
 				$Fileman->add( $newFile );
 			}
-		}
 
+			if( $upload_quickmode && !$failedFiles )
+			{ // we're quick uploading and have no failed files, leave the mode
+				$Fileman->fm_mode = NULL;
+			}
+		}
 
 		// Upload dialog:
 		require dirname(__FILE__).'/_files_upload.inc.php';
@@ -1013,9 +1022,6 @@ switch( $Fileman->fm_mode )
 			break;
 		}
 
-		// TODO: get rid of this:
-		$LogCmr = new Log( 'error' );  // Log for copy/move/rename mode
-
 		if( !$Fileman->SourceList->count() )
 		{
 			$Messages->add( T_('No source files!'), 'error' );
@@ -1047,7 +1053,7 @@ switch( $Fileman->fm_mode )
 			if( !isFilename($new_names[$loop_src_File->get_md5_ID()]) )
 			{
 				$confirm = 0;
-				$Messages->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ), 'error' );
+				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ) );
 				continue;
 			}
 
@@ -1055,26 +1061,25 @@ switch( $Fileman->fm_mode )
 			$extension = '';
 			if( ! validate_file_extension( $new_names[$loop_src_File->get_md5_ID()], $extension ) )
 			{ // Extension invalid:
-				$Messages->add( sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ), 'error' );
+				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ) );
 				$confirm = 0;
 				continue;
 			}
 
 			// Check if destination file exists:
-			if( ($dest_File = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(),
-																								$Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] ))
+			if( ($dest_File = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(), $Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] ))
 							&& $dest_File->exists() )
 			{ // Target exists
 				if( $dest_File === $loop_src_File )
 				{
-					$LogCmr->add( T_('Source and target files are the same. Please choose another name or directory.') );
+					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', T_('Source and target files are the same. Please choose another name or directory.') );
 					$confirm = 0;
 					continue;
 				}
 
 				if( ! isset( $overwrite[$loop_src_File->get_md5_ID()] ) )
 				{ // We have not yet asked to overwrite:
-					$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ), 'error' );
+					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ) );
 					$overwrite[$loop_src_File->get_md5_ID()] = 0;
 					$confirm = 0;
 					continue;
@@ -1093,8 +1098,7 @@ switch( $Fileman->fm_mode )
 				if( $Messages->count('restrict') )
 				{ // There are restrictions:
 					// TODO: work on a better output display here...
-					$Messages->add( sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'),
-																			 $dest_File->get_rdfp_rel_path() ), 'error' );
+					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'), $dest_File->get_rdfp_rel_path() ) );
 
 					$confirm = 0;
 					break;	// stop whole file list processing
@@ -1110,8 +1114,7 @@ switch( $Fileman->fm_mode )
 			while( $loop_src_File = & $Fileman->SourceList->get_next() )
 			{
 				// Get a pointer on dest file
-				$dest_File = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(),
-																								$Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
+				$dest_File = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(), $Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
 
 				if( $Fileman->fm_mode == 'file_copy' )
 				{ // COPY
@@ -1125,8 +1128,8 @@ switch( $Fileman->fm_mode )
 					}
 					else
 					{ // Failure:
-						$Messages->add( sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ), 'error' );
+						$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
+																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ) );
 					}
 				}
 				elseif( $Fileman->fm_mode == 'file_move' )
@@ -1148,14 +1151,18 @@ switch( $Fileman->fm_mode )
 					// Do the move:
 					$rdfp_oldpath = $loop_src_File->get_rdfp_rel_path();
 					$rdfp_newpath = $Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
+
 					if( $Fileman->move_File( $loop_src_File, $Fileman->get_root_type(), $Fileman->get_root_ID(), $rdfp_newpath ) )
 					{ // successfully moved
 						$Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ), 'success' );
+
+						// We remove the file from the source list, after refreshing the cache
+						$Fileman->SourceList->update_caches();
+						$Fileman->SourceList->remove( $loop_src_File );
 					}
 					else
 					{ // move failed
-						$Messages->add( sprintf( T_('Could not move &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ), 'error' );
-						// Note: we do not rollback, since unlinking is already done on disk :'(
+						$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not move &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ) );
 					}
 
 					$DB->commit();
@@ -1330,6 +1337,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.145  2005/12/10 03:02:50  blueyed
+ * Quick upload mode merged from post-phoenix
+ *
  * Revision 1.144  2005/12/06 00:01:56  blueyed
  * Unset action/fm_mode when no FileRoot available.
  *

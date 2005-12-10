@@ -120,23 +120,46 @@ if( false )
 	 */
 	function addAnotherFileInput()
 	{
+		var uploadfiles = document.getElementById("uploadfileinputs");
 		var newLI = document.createElement("li");
-		newLI.className = "clear";
-		uploadfiles = document.getElementById("uploadfileinputs");
+		var closeLink = document.createElement("a");
+		var closeImage = document.createElement("img");
 
 		uploadfiles.appendChild( newLI );
+		newLI.appendChild( closeLink );
+		closeLink.appendChild( closeImage );
 
 
-		appendLabelAndInputElements( newLI, '<?php echo TS_('Choose a file'); ?>:', false,
-																	'input', 'uploadfile[]', '20', '0', 'file', '' );
-		appendLabelAndInputElements( newLI, '<?php echo TS_('Filename on server (optional)'); ?>:', false,
-																	'input', 'uploadfile_name[]', '20', '80', 'text', '' );
-		appendLabelAndInputElements( newLI, '<?php echo TS_('Long title'); ?>:', true,
-																	'input', 'uploadfile_title[]', '50', '255', 'text', 'large' );
-		appendLabelAndInputElements( newLI, '<?php echo TS_('Alternative text (useful for images)'); ?>:', true,
-																	'input', 'uploadfile_alt[]', '50', '255', 'text', 'large' );
-		appendLabelAndInputElements( newLI, '<?php echo TS_('Caption/Description of the file'); ?>:', true,
-																	'textarea', 'uploadfile_desc[]', '38', '3', '', 'large' );
+		newLI.className = "clear";
+
+		closeImage.src = "<?php echo get_icon( 'close', 'url' ) ?>";
+		closeImage.alt = "<?php echo get_icon( 'close', 'alt' ) ?>";
+
+		<?php
+		$icon_class = get_icon( 'close', 'class' );
+		if( $icon_class )
+		{
+			?>
+			closeImage.className = '<?php echo $icon_class ?>';
+			<?php
+		}
+
+		if( get_icon( 'close', 'rollover' ) )
+		{ // handle rollover images ('close' by default is one).
+			?>
+			closeLink.className = 'rollover';
+			if( typeof setupRollovers == 'function' ) { setupRollovers(); }
+			<?php
+		}
+		?>
+		closeImage.setAttribute( 'onclick', "document.getElementById('uploadfileinputs').removeChild(this.parentNode.parentNode);" ); // TODO: setting onclick this way may not work in IE. (try attachEvent then)
+		closeLink.style.cssFloat = 'right';
+
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Choose a file'); ?>:', false, 'input', 'uploadfile[]', '20', '0', 'file', '' );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Filename on server (optional)'); ?>:', false, 'input', 'uploadfile_name[]', '20', '80', 'text', '' );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Long title'); ?>:', true, 'input', 'uploadfile_title[]', '50', '255', 'text', 'large' );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Alternative text (useful for images)'); ?>:', true, 'input', 'uploadfile_alt[]', '50', '255', 'text', 'large' );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Caption/Description of the file'); ?>:', true, 'textarea', 'uploadfile_desc[]', '38', '3', '', 'large' );
 	}
 	// -->
 </script>
@@ -147,17 +170,18 @@ if( false )
 
 	$Form = & new Form( 'files.php', '', 'post', 'fieldset', 'multipart/form-data' );
 
-	$Form->global_icon( T_('Quit upload mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
+	$Form->global_icon( T_('Quit upload mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
 
 	$Form->begin_form( 'fform', T_('File upload') );
 
 		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
+		$Form->hidden( 'upload_quickmode', $upload_quickmode );
 
 		echo $Fileman->getFormHiddenInputs();
 
 		if( count( $failedFiles ) )
 		{
-			$LogUpload->add( T_('Some file uploads failed. Please check the errors below.'), 'error' );
+			Log::display( '', '', T_('Some file uploads failed. Please check the errors below.'), 'error' );
 		}
 		$LogUpload->display( '', '', true, 'all' ); ?>
 
@@ -269,6 +293,9 @@ if( false )
 
 /*
  * $Log$
+ * Revision 1.18  2005/12/10 03:02:50  blueyed
+ * Quick upload mode merged from post-phoenix
+ *
  * Revision 1.17  2005/12/05 21:34:29  blueyed
  * doc
  *
