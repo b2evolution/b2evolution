@@ -112,12 +112,11 @@ class ldap_plugin extends Plugin
 	var $default_group_name = '';
 
 
-	var $code = 'evo_ldapa';
+	var $code = 'evo_ldap_auth';
 	var $priority = 50;
 	var $version = 'CVS $Revision$';
 	var $author = 'The b2evo Group';
 	var $help_url = 'http://b2evolution.net/'; // TODO: create /man page
-	var $is_tool = false;
 
 	var $apply_when = 'never';
 	var $apply_to_html = false;
@@ -147,26 +146,26 @@ class ldap_plugin extends Plugin
 	 */
 	function LoginAttempt( $params )
 	{
-		global $Debuglog, $localtimenow;
+		global $localtimenow;
 		global $UserCache, $GroupCache, $Settings, $Hit;
 
 		if( $local_User = & $UserCache->get_by_login( $params['login'] )
 				&& $local_User->pass == $params['pass_md5'] )
 		{ // User exist (with this password), do nothing
-			$Debuglog->add( 'User already exists locally with this password.', 'plugin_ldap' );
+			$this->debug_log( 'User already exists locally with this password.' );
 			return true;
 		}
 
 		if( empty($this->ldap_search_sets) )
 		{
-			$Debuglog->add( 'No LDAP search sets defined.', 'plugin_ldap' );
+			$this->debug_log( 'No LDAP search sets defined.' );
 			return false;
 		}
 
 		// Authenticate against LDAP
 		if( !function_exists( 'ldap_connect' ) )
 		{
-			$Debuglog->add( 'LDAP does not seem to be compiled into PHP.', array('plugin_ldap', 'error') );
+			$this->debug_log( 'LDAP does not seem to be compiled into PHP.' );
 			return false;
 		}
 
@@ -175,23 +174,21 @@ class ldap_plugin extends Plugin
 		{
 			if( !($ldap_conn = @ldap_connect( $l_set['server'] )) )
 			{
-				$Debuglog->add( 'Could not connect to LDAP server &laquo;'.$l_set['server'].'&raquo;!', 'plugin_ldap' );
-
+				$this->debug_log( 'Could not connect to LDAP server &laquo;'.$l_set['server'].'&raquo;!' );
 				continue;
 			}
-			$Debuglog->add( 'Connected to server &laquo;'.$l_set['server'].'&raquo;..', 'plugin_ldap' );
+			$this->debug_log( 'Connected to server &laquo;'.$l_set['server'].'&raquo;..' );
 
 			$ldap_rdn = sprintf( $l_set['rdn'], $params['login'] );
-			$Debuglog->add( 'Using rdn &laquo;'.$ldap_rdn.'&raquo;..', 'plugin_ldap' );
+			$this->debug_log( 'Using rdn &laquo;'.$ldap_rdn.'&raquo;..' );
 
 			if( !@ldap_bind($ldap_conn, $ldap_rdn, $params['pass']) )
 			{
-				$Debuglog->add( 'Could not bind to LDAP server!', 'plugin_ldap' );
-
+				$this->debug_log( 'Could not bind to LDAP server!' );
 				continue;
 			}
 
-			$Debuglog->add( 'User successfully bound to server.', 'plugin_ldap' );
+			$this->debug_log( 'User successfully bound to server.' );
 
 			// Search user info
 			$search_result = ldap_search(
@@ -203,7 +200,7 @@ class ldap_plugin extends Plugin
 
 			if( $search_info['count'] != 1 )
 			{ // nicht nur ein bzw kein Eintrag gefunden
-				$Debuglog->add( 'Found '.$search_info['count'].' entries with search!', 'plugin_ldap' );
+				$this->debug_log( 'Found '.$search_info['count'].' entries with search!' );
 
 				/*
 				for ($i=0; $i<$search_info["count"]; $i++) {
@@ -213,7 +210,7 @@ class ldap_plugin extends Plugin
 				}
 				*/
 			}
-			$Debuglog->add( 'search_info: <pre>'.var_export( $search_info, true ).'</pre>', 'plugin_ldap' );
+			$this->debug_log( 'search_info: <pre>'.var_export( $search_info, true ).'</pre>' );
 			#pre_dump( $search_info );
 
 
@@ -222,7 +219,7 @@ class ldap_plugin extends Plugin
 				$local_User->set( 'pass', $params['pass_md5'] );
 				$local_User->dbupdate();
 
-				$Debuglog->add( 'Updating user password locally.', 'plugin_ldap' );
+				$this->debug_log( 'Updating user password locally.' );
 			}
 			else
 			{ // create this user locally
@@ -261,38 +258,38 @@ class ldap_plugin extends Plugin
 				$assigned_group = false;
 				if( !empty($this->assign_user_to_group_by) )
 				{
-					$Debuglog->add( 'We want to assign the Group by &laquo;'.$this->assign_user_to_group_by.'&raquo;', 'plugin_ldap' );
+					$this->debug_log( 'We want to assign the Group by &laquo;'.$this->assign_user_to_group_by.'&raquo;' );
 					if( isset($search_info[0][$this->assign_user_to_group_by])
 					    && isset($search_info[0][$this->assign_user_to_group_by][0]) )
 					{ // There is info we want to assign by
 						$assign_by_value = $search_info[0][$this->assign_user_to_group_by][0];
-						$Debuglog->add( 'The users info has &laquo;'.$assign_by_value.'&raquo; as value given.', 'plugin_ldap' );
+						$this->debug_log( 'The users info has &laquo;'.$assign_by_value.'&raquo; as value given.' );
 
 						if( $users_Group = & $GroupCache->get_by_name( $assign_by_value, false ) )
 						{ // A group with the users value returned exists.
 							$NewUser->setGroup( $users_Group );
 							$assigned_group = true;
-							$Debuglog->add( 'Adding User to existing Group.', 'plugin_ldap' );
+							$this->debug_log( 'Adding User to existing Group.' );
 						}
 						elseif( !empty($this->template_group_name_for_unmatched_assign) )
 						{ // we want to create a new group matching the assign-by info
-							$Debuglog->add( 'Group with that name does not exist yet.', 'plugin_ldap' );
+							$this->debug_log( 'Group with that name does not exist yet.' );
 
 							if( $new_Group = $GroupCache->get_by_name($this->template_group_name_for_unmatched_assign) ) // COPY!
 							{ // take a copy of the Group to use as template
-								$Debuglog->add( 'Using Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; as template.', 'plugin_ldap' );
+								$this->debug_log( 'Using Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; as template.' );
 								$new_Group->set( 'ID', 0 ); // unset ID (to allow inserting)
 								$new_Group->set( 'name', $assign_by_value ); // set the wanted name
 								$new_Group->dbinsert();
-								$Debuglog->add( 'Created Group &laquo;'.$new_Group->get('name').'&raquo;', 'plugin_ldap' );
-								$Debuglog->add( 'Assigned User to new Group.', 'plugin_ldap' );
+								$this->debug_log( 'Created Group &laquo;'.$new_Group->get('name').'&raquo;' );
+								$this->debug_log( 'Assigned User to new Group.' );
 
 								$NewUser->setGroup( $new_Group );
 								$assigned_group = true;
 							}
 							else
 							{
-								$Debuglog->add( 'Template Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; not found!', 'plugin_ldap' );
+								$this->debug_log( 'Template Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; not found!' );
 							}
 						}
 					}
