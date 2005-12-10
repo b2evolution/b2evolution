@@ -99,7 +99,7 @@ require_once dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_adminUI.cla
  *
  * @global AdminUI
  */
-$AdminUI = & new AdminUI();
+$AdminUI = new AdminUI();
 
 // Construct the menu:
 $AdminUI->add_menu_entries(
@@ -245,5 +245,8 @@ $AdminUI->add_menu_entries(
 			),
 		)
 	);
+
+
+$Plugins->trigger_event( 'AdminInitMenu' );
 
 ?>
