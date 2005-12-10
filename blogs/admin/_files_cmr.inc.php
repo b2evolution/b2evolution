@@ -62,7 +62,7 @@ $AdminUI->disp_payload_begin();
 
 $Form = & new Form( 'files.php' );
 
-$Form->global_icon( T_('Quit copy/move mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
+$Form->global_icon( T_('Quit copy/move mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
 
 $Form->begin_form( 'fform', $Fileman->fm_mode == 'file_copy' ? T_('Copy') : T_('Move') );
 
@@ -96,6 +96,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.14  2005/12/10 03:05:58  blueyed
+ * minor
+ *
  * Revision 1.13  2005/11/21 18:33:19  fplanque
  * Too many undiscussed changes all around: Massive rollback! :((
  * As said before, I am only taking CLEARLY labelled bugfixes.

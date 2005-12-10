@@ -43,7 +43,7 @@ if( false )
 
 $Form = & new Form( 'files.php', '', 'post', 'fieldset' );
 
-$Form->global_icon( T_('Quit link mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false, 'forceFM' => 1 ) ) );
+$Form->global_icon( T_('Quit link mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
 
 $Form->begin_form( 'fform', sprintf( T_('Link files to &laquo;%s&raquo;...'), $edited_Item->dget('title') ) );
 
@@ -126,9 +126,8 @@ $Form->end_form( );
 
 /*
  * $Log$
- * Revision 1.6  2005/11/21 18:33:19  fplanque
- * Too many undiscussed changes all around: Massive rollback! :((
- * As said before, I am only taking CLEARLY labelled bugfixes.
+ * Revision 1.7  2005/12/10 03:05:58  blueyed
+ * minor
  *
  * Revision 1.4  2005/09/06 17:13:53  fplanque
  * stop processing early if referer spam has been detected
