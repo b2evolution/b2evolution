@@ -181,6 +181,46 @@ class Request
 
 
 	/**
+	 * Get the action from param.
+	 *
+	 * If we got no $action, we'll check for an $actionArray  ( <input type="submit" name="actionArray[real_action]" ...> )
+	 * And the real $action will be found in the first key...
+	 * When there are multiple submit buttons, this is smarter than checking the value which is a translated string.
+	 * When there is an image button, this allows to work around IE not sending the value (it only sends X & Y coords).
+	 *
+	 * @param string Default to use.
+	 * @return string
+	 */
+	function param_action( $default = '' )
+	{
+		#$this->param( 'action', 'string', NULL, true ); // blueyed>> is there a reason to remember? (taken from files.php)
+		$action = $this->param( 'action', 'string', NULL );
+
+		if( is_null($action) )
+		{ // Check $actionArray
+			$actionArray = array_keys( $this->param( 'actionArray', 'array', array(), true ) );
+			$action = array_pop($actionArray);
+			if( is_string($action) )
+			{
+				$action = substr( strip_tags($action), 0, 50 );  // sanitize it
+			}
+			elseif( !empty($actionArray) )
+			{ // this is probably a numeric index from '<input name="actionArray[]" .. />'
+				debug_die( 'Invalid action!' );
+			}
+		}
+
+		if( empty($action) )
+		{
+			$action = $default;
+		}
+
+		$this->params['action'] = $action;
+		return $action;
+	}
+
+
+	/**
 	 * Get the value of a param.
 	 *
 	 * @return NULL|mixed The value of the param, if set. NULL otherwise.
@@ -624,6 +664,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.25  2005/12/10 02:48:51  blueyed
+ * Added param_action()
+ *
  * Revision 1.24  2005/12/08 22:49:18  blueyed
  * Typo
  *
