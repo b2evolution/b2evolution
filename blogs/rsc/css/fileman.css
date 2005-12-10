@@ -86,6 +86,11 @@
 	font-size:84%;
 }
 
+#fmbar_roots {
+	float:left;
+	margin-right:1ex;
+}
+
 div.fm_query {
 	padding-top: 2ex;
 	border:1px solid;

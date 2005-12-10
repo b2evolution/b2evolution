@@ -5,7 +5,7 @@
  */
 
 
-/* 
+/*
  * Categories selection table:
  */
 table.catselect {
@@ -45,7 +45,7 @@ ul.clicktree {
 	list-style:none;
 }
 ul.clicktree ul.clicktree {
-	margin-left:4ex;
+	margin-left:2ex;
 }
 
 ul.plain {
