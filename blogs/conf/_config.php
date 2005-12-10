@@ -114,5 +114,6 @@ require_once  dirname(__FILE__).'/_locales.php';        // locale settings
 require_once  dirname(__FILE__).'/_formatting.php';     // formatting settings
 require_once  dirname(__FILE__).'/_admin.php';          // admin settings
 require_once  dirname(__FILE__).'/_stats.php';          // stats/hitlogging settings
+require_once  dirname(__FILE__).'/_application.php';    // application settings
 @include_once dirname(__FILE__).'/_overrides_TEST.php'; // Override for testing in there
 ?>

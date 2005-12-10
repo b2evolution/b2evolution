@@ -44,11 +44,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * Includes
- */
-require_once  dirname(__FILE__).'/'.$core_dirout.$conf_subdir.'_application.php';    // application settings
-
 
 $new_db_version = 9000;				// next time: 9010
 
@@ -254,6 +249,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.25  2005/12/10 00:07:24  blueyed
+ * Require /conf/_application.php in /conf/_config.php to allow easily overriding it.
+ *
  * Revision 1.24  2005/10/06 21:15:24  blueyed
  * Spelling
  *
