@@ -315,18 +315,22 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 		else
 		{ // Not in blacklist
 			?>
-			<p><strong><input type="checkbox" name="blacklist_locally" value="1" checked="checked" />
-			<?php printf ( T_('Blacklist the keyword [%s] locally.'), htmlspecialchars($keyword) ) ?>
-			</strong></p>
+			<p>
+			<input type="checkbox" name="blacklist_locally" id="blacklist_locally_cb" value="1" checked="checked" />
+			<label for="blacklist_locally_cb">
+				<strong><?php printf ( T_('Blacklist the keyword [%s] locally.'), htmlspecialchars($keyword) ) ?></strong>
+			</label>
+			</p>
 
 			<?php
 			if( $report_abuse )
 			{
 				?>
 				<p>
-				<strong><input type="checkbox" name="report" value="1" checked="checked" />
-				<?php printf ( T_('Report the keyword [%s] as abuse to b2evolution.net.'), htmlspecialchars($keyword) ) ?>
-				</strong>
+				<input type="checkbox" name="report" id="report_cb" value="1" checked="checked" />
+				<label for="report_cb">
+					<strong><?php printf ( T_('Report the keyword [%s] as abuse to b2evolution.net.'), htmlspecialchars($keyword) ) ?></strong>
+				</label>
 				[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
 				</p>
 				<?php
