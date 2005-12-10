@@ -76,6 +76,10 @@ class GeneralSettings extends AbstractSettings
 		// 'fm_enable_roots_group' => '0',  // TO DO
 		'fm_enable_roots_user' => '0',
 
+		'fm_default_chmod_file' => '664',   // Needs UI
+		'fm_default_chmod_dir' => '775',    // Needs UI
+
+
 		'hit_doublecheck_referer' => '0',
 		'links_extrapath' => '0',
 		'newusers_canregister' => '0',
@@ -141,6 +145,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.32  2005/12/10 02:54:33  blueyed
+ * Default chmod moved to $Settings again
+ *
  * Revision 1.31  2005/11/25 14:33:36  fplanque
  * no message
  *

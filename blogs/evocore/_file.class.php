@@ -301,30 +301,22 @@ class File extends DataObject
 	 * Also inserts meta data into DB (if file/folder was successfully created).
 	 *
 	 * @param string type ('dir'|'file')
-	 * @param string optional permissions (octal format)
+	 * @param string optional permissions (octal format), otherwise the default from {@link $Settings} gets used
 	 * @return boolean true if file/folder was created, false on failure
 	 */
 	function create( $type = 'file', $chmod = NULL )
 	{
 		if( $type == 'dir' )
 		{ // Create an empty directory:
-			if( $chmod === NULL )
-			{ // Create dir with default permissions (777)
-				$success = @mkdir( $this->_adfp_full_path );
-			}
-			else
-			{ // Create directory with specific permissions:
-				$success = @mkdir( $this->_adfp_full_path, octdec($chmod) );
-			}
+			$success = @mkdir( $this->_adfp_full_path );
+			$this->_is_dir = true; // used by chmod
 		}
 		else
 		{ // Create an empty file:
 			$success = touch( $this->_adfp_full_path );
-			if( $chmod !== NULL )
-			{
-				$this->chmod( $chmod );
-			}
+			$this->_is_dir = false; // used by chmod
 		}
+		$this->chmod( $chmod ); // uses $Settings for NULL
 
 		if( $success )
 		{	// The file/folder has been successfully created:
@@ -839,9 +831,9 @@ class File extends DataObject
 
 
 	/**
-	 * Rename the file in its current directoty on disk.
+	 * Rename the file in its current directory on disk.
 	 *
-	 * Also update meta data in DB
+	 * Also update meta data in DB.
 	 *
 	 * @access public
 	 * @param string new name (without path!)
@@ -931,8 +923,6 @@ class File extends DataObject
 		$this->load_meta();
 
 		// Memorize new filepath:
-		// blueyed>> couldn't we use $FileCache, after handling meta data ?
-		// blueyed>> In general, $this = & $FileCache->get_by_root_and_path( $root_type, $root_ID, $rdfp_rel_path, true );
 		$this->_root_type = $root_type;
 		$this->_root_ID = $root_ID;
 		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
@@ -1058,11 +1048,21 @@ class File extends DataObject
 	 * Change file permissions on disk.
 	 *
 	 * @access public
-	 * @param string chmod (octal three-digit-format, eg '777')
+	 * @param string|NULL chmod (octal three-digit-format, eg '777'), uses {@link $Settings} for NULL
+	 *                    (fm_default_chmod_dir, fm_default_chmod_file)
 	 * @return mixed new permissions on success (octal format), false on failure
 	 */
-	function chmod( $chmod )
+	function chmod( $chmod = NULL )
 	{
+		if( $chmod === NULL )
+		{
+			global $Settings;
+
+			$chmod = $this->is_dir()
+				? $Settings->get( 'fm_default_chmod_dir' )
+				: $Settings->get( 'fm_default_chmod_file' );
+		}
+
 		$chmod = octdec( $chmod );
 		if( @chmod( $this->_adfp_full_path, $chmod ) )
 		{
@@ -1215,6 +1215,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.52  2005/12/10 02:54:33  blueyed
+ * Default chmod moved to $Settings again
+ *
  * Revision 1.51  2005/11/24 08:43:34  blueyed
  * doc
  *
