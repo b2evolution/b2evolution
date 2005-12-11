@@ -1556,7 +1556,7 @@ function debug_info( $force = false )
 		$log_head_links = array();
 		foreach( $log_cats as $l_cat )
 		{
-			$log_head_links[] .= '<a href="#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+			$log_head_links[] .= '<a href="'.$ReqURI.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
 		}
 		$log_container_head .= implode( ' | ', $log_head_links );
 		echo format_to_output(
@@ -2324,6 +2324,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.158  2005/12/11 12:46:41  blueyed
+ * Fix $log_head_links for front office (where we have <base>).
+ *
  * Revision 1.157  2005/12/08 22:30:04  blueyed
  * Added 'alt' and 'class' to get_icon(); doc
  *
