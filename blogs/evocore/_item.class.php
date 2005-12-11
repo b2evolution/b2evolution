@@ -381,8 +381,6 @@ class Item extends DataObject
 	/**
 	 * Generate the permalink for the item.
 	 *
-	 * {@internal Item::gen_permalink(-)}}
-	 *
 	 * @todo archives modes in clean mode
 	 *
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
@@ -390,7 +388,7 @@ class Item extends DataObject
 	 * @param boolean true to force single post on destination page
 	 * @param string glue between url params
 	 */
-	function gen_permalink( $mode = '', $blogurl = '', $force_single = false, $glue = '&amp;' )
+	function get_permalink( $mode = '', $blogurl = '', $force_single = false, $glue = '&amp;' )
 	{
 		global $DB, $BlogCache, $cacheweekly, $Settings;
 
@@ -890,7 +888,7 @@ class Item extends DataObject
 			{ // We are offering to read more
 				$output = $content_parts[0];
 				$output .= $before_more .
-										'<a href="'.$this->gen_permalink( 'pid', $more_file ).'#more'.$this->ID.'">'.
+										'<a href="'.$this->get_permalink( 'pid', $more_file ).'#more'.$this->ID.'">'.
 										$more_link_text.'</a>' .
 										$after_more;
 			}
@@ -1185,14 +1183,12 @@ class Item extends DataObject
 	/**
 	 * Template function: display permalink for item
 	 *
-	 * {@internal Item::permalink(-)}}
-	 *
 	 * @param string 'post', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
 	function permalink( $mode = '', $blogurl='' )
 	{
-		echo $this->gen_permalink( $mode, $blogurl );
+		echo $this->get_permalink( $mode, $blogurl );
 	}
 
 
@@ -1285,7 +1281,7 @@ class Item extends DataObject
 		if( ($number == 0) && $hideifnone )
 			return false;
 
-		$url = $this->gen_permalink( $mode, $blogurl, true );
+		$url = $this->get_permalink( $mode, $blogurl, true );
 		if( $use_popup )
 		{ // We need to tell b2evo to use the popup template
 			$url = url_add_param( $url, 'template=popup' );
@@ -1546,8 +1542,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: display checkable list of renderers
-	 *
-	 * {@internal Item::renderer_checkboxes(-)}}
 	 */
 	function renderer_checkboxes()
 	{
@@ -2256,7 +2250,7 @@ class Item extends DataObject
 
 			$notify_message .= T_('Url').': '.str_replace('&amp;', '&', $this->get('url'))."\n";
 
-			$notify_message .= T_('Content').': '.str_replace('&amp;', '&', $this->gen_permalink( 'pid' ))."\n";
+			$notify_message .= T_('Content').': '.str_replace('&amp;', '&', $this->get_permalink( 'pid' ))."\n";
 												// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
 			$notify_message .= $this->get('content')."\n\n";
@@ -2335,6 +2329,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.75  2005/12/11 19:59:51  blueyed
+ * Renamed gen_permalink() to get_permalink()
+ *
  * Revision 1.74  2005/12/05 20:54:05  blueyed
  * Changed Item::views() to take $zero, $one and $more param and default to 'No views', '1 view' and '%d views' (translated). More consistent and easier on the skin.
  *

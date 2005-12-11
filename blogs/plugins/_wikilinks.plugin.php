@@ -136,7 +136,7 @@ class wikilinks_plugin extends Plugin
 				// Find matching Item:
 				if( ($Item = $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
 				{ // Item Found
-					$permalink = $Item->gen_permalink();
+					$permalink = $Item->get_permalink();
 
 					// WikiWord
 					$replace_links[] = '<a href="'.$permalink.'">'.$WikiWord.'</a>';
@@ -215,7 +215,7 @@ class wikilinks_plugin extends Plugin
 			// Find matching Item:
 			if( ($Item = $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
 			{ // Item Found
-				$permalink = $Item->gen_permalink();
+				$permalink = $Item->get_permalink();
 
 				// [[WikiWord text]]
 				$replace_links[] = '<a href="'.$permalink.'">$1</a>';

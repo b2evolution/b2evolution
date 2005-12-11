@@ -99,7 +99,7 @@ function trackback(
 	$excerpt = rawurlencode($excerpt);
 	$blog_name = rawurlencode(get_bloginfo('name'));
 	$Item = $ItemCache->get_by_ID( $ID );
-	$url = rawurlencode( $Item->gen_permalink('', '', false, '&') );
+	$url = rawurlencode( $Item->get_permalink('', '', false, '&') );
 	// dis is the trackback stuff to be sent:
 	$query_string = "title=$title&url=$url&blog_name=$blog_name&excerpt=$excerpt";
 	// echo "url:$trackback_url<br>$sending:$query_string<br />";
@@ -236,6 +236,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.13  2005/12/11 19:59:51  blueyed
+ * Renamed gen_permalink() to get_permalink()
+ *
  * Revision 1.12  2005/12/06 01:55:40  blueyed
  * Fix line ending for User-Agent; Also fix the infinite loop it was causing.
  *

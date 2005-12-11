@@ -88,7 +88,7 @@ function pingback(
 		$pingback_href_original_pos = 27;
 
 		$Item = $ItemCache->get_by_ID( $post_ID );
-		$pagelinkedfrom = $Item->gen_permalink();
+		$pagelinkedfrom = $Item->get_permalink();
 
 		if( !empty($post_url) )
 		{
@@ -368,6 +368,9 @@ function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 
 /*
  * $Log$
+ * Revision 1.9  2005/12/11 19:59:51  blueyed
+ * Renamed gen_permalink() to get_permalink()
+ *
  * Revision 1.8  2005/12/05 18:17:19  fplanque
  * Added new browsing features for the Tracker Use Case.
  *

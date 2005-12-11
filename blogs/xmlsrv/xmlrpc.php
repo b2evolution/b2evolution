@@ -317,7 +317,7 @@ function b2_getPostURL($m)
 						'This post ID ('.$post_ID.') does not correspond to any post here.' );
 	}
 
-	return new xmlrpcresp( new xmlrpcval( $Item->gen_permalink() ) );
+	return new xmlrpcresp( new xmlrpcval( $Item->get_permalink() ) );
 }
 
 
@@ -2514,6 +2514,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.84  2005/12/11 19:59:51  blueyed
+ * Renamed gen_permalink() to get_permalink()
+ *
  * Revision 1.83  2005/11/18 00:13:56  blueyed
  * Normalized Log class
  *

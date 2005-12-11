@@ -276,7 +276,7 @@ if( ($disp == 'posts') || ($disp == 'single') )
 
 		if( ($Item !== false) && ($Item->blog_ID != $blog) )
 		{ // We're on the wrong blog (probably an old permalink) let's redirect
-			$new_permalink = $Item->gen_permalink( '', '', false, '&' );
+			$new_permalink = $Item->get_permalink( '', '', false, '&' );
 
 			header ("Location: $new_permalink");
 			exit();
@@ -416,6 +416,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.37  2005/12/11 19:59:51  blueyed
+ * Renamed gen_permalink() to get_permalink()
+ *
  * Revision 1.36  2005/12/05 22:03:46  blueyed
  * REmoved obsolete todo
  *

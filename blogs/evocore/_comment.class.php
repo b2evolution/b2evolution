@@ -416,12 +416,12 @@ class Comment extends DataObject
 
 
 	/**
-	 * Generate permalink to this comment
+	 * Generate permalink to this comment.
 	 *
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
-	function gen_permalink( $mode = '', $blogurl='' )
+	function get_permalink( $mode = '', $blogurl='' )
 	{
 		global $Settings;
 
@@ -433,10 +433,10 @@ class Comment extends DataObject
 		{
 			case 'archive#id':
 			case 'archive#title':
-			  $mode = 'pid';
+				$mode = 'pid';
 		}
 
-		$post_permalink = $this->Item->gen_permalink( $mode, $blogurl );
+		$post_permalink = $this->Item->get_permalink( $mode, $blogurl );
 		return $post_permalink.'#c'.$this->ID;
 	}
 
@@ -449,7 +449,7 @@ class Comment extends DataObject
 	 */
 	function permalink( $mode = '', $blogurl='' )
 	{
-		echo $this->gen_permalink( $mode, $blogurl );
+		echo $this->get_permalink( $mode, $blogurl );
 	}
 
 
@@ -583,7 +583,7 @@ class Comment extends DataObject
 			$notify_message = T_('Blog').': '.$Blog->get('shortname')
 				.' ( '.str_replace('&amp;', '&', $Blog->get('blogurl'))." )\n"
 				.T_('Post').': '.$this->Item->get('title')
-				.' ( '.str_replace('&amp;', '&', $this->Item->gen_permalink( 'pid' ))." )\n";
+				.' ( '.str_replace('&amp;', '&', $this->Item->get_permalink( 'pid' ))." )\n";
 				// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
 			switch( $this->type )
@@ -609,7 +609,7 @@ class Comment extends DataObject
 			}
 
 			$notify_message .=
-				T_('Comment').': '.str_replace('&amp;', '&', $this->gen_permalink( 'pid' ))."\n" // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+				T_('Comment').': '.str_replace('&amp;', '&', $this->get_permalink( 'pid' ))."\n" // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 				.$this->get('content')."\n\n"
 				.T_('Edit/Delete').': '.$admin_url.'b2browse.php?blog='.$this->Item->blog_ID.'&p='.$this->Item->ID."&c=1\n\n"
 				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
@@ -636,6 +636,9 @@ class Comment extends DataObject
 }
 /*
  * $Log$
+ * Revision 1.21  2005/12/11 19:59:51  blueyed
+ * Renamed gen_permalink() to get_permalink()
+ *
  * Revision 1.20  2005/11/04 21:42:22  blueyed
  * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
  *
