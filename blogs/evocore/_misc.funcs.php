@@ -859,8 +859,8 @@ function balanceTags($text)
 	}
 
 	# b2 fix for the bug with HTML comments
-	$newtext = str_replace("< !--","<!--",$newtext);
-	$newtext = str_replace("<    !--","< !--",$newtext);
+	$newtext = str_replace( '< !--', '<'.'!--', $newtext ); // the concatenation is needed to work around some strange parse error in PHP 4.3.1
+	$newtext = str_replace( '<    !--', '< !--', $newtext );
 
 	return $newtext;
 }
@@ -2324,6 +2324,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.159  2005/12/11 19:19:53  blueyed
+ * Fixed strange Parse error.
+ *
  * Revision 1.158  2005/12/11 12:46:41  blueyed
  * Fix $log_head_links for front office (where we have <base>).
  *
