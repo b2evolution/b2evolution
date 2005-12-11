@@ -41,7 +41,12 @@ class MiscFuncsTestCase extends UnitTestCase
 				'http://www.logitech.com/index.cfm/products/detailsharmony/US/EN,CRID=2084,CONTENTID=8747' => '<a href="http://www.logitech.com/index.cfm/products/detailsharmony/US/EN,CRID=2084,CONTENTID=8747">http://www.logitech.com/index.cfm/products/detailsharmony/US/EN,CRID=2084,CONTENTID=8747</a>',
 				'Please look at http://this.com, and tell me what you think.' => 'Please look at <a href="http://this.com">http://this.com</a>, and tell me what you think.',
 				'https://paypal.com' => '<a href="https://paypal.com">https://paypal.com</a>',
-				'<div>http://b2evolution.net/</div>' => '<div><a href="http://b2evolution.net/">http://b2evolution.net/</a></div>',
+				'www.google.de' => '<a href="http://www.google.de">www.google.de</a>',
+				'www.google.de, and www.yahoo.com.' => '<a href="http://www.google.de">www.google.de</a>, and <a href="http://www.yahoo.com">www.yahoo.com</a>.',
+				'See http://www.google.de.' => 'See <a href="http://www.google.de">http://www.google.de</a>.',
+				'See https://www.google.de, or www.yahoo.com/test?a=b,c=d.' => 'See <a href="https://www.google.de">https://www.google.de</a>, or <a href="http://www.yahoo.com/test?a=b,c=d">www.yahoo.com/test?a=b,c=d</a>.',
+				'www. ' => 'www. ',
+				'www.example.org' => '<a href="http://www.example.org">www.example.org</a>',
 
 				// aim:
 

@@ -300,8 +300,7 @@ function convert_chars( $content, $flag='html' )
 /**
  * Make links clickable in a given text.
  *
- * {@internal only used with _autolinks.plugin.php - move it there?
- *  NOTE: its tested in the misc.funcs.simpletest.php test case }}
+ * {@internal NOTE: its tested in the misc.funcs.simpletest.php test case }}
  *
  * @todo IMHO it would be better to use "\b" (word boundary) to match the beginning of links..
  *
@@ -311,10 +310,10 @@ function convert_chars( $content, $flag='html' )
 function make_clickable( $text, $moredelim = '&amp;' )
 {
 	$text = preg_replace(
-		array( '#(^|[\s>])(https?|mailto)://(([^<>{}\s,]|,(?!\s))+)#i',
+		array( '#(^|[\s>])(https?|mailto)://([^<>{}\s]+[^.,<>{}\s])#i',
 			'#(^|[\s>])aim:([^,<\s]+)#i',
 			'#(^|[\s>])icq:(\d+)#i',
-			'#(^|[\s>])www\.([a-z0-9\-]+)\.([a-z0-9\-.\~]+)((?:/[^,<\s]*)?)#i',
+			'#(^|[\s>])www\.([a-z0-9\-]+)\.([a-z0-9\-.\~]+)((?:/[^<\s]*)?[^.,\s])#i',
 			'#(^|[\s>])([a-z0-9\-_.]+?)@([^,<\s]+)#i', ),
 		array( '$1<a href="$2://$3">$2://$3</a>',
 			'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.rawurlencode(T_('Hello')).'">$2$3</a>',
@@ -2324,6 +2323,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.160  2005/12/11 19:32:41  blueyed
+ * Fixed make_clickable() for dots at the end of URLs.
+ *
  * Revision 1.159  2005/12/11 19:19:53  blueyed
  * Fixed strange Parse error.
  *
