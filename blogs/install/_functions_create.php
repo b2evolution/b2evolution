@@ -87,20 +87,20 @@ function create_b2evo_tables()
 		user_ID int(11) unsigned NOT NULL auto_increment,
 		user_login varchar(20) NOT NULL,
 		user_pass CHAR(32) NOT NULL,
-		user_firstname varchar(50) NOT NULL,
-		user_lastname varchar(50) NOT NULL,
-		user_nickname varchar(50) NOT NULL,
-		user_icq int(11) unsigned DEFAULT 0 NOT NULL,
+		user_firstname varchar(50) NULL,
+		user_lastname varchar(50) NULL,
+		user_nickname varchar(50) NULL,
+		user_icq int(11) unsigned NULL,
 		user_email varchar(100) NOT NULL,
-		user_url varchar(100) NOT NULL,
-		user_ip varchar(15) NOT NULL,
-		user_domain varchar(200) NOT NULL,
-		user_browser varchar(200) NOT NULL,
-		dateYMDhour datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+		user_url varchar(100) NULL,
+		user_ip varchar(15) NULL,
+		user_domain varchar(200) NULL,
+		user_browser varchar(200) NULL,
+		dateYMDhour datetime NOT NULL,
 		user_level int unsigned DEFAULT 0 NOT NULL,
-		user_aim varchar(50) NOT NULL,
-		user_msn varchar(100) NOT NULL,
-		user_yim varchar(50) NOT NULL,
+		user_aim varchar(50) NULL,
+		user_msn varchar(100) NULL,
+		user_yim varchar(50) NULL,
 		user_locale varchar(20) DEFAULT 'en-EU' NOT NULL,
 		user_idmode varchar(20) NOT NULL DEFAULT 'login',
 		user_notify tinyint(1) NOT NULL default 1,
@@ -146,9 +146,9 @@ function create_b2evo_tables()
 		blog_links_blog_ID INT(11) NULL DEFAULT NULL,
 		blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
 		blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL,
-		blog_media_subdir VARCHAR( 255 ) NOT NULL,
-		blog_media_fullpath VARCHAR( 255 ) NOT NULL,
-		blog_media_url VARCHAR( 255 ) NOT NULL,
+		blog_media_subdir VARCHAR( 255 ) NULL,
+		blog_media_fullpath VARCHAR( 255 ) NULL,
+		blog_media_url VARCHAR( 255 ) NULL,
 		blog_UID VARCHAR(20),
 		PRIMARY KEY blog_ID (blog_ID),
 		UNIQUE KEY blog_urlname (blog_urlname)
@@ -200,7 +200,7 @@ function create_b2evo_tables()
 		post_wordcount        int(11) default NULL,
 		post_comments         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
 		post_commentsexpire   DATETIME DEFAULT NULL,
-		post_renderers        VARCHAR(179) NOT NULL default 'default',
+		post_renderers        TEXT NOT NULL,
 		post_priority         int(11) unsigned null,
 		PRIMARY KEY post_ID( post_ID ),
 		UNIQUE post_urltitle( post_urltitle ),
@@ -239,7 +239,7 @@ function create_b2evo_tables()
 		comment_author_email varchar(100) NULL,
 		comment_author_url varchar(100) NULL,
 		comment_author_IP varchar(23) NOT NULL default '',
-		comment_date datetime NOT NULL default '0000-00-00 00:00:00',
+		comment_date datetime NULL,
 		comment_content text NOT NULL,
 		comment_karma int(11) NOT NULL default '0',
 		PRIMARY KEY comment_ID (comment_ID),
@@ -1012,8 +1012,8 @@ function create_b2evo_tables_phoenix()
 	echo 'Creating table for Post Links... ';
 	$DB->query( "CREATE TABLE T_links (
 								link_ID               int(11) unsigned  not null AUTO_INCREMENT,
-								link_datecreated      datetime          not null default '0000-00-00 00:00:00',
-								link_datemodified     datetime          not null default '0000-00-00 00:00:00',
+								link_datecreated      datetime          not null,
+								link_datemodified     datetime          not null,
 								link_creator_user_ID  int(11) unsigned  not null,
 								link_lastedit_user_ID int(11) unsigned  not null,
 								link_item_ID    		  int(11) unsigned  NOT NULL,
@@ -1120,7 +1120,7 @@ function create_b2evo_relations()
 
 	$DB->query( 'alter table T_coll_user_perms
 								add constraint FK_bloguser_blog_ID
-								 			foreign key (bloguser_blog_ID)
+											foreign key (bloguser_blog_ID)
 											references T_blogs (blog_ID)
 											on delete restrict
 											on update restrict' );
@@ -1171,10 +1171,10 @@ function create_b2evo_relations()
 											on update restrict,
 								add constraint FK_post_lastedit_user_ID
 											foreign key (post_lastedit_user_ID)
-      								references T_users (user_ID)
-      								on delete restrict
-      								on update restrict,
-      					add constraint FK_post_creator_user_ID
+											references T_users (user_ID)
+											on delete restrict
+											on update restrict,
+								add constraint FK_post_creator_user_ID
 											foreign key (post_creator_user_ID)
 											references T_users (user_ID)
 											on delete restrict
@@ -1203,9 +1203,9 @@ function create_b2evo_relations()
 	$DB->query( 'alter table T_links
 								add constraint FK_link_creator_user_ID
 											foreign key (link_creator_user_ID)
-	 										references T_users (user_ID)
-											on delete restrict on
-											update restrict' );
+											references T_users (user_ID)
+											on delete restrict
+											on update restrict' );
 	$DB->query( 'alter table T_links
 								add constraint FK_link_lastedit_user_ID
 											foreign key (link_lastedit_user_ID)
@@ -1215,21 +1215,21 @@ function create_b2evo_relations()
 	$DB->query( 'alter table T_links
 								add constraint FK_link_dest_item_ID
 											foreign key (link_dest_item_ID)
-      								references T_posts (post_ID)
-      								on delete restrict
-      								on update restrict' );
+											references T_posts (post_ID)
+											on delete restrict
+											on update restrict' );
 	$DB->query( 'alter table T_links
-							 	add constraint FK_link_file_ID
-							 				foreign key (link_file_ID)
-								      references T_files (file_ID)
-								      on delete restrict
-								      on update restrict' );
+								add constraint FK_link_file_ID
+											foreign key (link_file_ID)
+											references T_files (file_ID)
+											on delete restrict
+											on update restrict' );
 	$DB->query( 'alter table T_links
-							 	add constraint FK_link_item_ID
-							 				foreign key (link_item_ID)
-								      references T_posts (post_ID)
-								      on delete restrict
-								      on update restrict' );
+								add constraint FK_link_item_ID
+											foreign key (link_item_ID)
+											references T_posts (post_ID)
+											on delete restrict
+											on update restrict' );
 
 	$DB->query( 'alter table T_users
 								add constraint FK_user_grp_ID
@@ -1280,6 +1280,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.158  2005/12/11 00:22:53  blueyed
+ * MySQL strict mode fixes. (SET sql_mode = "TRADITIONAL";)
+ *
  * Revision 1.157  2005/11/22 20:51:38  fplanque
  * no message
  *
