@@ -491,15 +491,19 @@ switch( $action )
 			{ // No integrity problem detected...
 				$action_msg .= '
 					<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
-					</form>
-					<form action="files.php" class="inline">
+					</form>';
+			}
+			else
+			{	// Integrity problem detected. Close form without offering to submit:
+				$action_msg .= '</form>';
+			}
+
+			// Offer to cancel:
+			$action_msg .= '<form action="files.php" class="inline">
 						'.$Fileman->getFormHiddenInputs().'
 						<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
 					</form>
-					';
-			}
-
-			$action_msg .= '</div>';
+				</div>';
 
 		}
 		else
@@ -1342,6 +1346,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.147  2005/12/12 17:57:22  fplanque
+ * fixed bug with delete (when some links prevent deletion)
+ *
  * Revision 1.146  2005/12/12 16:40:17  fplanque
  * fixed quick upload
  *
