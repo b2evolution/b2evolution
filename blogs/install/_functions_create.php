@@ -175,6 +175,7 @@ function create_b2evo_tables()
 
 
 	echo 'Creating table for Posts... ';
+	// TODO: renderers is now limited to 7 renderes (with 32 char names). Move to text but FORCE default value in Item class / dbinsert().
 	$query = "CREATE TABLE T_posts (
 		post_ID               int(11) unsigned NOT NULL auto_increment,
 		post_parent_ID        int(11) unsigned NULL,
@@ -200,7 +201,7 @@ function create_b2evo_tables()
 		post_wordcount        int(11) default NULL,
 		post_comments         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
 		post_commentsexpire   DATETIME DEFAULT NULL,
-		post_renderers        TEXT NOT NULL default 'default',
+		post_renderers        VARCHAR(230) NOT NULL default 'default',
 		post_priority         int(11) unsigned null,
 		PRIMARY KEY post_ID( post_ID ),
 		UNIQUE post_urltitle( post_urltitle ),
@@ -1280,6 +1281,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.160  2005/12/12 20:32:58  fplanque
+ * no message
+ *
  * Revision 1.159  2005/12/12 19:22:03  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
