@@ -29,7 +29,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -44,7 +44,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE.
  * @author sakichan: Nobuo SAKIYAMA.
  * @author Simon Willison.
  *
@@ -258,6 +258,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.8  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.7  2005/10/09 19:31:15  blueyed
  * Spelling (*allowed_attribues => *allowed_attributes)
  *

@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -332,8 +332,8 @@ function comment_author_url_basedomain( $disp = true )
 
 /*
  * $Log$
- * Revision 1.13  2005/12/05 18:17:19  fplanque
- * Added new browsing features for the Tracker Use Case.
+ * Revision 1.14  2005/12/12 19:21:21  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
  * Revision 1.12  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected

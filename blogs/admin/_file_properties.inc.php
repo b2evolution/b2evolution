@@ -27,7 +27,7 @@
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
  */
@@ -89,6 +89,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.12  2005/12/12 19:21:20  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.11  2005/10/31 23:20:45  fplanque
  * keeping things straight...
  *

@@ -27,7 +27,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  *
  * @version $Id$
  */
@@ -58,6 +58,38 @@ class FileCache extends DataObjectCache
 	function FileCache()
 	{
 		parent::DataObjectCache( 'File', false, 'T_files', 'file_', 'file_ID' );
+	}
+
+
+	/**
+	 * Instantiate a DataObject from a table row and then cache it.
+	 *
+	 * @param Object Database row
+	 * @return Object
+	 */
+	function & instantiate( & $db_row )
+	{
+		// Get ID of the object we'ere preparing to instantiate...
+		$obj_ID = $db_row->{$this->dbIDname};
+
+ 		if( !empty($obj_ID) )
+		{	// If the object ID is valid:
+	 		if( !isset($this->cache[$obj_ID]) )
+			{	// If not already cached:
+				// Instantiate a File object for this line:
+				$current_File = new File( $db_row->file_root_type, $db_row->file_root_ID, $db_row->file_path ); // COPY!
+				// Flow meta data into File object:
+				$current_File->load_meta( false, $db_row );
+				$this->add( $current_File );
+			}
+			else
+			{	// Already cached:
+			// Flow meta data into File object:
+			$current_File->load_meta( false, $db_row );
+			}
+		}
+
+		return $this->cache[$obj_ID];
 	}
 
 
@@ -102,39 +134,13 @@ class FileCache extends DataObjectCache
 	}
 
 
-	/**
-	 * Instantiate a DataObject from a table row and then cache it.
-	 *
-	 * @param Object Database row
-	 */
-	/* fpanque> we migth need something like this at some point in time...
-	function instantiate( & $db_row )
-	{
-		// Get ID of the object we'ere preparing to instantiate...
-		$obj_ID = $db_row->{$this->dbIDname};
-
- 		if( !empty($obj_ID) )
-		{	// If the object ID is valid:
-	 		if( !isset($this->cache[$obj_ID]) )
-			{	// If not already cached:
-				// Instantiate a File object for this line:
-				$current_File = new File( $row->file_root_type, $row->file_root_ID, $row->file_path ); // COPY!
-				// Flow meta data into File object:
-				$current_File->load_meta( false, $row );
-				$this->add( $File );
-			}
-			else
-			{	// Already cached:
-			// Flow meta data into File object:
-			$current_File->load_meta( false, $row );
-			}
-		}
-	}
-	*/
 }
 
 /*
  * $Log$
+ * Revision 1.7  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.6  2005/09/06 17:13:54  fplanque
  * stop processing early if referer spam has been detected
  *

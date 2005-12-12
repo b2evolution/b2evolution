@@ -7,7 +7,7 @@
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -676,6 +676,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.111  2005/12/12 19:22:03  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.110  2005/10/31 01:35:47  blueyed
  * Upgrade to 0.9: adjusted defaults
  *

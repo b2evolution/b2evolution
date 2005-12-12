@@ -27,7 +27,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -38,7 +38,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author CDI.
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE.
  * @author The SquirrelMail Project Team.
  *
  * @version $Id$
@@ -738,6 +738,9 @@ class POP3 {
 
 /*
  * $Log$
+ * Revision 1.5  2005/12/12 19:22:03  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.4  2005/09/06 17:14:12  fplanque
  * stop processing early if referer spam has been detected
  *

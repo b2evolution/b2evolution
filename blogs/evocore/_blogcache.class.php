@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -35,7 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  *
  * @version $Id$
  */
@@ -241,6 +241,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.18  2005/12/12 19:21:21  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.17  2005/11/26 07:35:20  blueyed
  * load_user_blogs(): return unique list! This fixes the blog being two times in the root list if the user has permission through his group and user.
  *

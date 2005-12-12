@@ -45,7 +45,9 @@ if( false )
 
 	$Results->title = T_('Linked to...');
 
-	// TYPE
+	/*
+	 * TYPE
+	 */
 	function display_type( & $row )
 	{
 		if( !empty($row->cont_ID) )
@@ -80,7 +82,9 @@ if( false )
 						);
 
 
-	// Sub Type column
+	/*
+	 * Sub Type column
+	 */
 	function display_subtype( & $row )
 	{
 		if( !empty($row->file_ID) )
@@ -102,7 +106,9 @@ if( false )
 						);
 
 
-	// LINK column
+	/*
+	 * LINK column
+	 */
 	function display_link( & $row )
 	{
 		if( !empty($row->cont_ID) )

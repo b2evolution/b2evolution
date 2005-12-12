@@ -27,7 +27,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  *
  * @version $Id$
  */
@@ -120,8 +120,8 @@ class DataObjectList extends Results
 
 /*
  * $Log$
- * Revision 1.12  2005/12/05 18:17:19  fplanque
- * Added new browsing features for the Tracker Use Case.
+ * Revision 1.13  2005/12/12 19:21:21  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
  * Revision 1.11  2005/10/27 15:25:03  fplanque
  * Normalization; doc; comments.

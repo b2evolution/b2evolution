@@ -28,7 +28,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
  * @version $Id$
@@ -270,6 +270,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.23  2005/12/12 19:21:23  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.22  2005/11/23 17:28:00  fplanque
  * also check group permissions
  *

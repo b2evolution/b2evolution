@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -42,6 +42,7 @@
  * @author jeffbearer: Jeff BEARER.
  * @author sakichan: Nobuo SAKIYAMA.
  * @author vegarg: Vegar BERG GULDAL.
+ * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  * @version $Id$
  */
@@ -1163,6 +1164,44 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 	}
 	// $Debuglog->add( 'regenerate_url(): ['.$url.']', 'params' );
 	return $url;
+}
+
+
+/**
+ * Construct an array of memorized params which are not in the ignore list
+ *
+ * @param mixed string or array of ignore params
+ */
+function get_memorized( $ignore = '' )
+{
+	global $global_param_list;
+	
+	$memo = array();
+			
+	// Transform ignore params into an array:
+	if( empty ( $ignore ) )
+	{
+		$ignore = array();
+	}
+	elseif( !is_array($ignore) )
+	{
+		$ignore = explode( ',', $ignore );
+	}
+	
+	// Loop on memorize params  
+	if( isset($global_param_list) ) 
+	{
+		foreach( $global_param_list as $var => $thisparam )
+		{
+			if( !in_array( $var, $ignore ) )
+			{ 
+				global $$var;
+				$value = $$var;
+				$memo[$var] = $$var;
+			}
+		}
+	}	 
+	return $memo;
 }
 
 
@@ -2330,6 +2369,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.162  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.161  2005/12/12 01:18:04  blueyed
  * Counter for $Timer; ignore absolute times below 0.005s; Fix for Timer::resume().
  *

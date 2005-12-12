@@ -9,12 +9,12 @@
  * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  *
  * {@internal
- * The University of North Carolina at Charlotte grants François PLANQUE the right to license
+ * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  *
- * Jason EDGECOMBE grants François PLANQUE the right to license
+ * Jason EDGECOMBE grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -564,6 +564,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.46  2005/12/12 19:21:20  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.45  2005/11/24 18:14:22  blueyed
  * using getter for Blog->siteurl again (after having fixed Blog class)
  *

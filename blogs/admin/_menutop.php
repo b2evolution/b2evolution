@@ -6,6 +6,10 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
+ * @author blueyed
+ * @author fplanque
+ * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
+ * 
  * @todo Let the {@link AdminUI_general AdminUI} object handle this.
  * @package admin
  */
@@ -37,7 +41,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/functions.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/rollovers.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/extracats.js"></script>
-
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/dynamic_select.js"></script>
+	
 	<?php
 
 	$Debuglog->add( 'Admin-Path: '.var_export($AdminUI->path, true) );

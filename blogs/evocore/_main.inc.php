@@ -40,15 +40,15 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * The University of North Carolina at Charlotte grants François PLANQUE the right to license
+ * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  *
- * Matt FOLLETT grants François PLANQUE the right to license
+ * Matt FOLLETT grants Francois PLANQUE the right to license
  * Matt FOLLETT's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -56,9 +56,10 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  * @author mfollett: Matt FOLLETT.
+ * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  * {@internal Below is a list of former authors whose contributions to this file have been
  *            either removed or redesigned and rewritten anew:
@@ -484,6 +485,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.71  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.70  2005/11/25 15:02:00  blueyed
  * $GroupCache: tell him about the name field. This allows to use get_by_name().
  *

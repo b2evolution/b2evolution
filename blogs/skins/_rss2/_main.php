@@ -39,7 +39,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  * }}
  *
  * @version $Id$

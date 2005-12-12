@@ -27,7 +27,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
  *
@@ -139,6 +139,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.6  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.5  2005/11/26 16:30:22  blueyed
  * Fix assigning $this->in_type_ID!
  *

@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -368,12 +368,14 @@ function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 
 /*
  * $Log$
+ * Revision 1.10  2005/12/12 19:21:23  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.9  2005/12/11 19:59:51  blueyed
  * Renamed gen_permalink() to get_permalink()
  *
  * Revision 1.8  2005/12/05 18:17:19  fplanque
  * Added new browsing features for the Tracker Use Case.
- *
  * Revision 1.7  2005/11/18 18:32:42  fplanque
  * Fixed xmlrpc logging insanity
  * (object should have been passed by reference but you can't pass NULL by ref)

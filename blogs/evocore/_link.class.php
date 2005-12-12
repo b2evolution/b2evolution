@@ -59,7 +59,7 @@ class Link extends DataObject
 	 */
 	function Link( $db_row = NULL )
 	{
-		global $ItemCache;
+		global $ItemCache, $FileCache;
 
 		// Call parent constructor:
 		parent::DataObject( 'T_links', 'link_', 'link_ID',
@@ -67,11 +67,13 @@ class Link extends DataObject
 
 		if( $db_row != NULL )
 		{
-			$this->ID       = $db_row->link_ID      ;
+			$this->ID       = $db_row->link_ID;
 			$this->ltype_ID = $db_row->link_ltype_ID;
 
 			// source of link:
 			$this->Item     = & $ItemCache->get_by_ID( $db_row->link_item_ID );
+
+			$this->File          = & $FileCache->get_by_ID( $db_row->link_file_ID, true, false );
 		}
 		else
 		{	// New object:
@@ -87,6 +89,11 @@ class Link extends DataObject
 	 */
 	function target_type()
 	{
+ 		if( !is_null($this->File) )
+		{
+			return 'file';
+		}
+
 		if( !is_null($this->Contact) )
 		{
 			return 'contact';
@@ -114,6 +121,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.9  2005/11/04 21:42:22  blueyed
  * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
  *

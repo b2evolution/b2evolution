@@ -29,11 +29,11 @@
  * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  *
- * Jason EDGECOMBE grants François PLANQUE the right to license
+ * Jason EDGECOMBE grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's personal contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -45,7 +45,7 @@
  * @author blueyed: Daniel HAHLER
  * @author cafelog (team)
  * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
- * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @version $Id$
  */
@@ -350,7 +350,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 </div>
 <div id="pageFooter">
 	<p class="baseline">
-		Original template design by <a href="http://fplanque.net/">François PLANQUE</a>.
+		Original template design by <a href="http://fplanque.net/">Francois PLANQUE</a>.
 	</p>
 	<div class="center">
 		<a href="http://validator.w3.org/check/referer"><img style="border:0;width:88px;height:31px" src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" class="middle" /></a>

@@ -200,7 +200,7 @@ function create_b2evo_tables()
 		post_wordcount        int(11) default NULL,
 		post_comments         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
 		post_commentsexpire   DATETIME DEFAULT NULL,
-		post_renderers        TEXT NOT NULL,
+		post_renderers        TEXT NOT NULL default 'default',
 		post_priority         int(11) unsigned null,
 		PRIMARY KEY post_ID( post_ID ),
 		UNIQUE post_urltitle( post_urltitle ),
@@ -239,7 +239,7 @@ function create_b2evo_tables()
 		comment_author_email varchar(100) NULL,
 		comment_author_url varchar(100) NULL,
 		comment_author_IP varchar(23) NOT NULL default '',
-		comment_date datetime NULL,
+		comment_date datetime NOT NULL,
 		comment_content text NOT NULL,
 		comment_karma int(11) NOT NULL default '0',
 		PRIMARY KEY comment_ID (comment_ID),
@@ -1280,6 +1280,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.159  2005/12/12 19:22:03  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.158  2005/12/11 00:22:53  blueyed
  * MySQL strict mode fixes. (SET sql_mode = "TRADITIONAL";)
  *

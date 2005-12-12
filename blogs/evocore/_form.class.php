@@ -27,10 +27,10 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * PROGIDISTRI grants François PLANQUE the right to license
+ * PROGIDISTRI grants Francois PLANQUE the right to license
  * PROGIDISTRI's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -41,6 +41,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
+ * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  * @todo Provide buffering of whole Form to be able to add onsubmit-JS to enable/disabled
  *       (group) checkboxes again and other useful stuff.
@@ -109,6 +110,12 @@ class Form extends Widget
 	 */
 	var $note_format = ' <span class="notes">%s</span>';
 
+	/**
+	 * This is a buffer for hidden fields. We'll display all of them just before the end of form </form>. This avoids having them caught in between table rows.
+	 * 
+	 * @var string
+	 */
+	var $hiddens = array();
 
 	/**
 	 * Constructor
@@ -165,9 +172,10 @@ class Form extends Widget
 		{
 			case 'table':
 				$this->formstart = '<table cellspacing="0" class="fform">'."\n";
-				$this->title_fmt = '<thead><tr class="formtitle"><th colspan="2"><div class="results_title">'
+				// Note: no thead in here until you can safely add a tbody to the rest of the content... 
+				$this->title_fmt = '<tr class="formtitle"><th colspan="2"><div class="results_title">'
 														.'<span style="float:right">$global_icons$</span>'
-														.'$title$</div></td></tr></thead>'."\n";
+														.'$title$</div></th></tr>'."\n";
 				$this->fieldstart = "<tr>\n";
 				$this->labelstart = '<td class="label">';
 				$this->labelend = "</td>\n";
@@ -319,9 +327,10 @@ class Form extends Widget
 	 *
 	 * @param string the title of the fieldset
 	 * @param string the class of the fieldset
+	 * @param array the icons action of the fieldset
 	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
-	function begin_fieldset( $title = '', $field_params = array() )
+	function begin_fieldset( $title = '', $field_params = array(), $icons = array() )
 	{
 		if( !isset($field_params['class']) )
 		{
@@ -336,6 +345,15 @@ class Form extends Widget
 				if( $title != '' )
 				{ // there is a title to display
 					// QUESTION: really build a <th> if it's empty? : YES, empty THs can be rendered and/or are DHTML scriptable
+					if( !empty( $icons ) )
+					{	
+						$r .= '<span class="fieldset_icons">'; 
+						foreach( $icons as $icon )
+						{
+							$r .= $icon;
+						}	
+						$r .= '</span>';
+					}
 					$r .= $title;
 				}
 
@@ -637,7 +655,7 @@ class Form extends Widget
 	 */
 	function date( $field_name, $field_value, $field_label, $date_format = 'yyyy-MM-dd' )
 	{
-		$field_params = array( 'date_format' => $date_format );
+		$field_params = array( 'date_format' => $date_format, 'type' => 'text' );
 
 		return $this->date_input( $field_name, $field_value, $field_label, $field_params );
 	}
@@ -715,67 +733,85 @@ class Form extends Widget
 	 */
 	function time_select( $field_name, $field_value = NULL, $precision = '5mn', $field_label, $field_note = NULL, $field_class = NULL, $field_onchange = NULL )
 	{
-			preg_match( '#([0-9]+)(mn|s)#', $precision, $matches );
+		preg_match( '#([0-9]+)(mn|s)#', $precision, $matches );
 
-			if( !isset( $matches[1] ) && !isset( $matches[2] ) )
-			{//precison has a bad format
-			return;
-			}
+		if( !isset( $matches[1] ) && !isset( $matches[2] ) )
+		{//precison has a bad format
+		return;
+		}
 
-			$field_params = array(
-			'note' => $field_note,
-			'class' => $field_class,
-			'onchange' => $field_onchange );
+		$field_params = array(
+		'note' => $field_note,
+		'class' => $field_class,
+		'onchange' => $field_onchange );
+		
+		/***  instantiate the precison for the minutes and secondes select options  ****/
 
-			$this->handle_common_params( $field_params, $field_name, $field_label );
+		if( $matches[2] == 'mn' )
+		{
+			$precision_mn = $matches[1];
+			$precision_s = 0;
+			// convert the precision in sec
+			$precision *= 60;
+		}
+		else
+		{
+			$precision_mn = 1;
+			$precision_s = $matches[1];
+		}
+		
+		/***  set round time with the precision  ***/
+		// Get nb sec since unix...
+		$nbsec = mysql2timestamp( $field_value );
+		$modulo =  $nbsec % $precision;
+		
+		if( $modulo < ( $precision / 2 ) )
+		{ // The round time is before
+			$nbsec -= $modulo;
+		}
+		else
+		{ // The round time is after
+			$nbsec += $precision - $modulo;
+		}
+		
+		/******************************************************/
 
-			$r = $this->begin_field();
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+		
+		$r = $this->begin_field();
+		
+		/**********   select options for the hours *************/
+					
+		$field_params['name'] = $field_name . '_h';
+		$field_params['id'] = $field_params['name'];	
+		// Get Hour part of datetime:
+		$hour = date( 'H', $nbsec );
+		
+		$r .= $this->_number_select(  $hour, 23 , 1, $field_params);
+		
+		/*********  select options for the minutes *************/
 
-			/**********   select options for the hours *************/
+		$field_params['name'] = $field_name . '_mn';
+		$field_params['id'] = $field_params['name'];
+		// Get Minute part of datetime:
+		$minute = date('i',$nbsec);
+		
+		$r .= ':'.$this->_number_select(  $minute, 59, $precision_mn, $field_params);
 
-			$field_params['name'] = $field_name . '_h';
+		if( $precision_s )
+		{/*********  select options for the minutes  ***********/
+
+			$field_params['name'] = $field_name . '_s';
 			$field_params['id'] = $field_params['name'];
-			// Get Hour part of datetime:
-			$hour = substr( $field_value, 11, 2 );
+			// Get Secondes part of datetime:
+			$seconde = substr( $field_value, 17, 2 );
 
-			$r .= $this->_number_select(  $hour, 23 , 1, $field_params);
+			$r .=':'.$this->_number_select(  $seconde, 59, $precision_s, $field_params);
+		}
 
-			/***  instantiate the precison for the minutes and secondes select options  ****/
+		$r .= $this->end_field();
 
-			if( $matches[2] == 'mn' )
-			{
-				$precision_mn = $matches[1];
-				$precision_s = 0;
-			}
-			else
-			{
-				$precision_mn = 1;
-				$precision_s = $matches[1];
-			}
-
-			/*********  select options for the minutes *************/
-
-			$field_params['name'] = $field_name . '_mn';
-			$field_params['id'] = $field_params['name'];
-			// Get Minute part of datetime:
-			$minute = substr( $field_value, 14, 2 );
-
-			$r .= ':'.$this->_number_select(  $minute, 59, $precision_mn, $field_params);
-
-			if( $precision_s )
-			{/*********  select options for the minutes  ***********/
-
-				$field_params['name'] = $field_name . '_s';
-				$field_params['id'] = $field_params['name'];
-				// Get Secondes part of datetime:
-				$seconde = substr( $field_value, 17, 2 );
-
-				$r .=':'.$this->_number_select(  $seconde, 59, $precision_s, $field_params);
-			}
-
-			$r .= $this->end_field();
-
-			return $this->display_or_return( $r );
+		return $this->display_or_return( $r );
 	}
 
 
@@ -791,11 +827,12 @@ class Form extends Widget
 	function _number_select( $field_value, $max, $precision = 1, $field_params )
 	{
 			$r	=	'<select'
-						. $this->get_field_params_as_string($field_params);
+						.$this->get_field_params_as_string( $field_params )
+						.'>';
 
 			for( $i=0; $i <= $max ; $i += $precision)
 			{
-				$val=sprintf('%02d', $i );
+				$val = sprintf( '%02d', $i );
 				$r .= '<option value="'.$val.'"'.
 								($field_value == $val ? ' selected="selected"' : '') .
 								'>'	.$val.'</option>';
@@ -965,10 +1002,11 @@ class Form extends Widget
 	 * @param string note
 	 * @param string CSS class
 	 * @param string value to use
+	 * @param boolean an optional indicating whether the box is disabled or not
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function checkbox( $field_name, $field_checked, $field_label, $field_note = '',
-											$field_class = '', $field_value = 1 )
+											$field_class = '', $field_value = 1, $field_disabled = false )
 	{
 		$field_params = array();
 
@@ -983,6 +1021,10 @@ class Form extends Widget
 		if( $field_value !== 1 )
 		{
 			$field_params['value'] = $field_value;
+		}
+		if( $field_disabled != false )
+		{
+			$field_params['disabled'] = $field_disabled;
 		}
 
 		return $this->checkbox_input( $field_name, $field_checked, $field_label, $field_params );
@@ -1073,8 +1115,15 @@ class Form extends Widget
 			$r .= "\n</fieldset>\n";
 		}
 
-		$r .= $this->formend
-					."\n</form>\n\n";
+		$r .= $this->formend;
+		
+		// Display all buffered hidden fields:
+		foreach( $this->hiddens as $hidden )
+		{
+			$r .= $hidden;		
+		}
+					
+		$r .= "\n</form>\n\n";
 
 		return $this->display_or_return( $r );
 	}
@@ -1115,6 +1164,8 @@ class Form extends Widget
 
 			$loop_field_note = isset($option[5]) ? $option[5] : '';
 
+			$r .= '<label class="">';
+			
 			if( isset($Request->err_messages[$field_name]) )
 			{ // There is an error message for this field, we want to mark the checkboxes with a red border:
 				$r .= '<span class="checkbox_error">';
@@ -1124,9 +1175,7 @@ class Form extends Widget
 			{
 				$after_field = '';
 			}
-
-			$r .= '<label class="">';
-
+			
 			$r .= "\t".'<input type="checkbox" name="'.$loop_field_name.'" value="'.$option[1].'" ';
 			if( $option[3] )
 			{ //the checkbox has to be checked by default
@@ -1309,12 +1358,24 @@ class Form extends Widget
 	{
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
-		$r = $this->begin_field()
-			."\n<select"
-			.$this->get_field_params_as_string($field_params).'>'
-			.$field_options
-			."</select>\n"
-			.$this->end_field();
+		$r = $this->begin_field();
+		if( !empty( $field_params['parent'] ) )
+		{// need to display an arrow to show that this select list options has a preselection from a parent
+			$r .= get_icon( 'parent_childto_arrow' );
+		}
+			
+		$r .="\n<select"
+			 .$this->get_field_params_as_string($field_params).'>'
+			 .$field_options
+			 ."</select>\n"
+			 .$this->end_field();
+		
+		if( !empty( $field_params['parent'] ) )
+		{ // When the page loads, set up the dynamic preselection from the parent to this select list options
+			$r .= "<script type='text/javascript'>
+						addEvent( window, 'load', dynamicSelect('$field_params[parent]', '$field_name'), false );
+						</script>";
+		}
 
 		return $this->display_or_return( $r );
 	}
@@ -1343,7 +1404,8 @@ class Form extends Widget
 		$field_params = array(
 			'note' => $field_note,
 			'class' => $field_class,
-			'onchange' => $field_onchange );
+			'onchange' => $field_onchange, 
+			 );
 
 		return $this->select_input_options( $field_name, $field_options, $field_label, $field_params );
 	}
@@ -1720,15 +1782,14 @@ class Form extends Widget
 	 * @param string Field value
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              Nothing yet.
-	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function hidden( $field_name, $field_value, $field_params = array() )
 	{
 		$field_params['name'] = $field_name;
 		$field_params['type'] = 'hidden';
 		$field_params['value'] = $field_value;
-
-		return $this->display_or_return( $this->get_input_element( $field_params ) );
+		
+		$this->hiddens[] = $this->get_input_element( $field_params );
 	}
 
 
@@ -2050,7 +2111,9 @@ class Form extends Widget
 		}
 
 		$r = $input_prefix
-			.'<input'.$this->get_field_params_as_string( $field_params ).' />'
+			.'<input'.$this->get_field_params_as_string( $field_params )
+			.' '.( isset( $field_param['disabled'] ) ? disabled( $field_param['disabled'] ) : '' )
+			.' />'
 			.$input_suffix;
 
 		return $r;
@@ -2200,7 +2263,7 @@ class Form extends Widget
 		// Error handling:
 		if( isset($field_params['name']) && isset($Request) && isset($Request->err_messages[$field_params['name']]) )
 		{ // There is an error message for this field:
-			if( !empty($field_params['type']) && $field_params['type'] == 'checkbox' )
+			if( isset($field_params['type']) && $field_params['type'] == 'checkbox' )
 			{ // checkboxes need a span
 				$field_params['input_suffix'] = '</span>'.( isset($field_params['input_suffix']) ? $field_params['input_suffix'] : '' );
 				$field_params['input_prefix'] = ( isset($field_params['input_prefix']) ? $field_params['input_prefix'] : '' ).'<span class="checkbox_required">';
@@ -2274,10 +2337,14 @@ class Form extends Widget
 			return $r;
 		}
 	}
+	
 }
 
 /*
  * $Log$
+ * Revision 1.92  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.91  2005/12/05 16:06:13  blueyed
  * Fix possible E_NOTICE
  *

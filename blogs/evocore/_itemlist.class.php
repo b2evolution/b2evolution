@@ -28,7 +28,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -37,7 +37,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE.
  * @author jupiterx: Jordan RUNNING.
  *
  * @version $Id$
@@ -874,8 +874,8 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
- * Revision 1.45  2005/12/05 18:17:19  fplanque
- * Added new browsing features for the Tracker Use Case.
+ * Revision 1.46  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
  * Revision 1.44  2005/12/05 15:29:15  fplanque
  * no message

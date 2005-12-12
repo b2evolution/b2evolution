@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -113,6 +113,7 @@ function trackback(
 		if( $fp = fopen($trackback_url, 'r') )
 		{
 			// blueyed>> why do we here just read the first 4kb, but in the POSTed response everything?
+			// fp>> this is dirty code... I've never really reviewed it entirely. Feel free to refactor as much as needed.
 			$result = fread($fp, 4096);
 			fclose($fp);
 
@@ -236,15 +237,14 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.14  2005/12/12 19:21:23  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.13  2005/12/11 19:59:51  blueyed
  * Renamed gen_permalink() to get_permalink()
  *
  * Revision 1.12  2005/12/06 01:55:40  blueyed
  * Fix line ending for User-Agent; Also fix the infinite loop it was causing.
- *
- * Revision 1.11  2005/12/05 18:17:19  fplanque
- * Added new browsing features for the Tracker Use Case.
- *
  * Revision 1.10  2005/12/04 00:23:11  blueyed
  * trackback(): send User-Agent header. This seems to be good behaviour.
  *

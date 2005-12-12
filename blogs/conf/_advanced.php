@@ -14,12 +14,12 @@
  * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * {@internal
- * The University of North Carolina at Charlotte grants François PLANQUE the right to license
+ * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  *
- * Matt FOLLETT grants François PLANQUE the right to license
+ * Matt FOLLETT grants Francois PLANQUE the right to license
  * Matt FOLLETT's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}

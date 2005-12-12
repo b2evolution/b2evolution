@@ -27,11 +27,11 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  *
- * Jason EDGECOMBE grants François PLANQUE the right to license
+ * Jason EDGECOMBE grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -40,7 +40,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE.
  * @author gorgeb: EPISTEMA (Bertrand Gorge).
  * @author jeffbearer: Jeff BEARER
  * @author edgester: Jason EDGECOMBE
@@ -642,13 +642,14 @@ class Blog extends DataObject
 
 			// Delete categories
 			// blueyed>> Is "SET FOREIGN_KEY_CHECKS = 0" the only solution? Otherwise we'd have to delete the blog before..
-			$save_foreign_key_checks = $DB->get_var( 'SELECT @@FOREIGN_KEY_CHECKS' );
-			$DB->query( 'SET FOREIGN_KEY_CHECKS = 0' );
+				// fp>> No way! The blog is not preventing deletion of the categories!
+			// $save_foreign_key_checks = $DB->get_var( 'SELECT @@FOREIGN_KEY_CHECKS' );
+			// $DB->query( 'SET FOREIGN_KEY_CHECKS = 0' );
 			if( $echo ) echo '<br />Deleting blog\'s categories... ';
 			$ret = $DB->query( "DELETE FROM T_categories
 													WHERE cat_blog_ID = $this->ID" );
 			if( $echo ) printf( '(%d rows)', $ret );
-			$DB->query( 'SET FOREIGN_KEY_CHECKS = '.$save_foreign_key_checks );
+			// $DB->query( 'SET FOREIGN_KEY_CHECKS = '.$save_foreign_key_checks );
 
 		} // / are there cats?
 
@@ -753,6 +754,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.47  2005/12/12 19:21:21  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.46  2005/12/08 22:44:01  blueyed
  * Use rel_path_to_base() to hide absolute paths in Messages
  *

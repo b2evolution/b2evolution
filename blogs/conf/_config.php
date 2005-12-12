@@ -32,7 +32,7 @@ die( 'The site is temporarily down for maintenance.' );
 /**
  * @var object Holds settings.
  */
-$EvoConfig = new stdClass;
+$EvoConfig = & new stdClass;
 
 /**
  * MySQL DB settings.

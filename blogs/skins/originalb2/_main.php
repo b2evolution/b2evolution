@@ -28,7 +28,7 @@
  * along with b2evolution; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Jason EDGECOMBE grants François PLANQUE the right to license
+ * Jason EDGECOMBE grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's personal contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -39,7 +39,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author BLUEROBOT.COM - {@link http://bluerobot.com/web/layouts/layout2.html} : layout
  * @author cafelog (team)
- * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  * @author edgester Jason EDGECOMBE
  *
  * {@internal Below is a list of former authors whose contributions to this file have been

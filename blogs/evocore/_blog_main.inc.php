@@ -28,10 +28,10 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * The University of North Carolina at Charlotte grants François PLANQUE the right to license
+ * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
@@ -41,7 +41,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  * @author jeffbearer: Jeff BEARER
  * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
  * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
@@ -416,6 +416,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.38  2005/12/12 19:21:21  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.37  2005/12/11 19:59:51  blueyed
  * Renamed gen_permalink() to get_permalink()
  *

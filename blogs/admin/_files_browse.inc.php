@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -35,7 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
  */
@@ -295,7 +295,8 @@ while( $lFile = & $Fileman->get_next() )
 	 */
 	if( $mode == 'upload' )
 	{
-		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles.'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
+		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles
+						.'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
 	}
 
 	echo '</td>';
@@ -558,6 +559,8 @@ else
 // If you want this feature to be usable by average users you must only have one line per file OR one file for all. You can't mix both.
 // The only way to have both is to have 2 spearate forms: 1 titled "change perms for all files simultaneously"-> submit  and another 1 title "change perms for each file individually" -> another submit
 // POST PHOENIX
+// fplanque>> second thought: changing perms for multiple files at once is useful. BUT assigning different perms to several files with ONE form is trying to solve a problem that not even geeks can face once in a lifetime.
+// This has to be simplified to ONE single set of permissions for all selected files. (If you need different perms, click again)
 			<input class="ActionButton" type="image" name="actionArray[edit_perms]"
 			onclick="return openselectedfiles(true);"
 			title="<?php echo T_('Change permissions for the selected files'); ?>"
@@ -806,6 +809,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.60  2005/12/12 19:21:20  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.59  2005/12/10 03:02:49  blueyed
  * Quick upload mode merged from post-phoenix
  *

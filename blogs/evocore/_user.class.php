@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -926,6 +926,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.55  2005/12/12 19:21:23  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.54  2005/12/08 22:44:02  blueyed
  * Use rel_path_to_base() to hide absolute paths in Messages
  *

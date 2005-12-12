@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -35,7 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  *
  * @version $Id$
  *
@@ -881,7 +881,7 @@ class Filelist
 
 			if( $File->is_dir() )
 			{
-				$this->_total_dir--;
+				$this->_total_dirs--;
 			}
 			else
 			{
@@ -1007,6 +1007,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.44  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.43  2005/12/09 16:16:03  blueyed
  * remove(): fix _current_idx decrementing; tightened $_order_index
  *

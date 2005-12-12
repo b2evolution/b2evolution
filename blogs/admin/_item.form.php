@@ -27,7 +27,7 @@
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  * @author blueyed: Daniel HAHLER
  * @author gorgeb
@@ -396,6 +396,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.42  2005/12/12 19:21:20  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.41  2005/11/27 08:54:28  blueyed
  * open_preview(): catch double-clicks on Preview button
  *

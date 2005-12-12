@@ -27,7 +27,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
  *
@@ -88,6 +88,9 @@ class FileRootCache
 
 /*
  * $Log$
+ * Revision 1.4  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.3  2005/11/18 07:53:05  blueyed
  * use $_FileRoot / $FileRootCache for absolute path, url and name of roots.
  *

@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -35,8 +35,9 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE.
  * @author gorgeb: EPISTEMA (Bertrand Gorge).
+ * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  * @version $Id$
  */
@@ -1521,6 +1522,7 @@ class Item extends DataObject
 	 */
 	function priority_options( $field_value, $allow_none )
 	{
+		$r = '';
 		if( $allow_none )
 		{
 			$r = '<option value="">'.T_('None').'</option>';
@@ -2329,6 +2331,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.76  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.75  2005/12/11 19:59:51  blueyed
  * Renamed gen_permalink() to get_permalink()
  *

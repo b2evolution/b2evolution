@@ -30,11 +30,11 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  *
- * Matt FOLLETT grants François PLANQUE the right to license
+ * Matt FOLLETT grants Francois PLANQUE the right to license
  * Matt FOLLETT's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -385,6 +385,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.34  2005/12/12 19:21:23  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.33  2005/11/17 19:35:26  fplanque
  * no message
  *

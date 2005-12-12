@@ -25,7 +25,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -33,8 +33,9 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
+ * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  * @version $Id$
  */
@@ -346,7 +347,7 @@ class DataObject
 	/**
 	 * Check relations for restrictions or cascades
 	 */
-	function check_relations( $what )
+	function check_relations( $what, $ignore = array() )
 	{
 		global $DB, $Messages, $EvoConfig;
 
@@ -356,14 +357,17 @@ class DataObject
 			{	// We have no declaration for this table, we consider we don't deal with this table in this app:
 				continue;
 			}
-			$count = $DB->get_var(
-				'SELECT COUNT(*)
-				   FROM '.$restriction['table'].'
-				  WHERE '.$restriction['fk'].' = '.$this->ID,
-				0, 0, 'restriction/cascade check' );
-			if( $count )
+			if( !in_array( $restriction['fk'], $ignore ) )
 			{
-				$Messages->add( sprintf( $restriction['msg'], $count ), 'restrict' );
+				$count = $DB->get_var(
+					'SELECT COUNT(*)
+					   FROM '.$restriction['table'].'
+					  WHERE '.$restriction['fk'].' = '.$this->ID,
+					0, 0, 'restriction/cascade check' );
+				if( $count )
+				{
+					$Messages->add( sprintf( $restriction['msg'], $count ), 'restrict' );
+				}
 			}
 		}
 	}
@@ -372,14 +376,16 @@ class DataObject
 	/**
 	 * Check relations for restrictions before deleting
 	 *
+	 * @param string
+	 * @param array list of foreign keys to ignore
 	 * @return boolean true if no restriction prevents deletion
 	 */
-	function check_delete( $restrict_title )
+	function check_delete( $restrict_title, $ignore = array() )
 	{
 		global $Messages;
 
 		// Check restrictions:
-		$this->check_relations( 'delete_restrictions' );
+		$this->check_relations( 'delete_restrictions', $ignore );
 
 		if( $Messages->count('restrict') )
 		{	// There are restrictions:
@@ -419,14 +425,14 @@ class DataObject
 		$Form = & new Form( '', '', 'get', '' );
 
 		$Form->begin_form( 'inline' );
-			$Form->hiddens( $hiddens );
+			$Form->hiddens_by_key( $hiddens );
 			$Form->hidden( 'action', $delete_action );
 			$Form->hidden( 'confirm', 1 );
 			$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
 
 		$Form->begin_form( 'inline' );
-			$Form->hiddens( $hiddens );
+			$Form->hiddens_by_key( $hiddens );
 			$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 		$Form->end_form();
 
@@ -653,8 +659,8 @@ function object_history( $pos_lastedit_user_ID, $pos_datemodified )
 
 /*
  * $Log$
- * Revision 1.31  2005/12/05 18:17:19  fplanque
- * Added new browsing features for the Tracker Use Case.
+ * Revision 1.32  2005/12/12 19:21:21  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
  * Revision 1.30  2005/11/28 07:39:43  blueyed
  * doc, normalization

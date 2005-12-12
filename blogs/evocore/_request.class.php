@@ -29,6 +29,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
+ * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  * @version $Id$
  */
@@ -179,6 +180,80 @@ class Request
 		return $this->params[$var];
 	}
 
+
+	/**
+ 	 * Sets a time parameter with the value from the request of the var argument or of the concat of the var argument_h: var argument_mn: var argument_s , 
+	 * except if param is already set!  
+	 *
+	 * @param string Variable to set
+	 * @param mixed Default value or TRUE if user input required
+	 * @param boolean Do we need to memorize this to regenerate the URL for this page?
+	 * @param boolean Override if variable already set
+	 * @param boolean Force setting of variable to default?
+	 * @return mixed Final value of Variable, or false if we don't force setting and did not set
+	 */
+	function param_time( $var, $default = '', $memorize = false,	$override = false, $forceset = true )
+	{
+		global $$var;
+		
+		if( $this->param( $var, '', $default, $memorize, $override, $forceset ) )
+		{
+			return $this->params[$var]; 
+		}
+		elseif ( ( $time_h = param( $var.'_h' ) ) && ( $time_mn = param( $var.'_mn' ) ) && ( $time_s = param ( $var.'_s', '', '00' ) ) )   
+		{
+			$$var = $time_h.':'.$time_mn.':'.$time_s;
+			$this->params[$var] = $$var;
+			return $$var;
+		}
+		else 
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * set a parameter with the second part(X2) of the value from request ( X1-X2 )
+	 * 
+	 * @param string Variable to set
+	 * 
+	 */
+	function param_child_select_value( $var )
+	{
+		global $$var;
+		
+		if( $val = param( $var, 'string' ) )
+		{ // keep only the second part of val
+			preg_match( '/^[0-9]+-([0-9]+)$/', $val, $res );
+			
+			if( isset( $res[1] ) )
+			{ //set to the var the second part of val
+				$$var = $res[1];
+				$this->params[$var] = $res[1];
+				return $$var;
+			}
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * Check if the value is a file name
+	 * 
+	 * @param string param name
+	 * @param string error message
+	 * @return boolean true if OK
+	 */
+	function param_isFilename( $var, $err_msg )
+	{
+		if( $error_filename = validate_filename( $this->params[$var] ) )
+		{
+			$this->param_error( $var, $error_filename );
+			return false;
+		}
+		return true;
+	}
+	
 
 	/**
 	 * Get the action from param.
@@ -664,6 +739,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.26  2005/12/12 19:21:23  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.25  2005/12/10 02:48:51  blueyed
  * Added param_action()
  *

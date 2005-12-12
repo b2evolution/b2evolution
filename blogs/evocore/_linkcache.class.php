@@ -23,7 +23,7 @@
  *
  * @package evocore
  *
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  *
  * @version $Id$
  */

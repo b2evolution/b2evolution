@@ -7,7 +7,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 $trans['fr_FR'] = array(
-	'' => "Project-Id-Version: b2evolution 0.9\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2005-11-24 16:43+0100\nPO-Revision-Date: 2005-11-24 16:50+0100\nLast-Translator: Francois PLANQUE <http://fplanque.net/>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\nX-Poedit-Language: French\nX-Poedit-Country: FRANCE\nX-Poedit-SourceCharset: iso-8859-1\n",
+	'' => "Project-Id-Version: b2evolution 0.9\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2005-11-24 16:43+0100\nPO-Revision-Date: 2005-11-24 16:50+0100\nLast-Translator: Francois PLANQUE <http://fplanque.net/>\nLanguage-Team: Francois PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\nX-Poedit-Language: French\nX-Poedit-Country: FRANCE\nX-Poedit-SourceCharset: iso-8859-1\n",
 	'Selected' => "Sélectionné",
 	'Categories' => "Catégories",
 	'Permanent link to full entry' => "Lien permanent vers l'article complet",

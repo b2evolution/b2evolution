@@ -26,7 +26,7 @@
  * @package plugins
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE - {@link http://fplanque.net/}
+ * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  * @author cafelog (team) - http://cafelog.com/
  *
  * @version $Id$

@@ -43,7 +43,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  * @author vegarg: Vegar BERG GULDAL
  *
  * @version $Id$
@@ -945,6 +945,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.12  2005/12/12 19:21:20  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.11  2005/12/03 12:35:02  blueyed
  * Fix displaying of Message when changing hit type to search. Closes: http://dev.b2evolution.net/todo.php/2005/12/02/changin_hit_type_to_search
  *

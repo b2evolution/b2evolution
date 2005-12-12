@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -35,7 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  *
  * @version $Id$
  */
@@ -112,11 +112,11 @@ class DataObjectCache
 		{
 			if( $objtype == 'Element' )
 			{ // Instanciate a dataobject with its params:
-				$this->cache[ $row->$dbIDname ] = new Element( $this->dbtablename, $this->dbprefix, $this->dbIDname, $row ); // COPY!
+				$this->add( new Element( $this->dbtablename, $this->dbprefix, $this->dbIDname, $row ) );
 			}
 			else
 			{ // Instantiate a custom object
-				$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
+				$this->add( new $objtype( $row ) );
 			}
 			// $obj = $this->cache[ $row->$dbIDname ];
 			// $obj->disp( 'name' );
@@ -153,7 +153,7 @@ class DataObjectCache
 		$objtype = $this->objtype;
 		foreach( $DB->get_results( $sql ) as $row )
 		{
-			$this->cache[ $row->$dbIDname ] = new $objtype( $row ); // COPY!
+			$this->add( new $objtype( $row ) );
 			// $obj = $this->cache[ $row->$dbIDname ];
 			// $obj->disp( 'name' );
 		}
@@ -279,12 +279,13 @@ class DataObjectCache
 			{ // Load just the requested object:
 				$Debuglog->add( "Loading <strong>$this->objtype($req_ID)</strong> into cache", 'dataobjects' );
 				// Note: $req_ID MUST be an unsigned integer. This is how DataObject works.
-				$sql = "SELECT * FROM $this->dbtablename WHERE $this->dbIDname = $req_ID";
+				$sql = "SELECT *
+				          FROM $this->dbtablename
+				         WHERE $this->dbIDname = $req_ID";
 
 				if( $row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_ID()' ) )
 				{
-					//$Debuglog->add( 'success', 'dataobjects' );
-					if( ! $this->add( new $this->objtype( $row ) ) )
+					if( ! $this->instantiate( $row ) )
 					{
 						$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
 					}
@@ -447,8 +448,8 @@ class DataObjectCache
 
 /*
  * $Log$
- * Revision 1.31  2005/12/05 18:17:19  fplanque
- * Added new browsing features for the Tracker Use Case.
+ * Revision 1.32  2005/12/12 19:21:21  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
  * Revision 1.30  2005/11/18 18:26:38  fplanque
  * no message

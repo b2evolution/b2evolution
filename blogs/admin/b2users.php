@@ -33,7 +33,7 @@
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
  *
@@ -595,6 +595,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.119  2005/12/12 19:21:20  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.118  2005/12/08 22:26:07  blueyed
  * Fix E_STRICT (assigning "new" by reference is deprecated)
  *

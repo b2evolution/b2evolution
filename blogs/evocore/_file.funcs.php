@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -35,7 +35,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
  */
@@ -480,10 +480,11 @@ function validate_file_extension( $filename, & $extension )
  * Return the path without the leading {@link $basepath}, or if not
  * below {@link $basepath}, just the basename of it.
  *
+ *         Do not use this for file handling. but "just" displaying!
+ *
  * @param string Path
  * @return string Relative path or even base name.
  *   NOTE: when $debug, the real path gets appended.
- *         Do not use this for file handling. but "just" displaying!
  */
 function rel_path_to_base( $path )
 {
@@ -510,6 +511,9 @@ function rel_path_to_base( $path )
 
 /*
  * $Log$
+ * Revision 1.37  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.36  2005/12/08 22:35:23  blueyed
  * Merged rel_path_to_base() from post-phoenix
  *

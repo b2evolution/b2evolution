@@ -27,7 +27,7 @@
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  *
  * @version $Id$
  */
@@ -215,6 +215,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.57  2005/12/12 19:21:20  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.56  2005/12/08 22:23:44  blueyed
  * Merged 1-2-3-4 scheme from post-phoenix
  *

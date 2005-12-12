@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * PROGIDISTRI grants François PLANQUE the right to license
+ * PROGIDISTRI grants Francois PLANQUE the right to license
  * PROGIDISTRI's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -1250,8 +1250,8 @@ class Results extends Widget
 
 /*
  * $Log$
- * Revision 1.42  2005/12/05 18:17:19  fplanque
- * Added new browsing features for the Tracker Use Case.
+ * Revision 1.43  2005/12/12 19:21:23  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
  * Revision 1.40  2005/11/23 23:29:16  blueyed
  * Sorry, encoding messed up.

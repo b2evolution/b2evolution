@@ -36,7 +36,7 @@
  * @package htsrv
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  *
  * @todo integrate it into the skins to avoid ugly die() on error and confusing redirect on success.
  *

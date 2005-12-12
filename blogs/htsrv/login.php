@@ -26,11 +26,11 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  *
- * Matt FOLLETT grants François PLANQUE the right to license
+ * Matt FOLLETT grants Francois PLANQUE the right to license
  * Matt FOLLETT's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -39,7 +39,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  * @author mfollett: Matt FOLLETT.
  *
  * @todo Actions 'retrievepassword' / 'changepwd': bind this to {@link $Session} rather than to a single IP! (blueyed)
@@ -70,6 +70,7 @@ switch( $action )
 		logout();          // logout $Session and set $current_User = false
 		header_nocache();  // defaults to redirect_to param
 		header_redirect(); // exits
+		/* exited */
 
 
 	case 'lostpassword': // Lost password:

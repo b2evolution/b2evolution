@@ -48,12 +48,12 @@
  * A $10 donation has been made to Justin VINCENT on behalf of the b2evolution team.
  * The package has been relicensed as GPL based on
  * "You may do what you like with ezSQL - no exceptions."
- * 2004-10-14 (email): Justin VINCENT grants François PLANQUE the right to relicense
+ * 2004-10-14 (email): Justin VINCENT grants Francois PLANQUE the right to relicense
  * this modified class under other licenses. "Just include a link to where you got it from."
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -62,7 +62,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
- * @author fplanque: François PLANQUE
+ * @author fplanque: Francois PLANQUE
  * @author Justin VINCENT
  *
  * @version $Id$
@@ -1161,6 +1161,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.48  2005/12/12 19:21:21  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
  * Revision 1.47  2005/12/12 01:18:04  blueyed
  * Counter for $Timer; ignore absolute times below 0.005s; Fix for Timer::resume().
  *
