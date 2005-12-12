@@ -212,9 +212,12 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 		else
 		{
 		?>
-			<p><strong><input type="checkbox" name="delhits" value="1" checked="checked" />
-			<?php printf ( T_('Delete the following %d referer hits:'), $DB->num_rows ) ?>
-			</strong></p>
+			<p>
+				<input type="checkbox" name="delhits" id="delhits_cb" value="1" checked="checked" />
+				<label for="delhits_cb">
+				<strong><?php printf ( T_('Delete the following %d referer hits:'), $DB->num_rows ) ?></strong>
+				</label>
+			</p>
 			<table class="grouped" cellspacing="0">
 				<thead>
 				<tr>
@@ -262,9 +265,12 @@ if( !$Messages->count('error') && $action == 'ban' && !( $delhits || $delcomment
 		else
 		{
 		?>
-			<p><strong><input type="checkbox" name="delcomments" value="1" checked="checked" />
-			<?php printf ( T_('Delete the following %d comments:'), count($res_affected_comments) ) ?>
-			</strong></p>
+			<p>
+				<input type="checkbox" name="delcomments" id="delcomments_cb" value="1" checked="checked" />
+				<label for="delcomments_cb">
+				<strong><?php printf ( T_('Delete the following %d comments:'), count($res_affected_comments) ) ?></strong>
+				</label>
+			</p>
 			<table class="grouped" cellspacing="0">
 				<thead>
 				<tr>
