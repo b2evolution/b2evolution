@@ -74,7 +74,7 @@ class Timer
 	 */
 	function reset( $category )
 	{
-		$this->_times[$category] = array( 'total' => 0 );
+		$this->_times[$category] = array( 'total' => 0, 'count' => 0 );
 	}
 
 
@@ -141,16 +141,21 @@ class Timer
 		{
 			$this->start($category);
 		}
-		$this->_times[$category]['resumed'] = $this->get_current_microtime();
+		else
+		{
+			$this->_times[$category]['resumed'] = $this->get_current_microtime();
+			$this->_times[$category]['count']++;
 
-		$this->_times[$category]['state'] = 'running';
+			$this->_times[$category]['state'] = 'running';
+		}
 	}
 
 
 	/**
+	 * Display the time for a given category.
 	 *
-	 *
-	 * @return
+	 * @param string Category name
+	 * @param integer Number of decimals after dot.
 	 */
 	function display_time( $category, $decimals = 3 )
 	{
@@ -159,13 +164,31 @@ class Timer
 
 
 	/**
+	 * Get the duration for a given category.
 	 *
-	 *
+	 * @param string Category name
+	 * @param integer Number of decimals after dot.
 	 * @return string
 	 */
 	function get_duration( $category, $decimals = 3 )
 	{
 		return number_format( $this->get_microtime($category), $decimals ); // TODO: decimals/seperator by locale!
+	}
+
+
+	/**
+	 * Get number of timer resumes (includes start).
+	 *
+	 * @return integer
+	 */
+	function get_count( $category )
+	{
+		if( isset( $this->_times[$category] ) )
+		{
+			return $this->_times[$category]['count'];
+		}
+
+		return false;
 	}
 
 
@@ -238,6 +261,9 @@ class Timer
 
 /*
  * $Log$
+ * Revision 1.5  2005/12/12 01:18:04  blueyed
+ * Counter for $Timer; ignore absolute times below 0.005s; Fix for Timer::resume().
+ *
  * Revision 1.4  2005/11/17 01:17:38  blueyed
  * Replaced main/sql-query times with dynamic timer table in debug_info()
  *

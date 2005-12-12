@@ -329,11 +329,6 @@ class DB
 	{
 		global $Timer;
 
-		if( is_object($Timer) )
-		{
-			$Timer->resume( 'sql_queries' );
-		}
-
 		if( !@mysql_select_db($db, $this->dbhandle) )
 		{
 			$this->print_error( '<p><strong>Error selecting database ['.$db.']!</strong></p>
@@ -341,11 +336,6 @@ class DB
 					<li>Are you sure the database exists?</li>
 					<li>Are you sure there is a valid database connection?</li>
 				</ol>' );
-		}
-
-		if( is_object($Timer) )
-		{
-			$Timer->pause( 'sql_queries' );
 		}
 	}
 
@@ -489,8 +479,6 @@ class DB
 
 	/**
 	 * Basic Query
-	 *
-	 * {@internal DB::query(-) }}
 	 *
 	 * @param string SQL query
 	 * @param string title for debugging
@@ -1006,8 +994,6 @@ class DB
 
 	/**
 	 * Displays all queries that have been executed
-	 *
-	 * {@internal DB::dump_queries(-) }}
 	 */
 	function dump_queries()
 	{
@@ -1175,6 +1161,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.47  2005/12/12 01:18:04  blueyed
+ * Counter for $Timer; ignore absolute times below 0.005s; Fix for Timer::resume().
+ *
  * Revision 1.46  2005/12/05 16:04:35  blueyed
  * get_row(): return NULL on empty results for OBJECT-type return value.
  *

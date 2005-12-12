@@ -137,7 +137,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 			break;
 
 		default:
-			die( 'Output format ['.$format.'] not supported.' );
+			debug_die( 'Output format ['.$format.'] not supported.' );
 	}
 
 	return $content;
@@ -946,7 +946,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		}
 		elseif( $default === true )
 		{
-			die( '<p class="error">'.sprintf( T_('Parameter &laquo;%s&raquo; is required!'), $var ).'</p>' );
+			debug_die( '<p class="error">'.sprintf( T_('Parameter &laquo;%s&raquo; is required!'), $var ).'</p>' );
 		}
 		elseif( $forceset )
 		{
@@ -1509,23 +1509,30 @@ function debug_info( $force = false )
 				$timer_rows[ $l_cat ] = $Timer->get_duration( $l_cat );
 			}
 			arsort( $timer_rows );
-			echo '<table><thead><tr><th colspan="3" class="center">Timers</th></tr></thead><tbody>';
+			echo '<table><thead>'
+				.'<tr><th colspan="4" class="center">Timers</th></tr>'
+				.'<tr><th>Category</th><th>Time</th><th>%</th><th>Count</th></tr>'
+				.'</thead><tbody>';
 			$count_ignored = 0;
 			foreach( $timer_rows as $l_cat => $l_time )
 			{
 				$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : 0;
 
-				if( $percent_l_cat < 0.5 )
+				if( $l_time < 0.005 )
 				{
 					$count_ignored++;
 					continue;
 				}
 
-				echo '<tr><td>'.$l_cat.'</td><td class="right">'.$l_time.'</td><td class="right">'.$percent_l_cat.'%</td></tr>';
+				echo "\n<tr>"
+					.'<td>'.$l_cat.'</td>'
+					.'<td class="right">'.$l_time.'</td>'
+					.'<td class="right">'.$percent_l_cat.'%</td>'
+					.'<td class="right">'.$Timer->get_count( $l_cat ).'</td></tr>';
 			}
 			if( $count_ignored )
 			{
-				echo '<tr><td colspan="3" class="center"> + '.$count_ignored.' &lt; 0.5% </td></tr>';
+				echo '<tr><td colspan="4" class="center"> + '.$count_ignored.' &lt; 0.005s </td></tr>';
 			}
 			echo '</tbody>';
 			echo '</table>';
@@ -2262,7 +2269,7 @@ function is_create_action( $action )
 			return false;
 
 		default:
-			die( 'Unhandled action in form: '.strip_tags($action_parts[0]) );
+			debug_die( 'Unhandled action in form: '.strip_tags($action_parts[0]) );
 	}
 }
 
@@ -2323,6 +2330,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.161  2005/12/12 01:18:04  blueyed
+ * Counter for $Timer; ignore absolute times below 0.005s; Fix for Timer::resume().
+ *
  * Revision 1.160  2005/12/11 19:32:41  blueyed
  * Fixed make_clickable() for dots at the end of URLs.
  *
