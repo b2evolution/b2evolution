@@ -38,11 +38,11 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  *
- * The University of North Carolina at Charlotte grants François PLANQUE the right to license
+ * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
@@ -52,7 +52,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
- * @author fplanque: François PLANQUE.
+ * @author fplanque: Francois PLANQUE.
  * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
  * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
  *
@@ -519,6 +519,7 @@ switch( $action )
 	case 'edit_properties':
 		// Edit File properties (Meta Data); this starts the File_properties mode: {{{
 
+// fp>> isn't there a global permission check on file:view that applies to the whole page already?
 		if( ! $current_User->check_perm( 'files', 'view' ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to view files.'), 'error' );
@@ -592,7 +593,7 @@ switch( $action )
 			$selectedFile->load_meta( true );
 
 			// Let's make the link!
-			$edited_Link = new Link();
+			$edited_Link = & new Link();
 			$edited_Link->set( 'item_ID', $edited_Item->ID );
 			$edited_Link->set( 'file_ID', $selectedFile->ID );
 			$edited_Link->dbinsert();
@@ -965,7 +966,10 @@ switch( $Fileman->fm_mode )
 		}
 
 		// Upload dialog:
-		require dirname(__FILE__).'/_files_upload.inc.php';
+		if( ! is_null($Fileman->fm_mode) )
+		{	// we haven't just exited the upload mode...
+			require dirname(__FILE__).'/_files_upload.inc.php';
+		}
 
 		// }}}
 		break;
@@ -1163,6 +1167,7 @@ switch( $Fileman->fm_mode )
 					else
 					{ // move failed
 						$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not move &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ) );
+						// Note: we do not rollback, since unlinking is already done on disk :'(
 					}
 
 					$DB->commit();
@@ -1337,14 +1342,14 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.146  2005/12/12 16:40:17  fplanque
+ * fixed quick upload
+ *
  * Revision 1.145  2005/12/10 03:02:50  blueyed
  * Quick upload mode merged from post-phoenix
  *
  * Revision 1.144  2005/12/06 00:01:56  blueyed
  * Unset action/fm_mode when no FileRoot available.
- *
- * Revision 1.143  2005/12/05 21:05:35  blueyed
- * Whitespace
  *
  * Revision 1.142  2005/12/04 15:49:20  blueyed
  * More descriptive error message when no perms for 'files'/'view'.
@@ -1364,20 +1369,11 @@ require dirname(__FILE__).'/_footer.php';
  * Revision 1.137  2005/11/24 17:56:20  blueyed
  * chmod() the uploaded file
  *
- * Revision 1.136  2005/11/24 14:43:59  fplanque
- * no message
- *
  * Revision 1.135  2005/11/24 13:23:57  blueyed
  * debug_die() for invalid action (only if actionArray given [and invalid])
  *
  * Revision 1.134  2005/11/24 08:54:42  blueyed
  * debug_die() for invalid action; doc
- *
- * Revision 1.133  2005/11/22 16:10:21  fplanque
- * no message
- *
- * Revision 1.132  2005/11/22 15:17:07  fplanque
- * doc
  *
  * Revision 1.131  2005/11/22 04:41:38  blueyed
  * Fix permissions editing again
@@ -1394,9 +1390,6 @@ require dirname(__FILE__).'/_footer.php';
  *
  * Revision 1.119  2005/10/28 02:37:37  blueyed
  * Normalized AbstractSettings API
- *
- * Revision 1.118  2005/09/23 18:28:17  fplanque
- * no message
  *
  * Revision 1.117  2005/09/22 21:35:26  blueyed
  * Fixed another "Only variables can be passed by reference" notice (php4) / fatal error (php5)
@@ -1415,9 +1408,6 @@ require dirname(__FILE__).'/_footer.php';
  *
  * Revision 1.112  2005/06/03 15:12:32  fplanque
  * error/info message cleanup
- *
- * Revision 1.111  2005/05/26 19:11:09  fplanque
- * no message
  *
  * Revision 1.110  2005/05/24 15:26:51  fplanque
  * cleanup
