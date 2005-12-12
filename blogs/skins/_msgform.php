@@ -102,7 +102,7 @@ if( !empty($comment_id) || !empty($post_id) )
 	<?php
 		form_text( 'sender_name', $email_author, 40, T_('From'),  T_('Your name.'), 50, 'bComment' );
 		form_text( 'sender_address', $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'), 100, 'bComment' );
-		form_text( 'subject', $subject, 40, T_('Subject'), T_('Subject of email message.'), 50, 'bComment' );
+		form_text( 'subject', $subject, 40, T_('Subject'), T_('Subject of email message.'), 255, 'bComment' );
 		form_textarea( 'message', '', 15, T_('Message'), T_('Plain text only.'), 40, 'bComment' );
 	?>
 
