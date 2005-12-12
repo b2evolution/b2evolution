@@ -297,7 +297,7 @@ function the_author_posts()
 {
 	global $postdata, $UserCache;
 
-	$User =& $UserCache->get_by_ID($postdata['Author_ID']);
+	$User = & $UserCache->get_by_ID($postdata['Author_ID']);
 	echo $User->get_num_posts();
 }
 
@@ -1365,14 +1365,14 @@ function single_post_title( $prefix = '#', $display = 'htmlhead' )
 	}
 	elseif( intval($p) )
 	{
-		if( $Item = $ItemCache->get_by_ID( $p, false ) )
+		if( $Item = & $ItemCache->get_by_ID( $p, false ) )
 		{
 			$disp_title = $Item->get('title');
 		}
 	}
 	elseif( !empty( $title ) )
 	{
-		if( $Item = $ItemCache->get_by_urltitle( $title, false ) )
+		if( $Item = & $ItemCache->get_by_urltitle( $title, false ) )
 		{
 			$disp_title = $Item->get('title');
 		}
@@ -1632,6 +1632,9 @@ $b2_version = $app_version;
 
 /*
  * $Log$
+ * Revision 1.20  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.19  2005/12/09 13:48:27  blueyed
  * Added $b2_version = $app_version, because this is often missed (even on skins.b2evolution.net).
  *

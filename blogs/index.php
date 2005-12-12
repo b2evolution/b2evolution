@@ -34,7 +34,7 @@ if( empty($blog) )
 	if( preg_match( '#^(.+?)index.php/([^/]+)#', $ReqHostPath, $matches ) )
 	{ // We have an URL blog name:
 		$Debuglog->add( 'Found a potential URL blog name: '.$matches[2], 'detectblog' );
-		if( (($Blog = $BlogCache->get_by_urlname( $matches[2], false )) !== false) )
+		if( (($Blog = & $BlogCache->get_by_urlname( $matches[2], false )) !== false) )
 		{ // We found a matching blog:
 			$blog = $Blog->ID;
 		}
@@ -52,7 +52,7 @@ if( empty($blog) )
 		}
 		$Debuglog->add( 'Looking up absolute url : '.$ReqAbsUrl, 'detectblog' );
 
-		if( (($Blog =& $BlogCache->get_by_url( $ReqAbsUrl, false )) !== false) )
+		if( (($Blog = & $BlogCache->get_by_url( $ReqAbsUrl, false )) !== false) )
 		{ // We found a matching blog:
 			$blog = $Blog->ID;
 			$Debuglog->add( 'Found matching blog: '.$blog, 'detectblog' );

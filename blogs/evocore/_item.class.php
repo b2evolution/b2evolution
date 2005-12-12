@@ -403,7 +403,7 @@ class Item extends DataObject
 
 		if( empty( $blogurl ) )
 		{
-			$current_Blog = $BlogCache->get_by_ID( $this->blog_ID );
+			$current_Blog = & $BlogCache->get_by_ID( $this->blog_ID );
 			$blogurl = $current_Blog->gen_blogurl();
 		}
 
@@ -651,7 +651,7 @@ class Item extends DataObject
 
 			if( $link_title )
 			{ // we want to display links
-				$lBlog =& $BlogCache->get_by_ID( $cat['cat_blog_ID'] );
+				$lBlog = & $BlogCache->get_by_ID( $cat['cat_blog_ID'] );
 				$cat_name = '<a href="'.url_add_param( $lBlog->get('blogurl'), 'cat='.$cat_ID ).'" title="'.$link_title.'">'.$cat_name.'</a>';
 			}
 
@@ -763,7 +763,7 @@ class Item extends DataObject
 		}
 
 		global $BlogCache;
-		$current_Blog = $BlogCache->get_by_ID( $this->blog_ID );
+		$current_Blog = & $BlogCache->get_by_ID( $this->blog_ID );
 		if ($current_Blog->allowcomments == 'never')
 			return false;
 
@@ -1243,7 +1243,7 @@ class Item extends DataObject
 				break;
 
 			case 'trackbacks':
-				$current_Blog =& $BlogCache->get_by_ID( $this->blog_ID );
+				$current_Blog = & $BlogCache->get_by_ID( $this->blog_ID );
 				if( ! $current_Blog->get( 'allowtrackbacks' ) )
 				{ // Trackbacks not allowed on this blog:
 					return;
@@ -1256,7 +1256,7 @@ class Item extends DataObject
 				break;
 
 			case 'pingbacks':
-				$current_Blog = $BlogCache->get_by_ID( $this->blog_ID );
+				$current_Blog = & $BlogCache->get_by_ID( $this->blog_ID );
 				if( ! $current_Blog->get( 'allowpingbacks' ) )
 				{ // Pingbacks not allowed on this blog:
 					return;
@@ -1694,7 +1694,7 @@ class Item extends DataObject
 	{
 		global $itemTypeCache, $object_def;
 
-		$Element = $itemTypeCache->get_by_ID( $this->typ_ID, true, !$object_def[$this->objtype]['allow_null']['typ_ID'] /* Do we allow NULL statuses for this object?: */ );
+		$Element = & $itemTypeCache->get_by_ID( $this->typ_ID, true, !$object_def[$this->objtype]['allow_null']['typ_ID'] /* Do we allow NULL statuses for this object?: */ );
 		if( !$Element )
 		{ // No status:
 			return;
@@ -2301,7 +2301,7 @@ class Item extends DataObject
 				return T_( $post_statuses[$this->status] );
 
 			case 't_extra_status':
-				if( ! ($Element = $itemStatusCache->get_by_ID( $this->st_ID, true,
+				if( ! ($Element = & $itemStatusCache->get_by_ID( $this->st_ID, true,
 							/* Do we allow NULL statuses for this object?: */ !$object_def[$this->objtype]['allow_null']['st_ID'] ) ) )
 				{ // No status:
 					return '';
@@ -2331,6 +2331,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.77  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.76  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

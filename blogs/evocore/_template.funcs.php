@@ -118,14 +118,14 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			}
 			elseif( intval($p) )
 			{	// We are requesting a specific post by ID:
-				if( $Item = $ItemCache->get_by_ID( $p, false ) )
+				if( $Item = & $ItemCache->get_by_ID( $p, false ) )
 				{
 					$r[] = T_('Post details').': '.$Item->get('title');
 				}
 			}
 			elseif( !empty( $title ) )
 			{	// We are requesting a specific post by title:
-				if( $Item = $ItemCache->get_by_urltitle( $title, false ) )
+				if( $Item = & $ItemCache->get_by_urltitle( $title, false ) )
 				{
 					$r[] = T_('Post details').': '.$Item->get('title');
 				}
@@ -310,6 +310,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.14  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.13  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

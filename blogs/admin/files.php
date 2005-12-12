@@ -150,7 +150,7 @@ if( $action == 'update_settings' )
  */
 if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 {
-	if( ($edited_Link = $LinkCache->get_by_ID( $link_ID, false )) === false )
+	if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) === false )
 	{	// We could not find the link to edit:
 		$Messages->head = T_('Cannot edit link!');
 		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
@@ -1346,6 +1346,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.148  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.147  2005/12/12 17:57:22  fplanque
  * fixed bug with delete (when some links prevent deletion)
  *

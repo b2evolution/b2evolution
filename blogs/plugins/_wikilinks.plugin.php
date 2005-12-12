@@ -134,7 +134,7 @@ class wikilinks_plugin extends Plugin
 
 
 				// Find matching Item:
-				if( ($Item = $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
+				if( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
 				{ // Item Found
 					$permalink = $Item->get_permalink();
 
@@ -213,7 +213,7 @@ class wikilinks_plugin extends Plugin
 
 
 			// Find matching Item:
-			if( ($Item = $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
+			if( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
 			{ // Item Found
 				$permalink = $Item->get_permalink();
 

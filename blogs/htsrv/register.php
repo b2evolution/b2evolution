@@ -97,7 +97,7 @@ switch( $action )
 			$new_User->set( 'locale', $locale );
 			$newusers_grp_ID = $Settings->get('newusers_grp_ID');
 			// echo $newusers_grp_ID;
-			$new_user_Group = $GroupCache->get_by_ID( $newusers_grp_ID );
+			$new_user_Group = & $GroupCache->get_by_ID( $newusers_grp_ID );
 			// echo $new_user_Group->disp('name');
 			$new_User->setGroup( $new_user_Group );
 			$new_User->dbinsert();

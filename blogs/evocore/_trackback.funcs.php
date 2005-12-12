@@ -98,7 +98,7 @@ function trackback(
 	$title = rawurlencode($title);
 	$excerpt = rawurlencode($excerpt);
 	$blog_name = rawurlencode(get_bloginfo('name'));
-	$Item = $ItemCache->get_by_ID( $ID );
+	$Item = & $ItemCache->get_by_ID( $ID );
 	$url = rawurlencode( $Item->get_permalink('', '', false, '&') );
 	// dis is the trackback stuff to be sent:
 	$query_string = "title=$title&url=$url&blog_name=$blog_name&excerpt=$excerpt";
@@ -237,6 +237,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.15  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.14  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

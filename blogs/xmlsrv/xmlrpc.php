@@ -311,7 +311,7 @@ function b2_getPostURL($m)
 				'Permission denied.' );
 	}
 
-	if( ( $Item = $ItemCache->get_by_ID( $post_ID ) ) === false )
+	if( ( $Item = & $ItemCache->get_by_ID( $post_ID ) ) === false )
 	{ // Post does not exist
 		return new xmlrpcresp(0, $xmlrpcerruser+7,
 						'This post ID ('.$post_ID.') does not correspond to any post here.' );
@@ -514,7 +514,7 @@ function bloggereditpost($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	if( ! ($edited_Item = $ItemCache->get_by_ID( $post_ID ) ) )
+	if( ! ($edited_Item = & $ItemCache->get_by_ID( $post_ID ) ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$post_ID)."); // user error 7
 	}
@@ -673,7 +673,7 @@ function bloggerdeletepost($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 
-	if( ! ($edited_Item = $ItemCache->get_by_ID( $post_ID, false ) ) )
+	if( ! ($edited_Item = & $ItemCache->get_by_ID( $post_ID, false ) ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+7, 'No such post.');	// user error 7
 	}
@@ -1314,7 +1314,7 @@ function pingback_ping( $m )
 		$blog = $postdata['Blog'];
 		xmlrpc_debugmsg( 'Blog='.$blog );
 
-		$tBlog =& $BlogCache->get_by_ID( $blog );
+		$tBlog = & $BlogCache->get_by_ID( $blog );
 		if( !$tBlog->get('allowpingbacks') )
 		{
 			return new xmlrpcresp(new xmlrpcval('Sorry, this weblog does not allow you to pingback its posts.'));
@@ -1428,7 +1428,7 @@ function pingback_ping( $m )
 							$recipient = $AuthorUser->get( 'email' );
 							$subject = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] );
 
-							$comment_Blog =& $BlogCache->get_by_ID( $blog );
+							$comment_Blog = & $BlogCache->get_by_ID( $blog );
 
 							$notify_message  = sprintf( T_('New pingback on your post #%d "%s"'), $post_ID, $postdata['Title'] )."\n";
 							$notify_message .= url_add_param( $comment_Blog->get('blogurl'), "p=$post_ID&pb=1\n\n", '&' );
@@ -1842,7 +1842,7 @@ function mt_setPostCategories($m) {
 	// Nb! category is the primary - categories the secondaries, first i.e. zeroeth categories ir also primary
 //	bpost_update( $post_ID, $post_title, $content, $now, $category, $categories, 'published', '#', '', 0, 'pingsdone', '', '', 'open'  );
 
-	if( ! ($edited_Item = $ItemCache->get_by_ID( $post_ID ) ) )
+	if( ! ($edited_Item = & $ItemCache->get_by_ID( $post_ID ) ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$post_ID)."); // user error 7
 	}
@@ -2019,7 +2019,7 @@ function mweditpost($m)
 					 'Wrong username/password combination '.$username.' / '.starify($password));
 	}
 	logIO("O","finished checking password ...");
-	if( ! ($edited_Item = $ItemCache->get_by_ID( $blogid ) ) )
+	if( ! ($edited_Item = & $ItemCache->get_by_ID( $blogid ) ) )
 	{
 		return new xmlrpcresp(0, $xmlrpcerruser+7, "No such post (#$blogid)."); // user error 7
 	}
@@ -2514,6 +2514,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.85  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.84  2005/12/11 19:59:51  blueyed
  * Renamed gen_permalink() to get_permalink()
  *

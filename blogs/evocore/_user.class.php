@@ -186,7 +186,7 @@ class User extends DataObject
 			$this->showonline = $db_row->user_showonline;
 
 			// Group for this user:
-			$this->Group = $GroupCache->get_by_ID( $db_row->user_grp_ID );
+			$this->Group = & $GroupCache->get_by_ID( $db_row->user_grp_ID );
 		}
 	}
 
@@ -926,6 +926,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.56  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.55  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

@@ -25,7 +25,7 @@ $show_statuses = array( 'published', 'protected', 'private', 'draft', 'deprecate
  */
 if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 {
-	if( ($edited_Link = $LinkCache->get_by_ID( $link_ID, false )) === false )
+	if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) === false )
 	{	// We could not find the linke to edit:
 		$Messages->head = T_('Cannot edit link!');
 		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
@@ -63,7 +63,7 @@ switch($action)
 		 * Display post editing form
 		 */
 		param( 'post', 'integer', true, true );
-		$edited_Item = $ItemCache->get_by_ID( $post );
+		$edited_Item = & $ItemCache->get_by_ID( $post );
 		$post_locale = $edited_Item->get( 'locale' );
 		$cat = $edited_Item->get( 'main_cat_ID' );
 		$blog = get_catblog($cat);

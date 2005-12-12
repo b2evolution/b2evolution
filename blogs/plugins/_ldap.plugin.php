@@ -275,7 +275,7 @@ class ldap_plugin extends Plugin
 						{ // we want to create a new group matching the assign-by info
 							$this->debug_log( 'Group with that name does not exist yet.' );
 
-							if( $new_Group = $GroupCache->get_by_name($this->template_group_name_for_unmatched_assign) ) // COPY!
+							if( $new_Group = & $GroupCache->get_by_name($this->template_group_name_for_unmatched_assign) ) // COPY!
 							{ // take a copy of the Group to use as template
 								$this->debug_log( 'Using Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; as template.' );
 								$new_Group->set( 'ID', 0 ); // unset ID (to allow inserting)
@@ -305,7 +305,7 @@ class ldap_plugin extends Plugin
 
 					if( ! $users_Group )
 					{ // either $this->default_group_name is not given or wrong
-						$users_Group = $GroupCache->get_by_ID( $Settings->get('newusers_grp_ID') );
+						$users_Group = & $GroupCache->get_by_ID( $Settings->get('newusers_grp_ID') );
 					}
 
 					$NewUser->setGroup( $users_Group );

@@ -890,7 +890,7 @@ param( 'mode', 'string', 'normal' );
 							$new_user->set('nickname', $usersmapped[ $post_author ][1]);
 							$new_user->set('pass', md5( $default_password ));
 							$new_user->set('level', $default_userlevel);
-							$new_user_Group =& $GroupCache->get_by_ID( $default_usergroup );
+							$new_user_Group = & $GroupCache->get_by_ID( $default_usergroup );
 							$new_user->setGroup( $new_user_Group );
 
 							if( !$simulate )

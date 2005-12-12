@@ -73,7 +73,7 @@ class Link extends DataObject
 			// source of link:
 			$this->Item     = & $ItemCache->get_by_ID( $db_row->link_item_ID );
 
-			$this->File          = & $FileCache->get_by_ID( $db_row->link_file_ID, true, false );
+			$this->File     = & $FileCache->get_by_ID( $db_row->link_file_ID, true, false );
 		}
 		else
 		{	// New object:
@@ -121,6 +121,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.10  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

@@ -247,7 +247,7 @@ class FileManager extends Filelist
 			}
 			elseif( $root_parts[0] == 'blog' && isset($root_parts[1]) )
 			{
-				$tBlog = $BlogCache->get_by_ID( $root_parts[1] );
+				$tBlog = & $BlogCache->get_by_ID( $root_parts[1] );
 				$this->_root_type = 'collection';
 				$this->_root_ID = $tBlog->ID;
 				$this->_ads_root_path = $tBlog->get( 'mediadir' );
@@ -1358,6 +1358,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.70  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.69  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

@@ -709,7 +709,7 @@ function the_categories( $link_title = '#',				// false if you want no links
 
 		if( $link_title && !$preview)
 		{ // we want to display links
-			$lBlog =& $BlogCache->get_by_ID( $cat['cat_blog_ID'] );
+			$lBlog = & $BlogCache->get_by_ID( $cat['cat_blog_ID'] );
 			$cat_name = '<a href="'.url_add_param( $lBlog->get('blogurl'), 'cat='.$cat_ID ).'" title="'.$link_title.'">'.$cat_name.'</a>';
 		}
 
@@ -946,6 +946,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.28  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.27  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

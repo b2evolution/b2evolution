@@ -125,7 +125,7 @@ $Form->begin_fieldset( T_('Access parameters') );
 	if( $default_blog_ID = $Settings->get('default_blog_ID') )
 	{
 		$Debuglog->add('Default blog is set to: '.$default_blog_ID);
-		if( $default_Blog = $BlogCache->get_by_ID($default_blog_ID, false) )
+		if( $default_Blog = & $BlogCache->get_by_ID($default_blog_ID, false) )
 		{ // Default blog exists
 			$defblog = $default_Blog->dget('shortname');
 		}

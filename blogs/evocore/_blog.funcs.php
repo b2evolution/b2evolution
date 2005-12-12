@@ -422,11 +422,11 @@ function get_bloginfo( $show = '', $this_blogparams = '' )
 		if( isset( $Blog ) )
 			$current_Blog = & $Blog;
 		else
-			$current_Blog = $BlogCache->get_by_ID($blog);
+			$current_Blog = & $BlogCache->get_by_ID($blog);
 	}
 	else
 	{
-		$current_Blog = $BlogCache->get_by_ID($this_blogparams->blog_ID);
+		$current_Blog = & $BlogCache->get_by_ID($this_blogparams->blog_ID);
 	}
 
 	return $current_Blog->get( $show );
@@ -650,6 +650,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.21  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.20  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

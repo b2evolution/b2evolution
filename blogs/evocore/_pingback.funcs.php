@@ -87,7 +87,7 @@ function pingback(
 		$x_pingback_str = 'x-pingback: ';
 		$pingback_href_original_pos = 27;
 
-		$Item = $ItemCache->get_by_ID( $post_ID );
+		$Item = & $ItemCache->get_by_ID( $post_ID );
 		$pagelinkedfrom = $Item->get_permalink();
 
 		if( !empty($post_url) )
@@ -368,6 +368,9 @@ function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 
 /*
  * $Log$
+ * Revision 1.11  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.10  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

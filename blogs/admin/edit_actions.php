@@ -165,7 +165,7 @@ switch($action)
 
 		// UPDATE POST:
 		$Request->param( 'post_ID', 'integer', true );
-		$edited_Item = $ItemCache->get_by_ID( $post_ID );
+		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
 
 		// Set the params we already got:
 		$edited_Item->set( 'status', $post_status );
@@ -249,7 +249,7 @@ switch($action)
 		 * PUBLISH POST NOW
 		 */
 		$Request->param( 'post_ID', 'integer', true );
-		$edited_Item = $ItemCache->get_by_ID( $post_ID );
+		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
 
 		$post_cat = $edited_Item->main_cat_ID;
 		$blog = get_catblog($post_cat);
@@ -337,7 +337,7 @@ switch($action)
 		 * DEPRECATE POST
 		 */
 		$Request->param( 'post_ID', 'integer', true );
-		$edited_Item = $ItemCache->get_by_ID( $post_ID );
+		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
 
 		$post_cat = $edited_Item->main_cat_ID;
 		$blog = get_catblog($post_cat);
@@ -378,7 +378,7 @@ switch($action)
 
 		param( 'post', 'integer' );
 		// echo $post;
-		if( ! ($edited_Item = $ItemCache->get_by_ID( $post, false ) ) )
+		if( ! ($edited_Item = & $ItemCache->get_by_ID( $post, false ) ) )
 		{
 			echo '<div class="panelinfo"><p class="error">'.( T_('Oops, no post with this ID!') ).'</p></div>';
 			break;
@@ -515,6 +515,9 @@ require( dirname(__FILE__) . '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.81  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.80  2005/11/21 18:16:29  fplanque
  * okay, a TWO liner :P
  *

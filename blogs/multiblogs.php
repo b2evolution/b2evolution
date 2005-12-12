@@ -195,7 +195,7 @@ require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
 		// Dirty trick until we get everything into objects:
 		$saved_blog = $blog;
 		$blog = 3;	// Blog B now
-		$Blog_B = $BlogCache->get_by_ID( 3 ); // Blog B
+		$Blog_B = & $BlogCache->get_by_ID( 3 ); // Blog B
 		?>
 
 		<h3>#2: <a href="<?php $Blog_B->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_B->disp( 'name', 'htmlbody' ) ?></a></h3>

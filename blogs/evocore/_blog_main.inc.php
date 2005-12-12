@@ -270,9 +270,9 @@ if( ($disp == 'posts') || ($disp == 'single') )
 	if( $redirect_to_postblog && ( $disp == 'single' ) )
 	{ // Yes we need to check.
 		if( !empty($p) )
-			$Item = $ItemCache->get_by_ID( $p, false );
+			$Item = & $ItemCache->get_by_ID( $p, false );
 		else
-			$Item = $ItemCache->get_by_urltitle( $title, false );
+			$Item = & $ItemCache->get_by_urltitle( $title, false );
 
 		if( ($Item !== false) && ($Item->blog_ID != $blog) )
 		{ // We're on the wrong blog (probably an old permalink) let's redirect
@@ -416,6 +416,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.39  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
  * Revision 1.38  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
