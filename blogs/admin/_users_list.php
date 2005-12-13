@@ -200,7 +200,7 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 }
 
 // Display filter/search block
-// TODO: should get handled by Results class
+// TODO: should use Results callback
 echo '<div class="center">';
 $Form = & new Form( 'b2users.php', 'filter', 'get', '' );
 $Form->begin_form('fform');
@@ -215,6 +215,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.58  2005/12/13 14:30:09  fplanque
+ * no message
+ *
  * Revision 1.57  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

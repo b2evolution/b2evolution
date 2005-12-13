@@ -327,7 +327,7 @@ else
 				}
 				// $all=$translated+$fuzzy+$untranslated;
 				echo "\n\t<td class=\"center\">". $all ."</td>";
-				$percent_done = $all ? round(($translated-$fuzzy/2)/$all*100) : 0;
+				$percent_done = ($all > 0) ? round(($translated-$fuzzy/2)/$all*100) : 0;
 				$color = sprintf( '%02x%02x00', 255 - round($percent_done * 2.55), round($percent_done * 2.55) );
 				echo "\n\t<td class=\"center\" style=\"background-color:#". $color . "\">". $percent_done ." %</td>";
 			}

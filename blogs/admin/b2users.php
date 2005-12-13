@@ -36,6 +36,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
+ * @todo separate object inits and permission checks
  *
  * @version $Id$
  */
@@ -85,7 +86,7 @@ elseif( $user_ID !== NULL )
 		$edited_User = new User();
 		$edited_User->set_datecreated( $localtimenow );
 	}
-	elseif( ($edited_User = $UserCache->get_by_ID( $user_ID, false )) === false )
+	elseif( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
 	{	// We could not find the User to edit:
 		unset( $edited_User );
 		$Messages->head = T_('Cannot edit user!');
@@ -136,7 +137,7 @@ elseif( $grp_ID !== NULL )
 	{ // New Group:
 		$edited_Group = new Group();
 	}
-	elseif( ($edited_Group = $GroupCache->get_by_ID( $grp_ID, false )) === false )
+	elseif( ($edited_Group = & $GroupCache->get_by_ID( $grp_ID, false )) === false )
 	{ // We could not find the Group to edit:
 		unset( $edited_Group );
 		$Messages->head = T_('Cannot edit group!');
@@ -194,7 +195,7 @@ if( !$Messages->count('error') )
 			}
 			else
 			{ // We use an empty user:
-				$edited_User = new User();
+				$edited_User = & new User();
 			}
 			break;
 
@@ -432,7 +433,7 @@ if( !$Messages->count('error') )
 			}
 			else
 			{ // We use an empty group:
-				$edited_Group = new Group();
+				$edited_Group = & new Group();
 			}
 			break;
 
@@ -535,6 +536,7 @@ if( !$Messages->count('error') )
 	}
 }
 
+
 /**
  * Display page header:
  */
@@ -595,6 +597,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.120  2005/12/13 14:30:09  fplanque
+ * no message
+ *
  * Revision 1.119  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
