@@ -561,7 +561,7 @@ function the_weekday_date($before='',$after='')
  *
  * TODO: archives modes in clean mode
  *
- * @deprecated deprecated by {@link Item::gen_permalink(-)}
+ * @deprecated deprecated by {@link Item::get_permalink(-)}
  */
 function gen_permalink(
 	$file,                  // base URL of the blog
@@ -958,6 +958,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.41  2005/12/14 16:52:36  blueyed
+ * doc
+ *
  * Revision 1.40  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
