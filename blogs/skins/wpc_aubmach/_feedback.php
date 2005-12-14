@@ -99,7 +99,7 @@
 	{
 		echo '<ol id="commentlist">';
 
-		while( $Comment = $CommentList->get_next() )
+		while( $Comment = & $CommentList->get_next() )
 		{	// Loop through comments:
 			?>
 			<!-- ========== START of a COMMENT/TB/PB ========== -->

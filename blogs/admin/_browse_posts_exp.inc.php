@@ -179,7 +179,7 @@ while( $Item = $MainList->get_item() )
 										T_('No feedback for this post yet...') .
 										'</p></div>' );
 
-			while( $Comment = $CommentList->get_next() )
+			while( $Comment = & $CommentList->get_next() )
 			{ // Loop through comments:
 				?>
 				<!-- ========== START of a COMMENT/TB/PB ========== -->
@@ -329,6 +329,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.2  2005/12/14 17:00:24  blueyed
+ * assign return value of get_next() by reference
+ *
  * Revision 1.1  2005/12/08 13:13:33  fplanque
  * no message
  *

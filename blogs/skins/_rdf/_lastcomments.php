@@ -56,7 +56,7 @@ $CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'D
 	<sy:updateBase>2000-01-01T12:00+00:00</sy:updateBase>
 	<items>
 		<rdf:Seq>
-		<?php while( $Comment = $CommentList->get_next() )
+		<?php while( $Comment = & $CommentList->get_next() )
 		{ // Loop through comments: ?>
 			<rdf:li rdf:resource="<?php $Comment->permalink() ?>"/>
 		<?php } // End of comment loop. ?>
@@ -65,7 +65,7 @@ $CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'D
 </channel>
 <?php
 $CommentList->restart();
-while( $Comment = $CommentList->get_next() )
+while( $Comment = & $CommentList->get_next() )
 { // Loop through comments: ?>
 <item rdf:about="<?php $Comment->permalink() ?>">
 	<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>

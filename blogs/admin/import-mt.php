@@ -1443,9 +1443,13 @@ function renderer_list()
 
 	$renderers = array('default');
 	$Plugins->restart();	 // make sure iterator is at start position
-	while( $loop_RendererPlugin = $Plugins->get_next() )
+	while( $loop_RendererPlugin = & $Plugins->get_next() )
 	{ // Go through whole list of renders
 		// echo ' ',$loop_RendererPlugin->code;
+		if( empty($loop_RendererPlugin->code) )
+		{ // No unique code!
+			continue;
+		}
 		if( $loop_RendererPlugin->apply_when == 'stealth'
 			|| $loop_RendererPlugin->apply_when == 'never' )
 		{	// This is not an option.

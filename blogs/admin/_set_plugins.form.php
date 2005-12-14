@@ -25,7 +25,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		<tbody>
 		<?php
 		$Plugins->restart();	 // make sure iterator is at start position
-		while( $loop_Plugin = $Plugins->get_next() )
+		while( $loop_Plugin = & $Plugins->get_next() )
 		{
 		?>
 		<tr>

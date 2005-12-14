@@ -47,7 +47,7 @@ $CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'D
 	<id><?php $Blog->disp( 'comments_atom_url', 'xmlattr' ) /* TODO: may need a regenerate_url() */ ?></id>
 	<generator uri="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
 	<updated><?php echo gmdate('Y-m-d\TH:i:s\Z'); ?></updated>
-	<?php while( $Comment = $CommentList->get_next() )
+	<?php while( $Comment = & $CommentList->get_next() )
 	{ // Loop through comments: ?>
 	<entry>
 		<title type="text"><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>

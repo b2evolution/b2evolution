@@ -24,7 +24,7 @@
 
 	$CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No comment yet...').'</p></div>' );
 
-	while( $Comment = $CommentList->get_next() )
+	while( $Comment = & $CommentList->get_next() )
 	{	// Loop through comments:	?>
 		<!-- ========== START of a COMMENT ========== -->
 		<a name="c<?php $Comment->ID() ?>"></a>

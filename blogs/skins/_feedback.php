@@ -95,7 +95,7 @@
 													T_('No %s for this post yet...'), implode( "/", $disp_title) ) .
 								'</p></div>' );
 
-	while( $Comment = $CommentList->get_next() )
+	while( $Comment = & $CommentList->get_next() )
 	{	// Loop through comments:
 		?>
 		<!-- ========== START of a COMMENT/TB/PB ========== -->

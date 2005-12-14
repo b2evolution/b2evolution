@@ -741,12 +741,12 @@ class Filelist
 		{
 			if( $type == 'dir' && !$this->_entries[ $index ]->is_dir() )
 			{ // we want a dir
-				$r = $this->get_next( 'dir' );
+				$r = & $this->get_next( 'dir' );
 				return $r;
 			}
 			elseif( $type == 'file' && $this->_entries[ $index ]->is_dir() )
 			{ // we want a file
-				$r = $this->get_next( 'file' );
+				$r = & $this->get_next( 'file' );
 				return $r;
 			}
 		}
@@ -1007,6 +1007,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.45  2005/12/14 17:00:25  blueyed
+ * assign return value of get_next() by reference
+ *
  * Revision 1.44  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
