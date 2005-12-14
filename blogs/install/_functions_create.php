@@ -1130,20 +1130,20 @@ function create_b2evo_tables_phoenix_beta()
 
 	echo 'Creating default file types... ';
 	// Contribs: feel free to add more types here...
-	$DB->query( "INSERT INTO T_filetypes
-							 VALUES (1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
-											(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
-											(3, 'jpg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
-											(4, 'txt', 'Text file', 'text/plain', 'text.gif', 'text', 1),
-											(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 0),
-											(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 1),
-											(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 1),
-											(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 1),
-											(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
-											(10, 'pps', 'Powerpoint slideshow', 'pps', 'pps.gif', 'external', 1),
-											(11, 'zip', 'Zip archive', 'application/zip', 'zip.gif', 'external', 1),
-											(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'download', 0);
-								" );
+	$DB->query( "INSERT INTO T_filetypes VALUES
+			(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
+			(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
+			(3, 'jpg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
+			(4, 'txt', 'Text file', 'text/plain', 'text.gif', 'text', 1),
+			(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 0),
+			(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 1),
+			(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 1),
+			(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 1),
+			(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
+			(10, 'pps', 'Powerpoint slideshow', 'pps', 'pps.gif', 'external', 1),
+			(11, 'zip', 'Zip archive', 'application/zip', 'zip.gif', 'external', 1),
+			(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'download', 0)
+		" );
 	echo "OK.<br />\n";
 }
 
@@ -1323,6 +1323,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.162  2005/12/14 22:30:06  blueyed
+ * Fix inserting default filetypes for MySQL 3
+ *
  * Revision 1.161  2005/12/14 19:36:16  fplanque
  * Enhanced file management
  *
