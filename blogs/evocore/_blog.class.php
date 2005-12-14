@@ -372,7 +372,12 @@ class Blog extends DataObject
 				return false;
 			}
 			else
-			{ // add note
+			{ // chmod and add note:
+				$chmod = $Settings->get('fm_default_chmod_dir');
+				if( !empty($chmod) )
+				{
+					@chmod( $mediadir, octdec($chmod) );
+				}
 				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), rel_path_to_base($mediadir), substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
 			}
 		}
@@ -641,15 +646,10 @@ class Blog extends DataObject
 			} // / are there posts?
 
 			// Delete categories
-			// blueyed>> Is "SET FOREIGN_KEY_CHECKS = 0" the only solution? Otherwise we'd have to delete the blog before..
-				// fp>> No way! The blog is not preventing deletion of the categories!
-			// $save_foreign_key_checks = $DB->get_var( 'SELECT @@FOREIGN_KEY_CHECKS' );
-			// $DB->query( 'SET FOREIGN_KEY_CHECKS = 0' );
 			if( $echo ) echo '<br />Deleting blog\'s categories... ';
 			$ret = $DB->query( "DELETE FROM T_categories
 													WHERE cat_blog_ID = $this->ID" );
 			if( $echo ) printf( '(%d rows)', $ret );
-			// $DB->query( 'SET FOREIGN_KEY_CHECKS = '.$save_foreign_key_checks );
 
 		} // / are there cats?
 
@@ -754,6 +754,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.48  2005/12/14 00:19:24  blueyed
+ * chmod() created media directory
+ *
  * Revision 1.47  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
