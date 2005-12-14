@@ -290,7 +290,7 @@ function user_preferredname( $user_ID )
 	global $UserCache;
 
 	if( !empty( $user_ID )
-		&& ($User = & $UserCache->get_by_ID( $user_ID ) ) )
+		&& ($User = & $UserCache->get_by_ID( $user_ID )) )
 	{
 		$User->disp('preferredname');
 	}
@@ -407,6 +407,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.36  2005/12/14 19:22:57  fplanque
+ * no message
+ *
  * Revision 1.35  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *

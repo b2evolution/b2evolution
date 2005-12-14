@@ -563,7 +563,7 @@ function the_weekday_date($before='',$after='')
  *
  * @deprecated deprecated by {@link Item::get_permalink(-)}
  */
-function gen_permalink(
+function get_permalink(
 	$file,                  // base URL of the blog
 	$id,                    // post ID to be linked to
 	$use_anchor_mode = '',  // Default to id
@@ -958,6 +958,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.42  2005/12/14 19:22:57  fplanque
+ * no message
+ *
  * Revision 1.41  2005/12/14 16:52:36  blueyed
  * doc
  *
