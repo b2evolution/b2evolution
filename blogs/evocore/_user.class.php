@@ -282,7 +282,12 @@ class User extends DataObject
 				return false;
 			}
 			else
-			{ // add note
+			{ // chmod and add note:
+				$chmod = $Settings->get('fm_default_chmod_dir');
+				if( !empty($chmod) )
+				{
+					@chmod( $userdir, octdec($chmod) );
+				}
 				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; has been created with permissions %s."), rel_path_to_base($userdir), substr( sprintf('%o', fileperms($userdir)), -3 ) ), 'success' );
 			}
 		}
@@ -926,6 +931,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.57  2005/12/14 17:14:42  blueyed
+ * chmod() created media directory
+ *
  * Revision 1.56  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *
