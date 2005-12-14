@@ -190,7 +190,6 @@ $AdminUI->add_menu_entries(
 				'href'=>'b2template.php'
 			),
 
-			// TODO: check filemanager permission
 			'files' => array(
 				'text' => T_('Files'),
 				'title' => T_('File Management'),
@@ -224,7 +223,10 @@ $AdminUI->add_menu_entries(
 						'href' => 'locales.php'.( (isset($loc_transinfo) && $loc_transinfo) ? '?loc_transinfo=1' : '' ) ),
 					'files' => array(
 						'text' => T_('Files'),
-						'href' =>'fileset.php' ),
+						'href' => 'fileset.php' ),
+					'filetypes' => array(
+						'text' => T_('File types'),
+						'href' => 'filetypes.php' ),
 					'statuses' => array(
 						'text' => T_('Post statuses'),
 						'title' => T_('Post statuses management'),

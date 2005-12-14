@@ -13,9 +13,9 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 $map_iconfiles = array(
 	'folder' => array(        // icon for folders
-		'file' => $rsc_subdir.'icons/fileicons/folder.png',
+		'file' => $rsc_subdir.'icons/fileicons/folder.gif',
 		'alt' => T_('Folder'),
-		'size' => array( 16, 16 ),
+		'size' => array( 16, 15 ),
 	),
 	'file_unknown' => array(  // icon for unknown files
 		'file' => $rsc_subdir.'icons/fileicons/default.png',
@@ -29,9 +29,9 @@ $map_iconfiles = array(
 	),
 
 	'folder_parent' => array( // go to parent directory
-		'file' => $rsc_subdir.'icons/up.png',
+		'file' => $rsc_subdir.'icons/up.gif',
 		'alt' => T_('Parent folder'),
-		'size' => array( 22, 22 ),
+		'size' => array( 16, 15 ),
 	),
 	'folder_home' => array(   // home folder
 		'file' => $rsc_subdir.'icons/folder_home2.png',
@@ -207,7 +207,7 @@ $map_iconfiles = array(
 		'alt' => T_('Email'),
 		'size' => array( 13, 10 ),
 	),
-	'www' => array(
+	'www' => array(   /* user's web site */
 		'file' => $rsc_subdir.'icons/url.gif',
 		'alt' => T_('WWW'),
 		'size' => array( 34, 17 ),
@@ -277,6 +277,17 @@ $map_iconfiles = array(
 		'size' => array( 14, 14 ),
 	),
 
+	'activate' => array(
+		'file' => $admin_subdir.'img/bullet_activate.png',
+		'alt' => '&bull;',
+		'size' => array( 17, 17 ),
+	),
+ 	'deactivate' => array(
+		'file' => $admin_subdir.'img/bullet_deactivate.png',
+		'alt' => '&nbsp;',
+		'size' => array( 17, 17 ),
+	),
+
 	'link' => array(
 		'file' => $admin_subdir.'img/chain_link.gif',
 		'alt' => T_('Link'),
@@ -313,6 +324,18 @@ $map_iconfiles = array(
 		'alt' => T_('History'),
 		'size' => array( 15, 15 ),
 	),
+
+	'file_allowed' => array( 
+		'file' => $rsc_subdir.'icons/unlocked.gif',
+		'alt' => T_( 'Allowed' ),
+		'size' => array( 16, 14 ),
+	),
+ 	'file_not_allowed' => array(
+		'file' => $rsc_subdir.'icons/locked.gif',
+		'alt' => T_( 'Blocked' ),
+		'size' => array( 16, 14 ),
+	),
+
 	'comments' => array(
 		'file' => $rsc_subdir.'icons/comments.gif',
 		'alt' => T_('Comments'),
