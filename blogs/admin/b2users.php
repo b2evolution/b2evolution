@@ -553,32 +553,30 @@ switch( $action )
 		break;
 
 
-	case 'delete_user':
-		// We need to ask for confirmation:
-		$hiddens = array( array( 'user_ID', $edited_User->ID ) );
-		$edited_User->confirm_delete(
-				sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $edited_User->dget( 'fullname' ), $edited_User->dget( 'login' ) ),
-				$action, $hiddens );
-	case 'new_user':
-	case 'view_user':
-	case 'edit_user':
-		// Display user form:
-		require dirname(__FILE__).'/_users_form.php';
-		break;
+		case 'delete_user':
+			// We need to ask for confirmation:
+			$edited_User->confirm_delete(
+					sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $edited_User->dget( 'fullname' ), $edited_User->dget( 'login' ) ),
+					$action, get_memorized( 'action' ) );
+		case 'new_user':
+		case 'view_user':
+		case 'edit_user':
+			// Display user form:
+			require dirname(__FILE__).'/_users_form.php';
+			break;
 
 
-	case 'delete_group':
-		// We need to ask for confirmation:
-		$hiddens = array( array( 'grp_ID', $edited_Group->ID ) );
-		$edited_Group->confirm_delete(
-				sprintf( T_('Delete group &laquo;%s&raquo;?'), $edited_Group->dget( 'name' ) ),
-				$action, $hiddens );
-	case 'new_group':
-	case 'edit_group':
-	case 'view_group':
-		// Display group form:
-		require dirname(__FILE__).'/_users_groupform.php';
-		break;
+		case 'delete_group':
+			// We need to ask for confirmation:
+			$edited_Group->confirm_delete(
+					sprintf( T_('Delete group &laquo;%s&raquo;?'), $edited_Group->dget( 'name' ) ),
+					$action, get_memorized( 'action' ) );
+		case 'new_group':
+		case 'edit_group':
+		case 'view_group':
+			// Display group form:
+			require dirname(__FILE__).'/_users_groupform.php';
+			break;
 
 
 	case 'promote':
@@ -597,6 +595,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.121  2005/12/14 19:31:24  fplanque
+ * bugfix
+ *
  * Revision 1.120  2005/12/13 14:30:09  fplanque
  * no message
  *
