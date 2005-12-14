@@ -17,6 +17,9 @@ function db_delete()
 {
 	global $DB;
 
+	echo "Dropping Filetypes table...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_filetypes' );
+
 	echo "Dropping Antispam table...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_antispam' );
 

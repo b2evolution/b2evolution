@@ -133,6 +133,8 @@ if( $action == 'update_settings' )
 	$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
 	$UserSettings->set( 'fm_getimagesizes',    param( 'option_getimagesizes',    'integer', 0 ) );
 	$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
+	$UserSettings->set( 'fm_showtypes',        param( 'option_showtypes',        'integer', 0 ) );
+	$UserSettings->set( 'fm_showfsperms',      param( 'option_showfsperms',      'integer', 0 ) );
 	$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
 	$UserSettings->set( 'fm_forceFM',          param( 'option_forceFM',          'integer', 0 ) );
 
@@ -360,19 +362,20 @@ switch( $action )
 
 			// Check if provided name is okay:
 			$new_names[$loop_src_File->get_md5_ID()] = trim(strip_tags($new_names[$loop_src_File->get_md5_ID()]));
-			if( !isFilename($new_names[$loop_src_File->get_md5_ID()]) )
+			
+			if( !$loop_src_File->is_dir() )
 			{
-				$confirm = 0;
-				$Messages->add( sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ), 'error' );
-				continue;
+				if( $error_filename = validate_filename( $new_names[$loop_src_File->get_md5_ID()] ) ) 
+				{ // Not a file name or not an allowed extension
+					$confirm = 0;
+					$Messages->add( $error_filename , 'error' );
+					continue;
+				}
 			}
-
-			// Check file extension:
-			$extension = '';
-			if( ! validate_file_extension( $new_names[$loop_src_File->get_md5_ID()], $extension ) )
-			{ // Extension invalid:
-				$Messages->add( sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ), 'error' );
+			elseif( $error_dirname = validate_dirname( $new_names[$loop_src_File->get_md5_ID()] ) ) 
+			{ // Not a directory name
 				$confirm = 0;
+				$Messages->add( $error_dirname, 'error' );
 				continue;
 			}
 		}
@@ -884,19 +887,10 @@ switch( $Fileman->fm_mode )
 				// Use new name on server if specified:
 				$newName = !empty( $uploadfile_name[ $lKey ] ) ? $uploadfile_name[ $lKey ] : $lName;
 
-				if( !isFilename( $newName ) )
-				{
-					$failedFiles[$lKey] = sprintf( T_('&laquo;%s&raquo; cannot be used as a valid filename on this server.'), $newName );
-					// Abort upload for this file:
-					continue;
-				}
-
-				// Check file extension:
-				$extension = '';
-				if( ! validate_file_extension( $newName, $extension ) )
-				{ // Extension invalid, message already output.
-					$failedFiles[$lKey] = sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension );
-					// Abort upload for this file:
+				if( $error_filename = validate_filename( $newName ) )
+				{ // Not a file name or not an allowed extension
+					$confirm = 0;
+					$Messages->add( $error_filename , 'error' );
 					continue;
 				}
 
@@ -1058,19 +1052,20 @@ switch( $Fileman->fm_mode )
 
 			// Check if provided name is okay:
 			$new_names[$loop_src_File->get_md5_ID()] = trim(strip_tags($new_names[$loop_src_File->get_md5_ID()]));
-			if( !isFilename($new_names[$loop_src_File->get_md5_ID()]) )
+			
+			if( !$loop_src_File->is_dir() )
 			{
-				$confirm = 0;
-				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $new_names[$loop_src_File->get_md5_ID()] ) );
-				continue;
+				if( $error_filename = validate_filename( $new_names[$loop_src_File->get_md5_ID()] ) ) 
+				{ // Not a file name or not an allowed extension
+					$confirm = 0;
+					$Messages->add( $error_filename , 'error' );
+					continue;
+				}
 			}
-
-			// Check file extension:
-			$extension = '';
-			if( ! validate_file_extension( $new_names[$loop_src_File->get_md5_ID()], $extension ) )
-			{ // Extension invalid:
-				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('The file extension &laquo;%s&raquo; is not allowed.'), $extension ) );
+			elseif( $error_dirname = validate_dirname( $new_names[$loop_src_File->get_md5_ID()] ) )
+			{ // Not a directory name
 				$confirm = 0;
+				$Messages->add( $error_dirname, 'error' );
 				continue;
 			}
 
@@ -1346,6 +1341,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.149  2005/12/14 19:36:15  fplanque
+ * Enhanced file management
+ *
  * Revision 1.148  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *

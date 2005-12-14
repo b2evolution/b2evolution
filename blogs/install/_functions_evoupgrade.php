@@ -650,22 +650,33 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
-		// Create relations:
-		create_b2evo_relations();
-
 		// INSTALL PLUGINS:
 		install_basic_plugins();
 	}
 
 
-	if( $old_db_version < 9010 )
+	if( $old_db_version < 9100 )
+	{	// Phoenix BETA:
+
+		// New tables:
+		create_b2evo_tables_phoenix_beta();
+	}
+
+
+	if( $old_db_version < 9200 )
 	{
 		/*
 		 * CONTRIBUTORS: If you need changes and we haven't started a block for next release yet, put them here!
 		 * Then create a new extension block, and increase db version numbers everywhere where needed in this file.
 		 */
 
+		// New tables:
+		create_b2evo_tables_phoenix_beta();
+
+		// Create relations:
+		create_b2evo_relations(); // EXPERIMENTAL!
 	}
+
 
 	// Update DB schema version to $new_db_version
 	set_upgrade_checkpoint( $new_db_version );
@@ -676,6 +687,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.112  2005/12/14 19:36:16  fplanque
+ * Enhanced file management
+ *
  * Revision 1.111  2005/12/12 19:22:03  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

@@ -45,7 +45,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-$new_db_version = 9000;				// next time: 9010
+$new_db_version = 9100;				// next time: 9200
 
 
 // Investigation for following code by Isaac - http://isaac.beigetower.org/
@@ -249,6 +249,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.27  2005/12/14 19:36:16  fplanque
+ * Enhanced file management
+ *
  * Revision 1.26  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

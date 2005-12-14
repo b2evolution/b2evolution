@@ -425,54 +425,91 @@ function check_canonical_path( $path )
 
 
 /**
- * Check for valid filename (no path allowed).
+ * Check for valid filename and extension of the filename (no path allowed). (MB)
  *
- * @uses $Settings
+ * @uses 	$FiletypeCache, $settings or $force_regexp_filename form _advanced.php
  * @param string filename to test
- * @return boolean true if the filename is valid according to the regular expression, false if not
+ * @return nothing if the filename is valid according to the regular expression and the extension too, error message if not
  */
-function isFilename( $filename )
+function validate_filename( $filename )
 {
-	global $Settings;
-
-	return (boolean)preg_match( ':'.str_replace( ':', '\:', $Settings->get( 'regexp_filename' ) ).':', $filename );
+	global $Settings, $FiletypeCache, $force_regexp_filename;
+	
+	// Check filename
+	if( $force_regexp_filename ) 
+	{ // Use the regexp from _advanced.php
+		if( !preg_match( ':'.str_replace( ':', '\:', $force_regexp_filename ).':', $filename ) )
+		{ // Invalid filename
+			return sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $filename );
+		}
+	}	
+	else 
+	{	// Use the regexp from SETTINGS 
+		if( !preg_match( ':'.str_replace( ':', '\:', $Settings->get( 'regexp_filename' ) ).':', $filename ) )
+		{ // Invalid filename 
+			return sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $filename );		
+		}
+	}
+	
+	// Check extension filename	
+	if( preg_match( '#\.([a-zA-Z0-9\-_]+)$#', $filename, $match ) )
+	{ // Filename has a valid extension
+		if( $Filetype = & $FiletypeCache->get_by_extension( strtolower( $match[1] ) , false ) )
+		{
+			if( $Filetype->allowed )
+			{ // Filename has an allowed extension
+				return;
+			}
+			else 
+			{	// Filename hasn't an allowed extension
+				return sprintf( T_('&laquo;%s&raquo; has not an allowed extension.'), $filename );
+			}
+		}
+		else
+		{ // Filename hasn't an allowed extension
+			return sprintf( T_('&laquo;%s&raquo; has an unricognized extension.'), $filename );
+		}
+	}
+	else 
+	{ // Filename hasn't a valid extension
+		return sprintf( T_('&laquo;%s&raquo; has not a valid extension.'), $filename );
+	}
 }
 
 
 /**
- * Check that the file extension is allowed.
+ * Check for valid dirname (no path allowed). ( MB )
  *
- * Case independant.
- *
- * @param filename to check
- * @param string by ref, returns extension
- * @return boolean
+ * @uses $Settings or $force_regexp_dirname form _advanced.php
+ * @param string dirname to test
+ * @return nothing if the dirname is valid according to the regular expression, error message if not
  */
-function validate_file_extension( $filename, & $extension )
-{
-	global $Settings, $Messages;
-	static $allowedFileExtensions;
-
-	if( !isset($allowedFileExtensions) )
-	{
-		$allowedFileExtensions = preg_split( '#\s+#', strtolower( trim( $Settings->get( 'upload_allowedext' ) ) ), -1, PREG_SPLIT_NO_EMPTY );
-	}
-
-	if( !empty($allowedFileExtensions) )
-	{ // check extension
-		if( preg_match( '#\.([a-zA-Z0-9\-_]+)$#', $filename, $match ) )
-		{
-			$extension = strtolower($match[1]);
-
-			if( !in_array( $extension, $allowedFileExtensions ) )
-			{
-				return false;
-			}
+function validate_dirname( $dirname )
+{	
+	global $Settings, $force_regexp_dirname;
+	
+	if( !empty( $force_regexp_dirname ) ) 
+	{ // Use the regexp from _advanced.php
+		if( preg_match( ':'.str_replace( ':', '\:', $force_regexp_dirname ).':', $dirname ) )
+		{ // Valid dirname
+			return;
 		}
-		// NOTE: Files with no extension are allowed..
+		else 
+		{ // Invalid filename
+			return sprintf( T_('&laquo;%s&raquo; is not a valid dirname.'), $dirname );	
+		}
 	}
-
-	return true;
+	else
+	{ // Use the regexp from SETTINGS 
+		if( preg_match( ':'.str_replace( ':', '\:', $Settings->get( 'regexp_dirname' ) ).':', $dirname ) )
+		{ // Valid dirname
+			return;
+		}
+		else 
+		{ // Invalid dirname
+			return sprintf( T_('&laquo;%s&raquo; is not a valid dirname.'), $dirname );	
+		}
+	}
 }
 
 
@@ -511,6 +548,9 @@ function rel_path_to_base( $path )
 
 /*
  * $Log$
+ * Revision 1.38  2005/12/14 19:36:16  fplanque
+ * Enhanced file management
+ *
  * Revision 1.37  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

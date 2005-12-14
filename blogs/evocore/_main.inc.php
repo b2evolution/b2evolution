@@ -272,11 +272,14 @@ require_once dirname(__FILE__).'/_link.class.php';
 require_once dirname(__FILE__).'/_linkcache.class.php';
 require_once dirname(__FILE__).'/_file.class.php';
 require_once dirname(__FILE__).'/_filerootcache.class.php';
+require_once dirname(__FILE__).'/_filetype.class.php';
+require_once dirname(__FILE__).'/_filetypecache.class.php';
 // Object caches init:
 
 $BlogCache = & new BlogCache();
 $FileCache = & new FileCache();
 $FileRootCache = & new FileRootCache();
+$FiletypeCache = & new FiletypeCache();
 $GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name' );
 $ItemCache = & new ItemCache();
 $itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
@@ -485,6 +488,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.72  2005/12/14 19:36:16  fplanque
+ * Enhanced file management
+ *
  * Revision 1.71  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

@@ -96,7 +96,7 @@ if( false )
 			$current_File->load_meta( false, $row );
 
 			// File type:
-			return $current_File->url( $current_File->get_icon(), T_('Let browser handle this file!')  ).' '.$current_File->get_type();
+			return $current_File->get_view_link( $current_File->get_icon(), T_('Let browser handle this file!')  ).' '.$current_File->get_type();
 		}
 	}
 	$Results->cols[] = array(

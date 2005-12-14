@@ -39,15 +39,31 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Upload options') );
 	$Form->checkbox( 'upload_enabled', $Settings->get('upload_enabled'), T_('Enable upload'), T_('Check to allow uploading files in general.' ) );
-	
-	$Form->text( 'upload_allowedext', $Settings->get('upload_allowedext'), 40, T_('Allowed file extensions'), T_('Seperated by space.' ).' '.T_('Leave it empty to disable this check.').' '.sprintf( /* TRANS: %s gets replaced with an example setting */ T_('E.g. &laquo;%s&raquo;'), $Settings->get_default( 'upload_allowedext' ) ), 255 );
-	
 	$Form->text( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum allowed filesize'), T_('KB (This cannot be higher than your PHP/Webserver setting!)'), 7 );
 $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Advanced options') );
-	$Form->text( 'regexp_filename', $Settings->get('regexp_filename'), 40, T_('Valid filename'), T_('Regular expression'), 255 );
+	// Do not display regexp for filename if the force_regexp_filename var is set
+	if( empty($force_regexp_filename) )
+	{
+		$Form->text( 'regexp_filename',
+										$Settings->get('regexp_filename'),
+										40,
+										T_('Valid filename'),
+										T_('Regular expression'),
+										255 );
+	}
+	// Do not display regexp for dirname if the force_regexp_dirname var is set	
+	if( empty( $force_regexp_dirname ) )
+	{
+		$Form->text( 'regexp_dirname',
+										$Settings->get('regexp_dirname'),
+										40,
+										T_('Valid dirname'),
+										T_('Regular expression'),
+										255 );
+	}
 $Form->end_fieldset();
 
 

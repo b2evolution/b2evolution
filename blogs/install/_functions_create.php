@@ -256,6 +256,7 @@ function create_b2evo_tables()
 	create_antispam();
 	create_locales();
 	create_b2evo_tables_phoenix();
+	create_b2evo_tables_phoenix_beta();
 
 	// Create relations:
 	create_b2evo_relations();
@@ -1108,6 +1109,47 @@ function create_b2evo_tables_phoenix()
 
 
 /**
+ * Create new tables for "Phoenix beta" version
+ */
+function create_b2evo_tables_phoenix_beta()
+{
+	global $DB;
+
+	echo 'Creating table for file types... ';
+	$DB->query( 'CREATE TABLE T_filetypes (
+							  ftyp_ID int(11) unsigned NOT NULL auto_increment,
+							  ftyp_extensions varchar(30) NOT NULL,
+							  ftyp_name varchar(30) NOT NULL,
+							  ftyp_mimetype varchar(50) NOT NULL,
+							  ftyp_icon varchar(20) default NULL,
+							  ftyp_viewtype varchar(10) NOT NULL,
+							  ftyp_allowed tinyint(1) default 0,
+							  PRIMARY KEY (ftyp_ID)
+								)' );
+	echo "OK.<br />\n";
+
+	echo 'Creating default file types... ';
+	// Contribs: feel free to add more types here...
+	$DB->query( "INSERT INTO T_filetypes
+							 VALUES (1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
+											(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
+											(3, 'jpg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
+											(4, 'txt', 'Text file', 'text/plain', 'text.gif', 'text', 1),
+											(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 0),
+											(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 1),
+											(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 1),
+											(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 1),
+											(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
+											(10, 'pps', 'Powerpoint slideshow', 'pps', 'pps.gif', 'external', 1),
+											(11, 'zip', 'Zip archive', 'application/zip', 'zip.gif', 'external', 1),
+											(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'download', 0);
+								" );
+	echo "OK.<br />\n";
+}
+
+
+
+/**
  * Create relations
  */
 function create_b2evo_relations()
@@ -1281,6 +1323,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.161  2005/12/14 19:36:16  fplanque
+ * Enhanced file management
+ *
  * Revision 1.160  2005/12/12 20:32:58  fplanque
  * no message
  *

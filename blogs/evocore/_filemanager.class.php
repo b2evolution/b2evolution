@@ -319,7 +319,7 @@ class FileManager extends Filelist
 
 
 		// For modes build $this->SourceList
-		if( $this->fm_mode && $this->fm_sources = param( 'fm_sources', 'array', array() ) )
+		if( $this->fm_mode && $this->fm_sources = param( 'fm_sources', 'array', array(), true ) )
 		{
 			if( $this->SourceList = & new Filelist( $this->_ads_root_path, $this->_root_type, $this->_root_ID ) )
 			{ // TODO: should fail for non-existant sources, or sources where no read-perm
@@ -859,6 +859,7 @@ class FileManager extends Filelist
 		}
 		else
 		{ // Link to perform given $action on directory or file:
+
 			if( !isset( $File->cache['linkFile_2'] ) )
 			{
 				$File->cache['linkFile_2'] = $this->getCurUrl().'&amp;fm_selected[]='.$File->get_md5_ID();
@@ -1049,11 +1050,18 @@ class FileManager extends Filelist
 				: T_('Cannot create a file without name.') ), 'error' );
 			return false;
 		}
-		elseif( !isFilename($name) )
+		
+		if( $type == 'file' )
 		{
-			$Messages->add( sprintf( ($type == 'dir'
-				? T_('&laquo;%s&raquo; is not a valid directory.')
-				: T_('&laquo;%s&raquo; is not a valid filename.') ), $name), 'error' );
+			if( $error_filename = validate_filename( $name ) ) 
+			{ // Not valid filename or extension
+				$Messages->add( $error_filename, 'error' );
+				return false;
+			}
+		}
+		elseif( $error_dirname = validate_dirname( $name ) )
+		{ // Not valid dirname
+			$Messages->add( $error_dirname, 'error' );
 			return false;
 		}
 
@@ -1358,6 +1366,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.71  2005/12/14 19:36:16  fplanque
+ * Enhanced file management
+ *
  * Revision 1.70  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *

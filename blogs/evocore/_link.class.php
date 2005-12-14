@@ -49,6 +49,8 @@ class Link extends DataObject
 	var $Item;
 	var $Contact;
 	var $Firm;
+	var $File;
+
 
 	/**
 	 * Constructor
@@ -121,6 +123,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2005/12/14 19:36:16  fplanque
+ * Enhanced file management
+ *
  * Revision 1.11  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *

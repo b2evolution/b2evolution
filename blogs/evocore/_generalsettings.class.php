@@ -76,9 +76,11 @@ class GeneralSettings extends AbstractSettings
 		// 'fm_enable_roots_group' => '0',  // TO DO
 		'fm_enable_roots_user' => '0',
 
+		'fm_showtypes' => '0',
+		'fm_showfsperms' => '0',
+
 		'fm_default_chmod_file' => '664',   // Needs UI
 		'fm_default_chmod_dir' => '775',    // Needs UI
-
 
 		'hit_doublecheck_referer' => '0',
 		'links_extrapath' => '0',
@@ -146,6 +148,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.34  2005/12/14 19:36:16  fplanque
+ * Enhanced file management
+ *
  * Revision 1.33  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

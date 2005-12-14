@@ -103,10 +103,7 @@ switch( $action )
 			$Request->param( 'upload_enabled', 'integer', 0 );
 			$Settings->set( 'upload_enabled', $upload_enabled );
 
-			$Request->param( 'upload_allowedext', 'string', true );
-			$Settings->set( 'upload_allowedext', strtolower(trim($upload_allowedext)));
-
-			$Request->param_integer_range( 'upload_maxkb', 1, 9999999, T_('Maximum allowed filesize must be between %d and %d KB.') );
+			$Request->param_integer_range( 'upload_maxkb', 1, $upload_maxmaxkb, T_('Maximum allowed filesize must be between %d and %d KB.') );
 			$Settings->set( 'upload_maxkb', $upload_maxkb );
 
 			// Advanced settings
@@ -114,6 +111,11 @@ switch( $action )
 			if( $Request->param_check_regexp( 'regexp_filename', T_('Valid filename pattern is not a regular expression!') ) )
 			{
 				$Settings->set( 'regexp_filename', $regexp_filename );
+			}
+			$Request->param( 'regexp_dirname', 'string', '' );
+			if( $Request->param_check_regexp( 'regexp_dirname', T_('Valid dirname pattern is not a regular expression!') ) )
+			{
+				$Settings->set( 'regexp_dirname', $regexp_dirname );
 			}
 
 			if( ! $Messages->count('error') )

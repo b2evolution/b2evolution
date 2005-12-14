@@ -233,22 +233,32 @@ else
 </tr>
 
 <?php
-	/*
-	 * Col headers:
-	 */
+	/*****************  Col headers  ****************/
+	
 	echo '<tr>';
-	echo '<th colspan="2" class="firstcol">';
+	echo '<th class="firstcol">';
 	$Fileman->dispButtonParent();
 	echo '</th>';
+	echo '<th>'.$Fileman->getLinkSort( 'type', '' ).'</th>';
 	if( $Fileman->flatmode )
 	{
 		echo '<th>'.$Fileman->getLinkSort( 'path', /* TRANS: file/directory path */ T_('Path') ).'</th>';
 	}
 	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'name', /* TRANS: file name */ T_('Name') ).'</th>';
-	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
+
+	if( $UserSettings->get('fm_showtypes') ) // MB UPDATE-------------
+	{ // Show file types column
+		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
+	}
+	
 	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'size', /* TRANS: file size */ T_('Size') ).'</th>';
 	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ).'</th>';
-	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'perms', /* TRANS: file's permissions (short) */ T_('Perms') ).'</th>';
+	
+	if( $UserSettings->get('fm_showfsperms') ) // MB UPDATE-------------
+	{ // Show file perms column
+		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'perms', /* TRANS: file's permissions (short) */ T_('Perms') ).'</th>';
+	}
+	
 	echo '<th class="lastcol nowrap">'. /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions').'</th>';
 	echo '</tr>';
 ?>
@@ -261,15 +271,13 @@ else
 <?php
 param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 
-/*
- * ---------------------------------------------
- * MAIN FILE LIST:
- * ---------------------------------------------
- */
+/***********************************************************/
+/*                    MAIN FILE LIST:                      */
+/***********************************************************/
 $Fileman->sort();
 $countFiles = 0;
 while( $lFile = & $Fileman->get_next() )
-{ // loop through all Files:
+{ // Loop through all Files:
 	echo '<tr';
 
 	if( $countFiles%2 ) echo ' class="odd"';
@@ -277,9 +285,8 @@ while( $lFile = & $Fileman->get_next() )
 	// select the file by default, when clicking on the <tr>; this gets "undone" for the checkbox itself and the filename link
 	echo ' onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">';
 
-	/*
-	 * Checkbox:
-	 */
+	/********************    Checkbox:    *******************/
+	
 	echo '<td class="checkbox firstcol">';
 	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"
@@ -290,9 +297,8 @@ while( $lFile = & $Fileman->get_next() )
 	}
 	echo ' />';
 
-	/*
-	 * Hidden info used by Javascript:
-	 */
+	/***********  Hidden info used by Javascript:  ***********/
+	
 	if( $mode == 'upload' )
 	{
 		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles
@@ -301,26 +307,28 @@ while( $lFile = & $Fileman->get_next() )
 
 	echo '</td>';
 
-
-	/*
-	 * File type Icon:
-	 */
+	/********************  File type Icon:  *******************/
+	
 	echo '<td class="icon">';
-	echo '<a href="';
 	if( $lFile->is_dir() )
-	{
-		echo $Fileman->getLinkFile( $lFile ).'" title="'.T_('Change into this directory');
+	{ // Directory
+		echo '<a href="'.$lFile->get_view_url().'" title="'.T_('Change into this directory').'">'.$lFile->get_icon().'</a>';
 	}
 	else
-	{
-		echo $Fileman->getFileUrl().'" title="'.T_('Let the browser handle this file');
-	}
-	echo '">'.$lFile->get_icon().'</a>';
+	{ // File
+		if( $view_link = $lFile->get_view_link( $lFile->get_icon(), NULL, NULL ) )
+		{
+			echo $view_link;
+		}
+		else 
+		{ // File extension unrecognized
+			echo $lFile->get_icon();
+		}
+}
 	echo '</td>';
-
-	/*
-	 * Path (flatmode):
-	 */
+	
+	/*******************  Path (flatmode): ******************/
+	
 	if( $Fileman->flatmode )
 	{
 		echo '<td class="filepath">';
@@ -331,56 +339,75 @@ while( $lFile = & $Fileman->get_next() )
 
 	echo '<td class="filename">';
 
-	/*
-	 * Open in new window:
-	 */
-	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" target="fileman_default"
-				title="'.T_('Open in a new window').'" onclick="return false;">';
-	$imgsize = $lFile->get_image_size( 'widthheight' );
-	echo '<button class="filenameIcon" type="button" id="button_new_'.$countFiles.'" onclick="'
-				.$Fileman->getJsPopupCode( NULL,
-							"'+( typeof(fm_popup_type) == 'undefined' ? 'fileman_default' : 'fileman_popup_$countFiles')+'",
-							($imgsize ? $imgsize[0]+100 : NULL), ($imgsize ? $imgsize[1]+150 : NULL) )
-				.'">'.get_icon( 'window_new' ).'</button></a>';
-
-	/*
-	 * Invalid filename warning:
-	 */
-	if( !isFilename( $lFile->get_name() ) )
-	{ // TODO: Warning icon with hint
-		echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => T_('The filename appears to be invalid and may cause problems.') ) );
+	/*************  Invalid filename warning:  *************/
+	
+	if( !$lFile->is_dir() )
+	{
+		if( $error_filename = validate_filename( $lFile->get_name() ) )
+		{ // TODO: Warning icon with hint
+			echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_filename ) );
+		}
 	}
-
-	/*
-	 * Link ("chain") icon:
-	 */
+	elseif( $error_dirname = validate_dirname( $lFile->get_name() ) )
+	{ // TODO: Warning icon with hint
+		echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_dirname ) );
+	}
+	
+	/****  Open in a new window  (only directories)  ****/
+	
+	if( $lFile->is_dir() )
+	{ // Directory 
+		$browse_dir_url = $lFile->get_view_url();
+		$target = $lFile->get_md5_ID();
+		
+		echo '<a href="'.$browse_dir_url.'" target="'.$target.' " class="filenameIcon"
+					title="'.T_('Open in a new window').'" onclick="'
+					
+					."pop_up_window( '$browse_dir_url', '$target', '"
+					.'width=800,height=800,'
+					."scrollbars=yes,status=yes,resizable=yes' ); return false;"
+					
+					.'">'.get_icon( 'window_new' ).'</a>';
+	}
+	
+	/***************  Link ("chain") icon:  **************/
+	
 	if( $Fileman->fm_mode == 'link_item'
 			// Plug extensions here!
+			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			// ONGsb only:
+			|| $Fileman->fm_mode == 'link_product'
+ 			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		)
 	{	// Offer option to link the file to an Item:
 		$Fileman->dispButtonFileLink();
 		echo ' ';
 	}
 
-	/*
-	 * Filename:
-	 */
-	echo '<a href="'.$Fileman->getLinkFile( $lFile ).'" onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">';
-	/*
-	if( $Fileman->flatmode && $Fileman->get_sort_order() != 'name' )
-	{	// Display directory name
-		echo './'.$lFile->get_rdfs_rel_path();
+	/********************  Filename  ********************/
+	
+	if( $lFile->is_dir() )
+	{ // Directory
+		
+		// Link to open the directory in the curent window						
+		echo '<a href="'.$browse_dir_url.'" onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">'
+			           .$lFile->get_name().'</a>';
 	}
 	else
-	*/
-	{	// Display file short name
-		echo $lFile->get_name();
+	{ // File
+		
+		if( $view_link = $lFile->get_view_link( $lFile->get_name(), NULL, NULL ) )
+		{
+			echo $view_link;
+		}
+		else
+		{ // File extension unrecognized
+			echo $lFile->get_name();
+		}
 	}
-	echo '</a>';
 
-	/*
-	 * File meta data:
-	 */
+	/***************  File meta data:  **************/
+	
 	echo '<span class="filemeta">';
 	// Optionnaly display IMAGE pixel size:
 	disp_cond( $Fileman->getFileImageSize(), ' (%s)' );
@@ -411,34 +438,35 @@ while( $lFile = & $Fileman->get_next() )
 	*/
 	echo '</td>';
 
-	/*
-	 * File type:
-	 */
-	echo '<td class="type">'.$lFile->get_type().'</td>';
-
-	/*
-	 * File size:
-	 */
+	/*******************  File type  ******************/
+	
+	if( $UserSettings->get('fm_showtypes') ) // MB UPDATE-------------
+	{ // Show file types
+		echo '<td class="type">'.$lFile->get_type().'</td>';
+	}
+	
+	/*******************  File size  ******************/
+	
 	echo '<td class="size">'.$lFile->get_size_formatted().'</td>';
 
-	/*
-	 * File time stamp:
-	 */
+	/****************  File time stamp  ***************/
+	
 	echo '<td class="timestamp">';
 	echo '<span class="date">'.$lFile->get_lastmod_formatted( 'date' ).'</span> ';
 	echo '<span class="time">'.$lFile->get_lastmod_formatted( 'time' ).'</span>';
 	echo '</td>';
 
-	/*
-	 * File permissions:
-	 */
-	echo '<td class="perms">';
-	$Fileman->dispButtonFileEditPerms();
-	echo '</td>';
-
-	/*
-	 * Action icons:
-	 */
+	/****************  File pemissions  ***************/
+	
+	if( $UserSettings->get('fm_showfsperms') ) // MB UPDATE-------------
+	{ // Show file perms
+		echo '<td class="perms">';
+		$Fileman->dispButtonFileEditPerms();
+		echo '</td>';
+	}
+	
+	/*****************  Action icons  ****************/
+		
 	echo '<td class="actions lastcol">';
 	// Not implemented yet: $Fileman->dispButtonFileEdit();
 	$Fileman->dispButtonFileProperties();
@@ -588,6 +616,9 @@ if( $countFiles )
 		<!--
 		/**
 		 * Open selected files in new popup windows:
+		 * fp>> Note: I think we're going to kill this feature. It's too geeky.
+		 * With the new system, anything that can gracefully open in a popup will already do so by default.
+		 * This feature virtually doesn't save any click but cost one more compared to directly clicking the file icons.
 		 */
 		function openselectedfiles( checkonly )
 		{
@@ -741,22 +772,6 @@ if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add
 
 <div class="clear"></div>
 
-<fieldset>
-	<legend><?php echo T_('Help') ?></legend>
-	<ul>
-		<li><?php echo T_('Clicking on a file icon lets the browser handle the file.'); ?></li>
-		<li><?php echo T_('Clicking on a file name invokes the default action (images get displayed as image, raw content for all other files).'); ?></li>
-		<li><?php printf( T_('Clicking on the %s icon invokes the default action in a new window.'), get_icon( 'window_new' ) ); ?></li>
-		<li><?php echo T_('Actions'); ?>:
-			<ul class="iconlegend">
-				<li><?php echo get_icon( 'file_rename' ).' '.T_('Rename'); ?></li>
-				<li><?php echo get_icon( 'file_copy' ).' '.T_('Copy'); ?></li>
-				<li><?php echo get_icon( 'file_move' ).' '.T_('Move'); ?></li>
-				<li><?php echo get_icon( 'file_delete' ).' '.T_('Delete'); ?></li>
-			</ul>
-		</li>
-	</ul>
-</fieldset>
 <?php
 
 
@@ -784,6 +799,8 @@ $options_Form = & new Form( 'files.php#FM_anchor', 'options_form', 'get', 'none'
 	<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
 		<?php
 		$options_Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Sort directories at top') );
+		$options_Form->checkbox( 'option_showtypes', $UserSettings->get('fm_showtypes'), T_('Show files types') );
+		$options_Form->checkbox( 'option_showfsperms', $UserSettings->get('fm_showfsperms'), T_('Show files perms') );
 		$options_Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Show hidden files') );
 		$options_Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), T_('Display file permissions like "rwxr-xr-x" rather than short form') );
 		$options_Form->checkbox( 'option_getimagesizes', $UserSettings->get('fm_getimagesizes'), T_('Display the image size of image files') );
@@ -809,6 +826,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.61  2005/12/14 19:36:15  fplanque
+ * Enhanced file management
+ *
  * Revision 1.60  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

@@ -83,11 +83,39 @@ class FileRootCache
 		$tmp_FileRoot = & $this->get_by_type_and_ID( $root_type, $root_in_type_ID );
 		return $tmp_FileRoot->ads_path;
 	}
+	
+	/**
+	 * Get a fileRoot by it's compact code.
+	 * 
+	 * @param string $code root (ex: blog_2)
+	 */
+	function get_by_code( $code )
+	{
+		$part = explode( '_', $code );
+		switch( $part[0] )
+		{
+			case 'user':
+				$root_type = 'user';
+				break;
+
+			case 'blog':
+			default:
+				$root_type = 'collection';
+		}
+		
+		$root_ID = $part[1];
+		
+		return $this->get_by_type_and_ID( $root_type, $root_ID );
+	}
+	
 }
 
 
 /*
  * $Log$
+ * Revision 1.5  2005/12/14 19:36:16  fplanque
+ * Enhanced file management
+ *
  * Revision 1.4  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

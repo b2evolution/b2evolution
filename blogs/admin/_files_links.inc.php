@@ -68,7 +68,7 @@ function file_type( & $row )
 	$current_File->load_meta( false, $row );
 
 	// File type:
-	return $current_File->url( $current_File->get_icon(), T_('Let browser handle this file!')  ).' '.$current_File->get_type();
+	return $current_File->get_view_link( $current_File->get_icon(), T_('Let browser handle this file!')  ).' '.$current_File->get_type();
 }
 $Results->cols[] = array(
 						'th' => T_('Type'),
@@ -126,6 +126,9 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.9  2005/12/14 19:36:15  fplanque
+ * Enhanced file management
+ *
  * Revision 1.8  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
