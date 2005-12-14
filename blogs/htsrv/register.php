@@ -111,7 +111,7 @@ switch( $action )
 			// TODO: END TRANSACTION !!
 
 			// switch to admins locale
-			$AdminUser =& $UserCache->get_by_ID( 1 );
+			$AdminUser = & $UserCache->get_by_ID( 1 );
 			locale_temp_switch( $AdminUser->get( 'locale' ) );
 
 			$message  = T_('New user registration on your blog').":\n"

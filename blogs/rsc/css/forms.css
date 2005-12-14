@@ -56,20 +56,14 @@ span.checkbox_error input.checkbox {
 	background:#fbf2ee;
 }
 
-
 input.field_required,
 select.field_required,
 textarea.field_required {
-	background:#f4ffe8;
+	border: 1px solid #d99;
 }
 span.checkbox_required {
-	background:#f4ffe8; /* does this make sense? - same question applies for span.checkbox_error  */
-	border: 1px solid #f4ffe8; /* very light */
+	border: 1px solid #d99;
 }
-span.checkbox_required input.checkbox {
-	background:#f4ffe8; /* very light */
-}
-
 
 input.large,
 textarea.large {

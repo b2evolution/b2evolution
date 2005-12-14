@@ -1266,7 +1266,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 		([a-z][a-z0-9+.\-]*):[0-9]*       # scheme
 		//                                # authority absolute URLs only
 		[a-z0-9][a-z0-9~+.\-_,:;/\\\\*=]* # Don t allow anything too funky like entities
-		([?#][a-z0-9~+.\-_,:;/\\\\%&=?#*\ \[\]]*)?
+		([?#][a-z0-9~+.\-_,:;/\\\\%&=!?#*\ \[\]]*)?
 		$|ix', $url, $matches) )
 	{ // Cannot vaidate URL structure
 		$Debuglog->add( 'URL &laquo;'.$url.';&raquo; does not match url pattern!', 'error' );
@@ -2369,6 +2369,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.163  2005/12/14 19:33:56  fplanque
+ * no message
+ *
  * Revision 1.162  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

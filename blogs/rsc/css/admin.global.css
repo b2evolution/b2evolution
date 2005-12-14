@@ -45,7 +45,7 @@ ul.clicktree {
 	list-style:none;
 }
 ul.clicktree ul.clicktree {
-	margin-left:2ex;
+	margin-left:4ex;
 }
 
 ul.plain {
