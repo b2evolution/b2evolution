@@ -191,11 +191,10 @@ class File extends DataObject
 	var $_is_image;
 
 	/**
-	 * caches the icon key for this file (based on its extension)
-	 * @var string
-	 * @access protected
+	 * Extension, Mime type, icon, viewtype and 'allowed extension' of the file 
+	 * @var Filetype object
 	 */
-	var $_icon_key;
+	var $Filetype;
 
 
 	/**
@@ -211,7 +210,7 @@ class File extends DataObject
 	 */
 	function File( $root_type, $root_ID, $rdfp_rel_path, $load_meta = false )
 	{
-		global $FileRootCache, $Debuglog;
+		global $FileRootCache, $Debuglog, $FiletypeCache;
 
 		$Debuglog->add( "new File( $root_type, $root_ID, $rdfp_rel_path, load_meta=$load_meta)", 'files' );
 
@@ -231,7 +230,13 @@ class File extends DataObject
 		$this->_name = basename( $this->_adfp_full_path );
 		$this->_dir = dirname( $this->_adfp_full_path ).'/';
 		$this->_md5ID = md5( $this->_adfp_full_path );
-
+		
+		// Create the filetype with the extension of the file if the extension exist in database
+		if( $ext = $this->get_ext() )
+		{ // The file has an extension, load filetype object
+			$this->Filetype = & $FiletypeCache->get_by_extension( strtolower( $ext ), false );
+		}
+		
 		// Initializes file properties (type, size, perms...)
 		$this->load_properties();
 
@@ -497,16 +502,37 @@ class File extends DataObject
 	}
 
 	/**
-	 * Get the absolute file url
+	 * Get the absolute file url if the file is public
+	 * Get the getfile.php url if we need to check permission before delivering the file
 	 */
 	function get_url()
 	{
-		if( ! $root_url = $this->_FileRoot->ads_url )
-		{ // could not get a root url
-			return false;
+		global $public_acces_to_media, $htsrv_url;
+		
+		if( $this->is_dir() )
+		{ // Directory
+			if( $public_acces_to_media )
+			{ // Public access: full path
+				$url = $this->get_rdfs_rel_path();
+			}
+			else
+			{ // No Access
+				die( 'Private directory! '); 
+			}		
 		}
-
-		return $root_url.$this->_rdfp_rel_path.( $this->_is_dir ? '/' : '' );
+		else
+		{ // File
+			if( $public_acces_to_media )
+			{ // Public Access : full path
+				$url = $this->_FileRoot->ads_url.$this->_rdfp_rel_path;
+			}
+			else
+			{ // Private Access: doesn't show the full path
+				$root = $this->_FileRoot->gen_ID( $this->_root_type, $this->_root_ID );
+				$url = $htsrv_url.'getfile.php/'.rawurlencode( $this->_name ).'?root='.$root.'&amp;path='.$this->_rdfp_rel_path;
+			}
+		}
+		return $url;
 	}
 
 
@@ -540,13 +566,10 @@ class File extends DataObject
 	/**
 	 * Get the file type as a descriptive localized string.
 	 *
-	 * @uses $fm_filetypes
 	 * @return string localized type name or 'Directory' or 'Unknown'
 	 */
 	function get_type()
 	{
-		global $fm_filetypes;
-
 		if( isset( $this->_type ) )
 		{ // The type is already cached for this object:
 			return $this->_type;
@@ -558,13 +581,10 @@ class File extends DataObject
 			return $this->_type;
 		}
 
-		foreach( $fm_filetypes as $type => $desc )
+		if( isset( $this->Filetype->mimetype ) )
 		{
-			if( preg_match('/'.$type.'$/i', $this->_name) )
-			{
-				$this->_type = T_($desc);	// Localized type desc
-				return $this->_type;
-			}
+			$this->_type = $this->Filetype->name;
+			return $this->_type;
 		}
 
 		$this->_type = T_('Unknown');
@@ -709,33 +729,20 @@ class File extends DataObject
 	 */
 	function get_icon()
 	{
-		global $map_iconfiles;
-
-		if( !isset($this->_icon_key) )
-		{	// We haven't cached the icon key before...
-			if( $this->is_dir() )
-			{ // Directory icon:
-				$this->_icon_key = 'folder';
-			}
-			else
-			{
-				$this->_icon_key = 'file_unknown';
-
-				// Loop through known file icons:
-				foreach( $map_iconfiles as $lKey => $lIconfile )
-				{
-					if( isset( $lIconfile['ext'] )
-							&& preg_match( '/'.$lIconfile['ext'].'$/i', $this->_name, $match ) )
-					{
-						$this->_icon_key = $lKey;
-						break;
-					}
-				}
-			}
+		if( $this->is_dir() )
+		{ // Directory icon:
+			$icon = 'folder';
 		}
-
-		// Return Icon for the determined key:
-		return get_icon( $this->_icon_key, 'imgtag', array( 'alt'=>$this->get_ext(), 'title'=>$this->get_type() ) );
+		elseif( isset( $this->Filetype->icon ) && $this->Filetype->icon )
+		{ // Return icon for known type of the file
+				return $this->Filetype->get_icon();
+		}
+		else 
+		{ // Icon for unknown file type:
+			$icon = 'file_unknown';
+		}
+		// Return Icon for a directory or unknown type file:
+		return get_icon( $icon, 'imgtag', array( 'alt'=>$this->get_ext(), 'title'=>$this->get_type() ) );
 	}
 
 
@@ -1133,9 +1140,52 @@ class File extends DataObject
 
 
 	/**
-	 * Template function. Display link to absolute file URL.
+	 * Get URL to view the file (either with viewer of with browser, etc...)
 	 */
-	function url( $text = NULL, $title = NULL, $no_access_text = NULL )
+	function get_view_url()
+	{
+		global $htsrv_url;
+		
+		// Get root code
+		$root = $this->_FileRoot->gen_ID( $this->_root_type, $this->_root_ID );
+		
+		if( $this->is_dir() )
+		{ // Directory
+			return regenerate_url( 'root,path', 'root='.$root.'&amp;path='.$this->get_rdfs_rel_path() );
+		}
+		else 
+		{ // File
+			if( !isset( $this->Filetype->viewtype ) )
+			{
+				return NULL;
+			}
+			switch( $this->Filetype->viewtype )
+			{
+				case 'image':
+					return  $htsrv_url.'viewfile.php?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=image';
+					break;
+				
+				case 'text':
+					return $htsrv_url.'viewfile.php?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=text';
+					break;
+					
+				case 'download':	 // will NOT open a popup and will insert a Content-disposition: attachment; header
+					return $htsrv_url.'getfile.php?root='.$root.'&amp;path='.$this->_rdfp_rel_path;
+					break;
+				
+				case 'browser':		// will open a popup
+				case 'external':  // will NOT open a popup
+				default:
+					return $this->get_url();
+			}
+		}
+	}
+
+	
+	/**
+	 * Get Link to view the file (either with viewer of with browser, etc...)
+	 */
+	function get_view_link( $text = NULL, $title = NULL, $no_access_text = NULL )
 	{
 		if( is_null( $text ) )
 		{	// Use file root+relpath+name by default
@@ -1153,14 +1203,31 @@ class File extends DataObject
 			$no_access_text = $text;
 		}
 
-		if( ! $url = $this->get_url() )
+		if( ! $url = $this->get_view_url() )
 		{
 			return $no_access_text;
 		}
 
-		return '<a href="'.$url.'" title="'.$title.'">'.$text.'</a>';
-	}
+		if( in_array( $this->Filetype->viewtype, array( 'external', 'download' ) ) )
+		{ // Link to open in the curent window
+			return '<a href="'.$url.'" title="'.$title.'">'.$text.'</a>';
+		}
+		else 
+		{ // Link to open in a new window
+			$target = $this->get_md5_ID();
+						
+			return '<a href="'.$url.'" target="'.$target.'"
+							title="'.T_('Open in a new window').'" onclick="'
 
+							."pop_up_window( '$url', '$target', '"
+							.'width=' . ( ( $width = $this->get_image_size( 'width' ) ) ? ( $width + 100 ) : 800  ).' ,'
+							.'height=' . ( ( $height = $this->get_image_size( 'height' ) ) ? ( $height + 150 ) : 800  ).' ,'
+							."scrollbars=yes,status=yes,resizable=yes' );"
+							
+							.'">'.$text.'</a>';
+		}
+	}
+		
 
 	/**
 	 * Template function. Display link to edit file.
@@ -1215,6 +1282,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.54  2005/12/14 19:33:10  fplanque
+ * more responsibility given to the file class, but the file class still can work standalone (without a filemanager)
+ *
  * Revision 1.53  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
