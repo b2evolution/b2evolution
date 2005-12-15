@@ -8,6 +8,9 @@
  *
  * @package htsrv
  * @author Jeff Bearer - {@link http://www.jeffbearer.com/} + blueyed, fplanque
+ *
+ * @todo Plugin hook.
+ * @todo Respect/provide user profile setting if he wants to be available for e-mail through msgform.
  */
 
 /**
@@ -16,7 +19,7 @@
 require_once dirname(__FILE__).'/../evocore/_main.inc.php';
 
 
-// TODO: Use Hit class to prevent mass mailings to members..
+// TODO: Flood protection (Use Hit class to prevent mass mailings to members..)
 
 
 // Getting GET or POST parameters:
