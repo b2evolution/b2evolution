@@ -889,8 +889,8 @@ switch( $Fileman->fm_mode )
 
 				if( $error_filename = validate_filename( $newName ) )
 				{ // Not a file name or not an allowed extension
-					$confirm = 0;
-					$Messages->add( $error_filename , 'error' );
+					$failedFiles[$lKey] = $error_filename;
+					// Abort upload for this file:
 					continue;
 				}
 
@@ -1341,6 +1341,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.150  2005/12/15 19:00:40  blueyed
+ * Another hard to merge fix. When a filename is invalid handle it like all other upload errors.
+ *
  * Revision 1.149  2005/12/14 19:36:15  fplanque
  * Enhanced file management
  *
