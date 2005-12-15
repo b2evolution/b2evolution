@@ -434,24 +434,24 @@ function check_canonical_path( $path )
 function validate_filename( $filename )
 {
 	global $Settings, $FiletypeCache, $force_regexp_filename;
-	
+
 	// Check filename
-	if( $force_regexp_filename ) 
+	if( $force_regexp_filename )
 	{ // Use the regexp from _advanced.php
 		if( !preg_match( ':'.str_replace( ':', '\:', $force_regexp_filename ).':', $filename ) )
 		{ // Invalid filename
 			return sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $filename );
 		}
-	}	
-	else 
-	{	// Use the regexp from SETTINGS 
+	}
+	else
+	{	// Use the regexp from SETTINGS
 		if( !preg_match( ':'.str_replace( ':', '\:', $Settings->get( 'regexp_filename' ) ).':', $filename ) )
-		{ // Invalid filename 
-			return sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $filename );		
+		{ // Invalid filename
+			return sprintf( T_('&laquo;%s&raquo; is not a valid filename.'), $filename );
 		}
 	}
-	
-	// Check extension filename	
+
+	// Check extension filename
 	if( preg_match( '#\.([a-zA-Z0-9\-_]+)$#', $filename, $match ) )
 	{ // Filename has a valid extension
 		if( $Filetype = & $FiletypeCache->get_by_extension( strtolower( $match[1] ) , false ) )
@@ -460,17 +460,17 @@ function validate_filename( $filename )
 			{ // Filename has an allowed extension
 				return;
 			}
-			else 
+			else
 			{	// Filename hasn't an allowed extension
 				return sprintf( T_('&laquo;%s&raquo; has not an allowed extension.'), $filename );
 			}
 		}
 		else
 		{ // Filename hasn't an allowed extension
-			return sprintf( T_('&laquo;%s&raquo; has an unricognized extension.'), $filename );
+			return sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $filename );
 		}
 	}
-	else 
+	else
 	{ // Filename hasn't a valid extension
 		return sprintf( T_('&laquo;%s&raquo; has not a valid extension.'), $filename );
 	}
@@ -485,29 +485,29 @@ function validate_filename( $filename )
  * @return nothing if the dirname is valid according to the regular expression, error message if not
  */
 function validate_dirname( $dirname )
-{	
+{
 	global $Settings, $force_regexp_dirname;
-	
-	if( !empty( $force_regexp_dirname ) ) 
+
+	if( !empty( $force_regexp_dirname ) )
 	{ // Use the regexp from _advanced.php
 		if( preg_match( ':'.str_replace( ':', '\:', $force_regexp_dirname ).':', $dirname ) )
 		{ // Valid dirname
 			return;
 		}
-		else 
+		else
 		{ // Invalid filename
-			return sprintf( T_('&laquo;%s&raquo; is not a valid dirname.'), $dirname );	
+			return sprintf( T_('&laquo;%s&raquo; is not a valid directory name.'), $dirname );
 		}
 	}
 	else
-	{ // Use the regexp from SETTINGS 
+	{ // Use the regexp from SETTINGS
 		if( preg_match( ':'.str_replace( ':', '\:', $Settings->get( 'regexp_dirname' ) ).':', $dirname ) )
 		{ // Valid dirname
 			return;
 		}
-		else 
+		else
 		{ // Invalid dirname
-			return sprintf( T_('&laquo;%s&raquo; is not a valid dirname.'), $dirname );	
+			return sprintf( T_('&laquo;%s&raquo; is not a valid directory name.'), $dirname );
 		}
 	}
 }
@@ -548,6 +548,9 @@ function rel_path_to_base( $path )
 
 /*
  * $Log$
+ * Revision 1.39  2005/12/15 19:12:54  blueyed
+ * Typo. consistent wording.
+ *
  * Revision 1.38  2005/12/14 19:36:16  fplanque
  * Enhanced file management
  *
