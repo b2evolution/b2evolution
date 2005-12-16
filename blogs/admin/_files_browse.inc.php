@@ -183,9 +183,20 @@ else
 
 				echo '>'.format_to_output( $lroot['name'] )."</option>\n";
 			}
-			echo '</select> ';
-			echo '<input class="ActionButton" type="submit" value="'.T_('Change root').'" />';
-			echo '</div>';
+			?>
+
+			</select>
+			<script type="text/javascript">
+				<!--
+				// Just to have noscript tag below
+				// -->
+			</script>
+			<noscript>
+				<input class="ActionButton" type="submit" value="'.T_('Change root').'" />
+			</noscript>
+			</div>
+
+			<?php
 		}
 		?>
 
@@ -258,6 +269,16 @@ else
 	if( $UserSettings->get('fm_showfsperms') ) // MB UPDATE-------------
 	{ // Show file perms column
 		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'perms', /* TRANS: file's permissions (short) */ T_('Perms') ).'</th>';
+	}
+
+	if( $UserSettings->get('fm_showfsowner') )
+	{ // Show file owner column
+		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'fsowner', /* TRANS: file owner */ T_('Owner') ).'</th>';
+	}
+
+	if( $UserSettings->get('fm_showfsgroup') )
+	{ // Show file group column
+		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'fsgroup', /* TRANS: file owner */ T_('Group') ).'</th>';
 	}
 
 	echo '<th class="lastcol nowrap">'. /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions').'</th>';
@@ -463,6 +484,24 @@ while( $lFile = & $Fileman->get_next() )
 	{ // Show file perms
 		echo '<td class="perms">';
 		$Fileman->dispButtonFileEditPerms();
+		echo '</td>';
+	}
+
+	/****************  File owner  ********************/
+
+	if( $UserSettings->get('fm_showfsowner') )
+	{ // Show file owner
+		echo '<td class="fsowner">';
+		echo $lFile->get_fsowner_name();
+		echo '</td>';
+	}
+
+	/****************  File group *********************/
+
+	if( $UserSettings->get('fm_showfsgroup') )
+	{ // Show file owner
+		echo '<td class="fsgroup">';
+		echo $lFile->get_fsgroup_name();
 		echo '</td>';
 	}
 
@@ -788,8 +827,10 @@ $options_Form = & new Form( 'files.php#FM_anchor', 'options_form', 'get', 'none'
 	<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
 		<?php
 		$options_Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Sort directories at top') );
-		$options_Form->checkbox( 'option_showtypes', $UserSettings->get('fm_showtypes'), T_('Show files types') );
-		$options_Form->checkbox( 'option_showfsperms', $UserSettings->get('fm_showfsperms'), T_('Show files perms') );
+		$options_Form->checkbox( 'option_showtypes', $UserSettings->get('fm_showtypes'), T_('Show file types') );
+		$options_Form->checkbox( 'option_showfsperms', $UserSettings->get('fm_showfsperms'), T_('Show file perms') );
+		$options_Form->checkbox( 'option_showfsowner', $UserSettings->get('fm_showfsowner'), T_('Show file owners') );
+		$options_Form->checkbox( 'option_showfsgroup', $UserSettings->get('fm_showfsgroup'), T_('Show file groups') );
 		$options_Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Show hidden files') );
 		$options_Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), T_('Display file permissions like "rwxr-xr-x" rather than short form') );
 		$options_Form->checkbox( 'option_getimagesizes', $UserSettings->get('fm_getimagesizes'), T_('Display the image size of image files') );
@@ -815,6 +856,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.65  2005/12/16 16:59:11  blueyed
+ * (Optional) File owner and group columns in Filemanager.
+ *
  * Revision 1.64  2005/12/16 15:03:04  blueyed
  * tooltitle class for "Create new.." labels
  *

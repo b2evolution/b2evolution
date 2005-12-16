@@ -537,6 +537,14 @@ class Filelist
 				$r = strcasecmp( $FileA->get_perms(), $FileB->get_perms() );
 				break;
 
+			case 'fsowner':
+				$r = strcasecmp( $FileA->get_fsowner_name(), $FileB->get_fsowner_name() );
+				break;
+
+			case 'fsgroup':
+				$r = strcasecmp( $FileA->get_fsgroup_name(), $FileB->get_fsgroup_name() );
+				break;
+
 			default:
 			case 'name':
 				$r = strcasecmp( $FileA->get_name(), $FileB->get_name() );
@@ -817,12 +825,22 @@ class Filelist
 	}
 
 
+	/**
+	 * Get the FileLists root type.
+	 *
+	 * @return string
+	 */
 	function get_root_type()
 	{
 		return $this->_root_type;
 	}
 
 
+	/**
+	 * Get the FileLists root ID (in_type_ID).
+	 *
+	 * @return FileRoot
+	 */
 	function get_root_ID()
 	{
 		return $this->_root_ID;
@@ -981,12 +999,15 @@ class Filelist
 			return false;
 		}
 
-		if( ! $rows = $DB->get_results( "SELECT *
-																			 FROM T_files
-																			WHERE file_root_type = '$this->_root_type'
-																				AND file_root_ID = $this->_root_ID
-																				AND file_path IN (".implode( ',', $to_load ).')',
-																			OBJECT, 'Load FileList meta data' ) )
+		$rows = $DB->get_results(
+				"SELECT *
+				   FROM T_files
+				  WHERE file_root_type = '$this->_root_type'
+				    AND file_root_ID = $this->_root_ID
+				    AND file_path IN (".implode( ',', $to_load ).')',
+				OBJECT, 'Load FileList meta data' );
+
+		if( ! $rows )
 		{ // We haven't found any meta data...
 			return false;
 		}
@@ -1007,6 +1028,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.46  2005/12/16 16:59:13  blueyed
+ * (Optional) File owner and group columns in Filemanager.
+ *
  * Revision 1.45  2005/12/14 17:00:25  blueyed
  * assign return value of get_next() by reference
  *

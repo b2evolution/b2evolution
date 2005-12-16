@@ -316,7 +316,7 @@ class FileManager extends Filelist
 				$this->cmr_keepsource = param( 'cmr_keepsource', 'integer', 0 );
 			}
 			else
-			{
+			{ // Without SourceList there's no mode
 				$this->fm_mode = false;
 			}
 		}
@@ -328,7 +328,7 @@ class FileManager extends Filelist
 		}
 
 
-		$this->_order = ( in_array( $order, array( 'name', 'path', 'type', 'size', 'lastmod', 'perms' ) ) ? $order : NULL );
+		$this->_order = ( in_array( $order, array( 'name', 'path', 'type', 'size', 'lastmod', 'perms', 'fsowner', 'fsgroup' ) ) ? $order : NULL );
 		$this->_order_asc = ( $orderasc === NULL  ? NULL : (bool)$orderasc );
 
 		$this->setFilter( $filterString, $filterIsRegexp );
@@ -843,7 +843,6 @@ class FileManager extends Filelist
 		}
 		else
 		{ // Link to perform given $action on directory or file:
-
 			if( !isset( $File->cache['linkFile_2'] ) )
 			{
 				$File->cache['linkFile_2'] = $this->getCurUrl().'&amp;fm_selected[]='.$File->get_md5_ID();
@@ -966,7 +965,7 @@ class FileManager extends Filelist
 				$rSub = $this->getDirectoryTreeRadio( $Root, $lFile->get_full_path(), $lFile->get_rdfs_rel_path() );
 
 				if( $rSub['opened'] )
-				{
+				{ // pass opened status on, if given
 					$r['opened'] = $rSub['opened'];
 				}
 
@@ -1037,7 +1036,7 @@ class FileManager extends Filelist
 
 		if( $type == 'file' )
 		{
-			if( $error_filename = validate_filename( $name ) ) 
+			if( $error_filename = validate_filename( $name ) )
 			{ // Not valid filename or extension
 				$Messages->add( $error_filename, 'error' );
 				return false;
@@ -1350,6 +1349,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.73  2005/12/16 16:59:13  blueyed
+ * (Optional) File owner and group columns in Filemanager.
+ *
  * Revision 1.72  2005/12/16 13:47:27  blueyed
  * Default chmod comes from $Settings finally
  *

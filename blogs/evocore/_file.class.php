@@ -134,6 +134,7 @@ class File extends DataObject
 	 * MD5 hash of full pathname.
 	 *
 	 * @todo fplanque>> the purpose of this thing isn't very clear... get rid of it?
+	 *       blueyed>> yes! Without a FileRoot at the beginning this was used as an "ID" for the file.
 	 *
 	 * @var string
 	 * @see get_md5_ID()
@@ -142,7 +143,7 @@ class File extends DataObject
 	var $_md5ID;
 
 	/**
-	 * does the File/folder exist on disk?
+	 * Does the File/folder exist on disk?
 	 * @var boolean
 	 * @see exists()
 	 * @access protected
@@ -158,7 +159,7 @@ class File extends DataObject
 	var $_is_dir;
 
 	/**
-	 * file size in bytes.
+	 * File size in bytes.
 	 * @var integer
 	 * @see get_size()
 	 * @access protected
@@ -175,12 +176,28 @@ class File extends DataObject
 	var $_lastmod_ts;
 
 	/**
-	 * UNIX file permissions.
+	 * File permissions.
 	 * @var integer
 	 * @see get_perms()
 	 * @access protected
 	 */
 	var $_perms;
+
+	/**
+	 * File owner.
+	 * @var string|NULL
+	 * @see get_fsowner_name()
+	 * @access protected
+	 */
+	var $_fsowner_name;
+
+	/**
+	 * File group.
+	 * @var string|NULL
+	 * @see get_fsgroup_name()
+	 * @access protected
+	 */
+	var $_fsgroup_name;
 
 	/**
 	 * Is the File an image?
@@ -716,6 +733,54 @@ class File extends DataObject
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * Get the owner name of the file.
+	 *
+	 * @return NULL|string
+	 */
+	function get_fsgroup_name()
+	{
+		if( ! isset( $this->_fsgroup_name ) )
+		{
+			$gid = filegroup( $this->_adfp_full_path );
+			if( $gid )
+			{
+				$posix_group = posix_getgrgid( $gid );
+				if( is_array($posix_group) )
+				{
+					$this->_fsgroup_name = $posix_group['name'];
+				}
+			}
+		}
+
+		return $this->_fsgroup_name;
+	}
+
+
+	/**
+	 * Get the owner name of the file.
+	 *
+	 * @return NULL|string
+	 */
+	function get_fsowner_name()
+	{
+		if( ! isset( $this->_fsowner_name ) )
+		{
+			$uid = fileowner( $this->_adfp_full_path );
+			if( $uid )
+			{
+				$posix_user = posix_getpwuid( $uid );
+				if( is_array($posix_user) )
+				{
+					$this->_fsowner_name = $posix_user['name'];
+				}
+			}
+		}
+
+		return $this->_fsowner_name;
 	}
 
 
@@ -1282,6 +1347,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.56  2005/12/16 16:59:13  blueyed
+ * (Optional) File owner and group columns in Filemanager.
+ *
  * Revision 1.55  2005/12/16 14:57:18  blueyed
  * Valid target for popup link
  *

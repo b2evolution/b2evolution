@@ -135,6 +135,8 @@ if( $action == 'update_settings' )
 	$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
 	$UserSettings->set( 'fm_showtypes',        param( 'option_showtypes',        'integer', 0 ) );
 	$UserSettings->set( 'fm_showfsperms',      param( 'option_showfsperms',      'integer', 0 ) );
+	$UserSettings->set( 'fm_showfsowner',      param( 'option_showfsowner',      'integer', 0 ) );
+	$UserSettings->set( 'fm_showfsgroup',      param( 'option_showfsgroup',      'integer', 0 ) );
 	$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
 	$UserSettings->set( 'fm_forceFM',          param( 'option_forceFM',          'integer', 0 ) );
 
@@ -1052,10 +1054,10 @@ switch( $Fileman->fm_mode )
 
 			// Check if provided name is okay:
 			$new_names[$loop_src_File->get_md5_ID()] = trim(strip_tags($new_names[$loop_src_File->get_md5_ID()]));
-			
+
 			if( !$loop_src_File->is_dir() )
 			{
-				if( $error_filename = validate_filename( $new_names[$loop_src_File->get_md5_ID()] ) ) 
+				if( $error_filename = validate_filename( $new_names[$loop_src_File->get_md5_ID()] ) )
 				{ // Not a file name or not an allowed extension
 					$confirm = 0;
 					$Messages->add( $error_filename , 'error' );
@@ -1341,6 +1343,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.151  2005/12/16 16:59:12  blueyed
+ * (Optional) File owner and group columns in Filemanager.
+ *
  * Revision 1.150  2005/12/15 19:00:40  blueyed
  * Another hard to merge fix. When a filename is invalid handle it like all other upload errors.
  *
