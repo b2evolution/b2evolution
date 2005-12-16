@@ -41,7 +41,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
- * @author gorgeb: EPISTEMA (Bertrand Gorge).
+ * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author jeffbearer: Jeff BEARER
  * @author edgester: Jason EDGECOMBE
  *
@@ -754,6 +754,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.49  2005/12/16 13:35:59  fplanque
+ * no message
+ *
  * Revision 1.48  2005/12/14 00:19:24  blueyed
  * chmod() created media directory
  *

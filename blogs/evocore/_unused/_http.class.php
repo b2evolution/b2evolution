@@ -30,6 +30,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author wmcroberts: Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
+ * @author gorgeb: Bertrand GORGE / EPISTEMA
  *
  * @version $Id$
  */
@@ -254,6 +255,9 @@ class Http {
 
 /*
  * $Log$
+ * Revision 1.1  2005/12/16 13:35:59  fplanque
+ * no message
+ *
  * Revision 1.5  2005/10/31 05:51:06  blueyed
  * Use rawurlencode() instead of urlencode()
  *

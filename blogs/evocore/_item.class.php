@@ -36,7 +36,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
- * @author gorgeb: EPISTEMA (Bertrand Gorge).
+ * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  * @version $Id$
@@ -2331,6 +2331,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.78  2005/12/16 13:35:59  fplanque
+ * no message
+ *
  * Revision 1.77  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *

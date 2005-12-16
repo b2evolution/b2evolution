@@ -36,7 +36,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
- * @author gorgeb: EPISTEMA (Bertrand Gorge).
+ * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author sakichan: Nobuo SAKIYAMA.
  *
  * @version $Id$
@@ -650,6 +650,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.22  2005/12/16 13:35:59  fplanque
+ * no message
+ *
  * Revision 1.21  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *

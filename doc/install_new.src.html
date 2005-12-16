@@ -34,10 +34,11 @@
 <p>{{{Before you begin, please note that some network features of b2evolution require you to agree our simple <a href="http://b2evolution.net/about/terms.html">Terms of service</a>.}}}</p>
 
 <p>{{{Once you have unzipped the b2evolution distribution:}}}</p>
-<ol class="expanded"><li>{{{On your server, create or locate a mysql database for b2evolution. (For example, you can call it "b2evolution")}}}<br />
+<ol class="expanded">
+	<li>{{{On your server, try to create a new (empty) MySQL database for b2evolution (For example, you can call it "b2evolution". The exact procedure to create a new database depends on your host/server setup. Alternatively, you can also use an existing database which b2evolution will share with existing applications.)}}}<br />
 	<br />
-	<span class="small"><strong>{{{Note:}}}</strong> {{{Unless you changed the config, all tables created by b2evolution are prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. Your existing tables will not be affected in any way.}}}</span></li>
-  <li>{{{Upload the b2evolution files to your website.}}}<br />
+	<span class="small"><strong>{{{Note:}}}</strong> {{{b2evolution will create about 25 tables in the database you select. Unless you changed the config, all these tables' names will be prefixed with evo_ . Unless you already have an application using the same prefix, this makes it safe to install b2evolution in a database shared with other applications. Your existing tables will not be affected in any way.}}}</span></li>
+	<li>{{{Upload the b2evolution files to your website.}}}<br />
 	<br />
 	<span class="small"><strong>{{{Note:}}} </strong>{{{Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another.}}}<br />
 	</span>

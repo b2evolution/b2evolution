@@ -30,7 +30,7 @@
  * @author fplanque: Francois PLANQUE
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  * @author blueyed: Daniel HAHLER
- * @author gorgeb
+ * @author gorgeb: Bertrand GORGE / EPISTEMA
  *
  * @todo blueyed>> IMHO it's not good to use CSS class .line here (mainly white-space:nowrap),
  *                 because on a smaller screen you'll cut things off! (and not every browser
@@ -396,6 +396,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.43  2005/12/16 13:35:58  fplanque
+ * no message
+ *
  * Revision 1.42  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

@@ -30,6 +30,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author wmcroberts: Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
+ * @author gorgeb: Bertrand GORGE / EPISTEMA
  *
  * @version $Id$
  */
@@ -123,6 +124,9 @@ class Download
 
 /*
  * $Log$
+ * Revision 1.1  2005/12/16 13:35:59  fplanque
+ * no message
+ *
  * Revision 1.6  2005/10/31 01:20:51  blueyed
  * Fix parse errors
  *

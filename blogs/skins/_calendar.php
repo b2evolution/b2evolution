@@ -12,6 +12,9 @@
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
+ *
+ * @author fplanque: Francois PLANQUE.
+ * @author gorgeb: Bertrand GORGE / EPISTEMA
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

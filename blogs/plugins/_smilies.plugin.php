@@ -6,7 +6,8 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @author bgorge
+ * @author fplanque: Francois PLANQUE.
+ * @author gorgeb: Bertrand GORGE / EPISTEMA
  *
  * @package plugins
  */
