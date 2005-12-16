@@ -688,12 +688,12 @@ if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_crea
 		echo $Fileman->getFormHiddenInputs();
 		if( ! $Settings->get( 'fm_enable_create_dir' ) )
 		{	// We can create files only:
-			echo '<label for="fm_createname">'.T_('New file:').'</label>';
+			echo '<label for="fm_createname" class="tooltitle">'.T_('New file:').'</label>';
 			echo '<input type="hidden" name="createnew" value="file" />';
 		}
 		elseif( ! $Settings->get( 'fm_enable_create_file' ) )
 		{	// We can create directories only:
-			echo '<label for="fm_createname">'.T_('New folder:').'</label>';
+			echo '<label for="fm_createname" class="tooltitle">'.T_('New folder:').'</label>';
 			echo '<input type="hidden" name="createnew" value="dir" />';
 		}
 		else
@@ -815,6 +815,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.64  2005/12/16 15:03:04  blueyed
+ * tooltitle class for "Create new.." labels
+ *
  * Revision 1.63  2005/12/16 14:58:24  blueyed
  * Valid target for popup link, fix label for filterString, labels for "Create new .."
  *
