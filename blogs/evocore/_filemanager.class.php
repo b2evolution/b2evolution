@@ -116,22 +116,6 @@ class FileManager extends Filelist
 	var $_use_image_sizes = false;
 
 	/**
-	 * Default perms for files
-	 * @todo move to user options
-	 * @deprecated in post-phoenix
-	 * @access protected
-	 */
-	var $_default_chmod_file = 664;
-
-	/**
-	 * Default perms for dirs
-	 * @todo move to user options
-	 * @deprecated in post-phoenix
-	 * @access protected
-	 */
-	var $_default_chmod_dir = 775;
-
-	/**
 	 * Evo Display mode (upload, bookmarklet, etc..)
 	 * @todo get rid of this, along with $_url_params
 	 * @param string
@@ -1050,7 +1034,7 @@ class FileManager extends Filelist
 				: T_('Cannot create a file without name.') ), 'error' );
 			return false;
 		}
-		
+
 		if( $type == 'file' )
 		{
 			if( $error_filename = validate_filename( $name ) ) 
@@ -1366,6 +1350,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.72  2005/12/16 13:47:27  blueyed
+ * Default chmod comes from $Settings finally
+ *
  * Revision 1.71  2005/12/14 19:36:16  fplanque
  * Enhanced file management
  *
