@@ -54,6 +54,22 @@ class FileRootCache
 
 
 	/**
+	 * Get a FileRoot (cached) by ID.
+	 *
+	 * @param string ID of the FileRoot (e.g. 'user_X' or 'collection_X')
+	 * @return FileRoot
+	 */
+	function & get_by_ID( $id )
+	{
+		$part = explode( '_', $id );
+		$root_type = $part[0];
+		$root_in_type_ID = $part[1];
+
+		return $this->get_by_type_and_ID( $root_type, $root_in_type_ID );
+	}
+
+
+	/**
 	 * Get a FileRoot (cached).
 	 *
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
@@ -83,36 +99,14 @@ class FileRootCache
 		$tmp_FileRoot = & $this->get_by_type_and_ID( $root_type, $root_in_type_ID );
 		return $tmp_FileRoot->ads_path;
 	}
-	
-	/**
-	 * Get a fileRoot by it's compact code.
-	 * 
-	 * @param string $code root (ex: blog_2)
-	 */
-	function get_by_code( $code )
-	{
-		$part = explode( '_', $code );
-		switch( $part[0] )
-		{
-			case 'user':
-				$root_type = 'user';
-				break;
-
-			case 'blog':
-			default:
-				$root_type = 'collection';
-		}
-		
-		$root_ID = $part[1];
-		
-		return $this->get_by_type_and_ID( $root_type, $root_ID );
-	}
-	
 }
 
 
 /*
  * $Log$
+ * Revision 1.6  2005/12/16 13:50:49  blueyed
+ * FileRoot::get_by_ID() from post-phoenix
+ *
  * Revision 1.5  2005/12/14 19:36:16  fplanque
  * Enhanced file management
  *

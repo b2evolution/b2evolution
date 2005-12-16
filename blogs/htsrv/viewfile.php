@@ -42,21 +42,21 @@
  * @version $Id$
  */
 
-// Load config, init and get the {@link $mode mode param}
-require_once '../admin/_header.php';
+/**
+ * Load config, init and get the {@link $mode mode param}.
+ */
+require_once dirname(__FILE__).'/../admin/_header.php';
 
-if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
-
-param( 'viewtype', 'string', true );
 // Check permission:
 $current_User->check_perm( 'files', 'view', true );
 
 // Load params
+param( 'viewtype', 'string', true );
 param( 'root', 'string', true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
-param( 'path', 'string', true ); 
+param( 'path', 'string', true );
 
 // Load fileroot infos
-$FileRoot = $FileRootCache->get_by_code( $root ); 
+$FileRoot = & $FileRootCache->get_by_ID( $root );
 
 // Create file object
 $selectedFile = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path );
@@ -79,17 +79,11 @@ $selectedFile = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path );
 
 <body>
 	<?php
-	 /* 21st century and some people still like to break copy/paste functionnality and stuff like that... :'(
-		  onclick="if( history.length > 1 ) { history.back() } else { window.close() }"
-			title="<?php echo T_('Click anywhere in this window to go back or close it if no go-back history available.') ?>">
-		*/
 
 switch( $viewtype )
 {
 	case 'image':
-		{ // --------------------------------
-			// We are displaying an image file:
-			// --------------------------------
+		{{{ // Display image file:
 			echo '<div class="center">';
 
 			if( $imgSize = $selectedFile->get_image_size( 'widthheight' ) )
@@ -115,35 +109,32 @@ switch( $viewtype )
 				echo '</div>';
 
 			}
-	
+
 			echo '</div>';
-		}
+		}}}
 		break;
-	
+
 	case 'text':
 
 		if( ($buffer = @file( $selectedFile->get_full_path() )) !== false )
-		{{{
-			// --------------------------------
-			// display raw file
-			// --------------------------------
+		{{{ // Display raw file
 			param( 'showlinenrs', 'integer', 0 );
-	
+
 			$buffer_lines = count( $buffer );
 	
 			echo '<div class="fileheader">';
-	
+
 			echo '<p>';
 			echo T_('File').': <strong>'.$selectedFile->get_name().'</strong>';
 			echo ' &middot; ';
 			echo T_('Title').': <strong>'.$selectedFile->dget( 'title' ).'</strong>';
 			echo '</p>';
-	
+
 	 		echo '<p>';
 			echo T_('Description').': '.$selectedFile->dget( 'desc' );
 			echo '</p>';
-	
-	
+
+
 			if( !$buffer_lines )
 			{
 				echo '<p>** '.T_('Empty file!').' ** </p></div>';
@@ -152,25 +143,25 @@ switch( $viewtype )
 			{
 				echo '<p>';
 				printf( T_('%d lines'), $buffer_lines );
-	
+
 				$linenr_width = strlen( $buffer_lines+1 );
-	
+
 				echo ' [';
 				?>
 				<noscript type="text/javascript">
 					<a href="<?php echo $selectedFile->get_url().'&amp;showlinenrs='.(1-$showlinenrs); ?>">
-	
+
 					<?php echo $showlinenrs ? T_('Hide line numbers') : T_('Show line numbers');
 					?></a>
 				</noscript>
 				<script type="text/javascript">
 					<!--
 					document.write('<a id="togglelinenrs" href="javascript:toggle_linenrs()">toggle</a>');
-	
+
 					showlinenrs = <?php var_export( !$showlinenrs ); ?>;
-	
+
 					toggle_linenrs();
-	
+
 					function toggle_linenrs()
 					{
 						if( showlinenrs )
@@ -203,18 +194,18 @@ switch( $viewtype )
 									document.getElementsByTagName("span")[i].appendChild( document.createTextNode( ' '+text+' ' ) );
 							}
 						}
-	
+
 						document.getElementById('togglelinenrs').replaceChild(replace, document.getElementById( 'togglelinenrs' ).firstChild);
 					}
 					-->
 				</script>
 				<?php
-	
+
 				echo ']</p>';
 				echo '</div>';
-	
+
 				echo '<pre class="rawcontent">';
-	
+
 				for( $i = 0; $i < $buffer_lines; $i++ )
 				{
 					echo '<span name="linenr" class="linenr">';
@@ -224,9 +215,9 @@ switch( $viewtype )
 					}
 					echo '</span>'.htmlspecialchars( str_replace( "\t", '  ', $buffer[$i] ) );  // TODO: customize tab-width
 				}
-	
+
 	  		echo '</pre>';
-	
+
 				echo '<div class="eof">** '.T_('End Of File').' **</div>';
 			}
 		}}}
@@ -236,15 +227,15 @@ switch( $viewtype )
 																			$Fileman->get_rdfs_path_relto_root( $selectedFile ) ), 'error' );
 		}
 		break;
-	
+
 	default:
 			Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'),
 																			$selectedFile->get_name() ), 'error' );
 		break;
-}	
+}
 
-	debug_info();
-	?>
+debug_info();
+?>
 
 </body>
 </html>
@@ -252,6 +243,9 @@ switch( $viewtype )
 <?php
 /*
  * $Log$
+ * Revision 1.2  2005/12/16 13:50:49  blueyed
+ * FileRoot::get_by_ID() from post-phoenix
+ *
  * Revision 1.1  2005/12/14 19:36:16  fplanque
  * Enhanced file management
  *
