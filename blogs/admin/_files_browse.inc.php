@@ -83,9 +83,10 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 	echo $Fileman->getFormHiddenInputs( array( 'filterString'=>'', 'filterIsRegexp'=>'' ) );
 	echo $Fileman->getFormHiddenSelectedFiles();
 	?>
-	<label for="filterString" id="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
+	<label for="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
 	<input type="text"
 		name="filterString"
+		id="filterString"
 		value="<?php echo format_to_output( $Fileman->get_filter( false ), 'formvalue' ) ?>"
 		size="7"
 		accesskey="f" />
@@ -358,7 +359,7 @@ while( $lFile = & $Fileman->get_next() )
 	if( $lFile->is_dir() )
 	{ // Directory
 		$browse_dir_url = $lFile->get_view_url();
-		$target = $lFile->get_md5_ID();
+		$target = 'evo_fm_'.$lFile->get_md5_ID();
 
 		echo '<a href="'.$browse_dir_url.'" target="'.$target.' " class="filenameIcon"
 					title="'.T_('Open in a new window').'" onclick="'
@@ -687,12 +688,12 @@ if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_crea
 		echo $Fileman->getFormHiddenInputs();
 		if( ! $Settings->get( 'fm_enable_create_dir' ) )
 		{	// We can create files only:
-			echo T_('New file:');
+			echo '<label for="fm_createname">'.T_('New file:').'</label>';
 			echo '<input type="hidden" name="createnew" value="file" />';
 		}
 		elseif( ! $Settings->get( 'fm_enable_create_file' ) )
 		{	// We can create directories only:
-			echo T_('New folder:');
+			echo '<label for="fm_createname">'.T_('New folder:').'</label>';
 			echo '<input type="hidden" name="createnew" value="dir" />';
 		}
 		else
@@ -715,7 +716,7 @@ if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_crea
 			echo '</select>:';
 		}
 	?>
-	<input type="text" name="createname" value="<?php
+	<input type="text" name="createname" id="fm_createname" value="<?php
 		if( isset( $createname ) )
 		{
 			echo $createname;
@@ -814,6 +815,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.63  2005/12/16 14:58:24  blueyed
+ * Valid target for popup link, fix label for filterString, labels for "Create new .."
+ *
  * Revision 1.62  2005/12/16 14:02:50  blueyed
  * Killed "open selected files in popup" feature. Renamed openselected() to check_if_selected_files() (what has been a sub-feature of openselected())
  *
