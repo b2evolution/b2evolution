@@ -191,7 +191,7 @@ class File extends DataObject
 	var $_is_image;
 
 	/**
-	 * Extension, Mime type, icon, viewtype and 'allowed extension' of the file 
+	 * Extension, Mime type, icon, viewtype and 'allowed extension' of the file
 	 * @var Filetype object
 	 */
 	var $Filetype;
@@ -230,13 +230,13 @@ class File extends DataObject
 		$this->_name = basename( $this->_adfp_full_path );
 		$this->_dir = dirname( $this->_adfp_full_path ).'/';
 		$this->_md5ID = md5( $this->_adfp_full_path );
-		
+
 		// Create the filetype with the extension of the file if the extension exist in database
 		if( $ext = $this->get_ext() )
 		{ // The file has an extension, load filetype object
 			$this->Filetype = & $FiletypeCache->get_by_extension( strtolower( $ext ), false );
 		}
-		
+
 		// Initializes file properties (type, size, perms...)
 		$this->load_properties();
 
@@ -508,7 +508,7 @@ class File extends DataObject
 	function get_url()
 	{
 		global $public_acces_to_media, $htsrv_url;
-		
+
 		if( $this->is_dir() )
 		{ // Directory
 			if( $public_acces_to_media )
@@ -517,8 +517,8 @@ class File extends DataObject
 			}
 			else
 			{ // No Access
-				die( 'Private directory! '); 
-			}		
+				die( 'Private directory! ');
+			}
 		}
 		else
 		{ // File
@@ -737,7 +737,7 @@ class File extends DataObject
 		{ // Return icon for known type of the file
 				return $this->Filetype->get_icon();
 		}
-		else 
+		else
 		{ // Icon for unknown file type:
 			$icon = 'file_unknown';
 		}
@@ -1145,15 +1145,15 @@ class File extends DataObject
 	function get_view_url()
 	{
 		global $htsrv_url;
-		
+
 		// Get root code
 		$root = $this->_FileRoot->gen_ID( $this->_root_type, $this->_root_ID );
-		
+
 		if( $this->is_dir() )
 		{ // Directory
 			return regenerate_url( 'root,path', 'root='.$root.'&amp;path='.$this->get_rdfs_rel_path() );
 		}
-		else 
+		else
 		{ // File
 			if( !isset( $this->Filetype->viewtype ) )
 			{
@@ -1164,15 +1164,15 @@ class File extends DataObject
 				case 'image':
 					return  $htsrv_url.'viewfile.php?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=image';
 					break;
-				
+
 				case 'text':
 					return $htsrv_url.'viewfile.php?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=text';
 					break;
-					
+
 				case 'download':	 // will NOT open a popup and will insert a Content-disposition: attachment; header
 					return $htsrv_url.'getfile.php?root='.$root.'&amp;path='.$this->_rdfp_rel_path;
 					break;
-				
+
 				case 'browser':		// will open a popup
 				case 'external':  // will NOT open a popup
 				default:
@@ -1181,7 +1181,7 @@ class File extends DataObject
 		}
 	}
 
-	
+
 	/**
 	 * Get Link to view the file (either with viewer of with browser, etc...)
 	 */
@@ -1212,10 +1212,10 @@ class File extends DataObject
 		{ // Link to open in the curent window
 			return '<a href="'.$url.'" title="'.$title.'">'.$text.'</a>';
 		}
-		else 
+		else
 		{ // Link to open in a new window
-			$target = $this->get_md5_ID();
-						
+			$target = 'evo_fm_'.$this->get_md5_ID();
+
 			return '<a href="'.$url.'" target="'.$target.'"
 							title="'.T_('Open in a new window').'" onclick="'
 
@@ -1223,11 +1223,11 @@ class File extends DataObject
 							.'width=' . ( ( $width = $this->get_image_size( 'width' ) ) ? ( $width + 100 ) : 800  ).' ,'
 							.'height=' . ( ( $height = $this->get_image_size( 'height' ) ) ? ( $height + 150 ) : 800  ).' ,'
 							."scrollbars=yes,status=yes,resizable=yes' );"
-							
+
 							.'">'.$text.'</a>';
 		}
 	}
-		
+
 
 	/**
 	 * Template function. Display link to edit file.
@@ -1282,6 +1282,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.55  2005/12/16 14:57:18  blueyed
+ * Valid target for popup link
+ *
  * Revision 1.54  2005/12/14 19:33:10  fplanque
  * more responsibility given to the file class, but the file class still can work standalone (without a filemanager)
  *
