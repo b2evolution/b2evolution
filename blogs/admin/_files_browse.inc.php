@@ -234,7 +234,7 @@ else
 
 <?php
 	/*****************  Col headers  ****************/
-	
+
 	echo '<tr>';
 	echo '<th class="firstcol">';
 	$Fileman->dispButtonParent();
@@ -250,15 +250,15 @@ else
 	{ // Show file types column
 		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
 	}
-	
+
 	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'size', /* TRANS: file size */ T_('Size') ).'</th>';
 	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ).'</th>';
-	
+
 	if( $UserSettings->get('fm_showfsperms') ) // MB UPDATE-------------
 	{ // Show file perms column
 		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'perms', /* TRANS: file's permissions (short) */ T_('Perms') ).'</th>';
 	}
-	
+
 	echo '<th class="lastcol nowrap">'. /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions').'</th>';
 	echo '</tr>';
 ?>
@@ -286,7 +286,7 @@ while( $lFile = & $Fileman->get_next() )
 	echo ' onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">';
 
 	/********************    Checkbox:    *******************/
-	
+
 	echo '<td class="checkbox firstcol">';
 	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"
@@ -298,7 +298,7 @@ while( $lFile = & $Fileman->get_next() )
 	echo ' />';
 
 	/***********  Hidden info used by Javascript:  ***********/
-	
+
 	if( $mode == 'upload' )
 	{
 		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles
@@ -308,7 +308,7 @@ while( $lFile = & $Fileman->get_next() )
 	echo '</td>';
 
 	/********************  File type Icon:  *******************/
-	
+
 	echo '<td class="icon">';
 	if( $lFile->is_dir() )
 	{ // Directory
@@ -320,15 +320,15 @@ while( $lFile = & $Fileman->get_next() )
 		{
 			echo $view_link;
 		}
-		else 
+		else
 		{ // File extension unrecognized
 			echo $lFile->get_icon();
 		}
 }
 	echo '</td>';
-	
+
 	/*******************  Path (flatmode): ******************/
-	
+
 	if( $Fileman->flatmode )
 	{
 		echo '<td class="filepath">';
@@ -340,7 +340,7 @@ while( $lFile = & $Fileman->get_next() )
 	echo '<td class="filename">';
 
 	/*************  Invalid filename warning:  *************/
-	
+
 	if( !$lFile->is_dir() )
 	{
 		if( $error_filename = validate_filename( $lFile->get_name() ) )
@@ -352,26 +352,26 @@ while( $lFile = & $Fileman->get_next() )
 	{ // TODO: Warning icon with hint
 		echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_dirname ) );
 	}
-	
+
 	/****  Open in a new window  (only directories)  ****/
-	
+
 	if( $lFile->is_dir() )
-	{ // Directory 
+	{ // Directory
 		$browse_dir_url = $lFile->get_view_url();
 		$target = $lFile->get_md5_ID();
-		
+
 		echo '<a href="'.$browse_dir_url.'" target="'.$target.' " class="filenameIcon"
 					title="'.T_('Open in a new window').'" onclick="'
-					
+
 					."pop_up_window( '$browse_dir_url', '$target', '"
 					.'width=800,height=800,'
 					."scrollbars=yes,status=yes,resizable=yes' ); return false;"
-					
+
 					.'">'.get_icon( 'window_new' ).'</a>';
 	}
-	
+
 	/***************  Link ("chain") icon:  **************/
-	
+
 	if( $Fileman->fm_mode == 'link_item'
 			// Plug extensions here!
 			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -385,17 +385,17 @@ while( $lFile = & $Fileman->get_next() )
 	}
 
 	/********************  Filename  ********************/
-	
+
 	if( $lFile->is_dir() )
 	{ // Directory
-		
-		// Link to open the directory in the curent window						
+
+		// Link to open the directory in the curent window
 		echo '<a href="'.$browse_dir_url.'" onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">'
 			           .$lFile->get_name().'</a>';
 	}
 	else
 	{ // File
-		
+
 		if( $view_link = $lFile->get_view_link( $lFile->get_name(), NULL, NULL ) )
 		{
 			echo $view_link;
@@ -407,7 +407,7 @@ while( $lFile = & $Fileman->get_next() )
 	}
 
 	/***************  File meta data:  **************/
-	
+
 	echo '<span class="filemeta">';
 	// Optionnaly display IMAGE pixel size:
 	disp_cond( $Fileman->getFileImageSize(), ' (%s)' );
@@ -439,34 +439,34 @@ while( $lFile = & $Fileman->get_next() )
 	echo '</td>';
 
 	/*******************  File type  ******************/
-	
+
 	if( $UserSettings->get('fm_showtypes') ) // MB UPDATE-------------
 	{ // Show file types
 		echo '<td class="type">'.$lFile->get_type().'</td>';
 	}
-	
+
 	/*******************  File size  ******************/
-	
+
 	echo '<td class="size">'.$lFile->get_size_formatted().'</td>';
 
 	/****************  File time stamp  ***************/
-	
+
 	echo '<td class="timestamp">';
 	echo '<span class="date">'.$lFile->get_lastmod_formatted( 'date' ).'</span> ';
 	echo '<span class="time">'.$lFile->get_lastmod_formatted( 'time' ).'</span>';
 	echo '</td>';
 
 	/****************  File pemissions  ***************/
-	
+
 	if( $UserSettings->get('fm_showfsperms') ) // MB UPDATE-------------
 	{ // Show file perms
 		echo '<td class="perms">';
 		$Fileman->dispButtonFileEditPerms();
 		echo '</td>';
 	}
-	
+
 	/*****************  Action icons  ****************/
-		
+
 	echo '<td class="actions lastcol">';
 	// Not implemented yet: $Fileman->dispButtonFileEdit();
 	$Fileman->dispButtonFileProperties();
@@ -523,14 +523,6 @@ else
 			?></a>
 		&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
 
-		<input class="ActionButton"
-			title="<?php echo T_('Open in new windows'); ?>"
-			name="actionArray[open_in_new_windows]"
-			value="open_in_new_windows"
-			type="image"
-			src="<?php echo get_icon( 'window_new', 'url' ) ?>"
-			onclick="openselectedfiles(); return false;" />
-
 		<?php
 		if( $mode == 'upload' )
 		{	// We are uploading in a popup opened by an edit screen
@@ -550,11 +542,13 @@ else
 			?>
 			<input class="ActionButton" type="image" name="actionArray[rename]"
 				title="<?php echo T_('Rename the selected files'); ?>"
-				src="<?php echo get_icon( 'file_rename', 'url' ); ?>" />
+				src="<?php echo get_icon( 'file_rename', 'url' ); ?>"
+				onclick="return check_if_selected_files();" />
 
 			<input class="DeleteButton" type="image" name="actionArray[delete]"
 				title="<?php echo T_('Delete the selected files') ?>"
-				src="<?php echo get_icon( 'file_delete', 'url' ) ?>" />
+				src="<?php echo get_icon( 'file_delete', 'url' ) ?>"
+				onclick="return check_if_selected_files();" />
 			<?php
 			// NOTE: No delete confirmation by javascript, we need to check DB integrity!
 
@@ -567,21 +561,21 @@ else
 				value="download"
 				type="image"
 				src="<?php echo get_icon( 'download', 'url' ) ?>"
-				onclick="return openselectedfiles(true);" / -->
+				onclick="return check_if_selected_files();" / -->
 
 			<!-- Not implemented yet: input class="ActionButton" type="submit"
-				name="actionArray[sendbymail]" value="<?php echo T_('Send by mail') ?>" onclick="return openselectedfiles(true);" / -->
+				name="actionArray[sendbymail]" value="<?php echo T_('Send by mail') ?>" onclick="return check_if_selected_files();" / -->
 
 
 		/* Not fully functional:
 		<input class="ActionButton" type="image" name="actionArray[file_copy]"
 			title="<?php echo T_('Copy the selected files'); ?>"
-			onclick="return openselectedfiles(true);"
+			onclick="return check_if_selected_files();"
 			src="<?php echo get_icon( 'file_copy', 'url' ); ?>" />
 
 		<input class="ActionButton" type="image" name="actionArray[file_move]"
 			title="<?php echo T_('Move the selected files'); ?>"
-			onclick="return openselectedfiles(true);"
+			onclick="return check_if_selected_files();"
 			src="<?php echo get_icon( 'file_move', 'url' ); ?>" />
 // This is too geeky! Default perms radio options and unchecked radio groups! NO WAY!
 // If you want this feature to be usable by average users you must only have one line per file OR one file for all. You can't mix both.
@@ -590,7 +584,7 @@ else
 // fplanque>> second thought: changing perms for multiple files at once is useful. BUT assigning different perms to several files with ONE form is trying to solve a problem that not even geeks can face once in a lifetime.
 // This has to be simplified to ONE single set of permissions for all selected files. (If you need different perms, click again)
 			<input class="ActionButton" type="image" name="actionArray[edit_perms]"
-			onclick="return openselectedfiles(true);"
+			onclick="return check_if_selected_files();"
 			title="<?php echo T_('Change permissions for the selected files'); ?>"
 			src="<?php echo get_icon( 'file_perms', 'url' ); ?>" />
 	*/ ?>
@@ -615,29 +609,23 @@ if( $countFiles )
 	<script type="text/javascript">
 		<!--
 		/**
-		 * Open selected files in new popup windows:
-		 * fp>> Note: I think we're going to kill this feature. It's too geeky.
-		 * With the new system, anything that can gracefully open in a popup will already do so by default.
-		 * This feature virtually doesn't save any click but cost one more compared to directly clicking the file icons.
+		 * Check if files are selected.
+		 *
+		 * This should be used as "onclick" handler for "With selected" actions (onclick="return check_if_selected_files();").
+		 * @return boolean true, if something is selected, false if not.
 		 */
-		function openselectedfiles( checkonly )
+		function check_if_selected_files()
 		{
 			elems = document.getElementsByName( 'fm_selected[]' );
-			fm_popup_type = 'selected';
-			var opened = 0;
+			var checked = 0;
 			for( i = 0; i < elems.length; i++ )
 			{
 				if( elems[i].checked )
 				{
-					if( !checkonly )
-					{
-						id = elems[i].id.substring( elems[i].id.lastIndexOf('_')+1, elems[i].id.length );
-						document.getElementById( 'button_new_'+id ).click();
-					}
-					opened++;
+					checked++;
 				}
 			}
-			if( !opened )
+			if( !checked )
 			{
 				alert( '<?php echo TS_('Nothing selected.') ?>' );
 				return false;
@@ -826,6 +814,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.62  2005/12/16 14:02:50  blueyed
+ * Killed "open selected files in popup" feature. Renamed openselected() to check_if_selected_files() (what has been a sub-feature of openselected())
+ *
  * Revision 1.61  2005/12/14 19:36:15  fplanque
  * Enhanced file management
  *
