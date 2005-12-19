@@ -929,7 +929,7 @@ switch( $Fileman->fm_mode )
 					$success_msg .=
 						'<ul>'
 							.'<li>'.T_("Here's the code to display it:").' <input type="text" value="'.$img_tag.'" /></li>'
-							.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_replace_selection( window.opener.document.post.content, \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\' ); } return false;">'.T_('Add the code to your post !').'</a></li>'
+							.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_replace_selection( window.opener.document.post.content, \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', window.opener.document ); } return false;">'.T_('Add the code to your post !').'</a></li>'
 						.'</ul>';
 				}
 
@@ -1343,6 +1343,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.152  2005/12/19 04:36:16  blueyed
+ * Fix using textarea_replace_selection() for IE from a popup.
+ *
  * Revision 1.151  2005/12/16 16:59:12  blueyed
  * (Optional) File owner and group columns in Filemanager.
  *

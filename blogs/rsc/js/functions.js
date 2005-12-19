@@ -167,13 +167,14 @@ function toggle_clickopen( id, hide, displayVisible )
  * TODO: Make the quicktags plugin use this general function.
  * @var element
  * @var text
+ * @var document (needs only be passed from a popup window as window.opener.document)
  */
-function textarea_replace_selection( myField, snippet )
+function textarea_replace_selection( myField, snippet, target_document )
 {
-	if (document.selection)
+	if (target_document.selection)
 	{ // IE support:
 		myField.focus();
-		sel = document.selection.createRange();
+		sel = target_document.selection.createRange();
 		sel.text = snippet;
 		myField.focus();
 	}

@@ -705,7 +705,7 @@ if( $countFiles )
 					return true;
 				}
 				window.opener.focus();
-				textarea_replace_selection( window.opener.document.post.content, snippet );
+				textarea_replace_selection( window.opener.document.post.content, snippet, window.opener.document );
 				return true;
 			}
 		}
@@ -856,6 +856,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.66  2005/12/19 04:36:16  blueyed
+ * Fix using textarea_replace_selection() for IE from a popup.
+ *
  * Revision 1.65  2005/12/16 16:59:11  blueyed
  * (Optional) File owner and group columns in Filemanager.
  *
