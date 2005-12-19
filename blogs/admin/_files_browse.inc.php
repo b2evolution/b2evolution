@@ -188,7 +188,7 @@ else
 			</select>
 			<script type="text/javascript">
 				<!--
-				// Just to have noscript tag below. fp>> is it required to have a script before noscript?
+				// Just to have noscript tag below (which has to know what type it is not for).
 				// -->
 			</script>
 			<noscript>
@@ -306,7 +306,7 @@ while( $lFile = & $Fileman->get_next() )
 
 	echo '>';		// Removed funky onclick behaviour
 	/********************    Checkbox:    *******************/
-	
+
 	echo '<td class="checkbox firstcol">';
 	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"';
@@ -561,7 +561,6 @@ else
 			?></a>
 		&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
 
-		// Removed "open popups" functionnality: too much complexity for almost no click saving at all
 		<?php
 		if( $mode == 'upload' )
 		{	// We are uploading in a popup opened by an edit screen
@@ -680,8 +679,7 @@ if( $countFiles )
 		 */
 		function insert_tag_for_selected_files()
 		{
-			elems = document.getElementsByName( 'fm_selected[]' );
-			fm_popup_type = 'selected';
+			var elems = document.getElementsByName( 'fm_selected[]' );
 			var snippet = '';
 			for( i = 0; i < elems.length; i++ )
 			{
@@ -855,6 +853,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.68  2005/12/19 22:48:45  blueyed
+ * doc
+ *
  * Revision 1.67  2005/12/19 16:42:03  fplanque
  * minor
  *
