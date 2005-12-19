@@ -101,6 +101,7 @@ class AbstractSettings
 	 */
 	var $allLoaded = false;
 
+
 	/**
 	 * Default settings.
 	 *
@@ -622,6 +623,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.26  2005/12/19 17:39:56  fplanque
+ * Remember prefered browing tab for each user.
+ *
  * Revision 1.25  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

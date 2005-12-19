@@ -33,7 +33,15 @@ else
 	// TODO: have a method of some object ?
 	$add_item_url = 'b2edit.php?blog='.$blog;
 
-	$Request->param( 'tab', 'string', 'postlist', true /* memorize */ );
+	// Determine tab to use:
+	$pref_browse_tab = $UserSettings->get( 'pref_browse_tab' ); // Get last memorized
+	$Request->param( 'tab', 'string', $pref_browse_tab, true /* memorize */ );
+	if( $tab != $pref_browse_tab )
+	{	// We have chosen a different tab from the last one:
+		// Make it the new preference:
+    $UserSettings->set( 'pref_browse_tab', $tab );
+		$UserSettings->dbupdate();
+	}
 
 	$Request->param( 'show_past', 'integer', '0', true );
 	$Request->param( 'show_future', 'integer', '0', true );

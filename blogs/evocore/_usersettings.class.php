@@ -54,6 +54,19 @@ require_once dirname(__FILE__).'/_abstractsettings.class.php';
 class UserSettings extends AbstractSettings
 {
 	/**
+	 * The default settings to use, when a setting is not given
+	 * in the database.
+	 *
+	 * @todo Allow overriding from /conf/_config_TEST.php?
+	 * @access protected
+	 * @var array
+	 */
+	var $_defaults = array(
+		'pref_browse_tab' => 'posts',
+	);
+
+
+	/**
 	 * Constructor
 	 */
 	function UserSettings()
@@ -126,6 +139,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.11  2005/12/19 17:39:56  fplanque
+ * Remember prefered browing tab for each user.
+ *
  * Revision 1.10  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

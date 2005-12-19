@@ -650,6 +650,8 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
+		set_upgrade_checkpoint( '9000' );
+
 		// INSTALL PLUGINS:
 		install_basic_plugins();
 	}
@@ -670,13 +672,11 @@ function upgrade_b2evo_tables()
 		 * Then create a new extension block, and increase db version numbers everywhere where needed in this file.
 		 */
 
-		// New tables:
-		create_b2evo_tables_phoenix_beta();
-
-		// Create relations:
-		create_b2evo_relations(); // EXPERIMENTAL!
 	}
 
+
+	// Create relations:
+	create_b2evo_relations(); // EXPERIMENTAL!
 
 	// Update DB schema version to $new_db_version
 	set_upgrade_checkpoint( $new_db_version );
@@ -687,6 +687,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.113  2005/12/19 17:39:56  fplanque
+ * Remember prefered browing tab for each user.
+ *
  * Revision 1.112  2005/12/14 19:36:16  fplanque
  * Enhanced file management
  *

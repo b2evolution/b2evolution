@@ -476,10 +476,10 @@ to
 		<?php
 		if( upgrade_b2evo_tables() )
 		{
-		?>
-		<p><?php echo T_('Upgrade completed successfully!')?></p>
-		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'b2evolution')?></p>
-		<?php
+			?>
+			<p><?php echo T_('Upgrade completed successfully!')?></p>
+			<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'b2evolution')?></p>
+			<?php
 		}
 		break;
 
