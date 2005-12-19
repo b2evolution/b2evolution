@@ -1804,17 +1804,13 @@ class Form extends Widget
 	 */
 	function hiddens( $hiddens )
 	{
-		$r = '';
-
 		$save_output = $this->output;
 		$this->output = false;
 		foreach( $hiddens as $hidden )
 		{
-			$r .= $this->hidden( $hidden[0], $hidden[1], isset($hidden[2]) ? $hidden[2] : array() );
+			$this->hidden( $hidden[0], $hidden[1], isset($hidden[2]) ? $hidden[2] : array() );
 		}
 		$this->output = $save_output;
-
-		return $this->display_or_return( $r );
 	}
 
 
@@ -1828,8 +1824,6 @@ class Form extends Widget
 	 */
 	function hiddens_by_key( $hiddens )
 	{
-		$r = '';
-
 		$save_output = $this->output;
 		$this->output = false;
 		foreach( $hiddens as $l_name => $l_value )
@@ -1838,17 +1832,15 @@ class Form extends Widget
 			{ // this happens for example when we've POSTed an array (for PHP it's an array then)
 				foreach( $l_value as $ll_key => $ll_value )
 				{
-					$r .= $this->hidden( $l_name.'['.$ll_key.']', $ll_value );
+					$this->hidden( $l_name.'['.$ll_key.']', $ll_value );
 				}
 			}
 			else
 			{
-				$r .= $this->hidden( $l_name, $l_value );
+				$this->hidden( $l_name, $l_value );
 			}
 		}
 		$this->output = $save_output;
-
-		return $this->display_or_return( $r );
 	}
 
 
@@ -2342,6 +2334,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.93  2005/12/19 16:42:03  fplanque
+ * minor
+ *
  * Revision 1.92  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

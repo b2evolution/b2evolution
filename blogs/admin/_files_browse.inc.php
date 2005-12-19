@@ -188,7 +188,7 @@ else
 			</select>
 			<script type="text/javascript">
 				<!--
-				// Just to have noscript tag below
+				// Just to have noscript tag below. fp>> is it required to have a script before noscript?
 				// -->
 			</script>
 			<noscript>
@@ -304,15 +304,13 @@ while( $lFile = & $Fileman->get_next() )
 
 	if( $countFiles%2 ) echo ' class="odd"';
 
-	// select the file by default, when clicking on the <tr>; this gets "undone" for the checkbox itself and the filename link
-	echo ' onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">';
-
+	echo '>';		// Removed funky onclick behaviour
 	/********************    Checkbox:    *******************/
-
+	
 	echo '<td class="checkbox firstcol">';
 	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
-				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"
-				onclick="this.checked = ! this.checked;"'; // undo the <tr>'s onclick checking of this box
+				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"';
+							// Removed funky onclick behaviour	
 	if( $checkall || $Fileman->isSelected( $lFile ) )
 	{
 		echo ' checked="checked"';
@@ -410,9 +408,9 @@ while( $lFile = & $Fileman->get_next() )
 
 	if( $lFile->is_dir() )
 	{ // Directory
-
-		// Link to open the directory in the curent window
-		echo '<a href="'.$browse_dir_url.'" onclick="var cb = document.getElementById(\'cb_filename_'.$countFiles.'\'); cb.checked = (! cb.checked);">'
+		
+		// Link to open the directory in the curent window						
+		echo '<a href="'.$browse_dir_url.'">'		// Removed funky onclick behaviour
 			           .$lFile->get_name().'</a>';
 	}
 	else
@@ -563,6 +561,7 @@ else
 			?></a>
 		&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
 
+		// Removed "open popups" functionnality: too much complexity for almost no click saving at all
 		<?php
 		if( $mode == 'upload' )
 		{	// We are uploading in a popup opened by an edit screen
@@ -856,6 +855,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.67  2005/12/19 16:42:03  fplanque
+ * minor
+ *
  * Revision 1.66  2005/12/19 04:36:16  blueyed
  * Fix using textarea_replace_selection() for IE from a popup.
  *

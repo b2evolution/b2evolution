@@ -488,6 +488,8 @@ class Results extends Widget
 				// GLOBAL (NAV) HEADER:
 				$this->display_nav( 'header' );
 
+				$this->display_top_callback();
+
 				// START OF LIST/TABLE:
 				$this->display_list_start();
 
@@ -511,6 +513,24 @@ class Results extends Widget
 	}
 
 
+	// EXPERIMENTAL:
+	function display_top_callback()
+	{
+		if( !empty($this->top_callback) )
+		{
+			$this->Form = new Form( regenerate_url(), $this->param_prefix.'form_search', 'post', 'none' ); // COPY!!
+
+			$this->Form->begin_form( '' );
+
+			$func = $this->top_callback;
+			$func( $this->Form );
+			$this->Form->submit( array( 'submit', T_('Filter list'), 'search' ) );
+
+			$this->Form->end_form( '' );
+		}
+	}
+
+
 	/**
 	 * Display list/table start.
 	 *
@@ -521,21 +541,6 @@ class Results extends Widget
 	function display_list_start()
 	{
 		echo $this->params['list_start'];
-		
-		// EXPERIMENTAL:
-		if( !empty($this->top_callback) )
-		{
-			$this->Form = new Form( regenerate_url(), $this->param_prefix.'form_search', 'post', 'none' ); // COPY!!
-	
-			$this->Form->begin_form( '' );
-			
-			$func = $this->top_callback;
-			$func( $this->Form );
-			$this->Form->submit( array( 'submit', T_('Filter list'), 'search' ) );
-			
-			$this->Form->end_form( '' );
-		}
-		
 	}
 
 
@@ -1250,6 +1255,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.44  2005/12/19 16:42:03  fplanque
+ * minor
+ *
  * Revision 1.43  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

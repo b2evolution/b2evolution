@@ -42,30 +42,31 @@ $Form->begin_fieldset( T_('Upload options') );
 	$Form->text( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum allowed filesize'), T_('KB (This cannot be higher than your PHP/Webserver setting!)'), 7 );
 $Form->end_fieldset();
 
-
-$Form->begin_fieldset( T_('Advanced options') );
-	// Do not display regexp for filename if the force_regexp_filename var is set
-	if( empty($force_regexp_filename) )
-	{
-		$Form->text( 'regexp_filename',
-										$Settings->get('regexp_filename'),
-										40,
-										T_('Valid filename'),
-										T_('Regular expression'),
-										255 );
-	}
-	// Do not display regexp for dirname if the force_regexp_dirname var is set	
-	if( empty( $force_regexp_dirname ) )
-	{
-		$Form->text( 'regexp_dirname',
-										$Settings->get('regexp_dirname'),
-										40,
-										T_('Valid dirname'),
-										T_('Regular expression'),
-										255 );
-	}
-$Form->end_fieldset();
-
+if( empty( $force_regexp_filename ) || empty( $force_regexp_dirname ) )
+{ // At least one of these strings can be configured in the UI:
+	$Form->begin_fieldset( T_('Advanced options') );
+		// Do not display regexp for filename if the force_regexp_filename var is set
+		if( empty($force_regexp_filename) )
+		{
+			$Form->text( 'regexp_filename',
+											$Settings->get('regexp_filename'),
+											40,
+											T_('Valid filename'),
+											T_('Regular expression'),
+											255 );
+		}
+		// Do not display regexp for dirname if the force_regexp_dirname var is set	
+		if( empty( $force_regexp_dirname ) )
+		{
+			$Form->text( 'regexp_dirname',
+											$Settings->get('regexp_dirname'),
+											40,
+											T_('Valid dirname'),
+											T_('Regular expression'),
+											255 );
+		}
+	$Form->end_fieldset();
+}
 
 $Form->end_form( array(
 		array( 'submit', 'submit', T_('Update'), 'SaveButton' ),

@@ -229,14 +229,14 @@ class FileManager extends Filelist
 				$this->_root_url = $this->User->getMediaUrl();
 				$this->root = 'user';
 			}
-			elseif( $root_parts[0] == 'blog' && isset($root_parts[1]) )
+			elseif( $root_parts[0] == 'collection' && isset($root_parts[1]) )
 			{
 				$tBlog = & $BlogCache->get_by_ID( $root_parts[1] );
 				$this->_root_type = 'collection';
 				$this->_root_ID = $tBlog->ID;
 				$this->_ads_root_path = $tBlog->get( 'mediadir' );
 				$this->_root_url = $tBlog->get( 'mediaurl' );
-				$this->root = 'blog_'.$tBlog->ID;
+				$this->root = 'collection_'.$tBlog->ID;
 			}
 
 			if( ! $this->_ads_root_path )
@@ -714,7 +714,7 @@ class FileManager extends Filelist
  				// echo '<br>got blog media dir for blog #'.$blog_ID;
 				$r[] = array( 'type' => 'collection',
 											'IDn'  => $blog_ID,
-											'id'   => 'blog_'.$blog_ID,
+											'id'   => 'collection_'.$blog_ID,
 											'name' => $Blog->get( 'shortname' ),
 											'path' => $blog_media_dir,
 											'url'  => $Blog->get( 'mediaurl' ) );
@@ -1349,6 +1349,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.74  2005/12/19 16:42:03  fplanque
+ * minor
+ *
  * Revision 1.73  2005/12/16 16:59:13  blueyed
  * (Optional) File owner and group columns in Filemanager.
  *

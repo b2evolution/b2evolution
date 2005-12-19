@@ -124,12 +124,8 @@ class FileRoot
 		switch( $root_type )
 		{
 			case 'user':
-				// Note: we might actually want to keep the ID here for global cacheing purposes.
-				return 'user_'.$root_in_type_ID;
-
 			case 'collection':
-				// TODO: rename this to 'collection_'
-				return 'blog_'.$root_in_type_ID;
+				return $root_type.'_'.$root_in_type_ID;
 		}
 
 		debug_die( "Root_type=$root_type not supported" );
@@ -139,6 +135,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.7  2005/12/19 16:42:03  fplanque
+ * minor
+ *
  * Revision 1.6  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

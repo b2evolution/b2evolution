@@ -30,7 +30,7 @@ $FileRoot = & $FileRootCache->get_by_ID( $root );
 $File = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path );
 
 // Headers to display the file directly in the browser
-header('Content-type: '. $File->Filetype->mimetype );
+header('Content-type: '.$File->Filetype->mimetype );
 header('Content-Length: '.filesize( $File->get_full_path() ) );
 
 if( $File->Filetype->viewtype == 'download' )

@@ -131,18 +131,6 @@ class File extends DataObject
 	var $_name;
 
 	/**
-	 * MD5 hash of full pathname.
-	 *
-	 * @todo fplanque>> the purpose of this thing isn't very clear... get rid of it?
-	 *       blueyed>> yes! Without a FileRoot at the beginning this was used as an "ID" for the file.
-	 *
-	 * @var string
-	 * @see get_md5_ID()
-	 * @access protected
-	 */
-	var $_md5ID;
-
-	/**
 	 * Does the File/folder exist on disk?
 	 * @var boolean
 	 * @see exists()
@@ -176,7 +164,7 @@ class File extends DataObject
 	var $_lastmod_ts;
 
 	/**
-	 * File permissions.
+	 * Filesystem file permissions.
 	 * @var integer
 	 * @see get_perms()
 	 * @access protected
@@ -1285,8 +1273,8 @@ class File extends DataObject
 							title="'.T_('Open in a new window').'" onclick="'
 
 							."pop_up_window( '$url', '$target', '"
-							.'width=' . ( ( $width = $this->get_image_size( 'width' ) ) ? ( $width + 100 ) : 800  ).' ,'
-							.'height=' . ( ( $height = $this->get_image_size( 'height' ) ) ? ( $height + 150 ) : 800  ).' ,'
+							.'width='.( ( $width = $this->get_image_size( 'width' ) ) ? ( $width + 100 ) : 800  ).','
+							.'height='.( ( $height = $this->get_image_size( 'height' ) ) ? ( $height + 150 ) : 800  ).','
 							."scrollbars=yes,status=yes,resizable=yes' );"
 
 							.'">'.$text.'</a>';
@@ -1347,6 +1335,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.57  2005/12/19 16:42:03  fplanque
+ * minor
+ *
  * Revision 1.56  2005/12/16 16:59:13  blueyed
  * (Optional) File owner and group columns in Filemanager.
  *
