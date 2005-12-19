@@ -143,7 +143,7 @@ else
 			// Init filter params:
 			$ItemList->load_from_Request();
 
-			if( $ItemList->ItemQuery->single_post )
+			if( $ItemList->single_post )
 			{	// We have requested a specific post
 				// hack this over to the exp tab
 				$tab = 'exp';
@@ -169,6 +169,18 @@ else
 					break;
 			}
 			break;
+
+
+		case 'comments':
+			/*
+			 * Latest comments:
+			 */
+			$Request->param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of cats to restrict to
+			$show_statuses = $show_status;
+
+			$CommentList = & new CommentList( $blog, "'comment','trackback','pingback'", $show_statuses, '',	'',	'DESC',	'',	20 );
+			break;
+
 
 		default:
   		debug_die( 'Unhandled content; tab='.$tab );
@@ -198,10 +210,11 @@ $AdminUI->add_menu_entries(
 							),
 					/*	'commentlist' => array(
 							'text' => T_('Comment list'),
-							'href' => 'b2browse.php?tab=commentlist&amp;blog='.$blog ),
+							'href' => 'b2browse.php?tab=commentlist&amp;blog='.$blog ), */
 						'comments' => array(
 							'text' => T_('Comments'),
-							'href' => 'b2browse.php?tab=comments&amp;blog='.$blog ), */
+							'href' => regenerate_url( 'tab', 'tab=comments' ),
+							),
 				)
 	);
 
@@ -219,36 +232,44 @@ if( $blog )
 	// Begin payload block:
 	$AdminUI->disp_payload_begin();
 
-	// fplanque> Note: this is depressing, but I have to put a table back here
-	// just because IE supports standards really badly! :'(
-	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>';
+	switch( $tab )
+	{
+		case 'comments':
+			require dirname(__FILE__).'/_browse_comments.inc.php';
+			break;
 
-	echo '<td class="browse_left_col">';
-		switch( $tab )
-		{
-			case 'postlist':
-				require dirname(__FILE__).'/_browse_posts_list.inc.php';
-				break;
+		default:
+			// fplanque> Note: this is depressing, but I have to put a table back here
+			// just because IE supports standards really badly! :'(
+			echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>';
 
-			case 'posts':
-				require dirname(__FILE__).'/_edit_showposts.php';
-				break;
+			echo '<td class="browse_left_col">';
+				switch( $tab )
+				{
+					case 'postlist':
+						require dirname(__FILE__).'/_browse_posts_list.inc.php';
+						break;
 
-			case 'exp':
-				require dirname(__FILE__).'/_browse_posts_exp.inc.php';
-				break;
+					case 'posts':
+						require dirname(__FILE__).'/_edit_showposts.php';
+						break;
 
-			case 'tracker':
-				require dirname(__FILE__).'/_browse_tracker.inc.php';
-				break;
-		}
-	echo '</td>';
+					case 'exp':
+						require dirname(__FILE__).'/_browse_posts_exp.inc.php';
+						break;
 
-	echo '<td class="browse_right_col">';
-		require dirname(__FILE__).'/_browse_posts_sidebar.inc.php';
-	echo '</td>';
+					case 'tracker':
+						require dirname(__FILE__).'/_browse_tracker.inc.php';
+						break;
+				}
+			echo '</td>';
 
-	echo '</tr></table>';
+			echo '<td class="browse_right_col">';
+				require dirname(__FILE__).'/_browse_posts_sidebar.inc.php';
+			echo '</td>';
+
+			echo '</tr></table>';
+	}
 
 	// End payload block:
 	$AdminUI->disp_payload_end();
