@@ -52,10 +52,6 @@ require_once dirname(__FILE__).'/_results.class.php';
  */
 class DataObjectList2 extends Results
 {
-	/**
-	 * Object array
-	 */
-	// var $Obj_array = array();
 
 
 	/**
@@ -109,6 +105,9 @@ class DataObjectList2 extends Results
 
 /*
  * $Log$
+ * Revision 1.2  2005/12/19 19:30:14  fplanque
+ * minor
+ *
  * Revision 1.1  2005/12/08 13:13:33  fplanque
  * no message
  *

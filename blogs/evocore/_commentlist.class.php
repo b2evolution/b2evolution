@@ -113,7 +113,7 @@ class CommentList extends DataObjectList
 
 		if(empty($orderby))
 		{
-			$orderby='comment_date '.$order;
+			$orderby = 'comment_date '.$order;
 		}
 		else
 		{
@@ -180,6 +180,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.14  2005/12/19 19:30:14  fplanque
+ * minor
+ *
  * Revision 1.13  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

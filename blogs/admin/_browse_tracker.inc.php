@@ -43,21 +43,9 @@ if( false )
 }
 
 
-/*
-$SQL = & new SQL();
+// Display title depending on selection params:
+request_title( '<h2>', '</h2>', '<br />', 'htmlbody', true, true, 'b2browse.php', 'blog='.$blog );
 
-	// Global list from the Task menu:
-
-	$SQL->SELECT( 'T_posts.*, ptyp_name, pst_name,
-									assigned.user_firstname AS asssigned_firstname, assigned.user_lastname AS asssigned_lastname' );
-
-	$SQL->FROM( 'T_posts LEFT JOIN T_poststatuses ON post_pst_ID = pst_ID
-						 			LEFT JOIN T_posttypes ON post_ptyp_ID = ptyp_ID
-						 			LEFT JOIN T_users assigned ON post_assigned_user_ID = assigned.user_ID
-						 			INNER JOIN T_categories ON post_main_cat_ID = cat_ID');
-
-	$SQL->WHERE( 'cat_blog_ID = '.$blog );
-*/
 
 /*
 	if(isset($tab)) switch( $tab )
@@ -82,17 +70,6 @@ $SQL = & new SQL();
 */
 
 
-/*
-// Filter the task list
-if ( param( 'post_filter', 'string', '', true) )
-{
-	// the search is made upon the title
-	$SQL->add_search_field( 'post_title' );
-	// Construction of the WHERE clause into the SQL quer
-	$SQL->WHERE_keyword( $post_filter, $search_kw_combine);
-}
-*/
-
 
 // RUN SEARCH/QUERY NOW:
 
@@ -101,8 +78,6 @@ if ( param( 'post_filter', 'string', '', true) )
 
 
 /*
-if( $pagenow != 'search.php')
-{
 	**
 	 * Callback to add filters on top of the result set
 	 *
@@ -114,7 +89,6 @@ if( $pagenow != 'search.php')
 		$Form->text( 'post_filter', $post_filter, 20, T_('Task title'), '', 60 );
 	}
 	$ItemList->top_callback = 'filter_on_post_title';
-}
 */
 
 
@@ -317,6 +291,9 @@ if( $restrict_to_open )
 
 /*
  * $Log$
+ * Revision 1.3  2005/12/19 19:30:14  fplanque
+ * minor
+ *
  * Revision 1.2  2005/12/19 18:10:18  fplanque
  * Normalized the exp and tracker tabs.
  *

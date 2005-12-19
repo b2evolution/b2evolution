@@ -67,6 +67,13 @@ class ItemList2 extends DataObjectList2
 	 */
 	var $unit;
 
+
+	/**
+	 * Did we request a single post?
+	 */
+ 	var $single_post = false;
+
+
 	/**
 	 * Constructor
 	 *
@@ -154,7 +161,7 @@ class ItemList2 extends DataObjectList2
     $p = $Request->param( 'p', 'integer' );          // Specific post number to display
 		$title = $Request->param( 'title', 'string' );	 // urtitle of post to display
 
-		$this->ItemQuery->where_ID( $p, $title );
+		$this->single_post = $this->ItemQuery->where_ID( $p, $title );
 
 
 		/*
@@ -424,6 +431,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.2  2005/12/19 19:30:14  fplanque
+ * minor
+ *
  * Revision 1.1  2005/12/08 13:13:33  fplanque
  * no message
  *

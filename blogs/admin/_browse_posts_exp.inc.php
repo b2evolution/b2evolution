@@ -34,7 +34,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-	echo '<h2>This is a demo of Class ItemList2 (which extends Results much better)</h2>';
+echo '<h5>This is a demo of Class ItemList2 (which extends Results much better)</h5>';
 
 echo '<div class="NavBar">';
 
@@ -330,6 +330,9 @@ if( $ItemList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.4  2005/12/19 19:30:14  fplanque
+ * minor
+ *
  * Revision 1.3  2005/12/19 18:10:18  fplanque
  * Normalized the exp and tracker tabs.
  *
