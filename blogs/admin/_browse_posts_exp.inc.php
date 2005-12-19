@@ -53,13 +53,13 @@ echo '<div class="NavBar">';
 
 	if( !$postend )
 	{
-		$postend = $poststart + $MainList->limit - 1;
+		$postend = $poststart + $ItemList->limit - 1;
 	}
 
 	$nextXstart = $postend + 1;
-	$nextXend = $postend + $MainList->limit;
+	$nextXend = $postend + $ItemList->limit;
 
-	$previousXstart = ($poststart - $MainList->limit);
+	$previousXstart = ($poststart - $ItemList->limit);
 	$previousXend = $poststart - 1;
 	if( $previousXstart < 1 )
 	{
@@ -67,7 +67,8 @@ echo '<div class="NavBar">';
 	}
 
 
-	$posts = $MainList->limit; // for display in navbar
+	$posts = $ItemList->limit; // for display in navbar
+	$MainList = & $ItemList;
 	require dirname(__FILE__). '/_edit_navbar.php';
 
 echo '</div>';
@@ -75,7 +76,7 @@ echo '</div>';
 /*
  * Display posts:
  */
-while( $Item = $MainList->get_item() )
+while( $Item = $ItemList->get_item() )
 {
 	?>
 	<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
@@ -153,7 +154,7 @@ while( $Item = $MainList->get_item() )
 
 			if( $Blog->allowcomments != 'never' )
 			{
- 				echo '<a href="b2browse.php?tab=posts&amp;blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1" class="ActionButton">';
+ 				echo '<a href="b2browse.php?blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1" class="ActionButton">';
 				// TRANS: Link to comments for current post
 				comments_number(T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
 				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'), $Item->ID);
@@ -309,7 +310,7 @@ while( $Item = $MainList->get_item() )
 <?php
 }
 
-if( $MainList->get_total_num_posts() )
+if( $ItemList->get_total_num_posts() )
 { // don't display navbar twice if we have no post
 	echo '<div class="NavBar">';
 	require dirname(__FILE__). '/_edit_navbar.php';
@@ -329,6 +330,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.3  2005/12/19 18:10:18  fplanque
+ * Normalized the exp and tracker tabs.
+ *
  * Revision 1.2  2005/12/14 17:00:24  blueyed
  * assign return value of get_next() by reference
  *

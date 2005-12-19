@@ -131,44 +131,44 @@ else
 
 
 		case 'exp':
+		case 'tracker':
 			/*
 			 * Let's go the clean new way...
 			 */
 			require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_itemlist2.class.php' );
 
 			// Create empty List:
-			$MainList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max );
+			$ItemList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max );
 
 			// Init filter params:
-			$MainList->load_from_Request();
+			$ItemList->load_from_Request();
 
-			// Run the query:
-			$MainList->query();
+			if( $ItemList->ItemQuery->single_post )
+			{	// We have requested a specific post
+				// hack this over to the exp tab
+				$tab = 'exp';
+			}
 
-			// Temporary inits:
-      $postIDlist = $MainList->get_page_ID_list();
-      $postIDarray = $MainList->get_page_ID_array();
+			switch( $tab )
+			{
+				case 'exp':
+					// Run the query:
+					$ItemList->query();
 
-			$Request->param( 'c', 'string' );
-			$Request->param( 'tb', 'integer', 0 );
-			$Request->param( 'pb', 'integer', 0 );
+					// Temporary inits:
+		      $postIDlist = $ItemList->get_page_ID_list();
+		      $postIDarray = $ItemList->get_page_ID_array();
+
+					$Request->param( 'c', 'string' );
+					$Request->param( 'tb', 'integer', 0 );
+					$Request->param( 'pb', 'integer', 0 );
+					break;
+
+				case 'tracker':
+					// DO **NOT** Run the query yet! (we want column definitions to be loaded and act as ORDER BY fields)
+					break;
+			}
 			break;
-
-
-		case 'tracker':
-			// This will eventually go the "clean" way....
-
-			require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_itemlist2.class.php' );
-
-			// Create empty List:
-			$Results = & new ItemList2( $Blog, $timestamp_min, $timestamp_max );
-
-			// Init filter params:
-			$Results->load_from_Request();
-
-			// DO **NOT** Run the query yet! (we want column definitions to be loaded and act as ORDER BY fields)
-		break;
-
 
 		default:
   		debug_die( 'Unhandled content; tab='.$tab );

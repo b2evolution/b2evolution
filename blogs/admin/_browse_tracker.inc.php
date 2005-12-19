@@ -96,7 +96,7 @@ if ( param( 'post_filter', 'string', '', true) )
 
 // RUN SEARCH/QUERY NOW:
 
-// $Results = & new Results( $SQL->get(), 'post_' );
+// $ItemList = & new Results( $SQL->get(), 'post_' );
 
 
 
@@ -113,19 +113,19 @@ if( $pagenow != 'search.php')
 		$Form->hidden( 'filter_on_post_title', 1 );
 		$Form->text( 'post_filter', $post_filter, 20, T_('Task title'), '', 60 );
 	}
-	$Results->top_callback = 'filter_on_post_title';
+	$ItemList->top_callback = 'filter_on_post_title';
 }
 */
 
 
-$Results->title = T_('Task list');
+$ItemList->title = T_('Task list');
 
 
 // We'll instantiate and cache each Post/Item:
-$Results->Cache = & $ItemCache;
+$ItemList->Cache = & $ItemCache;
 
 
-$Results->cols[] = array(
+$ItemList->cols[] = array(
 						'th' => /* TRANS: abbrev for Priority */ T_('P'),
 						'order' => 'post_priority',
 						'th_start' => '<th class="shrinkwrap">',
@@ -162,12 +162,12 @@ function task_title_link( $Item )
 	}
 	*/
 
-	$col .= '<a href="b2browse.php?tab=posts&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1" class="" title="'.
+	$col .= '<a href="b2browse.php?blog='.$Blog->ID.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1" class="" title="'.
 								T_('Edit this task...').'">'.$Item->dget('title').'</a></strong>';
 
 	return $col;
 }
-$Results->cols[] = array(
+$ItemList->cols[] = array(
 						'th' => T_('Task'),
 						'order' => 'post_title',
 						'td_start' => '<td class="tskst_$post_pst_ID$">',
@@ -190,14 +190,14 @@ function item_visibility( $Item )
 
 	return $r;
 }
-$Results->cols[] = array(
+$ItemList->cols[] = array(
 						'th' => T_('Visibility'),
 						'order' => 'post_status',
 						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
 						'td' => '%item_visibility( {Obj} )%',
 				);
 
-$Results->cols[] = array(
+$ItemList->cols[] = array(
 						'th' => T_('Status'),
 						'order' => 'post_pst_ID',
 						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
@@ -205,7 +205,7 @@ $Results->cols[] = array(
 						'td' => '@get(\'t_extra_status\')@',
 					);
 
-$Results->cols[] = array(
+$ItemList->cols[] = array(
 						'th' => T_('Type'),
 						'order' => 'post_ptyp_ID',
 						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
@@ -213,7 +213,7 @@ $Results->cols[] = array(
 						'td' => '@get(\'t_type\')@',
 					);
 
-$Results->cols[] = array(
+$ItemList->cols[] = array(
 						'th' => T_('ID'),
 						'order' => 'post_ID',
 						'th_start' => '<th class="shrinkwrap">',
@@ -222,7 +222,7 @@ $Results->cols[] = array(
 						'td' => '$post_ID$',
 					);
 
-$Results->cols[] = array(
+$ItemList->cols[] = array(
 						'th' => T_('Assigned'),
 						'order' => 'post_assigned_user_ID',
 						// 'td' => '$asssigned_firstname$ $asssigned_lastname$',
@@ -253,7 +253,7 @@ function deadline( $date )
 
 	return $output;
 }
-$Results->cols[] = array(
+$ItemList->cols[] = array(
 						'th' => T_('Deadline'),
 						'order' => 'post_datedeadline',
 						'td_start' => '<td class="center tskst_$post_pst_ID$">',
@@ -261,7 +261,7 @@ $Results->cols[] = array(
 					);
 
 
-$Results->cols[] = array(
+$ItemList->cols[] = array(
 	'th' => /* TRANS: abbrev for info */ T_('i'),
 	'td_start' => '<td class="shrinkwrap">',
 	'td' => '@history_info_icon()@',
@@ -282,7 +282,7 @@ function item_edit_actions( $Item )
 
 	return $r;
 }
-$Results->cols[] = array(
+$ItemList->cols[] = array(
 		'th' => T_('Act.'),
 		'td_start' => '<td class="shrinkwrap">',
 		'td' => '%item_edit_actions( {Obj} )%',
@@ -292,20 +292,20 @@ if( $current_User->check_perm( 'tasks', 'add', false, NULL ) )
 {	// User can add a task:
 	if( isset( $edited_Contact ) )
 	{
-		$Results->global_icon( T_('Add a linked task...'), 'new',
+		$ItemList->global_icon( T_('Add a linked task...'), 'new',
 			regenerate_url( 'action,cont_ID', 'action=new&amp;cont_ID='.$edited_Contact->ID, 'tasks.php' ), T_('Add linked task') );
 	}
 	else
 	{
-		$Results->global_icon( T_('Add a task...'), 'new', regenerate_url( 'action', 'action=new', 'tasks.php' ), T_('Add task') );
+		$ItemList->global_icon( T_('Add a task...'), 'new', regenerate_url( 'action', 'action=new', 'tasks.php' ), T_('Add task') );
 	}
 }
 
 
 
-$Results->global_icon( T_('Add a task...'), 'new', $add_item_url, T_('Add task') );
+$ItemList->global_icon( T_('Add a task...'), 'new', $add_item_url, T_('Add task') );
 
-$Results->display();
+$ItemList->display();
 
 /*
 if( $restrict_to_open )
@@ -317,6 +317,9 @@ if( $restrict_to_open )
 
 /*
  * $Log$
+ * Revision 1.2  2005/12/19 18:10:18  fplanque
+ * Normalized the exp and tracker tabs.
+ *
  * Revision 1.1  2005/12/08 13:13:33  fplanque
  * no message
  *

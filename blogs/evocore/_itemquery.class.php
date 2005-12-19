@@ -59,6 +59,8 @@ class ItemQuery extends SQL
 	var $phrase;
 	var $exact;
 
+	var $single_post = false;
+
 
 	/**
 	 * Constructor.
@@ -90,6 +92,7 @@ class ItemQuery extends SQL
 		if( !empty($p) && ($p != 'all') )
 		{
 			$this->WHERE_and( $this->dbIDname.' = '. intval($p) );
+			$this->single_post = true;
 		}
 
 		// if a post urltitle is specified, load that post
@@ -97,6 +100,7 @@ class ItemQuery extends SQL
 		{
 			global $DB;
 			$this->WHERE_and( $this->dbprefix.'urltitle = '.$DB->quote($title) );
+			$this->single_post = true;
 		}
 	}
 
@@ -396,6 +400,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.6  2005/12/19 18:10:18  fplanque
+ * Normalized the exp and tracker tabs.
+ *
  * Revision 1.5  2005/12/05 18:17:19  fplanque
  * Added new browsing features for the Tracker Use Case.
  *
