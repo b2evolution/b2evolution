@@ -44,8 +44,7 @@ if( false )
 
 
 // Display title depending on selection params:
-request_title( '<h2>', '</h2>', '<br />', 'htmlbody', true, true, 'b2browse.php', 'blog='.$blog );
-
+echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 
 /*
 	if(isset($tab)) switch( $tab )
@@ -154,7 +153,7 @@ $ItemList->cols[] = array(
  */
 function item_visibility( $Item )
 {
-	$r = $Item->get( 'status' );
+	$r = $Item->get( 't_status' );
 
 	// Display publish NOW button if current user has the rights:
 	$r .= $Item->get_publish_link( ' ', ' ', get_icon( 'publish' ), '#', '' );
@@ -291,6 +290,9 @@ if( $restrict_to_open )
 
 /*
  * $Log$
+ * Revision 1.4  2005/12/20 18:12:50  fplanque
+ * enhanced filtering/titling framework
+ *
  * Revision 1.3  2005/12/19 19:30:14  fplanque
  * minor
  *

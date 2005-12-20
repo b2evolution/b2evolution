@@ -36,16 +36,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 echo '<h5>This is a demo of Class ItemList2 (which extends Results much better)</h5>';
 
+// Display title depending on selection params:
+echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
+
+if( !$ItemList->single_post )
+{
 echo '<div class="NavBar">';
 
 	/*
 	 * @movedTo _b2browse.php
 	 */
-
-	// Display title depending on selection params:
-	request_title( '<h2>', '</h2>', '<br />', 'htmlbody', true, true, 'b2browse.php', 'blog='.$blog );
-
-
 	if( !$poststart )
 	{
 		$poststart = 1;
@@ -72,6 +72,8 @@ echo '<div class="NavBar">';
 	require dirname(__FILE__). '/_edit_navbar.php';
 
 echo '</div>';
+}
+
 
 /*
  * Display posts:
@@ -310,7 +312,7 @@ while( $Item = $ItemList->get_item() )
 <?php
 }
 
-if( $ItemList->get_total_num_posts() )
+if( $ItemList->get_total_num_posts() > 1 )
 { // don't display navbar twice if we have no post
 	echo '<div class="NavBar">';
 	require dirname(__FILE__). '/_edit_navbar.php';
@@ -330,6 +332,9 @@ if( $ItemList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.5  2005/12/20 18:12:50  fplanque
+ * enhanced filtering/titling framework
+ *
  * Revision 1.4  2005/12/19 19:30:14  fplanque
  * minor
  *

@@ -38,6 +38,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 require_once dirname(__FILE__).'/_results.class.php';
 
+
+class FilteredResults extends Results
+{
+	var $filters = array();
+}
+
+
+
 /**
  * Data Object List Base Class 2
  *
@@ -50,7 +58,7 @@ require_once dirname(__FILE__).'/_results.class.php';
  * @version beta
  * @abstract
  */
-class DataObjectList2 extends Results
+class DataObjectList2 extends FilteredResults
 {
 
 
@@ -80,6 +88,15 @@ class DataObjectList2 extends Results
 
 
 	/**
+	 * Instantiate an object for requested row and cache it:
+	 */
+	function & get_by_idx( $idx )
+	{
+		return $this->Cache->instantiate( $this->rows[$idx] );
+	}
+
+
+	/**
 	 * Get next object in list
 	 */
 	function & get_next()
@@ -88,23 +105,49 @@ class DataObjectList2 extends Results
 
 		if( $this->current_idx >= $this->result_num_rows )
 		{	// No more comment in list
-			$r = false;
+			$r = false; // TODO: try with NULL
 			return $r;
 		}
 
-		if( ! is_null( $this->Cache ) )
-		{ // We want to instantiate an object for the row and cache it:
-			// We also keep a local ref in case we want to use it for display:
-			$this->current_Obj = & $this->Cache->instantiate( $this->rows[$this->current_idx++] );
-		}
+		// We also keep a local ref in case we want to use it for display:
+		$this->current_Obj = & $this->get_by_idx( $this->current_idx++ );
 
 		return $this->current_Obj;
 	}
 
+
+	/**
+	 * Display a global title matching filter params
+	 *
+	 * @todo implement $order
+	 *
+	 * @param string prefix to display if a title is generated
+	 * @param string suffix to display if a title is generated
+	 * @param string glue to use if multiple title elements are generated
+	 * @param string comma separated list of titles inthe order we would like to display them
+	 * @param string format to output, default 'htmlbody'
+	 */
+	function get_filter_title( $prefix = ' ', $suffix = '', $glue = ' - ', $order = NULL, $format = 'htmlbody' )
+	{
+		$title_array = $this->get_filter_titles();
+
+  	if( empty( $title_array ) )
+  	{
+			return '';
+		}
+
+		// We have something to display:
+		$r = implode( $glue, $title_array );
+		$r = $prefix.format_to_output( $r, $format ).$suffix;
+		return $r;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.3  2005/12/20 18:12:50  fplanque
+ * enhanced filtering/titling framework
+ *
  * Revision 1.2  2005/12/19 19:30:14  fplanque
  * minor
  *

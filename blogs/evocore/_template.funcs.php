@@ -223,6 +223,14 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			}
 	}
 
+
+	/* TODO: once the MainList is moved to ItemList2, remove a lot from above and get them like this:
+	// EXPERIMENTAL:
+	global $MainList;
+	$additional_titles = $MainList->get_title();
+	$r = array_merge( $r, $additional_titles );
+	*/
+
 	if( !empty( $r ) )
 	{ // We have something to display:
 		$r = implode( $glue, $r );
@@ -310,6 +318,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.15  2005/12/20 18:12:50  fplanque
+ * enhanced filtering/titling framework
+ *
  * Revision 1.14  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *

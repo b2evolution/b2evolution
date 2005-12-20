@@ -105,8 +105,8 @@ class ItemList2 extends DataObjectList2
 
 		$this->Blog = & $Blog;
 
- 		$this->timestamp_min = $timestamp_min;
-		$this->timestamp_max = $timestamp_max;
+		$this->filters['ts_min'] = $timestamp_min;
+		$this->filters['ts_max'] = $timestamp_max;
 
 		// Default values:
 		$this->unit = $Settings->get('what_to_show');
@@ -129,58 +129,59 @@ class ItemList2 extends DataObjectList2
 		// Get chapters/categories (and compile those values right away)
 		$Request->compile_cat_array( $this->Blog->ID == 1 ? 0 : $this->Blog->ID );
 
-		// $this->cat = $Request->get( 'cat' );
-		// $this->catsel = $Request->get( 'catsel' );
-		$cat_array = $Request->get( 'cat_array' );
-		$cat_modifier = $Request->get( 'cat_modifier' );
+		$this->filters['cat_array'] = $Request->get( 'cat_array' );
+		$this->filters['cat_modifier'] = $Request->get( 'cat_modifier' );
 
-		$this->ItemQuery->where_chapter2( $this->Blog->ID, $cat_array, $cat_modifier );
+		$this->ItemQuery->where_chapter2( $this->Blog->ID, $this->filters['cat_array'], $this->filters['cat_modifier'] );
 
 
 		/*
 		 * Restrict to selected authors:
 		 */
-		$author = $Request->param( 'author', 'string', '', true );      // List of authors to restrict to
+		$this->filters['authors'] = $Request->param( 'author', 'string', '', true );      // List of authors to restrict to
 
-		$this->ItemQuery->where_author( $author );
+		$this->ItemQuery->where_author( $this->filters['authors'] );
 
 
 		/*
 		 * Restrict by keywords
 		 */
-		$keywords = $Request->param( 's', 'string', '', true );         // Search string
-		$phrase = $Request->param( 'sentence', 'string', 'AND', true ); // Search for sentence or for words
-		$exact = $Request->param( 'exact', 'integer', '', true );       // Require exact match of title or contents
+		$this->filters['keywords'] = $Request->param( 's', 'string', '', true );         // Search string
+		$this->filters['phrase'] = $Request->param( 'sentence', 'string', 'AND', true ); // Search for sentence or for words
+		$this->filters['exact'] = $Request->param( 'exact', 'integer', '', true );       // Require exact match of title or contents
 
-		$this->ItemQuery->where_keywords( $keywords, $phrase, $exact );
+		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 
 
 		/*
 		 * Specific Item selection?
 		 */
-    $p = $Request->param( 'p', 'integer' );          // Specific post number to display
-		$title = $Request->param( 'title', 'string' );	 // urtitle of post to display
+    $this->filters['post_ID'] = $Request->param( 'p', 'integer' );          // Specific post number to display
+		$this->filters['post_title'] = $Request->param( 'title', 'string' );	 // urtitle of post to display
 
-		$this->single_post = $this->ItemQuery->where_ID( $p, $title );
+		$this->single_post = $this->ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 
 
 		/*
 		 * If a timeframe is specified in the querystring, restrict to that timeframe:
 		 */
-		$m = $Request->param( 'm', 'integer', '', true );            // YearMonth(Day) to display
-		$w = $Request->param( 'w', 'integer', '', true );            // Week number
-		$dstart = $Request->param( 'dstart', 'integer', '', true );  // YearMonth(Day) to start at
+		$this->filters['ymdhms'] = $Request->param( 'm', 'integer', '', true );            // YearMonth(Day) to display
+		$this->filters['week'] = $Request->param( 'w', 'integer', '', true );            // Week number
+		$this->filters['ymdhms_min'] = $Request->param( 'dstart', 'integer', '', true );  // YearMonth(Day) to start at
+		$this->filters['ymdhms_max'] = '';
 
-		$this->ItemQuery->where_datestart( $m, $w, $dstart, '', $this->timestamp_min, $this->timestamp_max );
+		$this->ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
+		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
+		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
 
 
 		/*
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses wilh have been preset to a more restrictive set of values
-		$show_statuses = $Request->param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of sharings to restrict to
+		$this->filters['show_statuses_array'] = $Request->param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of sharings to restrict to
 
-		$this->ItemQuery->where_status( $show_statuses );
+		$this->ItemQuery->where_status( $this->filters['show_statuses_array'] );
 
 
 		/*
@@ -235,7 +236,7 @@ class ItemList2 extends DataObjectList2
 		$postend = $Request->param( 'postend', 'integer', 0, true );    // End results at this position
 
 
-		if( !empty($p) || !empty($title) )
+		if( $this->single_post )   // p or title
 		{ // Single post: no paging required!
 		}
 		elseif( !empty($poststart) )
@@ -282,9 +283,11 @@ class ItemList2 extends DataObjectList2
 		elseif( $this->unit == 'days' )
 		{ // We are going to limit to x days:
 			// echo 'LIMIT DAYS ';
-			if( empty( $dstart ) )
+			if( empty( $this->filters['ymdhms_min'] ) )
 			{ // We have no start date, we'll display the last x days:
-				if( !empty($keywords) || !empty($catarray) || !empty($author) )
+				if( !empty($this->filters['keywords'])
+					|| !empty($this->filters['cat_array'])
+					|| !empty($this->filters['authors']) )
 				{ // We are in DAYS mode but we can't restrict on these! (TODO: ?)
 					$limits = '';
 				}
@@ -304,7 +307,7 @@ class ItemList2 extends DataObjectList2
 
 				// TODO: this is redundant with previous dstart processing:
 				// Add trailing 0s: YYYYMMDDHHMMSS
-				$dstart0 = $dstart.'00000000000000';
+				$dstart0 = $this->filters['ymdhms_min'].'00000000000000';
 
 				$dstart_mysql = substr($dstart0,0,4).'-'.substr($dstart0,4,2).'-'.substr($dstart0,6,2).' '
 												.substr($dstart0,8,2).':'.substr($dstart0,10,2).':'.substr($dstart0,12,2);
@@ -402,6 +405,173 @@ class ItemList2 extends DataObjectList2
 	}
 
 
+	/**
+	 * Generate a title for the current list, depending on its filtering params
+	 *
+	 * @todo cleanup some displays
+	 * @todo implement HMS part of YMDHMS
+	 *
+	 * @return array
+   */
+  function get_filter_titles()
+  {
+		global $month, $post_statuses;
+
+  	$title_array = array();
+
+
+  	if( $this->single_post )
+		{	// We have requested a specific post:
+			// Should be in first position
+			$Item = & $this->get_by_idx( 0 );
+
+			if( is_null($Item) )
+			{
+				$title_array[] = T_('Invalid request');
+			}
+			else
+			{
+				$title_array[] = T_('Post details').': '.$Item->get('title');
+			}
+			return $title_array;
+		}
+
+
+		// CATEGORIES:
+  	if( !empty($this->filters['cat_array']) )
+  	{ // We have requested specific categories...
+			$cat_names = array();
+			foreach( $this->filters['cat_array'] as $cat_ID )
+			{
+				if( ($my_cat = get_the_category_by_ID( $cat_ID, false ) ) !== false )
+				{ // It is almost never meaningful to die over an invalid cat when generating title
+					$cat_names[] = $my_cat['cat_name'];
+				}
+			}
+			if( $this->filters['cat_modifier'] == '*' )
+			{
+				$cat_names_string = implode( ' + ', $cat_names );
+			}
+			else
+			{
+				$cat_names_string = implode( ', ', $cat_names );
+			}
+			if( !empty( $cat_names_string ) )
+			{
+				if( $this->filters['cat_modifier'] == '-' )
+				{
+					$cat_names_string = T_('All but ').$cat_names_string;
+					$title_array['cats'] = T_('Categories').': '.$cat_names_string;
+				}
+				else
+				{
+					if( count($this->filters['cat_array']) > 1 )
+						$title_array['cats'] = T_('Categories').': '.$cat_names_string;
+					else
+						$title_array['cats'] = T_('Category').': '.$cat_names_string;
+				}
+			}
+		}
+
+
+		// ARCHIVE TIMESLOT:
+		if( !empty($this->filters['ymdhms']) )
+		{	// We have asked for a specific timeframe:
+
+			$my_year = substr($this->filters['ymdhms'],0,4);
+
+			if( strlen($this->filters['ymdhms']) > 4 )
+			{ // We have requested a month too:
+				$my_month = T_($month[substr($this->filters['ymdhms'],4,2)]);
+			}
+			else
+			{
+				$my_month = '';
+			}
+
+			// Requested a day?
+			$my_day = substr($this->filters['ymdhms'],6,2);
+
+			$arch = T_('Archives for').': '.$my_month.' '.$my_year;
+
+			if( !empty( $my_day ) )
+			{	// We also want to display a day
+				$arch .= ", $my_day";
+			}
+
+			if( !empty($this->filters['week']) || ($this->filters['week'] === 0) ) // Note: week # can be 0
+			{	// We also want to display a week number
+				$arch .= ', '.T_('week').' '.$this->filters['week'];
+			}
+
+			$title_array['ymdhms'] = $arch;
+		}
+
+
+		// START AT
+		if( !empty($this->filters['ymdhms_min'] ) )
+		{
+			$title_array['ymdhms_min'] = T_('Start at').': '.$this->filters['ymdhms_min'] ;
+		}
+		if( !empty($this->filters['ts_min'] ) )
+		{
+			if( $this->filters['ts_min'] == 'now' )
+			{
+				$title_array['ts_min'] = T_('Hide past');
+			}
+			else
+			{
+				$title_array['ts_min'] = T_('Start at').': '.$this->filters['ts_min'];
+			}
+		}
+
+
+		// STOP AT
+		if( !empty($this->filters['ymdhms_max'] ) )
+		{
+			$title_array['ymdhms_max'] = T_('Stop at').': '.$this->filters['ymdhms_max'];
+		}
+		if( !empty($this->filters['ts_max'] ) )
+		{
+			if( $this->filters['ts_max'] == 'now' )
+			{
+				$title_array['ts_max'] = T_('Hide future');
+			}
+			else
+			{
+				$title_array['ts_max'] = T_('Stop at').': '.$this->filters['ts_max'];
+			}
+		}
+
+
+ 		// KEYWORDS:
+		if( !empty($this->filters['keywords']) )
+		{
+			$title_array['keywords'] = T_('Keyword(s)').': '.$this->filters['keywords'];
+		}
+
+
+		// AUTHORS:
+		if( !empty($this->filters['authors']) )
+		{
+			$title_array[] = T_('Author(s)').': '.$this->filters['authors'];
+		}
+
+
+		// SHOW STATUSES
+		if( count( $this->filters['show_statuses_array'] ) < 5 ) // TEMP
+		{
+			$status_titles = array();
+			foreach( $this->filters['show_statuses_array'] as $status )
+			{
+				$status_titles[] = T_( $post_statuses[$status] );
+			}
+			$title_array[] = T_('Visibility').': '.implode( ', ', $status_titles );
+		}
+
+		return $title_array;
+	}
+
 
 	/**
 	 * return total number of posts
@@ -431,6 +601,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.3  2005/12/20 18:12:50  fplanque
+ * enhanced filtering/titling framework
+ *
  * Revision 1.2  2005/12/19 19:30:14  fplanque
  * minor
  *
