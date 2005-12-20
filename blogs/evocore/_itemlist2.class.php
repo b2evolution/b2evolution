@@ -78,13 +78,13 @@ class ItemList2 extends DataObjectList2
 	 * Constructor
 	 *
 	 * @Param Blog
-	 * @param mixed Do not show posts before this timestamp, can be 'now'
-	 * @param mixed Do not show posts after this timestamp, can be 'now'
+	 * @param mixed Default filter set: Do not show posts before this timestamp, can be 'now'
+	 * @param mixed Default filter set: Do not show posts after this timestamp, can be 'now'
 	 */
 	function ItemList2(
 			& $Blog,
-			$timestamp_min = '',        // Do not show posts before this timestamp
-			$timestamp_max = 'now'     // Do not show posts after this timestamp
+			$timestamp_min = NULL,       // Do not show posts before this timestamp
+			$timestamp_max = NULL    		 // Do not show posts after this timestamp
 		)
 	{
 		global $ItemCache, $Settings;
@@ -98,19 +98,36 @@ class ItemList2 extends DataObjectList2
 		$this->page_param = 'paged';
 		$this->page = 1;
 
-
-
 		// The SQL Query object:
 		$this->ItemQuery = & new ItemQuery( $ItemCache->dbtablename, $ItemCache->dbprefix, $ItemCache->dbIDname );
 
 		$this->Blog = & $Blog;
 
-		$this->filters['ts_min'] = $timestamp_min;
-		$this->filters['ts_max'] = $timestamp_max;
-
 		// Default values:
 		$this->unit = $Settings->get('what_to_show');
 		// let's use the '20' default $this->limit = $Settings->get('posts_per_page');
+
+
+		// Initialize the default filter set:
+		$this->default_filters['ts_min'] = $timestamp_min;
+		$this->default_filters['ts_max'] = $timestamp_max;
+		$this->default_filters['cat_array'] = array();
+		$this->default_filters['cat_modifier'] = '';
+		$this->default_filters['authors'] = '';
+		$this->default_filters['keywords'] = '';
+		$this->default_filters['phrase'] = 'AND';
+		$this->default_filters['exact'] = 0;
+		$this->default_filters['post_ID'] = NULL;
+		$this->default_filters['post_title'] = NULL;
+		$this->default_filters['ymdhms'] = NULL;
+    $this->default_filters['week'] = NULL;
+    $this->default_filters['ymdhms_min'] = NULL;
+    $this->default_filters['ymdhms_max'] = NULL;
+		$this->default_filters['show_statuses_array'] = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
+
+		// The current filter set is the default filter set for now:
+		$this->filters = $this->default_filters;
+
 	}
 
 
@@ -148,7 +165,7 @@ class ItemList2 extends DataObjectList2
 		 */
 		$this->filters['keywords'] = $Request->param( 's', 'string', '', true );         // Search string
 		$this->filters['phrase'] = $Request->param( 'sentence', 'string', 'AND', true ); // Search for sentence or for words
-		$this->filters['exact'] = $Request->param( 'exact', 'integer', '', true );       // Require exact match of title or contents
+		$this->filters['exact'] = $Request->param( 'exact', 'integer', 0, true );        // Require exact match of title or contents
 
 		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 
@@ -156,8 +173,8 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * Specific Item selection?
 		 */
-    $this->filters['post_ID'] = $Request->param( 'p', 'integer' );          // Specific post number to display
-		$this->filters['post_title'] = $Request->param( 'title', 'string' );	 // urtitle of post to display
+    $this->filters['post_ID'] = $Request->param( 'p', 'integer', NULL );          // Specific post number to display
+		$this->filters['post_title'] = $Request->param( 'title', 'string', NULL );	  // urtitle of post to display
 
 		$this->single_post = $this->ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 
@@ -165,10 +182,22 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * If a timeframe is specified in the querystring, restrict to that timeframe:
 		 */
-		$this->filters['ymdhms'] = $Request->param( 'm', 'integer', '', true );            // YearMonth(Day) to display
-		$this->filters['week'] = $Request->param( 'w', 'integer', '', true );            // Week number
-		$this->filters['ymdhms_min'] = $Request->param( 'dstart', 'integer', '', true );  // YearMonth(Day) to start at
-		$this->filters['ymdhms_max'] = '';
+		$this->filters['ymdhms'] = $Request->param( 'm', 'integer', NULL, true );          // YearMonth(Day) to display
+		$this->filters['week'] = $Request->param( 'w', 'integer', NULL, true );            // Week number
+		$this->filters['ymdhms_min'] = $Request->param( 'dstart', 'integer', NULL, true ); // YearMonth(Day) to start at
+
+		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
+		if( is_null($this->default_filters['ts_min'])
+			&& is_null($this->default_filters['ts_max'] ) )
+		{	// We have not set a strict default -> we allow overridding:
+    	$show_past = $Request->param( 'show_past', 'integer', 0, true );
+			$show_future = $Request->param( 'show_future', 'integer', 0, true );
+			if( $show_past != $show_future )
+			{	// There is a point in overridding:
+				$this->filters['ts_min'] = ( $show_past == 0 ) ? 'now' : '';
+				$this->filters['ts_max'] = ( $show_future == 0 ) ? 'now' : '';
+			}
+		}
 
 		$this->ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
@@ -179,7 +208,7 @@ class ItemList2 extends DataObjectList2
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses wilh have been preset to a more restrictive set of values
-		$this->filters['show_statuses_array'] = $Request->param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of sharings to restrict to
+		$this->filters['show_statuses_array'] = $Request->param( 'show_status', 'array', $this->default_filters['show_statuses_array'], true );	// Array of sharings to restrict to
 
 		$this->ItemQuery->where_status( $this->filters['show_statuses_array'] );
 
@@ -508,6 +537,32 @@ class ItemList2 extends DataObjectList2
 		}
 
 
+ 		// KEYWORDS:
+		if( !empty($this->filters['keywords']) )
+		{
+			$title_array['keywords'] = T_('Keyword(s)').': '.$this->filters['keywords'];
+		}
+
+
+		// AUTHORS:
+		if( !empty($this->filters['authors']) )
+		{
+			$title_array[] = T_('Author(s)').': '.$this->filters['authors'];
+		}
+
+
+		// SHOW STATUSES
+		if( count( $this->filters['show_statuses_array'] ) < 5 ) // TEMP
+		{
+			$status_titles = array();
+			foreach( $this->filters['show_statuses_array'] as $status )
+			{
+				$status_titles[] = T_( $post_statuses[$status] );
+			}
+			$title_array[] = T_('Visibility').': '.implode( ', ', $status_titles );
+		}
+
+
 		// START AT
 		if( !empty($this->filters['ymdhms_min'] ) )
 		{
@@ -544,31 +599,6 @@ class ItemList2 extends DataObjectList2
 		}
 
 
- 		// KEYWORDS:
-		if( !empty($this->filters['keywords']) )
-		{
-			$title_array['keywords'] = T_('Keyword(s)').': '.$this->filters['keywords'];
-		}
-
-
-		// AUTHORS:
-		if( !empty($this->filters['authors']) )
-		{
-			$title_array[] = T_('Author(s)').': '.$this->filters['authors'];
-		}
-
-
-		// SHOW STATUSES
-		if( count( $this->filters['show_statuses_array'] ) < 5 ) // TEMP
-		{
-			$status_titles = array();
-			foreach( $this->filters['show_statuses_array'] as $status )
-			{
-				$status_titles[] = T_( $post_statuses[$status] );
-			}
-			$title_array[] = T_('Visibility').': '.implode( ', ', $status_titles );
-		}
-
 		return $title_array;
 	}
 
@@ -601,6 +631,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.4  2005/12/20 19:23:40  fplanque
+ * implemented filter comparison/detection
+ *
  * Revision 1.3  2005/12/20 18:12:50  fplanque
  * enhanced filtering/titling framework
  *

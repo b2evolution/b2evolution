@@ -41,7 +41,24 @@ require_once dirname(__FILE__).'/_results.class.php';
 
 class FilteredResults extends Results
 {
+	/**
+	 * Default filter set (used if no specific params are passed)
+	 */
+	var $default_filters = array();
+
+	/**
+	 * Current filter set (depending on user input)
+	 */
 	var $filters = array();
+
+
+	/**
+	 * Check if the Result set is filtered or not
+	 */
+	function is_filtered()
+	{
+		return ( $this->filters != $this->default_filters );
+	}
 }
 
 
@@ -145,6 +162,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.4  2005/12/20 19:23:40  fplanque
+ * implemented filter comparison/detection
+ *
  * Revision 1.3  2005/12/20 18:12:50  fplanque
  * enhanced filtering/titling framework
  *

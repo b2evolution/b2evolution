@@ -50,8 +50,6 @@ else
 		$show_past = 1;
 		$show_future = 1;
 	}
-	$timestamp_min = ( $show_past == 0 ) ? 'now' : '';
-	$timestamp_max = ( $show_future == 0 ) ? 'now' : '';
 
 	switch( $tab )
 	{
@@ -105,6 +103,8 @@ else
 			$Request->param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of cats to restrict to
 			$show_statuses = $show_status;
 
+			$timestamp_min = ( $show_past == 0 ) ? 'now' : '';
+			$timestamp_max = ( $show_future == 0 ) ? 'now' : '';
 
 			if( $p )
 			{	// We are requesting a specific post, force mode to post display:
@@ -138,10 +138,17 @@ else
 			require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_itemlist2.class.php' );
 
 			// Create empty List:
-			$ItemList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max );
+			$ItemList = & new ItemList2( $Blog, NULL, NULL );
 
 			// Init filter params:
 			$ItemList->load_from_Request();
+
+
+// pre_dump( $ItemList->default_filters );
+// pre_dump( $ItemList->filters );
+//pre_dump( serialize($ItemList->filters) );
+// echo 'Is filtered? '.($ItemList->is_filtered() ? 'yes' : 'no');
+
 
 			if( $ItemList->single_post )
 			{	// We have requested a specific post
