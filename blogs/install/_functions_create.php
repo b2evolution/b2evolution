@@ -1134,7 +1134,7 @@ function create_b2evo_tables_phoenix_beta()
 			(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
 			(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
 			(3, 'jpg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
-			(4, 'txt', 'Text file', 'text/plain', 'text.gif', 'text', 1),
+			(4, 'txt', 'Text file', 'text/plain', 'document.png', 'text', 1),
 			(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 0),
 			(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 1),
 			(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 1),
@@ -1323,6 +1323,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.163  2005/12/20 18:11:40  fplanque
+ * no message
+ *
  * Revision 1.162  2005/12/14 22:30:06  blueyed
  * Fix inserting default filetypes for MySQL 3
  *
