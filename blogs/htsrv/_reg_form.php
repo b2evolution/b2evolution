@@ -52,7 +52,9 @@ $Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Pre
 		</div>
 	</fieldset>
 </fieldset>
-</form>
+<?php
+$Form->end_form(); // display hidden fields etc
+?>
 
 <div style="text-align:right">
 	<a href="<?php echo $htsrv_url.'login.php' ?>"><?php echo T_('Log into existing account...') ?></a>
