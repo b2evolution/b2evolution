@@ -45,7 +45,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  * @author jeffbearer: Jeff BEARER - {@link http://www.jeffbearer.com/}.
- * @author mfollett:  Matt Follett - {@link http://www.mfollett.com/}.
+ * @author mfollett:  Matt FOLLETT - {@link http://www.mfollett.com/}.
  *
  * @version $Id$
  */
@@ -53,10 +53,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * A session stores data for a given user (not necessarily logged in).
+ * A session tracks a given user (not necessarily logged in) while he's navigating the site.
+ * A sessions also stores data for the length of the session.
  *
  * Sessions are tracked with a cookie containing the session ID.
  * The cookie also contains a random key to prevent sessions hacking.
+ *
+ * @todo: we could save a lot of queries by saving only on shutdown.
+ * Also we may not even need a shutdown object. I think it's okay to only save on clean shutdowns...
+ * which means with a call at the end of the main script.
  *
  * @package evocore
  */
@@ -94,9 +99,14 @@ class Session
 	 */
 	var $_data;
 
+	var $_session_needs_save = false;
+
 
 	/**
-	 * Keep the session active for the current user.
+	 * Constructor
+	 *
+	 * fp>> Note: I have refactored this with small error handlings first, because when there is a cascade of "else"
+	 * statements after the main handling, it's hard to know what they refer to.
 	 */
 	function Session()
 	{
@@ -106,19 +116,28 @@ class Session
 
 		if( !empty( $_COOKIE[$cookie_session] ) )
 		{ // session ID sent by cookie
-			if( preg_match( '~^(\d+)_(\w+)$~', remove_magic_quotes($_COOKIE[$cookie_session]), $match ) )
+			if( ! preg_match( '~^(\d+)_(\w+)$~', remove_magic_quotes($_COOKIE[$cookie_session]), $match ) )
 			{
+				$Debuglog->add( 'Invalid session cookie format!', 'session' );
+			}
+			else
+			{	// We have a valid session cookie:
 				$session_id_by_cookie = $match[1];
 				$session_key_by_cookie = $match[2];
 
 				$Debuglog->add( 'ID (from cookie): '.$session_id_by_cookie, 'session' );
 
-				if( $row = $DB->get_row( '
+				$row = $DB->get_row( '
 					SELECT sess_ID, sess_key, sess_data, sess_user_ID
 					  FROM T_sessions
 					 WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
 					   AND sess_key = '.$DB->quote($session_key_by_cookie).'
-					   AND sess_lastseen > '.($localtimenow - $DB->quote($Settings->get('timeout_sessions'))) ) )
+					   AND sess_lastseen > '.($localtimenow - $DB->quote($Settings->get('timeout_sessions'))) );
+				if( empty( $row ) )
+				{
+					$Debuglog->add( 'Session ID/key combination is invalid!', 'session' );
+				}
+				else
 				{ // ID + key are valid: load data
 					$Debuglog->add( 'ID is valid.', 'session' );
 					$this->ID = $row->sess_ID;
@@ -128,8 +147,14 @@ class Session
 
 					$Debuglog->add( 'user_ID: '.var_export($this->user_ID, true), 'session' );
 
-					if( $row->sess_data )
+					if( empty( $row->sess_data ) )
 					{
+						$Debuglog->add( 'No session data available.', 'session' );
+						$this->_data = NULL;
+					}
+					else
+					{ // Some session data has been previsouly stored:
+
 						$this->_data = @unserialize($row->sess_data);
 
 						if( $this->_data === false )
@@ -146,31 +171,20 @@ class Session
 							{
 								$Messages->add_messages( $this->_data['Messages']->messages );
 								$this->delete( 'Messages' );
-								$this->dbsave();
+								// fp> moved to delete $this->dbsave(); // TODO: on shutdown
 								$Debuglog->add( 'Added Messages from session data.', 'session' );
 							}
 						}
 					}
-					else
-					{
-						$Debuglog->add( 'No session data available.', 'session' );
-						$this->_data = NULL;
-					}
 				}
-				else
-				{
-					$Debuglog->add( 'Session ID/key combination is invalid!', 'session' );
-				}
-			}
-			else
-			{
-				$Debuglog->add( 'Invalid cookie data format!', 'session' );
 			}
 		}
 
 
 		if( $this->ID )
 		{ // there was a valid session before; update data
+			// TODO: save only on shutdown
+			// $this->_session_needs_save = true;
 			$DB->query( '
 				UPDATE T_sessions SET
 					sess_lastseen = "'.date( 'Y-m-d H:i:s', $localtimenow ).'",
@@ -181,9 +195,9 @@ class Session
 		{ // create a new session
 			$this->key = generate_random_key(32);
 
+			// We need to INSERT now because we need an ID now! (for thr cookie)
 			$DB->query( '
-				INSERT INTO T_sessions
-				( sess_key, sess_lastseen, sess_ipaddress, sess_agnt_ID )
+				INSERT INTO T_sessions( sess_key, sess_lastseen, sess_ipaddress, sess_agnt_ID )
 				VALUES (
 					"'.$this->key.'",
 					"'.date( 'Y-m-d H:i:s', $localtimenow ).'",
@@ -201,7 +215,7 @@ class Session
 		}
 
 		/*
-		TODO: (post-phoenix)
+		TODO: (post-phoenix) fp>> but don't call this Cron !!! It is not a SCHEDULED task! call it shutdown or sth like that.
 		$Cron->add_task( array(&$this, 'dbsave'), 'always' ); // always save data (no need to call it manually)!
 		*/
 	}
@@ -230,8 +244,11 @@ class Session
 		global $DB, $Debuglog;
 
 		// Set the entry in the database
+		// TODO: save only on shutdown
+		// $this->_session_needs_save = true;
 		$q = $DB->query( '
-			UPDATE T_sessions SET sess_user_ID = "'.$ID.'"
+			UPDATE T_sessions
+			   SET sess_user_ID = "'.$ID.'"
 			 WHERE sess_ID = "'.$this->ID.'"' );
 		if( $q !== false )
 		{ // No DB error - query() might return 0 for "0 rows affected"
@@ -267,13 +284,13 @@ class Session
 		// Invalidate the session key (no one will be able to use this session again)
 		$this->key = NULL;
 		$this->_data = NULL; // We don't need to keep old data
+		$this->_session_needs_save = true;
 		$this->dbsave(); // this will update $key and $_data in DB, but not user_ID
 
 		$this->user_ID = NULL; // unset this, so calls to has_User() return the right answer!
 
 		// clean up the session cookie:
 		setcookie( $cookie_session, '', 272851261, $cookie_path, $cookie_domain ); // 272851261 being the birthday of a lovely person
-
 	}
 
 
@@ -291,18 +308,8 @@ class Session
 	/**
 	 * Get the probability that this is spam.
 	 *
-	 * @todo (php5) Move to interface
-	 * @return integer|boolean
+	 * @todo Move to plugin
 	 */
-	function get_spam_probability()
-	{
-		if( $this->has_User() )
-		{
-			return -50;
-		}
-
-		return 0;
-	}
 
 
 	/**
@@ -328,7 +335,7 @@ class Session
 	 * Get a data value for the session.
 	 *
 	 * @param string Name of the data's key.
-	 * @return mixed|false The value, if set; otherwise false
+	 * @return mixed|NULL The value, if set; otherwise NULL
 	 */
 	function get( $param )
 	{
@@ -337,7 +344,7 @@ class Session
 			return $this->_data[$param];
 		}
 
-		return false;
+		return NULL;
 	}
 
 
@@ -351,7 +358,21 @@ class Session
 	 */
 	function set( $param, $value )
 	{
-		$this->_data[$param] = $value;
+		global $Debuglog;
+
+		if( !isset($this->_data[$param])
+				|| ($this->_data[$param] != $value) )
+		{	// There is something to update:
+
+			$this->_data[$param] = $value;
+
+			$Debuglog->add( 'Session data['.$param.'] updated!', 'session' );
+
+			$this->_session_needs_save = true;
+
+			// TODO: only save on shutdown:
+			$this->dbsave();
+		}
 	}
 
 
@@ -362,29 +383,55 @@ class Session
 	 *
 	 * @param string Name of the data's key.
 	 */
-	function delete( $key )
+	function delete( $param )
 	{
-		unset( $this->_data[$key] );
+		global $Debuglog;
+
+		if( isset($this->_data[$param]) )
+		{
+			unset( $this->_data[$param] );
+
+			$Debuglog->add( 'Session data['.$param.'] deleted!', 'session' );
+
+			$this->_session_needs_save = true;
+
+			// TODO: only save on shutdown:
+			$this->dbsave();
+		}
 	}
 
 
 	/**
-	 * Updates {@link $_data} and {@link $key} into the database.
+	 * Updates {@link $_data}
+	 *
+	 * Note: The key actually only needs to be updated on a logout.
+	 *
+	 * @todo call this on shutdown -> will also require to update lastseen and stuff like that.
 	 */
 	function dbsave()
 	{
-		global $DB;
+		global $DB, $Debuglog;
 
-		$DB->query( '
-			UPDATE T_sessions SET
-				sess_data = '.$DB->quote( serialize($this->_data) ).',
-				sess_key = '.$DB->quote( $this->key ).'
-			WHERE sess_ID = '.$this->ID, 'Session::dbsave' );
+		if( $this->_session_needs_save )
+		{	// There have been changes since the last save.
+			$DB->query( '
+				UPDATE T_sessions SET
+					sess_data = '.$DB->quote( serialize($this->_data) ).',
+					sess_key = '.$DB->quote( $this->key ).'
+				WHERE sess_ID = '.$this->ID, 'Session::dbsave' );
+
+			$Debuglog->add( 'Session data saved!', 'session' );
+
+ 			$this->_session_needs_save = false;
+		}
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.35  2005/12/21 20:38:18  fplanque
+ * Session refactoring/doc
+ *
  * Revision 1.34  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
