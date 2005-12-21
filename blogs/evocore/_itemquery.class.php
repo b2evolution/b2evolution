@@ -89,7 +89,7 @@ class ItemQuery extends SQL
 		$this->title = $title;
 
 		// if a post number is specified, load that post
-		if( !empty($p) && ($p != 'all') )
+		if( !empty($p) )
 		{
 			$this->WHERE_and( $this->dbIDname.' = '. intval($p) );
 			$r = true;
@@ -402,6 +402,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.8  2005/12/21 20:39:04  fplanque
+ * minor
+ *
  * Revision 1.7  2005/12/19 19:30:14  fplanque
  * minor
  *

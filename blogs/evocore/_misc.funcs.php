@@ -1024,9 +1024,12 @@ function param( $var, $type = '', $default = '', $memorize = false,
 }
 
 
+/**
+ *
+ */
 function memorize_param( $var, $type, $default, $value = NULL )
 {
-	global $Debuglog, $global_param_list, $$var;
+	global $Debuglog, $global_param_list;
 
 	if( !isset($global_param_list) )
 	{ // Init list if necessary:
@@ -1040,9 +1043,20 @@ function memorize_param( $var, $type, $default, $value = NULL )
 
 	if( !is_null( $value ) )
 	{	// We want to set the variable too.
-		$$var = $value;
+		set_param( $var, $value );
 	}
 }
+
+
+/**
+ * Set the value of a param (by force! :P)
+ */
+function set_param( $var, $value )
+{
+	global $$var;
+	$$var = $value;
+}
+
 
 /**
  * Forget a param so that is will not get included in subsequent {@see regenerate_url()} calls
@@ -2369,6 +2383,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.164  2005/12/21 20:39:04  fplanque
+ * minor
+ *
  * Revision 1.163  2005/12/14 19:33:56  fplanque
  * no message
  *

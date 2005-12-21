@@ -144,10 +144,6 @@ else
 			$ItemList->load_from_Request();
 
 
-// pre_dump( $ItemList->default_filters );
-// pre_dump( $ItemList->filters );
-//pre_dump( serialize($ItemList->filters) );
-// echo 'Is filtered? '.($ItemList->is_filtered() ? 'yes' : 'no');
 
 
 			if( $ItemList->single_post )

@@ -127,6 +127,17 @@ class Request
 
 
 	/**
+	 * Set the value of a param (by force! :P)
+	 */
+	function set_param( $var, $value )
+	{
+		global $$var;
+		$this->params[$var] = $value;
+		$$var = $value;
+	}
+
+
+	/**
 	 * Extend a parameter with an array of params.
 	 *
 	 * Will be used for author/authorsel[], etc.
@@ -739,6 +750,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.27  2005/12/21 20:39:04  fplanque
+ * minor
+ *
  * Revision 1.26  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
