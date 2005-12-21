@@ -94,19 +94,10 @@ class ItemList2 extends DataObjectList2
 		// Call parent constructor:
 		parent::DataObjectList2( $ItemCache, 20, '', NULL, 'paged' );
 
-		// Additional params:
-		$this->page_param = 'paged';
-		$this->page = 1;
-
 		// The SQL Query object:
 		$this->ItemQuery = & new ItemQuery( $ItemCache->dbtablename, $ItemCache->dbprefix, $ItemCache->dbIDname );
 
 		$this->Blog = & $Blog;
-
-		// Default values:
-		$this->unit = $Settings->get('what_to_show');
-		// let's use the '20' default $this->limit = $Settings->get('posts_per_page');
-
 
 		// Initialize the default filter set:
 		$this->default_filters['ts_min'] = $timestamp_min;
@@ -124,10 +115,15 @@ class ItemList2 extends DataObjectList2
     $this->default_filters['ymdhms_min'] = NULL;
     $this->default_filters['ymdhms_max'] = NULL;
 		$this->default_filters['show_statuses_array'] = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
+		$this->default_filters['orderby'] = $this->Cache->dbprefix.'datestart DESC';
+		$this->default_filters['unit'] = $Settings->get('what_to_show');
+		$this->default_filters['posts'] = $this->limit;
+		$this->default_filters['page'] = 1;
+		$this->page_param = 'paged';
+		$this->page = 1;
 
 		// The current filter set is the default filter set for now:
 		$this->filters = $this->default_filters;
-
 	}
 
 
@@ -149,15 +145,11 @@ class ItemList2 extends DataObjectList2
 		$this->filters['cat_array'] = $Request->get( 'cat_array' );
 		$this->filters['cat_modifier'] = $Request->get( 'cat_modifier' );
 
-		$this->ItemQuery->where_chapter2( $this->Blog->ID, $this->filters['cat_array'], $this->filters['cat_modifier'] );
-
 
 		/*
 		 * Restrict to selected authors:
 		 */
 		$this->filters['authors'] = $Request->param( 'author', 'string', '', true );      // List of authors to restrict to
-
-		$this->ItemQuery->where_author( $this->filters['authors'] );
 
 
 		/*
@@ -167,8 +159,6 @@ class ItemList2 extends DataObjectList2
 		$this->filters['phrase'] = $Request->param( 'sentence', 'string', 'AND', true ); // Search for sentence or for words
 		$this->filters['exact'] = $Request->param( 'exact', 'integer', 0, true );        // Require exact match of title or contents
 
-		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
-
 
 		/*
 		 * Specific Item selection?
@@ -176,7 +166,7 @@ class ItemList2 extends DataObjectList2
     $this->filters['post_ID'] = $Request->param( 'p', 'integer', NULL );          // Specific post number to display
 		$this->filters['post_title'] = $Request->param( 'title', 'string', NULL );	  // urtitle of post to display
 
-		$this->single_post = $this->ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
+		$this->single_post = !empty($this->filters['post_ID']) || !empty($this->filters['post_title']);
 
 
 		/*
@@ -199,24 +189,18 @@ class ItemList2 extends DataObjectList2
 			}
 		}
 
-		$this->ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
-		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
-		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
-
 
 		/*
 		 * Restrict to the statuses we want to show:
 		 */
-		// Note: oftentimes, $show_statuses wilh have been preset to a more restrictive set of values
+		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
 		$this->filters['show_statuses_array'] = $Request->param( 'show_status', 'array', $this->default_filters['show_statuses_array'], true );	// Array of sharings to restrict to
 
-		$this->ItemQuery->where_status( $this->filters['show_statuses_array'] );
 
 
 		/*
-		 * order by stuff:
+		 * OLD STYLE orders:
 		 */
-		// OLD STYLE orders:
 		$order = $Request->param( 'order', 'string', 'DESC', true );   // ASC or DESC
 		$orderby = $Request->param( 'orderby', 'string', '', true );     // list of fields to order by (TODO: change that crap)
 
@@ -227,61 +211,210 @@ class ItemList2 extends DataObjectList2
 
 		if(empty($orderby))
 		{
-			$orderby = $this->Cache->dbprefix.'datestart '.$order;
+			$this->filters['orderby'] = $this->Cache->dbprefix.'datestart '.$order;
 		}
 		else
 		{
 			$orderby_array = explode(' ',$orderby);
-			$orderby = $this->Cache->dbprefix.implode( ' '.$order.', '.$this->Cache->dbprefix, $orderby_array ).' '.$order;
+			$this->filters['orderby'] = $this->Cache->dbprefix.implode( ' '.$order.', '.$this->Cache->dbprefix, $orderby_array ).' '.$order;
 		}
 
-		// Memorize requested order list:
-		$this->ItemQuery->order_by( $orderby );
 
 
 		/*
-		 * ----------------------------------------------------
 		 * Paging limits:
-		 * ----------------------------------------------------
 		 */
-		$unit = $Request->param( 'unit', 'string', '', true );    		// list unit: 'posts' or 'days'
-		if( !empty($unit) )
-		{
-			$this->unit = $unit;	// is it really useful to memorize this?
-		}
-		//echo '<br />unit='.$this->unit;
+ 		$this->filters['unit'] = $Request->param( 'unit', 'string', $this->default_filters['unit'], true );    		// list unit: 'posts' or 'days'
+		$this->unit = $this->filters['unit'];	// TEMPORARy
+		//echo '<br />unit='.$this->filters['unit'];
 
-		$posts = $Request->param( 'posts', 'integer', 0, true ); // # of units to display on the page
-		if( !empty($posts) )
-		{
-			$this->limit = $posts;
-		}
+		$this->filters['posts'] = $Request->param( 'posts', 'integer', $this->default_filters['posts'], true ); 			// # of units to display on the page
+		$this->limit = $this->filters['posts']; // for compatibility with parent class
 
 		// 'paged'
-		$this->page = $Request->param( $this->page_param, 'integer', 1, true );      // List page number in paged display
+		$this->filters['page'] = $Request->param( $this->page_param, 'integer', 1, true );      // List page number in paged display
+		$this->page = $this->filters['page'];
 
  		// When in backoffice...  (to be deprecated...)
- 		$poststart = $Request->param( 'poststart', 'integer', 0, true );   // Start results at this position
-		$postend = $Request->param( 'postend', 'integer', 0, true );    // End results at this position
+ 		$this->poststart = $Request->param( 'poststart', 'integer', 0, true );   // Start results at this position
+		$this->postend = $Request->param( 'postend', 'integer', 0, true );    // End results at this position
 
 
+
+		if( $Request->validation_errors() )
+		{
+			return false;
+		}
+
+
+		if( $this->single_post )
+		{	// We have requested a specific post
+			// Do not attempt to save or load any filterset:
+			return true;
+		}
+
+
+		// echo 'Is filtered? '.($this->is_filtered() ? 'yes' : 'no');
+
+		global $Session;
+
+		$filterset_name = 'ItemList_filters_'.$this->Blog->ID;
+
+		if( $this->is_filtered() )
+		{	// We have an active filter:
+			// Let's memorize that filter into the session:
+			// echo 'saving filterset';
+			$Session->set( $filterset_name, $this->filters );
+		}
+		else
+		{	// No requested filter set, let's see if we can load a previously used filter set:
+			$filters = $Session->get( $filterset_name );
+			if( !empty($filters) )
+			{ // We have filters:
+				// echo 'restoring filterset';
+
+				// Restore filters:
+				$this->filters = $filters;
+
+				// Set back the GLOBALS !!! needed for regenerate_url.
+
+				/*
+				 * Blog & Chapters/categories restrictions:
+				 */
+				// Get chapters/categories (and compile those values right away)
+				$Request->set_param( 'cat_array', $this->filters['cat_array'] );
+				$Request->set_param( 'cat_modifier', $this->filters['cat_modifier'] );
+ 				$Request->set_param( 'cat', $this->filters['cat_modifier'].implode(',',$this->filters['cat_array']) );  // List of authors to restrict to
+
+				/*
+				 * Restrict to selected authors:
+				 */
+				$Request->set_param( 'author', $this->filters['authors'] );  // List of authors to restrict to
+
+				/*
+				 * Restrict by keywords
+				 */
+				$Request->set_param( 's', $this->filters['keywords'] );			 // Search string
+				$Request->set_param( 'sentence', $this->filters['phrase'] ); // Search for sentence or for words
+				$Request->set_param( 'exact', $this->filters['exact'] );     // Require exact match of title or contents
+
+				/*
+				 * Specific Item selection?
+				 */
+				$Request->set_param( 'm', $this->filters['ymdhms'] );          // YearMonth(Day) to display
+				$Request->set_param( 'w', $this->filters['week'] );            // Week number
+				$Request->set_param( 'dstart', $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
+
+				// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
+				if( is_null($this->default_filters['ts_min'])
+					&& is_null($this->default_filters['ts_max'] ) )
+				{	// We have not set a strict default -> we allow overridding:
+    			$Request->set_param( 'show_past', ($this->filters['ts_min'] == 'now') ? 0 : 1 );
+					$Request->set_param( 'show_future', ($this->filters['ts_max'] == 'now') ? 0 : 1 );
+				}
+
+     		/*
+				 * Restrict to the statuses we want to show:
+				 */
+				// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
+				$Request->set_param( 'show_status', $this->filters['show_statuses_array'] );	// Array of sharings to restrict to
+
+				/*
+				 * OLD STYLE orders:
+				 */
+				// TODO!
+
+				/*
+				 * Paging limits:
+				 */
+ 				$Request->set_param( 'unit', $this->filters['unit'] );    		// list unit: 'posts' or 'days'
+				$this->unit = $this->filters['unit'];	// TEMPORARy
+
+				$Request->set_param( 'posts', $this->filters['posts'] ); 			// # of units to display on the page
+				$this->limit = $this->filters['posts']; // for compatibility with parent class
+
+				// 'paged'
+				$Request->set_param( $this->page_param, $this->filters['page'] );      // List page number in paged display
+				$this->page = $this->filters['page'];
+			}
+		}
+
+
+		// pre_dump( $this->default_filters );
+		// pre_dump( $this->filters );
+
+
+		return true;
+	}
+
+
+	/**
+	 *
+	 * Note: so far, the query should not be run without a prior call to load_from_request()
+	 * Otherwise filtering will not be complete 'not even values given in the constructor will work)
+	 *
+	 * @todo count?
+	 */
+	function query()
+	{
+		global $DB;
+
+		if( !is_null( $this->rows ) )
+		{ // Query has already executed:
+			return;
+		}
+
+		// echo '<br />ItemList2 query';
+
+		// GENERATE THE QUERY:
+
+		/*
+		 * filetring stuff:
+		 */
+		$this->ItemQuery->where_chapter2( $this->Blog->ID, $this->filters['cat_array'], $this->filters['cat_modifier'] );
+
+		$this->ItemQuery->where_author( $this->filters['authors'] );
+
+		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
+
+		$this->ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
+
+		$this->ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
+		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
+		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
+
+		$this->ItemQuery->where_status( $this->filters['show_statuses_array'] );
+
+
+		/*
+		 * order by stuff:
+		 */
+		// Memorize requested order list:
+		$this->ItemQuery->order_by( $this->filters['orderby'] );
+
+
+		/*
+		 * Paging limits:
+		 */
 		if( $this->single_post )   // p or title
 		{ // Single post: no paging required!
 		}
-		elseif( !empty($poststart) )
+		elseif( !empty($this->filters['poststart']) )
 		{ // When in backoffice...  (to be deprecated...)
 			// echo 'POSTSTART-POSTEND ';
+			$poststart = $this->poststart;
+			$postend = $this->poststart;
 			if( $postend < $poststart )
 			{
 				$postend = $poststart + $this->limit - 1;
 			}
 
-			if( $this->unit == 'posts' )
+			if( $this->filters['unit'] == 'posts' )
 			{
 				$posts = $postend - $poststart + 1;
 				$this->ItemQuery->LIMIT( ($poststart-1).', '.$posts );
 			}
-			elseif( $this->unit == 'days' )
+			elseif( $this->filters['unit'] == 'days' )
 			{
 				$posts = $postend - $poststart + 1;
 				// echo 'days=',$posts;
@@ -295,15 +428,15 @@ class ItemList2 extends DataObjectList2
 									.'\' AND '.$this->dbprefix.'datestart <= \''. date('Y-m-d H:i:s', $this->limitdate_end) . '\'' );
 			}
 		}
-		elseif( !empty($m) )
+		elseif( !empty($this->filters['ymdhms']) )
 		{ // no restriction if we request a month... some permalinks may point to the archive!
 			// echo 'ARCHIVE - no limits';
 		}
-		elseif( $this->unit == 'posts' )
+		elseif( $this->filters['unit'] == 'posts' )
 		{
 			// echo 'LIMIT POSTS ';
 			$pgstrt = '';
-			if( $this->page )
+			if( $this->page > 1 )
 			{ // We have requested a specific page number
 				$pgstrt = (intval($this->page) -1) * $this->limit. ', ';
 			}
@@ -350,27 +483,6 @@ class ItemList2 extends DataObjectList2
 			die( 'Unhandled LIMITING mode in ItemList (paged mode is obsolete)' );
 
 
-		return ! $Request->validation_errors();
-	}
-
-
-	/**
-	 *
-	 * Note: so far, the query should not be run without a prior call to load_from_request()
-	 * Otherwise filtering will not be complete 'not even values given in the constructor will work)
-	 *
-	 * @todo count?
-	 */
-	function query()
-	{
-		global $DB;
-
-		if( !is_null( $this->rows ) )
-		{ // Query has already executed:
-			return;
-		}
-
-		// echo '<br />ItemList2 query';
 
 		// GET TOTAL ROW COUNT:
 		/*
@@ -631,6 +743,11 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.5  2005/12/21 20:42:28  fplanque
+ * filterset saving & restore if no filters are set.
+ * Note: reset all is broken.
+ * poststart/postend navigation in experimental tab is broken too.
+ *
  * Revision 1.4  2005/12/20 19:23:40  fplanque
  * implemented filter comparison/detection
  *
