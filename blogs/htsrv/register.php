@@ -104,6 +104,8 @@ switch( $action )
 
 			$UserCache->add( $new_User );
 
+			$Plugins->trigger_event( 'Registration', array( 'User' => & $new_User ) );
+
 			// TODO: Optionally auto create a blog (handle this together with the LDAP plugin)
 
 			// TODO: Optionally auto assign rights
