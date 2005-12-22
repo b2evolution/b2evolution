@@ -16,6 +16,8 @@ require_once (dirname(__FILE__). '/_header.php');
 
 $AdminUI->title = $AdminUI->title_titlearea = T_('Browse blog:');
 
+param( 'action', 'string', 'list' );
+
 $blog = autoselect_blog( $Request->param( 'blog', 'integer', 0 ), 'blog_ismember', 1 );
 
 if( ! $blog  )
@@ -28,6 +30,22 @@ else
 { // We could select a valid blog which we have permission to access:
 	$Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 	$AdminUI->title .= ' '.$Blog->dget( 'shortname' );
+
+
+	/*
+	 * Perform actions:
+	 */
+	switch( $action )
+	{
+		case 'filter_reset':
+    $filterset_name = 'ItemList_filters_'.$Blog->ID;
+
+		$Session->delete( $filterset_name );
+
+		break;
+
+	}
+
 
 	// This is used in the display templates
 	// TODO: have a method of some object ?
@@ -213,7 +231,7 @@ $AdminUI->add_menu_entries(
 							),
 					/*	'commentlist' => array(
 							'text' => T_('Comment list'),
-							'href' => 'b2browse.php?tab=commentlist&amp;blog='.$blog ), */
+							'href' => 'b2browse.php?tab=commentlist ), */
 						'comments' => array(
 							'text' => T_('Comments'),
 							'href' => regenerate_url( 'tab', 'tab=comments' ),

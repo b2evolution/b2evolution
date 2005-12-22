@@ -57,13 +57,16 @@ echo '</div>';
 
 echo '<div class="browse_side_item">';
 
-	$Form = & new Form( $pagenow, 'searchform', 'get', 'none' );
+	$Form = & new Form( '', 'resetform', 'get', 'none' );
 
 	$Form->begin_form( '' );
 
 		$Form->submit( array( 'submit', T_('Search'), 'search', '', 'float:right' ) );
 
-		echo '<h3>'.T_('Search').'</h3>';
+		echo '<h3>'.T_('Filters').'</h3>';
+
+		// TODO: style this better...
+		echo '<p><a href="'.$pagenow.'?blog='.$blog.'&action=filter_reset">'.T_('Reset all filters!').'</a></p>';
 
 		$Form->hidden( 'tab', $tab );
 		$Form->hidden( 'blog', $blog );
@@ -185,7 +188,9 @@ echo '<div class="browse_side_item">';
 
 
 		$Form->submit( array( 'submit', T_('Search'), 'search' ) );
-		$Form->button( array( 'button', '', T_('Full Reset'), 'search', 'document.location.href=\''.$pagenow.'?blog='.$blog.'\';' ) );
+
+		// TODO: style this better:
+		echo '<a href="'.$pagenow.'?blog='.$blog.'&action=filter_reset" class="ActionButton">'.T_('Reset all filters!').'</a>';
 
 	$Form->end_form();
 
@@ -193,6 +198,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.20  2005/12/22 13:41:00  fplanque
+ * Added clean filter_reset feature
+ *
  * Revision 1.19  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
