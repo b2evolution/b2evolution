@@ -52,8 +52,9 @@ require_once( EVODIR.'blogs/evocore/_main.inc.php' );
  *
  * These settings override the defaults from {@link $EvoConfig->DB}
  *
- * This is used to create a {@link $DB DB object} in the class {@link DbUnitTestCase},
- * which gets used for tests that need a real database connection.
+ * This is used to create {@link DbUnitTestCase::DB the test DB object}
+ * in the class {@link DbUnitTestCase}, which gets used for tests that
+ * need a real database connection.
  *
  * @global array $testDB_conf
  */

@@ -1,8 +1,6 @@
 <?php
 /**
  * The unit testcase class for install tests.
- *
- * NOTE: empty due to refactoring.
  */
 
 /**
@@ -16,12 +14,9 @@ require_once( dirname(__FILE__).'/DbUnitTestCase.class.php' );
 class InstallUnitTestCase extends DbUnitTestCase
 {
 	/**
-	 * Constructor
+	 * Number of basic plugins to test for being installed.
 	 */
-	function InstallUnitTestCase()
-	{
-		parent::DbUnitTestCase();
-	}
+	var $nr_of_basic_plugins = 6;
 }
 
 ?>

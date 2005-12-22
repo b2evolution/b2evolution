@@ -50,6 +50,8 @@ class Install_self extends InstallUnitTestCase
 		create_b2evo_tables();
 		populate_main_tables();
 		install_basic_plugins();
+
+		$this->assertEqual( $this->DB->get_var( 'SELECT COUNT(*) FROM T_plugins' ), $this->nr_of_basic_plugins );
 	}
 }
 

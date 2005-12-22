@@ -27,7 +27,32 @@ class DbUnitTestCase extends EvoUnitTestCase
 		}
 
 
-		$this->DB =& new DB( $testDB_conf );
+		$this->DB = & new DB( $testDB_conf );
+	}
+
+
+	/**
+	 * Setup global $DB as reference to member DB (test DB).
+	 */
+	function setUp()
+	{
+		parent::setUp();
+
+		$this->dropTestDbTables();
+
+		$this->old_DB = & $GLOBALS['DB'];
+		$GLOBALS['DB'] = & $this->DB;
+	}
+
+
+	/**
+	 * Setup global $DB as original DB object again.
+	 */
+	function tearDown()
+	{
+		parent::tearDown();
+
+		$GLOBALS['DB'] = & $this->old_DB;
 	}
 
 
@@ -84,6 +109,15 @@ class DbUnitTestCase extends EvoUnitTestCase
 	function createTablesFor0_9_0_11()
 	{
 		$this->executeQueriesFromFile( TESTSDIR.'install/sql/b2evolution_0_9_0_11.default.sql' );
+	}
+
+
+	/**
+	 * Creates the default tables for b2evolution 1.6.
+	 */
+	function createTablesFor1_6()
+	{
+		$this->executeQueriesFromFile( TESTSDIR.'install/sql/b2evolution_v-1-6.default.sql' );
 	}
 }
 
