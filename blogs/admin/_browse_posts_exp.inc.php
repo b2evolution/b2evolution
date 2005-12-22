@@ -34,46 +34,30 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-echo '<h5>This is a demo of Class ItemList2 (which extends Results much better)</h5>';
-
 // Display title depending on selection params:
 echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 
-if( !$ItemList->single_post )
-{
-echo '<div class="NavBar">';
+// Init display features:
+$display_params = array(
+					'header_start' => '<div class="NavBar center">',
+						'header_text' => '<strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
+						'header_text_single' => T_('1 page'),
+					'header_end' => '</div>',
+					'footer_start' => '',
+						'footer_text' => '<div class="NavBar center"><strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$</div>\n\n',
+						'footer_text_single' => '',
+							'prev_text' => T_('Previous'),
+							'next_text' => T_('Next'),
+							'list_prev_text' => T_('...'),
+							'list_next_text' => T_('...'),
+							'list_span' => 11,
+							'scroll_list_range' => 5,
+					'footer_end' => "",
+				);
+$ItemList->display_init( $display_params );
 
-	/*
-	 * @movedTo _b2browse.php
-	 */
-	if( !$poststart )
-	{
-		$poststart = 1;
-	}
-
-	if( !$postend )
-	{
-		$postend = $poststart + $ItemList->limit - 1;
-	}
-
-	$nextXstart = $postend + 1;
-	$nextXend = $postend + $ItemList->limit;
-
-	$previousXstart = ($poststart - $ItemList->limit);
-	$previousXend = $poststart - 1;
-	if( $previousXstart < 1 )
-	{
-		$previousXstart = 1;
-	}
-
-
-	$posts = $ItemList->limit; // for display in navbar
-	$MainList = & $ItemList;
-	require dirname(__FILE__). '/_edit_navbar.php';
-
-echo '</div>';
-}
-
+// Display navigation:
+$ItemList->display_nav( 'header' );
 
 /*
  * Display posts:
@@ -312,12 +296,8 @@ while( $Item = $ItemList->get_item() )
 <?php
 }
 
-if( $ItemList->get_total_num_posts() > 1 )
-{ // don't display navbar twice if we have no post
-	echo '<div class="NavBar">';
-	require dirname(__FILE__). '/_edit_navbar.php';
-	echo '</div>';
-}
+// Display navigation:
+$ItemList->display_nav( 'footer' );
 ?>
 
 <p class="center">
@@ -332,6 +312,9 @@ if( $ItemList->get_total_num_posts() > 1 )
 
 /*
  * $Log$
+ * Revision 1.6  2005/12/22 15:53:37  fplanque
+ * Splitted display and display init
+ *
  * Revision 1.5  2005/12/20 18:12:50  fplanque
  * enhanced filtering/titling framework
  *

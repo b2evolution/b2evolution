@@ -216,13 +216,13 @@ class Results extends Widget
 		$this->count_total_rows( $count_sql );
 
 		if( $init_page )
-		{	//attribution of a page number
+		{	// attribution of a page number
 			$this->page_param = 'results_'.$param_prefix.'page';
 			$page = param( $this->page_param, 'integer', 1, true );
 			$this->page = min( $page, $this->total_pages );
 		}
 
-		//attribution of an order type
+		// attribution of an order type
 		$this->order_param = 'results_'.$param_prefix.'order';
  		$this->order = param( $this->order_param, 'string', $default_order, true );
 	}
@@ -457,21 +457,8 @@ class Results extends Widget
 	 */
 	function display( $display_params = NULL )
 	{
-		// Make sure we have display parameters:
-		if( !is_null($display_params) )
-		{ // Use passed params:
-			$this->params = & $display_params;
-		}
-		elseif( empty( $this->params ) )
-		{ // Use default params from Admin Skin:
-			global $AdminUI;
-			$this->params = $AdminUI->get_menu_template( 'Results' );
-		}
-
-
-		// Make sure query has executed and we're at the top of the resultset:
-		$this->restart();
-
+		// Initialize displaying:
+		$this->display_init( $display_params );
 
 		// -------------------------
 		// Proceed with display:
@@ -513,7 +500,31 @@ class Results extends Widget
 	}
 
 
+	/**
+	 * Initialize things in order to be ready for displaying.
+	 *
+	 * This is useful when manually displaying, i-e: not by using Results::display()
+	 */
+	function display_init( $display_params = NULL )
+	{
+		// Make sure we have display parameters:
+		if( !is_null($display_params) )
+		{ // Use passed params:
+			$this->params = & $display_params;
+		}
+		elseif( empty( $this->params ) )
+		{ // Use default params from Admin Skin:
+			global $AdminUI;
+			$this->params = $AdminUI->get_menu_template( 'Results' );
+		}
+
+		// Make sure query has executed and we're at the top of the resultset:
+		$this->restart();
+	}
+
+
 	// EXPERIMENTAL:
+	// Used for filtering form
 	function display_top_callback()
 	{
 		if( !empty($this->top_callback) )
@@ -849,11 +860,11 @@ class Results extends Widget
 		echo $this->params[$template.'_start'];
 
 		if( ( $this->total_pages <= 1 ) )
-		{
+		{	// Single page (we probably don't want to show navigation in this case)
 			echo $this->params[$template.'_text_single'];
 		}
 		else
-		{
+		{	// Several pages
 			echo $this->replace_vars( $this->params[$template.'_text'] );
 		}
 
@@ -1255,6 +1266,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.45  2005/12/22 15:51:58  fplanque
+ * Splitted display and display init
+ *
  * Revision 1.44  2005/12/19 16:42:03  fplanque
  * minor
  *

@@ -235,10 +235,6 @@ class ItemList2 extends DataObjectList2
 		$this->filters['page'] = $Request->param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 		$this->page = $this->filters['page'];
 
- 		// When in backoffice...  (to be deprecated...)
- 		$this->poststart = $Request->param( 'poststart', 'integer', 0, true );   // Start results at this position
-		$this->postend = $Request->param( 'postend', 'integer', 0, true );    // End results at this position
-
 
 
 		if( $Request->validation_errors() )
@@ -398,35 +394,6 @@ class ItemList2 extends DataObjectList2
 		 */
 		if( $this->single_post )   // p or title
 		{ // Single post: no paging required!
-		}
-		elseif( !empty($this->filters['poststart']) )
-		{ // When in backoffice...  (to be deprecated...)
-			// echo 'POSTSTART-POSTEND ';
-			$poststart = $this->poststart;
-			$postend = $this->poststart;
-			if( $postend < $poststart )
-			{
-				$postend = $poststart + $this->limit - 1;
-			}
-
-			if( $this->filters['unit'] == 'posts' )
-			{
-				$posts = $postend - $poststart + 1;
-				$this->ItemQuery->LIMIT( ($poststart-1).', '.$posts );
-			}
-			elseif( $this->filters['unit'] == 'days' )
-			{
-				$posts = $postend - $poststart + 1;
-				// echo 'days=',$posts;
-				$lastpostdate = $this->get_lastpostdate();
-				$lastpostdate = mysql2date('Y-m-d 23:59:59',$lastpostdate);
-				// echo $lastpostdate;
-				$lastpostdate = mysql2timestamp( $lastpostdate );
-				$this->limitdate_end = $lastpostdate - (($poststart -1) * 86400);
-				$this->limitdate_start = $lastpostdate+1 - (($postend) * 86400);
-				$this->ItemQuery->WHERE_and( $this->dbprefix.'datestart >= \''. date( 'Y-m-d H:i:s', $this->limitdate_start )
-									.'\' AND '.$this->dbprefix.'datestart <= \''. date('Y-m-d H:i:s', $this->limitdate_end) . '\'' );
-			}
 		}
 		elseif( !empty($this->filters['ymdhms']) )
 		{ // no restriction if we request a month... some permalinks may point to the archive!
@@ -743,6 +710,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.6  2005/12/22 15:53:37  fplanque
+ * Splitted display and display init
+ *
  * Revision 1.5  2005/12/21 20:42:28  fplanque
  * filterset saving & restore if no filters are set.
  * Note: reset all is broken.
