@@ -18,16 +18,12 @@ class texturize_plugin extends Plugin
 	var $name = 'Texturize';
 	var $priority = 90;
 	var $apply_when = 'opt-in';
-	var $apply_to_html = true;
-	var $apply_to_xml = true;
 	var $short_desc;
 	var $long_desc;
 
 
 	/**
 	 * Constructor
-	 *
-	 * {@internal texturize_plugin::texturize_plugin(-)}}
 	 */
 	function texturize_plugin()
 	{
@@ -39,19 +35,13 @@ class texturize_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal texturize_plugin::Render(-)}}
-	 *
 	 * @param array Associative array of parameters
-	 * 							(Output format, see {@link format_to_output()})
+	 *   'data': the data (by reference). You probably want to modify this.
+	 *   'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function Render( & $params )
+	function RenderItemAsHtml( & $params )
 	{
-		if( ! parent::Render( $params ) )
-		{	// We cannot render the required format
-			return false;
-		}
-
 		$content = & $params['data'];
 
 		$output = '';
@@ -99,6 +89,17 @@ class texturize_plugin extends Plugin
 		$content = $output;
 
 		return true;
+	}
+
+
+	/**
+	 * The same as for HTML.
+	 *
+	 * @uses {@link RenderItemAsHtml()}
+	 */
+	function RenderItemAsXml( & $params )
+	{
+		$this->RenderItemAsHtml( $params );
 	}
 }
 

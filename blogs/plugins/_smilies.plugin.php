@@ -23,8 +23,6 @@ class smilies_plugin extends Plugin
 	var $name = 'Smilies';
 	var $priority = 80;
 	var $apply_when = 'opt-out';
-	var $apply_to_html = true;
-	var $apply_to_xml = false; // Leave the smilies alone
 
 	/**
 	 * Text similes search array
@@ -57,43 +55,27 @@ class smilies_plugin extends Plugin
 
 	/**
 	 * Constructor
-	 *
-	 * {@internal smilies_plugin::smilies_plugin(-)}}
 	 */
 	function smilies_plugin()
 	{
 		$this->short_desc = T_('Graphical smileys');
 		$this->long_desc = T_('One click smilies inserting + Convert text smilies to icons');
 
-		require dirname(__FILE__). '/_smilies.conf.php';
+		/**
+		 * Smilies configuration.
+		 * TODO: Move/transform to PluginSettings
+		 */
+		require dirname(__FILE__).'/_smilies.conf.php';
 	}
-
-
-  /**
-	 * Register event callbacks
-	 *
-	 * This method is called by b2evo to ask the plugin what events it would
-	 * like to receive notifications for.
-	 *
-	 * {@internal Plugin::RegisterEvents(-)}}
-	 *
-	 * @return array List of event names we wish to be called back for
-	 */
-/*	function RegisterEvents()
-	{
-		return array( 'DisplayToolbar' );
-	} */
 
 
 	/**
 	 * Display a toolbar
 	 *
-	 * {@internal smilies_plugin::DisplayToolbar(-)}}
-	 *
-   * @param array Associative array of parameters
+	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
-	function DisplayToolbar( & $params )
+	function AdminDisplayToolbar( & $params )
 	{
 		$grins = '';
 		$smiled = array();
@@ -158,19 +140,10 @@ class smilies_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal smilies_plugin::Render(-)}}
-	 *
-	 * @param array Associative array of parameters
-	 * 							(Output format, see {@link format_to_output()})
-	 * @return boolean true if we can render something for the required output format
+	 * @see Plugin::RenderItemAsHtml
 	 */
-	function Render( & $params )
+	function RenderItemAsHtml( & $params )
 	{
-		if( ! parent::render( $params ) )
-		{	// We cannot render the required format
-			return false;
-		}
-
 		if( ! isset( $this->search ) )
 		{	// We haven't prepared the smilies yet
 			$this->search = array();
@@ -197,6 +170,7 @@ class smilies_plugin extends Plugin
 
 
 		// REPLACE:  But not in code blocks.
+		// TODO: Also exclude <pre> blocks.
 
 		$content = & $params['data'];
 
@@ -241,6 +215,7 @@ class smilies_plugin extends Plugin
 		return preg_replace_callback($search, array($this, 'preg_insert_smilies_callback'), $text);
 	}
 }
+
 
 /**
  * sorts the smilies' array by length

@@ -27,8 +27,6 @@ class spellcheck_plugin extends Plugin
 
 	/**
 	 * Constructor
-	 *
-	 * {@internal spellcheck_plugin::spellcheck_plugin(-)}}
 	 */
 	function spellcheck_plugin()
 	{
@@ -39,8 +37,6 @@ class spellcheck_plugin extends Plugin
 
 	/**
 	 * Called when ending the admin html head section
-	 *
-	 * {@internal Plugin::AdminEndHtmlHead(-)}}
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we do something?
@@ -79,8 +75,6 @@ class spellcheck_plugin extends Plugin
 	/**
 	 * Called right after displaying the admin page footer
 	 *
-	 * {@internal Plugin::AdminAfterPageFooter(-)}}
-	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we do something?
 	 */
@@ -112,7 +106,7 @@ class spellcheck_plugin extends Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a button?
 	 */
-	function DisplayEditorButton( & $params )
+	function AdminDisplayEditorButton( & $params )
 	{
 		// This means we are using the spellchecker on this page!
 		$this->useSpellcheckOnThisPage = true;

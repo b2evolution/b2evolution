@@ -59,7 +59,7 @@ $Form->begin_form( 'eform' );
 	<div class="edit_toolbars">
 	<?php // --------------------------- TOOLBARS ------------------------------------
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'DisplayToolbar', array( 'target_type' => 'Comment' ) );
+		$Plugins->trigger_event( 'AdminDisplayToolbar', array( 'target_type' => 'Comment' ) );
 	?>
 	</div>
 
@@ -97,7 +97,7 @@ $Form->begin_form( 'eform' );
 	}
 
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Comment' ) );
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Comment' ) );
 
 	?>
 	</div>
@@ -181,6 +181,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.9  2005/12/22 23:13:39  blueyed
+ * Plugins' API changed and handling optimized
+ *
  * Revision 1.8  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

@@ -48,6 +48,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * is trying to login.
  * It will update the password locally in case it differs from the LDAP one.
  *
+ * @todo Register tools tab to search in LDAP (blueyed).
+ *
  * @package plugins
  */
 class ldap_plugin extends Plugin
@@ -117,10 +119,6 @@ class ldap_plugin extends Plugin
 	var $version = 'CVS $Revision$';
 	var $author = 'The b2evo Group';
 	var $help_url = 'http://b2evolution.net/'; // TODO: create /man page
-
-	var $apply_when = 'never';
-	var $apply_to_html = false;
-	var $apply_to_xml = false;
 
 
 	/**

@@ -338,8 +338,20 @@ function upgrade_b2evo_tables()
 		}
 
 		// Create locales
-		create_locales();
-
+		echo 'Creating table for Locales... ';
+		$query = "CREATE TABLE T_locales (
+				loc_locale varchar(20) NOT NULL default '',
+				loc_charset varchar(15) NOT NULL default 'iso-8859-1',
+				loc_datefmt varchar(10) NOT NULL default 'y-m-d',
+				loc_timefmt varchar(10) NOT NULL default 'H:i:s',
+				loc_name varchar(40) NOT NULL default '',
+				loc_messages varchar(20) NOT NULL default '',
+				loc_priority tinyint(4) UNSIGNED NOT NULL default '0',
+				loc_enabled tinyint(4) NOT NULL default '1',
+				PRIMARY KEY loc_locale( loc_locale )
+			) COMMENT='saves available locales'";
+		$DB->query( $query );
+		echo "OK.<br />\n";
 
 		echo 'Upgrading posts table... ';
 		$query = "UPDATE T_posts
@@ -505,6 +517,15 @@ function upgrade_b2evo_tables()
 		// New tables:
 		create_b2evo_tables_phoenix();
 
+		echo 'Creating plugins table... ';
+		$DB->query( "CREATE TABLE T_plugins (
+										plug_ID        INT(11) UNSIGNED NOT NULL auto_increment,
+										plug_priority  INT(11) NOT NULL default 50,
+										plug_classname VARCHAR(40) NOT NULL default '',
+										PRIMARY KEY ( plug_ID )
+									)");
+		echo "OK.<br />\n";
+
 		echo 'Upgrading blogs table... ';
 		$query = "ALTER TABLE T_blogs
 							MODIFY COLUMN blog_ID int(11) unsigned NOT NULL auto_increment,
@@ -652,8 +673,12 @@ function upgrade_b2evo_tables()
 
 		set_upgrade_checkpoint( '9000' );
 
-		// INSTALL PLUGINS:
-		install_basic_plugins();
+		if( $new_db_version < 9100 )
+		{ // We cannot install Plugins before having T_plugin_events created (comes with 9100)
+			// TODO: blueyed>> this is so hackish.. :/
+			// INSTALL PLUGINS:
+			install_basic_plugins();
+		}
 	}
 
 
@@ -662,6 +687,76 @@ function upgrade_b2evo_tables()
 
 		// New tables:
 		create_b2evo_tables_phoenix_beta();
+
+		echo 'Altering Plugins table... ';
+		$DB->query( "ALTER TABLE T_plugins
+		             ADD COLUMN plug_code VARCHAR(32) NULL AFTER plug_classname,
+		             ADD UNIQUE plug_code( plug_code )" );
+		echo "OK.<br />\n";
+
+		echo 'Giving Administrator Group edit perms on files... ';
+		$DB->query( 'UPDATE T_groups
+		             SET grp_perm_files = "edit"
+		             WHERE grp_ID = 1' );
+		echo "OK.<br />\n";
+
+		echo 'Giving Administrator Group full perms on media for all blogs... ';
+		$DB->query( 'UPDATE T_coll_group_perms
+		             SET bloggroup_perm_media_upload = 1,
+		                 bloggroup_perm_media_browse = 1,
+		                 bloggroup_perm_media_change = 1
+		             WHERE bloggroup_group_ID = 1' );
+		echo "OK.<br />\n";
+
+		echo 'Re-registering Plugins... ';
+		$Plugins = & new Plugins();
+		$Plugins->restart();
+		while( $Plugin = & $Plugins->get_next() )
+		{
+			$Plugins->set_empty_code_to_default( $Plugin );
+		}
+		echo "OK.<br />\n";
+
+		// Fixes for MySQL strict mode: {{{
+		echo 'Altering Users table... ';
+		$DB->query( 'ALTER TABLE T_users
+		             MODIFY COLUMN user_firstname varchar(50) NULL,
+		             MODIFY COLUMN user_lastname varchar(50) NULL,
+		             MODIFY COLUMN user_nickname varchar(50) NULL,
+		             MODIFY COLUMN user_icq int(11) unsigned NULL,
+		             MODIFY COLUMN user_url varchar(100) NULL,
+		             MODIFY COLUMN user_ip varchar(15) NULL,
+		             MODIFY COLUMN user_domain varchar(200) NULL,
+		             MODIFY COLUMN user_browser varchar(200) NULL,
+		             MODIFY COLUMN dateYMDhour datetime NOT NULL,
+		             MODIFY COLUMN user_aim varchar(50) NULL,
+		             MODIFY COLUMN user_msn varchar(100) NULL,
+		             MODIFY COLUMN user_yim varchar(50) NULL' );
+		echo "OK.<br />\n";
+
+		echo 'Altering Blogs table... ';
+		$DB->query( 'ALTER TABLE T_blogs
+		             MODIFY COLUMN blog_media_subdir VARCHAR( 255 ) NULL,
+		             MODIFY COLUMN blog_media_fullpath VARCHAR( 255 ) NULL,
+		             MODIFY COLUMN blog_media_url VARCHAR( 255 ) NULL' );
+		echo "OK.<br />\n";
+
+		echo 'Altering Comments table... ';
+		$DB->query( 'ALTER TABLE T_comments
+		             MODIFY COLUMN comment_date datetime NOT NULL' );
+		echo "OK.<br />\n";
+
+		echo 'Altering Links table... ';
+		$DB->query( 'ALTER TABLE T_links
+		             MODIFY COLUMN link_datecreated      datetime          not null,
+		             MODIFY COLUMN link_datemodified     datetime          not null' );
+		echo "OK.<br />\n";
+		// }}}
+
+		if( $old_db_version < 9000 )
+		{ // Basic plugins not installed from Phoenix Alpha
+			install_basic_plugins();
+		}
 	}
 
 
@@ -687,6 +782,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.114  2005/12/22 23:13:40  blueyed
+ * Plugins' API changed and handling optimized
+ *
  * Revision 1.113  2005/12/19 17:39:56  fplanque
  * Remember prefered browing tab for each user.
  *

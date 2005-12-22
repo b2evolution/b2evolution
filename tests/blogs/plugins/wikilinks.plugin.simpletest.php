@@ -49,7 +49,7 @@ class WikilinksPluginTestCase extends UnitTestCase
 									) as $lText => $lExpexted )
 		{
 			$params = array( 'data' => $lText, 'format' => 'htmlbody' );
-			$this->Plugin->Render( $params );
+			$this->Plugin->RenderItemAsHtml( $params );
 			$this->assertEqual( $params['data'], $lExpexted );
 		}
 	}

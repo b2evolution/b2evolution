@@ -23,15 +23,11 @@ class wikilinks_plugin extends Plugin
 	var $name = 'Wiki Links';
 	var $priority = 35;
 	var $apply_when = 'opt-in';
-	var $apply_to_html = true;
-	var $apply_to_xml = false; // Leave the markup
 	var $short_desc;
 	var $long_desc;
 
 	/**
 	 * Constructor
-	 *
-	 * {@internal gmcode_Rendererplugin::gmcode_Rendererplugin(-)}}
 	 */
 	function wikilinks_plugin()
 	{
@@ -43,21 +39,15 @@ class wikilinks_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal gmcode_Rendererplugin::Render(-)}}
-	 *
 	 * @todo get rid of global $blog
 	 *
 	 * @param array Associative array of parameters
-	 * 							(Output format, see {@link format_to_output()})
+	 *   'data': the data (by reference). You probably want to modify this.
+	 *   'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function Render( & $params )
+	function RenderItemAsHtml( & $params )
 	{
-		if( ! parent::Render( $params ) )
-		{ // We cannot render the required format
-			return false;
-		}
-
 		$content = & $params['data'];
 
 		global $ItemCache, $admin_url, $blog;

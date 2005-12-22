@@ -80,7 +80,7 @@ class archives_plugin extends Plugin
 	}
 
 
- 	/**
+	/**
 	 * Event handler: SkinTag
 	 *
 	 * {@internal archives_plugin::SkinTag(-)}}
@@ -265,17 +265,17 @@ class archives_plugin extends Plugin
 
 		// Display more link:
 		if( !empty($params['more_link']) )
-    {
+		{
 			echo $params['line_start'];
-     	echo '<a href="';
-     	$Blog->disp( 'arcdirurl', 'raw' );
-     	echo '">'.format_to_output($params['more_link']).'</a>';
+			echo '<a href="';
+			$Blog->disp( 'arcdirurl', 'raw' );
+			echo '">'.format_to_output($params['more_link']).'</a>';
 			echo $params['line_end'];
-    }
+		}
 
 		echo $params['list_end'];
 
- 		echo $params['block_end'];
+		echo $params['block_end'];
 
 		return true;
 	}
@@ -294,25 +294,25 @@ class ArchiveList extends Results
 
 	/**
 	 * Constructor
-   *
-   * Note: Weekly archives use MySQL's week numbering and MySQL default if applicable.
-   * In MySQL < 4.0.14, WEEK() always uses mode 0: Week starts on Sunday;
-   * Value range is 0 to 53; week 1 is the first week that starts in this year
-   * {@see http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html}
-   *
+	 *
+	 * Note: Weekly archives use MySQL's week numbering and MySQL default if applicable.
+	 * In MySQL < 4.0.14, WEEK() always uses mode 0: Week starts on Sunday;
+	 * Value range is 0 to 53; week 1 is the first week that starts in this year
+	 * {@see http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html}
+	 *
 	 * @todo categories combined with 'ALL' are not supported (will output too many archives,
 	 * some of which will resolve to no results). We need subqueries to support this efficiently.
 	 *
-   * @param string
-   * @param integer
-   * @param boolean
+	 * @param string
+	 * @param integer
+	 * @param boolean
 	 */
 	function ArchiveList(
 		$archive_mode = 'monthly',
 		$limit = 100,
 		$preserve_context = false,
 		$dbtable = 'T_posts',
- 		$dbprefix = 'post_',
+		$dbprefix = 'post_',
 		$dbIDname = 'ID' )
 	{
 		global $DB, $Settings;
@@ -496,7 +496,7 @@ class ArchiveList extends Results
 	{
 		// echo 'getting next item<br />';
 
- 		if( $this->current_idx >= $this->result_num_rows )
+		if( $this->current_idx >= $this->result_num_rows )
 		{	// No more entry
 			return false;
 		}
@@ -536,6 +536,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.15  2005/12/22 23:13:40  blueyed
+ * Plugins' API changed and handling optimized
+ *
  * Revision 1.14  2005/12/12 19:22:04  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

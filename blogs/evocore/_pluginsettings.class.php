@@ -26,7 +26,7 @@
  * }}
  *
  * {@internal
- * Daniel HAHLER grants François PLANQUE the right to license
+ * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
@@ -106,6 +106,9 @@ class PluginSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.3  2005/12/22 23:13:40  blueyed
+ * Plugins' API changed and handling optimized
+ *
  * Revision 1.2  2005/12/08 22:32:19  blueyed
  * Merged from post-phoenix; Added/fixed delete() (has to be derived to allow using it without plug_ID)
  *

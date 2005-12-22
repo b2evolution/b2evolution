@@ -21,16 +21,12 @@ class autolinks_plugin extends Plugin
 	var $priority = 60;
 
 	var $apply_when = 'opt-out';
-	var $apply_to_html = true;
-	var $apply_to_xml = false;
 	var $short_desc;
 	var $long_desc;
 
 
 	/**
 	 * Constructor
-	 *
-	 * {@internal autolinks_plugin::autolinks_plugin(-)}}
 	 */
 	function autolinks_plugin()
 	{
@@ -42,19 +38,12 @@ class autolinks_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal autolinks_plugin::Render(-)}}
-	 *
 	 * @param array Associative array of parameters
 	 * 							(Output format, see {@link format_to_output()})
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function Render( & $params )
+	function RenderItemAsHtml( & $params )
 	{
-		if( ! parent::Render( $params ) )
-		{	// We cannot render the required format
-			return false;
-		}
-
 		$content = & $params['data'];
 
 		$content = make_clickable( $content );

@@ -206,6 +206,25 @@ $Hit = & new Hit();
 
 
 /**
+ * The Session class
+ */
+require_once dirname(__FILE__).'/_session.class.php';
+/**
+ * @global Session The Session object
+ */
+$Session = & new Session();
+
+
+/**
+ * Plug-ins init:
+ */
+require_once dirname(__FILE__).'/_plugins.class.php';
+$Plugins = & new Plugins();
+
+$Plugins->trigger_event( 'SessionLoaded' );
+
+
+/**
  * Load Request class
  */
 require_once dirname(__FILE__).'/_request.class.php';
@@ -294,12 +313,6 @@ require_once dirname(__FILE__).'/_form.class.php';
 require_once dirname(__FILE__).'/_itemquery.class.php';
 require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_swfcharts.php';
 
-/**
- * Plug-ins init:
- */
-require_once dirname(__FILE__).'/_plugins.class.php';
-$Plugins = & new Plugins();
-
 
 /**
  * Output buffering?
@@ -335,14 +348,6 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true ))
  */
 locale_activate( $default_locale );
 
-/**
- * The Session class
- */
-require_once dirname(__FILE__).'/_session.class.php';
-/**
- * @global Session The Session object
- */
-$Session = & new Session();
 
 /**
  * Login procedure: {{{
@@ -488,6 +493,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.73  2005/12/22 23:13:40  blueyed
+ * Plugins' API changed and handling optimized
+ *
  * Revision 1.72  2005/12/14 19:36:16  fplanque
  * Enhanced file management
  *

@@ -38,12 +38,10 @@ class quicktags_plugin extends Plugin
 	/**
 	 * Display a toolbar
 	 *
-	 * {@internal quicktags_plugin::DisplayToolbar(-)}}
-	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
-	function DisplayToolbar( & $params )
+	function AdminDisplayToolbar( & $params )
 	{
 		global $Hit;
 
@@ -422,6 +420,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.12  2005/12/22 23:13:40  blueyed
+ * Plugins' API changed and handling optimized
+ *
  * Revision 1.11  2005/11/21 18:16:29  fplanque
  * okay, a TWO liner :P
  *

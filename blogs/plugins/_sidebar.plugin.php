@@ -47,13 +47,10 @@ class sidebar_plugin extends Plugin
 	var $version = 'CVS $Revision$';
 	var $author = 'Cafelog team';
 	var $help_url = 'http://b2evolution.net/';
-	var $is_tool = true;
 
 
 	/**
 	 * Constructor
-	 *
-	 * {@internal sidebar_plugin::sidebar_plugin(-)}}
 	 */
 	function sidebar_plugin()
 	{
@@ -62,15 +59,13 @@ class sidebar_plugin extends Plugin
 	}
 
 
- 	/**
-	 * We are displaying the tool menu
-	 *
-	 * {@internal sidebar_plugin::ToolMenu(-)}}
+	/**
+	 * We are displaying the tool menu block.
 	 *
 	 * @param array Associative array of parameters
-	 * @return boolean did we display a toolbar?
+	 * @return boolean did we display a tool menu block?
 	 */
-	function ToolMenu( $params )
+	function AdminToolPayload( $params )
 	{
 		global $Hit, $admin_url;
 

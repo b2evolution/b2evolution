@@ -23,8 +23,6 @@ class wacko_plugin extends Plugin
 	var $name = 'Wacko formatting';
 	var $priority = 30;
 	var $apply_when = 'opt-in';
-	var $apply_to_html = true;
-	var $apply_to_xml = false; // Leave the markup
 	var $short_desc;
 	var $long_desc;
 
@@ -34,19 +32,19 @@ class wacko_plugin extends Plugin
 	 * @access private
 	 */
 	var $search = array(
-											'#( ^ | \s ) ====== (.+?) ====== #x',
-											'#( ^ | \s ) ===== (.+?) ===== #x',
-											'#( ^ | \s ) ==== (.+?) ==== #x',
-											'#( ^ | \s ) === (.+?) === #x',
-											'#( ^ | \s ) == (.+?) == #x',
-											'#^ \s* --- \s* $#xm',	// multiline start/stop checking
-											'/ %%%
-												( \s*? \n )? 				# Eat optional blank line after %%%
-												(.+?)
-												( \n \s*? )? 				# Eat optional blank line before %%%
-												%%%
-											/sxe'		// %%%escaped codeblock%%%
-											);
+			'#( ^ | \s ) ====== (.+?) ====== #x',
+			'#( ^ | \s ) ===== (.+?) ===== #x',
+			'#( ^ | \s ) ==== (.+?) ==== #x',
+			'#( ^ | \s ) === (.+?) === #x',
+			'#( ^ | \s ) == (.+?) == #x',
+			'#^ \s* --- \s* $#xm',	// multiline start/stop checking
+			'/ %%%
+				( \s*? \n )? 				# Eat optional blank line after %%%
+				(.+?)
+				( \n \s*? )? 				# Eat optional blank line before %%%
+				%%%
+			/sxe'		// %%%escaped codeblock%%%
+		);
 
 	/**
 	 * HTML replace array
@@ -54,21 +52,19 @@ class wacko_plugin extends Plugin
 	 * @access private
 	 */
 	var $replace = array(
-											'$1<h6>$2</h6>',
-											'$1<h5>$2</h5>',
-											'$1<h4>$2</h4>',
-											'$1<h3>$2</h3>',
-											'$1<h2>$2</h2>',
-											'<hr />',
-											'\'<div class="codeblock"><pre><code>\'.
-											htmlspecialchars(stripslashes(\'$2\'),ENT_NOQUOTES).
-											\'</code></pre></div>\''
-											);
+			'$1<h6>$2</h6>',
+			'$1<h5>$2</h5>',
+			'$1<h4>$2</h4>',
+			'$1<h3>$2</h3>',
+			'$1<h2>$2</h2>',
+			'<hr />',
+			'\'<div class="codeblock"><pre><code>\'.
+			htmlspecialchars(stripslashes(\'$2\'),ENT_NOQUOTES).
+			\'</code></pre></div>\''
+		);
 
 	/**
 	 * Constructor
-	 *
-	 * {@internal gmcode_Rendererplugin::gmcode_Rendererplugin(-)}}
 	 */
 	function wacko_plugin()
 	{
@@ -84,19 +80,13 @@ class wacko_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * {@internal gmcode_Rendererplugin::Render(-)}}
-	 *
 	 * @param array Associative array of parameters
-	 * 							(Output format, see {@link format_to_output()})
+	 *   'data': the data (by reference). You probably want to modify this.
+	 *   'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function Render( & $params )
+	function RenderItemAsHtml( & $params )
 	{
-		if( ! parent::Render( $params ) )
-		{	// We cannot render the required format
-			return false;
-		}
-
 		$content = & $params['data'];
 
 		$content = preg_replace( $this->search, $this->replace, $content );

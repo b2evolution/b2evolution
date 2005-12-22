@@ -61,229 +61,316 @@ class Plugins
 	 */
 
 	/**
-	 * Array of loaded plug-ins:
+	 * Array of loaded plug-ins.
 	 */
 	var $Plugins = array();
 
+
 	/**
-	 * Indexes:
-	 * @todo updates
+	 * Index: plugin_code => Plugin
 	 */
-	var $index_Plugins = array();
+	var $index_code_Plugins = array();
+
+	/**
+	 * Index: plugin_classname => Plugin
+	 */
 	var $index_name_Plugins = array();
 
 	/**
-	 * Path to plug-ins:
+	 * Index: plugin_ID => Plugin|false
+	 * @var array
+	 */
+	var $index_ID_Plugins = array();
+
+	/**
+	 * Cache Plugin IDs by event.
+	 * @var array
+	 */
+	var $index_event_IDs = array();
+
+	/**
+	 * plug_ID => DB row from T_plugins to lazy-instantiate a Plugin.
+	 * @var array
+	 */
+	var $index_ID_rows = array();
+
+	/**
+	 * plug_code => plug_ID map to lazy-instantiate by code.
+	 * @var array
+	 */
+	var $index_code_ID = array();
+
+	/**
+	 * Path to plug-ins.
 	 */
 	var $plugins_path;
 
 	/**
-	 * Has the plug initialized? (plugins loaded?)
+	 * Have we loaded the plugins table (T_plugins)?
 	 * @var boolean
 	 */
-	var $initialized = false;
+	var $loaded_plugins_table = false;
 
 	/**
-	 * Current object idx in array:
+	 * Current object idx in {@link $sorted_IDs} array.
 	 * @var integer
 	 */
 	var $current_idx = 0;
+
+	/**
+	 * List of IDs, sorted. This gets used to lazy-instantiate a Plugin.
+	 *
+	 * @var array
+	 */
+	var $sorted_IDs = array();
+
+	/**
+	 * The smallest internal/auto-generated Plugin ID.
+	 * @var integer
+	 */
+	var $smallest_internal_ID = 0;
+
+
+	/**
+	 * The list of supported events/hooks.
+	 *
+	 * @var array
+	 */
+	var $supported_events = array(
+			'AdminEndHtmlHead',
+			'AdminAfterPageFooter',
+			'AdminDisplayEditorButton',
+			'AdminDisplayToolbar',
+			'AdminToolAction',
+			'AdminToolPayload',
+
+
+			'RenderItemAsHtml',
+			'RenderItemAsHtml',
+			'RenderItem',
+
+
+			'AdminInitMenu',
+			'Install',
+			'LoginAttempt',
+			'SessionLoaded', // gets called after $Session is initialized, quite early.
+			'Uninstall',
+			'Registration',
+			'GetDefaultSettings', // used to instantiate $Settings
+		);
 
 	/**#@-*/
 
 
 	/**
-	 * Constructor
-	 *
-	 * {@internal Plugins::Plugins(-)}}
-	 *
+	 * Constructor. Sets {@link $plugins_path} and load events.
 	 */
-	function Plugins( )
+	function Plugins()
 	{
 		global $core_dirout, $plugins_subdir;
+		global $DB, $Debuglog, $Timer;
 
 		// Set plugin path:
 		$this->plugins_path = dirname(__FILE__).'/'.$core_dirout.$plugins_subdir;
+
+		$Timer->resume( 'plugin_init' );
+
+		$this->load_events();
+
+		$Timer->pause( 'plugin_init' );
 	}
 
 
 	/**
-	 * Initialize Plug if it has not been done before.
-	 *
-	 * Load the installed plugins.
-	 *
-	 * {@internal Plugins::init(-)}}
-	 */
-	function init()
-	{
-		global $DB, $Debuglog, $Timer;
-
-		if( ! $this->initialized )
-		{
-			$Timer->resume( 'plugin_init' );
-			$Debuglog->add( 'Loading plugins...' );
-			foreach( $DB->get_results( '
-					SELECT * FROM T_plugins
-					ORDER BY plug_priority', ARRAY_A ) as $row )
-			{ // Loop through installed plugins:
-				$filename = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $row['plug_classname'] ).'.php';
-				if( ! is_file( $filename ) )
-				{ // Plugin not found!
-					$Debuglog->add( 'Plugin not found: '.$filename, 'plugins' );
-					// TODO: Automatically remove? Display note on admin/plugins.php?
-					continue;
-				}
-				// Load the plugin:
-				$Debuglog->add( 'Loading plugin: '.$row['plug_classname'], 'plugins' );
-				require_once $filename;
-				// Register the plugin:
-				$this->register( $row['plug_classname'], $row['plug_ID'], $row['plug_priority'] );
-			}
-
-			$Timer->pause( 'plugin_init' );
-			$this->initialized = true;
-		}
-	}
-
-
-	/**
-	 * Discover and load all available plugins.
-	 *
-	 * {@internal Plugins::discover(-)}}
+	 * Discover and register all available plugins.
 	 */
 	function discover()
 	{
 		global $Debuglog;
 
-		if( ! $this->initialized )
+		$Debuglog->add( 'Discovering plugins...', 'plugins' );
+
+		// Go through directory:
+		$this_dir = dir( $this->plugins_path );
+		while( $this_file = $this_dir->read() )
 		{
-			$Debuglog->add( 'Discovering plugins...' );
+			if( preg_match( '/^_(.+)\.plugin\.php$/', $this_file, $matches ) && is_file( $this->plugins_path. '/'. $this_file ) )
+			{ // Valid plugin file name, Register the plugin:
+				$classname = $matches[1].'_plugin';
 
-			// Go through directory:
-			$this_dir = dir( $this->plugins_path );
-			while( $this_file = $this_dir->read() )
-			{
-				if( preg_match( '/^_(.+)\.plugin\.php$/', $this_file, $matches ) && is_file( $this->plugins_path. '/'. $this_file ) )
-				{ // Valid plugin file name:
-					$Debuglog->add( 'Loading plugin: '.$this_file, 'plugins' );
-					// Load the plugin:
-					require_once $this->plugins_path.$this_file;
-					// Register the plugin:
-					$classname = $matches[1].'_plugin';
-					$this->register( $classname, 0 );
-				}
+				$this->register( $classname, 0 ); // auto-generate negative ID; will return string on error.
 			}
-
-			$this->sort( 'priority' );
-
-			$this->initialized = true;
 		}
+
+		$this->sort( 'priority' );
 	}
 
 
 	/**
-	 * Sort the list of {@link Plugins}.
+	 * Sort the list of {@link $Plugins}.
 	 *
-	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins
+	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins!
 	 *
 	 * @param string Order: 'priority' (default), 'name'
 	 */
 	function sort( $order = 'priority' )
 	{
+		$this->load_plugins_table();
+
 		switch( $order )
 		{
 			case 'name':
-				usort( $this->Plugins, 'sort_Plugin_name' );
+				usort( $this->sorted_IDs, array( & $this, 'sort_Plugin_name') );
 				break;
 
 			default:
 				// Sort array by priority:
-				usort( $this->Plugins, 'sort_Plugin_priority' );
+				usort( $this->sorted_IDs, array( & $this, 'sort_Plugin_priority') );
 		}
 	}
 
+	/**
+	 * Callback function to sort plugins by priority.
+	 */
+	function sort_Plugin_priority( & $a_ID, & $b_ID )
+	{
+		$a_Plugin = & $this->get_by_ID( $a_ID );
+		$b_Plugin = & $this->get_by_ID( $b_ID );
+
+		return $a_Plugin->priority - $b_Plugin->priority;
+	}
 
 	/**
-	 * Install a plugin
+	 * Callback function to sort plugins by name.
 	 *
-	 * Records it in the database
-	 *
-	 * {@internal Plugins::install(-)}}
+	 * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins
 	 */
-	function install( $plugin_name )
+	function sort_Plugin_name( & $a_ID, & $b_ID )
 	{
-		global $DB, $Debuglog;
+		$a_Plugin = & $this->get_by_ID( $a_ID );
+		$b_Plugin = & $this->get_by_ID( $b_ID );
 
-		$this->init();  // Init if not done yet.
-
-		// Load the plugin:
-		$filename = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $plugin_name ).'.php';
-		require_once $filename;
-
-		// Register the plugin:
-		$Plugin = & $this->register( $plugin_name, 0 );	// ID will be set a few lines below
-
-		$this->sort( 'priority' );
-
-		// Record into DB
-		//$DB->begin();
-
-		//$max_order = $DB->get_var( 'SELECT MAX(plug_order) FROM T_plugin' );
-
-		$DB->query( "INSERT INTO T_plugins( plug_classname, plug_priority )
-									VALUES( '$plugin_name', $Plugin->priority ) " );
-
-		//$DB->commit();
-
-		$Plugin->ID = $DB->insert_id;
-		$Debuglog->add( 'New plugin: '.$Plugin->name.' ID: '.$Plugin->ID, 'plugins' );
+		return strcasecmp( $a_Plugin->name, $b_Plugin->name );
 	}
 
 
 	/**
-	 * Uninstall a plugin
+	 * Install a plugin.
 	 *
-	 * Removes it from the database
+	 * Records it and its Events in the database.
 	 *
-	 * {@internal Plugins::uninstall(-)}}
+	 * @return Plugin|string The installed plugin on success, string with error on failure.
+	 */
+	function & install( $plugin_classname )
+	{
+		global $DB, $Debuglog, $Messages;
+
+		$this->load_plugins_table();
+
+		// Register the plugin:
+		$Plugin = & $this->register( $plugin_classname, 0 ); // Auto-generates negative ID; New ID will be set a few lines below
+
+		if( is_string($Plugin) )
+		{ // return error message from register()
+			return $Plugin;
+		}
+
+		if( isset($Plugin->nr_of_installs)
+		    && ( $this->count_regs( $Plugin->classname ) >= $Plugin->nr_of_installs ) )
+		{
+			$this->unregister( $Plugin );
+			return T_('The plugin cannot be installed again.');
+		}
+
+		if( ! $Plugin->Install() )
+		{
+			$this->unregister( $Plugin );
+			return T_('The installation method of the plugin failed.');
+		}
+
+		$this->sort( 'priority' );
+
+
+		// Record into DB
+		$DB->begin();
+
+		$DB->query( '
+				INSERT INTO T_plugins( plug_classname, plug_priority, plug_code )
+				VALUES( "'.$plugin_classname.'", '.$Plugin->priority.', '.$DB->quote($Plugin->code).' ) ' );
+
+		// Unset auto-generated ID info
+		unset( $this->index_ID_Plugins[ $Plugin->ID ] );
+		$key = array_search( $Plugin->ID, $this->sorted_IDs );
+
+		// New ID:
+		$Plugin->ID = $DB->insert_id;
+		$this->index_ID_Plugins[ $Plugin->ID ] = & $Plugin;
+		$this->sorted_IDs[$key] = $Plugin->ID;
+
+		$this->save_events( $Plugin );
+
+		$DB->commit();
+
+		// "GetDefaultSettings" was just discovered by save_events()
+		$this->instantiate_Settings( $Plugin );
+
+
+		$Debuglog->add( 'New plugin: '.$Plugin->name.' ID: '.$Plugin->ID, 'plugins' );
+
+		return $Plugin;
+	}
+
+
+	/**
+	 * Uninstall a plugin.
 	 *
-	 * @return boolean success
+	 * Removes the Plugin, its Settings and Events from the database.
+	 *
+	 * @return true|string True on success, string on failure (might be empty, as a lot of cases are checked that should never happen).
 	 */
 	function uninstall( $plugin_ID )
 	{
 		global $DB, $Debuglog;
 
-		$this->init();  // Init if not done yet.
+		$Debuglog->add( 'Uninstalling plugin (ID '.$plugin_ID.')...', 'plugins' );
+
+		$Plugin = & $this->get_by_ID( $plugin_ID ); // get the Plugin before any not loaded data might get deleted below
+
+		if( ! $Plugin )
+		{
+			$Debuglog->add( 'Plugin could not be instantiated!', 'plugins' );
+			return '';
+		}
+
+		if( ! $Plugin->Uninstall() )
+		{
+			return T_('The uninstallation method of the plugin failed.' );
+		}
+
+		$DB->begin();
+
+		// Delete Plugin settings (constraints)
+		$DB->query( "DELETE FROM T_pluginsettings
+		              WHERE pset_plug_ID = $plugin_ID" );
+
+		// Delete Plugin events (constraints)
+		$DB->query( "DELETE FROM T_plugin_events
+		              WHERE pevt_plug_ID = $plugin_ID" );
 
 		// Delete from DB
 		if( ! $DB->query( "DELETE FROM T_plugins
 		                    WHERE plug_ID = $plugin_ID" ) )
 		{ // Nothing removed!?
-			return false;
+			$DB->commit();
+
+			return ''; // should be prevented by UI
 		}
 
-		// for( $i = 0; $i < count( $this->Plugins ); $i++ )
-		$move_by = 0;
-		$items = count($this->Plugins);
-		foreach( $this->Plugins as $key => $Plugin )
-		{ // Go through plugins:
-			if( $Plugin->ID == $plugin_ID )
-			{ // This one must be unregistered...
-				unset( $this->index_Plugins[ $Plugin->code ] );
-				unset( $this->index_name_Plugins[ $Plugin->classname ] );
-				$move_by--;
-			}
-			elseif($move_by)
-			{ // This is a normal one but must be moved up
-				$this->Plugins[$key+$move_by] = & $this->Plugins[$key];
-			}
+		$DB->commit();
 
-			if( $key >= $items+$move_by )
-			{ // We are reaching the end of the array, we should unset
-				unset($this->Plugins[$key]);
-			}
-		}
-		// unset( $this->Plugins[ $key ] );
+		$this->unregister( $Plugin );
+
+		$Debuglog->add( 'Uninstalled plugin (ID '.$plugin_ID.').', 'plugins' );
 		return true;
 	}
 
@@ -293,50 +380,305 @@ class Plugins
 	 *
 	 * Will be called by plugin includes when they are called by init()
 	 *
-	 * {@internal Plugins::register(-)}}
-	 *
-	 * @param string name of plugin class to instanciate & register
+	 * @param string name of plugin class to instantiate & register
 	 * @param int ID in database (0 if not installed)
 	 * @param int Priority in database (-1 to keep default)
-	 * @return Plugin ref to newly created plugin
+	 * @return Plugin|string Plugin ref to newly created plugin; string in case of error
 	 * @access private
 	 */
 	function & register( $classname, $ID = 0, $priority = -1 )
 	{
-		global $Debuglog;
+		global $Debuglog, $Messages, $pagenow, $Timer;
+
+		if( $ID && isset($this->index_ID_Plugins[$ID]) )
+		{
+			debug_die( 'Tried to register already registered Plugin (ID '.$ID.')' ); // should never happen!
+			//$Timer->pause( 'plugins_register' );
+			//$r = 'error..';
+			//return $r;
+		}
+
+		$Timer->resume( 'plugins_register' );
+
+		$filename = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $classname ).'.php';
+
+		$Debuglog->add( 'register(): '.$classname.', ID: '.$ID.', priority: '.$priority.', filename: ['.$filename.']', 'plugins' );
+
+		if( ! is_readable( $filename ) )
+		{ // Plugin not found!
+			$Debuglog->add( 'Plugin filename ['.$filename.'] not readable!', array( 'plugins', 'error' ) );
+			$Timer->pause( 'plugins_register' );
+			$r = 'Plugin filename ['.rel_path_to_base($filename).'] not readable!'; // no translation, should not happen!
+			return $r;
+		}
+
+		$Debuglog->add( 'Loading plugin class file: '.$classname, 'plugins' );
+		require_once $filename;
 
 		if( !class_exists( $classname ) )
 		{ // the given class does not exist
-			// TODO: Add Message to log category 'plugin_errors' that gets displayed in Settings / Plugins (on discover)
-			$Debuglog->add( 'ERROR: Plugin class for ['.$classname.'] not defined - must match the filename.', 'plugins' );
-			return false;
+			// TODO: Automatically remove? Display note on admin/plugins.php?
+
+			$Timer->pause( 'plugins_register' );
+			$r = sprintf( /* TRANS: First %s is the (class)name */ T_('Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined - it must match the filename.'), $classname, rel_path_to_base($filename) );
+			return $r;
 		}
 		$Plugin = new $classname;	// COPY !
 
 		// Tell him his ID :)
-		$Plugin->ID = $ID;
+		if( $ID == 0 )
+		{
+			$Plugin->ID = --$this->smallest_internal_ID;
+		}
+		else
+		{
+			$Plugin->ID = $ID;
+		}
 		// Tell him his name :)
 		$Plugin->classname = $classname;
 		// Tell him his priority:
 		if( $priority > -1 ) { $Plugin->priority = $priority; }
+		if( isset( $this->index_ID_rows[$Plugin->ID] ) )
+		{
+			$Plugin->code = $this->index_ID_rows[$Plugin->ID]['plug_code'];
+		}
+
+		// Instantiate the Plugins Settings class
+		$this->instantiate_Settings( $Plugin );
 
 		// Memorizes Plugin in sequential array:
 		$this->Plugins[] = & $Plugin;
 		// Memorizes Plugin in code hash array:
-		$this->index_Plugins[ $Plugin->code ] = & $Plugin;
+		if( isset($this->index_code_ID[ $Plugin->code ]) && $this->index_code_ID[ $Plugin->code ] != $Plugin->ID )
+		{ // This code is already in use!
+			$Plugin->code = NULL;
+		}
+		else
+		{
+			$this->index_code_Plugins[ $Plugin->code ] = & $Plugin;
+			$this->index_code_ID[ $Plugin->code ] = & $Plugin->ID;
+		}
 		$this->index_name_Plugins[ $Plugin->classname ] = & $Plugin;
+		$this->index_ID_Plugins[ $Plugin->ID ] = & $Plugin;
 
-		// Request event callback registrations:
-		// events = $Plugin->RegisterEvents();
+		if( ! in_array( $Plugin->ID, $this->sorted_IDs ) )
+		{ // not in our sort index yet
+			$this->sorted_IDs[] = & $Plugin->ID;
+		}
+
+		$Timer->pause( 'plugins_register' );
 
 		return $Plugin;
 	}
 
 
 	/**
-	 * Count # of registrations of same plugin
+	 * Un-registers a plugin. This does not un-install it from DB, just from
+	 * the internal indexes.
+	 */
+	function unregister( & $Plugin )
+	{
+		// Forget events:
+		foreach( array_keys($this->index_event_IDs) as $l_event )
+		{
+			while( ($key = array_search( $Plugin->ID, $this->index_event_IDs[$l_event] )) !== false )
+			{
+				unset( $this->index_event_IDs[$l_event][$key] );
+			}
+		}
+
+		unset( $this->index_code_Plugins[ $Plugin->code ] );
+		unset( $this->index_name_Plugins[ $Plugin->classname ] );
+		unset( $this->index_ID_Plugins[ $Plugin->ID ] );
+
+		if( isset($this->index_ID_rows[ $Plugin->ID ]) )
+		{ // It has an associated DB row (load_plugins_table() was called)
+			unset($this->index_ID_rows[ $Plugin->ID ]);
+		}
+
+		$sort_key = array_search( $Plugin->ID, $this->sorted_IDs );
+		if( $sort_key === false )
+		{
+			$Debuglog->add( 'Tried to uninstall not-installed plugin (not in $sorted_IDs)!', 'plugins' );
+			return false; // should not happen
+		}
+		unset( $this->sorted_IDs[$sort_key] );
+		$this->sorted_IDs = array_values( $this->sorted_IDs );
+
+		// Unset from $Plugins array.. this should not be necessary really, but keeps things clean
+		foreach( $this->Plugins as $l_key => $l_Plugin )
+		{
+			if( $l_Plugin->ID == $Plugin->ID )
+			{
+				unset( $this->Plugins[$l_key] );
+				// Note: No need to re-arrange Plugins array..
+				break;
+			}
+		}
+
+		if( $this->current_idx >= $sort_key )
+		{ // We have removed a file before or at the $sort_key'th position
+			$this->current_idx--;
+		}
+	}
+
+
+	/**
+	 * Set the code for a given Plugin ID.
 	 *
-	 * {@internal Plugins::count_regs(-)}}
+	 * It makes sure that the index is handled and writes it to DB.
+	 *
+	 * @return boolean|integer|string
+	 *   true, if already set to same value.
+	 *   string: error message (already in use, wrong format)
+	 *   1 in case of setting it into DB (number of affected rows).
+	 *   false, if invalid Plugin.
+	 */
+	function set_code( $plugin_ID, $code )
+	{
+		global $DB;
+
+		if( strlen( $code ) > 32 )
+		{
+			return T_( 'The maximum length of a plugin code is 32 characters.' );
+		}
+
+		// TODO: more strict check?! Just "[\w_-]+" as regexp pattern?
+		if( strpos( $code, '.' ) !== false )
+		{
+			return T_( 'The plugin code cannot include a dot!' );
+		}
+
+		if( isset( $this->index_code_ID[$code] ) )
+		{
+			if( $this->index_code_ID[$code] == $plugin_ID )
+			{ // Already set to same value
+				return true;
+			}
+			else
+			{
+				return T_( 'The plugin code is already in use by another plugin.' );
+			}
+		}
+
+		$Plugin = & $this->get_by_ID( $plugin_ID );
+		if( ! $Plugin )
+		{
+			return false;
+		}
+		$Plugin->code = $code;
+		$this->index_code_ID[$code] = & $Plugin->ID;
+		$this->index_code_Plugins[$code] = & $Plugin;
+
+		return $DB->query( '
+			UPDATE T_plugins
+			SET plug_code = '.$DB->quote($code).'
+			WHERE plug_ID = '.$plugin_ID );
+	}
+
+
+	/**
+	 * Set the priority for a given Plugin ID.
+	 *
+	 * It makes sure that the index is handled and writes it to DB.
+	 *
+	 * @return boolean|integer
+	 *   true, if already set to same value.
+	 *   false if another Plugin uses that code already.
+	 *   1 in case of setting it into DB.
+	 */
+	function set_priority( $plugin_ID, $priority )
+	{
+		global $DB;
+
+		if( ! is_numeric($priority) )
+		{
+			debug_die( 'Plugin priority must be numeric.' );
+		}
+
+		$Plugin = & $this->get_by_ID($plugin_ID);
+		if( ! $Plugin )
+		{
+			return false;
+		}
+
+		if( $Plugin->priority == $priority )
+		{ // Already set to same value
+			return true;
+		}
+
+		$r = $DB->query( '
+			UPDATE T_plugins
+			SET plug_priority = '.$DB->quote($priority).'
+			WHERE plug_ID = '.$plugin_ID );
+
+		$Plugin->priority = $priority;
+		$this->sort();
+		return $r;
+	}
+
+
+	/**
+	 * Sets the Plugin's code to its default if the current code is empty and the Plugin's class
+	 * has a default code that is not in use by another Plugin.
+	 *
+	 * @return boolean true if the code has been "fixed", false if not
+	 */
+	function set_empty_code_to_default( & $Plugin )
+	{
+		$default_Plugin = & new $Plugin->classname;
+
+		$r = false;
+
+		if( empty($Plugin->code) // Instantiated Plugin has no code
+				&& ! empty($default_Plugin->code) // Plugin has default code
+				&& ! $this->get_by_code( $default_Plugin->code ) ) // Default code is not in use (anymore)
+		{ // Set the Plugin's code to the default one
+			$r = $this->set_code( $Plugin->ID, $default_Plugin->code );
+		}
+
+		return ( $r === 1 ); // true if one affected row
+	}
+
+
+	/**
+	 * Instantiate Settings member of class {@link PluginSettings} for the given
+	 * plugin, if it provides default settings.
+	 *
+	 * @param Plugin
+	 */
+	function instantiate_Settings( & $Plugin )
+	{
+		global $Debuglog, $Timer;
+
+		if( isset($this->index_event_IDs['GetDefaultSettings'])
+		    && in_array( $Plugin->ID, $this->index_event_IDs['GetDefaultSettings'] ) )
+		{
+			$defaults = $Plugin->GetDefaultSettings();
+			if( !is_array($defaults) )
+			{
+				$Debuglog->add( $Plugin->classname.'::GetDefaultSettings() did not return array!', array('plugins', 'error') );
+			}
+			else
+			{
+				$Timer->resume( 'plugins_settings' );
+				require_once dirname(__FILE__).'/_pluginsettings.class.php';
+				$Plugin->Settings = & new PluginSettings( $Plugin->ID );
+
+				foreach( $defaults as $l_name => $l_value )
+				{
+					$Plugin->Settings->_defaults[$l_name] = $l_value['defaultvalue'];
+				}
+				$Timer->pause( 'plugins_settings' );
+			}
+		}
+	}
+
+
+	/**
+	 * Count # of registrations of same plugin.
+	 *
+	 * Plugins with negative ID (auto-generated; not installed (yet)) will not get considered.
 	 *
 	 * @param string class name
 	 * @return int # of regs
@@ -345,9 +687,10 @@ class Plugins
 	{
 		$count = 0;
 
-		foreach( $this->Plugins as $Plugin )
+		foreach( $this->sorted_IDs as $plugin_ID )
 		{
-			if( $Plugin->classname == $classname )
+			$Plugin = & $this->get_by_ID( $plugin_ID );
+			if( $Plugin->classname == $classname && $Plugin->ID > 0 )
 			{
 				$count++;
 			}
@@ -357,84 +700,118 @@ class Plugins
 
 
 	/**
-	 * Get next plugin in list:
+	 * Get next plugin in the list.
 	 *
-	 * {@internal Plugins::get_next(-)}}
+	 * NOTE: You'll have to call {@link restart()} or {@link load_plugins_table()}
+	 * before using it.
 	 *
-	 * @return Plugin (false if no more plugin).
+	 * @return Plugin|false (false if no more plugin).
 	 */
 	function & get_next()
 	{
-		$this->init();  // Init if not done yet.
+		global $Debuglog;
 
-		if( $this->current_idx >= count( $this->Plugins ) )
+		$Debuglog->add( 'get_next() ('.$this->current_idx.')..', 'plugins' );
+
+		if( isset($this->sorted_IDs[$this->current_idx]) )
 		{
+			$Plugin = & $this->get_by_ID( $this->sorted_IDs[$this->current_idx] );
+
+			if( $Plugin )
+			{
+				$Debuglog->add( 'return: '.$Plugin->classname.' ('.$Plugin->ID.')', 'plugins' );
+				$this->current_idx++;
+			}
+
+			return $Plugin;
+		}
+		else
+		{
+			$Debuglog->add( 'return: false', 'plugins' );
 			$r = false;
 			return $r;
 		}
-
-		return $this->Plugins[ $this->current_idx++ ];
 	}
 
 
 	/**
-	 * Rewind iterator
-	 *
-	 * {@internal Plugins::restart(-) }}
+	 * Load plugins table and rewind iterator.
 	 */
 	function restart()
 	{
+		$this->load_plugins_table();
+
 		$this->current_idx = 0;
 	}
 
 
 	/**
-	 * Call all plugins for a given event
-	 *
-	 * {@internal Plugins::trigger_event(-)}}
+	 * Call all plugins for a given event.
 	 *
 	 * @param string event name, see {@link Plugin}
-	 * @param array Associative array of parameters
+	 * @param array Associative array of parameters for the Plugin
 	 */
 	function trigger_event( $event, $params = NULL )
 	{
-		global $Debuglog, $Timer;
+		global $Debuglog;
 
-		$this->init();  // Init if not done yet.
+		$Debuglog->add( 'Trigger event '.$event, 'plugins' );
 
-		$this->restart(); // Just in case.
+		if( empty($this->index_event_IDs[$event]) )
+		{ // No events registered
+			$Debuglog->add( 'No registered plugins.', 'plugins' );
+			return false;
+		}
+
+		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
+		foreach( $this->index_event_IDs[$event] as $l_plug_ID )
+		{
+			$this->call_method( $l_plug_ID, $event, $params );
+		}
+	}
+
+
+	/**
+	 * Call a method on a Plugin.
+	 *
+	 * This makes sure that the Timer for the Plugin gets resumed.
+	 *
+	 * @param integer Plugin ID
+	 * @param string Method name.
+	 * @param array Params.
+	 * @return
+	 */
+	function call_method( $plugin_ID, $method, $params = NULL )
+	{
+		global $Timer, $debug, $Debuglog;
 
 		if( is_null($params) )
 		{
 			$params = array();
 		}
 
-		$Debuglog->add( 'Trigger event '.$event, 'plugins' );
+		$Plugin = & $this->get_by_ID( $plugin_ID );
 
-		while( $loop_Plugin = & $this->get_next() )
-		{ // Go through whole list of plugins
-			//echo ' ',$loop_Plugin->code, ':';
-
-			if( method_exists( $loop_Plugin, $event ) )
+		if( method_exists( $Plugin, $method ) )
+		{
+			if( $debug )
 			{
+				// Hide passwords from Debuglog!
 				$debug_params = $params;
-				if( $event == 'LoginAttempt' )
-				{ // Hide passworts for LoginAttempt from Debuglog!
-					if( isset($debug_params['pass']) )
-					{
-						$debug_params['pass'] = '-hidden-';
-					}
-					if( isset($debug_params['pass_md5']) )
-					{
-						$debug_params['pass_md5'] = '-hidden-';
-					}
+				if( isset($debug_params['pass']) )
+				{
+					$debug_params['pass'] = '-hidden-';
 				}
-				$Debuglog->add( 'Calling '.get_class($loop_Plugin).'->'.$event.'( '.var_export( $debug_params, true ).' )', 'plugins' );
-
-				$Timer->resume( 'plugin_'.$loop_Plugin->code );
-				$loop_Plugin->$event( $params );
-				$Timer->pause( 'plugin_'.$loop_Plugin->code );
+				if( isset($debug_params['pass_md5']) )
+				{
+					$debug_params['pass_md5'] = '-hidden-';
+				}
+				$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.var_export( $debug_params, true ).' )', 'plugins' );
 			}
+
+			$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
+			$Plugin->$method( $params );
+			$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 		}
 	}
 
@@ -442,20 +819,16 @@ class Plugins
 	/**
 	 * Validate renderer list
 	 *
-	 * {@internal Plugins::validate_list(-)}}
-	 *
-	 * @param array renderer codes
+	 * @param array renderer codes ('default' will include all "opt-out"-ones)
 	 * @return array validated array
 	 */
 	function validate_list( $renderers = array('default') )
 	{
-		$this->init();  // Init if not done yet.
-
 		$this->restart(); // Just in case.
 
 		$validated_renderers = array();
 
-		while( $loop_RendererPlugin = $this->get_next() )
+		while( $loop_RendererPlugin = & $this->get_next() )
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
 
@@ -500,37 +873,50 @@ class Plugins
 	/**
 	 * Render the content
 	 *
-	 * {@internal Plugins::render(-)}}
-	 *
 	 * @param string content to render
 	 * @param array renderer codes
 	 * @param string Output format, see {@link format_to_output()}
+	 * @param string Type of data to render ('ItemContent').
 	 * @return string rendered content
 	 */
 	function render( & $content, & $renderers, $format, $type = 'ItemContent' )
 	{
-		$this->init();  // Init if not done yet.
-
-		$this->restart(); // Just in case.
-
 		// echo implode(',',$renderers);
 
 		$params = array(
-											'type'   => $type,
-											'data'   => & $content,
-											'format' => $format
-										);
+				/*
+				blueyed>> obsolete, should be handled by Plugin's event handler name.
+				'type'   => $type,
+				*/
+				'data'   => & $content,
+				'format' => $format
+			);
 
-		while( $loop_RendererPlugin = $this->get_next() )
+		// TODO: support $type different than 'ItemContent'
+		if( $format == 'htmlbody' || $format == 'entityencoded' )
+		{
+			$event = 'RenderItemAsHtml';
+		}
+		elseif( $format == 'xml' )
+		{
+			$event = 'RenderItemAsXml';
+		}
+		else
+		{
+			$event = 'RenderItem';
+		}
+		$renderer_Plugins = $this->get_list_by_event( $event );
+
+		foreach( $renderer_Plugins as $loop_RendererPlugin )
 		{ // Go through whole list of renders
-			//echo ' ',$loop_RendererPlugin->code, ':';
+			// echo ' ',$loop_RendererPlugin->code, ':';
 
 			switch( $loop_RendererPlugin->apply_when )
 			{
 				case 'stealth':
 				case 'always':
 					// echo 'FORCED ';
-					$loop_RendererPlugin->Render( $params );
+					$this->call_method( $loop_RendererPlugin->ID, $event, $params );
 					break;
 
 				case 'opt-out':
@@ -539,7 +925,7 @@ class Plugins
 					if( in_array( $loop_RendererPlugin->code, $renderers ) )
 					{ // Option is activated
 						// echo 'OPT ';
-						$loop_RendererPlugin->Render( $params );
+						$this->call_method( $loop_RendererPlugin->ID, $event, $params );
 					}
 					// else echo 'NOOPT ';
 					break;
@@ -555,15 +941,17 @@ class Plugins
 
 
 	/**
-	 * Quick-render a string with a single plugin.
+	 * Quick-render a string with a single plugin and format it for output.
 	 *
 	 * @param string Plugin code (must have render() method)
-	 * @param array data
-	 * @param string format to output, see {@link format_to_output()}
+	 * @param array
+	 *   'data': Data to render
+	 *   'format: format to output, see {@link format_to_output()}
+	 * @return string Rendered string
 	 */
-	function quick( $pluginCode, $params )
+	function quick( $plugin_code, $params )
 	{
-		$this->init();
+		global $Debuglog;
 
 		if( !is_array($params) )
 		{
@@ -574,14 +962,41 @@ class Plugins
 			$params = $params; // copy
 		}
 
-		if( isset($this->index_Plugins[ $pluginCode ]) )
+		$Plugin = & $this->get_by_code( $plugin_code );
+		if( $Plugin )
 		{
-			$this->index_Plugins[ $pluginCode ]->render( $params );
-			return $params['data'];
+			// Get the most appropriate handler:
+			$events = $this->get_enabled_events( $Plugin->ID );
+			$event = false;
+			if( $params['format'] == 'htmlbody' || $params['format'] == 'htmlentityencoded' )
+			{
+				if( in_array( 'RenderItemAsHtml', $events ) )
+				{
+					$event = 'RenderItemAsHtml';
+				}
+			}
+			elseif( $params['format'] == 'xml' )
+			{
+				if( in_array( 'RenderItemAsXml', $events ) )
+				{
+					$event = 'RenderItemAsXml';
+				}
+			}
+
+			if( $event )
+			{
+				$this->call_method( $Plugin->ID, $event, $params );
+			}
+			else
+			{
+				$Debuglog->add( $Plugin->classname.'(ID '.$Plugin->ID.'): failed to quick-render (tried method '.$event.')!', array( 'plugins', 'error' ) );
+			}
+			return format_to_output( $params['data'], $params['format'] );
 		}
 		else
 		{
-			return format_to_output( $params['data'], $format );
+			$Debuglog->add( 'Plugins::quick() - failed to instantiate Plugin by code ['.$plugin_code.']!', array( 'plugins', 'error' ) );
+			return format_to_output( $params['data'], $params['format'] );
 		}
 	}
 
@@ -591,75 +1006,411 @@ class Plugins
 	 *
 	 * This will call the SkinTag event handler.
 	 *
-	 * {@internal Plugins::call_by_code(-)}}
-	 *
 	 * @param string plugin code
 	 * @param array Associative array of parameters
 	 * @return boolean
 	 */
 	function call_by_code( $code, $params )
 	{
-		global $Debuglog;
+		$Plugin = & $this->get_by_code( $code );
 
-		$this->init();
-
-		if( ! isset($this->index_Plugins[ $code ]) )
-		{ // Plugins is not registered
-			$Debuglog->add( 'Requested plugin ['.$code.'] is not registered!', 'plugins' );
+		if( ! $Plugin )
+		{
 			return false;
 		}
 
-		$this->index_Plugins[ $code ]->SkinTag( $params );
+		$this->call_method( $Plugin->ID, 'SkinTag', $params );
 
 		return true;
 	}
 
 
 	/**
+	 * Load Plugin data from T_plugins (only once), ordered by priority.
+	 */
+	function load_plugins_table()
+	{
+		if( $this->loaded_plugins_table )
+		{
+			return;
+		}
+		global $Debuglog, $DB;
+
+		$Debuglog->add( 'Loading plugins table data.', 'plugins' );
+		$i = 0;
+		foreach( $DB->get_results( '
+				SELECT plug_ID, plug_priority, plug_classname, plug_code FROM T_plugins
+				ORDER BY plug_priority', ARRAY_A ) as $row )
+		{ // Loop through installed plugins:
+			$this->index_ID_rows[$row['plug_ID']] = $row; // remember the rows to instantiate the Plugin on request
+			if( !empty( $row['plug_code'] ) )
+			{
+				$this->index_code_ID[$row['plug_code']] = $row['plug_ID'];
+			}
+			//$this->_cache_name_rows[$row['plug_classname']] = $row; // remember the rows to instantiate the Plugin on request
+
+			$this->sorted_IDs[] = $row['plug_ID'];
+		}
+
+		$this->loaded_plugins_table = true;
+	}
+
+
+	/**
+	 * Get a specific plugin by its ID.
+	 *
+	 * @param integer plugin ID
+	 * @return Plugin|false
+	 */
+	function & get_by_ID( $plugin_ID )
+	{
+		global $Debuglog;
+
+		if( ! isset($this->index_ID_Plugins[ $plugin_ID ]) )
+		{ // Plugin is not instantiated yet
+			$Debuglog->add( 'get_by_ID(): Instantiate Plugin (ID '.$plugin_ID.').', 'plugins' );
+
+			$this->load_plugins_table();
+
+			#pre_dump( 'get_by_ID(), index_ID_rows', $this->index_ID_rows );
+
+			if( ! isset( $this->index_ID_rows[$plugin_ID] ) || !$this->index_ID_rows[$plugin_ID] )
+			{ // no plugin rows cached
+				#debug_die( 'Cannot instantiate Plugin (ID '.$plugin_ID.') without DB information.' );
+				$Debuglog->add( 'get_by_ID(): Plugin (ID '.$plugin_ID.') not registered in DB!', array( 'plugins', 'error' ) );
+				$r = false;
+				return $r;
+			}
+
+			$row = $this->index_ID_rows[$plugin_ID];
+
+			// Register the plugin:
+			$Plugin = & $this->register( $row['plug_classname'], $row['plug_ID'], $row['plug_priority'] );
+
+			if( is_string( $Plugin ) )
+			{
+				$Debuglog->add( 'Requested plugin [#'.$plugin_ID.'] not found!', 'plugins' );
+				$r = false;
+				return $r;
+			}
+
+			$this->index_ID_Plugins[ $plugin_ID ] = & $Plugin;
+		}
+
+		return $this->index_ID_Plugins[ $plugin_ID ];
+	}
+
+
+	/**
 	 * Get a specific plugin by its name.
 	 *
-	 * {@internal Plugins::get_by_name(-)}}
+	 * NOTE: You'll have to call {@link load_plugins_table()} or {@link restart()} before.
 	 *
 	 * @param string plugin name
 	 * @return Plugin|false
 	 */
-	function & get_by_name( $plugin_name )
+	function & get_by_name( $plugin_classname )
 	{
 		global $Debuglog;
 
-		$this->init();
-		if( ! isset($this->index_name_Plugins[ $plugin_name ]) )
+		if( ! isset($this->index_name_Plugins[ $plugin_classname ]) )
 		{ // Plugin is not registered
-			$Debuglog->add( 'Requested plugin ['.$plugin_name.'] not found!', 'plugins' );
+			$Debuglog->add( 'Requested plugin ['.$plugin_classname.'] not found!', 'plugins' );
 			return false;
 		}
 
-		return $this->index_name_Plugins[ $plugin_name ];
+		return $this->index_name_Plugins[ $plugin_classname ];
 	}
 
+
+	/**
+	 * Get a specific plugin by its code.
+	 *
+	 * @param string plugin name
+	 * @return Plugin|false
+	 */
+	function & get_by_code( $plugin_code )
+	{
+		global $Debuglog;
+
+		$r = false;
+
+		if( ! isset($this->index_code_Plugins[ $plugin_code ]) )
+		{ // Plugin is not registered yet
+			$this->load_plugins_table();
+
+			if( ! isset($this->index_code_ID[ $plugin_code ]) )
+			{
+				$Debuglog->add( 'Requested plugin ['.$plugin_code.'] is not registered!', 'plugins' );
+				return $r;
+			}
+
+			if( ! $this->get_by_ID( $this->index_code_ID[$plugin_code] ) )
+			{
+				$Debuglog->add( 'Requested plugin ['.$plugin_code.'] could not be instantiated!', 'plugins' );
+				return $r;
+			}
+		}
+
+		return $this->index_code_Plugins[ $plugin_code ];
+	}
+
+
+	/**
+	 * Get a list of plugins for a given event.
+	 *
+	 * @param string Event name
+	 * @return array of Plugins
+	 */
+	function get_list_by_event( $event )
+	{
+		$r = array();
+
+		if( isset($this->index_event_IDs[$event]) )
+		{
+			foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
+			{
+				$r[] = & $this->get_by_ID( $l_plugin_ID );
+			}
+		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Get a list of Plugins for a list of events.
+	 *
+	 * @param array Array of events
+	 * @return array List of Plugins
+	 */
+	function get_list_by_events( $events )
+	{
+		$r = array();
+
+		foreach( $events as $l_event )
+		{
+			$r = array_merge( $r, $this->get_list_by_event( $l_event ) );
+		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Get a list of (enabled) events for a given Plugin ID.
+	 *
+	 * @param integer Plugin ID
+	 * @return array
+	 */
+	function get_enabled_events( $plugin_ID )
+	{
+		$r = array();
+		foreach( $this->index_event_IDs as $l_event => $l_plugin_IDs )
+		{
+			if( in_array( $plugin_ID, $l_plugin_IDs ) )
+			{
+				$r[] = $l_event;
+			}
+		}
+		return $r;
+	}
+
+
+	/**
+	 * (Re)load Plugin Events.
+	 */
+	function load_events()
+	{
+		global $Debuglog, $DB;
+
+		$this->index_event_IDs = array();
+
+		$Debuglog->add( 'Loading plugin events.', 'plugins' );
+		foreach( $DB->get_results( '
+				SELECT pevt_plug_ID, pevt_event
+					FROM T_plugin_events
+				 WHERE pevt_enabled > 0' ) as $l_row )
+		{
+			$this->index_event_IDs[$l_row->pevt_event][] = $l_row->pevt_plug_ID;
+		}
+	}
+
+
+	/**
+	 * Get a list of methods that are supported as events out of the Plugins
+	 * source file.
+	 *
+	 * @return array
+	 */
+	function get_registered_events( $Plugin )
+	{
+		global $Timer;
+
+		if( ! function_exists( 'token_get_all' ) )
+		{
+			debug_die( 'We need the PHP Tokenizer functions to get the list of Plugin events (Enabled by default since PHP 4.3.0 and available since PHP 4.2.0).' );
+		}
+
+		$Timer->resume( 'plugins_detect_events' );
+
+		$plugin_class_methods = array(); // Return value
+
+		$filename = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $Plugin->classname ).'.php';
+		$classfile_contents = file_get_contents( $filename );
+
+		$token_buffer = '';
+		$classname = '';
+		$in_class_name = false;
+		$in_plugin_class = false;
+		$in_function_name = false;
+		foreach( token_get_all($classfile_contents) as $l_token )
+		{
+			if( $l_token[0] == T_COMMENT || $l_token[0] == T_WHITESPACE )
+			{
+				continue;
+			}
+
+			if( $in_plugin_class )
+			{
+				if( $l_token[0] == T_FUNCTION )
+				{
+					$in_function_name = true;
+					$token_buffer = '';
+				}
+				elseif( $in_function_name )
+				{
+					if( $l_token[0] == T_STRING )
+					{
+						$token_buffer .= $l_token[1];
+					}
+					else
+					{
+						$plugin_class_methods[] = trim($token_buffer);
+						$in_function_name = false;
+					}
+				}
+			}
+			elseif( $in_class_name )
+			{
+				if( $l_token[0] == T_STRING )
+				{
+					$token_buffer .= $l_token[1];
+				}
+				else
+				{
+					$classname = trim($token_buffer);
+					$in_plugin_class = ( $classname == $Plugin->classname );
+					$in_class_name = false;
+				}
+			}
+			elseif( $l_token[0] == T_CLASS )
+			{
+				$in_class_name = true;
+				$token_buffer = '';
+			}
+		}
+
+		$verified_events = array_intersect( $plugin_class_methods, $this->supported_events );
+
+		$Timer->pause( 'plugins_detect_events' );
+
+		// TODO: Report, when difference in $events_verified and what getRegisteredEvents() returned
+		return $verified_events;
+	}
+
+
+	/**
+	 * Save the events that the plugin provides into DB, while removing obsolete
+	 * entries (that the plugin does not register anymore).
+	 *
+	 * @return boolean True, if events have changed (some added/deleted), false if not.
+	 */
+	function save_events( $Plugin )
+	{
+		global $DB, $Debuglog;
+
+		// Query events:
+		$plugin_events = $this->get_registered_events( $Plugin );
+		$saved_events = $DB->get_col( 'SELECT pevt_event FROM T_plugin_events WHERE pevt_plug_ID = '.$Plugin->ID );
+		$obsolete_events = array_diff( $saved_events, $plugin_events );
+
+		// Delete obsolete events from DB:
+		$DB->query( '
+			DELETE FROM T_plugin_events
+			WHERE pevt_plug_ID = '.$Plugin->ID.'
+			  AND pevt_event IN ( "'.implode( '", "', $obsolete_events ).'" )' );
+
+		// Delete obsolete events from index:
+		foreach( $obsolete_events as $l_event )
+		{
+			if( ! isset($this->index_event_IDs[ $l_event ]) )
+			{ // No events of that type known
+				continue;
+			}
+			$key = array_search( $Plugin->ID, $this->index_event_IDs[ $l_event ] );
+			if( $key !== false )
+			{
+				unset( $this->index_event_IDs[ $l_event ][ $key ] );
+			}
+		}
+
+		if( $plugin_events )
+		{
+			$new_events = array_diff( $plugin_events, $saved_events );
+
+			foreach( $new_events as $l_event )
+			{
+				$this->index_event_IDs[ $l_event ][] = $Plugin->ID;
+			}
+
+			if( $new_events )
+			{
+				$DB->query( '
+					INSERT INTO T_plugin_events( pevt_plug_ID, pevt_event )
+					VALUES ( '.$Plugin->ID.', "'.implode( '" ), ('.$Plugin->ID.', "', $new_events ).'" )' );
+			}
+		}
+		$Debuglog->add( 'Registered events ['.implode( ', ', $plugin_events ).'] for Plugin '.$Plugin->name, 'plugins' );
+
+		return ( !empty( $new_events ) || !empty( $obsolete_events ) );
+	}
+
+
+
 }
 
 
 /**
- * Callback function to sort plugins by priority
- */
-function sort_Plugin_priority( & $a, & $b )
-{
-	return $a->priority - $b->priority;
-}
-
-/**
- * Callback function to sort plugins by name
+ * A sub-class of {@link Plugins}, just to not load any DB info.
  *
- * WARNING: do NOT sort by anything else than priority unless you're handling a list of NOT-YET-INSTALLED plugins
+ * This is only useful for displaying a list of available plugins!
+ *
+ * {@internal This is probably quicker and cleaner than using a member boolean in {@link Plugins} itself.}}
  */
-function sort_Plugin_name( & $a, & $b )
+class Plugins_no_DB extends Plugins
 {
-	return strcasecmp( $a->name, $b->name );
+	/**
+	 * No-operation.
+	 */
+	function load_plugins_table()
+	{
+	}
+
+	/**
+	 * No-operation.
+	 */
+	function load_events()
+	{
+	}
 }
+
 
 /*
  * $Log$
+ * Revision 1.16  2005/12/22 23:13:40  blueyed
+ * Plugins' API changed and handling optimized
+ *
  * Revision 1.15  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

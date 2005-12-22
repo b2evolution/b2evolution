@@ -170,8 +170,6 @@ class Item extends DataObject
 	/**
 	 * Constructor
 	 *
-	 * {@internal Item::Item(-)}}
-	 *
 	 * @param object table Database row
 	 * @param string
 	 * @param string
@@ -510,8 +508,6 @@ class Item extends DataObject
 	/**
 	 * Template function: display anchor for permalinks to refer to
 	 *
-	 * {@internal Item::anchor(-) }}
-	 *
 	 * @todo archives modes in clean mode
 	 *
 	 * @param string 'id' or 'title'
@@ -547,8 +543,6 @@ class Item extends DataObject
 	/**
 	 * Template function: display asignee of item
 	 *
-	 * {@internal Item::assigned_to(-) }}
-	 *
 	 * @param string
 	 * @param string
 	 * @param string Output format, see {@link format_to_output()}
@@ -566,8 +560,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: display list of assigned user options
-	 *
-	 * {@internal Item::assigned_user_options(-)}}
 	 */
 	function assigned_user_options()
 	{
@@ -609,8 +601,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: list all the category names
-	 *
-	 * {@internal Item::categories(-) }}
 	 *
 	 * @param string link title, '#' for default, false if you want no links
 	 * @param string string fo display before the MAIN category, 'hide' to ignore main cat
@@ -689,8 +679,6 @@ class Item extends DataObject
 	/**
 	 * Template function: display main category name
 	 *
-	 * {@internal Item::main_category(-) }}
-	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
 	function main_category( $format = 'htmlbody' )
@@ -701,8 +689,6 @@ class Item extends DataObject
 
 	/**
 	 * Check if user can see comments on this post
-	 *
-	 * {@internal Item::can_see_comments(-) }}
 	 */
 	function can_see_comments()
 	{
@@ -717,8 +703,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: Check if user can leave comment on this post or display error
-	 *
-	 * {@internal Item::can_comment(-) }}
 	 *
 	 * @param string string to display before any error message
 	 * @param string string to display after any error message
@@ -778,8 +762,6 @@ class Item extends DataObject
 	 * the view counter, except on special occasions, see {@link Hit::is_new_view()}.
 	 *
 	 * WARNING: parameter order is different from deprecated the_content(...)
-	 *
-	 * {@internal Item::content(-) }}
 	 *
 	 * @todo Param order and cleanup
 	 * @param mixed page number to display specific page, # for url parameter
@@ -900,8 +882,7 @@ class Item extends DataObject
 		}
 
 		// Apply rendering
-		$post_renderers = $Plugins->validate_list( $this->renderers );
-		$output = $Plugins->render( $output, $post_renderers, $format );
+		$output = $Plugins->render( $output, $this->renderers, $format );
 
 		// Character conversions
 		$output = format_to_output( $output, $format );
@@ -926,8 +907,6 @@ class Item extends DataObject
 	/**
 	 * Template function: display deadline date (datetime) of Item
 	 *
-	 * {@internal Item::deadline_date(-) }}
-	 *
 	 * @param string date/time format: leave empty to use locale default date format
 	 * @param boolean true if you want GMT
 	 */
@@ -943,8 +922,6 @@ class Item extends DataObject
 	/**
 	 * Template function: display deadline time (datetime) of Item
 	 *
-	 * {@internal Item::deadline_time(-) }}
-	 *
 	 * @param string date/time format: leave empty to use locale default time format
 	 * @param boolean true if you want GMT
 	 */
@@ -959,8 +936,6 @@ class Item extends DataObject
 
 	/**
 	 * Get reference to array of Links
-	 *
-	 * {@internal Item::get_Links(-) }}
 	 */
 	function & get_Links()
 	{
@@ -973,8 +948,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: display issue date (datetime) of Item
-	 *
-	 * {@internal Item::issue_date(-) }}
 	 *
 	 * @param string date/time format: leave empty to use locale default date format
 	 * @param boolean true if you want GMT
@@ -991,8 +964,6 @@ class Item extends DataObject
 	/**
 	 * Template function: display issue time (datetime) of Item
 	 *
-	 * {@internal Item::issue_time(-) }}
-	 *
 	 * @param string date/time format: leave empty to use locale default time format
 	 * @param boolean true if you want GMT
 	 */
@@ -1007,8 +978,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: display locale for item
-	 *
-	 * {@internal Item::lang(-) }}
 	 */
 	function lang()
 	{
@@ -1018,8 +987,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: display number of links attached to this Item
-	 *
-	 * {@internal Item::linkcount(-) }}
 	 */
 	function linkcount()
 	{
@@ -1032,8 +999,6 @@ class Item extends DataObject
 
 	/**
 	 * Load links if they were not loaded yet.
-	 *
-	 * {@internal Item::load_links(-) }}
 	 */
 	function load_links()
 	{
@@ -1047,8 +1012,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: display locale for item
-	 *
-	 * {@internal Item::locale(-) }}
 	 */
 	function locale()
 	{
@@ -1058,8 +1021,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: display language name for item
-	 *
-	 * {@internal Item::language(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
@@ -1073,8 +1034,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: Provide link to message form for this Item's author.
-	 *
-	 * {@internal Item::msgform_link(-)}}
 	 *
 	 * @param string url of the message form
 	 * @param string to display before link
@@ -1112,8 +1071,6 @@ class Item extends DataObject
 	/**
 	 * Template function: Provide link to message form for this Item's assigned User.
 	 *
-	 * {@internal Item::msgform_link_assigned(-)}}
-	 *
 	 * @param string url of the message form
 	 * @param string to display before link
 	 * @param string to display after link
@@ -1150,8 +1107,6 @@ class Item extends DataObject
 	/**
 	 * Template function: display last mod date (datetime) of Item
 	 *
-	 * {@internal Item::mod_date(-) }}
-	 *
 	 * @param string date/time format: leave empty to use locale default date format
 	 * @param boolean true if you want GMT
 	 */
@@ -1166,8 +1121,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: display last mod time (datetime) of Item
-	 *
-	 * {@internal Item::mod_time(-) }}
 	 *
 	 * @param string date/time format: leave empty to use locale default time format
 	 * @param boolean true if you want GMT
@@ -1195,8 +1148,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: Displays link to feedback page (under some conditions)
-	 *
-	 * {@internal Item::feedback_link(-)}}
 	 *
 	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
 	 * @param string String to display before the link (if comments are to be displayed)
@@ -1311,8 +1262,6 @@ class Item extends DataObject
 
 	/**
 	 * Displays button for deleting the Item if user has proper rights
-	 *
-	 * {@internal Item::delete_link(-)}}
 	 *
 	 * @param string to display before link
 	 * @param string to display after link
@@ -1517,8 +1466,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: display list of priority options
-	 *
-	 * {@internal Item::priority_options(-)}}
 	 */
 	function priority_options( $field_value, $allow_none )
 	{
@@ -1553,9 +1500,13 @@ class Item extends DataObject
 
 		$atLeastOneRenderer = false;
 
-		while( $loop_RendererPlugin = $Plugins->get_next() )
+		foreach( $Plugins->get_list_by_events( array('RenderItem', 'RenderItemAsHtml', 'RenderItemAsXml') ) as $loop_RendererPlugin )
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
+			if( empty($loop_RendererPlugin->code) )
+			{ // No unique code!
+				continue;
+			}
 			if( $loop_RendererPlugin->apply_when == 'stealth'
 				|| $loop_RendererPlugin->apply_when == 'never' )
 			{ // This is not an option.
@@ -1640,8 +1591,6 @@ class Item extends DataObject
 	 * - private
 	 * - draft
 	 *
-	 * {@internal Item::status(-) }}
-	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
 	function status( $format = 'htmlbody' )
@@ -1662,8 +1611,6 @@ class Item extends DataObject
 	/**
 	 * Template function: display extra status of item
 	 *
-	 * {@internal Item::extra_status(-) }}
-	 *
 	 * @param string
 	 * @param string
 	 * @param string Output format, see {@link format_to_output()}
@@ -1683,8 +1630,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: display type of item
-	 *
-	 * {@internal Item::type(-) }}
 	 *
 	 * @param string
 	 * @param string
@@ -1715,8 +1660,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: display title for item and link to related URL
-	 *
-	 * {@internal Item::title(-) }}
 	 *
 	 * @param string String to display before the title if there is something to display
 	 * @param string String to display after the title if there is something to display
@@ -1754,8 +1697,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: Displays trackback autodiscovery information
-	 *
-	 * {@internal Item::trackback_rdf(-) }}
 	 */
 	function trackback_rdf()
 	{
@@ -1785,8 +1726,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: displays url to use to trackback this item
-	 *
-	 * {@internal Item::trackback_url(-) }}
 	 */
 	function trackback_url()
 	{
@@ -1806,8 +1745,6 @@ class Item extends DataObject
 	/**
 	 * Template function: Display link to item related url
 	 *
-	 * {@internal Item::url_link(-) }}
-	 *
 	 * @param string string to display before the url (if exists)
 	 * @param string string to display after the url (if exists)
 	 * @param string Output format, see {@link format_to_output()}
@@ -1825,8 +1762,6 @@ class Item extends DataObject
 
 	/**
 	 * Template function: Display the number of words in the post
-	 *
-	 * {@internal Item::wordcount(-) }}
 	 */
 	function wordcount()
 	{
@@ -1959,8 +1894,6 @@ class Item extends DataObject
 	 *
 	 * This funtion has to handle all needed DB dependencies!
 	 *
-	 * {@internal Item::insert(-)}}
-	 *
 	 * @todo cleanup the set() calls
 	 */
 	function insert(
@@ -2060,8 +1993,6 @@ class Item extends DataObject
 	 * Update a post and save to DB
 	 *
 	 * This funtion has to handle all needed DB dependencies!
-	 *
-	 * {@internal Item::update(-)}}
 	 */
 	function update(
 		$post_title,
@@ -2331,8 +2262,8 @@ class Item extends DataObject
 
 /*
  * $Log$
- * Revision 1.78  2005/12/16 13:35:59  fplanque
- * no message
+ * Revision 1.79  2005/12/22 23:13:40  blueyed
+ * Plugins' API changed and handling optimized
  *
  * Revision 1.77  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
