@@ -69,7 +69,8 @@ switch( $action )
 		$changed = false;
 		while( $loop_Plugin = & $Plugins->get_next() )
 		{
-			if( $Plugins->save_events( $loop_Plugin ) )
+			// Discover new events:
+			if( $Plugins->save_events( $loop_Plugin, array() ) )
 			{
 				$changed = true;
 			}
@@ -180,7 +181,7 @@ switch( $action )
 			$action = 'edit_settings';
 		}
 
-
+		// Settings:
 		if( $edit_Plugin->Settings )
 		{
 			foreach( $edit_Plugin->GetDefaultSettings() as $l_name => $l_value )
@@ -196,6 +197,32 @@ switch( $action )
 			{
 				$Messages->add( T_('Plugin settings have not changed.'), 'note' );
 			}
+		}
+
+		// Events:
+		param( 'edited_plugin_displayed_events', 'array', array() );
+		param( 'edited_plugin_events', 'array', array() );
+		$registered_events = $Plugins->get_registered_events( $edit_Plugin );
+
+		$enable_events = $disable_events = array();
+		foreach( $edited_plugin_displayed_events as $l_event )
+		{
+			if( ! in_array( $l_event, $registered_events ) )
+			{ // unsupported event
+				continue;
+			}
+			if( isset($edited_plugin_events[$l_event]) && $edited_plugin_events[$l_event] )
+			{
+				$enable_events[] = $l_event; // may be already there
+			}
+			else
+			{ // unset:
+				$disable_events[] = $l_event;
+			}
+		}
+		if( $Plugins->save_events( $edit_Plugin, $enable_events, $disable_events ) )
+		{
+			$Messages->add( T_('Plugin events have been updated.'), 'success' );
 		}
 
 		break;
@@ -283,6 +310,12 @@ switch( $action )
 			{
 				$Messages->add( T_('Settings have not changed.'), 'note' );
 			}
+		}
+
+		// Enable all events:
+		if( $Plugins->save_events( $edit_Plugin ) )
+		{
+			$Messages->add( T_('Plugin events have been updated.'), 'success' );
 		}
 
 		// blueyed>> IMHO it's good to see the new settings again. Perhaps we could use $action = 'list' for "Settings have not changed"?
@@ -395,11 +428,35 @@ switch( $action )
 		$Form->end_fieldset();
 
 
-		// TODO: (de-)activate Events (Sub-Tab)
+		// (De-)Activate Events (Advanced)
+		$Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced')
+			.') <img src="'.get_icon('expand', 'url').'" id="clickimg_pluginevents" />', array('legend_params' => array( 'onclick' => 'toggle_clickopen(\'pluginevents\')') ) );
+		?>
+		<div id="clickdiv_pluginevents">
+		<?php
+		$enabled_events = $Plugins->get_enabled_events( $edit_Plugin->ID );
+		foreach( $Plugins->get_registered_events( $edit_Plugin ) as $l_event )
+		{
+			// TODO: add description - may be included in Plugins::supported_events
+			$Form->hidden( 'edited_plugin_displayed_events[]', $l_event ); // to consider only displayed ones
+			$Form->checkbox_input( 'edited_plugin_events['.$l_event.']', in_array( $l_event, $enabled_events ), $l_event );
+		}
+		?>
+		</div>
+		<?php
+		$Form->end_fieldset();
+		?>
 
+		<script type="text/javascript">
+			<!--
+			toggle_clickopen('pluginevents');
+			// -->
+		</script>
 
+		<?php
 		$Form->buttons_input( array(
 			array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => T_('Save !'), 'class' => 'SaveButton' ),
+			array( 'type' => 'reset', 'value' => T_('Reset'), 'class' => 'ResetButton' ),
 			array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'SaveButton' ),
 			) );
 		$Form->end_fieldset();

@@ -237,7 +237,6 @@ class Plugin
 	 *   'note' (gets displayed as a note to the field),
 	 *   'size', 'maxlength' (html input field attributes),
 	 *   'type' ('checkbox'),
-	 *   'advanced' (boolean, option does only get shown if the user clicks "show advanced options")
 	 * e.g.:
 	 * <code>
 	 * return array(
@@ -422,12 +421,14 @@ class Plugin
 
 
 	/**
-	 * Event handler: called when a new user has registered.
+	 * Event handler: Called when a new user has registered, at the end of the
+	 *                DB transaction that creates this user.
 	 *
 	 * @param array Associative array of parameters
 	 *              'User': the user object (as reference), see {@link User}.
+	 * @return boolean True, if the user should be created, false if not.
 	 */
-	function Registration( & $params )
+	function AppendUserRegisterTransact( & $params )
 	{
 	}
 
@@ -679,6 +680,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.14  2005/12/23 19:06:35  blueyed
+ * Advanced enabling/disabling of plugin events.
+ *
  * Revision 1.13  2005/12/22 23:13:40  blueyed
  * Plugins' API changed and handling optimized
  *

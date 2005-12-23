@@ -137,10 +137,11 @@ class Plugins
 	 * @var array
 	 */
 	var $supported_events = array(
-			'AdminEndHtmlHead',
 			'AdminAfterPageFooter',
 			'AdminDisplayEditorButton',
 			'AdminDisplayToolbar',
+			'AdminEndHtmlHead',
+			'AdminInitMenu',
 			'AdminToolAction',
 			'AdminToolPayload',
 
@@ -150,13 +151,12 @@ class Plugins
 			'RenderItem',
 
 
-			'AdminInitMenu',
+			'AppendUserRegisterTransact', // gets called during the transaction that creates a new user.
+			'GetDefaultSettings', // used to instantiate $Settings.
 			'Install',
 			'LoginAttempt',
 			'SessionLoaded', // gets called after $Session is initialized, quite early.
 			'Uninstall',
-			'Registration',
-			'GetDefaultSettings', // used to instantiate $Settings
 		);
 
 	/**#@-*/
@@ -1324,23 +1324,52 @@ class Plugins
 	 * Save the events that the plugin provides into DB, while removing obsolete
 	 * entries (that the plugin does not register anymore).
 	 *
-	 * @return boolean True, if events have changed (some added/deleted), false if not.
+	 * @param Plugin Plugin to save events for
+	 * @param array|NULL List of events to save as enabled for the Plugin.
+	 *              By default all provided events get saved as enabled. Pass array() to discover only new ones.
+	 * @param array List of events to save as disabled for the Plugin.
+	 *              By default, no events get disabled. Disabling an event takes priority over enabling.
+	 * @return boolean True, if events have changed, false if not.
 	 */
-	function save_events( $Plugin )
+	function save_events( $Plugin, $enable_events = NULL, $disable_events = NULL )
 	{
 		global $DB, $Debuglog;
 
-		// Query events:
-		$plugin_events = $this->get_registered_events( $Plugin );
-		$saved_events = $DB->get_col( 'SELECT pevt_event FROM T_plugin_events WHERE pevt_plug_ID = '.$Plugin->ID );
-		$obsolete_events = array_diff( $saved_events, $plugin_events );
+		$r = false;
+
+		$saved_events = array();
+		foreach( $DB->get_results( 'SELECT pevt_event, pevt_enabled FROM T_plugin_events WHERE pevt_plug_ID = '.$Plugin->ID ) as $l_row )
+		{
+			$saved_events[$l_row->pevt_event] = $l_row->pevt_enabled;
+		}
+		$available_events = $this->get_registered_events( $Plugin );
+		$obsolete_events = array_diff( array_keys($saved_events), $available_events );
+
+		if( is_null( $enable_events ) )
+		{ // Enable all events:
+			$enable_events = $available_events;
+		}
+		if( is_null( $disable_events ) )
+		{
+			$disable_events = array();
+		}
+		if( $disable_events )
+		{ // Remove events to be disabled from enabled ones:
+			$enable_events = array_diff( $enable_events, $disable_events );
+		}
+
+		// New discovered events:
+		$discovered_events = array_diff( $available_events, array_keys($saved_events), $enable_events, $disable_events );
+
 
 		// Delete obsolete events from DB:
-		$DB->query( '
-			DELETE FROM T_plugin_events
-			WHERE pevt_plug_ID = '.$Plugin->ID.'
-			  AND pevt_event IN ( "'.implode( '", "', $obsolete_events ).'" )' );
-
+		if( $DB->query( '
+				DELETE FROM T_plugin_events
+				WHERE pevt_plug_ID = '.$Plugin->ID.'
+					AND pevt_event IN ( "'.implode( '", "', $obsolete_events ).'" )' ) )
+		{
+			$r = true;
+		}
 		// Delete obsolete events from index:
 		foreach( $obsolete_events as $l_event )
 		{
@@ -1348,32 +1377,79 @@ class Plugins
 			{ // No events of that type known
 				continue;
 			}
-			$key = array_search( $Plugin->ID, $this->index_event_IDs[ $l_event ] );
-			if( $key !== false )
+			while( ($key = array_search( $Plugin->ID, $this->index_event_IDs[ $l_event ])) !== false )
 			{
 				unset( $this->index_event_IDs[ $l_event ][ $key ] );
 			}
 		}
 
-		if( $plugin_events )
+		if( $discovered_events )
 		{
-			$new_events = array_diff( $plugin_events, $saved_events );
+			$DB->query( '
+				INSERT INTO T_plugin_events( pevt_plug_ID, pevt_event, pevt_enabled )
+				VALUES ( '.$Plugin->ID.', "'.implode( '", 1 ), ('.$Plugin->ID.', "', $discovered_events ).'", 1 )' );
+			$r = true;
 
+			foreach( $discovered_events as $l_event )
+			{
+				$this->index_event_IDs[ $l_event ][] = $Plugin->ID;
+			}
+			$Debuglog->add( 'Discovered events ['.implode( ', ', $discovered_events ).'] for Plugin '.$Plugin->name, 'plugins' );
+		}
+
+		if( $enable_events )
+		{
+			$new_events = array();
+			foreach( $enable_events as $l_event )
+			{
+				if( ! isset( $saved_events[$l_event] ) || ! $saved_events[$l_event] )
+				{ // Event not saved yet or not enabled
+					$new_events[] = $l_event;
+				}
+			}
 			foreach( $new_events as $l_event )
 			{
 				$this->index_event_IDs[ $l_event ][] = $Plugin->ID;
 			}
-
 			if( $new_events )
 			{
 				$DB->query( '
-					INSERT INTO T_plugin_events( pevt_plug_ID, pevt_event )
-					VALUES ( '.$Plugin->ID.', "'.implode( '" ), ('.$Plugin->ID.', "', $new_events ).'" )' );
+					REPLACE INTO T_plugin_events( pevt_plug_ID, pevt_event, pevt_enabled )
+					VALUES ( '.$Plugin->ID.', "'.implode( '", 1 ), ('.$Plugin->ID.', "', $new_events ).'", 1 )' );
+				$r = true;
 			}
+			$Debuglog->add( 'Enabled events ['.implode( ', ', $new_events ).'] for Plugin '.$Plugin->name, 'plugins' );
 		}
-		$Debuglog->add( 'Registered events ['.implode( ', ', $plugin_events ).'] for Plugin '.$Plugin->name, 'plugins' );
 
-		return ( !empty( $new_events ) || !empty( $obsolete_events ) );
+		if( $disable_events )
+		{
+			$new_events = array();
+			foreach( $disable_events as $l_event )
+			{
+				if( ! isset( $saved_events[$l_event] ) || $saved_events[$l_event] )
+				{ // Event not saved yet or enabled
+					$new_events[] = $l_event;
+				}
+			}
+			foreach( $new_events as $l_event )
+			{
+				// Remove from index:
+				while( ($key = array_search( $Plugin->ID, $this->index_event_IDs[ $l_event ])) !== false )
+				{
+					unset( $this->index_event_IDs[ $l_event ][ $key ] );
+				}
+			}
+			if( $new_events )
+			{
+				$DB->query( '
+					REPLACE INTO T_plugin_events( pevt_plug_ID, pevt_event, pevt_enabled )
+					VALUES ( '.$Plugin->ID.', "'.implode( '", 0 ), ('.$Plugin->ID.', "', $new_events ).'", 0 )' );
+				$r = true;
+			}
+			$Debuglog->add( 'Disabled events ['.implode( ', ', $new_events ).'] for Plugin '.$Plugin->name, 'plugins' );
+		}
+
+		return $r;
 	}
 
 
@@ -1408,6 +1484,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.17  2005/12/23 19:06:35  blueyed
+ * Advanced enabling/disabling of plugin events.
+ *
  * Revision 1.16  2005/12/22 23:13:40  blueyed
  * Plugins' API changed and handling optimized
  *
