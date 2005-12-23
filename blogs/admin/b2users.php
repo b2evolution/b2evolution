@@ -340,7 +340,6 @@ if( !$Messages->count('error') )
 				if( $reload_page )
 				{ // save Messages and reload the current page through header redirection
 					$Session->set( 'Messages', $Messages );
-					// fp>> removed: $Session->dbsave();  It is the Session's object responsibility to save at the right time (ideally on shutdown)
 					header_redirect( $ReqURI ); // TODO: this _should_ be full URL, but we have no HTTP_HOST wrapper yet??
 				}
 
@@ -595,6 +594,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.123  2005/12/23 19:05:39  blueyed
+ * minor
+ *
  * Revision 1.122  2005/12/21 20:38:18  fplanque
  * Session refactoring/doc
  *
