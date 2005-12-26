@@ -162,13 +162,12 @@ else
 			$ItemList->load_from_Request();
 
 
-
-
 			if( $ItemList->single_post )
 			{	// We have requested a specific post
 				// hack this over to the exp tab
 				$tab = 'exp';
 			}
+
 
 			switch( $tab )
 			{
