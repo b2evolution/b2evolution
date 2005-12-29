@@ -84,7 +84,7 @@ function db_delete()
 	$DB->query( 'DROP TABLE IF EXISTS T_usersettings' );
 
 	echo "Dropping Plugin Events...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_plugin_events' );
+	$DB->query( 'DROP TABLE IF EXISTS T_pluginevents' );
 
 	echo "Dropping Plugin Settings...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_pluginsettings' );

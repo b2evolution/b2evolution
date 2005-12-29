@@ -1152,7 +1152,7 @@ function create_b2evo_tables_phoenix_beta()
 
 
 	echo 'Creating plugin events table... ';
-	$DB->query( 'CREATE TABLE T_plugin_events(
+	$DB->query( 'CREATE TABLE T_pluginevents(
 	                pevt_plug_ID INT(11) UNSIGNED NOT NULL,
 	                pevt_event VARCHAR(40) NOT NULL,
 	                pevt_enabled TINYINT NOT NULL DEFAULT 1,
@@ -1294,7 +1294,7 @@ function create_b2evo_relations()
 	                    on delete restrict
 	                    on update restrict' );
 
-	$DB->query( 'alter table T_plugin_events
+	$DB->query( 'alter table T_pluginevents
 	              add constraint FK_pevt_plug_ID
 	                    foreign key (pevt_plug_ID)
 	                    references T_plugins (plug_ID)
@@ -1350,6 +1350,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.165  2005/12/29 20:20:01  blueyed
+ * Renamed T_plugin_settings to T_pluginsettings
+ *
  * Revision 1.164  2005/12/22 23:13:40  blueyed
  * Plugins' API changed and handling optimized
  *

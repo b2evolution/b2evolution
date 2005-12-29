@@ -674,7 +674,7 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9000' );
 
 		if( $new_db_version < 9100 )
-		{ // We cannot install Plugins before having T_plugin_events created (comes with 9100)
+		{ // We cannot install Plugins before having T_pluginevents created (comes with 9100)
 			// TODO: blueyed>> this is so hackish.. :/
 			// INSTALL PLUGINS:
 			install_basic_plugins();
@@ -782,6 +782,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.115  2005/12/29 20:20:02  blueyed
+ * Renamed T_plugin_settings to T_pluginsettings
+ *
  * Revision 1.114  2005/12/22 23:13:40  blueyed
  * Plugins' API changed and handling optimized
  *

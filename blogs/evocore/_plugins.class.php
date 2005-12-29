@@ -354,7 +354,7 @@ class Plugins
 		              WHERE pset_plug_ID = $plugin_ID" );
 
 		// Delete Plugin events (constraints)
-		$DB->query( "DELETE FROM T_plugin_events
+		$DB->query( "DELETE FROM T_pluginevents
 		              WHERE pevt_plug_ID = $plugin_ID" );
 
 		// Delete from DB
@@ -1229,7 +1229,7 @@ class Plugins
 		$Debuglog->add( 'Loading plugin events.', 'plugins' );
 		foreach( $DB->get_results( '
 				SELECT pevt_plug_ID, pevt_event
-					FROM T_plugin_events
+					FROM T_pluginevents
 				 WHERE pevt_enabled > 0' ) as $l_row )
 		{
 			$this->index_event_IDs[$l_row->pevt_event][] = $l_row->pevt_plug_ID;
@@ -1338,7 +1338,7 @@ class Plugins
 		$r = false;
 
 		$saved_events = array();
-		foreach( $DB->get_results( 'SELECT pevt_event, pevt_enabled FROM T_plugin_events WHERE pevt_plug_ID = '.$Plugin->ID ) as $l_row )
+		foreach( $DB->get_results( 'SELECT pevt_event, pevt_enabled FROM T_pluginevents WHERE pevt_plug_ID = '.$Plugin->ID ) as $l_row )
 		{
 			$saved_events[$l_row->pevt_event] = $l_row->pevt_enabled;
 		}
@@ -1364,7 +1364,7 @@ class Plugins
 
 		// Delete obsolete events from DB:
 		if( $DB->query( '
-				DELETE FROM T_plugin_events
+				DELETE FROM T_pluginevents
 				WHERE pevt_plug_ID = '.$Plugin->ID.'
 					AND pevt_event IN ( "'.implode( '", "', $obsolete_events ).'" )' ) )
 		{
@@ -1386,7 +1386,7 @@ class Plugins
 		if( $discovered_events )
 		{
 			$DB->query( '
-				INSERT INTO T_plugin_events( pevt_plug_ID, pevt_event, pevt_enabled )
+				INSERT INTO T_pluginevents( pevt_plug_ID, pevt_event, pevt_enabled )
 				VALUES ( '.$Plugin->ID.', "'.implode( '", 1 ), ('.$Plugin->ID.', "', $discovered_events ).'", 1 )' );
 			$r = true;
 
@@ -1414,7 +1414,7 @@ class Plugins
 			if( $new_events )
 			{
 				$DB->query( '
-					REPLACE INTO T_plugin_events( pevt_plug_ID, pevt_event, pevt_enabled )
+					REPLACE INTO T_pluginevents( pevt_plug_ID, pevt_event, pevt_enabled )
 					VALUES ( '.$Plugin->ID.', "'.implode( '", 1 ), ('.$Plugin->ID.', "', $new_events ).'", 1 )' );
 				$r = true;
 			}
@@ -1442,7 +1442,7 @@ class Plugins
 			if( $new_events )
 			{
 				$DB->query( '
-					REPLACE INTO T_plugin_events( pevt_plug_ID, pevt_event, pevt_enabled )
+					REPLACE INTO T_pluginevents( pevt_plug_ID, pevt_event, pevt_enabled )
 					VALUES ( '.$Plugin->ID.', "'.implode( '", 0 ), ('.$Plugin->ID.', "', $new_events ).'", 0 )' );
 				$r = true;
 			}
@@ -1484,6 +1484,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.18  2005/12/29 20:19:58  blueyed
+ * Renamed T_plugin_settings to T_pluginsettings
+ *
  * Revision 1.17  2005/12/23 19:06:35  blueyed
  * Advanced enabling/disabling of plugin events.
  *
