@@ -59,7 +59,9 @@ span.checkbox_error input.checkbox {
 input.field_required,
 select.field_required,
 textarea.field_required {
-	border: 1px solid #d99;
+	background-image:  url("../icons/mandatory_star_desert.gif");
+	background-position: right center;
+	background-repeat: no-repeat;
 }
 span.checkbox_required {
 	border: 1px solid #d99;
