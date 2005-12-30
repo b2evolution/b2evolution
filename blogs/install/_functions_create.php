@@ -1129,7 +1129,7 @@ function create_b2evo_tables_phoenix_beta()
 							  ftyp_mimetype varchar(50) NOT NULL,
 							  ftyp_icon varchar(20) default NULL,
 							  ftyp_viewtype varchar(10) NOT NULL,
-							  ftyp_allowed tinyint(1) default 0,
+							  ftyp_allowed tinyint(1) NOT NULL default 0,
 							  PRIMARY KEY (ftyp_ID)
 								)' );
 	echo "OK.<br />\n";
@@ -1362,6 +1362,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.167  2005/12/30 18:54:59  fplanque
+ * minor
+ *
  * Revision 1.166  2005/12/30 18:08:24  fplanque
  * no message
  *
