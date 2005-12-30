@@ -168,6 +168,11 @@ class AbstractSettings
 			return true;
 		}
 
+		if( is_array($getArgs) && count($getArgs) != $this->count_colKeyNames )
+		{
+			debug_die( 'Count of arguments for AbstractSettings::get() does not match $colKeyNames (class '.get_class($this).')! '.count($args).' given, '.$this->count_colKeyNames.' expected.' );
+		}
+
 		/**
 		 * The where clause - gets filled when {@link $cacheByColKeys} is used.
 		 */
@@ -267,11 +272,6 @@ class AbstractSettings
 		global $Debuglog;
 
 		$args = func_get_args();
-
-		if( count($args) != $this->count_colKeyNames )
-		{
-			debug_die( 'Count of arguments for AbstractSettings::get() does not match $colKeyNames (class '.get_class($this).')! '.count($args).' given, '.$this->count_colKeyNames.' expected.' );
-		}
 
 		$this->_load( $args );
 
@@ -381,17 +381,11 @@ class AbstractSettings
 		global $Debuglog;
 
 		$args = func_get_args();
-		$count_args = count($args);
+		$value = array_pop($args);
 
-		if( $count_args != ( $this->count_colKeyNames + 1 ) )
-		{
-			debug_die( 'Count of arguments for AbstractSettings::set() does not match $colKeyNames (class '.get_class($this).')! '.count($args).' given, '.($this->count_colKeyNames+1).' expected.' );
-		}
-
-		$this->_load( $args ); // the last Arg is not meant to go to load() but it does no harm AFAICS
+		$this->_load( $args );
 
 		$debugMsg = get_class($this).'::set( '.implode(', ', $args ).' ): ';
-
 
 		switch( $this->count_colKeyNames )
 		{
@@ -415,14 +409,14 @@ class AbstractSettings
 
 		if( isset($atCache->value) )
 		{
-			if( $atCache->value == $args[ $count_args-1 ] )
+			if( $atCache->value == $value )
 			{ // already set
 				$Debuglog->add( $debugMsg.' Already set to the same value.', 'settings' );
 				return false;
 			}
 		}
 
-		$atCache->value = $args[ $count_args-1 ];
+		$atCache->value = $value;
 		$atCache->dbUptodate = false;
 
 		$Debuglog->add( $debugMsg.' SET!', 'settings' );
@@ -623,6 +617,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.27  2005/12/30 04:34:04  blueyed
+ * Small performance enhancements.
+ *
  * Revision 1.26  2005/12/19 17:39:56  fplanque
  * Remember prefered browing tab for each user.
  *
@@ -634,9 +631,6 @@ class AbstractSettings
  *
  * Revision 1.23  2005/12/07 18:04:17  blueyed
  * Normalization
- *
- * Revision 1.22  2005/11/18 18:26:38  fplanque
- * no message
  *
  * Revision 1.19  2005/11/01 23:03:22  blueyed
  * Fix notice on rare occasion (a setting was remembered as not existing [set to NULL in cache], not changed/set and dbupdate()) called
@@ -676,9 +670,6 @@ class AbstractSettings
  *
  * Revision 1.7  2004/12/30 14:29:42  fplanque
  * comments
- *
- * Revision 1.6  2004/12/29 02:25:55  blueyed
- * no message
  *
  * Revision 1.5  2004/11/08 02:48:26  blueyed
  * doc updated
