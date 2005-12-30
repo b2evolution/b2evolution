@@ -882,10 +882,11 @@ class Item extends DataObject
 		}
 
 		// Apply rendering
-		// fp> Why has this been removed???
-		//$post_renderers = $Plugins->validate_list( $this->renderers );
-		//$output = $Plugins->render( $output, $post_renderers, $format );
-		$output = $Plugins->render( $output, $this->renderers, $format );
+		// blueyed>> I've removed $Plugins->validate_list() here, because it will instantiate all Plugins!
+		//           But that would lose "stealth"/"always" apply_when and "default" renderer magic.. :/
+		// TODO: find a way to not instantiate all Plugins
+		$post_renderers = $Plugins->validate_list( $this->renderers );
+		$output = $Plugins->render( $output, $post_renderers, $format );
 
 		// Character conversions
 		$output = format_to_output( $output, $format );
@@ -2265,6 +2266,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.81  2005/12/30 21:39:03  blueyed
+ * fix/todo
+ *
  * Revision 1.80  2005/12/30 18:08:24  fplanque
  * no message
  *
