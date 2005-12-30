@@ -73,9 +73,11 @@ class Hit
 
 	/**
 	 * Is this a reload?
+	 * This gets lazy-filled by {@link is_reload()}.
 	 * @var boolean
+	 * @access protected
 	 */
-	var $reloaded = false;
+	var $_is_reload;
 
 	/**
 	 * Ignore this hit?
@@ -169,9 +171,7 @@ class Hit
 			}
 		}
 
-
 		$this->detect_useragent();
-		$this->detect_reload();
 
 
 		$Debuglog->add( 'IP: '.$this->IP, 'hit' );
@@ -184,30 +184,37 @@ class Hit
 	/**
 	 * Detect a reload.
 	 *
-	 * What exactly do we need this for?
+	 * If the URI has been requested from same IP/useragent in past reloadpage_timeout seconds.
+	 *
+	 * This gets used by {@link is_new_view()} to say if it's a new hit.
 	 *
 	 * @todo: if this is only useful to display who's online or view counts, provide option to disable all those resource consuming gadgets. (Those gadgets should be plugins actually, and they should enable this query only if needed)
 	 */
-	function detect_reload()
+	function is_reload()
 	{
-		global $DB, $Debuglog, $Settings, $ReqURI, $localtimenow;
-
-		/*
-		 * Check for reloads (if the URI has been requested from same IP/useragent
-		 * in past reloadpage_timeout seconds.)
-		 */
-		if( $DB->get_var( '
-			SELECT hit_ID FROM T_hitlog INNER JOIN T_sessions ON hit_sess_ID = sess_ID
-			       INNER JOIN T_useragents ON sess_agnt_ID = agnt_ID
-			 WHERE hit_uri = "'.$DB->escape( $ReqURI ).'"
-			   AND hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
-			   AND hit_remote_addr = '.$DB->quote( $this->IP ).'
-			   AND agnt_signature = '.$DB->quote($this->user_agent),
-					0, 0, 'Hit: Check for reload' ) )
+		if( ! isset( $this->_is_reload ) )
 		{
-			$Debuglog->add( 'Reload!', 'hit' );
-			$this->reloaded = true;  // We don't want to log this hit again
+			global $DB, $Debuglog, $Settings, $ReqURI, $localtimenow;
+
+			if( $DB->get_var( '
+				SELECT hit_ID FROM T_hitlog INNER JOIN T_sessions ON hit_sess_ID = sess_ID
+							 INNER JOIN T_useragents ON sess_agnt_ID = agnt_ID
+				 WHERE hit_uri = "'.$DB->escape( $ReqURI ).'"
+					 AND hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
+					 AND hit_remote_addr = '.$DB->quote( $this->IP ).'
+					 AND agnt_signature = '.$DB->quote($this->user_agent),
+						0, 0, 'Hit: Check for reload' ) )
+			{
+				$Debuglog->add( 'Reload!', 'hit' );
+				$this->_is_reload = true;  // We don't want to log this hit again
+			}
+			else
+			{
+				$this->_is_reload = false;
+			}
 		}
+
+		return $this->_is_reload;
 	}
 
 
@@ -401,7 +408,7 @@ class Hit
 	 * This function should be called at the end of the page, otherwise if the page
 	 * is displaying previous hits, it may display the current one too.
 	 *
-	 * The hit will not be logged in special occasions, see {@link is_new_view()} and {@link is_good_hit()}.
+	 * The hit will not be logged in special occasions, see {@link $ignore} and {@link is_good_hit()}.
 	 *
 	 * @return boolean true if the hit gets logged; false if not
 	 */
@@ -415,11 +422,12 @@ class Hit
 			return false;
 		}
 
-		if( !$this->is_new_view() || !$this->is_good_hit() )
+		if( $this->ignore || ! $this->is_good_hit() )
 		{ // We don't want to log this hit!
 			$hit_info = 'referer_type: '.var_export($this->referer_type, true)
 				.', agent_type: '.var_export($this->agent_type, true)
-				.', is'.( $this->is_new_view() ? '' : ' NOT' ).' a new view'
+				#.', is'.( $this->is_new_view() ? '' : ' NOT' ).' a new view'
+				.', is'.( $this->ignore ? '' : ' NOT' ).' ignored'
 				.', is'.( $this->is_good_hit() ? '' : ' NOT' ).' a good hit';
 			$Debuglog->add( 'log(): Hit NOT logged, ('.$hit_info.')', 'hit' );
 			return false;
@@ -632,8 +640,8 @@ class Hit
 	 */
 	function is_new_view()
 	{
-		#pre_dump( 'is_new_view:', !$this->reloaded,  !$this->ignore,   $this->agent_type != 'robot' );
-		return ( !$this->reloaded && !$this->ignore && $this->agent_type != 'robot' );
+		#pre_dump( 'is_new_view:', !$this->is_reload(),  !$this->ignore,   $this->agent_type != 'robot' );
+		return ( ! $this->is_reload() && ! $this->ignore && $this->agent_type != 'robot' );
 	}
 
 
@@ -644,7 +652,25 @@ class Hit
 	 */
 	function is_good_hit()
 	{
-		return !in_array( $this->referer_type, array( 'spam' ) );
+		return ( $this->referer_type != 'spam' );
 	}
+
+
+	/**
+	 * Is this a browser reload (F5)?
+	 *
+	 * @return boolean true on reload, false if not.
+	 */
+	function is_browser_reload()
+	{
+		if( ( isset( $_SERVER['HTTP_CACHE_CONTROL'] ) && strpos( $_SERVER['HTTP_CACHE_CONTROL'], 'max-age=0' ) !== false )
+			|| ( isset( $_SERVER['HTTP_PRAGMA'] ) && $_SERVER['HTTP_PRAGMA'] == 'no-cache' ) )
+		{ // Reload
+			return true;
+		}
+
+		return false;
+	}
+
 }
 ?>
