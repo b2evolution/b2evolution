@@ -135,6 +135,7 @@ switch( $action )
 			$msg = sprintf( T_('File type &laquo;%s&raquo; deleted.'), $edited_Filetype->dget('name') );
 			$edited_Filetype->dbdelete( true );
 			unset($edited_Filetype);
+			forget_param( 'ftyp_ID' );
 			$Messages->add( $msg, 'success' );
 			$action = 'list';
 		}

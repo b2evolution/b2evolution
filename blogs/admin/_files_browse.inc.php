@@ -133,7 +133,11 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 
 <!-- THE MAIN FORM -->
 
-<form action="files.php#FM_anchor" name="FilesForm" id="FilesForm" method="post">
+<?php 
+	$Form = & new Form( 'files.php#FM_anchor', 'FilesForm', 'post', 'none' );
+	$Form->begin_form();
+?>
+
 <input type="hidden" name="confirmed" value="0" />
 <input type="hidden" name="md5_filelist" value="<?php echo $Fileman->md5_checksum() ?>" />
 <input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->get_ads_list_path()) ?>" />
@@ -554,13 +558,10 @@ else
 	?>
 	<tr class="listfooter">
 		<td colspan="<?php echo $filetable_cols ?>">
-		<a id="checkallspan_0" href="<?php
-			echo url_add_param( $Fileman->getCurUrl(), 'checkall='.( $checkall ? '0' : '1' ) );
-			?>" onclick="toggleCheckboxes('FilesForm', 'fm_selected[]'); return false;"><?php
-			echo ($checkall) ? T_('uncheck all') : T_('check all');
-			?></a>
-		&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
-
+		
+		<?php	$Form->check_all();	?>	
+			&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
+				
 		<?php
 		if( $mode == 'upload' )
 		{	// We are uploading in a popup opened by an edit screen
@@ -636,7 +637,7 @@ else
 
 </table>
 
-</form>
+<?php $Form->end_form() ?>
 
 
 <?php
@@ -853,6 +854,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.69  2005/12/30 20:13:39  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.68  2005/12/19 22:48:45  blueyed
  * doc
  *

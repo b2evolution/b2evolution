@@ -141,6 +141,7 @@ function cat_delete( $cat_ID )
 	$remap_cat_ID = $row->cat_parent_ID;
 	$cat_blog_ID = $row->cat_blog_ID;
 
+	// Get the list of posts in this category
 	$sql = "SELECT post_ID
 					  FROM T_posts
 					 WHERE post_main_cat_ID = $cat_ID";
@@ -946,6 +947,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.29  2005/12/30 20:13:39  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.28  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *

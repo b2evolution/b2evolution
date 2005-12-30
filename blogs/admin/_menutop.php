@@ -42,6 +42,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/rollovers.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/extracats.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/dynamic_select.js"></script>
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/bozo_validator.js"></script>
 	
 	<?php
 

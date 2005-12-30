@@ -10,7 +10,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$Form = & new Form( 'settings.php', 'form' );
+$Form = & new Form( 'settings.php', 'settings_checkchanges' );
 
 $Form->begin_form( 'fform', T_('General Settings') );
 
@@ -25,7 +25,7 @@ $Form->begin_fieldset( T_('Default user rights') );
 
 	$Form->select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
 
-	$Form->text( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), 1 );
+	$Form->text_input( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), array( 'note'=>T_('Levels determine hierarchy of users in blogs.' ), 'maxlength'=>1, 'required'=>true ) );
 
 $Form->end_fieldset();
 
@@ -75,14 +75,14 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Security options') );
 
-$Form->text( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'), T_('for users.'), 2 );
+$Form->text_input( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'),array( 'note'=>T_('for users.'), 'maxlength'=>2, 'required'=>true ) );
 
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Miscellaneous options') );
 
-$Form->text( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 5,
-								T_('Reload-page timeout'), T_('Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit.'), 5 );
+$Form->text_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 5,
+								T_('Reload-page timeout'), array( 'note'=>T_('Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit.'), 'maxlength'=>5, 'required'=>true ) );
 
 $Form->end_fieldset();
 

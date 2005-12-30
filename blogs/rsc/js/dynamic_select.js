@@ -10,8 +10,19 @@
  *
  * 	CloneOptions always Values 'a-1','a-2','b-3','c-2','c-4'
  */
-
-
+ 
+/**
+* Called by window.onload event
+* Initialize all parent_child selects lists of the form
+*/
+function init_dynamicSelect()
+{
+	for( var i = 0; i < nb_dynamicSelects ; i++)
+	{
+		dynamicSelect( tab_dynamicSelects[i]['parent'], tab_dynamicSelects[i]['child'] ); 
+	}
+}
+ 
 /**
  * Initialize select lists
  *

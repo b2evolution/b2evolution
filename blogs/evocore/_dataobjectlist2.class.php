@@ -39,6 +39,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_results.class.php';
 
 
+/**
+ *
+ */
 class FilteredResults extends Results
 {
 	/**
@@ -162,6 +165,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.5  2005/12/30 20:13:39  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.4  2005/12/20 19:23:40  fplanque
  * implemented filter comparison/detection
  *

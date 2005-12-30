@@ -67,80 +67,194 @@ class ItemList2 extends DataObjectList2
 	 */
 	var $unit;
 
-
 	/**
 	 * Did we request a single post?
 	 */
  	var $single_post = false;
 
+	/**
+	 * Last date that has been output by date_if_changed()
+	 */
+	var $last_displayed_date = '';
+
 
 	/**
 	 * Constructor
 	 *
+	 * @todo  add param for saved session filter set
+	 *
 	 * @Param Blog
 	 * @param mixed Default filter set: Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Default filter set: Do not show posts after this timestamp, can be 'now'
+	 * @param string name of cache to be used
 	 */
 	function ItemList2(
 			& $Blog,
 			$timestamp_min = NULL,       // Do not show posts before this timestamp
-			$timestamp_max = NULL    		 // Do not show posts after this timestamp
+			$timestamp_max = NULL,   		 // Do not show posts after this timestamp
+			$cache_name = 'ItemCache'		 // name of cache to be used
 		)
 	{
-		global $ItemCache, $Settings;
+		global $Settings, $$cache_name;
 
 		// echo '<br />Instanciating ItemList2';
 
+		$DataObjectCache = & $$cache_name; // By ref!!
+
 		// Call parent constructor:
-		parent::DataObjectList2( $ItemCache, 20, '', NULL, 'paged' );
+		parent::DataObjectList2( $DataObjectCache, 20, '', NULL );
 
 		// The SQL Query object:
-		$this->ItemQuery = & new ItemQuery( $ItemCache->dbtablename, $ItemCache->dbprefix, $ItemCache->dbIDname );
+		$this->ItemQuery = & new ItemQuery( $DataObjectCache->dbtablename, $DataObjectCache->dbprefix, $DataObjectCache->dbIDname );
 
 		$this->Blog = & $Blog;
 
+		$this->filterset_name = 'ItemList_filters_'.$this->Blog->ID;
+
+ 		$this->page_param = 'paged';
+
 		// Initialize the default filter set:
-		$this->default_filters['ts_min'] = $timestamp_min;
-		$this->default_filters['ts_max'] = $timestamp_max;
-		$this->default_filters['cat_array'] = array();
-		$this->default_filters['cat_modifier'] = '';
-		$this->default_filters['authors'] = '';
-		$this->default_filters['keywords'] = '';
-		$this->default_filters['phrase'] = 'AND';
-		$this->default_filters['exact'] = 0;
-		$this->default_filters['post_ID'] = NULL;
-		$this->default_filters['post_title'] = NULL;
-		$this->default_filters['ymdhms'] = NULL;
-    $this->default_filters['week'] = NULL;
-    $this->default_filters['ymdhms_min'] = NULL;
-    $this->default_filters['ymdhms_max'] = NULL;
-		$this->default_filters['show_statuses_array'] = array( 'published', 'protected', 'private', 'draft', 'deprecated' );
-		$this->default_filters['orderby'] = $this->Cache->dbprefix.'datestart DESC';
-		$this->default_filters['unit'] = $Settings->get('what_to_show');
-		$this->default_filters['posts'] = $this->limit;
-		$this->default_filters['page'] = 1;
-		$this->page_param = 'paged';
-		$this->page = 1;
+		$this->set_default_filters( array(
+				'ts_min' => $timestamp_min,
+        'ts_max' => $timestamp_max,
+        'cat_array' => array(),
+        'cat_modifier' => NULL,
+				'authors' => NULL,
+				'keywords' => NULL,
+        'phrase' => 'AND',
+        'exact' => 0,
+        'post_ID' => NULL,
+        'post_title' => NULL,
+        'ymdhms' => NULL,
+        'week' => NULL,
+        'ymdhms_min' => NULL,
+        'ymdhms_max' => NULL,
+				'show_statuses_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
+				'order' => 'DESC',
+        'orderby' => 'datestart',
+        'unit' => $Settings->get('what_to_show'),
+				'posts' => $this->limit,
+				'page' => 1,
+			) );
+	}
+
+
+	/**
+	 * Set default filter values we always want to use if not individually specified otherwise:
+	 *
+	 * @param array
+	 */
+	function set_default_filters( $default_filters )
+	{
+		$this->default_filters = array_merge( $this->default_filters, $default_filters );
 
 		// The current filter set is the default filter set for now:
 		$this->filters = $this->default_filters;
+
+		// For compatibility with parent class:
+ 		$this->unit = $this->filters['unit'];
+		$this->limit = $this->filters['posts'];
+		$this->page = $this->filters['page'];
+	}
+
+
+	/**
+	 * Set/Activate filterset
+	 *
+	 * This will also set back the GLOBALS !!! needed for regenerate_url().
+	 *
+	 * @param array
+	 */
+	function set_filters( $filters )
+	{
+	  /**
+	   * @var Request
+	   */
+		global $Request;
+
+		$this->filters = array_merge( $this->default_filters, $filters );
+
+		/*
+		 * Blog & Chapters/categories restrictions:
+		 */
+		// Get chapters/categories (and compile those values right away)
+		$Request->set_param( 'cat_array', $this->filters['cat_array'] );
+		$Request->set_param( 'cat_modifier', $this->filters['cat_modifier'] );
+ 		$Request->set_param( 'cat', $this->filters['cat_modifier'].implode(',',$this->filters['cat_array']) );  // List of authors to restrict to
+
+		/*
+		 * Restrict to selected authors:
+		 */
+		$Request->set_param( 'author', $this->filters['authors'] );  // List of authors to restrict to
+
+		/*
+		 * Restrict by keywords
+		 */
+		$Request->set_param( 's', $this->filters['keywords'] );			 // Search string
+		$Request->set_param( 'sentence', $this->filters['phrase'] ); // Search for sentence or for words
+		$Request->set_param( 'exact', $this->filters['exact'] );     // Require exact match of title or contents
+
+		/*
+		 * Specific Item selection?
+		 */
+		$Request->set_param( 'm', $this->filters['ymdhms'] );          // YearMonth(Day) to display
+		$Request->set_param( 'w', $this->filters['week'] );            // Week number
+		$Request->set_param( 'dstart', $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
+
+		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
+		if( is_null($this->default_filters['ts_min'])
+			&& is_null($this->default_filters['ts_max'] ) )
+		{	// We have not set a strict default -> we allow overridding:
+    	$Request->set_param( 'show_past', ($this->filters['ts_min'] == 'now') ? 0 : 1 );
+			$Request->set_param( 'show_future', ($this->filters['ts_max'] == 'now') ? 0 : 1 );
+		}
+
+    /*
+		 * Restrict to the statuses we want to show:
+		 */
+		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
+		$Request->set_param( 'show_status', $this->filters['show_statuses_array'] );	// Array of sharings to restrict to
+
+		/*
+		 * OLD STYLE orders:
+		 */
+		$Request->set_param( 'order', $this->filters['order'] );   		// ASC or DESC
+		$Request->set_param( 'orderby', $this->filters['orderby'] );  // list of fields to order by (TODO: change that crap)
+
+		/*
+		 * Paging limits:
+		 */
+ 		$Request->set_param( 'unit', $this->filters['unit'] );    		// list unit: 'posts' or 'days'
+		$this->unit = $this->filters['unit'];	// TEMPORARy
+
+		$Request->set_param( 'posts', $this->filters['posts'] ); 			// # of units to display on the page
+		$this->limit = $this->filters['posts']; // for compatibility with parent class
+
+		// 'paged'
+		$Request->set_param( $this->page_param, $this->filters['page'] );      // List page number in paged display
+		$this->page = $this->filters['page'];
 	}
 
 
 	/**
 	 * Init filter params from Request params
 	 *
+	 * @param boolean
 	 * @return boolean true if loaded data seems valid.
 	 */
-	function load_from_Request()
+	function load_from_Request( $fallback_to_saved_filters = true )
 	{
+	  /**
+	   * @var Request
+	   */
 		global $Request;
 
 		/*
 		 * Blog & Chapters/categories restrictions:
 		 */
 		// Get chapters/categories (and compile those values right away)
-		$Request->compile_cat_array( $this->Blog->ID == 1 ? 0 : $this->Blog->ID );
+		$Request->compile_cat_array( $this->Blog->ID == 1 ? 0 : $this->Blog->ID,
+								$this->default_filters['cat_modifier'], $this->default_filters['cat_array'] );
 
 		$this->filters['cat_array'] = $Request->get( 'cat_array' );
 		$this->filters['cat_modifier'] = $Request->get( 'cat_modifier' );
@@ -149,22 +263,22 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * Restrict to selected authors:
 		 */
-		$this->filters['authors'] = $Request->param( 'author', 'string', '', true );      // List of authors to restrict to
+		$this->filters['authors'] = $Request->param( 'author', 'string', $this->default_filters['authors'], true );      // List of authors to restrict to
 
 
 		/*
 		 * Restrict by keywords
 		 */
-		$this->filters['keywords'] = $Request->param( 's', 'string', '', true );         // Search string
-		$this->filters['phrase'] = $Request->param( 'sentence', 'string', 'AND', true ); // Search for sentence or for words
-		$this->filters['exact'] = $Request->param( 'exact', 'integer', 0, true );        // Require exact match of title or contents
+		$this->filters['keywords'] = $Request->param( 's', 'string', $this->default_filters['keywords'], true );         // Search string
+		$this->filters['phrase'] = $Request->param( 'sentence', 'string', $this->default_filters['phrase'], true ); // Search for sentence or for words
+		$this->filters['exact'] = $Request->param( 'exact', 'integer', $this->default_filters['exact'], true );        // Require exact match of title or contents
 
 
 		/*
 		 * Specific Item selection?
 		 */
-    $this->filters['post_ID'] = $Request->param( 'p', 'integer', NULL );          // Specific post number to display
-		$this->filters['post_title'] = $Request->param( 'title', 'string', NULL );	  // urtitle of post to display
+    $this->filters['post_ID'] = $Request->param( 'p', 'integer', $this->default_filters['post_ID'] );          // Specific post number to display
+		$this->filters['post_title'] = $Request->param( 'title', 'string', $this->default_filters['post_title'] );	  // urtitle of post to display
 
 		$this->single_post = !empty($this->filters['post_ID']) || !empty($this->filters['post_title']);
 
@@ -172,9 +286,9 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * If a timeframe is specified in the querystring, restrict to that timeframe:
 		 */
-		$this->filters['ymdhms'] = $Request->param( 'm', 'integer', NULL, true );          // YearMonth(Day) to display
-		$this->filters['week'] = $Request->param( 'w', 'integer', NULL, true );            // Week number
-		$this->filters['ymdhms_min'] = $Request->param( 'dstart', 'integer', NULL, true ); // YearMonth(Day) to start at
+		$this->filters['ymdhms'] = $Request->param( 'm', 'integer', $this->default_filters['ymdhms'], true );          // YearMonth(Day) to display
+		$this->filters['week'] = $Request->param( 'w', 'integer', $this->default_filters['week'], true );            // Week number
+		$this->filters['ymdhms_min'] = $Request->param( 'dstart', 'integer', $this->default_filters['ymdhms_min'], true ); // YearMonth(Day) to start at
 
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
 		if( is_null($this->default_filters['ts_min'])
@@ -197,36 +311,19 @@ class ItemList2 extends DataObjectList2
 		$this->filters['show_statuses_array'] = $Request->param( 'show_status', 'array', $this->default_filters['show_statuses_array'], true );	// Array of sharings to restrict to
 
 
-
 		/*
-		 * OLD STYLE orders:
+		 * Ordering:
 		 */
-		$order = $Request->param( 'order', 'string', 'DESC', true );   // ASC or DESC
-		$orderby = $Request->param( 'orderby', 'string', '', true );     // list of fields to order by (TODO: change that crap)
-
-		if( (strtoupper($order) != 'ASC') && (strtoupper($order) != 'DESC') )
-		{
-			$order = 'DESC';
-		}
-
-		if(empty($orderby))
-		{
-			$this->filters['orderby'] = $this->Cache->dbprefix.'datestart '.$order;
-		}
-		else
-		{
-			$orderby_array = explode(' ',$orderby);
-			$this->filters['orderby'] = $this->Cache->dbprefix.implode( ' '.$order.', '.$this->Cache->dbprefix, $orderby_array ).' '.$order;
-		}
-
+		$this->filters['order'] = $Request->param( 'order', '/^(ASC|asc|DESC|desc)$/', $this->default_filters['order'], true );   			// ASC or DESC
+		$this->filters['orderby'] = $Request->param( 'orderby', '/^([A-Za-z0-9]+([ ,][A-Za-z0-9]+)*)?$/', $this->default_filters['orderby'], true );   // list of fields to order by (TODO: change that crap)
 
 
 		/*
 		 * Paging limits:
 		 */
  		$this->filters['unit'] = $Request->param( 'unit', 'string', $this->default_filters['unit'], true );    		// list unit: 'posts' or 'days'
-		$this->unit = $this->filters['unit'];	// TEMPORARy
-		//echo '<br />unit='.$this->filters['unit'];
+		$this->unit = $this->filters['unit'];	// TEMPORARY
+		// echo '<br />unit='.$this->filters['unit'];
 
 		$this->filters['posts'] = $Request->param( 'posts', 'integer', $this->default_filters['posts'], true ); 			// # of units to display on the page
 		$this->limit = $this->filters['posts']; // for compatibility with parent class
@@ -249,96 +346,66 @@ class ItemList2 extends DataObjectList2
 			return true;
 		}
 
-
 		// echo 'Is filtered? '.($this->is_filtered() ? 'yes' : 'no');
-
-		global $Session;
-
-		$filterset_name = 'ItemList_filters_'.$this->Blog->ID;
 
 		if( $this->is_filtered() )
 		{	// We have an active filter:
 			// Let's memorize that filter into the session:
-			// echo 'saving filterset';
-			$Session->set( $filterset_name, $this->filters );
+			$this->save_filterset();
 		}
-		else
-		{	// No requested filter set, let's see if we can load a previously used filter set:
-			$filters = $Session->get( $filterset_name );
-			if( !empty($filters) )
-			{ // We have filters:
-				// echo 'restoring filterset';
-
-				// Restore filters:
-				$this->filters = $filters;
-
-				// Set back the GLOBALS !!! needed for regenerate_url.
-
-				/*
-				 * Blog & Chapters/categories restrictions:
-				 */
-				// Get chapters/categories (and compile those values right away)
-				$Request->set_param( 'cat_array', $this->filters['cat_array'] );
-				$Request->set_param( 'cat_modifier', $this->filters['cat_modifier'] );
- 				$Request->set_param( 'cat', $this->filters['cat_modifier'].implode(',',$this->filters['cat_array']) );  // List of authors to restrict to
-
-				/*
-				 * Restrict to selected authors:
-				 */
-				$Request->set_param( 'author', $this->filters['authors'] );  // List of authors to restrict to
-
-				/*
-				 * Restrict by keywords
-				 */
-				$Request->set_param( 's', $this->filters['keywords'] );			 // Search string
-				$Request->set_param( 'sentence', $this->filters['phrase'] ); // Search for sentence or for words
-				$Request->set_param( 'exact', $this->filters['exact'] );     // Require exact match of title or contents
-
-				/*
-				 * Specific Item selection?
-				 */
-				$Request->set_param( 'm', $this->filters['ymdhms'] );          // YearMonth(Day) to display
-				$Request->set_param( 'w', $this->filters['week'] );            // Week number
-				$Request->set_param( 'dstart', $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
-
-				// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
-				if( is_null($this->default_filters['ts_min'])
-					&& is_null($this->default_filters['ts_max'] ) )
-				{	// We have not set a strict default -> we allow overridding:
-    			$Request->set_param( 'show_past', ($this->filters['ts_min'] == 'now') ? 0 : 1 );
-					$Request->set_param( 'show_future', ($this->filters['ts_max'] == 'now') ? 0 : 1 );
-				}
-
-     		/*
-				 * Restrict to the statuses we want to show:
-				 */
-				// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
-				$Request->set_param( 'show_status', $this->filters['show_statuses_array'] );	// Array of sharings to restrict to
-
-				/*
-				 * OLD STYLE orders:
-				 */
-				// TODO!
-
-				/*
-				 * Paging limits:
-				 */
- 				$Request->set_param( 'unit', $this->filters['unit'] );    		// list unit: 'posts' or 'days'
-				$this->unit = $this->filters['unit'];	// TEMPORARy
-
-				$Request->set_param( 'posts', $this->filters['posts'] ); 			// # of units to display on the page
-				$this->limit = $this->filters['posts']; // for compatibility with parent class
-
-				// 'paged'
-				$Request->set_param( $this->page_param, $this->filters['page'] );      // List page number in paged display
-				$this->page = $this->filters['page'];
-			}
+		elseif( $fallback_to_saved_filters )
+		{	// No requested filter set and we want to try and load a previously used filter set:
+			$this->restore_filterset();
 		}
 
+		//pre_dump( $this->default_filters );
+		//pre_dump( $this->filters );
 
-		// pre_dump( $this->default_filters );
-		// pre_dump( $this->filters );
 
+		return true;
+	}
+
+
+  /**
+   * Save current filterset to session.
+   */
+	function save_filterset()
+	{
+		global $Session;
+
+		// echo 'saving filterset';
+
+		$Session->set( $this->filterset_name, $this->filters );
+	}
+
+
+  /**
+   * Load previously saved filterset from session.
+   *
+   * @return boolean true if we could restore something
+   */
+	function restore_filterset()
+	{
+	  /**
+	   * @var Session
+	   */
+		global $Session;
+	  /**
+	   * @var Request
+	   */
+		global $Request;
+
+		$filters = $Session->get( $this->filterset_name );
+
+		if( empty($filters) )
+		{ // We have no saved filters:
+			return false;
+		}
+
+		// echo 'restoring filterset';
+
+		// Restore filters:
+		$this->set_filters( $filters );
 
 		return true;
 	}
@@ -346,8 +413,6 @@ class ItemList2 extends DataObjectList2
 
 	/**
 	 *
-	 * Note: so far, the query should not be run without a prior call to load_from_request()
-	 * Otherwise filtering will not be complete 'not even values given in the constructor will work)
 	 *
 	 * @todo count?
 	 */
@@ -385,8 +450,14 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * order by stuff:
 		 */
-		// Memorize requested order list:
-		$this->ItemQuery->order_by( $this->filters['orderby'] );
+		$order = $this->filters['order'];
+
+		$orderby = str_replace( ' ', ',', $this->filters['orderby'] );
+		$orderby_array = explode( ',', $orderby );
+
+		$order_by = $this->Cache->dbprefix.implode( ' '.$order.', '.$this->Cache->dbprefix, $orderby_array ).' '.$order;
+
+		$this->ItemQuery->order_by( $order_by );
 
 
 		/*
@@ -427,7 +498,7 @@ class ItemList2 extends DataObjectList2
 					$lastpostdate = mysql2date('U',$lastpostdate);
 					// go back x days
 					$otherdate = date('Y-m-d H:i:s', ($lastpostdate - (($this->limit-1) * 86400)));
-					$this->ItemQuery->WHERE_and( $this->dbprefix.'datestart > \''. $otherdate.'\'' );
+					$this->ItemQuery->WHERE_and( $this->Cache->dbprefix.'datestart > \''. $otherdate.'\'' );
 				}
 			}
 			else
@@ -443,11 +514,11 @@ class ItemList2 extends DataObjectList2
 				$dstart_ts = mysql2timestamp( $dstart_mysql );
 				// go forward x days
 				$enddate_ts = date('Y-m-d H:i:s', ($dstart_ts + ($this->limit * 86400)));
-				$this->ItemQuery->WHERE_and( $this->dbprefix.'datestart < \''. $enddate_ts.'\'' );
+				$this->ItemQuery->WHERE_and( $this->Cache->dbprefix.'datestart < \''. $enddate_ts.'\'' );
 			}
 		}
 		else
-			die( 'Unhandled LIMITING mode in ItemList (paged mode is obsolete)' );
+			die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
 
 
 
@@ -678,6 +749,41 @@ class ItemList2 extends DataObjectList2
 		}
 
 
+		// LIMIT TO
+		if( $this->single_post )   // p or title
+		{ // Single post: no paging required!
+		}
+		elseif( !empty($this->filters['ymdhms']) )
+		{ // no restriction if we request a month... some permalinks may point to the archive!
+		}
+		elseif( $this->filters['unit'] == 'posts' )
+		{ // We're going to page, so there's no real limit here...
+		}
+		elseif( $this->unit == 'days' )
+		{ // We are going to limit to x days:
+			// echo 'LIMIT DAYS ';
+			if( empty( $this->filters['ymdhms_min'] ) )
+			{ // We have no start date, we'll display the last x days:
+				if( !empty($this->filters['keywords'])
+					|| !empty($this->filters['cat_array'])
+					|| !empty($this->filters['authors']) )
+				{ // We are in DAYS mode but we can't restrict on these! (TODO: ?)
+				}
+				else
+				{ // We are going to limit to LAST x days:
+					// TODO: rename 'posts' to 'limit'
+					$title_array['posts'] = sprintf( T_('Limit to %d last days'), $this->limit );
+				}
+			}
+			else
+			{ // We have a start date, we'll display x days starting from that point:
+				$title_array['posts'] = sprintf( T_('Limit to %d days'), $this->limit );
+			}
+		}
+		else
+			die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
+
+
 		return $title_array;
 	}
 
@@ -706,10 +812,40 @@ class ItemList2 extends DataObjectList2
 		return $Item;
 	}
 
+
+	/**
+	 * Template function: Display the date if it has changed since last call
+	 *
+	 * @param string string to display before the date (if changed)
+	 * @param string string to display after the date (if changed)
+	 * @param string date/time format: leave empty to use locale default time format
+	 */
+	function date_if_changed( $before = '<h2>', $after = '</h2>', $format = '' )
+	{
+		$current_item_date = $this->current_Obj->issue_date;
+		if( empty($format) )
+		{
+			$current_item_date = mysql2date( locale_datefmt(), $current_item_date );
+		}
+		else
+		{
+			$current_item_date = mysql2date( $format, $current_item_date );
+		}
+
+		if( $current_item_date != $this->last_displayed_date )
+		{
+			$this->last_displayed_date = $current_item_date;
+
+			echo $before.$current_item_date.$after;
+		}
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.7  2005/12/30 20:13:40  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.6  2005/12/22 15:53:37  fplanque
  * Splitted display and display init
  *

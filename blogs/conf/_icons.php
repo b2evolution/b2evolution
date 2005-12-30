@@ -279,12 +279,12 @@ $map_iconfiles = array(
 
 	'activate' => array(
 		'file' => $admin_subdir.'img/bullet_activate.png',
-		'alt' => '&bull;',
+		'alt' => T_('Act.'),
 		'size' => array( 17, 17 ),
 	),
  	'deactivate' => array(
 		'file' => $admin_subdir.'img/bullet_deactivate.png',
-		'alt' => '&nbsp;',
+		'alt' => T_('Deact.'),
 		'size' => array( 17, 17 ),
 	),
 
@@ -304,6 +304,13 @@ $map_iconfiles = array(
 		'alt' => T_('Calendar'),
 		'size' => array( 16, 15 ),
 	),
+	
+	'parent_childto_arrow' => array(
+		'file' => $rsc_subdir.'icons/parent_childto_arrow.png',
+		'alt' => T_('+'),
+		'size' => array( 14, 17 ),
+	),
+	
 	'help' => array(
 		'file' => $img_subdir.'smilies/icon_question.gif',
 		'alt' => T_('Help'),

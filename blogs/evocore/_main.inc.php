@@ -106,8 +106,10 @@ $Messages = & new Log( 'error' );
  * Start timer:
  */
 require_once dirname(__FILE__).'/_timer.class.php';
-$Timer = & new Timer('main');
+$Timer = & new Timer('total');
 
+//
+$Timer->start( 'main.inc' );
 
 /**
  * Load base + advanced configuration:
@@ -503,6 +505,8 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale
  */
 require_once $conf_path.'_icons.php';
 
+//
+$Timer->pause( 'main.inc');
 
 /**
  * Load hacks file if it exists
@@ -511,6 +515,9 @@ require_once $conf_path.'_icons.php';
 
 /*
  * $Log$
+ * Revision 1.75  2005/12/30 20:13:40  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.74  2005/12/30 18:08:24  fplanque
  * no message
  *

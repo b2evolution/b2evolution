@@ -291,6 +291,17 @@ class SQL
 						
 			case 'PHRASE':
 						$where = $search_field.' like "%'.$search.'%"';
+						break;
+						
+			case 'BEGINWITH':
+						$twhere = array();
+						foreach( $this->search_field as $field )
+						{
+							$twhere[] = $field." LIKE '".$search."'";
+						}
+						$where = implode( ' OR ', $twhere ); 
+						break;
+						
 		}
 		$this->WHERE_and( $where );
 	}
@@ -299,6 +310,9 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.8  2005/12/30 20:13:40  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.7  2005/12/05 18:17:19  fplanque
  * Added new browsing features for the Tracker Use Case.
  *

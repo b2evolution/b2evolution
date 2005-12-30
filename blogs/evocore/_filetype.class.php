@@ -77,6 +77,10 @@ class Filetype extends DataObject
 			$this->viewtype    	= 	$db_row->ftyp_viewtype   	;
 			$this->allowed 			=		$db_row->ftyp_allowed		  ;
 		}
+		else
+		{	// Create a new filetype:
+			$this->set( 'viewtype', 'browser' );
+		}
 	}
 
 	

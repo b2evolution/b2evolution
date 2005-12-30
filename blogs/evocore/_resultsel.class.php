@@ -134,7 +134,7 @@ class ResultSel extends Results
 			return;
 		}
 
-		$this->Form = new Form( regenerate_url(), $this->param_prefix.'form', 'post', 'none' ); // COPY!!
+		$this->Form = new Form( regenerate_url(), $this->param_prefix.'selections_checkchanges', 'post', 'none' ); // COPY!!
 
 		$this->Form->begin_form( '' );
 
@@ -175,9 +175,8 @@ class ResultSel extends Results
 			$can_edit = $current_User->check_perm( 'selections', 'edit' );
 
 			if( $can_edit )
-			{
-				echo '<a href="'.regenerate_url().'" onclick="return check( this, true );">'.T_('Check all')
-						.'</a> | <a href="'.regenerate_url().'" onclick="return check( this, false );">'.T_('Uncheck all').'</a> ';
+			{ // links to check all and uncheck all
+				$this->Form->check_all();
 			}
 
 			// construction of the select menu :
@@ -185,7 +184,7 @@ class ResultSel extends Results
 
 			if( $can_edit )
 			{
-				$this->Form->text( 'selection_'.$this->param_prefix.'name', $selection_name, 25, T_('New selection name') );
+				$this->Form->text( 'selection_'.$this->param_prefix.'name', $selection_name, 25, T_('Selection name') );
 
 				// List of IDs displayed on this page (needed for deletes):
 				$this->Form->hidden( 'item_ID_list', implode( $item_ID_array, ',' ) );
@@ -262,12 +261,12 @@ function selection_checkbox( $item_ID, $param_prefix )
 
 	if( $current_User->check_perm( 'selections', 'edit' ) )
 	{	// User is allowed to edit
-		$r .= '<input type="checkbox" class="checkbox" name="'.$param_prefix.'items[]" value='.$item_ID;
+		$r .= '<span name="surround_check" class=""><input type="checkbox" class="checkbox" name="'.$param_prefix.'items[]" value='.$item_ID;
 		if( in_array( $item_ID, $cols_check ) )
 		{	// already in selection:
 			$r .= ' checked="checked" ';
 		}
-		$r .= ' />';
+		$r .= ' /></span>';
 	}
 	else
 	{	// User CANNOT edit:
@@ -360,65 +359,6 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 	switch( $category )
 	{ // definition of the table and column names depending on the selection category
 
-		case 'contacts': // parameters of contact selections
-			global $selection_cont_ID, $selection_cont_name;
-			$selections_table = 'T_contselections';
-			$sel_table = 'T_cont_csel';
-			$selections_table_name = 'csel_name';
-			$selections_table_id = 'csel_ID';
-			$sel_table_selection = 'cocs_csel_ID';
-			$sel_table_item = 'cocs_cont_ID';
-			$category_table = 'T_contacts';
-			$category_name = 'cont_lastname, cont_firstname';
-			break;
-
-		case 'firms': // parameters of firm selections
-			global $selection_firm_ID, $selection_firm_name;
-			$selections_table = 'T_firmselections';
-			$sel_table = 'T_firm_fsel';
-			$selections_table_name = 'fsel_name';
-			$selections_table_id = 'fsel_ID';
-			$sel_table_selection = 'fifs_fsel_ID';
-			$sel_table_item = 'fifs_firm_ID';
-			$category_table = 'T_firms';
-			$category_name = 'firm_name';
-			break;
-
-		case 'tasks': // parameters of task selections
-			global $selection_tsk_ID, $selection_tsk_name;
-			$selections_table = 'T_taskselections';
-			$sel_table = 'T_tsk_tsel';
-			$selections_table_name = 'tsel_name';
-			$selections_table_id = 'tsel_ID';
-			$sel_table_selection = 'tkts_tsel_ID';
-			$sel_table_item = 'tkts_tsk_ID';
-			$category_table = 'T_tasks';
-			$category_name = 'task_title';
-			break;
-
-		case 'etabs': // parameters of establishment selections
-			global $selection_etab_ID, $selection_etab_name;
-			$selections_table = 'T_etabselections';
-			$sel_table = 'T_etab_esel';
-			$selections_table_name = 'esel_name';
-			$selections_table_id = 'esel_ID';
-			$sel_table_selection = 'etes_esel_ID';
-			$sel_table_item = 'etes_etab_ID';
-			$category_table = 'T_establishments';
-			$category_name = 'etab_name';
-			break;
-
-		case 'addresses': // parameters of address selections
-			global $selection_addr_ID, $selection_addr_name;
-			$selections_table = 'T_addrselections';
-			$sel_table = 'T_addr_asel';
-			$selections_table_name = 'asel_name';
-			$selections_table_id = 'asel_ID';
-			$sel_table_selection = 'adas_asel_ID';
-			$sel_table_item = 'adas_addr_ID';
-			$category_table = 'T_addresses';
-			$category_name = 'addr_name';
-			break;
 
 		default: // default parameters
 			$selections = '';
@@ -441,7 +381,7 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
 			if( empty($selection_name) )
 			{	// No name provided:
-				// $Messages->add( T_('Cannot create a selection with an empty name'), 'error' );
+				$Messages->add( T_('Cannot create a selection with an empty name'), 'error' );
 				// Abord creation!
 				break;
 			}
@@ -468,31 +408,6 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
 			switch( $category )
 			{ // attribution of new values to some parameters so that the newly created selection can become the current one
-				case 'firms':
-					$selection_firm_ID = $selection_ID;
-					$selection_firm_name = $selection_name;
-					break;
-
-				case 'tasks':
-					$selection_tsk_ID = $selection_ID;
-					$selection_tsk_name = $selection_name;
-					break;
-
-				case 'etabs':
-					$selection_etab_ID = $selection_ID;
-					$selection_etab_name = $selection_name;
-					break;
-
-				case 'contacts':
-					$selection_cont_ID = $selection_ID;
-					$selection_cont_name = $selection_name;
-					break;
-
-				case 'addresses':
-					$selection_addr_ID = $selection_ID;
-					$selection_addr_name = $selection_name;
-					break;
-
 			}
 
 			$Messages->add( T_('Selection created.'), 'success' );
@@ -629,6 +544,9 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
 /*
  * $Log$
+ * Revision 1.10  2005/12/30 20:13:40  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.9  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

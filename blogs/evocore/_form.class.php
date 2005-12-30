@@ -118,6 +118,11 @@ class Form extends Widget
 	var $hiddens = array();
 
 	/**
+	 * Do we need to add javascript for check/uncheck all functionality
+	 */
+	var $check_all = false;
+	
+	/**
 	 * Constructor
 	 *
 	 * @param string the name of the form
@@ -1042,6 +1047,19 @@ class Form extends Widget
 		return $this->checkbox_input( $field_name, $field_checked, $field_label, $field_params );
 	}
 
+	/**
+	 * Create links to check and uncheck all check boxes of the form
+	 */
+	function check_all()
+	{
+		echo '<a name="check_all" href="'.regenerate_url().'">'.T_('Check all')
+				.'</a> | <a name="uncheck_all" href="'.regenerate_url().'">'.T_('Uncheck all').'</a> ';	
+			
+		// Need to add event click on links at the form end.		
+		$this->check_all = true;
+	}
+	
+	
 
 	/**
 	 * Returns 'disabled="disabled"' if the boolean param is false.
@@ -1098,6 +1116,12 @@ class Form extends Widget
 
 			$r .= $this->replace_vars( $this->title_fmt );
 		}
+		
+		// Initialization of javascript vars used to create parent_child select lists
+		$r .= '<script type="text/javascript">
+							var nb_dynamicSelects = 0; 
+							var tab_dynamicSelects = Array();
+						</script>';
 
 		return $this->display_or_return( $r );
 	}
@@ -1136,6 +1160,16 @@ class Form extends Widget
 		}
 
 		$r .= "\n</form>\n\n";
+		
+		// When the page loads, Initialize all the parent child select lists
+		$r .= '<script type="text/javascript">
+							addEvent( window, "load", init_dynamicSelect, false ); 
+						</script>';
+		
+		if( $this->check_all ) 
+		{// Init check_all event on check_all links
+			echo '<script type="text/javascript">addEvent( window, "load", init_check_all, false )</script>' ; 
+		}
 
 		return $this->display_or_return( $r );
 	}
@@ -1159,7 +1193,7 @@ class Form extends Widget
 	 * @param string label
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checklist( $options, $field_name, $field_label )
+	function checklist( $options, $field_name, $field_label, $required = false )
 	{
 		global $Request;
 
@@ -1177,10 +1211,14 @@ class Form extends Widget
 			$loop_field_note = isset($option[5]) ? $option[5] : '';
 
 			$r .= '<label class="">';
-
-			if( isset($Request->err_messages[$field_name]) )
+			if( isset($Request->err_messages[$field_name]))
 			{ // There is an error message for this field, we want to mark the checkboxes with a red border:
 				$r .= '<span class="checkbox_error">';
+				$after_field = '</span>';
+			}
+			elseif( $required )
+			{	//this field is required
+				$r .= '<span class="checkbox_required">';
 				$after_field = '</span>';
 			}
 			else
@@ -1383,10 +1421,13 @@ class Form extends Widget
 			 .$this->end_field();
 
 		if( !empty( $field_params['parent'] ) )
-		{ // When the page loads, set up the dynamic preselection from the parent to this select list options
+		{ // Set up the dynamic preselection array from the parent to this select list options
 			$r .= "<script type='text/javascript'>
-						addEvent( window, 'load', dynamicSelect('$field_params[parent]', '$field_name'), false );
-						</script>";
+								tab_dynamicSelects[nb_dynamicSelects] = Array(); 
+								tab_dynamicSelects[nb_dynamicSelects]['parent'] = '".$field_params['parent']."';
+								tab_dynamicSelects[nb_dynamicSelects]['child'] = '$field_name';
+								nb_dynamicSelects++;
+							</script>";
 		}
 
 		return $this->display_or_return( $r );
@@ -2346,6 +2387,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.95  2005/12/30 20:13:39  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.94  2005/12/23 19:06:35  blueyed
  * Advanced enabling/disabling of plugin events.
  *

@@ -46,7 +46,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $AdminUI->disp_payload_begin();
 
 
-$Form = & new Form( 'b2users.php', 'form' );
+$Form = & new Form( 'b2users.php', 'user_checkchanges' );
 
 if( !$user_profile_only )
 {
@@ -213,6 +213,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.79  2005/12/30 20:13:39  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.78  2005/12/13 14:32:04  fplanque
  * no need to color confuse the user about mandatory select lists which have non 'none' choice anyway.
  *

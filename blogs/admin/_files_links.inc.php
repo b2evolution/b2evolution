@@ -80,7 +80,11 @@ $Results->cols[] = array(
 // PATH COLUMN:
 function file_path()
 {
-	global $current_File, $edited_Item;
+	/**
+	 * @global File
+	 */
+	global $current_File;
+	global $edited_Item;
 
 	// File relative path & name:
 	return $current_File->edit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID );
@@ -126,6 +130,9 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.10  2005/12/30 20:13:39  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.9  2005/12/14 19:36:15  fplanque
  * Enhanced file management
  *

@@ -475,12 +475,13 @@ class Results extends Widget
 				// GLOBAL (NAV) HEADER:
 				$this->display_nav( 'header' );
 
+				// Experimental:
 				$this->display_top_callback();
 
 				// START OF LIST/TABLE:
 				$this->display_list_start();
 
-					// COLUMN HEADERS:
+					// TITLE / COLUMN HEADERS:
 					$this->display_head();
 
 					// GROUP & DATA ROWS:
@@ -579,11 +580,6 @@ class Results extends Widget
 	 */
 	function display_head()
 	{
-		if( ! $this->col_headers )
-		{ // We do not want to display headers:
-			return false;
-		}
-
 		echo $this->params['head_start'];
 
 		if( isset($this->title) )
@@ -593,7 +589,7 @@ class Results extends Widget
 
 		$col_count = 0;
 		$col_names = array();
-		foreach( $this->cols as $col )
+		if( isset( $this->cols) ) foreach( $this->cols as $col )
 		{ // For each column:
 
 			if( isset( $col['th_start'] ) )
@@ -1266,6 +1262,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.46  2005/12/30 20:13:40  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.45  2005/12/22 15:51:58  fplanque
  * Splitted display and display init
  *

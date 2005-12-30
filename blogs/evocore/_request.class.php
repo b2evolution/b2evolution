@@ -222,7 +222,8 @@ class Request
 			return false;
 		}
 	}
-	
+
+
 	/**
 	 * set a parameter with the second part(X2) of the value from request ( X1-X2 )
 	 * 
@@ -244,7 +245,7 @@ class Request
 				return $$var;
 			}
 		}
-		return false;
+		return '';
 	}
 	
 	
@@ -728,13 +729,13 @@ class Request
 	 * Compiles the cat array from $cat (recursive + optional modifiers) and $catsel[] (non recursive)
 	 * and keeps those values available for future reference
  	 */
-	function compile_cat_array( $restrict_to_blog = 0 )
+	function compile_cat_array( $restrict_to_blog = 0, $cat_default = NULL, $catsel_default = array() )
 	{
 		// For now, we'll also need those as globals!
 		global $cat_array, $cat_modifier;
 
-		$cat = $this->param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', '', true ); // List of cats to restrict to
-		$catsel = $this->param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
+		$cat = $this->param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $cat_default, true ); // List of cats to restrict to
+		$catsel = $this->param( 'catsel', 'array', $catsel_default, true );  // Array of cats to restrict to
 
 		$cat_array = array();
 		$cat_modifier = '';
@@ -750,6 +751,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.28  2005/12/30 20:13:40  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.27  2005/12/21 20:39:04  fplanque
  * minor
  *

@@ -32,10 +32,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
-$Form = & new Form( 'filetypes.php', 'form' );
+$Form = & new Form( 'filetypes.php', 'ftyp_checkchanges' );
 
 $Form->global_icon( T_('Delete this filetype!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,div_ID' ) );
+$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') );
 
@@ -43,11 +43,11 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 	
 	if( ! $creating ) $Form->hidden( 'ftyp_ID', $edited_Filetype->ID );
 	
-	$Form->text( 'ftyp_extensions', $edited_Filetype->extensions, 40, T_('Extensions'), '', 80 );
+	$Form->text_input( 'ftyp_extensions', $edited_Filetype->extensions, 40, T_('Extensions'), array( 'maxlength'=>80, 'required'=>true ) );
 	
-	$Form->text( 'ftyp_name', $edited_Filetype->name, 40, T_('File type name'), '', 80 );
+	$Form->text_input( 'ftyp_name', $edited_Filetype->name, 40, T_('File type name'), array( 'maxlength'=> 80, 'required'=>true ) );
 		
-	$Form->text( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), '', 80 );
+	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), array( 'maxlength'=> 80, 'required'=>true ) );
 	
 	$Form->text( 'ftyp_icon', $edited_Filetype->icon, 20, T_('Icon'), '', 40 );
 	

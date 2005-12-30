@@ -29,7 +29,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // blueyed>>halton Please keep an eye on your indenting! Remove these lines, when noticed them.
 
 
-$Form = & new Form( 'features.php', 'form' );
+$Form = & new Form( 'features.php', 'feats_checkchanges' );
 
 $Form->begin_form( 'fform', T_('Global Features') );
 
@@ -96,14 +96,14 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Hit logging') . get_web_help_link('Hit logging') );
 	$Form->checkbox_input( 'hit_doublecheck_referer', $Settings->get('hit_doublecheck_referer'), T_('Double-check Referer'), array( 'note' => T_('Activating this will search the requested (your) URL in the content of the referring page. This is against referer spam, but creates additional webserver traffic.') ) );
 	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Autoprune stats after'),
-		array( 'note' => T_('days. (0 to disable) How many days of stats do you want to keep in the database?') ) );
+		array( 'note' => T_('days. (0 to disable) How many days of stats do you want to keep in the database?'), 'required'=>true ) );
 $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Sessions') . get_web_help_link('Sessions') );
 	// TODO: enhance UI with a general Form method
 	$Form->text_input( 'timeout_sessions', $Settings->get('timeout_sessions'), 9, T_('Session timeout'),
-		array( 'note' => T_('seconds. How long can a user stay inactive before automatic logout?') ) );
+		array( 'note' => T_('seconds. How long can a user stay inactive before automatic logout?'), 'required'=>true) );
 $Form->end_fieldset();
 
 

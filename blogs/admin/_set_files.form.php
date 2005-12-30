@@ -22,7 +22,7 @@ if( false )
 	include('fileset.php');
 }
 
-$Form = & new Form( 'fileset.php', 'filesform' );
+$Form = & new Form( 'fileset.php', 'files_checkchanges' );
 
 $Form->begin_form( 'fform', T_('File Settings') );
 $Form->hidden( 'action', 'update' );
@@ -39,7 +39,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Upload options') );
 	$Form->checkbox( 'upload_enabled', $Settings->get('upload_enabled'), T_('Enable upload'), T_('Check to allow uploading files in general.' ) );
-	$Form->text( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum allowed filesize'), T_('KB (This cannot be higher than your PHP/Webserver setting!)'), 7 );
+	$Form->text_input( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum allowed filesize'), array( 'note'=>T_('KB (This cannot be higher than your PHP/Webserver setting!)'), 'maxlength'=>7, 'required'=>true ) );
 $Form->end_fieldset();
 
 if( empty( $force_regexp_filename ) || empty( $force_regexp_dirname ) )

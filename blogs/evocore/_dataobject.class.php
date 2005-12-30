@@ -431,6 +431,8 @@ class DataObject
 			$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
 
+		$Form = & new Form( '', '', 'get', '' );
+
 		$Form->begin_form( 'inline' );
 			$Form->hiddens_by_key( $hiddens );
 			$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
@@ -639,26 +641,12 @@ class DataObject
 }
 
 
-/**
- * @deprecated and not used in b2evo anyway
- */
-/*
-function object_history( $pos_lastedit_user_ID, $pos_datemodified )
-{
-	global $UserCache;
-	if( !empty( $pos_lastedit_user_ID ) )
-	{
-		$User = & $UserCache->get_by_ID( $pos_lastedit_user_ID );
-
-		$modified = sprintf( T_('Last modified on %s by %s'), mysql2localedate( $pos_datemodified ), $User->dget('preferredname') );
-
-		return get_icon( 'history', $what = 'imgtag', array( 'title'=>$modified ) );
-	}
-}
-*/
 
 /*
  * $Log$
+ * Revision 1.33  2005/12/30 20:13:39  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.32  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

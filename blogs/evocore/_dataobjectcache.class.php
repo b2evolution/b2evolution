@@ -149,13 +149,11 @@ class DataObjectCache
 		$sql = "SELECT *
 							FROM $this->dbtablename
 						 WHERE $this->dbIDname IN ($req_list)";
-		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
 		foreach( $DB->get_results( $sql ) as $row )
 		{
 			$this->add( new $objtype( $row ) );
-			// $obj = $this->cache[ $row->$dbIDname ];
-			// $obj->disp( 'name' );
+			// TODO: use instantiate()
 		}
 	}
 
@@ -221,8 +219,14 @@ class DataObjectCache
 
 		if( !isset($this->cache[$obj_ID]) )
 		{	// If the object ID is valid and not already cached:
-			$Obj = new $this->objtype( $db_row ); // COPY !!
-			$this->add( $Obj );
+			if( $this->objtype == 'Element' )
+			{ // Instanciate a dataobject with its params:
+				$this->add( new Element( $this->dbtablename, $this->dbprefix, $this->dbIDname, $db_row ) );
+			}
+			else
+			{ // Instantiate a custom object
+				$this->add( new $this->objtype( $db_row ) );
+			}
 		}
 
 		return $this->cache[$obj_ID];
@@ -448,6 +452,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.33  2005/12/30 20:13:39  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.32  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

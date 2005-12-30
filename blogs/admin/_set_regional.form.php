@@ -15,7 +15,7 @@ if( $action == 'edit' )
 {
 	param( 'template', 'string', ($edit_locale == '_new_') ? T_('Create new locale') : T_('Edit locale'), 'createnew' );
 
-	$Form = & new Form( 'locales.php' );
+	$Form = & new Form( 'locales.php', 'loc_checkchanges' );
 
 	$Form->begin_form( 'fform', T_('Regional Settings') );
 
@@ -120,7 +120,7 @@ else
 		echo '<div class="error">' . T_('Note: default locale is not enabled.') . '</div>';
 	}
 
-	$Form = & new Form( 'locales.php' );
+	$Form = & new Form( 'locales.php', 'loc_checkchanges' );
 
 	$Form->begin_form( 'fform', T_('Regional Settings') );
 
@@ -128,7 +128,8 @@ else
 	$Form->hidden( 'loc_transinfo', $loc_transinfo );
 
 	$Form->begin_fieldset( T_('Regional settings') );
-	$Form->text( 'newtime_difference', $Settings->get('time_difference'), 3, T_('Time difference'), sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 3 );
+	$Form->text_input( 'newtime_difference', $Settings->get('time_difference'), 3, T_('Time difference'), 
+				array( 'note'=>sprintf( '['. T_('in hours'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), date_i18n( locale_timefmt(), $servertimenow ) ), 'maxlength'=> 3, 'required'=>true ) );
 	$Form->select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options_return', T_('Default locale'), T_('Overridden by browser config, user locale or blog locale (in this order).'));
 	$Form->end_fieldset();
 

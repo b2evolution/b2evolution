@@ -1551,7 +1551,7 @@ function debug_info( $force = false )
 		{ // don't display changing items when we want to test obhandler
 
 			// Timer table:
-			$time_page = $Timer->get_duration( 'main' );
+			$time_page = $Timer->get_duration( 'total' );
 			$timer_rows = array();
 			foreach( $Timer->get_categories() as $l_cat )
 			{
@@ -1937,6 +1937,8 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  */
 function action_icon( $title, $icon, $url, $word = NULL )
 {
+	global $IconLegend;
+
 	$r = '<a href="'.$url.'" title="'.$title.'"';
 	if( get_icon( $icon, 'rollover' ) )
 	{
@@ -1948,7 +1950,12 @@ function action_icon( $title, $icon, $url, $word = NULL )
 		$r .= $word;
 	}
 	$r .= '</a> ';
-
+	
+	if( isset( $IconLegend ) )
+	{
+		$IconLegend->add_icon( $icon, $title );
+	}
+	
 	return $r;
 }
 
@@ -2383,6 +2390,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.165  2005/12/30 20:13:40  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.164  2005/12/21 20:39:04  fplanque
  * minor
  *

@@ -175,7 +175,7 @@ class ItemList extends DataObjectList
 		$timestamp_max = 'now',     // Do not show posts after this timestamp
 		$title = '',                // urltitle of post to display
 		$dstart = '',               // YearMonth(Day) to start at, '' for first available
-		$cache_name = '#',					//
+		$cache_name = '#',					// name of cache to be used
 		$params = array() )					// List of other params ( client_link, ...)
 	{
 		global $DB, $object_def;
@@ -874,6 +874,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.47  2005/12/30 20:13:40  fplanque
+ * UI changes mostly (need to double check sync)
+ *
  * Revision 1.46  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
