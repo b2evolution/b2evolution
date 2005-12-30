@@ -338,20 +338,8 @@ function upgrade_b2evo_tables()
 		}
 
 		// Create locales
-		echo 'Creating table for Locales... ';
-		$query = "CREATE TABLE T_locales (
-				loc_locale varchar(20) NOT NULL default '',
-				loc_charset varchar(15) NOT NULL default 'iso-8859-1',
-				loc_datefmt varchar(10) NOT NULL default 'y-m-d',
-				loc_timefmt varchar(10) NOT NULL default 'H:i:s',
-				loc_name varchar(40) NOT NULL default '',
-				loc_messages varchar(20) NOT NULL default '',
-				loc_priority tinyint(4) UNSIGNED NOT NULL default '0',
-				loc_enabled tinyint(4) NOT NULL default '1',
-				PRIMARY KEY loc_locale( loc_locale )
-			) COMMENT='saves available locales'";
-		$DB->query( $query );
-		echo "OK.<br />\n";
+		create_locales();
+
 
 		echo 'Upgrading posts table... ';
 		$query = "UPDATE T_posts
@@ -673,12 +661,6 @@ function upgrade_b2evo_tables()
 
 		set_upgrade_checkpoint( '9000' );
 
-		if( $new_db_version < 9100 )
-		{ // We cannot install Plugins before having T_pluginevents created (comes with 9100)
-			// TODO: blueyed>> this is so hackish.. :/
-			// INSTALL PLUGINS:
-			install_basic_plugins();
-		}
 	}
 
 
@@ -708,6 +690,15 @@ function upgrade_b2evo_tables()
 		             WHERE bloggroup_group_ID = 1' );
 		echo "OK.<br />\n";
 
+		if( $old_db_version >= 9000 )
+		{ // Uninstall all ALPHA (potentially incompatible) plugins
+			// TODO !!!
+		}
+
+		// INSTALL PLUGINS:
+		install_basic_plugins();
+
+	/* fp> do we still need this?
 		echo 'Re-registering Plugins... ';
 		$Plugins = & new Plugins();
 		$Plugins->restart();
@@ -716,6 +707,7 @@ function upgrade_b2evo_tables()
 			$Plugins->set_empty_code_to_default( $Plugin );
 		}
 		echo "OK.<br />\n";
+	*/
 
 		// Fixes for MySQL strict mode: {{{
 		echo 'Altering Users table... ';
@@ -753,10 +745,6 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 		// }}}
 
-		if( $old_db_version < 9000 )
-		{ // Basic plugins not installed from Phoenix Alpha
-			install_basic_plugins();
-		}
 	}
 
 
@@ -782,6 +770,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.116  2005/12/30 18:08:24  fplanque
+ * no message
+ *
  * Revision 1.115  2005/12/29 20:20:02  blueyed
  * Renamed T_plugin_settings to T_pluginsettings
  *

@@ -99,4 +99,10 @@ function db_delete()
 	$DB->query( 'DROP TABLE IF EXISTS T_useragents' );
 }
 
+/*
+ * $Log$
+ * Revision 1.26  2005/12/30 18:08:24  fplanque
+ * no message
+ *
+ */
 ?>

@@ -249,6 +249,12 @@ function create_b2evo_tables()
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
+
+	// Additionnal tables:
+	create_antispam();
+	create_locales();
+	create_b2evo_tables_phoenix();
+
 	echo 'Creating plugins table... ';
 	$DB->query( "CREATE TABLE T_plugins (
 			plug_ID        INT(11) UNSIGNED NOT NULL auto_increment,
@@ -259,27 +265,6 @@ function create_b2evo_tables()
 		)");
 	echo "OK.<br />\n";
 
-
-	echo 'Creating table for Locales... ';
-	$query = "CREATE TABLE T_locales (
-			loc_locale varchar(20) NOT NULL default '',
-			loc_charset varchar(15) NOT NULL default 'iso-8859-1',
-			loc_datefmt varchar(10) NOT NULL default 'y-m-d',
-			loc_timefmt varchar(10) NOT NULL default 'H:i:s',
-			loc_startofweek TINYINT UNSIGNED NOT NULL DEFAULT 1,
-			loc_name varchar(40) NOT NULL default '',
-			loc_messages varchar(20) NOT NULL default '',
-			loc_priority tinyint(4) UNSIGNED NOT NULL default '0',
-			loc_enabled tinyint(4) NOT NULL default '1',
-			PRIMARY KEY loc_locale( loc_locale )
-		) COMMENT='saves available locales'";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
-	// Additionnal tables:
-	create_antispam();
-	create_b2evo_tables_phoenix();
 	create_b2evo_tables_phoenix_beta();
 
 	// Create relations:
@@ -317,6 +302,33 @@ function create_antispam()
 	"('paris-hilton'), ('parishilton'), ('camgirls'), ('adult-models')";
 	$DB->query( $query );
 	echo "OK.<br />\n";
+}
+
+/**
+ * Create DB table for locales.
+ *
+ * Used when creating full install and upgrading from earlier versions
+ */
+function create_locales()
+{
+	global $DB;
+
+	echo 'Creating table for Locales... ';
+	$query = "CREATE TABLE T_locales (
+		loc_locale varchar(20) NOT NULL default '',
+		loc_charset varchar(15) NOT NULL default 'iso-8859-1',
+		loc_datefmt varchar(10) NOT NULL default 'y-m-d',
+		loc_timefmt varchar(10) NOT NULL default 'H:i:s',
+		loc_startofweek TINYINT UNSIGNED NOT NULL DEFAULT 1,
+		loc_name varchar(40) NOT NULL default '',
+		loc_messages varchar(20) NOT NULL default '',
+		loc_priority tinyint(4) UNSIGNED NOT NULL default '0',
+		loc_enabled tinyint(4) NOT NULL default '1',
+		PRIMARY KEY loc_locale( loc_locale )
+	) COMMENT='saves available locales'";
+	$DB->query( $query );
+	echo "OK.<br />\n";
+
 }
 
 
@@ -928,7 +940,7 @@ function populate_main_tables()
 
 
 /**
- * Create new tables for "Phoenix" version.
+ * Create new tables for "Phoenix Alpha" version.
  *
  * If any of these tables needs to be ALTERed later:
  *  - Take the CREATE statement out here and keep the clean/whole one with create_b2evo_tables()
@@ -1350,6 +1362,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.166  2005/12/30 18:08:24  fplanque
+ * no message
+ *
  * Revision 1.165  2005/12/29 20:20:01  blueyed
  * Renamed T_plugin_settings to T_pluginsettings
  *

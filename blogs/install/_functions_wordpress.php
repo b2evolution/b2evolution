@@ -142,4 +142,10 @@ function upgrade_cafelog_tables()
 
 }
 
+/*
+ * $Log$
+ * Revision 1.16  2005/12/30 18:08:24  fplanque
+ * no message
+ *
+ */
 ?>

@@ -112,4 +112,10 @@ function cleanup_comment_quotes()
 }
 
 
+/*
+ * $Log$
+ * Revision 1.10  2005/12/30 18:08:24  fplanque
+ * no message
+ *
+ */
 ?>

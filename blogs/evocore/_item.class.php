@@ -882,6 +882,9 @@ class Item extends DataObject
 		}
 
 		// Apply rendering
+		// fp> Why has this been removed???
+		//$post_renderers = $Plugins->validate_list( $this->renderers );
+		//$output = $Plugins->render( $output, $post_renderers, $format );
 		$output = $Plugins->render( $output, $this->renderers, $format );
 
 		// Character conversions
@@ -2262,6 +2265,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.80  2005/12/30 18:08:24  fplanque
+ * no message
+ *
  * Revision 1.79  2005/12/22 23:13:40  blueyed
  * Plugins' API changed and handling optimized
  *
