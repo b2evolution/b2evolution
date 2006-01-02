@@ -1,6 +1,6 @@
 <?php
 /**
- * This file sets various arrays and variables for use in b2evolution.
+ * This file sets various general purpose arrays and global variables for use in the app.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -43,9 +43,6 @@
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
-
-
-$new_db_version = 9100;				// next time: 9200
 
 
 // Investigation for following code by Isaac - http://isaac.beigetower.org/
@@ -249,6 +246,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.28  2006/01/02 19:43:57  fplanque
+ * just a little new year cleanup
+ *
  * Revision 1.27  2005/12/14 19:36:16  fplanque
  * Enhanced file management
  *

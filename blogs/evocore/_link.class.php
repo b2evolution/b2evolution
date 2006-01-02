@@ -47,8 +47,6 @@ class Link extends DataObject
 {
 	var $ltype_ID = 0;
 	var $Item;
-	var $Contact;
-	var $Firm;
 	var $File;
 
 
@@ -96,25 +94,6 @@ class Link extends DataObject
 			return 'file';
 		}
 
-		if( !is_null($this->Contact) )
-		{
-			return 'contact';
-		}
-
- 		if( !is_null($this->Establishment) )
-		{
-			return 'establishment';
-		}
-
- 		if( !is_null($this->Firm) )
-		{
-			return 'firm';
-		}
-
- 		if( !is_null($this->Task) )
-		{
-			return 'task';
-		}
 
 		return 'unkown';
 	}
@@ -123,6 +102,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2006/01/02 19:43:57  fplanque
+ * just a little new year cleanup
+ *
  * Revision 1.12  2005/12/14 19:36:16  fplanque
  * Enhanced file management
  *

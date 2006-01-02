@@ -15,6 +15,15 @@ $app_name = 'b2evolution';
 $app_shortname = 'b2evo';
 $app_version = '1.7-Beta';
 
+
+/**
+ * This is used to check if the database is up to date.
+ *
+ * This will be incrememented by 100 with each normal release in order to leave space for maintenance releases.
+ */
+$new_db_version = 9100;
+
+
 $admin_path_seprator = ' :: ';
 $app_admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website").
 									'"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution" title="'.

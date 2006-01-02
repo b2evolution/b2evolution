@@ -611,9 +611,7 @@ switch( $action )
 
 			$Messages->add( T_('Selected file has been linked to item.'), 'success' );
 		}
-		// Plug extensions here!
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// Plug extensions/hacks here!
 		else
 		{	// No Item to link to - end link_item mode.
 			$Fileman->fm_mode = NULL;
@@ -1343,6 +1341,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.153  2006/01/02 19:43:57  fplanque
+ * just a little new year cleanup
+ *
  * Revision 1.152  2005/12/19 04:36:16  blueyed
  * Fix using textarea_replace_selection() for IE from a popup.
  *

@@ -316,6 +316,12 @@ require_once dirname(__FILE__).'/_form.funcs.php';
 require_once dirname(__FILE__).'/_form.class.php';
 require_once dirname(__FILE__).'/_itemquery.class.php';
 require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_swfcharts.php';
+/**
+ * Icon Legend
+ */
+require_once dirname(__FILE__).'/_iconlegend.class.php';
+$IconLegend = new IconLegend();
+
 
 /**
  * Plug-ins init:
@@ -515,6 +521,9 @@ $Timer->pause( 'main.inc');
 
 /*
  * $Log$
+ * Revision 1.76  2006/01/02 19:43:57  fplanque
+ * just a little new year cleanup
+ *
  * Revision 1.75  2005/12/30 20:13:40  fplanque
  * UI changes mostly (need to double check sync)
  *

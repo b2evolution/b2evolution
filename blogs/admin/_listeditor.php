@@ -252,7 +252,7 @@ switch( $action )
 		$creating = true;
 }
 
-$Form = & new form( '', 'form' );
+$Form = & new form( '', 'leditor_checkchanges' );
 
 $Form->begin_form( 'fform', $creating ? T_('New entry') : T_('Edit entry') );
 
@@ -264,7 +264,7 @@ if( $action == 'edit' )
 	$Form->info( T_('ID'), $ID );
 }
 
-$Form->text( 'name', $name, min(40,$edited_name_maxlen), T_('Name'), '', $edited_name_maxlen );
+$Form->text_input( 'name', $name, min(40,$edited_name_maxlen), T_('Name'), array( 'maxlength'=>$edited_name_maxlen, 'required'=>true ) );
 
 if( $creating )
 {
