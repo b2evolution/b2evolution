@@ -742,7 +742,14 @@ class ItemList2 extends DataObjectList2
 		// ASSIGNEES:
 		if( !empty($this->filters['assignees']) )
 		{
-			$title_array[] = T_('Assigned to').': '.$this->filters['assignees'];
+			if( $this->filters['assignees'] == '-' )
+			{
+				$title_array[] = T_('Not assigned');
+			}
+			else
+			{
+				$title_array[] = T_('Assigned to').': '.$this->filters['assignees'];
+			}
 		}
 
 
@@ -888,6 +895,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.10  2006/01/04 19:18:15  fplanque
+ * allow filtering on assignees
+ *
  * Revision 1.9  2006/01/04 19:07:48  fplanque
  * allow filtering on assignees
  *
