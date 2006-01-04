@@ -1641,9 +1641,9 @@ class Item extends DataObject
 	 */
 	function type( $before = '', $after = '', $format = 'htmlbody' )
 	{
-		global $itemTypeCache, $object_def;
+		global $ItemTypeCache, $object_def;
 
-		$Element = & $itemTypeCache->get_by_ID( $this->typ_ID, true, !$object_def[$this->objtype]['allow_null']['typ_ID'] /* Do we allow NULL statuses for this object?: */ );
+		$Element = & $ItemTypeCache->get_by_ID( $this->typ_ID, true, !$object_def[$this->objtype]['allow_null']['typ_ID'] /* Do we allow NULL statuses for this object?: */ );
 		if( !$Element )
 		{ // No status:
 			return;
@@ -2219,7 +2219,7 @@ class Item extends DataObject
 	 */
 	function get( $parname )
 	{
-		global $itemTypeCache, $itemStatusCache, $object_def, $post_statuses;
+		global $ItemTypeCache, $ItemStatusCache, $object_def, $post_statuses;
 
 		switch( $parname )
 		{
@@ -2236,7 +2236,7 @@ class Item extends DataObject
 				return T_( $post_statuses[$this->status] );
 
 			case 't_extra_status':
-				if( ! ($Element = & $itemStatusCache->get_by_ID( $this->st_ID, true,
+				if( ! ($Element = & $ItemStatusCache->get_by_ID( $this->st_ID, true,
 							/* Do we allow NULL statuses for this object?: */ !$object_def[$this->objtype]['allow_null']['st_ID'] ) ) )
 				{ // No status:
 					return '';
@@ -2250,7 +2250,7 @@ class Item extends DataObject
 					return '';
 				}
 
-				$type_Element = & $itemTypeCache->get_by_ID( $this->typ_ID );
+				$type_Element = & $ItemTypeCache->get_by_ID( $this->typ_ID );
 				return $type_Element->name_return();
 
 			case 't_priority':
@@ -2266,6 +2266,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.82  2006/01/04 20:35:14  fplanque
+ * no message
+ *
  * Revision 1.81  2005/12/30 21:39:03  blueyed
  * fix/todo
  *

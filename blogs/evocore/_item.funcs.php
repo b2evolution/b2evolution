@@ -914,7 +914,8 @@ function cat_select_before_each( $cat_ID, $level )
 		{	// We want a form field:
 			$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
 						.T_('Select as an additional category').'" value="'.$cat_ID.'"';
-			if( ($cat_ID == $default_main_cat) || (in_array( $cat_ID, $post_extracats )) )
+			// if( ($cat_ID == $default_main_cat) || (in_array( $cat_ID, $post_extracats )) )  <--- We don't want to precheck the default cat because it will stay checked if we change the default main. On edit, the checkbox will always be in the array.
+			if( (in_array( $cat_ID, $post_extracats )) )
 			{
 				$r .= ' checked="checked"';
 			}
@@ -956,6 +957,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.44  2006/01/04 20:35:14  fplanque
+ * no message
+ *
  * Revision 1.43  2006/01/04 15:03:52  fplanque
  * enhanced list sorting capabilities
  *

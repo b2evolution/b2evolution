@@ -149,7 +149,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	echo ' ';
 
-	$Form->select_object( 'item_typ_ID', $edited_Item->typ_ID, $itemTypeCache, T_('Type') );
+	$Form->select_object( 'item_typ_ID', $edited_Item->typ_ID, $ItemTypeCache, T_('Type') );
 
 	echo ' ';
 
@@ -246,7 +246,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->begin_fieldset( T_('Workflow properties') );
 
 	$Form->select_options( 'item_st_ID',
-												$itemStatusCache->option_list_return( $edited_Item->st_ID, ! $edited_Item->st_required ),
+												$ItemStatusCache->option_list_return( $edited_Item->st_ID, ! $edited_Item->st_required ),
 												 T_('Task status') );
 
 	echo ' '; // allow wrapping!
@@ -396,6 +396,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.44  2006/01/04 20:35:14  fplanque
+ * no message
+ *
  * Revision 1.43  2005/12/16 13:35:58  fplanque
  * no message
  *

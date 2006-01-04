@@ -237,7 +237,7 @@ class ItemList extends DataObjectList
 		$this->ItemQuery->where_chapter( $blog, $cat, $catsel );
 
 		// Restrict to the statuses we want to show:
-		$this->ItemQuery->where_status( $show_statuses );
+		$this->ItemQuery->where_visibility( $show_statuses );
 
 		// Restrict to selected authors:
 		$this->ItemQuery->where_author( $author );
@@ -874,6 +874,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.48  2006/01/04 20:35:14  fplanque
+ * no message
+ *
  * Revision 1.47  2005/12/30 20:13:40  fplanque
  * UI changes mostly (need to double check sync)
  *

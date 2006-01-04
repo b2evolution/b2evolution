@@ -305,8 +305,8 @@ $FileRootCache = & new FileRootCache();
 $FiletypeCache = & new FiletypeCache();
 $GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name' );
 $ItemCache = & new ItemCache();
-$itemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
-$itemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
+$ItemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
+$ItemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
 $LinkCache = & new LinkCache();
 $UserCache = & new UserCache();
 
@@ -521,6 +521,9 @@ $Timer->pause( 'main.inc');
 
 /*
  * $Log$
+ * Revision 1.77  2006/01/04 20:35:14  fplanque
+ * no message
+ *
  * Revision 1.76  2006/01/02 19:43:57  fplanque
  * just a little new year cleanup
  *

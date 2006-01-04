@@ -392,7 +392,7 @@ function cat_load_cache( $cat_load_postcounts = 'none', $dbtable_items = 'T_post
 function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'post_ID' )
 {
 	global $DB, $cache_categories;
-	global $blog, $show_statuses, $author;
+	global $blog, $show_statuses, $author, $assgn, $status;
 	global $m, $w, $dstart, $timestamp_min, $timestamp_max;
 	global $s, $sentence, $exact;
 	global $cat_postcounts_loaded;
@@ -420,10 +420,16 @@ function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_po
 			$ItemQuery->where_chapter( $blog, '', array() );
 
 			// * Restrict to the statuses we want to show:
-			$ItemQuery->where_status( $show_statuses );
+			$ItemQuery->where_visibility( $show_statuses );
 
 			// Restrict to selected authors:
 			$ItemQuery->where_author( $author );
+
+			// Restrict to selected assignees:
+			$ItemQuery->where_assignees( $assgn );
+
+			// Restrict to selected satuses:
+			$ItemQuery->where_statuses( $status );
 
 			// - - - + * * timestamp restrictions:
 			$ItemQuery->where_datestart( $m, $w, $dstart, '', $timestamp_min, $timestamp_max );
@@ -437,7 +443,7 @@ function cat_load_postcounts( $cat_load_postcounts = 'canonic', $dbtable = 'T_po
 			$ItemQuery->where_chapter( $blog, '', array() );
 
 			// * Restrict to the statuses we want to show:
-			$ItemQuery->where_status( $show_statuses );
+			$ItemQuery->where_visibility( $show_statuses );
 
 			// - - - + * * timestamp restrictions:
 			$ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
@@ -947,6 +953,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.30  2006/01/04 20:35:14  fplanque
+ * no message
+ *
  * Revision 1.29  2005/12/30 20:13:39  fplanque
  * UI changes mostly (need to double check sync)
  *
