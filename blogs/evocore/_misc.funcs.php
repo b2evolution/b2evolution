@@ -1025,11 +1025,11 @@ function param( $var, $type = '', $default = '', $memorize = false,
 
 
 /**
- *
+ * Memorize a parameter for automatic future use in regenerate_url()
  */
 function memorize_param( $var, $type, $default, $value = NULL )
 {
-	global $Debuglog, $global_param_list;
+	global $Debuglog, $global_param_list, $$var;
 
 	if( !isset($global_param_list) )
 	{ // Init list if necessary:
@@ -2390,6 +2390,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.166  2006/01/04 15:02:10  fplanque
+ * better filtering design
+ *
  * Revision 1.165  2005/12/30 20:13:40  fplanque
  * UI changes mostly (need to double check sync)
  *

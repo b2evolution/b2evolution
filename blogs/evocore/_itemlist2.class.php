@@ -147,14 +147,6 @@ class ItemList2 extends DataObjectList2
 	function set_default_filters( $default_filters )
 	{
 		$this->default_filters = array_merge( $this->default_filters, $default_filters );
-
-		// The current filter set is the default filter set for now:
-		$this->filters = $this->default_filters;
-
-		// For compatibility with parent class:
- 		$this->unit = $this->filters['unit'];
-		$this->limit = $this->filters['posts'];
-		$this->page = $this->filters['page'];
 	}
 
 
@@ -178,60 +170,59 @@ class ItemList2 extends DataObjectList2
 		 * Blog & Chapters/categories restrictions:
 		 */
 		// Get chapters/categories (and compile those values right away)
-		$Request->set_param( 'cat_array', $this->filters['cat_array'] );
-		$Request->set_param( 'cat_modifier', $this->filters['cat_modifier'] );
- 		$Request->set_param( 'cat', $this->filters['cat_modifier'].implode(',',$this->filters['cat_array']) );  // List of authors to restrict to
+ 		$Request->memorize_param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], $this->filters['cat_modifier'] );  // List of authors to restrict to
+		$Request->memorize_param( 'cat_array', 'array', $this->default_filters['cat_array'], $this->filters['cat_array'] );
 
 		/*
 		 * Restrict to selected authors:
 		 */
-		$Request->set_param( 'author', $this->filters['authors'] );  // List of authors to restrict to
+		$Request->memorize_param( 'author', 'string', $this->default_filters['authors'], $this->filters['authors'] );  // List of authors to restrict to
 
 		/*
 		 * Restrict by keywords
 		 */
-		$Request->set_param( 's', $this->filters['keywords'] );			 // Search string
-		$Request->set_param( 'sentence', $this->filters['phrase'] ); // Search for sentence or for words
-		$Request->set_param( 'exact', $this->filters['exact'] );     // Require exact match of title or contents
+		$Request->memorize_param( 's', 'string', $this->default_filters['keywords'], $this->filters['keywords'] );			 // Search string
+		$Request->memorize_param( 'sentence', 'string', $this->default_filters['phrase'], $this->filters['phrase'] ); // Search for sentence or for words
+		$Request->memorize_param( 'exact', 'integer', $this->default_filters['exact'], $this->filters['exact'] );     // Require exact match of title or contents
 
 		/*
 		 * Specific Item selection?
 		 */
-		$Request->set_param( 'm', $this->filters['ymdhms'] );          // YearMonth(Day) to display
-		$Request->set_param( 'w', $this->filters['week'] );            // Week number
-		$Request->set_param( 'dstart', $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
+		$Request->memorize_param( 'm', 'integer', $this->default_filters['ymdhms'], $this->filters['ymdhms'] );          // YearMonth(Day) to display
+		$Request->memorize_param( 'w', 'integer', $this->default_filters['week'], $this->filters['week'] );            // Week number
+		$Request->memorize_param( 'dstart', 'integer', $this->default_filters['ymdhms_min'], $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
 
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
 		if( is_null($this->default_filters['ts_min'])
 			&& is_null($this->default_filters['ts_max'] ) )
 		{	// We have not set a strict default -> we allow overridding:
-    	$Request->set_param( 'show_past', ($this->filters['ts_min'] == 'now') ? 0 : 1 );
-			$Request->set_param( 'show_future', ($this->filters['ts_max'] == 'now') ? 0 : 1 );
+    	$Request->memorize_param( 'show_past', 'integer', 0, ($this->filters['ts_min'] == 'now') ? 0 : 1 );
+			$Request->memorize_param( 'show_future', 'integer', 0, ($this->filters['ts_max'] == 'now') ? 0 : 1 );
 		}
 
     /*
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
-		$Request->set_param( 'show_status', $this->filters['show_statuses_array'] );	// Array of sharings to restrict to
+		$Request->memorize_param( 'show_status', 'array', $this->default_filters['show_statuses_array'], $this->filters['show_statuses_array'] );	// Array of sharings to restrict to
 
 		/*
 		 * OLD STYLE orders:
 		 */
-		$Request->set_param( 'order', $this->filters['order'] );   		// ASC or DESC
-		$Request->set_param( 'orderby', $this->filters['orderby'] );  // list of fields to order by (TODO: change that crap)
+		$Request->set_param( 'order', '/^(ASC|asc|DESC|desc)$/', $this->default_filters['order'], $this->filters['order'] );   		// ASC or DESC
+		$Request->set_param( 'orderby', '/^([A-Za-z0-9]+([ ,][A-Za-z0-9]+)*)?$/', $this->default_filters['orderby'], $this->filters['orderby'] );  // list of fields to order by (TODO: change that crap)
 
 		/*
 		 * Paging limits:
 		 */
- 		$Request->set_param( 'unit', $this->filters['unit'] );    		// list unit: 'posts' or 'days'
-		$this->unit = $this->filters['unit'];	// TEMPORARy
+ 		$Request->set_param( 'unit', 'string', $this->default_filters['unit'], $this->filters['unit'] );    		// list unit: 'posts' or 'days'
+		$this->unit = $this->filters['unit'];	// TEMPORARY
 
-		$Request->set_param( 'posts', $this->filters['posts'] ); 			// # of units to display on the page
+		$Request->set_param( 'posts', 'integer', $this->default_filters['posts'], $this->filters['posts'] ); 			// # of units to display on the page
 		$this->limit = $this->filters['posts']; // for compatibility with parent class
 
 		// 'paged'
-		$Request->set_param( $this->page_param, $this->filters['page'] );      // List page number in paged display
+		$Request->set_param( $this->page_param, 'integer', 1, $this->filters['page'] );      // List page number in paged display
 		$this->page = $this->filters['page'];
 	}
 
@@ -239,15 +230,32 @@ class ItemList2 extends DataObjectList2
 	/**
 	 * Init filter params from Request params
 	 *
-	 * @param boolean
-	 * @return boolean true if loaded data seems valid.
+	 * @return boolean true if we could apply a filterset based on Request params (either explciit or reloaded)
 	 */
-	function load_from_Request( $fallback_to_saved_filters = true )
+	function load_from_Request()
 	{
 	  /**
 	   * @var Request
 	   */
 		global $Request;
+
+
+		// Do we want to restore filters or do we want to create a new filterset
+		$filter_action = $Request->param( 'filter', 'string', 'save' );
+		// echo ' filter action: ['.$filter_action.'] ';
+		switch( $filter_action )
+		{
+			case 'restore':
+				return $this->restore_filterset();
+
+			case 'reset':
+				// We want to reset the memorized filterset:
+				global $Session;
+				$Session->delete( $this->filterset_name );
+				// We have applied no filterset:
+				return false;
+		}
+
 
 		/*
 		 * Blog & Chapters/categories restrictions:
@@ -289,8 +297,11 @@ class ItemList2 extends DataObjectList2
 		$this->filters['ymdhms'] = $Request->param( 'm', 'integer', $this->default_filters['ymdhms'], true );          // YearMonth(Day) to display
 		$this->filters['week'] = $Request->param( 'w', 'integer', $this->default_filters['week'], true );            // Week number
 		$this->filters['ymdhms_min'] = $Request->param( 'dstart', 'integer', $this->default_filters['ymdhms_min'], true ); // YearMonth(Day) to start at
+		$this->filters['ymdhms_max'] = $this->default_filters['ymdhms_max']; // YearMonth(Day) to stop at
 
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
+		$this->filters['ts_min'] = $this->default_filters['ts_min'];
+		$this->filters['ts_max'] = $this->default_filters['ts_max'];
 		if( is_null($this->default_filters['ts_min'])
 			&& is_null($this->default_filters['ts_max'] ) )
 		{	// We have not set a strict default -> we allow overridding:
@@ -346,21 +357,14 @@ class ItemList2 extends DataObjectList2
 			return true;
 		}
 
-		// echo 'Is filtered? '.($this->is_filtered() ? 'yes' : 'no');
-
-		if( $this->is_filtered() )
-		{	// We have an active filter:
-			// Let's memorize that filter into the session:
-			$this->save_filterset();
-		}
-		elseif( $fallback_to_saved_filters )
-		{	// No requested filter set and we want to try and load a previously used filter set:
-			$this->restore_filterset();
-		}
-
+		// echo ' Got filters from URL?:'.($this->is_filtered() ? 'YES' : 'NO');
 		//pre_dump( $this->default_filters );
 		//pre_dump( $this->filters );
 
+		if( $filter_action == 'save' )
+		{
+			$this->save_filterset();
+		}
 
 		return true;
 	}
@@ -371,6 +375,9 @@ class ItemList2 extends DataObjectList2
    */
 	function save_filterset()
 	{
+    /**
+  	 * @var Session
+  	 */
 		global $Session;
 
 		// echo 'saving filterset';
@@ -402,7 +409,7 @@ class ItemList2 extends DataObjectList2
 			return false;
 		}
 
-		// echo 'restoring filterset';
+		// echo ' restoring filterset ';
 
 		// Restore filters:
 		$this->set_filters( $filters );
@@ -420,10 +427,19 @@ class ItemList2 extends DataObjectList2
 	{
 		global $DB;
 
+
 		if( !is_null( $this->rows ) )
 		{ // Query has already executed:
 			return;
 		}
+
+
+		if( empty( $this->filters ) )
+		{	// Filters have no been set before, we'll use the default filterset:
+			echo ' Query:Setting default filterset ';
+			$this->set_filters( $this->default_filters );
+		}
+
 
 		// echo '<br />ItemList2 query';
 
@@ -595,6 +611,14 @@ class ItemList2 extends DataObjectList2
   function get_filter_titles()
   {
 		global $month, $post_statuses;
+
+
+		if( empty( $this->filters ) )
+		{	// Filters have no been set before, we'll use the default filterset:
+			// echo ' setting default filterset ';
+			$this->set_filters( $this->default_filters );
+		}
+
 
   	$title_array = array();
 
@@ -843,6 +867,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.8  2006/01/04 15:02:10  fplanque
+ * better filtering design
+ *
  * Revision 1.7  2005/12/30 20:13:40  fplanque
  * UI changes mostly (need to double check sync)
  *

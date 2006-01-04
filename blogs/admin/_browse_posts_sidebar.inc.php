@@ -66,7 +66,7 @@ echo '<div class="browse_side_item">';
 		echo '<h3>'.T_('Filters').'</h3>';
 
 		// TODO: style this better...
-		echo '<p><a href="'.$pagenow.'?blog='.$blog.'&action=filter_reset">'.T_('Reset all filters!').'</a></p>';
+		echo '<p><a href="'.$pagenow.'?blog='.$blog.'&amp;filter=reset">'.T_('Reset all filters!').'</a></p>';
 
 		$Form->hidden( 'tab', $tab );
 		$Form->hidden( 'blog', $blog );
@@ -190,7 +190,7 @@ echo '<div class="browse_side_item">';
 		$Form->submit( array( 'submit', T_('Search'), 'search' ) );
 
 		// TODO: style this better:
-		echo '<a href="'.$pagenow.'?blog='.$blog.'&action=filter_reset" class="ActionButton">'.T_('Reset all filters!').'</a>';
+		echo '<a href="'.$pagenow.'?blog='.$blog.'&amp;filter=reset" class="ActionButton">'.T_('Reset all filters!').'</a>';
 
 	$Form->end_form();
 
@@ -198,6 +198,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.21  2006/01/04 15:02:10  fplanque
+ * better filtering design
+ *
  * Revision 1.20  2005/12/22 13:41:00  fplanque
  * Added clean filter_reset feature
  *

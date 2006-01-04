@@ -32,21 +32,6 @@ else
 	$AdminUI->title .= ' '.$Blog->dget( 'shortname' );
 
 
-	/*
-	 * Perform actions:
-	 */
-	switch( $action )
-	{
-		case 'filter_reset':
-    $filterset_name = 'ItemList_filters_'.$Blog->ID;
-
-		$Session->delete( $filterset_name );
-
-		break;
-
-	}
-
-
 	// This is used in the display templates
 	// TODO: have a method of some object ?
 	$add_item_url = 'b2edit.php?blog='.$blog;
@@ -159,7 +144,11 @@ else
 			$ItemList = & new ItemList2( $Blog, NULL, NULL );
 
 			// Init filter params:
-			$ItemList->load_from_Request();
+			if( ! $ItemList->load_from_Request() )
+			{ // If we could not init a filterset from request
+				// typically happens when we could no fall back to previously saved filterset...
+				// echo ' no filterset!';
+			}
 
 
 			if( $ItemList->single_post )
@@ -207,42 +196,12 @@ else
 	}
 }
 
-// Update Menus:
-$AdminUI->add_menu_entries(
-		'edit',
-		array(
-						'postlist' => array(
-							'text' => T_('Post list'),
-							'href' => regenerate_url( 'tab', 'tab=postlist' ),
-							),
-						'posts' => array(
-							'text' => T_('Full posts'),
-							'href' => regenerate_url( 'tab', 'tab=posts' ),
-							),
-						// EXPERIMENTAL:
-						'exp' => array(
-							'text' => T_('Experimental'),
-							'href' => regenerate_url( 'tab', 'tab=exp' ),
-							),
-						'tracker' => array(
-							'text' => T_('Tracker'),
-							'href' => regenerate_url( 'tab', 'tab=tracker' ),
-							),
-					/*	'commentlist' => array(
-							'text' => T_('Comment list'),
-							'href' => 'b2browse.php?tab=commentlist ), */
-						'comments' => array(
-							'text' => T_('Comments'),
-							'href' => regenerate_url( 'tab', 'tab=comments' ),
-							),
-				)
-	);
 
 
 $AdminUI->set_path( 'edit', $tab );
 
 // Generate available blogs list:
-$blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', 1, $pagenow.'?tab='.$tab.'&amp;blog=%d' );
+$blogListButtons = $AdminUI->get_html_collection_list( 'blog_ismember', 1, $pagenow.'?blog=%d&amp;tab='.$tab.'&amp;filter=restore' );
 
 require dirname(__FILE__).'/_menutop.php';
 

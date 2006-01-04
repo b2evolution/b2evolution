@@ -102,6 +102,8 @@ require_once dirname(__FILE__).'/'.$adminskins_subdir.$admin_skin.'/_adminUI.cla
 $AdminUI = & new AdminUI();
 
 // Construct the menu:
+// It is useful to have the whole structure in case we want to display DHTML drop down menus for example
+// Thus we should make this menu as complete as possible and change it as little as possible with dynamic functions later.
 $AdminUI->add_menu_entries(
 		NULL, // root
 		array(
@@ -113,11 +115,34 @@ $AdminUI->add_menu_entries(
 
 			'edit' => array(
 				'text'=>T_('Browse'),
-				'href'=>'b2browse.php?blog='.$blog,
+				'href'=>'b2browse.php?blog='.$blog.'&amp;filter=restore',
 				'style'=>'font-weight: bold;',
 				'entries' => array(
-					// Entries will be added here dynamically (and CONTEXTTUALLY) on the browsing page.
-				)
+						'postlist' => array(
+							'text' => T_('Post list'),
+							'href' => regenerate_url( 'tab', 'tab=postlist' ),
+							),
+						'posts' => array(
+							'text' => T_('Full posts'),
+							'href' => regenerate_url( 'tab', 'tab=posts' ),
+							),
+						// EXPERIMENTAL:
+						'exp' => array(
+							'text' => T_('Experimental'),
+							'href' => regenerate_url( 'tab', 'tab=exp&amp;filter=restore' ),
+							),
+						'tracker' => array(
+							'text' => T_('Tracker'),
+							'href' => regenerate_url( 'tab', 'tab=tracker&amp;filter=restore' ),
+							),
+					/*	'commentlist' => array(
+							'text' => T_('Comment list'),
+							'href' => 'b2browse.php?tab=commentlist ), */
+						'comments' => array(
+							'text' => T_('Comments'),
+							'href' => regenerate_url( 'tab', 'tab=comments' ),
+							),
+					)
 			),
 
 			'cats' => array(
@@ -249,6 +274,6 @@ $AdminUI->add_menu_entries(
 	);
 
 
-$Plugins->trigger_event( 'AdminInitMenu' );
+$Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 ?>

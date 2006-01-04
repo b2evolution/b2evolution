@@ -137,6 +137,19 @@ class Request
 	}
 
 
+  /**
+	 * Memorize a parameter for automatic future use in regenerate_url()
+	 */
+	function memorize_param( $var, $type, $default, $value = NULL )
+	{
+		memorize_param( $var, $type, $default, $value ); // note: will also set the global $$var if $valie is not NULL
+		if( !is_null($value) )
+		{
+			$this->params[$var] = $value;
+		}
+	}
+
+
 	/**
 	 * Extend a parameter with an array of params.
 	 *
@@ -751,6 +764,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.29  2006/01/04 15:02:10  fplanque
+ * better filtering design
+ *
  * Revision 1.28  2005/12/30 20:13:40  fplanque
  * UI changes mostly (need to double check sync)
  *
