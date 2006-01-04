@@ -501,12 +501,10 @@ function previous_posts_link($label='#', $page='')
  */
 function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
 {
-	global $p;
-	global $Settings, $MainList;
+	global $p, $Settings, $MainList;
 
 	if( !empty( $MainList->sql ) && empty($p) )
 	{
-		global $MainList;
 		$max_paged = $MainList->get_max_paged();
 		if( $max_paged > 1 )
 		{
@@ -958,6 +956,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.43  2006/01/04 15:03:52  fplanque
+ * enhanced list sorting capabilities
+ *
  * Revision 1.42  2005/12/14 19:22:57  fplanque
  * no message
  *

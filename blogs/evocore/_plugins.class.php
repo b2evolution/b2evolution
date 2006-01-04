@@ -141,7 +141,7 @@ class Plugins
 			'AdminDisplayEditorButton',
 			'AdminDisplayToolbar',
 			'AdminEndHtmlHead',
-			'AdminInitMenu',
+			'AdminAfterMenuInit',
 			'AdminToolAction',
 			'AdminToolPayload',
 
@@ -1484,6 +1484,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.19  2006/01/04 15:03:52  fplanque
+ * enhanced list sorting capabilities
+ *
  * Revision 1.18  2005/12/29 20:19:58  blueyed
  * Renamed T_plugin_settings to T_pluginsettings
  *

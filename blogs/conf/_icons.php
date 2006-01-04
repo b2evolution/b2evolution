@@ -61,7 +61,8 @@ $map_iconfiles = array(
 	),
 	'file_delete' => array(   // delete a file/folder
 		'file' => $rsc_subdir.'icons/filedelete.png',
-		'alt' => T_('Delete'),
+		'alt' => T_('Del'),
+		'legend'=>T_('Delete'),
 		'size' => array( 16, 16 ),
 	),
 	'file_perms' => array(    // edit permissions of a file
@@ -251,6 +252,7 @@ $map_iconfiles = array(
 	'delete' => array(
 		'file' => $rsc_subdir.'icons/delete.gif',
 		'alt' => T_('Del'),
+		'legend' => T_('Delete'),
 		'size' => array( 15, 15 ),
 	),
 	'close' => array(
@@ -280,11 +282,13 @@ $map_iconfiles = array(
 	'activate' => array(
 		'file' => $admin_subdir.'img/bullet_activate.png',
 		'alt' => T_('Act.'),
+		'legend' => T_('Activate'),
 		'size' => array( 17, 17 ),
 	),
  	'deactivate' => array(
 		'file' => $admin_subdir.'img/bullet_deactivate.png',
 		'alt' => T_('Deact.'),
+		'legend' => T_('Deactivate'),
 		'size' => array( 17, 17 ),
 	),
 
@@ -352,6 +356,33 @@ $map_iconfiles = array(
 		'file' => $rsc_subdir.'icons/nocomment.gif',
 		'alt' => T_('Comments'),
 		'size' => array( 15, 16 ),
+	),
+	
+	'move_up' => array( 
+		'file' => $rsc_subdir.'icons/move_up.gif',
+		'rollover' => true,
+		'alt' => T_( 'Up' ),
+		'size' => array( 12, 13 ),
+	),
+ 	'move_down' => array(
+		'file' => $rsc_subdir.'icons/move_down.gif',
+		'rollover' => true,
+		'alt' => T_( 'Down'),
+		'size' => array( 12, 13 ),
+	),
+	'nomove_up' => array(
+		'file' => $rsc_subdir.'icons/nomove_up.gif',
+		'alt' => T_( 'Sort by order' ),
+		'size' => array( 12, 13 ),
+	),
+	'nomove_down' => array(
+		'file' => $rsc_subdir.'icons/nomove_down.gif',
+		'alt' => T_( 'Sort by order' ),
+		'size' => array( 12, 13 ),
+	),
+	 	'nomove' => array(
+		'file' => $rsc_subdir.'icons/nomove.gif',
+		'size' => array( 12, 13 ),
 	),
 );
 

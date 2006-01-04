@@ -106,6 +106,23 @@ class Results extends Widget
 	 */
 	var $current_idx = 0;
 
+ 	/**
+	 * idx relative to whole list (range: 0 to total_rows-1)
+	 */
+	var $global_idx;
+
+ 	/**
+	 * Is this gobally the 1st item in the list? (NOT just the 1st in current page)
+	 */
+	var $global_is_first;
+
+ 	/**
+	 * Is this gobally the last item in the list? (NOT just the last in current page)
+	 * 
+	 */
+	var $global_is_last;
+	
+
 	/**
 	 * Cache to use to instantiate an object and cache it for each line of results.
 	 *
@@ -181,13 +198,17 @@ class Results extends Widget
 	 */
 	var $ID_col = '';
 
-
 	/**
 	 * URL param names
 	 */
 	var $param_prefix;
 	var $page_param;
 	var $order_param;
+
+	/**
+		* List of sortable fields
+		*/
+	var $order_field_list;
 
 
 	/**
@@ -213,6 +234,7 @@ class Results extends Widget
 		$this->param_prefix = $param_prefix;
 
 		// Count total rows:
+		// TODO: check if this can be done later instead
 		$this->count_total_rows( $count_sql );
 
 		if( $init_page )
@@ -239,11 +261,33 @@ class Results extends Widget
 		$this->query( $this->sql );
 
 		$this->current_idx = 0;
+			
+		$this->global_idx = (($this->page-1) * $this->limit) + $this->current_idx;
+		
+		$this->global_is_first = ( $this->global_idx <= 0 ) ? true : false;		
+
+		$this->global_is_last = ( $this->global_idx >= $this->total_rows-1 ) ? true : false;	
 
 		$this->current_group_ID = 0;
 	}
 
+	/**
+	 * Increment and update all necessary counters before processing a new line in result set
+	 */
+	function next_idx()
+	{
+		$this->current_idx++;
 
+		$this->global_idx = (($this->page-1) * $this->limit) + $this->current_idx;
+		
+		$this->global_is_first = ( $this->global_idx <= 0 ) ? true : false;		
+
+		$this->global_is_last = ( $this->global_idx >= $this->total_rows-1 ) ? true : false;		
+
+		return $this->current_idx;
+	}
+	
+	
 	/**
 	 * Run the query now!
 	 *
@@ -837,7 +881,8 @@ class Results extends Widget
 				$col_count++;
 			}
 			echo $this->params['line_end'];
-			$this->current_idx++;
+			
+			$this->next_idx();
 		}
 
 		echo $this->params['body_end'];
@@ -873,55 +918,58 @@ class Results extends Widget
 	 */
 	function get_order_field_list()
 	{
-		if( empty( $this->order ) )
-		{ // We have no user provided order:
-			if( empty( $this->cols ) )
-			{	// We have no columns to pick an automatic order from:
-				// echo 'Can\'t determine automatic order';
-				return '';
-			}
-
-			foreach( $this->cols as $col )
-			{
-				if( isset( $col['order'] ) )
-				{ // We have found the first orderable column:
-					$this->order .= 'A';
-					break;
+		if( is_null( $this->order_field_list ) )
+		{ // Order list is not defined yet
+			if( empty( $this->order ) )
+			{ // We have no user provided order:
+				if( empty( $this->cols ) )
+				{	// We have no columns to pick an automatic order from:
+					// echo 'Can\'t determine automatic order';
+					return '';
 				}
-				else
+
+				foreach( $this->cols as $col )
 				{
-					$this->order .= '-';
+					if( isset( $col['order'] ) )
+					{ // We have found the first orderable column:
+						$this->order .= 'A';
+						break;
+					}
+					else
+					{
+						$this->order .= '-';
+					}
+				}
+
+				if( empty( $this->cols ) )
+				{	// We did not find any column to order on...
+					return '';
 				}
 			}
 
-			if( empty( $this->cols ) )
-			{	// We did not find any column to order on...
-				return '';
-			}
-		}
+			// echo ' order='.$this->order.' ';
 
-		// echo ' order='.$this->order.' ';
+			$orders = array();
 
-		$orders = array();
+	    for( $i = 0; $i <= strlen( $this->order ); $i++ )
+	    {	// For each position in order string:
+				if( isset( $this->cols[$i]['order'] ) )
+				{	// if column is sortable:
+					switch( substr( $this->order, $i, 1 ) )
+					{
+						case 'A':
+							$orders[] = str_replace( ',', ' ASC,', $this->cols[$i]['order']).' ASC';
+							break;
 
-    for( $i = 0; $i <= strlen( $this->order ); $i++ )
-    {	// For each position in order string:
-			if( isset( $this->cols[$i]['order'] ) )
-			{	// if column is sortable:
-				switch( substr( $this->order, $i, 1 ) )
-				{
-					case 'A':
-						$orders[] = str_replace( ',', ' ASC,', $this->cols[$i]['order']).' ASC';
-						break;
-
-					case 'D':
-						$orders[] = str_replace( ',', ' DESC,', $this->cols[$i]['order']).' DESC';
-						break;
+						case 'D':
+							$orders[] = str_replace( ',', ' DESC,', $this->cols[$i]['order']).' DESC';
+							break;
+					}
 				}
 			}
+			$this->order_field_list = implode( ',', $orders );
 		}
-
-		return implode(',',$orders);	// May be empty
+		return $this->order_field_list;	// May be empty
 	}
 
 
@@ -933,6 +981,9 @@ class Results extends Widget
 	 * - £var£
 	 * - #var#
 	 * - {row}
+	 * - {global_idx}
+	 * - {global_is_first}
+	 * - {global_is_last}
 	 * - %func()%
 	 * - ¤func()¤
 	 */
@@ -948,6 +999,12 @@ class Results extends Widget
 		$content = preg_replace( '!\# (\w+) \#!ix', "\$row->$1", $content );
 		// Make variable substitution for full ROW:
 		$content = str_replace( '{row}', '$row', $content );
+		// Make variable substitution for full global_idx:
+		$content = str_replace( '{global_idx}', "\$this->global_idx", $content );
+		// Make variable substitution for full global_is_first:
+		$content = str_replace( '{global_is_first}', "\$this->global_is_first", $content );
+		// Make variable substitution for full global_is_last:
+		$content = str_replace( '{global_is_last}', "\$this->global_is_last", $content );
 		// Make callback function substitution:
 		$content = preg_replace( '#% (.+?) %#ix', "'.$1.'", $content );
 		// Sometimes we need embedded function call, so we provide a second sign:
@@ -956,10 +1013,97 @@ class Results extends Widget
 		$content = str_replace( '{Obj}', "\$this->current_Obj", $content );
 		// Make callback for Object method substitution:
 		$content = preg_replace( '#@ (.+?) @#ix', "'.\$this->current_Obj->$1.'", $content );
-
+		
+		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
+		
+		
 		return $content;
 	}
 
+	
+	function move_icons( )
+	{
+		$r = '';		
+	
+		$reg = '#^'.$this->param_prefix.'order (ASC|DESC).*#';
+		
+		if( preg_match( $reg, $this->order_field_list, $res ) )
+		{	// The table is sorted by the order column	
+			$sort = $res[1];
+			
+			// get the element ID
+			$idname = $this->param_prefix . 'ID';
+			$id = $this->rows[$this->current_idx]->$idname;
+		
+			// Move up arrow
+			if( $this->global_is_first )
+			{	// The element is the first so it can't move up, display a no move arrow
+				$r .= get_icon( 'nomove' ).' ';
+			}		
+			else
+			{
+				if(	$sort == 'ASC' )
+				{	// ASC sort, so move_up action for move up arrow
+					$action = 'move_up';
+					$alt = T_( 'Move up!' );
+					} 
+				else 
+				{	// Reverse sort, so action and alt are reverse too
+					$action = 'move_down';
+					$alt = T_('Move down! (reverse sort)');
+				}
+				$r .= action_icon( $alt, 'move_up', regenerate_url( 'action,'.$this->param_prefix.'ID' , $this->param_prefix.'ID='.$id.'&amp;action='.$action ) );
+			}
+			
+			// Move down arrow
+			if( $this->global_is_last )
+			{	// The element is the last so it can't move up, display a no move arrow
+				$r .= get_icon( 'nomove' ).' ';
+			}		
+			else
+			{
+				if(	$sort == 'ASC' )
+				{	// ASC sort, so move_down action for move down arrow
+					$action = 'move_down';
+					$alt = T_( 'Move down!' );
+				} 
+				else 
+				{ // Reverse sort, so action and alt are reverse too
+					$action = 'move_up';
+					$alt = T_('Move up! (reverse sort)');
+				}
+				$r .= action_icon( $alt, 'move_down', regenerate_url( 'action,'.$this->param_prefix.'ID', $this->param_prefix.'ID='.$id.'&amp;action='.$action ) );
+			}
+			
+			return $r;
+		}
+		else 
+		{	// The table is not sorted by the order column, so we display no move arrows
+			
+			if( $this->global_is_first )
+			{
+				// The element is the first so it can't move up, display a no move up arrow
+				$r = get_icon( 'nomove' ).' ';
+			}
+			else
+			{	// Display no move up arrow
+				$r = action_icon( T_( 'Sort by order' ), 'nomove_up', regenerate_url( 'action','action=sort_by_order' ) ); 
+			}
+			
+			if( $this->global_is_last )
+			{
+				// The element is the last so it can't move down, display a no move down arrow
+				$r .= get_icon( 'nomove' ).' ';
+			}
+			else
+			{ // Display no move down arrow
+				$r .= action_icon( T_( 'Sort by order' ), 'nomove_down', regenerate_url( 'action','action=sort_by_order' ) ); 
+			}
+			
+			return $r;
+		}
+	}
+	
 
 	/**
 	 * Widget callback for template vars.
@@ -1262,6 +1406,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.47  2006/01/04 15:03:53  fplanque
+ * enhanced list sorting capabilities
+ *
  * Revision 1.46  2005/12/30 20:13:40  fplanque
  * UI changes mostly (need to double check sync)
  *

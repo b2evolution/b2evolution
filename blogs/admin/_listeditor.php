@@ -60,7 +60,6 @@ if( !empty( $locked_IDs )
 }
 
 
-
 /**
  * Perform action:
  */
@@ -88,10 +87,32 @@ switch( $action )
 		$Request->param( 'name', 'string', true );
 		if( $Request->param_check_not_empty( 'name', T_('Please enter a string.') ) )
 		{
-			$DB->query( "
-				INSERT INTO $edited_table( $edited_table_namecol )
-				VALUES( ".$DB->quote($name).' )' );
+			$DB->begin();
 
+			if( !empty( $edited_table_ordercol ) )
+			{ // The element has an order field in database
+				if( $max_order = $DB->get_var( "SELECT MAX($edited_table_ordercol) FROM $edited_table" ) ) 
+				{	// The new element order must be the lastest
+					$max_order++;
+				}
+				else 
+				{ // There are no elements in the database yet, so his order is set to 1. 
+					$max_order = 1;
+				}
+			}
+			$DB->query( "
+				INSERT INTO $edited_table( $edited_table_namecol".
+				(isset( $edited_table_ordercol ) ? ', '.$edited_table_ordercol : '')
+			  .(isset( $edited_table_filtercol ) ? ', '.$edited_table_filtercol : '')
+				.')
+				VALUES( '.$DB->quote($name).
+				(isset( $edited_table_ordercol ) ? ', '.$max_order : '')
+				.(isset( $edited_table_filtercol ) ? ', '.$val_filtercol : '')
+				.' )' );
+			
+			$DB->commit();
+					
+					
 			$Messages->add( T_('Entry created.'), 'success' );
 			$name = '';
 		}
@@ -140,6 +161,132 @@ switch( $action )
 		}
 		$name = '';
 		break;
+		
+		
+	case 'move_up':
+		// Move up
+		$ID = param( $edited_table_prefix.'ID', 'integer', true );
+
+		$DB->begin();
+		
+		// Test if the ID exist and set his order
+		$order = $DB->get_var( "SELECT $edited_table_ordercol
+														 FROM $edited_table
+														WHERE $edited_table_IDcol = $ID" );
+		
+		if( $DB->num_rows != 1 )
+		{
+			$Messages->head = T_('Cannot edit entry!');
+			$Messages->add( T_('Requested entry does not exist any longer.'), 'error' );
+			$action = 'list';
+			$name = '';
+			$DB->commit();
+			break;
+			/* break */
+		}
+		
+		// Get the ID and the order of the inferior element which his order is the nearest   	
+		$rows = $DB->get_results( "SELECT $edited_table_IDcol, $edited_table_ordercol 
+														 	 	 FROM $edited_table
+																WHERE $edited_table_ordercol < $order"
+														.(isset( $edited_table_filtercol ) ? ' AND '.$edited_table_filtercol.' = '.$val_filtercol : 0)
+													." ORDER BY $edited_table_ordercol DESC 
+														 		LIMIT 0,1" );
+
+		if( count( $rows ) )
+		{
+			$name_ID = $edited_table_prefix.'ID';
+			$ID_inf = $rows[0]->$name_ID;
+			
+			$name_order = $edited_table_prefix.'order';
+			$order_inf = $rows[0]->$name_order;
+			
+			// Update the order of the ID
+			$DB->query( "UPDATE $edited_table 
+											SET $edited_table_ordercol = $order_inf
+										WHERE $edited_table_IDcol = $ID" );
+			
+			// Update the order of the inferior element
+			$DB->query( "UPDATE $edited_table 
+											SET $edited_table_ordercol = $order
+										WHERE $edited_table_IDcol = $ID_inf" );
+		}
+		else 
+		{
+			$Messages->add( T_('This element is already at the top.'), 'error' ); 
+		}	
+		
+		$DB->commit();
+			
+		$name = '';	
+		break;
+
+		
+	case 'move_down':
+		// Move up
+		$ID = param( $edited_table_prefix.'ID', 'integer', true );
+
+		$DB->begin();
+		
+		// Test if the ID exist and set his order
+		$order = $DB->get_var( "SELECT $edited_table_ordercol
+														 FROM $edited_table
+														WHERE $edited_table_IDcol = $ID" );
+		
+		if( $DB->num_rows != 1 )
+		{
+			$Messages->head = T_('Cannot edit entry!');
+			$Messages->add( T_('Requested entry does not exist any longer.'), 'error' );
+			$action = 'list';
+			$name = '';
+			$DB->commit();
+			break;
+			/* break */
+		}
+		
+		// Get the ID and the order of the inferior element which his order is the nearest   	
+		$rows = $DB->get_results( "SELECT $edited_table_IDcol, $edited_table_ordercol 
+														 	 	 FROM $edited_table
+																WHERE $edited_table_ordercol > $order"
+														.(isset( $edited_table_filtercol ) ? ' AND '.$edited_table_filtercol.' = '.$val_filtercol : 0)
+													." ORDER BY $edited_table_ordercol ASC 
+														 		LIMIT 0,1" );
+		
+		if( count( $rows ) )
+		{
+			$name_ID = $edited_table_prefix.'ID';
+			$ID_sup = $rows[0]->$name_ID;
+			
+			$name_order = $edited_table_prefix.'order';
+			$order_sup = $rows[0]->$name_order;
+			
+			// Update the order of the ID
+			$DB->query( "UPDATE $edited_table 
+											SET $edited_table_ordercol = $order_sup
+										WHERE $edited_table_IDcol = $ID" );
+			
+			// Update the order of the superior element
+			$DB->query( "UPDATE $edited_table 
+											SET $edited_table_ordercol = $order
+										WHERE $edited_table_IDcol = $ID_sup" );
+		}	
+		else 
+		{
+			$Messages->add( T_('This element is already at the bottom.'), 'error' ); 
+		}	
+			
+			
+		$DB->commit();
+			
+		$name = '';	
+		break;		
+		
+	case 'sort_by_order':
+		// The list is sorted by the order column now.
+		$Request->set_param( 'results_'.$edited_table_prefix.'order', '--A');
+		$name = '';
+		$action = 'list';
+		break;
 
 	default:
 		$name = '';
@@ -172,6 +319,10 @@ if( ($action == 'delete') && !$confirm )
 		$Form->hidden( 'action', 'delete' );
 		$Form->hidden( 'ID', $ID );
 		$Form->hidden( 'confirm', 1 );
+		
+		// We may need to use memorized params in the next page
+		$Form->hiddens_by_key( get_memorized( 'action,ID') );
+		
 		$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
 
@@ -190,11 +341,18 @@ if( ($action == 'delete') && !$confirm )
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
+// EXPERIMENTAL
+if ( !isset( $default_col_order ) )
+{ // The default order column is not set, so the default is the name column
+	$default_col_order = '-A-';
+}
 
 // Create result set:
-$Results = & new Results(	"SELECT $edited_table_IDcol, $edited_table_namecol
-														 FROM $edited_table
-														ORDER BY $edited_table_orderby" );
+$sql = "SELECT $edited_table_IDcol, $edited_table_namecol
+  			 	 FROM $edited_table"
+				. ( !empty( $edited_table_filtercol ) ? ' WHERE '.$edited_table_filtercol.' = '.$val_filtercol : '' ) ; 
+
+$Results = & new Results(	$sql, isset( $edited_table_prefix ) ? $edited_table_prefix : '',  $default_col_order );
 
 if( isset( $list_title ) )
 {
@@ -209,13 +367,28 @@ $Results->cols[] = array(
 		'td' => "\$$edited_table_IDcol\$",
 	);
 
+function link_name( $title , $ID )	
+{
+	return '<strong><a href="'.regenerate_url( 'action,ID', 'ID='.$ID.'&amp;action=edit' ).'">'.$title.'</a></strong>';
+}
+
 $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => $edited_table_namecol,
-		'td' => '<strong><a href="'.$pagenow.'?ID=$'.$edited_table_IDcol.'$&amp;action=edit" title="'
-		           .T_('Edit this entry...').'">$'.$edited_table_namecol.'$</a></strong>',
+ 		'td' => '%link_name( #'.$edited_table_namecol.'#, #'.$edited_table_IDcol.'# )%',
 	);
-
+	
+if( !empty( $edited_table_ordercol ) )
+{
+	$Results->cols[] = array(
+			'th' => T_('Move'),
+			'th_start' => '<th class="shrinkwrap">',
+			'order' => $edited_table_ordercol,
+			'td_start' => '<td class="shrinkwrap">',
+			'td' => '{move}',
+		);
+}
+	
 function edit_actions( $ID )
 {
 	global $locked_IDs;

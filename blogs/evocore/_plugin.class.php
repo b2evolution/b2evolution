@@ -271,7 +271,7 @@ class Plugin
 	 *
 	 * This is the hook to register menu entries. See {@link register_menu_entry()}.
 	 */
-	function AdminInitMenu()
+	function AdminAfterMenuInit()
 	{
 		// Example:
 		$this->register_menu_entry( T_('My Tab') );
@@ -680,6 +680,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.15  2006/01/04 15:03:52  fplanque
+ * enhanced list sorting capabilities
+ *
  * Revision 1.14  2005/12/23 19:06:35  blueyed
  * Advanced enabling/disabling of plugin events.
  *

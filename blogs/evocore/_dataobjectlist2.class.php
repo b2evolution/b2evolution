@@ -130,7 +130,8 @@ class DataObjectList2 extends FilteredResults
 		}
 
 		// We also keep a local ref in case we want to use it for display:
-		$this->current_Obj = & $this->get_by_idx( $this->current_idx++ );
+		$this->current_Obj = & $this->get_by_idx( $this->current_idx );
+		$this->next_idx();
 
 		return $this->current_Obj;
 	}
@@ -161,10 +162,111 @@ class DataObjectList2 extends FilteredResults
 		$r = $prefix.format_to_output( $r, $format ).$suffix;
 		return $r;
 	}
+	
+	
+	/**
+	 * Move up the element order in database
+	 *
+	 * @param integer id element
+	 * @return unknown
+	 */
+	function move_up( $id )
+	{
+		global $DB, $Messages;
+		
+		$DB->begin();
+		
+		if( ($obj = & $this->Cache->get_by_ID( $id )) === false )
+		{
+			$Messages->head = T_('Cannot edit entry!');
+			$Messages->add( T_('Requested entry does not exist any longer.'), 'error' );
+			$DB->commit();
+			return false;
+		}
+		$order = $obj->order;
+		
+		// Get the ID of the inferior element which his order is the nearest   	
+		$rows = $DB->get_results( 'SELECT '.$this->Cache->dbIDname
+														 	.' FROM '.$this->Cache->dbtablename
+														 .' WHERE '.$this->Cache->dbprefix.'order < '.$order  
+													.' ORDER BY '.$this->Cache->dbprefix.'order DESC 
+														 		LIMIT 0,1' );
+		
+		if( count( $rows ) )
+		{
+			// instantiate the inferior element
+			$obj_inf = & $this->Cache->get_by_ID( $rows[0]->act_ID );
+			
+			//  Update element order
+			$obj->set( 'order', $obj_inf->order );
+			$obj->dbupdate();
+			
+			// Update inferior element order
+			$obj_inf->set( 'order', $order );
+			$obj_inf->dbupdate();
+		}
+		else 
+		{
+			$Messages->add( T_('This element is already at the top.'), 'error' ); 
+		}	
+		$DB->commit();
+	}
+
+	
+	/**
+	 * Move down the element order in database
+	 *
+	 * @param integer id element
+	 * @return unknown
+	 */
+	function move_down( $id )
+	{
+		global $DB, $Messages;
+		
+		$DB->begin();
+		
+		if( ($obj = & $this->Cache->get_by_ID( $id )) === false )
+		{
+			$Messages->head = T_('Cannot edit entry!');
+			$Messages->add( T_('Requested entry does not exist any longer.'), 'error' );
+			$DB->commit();
+			return false;
+		}
+		$order = $obj->order;
+		
+		// Get the ID of the inferior element which his order is the nearest   	
+		$rows = $DB->get_results( 'SELECT '.$this->Cache->dbIDname
+														 	.' FROM '.$this->Cache->dbtablename
+														 .' WHERE '.$this->Cache->dbprefix.'order > '.$order  
+													.' ORDER BY '.$this->Cache->dbprefix.'order ASC 
+														 		LIMIT 0,1' );
+		
+		if( count( $rows ) )
+		{
+			// instantiate the inferior element
+			$obj_sup = & $this->Cache->get_by_ID( $rows[0]->act_ID );
+			
+			//  Update element order
+			$obj->set( 'order', $obj_sup->order );
+			$obj->dbupdate();
+			
+			// Update inferior element order
+			$obj_sup->set( 'order', $order );
+			$obj_sup->dbupdate();
+		}
+		else 
+		{
+			$Messages->add( T_('This element is already at the bottom.'), 'error' ); 
+		}	
+		$DB->commit();
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.6  2006/01/04 15:03:52  fplanque
+ * enhanced list sorting capabilities
+ *
  * Revision 1.5  2005/12/30 20:13:39  fplanque
  * UI changes mostly (need to double check sync)
  *
