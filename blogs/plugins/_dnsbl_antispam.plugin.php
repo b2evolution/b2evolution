@@ -104,7 +104,7 @@ class dnsbl_antispam_plugin extends Plugin
 	/**
 	 * Register a tools tab.
 	 */
-	function AdminInitMenu()
+	function AdminAfterMenuInit()
 	{
 		$this->register_menu_entry( T_('Check DNSBL') );
 	}
@@ -342,6 +342,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.3  2006/01/04 15:05:16  fplanque
+ * minor
+ *
  * Revision 1.2  2005/12/22 23:13:40  blueyed
  * Plugins' API changed and handling optimized
  *

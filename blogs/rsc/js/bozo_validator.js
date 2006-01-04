@@ -137,7 +137,7 @@ var bozo = {
 		
 		if ( bozo.nb_changes )
 		{	// there are input changes
-			if( !confirm('Do not save change(s)') )
+			if( !confirm( 'You have modified this form but you haven\'t submitted it yet.\nYou are about to loose your edits.\nAre you sure?' ) )
 			{ 	// cancel confirmation, so we cancel the href event
 				// For only Mozilla browser in this case
 				bozo.cancelClick( e );

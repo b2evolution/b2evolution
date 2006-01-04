@@ -183,7 +183,7 @@ class test_plugin extends Plugin
 	 *
 	 * This is the hook to register menu entries. See {@link register_menu_entry()}.
 	 */
-	function AdminInitMenu()
+	function AdminAfterMenuInit()
 	{
 		$this->register_menu_entry( 'Test tab' );
 	}

@@ -80,7 +80,7 @@ function refreshDynamicSelectOptions( sel1, sel2, clonedOptions )
 	for( var i = 0, j = 0; i < clonedOptions.length; i++ )
 	{
 		// If the value of a cloned option begins with the value of the selected option of the main select box
-		if ( clonedOptions[i].value.match( pattern1 ) ) 
+		if ( clonedOptions[i].value.match( pattern1 ) || clonedOptions[i].value == '' ) 
 		{ 
 			// Clone the option from the hidden option pool and append it to the dynamic select box
 			sel2.appendChild( clonedOptions[i].cloneNode( true ) );
