@@ -136,21 +136,6 @@ echo '<div class="browse_side_item">';
 		$Form->end_fieldset();
 
 
-		// CATEGORIES:
-		// Call the Categories plugin:
-		$Plugins->call_by_code( 'evo_Cats', array( // Parameters follow:
-				'block_start'=>'<fieldset>',
-				'block_end'=>"</fieldset>\n",
-				'title'=>'<legend>'.T_('Categories')."</legend>\n",
-				'collist_start'=>'<ul>',
-				'collist_end'=>"</ul>\n",
-				'coll_start'=>'<li><strong>',
-				'coll_end'=>"</strong></li>\n",
-				'link_type'=>'context', 							// Preserve page context
-				'form'=>true,                         // add form fields (radio buttons)
-			)	);
-
-
 		/*
 		 * Authors:
 		 * TODO: allow multiple selection
@@ -204,6 +189,49 @@ echo '<div class="browse_side_item">';
 		echo '</fieldset>';
 
 
+		/*
+		 * Statuses
+ 		 * TODO: allow multiple selection
+		 */
+		if( count($ItemStatusCache->cache) )
+		{
+			echo '<fieldset>';
+			echo '<legend>'.T_('Statuses').'</legend>';
+			echo '<ul>';
+
+			echo '<li><input type="radio" name="status" value="-" class="radio"';
+			if( '-' == $status ) echo ' checked="checked"';
+			echo ' /> <a href="'.regenerate_url( 'status', 'status=-', $pagenow ).'">'.T_('Without status').'</a></li>';
+
+			foreach( $ItemStatusCache->cache as $loop_Obj )
+			{
+				echo '<li><input type="radio" name="status" value="'.$loop_Obj->ID.'" class="radio"';
+				if( $loop_Obj->ID == $status ) echo ' checked="checked"';
+				echo ' /> <a href="'.regenerate_url( 'status', 'status='.$loop_Obj->ID, $pagenow ).'">';
+				$loop_Obj->disp('name');
+				echo '</a></li>';
+			}
+			echo '</ul>';
+			echo '</fieldset>';
+		}
+
+
+
+		// CATEGORIES:
+		// Call the Categories plugin:
+		$Plugins->call_by_code( 'evo_Cats', array( // Parameters follow:
+				'block_start'=>'<fieldset>',
+				'block_end'=>"</fieldset>\n",
+				'title'=>'<legend>'.T_('Categories')."</legend>\n",
+				'collist_start'=>'<ul>',
+				'collist_end'=>"</ul>\n",
+				'coll_start'=>'<li><strong>',
+				'coll_end'=>"</strong></li>\n",
+				'link_type'=>'context', 							// Preserve page context
+				'form'=>true,                         // add form fields (radio buttons)
+			)	);
+
+
 		// ARCHIVES:
 		// Call the Archives plugin:
 		$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
@@ -228,6 +256,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.23  2006/01/04 20:34:51  fplanque
+ * allow filtering on extra statuses
+ *
  * Revision 1.22  2006/01/04 19:07:48  fplanque
  * allow filtering on assignees
  *

@@ -127,7 +127,7 @@ class calendar_plugin extends Plugin
 	 	global $Settings, $month;
 		global $blog, $cat, $catsel;
 	 	global $show_statuses;
-	 	global $author;
+	 	global $author, $assgn, $status;
 	 	global $m, $w, $dstart, $timestamp_min, $timestamp_max;
 	 	global $s, $sentence, $exact;
 
@@ -198,10 +198,16 @@ class calendar_plugin extends Plugin
 			$Calendar->ItemQuery->where_chapter( $blog, $cat, $catsel );
 
 			// * Restrict to the statuses we want to show:
-			$Calendar->ItemQuery->where_status( $show_statuses );
+			$Calendar->ItemQuery->where_visibility( $show_statuses );
 
 			// Restrict to selected authors:
 			$Calendar->ItemQuery->where_author( $author );
+
+			// Restrict to selected assignees:
+			$Calendar->ItemQuery->where_assignees( $assgn );
+
+			// Restrict to selected satuses:
+			$Calendar->ItemQuery->where_statuses( $status );
 
 			// - - - + * * if a month is specified in the querystring, load that month:
 			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', $dstart, '', $timestamp_min, $timestamp_max );
@@ -215,7 +221,7 @@ class calendar_plugin extends Plugin
 			$Calendar->ItemQuery->where_chapter( $blog, '', array() );
 
 			// * Restrict to the statuses we want to show:
-			$Calendar->ItemQuery->where_status( $show_statuses );
+			$Calendar->ItemQuery->where_visibility( $show_statuses );
 
 			// - - - + * * if a month is specified in the querystring, load that month:
 			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', '', '', $timestamp_min, $timestamp_max );
@@ -835,7 +841,7 @@ class Calendar
 		// Restrict to selected blog/categories:
 		$nav_ItemQuery->where_chapter( $this->ItemQuery->blog, $this->ItemQuery->cat, $this->ItemQuery->catsel );
 		// Restrict to the statuses we want to show:
-		$nav_ItemQuery->where_status( $this->ItemQuery->show_statuses );
+		$nav_ItemQuery->where_visibility( $this->ItemQuery->show_statuses );
 		// Restrict to selected authors:
 		$nav_ItemQuery->where_author( $this->ItemQuery->author );
 		// if a month is specified in the querystring, load that month:
@@ -974,6 +980,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.11  2006/01/04 20:34:51  fplanque
+ * allow filtering on extra statuses
+ *
  * Revision 1.10  2005/12/12 19:22:04  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

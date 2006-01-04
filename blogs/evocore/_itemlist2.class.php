@@ -130,7 +130,8 @@ class ItemList2 extends DataObjectList2
         'week' => NULL,
         'ymdhms_min' => NULL,
         'ymdhms_max' => NULL,
-				'show_statuses_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
+        'statuses' => NULL,
+				'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated' ),
 				'order' => 'DESC',
         'orderby' => 'datestart',
         'unit' => $Settings->get('what_to_show'),
@@ -185,6 +186,11 @@ class ItemList2 extends DataObjectList2
 		$Request->memorize_param( 'assgn', 'string', $this->default_filters['assignees'], $this->filters['assignees'] );  // List of assignees to restrict to
 
 		/*
+		 * Restrict to selected statuses:
+		 */
+		$Request->memorize_param( 'status', 'string', $this->default_filters['statuses'], $this->filters['statuses'] );  // List of statuses to restrict to
+
+		/*
 		 * Restrict by keywords
 		 */
 		$Request->memorize_param( 's', 'string', $this->default_filters['keywords'], $this->filters['keywords'] );			 // Search string
@@ -210,7 +216,7 @@ class ItemList2 extends DataObjectList2
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
-		$Request->memorize_param( 'show_status', 'array', $this->default_filters['show_statuses_array'], $this->filters['show_statuses_array'] );	// Array of sharings to restrict to
+		$Request->memorize_param( 'show_status', 'array', $this->default_filters['visibility_array'], $this->filters['visibility_array'] );	// Array of sharings to restrict to
 
 		/*
 		 * OLD STYLE orders:
@@ -287,6 +293,12 @@ class ItemList2 extends DataObjectList2
 
 
 		/*
+		 * Restrict to selected statuses:
+		 */
+		$this->filters['statuses'] = $Request->param( 'status', '/^(-|-[0-9]|[0-9])(,[0-9]+)*$/', $this->default_filters['statuses'], true );      // List of statuses to restrict to
+
+
+		/*
 		 * Restrict by keywords
 		 */
 		$this->filters['keywords'] = $Request->param( 's', 'string', $this->default_filters['keywords'], true );         // Search string
@@ -331,7 +343,7 @@ class ItemList2 extends DataObjectList2
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
-		$this->filters['show_statuses_array'] = $Request->param( 'show_status', 'array', $this->default_filters['show_statuses_array'], true );	// Array of sharings to restrict to
+		$this->filters['visibility_array'] = $Request->param( 'show_status', 'array', $this->default_filters['visibility_array'], true );	// Array of sharings to restrict to
 
 
 		/*
@@ -466,6 +478,8 @@ class ItemList2 extends DataObjectList2
 
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
 
+		$this->ItemQuery->where_statuses( $this->filters['statuses'] );
+
 		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 
 		$this->ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
@@ -474,7 +488,7 @@ class ItemList2 extends DataObjectList2
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
 
-		$this->ItemQuery->where_status( $this->filters['show_statuses_array'] );
+		$this->ItemQuery->where_visibility( $this->filters['visibility_array'] );
 
 
 		/*
@@ -753,11 +767,25 @@ class ItemList2 extends DataObjectList2
 		}
 
 
+		// EXTRA STATUSES:
+		if( !empty($this->filters['statuses']) )
+		{
+			if( $this->filters['statuses'] == '-' )
+			{
+				$title_array[] = T_('Without status');
+			}
+			else
+			{
+				$title_array[] = T_('Status(es)').': '.$this->filters['statuses'];
+			}
+		}
+
+
 		// SHOW STATUSES
-		if( count( $this->filters['show_statuses_array'] ) < 5 ) // TEMP
+		if( count( $this->filters['visibility_array'] ) < 5 ) // TEMP
 		{
 			$status_titles = array();
-			foreach( $this->filters['show_statuses_array'] as $status )
+			foreach( $this->filters['visibility_array'] as $status )
 			{
 				$status_titles[] = T_( $post_statuses[$status] );
 			}
@@ -895,6 +923,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.11  2006/01/04 20:34:52  fplanque
+ * allow filtering on extra statuses
+ *
  * Revision 1.10  2006/01/04 19:18:15  fplanque
  * allow filtering on assignees
  *

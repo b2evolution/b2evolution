@@ -318,7 +318,7 @@ class ArchiveList extends Results
 		global $DB, $Settings;
 		global $blog, $cat, $catsel;
 		global $show_statuses;
-		global $author;
+		global $author, $assgn, $status;
 		global $timestamp_min, $timestamp_max;
 		global $s, $sentence, $exact;
 
@@ -342,10 +342,16 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_chapter( $blog, $cat, $catsel );
 
 			// * Restrict to the statuses we want to show:
-			$this->ItemQuery->where_status( $show_statuses );
+			$this->ItemQuery->where_visibility( $show_statuses );
 
 			// Restrict to selected authors:
 			$this->ItemQuery->where_author( $author );
+
+			// Restrict to selected assignees:
+			$this->ItemQuery->where_assignees( $assgn );
+
+			// Restrict to selected satuses:
+			$this->ItemQuery->where_statuses( $status );
 
 			// - - - + * * timestamp restrictions:
 			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
@@ -359,7 +365,7 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_chapter( $blog, '', array() );
 
 			// * Restrict to the statuses we want to show:
-			$this->ItemQuery->where_status( $show_statuses );
+			$this->ItemQuery->where_visibility( $show_statuses );
 
 			// - - - + * * timestamp restrictions:
 			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
@@ -536,6 +542,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.16  2006/01/04 20:34:51  fplanque
+ * allow filtering on extra statuses
+ *
  * Revision 1.15  2005/12/22 23:13:40  blueyed
  * Plugins' API changed and handling optimized
  *

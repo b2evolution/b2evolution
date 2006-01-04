@@ -52,6 +52,7 @@ class ItemQuery extends SQL
 	var $show_statuses;
 	var $author;
 	var $assignees;
+	var $statuses;
 	var $dstart;
 	var $dstop;
 	var $timestamp_min;
@@ -201,11 +202,11 @@ class ItemQuery extends SQL
 
 
   /**
-	 * Restrict to the statuses we want to show
+	 * Restrict to the visibility/sharing statuses we want to show
 	 *
 	 * @param array Restrict to these statuses
 	 */
-	function where_status( $show_statuses )
+	function where_visibility( $show_statuses )
 	{
 		$this->show_statuses = $show_statuses;
 
@@ -223,7 +224,7 @@ class ItemQuery extends SQL
 	 *
 	 * @param string List of authors to restrict to (must have been previously validated)
 	 */
-	function where_author( $author = '' )
+	function where_author( $author )
 	{
 		$this->author = $author;
 
@@ -252,7 +253,7 @@ class ItemQuery extends SQL
 	 *
 	 * @param string List of assignees to restrict to (must have been previously validated)
 	 */
-	function where_assignees( $assignees = '' )
+	function where_assignees( $assignees )
 	{
 		$this->assignees = $assignees;
 
@@ -273,6 +274,36 @@ class ItemQuery extends SQL
 		else
 		{
 			$this->WHERE_and( $this->dbprefix.'assigned_user_ID IN ('.$assignees.')' );
+		}
+	}
+
+
+  /**
+	 * Restrict to specific assignees
+	 *
+	 * @param string List of assignees to restrict to (must have been previously validated)
+	 */
+	function where_statuses( $statuses )
+	{
+		$this->statuses = $statuses;
+
+		if( empty( $statuses ) )
+		{
+			return;
+		}
+
+		if( $statuses == '-' )
+		{	// List is ONLY a MINUS sign (we want only those not assigned)
+			$this->WHERE_and( $this->dbprefix.'pst_ID IS NULL' );
+		}
+		elseif( substr( $statuses, 0, 1 ) == '-' )
+		{	// List starts with MINUS sign:
+			$this->WHERE_and( '( '.$this->dbprefix.'pst_ID IS NULL
+			                  OR '.$this->dbprefix.'pst_ID NOT IN ('.substr( $statuses, 1 ).') )' );
+		}
+		else
+		{
+			$this->WHERE_and( $this->dbprefix.'pst_ID IN ('.$statuses.')' );
 		}
 	}
 
@@ -430,6 +461,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.10  2006/01/04 20:34:52  fplanque
+ * allow filtering on extra statuses
+ *
  * Revision 1.9  2006/01/04 19:07:48  fplanque
  * allow filtering on assignees
  *
