@@ -82,7 +82,7 @@ else
 			$cat_modifier = '';
 			compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $Blog->ID == 1 ? 0 : $Blog->ID );
 
-			$Request->param( 'author', 'string', '', true );     // List of authors to restrict to
+			$Request->param( 'author', '/^-?[0-9]+(,[0-9]+)*$/', '', true );     // List of authors to restrict to
 
 			$Request->param( 'order', 'string', 'DESC', true );   // ASC or DESC
 			$Request->param( 'orderby', 'string', '', true );     // list of fields to order by

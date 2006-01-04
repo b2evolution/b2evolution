@@ -153,6 +153,7 @@ echo '<div class="browse_side_item">';
 
 		/*
 		 * Authors:
+		 * TODO: allow multiple selection
 		 */
 		echo '<fieldset>';
 		echo '<legend>'.T_('Authors').'</legend>';
@@ -166,6 +167,35 @@ echo '<div class="browse_side_item">';
 				echo '<li><input type="radio" name="author" value="'.$loop_Obj->ID.'" class="radio"';
 				if( $loop_Obj->ID == $author ) echo ' checked="checked"';
 				echo ' /> <a href="'.regenerate_url( 'author', 'author='.$loop_Obj->ID, $pagenow ).'">';
+				$loop_Obj->preferred_name();
+				echo '</a></li>';
+			}
+			echo '</ul>';
+		}
+		echo '</fieldset>';
+
+
+		/*
+		 * Assignees:
+ 		 * TODO: allow multiple selection
+		 */
+		echo '<fieldset>';
+		echo '<legend>'.T_('Assignees').'</legend>';
+		// Load current blog members into cache:
+		$UserCache->load_blogmembers( $blog );
+		if( count($UserCache->cache) )
+		{
+			echo '<ul>';
+
+			echo '<li><input type="radio" name="assgn" value="-" class="radio"';
+			if( '-' == $assgn ) echo ' checked="checked"';
+			echo ' /> <a href="'.regenerate_url( 'assgn', 'assgn=-', $pagenow ).'">'.T_('Not assigned').'</a></li>';
+
+			foreach( $UserCache->cache as $loop_Obj )
+			{
+				echo '<li><input type="radio" name="assgn" value="'.$loop_Obj->ID.'" class="radio"';
+				if( $loop_Obj->ID == $assgn ) echo ' checked="checked"';
+				echo ' /> <a href="'.regenerate_url( 'assgn', 'assgn='.$loop_Obj->ID, $pagenow ).'">';
 				$loop_Obj->preferred_name();
 				echo '</a></li>';
 			}
@@ -198,6 +228,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.22  2006/01/04 19:07:48  fplanque
+ * allow filtering on assignees
+ *
  * Revision 1.21  2006/01/04 15:02:10  fplanque
  * better filtering design
  *

@@ -51,6 +51,7 @@ class ItemQuery extends SQL
 	var $catsel;
 	var $show_statuses;
 	var $author;
+	var $assignees;
 	var $dstart;
 	var $dstop;
 	var $timestamp_min;
@@ -220,18 +221,18 @@ class ItemQuery extends SQL
   /**
 	 * Restrict to specific authors
 	 *
-	 * @param string List of authors to restrict to
+	 * @param string List of authors to restrict to (must have been previously validated)
 	 */
 	function where_author( $author = '' )
 	{
 		$this->author = $author;
 
-		if( empty($author) || ($author == 'all'))
+		if( empty( $author ) )
 		{
 			return;
 		}
 
-		if( substr($author, 0, 1 ) == '-' )
+		if( substr( $author, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$eq = 'NOT IN';
 			$author_list = substr( $author, 1 );
@@ -241,10 +242,37 @@ class ItemQuery extends SQL
 			$eq = 'IN';
 			$author_list = $author;
 		}
-		// Check that the string is valid (digits and comas only)
-		if( preg_match( '#^[0-9]+(,[0-9]+)*$#', $author_list ) )
-		{	// Okay, there is no sql injection risk
-			$this->WHERE_and( $this->dbprefix.'creator_user_ID '.$eq.' ('.$author_list.')' );
+
+		$this->WHERE_and( $this->dbprefix.'creator_user_ID '.$eq.' ('.$author_list.')' );
+	}
+
+
+  /**
+	 * Restrict to specific assignees
+	 *
+	 * @param string List of assignees to restrict to (must have been previously validated)
+	 */
+	function where_assignees( $assignees = '' )
+	{
+		$this->assignees = $assignees;
+
+		if( empty( $assignees ) )
+		{
+			return;
+		}
+
+		if( $assignees == '-' )
+		{	// List is ONLY a MINUS sign (we want only those not assigned)
+			$this->WHERE_and( $this->dbprefix.'assigned_user_ID IS NULL' );
+		}
+		elseif( substr( $assignees, 0, 1 ) == '-' )
+		{	// List starts with MINUS sign:
+			$this->WHERE_and( '( '.$this->dbprefix.'assigned_user_ID IS NULL
+			                  OR '.$this->dbprefix.'assigned_user_ID NOT IN ('.substr( $assignees, 1 ).') )' );
+		}
+		else
+		{
+			$this->WHERE_and( $this->dbprefix.'assigned_user_ID IN ('.$assignees.')' );
 		}
 	}
 
@@ -402,6 +430,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.9  2006/01/04 19:07:48  fplanque
+ * allow filtering on assignees
+ *
  * Revision 1.8  2005/12/21 20:39:04  fplanque
  * minor
  *

@@ -76,7 +76,7 @@ $cat_array = array();
 $cat_modifier = '';
 compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */ $cat_modifier, $blog == 1 ? 0 : $blog );
 
-$Request->param( 'author', 'integer', '', true );         // List of authors to restrict to
+$Request->param( 'author', '/^-?[0-9]+(,[0-9]+)*$/', '', true );         // List of authors to restrict to
 
 $Request->param( 'order', 'string', 'DESC', true );       // ASC or DESC
 $Request->param( 'orderby', 'string', '', true );         // list of fields to order by
@@ -416,6 +416,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.40  2006/01/04 19:07:48  fplanque
+ * allow filtering on assignees
+ *
  * Revision 1.39  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *

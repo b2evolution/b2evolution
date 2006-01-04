@@ -120,6 +120,7 @@ class ItemList2 extends DataObjectList2
         'cat_array' => array(),
         'cat_modifier' => NULL,
 				'authors' => NULL,
+				'assignees' => NULL,
 				'keywords' => NULL,
         'phrase' => 'AND',
         'exact' => 0,
@@ -177,6 +178,11 @@ class ItemList2 extends DataObjectList2
 		 * Restrict to selected authors:
 		 */
 		$Request->memorize_param( 'author', 'string', $this->default_filters['authors'], $this->filters['authors'] );  // List of authors to restrict to
+
+		/*
+		 * Restrict to selected assignees:
+		 */
+		$Request->memorize_param( 'assgn', 'string', $this->default_filters['assignees'], $this->filters['assignees'] );  // List of assignees to restrict to
 
 		/*
 		 * Restrict by keywords
@@ -271,7 +277,13 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * Restrict to selected authors:
 		 */
-		$this->filters['authors'] = $Request->param( 'author', 'string', $this->default_filters['authors'], true );      // List of authors to restrict to
+		$this->filters['authors'] = $Request->param( 'author', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['authors'], true );      // List of authors to restrict to
+
+
+		/*
+		 * Restrict to selected assignees:
+		 */
+		$this->filters['assignees'] = $Request->param( 'assgn', '/^(-|-[0-9]|[0-9])(,[0-9]+)*$/', $this->default_filters['assignees'], true );      // List of assignees to restrict to
 
 
 		/*
@@ -451,6 +463,8 @@ class ItemList2 extends DataObjectList2
 		$this->ItemQuery->where_chapter2( $this->Blog->ID, $this->filters['cat_array'], $this->filters['cat_modifier'] );
 
 		$this->ItemQuery->where_author( $this->filters['authors'] );
+
+		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
 
 		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 
@@ -725,6 +739,13 @@ class ItemList2 extends DataObjectList2
 		}
 
 
+		// ASSIGNEES:
+		if( !empty($this->filters['assignees']) )
+		{
+			$title_array[] = T_('Assigned to').': '.$this->filters['assignees'];
+		}
+
+
 		// SHOW STATUSES
 		if( count( $this->filters['show_statuses_array'] ) < 5 ) // TEMP
 		{
@@ -867,6 +888,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.9  2006/01/04 19:07:48  fplanque
+ * allow filtering on assignees
+ *
  * Revision 1.8  2006/01/04 15:02:10  fplanque
  * better filtering design
  *
