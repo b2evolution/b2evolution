@@ -165,7 +165,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	// --------------------------- TOOLBARS ------------------------------------
 	echo '<div class="edit_toolbars">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'DisplayToolbar', array( 'target_type' => 'Item' ) );
+	$Plugins->trigger_event( 'AdminDisplayToolbar', array( 'target_type' => 'Item' ) );
 	echo '</div>';
 
 	// ---------------------------- TEXTAREA -------------------------------------
@@ -213,7 +213,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	}
 
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Item' ) );
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item' ) );
 
 	echo '</div>';
 
@@ -396,6 +396,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.45  2006/01/05 23:44:21  blueyed
+ * Use new event names.
+ *
  * Revision 1.44  2006/01/04 20:35:14  fplanque
  * no message
  *
