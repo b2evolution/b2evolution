@@ -520,13 +520,14 @@ class Plugin
 	 * the category 'plugin_[plugin_code]_[plugin_ID]'.
 	 *
 	 * @param string Message to log.
-	 * @return
+	 * @param array Optional list of additional categories
 	 */
-	function debug_log( $msg )
+	function debug_log( $msg, $add_cats = array() )
 	{
 		global $Debuglog;
 
-		$Debuglog->add( $msg, 'plugin_'.$this->code.'_'.$this->ID );
+		$add_cats[] = 'plugin_'.$this->code.'_'.$this->ID;
+		$Debuglog->add( $msg, $add_cats );
 	}
 
 
@@ -535,7 +536,7 @@ class Plugin
 	 * catgory of 'note'.
 	 *
 	 * @param string Message
-	 * @param string category ('note', 'error', 'success'; default: 'note')
+	 * @param string|array category ('note', 'error', 'success'; default: 'note')
 	 */
 	function msg( $msg, $category = 'note' )
 	{
@@ -680,6 +681,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.16  2006/01/05 23:57:17  blueyed
+ * Enhancements to msg() and debug_log()
+ *
  * Revision 1.15  2006/01/04 15:03:52  fplanque
  * enhanced list sorting capabilities
  *
