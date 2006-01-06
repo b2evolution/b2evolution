@@ -32,7 +32,7 @@ if( ! empty($tab) )
 	if( preg_match( '~^plug_ID_(\d+)$~', $tab, $match ) )
 	{
 		$tab_plugin_ID = $match[1];
-		$Plugins->call_method( $tab_plugin_ID, 'AdminTabAction' );
+		$Plugins->call_method( $tab_plugin_ID, 'AdminTabAction', $params = array() );
 	}
 	else
 	{
@@ -57,7 +57,7 @@ if( empty($tab) )
 		echo '<h2>';
 		$loop_Plugin->name();
 		echo '</h2>';
-		$Plugins->call_method( $loop_Plugin->ID, 'AdminToolPayload' );
+		$Plugins->call_method( $loop_Plugin->ID, 'AdminToolPayload', $params = array() );
 		echo '</div>';
 	}
 	?>
@@ -77,7 +77,7 @@ else
 {
 	if( $tab_plugin_ID )
 	{
-		$Plugins->call_method( $tab_plugin_ID, 'AdminTabPayload' );
+		$Plugins->call_method( $tab_plugin_ID, 'AdminTabPayload', $params = array() );
 	}
 }
 
