@@ -251,10 +251,10 @@ class POFile // {{{
 		$lines = file( $this->filename );
 		$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
 		$all = 0;
-		$fuzzy=0;
-		$untranslated=0;
-		$translated=0;
-		$status='-';
+		$fuzzy = 0;
+		$untranslated = 0;
+		$translated = 0;
+		$status = '-';
 		$matches = array();
 		$sources = array();
 		$loc_vars = array();

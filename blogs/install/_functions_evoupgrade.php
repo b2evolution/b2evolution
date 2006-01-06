@@ -760,11 +760,11 @@ function upgrade_b2evo_tables()
 	}
 
 
-	// Create relations:
-	create_b2evo_relations(); // EXPERIMENTAL!
-
 	// Update DB schema version to $new_db_version
 	set_upgrade_checkpoint( $new_db_version );
+
+	// Create relations:
+	create_b2evo_relations(); // EXPERIMENTAL!
 
 	return true;
 }
@@ -772,6 +772,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.118  2006/01/06 16:47:42  fplanque
+ * no message
+ *
  * Revision 1.117  2006/01/06 00:11:47  blueyed
  * Fix potential SQL error when upgrading from < 0.9 to Phoenix
  *

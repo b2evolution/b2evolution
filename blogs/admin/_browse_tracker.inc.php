@@ -236,6 +236,8 @@ $ItemList->cols[] = array(
 
 $ItemList->cols[] = array(
 	'th' => /* TRANS: abbrev for info */ T_('i'),
+	'order' => 'post_datemodified',
+	'th_start' => '<th class="shrinkwrap">',
 	'td_start' => '<td class="shrinkwrap">',
 	'td' => '@history_info_icon()@',
 );
@@ -290,6 +292,9 @@ if( $restrict_to_open )
 
 /*
  * $Log$
+ * Revision 1.5  2006/01/06 16:47:42  fplanque
+ * no message
+ *
  * Revision 1.4  2005/12/20 18:12:50  fplanque
  * enhanced filtering/titling framework
  *

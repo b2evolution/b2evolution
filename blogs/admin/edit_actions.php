@@ -68,7 +68,7 @@ switch($action)
 				break;
 
 			default:
-				$location="b2browse.php?blog=$blog";
+				$location="b2browse.php?blog=$blog&amp;filter=restore";
 				break;
 		}
 		$AdminUI->title = T_('Adding new post...');
@@ -158,7 +158,7 @@ switch($action)
 
 		// Mumby funky old style navigation stuff:
 		$blog = get_catblog($post_category);
-		$location = 'b2browse.php?blog='. $blog;
+		$location = 'b2browse.php?blog='.$blog.'&amp;filter=restore';
 		$AdminUI->title = T_('Updating post...');
 		require( dirname(__FILE__) . '/_menutop.php' );
 
@@ -254,7 +254,7 @@ switch($action)
 		$post_cat = $edited_Item->main_cat_ID;
 		$blog = get_catblog($post_cat);
 		$blogparams = get_blogparams_by_ID( $blog );
-		$location = 'b2browse.php?blog=' . $blog;
+		$location = 'b2browse.php?blog='.$blog.'&amp;filter=restore';
 
 		$AdminUI->title = T_('Updating post status...');
 		require(dirname(__FILE__).'/_menutop.php');
@@ -342,7 +342,7 @@ switch($action)
 		$post_cat = $edited_Item->main_cat_ID;
 		$blog = get_catblog($post_cat);
 		$blogparams = get_blogparams_by_ID( $blog );
-		$location = 'b2browse.php?blog=' . $blog;
+		$location = 'b2browse.php?blog='.$blog.'&amp;filter=restore';
 
 		$AdminUI->title = T_('Updating post status...');
 		require(dirname(__FILE__).'/_menutop.php');
@@ -384,7 +384,7 @@ switch($action)
 			break;
 		}
 		$blog = $edited_Item->blog_ID;
-		$location = 'b2browse.php?blog='.$blog;
+		$location = 'b2browse.php?blog='.$blog.'&amp;filter=restore';
 
 		// Check permission:
 		$current_User->check_perm( 'blog_del_post', '', true, $blog );
@@ -494,7 +494,7 @@ if( empty( $mode ) )
 { // Normal mode:
 	if( isset($location) )
 	{
-		echo '<p><strong>[<a href="' . $location . '">' . T_('Back to posts!') . '</a>]</strong></p>';
+		echo '<p><strong>[<a href="'.$location.'">'.T_('Back to posts!').'</a>]</strong></p>';
 	}
 	echo '<p>' . T_('You may also want to generate static pages or view your blogs...') . '</p>';
 	echo '</div>';
@@ -515,6 +515,9 @@ require( dirname(__FILE__) . '/_footer.php' );
 
 /*
  * $Log$
+ * Revision 1.82  2006/01/06 16:47:42  fplanque
+ * no message
+ *
  * Revision 1.81  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *
