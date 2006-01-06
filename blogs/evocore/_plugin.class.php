@@ -428,7 +428,7 @@ class Plugin
 	 *              'User': the user object (as reference), see {@link User}.
 	 * @return boolean True, if the user should be created, false if not.
 	 */
-	function AppendUserRegisterTransact( & $params )
+	function AppendUserRegistrTransact( & $params )
 	{
 	}
 
@@ -681,6 +681,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.17  2006/01/06 00:27:06  blueyed
+ * Small enhancements to new Plugin system
+ *
  * Revision 1.16  2006/01/05 23:57:17  blueyed
  * Enhancements to msg() and debug_log()
  *

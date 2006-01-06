@@ -435,11 +435,26 @@ switch( $action )
 		<div id="clickdiv_pluginevents">
 		<?php
 		$enabled_events = $Plugins->get_enabled_events( $edit_Plugin->ID );
-		foreach( $Plugins->get_registered_events( $edit_Plugin ) as $l_event )
+		$supported_events = $Plugins->get_supported_events();
+		$registered_events = $Plugins->get_registered_events( $edit_Plugin );
+		$count = 0;
+		foreach( array_keys($supported_events) as $l_event )
 		{
-			// TODO: add description - may be included in Plugins::supported_events
-			$Form->hidden( 'edited_plugin_displayed_events[]', $l_event ); // to consider only displayed ones
-			$Form->checkbox_input( 'edited_plugin_events['.$l_event.']', in_array( $l_event, $enabled_events ), $l_event );
+			if( ! in_array( $l_event, $registered_events ) )
+			{
+				continue;
+			}
+			if( in_array( $l_event, $Plugins->_supported_private_events ) )
+			{
+				continue;
+			}
+			$Form->hidden( 'edited_plugin_displayed_events[]', $l_event ); // to consider only displayed ones on update
+			$Form->checkbox_input( 'edited_plugin_events['.$l_event.']', in_array( $l_event, $enabled_events ), $l_event, array( 'note' => $supported_events[$l_event] ) );
+			$count++;
+		}
+		if( ! $count )
+		{
+			echo T_( 'This plugin has no registered events.' );
 		}
 		?>
 		</div>

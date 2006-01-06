@@ -134,30 +134,18 @@ class Plugins
 	/**
 	 * The list of supported events/hooks.
 	 *
+	 * Gets lazy-filled in {@link get_supported_events()}.
+	 *
+	 * @access protected
 	 * @var array
 	 */
-	var $supported_events = array(
-			'AdminAfterPageFooter',
-			'AdminDisplayEditorButton',
-			'AdminDisplayToolbar',
-			'AdminEndHtmlHead',
-			'AdminAfterMenuInit',
-			'AdminToolAction',
-			'AdminToolPayload',
+	var $_supported_events;
 
-
-			'RenderItemAsHtml',
-			'RenderItemAsHtml',
-			'RenderItem',
-
-
-			'AppendUserRegisterTransact', // gets called during the transaction that creates a new user.
-			'GetDefaultSettings', // used to instantiate $Settings.
-			'Install',
-			'LoginAttempt',
-			'SessionLoaded', // gets called after $Session is initialized, quite early.
-			'Uninstall',
-		);
+	/**
+	 * A list of events that should not be allowed to be disabled in the backoffice.
+	 * @var array
+	 */
+	var $_supported_private_events = array( 'PluginSettingsInstantiated', 'Install', 'Uninstall' );
 
 	/**#@-*/
 
@@ -182,6 +170,48 @@ class Plugins
 
 
 	/**
+	 * Get the list of supported/available events/hooks.
+	 *
+	 * @todo Finish descriptions
+	 * @return array Name of event (key) => description (value)
+	 */
+	function get_supported_events()
+	{
+		if( empty( $this->_supported_events ) )
+		{
+			$this->_supported_events = array(
+				'AdminAfterPageFooter' => '',
+				'AdminDisplayEditorButton' => '',
+				'AdminDisplayToolbar' => '',
+				'AdminEndHtmlHead' => '',
+				'AdminAfterMenuInit' => '',
+				'AdminToolAction' => '',
+				'AdminToolPayload' => '',
+
+				'CacheObjects' => '',
+				'CacheAnonContent' => '',
+
+				'PluginSettingsInstantiated' => '',
+
+				'RenderItemAsHtml' => '',
+				'RenderItemAsHtml' => '',
+				'RenderItem' => '',
+
+
+				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
+				'GetDefaultSettings' => '', // used to instantiate $Settings.
+				'Install' => '',
+				'LoginAttempt' => '',
+				'SessionLoaded' => '', // gets called after $Session is initialized, quite early.
+				'Uninstall' => '',
+			);
+		}
+
+		return $this->_supported_events;
+	}
+
+
+	/**
 	 * Discover and register all available plugins.
 	 */
 	function discover()
@@ -201,8 +231,6 @@ class Plugins
 				$this->register( $classname, 0 ); // auto-generate negative ID; will return string on error.
 			}
 		}
-
-		$this->sort( 'priority' );
 	}
 
 
@@ -443,9 +471,6 @@ class Plugins
 			$Plugin->code = $this->index_ID_rows[$Plugin->ID]['plug_code'];
 		}
 
-		// Instantiate the Plugins Settings class
-		$this->instantiate_Settings( $Plugin );
-
 		// Memorizes Plugin in sequential array:
 		$this->Plugins[] = & $Plugin;
 		// Memorizes Plugin in code hash array:
@@ -465,6 +490,9 @@ class Plugins
 		{ // not in our sort index yet
 			$this->sorted_IDs[] = & $Plugin->ID;
 		}
+
+		// Instantiate the Plugins Settings class
+		$this->instantiate_Settings( $Plugin );
 
 		$Timer->pause( 'plugins_register' );
 
@@ -671,6 +699,8 @@ class Plugins
 				}
 				$Timer->pause( 'plugins_settings' );
 			}
+
+			$this->call_method( $Plugin->ID, 'PluginSettingsInstantiated', $params = array() );
 		}
 	}
 
@@ -764,9 +794,9 @@ class Plugins
 		}
 
 		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
-		foreach( $this->index_event_IDs[$event] as $l_plug_ID )
+		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
 		{
-			$this->call_method( $l_plug_ID, $event, $params );
+			$this->call_method( $l_plugin_ID, $event, $params );
 		}
 	}
 
@@ -778,10 +808,10 @@ class Plugins
 	 *
 	 * @param integer Plugin ID
 	 * @param string Method name.
-	 * @param array Params.
-	 * @return
+	 * @param array Params (by reference).
+	 * @return NULL|mixed Return value of the plugin's method call or NULL if no such method.
 	 */
-	function call_method( $plugin_ID, $method, $params = NULL )
+	function call_method( $plugin_ID, $method, & $params )
 	{
 		global $Timer, $debug, $Debuglog;
 
@@ -792,32 +822,38 @@ class Plugins
 
 		$Plugin = & $this->get_by_ID( $plugin_ID );
 
-		if( method_exists( $Plugin, $method ) )
+		if( ! method_exists( $Plugin, $method ) )
 		{
-			if( $debug )
-			{
-				// Hide passwords from Debuglog!
-				$debug_params = $params;
-				if( isset($debug_params['pass']) )
-				{
-					$debug_params['pass'] = '-hidden-';
-				}
-				if( isset($debug_params['pass_md5']) )
-				{
-					$debug_params['pass_md5'] = '-hidden-';
-				}
-				$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.var_export( $debug_params, true ).' )', 'plugins' );
-			}
-
-			$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
-			$Plugin->$method( $params );
-			$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
+			return NULL;
 		}
+
+		if( $debug )
+		{
+			// Hide passwords from Debuglog!
+			$debug_params = $params;
+			if( isset($debug_params['pass']) )
+			{
+				$debug_params['pass'] = '-hidden-';
+			}
+			if( isset($debug_params['pass_md5']) )
+			{
+				$debug_params['pass_md5'] = '-hidden-';
+			}
+			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.var_export( $debug_params, true ).' )', 'plugins' );
+		}
+
+		$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
+		$r = $Plugin->$method( $params );
+		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
+
+		return $r;
 	}
 
 
 	/**
-	 * Validate renderer list
+	 * Validate renderer list.
+	 *
+	 * NOTE: this will instantiate all Plugins!
 	 *
 	 * @param array renderer codes ('default' will include all "opt-out"-ones)
 	 * @return array validated array
@@ -1102,7 +1138,7 @@ class Plugins
 
 
 	/**
-	 * Get a specific plugin by its name.
+	 * Get a specific Plugin by its name.
 	 *
 	 * NOTE: You'll have to call {@link load_plugins_table()} or {@link restart()} before.
 	 *
@@ -1124,7 +1160,7 @@ class Plugins
 
 
 	/**
-	 * Get a specific plugin by its code.
+	 * Get a specific Plugin by its code.
 	 *
 	 * @param string plugin name
 	 * @return Plugin|false
@@ -1157,7 +1193,7 @@ class Plugins
 
 
 	/**
-	 * Get a list of plugins for a given event.
+	 * Get a list of Plugins for a given event.
 	 *
 	 * @param string Event name
 	 * @return array of Plugins
@@ -1238,7 +1274,7 @@ class Plugins
 
 
 	/**
-	 * Get a list of methods that are supported as events out of the Plugins
+	 * Get a list of methods that are supported as events out of the Plugin's
 	 * source file.
 	 *
 	 * @return array
@@ -1311,7 +1347,9 @@ class Plugins
 			}
 		}
 
-		$verified_events = array_intersect( $plugin_class_methods, $this->supported_events );
+		$supported_events = $this->get_supported_events();
+		$supported_events = array_keys($supported_events);
+		$verified_events = array_intersect( $plugin_class_methods, $supported_events );
 
 		$Timer->pause( 'plugins_detect_events' );
 
@@ -1391,8 +1429,12 @@ class Plugins
 			$r = true;
 
 			foreach( $discovered_events as $l_event )
-			{
-				$this->index_event_IDs[ $l_event ][] = $Plugin->ID;
+			{ // add events to index
+				if( empty($this->index_event_IDs[$l_event])
+				    || ! in_array( $Plugin->ID, $this->index_event_IDs[$l_event] ) )
+				{
+					$this->index_event_IDs[ $l_event ][] = $Plugin->ID;
+				}
 			}
 			$Debuglog->add( 'Discovered events ['.implode( ', ', $discovered_events ).'] for Plugin '.$Plugin->name, 'plugins' );
 		}
@@ -1408,8 +1450,12 @@ class Plugins
 				}
 			}
 			foreach( $new_events as $l_event )
-			{
-				$this->index_event_IDs[ $l_event ][] = $Plugin->ID;
+			{ // add events to index
+				if( empty($this->index_event_IDs[$l_event])
+				    || ! in_array( $Plugin->ID, $this->index_event_IDs[ $l_event ] ) )
+				{
+					$this->index_event_IDs[ $l_event ][] = $Plugin->ID;
+				}
 			}
 			if( $new_events )
 			{
@@ -1434,9 +1480,12 @@ class Plugins
 			foreach( $new_events as $l_event )
 			{
 				// Remove from index:
-				while( ($key = array_search( $Plugin->ID, $this->index_event_IDs[ $l_event ])) !== false )
+				if( isset($this->index_event_IDs[ $l_event ]) )
 				{
-					unset( $this->index_event_IDs[ $l_event ][ $key ] );
+					while( ($key = array_search( $Plugin->ID, $this->index_event_IDs[ $l_event ])) !== false )
+					{
+						unset( $this->index_event_IDs[ $l_event ][ $key ] );
+					}
 				}
 			}
 			if( $new_events )
@@ -1484,6 +1533,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.20  2006/01/06 00:27:06  blueyed
+ * Small enhancements to new Plugin system
+ *
  * Revision 1.19  2006/01/04 15:03:52  fplanque
  * enhanced list sorting capabilities
  *

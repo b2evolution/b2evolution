@@ -316,7 +316,7 @@ class test_plugin extends Plugin
 	 * Event handler: called when a new user has registered.
 	 * @see Plugin::Registration
 	 */
-	function Registration( $params )
+	function AppendUserRegistrTransact( $params )
 	{
 		$this->msg( 'The TEST plugin welcomes the new user '.$params['User']->dget('login').'!' );
 	}
