@@ -554,7 +554,8 @@ class ItemList extends DataObjectList
 		return "SELECT
 			0 AS {$this->dbIDname},
 			$preview_userid AS {$this->dbprefix}creator_user_ID,
-			'$post_date' AS {$this->dbprefix}datestart,
+			$preview_userid AS {$this->dbprefix}lastedit_user_ID,
+			'$post_date' AS {$this->dbprefix}datecreated,
 			'$post_date' AS {$this->dbprefix}datemodified,
 			'".$DB->escape($post_status)."' AS {$this->dbprefix}status,
 			'".$DB->escape($post_locale)."' AS {$this->dbprefix}locale,
@@ -569,6 +570,7 @@ class ItemList extends DataObjectList
 			".$DB->quote($post_comments)." AS {$this->dbprefix}comments,
 			'".$DB->escape( $post_renderers )."' AS {$this->dbprefix}renderers,
 			".$DB->quote($item_assigned_user_ID)." AS {$this->dbprefix}assigned_user_ID,
+ 			NULL AS {$this->dbprefix}datestart,
 			".$DB->quote($item_typ_ID)." AS {$this->dbprefix}ptyp_ID,
 			".$DB->quote($item_st_ID)." AS {$this->dbprefix}pst_ID,
 			".$DB->quote($item_deadline)." AS {$this->dbprefix}datedeadline,
@@ -874,6 +876,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.49  2006/01/06 16:44:16  fplanque
+ * bugfix
+ *
  * Revision 1.48  2006/01/04 20:35:14  fplanque
  * no message
  *

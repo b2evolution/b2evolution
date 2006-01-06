@@ -632,8 +632,8 @@ function bloggereditpost($m)
 
 
 
-$bloggerdeletepost_doc='Deletes a post, blogger-api like';
-$bloggerdeletepost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcBoolean));
+$bloggerdeletepost_doc = 'Deletes a post, blogger-api like';
+$bloggerdeletepost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
 /**
  * blogger.editPost deletes a given post.
  *
@@ -2514,6 +2514,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.86  2006/01/06 16:42:41  fplanque
+ * bugfix
+ *
  * Revision 1.85  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *
