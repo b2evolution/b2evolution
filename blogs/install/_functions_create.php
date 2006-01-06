@@ -272,13 +272,14 @@ function create_b2evo_tables()
 	create_b2evo_tables_phoenix();
 
 	echo 'Creating plugins table... ';
-	$DB->query( "CREATE TABLE T_plugins (
-			plug_ID        INT(11) UNSIGNED NOT NULL auto_increment,
-			plug_priority  INT(11) NOT NULL default 50,
-			plug_classname VARCHAR(40) NOT NULL default '',
-			plug_code      VARCHAR(32) NULL,
+	$DB->query( 'CREATE TABLE T_plugins (
+			plug_ID              INT(11) UNSIGNED NOT NULL auto_increment,
+			plug_priority        INT(11) NOT NULL default 50,
+			plug_classname       VARCHAR(40) NOT NULL default "",
+			plug_code            VARCHAR(32) NULL,
+			plug_apply_rendering ENUM( "stealth", "always", "opt-out", "opt-in", "lazy", "never" ) NOT NULL DEFAULT "never",
 			PRIMARY KEY ( plug_ID )
-		)");
+		)' );
 	echo "OK.<br />\n";
 
 	create_b2evo_tables_phoenix_beta();
@@ -1351,6 +1352,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.169  2006/01/06 18:58:09  blueyed
+ * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
+ *
  * Revision 1.168  2006/01/06 00:11:47  blueyed
  * Fix potential SQL error when upgrading from < 0.9 to Phoenix
  *

@@ -26,6 +26,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		</thead>
 		<tbody>
 		<?php
+		$apply_rendering_values = $Plugins->get_apply_rendering_values(true); // with descs
 		$Plugins->restart();	 // make sure iterator is at start position
 		$count = 0;
 		while( $loop_Plugin = & $Plugins->get_next() )
@@ -38,7 +39,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				</a>
 			</td>
 			<td class="right"><?php	echo $loop_Plugin->priority; ?></td>
-			<td><?php echo $loop_Plugin->apply_when; ?></td>
+			<td><span title="<?php echo format_to_output( $apply_rendering_values[$loop_Plugin->apply_rendering], 'htmlattr' ) ?>"><?php echo $loop_Plugin->apply_rendering; ?></span></td>
 			<td>
 				<?php $loop_Plugin->code() ?>
 			</td>

@@ -18,7 +18,7 @@ class auto_p_plugin extends Plugin
 	var $name = 'Auto P';
 	var $priority = 70;
 
-	var $apply_when = 'opt-out';
+	var $apply_rendering = 'opt-out';
 	var $short_desc;
 	var $long_desc;
 

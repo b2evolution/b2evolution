@@ -22,7 +22,7 @@ class wacko_plugin extends Plugin
 	var $code = 'b2evWcko';
 	var $name = 'Wacko formatting';
 	var $priority = 30;
-	var $apply_when = 'opt-in';
+	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
 

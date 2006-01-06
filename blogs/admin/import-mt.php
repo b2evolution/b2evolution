@@ -1450,8 +1450,8 @@ function renderer_list()
 		{ // No unique code!
 			continue;
 		}
-		if( $loop_RendererPlugin->apply_when == 'stealth'
-			|| $loop_RendererPlugin->apply_when == 'never' )
+		if( $loop_RendererPlugin->apply_rendering == 'stealth'
+			|| $loop_RendererPlugin->apply_rendering == 'never' )
 		{	// This is not an option.
 			continue;
 		}
@@ -1476,7 +1476,7 @@ function renderer_list()
 			<input type="checkbox" class="checkbox" name="renderers[]"
 				value="<?php $loop_RendererPlugin->code() ?>" id="<?php $loop_RendererPlugin->code() ?>"
 				<?php
-				switch( $loop_RendererPlugin->apply_when )
+				switch( $loop_RendererPlugin->apply_rendering )
 				{
 					case 'always':
 						// echo 'FORCED';

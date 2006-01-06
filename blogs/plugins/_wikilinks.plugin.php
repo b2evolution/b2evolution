@@ -22,7 +22,7 @@ class wikilinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Wiki Links';
 	var $priority = 35;
-	var $apply_when = 'opt-in';
+	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
 

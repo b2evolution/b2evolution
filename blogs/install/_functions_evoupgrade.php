@@ -683,9 +683,10 @@ function upgrade_b2evo_tables()
 		create_b2evo_tables_phoenix_beta();
 
 		echo 'Altering Plugins table... ';
-		$DB->query( "ALTER TABLE T_plugins
+		$DB->query( 'ALTER TABLE T_plugins
 		             ADD COLUMN plug_code VARCHAR(32) NULL AFTER plug_classname,
-		             ADD UNIQUE plug_code( plug_code )" );
+		             ADD COLUMN plug_apply_rendering ENUM( "stealth", "always", "opt-out", "opt-in", "lazy", "never" ) NOT NULL DEFAULT "never" AFTER plug_code,
+		             ADD UNIQUE plug_code( plug_code )' );
 		echo "OK.<br />\n";
 
 		echo 'Giving Administrator Group edit perms on files... ';
@@ -772,14 +773,11 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
- * Revision 1.118  2006/01/06 16:47:42  fplanque
- * no message
+ * Revision 1.119  2006/01/06 18:58:09  blueyed
+ * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
  *
  * Revision 1.117  2006/01/06 00:11:47  blueyed
  * Fix potential SQL error when upgrading from < 0.9 to Phoenix
- *
- * Revision 1.116  2005/12/30 18:08:24  fplanque
- * no message
  *
  * Revision 1.115  2005/12/29 20:20:02  blueyed
  * Renamed T_plugin_settings to T_pluginsettings
@@ -801,9 +799,6 @@ function upgrade_b2evo_tables()
  *
  * Revision 1.109  2005/10/28 22:33:54  blueyed
  * Removed not used globals for upgrade to 1.6
- *
- * Revision 1.108  2005/10/07 19:34:49  fplanque
- * no message
  *
  * Revision 1.107  2005/10/03 18:10:08  fplanque
  * renamed post_ID field

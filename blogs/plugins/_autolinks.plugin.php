@@ -20,7 +20,7 @@ class autolinks_plugin extends Plugin
 	var $name = 'Auto Links';
 	var $priority = 60;
 
-	var $apply_when = 'opt-out';
+	var $apply_rendering = 'opt-out';
 	var $short_desc;
 	var $long_desc;
 

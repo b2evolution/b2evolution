@@ -22,7 +22,7 @@ class gmcode_plugin extends Plugin
 	var $code = 'b2evGMco';
 	var $name = 'GM code';
 	var $priority = 45;
-	var $apply_when = 'opt-out';
+	var $apply_rendering = 'opt-out';
 	var $short_desc;
 	var $long_desc;
 	var $version = '$Revision$';

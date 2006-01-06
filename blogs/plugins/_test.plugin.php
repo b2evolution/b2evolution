@@ -68,7 +68,7 @@ class test_plugin extends Plugin
 	/*
 	 * These variables MAY be overriden.
 	 */
-	var $apply_when = 'opt-out';
+	var $apply_rendering = 'opt-out';
 	var $nr_of_installs = 1;
 
 

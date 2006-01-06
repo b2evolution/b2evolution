@@ -142,7 +142,13 @@ class Plugin
 
 
 	/**
-	 * When should this rendering plugin apply?
+	 * If this is a rendering plugin, when should rendering apply?
+	 *
+	 * This is the default value for the plugin and can be overriden in the Plugins
+	 * administration for plugins that provide rendering events.
+	 *
+	 * {@internal The actual value for the plugin gets stored in T_plugins.plug_apply_rendering.}}
+	 *
 	 * Possible values:
 	 * - 'stealth'
 	 * - 'always'
@@ -152,9 +158,8 @@ class Plugin
 	 * - 'never'
 	 *
 	 * @var string
-	 * @todo get this outta here
 	 */
-	var $apply_when = 'never';	// By default, this may not be a rendering plugin
+	var $apply_rendering = 'never'; // By default, this may not be a rendering plugin
 
 
 	/**
@@ -681,6 +686,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.18  2006/01/06 18:58:08  blueyed
+ * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
+ *
  * Revision 1.17  2006/01/06 00:27:06  blueyed
  * Small enhancements to new Plugin system
  *

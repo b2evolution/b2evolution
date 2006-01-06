@@ -21,7 +21,7 @@ class spellcheck_plugin extends Plugin
 	var $code = 'cafeSpell';
 	var $name = 'Spellchecker';
 	var $priority = 10;
-	var $apply_when = 'never';
+	var $apply_rendering = 'never';
 
 	var $useSpellcheckOnThisPage = false; // So far we have not requested it on this page.
 

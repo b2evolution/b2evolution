@@ -156,6 +156,7 @@ switch( $action )
 		// Params from/for form:
 		$Request->param( 'edited_plugin_code' );
 		$Request->param( 'edited_plugin_priority' );
+		$Request->param( 'edited_plugin_apply_rendering' );
 
 		$updated = $Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
 		if( is_string( $updated ) )
@@ -179,6 +180,12 @@ switch( $action )
 		else
 		{
 			$action = 'edit_settings';
+		}
+
+		// apply_rendering:
+		if( $Plugins->set_apply_rendering( $edit_Plugin->ID, $edited_plugin_apply_rendering ) )
+		{
+			$Messages->add( T_('Plugin rendering appliance updated.'), 'success' );
 		}
 
 		// Settings:
@@ -247,6 +254,7 @@ switch( $action )
 		// Params for form:
 		$edited_plugin_code = $edit_Plugin->code;
 		$edited_plugin_priority = $edit_Plugin->priority;
+		$edited_plugin_apply_rendering = $edit_Plugin->apply_rendering;
 
 		break;
 
@@ -272,6 +280,7 @@ switch( $action )
 		// Params for/"from" form:
 		$edited_plugin_code = $default_Plugin->code;
 		$edited_plugin_priority = $default_Plugin->priority;
+		$edited_plugin_apply_rendering = $default_Plugin->apply_rendering;
 
 		// Code:
 		$updated = $Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
@@ -297,6 +306,12 @@ switch( $action )
 			{
 				$Messages->add( T_('Plugin priority updated.'), 'success' );
 			}
+		}
+
+		// apply_rendering:
+		if( $Plugins->set_apply_rendering( $edit_Plugin->ID, $edited_plugin_apply_rendering ) )
+		{
+			$Messages->add( T_('Plugin rendering appliance updated.'), 'success' );
 		}
 
 		// PluginSettings:
@@ -423,8 +438,14 @@ switch( $action )
 
 		// Plugin variables
 		$Form->begin_fieldset( T_('Plugin variables').' ('.T_('Advanced').')', array( 'class' => 'clear' ) );
-		$Form->text_input( 'edited_plugin_code', $edited_plugin_code, 15, T_('Code'), array('maxlength'=>32, 'note'=>'The code to call the plugin by code.') );
+		$Form->text_input( 'edited_plugin_code', $edited_plugin_code, 15, T_('Code'), array('maxlength'=>32, 'note'=>'The code to call the plugin by code. This is also used to link renderer plugins to items.') );
 		$Form->text_input( 'edited_plugin_priority', $edited_plugin_priority, 4, T_('Priority'), array( 'maxlength' => 4 ) );
+		$Form->select_input_array( 'edited_plugin_apply_rendering', $Plugins->get_apply_rendering_values(), T_('Apply rendering'), array(
+			'value' => $edited_plugin_apply_rendering,
+			'note' => empty( $edited_plugin_code )
+				? T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.')
+				: NULL )
+			);
 		$Form->end_fieldset();
 
 

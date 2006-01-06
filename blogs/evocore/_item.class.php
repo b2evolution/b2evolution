@@ -882,9 +882,6 @@ class Item extends DataObject
 		}
 
 		// Apply rendering
-		// blueyed>> I've removed $Plugins->validate_list() here, because it will instantiate all Plugins!
-		//           But that would lose "stealth"/"always" apply_when and "default" renderer magic.. :/
-		// TODO: find a way to not instantiate all Plugins
 		$post_renderers = $Plugins->validate_list( $this->renderers );
 		$output = $Plugins->render( $output, $post_renderers, $format );
 
@@ -1511,8 +1508,8 @@ class Item extends DataObject
 			{ // No unique code!
 				continue;
 			}
-			if( $loop_RendererPlugin->apply_when == 'stealth'
-				|| $loop_RendererPlugin->apply_when == 'never' )
+			if( $loop_RendererPlugin->apply_rendering == 'stealth'
+				|| $loop_RendererPlugin->apply_rendering == 'never' )
 			{ // This is not an option.
 				continue;
 			}
@@ -1520,7 +1517,7 @@ class Item extends DataObject
 
 			echo '<div>';
 
-			// echo $loop_RendererPlugin->apply_when;
+			// echo $loop_RendererPlugin->apply_rendering;
 
 			echo '<input type="checkbox" class="checkbox" name="renderers[]" value="';
 			$loop_RendererPlugin->code();
@@ -1528,7 +1525,7 @@ class Item extends DataObject
 			$loop_RendererPlugin->code();
 			echo '"';
 
-			switch( $loop_RendererPlugin->apply_when )
+			switch( $loop_RendererPlugin->apply_rendering )
 			{
 				case 'always':
 					echo ' checked="checked"';
@@ -2266,6 +2263,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.83  2006/01/06 18:58:08  blueyed
+ * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
+ *
  * Revision 1.82  2006/01/04 20:35:14  fplanque
  * no message
  *

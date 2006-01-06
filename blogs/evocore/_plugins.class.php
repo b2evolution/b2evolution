@@ -101,6 +101,12 @@ class Plugins
 	var $index_code_ID = array();
 
 	/**
+	 * Cache Plugin IDs by apply_rendering setting.
+	 * @var array
+	 */
+	var $index_apply_rendering_codes = array();
+
+	/**
 	 * Path to plug-ins.
 	 */
 	var $plugins_path;
@@ -173,6 +179,7 @@ class Plugins
 	 * Get the list of supported/available events/hooks.
 	 *
 	 * @todo Finish descriptions
+	 *
 	 * @return array Name of event (key) => description (value)
 	 */
 	function get_supported_events()
@@ -208,6 +215,36 @@ class Plugins
 		}
 
 		return $this->_supported_events;
+	}
+
+
+	/**
+	 * Get the list of values for when a rendering Plugin can apply (apply_rendering).
+	 *
+	 * @todo Add descriptions.
+	 *
+	 * @param boolean Return an associative array with description for the values?
+	 * @return array
+	 */
+	function get_apply_rendering_values( $with_desc = false )
+	{
+		if( empty( $this->_apply_rendering_values ) )
+		{
+			$this->_apply_rendering_values = array(
+					'stealth' => '',
+					'always' => '',
+					'opt-out' => '',
+					'opt-in' => '',
+					'lazy' => '',
+					'never' => '',
+				);
+		}
+		if( ! $with_desc )
+		{
+			return array_keys( $this->_apply_rendering_values );
+		}
+
+		return $this->_apply_rendering_values;
 	}
 
 
@@ -323,8 +360,8 @@ class Plugins
 		$DB->begin();
 
 		$DB->query( '
-				INSERT INTO T_plugins( plug_classname, plug_priority, plug_code )
-				VALUES( "'.$plugin_classname.'", '.$Plugin->priority.', '.$DB->quote($Plugin->code).' ) ' );
+				INSERT INTO T_plugins( plug_classname, plug_priority, plug_code, plug_apply_rendering )
+				VALUES( "'.$plugin_classname.'", '.$Plugin->priority.', '.$DB->quote($Plugin->code).', '.$DB->quote($Plugin->apply_rendering).' ) ' );
 
 		// Unset auto-generated ID info
 		unset( $this->index_ID_Plugins[ $Plugin->ID ] );
@@ -411,10 +448,11 @@ class Plugins
 	 * @param string name of plugin class to instantiate & register
 	 * @param int ID in database (0 if not installed)
 	 * @param int Priority in database (-1 to keep default)
+	 * @param array When should rendering apply? (NULL to keep default)
 	 * @return Plugin|string Plugin ref to newly created plugin; string in case of error
 	 * @access private
 	 */
-	function & register( $classname, $ID = 0, $priority = -1 )
+	function & register( $classname, $ID = 0, $priority = -1, $apply_rendering = NULL )
 	{
 		global $Debuglog, $Messages, $pagenow, $Timer;
 
@@ -471,6 +509,11 @@ class Plugins
 			$Plugin->code = $this->index_ID_rows[$Plugin->ID]['plug_code'];
 		}
 
+		if( isset($apply_rendering) )
+		{
+			$Plugin->apply_rendering = $apply_rendering;
+		}
+
 		// Memorizes Plugin in sequential array:
 		$this->Plugins[] = & $Plugin;
 		// Memorizes Plugin in code hash array:
@@ -512,6 +555,15 @@ class Plugins
 			while( ($key = array_search( $Plugin->ID, $this->index_event_IDs[$l_event] )) !== false )
 			{
 				unset( $this->index_event_IDs[$l_event][$key] );
+			}
+		}
+
+		// Unset rendering index:
+		if( isset( $this->index_apply_rendering_codes[ $Plugin->apply_rendering ] ) )
+		{
+			while( ( $key = array_search( $apply_rendering, $this->index_apply_rendering_codes[$Plugin->apply_rendering] ) ) !== false )
+			{
+				unset( $this->index_apply_rendering_codes[$Plugin->apply_rendering][$key] );
 			}
 		}
 
@@ -643,6 +695,44 @@ class Plugins
 		$Plugin->priority = $priority;
 		$this->sort();
 		return $r;
+	}
+
+
+	/**
+	 * Set the apply_rendering value for a given Plugin ID.
+	 *
+	 * It makes sure that the index is handled and writes it to DB.
+	 *
+	 * @return boolean true if set to new value, false in case of error or if already set to same value
+	 */
+	function set_apply_rendering( $plugin_ID, $apply_rendering )
+	{
+		global $DB;
+
+		if( ! in_array( $apply_rendering, $this->get_apply_rendering_values() ) )
+		{
+			debug_die( 'Plugin apply_rendering not in allowed list.' );
+		}
+
+		$Plugin = & $this->get_by_ID($plugin_ID);
+		if( ! $Plugin )
+		{
+			return false;
+		}
+
+		if( $Plugin->apply_rendering == $apply_rendering )
+		{ // Already set to same value
+			return false;
+		}
+
+		$r = $DB->query( '
+			UPDATE T_plugins
+			SET plug_apply_rendering = '.$DB->quote($apply_rendering).'
+			WHERE plug_ID = '.$plugin_ID );
+
+		$Plugin->apply_rendering = $apply_rendering;
+
+		return true;
 	}
 
 
@@ -853,55 +943,63 @@ class Plugins
 	/**
 	 * Validate renderer list.
 	 *
-	 * NOTE: this will instantiate all Plugins!
-	 *
 	 * @param array renderer codes ('default' will include all "opt-out"-ones)
 	 * @return array validated array
 	 */
 	function validate_list( $renderers = array('default') )
 	{
-		$this->restart(); // Just in case.
-
 		$validated_renderers = array();
 
-		while( $loop_RendererPlugin = & $this->get_next() )
-		{ // Go through whole list of renders
-			// echo ' ',$loop_RendererPlugin->code;
+		$index = & $this->index_apply_rendering_codes;
 
-			switch( $loop_RendererPlugin->apply_when )
+		if( isset( $index['stealth'] ) )
+		{
+			// pre_dump( 'stealth:', $index['stealth'] );
+			$validated_renderers = array_merge( $validated_renderers, $index['stealth'] );
+		}
+		if( isset( $index['always'] ) )
+		{
+			// pre_dump( 'always:', $index['always'] );
+			$validated_renderers = array_merge( $validated_renderers, $index['always'] );
+		}
+
+		if( isset( $index['opt-out'] ) )
+		{
+			foreach( $index['opt-out'] as $l_code )
 			{
-				case 'stealth':
-				case 'always':
-					// echo 'FORCED';
-					$validated_renderers[] = $loop_RendererPlugin->code;
-					break;
-
-				case 'opt-out':
-					if( in_array( $loop_RendererPlugin->code, $renderers ) // Option is activated
-						|| in_array( 'default', $renderers ) ) // OR we're asking for default renderer set
-					{
-						// echo 'OPT';
-						$validated_renderers[] = $loop_RendererPlugin->code;
-					}
-					// else echo 'NO';
-					break;
-
-				case 'opt-in':
-				case 'lazy':
-					if( in_array( $loop_RendererPlugin->code, $renderers ) ) // Option is activated
-					{
-						// echo 'OPT';
-						$validated_renderers[] = $loop_RendererPlugin->code;
-					}
-					// else echo 'NO';
-					break;
-
-				case 'never':
-					// echo 'NEVER';
-					continue;	// STOP, don't render, go to next renderer
+				if( in_array( $l_code, $renderers ) // Option is activated
+					|| in_array( 'default', $renderers ) ) // OR we're asking for default renderer set
+				{
+					// pre_dump( 'opt-out:', $l_code );
+					$validated_renderers[] = $l_code;
+				}
 			}
 		}
-		// echo count( $validated_renderers );
+
+		if( isset( $index['opt-in'] ) )
+		{
+			foreach( $index['opt-in'] as $l_code )
+			{
+				if( in_array( $l_code, $renderers ) ) // Option is activated
+				{
+					// pre_dump( 'opt-in:', $l_code );
+					$validated_renderers[] = $loop_RendererPlugin->code;
+				}
+			}
+		}
+		if( isset( $index['lazy'] ) )
+		{
+			foreach( $index['lazy'] as $l_code )
+			{
+				if( in_array( $l_code, $renderers ) ) // Option is activated
+				{
+					// pre_dump( 'lazy:', $l_code );
+					$validated_renderers[] = $loop_RendererPlugin->code;
+				}
+			}
+		}
+
+		// echo 'validated Renderers: '.count( $validated_renderers );
 		return $validated_renderers;
 	}
 
@@ -947,7 +1045,7 @@ class Plugins
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code, ':';
 
-			switch( $loop_RendererPlugin->apply_when )
+			switch( $loop_RendererPlugin->apply_rendering )
 			{
 				case 'stealth':
 				case 'always':
@@ -1062,7 +1160,9 @@ class Plugins
 
 
 	/**
-	 * Load Plugin data from T_plugins (only once), ordered by priority.
+	 * Load Plugins data from T_plugins (only once), ordered by priority.
+	 *
+	 * This fills the needed indexes to lazy-instantiate a Plugin when requested.
 	 */
 	function load_plugins_table()
 	{
@@ -1075,7 +1175,7 @@ class Plugins
 		$Debuglog->add( 'Loading plugins table data.', 'plugins' );
 		$i = 0;
 		foreach( $DB->get_results( '
-				SELECT plug_ID, plug_priority, plug_classname, plug_code FROM T_plugins
+				SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering FROM T_plugins
 				ORDER BY plug_priority', ARRAY_A ) as $row )
 		{ // Loop through installed plugins:
 			$this->index_ID_rows[$row['plug_ID']] = $row; // remember the rows to instantiate the Plugin on request
@@ -1083,7 +1183,7 @@ class Plugins
 			{
 				$this->index_code_ID[$row['plug_code']] = $row['plug_ID'];
 			}
-			//$this->_cache_name_rows[$row['plug_classname']] = $row; // remember the rows to instantiate the Plugin on request
+			$this->index_apply_rendering_codes[$row['plug_apply_rendering']][] = $row['plug_code'];
 
 			$this->sorted_IDs[] = $row['plug_ID'];
 		}
@@ -1094,6 +1194,8 @@ class Plugins
 
 	/**
 	 * Get a specific plugin by its ID.
+	 *
+	 * This is the workhorse when it comes to lazy-instantiate a Plugin.
 	 *
 	 * @param integer plugin ID
 	 * @return Plugin|false
@@ -1118,10 +1220,10 @@ class Plugins
 				return $r;
 			}
 
-			$row = $this->index_ID_rows[$plugin_ID];
+			$row = & $this->index_ID_rows[$plugin_ID];
 
 			// Register the plugin:
-			$Plugin = & $this->register( $row['plug_classname'], $row['plug_ID'], $row['plug_priority'] );
+			$Plugin = & $this->register( $row['plug_classname'], $row['plug_ID'], $row['plug_priority'], $row['plug_apply_rendering'] );
 
 			if( is_string( $Plugin ) )
 			{
@@ -1533,6 +1635,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.21  2006/01/06 18:58:08  blueyed
+ * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
+ *
  * Revision 1.20  2006/01/06 00:27:06  blueyed
  * Small enhancements to new Plugin system
  *

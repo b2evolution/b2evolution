@@ -21,7 +21,7 @@ class bbcode_plugin extends Plugin
 	var $code = 'b2evBBco';
 	var $name = 'BB code';
 	var $priority = 50;
-	var $apply_when = 'opt-in';
+	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
 

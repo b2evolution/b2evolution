@@ -208,7 +208,7 @@ class textile_plugin extends Plugin
 	var $code = 'b2DATxtl';
 	var $name = 'Textile (beta)';
 	var $priority = 20;
-	var $apply_when = 'opt-in';
+	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
 
