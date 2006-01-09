@@ -363,12 +363,12 @@ class Blog extends DataObject
 			// TODO: Link to some help page(s) with errors!
 			if( !is_writable( dirname($mediadir) ) )
 			{ // add error
-				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; cannot be created, because the parent directory &laquo;%s&raquo; is not writable."), $mediadir, dirname($mediadir) ), 'error' );
+				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($mediadir) ), 'error' );
 				return false;
 			}
 			elseif( !@mkdir( $mediadir ) ) // default chmod?!
 			{ // add error
-				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), $mediadir ), 'error' );
+				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($mediadir) ), 'error' );
 				return false;
 			}
 			else
@@ -754,6 +754,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.50  2006/01/09 19:11:14  blueyed
+ * User/Blog media dir creation messages more verbose/secure.
+ *
  * Revision 1.49  2005/12/16 13:35:59  fplanque
  * no message
  *

@@ -276,9 +276,14 @@ class User extends DataObject
 		$userdir = $basepath.$media_subdir.'users/'.$this->login.'/';
 		if( !is_dir( $userdir ) )
 		{
-			if( !@mkdir( $userdir ) )
+			if( !is_writable( dirname($userdir) ) )
 			{ // add error
-				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; could not be created."), $userdir ), 'error' );
+				$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($userdir) ), 'error' );
+				return false;
+			}
+			elseif( !@mkdir( $userdir ) )
+			{ // add error
+				$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($userdir) ), 'error' );
 				return false;
 			}
 			else
@@ -931,6 +936,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.58  2006/01/09 19:11:14  blueyed
+ * User/Blog media dir creation messages more verbose/secure.
+ *
  * Revision 1.57  2005/12/14 17:14:42  blueyed
  * chmod() created media directory
  *
