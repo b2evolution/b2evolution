@@ -419,7 +419,14 @@ function check_canonical_path( $path )
 				$j--;
 			}
 		}
-		return array( implode('/', $pwdArr).'/', false );
+
+		$r_path = implode('/', $pwdArr).'/';
+
+		if( strpos( ltrim($path), '/' ) === 0 )
+		{ // There was at least one slash at the beginning
+			$r_path = '/'.$r_path;
+		}
+		return array( $r_path, false );
 	}
 }
 
@@ -548,6 +555,9 @@ function rel_path_to_base( $path )
 
 /*
  * $Log$
+ * Revision 1.40  2006/01/09 19:26:20  blueyed
+ * Fix check_canonical_path() for non-existing paths with trailing slash.
+ *
  * Revision 1.39  2005/12/15 19:12:54  blueyed
  * Typo. consistent wording.
  *
