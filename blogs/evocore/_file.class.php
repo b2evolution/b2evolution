@@ -734,7 +734,7 @@ class File extends DataObject
 		if( ! isset( $this->_fsgroup_name ) )
 		{
 			$gid = filegroup( $this->_adfp_full_path );
-			if( $gid )
+			if( $gid !== false )
 			{
 				$posix_group = posix_getgrgid( $gid );
 				if( is_array($posix_group) )
@@ -758,7 +758,7 @@ class File extends DataObject
 		if( ! isset( $this->_fsowner_name ) )
 		{
 			$uid = fileowner( $this->_adfp_full_path );
-			if( $uid )
+			if( $uid !== false )
 			{
 				$posix_user = posix_getpwuid( $uid );
 				if( is_array($posix_user) )
@@ -1335,6 +1335,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.58  2006/01/09 21:57:26  blueyed
+ * get_fsgroup_name(), get_fsowner_name(): fix for root (ID 0)
+ *
  * Revision 1.57  2005/12/19 16:42:03  fplanque
  * minor
  *
