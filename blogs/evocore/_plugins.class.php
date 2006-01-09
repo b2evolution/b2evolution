@@ -948,6 +948,8 @@ class Plugins
 	 */
 	function validate_list( $renderers = array('default') )
 	{
+		$this->load_plugins_table();
+
 		$validated_renderers = array();
 
 		$index = & $this->index_apply_rendering_codes;
@@ -983,7 +985,7 @@ class Plugins
 				if( in_array( $l_code, $renderers ) ) // Option is activated
 				{
 					// pre_dump( 'opt-in:', $l_code );
-					$validated_renderers[] = $loop_RendererPlugin->code;
+					$validated_renderers[] = $l_code;
 				}
 			}
 		}
@@ -994,7 +996,7 @@ class Plugins
 				if( in_array( $l_code, $renderers ) ) // Option is activated
 				{
 					// pre_dump( 'lazy:', $l_code );
-					$validated_renderers[] = $loop_RendererPlugin->code;
+					$validated_renderers[] = $l_code;
 				}
 			}
 		}
@@ -1635,6 +1637,10 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.22  2006/01/09 18:17:42  blueyed
+ * validate_list() need to call load_plugin_tables(); also fixed it for opt-in and lazy renderers.
+ * Fixes http://dev.b2evolution.net/todo.php/2006/01/09/wacko_formatting_plugin_does_not_work_an
+ *
  * Revision 1.21  2006/01/06 18:58:08  blueyed
  * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
  *
