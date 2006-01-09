@@ -50,6 +50,9 @@ require_once dirname(__FILE__).'/_fileroot.class.php';
  */
 class FileRootCache
 {
+	/**
+	 * @var array Internal cache
+	 */
 	var $cache = array();
 
 
@@ -57,7 +60,7 @@ class FileRootCache
 	 * Get a FileRoot (cached) by ID.
 	 *
 	 * @param string ID of the FileRoot (e.g. 'user_X' or 'collection_X')
-	 * @return FileRoot
+	 * @return FileRoot|false FileRoot on success, false on failure (ads_path is false).
 	 */
 	function & get_by_ID( $id )
 	{
@@ -74,7 +77,7 @@ class FileRootCache
 	 *
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
-	 * @return FileRoot
+	 * @return FileRoot|false FileRoot on success, false on failure (ads_path is false).
 	 */
 	function & get_by_type_and_ID( $root_type, $root_in_type_ID )
 	{
@@ -82,7 +85,12 @@ class FileRootCache
 
 		if( ! isset( $this->cache[$root_ID] ) )
 		{	// Not in Cache, let's instantiate:
-			$this->cache[$root_ID] = new FileRoot( $root_type, $root_in_type_ID ); // COPY
+			$Root = new FileRoot( $root_type, $root_in_type_ID ); // COPY; blueyed>> why?
+			if( empty($Root->ads_path) ) // false
+			{
+				$Root = false;
+			}
+			$this->cache[$root_ID] = & $Root;
 		}
 
 		return $this->cache[$root_ID];
@@ -104,6 +112,9 @@ class FileRootCache
 
 /*
  * $Log$
+ * Revision 1.7  2006/01/09 18:51:22  blueyed
+ * get_by_type_and_ID(): return false if this root has no valid path/does not exist!
+ *
  * Revision 1.6  2005/12/16 13:50:49  blueyed
  * FileRoot::get_by_ID() from post-phoenix
  *
