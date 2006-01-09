@@ -133,7 +133,7 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 
 <!-- THE MAIN FORM -->
 
-<?php 
+<?php
 	$Form = & new Form( 'files.php#FM_anchor', 'FilesForm', 'post', 'none' );
 	$Form->begin_form();
 ?>
@@ -148,17 +148,14 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 
 <?php
 /**
- * @global integer Number of cols for the files table, 8 by default
+ * @global integer Number of cols for the files table, 6 is minimum.
  */
-if( $Fileman->flatmode )
-{
-	$filetable_cols = 9;
-}
-else
-{
-	$filetable_cols = 8;
-}
-
+$filetable_cols = 6
+	+ (int)$Fileman->flatmode
+	+ (int)$UserSettings->get('fm_showtypes')
+	+ (int)$UserSettings->get('fm_showfsperms')
+	+ (int)$UserSettings->get('fm_showfsowner')
+	+ (int)$UserSettings->get('fm_showfsgroup');
 ?>
 
 <thead>
@@ -282,7 +279,7 @@ else
 
 	if( $UserSettings->get('fm_showfsgroup') )
 	{ // Show file group column
-		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'fsgroup', /* TRANS: file owner */ T_('Group') ).'</th>';
+		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'fsgroup', /* TRANS: file group */ T_('Group') ).'</th>';
 	}
 
 	echo '<th class="lastcol nowrap">'. /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions').'</th>';
@@ -314,7 +311,6 @@ while( $lFile = & $Fileman->get_next() )
 	echo '<td class="checkbox firstcol">';
 	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"';
-							// Removed funky onclick behaviour	
 	if( $checkall || $Fileman->isSelected( $lFile ) )
 	{
 		echo ' checked="checked"';
@@ -412,8 +408,8 @@ while( $lFile = & $Fileman->get_next() )
 
 	if( $lFile->is_dir() )
 	{ // Directory
-		
-		// Link to open the directory in the curent window						
+
+		// Link to open the directory in the curent window
 		echo '<a href="'.$browse_dir_url.'">'		// Removed funky onclick behaviour
 			           .$lFile->get_name().'</a>';
 	}
@@ -558,10 +554,10 @@ else
 	?>
 	<tr class="listfooter">
 		<td colspan="<?php echo $filetable_cols ?>">
-		
-		<?php	$Form->check_all();	?>	
+
+		<?php	$Form->check_all();	?>
 			&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
-				
+
 		<?php
 		if( $mode == 'upload' )
 		{	// We are uploading in a popup opened by an edit screen
@@ -854,6 +850,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.70  2006/01/09 22:00:32  blueyed
+ * Fixed colspan for first row to be as wide as the number of chosen columns.
+ *
  * Revision 1.69  2005/12/30 20:13:39  fplanque
  * UI changes mostly (need to double check sync)
  *
