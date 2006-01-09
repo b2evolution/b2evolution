@@ -100,7 +100,7 @@ echo '<table class="grouped">';
 echo "<tr>\n";
 echo '<th>'.T_('Issue date')."</th>\n";
 echo '<th>'.T_('Author')."</th>\n";
-echo '<th colspan="2">'.T_('Status')."</th>\n";
+echo '<th colspan="2">'.T_('Visibility')."</th>\n";
 echo '<th>'.T_('Title')."</th>\n";
 if( $Blog->ID == 1 )
 { // "All blogs": display name of blog
@@ -223,6 +223,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.18  2006/01/09 17:21:06  fplanque
+ * no message
+ *
  * Revision 1.17  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

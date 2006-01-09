@@ -34,17 +34,22 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @var Comment
+ */
+global $Comment;
+
 /*
  * Display comments:
  */
 ?>
 <div class="bFeedback">
-<h2><?php echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks') ?>:</h2>
+<h2><?php echo T_('Feedback (Comments, Trackbacks...)') ?></h2>
 <?php
 
 $CommentList->display_if_empty(
 							'<div class="bComment"><p>' .
-							T_('No feedback for yet...') .
+							T_('No feedback yet...') .
 							'</p></div>' );
 
 while( $Comment = & $CommentList->get_next() )
@@ -53,10 +58,10 @@ while( $Comment = & $CommentList->get_next() )
 	<!-- ========== START of a COMMENT/TB/PB ========== -->
 	<div class="bComment">
 		<div class="bSmallHead">
+			<strong><?php $Comment->date(); ?></strong>
+			@
+			<strong><?php $Comment->time( 'H:i' ); ?></strong>
 			<?php
-			$Comment->date();
-			echo ' @ ';
-			$Comment->time( 'H:i' );
 			if( $Comment->author_url( '', ' &middot; Url: ', '' )
 					&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{ // There is an URL and we have permission to ban...
@@ -72,6 +77,11 @@ while( $Comment = & $CommentList->get_next() )
 		 ?>
 		</div>
 		<div class="bCommentContent">
+		<div class="bTitle">
+			<?php echo T_('In response to:').' <a href="b2browse.php?blog='.$Blog->ID.'&amp;tab=exp&amp;p='.$Comment->Item->ID
+								.'&amp;c=1&amp;tb=1&amp;pb=1" class="" title="'.T_('Edit this task...').'">'.$Comment->Item->dget('title').'</a>';
+				?>
+		</div>
 		<div class="bCommentTitle">
 		<?php
 			switch( $Comment->get( 'type' ) )
@@ -116,6 +126,9 @@ while( $Comment = & $CommentList->get_next() )
 <?php
 /*
  * $Log$
+ * Revision 1.2  2006/01/09 17:21:06  fplanque
+ * no message
+ *
  * Revision 1.1  2005/12/19 19:29:46  fplanque
  * added browse latest comments (to be enhanced...)
  * Feel free to add status management / moderation

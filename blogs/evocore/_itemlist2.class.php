@@ -460,7 +460,7 @@ class ItemList2 extends DataObjectList2
 
 		if( empty( $this->filters ) )
 		{	// Filters have no been set before, we'll use the default filterset:
-			echo ' Query:Setting default filterset ';
+			// echo ' Query:Setting default filterset ';
 			$this->set_filters( $this->default_filters );
 		}
 
@@ -923,6 +923,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.12  2006/01/09 17:21:06  fplanque
+ * no message
+ *
  * Revision 1.11  2006/01/04 20:34:52  fplanque
  * allow filtering on extra statuses
  *

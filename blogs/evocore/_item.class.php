@@ -1466,6 +1466,23 @@ class Item extends DataObject
 
 
 	/**
+	 * Template function: display priority of item
+	 *
+	 * @param string
+	 * @param string
+	 */
+	function priority( $before = '', $after = '' )
+	{
+		if( isset($this->priority) )
+		{
+			echo $before;
+			echo $this->priority;
+			echo $after;
+		}
+	}
+
+
+	/**
 	 * Template function: display list of priority options
 	 */
 	function priority_options( $field_value, $allow_none )
@@ -2263,6 +2280,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.84  2006/01/09 17:21:06  fplanque
+ * no message
+ *
  * Revision 1.83  2006/01/06 18:58:08  blueyed
  * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
  *

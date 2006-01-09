@@ -34,6 +34,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @var Item
+ */
+global $Item;
+
 // Display title depending on selection params:
 echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 
@@ -71,38 +76,39 @@ while( $Item = $ItemList->get_item() )
 		$Item->anchor(); ?>
 		<div class="bSmallHead">
 			<?php
-
 				echo '<div class="bSmallHeadRight">';
 				locale_flag( $Item->locale, 'h10px' );
 				echo '</div>';
 
 				echo '<strong>';
-				$Item->issue_date(); echo ' @ '; $Item->issue_time();
-				echo '</strong>';
+				$Item->issue_date();
+ 				echo '</strong> @ <strong>';
+ 				$Item->issue_time( 'H:i' );
+ 				echo '</strong>';
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
-				echo ' ', T_('by'), ' ';
-				$Item->Author->preferred_name();
-				echo ' (';
+				echo ' ', T_('by'), ' <acronym title="';
 				$Item->Author->login();
-				echo ', ', T_('level:');
+				echo ', '.T_('level:');
 				$Item->Author->level();
-				echo '), ';
-				$Item->views();
-				echo ' '.T_('views');
+				echo '"><strong>';
+				$Item->Author->preferred_name();
+				echo '</strong></acronym>';
 
 				echo '<div class="bSmallHeadRight">';
-				echo T_('Status').': ';
+				echo T_('Visibility').': ';
 				echo '<span class="Status">';
 				$Item->status();
 				echo '</span>';
 				echo '</div>';
 
 				echo '<br />';
-				$Item->type( T_('Type').': ', ' &nbsp; ' );
-				$Item->assigned_to( T_('Assigned to:').' ' );
+				$Item->type( T_('Type').': <strong>', '</strong> &nbsp; ' );
+				$Item->priority( T_('Priority').': <strong>', '</strong> &nbsp; ' );
+				$Item->assigned_to( T_('Assigned to:').' <strong>', '</strong> &nbsp; ' );
+				$Item->extra_status( T_('Task Status').': <strong>', '</strong>' );
 
 				echo '<div class="bSmallHeadRight">';
-				$Item->extra_status( T_('Extra').': ' );
+				$Item->views();
 				echo '</div>';
 
 				echo '<br />'.T_('Categories').': ';
@@ -312,6 +318,9 @@ $ItemList->display_nav( 'footer' );
 
 /*
  * $Log$
+ * Revision 1.7  2006/01/09 17:21:06  fplanque
+ * no message
+ *
  * Revision 1.6  2005/12/22 15:53:37  fplanque
  * Splitted display and display init
  *

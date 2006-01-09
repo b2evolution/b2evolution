@@ -245,9 +245,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Workflow properties') );
 
-	$Form->select_options( 'item_st_ID',
-												$ItemStatusCache->option_list_return( $edited_Item->st_ID, ! $edited_Item->st_required ),
-												 T_('Task status') );
+	$Form->select_object( 'item_priority', NULL, $edited_Item, T_('Priority'), '', true, '', 'priority_options' );
 
 	echo ' '; // allow wrapping!
 
@@ -256,8 +254,9 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	echo ' '; // allow wrapping!
 
-	$Form->select_object( 'item_priority', NULL, $edited_Item, T_('Priority'),
-												'', true, '', 'priority_options' );
+	$Form->select_options( 'item_st_ID',
+												$ItemStatusCache->option_list_return( $edited_Item->st_ID, ! $edited_Item->st_required ),
+												 T_('Task status') );
 
 	echo ' '; // allow wrapping!
 
@@ -396,6 +395,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.46  2006/01/09 17:21:06  fplanque
+ * no message
+ *
  * Revision 1.45  2006/01/05 23:44:21  blueyed
  * Use new event names.
  *
