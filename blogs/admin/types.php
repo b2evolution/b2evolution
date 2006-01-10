@@ -37,7 +37,7 @@ $AdminUI->set_path( 'options', 'types' );
 $edited_table = 'T_posttypes';
 $edited_table_IDcol = 'ptyp_ID';
 $edited_table_namecol = 'ptyp_name';
-$edited_table_orderby = 'ptyp_name ASC';
+$default_col_order = '-A';
 $edited_name_maxlen = 40;
 
 require dirname(__FILE__).'/_listeditor.php';

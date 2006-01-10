@@ -37,8 +37,8 @@ $AdminUI->set_path( 'options', 'statuses' );
 $edited_table = 'T_poststatuses';
 $edited_table_IDcol = 'pst_ID';
 $edited_table_namecol = 'pst_name';
-$edited_table_orderby = 'pst_ID ASC';
+$default_col_order = 'A';
 $edited_name_maxlen = 40;
 
-require dirname(__FILE__). '/_listeditor.php';
+require dirname(__FILE__).'/_listeditor.php';
 ?>

@@ -193,8 +193,9 @@ echo '<div class="browse_side_item">';
 		 * Statuses
  		 * TODO: allow multiple selection
 		 */
+		$ItemStatusCache->load_all(); // TODO: load for current blog only
 		if( count($ItemStatusCache->cache) )
-		{
+		{	// We have satuses:
 			echo '<fieldset>';
 			echo '<legend>'.T_('Statuses').'</legend>';
 			echo '<ul>';
@@ -256,6 +257,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.24  2006/01/10 20:55:40  fplanque
+ * bugfix
+ *
  * Revision 1.23  2006/01/04 20:34:51  fplanque
  * allow filtering on extra statuses
  *
