@@ -330,7 +330,9 @@ class User extends DataObject
 	{
 		switch( $parname )
 		{
-			// case 'icq':		// Dangerous: easy to forget it's not a string
+			case 'icq':
+				return parent::set_param( $parname, 'number', $parvalue, true );
+
 			case 'level':
 			case 'notify':
 			case 'showonline':
@@ -936,6 +938,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.60  2006/01/10 21:09:30  fplanque
+ * I think the ICQ NULL is better enforced in User::set()
+ *
  * Revision 1.59  2006/01/10 19:59:55  blueyed
  * type-fix for icq member
  *

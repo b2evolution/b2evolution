@@ -65,10 +65,6 @@ param( 'newuser_nickname', 'string', '' );
 param( 'newuser_idmode', 'string', '' );
 param( 'newuser_locale', 'string', $default_locale );
 param( 'newuser_icq', 'string', '' );
-if( empty( $newuser_icq ) )
-{ // make it NULL, to avaoid out-of-range SQL error for ''
-	$newuser_icq = NULL;
-}
 param( 'newuser_aim', 'string', '' );
 param( 'newuser_msn', 'string', '' );
 param( 'newuser_yim', 'string', '' );
