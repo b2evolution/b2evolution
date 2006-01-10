@@ -265,6 +265,10 @@ if( !$Messages->count('error') )
 
 			$Request->param( 'edited_user_icq', 'string', true );
 			$Request->param_check_number( 'edited_user_icq', T_('The ICQ UIN can only be a number, no letters allowed.') );
+			if( ! $Request->get( 'edited_user_icq' ) )
+			{ // make it NULL, to avaoid out-of-range SQL error for ''
+				$Request->set_param( 'edited_user_icq', NULL );
+			}
 
 			param( 'edited_user_aim', 'string', true );
 
@@ -594,6 +598,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.124  2006/01/10 19:58:20  blueyed
+ * Type-Fix for ICQ param (cannot be updated as '' in SQL strict mode)
+ *
  * Revision 1.123  2005/12/23 19:05:39  blueyed
  * minor
  *
