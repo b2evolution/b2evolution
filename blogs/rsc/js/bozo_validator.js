@@ -7,11 +7,16 @@
  * 
  * Tested on Firefox (XP & Mac osx) , Ie (XP), Safari (Mac osx)
  */
+var bozo_confirm_mess;
+
 var bozo = {
 	
 	'tab_changes' : Array(), 	// array of changes numbers for each form we need to verify
 	'nb_changes' : 0, 			// Total changes number 
-	
+
+	// If no translated message has been provided, use this default:
+	'confirm_mess' : bozo_confirm_mess ? bozo_confirm_mess : 'You have modified this form but you haven\'t submitted it yet.\nYou are about to loose your edits.\nAre you sure?',
+
 	/**
 	 *	BOZO VALIDATOR INITIALIZATION 
 	 *	Add change event on all inputs if the form parent ID is like *_checkchanges
@@ -59,7 +64,7 @@ var bozo = {
 			}
 			
 			all_selects = el_form.getElementsByTagName( 'select' );
-			// Loop on all form textareas
+			// Loop on all form selects
 			for( var j = 0; j < all_selects.length; j++ ) 
 			{	if( el_form.id && el_form.id.indexOf( '_checkchanges' ) != -1 )
 				{
@@ -137,7 +142,7 @@ var bozo = {
 		
 		if ( bozo.nb_changes )
 		{	// there are input changes
-			if( !confirm( 'You have modified this form but you haven\'t submitted it yet.\nYou are about to loose your edits.\nAre you sure?' ) )
+			if( !confirm( bozo.confirm_mess ) )
 			{ 	// cancel confirmation, so we cancel the href event
 				// For only Mozilla browser in this case
 				bozo.cancelClick( e );
@@ -168,7 +173,7 @@ var bozo = {
 		}
 		if ( changes )
 		{	// exist changes in other form inputs
-			if( !confirm('Do not save change(s)') )
+			if( !confirm( bozo.confirm_mess ) )
 			{ 	// cancel confirmation, so we cancel the submit event
 				// For only Mozilla browser in this case
 				bozo.cancelClick( e );
