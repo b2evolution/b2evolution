@@ -733,7 +733,7 @@ class File extends DataObject
 	{
 		if( ! isset( $this->_fsgroup_name ) )
 		{
-			$gid = filegroup( $this->_adfp_full_path );
+			$gid = @filegroup( $this->_adfp_full_path ); // might spit a warning for a dangling symlink
 			if( $gid !== false )
 			{
 				$posix_group = posix_getgrgid( $gid );
@@ -757,7 +757,7 @@ class File extends DataObject
 	{
 		if( ! isset( $this->_fsowner_name ) )
 		{
-			$uid = fileowner( $this->_adfp_full_path );
+			$uid = @fileowner( $this->_adfp_full_path ); // might spit a warning for a dangling symlink
 			if( $uid !== false )
 			{
 				$posix_user = posix_getpwuid( $uid );
@@ -1335,6 +1335,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.59  2006/01/10 10:36:31  blueyed
+ * Suppress warnings for dangling symlinks
+ *
  * Revision 1.58  2006/01/09 21:57:26  blueyed
  * get_fsgroup_name(), get_fsowner_name(): fix for root (ID 0)
  *
