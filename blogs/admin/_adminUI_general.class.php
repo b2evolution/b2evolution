@@ -1115,7 +1115,7 @@ class AdminUI_general
 	 */
 	function get_page_head()
 	{
-		global $app_version, $current_User;
+		global $app_shortname, $app_version, $current_User;
 
 		$r = '
 		<div id="header">
@@ -1126,7 +1126,7 @@ class AdminUI_general
 					'.$this->exit_links.'
 				</span>
 
-				b2evo v <strong>'.$app_version.'</strong>
+				'.$app_shortname.' v <strong>'.$app_version.'</strong>
 				&middot; '.$this->get_head_info().'
 			</div>
 
@@ -1165,6 +1165,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.43  2006/01/10 19:03:16  blueyed
+ * Use $app_shortname in get_page_head()
+ *
  * Revision 1.42  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
