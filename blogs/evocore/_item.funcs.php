@@ -147,11 +147,12 @@ function get_postdata($postid)
 
 	// echo "*** Loading post data! ***<br>\n";
 	// We have to load the post
-	$sql = 'SELECT post_ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_locale, post_content, post_title,
-											post_url, post_main_cat_ID, post_flags, post_wordcount, post_comments, post_views, cat_blog_ID
-					FROM T_posts
-					INNER JOIN T_categories ON post_main_cat_ID = cat_ID
-					WHERE post_ID = '.$postid;
+	$sql = 'SELECT post_ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_content, post_title,
+											post_main_cat_ID, post_flags, cat_blog_ID ';
+	$sql .= ', post_locale, post_url, post_wordcount, post_comments, post_views ';
+	$sql .= '	FROM T_posts
+					 INNER JOIN T_categories ON post_main_cat_ID = cat_ID
+					 WHERE post_ID = '.$postid;
 	// Restrict to the statuses we want to show:
 	// echo $show_statuses;
 	// fplanque: 2004-04-04: this should not be needed here. (and is indeed problematic when we want to
@@ -168,12 +169,12 @@ function get_postdata($postid)
 			'Author_ID' => $myrow->post_creator_user_ID,
 			'Date' => $myrow->post_datestart,
 			'Status' => $myrow->post_status,
-			'Locale' => $myrow->post_locale,
 			'Content' => $myrow->post_content,
 			'Title' => $myrow->post_title,
-			'Url' => $myrow->post_url,
 			'Category' => $myrow->post_main_cat_ID,
 			'Flags' => explode( ',', $myrow->post_flags ),
+			'Locale' => $myrow->post_locale,
+			'Url' => $myrow->post_url,
 			'Wordcount' => $myrow->post_wordcount,
 			'views' => $myrow->post_views,
 			'comments' => $myrow->post_comments,
@@ -957,6 +958,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.45  2006/01/10 20:59:49  fplanque
+ * minor / fixed internal sync issues @ progidistri
+ *
  * Revision 1.44  2006/01/04 20:35:14  fplanque
  * no message
  *

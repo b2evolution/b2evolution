@@ -785,11 +785,11 @@ class ItemList extends DataObjectList
 				'Author_ID'  => $this->last_Item->Author->ID,
 				'Date'       => $this->last_Item->issue_date,
 				'Status'     => $this->last_Item->status,
-				'Locale'     => $this->last_Item->locale,
 				'Content'    => $this->last_Item->content,
 				'Title'      => $this->last_Item->title,
-				'Url'        => $this->last_Item->url,
 				'Category'   => $this->last_Item->main_cat_ID,
+				'Locale'     => $this->last_Item->locale,
+				'Url'        => $this->last_Item->url,
 				'Flags'      => explode( ',', $this->last_Item->flags ),
 				'Wordcount'  => $this->last_Item->wordcount,
 				'views'      => $this->last_Item->views,
@@ -876,6 +876,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.50  2006/01/10 20:59:49  fplanque
+ * minor / fixed internal sync issues @ progidistri
+ *
  * Revision 1.49  2006/01/06 16:44:16  fplanque
  * bugfix
  *

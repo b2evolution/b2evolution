@@ -87,12 +87,14 @@ class ItemList2 extends DataObjectList2
 	 * @param mixed Default filter set: Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Default filter set: Do not show posts after this timestamp, can be 'now'
 	 * @param string name of cache to be used
+	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 */
 	function ItemList2(
 			& $Blog,
 			$timestamp_min = NULL,       // Do not show posts before this timestamp
 			$timestamp_max = NULL,   		 // Do not show posts after this timestamp
-			$cache_name = 'ItemCache'		 // name of cache to be used
+			$cache_name = 'ItemCache',	 // name of cache to be used
+			$param_prefix = ''
 		)
 	{
 		global $Settings, $$cache_name;
@@ -102,7 +104,7 @@ class ItemList2 extends DataObjectList2
 		$DataObjectCache = & $$cache_name; // By ref!!
 
 		// Call parent constructor:
-		parent::DataObjectList2( $DataObjectCache, 20, '', NULL );
+		parent::DataObjectList2( $DataObjectCache, 20, $param_prefix, NULL );
 
 		// The SQL Query object:
 		$this->ItemQuery = & new ItemQuery( $DataObjectCache->dbtablename, $DataObjectCache->dbprefix, $DataObjectCache->dbIDname );
@@ -923,6 +925,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.13  2006/01/10 21:00:09  fplanque
+ * minor / fixed internal sync issues @ progidistri
+ *
  * Revision 1.12  2006/01/09 17:21:06  fplanque
  * no message
  *

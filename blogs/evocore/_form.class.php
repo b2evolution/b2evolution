@@ -1397,7 +1397,7 @@ class Form extends Widget
 	 * Display a select field and populate it with a cache object.
 	 *
 	 * @param string field name
-	 * @param string string containing options
+	 * @param string string containing options '<option ...</option>'
 	 * @param string field label to be display before the field
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - 'label': Field label to be display before the field
@@ -2387,6 +2387,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.96  2006/01/10 20:59:49  fplanque
+ * minor / fixed internal sync issues @ progidistri
+ *
  * Revision 1.95  2005/12/30 20:13:39  fplanque
  * UI changes mostly (need to double check sync)
  *

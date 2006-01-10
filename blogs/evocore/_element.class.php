@@ -73,12 +73,7 @@ class Element extends DataObject
 		// Call parent constructor:
 		parent::DataObject( $tablename, $prefix, $dbIDname );
 
-		if( $db_row == NULL )
-		{
-			// echo 'Creating blank group';
-			$this->set( 'name', T_('New element') );
-		}
-		else
+		if( $db_row != NULL )
 		{
 			// echo 'Instanciating existing group';
 			$this->ID = $db_row->$dbIDname;
@@ -123,6 +118,9 @@ class Element extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2006/01/10 20:59:49  fplanque
+ * minor / fixed internal sync issues @ progidistri
+ *
  * Revision 1.7  2005/11/04 21:42:22  blueyed
  * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
  *

@@ -69,12 +69,12 @@ $object_def['Item'] = array( // definition of the object:
 					'datestart'       => 'post_datestart',
 					'datemodified'    => 'post_datemodified',
 					'status'          => 'post_status',
-					'locale'          => 'post_locale',
 					'content'         => 'post_content',
 					'title'           => 'post_title',
+					'main_cat_ID'     => 'post_main_cat_ID',
+					'locale'          => 'post_locale',
 					'urltitle'        => 'post_urltitle',
 					'url'             => 'post_url',
-					'main_cat_ID'     => 'post_main_cat_ID',
 					'flags'           => 'post_flags',
 					'wordcount'       => 'post_wordcount',
 					'comments'        => 'post_comments',
@@ -215,9 +215,6 @@ class Item extends DataObject
 				// b2evo only:
 				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
 				array( 'table'=>'T_comments', 'fk'=>'comment_post_ID', 'msg'=>T_('%d comments') ),
-				// progidistri only: (those won't hurt)
-				array( 'table'=>'T_taskcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
-				array( 'table'=>'T_tsk_tsel', 'fk'=>'tkts_tsk_ID', 'msg'=>T_('%d task selections') ),
 			);
 
 		$this->objtype = $objtype;
@@ -251,18 +248,18 @@ class Item extends DataObject
 			$this->issue_date = $db_row->$db_cols['datestart'];
 			$this->mod_date =$db_row->$db_cols['datemodified'];
 			$this->status = $db_row->$db_cols['status'];
-			$this->locale = $db_row->$db_cols['locale'];
 			$this->title = $db_row->$db_cols['title'];
-			$this->urltitle = $db_row->$db_cols['urltitle'];
 			$this->content = $db_row->$db_cols['content'];
-			$this->wordcount = $db_row->$db_cols['wordcount'];
 			$this->main_cat_ID = $db_row->$db_cols['main_cat_ID'];
-			$this->flags = $db_row->$db_cols['flags'];
-			$this->comments = $db_row->$db_cols['comments'];			// Comments status
 			$this->typ_ID = $db_row->$db_cols['typ_ID'];
 			$this->st_ID = $db_row->$db_cols['st_ID'];
 			$this->deadline = $db_row->$db_cols['deadline'];
 			$this->priority = $db_row->$db_cols['priority'];
+			$this->locale = $db_row->$db_cols['locale'];
+			$this->urltitle = $db_row->$db_cols['urltitle'];
+			$this->wordcount = $db_row->$db_cols['wordcount'];
+			$this->flags = $db_row->$db_cols['flags'];
+			$this->comments = $db_row->$db_cols['comments'];			// Comments status
 
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = explode( '.', $db_row->$db_cols['renderers'] );
@@ -2280,6 +2277,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.85  2006/01/10 20:59:49  fplanque
+ * minor / fixed internal sync issues @ progidistri
+ *
  * Revision 1.84  2006/01/09 17:21:06  fplanque
  * no message
  *
