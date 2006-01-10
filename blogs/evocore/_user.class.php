@@ -136,7 +136,7 @@ class User extends DataObject
 					: $default_locale );
 			$this->email = '';
 			$this->url = '';
-			$this->icq = 0;
+			$this->icq = NULL;
 			$this->aim = '';
 			$this->msn = '';
 			$this->yim = '';
@@ -936,6 +936,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.59  2006/01/10 19:59:55  blueyed
+ * type-fix for icq member
+ *
  * Revision 1.58  2006/01/09 19:11:14  blueyed
  * User/Blog media dir creation messages more verbose/secure.
  *
