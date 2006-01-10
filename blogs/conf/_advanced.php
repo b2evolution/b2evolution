@@ -57,8 +57,9 @@ $debug = 0;
  */
 $obhandler_debug = false;
 
+
 /**
- * Demo mode: don't allow changes to the 'demouser' account.
+ * Demo mode: don't allow changes to the 'demouser' and 'admin' account.
  * @global boolean Default: false
  */
 $demo_mode = false;
@@ -84,7 +85,7 @@ if( !isset($default_to_blog) )
 	 * 2 is the default setting, since it is the first user blog created by b2evo.
 	 * 1 is also a popular choice, since it is a special blog aggregating all the others.
 	 * @global int $default_to_blog
-	 * @todo move to $Settings
+	 * @todo move to {@link $Settings}
 	 */
 	$default_to_blog = 2;
 }
