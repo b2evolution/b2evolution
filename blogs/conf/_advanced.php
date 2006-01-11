@@ -537,8 +537,11 @@ $force_regexp_dirname = '';
 
 
 /**
- * Set this to 1 to disable using PHP's register_shutdown_function().
+ * Set this to 1 to disable using PHP's register_shutdown_function(),
+ * but not everywhere (Session saving is done always at the end).
+ *
  * This is NOT recommened, because it affects things that should be done after delivering the page.
+ *
  * @global int $debug_no_register_shutdown
  */
 $debug_no_register_shutdown = 0;

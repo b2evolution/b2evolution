@@ -104,9 +104,6 @@ class Session
 
 	/**
 	 * Constructor
-	 *
-	 * fp>> Note: I have refactored this with small error handlings first, because when there is a cascade of "else"
-	 * statements after the main handling, it's hard to know what they refer to.
 	 */
 	function Session()
 	{
@@ -183,19 +180,13 @@ class Session
 
 		if( $this->ID )
 		{ // there was a valid session before; update data
-			// TODO: save only on shutdown
-			// $this->_session_needs_save = true;
-			$DB->query( '
-				UPDATE T_sessions SET
-					sess_lastseen = "'.date( 'Y-m-d H:i:s', $localtimenow ).'",
-					sess_ipaddress = "'.$Hit->IP.'"
-					WHERE sess_ID = '.$this->ID );
+			$this->_session_needs_save = true;
 		}
 		else
 		{ // create a new session
 			$this->key = generate_random_key(32);
 
-			// We need to INSERT now because we need an ID now! (for thr cookie)
+			// We need to INSERT now because we need an ID now! (for the cookie)
 			$DB->query( '
 				INSERT INTO T_sessions( sess_key, sess_lastseen, sess_ipaddress, sess_agnt_ID )
 				VALUES (
@@ -214,10 +205,7 @@ class Session
 			$Debuglog->add( 'Cookie sent.', 'session' );
 		}
 
-		/*
-		TODO: (post-phoenix) fp>> but don't call this Cron !!! It is not a SCHEDULED task! call it shutdown or sth like that.
-		$Cron->add_task( array(&$this, 'dbsave'), 'always' ); // always save data (no need to call it manually)!
-		*/
+		register_shutdown_function( array( &$this, 'dbsave' ) );
 	}
 
 
@@ -244,12 +232,12 @@ class Session
 		global $DB, $Debuglog;
 
 		// Set the entry in the database
-		// TODO: save only on shutdown
-		// $this->_session_needs_save = true;
+		// Update here always, to have the DB row ID:
 		$q = $DB->query( '
 			UPDATE T_sessions
 			   SET sess_user_ID = "'.$ID.'"
 			 WHERE sess_ID = "'.$this->ID.'"' );
+
 		if( $q !== false )
 		{ // No DB error - query() might return 0 for "0 rows affected"
 			$this->user_ID = $ID;
@@ -303,13 +291,6 @@ class Session
 	{
 		return !empty( $this->user_ID );
 	}
-
-
-	/**
-	 * Get the probability that this is spam.
-	 *
-	 * @todo Move to plugin
-	 */
 
 
 	/**
@@ -369,9 +350,6 @@ class Session
 			$Debuglog->add( 'Session data['.$param.'] updated!', 'session' );
 
 			$this->_session_needs_save = true;
-
-			// TODO: only save on shutdown:
-			$this->dbsave();
 		}
 	}
 
@@ -394,31 +372,30 @@ class Session
 			$Debuglog->add( 'Session data['.$param.'] deleted!', 'session' );
 
 			$this->_session_needs_save = true;
-
-			// TODO: only save on shutdown:
-			$this->dbsave();
 		}
 	}
 
 
 	/**
-	 * Updates {@link $_data}
+	 * Updates session data in database.
 	 *
 	 * Note: The key actually only needs to be updated on a logout.
-	 *
-	 * @todo call this on shutdown -> will also require to update lastseen and stuff like that.
 	 */
 	function dbsave()
 	{
-		global $DB, $Debuglog;
+		global $DB, $Debuglog, $Hit, $localtimenow;
 
 		if( $this->_session_needs_save )
 		{	// There have been changes since the last save.
 			$DB->query( '
 				UPDATE T_sessions SET
+					sess_agnt_ID = "'.$Hit->agent_ID.'",
 					sess_data = '.$DB->quote( serialize($this->_data) ).',
-					sess_key = '.$DB->quote( $this->key ).'
-				WHERE sess_ID = '.$this->ID, 'Session::dbsave' );
+					sess_ipaddress = "'.$Hit->IP.'",
+					sess_key = '.$DB->quote( $this->key ).',
+					sess_lastseen = "'.date( 'Y-m-d H:i:s', $localtimenow ).'",
+					sess_user_ID = "'.$this->user_ID.'"
+				WHERE sess_ID = '.$this->ID, 'Session::dbsave()' );
 
 			$Debuglog->add( 'Session data saved!', 'session' );
 
@@ -429,6 +406,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.36  2006/01/11 01:06:37  blueyed
+ * Save session data once at shutdown into DB
+ *
  * Revision 1.35  2005/12/21 20:38:18  fplanque
  * Session refactoring/doc
  *
