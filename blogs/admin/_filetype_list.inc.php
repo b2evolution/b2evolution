@@ -84,7 +84,7 @@ function display_perm( $perm )
 }
 					
 $Results->cols[] = array(
-						'th' => T_('Allowed'),
+						'th' => T_('Upload'),
 						'order' => 'ftyp_allowed',
 						'th_start' => '<th class="shrinkwrap">',
 						'td_start' => '<td class="shrinkwrap">',

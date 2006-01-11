@@ -141,7 +141,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Filetype->check_delete( sprintf( T_('Cannot delete Division &laquo;%s&raquo;'), $edited_Filetype->dget('name') ) ) )
+			if( ! $edited_Filetype->check_delete( sprintf( T_('Cannot delete file type &laquo;%s&raquo;'), $edited_Filetype->dget('name') ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}

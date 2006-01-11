@@ -93,7 +93,7 @@ if( !$Settings->get( 'fm_enabled' ) )
 // Check permission:
 if( ! $current_User->check_perm( 'files', 'view' ) )
 {
-	$Messages->add( T_('You do not have permission to view files.') );
+	$Messages->add( T_('You have no permission to view files.') );
 	require dirname(__FILE__).'/_menutop.php';
 	require dirname(__FILE__).'/_footer.php';
 	return;
@@ -1341,6 +1341,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.154  2006/01/11 17:32:53  fplanque
+ * wording / translation
+ *
  * Revision 1.153  2006/01/02 19:43:57  fplanque
  * just a little new year cleanup
  *

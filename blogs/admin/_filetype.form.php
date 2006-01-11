@@ -50,13 +50,13 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), array( 'maxlength'=> 80, 'required'=>true ) );
 	
 	$Form->text( 'ftyp_icon', $edited_Filetype->icon, 20, T_('Icon'), '', 40 );
-	
+
 	$Form->radio( 'ftyp_viewtype',
 								$edited_Filetype->viewtype,
 								 array( 
 												array( 'browser', T_( 'Open with browser (popup)' ), T_( 'Let the browser handle the file in a popup.' ) ),
-												array( 'text', T_( 'Open with text viewer (popup)' ), T_( 'Use the online text viewer (recommended for .txt' ) ),
-												array( 'image', T_( 'Open with image viewer (popup)' ), T_( 'Use the online image viewer (recommended for .gif .png .jpg' ) ),
+												array( 'text', T_( 'Open with text viewer (popup)' ), T_( 'Use the online text viewer (recommended for .txt)' ) ),
+												array( 'image', T_( 'Open with image viewer (popup)' ), T_( 'Use the online image viewer (recommended for .gif .png .jpg)' ) ),
 												array( 'external', T_( 'Open with external app (no popup)' ), T_( 'Let the browser handle the file in a popup. Note: if you do not want Word to open inside of IE, you must uncheck "browse in same window" in Windows\' file types.' ) ),
 												array( 'download', T_( 'Download to disk (no popup)' ), T_( 'Tell the browser to save the file to disk instead of displaying it.' ) )
 											),
@@ -76,8 +76,8 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 		}
 	}
 	
-	$Form->checkbox( 'ftyp_allowed', $edited_Filetype->allowed, T_('Allowed'),
-									T_('Check to make this file type allowed to upload and renamed'), '', 1, $not_allowed);
+	$Form->checkbox( 'ftyp_allowed', $edited_Filetype->allowed, T_('Allow upload'),
+									T_('Check to allow uploading and renaming of this file type'), '', 1, $not_allowed);
 
 if( $creating )
 {

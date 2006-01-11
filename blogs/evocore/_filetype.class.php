@@ -94,13 +94,13 @@ class Filetype extends DataObject
 		global $Request, $force_upload_forbiddenext;
 
 		// Extensions
-		if( $Request->param_string_not_empty( 'ftyp_extensions', T_('Please enter a extension.') ) )
+		if( $Request->param_string_not_empty( 'ftyp_extensions', T_('Please enter file extensions separated by space.') ) )
 		{ // Check if estensions has a valid format
 			$Request->params['ftyp_extensions'] = strtolower( trim( $Request->params['ftyp_extensions'] ) );
 			$reg_exp = '/^[a-z0-9]+( [a-z0-9]+)*$/';
 			if( !preg_match( $reg_exp, $Request->params['ftyp_extensions'], $res ) ) 
 			{ // Extensiosn has an invalid format
-				$Request->param_error( 'ftyp_extensions', T_( 'Invalid format extensions' ) );
+				$Request->param_error( 'ftyp_extensions', T_( 'Invalid file extensions format.' ) );
 			}
 		}
 		$this->set_from_Request( 'extensions' );

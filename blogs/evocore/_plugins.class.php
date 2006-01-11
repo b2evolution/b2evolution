@@ -350,7 +350,7 @@ class Plugins
 		if( ! $Plugin->Install() )
 		{
 			$this->unregister( $Plugin );
-			return T_('The installation method of the plugin failed.');
+			return T_('The installation of the plugin failed.');
 		}
 
 		$this->sort( 'priority' );
@@ -409,7 +409,7 @@ class Plugins
 
 		if( ! $Plugin->Uninstall() )
 		{
-			return T_('The uninstallation method of the plugin failed.' );
+			return T_('The uninstallation of the plugin failed.' );
 		}
 
 		$DB->begin();
@@ -1637,6 +1637,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.24  2006/01/11 17:32:52  fplanque
+ * wording / translation
+ *
  * Revision 1.23  2006/01/11 01:23:59  blueyed
  * Fixes
  *
