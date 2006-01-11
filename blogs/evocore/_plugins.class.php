@@ -83,7 +83,7 @@ class Plugins
 	var $index_ID_Plugins = array();
 
 	/**
-	 * Cache Plugin IDs by event.
+	 * Cache Plugin IDs by event. IDs are sorted by priority.
 	 * @var array
 	 */
 	var $index_event_IDs = array();
@@ -544,8 +544,9 @@ class Plugins
 
 
 	/**
-	 * Un-registers a plugin. This does not un-install it from DB, just from
-	 * the internal indexes.
+	 * Un-register a plugin.
+	 *
+	 * This does not un-install it from DB, just from the internal indexes.
 	 */
 	function unregister( & $Plugin )
 	{
@@ -1010,7 +1011,7 @@ class Plugins
 	 * Render the content
 	 *
 	 * @param string content to render
-	 * @param array renderer codes
+	 * @param array renderer codes to use for opt-out, opt-in and lazy.
 	 * @param string Output format, see {@link format_to_output()}
 	 * @param string Type of data to render ('ItemContent').
 	 * @return string rendered content
@@ -1020,10 +1021,6 @@ class Plugins
 		// echo implode(',',$renderers);
 
 		$params = array(
-				/*
-				blueyed>> obsolete, should be handled by Plugin's event handler name.
-				'type'   => $type,
-				*/
 				'data'   => & $content,
 				'format' => $format
 			);
@@ -1369,8 +1366,9 @@ class Plugins
 		$Debuglog->add( 'Loading plugin events.', 'plugins' );
 		foreach( $DB->get_results( '
 				SELECT pevt_plug_ID, pevt_event
-					FROM T_pluginevents
-				 WHERE pevt_enabled > 0' ) as $l_row )
+					FROM T_pluginevents INNER JOIN T_plugins ON pevt_plug_ID = plug_ID
+				 WHERE pevt_enabled > 0
+				 ORDER BY plug_priority', OBJECT, 'Loading plugin events' ) as $l_row )
 		{
 			$this->index_event_IDs[$l_row->pevt_event][] = $l_row->pevt_plug_ID;
 		}
@@ -1512,18 +1510,6 @@ class Plugins
 		{
 			$r = true;
 		}
-		// Delete obsolete events from index:
-		foreach( $obsolete_events as $l_event )
-		{
-			if( ! isset($this->index_event_IDs[ $l_event ]) )
-			{ // No events of that type known
-				continue;
-			}
-			while( ($key = array_search( $Plugin->ID, $this->index_event_IDs[ $l_event ])) !== false )
-			{
-				unset( $this->index_event_IDs[ $l_event ][ $key ] );
-			}
-		}
 
 		if( $discovered_events )
 		{
@@ -1532,14 +1518,6 @@ class Plugins
 				VALUES ( '.$Plugin->ID.', "'.implode( '", 1 ), ('.$Plugin->ID.', "', $discovered_events ).'", 1 )' );
 			$r = true;
 
-			foreach( $discovered_events as $l_event )
-			{ // add events to index
-				if( empty($this->index_event_IDs[$l_event])
-				    || ! in_array( $Plugin->ID, $this->index_event_IDs[$l_event] ) )
-				{
-					$this->index_event_IDs[ $l_event ][] = $Plugin->ID;
-				}
-			}
 			$Debuglog->add( 'Discovered events ['.implode( ', ', $discovered_events ).'] for Plugin '.$Plugin->name, 'plugins' );
 		}
 
@@ -1551,14 +1529,6 @@ class Plugins
 				if( ! isset( $saved_events[$l_event] ) || ! $saved_events[$l_event] )
 				{ // Event not saved yet or not enabled
 					$new_events[] = $l_event;
-				}
-			}
-			foreach( $new_events as $l_event )
-			{ // add events to index
-				if( empty($this->index_event_IDs[$l_event])
-				    || ! in_array( $Plugin->ID, $this->index_event_IDs[ $l_event ] ) )
-				{
-					$this->index_event_IDs[ $l_event ][] = $Plugin->ID;
 				}
 			}
 			if( $new_events )
@@ -1581,17 +1551,6 @@ class Plugins
 					$new_events[] = $l_event;
 				}
 			}
-			foreach( $new_events as $l_event )
-			{
-				// Remove from index:
-				if( isset($this->index_event_IDs[ $l_event ]) )
-				{
-					while( ($key = array_search( $Plugin->ID, $this->index_event_IDs[ $l_event ])) !== false )
-					{
-						unset( $this->index_event_IDs[ $l_event ][ $key ] );
-					}
-				}
-			}
 			if( $new_events )
 			{
 				$DB->query( '
@@ -1600,6 +1559,11 @@ class Plugins
 				$r = true;
 			}
 			$Debuglog->add( 'Disabled events ['.implode( ', ', $new_events ).'] for Plugin '.$Plugin->name, 'plugins' );
+		}
+
+		if( $r )
+		{ // Something has changed: Reload event index
+			$this->load_events();
 		}
 
 		return $r;
@@ -1637,6 +1601,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.25  2006/01/11 21:06:26  blueyed
+ * Fix/cleanup $index_event_IDs handling: gets sorted by priority now. Should finally close http://dev.b2evolution.net/todo.php/2006/01/09/wacko_formatting_plugin_does_not_work_an
+ *
  * Revision 1.24  2006/01/11 17:32:52  fplanque
  * wording / translation
  *
