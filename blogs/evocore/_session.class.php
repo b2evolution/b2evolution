@@ -213,7 +213,6 @@ class Session
 	 * Attach a User object to the session.
 	 *
 	 * @param User The user to attach
-	 * @return boolean true on success, false on failure
 	 */
 	function set_User( $User )
 	{
@@ -224,35 +223,13 @@ class Session
 	/**
 	 * Attach a user ID to the session.
 	 *
+	 * NOTE: ID gets saved to DB on shutdown. This may be a "problem" when querying T_sessions for sess_user_ID.
+	 *
 	 * @param integer The ID of the user to attach
-	 * @return boolean true on success, false on failure
 	 */
 	function set_user_ID( $ID )
 	{
-		global $DB, $Debuglog;
-
-		// Set the entry in the database
-		// Update here always, to have the DB row ID: (fp>> please elaborate why we nned this)
-		// $this->_session_needs_save = true;
-		$q = $DB->query( '
-			UPDATE T_sessions
-			   SET sess_user_ID = "'.$ID.'"
-			 WHERE sess_ID = "'.$this->ID.'"' );
-
-		if( $q !== false )
-		{ // No DB error - query() might return 0 for "0 rows affected"
-			$this->user_ID = $ID;
-
-			$Debuglog->add( 'Set user_ID to '.$this->user_ID, 'session' );
-
-			return true;
-		}
-		else
-		{
-			$Debuglog->add( 'Setting user of session failed!', 'session' );
-
-			return false;
-		}
+		$this->user_ID = $ID;
 	}
 
 
@@ -407,8 +384,8 @@ class Session
 
 /*
  * $Log$
- * Revision 1.37  2006/01/11 17:33:52  fplanque
- * no message
+ * Revision 1.38  2006/01/11 18:23:04  blueyed
+ * Also update sess_user_ID in DB on shutdown with set_User() and set_user_ID().
  *
  * Revision 1.36  2006/01/11 01:06:37  blueyed
  * Save session data once at shutdown into DB
