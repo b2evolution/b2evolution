@@ -73,11 +73,11 @@ class Hit
 
 	/**
 	 * Is this a reload?
-	 * This gets lazy-filled by {@link is_reload()}.
+	 * This gets lazy-filled by {@link is_new_view()}.
 	 * @var boolean
 	 * @access protected
 	 */
-	var $_is_reload;
+	var $_is_new_view;
 
 	/**
 	 * Ignore this hit?
@@ -178,43 +178,6 @@ class Hit
 		$Debuglog->add( 'UserAgent: '.$this->user_agent, 'hit' );
 		$Debuglog->add( 'Referer: '.var_export($this->referer, true).'; type='.$this->referer_type, 'hit' );
 		$Debuglog->add( 'Remote Host: '.$this->get_remote_host(), 'hit' );
-	}
-
-
-	/**
-	 * Detect a reload.
-	 *
-	 * If the URI has been requested from same IP/useragent in past reloadpage_timeout seconds.
-	 *
-	 * This gets used by {@link is_new_view()} to say if it's a new hit.
-	 *
-	 * @todo: if this is only useful to display who's online or view counts, provide option to disable all those resource consuming gadgets. (Those gadgets should be plugins actually, and they should enable this query only if needed)
-	 */
-	function is_reload()
-	{
-		if( ! isset( $this->_is_reload ) )
-		{
-			global $DB, $Debuglog, $Settings, $ReqURI, $localtimenow;
-
-			if( $DB->get_var( '
-				SELECT hit_ID FROM T_hitlog INNER JOIN T_sessions ON hit_sess_ID = sess_ID
-							 INNER JOIN T_useragents ON sess_agnt_ID = agnt_ID
-				 WHERE hit_uri = "'.$DB->escape( $ReqURI ).'"
-					 AND hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
-					 AND hit_remote_addr = '.$DB->quote( $this->IP ).'
-					 AND agnt_signature = '.$DB->quote($this->user_agent),
-						0, 0, 'Hit: Check for reload' ) )
-			{
-				$Debuglog->add( 'Reload!', 'hit' );
-				$this->_is_reload = true;  // We don't want to log this hit again
-			}
-			else
-			{
-				$this->_is_reload = false;
-			}
-		}
-
-		return $this->_is_reload;
 	}
 
 
@@ -634,14 +597,61 @@ class Hit
 
 
 	/**
-	 * Determine if a hit is a new view (not reloaded, ignored or a robot).
+	 * Determine if a hit is a new view (not reloaded, (internally) ignored or from a robot).
 	 *
+	 * 'Reloaded' means: visited before from the same user (in a session) or from same IP/user_agent in the
+	 * last {@link $Settings reloadpage_timeout} seconds.
+	 *
+	 * This gets queried by the Item objects before incrementing its view count (if the Item gets viewed
+	 * in total ({@link $dispmore})).
+	 *
+	 * @todo fplanque>> if this is only useful to display who's online or view counts, provide option to disable all those resource consuming gadgets. (Those gadgets should be plugins actually, and they should enable this query only if needed)
+	 *        blueyed>> Move functionality to Plugin (with a hook in Item::content())?!
 	 * @return boolean
 	 */
 	function is_new_view()
 	{
-		#pre_dump( 'is_new_view:', !$this->is_reload(),  !$this->ignore,   $this->agent_type != 'robot' );
-		return ( ! $this->is_reload() && ! $this->ignore && $this->agent_type != 'robot' );
+		if( $this->ignore || $this->agent_type == 'robot' )
+		{
+			return false;
+		}
+
+		if( ! isset($this->_is_new_view) )
+		{
+			global $current_User;
+			global $DB, $Debuglog, $Settings, $ReqURI, $localtimenow;
+
+			// Restrict to current user if logged in:
+			if( ! empty($current_User->ID) )
+			{ // select by user ID: one user counts really just once. May be even faster than the anonymous query below..!?
+				$sql = '
+					SELECT hit_ID FROM T_hitlog INNER JOIN T_sessions ON hit_sess_ID = sess_ID
+					 WHERE sess_user_ID = '.$current_User->ID.'
+						 AND hit_uri = "'.$DB->escape( $ReqURI ).'"
+					 LIMIT 1';
+			}
+			else
+			{ // select by remote_addr/agnt_signature:
+				$sql = 'SELECT hit_ID FROM T_hitlog INNER JOIN T_sessions ON hit_sess_ID = sess_ID
+							 INNER JOIN T_useragents ON sess_agnt_ID = agnt_ID
+				 WHERE hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
+					 AND hit_remote_addr = '.$DB->quote( $this->IP ).'
+					 AND hit_uri = "'.$DB->escape( $ReqURI ).'"
+					 AND agnt_signature = '.$DB->quote($this->user_agent).'
+				 LIMIT 1';
+			}
+			if( $DB->get_var( $sql, 0, 0, 'Hit: Check for reload' ) )
+			{
+				$Debuglog->add( 'No new view!', 'hit' );
+				$this->_is_new_view = true;  // We don't want to log this hit again
+			}
+			else
+			{
+				$this->_is_new_view = false;
+			}
+		}
+
+		return $this->_is_new_view;
 	}
 
 
