@@ -232,7 +232,8 @@ class Session
 		global $DB, $Debuglog;
 
 		// Set the entry in the database
-		// Update here always, to have the DB row ID:
+		// Update here always, to have the DB row ID: (fp>> please elaborate why we nned this)
+		// $this->_session_needs_save = true;
 		$q = $DB->query( '
 			UPDATE T_sessions
 			   SET sess_user_ID = "'.$ID.'"
@@ -406,6 +407,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.37  2006/01/11 17:33:52  fplanque
+ * no message
+ *
  * Revision 1.36  2006/01/11 01:06:37  blueyed
  * Save session data once at shutdown into DB
  *
