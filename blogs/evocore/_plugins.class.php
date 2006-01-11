@@ -200,9 +200,9 @@ class Plugins
 
 				'PluginSettingsInstantiated' => '',
 
-				'RenderItemAsHtml' => '',
-				'RenderItemAsHtml' => '',
-				'RenderItem' => '',
+				'RenderItemAsHtml' => T_('Renders content when generated as HTML.'),
+				'RenderItemAsXML' => T_('Renders content when generated as XML.'),
+				'RenderItem' => T_('Renders content when not generated as HTML or XML.'),
 
 
 				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
@@ -558,10 +558,10 @@ class Plugins
 			}
 		}
 
-		// Unset rendering index:
+		// Unset apply-rendering index:
 		if( isset( $this->index_apply_rendering_codes[ $Plugin->apply_rendering ] ) )
 		{
-			while( ( $key = array_search( $apply_rendering, $this->index_apply_rendering_codes[$Plugin->apply_rendering] ) ) !== false )
+			while( ( $key = array_search( $Plugin->code, $this->index_apply_rendering_codes[$Plugin->apply_rendering] ) ) !== false )
 			{
 				unset( $this->index_apply_rendering_codes[$Plugin->apply_rendering][$key] );
 			}
@@ -1637,6 +1637,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.23  2006/01/11 01:23:59  blueyed
+ * Fixes
+ *
  * Revision 1.22  2006/01/09 18:17:42  blueyed
  * validate_list() need to call load_plugin_tables(); also fixed it for opt-in and lazy renderers.
  * Fixes http://dev.b2evolution.net/todo.php/2006/01/09/wacko_formatting_plugin_does_not_work_an
