@@ -56,7 +56,6 @@ class ItemList2 extends DataObjectList2
 	 */
 	var $ItemQuery;
 
-
 	/**
 	 * Blog object this ItemList refers to
 	 */
@@ -168,14 +167,23 @@ class ItemList2 extends DataObjectList2
 	   */
 		global $Request;
 
+		// Activate the filterset (fallback to default filter when a value is not set):
 		$this->filters = array_merge( $this->default_filters, $filters );
+
+
+		// set back the GLOBALS !!! needed for regenerate_url() :
 
 		/*
 		 * Blog & Chapters/categories restrictions:
 		 */
 		// Get chapters/categories (and compile those values right away)
  		$Request->memorize_param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], $this->filters['cat_modifier'] );  // List of authors to restrict to
-		$Request->memorize_param( 'cat_array', 'array', $this->default_filters['cat_array'], $this->filters['cat_array'] );
+		$Request->memorize_param( 'catsel', 'array', $this->default_filters['cat_array'], $this->filters['cat_array'] );
+		// TEMP until we get this straight:
+		global $cat_array, $cat_modifier;
+		$cat_array = $this->default_filters['cat_array'];
+		$cat_modifier = $this->default_filters['cat_modifier'];
+
 
 		/*
 		 * Restrict to selected authors:
@@ -693,7 +701,7 @@ class ItemList2 extends DataObjectList2
 			{
 				if( $this->filters['cat_modifier'] == '-' )
 				{
-					$cat_names_string = T_('All but ').$cat_names_string;
+					$cat_names_string = T_('All but ').' '.$cat_names_string;
 					$title_array['cats'] = T_('Categories').': '.$cat_names_string;
 				}
 				else
@@ -925,6 +933,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.14  2006/01/11 18:57:05  fplanque
+ * bugfix
+ *
  * Revision 1.13  2006/01/10 21:00:09  fplanque
  * minor / fixed internal sync issues @ progidistri
  *
