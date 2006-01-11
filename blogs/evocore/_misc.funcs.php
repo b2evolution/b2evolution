@@ -1189,9 +1189,9 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 function get_memorized( $ignore = '' )
 {
 	global $global_param_list;
-	
+
 	$memo = array();
-			
+
 	// Transform ignore params into an array:
 	if( empty ( $ignore ) )
 	{
@@ -1201,20 +1201,20 @@ function get_memorized( $ignore = '' )
 	{
 		$ignore = explode( ',', $ignore );
 	}
-	
-	// Loop on memorize params  
-	if( isset($global_param_list) ) 
+
+	// Loop on memorize params
+	if( isset($global_param_list) )
 	{
 		foreach( $global_param_list as $var => $thisparam )
 		{
 			if( !in_array( $var, $ignore ) )
-			{ 
+			{
 				global $$var;
 				$value = $$var;
 				$memo[$var] = $$var;
 			}
 		}
-	}	 
+	}
 	return $memo;
 }
 
@@ -1333,9 +1333,10 @@ function pre_dump( $vars )
  *              For example, array('class' => 'DB') would exclude everything after the stack
  *              "enters" class DB and everything that got called afterwards.
  *              You can also give an array of arrays which means that every condition in one of the given array must match.
+ * @param integer Number of stack entries to include, after $ignore_from matches.
  * @return string HTML table
  */
-function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'function' => 'debug_get_backtrace' ) )
+function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'function' => 'debug_get_backtrace' ), $offset_ignore_from = 0 )
 {
 	$r = '';
 
@@ -1348,10 +1349,16 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 		if( $ignore_from )
 		{	// we want to ignore from a certain point
 			$trace_length = 0;
+			$break_because_of_offset = false;
 
 			for( $i = count($backtrace); $i > 0; $i-- )
 			{	// Search the backtrace from behind (first call).
-				$l_stack =& $backtrace[$i-1];
+				$l_stack = & $backtrace[$i-1];
+
+				if( $break_because_of_offset && $offset_ignore_from < 1 )
+				{ // we've respected the offset, but need to break now
+					break; // ignore from here
+				}
 
 				foreach( $ignore_from as $l_ignore_key => $l_ignore_value )
 				{	// Check if we want to ignore from here
@@ -1365,11 +1372,21 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 								continue 2; // next ignore setting, because not all match.
 							}
 						}
+						if( $offset_ignore_from-- > 0 )
+						{
+							$break_because_of_offset = true;
+							break;
+						}
 						break 2; // ignore from here
 					}
-					if( isset($l_stack[$l_ignore_key])
+					elseif( isset($l_stack[$l_ignore_key])
 						&& !strcasecmp($l_stack[$l_ignore_key], $l_ignore_value) /* is equal case-insensitive */ )
 					{
+						if( $offset_ignore_from-- > 0 )
+						{
+							$break_because_of_offset = true;
+							break;
+						}
 						break 2; // ignore from here
 					}
 				}
@@ -1950,12 +1967,12 @@ function action_icon( $title, $icon, $url, $word = NULL )
 		$r .= $word;
 	}
 	$r .= '</a> ';
-	
+
 	if( isset( $IconLegend ) )
 	{
 		$IconLegend->add_icon( $icon, $title );
 	}
-	
+
 	return $r;
 }
 
@@ -2390,6 +2407,9 @@ function get_web_help_link( $topic )
 
 /*
  * $Log$
+ * Revision 1.167  2006/01/11 23:39:19  blueyed
+ * Enhanced backtrace-debugging for queries
+ *
  * Revision 1.166  2006/01/04 15:02:10  fplanque
  * better filtering design
  *

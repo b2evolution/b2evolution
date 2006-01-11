@@ -461,7 +461,7 @@ class DB
 			echo '</div>';
 		}
 
-		if( $this->halt_on_error ) die();
+		if( $this->halt_on_error ) debug_die();
 	}
 
 
@@ -594,7 +594,7 @@ class DB
 
 		if( $this->debug_dump_function_trace_for_queries )
 		{
-			$this->queries[ $this->num_queries - 1 ]['function_trace'] = debug_get_backtrace( $this->debug_dump_function_trace_for_queries, array( array( 'class' => 'DB', 'function' => 'query' ) ) );
+			$this->queries[ $this->num_queries - 1 ]['function_trace'] = debug_get_backtrace( $this->debug_dump_function_trace_for_queries, array( array( 'class' => 'DB' ) ), 1 ); // including first stack entry from class DB
 		}
 
 
@@ -1161,6 +1161,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.49  2006/01/11 23:39:19  blueyed
+ * Enhanced backtrace-debugging for queries
+ *
  * Revision 1.48  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
