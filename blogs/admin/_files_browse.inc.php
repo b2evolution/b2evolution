@@ -588,20 +588,20 @@ else
 			// NOTE: No delete confirmation by javascript, we need to check DB integrity!
 
 		}
+		?>
 
-		/*
-			<!-- Not implemented yet: input class="ActionButton"
-				title="<?php echo T_('Download the selected files') ?>"
-				name="actionArray[download]"
-				value="download"
-				type="image"
-				src="<?php echo get_icon( 'download', 'url' ) ?>"
-				onclick="return check_if_selected_files();" / -->
+		<input class="ActionButton"
+			title="<?php echo T_('Download the selected files as archive') ?>"
+			name="actionArray[download]"
+			value="download"
+			type="image"
+			src="<?php echo get_icon( 'download', 'url' ) ?>"
+			onclick="return check_if_selected_files();" />
 
 			<!-- Not implemented yet: input class="ActionButton" type="submit"
 				name="actionArray[sendbymail]" value="<?php echo T_('Send by mail') ?>" onclick="return check_if_selected_files();" / -->
 
-
+		<?php
 		/* Not fully functional:
 		<input class="ActionButton" type="image" name="actionArray[file_copy]"
 			title="<?php echo T_('Copy the selected files'); ?>"
@@ -850,6 +850,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.71  2006/01/11 22:09:29  blueyed
+ * Reactive "download selected files as zip", also as a "workaround" to always have an icon next to "With selected files:".. ;)
+ *
  * Revision 1.70  2006/01/09 22:00:32  blueyed
  * Fixed colspan for first row to be as wide as the number of chosen columns.
  *
@@ -907,9 +910,6 @@ $AdminUI->disp_payload_end();
  * Revision 1.52  2005/11/21 18:33:19  fplanque
  * Too many undiscussed changes all around: Massive rollback! :((
  * As said before, I am only taking CLEARLY labelled bugfixes.
- *
- * Revision 1.46  2005/11/18 21:01:21  fplanque
- * no message
  *
  * Revision 1.45  2005/11/14 18:08:14  blueyed
  * Fix fatal error when displaying paths in flat mode.

@@ -258,10 +258,8 @@ switch( $action )
 	*/
 
 
-	/*
 	case 'download':
-	{{{ not implemented yet
-		// TODO: provide optional zip formats
+	{{{ // TODO: provide optional zip formats (tgz, ..) - the used lib provides more..
 		$action_title = T_('Download');
 
 		if( !$selected_Filelist->count() )
@@ -275,61 +273,31 @@ switch( $action )
 
 		if( empty($zipname) )
 		{
-			$action_msg =
-				"\n"
-				.'<div class="panelblock">'
-				."\n"
-				.T_('You want to download:')
-				.'<ul>'
-				.'<li>'.implode( "</li>\n<li>", $selected_Filelist->get_array( 'get_prefixed_name' ) )."</li>\n"
-				.'</ul>
-
-				<form action="files.php" class="fform" method="post">
-				' // TODO: use Form class
-				.$Fileman->getFormHiddenInputs()
-				.$Fileman->getFormHiddenSelectedFiles()
-				.form_hidden( 'action', 'download', false )
-				.'
-				<fieldset>
-					<legend>'.T_('Download options').'</legend>
-					'
-					.form_text( 'zipname', '', 20, T_('Archive filename'), T_("This is the name of the file which will get sent to you."), 80, '', 'text', false )."\n"
-					.( $selected_Filelist->count_dirs() ?
-							form_checkbox( 'exclude_sd', $exclude_sd, T_('Exclude subdirectories'), T_('This will exclude subdirectories of selected directories.'), '', false )."\n" :
-							'' )
-					.'
-					<div class="input">
-						<input class="ActionButton" type="submit" value="'
-					.format_to_output( T_('Download'), 'formvalue' ).'" />
-					</div>
-				</fieldset>
-				</form>
-				</div>
-				';
-		}
-		else
-		{ // Downloading
-			require dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php';
-
-			$arraylist = $selected_Filelist->get_array( 'getname' );
-
-			$options = array (
-				'basedir' => $Fileman->get_ads_list_path(),
-				'inmemory' => 1,
-				'recurse' => 1-$exclude_sd,
-			);
-
-			$zipfile = new zip_file( $zipname );
-			$zipfile->set_options( $options );
-			$zipfile->add_files( $arraylist );
-			$zipfile->create_archive();
-			$zipfile->download_file();
-			exit;
-			#$Messages->add( sprintf(T_('Zipfile &laquo;%s&raquo; sent to you!'), $zipname), 'success' );
+			if( param( 'action_invoked', 'integer', 0 ) )
+			{ // Action was invoked, add "hint"
+				$Request->param_error( 'zipname', T_('Please provide the name of the archive.') );
+			}
+			break;
 		}
 
-		break;
-	}}}*/
+		// Downloading
+		require dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php';
+
+		$arraylist = $selected_Filelist->get_array( 'get_name' );
+
+		$options = array (
+			'basedir' => $Fileman->get_ads_list_path(),
+			'inmemory' => 1,
+			'recurse' => 1-$exclude_sd,
+		);
+
+		$zipfile = & new zip_file( $zipname );
+		$zipfile->set_options( $options );
+		$zipfile->add_files( $arraylist );
+		$zipfile->create_archive();
+		$zipfile->download_file();
+		exit;
+	}}}
 
 
 	case 'rename':
@@ -527,14 +495,6 @@ switch( $action )
 
 	case 'edit_properties':
 		// Edit File properties (Meta Data); this starts the File_properties mode: {{{
-
-// fp>> isn't there a global permission check on file:view that applies to the whole page already?
-		if( ! $current_User->check_perm( 'files', 'view' ) )
-		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to view files.'), 'error' );
-			$action = 'list';
-			break;
-		}
 
 		$selectedFile = & $selected_Filelist->getFileByIndex(0);
 		// Load meta data:
@@ -1257,6 +1217,13 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 		break;
 
+	case 'download':
+		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
+		$AdminUI->disp_payload_begin();
+		require dirname(__FILE__).'/_files_download.form.php';
+		$AdminUI->disp_payload_end();
+		break;
+
 
 	case 'edit_perms':
 		// Filesystem permissions for specific files
@@ -1341,6 +1308,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.155  2006/01/11 22:09:29  blueyed
+ * Reactive "download selected files as zip", also as a "workaround" to always have an icon next to "With selected files:".. ;)
+ *
  * Revision 1.154  2006/01/11 17:32:53  fplanque
  * wording / translation
  *
