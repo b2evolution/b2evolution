@@ -229,7 +229,11 @@ class Session
 	 */
 	function set_user_ID( $ID )
 	{
-		$this->user_ID = $ID;
+		if( $ID != $this->user_ID )
+		{
+			$this->user_ID = $ID;
+			$this->_session_needs_save = true;
+		}
 	}
 
 
@@ -251,9 +255,9 @@ class Session
 		$this->key = NULL;
 		$this->_data = NULL; // We don't need to keep old data
 		$this->_session_needs_save = true;
-		$this->dbsave(); // this will update $key and $_data in DB, but not user_ID
+		$this->dbsave();
 
-		$this->user_ID = NULL; // unset this, so calls to has_User() return the right answer!
+		$this->user_ID = NULL; // Unset user_ID after invalidating/saving the session above, to keep the user info attached to the old session.
 
 		// clean up the session cookie:
 		setcookie( $cookie_session, '', 272851261, $cookie_path, $cookie_domain ); // 272851261 being the birthday of a lovely person
@@ -319,10 +323,8 @@ class Session
 	{
 		global $Debuglog;
 
-		if( !isset($this->_data[$param])
-				|| ($this->_data[$param] != $value) )
+		if( ! isset($this->_data[$param]) || ($this->_data[$param] != $value) )
 		{	// There is something to update:
-
 			$this->_data[$param] = $value;
 
 			$Debuglog->add( 'Session data['.$param.'] updated!', 'session' );
@@ -377,13 +379,16 @@ class Session
 
 			$Debuglog->add( 'Session data saved!', 'session' );
 
- 			$this->_session_needs_save = false;
+			$this->_session_needs_save = false;
 		}
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.39  2006/01/12 21:55:13  blueyed
+ * Fix
+ *
  * Revision 1.38  2006/01/11 18:23:04  blueyed
  * Also update sess_user_ID in DB on shutdown with set_User() and set_user_ID().
  *

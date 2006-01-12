@@ -432,7 +432,7 @@ if( !empty($login) && !empty($pass) )
 		// set the user from the login that succeeded
 		$current_User =& $UserCache->get_by_login($login);
 		// save the user for later hits
-		$Session->set_user( $current_User );
+		$Session->set_User( $current_User );
 
 		// Remove deprecated cookies:
 		// We do not use $cookie_user / $cookie_pass (would be set in _obsolete092.php), because it
@@ -521,17 +521,14 @@ $Timer->pause( 'main.inc');
 
 /*
  * $Log$
- * Revision 1.77  2006/01/04 20:35:14  fplanque
- * no message
+ * Revision 1.78  2006/01/12 21:55:13  blueyed
+ * Fix
  *
  * Revision 1.76  2006/01/02 19:43:57  fplanque
  * just a little new year cleanup
  *
  * Revision 1.75  2005/12/30 20:13:40  fplanque
  * UI changes mostly (need to double check sync)
- *
- * Revision 1.74  2005/12/30 18:08:24  fplanque
- * no message
  *
  * Revision 1.73  2005/12/22 23:13:40  blueyed
  * Plugins' API changed and handling optimized
@@ -544,9 +541,6 @@ $Timer->pause( 'main.inc');
  *
  * Revision 1.70  2005/11/25 15:02:00  blueyed
  * $GroupCache: tell him about the name field. This allows to use get_by_name().
- *
- * Revision 1.69  2005/11/24 14:43:59  fplanque
- * no message
  *
  * Revision 1.68  2005/11/24 00:28:18  blueyed
  * Include _vars.inc.php before _conf_error.inc.php!
