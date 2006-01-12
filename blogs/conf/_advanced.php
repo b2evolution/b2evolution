@@ -541,7 +541,7 @@ $force_regexp_dirname = '';
  * but not everywhere (Session saving is done always at the end).
  *
  * This is NOT recommened, because it affects things that should be done after delivering the page.
- *
+ * fp>> What exactly does this disable and what exactly does it NOT disable?
  * @global int $debug_no_register_shutdown
  */
 $debug_no_register_shutdown = 0;
