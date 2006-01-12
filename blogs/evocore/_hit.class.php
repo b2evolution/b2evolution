@@ -272,7 +272,6 @@ class Hit
 		global $HTTP_USER_AGENT; // might be set by PHP, give highest priority
 		global $DB, $Debuglog;
 		global $user_agents;
-		global $ReqPath;         // used to detect RSS feeds
 
 		if( isset($HTTP_USER_AGENT) )
 		{
@@ -326,9 +325,9 @@ class Hit
 
 
 		/*
-		 * Detect requests for XML feeds
+		 * Detect requests for XML feeds by $tempskin param
 		 */
-		if( stristr($ReqPath, 'rss') || stristr($ReqPath, 'rdf') || stristr($ReqPath, 'atom') )
+		if( in_array( param('tempskin', 'string', '', true), array( '_atom', '_rdf', '_rss', '_rss2' ) ) )
 		{
 			$Debuglog->add( 'detect_useragent(): RSS', 'hit' );
 			$this->agent_type = 'rss';
