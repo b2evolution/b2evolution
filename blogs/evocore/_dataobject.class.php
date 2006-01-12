@@ -535,20 +535,20 @@ class DataObject
 		// i-e: transform 0 to ''
 		$new_value = ($make_null && ($parvalue === '')) ? NULL : $parvalue;
 
-		if( isset($this->$parname) && $this->$parname === $new_value )
-		{
-			$Debuglog->add( $this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' to '.$this->$parname, 'dataobjects' );
-			// echo '<br />'.$this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' to '.$this->$parname;
+		if( (isset($this->$parname) && !is_null($new_value) && $this->$parname == $new_value)
+			|| (is_null($this->$parname) && is_null($new_value)) )
+		{	// Value has not changed (we need 2 tests, for NULL and for NOT NULL value pairs)
+			$Debuglog->add( $this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' = '.$this->$parname, 'dataobjects' );
+			// echo '<br />'.$this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' = '.$this->$parname;
 
 			return false;
 		}
 		else
 		{
 			// Set the value in the object:
+			/// echo '<br/>'.$this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$new_value.(is_null($new_value)?' NULL':'').' (was:'.$this->$parname.(is_null($this->$parname)?' NULL':'').')';
 			$this->$parname = $new_value;
-			//echo '<br/>'.$this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname;
 			$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname, 'dataobjects' );
-			// echo '<br />'.$this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname;
 
 			// Remember change for later db update:
 			$this->dbchange( $dbfield, $fieldtype, $parname );
@@ -644,6 +644,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2006/01/12 18:22:58  fplanque
+ * fix tentative for integer vs '' vs NULL vs 0
+ *
  * Revision 1.33  2005/12/30 20:13:39  fplanque
  * UI changes mostly (need to double check sync)
  *
