@@ -535,7 +535,13 @@ class DataObject
 		// i-e: transform 0 to ''
 		$new_value = ($make_null && ($parvalue === '')) ? NULL : $parvalue;
 
-		if( (isset($this->$parname) && !is_null($new_value) && $this->$parname == $new_value)
+		if( !isset($this->$parname) )
+		{	// This property has never been set before, set it to NULL now in order for tests to work:
+			$this->$parname = NULL;
+		}
+
+
+		if( (!is_null($new_value) && $this->$parname == $new_value)
 			|| (is_null($this->$parname) && is_null($new_value)) )
 		{	// Value has not changed (we need 2 tests, for NULL and for NOT NULL value pairs)
 			$Debuglog->add( $this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' = '.$this->$parname, 'dataobjects' );
@@ -546,7 +552,7 @@ class DataObject
 		else
 		{
 			// Set the value in the object:
-			/// echo '<br/>'.$this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$new_value.(is_null($new_value)?' NULL':'').' (was:'.$this->$parname.(is_null($this->$parname)?' NULL':'').')';
+			// echo '<br/>'.$this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$new_value.(is_null($new_value)?' NULL':'').' (was:'.$this->$parname.(is_null($this->$parname)?' NULL':'').')';
 			$this->$parname = $new_value;
 			$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname, 'dataobjects' );
 
@@ -644,6 +650,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2006/01/12 19:20:03  fplanque
+ * no message
+ *
  * Revision 1.34  2006/01/12 18:22:58  fplanque
  * fix tentative for integer vs '' vs NULL vs 0
  *

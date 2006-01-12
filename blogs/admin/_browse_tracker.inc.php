@@ -174,7 +174,6 @@ $ItemList->cols[] = array(
 						'th' => T_('Status'),
 						'order' => 'post_pst_ID',
 						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
-						// 'td' => '$pst_name$',
 						'td' => '@get(\'t_extra_status\')@',
 					);
 
@@ -182,7 +181,6 @@ $ItemList->cols[] = array(
 						'th' => T_('Type'),
 						'order' => 'post_ptyp_ID',
 						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
-						// 'td' => '$ptyp_name$',
 						'td' => '@get(\'t_type\')@',
 					);
 
@@ -198,7 +196,6 @@ $ItemList->cols[] = array(
 $ItemList->cols[] = array(
 						'th' => T_('Assigned'),
 						'order' => 'post_assigned_user_ID',
-						// 'td' => '$asssigned_firstname$ $asssigned_lastname$',
 						'td' => '@get(\'t_assigned_to\')@',
 					);
 
@@ -292,6 +289,9 @@ if( $restrict_to_open )
 
 /*
  * $Log$
+ * Revision 1.6  2006/01/12 19:20:00  fplanque
+ * no message
+ *
  * Revision 1.5  2006/01/06 16:47:42  fplanque
  * no message
  *
