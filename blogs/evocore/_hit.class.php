@@ -272,7 +272,7 @@ class Hit
 		global $HTTP_USER_AGENT; // might be set by PHP, give highest priority
 		global $DB, $Debuglog;
 		global $user_agents;
-		global $skin; // to detect agent_type
+		global $skin; // to detect agent_type (gets set in /xmlsrv/atom.php for example)
 
 
 		if( isset($HTTP_USER_AGENT) )
@@ -327,9 +327,11 @@ class Hit
 
 
 		/*
-		 * Detect requests for XML feeds by $skin param
+		 * Detect requests for XML feeds by $skin / $tempskin param.
+		 * Use $skin, if not empty (may be set in /xmlsrv/atom.php for example), otherwise $tempskin.
 		 */
-		if( in_array( $skin, array( '_atom', '_rdf', '_rss', '_rss2' ) ) )
+		$used_skin = empty( $skin ) ? param( 'tempskin', 'string', '', true ) : $skin;
+		if( in_array( $used_skin, array( '_atom', '_rdf', '_rss', '_rss2' ) ) )
 		{
 			$Debuglog->add( 'detect_useragent(): RSS', 'hit' );
 			$this->agent_type = 'rss';
