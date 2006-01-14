@@ -374,7 +374,7 @@ class Session
 					sess_ipaddress = "'.$Hit->IP.'",
 					sess_key = '.$DB->quote( $this->key ).',
 					sess_lastseen = "'.date( 'Y-m-d H:i:s', $localtimenow ).'",
-					sess_user_ID = "'.$this->user_ID.'"
+					sess_user_ID = '.$DB->null( $this->user_ID ).'
 				WHERE sess_ID = '.$this->ID, 'Session::dbsave()' );
 
 			$Debuglog->add( 'Session data saved!', 'session' );
@@ -386,6 +386,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.40  2006/01/14 14:23:07  blueyed
+ * "Out of range" fix in dbsave()
+ *
  * Revision 1.39  2006/01/12 21:55:13  blueyed
  * Fix
  *
