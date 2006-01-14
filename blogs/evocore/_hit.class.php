@@ -272,6 +272,8 @@ class Hit
 		global $HTTP_USER_AGENT; // might be set by PHP, give highest priority
 		global $DB, $Debuglog;
 		global $user_agents;
+		global $skin; // to detect agent_type
+
 
 		if( isset($HTTP_USER_AGENT) )
 		{
@@ -325,9 +327,9 @@ class Hit
 
 
 		/*
-		 * Detect requests for XML feeds by $tempskin param
+		 * Detect requests for XML feeds by $skin param
 		 */
-		if( in_array( param('tempskin', 'string', '', true), array( '_atom', '_rdf', '_rss', '_rss2' ) ) )
+		if( in_array( $skin, array( '_atom', '_rdf', '_rss', '_rss2' ) ) )
 		{
 			$Debuglog->add( 'detect_useragent(): RSS', 'hit' );
 			$this->agent_type = 'rss';
@@ -346,11 +348,10 @@ class Hit
 
 
 		if( $agnt_data = $DB->get_row( '
-			SELECT agnt_ID, agnt_type FROM T_useragents
+			SELECT agnt_ID FROM T_useragents
 			 WHERE agnt_signature = "'.$DB->escape( $this->user_agent ).'"
 			   AND agnt_type = "'.$this->agent_type.'"' ) )
-		{ // this agent (with that type) hit us once before
-			$this->agent_type = $agnt_data->agnt_type;
+		{ // this agent (with that type) hit us once before, re-use ID
 			$this->agent_ID = $agnt_data->agnt_ID;
 		}
 		else
