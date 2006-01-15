@@ -151,7 +151,7 @@ class Plugins
 	 * A list of events that should not be allowed to be disabled in the backoffice.
 	 * @var array
 	 */
-	var $_supported_private_events = array( 'PluginSettingsInstantiated', 'Install', 'Uninstall' );
+	var $_supported_private_events = array( 'GetDefaultSettings', 'PluginSettingsInstantiated', 'Install', 'Uninstall' );
 
 	/**#@-*/
 
@@ -178,6 +178,9 @@ class Plugins
 	/**
 	 * Get the list of supported/available events/hooks.
 	 *
+	 * Those listed in {@link $_supported_private_events} are supported, but
+	 * cannot be disabled in backoffice.
+	 *
 	 * @todo Finish descriptions
 	 *
 	 * @return array Name of event (key) => description (value)
@@ -198,7 +201,7 @@ class Plugins
 				'CacheObjects' => '',
 				'CacheAnonContent' => '',
 
-				'PluginSettingsInstantiated' => '',
+				'PluginSettingsInstantiated' => '', /* private / needs not description */
 
 				'RenderItemAsHtml' => T_('Renders content when generated as HTML.'),
 				'RenderItemAsXML' => T_('Renders content when generated as XML.'),
@@ -206,11 +209,11 @@ class Plugins
 
 
 				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
-				'GetDefaultSettings' => '', // used to instantiate $Settings.
-				'Install' => '',
+				'GetDefaultSettings' => '',  /* private / needs not description */ // used to instantiate $Settings.
+				'Install' => '', /* private / needs not description */
 				'LoginAttempt' => '',
 				'SessionLoaded' => '', // gets called after $Session is initialized, quite early.
-				'Uninstall' => '',
+				'Uninstall' => '', /* private / needs not description */
 			);
 		}
 
@@ -443,16 +446,21 @@ class Plugins
 	/**
 	 * Register a plugin.
 	 *
-	 * Will be called by plugin includes when they are called by init()
+	 * This handles the indexes, dynamically unregisters a Plugin that does not exist (anymore)
+	 * and instantiates the Plugin's Settings.
 	 *
+	 * @todo When a Plugin does not exist anymore we might want to provide a link in
+	 *       "Tools / Plugins" to un-install it completely or handle it otherwise..
+	 * @access private
 	 * @param string name of plugin class to instantiate & register
 	 * @param int ID in database (0 if not installed)
 	 * @param int Priority in database (-1 to keep default)
 	 * @param array When should rendering apply? (NULL to keep default)
+	 * @param boolean Must the plugin exist (filename and classname)?
+	 *                This is used internally to be able to unregister an non-existing plugin.
 	 * @return Plugin|string Plugin ref to newly created plugin; string in case of error
-	 * @access private
 	 */
-	function & register( $classname, $ID = 0, $priority = -1, $apply_rendering = NULL )
+	function & register( $classname, $ID = 0, $priority = -1, $apply_rendering = NULL, $must_exists = true )
 	{
 		global $Debuglog, $Messages, $pagenow, $Timer;
 
@@ -471,25 +479,54 @@ class Plugins
 		$Debuglog->add( 'register(): '.$classname.', ID: '.$ID.', priority: '.$priority.', filename: ['.$filename.']', 'plugins' );
 
 		if( ! is_readable( $filename ) )
-		{ // Plugin not found!
-			$Debuglog->add( 'Plugin filename ['.$filename.'] not readable!', array( 'plugins', 'error' ) );
-			$Timer->pause( 'plugins_register' );
-			$r = 'Plugin filename ['.rel_path_to_base($filename).'] not readable!'; // no translation, should not happen!
-			return $r;
-		}
+		{ // Plugin file not found!
+			if( $must_exists )
+			{
+				$Debuglog->add( 'Plugin filename ['.$filename.'] not readable!', array( 'plugins', 'error' ) );
+				$Timer->pause( 'plugins_register' );
 
-		$Debuglog->add( 'Loading plugin class file: '.$classname, 'plugins' );
-		require_once $filename;
+				// unregister:
+				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, false ); // must not exist
+				$this->unregister( $Plugin );
+				$Debuglog->add( 'Unregistered plugin ['.$classname.']!', array( 'plugins', 'error' ) );
+
+				$r = 'Plugin filename ['.rel_path_to_base($filename).'] not readable!'; // no translation, should not happen!
+				return $r;
+			}
+		}
+		else
+		{
+			$Debuglog->add( 'Loading plugin class file: '.$classname, 'plugins' );
+			require_once $filename;
+		}
 
 		if( !class_exists( $classname ) )
 		{ // the given class does not exist
 			// TODO: Automatically remove? Display note on admin/plugins.php?
 
-			$Timer->pause( 'plugins_register' );
-			$r = sprintf( /* TRANS: First %s is the (class)name */ T_('Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined - it must match the filename.'), $classname, rel_path_to_base($filename) );
-			return $r;
+			if( $must_exists )
+			{
+				// unregister:
+				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, false ); // must not exist
+				$this->unregister( $Plugin );
+				$Debuglog->add( 'Unregistered plugin ['.$classname.']!', array( 'plugins', 'error' ) );
+
+				$Timer->pause( 'plugins_register' );
+				$r = sprintf( /* TRANS: First %s is the (class)name */ T_('Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined - it must match the filename.'), $classname, rel_path_to_base($filename) );
+				$Debuglog->add( $r, array( 'plugins', 'error' ) );
+				return $r;
+			}
+			else
+			{
+				$Plugin = new stdClass;	// COPY !
+				$Plugin->code = NULL;
+				$Plugin->apply_rendering = 'never';
+			}
 		}
-		$Plugin = new $classname;	// COPY !
+		else
+		{
+			$Plugin = new $classname;	// COPY !
+		}
 
 		// Tell him his ID :)
 		if( $ID == 0 )
@@ -770,29 +807,31 @@ class Plugins
 	{
 		global $Debuglog, $Timer;
 
-		if( isset($this->index_event_IDs['GetDefaultSettings'])
-		    && in_array( $Plugin->ID, $this->index_event_IDs['GetDefaultSettings'] ) )
+		if( ! isset($this->index_event_IDs['GetDefaultSettings'])
+		    || ! in_array( $Plugin->ID, $this->index_event_IDs['GetDefaultSettings'] ) )
 		{
-			$defaults = $Plugin->GetDefaultSettings();
-			if( !is_array($defaults) )
-			{
-				$Debuglog->add( $Plugin->classname.'::GetDefaultSettings() did not return array!', array('plugins', 'error') );
-			}
-			else
-			{
-				$Timer->resume( 'plugins_settings' );
-				require_once dirname(__FILE__).'/_pluginsettings.class.php';
-				$Plugin->Settings = & new PluginSettings( $Plugin->ID );
-
-				foreach( $defaults as $l_name => $l_value )
-				{
-					$Plugin->Settings->_defaults[$l_name] = $l_value['defaultvalue'];
-				}
-				$Timer->pause( 'plugins_settings' );
-			}
-
-			$this->call_method( $Plugin->ID, 'PluginSettingsInstantiated', $params = array() );
+			return false;
 		}
+
+		$defaults = $this->call_method( $Plugin->ID, 'GetDefaultSettings', $params = array() );
+		if( !is_array($defaults) )
+		{
+			$Debuglog->add( $Plugin->classname.'::GetDefaultSettings() did not return array!', array('plugins', 'error') );
+		}
+		else
+		{
+			$Timer->resume( 'plugins_settings' );
+			require_once dirname(__FILE__).'/_pluginsettings.class.php';
+			$Plugin->Settings = & new PluginSettings( $Plugin->ID );
+
+			foreach( $defaults as $l_name => $l_value )
+			{
+				$Plugin->Settings->_defaults[$l_name] = $l_value['defaultvalue'];
+			}
+			$Timer->pause( 'plugins_settings' );
+		}
+
+		$this->call_method( $Plugin->ID, 'PluginSettingsInstantiated', $params = array() );
 	}
 
 
@@ -811,7 +850,7 @@ class Plugins
 		foreach( $this->sorted_IDs as $plugin_ID )
 		{
 			$Plugin = & $this->get_by_ID( $plugin_ID );
-			if( $Plugin->classname == $classname && $Plugin->ID > 0 )
+			if( $Plugin && $Plugin->classname == $classname && $Plugin->ID > 0 )
 			{
 				$count++;
 			}
@@ -905,11 +944,6 @@ class Plugins
 	function call_method( $plugin_ID, $method, & $params )
 	{
 		global $Timer, $debug, $Debuglog;
-
-		if( is_null($params) )
-		{
-			$params = array();
-		}
 
 		$Plugin = & $this->get_by_ID( $plugin_ID );
 
@@ -1601,6 +1635,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.26  2006/01/15 13:16:26  blueyed
+ * Dynamically unregister a non-existing (filename/classname) plugin.
+ *
  * Revision 1.25  2006/01/11 21:06:26  blueyed
  * Fix/cleanup $index_event_IDs handling: gets sorted by priority now. Should finally close http://dev.b2evolution.net/todo.php/2006/01/09/wacko_formatting_plugin_does_not_work_an
  *
