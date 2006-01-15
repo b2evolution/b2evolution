@@ -2401,12 +2401,46 @@ function get_web_help_link( $topic )
 	{
 		return '';
 	}
+}
 
+
+/**
+ * Build a string out of $field_attribs, with each attribute
+ * prefixed by a space character.
+ *
+ * @param array Array of field attributes.
+ * @return string
+ */
+function get_field_attribs_as_string( $field_attribs )
+{
+	$r = '';
+
+	foreach( $field_attribs as $l_attr => $l_value )
+	{
+		if( $l_value === '' || $l_value === NULL )
+		{ // don't generate empty attributes (it may be NULL if we pass 'value' => NULL as field_param for example, because isset() does not match it!)
+			continue;
+		}
+
+		if( $l_attr == 'value' )
+		{
+			$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
+		}
+		else
+		{
+			$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
+		}
+	}
+
+	return $r;
 }
 
 
 /*
  * $Log$
+ * Revision 1.168  2006/01/15 17:40:55  blueyed
+ * Moved Form::get_field_params_as_string() to function get_field_attribs_as_string() and minor fixes.
+ *
  * Revision 1.167  2006/01/11 23:39:19  blueyed
  * Enhanced backtrace-debugging for queries
  *

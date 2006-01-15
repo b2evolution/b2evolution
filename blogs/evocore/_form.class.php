@@ -121,7 +121,7 @@ class Form extends Widget
 	 * Do we need to add javascript for check/uncheck all functionality
 	 */
 	var $check_all = false;
-	
+
 	/**
 	 * Constructor
 	 *
@@ -346,7 +346,7 @@ class Form extends Widget
 		switch( $this->layout )
 		{
 			case 'table':
-				$r = '<tr'.$this->get_field_params_as_string($field_params).'><th colspan="2">'."\n";
+				$r = '<tr'.get_field_attribs_as_string($field_params).'><th colspan="2">'."\n";
 				// NOTE: empty THs can be rendered and/or are DHTML scriptable
 
 				if( $title != '' )
@@ -373,14 +373,14 @@ class Form extends Widget
 					unset( $field_params['legend_params'] );
 				}
 
-				$r = '<fieldset'.$this->get_field_params_as_string($field_params).'>'."\n";
+				$r = '<fieldset'.get_field_attribs_as_string($field_params).'>'."\n";
 
 				if( $title != '' || isset($legend_params) )
 				{ // there is a legend tag (or explicit params for it) to display
 					$r .= '<legend';
 					if( isset($legend_params) )
 					{
-						$r .= $this->get_field_params_as_string($legend_params);
+						$r .= get_field_attribs_as_string($legend_params);
 					}
 					$r .= '>'.$title."</legend>\n";
 				}
@@ -843,9 +843,7 @@ class Form extends Widget
 	 */
 	function _number_select( $field_value, $max, $precision = 1, $field_params )
 	{
-			$r	=	'<select'
-						.$this->get_field_params_as_string( $field_params )
-						.'>';
+			$r	=	'<select'.get_field_attribs_as_string( $field_params ).'>';
 
 			for( $i=0; $i <= $max ; $i += $precision)
 			{
@@ -1041,7 +1039,7 @@ class Form extends Widget
 		}
 		if( $field_disabled != false )
 		{
-			$field_params['disabled'] = $field_disabled;
+			$field_params['disabled'] = 'disabled';
 		}
 
 		return $this->checkbox_input( $field_name, $field_checked, $field_label, $field_params );
@@ -1053,24 +1051,12 @@ class Form extends Widget
 	function check_all()
 	{
 		echo '<a name="check_all" href="'.regenerate_url().'">'.T_('Check all')
-				.'</a> | <a name="uncheck_all" href="'.regenerate_url().'">'.T_('Uncheck all').'</a> ';	
-			
-		// Need to add event click on links at the form end.		
+				.'</a> | <a name="uncheck_all" href="'.regenerate_url().'">'.T_('Uncheck all').'</a> ';
+
+		// Need to add event click on links at the form end.
 		$this->check_all = true;
 	}
-	
-	
 
-	/**
-	 * Returns 'disabled="disabled"' if the boolean param is false.
-	 *
-	 * @static
-	 * @return string 'disabled="disabled"', ''
-	 */
-	function disabled( $boolean )
-	{
-		return $boolean ? 'disabled="disabled"' : '';
-	}
 
 
 	/**
@@ -1107,7 +1093,7 @@ class Form extends Widget
 			$form_params['action'] = $this->form_action;
 		}
 
-		$r = "\n\n<form".$this->get_field_params_as_string($form_params).">\n"
+		$r = "\n\n<form".get_field_attribs_as_string($form_params).">\n"
 					.$this->formstart;
 
 		if( !empty($form_title) )
@@ -1116,10 +1102,10 @@ class Form extends Widget
 
 			$r .= $this->replace_vars( $this->title_fmt );
 		}
-		
+
 		// Initialization of javascript vars used to create parent_child select lists
 		$r .= '<script type="text/javascript">
-							var nb_dynamicSelects = 0; 
+							var nb_dynamicSelects = 0;
 							var tab_dynamicSelects = Array();
 						</script>';
 
@@ -1160,15 +1146,15 @@ class Form extends Widget
 		}
 
 		$r .= "\n</form>\n\n";
-		
+
 		// When the page loads, Initialize all the parent child select lists
 		$r .= '<script type="text/javascript">
-							addEvent( window, "load", init_dynamicSelect, false ); 
+							addEvent( window, "load", init_dynamicSelect, false );
 						</script>';
-		
-		if( $this->check_all ) 
+
+		if( $this->check_all )
 		{// Init check_all event on check_all links
-			echo '<script type="text/javascript">addEvent( window, "load", init_check_all, false )</script>' ; 
+			echo '<script type="text/javascript">addEvent( window, "load", init_check_all, false )</script>' ;
 		}
 
 		return $this->display_or_return( $r );
@@ -1414,8 +1400,7 @@ class Form extends Widget
 			$r .= get_icon( 'parent_childto_arrow' );
 		}
 
-		$r .="\n<select"
-			 .$this->get_field_params_as_string($field_params).'>'
+		$r .="\n<select".get_field_attribs_as_string($field_params).'>'
 			 .$field_options
 			 ."</select>\n"
 			 .$this->end_field();
@@ -1423,7 +1408,7 @@ class Form extends Widget
 		if( !empty( $field_params['parent'] ) )
 		{ // Set up the dynamic preselection array from the parent to this select list options
 			$r .= "<script type='text/javascript'>
-								tab_dynamicSelects[nb_dynamicSelects] = Array(); 
+								tab_dynamicSelects[nb_dynamicSelects] = Array();
 								tab_dynamicSelects[nb_dynamicSelects]['parent'] = '".$field_params['parent']."';
 								tab_dynamicSelects[nb_dynamicSelects]['child'] = '$field_name';
 								nb_dynamicSelects++;
@@ -1543,7 +1528,7 @@ class Form extends Widget
 			// see http://fplanque.net/2003/Articles/iecsstextarea/index.html
 			.'<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />'
 			.'<textarea'
-			.$this->get_field_params_as_string( $field_params )
+			.get_field_attribs_as_string( $field_params )
 			.' rows="'.$field_rows.'">'
 			.format_to_output( $field_value, 'formvalue' )
 			.'</textarea>'
@@ -2156,9 +2141,7 @@ class Form extends Widget
 		}
 
 		$r = $input_prefix
-			.'<input'.$this->get_field_params_as_string( $field_params )
-			.' '.( isset( $field_param['disabled'] ) ? disabled( $field_param['disabled'] ) : '' )
-			.' />'
+			.'<input'.get_field_attribs_as_string( $field_params ).' />'
 			.$input_suffix;
 
 		return $r;
@@ -2334,38 +2317,6 @@ class Form extends Widget
 
 
 	/**
-	 * Build a string out of $field_params, with each attribute
-	 * prefixed by a space character.
-	 *
-	 * @param array Array of field params.
-	 * @return string
-	 */
-	function get_field_params_as_string( $field_params )
-	{
-		$r = '';
-
-		foreach( $field_params as $l_attr => $l_value )
-		{
-			if( $l_value === '' || $l_value === NULL )
-			{ // don't generate empty attributes (it may be NULL if we pass 'value' => NULL as field_param for example, because isset() does not match it!)
-				continue;
-			}
-
-			if( $l_attr == 'value' )
-			{
-				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
-			}
-			else
-			{
-				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
-			}
-		}
-
-		return $r;
-	}
-
-
-	/**
 	 * Display or return, according to {@link $output}.
 	 *
 	 * @return true|string True, if we want to display, the string if not.
@@ -2387,6 +2338,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.97  2006/01/15 17:40:54  blueyed
+ * Moved Form::get_field_params_as_string() to function get_field_attribs_as_string() and minor fixes.
+ *
  * Revision 1.96  2006/01/10 20:59:49  fplanque
  * minor / fixed internal sync issues @ progidistri
  *
