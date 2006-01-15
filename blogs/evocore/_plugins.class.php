@@ -983,6 +983,28 @@ class Plugins
 
 
 	/**
+	 * Call a method on a Plugin if it is not deactivated.
+	 *
+	 * This is a wrapper around {@link call_method()}.
+	 *
+	 * @param integer Plugin ID
+	 * @param string Method name.
+	 * @param array Params (by reference).
+	 * @return NULL|mixed Return value of the plugin's method call or NULL if no such method (or inactive).
+	 */
+	function call_method_if_active( $plugin_ID, $method, & $params )
+	{
+		if( ! isset($this->index_event_IDs[$method])
+		    || ! in_array( $plugin_ID, $this->index_event_IDs[$method] ) )
+		{
+			return NULL;
+		}
+
+		return $this->call_method( $plugin_ID, $method, $params );
+	}
+
+
+	/**
 	 * Validate renderer list.
 	 *
 	 * @param array renderer codes ('default' will include all "opt-out"-ones)
@@ -1193,7 +1215,7 @@ class Plugins
 			return false;
 		}
 
-		$this->call_method( $Plugin->ID, 'SkinTag', $params );
+		$this->call_method_if_active( $Plugin->ID, 'SkinTag', $params );
 
 		return true;
 	}
@@ -1642,6 +1664,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.29  2006/01/15 23:59:13  blueyed
+ * Added Plugins::call_method_if_active()
+ *
  * Revision 1.28  2006/01/15 15:29:46  blueyed
  * set_code(): handle empty codes correctly
  *
