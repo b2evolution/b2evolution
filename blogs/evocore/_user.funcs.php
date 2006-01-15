@@ -204,9 +204,16 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 
 
 /**
- * Template tag: Provide a link to the backoffice
+ * Template tag: Provide a link to the backoffice.
+ *
+ * @param string To be displayed before the link.
+ * @param string To be displayed after the link.
+ * @param string The page to link to below {@link $admin_url}. Example: 'tools.php' to go to the "Tools" tab.
+ *               Defaults to '' which will respect the setting in index.php.
+ * @param string Text for the link.
+ * @param string Title for the link.
  */
-function user_admin_link( $before = '', $after = '', $page = 'b2edit.php', $link_text = '', $link_title = '#' )
+function user_admin_link( $before = '', $after = '', $page = '', $link_text = '', $link_title = '#' )
 {
 	global $admin_url, $blog, $current_User;
 
@@ -407,8 +414,8 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
- * Revision 1.36  2005/12/14 19:22:57  fplanque
- * no message
+ * Revision 1.37  2006/01/15 19:05:36  blueyed
+ * user_admin_link(): empty default for $page, so that /admin/index.php gets respected.
  *
  * Revision 1.35  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
@@ -487,9 +494,6 @@ function profile_check_params( $params, $User = NULL )
  *
  * Revision 1.10  2005/02/08 03:06:26  blueyed
  * marked get_user_info() as deprecated
- *
- * Revision 1.9  2005/01/03 19:15:15  fplanque
- * no message
  *
  * Revision 1.7  2004/12/30 23:07:02  blueyed
  * removed obsolete $user_nickname
