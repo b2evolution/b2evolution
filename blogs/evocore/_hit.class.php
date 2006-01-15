@@ -645,11 +645,11 @@ class Hit
 			if( $DB->get_var( $sql, 0, 0, 'Hit: Check for reload' ) )
 			{
 				$Debuglog->add( 'No new view!', 'hit' );
-				$this->_is_new_view = true;  // We don't want to log this hit again
+				$this->_is_new_view = false;  // We don't want to log this hit again
 			}
 			else
 			{
-				$this->_is_new_view = false;
+				$this->_is_new_view = true;
 			}
 		}
 
