@@ -1270,19 +1270,22 @@ function validate_url( $url, & $allowed_uri_scheme )
 	}
 
 	// minimum length: http://az.fr/
+	// TODO: fails on "http://blogs" (without trailing slash)
 	if( strlen($url) < 13 )
 	{ // URL too short!
 		$Debuglog->add( 'URL &laquo;'.$url.';&raquo; is too short!', 'error' );
 		return T_('Invalid URL');
 	}
 
-	if( ! preg_match('|^                # start
+	// Validate URL structure
+	// NOTE: this causes the most problems with this function!
+	if( ! preg_match('~^                # start
 		([a-z][a-z0-9+.\-]*):[0-9]*       # scheme
 		//                                # authority absolute URLs only
-		[a-z0-9][a-z0-9~+.\-_,:;/\\\\*=]* # Don t allow anything too funky like entities
-		([?#][a-z0-9~+.\-_,:;/\\\\%&=!?#*\ \[\]]*)?
-		$|ix', $url, $matches) )
-	{ // Cannot vaidate URL structure
+		[a-z0-9]([a-z0-9\~+.\-_,:;/\\\\*=]|(%\d+))* # Don t allow anything too funky like entities
+		([?#][a-z0-9\~+.\-_,:;/\\\\%&=!?#*\ \[\]]*)?
+		$~ix', $url, $matches) )
+	{ // Cannot validate URL structure
 		$Debuglog->add( 'URL &laquo;'.$url.';&raquo; does not match url pattern!', 'error' );
 		return T_('Invalid URL');
 	}
@@ -2438,6 +2441,9 @@ function get_field_attribs_as_string( $field_attribs )
 
 /*
  * $Log$
+ * Revision 1.169  2006/01/15 18:36:26  blueyed
+ * Just another fix to validate_url()
+ *
  * Revision 1.168  2006/01/15 17:40:55  blueyed
  * Moved Form::get_field_params_as_string() to function get_field_attribs_as_string() and minor fixes.
  *
