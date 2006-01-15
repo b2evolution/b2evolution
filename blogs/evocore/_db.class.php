@@ -256,21 +256,15 @@ class DB
 		if( isset($params['debug_dump_function_trace_for_errors']) ) $this->debug_dump_function_trace_for_errors = $params['debug_dump_function_trace_for_errors'];
 		if( isset($params['debug_dump_function_trace_for_queries']) ) $this->debug_dump_function_trace_for_queries = $params['debug_dump_function_trace_for_queries'];
 
-		if( !extension_loaded('mysql') )
+		if( ! extension_loaded('mysql') )
 		{ // The mysql extension is not loaded, try to dynamically load it:
-			if (strtoupper(substr(PHP_OS, 0, 3) == 'WIN'))
-			{
-				@dl('php_mysql.dll');
-			}
-			else
-			{
-				@dl('mysql.so');
-			}
+			$mysql_ext_file = strtoupper(substr(PHP_OS, 0, 3) == 'WIN') ? 'php_mysql.dll' : 'mysql.so';
+			@dl( $mysql_ext_file );
 
-			if( !extension_loaded('mysql') )
+			if( ! extension_loaded('mysql') )
 			{ // Still not loaded:
 				$this->print_error( '<p><strong>The PHP MySQL module could not be loaded.</strong></p>
-					<p>You must edit your php configuration (php.ini) and enable this module.</p>
+					<p>You must edit your php configuration (php.ini) and enable this module ('.$mysql_ext_file.').</p>
 					<p>Do not forget to restart your webserver (if necessary) after editing the PHP conf.</p>' );
 				return;
 			}
@@ -461,7 +455,18 @@ class DB
 			echo '</div>';
 		}
 
-		if( $this->halt_on_error ) debug_die();
+		if( $this->halt_on_error )
+		{
+			if( function_exists( 'debug_die' ) )
+			{
+				$include_backtrace = ! $this->show_errors || ! $this->debug_dump_function_trace_for_errors; // no backtrace if displayed above
+				debug_die( '', NULL, '</body></html>', $include_backtrace );
+			}
+			else
+			{
+				die();
+			}
+		}
 	}
 
 
@@ -1161,6 +1166,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.50  2006/01/15 18:56:02  blueyed
+ * Made error on loading extension clearer; do not display function backtrace twice with print_error().
+ *
  * Revision 1.49  2006/01/11 23:39:19  blueyed
  * Enhanced backtrace-debugging for queries
  *
