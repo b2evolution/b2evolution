@@ -467,9 +467,6 @@ class Plugins
 		if( $ID && isset($this->index_ID_Plugins[$ID]) )
 		{
 			debug_die( 'Tried to register already registered Plugin (ID '.$ID.')' ); // should never happen!
-			//$Timer->pause( 'plugins_register' );
-			//$r = 'error..';
-			//return $r;
 		}
 
 		$Timer->resume( 'plugins_register' );
@@ -482,15 +479,15 @@ class Plugins
 		{ // Plugin file not found!
 			if( $must_exists )
 			{
-				$Debuglog->add( 'Plugin filename ['.$filename.'] not readable!', array( 'plugins', 'error' ) );
-				$Timer->pause( 'plugins_register' );
+				$r = 'Plugin filename ['.rel_path_to_base($filename).'] not readable!'; // no translation, should not happen!
+				$Debuglog->add( $r, array( 'plugins', 'error' ) );
 
 				// unregister:
 				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, false ); // must not exist
 				$this->unregister( $Plugin );
 				$Debuglog->add( 'Unregistered plugin ['.$classname.']!', array( 'plugins', 'error' ) );
 
-				$r = 'Plugin filename ['.rel_path_to_base($filename).'] not readable!'; // no translation, should not happen!
+				$Timer->pause( 'plugins_register' );
 				return $r;
 			}
 		}
@@ -500,20 +497,19 @@ class Plugins
 			require_once $filename;
 		}
 
-		if( !class_exists( $classname ) )
+		if( ! class_exists( $classname ) )
 		{ // the given class does not exist
-			// TODO: Automatically remove? Display note on admin/plugins.php?
-
 			if( $must_exists )
 			{
+				$r = sprintf( /* TRANS: First %s is the (class)name */ T_('Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined - it must match the filename.'), $classname, rel_path_to_base($filename) );
+				$Debuglog->add( $r, array( 'plugins', 'error' ) );
+
 				// unregister:
 				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, false ); // must not exist
 				$this->unregister( $Plugin );
 				$Debuglog->add( 'Unregistered plugin ['.$classname.']!', array( 'plugins', 'error' ) );
 
 				$Timer->pause( 'plugins_register' );
-				$r = sprintf( /* TRANS: First %s is the (class)name */ T_('Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined - it must match the filename.'), $classname, rel_path_to_base($filename) );
-				$Debuglog->add( $r, array( 'plugins', 'error' ) );
 				return $r;
 			}
 			else
@@ -690,7 +686,7 @@ class Plugins
 
 		return $DB->query( '
 			UPDATE T_plugins
-			SET plug_code = '.$DB->quote($code).'
+			  SET plug_code = '.$DB->quote($code).'
 			WHERE plug_ID = '.$plugin_ID );
 	}
 
@@ -727,7 +723,7 @@ class Plugins
 
 		$r = $DB->query( '
 			UPDATE T_plugins
-			SET plug_priority = '.$DB->quote($priority).'
+			  SET plug_priority = '.$DB->quote($priority).'
 			WHERE plug_ID = '.$plugin_ID );
 
 		$Plugin->priority = $priority;
@@ -765,7 +761,7 @@ class Plugins
 
 		$r = $DB->query( '
 			UPDATE T_plugins
-			SET plug_apply_rendering = '.$DB->quote($apply_rendering).'
+			  SET plug_apply_rendering = '.$DB->quote($apply_rendering).'
 			WHERE plug_ID = '.$plugin_ID );
 
 		$Plugin->apply_rendering = $apply_rendering;
@@ -808,12 +804,13 @@ class Plugins
 		global $Debuglog, $Timer;
 
 		if( ! isset($this->index_event_IDs['GetDefaultSettings'])
-		    || ! in_array( $Plugin->ID, $this->index_event_IDs['GetDefaultSettings'] ) )
+		    || ! in_array( $Plugin->ID, $this->index_event_IDs['GetDefaultSettings'] )
+		    || ! method_exists( $Plugin, 'GetDefaultSettings' ) )
 		{
 			return false;
 		}
 
-		$defaults = $this->call_method( $Plugin->ID, 'GetDefaultSettings', $params = array() );
+		$defaults = $Plugin->GetDefaultSettings();
 		if( !is_array($defaults) )
 		{
 			$Debuglog->add( $Plugin->classname.'::GetDefaultSettings() did not return array!', array('plugins', 'error') );
@@ -895,7 +892,7 @@ class Plugins
 
 
 	/**
-	 * Load plugins table and rewind iterator.
+	 * Load plugins table and rewind iterator used by {@link get_next()}.
 	 */
 	function restart()
 	{
@@ -1635,6 +1632,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.27  2006/01/15 13:59:15  blueyed
+ * Cleanup
+ *
  * Revision 1.26  2006/01/15 13:16:26  blueyed
  * Dynamically unregister a non-existing (filename/classname) plugin.
  *
