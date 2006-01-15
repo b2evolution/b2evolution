@@ -246,7 +246,7 @@ class Item extends DataObject
 			$this->Author = & $UserCache->get_by_ID( $this->creator_user_ID );
 			$this->assign_to( $db_row->$db_cols['assigned_user_ID'], false );
 			$this->issue_date = $db_row->$db_cols['datestart'];
-			$this->mod_date =$db_row->$db_cols['datemodified'];
+			$this->mod_date = $db_row->$db_cols['datemodified'];
 			$this->status = $db_row->$db_cols['status'];
 			$this->title = $db_row->$db_cols['title'];
 			$this->content = $db_row->$db_cols['content'];
@@ -1760,16 +1760,26 @@ class Item extends DataObject
 	/**
 	 * Template function: Display link to item related url
 	 *
-	 * @param string string to display before the url (if exists)
-	 * @param string string to display after the url (if exists)
+	 * @param string string to display before the link (if exists)
+	 * @param string string to display after the link (if exists)
+	 * @param string Text to display the link in the anchor (%s gets replaced by the URL).
+	 * @param array Attributes for the <a> tag (%s gets replaced by the URL in 'href', if set).
 	 * @param string Output format, see {@link format_to_output()}
 	 */
-	function url_link( $before='', $after='', $format = 'htmlbody' )
+	function url_link( $before = '', $after = '', $text = '%s', $attribs = array(), $format = 'htmlbody' )
 	{
-		if( !empty( $this->url ) )
+		if( ! empty( $this->url ) )
 		{
+			if( isset($attribs['href']) )
+			{
+				$attribs['href'] = str_replace( '%s', $this->url, $attribs['href'] );
+			}
+			else
+			{
+				$attribs['href'] = $this->url;
+			}
 			echo $before;
-			echo format_to_output( '<a href="'.$this->url.'">'.$this->url.'</a>', $format );
+			echo format_to_output( '<a'.get_field_attribs_as_string( $attribs ).'>'.str_replace( '%s', $this->url, $text ).'</a>', $format );
 			echo $after;
 		}
 	}
@@ -2277,6 +2287,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.86  2006/01/15 17:59:23  blueyed
+ * API break of Item::url_link(). See http://dev.b2evolution.net/todo.php/2005/12/09/api_break_params_to_item_url_link_change
+ *
  * Revision 1.85  2006/01/10 20:59:49  fplanque
  * minor / fixed internal sync issues @ progidistri
  *

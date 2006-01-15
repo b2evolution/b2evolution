@@ -58,7 +58,7 @@ echo '<?xml version="1.0"?'.'>';
 			$Blog->disp( 'name', 'xml' );
 			request_title( ' - ', '', ' - ', 'xml' );
 		?></title>
-    <?php
+		<?php
 		switch( $disp )
 		{
 			case 'comments':
@@ -83,7 +83,7 @@ echo '<?xml version="1.0"?'.'>';
 					<?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml' ) ?>
 					<guid isPermaLink="false"><?php $Item->ID() ?>@<?php echo $baseurl ?></guid>
 					<description><?php
-						$Item->url_link( '', ' ', 'xml' );
+						$Item->url_link( '', ' ', '%s', array(), 'xml' );
 						$Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'xml', $rss_excerpt_length );
 					?></description>
 					<content:encoded><![CDATA[<?php

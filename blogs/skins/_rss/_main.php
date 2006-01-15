@@ -44,12 +44,12 @@ echo "<?xml version=\"1.0\"?".">";
 ?>
 <!-- generator="<?php echo $app_name; ?>/<?php echo $app_version ?>" -->
 <rss version="0.92">
-  <channel>
+	<channel>
 		<title><?php
 			$Blog->disp( 'name', 'xml' );
 			request_title( ' - ', '', ' - ', 'xml' );
 		?></title>
-    <?php
+		<?php
 		switch( $disp )
 		{
 			case 'comments':
@@ -67,7 +67,7 @@ echo "<?xml version=\"1.0\"?".">";
 			  <item>
 			    <title><?php $Item->title( '', '', false, 'xml' ) ?></title>
 			    <description><?php
-			      $Item->url_link( '', ' ', 'entityencoded' );
+			      $Item->url_link( '', ' ', '%s', array(), 'entityencoded' );
 			      $Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'entityencoded' );
 			    ?></description>
 			    <link><?php $Item->permalink( 'single' ) ?></link>
@@ -75,7 +75,7 @@ echo "<?xml version=\"1.0\"?".">";
 			  <?php }
 		}
 		?>
-  </channel>
+	</channel>
 </rss>
 <?php
 $Hit->log();  // log the hit on this page

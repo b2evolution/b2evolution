@@ -85,7 +85,7 @@ switch( $disp )
 			<dc:creator><?php $Item->Author->preferred_name( 'xml' ) ?></dc:creator>
 			<dc:subject><?php $Item->main_category( 'xml' ) ?></dc:subject>
 			<description><?php
-				$Item->url_link( '', ' ', 'xml' );
+				$Item->url_link( '', ' ', '%s', array(), 'xml' );
 				$Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'xml', $rss_excerpt_length );
 			?></description>
 			<content:encoded><![CDATA[<?php

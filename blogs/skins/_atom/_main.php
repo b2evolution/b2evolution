@@ -48,7 +48,7 @@ echo '<?xml version="1.0" encoding="utf-8"?'.'>';
 		$Blog->disp( 'name', 'xml' );
 		request_title( ' - ', '', ' - ', 'xml' );
 	?></title>
-  <?php
+	<?php
 	switch( $disp )
 	{
 		case 'comments':
@@ -64,7 +64,7 @@ echo '<?xml version="1.0" encoding="utf-8"?'.'>';
 			<subtitle><?php $Blog->disp( 'shortdesc', 'xml' ) ?></subtitle>
 			<generator uri="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
 			<updated><?php $MainList->mod_date( 'isoZ', true ) ?></updated>
- 			<?php while( $Item = $MainList->get_item() ) {	?>
+			<?php while( $Item = $MainList->get_item() ) {	?>
 			<entry>
 				<title type="text"><?php $Item->title( '', '', false, 'xml' ) ?></title>
 				<link rel="alternate" type="text/html" href="<?php $Item->permalink( 'single' ) ?>" />
@@ -75,7 +75,7 @@ echo '<?xml version="1.0" encoding="utf-8"?'.'>';
 				<id><?php $Item->permalink( 'single' ) ?></id>
 				<published><?php $Item->issue_date( 'isoZ', true ) ?></published>
 				<updated><?php $Item->mod_date( 'isoZ', true ) ?></updated>
-        <content type="html"><![CDATA[<?php
+				<content type="html"><![CDATA[<?php
 					$Item->url_link( '<p>', '</p>' );
 					$Item->content()
 				?>]]></content>
