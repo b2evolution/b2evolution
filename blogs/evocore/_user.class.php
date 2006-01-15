@@ -560,9 +560,18 @@ class User extends DataObject
 								WHERE bloguser_blog_ID = $perm_target_blog
 								  AND bloguser_user_ID = $this->ID";
 			// echo $query, '<br />';
-			if( ($row = $DB->get_row( $query, ARRAY_A )) == NULL )
-			{ // No rights set for this Blog/User
-				return false;	// Permission denied
+			$row = $DB->get_row( $query, ARRAY_A );
+
+			if( empty($row) )
+			{ // No rights set for this Blog/User: remember this (to not have the same query next time) and pass on, because blog_genstatic is based on user level!
+				$this->blog_post_statuses[$perm_target_blog] = array(
+						'blog_ismember' => '0',
+						'blog_post_statuses' => array(),
+						'blog_del_post' => '0',
+						'blog_comments' => '0',
+						'blog_cats' => '0',
+						'blog_properties' => '0',
+					);
 			}
 			else
 			{ // OK, rights found:
@@ -591,7 +600,7 @@ class User extends DataObject
 
 			case 'blog_post_statuses':
 				if( $permlevel == 'any' )
-				{ // Any prermission will do:
+				{ // Any permission will do:
 					// echo count($this->blog_post_statuses);
 					return ( count($this->blog_post_statuses[$perm_target_blog]['blog_post_statuses']) > 0 );
 				}
@@ -938,6 +947,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.61  2006/01/15 16:36:58  blueyed
+ * check_perm_blogusers(): optimize and fix for blog_genstatic.
+ *
  * Revision 1.60  2006/01/10 21:09:30  fplanque
  * I think the ICQ NULL is better enforced in User::set()
  *
