@@ -642,6 +642,8 @@ class Plugins
 	 *
 	 * It makes sure that the index is handled and writes it to DB.
 	 *
+	 * @param string Plugin ID
+	 * @param string Code to set the plugin to
 	 * @return boolean|integer|string
 	 *   true, if already set to same value.
 	 *   string: error message (already in use, wrong format)
@@ -663,7 +665,7 @@ class Plugins
 			return T_( 'The plugin code cannot include a dot!' );
 		}
 
-		if( isset( $this->index_code_ID[$code] ) )
+		if( ! empty($code) && isset( $this->index_code_ID[$code] ) )
 		{
 			if( $this->index_code_ID[$code] == $plugin_ID )
 			{ // Already set to same value
@@ -680,9 +682,17 @@ class Plugins
 		{
 			return false;
 		}
+
+		if( empty($code) )
+		{
+			$code = NULL;
+		}
+		else
+		{ // update indexes
+			$this->index_code_ID[$code] = & $Plugin->ID;
+			$this->index_code_Plugins[$code] = & $Plugin;
+		}
 		$Plugin->code = $code;
-		$this->index_code_ID[$code] = & $Plugin->ID;
-		$this->index_code_Plugins[$code] = & $Plugin;
 
 		return $DB->query( '
 			UPDATE T_plugins
@@ -1209,7 +1219,7 @@ class Plugins
 				ORDER BY plug_priority', ARRAY_A ) as $row )
 		{ // Loop through installed plugins:
 			$this->index_ID_rows[$row['plug_ID']] = $row; // remember the rows to instantiate the Plugin on request
-			if( !empty( $row['plug_code'] ) )
+			if( ! empty( $row['plug_code'] ) )
 			{
 				$this->index_code_ID[$row['plug_code']] = $row['plug_ID'];
 			}
@@ -1632,6 +1642,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.28  2006/01/15 15:29:46  blueyed
+ * set_code(): handle empty codes correctly
+ *
  * Revision 1.27  2006/01/15 13:59:15  blueyed
  * Cleanup
  *
