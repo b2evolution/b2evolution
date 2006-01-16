@@ -140,7 +140,8 @@ class BlogCache extends DataObjectCache
 		if( empty( $row ) )
 		{ // Requested object does not exist
 			if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
-			return false;
+			$r = false;
+			return $r;
 		}
 
 		$Blog = new Blog( $row );
@@ -241,6 +242,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.19  2006/01/16 21:22:56  blueyed
+ * Fix return by reference.
+ *
  * Revision 1.18  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
