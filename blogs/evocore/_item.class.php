@@ -835,7 +835,13 @@ class Item extends DataObject
 				$disppage = $page;
 			}
 			if( $disppage > $numpages )
+			{
 				$disppage = $numpages;
+			}
+			elseif( $disppage < 1 )
+			{ // somehow there are a lot of "undefined index -1 errors" for the "$pages[$disppage-1]" line below on the demo site, which I could not reproduce, but this check here makes sense anyway
+				$disppage = 1;
+			}
 			$content = $pages[$disppage-1];
 			if($disppage > 1) $dispmore=1;
 		}
@@ -2287,6 +2293,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.87  2006/01/16 00:45:19  blueyed
+ * Item::content() extra check for "$disppage < 1".
+ *
  * Revision 1.86  2006/01/15 17:59:23  blueyed
  * API break of Item::url_link(). See http://dev.b2evolution.net/todo.php/2005/12/09/api_break_params_to_item_url_link_change
  *
