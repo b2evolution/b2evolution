@@ -81,6 +81,10 @@ class SafeHtmlChecker
 		$this->tagattrs = & $allowed_attributes;
 		$this->uri_attrs = & $uri_attrs;
 		$this->allowed_uri_scheme = & $allowed_uri_scheme;
+		if( ! in_array( $encoding, array( 'ISO-8859-1', 'UTF-8', 'US-ASCII' ) ) )
+		{ // passed encoding not supported by xml_parser_create()
+			$encoding = 'UTF-8';
+		}
 		$this->encoding = $encoding;
 		$this->parser = xml_parser_create( $this->encoding );
 		$this->last_checked_pos = 0;
@@ -258,6 +262,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.9  2006/01/16 00:35:12  blueyed
+ * Fallback to UTF-8 encoding for not-supported encodings.
+ *
  * Revision 1.8  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
