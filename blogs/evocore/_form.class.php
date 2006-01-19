@@ -1157,6 +1157,9 @@ class Form extends Widget
 			echo '<script type="text/javascript">addEvent( window, "load", init_check_all, false )</script>' ;
 		}
 
+		// Reset (in case we re-use begin_form!)
+		$this->hiddens = array();
+
 		return $this->display_or_return( $r );
 	}
 
@@ -2338,6 +2341,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.98  2006/01/19 22:19:51  blueyed
+ * Reset $hiddens in end_form() !
+ *
  * Revision 1.97  2006/01/15 17:40:54  blueyed
  * Moved Form::get_field_params_as_string() to function get_field_attribs_as_string() and minor fixes.
  *
