@@ -142,20 +142,20 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->text( 'post_title', $post_title, 48, T_('Title'), '', 255 );
 
-	echo ' '; // allow wrapping here! (and below)
-	          // blueyed>> (Opera would additionally need text/&nbsp; here, but that wraps ugly)
-
+	echo ' <span id="itemform_post_locale">'; // allow wrapping here! (and below)
+	                                          // blueyed>> (Opera would additionally need text/&nbsp; here, but that wraps ugly)
 	$Form->select( 'post_locale', $post_locale, 'locale_options_return', T_('Language') );
+	echo '</span>';
 
-	echo ' ';
-
+	echo ' <span id="itemform_typ_ID">';
 	$Form->select_object( 'item_typ_ID', $edited_Item->typ_ID, $ItemTypeCache, T_('Type') );
-
-	echo ' ';
+	echo '</span>';
 
 	if( $use_post_url )
 	{
+		echo ' <span id="itemform_post_url">';
 		$Form->text( 'post_url', $post_url, 40, T_('Link to url'), '', 255 );
+		echo '</span>';
 	}
 	else
 	{
@@ -171,14 +171,14 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	// ---------------------------- TEXTAREA -------------------------------------
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea( 'content', $content, 16, '', '', 40 , '' );
+	$Form->textarea_input( 'content', $content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content' ) );
 	$Form->fieldstart = '<span class="line">';
 	$Form->fieldend = '</span>';
 	?>
 	<script type="text/javascript" language="JavaScript">
 		<!--
 		// This is for toolbar plugins
-		b2evoCanvas = document.getElementById('content');
+		b2evoCanvas = document.getElementById('itemform_post_content');
 		//-->
 	</script>
 
@@ -202,12 +202,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	if( $Settings->get( 'fm_enabled' ) )
 	{ // ---------- UPLOAD ----------
-		echo '<input type="button" value="Files" class="ActionButton"
+		echo '<input id="itemform_button_files" type="button" value="Files" class="ActionButton"
 						onclick="pop_up_window( \'files.php?mode=upload\', \'fileman_upload\' );" /> ';
 
 		if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
 		{
-			echo '<input type="button" value="Upload" class="ActionButton"
+			echo '<input id="itemform_button_upload" type="button" value="Upload" class="ActionButton"
 							onclick="pop_up_window( \'files.php?mode=upload&amp;fm_mode=file_upload\', \'fileman_upload\' );" /> ';
 		}
 	}
@@ -222,17 +222,24 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	// ############################ ADVANCED #############################
 
-	$Form->begin_fieldset( T_('Advanced properties') );
+	$Form->begin_fieldset( T_('Advanced properties'), array( 'id' => 'itemform_adv_props' ) );
 
 	if( $current_User->check_perm( 'edit_timestamp' ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
+		?>
+		<div id="itemform_edit_timestamp">
+		<?php
 		$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), T_('Issue date') );
+		echo ' '; // allow wrapping!
 		$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '' );
+		echo ' '; // allow wrapping!
 		if( $next_action == 'create' )
 		{ // If not checked, create time will be used...
 			$Form->checkbox( 'edit_date', 0, '', T_('Edit') );
 		}
-		echo ' '; // allow wrapping!
+		?>
+		</div>
+		<?php
 	}
 
 	$Form->text( 'post_urltitle', $post_urltitle, 40, T_('URL Title'),
@@ -243,7 +250,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	// ############################ WORKFLOW #############################
 
-	$Form->begin_fieldset( T_('Workflow properties') );
+	$Form->begin_fieldset( T_('Workflow properties'), array( 'id' => 'itemform_workflow_props' ) );
 
 	$Form->select_object( 'item_priority', NULL, $edited_Item, T_('Priority'), '', true, '', 'priority_options' );
 
@@ -269,13 +276,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	if( isset( $Blog ) && ( $Blog->get('allowpingbacks') || $Blog->get('allowtrackbacks') ) )
 	{
-		$Form->begin_fieldset( T_('Additional actions') );
+		$Form->begin_fieldset( T_('Additional actions'), array( 'id' => 'itemform_additional_actions' ) );
 
 		if( $Blog->get('allowpingbacks') )
 		{ // --------------------------- PINGBACK --------------------------------------
-
 		?>
-		<div>
+		<div id="itemform_pingbacks">
 			<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback"
 				<?php	if ($post_pingback) { echo ' checked="checked"'; } ?> />
 			<label for="post_pingback"><strong><?php echo T_('Pingback') ?></strong> <span class="notes"><?php echo T_('(Send a pingback to all URLs in this post)') ?></span></label>
@@ -286,14 +292,13 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		if( $Blog->get('allowtrackbacks') )
 		{ // --------------------------- TRACKBACK --------------------------------------
 		?>
-		<div>
+		<div id="itemform_trackbacks">
 			<label for="trackback_url"><strong><?php echo T_('Trackback URLs') ?>:</strong> <span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br /><input type="text" name="trackback_url" class="large" id="trackback_url" value="<?php echo format_to_output( $post_trackbacks, 'formvalue' ); ?>" />
 		</div>
 		<?php
 		}
 
 		$Form->end_fieldset();
-
 	}
 	?>
 
@@ -304,7 +309,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	<?php
 	// ################### CATEGORIES ###################
 
-	$Form->begin_fieldset( T_('Categories'), array( 'class'=>'extracats' ) );
+	$Form->begin_fieldset( T_('Categories'), array( 'class'=>'extracats', 'id' => 'itemform_categories' ) );
 
 	echo cat_select();
 
@@ -313,7 +318,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	// ################### VISIBILITY / SHARING ###################
 
-	$Form->begin_fieldset( T_('Visibility / Sharing') );
+	$Form->begin_fieldset( T_('Visibility / Sharing'), array( 'id' => 'itemform_visibility' ) );
 
 	$sharing_options = array();
 	if( $current_User->check_perm( 'blog_post_statuses', 'published', false, $blog ) )
@@ -336,7 +341,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	if( $Blog->allowcomments == 'post_by_post' )
 	{
-		$Form->begin_fieldset( T_('Comments') );
+		$Form->begin_fieldset( T_('Comments'), array( 'id' => 'itemform_comments' ) );
 
 		?>
 			<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?> />
@@ -355,7 +360,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	// ################### TEXT RENDERERS ###################
 
-	$Form->begin_fieldset( T_('Text Renderers') );
+	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
 
 	$edited_Item->renderer_checkboxes();
 
@@ -395,6 +400,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.47  2006/01/20 16:45:11  blueyed
+ * Add html IDs to input objects/blocks
+ *
  * Revision 1.46  2006/01/09 17:21:06  fplanque
  * no message
  *
