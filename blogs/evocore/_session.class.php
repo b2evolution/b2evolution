@@ -362,10 +362,11 @@ class Session
 
 		if( $this->_session_needs_save )
 		{	// There have been changes since the last save.
+			$sess_data = is_null($this->_data) ? $this->_data : serialize($this->_data);
 			$DB->query( '
 				UPDATE T_sessions SET
 					sess_agnt_ID = "'.$Hit->agent_ID.'",
-					sess_data = '.$DB->quote( serialize($this->_data) ).',
+					sess_data = '.$DB->quote( $sess_data ).',
 					sess_ipaddress = "'.$Hit->IP.'",
 					sess_key = '.$DB->quote( $this->key ).',
 					sess_lastseen = "'.date( 'Y-m-d H:i:s', $localtimenow ).'",
@@ -381,6 +382,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.42  2006/01/20 17:08:13  blueyed
+ * Save sess_data as NULL (unserialized) if NULL.
+ *
  * Revision 1.41  2006/01/20 16:40:56  blueyed
  * Cleanup
  *
