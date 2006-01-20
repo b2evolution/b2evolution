@@ -30,10 +30,14 @@ var bozo = {
 		{   // Get the form element
 			var el_form = document.forms[i];
 			
-			if( el_form.id.indexOf( '_checkchanges' ) != -1 )
-			{	// The form has an 'checkchanges' ID, initialize his changes number to 0
-				bozo.tab_changes[el_form.id] = 0;
-			}
+			if( el_form.id.indexOf( '_checkchanges' ) == -1 )
+			{	// The form has no 'checkchanges' ID, skip it
+        continue;
+      }
+      
+      // initialize his changes number to 0
+      bozo.tab_changes[el_form.id] = 0;
+
 			all_inputs = el_form.getElementsByTagName( 'input' );
 			// Loop on all form inputs 
 			for( var j = 0; j < all_inputs.length; j++ ) 
