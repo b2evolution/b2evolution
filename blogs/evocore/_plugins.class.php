@@ -204,7 +204,7 @@ class Plugins
 				'PluginSettingsInstantiated' => '', /* private / needs not description */
 
 				'RenderItemAsHtml' => T_('Renders content when generated as HTML.'),
-				'RenderItemAsXML' => T_('Renders content when generated as XML.'),
+				'RenderItemAsXml' => T_('Renders content when generated as XML.'),
 				'RenderItem' => T_('Renders content when not generated as HTML or XML.'),
 
 
@@ -347,17 +347,23 @@ class Plugins
 		    && ( $this->count_regs( $Plugin->classname ) >= $Plugin->nr_of_installs ) )
 		{
 			$this->unregister( $Plugin );
-			return T_('The plugin cannot be installed again.');
+			$r = T_('The plugin cannot be installed again.');
+			return $r;
 		}
 
 		if( ! $Plugin->Install() )
 		{
 			$this->unregister( $Plugin );
-			return T_('The installation of the plugin failed.');
+			$r = T_('The installation of the plugin failed.');
+			return $r;
 		}
 
 		$this->sort( 'priority' );
 
+		if( empty($Plugin->code) )
+		{
+			$Plugin->code = NULL;
+		}
 
 		// Record into DB
 		$DB->begin();
@@ -381,7 +387,6 @@ class Plugins
 
 		// "GetDefaultSettings" was just discovered by save_events()
 		$this->instantiate_Settings( $Plugin );
-
 
 		$Debuglog->add( 'New plugin: '.$Plugin->name.' ID: '.$Plugin->ID, 'plugins' );
 
@@ -450,7 +455,7 @@ class Plugins
 	 * and instantiates the Plugin's Settings.
 	 *
 	 * @todo When a Plugin does not exist anymore we might want to provide a link in
-	 *       "Tools / Plugins" to un-install it completely or handle it otherwise..
+	 *       "Tools / Plugins" to un-install it completely or handle it otherwise.. (deactivate)
 	 * @access private
 	 * @param string name of plugin class to instantiate & register
 	 * @param int ID in database (0 if not installed)
@@ -813,6 +818,8 @@ class Plugins
 	{
 		global $Debuglog, $Timer;
 
+		$Timer->resume( 'plugins_settings' );
+
 		if( ! isset($this->index_event_IDs['GetDefaultSettings'])
 		    || ! in_array( $Plugin->ID, $this->index_event_IDs['GetDefaultSettings'] )
 		    || ! method_exists( $Plugin, 'GetDefaultSettings' ) )
@@ -827,7 +834,6 @@ class Plugins
 		}
 		else
 		{
-			$Timer->resume( 'plugins_settings' );
 			require_once dirname(__FILE__).'/_pluginsettings.class.php';
 			$Plugin->Settings = & new PluginSettings( $Plugin->ID );
 
@@ -835,10 +841,11 @@ class Plugins
 			{
 				$Plugin->Settings->_defaults[$l_name] = $l_value['defaultvalue'];
 			}
-			$Timer->pause( 'plugins_settings' );
 		}
 
 		$this->call_method( $Plugin->ID, 'PluginSettingsInstantiated', $params = array() );
+
+		$Timer->pause( 'plugins_settings' );
 	}
 
 
@@ -971,7 +978,7 @@ class Plugins
 			{
 				$debug_params['pass_md5'] = '-hidden-';
 			}
-			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.var_export( $debug_params, true ).' )', 'plugins' );
+			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( '.htmlspecialchars(var_export( $debug_params, true )).' )', 'plugins' );
 		}
 
 		$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
@@ -1664,6 +1671,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.30  2006/01/20 00:42:18  blueyed
+ * Fixes
+ *
  * Revision 1.29  2006/01/15 23:59:13  blueyed
  * Added Plugins::call_method_if_active()
  *
