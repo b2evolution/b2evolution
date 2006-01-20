@@ -168,21 +168,24 @@ $filetable_cols = 6
 		 * Display ROOTs list:
 		 * -----------------------------------------------
 		 */
-		$rootlist = $Fileman->getRootList();
+		$rootlist = $Fileman->get_available_FileRoots();
 		if( count($rootlist) > 1 )
 		{ // provide list of roots to choose from
-			echo '<div id="fmbar_roots">';
-			echo '<select name="new_root" onchange="this.form.submit();">';
-			foreach( $rootlist as $lroot )
-			{
-				echo '<option value="'.$lroot['id'].'"';
+			?>
+			<div id="fmbar_roots">
+			<select name="new_root" onchange="this.form.submit();">
 
-				if( $Fileman->root == $lroot['id'] )
+			<?php
+			foreach( $rootlist as $l_FileRoot )
+			{
+				echo '<option value="'.$l_FileRoot->ID.'"';
+
+				if( $Fileman->_FileRoot && $Fileman->_FileRoot->ID == $l_FileRoot->ID )
 				{
 					echo ' selected="selected"';
 				}
 
-				echo '>'.format_to_output( $lroot['name'] )."</option>\n";
+				echo '>'.format_to_output( $l_FileRoot->name )."</option>\n";
 			}
 			?>
 
@@ -850,6 +853,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.72  2006/01/20 00:39:17  blueyed
+ * Refactorisation/enhancements to filemanager.
+ *
  * Revision 1.71  2006/01/11 22:09:29  blueyed
  * Reactive "download selected files as zip", also as a "workaround" to always have an icon next to "With selected files:".. ;)
  *

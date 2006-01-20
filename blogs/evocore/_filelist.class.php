@@ -65,6 +65,13 @@ require_once dirname(__FILE__).'/_file.class.php';
 class Filelist
 {
 	/**
+	 * The root of the file list.
+	 *
+	 * @var FileRoot
+	 */
+	var $_FileRoot;
+
+	/**
 	 * Root type: 'user', 'group' or 'collection'.
 	 *
 	 * All files in this list MUST have that same root type. Adding will fail otherwise.
@@ -83,15 +90,6 @@ class Filelist
 	 * @access protected
 	 */
 	var $_root_ID = 0;
-
-	/**
-	 * path to root directory with ending slash, except for absolute.
-	 *
-	 * @todo remove exception for absolute
-	 * @param string
-	 * @access protected
-	 */
-	var $_ads_root_path;
 
 	/**
 	 * Path to list with trailing slash.
@@ -259,10 +257,10 @@ class Filelist
 	 * Constructor
 	 *
 	 * @param boolean|string Default path for the files, false if you want to create an arbitrary list
-	 * @param string Root type: 'user', 'group' or 'collection' (has to be the same for all files..)
+	 * @param FileRoot See FileRootCache::get_by_type_and_ID()
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 */
-	function Filelist( $path, $root_type, $root_ID )
+	function Filelist( $path, $FileRoot )
 	{
 		global $FileRootCache;
 
@@ -271,11 +269,9 @@ class Filelist
 			$this->_ads_list_path = $path;
 		}
 
-		if( !is_null($root_type) )
+		if( !is_null($FileRoot) )
 		{	// We want to set a root different from default:
-			$this->_root_type = $root_type;
-			$this->_root_ID = $root_ID;
-			$this->_ads_root_path = $FileRootCache->get_root_dir( $root_type, $root_ID );
+			$this->_FileRoot = & $FileRoot;
 		}
 
 		if( !empty($this->_ads_list_path) )
@@ -376,9 +372,9 @@ class Filelist
 		}
 
 		// Integrity check:
-		if( $File->_root_type != $this->_root_type || $File->_root_ID != $this->_root_ID )
+		if( $File->_root_type != $this->_FileRoot->type || $File->_root_ID != $this->_FileRoot->in_type_ID )
 		{
-			debug_die( 'Adding file '.$File->_root_type.':'.$File->_root_ID.':'.$File->get_rdfs_rel_path().' to filelist '.$this->_root_type.':'.$this->_root_ID.' : root mismatch!' );
+			debug_die( 'Adding file '.$File->_root_type.':'.$File->_root_ID.':'.$File->get_rdfs_rel_path().' to filelist '.$this->_FileRoot->type.':'.$this->_FileRoot->in_type_ID.' : root mismatch!' );
 		}
 
 		if( $mustExist && !$File->exists() )
@@ -453,7 +449,7 @@ class Filelist
 	{
 		global $FileCache;
 
-		$NewFile = & $FileCache->get_by_root_and_path( $this->_root_type, $this->_root_ID, $rel_path );
+		$NewFile = & $FileCache->get_by_root_and_path( $this->_FileRoot->type, $this->_FileRoot->in_type_ID, $rel_path );
 
 		return $this->add( $NewFile, $mustExist );
 	}
@@ -826,13 +822,24 @@ class Filelist
 
 
 	/**
+	 * Get the FileLists FileRoot
+	 *
+	 * @return FileRoot
+	 */
+	function & get_FileRoot()
+	{
+		return $this->_FileRoot;
+	}
+
+
+	/**
 	 * Get the FileLists root type.
 	 *
 	 * @return string
 	 */
 	function get_root_type()
 	{
-		return $this->_root_type;
+		return $this->_FileRoot->type;
 	}
 
 
@@ -843,7 +850,7 @@ class Filelist
 	 */
 	function get_root_ID()
 	{
-		return $this->_root_ID;
+		return $this->_FileRoot->in_type_ID;
 	}
 
 
@@ -865,7 +872,7 @@ class Filelist
 
 
 	/**
-	 * Get the path (and name) of a {@link File} relative to the {@link Filelist::_ads_root_path}.
+	 * Get the path (and name) of a {@link File} relative to the {@link Filelist::_FileRoot->ads_path}.
 	 *
 	 * @param string
 	 * @return string
@@ -873,13 +880,13 @@ class Filelist
 	function rdfs_relto_root_from_adfs( $adfs_path )
 	{
 		// Check that the file is inside root:
-		if( substr( $adfs_path, 0, strlen($this->_ads_root_path) ) != $this->_ads_root_path )
+		if( substr( $adfs_path, 0, strlen($this->_FileRoot->ads_path) ) != $this->_FileRoot->ads_path )
 		{
 			debug_die( 'rdfs_relto_root_from_adfs: Path is NOT inside of root!' );
 		}
 
 		// Return only the relative part:
- 		return substr( $adfs_path, strlen($this->_ads_root_path) );
+ 		return substr( $adfs_path, strlen($this->_FileRoot->ads_path) );
 	}
 
 
@@ -1028,6 +1035,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.47  2006/01/20 00:39:17  blueyed
+ * Refactorisation/enhancements to filemanager.
+ *
  * Revision 1.46  2005/12/16 16:59:13  blueyed
  * (Optional) File owner and group columns in Filemanager.
  *
@@ -1049,6 +1059,15 @@ class Filelist
  * Revision 1.40  2005/11/21 18:33:19  fplanque
  * Too many undiscussed changes all around: Massive rollback! :((
  * As said before, I am only taking CLEARLY labelled bugfixes.
+ *
+ * Revision 1.39  2005/11/21 03:42:39  blueyed
+ * remove(): fixed totals of dirs and files; removed call to load() there becuase it does not work with arbitrary lists (e.g. selectedFiles)
+ *
+ * Revision 1.38  2005/11/19 23:17:29  blueyed
+ * fixed remove(); doc
+ *
+ * Revision 1.37  2005/11/19 03:43:00  blueyed
+ * doc
  *
  * Revision 1.36  2005/11/18 07:53:05  blueyed
  * use $_FileRoot / $FileRootCache for absolute path, url and name of roots.

@@ -183,7 +183,7 @@ if( false )
 		{
 			Log::display( '', '', T_('Some file uploads failed. Please check the errors below.'), 'error' );
 		}
-		$LogUpload->display( '', '', true, 'all' ); ?>
+		?>
 
 		<?php /* DIV to prevent the "Upload into" fieldset from wrapping below the "Files to upload" box (on any browser), because padding/margin of the fieldset does not affect the width of the both boxes */ ?>
 		<div class="box_files_to_upload">
@@ -276,7 +276,7 @@ if( false )
 		<fieldset class="upload_into">
 			<legend><?php echo T_('Upload files into:'); ?></legend>
 			<?php
-				echo $Fileman->getDirectoryTreeRadio();
+				echo $Fileman->get_directory_tree_radio();
 			?>
 		</fieldset>
 		</div>
@@ -293,6 +293,9 @@ if( false )
 
 /*
  * $Log$
+ * Revision 1.20  2006/01/20 00:39:17  blueyed
+ * Refactorisation/enhancements to filemanager.
+ *
  * Revision 1.19  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

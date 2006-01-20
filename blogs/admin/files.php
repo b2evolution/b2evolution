@@ -317,7 +317,7 @@ switch( $action )
 			break;
 		}
 
-		param( 'confirm', 'integer', 0 );
+		param( 'confirmed', 'integer', 0 );
 		param( 'new_names', 'array', array() );
 
 		// Check params for each file to rename:
@@ -325,32 +325,32 @@ switch( $action )
 		{
 			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
 			{ // We have not yet provided a name to rename to...
-				$confirm = 0;
+				$confirmed = 0;
 				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get_name();
 				continue;
 			}
 
 			// Check if provided name is okay:
 			$new_names[$loop_src_File->get_md5_ID()] = trim(strip_tags($new_names[$loop_src_File->get_md5_ID()]));
-			
+
 			if( !$loop_src_File->is_dir() )
 			{
-				if( $error_filename = validate_filename( $new_names[$loop_src_File->get_md5_ID()] ) ) 
+				if( $error_filename = validate_filename( $new_names[$loop_src_File->get_md5_ID()] ) )
 				{ // Not a file name or not an allowed extension
-					$confirm = 0;
-					$Messages->add( $error_filename , 'error' );
+					$confirmed = 0;
+					$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $error_filename );
 					continue;
 				}
 			}
-			elseif( $error_dirname = validate_dirname( $new_names[$loop_src_File->get_md5_ID()] ) ) 
+			elseif( $error_dirname = validate_dirname( $new_names[$loop_src_File->get_md5_ID()] ) )
 			{ // Not a directory name
-				$confirm = 0;
-				$Messages->add( $error_dirname, 'error' );
+				$confirmed = 0;
+				$Request->param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $error_dirname );
 				continue;
 			}
 		}
 
-		if( $confirm )
+		if( $confirmed )
 		{ // Rename is confirmed, let's proceed:
 			$selected_Filelist->restart();
 			while( $loop_src_File = & $selected_Filelist->get_next() )
@@ -364,7 +364,7 @@ switch( $action )
 					continue;
 				}
 				// Perform rename:
-				if( ! $loop_src_File->rename_to( $new_name ) )
+				if( ! $Fileman->rename_File( $loop_src_File, $new_name ) )
 				{
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
 						$old_name, $new_name ), 'error' );
@@ -1246,6 +1246,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.157  2006/01/20 00:39:17  blueyed
+ * Refactorisation/enhancements to filemanager.
+ *
  * Revision 1.156  2006/01/20 00:07:26  blueyed
  * 1-2-3-4 scheme for files.php again. Not fully tested.
  *

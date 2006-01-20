@@ -163,11 +163,17 @@ class FileManager extends Filelist
 			'mode'           => '_evo_mode',
 			'fm_mode'        => 'fm_mode',
 			'fm_sources'     => 'fm_sources',
-			'cmr_keepsource' => 'cmr_keepsource',
+			'fm_sources_root'=> 'fm_sources_root',
 			'flatmode'       => 'flatmode',
 			'forceFM'        => 'forceFM',
 			'item_ID'	       => '_item_ID',	             // Used in fm_mode=link_item
 		);
+
+	/**
+	 * Root of the sources (e.g. 'user' or 'blog_X')
+	 * @var string
+	 */
+	var $fm_sources_root;
 
 
 	/**
@@ -189,6 +195,7 @@ class FileManager extends Filelist
 	{
 		global $basepath, $baseurl, $media_subdir, $admin_subdir, $admin_url;
 		global $BlogCache, $UserCache, $Debuglog, $AdminUI, $Messages;
+		global $FileRootCache;
 
 		// Global params to remember:
 		global $mode, $item_ID;
@@ -199,84 +206,66 @@ class FileManager extends Filelist
 
 		$this->_result_params = $AdminUI->get_menu_template('Results');
 
-		if( empty($root) )
-		{ // NO folder requested, get the first one available:
-			$root_array = $this->getRootList();
+		$this->_ads_list_path = false; // false by default, gets set if we have a valid root
 
-			if( count($root_array) )
-			{ // We found at least one media dir:
-				$this->_root_type = $root_array[0]['type'];
-				$this->_root_ID = $root_array[0]['IDn'];
-				$this->_ads_root_path = $root_array[0]['path'];
-				$this->_root_url = $root_array[0]['url'];
-				$this->root = $root_array[0]['id'];
+		// Get root:
+		$available_Roots = $this->get_available_FileRoots();
+
+		if( ! empty($root) )
+		{ // We have requested a root folder by string:
+			$this->_FileRoot = & $FileRootCache->get_by_ID($root);
+
+			if( !$this->_FileRoot || ! isset( $available_Roots[$this->_FileRoot->ID] ) )
+			{ // Root not found or not in list of available ones
+				$Messages->add( T_('You don\'t have access to the requested root directory.'), 'error' );
+				$this->_FileRoot = false;
+			}
+		}
+
+		if( ! $this->_FileRoot )
+		{ // No root requested (or the requested is invalid), get the first one available:
+			if( $available_Roots
+			    && ( $tmp_keys = array_keys( $available_Roots ) )
+			    && $first_Root = & $available_Roots[ $tmp_keys[0] ] )
+			{ // get the first one
+				$this->_FileRoot = & $first_Root;
 			}
 			else
 			{
 				$Messages->add( T_('You don\'t have access to any root directory.'), 'error' );
-				$this->_ads_list_path = false;
-			}
-		}
-		else
-		{ // We have requested a root folder:
-			$root_parts = explode( '_', $root );
-
-			if( $root_parts[0] == 'user' )
-			{
-				$this->_root_type = 'user';
-				$this->_root_ID = $this->User->ID;
-				$this->_ads_root_path = $this->User->getMediaDir();
-				$this->_root_url = $this->User->getMediaUrl();
-				$this->root = 'user';
-			}
-			elseif( $root_parts[0] == 'collection' && isset($root_parts[1]) )
-			{
-				$tBlog = & $BlogCache->get_by_ID( $root_parts[1] );
-				$this->_root_type = 'collection';
-				$this->_root_ID = $tBlog->ID;
-				$this->_ads_root_path = $tBlog->get( 'mediadir' );
-				$this->_root_url = $tBlog->get( 'mediaurl' );
-				$this->root = 'collection_'.$tBlog->ID;
-			}
-
-			if( ! $this->_ads_root_path )
-			{
-				$Messages->add( T_('You don\'t have access to the requested root directory.'), 'error' );
-				$this->_ads_list_path = false;
 			}
 		}
 
-		if( $this->_ads_root_path )
-		{ // We have access to a/requested root dir:
+		if( $this->_FileRoot )
+		{ // We have access to the root:
+			$this->root = $this->_FileRoot->ID; // remember to regenerate it in getCurUrl()
 
-			list( $_ads_real_root_path, $real_root_path_exists ) = check_canonical_path( $this->_ads_root_path );
+			list( $_ads_real_root_path, $real_root_path_exists ) = check_canonical_path( $this->_FileRoot->ads_path );
 			$Debuglog->add( 'FM: real_root_dir: '.var_export( $_ads_real_root_path, true ), 'files' );
 
 			if( !$real_root_path_exists )
 			{
-				$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $this->_ads_root_path ), 'error' );
-				$this->_ads_list_path = false;
+				$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $this->_FileRoot->ads_path ), 'error' );
 			}
 			else
 			{ // Root exists
 				// Let's get into requested list dir...
-				$this->_ads_list_path = trailing_slash( $this->_ads_root_path.$path );
+				$this->_ads_list_path = trailing_slash( $this->_FileRoot->ads_path.$path );
 
 				// get real cwd
 				list( $_ads_real_list_path, $realpath_exists ) = check_canonical_path( $this->_ads_list_path );
 
-
-				if( ! preg_match( '#^'.$this->_ads_root_path.'#', $_ads_real_list_path ) )
+				if( ! preg_match( '#^'.$this->_FileRoot->ads_path.'#', $_ads_real_list_path ) )
 				{ // cwd is not below root!
 					$Messages->add( T_( 'You are not allowed to go outside your root directory!' ), 'error' );
-					$this->_ads_list_path = $this->_ads_root_path;
+					$this->_ads_list_path = $this->_FileRoot->ads_path;
 				}
 				else
 				{ // allowed
 					if( !$realpath_exists )
 					{ // does not exist
 						$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $this->_ads_list_path ), 'error' );
-						$this->_ads_list_path = NULL;
+						$this->_ads_list_path = false;
 					}
 					else
 					{ // Okay we can list this directory...
@@ -286,7 +275,7 @@ class FileManager extends Filelist
 			}
 
 			// Finish initializing:
-			parent::Filelist( NULL, NULL, NULL ); // Do not override anything
+			parent::Filelist( NULL, NULL ); // Do not override anything
 		}
 
 
@@ -303,17 +292,30 @@ class FileManager extends Filelist
 
 
 		// For modes build $this->SourceList
-		if( $this->fm_mode && $this->fm_sources = param( 'fm_sources', 'array', array(), true ) )
+		if( $this->fm_mode && $this->fm_sources = param( 'fm_sources', 'array', array() ) )
 		{
-			if( $this->SourceList = & new Filelist( $this->_ads_root_path, $this->_root_type, $this->_root_ID ) )
-			{ // TODO: should fail for non-existant sources, or sources where no read-perm
+			$this->fm_sources_root = param( 'fm_sources_root', 'string', '' );
 
-				foreach( $this->fm_sources as $lSourcePath )
+			$sources_Root = & $FileRootCache->get_by_ID( $this->fm_sources_root );
+
+			if( $sources_Root )
+			{ // instantiate the source list for the selected sources
+				$this->SourceList = & new Filelist( $sources_Root->ads_path, $sources_Root );
+			}
+			else
+			{ // fallback: source files are considered to be in the current root
+				$this->SourceList = & new Filelist( $this->_FileRoot->ads_path, $this->_FileRoot );
+				$Debuglog->add( 'SourceList without explicit root!', 'error' );
+			}
+
+			if( $this->SourceList )
+			{
+				// TODO: should fail for non-existant sources, or sources where no read-perm
+				foreach( $this->fm_sources as $l_source_path )
 				{
 					// echo '<br>'.$lSourcePath;
-					$this->SourceList->add_by_subpath( urldecode($lSourcePath) );
+					$this->SourceList->add_by_subpath( urldecode($l_source_path) );
 				}
-				$this->cmr_keepsource = param( 'cmr_keepsource', 'integer', 0 );
 			}
 			else
 			{ // Without SourceList there's no mode
@@ -324,7 +326,7 @@ class FileManager extends Filelist
 		{
 			$this->SourceList = false;
 			$this->fm_sources = NULL;
-			$this->cmr_keepsource = NULL;
+			$this->fm_sources_root = NULL;
 		}
 
 
@@ -336,9 +338,7 @@ class FileManager extends Filelist
 
 		$this->loadSettings();
 
-		$Debuglog->add( 'FM root: '.var_export( $this->root, true ), 'files' );
-		$Debuglog->add( 'FM _ads_root_path: '.var_export( $this->_ads_root_path, true ), 'files' );
-		$Debuglog->add( 'FM root_url: '.var_export( $this->_root_url, true ), 'files' );
+		$Debuglog->add( 'FM root: '.var_export( $this->_FileRoot, true ), 'files' );
 		$Debuglog->add( 'FM _ads_list_path: '.var_export( $this->_ads_list_path, true ), 'files' );
 		$Debuglog->add( 'FM _rds_list_path: '.var_export( $this->_rds_list_path, true ), 'files' );
 
@@ -470,10 +470,8 @@ class FileManager extends Filelist
 		{
 			return false;
 		}
-		$url = $this->getCurUrl( array( 'fm_mode' => 'file_'.$mode,
-																		'fm_sources' => false,
-																		'cmr_keepsource' => (int)($mode == 'copy') ) );
-		$url .= '&amp;fm_sources[]='.rawurlencode( $this->curFile->get_rdfp_rel_path() );
+		$url = $this->getCurUrl( array( 'fm_mode' => 'file_'.$mode, 'fm_sources' => false, 'fm_sources_root' => false ) );
+		$url .= '&amp;fm_sources[]='.rawurlencode( $this->curFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$this->_FileRoot->ID;
 
 		echo '<a href="'.$url
 					#.'" target="fileman_copymoverename" onclick="'
@@ -693,45 +691,32 @@ class FileManager extends Filelist
 	/**
 	 * Get an array of available roots.
 	 *
-	 * @todo Cache this! => Use $FileRootCache
-	 * @return array of arrays for each root: array( type [blog/user], id, name )
+	 * @return array of FileRoots (key being the FileRoot's ID)
 	 */
-	function getRootList()
+	function get_available_FileRoots()
 	{
-		global $BlogCache;
-
-		$bloglist = $BlogCache->load_user_blogs( 'browse', $this->User->ID );
+		global $FileRootCache, $BlogCache;
 
 		$r = array();
+
+		// The user's blog (if available) is the default/first one:
+		$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $this->User->ID );
+		if( $user_FileRoot )
+		{ // We got a user media dir:
+			$r[ $user_FileRoot->ID ] = & $user_FileRoot;
+		}
+
+		$bloglist = $BlogCache->load_user_blogs( 'browse', $this->User->ID );
 
 		// blog media dirs:
 		foreach( $bloglist as $blog_ID )
 		{
-			$Blog = & $BlogCache->get_by_ID( $blog_ID );
-
-			if( $blog_media_dir = $Blog->getMediaDir() )
-			{ // we got a blog media dir:
- 				// echo '<br>got blog media dir for blog #'.$blog_ID;
-				$r[] = array( 'type' => 'collection',
-											'IDn'  => $blog_ID,
-											'id'   => 'collection_'.$blog_ID,
-											'name' => $Blog->get( 'shortname' ),
-											'path' => $blog_media_dir,
-											'url'  => $Blog->get( 'mediaurl' ) );
+			if( $Root = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_ID ) )
+			{
+				$r[ $Root->ID ] = & $Root;
 			}
-			// else echo '<br>NO blog media dir for blog #'.$blog_ID;
 		}
 
-		// the user's root
-		if( $user_media_dir = $this->User->getMediaDir() )
-		{ // We got a user media dir:
-			$r[] = array( 'type' => 'user',
-										'IDn'  => $this->User->ID,
-										'id'   => 'user',
-										'name' => T_('My folder'),
-										'path' => $user_media_dir,
-										'url'  => $this->User->getMediaUrl() );
-		}
 		return $r;
 	}
 
@@ -863,7 +848,7 @@ class FileManager extends Filelist
 
 		if( is_null($this->_selected_Filelist) )
 		{
-			$this->_selected_Filelist = new Filelist( false, $this->_root_type, $this->_root_ID );
+			$this->_selected_Filelist = new Filelist( false, $this->_FileRoot );
 
 			$fm_selected = param( 'fm_selected', 'array', array() );
 
@@ -887,11 +872,11 @@ class FileManager extends Filelist
 	/**
 	 * Get the directories of the supplied path as a radio button tree.
 	 *
-	 * @param NULL|array list of root IDs (defaults to all)
+	 * @param NULL|FileRoot A single root or NULL for all available.
 	 * @param string the root path to use
 	 * @return string
 	 */
-	function getDirectoryTreeRadio( $Root = NULL , $path = NULL, $rootSubpath = NULL )
+	function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = NULL, $name = NULL )
 	{
 		static $js_closeClickIDs; // clickopen IDs that should get closed
 
@@ -899,12 +884,12 @@ class FileManager extends Filelist
 		{ // This is the top level call:
 			$js_closeClickIDs = array();
 
-			$_roots = $this->getRootList();
+			$_roots = $this->get_available_FileRoots();
 
 			$r = '<ul class="clicktree">';
-			foreach( $_roots as $lRoot )
+			foreach( $_roots as $l_Root )
 			{
-				$subR = $this->getDirectoryTreeRadio( $lRoot, $lRoot['path'], '' );
+				$subR = $this->get_directory_tree_radio( $l_Root, $l_Root->ads_path, '' );
 				if( !empty( $subR['string'] ) )
 				{
 					$r .= '<li>'.$subR['string'].'</li>';
@@ -913,56 +898,60 @@ class FileManager extends Filelist
 
 			$r .= '</ul>';
 
-			if( !empty($js_closeClickIDs) )
-			{
+			if( ! empty($js_closeClickIDs) )
+			{ // there are IDs of checkboxes that we want to close
 				$r .= "\n".'<script type="text/javascript">toggle_clickopen( \''
-							.implode( "' );\ntoggle_clickopen( '", $js_closeClickIDs )
-							."' );\n</script>";
+				      .implode( "' );\ntoggle_clickopen( '", $js_closeClickIDs )
+				      ."' );\n</script>";
 			}
 
 			return $r;
 		}
 
 		// We'll go through files in current dir:
-		$Nodelist = new Filelist( trailing_slash($path), $Root['type'], $Root['IDn'] );
+		$Nodelist = new Filelist( trailing_slash($path), $Root );
 		$Nodelist->load();
+		$has_sub_dirs = $Nodelist->count_dirs();
 
-		$root_and_path = format_to_output( serialize( array( 'root' => $Root['id'], 'path' => $rootSubpath ) ), 'formvalue' );
+		$root_and_path = format_to_output( serialize( array( 'root' => $Root->ID, 'path' => $rootSubpath ) ), 'formvalue' );
 		$id_path = md5( $path );
 
-		$r['string'] = '<input type="radio"
-		                       name="root_and_path"
-		                       value="'.$root_and_path.'"
-		                       id="radio_'.$id_path.'"'
-		                       .( $Root['id'] == $this->root && $rootSubpath == $this->_rds_list_path ? ' checked="checked"' : '' ).'
-		                /> ';
+		// the radio input to select this path
+		$r['string'] = '<input'
+			.' type="radio"'
+			.' name="root_and_path"'
+			.' value="'.$root_and_path.'"'
+			.' id="radio_'.$id_path.'"'
+			.( $Root->ID == $this->_FileRoot->ID && $rootSubpath == $this->_rds_list_path ? ' checked="checked"' : '' )
+			//.( ! $has_sub_dirs ? ' style="margin-right:'.get_icon( 'collapse', 'size', array( 'size' => 'width' ) ).'px"' : '' )
+			.' /> ';
 
 		$label = '<label for="radio_'.$id_path.'">'
-							.'<a href="'.$this->getCurUrl( array( 'root' => $Root['id'], 'path' => $rootSubpath, 'forceFM' => 1 ) ).'"
-								title="'.T_('Open this directory in the Filemanager').'">'
-							.( empty($path) ? $Root['name'] : basename( $path ) )
-							.'</a>'
-							.'</label>';
+			.'<a href="'.$this->getCurUrl( array( 'root' => $Root->ID, 'path' => $rootSubpath ) ).'"
+			title="'.T_('Open this directory in the Filemanager').'">'
+			.( empty($rootSubpath) ? $Root->name : basename( $path ) )
+			.'</a>'
+			.'</label>';
 
-		$r['opened'] = ( $Root['id'] == $this->root && $rootSubpath == $this->_rds_list_path ) ? true : NULL;
+		$r['opened'] = ( $Root->ID == $this->_FileRoot->ID && $rootSubpath == $this->_rds_list_path ) ? true : NULL;
 
 
-		if( !$Nodelist->count_dirs() )
+		if( ! $has_sub_dirs )
 		{
 			$r['string'] .= $label;
 			return $r;
 		}
 		else
 		{ // Process subdirs
-			$r['string'] .= '<img src="'.get_icon( 'collapse', 'url' ).'"'
-				.' onclick="toggle_clickopen(\''.$id_path.'\');"'
-				.' id="clickimg_'.$id_path.'" alt="+ / -" />
-				'.$label.'
-				<ul class="clicktree" id="clickdiv_'.$id_path.'">'."\n";
+			$r['string'] .= $label
+				.' <img src="'.get_icon( 'collapse', 'url' ).'"'
+					.' onclick="toggle_clickopen(\''.$id_path.'\');"'
+					.' id="clickimg_'.$id_path.'" alt="+ / -" />'
+				.'<ul class="clicktree" id="clickdiv_'.$id_path.'">'."\n";
 
-			while( $lFile =& $Nodelist->get_next( 'dir' ) )
+			while( $l_File = & $Nodelist->get_next( 'dir' ) )
 			{
-				$rSub = $this->getDirectoryTreeRadio( $Root, $lFile->get_full_path(), $lFile->get_rdfs_rel_path() );
+				$rSub = $this->get_directory_tree_radio( $Root, $l_File->get_full_path(), $l_File->get_rdfs_rel_path() );
 
 				if( $rSub['opened'] )
 				{ // pass opened status on, if given
@@ -1049,7 +1038,7 @@ class FileManager extends Filelist
 		}
 
 		// Try to get File object:
-		$newFile = & $FileCache->get_by_root_and_path( $this->_root_type, $this->_root_ID, $this->_rds_list_path.$name );
+		$newFile = & $FileCache->get_by_root_and_path( $this->_FileRoot->type, $this->_FileRoot->in_type_ID, $this->_rds_list_path.$name );
 
 		if( $newFile->exists() )
 		{
@@ -1099,7 +1088,7 @@ class FileManager extends Filelist
 		}
 
 		// Get the part of the path which is not clickable:
-		$r = substr( $this->_ads_root_path, 0, strrpos( substr($this->_ads_root_path, 0, -1), '/' )+1 );
+		$r = substr( $this->_FileRoot->ads_path, 0, strrpos( substr($this->_FileRoot->ads_path, 0, -1), '/' )+1 );
 
 		// get the part that is clickable
 		$clickabledirs = explode( '/', substr( $this->_ads_list_path, strlen($r) ) );
@@ -1297,6 +1286,33 @@ class FileManager extends Filelist
 
 
 	/**
+	 * Rename a File object physically
+	 *
+	 * @param File The source file
+	 * @param string The new name
+	 * @param boolean Overwrite existing target?
+	 * @return boolean true on success, false on failure (e.g. file already exists)
+	 */
+	function rename_File( & $File, $new_name, $overwrite = false )
+	{
+		if( ! $File->rename_to( $new_name, $overwrite ) )
+		{ // failed
+			return false;
+		}
+
+		// We have moved in same dir, update caches:
+		$this->update_caches();
+
+		if( $this->contains( $File ) === false )
+		{ // File not in filelist (expected if not same dir)
+			$this->add( $File );
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Moves a File object physically
 	 *
 	 * @param File The source file
@@ -1349,6 +1365,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.75  2006/01/20 00:39:17  blueyed
+ * Refactorisation/enhancements to filemanager.
+ *
  * Revision 1.74  2005/12/19 16:42:03  fplanque
  * minor
  *
@@ -1415,7 +1434,7 @@ class FileManager extends Filelist
  * permission checking remains to be done.
  *
  * Revision 1.48  2005/06/22 14:50:47  blueyed
- * getDirectoryTreeRadio(): fix JS error for empty clickopen list
+ * get_directory_tree_radio(): fix JS error for empty clickopen list
  *
  * Revision 1.47  2005/06/03 15:12:33  fplanque
  * error/info message cleanup
