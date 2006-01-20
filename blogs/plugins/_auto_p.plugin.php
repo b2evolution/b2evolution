@@ -11,6 +11,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /**
  * @package plugins
+ *
+ * @todo This is buggy, because it does not create newlines/paragraphs in tag blocks only.
+ *       blueyed>> I've started working on it.
  */
 class auto_p_plugin extends Plugin
 {
@@ -25,9 +28,6 @@ class auto_p_plugin extends Plugin
 
 	/**
 	 * Constructor
-	 *
-	 * @todo This is buggy, because it does not create newlines/paragraphs in tag blocks only.
-	 *       blueyed>> I've started working on it.
 	 */
 	function auto_p_plugin()
 	{
@@ -141,28 +141,6 @@ class auto_p_plugin extends Plugin
 		// $content = preg_replace('/&([^#])(?![a-z]{1,8};)/', '&#038;$1', $pee);
 
 		return $pee;
-	}
-
-
-	/**
-	 * SHICE!
-	 *
-	 * @return
-	 */
-	function newlines_in_tags( $text )
-	{
-		#if( is_array($text) )
-		#{
-		pre_dump( 'text', $text );
-		$text = preg_replace_callback(
-			'~<(?!p)('.$this->block_tags.')>(.*?)</\1>~s',
-			array( &$this, 'newlines_in_tags' ).
-			$text );
-		#{
-		#	return '<'.$m[1].'>'.$this->newlines_in_tags( $m[2] ).'</'.$m[1].'>';
-		#}
-
-		return preg_replace( '/\n?(.+?)(?:\n\s*\n|\z)/s', "\t<p>$1</p>\n", $text );
 	}
 }
 ?>

@@ -46,7 +46,7 @@ require_once dirname(__FILE__).'/_dataobjectcache.class.php';
 class FileCache extends DataObjectCache
 {
 	/**
-	 * Cache for 'root_type:root_ID:relative_path' -> File object reference
+	 * Cache for 'root_type:root_in_type_ID:relative_path' -> File object reference
 	 * @access private
 	 * @var array
 	 */
@@ -84,8 +84,8 @@ class FileCache extends DataObjectCache
 			}
 			else
 			{	// Already cached:
-			// Flow meta data into File object:
-			$current_File->load_meta( false, $db_row );
+				// Flow meta data into File object:
+				$current_File->load_meta( false, $db_row );
 			}
 		}
 
@@ -97,13 +97,13 @@ class FileCache extends DataObjectCache
 	 * Creates an object of the {@link File} class, while providing caching
 	 * and making sure that only one reference to a file exists.
 	 *
-	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
+	 * @param string Root type: 'user', 'group' or 'collection'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 * @param string Subpath for this file/folder, relative the associated root, including trailing slash (if directory)
 	 * @param boolean check for meta data?
 	 * @return File an {@link File} object
 	 */
-	function & get_by_root_and_path( $root_type, $root_ID, $rel_path, $load_meta = false )
+	function & get_by_root_and_path( $root_type, $root_in_type_ID, $rel_path, $load_meta = false )
 	{
 		global $Debuglog, $cache_File;
 
@@ -113,7 +113,7 @@ class FileCache extends DataObjectCache
 		}
 
 		// Generate cache key for this file:
-		$cacheindex = $root_type.':'.$root_ID.':'.$rel_path;
+		$cacheindex = $root_type.':'.$root_in_type_ID.':'.$rel_path;
 
 		if( isset( $this->cache_root_and_path[$cacheindex] ) )
 		{	// Already in cache
@@ -127,7 +127,7 @@ class FileCache extends DataObjectCache
 		else
 		{	// Not in cache
 			$Debuglog->add( 'File not in cache: '.$cacheindex, 'files' );
-			$File = new File( $root_type, $root_ID, $rel_path, $load_meta ); // COPY !!
+			$File = new File( $root_type, $root_in_type_ID, $rel_path, $load_meta ); // COPY !!
 			$this->cache_root_and_path[$cacheindex] = & $File;
 		}
 		return $File;
@@ -138,6 +138,9 @@ class FileCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.8  2006/01/20 16:40:56  blueyed
+ * Cleanup
+ *
  * Revision 1.7  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

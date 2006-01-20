@@ -85,22 +85,6 @@ class File extends DataObject
 	var $_FileRoot;
 
 	/**
-	 * Root type: 'user', 'group', 'collection' or 'absolute'
-	 * @var string
-	 * @access protected
-	 * @todo replace by $_FileRoot
-	 */
-	var $_root_type;
-
-	/**
-	 * Root ID: ID of the user, the group or the collection the file belongs to...
-	 * @var integer
-	 * @access protected
-	 * @todo replace by $_FileRoot
-	 */
-	var $_root_ID;
-
-	/**
 	 * Posix subpath for this file/folder, relative the associated root (No trailing slash)
 	 * @var string
 	 * @access protected
@@ -129,6 +113,19 @@ class File extends DataObject
 	 * @access protected
 	 */
 	var $_name;
+
+	/**
+	 * MD5 hash of full pathname.
+	 *
+	 * This is useful to refer to files in hidden form fields, but might be replaced by the root_ID+relpath.
+	 *
+	 * @todo fplanque>> the purpose of this thing isn't very clear... get rid of it?
+	 *
+	 * @var string
+	 * @see get_md5_ID()
+	 * @access protected
+	 */
+	var $_md5ID;
 
 	/**
 	 * Does the File/folder exist on disk?
@@ -227,8 +224,6 @@ class File extends DataObject
 			);
 
 		// Memorize filepath:
-		$this->_root_type = $root_type;
-		$this->_root_ID = $root_ID;
 		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
 		$this->_rdfp_rel_path = no_trailing_slash(str_replace( '\\', '/', $rdfp_rel_path ));
 		$this->_adfp_full_path = $this->_FileRoot->ads_path.$this->_rdfp_rel_path;
@@ -269,16 +264,17 @@ class File extends DataObject
 		{ // We haven't tried loading yet:
 			if( is_null( $row )	)
 			{	// No DB data has been provided:
-				$row = $DB->get_row( "SELECT * FROM T_files
-																WHERE file_root_type = '$this->_root_type'
-																	AND file_root_ID = $this->_root_ID
-																	AND file_path = ".$DB->quote($this->_rdfp_rel_path),
-																OBJECT, 0, 'Load file meta data' );
+				$row = $DB->get_row( '
+					SELECT * FROM T_files
+					 WHERE file_root_type = "'.$this->_FileRoot->type.'"
+					   AND file_root_ID = '.$this->_FileRoot->in_type_ID.'
+					   AND file_path = '.$DB->quote($this->_rdfp_rel_path),
+					OBJECT, 0, 'Load file meta data' );
 			}
 
 			if( $row )
 			{ // We found meta data
-				$Debuglog->add( "Loaded metadata for $this->_root_type:$this->_root_ID:$this->_rdfp_rel_path", 'files' );
+				$Debuglog->add( "Loaded metadata for {$this->_FileRoot->ID}:{$this->_rdfp_rel_path}", 'files' );
 				$this->meta  = 'loaded';
 				$this->ID    = $row->file_ID;
 				$this->title = $row->file_title;
@@ -290,7 +286,7 @@ class File extends DataObject
 			}
 			else
 			{ // No meta data...
-				$Debuglog->add( "No metadata could be loaded for $this->_root_type:$this->_root_ID:$this->_rdfp_rel_path", 'files' );
+				$Debuglog->add( "No metadata could be loaded for {$this->_FileRoot->ID}:$this->_rdfp_rel_path", 'files' );
 				$this->meta = 'notfound';
 
 				if( $force_creation )
@@ -339,8 +335,8 @@ class File extends DataObject
 			// Let's recycle it! :
 			if( ! $this->load_meta() )
 			{ // No meta data could be loaded, let's make sure localization info gets recorded:
-				$this->set( 'root_type', $this->_root_type );
-				$this->set( 'root_ID', $this->_root_ID );
+				$this->set( 'root_type', $this->_FileRoot->type );
+				$this->set( 'root_ID', $this->_FileRoot->in_type_ID );
 				$this->set( 'path', $this->_rdfp_rel_path );
 			}
 
@@ -506,6 +502,7 @@ class File extends DataObject
 		return $this->_adfp_full_path.( $this->_is_dir ? '/' : '' );
 	}
 
+
 	/**
 	 * Get the absolute file url if the file is public
 	 * Get the getfile.php url if we need to check permission before delivering the file
@@ -533,7 +530,7 @@ class File extends DataObject
 			}
 			else
 			{ // Private Access: doesn't show the full path
-				$root = $this->_FileRoot->gen_ID( $this->_root_type, $this->_root_ID );
+				$root = $this->_FileRoot->ID;
 				$url = $htsrv_url.'getfile.php/'.rawurlencode( $this->_name ).'?root='.$root.'&amp;path='.$this->_rdfp_rel_path;
 			}
 		}
@@ -547,6 +544,17 @@ class File extends DataObject
 	function get_root_and_rel_path()
 	{
 		return $this->_FileRoot->name.':'.$this->get_rdfs_rel_path();
+	}
+
+
+	/**
+	 * Get the File's FileRoot.
+	 *
+	 * @return FileRoot
+	 */
+	function & get_FileRoot()
+	{
+		return $this->_FileRoot;
 	}
 
 
@@ -617,6 +625,7 @@ class File extends DataObject
 	{
 		return $this->_lastmod_ts;
 	}
+
 
 	/**
 	 * Get date/time of last modification, formatted.
@@ -689,21 +698,21 @@ class File extends DataObject
 
 				// owner
 				$sP .= (($this->_perms & 0x0100) ? 'r' : '&minus;') .
-								(($this->_perms & 0x0080) ? 'w' : '&minus;') .
-								(($this->_perms & 0x0040) ? (($this->_perms & 0x0800) ? 's' : 'x' ) :
-																				(($this->_perms & 0x0800) ? 'S' : '&minus;'));
+				       (($this->_perms & 0x0080) ? 'w' : '&minus;') .
+				       (($this->_perms & 0x0040) ? (($this->_perms & 0x0800) ? 's' : 'x' )
+				                                 : (($this->_perms & 0x0800) ? 'S' : '&minus;'));
 
 				// group
 				$sP .= (($this->_perms & 0x0020) ? 'r' : '&minus;') .
-								(($this->_perms & 0x0010) ? 'w' : '&minus;') .
-								(($this->_perms & 0x0008) ? (($this->_perms & 0x0400) ? 's' : 'x' ) :
-																				(($this->_perms & 0x0400) ? 'S' : '&minus;'));
+				       (($this->_perms & 0x0010) ? 'w' : '&minus;') .
+				       (($this->_perms & 0x0008) ? (($this->_perms & 0x0400) ? 's' : 'x' )
+				                                 : (($this->_perms & 0x0400) ? 'S' : '&minus;'));
 
 				// world
 				$sP .= (($this->_perms & 0x0004) ? 'r' : '&minus;') .
-								(($this->_perms & 0x0002) ? 'w' : '&minus;') .
-								(($this->_perms & 0x0001) ? (($this->_perms & 0x0200) ? 't' : 'x' ) :
-																				(($this->_perms & 0x0200) ? 'T' : '&minus;'));
+				       (($this->_perms & 0x0002) ? 'w' : '&minus;') .
+				       (($this->_perms & 0x0001) ? (($this->_perms & 0x0200) ? 't' : 'x' )
+				                                 : (($this->_perms & 0x0200) ? 'T' : '&minus;'));
 				return $sP;
 
 			case NULL:
@@ -837,9 +846,9 @@ class File extends DataObject
 	 * Get a complete tag (IMG or A HREF) pointing to this file.
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
-										$before_image_legend = '<div class="image_legend">',
-										$after_image_legend = '</div>',
-										$after_image = '</div>' )
+	                  $before_image_legend = '<div class="image_legend">',
+	                  $after_image_legend = '</div>',
+	                  $after_image = '</div>' )
 	{
 		if( $this->is_dir() )
 		{	// We can't reference a directory
@@ -935,8 +944,8 @@ class File extends DataObject
 
 		if( $this->meta == 'loaded' )
 		{	// We have meta data, we need to deal with it:
-			// unchanged : $this->set( 'root_type', $this->_root_type );
-			// unchanged : $this->set( 'root_ID', $this->_root_ID );
+			// unchanged : $this->set( 'root_type', $this->_FileRoot->type );
+			// unchanged : $this->set( 'root_ID', $this->_FileRoot->in_type_ID );
 			$this->set( 'path', $this->_rdfp_rel_path );
 			// Record to DB:
 			$this->dbupdate();
@@ -983,8 +992,6 @@ class File extends DataObject
 		$this->load_meta();
 
 		// Memorize new filepath:
-		$this->_root_type = $root_type;
-		$this->_root_ID = $root_ID;
 		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
 		$this->_rdfp_rel_path = $rdfp_rel_path;
 		$this->_adfp_full_path = $adfp_posix_path;
@@ -994,8 +1001,8 @@ class File extends DataObject
 
 		if( $this->meta == 'loaded' )
 		{	// We have meta data, we need to deal with it:
-			$this->set( 'root_type', $this->_root_type );
-			$this->set( 'root_ID', $this->_root_ID );
+			$this->set( 'root_type', $this->_FileRoot->type );
+			$this->set( 'root_ID', $this->_FileRoot->in_type_ID );
 			$this->set( 'path', $this->_rdfp_rel_path );
 			// Record to DB:
 			$this->dbupdate();
@@ -1161,8 +1168,8 @@ class File extends DataObject
 		$Debuglog->add( 'Inserting meta data for new file into db', 'files' );
 
 		// Let's make sure the bare minimum gets saved to DB:
-		$this->set_param( 'root_type', 'string', $this->_root_type );
-		$this->set_param( 'root_ID', 'integer', $this->_root_ID );
+		$this->set_param( 'root_type', 'string', $this->_FileRoot->type );
+		$this->set_param( 'root_ID', 'integer', $this->_FileRoot->in_type_ID );
 		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );
 
 		// Let parent do the insert:
@@ -1200,11 +1207,11 @@ class File extends DataObject
 		global $htsrv_url;
 
 		// Get root code
-		$root = $this->_FileRoot->gen_ID( $this->_root_type, $this->_root_ID );
+		$root_ID = $this->_FileRoot->ID;
 
 		if( $this->is_dir() )
 		{ // Directory
-			return regenerate_url( 'root,path', 'root='.$root.'&amp;path='.$this->get_rdfs_rel_path() );
+			return regenerate_url( 'root,path', 'root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
 		}
 		else
 		{ // File
@@ -1215,16 +1222,13 @@ class File extends DataObject
 			switch( $this->Filetype->viewtype )
 			{
 				case 'image':
-					return  $htsrv_url.'viewfile.php?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=image';
-					break;
+					return  $htsrv_url.'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=image';
 
 				case 'text':
-					return $htsrv_url.'viewfile.php?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=text';
-					break;
+					return $htsrv_url.'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=text';
 
 				case 'download':	 // will NOT open a popup and will insert a Content-disposition: attachment; header
-					return $htsrv_url.'getfile.php?root='.$root.'&amp;path='.$this->_rdfp_rel_path;
-					break;
+					return $htsrv_url.'getfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path;
 
 				case 'browser':		// will open a popup
 				case 'external':  // will NOT open a popup
@@ -1269,15 +1273,14 @@ class File extends DataObject
 		{ // Link to open in a new window
 			$target = 'evo_fm_'.$this->get_md5_ID();
 
+			// onclick: we unset target attrib and return the return value of pop_up_window() to make the browser not follow the regular href link (at least FF 1.5 needs the target reset)
 			return '<a href="'.$url.'" target="'.$target.'"
-							title="'.T_('Open in a new window').'" onclick="'
-
-							."pop_up_window( '$url', '$target', '"
-							.'width='.( ( $width = $this->get_image_size( 'width' ) ) ? ( $width + 100 ) : 800  ).','
-							.'height='.( ( $height = $this->get_image_size( 'height' ) ) ? ( $height + 150 ) : 800  ).','
-							."scrollbars=yes,status=yes,resizable=yes' );"
-
-							.'">'.$text.'</a>';
+				title="'.T_('Open in a new window').'" onclick="'
+				."this.target = ''; return pop_up_window( '$url', '$target', '"
+				.'width='.( ( $width = $this->get_image_size( 'width' ) ) ? ( $width + 100 ) : 800  ).','
+				.'height='.( ( $height = $this->get_image_size( 'height' ) ) ? ( $height + 150 ) : 800  ).','
+				."scrollbars=yes,status=yes,resizable=yes' );"
+				.'">'.$text.'</a>';
 		}
 	}
 
@@ -1335,6 +1338,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.60  2006/01/20 16:40:56  blueyed
+ * Cleanup
+ *
  * Revision 1.59  2006/01/10 10:36:31  blueyed
  * Suppress warnings for dangling symlinks
  *

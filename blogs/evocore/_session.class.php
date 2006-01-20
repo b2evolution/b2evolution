@@ -59,10 +59,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Sessions are tracked with a cookie containing the session ID.
  * The cookie also contains a random key to prevent sessions hacking.
  *
- * @todo: we could save a lot of queries by saving only on shutdown.
- * Also we may not even need a shutdown object. I think it's okay to only save on clean shutdowns...
- * which means with a call at the end of the main script.
- *
  * @package evocore
  */
 class Session
@@ -168,7 +164,6 @@ class Session
 							{
 								$Messages->add_messages( $this->_data['Messages']->messages );
 								$this->delete( 'Messages' );
-								// fp> moved to delete $this->dbsave(); // TODO: on shutdown
 								$Debuglog->add( 'Added Messages from session data.', 'session' );
 							}
 						}
@@ -386,6 +381,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.41  2006/01/20 16:40:56  blueyed
+ * Cleanup
+ *
  * Revision 1.40  2006/01/14 14:23:07  blueyed
  * "Out of range" fix in dbsave()
  *

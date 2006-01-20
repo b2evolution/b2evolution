@@ -85,7 +85,7 @@ class FileRootCache
 
 		if( ! isset( $this->cache[$root_ID] ) )
 		{	// Not in Cache, let's instantiate:
-			$Root = new FileRoot( $root_type, $root_in_type_ID ); // COPY; blueyed>> why?
+			$Root = new FileRoot( $root_type, $root_in_type_ID ); // COPY
 			if( empty($Root->ads_path) ) // false
 			{
 				$Root = false;
@@ -112,6 +112,9 @@ class FileRootCache
 
 /*
  * $Log$
+ * Revision 1.8  2006/01/20 16:40:56  blueyed
+ * Cleanup
+ *
  * Revision 1.7  2006/01/09 18:51:22  blueyed
  * get_by_type_and_ID(): return false if this root has no valid path/does not exist!
  *

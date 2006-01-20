@@ -67,29 +67,11 @@ class Filelist
 	/**
 	 * The root of the file list.
 	 *
+	 * All files in this list MUST have that same FileRoot. Adding will fail otherwise.
+	 *
 	 * @var FileRoot
 	 */
 	var $_FileRoot;
-
-	/**
-	 * Root type: 'user', 'group' or 'collection'.
-	 *
-	 * All files in this list MUST have that same root type. Adding will fail otherwise.
-	 *
-	 * @var string
-	 * @access protected
-	 */
-	var $_root_type;
-
-	/**
-	 * Root ID: ID of the user, the group or the collection the file belongs to...
-	 *
-	 * All files in this list MUST have that same root ID. Adding will fail otherwise.
-	 *
-	 * @var integer
-	 * @access protected
-	 */
-	var $_root_ID = 0;
 
 	/**
 	 * Path to list with trailing slash.
@@ -372,12 +354,12 @@ class Filelist
 		}
 
 		// Integrity check:
-		if( $File->_root_type != $this->_FileRoot->type || $File->_root_ID != $this->_FileRoot->in_type_ID )
+		if( $File->_FileRoot->ID != $this->_FileRoot->ID )
 		{
-			debug_die( 'Adding file '.$File->_root_type.':'.$File->_root_ID.':'.$File->get_rdfs_rel_path().' to filelist '.$this->_FileRoot->type.':'.$this->_FileRoot->in_type_ID.' : root mismatch!' );
+			debug_die( 'Adding file '.$File->_FileRoot->ID.':'.$File->get_rdfs_rel_path().' to filelist '.$this->_FileRoot->ID.' : root mismatch!' );
 		}
 
-		if( $mustExist && !$File->exists() )
+		if( $mustExist && ! $File->exists() )
 		{	// File does not exist..
 			return false;
 		}
@@ -1006,14 +988,13 @@ class Filelist
 			return false;
 		}
 
-		$rows = $DB->get_results(
-				"SELECT *
-				   FROM T_files
-				  WHERE file_root_type = '$this->_root_type'
-				    AND file_root_ID = $this->_root_ID
-				    AND file_path IN (".implode( ',', $to_load ).')',
-				OBJECT, 'Load FileList meta data' );
-
+		$rows = $DB->get_results( '
+			SELECT *
+			  FROM T_files
+			 WHERE file_root_type = "'.$this->_FileRoot->type.'"
+			   AND file_root_ID = '.$this->_FileRoot->in_type_ID.'
+			   AND file_path IN ('.implode( ',', $to_load ).')',
+			OBJECT, 'Load FileList meta data' );
 		if( ! $rows )
 		{ // We haven't found any meta data...
 			return false;
@@ -1035,6 +1016,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.48  2006/01/20 16:40:56  blueyed
+ * Cleanup
+ *
  * Revision 1.47  2006/01/20 00:39:17  blueyed
  * Refactorisation/enhancements to filemanager.
  *

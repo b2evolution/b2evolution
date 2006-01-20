@@ -206,8 +206,8 @@ class Request
 
 
 	/**
- 	 * Sets a time parameter with the value from the request of the var argument or of the concat of the var argument_h: var argument_mn: var argument_s , 
-	 * except if param is already set!  
+ 	 * Sets a time parameter with the value from the request of the var argument or of the concat of the var argument_h: var argument_mn: var argument_s ,
+	 * except if param is already set!
 	 *
 	 * @param string Variable to set
 	 * @param mixed Default value or TRUE if user input required
@@ -219,18 +219,18 @@ class Request
 	function param_time( $var, $default = '', $memorize = false,	$override = false, $forceset = true )
 	{
 		global $$var;
-		
+
 		if( $this->param( $var, '', $default, $memorize, $override, $forceset ) )
 		{
-			return $this->params[$var]; 
+			return $this->params[$var];
 		}
-		elseif ( ( $time_h = param( $var.'_h' ) ) && ( $time_mn = param( $var.'_mn' ) ) && ( $time_s = param ( $var.'_s', '', '00' ) ) )   
+		elseif ( ( $time_h = param( $var.'_h' ) ) && ( $time_mn = param( $var.'_mn' ) ) && ( $time_s = param ( $var.'_s', '', '00' ) ) )
 		{
 			$$var = $time_h.':'.$time_mn.':'.$time_s;
 			$this->params[$var] = $$var;
 			return $$var;
 		}
-		else 
+		else
 		{
 			return false;
 		}
@@ -239,18 +239,18 @@ class Request
 
 	/**
 	 * set a parameter with the second part(X2) of the value from request ( X1-X2 )
-	 * 
+	 *
 	 * @param string Variable to set
-	 * 
+	 *
 	 */
 	function param_child_select_value( $var )
 	{
 		global $$var;
-		
+
 		if( $val = param( $var, 'string' ) )
 		{ // keep only the second part of val
 			preg_match( '/^[0-9]+-([0-9]+)$/', $val, $res );
-			
+
 			if( isset( $res[1] ) )
 			{ //set to the var the second part of val
 				$$var = $res[1];
@@ -260,11 +260,11 @@ class Request
 		}
 		return '';
 	}
-	
-	
+
+
 	/**
 	 * Check if the value is a file name
-	 * 
+	 *
 	 * @param string param name
 	 * @param string error message
 	 * @return boolean true if OK
@@ -278,15 +278,16 @@ class Request
 		}
 		return true;
 	}
-	
+
 
 	/**
 	 * Get the action from param.
 	 *
-	 * If we got no $action, we'll check for an $actionArray  ( <input type="submit" name="actionArray[real_action]" ...> )
+	 * If we got no "action" param, we'll check for an "actionArray" param
+	 * ( <input type="submit" name="actionArray[real_action]" ...> )
 	 * And the real $action will be found in the first key...
 	 * When there are multiple submit buttons, this is smarter than checking the value which is a translated string.
-	 * When there is an image button, this allows to work around IE not sending the value (it only sends X & Y coords).
+	 * When there is an image button, this allows to work around IE not sending the value (it only sends X & Y coords of the click).
 	 *
 	 * @param string Default to use.
 	 * @return string
@@ -764,6 +765,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.30  2006/01/20 16:40:56  blueyed
+ * Cleanup
+ *
  * Revision 1.29  2006/01/04 15:02:10  fplanque
  * better filtering design
  *
