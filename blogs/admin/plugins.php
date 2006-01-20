@@ -119,7 +119,19 @@ switch( $action )
 		// Uninstall plugin:
 		param( 'plugin_ID', 'int', true );
 
-		$success = $Plugins->uninstall( $plugin_ID );
+		$success = $Plugins->call_method( $plugin_ID, 'Uninstall', $params = array( 'handles_display' => false ) );
+		if( $success === false )
+		{
+			if( $params['handles_display'] )
+			{ // The plugin handles display
+				$action = 'list';
+				break;
+			}
+		}
+		else
+		{ // try un-installing
+			$success = $Plugins->uninstall( $plugin_ID );
+		}
 
 		if( $success === true )
 		{
@@ -263,11 +275,9 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		// Edit plugin settings:
 		param( 'plugin_ID', 'integer', true );
 
 		$edit_Plugin = & $Plugins->get_by_ID( $plugin_ID );
-
 		if( !$edit_Plugin )
 		{
 			$Debuglog->add( 'The plugin with ID '.$plugin_ID.' was not found.', array('plugins', 'error') );

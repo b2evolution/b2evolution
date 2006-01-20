@@ -415,11 +415,6 @@ class Plugins
 			return '';
 		}
 
-		if( ! $Plugin->Uninstall() )
-		{
-			return T_('The uninstallation of the plugin failed.' );
-		}
-
 		$DB->begin();
 
 		// Delete Plugin settings (constraints)
@@ -1671,6 +1666,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.31  2006/01/20 00:45:32  blueyed
+ * Moved "Uninstall" plugin hook to /admin/plugins.php
+ *
  * Revision 1.30  2006/01/20 00:42:18  blueyed
  * Fixes
  *
