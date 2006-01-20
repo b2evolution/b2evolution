@@ -1531,8 +1531,9 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
  * @param boolean|NULL If set it overrides the setting of {@link $debug} to
  *                     decide if we want a backtrace and whole debug_info.
  * @param string This gets output at the very end (after backtrace and last words)
+ * @param string Include function backtrace if outputting debug_info()?
  */
-function debug_die( $last_words = '', $force = NULL, $very_last = '</body></html>' )
+function debug_die( $last_words = '', $force = NULL, $very_last = '</body></html>', $include_backtrace = true )
 {
 	global $debug;
 
@@ -1540,7 +1541,10 @@ function debug_die( $last_words = '', $force = NULL, $very_last = '</body></html
 
 	if( ( isset($force) && $force ) || ( !isset($force) && $debug ) )
 	{
-		echo debug_get_backtrace();
+		if( $include_backtrace )
+		{
+			echo debug_get_backtrace();
+		}
 		debug_info();
 	}
 
@@ -2441,6 +2445,9 @@ function get_field_attribs_as_string( $field_attribs )
 
 /*
  * $Log$
+ * Revision 1.170  2006/01/20 00:04:21  blueyed
+ * debug_die(): $include_backtrace param
+ *
  * Revision 1.169  2006/01/15 18:36:26  blueyed
  * Just another fix to validate_url()
  *
