@@ -305,10 +305,9 @@ $countFiles = 0;
 while( $lFile = & $Fileman->get_next() )
 { // Loop through all Files:
 	echo '<tr';
-
 	if( $countFiles%2 ) echo ' class="odd"';
+	echo '>';
 
-	echo '>';		// Removed funky onclick behaviour
 	/********************    Checkbox:    *******************/
 
 	echo '<td class="checkbox firstcol">';
@@ -325,7 +324,7 @@ while( $lFile = & $Fileman->get_next() )
 	if( $mode == 'upload' )
 	{
 		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles
-						.'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
+		    .'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
 	}
 
 	echo '</td>';
@@ -853,6 +852,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.73  2006/01/20 16:45:43  blueyed
+ * whitespace
+ *
  * Revision 1.72  2006/01/20 00:39:17  blueyed
  * Refactorisation/enhancements to filemanager.
  *
