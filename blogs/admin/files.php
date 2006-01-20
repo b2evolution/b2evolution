@@ -367,12 +367,12 @@ switch( $action )
 				if( ! $loop_src_File->rename_to( $new_name ) )
 				{
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
-													$old_name, $new_name ), 'error' );
+						$old_name, $new_name ), 'error' );
 					continue;
 				}
 
 				$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
-													$old_name, $new_name ), 'success' );
+						$old_name, $new_name ), 'success' );
 			}
 
 			$action = 'list';
@@ -382,10 +382,14 @@ switch( $action )
 
 
 	case 'delete':
-		// Check permission:
-		$current_User->check_perm( 'files', 'edit', true );
+		// Delete a file or directory: {{{
+		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		{ // We do not have permission to edit files
+			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
+			$action = 'list';
+			break;
+		}
 
-		// delete a file/dir
 		if( ! $selected_Filelist->count() )
 		{
 			$Messages->add( T_('Nothing selected.'), 'error' );
@@ -394,102 +398,45 @@ switch( $action )
 		}
 
 		param( 'confirmed', 'integer', 0 );
-		param( 'delsubdirs', 'array', array() );
+		// fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB
 
-		if( ! $confirmed )
-		{
-			$action_msg = '<div class="panelinfo">';
-			$action_msg .= '<h2>'.T_('Delete file(s)?').'</h2>';
-
-			$action_msg .= '
-				<form action="files.php" class="inline">
-					<input type="hidden" name="confirmed" value="1" />
-					<input type="hidden" name="action" value="delete" />
-					'.$Fileman->getFormHiddenSelectedFiles()
-					.$Fileman->getFormHiddenInputs()."\n";
-
-
-			$action_msg .= $selected_Filelist->count() > 1 ?
-											T_('Do you really want to delete the following files?') :
-											T_('Do you really want to delete the following file?');
-
-			$action_msg .= '
-			<ul>
-			';
-
-			// So far there is no problem with confirming...
-			$can_confirm = true;
-
-			// make sure we have loaded metas for all files in selection!
-			$selected_Filelist->load_meta();
-
-			foreach( $selected_Filelist->_entries as $lFile )
+		$selected_Filelist->restart();
+		if( $confirmed )
+		{ // Unlink files:
+			while( $l_File = & $selected_Filelist->get_next() )
 			{
-				$action_msg .= '<li>'.$lFile->get_prefixed_name();
-
-				/* fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB integrity for these...
-				if( $lFile->is_dir() )
-				{ // This is a directory
-						$action_msg .= '
-						<br />
-						<input title="'.sprintf( T_('Check to include subdirectories of &laquo;%s&raquo;'), $lFile->get_name() ).'"
-							type="checkbox"
-							name="delsubdirs['.$lFile->get_md5_ID().']"
-							id="delsubdirs_'.$lFile->get_md5_ID().'"
-							value="1" />
-							<label for="delsubdirs_'.$lFile->get_md5_ID().'">'
-								.T_( 'Including subdirectories' ).'</label>';
-				}
-				*/
-
-				// Check if there are delete restrictions on this file:
-				$lFile->check_relations( 'delete_restrictions' );
-
-				if( $Messages->count('restrict') )
-				{ // There are restrictions:
-					$action_msg .= ': <strong>'.T_('cannot be deleted because of the following relations').'</strong> :';
-					$action_msg .= $Messages->display( NULL, NULL, false, 'restrict', '', 'ul', false );
-					$Messages->clear( 'restrict' );
-					// We won't be able to continue with deletion...
-					$can_confirm = false;
-				}
-
-				$action_msg .= '</li>';
+				$Fileman->unlink( $l_File ); // handles $Messages
 			}
-
-			$action_msg .= "</ul>\n";
-
-
-			if( $can_confirm )
-			{ // No integrity problem detected...
-				$action_msg .= '
-					<input type="submit" value="'.T_('I am sure!').'" class="DeleteButton" />
-					</form>';
-			}
-			else
-			{	// Integrity problem detected. Close form without offering to submit:
-				$action_msg .= '</form>';
-			}
-
-			// Offer to cancel:
-			$action_msg .= '<form action="files.php" class="inline">
-						'.$Fileman->getFormHiddenInputs().'
-						<input type="submit" value="'.T_('CANCEL').'" class="CancelButton" />
-					</form>
-				</div>';
-
+			$action = 'list';
 		}
 		else
 		{
-			$selected_Filelist->restart();
-			while( $lFile =& $selected_Filelist->get_next() )
+			// make sure we have loaded metas for all files in selection!
+			$selected_Filelist->load_meta();
+
+			// Check if there are delete restrictions on the files:
+			while( $l_File = & $selected_Filelist->get_next() )
 			{
-				if( !$Fileman->unlink( $lFile, isset( $delsubdirs[$lFile->get_md5_ID()] ) ) ) // handles Messages
-				{
-					// TODO: offer file again, allowing to include subdirs..
+				// Check if there are delete restrictions on this file:
+				$l_File->check_relations( 'delete_restrictions' );
+
+				if( $Messages->count('restrict') )
+				{ // There are restrictions:
+					$Messages->add( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
+						.$Messages->display( NULL, NULL, false, 'restrict', '', 'ul', false ) );
+					$Messages->clear( 'restrict' );
+
+					// remove it from the list of selected files (that will be offered to delete):
+					$selected_Filelist->remove( $l_File );
 				}
 			}
+
+			if( ! $selected_Filelist->count() )
+			{ // no files left in list, cancel action
+				$action = 'list';
+			}
 		}
+		// }}}
 		break;
 
 
@@ -719,17 +666,6 @@ switch( $action )
 }
 
 
-
-/**
- * The top menu
- */
-require dirname(__FILE__).'/_menutop.php';
-
-// Temporary fix:
-// Messages have already bben displayed:
-$Messages->clear( 'all' );
-
-
 // echo 'fm mode:'.$Fileman->fm_mode;
 
 switch( $Fileman->fm_mode )
@@ -757,8 +693,6 @@ switch( $Fileman->fm_mode )
 
 		// Quick mode means "just upload and leave mode when successful"
 		$Request->param( 'upload_quickmode', 'integer', 0 );
-
-		$LogUpload = new Log( 'error' );
 
 		/**
 		 * @var array Remember failed files (and the error messages)
@@ -891,7 +825,7 @@ switch( $Fileman->fm_mode )
 						.'</ul>';
 				}
 
-				$LogUpload->add( $success_msg, 'success' );
+				$Messages->add( $success_msg, 'success' );
 
 				// Refreshes file properties (type, size, perms...)
 				$newFile->load_properties();
@@ -923,12 +857,6 @@ switch( $Fileman->fm_mode )
 			}
 		}
 
-		// Upload dialog:
-		if( ! is_null($Fileman->fm_mode) )
-		{	// we haven't just exited the upload mode...
-			require dirname(__FILE__).'/_files_upload.inc.php';
-		}
-
 		// }}}
 		break;
 
@@ -938,9 +866,6 @@ switch( $Fileman->fm_mode )
 		{
 			$Fileman->fm_mode = NULL;
 		}
-
-		// File properties (Meta data) dialog:
-		require dirname(__FILE__).'/_file_properties.inc.php';
 		break;
 
 
@@ -1172,6 +1097,12 @@ switch( $Fileman->fm_mode )
 } // }}}
 
 
+/**
+ * The top menu
+ */
+require dirname(__FILE__).'/_menutop.php';
+
+
 // Display reload-icon in the opener window if we're a popup in the same CWD and the
 // Filemanager content differs.
 ?>
@@ -1195,16 +1126,6 @@ switch( $Fileman->fm_mode )
 
 
 <?php
-
-
-// TODO: remove this!
-// Output errors, notes and action messages
-if( $Messages->count( 'all' ) )
-{
-	$Messages->display( '', '', true, 'all' );
-}
-
-
 /*
  * Display payload:
  */
@@ -1214,6 +1135,13 @@ switch( $action )
 		// Rename files dialog:
 		$AdminUI->disp_payload_begin();
 		require dirname(__FILE__).'/_files_rename.form.php';
+		$AdminUI->disp_payload_end();
+		break;
+
+	case 'delete':
+		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
+		$AdminUI->disp_payload_begin();
+		require dirname(__FILE__).'/_files_delete.form.php';
 		$AdminUI->disp_payload_end();
 		break;
 
@@ -1263,6 +1191,16 @@ switch( $Fileman->fm_mode )
 		// CMR dialog:
 		require dirname(__FILE__).'/_files_cmr.inc.php';
 		break;
+
+	case 'file_upload':
+		// Upload dialog:
+		require dirname(__FILE__).'/_files_upload.inc.php';
+		break;
+
+	case 'File_properties':
+		// File properties (Meta data) dialog:
+		require dirname(__FILE__).'/_file_properties.inc.php';
+		break;
 }
 
 
@@ -1308,6 +1246,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.156  2006/01/20 00:07:26  blueyed
+ * 1-2-3-4 scheme for files.php again. Not fully tested.
+ *
  * Revision 1.155  2006/01/11 22:09:29  blueyed
  * Reactive "download selected files as zip", also as a "workaround" to always have an icon next to "With selected files:".. ;)
  *
