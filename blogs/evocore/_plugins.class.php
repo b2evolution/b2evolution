@@ -1372,7 +1372,7 @@ class Plugins
 		{
 			foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
 			{
-				$r[] = & $this->get_by_ID( $l_plugin_ID );
+				$r[ $l_plugin_ID ] = & $this->get_by_ID( $l_plugin_ID );
 			}
 		}
 
@@ -1381,7 +1381,7 @@ class Plugins
 
 
 	/**
-	 * Get a list of Plugins for a list of events.
+	 * Get a list of Plugins for a list of events. Every Plugin is only once in this list.
 	 *
 	 * @param array Array of events
 	 * @return array List of Plugins
@@ -1392,7 +1392,10 @@ class Plugins
 
 		foreach( $events as $l_event )
 		{
-			$r = array_merge( $r, $this->get_list_by_event( $l_event ) );
+			foreach( array_keys($this->get_list_by_event( $l_event )) as $l_plugin_ID )
+			{
+				$r[ $l_plugin_ID ] = & $this->get_by_ID( $l_plugin_ID );
+			}
 		}
 
 		return $r;
@@ -1666,6 +1669,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.32  2006/01/21 16:34:56  blueyed
+ * Fixed get_list_by_events()
+ *
  * Revision 1.31  2006/01/20 00:45:32  blueyed
  * Moved "Uninstall" plugin hook to /admin/plugins.php
  *
