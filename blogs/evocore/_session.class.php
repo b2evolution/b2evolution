@@ -90,6 +90,9 @@ class Session
 
 	/**
 	 * Data stored for the session.
+	 *
+	 * This holds an array( expire, value ) for each data item key.
+	 *
 	 * @access protected
 	 * @var object
 	 */
@@ -160,9 +163,9 @@ class Session
 							$Debuglog->add( 'Session data loaded.', 'session' );
 
 							// Load a Messages object from session data, if available:
-							if( isset($this->_data['Messages']) && is_a( $this->_data['Messages'], 'log' ) )
+							if( ($sess_Messages = $this->get('Messages')) && is_a( $sess_Messages, 'log' ) )
 							{
-								$Messages->add_messages( $this->_data['Messages']->messages );
+								$Messages->add_messages( $sess_Messages->messages );
 								$this->delete( 'Messages' );
 								$Debuglog->add( 'Added Messages from session data.', 'session' );
 							}
@@ -200,7 +203,7 @@ class Session
 			$Debuglog->add( 'Cookie sent.', 'session' );
 		}
 
-		register_shutdown_function( array( &$this, 'dbsave' ) );
+		register_shutdown_function( array( & $this, 'dbsave' ) );
 	}
 
 
@@ -290,16 +293,28 @@ class Session
 
 
 	/**
-	 * Get a data value for the session.
+	 * Get a data value for the session. This checks for the data to be expired and unsets it then.
 	 *
 	 * @param string Name of the data's key.
 	 * @return mixed|NULL The value, if set; otherwise NULL
 	 */
 	function get( $param )
 	{
+		global $Debuglog, $localtimenow;
+
 		if( isset( $this->_data[$param] ) )
 		{
-			return $this->_data[$param];
+			if( isset($this->_data[$param][1])
+			  && ( ! isset( $this->_data[$param][0] ) || $this->_data[$param][0] > $localtimenow ) ) // check for expired data
+			{
+				return $this->_data[$param][1];
+			}
+			else
+			{ // expired or old format (without 'value' key)
+				unset( $this->_data[$param] );
+				$this->_session_needs_save = true;
+				$Debuglog->add( 'Session data['.$param.'] expired.', 'session' );
+			}
 		}
 
 		return NULL;
@@ -309,20 +324,22 @@ class Session
 	/**
 	 * Set a data value for the session.
 	 *
-	 * You'll have to call {@link $dbsave()} to commit it!
-	 *
 	 * @param string Name of the data's key.
 	 * @param mixed The value
+	 * @param integer Time in seconds for data to expire (0 to disable).
 	 */
-	function set( $param, $value )
+	function set( $param, $value, $expire = 0 )
 	{
-		global $Debuglog;
+		global $Debuglog, $localtimenow;
 
-		if( ! isset($this->_data[$param]) || ($this->_data[$param] != $value) )
+		if( ! isset($this->_data[$param])
+		 || ! isset($this->_data[$param][0])
+		 || $this->_data[$param][1] != $value
+		 || $expire != 0 )
 		{	// There is something to update:
-			$this->_data[$param] = $value;
+			$this->_data[$param] = array( ( $expire ? ($localtimenow + $expire) : NULL ), $value );
 
-			$Debuglog->add( 'Session data['.$param.'] updated!', 'session' );
+			$Debuglog->add( 'Session data['.$param.'] updated. Expire in: '.$expire.'.', 'session' );
 
 			$this->_session_needs_save = true;
 		}
@@ -331,8 +348,6 @@ class Session
 
 	/**
 	 * Delete a value from the session data.
-	 *
-	 * You'll have to call {@link $dbsave()} to commit it!
 	 *
 	 * @param string Name of the data's key.
 	 */
@@ -382,6 +397,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.43  2006/01/22 19:38:45  blueyed
+ * Added expiration support through set() for session data.
+ *
  * Revision 1.42  2006/01/20 17:08:13  blueyed
  * Save sess_data as NULL (unserialized) if NULL.
  *
