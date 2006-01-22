@@ -370,6 +370,44 @@ class AbstractSettings
 
 
 	/**
+	 * Get a value {@link unserialize() unserialized}.
+	 *
+	 * @param string,... the values for the column keys (depends on $this->colKeyNames
+	 *                   and must match its count and order)
+	 * @param mixed The default to use when unserializing failed or key does not exist. Default is NULL.
+	 * @return mixed Value as mixed on success, default otherwise.
+	 */
+	function get_unserialized()
+	{
+		$args = func_get_args();
+		if( count($this->colKeyNames) == (count($args)+1) )
+		{
+			$default = NULL;
+		}
+		else
+		{
+			$default = array_pop( $args );
+		}
+
+		$result = call_user_func_array( array( &$this, 'get' ), $args );
+
+		if( $result !== NULL && $result !== false )
+		{ // No error and value retrieved
+			$result = @unserialize($result);
+			if( $result === false )
+			{
+				$result = $default;
+			}
+			return $result;
+		}
+		else
+		{
+			return $default;
+		}
+	}
+
+
+	/**
 	 * Temporarily sets a setting ({@link dbupdate()} writes it to DB).
 	 *
 	 * @param string $args,... the values for the {@link $colKeyNames column keys}
@@ -617,6 +655,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.28  2006/01/22 22:41:12  blueyed
+ * Added get_unserialized().
+ *
  * Revision 1.27  2005/12/30 04:34:04  blueyed
  * Small performance enhancements.
  *
