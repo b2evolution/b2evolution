@@ -2443,8 +2443,27 @@ function get_field_attribs_as_string( $field_attribs )
 }
 
 
+/**
+ * Is the current page a admin/backoffice page?
+ *
+ * @return boolean
+ */
+function is_admin_page()
+{
+	global $admin_url, $ReqPath;
+
+	// Note: on IIS you can receive 'off' in the HTTPS field!! :[
+	$ReqHostPath = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'].$ReqPath;
+
+	return ( strpos( $ReqHostPath, $admin_url ) === 0 );
+}
+
+
 /*
  * $Log$
+ * Revision 1.171  2006/01/22 14:23:47  blueyed
+ * Added is_admin_page()
+ *
  * Revision 1.170  2006/01/20 00:04:21  blueyed
  * debug_die(): $include_backtrace param
  *
