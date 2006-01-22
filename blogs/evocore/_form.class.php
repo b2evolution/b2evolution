@@ -2158,6 +2158,14 @@ class Form extends Widget
 	 */
 	function get_valid_id( $id )
 	{
+		if( substr( $id, -2 ) == '[]' )
+		{
+			if( empty($this->_generated_id_count) )
+			{
+				$this->_generated_id_count = 0;
+			}
+			return substr( $id, 0, -2 ).'_A'.(++$this->_generated_id_count);
+		}
 		return str_replace( array( '[', ']' ), '_', $id );
 	}
 
@@ -2341,6 +2349,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.99  2006/01/22 21:18:58  blueyed
+ * get_valid_id(): fix for "array[]" type names.
+ *
  * Revision 1.98  2006/01/19 22:19:51  blueyed
  * Reset $hiddens in end_form() !
  *
