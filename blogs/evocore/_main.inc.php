@@ -108,7 +108,6 @@ $Messages = & new Log( 'error' );
 require_once dirname(__FILE__).'/_timer.class.php';
 $Timer = & new Timer('total');
 
-//
 $Timer->start( 'main.inc' );
 
 /**
@@ -207,25 +206,38 @@ require_once dirname(__FILE__).'/_hit.class.php';
 $Hit = & new Hit();
 
 
-// fp>> what is the damn good reason to move these up ?
-
 /**
- * The Session class
+ * The Session class.
+ * It has to be instantiated before the "SessionLoaded" hook.
  */
-//*require_once dirname(__FILE__).'/_session.class.php';
+require_once dirname(__FILE__).'/_session.class.php';
 /**
  * @global Session The Session object
  */
-//$Session = & new Session();
+$Session = & new Session();
 
 
 /**
- * Plug-ins init:
+ * Plug-ins init.
+ * This is done quite early here to give an early hook to plugins (though it might also be moved just after $DB init when there is reason for a hook there).
+ * The {@link dnsbl_antispam_plugin} is an example that uses this hook.
  */
-//require_once dirname(__FILE__).'/_plugins.class.php';
-//$Plugins = & new Plugins();
+require_once dirname(__FILE__).'/_plugins.class.php';
+/**
+ * @global Plugins The Plugin management object
+ */
+$Plugins = & new Plugins();
 
-//$Plugins->trigger_event( 'SessionLoaded' );
+
+// NOTE: it might be faster (though more bandwidth intensive) to spit cached pages (CachePageContent event) than to look into blocking the request (SessionLoaded event).
+$Plugins->trigger_event( 'SessionLoaded' );
+
+
+if( empty($generating_static) && $get_return = $Plugins->trigger_event_first_true( 'CachePageContent' ) )
+{
+	echo $get_return['data'];
+	die;
+}
 
 
 /**
@@ -324,13 +336,6 @@ $IconLegend = new IconLegend();
 
 
 /**
- * Plug-ins init:
- */
-require_once dirname(__FILE__).'/_plugins.class.php';
-$Plugins = & new Plugins();
-
-
-/**
  * Output buffering?
  */
 if( $use_obhandler )
@@ -364,16 +369,6 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true ))
  */
 locale_activate( $default_locale );
 
-/**
- * The Session class
- */
-require_once dirname(__FILE__).'/_session.class.php';
-/**
- * @global Session The Session object
- */
-$Session = & new Session();
-
-$Plugins->trigger_event( 'SessionLoaded' );
 
 /**
  * Login procedure: {{{
@@ -514,13 +509,19 @@ require_once $conf_path.'_icons.php';
 //
 $Timer->pause( 'main.inc');
 
+
+$Timer->resume( 'hacks.php' );
 /**
  * Load hacks file if it exists
  */
 @include_once dirname(__FILE__).'/../conf/hacks.php';
+$Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.79  2006/01/22 20:52:24  blueyed
+ * Documented movin $Plugins/$Session init up.
+ *
  * Revision 1.78  2006/01/12 21:55:13  blueyed
  * Fix
  *
