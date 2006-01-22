@@ -85,7 +85,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				<?php $loop_Plugin->name(); ?>
 			</td>
 			<td>
-				[<a href="plugins.php?action=info&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname) ?>">?</a>]
+				[<a href="plugins.php?action=info&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>">?</a>]
 				<?php
 				$registrations = $Plugins->count_regs($loop_Plugin->classname);
 
