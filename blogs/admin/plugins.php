@@ -119,7 +119,7 @@ switch( $action )
 		// Uninstall plugin:
 		param( 'plugin_ID', 'int', true );
 
-		$success = $Plugins->call_method( $plugin_ID, 'Uninstall', $params = array( 'handles_display' => false ) );
+		$success = $Plugins->call_method( $plugin_ID, 'Uninstall', $params = array( 'unattended' => false ) );
 		if( $success === false )
 		{
 			if( $params['handles_display'] )
@@ -151,7 +151,7 @@ switch( $action )
 
 	case 'update_settings':
 		// Update plugin settings:
-		$action = 'list'; // next action in any case
+		$action = 'list'; // next action by default
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -203,9 +203,26 @@ switch( $action )
 		// Settings:
 		if( $edit_Plugin->Settings )
 		{
-			foreach( $edit_Plugin->GetDefaultSettings() as $l_name => $l_value )
+			foreach( $edit_Plugin->GetDefaultSettings() as $l_name => $l_meta )
 			{
-				$edit_Plugin->Settings->set( $l_name, param( 'edited_plugin_set_'.$l_name ) );
+				$l_value = param( 'edited_plugin_set_'.$l_name );
+				if( false === $Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsBeforeSet', $params = array( 'name' => &$l_name, 'value' => &$l_value ) ) )
+				{ // skip this
+					$action = 'edit_settings';
+					continue;
+				}
+				if( isset($l_meta['valid_pattern']) )
+				{
+					$param_pattern = is_array($l_meta['valid_pattern']) ? $l_meta['valid_pattern']['pattern'] : $l_meta['valid_pattern'];
+					if( ! preg_match( $param_pattern, $l_value ) )
+					{
+						$param_error = is_array($l_meta['valid_pattern']) ? $l_meta['valid_pattern']['error'] : sprintf(T_('The value is invalid. It must match the regular expression &laquo;%s&raquo;.'), $param_pattern);
+						$Request->param_error( 'edited_plugin_set_'.$l_name, $param_error );
+						$action = 'edit_settings';
+						continue;
+					}
+				}
+				$edit_Plugin->Settings->set( $l_name, $l_value );
 			}
 
 			if( $edit_Plugin->Settings->dbupdate() )
@@ -348,6 +365,18 @@ switch( $action )
 
 		break;
 
+	case 'info':
+		param( 'plugin_ID', 'integer', true );
+		if( ! ($info_Plugin = & $AvailablePlugins->get_by_ID( $plugin_ID )) )
+		{
+			$info_Plugin = & $Plugins->get_by_ID($plugin_ID);
+		}
+		if( ! $info_Plugin )
+		{
+			$action = 'list';
+		}
+		break;
+
 }
 
 /*
@@ -361,6 +390,7 @@ if( 1 || $Settings->get( 'plugins_disp_log_in_admin' ) )
 if( $action == 'edit_settings' )
 {
 	$AdminUI->append_to_titlearea( sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ) );
+	$Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $params = array() );
 }
 
 
@@ -373,16 +403,13 @@ switch( $action )
 {
 	case 'info':
 		// Display plugin info:
-		param( 'plugin', 'string', true );
-		$Plugin = $AvailablePlugins->get_by_name( $plugin );
-
 		$Form = & new Form( $pagenow );
 		$Form->begin_form('fform');
 		$Form->begin_fieldset('Plugin info', array('class' => 'fieldset clear')); // "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509)
-		$Form->info_field( T_('Name'), $Plugin->name( 'raw', false ) );
-		$Form->info_field( T_('Code'), $Plugin->code, array( 'note' => T_('This 32 character code uniquely identifies the functionality of this plugin.') ) );
-		$Form->info_field( T_('Short desc'), $Plugin->short_desc( 'raw', false ) );
-		$Form->info_field( T_('Long desc'), $Plugin->long_desc( 'raw', false ) );
+		$Form->info_field( T_('Name'), $info_Plugin->name( 'raw', false ) );
+		$Form->info_field( T_('Code'), $info_Plugin->code, array( 'note' => T_('This 32 character code uniquely identifies the functionality of this plugin.') ) );
+		$Form->info_field( T_('Short desc'), $info_Plugin->short_desc( 'raw', false ) );
+		$Form->info_field( T_('Long desc'), $info_Plugin->long_desc( 'raw', false ) );
 		// TODO: help url
 		$Form->end_fieldset();
 		$Form->end_form();
@@ -417,6 +444,15 @@ switch( $action )
 				{ // Checkbox:
 					$Form->checkbox_input( 'edited_plugin_set_'.$l_name,
 						$edit_Plugin->Settings->get($l_name),
+						$l_value['label'],
+						$params );
+				}
+				elseif( isset($l_value['type']) && $l_value['type'] == 'textarea' )
+				{ // Checkbox:
+					$textarea_rows = isset($l_value['rows']) ? $l_value['rows'] : 3;
+					$Form->textarea_input( 'edited_plugin_set_'.$l_name,
+						$edit_Plugin->Settings->get($l_name),
+						$textarea_rows,
 						$l_value['label'],
 						$params );
 				}
@@ -465,7 +501,14 @@ switch( $action )
 		?>
 		<div id="clickdiv_pluginevents">
 		<?php
-		$enabled_events = $Plugins->get_enabled_events( $edit_Plugin->ID );
+		/**
+		 * We do not use {@link Plugins::get_enabled_events()}, because it may have been
+		 * dynamically disabled by {@link Plugin::remove_events_for_this_request()}.
+		 */
+		$enabled_events = $DB->get_col( '
+			SELECT pevt_event FROM T_pluginevents
+			 WHERE pevt_plug_ID = '.$edit_Plugin->ID.'
+			   AND pevt_enabled > 0' );
 		$supported_events = $Plugins->get_supported_events();
 		$registered_events = $Plugins->get_registered_events( $edit_Plugin );
 		$count = 0;
