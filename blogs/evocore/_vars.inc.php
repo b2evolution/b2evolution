@@ -73,7 +73,6 @@ elseif( isset($_SERVER['PATH_INFO']) )
 { // CGI/FastCGI
 	if( isset($_SERVER['SCRIPT_NAME']) )
 	{
-
 		$Debuglog->add( 'Getting ReqPath from PATH_INFO and SCRIPT_NAME', 'vars' );
 
 		if ($_SERVER['SCRIPT_NAME'] == $_SERVER['PATH_INFO'] )
@@ -96,6 +95,12 @@ elseif( isset($_SERVER['PATH_INFO']) )
 
 		$ReqPath = $_SERVER['PATH_INFO'];
 	}
+	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
+}
+elseif( isset($_SERVER['ORIG_PATH_INFO']) )
+{ // Tomcat 5.5.x with Herbelin PHP servlet and PHP 5.1
+	$Debuglog->add( 'Getting ReqPath from ORIG_PATH_INFO', 'vars' );
+	$ReqPath = $_SERVER['ORIG_PATH_INFO'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['SCRIPT_NAME']) )
@@ -246,6 +251,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.29  2006/01/22 22:47:29  blueyed
+ * Fix for $ReqPath/$ReqURI detection.
+ *
  * Revision 1.28  2006/01/02 19:43:57  fplanque
  * just a little new year cleanup
  *
