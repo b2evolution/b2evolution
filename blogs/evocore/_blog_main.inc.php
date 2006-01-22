@@ -60,6 +60,8 @@
  */
 require_once (dirname(__FILE__). '/_main.inc.php');
 
+$Timer->resume( 'blog_main.inc' );
+
 // Getting GET or POST parameters:
 $Request->param( 'blog', 'integer', 0, true );  // Can't use $default_to_blog because the param must always be included in regenerate_url() when present
 $Request->param( 'p', 'integer', '', true );              // Specific post number to display
@@ -324,6 +326,7 @@ if( !empty($tempskin) )
 
 // Let's check if a skin has been forced in the stub file:
 // Note: URL skin requests are handled with param() 20 lines below
+// Note: with "register_globals = On" this may be set from URL..
 if( !isset( $skin ) )
 { // No skin forced in stub (not even '' for no-skin)...
 	$Debuglog->add( 'No skin forced.', 'skin' );
@@ -416,6 +419,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.41  2006/01/22 22:41:59  blueyed
+ * Timer, doc
+ *
  * Revision 1.40  2006/01/04 19:07:48  fplanque
  * allow filtering on assignees
  *
