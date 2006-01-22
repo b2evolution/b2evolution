@@ -85,10 +85,9 @@ class DataObject
 	 */
 	var $delete_cascades = array();
 
+
 	/**
 	 * Constructor
-	 *
-	 * {@internal DataObject::DataObject(-) }}
 	 *
 	 * @param string Name of table in database
 	 * @param string Prefix of fields in the table
@@ -113,8 +112,6 @@ class DataObject
 	/**
 	 * Records a change that will need to be updated in the db
 	 *
-	 * {@internal DataObject::dbchange(-)}}
-	 *
 	 * @access protected
 	 * @param string Name of parameter
 	 * @param string DB field type ('string', 'number', 'date' )
@@ -131,16 +128,20 @@ class DataObject
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
+	 * Triggers plugin event AfterDataObjectUpdate.
+	 *
 	 * @return boolean true on success
 	 */
 	function dbupdate()
 	{
-		global $DB, $localtimenow, $current_User;
+		global $DB, $localtimenow, $current_User, $Plugins;
 
 		if( $this->ID == 0 ) { debug_die( 'New object cannot be updated!' ); }
 
 		if( count( $this->dbchanges ) == 0 )
+		{
 			return;	// No changes!
+		}
 
 		if( !empty($this->datemodified_field) )
 		{	// We want to track modification date:
@@ -189,6 +190,11 @@ class DataObject
 			return false;
 		}
 
+		$Plugins->trigger_event( 'AfterDataObjectUpdate', $params = array(
+				'DataObject' => & $this,
+				'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
+			) );
+
 		// Reset changes in object:
 		$this->dbchanges = array();
 
@@ -197,13 +203,15 @@ class DataObject
 
 
 	/**
-	 * Insert object into DB based on previously recorded changes
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * Triggers plugin event AfterDataObjectInsert.
 	 *
 	 * @return boolean true on success
 	 */
-	function dbinsert( )
+	function dbinsert()
 	{
-		global $DB, $localtimenow, $current_User;
+		global $DB, $localtimenow, $current_User, $Plugins;
 
 		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
 
@@ -229,7 +237,6 @@ class DataObject
 				$this->set_param( $this->lasteditor_field, 'number', $current_User->ID );
 			}
 		}
-
 
 		$sql_fields = array();
 		$sql_values = array();
@@ -273,12 +280,17 @@ class DataObject
 		// Reset changes in object:
 		$this->dbchanges = array();
 
+		$Plugins->trigger_event( 'AfterDataObjectInsert', $params = array(
+				'DataObject' => & $this,
+				'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
+			) );
+
 		return true;
 	}
 
 
 	/**
-	 * Inserts or Updates depending on object state
+	 * Inserts or Updates depending on object state.
 	 *
 	 * @return boolean true on success, false on failure
 	 */
@@ -298,11 +310,13 @@ class DataObject
 
 
 	/**
-	 * Delete object from DB
+	 * Delete object from DB.
+	 *
+	 * Triggers plugin event AfterDataObjectDelete.
 	 */
-	function dbdelete( )
+	function dbdelete()
 	{
-		global $DB, $Messages, $EvoConfig;
+		global $DB, $Messages, $EvoConfig, $Plugins;
 
 		if( $this->ID == 0 ) { debug_die( 'Non persistant object cannot be deleted!' ); }
 
@@ -338,6 +352,11 @@ class DataObject
 			// End transaction:
 			$DB->commit();
 		}
+
+		$Plugins->trigger_event( 'AfterDataObjectDelete', $params = array(
+				'DataObject' => & $this,
+				'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
+			) );
 
 		// Just in case... remember this object has been deleted from DB!
 		$this->ID = 0;
@@ -446,8 +465,6 @@ class DataObject
 	/**
 	 * Get a member param by its name
 	 *
-	 * {@internal DataObject::get(-) }}
-	 *
 	 * @param mixed Name of parameter
 	 * @return mixed Value of parameter
 	 */
@@ -462,8 +479,6 @@ class DataObject
 	 *
 	 * Same as disp but don't echo
 	 *
-	 * {@internal DataObject::dget(-) }}
-	 *
 	 * @param string Name of parameter
 	 * @param string Output format, see {@link format_to_output()}
 	 */
@@ -476,8 +491,6 @@ class DataObject
 
 	/**
 	 * Display a member param by its name
-	 *
-	 * {@internal DataObject::disp(-) }}
 	 *
 	 * @param string Name of parameter
 	 * @param string Output format, see {@link format_to_output()}
@@ -650,8 +663,8 @@ class DataObject
 
 /*
  * $Log$
- * Revision 1.35  2006/01/12 19:20:03  fplanque
- * no message
+ * Revision 1.36  2006/01/22 22:44:28  blueyed
+ * Added AfterDataObject* hooks.
  *
  * Revision 1.34  2006/01/12 18:22:58  fplanque
  * fix tentative for integer vs '' vs NULL vs 0
@@ -664,9 +677,6 @@ class DataObject
  *
  * Revision 1.30  2005/11/28 07:39:43  blueyed
  * doc, normalization
- *
- * Revision 1.29  2005/11/18 18:26:38  fplanque
- * no message
  *
  * Revision 1.28  2005/11/09 03:28:55  blueyed
  * BUG: on dbupdate() it should not set the current_User as last editor!; minor other stuff
