@@ -52,6 +52,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class Hit
 {
 	/**
+	 * ID in DB, gets set when {@link log()} was called and the hit was logged.
+	 */
+	var $ID;
+
+	/**
 	 * Is the hit already logged?
 	 * @var boolean
 	 */
@@ -451,10 +456,11 @@ class Hit
 				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr )
 			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'",
 				"'.$this->referer_type.'", "'.$DB->escape($this->referer).'",
-				"'.$this->referer_domain_ID.'", "'.$Blog->ID.'", "'.$DB->escape( $this->IP ).'"
+				"'.$this->referer_domain_ID.'", '.$DB->quote($Blog->ID).', "'.$DB->escape( $this->IP ).'"
 			)';
 
 		$DB->query( $sql, 'Record the hit' );
+		$this->ID = $DB->insert_id;
 
 		require_once( dirname(__FILE__).'/_hitlist.class.php' );
 		Hitlist::dbprune(); // will prune once per day, according to Settings
