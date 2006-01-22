@@ -1590,31 +1590,43 @@ function debug_info( $force = false )
 				.'<tr><th colspan="4" class="center">Timers</th></tr>'
 				.'<tr><th>Category</th><th>Time</th><th>%</th><th>Count</th></tr>'
 				.'</thead><tbody>';
-			$count_ignored = 0;
+
+			$table_rows_ignore_perhaps = array();
 			foreach( $timer_rows as $l_cat => $l_time )
 			{
 				$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : 0;
 
-				if( $l_time < 0.005 )
-				{
-					$count_ignored++;
-					continue;
-				}
-
-				echo "\n<tr>"
+				$row = "\n<tr>"
 					.'<td>'.$l_cat.'</td>'
 					.'<td class="right">'.$l_time.'</td>'
 					.'<td class="right">'.$percent_l_cat.'%</td>'
 					.'<td class="right">'.$Timer->get_count( $l_cat ).'</td></tr>';
+
+				if( $l_time < 0.005 )
+				{
+					$table_rows_ignore_perhaps[] = $row;
+				}
+				else
+				{
+					echo $row;
+				}
 			}
-			if( $count_ignored )
+			$count_ignored = count($table_rows_ignore_perhaps);
+			if( $count_ignored > 5 )
 			{
 				echo '<tr><td colspan="4" class="center"> + '.$count_ignored.' &lt; 0.005s </td></tr>';
+			}
+			else
+			{
+				echo implode( "\n", $table_rows_ignore_perhaps );
 			}
 			echo '</tbody>';
 			echo '</table>';
 
-			echo '<a href="'.format_to_output($ReqURI).'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br/>';
+			if( isset($DB) )
+			{
+				echo '<a href="'.format_to_output($ReqURI).'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br />';
+			}
 
 			foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
 				'memory_get_usage' => array( 'display' => 'Memory usage', 'high' => 8000000 ),
@@ -2461,6 +2473,9 @@ function is_admin_page()
 
 /*
  * $Log$
+ * Revision 1.172  2006/01/22 14:25:05  blueyed
+ * debug_info(): enhanced, small fix
+ *
  * Revision 1.171  2006/01/22 14:23:47  blueyed
  * Added is_admin_page()
  *
