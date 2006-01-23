@@ -564,11 +564,7 @@ class AdminUI_general
 			{
 				$perm = true; // By default
 
-				if( ( ( !isset($loop_details['perm_name'])
-				        || ($perm = $current_User->check_perm( $loop_details['perm_name'], $loop_details['perm_level'] ) ) )
-				      && ( !isset($loop_details['perm_eval'])
-				            || $perm = eval($loop_details['perm_eval']) )
-				    )
+				if( $this->check_perm( $loop_details )
 				    || isset($loop_details['text_noperm']) )
 				{ // If no permission requested or if perm granted or if we have an alt text, display tab:
 					$anchor = '<a href="';
@@ -997,8 +993,10 @@ class AdminUI_general
 	 * @param integer|NULL Numerical index of the path, NULL means 'append'.
 	 * @param array Either the key of the path or an array(keyname, propsArray).
 	 * @param array Properties for this path entry.
+	 * @param boolean Exit script when the user has no permissions to this path?
+	 * @return boolean True if perm granted, false if not (and we're not exiting).
 	 */
-	function set_path_by_nr( $nr, $pathKey, $pathProps = array() )
+	function set_path_by_nr( $nr, $pathKey, $pathProps = array(), $die_when_no_perm = true )
 	{
 		if( is_null($nr) )
 		{ // append
@@ -1018,6 +1016,14 @@ class AdminUI_general
 		$this->pathProps[$nr] = $pathProps;
 
 		#pre_dump( 'setPathByNr: ', $nr, $pathKey, $pathProps );
+
+		$perm = $this->check_perm( $pathProps );
+		if( ! $perm && $die_when_no_perm )
+		{
+			debug_die( 'Permission denied! (path: '.$nr.'/'.$pathKey.')' );
+		}
+
+		return $perm;
 	}
 
 
@@ -1161,10 +1167,45 @@ class AdminUI_general
 		return $r;
 	}
 
+
+	/**
+	 * Checks if {@link the $current_User} has needed perms on an menu entry.
+	 *
+	 * @param array Path properties: An array, where 'perm_name' and/or 'perm_eval' might be set.
+	 *              'perm_level' (used with 'perm_name') defaults to 'any' if not given.
+	 * @return true|false
+	 */
+	function check_perm( $perminfo )
+	{
+		global $current_User;
+
+		$perm = true;
+
+		if( isset($perminfo['perm_name']) )
+		{
+			$perm_level = isset( $perminfo['perm_level'] ) ? $perminfo['perm_level'] : 'any';
+
+			$perm = $current_User->check_perm( $perminfo['perm_name'], $perm_level );
+		}
+
+		if( $perm )
+		{
+			if( isset($loop_details['perm_eval']) )
+			{
+				$perm = eval($loop_details['perm_eval']);
+			}
+		}
+
+		return $perm;
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.44  2006/01/23 23:29:49  blueyed
+ * Added permission checks when setting a path
+ *
  * Revision 1.43  2006/01/10 19:03:16  blueyed
  * Use $app_shortname in get_page_head()
  *
