@@ -190,10 +190,13 @@ class DataObject
 			return false;
 		}
 
-		$Plugins->trigger_event( 'AfterDataObjectUpdate', $params = array(
-				'DataObject' => & $this,
-				'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
-			) );
+		if( $Plugins )
+		{
+			$Plugins->trigger_event( 'AfterDataObjectUpdate', $params = array(
+					'DataObject' => & $this,
+					'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
+				) );
+		}
 
 		// Reset changes in object:
 		$this->dbchanges = array();
@@ -280,10 +283,13 @@ class DataObject
 		// Reset changes in object:
 		$this->dbchanges = array();
 
-		$Plugins->trigger_event( 'AfterDataObjectInsert', $params = array(
-				'DataObject' => & $this,
-				'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
-			) );
+		if( $Plugins )
+		{
+			$Plugins->trigger_event( 'AfterDataObjectInsert', $params = array(
+					'DataObject' => & $this,
+					'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
+				) );
+		}
 
 		return true;
 	}
@@ -353,10 +359,13 @@ class DataObject
 			$DB->commit();
 		}
 
-		$Plugins->trigger_event( 'AfterDataObjectDelete', $params = array(
-				'DataObject' => & $this,
-				'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
-			) );
+		if( $Plugins )
+		{
+			$Plugins->trigger_event( 'AfterDataObjectDelete', $params = array(
+					'DataObject' => & $this,
+					'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
+				) );
+		}
 
 		// Just in case... remember this object has been deleted from DB!
 		$this->ID = 0;
@@ -663,6 +672,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2006/01/23 01:06:49  blueyed
+ * Extra check if $Plugins exist before triggering events.
+ *
  * Revision 1.36  2006/01/22 22:44:28  blueyed
  * Added AfterDataObject* hooks.
  *
