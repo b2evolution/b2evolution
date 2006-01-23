@@ -579,6 +579,47 @@ class Plugin
 		$this->$parname = $parvalue;
 	}
 
+
+	/**
+	 * Get canonical prefix for database tables a plugin might create.
+	 *
+	 * @return string
+	 */
+	function get_table_prefix()
+	{
+		global $tableprefix;
+
+		return $tableprefix.'plugin_ID'.$this->ID.'_';
+	}
+
+
+	/**
+	 * Remove a list of Plugin events for the current request.
+	 *
+	 * @todo Needs to break out of a triggered event that caused the Plugin to call this.
+	 * @param array List of events.
+	 */
+	function remove_events_for_this_request( $events )
+	{
+		global $Plugins;
+
+		if( ! is_array($events) )
+		{
+			$events = array( $events );
+		}
+
+		foreach( $events as $event )
+		{
+			if( isset($Plugins->index_event_IDs[$event]) )
+			{
+				while( ($key = array_search( $this->ID, $Plugins->index_event_IDs[$event] )) !== false )
+				{
+					unset( $Plugins->index_event_IDs[$event][$key] );
+				}
+			}
+		}
+	}
+
 	/*
 	 * Helper methods }}}
 	 */
@@ -686,6 +727,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.19  2006/01/23 01:12:15  blueyed
+ * Added get_table_prefix() and remove_events_for_this_request(),
+ *
  * Revision 1.18  2006/01/06 18:58:08  blueyed
  * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
  *
