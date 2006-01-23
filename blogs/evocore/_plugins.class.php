@@ -1377,7 +1377,10 @@ class Plugins
 		{
 			foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
 			{
-				$r[ $l_plugin_ID ] = & $this->get_by_ID( $l_plugin_ID );
+				if( $Plugin = & $this->get_by_ID( $l_plugin_ID ) )
+				{
+					$r[ $l_plugin_ID ] = & $Plugin;
+				}
 			}
 		}
 
@@ -1399,7 +1402,54 @@ class Plugins
 		{
 			foreach( array_keys($this->get_list_by_event( $l_event )) as $l_plugin_ID )
 			{
-				$r[ $l_plugin_ID ] = & $this->get_by_ID( $l_plugin_ID );
+				if( $Plugin = & $this->get_by_ID( $l_plugin_ID ) )
+				{
+					$r[ $l_plugin_ID ] = & $Plugin;
+				}
+			}
+		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Get a list of plugins that provide all given events.
+	 *
+	 * @return array
+	 */
+	function get_list_by_all_events( $events )
+	{
+		$candidates = array();
+
+		foreach( $events as $l_event )
+		{
+			if( empty($this->index_event_IDs[$l_event]) )
+			{
+				return array();
+			}
+
+			if( empty($candidates) )
+			{
+				$candidates = $this->index_event_IDs[$l_event];
+			}
+			else
+			{
+				$candidates = array_intersect( $candidates, $this->index_event_IDs[$l_event] );
+				if( empty($candidates) )
+				{
+					return array();
+				}
+			}
+		}
+
+		$r = array();
+		foreach( $candidates as $plugin_ID )
+		{
+			$Plugin = & $this->get_by_ID( $plugin_ID );
+			if( $Plugin )
+			{
+				$r[ $plugin_ID ] = & $Plugin;
 			}
 		}
 
@@ -1674,6 +1724,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.34  2006/01/23 01:09:03  blueyed
+ * Added get_list_by_all_events()
+ *
  * Revision 1.33  2006/01/23 00:57:39  blueyed
  * Cleanup, forgot trigger_event_first_true() :/
  *
