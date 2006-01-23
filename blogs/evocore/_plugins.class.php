@@ -72,12 +72,7 @@ class Plugins
 	var $index_code_Plugins = array();
 
 	/**
-	 * Index: plugin_classname => Plugin
-	 */
-	var $index_name_Plugins = array();
-
-	/**
-	 * Index: plugin_ID => Plugin|false
+	 * Index: plugin_ID => Plugin
 	 * @var array
 	 */
 	var $index_ID_Plugins = array();
@@ -559,7 +554,6 @@ class Plugins
 			$this->index_code_Plugins[ $Plugin->code ] = & $Plugin;
 			$this->index_code_ID[ $Plugin->code ] = & $Plugin->ID;
 		}
-		$this->index_name_Plugins[ $Plugin->classname ] = & $Plugin;
 		$this->index_ID_Plugins[ $Plugin->ID ] = & $Plugin;
 
 		if( ! in_array( $Plugin->ID, $this->sorted_IDs ) )
@@ -602,7 +596,6 @@ class Plugins
 		}
 
 		unset( $this->index_code_Plugins[ $Plugin->code ] );
-		unset( $this->index_name_Plugins[ $Plugin->classname ] );
 		unset( $this->index_ID_Plugins[ $Plugin->ID ] );
 
 		if( isset($this->index_ID_rows[ $Plugin->ID ]) )
@@ -815,14 +808,13 @@ class Plugins
 
 		$Timer->resume( 'plugins_settings' );
 
-		if( ! isset($this->index_event_IDs['GetDefaultSettings'])
-		    || ! in_array( $Plugin->ID, $this->index_event_IDs['GetDefaultSettings'] )
-		    || ! method_exists( $Plugin, 'GetDefaultSettings' ) )
+		$defaults = $this->call_method_if_active( $Plugin->ID, 'GetDefaultSettings', $params = array() );
+
+		if( empty($defaults) )
 		{
 			return false;
 		}
 
-		$defaults = $Plugin->GetDefaultSettings();
 		if( !is_array($defaults) )
 		{
 			$Debuglog->add( $Plugin->classname.'::GetDefaultSettings() did not return array!', array('plugins', 'error') );
@@ -836,9 +828,9 @@ class Plugins
 			{
 				$Plugin->Settings->_defaults[$l_name] = $l_value['defaultvalue'];
 			}
-		}
 
-		$this->call_method( $Plugin->ID, 'PluginSettingsInstantiated', $params = array() );
+			$this->call_method( $Plugin->ID, 'PluginSettingsInstantiated', $params = array() );
+		}
 
 		$Timer->pause( 'plugins_settings' );
 	}
@@ -937,6 +929,41 @@ class Plugins
 		{
 			$this->call_method( $l_plugin_ID, $event, $params );
 		}
+	}
+
+
+	/**
+	 * Call all plugins for a given event, until the first one returns true.
+	 *
+	 * @param string event name, see {@link Plugin}
+	 * @param array Associative array of parameters for the Plugin
+	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin;
+	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
+	 */
+	function trigger_event_first_true( $event, $params = NULL )
+	{
+		global $Debuglog;
+
+		$Debuglog->add( 'Trigger event '.$event.' (first true)', 'plugins' );
+
+		if( empty($this->index_event_IDs[$event]) )
+		{ // No events registered
+			$Debuglog->add( 'No registered plugins.', 'plugins' );
+			return array();
+		}
+
+		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
+		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
+		{
+			$r = $this->call_method( $l_plugin_ID, $event, $params );
+			if( $r === true )
+			{
+				$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned true!', 'plugins' );
+				$params['plugin_ID'] = & $l_plugin_ID;
+				return $params;
+			}
+		}
+		return array();
 	}
 
 
@@ -1304,28 +1331,6 @@ class Plugins
 
 
 	/**
-	 * Get a specific Plugin by its name.
-	 *
-	 * NOTE: You'll have to call {@link load_plugins_table()} or {@link restart()} before.
-	 *
-	 * @param string plugin name
-	 * @return Plugin|false
-	 */
-	function & get_by_name( $plugin_classname )
-	{
-		global $Debuglog;
-
-		if( ! isset($this->index_name_Plugins[ $plugin_classname ]) )
-		{ // Plugin is not registered
-			$Debuglog->add( 'Requested plugin ['.$plugin_classname.'] not found!', 'plugins' );
-			return false;
-		}
-
-		return $this->index_name_Plugins[ $plugin_classname ];
-	}
-
-
-	/**
 	 * Get a specific Plugin by its code.
 	 *
 	 * @param string plugin name
@@ -1571,7 +1576,7 @@ class Plugins
 
 
 		// Delete obsolete events from DB:
-		if( $DB->query( '
+		if( $obsolete_events && $DB->query( '
 				DELETE FROM T_pluginevents
 				WHERE pevt_plug_ID = '.$Plugin->ID.'
 					AND pevt_event IN ( "'.implode( '", "', $obsolete_events ).'" )' ) )
@@ -1669,6 +1674,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.33  2006/01/23 00:57:39  blueyed
+ * Cleanup, forgot trigger_event_first_true() :/
+ *
  * Revision 1.32  2006/01/21 16:34:56  blueyed
  * Fixed get_list_by_events()
  *
