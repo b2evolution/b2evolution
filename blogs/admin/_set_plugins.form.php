@@ -21,7 +21,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			<th title="<?php echo T_('When should rendering apply?') ?>"><?php echo T_('Apply') ?></th>
 			<th class="advanced_info" title="<?php echo T_('The code to call the plugin by code.') ?>"><?php echo /* TRANS: Code of a plugin */ T_('Code') ?></th>
 			<th><?php echo T_('Description') ?></th>
-			<th class="lastcol"><?php echo T_('Actions') ?></th>
+			<?php
+			if( $current_User->check_perm( 'options', 'edit', false ) )
+			{ ?>
+				<th class="lastcol"><?php echo T_('Actions') ?></th>
+				<?php
+			} ?>
 		</tr>
 		</thead>
 		<tbody>
@@ -46,10 +51,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			<td>
 				<?php $loop_Plugin->short_desc(); ?>
 			</td>
-			<td class="lastcol right">
-				<a href="plugins.php?action=edit_settings&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>" title="<?php echo T_('Edit plugin settings!') ?>"><?php echo get_icon( 'edit', 'imgtag', array( 'title' => T_('Edit plugin settings!') ) ) ?></a>
-				<a href="plugins.php?action=uninstall&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>" title="<?php echo T_('Un-install this plugin!') ?>"><?php echo get_icon( 'delete', 'imgtag', array( 'title' => T_('Un-install this plugin!') ) ) ?></a>
-			</td>
+			<?php
+			if( $current_User->check_perm( 'options', 'edit', false ) )
+			{ ?>
+				<td class="lastcol right">
+					<a href="plugins.php?action=edit_settings&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>" title="<?php echo T_('Edit plugin settings!') ?>"><?php echo get_icon( 'edit', 'imgtag', array( 'title' => T_('Edit plugin settings!') ) ) ?></a>
+					<a href="plugins.php?action=uninstall&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>" title="<?php echo T_('Un-install this plugin!') ?>"><?php echo get_icon( 'delete', 'imgtag', array( 'title' => T_('Un-install this plugin!') ) ) ?></a>
+				</td>
+				<?php
+			} ?>
 		</tr>
 		<?php
 		}
@@ -89,9 +99,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				<?php
 				$registrations = $Plugins->count_regs($loop_Plugin->classname);
 
-				if( ! isset( $loop_Plugin->nr_of_installs )
-				    || $registrations < $loop_Plugin->nr_of_installs )
-				{ // number of installations are not limited or not reached yet
+				if( $current_User->check_perm( 'options', 'edit', false )
+				    && ( ! isset( $loop_Plugin->nr_of_installs )
+				         || $registrations < $loop_Plugin->nr_of_installs ) )
+				{ // number of installations are not limited or not reached yet and user has "edit options" perms
 					?>
 					[<a href="plugins.php?action=install&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname) ?>"><?php
 						echo T_('Install');

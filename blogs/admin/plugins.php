@@ -266,7 +266,7 @@ switch( $action )
 
 	case 'edit_settings':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		$current_User->check_perm( 'options', 'view', true );
 
 		// Edit plugin settings:
 		param( 'plugin_ID', 'integer', true );
@@ -543,11 +543,14 @@ switch( $action )
 		</script>
 
 		<?php
-		$Form->buttons_input( array(
-			array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => T_('Save !'), 'class' => 'SaveButton' ),
-			array( 'type' => 'reset', 'value' => T_('Reset'), 'class' => 'ResetButton' ),
-			array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'SaveButton' ),
-			) );
+		if( $current_User->check_perm( 'options', 'edit', false ) )
+		{
+			$Form->buttons_input( array(
+				array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => T_('Save !'), 'class' => 'SaveButton' ),
+				array( 'type' => 'reset', 'value' => T_('Reset'), 'class' => 'ResetButton' ),
+				array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'SaveButton' ),
+				) );
+		}
 		$Form->end_fieldset();
 
 
