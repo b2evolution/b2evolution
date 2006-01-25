@@ -1793,6 +1793,10 @@ function url_add_param( $url, $param, $moredelim = '&amp;' )
 function url_add_tail( $url, $tail )
 {
 	$parts = explode( '?', $url );
+	if( substr($parts[0], -1) == '/' )
+	{
+		$parts[0] = substr($parts[0], 0, -1);
+	}
 	if( isset($parts[1]) )
 	{
 		return $parts[0].$tail.'?'.$parts[1];
@@ -2473,6 +2477,9 @@ function is_admin_page()
 
 /*
  * $Log$
+ * Revision 1.173  2006/01/25 19:19:17  blueyed
+ * Fixes for blogurl handling. Thanks to BenFranske for pointing out the biggest issue (http://forums.b2evolution.net/viewtopic.php?t=6844)
+ *
  * Revision 1.172  2006/01/22 14:25:05  blueyed
  * debug_info(): enhanced, small fix
  *

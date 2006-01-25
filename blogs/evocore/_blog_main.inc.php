@@ -148,21 +148,12 @@ locale_activate( $Blog->get('locale') );
 if( !isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
 {
-	// Check and Remove blog baseurl from ReqPath:
-	// if Blog is installed on separate domain
-	// use this domain setting as base for the actual path
-	/* Yet another bug in the multidomain stuff that doesn't work on single domains...
-	if( $Blog->get( 'siteurl' ) )
-	{
-		$blog_baseurl = substr( $Blog->get( 'siteurl' ), strlen( $baseurlroot ) );
-	}
-	else
-	 */
-	$blog_baseurl = substr( $Blog->get( 'baseurl' ), strlen( $baseurlroot ) );
+	// Check and Remove blog base URI from ReqPath:
+	$blog_baseuri = substr( $Blog->get('baseurl'), strlen( $Blog->get('baseurlroot') ) );
 
-	if( ($pos = strpos( $ReqPath, $blog_baseurl )) !== false )
+	if( ($pos = strpos( $ReqPath, $blog_baseuri )) !== false )
 	{ // note: $pos will typically be 0
-		$path_string = substr( $ReqPath, $pos+strlen( $blog_baseurl ) );
+		$path_string = substr( $ReqPath, $pos+strlen( $blog_baseuri ) );
 
 		$Debuglog->add( 'Extra path info found! path_string=' . $path_string , 'params' );
 		//echo "path=[$path_string]<br />";
@@ -419,6 +410,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.42  2006/01/25 19:19:17  blueyed
+ * Fixes for blogurl handling. Thanks to BenFranske for pointing out the biggest issue (http://forums.b2evolution.net/viewtopic.php?t=6844)
+ *
  * Revision 1.41  2006/01/22 22:41:59  blueyed
  * Timer, doc
  *

@@ -46,9 +46,9 @@ require_once dirname(__FILE__).'/evocore/_main.inc.php';
 <h2><?php echo T_('Individual blogs on this system') ?>:</h2>
 <ul>
 <?php // --------------------------- BLOG LIST -----------------------------
-	for( $curr_blog_ID = blog_list_start('stub');
+	for( $curr_blog_ID = blog_list_start();
 				$curr_blog_ID != false;
-				 $curr_blog_ID = blog_list_next('stub') )
+				 $curr_blog_ID = blog_list_next() )
 	{ # by uncommenting the following lines you can hide some blogs
 		if( $curr_blog_ID == 1 ) continue; // Hide blog 1...
 		// if( $curr_blog_ID == 2 ) continue; // Hide blog 2...

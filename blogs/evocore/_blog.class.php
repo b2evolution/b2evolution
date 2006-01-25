@@ -84,7 +84,7 @@ class Blog extends DataObject
 	var $access_type;
 	var $siteurl;
 	var $staticfilename;
-	var $stub;     // stub file (can be empty)
+	var $stub;     // stub file (can be empty/virtual)
 	var $urlname;  // used to identify blog in URLs
 	var $links_blog_ID = 0;
 	var $notes;
@@ -326,6 +326,8 @@ class Blog extends DataObject
 
 	/**
 	 * Get the blog's media directory (and create it if necessary).
+	 *
+	 * @return mixed the path as string on success, false if the dir could not be created
 	 */
 	function getMediaDir()
 	{
@@ -366,7 +368,7 @@ class Blog extends DataObject
 				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($mediadir) ), 'error' );
 				return false;
 			}
-			elseif( !@mkdir( $mediadir ) ) // default chmod?!
+			elseif( !@mkdir( $mediadir ) )
 			{ // add error
 				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($mediadir) ), 'error' );
 				return false;
@@ -427,9 +429,6 @@ class Blog extends DataObject
 						return false;
 				}
 
-			case 'subdir':
-				return $this->siteurl;
-
 			case 'suburl':
 				return $this->gen_blogurl( 'default', false );
 
@@ -445,7 +444,13 @@ class Blog extends DataObject
 				return $this->gen_blogurl( 'static' );
 
 			case 'dynfilepath':
-				return $basepath.$this->siteurl.$this->stub.( preg_match( '#.php$#', $this->stub ) ? '' : '.php' );
+				$r = $basepath.$this->siteurl;
+				if( ! empty($this->stub) )
+				{ // $stub can actually be empty/virtual - not a real php file!
+					$r .= $this->stub.( preg_match( '#.php$#', $this->stub ) ? '' : '.php' );
+				}
+				// TODO: check if the path exists and return false otherwise?!
+				return $r;
 
 			case 'staticfilepath':
 				return $basepath.$this->siteurl.$this->staticfilename;
@@ -464,6 +469,16 @@ class Blog extends DataObject
 					}
 					return $r;
 				}
+
+			case 'baseurlroot':
+				$blog_baseurl = $this->get('baseurl');
+
+				if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $blog_baseurl, $matches ) )
+				{
+					return $matches[1];
+				}
+
+				debug_die( 'Blog::get(baseurl) - assertion failed.' );
 
 			case 'basehost':
 				$baseurl = $this->get('baseurl');
@@ -754,6 +769,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2006/01/25 19:19:17  blueyed
+ * Fixes for blogurl handling. Thanks to BenFranske for pointing out the biggest issue (http://forums.b2evolution.net/viewtopic.php?t=6844)
+ *
  * Revision 1.50  2006/01/09 19:11:14  blueyed
  * User/Blog media dir creation messages more verbose/secure.
  *
