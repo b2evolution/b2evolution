@@ -60,7 +60,10 @@ $AvailablePlugins->sort('name');
 
 switch( $action )
 {
-	case 'reload_plugins': // (Un)Register new/obsolete events, detect new codes for plugins without one
+	case 'reload_plugins':
+		// Register new events
+		// Unregister obsolete events
+		// Detect new codes for plugins without one (fp>>why do we need this one?)
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -418,8 +421,8 @@ switch( $action )
 
 
 	case 'edit_settings':
-		$Form = & new Form( $pagenow );
-		$Form->begin_form('fform');
+		$Form = & new Form( $pagenow, 'pluginsettings_checkchanges' );
+		$Form->begin_form( 'fform') ;
 		$Form->hidden( 'plugin_ID', $plugin_ID );
 
 		// PluginSettings

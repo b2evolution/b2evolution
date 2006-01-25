@@ -67,7 +67,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		</tbody>
 	</table>
 	<p class="center">
-	<a href="<?php echo $pagenow ?>?action=reload_plugins" title="<?php echo T_('Reload events and codes for installed plug-ins.') ?>"><?php echo T_('Reload plug-ins') ?></a>
+		<a href="<?php echo $pagenow ?>?action=reload_plugins"><?php echo T_('Reload events and codes for installed plug-ins.')
+		/* TODO: explain why we need this and find a better name. ONE THING SEEMS SURE THOUGH: this does NOT "reload" the plugins. */ ?></a>
 	</p>
 </fieldset>
 
