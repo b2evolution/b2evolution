@@ -244,7 +244,7 @@ while( $Item = $ItemList->get_item() )
 
 			<?php
 
-			$Form = & new Form( $htsrv_url.'comment_post.php', '' );
+			$Form = & new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges' );
 
 			$Form->begin_form( 'bComment' );
 
@@ -318,6 +318,9 @@ $ItemList->display_nav( 'footer' );
 
 /*
  * $Log$
+ * Revision 1.8  2006/01/25 18:24:21  fplanque
+ * hooked bozo validator in several different places
+ *
  * Revision 1.7  2006/01/09 17:21:06  fplanque
  * no message
  *

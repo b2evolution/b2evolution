@@ -85,7 +85,7 @@ if( $action == 'edit' )
 	$form_action .= '?action=edit&amp;blog='.$blog;
 }
 
-$Form = new Form( $form_action );
+$Form = new Form( $form_action, 'bloggeneral_checkchanges' );
 
 $Form->begin_form( 'fform' );
 

@@ -110,13 +110,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 						{
 							document.getElementById( 'userlist_default' ).style.display='none';
 							document.getElementById( 'userlist_wide' ).style.display='block';
-							document.FormPerm.layout.value = 'wide';
+							document.blogperm_checkchanges.layout.value = 'wide';
 						}
 						else
 						{
 							document.getElementById( 'userlist_wide' ).style.display='none';
 							document.getElementById( 'userlist_default' ).style.display='block';
-							document.FormPerm.layout.value = 'default';
+							document.blogperm_checkchanges.layout.value = 'default';
 						}
 					}
 

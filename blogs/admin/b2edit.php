@@ -14,6 +14,11 @@
  */
 require_once (dirname(__FILE__). '/_header.php');
 
+/**
+ * @var AdminUI
+ */
+global $AdminUI;
+
 $AdminUI->set_path( 'new' );
 param( 'action', 'string', 'new', true );
 
@@ -57,6 +62,7 @@ switch($action)
 		}
 		// This will eventually boil down to editing, so we need to prepare...
 
+
 	case 'edit':
 		/*
 		 * --------------------------------------------------------------------
@@ -76,6 +82,7 @@ switch($action)
 		// Check permission:
 		$current_User->check_perm( 'blog_post_statuses', $post_status, true, $blog );
 		break;
+
 
 	case 'editcomment':
 		/*
@@ -109,8 +116,8 @@ switch($action)
 
 		// Generate available blogs list:
 		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_post_statuses', 'any', $pagenow.'?blog=%d', NULL, '',
-												( blog_has_cats( $blog ) ? 'return edit_reload(this.ownerDocument.forms.namedItem(\'post\'), %d )'
-												: '' /* Current blog has no cats, we can't be posting */ ) );
+												( blog_has_cats( $blog ) ? 'return edit_reload(this.ownerDocument.forms.namedItem(\'item_checkchanges\'), %d )'
+												: '' /* Current blog has no cats, we can't be posting */ ), 'swicth_to_%d_nocheckchanges' );
 		// TODO: edit_reload params handling is far from complete..
 
 		if( !$blog )
@@ -182,7 +189,6 @@ switch($action)
  * Display page header:
  */
 require dirname(__FILE__).'/_menutop.php';
-
 
 /**
  * Display payload:

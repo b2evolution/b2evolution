@@ -45,7 +45,7 @@ function list_groups( $layout, $query )
 					<td><?php echo format_to_output( $lrow['grp_name'], 'htmlbody' ); ?></td>
 					<td class="center">
 						<input id="checkallspan_state_<?php echo $lrow['grp_ID'] ?>" type="checkbox" name="blog_ismember_<?php echo $lrow['grp_ID'] ?>"
-							<?php if( isset( $lrow['bloggroup_ismember'] ) && $lrow['bloggroup_ismember'] != 0  ) { ?> checked="checked" <?php } ?>
+							<?php if( !empty( $lrow['bloggroup_ismember'] ) ) { ?> checked="checked" <?php } ?>
 							onclick="merge_from_wide( this, <?php echo $lrow['grp_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to read protected posts') ?>" />
 					</td>
@@ -81,59 +81,59 @@ function list_groups( $layout, $query )
 					</td>
 					<td class="center">
 						<input type="checkbox" name="blog_perm_delpost_<?php echo $lrow['grp_ID'] ?>"
-							<?php if( isset($lrow['bloggroup_perm_delpost']) && $lrow['bloggroup_perm_delpost'] != 0  ) { ?> checked="checked" <?php } ?>
+							<?php if( !empty($lrow['bloggroup_perm_delpost']) ) { ?> checked="checked" <?php } ?>
 							onclick="merge_from_wide( this, <?php echo $lrow['grp_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to delete posts in this blog') ?>" />
 					</td>
 					<td class="center">
 						<input type="checkbox" name="blog_perm_comments_<?php echo $lrow['grp_ID'] ?>"
-							<?php if( isset( $lrow['bloggroup_perm_comments'] ) && $lrow['bloggroup_perm_comments'] != 0  ) { ?> checked="checked" <?php } ?>
+							<?php if( !empty( $lrow['bloggroup_perm_comments'] ) ) { ?> checked="checked" <?php } ?>
 							onclick="merge_from_wide( this, <?php echo $lrow['grp_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to edit comments in this blog') ?>" />
 					</td>
 					<td class="center">
 						<input type="checkbox" name="blog_perm_cats_<?php echo $lrow['grp_ID'] ?>"
-							<?php if( isset( $lrow['bloggroup_perm_cats'] ) && $lrow['bloggroup_perm_cats'] != 0  ) { ?> checked="checked" <?php } ?>
+							<?php if( !empty( $lrow['bloggroup_perm_cats'] ) ) { ?> checked="checked" <?php } ?>
 							onclick="merge_from_wide( this, <?php echo $lrow['grp_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to edit categories for this blog') ?>" />
 					</td>
 					<td class="center">
 						<input type="checkbox" name="blog_perm_properties_<?php echo $lrow['grp_ID'] ?>"
-							<?php if( isset( $lrow['bloggroup_perm_properties'] ) && $lrow['bloggroup_perm_properties'] != 0  ) { ?> checked="checked" <?php } ?>
+							<?php if( !empty( $lrow['bloggroup_perm_properties'] ) ) { ?> checked="checked" <?php } ?>
 							onclick="merge_from_wide( this, <?php echo $lrow['grp_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_('Permission to edit blog properties') ?>" />
 					</td>
 					<td class="center">
 						<input type="checkbox" name="blog_perm_media_upload_<?php echo $lrow['grp_ID'] ?>"
-							<?php if( isset( $lrow['bloggroup_perm_media_upload'] ) && $lrow['bloggroup_perm_media_upload'] != 0  ) { ?> checked="checked" <?php } ?>
+							<?php if( !empty( $lrow['bloggroup_perm_media_upload'] ) ) { ?> checked="checked" <?php } ?>
 							onclick="merge_from_wide( this, <?php echo $lrow['grp_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_("Permission to upload into blog's media folder") ?>" />
 					</td>
 					<td class="center">
 						<input type="checkbox" name="blog_perm_media_browse_<?php echo $lrow['grp_ID'] ?>"
-							<?php if( isset( $lrow['bloggroup_perm_media_browse'] ) && $lrow['bloggroup_perm_media_browse'] != 0  ) { ?> checked="checked" <?php } ?>
+							<?php if( !empty( $lrow['bloggroup_perm_media_browse'] ) ) { ?> checked="checked" <?php } ?>
 							onclick="merge_from_wide( this, <?php echo $lrow['grp_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_("Permission to browse blog's media folder") ?>" />
 					</td>
 					<td class="center">
 						<input type="checkbox" name="blog_perm_media_change_<?php echo $lrow['grp_ID'] ?>"
-							<?php if( isset( $lrow['bloggroup_perm_media_change'] ) && $lrow['bloggroup_perm_media_change'] != 0  ) { ?> checked="checked" <?php } ?>
+							<?php if( !empty( $lrow['bloggroup_perm_media_change'] ) ) { ?> checked="checked" <?php } ?>
 							onclick="merge_from_wide( this, <?php echo $lrow['grp_ID'] ?>);" class="checkbox"
 							value="1" title="<?php echo T_("Permission to change the blog's media folder content") ?>" />
 					</td>
 					<td class="center">
-						<a href="javascript:toggleall_wide(document.FormPerm, <?php echo $lrow['grp_ID'] ?>);merge_from_wide( document.FormPerm, <?php echo $lrow['grp_ID'] ?>); setcheckallspan(<?php echo $lrow['grp_ID'] ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
+						<a href="javascript:toggleall_wide(document.blogperm_checkchanges, <?php echo $lrow['grp_ID'] ?>);merge_from_wide( document.blogperm_checkchanges, <?php echo $lrow['grp_ID'] ?>); setcheckallspan(<?php echo $lrow['grp_ID'] ?>);" title="<?php echo T_('(un)selects all checkboxes using Javascript') ?>">
 							<span id="checkallspan_<?php echo $lrow['grp_ID'] ?>"><?php echo T_('(un)check all')?></span>
 						</a>
 					</td>
 				</tr>
 				<?php
-			break;
+				break;
 
 
 			case 'custom':
 				// TODO: custom edit form.
-			break;
+				break;
 
 
 			default:
@@ -174,7 +174,7 @@ function list_groups( $layout, $query )
 }
 
 
-$Form = & new Form( 'blogs.php', 'FormPerm', 'post', 'fieldset' );
+$Form = & new Form( 'blogs.php', 'blogperm_checkchanges', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -316,7 +316,7 @@ $Form->begin_fieldset( T_('Group permissions') );
 $Form->end_fieldset();
 // warning if a user withdraws own permission to edit the blog's properties
 // todo: check if user is withdrawing own group permissions
-form_submit( ( $current_User->ID != 1 ) ); //? 'onclick="if( document.FormPerm.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''.TS_('Warning! You are about to remove your own permission to edit this blog!\nYou won\'t have access to its properties any longer if you do that!').'\') );"' : '' );
+form_submit( ( $current_User->ID != 1 ) ); //? 'onclick="if( document.blogperm_checkchanges.blog_perm_properties_'.$current_User->ID.'.checked == false) return( confirm(\''.TS_('Warning! You are about to remove your own permission to edit this blog!\nYou won\'t have access to its properties any longer if you do that!').'\') );"' : '' );
 
 $Form->end_form();
 ?>

@@ -483,9 +483,11 @@ class AdminUI_general
 	 * @param string Title for "all" button
 	 * @param string URL for "all" button
 	 * @param string onclick attribute format string, with %d for blog number.
+	 * @param string name attribute for each button (%d for blog number)
 	 * @return string HTML
 	 */
-	function get_html_collection_list( $permname = 'blog_ismember', $permlevel = 1, $url_format = '?blog=%d', $all_title = NULL, $all_url = '', $onclick = NULL )
+	function get_html_collection_list( $permname = 'blog_ismember', $permlevel = 1, $url_format = '?blog=%d',
+							$all_title = NULL, $all_url = '', $onclick = NULL, $name = NULL )
 	{
 		global $current_User, $blog;
 
@@ -516,9 +518,14 @@ class AdminUI_general
 			$r .= '<a href="'.sprintf( $url_format, $curr_blog_ID )
 						.'" class="'.( $curr_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'"';
 
-			if( ! is_null($onclick) )
+			if( !is_null($onclick) )
 			{	// We want to include an onclick attribute:
 				$r .= ' onclick="'.sprintf( $onclick, $curr_blog_ID ).'"';
+			}
+
+			if( !is_null($name) )
+			{	// We want to include a name attribute:
+				$r .= ' name="'.sprintf( $name, $curr_blog_ID ).'"';
 			}
 
 			$r .= '>'.blog_list_iteminfo( 'shortname', false ).'</a> ';
@@ -987,6 +994,7 @@ class AdminUI_general
 
 	/**
 	 * Set $pathKey as the $nr'th path key.
+fp>> Please describe this better
 	 *
 	 * Also marks the parent node as selected.
 	 *
@@ -1182,16 +1190,16 @@ class AdminUI_general
 		$perm = true;
 
 		if( isset($perminfo['perm_name']) )
-		{
+		{	// COMMENT!!!????!!!!????
 			$perm_level = isset( $perminfo['perm_level'] ) ? $perminfo['perm_level'] : 'any';
 
 			$perm = $current_User->check_perm( $perminfo['perm_name'], $perm_level );
 		}
 
 		if( $perm )
-		{
+		{	// COMMENT!!!????!!!!????
 			if( isset($loop_details['perm_eval']) )
-			{
+			{	// COMMENT!!!????!!!!????
 				$perm = eval($loop_details['perm_eval']);
 			}
 		}
@@ -1203,6 +1211,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.45  2006/01/25 18:24:21  fplanque
+ * hooked bozo validator in several different places
+ *
  * Revision 1.44  2006/01/23 23:29:49  blueyed
  * Added permission checks when setting a path
  *

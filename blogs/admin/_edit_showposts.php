@@ -265,7 +265,7 @@ while( $Item = $MainList->get_item() )
 
 			<?php
 
-			$Form = & new Form( $htsrv_url.'comment_post.php', '' );
+			$Form = & new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges' );
 
 			$Form->begin_form( 'bComment' );
 
@@ -343,6 +343,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.115  2006/01/25 18:24:21  fplanque
+ * hooked bozo validator in several different places
+ *
  * Revision 1.114  2006/01/09 17:21:06  fplanque
  * no message
  *

@@ -1,6 +1,6 @@
 /**
- *
- * CLASS BOZO VALIDATOR
+ * "BOZO VALIDATOR" : Check if a form has been changed but not submitted when a bozo clicks
+ * on a link which will result in potential data input loss
  *
  * Used for bozos, ask for confirmation to change the current page when he clicks on a link after having done changes on inputs forms 
  *	without saving them
@@ -32,10 +32,13 @@ var bozo = {
 		{ // Get the next form element:
 			var el_form = document.forms[i];
 			
+			// Get all inputs for this form:
+			all_inputs = el_form.getElementsByTagName( 'input' );
+
 			if( el_form.id.indexOf( '_checkchanges' ) == -1 )
-			{	// The form has no 'checkchanges' ID, we won't react on changes BUT we still need to react on SUBMIT
+			{	// The form has no '_checkchanges' ID, we won't react on changes BUT we still need to react on SUBMIT...
 				// Loop through all form inputs:
-				for( var j = 0; j < all_inputs.length; j++ ) 
+				for( var j = 0; j < all_inputs.length; j++ )
 				{	// Get the next input element:
 					var field = all_inputs[j];
 					if( field.type == 'submit' )
@@ -46,11 +49,9 @@ var bozo = {
 				}
         continue;
       }
-      
+
       // Initialize this form as having no changes yet:
       bozo.tab_changes[el_form.id] = 0;
-
-			all_inputs = el_form.getElementsByTagName( 'input' );
 
 			// Loop through all form inputs:
 			for( var j = 0; j < all_inputs.length; j++ ) 
@@ -94,8 +95,12 @@ var bozo = {
 		{	// Get the link element:
 			var link = all_links[j];
 			// Add a click event for the element
-			if(link.name != 'check_all' && link.name != 'uncheck_all' && link.href != ( document.location.href+'#' ) && !link.target )
-			{	// link name is not check_all, not uncheck_all, not '#' (happens with calendar popup), and has not a target, so we add click event to the validate_href function
+			if(	link.name != 'check_all' && link.name != 'uncheck_all' 	// link name is not check_all, not uncheck_all
+					&& link.name.indexOf( '_nocheckchanges' ) == -1					// link name does not hint to "NOT check for changes"
+					&& link.href != ( document.location.href+'#' )					// link is not '#' (happens with calendar popup)
+					&& link.href.indexOf( 'javascript:' ) == -1							// link does not trigger a Javascript
+					&& !link.target )																				// link has no target
+			{	// Link will most likely quit the page and lose form input, so we add click event to the validate_href function:
 				addEvent( link, 'click', bozo.validate_href, false);
 			}
 		}

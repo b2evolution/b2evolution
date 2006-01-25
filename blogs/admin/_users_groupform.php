@@ -46,7 +46,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $AdminUI->disp_payload_begin();
 
 
-$Form = & new Form( 'b2users.php' );
+$Form = & new Form( 'b2users.php', 'group_checkchanges' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'grp_ID,action' ) );
 
@@ -153,6 +153,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.45  2006/01/25 18:24:21  fplanque
+ * hooked bozo validator in several different places
+ *
  * Revision 1.44  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *

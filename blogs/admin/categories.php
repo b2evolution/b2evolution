@@ -190,7 +190,7 @@ switch($action)
 		// New category form:
 		$AdminUI->disp_payload_begin();
 
-		$Form = & new Form( 'categories.php' );
+		$Form = & new Form( 'categories.php', 'cat_checkchanges' );
 
 		$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,parent_cat_ID' ) );
 
@@ -232,7 +232,7 @@ switch($action)
 
 		$AdminUI->disp_payload_begin();
 
-		$Form = & new Form( 'categories.php' );
+		$Form = & new Form( 'categories.php', 'cat_checkchanges' );
 
 		$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,cat_ID' ) );
 
@@ -367,6 +367,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.3  2006/01/25 18:24:21  fplanque
+ * hooked bozo validator in several different places
+ *
  * Revision 1.2  2005/11/22 20:03:23  fplanque
  * no message
  *

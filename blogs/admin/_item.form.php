@@ -109,7 +109,7 @@ if( isset($Blog) )
 $AdminUI->disp_payload_begin();
 
 
-$Form = & new Form( $form_action, 'post', 'post', 'none' );
+$Form = & new Form( $form_action, 'item_checkchanges', 'post', 'none' );
 $Form->fieldstart = '<span class="line">';
 $Form->fieldend = '</span>';
 $Form->labelstart = '<strong>';
@@ -400,6 +400,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.48  2006/01/25 18:24:21  fplanque
+ * hooked bozo validator in several different places
+ *
  * Revision 1.47  2006/01/20 16:45:11  blueyed
  * Add html IDs to input objects/blocks
  *
