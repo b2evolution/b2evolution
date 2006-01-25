@@ -280,6 +280,11 @@ class Plugins
 	{
 		$this->load_plugins_table();
 
+		foreach( $this->sorted_IDs as $plugin_ID )
+		{ // Instantiate every plugin, so invalid ones do not get unregistered during sorting (crashes PHP, because $sorted_IDs gets changed etc)
+			$this->get_by_ID( $plugin_ID );
+		}
+
 		switch( $order )
 		{
 			case 'name':
@@ -606,7 +611,7 @@ class Plugins
 		$sort_key = array_search( $Plugin->ID, $this->sorted_IDs );
 		if( $sort_key === false )
 		{
-			$Debuglog->add( 'Tried to uninstall not-installed plugin (not in $sorted_IDs)!', 'plugins' );
+			$Debuglog->add( 'Tried to unregister not-installed plugin (not in $sorted_IDs)!', 'plugins' );
 			return false; // should not happen
 		}
 		unset( $this->sorted_IDs[$sort_key] );
@@ -878,12 +883,14 @@ class Plugins
 		{
 			$Plugin = & $this->get_by_ID( $this->sorted_IDs[$this->current_idx] );
 
-			if( $Plugin )
-			{
-				$Debuglog->add( 'return: '.$Plugin->classname.' ('.$Plugin->ID.')', 'plugins' );
-				$this->current_idx++;
+			$this->current_idx++;
+
+			if( ! $Plugin )
+			{ // recurse until we've been through whole $sorted_IDs!
+				return $this->get_next();
 			}
 
+			$Debuglog->add( 'return: '.$Plugin->classname.' ('.$Plugin->ID.')', 'plugins' );
 			return $Plugin;
 		}
 		else
@@ -1724,6 +1731,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.35  2006/01/25 23:37:57  blueyed
+ * bugfixes
+ *
  * Revision 1.34  2006/01/23 01:09:03  blueyed
  * Added get_list_by_all_events()
  *
