@@ -1768,8 +1768,8 @@ class Item extends DataObject
 	 *
 	 * @param string string to display before the link (if exists)
 	 * @param string string to display after the link (if exists)
-	 * @param string Text to display the link in the anchor (%s gets replaced by the URL).
-	 * @param array Attributes for the <a> tag (%s gets replaced by the URL in 'href', if set).
+	 * @param string Link text to use (%s gets replaced by the URL).
+	 * @param array Attributes for the <a> tag (if the href attribute is set, %s gets replaced by the URL).
 	 * @param string Output format, see {@link format_to_output()}
 	 */
 	function url_link( $before = '', $after = '', $text = '%s', $attribs = array(), $format = 'htmlbody' )
@@ -1777,11 +1777,11 @@ class Item extends DataObject
 		if( ! empty( $this->url ) )
 		{
 			if( isset($attribs['href']) )
-			{
+			{	// We have specified our own href attribute for the link:!
 				$attribs['href'] = str_replace( '%s', $this->url, $attribs['href'] );
 			}
 			else
-			{
+			{ // Use default href:
 				$attribs['href'] = $this->url;
 			}
 			echo $before;
@@ -2293,6 +2293,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.88  2006/01/25 15:55:29  fplanque
+ * no message
+ *
  * Revision 1.87  2006/01/16 00:45:19  blueyed
  * Item::content() extra check for "$disppage < 1".
  *
