@@ -202,6 +202,74 @@ switch( $action )
 		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_properties', 'edit',
 													'blogs.php?action=edit&amp;blog=%d&amp;tab='.$AdminUI->get_path(1),
 													T_('List'), 'blogs.php' );
+		break;
+
+
+	case 'GenStatic':
+		// ----------  Generate static homepage for blog ----------
+		$AdminUI->append_to_titlearea( sprintf( T_('Generating static page for blog [%s]'), $edited_Blog->dget('name') ) );
+		$current_User->check_perm( 'blog_genstatic', 'any', true, $blog );
+
+		$staticfilename = $edited_Blog->get('staticfilename');
+		if( empty( $staticfilename ) )
+		{
+			$Messages->add( T_('You haven\'t set a static filename for this blog!') );
+			break;
+		}
+
+		// GENERATION!
+		$static_gen_saved_locale = $current_locale;
+		$generating_static = true;
+		$resolve_extra_path = false;
+		flush();
+		ob_start();
+		switch( $edited_Blog->access_type )
+		{
+			case 'default':
+			case 'index.php':
+				// Access through index.php
+				// We need to set required variables
+				$blog = $edited_Blog->ID;
+				# This setting retricts posts to those published, thus hiding drafts.
+				$show_statuses = array();
+				# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
+				$linkblog_cat = '';
+				# This is the array if categories to restrict the linkblog to (non recursive)
+				$linkblog_catsel = array( );
+				# Here you can set a limit before which posts will be ignored
+				$timestamp_min = '';
+				# Here you can set a limit after which posts will be ignored
+				$timestamp_max = 'now';
+				// That's it, now let b2evolution do the rest! :)
+				require $basepath.$core_subdir.'_blog_main.inc.php';
+				break;
+
+			case 'stub':
+				// Access through stub file
+				// TODO: stub file might be empty or handled by webserver (mod_rewrite)! We cannot require this!
+				require $edited_Blog->get('dynfilepath');
+		}
+		$page = ob_get_contents();
+		ob_end_clean();
+		unset( $generating_static );
+
+		// Switch back to saved locale (the blog page may have changed it):
+		locale_activate( $static_gen_saved_locale);
+
+		$staticfilename = $edited_Blog->get('staticfilepath');
+
+		if( ! ($fp = @fopen( $staticfilename, 'w' )) )
+		{ // could not open file
+			$Messages->add( T_('File cannot be written!') );
+			$Messages->add( sprintf( '<p>'.T_('You should check the file permissions for [%s]. See <a %s>online manual on file permissions</a>.').'</p>',$staticfilename, 'href="http://b2evolution.net/man/install/file_permissions.html"' ) );
+		}
+		else
+		{ // file is writable
+			fwrite( $fp, $page );
+			fclose( $fp );
+			$Messages->add( sprintf( T_('Generated static file &laquo;%s&raquo;.'), $staticfilename ), 'success' );
+		}
+		break;
 }
 
 require dirname(__FILE__).'/_menutop.php';
@@ -471,87 +539,6 @@ switch($action)
 		break;
 
 
-	case 'GenStatic':
-		// ----------  Generate static homepage for blog ----------
-		?>
-			<div class="panelinfo">
-				<h3>
-				<?php
-					printf( T_('Generating static page for blog [%s]'), $edited_Blog->dget('name') );
-				?>
-				</h3>
-		<?php
-		$current_User->check_perm( 'blog_genstatic', 'any', true, $blog );
-
-		$staticfilename = $edited_Blog->get('staticfilename');
-		if( empty( $staticfilename ) )
-		{
-			echo '<p class="error">', T_('You haven\'t set a static filename for this blog!'), "</p>\n</div>\n";
-			break;
-		}
-
-		// GENERATION!
-		$static_gen_saved_locale = $current_locale;
-		$generating_static = true;
-		$resolve_extra_path = false;
-		flush();
-		ob_start();
-		switch( $edited_Blog->access_type )
-		{
-			case 'default':
-			case 'index.php':
-				// Access through index.php
-				// We need to set required variables
-				$blog = $edited_Blog->ID;
-				# This setting retricts posts to those published, thus hiding drafts.
-				$show_statuses = array();
-				# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
-				$linkblog_cat = '';
-				# This is the array if categories to restrict the linkblog to (non recursive)
-				$linkblog_catsel = array( );
-				# Here you can set a limit before which posts will be ignored
-				$timestamp_min = '';
-				# Here you can set a limit after which posts will be ignored
-				$timestamp_max = 'now';
-				// That's it, now let b2evolution do the rest! :)
-				require $basepath.$core_subdir.'_blog_main.inc.php';
-				break;
-
-			case 'stub':
-				// Access through stub file
-				require $edited_Blog->get('dynfilepath');
-		}
-		$page = ob_get_contents();
-		ob_end_clean();
-		unset( $generating_static );
-
-		// Switch back to saved locale (the blog page may have changed it):
-		locale_activate( $static_gen_saved_locale);
-
-		$staticfilename = $edited_Blog->get('staticfilepath');
-
-		if( ! ($fp = @fopen( $staticfilename, 'w' )) )
-		{ // could not open file
-			?>
-			<div class="error">
-				<p class="error"><?php echo T_('File cannot be written!') ?></p>
-				<p><?php printf( '<p>'.T_('You should check the file permissions for [%s]. See <a %s>online manual on file permissions</a>.').'</p>',$staticfilename, 'href="http://b2evolution.net/man/install/file_permissions.html"' ); ?></p>
-			</div>
-			<?php
-		}
-		else
-		{ // file writing OK
-			printf( '<p>'.T_('Writing to file [%s]...').'</p>', $staticfilename );
-			fwrite( $fp, $page );
-			fclose( $fp );
-
-			echo '<p>'.T_('Done.').'</p>';
-		}
-		?>
-		</div>
-		<?php
-		break;
-
 	default:
 		// List the blogs:
 		require dirname(__FILE__).'/_blogs_list.php';
@@ -564,6 +551,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.47  2006/01/25 19:16:54  blueyed
+ * moved to 1-2-3-4 scheme, todo.
+ *
  * Revision 1.46  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
