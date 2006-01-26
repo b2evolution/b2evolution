@@ -371,6 +371,8 @@ class AbstractSettings
 
 	/**
 	 * Get a value {@link unserialize() unserialized}.
+
+fp>> what do we need this for?
 	 *
 	 * @param string,... the values for the column keys (depends on $this->colKeyNames
 	 *                   and must match its count and order)
@@ -655,6 +657,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.29  2006/01/26 19:27:58  fplanque
+ * no message
+ *
  * Revision 1.28  2006/01/22 22:41:12  blueyed
  * Added get_unserialized().
  *

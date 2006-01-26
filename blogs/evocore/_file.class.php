@@ -119,7 +119,7 @@ class File extends DataObject
 	 *
 	 * This is useful to refer to files in hidden form fields, but might be replaced by the root_ID+relpath.
 	 *
-	 * @todo fplanque>> the purpose of this thing isn't very clear... get rid of it?
+	 * @todo fplanque>> get rid of it
 	 *
 	 * @var string
 	 * @see get_md5_ID()
@@ -1338,6 +1338,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.61  2006/01/26 19:27:58  fplanque
+ * no message
+ *
  * Revision 1.60  2006/01/20 16:40:56  blueyed
  * Cleanup
  *

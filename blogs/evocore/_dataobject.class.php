@@ -191,7 +191,7 @@ class DataObject
 		}
 
 		if( $Plugins )
-		{
+		{	// Note: this event is most probably overkill.
 			$Plugins->trigger_event( 'AfterDataObjectUpdate', $params = array(
 					'DataObject' => & $this,
 					'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
@@ -284,7 +284,7 @@ class DataObject
 		$this->dbchanges = array();
 
 		if( $Plugins )
-		{
+		{	// Note: this event is most probably overkill.
 			$Plugins->trigger_event( 'AfterDataObjectInsert', $params = array(
 					'DataObject' => & $this,
 					'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
@@ -360,7 +360,7 @@ class DataObject
 		}
 
 		if( $Plugins )
-		{
+		{	// Note: this event is most probably overkill.
 			$Plugins->trigger_event( 'AfterDataObjectDelete', $params = array(
 					'DataObject' => & $this,
 					'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
@@ -672,6 +672,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2006/01/26 19:27:58  fplanque
+ * no message
+ *
  * Revision 1.37  2006/01/23 01:06:49  blueyed
  * Extra check if $Plugins exist before triggering events.
  *

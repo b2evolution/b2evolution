@@ -1270,7 +1270,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 	}
 
 	// minimum length: http://az.fr/
-	// TODO: fails on "http://blogs" (without trailing slash)
+	// TODO: fails on "http://blogs" (without trailing slash)  fp>> yes, "blogs" is not a valid domain name, allowing this could cause all sorts of unexpected problems
 	if( strlen($url) < 13 )
 	{ // URL too short!
 		$Debuglog->add( 'URL &laquo;'.$url.';&raquo; is too short!', 'error' );
@@ -1279,6 +1279,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 
 	// Validate URL structure
 	// NOTE: this causes the most problems with this function!
+	// fp>> we should probably go back to a very laxist scheme here... :(
 	if( ! preg_match('~^                # start
 		([a-z][a-z0-9+.\-]*):[0-9]*       # scheme
 		//                                # authority absolute URLs only
@@ -1532,6 +1533,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
  *                     decide if we want a backtrace and whole debug_info.
  * @param string This gets output at the very end (after backtrace and last words)
  * @param string Include function backtrace if outputting debug_info()?
+fp>> what's a good reason to die without a backtrace? Dying means there is a severe error! (If there is no error, it's called "exiting") If debug is on, why not display as much info about the error as we can?
  */
 function debug_die( $last_words = '', $force = NULL, $very_last = '</body></html>', $include_backtrace = true )
 {
@@ -2460,7 +2462,7 @@ function get_field_attribs_as_string( $field_attribs )
 
 
 /**
- * Is the current page a admin/backoffice page?
+ * Is the current page an admin/backoffice page?
  *
  * @return boolean
  */
@@ -2477,6 +2479,9 @@ function is_admin_page()
 
 /*
  * $Log$
+ * Revision 1.174  2006/01/26 19:27:58  fplanque
+ * no message
+ *
  * Revision 1.173  2006/01/25 19:19:17  blueyed
  * Fixes for blogurl handling. Thanks to BenFranske for pointing out the biggest issue (http://forums.b2evolution.net/viewtopic.php?t=6844)
  *

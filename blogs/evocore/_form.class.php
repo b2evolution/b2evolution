@@ -1157,7 +1157,7 @@ class Form extends Widget
 			echo '<script type="text/javascript">addEvent( window, "load", init_check_all, false )</script>' ;
 		}
 
-		// Reset (in case we re-use begin_form!)
+		// Reset (in case we re-use begin_form! NOTE: DO NOT REUSE begin_form, it's against the spec.)
 		$this->hiddens = array();
 
 		return $this->display_or_return( $r );
@@ -2349,6 +2349,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.100  2006/01/26 19:27:58  fplanque
+ * no message
+ *
  * Revision 1.99  2006/01/22 21:18:58  blueyed
  * get_valid_id(): fix for "array[]" type names.
  *

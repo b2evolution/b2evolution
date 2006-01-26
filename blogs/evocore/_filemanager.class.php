@@ -150,6 +150,7 @@ class FileManager extends Filelist
 	/**
 	 * These are variables that get considered when regenerating an URL
 	 *
+	 * @todo get rid of this and use regenerate_url()
 	 * @param array URL param => member name
 	 * @access private
 	 */
@@ -1287,6 +1288,7 @@ class FileManager extends Filelist
 
 	/**
 	 * Rename a File object physically
+fp>> STOP adding features to this lousy Fileman class. All this hould be direclty un files.php
 	 *
 	 * @param File The source file
 	 * @param string The new name
@@ -1365,6 +1367,9 @@ class FileManager extends Filelist
 
 /*
  * $Log$
+ * Revision 1.76  2006/01/26 19:27:58  fplanque
+ * no message
+ *
  * Revision 1.75  2006/01/20 00:39:17  blueyed
  * Refactorisation/enhancements to filemanager.
  *

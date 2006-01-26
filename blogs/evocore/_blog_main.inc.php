@@ -317,7 +317,7 @@ if( !empty($tempskin) )
 
 // Let's check if a skin has been forced in the stub file:
 // Note: URL skin requests are handled with param() 20 lines below
-// Note: with "register_globals = On" this may be set from URL..
+// Note: with "register_globals = On" this may be set from URL.. (in which case the code 20 line sbelow becomes useless)
 if( !isset( $skin ) )
 { // No skin forced in stub (not even '' for no-skin)...
 	$Debuglog->add( 'No skin forced.', 'skin' );
@@ -410,6 +410,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.43  2006/01/26 19:27:58  fplanque
+ * no message
+ *
  * Revision 1.42  2006/01/25 19:19:17  blueyed
  * Fixes for blogurl handling. Thanks to BenFranske for pointing out the biggest issue (http://forums.b2evolution.net/viewtopic.php?t=6844)
  *
