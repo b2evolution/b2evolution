@@ -60,9 +60,11 @@ require_once dirname(__FILE__).'/evocore/_main.inc.php';
 		blog_list_iteminfo( 'shortdesc', 'htmlattr');
 		echo '">';
 		blog_list_iteminfo( 'name', 'htmlbody');
-		echo '</a></strong> &nbsp; (';
-		blog_list_iteminfo( 'stub', 'raw');
-		echo ')';
+		echo '</a></strong>&nbsp; ';
+		if( $l_stub = blog_list_iteminfo( 'stub', false) )
+		{
+			echo '('.$l_stub.')';
+		}
 		echo '</li>';
 	}
 	// ---------------------------------- END OF BLOG LIST ---------------------------------
