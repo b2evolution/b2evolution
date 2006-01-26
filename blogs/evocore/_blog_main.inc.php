@@ -150,6 +150,7 @@ if( $resolve_extra_path )
 {
 	// Check and Remove blog base URI from ReqPath:
 	$blog_baseuri = substr( $Blog->get('baseurl'), strlen( $Blog->get('baseurlroot') ) );
+	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
 	if( ($pos = strpos( $ReqPath, $blog_baseuri )) !== false )
 	{ // note: $pos will typically be 0
@@ -410,6 +411,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.44  2006/01/26 21:27:21  blueyed
+ * add debug
+ *
  * Revision 1.43  2006/01/26 19:27:58  fplanque
  * no message
  *
