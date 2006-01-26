@@ -63,7 +63,7 @@ class Request
 	 * of the fields where the error occurred.
 	 * @var boolean
 	 */
-	var $link_log_messages_to_field_IDs = false;
+	var $link_log_messages_to_field_IDs = true;
 
 
 	/**
@@ -765,6 +765,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.31  2006/01/26 21:20:24  blueyed
+ * Default for $link_log_messages_to_field_IDs changed to true, adding better usability for form errors.
+ *
  * Revision 1.30  2006/01/20 16:40:56  blueyed
  * Cleanup
  *
