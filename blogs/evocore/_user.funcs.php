@@ -238,9 +238,20 @@ function user_admin_link( $before = '', $after = '', $page = '', $link_text = ''
 
 
 /**
- * Template tag: Provide a link to user profile
+ * Template tag: Display a link to user profile
  */
 function user_profile_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+{
+	echo get_user_profile_link( $before, $after, $link_text, $link_title );
+}
+
+
+/**
+ * Template tag: Get a link to user profile
+ *
+ * @return string|false
+ */
+function get_user_profile_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
 	global $current_User, $pagenow, $Blog;
 
@@ -252,12 +263,14 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
 	if( $link_text == '' ) $link_text = T_('Profile (%s)');
 	if( $link_title == '#' ) $link_title = T_('Edit your profile');
 
-	echo $before;
-	echo '<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=profile&amp;redirect_to='.rawurlencode(regenerate_url()) )
-			.'" title="', $link_title, '">';
-	printf( $link_text, $current_User->login );
-	echo '</a>';
-	echo $after;
+	$r = $before
+		.'<a href="'.url_add_param( $Blog->dget( 'blogurl', 'raw' ), 'disp=profile&amp;redirect_to='.rawurlencode(regenerate_url()) )
+		.'" title="'.$link_title.'">'
+		.sprintf( $link_text, $current_User->login )
+		.'</a>'
+		.$after;
+
+	return $r;
 }
 
 
@@ -414,6 +427,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.38  2006/01/26 20:58:16  blueyed
+ * Added get_user_profile_link()
+ *
  * Revision 1.37  2006/01/15 19:05:36  blueyed
  * user_admin_link(): empty default for $page, so that /admin/index.php gets respected.
  *
