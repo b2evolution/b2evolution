@@ -185,7 +185,6 @@ function set_edited_Blog_from_params( $for )
 }
 
 
-// page title
 switch( $action )
 {
 	case 'new':
@@ -551,6 +550,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.48  2006/01/26 20:37:57  blueyed
+ * minor
+ *
  * Revision 1.47  2006/01/25 19:16:54  blueyed
  * moved to 1-2-3-4 scheme, todo.
  *
