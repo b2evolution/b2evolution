@@ -1968,6 +1968,9 @@ class Plugins
 
 				break;
 
+			case 'password':
+				$params['type'] = 'password'; // same as text input, but type=password
+
 			case 'text':
 				// Default: "text input"
 				if( isset($set_meta['size']) )
@@ -2024,6 +2027,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.38  2006/01/26 23:47:27  blueyed
+ * Added password settings type.
+ *
  * Revision 1.37  2006/01/26 23:08:36  blueyed
  * Plugins enhanced.
  *

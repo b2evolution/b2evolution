@@ -242,7 +242,7 @@ class Plugin
 	 *   'defaultvalue' (default value, defaults to '')
 	 *   'note' (gets displayed as a note to the param field),
 	 *   'size', 'maxlength' (html input field attributes),
-	 *   'type' ('checkbox', 'textarea', 'text' (default)),
+	 *   'type' ('checkbox', 'textarea', 'password', 'array', 'text' (default)),
 	 *   'rows' (number of rows for type=='textarea'),
 	 *   'cols' (number of cols for type=='textarea'),
 	 *   'valid_pattern' (a regular expression pattern that the value must match)
@@ -1001,6 +1001,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.21  2006/01/26 23:47:27  blueyed
+ * Added password settings type.
+ *
  * Revision 1.20  2006/01/26 23:08:36  blueyed
  * Plugins enhanced.
  *
