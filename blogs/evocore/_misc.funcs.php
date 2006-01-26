@@ -1533,7 +1533,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
  *                     decide if we want a backtrace and whole debug_info.
  * @param string This gets output at the very end (after backtrace and last words)
  * @param string Include function backtrace if outputting debug_info()?
-fp>> what's a good reason to die without a backtrace? Dying means there is a severe error! (If there is no error, it's called "exiting") If debug is on, why not display as much info about the error as we can?
+ *               (used in DB class when we already have the backtrace for the mysql error)
  */
 function debug_die( $last_words = '', $force = NULL, $very_last = '</body></html>', $include_backtrace = true )
 {
@@ -2479,6 +2479,9 @@ function is_admin_page()
 
 /*
  * $Log$
+ * Revision 1.175  2006/01/26 19:37:25  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.174  2006/01/26 19:27:58  fplanque
  * no message
  *
