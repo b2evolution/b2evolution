@@ -1149,7 +1149,7 @@ class Form extends Widget
 
 		// When the page loads, Initialize all the parent child select lists
 		$r .= '<script type="text/javascript">
-							addEvent( window, "load", init_dynamicSelect, false );
+							if( addEvent ) { addEvent( window, "load", init_dynamicSelect, false ); }
 						</script>';
 
 		if( $this->check_all )
@@ -2349,6 +2349,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.102  2006/01/26 22:42:44  blueyed
+ * end_form(): check for existence of JS addEvent().
+ *
  * Revision 1.101  2006/01/26 20:27:45  blueyed
  * minor
  *
