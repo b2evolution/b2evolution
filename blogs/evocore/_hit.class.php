@@ -405,7 +405,7 @@ class Hit
 
 		if( $this->referer_type == 'referer' && $Settings->get('hit_doublecheck_referer') )
 		{
-			if( !$debug_no_register_shutdown && function_exists( 'register_shutdown_function' ) )
+			if( empty($debug_no_register_shutdown) && function_exists( 'register_shutdown_function' ) )
 			{ // register it as a shutdown function, because it will be slow!
 				$Debuglog->add( 'log(): double-check: loading referering page.. (register_shutdown_function())', 'hit' );
 				register_shutdown_function( array( &$this, 'double_check_referer' ) ); // this will also call _record_the_hit()

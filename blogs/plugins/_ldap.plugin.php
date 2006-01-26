@@ -177,7 +177,7 @@ class ldap_plugin extends Plugin
 			}
 			$this->debug_log( 'Connected to server &laquo;'.$l_set['server'].'&raquo;..' );
 
-			$ldap_rdn = sprintf( $l_set['rdn'], $params['login'] );
+			$ldap_rdn = str_replace( '%s', $params['login'], $l_set['rdn'] );
 			$this->debug_log( 'Using rdn &laquo;'.$ldap_rdn.'&raquo;..' );
 
 			if( !@ldap_bind($ldap_conn, $ldap_rdn, $params['pass']) )
@@ -192,7 +192,7 @@ class ldap_plugin extends Plugin
 			$search_result = ldap_search(
 					$ldap_conn,
 					$l_set['base_dn'],
-					sprintf( $l_set['search_filter'], $params['login'] ) );
+					str_replace( '%s', $params['login'], $l_set['search_filter'] ) );
 
 			$search_info = ldap_get_entries($ldap_conn, $search_result);
 
@@ -273,7 +273,7 @@ class ldap_plugin extends Plugin
 						{ // we want to create a new group matching the assign-by info
 							$this->debug_log( 'Group with that name does not exist yet.' );
 
-							if( $new_Group = $GroupCache->get_by_name($this->template_group_name_for_unmatched_assign) ) // COPY!
+							if( $new_Group = $GroupCache->get_by_name( $this->template_group_name_for_unmatched_assign, false ) ) // COPY!! and do not halt on error
 							{ // take a copy of the Group to use as template
 								$this->debug_log( 'Using Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; as template.' );
 								$new_Group->set( 'ID', 0 ); // unset ID (to allow inserting)

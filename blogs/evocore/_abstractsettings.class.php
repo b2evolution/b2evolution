@@ -122,7 +122,7 @@ class AbstractSettings
 	function AbstractSettings( $dbTableName, $colKeyNames, $colValueName, $cacheByColKeys = 0 )
 	{
 		global $DB;
-		$this->DB =& $DB;
+		$this->DB = & $DB;
 
 		$this->dbTableName = $dbTableName;
 		$this->colKeyNames = $colKeyNames;
@@ -188,7 +188,7 @@ class AbstractSettings
 
 				if( !is_array( $testCache )
 						|| !isset( $testCache[$getArgs[$i]] )
-						|| !($testCache =& $testCache[$getArgs[$i]]) )
+						|| !($testCache = & $testCache[$getArgs[$i]]) )
 				{
 					break;
 				}
@@ -215,7 +215,7 @@ class AbstractSettings
 		switch( $this->count_colKeyNames )
 		{
 			case 1:
-				if( !$result )
+				if( ! $result )
 				{ // Remember that we've tried it
 					$this->cache[ $getArgs[0] ] = NULL;
 				}
@@ -228,7 +228,7 @@ class AbstractSettings
 				break;
 
 			case 2:
-				if( !$result )
+				if( ! $result )
 				{ // Remember that we've tried it
 					$this->cache[ $getArgs[0] ][ $getArgs[1] ] = NULL;
 				}
@@ -241,7 +241,7 @@ class AbstractSettings
 				break;
 
 			case 3:
-				if( !$result )
+				if( ! $result )
 				{ // Remember that we've tried it
 					$this->cache[ $getArgs[0] ][ $getArgs[1] ][ $getArgs[2] ] = NULL;
 				}
@@ -350,12 +350,12 @@ class AbstractSettings
 	 *               and must match its count and order)
 	 * @return boolean true on success (variable was set), false if not
 	 */
-	function get_cond( &$toset )
+	function get_cond( & $toset )
 	{
 		$args = func_get_args();
 		array_shift( $args );
 
-		$result = call_user_func_array( array( &$this, 'get' ), $args );
+		$result = call_user_func_array( array( & $this, 'get' ), $args );
 
 		if( $result !== NULL && $result !== false )
 		{ // No error and value retrieved
@@ -371,8 +371,9 @@ class AbstractSettings
 
 	/**
 	 * Get a value {@link unserialize() unserialized}.
-
-fp>> what do we need this for?
+	 *
+	 * A simple method to get serialized data from the settings table. The Plugin Settings handling
+	 * makes use of it.
 	 *
 	 * @param string,... the values for the column keys (depends on $this->colKeyNames
 	 *                   and must match its count and order)
@@ -383,7 +384,7 @@ fp>> what do we need this for?
 	{
 		$args = func_get_args();
 		if( count($this->colKeyNames) == (count($args)+1) )
-		{
+		{ // no default as last param
 			$default = NULL;
 		}
 		else
@@ -391,7 +392,7 @@ fp>> what do we need this for?
 			$default = array_pop( $args );
 		}
 
-		$result = call_user_func_array( array( &$this, 'get' ), $args );
+		$result = call_user_func_array( array( & $this, 'get' ), $args );
 
 		if( $result !== NULL && $result !== false )
 		{ // No error and value retrieved
@@ -430,15 +431,15 @@ fp>> what do we need this for?
 		switch( $this->count_colKeyNames )
 		{
 			case 1:
-				$atCache =& $this->cache[ $args[0] ];
+				$atCache = & $this->cache[ $args[0] ];
 				break;
 
 			case 2:
-				$atCache =& $this->cache[ $args[0] ][ $args[1] ];
+				$atCache = & $this->cache[ $args[0] ][ $args[1] ];
 				break;
 
 			case 3:
-				$atCache =& $this->cache[ $args[0] ][ $args[1] ][ $args[2] ];
+				$atCache = & $this->cache[ $args[0] ][ $args[1] ][ $args[2] ];
 				break;
 
 			default:
@@ -474,7 +475,7 @@ fp>> what do we need this for?
 	{
 		foreach( $array as $lSet )
 		{
-			call_user_func_array( array( &$this, 'set' ), $lSet );
+			call_user_func_array( array( & $this, 'set' ), $lSet );
 		}
 	}
 
@@ -491,15 +492,15 @@ fp>> what do we need this for?
 		switch( $this->count_colKeyNames )
 		{
 			case 1:
-				$atCache =& $this->cache[ $args[0] ];
+				$atCache = & $this->cache[ $args[0] ];
 				break;
 
 			case 2:
-				$atCache =& $this->cache[ $args[0] ][ $args[1] ];
+				$atCache = & $this->cache[ $args[0] ][ $args[1] ];
 				break;
 
 			case 3:
-				$atCache =& $this->cache[ $args[0] ][ $args[1] ][ $args[2] ];
+				$atCache = & $this->cache[ $args[0] ][ $args[1] ][ $args[2] ];
 				break;
 
 			default:
@@ -521,7 +522,7 @@ fp>> what do we need this for?
 	{
 		foreach( $array as $lDel )
 		{
-			call_user_func_array( array( &$this, 'delete' ), $lDel );
+			call_user_func_array( array( & $this, 'delete' ), $lDel );
 		}
 	}
 
@@ -553,7 +554,6 @@ fp>> what do we need this for?
 		{
 			return false;
 		}
-
 
 		$query_insert = array();
 		$query_where_delete = array();
@@ -657,8 +657,8 @@ fp>> what do we need this for?
 
 /*
  * $Log$
- * Revision 1.29  2006/01/26 19:27:58  fplanque
- * no message
+ * Revision 1.30  2006/01/26 20:27:45  blueyed
+ * minor
  *
  * Revision 1.28  2006/01/22 22:41:12  blueyed
  * Added get_unserialized().

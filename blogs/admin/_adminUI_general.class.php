@@ -658,7 +658,7 @@ class AdminUI_general
 	 */
 	function get_selected( $path )
 	{
-		$node =& $this->get_node_by_path($path);
+		$node = & $this->get_node_by_path($path);
 
 		if( isset($node['selected']) )
 		{
@@ -993,10 +993,9 @@ class AdminUI_general
 
 
 	/**
-	 * Set $pathKey as the $nr'th path key.
-fp>> Please describe this better
+	 * Set a path (that the user has chosen) by number ($nr) to $pathKey.
 	 *
-	 * Also marks the parent node as selected.
+	 * This also marks the parent node as selected.
 	 *
 	 * @param integer|NULL Numerical index of the path, NULL means 'append'.
 	 * @param array Either the key of the path or an array(keyname, propsArray).
@@ -1010,13 +1009,13 @@ fp>> Please describe this better
 		{ // append
 			$nr = count($this->path);
 		}
-		if( $nr === 0 )
+		if( $nr == 0 )
 		{
-			$parentNode =& $this->get_node_by_path(NULL);
+			$parentNode = & $this->get_node_by_path(NULL);
 		}
 		else
 		{
-			$parentNode =& $this->get_node_by_path($this->get_path_range( 0, $nr-1 ));
+			$parentNode = & $this->get_node_by_path($this->get_path_range( 0, $nr-1 ));
 		}
 		$parentNode['selected'] = $pathKey;
 
@@ -1045,7 +1044,7 @@ fp>> Please describe this better
 		$search_path = $this->path;
 		$search_path[] = $path;
 		// auto-detect path props from menu entries
-		if( $node =& $this->get_node_by_path( $search_path ) )
+		if( $node = & $this->get_node_by_path( $search_path ) )
 		{
 			$pathProps = array_merge( $pathProps, $node );
 		}
@@ -1088,7 +1087,7 @@ fp>> Please describe this better
 				$pathProps = array();
 			}
 
-			if( $node =& $this->get_node_by_path( array_merge( $prevPath, array($pathName) ) ) )
+			if( $node = & $this->get_node_by_path( array_merge( $prevPath, array($pathName) ) ) )
 			{ // the node exists in the menu entries: merge the properties
 				$pathProps = array_merge( $node, $pathProps );
 			}
@@ -1177,7 +1176,7 @@ fp>> Please describe this better
 
 
 	/**
-	 * Checks if {@link the $current_User} has needed perms on an menu entry.
+	 * Checks if {@link $current_User the current User} has needed perms on an menu entry.
 	 *
 	 * @param array Path properties: An array, where 'perm_name' and/or 'perm_eval' might be set.
 	 *              'perm_level' (used with 'perm_name') defaults to 'any' if not given.
@@ -1190,18 +1189,15 @@ fp>> Please describe this better
 		$perm = true;
 
 		if( isset($perminfo['perm_name']) )
-		{	// COMMENT!!!????!!!!????
+		{ // 'perm_name' given, check it together with 'perm_level' (which defaults to 'any')
 			$perm_level = isset( $perminfo['perm_level'] ) ? $perminfo['perm_level'] : 'any';
 
 			$perm = $current_User->check_perm( $perminfo['perm_name'], $perm_level );
 		}
 
-		if( $perm )
-		{	// COMMENT!!!????!!!!????
-			if( isset($loop_details['perm_eval']) )
-			{	// COMMENT!!!????!!!!????
-				$perm = eval($loop_details['perm_eval']);
-			}
+		if( $perm && isset($loop_details['perm_eval']) )
+		{ // only check for 'perm_eval' if perms still granted
+			$perm = eval($loop_details['perm_eval']);
 		}
 
 		return $perm;
@@ -1211,6 +1207,9 @@ fp>> Please describe this better
 
 /*
  * $Log$
+ * Revision 1.46  2006/01/26 20:27:45  blueyed
+ * minor
+ *
  * Revision 1.45  2006/01/25 18:24:21  fplanque
  * hooked bozo validator in several different places
  *

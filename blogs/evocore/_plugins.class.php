@@ -782,6 +782,10 @@ class Plugins
 	 * Sets the Plugin's code to its default if the current code is empty and the Plugin's class
 	 * has a default code that is not in use by another Plugin.
 	 *
+	 * When a Plugin has been installed several times and the one "blocking" the default code
+	 * got uninstalled, the code is free and gets assigned here to one of the other Plugin
+	 * instances.
+	 *
 	 * @return boolean true if the code has been "fixed", false if not
 	 */
 	function set_empty_code_to_default( & $Plugin )
@@ -829,9 +833,9 @@ class Plugins
 			require_once dirname(__FILE__).'/_pluginsettings.class.php';
 			$Plugin->Settings = & new PluginSettings( $Plugin->ID );
 
-			foreach( $defaults as $l_name => $l_value )
+			foreach( $defaults as $l_name => $l_meta )
 			{
-				$Plugin->Settings->_defaults[$l_name] = $l_value['defaultvalue'];
+				$Plugin->Settings->_defaults[$l_name] = isset($l_meta['defaultvalue']) ? $l_meta['defaultvalue'] : '';
 			}
 
 			$this->call_method( $Plugin->ID, 'PluginSettingsInstantiated', $params = array() );
@@ -1731,6 +1735,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.36  2006/01/26 20:27:45  blueyed
+ * minor
+ *
  * Revision 1.35  2006/01/25 23:37:57  blueyed
  * bugfixes
  *

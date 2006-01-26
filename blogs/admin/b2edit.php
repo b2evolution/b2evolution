@@ -117,7 +117,7 @@ switch($action)
 		// Generate available blogs list:
 		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_post_statuses', 'any', $pagenow.'?blog=%d', NULL, '',
 												( blog_has_cats( $blog ) ? 'return edit_reload(this.ownerDocument.forms.namedItem(\'item_checkchanges\'), %d )'
-												: '' /* Current blog has no cats, we can't be posting */ ), 'swicth_to_%d_nocheckchanges' );
+												: '' /* Current blog has no cats, we can't be posting */ ), 'switch_to_%d_nocheckchanges' );
 		// TODO: edit_reload params handling is far from complete..
 
 		if( !$blog )

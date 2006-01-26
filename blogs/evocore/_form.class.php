@@ -2164,7 +2164,7 @@ class Form extends Widget
 			{
 				$this->_generated_id_count = 0;
 			}
-			return substr( $id, 0, -2 ).'_A'.(++$this->_generated_id_count);
+			$id = substr( $id, 0, -2 ).'_A'.(++$this->_generated_id_count);
 		}
 		return str_replace( array( '[', ']' ), '_', $id );
 	}
@@ -2349,8 +2349,8 @@ class Form extends Widget
 
 /*
  * $Log$
- * Revision 1.100  2006/01/26 19:27:58  fplanque
- * no message
+ * Revision 1.101  2006/01/26 20:27:45  blueyed
+ * minor
  *
  * Revision 1.99  2006/01/22 21:18:58  blueyed
  * get_valid_id(): fix for "array[]" type names.
