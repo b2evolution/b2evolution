@@ -933,14 +933,14 @@ class Filelist
 		{
 			foreach( $this->_order_index as $index )
 			{
-				$r[] =& $this->_entries[ $index ]->$method();
+				$r[] = $this->_entries[ $index ]->$method();
 			}
 		}
 		else
 		{
 			foreach( $this->_order_index as $index )
 			{
-				$r[] =& $this->_entries[ $index ];
+				$r[] = & $this->_entries[ $index ];
 			}
 		}
 
@@ -1016,6 +1016,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.49  2006/01/26 19:26:51  fplanque
+ * fixed notice
+ *
  * Revision 1.48  2006/01/20 16:40:56  blueyed
  * Cleanup
  *
