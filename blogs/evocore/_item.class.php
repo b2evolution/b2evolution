@@ -587,6 +587,7 @@ class Item extends DataObject
 	 * Template function: Display the main blog name.
 	 *
 	 * @todo is it possible to use $Item->getBlog()->name() instead? (we can't possibly duplicate all sub-object functions here!!!)
+	 *       blueyed>> not with PHP4
 	 * @param string Output format. See {@link format_to_output()}.
 	 */
 	function blog_name( $format = 'htmlbody' )
@@ -685,11 +686,15 @@ class Item extends DataObject
 
 
 	/**
-	 * Check if user can see comments on this post
+	 * Check if user can see comments on this post, which he cannot if they
+	 * are disabled for the Item or never allowed for the blog.
+	 *
+	 * @return boolean
 	 */
 	function can_see_comments()
 	{
-		if( $this->comments == 'disabled'  )
+		if( $this->comments == 'disabled'
+		    || ( $this->getBlog() && $this->Blog->allowcomments == 'never' ) )
 		{ // Comments are disabled on this post
 			return false;
 		}
@@ -2293,8 +2298,8 @@ class Item extends DataObject
 
 /*
  * $Log$
- * Revision 1.88  2006/01/25 15:55:29  fplanque
- * no message
+ * Revision 1.89  2006/01/26 20:09:58  blueyed
+ * Fix for comments visibility. Thanks to jbettis (http://forums.b2evolution.net/viewtopic.php?p=32435)
  *
  * Revision 1.87  2006/01/16 00:45:19  blueyed
  * Item::content() extra check for "$disppage < 1".
@@ -2305,20 +2310,11 @@ class Item extends DataObject
  * Revision 1.85  2006/01/10 20:59:49  fplanque
  * minor / fixed internal sync issues @ progidistri
  *
- * Revision 1.84  2006/01/09 17:21:06  fplanque
- * no message
- *
  * Revision 1.83  2006/01/06 18:58:08  blueyed
  * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
  *
- * Revision 1.82  2006/01/04 20:35:14  fplanque
- * no message
- *
  * Revision 1.81  2005/12/30 21:39:03  blueyed
  * fix/todo
- *
- * Revision 1.80  2005/12/30 18:08:24  fplanque
- * no message
  *
  * Revision 1.79  2005/12/22 23:13:40  blueyed
  * Plugins' API changed and handling optimized

@@ -1,7 +1,7 @@
 <?php
 	/**
 	 * This is the template that displays the feedback for a post
-	 * (comments, trackbak, pingback...)
+	 * (comments, trackback, pingback...)
 	 *
 	 * This file is not meant to be called directly.
 	 * It is meant to be called by an include in the _main.php template.
@@ -60,23 +60,31 @@
 		}
 		?>
 		<a name="comments"></a>
-	<?php }
-	if( $disp_trackbacks ) {
+		<?php
+	}
+	if( $disp_trackbacks )
+	{
 		$type_list[] = "'trackback'";
 		$disp_title[] = T_("Trackbacks"); ?>
 		<a name="trackbacks"></a>
-	<?php }
-	if( $disp_pingbacks ) {
+		<?php
+	}
+	if( $disp_pingbacks )
+	{
 		$type_list[] = "'pingback'";
 		$disp_title[] = T_("Pingbacks"); ?>
 		<a name="pingbacks"></a>
-	<?php } ?>
+		<?php
+	}
 
-	<?php if( $disp_trackback_url )
-	{	// We want to display the trackback URL: ?>
-	<h4><?php echo T_('Trackback address for this post:') ?></h4>
-	<code><?php $Item->trackback_url() ?></code>
-	<?php } ?>
+	if( $disp_trackback_url )
+	{ // We want to display the trackback URL:
+		?>
+		<h4><?php echo T_('Trackback address for this post:') ?></h4>
+		<code><?php $Item->trackback_url() ?></code>
+		<?php
+	}
+	?>
 
 	<?php
 	if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
@@ -87,7 +95,7 @@
 	<h4><?php echo implode( ", ", $disp_title) ?>:</h4>
 
 	<?php
-	$CommentList = & new CommentList( 0, implode(',', $type_list), array(), $id, '', 'ASC' );
+	$CommentList = & new CommentList( 0, implode(',', $type_list), array(), $Item->ID, '', 'ASC' );
 
 	$CommentList->display_if_empty(
 								'<div class="bComment"><p>' .

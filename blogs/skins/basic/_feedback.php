@@ -88,7 +88,7 @@
 	<h4><?php echo implode( ", ", $disp_title) ?>:</h4>
 
 	<?php
-	$CommentList = & new CommentList( 0, implode(',', $type_list), array(), $id, '', 'ASC' );
+	$CommentList = & new CommentList( 0, implode(',', $type_list), array(), $Item->ID, '', 'ASC' );
 
 	$CommentList->display_if_empty(
 								'<p>' .
