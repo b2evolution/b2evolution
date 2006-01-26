@@ -492,6 +492,7 @@ $locales_dirout = '../';                 // Relative path to go back to base
  */
 $plugins_subdir = 'plugins/';            // Subdirectory relative to base
 $plugins_dirout = '../';                 // Relative path to go back to base
+$plugins_url = $baseurl.$plugins_subdir; // You should not need to change this
 /**
  * Location of the install folder.
  * @global string $install_subdir
@@ -538,10 +539,13 @@ $force_regexp_dirname = '';
 
 /**
  * Set this to 1 to disable using PHP's register_shutdown_function(),
- * but not everywhere (Session saving is done always at the end).
+ * but not everywhere.
  *
  * This is NOT recommened, because it affects things that should be done after delivering the page.
- * fp>> What exactly does this disable and what exactly does it NOT disable?
+ *
+ * Currently, it disables using register_shutdown_function() for hit_doublecheck_referer
+ * ({@link Hit::log()), but not for {@link Session::dbsave()}.
+ *
  * @global int $debug_no_register_shutdown
  */
 $debug_no_register_shutdown = 0;
