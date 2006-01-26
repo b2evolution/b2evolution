@@ -703,6 +703,11 @@ function upgrade_b2evo_tables()
 		             WHERE bloggroup_group_ID = 1' );
 		echo "OK.<br />\n";
 
+		echo 'Altering Comments table... ';
+		$DB->query( 'ALTER TABLE T_comments
+		             ADD COLUMN comment_spam_karma TINYINT UNSIGNED NULL AFTER comment_karma' );
+		echo "OK.<br />\n";
+
 		if( $old_db_version >= 9000 )
 		{ // Uninstall all ALPHA (potentially incompatible) plugins
 			// TODO !!!
@@ -773,6 +778,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.120  2006/01/26 22:43:58  blueyed
+ * Added comment_spam_karma field
+ *
  * Revision 1.119  2006/01/06 18:58:09  blueyed
  * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
  *

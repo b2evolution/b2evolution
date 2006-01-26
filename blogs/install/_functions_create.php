@@ -241,6 +241,7 @@ function create_b2evo_tables()
 		comment_date datetime NOT NULL,
 		comment_content text NOT NULL,
 		comment_karma int(11) NOT NULL default '0',
+		comment_spam_karma TINYINT UNSIGNED NULL,
 		PRIMARY KEY comment_ID (comment_ID),
 		KEY comment_post_ID (comment_post_ID),
 		KEY comment_date (comment_date),
@@ -1352,6 +1353,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.170  2006/01/26 22:43:58  blueyed
+ * Added comment_spam_karma field
+ *
  * Revision 1.169  2006/01/06 18:58:09  blueyed
  * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
  *
