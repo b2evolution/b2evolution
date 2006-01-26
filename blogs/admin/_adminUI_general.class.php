@@ -455,6 +455,10 @@ class AdminUI_general
 	 */
 	function disp_payload_begin()
 	{
+		global $Plugins;
+
+		$Plugins->trigger_event( 'AdminBeginPayload' );
+
 		// Display submenu (this also opens a div class="panelblock" or class="panelblocktabs")
 		$this->disp_submenu();
 	}
@@ -1207,6 +1211,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.47  2006/01/26 23:08:35  blueyed
+ * Plugins enhanced.
+ *
  * Revision 1.46  2006/01/26 20:27:45  blueyed
  * minor
  *

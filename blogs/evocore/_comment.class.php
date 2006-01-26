@@ -630,12 +630,31 @@ class Comment extends DataObject
 
 			locale_restore_previous();
 		}
+	}
 
+
+	/**
+	 * Get karma and set it before adding the Comment to DB.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbinsert()
+	{
+		global $Plugins;
+
+		$spam_karma = $Plugins->trigger_karma_collect( 'GetKarmaForComment', array( 'Comment' => & $this ) );
+
+		$this->set( 'spam_karma', $spam_karma );
+
+		return parent::dbinsert();
 	}
 
 }
 /*
  * $Log$
+ * Revision 1.23  2006/01/26 23:08:35  blueyed
+ * Plugins enhanced.
+ *
  * Revision 1.22  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

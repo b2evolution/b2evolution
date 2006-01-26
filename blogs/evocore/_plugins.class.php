@@ -52,6 +52,8 @@ require_once dirname(__FILE__).'/_plugin.class.php';
  *
  * This is where you can plug-in some plugins :D
  *
+ * @todo Handle dependencies on other plugins or events. The {@link dnsbl_antispam_plugin} does this itself now.
+ * @todo A plugin might want to register allowed events that it triggers itself on installation..
  * @package evocore
  */
 class Plugins
@@ -146,7 +148,7 @@ class Plugins
 	 * A list of events that should not be allowed to be disabled in the backoffice.
 	 * @var array
 	 */
-	var $_supported_private_events = array( 'GetDefaultSettings', 'PluginSettingsInstantiated', 'Install', 'Uninstall' );
+	var $_supported_private_events = array( 'GetDefaultSettings', 'PluginSettingsInstantiated', 'AfterInstall', 'BeforeInstall', 'BeforeUninstall' );
 
 	/**#@-*/
 
@@ -190,25 +192,60 @@ class Plugins
 				'AdminDisplayToolbar' => '',
 				'AdminEndHtmlHead' => '',
 				'AdminAfterMenuInit' => '',
+				'AdminTabAction' => '',
+				'AdminTabPayload' => '',
 				'AdminToolAction' => '',
 				'AdminToolPayload' => '',
 
-				'CacheObjects' => '',
-				'CacheAnonContent' => '',
+				'AdminBeginPayload' => '',
 
-				'PluginSettingsInstantiated' => '', /* private / needs not description */
+				'CacheObjects' => T_('Cache data objects.'),
+				'CachePageContent' => T_('Cache page content.'),
+				'CacheIsCollectingContent' => T_('Gets asked for if we are generating cached content.'),
+
+				'AfterDataObjectDelete' => '',
+				'AfterDataObjectInsert' => '',
+				'AfterDataObjectUpdate' => '',
+
+				'PluginSettingsInstantiated' => '', /* private / needs no description */
+				'PluginSettingsBeforeSet' => T_("Called before setting a plugin's setting in the backoffice."),
+				'PluginSettingsEditAction' => T_("Called as action before editing the plugin's settings."),
 
 				'RenderItemAsHtml' => T_('Renders content when generated as HTML.'),
 				'RenderItemAsXml' => T_('Renders content when generated as XML.'),
 				'RenderItem' => T_('Renders content when not generated as HTML or XML.'),
 
+				/*
+				not used yet..
+				'DisplayItemAsHtml' => T_('Called on an item when it gets displayed as HTML.'),
+				'DisplayItemAsXml' => T_('Called on an item when it gets displayed as XML.'),
+				'DisplayItem' => T_('Called on an item when it gets not displayed as HTML or XML.'),
+				*/
+				'DisplayItemAllFormats' => T_('Called on an item when it gets displayed.'),
+
+				'ItemViewed' => T_('Called when the view counter of an item got increased.'),
+
+				'SkinTag' => '',
+
+				'DisplayCommentFormButton' => '',
+				'DisplayCommentFormFieldset' => '',
+
+				'CommentFormSent' => T_('Called when a comment form got submitted.'),
+
+				'GetKarmaForComment' => '',
+
+				'CaptchaValidated' => T_('Validate the test from CaptchaPayload to detect humans.'),
+				'CaptchaPayload' => T_('Provide a turing test to detect humans.'),
+				'CaptchaFormPayload' => '',
+				'CaptchaFormGetKarma' => '',
 
 				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
 				'GetDefaultSettings' => '',  /* private / needs not description */ // used to instantiate $Settings.
-				'Install' => '', /* private / needs not description */
+				'AfterInstall' => '', /* private / needs not description */
+				'AfterUninstall' => '', /* private / needs not description */
+				'BeforeInstall' => '', /* private / needs not description */
 				'LoginAttempt' => '',
 				'SessionLoaded' => '', // gets called after $Session is initialized, quite early.
-				'Uninstall' => '', /* private / needs not description */
 			);
 		}
 
@@ -351,7 +388,7 @@ class Plugins
 			return $r;
 		}
 
-		if( ! $Plugin->Install() )
+		if( ! $Plugin->BeforeInstall() )
 		{
 			$this->unregister( $Plugin );
 			$r = T_('The installation of the plugin failed.');
@@ -389,6 +426,8 @@ class Plugins
 		$this->instantiate_Settings( $Plugin );
 
 		$Debuglog->add( 'New plugin: '.$Plugin->name.' ID: '.$Plugin->ID, 'plugins' );
+
+		$this->call_method( $Plugin->ID, 'AfterInstall', $params = array() );
 
 		return $Plugin;
 	}
@@ -918,6 +957,64 @@ class Plugins
 
 
 	/**
+	 * Stop propagation of events to next plugins in {@link trigger_event()}.
+	 */
+	function stop_propagation()
+	{
+		$this->_stop_propagation = true;
+	}
+
+
+	/**
+	 * Trigger appropriate events before displaying content.
+	 *
+	 * This is different from {@link render()}:
+	 *  - It applies on every display (rendering will get cached later)
+	 *  - It calls all Plugins that register these events, not just associated ones.
+	 *
+	 * @param string Content to render
+	 * @param mixed The affected object
+	 * @param string Output format, see {@link format_to_output()}
+	 * @param string Type of data to display ('ItemContent').
+	 * @return string rendered content
+	 */
+	function trigger_display( & $content, & $Object, $format, $type = 'ItemContent' )
+	{
+		$params = array(
+				'data'   => & $content,
+				'format' => $format,
+			);
+
+		if( $type == 'ItemContent' )
+		{
+			$params['Item'] = & $Object;
+		}
+
+		/*
+		Not used yet:
+		// TODO: support $type different than 'ItemContent'
+		if( $format == 'htmlbody' || $format == 'entityencoded' )
+		{
+			$event = 'DisplayItemAsHtml';
+		}
+		elseif( $format == 'xml' )
+		{
+			$event = 'DisplayItemAsXml';
+		}
+		else
+		{
+			$event = 'DisplayItem';
+		}
+		$this->trigger_event( $event, $params );
+		*/
+
+		$this->trigger_event( 'DisplayItemAllFormats', $params );
+
+		return $content;
+	}
+
+
+	/**
 	 * Call all plugins for a given event.
 	 *
 	 * @param string event name, see {@link Plugin}
@@ -939,6 +1036,11 @@ class Plugins
 		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
 		{
 			$this->call_method( $l_plugin_ID, $event, $params );
+			if( ! empty($this->_stop_propagation) )
+			{
+				$this->_stop_propagation = false;
+				break;
+			}
 		}
 	}
 
@@ -975,6 +1077,28 @@ class Plugins
 			}
 		}
 		return array();
+	}
+
+
+	/**
+	 * Trigger a karma collecting event.
+	 *
+	 * @param string Event
+	 * @param array Params to the event
+	 * @param integer Maximum karma to start with
+	 * @param integer Absolute karma to start with
+	 * @return integer Karma percentage (rounded)
+	 */
+	function trigger_karma_collect( $event, $params, $karma_max = 1, $karma_absolute = 1 )
+	{
+		$params['karma_max'] = & $karma_max;
+		$params['karma_absolute'] = & $karma_absolute;
+
+		$this->trigger_event( $event, $params );
+
+		$percentage = $karma_max ? ( $karma_absolute * 100 ) / $karma_max : 0;
+
+		return round($percentage);
 	}
 
 
@@ -1704,7 +1828,172 @@ class Plugins
 	}
 
 
+	/**
+	 * Load an object from a Cache plugin or create a new one if we have a
+	 * cache miss or no caching plugins.
+	 *
+	 * It registers a shutdown function, that refreshes the data to the cache plugin
+	 * which is not optimal, but we have no hook to see if data retrieved from
+	 * a {@link DataObjectCache} derived class has changed.
+	 * @param string object name
+	 * @param string eval this to create the object. Default is to create an object
+	 *               of class $objectName.
+	 */
+	function get_object_from_cacheplugin_or_create( $objectName, $eval_create_object = NULL )
+	{
+		$get_return = $this->trigger_event_first_true( 'CacheObjects',
+			array( 'action' => 'get', 'key' => 'object_'.$objectName ) );
 
+		if( isset( $get_return['plugin_ID'] ) )
+		{
+			$GLOBALS[$objectName] = & $get_return['data'];
+
+			$Plugin = & $this->get_by_ID( $get_return['plugin_ID'] );
+			register_shutdown_function( array(&$Plugin, 'CacheObjects'),
+				array( 'action' => 'set', 'key' => 'object_'.$objectName, 'data' => & $GLOBALS[$objectName] ) );
+		}
+		else
+		{ // Cache miss, create it:
+			if( empty($eval_create_object) )
+			{
+				$GLOBALS[$objectName] = & new $objectName();
+			}
+			else
+			{
+				eval( '$GLOBALS[\''.$objectName.'\'] = '.$eval_create_object.';' );
+			}
+
+			// Try to set in cache:
+			$set_return = $this->trigger_event_first_true( 'CacheObjects',
+				array( 'action' => 'set', 'key' => 'object_'.$objectName, 'data' => & $GLOBALS[$objectName] ) );
+
+			if( isset( $set_return['plugin_ID'] ) )
+			{ // success, register a shutdown function to save this data on shutdown
+				$Plugin = & $this->get_by_ID( $set_return['plugin_ID'] );
+				register_shutdown_function( array(&$Plugin, 'CacheObjects'),
+					array( 'action' => 'set', 'key' => 'object_'.$objectName, 'data' => & $GLOBALS[$objectName] ) );
+			}
+		}
+	}
+
+
+	/**
+	 * Display the fieldset for the Plugin Settings.
+	 *
+	 * @uses display_settings_fieldset_field() for each field to allow recursion for array type settings
+	 * @param Plugin (by reference)
+	 * @param Form (by reference)
+	 */
+	function display_settings_fieldset( & $Plugin, & $Form )
+	{
+		if( ! $Plugin->Settings )
+		{
+			return false;
+		}
+
+		$Form->begin_fieldset( T_('Plugin settings'), array( 'class' => 'clear' ) );
+
+		foreach( $Plugin->GetDefaultSettings() as $l_name => $l_meta )
+		{
+			$this->display_settings_fieldset_field( $l_name, $l_meta, $Plugin, $Form );
+		}
+		$Form->end_fieldset();
+	}
+
+
+	/**
+	 * Display a single field (setting) of the Plugin's Settings.
+	 *
+	 * @param string Settings name (key)
+	 * @param array Meta data for this setting. See {@link Plugin::GetDefaultSettings()}
+	 * @param Plugin (by reference)
+	 * @param Form (by reference)
+	 * @param mixed Value to really use (used for recursion into array type settings)
+	 */
+	function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Form, $use_value = NULL )
+	{
+		global $debug;
+
+		$params = array();
+
+		if( isset($set_meta['maxlength']) )
+		{
+			$params['maxlength'] = (int)$set_meta['maxlength'];
+		}
+		if( isset($set_meta['note']) )
+		{
+			$params['note'] = $set_meta['note'];
+		}
+
+		if( ! isset($set_meta['type']) )
+		{
+			$set_meta['type'] = 'text';
+		}
+
+		// Display input element:
+		switch( $set_meta['type'] )
+		{
+			case 'checkbox':
+				$Form->checkbox_input( 'edited_plugin_set_'.$set_name,
+					isset($use_value) ? $use_value : $Plugin->Settings->get($set_name),
+					$set_meta['label'],
+					$params );
+				break;
+
+			case 'textarea':
+				$textarea_rows = isset($set_meta['rows']) ? $set_meta['rows'] : 3;
+				$Form->textarea_input( 'edited_plugin_set_'.$set_name,
+					isset($use_value) ? $use_value : $Plugin->Settings->get($set_name),
+					$textarea_rows,
+					$set_meta['label'],
+					$params );
+				break;
+
+			case 'array':
+				$Form->begin_fieldset( (isset($set_meta['label']) ? $set_meta['label'] : '').( $debug ? ' [debug: '.$set_name.']' : '' ) );
+
+				$plugin_value = isset($use_value) ? $use_value : $Plugin->Settings->get_unserialized( $set_name );
+
+				$count = 0;
+				foreach( $set_meta['entries'] as $l_set_name => $l_set_entry )
+				{
+					$l_value = isset($plugin_value[$count][$l_set_name]) ? $plugin_value[$count][$l_set_name] : NULL;
+					$this->display_settings_fieldset_field( $set_name.'['.$count.']['.$l_set_name.']', $l_set_entry, $Plugin, $Form, $l_value );
+				}
+				$count++;
+				$Form->end_fieldset();
+
+				// if not max_number
+				$Form->info_field( '', '<a href="'.regenerate_url().'">'.T_('Add another set').'</a>' );
+
+				break;
+
+			case 'text':
+				// Default: "text input"
+				if( isset($set_meta['size']) )
+				{
+					$size = (int)$set_meta['size'];
+				}
+				else
+				{ // Default size:
+					$size = 25;
+				}
+				if( ! isset($params['maxlength']) || $params['maxlength'] > 255 )
+				{ // T_pluginsettings.pset_value can hold 255 chars only
+					$params['maxlength'] = 255;
+				}
+
+				$Form->text_input( 'edited_plugin_set_'.$set_name,
+					isset($use_value) ? $use_value : $Plugin->Settings->get($set_name),
+					$size,
+					$set_meta['label'],
+					$params );
+				break;
+
+			default:
+				debug_die( 'Unsupported type from GetDefaultSettings()!' );
+		}
+	}
 }
 
 
@@ -1735,6 +2024,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.37  2006/01/26 23:08:36  blueyed
+ * Plugins enhanced.
+ *
  * Revision 1.36  2006/01/26 20:27:45  blueyed
  * minor
  *

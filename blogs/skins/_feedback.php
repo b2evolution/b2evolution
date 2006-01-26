@@ -162,69 +162,84 @@
 		?>
 
 		<!-- form to add a comment -->
-		<form action="<?php echo $htsrv_url ?>comment_post.php" method="post" class="bComment">
+		<?php
+		$Form = new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID );
+			$Form->begin_form( 'bComment' );
 
-			<input type="hidden" name="comment_post_ID" value="<?php $Item->ID() ?>" />
-			<input type="hidden" name="redirect_to" value="<?php
+			$Form->hidden( 'comment_post_ID', $Item->ID );
+			$Form->hidden( 'redirect_to',
 					// Make sure we get back to the right page (on the right domain)
 					// fplanque>> TODO: check if we can use the permalink instead but we must check that application wide,
 					// that is to say: check with the comments in a pop-up etc...
-					echo regenerate_url( '', '', $Blog->get('blogurl') );
-				?>" />
+					regenerate_url( '', '', $Blog->get('blogurl') ) );
 
-			<?php
 			if( is_logged_in() )
 			{ // User is logged in:
-				?>
-				<fieldset>
-					<div class="label"><?php echo T_('User') ?>:</div>
-					<div class="info">
-						<strong><?php $current_User->preferred_name()?></strong>
-						<?php user_profile_link( ' [', ']', T_('Edit profile') ) ?>
-						</div>
-				</fieldset>
-				<?php
+				$Form->begin_fieldset();
+				$Form->info_field( T_('User'), '<strong>'.$current_User->get_preferred_name().'</strong>'
+					.' '.get_user_profile_link( ' [', ']', T_('Edit profile') ) );
+				$Form->end_fieldset();
 			}
 			else
 			{ // User is not loggued in:
-				form_text( 'author', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
+				$Form->text( 'author', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
 
-				form_text( 'email', $comment_author_email, 40, T_('Email'), T_('Your email address will <strong>not</strong> be displayed on this site.'), 100, 'bComment' );
+				$Form->text( 'email', $comment_author_email, 40, T_('Email'), T_('Your email address will <strong>not</strong> be displayed on this site.'), 100, 'bComment' );
 
-				form_text( 'url', $comment_author_url, 40, T_('Site/Url'), T_('Your URL will be displayed.'), 100, 'bComment' );
+				$Form->text( 'url', $comment_author_url, 40, T_('Site/Url'), T_('Your URL will be displayed.'), 100, 'bComment' );
 			}
 
 			// TODO: use a smaller textarea when using c=1 GET param
-			form_textarea( 'comment', '', 10, T_('Comment text'),
+			$Form->textarea( 'comment', '', 10, T_('Comment text'),
 											T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), 40, 'bComment' );
+
+
+			$comment_options = '';
+			$Form->output = false;
+			$Form->label_to_the_left = false;
+			$old_label_suffix = $Form->label_suffix;
+			$Form->label_suffix = '';
+			$Form->switch_layout('inline');
+			if( substr($comments_use_autobr,0,4) == 'opt-')
+			{
+				$comment_options .= $Form->checkbox_input( 'comment_autobr', ($comments_use_autobr == 'opt-out'), T_('Auto-BR'), array(
+					'note' => '('.T_('Line breaks become &lt;br /&gt;').')', 'tabindex' => 6 ) ).'<br />';
+			}
+			if( ! is_logged_in() )
+			{ // User is not logged in:
+				$comment_options .= $Form->checkbox_input( 'comment_cookies', true, T_('Remember me'), array(
+					'note' => '('.T_('(Set cookies for name, email &amp; url)').')', 'tabindex' => 7 ) );
+			}
+			$Form->output = true;
+			$Form->label_to_the_left = true;
+			$Form->label_suffix = $old_label_suffix;
+			$Form->switch_layout(NULL);
+
+			if( ! empty($comment_options) )
+			{
+				$Form->begin_fieldset();
+					echo $Form->begin_field( NULL, T_('Options') );
+					echo $comment_options;
+					echo $Form->end_field();
+				$Form->end_fieldset();
+			}
+
+			$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
+
+			$Form->begin_fieldset();
+				?>
+				<div class="input">
+				<?php
+				$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID, 'class' => 'submit', 'value' => T_('Send comment'), 'tabindex' => 8 ) );
+
+				$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );
+				?>
+
+				</div>
+
+				<?php
+			$Form->end_fieldset();
 			?>
-
-			<fieldset>
-				<div class="label"><?php echo T_('Options') ?>:
-				<?php if( (substr($comments_use_autobr,0,4) == 'opt-') && (! is_logged_in()) )
-				{ // Ladies and gentlemen, check out the biggest piece of anti IE-layout-bugs
-					// crap you've ever seen:
-					echo '<br />&nbsp;'; // make the float a little higher
-				} ?>
-				</div>
-				<div class="input">
-				<?php if( substr($comments_use_autobr,0,4) == 'opt-') { ?>
-				<input type="checkbox" class="checkbox" name="comment_autobr" value="1" <?php if($comments_use_autobr == 'opt-out') echo ' checked="checked"' ?> tabindex="6" id="comment_autobr" /> <label for="comment_autobr"><?php echo T_('Auto-BR') ?></label> <span class="notes">(<?php echo T_('Line breaks become &lt;br /&gt;') ?>)</span><br />
-				<?php }
-				if( ! is_logged_in() )
-				{ // User is not logged in:
-					?>
-					<input type="checkbox" class="checkbox" name="comment_cookies" value="1" checked="checked" tabindex="7" id="comment_cookies" /> <label for="comment_cookies"><?php echo T_('Remember me') ?></label> <span class="notes"><?php echo T_('(Set cookies for name, email &amp; url)') ?></span>
-					<?php
-				} ?>
-				</div>
-			</fieldset>
-
-			<fieldset>
-				<div class="input">
-					<input type="submit" name="submit" class="submit" value="<?php echo T_('Send comment') ?>" tabindex="8" />
-				</div>
-			</fieldset>
 
 			<div class="clear"></div>
 

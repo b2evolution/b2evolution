@@ -12,7 +12,7 @@
 /**
  * Initialize everything:
  */
-require_once( dirname(__FILE__) . '/../evocore/_main.inc.php' );
+require_once( dirname(__FILE__).'/../evocore/_main.inc.php' );
 
 // statuses allowed for acting on:
 $show_statuses = array( 'published', 'protected', 'private' );
@@ -30,7 +30,9 @@ if( ! $commented_Item->can_comment( '', '', '', '' ) )
 	$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
 }
 
-param( 'comment' , 'html' );
+$Plugins->trigger_event( 'CommentFormSent', array( 'Item' => & $commented_Item ) );
+
+param( 'comment', 'html' );
 param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
 
 if( ! is_logged_in() )
@@ -68,7 +70,7 @@ if( ! is_logged_in() )
 	}
 }
 
-$now = date("Y-m-d H:i:s", $localtimenow );
+$now = date( 'Y-m-d H:i:s', $localtimenow );
 
 // CHECK and FORMAT content
 //echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);

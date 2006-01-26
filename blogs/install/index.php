@@ -441,6 +441,9 @@ to
 		 * NEW DB: Create a plain new db structure + sample contents
 		 * -----------------------------------------------------------------------------------
 		 */
+		$DB->halt_on_error = $DB->show_errors = false;
+		$Plugins = new Plugins(); // inserting sample data triggers events
+		$DB->halt_on_error = $DB->show_errors = true;
 		?>
 		<h2><?php echo T_('Installing b2evolution tables with sample data')?></h2>
 		<?php
@@ -569,6 +572,30 @@ to
 <p>Then reload this page and a reset option will appear.</p>');
 			break;
 		}
+		// Uninstall Plugins
+		$DB->show_errors = $DB->halt_on_error = false;
+		$Plugins = new Plugins();
+		$DB->show_errors = $DB->halt_on_error = true;
+		$at_least_one_failed = false;
+		foreach( $Plugins->get_list_by_event( 'Uninstall' ) as $l_Plugin )
+		{
+			$success = $Plugins->call_method( $l_Plugin->ID, 'Uninstall', $params = array( 'unattended' => true ) );
+			if( $success === false )
+			{
+				echo "Failed un-installing plugin $l_Plugin->classname (ID $l_Plugin->ID)...<br />\n";
+				$at_least_one_failed = false;
+			}
+			else
+			{
+				echo "Uninstalled plugin $l_Plugin->classname (ID $l_Plugin->ID)...<br />\n";
+			}
+		}
+		if( $at_least_one_failed )
+		{
+			echo "You may want to manually remove left files or DB tables from the failed plugin(s).<br />\n";
+		}
+		$DB->show_errors = $DB->halt_on_error = true;
+
 		db_delete();
 		?>
 		<p><?php echo T_('Reset done!')?></p>
@@ -594,6 +621,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.83  2006/01/26 23:08:36  blueyed
+ * Plugins enhanced.
+ *
  * Revision 1.82  2006/01/14 20:45:10  blueyed
  * do not dump function trace on DB errors during install/config when not appropriate.
  *

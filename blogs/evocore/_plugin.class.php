@@ -237,11 +237,17 @@ class Plugin
 	 *
 	 * The array to be returned should define the names of the settings as keys
 	 * and assign an array with the following keys to them:
-	 *   'label', 'defaultvalue' and
-	 * (optionally)
-	 *   'note' (gets displayed as a note to the field),
+	 *   'label' (Name of the param)
+	 * and optionally:
+	 *   'defaultvalue' (default value, defaults to '')
+	 *   'note' (gets displayed as a note to the param field),
 	 *   'size', 'maxlength' (html input field attributes),
-	 *   'type' ('checkbox'),
+	 *   'type' ('checkbox', 'textarea', 'text' (default)),
+	 *   'rows' (number of rows for type=='textarea'),
+	 *   'cols' (number of cols for type=='textarea'),
+	 *   'valid_pattern' (a regular expression pattern that the value must match)
+	 *                   Either a pattern as string or an array with keys
+	 *                   'pattern' and 'error' for a custom error message.
 	 * e.g.:
 	 * <code>
 	 * return array(
@@ -249,6 +255,7 @@ class Plugin
 	 *     'label' => T_('My Param!'),
 	 *     'defaultvalue' => '1',
 	 *     'note' => T_('Quite cool, eh?'),
+	 *     'valid_pattern' => array( 'pattern' => '\d+', T_('The value must be numeric.') ),
 	 *   ),
 	 *   'another_param' => array( // this one has no 'note'
 	 *     'label' => T_('My checkbox'),
@@ -387,27 +394,109 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called when the plugin is going to be installed.
+	 * Event handler: Gets invoked before the main payload in the backoffice.
+	 *
+	 * This displays the payload for handling uninstallation of Plugin database tables.
+	 * If you want to use this, call parent::AdminBeginPayload() in your Plugin.
+	 *
+	 * @see BeforeUninstall() for the corresponding action handler
+	 */
+	function AdminBeginPayload()
+	{
+		if( ! empty($this->display_confirm_for_uninstall_tables) )
+		{
+			?>
+
+			<div class="panelinfo">
+
+				<h3><?php echo T_('Delete plugin database tables') ?></h3>
+
+				<p><?php echo T_('Uninstalling this plugin will also delete its database tables.') ?></p>
+
+				<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
+
+				<?php
+				$Form = & new Form( '', 'uninstall_plugin', 'get' );
+
+				$Form->begin_form( 'inline' );
+				$Form->hidden( 'action', 'uninstall' );
+				$Form->hidden( 'plugin_ID', $this->ID );
+				$Form->hidden( 'plugin_'.$this->ID.'_confirm_drop', 1 );
+
+				// We may need to use memorized params in the next page
+				$Form->hiddens_by_key( get_memorized( 'action,plugin_ID') );
+
+				$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
+				$Form->end_form();
+
+				$Form = & new Form( '', 'uninstall_plugin_cancel', 'get' );
+				$Form->begin_form( 'inline' );
+				$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
+				$Form->end_form()
+				?>
+
+			</div>
+
+			<?php
+		}
+	}
+
+
+	/**
+	 * Event handler: Called before the plugin is going to be installed.
 	 *
 	 * This is the hook to create any DB tables or the like.
 	 *
 	 * @return boolean true on success, false on failure (the plugin won't get installed then).
 	 */
-	function Install()
+	function BeforeInstall()
 	{
 		return true;
 	}
 
 
 	/**
-	 * Event handler: Called when the plugin is going to be un-installed.
+	 * Event handler: Called after the plugin has been installed.
+	 */
+	function AfterInstall()
+	{
+	}
+
+
+	/**
+	 * Event handler: Called before the plugin is going to be un-installed.
 	 *
 	 * This is the hook to remove any DB tables or the like.
 	 *
+	 * You might want to call "parent::BeforeUninstall()" in your plugin to handle canonical
+	 * database tables, which is done here.
+	 *
+	 * @see AdminBeginPayload() for the corresponding payload handler
+	 * @param array Associative array of parameters.
+	 *              'handles_display': Setting it to true avoids a generic "Uninstall failed" message.
+	 *              'unattended': true if Uninstall is unattended (Install action "deletedb"). Removes tables without confirmation.
 	 * @return boolean true on success, false on failure (the plugin won't get uninstalled then).
 	 */
-	function Uninstall()
+	function BeforeUninstall( & $params )
 	{
+		global $DB;
+		if( $tables = $DB->get_col( 'SHOW TABLES LIKE "'.$this->get_table_prefix().'%"' ) )
+		{
+			if( empty($params['unattended']) && ! param( 'plugin_'.$this->ID.'_confirm_drop', 'integer', 0 ) )
+			{ // not confirmed and not silently requested
+				$this->display_confirm_for_uninstall_tables = true; // see AdminBeginPayload()
+				return false;
+			}
+
+			// Drop tables:
+			$sql = 'DROP TABLE IF EXISTS '.implode( ', ', $tables );
+			$DB->query( $sql );
+			if( empty($params['unattended']) )
+			{
+				$this->msg( T_('Dropped plugin tables.'), 'success' );
+			}
+		}
+
 		return true;
 	}
 
@@ -511,6 +600,176 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: called at the end of {@link DataObject::dbupdate() updating
+	 * a data object in the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'DataObject': the related dataobject
+	 *   - 'classname': DataObject's classname, lowercased (e.g. 'item')
+	 */
+	function AfterDataObjectUpdate( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link DataObject::dbinsert() inserting
+	 * a data object into the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'DataObject': the related dataobject
+	 *   - 'classname': DataObject's classname, lowercased (e.g. 'item')
+	 */
+	function AfterDataObjectInsert( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link DataObject::dbdelete() deleting
+	 * a data object from the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'DataObject': the related dataobject
+	 *   - 'classname': DataObject's classname, lowercased (e.g. 'item')
+	 */
+	function AfterDataObjectDelete( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called to cache object data.
+	 *
+	 * @see memcache_plugin::CacheObjects()
+	 * @param array Associative array of parameters
+	 *   - 'action': 'delete', 'set', 'get'
+	 *   - 'key': The key to refer to 'data'
+	 *   - 'data': The actual data.
+	 * @return boolean True if action was successful, false otherwise.
+	 */
+	function CacheObjects( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called to cache page content (get cached content or request caching).
+	 *
+	 * This method must build a unique key for the requested page (including cookie/session info) and
+	 * start an output buffer, to get the content to cache.
+	 *
+	 * @see Plugin::CacheIsCollectingContent()
+	 * @see memcache_plugin::CachePageContent()
+	 * @param array Associative array of parameters
+	 *   - 'data': this must get set to the page content on cache hit
+	 * @return boolean True if we handled the request (either returned caching data or started buffering),
+	 *                 false if we do not want to cache this page.
+	 */
+	function CachePageContent( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: gets asked for if we are generating cached content.
+	 *
+	 * This is useful to not generate a list of online users or the like.
+	 *
+	 * @see Plugin::CachePageContent()
+	 * @return boolean
+	 */
+	function CacheIsCollectingContent()
+	{
+	}
+
+
+	/**
+	 * Event handler: Called before setting a plugin's setting in the backoffice.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'name': name of the setting
+	 *   - 'value': value of the setting (by reference)
+	 * @return boolean false to prevent the setting being set.
+	 */
+	function PluginSettingsBeforeSet( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called as action before displaying the payload
+	 * to edit the plugin's settings.
+	 */
+	function PluginSettingsEditAction( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called after the {@link Plugin::Settings Settings object of the Plugin}
+	 * has been instantiated.
+	 *
+	 * Use this to validate Settings or cache them into class properties.
+	 */
+	function PluginSettingsInstantiated( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called when the view counter of an item got increased.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the Item object (by reference)
+	 */
+	function ItemViewed( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the frontend comment form.
+	 *
+	 * You might want to use this to inject antispam payload to use in
+	 * in {@link GetKarmaForComment()} or modify the Comment according
+	 * to it in {@link CommentFormSent()}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the comment form generating object
+	 *   - 'Item': the Item for which the comment is meant
+	 */
+	function DisplayCommentFormFieldset( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called in the submit button section of the
+	 * frontend comment form.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the comment form generating object
+	 *   - 'Item': the Item for which the comment is meant
+	 */
+	function DisplayCommentFormButton( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called when a comment form got submitted.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the Item for which the comment is meant
+	 */
+	function CommentFormSent( & $params )
+	{
+	}
+
+
 	/*
 	 * Event handlers }}}
 	 */
@@ -522,16 +781,16 @@ class Plugin
 
 	/**
 	 * Log a message. This gets added to {@link $Debuglog the global Debuglog} with
-	 * the category 'plugin_[plugin_code]_[plugin_ID]'.
+	 * the category '[plugin_classname]_[plugin_ID]'.
 	 *
 	 * @param string Message to log.
-	 * @param array Optional list of additional categories
+	 * @param array Optional list of additional categories.
 	 */
 	function debug_log( $msg, $add_cats = array() )
 	{
 		global $Debuglog;
 
-		$add_cats[] = 'plugin_'.$this->code.'_'.$this->ID;
+		$add_cats[] = $this->classname.'_'.$this->ID;
 		$Debuglog->add( $msg, $add_cats );
 	}
 
@@ -554,7 +813,8 @@ class Plugin
 	 * Register a tab (sub-menu) for the backoffice Tools menus.
 	 *
 	 * @param string Text for the tab.
-	 * @param string|array See {@link AdminUI::add_menu_entries()}. Default: 'tools' for the Tools menu.
+	 * @param string|array Path to add the menu entry into.
+	 *        See {@link AdminUI::add_menu_entries()}. Default: 'tools' for the Tools menu.
 	 * @param array Optional params. See {@link AdminUI::add_menu_entries()}.
 	 */
 	function register_menu_entry( $text, $path = 'tools', $menu_entry_props = array() )
@@ -618,6 +878,20 @@ class Plugin
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * Stop propagation of the event to next plugins (with lower priority)
+	 * in events that get triggered for a batch of Plugins.
+	 *
+	 * @see Plugins::trigger_event()
+	 * @see Plugins::stop_propagation()
+	 */
+	function stop_propagation()
+	{
+		global $Plugins;
+		$Plugins->stop_propagation();
 	}
 
 	/*
@@ -727,6 +1001,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.20  2006/01/26 23:08:36  blueyed
+ * Plugins enhanced.
+ *
  * Revision 1.19  2006/01/23 01:12:15  blueyed
  * Added get_table_prefix() and remove_events_for_this_request(),
  *

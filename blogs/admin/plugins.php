@@ -63,7 +63,7 @@ switch( $action )
 	case 'reload_plugins':
 		// Register new events
 		// Unregister obsolete events
-		// Detect new codes for plugins without one (fp>>why do we need this one?)
+		// Detect new codes for plugins without one (see Plugins::set_empty_code_to_default())
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -122,7 +122,7 @@ switch( $action )
 		// Uninstall plugin:
 		param( 'plugin_ID', 'int', true );
 
-		$success = $Plugins->call_method( $plugin_ID, 'Uninstall', $params = array( 'unattended' => false ) );
+		$success = $Plugins->call_method( $plugin_ID, 'BeforeUninstall', $params = array( 'unattended' => false ) );
 		if( $success === false )
 		{
 			if( $params['handles_display'] )
@@ -208,8 +208,9 @@ switch( $action )
 		{
 			foreach( $edit_Plugin->GetDefaultSettings() as $l_name => $l_meta )
 			{
-				$l_value = param( 'edited_plugin_set_'.$l_name );
-				if( false === $Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsBeforeSet', $params = array( 'name' => &$l_name, 'value' => &$l_value ) ) )
+				$l_param_type = (isset($l_meta['type']) && $l_meta['type'] == 'array') ? 'array' : 'string';
+				$l_value = param( 'edited_plugin_set_'.$l_name, $l_param_type );
+				if( false === $Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsBeforeSet', $params = array( 'name' => $l_name, 'value' => & $l_value, 'meta' => $l_meta ) ) )
 				{ // skip this
 					$action = 'edit_settings';
 					continue;
@@ -224,6 +225,10 @@ switch( $action )
 						$action = 'edit_settings';
 						continue;
 					}
+				}
+				if( $l_param_type == 'array' )
+				{
+					$l_value = serialize($l_value);
 				}
 				$edit_Plugin->Settings->set( $l_name, $l_value );
 			}
@@ -276,7 +281,7 @@ switch( $action )
 
 		$edit_Plugin = & $Plugins->get_by_ID( $plugin_ID );
 
-		if( !$edit_Plugin )
+		if( ! $edit_Plugin )
 		{
 			$Debuglog->add( 'The plugin with ID '.$plugin_ID.' was not found.', array('plugins', 'error') );
 			$action = 'list';
@@ -426,64 +431,7 @@ switch( $action )
 		$Form->hidden( 'plugin_ID', $plugin_ID );
 
 		// PluginSettings
-		if( $edit_Plugin->Settings )
-		{
-			$Form->begin_fieldset( T_('Plugin settings'), array( 'class' => 'clear' ) );
-
-			foreach( $edit_Plugin->GetDefaultSettings() as $l_name => $l_value )
-			{
-				$params = array();
-				if( isset($l_value['maxlength']) )
-				{
-					$params['maxlength'] = (int)$l_value['maxlength'];
-				}
-				if( isset($l_value['note']) )
-				{
-					$params['note'] = $l_value['note'];
-				}
-
-				// Display input element:
-				if( isset($l_value['type']) && $l_value['type'] == 'checkbox' )
-				{ // Checkbox:
-					$Form->checkbox_input( 'edited_plugin_set_'.$l_name,
-						$edit_Plugin->Settings->get($l_name),
-						$l_value['label'],
-						$params );
-				}
-				elseif( isset($l_value['type']) && $l_value['type'] == 'textarea' )
-				{ // Checkbox:
-					$textarea_rows = isset($l_value['rows']) ? $l_value['rows'] : 3;
-					$Form->textarea_input( 'edited_plugin_set_'.$l_name,
-						$edit_Plugin->Settings->get($l_name),
-						$textarea_rows,
-						$l_value['label'],
-						$params );
-				}
-				else
-				{ // Default: "text input"
-					if( isset($l_value['size']) )
-					{
-						$size = (int)$l_value['size'];
-					}
-					else
-					{ // Default size:
-						$size = 25;
-					}
-					if( ! isset($params['maxlength']) || $params['maxlength'] > 255 )
-					{ // T_pluginsettings.pset_value can hold 255 chars only
-						$params['maxlength'] = 255;
-					}
-
-					$Form->text_input( 'edited_plugin_set_'.$l_name,
-						$edit_Plugin->Settings->get($l_name),
-						$size,
-						$l_value['label'],
-						$params );
-				}
-			}
-			$Form->end_fieldset();
-		}
-
+		$Plugins->display_settings_fieldset( $edit_Plugin, $Form );
 
 		// Plugin variables
 		$Form->begin_fieldset( T_('Plugin variables').' ('.T_('Advanced').')', array( 'class' => 'clear' ) );

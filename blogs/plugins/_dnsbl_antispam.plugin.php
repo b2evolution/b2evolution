@@ -52,16 +52,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * This plugin provides a method for {@link antispam_main_init} and checks
+ * This plugin provides the event {@link SessionLoaded()} and checks
  * the remote IP against a list of DNS Blacklists.
  *
- * It allows the user to whitelist her/himself.
+ * It allows the user to whitelist her/himself through the plugin interface itself, by requiring a
+ * plugin that provides {@link Plugin::CaptchaValidated()} and {@link Plugin::CaptchaPayload()} events.
+ * See {@link validate_dependencies()}.
  */
 class dnsbl_antispam_plugin extends Plugin
 {
 	var $name = 'DNSBL Antispam';
-	var $code = 'evoDnsbl';
-	var $priority = 10; // do this quite early
+	var $code = 'evo_dnsbl';
+	var $priority = 40;
 	var $version = '$Revision$';
 	var $author = 'The b2evo Group';
 	var $help_url = 'http://b2evolution.net/';
@@ -73,7 +75,7 @@ class dnsbl_antispam_plugin extends Plugin
 	function dnsbl_antispam_plugin()
 	{
 		$this->short_desc = T_("Checks the user's IP address against a list of DNS blacklists.");
-		$this->long_desc = T_('If the IP address is blacklisted, the request is canceled early and the user can (optionally) whitelist his session by clicking a button.');
+		$this->long_desc = T_('If the IP address is blacklisted, the request is canceled early and the user can (optionally) whitelist his session through a Captcha plugin.');
 	}
 
 
@@ -87,16 +89,45 @@ class dnsbl_antispam_plugin extends Plugin
 		return array(
 			'dnsbls' => array(
 				'label' => T_('DNS Blacklists'),
-				'defaultvalue' => 'sbl-xbl.spamhaus.org list.dsbl.org',
+				'defaultvalue' => "list.dsbl.org\nsbl-xbl.spamhaus.org",
+				'type' => 'textarea',
 				'size' => '50',
 				'note' => T_('The list of DNS blacklists to check, seperated by whitespace.'),
-				),
+			),
 			'use_whitelisting' => array(
 				'label' => T_('Whitelisting'),
 				'defaultvalue' => '1',
 				'note' => T_('Allow the user to whitelist his session by pressing a button once if his IP address is blacklisted.'),
 				'type' => 'checkbox',
-				),
+			),
+			'timeout_whitelist' => array(
+				'label' => T_('Whitelist timeout'),
+				'defaultvalue' => 86400, // timeout: 1 day
+				'note' => T_('in seconds. How long should a session be whitelisted?'),
+				'size' => 10,
+				'valid_pattern' => '~^\d{3,}$~',
+			),
+			'enable_stats' => array(
+				'label' => T_('Statistics'),
+				'defaultvalue' => '0',
+				'note' => T_('Enable statistics. This generates a small overhead, but will show you how effective it is.'),
+				'type' => 'checkbox',
+			),
+			'tooslow_tries' => array(
+				'label' => T_('Retry slow lists'),
+				'defaultvalue' => '5',
+				'note' => T_('How often should a slow list be retried? (0 to deactivate slow list handling)'),
+				'size' => 5,
+				'valid_pattern' => '~\d+~',
+			),
+			'tooslow_limit' => array(
+				'label' => T_('Timeout'),
+				'defaultvalue' => '2.0',
+				'note' => T_('in seconds. When is a DNSBL considered to be too slow?'),
+				'size' => '5',
+				'valid_pattern' => '~\d+(\.\d+)?~',
+			),
+
 		);
 	}
 
@@ -106,7 +137,7 @@ class dnsbl_antispam_plugin extends Plugin
 	 */
 	function AdminAfterMenuInit()
 	{
-		$this->register_menu_entry( T_('Check DNSBL') );
+		$this->register_menu_entry( T_('DNSBL') );
 	}
 
 
@@ -117,10 +148,11 @@ class dnsbl_antispam_plugin extends Plugin
 	 */
 	function AdminTabAction()
 	{
-		global $Messages;
+		global $Messages, $Request;
 		$this->param_check_for = param( 'check_for' );
+		$action = param( 'dnsblaction', 'array', array() );
 
-		if( !empty($this->param_check_for) )
+		if( isset($action['checklist']) && ! empty($this->param_check_for) )
 		{
 			if( trim( $this->Settings->get( 'dnsbls' ) ) == '' )
 			{
@@ -134,39 +166,265 @@ class dnsbl_antispam_plugin extends Plugin
 				$Messages->add( $l_result, 'note' );
 			}
 		}
+		elseif( isset($action['update_tooslow']) )
+		{
+			$shown = param( 'tooslow_shown_lists', 'array', array() );
+			$deactivate = param( 'tooslow_deactivate', 'array', array() );
+
+			$tooslow_dnsbls = $this->Settings->get_unserialized( 'tooslow_dnsbls', array() );
+
+			foreach( $shown as $k => $blacklist )
+			{
+				if( ! empty($deactivate[$k]) )
+				{
+					if( ! isset($tooslow_dnsbls[$blacklist]) || $tooslow_dnsbls[$blacklist] < $this->Settings->get('tooslow_tries') )
+					{
+						$tooslow_dnsbls[$blacklist] = $this->Settings->get('tooslow_tries') + 1;
+					}
+				}
+				else
+				{
+					if( isset($tooslow_dnsbls[$blacklist]) && $tooslow_dnsbls[$blacklist] > $this->Settings->get('tooslow_tries') )
+					{
+						unset($tooslow_dnsbls[$blacklist]);
+					}
+				}
+			}
+			if( $this->Settings->set( 'tooslow_dnsbls', serialize($tooslow_dnsbls) ) )
+			{
+				$this->Settings->dbupdate();
+			}
+		}
 	}
 
 
 	/**
-	 * Display our tool tab.
+	 * Display our tool tab with query action and statistics if enabled.
 	 */
 	function AdminTabPayload()
 	{
+		global $DB;
+
 		$Form = new Form();
 		$Form->begin_form( 'fform' );
 
 		$Form->text_input( 'check_for', $this->param_check_for, 0, T_('Check') );
+		$Form->buttons( array(
+				array(
+					'name' => 'dnsblaction[checklist]',
+					'value' => T_('Check list'),
+				),
+				array(
+					'name' => 'dnsblaction[checkopenrbl]',
+					'value' => T_('Check at openrbl.org'),
+					'onclick' => 'return pop_up_window( "http://openrbl.org/query?"+document.getElementById("check_for").value, "dnsbl_check" );',
+				)
+			) );
 
-		$Form->end_form( array(array( 'submit' )) );
+		$Form->end_form();
+
+
+		if( $this->Settings->get('tooslow_tries')
+		    && ( $dnsbls = preg_split( '~\s+~', $this->Settings->get( 'dnsbls' ), -1, PREG_SPLIT_NO_EMPTY ) ) )
+		{
+			$Form->begin_form('fform');
+			$Form->begin_fieldset( T_('Too slow lists') );
+
+			$tooslow_dnsbls = $this->Settings->get_unserialized( 'tooslow_dnsbls', array() );
+
+			foreach( $dnsbls as $blacklist )
+			{
+				$Form->hidden( 'tooslow_shown_lists[]', $blacklist );
+				$field_params = array();
+				if( ! empty($tooslow_dnsbls[$blacklist]) )
+				{
+					$field_params['note'] = sprintf( T_('This blacklist was %d times too slow.'), $tooslow_dnsbls[$blacklist] );
+				}
+				$Form->checkbox_input( 'tooslow_deactivate[]',
+					( isset( $tooslow_dnsbls[$blacklist] ) && $tooslow_dnsbls[$blacklist] > $this->Settings->get('tooslow_tries') ),
+					$blacklist, $field_params );
+			}
+			$Form->end_fieldset();
+			$Form->end_form( array( array('name'=>'dnsblaction[update_tooslow]', 'value'=>T_('Update')) ) );
+		}
+
+
+		if( $this->Settings->get('enable_stats') )
+		{
+			$c_blocked = $DB->get_var( '
+				SELECT COUNT(*)
+				  FROM '.$this->get_table_prefix().'log
+				 WHERE log_type = "blocked"' );
+			$c_notblocked = $DB->get_var( '
+				SELECT COUNT(*)
+				  FROM '.$this->get_table_prefix().'log
+				 WHERE log_type = "not_blocked"' );
+			$c_whitelisted = $DB->get_var( '
+				SELECT COUNT(*)
+				  FROM '.$this->get_table_prefix().'log
+				 WHERE log_type = "whitelisted"' );
+
+			$Form->begin_form( 'fform' );
+			$Form->begin_fieldset( T_('Statistics') );
+
+			$c_total = $c_blocked + $c_whitelisted + $c_notblocked;
+			$Form->info_field( T_('Blocked requests'), $c_blocked.( $c_total ? ' ('.round((100/$c_total)*$c_blocked).'%)' : '' ) );
+			$Form->info_field( T_('Whitelisted requests'), $c_whitelisted.( $c_total ? ' ('.round((100/$c_total)*$c_whitelisted).'%)' : '' ) );
+			$Form->info_field( T_('Not blocked requests'), $c_notblocked.( $c_total ? ' ('.round((100/$c_total)*$c_notblocked).'%)' : '' ) );
+
+			$stats_from = $DB->get_row( '
+				SELECT UNIX_TIMESTAMP(MAX(hit_datetime)) AS end, UNIX_TIMESTAMP(MIN(hit_datetime)) AS start FROM T_hitlog, '.$this->get_table_prefix().'log
+				 WHERE hit_ID = log_hit_ID
+				 ORDER BY hit_datetime DESC' );
+
+			if( $stats_from )
+			{
+				$date_fmt = locale_datefmt().' '.locale_timefmt();
+				printf( T_( 'The above statistics are from %s to %s.' ), date( $date_fmt, $stats_from->start ), date( $date_fmt, $stats_from->end ) );
+			}
+
+			$Form->end_fieldset();
+			$Form->end_form();
+		}
 	}
 
 
 	/**
-	 * Plugin hook.
+	 * If statistics get enabled, create the necessary DB tables.
+	 */
+	function PluginSettingsBeforeSet( & $params )
+	{
+		global $DB;
+
+		if( $params['name'] == 'enable_stats' && $params['value'] )
+		{
+			if( ! $DB->get_var( 'SHOW TABLES LIKE "'.$this->get_table_prefix().'log"' ) )
+			{
+				$q1 = $DB->query( '
+					CREATE TABLE IF NOT EXISTS '.$this->get_table_prefix().'log (
+					log_type ENUM( "blocked", "not_blocked", "whitelisted" ) NOT NULL,
+					log_hit_ID INT UNSIGNED NULL,
+					log_data VARCHAR(255) NULL )' );
+
+				$this->msg( sprintf(T_('Plugin table &laquo;%s&raquo; has been created.'), $this->get_table_prefix().'log') );
+
+				/*
+				Might be used later to store total numbers of purged data..
+				$q2 = $DB->query( '
+					CREATE TABLE IF NOT EXISTS '.$this->get_table_prefix().'log_total (
+					logt_blocked INT UNSIGNED NOT NULL,
+					logt_not_blocked INT UNSIGNED NOT NULL,
+					logt_whitelisted INT UNSIGNED NOT NULL )' );
+				*/
+			}
+		}
+		elseif( $params['name'] == 'use_whitelisting' && $params['value'] )
+		{
+			if( $error = $this->validate_dependencies() )
+			{
+				$this->msg( $error, 'error' );
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Pass Uninstall event to parent class, which asks eventually to drop
+	 * our tables.
 	 *
-	 * It checks if the remote IP is in the list of {@link $dnsbls DNS Blacklists} and
+	 * @return boolean
+	 */
+	function BeforeUninstall( & $params )
+	{
+		$params['handles_display'] = true; // we handle display in AdminBeginPayload
+		return parent::BeforeUninstall( $params );
+	}
+
+
+	/**
+	 * Handle display of the necessary {@link Uninstall()} payload.
+	 *
+	 * @return boolean
+	 */
+	function AdminBeginPayload()
+	{
+		return parent::AdminBeginPayload();
+	}
+
+
+	/**
+	 * Check dependency on Captcha plugin and add note in case it's missing.
+	 *
+	 * @return true
+	 */
+	function BeforeInstall()
+	{
+		if( $error = $this->validate_dependencies() )
+		{
+			$this->msg( $error );
+			$this->use_whitelisting = false;
+		}
+		return true; // Just a note.
+	}
+
+
+	/**
+	 * Add message when editing settings about missing dependencies.
+	 */
+	function PluginSettingsEditAction()
+	{
+		if( ! $this->use_whitelisting )
+		{
+			return;
+		}
+
+		if( $error = $this->validate_dependencies() )
+		{
+			$this->msg( $error, 'error' );
+			$this->use_whitelisting = false;
+			$this->Settings->set('use_whitelisting', 0);
+			$this->Settings->dbupdate();
+		}
+	}
+
+
+	/**
+	 * Get $use_whitelisting property, if not set before (e.g. in {@link Install()}).
+	 */
+	function PluginSettingsInstantiated()
+	{
+		if( ! isset($this->use_whitelisting) )
+		{
+			$this->use_whitelisting = $this->Settings->get('use_whitelisting');
+		}
+	}
+
+
+	/**
+	 * Plugin's main action hook.
+	 *
+	 * It checks if the remote IP is in the list of DNS Blacklists and
 	 * dies with an error page then, allowing the user to whitelist her/himself for the
-	 * session.
+	 * session if a plugin is installed for it.
+	 *
+	 * @return boolean
 	 */
 	function SessionLoaded()
 	{
-		global $Hit, $Session;
+		global $Hit, $Session, $Plugins;
 
-		$use_whitelisting = $this->Settings->get( 'use_whitelisting' );
+		if( is_admin_page() )
+		{
+			return false;
+		}
 
-		if( $use_whitelisting && $Session->get('antispam_whitelist_ip') )
+		if( $this->use_whitelisting && $Session->get( 'dnsbl_'.$this->ID.'_whitelisted' ) )
 		{
 			$this->debug_log( 'User is whitelisted.' );
+			$this->update_stats( 'whitelisted' );
 			return true;
 		}
 
@@ -174,31 +432,21 @@ class dnsbl_antispam_plugin extends Plugin
 		{ // the IP is blocked
 			$this->debug_log( 'IP is blocked: '.$ip_blocked_by );
 
-			if( $use_whitelisting )
+			if( $this->use_whitelisting )
 			{ // check if he wants to whitelist now
-				$whitelist_key = param( 'antispam_whitelist_key', 'string' );
-
-				$this->debug_log( 'Given whitelist key: '.var_export( $whitelist_key, true ) );
-
-				if( !empty($whitelist_key) )
-				{ // User is trying to whitelist
-
-					if( $Session->get( 'antispam_whitelist_key' ) == $whitelist_key )
-					{ // Whitelisted (remember this in the session and delete obsolete data):
-						$Session->set('antispam_whitelist_ip', 1);
-						$Session->delete('antispam_whitelist_key');
-						$Session->dbsave();
-
-						$this->debug_log( 'User has whitelisted himself.' );
-
-						return true;
-					}
+				if( $Plugins->trigger_event_first_true( 'CaptchaValidated', array( 'key' => 'dnsbl_'.$this->ID ) ) )
+				{
+					#echo 'WHITE';
+					$Session->set( 'dnsbl_'.$this->ID.'_whitelisted', 1, $this->Settings->get('timeout_whitelisted') );
+					$this->update_stats( 'whitelisted' );
+					return true;
 				}
 			}
 			else
 			{
-				$this->debug_log( 'Whitelisting not enabled.' );
+				$this->debug_log( 'Whitelisting is disabled.' );
 			}
+			$this->update_stats( 'blocked' );
 
 			// The error for our error page:
 			$error_ip_blocked = sprintf( /* TRANS: %s is the name of a DNS blacklist */ T_('Your IP address is blocked in &laquo;%s&raquo;.'), $ip_blocked_by );
@@ -206,6 +454,9 @@ class dnsbl_antispam_plugin extends Plugin
 			$this->display_error_page( $error_ip_blocked );
 			exit();
 		}
+
+		// IP not blocked
+		$this->update_stats( 'not_blocked' );
 	}
 
 
@@ -221,6 +472,8 @@ class dnsbl_antispam_plugin extends Plugin
 	 */
 	function is_listed( $ip, $check_all = false )
 	{
+		global $Timer;
+
 		$dnsbls = preg_split( '~\s+~', $this->Settings->get( 'dnsbls' ), -1, PREG_SPLIT_NO_EMPTY );
 
 		if( !$dnsbls )
@@ -228,30 +481,63 @@ class dnsbl_antispam_plugin extends Plugin
 			$this->debug_log( 'No DNS blacklists given!' );
 		}
 
+		$tooslow_tries = $this->Settings->get( 'tooslow_tries' );
+		$tooslow_needs_update = false;
+		if( $tooslow_tries )
+		{
+			$tooslow_dnsbls = $this->Settings->get_unserialized( 'tooslow_dnsbls', array() );
+		}
+		else
+		{
+			$tooslow_dnsbls = array();
+		}
+
 		$r = array();
 
 		foreach( $dnsbls as $blacklist )
 		{
+			if( isset($tooslow_dnsbls[$blacklist]) && $tooslow_dnsbls[$blacklist] > $tooslow_tries )
+			{
+				$this->debug_log( 'Skipping '.$blacklist.', because it is marked as too slow.' );
+				continue;
+			}
 			$log_msg = 'Checking '.$ip.' in DNSBL '.$blacklist.': ';
 
+			$Timer->start( 'check_dnsbl_ip_'.$blacklist, false );
 			$listed = $this->check_dnsbl_ip( $ip, $blacklist );
-			if( $listed )
+			$Timer->stop( 'check_dnsbl_ip_'.$blacklist );
+			$time_taken = $Timer->get_duration('check_dnsbl_ip_'.$blacklist);
+
+			$log_msg .= $listed ? 'BLACKLISTED ('.$listed.')' : 'OK (not listed).';
+			$log_msg .= ' ('.$time_taken.'s)';
+
+			if( $tooslow_tries && $time_taken > $this->Settings->get('tooslow_limit') )
 			{
-				$log_msg .= 'BLACKLISTED ('.$listed.')';
-			}
-			else
-			{
-				$log_msg .= 'OK (not listed).';
+				$tooslow_dnsbls[$blacklist] = isset($tooslow_dnsbls[$blacklist]) ? ($tooslow_dnsbls[$blacklist]+1) : 1;
+				$tooslow_needs_update = true;
+				$this->debug_log( 'Increased tooslow-counter on '.$blacklist.' to '.$tooslow_dnsbls[$blacklist].'.' );
 			}
 
 			$this->debug_log( $log_msg );
 
-			if( !$check_all )
+			if( ! $check_all )
 			{
-				return $listed ? $blacklist.': '.$listed : false;
+				if( $listed )
+				{
+					$r = $blacklist.': '.$listed;
+					break;
+				}
 			}
+			else
+			{
+				$r[] = $blacklist.': '.( $listed ? T_('Blacklisted').' ('.$listed.')' : 'not listed' );
+			}
+		}
 
-			$r[] = $blacklist.': '.( $listed ? T_('Blacklisted').' ('.$listed.')' : 'not listed' );
+		if( $tooslow_needs_update )
+		{ // might have changed
+			$this->Settings->set( 'tooslow_dnsbls', serialize($tooslow_dnsbls) );
+			$this->Settings->dbupdate();
 		}
 
 		if( empty($r) )
@@ -284,21 +570,15 @@ class dnsbl_antispam_plugin extends Plugin
 
 
 	/**
-	 * Display error page that allows whitelisting the Session.
+	 * Display error page that may allow whitelisting the Session.
 	 *
 	 * @param string Additional error message.
 	 */
 	function display_error_page( $error_ip_blocked )
 	{
-		global $Session, $ReqURI;
-		global $plugins_dirout, $core_subdir;
+		global $Plugins, $plugins_dirout, $core_subdir;
 
 		require_once dirname(__FILE__).'/'.$plugins_dirout.$core_subdir.'_form.class.php';
-
-		// Whitelist this session - this gets checked against the antispam_whitelist_key GET param:
-		$antispam_whitelist_key = generate_random_key(50);
-		$Session->set( 'antispam_whitelist_key', $antispam_whitelist_key );
-		$Session->dbsave();
 
 		header('HTTP/1.0 403 Forbidden');
 		?>
@@ -311,22 +591,17 @@ class dnsbl_antispam_plugin extends Plugin
 
 			<body>
 				<h1><?php echo T_('Your IP address is blocked.') ?></h1>
+
 				<?php
 				if( !empty($error_ip_blocked) )
 				{
 					echo '<p>'.$error_ip_blocked.'</p>';
 				}
 
-				if( $this->Settings->get('use_whitelisting') )
+				if( ! $this->use_whitelisting
+				 || ! $Plugins->trigger_event_first_true( 'CaptchaPayload', array( 'key' => 'dnsbl_'.$this->ID ) ) )
 				{
-					$Form = new Form( $ReqURI );
-					$Form->switch_layout( 'none' );
-					$Form->begin_form();
-					$post_copy = $_POST;
-					unset( $post_copy['antispam_whitelist_key'] ); // do not include a (perhaps) previously POSTed one.
-					$Form->hiddens_by_key( $post_copy );
-					$Form->hidden( 'antispam_whitelist_key', $antispam_whitelist_key );
-					$Form->end_form( array( array('value' => T_('I am not evil! Please whitelist my session!')) ) );
+					echo '<p>'.T_("Whitelisting is not enabled. You cannot access this site with your current IP address. Your only hope might be to get a new IP address by re-connecting to your Internet Service Provider.").'</p>';
 				}
 
 				debug_info();
@@ -336,12 +611,65 @@ class dnsbl_antispam_plugin extends Plugin
 		<?php
 	}
 
+
+	/**
+	 * Update our statistics.
+	 *
+	 * We call ourself here as shutdown_function because we want {@link $Hit::ID}.
+	 *
+	 * @param string Type ('blocked', 'not_blocked', 'whitelisted')
+	 * @return boolean
+	 */
+	function update_stats( $type, $data = NULL, $doit = false )
+	{
+		global $DB, $Hit;
+
+		if( ! $this->Settings->get( 'enable_stats' ) )
+		{
+			return false;
+		}
+
+		if( ! $doit )
+		{
+			register_shutdown_function( array(&$this, 'update_stats'), $type, $data, true );
+			return;
+		}
+
+		$hit_ID = isset( $Hit->ID ) ? $Hit->ID : NULL;
+
+		$DB->query( '
+			INSERT INTO '.$this->get_table_prefix().'log
+			( log_type, log_hit_ID, log_data )
+			VALUES ( "'.$type.'", '.$DB->quote($hit_ID).', '.$DB->quote($data).' )' );
+
+		return true;
+	}
+
+
+	/**
+	 * Internal method to check dependencies on Captcha plugin.
+	 *
+	 * @return string|true
+	 */
+	function validate_dependencies()
+	{
+		global $Plugins;
+
+		if( ! $Plugins->get_list_by_all_events( array('CaptchaValidated', 'CaptchaPayload') ) )
+		{
+			return T_('There is no Captcha plugin installed. Whitelisting is disabled.');
+		}
+	}
+
 }
 
 
 
 /*
  * $Log$
+ * Revision 1.4  2006/01/26 23:08:36  blueyed
+ * Plugins enhanced.
+ *
  * Revision 1.3  2006/01/04 15:05:16  fplanque
  * minor
  *

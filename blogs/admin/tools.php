@@ -7,7 +7,7 @@
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
- * @author This file built upon code from original b2 - http://cafelog.com/
+ * @author blueyed: Daniel HAHLER
  */
 
 /**
@@ -23,7 +23,6 @@ if( $AdminUI->get_menu_entries('tools') )
 
 $Plugin = NULL;
 param( 'tab', 'string', '', true );
-$AdminUI->set_path_by_nr( 1, $tab );
 
 $tab_plugin_ID = false;
 
@@ -32,7 +31,16 @@ if( ! empty($tab) )
 	if( preg_match( '~^plug_ID_(\d+)$~', $tab, $match ) )
 	{
 		$tab_plugin_ID = $match[1];
-		$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabAction', $params = array() );
+		if( ! $Plugins->get_by_ID( $match[1] ) )
+		{ // Plugin does not exist
+			$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $tab_plugin_ID ), 'error' );
+			$tab_plugin_ID = false;
+			$tab = '';
+		}
+		else
+		{
+			$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabAction', $params = array() );
+		}
 	}
 	else
 	{
@@ -42,14 +50,15 @@ if( ! empty($tab) )
 }
 
 
+$AdminUI->set_path_by_nr( 1, $tab );
+
 require( dirname(__FILE__).'/_menutop.php' );
 
 $AdminUI->disp_payload_begin();
 
 
 if( empty($tab) )
-{
-	// Event AdminToolPayload:
+{ // Event AdminToolPayload:
 	$tool_plugins = $Plugins->get_list_by_event( 'AdminToolPayload' );
 	foreach( $tool_plugins as $loop_Plugin )
 	{
@@ -73,12 +82,9 @@ if( empty($tab) )
 
 	<?php
 }
-else
-{
-	if( $tab_plugin_ID )
-	{
-		$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabPayload', $params = array() );
-	}
+elseif( $tab_plugin_ID )
+{ // Plugin tab
+	$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabPayload', $params = array() );
 }
 
 

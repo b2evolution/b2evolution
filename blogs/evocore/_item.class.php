@@ -821,6 +821,7 @@ class Item extends DataObject
 		if( $dispmore && !$preview && $Hit->is_new_view() )
 		{ // Increment view counter
 			$this->set_param( 'views', 'number', $this->views+1 );
+			$Plugins->trigger_event( 'ItemViewed', array( 'Item' => & $this ) );
 			$this->dbupdate();  // move to end of method, if we should have more params to be changed someday
 		}
 
@@ -892,6 +893,9 @@ class Item extends DataObject
 		// Apply rendering
 		$post_renderers = $Plugins->validate_list( $this->renderers );
 		$output = $Plugins->render( $output, $post_renderers, $format );
+
+		// Apply Display plugins
+		$output = $Plugins->trigger_display( $output, $this, $format );
 
 		// Character conversions
 		$output = format_to_output( $output, $format );
@@ -2298,6 +2302,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.90  2006/01/26 23:08:35  blueyed
+ * Plugins enhanced.
+ *
  * Revision 1.89  2006/01/26 20:09:58  blueyed
  * Fix for comments visibility. Thanks to jbettis (http://forums.b2evolution.net/viewtopic.php?p=32435)
  *

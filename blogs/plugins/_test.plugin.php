@@ -2,7 +2,8 @@
 /**
  * This file implements the TEST plugin.
  *
- * For the most recent API documentation see {@link Plugin} in ../evocore/_plugin.class.php.
+ * For the most recent and complete Plugin API documentation
+ * see {@link Plugin} in ../evocore/_plugin.class.php.
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
@@ -240,6 +241,19 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Gets invoked before the main payload in the backoffice.
+	 *
+	 * @see Plugin::AdminBeginPayload()
+	 */
+	function AdminBeginPayload()
+	{
+		echo '<div class="panelblock center">TEST plugin: AdminBeginPayload event.</div>';
+
+		parent::AdminBeginPayload();
+	}
+
+
+	/**
 	 * Event handler: Called when rendering item/post contents as HTML.
 	 *
 	 * Note: return value is ignored. You have to change $params['content'].
@@ -290,22 +304,32 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when the plugin is going to be installed.
-	 * @see Plugin::Install
+	 * Event handler: Called before the plugin is installed.
+	 * @see Plugin::BeforeInstall()
 	 */
-	function Install()
+	function BeforeInstall()
 	{
 		global $Plugins;
-		$this->msg( 'TEST plugin sucessfully installed. All the hard work we did was adding this message.. ;)' );
+		$this->msg( 'TEST plugin: BeforeInstall event.' );
 		return true;
 	}
 
 
 	/**
-	 * Event handler: Called when the plugin is going to be un-installed.
-	 * @see Plugin::Install
+	 * Event handler: Called when the plugin has been installed.
+	 * @see Plugin::AfterInstall()
 	 */
-	function Uninstall()
+	function AfterInstall()
+	{
+		$this->msg( 'TEST plugin sucessfully installed. All the hard work we did was adding this message in AfterInstall event.. ;)' );
+	}
+
+
+	/**
+	 * Event handler: Called before the plugin is going to be un-installed.
+	 * @see Plugin::BeforeUninstall()
+	 */
+	function BeforeUninstall()
 	{
 		$this->msg( 'TEST plugin sucessfully un-installed. All the hard work we did was adding this message.. ;)' );
 		return true;
@@ -314,7 +338,7 @@ class test_plugin extends Plugin
 
 	/**
 	 * Event handler: called when a new user has registered.
-	 * @see Plugin::Registration
+	 * @see Plugin::AppendUserRegistrTransact()
 	 */
 	function AppendUserRegistrTransact( $params )
 	{

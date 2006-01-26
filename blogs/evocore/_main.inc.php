@@ -233,7 +233,9 @@ $Plugins = & new Plugins();
 $Plugins->trigger_event( 'SessionLoaded' );
 
 
-if( empty($generating_static) && $get_return = $Plugins->trigger_event_first_true( 'CachePageContent' ) )
+if( empty($generating_static)
+    && ( $get_return = $Plugins->trigger_event_first_true( 'CachePageContent' ) )
+    && ( isset($get_return['data']) ) )
 {
 	echo $get_return['data'];
 	die;
@@ -519,6 +521,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.80  2006/01/26 23:08:36  blueyed
+ * Plugins enhanced.
+ *
  * Revision 1.79  2006/01/22 20:52:24  blueyed
  * Documented movin $Plugins/$Session init up.
  *
