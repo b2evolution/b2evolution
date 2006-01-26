@@ -339,7 +339,7 @@ class Session
 		{	// There is something to update:
 			$this->_data[$param] = array( ( $expire ? ($localtimenow + $expire) : NULL ), $value );
 
-			$Debuglog->add( 'Session data['.$param.'] updated. Expire in: '.$expire.'.', 'session' );
+			$Debuglog->add( 'Session data['.$param.'] updated. Expire in: '.( $expire ? $expire.'s' : '-' ).'.', 'session' );
 
 			$this->_session_needs_save = true;
 		}
@@ -397,6 +397,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.44  2006/01/26 21:20:59  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.43  2006/01/22 19:38:45  blueyed
  * Added expiration support through set() for session data.
  *
