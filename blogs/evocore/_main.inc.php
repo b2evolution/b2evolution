@@ -219,8 +219,8 @@ $Session = & new Session();
 
 /**
  * Plug-ins init.
- * This is done quite early here to give an early hook to plugins (though it might also be moved just after $DB init when there is reason for a hook there).
- * The {@link dnsbl_antispam_plugin} is an example that uses this hook.
+ * This is done quite early here to give an early hook to plugins (fp>WHERE?? WHICH HOOK?)(though it might also be moved just after $DB init when there is reason for a hook there).
+ * The {@link dnsbl_antispam_plugin} is an example that uses this hook. WHAT DOES IT DO WITH THE HOOK. STOP FORCING THE READER TO WANDER THROUGH MULTIPLE FILES IN ORDER TO UNDERSTAND YOUR COMMENTS!!!!!!!!!!!!!!!
  */
 require_once dirname(__FILE__).'/_plugins.class.php';
 /**
@@ -233,6 +233,7 @@ $Plugins = & new Plugins();
 $Plugins->trigger_event( 'SessionLoaded' );
 
 
+// WHAT THE HELL IS THAT:::: ??????
 if( empty($generating_static)
     && ( $get_return = $Plugins->trigger_event_first_true( 'CachePageContent' ) )
     && ( isset($get_return['data']) ) )
@@ -521,6 +522,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.81  2006/01/27 16:52:45  fplanque
+ * no message
+ *
  * Revision 1.80  2006/01/26 23:08:36  blueyed
  * Plugins enhanced.
  *

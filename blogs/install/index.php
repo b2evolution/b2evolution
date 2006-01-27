@@ -441,9 +441,13 @@ to
 		 * NEW DB: Create a plain new db structure + sample contents
 		 * -----------------------------------------------------------------------------------
 		 */
-		$DB->halt_on_error = $DB->show_errors = false;
+	/*
+	fp>> what's a damn good reason to take the risk of having plugins mess around during the main install ???
+		$DB->halt_on_error = false;
+		$DB->show_errors = false;
 		$Plugins = new Plugins(); // inserting sample data triggers events
 		$DB->halt_on_error = $DB->show_errors = true;
+	*/
 		?>
 		<h2><?php echo T_('Installing b2evolution tables with sample data')?></h2>
 		<?php
@@ -573,6 +577,8 @@ to
 			break;
 		}
 		// Uninstall Plugins
+// TODO: fp>> I don't trust the plugins to uninstall themselves correctly. There will be tons of lousy poorly written plugins. All I trust them to do is to crash the uninstall procedure. We want a hardcore brute force uninsall! and most users "may NOT want" to even think about "ma-nu-al-ly" removing something from their DB.
+/*
 		$DB->show_errors = $DB->halt_on_error = false;
 		$Plugins = new Plugins();
 		$DB->show_errors = $DB->halt_on_error = true;
@@ -595,7 +601,7 @@ to
 			echo "You may want to manually remove left files or DB tables from the failed plugin(s).<br />\n";
 		}
 		$DB->show_errors = $DB->halt_on_error = true;
-
+*/
 		db_delete();
 		?>
 		<p><?php echo T_('Reset done!')?></p>
@@ -621,6 +627,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.84  2006/01/27 16:52:46  fplanque
+ * no message
+ *
  * Revision 1.83  2006/01/26 23:08:36  blueyed
  * Plugins enhanced.
  *

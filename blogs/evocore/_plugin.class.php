@@ -400,6 +400,7 @@ class Plugin
 	 * If you want to use this, call parent::AdminBeginPayload() in your Plugin.
 	 *
 	 * @see BeforeUninstall() for the corresponding action handler
+	 * @todo: fp>> using this hook to uninstall a plugin feels so incredibly dirty...
 	 */
 	function AdminBeginPayload()
 	{
@@ -854,7 +855,9 @@ class Plugin
 
 
 	/**
-	 * Remove a list of Plugin events for the current request.
+	 * Remove a list of Plugin events, for the current request only.
+	 *
+fp>> At this place there should typically be an example of when you want to use this
 	 *
 	 * @todo Needs to break out of a triggered event that caused the Plugin to call this.
 	 * @param array List of events.
@@ -1001,6 +1004,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.22  2006/01/27 16:52:46  fplanque
+ * no message
+ *
  * Revision 1.21  2006/01/26 23:47:27  blueyed
  * Added password settings type.
  *
