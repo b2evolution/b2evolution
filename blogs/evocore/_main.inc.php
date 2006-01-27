@@ -384,7 +384,9 @@ if( !isset($login_required) )
 
 // TODO: prevent brute force attacks! (timeout - based on coming Session or Hit object?)
 
-$login = $pass = $pass_md5 = NULL;
+$login = NULL;
+$pass = NULL;
+$pass_md5 = NULL;
 
 if( isset($_POST['login'] ) && isset($_POST['pwd'] ) )
 { // Trying to log in with a POST
@@ -522,6 +524,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.82  2006/01/27 17:50:37  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.81  2006/01/27 16:52:45  fplanque
  * no message
  *

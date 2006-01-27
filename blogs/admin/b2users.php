@@ -277,9 +277,10 @@ if( !$Messages->count('error') )
 
 			$Request->param( 'edited_user_pass1', 'string', true );
 			$Request->param( 'edited_user_pass2', 'string', true );
-			if( !$Request->param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', ($edited_User->ID == 0) ) ) // required for new users
-			{
-				$edited_user_pass1 = $edited_user_pass2 = ''; // empty it
+			if( ! $Request->param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', ($edited_User->ID == 0) ) ) // required for new users
+			{ // passwords not the same or empty: empty them for the form
+				$edited_user_pass1 = '';
+				$edited_user_pass2 = '';
 			}
 
 			$edited_User->set( 'login', $edited_user_login );
@@ -594,6 +595,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.126  2006/01/27 17:50:36  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.125  2006/01/10 21:09:30  fplanque
  * I think the ICQ NULL is better enforced in User::set()
  *

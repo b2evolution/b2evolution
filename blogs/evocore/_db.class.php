@@ -1012,7 +1012,8 @@ class DB
 			$time_queries = 0;
 		}
 
-		$count_queries = $count_rows = 0;
+		$count_queries = 0;
+		$count_rows = 0;
 
 		echo '<strong>DB queries:</strong> '.$this->num_queries.'<br />';
 
@@ -1166,6 +1167,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.51  2006/01/27 17:50:37  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.50  2006/01/15 18:56:02  blueyed
  * Made error on loading extension clearer; do not display function backtrace twice with print_error().
  *

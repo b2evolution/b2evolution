@@ -63,7 +63,7 @@ switch( $action )
 	case 'reload_plugins':
 		// Register new events
 		// Unregister obsolete events
-		// Detect plugins with no code and try to have at least one plugin with the default code 
+		// Detect plugins with no code and try to have at least one plugin with the default code
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -249,7 +249,8 @@ switch( $action )
 		param( 'edited_plugin_events', 'array', array() );
 		$registered_events = $Plugins->get_registered_events( $edit_Plugin );
 
-		$enable_events = $disable_events = array();
+		$enable_events = array();
+		$disable_events = array();
 		foreach( $edited_plugin_displayed_events as $l_event )
 		{
 			if( ! in_array( $l_event, $registered_events ) )
