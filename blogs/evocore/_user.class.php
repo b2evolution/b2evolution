@@ -563,7 +563,7 @@ class User extends DataObject
 			$row = $DB->get_row( $query, ARRAY_A );
 
 			if( empty($row) )
-			{ // No rights set for this Blog/User: remember this (to not have the same query next time) and pass on, because blog_genstatic is based on user level!
+			{ // No rights set for this Blog/User: remember this (in order not to have the same query next time)
 				$this->blog_post_statuses[$perm_target_blog] = array(
 						'blog_ismember' => '0',
 						'blog_post_statuses' => array(),
@@ -947,6 +947,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.62  2006/01/27 14:06:11  fplanque
+ * no message
+ *
  * Revision 1.61  2006/01/15 16:36:58  blueyed
  * check_perm_blogusers(): optimize and fix for blog_genstatic.
  *
