@@ -998,6 +998,7 @@ class AdminUI_general
 
 	/**
 	 * Set a path (that the user has chosen) by number ($nr) to $pathKey.
+fp>> Please describe this better ( "path by number" doesn't mean anything ) I can't understand this function
 	 *
 	 * This also marks the parent node as selected.
 	 *
@@ -1014,11 +1015,11 @@ class AdminUI_general
 			$nr = count($this->path);
 		}
 		if( $nr == 0 )
-		{
+		{ // comment!!??
 			$parentNode = & $this->get_node_by_path(NULL);
 		}
 		else
-		{
+		{ // comment!!??
 			$parentNode = & $this->get_node_by_path($this->get_path_range( 0, $nr-1 ));
 		}
 		$parentNode['selected'] = $pathKey;
@@ -1211,6 +1212,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.48  2006/01/27 15:10:11  fplanque
+ * no message
+ *
  * Revision 1.47  2006/01/26 23:08:35  blueyed
  * Plugins enhanced.
  *

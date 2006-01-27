@@ -334,7 +334,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	</div>
 
 
-	<?php if( !isset($generating_static) && !$Plugins->trigger_event_first_true('CacheIsCollectingContent') ) { ?>
+	<?php if( !isset($generating_static) && !$Plugins->trigger_event_first_true('CacheIsCollectingContent') ) { // fp>>Comment this!!!?>
 	<div class="bSideItem">
 		<h3 class="sideItemTitle"><?php echo T_('Who\'s Online?') ?></h3>
 		<?php

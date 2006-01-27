@@ -206,9 +206,11 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 /**
  * Template tag: Provide a link to the backoffice.
  *
+ * Unsually provided in skins in order for newbies to find the admin interface more easily...
+ *
  * @param string To be displayed before the link.
  * @param string To be displayed after the link.
- * @param string The page to link to below {@link $admin_url}. Example: 'tools.php' to go to the "Tools" tab.
+ * @param string The page to link to inside of {@link $admin_url}. Example: 'tools.php' to go to the "Tools" tab.
  *               Defaults to '' which will respect the setting in index.php.
  * @param string Text for the link.
  * @param string Title for the link.
@@ -427,6 +429,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.39  2006/01/27 15:10:13  fplanque
+ * no message
+ *
  * Revision 1.38  2006/01/26 20:58:16  blueyed
  * Added get_user_profile_link()
  *

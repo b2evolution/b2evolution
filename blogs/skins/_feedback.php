@@ -163,7 +163,7 @@
 
 		<!-- form to add a comment -->
 		<?php
-		$Form = new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID );
+		$Form = & new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID );
 			$Form->begin_form( 'bComment' );
 
 			$Form->hidden( 'comment_post_ID', $Item->ID );

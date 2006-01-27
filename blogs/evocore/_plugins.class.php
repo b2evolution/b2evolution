@@ -825,6 +825,7 @@ class Plugins
 	 * got uninstalled, the code is free and gets assigned here to one of the other Plugin
 	 * instances.
 	 *
+	 * @todo fp>>useless function similar to the ones in FileManager class. move this code to the caller!
 	 * @return boolean true if the code has been "fixed", false if not
 	 */
 	function set_empty_code_to_default( & $Plugin )
@@ -2027,6 +2028,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.39  2006/01/27 15:10:13  fplanque
+ * no message
+ *
  * Revision 1.38  2006/01/26 23:47:27  blueyed
  * Added password settings type.
  *

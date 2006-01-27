@@ -63,7 +63,7 @@ switch( $action )
 	case 'reload_plugins':
 		// Register new events
 		// Unregister obsolete events
-		// Detect new codes for plugins without one (see Plugins::set_empty_code_to_default())
+		// Detect plugins with no code and try to have at least one plugin with the default code 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -78,6 +78,7 @@ switch( $action )
 				$changed = true;
 			}
 
+			// Detect plugins with no code and try to have at least one plugin with the default code:
 			if( $Plugins->set_empty_code_to_default( $loop_Plugin ) )
 			{
 				$changed = true;
