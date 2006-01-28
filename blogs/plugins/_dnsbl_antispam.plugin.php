@@ -414,14 +414,14 @@ class dnsbl_antispam_plugin extends Plugin
 	 */
 	function SessionLoaded()
 	{
-		global $Hit, $Session, $Plugins;
+		global $Hit, $Plugins;
 
 		if( is_admin_page() )
 		{
 			return false;
 		}
 
-		if( $this->use_whitelisting && $Session->get( 'dnsbl_'.$this->ID.'_whitelisted' ) )
+		if( $this->use_whitelisting && $this->session_get( 'whitelisted' ) )
 		{
 			$this->debug_log( 'User is whitelisted.' );
 			$this->update_stats( 'whitelisted' );
@@ -437,7 +437,7 @@ class dnsbl_antispam_plugin extends Plugin
 				if( $Plugins->trigger_event_first_true( 'CaptchaValidated', array( 'key' => 'dnsbl_'.$this->ID ) ) )
 				{
 					#echo 'WHITE';
-					$Session->set( 'dnsbl_'.$this->ID.'_whitelisted', 1, $this->Settings->get('timeout_whitelisted') );
+					$this->session_set( 'whitelisted', 1, $this->Settings->get('timeout_whitelisted') );
 					$this->update_stats( 'whitelisted' );
 					return true;
 				}
@@ -667,6 +667,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.5  2006/01/28 21:13:19  blueyed
+ * Use helpers for Session data handling.
+ *
  * Revision 1.4  2006/01/26 23:08:36  blueyed
  * Plugins enhanced.
  *
