@@ -218,7 +218,7 @@
 			if( ! empty($comment_options) )
 			{
 				$Form->begin_fieldset();
-					echo $Form->begin_field( NULL, T_('Options') );
+					echo $Form->begin_field( NULL, T_('Options'), true );
 					echo $comment_options;
 					echo $Form->end_field();
 				$Form->end_fieldset();

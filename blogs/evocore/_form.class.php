@@ -249,10 +249,15 @@ class Form extends Widget
 	 * @uses $_common_params
 	 * @param string The name of the field
 	 * @param string The field label
+	 * @param boolean Reset {@link $_common_params}? This should be used if you build a field by yourself.
 	 * @return The generated HTML
 	 */
-	function begin_field( $field_name = NULL, $field_label = NULL )
+	function begin_field( $field_name = NULL, $field_label = NULL, $reset_common_params = false )
 	{
+		if( $reset_common_params )
+		{
+			$this->_common_params = array();
+		}
 		// Remember these, to make them available to get_label() for !$label_to_the_left
 		if( isset($field_name) )
 		{
@@ -2349,6 +2354,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.103  2006/01/28 22:22:38  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.102  2006/01/26 22:42:44  blueyed
  * end_form(): check for existence of JS addEvent().
  *
