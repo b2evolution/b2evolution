@@ -1148,7 +1148,7 @@ function create_b2evo_tables_phoenix_beta()
 	$DB->query( 'CREATE TABLE T_pluginsettings (
 									pset_plug_ID INT(11) UNSIGNED NOT NULL,
 									pset_name VARCHAR( 30 ) NOT NULL,
-									pset_value VARCHAR( 255 ) NULL,
+									pset_value TEXT NULL,
 									PRIMARY KEY ( pset_plug_ID, pset_name )
 								)' );
 	echo "OK.<br />\n";
@@ -1353,6 +1353,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.171  2006/01/28 18:25:02  blueyed
+ * pset_value as TEXT
+ *
  * Revision 1.170  2006/01/26 22:43:58  blueyed
  * Added comment_spam_karma field
  *
