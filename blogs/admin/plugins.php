@@ -218,13 +218,23 @@ switch( $action )
 		{
 			foreach( $edit_Plugin->GetDefaultSettings() as $l_name => $l_meta )
 			{
-				$l_param_type = (isset($l_meta['type']) && $l_meta['type'] == 'array') ? 'array' : 'string';
+				if( isset($l_meta['type']) && $l_meta['type'] == 'array' )
+				{ // this settings has a type
+					$l_param_type = $l_meta['type'];
+				}
+				else
+				{
+					$l_param_type = NULL;
+				}
 				$l_value = param( 'edited_plugin_set_'.$l_name, $l_param_type );
-				if( false === $Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsBeforeSet', $params = array( 'name' => $l_name, 'value' => & $l_value, 'meta' => $l_meta ) ) )
-				{ // skip this
+
+				if( isset($l_meta['type']) && $l_meta['type'] == 'integer' && ! preg_match( '~^\d+$~', $l_value ) )
+				{
+					$Request->param_error( 'edited_plugin_set_'.$l_name, sprintf( T_('The value for %s must be numeric.'), $l_name ), T_('The value must be numeric.') );
 					$action = 'edit_settings';
 					continue;
 				}
+
 				if( isset($l_meta['valid_pattern']) )
 				{
 					$param_pattern = is_array($l_meta['valid_pattern']) ? $l_meta['valid_pattern']['pattern'] : $l_meta['valid_pattern'];
@@ -239,6 +249,13 @@ switch( $action )
 				if( $l_param_type == 'array' )
 				{
 					$l_value = serialize($l_value);
+				}
+
+				// Ask the plugin if it's ok:
+				if( false === $Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsBeforeSet', $params = array( 'name' => $l_name, 'value' => & $l_value, 'meta' => $l_meta ) ) )
+				{ // skip this
+					$action = 'edit_settings';
+					continue;
 				}
 				$edit_Plugin->Settings->set( $l_name, $l_value );
 			}

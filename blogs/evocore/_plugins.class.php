@@ -1905,10 +1905,6 @@ class Plugins
 
 		$params = array();
 
-		if( isset($set_meta['maxlength']) )
-		{
-			$params['maxlength'] = (int)$set_meta['maxlength'];
-		}
 		if( isset($set_meta['note']) )
 		{
 			$params['note'] = $set_meta['note'];
@@ -1960,6 +1956,7 @@ class Plugins
 			case 'password':
 				$params['type'] = 'password'; // same as text input, but type=password
 
+			case 'integer':
 			case 'text':
 				// Default: "text input"
 				if( isset($set_meta['size']) )
@@ -1970,9 +1967,13 @@ class Plugins
 				{ // Default size:
 					$size = 25;
 				}
-				if( ! isset($params['maxlength']) || $params['maxlength'] > 255 )
-				{ // T_pluginsettings.pset_value can hold 255 chars only
-					$params['maxlength'] = 255;
+				if( isset($set_meta['maxlength']) )
+				{
+					$params['maxlength'] = (int)$set_meta['maxlength'];
+				}
+				else
+				{ // do not use size as maxlength, if not given!
+					$params['maxlength'] = '';
 				}
 
 				$Form->text_input( 'edited_plugin_set_'.$set_name,
@@ -2016,14 +2017,11 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
- * Revision 1.41  2006/01/28 17:52:15  blueyed
+ * Revision 1.42  2006/01/28 23:40:56  blueyed
  * *** empty log message ***
  *
  * Revision 1.40  2006/01/28 17:07:32  blueyed
  * Moved set_empty_code_to_default() to caller.
- *
- * Revision 1.39  2006/01/27 15:10:13  fplanque
- * no message
  *
  * Revision 1.38  2006/01/26 23:47:27  blueyed
  * Added password settings type.

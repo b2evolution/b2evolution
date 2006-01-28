@@ -242,7 +242,7 @@ class Plugin
 	 *   'defaultvalue' (default value, defaults to '')
 	 *   'note' (gets displayed as a note to the param field),
 	 *   'size', 'maxlength' (html input field attributes),
-	 *   'type' ('checkbox', 'textarea', 'password', 'array', 'text' (default)),
+	 *   'type' ('checkbox', 'textarea', 'password', 'array', 'number', 'text' (default)),
 	 *   'rows' (number of rows for type=='textarea'),
 	 *   'cols' (number of cols for type=='textarea'),
 	 *   'valid_pattern' (a regular expression pattern that the value must match)
@@ -267,6 +267,30 @@ class Plugin
 	 * @return array
 	 */
 	function GetDefaultSettings()
+	{
+		return array();
+	}
+
+
+	/**
+	 * Override this method to define methods/functions that you want to make accessible
+	 * through /htsrv/call_plugin.php, which allows you to call those methods by HTTP request.
+	 *
+	 * This is useful for things like AJAX or displaying an <iframe> element, where the content
+	 * should get provided by the plugin itself.
+	 *
+	 * E.g., the image captcha plugin uses this method to serve a generated image.
+	 *
+	 * NOTE: the Plugin's method must be prefixed with "htsrv_", but in this list (and the URL) it
+	 *       is not. E.g., to have a method "disp_image" that should be callable through this method
+	 *       return <code>array('disp_image')</code> here and implement it as
+	 *       <code>function htsrv_disp_image( $params )</code> in your plugin.
+	 *       This is used to distinguish those methods from others, but keep URLs nice.
+	 *
+	 * @see get_htsrv_url()
+	 * @return array
+	 */
+	function get_htsrv_methods()
 	{
 		return array();
 	}
@@ -800,6 +824,32 @@ class Plugin
 
 
 	/**
+	 * Get the URL to call a plugin method through http. This links to the /htsrv/call_plugin.php
+	 * file.
+	 *
+	 * @todo we might want to provide whitelisting of methods through {@link $Session} here and check for it in the htsrv handler.
+	 *
+	 * @param string Method to call. This must be listed in {@link get_htsrv_methods()}.
+	 * @param array Array of optional parameters passed to the method.
+	 * @param string Glue for additional GET params used internally.
+	 * @return string The URL
+	 */
+	function get_htsrv_url( $method, $params = array(), $glue = '&amp;' )
+	{
+		global $htsrv_url;
+		global $Session, $localtimenow;
+
+		$r = $htsrv_url.'call_plugin.php?plugin_ID='.$this->ID.$glue.'method='.$method;
+		if( !empty( $params ) )
+		{
+			$r .= $glue.'params='.rawurlencode(serialize( $params ));
+		}
+
+		return $r;
+	}
+
+
+	/**
 	 * A simple wrapper around the {@link $Messages} object with a default
 	 * catgory of 'note'.
 	 *
@@ -1026,7 +1076,7 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
- * Revision 1.26  2006/01/28 21:59:12  blueyed
+ * Revision 1.27  2006/01/28 23:40:56  blueyed
  * *** empty log message ***
  *
  * Revision 1.25  2006/01/28 21:11:16  blueyed
