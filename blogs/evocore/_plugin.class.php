@@ -401,6 +401,7 @@ class Plugin
 	 *
 	 * @see BeforeUninstall() for the corresponding action handler
 	 * @todo: fp>> using this hook to uninstall a plugin feels so incredibly dirty...
+	 *   blueyed>> This is the payload part only. Should we have an extra event for that? UninstallPayload()?
 	 */
 	function AdminBeginPayload()
 	{
@@ -869,6 +870,55 @@ class Plugin
 		$Plugins->stop_propagation();
 	}
 
+
+	/**
+	 * Set a data value for the session.
+	 *
+	 * @param string Name of the data's key (gets prefixed with 'plugIDX_' internally).
+	 * @param mixed The value
+	 * @param integer Time in seconds for data to expire (0 to disable).
+	 * @param boolean Should the data get saved immediately?
+	 */
+	function session_set( $name, $value, $timeout, $save_immediately = false )
+	{
+		global $Session;
+
+		$r = $Session->set( 'plugID'.$this->ID.'_'.$name, $value, $timeout );
+		if( $save_immediately )
+		{
+			$Session->dbupdate();
+		}
+		return $r;
+	}
+
+
+	/**
+	 * Get a data value for the session, using a unique prefix to the Plugin.
+	 * This checks for the data to be expired and unsets it then.
+	 *
+	 * @param string Name of the data's key (gets prefixed with 'plugIDX_' internally).
+	 * @return mixed|NULL The value, if set; otherwise NULL
+	 */
+	function session_get( $name )
+	{
+		global $Session;
+
+		return $Session->get( 'plugID'.$this->ID.'_'.$name );
+	}
+
+
+	/**
+	 * Delete a value from the session data, using a unique prefix to the Plugin.
+	 *
+	 * @param string Name of the data's key (gets prefixed with 'plugIDX_' internally).
+	 */
+	function session_delete( $name )
+	{
+		global $Session;
+
+		return $Session->delete( 'plugID'.$this->ID.'_'.$name );
+	}
+
 	/*
 	 * Helper methods }}}
 	 */
@@ -976,8 +1026,8 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
- * Revision 1.24  2006/01/28 17:52:15  blueyed
- * *** empty log message ***
+ * Revision 1.25  2006/01/28 21:11:16  blueyed
+ * Added helpers for Session data handling.
  *
  * Revision 1.23  2006/01/28 16:59:47  blueyed
  * Removed remove_events_for_this_request() as the problem would be anyway to handle the event where it got called from.
