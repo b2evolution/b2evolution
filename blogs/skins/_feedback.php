@@ -152,18 +152,18 @@
 	{	// We want to display the comments form:
 		if( $Item->can_comment() )
 		{ // User can leave a comment
-		?>
-		<h4><?php echo T_('Leave a comment') ?>:</h4>
+			?>
+			<h4><?php echo T_('Leave a comment') ?>:</h4>
 
-		<?php
+			<?php
 			$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
 			$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
 			$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
-		?>
+			?>
 
-		<!-- form to add a comment -->
-		<?php
-		$Form = & new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID );
+			<!-- form to add a comment -->
+			<?php
+			$Form = & new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID );
 			$Form->begin_form( 'bComment' );
 
 			$Form->hidden( 'comment_post_ID', $Item->ID );
@@ -243,8 +243,8 @@
 
 			<div class="clear"></div>
 
-		</form>
-		<?php
+			<?php
+			$Form->end_form();
 		}
 	}
 	?>
