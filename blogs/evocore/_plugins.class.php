@@ -621,6 +621,8 @@ class Plugins
 	 */
 	function unregister( & $Plugin )
 	{
+		global $Debuglog;
+
 		// Forget events:
 		foreach( array_keys($this->index_event_IDs) as $l_event )
 		{
@@ -649,9 +651,9 @@ class Plugins
 
 		$sort_key = array_search( $Plugin->ID, $this->sorted_IDs );
 		if( $sort_key === false )
-		{
+		{ // this may happen if a Plugin has unregistered itself
 			$Debuglog->add( 'Tried to unregister not-installed plugin (not in $sorted_IDs)!', 'plugins' );
-			return false; // should not happen
+			return false;
 		}
 		unset( $this->sorted_IDs[$sort_key] );
 		$this->sorted_IDs = array_values( $this->sorted_IDs );
@@ -814,34 +816,6 @@ class Plugins
 		$Plugin->apply_rendering = $apply_rendering;
 
 		return true;
-	}
-
-
-	/**
-	 * Sets the Plugin's code to its default if the current code is empty and the Plugin's class
-	 * has a default code that is not in use by another Plugin.
-	 *
-	 * When a Plugin has been installed several times and the one "blocking" the default code
-	 * got uninstalled, the code is free and gets assigned here to one of the other Plugin
-	 * instances.
-	 *
-	 * @todo fp>>useless function similar to the ones in FileManager class. move this code to the caller!
-	 * @return boolean true if the code has been "fixed", false if not
-	 */
-	function set_empty_code_to_default( & $Plugin )
-	{
-		$default_Plugin = & new $Plugin->classname;
-
-		$r = false;
-
-		if( empty($Plugin->code) // Instantiated Plugin has no code
-				&& ! empty($default_Plugin->code) // Plugin has default code
-				&& ! $this->get_by_code( $default_Plugin->code ) ) // Default code is not in use (anymore)
-		{ // Set the Plugin's code to the default one
-			$r = $this->set_code( $Plugin->ID, $default_Plugin->code );
-		}
-
-		return ( $r === 1 ); // true if one affected row
 	}
 
 
@@ -2028,6 +2002,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.40  2006/01/28 17:07:32  blueyed
+ * Moved set_empty_code_to_default() to caller.
+ *
  * Revision 1.39  2006/01/27 15:10:13  fplanque
  * no message
  *

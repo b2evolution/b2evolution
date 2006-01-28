@@ -79,9 +79,18 @@ switch( $action )
 			}
 
 			// Detect plugins with no code and try to have at least one plugin with the default code:
-			if( $Plugins->set_empty_code_to_default( $loop_Plugin ) )
-			{
-				$changed = true;
+			if( empty($loop_Plugin->code) )
+			{ // Instantiated Plugin has no code
+				$default_Plugin = & new $loop_Plugin->classname;
+
+				if( ! empty($default_Plugin->code) // Plugin has default code
+				    && ! $Plugins->get_by_code( $default_Plugin->code ) ) // Default code is not in use (anymore)
+				{ // Set the Plugin's code to the default one
+					if( $Plugins->set_code( $loop_Plugin->ID, $default_Plugin->code ) )
+					{
+						$changed = true;
+					}
+				}
 			}
 		}
 
