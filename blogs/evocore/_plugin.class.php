@@ -886,7 +886,7 @@ class Plugin
 		$r = $Session->set( 'plugID'.$this->ID.'_'.$name, $value, $timeout );
 		if( $save_immediately )
 		{
-			$Session->dbupdate();
+			$Session->dbsave();
 		}
 		return $r;
 	}
@@ -1026,6 +1026,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.26  2006/01/28 21:59:12  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.25  2006/01/28 21:11:16  blueyed
  * Added helpers for Session data handling.
  *
