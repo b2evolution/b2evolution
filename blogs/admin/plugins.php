@@ -452,16 +452,11 @@ switch( $action )
 		$Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced')
 			.') <img src="'.get_icon('expand', 'url').'" id="clickimg_pluginevents" />', array('legend_params' => array( 'onclick' => 'toggle_clickopen(\'pluginevents\')') ) );
 		?>
+
 		<div id="clickdiv_pluginevents">
+
 		<?php
-		/**
-		 * We do not use {@link Plugins::get_enabled_events()}, because it may have been
-		 * dynamically disabled by {@link Plugin::remove_events_for_this_request()}.
-		 */
-		$enabled_events = $DB->get_col( '
-			SELECT pevt_event FROM T_pluginevents
-			 WHERE pevt_plug_ID = '.$edit_Plugin->ID.'
-			   AND pevt_enabled > 0' );
+		$enabled_events = $Plugins->get_enabled_events( $edit_Plugin->ID );
 		$supported_events = $Plugins->get_supported_events();
 		$registered_events = $Plugins->get_registered_events( $edit_Plugin );
 		$count = 0;
@@ -484,7 +479,9 @@ switch( $action )
 			echo T_( 'This plugin has no registered events.' );
 		}
 		?>
+
 		</div>
+
 		<?php
 		$Form->end_fieldset();
 		?>

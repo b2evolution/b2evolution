@@ -855,36 +855,6 @@ class Plugin
 
 
 	/**
-	 * Remove a list of Plugin events, for the current request only.
-	 *
-fp>> At this place there should typically be an example of when you want to use this
-	 *
-	 * @todo Needs to break out of a triggered event that caused the Plugin to call this.
-	 * @param array List of events.
-	 */
-	function remove_events_for_this_request( $events )
-	{
-		global $Plugins;
-
-		if( ! is_array($events) )
-		{
-			$events = array( $events );
-		}
-
-		foreach( $events as $event )
-		{
-			if( isset($Plugins->index_event_IDs[$event]) )
-			{
-				while( ($key = array_search( $this->ID, $Plugins->index_event_IDs[$event] )) !== false )
-				{
-					unset( $Plugins->index_event_IDs[$event][$key] );
-				}
-			}
-		}
-	}
-
-
-	/**
 	 * Stop propagation of the event to next plugins (with lower priority)
 	 * in events that get triggered for a batch of Plugins.
 	 *
@@ -1004,8 +974,8 @@ fp>> At this place there should typically be an example of when you want to use 
 
 /* {{{ Revision log:
  * $Log$
- * Revision 1.22  2006/01/27 16:52:46  fplanque
- * no message
+ * Revision 1.23  2006/01/28 16:59:47  blueyed
+ * Removed remove_events_for_this_request() as the problem would be anyway to handle the event where it got called from.
  *
  * Revision 1.21  2006/01/26 23:47:27  blueyed
  * Added password settings type.
