@@ -334,7 +334,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	</div>
 
 
-	<?php if( !isset($generating_static) && !$Plugins->trigger_event_first_true('CacheIsCollectingContent') ) { // fp>>Comment this!!!?>
+	<?php
+	if( empty($generating_static) && ! $Plugins->trigger_event_first_true('CacheIsCollectingContent') )
+	{ // We're not generating static pages nor is a caching plugin collecting the content, so we can display this block
+		// TODO: when this gets a SkinTag plugin this check should get done by the Plugin
+		?>
 	<div class="bSideItem">
 		<h3 class="sideItemTitle"><?php echo T_('Who\'s Online?') ?></h3>
 		<?php
