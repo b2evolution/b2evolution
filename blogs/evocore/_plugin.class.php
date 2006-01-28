@@ -714,6 +714,8 @@ class Plugin
 	 * has been instantiated.
 	 *
 	 * Use this to validate Settings or cache them into class properties.
+	 *
+	 * @return boolean If false gets returned the Plugin gets unregistered (for the current request only).
 	 */
 	function PluginSettingsInstantiated( & $params )
 	{
@@ -974,6 +976,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.24  2006/01/28 17:52:15  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.23  2006/01/28 16:59:47  blueyed
  * Removed remove_events_for_this_request() as the problem would be anyway to handle the event where it got called from.
  *

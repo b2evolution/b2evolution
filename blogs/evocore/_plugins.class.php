@@ -606,7 +606,11 @@ class Plugins
 		}
 
 		// Instantiate the Plugins Settings class
-		$this->instantiate_Settings( $Plugin );
+		if( $this->instantiate_Settings( $Plugin ) === false )
+		{
+			$this->unregister( $Plugin );
+			$Plugin = '';
+		}
 
 		$Timer->pause( 'plugins_register' );
 
@@ -824,6 +828,8 @@ class Plugins
 	 * plugin, if it provides default settings.
 	 *
 	 * @param Plugin
+	 * @return NULL|boolean NULL, if no Settings;
+	 *    False, if the plugin's method {@link PluginSettingsInstantiated()} returned false.
 	 */
 	function instantiate_Settings( & $Plugin )
 	{
@@ -831,11 +837,13 @@ class Plugins
 
 		$Timer->resume( 'plugins_settings' );
 
+		$r = true;
+
 		$defaults = $this->call_method_if_active( $Plugin->ID, 'GetDefaultSettings', $params = array() );
 
 		if( empty($defaults) )
 		{
-			return false;
+			return NULL;
 		}
 
 		if( !is_array($defaults) )
@@ -852,10 +860,16 @@ class Plugins
 				$Plugin->Settings->_defaults[$l_name] = isset($l_meta['defaultvalue']) ? $l_meta['defaultvalue'] : '';
 			}
 
-			$this->call_method( $Plugin->ID, 'PluginSettingsInstantiated', $params = array() );
+			$event_r = $this->call_method( $Plugin->ID, 'PluginSettingsInstantiated', $params = array() );
+			if( $event_r === false )
+			{
+				$r = false;
+			}
 		}
 
 		$Timer->pause( 'plugins_settings' );
+
+		return $r;
 	}
 
 
@@ -2002,6 +2016,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.41  2006/01/28 17:52:15  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.40  2006/01/28 17:07:32  blueyed
  * Moved set_empty_code_to_default() to caller.
  *
