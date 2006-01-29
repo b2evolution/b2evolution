@@ -2,7 +2,7 @@
 /**
  * This file implements the PluginS class.
  *
- * This is where you can plug-in some plugins :D
+ * This is where you can plug-in some {@link Plugin plugins} :D
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
@@ -50,10 +50,10 @@ require_once dirname(__FILE__).'/_plugin.class.php';
 /**
  * Plugins Class
  *
- * This is where you can plug-in some plugins :D
+ * This is where you can plug-in some {@link Plugin plugins} :D
  *
  * @todo Handle dependencies on other plugins or events. The {@link dnsbl_antispam_plugin} does this itself now.
- * @todo A plugin might want to register allowed events that it triggers itself on installation..
+ * @todo A plugin might want to register allowed events (that it triggers itself) on installation..
  * @package evocore
  */
 class Plugins
@@ -66,7 +66,6 @@ class Plugins
 	 * Array of loaded plug-ins.
 	 */
 	var $Plugins = array();
-
 
 	/**
 	 * Index: plugin_code => Plugin
@@ -132,7 +131,6 @@ class Plugins
 	 * @var integer
 	 */
 	var $smallest_internal_ID = 0;
-
 
 	/**
 	 * The list of supported events/hooks.
@@ -210,6 +208,7 @@ class Plugins
 				'PluginSettingsInstantiated' => '', /* private / needs no description */
 				'PluginSettingsBeforeSet' => T_("Called before setting a plugin's setting in the backoffice."),
 				'PluginSettingsEditAction' => T_("Called as action before editing the plugin's settings."),
+				'PluginSettingsEditDisplayAfter' => T_('Called after standard plugin settings are displayed for editing.'),
 
 				'RenderItemAsHtml' => T_('Renders content when generated as HTML.'),
 				'RenderItemAsXml' => T_('Renders content when generated as XML.'),
@@ -230,7 +229,7 @@ class Plugins
 				'DisplayCommentFormButton' => '',
 				'DisplayCommentFormFieldset' => '',
 
-				'CommentFormSent' => T_('Called when a comment form got submitted.'),
+				'CommentFormSent' => T_('Called when a comment form has been submitted.'),
 
 				'GetKarmaForComment' => '',
 
@@ -1886,6 +1885,9 @@ class Plugins
 		{
 			$this->display_settings_fieldset_field( $l_name, $l_meta, $Plugin, $Form );
 		}
+
+		$this->call_method_if_active( $Plugin->ID, 'PluginSettingsEditDisplayAfter', $params = array() );
+
 		$Form->end_fieldset();
 	}
 
@@ -2017,7 +2019,7 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
- * Revision 1.42  2006/01/28 23:40:56  blueyed
+ * Revision 1.43  2006/01/29 15:32:35  blueyed
  * *** empty log message ***
  *
  * Revision 1.40  2006/01/28 17:07:32  blueyed
