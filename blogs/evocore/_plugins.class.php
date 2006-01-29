@@ -229,14 +229,15 @@ class Plugins
 				'DisplayCommentFormButton' => '',
 				'DisplayCommentFormFieldset' => '',
 
+				'DisplayHelp' => T_('Displays help for the plugin.'),
+
 				'CommentFormSent' => T_('Called when a comment form has been submitted.'),
 
 				'GetKarmaForComment' => '',
 
+				// Other Plugins can use this:
 				'CaptchaValidated' => T_('Validate the test from CaptchaPayload to detect humans.'),
 				'CaptchaPayload' => T_('Provide a turing test to detect humans.'),
-				'CaptchaFormPayload' => '',
-				'CaptchaFormGetKarma' => '',
 
 				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
 				'GetDefaultSettings' => '',  /* private / needs not description */ // used to instantiate $Settings.
@@ -1601,6 +1602,18 @@ class Plugins
 
 
 	/**
+	 * Has a plugin a specific event registered/enabled?
+	 *
+	 * @return boolean
+	 */
+	function has_event( $plugin_ID, $event )
+	{
+		return isset($this->index_event_IDs[$event])
+			&& in_array( $plugin_ID, $this->index_event_IDs[$event] );
+	}
+
+
+	/**
 	 * (Re)load Plugin Events.
 	 */
 	function load_events()
@@ -1866,33 +1879,6 @@ class Plugins
 
 
 	/**
-	 * Display the fieldset for the Plugin Settings.
-	 *
-	 * @uses display_settings_fieldset_field() for each field to allow recursion for array type settings
-	 * @param Plugin (by reference)
-	 * @param Form (by reference)
-	 */
-	function display_settings_fieldset( & $Plugin, & $Form )
-	{
-		if( ! $Plugin->Settings )
-		{
-			return false;
-		}
-
-		$Form->begin_fieldset( T_('Plugin settings'), array( 'class' => 'clear' ) );
-
-		foreach( $Plugin->GetDefaultSettings() as $l_name => $l_meta )
-		{
-			$this->display_settings_fieldset_field( $l_name, $l_meta, $Plugin, $Form );
-		}
-
-		$this->call_method_if_active( $Plugin->ID, 'PluginSettingsEditDisplayAfter', $params = array() );
-
-		$Form->end_fieldset();
-	}
-
-
-	/**
 	 * Display a single field (setting) of the Plugin's Settings.
 	 *
 	 * @param string Settings name (key)
@@ -1915,6 +1901,20 @@ class Plugins
 		if( ! isset($set_meta['type']) )
 		{
 			$set_meta['type'] = 'text';
+		}
+
+		if( isset($set_meta['help']) )
+		{
+			if( is_string($set_meta['help']) )
+			{
+				$get_help_link_params = array($set_meta['help']);
+			}
+			else
+			{
+				$get_help_link_params = $set_meta['help'];
+			}
+
+			$params['note'] .= ' '.call_user_func_array( array( & $Plugin, 'get_help_link'), $get_help_link_params );
 		}
 
 		// Display input element:
@@ -2019,7 +2019,7 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
- * Revision 1.43  2006/01/29 15:32:35  blueyed
+ * Revision 1.44  2006/01/29 20:48:17  blueyed
  * *** empty log message ***
  *
  * Revision 1.40  2006/01/28 17:07:32  blueyed

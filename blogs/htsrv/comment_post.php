@@ -30,7 +30,7 @@ if( ! $commented_Item->can_comment( '', '', '', '' ) )
 	$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
 }
 
-// fp>>What would this be used for??  And the event name doesn't speak for itself...
+// Trigger event: a Plugin could add a $category="error" message here..
 $Plugins->trigger_event( 'CommentFormSent', array( 'Item' => & $commented_Item ) );
 
 param( 'comment', 'html' );
@@ -200,6 +200,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.51  2006/01/29 20:48:17  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.50  2006/01/27 15:10:13  fplanque
  * no message
  *

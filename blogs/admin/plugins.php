@@ -407,11 +407,11 @@ switch( $action )
 
 	case 'info':
 		param( 'plugin_ID', 'integer', true );
-		if( ! ($info_Plugin = & $AvailablePlugins->get_by_ID( $plugin_ID )) )
+		if( ! ($edit_Plugin = & $AvailablePlugins->get_by_ID( $plugin_ID )) )
 		{
-			$info_Plugin = & $Plugins->get_by_ID($plugin_ID);
+			$edit_Plugin = & $Plugins->get_by_ID($plugin_ID);
 		}
-		if( ! $info_Plugin )
+		if( ! $edit_Plugin )
 		{
 			$action = 'list';
 		}
@@ -440,29 +440,49 @@ $AdminUI->disp_payload_begin();
 
 switch( $action )
 {
-	case 'info':
-		// Display plugin info:
-		$Form = & new Form( $pagenow );
-		$Form->begin_form('fform');
-		$Form->begin_fieldset('Plugin info', array('class' => 'fieldset clear')); // "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509)
-		$Form->info_field( T_('Name'), $info_Plugin->name( 'raw', false ) );
-		$Form->info_field( T_('Code'), $info_Plugin->code, array( 'note' => T_('This 32 character code uniquely identifies the functionality of this plugin.') ) );
-		$Form->info_field( T_('Short desc'), $info_Plugin->short_desc( 'raw', false ) );
-		$Form->info_field( T_('Long desc'), $info_Plugin->long_desc( 'raw', false ) );
-		// TODO: help url
-		$Form->end_fieldset();
-		$Form->end_form();
-		$action = 'list';
+	case 'disp_help':
+		// Display plugin help ("DisplayHelp" event):
+		param( 'plugin_ID', 'integer', 0 );
+		if( $plugin_ID && $Plugins->has_event( $plugin_ID, 'DisplayHelp' ) )
+		{
+			$edit_Plugin = & $Plugins->get_by_ID($plugin_ID);
+
+			echo '<h3>'.sprintf( T_('Help for plugin &laquo;%s&raquo;'), $edit_Plugin->name );
+			if( ! empty($edit_Plugin->help_url) )
+			{
+				echo ' '.action_icon( T_('External help page'), 'www', $edit_Plugin->help_url );
+			}
+			echo '</h3>';
+
+			$Plugins->call_method( $plugin_ID, 'DisplayHelp', $params = array() );
+		}
+		else
+		{
+			$action = 'list';
+		}
 		break;
 
 
 	case 'edit_settings':
+		// Edit plugin settings:
 		$Form = & new Form( $pagenow, 'pluginsettings_checkchanges' );
 		$Form->begin_form( 'fform') ;
 		$Form->hidden( 'plugin_ID', $plugin_ID );
 
 		// PluginSettings
-		$Plugins->display_settings_fieldset( $edit_Plugin, $Form );
+		if( $edit_Plugin->Settings )
+		{
+			$Form->begin_fieldset( T_('Plugin settings'), array( 'class' => 'clear' ) );
+
+			foreach( $edit_Plugin->GetDefaultSettings() as $l_name => $l_meta )
+			{
+				$Plugins->display_settings_fieldset_field( $l_name, $l_meta, $edit_Plugin, $Form );
+			}
+
+			$Plugins->call_method_if_active( $edit_Plugin->ID, 'PluginSettingsEditDisplayAfter', $params = array() );
+
+			$Form->end_fieldset();
+		}
 
 		// Plugin variables
 		$Form->begin_fieldset( T_('Plugin variables').' ('.T_('Advanced').')', array( 'class' => 'clear' ) );
@@ -530,20 +550,39 @@ switch( $action )
 				array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'SaveButton' ),
 				) );
 		}
-		$Form->end_fieldset();
+		$Form->end_form();
+		// Go on to displaying info - might be handy to not edit a wrong Plugin and provides help links:
 
 
-		// Display info - might be handy to not edit a wrong Plugin
-		$Form->begin_fieldset('Plugin info');
+	case 'info':
+		// Display plugin info:
+		$Form = & new Form( $pagenow );
+		$Form->begin_form('fform');
+		$Form->begin_fieldset('Plugin info', array('class' => 'fieldset clear')); // "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509)
 		$Form->info_field( T_('Name'), $edit_Plugin->name( 'raw', false ) );
+		$Form->info_field( T_('Code'), $edit_Plugin->code, array( 'note' => T_('This 32 character code uniquely identifies the functionality of this plugin.') ) );
 		$Form->info_field( T_('Short desc'), $edit_Plugin->short_desc( 'raw', false ) );
 		$Form->info_field( T_('Long desc'), $edit_Plugin->long_desc( 'raw', false ) );
-		$Form->info_field( T_('ID'), $edit_Plugin->ID );
-		// TODO: help URL
-		$Form->end_fieldset();
+		if( $edit_Plugin->ID > 0 || 1 ) $Form->info_field( T_('ID'), $edit_Plugin->ID );
+		if( ! empty($edit_Plugin->help_url) || $Plugins->has_event( $edit_Plugin->ID, 'DisplayHelp' ) )
+		{
+			$field_contents = '';
 
+			if( $Plugins->has_event( $edit_Plugin->ID, 'DisplayHelp' ) )
+			{
+				$field_contents .= action_icon( T_('Help'), 'help', 'plugins.php?action=disp_help&amp;plugin_ID='.$edit_Plugin->ID );
+			}
+			if( ! empty($edit_Plugin->help_url) )
+			{
+				$field_contents .= action_icon( T_('External help page'), 'www', $edit_Plugin->help_url );
+			}
+			$Form->info_field( T_('Help'), $field_contents );
+		}
+		$Form->end_fieldset();
 		$Form->end_form();
+		$action = 'list';
 		break;
+
 }
 
 

@@ -248,6 +248,9 @@ class Plugin
 	 *   'valid_pattern' (a regular expression pattern that the value must match)
 	 *                   Either a pattern as string or an array with keys
 	 *                   'pattern' and 'error' for a custom error message.
+	 *   'help' (either the first param to {@link get_help_link()} (anchor) as string or
+	 *           an array with all params to this method). E.g., 'param_complicated' would
+	 *           link to the internal help. See {@link DisplayHelp}.
 	 * e.g.:
 	 * <code>
 	 * return array(
@@ -969,6 +972,48 @@ class Plugin
 		return $Session->delete( 'plugID'.$this->ID.'_'.$name );
 	}
 
+
+	/**
+	 * Display a help link.
+	 *
+	 * The anchor (if given) should be defined (as HTML id attribute) in either
+	 *  - the output of {@link DisplayHelp()} (prefixed with the plugin's
+	 *    classname, e.g. 'test_plugin_anchor' when 'anchor' gets passed here)
+	 *  - or the page that {@link $help_url} links to.
+	 *  (depending on the $external param).
+	 *
+	 * @param string HTML anchor for a specific help topic (empty to not use it).
+	 *               When linking to {@link DisplayHelp() the internal help}, it
+	 *               gets prefixed with "[plugin_classname]_".
+	 * @param string Title for the icon/legend
+	 * @param boolean Use external help? See {@link $help_url}.
+	 * @param string Word to use after the icon.
+	 * @param string Icon to use. See {@link $map_iconfiles}.
+	 * @return string The html A tag, linking to the help.
+	 */
+	function get_help_link( $anchor, $title = '', $external = false, $word = NULL, $icon = 'help' )
+	{
+		global $admin_url;
+		if( $external )
+		{
+			$url = $this->help_url;
+			if( ! empty($anchor) )
+			{
+				$url .= '#'.$anchor;
+			}
+		}
+		else
+		{
+			$url = $admin_url.'plugins.php?action=disp_help&amp;plugin_ID='.$this->ID;
+			if( ! empty($anchor) )
+			{
+				$url .= '#'.$this->classname.'_'.$anchor;
+			}
+		}
+
+		return action_icon( $title, $icon, $url, $word );
+	}
+
 	/*
 	 * Helper methods }}}
 	 */
@@ -1076,7 +1121,7 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
- * Revision 1.28  2006/01/29 00:38:03  blueyed
+ * Revision 1.29  2006/01/29 20:48:17  blueyed
  * *** empty log message ***
  *
  * Revision 1.25  2006/01/28 21:11:16  blueyed

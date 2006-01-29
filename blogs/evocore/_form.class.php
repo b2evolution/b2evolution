@@ -382,6 +382,15 @@ class Form extends Widget
 
 				if( $title != '' || isset($legend_params) )
 				{ // there is a legend tag (or explicit params for it) to display
+					if( !empty( $icons ) )
+					{
+						$r .= '<span class="fieldset_icons">';
+						foreach( $icons as $icon )
+						{
+							$r .= $icon;
+						}
+						$r .= '</span>';
+					}
 					$r .= '<legend';
 					if( isset($legend_params) )
 					{
@@ -2354,7 +2363,7 @@ class Form extends Widget
 
 /*
  * $Log$
- * Revision 1.103  2006/01/28 22:22:38  blueyed
+ * Revision 1.104  2006/01/29 20:44:46  blueyed
  * *** empty log message ***
  *
  * Revision 1.102  2006/01/26 22:42:44  blueyed
