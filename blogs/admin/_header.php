@@ -23,7 +23,16 @@ if( ! $current_User->check_perm( 'admin', 'any' ) )
 	require dirname(__FILE__).'/_access_denied.inc.php';
 }
 
-param( 'blog', 'integer', 0, true ); // We may need this for the urls
+
+// Get the blog from param, defaulting to the last selected one for this user:
+$user_selected_blog = (int)$UserSettings->get('selected_blog'); // QUESTION: we might want to exclude $pagenow=stats.php here..?!
+param( 'blog', 'integer', $user_selected_blog, true ); // We may need this for the urls
+if( $blog != $user_selected_blog )
+{ // Update UserSettings for selected blog:
+	$UserSettings->set( 'selected_blog', $blog );
+	$UserSettings->dbupdate();
+}
+
 param( 'mode', 'string', '' );  // Sidebar, bookmarklet
 
 
@@ -32,7 +41,7 @@ param( 'mode', 'string', '' );  // Sidebar, bookmarklet
 $admin_skin = $UserSettings->get( 'admin_skin' );
 $admin_skin_path = dirname(__FILE__).'/'.$adminskins_subdir.'%s/_adminUI.class.php';
 
-if( !$admin_skin || !file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
+if( ! $admin_skin || ! file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 { // there's no skin for the user
 	if( !$admin_skin )
 	{
@@ -82,7 +91,7 @@ if( !$admin_skin || !file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 		}
 	}
 }
-if( !$admin_skin )
+if( ! $admin_skin )
 {
 	$Debuglog->display( 'No admin skin available!', '', true, 'skin' );
 	exit();
