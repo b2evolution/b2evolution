@@ -242,7 +242,7 @@ class Plugin
 	 *   'defaultvalue' (default value, defaults to '')
 	 *   'note' (gets displayed as a note to the param field),
 	 *   'size', 'maxlength' (html input field attributes),
-	 *   'type' ('checkbox', 'textarea', 'password', 'array', 'number', 'text' (default)),
+	 *   'type' ('checkbox', 'textarea', 'password', 'array', 'integer', 'text' (default)),
 	 *   'rows' (number of rows for type=='textarea'),
 	 *   'cols' (number of cols for type=='textarea'),
 	 *   'valid_pattern' (a regular expression pattern that the value must match)
@@ -718,7 +718,7 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'name': name of the setting
 	 *   - 'value': value of the setting (by reference)
-	 * @return boolean false to prevent the setting being set.
+	 * @return string|NULL Return a string with an error to prevent the setting from being set.
 	 */
 	function PluginSettingsBeforeSet( & $params )
 	{
@@ -1076,7 +1076,7 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
- * Revision 1.27  2006/01/28 23:40:56  blueyed
+ * Revision 1.28  2006/01/29 00:38:03  blueyed
  * *** empty log message ***
  *
  * Revision 1.25  2006/01/28 21:11:16  blueyed

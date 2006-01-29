@@ -252,8 +252,9 @@ switch( $action )
 				}
 
 				// Ask the plugin if it's ok:
-				if( false === $Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsBeforeSet', $params = array( 'name' => $l_name, 'value' => & $l_value, 'meta' => $l_meta ) ) )
+				if( $error = $Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsBeforeSet', $params = array( 'name' => $l_name, 'value' => & $l_value, 'meta' => $l_meta ) ) )
 				{ // skip this
+					$Request->param_error( 'edited_plugin_set_'.$l_name, $error );
 					$action = 'edit_settings';
 					continue;
 				}
@@ -315,6 +316,8 @@ switch( $action )
 			$action = 'list';
 			break;
 		}
+
+		$Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $params = array() );
 
 		// Params for form:
 		$edited_plugin_code = $edit_Plugin->code;
@@ -401,6 +404,7 @@ switch( $action )
 
 		break;
 
+
 	case 'info':
 		param( 'plugin_ID', 'integer', true );
 		if( ! ($info_Plugin = & $AvailablePlugins->get_by_ID( $plugin_ID )) )
@@ -426,7 +430,6 @@ if( 1 || $Settings->get( 'plugins_disp_log_in_admin' ) )
 if( $action == 'edit_settings' )
 {
 	$AdminUI->append_to_titlearea( sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ) );
-	$Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $params = array() );
 }
 
 

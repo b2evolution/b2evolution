@@ -322,12 +322,9 @@ class dnsbl_antispam_plugin extends Plugin
 		{
 			if( $error = $this->validate_dependencies() )
 			{
-				$this->msg( $error, 'error' );
-				return false;
+				return $error;
 			}
 		}
-
-		return true;
 	}
 
 
@@ -667,6 +664,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.6  2006/01/29 00:38:03  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.5  2006/01/28 21:13:19  blueyed
  * Use helpers for Session data handling.
  *
