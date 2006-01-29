@@ -208,7 +208,7 @@
 			if( ! is_logged_in() )
 			{ // User is not logged in:
 				$comment_options .= $Form->checkbox_input( 'comment_cookies', true, T_('Remember me'), array(
-					'note' => '('.T_('(Set cookies for name, email &amp; url)').')', 'tabindex' => 7 ) );
+					'note' => '('.T_('Set cookies for name, email and url').')', 'tabindex' => 7 ) );
 			}
 			$Form->output = true;
 			$Form->label_to_the_left = true;
