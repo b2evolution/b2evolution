@@ -431,6 +431,7 @@ class dnsbl_antispam_plugin extends Plugin
 
 			if( $this->use_whitelisting )
 			{ // check if he wants to whitelist now
+				// TODO: should be trigger_event_no_false() ..
 				if( $Plugins->trigger_event_first_true( 'CaptchaValidated', array( 'key' => 'dnsbl_'.$this->ID ) ) )
 				{
 					#echo 'WHITE';
@@ -664,8 +665,8 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.6  2006/01/29 00:38:03  blueyed
- * *** empty log message ***
+ * Revision 1.7  2006/01/29 20:47:06  blueyed
+ * todo
  *
  * Revision 1.5  2006/01/28 21:13:19  blueyed
  * Use helpers for Session data handling.
