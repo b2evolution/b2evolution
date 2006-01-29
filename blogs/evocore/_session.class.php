@@ -393,12 +393,47 @@ class Session
 			$this->_session_needs_save = false;
 		}
 	}
+
+
+	/**
+	 * Reload session data.
+	 *
+	 * This is needed if the running process waits for a child process to write data
+	 * into the Session, e.g. the captcha plugin in test mode waiting for the Debuglog
+	 * output from the process that created the image (included through an IMG tag in
+	 * an IFRAME).
+	 */
+	function reload_data()
+	{
+		global $Debuglog, $DB;
+
+		if( empty($this->ID) )
+		{
+			return false;
+		}
+
+		$sess_data = $DB->get_var( '
+			SELECT sess_data FROM T_sessions
+			 WHERE sess_ID = '.$this->ID );
+
+		$sess_data = @unserialize( $sess_data );
+		if( $sess_data === false )
+		{
+			$this->_data = NULL;
+		}
+		else
+		{
+			$this->_data = $sess_data;
+		}
+
+		$Debuglog->add( 'Reloaded session data.' );
+	}
 }
 
 /*
  * $Log$
- * Revision 1.44  2006/01/26 21:20:59  blueyed
- * *** empty log message ***
+ * Revision 1.45  2006/01/29 15:07:01  blueyed
+ * Added reload_data()
  *
  * Revision 1.43  2006/01/22 19:38:45  blueyed
  * Added expiration support through set() for session data.
