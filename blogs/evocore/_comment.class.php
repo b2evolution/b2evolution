@@ -559,7 +559,7 @@ class Comment extends DataObject
 			$mail_from = "\"$this->author\" <$this->author_email>";
 		}
 
-		$Blog = & $this->Item->getBlog();
+		$Blog = & $this->Item->get_Blog();
 
 		// Send emails:
 		foreach( $notify_array as $notify_email => $notify_locale )
@@ -652,6 +652,9 @@ class Comment extends DataObject
 }
 /*
  * $Log$
+ * Revision 1.24  2006/01/29 20:36:35  blueyed
+ * Renamed Item::getBlog() to Item::get_Blog()
+ *
  * Revision 1.23  2006/01/26 23:08:35  blueyed
  * Plugins enhanced.
  *

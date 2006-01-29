@@ -142,7 +142,7 @@ class Item extends DataObject
 	 */
 	var $blog_ID;
 	/**
-	 * The Blog of the Item (lazy filled, use {@link getBlog()} to access it.
+	 * The Blog of the Item (lazy filled, use {@link get_Blog()} to access it.
 	 * @access protected
 	 * @var Blog
 	 */
@@ -586,13 +586,13 @@ class Item extends DataObject
 	/**
 	 * Template function: Display the main blog name.
 	 *
-	 * @todo is it possible to use $Item->getBlog()->name() instead? (we can't possibly duplicate all sub-object functions here!!!)
+	 * @todo is it possible to use $Item->get_Blog()->name() instead? (we can't possibly duplicate all sub-object functions here!!!)
 	 *       blueyed>> not with PHP4
 	 * @param string Output format. See {@link format_to_output()}.
 	 */
 	function blog_name( $format = 'htmlbody' )
 	{
-		$current_Blog = & $this->getBlog();
+		$current_Blog = & $this->get_Blog();
 		$current_Blog->name( $format );
 	}
 
@@ -694,7 +694,7 @@ class Item extends DataObject
 	function can_see_comments()
 	{
 		if( $this->comments == 'disabled'
-		    || ( $this->getBlog() && $this->Blog->allowcomments == 'never' ) )
+		    || ( $this->get_Blog() && $this->Blog->allowcomments == 'never' ) )
 		{ // Comments are disabled on this post
 			return false;
 		}
@@ -2151,7 +2151,7 @@ class Item extends DataObject
 	 *
 	 * @return Blog
 	 */
-	function & getBlog()
+	function & get_Blog()
 	{
 		if( is_null($this->Blog) )
 		{
@@ -2205,7 +2205,7 @@ class Item extends DataObject
 
 		$mail_from = '"'.$this->Author->get('preferredname').'" <'.$this->Author->get('email').'>';
 
-		$Blog = & $this->getBlog();
+		$Blog = & $this->get_Blog();
 
 		// Send emails:
 		foreach( $notify_array as $notify_email => $notify_locale )
@@ -2302,6 +2302,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.91  2006/01/29 20:36:35  blueyed
+ * Renamed Item::getBlog() to Item::get_Blog()
+ *
  * Revision 1.90  2006/01/26 23:08:35  blueyed
  * Plugins enhanced.
  *

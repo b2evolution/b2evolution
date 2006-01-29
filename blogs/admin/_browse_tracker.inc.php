@@ -119,7 +119,7 @@ function task_title_link( $Item )
 	/*
 	 // Requires $postIDlist to be set... or something cleaner...
   if( $Blog->allowcomments != 'never' )
-	{ // TODO: should use $Item->getBlog() for $Blog == 1 (see also <th> for this).
+	{ // TODO: should use $Item->get_Blog() for $Blog == 1 (see also <th> for this).
 		$nb_comments = generic_ctp_number($Item->ID, 'feedback');
 		$col .= '<a href="b2browse.php?tab=posts&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1"
 						title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'" class="">';
@@ -289,6 +289,9 @@ if( $restrict_to_open )
 
 /*
  * $Log$
+ * Revision 1.7  2006/01/29 20:36:35  blueyed
+ * Renamed Item::getBlog() to Item::get_Blog()
+ *
  * Revision 1.6  2006/01/12 19:20:00  fplanque
  * no message
  *

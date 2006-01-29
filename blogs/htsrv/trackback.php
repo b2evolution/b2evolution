@@ -68,7 +68,7 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 
 	$comment_post_ID = $tb_id;
 	$commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
-	if( !( $Blog = & $commented_Item->getBlog() ) )
+	if( !( $Blog = & $commented_Item->get_Blog() ) )
 	{
 		trackback_response( 1, 'Sorry, could not get the post\'s weblog.' );
 	}

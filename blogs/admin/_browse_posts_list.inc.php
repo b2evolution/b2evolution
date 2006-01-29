@@ -151,7 +151,7 @@ while( $Item = $MainList->get_item() )
 	locale_flag( $Item->locale, 'w16px' );
 
 	if( $Blog->allowcomments != 'never' )
-	{ // TODO: should use $Item->getBlog() for $Blog == 1 (see also <th> for this).
+	{ // TODO: should use $Item->get_Blog() for $Blog == 1 (see also <th> for this).
 		$nb_comments = generic_ctp_number($Item->ID, 'feedback');
 		echo ' <a href="b2browse.php?tab=posts&amp;blog='.$blog.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1"
 						title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'" class="">';
@@ -179,7 +179,7 @@ while( $Item = $MainList->get_item() )
 	if( $Blog->ID == 1 )
 	{ // "All blogs": display name of blog, linked to browse this blog.
 		echo '<td>';
-		$Item_Blog =& $Item->getBlog();
+		$Item_Blog = & $Item->get_Blog();
 
 		echo '<a href="'.regenerate_url( 'blog', 'blog='.$Item_Blog->ID )
 			.'" title="'.$Item_Blog->dget( 'name', 'htmlattr' )
@@ -223,6 +223,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.19  2006/01/29 20:36:35  blueyed
+ * Renamed Item::getBlog() to Item::get_Blog()
+ *
  * Revision 1.18  2006/01/09 17:21:06  fplanque
  * no message
  *
