@@ -1079,8 +1079,8 @@ function forget_param( $var )
  * This may clean it up
  * But it is also useful when generating static pages: you cannot rely on $_REQUEST[]
  *
- * @param mixed string or array of params to ignore (can be regexps in /.../)
- * @param mixed string or array of params to set
+ * @param mixed string (delimited by commas) or array of params to ignore (can be regexps in /.../)
+ * @param mixed string or array of param(s) to set
  * @param mixed string Alternative URL we want to point to if not the current $ReqPath
  */
 function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
@@ -2479,6 +2479,9 @@ function is_admin_page()
 
 /*
  * $Log$
+ * Revision 1.176  2006/01/30 20:17:51  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.175  2006/01/26 19:37:25  blueyed
  * *** empty log message ***
  *
@@ -2569,16 +2572,10 @@ function is_admin_page()
  * Revision 1.146  2005/11/19 03:43:51  blueyed
  * html fix in debug_info()
  *
- * Revision 1.145  2005/11/18 22:05:41  fplanque
- * no message
- *
  * Revision 1.144  2005/11/18 18:32:42  fplanque
  * Fixed xmlrpc logging insanity
  * (object should have been passed by reference but you can't pass NULL by ref)
  * And the code was geeky/unreadable anyway.
- *
- * Revision 1.143  2005/11/17 19:35:26  fplanque
- * no message
  *
  * Revision 1.142  2005/11/17 17:19:38  blueyed
  * Ignore timers below 0.5% of total time
@@ -2735,12 +2732,6 @@ function is_admin_page()
  * Revision 1.92  2005/10/06 21:04:33  blueyed
  * Made validate_url() more verbose - thanks to stk (http://forums.b2evolution.net/viewtopic.php?p=26984#26984)
  *
- * Revision 1.91  2005/10/05 14:22:29  fplanque
- * no message
- *
- * Revision 1.90  2005/09/23 18:28:17  fplanque
- * no message
- *
  * Revision 1.89  2005/09/20 23:23:56  blueyed
  * Added colorization of query durations (graph bar).
  *
@@ -2769,9 +2760,6 @@ function is_admin_page()
  * Revision 1.79  2005/08/18 15:06:18  fplanque
  * got rid of format_to_edit(). This functionnality is being taken care of by the Form class.
  *
- * Revision 1.78  2005/08/09 15:22:40  fplanque
- * no message
- *
  * Revision 1.77  2005/08/08 22:50:42  blueyed
  * refactored xmlrpc_displayresult() to "display into" Log object.
  *
@@ -2793,9 +2781,6 @@ function is_admin_page()
  * Revision 1.70  2005/06/03 15:12:33  fplanque
  * error/info message cleanup
  *
- * Revision 1.69  2005/06/02 18:50:52  fplanque
- * no message
- *
  * Revision 1.68  2005/05/24 15:26:53  fplanque
  * cleanup
  *
@@ -2807,9 +2792,6 @@ function is_admin_page()
  *
  * Revision 1.65  2005/04/27 19:05:46  fplanque
  * normalizing, cleanup, documentaion
- *
- * Revision 1.64  2005/04/26 18:19:25  fplanque
- * no message
  *
  * Revision 1.62  2005/04/06 19:11:01  fplanque
  * refactored Results class:

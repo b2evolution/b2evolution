@@ -382,6 +382,8 @@ class AbstractSettings
 	 */
 	function get_unserialized()
 	{
+		global $Debuglog;
+
 		$args = func_get_args();
 		if( count($this->colKeyNames) == (count($args)+1) )
 		{ // no default as last param
@@ -396,10 +398,15 @@ class AbstractSettings
 
 		if( $result !== NULL && $result !== false )
 		{ // No error and value retrieved
-			$result = @unserialize($result);
-			if( $result === false )
+			$result_unserialized = @unserialize($result);
+			if( $result_unserialized === false )
 			{
+				$Debuglog->add( get_class($this).'::unserialize() failed for ('.var_export( $args, true ).'), size: '.strlen($result).'. Using default: '.var_export($default), array('settings', 'error') );
 				$result = $default;
+			}
+			else
+			{
+				$result = $result_unserialized;
 			}
 			return $result;
 		}
@@ -657,6 +664,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.31  2006/01/30 20:16:55  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.30  2006/01/26 20:27:45  blueyed
  * minor
  *
