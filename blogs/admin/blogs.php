@@ -189,13 +189,13 @@ switch( $action )
 {
 	case 'new':
 	case 'create':
-		$AdminUI->add_path( 'new', array( 'text' => T_('New') ) );
+		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
 		break;
 
 	case 'update':
 	case 'edit':
-		$AdminUI->add_path( $tab );
-		$AdminUI->add_path( 'blog', array( 'text' => '&laquo;'.$edited_Blog->dget('shortname').'&raquo;' ) );
+		$AdminUI->append_path_level( $tab );
+		$AdminUI->append_path_level( 'blog', array( 'text' => '&laquo;'.$edited_Blog->dget('shortname').'&raquo;' ) );
 
 		// Generate available blogs list:
 		$blogListButtons = $AdminUI->get_html_collection_list( 'blog_properties', 'edit',
@@ -550,6 +550,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.49  2006/01/30 19:49:17  fplanque
+ * Fixed the 3 broken check_perm() features! 1) text_no_perm 2) perm_eval 3) average user trying to edit his profile
+ *
  * Revision 1.48  2006/01/26 20:37:57  blueyed
  * minor
  *

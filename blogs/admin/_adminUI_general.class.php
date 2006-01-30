@@ -105,11 +105,11 @@ class AdminUI_general
 	var $_menus = array();
 
 	/**
-	 * The path of the selected menu.
-	 * Use {@link get_path()} or {@link get_path_range()} to access it.
-	 * Use {@link set_path()}, {@link add_path()} or {@link set_path_by_nr()} to set it.
+	 * The path of the current selected menu entry.
+	 * The top level entry is at position 0. Selected submenu entries follow.
 	 *
-	 * Beginning at 0 for the first entry in the selected-menu-path..
+	 * Use {@link get_path()} or {@link get_path_range()} to access it.
+	 * Use {@link set_path()}, {@link append_path_level()} or {@link set_path_level()} to set it.
 	 *
 	 * @access protected
 	 * @var array
@@ -118,8 +118,9 @@ class AdminUI_general
 
 	/**
 	 * The properties of the path entries.
+	 *
 	 * Use {@link get_prop_for_path()} or {@link get_properties_for_path()} to access it
-	 * Use {@link set_path()}, {@link add_path()} or {@link set_path_by_nr()} to set it.
+	 * Use {@link set_path()}, {@link append_path_level()} or {@link set_path_level()} to set it.
 	 *
 	 * @access protected
 	 * @var array
@@ -577,7 +578,7 @@ class AdminUI_general
 			{
 				$perm = true; // By default
 
-				if( $this->check_perm( $loop_details )
+				if( ($perm = $this->check_perm( $loop_details ))
 				    || isset($loop_details['text_noperm']) )
 				{ // If no permission requested or if perm granted or if we have an alt text, display tab:
 					$anchor = '<a href="';
@@ -999,47 +1000,49 @@ class AdminUI_general
 
 
 	/**
-	 * Set a path (that the user has chosen) by number ($nr) to $pathKey.
+	 * Set a specific path level (specific depth).
 	 *
-	 * E.g., if plugins.php gets called, there should be a call to $AdminUI->set_path_by_nr( 0, 'plugins' ), which selects this entry from the menu.
+	 * First level is 0, then the first subpath/submenu is level 1, etc.
 	 *
-	 * There are wrappers to this function.
-	 * @see add_path()
+	 * E.g., if plugins.php gets called, there could be a call to
+	 * $AdminUI->set_path_level( 0, 'plugins' ), which selects this entry from the menu.
+	 * If a specific tab is called inside of plugins.php, there could be a call to
+	 * $AdminUI->set_path_level( 1, $tab )
+	 *
+	 * Though, it is recommended to call the wrapper functions:
+	 * @see append_path_level()
 	 * @see set_path()
 	 *
 	 * This also marks the parent node as selected and checks for permissions.
 	 *
-	 * @param integer|NULL Numerical index of the path, NULL means 'append'.
+	 * @param integer Path level to set (starts at 0)
 	 * @param array Either the key of the path or an array(keyname, propsArray).
 	 * @param array Properties for this path entry.
 	 * @param boolean Exit script when the user has no permissions to this path?
 	 * @return boolean True if perm granted, false if not (and we're not exiting).
 	 */
-	function set_path_by_nr( $nr, $pathKey, $pathProps = array(), $die_when_no_perm = true )
+	function set_path_level( $level, $pathKey, $pathProps = array(), $die_when_no_perm = true )
 	{
-		if( is_null($nr) )
-		{ // append
-			$nr = count($this->path);
-		}
-		if( $nr == 0 )
-		{ // first entry in menu-path: parent node is NULL
+		// Get the parent node (the level above this one):
+		if( $level == 0 )
+		{ // first level in menu-path: parent node is NULL
 			$parentNode = & $this->get_node_by_path(NULL);
 		}
 		else
-		{ // parent node is the trunk from root to previous number
-			$parentNode = & $this->get_node_by_path($this->get_path_range( 0, $nr-1 ));
+		{ // parent node is the trunk from root to previous level
+			$parentNode = & $this->get_node_by_path($this->get_path_range( 0, $level-1 ));
 		}
 		$parentNode['selected'] = $pathKey;
 
-		$this->path[$nr] = $pathKey;
-		$this->pathProps[$nr] = $pathProps;
+		$this->path[$level] = $pathKey;
+		$this->pathProps[$level] = $pathProps;
 
-		#pre_dump( 'setPathByNr: ', $nr, $pathKey, $pathProps );
+		#pre_dump( 'set_path_level: ', $level, $pathKey, $pathProps );
 
 		$perm = $this->check_perm( $pathProps );
 		if( ! $perm && $die_when_no_perm )
 		{
-			debug_die( 'Permission denied! (path: '.$nr.'/'.$pathKey.')' );
+			debug_die( 'Permission denied! (set_path_level: '.$level.'/'.$pathKey.')' );
 		}
 
 		return $perm;
@@ -1047,11 +1050,11 @@ class AdminUI_general
 
 
 	/**
-	 * Add a path at the end of the path list.
+	 * Append a selected menu entry to the current path of selected entries.
 	 *
 	 * @param string|array Either the key of the path or an array(keyname, propsArray).
 	 */
-	function add_path( $path, $pathProps = array() )
+	function append_path_level( $path, $pathProps = array() )
 	{
 		$search_path = $this->path;
 		$search_path[] = $path;
@@ -1061,7 +1064,8 @@ class AdminUI_general
 			$pathProps = array_merge( $pathProps, $node );
 		}
 
-		$this->set_path_by_nr( NULL, $path, $pathProps );
+		// Set the path level right after the last existing one:
+		$this->set_path_level( count($this->path), $path, $pathProps );
 	}
 
 
@@ -1073,20 +1077,20 @@ class AdminUI_general
 	 * set_path( 'options', 'plugins' );
 	 * </code>
 	 *
-	 * Use {@link add_path()} to append a single path.
+	 * Use {@link append_path_level()} to append a single path element.
 	 *
-	 * This is an easy stub for {@link set_path_by_nr()}.
+	 * This is an easy stub for {@link set_path_level()}.
 	 *
-	 * @param string|array,... Either the key of the path or an array(keyname, propsArray).
-	 * @uses set_path_by_nr()
+	 * @param string|array,... VARIABLE NUMBER OF ARGUMENTS. Each is either the key of a path entry or an array(keyname, propsArray).
 	 */
-	function set_path()
+	function set_path(        )
 	{
 		$args = func_get_args();
 
 		$i = 0;
 		$prevPath = array();  // Remember the path we have walked through
 
+		// Loop though all path levels to set:
 		foreach( $args as $arg )
 		{
 			if( is_array($arg) )
@@ -1104,7 +1108,8 @@ class AdminUI_general
 				$pathProps = array_merge( $node, $pathProps );
 			}
 
-			$this->set_path_by_nr( $i++, $pathName, $pathProps );
+			// fp>>dh: die_when_no_perm kills the "average user edits his profile" feature. Please handle this before adding the die feature!
+			$this->set_path_level( $i++, $pathName, $pathProps, false );
 
 			$prevPath[] = $pathName;
 		}
@@ -1188,37 +1193,43 @@ class AdminUI_general
 
 
 	/**
-	 * Checks if {@link $current_User the current User} has needed perms on an menu entry.
+	 * Checks if {@link $current_User the current User} has needed perms on a menu entry.
 	 *
 	 * @param array Path properties: An array, where 'perm_name' and/or 'perm_eval' might be set.
 	 *              'perm_level' (used with 'perm_name') defaults to 'any' if not given.
-	 * @return true|false
+	 * @return boolean
 	 */
 	function check_perm( $perminfo )
 	{
 		global $current_User;
 
-		$perm = true;
-
 		if( isset($perminfo['perm_name']) )
 		{ // 'perm_name' given, check it together with 'perm_level' (which defaults to 'any')
 			$perm_level = isset( $perminfo['perm_level'] ) ? $perminfo['perm_level'] : 'any';
-
-			$perm = $current_User->check_perm( $perminfo['perm_name'], $perm_level );
+			if( ! $current_User->check_perm( $perminfo['perm_name'], $perm_level ) )
+			{	// permission denied!
+				return false;
+			}
 		}
 
-		if( $perm && isset($loop_details['perm_eval']) )
-		{ // only check for 'perm_eval' if perms still granted
-			$perm = eval($loop_details['perm_eval']);
+		if( isset($perminfo['perm_eval']) )
+		{ // also check for 'perm_eval'
+			if( ! eval($perminfo['perm_eval']) )
+			{	// permission denied!
+				return false;
+			}
 		}
 
-		return $perm;
+		return true;
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.50  2006/01/30 19:49:17  fplanque
+ * Fixed the 3 broken check_perm() features! 1) text_no_perm 2) perm_eval 3) average user trying to edit his profile
+ *
  * Revision 1.49  2006/01/30 16:09:33  blueyed
  * doc
  *

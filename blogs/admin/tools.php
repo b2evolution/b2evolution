@@ -50,7 +50,7 @@ if( ! empty($tab) )
 }
 
 
-$AdminUI->set_path_by_nr( 1, $tab );
+$AdminUI->set_path_level( 1, $tab );		// fp>> can we use the 'append_path_level()' method here??? would be more readable...
 
 require( dirname(__FILE__).'/_menutop.php' );
 
