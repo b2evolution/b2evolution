@@ -109,6 +109,8 @@ class AdminUI_general
 	 * Use {@link get_path()} or {@link get_path_range()} to access it.
 	 * Use {@link set_path()}, {@link add_path()} or {@link set_path_by_nr()} to set it.
 	 *
+	 * Beginning at 0 for the first entry in the selected-menu-path..
+	 *
 	 * @access protected
 	 * @var array
 	 */
@@ -998,9 +1000,14 @@ class AdminUI_general
 
 	/**
 	 * Set a path (that the user has chosen) by number ($nr) to $pathKey.
-fp>> Please describe this better ( "path by number" doesn't mean anything ) I can't understand this function
 	 *
-	 * This also marks the parent node as selected.
+	 * E.g., if plugins.php gets called, there should be a call to $AdminUI->set_path_by_nr( 0, 'plugins' ), which selects this entry from the menu.
+	 *
+	 * There are wrappers to this function.
+	 * @see add_path()
+	 * @see set_path()
+	 *
+	 * This also marks the parent node as selected and checks for permissions.
 	 *
 	 * @param integer|NULL Numerical index of the path, NULL means 'append'.
 	 * @param array Either the key of the path or an array(keyname, propsArray).
@@ -1015,11 +1022,11 @@ fp>> Please describe this better ( "path by number" doesn't mean anything ) I ca
 			$nr = count($this->path);
 		}
 		if( $nr == 0 )
-		{ // comment!!??
+		{ // first entry in menu-path: parent node is NULL
 			$parentNode = & $this->get_node_by_path(NULL);
 		}
 		else
-		{ // comment!!??
+		{ // parent node is the trunk from root to previous number
 			$parentNode = & $this->get_node_by_path($this->get_path_range( 0, $nr-1 ));
 		}
 		$parentNode['selected'] = $pathKey;
@@ -1212,8 +1219,8 @@ fp>> Please describe this better ( "path by number" doesn't mean anything ) I ca
 
 /*
  * $Log$
- * Revision 1.48  2006/01/27 15:10:11  fplanque
- * no message
+ * Revision 1.49  2006/01/30 16:09:33  blueyed
+ * doc
  *
  * Revision 1.47  2006/01/26 23:08:35  blueyed
  * Plugins enhanced.
@@ -1263,9 +1270,6 @@ fp>> Please describe this better ( "path by number" doesn't mean anything ) I ca
  * Revision 1.32  2005/08/31 19:06:41  fplanque
  * minor
  *
- * Revision 1.31  2005/08/01 19:36:54  fplanque
- * no message
- *
  * Revision 1.30  2005/07/18 14:21:37  fplanque
  * Use a default Form layout which can be skin dependant
  *
@@ -1286,9 +1290,6 @@ fp>> Please describe this better ( "path by number" doesn't mean anything ) I ca
  *
  * Revision 1.24  2005/06/03 20:14:37  fplanque
  * started input validation framework
- *
- * Revision 1.23  2005/06/02 18:50:52  fplanque
- * no message
  *
  * Revision 1.22  2005/05/02 19:06:44  fplanque
  * started paging of user list..

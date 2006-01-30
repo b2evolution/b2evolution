@@ -278,6 +278,7 @@ if( ($disp == 'posts') || ($disp == 'single') )
 	}
 
 	// Note: even if we request the same post, the following will do more restrictions (dates, etc.)
+	// TODO: There's a bug here with using $catsel (instead of $cat_array), which I've reported to dev-ML (don't remember). Francois, please look into it.
 	$MainList = & new ItemList(
 		$blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
 		$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
@@ -319,6 +320,7 @@ if( !empty($tempskin) )
 // Let's check if a skin has been forced in the stub file:
 // Note: URL skin requests are handled with param() 20 lines below
 // Note: with "register_globals = On" this may be set from URL.. (in which case the code 20 line sbelow becomes useless)
+//       blueyed>> You've said that it's not security issue etc.. but I still would init $skin in /conf/_advanced.php and use empty() here.
 if( !isset( $skin ) )
 { // No skin forced in stub (not even '' for no-skin)...
 	$Debuglog->add( 'No skin forced.', 'skin' );
@@ -411,6 +413,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.45  2006/01/30 16:09:34  blueyed
+ * doc
+ *
  * Revision 1.44  2006/01/26 21:27:21  blueyed
  * add debug
  *

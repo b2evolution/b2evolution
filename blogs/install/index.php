@@ -443,9 +443,10 @@ to
 		 */
 	/*
 	fp>> what's a damn good reason to take the risk of having plugins mess around during the main install ???
+		// inserting sample data triggers events: we could instantiate $Plugins from class Plugins_no_DB..
 		$DB->halt_on_error = false;
 		$DB->show_errors = false;
-		$Plugins = new Plugins(); // inserting sample data triggers events
+		$Plugins = new Plugins();
 		$DB->halt_on_error = $DB->show_errors = true;
 	*/
 		?>
@@ -627,17 +628,14 @@ to
 <?php
 /*
  * $Log$
- * Revision 1.84  2006/01/27 16:52:46  fplanque
- * no message
+ * Revision 1.85  2006/01/30 16:09:34  blueyed
+ * doc
  *
  * Revision 1.83  2006/01/26 23:08:36  blueyed
  * Plugins enhanced.
  *
  * Revision 1.82  2006/01/14 20:45:10  blueyed
  * do not dump function trace on DB errors during install/config when not appropriate.
- *
- * Revision 1.81  2005/12/30 18:08:24  fplanque
- * no message
  *
  */
 ?>

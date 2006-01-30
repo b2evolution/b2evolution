@@ -546,6 +546,7 @@ $force_regexp_dirname = '';
  * Currently, it disables using register_shutdown_function() for hit_doublecheck_referer
  * ({@link Hit::log()), but not for {@link Session::dbsave()}.
  * fp>>why would we ever want to disable this feature?
+ * blueyed>> for debugging?!
  * @global int $debug_no_register_shutdown
  */
 $debug_no_register_shutdown = 0;
