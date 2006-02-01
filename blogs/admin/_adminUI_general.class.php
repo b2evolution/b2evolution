@@ -1018,10 +1018,11 @@ class AdminUI_general
 	 * @param integer Path level to set (starts at 0)
 	 * @param array Either the key of the path or an array(keyname, propsArray).
 	 * @param array Properties for this path entry.
-	 * @param boolean Exit script when the user has no permissions to this path?
+	 * @param boolean Exit script when the user has no permissions to this path and
+	 *                text_noperm is not set for the path?
 	 * @return boolean True if perm granted, false if not (and we're not exiting).
 	 */
-	function set_path_level( $level, $pathKey, $pathProps = array(), $die_when_no_perm = true )
+	function set_path_level( $level, $pathKey, $pathProps = array(), $die_if_no_perm = true )
 	{
 		// Get the parent node (the level above this one):
 		if( $level == 0 )
@@ -1040,7 +1041,7 @@ class AdminUI_general
 		#pre_dump( 'set_path_level: ', $level, $pathKey, $pathProps );
 
 		$perm = $this->check_perm( $pathProps );
-		if( ! $perm && $die_when_no_perm )
+		if( ! $perm && empty($pathProps['text_noperm']) && $die_if_no_perm )
 		{
 			debug_die( 'Permission denied! (set_path_level: '.$level.'/'.$pathKey.')' );
 		}
@@ -1108,8 +1109,7 @@ class AdminUI_general
 				$pathProps = array_merge( $node, $pathProps );
 			}
 
-			// fp>>dh: die_when_no_perm kills the "average user edits his profile" feature. Please handle this before adding the die feature!
-			$this->set_path_level( $i++, $pathName, $pathProps, false );
+			$this->set_path_level( $i++, $pathName, $pathProps );
 
 			$prevPath[] = $pathName;
 		}
@@ -1227,6 +1227,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.51  2006/02/01 20:06:15  blueyed
+ * die_if_no_perm re-enabled
+ *
  * Revision 1.50  2006/01/30 19:49:17  fplanque
  * Fixed the 3 broken check_perm() features! 1) text_no_perm 2) perm_eval 3) average user trying to edit his profile
  *
