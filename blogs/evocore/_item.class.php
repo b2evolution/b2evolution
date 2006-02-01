@@ -2002,7 +2002,7 @@ class Item extends DataObject
 	 */
 	function dbinsert()
 	{
-		global $DB, $current_User;
+		global $DB, $current_User, $Plugins;
 
 		$DB->begin();
 
@@ -2024,6 +2024,8 @@ class Item extends DataObject
 		}
 
 		$DB->commit();
+
+		$Plugins->trigger_event( 'AfterItemInsert', $params = array( 'Item' => & $this ) );
 
 		return $result;
 	}
@@ -2086,9 +2088,9 @@ class Item extends DataObject
 	 *
 	 * @return boolean true on success
 	 */
-	function dbupdate( )
+	function dbupdate()
 	{
-		global $DB;
+		global $DB, $Plugins;
 
 		$DB->begin();
 
@@ -2109,7 +2111,34 @@ class Item extends DataObject
 
 		$DB->commit();
 
+		$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this ) );
+
 		return $result;
+	}
+
+
+	/**
+	 * Trigger event AfterItemDelete after calling parent method.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbdelete()
+	{
+		global $Plugins;
+
+		// remember ID, because parent method resets it to 0
+		$old_ID = $this->ID;
+
+		$r = parent::dbupdate();
+
+		// set the ID for the Plugin event
+		$this->ID = $old_ID;
+
+		$Plugins->trigger_event( 'AfterItemDelete', $params = array( 'Item' => & $this ) );
+
+		$this->ID = 0;
+
+		return $r;
 	}
 
 
@@ -2302,6 +2331,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.92  2006/02/01 23:32:32  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.91  2006/01/29 20:36:35  blueyed
  * Renamed Item::getBlog() to Item::get_Blog()
  *

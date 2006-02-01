@@ -128,13 +128,11 @@ class DataObject
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
-	 * Triggers plugin event AfterDataObjectUpdate.
-	 *
 	 * @return boolean true on success
 	 */
 	function dbupdate()
 	{
-		global $DB, $localtimenow, $current_User, $Plugins;
+		global $DB, $localtimenow, $current_User;
 
 		if( $this->ID == 0 ) { debug_die( 'New object cannot be updated!' ); }
 
@@ -190,15 +188,6 @@ class DataObject
 			return false;
 		}
 
-		if( $Plugins )
-		{	// Note: this event is most probably overkill.
-			// blueyed>> but needed for cache handling plugins..
-			$Plugins->trigger_event( 'AfterDataObjectUpdate', $params = array(
-					'DataObject' => & $this,
-					'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
-				) );
-		}
-
 		// Reset changes in object:
 		$this->dbchanges = array();
 
@@ -209,13 +198,11 @@ class DataObject
 	/**
 	 * Insert object into DB based on previously recorded changes.
 	 *
-	 * Triggers plugin event AfterDataObjectInsert.
-	 *
 	 * @return boolean true on success
 	 */
 	function dbinsert()
 	{
-		global $DB, $localtimenow, $current_User, $Plugins;
+		global $DB, $localtimenow, $current_User;
 
 		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
 
@@ -284,23 +271,12 @@ class DataObject
 		// Reset changes in object:
 		$this->dbchanges = array();
 
-		if( $Plugins )
-		{	// Note: this event is most probably overkill.
-			// blueyed>> but needed for cache handling plugins..
-			$Plugins->trigger_event( 'AfterDataObjectInsert', $params = array(
-					'DataObject' => & $this,
-					'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
-				) );
-		}
-
 		return true;
 	}
 
 
 	/**
 	 * Inserts or Updates depending on object state.
-	 *
-	 * Triggers either plugin event AfterDataObjectInsert or AfterDataObjectUpdate.
 	 *
 	 * @uses dbinsert()
 	 * @uses dbupdate()
@@ -323,12 +299,10 @@ class DataObject
 
 	/**
 	 * Delete object from DB.
-	 *
-	 * Triggers plugin event AfterDataObjectDelete.
 	 */
 	function dbdelete()
 	{
-		global $DB, $Messages, $EvoConfig, $Plugins;
+		global $DB, $Messages, $EvoConfig;
 
 		if( $this->ID == 0 ) { debug_die( 'Non persistant object cannot be deleted!' ); }
 
@@ -363,15 +337,6 @@ class DataObject
 
 			// End transaction:
 			$DB->commit();
-		}
-
-		if( $Plugins )
-		{	// Note: this event is most probably overkill.
-			// blueyed>> but needed for cache handling plugins..
-			$Plugins->trigger_event( 'AfterDataObjectDelete', $params = array(
-					'DataObject' => & $this,
-					'classname' => strtolower(get_class($this)), // get_class() is case in-sensitive in PHP4, but not so in PHP5.
-				) );
 		}
 
 		// Just in case... remember this object has been deleted from DB!
@@ -679,11 +644,8 @@ class DataObject
 
 /*
  * $Log$
- * Revision 1.39  2006/01/26 20:27:45  blueyed
- * minor
- *
- * Revision 1.37  2006/01/23 01:06:49  blueyed
- * Extra check if $Plugins exist before triggering events.
+ * Revision 1.40  2006/02/01 23:32:32  blueyed
+ * *** empty log message ***
  *
  * Revision 1.36  2006/01/22 22:44:28  blueyed
  * Added AfterDataObject* hooks.

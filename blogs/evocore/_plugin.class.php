@@ -631,40 +631,73 @@ class Plugin
 
 
 	/**
-	 * Event handler: called at the end of {@link DataObject::dbupdate() updating
-	 * a data object in the database}.
+	 * Event handler: called at the end of {@link Comment::dbupdate() updating
+	 * a comment in the database}, which means that it has changed.
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'DataObject': the related dataobject
-	 *   - 'classname': DataObject's classname, lowercased (e.g. 'item')
+	 *   - 'Comment': the related Comment (by reference)
 	 */
-	function AfterDataObjectUpdate( & $params )
+	function AfterCommentUpdate( & $params )
 	{
 	}
 
 
 	/**
-	 * Event handler: called at the end of {@link DataObject::dbinsert() inserting
-	 * a data object into the database}.
+	 * Event handler: called at the end of {@link Comment::dbinsert() inserting
+	 * a comment into the database}, which means it has been created.
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'DataObject': the related dataobject
-	 *   - 'classname': DataObject's classname, lowercased (e.g. 'item')
+	 *   - 'Comment': the related Comment (by reference)
 	 */
-	function AfterDataObjectInsert( & $params )
+	function AfterCommentInsert( & $params )
 	{
 	}
 
 
 	/**
-	 * Event handler: called at the end of {@link DataObject::dbdelete() deleting
-	 * a data object from the database}.
+	 * Event handler: called at the end of {@link Comment::dbdelete() deleting
+	 * a comment from the database}.
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'DataObject': the related dataobject
-	 *   - 'classname': DataObject's classname, lowercased (e.g. 'item')
+	 *   - 'Comment': the related Comment (by reference)
 	 */
-	function AfterDataObjectDelete( & $params )
+	function AfterCommentDelete( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link Item::dbupdate() updating
+	 * an item/post in the database}, which means that it has changed.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
+	 */
+	function AfterItemUpdate( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link Item::dbinsert() inserting
+	 * a item/post into the database}, which means it has been created.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
+	 */
+	function AfterItemInsert( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link Item::dbdelete() deleting
+	 * an item/post from the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
+	 */
+	function AfterItemDelete( & $params )
 	{
 	}
 
@@ -1121,7 +1154,7 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
- * Revision 1.29  2006/01/29 20:48:17  blueyed
+ * Revision 1.30  2006/02/01 23:32:32  blueyed
  * *** empty log message ***
  *
  * Revision 1.25  2006/01/28 21:11:16  blueyed

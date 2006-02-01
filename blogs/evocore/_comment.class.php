@@ -634,6 +634,23 @@ class Comment extends DataObject
 
 
 	/**
+	 * Trigger event AfterCommentUpdate after calling parent method.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbupdate()
+	{
+		global $Plugins;
+
+		$r = parent::dbupdate();
+
+		$Plugins->trigger_event( 'AfterCommentUpdate', $params = array( 'Comment' => & $this ) );
+
+		return $r;
+	}
+
+
+	/**
 	 * Get karma and set it before adding the Comment to DB.
 	 *
 	 * @return boolean true on success
@@ -646,12 +663,45 @@ class Comment extends DataObject
 
 		$this->set( 'spam_karma', $spam_karma );
 
-		return parent::dbinsert();
+		$r = parent::dbinsert();
+
+		$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this ) );
+
+		return $r;
+	}
+
+
+	/**
+	 * Trigger event AfterCommentDelete after calling parent method.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbdelete()
+	{
+		global $Plugins;
+
+		// remember ID, because parent method resets it to 0
+		$old_ID = $this->ID;
+
+		$r = parent::dbupdate();
+
+		// set the ID for the Plugin event
+		$this->ID = $old_ID;
+
+		$Plugins->trigger_event( 'AfterCommentDelete', $params = array( 'Comment' => & $this ) );
+
+		$this->ID = 0;
+
+		return $r;
 	}
 
 }
+
 /*
  * $Log$
+ * Revision 1.25  2006/02/01 23:32:32  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.24  2006/01/29 20:36:35  blueyed
  * Renamed Item::getBlog() to Item::get_Blog()
  *

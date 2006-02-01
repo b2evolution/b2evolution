@@ -201,9 +201,12 @@ class Plugins
 				'CachePageContent' => T_('Cache page content.'),
 				'CacheIsCollectingContent' => T_('Gets asked for if we are generating cached content.'),
 
-				'AfterDataObjectDelete' => '',
-				'AfterDataObjectInsert' => '',
-				'AfterDataObjectUpdate' => '',
+				'AfterCommentDelete' => '',
+				'AfterCommentInsert' => '',
+				'AfterCommentUpdate' => '',
+				'AfterItemDelete' => '',
+				'AfterItemInsert' => '',
+				'AfterItemUpdate' => '',
 
 				'PluginSettingsInstantiated' => '', /* private / needs no description */
 				'PluginSettingsBeforeSet' => T_("Called before setting a plugin's setting in the backoffice."),
@@ -608,6 +611,7 @@ class Plugins
 		// Instantiate the Plugins Settings class
 		if( $this->instantiate_Settings( $Plugin ) === false )
 		{
+			$Debuglog->add( 'Unregistered plugin, because instantiating its Settings returned false.', 'plugins' );
 			$this->unregister( $Plugin );
 			$Plugin = '';
 		}
@@ -1881,6 +1885,7 @@ class Plugins
 	/**
 	 * Display a single field (setting) of the Plugin's Settings.
 	 *
+	 * @todo Move to plugins.php/_plugins_settings.form.php..
 	 * @param string Settings name (key)
 	 * @param array Meta data for this setting. See {@link Plugin::GetDefaultSettings()}
 	 * @param Plugin (by reference)
@@ -1941,17 +1946,26 @@ class Plugins
 
 				$plugin_value = isset($use_value) ? $use_value : $Plugin->Settings->get_unserialized( $set_name );
 
-				$count = 0;
-				foreach( $set_meta['entries'] as $l_set_name => $l_set_entry )
+				$insert_new_set_as = 0;
+				if( is_array( $plugin_value ) )
 				{
-					$l_value = isset($plugin_value[$count][$l_set_name]) ? $plugin_value[$count][$l_set_name] : NULL;
-					$this->display_settings_fieldset_field( $set_name.'['.$count.']['.$l_set_name.']', $l_set_entry, $Plugin, $Form, $l_value );
+					foreach( $plugin_value as $k => $v )
+					{
+						foreach( $set_meta['entries'] as $l_set_name => $l_set_entry )
+						{
+							$l_value = isset($plugin_value[$k][$l_set_name]) ? $plugin_value[$k][$l_set_name] : NULL;
+							$this->display_settings_fieldset_field( $set_name.'['.$k.']['.$l_set_name.']', $l_set_entry, $Plugin, $Form, $l_value );
+						}
+						$insert_new_set_as = $k+1;
+					}
 				}
-				$count++;
+				if( ! isset( $set_meta['max_number'] ) || $set_meta['max_number'] > count($plugin_value) )
+				{ // no max_number defined or not reached: display link to add a new set
+
+					echo '<a href="'.regenerate_url( 'action', array('action=add_settings_set', 'insert_as='.$set_name.'['.$insert_new_set_as.']', 'plugin_ID='.$Plugin->ID), 'plugins.php' ).'">'.T_('Add another set').'</a>';
+				}
 				$Form->end_fieldset();
 
-				// if not max_number
-				$Form->info_field( '', '<a href="'.regenerate_url().'">'.T_('Add another set').'</a>' );
 
 				break;
 
@@ -2019,7 +2033,7 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
- * Revision 1.44  2006/01/29 20:48:17  blueyed
+ * Revision 1.45  2006/02/01 23:32:32  blueyed
  * *** empty log message ***
  *
  * Revision 1.40  2006/01/28 17:07:32  blueyed
