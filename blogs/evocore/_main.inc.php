@@ -219,8 +219,8 @@ $Session = & new Session();
 
 /**
  * Plug-ins init.
- * This is done quite early here to give an early hook to plugins (fp>WHERE?? WHICH HOOK?)(though it might also be moved just after $DB init when there is reason for a hook there).
- * The {@link dnsbl_antispam_plugin} is an example that uses this hook. WHAT DOES IT DO WITH THE HOOK. STOP FORCING THE READER TO WANDER THROUGH MULTIPLE FILES IN ORDER TO UNDERSTAND YOUR COMMENTS!!!!!!!!!!!!!!!
+ * This is done quite early here to give an early hook ("SessionLoaded") to plugins (though it might also be moved just after $DB init when there is reason for a hook there).
+ * The {@link dnsbl_antispam_plugin} is an example that uses this to check the user's IP against a list of DNS blacklists.
  */
 require_once dirname(__FILE__).'/_plugins.class.php';
 /**
@@ -233,10 +233,10 @@ $Plugins = & new Plugins();
 $Plugins->trigger_event( 'SessionLoaded' );
 
 
-// WHAT THE HELL IS THAT:::: ??????
+// Trigger a page content caching plugin. This would either return the cached content here or start output buffering
 if( empty($generating_static)
     && ( $get_return = $Plugins->trigger_event_first_true( 'CachePageContent' ) )
-    && ( isset($get_return['data']) ) )
+    && ( isset($get_return['data']) ) ) // cached content returned
 {
 	echo $get_return['data'];
 	die;
@@ -312,16 +312,19 @@ require_once dirname(__FILE__).'/_file.class.php';
 require_once dirname(__FILE__).'/_filerootcache.class.php';
 require_once dirname(__FILE__).'/_filetype.class.php';
 require_once dirname(__FILE__).'/_filetypecache.class.php';
-// Object caches init:
 
+// Object caches init (we're asking plugins that provide the "CacheObjects" event here first):
+$Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
+$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
+$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', '& new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\' )' );
+$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', '& new DataObjectCache( \'Element\', true, \'T_posttypes\', \'ptyp_\', \'ptyp_ID\' )' );
+$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', '& new DataObjectCache( \'Element\', true, \'T_poststatuses\', \'pst_\', \'pst_ID\' )' );
+
+
+// Caches that are not meant to be loaded in total:
 $BlogCache = & new BlogCache();
 $FileCache = & new FileCache();
-$FileRootCache = & new FileRootCache();
-$FiletypeCache = & new FiletypeCache();
-$GroupCache = & new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name' );
 $ItemCache = & new ItemCache();
-$ItemTypeCache = & new DataObjectCache( 'Element', true, 'T_posttypes', 'ptyp_', 'ptyp_ID' );
-$ItemStatusCache = & new DataObjectCache( 'Element', true, 'T_poststatuses', 'pst_', 'pst_ID' );
 $LinkCache = & new LinkCache();
 $UserCache = & new UserCache();
 
@@ -524,11 +527,8 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
- * Revision 1.82  2006/01/27 17:50:37  blueyed
- * *** empty log message ***
- *
- * Revision 1.81  2006/01/27 16:52:45  fplanque
- * no message
+ * Revision 1.83  2006/02/01 21:36:51  blueyed
+ * Trigger CacheObject event
  *
  * Revision 1.80  2006/01/26 23:08:36  blueyed
  * Plugins enhanced.
