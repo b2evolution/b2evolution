@@ -441,14 +441,9 @@ to
 		 * NEW DB: Create a plain new db structure + sample contents
 		 * -----------------------------------------------------------------------------------
 		 */
-	/*
-	fp>> what's a damn good reason to take the risk of having plugins mess around during the main install ???
-		// inserting sample data triggers events: we could instantiate $Plugins from class Plugins_no_DB..
-		$DB->halt_on_error = false;
-		$DB->show_errors = false;
-		$Plugins = new Plugins();
-		$DB->halt_on_error = $DB->show_errors = true;
-	*/
+
+		// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
+		$Plugins = new Plugins_no_DB();
 		?>
 		<h2><?php echo T_('Installing b2evolution tables with sample data')?></h2>
 		<?php
@@ -628,6 +623,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.86  2006/02/02 00:49:33  blueyed
+ * Use class Plugins_no_DB for $Plugins on "newdb" action
+ *
  * Revision 1.85  2006/01/30 16:09:34  blueyed
  * doc
  *
