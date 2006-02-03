@@ -124,7 +124,7 @@ if( $config_is_done || (($action != 'start') && ($action != 'default') && ($acti
 
 	if( $DB->error )
 	{ // restart conf
-		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
+		Log::display( T_('MySQL error!'), '', T_('Check your database config settings below and update them if necessary...') );
 		$action = 'start';
 	}
 	else
@@ -623,6 +623,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.87  2006/02/03 16:46:25  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.86  2006/02/02 00:49:33  blueyed
  * Use class Plugins_no_DB for $Plugins on "newdb" action
  *
