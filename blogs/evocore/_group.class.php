@@ -154,8 +154,6 @@ class Group extends DataObject
 
 		$perm = false; // Default is false!
 
-		// echo "<br>Checking group perm $permname:$permlevel against $permvalue";
-
 		if( isset($this->{'perm_'.$permname}) )
 		{
 			$permvalue = $this->{'perm_'.$permname};
@@ -166,6 +164,8 @@ class Group extends DataObject
 
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
+
+		// echo "<br>Checking group perm $permname:$permlevel against $permvalue";
 
 		// Check group permission:
 		switch( $permname )
@@ -432,6 +432,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2006/02/03 16:24:51  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.16  2005/11/04 21:42:22  blueyed
  * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
  *
