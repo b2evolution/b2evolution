@@ -94,7 +94,7 @@ class Session
 	 * This holds an array( expire, value ) for each data item key.
 	 *
 	 * @access protected
-	 * @var object
+	 * @var array
 	 */
 	var $_data;
 
@@ -146,7 +146,7 @@ class Session
 					if( empty( $row->sess_data ) )
 					{
 						$Debuglog->add( 'No session data available.', 'session' );
-						$this->_data = NULL;
+						$this->_data = array();
 					}
 					else
 					{ // Some session data has been previsouly stored:
@@ -156,7 +156,7 @@ class Session
 						if( $this->_data === false )
 						{
 							$Debuglog->add( 'Session data corrupted!', 'session' );
-							$this->_data = NULL;
+							$this->_data = array();
 						}
 						else
 						{
@@ -251,7 +251,7 @@ class Session
 
 		// Invalidate the session key (no one will be able to use this session again)
 		$this->key = NULL;
-		$this->_data = NULL; // We don't need to keep old data
+		$this->_data = array(); // We don't need to keep old data
 		$this->_session_needs_save = true;
 		$this->dbsave();
 
@@ -333,7 +333,7 @@ class Session
 		global $Debuglog, $localtimenow;
 
 		if( ! isset($this->_data[$param])
-		 || ! isset($this->_data[$param][0])
+		 || ! is_array($this->_data[$param]) // deprecated: check to transform 1.6 session data to 1.7
 		 || $this->_data[$param][1] != $value
 		 || $expire != 0 )
 		{	// There is something to update:
@@ -375,23 +375,25 @@ class Session
 	{
 		global $DB, $Debuglog, $Hit, $localtimenow;
 
-		if( $this->_session_needs_save )
-		{	// There have been changes since the last save.
-			$sess_data = is_null($this->_data) ? $this->_data : serialize($this->_data);
-			$DB->query( '
-				UPDATE T_sessions SET
-					sess_agnt_ID = "'.$Hit->agent_ID.'",
-					sess_data = '.$DB->quote( $sess_data ).',
-					sess_ipaddress = "'.$Hit->IP.'",
-					sess_key = '.$DB->quote( $this->key ).',
-					sess_lastseen = "'.date( 'Y-m-d H:i:s', $localtimenow ).'",
-					sess_user_ID = '.$DB->null( $this->user_ID ).'
-				WHERE sess_ID = '.$this->ID, 'Session::dbsave()' );
-
-			$Debuglog->add( 'Session data saved!', 'session' );
-
-			$this->_session_needs_save = false;
+		if( ! $this->_session_needs_save )
+		{	// There have been no changes since the last save.
+			return false;
 		}
+
+		$sess_data = empty($this->_data) ? NULL : serialize($this->_data);
+		$DB->query( '
+			UPDATE T_sessions SET
+				sess_agnt_ID = "'.$Hit->agent_ID.'",
+				sess_data = '.$DB->quote( $sess_data ).',
+				sess_ipaddress = "'.$Hit->IP.'",
+				sess_key = '.$DB->quote( $this->key ).',
+				sess_lastseen = "'.date( 'Y-m-d H:i:s', $localtimenow ).'",
+				sess_user_ID = '.$DB->null( $this->user_ID ).'
+			WHERE sess_ID = '.$this->ID, 'Session::dbsave()' );
+
+		$Debuglog->add( 'Session data saved!', 'session' );
+
+		$this->_session_needs_save = false;
 	}
 
 
@@ -400,8 +402,7 @@ class Session
 	 *
 	 * This is needed if the running process waits for a child process to write data
 	 * into the Session, e.g. the captcha plugin in test mode waiting for the Debuglog
-	 * output from the process that created the image (included through an IMG tag in
-	 * an IFRAME).
+	 * output from the process that created the image (included through an IMG tag).
 	 */
 	function reload_data()
 	{
@@ -419,7 +420,7 @@ class Session
 		$sess_data = @unserialize( $sess_data );
 		if( $sess_data === false )
 		{
-			$this->_data = NULL;
+			$this->_data = array();
 		}
 		else
 		{
@@ -432,6 +433,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.46  2006/02/03 20:47:11  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.45  2006/01/29 15:07:01  blueyed
  * Added reload_data()
  *
