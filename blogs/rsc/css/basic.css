@@ -37,14 +37,21 @@ code {
 .center {
 	text-align: center;
 }
-.right{
+.right {
 	text-align: right;
+}
+.top {
+	vertical-align: top;
 }
 .clear{
 	clear: both;
 }
 .small {
 	font-size: 84%;
+}
+.small_details {
+	font-size: 84%;
+	color: #555;
 }
 .shrinkwrap
 {
