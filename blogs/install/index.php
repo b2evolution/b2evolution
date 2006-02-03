@@ -124,7 +124,7 @@ if( $config_is_done || (($action != 'start') && ($action != 'default') && ($acti
 
 	if( $DB->error )
 	{ // restart conf
-		Log::display( T_('MySQL error!'), '', T_('Check your database config settings below and update them if necessary...') );
+		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
 		$action = 'start';
 	}
 	else
@@ -443,7 +443,7 @@ to
 		 */
 
 		// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
-		$Plugins = new Plugins_no_DB();
+		$Plugins = new Plugins_no_DB(); // fp>> can this be renamed to Plugins_placeholder or Plugins_noop
 		?>
 		<h2><?php echo T_('Installing b2evolution tables with sample data')?></h2>
 		<?php
@@ -623,8 +623,8 @@ to
 <?php
 /*
  * $Log$
- * Revision 1.87  2006/02/03 16:46:25  blueyed
- * *** empty log message ***
+ * Revision 1.88  2006/02/03 19:36:40  fplanque
+ * Log::display is insane compared to the simplicity of echo :]
  *
  * Revision 1.86  2006/02/02 00:49:33  blueyed
  * Use class Plugins_no_DB for $Plugins on "newdb" action
