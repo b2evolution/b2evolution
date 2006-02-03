@@ -716,8 +716,14 @@ function upgrade_b2evo_tables()
 		// INSTALL PLUGINS:
 		install_basic_plugins();
 
+		echo 'Altering Posts table... ';
+		$DB->query( "
+				ALTER TABLE T_posts
+				MODIFY COLUMN post_renderers TEXT NOT NULL,
+				MODIFY COLUMN post_content TEXT NULL" ); // may be NULL if no content given
+		echo "OK.<br />\n";
 
-		// Fixes for MySQL strict mode: {{{
+		// Fixes for MySQL strict mode (MySQL 5): {{{
 		echo 'Altering Users table... ';
 		$DB->query( 'ALTER TABLE T_users
 		             MODIFY COLUMN user_firstname varchar(50) NULL,
@@ -778,6 +784,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.121  2006/02/03 17:35:17  blueyed
+ * post_renderers as TEXT
+ *
  * Revision 1.120  2006/01/26 22:43:58  blueyed
  * Added comment_spam_karma field
  *

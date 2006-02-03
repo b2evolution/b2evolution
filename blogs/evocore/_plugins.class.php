@@ -1222,6 +1222,15 @@ class Plugins
 			}
 		}
 
+		// Make sure there's no renderer code with a dot, as the list gets imploded by that when saved:
+		foreach( $validated_renderers as $k => $l_code )
+		{
+			if( strpos( $l_code, '.' ) !== false )
+			{
+				unset( $validated_renderers[$k] );
+			}
+		}
+
 		// echo 'validated Renderers: '.count( $validated_renderers );
 		return $validated_renderers;
 	}
@@ -2033,8 +2042,8 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
- * Revision 1.45  2006/02/01 23:32:32  blueyed
- * *** empty log message ***
+ * Revision 1.46  2006/02/03 17:35:17  blueyed
+ * post_renderers as TEXT
  *
  * Revision 1.40  2006/01/28 17:07:32  blueyed
  * Moved set_empty_code_to_default() to caller.

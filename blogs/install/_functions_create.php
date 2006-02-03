@@ -189,7 +189,7 @@ function create_b2evo_tables()
 		post_pst_ID           int(11) unsigned NULL,
 		post_ptyp_ID          int(11) unsigned NULL,
 		post_locale           VARCHAR(20) NOT NULL DEFAULT 'en-EU',
-		post_content          text NOT NULL,
+		post_content          text NULL,
 		post_title            text NOT NULL,
 		post_urltitle         VARCHAR(50) NULL DEFAULT NULL,
 		post_url              VARCHAR(250) NULL DEFAULT NULL,
@@ -199,7 +199,7 @@ function create_b2evo_tables()
 		post_wordcount        int(11) default NULL,
 		post_comments         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
 		post_commentsexpire   DATETIME DEFAULT NULL,
-		post_renderers        VARCHAR(230) NOT NULL default 'default',
+		post_renderers        TEXT NOT NULL,
 		post_priority         int(11) unsigned null,
 		PRIMARY KEY post_ID( post_ID ),
 		UNIQUE post_urltitle( post_urltitle ),
@@ -1353,6 +1353,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.172  2006/02/03 17:35:17  blueyed
+ * post_renderers as TEXT
+ *
  * Revision 1.171  2006/01/28 18:25:02  blueyed
  * pset_value as TEXT
  *

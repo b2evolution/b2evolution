@@ -127,6 +127,9 @@ class Item extends DataObject
 	var $wordcount = 0;
 	var $main_cat_ID = 0;
 	var $flags;
+	/**
+	 * @var string The list of renderers, imploded by '.'.
+	 */
 	var $renderers;
 	var $comments;     // Comments status
 	var $url;          // Should move
@@ -181,8 +184,8 @@ class Item extends DataObject
 	 * @param string User ID field name
 	 */
 	function Item( $db_row = NULL, $dbtable = 'T_posts', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'Item',
-		              $datecreated_field = 'datecreated', $datemodified_field = 'datemodified',
-		              $creator_field = 'creator_user_ID', $lasteditor_field = 'lastedit_user_ID' )
+	               $datecreated_field = 'datecreated', $datemodified_field = 'datemodified',
+	               $creator_field = 'creator_user_ID', $lasteditor_field = 'lastedit_user_ID' )
 	{
 		global $UserCache, $object_def, $localtimenow, $default_locale, $current_User;
 
@@ -231,7 +234,7 @@ class Item extends DataObject
 			$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
 			$this->set( 'flags', '' );
 			// Set the renderer list to 'default' will trigger all 'opt-out' renderers:
-			$this->renderers = array( 'default' );
+			$this->set( 'renderers', array('default') );
 			$this->set( 'status', 'published' );
 			$this->set( 'locale', $default_locale );
 			$this->set( 'priority', 3 );
@@ -262,7 +265,7 @@ class Item extends DataObject
 			$this->comments = $db_row->$db_cols['comments'];			// Comments status
 
 			// echo 'renderers=', $db_row->post_renderers;
-			$this->renderers = explode( '.', $db_row->$db_cols['renderers'] );
+			$this->renderers = $db_row->$db_cols['renderers'];
 
 			$this->views = $db_row->$db_cols['views'];
 			$this->url = $db_row->$db_cols['url'];			// Should move
@@ -367,7 +370,7 @@ class Item extends DataObject
 
 		$Request->param( 'renderers', 'array', array() );
 		$renderers = $Plugins->validate_list( $Request->get('renderers') );
-		$this->set( 'renderers', implode('.',$renderers) );
+		$this->set( 'renderers', $renderers );
 
 
 		return ! $Request->validation_errors();
@@ -891,7 +894,7 @@ class Item extends DataObject
 		}
 
 		// Apply rendering
-		$post_renderers = $Plugins->validate_list( $this->renderers );
+		$post_renderers = $Plugins->validate_list( explode( '.', $this->renderers ) );
 		$output = $Plugins->render( $output, $post_renderers, $format );
 
 		// Apply Display plugins
@@ -1554,6 +1557,8 @@ class Item extends DataObject
 			$loop_RendererPlugin->code();
 			echo '"';
 
+			$item_renderers = explode( '.', $this->renderers );
+
 			switch( $loop_RendererPlugin->apply_rendering )
 			{
 				case 'always':
@@ -1562,22 +1567,22 @@ class Item extends DataObject
 					break;
 
 				case 'opt-out':
-					if( in_array( $loop_RendererPlugin->code, $this->renderers ) // Option is activated
-						|| in_array( 'default', $this->renderers ) ) // OR we're asking for default renderer set
+					if( in_array( $loop_RendererPlugin->code, $item_renderers ) // Option is activated
+						|| in_array( 'default', $item_renderers ) ) // OR we're asking for default renderer set
 					{
 						echo ' checked="checked"';
 					}
 					break;
 
 				case 'opt-in':
-					if( in_array( $loop_RendererPlugin->code, $this->renderers ) ) // Option is activated
+					if( in_array( $loop_RendererPlugin->code, $item_renderers ) ) // Option is activated
 					{
 						echo ' checked="checked"';
 					}
 					break;
 
 				case 'lazy':
-					if( in_array( $loop_RendererPlugin->code, $this->renderers ) ) // Option is activated
+					if( in_array( $loop_RendererPlugin->code, $item_renderers ) ) // Option is activated
 					{
 						echo ' checked="checked"';
 					}
@@ -1916,6 +1921,9 @@ class Item extends DataObject
 			case 'pingsdone':
 				return $this->set_param( 'flags', 'string', $parvalue ? 'pingsdone' : '' );
 
+			case 'renderers':
+				return $this->set_param( 'renderers', 'string', implode( '.', $parvalue ) );
+
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
@@ -1983,7 +1991,7 @@ class Item extends DataObject
 		$this->set( 'url', $post_url );
 		$this->set( 'flags', $pingsdone ? 'pingsdone' : '' );
 		$this->set( 'comments', $post_comments );
-		$this->set( 'renderers', implode('.',$post_renderers) );
+		$this->set( 'renderers', $post_renderers );
 		$this->set( 'typ_ID', $item_typ_ID );
 		$this->set( 'st_ID', $item_st_ID );
 
@@ -2066,7 +2074,7 @@ class Item extends DataObject
 		$this->set( 'status', $post_status );
 		$this->set( 'flags', $pingsdone ? 'pingsdone' : '' );
 		$this->set( 'comments', $post_comments );
-		$this->set( 'renderers', implode('.',$post_renderers) );
+		$this->set( 'renderers', $post_renderers );
 		$this->set( 'typ_ID', $item_typ_ID );
 		$this->set( 'st_ID', $item_st_ID );
 		if( $post_locale != '#' )
@@ -2331,8 +2339,8 @@ class Item extends DataObject
 
 /*
  * $Log$
- * Revision 1.92  2006/02/01 23:32:32  blueyed
- * *** empty log message ***
+ * Revision 1.93  2006/02/03 17:35:17  blueyed
+ * post_renderers as TEXT
  *
  * Revision 1.91  2006/01/29 20:36:35  blueyed
  * Renamed Item::getBlog() to Item::get_Blog()
