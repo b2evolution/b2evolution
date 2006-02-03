@@ -364,13 +364,30 @@ function locale_timefmt()
 /**
  * Returns the current locale's start of week
  *
- * @return integer
+ * @return integer 0 for Sunday, 1 for Monday
  */
 function locale_startofweek()
 {
 	global $locales, $current_locale;
 
 	return (int)$locales[$current_locale]['startofweek'];
+}
+
+
+/**
+ * Get the country locale
+ * 
+ * @param string locale to use, '' for current 
+ * 
+ * @return string country locale
+ */
+function locale_country( $locale = '' )
+{
+	global $current_locale;
+
+	if( empty($locale) ) $locale = $current_locale;
+
+	return substr( $locale, 3, 2 );
 }
 
 
@@ -704,6 +721,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.17  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.16  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

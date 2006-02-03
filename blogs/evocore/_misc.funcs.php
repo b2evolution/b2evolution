@@ -344,6 +344,14 @@ function mysql2timestamp( $m )
 }
 
 /**
+ * Convert a MYSQL date -- WITHOUT the time -- to a UNIX timestamp
+ */
+function mysql2datestamp( $m )
+{
+	return mktime( 0, 0, 0, substr($m,5,2), substr($m,8,2), substr($m,0,4) );
+}
+
+/**
  * Format a MYSQL date to current locale date format.
  *
  * {@internal mysql2localedate(-)}}
@@ -386,8 +394,6 @@ function mysql2date( $dateformatstring, $mysqlstring, $useGM = false )
 /**
  * Date internationalization: same as date() formatting but with i18n support
  *
- * {@internal date_i18n(-)}}
- *
  * @param string enhanced format string
  * @param integer UNIX timestamp
  * @param boolean true to use GM time
@@ -395,7 +401,7 @@ function mysql2date( $dateformatstring, $mysqlstring, $useGM = false )
 function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 {
 	global $month, $month_abbrev, $weekday, $weekday_abbrev, $weekday_letter;
-	global $Settings;
+	global $Settings, $localtimenow;
 
 	if( $dateformatstring == 'isoZ' )
 	{ // full ISO 8601 format
@@ -411,6 +417,7 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 
 		/*
 		Special symbols:
+			'b': wether it's today (1) or not (0)
 			'l': weekday
 			'D': weekday abbrev
 			'e': weekday letter
@@ -421,7 +428,7 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 		#echo $dateformatstring, '<br />';
 
 		// protect special symbols, that date() would need proper locale set for
-		$protected_dateformatstring = preg_replace( '/(?<!\\\)([lDeFM])/',
+		$protected_dateformatstring = preg_replace( '/(?<!\\\)([blDeFM])/',
 																								'@@@\\\$1@@@',
 																								$dateformatstring );
 
@@ -432,17 +439,21 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 		if( $protected_dateformatstring != $dateformatstring )
 		{ // we had special symbols, replace them
 
+			$istoday = ( date('Ymd',$unixtimestamp) == date('Ymd',$localtimenow) ) ? '1' : '0';
 			$datemonth = date('m', $unixtimestamp);
 			$dateweekday = date('w', $unixtimestamp);
 
 			// replace special symbols
-			$r = str_replace( array(  '@@@l@@@',
+			$r = str_replace( array(
+																'@@@b@@@',
+																'@@@l@@@',
 																'@@@D@@@',
 																'@@@e@@@',
 																'@@@F@@@',
 																'@@@M@@@',
 															),
-												array(  T_($weekday[$dateweekday]),
+												array(  $istoday,
+																T_($weekday[$dateweekday]),
 																T_($weekday_abbrev[$dateweekday]),
 																T_($weekday_letter[$dateweekday]),
 																T_($month[$datemonth]),
@@ -456,36 +467,85 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 
 
 /**
+ * Format dates into a string in a way similar to sprintf()
+ */
+function date_sprintf( $string, $timestamp )
+{
+	global $date_sprintf_timestamp;
+	$date_sprintf_timestamp = $timestamp;
+
+	return preg_replace_callback( '/%\{(.*?)\}/', 'date_sprintf_callback', $string );
+}
+function date_sprintf_callback( $matches )
+{
+	global $date_sprintf_timestamp;
+
+	return date_i18n( $matches[1], $date_sprintf_timestamp );
+}
+
+
+
+/**
+ *
+ * @param integer year
+ * @param integer month (0-53)
+ * @param integer 0 for sunday, 1 for monday
+ */
+function get_start_date_for_week( $year, $week, $startofweek )
+{
+	$new_years_date = mktime( 0, 0, 0, 1, 1, $year );
+	$weekday = date('w', $new_years_date);
+	// echo '<br> 1st day is a: '.$weekday;
+
+	// How many days until start of week:
+	$days_to_new_week = (7 - $weekday + $startofweek) % 7;
+	// echo '<br> days to new week: '.$days_to_new_week;
+
+	// We now add the required number of days to find the 1st sunday/monday in the year:
+	$first_week_start_date = $new_years_date + $days_to_new_week * 86400;
+	// echo '<br> 1stweeks starts on '.date( locale_datefmt(), $first_week_start_date );
+
+	// We add the number of requested weeks:
+	$date = $first_week_start_date + ($week-1) * 604800;
+	// echo '<br> week '.$week.' starts on '.date( locale_datefmt(), $date );
+
+	return $date;
+}
+
+
+
+/**
  * Get start and end day of a week, based on week number and start-of-week
  *
  * Used by Calendar
  *
- * {@internal get_weekstartend(-)}}
+ * fp>> I'd really like someone to comment the magic of that thing...
+ *
+ * @param date
+ * @param integer 0 for Sunday, 1 for Monday
  */
-function get_weekstartend( $mysqlstring, $startOfWeek )
+function get_weekstartend( $date, $startOfWeek )
 {
-	$my = substr($mysqlstring, 0, 4);
-	$mm = substr($mysqlstring, 5, 2);
-	$md = substr($mysqlstring, 8, 2);
-	$day = mktime(0, 0, 0, $mm, $md, $my);
-	$weekday = date('w', $day);
+	$weekday = date('w', $date);
 	$i = 86400;
 	while( $weekday <> $startOfWeek )
 	{
-		$weekday = date('w', $day);
-		$day = $day - 86400;
+		$weekday = date('w', $date);
+		$date = $date - 86400;
 		$i = 0;
 	}
-	$week['start'] = $day + 86400 - $i;
-	$week['end']   = $day + 691199;
+	$week['start'] = $date + 86400 - $i;
+	$week['end']   = $date + 604800; // 691199;
 
-	#pre_dump( 'weekstartend: '.$mysqlstring, date( 'Y-m-d', $week['start'] ), date( 'Y-m-d', $week['end'] ) );
+	// pre_dump( 'weekstartend: ', date( 'Y-m-d', $week['start'] ), date( 'Y-m-d', $week['end'] ) );
 
 	return( $week );
 }
 
 
-function antispambot($emailaddy, $mailto = 0) {
+// fp>> WHAT IS THAT???
+function antispambot($emailaddy, $mailto = 0)
+{
 	$emailNOSPAMaddy = '';
 	srand ((float) microtime() * 1000000);
 	for ($i = 0; $i < strlen($emailaddy); $i = $i + 1) {
@@ -1079,8 +1139,8 @@ function forget_param( $var )
  * This may clean it up
  * But it is also useful when generating static pages: you cannot rely on $_REQUEST[]
  *
- * @param mixed string (delimited by commas) or array of params to ignore (can be regexps in /.../)
- * @param mixed string or array of param(s) to set
+ * @param mixed string or array of params to ignore (can be regexps in /.../)
+ * @param mixed string or array of params to set
  * @param mixed string Alternative URL we want to point to if not the current $ReqPath
  */
 function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
@@ -2396,6 +2456,67 @@ function get_link_showhide( $link_id, $target_id, $text_when_displayed, $text_wh
 
 
 /**
+ * Compact a date in a number keeping only integer value of the string
+ *
+ * @param string date
+ */
+function compact_date( $date )
+{
+ 	return preg_replace( '#[^0-9]#', '', $date );
+}
+
+
+/**
+ * Decompact a date in a date format ( Y-m-d h:m:s )
+ *
+ * @param string date
+ */
+function decompact_date( $date )
+{
+	$date0 = $date;
+ 	
+	return  substr($date0,0,4).'-'.substr($date0,4,2).'-'.substr($date0,6,2).' '
+								.substr($date0,8,2).':'.substr($date0,10,2).':'.substr($date0,12,2);
+}
+
+/**
+ * Check the format of the phone number param and
+ * format it in a french number if it is.
+ * 
+ * @param string phone number
+ */
+function format_phone( $phone )
+{
+
+	if( ( $indic = substr( $phone, 0, 3 ) ) == '+33'  && strlen( $phone ) == 12 )
+	{ // French number, so we can format it (+33 x.xx.xx.xx.xx):
+		$phone_formated = $indic.format_french_phone( ' '.substr( $phone, 3, strlen( $phone)-3 ) );
+	}
+	elseif ( substr( $phone, 0 , 1 ) != '+' && strlen( $phone ) == 10  ) 
+	{ // French number, so we can format it (xx.xx.xx.xx.xx):
+		$phone_formated = format_french_phone( $phone );
+	}
+	else 
+	{ // unknown format, so don't change it:
+		$phone_formated = $phone;
+	}
+	
+	return $phone_formated;
+}
+
+
+/**
+ * Format a string in a french phone number
+ *
+ * @param string phone number
+ */
+function format_french_phone( $phone )
+{
+	return substr($phone, 0 , 2).'.'.substr($phone, 2, 2).'.'.substr($phone, 4, 2)
+					.'.'.substr($phone, 6, 2).'.'.substr($phone, 8, 2); 
+}
+
+/**
  * Generate a link to a online help resource.
  * testing the concept of online help (aka webhelp).
  * this function should be relocated somewhere better if it is taken onboard by the project
@@ -2479,6 +2600,9 @@ function is_admin_page()
 
 /*
  * $Log$
+ * Revision 1.177  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.176  2006/01/30 20:17:51  blueyed
  * *** empty log message ***
  *

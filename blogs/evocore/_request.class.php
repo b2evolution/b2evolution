@@ -294,6 +294,8 @@ class Request
 	 */
 	function param_action( $default = '' )
 	{
+		global $action;
+
 		#$this->param( 'action', 'string', NULL, true ); // blueyed>> is there a reason to remember? (taken from files.php)
 		$action = $this->param( 'action', 'string', NULL );
 
@@ -446,6 +448,8 @@ class Request
 	 */
 	function param_check_phone( $var, $required = false )
 	{
+		global $$var;
+		
 		if( empty( $this->params[$var] ) && ! $required )
 		{ // empty is OK:
 			return true;
@@ -455,6 +459,11 @@ class Request
 		{
 			$this->param_error( $var, T_('The phone number is invalid.') );
 			return false;
+		}
+		else 
+		{ // Keep only 0123456789+ caracters
+			$this->params[$var] = preg_replace( '#[^0-9+]#', '', $this->params[$var]);
+			$$var = $this->params[$var];
 		}
 		return true;
 	}
@@ -474,7 +483,6 @@ class Request
 		}
 		return true;
 	}
-
 
 
 	/**
@@ -500,12 +508,12 @@ class Request
 	 * @param array|boolean Additional params:
 	 *        - 'required': Is non-empty date required? Default: true.
 	 *        - 'date_pattern': Pattern for the date, using named capturing groups ('day', 'month', 'year').
-	 *           Default: '#^(\d\d\d\d)-(\d\d)-(\d\d)$#' (ISO)
-	 *           You can also use "Named Capturing Groups" and write it like this:
-	 *           '#^(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)$#' (ISO).
-	 *           This allows to use for example '#^(?P<day>\d\d)-(?P<month>\d\d)-(?P<year>\d\d\d\d)$#'
-	 *           NOTE: "Named Capturing Groups" require PHP 4.3.3! If no named groups are given we'll use
-	 *           (1 == year, 2 == month, 3 == day).
+	 *           Default: '#^(\d\d\d\d)-?(\d\d)-?(\d\d)$#' (accepts both ISO and "compact")
+	 *         	 		You can also use "Named Capturing Groups" and write it like this:
+	 *         	  	'#^(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)$#' (ISO).
+	 *           		This allows to use for example '#^(?P<day>\d\d)-(?P<month>\d\d)-(?P<year>\d\d\d\d)$#'
+	 *           		NOTE: "Named Capturing Groups" require PHP 4.3.3! If no named groups are given we'll use
+	 *           		(1 == year, 2 == month, 3 == day).
 	 *        - 'field_err_msg': Error for the form field
 	 * @return boolean|array true if empty, but OK. False if not valid. Matching array if ok.
 	 */
@@ -523,7 +531,7 @@ class Request
 			//$func_params['date_pattern'] = '#^(?P<year>\d\d\d\d)-(?P<month>[01]?\d)-(?P<day>[0123]?\d)$#'; // This may be useful, when taking care of leading zeros afterwards again, eg date('Y-m-d').
 			//$func_params['date_pattern'] = '#^(?P<year>\d\d\d\d)-(?P<month>[01]\d)-(?P<day>[0123]\d)$#';
 			//$func_params['date_pattern'] = '#^(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)$#';
-			$func_params['date_pattern'] = '#^(\d\d\d\d)-(\d\d)-(\d\d)$#';
+			$func_params['date_pattern'] = '#^(\d\d\d\d)-?(\d\d)-?(\d\d)$#';
 		}
 
 		if( preg_match( $func_params['date_pattern'], $this->params[$var], $match ) )
@@ -551,6 +559,33 @@ class Request
 
 		$this->param_error( $var, $err_msg, $func_params['field_err_msg'] );
 		return false;
+	}
+	
+	
+  /**
+	 * Sets a date parameter with values from the request or to provided default,
+	 * And check if param is a valid date (format wise).
+	 * 
+	 * @param string Variable to set
+	 * @param mixed Default value or TRUE if user input required
+	 * @param string error message
+	 * @param boolean 'required': Is non-empty date required? Default: true.
+	 * 
+	 * @return string the compact date value ( yyyymmdd )
+   */
+	function param_compact_date( $var, $default = '', $err_msg, $required = false )
+	{
+		global $$var;
+		
+		$this->params[$var] = param( $var, 'string', $default );
+
+		if( $this->param_check_date_format( $var, $err_msg, array( 'required' => $required ) ) )
+		{	// Valid DATE input format!
+			// Convert to output format:
+			$this->params[$var] = compact_date( $this->params[$var] );
+			$$var = $this->params[$var];
+			return $$var;
+		}
 	}
 
 
@@ -640,7 +675,38 @@ class Request
 		return false;
 	}
 
+/**
+ * Sets a combo parameter with values from the request,
+ * => the value of the select option and the input text value if new is selected
+ * Display an error if the new value is selected that the input text has a value  
+ * 
+ * @param string Variable to set
+ * @param string error message
+ * 
+ * @return string position status ID or 'new' or '' if new is seleted but not input text value 
+ * 
+ */
+function param_combo( $var, $err_msg )
+{
+	$this->params[$var] = param( $var, 'string', true );
 
+	if( $this->params[$var] == 'new' )
+	{	// The new option is selected in the combo select, so we need to check if we have a value in the combo input text:
+		$this->params[$var.'_combo'] = param( $var.'_combo', 'string' );
+
+		if( empty( $this->params[$var.'_combo'] ) )
+		{ // We have no value in the combo input text, so display error
+			$this->param_error( $var, $err_msg );
+			// Set request param to null 
+			$this->params[$var] = null;
+			return '';
+		}
+	}
+	
+	return $this->params[$var];
+}
+	
+	
 	/**
 	 * Check if there have been validation errors
 	 *
@@ -765,6 +831,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.32  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.31  2006/01/26 21:20:24  blueyed
  * Default for $link_log_messages_to_field_IDs changed to true, adding better usability for form errors.
  *

@@ -311,6 +311,7 @@ while( $lFile = & $Fileman->get_next() )
 	/********************    Checkbox:    *******************/
 
 	echo '<td class="checkbox firstcol">';
+	echo '<span name="surround_check" class="check_surround_init">';
 	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"';
 	if( $checkall || $Fileman->isSelected( $lFile ) )
@@ -318,6 +319,7 @@ while( $lFile = & $Fileman->get_next() )
 		echo ' checked="checked"';
 	}
 	echo ' />';
+	echo '</span>';
 
 	/***********  Hidden info used by Javascript:  ***********/
 
@@ -556,10 +558,10 @@ else
 	?>
 	<tr class="listfooter">
 		<td colspan="<?php echo $filetable_cols ?>">
-
-		<?php	$Form->check_all();	?>
+		
+		<?php	echo $Form->check_all();	?>	
 			&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
-
+				
 		<?php
 		if( $mode == 'upload' )
 		{	// We are uploading in a popup opened by an edit screen
@@ -852,6 +854,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.74  2006/02/03 21:58:04  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.73  2006/01/20 16:45:43  blueyed
  * whitespace
  *

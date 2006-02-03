@@ -179,7 +179,7 @@ class Form extends Widget
 				$this->formstart = '<table cellspacing="0" class="fform">'."\n";
 				// Note: no thead in here until you can safely add a tbody to the rest of the content...
 				$this->title_fmt = '<tr class="formtitle"><th colspan="2"><div class="results_title">'
-														.'<span style="float:right">$global_icons$</span>'
+														.'<span class="right_icons">$global_icons$</span>'
 														.'$title$</div></th></tr>'."\n";
 				$this->fieldstart = "<tr>\n";
 				$this->labelstart = '<td class="label">';
@@ -597,6 +597,12 @@ class Form extends Widget
 	function date_input( $field_name, $field_value, $field_label, $field_params = array() )
 	{
 		global $month, $weekday_letter;
+		
+		// The date value may be compact, in this case we have to decompact it
+		if( preg_match( '/^[0-9]+$/', $field_value ) )
+		{	// The date is compact, so we decompact it
+			$field_value = decompact_date( $field_value );
+		} 
 
 		if( !isset($field_params['date_format']) )
 		{
@@ -1060,15 +1066,19 @@ class Form extends Widget
 	}
 
 	/**
-	 * Create links to check and uncheck all check boxes of the form
+	 * Return links to check and uncheck all check boxes of the form
 	 */
 	function check_all()
 	{
-		echo '<a name="check_all" href="'.regenerate_url().'">'.T_('Check all')
-				.'</a> | <a name="uncheck_all" href="'.regenerate_url().'">'.T_('Uncheck all').'</a> ';
-
-		// Need to add event click on links at the form end.
+		// Need to add event click on links at the form end.		
 		$this->check_all = true;
+		
+		return '<a name="check_all_nocheckchanges" href="'.regenerate_url().'">'
+				//.T_('Check all').' '
+				.get_icon( 'check_all', 'imgtag', NULL, true )
+				.'</a> | <a name="uncheck_all_nocheckchanges" href="'.regenerate_url().'">'
+				//.T_('Uncheck all').' '
+				.get_icon( 'uncheck_all', 'imgtag', NULL, true ).'</a> '.'&nbsp;';	
 	}
 
 
@@ -1122,7 +1132,14 @@ class Form extends Widget
 							var nb_dynamicSelects = 0;
 							var tab_dynamicSelects = Array();
 						</script>';
-
+		
+		if( preg_match( '#^(.*)_checkchanges#', $this->form_name ) && !empty( $this->title ) )
+		{ // This form will trigger the bozo validator and has a title, preset a localized bozo confirm message:
+			$r .= '<script type="text/javascript">
+		 						bozo.confirm_mess = "'.sprintf(T_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to loose your edits.\nAre you sure?' ), $this->title ).'"; 
+		 				</script>';
+		}
+		
 		return $this->display_or_return( $r );
 	}
 
@@ -1194,9 +1211,11 @@ class Form extends Widget
 	 * @param array a two-dimensional array containing the parameters of the input tag
 	 * @param string name
 	 * @param string label
+	 * @param boolean true to surround checkboxes if they are required
+	 * @param boolean true add a surround_check span, used by check_all mouseover 
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checklist( $options, $field_name, $field_label, $required = false )
+	function checklist( $options, $field_name, $field_label, $required = false, $add_highlight_spans = false )
 	{
 		global $Request;
 
@@ -1214,6 +1233,17 @@ class Form extends Widget
 			$loop_field_note = isset($option[5]) ? $option[5] : '';
 
 			$r .= '<label class="">';
+			
+			if( $add_highlight_spans )
+			{ // Need it to highlight checkbox for check_all and uncheck_all mouseover 
+				$r .= '<span name="surround_check" class="checkbox_surround_init">';
+				$after_field_highlight = '</span>';
+			}
+			else 
+			{
+				$after_field_highlight = '';
+			}
+			
 			if( isset($Request->err_messages[$field_name]))
 			{ // There is an error message for this field, we want to mark the checkboxes with a red border:
 				$r .= '<span class="checkbox_error">';
@@ -1241,6 +1271,8 @@ class Form extends Widget
 			$r .= ' class="checkbox" />';
 
 			$r .= $after_field;
+			
+			$r .= $after_field_highlight;
 
 			$r .= ' '.$option[2];
 
@@ -1513,6 +1545,78 @@ class Form extends Widget
 		return $this->select_input_options( $field_name, $options_list, $field_label, $field_params );
 	}
 
+	/**
+	 * Combo box
+	 * Display a select options list with an option 'new', 
+	 * and when this one is seleted, display a combo input text to add a new value 
+	 *
+	 * @param string field name
+	 * @param string field value
+	 * @param string containing options
+	 * @param string field label
+	 * @param array Optional params
+	 * 
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function combo_box( $field_name, $field_value, $field_options, $field_label, $field_params = array() )
+	{
+		global $Request;
+		
+		if ( isset( $Request ) && isset( $Request->err_messages[$field_name] ) )
+		{	// There is an error on the combo, so we need to set the combo input text class to 'field_error'
+			$input_class = 'field_error';
+		}
+		else 
+		{
+			$input_class = '';
+		}
+		
+		// Set onchange event on the select, when the select changes, we check the value to display or hide an input text after it 
+		$field_params['onchange']= 'check_combo( this.id, this.options[this.selectedIndex].value, "'.$input_class.'")';
+			
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		$r = $this->begin_field();
+
+		// Select option to add after the select list a combo input text: 
+		$option_new  = '<option value="new">'.T_('New').': </option>'."\n";
+		
+		// Add the new option to the select list:
+		$field_options = $option_new . $field_options;
+		
+		// Select list
+		$r .="\n<select"
+			 .$this->get_field_params_as_string($field_params).'>'
+			 .$field_options
+			 ."</select>";
+		
+		if( $field_options == $option_new  || $input_class == 'field_error' || !$field_value )
+		{	// The list is empty or there is an error on the combo or no field value, so we have to display the input text:
+			$visible = 'inline';
+		}
+		else 
+		{ // Hide the input text:
+			$visible = 'none' ;
+		}
+		
+		$r .= '<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="30" class="'.$input_class.'" style="display:'.$visible.'">';
+
+		// We need <script> tag here to use a <noscript> tag when javascript is deactivated:
+		$r .= '<script type="text/javascript">
+					 </script>';
+		
+		if( $visible == 'none' )
+		{ // The input text is hidden, so if no javascript activated, we always display input text:
+			$r .= '<noscript>
+							<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="30" class="'.$input_class.'">
+						</noscript>';
+		}
+		
+		$r .= $this->end_field();
+		
+		return $this->display_or_return( $r );
+	}
+	
 
 	/**
 	 * Build a text area.
@@ -2363,6 +2467,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.105  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.104  2006/01/29 20:44:46  blueyed
  * *** empty log message ***
  *

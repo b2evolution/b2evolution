@@ -33,19 +33,20 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	</script>
 
 	<!-- script allowing to check and uncheck all boxes in forms -->
+	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/functions.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/form_extensions.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/anchorposition.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/date.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/popupwindow.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/calendarpopup.js"></script>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/functions.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/rollovers.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/extracats.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/dynamic_select.js"></script>
-	<script type="text/javascript">bozo_confirm_mess = "<?php echo T_(  'You have modified this form but you haven\'t submitted it yet.\nYou are about to loose your edits.\nAre you sure?' );?>"</script>
-	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/bozo_validator.js"></script>
-	
-	<?php
+	<?php	
+	if( $UserSettings->get('bozo') <> 0 )
+	{	// Activate bozo validator
+		echo '<script type="text/javascript" src="'.$rsc_url.'js/bozo_validator.js"></script>';
+	}
 
 	$Debuglog->add( 'Admin-Path: '.var_export($AdminUI->path, true) );
 

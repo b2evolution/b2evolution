@@ -63,6 +63,9 @@ span.checkbox_surround {
 span.checkbox_surround input.checkbox {
 	background: #fbf2ee;
 }
+span.checkbox_surround_init {
+	padding : 1px;
+}
 
 input.field_required,
 select.field_required,

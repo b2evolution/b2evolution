@@ -14,7 +14,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Icon Legend
  */
-$IconLegend->display_legend();
+if( $UserSettings->get('legend') <> 0 )
+{	// Display icons legend
+	$IconLegend->display_legend();
+}
 
 // Close open divs, etc...
 echo $AdminUI->get_body_bottom();

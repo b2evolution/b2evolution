@@ -57,18 +57,21 @@ var bozo = {
 			for( var j = 0; j < all_inputs.length; j++ ) 
 			{	// Get the next input element:
 				var field = all_inputs[j];
-				if( field.type == 'submit' )
-				{	// The input is a submit, so we add a click event to validate_submit function
-					addEvent( field , 'click', bozo.validate_submit, false );
-				}
-				// TODO: handle IMAGE type
-				else if( field.type == 'reset' )
-				{	// The input is a reset, so we add a click event to reset_changes function
-					addEvent( field , 'click', bozo.reset_changes, false );
-				}
-				else
-				{	// The input is not a submit/image/reset, so we add a change event:
-					addEvent( field , 'change', bozo.change, false );
+				if( field.className.indexOf( 'no_checkchanges' ) == -1  )
+				{	// We can add event on this field:
+					if( field.type == 'submit' )
+					{	// The input is a submit, so we add a click event to validate_submit function
+						addEvent( field , 'click', bozo.validate_submit, false );
+					}
+					// TODO: handle IMAGE type
+					else if( field.type == 'reset' )
+					{	// The input is a reset, so we add a click event to reset_changes function
+						addEvent( field , 'click', bozo.reset_changes, false );
+					}
+					else
+					{	// The input is not a submit/image/reset, so we add a change event:
+						addEvent( field , 'change', bozo.change, false );
+					}
 				}
 			}
 			

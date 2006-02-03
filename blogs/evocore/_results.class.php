@@ -149,6 +149,12 @@ class Results extends Widget
 	 */
 	var $cols;
 
+
+	/**
+	 * Lazy filled.
+	 */
+	var $nb_cols;
+
 	/**
 	 * Do we want to display column headers?
 	 * @var boolean
@@ -270,6 +276,7 @@ class Results extends Widget
 
 		$this->current_group_ID = 0;
 	}
+
 
 	/**
 	 * Increment and update all necessary counters before processing a new line in result set
@@ -499,7 +506,7 @@ class Results extends Widget
 	 *
 	 * @return int # of rows displayed
 	 */
-	function display( $display_params = NULL )
+	function display( $display_params = NULL, $fadeout = array() )
 	{
 		// Initialize displaying:
 		$this->display_init( $display_params );
@@ -511,7 +518,15 @@ class Results extends Widget
 
 			if( $this->total_pages == 0 )
 			{ // There are no results! Nothing to display!
-				echo $this->replace_vars( $this->params['no_results'] );
+
+				// START OF LIST/TABLE:
+				$this->display_list_start();
+
+				// DISPLAY FILTERS:
+				$this->display_filters();
+
+				// END OF LIST/TABLE:
+				$this->display_list_end();
 			}
 			else
 			{	// We have rows to display:
@@ -519,17 +534,14 @@ class Results extends Widget
 				// GLOBAL (NAV) HEADER:
 				$this->display_nav( 'header' );
 
-				// Experimental:
-				$this->display_top_callback();
-
 				// START OF LIST/TABLE:
 				$this->display_list_start();
 
-					// TITLE / COLUMN HEADERS:
+					// TITLE / FILTERS / COLUMN HEADERS:
 					$this->display_head();
 
 					// GROUP & DATA ROWS:
-					$this->display_body();
+					$this->display_body( $fadeout );
 
 				// END OF LIST/TABLE:
 				$this->display_list_end();
@@ -568,35 +580,23 @@ class Results extends Widget
 	}
 
 
-	// EXPERIMENTAL:
-	// Used for filtering form
-	function display_top_callback()
-	{
-		if( !empty($this->top_callback) )
-		{
-			$this->Form = new Form( regenerate_url(), $this->param_prefix.'form_search', 'post', 'none' ); // COPY!!
-
-			$this->Form->begin_form( '' );
-
-			$func = $this->top_callback;
-			$func( $this->Form );
-			$this->Form->submit( array( 'submit', T_('Filter list'), 'search' ) );
-
-			$this->Form->end_form( '' );
-		}
-	}
-
-
 	/**
 	 * Display list/table start.
 	 *
 	 * Typically outputs <ul> or <table>
 	 *
-	 * @access protected
+	 * @param boolean do we want special treatment when there are no results
 	 */
-	function display_list_start()
+	function display_list_start( $detect_no_results = true )
 	{
-		echo $this->params['list_start'];
+		if( $detect_no_results && $this->total_pages == 0 )
+		{ // There are no results! Nothing to display!
+			echo $this->replace_vars( $this->params['no_results_start'] );
+		}
+		else
+		{	// We have rows to display:
+			echo $this->params['list_start'];
+		}
 	}
 
 
@@ -605,11 +605,47 @@ class Results extends Widget
 	 *
 	 * Typically outputs </ul> or </table>
 	 *
-	 * @access protected
+	 * @param boolean do we want special treatment when there are no results
 	 */
-	function display_list_end()
+	function display_list_end( $detect_no_results = true )
 	{
-		echo $this->params['list_end'];
+		if( $detect_no_results && $this->total_pages == 0 )
+		{ // There are no results! Nothing to display!
+			echo $this->replace_vars( $this->params['no_results_end'] );
+		}
+		else
+		{	// We have rows to display:
+			echo $this->params['list_end'];
+		}
+	}
+
+
+  /**
+   * Display the filtering form
+   */
+	function display_filters()
+	{
+		if( !empty($this->filters_callback) )
+		{
+			echo $this->replace_vars( $this->params['filters_start'] );
+
+			$this->Form = new Form( regenerate_url(), $this->param_prefix.'form_search', 'post', 'none' ); // COPY!!
+
+			$this->Form->begin_form( '' );
+
+			echo T_('Filters').': ';
+
+			$func = $this->filters_callback;
+
+			if( ! $func( $this->Form ) )
+			{	// Function has not displayed the filter button yet:
+				$this->Form->submit( array( 'filter_submit', T_('Filter list'), 'search' ) );
+			}
+
+			$this->Form->end_form( '' );
+
+			echo $this->params['filters_end'];
+		}
 	}
 
 
@@ -626,11 +662,19 @@ class Results extends Widget
 	{
 		echo $this->params['head_start'];
 
+
+		// DISPLAY TITLE:
 		if( isset($this->title) )
 		{ // A title has been defined for this result set:
 			echo $this->replace_vars( $this->params['head_title'] );
 		}
 
+
+		// DISPLAY FILTERS:
+		$this->display_filters();
+
+
+		// DISPLAY COLUMN HEADERS:
 		$col_count = 0;
 		$col_names = array();
 		if( isset( $this->cols) ) foreach( $this->cols as $col )
@@ -749,7 +793,7 @@ class Results extends Widget
 		echo $this->params['head_end'];
 
 
-		// experimental:
+		// Experimental:
 		echo $this->params['tfoot_start'];
 		echo $this->params['tfoot_end'];
 	}
@@ -761,12 +805,23 @@ class Results extends Widget
 	 * This includes groups and data rows.
 	 *
 	 * @access protected
+	 *
+	 * @param array fadeout list
 	 */
-	function display_body()
+	function display_body( $fadeout = array() )
 	{
+		if( !empty( $fadeout ) )
+		{ // Initialize fadeout javascript:
+			global $rsc_url;
+			echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
+			echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
+		}
+
 		echo $this->params['body_start'];
 
 		$line_count = 0;
+		// Used to set an id to fadeout element 
+		$fadeout_count = 0;
 		foreach( $this->rows as $row )
 		{ // For each row/line:
 
@@ -851,7 +906,34 @@ class Results extends Widget
 			$col_count = 0;
 			foreach( $this->cols as $col )
 			{ // For each column:
-
+				
+				/**
+				 * Update td start class for fadeout list results
+				 */ 
+				foreach ( $fadeout as $key=>$crit )
+				{
+					if( isset( $row->$key ) && in_array( $row->$key, $crit ) )
+					{ // Col is in the fadeout list
+						if( isset( $col['td_start'] ) )
+						{	// We have a customized column start for this one: 
+							if( preg_match( '#.*class="(.*)".*#', $col['td_start'], $res ) )
+							{	// Already has a class, so add to its fadeout class
+								$col['td_start'] = '<td class="fadeout-ffff00 '.$res[1].'" id="fadeout-'.$fadeout_count.'">';
+							}
+							else 
+							{	// has no class so a add fadout class
+								$col['td_start'] = '<td class="fadeout-ffff00" id="fadeout-'.$fadeout_count.'">';
+							}
+						}
+						else 
+						{	// We have not a customized column start for this one, so we set one with fadeout class  
+								$col['td_start'] = '<td class="fadeout-ffff00" id="fadeout-'.$fadeout_count.'">';
+						}
+						$fadeout_count++;
+						break;
+					}
+				}
+			
 				if( isset( $col['td_start'] ) )
 				{ // We have a customized column start for this one:
 					$output = $col['td_start'];
@@ -1014,6 +1096,7 @@ class Results extends Widget
 		// Make callback for Object method substitution:
 		$content = preg_replace( '#@ (.+?) @#ix', "'.\$this->current_Obj->$1.'", $content );
 		
+		// Make callback function move_icons
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
 		
 		
@@ -1173,7 +1256,11 @@ class Results extends Widget
 
 			case 'nb_cols' :
 				// Number of columns in result:
-				return count($this->cols);
+				if( !isset($this->nb_cols) )
+				{
+					$this->nb_cols = count($this->cols);
+				}
+				return $this->nb_cols;
 
 			default :
 				return parent::replace_callback( $matches );
@@ -1406,6 +1493,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.48  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.47  2006/01/04 15:03:53  fplanque
  * enhanced list sorting capabilities
  *

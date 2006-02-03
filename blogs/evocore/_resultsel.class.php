@@ -138,19 +138,48 @@ class ResultSel extends Results
 
 		$this->Form->begin_form( '' );
 
-		$this->Form->hidden( $this->param_prefix.'update_selection', 1 );// the database has to be updated :
+		if( $this->total_pages > 0 )
+		{	// We have rows to display, we want the selection stuff:
 
-		// Sets the cols_check global variable to verify if checkboxes
-		// have to be checked in the result set :
-		cols_check( $this->current_selection_ID, $this->table_objsel, $this->field_selected, $this->field_selection );
+			// Need it to check in the next page if the selection has to be updated
+			$this->Form->hidden( $this->param_prefix.'previous_sel_ID', $this->current_selection_ID );
 
-		// item_ID_array must be emptied to avoid conflicts with previous result sets :
-		// TODO: put this into object
-		$item_ID_array = array();
+			// Sets the cols_check global variable to verify if checkboxes
+			// have to be checked in the result set :
+			cols_check( $this->current_selection_ID, $this->table_objsel, $this->field_selected, $this->field_selection );
 
+			// item_ID_array must be emptied to avoid conflicts with previous result sets :
+			// TODO: put this into object
+			$item_ID_array = array();
+		}
 
 		// list/table start:
 		parent::display_list_start();
+	}
+
+
+  /**
+   * Display the filtering form WITHOUT starting a new form!
+   *
+   * We must NOT create a new form since we already have one for the selection!!
+   */
+	function display_filters()
+	{
+		if( !empty($this->filters_callback) )
+		{
+			echo $this->replace_vars( $this->params['filters_start'] );
+
+			echo T_('Filters').': ';
+
+			$func = $this->filters_callback;
+
+			if( ! $func( $this->Form ) )
+			{	// Function has not displayed the filter button yet:
+				$this->Form->submit( array( 'filter_submit', T_('Filter list'), 'search' ) );
+			}
+
+			echo $this->params['filters_end'];
+		}
 	}
 
 
@@ -170,13 +199,17 @@ class ResultSel extends Results
 			return;
 		}
 
-		echo $this->replace_vars( $this->params['functions_start'] );
+
+		if( $this->total_pages > 0 )
+		{	// We have rows to display, we want the selection stuff:
+
+			echo $this->replace_vars( $this->params['functions_start'] );
 
 			$can_edit = $current_User->check_perm( 'selections', 'edit' );
 
 			if( $can_edit )
 			{ // links to check all and uncheck all
-				$this->Form->check_all();
+				echo $this->Form->check_all();
 			}
 
 			// construction of the select menu :
@@ -189,11 +222,15 @@ class ResultSel extends Results
 				// List of IDs displayed on this page (needed for deletes):
 				$this->Form->hidden( 'item_ID_list', implode( $item_ID_array, ',' ) );
 
-				$this->Form->submit( array( '', T_('Update selection'), 'SaveButton' ) );
+				// actionArray[update_selection] is experimental
+				$this->Form->submit( array( 'actionArray[update_'.$this->param_prefix.'selection]', T_('Update selection'), 'SaveButton' ) );
 			}
 
-		echo $this->replace_vars( $this->params['functions_end'] );
+			echo $this->replace_vars( $this->params['functions_end'] );
 
+		}
+
+		
 		// list/table end:
 		parent::display_list_end();
 
@@ -261,7 +298,7 @@ function selection_checkbox( $item_ID, $param_prefix )
 
 	if( $current_User->check_perm( 'selections', 'edit' ) )
 	{	// User is allowed to edit
-		$r .= '<span name="surround_check" class=""><input type="checkbox" class="checkbox" name="'.$param_prefix.'items[]" value='.$item_ID;
+		$r .= '<span name="surround_check" class="checkbox_surround_init"><input type="checkbox" class="checkbox" name="'.$param_prefix.'items[]" value='.$item_ID;
 		if( in_array( $item_ID, $cols_check ) )
 		{	// already in selection:
 			$r .= ' checked="checked" ';
@@ -301,8 +338,10 @@ function selection_select_tag(
 
 	$r = T_('Selection');
 	$r .= ' <select name="selection_'.$category_prefix.'ID"
-					onchange="selform = get_form( this );selform.elements[\''.$category_prefix.'update_selection\'].value=0;selform.submit()" >'."\n";
-	// in the onchange attribute, option_db is set to 0 to avoid updating the database
+					onchange="selform = get_form( this );
+						selform.elements[\''.$category_prefix.'previous_sel_ID\'].value=-1;
+						selform.submit()" >'."\n";
+	// in the onchange attribute, option_db is set to -1 to avoid updating the database
 
 	if( $current_User->check_perm( 'selections', 'edit' ) )
 	{	// User is allowed to edit
@@ -341,37 +380,70 @@ function selection_select_tag(
 
 
 /**
+ * Handle selection action
+ * 
+ * Determine if we need to perform an action to the current selection and do it in this case. 
+ *  
+ * @param integer the current selection id
+ * @param string prefix (cont_, etab_, firm_, ..)
+ * @param string selection prefix (cocs_, etes_, fifs_, ..)
+ */
+function handle_selection_actions( $selection_ID, $prefix, $prefix_sel )
+{
+	$previous_sel_ID = param( $prefix.'previous_sel_ID', 'integer', 0, true );// previous selection ID, need it to check for updating sel
+	
+	if( $selection_ID == $previous_sel_ID ) // the databse has to be updated
+	{	// The selected ID is the same than the edited one in the previous page 	
+		if( $selection_ID == 0 )
+		{ // A new selection must be created
+			$action = 'create';
+		}
+		elseif( $selection_ID >0 )
+		{ // An existing selection is being updated
+			$action = 'update';
+		}
+		// Get the selection name
+		$selection_name = param( 'selection_'.$prefix.'name', 'string', '', true );
+
+		// Do the slection action
+		selection_action( $action, $selection_ID, $selection_name, $prefix, $prefix_sel );
+	}
+}
+
+		
+/**
  * Manages the various database changes to make on selections
  *
- * @param string the selection category
  * @param string the action currently effectuated
  * @param integer the current selection id
  * @param string the current selection name
- * @param array the items of the selection
+ * @param string prefix (cont_, etab_, firm_, ..)
+ * @param string selection prefix (cocs_, etes_, fifs_, ..)
  */
-function selection_action( $category, $action, $selection_ID, $selection_name, $items )
+function selection_action( $action, $selection_ID, $selection_name, $prefix, $prefix_sel )
 { // the form has been submitted to act on the database and not only to change the display
 
 	global $DB, $Messages, $confirm, $item_ID_list, $current_User;
-
+	
+	$items = param( $prefix.'items', 'array', array(), false );	// do NOT memorize // ?????????????
+	param( 'item_ID_list', 'string', '', false );
+	
 	$current_User->check_perm( 'selections', 'edit', true );
 
-	switch( $category )
-	{ // definition of the table and column names depending on the selection category
 
+	// Set global vars, selection_.prefix.ID, selection_.prefix_name 
+	$selection_prefix_ID = 'selection_'.$prefix.'ID';
+	$selection_prefix_name = 'selection_'.$prefix.'name';
+	global $$selection_prefix_ID, $$selection_prefix_name;
+	
+	// Moche ms bon...
+	$selections_table = 'T_'.substr($prefix,0,strlen($prefix)-1).'selections';
+	$sel_table = 'T_'.$prefix.substr($prefix,0,1).'sel';	
+	$selections_table_name = substr($prefix,0,1).'sel_name';
+	$selections_table_id = substr($prefix,0,1).'sel_ID';
+	$sel_table_selection = $prefix_sel.$selections_table_id;
+	$sel_table_item = $prefix_sel.$prefix.'ID';
 
-		default: // default parameters
-			$selections = '';
-			$sel_table = '';
-			$selections_table_name = '';
-			$selections_table_id = '';
-			$sel_table_selection = '';
-			$sel_table_item = '';
-			$category_table = '';
-			$category_name = '';
-			break;
-
-	}
 
 	switch( $action )
 	{
@@ -406,9 +478,12 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 				$DB->query( $sql_sel ); // insertion of the relation between selections and items in the database
 			}
 
-			switch( $category )
-			{ // attribution of new values to some parameters so that the newly created selection can become the current one
-			}
+			// Set $selection_.$prefix.ID var
+			$sel_prefix_ID = 'selection_'.$prefix.'ID';
+			$$sel_prefix_ID = $selection_ID;
+			// Set $selection_.$prefix.name var
+			$sel_prefix_name = 'selection_'.$prefix.'name';
+			$$sel_prefix_name = $selection_name;
 
 			$Messages->add( T_('Selection created.'), 'success' );
 
@@ -496,18 +571,22 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 					<p>
 
 				<?php
-					$Form = & new Form( regenerate_url( 'tab', 'tab='.$category ), 'form', 'get' );
+					$Form = & new Form( regenerate_url(), 'form_confirm', 'post', '' );
 
 					$action = '';
 
 					$Form->begin_form( 'inline' );
 					$Form->hidden( 'action', 'delete' );
 					$Form->hidden( 'selection_ID', $selection_ID );
+					$Form->hidden( 'selection_name', $selection_name );
 					$Form->hidden( 'confirm', 1 );
-					$Form->hidden( 'tab', $category );
 					$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
 					$Form->end_form();
+					
+					unset( $Form );
 
+					$Form = & new Form( regenerate_url(), 'form_cancel', 'post', '' );
+					
 					$Form->begin_form( 'inline' );
 					$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 					$Form->end_form();
@@ -544,6 +623,9 @@ function selection_action( $category, $action, $selection_ID, $selection_name, $
 
 /*
  * $Log$
+ * Revision 1.11  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.10  2005/12/30 20:13:40  fplanque
  * UI changes mostly (need to double check sync)
  *

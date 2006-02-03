@@ -422,7 +422,7 @@ class DataObject
 
 		echo '<h3>'.T_('THIS CANNOT BE UNDONE!').'</h3>';
 
-		$Form = & new Form( '', '', 'get', '' );
+		$Form = & new Form( '', 'form_confirm', 'get', '' );
 
 		$Form->begin_form( 'inline' );
 			$Form->hiddens_by_key( $hiddens );
@@ -431,7 +431,7 @@ class DataObject
 			$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
 
-		$Form = & new Form( '', '', 'get', '' );
+		$Form = & new Form( '', 'form_cancel', 'get', '' );
 
 		$Form->begin_form( 'inline' );
 			$Form->hiddens_by_key( $hiddens );
@@ -644,6 +644,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.40  2006/02/01 23:32:32  blueyed
  * *** empty log message ***
  *

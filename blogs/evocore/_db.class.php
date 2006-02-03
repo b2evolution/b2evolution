@@ -381,11 +381,11 @@ class DB
 	function week( $date, $startofweek )
 	{
 		if( $startofweek == 1 )
-		{ // Week starts on Monday:
+		{ // Week starts on Monday, week 1 must have a monday in this year:
 			return ' WEEK( '.$date.', 5 ) ';
 		}
 
-		// Week starts on Sunday:
+		// Week starts on Sunday, week 1 must have a sunday in this year:
 		return ' WEEK( '.$date.', 0 ) ';
 	}
 
@@ -1167,6 +1167,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.52  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.51  2006/01/27 17:50:37  blueyed
  * *** empty log message ***
  *

@@ -178,6 +178,11 @@ $Form->begin_fieldset( T_('Features') );
 	{
 		$Form->info_field( T_('Admin skin'), $value_admin_skin, array( 'note' => T_('The skin defines how the backoffice appears to you.') ) );
 	}
+	// To display or hide icon legend
+	$Form->checkbox( 'edited_user_legend', $UserSettings->get('legend'), T_('Display icon legend'), T_('Display a legend at the bottom of every page including all action icons used on that page.') );
+	// To activate or deactivate bozo validator
+	$Form->checkbox( 'edited_user_bozo', $UserSettings->get('bozo'), T_('Use anti-bozo form validator'), T_('This will alert you if you fill in data into a form and try to leave the form before submitting the data.') );
+	
 $Form->end_fieldset();
 
 
@@ -213,6 +218,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.80  2006/02/03 21:58:04  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.79  2005/12/30 20:13:39  fplanque
  * UI changes mostly (need to double check sync)
  *

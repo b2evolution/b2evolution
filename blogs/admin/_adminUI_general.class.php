@@ -826,6 +826,8 @@ class AdminUI_general
 						'head_start' => "<thead><tr>\n",
 							'head_title' => '<th colspan="$nb_cols$"><span style="float:right">$global_icons$</span>$title$</th></tr>'
 							                ."\n\n<tr>\n",
+							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
+							'filters_end' => '</td></tr>',
 							'colhead_start' => '<th>',
 							'colhead_start_first' => '<th class="firstcol">',
 							'colhead_start_last' => '<th class="lastcol">',
@@ -878,11 +880,11 @@ class AdminUI_general
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
-					'no_results' => '<table class="grouped clear" cellspacing="0">'."\n\n"
-					                .'<th><span style="float:right">$global_icons$</span>'
-					                .'$title$</th></tr>'."\n\n<tr>\n"
-					                .'<tr class="lastline"><td class="firstcol lastcol">'.T_('No results.').'</td></tr>'
-					                .'</table>'."\n\n",
+					'no_results_start' => '<table class="grouped clear" cellspacing="0">'."\n\n"
+								                .'<th><span style="float:right">$global_icons$</span>'
+								                .'$title$</th></tr>'."\n",
+					'no_results_end'   => '<tr class="lastline"><td class="firstcol lastcol">'.T_('No results.').'</td></tr>'
+								                .'</table>'."\n\n",
 				'after' => '</div>',
 				'sort_type' => 'basic'
 				);
@@ -1227,6 +1229,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.52  2006/02/03 21:58:04  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.51  2006/02/01 20:06:15  blueyed
  * die_if_no_perm re-enabled
  *

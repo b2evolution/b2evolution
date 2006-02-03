@@ -312,6 +312,8 @@ require_once dirname(__FILE__).'/_file.class.php';
 require_once dirname(__FILE__).'/_filerootcache.class.php';
 require_once dirname(__FILE__).'/_filetype.class.php';
 require_once dirname(__FILE__).'/_filetypecache.class.php';
+require_once dirname(__FILE__).'/_itemtype.class.php';
+require_once dirname(__FILE__).'/_itemtypecache.class.php';
 
 // Object caches init (we're asking plugins that provide the "CacheObjects" event here first):
 $Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
@@ -325,6 +327,7 @@ $Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', '& new DataO
 $BlogCache = & new BlogCache();
 $FileCache = & new FileCache();
 $ItemCache = & new ItemCache();
+$itemTypeCache = & new ItemTypeCache();
 $LinkCache = & new LinkCache();
 $UserCache = & new UserCache();
 
@@ -527,6 +530,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.84  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.83  2006/02/01 21:36:51  blueyed
  * Trigger CacheObject event
  *

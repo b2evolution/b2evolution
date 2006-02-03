@@ -87,7 +87,7 @@ echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 		$Form->hidden( 'filter_on_post_title', 1 );
 		$Form->text( 'post_filter', $post_filter, 20, T_('Task title'), '', 60 );
 	}
-	$ItemList->top_callback = 'filter_on_post_title';
+	$ItemList->filters_callback = 'filter_on_post_title';
 */
 
 
@@ -289,6 +289,9 @@ if( $restrict_to_open )
 
 /*
  * $Log$
+ * Revision 1.8  2006/02/03 21:58:04  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.7  2006/01/29 20:36:35  blueyed
  * Renamed Item::getBlog() to Item::get_Blog()
  *

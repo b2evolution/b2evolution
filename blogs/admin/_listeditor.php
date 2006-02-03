@@ -48,6 +48,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 param( 'action', 'string', 'list' );
 param( 'ID', 'integer', 0 );
 
+// Init fadeout result array:
+$result_fadeout = array();
+
 /**
  * Check locked elements
  */
@@ -112,7 +115,9 @@ switch( $action )
 			
 			$DB->commit();
 					
-					
+			// Add the ID of the new object to the result fadeout
+			$result_fadeout[$edited_table_IDcol][] = $DB->insert_id;
+				
 			$Messages->add( T_('Entry created.'), 'success' );
 			$name = '';
 		}
@@ -122,16 +127,22 @@ switch( $action )
 	case 'update':
 		// Update in database...:
 		$Request->param( 'ID', 'integer', true );
-		$Request->param_string_not_empty( 'name', T_('Please enter a string.') );
-		{
+		if( $Request->param_string_not_empty( 'name', T_('Please enter a string.') ) )
+		{	// Update in database
 			$DB->query( "
 				UPDATE $edited_table
 				   SET $edited_table_namecol = ".$DB->quote($name)."
 				 WHERE $edited_table_IDcol = $ID" );
 
 			$Messages->add( sprintf( T_('Entry #%d updated.'), $ID ), 'success' );
+			// Add the object ID to the result fadeout
+			$result_fadeout[$edited_table_IDcol][] = $ID;
 			unset( $ID );
 			$name = '';
+		}
+		else 
+		{
+			$action = 'edit';
 		}
 		break;
 
@@ -159,6 +170,42 @@ switch( $action )
 			unset( $ID );
 			$action = 'list';
 		}
+		elseif( isset( $delete_restrictions ) )
+		{  // Not confirmed, delete restrictions set, so check for restrictions:
+			foreach( $delete_restrictions as $restriction )
+			{
+				if( !isset( $EvoConfig->DB['aliases'][$restriction['table']] ) )
+				{	// We have no declaration for this table, we consider we don't deal with this table in this app:
+					continue;
+				}
+				$count = $DB->get_var(
+					'SELECT COUNT(*)
+					   FROM '.$restriction['table'].'
+					  WHERE '.$restriction['fk'].' = '.$ID,
+					0, 0, 'restriction/cascade check' );
+				if( $count )
+				{
+					$Messages->add( sprintf( $restriction['msg'], $count ), 'restrict' );
+				}
+			}
+			if( $Messages->count('restrict') )
+			{	// There are restrictions:
+				$Messages->head = array(
+						'container' => $restrict_title,
+						'restrict' => T_('The following relations prevent deletion:')
+					);
+				$Messages->foot =	T_('Please delete related objects before you proceed.');
+			}
+			else 
+			{ // There are no restrictions, so we can display delete dialog 
+				$checked_delete = true;
+			}
+		}
+		else 
+		{	// No delete restrictions to check, so we can display delete dialog 
+			$checked_delete = true;
+		}
+			
 		$name = '';
 		break;
 		
@@ -171,8 +218,8 @@ switch( $action )
 		
 		// Test if the ID exist and set his order
 		$order = $DB->get_var( "SELECT $edited_table_ordercol
-														 FROM $edited_table
-														WHERE $edited_table_IDcol = $ID" );
+														  FROM $edited_table
+														 WHERE $edited_table_IDcol = $ID" );
 		
 		if( $DB->num_rows != 1 )
 		{
@@ -210,6 +257,10 @@ switch( $action )
 			$DB->query( "UPDATE $edited_table 
 											SET $edited_table_ordercol = $order
 										WHERE $edited_table_IDcol = $ID_inf" );
+				
+		// EXPERIMENTAL FOR FADEOUT RESULT
+			$result_fadeout[$edited_table_IDcol][] = $ID;
+			$result_fadeout[$edited_table_IDcol][] = $ID_inf;
 		}
 		else 
 		{
@@ -217,7 +268,7 @@ switch( $action )
 		}	
 		
 		$DB->commit();
-			
+		
 		$name = '';	
 		break;
 
@@ -230,8 +281,8 @@ switch( $action )
 		
 		// Test if the ID exist and set his order
 		$order = $DB->get_var( "SELECT $edited_table_ordercol
-														 FROM $edited_table
-														WHERE $edited_table_IDcol = $ID" );
+														  FROM $edited_table
+														 WHERE $edited_table_IDcol = $ID" );
 		
 		if( $DB->num_rows != 1 )
 		{
@@ -269,6 +320,10 @@ switch( $action )
 			$DB->query( "UPDATE $edited_table 
 											SET $edited_table_ordercol = $order
 										WHERE $edited_table_IDcol = $ID_sup" );
+			
+			// EXPERIMENTAL FOR FADEOUT RESULT
+			$result_fadeout[$edited_table_IDcol][] = $ID;
+			$result_fadeout[$edited_table_IDcol][] = $ID_sup;
 		}	
 		else 
 		{
@@ -302,7 +357,7 @@ require dirname(__FILE__).'/_menutop.php';
 /**
  * Display payload:
  */
-if( ($action == 'delete') && !$confirm )
+if( ($action == 'delete') && !$confirm && $checked_delete )
 {
 	?>
 	<div class="panelinfo">
@@ -310,10 +365,8 @@ if( ($action == 'delete') && !$confirm )
 
 		<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
-		<p>
-
 		<?php
-		$Form = & new Form( '', 'form', 'get' );
+		$Form = & new Form( '', 'form_delete', 'get', '' );
 
 		$Form->begin_form( 'inline' );
 		$Form->hidden( 'action', 'delete' );
@@ -326,12 +379,12 @@ if( ($action == 'delete') && !$confirm )
 		$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
 
+		$Form = & new Form( '', 'form_cancel', 'get', '' );
+				
 		$Form->begin_form( 'inline' );
 		$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 		$Form->end_form()
 		?>
-
-		</p>
 
 	</div>
 	<?php
@@ -349,7 +402,7 @@ if ( !isset( $default_col_order ) )
 
 // Create result set:
 $sql = "SELECT $edited_table_IDcol, $edited_table_namecol
-  			 	 FROM $edited_table"
+  			 	FROM $edited_table"
 				. ( !empty( $edited_table_filtercol ) ? ' WHERE '.$edited_table_filtercol.' = '.$val_filtercol : '' ) ; 
 
 $Results = & new Results(	$sql, isset( $edited_table_prefix ) ? $edited_table_prefix : '',  $default_col_order );
@@ -408,10 +461,14 @@ function edit_actions( $ID )
 
 $Results->cols[] = array(
 		'th' => T_('Actions'),
+		'td_start' => '<td class="shrinkwrap lastcol">',
 		'td' => '%edit_actions( #'.$edited_table_IDcol.'# )%',
 	);
 
-$Results->display();
+// EXPERIMENTAL 
+// $Results->display();
+$Results->display( NULL, $result_fadeout );
+
 
 // FORM:
 switch( $action )

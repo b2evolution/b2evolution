@@ -172,7 +172,7 @@ class DataObjectList2 extends FilteredResults
 	 */
 	function move_up( $id )
 	{
-		global $DB, $Messages;
+		global $DB, $Messages, $result_fadeout;
 		
 		$DB->begin();
 		
@@ -204,6 +204,10 @@ class DataObjectList2 extends FilteredResults
 			// Update inferior element order
 			$obj_inf->set( 'order', $order );
 			$obj_inf->dbupdate();
+			
+			// EXPERIMENTAL FOR FADEOUT RESULT
+			$result_fadeout[$this->Cache->dbIDname][] = $id;
+			$result_fadeout[$this->Cache->dbIDname][] = $obj_inf->ID;
 		}
 		else 
 		{
@@ -221,7 +225,7 @@ class DataObjectList2 extends FilteredResults
 	 */
 	function move_down( $id )
 	{
-		global $DB, $Messages;
+		global $DB, $Messages, $result_fadeout;
 		
 		$DB->begin();
 		
@@ -253,6 +257,10 @@ class DataObjectList2 extends FilteredResults
 			// Update inferior element order
 			$obj_sup->set( 'order', $order );
 			$obj_sup->dbupdate();
+			
+			// EXPERIMENTAL FOR FADEOUT RESULT
+			$result_fadeout[$this->Cache->dbIDname][] = $id;
+			$result_fadeout[$this->Cache->dbIDname][] = $obj_sup->ID;
 		}
 		else 
 		{
@@ -264,6 +272,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.7  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.6  2006/01/04 15:03:52  fplanque
  * enhanced list sorting capabilities
  *

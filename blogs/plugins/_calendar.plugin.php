@@ -314,7 +314,7 @@ class Calendar
 	 */
 	function Calendar( $m = '' )
 	{
-		global $Settings;
+		global $Settings, $localtimenow;
 
 		$this->dbtable = 'T_posts';
 		$this->dbprefix = 'post_';
@@ -323,25 +323,28 @@ class Calendar
 		// OBJECT THAT WILL BE USED TO CONSTRUCT THE WHERE CLAUSE:
 		$this->ItemQuery = new ItemQuery( $this->dbtable, $this->dbprefix, $this->dbIDname );	// COPY!!
 
+		$localyearnow = date( 'Y', $localtimenow );
+		$localmonthnow = date( 'm', $localtimenow );
+
 		// Find out which month to display:
 		if( empty($m) )
 		{ // Current month (monthly)
-			$this->year = date('Y');
-			$this->month = date('m');
+			$this->year = $localyearnow;
+			$this->month = $localmonthnow;
 			$this->mode = 'month';
 
 			$this->todayIsVisible = true;
 		}
 		else
-		{
+		{	// We have requested a specific date
 			$this->year = substr($m, 0, 4);
 			if (strlen($m) < 6)
 			{ // no month provided
 				$this->mode = 'year';
 
-				if( $this->year == date('Y') )
+				if( $this->year == $localyearnow )
 				{ // we display current year, month gets current
-					$this->month = date('m');
+					$this->month = $localmonthnow;
 				}
 				else
 				{ // highlight no month, when not current year
@@ -354,7 +357,7 @@ class Calendar
 				$this->mode = 'month';
 			}
 
-			$this->todayIsVisible = ( $this->month == date('m') && $this->year == date('Y') );
+			$this->todayIsVisible = ( $this->month == $localmonthnow && $this->year == $localyearnow );
 		}
 
 
@@ -481,28 +484,42 @@ class Calendar
 
 			$daysinmonth = intval(date('t', mktime(0, 0, 0, $this->month, 1, $this->year)));
 			// echo 'days in month=', $daysinmonth;
-			$datestartofmonth = $this->year.'-'.$this->month.'-01';
-			$dateendofmonth = $this->year.'-'.$this->month.'-'.$daysinmonth;
 
-			// caution: offset bug inside
-			$calendarblah = get_weekstartend($datestartofmonth, locale_startofweek());
-			if (mysql2date('w', $datestartofmonth) == locale_startofweek())
+
+			// caution: offset bug inside (??)
+			$datestartofmonth = mktime(0, 0, 0, $this->month, 1, $this->year );
+			// echo date( locale_datefmt(), $datestartofmonth );
+			$calendarblah = get_weekstartend( $datestartofmonth, locale_startofweek() );
+			$calendarfirst = $calendarblah['start'];
+/*			if(date('w', $datestartofmonth) == locale_startofweek())
 			{
-				$calendarfirst = $calendarblah['start'] + 1 + 3600;     // adjust for daylight savings time
+				$calendarfirst = $calendarblah['start'] + 1; // ???
 			}
 			else
 			{
-				$calendarfirst = $calendarblah['end'] - 604799 + 3600;  // adjust for daylight savings time
+				$calendarfirst = $calendarblah['end'] - 604799; // ???
 			}
-			#pre_dump( 'calendarfirst', date('Y-m-d', $calendarfirst) );
+*/
+//			pre_dump( 'calendarfirst', date('Y-m-d', $calendarfirst) );
 
-			$calendarblah = get_weekstartend($dateendofmonth, $end_of_week);
-			if (mysql2date('w', $dateendofmonth) == $end_of_week) {
+
+
+			$dateendofmonth = mktime(0, 0, 0, $this->month, $daysinmonth, $this->year);
+			// echo date( locale_datefmt(), $dateendofmonth );
+			$calendarblah = get_weekstartend( $dateendofmonth, locale_startofweek() );
+			$calendarlast = $calendarblah['end'];
+
+/*			if(date('w', $dateendofmonth) == $end_of_week)
+			{
 				$calendarlast = $calendarblah['start'] + 1;
-			} else {
+			}
+			else
+			{
 				$calendarlast = $calendarblah['end'] + 10000;
 			}
-			#pre_dump( 'calendarlast', date('Y-m-d', $calendarlast) );
+*/
+//			pre_dump( 'calendarlast', date('Y-m-d', $calendarlast) );
+
 
 			// here the offset bug is corrected
 			if( (intval(date('d', $calendarfirst)) > 1) && (intval(date('m', $calendarfirst)) == intval($this->month)) )
@@ -645,7 +662,7 @@ class Calendar
 		if( $this->mode == 'year' )
 		{
 			for ($i = 1; $i < 13; $i = $i + 1)
-			{
+			{	// For each month:
 				if( isset($monthswithposts[ $i ]) )
 				{
 					if( $this->month == $i )
@@ -697,12 +714,12 @@ class Calendar
 			}
 		}
 		else // mode == 'month'
-		{
+		{	// Display current month:
 			$newrow = 0;
 			$j = 0;
 			$k = 1;
 
-			for( $i = $calendarfirst; $i < ($calendarlast + 86400); $i = $i + 86400 )
+			for( $i = $calendarfirst; $i <= $calendarlast; $i = $i + 86400 )
 			{ // loop day by day (86400 seconds = 24 hours)
 				if ($newrow == 1)
 				{ // We need to start a new row:
@@ -980,6 +997,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.12  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.11  2006/01/04 20:34:51  fplanque
  * allow filtering on extra statuses
  *

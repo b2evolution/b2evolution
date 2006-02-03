@@ -48,6 +48,7 @@ class SQL
 	var $order_by = '';
 	var $limit = '';
 	var $search_field = array();
+	var $search_field_regexp = array();
 
 
 	/**
@@ -250,10 +251,16 @@ class SQL
 	 * create array of search fields
 	 *
 	 * @param string field to search on
+	 * @param string regular expression we want to use on the search for the field param
 	 */
-	function add_search_field( $field )
+	function add_search_field( $field,  $reg_exp = '' )
 	{
 		$this->search_field[] = $field;
+		
+		if( !empty( $reg_exp ) )
+		{	// We want to use a regular expression on the search for this field, so add to the search field regexp array 
+			$this->search_field_regexp[$field] = $reg_exp;
+		}
 	}
 	
 	/**
@@ -277,39 +284,80 @@ class SQL
 		{
 			case 'AND':
 			case 'OR':
-						// create array of key words of the search string
-						$keyword_array = explode( ' ', $search );
-						$keyword_array = array_filter( $keyword_array, 'filter_empty' ); 
-						
-						$twhere = array();
-						foreach($keyword_array as $keyword)
-						{
-							$twhere[] = $search_field.' like \'%'.$keyword.'%\'';
-						}
-						$where = implode( ' '.$search_kw_combine.' ', $twhere);				
-						break;
+				// Create array of key words of the search string
+				$keyword_array = explode( ' ', $search );
+				$keyword_array = array_filter( $keyword_array, 'filter_empty' ); 
+				
+				$twhere = array();
+				// Loop on all keywords
+				foreach($keyword_array as $keyword)
+				{
+					$twhere[] = '( '.$search_field.' like \'%'.$keyword.'%\''.$this->WHERE_regexp( $keyword, $search_kw_combine ).' )';
+				}
+				$where = implode( ' '.$search_kw_combine.' ', $twhere);				
+				break;
 						
 			case 'PHRASE':
-						$where = $search_field.' like "%'.$search.'%"';
-						break;
+					$where = $search_field.' like "%'.$search.'%"'.$this->WHERE_regexp( $search, $search_kw_combine );
+					break;
 						
 			case 'BEGINWITH':
-						$twhere = array();
-						foreach( $this->search_field as $field )
-						{
-							$twhere[] = $field." LIKE '".$search."'";
-						}
-						$where = implode( ' OR ', $twhere ); 
-						break;
+				$twhere = array();
+				foreach( $this->search_field as $field )
+				{
+					$twhere[] = $field." LIKE '".$search."%'";
+				}
+				$where = implode( ' OR ', $twhere ).$this->WHERE_regexp( $search, $search_kw_combine); 
+				break;
 						
 		}
 		$this->WHERE_and( $where );
 	}
 	
+	/**
+	 * create the filter whith the search field regexp array
+	 *
+	 * @param string search 
+	 * @param string operator( AND , OR , PHRASE ) for the filter
+	 *
+	 */
+	function WHERE_regexp( $search, $search_kw_combine )
+	{
+		$where = '';
+		
+		// Loop on all fields we have to use a replace regular expression on search:
+		foreach( $this->search_field_regexp as $field=>$reg_exp )
+		{
+				// Use reg exp replace on search
+				$search_reg_exp = preg_replace( $reg_exp, '', $search );
+				
+				if( !empty( $search_reg_exp ) )
+				{	// The reg exp search is not empty, so we add it to the request with an 'OR' operator:
+					switch( $search_kw_combine )
+					{
+						case 'AND':
+						case 'OR':
+						case 'PHRASE':
+							$where .= ' OR '.$field.' like \'%'.$search_reg_exp.'%\''; 			
+							break;
+							
+						case 'BEGINWITH':
+							$where .= ' OR '.$field.' like \''.$search_reg_exp.'%\''; 			
+							break;			
+					}
+				}
+		}
+		return $where;
+	}
+	
+	
 }
 
 /*
  * $Log$
+ * Revision 1.9  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.8  2005/12/30 20:13:40  fplanque
  * UI changes mostly (need to double check sync)
  *

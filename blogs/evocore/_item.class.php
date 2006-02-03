@@ -589,7 +589,7 @@ class Item extends DataObject
 	/**
 	 * Template function: Display the main blog name.
 	 *
-	 * @todo is it possible to use $Item->get_Blog()->name() instead? (we can't possibly duplicate all sub-object functions here!!!)
+	 * @todo is it possible to use {$Item->get_Blog()}->name() instead? (we can't possibly duplicate all sub-object functions here!!!)
 	 *       blueyed>> not with PHP4
 	 * @param string Output format. See {@link format_to_output()}.
 	 */
@@ -2339,6 +2339,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.94  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.93  2006/02/03 17:35:17  blueyed
  * post_renderers as TEXT
  *

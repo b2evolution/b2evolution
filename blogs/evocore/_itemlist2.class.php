@@ -76,6 +76,12 @@ class ItemList2 extends DataObjectList2
 	 */
 	var $last_displayed_date = '';
 
+  /**
+   * Lazy filled
+   * @access private
+   */
+  var $advertised_start_date;
+  var $advertised_stop_date;
 
 	/**
 	 * Constructor
@@ -93,7 +99,8 @@ class ItemList2 extends DataObjectList2
 			$timestamp_min = NULL,       // Do not show posts before this timestamp
 			$timestamp_max = NULL,   		 // Do not show posts after this timestamp
 			$cache_name = 'ItemCache',	 // name of cache to be used
-			$param_prefix = ''
+			$param_prefix = '',
+			$filterset_name = ''				// Name to be used when saving the filterset (leave empty to use default for collection)
 		)
 	{
 		global $Settings, $$cache_name;
@@ -110,9 +117,16 @@ class ItemList2 extends DataObjectList2
 
 		$this->Blog = & $Blog;
 
-		$this->filterset_name = 'ItemList_filters_'.$this->Blog->ID;
+		if( !empty( $filterset_name ) )
+		{	// Set the filterset_name with the filterset_name param
+			$this->filterset_name = 'ItemList_filters_'.$filterset_name;
+		}
+		else 
+		{	// Set a generic filterset_name
+			$this->filterset_name = 'ItemList_filters_coll'.$this->Blog->ID;
+		}
 
- 		$this->page_param = 'paged';
+		$this->page_param = 'paged';
 
 		// Initialize the default filter set:
 		$this->set_default_filters( array(
@@ -138,6 +152,10 @@ class ItemList2 extends DataObjectList2
         'unit' => $Settings->get('what_to_show'),
 				'posts' => $this->limit,
 				'page' => 1,
+				'item_type' => NULL,
+				'contact_link' => NULL,
+				'establishment_link' => NULL,
+				'firm_link' => NULL,
 			) );
 	}
 
@@ -213,6 +231,7 @@ class ItemList2 extends DataObjectList2
 		$Request->memorize_param( 'm', 'integer', $this->default_filters['ymdhms'], $this->filters['ymdhms'] );          // YearMonth(Day) to display
 		$Request->memorize_param( 'w', 'integer', $this->default_filters['week'], $this->filters['week'] );            // Week number
 		$Request->memorize_param( 'dstart', 'integer', $this->default_filters['ymdhms_min'], $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
+		$Request->memorize_param( 'dstop', 'integer', $this->default_filters['ymdhms_max'], $this->filters['ymdhms_max'] ); // YearMonth(Day) to start at
 
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
 		if( is_null($this->default_filters['ts_min'])
@@ -231,20 +250,20 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * OLD STYLE orders:
 		 */
-		$Request->set_param( 'order', '/^(ASC|asc|DESC|desc)$/', $this->default_filters['order'], $this->filters['order'] );   		// ASC or DESC
-		$Request->set_param( 'orderby', '/^([A-Za-z0-9]+([ ,][A-Za-z0-9]+)*)?$/', $this->default_filters['orderby'], $this->filters['orderby'] );  // list of fields to order by (TODO: change that crap)
+		$Request->memorize_param( 'order', 'string', $this->default_filters['order'], $this->filters['order'] );   		// ASC or DESC
+		$Request->memorize_param( 'orderby', 'string', $this->default_filters['orderby'], $this->filters['orderby'] );  // list of fields to order by (TODO: change that crap)
 
 		/*
 		 * Paging limits:
 		 */
- 		$Request->set_param( 'unit', 'string', $this->default_filters['unit'], $this->filters['unit'] );    		// list unit: 'posts' or 'days'
+ 		$Request->memorize_param( 'unit', 'string', $this->default_filters['unit'], $this->filters['unit'] );    		// list unit: 'posts' or 'days'
 		$this->unit = $this->filters['unit'];	// TEMPORARY
 
-		$Request->set_param( 'posts', 'integer', $this->default_filters['posts'], $this->filters['posts'] ); 			// # of units to display on the page
+		$Request->memorize_param( 'posts', 'integer', $this->default_filters['posts'], $this->filters['posts'] ); 			// # of units to display on the page
 		$this->limit = $this->filters['posts']; // for compatibility with parent class
 
 		// 'paged'
-		$Request->set_param( $this->page_param, 'integer', 1, $this->filters['page'] );      // List page number in paged display
+		$Request->memorize_param( $this->page_param, 'integer', 1, $this->filters['page'] );      // List page number in paged display
 		$this->page = $this->filters['page'];
 	}
 
@@ -330,10 +349,13 @@ class ItemList2 extends DataObjectList2
 		 */
 		$this->filters['ymdhms'] = $Request->param( 'm', 'integer', $this->default_filters['ymdhms'], true );          // YearMonth(Day) to display
 		$this->filters['week'] = $Request->param( 'w', 'integer', $this->default_filters['week'], true );            // Week number
-		$this->filters['ymdhms_min'] = $Request->param( 'dstart', 'integer', $this->default_filters['ymdhms_min'], true ); // YearMonth(Day) to start at
-		$this->filters['ymdhms_max'] = $this->default_filters['ymdhms_max']; // YearMonth(Day) to stop at
 
+		$this->filters['ymdhms_min'] = $Request->param_compact_date( 'dstart', $this->default_filters['ymdhms_min'], T_( 'Invalid date' ) ); // YearMonth(Day) to start at
+		$this->filters['ymdhms_max'] = $Request->param_compact_date( 'dstop', $this->default_filters['ymdhms_max'], T_( 'Invalid date' ) ); // YearMonth(Day) to stop at
+
+		
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
+		// So far, these act as SILENT filters. They will not advertise their filtering in titles etc.
 		$this->filters['ts_min'] = $this->default_filters['ts_min'];
 		$this->filters['ts_max'] = $this->default_filters['ts_max'];
 		if( is_null($this->default_filters['ts_min'])
@@ -359,7 +381,7 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * Ordering:
 		 */
-		$this->filters['order'] = $Request->param( 'order', '/^(ASC|asc|DESC|desc)$/', $this->default_filters['order'], true );   			// ASC or DESC
+		$this->filters['order'] = $Request->param( 'order', '/^(ASC|asc|DESC|desc)$/', $this->default_filters['order'], true );		// ASC or DESC
 		$this->filters['orderby'] = $Request->param( 'orderby', '/^([A-Za-z0-9]+([ ,][A-Za-z0-9]+)*)?$/', $this->default_filters['orderby'], true );   // list of fields to order by (TODO: change that crap)
 
 
@@ -376,7 +398,9 @@ class ItemList2 extends DataObjectList2
 		// 'paged'
 		$this->filters['page'] = $Request->param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 		$this->page = $this->filters['page'];
-
+		
+		// Item type
+		$this->filters['item_type'] = $this->default_filters['item_type'];
 
 
 		if( $Request->validation_errors() )
@@ -500,6 +524,13 @@ class ItemList2 extends DataObjectList2
 
 		$this->ItemQuery->where_visibility( $this->filters['visibility_array'] );
 
+		/**
+		 * Restrict to an item type
+		 */
+		if( !empty( $this->filters['item_type'] ) )
+		{
+			$this->ItemQuery->where_and( 'itm_ityp_ID = '.$this->filters['item_type'] );
+		}	
 
 		/*
 		 * order by stuff:
@@ -573,7 +604,6 @@ class ItemList2 extends DataObjectList2
 		}
 		else
 			die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
-
 
 
 		// GET TOTAL ROW COUNT:
@@ -903,36 +933,204 @@ class ItemList2 extends DataObjectList2
 	}
 
 
+  /**
+   * Get the adverstised start date (does not include timestamp_min)
+   *
+   * Note: there is a priority order in the params to determine the start date:
+   *  -dstart
+   *  -week + m
+   *  -m
+   *  -dstop - x days
+   * @see ItemQuery::where_datestart()
+   */
+	function get_advertised_start_date()
+	{
+		if( is_null( $this->advertised_start_date ) )
+		{	// We haven't determined the start date yet:
+
+			if( !empty( $this->filters['ymdhms_min'] ) )
+			{	// We have requested start date (8 digits)
+				$m = $this->filters['ymdhms_min'];
+				$this->advertised_start_date = mktime( 0, 0, 0, substr($m,4,2), substr($m,6,2), substr($m,0,4) );
+			}
+			elseif( !is_null($this->filters['week']) 		// note: 0 is a valid week number
+						&& !empty( $this->filters['ymdhms'] ) )
+			{	// we want to restrict on a specific week
+				$this->advertised_start_date = get_start_date_for_week( substr($this->filters['ymdhms'],0,4), $this->filters['week'], locale_startofweek() );
+			}
+			elseif( strlen( $this->filters['ymdhms'] ) >= 4 )
+			{	// We have requested an interval
+				$m = $this->filters['ymdhms'].'0101';
+				$this->advertised_start_date = mktime( 0, 0, 0, substr($m,4,2), substr($m,6,2), substr($m,0,4) );
+			}
+			elseif( $this->filters['unit'] == 'days'
+						&& ($stop_date = $this->get_advertised_stop_date()) != '' )
+			{	// We want to restrict on a specific number of days after the start date:
+				$this->advertised_start_date = $stop_date - ($this->limit-1) * 86400;
+			}
+			else
+			{	// We cannot determine a start date, save an empty string (to differentiate from NULL)
+				$this->advertised_start_date = '';
+			}
+
+		}
+
+		return $this->advertised_start_date;
+	}
+
+
+  /**
+   * Get the adverstised stop date (does not include timestamp_max)
+   *
+   * Note: there is a priority order in the params to determine the stop date.
+   *  -dstop
+   *  -week + m
+   *  -m
+   *  -dstart + x days
+   */
+	function get_advertised_stop_date()
+	{
+		if( is_null( $this->advertised_stop_date ) )
+		{	// We haven't determined the stop date yet:
+
+			if( !empty( $this->filters['ymdhms_max'] ) )
+			{	// We have requested an end date (8 digits)
+				$m = $this->filters['ymdhms_max'];
+				$this->advertised_stop_date = mktime( 0, 0, 0, substr($m,4,2), substr($m,6,2), substr($m,0,4) );
+			}
+			elseif( !is_null($this->filters['week']) 		// note: 0 is a valid week number
+						&& !empty( $this->filters['ymdhms'] ) )
+			{	// we want to restrict on a specific week
+				$this->advertised_stop_date = get_start_date_for_week( substr($this->filters['ymdhms'],0,4), $this->filters['week'], locale_startofweek() );
+				$this->advertised_stop_date += 518400; // + 6 days
+			}
+			elseif( !empty( $this->filters['ymdhms'] ) )
+			{	// We want to restrict on an interval:
+				if( strlen( $this->filters['ymdhms'] ) >= 8 )
+				{	// We have requested a day interval
+					$m = $this->filters['ymdhms'];
+					$this->advertised_stop_date = mktime( 0, 0, 0, substr($m,4,2), substr($m,6,2), substr($m,0,4) );
+				}
+				elseif( strlen( $this->filters['ymdhms'] ) == 6 )
+				{ // We want to go to the end of the month:
+					$m = $this->filters['ymdhms'];
+					$this->advertised_stop_date = mktime( 0, 0, 0, substr($m,4,2)+1, 0, substr($m,0,4) ); // 0th day of next mont = last day of month
+				}
+				elseif( strlen( $this->filters['ymdhms'] ) == 4 )
+				{ // We want to go to the end of the year:
+					$m = $this->filters['ymdhms'];
+					$this->advertised_stop_date = mktime( 0, 0, 0, 12, 31, substr($m,0,4) );
+				}
+			}
+			elseif( $this->filters['unit'] == 'days'
+						&& ($start_date = $this->get_advertised_start_date()) != '' )
+			{	// We want to restrict on a specific number of days after the start date:
+				$this->advertised_stop_date = $start_date + ($this->limit-1) * 86400;
+			}
+			else
+			{	// We cannot determine a stop date, save an empty string (to differentiate from NULL)
+				$this->advertised_stop_date = '';
+			}
+
+		}
+
+		return $this->advertised_stop_date;
+	}
+
+
+  /**
+   * Make sure date displaying starts at the beginning of the current filter interval
+   *
+   * Note: we're talking about strict dates (no times involved)
+   */
+  function set_start_date( )
+	{
+		$start_date = $this->get_advertised_start_date();
+
+		if( !empty( $start_date ) )
+		{	// Memorize the last displayed as the day BEFORE the one we're going to display
+			//echo ' start at='.date( locale_datefmt(), $start_date );
+			$this->last_displayed_date = $start_date - 86400;
+		}
+	}
+
+
 	/**
-	 * Template function: Display the date if it has changed since last call
+	 * Template function: display potentially remaining empty days until the end of the filter interval
 	 *
 	 * @param string string to display before the date (if changed)
 	 * @param string string to display after the date (if changed)
 	 * @param string date/time format: leave empty to use locale default time format
 	 */
-	function date_if_changed( $before = '<h2>', $after = '</h2>', $format = '' )
+	function dates_to_end( $before_empty_day = '<h2>', $after_empty_day = '</h2>', $format = '' )
 	{
-		$current_item_date = $this->current_Obj->issue_date;
+		$stop_date = $this->get_advertised_stop_date();
+
+		if( !is_null( $stop_date ) )
+		{	// There is a stop date, we want to display days:
+			//echo ' - stop at='.date( locale_datefmt(), $stop_date );
+			//echo ' - last displayed='.date( locale_datefmt(), $this->last_displayed_date );
+			while( $this->last_displayed_date < $stop_date )
+			{
+				$this->last_displayed_date += 86400;	// Add one day's worth of seconds
+				echo date_sprintf( $before_empty_day, $this->last_displayed_date )
+						.date_i18n( $format, $this->last_displayed_date )
+						.date_sprintf( $after_empty_day, $this->last_displayed_date );
+			}
+		}
+	}
+
+
+	/**
+	 * Template function: Display the date if it has changed since last call
+	 *
+	 * Optionally also displays empty dates in between.
+	 *
+	 * @param string string to display before the date (if changed)
+	 * @param string string to display after the date (if changed)
+	 * @param string date/time format: leave empty to use locale default time format
+	 * @param string|NULL string to display before any empty dates. Set to NULL in order not to display empty dates.
+	 * @param string|NULL string to display after any empty dates.
+	 */
+	function date_if_changed( $before = '<h2>', $after = '</h2>', $format = '',
+														$before_empty_day = NULL, $after_empty_day = NULL )
+	{
 		if( empty($format) )
-		{
-			$current_item_date = mysql2date( locale_datefmt(), $current_item_date );
+		{	// No format specified, use default locale format:
+			$format =	locale_datefmt();
 		}
-		else
-		{
-			$current_item_date = mysql2date( $format, $current_item_date );
-		}
+
+		// Get a timestamp for the date WITHOUT the time:
+		$current_item_date = mysql2datestamp( $this->current_Obj->issue_date );
 
 		if( $current_item_date != $this->last_displayed_date )
-		{
-			$this->last_displayed_date = $current_item_date;
+		{	// Date has changed...
 
-			echo $before.$current_item_date.$after;
+			if( !empty($before_empty_day) && !empty($this->last_displayed_date) )
+			{	// We want to display ALL dates from the previous to the current:
+				while( $this->last_displayed_date < $current_item_date-86400 )
+				{
+					$this->last_displayed_date += 86400;	// Add one day's worth of seconds
+					echo date_sprintf( $before_empty_day, $this->last_displayed_date )
+							.date_i18n( $format, $this->last_displayed_date )
+							.date_sprintf( $after_empty_day, $this->last_displayed_date );
+				}
+			}
+
+			// Display the new current date:
+			echo date_sprintf( $before, $current_item_date )
+					.date_i18n( $format, $current_item_date )
+					.date_sprintf( $after, $current_item_date );
+			$this->last_displayed_date = $current_item_date;
 		}
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.15  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.14  2006/01/11 18:57:05  fplanque
  * bugfix
  *

@@ -47,7 +47,7 @@
 require_once dirname(__FILE__).'/_header.php';
 $AdminUI->set_path( 'users' );
 
-param( 'action', 'string', 'list' );
+$Request->param_action( 'list' );
 
 param( 'filteron', 'string', '', true );
 param( 'filter', 'array', array() );
@@ -303,7 +303,8 @@ if( !$Messages->count('error') )
 
 			// Features
 			$Request->param( 'edited_user_admin_skin', 'string', true );
-
+			$Request->param( 'edited_user_legend', 'integer', 0 );
+			$Request->param( 'edited_user_bozo', 'integer', 0 );
 
 			if( $Messages->count( 'error' ) )
 			{	// We have found validation errors:
@@ -336,6 +337,12 @@ if( !$Messages->count('error') )
 				{ // admin_skin has changed or was set the first time for the current user
 					$reload_page = true;
 				}
+				// Set icons legend displayed
+				$UserSettings->set( 'legend', $edited_user_legend, $edited_User->ID );
+				
+				// Set bozo validador activation
+				$UserSettings->set( 'bozo', $edited_user_bozo, $edited_User->ID );
+								
 				$UserSettings->dbupdate();
 
 				if( $reload_page )
@@ -595,6 +602,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.127  2006/02/03 21:58:04  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.126  2006/01/27 17:50:36  blueyed
  * *** empty log message ***
  *

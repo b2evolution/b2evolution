@@ -133,7 +133,7 @@ function surround_check( e, class_name, check_val )
 		if( el_input.type == 'checkbox' )
 		{	// The input is a checkbox
 			if( check_val == null || el_input.checked == check_val ) 
-			{	// Change the checkbox input class
+			{	// Change the parent (span) class
 				el_input.parentNode.className = class_name;
 			}
 		}
@@ -160,7 +160,7 @@ function surround_checked( e )
  */
 function unsurround_all( e )
 {	
-	surround_check( e, '', null);
+	surround_check( e, 'checkbox_surround_init', null);
 }
 
 /*
@@ -172,7 +172,7 @@ function init_check_all()
 	//var exx = document.getElementsByName('surround_check');
 	//alert(exx.length);
 	
-	var check_links = document.getElementsByName('check_all')
+	var check_links = document.getElementsByName('check_all_nocheckchanges')
 	// Add click event on all check_all links
 	for( var i=0; i < check_links.length ; i++ )
 	{
@@ -182,7 +182,7 @@ function init_check_all()
 		addEvent( link, 'mouseout', unsurround_all, false );
 	}
 	// Add click event on all un_check_all links
-	var uncheck_links = document.getElementsByName('uncheck_all')
+	var uncheck_links = document.getElementsByName('uncheck_all_nocheckchanges')
 	for( var i=0; i < uncheck_links.length ; i++ )
 	{
 		var link = uncheck_links[i];
@@ -224,52 +224,51 @@ function focus_on_first_input()
 	if( first_form = document.forms[0] )
 	{	// There is a form in the document, so we get all inputs of the first form
 		all_inputs = first_form.getElementsByTagName( 'input' );
-		
-		// Loop on all inputs to find the first input text
-		for( i = 0 ; all_inputs[i].type != 'text' ; i++ ); 
-		
-		if( all_inputs[i] )
-		{	// We found the first input text, so we focus on
-			all_inputs[i].focus();
+
+		if( all_inputs.length )
+		{ // There is at least one input
+			// Loop on all inputs to find the first input text
+			for( i = 0 ; i < all_inputs.length && all_inputs[i].type != 'text'; i++ ); 
+			
+			if( i != all_inputs.length )
+			{	// We found the first input text, so we focus on
+				all_inputs[i].focus();
+			}
 		}
 	}
 }
-
+addEvent( window, 'load', focus_on_first_input, false );
 
 /**
  * Handle Combo Boxes
- * Add an input text to the select list when new is selected
- * And remove it when another value is selected
+ * Display the input text when value is 'new'
+ * and hide the input text for all other values
  *
  * @param string ID of the select list
  * @param string value selected
+ * @param string class name for the input text
  */
-function check_combo( el_ID, value )
+function check_combo( el_ID, value, class_name )
 {	
 	if( value == 'new' )
-	{	// Add an input text to the select list
+	{	// Display the input text and focus on
 		
-		// Get the parent of the select  list
-		parent_combo = document.getElementById(el_ID ).parentNode;	
+		// Get the combo the input text
+		input_text = document.getElementById(el_ID+'_combo' );	
 		
-		// Create an input element
-		input_text = 	document.createElement("input");
-		
-		// Set its type to text, id, name, size, name,...
-		input_text.type='text';
- 		input_text.id = el_ID+'_combo';
- 		input_text.name = el_ID+'_combo';
- 		input_text.size = 30;
- 		
- 		// Add to the parent of the select list
- 		parent_combo.appendChild( input_text );
- 		
+		// Display the input text
+		input_text.style.display = "inline";
+			
  		// Focus on the new input text
 		input_text.focus(); 		
 	}
-	else if( input_text = document.getElementById( el_ID+'_combo' ) )
-	{ // We don't want to add an input text to the select list but there is already one, so we remove it 
-		parent_combo = input_text.parentNode;
-		parent_combo.removeChild( input_text);
+	else 
+	{ // Hide the input text
+	
+		// Get the combo the input text
+		input_text = document.getElementById(el_ID+'_combo' );	
+		
+		// Hide the input text
+		input_text.style.display = "none";
 	}
 }

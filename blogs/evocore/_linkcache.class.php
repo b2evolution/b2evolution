@@ -131,9 +131,11 @@ class LinkCache extends DataObjectCache
 
 			$Debuglog->add( "Loading <strong>$this->objtype(Item #$item_ID)</strong> into cache" );
 
-			foreach( $DB->get_results( 'SELECT *
-																		FROM T_links
-																	 WHERE link_item_ID = '.$item_ID ) as $row )
+			$sql = 'SELECT *
+								FROM T_links
+							 WHERE link_itm_ID = '.$item_ID.'
+							 ORDER BY link_ltype_ID, link_dest_itm_ID, link_file_ID';
+			foreach( $DB->get_results( $sql ) as $row )
 			{	// Cache each matching object:
 				$this->add( new Link( $row ) );
 			}

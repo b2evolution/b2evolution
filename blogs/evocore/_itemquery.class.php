@@ -309,12 +309,19 @@ class ItemQuery extends SQL
 
 
 	/**
-	 * Restricts to a specific start date
+	 * Restricts to a specific date range. (despite thje 'start' in the name
 	 *
-	 * @param string YYYYMMDDHHMMSS (everything after YYYY is optional) or ''
+	 * Priorities:
+   *  -dstart and/or dstop
+   *  -week + m
+   *  -m
+   * @todo  -dstart + x days
+   * @see ItemList2::get_advertised_start_date()
+	 *
+ 	 * @param string YYYYMMDDHHMMSS (everything after YYYY is optional) or ''
 	 * @param integer week number or ''
 	 * @param string YYYYMMDDHHMMSS to start at, '' for first available
-	 * @param string NOT IMPLEMENTED
+	 * @param string YYYYMMDDHHMMSS to stop at
 	 * @param mixed Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Do not show posts after this timestamp, can be 'now'
 	 */
@@ -329,42 +336,111 @@ class ItemQuery extends SQL
 		$this->timestamp_min = $timestamp_min;
 		$this->timestamp_max = $timestamp_max;
 
-		if( !empty($m) )
-		{
-			$this->WHERE_and( 'YEAR('.$this->dbprefix.'datestart)='.intval(substr($m,0,4)) );
-			if( strlen($m) > 5 )
-				$this->WHERE_and( 'MONTH('.$this->dbprefix.'datestart)='.intval(substr($m,4,2)) );
-			if( strlen($m) > 7 )
-				$this->WHERE_and( 'DAYOFMONTH('.$this->dbprefix.'datestart)='.intval(substr($m,6,2)) );
-			if( strlen($m) > 9 )
-				$this->WHERE_and( 'HOUR('.$this->dbprefix.'datestart)='.intval(substr($m,8,2)) );
-			if( strlen($m) > 11 )
-				$this->WHERE_and( 'MINUTE('.$this->dbprefix.'datestart)='.intval(substr($m,10,2)) );
-			if( strlen($m) > 13 )
-				$this->WHERE_and( 'SECOND('.$this->dbprefix.'datestart)='.intval(substr($m,12,2)) );
-		}
 
-
-		if( !empty($w) && ($w>=0) ) // Note: week # can be 0
-		{ // If a week number is specified
-			global $DB;
-
-			$this->WHERE_and( $DB->week( $this->dbprefix.'datestart', locale_startofweek() ).'='.intval($w) );
-		}
+		$start_is_set = false;
+		$stop_is_set = false;
 
 
 		// if a start date is specified in the querystring, crop anything before
 		if( !empty($dstart) )
 		{
 			// Add trailing 0s: YYYYMMDDHHMMSS
-			$dstart0 = $dstart.'00000000000000';
+			$dstart0 = $dstart.'00000000000000';  // TODO: this is NOT correct, should be 0101 for month
 
 			$dstart_mysql = substr($dstart0,0,4).'-'.substr($dstart0,4,2).'-'.substr($dstart0,6,2).' '
 											.substr($dstart0,8,2).':'.substr($dstart0,10,2).':'.substr($dstart0,12,2);
 
 			$this->WHERE_and( $this->dbprefix.'datestart >= \''.$dstart_mysql.'\'' );
+
+			$start_is_set = true;
 		}
 
+
+		// if a stop date is specified in the querystring, crop anything before
+		if( !empty($dstop) )
+		{
+			switch( strlen( $dstop ) )
+			{
+				case '4':
+					// We have only year, add one to year
+					$dstop_mysql = ($dstop+1).'-01-01 00:00';
+					break;
+
+				case '6':
+					// We have year month, add one to month
+					$dstop_mysql = date("Y-m-d H:i ", mktime(0, 0, 0, substr($dstop,4,2)+1, 01, substr($dstop,0,4)));
+					break;
+
+				case '8':
+					// We have year mounth day, add one to day
+					$dstop_mysql = date("Y-m-d H:i ", mktime(0, 0, 0, substr($dstop,4,2), (substr($dstop,6,2) + 1 ), substr($dstop,0,4)));
+					break;
+
+				case '10':
+					// We have year mounth day hour, add one to hour
+					$dstop_mysql = date("Y-m-d H:i ", mktime( ( substr($dstop,8,2) + 1 ), 0, 0, substr($dstop,4,2), substr($dstop,6,2), substr($dstop,0,4)));
+					break;
+
+				case '12':
+					// We have year mounth day hour minute, add one to minute
+					$dstop_mysql = date("Y-m-d H:i ", mktime( substr($dstop,8,2), ( substr($dstop,8,2) + 1 ), 0, substr($dstop,4,2), substr($dstop,6,2), substr($dstop,0,4)));
+					break;
+
+				default:
+					// add one to second
+					$dstop_mysql = substr($dstop,0,4).'-'.substr($dstop,4,2).'-'.substr($dstop,6,2).' '
+											.substr($dstop,8,2).':'.substr($dstop,10,2).':'.( substr( $dstop,12,2) + 1 );
+			}
+
+			$this->WHERE_and( $this->dbprefix.'datestart < \''.$dstop_mysql.'\'' ); // NOT <= comparator because we compare to the superior stop date
+
+			$stop_is_set = true;
+		}
+
+
+		if( !$start_is_set || !$stop_is_set )
+		{
+
+			if( !is_null($w)  // Note: week # can be 0
+					&& strlen($m) == 4 )
+			{ // If a week number is specified (with a year)
+
+				// Note: we use PHP to calculate week boundaries in order to handle weeks
+				// that overlap 2 years properly, even when start on week is monday (which MYSQL won't handle properly)
+				$start_date_for_week = get_start_date_for_week( $m, $w, locale_startofweek() );
+
+				$this->WHERE_and( $this->dbprefix.'datestart >= "'.date('Y-m-d',$start_date_for_week).'"' );
+				$this->WHERE_and( $this->dbprefix.'datestart < "'.date('Y-m-d',$start_date_for_week+604800 ).'"' ); // + 7 days
+
+				$start_is_set = true;
+				$stop_is_set = true;
+			}
+			elseif( !empty($m) )
+			{	// We want to restrict on an interval:
+				$this->WHERE_and( 'YEAR('.$this->dbprefix.'datestart)='.intval(substr($m,0,4)) );
+				if( strlen($m) > 5 )
+					$this->WHERE_and( 'MONTH('.$this->dbprefix.'datestart)='.intval(substr($m,4,2)) );
+				if( strlen($m) > 7 )
+					$this->WHERE_and( 'DAYOFMONTH('.$this->dbprefix.'datestart)='.intval(substr($m,6,2)) );
+				if( strlen($m) > 9 )
+					$this->WHERE_and( 'HOUR('.$this->dbprefix.'datestart)='.intval(substr($m,8,2)) );
+				if( strlen($m) > 11 )
+					$this->WHERE_and( 'MINUTE('.$this->dbprefix.'datestart)='.intval(substr($m,10,2)) );
+				if( strlen($m) > 13 )
+					$this->WHERE_and( 'SECOND('.$this->dbprefix.'datestart)='.intval(substr($m,12,2)) );
+
+				$start_is_set = true;
+				$stop_is_set = true;
+			}
+
+		}
+
+
+		// TODO: start + x days
+		// TODO: stop - x days
+
+
+		// SILENT limits!
 
 		// Timestamp limits:
 		if( $timestamp_min == 'now' )
@@ -461,6 +537,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.11  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
  * Revision 1.10  2006/01/04 20:34:52  fplanque
  * allow filtering on extra statuses
  *
