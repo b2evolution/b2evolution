@@ -64,7 +64,7 @@ $object_def['Item'] = array( // definition of the object:
 					'creator_user_ID' => 'post_creator_user_ID',
 					'lastedit_user_ID'=> 'post_lastedit_user_ID',
 					'assigned_user_ID'=> 'post_assigned_user_ID',
-					'datecreated'			=> 'post_datecreated',
+					'datecreated'     => 'post_datecreated',
 					'deadline'        => 'post_datedeadline',
 					'datestart'       => 'post_datestart',
 					'datemodified'    => 'post_datemodified',
@@ -82,7 +82,7 @@ $object_def['Item'] = array( // definition of the object:
 					'renderers'       => 'post_renderers',
 					'st_ID'           => 'post_pst_ID',
 					'typ_ID'          => 'post_ptyp_ID',
-					'priority'				=> 'post_priority'
+					'priority'        => 'post_priority'
 				),
 			'allow_null' => array( // specifies column nullability:
 					'assigned_user_ID'=> true,
@@ -590,7 +590,7 @@ class Item extends DataObject
 	 * Template function: Display the main blog name.
 	 *
 	 * @todo is it possible to use {$Item->get_Blog()}->name() instead? (we can't possibly duplicate all sub-object functions here!!!)
-	 *       blueyed>> not with PHP4
+	 *       blueyed>> not with PHP4 and {$Item->get_Blog()}->name() (with curly brackets) not even in PHP5!
 	 * @param string Output format. See {@link format_to_output()}.
 	 */
 	function blog_name( $format = 'htmlbody' )
@@ -821,11 +821,9 @@ class Item extends DataObject
 		 * Check if we want to increment view count, see {@link Hit::is_new_view()}
 		 */
 		#pre_dump( 'incViews', $dispmore, !$preview, $Hit->is_new_view() );
-		if( $dispmore && !$preview && $Hit->is_new_view() )
+		if( $dispmore && ! $preview && $Hit->is_new_view() )
 		{ // Increment view counter
-			$this->set_param( 'views', 'number', $this->views+1 );
-			$Plugins->trigger_event( 'ItemViewed', array( 'Item' => & $this ) );
-			$this->dbupdate();  // move to end of method, if we should have more params to be changed someday
+			$this->increment_viewcount();
 		}
 
 		$content = $this->content;
@@ -2184,6 +2182,22 @@ class Item extends DataObject
 
 
 	/**
+	 * Increment the view count of the item directly in DB.
+	 *
+	 * This triggers the plugin event 'ItemViewed'.
+	 */
+	function increment_viewcount()
+	{
+		global $Plugins, $DB;
+
+		$DB->query( 'UPDATE T_posts SET post_views = post_views + 1' );
+
+		// Trigger event that the item has been viewed (which is != displayed) and useful for cache handling plugins
+		$Plugins->trigger_event( 'ItemViewed', array( 'Item' => & $this ) );
+	}
+
+
+	/**
 	 * Get the Blog object for the Item.
 	 *
 	 * @return Blog
@@ -2339,6 +2353,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.95  2006/02/05 00:54:12  blueyed
+ * increment_viewcount(), doc
+ *
  * Revision 1.94  2006/02/03 21:58:05  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
  *
