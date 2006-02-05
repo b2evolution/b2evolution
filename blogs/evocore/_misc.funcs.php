@@ -591,14 +591,14 @@ function is_email( $email, $format = 'simple', $return_match = false )
 			 * Regexp pattern converted from: http://www.regexlib.com/REDetails.aspx?regexp_id=711
 			 * Extended to allow escaped quotes.
 			 */
-			$pattern_email = '§^
+			$pattern_email = '/^
 				(
-					(?>[a-zA-Z\d!\#$%&\'*+\-/=?^_`{|}~]+\x20*
+					(?>[a-zA-Z\d!\#$%&\'*+\-\/=?^_`{|}~]+\x20*
 						|"( \\\" | (?=[\x01-\x7f])[^"\\\] | \\[\x01-\x7f] )*"\x20*)* # Name
 					(<)
 				)?
 				(
-					(?!\.)(?>\.?[a-zA-Z\d!\#$%&\'*+\-/=?^_`{|}~]+)+
+					(?!\.)(?>\.?[a-zA-Z\d!\#$%&\'*+\-\/=?^_`{|}~]+)+
 					|"( \\\" | (?=[\x01-\x7f])[^"\\\] | \\[\x01-\x7f] )* " # quoted mailbox name
 				)
 				@
@@ -612,7 +612,7 @@ function is_email( $email, $format = 'simple', $return_match = false )
 					)\]
 				)
 				(?(3)>) # match ">" if it was there
-				$§x';
+				$/x';
 			break;
 
 		case 'simple':
@@ -1139,8 +1139,8 @@ function forget_param( $var )
  * This may clean it up
  * But it is also useful when generating static pages: you cannot rely on $_REQUEST[]
  *
- * @param mixed string or array of params to ignore (can be regexps in /.../)
- * @param mixed string or array of params to set
+ * @param mixed string (delimited by commas) or array of params to ignore (can be regexps in /.../)
+ * @param mixed string or array of param(s) to set
  * @param mixed string Alternative URL we want to point to if not the current $ReqPath
  */
 function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
@@ -1340,6 +1340,11 @@ function validate_url( $url, & $allowed_uri_scheme )
 	// Validate URL structure
 	// NOTE: this causes the most problems with this function!
 	// fp>> we should probably go back to a very laxist scheme here... :(
+	// blueyed>> yes, seems so.
+	/* Remaining problems with this one are:
+	 *  - no spaces in URL allowed (must be written as %20)
+	 *  - umlauts in domains/url
+	 */
 	if( ! preg_match('~^                # start
 		([a-z][a-z0-9+.\-]*):[0-9]*       # scheme
 		//                                # authority absolute URLs only
@@ -1347,7 +1352,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 		([?#][a-z0-9\~+.\-_,:;/\\\\%&=!?#*\ \[\]]*)?
 		$~ix', $url, $matches) )
 	{ // Cannot validate URL structure
-		$Debuglog->add( 'URL &laquo;'.$url.';&raquo; does not match url pattern!', 'error' );
+		$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
 		return T_('Invalid URL');
 	}
 
@@ -2474,7 +2479,7 @@ function compact_date( $date )
 function decompact_date( $date )
 {
 	$date0 = $date;
- 	
+
 	return  substr($date0,0,4).'-'.substr($date0,4,2).'-'.substr($date0,6,2).' '
 								.substr($date0,8,2).':'.substr($date0,10,2).':'.substr($date0,12,2);
 }
@@ -2482,7 +2487,7 @@ function decompact_date( $date )
 /**
  * Check the format of the phone number param and
  * format it in a french number if it is.
- * 
+ *
  * @param string phone number
  */
 function format_phone( $phone )
@@ -2492,15 +2497,15 @@ function format_phone( $phone )
 	{ // French number, so we can format it (+33 x.xx.xx.xx.xx):
 		$phone_formated = $indic.format_french_phone( ' '.substr( $phone, 3, strlen( $phone)-3 ) );
 	}
-	elseif ( substr( $phone, 0 , 1 ) != '+' && strlen( $phone ) == 10  ) 
+	elseif ( substr( $phone, 0 , 1 ) != '+' && strlen( $phone ) == 10  )
 	{ // French number, so we can format it (xx.xx.xx.xx.xx):
 		$phone_formated = format_french_phone( $phone );
 	}
-	else 
+	else
 	{ // unknown format, so don't change it:
 		$phone_formated = $phone;
 	}
-	
+
 	return $phone_formated;
 }
 
@@ -2513,7 +2518,7 @@ function format_phone( $phone )
 function format_french_phone( $phone )
 {
 	return substr($phone, 0 , 2).'.'.substr($phone, 2, 2).'.'.substr($phone, 4, 2)
-					.'.'.substr($phone, 6, 2).'.'.substr($phone, 8, 2); 
+					.'.'.substr($phone, 6, 2).'.'.substr($phone, 8, 2);
 }
 
 /**
@@ -2600,17 +2605,11 @@ function is_admin_page()
 
 /*
  * $Log$
+ * Revision 1.178  2006/02/05 01:58:40  blueyed
+ * is_email() re-added pattern delimiter..
+ *
  * Revision 1.177  2006/02/03 21:58:05  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
- *
- * Revision 1.176  2006/01/30 20:17:51  blueyed
- * *** empty log message ***
- *
- * Revision 1.175  2006/01/26 19:37:25  blueyed
- * *** empty log message ***
- *
- * Revision 1.174  2006/01/26 19:27:58  fplanque
- * no message
  *
  * Revision 1.173  2006/01/25 19:19:17  blueyed
  * Fixes for blogurl handling. Thanks to BenFranske for pointing out the biggest issue (http://forums.b2evolution.net/viewtopic.php?t=6844)
@@ -2641,9 +2640,6 @@ function is_admin_page()
  *
  * Revision 1.164  2005/12/21 20:39:04  fplanque
  * minor
- *
- * Revision 1.163  2005/12/14 19:33:56  fplanque
- * no message
  *
  * Revision 1.162  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
