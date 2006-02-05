@@ -558,7 +558,7 @@ function the_content(
 		}
 		else
 		{ // We are offering to read more
-			$more_link = gen_permalink( $file, $id, 'id', 'single', 1 );
+			$more_link = get_permalink( $file, $id, 'id', 'single', 1 );
 			$output .= $before_more_link.'<a href="'.$more_link.'#more'.$id.'">'.$more_link_text.'</a>'.$after_more_link;
 		}
 	}
@@ -862,7 +862,7 @@ function permalink_single($file='')
 {
 	global $id;
 	if (empty($file)) $file = get_bloginfo('blogurl');
-	echo gen_permalink( $file, $id, 'id', 'single' );
+	echo get_permalink( $file, $id, 'id', 'single' );
 }
 
 
@@ -1136,7 +1136,7 @@ function comment_blog_name( $disp = true )
 function comment_post_link()
 {
 	global $commentdata;
-	echo gen_permalink( $commentdata['blog_siteurl']. '/'. $commentdata['blog_stub'], $commentdata['post_ID'],	'id', 'single' );
+	echo get_permalink( $commentdata['blog_siteurl']. '/'. $commentdata['blog_stub'], $commentdata['post_ID'],	'id', 'single' );
 }
 
 
@@ -1391,6 +1391,20 @@ function single_post_title( $prefix = '#', $display = 'htmlhead' )
 	}
 }
 
+
+/**
+ * Display permalink
+ *
+ * @deprecated deprecated by {@link (Item::permalink())}
+ */
+function permalink_link($file='', $mode = 'id', $post_ID = '' )		// id or title
+{
+	global $id;
+	if( empty($post_ID) ) $post_ID = $id;
+	if( empty($file) ) $file = get_bloginfo('blogurl');
+	echo get_permalink( $file, $post_ID, $mode );
+}
+
 // _item_funcs.php }}}
 
 
@@ -1632,6 +1646,9 @@ $b2_version = $app_version;
 
 /*
  * $Log$
+ * Revision 1.21  2006/02/05 14:07:18  blueyed
+ * Fixed 'postbypost' archive mode.
+ *
  * Revision 1.20  2005/12/12 19:44:09  fplanque
  * Use cached objects by reference instead of copying them!!
  *

@@ -554,9 +554,7 @@ function the_weekday_date($before='',$after='')
 
 
 /**
- * gen_permalink(-)
- *
- * generate permalink
+ * Generate permalink
  *
  * TODO: archives modes in clean mode
  *
@@ -651,22 +649,6 @@ function get_permalink(
 	}
 
 	return $permalink;
-}
-
-
-/**
- * permalink_link(-)
- *
- * Display permalink
- *
- * @deprecated deprecated by {@link (Item::permalink())} but still used by _archives.plugin.php
- */
-function permalink_link($file='', $mode = 'id', $post_ID = '' )		// id or title
-{
-	global $id;
-	if( empty($post_ID) ) $post_ID = $id;
-	if( empty($file) ) $file = get_bloginfo('blogurl');
-	echo gen_permalink( $file, $post_ID, $mode );
 }
 
 
@@ -958,6 +940,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.46  2006/02/05 14:07:18  blueyed
+ * Fixed 'postbypost' archive mode.
+ *
  * Revision 1.45  2006/01/10 20:59:49  fplanque
  * minor / fixed internal sync issues @ progidistri
  *

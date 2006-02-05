@@ -246,7 +246,7 @@ class archives_plugin extends Plugin
 					}
 					else
 					{	// We want to link to the absolute canonical URL for this archive:
-						permalink_link( '', 'id', $post_ID );
+						echo get_permalink( $Blog->get('url'), $post_ID, 'id' );
 					}
 					echo '">';
 					if ($post_title)
@@ -542,6 +542,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.17  2006/02/05 14:07:18  blueyed
+ * Fixed 'postbypost' archive mode.
+ *
  * Revision 1.16  2006/01/04 20:34:51  fplanque
  * allow filtering on extra statuses
  *
