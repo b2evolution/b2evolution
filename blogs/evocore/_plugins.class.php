@@ -137,7 +137,6 @@ class Plugins
 	 *
 	 * Gets lazy-filled in {@link get_supported_events()}.
 	 *
-	 * @access protected
 	 * @var array
 	 */
 	var $_supported_events;
@@ -231,8 +230,6 @@ class Plugins
 
 				'DisplayCommentFormButton' => '',
 				'DisplayCommentFormFieldset' => '',
-
-				'DisplayHelp' => T_('Displays help for the plugin.'),
 
 				'CommentFormSent' => T_('Called when a comment form has been submitted.'),
 
@@ -1369,10 +1366,10 @@ class Plugins
 	 * This will call the SkinTag event handler.
 	 *
 	 * @param string plugin code
-	 * @param array Associative array of parameters
+	 * @param array Associative array of parameters (gets passed to the plugin)
 	 * @return boolean
 	 */
-	function call_by_code( $code, $params )
+	function call_by_code( $code, $params = array() )
 	{
 		$Plugin = & $this->get_by_code( $code );
 
@@ -2042,6 +2039,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.47  2006/02/05 19:04:49  blueyed
+ * doc fixes
+ *
  * Revision 1.46  2006/02/03 17:35:17  blueyed
  * post_renderers as TEXT
  *

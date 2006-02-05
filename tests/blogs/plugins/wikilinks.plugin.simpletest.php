@@ -12,7 +12,7 @@ require_once( EVODIR.'blogs/plugins/_wikilinks.plugin.php' );
 
 
 /**
- *
+ * @package tests
  */
 class WikilinksPluginTestCase extends UnitTestCase
 {

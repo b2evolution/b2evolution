@@ -24,7 +24,7 @@
  * @package admin
  *
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
- * 
+ *
  *
  * @version $Id$
  */
@@ -44,7 +44,7 @@ $Results->cols[] = array(
 						'td_start' => '<td class="firstcol shrinkwrap">',
 						'td' => '<img src="../rsc/icons/fileicons/$ftyp_icon$" alt="$ftyp_icon$">',
 					);
-					
+
 $Results->cols[] = array(
 						'th' => T_('Extensions'),
 						'order' => 'ftyp_extensions',
@@ -56,8 +56,8 @@ $Results->cols[] = array(
 						'th' => T_('Name'),
 						'order' => 'ftyp_name',
 						'td' => '$ftyp_name$',
-					);					
-					
+					);
+
 $Results->cols[] = array(
 						'th' => T_('Mime type'),
 						'order' => 'ftyp_mimetype',
@@ -69,20 +69,22 @@ $Results->cols[] = array(
 						'order' => 'ftyp_viewtype',
 						'td' => '$ftyp_viewtype$',
 					);
-// display the permissions for the type file
+/**
+ * Display the permissions for the type file
+ */
 function display_perm( $perm )
 {
 	if ( $perm )
 	{
 		$r = get_icon( 'file_allowed' );
 	}
-	else 
+	else
 	{
 		$r = get_icon( 'file_not_allowed' );
 	}
 	return $r;
 }
-					
+
 $Results->cols[] = array(
 						'th' => T_('Upload'),
 						'order' => 'ftyp_allowed',
@@ -90,7 +92,7 @@ $Results->cols[] = array(
 						'td_start' => '<td class="shrinkwrap">',
 						'td' => '%display_perm( #ftyp_allowed# )%',
 					);
-					
+
 $Results->cols[] = array(
 						'th' => T_('Actions'),
 						'td' => action_icon( T_('Edit this file type...'), 'edit',

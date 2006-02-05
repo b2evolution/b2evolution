@@ -95,7 +95,7 @@ class texturize_plugin extends Plugin
 	/**
 	 * The same as for HTML.
 	 *
-	 * @uses {@link RenderItemAsHtml()}
+	 * @uses RenderItemAsHtml()
 	 */
 	function RenderItemAsXml( & $params )
 	{

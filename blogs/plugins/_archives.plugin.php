@@ -297,8 +297,9 @@ class ArchiveList extends Results
 	 *
 	 * Note: Weekly archives use MySQL's week numbering and MySQL default if applicable.
 	 * In MySQL < 4.0.14, WEEK() always uses mode 0: Week starts on Sunday;
-	 * Value range is 0 to 53; week 1 is the first week that starts in this year
-	 * {@see http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html}
+	 * Value range is 0 to 53; week 1 is the first week that starts in this year.
+	 *
+	 * @link http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
 	 *
 	 * @todo categories combined with 'ALL' are not supported (will output too many archives,
 	 * some of which will resolve to no results). We need subqueries to support this efficiently.
@@ -542,6 +543,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.18  2006/02/05 19:04:49  blueyed
+ * doc fixes
+ *
  * Revision 1.17  2006/02/05 14:07:18  blueyed
  * Fixed 'postbypost' archive mode.
  *

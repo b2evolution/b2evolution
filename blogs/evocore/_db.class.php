@@ -134,7 +134,7 @@ class DB
 	/**
 	 * Use transactions in DB?
 	 *
-	 * You need to use InnoDB in order to enable this. {@see $table_options}
+	 * You need to use InnoDB in order to enable this.  See the {@link $EvoConfig->DB "table_options" key}.
 	 */
 	var $use_transactions = false;
 
@@ -166,7 +166,7 @@ class DB
 
 	/**
 	 * @var string Database name
-	 * @see {@link select()}
+	 * @see select()
 	 */
 	var $dbname;
 
@@ -372,7 +372,7 @@ class DB
 	/**
 	 * Returns the correct WEEK() function to get the week number for the given date.
 	 *
-	 * {@see http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html}
+	 * @link http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
 	 *
 	 * @todo disable when MySQL < 4
 	 * @param string will be used as is
@@ -1167,6 +1167,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.53  2006/02/05 19:04:48  blueyed
+ * doc fixes
+ *
  * Revision 1.52  2006/02/03 21:58:05  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
  *

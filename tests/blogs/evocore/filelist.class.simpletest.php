@@ -12,7 +12,7 @@ require_once( EVODIR.'/blogs/evocore/_filelist.class.php' );
 
 
 /**
- *
+ * @package tests
  */
 class FilelistTestCase extends FilemanUnitTestCase
 {
@@ -90,8 +90,6 @@ class FilelistTestCase extends FilemanUnitTestCase
 
 	/**
 	 * Tests, if get_next() works correctly when removing a file
-	 *
-	 * @return
 	 */
 	function testRemoveInsideOfGetNext()
 	{
@@ -131,8 +129,6 @@ class FilelistTestCase extends FilemanUnitTestCase
 
 	/**
 	 * Tests counters after removing
-	 *
-	 * @return
 	 */
 	function testCountersAfterRemove()
 	{

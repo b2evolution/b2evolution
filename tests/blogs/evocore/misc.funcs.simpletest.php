@@ -12,7 +12,7 @@ require_once( EVODIR.'blogs/evocore/_misc.funcs.php' );
 
 
 /**
- *
+ * @package tests
  */
 class MiscFuncsTestCase extends UnitTestCase
 {

@@ -320,7 +320,7 @@ class textile_plugin extends Plugin
 		/**
 		 * Strip markup from XML. The same as for HTML.
 		 *
-		 * @uses {@link RenderItemAsHtml()}
+		 * @uses RenderItemAsHtml()
 		 */
 		function RenderItemAsXml( & $params )
 		{

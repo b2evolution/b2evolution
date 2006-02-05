@@ -12,7 +12,7 @@ require_once( EVODIR.'/blogs/evocore/_file.class.php' );
 
 
 /**
- *
+ * @package tests
  */
 class FileTestCase extends FilemanUnitTestCase
 {

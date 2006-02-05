@@ -12,7 +12,7 @@ require_once( EVODIR.'blogs/evocore/_abstractsettings.class.php' );
 
 
 /**
- *
+ * @package tests
  */
 class AbstractSettingsTestCase extends FilemanUnitTestCase
 {

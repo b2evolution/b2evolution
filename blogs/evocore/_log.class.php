@@ -211,8 +211,8 @@ class Log
 			{
 				$r = $headfoot[$category];
 			}
-			elseif( isset($headfoot['all']) )
-			{
+			elseif( isset($headfoot['all']) && $category != 'container' )
+			{ // use 'all' info, except if for container
 				$r = $headfoot['all'];
 			}
 			else
@@ -600,6 +600,8 @@ class Log
  * This is a no-operation implementation of {@link Log}.
  *
  * It just implements the used methods {@link get()} and {@link display()}.
+ *
+ * @package evocore
  */
 class Log_noop {
 	/**
@@ -620,6 +622,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.24  2006/02/05 19:04:48  blueyed
+ * doc fixes
+ *
  * Revision 1.23  2005/12/12 19:21:22  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

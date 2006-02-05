@@ -1119,7 +1119,7 @@ function set_param( $var, $value )
 
 
 /**
- * Forget a param so that is will not get included in subsequent {@see regenerate_url()} calls
+ * Forget a param so that is will not get included in subsequent {@link regenerate_url()} calls.
  */
 function forget_param( $var )
 {
@@ -2038,8 +2038,8 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  * Create IMG tag for an action icon.
  *
  * @param string TITLE text (IMG and A link)
- * @param string icon code {@see $$map_iconfiles}
- * @param string icon code for {@see get_icon()}
+ * @param string icon code, see {@link $map_iconfiles}
+ * @param string icon code for {@link get_icon()}
  * @param string word to be displayed after icon
  */
 function action_icon( $title, $icon, $url, $word = NULL )
@@ -2605,6 +2605,9 @@ function is_admin_page()
 
 /*
  * $Log$
+ * Revision 1.179  2006/02/05 19:04:48  blueyed
+ * doc fixes
+ *
  * Revision 1.178  2006/02/05 01:58:40  blueyed
  * is_email() re-added pattern delimiter..
  *
