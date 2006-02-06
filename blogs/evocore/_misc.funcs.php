@@ -2044,25 +2044,18 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  */
 function action_icon( $title, $icon, $url, $word = NULL )
 {
-	global $IconLegend;
-
 	$r = '<a href="'.$url.'" title="'.$title.'"';
 	if( get_icon( $icon, 'rollover' ) )
 	{
 		$r .= ' class="rollover"';
 	}
-	$r .= '>'.get_icon( $icon, 'imgtag', array( 'title'=>$title ) );
+	$r .= '>'.get_icon( $icon, 'imgtag', array( 'title'=>$title ), true );
 	if( !empty($word) )
 	{
 		$r .= $word;
 	}
 	$r .= '</a> ';
-
-	if( isset( $IconLegend ) )
-	{
-		$IconLegend->add_icon( $icon, $title );
-	}
-
+	
 	return $r;
 }
 
@@ -2078,10 +2071,11 @@ function action_icon( $title, $icon, $url, $word = NULL )
  * @param array additional params ( 'class' => class name when getting 'imgtag',
 																		'size' => param for 'size',
 																		'title' => title attribute for imgtag)
+ * @param boolean true to include this icon into the legend at the bottom of the page
  */
-function get_icon( $iconKey, $what = 'imgtag', $params = NULL )
+function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legend = false )
 {
-	global $map_iconfiles, $basepath, $admin_subdir, $baseurl, $Debuglog;
+	global $map_iconfiles, $basepath, $admin_subdir, $baseurl, $Debuglog,	$IconLegend;
 
 	if( isset( $map_iconfiles[$iconKey] ) && isset( $map_iconfiles[$iconKey]['file'] ) )
 	{
@@ -2208,6 +2202,11 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL )
 
 			$r .= '" />';
 			break;
+	}
+	
+	if( $include_in_legend && isset( $IconLegend ) )
+	{ // This icon should be included into the legend:
+		$IconLegend->add_icon( $iconKey );
 	}
 
 	return $r;
@@ -2605,6 +2604,9 @@ function is_admin_page()
 
 /*
  * $Log$
+ * Revision 1.180  2006/02/06 20:05:30  fplanque
+ * minor
+ *
  * Revision 1.179  2006/02/05 19:04:48  blueyed
  * doc fixes
  *

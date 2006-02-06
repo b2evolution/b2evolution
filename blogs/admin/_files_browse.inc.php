@@ -311,7 +311,7 @@ while( $lFile = & $Fileman->get_next() )
 	/********************    Checkbox:    *******************/
 
 	echo '<td class="checkbox firstcol">';
-	echo '<span name="surround_check" class="check_surround_init">';
+	echo '<span name="surround_check" class="checkbox_surround_init">';
 	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"';
 	if( $checkall || $Fileman->isSelected( $lFile ) )
@@ -854,6 +854,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.75  2006/02/06 20:05:30  fplanque
+ * minor
+ *
  * Revision 1.74  2006/02/03 21:58:04  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
  *

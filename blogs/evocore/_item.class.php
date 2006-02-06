@@ -2310,6 +2310,10 @@ class Item extends DataObject
 
 		switch( $parname )
 		{
+			case 't_author':
+				// Text: author
+				return $this->Author->get( 'preferredname' );
+
 			case 't_assigned_to':
 				// Text: assignee
 				if( empty($this->assigned_User) )
@@ -2353,6 +2357,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.97  2006/02/06 20:05:30  fplanque
+ * minor
+ *
  * Revision 1.96  2006/02/06 01:42:56  blueyed
  * *** empty log message ***
  *
