@@ -2013,9 +2013,10 @@ class Plugins
 
 
 /**
- * A sub-class of {@link Plugins}, just to not load any DB info.
+ * A sub-class of {@link Plugins}, just to not load any DB info (which means Plugins and Events).
  *
- * This is only useful for displaying a list of available plugins!
+ * This is only useful for displaying a list of available plugins or during installation to have
+ * a {@link $Plugins} object that does not interfere with the installation process.
  *
  * {@internal This is probably quicker and cleaner than using a member boolean in {@link Plugins} itself.}}
  */
@@ -2039,6 +2040,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.48  2006/02/06 18:12:47  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.47  2006/02/05 19:04:49  blueyed
  * doc fixes
  *
