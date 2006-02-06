@@ -2135,7 +2135,7 @@ class Item extends DataObject
 		// remember ID, because parent method resets it to 0
 		$old_ID = $this->ID;
 
-		$r = parent::dbupdate();
+		$r = parent::dbdelete();
 
 		// set the ID for the Plugin event
 		$this->ID = $old_ID;
@@ -2353,6 +2353,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.96  2006/02/06 01:42:56  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.95  2006/02/05 00:54:12  blueyed
  * increment_viewcount(), doc
  *

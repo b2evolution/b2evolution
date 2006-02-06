@@ -683,7 +683,7 @@ class Comment extends DataObject
 		// remember ID, because parent method resets it to 0
 		$old_ID = $this->ID;
 
-		$r = parent::dbupdate();
+		$r = parent::dbdelete();
 
 		// set the ID for the Plugin event
 		$this->ID = $old_ID;
@@ -699,7 +699,7 @@ class Comment extends DataObject
 
 /*
  * $Log$
- * Revision 1.25  2006/02/01 23:32:32  blueyed
+ * Revision 1.26  2006/02/06 01:42:56  blueyed
  * *** empty log message ***
  *
  * Revision 1.24  2006/01/29 20:36:35  blueyed
