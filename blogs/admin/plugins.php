@@ -417,6 +417,18 @@ switch( $action )
 		}
 		break;
 
+
+	case 'disp_help':
+		param( 'plugin_ID', 'integer', 0 );
+		$edit_Plugin = & $Plugins->get_by_ID($plugin_ID);
+
+		if( ! $edit_Plugin || ! ($help_file = $edit_Plugin->get_help_file( $plugin_ID )) )
+		{
+			$action = 'list';
+		}
+		break;
+
+
 }
 
 /*
@@ -427,9 +439,21 @@ if( 1 || $Settings->get( 'plugins_disp_log_in_admin' ) )
 */
 
 
-if( $action == 'edit_settings' )
+// Extend titlearea for some actions:
+switch( $action )
 {
-	$AdminUI->append_to_titlearea( sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ) );
+	case 'edit_settings':
+		$AdminUI->append_to_titlearea( sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ) );
+		break;
+
+	case 'disp_help':
+		$title = sprintf( T_('Help for plugin &laquo;%s&raquo;'), '<a href="plugins.php?action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID.'">'.$edit_Plugin->name.'</a>' );
+		if( ! empty($edit_Plugin->help_url) )
+		{
+			$title .= ' '.action_icon( T_('External help page'), 'www', $edit_Plugin->help_url );
+		}
+		$AdminUI->append_to_titlearea( $title );
+		break;
 }
 
 
@@ -441,25 +465,8 @@ $AdminUI->disp_payload_begin();
 switch( $action )
 {
 	case 'disp_help':
-		// Display plugin help ("DisplayHelp" event):
-		param( 'plugin_ID', 'integer', 0 );
-		if( $plugin_ID && $Plugins->has_event( $plugin_ID, 'DisplayHelp' ) )
-		{
-			$edit_Plugin = & $Plugins->get_by_ID($plugin_ID);
-
-			echo '<h3>'.sprintf( T_('Help for plugin &laquo;%s&raquo;'), $edit_Plugin->name );
-			if( ! empty($edit_Plugin->help_url) )
-			{
-				echo ' '.action_icon( T_('External help page'), 'www', $edit_Plugin->help_url );
-			}
-			echo '</h3>';
-
-			$Plugins->call_method( $plugin_ID, 'DisplayHelp', $params = array() );
-		}
-		else
-		{
-			$action = 'list';
-		}
+		// Display plugin help:
+		readfile( $help_file );
 		break;
 
 
@@ -560,24 +567,32 @@ switch( $action )
 		$Form->begin_form('fform');
 		$Form->begin_fieldset('Plugin info', array('class' => 'fieldset clear')); // "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509)
 		$Form->info_field( T_('Name'), $edit_Plugin->name( 'raw', false ) );
-		$Form->info_field( T_('Code'), $edit_Plugin->code, array( 'note' => T_('This 32 character code uniquely identifies the functionality of this plugin.') ) );
+		$Form->info_field( T_('Code'),
+				( empty($edit_Plugin->code)
+					? ' - '
+					: $edit_Plugin->code ), array( 'note' => T_('This 32 character code uniquely identifies the functionality of this plugin. It is only necessary to call the plugin by code (SkinTag) or when using it as a Renderer.') ) );
 		$Form->info_field( T_('Short desc'), $edit_Plugin->short_desc( 'raw', false ) );
 		$Form->info_field( T_('Long desc'), $edit_Plugin->long_desc( 'raw', false ) );
-		if( $edit_Plugin->ID > 0 || 1 ) $Form->info_field( T_('ID'), $edit_Plugin->ID );
-		if( ! empty($edit_Plugin->help_url) || $Plugins->has_event( $edit_Plugin->ID, 'DisplayHelp' ) )
-		{
-			$field_contents = '';
-
-			if( $Plugins->has_event( $edit_Plugin->ID, 'DisplayHelp' ) )
-			{
-				$field_contents .= action_icon( T_('Help'), 'help', 'plugins.php?action=disp_help&amp;plugin_ID='.$edit_Plugin->ID );
-			}
-			if( ! empty($edit_Plugin->help_url) )
-			{
-				$field_contents .= action_icon( T_('External help page'), 'www', $edit_Plugin->help_url );
-			}
-			$Form->info_field( T_('Help'), $field_contents );
+		if( $edit_Plugin->ID > 0 )
+		{ // do not display ID for not registered Plugins
+			$Form->info_field( T_('ID'), $edit_Plugin->ID );
 		}
+
+		// Help icons, if available:
+		$help_icons = array();
+		if( $help_internal = $edit_Plugin->get_help_icon() )
+		{
+			$help_icons[] = $help_internal;
+		}
+		if( $help_external = $edit_Plugin->get_help_icon( NULL, NULL, true ) )
+		{
+			$help_icons[] = $help_external;
+		}
+		if( ! empty($help_icons) )
+		{
+			$Form->info_field( T_('Help'), implode( ' ', $help_icons ) );
+		}
+
 		$Form->end_fieldset();
 		$Form->end_form();
 		$action = 'list';

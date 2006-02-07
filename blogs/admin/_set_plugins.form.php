@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			<th class="firstcol"><?php echo T_('Plug-in') ?></th>
 			<th><?php echo T_('Priority') ?></th>
 			<th title="<?php echo T_('When should rendering apply?') ?>"><?php echo T_('Apply') ?></th>
-			<th class="advanced_info" title="<?php echo T_('The code to call the plugin by code.') ?>"><?php echo /* TRANS: Code of a plugin */ T_('Code') ?></th>
+			<th class="advanced_info" title="<?php echo T_('The code to call the plugin by code (SkinTag) or as Renderer.') ?>"><?php echo /* TRANS: Code of a plugin */ T_('Code') ?></th>
 			<th><?php echo T_('Description') ?></th>
 			<?php
 			if( $current_User->check_perm( 'options', 'edit', false ) )
@@ -27,6 +27,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				<th class="lastcol"><?php echo T_('Actions') ?></th>
 				<?php
 			} ?>
+			<th><?php echo T_('Help') ?></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -60,6 +61,25 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				</td>
 				<?php
 			} ?>
+			<td>
+				[<a title="<?php echo T_('Display info') ?>" href="plugins.php?action=info&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>">?</a>]
+				<?php
+				// Help icons, if available:
+				$help_icons = array();
+				if( $help_external = $loop_Plugin->get_help_icon( NULL, NULL, true ) )
+				{
+					$help_icons[] = $help_external;
+				}
+				if( $help_internal = $loop_Plugin->get_help_icon() )
+				{
+					$help_icons[] = $help_internal;
+				}
+				if( ! empty($help_icons) )
+				{
+					echo implode( ' ', $help_icons );
+				}
+				?>
+			</td>
 		</tr>
 		<?php
 		}
@@ -80,9 +100,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		<tr>
 			<th class="firstcol"><?php echo T_('Plug-in') ?></th>
 			<th><?php echo T_('Actions') ?></th>
-			<!--
-			<th><?php echo T_('Version') ?></th>
-			 -->
+			<th><?php echo T_('Help') ?></th>
 			<th class="lastcol"><?php echo T_('Description') ?></th>
 		</tr>
 		<?php
@@ -96,7 +114,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				<?php $loop_Plugin->name(); ?>
 			</td>
 			<td>
-				[<a href="plugins.php?action=info&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>">?</a>]
 				<?php
 				$registrations = $Plugins->count_regs($loop_Plugin->classname);
 
@@ -116,11 +133,25 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				}
 				?>
 			</td>
-			<!--
-			<td class="firstcol">
-				<?php echo $loop_Plugin->version; ?>
+			<td>
+				[<a title="<?php echo T_('Display info') ?>" href="plugins.php?action=info&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>">?</a>]
+				<?php
+				// Help icons, if available:
+				$help_icons = array();
+				if( $help_external = $loop_Plugin->get_help_icon( NULL, NULL, true ) )
+				{
+					$help_icons[] = $help_external;
+				}
+				if( $help_internal = $loop_Plugin->get_help_icon() )
+				{
+					$help_icons[] = $help_internal;
+				}
+				if( ! empty($help_icons) )
+				{
+					echo implode( ' ', $help_icons );
+				}
+				?>
 			</td>
-			-->
 			<td class="lastcol">
 				<?php
 				$loop_Plugin->short_desc();

@@ -47,6 +47,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Real plugins should be derived from this class.
  *
  * @abstract
+ * @package plugins
  */
 class Plugin
 {
@@ -248,9 +249,9 @@ class Plugin
 	 *   'valid_pattern' (a regular expression pattern that the value must match)
 	 *                   Either a pattern as string or an array with keys
 	 *                   'pattern' and 'error' for a custom error message.
-	 *   'help' (either the first param to {@link get_help_link()} (anchor) as string or
+	 *   'help' (either the first param to {@link get_help_icon()} (anchor) as string or
 	 *           an array with all params to this method). E.g., 'param_complicated' would
-	 *           link to the internal help. See {@link DisplayHelp}.
+	 *           link to the internal help.
 	 * e.g.:
 	 * <code>
 	 * return array(
@@ -426,8 +427,9 @@ class Plugin
 	 * This displays the payload for handling uninstallation of Plugin database tables.
 	 * If you want to use this, call parent::AdminBeginPayload() in your Plugin.
 	 *
-	 * @see BeforeUninstall() for the corresponding action handler
-	 * @todo: fp>> using this hook to uninstall a plugin feels so incredibly dirty...
+	 * See {@link BeforeUninstall()} for the corresponding action handler.
+	 *
+	 * @todo fp>> using this hook to uninstall a plugin feels so incredibly dirty...
 	 *   blueyed>> This is the payload part only. Should we have an extra event for that? UninstallPayload()?
 	 */
 	function AdminBeginPayload()
@@ -500,7 +502,8 @@ class Plugin
 	 * You might want to call "parent::BeforeUninstall()" in your plugin to handle canonical
 	 * database tables, which is done here.
 	 *
-	 * @see AdminBeginPayload() for the corresponding payload handler
+	 * See {@link AdminBeginPayload()} for the corresponding payload handler.
+	 *
 	 * @param array Associative array of parameters.
 	 *              'handles_display': Setting it to true avoids a generic "Uninstall failed" message.
 	 *              'unattended': true if Uninstall is unattended (Install action "deletedb"). Removes tables without confirmation.
@@ -1009,26 +1012,31 @@ class Plugin
 	/**
 	 * Display a help link.
 	 *
-	 * The anchor (if given) should be defined (as HTML id attribute) in either
-	 *  - the output of {@link DisplayHelp()} (prefixed with the plugin's
-	 *    classname, e.g. 'test_plugin_anchor' when 'anchor' gets passed here)
+	 * The anchor (if given) should be defined (as HTML id attribute for a headline) in either
+	 *  - the README.html file (prefixed with the plugin's classname, e.g.
+	 *    'test_plugin_anchor' when 'anchor' gets passed here)
 	 *  - or the page that {@link $help_url} links to.
 	 *  (depending on the $external param).
 	 *
 	 * @param string HTML anchor for a specific help topic (empty to not use it).
-	 *               When linking to {@link DisplayHelp() the internal help}, it
-	 *               gets prefixed with "[plugin_classname]_".
+	 *               When linking to the internal help, it gets prefixed with "[plugin_classname]_".
 	 * @param string Title for the icon/legend
 	 * @param boolean Use external help? See {@link $help_url}.
 	 * @param string Word to use after the icon.
-	 * @param string Icon to use. See {@link $map_iconfiles}.
-	 * @return string The html A tag, linking to the help.
+	 * @param string Icon to use. Default for 'internal' is 'help', and for 'external' it is 'www'. See {@link $map_iconfiles}.
+	 * @return string|false The html A tag, linking to the help.
+	 *         False if internal help requested, but not available (see {@link Plugins::get_help_file()}).
 	 */
-	function get_help_link( $anchor, $title = '', $external = false, $word = NULL, $icon = 'help' )
+	function get_help_icon( $anchor = NULL, $title = NULL, $external = false, $word = NULL, $icon = NULL )
 	{
 		global $admin_url;
+
 		if( $external )
 		{
+			if( empty($this->help_url) )
+			{
+				return false;
+			}
 			$url = $this->help_url;
 			if( ! empty($anchor) )
 			{
@@ -1036,7 +1044,12 @@ class Plugin
 			}
 		}
 		else
-		{
+		{ // internal help:
+			if( ! $this->get_help_file() )
+			{
+				return false;
+			}
+
 			$url = $admin_url.'plugins.php?action=disp_help&amp;plugin_ID='.$this->ID;
 			if( ! empty($anchor) )
 			{
@@ -1044,7 +1057,50 @@ class Plugin
 			}
 		}
 
+		if( is_null($icon) )
+		{
+			$icon = $external ? 'www' : 'help';
+		}
+
+		if( is_null($title) )
+		{
+			$title = $external ? T_('Homepage of the plugin') : T_('Local documentation of the plugin');
+		}
+
 		return action_icon( $title, $icon, $url, $word );
+	}
+
+
+	/**
+	 * Get the help file for a Plugin ID. README.LOCALE.html will take
+	 * precedence above the general (english) README.html.
+	 *
+	 * @return false|string
+	 */
+	function get_help_file()
+	{
+		global $default_locale, $plugins_subdir, $core_dirout;
+
+		$name = preg_replace( '~_plugin$~', '', $this->classname );
+		// Get the language. We use $default_locale because it does not have to be activated ($current_locale)
+		$lang = substr( $default_locale, 0, 2 );
+
+		$help_dir = dirname(__FILE__).'/'.$core_dirout.$plugins_subdir.$name.'/';
+
+		// Try help for the user's locale:
+		$help_file = $help_dir.'README.'.$lang.'.html';
+
+		if( ! file_exists($help_file) )
+		{ // Fallback: README.html
+			$help_file = $help_dir.'README.html';
+
+			if( ! file_exists($help_file) )
+			{
+				return false;
+			}
+		}
+
+		return $help_file;
 	}
 
 	/*
@@ -1154,8 +1210,8 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
- * Revision 1.30  2006/02/01 23:32:32  blueyed
- * *** empty log message ***
+ * Revision 1.31  2006/02/07 11:14:21  blueyed
+ * Help for Plugins improved.
  *
  * Revision 1.25  2006/01/28 21:11:16  blueyed
  * Added helpers for Session data handling.
