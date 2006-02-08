@@ -49,14 +49,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class DataObjectCache
 {
-	var	$dbtablename;
+	var $dbtablename;
 	var $dbprefix;
 	var $dbIDname;
 
 	/**
 	 * Class name of objects in this cache:
 	 */
-	var	$objtype;
+	var $objtype;
 
 	/**
 	 * Object array
@@ -70,8 +70,6 @@ class DataObjectCache
 
 	/**
 	 * Constructor
-	 *
-	 * {@internal DataObjectCache::DataObjectCache(-) }}
 	 *
 	 * @param string Name of DataObject class we are cacheing
 	 * @param boolean true if it's OK to just load all items!
@@ -131,8 +129,6 @@ class DataObjectCache
 	/**
 	 * Load a list of objects into the cache
 	 *
-	 * {@internal DataObjectCache::load_list(-) }}
-	 *
 	 * @param string list of IDs of objects to load
 	 */
 	function load_list( $req_list )
@@ -147,8 +143,8 @@ class DataObjectCache
 		}
 
 		$sql = "SELECT *
-							FROM $this->dbtablename
-						 WHERE $this->dbIDname IN ($req_list)";
+		          FROM $this->dbtablename
+		         WHERE $this->dbIDname IN ($req_list)";
 		$objtype = $this->objtype;
 		foreach( $DB->get_results( $sql ) as $row )
 		{
@@ -158,6 +154,11 @@ class DataObjectCache
 	}
 
 
+	/**
+	 * Get an array of all (loaded) IDs.
+	 *
+	 * @return array
+	 */
 	function get_ID_array()
 	{
 		$IDs = array();
@@ -173,8 +174,6 @@ class DataObjectCache
 
 	/**
 	 * Add a dataobject to the cache
-	 *
-	 * {@internal DataObjectCache::add(-) }}
 	 */
 	function add( & $Obj )
 	{
@@ -235,8 +234,6 @@ class DataObjectCache
 
 	/**
 	 * Clear the cache **extensively**
-	 *
-	 * {@internal DataObjectCache::clear(-) }}
 	 */
 	function clear()
 	{
@@ -249,8 +246,6 @@ class DataObjectCache
 	 * Get an object from cache by ID
 	 *
 	 * Load the cache if necessary (all at once if allowed).
-	 *
-	 * {@internal DataObjectCache::get_by_ID(-) }}
 	 *
 	 * @param integer ID of object to load
 	 * @param boolean true if function should die on error
@@ -381,7 +376,7 @@ class DataObjectCache
 	 *
 	 * Load the cache if necessary
 	 *
-	 * {@internal DataObjectCache::option_list(-) }}
+	 * @todo Shouldn't this use {@link option_list_return()}?
 	 *
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID ''
@@ -415,8 +410,6 @@ class DataObjectCache
 	 * Returns form option list with cache contents
 	 *
 	 * Load the cache if necessary
-	 *
-	 * {@internal DataObjectCache::option_list_return(-) }}
 	 *
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID ''
@@ -452,14 +445,14 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.34  2006/02/08 12:24:37  blueyed
+ * doc
+ *
  * Revision 1.33  2005/12/30 20:13:39  fplanque
  * UI changes mostly (need to double check sync)
  *
  * Revision 1.32  2005/12/12 19:21:21  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.30  2005/11/18 18:26:38  fplanque
- * no message
  *
  * Revision 1.28  2005/11/16 21:53:49  fplanque
  * minor
