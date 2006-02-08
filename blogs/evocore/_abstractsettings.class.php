@@ -401,7 +401,7 @@ class AbstractSettings
 			$result_unserialized = @unserialize($result);
 			if( $result_unserialized === false )
 			{
-				$Debuglog->add( get_class($this).'::unserialize() failed for ('.var_export( $args, true ).'), size: '.strlen($result).'. Using default: '.var_export($default), array('settings', 'error') );
+				$Debuglog->add( get_class($this).'::unserialize() failed for ('.var_export( $args, true ).'), size: '.strlen($result).'. Using default: '.var_export($default, true), array('settings', 'error') );
 				$result = $default;
 			}
 			else
@@ -664,7 +664,7 @@ class AbstractSettings
 
 /*
  * $Log$
- * Revision 1.31  2006/01/30 20:16:55  blueyed
+ * Revision 1.32  2006/02/08 09:43:08  blueyed
  * *** empty log message ***
  *
  * Revision 1.30  2006/01/26 20:27:45  blueyed
