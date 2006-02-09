@@ -208,7 +208,7 @@ $map_iconfiles = array(
 		'alt' => T_('Email'),
 		'size' => array( 13, 10 ),
 	),
-	'www' => array(   /* user's web site */
+	'www' => array(   /* user's web site, plugin's help url */
 		'file' => $rsc_subdir.'icons/url.gif',
 		'alt' => T_('WWW'),
 		'size' => array( 34, 17 ),
@@ -308,13 +308,13 @@ $map_iconfiles = array(
 		'alt' => T_('Calendar'),
 		'size' => array( 16, 15 ),
 	),
-	
+
 	'parent_childto_arrow' => array(
 		'file' => $rsc_subdir.'icons/parent_childto_arrow.png',
 		'alt' => T_('+'),
 		'size' => array( 14, 17 ),
 	),
-	
+
 	'help' => array(
 		'file' => $img_subdir.'smilies/icon_question.gif',
 		'alt' => T_('Help'),
@@ -336,7 +336,7 @@ $map_iconfiles = array(
 		'size' => array( 15, 15 ),
 	),
 
-	'file_allowed' => array( 
+	'file_allowed' => array(
 		'file' => $rsc_subdir.'icons/unlocked.gif',
 		'alt' => T_( 'Allowed' ),
 		'size' => array( 16, 14 ),
@@ -357,8 +357,8 @@ $map_iconfiles = array(
 		'alt' => T_('Comments'),
 		'size' => array( 15, 16 ),
 	),
-	
-	'move_up' => array( 
+
+	'move_up' => array(
 		'file' => $rsc_subdir.'icons/move_up.gif',
 		'rollover' => true,
 		'alt' => T_( 'Up' ),
