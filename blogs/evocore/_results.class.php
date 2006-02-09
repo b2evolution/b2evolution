@@ -118,10 +118,10 @@ class Results extends Widget
 
  	/**
 	 * Is this gobally the last item in the list? (NOT just the last in current page)
-	 * 
+	 *
 	 */
 	var $global_is_last;
-	
+
 
 	/**
 	 * Cache to use to instantiate an object and cache it for each line of results.
@@ -267,12 +267,12 @@ class Results extends Widget
 		$this->query( $this->sql );
 
 		$this->current_idx = 0;
-			
-		$this->global_idx = (($this->page-1) * $this->limit) + $this->current_idx;
-		
-		$this->global_is_first = ( $this->global_idx <= 0 ) ? true : false;		
 
-		$this->global_is_last = ( $this->global_idx >= $this->total_rows-1 ) ? true : false;	
+		$this->global_idx = (($this->page-1) * $this->limit) + $this->current_idx;
+
+		$this->global_is_first = ( $this->global_idx <= 0 ) ? true : false;
+
+		$this->global_is_last = ( $this->global_idx >= $this->total_rows-1 ) ? true : false;
 
 		$this->current_group_ID = 0;
 	}
@@ -286,15 +286,15 @@ class Results extends Widget
 		$this->current_idx++;
 
 		$this->global_idx = (($this->page-1) * $this->limit) + $this->current_idx;
-		
-		$this->global_is_first = ( $this->global_idx <= 0 ) ? true : false;		
 
-		$this->global_is_last = ( $this->global_idx >= $this->total_rows-1 ) ? true : false;		
+		$this->global_is_first = ( $this->global_idx <= 0 ) ? true : false;
+
+		$this->global_is_last = ( $this->global_idx >= $this->total_rows-1 ) ? true : false;
 
 		return $this->current_idx;
 	}
-	
-	
+
+
 	/**
 	 * Run the query now!
 	 *
@@ -480,7 +480,7 @@ class Results extends Widget
 	 * If you define ->Cache before display, all rows will be instantiated on the fly.
 	 * No need to restart et go through the rows a second time here.
 	 *
-	 * @params DataObjectCache
+	 * @param DataObjectCache
 	 */
 	function instantiate_page_to_Cache( & $Cache )
 	{
@@ -583,7 +583,7 @@ class Results extends Widget
 	/**
 	 * Display list/table start.
 	 *
-	 * Typically outputs <ul> or <table>
+	 * Typically outputs UL or TABLE tags.
 	 *
 	 * @param boolean do we want special treatment when there are no results
 	 */
@@ -820,7 +820,7 @@ class Results extends Widget
 		echo $this->params['body_start'];
 
 		$line_count = 0;
-		// Used to set an id to fadeout element 
+		// Used to set an id to fadeout element
 		$fadeout_count = 0;
 		foreach( $this->rows as $row )
 		{ // For each row/line:
@@ -906,34 +906,34 @@ class Results extends Widget
 			$col_count = 0;
 			foreach( $this->cols as $col )
 			{ // For each column:
-				
+
 				/**
 				 * Update td start class for fadeout list results
-				 */ 
+				 */
 				foreach ( $fadeout as $key=>$crit )
 				{
 					if( isset( $row->$key ) && in_array( $row->$key, $crit ) )
 					{ // Col is in the fadeout list
 						if( isset( $col['td_start'] ) )
-						{	// We have a customized column start for this one: 
+						{	// We have a customized column start for this one:
 							if( preg_match( '#.*class="(.*)".*#', $col['td_start'], $res ) )
 							{	// Already has a class, so add to its fadeout class
 								$col['td_start'] = '<td class="fadeout-ffff00 '.$res[1].'" id="fadeout-'.$fadeout_count.'">';
 							}
-							else 
+							else
 							{	// has no class so a add fadout class
 								$col['td_start'] = '<td class="fadeout-ffff00" id="fadeout-'.$fadeout_count.'">';
 							}
 						}
-						else 
-						{	// We have not a customized column start for this one, so we set one with fadeout class  
+						else
+						{	// We have not a customized column start for this one, so we set one with fadeout class
 								$col['td_start'] = '<td class="fadeout-ffff00" id="fadeout-'.$fadeout_count.'">';
 						}
 						$fadeout_count++;
 						break;
 					}
 				}
-			
+
 				if( isset( $col['td_start'] ) )
 				{ // We have a customized column start for this one:
 					$output = $col['td_start'];
@@ -963,7 +963,7 @@ class Results extends Widget
 				$col_count++;
 			}
 			echo $this->params['line_end'];
-			
+
 			$this->next_idx();
 		}
 
@@ -1095,74 +1095,74 @@ class Results extends Widget
 		$content = str_replace( '{Obj}', "\$this->current_Obj", $content );
 		// Make callback for Object method substitution:
 		$content = preg_replace( '#@ (.+?) @#ix', "'.\$this->current_Obj->$1.'", $content );
-		
+
 		// Make callback function move_icons
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
-		
-		
+
+
 		return $content;
 	}
 
-	
+
 	function move_icons( )
 	{
-		$r = '';		
-	
+		$r = '';
+
 		$reg = '#^'.$this->param_prefix.'order (ASC|DESC).*#';
-		
+
 		if( preg_match( $reg, $this->order_field_list, $res ) )
-		{	// The table is sorted by the order column	
+		{	// The table is sorted by the order column
 			$sort = $res[1];
-			
+
 			// get the element ID
 			$idname = $this->param_prefix . 'ID';
 			$id = $this->rows[$this->current_idx]->$idname;
-		
+
 			// Move up arrow
 			if( $this->global_is_first )
 			{	// The element is the first so it can't move up, display a no move arrow
 				$r .= get_icon( 'nomove' ).' ';
-			}		
+			}
 			else
 			{
 				if(	$sort == 'ASC' )
 				{	// ASC sort, so move_up action for move up arrow
 					$action = 'move_up';
 					$alt = T_( 'Move up!' );
-					} 
-				else 
+					}
+				else
 				{	// Reverse sort, so action and alt are reverse too
 					$action = 'move_down';
 					$alt = T_('Move down! (reverse sort)');
 				}
 				$r .= action_icon( $alt, 'move_up', regenerate_url( 'action,'.$this->param_prefix.'ID' , $this->param_prefix.'ID='.$id.'&amp;action='.$action ) );
 			}
-			
+
 			// Move down arrow
 			if( $this->global_is_last )
 			{	// The element is the last so it can't move up, display a no move arrow
 				$r .= get_icon( 'nomove' ).' ';
-			}		
+			}
 			else
 			{
 				if(	$sort == 'ASC' )
 				{	// ASC sort, so move_down action for move down arrow
 					$action = 'move_down';
 					$alt = T_( 'Move down!' );
-				} 
-				else 
+				}
+				else
 				{ // Reverse sort, so action and alt are reverse too
 					$action = 'move_up';
 					$alt = T_('Move up! (reverse sort)');
 				}
 				$r .= action_icon( $alt, 'move_down', regenerate_url( 'action,'.$this->param_prefix.'ID', $this->param_prefix.'ID='.$id.'&amp;action='.$action ) );
 			}
-			
+
 			return $r;
 		}
-		else 
+		else
 		{	// The table is not sorted by the order column, so we display no move arrows
-			
+
 			if( $this->global_is_first )
 			{
 				// The element is the first so it can't move up, display a no move up arrow
@@ -1170,9 +1170,9 @@ class Results extends Widget
 			}
 			else
 			{	// Display no move up arrow
-				$r = action_icon( T_( 'Sort by order' ), 'nomove_up', regenerate_url( 'action','action=sort_by_order' ) ); 
+				$r = action_icon( T_( 'Sort by order' ), 'nomove_up', regenerate_url( 'action','action=sort_by_order' ) );
 			}
-			
+
 			if( $this->global_is_last )
 			{
 				// The element is the last so it can't move down, display a no move down arrow
@@ -1180,13 +1180,13 @@ class Results extends Widget
 			}
 			else
 			{ // Display no move down arrow
-				$r .= action_icon( T_( 'Sort by order' ), 'nomove_down', regenerate_url( 'action','action=sort_by_order' ) ); 
+				$r .= action_icon( T_( 'Sort by order' ), 'nomove_down', regenerate_url( 'action','action=sort_by_order' ) );
 			}
-			
+
 			return $r;
 		}
 	}
-	
+
 
 	/**
 	 * Widget callback for template vars.
@@ -1493,6 +1493,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.49  2006/02/09 23:31:05  blueyed
+ * doc fixes
+ *
  * Revision 1.48  2006/02/03 21:58:05  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
  *
