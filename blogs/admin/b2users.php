@@ -220,7 +220,6 @@ if( !$Messages->count('error') )
 
 			$Request->param( 'edited_user_login', 'string' );
 			$Request->param_check_not_empty( 'edited_user_login', T_('You must provide a login!') );
-			$edited_user_login = strtolower( $edited_user_login );
 
 			if( $current_User->check_perm( 'users', 'edit' ) )
 			{ // changing level/group is allowed (not in profile mode)
@@ -339,10 +338,10 @@ if( !$Messages->count('error') )
 				}
 				// Set icons legend displayed
 				$UserSettings->set( 'legend', $edited_user_legend, $edited_User->ID );
-				
+
 				// Set bozo validador activation
 				$UserSettings->set( 'bozo', $edited_user_bozo, $edited_User->ID );
-								
+
 				$UserSettings->dbupdate();
 
 				if( $reload_page )
@@ -602,6 +601,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.128  2006/02/09 00:55:35  blueyed
+ * Store user's login MixedCase in DB, the same as with /htsrv/register.php.
+ *
  * Revision 1.127  2006/02/03 21:58:04  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
  *
