@@ -48,7 +48,7 @@ require_once dirname(__FILE__).'/_dataobjectcache.class.php';
 class UserCache extends DataObjectCache
 {
 	/**
-	 * Cache for login -> User object reference
+	 * Cache for login -> User object reference. "login" is transformed to lowercase.
 	 * @access private
 	 * @var array
 	 */
@@ -95,9 +95,10 @@ class UserCache extends DataObjectCache
 		if( !isset( $this->cache_login[$login] ) )
 		{
 			global $DB;
-			if( $row = $DB->get_row( 'SELECT *
-																	FROM T_users
-																 WHERE user_login = "'.$DB->escape($login).'"', 0, 0, 'Get User login' ) )
+			if( $row = $DB->get_row( '
+					SELECT *
+					  FROM T_users
+					 WHERE user_login = "'.$DB->escape($login).'"', 0, 0, 'Get User login' ) )
 			{
 				$this->add( new User( $row ) );
 			}
@@ -151,7 +152,7 @@ class UserCache extends DataObjectCache
 	{
 		if( parent::add( $Obj ) )
 		{
-			$this->cache_login[$Obj->login] = & $Obj;
+			$this->cache_login[ strtolower($Obj->login) ] = & $Obj;
 
 			return true;
 		}
@@ -270,6 +271,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.24  2006/02/09 00:53:10  blueyed
+ * add(): Cache logins lowercase!
+ *
  * Revision 1.23  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
