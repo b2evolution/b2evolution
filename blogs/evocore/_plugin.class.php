@@ -512,7 +512,7 @@ class Plugin
 	function BeforeUninstall( & $params )
 	{
 		global $DB;
-		if( $tables = $DB->get_col( 'SHOW TABLES LIKE "'.$this->get_table_prefix().'%"' ) )
+		if( $tables = $DB->get_col( 'SHOW TABLES LIKE "'.$this->get_sql_table('%').'"' ) )
 		{
 			if( empty($params['unattended']) && ! param( 'plugin_'.$this->ID.'_confirm_drop', 'integer', 0 ) )
 			{ // not confirmed and not silently requested
@@ -934,15 +934,32 @@ class Plugin
 
 
 	/**
-	 * Get canonical prefix for database tables a plugin might create.
-	 *
-	 * @return string
+	 * @deprecated Please use {@link get_sql_table()} instead!
 	 */
 	function get_table_prefix()
 	{
-		global $tableprefix;
+		global $tableprefix, $Debuglog;
+
+		$Debuglog->add( 'Call to deprecated function: '.debug_get_backtrace(), 'deprecated' );
 
 		return $tableprefix.'plugin_ID'.$this->ID.'_';
+	}
+
+
+	/**
+	 * Get canonical name for database tables a plugin uses, by adding an unique
+	 * prefix for your plugin instance ("plugin_ID[ID]_").
+	 *
+	 * You should use this when refering to your SQL table names.
+	 *
+	 * @param string Your name, which gets returned with the unique prefix.
+	 * @return string
+	 */
+	function get_sql_table( $name )
+	{
+		global $tableprefix;
+
+		return $tableprefix.'plugin_ID'.$this->ID.'_'.$name;
 	}
 
 
@@ -1210,6 +1227,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.32  2006/02/09 22:05:43  blueyed
+ * doc fixes
+ *
  * Revision 1.31  2006/02/07 11:14:21  blueyed
  * Help for Plugins improved.
  *

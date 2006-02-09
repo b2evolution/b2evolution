@@ -237,7 +237,7 @@ $EvoConfig->DB['table_options'] = ''; 	// Low ranking MySQL hosting compatibilit
 /**
  * Use transactions in DB?
  *
- * You need to use InnoDB in order to enable this. {@see $EvoConfig->DB['table_options']}
+ * You need to use InnoDB in order to enable this. See the {@link $EvoConfig->DB "table_options" key}.
  */
 $EvoConfig->DB['use_transactions'] = false;
 // Recommended settings:
@@ -544,7 +544,7 @@ $force_regexp_dirname = '';
  * This is NOT recommened, because it affects things that should be done after delivering the page.
  *
  * Currently, it disables using register_shutdown_function() for hit_doublecheck_referer
- * ({@link Hit::log()), but not for {@link Session::dbsave()}.
+ * ({@link Hit::log()}), but not for {@link Session::dbsave()}.
  * fp>>why would we ever want to disable this feature?
  * blueyed>> for debugging?!
  * @global int $debug_no_register_shutdown

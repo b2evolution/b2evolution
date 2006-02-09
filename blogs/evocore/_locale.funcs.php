@@ -52,8 +52,6 @@ if( !defined('EVO_MAIN_INIT') && !defined('EVO_CONFIG_LOADED') ) die( 'Please, d
  * Translate a text to the desired locale (b2evo localization only)
  * or to the current locale
  *
- * {@internal T_(-)}}
- *
  * @param string String to translate, '' to get language file info (as in gettext spec)
  * @param string locale to translate to, '' to use current locale (basic gettext does only support '')
  */
@@ -180,8 +178,6 @@ function TS_( $string, $req_locale = '' )
  *
  * Calls can be nested, see {@link locale_restore_previous}.
  *
- * {@internal locale_temp_switch(-)}}
- *
  * @param string locale to activate
  */
 function locale_temp_switch( $locale )
@@ -200,7 +196,6 @@ function locale_temp_switch( $locale )
 /**
  * Restore the locale in use before the switch
  *
- * {@internal locale_restore_previous(-)}}
  * @see locale_temp_switch()
  * @return boolean true on success, false on failure (no locale stored before)
  */
@@ -303,8 +298,6 @@ function locale_by_lang( $lang, $fallback_to_default = true )
 /**
  * Displays/Returns the current locale. (for backward compatibility)
  *
- * {@internal locale_lang(-)}}
- *
  * @param boolean true (default) if we want it to be outputted
  * @return string current locale, if $disp = false
  */
@@ -321,8 +314,6 @@ function locale_lang( $disp = true )
 
 /**
  * Returns the charset of the current locale
- *
- * {@internal locale_charset(-)}}
  */
 function locale_charset( $disp = true )
 {
@@ -337,8 +328,6 @@ function locale_charset( $disp = true )
 
 /**
  * Returns the current locale's default date format
- *
- * {@internal locale_datefmt(-)}}
  */
 function locale_datefmt()
 {
@@ -350,8 +339,6 @@ function locale_datefmt()
 
 /**
  * Returns the current locale's default time format
- *
- * {@internal locale_timefmt(-)}}
  */
 function locale_timefmt()
 {
@@ -376,9 +363,9 @@ function locale_startofweek()
 
 /**
  * Get the country locale
- * 
- * @param string locale to use, '' for current 
- * 
+ *
+ * @param string locale to use, '' for current
+ *
  * @return string country locale
  */
 function locale_country( $locale = '' )
@@ -393,8 +380,6 @@ function locale_country( $locale = '' )
 
 /**
  * Template function: Display locale flag
- *
- * {@internal locale_flag(-)}}
  *
  * @param string locale to use, '' for current
  * @param string collection name (subdir of img/flags)
@@ -444,8 +429,6 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 /**
  * [callback function] Outputs an <option> set with default locale selected
  *
- * {@internal locale_options(-)}}
- *
  * @param string default value
  * @param boolean echo output?
  */
@@ -483,8 +466,6 @@ function locale_options( $default = '', $disp = true )
 /**
  * [callback function] Returns an <option> set with default locale selected
  *
- * {@internal locale_options(-)}}
- *
  * @param string default value
  */
 function locale_options_return( $default = '' )
@@ -499,8 +480,6 @@ function locale_options_return( $default = '' )
  *
  * First matched full locale code in HTTP_ACCEPT_LANGUAGE will win
  * Otherwise, first locale in table matching a lang code will win
- *
- * {@internal locale_from_httpaccept(-)}}
  *
  * @return locale made out of HTTP_ACCEPT_LANGUAGE or $default_locale, if no match
  */
@@ -721,6 +700,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.18  2006/02/09 22:05:43  blueyed
+ * doc fixes
+ *
  * Revision 1.17  2006/02/03 21:58:05  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
  *

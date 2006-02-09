@@ -95,8 +95,6 @@ class User extends DataObject
 	/**
 	 * Constructor
 	 *
-	 * {@internal User::User(-)}}
-	 *
 	 * @param object DB row
 	 */
 	function User( $db_row = NULL )
@@ -194,7 +192,6 @@ class User extends DataObject
 	/**
 	 * Get a param
 	 *
-	 * {@internal User::get(-)}}
 	 * @param string the parameter
 	 */
 	function get( $parname )
@@ -386,8 +383,6 @@ class User extends DataObject
 	/**
 	 * Check permission for this user
 	 *
-	 * {@internal User::check_perm(-) }}
-	 *
 	 * @param string Permission name, can be one of:
 	 *                - 'upload'
 	 *                - 'edit_timestamp'
@@ -478,8 +473,6 @@ class User extends DataObject
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()} instead
 	 *
-	 * {@internal User::check_perm_catsusers(-) }}
-	 *
 	 * @see User::check_perm()
 	 * @param string Permission name, can be one of the following:
 	 *                  - cat_post_statuses
@@ -525,8 +518,6 @@ class User extends DataObject
 	 * Check permission for this user on a specified blog
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()} instead
-	 *
-	 * {@internal User::check_perm_blogusers(-) }}
 	 *
 	 * @see User::check_perm()
 	 * @param string Permission name, can be one of the following:
@@ -724,8 +715,6 @@ class User extends DataObject
 
 	/**
 	 * Template function: display user's level
-	 *
-	 * {@internal User::level(-) }}
 	 */
 	function level()
 	{
@@ -735,8 +724,6 @@ class User extends DataObject
 
 	/**
 	 * Template function: display user's login
-	 *
-	 * {@internal User::login(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
@@ -809,8 +796,6 @@ class User extends DataObject
 	/**
 	 * Template function: display user's preferred name
 	 *
-	 * {@internal User::preferred_name(-) }}
-	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
 	function preferred_name( $format = 'htmlbody', $disp = true )
@@ -829,8 +814,6 @@ class User extends DataObject
 	/**
 	 * Return user's preferred name
 	 *
-	 * {@internal User::preferred_name(-) }}
-	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
 	function preferred_name_return( $format = 'htmlbody' )
@@ -841,8 +824,6 @@ class User extends DataObject
 
 	/**
 	 * Template function: display user's URL
-	 *
-	 * {@internal User::url(-) }}
 	 *
 	 * @param string string to display before the date (if changed)
 	 * @param string string to display after the date (if changed)
@@ -947,6 +928,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.63  2006/02/09 22:05:43  blueyed
+ * doc fixes
+ *
  * Revision 1.62  2006/01/27 14:06:11  fplanque
  * no message
  *

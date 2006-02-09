@@ -434,7 +434,7 @@ class Form extends Widget
 	/**
 	 * Builds a text (or password) input field.
 	 *
-	 * Note: please use {@link Form::password_input()} for password fields.
+	 * Note: please use {@link password_input()} for password fields.
 	 *
 	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
 	 * @param string Initial value
@@ -486,7 +486,7 @@ class Form extends Widget
 	/**
 	 * Builds a text (or password) input field.
 	 *
-	 * Note: please use {@link Form::password()} for password fields
+	 * Note: please use {@link password()} for password fields
 	 *
 	 * @param string the name of the input field
 	 * @param string initial value
@@ -1677,7 +1677,7 @@ class Form extends Widget
 	/**
 	 * Build a text area.
 	 *
-	 * @uses {@link textarea_input()}
+	 * @uses textarea_input()
 	 *
 	 * @param string
 	 * @param string
@@ -2480,14 +2480,11 @@ class Form extends Widget
 
 /*
  * $Log$
- * Revision 1.107  2006/02/09 15:54:02  blueyed
- * *** empty log message ***
+ * Revision 1.108  2006/02/09 22:05:43  blueyed
+ * doc fixes
  *
  * Revision 1.105  2006/02/03 21:58:05  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
- *
- * Revision 1.104  2006/01/29 20:44:46  blueyed
- * *** empty log message ***
  *
  * Revision 1.102  2006/01/26 22:42:44  blueyed
  * end_form(): check for existence of JS addEvent().
