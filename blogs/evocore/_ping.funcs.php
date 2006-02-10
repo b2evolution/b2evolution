@@ -204,16 +204,13 @@ function pingBlogs( & $blogparams, $display = true )
 	}
 }
 
-/*
-* pingTechnorati(-)
-*
-* pings technorati.com
-*
-* Code by Isaac Schlueter http://isaac.beigetower.org
-* Adapted from the b2 ping instructions listed at
-* http://developers.technorati.com/wiki/pingConfigurations
-*
-*/
+/**
+ * Pings technorati.com
+ *
+ * Code by {@link http://isaacschlueter.com/ Isaac Schlueter}
+ * Adapted from the b2 ping instructions listed at
+ * {@link http://developers.technorati.com/wiki/pingConfigurations}.
+ */
 function pingTechnorati(& $blogparams, $display = true )
 {
 	global $baseurl, $blogfilename;
@@ -247,6 +244,9 @@ function pingTechnorati(& $blogparams, $display = true )
 
 /*
  * $Log$
+ * Revision 1.9  2006/02/10 20:37:10  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.8  2005/12/12 19:21:23  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

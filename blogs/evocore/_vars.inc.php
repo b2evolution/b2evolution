@@ -45,7 +45,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-// Investigation for following code by Isaac - http://isaac.beigetower.org/
+// Investigation for following code by Isaac - http://isaacschlueter.com/
 // $debug = true;
 if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
 { // Warning: on some IIS installs it it set but empty!
@@ -251,6 +251,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.30  2006/02/10 20:37:10  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.29  2006/01/22 22:47:29  blueyed
  * Fix for $ReqPath/$ReqURI detection.
  *
