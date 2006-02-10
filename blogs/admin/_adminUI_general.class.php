@@ -1012,8 +1012,8 @@ class AdminUI_general
 	 * $AdminUI->set_path_level( 1, $tab )
 	 *
 	 * Though, it is recommended to call the wrapper functions:
-	 * @see append_path_level()
-	 * @see set_path()
+	 *  - {@link append_path_level()}
+	 *  - {@link set_path()}
 	 *
 	 * This also marks the parent node as selected and checks for permissions.
 	 *
@@ -1229,6 +1229,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.53  2006/02/10 20:29:34  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.52  2006/02/03 21:58:04  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
  *

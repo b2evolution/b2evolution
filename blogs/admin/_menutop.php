@@ -250,16 +250,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				 *
 				 * @param string the form name
 				 * @param string the checkbox(es) element(s) name
-				 * @param string number/name of the checkall set  (PLEASE DOCUMENT THIS MORE)
+				 * @param string number/name of the checkall set to use. Defaults to 0 and is needed when there are several "checkall-sets" on one page.
 				 */ ?>
-				function toggleCheckboxes(the_form, the_elements, nr)
+				function toggleCheckboxes(the_form, the_elements, set_name)
 				{
-					if( typeof nr == 'undefined' )
+					if( typeof set_name == 'undefined' )
 					{
-						nr = 0;
+						set_name = 0;
 					}
-					if( allchecked[nr] ) allchecked[nr] = false;
-					else allchecked[nr] = true;
+					if( allchecked[set_name] ) allchecked[set_name] = false;
+					else allchecked[set_name] = true;
 
 					var elems = document.forms[the_form].elements[the_elements];
 					if( !elems )
@@ -278,7 +278,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					{
 						elems.checked = allchecked[nr];
 					}
-					setcheckallspan( nr );
+					setcheckallspan( set_name );
 				}
 				<?php // }}}
 				break;
@@ -286,19 +286,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 			// --- general functions ----------------
 			/**
-			 * replaces the text of the [nr]th checkall-html-ID
+			 * replaces the text of the checkall-html-ID for set_name
 			 *
-			 * @param integer number of the checkall "set"
+			 * @param integer|string number or name of the checkall "set" to use
 			 * @param boolean force setting to true/false
 			 */ ?>
-			function setcheckallspan( nr, set )
+			function setcheckallspan( set_name, set )
 			{
-				if( typeof(allchecked[nr]) == 'undefined' || typeof(set) != 'undefined' )
+				if( typeof(allchecked[set_name]) == 'undefined' || typeof(set) != 'undefined' )
 				{ // init
-					allchecked[nr] = set;
+					allchecked[set_name] = set;
 				}
 
-				if( allchecked[nr] )
+				if( allchecked[set_name] )
 				{
 					var replace = document.createTextNode('<?php echo TS_('uncheck all') ?>');
 				}
@@ -307,11 +307,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					var replace = document.createTextNode('<?php echo TS_('check all') ?>');
 				}
 
-				if( document.getElementById( idprefix+'_'+String(nr) ) )
+				if( document.getElementById( idprefix+'_'+String(set_name) ) )
 				{
-					document.getElementById( idprefix+'_'+String(nr) ).replaceChild(replace, document.getElementById( idprefix+'_'+String(nr) ).firstChild);
+					document.getElementById( idprefix+'_'+String(set_name) ).replaceChild(replace, document.getElementById( idprefix+'_'+String(set_name) ).firstChild);
 				}
-				//else alert('no element with id '+idprefix+'_'+String(nr));
+				//else alert('no element with id '+idprefix+'_'+String(set_name));
 			}
 
 			<?php
