@@ -384,6 +384,23 @@ $map_iconfiles = array(
 		'file' => $rsc_subdir.'icons/nomove.gif',
 		'size' => array( 12, 13 ),
 	),
+		
+	'check_all' => array(
+		'file' => $rsc_subdir.'icons/check_all.gif',
+		'alt'	 => T_('Check all'),
+		'size' => array( 17, 17 ),
+	),
+	'uncheck_all' => array(
+		'file' => $rsc_subdir.'icons/uncheck_all.gif',
+		'alt'	 => T_('Uncheck all'),
+		'size' => array( 17, 17 ),
+	),
+	
+	'reset_filters' => array(
+		'file' => $rsc_subdir.'icons/reset_filter.gif',
+		'alt'	 => T_('Reset all filters'),
+		'size' => array( 16, 16 ),
+	),
 );
 
 ?>

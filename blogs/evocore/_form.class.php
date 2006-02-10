@@ -179,7 +179,6 @@ class Form extends Widget
 			case 'table':
 				$this->formstart = '<table cellspacing="0" class="fform">'."\n";
 				// Note: no thead in here until you can safely add a tbody to the rest of the content...
-				// TODO: class "right_icons" does not get used in CSS..
 				$this->title_fmt = '<tr class="formtitle"><th colspan="2"><div class="results_title">'
 														.'<span class="right_icons">$global_icons$</span>'
 														.'$title$</div></th></tr>'."\n";
@@ -337,7 +336,6 @@ class Form extends Widget
 	 * Builds a fieldset tag. This is a fieldset element by default, but a th element
 	 * for table layout.
 	 *
-	 * @todo class="fieldset_icons" is not defined and should probably be the same as "right_icons" above in {@link switch_layout()}.
 	 * @param string the title of the fieldset
 	 * @param string the field params to the fieldset
 	 *               additionally 'legend_params' can be used to give an array of field params
@@ -434,7 +432,7 @@ class Form extends Widget
 	/**
 	 * Builds a text (or password) input field.
 	 *
-	 * Note: please use {@link password_input()} for password fields.
+	 * Note: please use {@link Form::password_input()} for password fields.
 	 *
 	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
 	 * @param string Initial value
@@ -486,7 +484,7 @@ class Form extends Widget
 	/**
 	 * Builds a text (or password) input field.
 	 *
-	 * Note: please use {@link password()} for password fields
+	 * Note: please use {@link Form::password()} for password fields
 	 *
 	 * @param string the name of the input field
 	 * @param string initial value
@@ -1069,21 +1067,19 @@ class Form extends Widget
 	}
 
 	/**
-	 * Return links to check and uncheck all check boxes of the form.
-	 * @todo needs icons
+	 * Return links to check and uncheck all check boxes of the form
 	 */
 	function check_all()
 	{
-		// Need to add event click on links at the form end.
+		// Need to add event click on links at the form end.		
 		$this->check_all = true;
-
+		
 		return '<a name="check_all_nocheckchanges" href="'.regenerate_url().'">'
-				.T_('Check all').' '
-				#.get_icon( 'check_all', 'imgtag', NULL, true )
+				//.T_('Check all').' '
+				.get_icon( 'check_all', 'imgtag', NULL, true )
 				.'</a> | <a name="uncheck_all_nocheckchanges" href="'.regenerate_url().'">'
-				.T_('Uncheck all').' '
-				#.get_icon( 'uncheck_all', 'imgtag', NULL, true )
-				.'</a> '.'&nbsp;';
+				//.T_('Uncheck all').' '
+				.get_icon( 'uncheck_all', 'imgtag', NULL, true ).'</a> '.'&nbsp;';	
 	}
 
 
@@ -2480,6 +2476,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.109  2006/02/10 20:35:15  fplanque
+ * fixed check all icons
+ *
  * Revision 1.108  2006/02/09 22:05:43  blueyed
  * doc fixes
  *
