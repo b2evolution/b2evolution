@@ -510,7 +510,7 @@ switch( $action )
 
 			// Let's make the link!
 			$edited_Link = & new Link();
-			$edited_Link->set( 'item_ID', $edited_Item->ID );
+			$edited_Link->set( 'itm_ID', $edited_Item->ID );
 			$edited_Link->set( 'file_ID', $selectedFile->ID );
 			$edited_Link->dbinsert();
 
@@ -1246,6 +1246,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.158  2006/02/10 22:05:07  fplanque
+ * Normalized itm links
+ *
  * Revision 1.157  2006/01/20 00:39:17  blueyed
  * Refactorisation/enhancements to filemanager.
  *

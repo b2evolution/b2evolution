@@ -71,7 +71,7 @@ class Link extends DataObject
 			$this->ltype_ID = $db_row->link_ltype_ID;
 
 			// source of link:
-			$this->Item     = & $ItemCache->get_by_ID( $db_row->link_item_ID );
+			$this->Item     = & $ItemCache->get_by_ID( $db_row->link_itm_ID );
 
 			$this->File     = & $FileCache->get_by_ID( $db_row->link_file_ID, true, false );
 		}
@@ -102,6 +102,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2006/02/10 22:05:07  fplanque
+ * Normalized itm links
+ *
  * Revision 1.13  2006/01/02 19:43:57  fplanque
  * just a little new year cleanup
  *

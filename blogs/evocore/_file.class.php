@@ -1294,7 +1294,7 @@ class File extends DataObject
 	 * @param string text to display if access denied
 	 * @param string page url for the edit action
 	 */
-	function edit_link( $link_item_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
+	function edit_link( $link_itm_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
 											$actionurl = 'files.php' )
 	{
 		if( is_null( $text ) )
@@ -1324,9 +1324,9 @@ class File extends DataObject
 
 		$url_params = 'root='.$this->_FileRoot->ID.'&amp;path='.$rdfp_path.'/';
 
-		if( ! is_null($link_item_ID) )
+		if( ! is_null($link_itm_ID) )
 		{	// We want to open the filemanager in link mode:
-			$url_params .= '&amp;fm_mode=link_item&amp;item_ID='.$link_item_ID;
+			$url_params .= '&amp;fm_mode=link_item&amp;item_ID='.$link_itm_ID;
 		}
 
 		$url = url_add_param( $actionurl, $url_params );
@@ -1338,6 +1338,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.62  2006/02/10 22:05:07  fplanque
+ * Normalized itm links
+ *
  * Revision 1.61  2006/01/26 19:27:58  fplanque
  * no message
  *

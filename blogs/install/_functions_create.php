@@ -1013,8 +1013,8 @@ function create_b2evo_tables_phoenix()
 								link_datemodified     datetime          not null,
 								link_creator_user_ID  int(11) unsigned  not null,
 								link_lastedit_user_ID int(11) unsigned  not null,
-								link_item_ID    		  int(11) unsigned  NOT NULL,
-								link_dest_item_ID		  int(11) unsigned  NULL,
+ 								link_itm_ID     		  int(11) unsigned  NOT NULL,
+								link_dest_itm_ID		  int(11) unsigned  NULL,
 								link_file_ID				  int(11) unsigned  NULL,
 								link_ltype_ID				  int(11) unsigned  NOT NULL default 1,
 								link_external_url     VARCHAR(255)      NULL,
@@ -1353,6 +1353,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.173  2006/02/10 22:05:07  fplanque
+ * Normalized itm links
+ *
  * Revision 1.172  2006/02/03 17:35:17  blueyed
  * post_renderers as TEXT
  *

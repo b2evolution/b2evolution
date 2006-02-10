@@ -205,17 +205,12 @@ class Item extends DataObject
 												$creator_field, $lasteditor_field );
 
 		$this->delete_restrictions = array(
-				array( 'table'=>'T_links', 'fk'=>'link_dest_item_ID', 'msg'=>T_('%d links to source items') ),
-				// b2evo only:
+				array( 'table'=>'T_links', 'fk'=>'link_dest_itm_ID', 'msg'=>T_('%d links to source items') ),
 				array( 'table'=>'T_posts', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
-				// progidistri only: (those won't hurt)
-				array( 'table'=>'T_tasks', 'fk'=>'tsk_parent_tsk_ID', 'msg'=>T_('%d links to child items') ),
-				array( 'table'=>'T_mission_assignments', 'fk'=>'ma_tsk_ID', 'msg'=>T_('%d mission assignment embodied by this task') ),
 			);
 
 		$this->delete_cascades = array(
-				array( 'table'=>'T_links', 'fk'=>'link_item_ID', 'msg'=>T_('%d links to destination items') ),
-				// b2evo only:
+				array( 'table'=>'T_links', 'fk'=>'link_itm_ID', 'msg'=>T_('%d links to destination items') ),
 				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
 				array( 'table'=>'T_comments', 'fk'=>'comment_post_ID', 'msg'=>T_('%d comments') ),
 			);
@@ -2357,6 +2352,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.98  2006/02/10 22:05:07  fplanque
+ * Normalized itm links
+ *
  * Revision 1.97  2006/02/06 20:05:30  fplanque
  * minor
  *

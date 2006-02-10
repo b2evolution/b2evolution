@@ -32,14 +32,13 @@ if( false )
 		$order_fields[] = 'firm_name';
 	}
 
-	if( isset( $EvoConfig->DB['aliases']['T_tasks'] ) )
-	{	// This application handles tasks:
-		$SQL->SELECT_add( ', tsk_ID, tsk_title' );
-		$SQL->FROM_add( 'LEFT JOIN T_tasks ON link_dest_item_ID = tsk_ID' );
-		$order_fields[] = 'tsk_title';
+	// Linked items:
+	$SQL->SELECT_add( ', itm_ID, itm_title' );
+	$SQL->FROM_add( 'LEFT JOIN T_items ON link_dest_itm_ID = itm_ID' );
+	$order_fields[] = 'itm_title';
 	}
 
-	$SQL->WHERE( 'link_item_ID = '.$edited_Item->ID );
+	$SQL->WHERE( 'link_itm_ID = '.$edited_Item->ID );
 
 	$Results = & new Results( $SQL->get(), 'link_' );
 
@@ -62,9 +61,9 @@ if( false )
 		{
 			return T_('Firm');
 		}
-		elseif( !empty($row->tsk_ID) )
+		elseif( !empty($row->itm_ID) )
 		{
-			return T_('Task');
+			return T_('Item');
 		}
 		elseif( !empty($row->file_ID) )
 		{
@@ -111,32 +110,17 @@ if( false )
 	 */
 	function display_link( & $row )
 	{
-		if( !empty($row->cont_ID) )
+		if( !empty($row->itm_ID) )
 		{
-			return '<a href="'.regenerate_url( 'action,pos_ID,cont_ID', 'cont_ID='.$row->cont_ID, 'contacts.php' )
-						.'" title="'.T_('View this contact...').'">'.$row->cont_firstname.' '.$row->cont_lastname.'</a>';
-		}
-		elseif( !empty($row->etab_ID) )
-		{
-			return '<a href="'.regenerate_url( 'action,etab_ID', 'etab_ID='.$row->etab_ID, 'establishments.php' )
-						.'" title="'.T_('View this establishment...').'">'.$row->etab_name.'</a>';
-		}
-		elseif( !empty($row->firm_ID) )
-		{
-			return '<a href="'.regenerate_url( 'action,firm_ID', 'firm_ID='.$row->firm_ID, 'firms.php' )
-						.'" title="'.T_('View this firm...').'">'.$row->firm_name.'</a>';
-		}
-		elseif( !empty($row->tsk_ID) )
-		{
-			return '<a href="'.regenerate_url( 'action,tsk_ID', 'tsk_ID='.$row->tsk_ID, 'tasks.php' )
-						.'" title="'.T_('View this task...').'">'.$row->tsk_title.'</a>';
+			return '<a href="'.regenerate_url( 'action,itm_ID', 'itm_ID='.$row->itm_ID, 'tasks.php' )
+						.'" title="'.T_('View this item...').'">'.$row->itm_title.'</a>';
 		}
 		elseif( !empty($row->file_ID) )
 		{
 			global $current_File, $edited_Item;
 
 			// File relative path & name:
-			return $current_File->edit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID ).'<span class="filemeta"> - '.$current_File->dget('title').'</span>';
+			return $current_File->edit_link( '&amp;fm_mode=link_item&amp;itm_ID='.$edited_Item->ID ).'<span class="filemeta"> - '.$current_File->dget('title').'</span>';
 		}
 
 		return '?';
@@ -157,11 +141,11 @@ if( false )
 			if( isset($current_File) )
 			{
 				$title = T_('Locate this file!');
-				$r = $current_File->edit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title ).' ';
+				$r = $current_File->edit_link( '&amp;fm_mode=link_item&amp;itm_ID='.$edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title ).' ';
 			}
 
 			return $r.action_icon( T_('Delete this link!'), 'unlink',
-		                      regenerate_url(  'tsk_ID,action', "link_ID=$link_ID&amp;action=delete_link" ) );
+		                      regenerate_url( 'itm_ID,action', "link_ID=$link_ID&amp;action=delete_link" ) );
 		}
 		$Results->cols[] = array(
 								'th' => T_('Actions'),
@@ -170,26 +154,6 @@ if( false )
 							);
 	}
 
-	if( isset( $EvoConfig->DB['aliases']['T_firms'] ) )
-	{	// This application handles firms:
-		$Results->global_icon( T_('Link an existing firm...'), 'link',
-													'?tsk_ID='.$edited_Item->ID.'&amp;action=link_firm', T_('Firm') );
-	}
-	if( isset( $EvoConfig->DB['aliases']['T_contacts'] ) )
-	{	// This application handles contacts:
-		$Results->global_icon( T_('Link an existing contact...'), 'link',
-													'?tsk_ID='.$edited_Item->ID.'&amp;action=link_contact', T_('Contact') );
-	}
-	if( isset( $EvoConfig->DB['aliases']['T_establishments'] ) )
-	{	// This application handles estabs:
-		$Results->global_icon( T_('Link an existing establishment...'), 'link',
-													'?tsk_ID='.$edited_Item->ID.'&amp;action=link_establishment', T_('Establishment') );
-	}
-	if( isset( $EvoConfig->DB['aliases']['T_tasks'] ) && $current_User->check_perm( 'tasks', 'list', false, NULL ) )
-	{	// This application handles tasks:
-		$Results->global_icon( T_('Link an existing task...'), 'link',
-													'?tsk_ID='.$edited_Item->ID.'&amp;action=link_task', T_('Task') );
-	}
 	if( $current_User->check_perm( 'files', 'view' ) )
 	{
 		$Results->global_icon( T_('Link a file...'), 'link',

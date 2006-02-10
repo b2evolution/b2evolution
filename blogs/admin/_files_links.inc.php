@@ -52,7 +52,7 @@ $edited_Item->edit_link( '<p>', '</p>', T_('Edit this post') );
 $Results = & new Results(
 					'SELECT link_ID, link_ltype_ID, T_files.*
 						 FROM T_links INNER JOIN T_files ON link_file_ID = file_ID
-						WHERE link_item_ID = '.$edited_Item->ID,
+						WHERE link_itm_ID = '.$edited_Item->ID,
 					'link_' );
 
 $Results->title = T_('Existing links');
@@ -130,6 +130,9 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.11  2006/02/10 22:05:07  fplanque
+ * Normalized itm links
+ *
  * Revision 1.10  2005/12/30 20:13:39  fplanque
  * UI changes mostly (need to double check sync)
  *

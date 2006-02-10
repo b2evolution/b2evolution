@@ -755,7 +755,9 @@ function upgrade_b2evo_tables()
 		echo 'Altering Links table... ';
 		$DB->query( 'ALTER TABLE T_links
 		             MODIFY COLUMN link_datecreated      datetime          not null,
-		             MODIFY COLUMN link_datemodified     datetime          not null' );
+		             MODIFY COLUMN link_datemodified     datetime          not null,
+								 CHANGE link_item_ID link_itm_ID INT( 11 ) UNSIGNED NOT NULL
+								 CHANGE link_dest_item_ID link_dest_itm_ID INT( 11 ) UNSIGNED NULL' );
 		echo "OK.<br />\n";
 		// }}}
 
@@ -784,6 +786,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.122  2006/02/10 22:05:07  fplanque
+ * Normalized itm links
+ *
  * Revision 1.121  2006/02/03 17:35:17  blueyed
  * post_renderers as TEXT
  *

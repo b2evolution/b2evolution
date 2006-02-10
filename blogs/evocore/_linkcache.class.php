@@ -170,7 +170,7 @@ class LinkCache extends DataObjectCache
 
 		foreach( $DB->get_results( 'SELECT *
 																	FROM T_links
-																 WHERE link_item_ID IN ('.$item_list.')' ) as $row )
+																 WHERE link_itm_ID IN ('.$item_list.')' ) as $row )
 		{	// Cache each matching object:
 			$this->add( new Link( $row ) );
 		}
