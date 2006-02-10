@@ -23,7 +23,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 <div class="loginblock">
 
-<div style="float:left"><h1 class="logintitle"><a href="http://b2evolution.net/"><img src="../img/b2evolution_minilogo.png" width="231" height="50" alt="b2evolution" /></a></h1></div>
+<div style="float:left">
+	<h1 class="logintitle"><?php echo $app_banner; ?></h1>
+</div>
 
 <?php if( isset($page_icon) ) { ?>
 <img src="<?php echo $htsrv_url.'rsc/icons/'.$page_icon ?>" width="24" height="24" style="float:right;" alt="" />

@@ -36,7 +36,6 @@ if( false )
 	$SQL->SELECT_add( ', itm_ID, itm_title' );
 	$SQL->FROM_add( 'LEFT JOIN T_items ON link_dest_itm_ID = itm_ID' );
 	$order_fields[] = 'itm_title';
-	}
 
 	$SQL->WHERE( 'link_itm_ID = '.$edited_Item->ID );
 

@@ -363,27 +363,27 @@ class ItemQuery extends SQL
 			{
 				case '4':
 					// We have only year, add one to year
-					$dstop_mysql = ($dstop+1).'-01-01 00:00';
+					$dstop_mysql = ($dstop+1).'-01-01 00:00:00';
 					break;
 
 				case '6':
 					// We have year month, add one to month
-					$dstop_mysql = date("Y-m-d H:i ", mktime(0, 0, 0, substr($dstop,4,2)+1, 01, substr($dstop,0,4)));
+					$dstop_mysql = date("Y-m-d H:i:s ", mktime(0, 0, 0, substr($dstop,4,2)+1, 01, substr($dstop,0,4)));
 					break;
 
 				case '8':
 					// We have year mounth day, add one to day
-					$dstop_mysql = date("Y-m-d H:i ", mktime(0, 0, 0, substr($dstop,4,2), (substr($dstop,6,2) + 1 ), substr($dstop,0,4)));
+					$dstop_mysql = date("Y-m-d H:i:s ", mktime(0, 0, 0, substr($dstop,4,2), (substr($dstop,6,2) + 1 ), substr($dstop,0,4)));
 					break;
 
 				case '10':
 					// We have year mounth day hour, add one to hour
-					$dstop_mysql = date("Y-m-d H:i ", mktime( ( substr($dstop,8,2) + 1 ), 0, 0, substr($dstop,4,2), substr($dstop,6,2), substr($dstop,0,4)));
+					$dstop_mysql = date("Y-m-d H:i:s ", mktime( ( substr($dstop,8,2) + 1 ), 0, 0, substr($dstop,4,2), substr($dstop,6,2), substr($dstop,0,4)));
 					break;
 
 				case '12':
 					// We have year mounth day hour minute, add one to minute
-					$dstop_mysql = date("Y-m-d H:i ", mktime( substr($dstop,8,2), ( substr($dstop,8,2) + 1 ), 0, substr($dstop,4,2), substr($dstop,6,2), substr($dstop,0,4)));
+					$dstop_mysql = date("Y-m-d H:i:s ", mktime( substr($dstop,8,2), ( substr($dstop,8,2) + 1 ), 0, substr($dstop,4,2), substr($dstop,6,2), substr($dstop,0,4)));
 					break;
 
 				default:
@@ -537,6 +537,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.12  2006/02/10 22:08:07  fplanque
+ * Various small fixes
+ *
  * Revision 1.11  2006/02/03 21:58:05  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
  *

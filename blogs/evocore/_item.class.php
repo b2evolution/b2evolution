@@ -2348,10 +2348,34 @@ class Item extends DataObject
 
 		return parent::get( $parname );
 	}
+	
+
+	/**
+	 * Assign the item to the first category we find in the requested collection
+	 *
+	 * @param integer $collection_ID
+	 */
+	function assign_to_first_cat_for_collection ( $collection_ID )
+	{
+		global $DB;
+
+		// Get the first category ID for the collection ID param
+		$cat_ID = $DB->get_var( 'SELECT cat_ID
+															 FROM T_categories
+														  WHERE cat_blog_ID = '.$collection_ID.'
+													 ORDER BY cat_ID ASC
+												 			LIMIT 1' );
+
+		// Set to the item the first category we got
+		$this->set( 'main_cat_ID', $cat_ID );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.99  2006/02/10 22:08:07  fplanque
+ * Various small fixes
+ *
  * Revision 1.98  2006/02/10 22:05:07  fplanque
  * Normalized itm links
  *

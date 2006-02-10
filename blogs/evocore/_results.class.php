@@ -118,7 +118,6 @@ class Results extends Widget
 
  	/**
 	 * Is this gobally the last item in the list? (NOT just the last in current page)
-	 *
 	 */
 	var $global_is_last;
 
@@ -1493,6 +1492,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.50  2006/02/10 22:08:07  fplanque
+ * Various small fixes
+ *
  * Revision 1.49  2006/02/09 23:31:05  blueyed
  * doc fixes
  *

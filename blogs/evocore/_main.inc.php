@@ -299,21 +299,21 @@ require_once dirname(__FILE__).'/_template.funcs.php';    // function to be call
 require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_xmlrpc.php';
 require_once dirname(__FILE__).'/'.$core_dirout.$lib_subdir.'_xmlrpcs.php';
 require_once dirname(__FILE__).'/_blog.class.php';
-require_once dirname(__FILE__).'/_itemlist.class.php';
-require_once dirname(__FILE__).'/_itemcache.class.php';
 require_once dirname(__FILE__).'/_commentlist.class.php';
 require_once dirname(__FILE__).'/_dataobjectcache.class.php';
 require_once dirname(__FILE__).'/_element.class.php';
 require_once dirname(__FILE__).'/_filecache.class.php';
-require_once dirname(__FILE__).'/_usercache.class.php';
-require_once dirname(__FILE__).'/_link.class.php';
-require_once dirname(__FILE__).'/_linkcache.class.php';
 require_once dirname(__FILE__).'/_file.class.php';
 require_once dirname(__FILE__).'/_filerootcache.class.php';
 require_once dirname(__FILE__).'/_filetype.class.php';
 require_once dirname(__FILE__).'/_filetypecache.class.php';
+require_once dirname(__FILE__).'/_itemlist.class.php';
+require_once dirname(__FILE__).'/_itemcache.class.php';
 require_once dirname(__FILE__).'/_itemtype.class.php';
 require_once dirname(__FILE__).'/_itemtypecache.class.php';
+require_once dirname(__FILE__).'/_link.class.php';
+require_once dirname(__FILE__).'/_linkcache.class.php';
+require_once dirname(__FILE__).'/_usercache.class.php';
 
 // Object caches init (we're asking plugins that provide the "CacheObjects" event here first):
 $Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
@@ -322,12 +322,10 @@ $Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', '& new DataObject
 $Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', '& new DataObjectCache( \'Element\', true, \'T_posttypes\', \'ptyp_\', \'ptyp_ID\' )' );
 $Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', '& new DataObjectCache( \'Element\', true, \'T_poststatuses\', \'pst_\', \'pst_ID\' )' );
 
-
 // Caches that are not meant to be loaded in total:
 $BlogCache = & new BlogCache();
 $FileCache = & new FileCache();
 $ItemCache = & new ItemCache();
-$itemTypeCache = & new ItemTypeCache();
 $LinkCache = & new LinkCache();
 $UserCache = & new UserCache();
 
@@ -530,6 +528,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.85  2006/02/10 22:08:07  fplanque
+ * Various small fixes
+ *
  * Revision 1.84  2006/02/03 21:58:05  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
  *

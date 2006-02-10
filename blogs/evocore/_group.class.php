@@ -154,6 +154,7 @@ class Group extends DataObject
 
 		$perm = false; // Default is false!
 
+		// echo "<br>Checking group perm $permname:$permlevel against $permvalue";
 		if( isset($this->{'perm_'.$permname}) )
 		{
 			$permvalue = $this->{'perm_'.$permname};
@@ -432,6 +433,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2006/02/10 22:08:07  fplanque
+ * Various small fixes
+ *
  * Revision 1.17  2006/02/03 16:24:51  blueyed
  * *** empty log message ***
  *

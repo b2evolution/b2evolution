@@ -1594,11 +1594,10 @@ class Form extends Widget
 		$field_options = $option_new . $field_options;
 
 		// Select list
-		$r .="\n<select"
-			 .$this->get_field_params_as_string($field_params).'>'
+		$r .="\n<select".get_field_attribs_as_string($field_params).'>'
 			 .$field_options
-			 ."</select>";
-
+			 ."</select>\n";
+		
 		if( $field_options == $option_new  || $input_class == 'field_error' || !$field_value )
 		{	// The list is empty or there is an error on the combo or no field value, so we have to display the input text:
 			$visible = 'inline';
@@ -2476,6 +2475,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.110  2006/02/10 22:08:07  fplanque
+ * Various small fixes
+ *
  * Revision 1.109  2006/02/10 20:35:15  fplanque
  * fixed check all icons
  *

@@ -675,36 +675,42 @@ class Request
 		return false;
 	}
 
-/**
- * Sets a combo parameter with values from the request,
- * => the value of the select option and the input text value if new is selected
- * Display an error if the new value is selected that the input text has a value  
- * 
- * @param string Variable to set
- * @param string error message
- * 
- * @return string position status ID or 'new' or '' if new is seleted but not input text value 
- * 
- */
-function param_combo( $var, $err_msg )
-{
-	$this->params[$var] = param( $var, 'string', true );
-
-	if( $this->params[$var] == 'new' )
-	{	// The new option is selected in the combo select, so we need to check if we have a value in the combo input text:
-		$this->params[$var.'_combo'] = param( $var.'_combo', 'string' );
-
-		if( empty( $this->params[$var.'_combo'] ) )
-		{ // We have no value in the combo input text, so display error
-			$this->param_error( $var, $err_msg );
-			// Set request param to null 
-			$this->params[$var] = null;
-			return '';
-		}
-	}
 	
-	return $this->params[$var];
-}
+	/**
+	 * Sets a combo parameter with values from the request,
+	 * => the value of the select option and the input text value if new is selected
+	 * Display an error if the new value is selected that the input text has a value  
+	 * 
+	 * @param string Variable to set
+	 * @param boolean true: allows to select new without entring a value in the input combo text
+	 * @param string error message
+	 * 
+	 * @return string position status ID or 'new' or '' if new is seleted but not input text value 
+	 * 
+	 */
+	function param_combo( $var, $allow_none, $err_msg = ''  )
+	{
+		$this->params[$var] = param( $var, 'string', true );
+	
+		if( $this->params[$var] == 'new' )
+		{	// The new option is selected in the combo select, so we need to check if we have a value in the combo input text:
+			$this->params[$var.'_combo'] = param( $var.'_combo', 'string' );
+	
+			if( empty( $this->params[$var.'_combo'] ) )
+			{ // We have no value in the combo input text
+				
+				// Set request param to null 
+				$this->params[$var] = NULL;
+	
+				if( !$allow_none )
+				{ // it's not allowed, so display error:
+					$this->param_error( $var, $err_msg );
+				}
+			}
+		}
+		
+		return $this->params[$var];
+	}
 	
 	
 	/**
@@ -831,6 +837,9 @@ function param_combo( $var, $err_msg )
 
 /*
  * $Log$
+ * Revision 1.33  2006/02/10 22:08:07  fplanque
+ * Various small fixes
+ *
  * Revision 1.32  2006/02/03 21:58:05  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
  *
