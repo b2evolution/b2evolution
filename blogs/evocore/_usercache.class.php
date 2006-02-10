@@ -91,7 +91,10 @@ class UserCache extends DataObjectCache
 	 */
 	function & get_by_login( $login )
 	{
+		// Make sure we have a lowercase login:
+		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes.
 		$login = strtolower( $login );
+
 		if( !isset( $this->cache_login[$login] ) )
 		{
 			global $DB;
@@ -271,6 +274,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.25  2006/02/10 22:33:19  fplanque
+ * logins should be lowercase
+ *
  * Revision 1.24  2006/02/09 00:53:10  blueyed
  * add(): Cache logins lowercase!
  *

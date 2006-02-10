@@ -75,6 +75,9 @@ switch( $action )
 																	'email' => $email,
 																	'pass_required' => true ) );
 
+		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
+		$login = strtolower( $login );
+
 		if( $UserCache->get_by_login( $login ) )
 		{ // The login is already registered
 			$Messages->add( sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ), 'error' );

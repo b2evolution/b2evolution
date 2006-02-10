@@ -220,6 +220,8 @@ if( !$Messages->count('error') )
 
 			$Request->param( 'edited_user_login', 'string' );
 			$Request->param_check_not_empty( 'edited_user_login', T_('You must provide a login!') );
+			// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
+			$edited_user_login = strtolower( $edited_user_login );
 
 			if( $current_User->check_perm( 'users', 'edit' ) )
 			{ // changing level/group is allowed (not in profile mode)
@@ -601,6 +603,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.129  2006/02/10 22:33:19  fplanque
+ * logins should be lowercase
+ *
  * Revision 1.128  2006/02/09 00:55:35  blueyed
  * Store user's login MixedCase in DB, the same as with /htsrv/register.php.
  *
