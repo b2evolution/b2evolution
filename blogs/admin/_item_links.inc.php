@@ -7,35 +7,10 @@ if( false )
 }
 
 	$SQL = & new SQL();
+
 	$SQL->SELECT( 'link_ID, link_ltype_ID, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 	$SQL->FROM( 'T_links LEFT JOIN T_files ON link_file_ID = file_ID' );
 	$order_fields = array( 'file_path' );
-
-	if( isset( $EvoConfig->DB['aliases']['T_contacts'] ) )
-	{	// This application handles contacts:
-		$SQL->SELECT_add( ', cont_ID, cont_firstname, cont_lastname' );
-		$SQL->FROM_add( 'LEFT JOIN T_contacts ON link_cont_ID = cont_ID' );
-		$order_fields[] = 'cont_lastname, cont_firstname';
-	}
-
-	if( isset( $EvoConfig->DB['aliases']['T_establishments'] ) )
-	{	// This application handles estabs:
-		$SQL->SELECT_add( ', etab_ID, etab_name' );
-		$SQL->FROM_add( 'LEFT JOIN T_establishments ON link_etab_ID = etab_ID' );
-		$order_fields[] = 'etab_name';
-	}
-
-	if( isset( $EvoConfig->DB['aliases']['T_firms'] ) )
-	{	// This application handles firms:
-		$SQL->SELECT_add( ', firm_ID, firm_name' );
-		$SQL->FROM_add( 'LEFT JOIN T_firms ON link_firm_ID = firm_ID' );
-		$order_fields[] = 'firm_name';
-	}
-
-	// Linked items:
-	$SQL->SELECT_add( ', itm_ID, itm_title' );
-	$SQL->FROM_add( 'LEFT JOIN T_items ON link_dest_itm_ID = itm_ID' );
-	$order_fields[] = 'itm_title';
 
 	$SQL->WHERE( 'link_itm_ID = '.$edited_Item->ID );
 
@@ -48,23 +23,7 @@ if( false )
 	 */
 	function display_type( & $row )
 	{
-		if( !empty($row->cont_ID) )
-		{
-			return T_('Contact');
-		}
-		elseif( !empty($row->etab_ID) )
-		{
-			return T_('Establishment');
-		}
-		elseif( !empty($row->firm_ID) )
-		{
-			return T_('Firm');
-		}
-		elseif( !empty($row->itm_ID) )
-		{
-			return T_('Item');
-		}
-		elseif( !empty($row->file_ID) )
+		if( !empty($row->file_ID) )
 		{
 			return T_('File');
 		}
@@ -109,12 +68,7 @@ if( false )
 	 */
 	function display_link( & $row )
 	{
-		if( !empty($row->itm_ID) )
-		{
-			return '<a href="'.regenerate_url( 'action,itm_ID', 'itm_ID='.$row->itm_ID, 'tasks.php' )
-						.'" title="'.T_('View this item...').'">'.$row->itm_title.'</a>';
-		}
-		elseif( !empty($row->file_ID) )
+		if( !empty($row->file_ID) )
 		{
 			global $current_File, $edited_Item;
 
