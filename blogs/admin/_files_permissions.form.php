@@ -51,7 +51,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-$Form = & new Form( 'files.php', 'form_edit_perms' );
+$Form = & new Form( 'files.php', 'fm_perms_checkchanges' );
+
+$Form->global_icon( T_('Cancel editing!'), 'close',	$Fileman->getCurUrl( ) );
 
 $Form->begin_form( 'fform', T_('Change permissions') );
 	echo $Fileman->getFormHiddenInputs();
@@ -71,7 +73,7 @@ $Form->begin_form( 'fform', T_('Change permissions') );
 			$Form->text_input( 'edit_perms_default', $edit_perms_default, 3, T_('Default permissions') );
 		}
 
-		$Form->info_field( '', '<a id="checkallspan_edit_perms_set" href="#" onclick="toggleCheckboxes(\'form_edit_perms\', \'use_default_perms[]\', \'edit_perms_set\'); return false;">'.T_('check all').'</a>' );
+		$Form->info_field( '', '<a id="checkallspan_edit_perms_set" href="#" onclick="toggleCheckboxes(\'fm_perms_checkchanges\', \'use_default_perms[]\', \'edit_perms_set\'); return false;">'.T_('check all').'</a>' );
 
 		$Form->end_fieldset();
 	}
@@ -93,7 +95,7 @@ $Form->begin_form( 'fform', T_('Change permissions') );
 	while( $l_File = & $selected_Filelist->get_next() )
 	{
 		if( $perms_read_readonly )
-		{ // readonly/write only: display radio inputs to change readonly/write
+		{ // readonly/write only (WINDOWS): display radio inputs to change readonly/write
 			$field_options = $field_options_read_readonly;
 			$field_params = array();
 			if( !empty($use_default_perms_checkbox) )
@@ -102,18 +104,18 @@ $Form->begin_form( 'fform', T_('Change permissions') );
 			}
 
 			$l_perms = $l_File->get_perms( 'octal' );
-			if( $l_perms == 444 )
+			if( $l_perms == 555 )
 			{
 				$field_options[0]['params']['checked'] = 'checked';
 			}
-			elseif( $l_perms == 666 )
+			else
 			{
 				$field_options[1]['params']['checked'] = 'checked';
 			}
 			$Form->radio_input( 'perms['.$l_File->get_md5_ID().']', false, $field_options, $l_File->get_rdfp_rel_path(), $field_params );
 		}
 		else
-		{ // display a text input with unix perms
+		{ // display a text input with UNIX perms
 			$field_params = array();
 			if( !empty($use_default_perms_checkbox) )
 			{
@@ -132,6 +134,10 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.3  2006/02/11 21:17:54  fplanque
+ * fixed permissions on windows;
+ * added bozo validator
+ *
  * Revision 1.2  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
