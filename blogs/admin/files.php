@@ -1075,7 +1075,7 @@ switch( $Fileman->fm_mode )
 	case 'link_item':
 		// We want to link file(s) to an item:
 
-		// TODO: check perms. ??
+		// TODO: maybe this should not be a mode and maybe we shouldhandle linking as soon as we have an $edited_Item ...
 
 		if( !isset($edited_Item) )
 		{ // No Item to link to...
@@ -1084,11 +1084,6 @@ switch( $Fileman->fm_mode )
 		}
 
 		// TODO: check EDIT permissions!
-
-		// Links dialog:
-		$AdminUI->disp_payload_begin();
-		require dirname(__FILE__).'/_files_links.inc.php';
-		$AdminUI->disp_payload_end();
 
 		// we want the file manager in this mode:
 		$Fileman->forceFM = 1;
@@ -1201,6 +1196,12 @@ switch( $Fileman->fm_mode )
 		// File properties (Meta data) dialog:
 		require dirname(__FILE__).'/_file_properties.inc.php';
 		break;
+
+	case 'link_item':
+		// Links dialog:
+		$AdminUI->disp_payload_begin();
+		require dirname(__FILE__).'/_files_links.inc.php';
+		$AdminUI->disp_payload_end();
 }
 
 
@@ -1246,6 +1247,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.159  2006/02/11 21:29:46  fplanque
+ * Fixed display of link_item mode
+ *
  * Revision 1.158  2006/02/10 22:05:07  fplanque
  * Normalized itm links
  *
