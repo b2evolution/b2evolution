@@ -41,7 +41,7 @@ if( false )
 	include('files.php');
 }
 
-$Form = & new Form( 'files.php' );
+$Form = & new Form( 'files.php', 'fm_rename_checkchanges' );
 
 $Form->global_icon( T_('Cancel rename!'), 'close',	$Fileman->getCurUrl( ) );
 
@@ -69,6 +69,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Rename'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.8  2006/02/11 21:19:29  fplanque
+ * added bozo validator to FM
+ *
  * Revision 1.7  2006/01/20 00:39:17  blueyed
  * Refactorisation/enhancements to filemanager.
  *

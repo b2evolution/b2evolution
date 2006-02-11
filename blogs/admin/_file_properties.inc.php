@@ -44,7 +44,7 @@ if( false )
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-$Form = & new Form( 'files.php' );
+$Form = & new Form( 'files.php', 'fm_properties_checkchanges' );
 
 $Form->global_icon( T_('Close properties!'), 'close', $Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
 
@@ -89,6 +89,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.13  2006/02/11 21:19:29  fplanque
+ * added bozo validator to FM
+ *
  * Revision 1.12  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *

@@ -51,7 +51,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-$Form = & new Form( 'files.php' );
+$Form = & new Form( 'files.php', 'fm_download_checkchanges' );
 
 $Form->global_icon( T_('Cancel download!'), 'close',	$Fileman->getCurUrl( ) );
 
@@ -81,6 +81,9 @@ $Form->end_form( array(
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.2  2006/02/11 21:19:29  fplanque
+ * added bozo validator to FM
+ *
  * Revision 1.1  2006/01/24 23:42:17  blueyed
  * Added download form.
  *

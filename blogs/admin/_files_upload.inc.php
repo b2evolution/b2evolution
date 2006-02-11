@@ -168,7 +168,7 @@ if( false )
 	// Begin payload block:
 	$AdminUI->disp_payload_begin();
 
-	$Form = & new Form( 'files.php', '', 'post', 'fieldset', 'multipart/form-data' );
+	$Form = & new Form( 'files.php', 'fm_upload_checkchanges', 'post', 'fieldset', 'multipart/form-data' );
 
 	$Form->global_icon( T_('Quit upload mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
 
@@ -293,6 +293,9 @@ if( false )
 
 /*
  * $Log$
+ * Revision 1.21  2006/02/11 21:19:29  fplanque
+ * added bozo validator to FM
+ *
  * Revision 1.20  2006/01/20 00:39:17  blueyed
  * Refactorisation/enhancements to filemanager.
  *

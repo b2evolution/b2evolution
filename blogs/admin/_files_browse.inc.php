@@ -78,38 +78,30 @@ $AdminUI->disp_payload_begin();
 $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalue' );
 ?>
 
-<form action="files.php#FM_anchor" id="fmbar_filter" class="toolbaritem">
+<form id="fmbar_filter_checkchanges" action="files.php#FM_anchor" class="toolbaritem">
 	<?php
 	echo $Fileman->getFormHiddenInputs( array( 'filterString'=>'', 'filterIsRegexp'=>'' ) );
 	echo $Fileman->getFormHiddenSelectedFiles();
 	?>
 	<label for="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
-	<input type="text"
-		name="filterString"
-		id="filterString"
+	<input type="text" name="filterString" d="filterString"
 		value="<?php echo format_to_output( $Fileman->get_filter( false ), 'formvalue' ) ?>"
-		size="7"
-		accesskey="f" />
+		size="7" accesskey="f" />
+
 	<input type="checkbox" class="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php echo $titleRegExp; ?>"
 		value="1"<?php if( $Fileman->is_filter_regexp() ) echo ' checked="checked"' ?> />
 	<label for="filterIsRegexp" title="<?php echo $titleRegExp; ?>"><?php
 		echo /* TRANS: short for "is regular expression" */ T_('RegExp'); ?></label>
 
-	<input name="actionArray[filter]"
-		class="ActionButton"
-		type="submit"
+	<input type="submit" name="actionArray[filter]" class="ActionButton"
 		value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
 
 	<?php
 	if( $Fileman->is_filtering() )
 	{ // "reset filter" form
 		?>
-		<input value="<?php echo T_('Unset filter'); ?>"
-			title="<?php echo T_('Unset filter'); ?>"
-			type="image"
-			name="actionArray[filter_unset]"
-			class="ActionButton"
-			src="<?php echo get_icon( 'delete', 'url' ) ?>" />
+		<input type="image" name="actionArray[filter_unset]" value="<?php echo T_('Unset filter'); ?>"
+			title="<?php echo T_('Unset filter'); ?>" src="<?php echo get_icon( 'delete', 'url' ) ?>" class="ActionButton" />
 		<?php
 	}
 	?>
@@ -714,13 +706,13 @@ if( $countFiles )
 
 
 /*
- * CREATE:
+ * CREATE TOOLBAR:
  */
 if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ))
 			&& $current_User->check_perm( 'files', 'add' ) )
 { // dir or file creation is enabled and we're allowed to add files:
 ?>
-<form action="files.php#FM_anchor" class="toolbaritem">
+<form id="fmbar_create_checkchanges" action="files.php#FM_anchor" class="toolbaritem">
 	<?php
 		echo $Fileman->getFormHiddenInputs();
 		if( ! $Settings->get( 'fm_enable_create_dir' ) )
@@ -808,40 +800,40 @@ if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add
 // ------------------
 param( 'options_show', 'integer', 0 );
 
-$options_Form = & new Form( 'files.php#FM_anchor', 'options_form', 'get', 'none' );
-	$options_Form->label_to_the_left = false;
-	$options_Form->label_suffix = '';
-	$options_Form->fieldend = '<br />';
-	$options_Form->begin_form( 'fform' );
-	$options_Form->hidden( 'options_show', 1 );
+$Form = & new Form( 'files.php#FM_anchor', 'fm_options_checkchanges', 'get', 'none' );
+	$Form->label_to_the_left = false;
+	$Form->label_suffix = '';
+	$Form->fieldend = '<br />';
+	$Form->begin_form( 'fform' );
+	$Form->hidden( 'options_show', 1 );
 	echo $Fileman->getFormHiddenInputs();
 
 	// Link to toggle the display of the form
 	$toggle_link = '['.get_link_showhide( 'options_toggle', 'options_list', T_('Hide menu'), T_('Show menu'), !$options_show ).']';
 
-	$options_Form->begin_fieldset( T_('Options').$toggle_link );
+	$Form->begin_fieldset( T_('Options').$toggle_link );
 	?>
 
 	<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
 		<?php
-		$options_Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Sort directories at top') );
-		$options_Form->checkbox( 'option_showtypes', $UserSettings->get('fm_showtypes'), T_('Show file types') );
-		$options_Form->checkbox( 'option_showfsperms', $UserSettings->get('fm_showfsperms'), T_('Show file perms') );
-		$options_Form->checkbox( 'option_showfsowner', $UserSettings->get('fm_showfsowner'), T_('Show file owners') );
-		$options_Form->checkbox( 'option_showfsgroup', $UserSettings->get('fm_showfsgroup'), T_('Show file groups') );
-		$options_Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Show hidden files') );
-		$options_Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), T_('Display file permissions like "rwxr-xr-x" rather than short form') );
-		$options_Form->checkbox( 'option_getimagesizes', $UserSettings->get('fm_getimagesizes'), T_('Display the image size of image files') );
-		$options_Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Recursive size of directories') );
-		$options_Form->checkbox( 'option_forceFM', $UserSettings->get('fm_forceFM'), T_('Always show the Filemanager'), 'Display the Filemanager also in modes like upload.' );
+		$Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Sort directories at top') );
+		$Form->checkbox( 'option_showtypes', $UserSettings->get('fm_showtypes'), T_('Show file types') );
+		$Form->checkbox( 'option_showfsperms', $UserSettings->get('fm_showfsperms'), T_('Show file perms') );
+		$Form->checkbox( 'option_showfsowner', $UserSettings->get('fm_showfsowner'), T_('Show file owners') );
+		$Form->checkbox( 'option_showfsgroup', $UserSettings->get('fm_showfsgroup'), T_('Show file groups') );
+		$Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Show hidden files') );
+		$Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), T_('Display file permissions like "rwxr-xr-x" rather than short form') );
+		$Form->checkbox( 'option_getimagesizes', $UserSettings->get('fm_getimagesizes'), T_('Display the image size of image files') );
+		$Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Recursive size of directories') );
+		$Form->checkbox( 'option_forceFM', $UserSettings->get('fm_forceFM'), T_('Always show the Filemanager'), 'Display the Filemanager also in modes like upload.' );
 
-		$options_Form->submit( array('actionArray[update_settings]', T_('Update !'), 'ActionButton') );
+		$Form->submit( array('actionArray[update_settings]', T_('Update !'), 'ActionButton') );
 		?>
 	</div>
 
 	<?php
-	$options_Form->end_fieldset();
-$options_Form->end_form();
+	$Form->end_fieldset();
+$Form->end_form();
 ?>
 
 </div>
@@ -854,6 +846,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.76  2006/02/11 21:19:29  fplanque
+ * added bozo validator to FM
+ *
  * Revision 1.75  2006/02/06 20:05:30  fplanque
  * minor
  *

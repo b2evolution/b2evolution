@@ -60,7 +60,7 @@ if( false )
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-$Form = & new Form( 'files.php' );
+$Form = & new Form( 'files.php', 'fm_copymove_checkchanges' );
 
 $Form->global_icon( T_('Quit copy/move mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
 
@@ -96,6 +96,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.16  2006/02/11 21:19:29  fplanque
+ * added bozo validator to FM
+ *
  * Revision 1.15  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
