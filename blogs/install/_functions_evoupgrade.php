@@ -777,12 +777,8 @@ function upgrade_b2evo_tables()
 		$DB->query( 'ALTER TABLE T_links
 		             MODIFY COLUMN link_datecreated      datetime          not null,
 		             MODIFY COLUMN link_datemodified     datetime          not null,
-		             CHANGE link_item_ID link_itm_ID INT( 11 ) UNSIGNED NOT NULL,
-		             CHANGE link_dest_item_ID link_dest_itm_ID INT( 11 ) UNSIGNED NULL,
-		             DROP INDEX link_item_ID,
-		             DROP INDEX link_dest_item_ID,
-		             ADD INDEX link_itm_ID( link_itm_ID ),
-		             ADD INDEX link_dest_itm_ID (link_dest_itm_ID)' );
+								 CHANGE link_item_ID link_itm_ID INT( 11 ) UNSIGNED NOT NULL
+								 CHANGE link_dest_item_ID link_dest_itm_ID INT( 11 ) UNSIGNED NULL' );
 		echo "OK.<br />\n";
 		// }}}
 
@@ -811,6 +807,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.124  2006/02/11 18:53:57  fplanque
+ * most people don't have relations installed
+ *
  * Revision 1.123  2006/02/11 01:08:20  blueyed
  * Oh what fun it is to drop some "e".
  *
