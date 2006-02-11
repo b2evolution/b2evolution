@@ -272,6 +272,27 @@ function create_b2evo_tables()
 	create_antispam();
 	create_b2evo_tables_phoenix();
 
+	echo 'Creating table for Post Links... ';
+	$DB->query( "CREATE TABLE T_links (
+								link_ID               int(11) unsigned  not null AUTO_INCREMENT,
+								link_datecreated      datetime          not null,
+								link_datemodified     datetime          not null,
+								link_creator_user_ID  int(11) unsigned  not null,
+								link_lastedit_user_ID int(11) unsigned  not null,
+								link_itm_ID           int(11) unsigned  NOT NULL,
+								link_dest_itm_ID      int(11) unsigned  NULL,
+								link_file_ID          int(11) unsigned  NULL,
+								link_ltype_ID         int(11) unsigned  NOT NULL default 1,
+								link_external_url     VARCHAR(255)      NULL,
+								link_title            TEXT              NULL,
+								PRIMARY KEY (link_ID),
+								INDEX link_itm_ID( link_itm_ID ),
+								INDEX link_dest_itm_ID (link_dest_itm_ID),
+								INDEX link_file_ID (link_file_ID)
+							)" );
+	echo "OK.<br />\n";
+
+
 	echo 'Creating plugins table... ';
 	$DB->query( 'CREATE TABLE T_plugins (
 			plug_ID              INT(11) UNSIGNED NOT NULL auto_increment,
@@ -1006,27 +1027,6 @@ function create_b2evo_tables_phoenix()
 	echo "OK.<br />\n";
 
 
-	echo 'Creating table for Post Links... ';
-	$DB->query( "CREATE TABLE T_links (
-								link_ID               int(11) unsigned  not null AUTO_INCREMENT,
-								link_datecreated      datetime          not null,
-								link_datemodified     datetime          not null,
-								link_creator_user_ID  int(11) unsigned  not null,
-								link_lastedit_user_ID int(11) unsigned  not null,
- 								link_itm_ID     		  int(11) unsigned  NOT NULL,
-								link_dest_itm_ID		  int(11) unsigned  NULL,
-								link_file_ID				  int(11) unsigned  NULL,
-								link_ltype_ID				  int(11) unsigned  NOT NULL default 1,
-								link_external_url     VARCHAR(255)      NULL,
-								link_title          	TEXT              NULL,
-								PRIMARY KEY (link_ID),
-								INDEX link_item_ID( link_item_ID ),
-								INDEX link_dest_item_ID (link_dest_item_ID),
-								INDEX link_file_ID (link_file_ID)
-							)" );
-	echo "OK.<br />\n";
-
-
 	echo 'Creating table for base domains... ';
 	$DB->query( "CREATE TABLE T_basedomains (
 								dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1272,8 +1272,8 @@ function create_b2evo_relations()
 											on delete restrict
 											on update restrict' );
 	$DB->query( 'alter table T_links
-								add constraint FK_link_dest_item_ID
-											foreign key (link_dest_item_ID)
+								add constraint FK_link_dest_itm_ID
+											foreign key (link_dest_itm_ID)
 											references T_posts (post_ID)
 											on delete restrict
 											on update restrict' );
@@ -1284,8 +1284,8 @@ function create_b2evo_relations()
 											on delete restrict
 											on update restrict' );
 	$DB->query( 'alter table T_links
-								add constraint FK_link_item_ID
-											foreign key (link_item_ID)
+								add constraint FK_link_itm_ID
+											foreign key (link_itm_ID)
 											references T_posts (post_ID)
 											on delete restrict
 											on update restrict' );
@@ -1353,6 +1353,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.174  2006/02/11 01:08:19  blueyed
+ * Oh what fun it is to drop some "e".
+ *
  * Revision 1.173  2006/02/10 22:05:07  fplanque
  * Normalized itm links
  *

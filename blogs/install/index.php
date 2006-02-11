@@ -124,6 +124,8 @@ if( $config_is_done || (($action != 'start') && ($action != 'default') && ($acti
 
 	if( $DB->error )
 	{ // restart conf
+		// TODO: Use title/headline, or just:
+		// Log::display( T_('MySQL error!'), '', T_('Check your database config settings below and update them if necessary...') );
 		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
 		$action = 'start';
 	}
@@ -616,13 +618,19 @@ to
 
 <?php
 	debug_info(); // output debug info if requested
-?>
 
+
+	// the following comment gets checked in the automatic install script of demo.b2evolution.net:
+?>
+<!-- b2evo-install-end -->
 </body>
 </html>
 <?php
 /*
  * $Log$
+ * Revision 1.89  2006/02/11 01:08:20  blueyed
+ * Oh what fun it is to drop some "e".
+ *
  * Revision 1.88  2006/02/03 19:36:40  fplanque
  * Log::display is insane compared to the simplicity of echo :]
  *

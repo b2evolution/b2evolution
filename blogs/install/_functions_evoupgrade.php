@@ -671,6 +671,27 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
+		echo 'Creating table for Post Links... ';
+		$DB->query( "CREATE TABLE T_links (
+									link_ID               int(11) unsigned  not null AUTO_INCREMENT,
+									link_datecreated      datetime          not null,
+									link_datemodified     datetime          not null,
+									link_creator_user_ID  int(11) unsigned  not null,
+									link_lastedit_user_ID int(11) unsigned  not null,
+									link_item_ID          int(11) unsigned  NOT NULL,
+									link_dest_item_ID     int(11) unsigned  NULL,
+									link_file_ID          int(11) unsigned  NULL,
+									link_ltype_ID         int(11) unsigned  NOT NULL default 1,
+									link_external_url     VARCHAR(255)      NULL,
+									link_title            TEXT              NULL,
+									PRIMARY KEY (link_ID),
+									INDEX link_item_ID( link_item_ID ),
+									INDEX link_dest_item_ID (link_dest_item_ID),
+									INDEX link_file_ID (link_file_ID)
+								)" );
+		echo "OK.<br />\n";
+
+
 		set_upgrade_checkpoint( '9000' );
 
 	}
@@ -756,8 +777,12 @@ function upgrade_b2evo_tables()
 		$DB->query( 'ALTER TABLE T_links
 		             MODIFY COLUMN link_datecreated      datetime          not null,
 		             MODIFY COLUMN link_datemodified     datetime          not null,
-								 CHANGE link_item_ID link_itm_ID INT( 11 ) UNSIGNED NOT NULL
-								 CHANGE link_dest_item_ID link_dest_itm_ID INT( 11 ) UNSIGNED NULL' );
+		             CHANGE link_item_ID link_itm_ID INT( 11 ) UNSIGNED NOT NULL,
+		             CHANGE link_dest_item_ID link_dest_itm_ID INT( 11 ) UNSIGNED NULL,
+		             DROP INDEX link_item_ID,
+		             DROP INDEX link_dest_item_ID,
+		             ADD INDEX link_itm_ID( link_itm_ID ),
+		             ADD INDEX link_dest_itm_ID (link_dest_itm_ID)' );
 		echo "OK.<br />\n";
 		// }}}
 
@@ -786,6 +811,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.123  2006/02/11 01:08:20  blueyed
+ * Oh what fun it is to drop some "e".
+ *
  * Revision 1.122  2006/02/10 22:05:07  fplanque
  * Normalized itm links
  *
