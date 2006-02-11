@@ -2179,7 +2179,11 @@ class Item extends DataObject
 	/**
 	 * Increment the view count of the item directly in DB.
 	 *
-	 * This triggers the plugin event 'ItemViewed'.
+	 * This method serves TWO purposes (that would break if we used dbupdate() ) :
+	 *  - Increment the viewcount WITHOUT affecting the lastmodified date and user.
+	 *  - Incirement the viewcount in an ATOMIC manner (even if several hits on the same Item occur simultaneously).
+	 *
+	 * This also triggers the plugin event 'ItemViewed'.
 	 */
 	function increment_viewcount()
 	{
@@ -2373,6 +2377,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.100  2006/02/11 21:50:07  fplanque
+ * doc
+ *
  * Revision 1.99  2006/02/10 22:08:07  fplanque
  * Various small fixes
  *
