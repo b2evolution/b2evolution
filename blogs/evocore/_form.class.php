@@ -1071,15 +1071,15 @@ class Form extends Widget
 	 */
 	function check_all()
 	{
-		// Need to add event click on links at the form end.		
+		// Need to add event click on links at the form end.
 		$this->check_all = true;
-		
+
 		return '<a name="check_all_nocheckchanges" href="'.regenerate_url().'">'
 				//.T_('Check all').' '
 				.get_icon( 'check_all', 'imgtag', NULL, true )
 				.'</a> | <a name="uncheck_all_nocheckchanges" href="'.regenerate_url().'">'
 				//.T_('Uncheck all').' '
-				.get_icon( 'uncheck_all', 'imgtag', NULL, true ).'</a> '.'&nbsp;';	
+				.get_icon( 'uncheck_all', 'imgtag', NULL, true ).'</a> '.'&nbsp;';
 	}
 
 
@@ -1597,7 +1597,7 @@ class Form extends Widget
 		$r .="\n<select".get_field_attribs_as_string($field_params).'>'
 			 .$field_options
 			 ."</select>\n";
-		
+
 		if( $field_options == $option_new  || $input_class == 'field_error' || !$field_value )
 		{	// The list is empty or there is an error on the combo or no field value, so we have to display the input text:
 			$visible = 'inline';
@@ -1987,14 +1987,19 @@ class Form extends Widget
 	 * It supports array values (one-dimensional) and generates appropriate key-value pairs.
 	 *
 	 * @param array associative array ( name => value ) of hidden fields.
+	 * @param array|NULL A list of keys to ignore.
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function hiddens_by_key( $hiddens )
+	function hiddens_by_key( $hiddens, $exclude = NULL )
 	{
 		$save_output = $this->output;
 		$this->output = false;
 		foreach( $hiddens as $l_name => $l_value )
 		{
+			if( isset($exclude) && in_array( $l_name, $exclude ) )
+			{
+				continue;
+			}
 			if( is_array( $l_value ) )
 			{ // this happens for example when we've POSTed an array (for PHP it's an array then)
 				foreach( $l_value as $ll_key => $ll_value )
@@ -2475,6 +2480,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.111  2006/02/12 14:16:12  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.110  2006/02/10 22:08:07  fplanque
  * Various small fixes
  *
