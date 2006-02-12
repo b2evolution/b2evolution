@@ -84,7 +84,7 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 	echo $Fileman->getFormHiddenSelectedFiles();
 	?>
 	<label for="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
-	<input type="text" name="filterString" d="filterString"
+	<input type="text" name="filterString" id="filterString"
 		value="<?php echo format_to_output( $Fileman->get_filter( false ), 'formvalue' ) ?>"
 		size="7" accesskey="f" />
 
@@ -550,10 +550,10 @@ else
 	?>
 	<tr class="listfooter">
 		<td colspan="<?php echo $filetable_cols ?>">
-		
-		<?php	echo $Form->check_all();	?>	
+
+		<?php	echo $Form->check_all();	?>
 			&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
-				
+
 		<?php
 		if( $mode == 'upload' )
 		{	// We are uploading in a popup opened by an edit screen
@@ -846,6 +846,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.77  2006/02/12 00:17:03  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.76  2006/02/11 21:19:29  fplanque
  * added bozo validator to FM
  *
