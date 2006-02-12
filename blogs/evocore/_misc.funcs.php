@@ -62,8 +62,6 @@ require_once dirname(__FILE__).'/_file.funcs.php';
 /**
  * Format a string/content for being output
  *
- * {@internal format_to_output(-) }}
- *
  * @author fplanque
  * @param string raw text
  * @param string format, can be one of the following
@@ -258,8 +256,6 @@ function zeroise($number, $threshold)
  *
  * Preserves < > and quotes.
  *
- * {@internal convert_chars(-)}}
- *
  * fplanque: simplified
  * sakichan: pregs instead of loop
  */
@@ -354,8 +350,6 @@ function mysql2datestamp( $m )
 /**
  * Format a MYSQL date to current locale date format.
  *
- * {@internal mysql2localedate(-)}}
- *
  * @param string MYSQL date YYYY-MM-DD HH:MM:SS
  */
 function mysql2localedate( $mysqlstring )
@@ -371,8 +365,6 @@ function mysql2localedatetime( $mysqlstring )
 
 /**
  * Format a MYSQL date.
- *
- * {@internal mysql2date(-)}}
  *
  * @param string enhanced format string
  * @param string MYSQL date YYYY-MM-DD HH:MM:SS
@@ -929,8 +921,6 @@ function balanceTags($text)
 /**
  * Clean up the mess PHP has created with its funky quoting everything!
  *
- * {@internal remove_magic_quotes(-)}}
- *
  * @param mixed string or array (function is recursive)
  */
 function remove_magic_quotes( $mixed )
@@ -1376,8 +1366,6 @@ function validate_url( $url, & $allowed_uri_scheme )
 /**
  * Wrap pre tag around var_dump() for better debugging
  *
- * {@internal pre_dump(-) }}
- *
  * @param mixed variable to dump
  * @param string title to display
  */
@@ -1389,6 +1377,7 @@ function pre_dump( $vars )
 		echo htmlspecialchars( var_export( $lvar, true ) ).'<br />';
 	}
 	echo '</pre>';
+	#echo debug_get_backtrace();
 }
 
 
@@ -1622,8 +1611,6 @@ function debug_die( $last_words = '', $force = NULL, $very_last = '</body></html
 /**
  * Outputs debug info. (Typically at the end of the page)
  *
- * {@internal debug_info(-) }}
- *
  * @param boolean true to force output
  */
 function debug_info( $force = false )
@@ -1750,8 +1737,6 @@ function debug_info( $force = false )
  * It will be set in /blogs/evocore/_main.inc.php and handle the output.
  * It strips every line and generates a md5-ETag, which is checked against the one eventually
  * being sent by the browser.
- *
- * {@internal obhandler(-) }}
  *
  * @param string output given by PHP
 */
@@ -2055,7 +2040,7 @@ function action_icon( $title, $icon, $url, $word = NULL )
 		$r .= $word;
 	}
 	$r .= '</a> ';
-	
+
 	return $r;
 }
 
@@ -2203,7 +2188,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			$r .= '" />';
 			break;
 	}
-	
+
 	if( $include_in_legend && isset( $IconLegend ) )
 	{ // This icon should be included into the legend:
 		$IconLegend->add_icon( $iconKey );
@@ -2604,6 +2589,9 @@ function is_admin_page()
 
 /*
  * $Log$
+ * Revision 1.181  2006/02/12 03:14:17  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.180  2006/02/06 20:05:30  fplanque
  * minor
  *
