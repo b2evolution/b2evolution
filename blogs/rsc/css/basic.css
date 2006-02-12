@@ -27,8 +27,7 @@ code {
 
 .nobr,
 .nowrap,
-.line
-{
+.line {
 	white-space: nowrap;
 }
 .left {
@@ -53,11 +52,15 @@ code {
 	font-size: 84%;
 	color: #555;
 }
-.shrinkwrap
-{
+.shrinkwrap {
 	width: 1%;
 	white-space:nowrap;
 	text-align:center;
+}
+
+.filename {
+	font-family:monospace;
+	font-size:larger;
 }
 
 /*
