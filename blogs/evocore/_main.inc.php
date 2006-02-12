@@ -405,11 +405,13 @@ elseif( isset($_GET['login'] ) )
 	unset($_GET['pwd']); // password will be hashed below
 }
 
-
 $Debuglog->add( 'login: '.var_export($login, true), 'login' );
 $Debuglog->add( 'pass: '.( empty($pass) ? '' : 'not' ).' empty', 'login' );
 
-if( !empty($login) && !empty($pass) )
+// either 'login' (normal) or 'redirect_to_backoffice' may be set here. This also helps to display the login form again, if either login or pass were empty.
+$login_action = param( 'login_action', 'array', array() );
+
+if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 { // User is trying to login right now
 	$Debuglog->add( 'User is trying to log in.', 'login' );
 
@@ -444,6 +446,12 @@ if( !empty($login) && !empty($pass) )
 		//  register_globals! (272851261 is the birthday of a lovely person ;)
 		setcookie( 'cookie'.$instance_name.'user', '', 272851261, $cookie_path, $cookie_domain );
 		setcookie( 'cookie'.$instance_name.'pass', '', 272851261, $cookie_path, $cookie_domain );
+
+		if( isset($login_action['redirect_to_backoffice']) )
+		{ // user pressed the "Log into backoffice!" button
+			header_redirect( $admin_url );
+			exit();
+		}
 	}
 }
 elseif( empty($login) && $Session->has_User() )
@@ -528,6 +536,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.86  2006/02/12 14:26:37  blueyed
+ * Fixed and enhanced login form (log into backoffice)
+ *
  * Revision 1.85  2006/02/10 22:08:07  fplanque
  * Various small fixes
  *

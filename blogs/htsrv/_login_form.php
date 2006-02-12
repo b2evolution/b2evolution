@@ -52,7 +52,7 @@ $Form = & new Form( $location, '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
-	$Form->hiddens_by_key( $_POST ); // passthrough POSTed data (when login is required after posting somewhere)
+	$Form->hiddens_by_key( $_POST, array('login_action', 'login') ); // passthrough POSTed data (when login is required after having POSTed something)
 
 	if( !empty($mode) )
 	{ // We're in the process of bookmarkletting something, we don't want to loose it:
@@ -79,7 +79,12 @@ $Form->begin_form( 'fform' );
 
 	echo $Form->fieldstart;
 	echo $Form->inputstart;
-	$Form->submit( array( 'submit', T_('Log in!'), 'search' ) );
+	$Form->submit( array( 'login_action[login]', T_('Log in!'), 'search' ) );
+
+	if( $location != str_replace( '&', '&amp;', $admin_url ) && ! is_admin_page() )
+	{ // provide button to log straight into backoffice, if we would not go there anyway
+		$Form->submit( array( 'login_action[redirect_to_backoffice]', T_('Log into backoffice!'), 'search' ) );
+	}
 	echo $Form->inputend;
 	echo $Form->fieldend;
 
