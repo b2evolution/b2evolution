@@ -909,7 +909,7 @@ switch( $Fileman->fm_mode )
 			break;
 		}
 
-		if( !$Fileman->SourceList->count() )
+		if( ! $Fileman->SourceList || ! $Fileman->SourceList->count() )
 		{
 			$Messages->add( T_('No source files!'), 'error' );
 			$Fileman->fm_mode = NULL;
@@ -1247,6 +1247,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.160  2006/02/13 00:48:56  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.159  2006/02/11 21:29:46  fplanque
  * Fixed display of link_item mode
  *
