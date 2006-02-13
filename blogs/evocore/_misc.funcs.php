@@ -974,26 +974,27 @@ function remove_magic_quotes( $mixed )
 function param( $var, $type = '', $default = '', $memorize = false,
 								$override = false, $forceset = true )
 {
-	global $$var, $global_param_list, $Debuglog, $debug;
+	global $global_param_list, $Debuglog, $debug;
+	// NOTE: we use $GLOBALS[$var] instead of $$var, because otherwise it would conflict with param names which are used as function params ("var", "type", "default", ..)!
 
 	// Check if already set
 	// WARNING: when PHP register globals is ON, COOKIES get priority over GET and POST with this!!!
-	if( !isset( $$var ) || $override )
+	if( !isset( $GLOBALS[$var] ) || $override )
 	{
 		if( isset($_POST[$var]) )
 		{
-			$$var = remove_magic_quotes( $_POST[$var] );
-			// $Debuglog->add( 'param(-): '.$var.'='.$$var.' set by POST', 'params' );
+			$GLOBALS[$var] = remove_magic_quotes( $_POST[$var] );
+			// $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by POST', 'params' );
 		}
 		elseif( isset($_GET[$var]) )
 		{
-			$$var = remove_magic_quotes($_GET[$var]);
-			// $Debuglog->add( 'param(-): '.$var.'='.$$var.' set by GET', 'params' );
+			$GLOBALS[$var] = remove_magic_quotes($_GET[$var]);
+			// $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by GET', 'params' );
 		}
 		elseif( isset($_COOKIE[$var]))
 		{
-			$$var = remove_magic_quotes($_COOKIE[$var]);
-			// $Debuglog->add( 'param(-): '.$var.'='.$$var.' set by COOKIE', 'params' );
+			$GLOBALS[$var] = remove_magic_quotes($_COOKIE[$var]);
+			// $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by COOKIE', 'params' );
 		}
 		elseif( $default === true )
 		{
@@ -1001,8 +1002,8 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		}
 		elseif( $forceset )
 		{
-			$$var = $default;
-			// $Debuglog->add( 'param(-): '.$var.'='.$$var.' set by default', 'params' );
+			$GLOBALS[$var] = $default;
+			// $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by default', 'params' );
 		}
 		else
 		{ // param not found! don't set the variable.
@@ -1012,13 +1013,13 @@ function param( $var, $type = '', $default = '', $memorize = false,
 	}
 	else
 	{ // Variable was already set but we need to remove the auto quotes
-		$$var = remove_magic_quotes($$var);
+		$GLOBALS[$var] = remove_magic_quotes($GLOBALS[$var]);
 
-		// $Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($$var, true).']!', 'params' );
+		// $Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($GLOBALS[$var], true).']!', 'params' );
 	}
 
 	// type will be forced even if it was set before and not overriden
-	if( !empty($type) && $$var !== NULL )
+	if( !empty($type) && $GLOBALS[$var] !== NULL )
 	{ // Force the type
 		// echo "forcing type!";
 		switch( $type )
@@ -1029,37 +1030,37 @@ function param( $var, $type = '', $default = '', $memorize = false,
 				break;
 
 			case 'string':
-				// echo $var, '=', $$var, '<br />';
-				$$var = trim( strip_tags($$var) );
+				// echo $var, '=', $GLOBALS[$var], '<br />';
+				$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
 				break;
 
 			default:
-				if( $$var === '' )
+				if( $GLOBALS[$var] === '' )
 				{
 					// fplanque> note: there might be side effects to this, but we need
 					// this to distinguish between 0 and 'no input'
-					$$var = NULL;
+					$GLOBALS[$var] = NULL;
 					$Debuglog->add( 'param(-): <strong>'.$var.'</strong> set to NULL', 'params' );
 				}
 				elseif( substr( $type, 0, 1 ) == '/' )
 				{	// We want to match against a regexp:
-					if( preg_match( $type, $$var ) )
+					if( preg_match( $type, $GLOBALS[$var] ) )
 					{	// Okay, match
 						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> matched against '.$type, 'params' );
 					}
 					else
 					{
-						$$var = $default;
-						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> DID NOT match '.$type.' set to default value='.$$var, 'params' );
+						$GLOBALS[$var] = $default;
+						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> DID NOT match '.$type.' set to default value='.$GLOBALS[$var], 'params' );
 					}
 					// From now on, consider this as a string: (we need this when memorizing)
 					$type = 'string';
 				}
 				else
 				{
-					settype( $$var, $type );
-					$Debuglog->add( 'param(-): <strong>'.$var.'</strong> typed to '.$type.', new value='.$$var, 'params' );
+					settype( $GLOBALS[$var], $type );
+					$Debuglog->add( 'param(-): <strong>'.$var.'</strong> typed to '.$type.', new value='.$GLOBALS[$var], 'params' );
 				}
 		}
 	}
@@ -1069,8 +1070,8 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		memorize_param( $var, $type, $default );
 	}
 
-	// echo $var, '(', gettype($$var), ')=', $$var, '<br />';
-	return $$var;
+	// echo $var, '(', gettype($GLOBALS[$var]), ')=', $GLOBALS[$var], '<br />';
+	return $GLOBALS[$var];
 }
 
 
@@ -2589,8 +2590,8 @@ function is_admin_page()
 
 /*
  * $Log$
- * Revision 1.181  2006/02/12 03:14:17  blueyed
- * *** empty log message ***
+ * Revision 1.182  2006/02/13 15:40:37  blueyed
+ * param(): use $GLOBALS instead of $$var again, but this time with a good reason.
  *
  * Revision 1.180  2006/02/06 20:05:30  fplanque
  * minor
