@@ -315,7 +315,8 @@ while( $lFile = & $Fileman->get_next() )
 	/***********  Hidden info used by Javascript:  ***********/
 
 	if( $mode == 'upload' )
-	{
+	{	// This mode allows to insert img tags into the post...
+		// Hidden info used by Javascript:
 		echo '<input type="hidden" name="img_tag_'.$countFiles.'" id="img_tag_'.$countFiles
 		    .'" value="'.format_to_output( $lFile->get_tag(), 'formvalue' ).'">';
 	}
@@ -841,6 +842,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.80  2006/02/13 21:40:30  fplanque
+ * fixed memorizing of the mode when uploading/inserting IMGs into posts.
+ *
  * Revision 1.79  2006/02/13 20:20:09  fplanque
  * minor / cleanup
  *

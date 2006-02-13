@@ -1211,7 +1211,8 @@ class File extends DataObject
 
 		if( $this->is_dir() )
 		{ // Directory
-			return regenerate_url( 'root,path', 'root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
+			// Note: we make sure that the mode is fileman and not upload (we cannot insert IMG tags from a sub-popup)
+			return regenerate_url( 'root,path,mode', 'mode=fileman&amp;root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
 		}
 		else
 		{ // File
@@ -1338,6 +1339,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.63  2006/02/13 21:40:30  fplanque
+ * fixed memorizing of the mode when uploading/inserting IMGs into posts.
+ *
  * Revision 1.62  2006/02/10 22:05:07  fplanque
  * Normalized itm links
  *

@@ -33,8 +33,7 @@ if( $blog != $user_selected_blog )
 	$UserSettings->dbupdate();
 }
 
-param( 'mode', 'string', '' );  // Sidebar, bookmarklet
-
+param( 'mode', 'string', '', true );  // Sidebar, bookmarklet, upload (upload actually means th like: select img for post)
 
 // Get the Admin skin
 // TODO: Allow setting through GET param (dropdown in backoffice), respecting a checkbox "Use different setting on each computer" (if cookie_state handling is ready)
