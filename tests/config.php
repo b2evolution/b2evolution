@@ -38,9 +38,36 @@ if( !defined( 'TMPDIR' ) )
  * TODO: not sure, if we should really load everything. We'd need at least
  *       to define EVO_MAIN_INIT to load single class files, ...
  */
-#define( 'EVO_MAIN_INIT', 'SIMPLETEST' );
-#require_once( EVODIR.'blogs/conf/_config.php' );
-require_once( EVODIR.'blogs/evocore/_main.inc.php' );
+define( 'EVO_MAIN_INIT', 'SIMPLETEST' );
+require_once( EVODIR.'blogs/conf/_config.php' );
+require_once( EVODIR.'blogs/evocore/_misc.funcs.php' );
+require_once( EVODIR.'blogs/evocore/_blog.funcs.php' );
+require_once( EVODIR.'blogs/evocore/_category.funcs.php' );
+require_once( EVODIR.'blogs/evocore/_item.funcs.php' );
+require_once( EVODIR.'blogs/evocore/_dataobject.class.php' );
+require_once( EVODIR.'blogs/evocore/_log.class.php' );
+
+require_once( EVODIR.'blogs/evocore/_abstractsettings.class.php' );
+require_once( EVODIR.'blogs/evocore/_generalsettings.class.php' );
+
+require_once( EVODIR.'blogs/evocore/_filecache.class.php' );
+require_once( EVODIR.'blogs/evocore/_item.class.php' );
+require_once( EVODIR.'blogs/evocore/_fileroot.class.php' );
+require_once( EVODIR.'blogs/evocore/_filerootcache.class.php' );
+require_once( EVODIR.'blogs/evocore/_filetype.class.php' );
+require_once( EVODIR.'blogs/evocore/_filetypecache.class.php' );
+
+require_once( EVODIR.'blogs/evocore/_usercache.class.php' );
+require_once( EVODIR.'blogs/evocore/_user.class.php' );
+require_once( EVODIR.'blogs/evocore/_group.class.php' );
+require_once( EVODIR.'blogs/evocore/_results.class.php' );
+require_once( EVODIR.'blogs/evocore/_timer.class.php' );
+
+require_once( EVODIR.'blogs/evocore/_db.class.php' );
+
+require_once( EVODIR.'blogs/evocore/_plugins.class.php' );
+
+#require_once( EVODIR.'blogs/evocore/_main.inc.php' );
 
 
 /**
@@ -52,7 +79,7 @@ require_once( EVODIR.'blogs/evocore/_main.inc.php' );
  *
  * These settings override the defaults from {@link $EvoConfig->DB}
  *
- * This is used to create {@link DbUnitTestCase::DB the test DB object}
+ * This is used to create {@link DbUnitTestCase::test_DB the test DB object}
  * in the class {@link DbUnitTestCase}, which gets used for tests that
  * need a real database connection.
  *
@@ -75,10 +102,10 @@ $testDB_conf = array_merge( array(
 		# 'table_options' => ' ENGINE=InnoDB ',
 		// Development settings:
 		# 'table_options' => ' ENGINE=InnoDB DEFAULT CHARSET=utf8 ',
+		'new_link' => true,            // Create a new link to the DB! This is required to not interfere with the normal connection (used DB).
 	),
 	$testDB_conf );
 
 // Use default aliases, if not set
 $testDB_conf['aliases'] = array_merge( $EvoConfig->DB['aliases'], isset($testDB_conf['aliases']) ? $testDB_conf['aliases'] : array() );
-
 ?>

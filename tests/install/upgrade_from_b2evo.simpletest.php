@@ -27,8 +27,10 @@ class UpgradeTo1_6TestCase extends InstallUnitTestCase
 	{
 		parent::setUp();
 
-		$this->old_sql_mode = $this->DB->get_var( 'SELECT @@sql_mode' );
-		$this->DB->query( 'SET sql_mode = ""' );
+		$this->dropTestDbTables();
+
+		$this->old_sql_mode = $this->test_DB->get_var( 'SELECT @@sql_mode' );
+		$this->test_DB->query( 'SET sql_mode = ""' );
 	}
 
 
@@ -36,10 +38,10 @@ class UpgradeTo1_6TestCase extends InstallUnitTestCase
 	{
 		global $new_db_version;
 
-		$this->assertEqual( $new_db_version, $this->DB->get_var('SELECT set_value FROM T_settings WHERE set_name = "db_version"') );
-		$this->assertEqual( $this->DB->get_var( 'SELECT COUNT(*) FROM T_plugins' ), $this->nr_of_basic_plugins );
+		$this->assertEqual( $new_db_version, $this->test_DB->get_var('SELECT set_value FROM T_settings WHERE set_name = "db_version"') );
+		$this->assertEqual( $this->test_DB->get_var( 'SELECT COUNT(*) FROM T_plugins' ), $this->nr_of_basic_plugins );
 
-		$this->DB->query( 'SET sql_mode = "'.$this->old_sql_mode.'"' );
+		$this->test_DB->query( 'SET sql_mode = "'.$this->old_sql_mode.'"' );
 
 		parent::tearDown();
 	}

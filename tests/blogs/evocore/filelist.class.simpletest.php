@@ -26,7 +26,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 	{
 		parent::setUp();
 
-		$this->Filelist = new Filelist( false, 'user', 1 );
+		$this->Filelist = new Filelist( false, new FileRoot( 'user', 1 ) );
 	}
 
 
@@ -143,6 +143,22 @@ class FilelistTestCase extends FilemanUnitTestCase
 		$this->assertEqual( $this->Filelist->count_files(), 0 );
 
 		$this->assertEqual( $this->Filelist->get_next(), false, 'No file returned.' );
+	}
+
+
+	/**
+	 *
+	 */
+	function testRemoveAfterMove()
+	{
+		$File = new File( 'user', 1, 'a' );
+		$this->Filelist->add( $File );
+
+		// TODO: move method to Filelist!
+		#$this->Filelist->move_File( $File, 'user', 2, 'b' );
+
+		$this->assertTrue( $this->Filelist->remove( $File ) );
+		$this->assertEqual( $this->Filelist->count_files(), 0 );
 	}
 
 

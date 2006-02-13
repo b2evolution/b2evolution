@@ -26,6 +26,7 @@ class Install_self extends InstallUnitTestCase
 
 	function setUp()
 	{
+		parent::setUp();
 		$this->dropTestDbTables();
 	}
 
@@ -33,7 +34,10 @@ class Install_self extends InstallUnitTestCase
 	function tearDown()
 	{
 		global $new_db_version;
-		$this->assertEqual( $new_db_version, $this->DB->get_var('SELECT set_value FROM T_settings WHERE set_name = "db_version"') );
+
+		parent::tearDown();
+
+		$this->assertEqual( $new_db_version, $this->test_DB->get_var('SELECT set_value FROM T_settings WHERE set_name = "db_version"') );
 		$this->dropTestDbTables();
 	}
 
@@ -45,13 +49,11 @@ class Install_self extends InstallUnitTestCase
 	{
 		require_once( EVODIR.'blogs/install/_functions_create.php' );
 
-		$GLOBALS['DB'] = $this->DB;
-
 		create_b2evo_tables();
 		populate_main_tables();
 		install_basic_plugins();
 
-		$this->assertEqual( $this->DB->get_var( 'SELECT COUNT(*) FROM T_plugins' ), $this->nr_of_basic_plugins );
+		$this->assertEqual( $this->test_DB->get_var( 'SELECT COUNT(*) FROM T_plugins' ), $this->nr_of_basic_plugins );
 	}
 }
 

@@ -24,22 +24,21 @@ class FileTestCase extends FilemanUnitTestCase
 
 	function setUp()
 	{
-		global $Settings;
-
 		parent::setUp();
 
+		Mock::generate('GeneralSettings');
 
-		$this->_old_fm_enable_roots_user = $Settings->get('fm_enable_roots_user');
-		$Settings->set( 'fm_enable_roots_user', 1 );
+		$this->old_Settings = & $GLOBALS['Settings'];
+		$GLOBALS['Settings'] = new MockGeneralSettings();
+		$GLOBALS['Settings']->setReturnValue( 'get', 1, array( 'fm_enable_roots_user' ) );
 	}
 
 
 	function tearDown()
 	{
-		global $Settings;
 		parent::tearDown();
 
-		$Settings->set( 'fm_enable_roots_user', $this->_old_fm_enable_roots_user );
+		$GLOBALS['Settings'] = & $this->old_Settings;
 		$this->unlinkCreatedFiles();
 	}
 

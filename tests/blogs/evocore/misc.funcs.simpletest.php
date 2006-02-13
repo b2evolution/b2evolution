@@ -137,6 +137,26 @@ class MiscFuncsTestCase extends UnitTestCase
 		}
 	}
 
+
+	function test_implode_with_and()
+	{
+		$this->assertEqual(
+			implode_with_and( array() ),
+			'' );
+
+		$this->assertEqual(
+			implode_with_and( array('one') ),
+			'one' );
+
+		$this->assertEqual(
+			implode_with_and( array('one', 'two') ),
+			'one and two' );
+
+		$this->assertEqual(
+			implode_with_and( array('one', 'two', 'three') ),
+			'one, two and three' );
+	}
+
 }
 
 
