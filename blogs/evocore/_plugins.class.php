@@ -137,6 +137,7 @@ class Plugins
 	 *
 	 * Gets lazy-filled in {@link get_supported_events()}.
 	 *
+	 * @access protected
 	 * @var array
 	 */
 	var $_supported_events;
@@ -2040,6 +2041,9 @@ class Plugins_no_DB extends Plugins
 
 /*
  * $Log$
+ * Revision 1.49  2006/02/13 15:42:48  blueyed
+ * no message
+ *
  * Revision 1.48  2006/02/06 18:12:47  blueyed
  * *** empty log message ***
  *
