@@ -235,6 +235,9 @@ class DB
 	 *    - 'table_options': sets {@link $table_options}
 	 *    - 'use_transactions': sets {@link $use_transactions}
 	 *    - 'aliases': Aliases for tables (array( alias => table name )); Default: no aliases.
+	 *    - 'new_link': create a new link to the DB, even if there was a mysql_connect() with
+	 *       the same params before.
+	 *    - 'client_flags': optional settings like compression or SSL encryption. See {@link http://www.php.net/manual/en/ref.mysql.php#mysql.client-flags}.
 	 */
 	function DB( $params )
 	{
@@ -270,13 +273,16 @@ class DB
 			}
 		}
 
+		$new_link = isset( $params['new_link'] ) ? $params['new_link'] : false;
+		$client_flags = isset( $params['client_flags'] ) ? $params['client_flags'] : 0;
+
 		// Connect to the Database:
-		$this->dbhandle = @mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword );
+		$this->dbhandle = @mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags );
 
 		if( ! $this->dbhandle )
 		{
 			$this->print_error( '<p><strong>Error establishing a database connection!</strong></p>
-				<p>('.mysql_error().')</p>
+				<p>('.mysql_error($this->dbhandle).')</p>
 				<ol>
 					<li>Are you sure you have typed the correct user/password?</li>
 					<li>Are you sure that you have typed the correct hostname?</li>
@@ -339,7 +345,7 @@ class DB
 	 */
 	function escape($str)
 	{
-		return mysql_real_escape_string($str);
+		return mysql_real_escape_string($str, $this->dbhandle);
 	}
 
 
@@ -353,7 +359,7 @@ class DB
 		if( $str === NULL )
 			return 'NULL';
 		else
-			return "'".mysql_real_escape_string($str)."'";
+			return "'".mysql_real_escape_string($str, $this->dbhandle)."'";
 	}
 
 
@@ -424,7 +430,7 @@ class DB
 		$this->error = true;
 
 		// If no special error string then use mysql default..
-		$this->last_error = empty($str) ? ( '<p>'.mysql_error().'(Errno='.mysql_errno().')</p>' ) : $str;
+		$this->last_error = empty($str) ? ( '<p>'.mysql_error($this->dbhandle).'(Errno='.mysql_errno($this->dbhandle).')</p>' ) : $str;
 
 		// Log this error to the global array..
 		$EZSQL_ERROR[] = array(
@@ -504,6 +510,7 @@ class DB
 		// echo $this->func_call, '<br />';
 
 		// Replace aliases:
+		// TODO: this should only replace the table name part(s), not the whole query!
 		$query = preg_replace( $this->dbaliases, $this->dbreplaces, $query );
 		// echo '<p>'.$query.'</p>';
 
@@ -545,7 +552,7 @@ class DB
 		}
 
 		// If there is an error then take note of it..
-		if( mysql_error() )
+		if( mysql_error($this->dbhandle) )
 		{
 			$this->print_error( '', $title );
 			return false;
@@ -554,7 +561,7 @@ class DB
 		if( preg_match( '#^ \s* (insert|delete|update|replace) \s #ix', $query) )
 		{ // Query was an insert, delete, update, replace:
 
-			$this->rows_affected = mysql_affected_rows();
+			$this->rows_affected = mysql_affected_rows($this->dbhandle);
 			$this->queries[ $this->num_queries - 1 ]['rows'] = $this->rows_affected;
 
 			// Take note of the insert_id
@@ -764,7 +771,7 @@ class DB
 
 
 	/**
-	 * Get a column as comma-seperated list.
+	 * Get a column as comma-separated list.
 	 *
 	 * @param string|NULL Query to execute
 	 * @param integer Column of the result set
@@ -1167,6 +1174,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.54  2006/02/13 00:40:25  blueyed
+ * new_link and client_flags param for mysql_connect(). Also pass the $dbhandle to every mysql_*() function.
+ *
  * Revision 1.53  2006/02/05 19:04:48  blueyed
  * doc fixes
  *
