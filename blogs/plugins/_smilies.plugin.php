@@ -96,13 +96,8 @@ class smilies_plugin extends Plugin
 		<script type="text/javascript">
 		function grin(tag)
 		{
-			var myField;
-			if (document.getElementById('content') && document.getElementById('content').type == 'textarea') {
-				myField = document.getElementById('content');
-			}
-			else {
-				return false;
-			}
+			var myField = b2evoCanvas;
+
 			if (document.selection) {
 				myField.focus();
 				sel = document.selection.createRange();
@@ -140,7 +135,7 @@ class smilies_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * @see Plugin::RenderItemAsHtml
+	 * @see Plugin::RenderItemAsHtml()
 	 */
 	function RenderItemAsHtml( & $params )
 	{
