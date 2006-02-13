@@ -34,7 +34,7 @@
 #filemanmain table.grouped td.type {
 	white-space:nowrap;
 }
-#filemanmain table.grouped td.filename {
+#filemanmain table.grouped td.fm_filename {
 	width:100%;
 	text-align: left;
 }
