@@ -821,7 +821,7 @@ switch( $Fileman->fm_mode )
 					$success_msg .=
 						'<ul>'
 							.'<li>'.T_("Here's the code to display it:").' <input type="text" value="'.$img_tag.'" /></li>'
-							.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_replace_selection( window.opener.document.post.content, \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', window.opener.document ); } return false;">'.T_('Add the code to your post !').'</a></li>'
+							.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_replace_selection( window.opener.document.item_checkchanges.itemform_post_content, \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', window.opener.document ); } return false;">'.T_('Add the code to your post !').'</a></li>'
 						.'</ul>';
 				}
 
@@ -1247,8 +1247,8 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
- * Revision 1.160  2006/02/13 00:48:56  blueyed
- * *** empty log message ***
+ * Revision 1.161  2006/02/13 01:05:20  blueyed
+ * Fix IDs to the item textarea.
  *
  * Revision 1.159  2006/02/11 21:29:46  fplanque
  * Fixed display of link_item mode

@@ -695,7 +695,7 @@ if( $countFiles )
 					return true;
 				}
 				window.opener.focus();
-				textarea_replace_selection( window.opener.document.post.content, snippet, window.opener.document );
+				textarea_replace_selection( window.opener.document.item_checkchanges.itemform_post_content, snippet, window.opener.document );
 				return true;
 			}
 		}
@@ -846,8 +846,8 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
- * Revision 1.77  2006/02/12 00:17:03  blueyed
- * *** empty log message ***
+ * Revision 1.78  2006/02/13 01:05:20  blueyed
+ * Fix IDs to the item textarea.
  *
  * Revision 1.76  2006/02/11 21:19:29  fplanque
  * added bozo validator to FM
