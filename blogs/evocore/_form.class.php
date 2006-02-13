@@ -1066,6 +1066,7 @@ class Form extends Widget
 		return $this->checkbox_input( $field_name, $field_checked, $field_label, $field_params );
 	}
 
+
 	/**
 	 * Return links to check and uncheck all check boxes of the form
 	 */
@@ -1081,7 +1082,6 @@ class Form extends Widget
 				//.T_('Uncheck all').' '
 				.get_icon( 'uncheck_all', 'imgtag', NULL, true ).'</a> '.'&nbsp;';
 	}
-
 
 
 	/**
@@ -1137,7 +1137,10 @@ class Form extends Widget
 		if( preg_match( '#^(.*)_checkchanges#', $this->form_name ) && !empty( $this->title ) )
 		{ // This form will trigger the bozo validator and has a title, preset a localized bozo confirm message:
 			$r .= '<script type="text/javascript">
-		 						bozo.confirm_mess = "'.sprintf(T_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to loose your edits.\nAre you sure?' ), $this->title ).'";
+								if( typeof bozo == "object" )
+								{
+									bozo.confirm_mess = "'.sprintf(T_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to loose your edits.\nAre you sure?' ), $this->title ).'";
+								}
 		 				</script>';
 		}
 
@@ -1181,13 +1184,17 @@ class Form extends Widget
 
 		// When the page loads, Initialize all the parent child select lists
 		$r .= '<script type="text/javascript">
-							if( addEvent ) { addEvent( window, "load", init_dynamicSelect, false ); }
+							if( typeof addEvent == "function" )
+							{
+								addEvent( window, "load", init_dynamicSelect, false );
+								';
+								if( $this->check_all )
+								{ // Init check_all event on check_all links
+									$r .= 'addEvent( window, "load", init_check_all, false );';
+								}
+								$r .= '
+							}
 						</script>';
-
-		if( $this->check_all )
-		{// Init check_all event on check_all links
-			echo '<script type="text/javascript">addEvent( window, "load", init_check_all, false )</script>' ;
-		}
 
 		// Reset (in case we re-use begin_form! NOTE: DO NOT REUSE begin_form, it's against the spec.)
 		$this->hiddens = array();
@@ -1441,7 +1448,7 @@ class Form extends Widget
 	 * Display a select field and populate it with a cache object.
 	 *
 	 * @param string field name
-	 * @param string string containing options '<option ...</option>'
+	 * @param string string containing options '<option>...</option>'
 	 * @param string field label to be display before the field
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - 'label': Field label to be display before the field
@@ -1553,6 +1560,7 @@ class Form extends Widget
 
 		return $this->select_input_options( $field_name, $options_list, $field_label, $field_params );
 	}
+
 
 	/**
 	 * Combo box
@@ -2480,6 +2488,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.112  2006/02/13 15:33:37  blueyed
+ * JS error fixes
+ *
  * Revision 1.111  2006/02/12 14:16:12  blueyed
  * *** empty log message ***
  *
