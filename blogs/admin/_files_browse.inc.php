@@ -45,6 +45,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
+echo '<div id="filemanmain">';
 
 ?>
 
@@ -296,9 +297,7 @@ $Fileman->sort();
 $countFiles = 0;
 while( $lFile = & $Fileman->get_next() )
 { // Loop through all Files:
-	echo '<tr';
-	if( $countFiles%2 ) echo ' class="odd"';
-	echo '>';
+	echo '<tr class="'.( $countFiles%2 ? 'odd' : 'even' ).'">';
 
 	/********************    Checkbox:    *******************/
 
@@ -551,7 +550,7 @@ else
 	<tr class="listfooter">
 		<td colspan="<?php echo $filetable_cols ?>">
 
-		<?php	echo $Form->check_all();	?>
+		<?php	echo $Form->check_all(); ?>
 			&mdash; <strong><?php echo T_('With selected files:') ?> </strong>
 
 		<?php
@@ -812,10 +811,10 @@ $Form = & new Form( 'files.php#FM_anchor', 'fm_options_checkchanges', 'get', 'no
 	$toggle_link = '['.get_link_showhide( 'options_toggle', 'options_list', T_('Hide menu'), T_('Show menu'), !$options_show ).']';
 
 	$Form->begin_fieldset( T_('Options').$toggle_link );
-	?>
 
-	<div id="options_list"<?php if( !$options_show ) echo ' style="display:none"' ?>>
-		<?php
+	echo '<div id="options_list" ';
+	if( !$options_show ) echo ' style="display:none"';
+	echo '>';
 		$Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Sort directories at top') );
 		$Form->checkbox( 'option_showtypes', $UserSettings->get('fm_showtypes'), T_('Show file types') );
 		$Form->checkbox( 'option_showfsperms', $UserSettings->get('fm_showfsperms'), T_('Show file perms') );
@@ -828,17 +827,13 @@ $Form = & new Form( 'files.php#FM_anchor', 'fm_options_checkchanges', 'get', 'no
 		$Form->checkbox( 'option_forceFM', $UserSettings->get('fm_forceFM'), T_('Always show the Filemanager'), 'Display the Filemanager also in modes like upload.' );
 
 		$Form->submit( array('actionArray[update_settings]', T_('Update !'), 'ActionButton') );
-		?>
-	</div>
+	echo '</div>';
 
-	<?php
 	$Form->end_fieldset();
 $Form->end_form();
 ?>
 
 </div>
-
-<div class="clear"></div>
 
 <?php
 // End payload block:
@@ -846,6 +841,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.79  2006/02/13 20:20:09  fplanque
+ * minor / cleanup
+ *
  * Revision 1.78  2006/02/13 01:05:20  blueyed
  * Fix IDs to the item textarea.
  *

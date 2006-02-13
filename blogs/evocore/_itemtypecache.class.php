@@ -35,7 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_dataobjectcache.class.php';
 
 /**
- * Division Class
+ * ItemTypeCache Class
  *
  * @package gsbcore
  */
@@ -57,11 +57,12 @@ class ItemTypeCache extends DataObjectCache
 	 *
 	 * @param table Database row
 	 */
-	function ItemTypeCache( $db_row = NULL )
+	function ItemTypeCache()
 	{
 		// Call parent constructor:
 		parent::DataObjectCache( 'ItemType', true, 'T_itemtypes', 'ityp_', 'ityp_ID' );
 	}
+
 
 	/**
 	 * Load a list of item types for a given collection and store them into the collection cache
@@ -124,7 +125,7 @@ class ItemTypeCache extends DataObjectCache
 
 		// TODO: move this away
 		if( empty( $default ) )
-		{	// No default param, so we set it to the collection item type by default if exist else to 0 
+		{	// No default param, so we set it to the collection item type by default if exist else to 0
 			$default = isset( $this->col_default[$col_ID] ) ? $this->col_default[$col_ID] : 0 ;
 		}
 

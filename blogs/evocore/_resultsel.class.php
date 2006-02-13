@@ -165,21 +165,12 @@ class ResultSel extends Results
    */
 	function display_filters()
 	{
-		if( !empty($this->filters_callback) )
-		{
-			echo $this->replace_vars( $this->params['filters_start'] );
+		global $current_User;
 
-			echo T_('Filters').': ';
+		// If the user can do selections, there is already a form surrounding the results, so we don't need a new one:
+		$need_new_form = ! $current_User->check_perm( 'selections', 'view' );
 
-			$func = $this->filters_callback;
-
-			if( ! $func( $this->Form ) )
-			{	// Function has not displayed the filter button yet:
-				$this->Form->submit( array( 'filter_submit', T_('Filter list'), 'search' ) );
-			}
-
-			echo $this->params['filters_end'];
-		}
+		parent::display_filters( $need_new_form );
 	}
 
 
@@ -623,6 +614,9 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 
 /*
  * $Log$
+ * Revision 1.12  2006/02/13 20:20:09  fplanque
+ * minor / cleanup
+ *
  * Revision 1.11  2006/02/03 21:58:05  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
  *

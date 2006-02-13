@@ -1134,11 +1134,12 @@ class Form extends Widget
 							var tab_dynamicSelects = Array();
 						</script>';
 
+		// TODO: check if bozo validator is activated in PHP
 		if( preg_match( '#^(.*)_checkchanges#', $this->form_name ) && !empty( $this->title ) )
 		{ // This form will trigger the bozo validator and has a title, preset a localized bozo confirm message:
 			$r .= '<script type="text/javascript">
 								if( typeof bozo == "object" )
-								{
+								{	// If Bozo validator is active:
 									bozo.confirm_mess = "'.sprintf(T_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to loose your edits.\nAre you sure?' ), $this->title ).'";
 								}
 		 				</script>';
@@ -2488,6 +2489,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.113  2006/02/13 20:20:09  fplanque
+ * minor / cleanup
+ *
  * Revision 1.112  2006/02/13 15:33:37  blueyed
  * JS error fixes
  *

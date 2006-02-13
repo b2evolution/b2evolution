@@ -34,7 +34,7 @@
 require_once dirname(__FILE__). '/_header.php';
 
 $AdminUI->set_path( 'options', 'types' );
-$edited_table = 'T_posttypes';
+$edited_table = 'T_itemtypes';
 $edited_table_IDcol = 'ptyp_ID';
 $edited_table_namecol = 'ptyp_name';
 $default_col_order = '-A';

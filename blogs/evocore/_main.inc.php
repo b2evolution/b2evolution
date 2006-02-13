@@ -319,8 +319,8 @@ require_once dirname(__FILE__).'/_usercache.class.php';
 $Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
 $Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
 $Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', '& new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\' )' );
-$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', '& new DataObjectCache( \'Element\', true, \'T_posttypes\', \'ptyp_\', \'ptyp_ID\' )' );
-$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', '& new DataObjectCache( \'Element\', true, \'T_poststatuses\', \'pst_\', \'pst_ID\' )' );
+$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', '& new DataObjectCache( \'Element\', true, \'T_itemtypes\', \'ptyp_\', \'ptyp_ID\' )' );
+$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', '& new DataObjectCache( \'Element\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\' )' );
 
 // Caches that are not meant to be loaded in total:
 $BlogCache = & new BlogCache();
@@ -536,6 +536,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.87  2006/02/13 20:20:09  fplanque
+ * minor / cleanup
+ *
  * Revision 1.86  2006/02/12 14:26:37  blueyed
  * Fixed and enhanced login form (log into backoffice)
  *

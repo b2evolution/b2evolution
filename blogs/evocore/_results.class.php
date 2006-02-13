@@ -621,16 +621,21 @@ class Results extends Widget
 
   /**
    * Display the filtering form
+   *
+   * @param boolean Do we need to create a new form for the filters (this is useful for ResultSel)
    */
-	function display_filters()
+	function display_filters( $create_new_form = true )
 	{
 		if( !empty($this->filters_callback) )
 		{
 			echo $this->replace_vars( $this->params['filters_start'] );
 
-			$this->Form = new Form( regenerate_url(), $this->param_prefix.'form_search', 'post', 'none' ); // COPY!!
+			if( $create_new_form )
+			{	// We do not already have a form surrounding the whole rsult list:
+				$this->Form = new Form( regenerate_url(), $this->param_prefix.'form_search', 'post', 'none' ); // COPY!!
 
-			$this->Form->begin_form( '' );
+				$this->Form->begin_form( '' );
+			}
 
 			echo T_('Filters').': ';
 
@@ -641,7 +646,10 @@ class Results extends Widget
 				$this->Form->submit( array( 'filter_submit', T_('Filter list'), 'search' ) );
 			}
 
-			$this->Form->end_form( '' );
+			if( $create_new_form )
+			{	// We do not already have a form surrounding the whole rsult list:
+				$this->Form->end_form( '' );
+			}
 
 			echo $this->params['filters_end'];
 		}
@@ -1492,6 +1500,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.51  2006/02/13 20:20:09  fplanque
+ * minor / cleanup
+ *
  * Revision 1.50  2006/02/10 22:08:07  fplanque
  * Various small fixes
  *

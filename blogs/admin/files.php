@@ -909,7 +909,7 @@ switch( $Fileman->fm_mode )
 			break;
 		}
 
-		if( ! $Fileman->SourceList || ! $Fileman->SourceList->count() )
+		if( empty($Fileman->SourceList) )
 		{
 			$Messages->add( T_('No source files!'), 'error' );
 			$Fileman->fm_mode = NULL;
@@ -1085,7 +1085,7 @@ switch( $Fileman->fm_mode )
 
 		// TODO: check EDIT permissions!
 
-		// we want the file manager in this mode:
+		// we want to display the file manager in this mode:
 		$Fileman->forceFM = 1;
 		break;
 
@@ -1178,6 +1178,7 @@ switch( $action )
 		}
 }
 
+
 // FM modes displays:
 switch( $Fileman->fm_mode )
 {
@@ -1202,6 +1203,7 @@ switch( $Fileman->fm_mode )
 		$AdminUI->disp_payload_begin();
 		require dirname(__FILE__).'/_files_links.inc.php';
 		$AdminUI->disp_payload_end();
+		break;
 }
 
 
@@ -1223,22 +1225,14 @@ if( $Fileman->fm_mode )
 	}
 }
 
-?><div id="filemanmain"><?php
 
-if( !$showFilemanager )
-{ // We're in a mode and don't force the FM
-	?>
-	</div>
-	<?php
-
-	require dirname(__FILE__). '/_footer.php';
-	return;
+if( $showFilemanager )
+{ // We're NOT in a mode where we want to hide the FM
+	// -------------------
+	// Browsing interface:
+	// -------------------
+	require dirname(__FILE__).'/_files_browse.inc.php';
 }
-
-// -------------------
-// Browsing interface:
-// -------------------
-require dirname(__FILE__).'/_files_browse.inc.php';
 
 
 require dirname(__FILE__).'/_footer.php';
@@ -1247,6 +1241,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.162  2006/02/13 20:20:09  fplanque
+ * minor / cleanup
+ *
  * Revision 1.161  2006/02/13 01:05:20  blueyed
  * Fix IDs to the item textarea.
  *

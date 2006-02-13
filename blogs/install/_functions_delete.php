@@ -45,10 +45,10 @@ function db_delete()
 	$DB->query( 'DROP TABLE IF EXISTS T_categories' );
 
 	echo "Dropping Post Statuses...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_poststatuses' );
+	$DB->query( 'DROP TABLE IF EXISTS T_itemstatuses' );
 
 	echo "Dropping Post Types...<br />\n";
-	$DB->query( 'DROP TABLE IF EXISTS T_posttypes' );
+	$DB->query( 'DROP TABLE IF EXISTS T_itemtypes' );
 
 	echo "Dropping User Settings...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_usersettings' );
@@ -101,6 +101,9 @@ function db_delete()
 
 /*
  * $Log$
+ * Revision 1.27  2006/02/13 20:20:10  fplanque
+ * minor / cleanup
+ *
  * Revision 1.26  2005/12/30 18:08:24  fplanque
  * no message
  *

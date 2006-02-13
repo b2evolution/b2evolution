@@ -252,7 +252,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				 * @param string the checkbox(es) element(s) name
 				 * @param string number/name of the checkall set to use. Defaults to 0 and is needed when there are several "checkall-sets" on one page.
 				 */ ?>
-				function toggleCheckboxes(the_form, the_elements, set_name)
+				function toggleCheckboxes(the_form, the_elements, set_name )
 				{
 					if( typeof set_name == 'undefined' )
 					{

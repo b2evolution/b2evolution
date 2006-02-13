@@ -988,7 +988,7 @@ function create_b2evo_tables_phoenix()
 
 
 	echo 'Creating table for Post Statuses... ';
-	$query="CREATE TABLE T_poststatuses (
+	$query="CREATE TABLE T_itemstatuses (
 									pst_ID   int(11) unsigned not null AUTO_INCREMENT,
 									pst_name varchar(30)      not null,
 									primary key ( pst_ID )
@@ -998,7 +998,7 @@ function create_b2evo_tables_phoenix()
 
 
 	echo 'Creating table for Post Types... ';
-	$query="CREATE TABLE T_posttypes (
+	$query="CREATE TABLE T_itemtypes (
 									ptyp_ID   int(11) unsigned not null AUTO_INCREMENT,
 									ptyp_name varchar(30)      not null,
 									primary key (ptyp_ID)
@@ -1006,7 +1006,7 @@ function create_b2evo_tables_phoenix()
 	$DB->query( $query );
 	echo "OK.<br />\n";
 	echo 'Creating default Post Types... ';
-	$DB->query( "INSERT INTO T_posttypes ( ptyp_ID, ptyp_name )
+	$DB->query( "INSERT INTO T_itemtypes ( ptyp_ID, ptyp_name )
 										VALUES ( 1, 'Post' ),
 										       ( 2, 'Link' )" );
 	echo "OK.<br />\n";
@@ -1250,12 +1250,12 @@ function create_b2evo_relations()
 											on update restrict,
 								add constraint FK_post_pst_ID
 											foreign key (post_pst_ID)
-											references T_poststatuses (pst_ID)
+											references T_itemstatuses (pst_ID)
 											on delete restrict
 											on update restrict,
 								add constraint FK_post_ptyp_ID
 											foreign key (post_ptyp_ID)
-											references T_posttypes (ptyp_ID)
+											references T_itemtypes (ptyp_ID)
 											on delete restrict
 											on update restrict' );
 
@@ -1353,6 +1353,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.175  2006/02/13 20:20:10  fplanque
+ * minor / cleanup
+ *
  * Revision 1.174  2006/02/11 01:08:19  blueyed
  * Oh what fun it is to drop some "e".
  *

@@ -34,7 +34,7 @@
 require_once dirname(__FILE__). '/_header.php';
 
 $AdminUI->set_path( 'options', 'statuses' );
-$edited_table = 'T_poststatuses';
+$edited_table = 'T_itemstatuses';
 $edited_table_IDcol = 'pst_ID';
 $edited_table_namecol = 'pst_name';
 $default_col_order = 'A';
