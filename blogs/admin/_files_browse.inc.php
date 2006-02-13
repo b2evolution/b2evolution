@@ -353,7 +353,7 @@ while( $lFile = & $Fileman->get_next() )
 	}
 
 
-	echo '<td class="filename">';
+	echo '<td class="fm_filename">';
 
 	/*************  Invalid filename warning:  *************/
 
@@ -393,7 +393,7 @@ while( $lFile = & $Fileman->get_next() )
 			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			// ONGsb only:
 			|| $Fileman->fm_mode == 'link_product'
- 			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		)
 	{	// Offer option to link the file to an Item:
 		$Fileman->dispButtonFileLink();
@@ -842,6 +842,9 @@ $AdminUI->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.81  2006/02/13 22:03:10  blueyed
+ * Fixed conflict with general .filename class.
+ *
  * Revision 1.80  2006/02/13 21:40:30  fplanque
  * fixed memorizing of the mode when uploading/inserting IMGs into posts.
  *
