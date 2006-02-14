@@ -182,6 +182,7 @@ class Form extends Widget
 				$this->title_fmt = '<tr class="formtitle"><th colspan="2"><div class="results_title">'
 														.'<span class="right_icons">$global_icons$</span>'
 														.'$title$</div></th></tr>'."\n";
+				$this->no_title_fmt = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
 				$this->fieldstart = "<tr>\n";
 				$this->labelstart = '<td class="label">';
 				$this->labelend = "</td>\n";
@@ -197,6 +198,7 @@ class Form extends Widget
 			case 'fieldset':
 				$this->formstart = '';
 				$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
+				$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
 				$this->fieldstart = "<fieldset>\n";
 				$this->labelstart = '<div class="label">';
 				$this->labelend = "</div>\n";
@@ -211,7 +213,8 @@ class Form extends Widget
 
 			case 'linespan':
 				$this->formstart = '';
-				$this->title_fmt = '$title$'."\n";
+				$this->title_fmt = '$title$'."\n"; // QUESTION: no icons here?!
+				$this->no_title_fmt = '';          //           "
 				$this->fieldstart = '<span class="line">';
 				$this->labelstart = '';
 				$this->labelend = "\n";
@@ -227,7 +230,8 @@ class Form extends Widget
 			default:
 				// "none" (no layout)
 				$this->formstart = '';
-				$this->title_fmt = '$title$'."\n";
+				$this->title_fmt = '$title$'."\n"; // QUESTION: no icons here?!
+				$this->no_title_fmt = '';          //           "
 				$this->fieldstart = '';
 				$this->labelstart = '';
 				$this->labelend = "\n";
@@ -1121,7 +1125,11 @@ class Form extends Widget
 		$r = "\n\n<form".get_field_attribs_as_string($form_params).">\n"
 					.$this->formstart;
 
-		if( !empty($form_title) )
+		if( empty($form_title) )
+		{
+			$r .= $this->replace_vars( $this->no_title_fmt );
+		}
+		else
 		{
 			$this->title = $form_title;
 
@@ -2489,6 +2497,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.114  2006/02/14 20:24:39  blueyed
+ * no_title_fmt
+ *
  * Revision 1.113  2006/02/13 20:20:09  fplanque
  * minor / cleanup
  *
