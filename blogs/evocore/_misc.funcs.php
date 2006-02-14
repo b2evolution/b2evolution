@@ -1869,7 +1869,7 @@ function url_add_tail( $url, $tail )
  * because some mail transfer agents replace \n by \r\n automatically.
  *
  * @param string Recipient, either email only or in "Name <example@example.com>" format (RFC2822).
- *               Can be multiple comma-seperated addresses.
+ *               Can be multiple comma-separated addresses.
  * @param string Subject of the mail
  * @param string The message text
  * @param string From address, being added to headers (we'll prevent injections);
@@ -2588,8 +2588,44 @@ function is_admin_page()
 }
 
 
+/**
+ * Implode an array with "and" support.
+ *
+ * If there's one element in the table, it is returned.
+ * If there are at least two elements, the last one is concatenated using $implode_last, while the ones before are imploded using $implode_by.
+ *
+ * @todo Support for locales that have a different kind of enumeration?!
+ * @return string
+ */
+function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
+{
+	switch( count($arr) )
+	{
+		case 0:
+			return '';
+
+		case 1:
+			$r = array_shift($arr);
+			return $r;
+
+		default:
+			if( ! isset($implode_last) )
+			{
+				$implode_last = /* Used to append the last element of an enumeration of at least two strings */ T_(' and ');
+			}
+
+			$r = implode( $implode_by, array_slice( $arr, 0, -1 ) )
+			    .$implode_last.array_pop( $arr );
+			return $r;
+	}
+}
+
+
 /*
  * $Log$
+ * Revision 1.183  2006/02/14 20:11:38  blueyed
+ * added implode_with_and()
+ *
  * Revision 1.182  2006/02/13 15:40:37  blueyed
  * param(): use $GLOBALS instead of $$var again, but this time with a good reason.
  *
