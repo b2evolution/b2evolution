@@ -282,7 +282,7 @@ class DB
 		if( ! $this->dbhandle )
 		{
 			$this->print_error( '<p><strong>Error establishing a database connection!</strong></p>
-				<p>('.mysql_error($this->dbhandle).')</p>
+				<p>('.mysql_error().')</p>
 				<ol>
 					<li>Are you sure you have typed the correct user/password?</li>
 					<li>Are you sure that you have typed the correct hostname?</li>
@@ -1174,6 +1174,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.55  2006/02/14 20:22:22  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.54  2006/02/13 00:40:25  blueyed
  * new_link and client_flags param for mysql_connect(). Also pass the $dbhandle to every mysql_*() function.
  *
@@ -1182,9 +1185,6 @@ class DB
  *
  * Revision 1.52  2006/02/03 21:58:05  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
- *
- * Revision 1.51  2006/01/27 17:50:37  blueyed
- * *** empty log message ***
  *
  * Revision 1.50  2006/01/15 18:56:02  blueyed
  * Made error on loading extension clearer; do not display function backtrace twice with print_error().
@@ -1200,9 +1200,6 @@ class DB
  *
  * Revision 1.46  2005/12/05 16:04:35  blueyed
  * get_row(): return NULL on empty results for OBJECT-type return value.
- *
- * Revision 1.45  2005/11/23 17:29:19  fplanque
- * no message
  *
  * Revision 1.44  2005/11/18 18:46:27  fplanque
  * factorized query formatting
