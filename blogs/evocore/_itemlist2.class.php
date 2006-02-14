@@ -113,7 +113,7 @@ class ItemList2 extends DataObjectList2
 		parent::DataObjectList2( $DataObjectCache, 20, $param_prefix, NULL );
 
 		// The SQL Query object:
-		$this->ItemQuery = & new ItemQuery( $DataObjectCache->dbtablename, $DataObjectCache->dbprefix, $DataObjectCache->dbIDname );
+		$this->ItemQuery = & new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
 
 		$this->Blog = & $Blog;
 
@@ -669,6 +669,89 @@ class ItemList2 extends DataObjectList2
 
 
 	/**
+	 * Get date of the last post/item
+	 */
+	function get_lastpostdate()
+	{
+		global $localtimenow, $DB;
+
+
+		if( empty( $this->filters ) )
+		{	// Filters have no been set before, we'll use the default filterset:
+			// echo ' Query:Setting default filterset ';
+			$this->set_filters( $this->default_filters );
+		}
+
+		// GENERATE THE QUERY:
+
+		// The SQL Query object:
+		$lastpost_ItemQuery = & new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
+
+
+		/*
+		 * filetring stuff:
+		 */
+		$lastpost_ItemQuery->where_chapter2( $this->Blog->ID, $this->filters['cat_array'], $this->filters['cat_modifier'] );
+
+		$lastpost_ItemQuery->where_author( $this->filters['authors'] );
+
+		$lastpost_ItemQuery->where_assignees( $this->filters['assignees'] );
+
+		$lastpost_ItemQuery->where_statuses( $this->filters['statuses'] );
+
+		$lastpost_ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
+
+		$lastpost_ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
+
+		$lastpost_ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
+		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
+		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
+
+		$lastpost_ItemQuery->where_visibility( $this->filters['visibility_array'] );
+
+		/**
+		 * Restrict to an item type
+		 * @todo method of ItemQuery
+		 */
+		if( !empty( $this->filters['item_type'] ) )
+		{
+			$lastpost_ItemQuery->where_and( 'itm_ityp_ID = '.$this->filters['item_type'] );
+		}
+
+
+		/*
+		 * order by stuff:
+		 * LAST POST FIRST!!! (That's the whole point!)
+		 */
+		$lastpost_ItemQuery->order_by( $this->Cache->dbprefix.'datestart DESC' );
+
+
+		/*
+		 * Paging limits:
+		 * ONLY THE LAST POST!!!
+		 */
+		$lastpost_ItemQuery->LIMIT( '1' );
+
+
+		// Select the datestart:
+		$lastpost_ItemQuery->select( $this->Cache->dbprefix.'datestart' );
+
+
+		$lastpostdate = $DB->get_var( $lastpost_ItemQuery->get(), 0, 0, 'Get last post date' );
+
+		if( empty( $lastpostdate ) )
+		{
+			// echo 'we have no last item';
+			$lastpostdate = date('Y-m-d H:i:s', $localtimenow);
+		}
+
+		// echo $lastpostdate;
+
+		return $lastpostdate;
+	}
+
+
+	/**
 	 * Generate a title for the current list, depending on its filtering params
 	 *
 	 * @todo cleanup some displays
@@ -1128,6 +1211,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.16  2006/02/14 21:56:51  fplanque
+ * implemented missing get_lastpostdate()
+ *
  * Revision 1.15  2006/02/03 21:58:05  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
  *
