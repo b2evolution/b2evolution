@@ -445,7 +445,7 @@ to
 		 */
 
 		// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
-		$Plugins = new Plugins_no_DB(); // fp>> can this be renamed to Plugins_placeholder or Plugins_noop
+		$Plugins = new Plugins_no_DB();
 		?>
 		<h2><?php echo T_('Installing b2evolution tables with sample data')?></h2>
 		<?php
@@ -628,6 +628,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.90  2006/02/14 16:58:49  blueyed
+ * no message
+ *
  * Revision 1.89  2006/02/11 01:08:20  blueyed
  * Oh what fun it is to drop some "e".
  *
