@@ -112,6 +112,33 @@ class test_plugin extends Plugin
 				'defaultvalue' => '',
 				'note' => T_('Welcome to b2evolution'),
 				),
+			'my_select' => array(
+				'label' => T_('Selector'),
+				'defaultvalue' => 'one',
+				'type' => 'select',
+				'options' => array( 'sun' => T_('Sunday'), 'mon' => T_('Monday') ),
+				),
+			);
+	}
+
+
+	/**
+	 * Define some dependencies.
+	 *
+	 * @return array
+	 */
+	function GetDependencies()
+	{
+		return array(
+				'recommends' => array(
+					'events_by_one' => array( array('Foo', 'Bar'), array('FooBar', 'BarFoo') ), // a plugin that provides "Foo" and "Bar", and one (may be the same) that provides "FooBar" and "BarFoo"
+					'events' => array( 'some_event', 'some_other_event' ),
+					'plugins' => array( array( 'some_plugin', '1' ) ), // at least version 1 of some_plugin
+				),
+
+				'requires' => array(
+					// Same syntax as with the 'recommends' class above, but would prevent the plugin from being installed.
+				),
 			);
 	}
 
@@ -321,7 +348,7 @@ class test_plugin extends Plugin
 	 */
 	function AfterInstall()
 	{
-		$this->msg( 'TEST plugin sucessfully installed. All the hard work we did was adding this message in AfterInstall event.. ;)' );
+		$this->msg( 'TEST plugin sucessfully installed. All the hard work we did was adding this message in the AfterInstall event.. ;)' );
 	}
 
 

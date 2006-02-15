@@ -88,7 +88,7 @@ class ItemList2 extends DataObjectList2
 	 *
 	 * @todo  add param for saved session filter set
 	 *
-	 * @Param Blog
+	 * @param Blog
 	 * @param mixed Default filter set: Do not show posts before this timestamp, can be 'now'
 	 * @param mixed Default filter set: Do not show posts after this timestamp, can be 'now'
 	 * @param string name of cache to be used
@@ -121,7 +121,7 @@ class ItemList2 extends DataObjectList2
 		{	// Set the filterset_name with the filterset_name param
 			$this->filterset_name = 'ItemList_filters_'.$filterset_name;
 		}
-		else 
+		else
 		{	// Set a generic filterset_name
 			$this->filterset_name = 'ItemList_filters_coll'.$this->Blog->ID;
 		}
@@ -353,7 +353,7 @@ class ItemList2 extends DataObjectList2
 		$this->filters['ymdhms_min'] = $Request->param_compact_date( 'dstart', $this->default_filters['ymdhms_min'], T_( 'Invalid date' ) ); // YearMonth(Day) to start at
 		$this->filters['ymdhms_max'] = $Request->param_compact_date( 'dstop', $this->default_filters['ymdhms_max'], T_( 'Invalid date' ) ); // YearMonth(Day) to stop at
 
-		
+
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
 		// So far, these act as SILENT filters. They will not advertise their filtering in titles etc.
 		$this->filters['ts_min'] = $this->default_filters['ts_min'];
@@ -398,7 +398,7 @@ class ItemList2 extends DataObjectList2
 		// 'paged'
 		$this->filters['page'] = $Request->param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 		$this->page = $this->filters['page'];
-		
+
 		// Item type
 		$this->filters['item_type'] = $this->default_filters['item_type'];
 
@@ -530,7 +530,7 @@ class ItemList2 extends DataObjectList2
 		if( !empty( $this->filters['item_type'] ) )
 		{
 			$this->ItemQuery->where_and( 'itm_ityp_ID = '.$this->filters['item_type'] );
-		}	
+		}
 
 		/*
 		 * order by stuff:
@@ -1211,6 +1211,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.17  2006/02/15 04:07:16  blueyed
+ * minor merge
+ *
  * Revision 1.16  2006/02/14 21:56:51  fplanque
  * implemented missing get_lastpostdate()
  *

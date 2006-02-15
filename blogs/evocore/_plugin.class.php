@@ -89,9 +89,13 @@ class Plugin
 	var $priority = 50;
 
 	/**
-	 * Plugin version number.
+	 * Plugin version number (max 42 chars, so obscure CVS Revision keywords get handled).
 	 *
-	 * This is for user info only.
+	 * This must be compatible to PHP's {@link version_compare()},
+	 * e.g. '1', '2', '1.1', '2.1b' and '10-1-1a' are fine.
+	 *
+	 * This can be used by other plugins when requiring your plugin
+	 * through {@link Plugin::GetDependencies()}.
 	 *
 	 * @var string
 	 */
@@ -201,10 +205,20 @@ class Plugin
 	/**
 	 * If the plugin provides settings, this will become the object to access them.
 	 *
+	 * This gets instantianted in {@link Plugins::instantiate_Settings()}.
+	 *
 	 * @see GetDefaultSettings()
 	 * @var NULL|PluginSettings
 	 */
 	var $Settings;
+
+
+	/**
+	 * The status of the plugin.
+	 *
+	 * @var string Either 'enabled', 'disabled', 'needs_config' or 'broken'.
+	 */
+	var $status;
 
 	/**#@-*/
 
@@ -273,6 +287,45 @@ class Plugin
 	function GetDefaultSettings()
 	{
 		return array();
+	}
+
+
+	/**
+	 * Get the list of dependencies that the plugin has.
+	 *
+	 * This gets checked on install or uninstall of a plugin.
+	 *
+	 * There are two classes of dependencies:
+	 *  - 'recommends': This is just a recommendation. If it cannot get fulfilled
+	 *                  there will just be a note added on install.
+	 *  - 'requires': A plugin cannot be installed if the dependencies cannot get
+	 *                fulfilled. Also, a plugin cannot get uninstalled, if another
+	 *                plugin depends on it.
+	 *
+	 * Each class of dependency can have the following types:
+	 *  - 'events_by_one': A list of eventlists that have to be provided by a single plugin,
+	 *                     e.g., <code>array( array('CaptchaPayload', 'CaptchaValidated') )</code>
+	 *                     to look for a plugin that provides both events.
+	 *  - 'plugins':
+	 *    A list of plugins, either just the plugin's classname or an array with
+	 *    classname and minimum version of the plugin (see {@link Plugin::version}).
+	 *    E.g.: <code>array( 'test_plugin', '1' )</code> to require at least version "1"
+	 *          of the test plugin.
+	 *  - 'api_min': You can require a specific minimum version of the Plugins API here.
+	 *               If it's just a number, only the major version is checked against.
+	 *               To check also for the minor version, you have to give an array:
+	 *               array( major, minor ).
+	 *               Major versions will mark drastic changes, while minor version
+	 *               increasement just means "new features" (probably hooks).
+	 *               This way you can make sure that the hooks you need are implemented
+	 *               in the core.
+	 *
+	 * @see test_plugin
+	 * @return array
+	 */
+	function GetDependencies()
+	{
+		return array(); // no dependencies by default, of course
 	}
 
 
@@ -530,6 +583,34 @@ class Plugin
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Event handler: Called when the admin tries to enable the plugin and also
+	 * after installation.
+	 *
+	 * Use this, if your plugin needs configuration before it can be used.
+	 *
+	 * If you want to disable your Plugin yourself, use {@link Plugin::disable()}.
+	 *
+	 * @return boolean|string True, if the plugin can be enabled/activated,
+	 *                        a string with an error/note otherwise.
+	 */
+	function BeforeEnable()
+	{
+		return true;  // default is to allow Activation
+	}
+
+
+	/**
+	 * Event handler: Your plugin gets notified here, just before it gets
+	 * disabled.
+	 *
+	 * You cannot prevent this, but only clean up stuff, if you have to.
+	 */
+	function BeforeDisable()
+	{
 	}
 
 
@@ -934,7 +1015,7 @@ class Plugin
 
 
 	/**
-	 * @deprecated Please use {@link get_sql_table()} instead!
+	 * @deprecated Please use {@link get_sql_table()} instead! Will be removed shortly!
 	 */
 	function get_table_prefix()
 	{
@@ -1227,6 +1308,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.33  2006/02/15 04:07:16  blueyed
+ * minor merge
+ *
  * Revision 1.32  2006/02/09 22:05:43  blueyed
  * doc fixes
  *

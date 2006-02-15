@@ -58,8 +58,8 @@ if( isset($filter['off']) )
 	forget_param( 'filteron' );
 }
 
-param( 'user_ID', 'integer', NULL, true, false, false );
-param( 'grp_ID', 'integer', NULL, true, false, false );
+param( 'user_ID', 'integer', NULL, true );
+param( 'grp_ID', 'integer', NULL, true );
 
 /**
  * @global boolean true, if user is only allowed to edit his profile
@@ -603,6 +603,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.130  2006/02/15 04:07:14  blueyed
+ * minor merge
+ *
  * Revision 1.129  2006/02/10 22:33:19  fplanque
  * logins should be lowercase
  *

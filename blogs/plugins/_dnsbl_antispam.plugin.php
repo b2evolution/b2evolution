@@ -92,7 +92,7 @@ class dnsbl_antispam_plugin extends Plugin
 				'defaultvalue' => "list.dsbl.org\nsbl-xbl.spamhaus.org",
 				'type' => 'textarea',
 				'size' => '50',
-				'note' => T_('The list of DNS blacklists to check, seperated by whitespace.'),
+				'note' => T_('The list of DNS blacklists to check, separated by whitespace.'),
 			),
 			'use_whitelisting' => array(
 				'label' => T_('Whitelisting'),
@@ -253,15 +253,15 @@ class dnsbl_antispam_plugin extends Plugin
 		{
 			$c_blocked = $DB->get_var( '
 				SELECT COUNT(*)
-				  FROM '.$this->get_table_prefix().'log
+				  FROM '.$this->get_sql_table('log').'
 				 WHERE log_type = "blocked"' );
 			$c_notblocked = $DB->get_var( '
 				SELECT COUNT(*)
-				  FROM '.$this->get_table_prefix().'log
+				  FROM '.$this->get_sql_table('log').'
 				 WHERE log_type = "not_blocked"' );
 			$c_whitelisted = $DB->get_var( '
 				SELECT COUNT(*)
-				  FROM '.$this->get_table_prefix().'log
+				  FROM '.$this->get_sql_table('log').'
 				 WHERE log_type = "whitelisted"' );
 
 			$Form->begin_form( 'fform' );
@@ -273,7 +273,7 @@ class dnsbl_antispam_plugin extends Plugin
 			$Form->info_field( T_('Not blocked requests'), $c_notblocked.( $c_total ? ' ('.round((100/$c_total)*$c_notblocked).'%)' : '' ) );
 
 			$stats_from = $DB->get_row( '
-				SELECT UNIX_TIMESTAMP(MAX(hit_datetime)) AS end, UNIX_TIMESTAMP(MIN(hit_datetime)) AS start FROM T_hitlog, '.$this->get_table_prefix().'log
+				SELECT UNIX_TIMESTAMP(MAX(hit_datetime)) AS end, UNIX_TIMESTAMP(MIN(hit_datetime)) AS start FROM T_hitlog, '.$this->get_sql_table('log').'
 				 WHERE hit_ID = log_hit_ID
 				 ORDER BY hit_datetime DESC' );
 
@@ -636,7 +636,7 @@ class dnsbl_antispam_plugin extends Plugin
 		$hit_ID = isset( $Hit->ID ) ? $Hit->ID : NULL;
 
 		$DB->query( '
-			INSERT INTO '.$this->get_table_prefix().'log
+			INSERT INTO '.$this->get_sql_table('log').'
 			( log_type, log_hit_ID, log_data )
 			VALUES ( "'.$type.'", '.$DB->quote($hit_ID).', '.$DB->quote($data).' )' );
 
@@ -665,6 +665,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.8  2006/02/15 04:07:16  blueyed
+ * minor merge
+ *
  * Revision 1.7  2006/01/29 20:47:06  blueyed
  * todo
  *
