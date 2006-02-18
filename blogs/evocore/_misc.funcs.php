@@ -2589,7 +2589,7 @@ function is_admin_page()
 
 
 /**
- * Implode an array with "and" support.
+ * Implode array( 'x', 'y', 'z' ) to something like 'x, y and z'. Useful for displaying list to the end user.
  *
  * If there's one element in the table, it is returned.
  * If there are at least two elements, the last one is concatenated using $implode_last, while the ones before are imploded using $implode_by.
@@ -2611,7 +2611,7 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 		default:
 			if( ! isset($implode_last) )
 			{
-				$implode_last = /* Used to append the last element of an enumeration of at least two strings */ T_(' and ');
+				$implode_last = /* TRANS: Used to append the last element of an enumeration of at least two strings */ T_(' and ');
 			}
 
 			$r = implode( $implode_by, array_slice( $arr, 0, -1 ) )
@@ -2623,6 +2623,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.184  2006/02/18 23:36:57  fplanque
+ * no message
+ *
  * Revision 1.183  2006/02/14 20:11:38  blueyed
  * added implode_with_and()
  *

@@ -38,7 +38,7 @@
 	width:100%;
 	text-align: left;
 }
-#filemanmain table.grouped td.filename div.path {
+#filemanmain table.grouped td.fm_filename div.path {
 	clear:right;
 	float:right;
 }

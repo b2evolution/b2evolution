@@ -213,7 +213,7 @@ class Form extends Widget
 
 			case 'linespan':
 				$this->formstart = '';
-				$this->title_fmt = '$title$'."\n"; // QUESTION: no icons here?!
+				$this->title_fmt = '$title$'."\n"; // TODO: icons
 				$this->no_title_fmt = '';          //           "
 				$this->fieldstart = '<span class="line">';
 				$this->labelstart = '';
@@ -230,7 +230,7 @@ class Form extends Widget
 			default:
 				// "none" (no layout)
 				$this->formstart = '';
-				$this->title_fmt = '$title$'."\n"; // QUESTION: no icons here?!
+				$this->title_fmt = '$title$'."\n"; // TODO: icons
 				$this->no_title_fmt = '';          //           "
 				$this->fieldstart = '';
 				$this->labelstart = '';
@@ -2497,6 +2497,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.115  2006/02/18 23:36:57  fplanque
+ * no message
+ *
  * Revision 1.114  2006/02/14 20:24:39  blueyed
  * no_title_fmt
  *

@@ -909,7 +909,7 @@ switch( $Fileman->fm_mode )
 			break;
 		}
 
-		if( empty($Fileman->SourceList) || ! $Fileman->SourceList->count() )
+		if( !isset($Fileman->SourceList) || !$Fileman->SourceList->count() )
 		{
 			$Messages->add( T_('No source files!'), 'error' );
 			$Fileman->fm_mode = NULL;
@@ -1241,6 +1241,9 @@ require dirname(__FILE__).'/_footer.php';
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.164  2006/02/18 23:36:57  fplanque
+ * no message
+ *
  * Revision 1.163  2006/02/14 20:12:29  blueyed
  * *** empty log message ***
  *
