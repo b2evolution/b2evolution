@@ -36,7 +36,7 @@ $new_db_version = 9100;
 
 $admin_path_seprator = ' :: ';
 $app_admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website").
-									'"><img id="evologo" src="rsc/img/b2evolution_minilogo2.png" alt="b2evolution" title="'.
+									'"><img id="evologo" src="'.$rsc_url.'img/b2evolution_minilogo2.png" alt="b2evolution" title="'.
 									T_("visit b2evolution's website").'" width="185" height="40" /></a>';
 $app_exit_links = '<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
 									&bull;
