@@ -16,7 +16,9 @@
 /**
  * Includes
  */
-require_once dirname(__FILE__).'/../evocore/_main.inc.php';
+require_once dirname(__FILE__).'/../conf/_config.php';
+
+require_once $inc_path.'_main.inc.php';
 
 
 // TODO: Flood protection (Use Hit class to prevent mass mailings to members..)

@@ -55,7 +55,7 @@ $timestamp_max = 'now';
 /**
  * Let b2evolution handle the query string and load the blog data:
  */
-require(dirname(__FILE__).'/evocore/_blog_main.inc.php');
+require $inc_path.'_blog_main.inc.php';
 
 
 # Now, below you'll find the main template...

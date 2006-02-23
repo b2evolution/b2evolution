@@ -44,7 +44,7 @@
  * Includes:
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
-require_once dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.inc.php';
+require_once $inc_path.'_main.inc.php';
 
 
 param( 'action', 'string', '' );
@@ -65,7 +65,7 @@ switch( $action )
 		/*
 		 * Do the registration:
 		 */
-		param( 'redirect_to', 'string', $admin_url.'b2edit.php' );
+		param( 'redirect_to', 'string', $admin_url );
 		param( 'pass1', 'string', '' );
 		param( 'pass2', 'string', '' );
 
@@ -125,7 +125,7 @@ switch( $action )
 									.T_('Login:')." $login\n"
 									.T_('Email').": $email\n"
 									."\n"
-									.T_('Manage users').': '.$admin_url."b2users.php\n";
+									.T_('Manage users').': '.$admin_url."?ctrl=users\n";
 
 			send_mail( $admin_email, T_('New user registration on your blog'), $message, $notify_from );
 
@@ -152,7 +152,7 @@ switch( $action )
 /*
  * Default: registration form:
  */
-param( 'redirect_to', 'string', $admin_url.'b2edit.php' );
+param( 'redirect_to', 'string', $admin_url );
 // Display reg form:
 require( dirname(__FILE__).'/_reg_form.php' );
 

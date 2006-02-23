@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>/inc/VIEW Folder</title>
+</head>
+<body>
+	<h2><a href="http://evocore.net/">evoCore</a> FrameWork</h2>
+	<h1><code>/inc/VIEW</code> folder</h1>
+	<p>This folder holds the <strong>View</strong>s for the application.</p>
+	<p>This folder holds PHP include files which output visible data (HTML) to the user. In other words, these views are PHP templates.</p>
+	<p>It is very important to understand that these views are very rough templates. For example a view may decide to output a 
+	list of users with 3 columns (Name, Login and Group). In another scenario it may output a list of Firstnames and Lastnames 
+	and group these by user Group. <strong>BUT</strong> either way, there are still additional layers of presentation which 
+	determine the exact rendering of the View (see the Admin skins <code>/skins_adm</code> folder).</p>
+<p>It is also important to understand that a specific View can be called by different controllers. A contextual help block would be an example of that (provided the content is dynamic).</p>
+<p>A single controller can also be calling several views in a row. (The controller can assemble multiple views). </p>
+<p><strong>b2evolution Note:</strong> in b2evolution, the <code>/inc/VIEW</code> folder applies to the admin interface only. 
+	For the sake of simplicity, public blog views are entirely handled by the /skins folder, so that graphics designers have 
+	all presentation files grouped in a single place. </p>
+</body>
+</html>

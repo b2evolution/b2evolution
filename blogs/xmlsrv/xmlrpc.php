@@ -1435,7 +1435,7 @@ function pingback_ping( $m )
 							$notify_message .= T_('Website'). ": $original_title\n";
 							$notify_message .= T_('Url'). ": $original_pagelinkedfrom\n";
 							$notify_message .= T_('Excerpt'). ": \n[...] $original_context [...]\n\n";
-							$notify_message .= T_('Edit/Delete').': '.$admin_url.'b2browse.php?blog='.$blog.'&p='.$post_ID."&c=1\n\n";
+							$notify_message .= T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&amp;blog='.$blog.'&p='.$post_ID."&c=1\n\n";
 
 							send_mail( $recipient, $subject, $notify_message, $notify_from );
 
@@ -2514,6 +2514,11 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.87  2006/02/23 21:12:54  fplanque
+ * File reorganization to MVC (Model View Controller) architecture.
+ * See index.hml files in folders.
+ * (Sorry for all the remaining bugs induced by the reorg... :/)
+ *
  * Revision 1.86  2006/01/06 16:42:41  fplanque
  * bugfix
  *

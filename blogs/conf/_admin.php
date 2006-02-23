@@ -1,17 +1,60 @@
 <?php
 /**
- * This is b2evolution's admin config file
+ * This is the admin config file
  *
- * This sets how the back-office works
- * Last significant changes to this file: version 1.6
- *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This sets how the back-office/admin interface works
  *
  * @package conf
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
+
+$dispatcher = 'admin.php';
+$admin_url = $baseurl.$dispatcher;
+
+/**
+ * Default controller to use.
+ *
+ * This determines the default page when you access the admin.
+ */
+$default_ctrl = 'edit';
+
+
+/**
+ * Controller mappings.
+ *
+ * For each controller name, we associate a controller file to be found in /inc/CONTROLLERS/ .
+ * The advantage of this indirection is that it is easy to reorganize the controllers into
+ * subdirectories by modules. It is also easy to deactivate some controllers if you don't
+ * want to provide this functionnality on a given installation.
+ *
+ * Note: while the controller mappings might more or less follow the menu structure, we do not merge
+ * the two tables since we could, at any time, decide to mae a skin with a different menu structure.
+ * The controllers however would most likely remain the same.
+ *
+ * @global array
+ */
+$ctrl_mappings = array(
+		'antispam'					=> 'antispam/antispam.php',
+		'browse'						=> 'items/b2browse.php',
+		'chapters'					=> 'collections/categories.php', // todo
+		'collections'				=> 'collections/blogs.php',
+		'edit'							=> 'items/b2edit.php',
+		'editactions'				=> 'items/edit_actions.php',
+		'features'					=> 'settings/features.php',
+		'files'							=> 'files/files.php',
+		'fileset'						=> 'files/fileset.php',
+		'filetypes'					=> 'files/filetypes.php',
+		'itemstatuses'			=> 'items/statuses.php',
+		'itemtypes'					=> 'items/types.php',
+		'locales'						=> 'settings/locales.php',
+		'mtimport'					=> 'imports/import-mt.php',
+		'plugins'						=> 'settings/plugins.php', // todo
+		'settings'					=> 'settings/settings.php',
+		'stats'							=> 'sessions/stats.php',
+		'templates'					=> 'skins/b2template.php',
+		'tools'							=> '_misc/tools.php',
+		'users'							=> 'users/b2users.php',
+	);
 
 
 /**

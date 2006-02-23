@@ -1353,6 +1353,11 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.176  2006/02/23 21:12:33  fplanque
+ * File reorganization to MVC (Model View Controller) architecture.
+ * See index.hml files in folders.
+ * (Sorry for all the remaining bugs induced by the reorg... :/)
+ *
  * Revision 1.175  2006/02/13 20:20:10  fplanque
  * minor / cleanup
  *

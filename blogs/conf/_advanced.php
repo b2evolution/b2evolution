@@ -1,28 +1,9 @@
 <?php
 /**
- * This file includes advanced settings for b2evolution.
- *
- * Last significant changes to this file: version 1.6
+ * This file includes advanced settings for the evoCore framework.
  *
  * Please NOTE: You should not comment variables out to prevent
  * URL overrides.
- *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
- * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
- *
- * {@internal
- * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
- * Jason EDGECOMBE's contributions to this file and the b2evolution project
- * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
- * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
- *
- * Matt FOLLETT grants Francois PLANQUE the right to license
- * Matt FOLLETT's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
  *
  * @package conf
  *
@@ -408,33 +389,46 @@ $cookie_expired = time() - 86400;
 	NOTE: All paths must have a trailing slash!
 
 	Example of a possible setting:
-		$admin_subdir = 'backoffice/b2evo/'; // Subdirectory relative to base
-		$admin_dirout = '../../';            // Relative path to go back to base
+		$conf_subdir = 'settings/b2evo/';   // Subdirectory relative to base
+		$conf_subdir = '../../';            // Relative path to go back to base
 */
 /**
  * Location of the configuration files.
+ *
+ * Note: This folder NEEDS to by accessible by PHP only.
+ *
  * @global string $conf_subdir
  */
 $conf_subdir = 'conf/';                  // Subdirectory relative to base
-$conf_dirout = '../';                    // Relative path to go back to base
-
 $conf_path = str_replace( '\\', '/', dirname(__FILE__) ).'/';
-$basepath = preg_replace( '#/'.$conf_subdir.'$#', '', $conf_path ).'/'; // Remove his file's subpath
+
+$basepath = preg_replace( '#/'.$conf_subdir.'$#', '', $conf_path ).'/'; // Remove this file's subpath
 
 /**
- * Location of the backoffice (admin) folder.
- * @global string $admin_subdir
+ * Location of the include folder.
+ *
+ * Note: This folder NEEDS to by accessible by PHP only.
+ *
+ * @global string $inc_subdir
  */
-$admin_subdir = 'admin/';                // Subdirectory relative to base
-$admin_dirout = '../';                   // Relative path to go back to base
-$admin_url = $baseurl.$admin_subdir;     // You should not need to change this
+$inc_subdir = 'inc/';   		             	// Subdirectory relative to base
+$inc_path = $basepath.$inc_subdir; 		   	// You should not need to change this
+$misc_inc_path = $inc_path.'_misc/';	   	// You should not need to change this
+$model_path = $inc_path.'MODEL/';	  		 	// You should not need to change this
+$view_path = $inc_path.'VIEW/';						// You should not need to change this
+$control_path = $inc_path.'CONTROL/';			// You should not need to change this
+
 /**
  * Location of the HTml SeRVices folder.
+ *
+ * Note: This folder NEEDS to by accessible through HTTP.
+ *
  * @global string $htsrv_subdir
  */
 $htsrv_subdir = 'htsrv/';                // Subdirectory relative to base
-$htsrv_dirout = '../';                   // Relative path to go back to base
+$htsrv_path = $basepath.$htsrv_subdir;   // You should not need to change this
 $htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
+
 /**
  * Location of the XML SeRVices folder.
  * @global string $xmlsrv_subdir
@@ -442,18 +436,18 @@ $htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
 $xmlsrv_subdir = 'xmlsrv/';              // Subdirectory relative to base
 $xmlsrv_dirout = '../';                  // Relative path to go back to base
 $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
-/**
- * Location of the IMG folder.
- * @global string $img_subdir
- */
-$img_subdir = 'img/';                    // Subdirectory relative to base
-$img_url = $baseurl.$img_subdir;         // You should not need to change this
+
 /**
  * Location of the RSC folder.
+ *
+ * Note: This folder NEEDS to by accessible through HTTP.
+ *
  * @global string $rsc_subdir
  */
 $rsc_subdir = 'rsc/';                    // Subdirectory relative to base
+$rsc_path = $basepath.$rsc_subdir;       // You should not need to change this
 $rsc_url = $baseurl.$rsc_subdir;         // You should not need to change this
+
 /**
  * Location of the skins folder.
  * @global string $skins_subdir
@@ -461,50 +455,57 @@ $rsc_url = $baseurl.$rsc_subdir;         // You should not need to change this
 $skins_subdir = 'skins/';                // Subdirectory relative to base
 $skins_dirout = '../';                   // Relative path to go back to base
 $skins_url = $baseurl.$skins_subdir;     // You should not need to change this
+
 /**
  * Location of the admin skins folder.
+ *
+ * Note: This folder NEEDS to by accessible by both PHP AND through HTTP.
+ *
  * @global string $adminskins_subdir
  */
-$adminskins_subdir = 'skins/';             // Subdirectory relative to ADMIN
-$adminskins_dirout = '../';                // Relative path to go back to ADMIN
-$adminskins_url = $baseurl.$admin_subdir.$skins_subdir;  // You should not need to change this
-/**
- * Location of the core (the "includes") files.
- * @global string $core_subdir
- */
-$core_subdir = 'evocore/';               // Subdirectory relative to base
-$core_dirout = '../';                    // Relative path to go back to base
-/**
- * Location of the lib (the "external includes") files.
- * @global string $lib_subdir
- */
-$lib_subdir = 'lib/';                    // Subdirectory relative to base
-$lib_dirout = '../';                     // Relative path to go back to base
+$adminskins_subdir = 'skins_adm/';         // Subdirectory relative to ADMIN
+$adminskins_path = $basepath.$adminskins_subdir; // You should not need to change this
+$adminskins_url = $baseurl.$adminskins_subdir;   // You should not need to change this
+
 /**
  * Location of the locales folder.
+ *
+ * Note: This folder NEEDS to by accessible by PHP AND MAY NEED to be accessible through HTTP.
+ * Exact requirements depend on future uses like localized icons.
+ *
  * @global string $locales_subdir
  */
 $locales_subdir = 'locales/';            // Subdirectory relative to base
-$locales_dirout = '../';                 // Relative path to go back to base
+$locales_path = $basepath.$locales_subdir;  // You should not need to change this
+
 /**
  * Location of the plug-ins.
+ *
+ * Note: This folder NEEDS to by accessible by PHP AND MAY NEED to be accessible through HTTP.
+ * Exact requirements depend on installed plugins.
+ *
  * @global string $plugins_subdir
  */
 $plugins_subdir = 'plugins/';            // Subdirectory relative to base
-$plugins_dirout = '../';                 // Relative path to go back to base
+$plugins_path = $basepath.$plugins_subdir;  // You should not need to change this
 $plugins_url = $baseurl.$plugins_subdir; // You should not need to change this
+
 /**
  * Location of the install folder.
  * @global string $install_subdir
  */
 $install_subdir = 'install/';            // Subdirectory relative to base
 $install_dirout = '../';                 // Relative path to go back to base
+
 /**
  * Location of the root media folder.
+ *
+ * Note: This folder MAY or MAY NOT NEED to be accessible by PHP AND/OR through HTTP.
+ * Exact requirements depend on $public_acces_to_media .
+ *
  * @global string $media_subdir
  */
 $media_subdir = 'media/';                // Subdirectory relative to base
-$media_dirout = '../';                   // Relative path to go back to base
 $media_url = $baseurl.$media_subdir;     // You should not need to change this
 
 

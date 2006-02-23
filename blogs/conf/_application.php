@@ -19,12 +19,12 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible to {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '1.7-beta';
+$app_version = '1.8-alpha';
 
 /**
  * Is displayed on the login screen:
  */
-$app_banner = '<a href="http://b2evolution.net/"><img src="../img/b2evolution_minilogo.png" width="231" height="50" alt="b2evolution" /></a>';
+$app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evolution_minilogo.png" width="231" height="50" alt="b2evolution" /></a>';
 
 /**
  * This is used to check if the database is up to date.
@@ -36,7 +36,7 @@ $new_db_version = 9100;
 
 $admin_path_seprator = ' :: ';
 $app_admin_logo = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website").
-									'"><img id="evologo" src="../img/b2evolution_minilogo2.png" alt="b2evolution" title="'.
+									'"><img id="evologo" src="rsc/img/b2evolution_minilogo2.png" alt="b2evolution" title="'.
 									T_("visit b2evolution's website").'" width="185" height="40" /></a>';
 $app_exit_links = '<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
 									&bull;

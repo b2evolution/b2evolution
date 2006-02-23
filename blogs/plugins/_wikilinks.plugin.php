@@ -135,7 +135,7 @@ class wikilinks_plugin extends Plugin
 				else
 				{ // Item not found
 
-					$create_link = isset($blog) ? ('<a href="'.$admin_url.'b2edit.php?blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
+					$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=edit&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
 
 					// WikiWord
 					$replace_links[] = '<span class="NonExistentWikiWord">'.$WikiWord.$create_link.'</span>';
@@ -222,7 +222,7 @@ class wikilinks_plugin extends Plugin
 			else
 			{ // Item not found
 
-				$create_link = isset($blog) ? ('<a href="'.$admin_url.'b2edit.php?blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
+				$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=edit&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^A-Z_])([A-Z])*', '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
 
 				// [[WikiWord text]]
 				$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';

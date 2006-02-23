@@ -12,7 +12,9 @@
 /**
  * Initialize everything:
  */
-require_once( dirname(__FILE__).'/../evocore/_main.inc.php' );
+require_once dirname(__FILE__).'/../conf/_config.php';
+
+require_once $inc_path.'_main.inc.php';
 
 // statuses allowed for acting on:
 $show_statuses = array( 'published', 'protected', 'private' );
@@ -200,6 +202,11 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.52  2006/02/23 21:11:47  fplanque
+ * File reorganization to MVC (Model View Controller) architecture.
+ * See index.hml files in folders.
+ * (Sorry for all the remaining bugs induced by the reorg... :/)
+ *
  * Revision 1.51  2006/01/29 20:48:17  blueyed
  * *** empty log message ***
  *

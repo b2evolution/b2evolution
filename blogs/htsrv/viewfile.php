@@ -67,14 +67,8 @@ $selectedFile = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path );
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title><?php echo $selectedFile->get_name().' ('.T_('Preview').')'; ?></title>
-	<link href="skins/legacy/rsc/css/variation.css" rel="stylesheet" type="text/css" title="Variation" />
-	<link href="skins/legacy/rsc/css/desert.css" rel="alternate stylesheet" type="text/css" title="Desert" />
-	<link href="skins/legacy/rsc/css/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
-	<?php if( is_file( dirname(__FILE__).'/skins/legacy/rsc/css/custom.css' ) ) { ?>
-	<link href="skins/legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />
-	<?php } ?>
 	<script type="text/javascript" src="../rsc/js/styleswitcher.js"></script>
-	<link href="../rsc/css/fileman.css" rel="stylesheet" type="text/css" />
+	<link href="../rsc/css/viewfile.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
@@ -243,6 +237,11 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.3  2006/02/23 21:11:47  fplanque
+ * File reorganization to MVC (Model View Controller) architecture.
+ * See index.hml files in folders.
+ * (Sorry for all the remaining bugs induced by the reorg... :/)
+ *
  * Revision 1.2  2005/12/16 13:50:49  blueyed
  * FileRoot::get_by_ID() from post-phoenix
  *

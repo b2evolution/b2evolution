@@ -21,21 +21,21 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 // Make the includes believe they are being called in the right place...
 define( 'EVO_MAIN_INIT', true );
 
-require_once dirname(__FILE__).'/'.$install_dirout.$conf_subdir.'_upgrade.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_log.class.php';
+require_once $conf_path.'_upgrade.php';
+require_once $misc_inc_path.'_log.class.php';
 $Debuglog = new Log( 'note' );
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_misc.funcs.php'; // db funcs
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_vars.inc.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_db.class.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_blog.funcs.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_category.funcs.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_item.class.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_item.funcs.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_form.funcs.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_user.funcs.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_timer.class.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_plugins.class.php';
-require_once dirname(__FILE__).'/'.$install_dirout.$core_subdir.'_results.class.php'; // needed to install default plugins
+require_once $misc_inc_path.'_misc.funcs.php'; // db funcs
+require_once $inc_path.'_vars.inc.php';
+require_once $misc_inc_path.'_db.class.php';
+require_once $model_path.'collections/_blog.funcs.php';
+require_once $model_path.'collections/_category.funcs.php';
+require_once $model_path.'items/_item.class.php';
+require_once $model_path.'items/_item.funcs.php';
+require_once $misc_inc_path.'_form.funcs.php';
+require_once $model_path.'users/_user.funcs.php';
+require_once $misc_inc_path.'_timer.class.php';
+require_once $misc_inc_path.'_plugins.class.php';
+require_once $misc_inc_path.'_results.class.php'; // needed to install default plugins
 require_once dirname(__FILE__).'/_functions_install.php';
 require_once dirname(__FILE__).'/_functions_create.php';
 
@@ -67,7 +67,7 @@ $timestamp = time() - 120; // We start dates 2 minutes ago because their dates i
 </head>
 <body>
 <div id="rowheader" >
-	<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="../img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" /></a></h1>
+	<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="<?php echo $rsc_url; ?>/img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" /></a></h1>
 	<div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
 	<h1 id="version"><?php echo T_('Installer for version '), ' ', $app_version ?></h1>
 	<div id="quicklinks">
@@ -99,7 +99,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 		echo "\n<li>";
 		if( $default_locale == $lkey ) echo '<strong>';
 		echo ' <a href="index.php?action='.$action.'&amp;locale='.$lkey.'">';
-		locale_flag( $lkey, 'w16px', 'flag', '', true, $install_dirout.$img_subdir.'flags' );
+		locale_flag( $lkey, 'w16px', 'flag', '', true, $rsc_url.'flags' );
 		echo T_( $lvalue['name'] );
 		echo '</a>';
 		if( $default_locale == $lkey ) echo '</strong>';
@@ -628,6 +628,11 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.91  2006/02/23 21:12:33  fplanque
+ * File reorganization to MVC (Model View Controller) architecture.
+ * See index.hml files in folders.
+ * (Sorry for all the remaining bugs induced by the reorg... :/)
+ *
  * Revision 1.90  2006/02/14 16:58:49  blueyed
  * no message
  *

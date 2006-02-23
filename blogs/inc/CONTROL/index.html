@@ -1,0 +1,17 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>/inc/CONTROL Folder</title>
+</head>
+<body>
+	<h2><a href="http://evocore.net/">evoCore</a> FrameWork</h2>
+	<h1><code>/inc/CONTROL</code> folder</h1>
+	<p>This folder holds the <strong>Control</strong>lers for the application.</p>
+<p>Each controller is a PHP include file which implements the logic for manipulating a particular &quot;set&quot; of data. For example there could be a controller to handle general settings and another controller to handle local settings.</p>
+<p>Controllers are grouped into foldes which represent modules. For example, the local and the general settings controllers both belong to the same module which holds the settings alltogether.</p>
+<p>Each HTTP request will typically get routed to precisely <strong>one</strong> controller (except for stub controllers) which means there will be <strong>one</strong> PHP include for that controller. Therefore it seems reasonable to make each controller as small as possible in order to minimize parsing/compiling/memory usage overhead. However, different actions on the same &quot;set&quot; of data -- like creating, editing and deleting the same data -- are closely related and, though they are not invoked at the same time, separating these actions into different controllers makes it harder to maintain the application over time when new fields or constraints are added to that set of data.</p>
+<p>Thus, it is recommended to try and find the right trade off between the size of the controller and the logical grouping of actions into the same controller. </p>
+<p>&nbsp;</p>
+</body>
+</html>

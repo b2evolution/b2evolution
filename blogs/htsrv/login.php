@@ -51,7 +51,7 @@
  * Includes:
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
-require_once dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.inc.php';
+require_once $inc_path.'_main.inc.php';
 
 param( 'action', 'string', '' );
 param( 'mode', 'string', '' );
@@ -203,13 +203,17 @@ switch( $action )
 		$current_User = & $ForgetfulUser;
 		$user_ID = $current_User->ID; // the selected user in the user admin
 
+die( 'this feature doesn\'t work right now :(' );
+
+// TODO: we have a working redirect function and we can pass Messages now, we gotta do that!
+
 		/**
 		 * Init the backoffice.
 		 */
-		require_once dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'_header.php';
+		require_once dirname(__FILE__).'/../_header.php';
 
-		$AdminUI->add_headline( '<base href="'.$admin_url.'" />' );
-		require( dirname(__FILE__).'/'.$htsrv_dirout.$admin_subdir.'b2users.php' );
+		$AdminUI->add_headline( '<base href="'.$htsrv_url.'" />' );
+		require 'b2users.php';
 
 		#header( 'Location: '.$baseurl.$admin_subdir.'b2users.php' ); // does not allow to leave a Message and IIS is known to cause problems with setcookie() and redirect.
 		exit();
@@ -220,7 +224,7 @@ switch( $action )
 
 
 // Default: login form
-require dirname(__FILE__).'/_login_form.php';
+require $view_path.'login/_login_form.php';
 exit();
 
 ?>

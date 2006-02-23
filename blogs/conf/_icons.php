@@ -72,16 +72,17 @@ $map_iconfiles = array(
 	),
 
 
-	'ascending' => array(     // sort ascending
-		'file' => $rsc_subdir.'icons/ascending.png',
-		'alt' => T_('ascending'),
-		'size' => array( 16, 16 ),
+	'ascending' => array(     // ascending sort order
+		'file' => $rsc_subdir.'icons/ascending.gif',
+		'alt' => T_('A'),
+		'size' => array( 15, 15 ),
 	),
-	'descending' => array(    // sort descending
-		'file' => $rsc_subdir.'icons/descending.png',
-		'alt' => T_('descending'),
-		'size' => array( 16, 16 ),
+	'descending' => array(    // descending sort order
+		'file' => $rsc_subdir.'icons/descending.gif',
+		'alt' => T_('D'),
+		'size' => array( 15, 15 ),
 	),
+
 	'window_new' => array(    // open in a new window
 		'file' => $rsc_subdir.'icons/window_new.png',
 		'alt' => T_('New window'),
@@ -176,22 +177,22 @@ $map_iconfiles = array(
 
 
 	'collapse' => array(
-		'file' => $img_subdir.'collapse.gif',
+		'file' => $rsc_subdir.'icons/collapse.gif',
 		'alt' => T_('Close'),
 		'size' => array( 16, 16 ),
 	),
 	'expand' => array(
-		'file' => $img_subdir.'expand.gif',
+		'file' => $rsc_subdir.'icons/expand.gif',
 		'alt' => T_('Open'),
 		'size' => array( 16, 16 ),
 	),
 	'reload' => array(
-		'file' => $img_subdir.'reload.png',
+		'file' => $rsc_subdir.'icons/reload.png',
 		'alt' => T_('Reload'),
 		'size' => array( 16, 16 ),
 	),
 	'download' => array(
-		'file' => $img_subdir.'download_manager.png',
+		'file' => $rsc_subdir.'icons/download_manager.png',
 		'alt' => T_('Download'),
 		'size' => array( 16, 16 ),
 	),
@@ -203,6 +204,11 @@ $map_iconfiles = array(
 		'size' => array( 16, 16 ),
 	),
 
+	'info' => array(
+		'file' => $rsc_subdir.'icons/info.gif',
+		'alt' => T_('Info'),
+		'size' => array( 16, 16 ),
+	),
 	'email' => array(
 		'file' => $rsc_subdir.'icons/envelope.gif',
 		'alt' => T_('Email'),
@@ -211,6 +217,7 @@ $map_iconfiles = array(
 	'www' => array(   /* user's web site, plugin's help url */
 		'file' => $rsc_subdir.'icons/url.gif',
 		'alt' => T_('WWW'),
+		'legend' => T_('Website'),
 		'size' => array( 34, 17 ),
 	),
 
@@ -230,7 +237,7 @@ $map_iconfiles = array(
 		'size' => array( 16, 15 ),
 	),
 	'properties' => array(
-		'file' => $admin_subdir.'img/properties.png',
+		'file' => $rsc_subdir.'icons/properties.png',
 		'alt' => T_('Properties'),
 		'size' => array( 18, 13 ),
 	),
@@ -256,45 +263,58 @@ $map_iconfiles = array(
 		'size' => array( 15, 15 ),
 	),
 	'close' => array(
-		'file' => $admin_subdir.'img/close.gif',
+		'file' => $rsc_subdir.'icons/close.gif',
 		'rollover' => true,
 		'alt' => T_('Close'),
 		'size' => array( 14, 14 ),
 	),
 
-	'assign' => array(
-		'file' => $rsc_subdir.'icons/handpoint13.gif',
-		'alt' => T_('Assigned to'),
-		'size' => array( 27, 13 ),
-	),
 
- 	'arrow_up' => array(
-		'file' => $admin_subdir.'img/arrowup.png',
+ 	'increase' => array(
+		'file' => $rsc_subdir.'icons/increase.gif',
+		'rollover' => true,
 		'alt' => T_('+'),
-		'size' => array( 14, 14 ),
+		'size' => array( 15, 15 ),
 	),
- 	'arrow_down' => array(
-		'file' => $admin_subdir.'img/arrowdown.png',
+ 	'decrease' => array(
+		'file' => $rsc_subdir.'icons/decrease.gif',
+		'rollover' => true,
 		'alt' => T_('-'),
-		'size' => array( 14, 14 ),
+		'size' => array( 15, 15 ),
 	),
 
+ 	'bullet_full' => array(
+		'file' => $rsc_subdir.'icons/bullet_full.png',
+		'alt' => '&bull;',
+		'size' => array( 9, 9 ),
+	),
+ 	'bullet_empty' => array(
+		'file' => $rsc_subdir.'icons/bullet_empty.png',
+		'alt' => '&nbsp;',
+		'size' => array( 9, 9 ),
+	),
+	'bullet_red' => array(
+		'file' => $rsc_subdir.'icons/bullet_red.gif',
+		'alt' => '&nbsp;',
+		'size' => array( 9, 9 ),
+	),
+	
 	'activate' => array(
-		'file' => $admin_subdir.'img/bullet_activate.png',
+		'file' => $rsc_subdir.'icons/bullet_activate.png',
 		'alt' => T_('Act.'),
 		'legend' => T_('Activate'),
 		'size' => array( 17, 17 ),
 	),
  	'deactivate' => array(
-		'file' => $admin_subdir.'img/bullet_deactivate.png',
+		'file' => $rsc_subdir.'icons/bullet_deactivate.png',
 		'alt' => T_('Deact.'),
 		'legend' => T_('Deactivate'),
 		'size' => array( 17, 17 ),
 	),
 
 	'link' => array(
-		'file' => $admin_subdir.'img/chain_link.gif',
-		'alt' => T_('Link'),
+		'file' => $rsc_subdir.'icons/chain_link.gif',
+		/* TRANS: Link + space => verb (not noun) */ 'alt' => T_('Link '),
 		'size' => array( 14, 14 ),
 	),
  	'unlink' => array(
@@ -316,12 +336,12 @@ $map_iconfiles = array(
 	),
 
 	'help' => array(
-		'file' => $img_subdir.'smilies/icon_question.gif',
+		'file' => $rsc_subdir.'icons/icon_question.gif',
 		'alt' => T_('Help'),
 		'size' => array( 15, 15 ),
 	),
 	'webhelp' => array(
-		'file' => $img_subdir.'smilies/icon_help.gif',
+		'file' => $rsc_subdir.'icons/icon_help.gif',
 		'alt' => T_('Help'),
 		'size' => array( 15, 15 ),
 	),
@@ -380,11 +400,16 @@ $map_iconfiles = array(
 		'alt' => T_( 'Sort by order' ),
 		'size' => array( 12, 13 ),
 	),
-	 	'nomove' => array(
+ 	'nomove' => array(
 		'file' => $rsc_subdir.'icons/nomove.gif',
 		'size' => array( 12, 13 ),
 	),
 		
+	'assign' => array(
+		'file' => $rsc_subdir.'icons/handpoint13.gif',
+		'alt' => T_('Assigned to'),
+		'size' => array( 27, 13 ),
+	),
 	'check_all' => array(
 		'file' => $rsc_subdir.'icons/check_all.gif',
 		'alt'	 => T_('Check all'),
@@ -400,6 +425,12 @@ $map_iconfiles = array(
 		'file' => $rsc_subdir.'icons/reset_filter.gif',
 		'alt'	 => T_('Reset all filters'),
 		'size' => array( 16, 16 ),
+	),
+
+	'allowback' => array(
+		'file' => $rsc_subdir.'icons/tick.gif',
+		'alt'	 => T_('Allow back'),
+		'size' => array( 13, 13 ),
 	),
 );
 

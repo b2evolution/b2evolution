@@ -102,7 +102,7 @@ class categories_plugin extends Plugin
 		/**
 		 * @todo get rid of these globals:
 		 */
-		global $blog, $cat_modifier, $pagenow;
+		global $blog, $cat_modifier;
 
 		/**
 		 * Default params:
@@ -266,7 +266,7 @@ class categories_plugin extends Plugin
 
 	function callback_before_each( $cat_ID, $level )
 	{ // callback to display sublist element
-		global $tab, $blog, $cat_array, $pagenow;
+		global $tab, $blog, $cat_array;
 		$cat = get_the_category_by_ID( $cat_ID );
 		$r = $this->params['line_start'];
 

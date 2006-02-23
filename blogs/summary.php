@@ -17,7 +17,9 @@
  * Check this: we are requiring _main.inc.php INSTEAD of _blog_main.inc.php because we are not
  * trying to initialize any particular blog
  */
-require(dirname(__FILE__).'/evocore/_main.inc.php');
+require_once dirname(__FILE__).'/conf/_config.php';
+
+require_once $inc_path.'_main.inc.php';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->

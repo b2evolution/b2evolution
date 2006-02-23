@@ -15,10 +15,15 @@
  */
 
 /**
+ * First thing: Do the minimal initializations required for b2evo:
+ */
+require_once dirname(__FILE__).'/conf/_config.php';
+
+/**
  * Check this: we are requiring _main.inc.php INSTEAD of _blog_main.inc.php because we are not
  * trying to initialize any particular blog
  */
-require_once dirname(__FILE__).'/evocore/_main.inc.php';
+require_once $inc_path.'_main.inc.php';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -30,7 +35,7 @@ require_once dirname(__FILE__).'/evocore/_main.inc.php';
 </head>
 <body>
 <div id="rowheader2">
-<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" /></a></h1>
+<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="<?php echo $rsc_url ?>img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" /></a></h1>
 <div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
 </div>
 
@@ -39,7 +44,7 @@ require_once dirname(__FILE__).'/evocore/_main.inc.php';
 <p>
 	<?php echo T_('This is the default homepage for b2evolution. It will be displayed as long as you don\'t select a default blog in the general settings.');
 	?>
-	( <a href="<?php echo $admin_url ?>settings.php?tab=general#default_blog_ID"><?php echo T_( 'Edit config' ) ?></a> )
+	( <a href="<?php echo $admin_url ?>?ctrl=settings&amp;tab=general#default_blog_ID"><?php echo T_( 'Edit config' ) ?></a> )
 </p>
 
 
