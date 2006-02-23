@@ -304,7 +304,7 @@ function PopupWindow() {
 	
 	this.contents = "";
 	this.url="";
-	this.windowProperties="toolbar=no,location=no,status=no,menubar=no,scrollbars=auto,resizable,alwaysRaised,dependent,titlebar=no";
+	this.windowProperties="toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable,alwaysRaised,dependent,titlebar=no";
 	if (arguments.length>0) {
 		this.type="DIV";
 		this.divName = arguments[0];
