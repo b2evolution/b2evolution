@@ -116,8 +116,8 @@ if( !$ok )
  */
 if( $Messages->display( T_('Cannot post comment, please correct these errors:'),
 	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' ) )
-{
-	exit(); // TODO: nicer displaying here
+{ // TODO: nicer displaying here
+	debug_die();
 }
 
 
@@ -202,16 +202,13 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.53  2006/02/23 22:05:49  blueyed
+ * use debug_die()
+ *
  * Revision 1.52  2006/02/23 21:11:47  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.51  2006/01/29 20:48:17  blueyed
- * *** empty log message ***
- *
- * Revision 1.50  2006/01/27 15:10:13  fplanque
- * no message
  *
  */
 ?>
