@@ -47,7 +47,7 @@ param( 'ctrl', '/^[a-z0-9]+$/', $default_ctrl, true );
 // Check matching controller file:
 if( !isset($ctrl_mappings[$ctrl]) )
 {
-	die( 'The requested controller ['.$ctrl.'] does not exist.' );
+	debug_die( 'The requested controller ['.$ctrl.'] does not exist.' );
 }
 
 // Call the requested controller:
