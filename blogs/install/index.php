@@ -67,7 +67,7 @@ $timestamp = time() - 120; // We start dates 2 minutes ago because their dates i
 </head>
 <body>
 <div id="rowheader" >
-	<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="<?php echo $rsc_url; ?>/img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" /></a></h1>
+	<h1><a href="http://b2evolution.net/" title="b2evolution: Home"><img src="<?php echo $rsc_url; ?>img/b2evolution_logo.png" alt="b2evolution" width="472" height="102" /></a></h1>
 	<div id="tagline"><?php echo T_('Multilingual multiuser multi-blog engine.') ?></div>
 	<h1 id="version"><?php echo T_('Installer for version '), ' ', $app_version ?></h1>
 	<div id="quicklinks">
@@ -628,13 +628,13 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.92  2006/02/23 22:17:31  blueyed
+ * fix path
+ *
  * Revision 1.91  2006/02/23 21:12:33  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.90  2006/02/14 16:58:49  blueyed
- * no message
  *
  * Revision 1.89  2006/02/11 01:08:20  blueyed
  * Oh what fun it is to drop some "e".
