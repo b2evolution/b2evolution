@@ -493,7 +493,7 @@ class DB
 	 *
 	 * @param string SQL query
 	 * @param string title for debugging
-	 * @return mixed # of rows affected or false if error
+	 * @return int|false number of rows, number of rows affected (INSERT, DELETE, UPDATE, REPLACE) or false if error
 	 */
 	function query( $query, $title = '' )
 	{
@@ -1174,13 +1174,13 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/23 22:33:58  blueyed
+ * doc
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.55  2006/02/14 20:22:22  blueyed
- * *** empty log message ***
  *
  * Revision 1.54  2006/02/13 00:40:25  blueyed
  * new_link and client_flags param for mysql_connect(). Also pass the $dbhandle to every mysql_*() function.
