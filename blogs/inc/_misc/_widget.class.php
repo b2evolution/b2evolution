@@ -47,7 +47,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * It provides a method {@link replace_vars()} that can be used to replace object properties in given strings.
  * You can also register global action icons.
  *
- * @access abstract
+ * @package evocore
+ * @abstract
  */
 class Widget
 {
@@ -67,8 +68,8 @@ class Widget
 	 * Registers a global action icon
 	 *
 	 * @param string TITLE text (IMG and A link)
-	 * @param string icon code {@see $$map_iconfiles}
-	 * @param string icon code for {@see get_icon()}
+	 * @param string icon code, see {@link $map_iconfiles}
+	 * @param string icon code for {@link get_icon()}
 	 */
 	function global_icon( $title, $icon, $url, $word = '' )
 	{
@@ -85,7 +86,6 @@ class Widget
 	 *
 	 * You can give an alternative string to display, if the substituted variable
 	 * is empty, like:
-	 * <code>$vars "Display if empty"$</code>
 	 * <code>$vars "Display if empty"$</code>
 	 *
 	 * @param string template
