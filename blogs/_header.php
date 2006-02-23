@@ -10,7 +10,7 @@
 
 
 // Get the blog from param, defaulting to the last selected one for this user:
-$user_selected_blog = (int)$UserSettings->get('selected_blog'); // QUESTION: we might want to exclude $pagenow=stats.php here..?! WHY??
+$user_selected_blog = (int)$UserSettings->get('selected_blog');
 param( 'blog', 'integer', $user_selected_blog, true ); // We may need this for the urls
 if( $blog != $user_selected_blog )
 { // Update UserSettings for selected blog:
