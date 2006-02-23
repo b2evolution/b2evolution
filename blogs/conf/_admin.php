@@ -25,10 +25,10 @@ $default_ctrl = 'edit';
  * For each controller name, we associate a controller file to be found in /inc/CONTROLLERS/ .
  * The advantage of this indirection is that it is easy to reorganize the controllers into
  * subdirectories by modules. It is also easy to deactivate some controllers if you don't
- * want to provide this functionnality on a given installation.
+ * want to provide this functionality on a given installation.
  *
  * Note: while the controller mappings might more or less follow the menu structure, we do not merge
- * the two tables since we could, at any time, decide to mae a skin with a different menu structure.
+ * the two tables since we could, at any time, decide to make a skin with a different menu structure.
  * The controllers however would most likely remain the same.
  *
  * @global array
