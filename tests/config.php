@@ -39,35 +39,21 @@ if( !defined( 'TMPDIR' ) )
  *       to define EVO_MAIN_INIT to load single class files, ...
  */
 define( 'EVO_MAIN_INIT', 'SIMPLETEST' );
-require_once( EVODIR.'blogs/conf/_config.php' );
-require_once( EVODIR.'blogs/evocore/_misc.funcs.php' );
-require_once( EVODIR.'blogs/evocore/_blog.funcs.php' );
-require_once( EVODIR.'blogs/evocore/_category.funcs.php' );
-require_once( EVODIR.'blogs/evocore/_item.funcs.php' );
-require_once( EVODIR.'blogs/evocore/_dataobject.class.php' );
-require_once( EVODIR.'blogs/evocore/_log.class.php' );
+require_once EVODIR.'blogs/conf/_config.php';
 
-require_once( EVODIR.'blogs/evocore/_abstractsettings.class.php' );
-require_once( EVODIR.'blogs/evocore/_generalsettings.class.php' );
 
-require_once( EVODIR.'blogs/evocore/_filecache.class.php' );
-require_once( EVODIR.'blogs/evocore/_item.class.php' );
-require_once( EVODIR.'blogs/evocore/_fileroot.class.php' );
-require_once( EVODIR.'blogs/evocore/_filerootcache.class.php' );
-require_once( EVODIR.'blogs/evocore/_filetype.class.php' );
-require_once( EVODIR.'blogs/evocore/_filetypecache.class.php' );
+// Load all .class.php and .funcs.php files:
+require_once $model_path.'files/_file.funcs.php';
 
-require_once( EVODIR.'blogs/evocore/_usercache.class.php' );
-require_once( EVODIR.'blogs/evocore/_user.class.php' );
-require_once( EVODIR.'blogs/evocore/_group.class.php' );
-require_once( EVODIR.'blogs/evocore/_results.class.php' );
-require_once( EVODIR.'blogs/evocore/_timer.class.php' );
-
-require_once( EVODIR.'blogs/evocore/_db.class.php' );
-
-require_once( EVODIR.'blogs/evocore/_plugins.class.php' );
-
-#require_once( EVODIR.'blogs/evocore/_main.inc.php' );
+$includes = get_filenames( $inc_path, true, false );
+foreach( $includes as $include_file )
+{
+	if( ! preg_match( '~\.(funcs|class)\.php~', $include_file ) )
+	{
+		continue;
+	}
+	require_once $include_file;
+}
 
 
 /**

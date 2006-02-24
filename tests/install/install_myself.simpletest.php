@@ -6,19 +6,15 @@
 /**
  * SimpleTest config
  */
-require_once( dirname(__FILE__).'/../config.simpletest.php' );
-
-
-require_once( EVODIR.'blogs/install/_functions_install.php' );
-require_once( EVODIR.'blogs/install/_functions_create.php' );
+require_once dirname(__FILE__).'/../config.simpletest.php';
 
 
 /**
  *
  */
-class Install_self extends InstallUnitTestCase
+class InstallSelfTestCase extends InstallUnitTestCase
 {
-	function Install_self()
+	function InstallSelfTestCase()
 	{
 		$this->InstallUnitTestCase( 'Installing myself' );
 	}
@@ -47,8 +43,6 @@ class Install_self extends InstallUnitTestCase
 	 */
 	function testInstall()
 	{
-		require_once( EVODIR.'blogs/install/_functions_create.php' );
-
 		create_b2evo_tables();
 		populate_main_tables();
 		install_basic_plugins();
@@ -60,7 +54,7 @@ class Install_self extends InstallUnitTestCase
 
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
-	$test = new UpgradeTo1_6TestCase();
+	$test = new InstallSelfTestCase();
 	$test->run( new HtmlReporter() );
 	unset( $test );
 }

@@ -4,16 +4,27 @@
  * provides DB handling functions for the test DB.
  */
 
+
 /**
- * The DB class for the internal DB object.
+ * We use create_b2evo_tables() in {@link create_current_tables()}.
  */
-require_once( EVODIR.'blogs/'.$core_subdir.'_db.class.php' );
+require_once $basepath.$install_subdir.'_functions_create.php';
+
 
 /**
  * The base class for all unit tests that use the test DB.
+ *
+ * It sets the global $DB to the test-DB object and creates a fresh installation in {@link setUp()}.
  */
 class DbUnitTestCase extends EvoUnitTestCase
 {
+	/**
+	 * @var DB A database object connected to the test DB.
+	 * @see $testDB_conf
+	 */
+	var $test_DB;
+
+
 	/**
 	 * Constructor
 	 */
@@ -26,22 +37,19 @@ class DbUnitTestCase extends EvoUnitTestCase
 			die( 'Please set the DB name to use for tests in /tests/config.php or /tests/config.OVERRIDE.php. See $testDB_conf there..' );
 		}
 
-
-		$this->DB = & new DB( $testDB_conf );
+		$this->test_DB = new DB( $testDB_conf );
 	}
 
 
 	/**
-	 * Setup global $DB as reference to member DB (test DB).
+	 * Setup global $DB as reference to member test_DB (test DB).
 	 */
 	function setUp()
 	{
 		parent::setUp();
 
-		$this->dropTestDbTables();
-
 		$this->old_DB = & $GLOBALS['DB'];
-		$GLOBALS['DB'] = & $this->DB;
+		$GLOBALS['DB'] = & $this->test_DB;
 	}
 
 
@@ -70,7 +78,7 @@ class DbUnitTestCase extends EvoUnitTestCase
 				continue;
 			}
 
-			$this->DB->query( $lQuery );
+			$this->test_DB->query( $lQuery );
 		}
 	}
 
@@ -84,9 +92,14 @@ class DbUnitTestCase extends EvoUnitTestCase
 
 		$testDbTables = array_keys($EvoConfig->DB['aliases']);
 
+		if( $test_tables = $this->test_DB->get_col( 'SHOW TABLES LIKE "test_%"' ) )
+		{
+			$testDbTables = array_merge( $testDbTables, $test_tables );
+		}
+
 		$drop_query = 'DROP TABLE IF EXISTS '.implode( ', ', $testDbTables );
 
-		$this->DB->query( $drop_query );
+		$this->test_DB->query( $drop_query );
 	}
 
 
@@ -95,8 +108,6 @@ class DbUnitTestCase extends EvoUnitTestCase
 	 */
 	function create_current_tables()
 	{
-		require_once( EVODIR.'blogs/install/_functions_create.php' );
-
 		$this->dropTestDbTables();
 
 		create_b2evo_tables();

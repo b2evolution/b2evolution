@@ -6,20 +6,17 @@
 /**
  * SimpleTest config
  */
-require_once( dirname(__FILE__).'/../config.simpletest.php' );
-
-
-require_once( EVODIR.'blogs/install/_functions_evoupgrade.php' );
+require_once dirname(__FILE__).'/../config.simpletest.php';
 
 
 /**
- *
+ * Test upgrading to current scheme
  */
-class UpgradeTo1_6TestCase extends InstallUnitTestCase
+class UpgradeToCurrentTestCase extends InstallUnitTestCase
 {
-	function UpgradeTo1_6TestCase()
+	function UpgradeToCurrentTestCase()
 	{
-		$this->InstallUnitTestCase( 'Upgrade to version 1.6 tests' );
+		$this->InstallUnitTestCase( 'Upgrade to current version' );
 	}
 
 
@@ -48,6 +45,16 @@ class UpgradeTo1_6TestCase extends InstallUnitTestCase
 
 
 	/**
+	 * Test upgrade from 0.8.2
+	 */
+	function testUpgradeFrom0_8_2()
+	{
+		$this->executeQueriesFromFile( TESTSDIR.'install/sql/b2evolution_0_8_2.default.sql' );
+		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 0.8.2 successful!' );
+	}
+
+
+	/**
 	 * Test upgrade from 0.9.0.11
 	 */
 	function testUpgradeFrom0_9_0_11()
@@ -70,7 +77,7 @@ class UpgradeTo1_6TestCase extends InstallUnitTestCase
 
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
-	$test = new UpgradeTo1_6TestCase();
+	$test = new UpgradeToCurrentTestCase();
 	$test->run( new HtmlReporter() );
 	unset( $test );
 }

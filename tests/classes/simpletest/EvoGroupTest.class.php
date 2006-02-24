@@ -10,11 +10,6 @@
  */
 require_once( dirname(__FILE__).'/HtmlReporterShowPasses.class.php' );
 
-/**
- * We use {@link get_filenames()}
- */
-require_once( EVODIR.'blogs/evocore/_file.funcs.php' );
-
 
 /**
  * Evo GroupTest class.

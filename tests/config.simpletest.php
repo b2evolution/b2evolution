@@ -63,7 +63,6 @@ require_once( dirname(__FILE__).'/classes/simpletest/InstallUnitTestCase.class.p
 /**
  * Create a DB Mockobject
  */
-require_once( EVODIR.'/blogs/evocore/_db.class.php' );
 Mock::generate( 'DB' );
 
 ?>

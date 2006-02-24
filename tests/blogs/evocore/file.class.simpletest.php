@@ -8,8 +8,6 @@
  */
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
-require_once( EVODIR.'/blogs/evocore/_file.class.php' );
-
 
 /**
  * @package tests

@@ -8,13 +8,11 @@
  */
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
-require_once( EVODIR.'blogs/evocore/_misc.funcs.php' );
-
 
 /**
  * @package tests
  */
-class MiscFuncsTestCase extends UnitTestCase
+class MiscFuncsTestCase extends EvoUnitTestCase
 {
 	function MiscFuncsTestCase()
 	{
@@ -155,6 +153,23 @@ class MiscFuncsTestCase extends UnitTestCase
 		$this->assertEqual(
 			implode_with_and( array('one', 'two', 'three') ),
 			'one, two and three' );
+	}
+
+
+	function test_validate_url()
+	{
+		foreach( array(
+			'mailto:example@example.org',
+			'http://b2evolution.net',
+			'https://www.b2evolution.net',
+			) as $url )
+		{
+			$r = validate_url( $url, $GLOBALS['comments_allowed_uri_scheme'] );
+			$this->assertFalse( $r );
+
+			$r = validate_url( $url, $GLOBALS['allowed_uri_scheme'] );
+			$this->assertFalse( $r );
+		}
 	}
 
 }
