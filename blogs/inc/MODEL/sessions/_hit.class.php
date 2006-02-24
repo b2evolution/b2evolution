@@ -48,6 +48,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * NOTE: The internal function double_check_referer() uses the class Net_IDNA_php4 from /blogs/lib/_idna_convert.class.php.
  *       It's required() only, when needed.
+ * @package evocore
  */
 class Hit
 {
@@ -581,41 +582,43 @@ class Hit
 	}
 
 
-   /**
-    * Get the remote hostname.
-    *
-    * @return string
-    */
-   function get_remote_host( $allow_nslookup = false )
-   {
-      global $Timer;
+	/**
+	 * Get the remote hostname.
+	 *
+	 * @return string
+	 */
+	function get_remote_host( $allow_nslookup = false )
+	{
+		global $Timer;
 
-      $Timer->start( 'Hit::get_remote_host' );
+		$Timer->start( 'Hit::get_remote_host' );
 
-      if( is_null($this->_remoteHost) )
-      {
-         if( isset( $_SERVER['REMOTE_HOST'] ) )
-         {
-            $this->_remoteHost = $_SERVER['REMOTE_HOST'];
-         }
-         elseif( $allow_nslookup )
-         {   // We allowed reverse DNS lookup:
-            // This can be terribly time consuming (4/5 seconds!) when there is no reverse dns available!
-            // This is the case on many intranets and many users' first time installs!!!
-            // Some people end up considering evocore is very slow just because of this line!
-            // This cannot be enabled by default.
-            $this->_remoteHost = @gethostbyaddr($this->IP);
-         }
-         else
-         {
-            $this->_remoteHost = '';
-         }
-      }
+		if( is_null($this->_remoteHost) )
+		{
+			if( isset( $_SERVER['REMOTE_HOST'] ) )
+			{
+				$this->_remoteHost = $_SERVER['REMOTE_HOST'];
+			}
+			elseif( $allow_nslookup )
+			{ // We allowed reverse DNS lookup:
+				/*
+				This can be terribly time consuming (4/5 seconds!) when there is no reverse dns available!
+				This is the case on many intranets and many users' first time installs!!!
+				Some people end up considering evocore is very slow just because of this line!
+				This cannot be enabled by default.
+				*/
+				$this->_remoteHost = @gethostbyaddr($this->IP);
+			}
+			else
+			{
+				$this->_remoteHost = '';
+			}
+		}
 
-      $Timer->pause( 'Hit::get_remote_host' );
+		$Timer->pause( 'Hit::get_remote_host' );
 
-      return $this->_remoteHost;
-   }
+		return $this->_remoteHost;
+	}
 
 
 	/**
