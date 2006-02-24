@@ -1339,9 +1339,12 @@ function validate_url( $url, & $allowed_uri_scheme )
 	 *  - umlauts in domains/url
 	 */
 	if( ! preg_match('~^                # start
-		([a-z][a-z0-9+.\-]*):[0-9]*       # scheme
-		//                                # authority absolute URLs only
-		[a-z0-9]([a-z0-9\~+.\-_,:;/\\\\*=]|(%\d+))* # Don t allow anything too funky like entities
+		(?:
+			(?: ([a-z][a-z0-9+.\-]*):[0-9]*       # scheme
+				//                                # authority absolute URLs only
+			)|(mailto):
+		)
+		[a-z0-9]([a-z0-9\~+.\-_,:;/\\\\*=@]|(%\d+))* # Don t allow anything too funky like entities
 		([?#][a-z0-9\~+.\-_,:;/\\\\%&=!?#*\ \[\]]*)?
 		$~ix', $url, $matches) )
 	{ // Cannot validate URL structure
@@ -1349,9 +1352,10 @@ function validate_url( $url, & $allowed_uri_scheme )
 		return T_('Invalid URL');
 	}
 
-	$scheme = strtolower($matches[1]);
+	$scheme = empty( $matches[1] ) ? strtolower($matches[2]) : strtolower($matches[1]);
 	if( !in_array( $scheme, $allowed_uri_scheme ) )
 	{ // Scheme not allowed
+		$Debuglog->add( 'URL scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
 		return T_('URI scheme not allowed');
 	}
 
@@ -2029,15 +2033,48 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  * @param string icon code, see {@link $map_iconfiles}
  * @param string icon code for {@link get_icon()}
  * @param string word to be displayed after icon
+ * @param array Additional attributes to the A tag. It may also contain these params:
+ *              'use_js_popup': if true, the link gets opened as JS popup.
+ * @return string The generated action icon link.
  */
-function action_icon( $title, $icon, $url, $word = NULL )
+function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array() )
 {
-	$r = '<a href="'.$url.'" title="'.$title.'"';
+	static $count_generated = 0;
+
+	if( ! isset($link_attribs['id']) )
+	{
+		$link_attribs['id'] = 'action_icon_'.$count_generated++;
+	}
+
+	$link_attribs['href'] = $url;
+	$link_attribs['title'] = $url;
+
 	if( get_icon( $icon, 'rollover' ) )
 	{
-		$r .= ' class="rollover"';
+		if( empty($link_attribs['class']) )
+		{
+			$link_attribs['class'] = 'rollover';
+		}
+		else
+		{
+			$link_attribs['class'] .= ' rollover';
+		}
 	}
-	$r .= '>'.get_icon( $icon, 'imgtag', array( 'title'=>$title ), true );
+
+	if( isset($link_attribs['use_js_popup']) )
+	{
+		$popup_js = 'var win = new PopupWindow(); win.autoHide(); win.setUrl( "'.$link_attribs['href'].'" ); win.setSize( 500, 400 ); win.showPopup("'.$link_attribs['id'].'"); return false;';
+		if( empty( $link_attribs['onclick'] ) )
+		{
+			$link_attribs['onclick'] = $popup_js;
+		}
+		else
+		{
+			$link_attribs['onclick'] .= $popup_js;
+		}
+	}
+
+	$r = '<a'.get_field_attribs_as_string($link_attribs).'>'.get_icon( $icon, 'imgtag', array( 'title'=>$title ), true );
 	if( !empty($word) )
 	{
 		$r .= $word;
@@ -2625,13 +2662,13 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 19:36:04  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.184  2006/02/18 23:36:57  fplanque
- * no message
  *
  * Revision 1.183  2006/02/14 20:11:38  blueyed
  * added implode_with_and()
