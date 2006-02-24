@@ -171,7 +171,7 @@ class dnsbl_antispam_plugin extends Plugin
 			$shown = param( 'tooslow_shown_lists', 'array', array() );
 			$deactivate = param( 'tooslow_deactivate', 'array', array() );
 
-			$tooslow_dnsbls = $this->Settings->get_unserialized( 'tooslow_dnsbls', array() );
+			$tooslow_dnsbls = $this->Settings->get( 'tooslow_dnsbls' );
 
 			foreach( $shown as $k => $blacklist )
 			{
@@ -230,7 +230,7 @@ class dnsbl_antispam_plugin extends Plugin
 			$Form->begin_form('fform');
 			$Form->begin_fieldset( T_('Too slow lists') );
 
-			$tooslow_dnsbls = $this->Settings->get_unserialized( 'tooslow_dnsbls', array() );
+			$tooslow_dnsbls = $this->Settings->get( 'tooslow_dnsbls' );
 
 			foreach( $dnsbls as $blacklist )
 			{
@@ -483,7 +483,7 @@ class dnsbl_antispam_plugin extends Plugin
 		$tooslow_needs_update = false;
 		if( $tooslow_tries )
 		{
-			$tooslow_dnsbls = $this->Settings->get_unserialized( 'tooslow_dnsbls', array() );
+			$tooslow_dnsbls = $this->Settings->get_unserialized( 'tooslow_dnsbls' );
 		}
 		else
 		{
@@ -665,6 +665,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.9  2006/02/24 19:18:32  blueyed
+ * Settings::get_unserialized() has been removed
+ *
  * Revision 1.8  2006/02/15 04:07:16  blueyed
  * minor merge
  *
