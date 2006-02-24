@@ -64,7 +64,7 @@ $admin_Plugins = new Plugins_admin();
  */
 function install_plugin_db_schema_action( & $Plugin )
 {
-	global $action, $Request, $admin_dirout, $core_subdir, $install_db_deltas, $DB, $Messages;
+	global $action, $Request, $inc_path, $install_db_deltas, $DB, $Messages;
 
 	$action = 'list';
 	// Prepare vars for DB layout changes
@@ -75,7 +75,7 @@ function install_plugin_db_schema_action( & $Plugin )
 
 	if( ! empty($db_layout) )
 	{ // The plugin has a DB layout attached
-		require_once $inc_path.'misc/_upgrade.funcs.php';
+		require_once $inc_path.'_misc/_upgrade.funcs.php';
 
 		// Get the queries to make:
 		foreach( db_delta($db_layout, false) as $table => $queries )
@@ -123,6 +123,9 @@ function install_plugin_db_schema_action( & $Plugin )
  *
  * @param string Setting name
  * @param string The settings path, e.g. 'setting[0]foo[1]'. (Is used as array internally for recursion.)
+ * @param mixed The initial value of the setting, typically array() - NULL to unset it (action "delete_settings_set" uses it)
+ * @param mixed Used internally for recursion (current setting to look at)
+ * @param mixed Used internally for recursion (meta info of current setting to look at)
  * @return array|false
  */
 function _set_setting_by_path( & $Plugin, $path, $init_value = array(), $setting = NULL, $meta = NULL )
@@ -207,11 +210,11 @@ function _set_setting_by_path( & $Plugin, $path, $init_value = array(), $setting
 	}
 	else
 	{ // Recurse:
-		$new_set = _set_setting_by_path( $Plugin, $path, $init_value, $setting, $meta );
+		$new_set = _set_setting_by_path( $Plugin, $path, $init_value, $setting[$set_index], $meta );
 
 		if( $new_set !== false )
 		{
-			$setting[$set_index][$path[0]] = array_merge( $setting[$set_index][$path[0]], $new_set );
+			$setting[$set_index][$path[0]] = $new_set;
 		}
 	}
 
@@ -876,7 +879,8 @@ switch( $action )
 		<div class="panelinfo">
 
 			<?php
-			$Form = & new Form( 'plugins.php', 'install_db_deltas', 'get' );
+			$Form = & new Form( NULL, 'install_db_deltas', 'get' );
+			$Form->hidden_ctrl();
 			$Form->global_icon( T_('Cancel installation!'), 'close', regenerate_url() );
 
 			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Setup database for plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );

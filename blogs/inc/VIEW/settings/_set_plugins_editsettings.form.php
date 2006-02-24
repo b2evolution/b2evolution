@@ -60,7 +60,7 @@ global $edit_Plugin;
  */
 global $admin_Plugins;
 
-global $edited_plugin_priority, $edited_plugin_code, $edited_plugin_apply_rendering;
+global $edited_plugin_priority, $edited_plugin_code, $edited_plugin_apply_rendering, $admin_url;
 
 /**
  * @global string Contents of the Plugin's help file, if any. We search there for matching IDs/anchors to display links to them.
@@ -83,7 +83,7 @@ if( ! empty( $edit_Plugin->help_url ) )
 }
 if( $edit_Plugin->get_help_file() )
 {
-	$Form->global_icon( T_('Local documentation of the plugin'), 'help', 'plugins.php?action=disp_help&amp;plugin_ID='.$edit_Plugin->ID );
+	$Form->global_icon( T_('Local documentation of the plugin'), 'help', url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help&amp;plugin_ID='.$edit_Plugin->ID ) );
 }
 
 $Form->global_icon( T_('Cancel edit!'), 'close', regenerate_url() );
@@ -329,7 +329,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 					$fieldset_icons = array();
 					if( ! isset($set_meta['min_count']) || count($set_value) > $set_meta['min_count'] )
 					{ // provide icon to remove this set
-						$fieldset_icons[] = action_icon( T_('Delete set!'), 'delete', regenerate_url( 'action', array('action=delete_settings_set', 'set_path='.$set_name.'['.$insert_new_set_as.']', 'plugin_ID='.$Plugin->ID), 'plugins.php' ) );
+						$fieldset_icons[] = action_icon( T_('Delete set!'), 'delete', regenerate_url( 'action', array('action=delete_settings_set', 'set_path='.$set_name.'['.$insert_new_set_as.']', 'plugin_ID='.$Plugin->ID) ) );
 					}
 					$Form->begin_fieldset( '#'.$k, array(), $fieldset_icons );
 
@@ -345,7 +345,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 			}
 			if( ! isset( $set_meta['max_number'] ) || $set_meta['max_number'] > count($set_value) )
 			{ // no max_number defined or not reached: display link to add a new set
-				echo action_icon( sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label), 'new', regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_name.'['.$insert_new_set_as.']', 'plugin_ID='.$Plugin->ID), 'plugins.php' ), T_('New set') );
+				echo action_icon( sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label), 'new', regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_name.'['.$insert_new_set_as.']', 'plugin_ID='.$Plugin->ID) ), T_('New set') );
 			}
 			$Form->end_fieldset();
 
@@ -385,6 +385,9 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.2  2006/02/24 23:38:55  blueyed
+ * fixes
+ *
  * Revision 1.1  2006/02/24 23:02:16  blueyed
  * Added _set_plugins_editsettings.form VIEW
  *
