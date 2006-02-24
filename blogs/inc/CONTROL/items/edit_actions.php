@@ -66,7 +66,7 @@ switch($action)
 				break;
 
 			default:
-				$location = url_add_param( $admin_url, "?ctrl=browse&amp;blog=$blog&amp;filter=restore" );
+				$location = url_add_param( $admin_url, "ctrl=browse&amp;blog=$blog&amp;filter=restore" );
 				break;
 		}
 		$AdminUI->title = T_('Adding new post...');
@@ -546,6 +546,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 00:27:14  blueyed
+ * fix
+ *
  * Revision 1.1  2006/02/23 21:11:56  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
