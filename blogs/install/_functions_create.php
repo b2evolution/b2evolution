@@ -63,258 +63,29 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function create_b2evo_tables()
 {
-	global $baseurl, $new_db_version, $DB;
-	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
-	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
+	global $inc_path;
 
-	create_groups();
+	require_once $inc_path.'_misc/_db_schema.inc.php';
+	require_once $inc_path.'_misc/_upgrade.funcs.php';
 
+	// Alter DB to match DB schema:
+	install_make_db_schema_current( true );
 
-	echo 'Creating table for Settings... ';
-	$query = "CREATE TABLE T_settings (
-		set_name VARCHAR( 30 ) NOT NULL ,
-		set_value VARCHAR( 255 ) NULL ,
-		PRIMARY KEY ( set_name )
-		)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for Users... ';
-	$query = "CREATE TABLE T_users (
-		user_ID int(11) unsigned NOT NULL auto_increment,
-		user_login varchar(20) NOT NULL,
-		user_pass CHAR(32) NOT NULL,
-		user_firstname varchar(50) NULL,
-		user_lastname varchar(50) NULL,
-		user_nickname varchar(50) NULL,
-		user_icq int(11) unsigned NULL,
-		user_email varchar(100) NOT NULL,
-		user_url varchar(100) NULL,
-		user_ip varchar(15) NULL,
-		user_domain varchar(200) NULL,
-		user_browser varchar(200) NULL,
-		dateYMDhour datetime NOT NULL,
-		user_level int unsigned DEFAULT 0 NOT NULL,
-		user_aim varchar(50) NULL,
-		user_msn varchar(100) NULL,
-		user_yim varchar(50) NULL,
-		user_locale varchar(20) DEFAULT 'en-EU' NOT NULL,
-		user_idmode varchar(20) NOT NULL DEFAULT 'login',
-		user_notify tinyint(1) NOT NULL default 1,
-		user_showonline tinyint(1) NOT NULL default 1,
-		user_grp_ID int(4) NOT NULL default 1,
-		PRIMARY KEY user_ID (user_ID),
-		UNIQUE user_login (user_login),
-		KEY user_grp_ID (user_grp_ID)
-	)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for Blogs... ';
-	$query = "CREATE TABLE T_blogs (
-		blog_ID int(11) unsigned NOT NULL auto_increment,
-		blog_shortname varchar(12) NULL default '',
-		blog_name varchar(50) NOT NULL default '',
-		blog_tagline varchar(250) NULL default '',
-		blog_description varchar(250) NULL default '',
-		blog_longdesc TEXT NULL DEFAULT NULL,
-		blog_locale VARCHAR(20) NOT NULL DEFAULT 'en-EU',
-		blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php',
-		blog_siteurl varchar(120) NOT NULL default '',
-		blog_staticfilename varchar(30) NULL default NULL,
-		blog_stub VARCHAR(255) NOT NULL DEFAULT 'stub',
-		blog_urlname VARCHAR(255) NOT NULL DEFAULT 'urlname',
-		blog_notes TEXT NULL,
-		blog_keywords tinytext,
-		blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post',
-		blog_allowtrackbacks TINYINT(1) NOT NULL default 1,
-		blog_allowpingbacks TINYINT(1) NOT NULL default 0,
-		blog_allowblogcss TINYINT(1) NOT NULL default 1,
-		blog_allowusercss TINYINT(1) NOT NULL default 1,
-		blog_pingb2evonet TINYINT(1) NOT NULL default 0,
-		blog_pingtechnorati TINYINT(1) NOT NULL default 0,
-		blog_pingweblogs TINYINT(1) NOT NULL default 0,
-		blog_pingblodotgs TINYINT(1) NOT NULL default 0,
-		blog_default_skin VARCHAR(30) NOT NULL DEFAULT 'custom',
-		blog_force_skin TINYINT(1) NOT NULL default 0,
-		blog_disp_bloglist TINYINT(1) NOT NULL DEFAULT 1,
-		blog_in_bloglist TINYINT(1) NOT NULL DEFAULT 1,
-		blog_links_blog_ID INT(11) NULL DEFAULT NULL,
-		blog_commentsexpire INT(4) NOT NULL DEFAULT 0,
-		blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL,
-		blog_media_subdir VARCHAR( 255 ) NULL,
-		blog_media_fullpath VARCHAR( 255 ) NULL,
-		blog_media_url VARCHAR( 255 ) NULL,
-		blog_UID VARCHAR(20),
-		PRIMARY KEY blog_ID (blog_ID),
-		UNIQUE KEY blog_urlname (blog_urlname)
-	)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for Categories... ';
-	$query="CREATE TABLE T_categories (
-		cat_ID int(11) unsigned NOT NULL auto_increment,
-		cat_parent_ID int(11) unsigned NULL,
-		cat_name tinytext NOT NULL,
-		cat_blog_ID int(11) unsigned NOT NULL default 2,
-		cat_description VARCHAR(250) NULL DEFAULT NULL,
-		cat_longdesc TEXT NULL DEFAULT NULL,
-		cat_icon VARCHAR(30) NULL DEFAULT NULL,
-		PRIMARY KEY cat_ID (cat_ID),
-		KEY cat_blog_ID (cat_blog_ID),
-		KEY cat_parent_ID (cat_parent_ID)
-	)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for Posts... ';
-	// TODO: renderers is now limited to 7 renderes (with 32 char names). Move to text but FORCE default value in Item class / dbinsert().
-	$query = "CREATE TABLE T_posts (
-		post_ID               int(11) unsigned NOT NULL auto_increment,
-		post_parent_ID        int(11) unsigned NULL,
-		post_creator_user_ID  int(11) unsigned NOT NULL,
-		post_lastedit_user_ID int(11) unsigned NULL,
-		post_assigned_user_ID int(11) unsigned NULL,
-		post_datestart        datetime NOT NULL,
-		post_datedeadline     datetime NULL,
-		post_datecreated      datetime NULL,
-		post_datemodified     datetime NOT NULL,
-		post_status           enum('published','deprecated','protected','private','draft')
-		                        NOT NULL default 'published',
-		post_pst_ID           int(11) unsigned NULL,
-		post_ptyp_ID          int(11) unsigned NULL,
-		post_locale           VARCHAR(20) NOT NULL DEFAULT 'en-EU',
-		post_content          text NULL,
-		post_title            text NOT NULL,
-		post_urltitle         VARCHAR(50) NULL DEFAULT NULL,
-		post_url              VARCHAR(250) NULL DEFAULT NULL,
-		post_main_cat_ID      int(11) unsigned NOT NULL,
-		post_flags            SET( 'pingsdone', 'imported'),
-		post_views            INT(11) UNSIGNED NOT NULL DEFAULT 0,
-		post_wordcount        int(11) default NULL,
-		post_comments         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
-		post_commentsexpire   DATETIME DEFAULT NULL,
-		post_renderers        TEXT NOT NULL,
-		post_priority         int(11) unsigned null,
-		PRIMARY KEY post_ID( post_ID ),
-		UNIQUE post_urltitle( post_urltitle ),
-		INDEX post_datestart( post_datestart ),
-		INDEX post_main_cat_ID( post_main_cat_ID ),
-		INDEX post_creator_user_ID( post_creator_user_ID ),
-		INDEX post_status( post_status ),
-		INDEX post_parent_ID( post_parent_ID ),
-		INDEX post_assigned_user_ID( post_assigned_user_ID ),
-		INDEX post_ptyp_ID( post_ptyp_ID ),
-		INDEX post_pst_ID( post_pst_ID )
-	)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for Categories-to-Posts relationships... ';
-	$query = "CREATE TABLE T_postcats (
-		postcat_post_ID int(11) unsigned NOT NULL,
-		postcat_cat_ID int(11) unsigned NOT NULL,
-		PRIMARY KEY postcat_pk (postcat_post_ID,postcat_cat_ID),
-		UNIQUE catpost ( postcat_cat_ID, postcat_post_ID )
-	)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for Comments... ';
-	$query = "CREATE TABLE T_comments (
-		comment_ID        int(11) unsigned NOT NULL auto_increment,
-		comment_post_ID   int(11) unsigned NOT NULL default '0',
-		comment_type enum('comment','linkback','trackback','pingback') NOT NULL default 'comment',
-		comment_status ENUM('published', 'deprecated', 'protected', 'private', 'draft') DEFAULT 'published' NOT NULL,
-		comment_author_ID int unsigned NULL default NULL,
-		comment_author varchar(100) NULL,
-		comment_author_email varchar(100) NULL,
-		comment_author_url varchar(100) NULL,
-		comment_author_IP varchar(23) NOT NULL default '',
-		comment_date datetime NOT NULL,
-		comment_content text NOT NULL,
-		comment_karma int(11) NOT NULL default '0',
-		comment_spam_karma TINYINT UNSIGNED NULL,
-		PRIMARY KEY comment_ID (comment_ID),
-		KEY comment_post_ID (comment_post_ID),
-		KEY comment_date (comment_date),
-		KEY comment_type (comment_type)
-	)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for Locales... ';
-	$query = "CREATE TABLE T_locales (
-			loc_locale varchar(20) NOT NULL default '',
-			loc_charset varchar(15) NOT NULL default 'iso-8859-1',
-			loc_datefmt varchar(10) NOT NULL default 'y-m-d',
-			loc_timefmt varchar(10) NOT NULL default 'H:i:s',
-			loc_startofweek TINYINT UNSIGNED NOT NULL DEFAULT 1,
-			loc_name varchar(40) NOT NULL default '',
-			loc_messages varchar(20) NOT NULL default '',
-			loc_priority tinyint(4) UNSIGNED NOT NULL default '0',
-			loc_enabled tinyint(4) NOT NULL default '1',
-			PRIMARY KEY loc_locale( loc_locale )
-		) COMMENT='saves available locales'";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
-	// Additionnal tables:
-	create_antispam();
-	create_b2evo_tables_phoenix();
-
-	echo 'Creating table for Post Links... ';
-	$DB->query( "CREATE TABLE T_links (
-								link_ID               int(11) unsigned  not null AUTO_INCREMENT,
-								link_datecreated      datetime          not null,
-								link_datemodified     datetime          not null,
-								link_creator_user_ID  int(11) unsigned  not null,
-								link_lastedit_user_ID int(11) unsigned  not null,
-								link_itm_ID           int(11) unsigned  NOT NULL,
-								link_dest_itm_ID      int(11) unsigned  NULL,
-								link_file_ID          int(11) unsigned  NULL,
-								link_ltype_ID         int(11) unsigned  NOT NULL default 1,
-								link_external_url     VARCHAR(255)      NULL,
-								link_title            TEXT              NULL,
-								PRIMARY KEY (link_ID),
-								INDEX link_itm_ID( link_itm_ID ),
-								INDEX link_dest_itm_ID (link_dest_itm_ID),
-								INDEX link_file_ID (link_file_ID)
-							)" );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating plugins table... ';
-	$DB->query( 'CREATE TABLE T_plugins (
-			plug_ID              INT(11) UNSIGNED NOT NULL auto_increment,
-			plug_priority        INT(11) NOT NULL default 50,
-			plug_classname       VARCHAR(40) NOT NULL default "",
-			plug_code            VARCHAR(32) NULL,
-			plug_apply_rendering ENUM( "stealth", "always", "opt-out", "opt-in", "lazy", "never" ) NOT NULL DEFAULT "never",
-			PRIMARY KEY ( plug_ID )
-		)' );
-	echo "OK.<br />\n";
-
-	create_b2evo_tables_phoenix_beta();
+	// Insert all default data:
+	install_insert_default_data(0);
 
 	// Create relations:
 	create_b2evo_relations();
+
+	return true;
 }
 
 
-/*
- * create_antispam(-)
+/**
+ * Used only when upgrading to 0.8.7 or later.
  *
- * Used when creating full install and upgrading from earlier versions
+ * @deprecated Table layout gets handled by {@link db_delta()} and defaults are present in {@link install_insert_default_data()}.
+ *
  */
 function create_antispam()
 {
@@ -510,7 +281,6 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
  *
  * This is called for fresh installs and cafelog upgrade.
  *
- * {@internal create_default_blogs(-) }}
  * @param string
  * @param string
  * @param string
@@ -604,7 +374,6 @@ function create_default_blogs( $blog_a_short = 'Blog A', $blog_a_long = '#', $bl
  *
  * This is called for fresh installs and cafelog upgrade.
  *
- * {@internal create_default_categories(-) }}
  * @param boolean
  */
 function create_default_categories( $populate_blog_a = true )
@@ -645,7 +414,6 @@ function create_default_categories( $populate_blog_a = true )
  *
  * This is called for fresh installs and cafelog upgrade.
  *
- * {@internal create_default_contents(-) }}
  * @param boolean
  */
 function create_default_contents( $populate_blog_a = true )
@@ -780,8 +548,10 @@ function create_default_settings( $override = array() )
 		'newusers_grp_ID' => $Group_Users->get('ID'),
 	);
 
+	$settings = array_merge( array_keys($defaults), array_keys($override) );
+	$settings = array_unique( $settings );
 	$insertvalues = array();
-	foreach( array_merge( array_keys($defaults), array_keys($override) ) as $name )
+	foreach( $settings as $name )
 	{
 		if( isset($override[$name]) )
 		{
@@ -908,7 +678,7 @@ function populate_main_tables()
 	echo "OK.<br />\n";
 
 
- 	echo 'Creating default group/blog permissions... ';
+	echo 'Creating default group/blog permissions... ';
 	// Admin for blog A:
 	$query = "
 		INSERT INTO T_coll_group_perms( bloggroup_blog_ID, bloggroup_group_ID, bloggroup_ismember,
@@ -947,221 +717,6 @@ function populate_main_tables()
 	*/
 
 	create_default_settings();
-
-}
-
-
-/**
- * Create new tables for "Phoenix Alpha" version.
- *
- * If any of these tables needs to be ALTERed later:
- *  - Take the CREATE statement out here and keep the clean/whole one with create_b2evo_tables()
- *  - Use the original statement (as it was defined here) in the appropriate block in
- *    upgrade_b2evo_tables() and add the ALTER block to the $old_db_version where you want to change it.
- */
-function create_b2evo_tables_phoenix()
-{
-	global $DB;
-
-	echo 'Creating table for active sessions... ';
-	$DB->query( "CREATE TABLE T_sessions (
-									sess_ID        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-									sess_key       CHAR(32) NULL,
-									sess_lastseen  DATETIME NOT NULL,
-									sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
-									sess_user_ID   INT(10) DEFAULT NULL,
-									sess_agnt_ID   INT UNSIGNED NULL,
-									sess_data      TEXT DEFAULT NULL,
-									PRIMARY KEY( sess_ID )
-								)" );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating user settings table... ';
-	$DB->query( "CREATE TABLE T_usersettings (
-									uset_user_ID INT(11) UNSIGNED NOT NULL,
-									uset_name    VARCHAR( 30 ) NOT NULL,
-									uset_value   VARCHAR( 255 ) NULL,
-									PRIMARY KEY ( uset_user_ID, uset_name )
-								)");
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for Post Statuses... ';
-	$query="CREATE TABLE T_itemstatuses (
-									pst_ID   int(11) unsigned not null AUTO_INCREMENT,
-									pst_name varchar(30)      not null,
-									primary key ( pst_ID )
-								)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for Post Types... ';
-	$query="CREATE TABLE T_itemtypes (
-									ptyp_ID   int(11) unsigned not null AUTO_INCREMENT,
-									ptyp_name varchar(30)      not null,
-									primary key (ptyp_ID)
-								)";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-	echo 'Creating default Post Types... ';
-	$DB->query( "INSERT INTO T_itemtypes ( ptyp_ID, ptyp_name )
-										VALUES ( 1, 'Post' ),
-										       ( 2, 'Link' )" );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for File Meta Data... ';
-	$DB->query( "CREATE TABLE T_files (
-								 file_ID        int(11) unsigned  not null AUTO_INCREMENT,
-								 file_root_type enum('absolute','user','group','collection') not null default 'absolute',
-								 file_root_ID   int(11) unsigned  not null default 0,
-								 file_path      varchar(255)      not null default '',
-								 file_title     varchar(255),
-								 file_alt       varchar(255),
-								 file_desc      text,
-								 primary key (file_ID),
-								 unique file (file_root_type, file_root_ID, file_path)
-							)" );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for base domains... ';
-	$DB->query( "CREATE TABLE T_basedomains (
-								dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-								dom_name   VARCHAR(250) NOT NULL DEFAULT '',
-								dom_status ENUM('unknown','whitelist','blacklist') NOT NULL DEFAULT 'unknown',
-								dom_type   ENUM('unknown','normal','searcheng','aggregator') NOT NULL DEFAULT 'unknown',
-								PRIMARY KEY (dom_ID),
-								UNIQUE (dom_name)
-							)" );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for user agents... ';
-	$DB->query( "CREATE TABLE T_useragents (
-								agnt_ID        INT UNSIGNED NOT NULL AUTO_INCREMENT,
-								agnt_signature VARCHAR(250) NOT NULL,
-								agnt_type      ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL ,
-								PRIMARY KEY (agnt_ID) )" );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for Hit-Logs... ';
-	$query = "CREATE TABLE T_hitlog (
-							hit_ID             INT(11) NOT NULL AUTO_INCREMENT,
-							hit_sess_ID        INT UNSIGNED,
-							hit_datetime       DATETIME NOT NULL,
-							hit_uri            VARCHAR(250) DEFAULT NULL,
-							hit_referer_type   ENUM('search','blacklist','referer','direct','spam') NOT NULL,
-							hit_referer        VARCHAR(250) DEFAULT NULL,
-							hit_referer_dom_ID INT UNSIGNED DEFAULT NULL,
-							hit_blog_ID        int(11) UNSIGNED NULL DEFAULT NULL,
-							hit_remote_addr    VARCHAR(40) DEFAULT NULL,
-							PRIMARY KEY (hit_ID),
-							INDEX hit_datetime ( hit_datetime ),
-							INDEX hit_blog_ID (hit_blog_ID)
-						)"; // TODO: more indexes?
-	$DB->query( $query );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for subscriptions... ';
-	$DB->query( "CREATE TABLE T_subscriptions (
-							   sub_coll_ID     int(11) unsigned    not null,
-							   sub_user_ID     int(11) unsigned    not null,
-							   sub_items       tinyint(1)          not null,
-							   sub_comments    tinyint(1)          not null,
-							   primary key (sub_coll_ID, sub_user_ID)
-							  )" );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating table for blog-group permissions... ';
-	$DB->query( "CREATE TABLE T_coll_group_perms (
-									bloggroup_blog_ID int(11) unsigned NOT NULL default 0,
-									bloggroup_group_ID int(11) unsigned NOT NULL default 0,
-									bloggroup_ismember tinyint NOT NULL default 0,
-									bloggroup_perm_poststatuses set('published','deprecated','protected','private','draft') NOT NULL default '',
-									bloggroup_perm_delpost tinyint NOT NULL default 0,
-									bloggroup_perm_comments tinyint NOT NULL default 0,
-									bloggroup_perm_cats tinyint NOT NULL default 0,
-									bloggroup_perm_properties tinyint NOT NULL default 0,
-									bloggroup_perm_media_upload tinyint NOT NULL default 0,
-									bloggroup_perm_media_browse tinyint NOT NULL default 0,
-									bloggroup_perm_media_change tinyint NOT NULL default 0,
-									PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID) )" );
-	echo "OK.<br />\n";
-
-	/*
-			evo_linktypes tables:
-			-ltype_ID    INT     PK
-			-ltype_desc    VARCHAR(50)
-
-	 */
-}
-
-
-/**
- * Create new tables for "Phoenix beta" version.
- *
- * When you want to upgrade any of these tables, please see documentation at {@link create_b2evo_tables_phoenix()}.
- */
-function create_b2evo_tables_phoenix_beta()
-{
-	global $DB;
-
-	echo 'Creating table for file types... ';
-	$DB->query( 'CREATE TABLE T_filetypes (
-							  ftyp_ID int(11) unsigned NOT NULL auto_increment,
-							  ftyp_extensions varchar(30) NOT NULL,
-							  ftyp_name varchar(30) NOT NULL,
-							  ftyp_mimetype varchar(50) NOT NULL,
-							  ftyp_icon varchar(20) default NULL,
-							  ftyp_viewtype varchar(10) NOT NULL,
-							  ftyp_allowed tinyint(1) NOT NULL default 0,
-							  PRIMARY KEY (ftyp_ID)
-								)' );
-	echo "OK.<br />\n";
-
-	echo 'Creating default file types... ';
-	// Contribs: feel free to add more types here...
-	$DB->query( "INSERT INTO T_filetypes VALUES
-			(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
-			(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
-			(3, 'jpg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
-			(4, 'txt', 'Text file', 'text/plain', 'document.png', 'text', 1),
-			(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 0),
-			(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 1),
-			(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 1),
-			(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 1),
-			(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
-			(10, 'pps', 'Powerpoint slideshow', 'pps', 'pps.gif', 'external', 1),
-			(11, 'zip', 'Zip archive', 'application/zip', 'zip.gif', 'external', 1),
-			(12, 'php php3 php4 php5 php6', 'Php files', 'application/x-httpd-php', 'php.gif', 'download', 0)
-		" );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating plugin settings table... ';
-	$DB->query( 'CREATE TABLE T_pluginsettings (
-									pset_plug_ID INT(11) UNSIGNED NOT NULL,
-									pset_name VARCHAR( 30 ) NOT NULL,
-									pset_value TEXT NULL,
-									PRIMARY KEY ( pset_plug_ID, pset_name )
-								)' );
-	echo "OK.<br />\n";
-
-
-	echo 'Creating plugin events table... ';
-	$DB->query( 'CREATE TABLE T_pluginevents(
-	                pevt_plug_ID INT(11) UNSIGNED NOT NULL,
-	                pevt_event VARCHAR(40) NOT NULL,
-	                pevt_enabled TINYINT NOT NULL DEFAULT 1,
-	                PRIMARY KEY( pevt_plug_ID, pevt_event )
-								)' );
-	echo "OK.<br />\n";
 }
 
 
@@ -1335,6 +890,15 @@ function create_b2evo_relations()
 	echo "OK.<br />\n";
 }
 
+
+/**
+ * Install basic plugins.
+ *
+ * This gets called separately on fresh installs.
+ *
+ * NOTE: this won't call the "AfterInstall" method on the plugin nor install its DB schema.
+ *       This get done in the plugins controller currently and would need to be changed/added here, if needed later.
+ */
 function install_basic_plugins()
 {
 	echo 'Installing default plugins... ';
@@ -1353,6 +917,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.177  2006/02/24 19:59:29  blueyed
+ * New install/upgrade, which makes use of db_delta()
+ *
  * Revision 1.176  2006/02/23 21:12:33  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

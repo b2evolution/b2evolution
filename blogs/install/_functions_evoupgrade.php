@@ -127,13 +127,34 @@ function upgrade_b2evo_tables()
 	// used for defaults, when upgrading to 1.6
 	global $use_fileupload, $fileupload_allowedtypes, $fileupload_maxk, $doubleCheckReferers;
 
+	// new DB-delta functionality
+	global $schema_queries, $inc_path;
+
+	require_once $inc_path.'_misc/_db_schema.inc.php';
+	require_once $inc_path.'_misc/_upgrade.funcs.php';
+
+
 	// Check DB version:
 	check_db_version();
+
 	if( $old_db_version == $new_db_version )
-	{
-		echo '<p>'.T_('The database schema is already up to date. There is nothing to do.').'</p>';
-		printf( '<p>'.T_('Now you can <a %s>log in</a> with your usual %s username and password.').'</p>', 'href="'.$admin_url.'"', 'b2evolution' );
-		return false;
+	{ // Probably no need to update, but check current DB schema first
+		$db_schema_needs_update = false;
+		foreach( $schema_queries as $table => $query_info )
+		{
+			if( db_delta( $query_info[1], false ) )
+			{
+				$db_schema_needs_update = true;
+				break;
+			}
+		}
+
+		if( ! $db_schema_needs_update )
+		{
+			echo '<p>'.T_('The database schema is already up to date. There is nothing to do.').'</p>';
+			printf( '<p>'.T_('Now you can <a %s>log in</a> with your usual %s username and password.').'</p>', 'href="'.$admin_url.'"', 'b2evolution' );
+			return false;
+		}
 	}
 
 
@@ -511,11 +532,8 @@ function upgrade_b2evo_tables()
 	{ // ---------------------------------- upgrade to 0.9.2 a.k.a 1.6 "phoenix"
 
 		echo 'Dropping old Hitlog table... ';
-		$DB->query( 'DROP TABLE T_hitlog' );
+		$DB->query( 'DROP TABLE IF EXISTS T_hitlog' );
 		echo "OK.<br />\n";
-
-		// New tables:
-		create_b2evo_tables_phoenix();
 
 		echo 'Creating plugins table... ';
 		$DB->query( "CREATE TABLE T_plugins (
@@ -627,14 +645,17 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
-		echo 'Altering table for Blog-User permissions... ';
-		$DB->query( 'ALTER TABLE T_coll_user_perms
-									MODIFY COLUMN bloguser_blog_ID int(11) unsigned NOT NULL default 0,
-									MODIFY COLUMN bloguser_user_ID int(11) unsigned NOT NULL default 0,
-									ADD COLUMN bloguser_perm_media_upload tinyint NOT NULL default 0,
-									ADD COLUMN bloguser_perm_media_browse tinyint NOT NULL default 0,
-									ADD COLUMN bloguser_perm_media_change tinyint NOT NULL default 0' );
-		echo "OK.<br />\n";
+		if( !isset( $tableblogusers_isuptodate ) )
+		{
+			echo 'Altering table for Blog-User permissions... ';
+			$DB->query( 'ALTER TABLE T_coll_user_perms
+										MODIFY COLUMN bloguser_blog_ID int(11) unsigned NOT NULL default 0,
+										MODIFY COLUMN bloguser_user_ID int(11) unsigned NOT NULL default 0,
+										ADD COLUMN bloguser_perm_media_upload tinyint NOT NULL default 0,
+										ADD COLUMN bloguser_perm_media_browse tinyint NOT NULL default 0,
+										ADD COLUMN bloguser_perm_media_change tinyint NOT NULL default 0' );
+			echo "OK.<br />\n";
+		}
 
 
 		echo 'Altering comments table... ';
@@ -664,11 +685,14 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
-		echo 'Altering Groups table... ';
-		$DB->query( "ALTER TABLE T_groups
-									ADD COLUMN grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible' AFTER grp_name,
-								  ADD COLUMN grp_perm_files enum('none','view','add','edit') NOT NULL default 'none'" );
-		echo "OK.<br />\n";
+		if( !isset( $tablegroups_isuptodate ) )
+		{
+			echo 'Altering Groups table... ';
+			$DB->query( "ALTER TABLE T_groups
+										ADD COLUMN grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible' AFTER grp_name,
+										ADD COLUMN grp_perm_files enum('none','view','add','edit') NOT NULL default 'none'" );
+			echo "OK.<br />\n";
+		}
 
 
 		echo 'Creating table for Post Links... ';
@@ -693,94 +717,17 @@ function upgrade_b2evo_tables()
 
 
 		set_upgrade_checkpoint( '9000' );
-
 	}
 
 
 	if( $old_db_version < 9100 )
-	{	// Phoenix BETA:
-
-		// New tables:
-		create_b2evo_tables_phoenix_beta();
-
-		echo 'Altering Plugins table... ';
-		$DB->query( 'ALTER TABLE T_plugins
-		             ADD COLUMN plug_code VARCHAR(32) NULL AFTER plug_classname,
-		             ADD COLUMN plug_apply_rendering ENUM( "stealth", "always", "opt-out", "opt-in", "lazy", "never" ) NOT NULL DEFAULT "never" AFTER plug_code,
-		             ADD UNIQUE plug_code( plug_code )' );
-		echo "OK.<br />\n";
-
-		echo 'Giving Administrator Group edit perms on files... ';
-		$DB->query( 'UPDATE T_groups
-		             SET grp_perm_files = "edit"
-		             WHERE grp_ID = 1' );
-		echo "OK.<br />\n";
-
-		echo 'Giving Administrator Group full perms on media for all blogs... ';
-		$DB->query( 'UPDATE T_coll_group_perms
-		             SET bloggroup_perm_media_upload = 1,
-		                 bloggroup_perm_media_browse = 1,
-		                 bloggroup_perm_media_change = 1
-		             WHERE bloggroup_group_ID = 1' );
-		echo "OK.<br />\n";
-
-		echo 'Altering Comments table... ';
-		$DB->query( 'ALTER TABLE T_comments
-		             ADD COLUMN comment_spam_karma TINYINT UNSIGNED NULL AFTER comment_karma' );
-		echo "OK.<br />\n";
-
-		if( $old_db_version >= 9000 )
-		{ // Uninstall all ALPHA (potentially incompatible) plugins
-			// TODO !!!
-		}
-
-		// INSTALL PLUGINS:
-		install_basic_plugins();
-
-		echo 'Altering Posts table... ';
-		$DB->query( "
-				ALTER TABLE T_posts
-				MODIFY COLUMN post_renderers TEXT NOT NULL,
-				MODIFY COLUMN post_content TEXT NULL" ); // may be NULL if no content given
-		echo "OK.<br />\n";
-
-		// Fixes for MySQL strict mode (MySQL 5): {{{
-		echo 'Altering Users table... ';
-		$DB->query( 'ALTER TABLE T_users
-		             MODIFY COLUMN user_firstname varchar(50) NULL,
-		             MODIFY COLUMN user_lastname varchar(50) NULL,
-		             MODIFY COLUMN user_nickname varchar(50) NULL,
-		             MODIFY COLUMN user_icq int(11) unsigned NULL,
-		             MODIFY COLUMN user_url varchar(100) NULL,
-		             MODIFY COLUMN user_ip varchar(15) NULL,
-		             MODIFY COLUMN user_domain varchar(200) NULL,
-		             MODIFY COLUMN user_browser varchar(200) NULL,
-		             MODIFY COLUMN dateYMDhour datetime NOT NULL,
-		             MODIFY COLUMN user_aim varchar(50) NULL,
-		             MODIFY COLUMN user_msn varchar(100) NULL,
-		             MODIFY COLUMN user_yim varchar(50) NULL' );
-		echo "OK.<br />\n";
-
-		echo 'Altering Blogs table... ';
-		$DB->query( 'ALTER TABLE T_blogs
-		             MODIFY COLUMN blog_media_subdir VARCHAR( 255 ) NULL,
-		             MODIFY COLUMN blog_media_fullpath VARCHAR( 255 ) NULL,
-		             MODIFY COLUMN blog_media_url VARCHAR( 255 ) NULL' );
-		echo "OK.<br />\n";
-
-		echo 'Altering Comments table... ';
-		$DB->query( 'ALTER TABLE T_comments
-		             MODIFY COLUMN comment_date datetime NOT NULL' );
-		echo "OK.<br />\n";
+	{	// Phoenix BETA (only column renames):
 
 		echo 'Altering Links table... ';
 		$DB->query( 'ALTER TABLE T_links
-		             MODIFY COLUMN link_datecreated      datetime          not null,
-		             MODIFY COLUMN link_datemodified     datetime          not null,
-								 CHANGE link_item_ID link_itm_ID INT( 11 ) UNSIGNED NOT NULL,
-								 CHANGE link_dest_item_ID link_dest_itm_ID INT( 11 ) UNSIGNED NULL' );
+		             CHANGE link_item_ID link_itm_ID INT( 11 ) UNSIGNED NOT NULL,
+		             CHANGE link_dest_item_ID link_dest_itm_ID INT( 11 ) UNSIGNED NULL' );
 		echo "OK.<br />\n";
-		// }}}
 
 	}
 
@@ -788,18 +735,60 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 9200 )
 	{
 		/*
+		 * TODO: the following paragraph needs to be rephrased probably. I've not understand it before anyway.. :p
+		 *       Please read through all the new comments/explanations and ask/rephrase where it's not clear. (blueyed)
+		 *
 		 * CONTRIBUTORS: If you need changes and we haven't started a block for next release yet, put them here!
 		 * Then create a new extension block, and increase db version numbers everywhere where needed in this file.
 		 */
 
+		/*
+		 * Only DB table column renames should go here.
+		 *
+		 * It gets a bit tricky with them if you cannot say using $old_db_version when the column
+		 * has been created with the original name: you probably have to use "SHOW COLUMNS FROM table"
+		 * to see if it (the original name) is there.
+		 *
+		 * Then put the generated ALTER COLUMN query here, before the schema upgrade is done (below).
+		 *
+		 * This is because we cannot detect a column rename easily.
+		 *
+		 * See below for "normal" DB upgrade.
+		 */
 	}
+
+
+	/*
+	 * Since $new_db_version == 9100 (Phoenix-Beta) we alter the existing tables to match our
+	 * scheme here. (Except for renaming table column names - see above).
+	 *
+	 * It is easy:
+	 * - To change DB table layout, alter $schema_queries in /inc/_misc/_db_schema.inc.php.
+	 *
+	 * - To insert default data, add it to the corresponding block in
+	 *   install_insert_default_data() (/inc/_misc/_db_schema.inc.php).
+	 */
+
+	// Alter DB to match DB schema:
+	// TODO: This could be made interactive! Like "the following queries have to be done" and a possibility to abort
+	install_make_db_schema_current( true );
+
+
+	// Insert default values, but only those since Phoenix-Alpha:
+	// TODO: cleanup/move previous upgrade instructions (data inserts) from above to install_insert_default_data()?!
+	$db_version_ge_9000 = ( $old_db_version >= 9000 ? $old_db_version : 9000 );
+	install_insert_default_data( $db_version_ge_9000 );
 
 
 	// Update DB schema version to $new_db_version
 	set_upgrade_checkpoint( $new_db_version );
 
-	// Create relations:
-	create_b2evo_relations(); // EXPERIMENTAL!
+
+	if( $old_db_version < 9100 )
+	{ // Create (EXPERIMENTAL) relations, only if upgrading to Phoenix-Beta:
+		// TODO: this should/could get handled by db_delta(), by adding it to the "normal" DB schema, if requested.
+		create_b2evo_relations(); // EXPERIMENTAL!
+	}
 
 	return true;
 }
@@ -807,6 +796,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.127  2006/02/24 19:59:29  blueyed
+ * New install/upgrade, which makes use of db_delta()
+ *
  * Revision 1.126  2006/02/13 20:20:10  fplanque
  * minor / cleanup
  *
