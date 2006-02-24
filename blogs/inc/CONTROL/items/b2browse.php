@@ -196,8 +196,8 @@ else
 
 /*
  * Add sub menu entries.
- * We do this here instead of _header because we need to includ eall filter params into regenerate_url()
- * Note: this whill override default tabs from _header config.
+ * We do this here instead of _header because we need to include all filter params into regenerate_url()
+ * Note: this will override default tabs from _header config.
  */
 $AdminUI->add_menu_entries(
 		'edit',
