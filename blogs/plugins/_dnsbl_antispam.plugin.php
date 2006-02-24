@@ -483,7 +483,7 @@ class dnsbl_antispam_plugin extends Plugin
 		$tooslow_needs_update = false;
 		if( $tooslow_tries )
 		{
-			$tooslow_dnsbls = $this->Settings->get_unserialized( 'tooslow_dnsbls' );
+			$tooslow_dnsbls = $this->Settings->get( 'tooslow_dnsbls' );
 		}
 		else
 		{
@@ -665,7 +665,7 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
- * Revision 1.9  2006/02/24 19:18:32  blueyed
+ * Revision 1.10  2006/02/24 20:39:40  blueyed
  * Settings::get_unserialized() has been removed
  *
  * Revision 1.8  2006/02/15 04:07:16  blueyed
