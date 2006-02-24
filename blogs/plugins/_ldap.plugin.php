@@ -54,66 +54,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class ldap_plugin extends Plugin
 {
-	/*
-	 * LDAP config
-	 * TODO: move to plugin settings.
-	 */
-
-	/**
-	 * A list of search sets ('server', 'rdn', 'base_dn', 'search_filter').
-	 *
-	 * 'server': The LDAP server
-	 * 'rdn': The LDAP RDN, used to bind to the server (%s gets replaced by the user login)
-	 * 'base_dn': The LDAP base DN, used as base dn for search.
-	 * 'search_filter': The search filter used to get information about the user (%s gets replaced by the user login).
-	 *
-	 * @var array
-	 */
-	var $ldap_search_sets = array(
-			array(
-				'server' => 'exchange.excample.com',
-				'rdn' => 'cn=%s,ou=<Organisation Unit>,o=<Organisation>',
-				'base_dn' => 'cn=Recipients,ou=<Organisation Unit>,o=<Organisation>',
-				'search_filter' => 'rdn=%s',
-			),
-			// You could add other sets here..
-		);
-
-	/**
-	 * If set, the search information / result will be looked up for this key.
-	 * If there exists a group by that name the user gets assigned to this
-	 * group.
-	 *
-	 * A good example might be 'department'.
-	 *
-	 * @var string Empty to disable assignment of Groups by search info.
-	 */
-	var $assign_user_to_group_by = '';
-
-	/**
-	 * If you want to automagically create a new Group when there does not exist
-	 * one yet with a name equal to the user's value of {@link $assign_user_to_group_by}
-	 * you can define a Group name here, that gets used as a template for a new
-	 * Group to create.
-	 *
-	 * You could create a group 'LDAP_Template' for example and configure it here
-	 * to be used as template for new groups to be created.
-	 *
-	 * @var string Empty to disable creating new Groups.
-	 */
-	var $template_group_name_for_unmatched_assign = '';
-
-	/**
-	 * The default (fallback) Group name for created users.
-	 *
-	 * If empty (or does not exist), the default group for new users
-	 * (from Settings) gets used.
-	 *
-	 * @var string Empty to use default group for new users.
-	 */
-	var $default_group_name = '';
-
-
 	var $code = 'evo_ldap_auth';
 	var $priority = 50;
 	var $version = 'CVS $Revision$';
@@ -129,6 +69,58 @@ class ldap_plugin extends Plugin
 		$this->name = T_('LDAP authentication');
 		$this->short_desc = T_('Creates users if they could be authenticated through LDAP.');
 		#$this->long_desc = T_('');
+	}
+
+
+	function GetDefaultSettings()
+	{
+		global $Settings;
+
+		return array(
+			'search_sets' => array(
+				'label' => T_('LDAP server sets'),
+				'note' => T_('LDAP server sets to search.'),
+				'type' => 'array',
+				'max_count' => 10,
+				'entries' => array(
+					'server' => array(
+						'label' => T_('Server'),
+						'note' => T_('The LDAP server.'),
+						'size' => 25,
+					),
+					'rdn' => array(
+						'label' => T_('RDN'),
+						'note' => T_('The LDAP RDN, used to bind to the server (%s gets replaced by the user login).'),
+					),
+					'base_dn' => array(
+						'label' => T_('Base DN'),
+						'note' => T_('The LDAP base DN, used as base dn for search.'),
+					),
+					'search_filter' => array(
+						'label' => T_('Search filter'),
+						'note' => T_('The search filter used to get information about the user (%s gets replaced by the user login).'),
+					),
+					'assign_user_to_group_by' => array(
+						'label' => T_('Assign group by'),
+						'note' => T_('LDAP search result key to assign the group by.'),
+					),
+					'tpl_new_grp_ID' => array(
+						'label' => T_('Template Group for new'),
+						'type' => 'select_group',
+						'note' => T_('The group to use as template, if we create a new group. Set this to "None" to not create new groups.'),
+						'allow_none' => true,
+					),
+				),
+			),
+
+			'fallback_grp_ID' => array(
+				'label' => T_('Default group'),
+				'type' => 'select_group',
+				'note' => T_('The group to use as fallback, if we do not want to create a new group. "None" to not a create a new user in that case.' ),
+				'allow_none' => true,
+				'defaultvalue' => $Settings->get('newusers_grp_ID'),
+			),
+		);
 	}
 
 
@@ -154,7 +146,9 @@ class ldap_plugin extends Plugin
 			return true;
 		}
 
-		if( empty($this->ldap_search_sets) )
+		$search_sets = $this->Settings->get( 'search_sets' );
+
+		if( empty($search_sets) )
 		{
 			$this->debug_log( 'No LDAP search sets defined.' );
 			return false;
@@ -168,7 +162,7 @@ class ldap_plugin extends Plugin
 		}
 
 		// Loop through list of search sets
-		foreach( $this->ldap_search_sets as $l_set )
+		foreach( $search_sets as $l_set )
 		{
 			if( !($ldap_conn = @ldap_connect( $l_set['server'] )) )
 			{
@@ -254,13 +248,13 @@ class ldap_plugin extends Plugin
 				$NewUser->set( 'showonline', 1 );
 
 				$assigned_group = false;
-				if( !empty($this->assign_user_to_group_by) )
+				if( ! empty($l_set['assign_user_to_group_by']) )
 				{
-					$this->debug_log( 'We want to assign the Group by &laquo;'.$this->assign_user_to_group_by.'&raquo;' );
-					if( isset($search_info[0][$this->assign_user_to_group_by])
-					    && isset($search_info[0][$this->assign_user_to_group_by][0]) )
+					$this->debug_log( 'We want to assign the Group by &laquo;'.$l_set['assign_user_to_group_by'].'&raquo;' );
+					if( isset($search_info[0][$l_set['assign_user_to_group_by']])
+					    && isset($search_info[0][$l_set['assign_user_to_group_by']][0]) )
 					{ // There is info we want to assign by
-						$assign_by_value = $search_info[0][$this->assign_user_to_group_by][0];
+						$assign_by_value = $search_info[0][$l_set['assign_user_to_group_by']][0];
 						$this->debug_log( 'The users info has &laquo;'.$assign_by_value.'&raquo; as value given.' );
 
 						if( $users_Group = & $GroupCache->get_by_name( $assign_by_value, false ) )
@@ -269,13 +263,13 @@ class ldap_plugin extends Plugin
 							$assigned_group = true;
 							$this->debug_log( 'Adding User to existing Group.' );
 						}
-						elseif( !empty($this->template_group_name_for_unmatched_assign) )
+						elseif( $this->Settings->get('tpl_new_grp_ID') )
 						{ // we want to create a new group matching the assign-by info
 							$this->debug_log( 'Group with that name does not exist yet.' );
 
-							if( $new_Group = $GroupCache->get_by_name( $this->template_group_name_for_unmatched_assign, false ) ) // COPY!! and do not halt on error
+							if( $new_Group = $GroupCache->get_by_name( $this->Settings->get('tpl_new_grp_ID'), false ) ) // COPY!! and do not halt on error
 							{ // take a copy of the Group to use as template
-								$this->debug_log( 'Using Group &laquo;'.$this->template_group_name_for_unmatched_assign.'&raquo; as template.' );
+								$this->debug_log( 'Using Group &laquo;'.$this->Settings->get('tpl_new_grp_ID').'&raquo; as template.' );
 								$new_Group->set( 'ID', 0 ); // unset ID (to allow inserting)
 								$new_Group->set( 'name', $assign_by_value ); // set the wanted name
 								$new_Group->dbinsert();
@@ -296,22 +290,42 @@ class ldap_plugin extends Plugin
 				if( ! $assigned_group )
 				{ // Default group
 					$users_Group = NULL;
-					if( !empty($this->default_group_name) )
+					$fallback_grp_ID = $this->Settings->get( 'fallback_grp_ID' );
+
+					if( empty($fallback_grp_ID) )
 					{
-						$users_Group = & $GroupCache->get_by_name($this->default_group_name);
+						$this->debug_log( 'No default/fallback group given.' );
+					}
+					else
+					{
+						$users_Group = & $GroupCache->get_by_ID($fallback_grp_ID);
+
+						if( $users_Group )
+						{ // either $this->default_group_name is not given or wrong
+							$NewUser->setGroup( $users_Group );
+							$assigned_group = true;
+
+							$this->debug_log( 'Using default/fallback group ('.$users_Group->get('name').').' );
+						}
+						else
+						{
+							$this->debug_log( 'Default/fallback group not existing ('.$fallback_grp_ID.').' );
+						}
 					}
 
-					if( ! $users_Group )
-					{ // either $this->default_group_name is not given or wrong
-						$users_Group = & $GroupCache->get_by_ID( $Settings->get('newusers_grp_ID') );
-					}
-
-					$NewUser->setGroup( $users_Group );
 				}
 
-				$NewUser->dbinsert();
+				if( $assigned_group )
+				{
+					$NewUser->dbinsert();
+					$UserCache->add( $NewUser );
 
-				$UserCache->add( $NewUser );
+					$this->debug_log( 'Created user.' );
+				}
+				else
+				{
+					$this->debug_log( 'NOT created user, because no group has been assigned.' );
+				}
 			}
 			return true;
 		}
