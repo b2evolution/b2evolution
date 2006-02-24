@@ -43,13 +43,13 @@ $Results->cols[] = array(
 						//'order' => 'ftyp_icon',
 						'th_start' => '<th class="firstcol shrinkwrap">',
 						'td_start' => '<td class="firstcol shrinkwrap">',
-						'td' => '<img src="'.$rsc_url.'/icons/fileicons/$ftyp_icon$" alt="$ftyp_icon$">',
+						'td' => '<img src="'.$rsc_url.'icons/fileicons/$ftyp_icon$" alt="$ftyp_icon$">',
 					);
 
 $Results->cols[] = array(
 						'th' => T_('Extensions'),
 						'order' => 'ftyp_extensions',
-						'td' => '<a href="?ctrl=filetypes&amp;ftyp_ID=$ftyp_ID$&amp;action=edit" title="'.
+						'td' => '<a href="admin.php?ctrl=filetypes&amp;ftyp_ID=$ftyp_ID$&amp;action=edit" title="'.
 										T_('Edit this file type...').'">$ftyp_extensions$</a>',
 					);
 
