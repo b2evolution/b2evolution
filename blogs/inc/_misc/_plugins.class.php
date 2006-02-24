@@ -63,6 +63,11 @@ class Plugins
 	 */
 
 	/**
+	 * @var array Our API version as (major, minor). A Plugin can request a check against it through {@link Plugin::GetDependencies()}.
+	 */
+	var $api_version = array( 1, 0 );
+
+	/**
 	 * Array of loaded plug-ins.
 	 */
 	var $Plugins = array();
@@ -137,7 +142,6 @@ class Plugins
 	 *
 	 * Gets lazy-filled in {@link get_supported_events()}.
 	 *
-	 * @access protected
 	 * @var array
 	 */
 	var $_supported_events;
@@ -148,6 +152,20 @@ class Plugins
 	 */
 	var $_supported_private_events = array( 'GetDefaultSettings', 'PluginSettingsInstantiated', 'AfterInstall', 'BeforeInstall', 'BeforeUninstall' );
 
+	/**#@-*/
+
+
+	/**#@+
+	 * @access protected
+	 */
+
+	/**
+	 * @var string SQL to use in {@link load_plugins_table()}. Gets overwritten by {@link Plugins_admin}.
+	 */
+	var $sql_load_plugins_table = '
+			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version FROM T_plugins
+			 WHERE plug_status = "enabled"
+			 ORDER BY plug_priority';
 	/**#@-*/
 
 
@@ -209,7 +227,7 @@ class Plugins
 				'AfterItemUpdate' => '',
 
 				'PluginSettingsInstantiated' => '', /* private / needs no description */
-				'PluginSettingsBeforeSet' => T_("Called before setting a plugin's setting in the backoffice."),
+				'PluginSettingsValidateSet' => T_("Called before setting a plugin's setting in the backoffice."),
 				'PluginSettingsEditAction' => T_("Called as action before editing the plugin's settings."),
 				'PluginSettingsEditDisplayAfter' => T_('Called after standard plugin settings are displayed for editing.'),
 
@@ -297,11 +315,20 @@ class Plugins
 		$this_dir = dir( $this->plugins_path );
 		while( $this_file = $this_dir->read() )
 		{
-			if( preg_match( '/^_(.+)\.plugin\.php$/', $this_file, $matches ) && is_file( $this->plugins_path. '/'. $this_file ) )
-			{ // Valid plugin file name, Register the plugin:
-				$classname = $matches[1].'_plugin';
+			if( preg_match( '/^_(.+)\.plugin\.php$/', $this_file, $match ) && is_file( $this->plugins_path.$this_file ) )
+			{ // Plugin class name in plugins/
+				$classname = $match[1].'_plugin';
 
 				$this->register( $classname, 0 ); // auto-generate negative ID; will return string on error.
+			}
+			elseif( preg_match( '/^(.+)\_plugin$/', $this_file, $match )
+				&& is_dir( $this->plugins_path.$this_file )
+				&& is_file( $this->plugins_path.$this_file.'/_'.$match[1].'.plugin.php' ) )
+			{ // Plugin class name in plugins/<plug_classname>/
+				$classname = $match[1].'_plugin';
+				$filepath = $this->plugins_path.$this_file.'/_'.$match[1].'.plugin.php';
+
+				$this->register( $classname, 0, -1, NULL, $filepath );
 			}
 		}
 	}
@@ -361,20 +388,49 @@ class Plugins
 
 
 	/**
-	 * Install a plugin.
+	 * Sets the status of a Plugin in DB and registers it into the internal indices when "enabled".
+	 * Otherwise it gets unregisters, but only when we're not in {@link Plugins_admin}, because we
+	 * want to keep it in then in our indices.
 	 *
-	 * Records it and its Events in the database.
-	 *
-	 * @return Plugin|string The installed plugin on success, string with error on failure.
+	 * @param Plugin
+	 * @param string New status ("enabled", "disabled", "needs_config", "broken")
 	 */
-	function & install( $plugin_classname )
+	function set_Plugin_status( & $Plugin, $status )
 	{
-		global $DB, $Debuglog, $Messages;
+		global $DB;
+
+		$DB->query( 'UPDATE T_plugins SET plug_status = "'.$status.'" WHERE plug_ID = "'.$Plugin->ID.'"' );
+
+		if( $status == 'enabled' )
+		{ // Reload plugins tables, which includes the plugin in further requests
+			$this->loaded_plugins_table = false;
+			$this->load_plugins_table();
+			$this->load_events();
+		}
+		elseif( strtolower( get_class($this) ) != 'plugins_admin' )
+		{
+			$this->unregister( $Plugin );
+		}
+		$Plugin->status = $status;
+	}
+
+
+	/**
+	 * Install a plugin into DB.
+	 *
+	 * @param string Classname of the plugin to install
+	 * @param string Initial DB Status of the plugin ("enbaled", "disabled", "needs_config", "broken")
+	 * @param string|NULL Optional classfile path, if not default (used for tests).
+	 * @return string|Plugin The installed Plugin (eventually with $install_dep_notes set) or a string in case of error.
+	 */
+	function & install( $classname, $plug_status = 'enabled', $classfile_path = NULL )
+	{
+		global $DB, $Debuglog;
 
 		$this->load_plugins_table();
 
 		// Register the plugin:
-		$Plugin = & $this->register( $plugin_classname, 0 ); // Auto-generates negative ID; New ID will be set a few lines below
+		$Plugin = & $this->register( $classname, 0, -1, NULL, $classfile_path ); // Auto-generates negative ID; New ID will be set a few lines below
 
 		if( is_string($Plugin) )
 		{ // return error message from register()
@@ -396,19 +452,37 @@ class Plugins
 			return $r;
 		}
 
-		$this->sort( 'priority' );
+		// Dependencies:
+		if( strtolower( get_class($this) ) == 'plugins_admin' )
+		{ // We must check dependencies against installed Plugins ($Plugins)
+			global $Plugins;
+			$dep_msgs = $Plugins->validate_dependencies( $Plugin, 'activate' );
+		}
+		else
+		{
+			$dep_msgs = $this->validate_dependencies( $Plugin, 'activate' );
+		}
+		if( ! empty( $dep_msgs['error'] ) )
+		{ // required dependencies
+			$this->unregister( $Plugin );
+			$r = T_('Some plugin dependencies are not fulfilled:').' <ul><li>'.implode( '</li><li>', $dep_msgs['error'] ).'</li></ul>';
+			return $r;
+		}
 
+		// All OK, install:
 		if( empty($Plugin->code) )
 		{
 			$Plugin->code = NULL;
 		}
 
+		$Plugin->status = $plug_status;
+
 		// Record into DB
 		$DB->begin();
 
 		$DB->query( '
-				INSERT INTO T_plugins( plug_classname, plug_priority, plug_code, plug_apply_rendering )
-				VALUES( "'.$plugin_classname.'", '.$Plugin->priority.', '.$DB->quote($Plugin->code).', '.$DB->quote($Plugin->apply_rendering).' ) ' );
+				INSERT INTO T_plugins( plug_classname, plug_priority, plug_code, plug_apply_rendering, plug_version, plug_status )
+				VALUES( "'.$classname.'", '.$Plugin->priority.', '.$DB->quote($Plugin->code).', '.$DB->quote($Plugin->apply_rendering).', '.$DB->quote($Plugin->version).', '.$DB->quote($Plugin->status).' ) ' );
 
 		// Unset auto-generated ID info
 		unset( $this->index_ID_Plugins[ $Plugin->ID ] );
@@ -426,9 +500,12 @@ class Plugins
 		// "GetDefaultSettings" was just discovered by save_events()
 		$this->instantiate_Settings( $Plugin );
 
-		$Debuglog->add( 'New plugin: '.$Plugin->name.' ID: '.$Plugin->ID, 'plugins' );
+		$Debuglog->add( 'Installed plugin: '.$Plugin->name.' ID: '.$Plugin->ID, 'plugins' );
 
-		$this->call_method( $Plugin->ID, 'AfterInstall', $params = array() );
+		if( ! empty($dep_msgs['note']) )
+		{ // Add dependency notes
+			$Plugin->install_dep_notes = $dep_msgs['note'];
+		}
 
 		return $Plugin;
 	}
@@ -439,7 +516,7 @@ class Plugins
 	 *
 	 * Removes the Plugin, its Settings and Events from the database.
 	 *
-	 * @return true|string True on success, string on failure (might be empty, as a lot of cases are checked that should never happen).
+	 * @return boolean True on success
 	 */
 	function uninstall( $plugin_ID )
 	{
@@ -448,12 +525,6 @@ class Plugins
 		$Debuglog->add( 'Uninstalling plugin (ID '.$plugin_ID.')...', 'plugins' );
 
 		$Plugin = & $this->get_by_ID( $plugin_ID ); // get the Plugin before any not loaded data might get deleted below
-
-		if( ! $Plugin )
-		{
-			$Debuglog->add( 'Plugin could not be instantiated!', 'plugins' );
-			return '';
-		}
 
 		$DB->begin();
 
@@ -466,20 +537,259 @@ class Plugins
 		              WHERE pevt_plug_ID = $plugin_ID" );
 
 		// Delete from DB
-		if( ! $DB->query( "DELETE FROM T_plugins
-		                    WHERE plug_ID = $plugin_ID" ) )
-		{ // Nothing removed!?
-			$DB->commit();
-
-			return ''; // should be prevented by UI
-		}
+		$DB->query( "DELETE FROM T_plugins
+		              WHERE plug_ID = $plugin_ID" );
 
 		$DB->commit();
 
-		$this->unregister( $Plugin );
+		if( $Plugin )
+		{
+			$this->unregister( $Plugin );
+		}
 
 		$Debuglog->add( 'Uninstalled plugin (ID '.$plugin_ID.').', 'plugins' );
 		return true;
+	}
+
+
+	/**
+	 * Validate dependencies of a Plugin.
+	 *
+	 * @param Plugin
+	 * @param string Mode of check: either 'activate' or 'deactivate'
+	 * @return array The key 'note' holds an array of notes (recommendations), the key 'error' holds a list
+	 *               of messages for dependency errors.
+	 */
+	function validate_dependencies( & $Plugin, $mode )
+	{
+		global $DB, $app_name;
+
+		$msgs = array();
+
+		if( $mode == 'deactivate' )
+		{ // Check the whole list of installed plugins if they depend on our Plugin or it's (set of) events.
+			$required_by_plugin = array(); // a list of plugin classnames that require our poor Plugin
+
+			foreach( $this->sorted_IDs as $validate_against_ID )
+			{
+				if( $validate_against_ID == $Plugin->ID )
+				{ // the plugin itself
+					continue;
+				}
+
+				$against_Plugin = & $this->get_by_ID($validate_against_ID);
+
+				if( $against_Plugin->status != 'enabled' )
+				{ // The plugin is not enabled (this check is needed when checking deps with the Plugins_admin class)
+					continue;
+				}
+
+				$deps = $against_Plugin->GetDependencies();
+
+				if( empty($deps['requires']) )
+				{ // has no dependencies
+					continue;
+				}
+
+				if( ! empty($deps['requires']['plugins']) )
+				{
+					foreach( $deps['requires']['plugins'] as $l_req_plugin )
+					{
+						if( ! is_array($l_req_plugin) )
+						{
+							$l_req_plugin = array( $l_req_plugin, 0 );
+						}
+
+						if( $Plugin->classname == $l_req_plugin[0] )
+						{ // our plugin is required by this one, check if it is the only instance
+							if( $this->count_regs($Plugin->classname) < 2 )
+							{
+								$required_by_plugin[] = $against_Plugin->classname;
+							}
+						}
+					}
+				}
+
+				if( ! empty($deps['requires']['events_by_one']) )
+				{
+					foreach( $deps['requires']['events_by_one'] as $req_events )
+					{
+						// Get a list of plugins that provide all the events
+						$provided_by = array_keys( $this->get_list_by_all_events( $req_events ) );
+
+						if( in_array($Plugin->ID, $provided_by) && count($provided_by) < 2 )
+						{ // we're the only Plugin which provides this set of events
+							$msgs['error'][] = sprintf( T_( 'The events %s are required by %s (ID %d).' ), implode_with_and($req_events), $against_Plugin->classname, $against_Plugin->ID );
+						}
+					}
+				}
+
+				if( ! empty($deps['requires']['events']) )
+				{
+					foreach( $deps['requires']['events'] as $req_event )
+					{
+						// Get a list of plugins that provide all the events
+						$provided_by = array_keys( $this->get_list_by_event( $req_event ) );
+
+						if( in_array($Plugin->ID, $provided_by) && count($provided_by) < 2 )
+						{ // we're the only Plugin which provides this event
+							$msgs['error'][] = sprintf( T_( 'The event %s is required by %s (ID %d).' ), $req_event, $against_Plugin->classname, $against_Plugin->ID );
+						}
+					}
+				}
+
+				// TODO: We might also handle the 'recommends' and add it to $msgs['note']
+			}
+
+			if( ! empty( $required_by_plugin ) )
+			{ // Prepend the message to the beginning, because it's the most restrictive (IMHO)
+				$required_by_plugin = array_unique($required_by_plugin);
+				if( ! isset($msgs['error']) )
+				{
+					$msgs['error'] = array();
+				}
+				array_unshift( $msgs['error'], sprintf( T_('The plugin is required by the following plugins: %s.'), implode_with_and($required_by_plugin) ) );
+			}
+
+			return $msgs;
+		}
+
+
+		// mode 'activate':
+		$deps = $Plugin->GetDependencies();
+
+		if( empty($deps) )
+		{
+			return array();
+		}
+
+		foreach( $deps as $class => $dep_list )
+		{
+			if( ! is_array($dep_list) )
+			{ // Invalid format: "throw" error (needs not translation)
+				return array(
+						'error' => array( 'GetDependencies() did not return array of arrays. Please contact the plugin developer.' )
+					);
+			}
+			foreach( $dep_list as $type => $type_params )
+			{
+				switch( $type )
+				{
+					case 'events_by_one':
+						foreach( $type_params as $sub_param )
+						{
+							if( ! is_array($sub_param) )
+							{ // Invalid format: "throw" error (needs not translation)
+								return array(
+										'error' => array( 'GetDependencies() did not return array of arrays for events_by_one. Please contact the plugin developer.' )
+									);
+							}
+							if( ! $this->are_events_available( $sub_param, true ) )
+							{
+								if( $class == 'recommends' )
+								{
+									$msgs['note'][] = sprintf( T_( 'The plugin recommends a plugin which provides all of the following events: %s.' ), implode_with_and( $sub_param ) );
+								}
+								else
+								{
+									$msgs['error'][] = sprintf( T_( 'The plugin requires a plugin which provides all of the following events: %s.' ), implode_with_and( $sub_param ) );
+								}
+							}
+						}
+						break;
+
+					case 'events':
+						if( ! $this->are_events_available( $type_params, false ) )
+						{
+							if( $class == 'recommends' )
+							{
+								$msgs['note'][] = sprintf( T_( 'The plugin recommends plugins which provide the events: %s.' ), implode_with_and( $type_params ) );
+							}
+							else
+							{
+								$msgs['error'][] = sprintf( T_( 'The plugin requires plugins which provide the events: %s.' ), implode_with_and( $type_params ) );
+							}
+						}
+						break;
+
+					case 'plugins':
+						foreach( $type_params as $plugin_req )
+						{
+							if( ! is_array($plugin_req) )
+							{
+								$plugin_req = array( $plugin_req, '0' );
+							}
+							elseif( ! isset($plugin_req[1]) )
+							{
+								$plugin_req[1] = '0';
+							}
+
+							if( $versions = $DB->get_col( '
+								SELECT plug_version FROM T_plugins
+								 WHERE plug_classname = '.$DB->quote($plugin_req[0]).'
+									 AND plug_status = "enabled"' ) )
+							{
+								// Clean up version from CVS Revision prefix/suffix:
+								$versions[] = $plugin_req[1];
+								$clean_versions = preg_replace( array( '~^(CVS\s+)?\$Revision$$~' ), '', $versions );
+								$clean_req_ver = array_pop($clean_versions);
+								usort( $clean_versions, 'version_compare' );
+								$clean_oldest_enabled = array_shift($clean_versions);
+
+								if( version_compare( $clean_oldest_enabled, $clean_req_ver, '<' ) )
+								{ // at least one instance of the installed plugins is not the current version
+									$msgs['error'][] = sprintf( T_( 'The plugin requires at least version %s of the plugin %s, but you have %s.' ), $plugin_req[1], $plugin_req[0], $oldest );
+								}
+							}
+							else
+							{ // no plugin existing
+								if( $class == 'recommends' )
+								{
+									$recommends[] = $plugin_req[0];
+								}
+								else
+								{
+									$requires[] = $plugin_req[0];
+								}
+							}
+						}
+
+						if( ! empty( $requires ) )
+						{
+							$msgs['error'][] = sprintf( T_( 'The plugin requires the plugins: %s.' ), implode_with_and( $requires ) );
+						}
+
+						if( ! empty( $recommends ) )
+						{
+							$msgs['note'][] = sprintf( T_( 'The plugin recommends to install the plugins: %s.' ), implode_with_and( $recommends ) );
+						}
+						break;
+
+					case 'api_min':
+						$api_min = $type_params;
+						if( ! is_array($api_min) )
+						{
+							$api_min = array( $api_min, 0 );
+						}
+
+						if( $this->api_version[0] < $api_min[0]  // API's major version too old
+							|| ( $this->api_version[0] == $api_min[0] && $this->api_version[1] < $api_min[1] ) ) // API's minor version too old
+						{
+							if( $class == 'recommends' )
+							{
+								$msgs['note'][] = sprintf( T_('The plugin recommends version %s of the plugin API (%s is installed). Think about upgrading your %s installation.'), implode('.', $api_min), implode('.', $this->api_version), $app_name );
+							}
+							else
+							{
+								$msgs['error'][] = sprintf( T_('The plugin requires version %s of the plugin API, but %s is installed. You will probably have to upgrade your %s installation.'), implode('.', $api_min), implode('.', $this->api_version), $app_name );
+							}
+						}
+						break;
+				}
+			}
+		}
+
+		return $msgs;
 	}
 
 
@@ -492,15 +802,16 @@ class Plugins
 	 * @todo When a Plugin does not exist anymore we might want to provide a link in
 	 *       "Tools / Plugins" to un-install it completely or handle it otherwise.. (deactivate)
 	 * @access private
-	 * @param string name of plugin class to instantiate & register
+	 * @param string name of plugin class to instantiate and register
 	 * @param int ID in database (0 if not installed)
 	 * @param int Priority in database (-1 to keep default)
 	 * @param array When should rendering apply? (NULL to keep default)
-	 * @param boolean Must the plugin exist (filename and classname)?
-	 *                This is used internally to be able to unregister an non-existing plugin.
+	 * @param string Path of the .php class file of the plugin.
+	 * @param boolean Must the plugin exist (classfile_path and classname)?
+	 *                This is used internally to be able to unregister a non-existing plugin.
 	 * @return Plugin|string Plugin ref to newly created plugin; string in case of error
 	 */
-	function & register( $classname, $ID = 0, $priority = -1, $apply_rendering = NULL, $must_exists = true )
+	function & register( $classname, $ID = 0, $priority = -1, $apply_rendering = NULL, $classfile_path = NULL, $must_exists = true )
 	{
 		global $Debuglog, $Messages, $Timer;
 
@@ -511,19 +822,26 @@ class Plugins
 
 		$Timer->resume( 'plugins_register' );
 
-		$filename = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $classname ).'.php';
+		if( empty($classfile_path) )
+		{
+			$classfile_path = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $classname ).'.php';
+			if( ! is_readable( $classfile_path ) )
+			{ // Try <plug_classname>/<plug_classname>.php (subfolder)
+				$classfile_path = $this->plugins_path.$classname.'/_'.str_replace( '_plugin', '.plugin', $classname ).'.php';
+			}
+		}
 
-		$Debuglog->add( 'register(): '.$classname.', ID: '.$ID.', priority: '.$priority.', filename: ['.$filename.']', 'plugins' );
+		$Debuglog->add( 'register(): '.$classname.', ID: '.$ID.', priority: '.$priority.', classfile_path: ['.$classfile_path.']', 'plugins' );
 
-		if( ! is_readable( $filename ) )
+		if( ! is_readable( $classfile_path ) )
 		{ // Plugin file not found!
 			if( $must_exists )
 			{
-				$r = 'Plugin filename ['.rel_path_to_base($filename).'] not readable!'; // no translation, should not happen!
+				$r = 'Plugin class file ['.rel_path_to_base($classfile_path).'] not readable!'; // no translation, should not happen!
 				$Debuglog->add( $r, array( 'plugins', 'error' ) );
 
 				// unregister:
-				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, false ); // must not exist
+				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, $classfile_path, false ); // must not exist
 				$this->unregister( $Plugin );
 				$Debuglog->add( 'Unregistered plugin ['.$classname.']!', array( 'plugins', 'error' ) );
 
@@ -534,18 +852,18 @@ class Plugins
 		else
 		{
 			$Debuglog->add( 'Loading plugin class file: '.$classname, 'plugins' );
-			require_once $filename;
+			require_once $classfile_path;
 		}
 
 		if( ! class_exists( $classname ) )
 		{ // the given class does not exist
 			if( $must_exists )
 			{
-				$r = sprintf( /* TRANS: First %s is the (class)name */ T_('Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined - it must match the filename.'), $classname, rel_path_to_base($filename) );
+				$r = sprintf( /* TRANS: First %s is the (class)name */ T_('Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined - it must match the filename.'), $classname, rel_path_to_base($classfile_path) );
 				$Debuglog->add( $r, array( 'plugins', 'error' ) );
 
 				// unregister:
-				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, false ); // must not exist
+				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, $classfile_path, false ); // must not exist
 				$this->unregister( $Plugin );
 				$Debuglog->add( 'Unregistered plugin ['.$classname.']!', array( 'plugins', 'error' ) );
 
@@ -564,6 +882,8 @@ class Plugins
 			$Plugin = new $classname;	// COPY !
 		}
 
+		$Plugin->classfile_path = $classfile_path;
+
 		// Tell him his ID :)
 		if( $ID == 0 )
 		{
@@ -577,9 +897,14 @@ class Plugins
 		$Plugin->classname = $classname;
 		// Tell him his priority:
 		if( $priority > -1 ) { $Plugin->priority = $priority; }
+
+		// Properties from T_plugins
 		if( isset( $this->index_ID_rows[$Plugin->ID] ) )
 		{
+			// Code
 			$Plugin->code = $this->index_ID_rows[$Plugin->ID]['plug_code'];
+			// Status
+			$Plugin->status = $this->index_ID_rows[$Plugin->ID]['plug_status'];
 		}
 
 		if( isset($apply_rendering) )
@@ -590,8 +915,8 @@ class Plugins
 		// Memorizes Plugin in sequential array:
 		$this->Plugins[] = & $Plugin;
 		// Memorizes Plugin in code hash array:
-		if( isset($this->index_code_ID[ $Plugin->code ]) && $this->index_code_ID[ $Plugin->code ] != $Plugin->ID )
-		{ // This code is already in use!
+		if( ! empty($this->index_code_ID[ $Plugin->code ]) && $this->index_code_ID[ $Plugin->code ] != $Plugin->ID )
+		{ // The plugin's default code is already in use!
 			$Plugin->code = NULL;
 		}
 		else
@@ -612,6 +937,38 @@ class Plugins
 			$Debuglog->add( 'Unregistered plugin, because instantiating its Settings returned false.', 'plugins' );
 			$this->unregister( $Plugin );
 			$Plugin = '';
+		}
+
+		// Version check:
+		if( $must_exists
+		    && isset($this->index_ID_rows[$Plugin->ID])
+		    && $Plugin->version != $this->index_ID_rows[$Plugin->ID]['plug_version'] )
+		{ // Version has changed since installation or last update
+			$db_deltas = array();
+
+			// Extended check with cleaned up versions, if currently stored version is less or equal (because it was just different above!):
+			// NOTE: we do not want to compare DB schema (and set status to "needs_config") in case of downgrades..
+			list( $old_version, $new_version ) = preg_replace( array( '~^(CVS\s+)?\$Revision$$~' ), '', array( $this->index_ID_rows[$Plugin->ID]['plug_version'], $Plugin->version ) );
+			if( version_compare( $new_version, $old_version, '>=' ) )
+			{
+				$Debuglog->add( 'Version for '.$Plugin->classname.' changed from '.$this->index_ID_rows[$Plugin->ID]['plug_version'].' to '.$Plugin->version, 'plugins' );
+
+				require_once( dirname(__FILE__).'/_upgrade.funcs.php' );
+				$db_deltas = db_delta($Plugin->GetDbLayout());
+			}
+
+			if( empty($db_deltas) )
+			{ // No DB changes needed, bump the version
+				global $DB;
+				$DB->query( '
+						UPDATE T_plugins
+							 SET plug_version = '.$DB->quote($Plugin->version).'
+						 WHERE plug_ID = '.$Plugin->ID );
+			}
+			else
+			{ // If there are DB schema changes needed, set the Plugin status to "needs_config"
+				$this->set_Plugin_status( $Plugin, 'needs_config' );
+			}
 		}
 
 		$Timer->pause( 'plugins_register' );
@@ -848,7 +1205,7 @@ class Plugins
 			return NULL;
 		}
 
-		if( !is_array($defaults) )
+		if( ! is_array($defaults) )
 		{
 			$Debuglog->add( $Plugin->classname.'::GetDefaultSettings() did not return array!', array('plugins', 'error') );
 		}
@@ -859,7 +1216,24 @@ class Plugins
 
 			foreach( $defaults as $l_name => $l_meta )
 			{
-				$Plugin->Settings->_defaults[$l_name] = isset($l_meta['defaultvalue']) ? $l_meta['defaultvalue'] : '';
+				if( isset($l_meta['layout']) )
+				{ // Skip non-value entries
+					continue;
+				}
+
+				if( isset($l_meta['defaultvalue']) )
+				{
+					$Plugin->Settings->_defaults[$l_name] = $l_meta['defaultvalue'];
+				}
+				elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'array' )
+				{
+					$Plugin->Settings->_defaults[$l_name] = array();
+					$Plugin->Settings->_defaults_to_be_serialized[] = $l_name;
+				}
+				else
+				{
+					$Plugin->Settings->_defaults[$l_name] = '';
+				}
 			}
 
 			$event_r = $this->call_method( $Plugin->ID, 'PluginSettingsInstantiated', $params = array() );
@@ -1399,10 +1773,13 @@ class Plugins
 		global $Debuglog, $DB;
 
 		$Debuglog->add( 'Loading plugins table data.', 'plugins' );
-		$i = 0;
-		foreach( $DB->get_results( '
-				SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering FROM T_plugins
-				ORDER BY plug_priority', ARRAY_A ) as $row )
+
+		$this->index_ID_rows = array();
+		$this->index_code_ID = array();
+		$this->index_apply_rendering_codes = array();
+		$this->sorted_IDs = array();
+
+		foreach( $DB->get_results( $this->sql_load_plugins_table, ARRAY_A ) as $row )
 		{ // Loop through installed plugins:
 			$this->index_ID_rows[$row['plug_ID']] = $row; // remember the rows to instantiate the Plugin on request
 			if( ! empty( $row['plug_code'] ) )
@@ -1502,7 +1879,7 @@ class Plugins
 	 * Get a list of Plugins for a given event.
 	 *
 	 * @param string Event name
-	 * @return array of Plugins
+	 * @return array List of Plugins, where the key is the plugin's ID
 	 */
 	function get_list_by_event( $event )
 	{
@@ -1527,7 +1904,7 @@ class Plugins
 	 * Get a list of Plugins for a list of events. Every Plugin is only once in this list.
 	 *
 	 * @param array Array of events
-	 * @return array List of Plugins
+	 * @return array List of Plugins, where the key is the plugin's ID
 	 */
 	function get_list_by_events( $events )
 	{
@@ -1551,7 +1928,7 @@ class Plugins
 	/**
 	 * Get a list of plugins that provide all given events.
 	 *
-	 * @return array
+	 * @return array The list of plugins, where the key is the plugin's ID
 	 */
 	function get_list_by_all_events( $events )
 	{
@@ -1625,7 +2002,32 @@ class Plugins
 
 
 	/**
-	 * (Re)load Plugin Events.
+	 * Check if the requested list of events is provided by any or one plugin.
+	 *
+	 * @param array|string A single event or a list thereof
+	 * @param boolean Make sure there's at least one plugin that provides them all?
+	 *                This is useful for event pairs like "CaptchaPayload" and "CaptchaValidated", which
+	 *                should be served by the same plugin.
+	 * @return boolean
+	 */
+	function are_events_available( $events, $by_one_plugin = false )
+	{
+		if( ! is_array($events) )
+		{
+			$events = array($events);
+		}
+
+		if( $by_one_plugin )
+		{
+			return (bool)$this->get_list_by_all_events( $events );
+		}
+
+		return (bool)$this->get_list_by_events( $events );
+	}
+
+
+	/**
+	 * (Re)load Plugin Events for enabled plugins.
 	 */
 	function load_events()
 	{
@@ -1638,6 +2040,7 @@ class Plugins
 				SELECT pevt_plug_ID, pevt_event
 					FROM T_pluginevents INNER JOIN T_plugins ON pevt_plug_ID = plug_ID
 				 WHERE pevt_enabled > 0
+				   AND plug_status = "enabled"
 				 ORDER BY plug_priority', OBJECT, 'Loading plugin events' ) as $l_row )
 		{
 			$this->index_event_IDs[$l_row->pevt_event][] = $l_row->pevt_plug_ID;
@@ -1664,8 +2067,7 @@ class Plugins
 
 		$plugin_class_methods = array(); // Return value
 
-		$filename = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $Plugin->classname ).'.php';
-		$classfile_contents = file_get_contents( $filename );
+		$classfile_contents = file_get_contents( $Plugin->classfile_path );
 
 		$token_buffer = '';
 		$classname = '';
@@ -1888,128 +2290,6 @@ class Plugins
 		}
 	}
 
-
-	/**
-	 * Display a single field (setting) of the Plugin's Settings.
-	 *
-	 * @todo Move to plugins.php/_plugins_settings.form.php..
-	 * @param string Settings name (key)
-	 * @param array Meta data for this setting. See {@link Plugin::GetDefaultSettings()}
-	 * @param Plugin (by reference)
-	 * @param Form (by reference)
-	 * @param mixed Value to really use (used for recursion into array type settings)
-	 */
-	function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Form, $use_value = NULL )
-	{
-		global $debug;
-
-		$params = array();
-
-		if( isset($set_meta['note']) )
-		{
-			$params['note'] = $set_meta['note'];
-		}
-
-		if( ! isset($set_meta['type']) )
-		{
-			$set_meta['type'] = 'text';
-		}
-
-		if( isset($set_meta['help']) )
-		{
-			if( is_string($set_meta['help']) )
-			{
-				$get_help_link_params = array($set_meta['help']);
-			}
-			else
-			{
-				$get_help_link_params = $set_meta['help'];
-			}
-
-			$params['note'] .= ' '.call_user_func_array( array( & $Plugin, 'get_help_link'), $get_help_link_params );
-		}
-
-		// Display input element:
-		switch( $set_meta['type'] )
-		{
-			case 'checkbox':
-				$Form->checkbox_input( 'edited_plugin_set_'.$set_name,
-					isset($use_value) ? $use_value : $Plugin->Settings->get($set_name),
-					$set_meta['label'],
-					$params );
-				break;
-
-			case 'textarea':
-				$textarea_rows = isset($set_meta['rows']) ? $set_meta['rows'] : 3;
-				$Form->textarea_input( 'edited_plugin_set_'.$set_name,
-					isset($use_value) ? $use_value : $Plugin->Settings->get($set_name),
-					$textarea_rows,
-					$set_meta['label'],
-					$params );
-				break;
-
-			case 'array':
-				$Form->begin_fieldset( (isset($set_meta['label']) ? $set_meta['label'] : '').( $debug ? ' [debug: '.$set_name.']' : '' ) );
-
-				$plugin_value = isset($use_value) ? $use_value : $Plugin->Settings->get_unserialized( $set_name );
-
-				$insert_new_set_as = 0;
-				if( is_array( $plugin_value ) )
-				{
-					foreach( $plugin_value as $k => $v )
-					{
-						foreach( $set_meta['entries'] as $l_set_name => $l_set_entry )
-						{
-							$l_value = isset($plugin_value[$k][$l_set_name]) ? $plugin_value[$k][$l_set_name] : NULL;
-							$this->display_settings_fieldset_field( $set_name.'['.$k.']['.$l_set_name.']', $l_set_entry, $Plugin, $Form, $l_value );
-						}
-						$insert_new_set_as = $k+1;
-					}
-				}
-				if( ! isset( $set_meta['max_number'] ) || $set_meta['max_number'] > count($plugin_value) )
-				{ // no max_number defined or not reached: display link to add a new set
-
-					echo '<a href="'.regenerate_url( 'ctrl,action', array( 'ctrl=plugins', 'action=add_settings_set', 'insert_as='.$set_name.'['.$insert_new_set_as.']', 'plugin_ID='.$Plugin->ID), 'admin.php' ).'">'.T_('Add another set').'</a>';
-				}
-				$Form->end_fieldset();
-
-
-				break;
-
-			case 'password':
-				$params['type'] = 'password'; // same as text input, but type=password
-
-			case 'integer':
-			case 'text':
-				// Default: "text input"
-				if( isset($set_meta['size']) )
-				{
-					$size = (int)$set_meta['size'];
-				}
-				else
-				{ // Default size:
-					$size = 25;
-				}
-				if( isset($set_meta['maxlength']) )
-				{
-					$params['maxlength'] = (int)$set_meta['maxlength'];
-				}
-				else
-				{ // do not use size as maxlength, if not given!
-					$params['maxlength'] = '';
-				}
-
-				$Form->text_input( 'edited_plugin_set_'.$set_name,
-					isset($use_value) ? $use_value : $Plugin->Settings->get($set_name),
-					$size,
-					$set_meta['label'],
-					$params );
-				break;
-
-			default:
-				debug_die( 'Unsupported type from GetDefaultSettings()!' );
-		}
-	}
 }
 
 
@@ -2017,9 +2297,11 @@ class Plugins
  * A sub-class of {@link Plugins}, just to not load any DB info (which means Plugins and Events).
  *
  * This is only useful for displaying a list of available plugins or during installation to have
- * a {@link $Plugins} object that does not interfere with the installation process.
+ * a global $Plugins object that does not interfere with the installation process.
  *
  * {@internal This is probably quicker and cleaner than using a member boolean in {@link Plugins} itself.}}
+ *
+ * @package evocore
  */
 class Plugins_no_DB extends Plugins
 {
@@ -2039,18 +2321,31 @@ class Plugins_no_DB extends Plugins
 }
 
 
+/**
+ * A Plugins object that loads all Plugins, not just the enabled ones. This is needed for the backoffice plugin management.
+ *
+ * @package evocore
+ */
+class Plugins_admin extends Plugins
+{
+	/**
+	 * Load all plugins (not just enabled ones).
+	 */
+	var $sql_load_plugins_table = '
+			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version FROM T_plugins
+			 ORDER BY plug_priority';
+}
+
+
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 19:32:05  blueyed
+ * doc, temporary style
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.49  2006/02/13 15:42:48  blueyed
- * no message
- *
- * Revision 1.48  2006/02/06 18:12:47  blueyed
- * *** empty log message ***
  *
  * Revision 1.47  2006/02/05 19:04:49  blueyed
  * doc fixes

@@ -364,7 +364,7 @@ class Form extends Widget
 				{ // there is a title to display
 					if( !empty( $icons ) )
 					{
-						$r .= '<span class="fieldset_icons">';
+						$r .= '<span class="fieldset_icons" style="float:right">';
 						foreach( $icons as $icon )
 						{
 							$r .= $icon;
@@ -390,12 +390,12 @@ class Form extends Widget
 				{ // there is a legend tag (or explicit params for it) to display
 					if( !empty( $icons ) )
 					{
-						$r .= '<span class="fieldset_icons">';
+						$r .= '<div class="fieldset_icons" style="text-align:right">';
 						foreach( $icons as $icon )
 						{
 							$r .= $icon;
 						}
-						$r .= '</span>';
+						$r .= '</div>';
 					}
 					$r .= '<legend';
 					if( isset($legend_params) )
@@ -1159,7 +1159,7 @@ class Form extends Widget
 
 
 	/**
-	 * Ends the form and optionally displays buttons.
+	 * Ends the form, optionally displays buttons and closes all open fieldsets.
 	 *
 	 * @param array Optional array to display the buttons before the end of the form, see {@link buttons_input()}
 	 * @return true|string true (if output) or the generated HTML if not outputting.
@@ -2506,13 +2506,13 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 19:34:02  blueyed
+ * doc, temporary style
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.115  2006/02/18 23:36:57  fplanque
- * no message
  *
  * Revision 1.114  2006/02/14 20:24:39  blueyed
  * no_title_fmt
