@@ -63,14 +63,14 @@ class PluginsTestCase extends DbUnitTestCase
 		$this->assertIsA( $a_Plugin, 'Plugin' );
 
 		// The B plugin should now NOT be able to get disabled
-		$dep_msgs = $this->Plugins->validate_dependencies( $b_Plugin, 'deactivate' );
+		$dep_msgs = $this->Plugins->validate_dependencies( $b_Plugin, 'disable' );
 		$this->assertEqual( array_keys($dep_msgs), array('error') );
 		$this->assertEqual( count($dep_msgs['error']), 1 );
 
 		$this->assertTrue( $this->Plugins->uninstall( $a_Plugin->ID ) );
 
 		// The B plugin should now be able to get disabled
-		$dep_msgs = $this->Plugins->validate_dependencies( $b_Plugin, 'deactivate' );
+		$dep_msgs = $this->Plugins->validate_dependencies( $b_Plugin, 'disable' );
 		$this->assertEqual( $dep_msgs, array() );
 	}
 
@@ -85,7 +85,7 @@ class PluginsTestCase extends DbUnitTestCase
 		// Only major version given (not fulfilled)
 		$mock_Plugin = new MockPlugin();
 		$mock_Plugin->setReturnValue( 'GetDependencies', array( 'requires' => array( 'api_min' => $this->Plugins->api_version[0]+1 ) ) );
-		$dep_msgs = $this->Plugins->validate_dependencies( $mock_Plugin, 'activate' );
+		$dep_msgs = $this->Plugins->validate_dependencies( $mock_Plugin, 'enable' );
 		$this->assertEqual( array_keys($dep_msgs), array('error') );
 		$this->assertEqual( count($dep_msgs['error']), 1 );
 
@@ -93,7 +93,7 @@ class PluginsTestCase extends DbUnitTestCase
 		// Only major version given (fulfilled)
 		$mock_Plugin = new MockPlugin();
 		$mock_Plugin->setReturnValue( 'GetDependencies', array( 'requires' => array( 'api_min' => $this->Plugins->api_version[0] ) ) );
-		$dep_msgs = $this->Plugins->validate_dependencies( $mock_Plugin, 'activate' );
+		$dep_msgs = $this->Plugins->validate_dependencies( $mock_Plugin, 'enable' );
 		$this->assertEqual( array_keys($dep_msgs), array() );
 
 	}
