@@ -58,9 +58,7 @@ class ItemCache extends DataObjectCache
 	/**
 	 * Constructor
 	 *
-	 * {@internal ItemCache::ItemCache(-) }}
-	 *
-	 * @Param string object type of elements in Cache
+	 * @param string object type of elements in Cache
 	 * @param string Name of the DB table
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
@@ -74,8 +72,6 @@ class ItemCache extends DataObjectCache
 	 * Get an object from cache by its urltitle
 	 *
 	 * Load into cache if necessary
-	 *
-	 * {@internal ItemCache::get_by_urltitle(-) }}
 	 *
 	 * @param string stub of object to load
 	 * @param boolean false if you want to return false on error
@@ -120,8 +116,6 @@ class ItemCache extends DataObjectCache
 	/**
 	 * Load a list of item referenced by their urltitle into the cache
 	 *
-	 * {@internal DataObjectCache::load_urltitle_array(-) }}
-	 *
 	 * @param array of urltitles of Items to load
 	 */
 	function load_urltitle_array( $req_array )
@@ -160,6 +154,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 16:45:46  blueyed
+ * doc fix
+ *
  * Revision 1.1  2006/02/23 21:11:58  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
