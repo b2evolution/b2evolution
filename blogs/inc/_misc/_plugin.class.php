@@ -1355,7 +1355,7 @@ class Plugin
 				$action = 'disp_help';
 			}
 
-			$url = $admin_url.'plugins.php?action='.$action.'&amp;plugin_ID='.$this->ID;
+			$url = url_add_param( $admin_url, 'ctrl=plugins&amp;action='.$action.'&amp;plugin_ID='.$this->ID );
 			if( ! empty($anchor) )
 			{
 				$url .= '#'.$this->classname.'_'.$anchor;
@@ -1416,6 +1416,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.3  2006/02/24 22:22:57  blueyed
+ * Fix URL for internal help.
+ *
  * Revision 1.2  2006/02/24 22:08:59  blueyed
  * Plugin enhancements
  *
