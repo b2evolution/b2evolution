@@ -75,7 +75,7 @@ class gmcode_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
-	 * @see Plugin::RenderItemAsHtml
+	 * @see Plugin::RenderItemAsHtml()
 	 */
 	function RenderItemAsHtml( & $params )
 	{
