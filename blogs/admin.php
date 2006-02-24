@@ -33,7 +33,7 @@ require_once $inc_path.'_main.inc.php';
 // Check global permission:
 if( ! $current_User->check_perm( 'admin', 'any' ) )
 {	// No permission to access admin...
-	require dirname(__FILE__).'/_access_denied.inc.php';
+	require $view_path.'errors/_access_denied.inc.php';
 }
 
 
