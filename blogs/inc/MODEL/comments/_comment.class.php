@@ -661,6 +661,11 @@ class Comment extends DataObject
 
 		$spam_karma = $Plugins->trigger_karma_collect( 'GetKarmaForComment', array( 'Comment' => & $this ) );
 
+		if( $spam_karma > 250 )
+		{ // "spam_karma" is a TINYINT field, max it to 250. For displaying we could still max it to 100.
+			$spam_karma = 250;
+		}
+
 		$this->set( 'spam_karma', $spam_karma );
 
 		$r = parent::dbinsert();
@@ -699,13 +704,13 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 21:50:14  blueyed
+ * Max spam_karma to 250
+ *
  * Revision 1.1  2006/02/23 21:11:57  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.26  2006/02/06 01:42:56  blueyed
- * *** empty log message ***
  *
  * Revision 1.24  2006/01/29 20:36:35  blueyed
  * Renamed Item::getBlog() to Item::get_Blog()
