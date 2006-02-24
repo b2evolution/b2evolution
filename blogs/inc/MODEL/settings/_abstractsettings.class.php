@@ -46,7 +46,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @package evocore
  * @abstract
- * @see UserSettings, GeneralSettings
+ * @todo For performance reasons this should get split up into AbstractSettings_X where X is the number of $colKeyNames
+ * @see UserSettings, GeneralSettings, PluginSettings
  */
 class AbstractSettings
 {
@@ -111,6 +112,16 @@ class AbstractSettings
 	 * @var array
 	 */
 	var $_defaults = array();
+
+
+	/**
+	 * A list of last colkeyname which are meant to be serialized (array or object).
+	 * They are {@link unserialize() unserialized} once with {@link get()} and
+	 * {@link serialize() serialized} with {@link dbupdate()}.
+	 *
+	 * @var array
+	 */
+	var $_defaults_to_be_serialized = array();
 
 
 	/**
@@ -284,6 +295,12 @@ class AbstractSettings
 			case 1:
 				if( isset($this->cache[ $args[0] ]) )
 				{
+					if( empty($this->cache[ $args[0] ]->unserialized) && in_array( $args[0], $this->_defaults_to_be_serialized ) )
+					{ // Unserialize setting (once)
+						$this->cache[ $args[0] ]->value = @unserialize($this->cache[ $args[0] ]->value);
+						$this->cache[ $args[0] ]->unserialized = true;
+					}
+
 					$r = $this->cache[ $args[0] ]->value;
 				}
 				elseif( NULL !== ($default = $this->get_default( $args[0] )) )
@@ -296,6 +313,12 @@ class AbstractSettings
 			case 2:
 				if( isset($this->cache[ $args[0] ][ $args[1] ]) )
 				{
+					if( empty($this->cache[ $args[0] ][ $args[1] ]->unserialized) && in_array( $args[1], $this->_defaults_to_be_serialized ) )
+					{ // Unserialize setting (once)
+						$this->cache[ $args[0] ][ $args[1] ]->value = @unserialize($this->cache[ $args[0] ][ $args[1] ]->value);
+						$this->cache[ $args[0] ][ $args[1] ]->unserialized = true;
+					}
+
 					$r = $this->cache[ $args[0] ][ $args[1] ]->value;
 				}
 				elseif( NULL !== ($default = $this->get_default( $args[1] )) )
@@ -308,6 +331,12 @@ class AbstractSettings
 			case 3:
 				if( isset($this->cache[ $args[0] ][ $args[1] ][ $args[2] ]) )
 				{
+					if( empty($this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->unserialized) && in_array( $args[2], $this->_defaults_to_be_serialized ) )
+					{ // Unserialize setting (once)
+						$this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->value = @unserialize($this->cache[ $args[0] ][ $args[1][ $args[2] ] ]->value);
+						$this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->unserialized = true;
+					}
+
 					$r = $this->cache[ $args[0] ][ $args[1] ][ $args[2] ]->value;
 				}
 				elseif( NULL !== ($default = $this->get_default( $args[2] )) )
@@ -330,11 +359,11 @@ class AbstractSettings
 	 * @param string The last column key
 	 * @return NULL|mixed NULL if no default is set, otherwise the value (should be string).
 	 */
-	function get_default( $lastKey )
+	function get_default( $last_key )
 	{
-		if( isset($this->_defaults[ $lastKey ]) )
+		if( isset($this->_defaults[ $last_key ]) )
 		{
-			return $this->_defaults[ $lastKey ];
+			return $this->_defaults[ $last_key ];
 		}
 
 		return NULL;
@@ -365,54 +394,6 @@ class AbstractSettings
 		else
 		{
 			return false;
-		}
-	}
-
-
-	/**
-	 * Get a value {@link unserialize() unserialized}.
-	 *
-	 * A simple method to get serialized data from the settings table. The Plugin Settings handling
-	 * makes use of it.
-	 *
-	 * @param string,... the values for the column keys (depends on $this->colKeyNames
-	 *                   and must match its count and order)
-	 * @param mixed The default to use when unserializing failed or key does not exist. Default is NULL.
-	 * @return mixed Value as mixed on success, default otherwise.
-	 */
-	function get_unserialized()
-	{
-		global $Debuglog;
-
-		$args = func_get_args();
-		if( count($this->colKeyNames) == (count($args)+1) )
-		{ // no default as last param
-			$default = NULL;
-		}
-		else
-		{
-			$default = array_pop( $args );
-		}
-
-		$result = call_user_func_array( array( & $this, 'get' ), $args );
-
-		if( $result !== NULL && $result !== false )
-		{ // No error and value retrieved
-			$result_unserialized = @unserialize($result);
-			if( $result_unserialized === false )
-			{
-				$Debuglog->add( get_class($this).'::unserialize() failed for ('.var_export( $args, true ).'), size: '.strlen($result).'. Using default: '.var_export($default, true), array('settings', 'error') );
-				$result = $default;
-			}
-			else
-			{
-				$result = $result_unserialized;
-			}
-			return $result;
-		}
-		else
-		{
-			return $default;
 		}
 	}
 
@@ -466,6 +447,7 @@ class AbstractSettings
 
 		$atCache->value = $value;
 		$atCache->dbUptodate = false;
+		$atCache->unserialized = true;
 
 		$Debuglog->add( $debugMsg.' SET!', 'settings' );
 
@@ -581,7 +563,12 @@ class AbstractSettings
 					}
 					elseif( isset($value->dbUptodate) && !$value->dbUptodate )
 					{
-						$query_insert[] = "('$key', '".$this->DB->escape( $value->value )."')";
+						$value = $value->value;
+						if( in_array( $key, $this->_defaults_to_be_serialized ) )
+						{
+							$value = serialize($value);
+						}
+						$query_insert[] = "('$key', '".$this->DB->escape( $value )."')";
 						$this->cache[$key]->dbUptodate = true;
 					}
 				}
@@ -603,7 +590,12 @@ class AbstractSettings
 						}
 						elseif( isset($value2->dbUptodate) && !$value2->dbUptodate )
 						{
-							$query_insert[] = "('$key', '$key2', '".$this->DB->escape( $value2->value )."')";
+							$value = $value2->value;
+							if( in_array( $key2, $this->_defaults_to_be_serialized ) )
+							{
+								$value = serialize($value);
+							}
+							$query_insert[] = "('$key', '$key2', '".$this->DB->escape( $value )."')";
 							$this->cache[$key][$key2]->dbUptodate = true;
 						}
 					}
@@ -628,7 +620,12 @@ class AbstractSettings
 							}
 							elseif( isset($value3->dbUptodate) && !$value3->dbUptodate )
 							{
-								$query_insert[] = "('$key', '$key2', '$key3', '".$this->DB->escape( $value3->value )."')";
+								$value = $value3->value;
+								if( in_array( $key3, $this->_defaults_to_be_serialized ) )
+								{
+									$value = serialize($value);
+								}
+								$query_insert[] = "('$key', '$key2', '$key3', '".$this->DB->escape( $value )."')";
 								$this->cache[$key][$key2][$key3]->dbUptodate = true;
 							}
 						}
@@ -664,13 +661,13 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 15:09:31  blueyed
+ * Decent support for serialized settings through get() and dbupdate().
+ *
  * Revision 1.1  2006/02/23 21:11:58  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.32  2006/02/08 09:43:08  blueyed
- * *** empty log message ***
  *
  * Revision 1.30  2006/01/26 20:27:45  blueyed
  * minor
