@@ -34,26 +34,26 @@ $default_ctrl = 'edit';
  * @global array
  */
 $ctrl_mappings = array(
-		'antispam'					=> 'antispam/antispam.php',
-		'browse'						=> 'items/b2browse.php',
-		'chapters'					=> 'collections/categories.php', // todo
-		'collections'				=> 'collections/blogs.php',
-		'edit'							=> 'items/b2edit.php',
-		'editactions'				=> 'items/edit_actions.php',
-		'features'					=> 'settings/features.php',
-		'files'							=> 'files/files.php',
-		'fileset'						=> 'files/fileset.php',
-		'filetypes'					=> 'files/filetypes.php',
-		'itemstatuses'			=> 'items/statuses.php',
-		'itemtypes'					=> 'items/types.php',
-		'locales'						=> 'settings/locales.php',
-		'mtimport'					=> 'imports/import-mt.php',
-		'plugins'						=> 'settings/plugins.php', // todo
-		'settings'					=> 'settings/settings.php',
-		'stats'							=> 'sessions/stats.php',
-		'templates'					=> 'skins/b2template.php',
-		'tools'							=> '_misc/tools.php',
-		'users'							=> 'users/b2users.php',
+		'antispam'     => 'antispam/antispam.php',
+		'browse'       => 'items/b2browse.php',
+		'chapters'     => 'collections/categories.php', // todo
+		'collections'  => 'collections/blogs.php',
+		'edit'         => 'items/b2edit.php',
+		'editactions'  => 'items/edit_actions.php',
+		'features'     => 'settings/features.php',
+		'files'        => 'files/files.php',
+		'fileset'      => 'files/fileset.php',
+		'filetypes'    => 'files/filetypes.php',
+		'itemstatuses' => 'items/statuses.php',
+		'itemtypes'    => 'items/types.php',
+		'locales'      => 'settings/locales.php',
+		'mtimport'     => 'imports/import-mt.php',
+		'plugins'      => 'settings/plugins.php', // todo
+		'settings'     => 'settings/settings.php',
+		'stats'        => 'sessions/stats.php',
+		'templates'    => 'skins/b2template.php',
+		'tools'        => '_misc/tools.php',
+		'users'        => 'users/b2users.php',
 	);
 
 
