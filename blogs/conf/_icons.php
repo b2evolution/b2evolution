@@ -299,25 +299,25 @@ $map_iconfiles = array(
 		'size' => array( 9, 9 ),
 	),
 
-	'activate' => array(
+	'enable' => array(
 		'file' => $rsc_subdir.'icons/bullet_activate.png',
 		'alt'  => /* TRANS: Short for "Activate(d)" */ T_('Act.'),
 		'legend' => T_('Activate'),
 		'size' => array( 17, 17 ),
 	),
-	'deactivate' => array(
+	'disable' => array(
 		'file' => $rsc_subdir.'icons/bullet_deactivate.png',
 		'alt'  => /* TRANS: Short for "Deactivate(d)" */ T_('Deact.'),
 		'legend' => T_('Deactivate'),
 		'size' => array( 17, 17 ),
 	),
-	'activated' => array(
+	'enabled' => array(
 		'file' => $rsc_subdir.'icons/bullet_full.png',
 		'alt'  => /* TRANS: Short for "Activate(d)" */ T_('Act.'),
 		'legend' => T_('Activated'),
 		'size' => array( 9, 9 ),
 	),
-	'deactivated' => array(
+	'disabled' => array(
 		'file' => $rsc_subdir.'icons/bullet_empty.png',
 		'alt'  => /* TRANS: Short for "Deactivate(d)" */ T_('Deact.'),
 		'legend' => T_('Deactivated'),
