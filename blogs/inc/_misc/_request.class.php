@@ -131,13 +131,12 @@ class Request
 	 */
 	function set_param( $var, $value )
 	{
-		global $$var;
 		$this->params[$var] = $value;
-		$$var = $value;
+		$GLOBALS[$var] = $value;
 	}
 
 
-  /**
+	/**
 	 * Memorize a parameter for automatic future use in regenerate_url()
 	 */
 	function memorize_param( $var, $type, $default, $value = NULL )
@@ -281,44 +280,61 @@ class Request
 
 
 	/**
-	 * Get the action from param.
+	 * Get the action from params.
 	 *
 	 * If we got no "action" param, we'll check for an "actionArray" param
-	 * ( <input type="submit" name="actionArray[real_action]" ...> )
+	 * ( <input type="submit" name="actionArray[real_action]" ...> ).
 	 * And the real $action will be found in the first key...
 	 * When there are multiple submit buttons, this is smarter than checking the value which is a translated string.
 	 * When there is an image button, this allows to work around IE not sending the value (it only sends X & Y coords of the click).
 	 *
-	 * @param string Default to use.
+	 * @param mixed Default to use.
 	 * @return string
 	 */
 	function param_action( $default = '' )
 	{
-		global $action;
-
 		#$this->param( 'action', 'string', NULL, true ); // blueyed>> is there a reason to remember? (taken from files.php)
 		$action = $this->param( 'action', 'string', NULL );
 
 		if( is_null($action) )
 		{ // Check $actionArray
-			$actionArray = array_keys( $this->param( 'actionArray', 'array', array(), true ) );
-			$action = array_pop($actionArray);
-			if( is_string($action) )
-			{
-				$action = substr( strip_tags($action), 0, 50 );  // sanitize it
-			}
-			elseif( !empty($actionArray) )
-			{ // this is probably a numeric index from '<input name="actionArray[]" .. />'
-				debug_die( 'Invalid action!' );
-			}
+			$action = $this->param_arrayindex( 'actionArray', $default );
+
+			$this->set_param( 'action', $action ); // always set "action"
 		}
 
-		if( empty($action) )
+		return $action;
+	}
+
+
+	/**
+	 * Get the param from an array param's first index.
+	 *
+	 * E.g., for "param[value]" as a submit button you can get the value with
+	 *       <code>Request::param_arrayindex( 'param' )</code>.
+	 *
+	 * @see Request::param_action()
+	 * @param string Param name
+	 * @param mixed Default to use
+	 * @return string
+	 */
+	function param_arrayindex( $param_name, $default = '' )
+	{
+		$array = array_keys( $this->param( $param_name, 'array', array() ) );
+		$action = array_pop($array);
+		if( is_string($action) )
+		{
+			$action = substr( strip_tags($action), 0, 50 );  // sanitize it
+		}
+		elseif( !empty($action) )
+		{ // this is probably a numeric index from '<input name="array[]" .. />'
+			debug_die( 'Invalid action!' );
+		}
+		else
 		{
 			$action = $default;
 		}
 
-		$this->params['action'] = $action;
 		return $action;
 	}
 
@@ -449,7 +465,7 @@ class Request
 	function param_check_phone( $var, $required = false )
 	{
 		global $$var;
-		
+
 		if( empty( $this->params[$var] ) && ! $required )
 		{ // empty is OK:
 			return true;
@@ -460,7 +476,7 @@ class Request
 			$this->param_error( $var, T_('The phone number is invalid.') );
 			return false;
 		}
-		else 
+		else
 		{ // Keep only 0123456789+ caracters
 			$this->params[$var] = preg_replace( '#[^0-9+]#', '', $this->params[$var]);
 			$$var = $this->params[$var];
@@ -560,23 +576,23 @@ class Request
 		$this->param_error( $var, $err_msg, $func_params['field_err_msg'] );
 		return false;
 	}
-	
-	
-  /**
+
+
+	/**
 	 * Sets a date parameter with values from the request or to provided default,
 	 * And check if param is a valid date (format wise).
-	 * 
+	 *
 	 * @param string Variable to set
 	 * @param mixed Default value or TRUE if user input required
 	 * @param string error message
 	 * @param boolean 'required': Is non-empty date required? Default: true.
-	 * 
+	 *
 	 * @return string the compact date value ( yyyymmdd )
-   */
+	 */
 	function param_compact_date( $var, $default = '', $err_msg, $required = false )
 	{
 		global $$var;
-		
+
 		$this->params[$var] = param( $var, 'string', $default );
 
 		if( $this->param_check_date_format( $var, $err_msg, array( 'required' => $required ) ) )
@@ -675,44 +691,84 @@ class Request
 		return false;
 	}
 
-	
+
 	/**
 	 * Sets a combo parameter with values from the request,
 	 * => the value of the select option and the input text value if new is selected
-	 * Display an error if the new value is selected that the input text has a value  
-	 * 
+	 * Display an error if the new value is selected that the input text has a value
+	 *
 	 * @param string Variable to set
 	 * @param boolean true: allows to select new without entring a value in the input combo text
 	 * @param string error message
-	 * 
-	 * @return string position status ID or 'new' or '' if new is seleted but not input text value 
-	 * 
+	 *
+	 * @return string position status ID or 'new' or '' if new is seleted but not input text value
+	 *
 	 */
 	function param_combo( $var, $allow_none, $err_msg = ''  )
 	{
 		$this->params[$var] = param( $var, 'string', true );
-	
+
 		if( $this->params[$var] == 'new' )
 		{	// The new option is selected in the combo select, so we need to check if we have a value in the combo input text:
 			$this->params[$var.'_combo'] = param( $var.'_combo', 'string' );
-	
+
 			if( empty( $this->params[$var.'_combo'] ) )
 			{ // We have no value in the combo input text
-				
-				// Set request param to null 
+
+				// Set request param to null
 				$this->params[$var] = NULL;
-	
+
 				if( !$allow_none )
 				{ // it's not allowed, so display error:
 					$this->param_error( $var, $err_msg );
 				}
 			}
 		}
-		
+
 		return $this->params[$var];
 	}
-	
-	
+
+
+	/**
+	 * Get a param, in co-operation with {@link $UserSettings}.
+	 * If the param is given, it will get updated in {@link $UserSettings}, otherwise the user's setting gets used as default.
+	 *
+	 *
+	 * @param string Param and {@link $UserSettings} name. Make sure this is unique.
+	 * @param mixed,... The same params as to {@link Request::param()}.
+	 *        You probably want to give the third (absolutely) one ($default) as NULL, so it falls back
+	 *        to {@link $UserSettings} and not the default you give. If it's not given, NULL is used as default (and not '').
+	 * @return NULL|mixed NULL, if neither a param was given nor {@link $UserSettings} knows about it.
+	 */
+	function param_UserSettings(  )
+	{
+		global $UserSettings;
+
+		$args = func_get_args();
+
+		if( ! isset( $args[2] ) )
+		{ // $default is not given, so we assume NULL because of functionality
+			$args[2] = NULL;
+		}
+
+		$value = call_user_func_array( array(&$this, 'param'), $args );
+
+		if( isset($value) )
+		{
+			$UserSettings->set( $args[0], $value );
+			$UserSettings->dbupdate();
+
+			return $value;
+		}
+		else
+		{
+			$this->set_param( $args[0], $UserSettings->get($args[0]) );
+
+			return $this->params[ $args[0] ];
+		}
+	}
+
+
 	/**
 	 * Check if there have been validation errors
 	 *
@@ -727,9 +783,10 @@ class Request
 
 
 	/**
+	 * Add an error for a variable, either to the Form's field and/or the global {@link $Messages} object.
 	 *
 	 * @param string param name
-	 * @param string error message
+	 * @param string|NULL error message (by using NULL you can only add an error to the field, but not the $Message object)
 	 * @param string|NULL error message for form field ($err_msg gets used if === NULL).
 	 */
 	function param_error( $var, $err_msg, $field_err_msg = NULL )
@@ -742,15 +799,19 @@ class Request
 			}
 			$this->err_messages[$var] = $field_err_msg;
 
-			$this->_add_message_to_Log( $var, $err_msg, 'error' );
+			if( isset($err_msg) )
+			{
+				$this->_add_message_to_Log( $var, $err_msg, 'error' );
+			}
 		}
 	}
 
 
 	/**
+	 * Add an error for multiple variables, either to the Form's field and/or the global {@link $Messages} object.
 	 *
 	 * @param array of param names
-	 * @param string error message
+	 * @param string|NULL error message (by using NULL you can only add an error to the field, but not the $Message object)
 	 * @param string|NULL error message for form fields ($err_msg gets used if === NULL).
 	 */
 	function param_error_multiple( $vars, $err_msg, $field_err_msg = NULL )
@@ -768,7 +829,10 @@ class Request
 			}
 		}
 
-		$this->_add_message_to_Log( $var, $err_msg, 'error' );
+		if( isset($err_msg) )
+		{
+			$this->_add_message_to_Log( $var, $err_msg, 'error' );
+		}
 	}
 
 
@@ -814,7 +878,7 @@ class Request
 	/**
 	 * Compiles the cat array from $cat (recursive + optional modifiers) and $catsel[] (non recursive)
 	 * and keeps those values available for future reference
- 	 */
+	 */
 	function compile_cat_array( $restrict_to_blog = 0, $cat_default = NULL, $catsel_default = array() )
 	{
 		// For now, we'll also need those as globals!
@@ -837,6 +901,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 19:49:00  blueyed
+ * Enhancements
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
