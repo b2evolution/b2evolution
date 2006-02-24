@@ -41,33 +41,38 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @var User
+ * @global User
  */
 global $current_User;
 /**
- * @var Item
+ * @global Item
  */
 global $edited_Item;
 /**
- * @var Blog
+ * @global Blog
  */
 global $Blog;
 /**
- * @var DataObjectCache
+ * @global DataObjectCache
  */
 global $ItemTypeCache;
 /**
- * @var DataObjectCache
+ * @global DataObjectCache
  */
 global $ItemStatusCache;
 /**
- * @var Plugins
+ * @global Plugins
  */
 global $Plugins;
 /**
- * @var GeneralSettings
+ * @global GeneralSettings
  */
 global $Settings;
+
+/**
+ * @global string Used for JS edit_reload()
+ */
+global $pagenow;
 
 
 if( isset($Blog) )
@@ -431,6 +436,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 23:02:43  blueyed
+ * Added missing global $pagenow
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
@@ -442,17 +450,8 @@ if( $next_action == 'update' )
  * Revision 1.47  2006/01/20 16:45:11  blueyed
  * Add html IDs to input objects/blocks
  *
- * Revision 1.46  2006/01/09 17:21:06  fplanque
- * no message
- *
  * Revision 1.45  2006/01/05 23:44:21  blueyed
  * Use new event names.
- *
- * Revision 1.44  2006/01/04 20:35:14  fplanque
- * no message
- *
- * Revision 1.43  2005/12/16 13:35:58  fplanque
- * no message
  *
  * Revision 1.42  2005/12/12 19:21:20  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
