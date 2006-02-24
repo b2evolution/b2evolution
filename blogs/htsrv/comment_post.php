@@ -116,8 +116,8 @@ if( !$ok )
  */
 if( $Messages->display( T_('Cannot post comment, please correct these errors:'),
 	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' ) )
-{ // TODO: nicer displaying here
-	debug_die();
+{
+	exit(); // TODO: nicer displaying here (but do NOT die() or debug_die() because this is not a BUG/user hack, it's a plain user input error (any bozo can produce it)
 }
 
 
@@ -202,8 +202,8 @@ header_redirect();
 
 /*
  * $Log$
- * Revision 1.53  2006/02/23 22:05:49  blueyed
- * use debug_die()
+ * Revision 1.54  2006/02/24 14:06:49  fplanque
+ * no message
  *
  * Revision 1.52  2006/02/23 21:11:47  fplanque
  * File reorganization to MVC (Model View Controller) architecture.

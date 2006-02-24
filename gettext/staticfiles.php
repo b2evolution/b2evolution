@@ -87,10 +87,7 @@ if( !isset($argv) )
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<title>b2evo :: static page generation</title>
-		<link href="../blogs/admin/skins/legacy/rsc/css/desert.css" rel="stylesheet" type="text/css" title="Desert" />
-		<link href="../blogs/admin/skins/legacy/rsc/css/variation.css" rel="alternate stylesheet" type="text/css" title="Variation" />
-		<link href="../blogs/admin/skins/legacy/rsc/css/legacy.css" rel="alternate stylesheet" type="text/css" title="Legacy" />
-		<script type="text/javascript" src="../blogs/rsc/js/styleswitcher.js"></script>
+		<link href="../blogs/skins_adm/legacy/rsc/css/desert.css" rel="stylesheet" type="text/css" title="Desert" />
 	</head>
 	<body>
 	<div class="center" style="margin:auto;width:75%">
@@ -567,7 +564,7 @@ switch( $action )
 					$linkto = str_replace('.src.', ( $ttarget != DEFAULT_TARGET ) ? ".$ttarget." : '.', basename($srcfile) );
 
 					$trans_available .=
-					"\t\t".'<li><a href="'.$linkto.'">'.locale_flag($ttarget, 'w16px', 'flag', '', false, $path_to_root.'blogs/img/flags').T_( $locales[$ttarget]['name'] ).'</a></li>'."\n";
+					"\t\t".'<li><a href="'.$linkto.'">'.locale_flag($ttarget, 'w16px', 'flag', '', false, $path_to_root.'blogs/rsc/flags').T_( $locales[$ttarget]['name'] ).'</a></li>'."\n";
 				}
 				$trans_available .= "\t</ul>";
 

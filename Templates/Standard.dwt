@@ -38,7 +38,7 @@
   <tr> 
   <td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
     
-	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="../blogs/img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
+	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="../blogs/rsc/img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
   </tr>
 </table>
 <p class="baseline">
@@ -50,9 +50,9 @@
 	<?php if( isset($Blog) ) 
 	{ ?>
 	
-	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../blogs/img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
+	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../blogs/rsc/img/valid-rss.png" alt="Valid RSS!" style="border:0;width:88px;height:31px" class="middle" /></a>
 
-	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="../blogs/img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
+	<a href="http://feedvalidator.org/check.cgi?url=<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><img src="../blogs/rsc/img/valid-atom.png" alt="Valid Atom!" style="border:0;width:88px;height:31px" class="middle" /></a>
 	
 	<?php } ?>
 	
