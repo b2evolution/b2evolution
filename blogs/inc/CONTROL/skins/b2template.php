@@ -36,7 +36,7 @@ switch($action)
 		fwrite($f,$newcontent);
 		fclose($f);
 
-		header("Location: admin.php?ctrl=templates&amp;file=$file&a=te");
+		header("Location: admin.php?ctrl=templates&file=$file&a=te");
 		exit();
 
 		break;
