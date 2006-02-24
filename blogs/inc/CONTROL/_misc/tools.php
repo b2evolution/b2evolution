@@ -19,7 +19,7 @@ if( $AdminUI->get_menu_entries('tools') )
 	$AdminUI->unshift_menu_entries( 'tools', array( '' => array('text' => T_('Main tab') ) ) );
 }
 
-$Plugin = NULL;
+$tab_Plugin = NULL;
 param( 'tab', 'string', '', true );
 
 $tab_plugin_ID = false;
@@ -29,10 +29,12 @@ if( ! empty($tab) )
 	if( preg_match( '~^plug_ID_(\d+)$~', $tab, $match ) )
 	{
 		$tab_plugin_ID = $match[1];
-		if( ! $Plugins->get_by_ID( $match[1] ) )
+		$tab_Plugin = & $Plugins->get_by_ID( $match[1] );
+		if( ! $tab_Plugin )
 		{ // Plugin does not exist
 			$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $tab_plugin_ID ), 'error' );
 			$tab_plugin_ID = false;
+			$tab_Plugin = false;
 			$tab = '';
 		}
 		else
@@ -48,7 +50,7 @@ if( ! empty($tab) )
 }
 
 
-$AdminUI->set_path_level( 1, $tab );		// fp>> can we use the 'append_path_level()' method here??? would be more readable...
+$AdminUI->append_path_level( $tab );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -61,7 +63,7 @@ $AdminUI->disp_payload_begin();
 
 
 if( empty($tab) )
-{ // Event AdminToolPayload:
+{ // Event AdminToolPayload for each Plugin:
 	$tool_plugins = $Plugins->get_list_by_event( 'AdminToolPayload' );
 	foreach( $tool_plugins as $loop_Plugin )
 	{
@@ -85,8 +87,24 @@ if( empty($tab) )
 
 	<?php
 }
-elseif( $tab_plugin_ID )
+elseif( $tab_Plugin )
 { // Plugin tab
+
+	// Icons:
+	// TODO: remove "style" attrib if "right_icons" is defined
+	?>
+
+	<div class="right_icons" style="text-align:right">
+
+	<?php
+	echo action_icon( T_('Edit plugin settings!'), 'edit', '?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$tab_Plugin->ID )
+		.' '.$tab_Plugin->get_help_icon( NULL, NULL, true )
+		.' '.$tab_Plugin->get_help_icon();
+	?>
+
+	</div>
+
+	<?php
 	$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabPayload', $params = array() );
 }
 
