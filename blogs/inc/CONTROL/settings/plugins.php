@@ -911,7 +911,7 @@ switch( $action )
 
 
 	case 'edit_settings':
-		$AdminUI->disp_view( 'settings/_set_plugins_editsettings.form.php' );
+		$AdminUI->disp_view( 'settings/_set_plugins_editsettings.form' );
 		// Go on to displaying info - might be handy to not edit a wrong Plugin and provides help links:
 
 
