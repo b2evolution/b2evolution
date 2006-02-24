@@ -781,7 +781,7 @@ class Item extends DataObject
 		$more_file = ''
 		)
 	{
-		global $Plugins, $Hit, $more, $preview;
+		global $Plugins, $Hit, $more, $preview, $current_User, $Debuglog;
 		// echo $format,'-',$cut,'-',$dispmore,'-',$disppage;
 
 		if( $more_link_text == '#' )
@@ -810,8 +810,18 @@ class Item extends DataObject
 		 */
 		#pre_dump( 'incViews', $dispmore, !$preview, $Hit->is_new_view() );
 		if( $dispmore && ! $preview && $Hit->is_new_view() )
-		{ // Increment view counter
-			$this->increment_viewcount();
+		{ // Increment view counter (only if current User is not the item's author)
+			if( is_a( $current_User, 'User' ) )
+			{
+				if( $this->Author->get( 'login') != $current_User->get( 'login' ) )
+				{
+					$this->inc_viewcount();
+				}
+				else
+				{
+					$Debuglog->add( 'Not incrementing view count, because viewing user is Author.', 'items' );
+				}
+			}
 		}
 
 		$content = $this->content;
@@ -2178,7 +2188,7 @@ class Item extends DataObject
 	 *
 	 * This also triggers the plugin event 'ItemViewed'.
 	 */
-	function increment_viewcount()
+	function inc_viewcount()
 	{
 		global $Plugins, $DB;
 
@@ -2345,23 +2355,24 @@ class Item extends DataObject
 
 		return parent::get( $parname );
 	}
-	
+
 
 	/**
 	 * Assign the item to the first category we find in the requested collection
 	 *
 	 * @param integer $collection_ID
 	 */
-	function assign_to_first_cat_for_collection ( $collection_ID )
+	function assign_to_first_cat_for_collection( $collection_ID )
 	{
 		global $DB;
 
 		// Get the first category ID for the collection ID param
-		$cat_ID = $DB->get_var( 'SELECT cat_ID
-															 FROM T_categories
-														  WHERE cat_blog_ID = '.$collection_ID.'
-													 ORDER BY cat_ID ASC
-												 			LIMIT 1' );
+		$cat_ID = $DB->get_var( '
+				SELECT cat_ID
+					FROM T_categories
+				 WHERE cat_blog_ID = '.$collection_ID.'
+				 ORDER BY cat_ID ASC
+				 LIMIT 1' );
 
 		// Set to the item the first category we got
 		$this->set( 'main_cat_ID', $cat_ID );
@@ -2370,6 +2381,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 19:17:52  blueyed
+ * Only increment view count if current User is not the Author.
+ *
  * Revision 1.1  2006/02/23 21:11:58  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
@@ -2386,9 +2400,6 @@ class Item extends DataObject
  *
  * Revision 1.97  2006/02/06 20:05:30  fplanque
  * minor
- *
- * Revision 1.96  2006/02/06 01:42:56  blueyed
- * *** empty log message ***
  *
  * Revision 1.95  2006/02/05 00:54:12  blueyed
  * increment_viewcount(), doc
