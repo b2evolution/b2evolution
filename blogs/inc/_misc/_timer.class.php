@@ -152,13 +152,6 @@ class Timer
 
 
 	/**
-	 * Display the time for a given category.
-	 *
-	 * @deprecated use get_duration() instead - This class should not display anything.
-	 */
-
-
-	/**
 	 * Get the duration for a given category.
 	 *
 	 * @param string Category name
@@ -256,6 +249,9 @@ class Timer
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 19:59:57  blueyed
+ * doc
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
