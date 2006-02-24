@@ -570,13 +570,6 @@ class FileManager extends Filelist
 
 
 	/**
-	 * Generate HTML to display an image File framed.
-	 *
-	 * @movedTo _file_view.inc.php because this is definitely not a FM feature, it's pure image display...
-	 */
-
-
-	/**
 	 * Get the current url, with all relevant GET params (root, path, filterString,
 	 * filterIsRegexp, order, orderasc).
 	 * Params can be overridden / disabled.
@@ -1360,6 +1353,9 @@ fp>> STOP adding features to this lousy Fileman class. All this should be direcl
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 20:50:46  blueyed
+ * doc
+ *
  * Revision 1.1  2006/02/23 21:11:57  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
