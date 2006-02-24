@@ -45,6 +45,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /**
  * A list of hits. Provides functions for maintaining and extraction of Hits.
+ *
+ * @package evocore
  */
 class Hitlist
 {
