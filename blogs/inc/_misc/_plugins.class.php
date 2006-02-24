@@ -456,11 +456,11 @@ class Plugins
 		if( strtolower( get_class($this) ) == 'plugins_admin' )
 		{ // We must check dependencies against installed Plugins ($Plugins)
 			global $Plugins;
-			$dep_msgs = $Plugins->validate_dependencies( $Plugin, 'activate' );
+			$dep_msgs = $Plugins->validate_dependencies( $Plugin, 'enable' );
 		}
 		else
 		{
-			$dep_msgs = $this->validate_dependencies( $Plugin, 'activate' );
+			$dep_msgs = $this->validate_dependencies( $Plugin, 'enable' );
 		}
 		if( ! empty( $dep_msgs['error'] ) )
 		{ // required dependencies
@@ -556,7 +556,7 @@ class Plugins
 	 * Validate dependencies of a Plugin.
 	 *
 	 * @param Plugin
-	 * @param string Mode of check: either 'activate' or 'deactivate'
+	 * @param string Mode of check: either 'enable' or 'disable'
 	 * @return array The key 'note' holds an array of notes (recommendations), the key 'error' holds a list
 	 *               of messages for dependency errors.
 	 */
@@ -566,7 +566,7 @@ class Plugins
 
 		$msgs = array();
 
-		if( $mode == 'deactivate' )
+		if( $mode == 'disable' )
 		{ // Check the whole list of installed plugins if they depend on our Plugin or it's (set of) events.
 			$required_by_plugin = array(); // a list of plugin classnames that require our poor Plugin
 
@@ -655,7 +655,7 @@ class Plugins
 		}
 
 
-		// mode 'activate':
+		// mode 'enable':
 		$deps = $Plugin->GetDependencies();
 
 		if( empty($deps) )
@@ -731,7 +731,7 @@ class Plugins
 							{
 								// Clean up version from CVS Revision prefix/suffix:
 								$versions[] = $plugin_req[1];
-								$clean_versions = preg_replace( array( '~^(CVS\s+)?\$Revision$$~' ), '', $versions );
+								$clean_versions = preg_replace( array( '~^(CVS\s+)?\$'.'Revision:\s*~i', '~\s*\$$~' ), '', $versions );
 								$clean_req_ver = array_pop($clean_versions);
 								usort( $clean_versions, 'version_compare' );
 								$clean_oldest_enabled = array_shift($clean_versions);
@@ -948,7 +948,7 @@ class Plugins
 
 			// Extended check with cleaned up versions, if currently stored version is less or equal (because it was just different above!):
 			// NOTE: we do not want to compare DB schema (and set status to "needs_config") in case of downgrades..
-			list( $old_version, $new_version ) = preg_replace( array( '~^(CVS\s+)?\$Revision$$~' ), '', array( $this->index_ID_rows[$Plugin->ID]['plug_version'], $Plugin->version ) );
+			list( $old_version, $new_version ) = preg_replace( array( '~^(CVS\s+)?\$'.'Revision:\s*~i', '~\s*\$$~' ), '', array( $this->index_ID_rows[$Plugin->ID]['plug_version'], $Plugin->version ) );
 			if( version_compare( $new_version, $old_version, '>=' ) )
 			{
 				$Debuglog->add( 'Version for '.$Plugin->classname.' changed from '.$this->index_ID_rows[$Plugin->ID]['plug_version'].' to '.$Plugin->version, 'plugins' );
@@ -2339,8 +2339,8 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
- * Revision 1.2  2006/02/24 19:32:05  blueyed
- * doc, temporary style
+ * Revision 1.3  2006/02/24 22:08:59  blueyed
+ * Plugin enhancements
  *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.

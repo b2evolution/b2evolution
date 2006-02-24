@@ -31,6 +31,7 @@
  * }}
  *
  * @package plugins
+ * @tutorial plugins.pkg
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
@@ -96,6 +97,9 @@ class Plugin
 	 *
 	 * This can be used by other plugins when requiring your plugin
 	 * through {@link Plugin::GetDependencies()}.
+	 *
+	 * By increasing it you can request a call of {@link GetDbLayout()} upon instantiating.
+	 * If there are DB layout changes to make, the plugin gets changed to status "needs_config".
 	 *
 	 * @var string
 	 */
@@ -251,34 +255,60 @@ class Plugin
 	 * {@link PluginSettings()}, where {@link $Settings} gets derived from.
 	 *
 	 * The array to be returned should define the names of the settings as keys
-	 * and assign an array with the following keys to them:
-	 *   'label' (Name of the param)
-	 * and optionally:
-	 *   'defaultvalue' (default value, defaults to '')
-	 *   'note' (gets displayed as a note to the param field),
-	 *   'size', 'maxlength' (html input field attributes),
-	 *   'type' ('checkbox', 'textarea', 'password', 'array', 'integer', 'text' (default)),
-	 *   'rows' (number of rows for type=='textarea'),
-	 *   'cols' (number of cols for type=='textarea'),
-	 *   'valid_pattern' (a regular expression pattern that the value must match)
-	 *                   Either a pattern as string or an array with keys
-	 *                   'pattern' and 'error' for a custom error message.
-	 *   'help' (either the first param to {@link get_help_icon()} (anchor) as string or
-	 *           an array with all params to this method). E.g., 'param_complicated' would
-	 *           link to the internal help.
+	 * and assign an array with the following keys to them (only 'label' is required):
+	 *
+	 *   - 'label': Name/Title of the param, gets displayed as label for the input field, or
+	 *              as "legend" tag with types "array" and "fieldset".
+	 *   - 'defaultvalue': Default value for the setting, defaults to '' (empty string)
+	 *   - 'type', which can be:
+	 *     - 'text' (default): a simple string
+	 *     - 'password': like text, but hidden during input
+	 *     - 'checkbox': either 0 or 1
+	 *     - 'integer': a number (like 'text' for input, but gets validated when submitting)
+	 *     - 'textarea': several lines of input. The following can be set for this type:
+	 *       - 'rows': number of rows
+	 *       - 'cols': number of columns
+	 *     - 'select': a drop down field; you must set 'options' for it:
+	 *       - 'options': an array of options ('value' => 'description'), see {@link Form::select_input_array()}.
+	 *     - 'select_group': a drop down field, providing all existing groups
+	 *     - 'select_user': a drop down field, providing all existing groups
+	 *     - 'array': a subset of settings. The following keys apply to this type:
+	 *       - 'entries': an array with the sub-settings (which can be everything from the top-level)
+	 *       - 'max_count': maximum count of sets (optional, default is no restriction)
+	 *       - 'min_count': minimum count of sets (optional, default is no restriction)
+	 *   - 'note' (gets displayed as a note to the param field),
+	 *   - 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
+	 *   - 'maxlength': maxlength attribute for the input field (See 'size' above; defaults to no limit)
+	 *   - 'allow_none': set this to true to have "None" in the options list for types
+	 *                   'select_group' and 'select_user'.
+	 *   - 'valid_pattern' (a regular expression pattern that the value must match).
+	 *                     This is either just a regexp pattern as string or an array
+	 *                     with the keys 'pattern' and 'error' to define a custom error message.
+	 *   - 'help': either the anchor in the internal help (first param to {@link get_help_icon()})
+	 *             or an array with all params to this method.
+	 *             E.g., 'param_explained' would link to the internal help's #classname_plugin_param_explained.
+	 *   - 'layout': Use this to visually group your settings.
+	 *               Either 'begin_fieldset', 'end_fieldset' or 'separator'. You can use 'label' for 'begin_fieldset'.
 	 * e.g.:
 	 * <code>
 	 * return array(
 	 *   'my_param' => array(
-	 *     'label' => T_('My Param!'),
-	 *     'defaultvalue' => '1',
+	 *     'label' => T_('My Param'),
+	 *     'defaultvalue' => '10',
 	 *     'note' => T_('Quite cool, eh?'),
-	 *     'valid_pattern' => array( 'pattern' => '\d+', T_('The value must be numeric.') ),
+	 *     'valid_pattern' => array( 'pattern' => '[1-9]\d+', T_('The value must be >= 10.') ),
 	 *   ),
 	 *   'another_param' => array( // this one has no 'note'
 	 *     'label' => T_('My checkbox'),
 	 *     'defaultvalue' => '1',
 	 *     'type' => 'checkbox',
+	 *   ),
+	 *   array( 'layout' => 'separator' ),
+	 *   'my_select' => array(
+	 *     'label' => T_('Selector'),
+	 *     'defaultvalue' => 'one',
+	 *     'type' => 'select',
+	 *     'options' => array( 'sun' => T_('Sunday'), 'mon' => T_('Monday') ),
 	 *   ) );
 	 * </code>
 	 *
@@ -326,6 +356,24 @@ class Plugin
 	function GetDependencies()
 	{
 		return array(); // no dependencies by default, of course
+	}
+
+
+	/**
+	 * This method should return your DB schema, consisting of a list of CREATE TABLE
+	 * queries.
+	 *
+	 * The DB gets changed accordingly on installing or enabling your Plugin.
+	 *
+	 * If you want to change your DB layout in a new version of your Plugin, simply
+	 * adjust the queries here and increase {@link Plugin::version}, because this will
+	 * request to check the current DB layout against the one you require.
+	 *
+	 * @see db_delta()
+	 */
+	function GetDbLayout()
+	{
+		return array();
 	}
 
 
@@ -476,53 +524,9 @@ class Plugin
 
 	/**
 	 * Event handler: Gets invoked before the main payload in the backoffice.
-	 *
-	 * This displays the payload for handling uninstallation of Plugin database tables.
-	 * If you want to use this, call parent::AdminBeginPayload() in your Plugin.
-	 *
-	 * See {@link BeforeUninstall()} for the corresponding action handler.
-	 *
-	 * @todo fp>> using this hook to uninstall a plugin feels so incredibly dirty...
-	 *   blueyed>> This is the payload part only. Should we have an extra event for that? UninstallPayload()?
 	 */
 	function AdminBeginPayload()
 	{
-		if( ! empty($this->display_confirm_for_uninstall_tables) )
-		{
-			?>
-
-			<div class="panelinfo">
-
-				<h3><?php echo T_('Delete plugin database tables') ?></h3>
-
-				<p><?php echo T_('Uninstalling this plugin will also delete its database tables.') ?></p>
-
-				<p><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
-
-				<?php
-				$Form = & new Form( '', 'uninstall_plugin', 'get' );
-
-				$Form->begin_form( 'inline' );
-				$Form->hidden( 'action', 'uninstall' );
-				$Form->hidden( 'plugin_ID', $this->ID );
-				$Form->hidden( 'plugin_'.$this->ID.'_confirm_drop', 1 );
-
-				// We may need to use memorized params in the next page
-				$Form->hiddens_by_key( get_memorized( 'action,plugin_ID') );
-
-				$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
-				$Form->end_form();
-
-				$Form = & new Form( '', 'uninstall_plugin_cancel', 'get' );
-				$Form->begin_form( 'inline' );
-				$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
-				$Form->end_form()
-				?>
-
-			</div>
-
-			<?php
-		}
 	}
 
 
@@ -555,26 +559,26 @@ class Plugin
 	 * You might want to call "parent::BeforeUninstall()" in your plugin to handle canonical
 	 * database tables, which is done here.
 	 *
-	 * See {@link AdminBeginPayload()} for the corresponding payload handler.
+	 * See {@link UninstallPayload()} for the corresponding payload handler.
 	 *
 	 * @param array Associative array of parameters.
 	 *              'handles_display': Setting it to true avoids a generic "Uninstall failed" message.
 	 *              'unattended': true if Uninstall is unattended (Install action "deletedb"). Removes tables without confirmation.
-	 * @return boolean true on success, false on failure (the plugin won't get uninstalled then).
+	 * @return boolean|NULL true on success, false on failure (the plugin won't get uninstalled then).
+	 *         NULL requests to execute th {@link BeforeUninstallPayload()} method.
 	 */
 	function BeforeUninstall( & $params )
 	{
 		global $DB;
-		if( $tables = $DB->get_col( 'SHOW TABLES LIKE "'.$this->get_sql_table('%').'"' ) )
+		if( $this->tables_to_delete_on_uninstall = $DB->get_col( 'SHOW TABLES LIKE "'.$this->get_sql_table('%').'"' ) )
 		{
 			if( empty($params['unattended']) && ! param( 'plugin_'.$this->ID.'_confirm_drop', 'integer', 0 ) )
-			{ // not confirmed and not silently requested
-				$this->display_confirm_for_uninstall_tables = true; // see AdminBeginPayload()
-				return false;
+			{ // not confirmed and not silently requested: request call to BeforeUninstallPayload()
+				return NULL;
 			}
 
 			// Drop tables:
-			$sql = 'DROP TABLE IF EXISTS '.implode( ', ', $tables );
+			$sql = 'DROP TABLE IF EXISTS '.implode( ', ', $this->tables_to_delete_on_uninstall );
 			$DB->query( $sql );
 			if( empty($params['unattended']) )
 			{
@@ -583,6 +587,56 @@ class Plugin
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Event handler: Gets invoked to display the payload before uninstalling the plugin.
+	 *
+	 * By default, this method asks the admin for confirmation if he wants to delete
+	 * the plugin's tables (detected through table prefix).
+	 *
+	 * You can override or extend this method to display your own payload that has to be
+	 * confirmed.
+	 *
+	 * See {@link BeforeUninstall()} for the corresponding action handler.
+	 */
+	function BeforeUninstallPayload()
+	{
+		?>
+
+		<div class="panelinfo">
+
+			<?php
+			$Form = & new Form( '', 'uninstall_plugin', 'get' );
+			$Form->global_icon( T_('Cancel delete!'), 'close', regenerate_url() );
+
+			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Uninstall plugin #%d (%s)'), $this->ID, $this->name ) );
+
+			echo '<p>'.T_('Uninstalling this plugin will also delete its database tables:')
+				.'<ul>'
+				.'<li>'
+				.implode( '</li><li>', $this->tables_to_delete_on_uninstall )
+				.'</li>'
+				.'</ul>'
+				.'</p>';
+
+			echo '<p>'.T_('THIS CANNOT BE UNDONE!').'</p>';
+
+			$Form->hidden( 'action', 'uninstall' );
+			$Form->hidden( 'plugin_ID', $this->ID );
+			$Form->hidden( 'plugin_'.$this->ID.'_confirm_drop', 1 );
+
+			// We may need to use memorized params in the next page
+			$Form->hiddens_by_key( get_memorized( 'action,plugin_ID') );
+
+			$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
+			$Form->end_form();
+			?>
+
+		</div>
+
+		<?php
 	}
 
 
@@ -833,14 +887,15 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called before setting a plugin's setting in the backoffice.
+	 * Event handler: Called before displaying or setting a plugin's setting in the backoffice.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'name': name of the setting
 	 *   - 'value': value of the setting (by reference)
-	 * @return string|NULL Return a string with an error to prevent the setting from being set.
+	 * @return string|NULL Return a string with an error to prevent the setting from being set
+	 *                     and/or a message added to the settings field.
 	 */
-	function PluginSettingsBeforeSet( & $params )
+	function PluginSettingsValidateSet( & $params )
 	{
 	}
 
@@ -1002,6 +1057,23 @@ class Plugin
 
 
 	/**
+	 * Check if the requested list of events is provided by any or one plugin.
+	 *
+	 * @param array|string A single event or a list thereof
+	 * @param boolean Make sure there's at least one plugin that provides them all?
+	 *                This is useful for event pairs like "CaptchaPayload" and "CaptchaValidated", which
+	 *                should be served by the same plugin.
+	 * @return boolean
+	 */
+	function are_events_available( $events, $by_one_plugin = false )
+	{
+		global $Plugins;
+
+		return $Plugins->are_events_available( $events, $by_one_plugin );
+	}
+
+
+	/**
 	 * Set param value.
 	 *
 	 * @param string Name of parameter
@@ -1011,6 +1083,25 @@ class Plugin
 	{
 		// Set value:
 		$this->$parname = $parvalue;
+	}
+
+
+	/**
+	 * Set the status of the plugin.
+	 *
+	 * @param string 'enabled', 'disabled' or 'needs_config'
+	 * @return boolean
+	 */
+	function set_status( $status )
+	{
+		global $Plugins;
+
+		if( ! in_array( $status, array( 'enabled', 'disabled', 'needs_config' ) ) )
+		{
+			return false;
+		}
+
+		$Plugins->set_status( $this->ID, $status );
 	}
 
 
@@ -1033,6 +1124,7 @@ class Plugin
 	 *
 	 * You should use this when refering to your SQL table names.
 	 *
+	 * @see Plugin::sql_delta()
 	 * @param string Your name, which gets returned with the unique prefix.
 	 * @return string
 	 */
@@ -1041,6 +1133,27 @@ class Plugin
 		global $tableprefix;
 
 		return $tableprefix.'plugin_ID'.$this->ID.'_'.$name;
+	}
+
+
+	/**
+	 * This is a magic method you should use to create your custom database tables
+	 * (if you want to create and use any): You give a list of queries to it and
+	 * it will alter the DB to fit your table schema..
+	 *
+	 * @see Plugin::get_sql_table()
+	 * @uses db_delta()
+	 *
+	 * @param string|array A single query as string or a list of queries as array
+	 * @param boolean Execute the generated SQL right away?
+	 * @return array An empty array, if no alterations were needed, otherwise a quite complex
+	 *               list of what was generated. Please see {@link db_delta()} for details.
+	 */
+	function sql_delta( $queries, $execute = true )
+	{
+		require_once( dirname(__FILE__).'/_upgrade.funcs.php' );
+
+		return db_delta( $queries, $execute );
 	}
 
 
@@ -1104,101 +1217,6 @@ class Plugin
 		global $Session;
 
 		return $Session->delete( 'plugID'.$this->ID.'_'.$name );
-	}
-
-
-	/**
-	 * Display a help link.
-	 *
-	 * The anchor (if given) should be defined (as HTML id attribute for a headline) in either
-	 *  - the README.html file (prefixed with the plugin's classname, e.g.
-	 *    'test_plugin_anchor' when 'anchor' gets passed here)
-	 *  - or the page that {@link $help_url} links to.
-	 *  (depending on the $external param).
-	 *
-	 * @param string HTML anchor for a specific help topic (empty to not use it).
-	 *               When linking to the internal help, it gets prefixed with "[plugin_classname]_".
-	 * @param string Title for the icon/legend
-	 * @param boolean Use external help? See {@link $help_url}.
-	 * @param string Word to use after the icon.
-	 * @param string Icon to use. Default for 'internal' is 'help', and for 'external' it is 'www'. See {@link $map_iconfiles}.
-	 * @return string|false The html A tag, linking to the help.
-	 *         False if internal help requested, but not available (see {@link Plugins::get_help_file()}).
-	 */
-	function get_help_icon( $anchor = NULL, $title = NULL, $external = false, $word = NULL, $icon = NULL )
-	{
-		global $admin_url;
-
-		if( $external )
-		{
-			if( empty($this->help_url) )
-			{
-				return false;
-			}
-			$url = $this->help_url;
-			if( ! empty($anchor) )
-			{
-				$url .= '#'.$anchor;
-			}
-		}
-		else
-		{ // internal help:
-			if( ! $this->get_help_file() )
-			{
-				return false;
-			}
-
-			$url = $admin_url.'?ctrl=plugins&amp;action=disp_help&amp;plugin_ID='.$this->ID;
-			if( ! empty($anchor) )
-			{
-				$url .= '#'.$this->classname.'_'.$anchor;
-			}
-		}
-
-		if( is_null($icon) )
-		{
-			$icon = $external ? 'www' : 'help';
-		}
-
-		if( is_null($title) )
-		{
-			$title = $external ? T_('Homepage of the plugin') : T_('Local documentation of the plugin');
-		}
-
-		return action_icon( $title, $icon, $url, $word );
-	}
-
-
-	/**
-	 * Get the help file for a Plugin ID. README.LOCALE.html will take
-	 * precedence above the general (english) README.html.
-	 *
-	 * @return false|string
-	 */
-	function get_help_file()
-	{
-		global $default_locale, $plugins_subdir, $plugins_path;
-
-		$name = preg_replace( '~_plugin$~', '', $this->classname );
-		// Get the language. We use $default_locale because it does not have to be activated ($current_locale)
-		$lang = substr( $default_locale, 0, 2 );
-
-		$help_dir = $plugins_path.$name.'/';
-
-		// Try help for the user's locale:
-		$help_file = $help_dir.'README.'.$lang.'.html';
-
-		if( ! file_exists($help_file) )
-		{ // Fallback: README.html
-			$help_file = $help_dir.'README.html';
-
-			if( ! file_exists($help_file) )
-			{
-				return false;
-			}
-		}
-
-		return $help_file;
 	}
 
 	/*
@@ -1282,22 +1300,111 @@ class Plugin
 
 
 	/**
-	 * Display link to the help for this plugin (if set in {@link $help_url}).
+	 * Display a help link.
 	 *
-	 * @return boolean true if it was displayed; false if not
+	 * The anchor (if given) should be defined (as HTML id attribute for a headline) in either
+	 *  - the README.html file (prefixed with the plugin's classname, e.g.
+	 *    'test_plugin_anchor' when 'anchor' gets passed here)
+	 *  - or the page that {@link $help_url} links to.
+	 *  (depending on the $external param).
+	 *
+	 * @param string HTML anchor for a specific help topic (empty to not use it).
+	 *               When linking to the internal help, it gets prefixed with "[plugin_classname]_".
+	 * @param string Title for the icon/legend
+	 * @param boolean Use external help? See {@link $help_url}.
+	 * @param string Word to use after the icon.
+	 * @param string Icon to use. Default for 'internal' is 'help', and for 'external' it is 'www'. See {@link $map_iconfiles}.
+	 * @return string|false The html A tag, linking to the help.
+	 *         False if internal help requested, but not available (see {@link Plugins::get_help_file()}).
 	 */
-	function help_link()
+	function get_help_icon( $anchor = NULL, $title = NULL, $external = false, $word = NULL, $icon = NULL, $link_attribs = array() )
 	{
-		if( !empty($this->help_url) )
-		{ // Link to the help for this renderer plugin
-			echo ' <a href="'.$this->help_url.'"'
-						.' target="_blank" title="'.T_('Open help for this plugin in a new window.').'">'
-						.get_icon( 'help' )
-						.'</a>';
-			return true;
+		global $admin_url;
+
+		if( $external )
+		{
+			if( empty($this->help_url) )
+			{
+				return false;
+			}
+			$url = $this->help_url;
+			if( ! empty($anchor) )
+			{
+				$url .= '#'.$anchor;
+			}
+
+			if( ! isset($link_attribs['target']) )
+			{ // open in a new window
+				$link_attribs['target'] = '_blank';
+			}
+		}
+		else
+		{ // internal help:
+			if( ! $this->get_help_file() )
+			{
+				return false;
+			}
+
+			if( isset( $link_attribs['action'] ) )
+			{
+				$action = $link_attribs['action'];
+				unset($link_attribs['action']);
+			}
+			else
+			{
+				$action = 'disp_help';
+			}
+
+			$url = $admin_url.'plugins.php?action='.$action.'&amp;plugin_ID='.$this->ID;
+			if( ! empty($anchor) )
+			{
+				$url .= '#'.$this->classname.'_'.$anchor;
+			}
 		}
 
-		return false;
+		if( is_null($icon) )
+		{
+			$icon = $external ? 'www' : 'help';
+		}
+
+		if( is_null($title) )
+		{
+			$title = $external ? T_('Homepage of the plugin') : T_('Local documentation of the plugin');
+		}
+
+		return action_icon( $title, $icon, $url, $word, $link_attribs );
+	}
+
+
+	/**
+	 * Get the help file for a Plugin ID. README.LOCALE.html will take
+	 * precedence above the general (english) README.html.
+	 *
+	 * @return false|string
+	 */
+	function get_help_file()
+	{
+		global $default_locale, $plugins_path;
+
+		// Get the language. We use $default_locale because it does not have to be activated ($current_locale)
+		$lang = substr( $default_locale, 0, 2 );
+
+		$help_dir = $plugins_path.$this->classname.'/';
+
+		// Try help for the user's locale:
+		$help_file = $help_dir.'README.'.$lang.'.html';
+
+		if( ! file_exists($help_file) )
+		{ // Fallback: README.html
+			$help_file = $help_dir.'README.html';
+
+			if( ! file_exists($help_file) )
+			{
+				return false;
+			}
+		}
+
+		return $help_file;
 	}
 
 	/*
@@ -1306,8 +1413,12 @@ class Plugin
 
 }
 
+
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.2  2006/02/24 22:08:59  blueyed
+ * Plugin enhancements
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

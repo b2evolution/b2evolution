@@ -46,18 +46,320 @@ $AdminUI->set_path( 'options', 'plugins' );
 
 $action = $Request->param_action( 'list' );
 
+$Request->param_UserSettings( 'plugins_disp_avail', 'integer' );
+
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );
 
 
-// Discover available plugins:
-$AvailablePlugins = & new Plugins_no_DB(); // do not load registered plugins/events from DB
-$AvailablePlugins->discover();
-$AvailablePlugins->sort('name');
+$admin_Plugins = new Plugins_admin();
+
+
+/**
+ * Helper function to do the action part of DB schema upgrades for "enable" and "install"
+ * actions.
+ *
+ * @param Plugin
+ * @return boolean True, if no changes needed or done; false if we should break out to display "install_db_schema" action payload.
+ */
+function install_plugin_db_schema_action( & $Plugin )
+{
+	global $action, $Request, $admin_dirout, $core_subdir, $install_db_deltas, $DB, $Messages;
+
+	$action = 'list';
+	// Prepare vars for DB layout changes
+	$install_db_deltas_confirm_md5 = $Request->param( 'install_db_deltas_confirm_md5' );
+
+	$db_layout = $Plugin->GetDbLayout();
+	$install_db_deltas = array(); // This eventually holds changes to make
+
+	if( ! empty($db_layout) )
+	{ // The plugin has a DB layout attached
+		require_once $inc_path.'misc/_upgrade.funcs.php';
+
+		// Get the queries to make:
+		foreach( db_delta($db_layout, false) as $table => $queries )
+		{
+			foreach( $queries as $query_info )
+			{
+				$install_db_deltas[] = $query_info['query'];
+			}
+		}
+
+		if( ! empty($install_db_deltas) )
+		{ // delta queries to make
+			if( empty($install_db_deltas_confirm_md5) )
+			{ // delta queries have to be confirmed in payload
+				$action = 'install_db_schema';
+				return false;
+			}
+			elseif( $install_db_deltas_confirm_md5 == md5( implode('', $install_db_deltas) ) )
+			{ // Confirmed in first step:
+				foreach( $install_db_deltas as $query )
+				{
+					$DB->query( $query );
+				}
+
+				$Messages->add( T_('The database has been updated.'), 'success' );
+			}
+			else
+			{ // should not happen
+				$Messages->add( T_('The DB schema has been changed since confirmation.'), 'error' );
+
+				// delta queries have to be confirmed (again) in payload
+				$action = 'install_db_schema';
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+
+/**
+ * Helper method for "add_settings_set" and "delete_settings_set" action.
+ *
+ * Walks the given settings path and either inits the target entry or unsets it ($init_value=NULL).
+ *
+ * @param string Setting name
+ * @param string The settings path, e.g. 'setting[0]foo[1]'. (Is used as array internally for recursion.)
+ * @return array|false
+ */
+function _set_setting_by_path( & $Plugin, $path, $init_value = array(), $setting = NULL, $meta = NULL )
+{
+	if( ! is_array($path) )
+	{ // Init:
+		if( ! preg_match( '~(\w+\[\w+\])+~', $path ) )
+		{
+			debug_die( 'Invalid path param!' );
+		}
+
+		$path = preg_split( '~(\[|\]\[?)~', $path, -1, PREG_SPLIT_NO_EMPTY ); // split by "[" and "][", so we get an array with setting name and index alternating
+		$set_name = array_shift($path);
+
+		$setting = $Plugin->Settings->get($set_name);
+
+		// meta info for this setting:
+		$defaults = $Plugin->GetDefaultSettings();
+		if( ! isset($defaults[ $set_name ]) )
+		{
+			debug_die( 'Invalid setting - no meta data!' );
+		}
+
+		$meta = $defaults[ $set_name ];
+
+		$root_instance = true; // to set the new value at the end
+	}
+	else
+	{
+		$set_name = array_shift($path);
+		$setting = isset($setting[$set_name]) ? $setting[$set_name] : array();
+		$meta = $meta['entries'][$set_name];
+	}
+
+	if( ! is_array($setting) )
+	{ // something broken
+		$setting = array();
+	}
+
+	$set_index = array_shift($path);
+
+	if( ! count($path) )
+	{ // at the end: init this entry
+
+		if( isset($setting[$set_index]) && $init_value != NULL )
+		{ // Setting already exists (and we do not want to delete), e.g. page reload!
+			return false;
+			/*
+			while( isset($l_setting[ $path[0] ]) )
+			{ // bump the index until not set
+				$path[0]++;
+			}
+			*/
+		}
+
+		if( is_null($init_value) )
+		{ // NULL is meant to unset it
+			unset($setting[$set_index]);
+		}
+		else
+		{
+			$setting[$set_index] = $init_value;
+			foreach( $meta['entries'] as $k => $v )
+			{
+				if( isset( $meta['defaultvalue'] ) )
+				{ // set to defaultvalue
+					$setting[$set_index][$k] = $meta['defaultvalue'];
+				}
+				else
+				{
+					if( isset($v['type']) && $v['type'] = 'array' )
+					{
+						$setting[$set_index][$k] = array();
+					}
+					else
+					{
+						$setting[$set_index][$k] = '';
+					}
+				}
+			}
+		}
+	}
+	else
+	{ // Recurse:
+		$new_set = _set_setting_by_path( $Plugin, $path, $init_value, $setting, $meta );
+
+		if( $new_set !== false )
+		{
+			$setting[$set_index][$path[0]] = array_merge( $setting[$set_index][$path[0]], $new_set );
+		}
+	}
+
+	if( isset($root_instance) )
+	{ // this is the root call, set the new setting
+		$r = $Plugin->Settings->set( $set_name, $setting );
+	}
+
+	return $setting;
+}
+
+
+// Actions that delegate to other actions (other than list):
+switch( $action )
+{
+	case 'delete_settings_set':
+		param( 'plugin_ID', 'integer', true );
+		param( 'set_path' );
+
+		$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
+
+		_set_setting_by_path( $edit_Plugin, $set_path, NULL );
+
+		$edit_Plugin->Settings->dbupdate();
+
+		$action = 'edit_settings';
+
+		break;
+
+	case 'add_settings_set': // delegates to edit_settings
+		// Add a new set to an array type setting:
+		param( 'plugin_ID', 'integer', true );
+		param( 'set_path', 'string', '' );
+
+		$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
+
+		_set_setting_by_path( $edit_Plugin, $set_path, array() );
+
+		#$edit_Plugin->Settings->dbupdate();
+
+		$action = 'edit_settings';
+
+		break;
+
+}
 
 
 switch( $action )
 {
+	// Disable a plugin, only if it is "enabled"
+	case 'disable_plugin':
+		$current_User->check_perm( 'options', 'edit', true );
+
+		param( 'plugin_ID', 'integer', true );
+
+		$action = 'list';
+
+		$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
+
+		if( empty($edit_Plugin) )
+		{
+			$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $plugin_ID ), 'error' );
+			break;
+		}
+		if( $edit_Plugin->status != 'enabled' )
+		{
+			$Messages->add( sprintf( T_( 'The plugin with ID %d is already disabled.' ), $plugin_ID ), 'note' );
+			break;
+		}
+
+		// Check dependencies
+		$msgs = $Plugins->validate_dependencies( $edit_Plugin, 'disable' );
+		if( ! empty( $msgs['error'] ) )
+		{
+			$Messages->add( T_( 'The plugin cannot get disabled because of dependency problems:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>', 'error' );
+			break;
+		}
+
+		$edit_Plugin->BeforeDisable();
+
+		// we call $Plugins(!) here: the Plugin gets disabled on the current page already and it should not get (un)registered on $Plugins_admin!
+		$Plugins->set_Plugin_status( $edit_Plugin, 'disabled' ); // sets $edit_Plugin->status
+
+		$Messages->add( sprintf( T_('Disabled plugin #%d.'), $edit_Plugin->ID ), 'success' );
+
+		break;
+
+
+	// Try to enable a plugin, only if it is in state "disabled" or "needs_config"
+	case 'enable_plugin':
+		$current_User->check_perm( 'options', 'edit', true );
+
+		param( 'plugin_ID', 'integer', true );
+
+		$action = 'list';
+
+		$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
+
+		if( empty($edit_Plugin) )
+		{
+			$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $plugin_ID ), 'error' );
+			break;
+		}
+		if( $edit_Plugin->status == 'enabled' )
+		{
+			$Messages->add( sprintf( T_( 'The plugin with ID %d is already enabled.' ), $plugin_ID ), 'note' );
+			break;
+		}
+		if( $edit_Plugin->status == 'broken' )
+		{
+			$Messages->add( sprintf( T_( 'The plugin status is in a broken state. It cannot get enabled.' ), $plugin_ID ), 'error' );
+			break;
+		}
+
+		// Check dependencies
+		$msgs = $Plugins->validate_dependencies( $edit_Plugin, 'enable' );
+		if( ! empty( $msgs['error'] ) )
+		{
+			$Messages->add( T_( 'The plugin cannot get enabled because of dependency problems:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>' );
+			break;
+		}
+
+		if( ! install_plugin_db_schema_action( $edit_Plugin ) )
+		{
+			$next_action = 'enable_plugin';
+			break;
+		}
+
+		// Update plugin version in DB:
+		$DB->query( 'UPDATE T_plugins SET plug_version = "'.$DB->quote($edit_Plugin->version).'"' );
+
+		// Try to enable plugin:
+		$enable_return = $edit_Plugin->BeforeEnable();
+		if( $enable_return === true )
+		{
+			// we call $Plugins(!) here: the Plugin gets active on the current page already and it should not get (un)registered on $Plugins_admin!
+			$Plugins->set_Plugin_status( $edit_Plugin, 'enabled' ); // sets $edit_Plugin->status
+
+			$Messages->add( sprintf( T_('Enabled plugin #%d.'), $edit_Plugin->ID ), 'success' );
+		}
+		else
+		{
+			$Messages->add( T_('The plugin has not been enabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
+		}
+
+		break;
+
+
 	case 'reload_plugins':
 		// Register new events
 		// Unregister obsolete events
@@ -65,13 +367,13 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$Plugins->restart();
-		$Plugins->load_events();
+		$admin_Plugins->restart();
+		$admin_Plugins->load_events();
 		$changed = false;
-		while( $loop_Plugin = & $Plugins->get_next() )
+		while( $loop_Plugin = & $admin_Plugins->get_next() )
 		{
 			// Discover new events:
-			if( $Plugins->save_events( $loop_Plugin, array() ) )
+			if( $admin_Plugins->save_events( $loop_Plugin, array() ) )
 			{
 				$changed = true;
 			}
@@ -82,9 +384,9 @@ switch( $action )
 				$default_Plugin = & new $loop_Plugin->classname;
 
 				if( ! empty($default_Plugin->code) // Plugin has default code
-				    && ! $Plugins->get_by_code( $default_Plugin->code ) ) // Default code is not in use (anymore)
+				    && ! $admin_Plugins->get_by_code( $default_Plugin->code ) ) // Default code is not in use (anymore)
 				{ // Set the Plugin's code to the default one
-					if( $Plugins->set_code( $loop_Plugin->ID, $default_Plugin->code ) )
+					if( $admin_Plugins->set_code( $loop_Plugin->ID, $default_Plugin->code ) )
 					{
 						$changed = true;
 					}
@@ -104,23 +406,65 @@ switch( $action )
 		break;
 
 
-	case 'install':
+	case 'install': // Install a plugin. This may be a two-step action, when DB changes have to be confirmed {{{
 		$action = 'list';
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
-		// Install plugin:
-		param( 'plugin', 'string', true );
-		$installed_Plugin = & $Plugins->install( $plugin );
 
-		if( is_string( $installed_Plugin ) )
-		{ // error
-			$Messages->add( sprintf( T_('Could not install plugin &laquo;%s&raquo;!'), $plugin ), 'error' );
-			$Messages->add( $installed_Plugin, 'error' );
+		// First step:
+		param( 'plugin', 'string', true );
+
+		$edit_Plugin = $admin_Plugins->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
+
+		if( is_string($edit_Plugin) )
+		{
+			$Messages->add( $edit_Plugin, 'error' );
+			break;
+		}
+
+
+	case 'install_db_schema': // we come here from the first step
+		$Request->param( 'plugin_ID', 'integer', 0 );
+
+		if( $plugin_ID )
+		{
+			$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
+
+			if( ! is_a($edit_Plugin, 'Plugin') )
+			{
+				$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $plugin_ID ), 'error' );
+				break;
+			}
+		}
+		if( ! install_plugin_db_schema_action($edit_Plugin) )
+		{
+			$next_action = 'install_db_schema';
+			break;
+		}
+
+		$Messages->add( sprintf( T_('Installed plugin &laquo;%s&raquo;.'), $edit_Plugin->classname ), 'success' );
+
+		// Install completed:
+		$r = $admin_Plugins->call_method( $edit_Plugin->ID, 'AfterInstall', $params = array() );
+
+		// Try to enable plugin:
+		$enable_return = $edit_Plugin->BeforeEnable();
+		if( $enable_return === true )
+		{
+			$admin_Plugins->set_Plugin_status( $edit_Plugin, 'enabled' );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_('Installed plugin &laquo;%s&raquo;.'), $plugin ), 'success' );
+			$Messages->add( T_('The plugin has not been enabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
+			$admin_Plugins->set_Plugin_status( $edit_Plugin, 'disabled' ); // also unregisters it
 		}
+
+		if( ! empty( $edit_Plugin->install_dep_notes ) )
+		{ // Add notes from dependencies
+			$Messages->add_messages( array( 'note' => $edit_Plugin->install_dep_notes ) );
+		}
+
+		// }}}
 		break;
 
 
@@ -130,49 +474,78 @@ switch( $action )
 		// Uninstall plugin:
 		param( 'plugin_ID', 'int', true );
 
-		$success = $Plugins->call_method( $plugin_ID, 'BeforeUninstall', $params = array( 'unattended' => false ) );
-		if( $success === false )
+		$action = 'list'; // leave 'uninstall' by default
+
+		$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
+
+		if( empty($edit_Plugin) )
 		{
-			if( $params['handles_display'] )
-			{ // The plugin handles display
-				$action = 'list';
-				break;
-			}
+			$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $plugin_ID ), 'error' );
+			break;
 		}
-		else
-		{ // try un-installing
-			$success = $Plugins->uninstall( $plugin_ID );
+
+		// Check dependencies:
+		$msgs = $Plugins->validate_dependencies( $edit_Plugin, 'disable' );
+		if( ! empty( $msgs['error'] ) )
+		{
+			$Messages->add( T_( 'The plugin cannot get uninstalled because of dependency problems:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>', 'error' );
+			break;
+		}
+		if( ! empty( $msgs['note'] ) )
+		{ // just notes:
+			$Messages->add_messages( array( 'note' => $msgs['note'] ) );
+		}
+
+		// Ask plugin:
+		$success = $admin_Plugins->call_method( $plugin_ID, 'BeforeUninstall', $params = array( 'unattended' => false ) );
+
+		if( $success === false )
+		{ // failed
+			if( empty($params['handles_display']) )
+			{ // The plugin does not handle display
+				$Messages->add( sprintf( T_('Could not uninstall plugin #%d.'), $plugin_ID ), 'error' );
+			}
+			break;
 		}
 
 		if( $success === true )
-		{
+		{ // success
+			$Plugins->uninstall( $plugin_ID );
+			$admin_Plugins->unregister( $edit_Plugin );
+
 			$Messages->add( sprintf( T_('Uninstalled plugin #%d.'), $plugin_ID ), 'success' );
+			break;
 		}
-		else
-		{
-			$Messages->add( sprintf( T_('Could not uninstall plugin #%d.'), $plugin_ID ), 'error' );
-			if( ! empty($success) )
-			{
-				$Messages->add( $success, 'error' );
-			}
-		}
-		$action = 'list';
+
+		// $success === NULL (or other): execute plugin event BeforeUninstallPayload() below
+		$action = 'uninstall';
+
 		break;
 
 
 	case 'update_settings':
 		// Update plugin settings:
-		$action = 'list'; // next action by default
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
 		param( 'plugin_ID', 'integer', true );
 
-		$edit_Plugin = & $Plugins->get_by_ID( $plugin_ID );
-		if( !$edit_Plugin )
+		// Next default action:
+		if( isset($actionArray['update_settings']) && is_array($actionArray['update_settings']) && isset($actionArray['update_settings']['review']) )
+		{ // "Save (and review)"
+			$action = 'edit_settings';
+		}
+		else
+		{
+			$action = 'list';
+		}
+
+		$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
+		if( empty($edit_Plugin) )
 		{
 			$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $plugin_ID ), 'error' );
+			$action = 'list';
 			break;
 		}
 
@@ -181,7 +554,7 @@ switch( $action )
 		$Request->param( 'edited_plugin_priority' );
 		$Request->param( 'edited_plugin_apply_rendering' );
 
-		$updated = $Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
+		$updated = $admin_Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
 		if( is_string( $updated ) )
 		{
 			$Request->param_error( 'edited_plugin_code', $updated );
@@ -194,7 +567,7 @@ switch( $action )
 
 		if( $Request->param_check_number( 'edited_plugin_priority', T_('Plugin priority must be numeric.'), true ) )
 		{
-			$updated = $Plugins->set_priority( $edit_Plugin->ID, $edited_plugin_priority );
+			$updated = $admin_Plugins->set_priority( $edit_Plugin->ID, $edited_plugin_priority );
 			if( $updated === 1 )
 			{
 				$Messages->add( T_('Plugin priority updated.'), 'success' );
@@ -206,7 +579,7 @@ switch( $action )
 		}
 
 		// apply_rendering:
-		if( $Plugins->set_apply_rendering( $edit_Plugin->ID, $edited_plugin_apply_rendering ) )
+		if( $admin_Plugins->set_apply_rendering( $edit_Plugin->ID, $edited_plugin_apply_rendering ) )
 		{
 			$Messages->add( T_('Plugin rendering appliance updated.'), 'success' );
 		}
@@ -216,6 +589,10 @@ switch( $action )
 		{
 			foreach( $edit_Plugin->GetDefaultSettings() as $l_name => $l_meta )
 			{
+				if( isset($l_meta['layout']) )
+				{ // a layout "setting"
+					continue;
+				}
 				if( isset($l_meta['type']) && $l_meta['type'] == 'array' )
 				{ // this settings has a type
 					$l_param_type = $l_meta['type'];
@@ -244,13 +621,9 @@ switch( $action )
 						continue;
 					}
 				}
-				if( $l_param_type == 'array' )
-				{
-					$l_value = serialize($l_value);
-				}
 
 				// Ask the plugin if it's ok:
-				if( $error = $Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsBeforeSet', $params = array( 'name' => $l_name, 'value' => & $l_value, 'meta' => $l_meta ) ) )
+				if( $error = $admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsValidateSet', $params = array( 'name' => $l_name, 'value' => & $l_value, 'meta' => $l_meta ) ) )
 				{ // skip this
 					$Request->param_error( 'edited_plugin_set_'.$l_name, $error );
 					$action = 'edit_settings';
@@ -272,7 +645,7 @@ switch( $action )
 		// Events:
 		param( 'edited_plugin_displayed_events', 'array', array() );
 		param( 'edited_plugin_events', 'array', array() );
-		$registered_events = $Plugins->get_registered_events( $edit_Plugin );
+		$registered_events = $admin_Plugins->get_registered_events( $edit_Plugin );
 
 		$enable_events = array();
 		$disable_events = array();
@@ -291,7 +664,7 @@ switch( $action )
 				$disable_events[] = $l_event;
 			}
 		}
-		if( $Plugins->save_events( $edit_Plugin, $enable_events, $disable_events ) )
+		if( $admin_Plugins->save_events( $edit_Plugin, $enable_events, $disable_events ) )
 		{
 			$Messages->add( T_('Plugin events have been updated.'), 'success' );
 		}
@@ -306,7 +679,7 @@ switch( $action )
 		// Edit plugin settings:
 		param( 'plugin_ID', 'integer', true );
 
-		$edit_Plugin = & $Plugins->get_by_ID( $plugin_ID );
+		$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
 
 		if( ! $edit_Plugin )
 		{
@@ -315,7 +688,7 @@ switch( $action )
 			break;
 		}
 
-		$Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $params = array() );
+		$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $params = array() );
 
 		// Params for form:
 		$edited_plugin_code = $edit_Plugin->code;
@@ -331,7 +704,7 @@ switch( $action )
 
 		param( 'plugin_ID', 'integer', true );
 
-		$edit_Plugin = & $Plugins->get_by_ID( $plugin_ID );
+		$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
 		if( !$edit_Plugin )
 		{
 			$Debuglog->add( 'The plugin with ID '.$plugin_ID.' was not found.', array('plugins', 'error') );
@@ -347,7 +720,7 @@ switch( $action )
 		$edited_plugin_apply_rendering = $default_Plugin->apply_rendering;
 
 		// Code:
-		$updated = $Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
+		$updated = $admin_Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
 		if( is_string( $updated ) )
 		{ // error message
 			$Request->param_error( 'edited_plugin_code', $updated );
@@ -365,7 +738,7 @@ switch( $action )
 		}
 		else
 		{
-			$updated = $Plugins->set_priority( $edit_Plugin->ID, $edited_plugin_priority );
+			$updated = $admin_Plugins->set_priority( $edit_Plugin->ID, $edited_plugin_priority );
 			if( $updated === 1 )
 			{
 				$Messages->add( T_('Plugin priority updated.'), 'success' );
@@ -373,7 +746,7 @@ switch( $action )
 		}
 
 		// apply_rendering:
-		if( $Plugins->set_apply_rendering( $edit_Plugin->ID, $edited_plugin_apply_rendering ) )
+		if( $admin_Plugins->set_apply_rendering( $edit_Plugin->ID, $edited_plugin_apply_rendering ) )
 		{
 			$Messages->add( T_('Plugin rendering appliance updated.'), 'success' );
 		}
@@ -392,7 +765,7 @@ switch( $action )
 		}
 
 		// Enable all events:
-		if( $Plugins->save_events( $edit_Plugin ) )
+		if( $admin_Plugins->save_events( $edit_Plugin ) )
 		{
 			$Messages->add( T_('Plugin events have been updated.'), 'success' );
 		}
@@ -405,9 +778,14 @@ switch( $action )
 
 	case 'info':
 		param( 'plugin_ID', 'integer', true );
+
+		// Discover available plugins:
+		$AvailablePlugins = & new Plugins_no_DB(); // do not load registered plugins/events from DB
+		$AvailablePlugins->discover();
+
 		if( ! ($edit_Plugin = & $AvailablePlugins->get_by_ID( $plugin_ID )) )
 		{
-			$edit_Plugin = & $Plugins->get_by_ID($plugin_ID);
+			$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 		}
 		if( ! $edit_Plugin )
 		{
@@ -416,14 +794,24 @@ switch( $action )
 		break;
 
 
+	case 'disp_help_plain': // just the help, without any payload
 	case 'disp_help':
 		param( 'plugin_ID', 'integer', 0 );
-		$edit_Plugin = & $Plugins->get_by_ID($plugin_ID);
+		$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 
 		if( ! $edit_Plugin || ! ($help_file = $edit_Plugin->get_help_file( $plugin_ID )) )
 		{
 			$action = 'list';
 		}
+
+		if( $action == 'disp_help' )
+		{ // display it later
+			break;
+		}
+
+		readfile($help_file);
+		debug_die();
+
 		break;
 
 
@@ -438,6 +826,7 @@ if( 1 || $Settings->get( 'plugins_disp_log_in_admin' ) )
 
 
 // Extend titlearea for some actions:
+// blueyed>> IMHO it's a good use for the whitespace here (instead of directly above the payload)
 switch( $action )
 {
 	case 'edit_settings':
@@ -467,99 +856,62 @@ switch( $action )
 {
 	case 'disp_help':
 		// Display plugin help:
-		readfile( $help_file );
+		$help_file_body = implode( '', file($help_file) );
+
+		// Try to extract the BODY part:
+		if( preg_match( '~<body.*?>(.*)</body>~is', $help_file_body, $match ) )
+		{
+			$help_file_body = $match[1];
+		}
+
+		echo $help_file_body;
+		unset($help_file_body);
 		break;
 
 
-	case 'edit_settings':
-		// Edit plugin settings:
-		$Form = & new Form( $pagenow, 'pluginsettings_checkchanges' );
-		$Form->begin_form( 'fform') ;
-		$Form->hidden( 'ctrl', 'plugins' );
-		$Form->hidden( 'plugin_ID', $plugin_ID );
-
-		// PluginSettings
-		if( $edit_Plugin->Settings )
-		{
-			$Form->begin_fieldset( T_('Plugin settings'), array( 'class' => 'clear' ) );
-
-			foreach( $edit_Plugin->GetDefaultSettings() as $l_name => $l_meta )
-			{
-				$Plugins->display_settings_fieldset_field( $l_name, $l_meta, $edit_Plugin, $Form );
-			}
-
-			$Plugins->call_method_if_active( $edit_Plugin->ID, 'PluginSettingsEditDisplayAfter', $params = array() );
-
-			$Form->end_fieldset();
-		}
-
-		// Plugin variables
-		$Form->begin_fieldset( T_('Plugin variables').' ('.T_('Advanced').')', array( 'class' => 'clear' ) );
-		$Form->text_input( 'edited_plugin_code', $edited_plugin_code, 15, T_('Code'), array('maxlength'=>32, 'note'=>'The code to call the plugin by code. This is also used to link renderer plugins to items.') );
-		$Form->text_input( 'edited_plugin_priority', $edited_plugin_priority, 4, T_('Priority'), array( 'maxlength' => 4 ) );
-		$Form->select_input_array( 'edited_plugin_apply_rendering', $Plugins->get_apply_rendering_values(), T_('Apply rendering'), array(
-			'value' => $edited_plugin_apply_rendering,
-			'note' => empty( $edited_plugin_code )
-				? T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.')
-				: NULL )
-			);
-		$Form->end_fieldset();
-
-
-		// (De-)Activate Events (Advanced)
-		$Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced')
-			.') <img src="'.get_icon('expand', 'url').'" id="clickimg_pluginevents" />', array('legend_params' => array( 'onclick' => 'toggle_clickopen(\'pluginevents\')') ) );
+	case 'install_db_schema':
+		// Payload for 'install_db_schema' action if DB layout changes have to be confirmed:
 		?>
 
-		<div id="clickdiv_pluginevents">
+		<div class="panelinfo">
 
-		<?php
-		$enabled_events = $Plugins->get_enabled_events( $edit_Plugin->ID );
-		$supported_events = $Plugins->get_supported_events();
-		$registered_events = $Plugins->get_registered_events( $edit_Plugin );
-		$count = 0;
-		foreach( array_keys($supported_events) as $l_event )
-		{
-			if( ! in_array( $l_event, $registered_events ) )
+			<?php
+			$Form = & new Form( 'plugins.php', 'install_db_deltas', 'get' );
+			$Form->global_icon( T_('Cancel installation!'), 'close', regenerate_url() );
+
+			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Setup database for plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
+
+			echo '<p>'.T_('The plugin needs the following database changes.').'</p>';
+
+			$Form->hidden( 'action', $next_action );
+			$Form->hidden( 'plugin_ID', $edit_Plugin->ID );
+
+
+			if( ! empty($install_db_deltas) )
 			{
-				continue;
+				echo '<p>'.T_('The following queries will be executed. If you are not sure what this means, it will probably be alright.').'</p>';
+				echo '<ul><li><pre>'.implode( '</pre></li><li><pre>', $install_db_deltas ).'</pre></li></ul>';
+
+				$Form->hidden( 'install_db_deltas_confirm_md5', md5(implode( '', $install_db_deltas )) );
 			}
-			if( in_array( $l_event, $Plugins->_supported_private_events ) )
-			{
-				continue;
-			}
-			$Form->hidden( 'edited_plugin_displayed_events[]', $l_event ); // to consider only displayed ones on update
-			$Form->checkbox_input( 'edited_plugin_events['.$l_event.']', in_array( $l_event, $enabled_events ), $l_event, array( 'note' => $supported_events[$l_event] ) );
-			$count++;
-		}
-		if( ! $count )
-		{
-			echo T_( 'This plugin has no registered events.' );
-		}
-		?>
+
+			$Form->submit( array( '', T_('Install!'), 'ActionButton' ) );
+			$Form->end_form();
+			?>
 
 		</div>
 
 		<?php
-		$Form->end_fieldset();
-		?>
+		break;
 
-		<script type="text/javascript">
-			<!--
-			toggle_clickopen('pluginevents');
-			// -->
-		</script>
 
-		<?php
-		if( $current_User->check_perm( 'options', 'edit', false ) )
-		{
-			$Form->buttons_input( array(
-				array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => T_('Save !'), 'class' => 'SaveButton' ),
-				array( 'type' => 'reset', 'value' => T_('Reset'), 'class' => 'ResetButton' ),
-				array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'SaveButton' ),
-				) );
-		}
-		$Form->end_form();
+	case 'uninstall':
+		$admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstallPayload', $params = array() );
+		break;
+
+
+	case 'edit_settings':
+		$AdminUI->disp_view( 'settings/_set_plugins_editsettings.form.php' );
 		// Go on to displaying info - might be handy to not edit a wrong Plugin and provides help links:
 
 
@@ -598,7 +950,7 @@ switch( $action )
 
 		$Form->end_fieldset();
 		$Form->end_form();
-		$action = 'list';
+		$action = '';
 		break;
 
 }
@@ -606,6 +958,11 @@ switch( $action )
 
 if( $action == 'list' )
 {
+	// Discover available plugins:
+	$AvailablePlugins = & new Plugins_no_DB(); // do not load registered plugins/events from DB
+	$AvailablePlugins->discover();
+	$AvailablePlugins->sort('name');
+
 	// Display VIEW:
 	$AdminUI->disp_view( 'settings/_set_plugins.form' );
 }

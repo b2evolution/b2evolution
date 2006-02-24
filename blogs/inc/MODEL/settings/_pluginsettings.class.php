@@ -65,6 +65,7 @@ class PluginSettings extends AbstractSettings
 		$this->plugin_ID = $plugin_ID;
 	}
 
+
 	/**
 	 * Get a setting by name for the Plugin.
 	 *
@@ -106,6 +107,9 @@ class PluginSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 22:09:00  blueyed
+ * Plugin enhancements
+ *
  * Revision 1.1  2006/02/23 21:11:58  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
