@@ -47,7 +47,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Includes:
  */
-require_once dirname(__FILE__).'/_group.funcs.php';
+require_once dirname(__FILE__).'/_group.class.php';
 require_once dirname(__FILE__).'/_user.class.php';
 
 
@@ -428,6 +428,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/24 20:26:37  blueyed
+ * _group.funcs.php is empty
+ *
  * Revision 1.1  2006/02/23 21:11:58  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
