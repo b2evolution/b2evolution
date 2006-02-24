@@ -118,6 +118,7 @@ if( $Messages->display( T_('Cannot post comment, please correct these errors:'),
 	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' ) )
 {
 	exit(); // TODO: nicer displaying here (but do NOT die() or debug_die() because this is not a BUG/user hack, it's a plain user input error (any bozo can produce it)
+		// blueyed>> Why NOT debug_die()? You NEED the Debuglog output if you want to see why your Plugin prevented the comment from being posted!!
 }
 
 
@@ -202,6 +203,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.55  2006/02/24 20:03:13  blueyed
+ * F2
+ *
  * Revision 1.54  2006/02/24 14:06:49  fplanque
  * no message
  *
