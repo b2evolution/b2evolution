@@ -35,18 +35,24 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @var Blog
+ * @global Blog
  */
 global $Blog;
 /**
- * @var ItemList2
+ * @global ItemList2
  */
 global $ItemList;
 /**
- * Note: definition only (does not need to ba a global)
- * @var Item
+ * Note: definition only (does not need to be a global)
+ * @global Item
  */
 global $Item;
+
+/**
+ * @global string
+ */
+global $add_item_url;
+
 
 // Display title depending on selection params:
 echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
@@ -323,11 +329,10 @@ $ItemList->display_nav( 'footer' );
 
 <?php
 /*
- * @movedTo _browse_posts_sidebar.inc.php
- */
-
-/*
  * $Log$
+ * Revision 1.2  2006/02/25 22:53:11  blueyed
+ * fix
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
