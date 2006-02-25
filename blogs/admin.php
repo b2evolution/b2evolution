@@ -44,6 +44,41 @@ require_once dirname(__FILE__).'/_header.php';
 // Get requested controller and memorize it:
 param( 'ctrl', '/^[a-z0-9]+$/', $default_ctrl, true );
 
+
+// Redirect old-style URLs (e.g. /admin/plugins.php), if they come here because the webserver maps "/admin/" to "/admin.php"
+if( ! empty( $_SERVER['PATH_INFO'] ) )
+{
+	// Try to find the appropriate controller (ctrl) setting
+	foreach( $ctrl_mappings as $k => $v )
+	{
+		if( preg_match( '~'.preg_quote( $_SERVER['PATH_INFO'], '~' ).'$~', $v ) )
+		{
+			$ctrl = $k;
+			break;
+		}
+	}
+
+	// Sanitize QUERY_STRING
+	if( ! empty( $_SERVER['QUERY_STRING'] ) )
+	{
+		$query_string = explode( '&', $_SERVER['QUERY_STRING'] );
+		foreach( $query_string as $k => $v )
+		{
+			$query_string[$k] = strip_tags($v);
+		}
+		$query_string = '&'.implode( '&', $query_string );
+	}
+	else
+	{
+		$query_string = '';
+	}
+
+	header( 'HTTP/1.1 301 Moved Permanently' );
+	header( 'Location: '.url_add_param( $admin_url, 'ctrl='.$ctrl.$query_string, '&' ) );
+	exit;
+}
+
+
 // Check matching controller file:
 if( !isset($ctrl_mappings[$ctrl]) )
 {
