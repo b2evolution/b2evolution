@@ -1212,6 +1212,7 @@ class File extends DataObject
 		if( $this->is_dir() )
 		{ // Directory
 			// Note: we make sure that the mode is fileman and not upload (we cannot insert IMG tags from a sub-popup)
+			// TODO: "mode=fileman" kills the header/footer while browsing "normally" (files.php). Just empty it??
 			return regenerate_url( 'root,path,mode', 'mode=fileman&amp;root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
 		}
 		else
@@ -1339,6 +1340,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/27 23:58:01  blueyed
+ * todo
+ *
  * Revision 1.1  2006/02/23 21:11:57  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
