@@ -81,17 +81,17 @@ class UserSettings extends AbstractSettings
 	 * @param string name of setting
 	 * @param integer User ID (by default $current_User->ID will be used)
 	 */
-	function get( $setting, $user = NULL )
+	function get( $setting, $user_ID = NULL )
 	{
-		global $current_User;
-
-		if( $user === NULL )
+		if( ! isset($user_ID) )
 		{
+			global $current_User;
+
 			return parent::get( $current_User->ID, $setting );
 		}
 		else
 		{
-			return parent::get( $user, $setting );
+			return parent::get( $user_ID, $setting );
 		}
 	}
 
@@ -103,17 +103,16 @@ class UserSettings extends AbstractSettings
 	 * @param mixed new value
 	 * @param integer User ID (by default $current_User->ID will be used)
 	 */
-	function set( $setting, $value, $user = NULL )
+	function set( $setting, $value, $user_ID = NULL )
 	{
-		global $current_User;
-
-		if( $user === NULL )
+		if( ! isset($user_ID) )
 		{
+			global $current_User;
 			return parent::set( $current_User->ID, $setting, $value );
 		}
 		else
 		{
-			return parent::set( $user, $setting, $value );
+			return parent::set( $user_ID, $setting, $value );
 		}
 	}
 
@@ -124,21 +123,24 @@ class UserSettings extends AbstractSettings
 	 * @param string name of setting
 	 * @param integer User ID (by default $current_User->ID will be used)
 	 */
-	function delete( $setting, $user = NULL )
+	function delete( $setting, $user_ID = NULL )
 	{
-		global $current_User;
-
-		if( is_null($user) )
+		if( ! isset($user_ID) )
 		{
-			$user = $current_User->ID;
+			global $current_User;
+
+			$user_ID = $current_User->ID;
 		}
 
-		return parent::delete( $user, $setting );
+		return parent::delete( $user_ID, $setting );
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/27 16:43:09  blueyed
+ * Normalized
+ *
  * Revision 1.1  2006/02/23 21:11:58  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
