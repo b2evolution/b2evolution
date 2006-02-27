@@ -94,11 +94,14 @@ $Form->hidden( 'plugin_ID', $edit_Plugin->ID );
 // PluginSettings
 if( $edit_Plugin->Settings )
 {
+	global $inc_path;
+	require_once $inc_path.'_misc/_plugin.funcs.php';
+
 	$Form->begin_fieldset( T_('Plugin settings'), array( 'class' => 'clear' ) );
 
 	foreach( $edit_Plugin->GetDefaultSettings() as $l_name => $l_meta )
 	{
-		display_settings_fieldset_field( $l_name, $l_meta, $edit_Plugin, $Form );
+		display_settings_fieldset_field( $l_name, $l_meta, $edit_Plugin, $Form, 'Settings' );
 	}
 
 	$admin_Plugins->call_method_if_active( $edit_Plugin->ID, 'PluginSettingsEditDisplayAfter', $params = array() );
@@ -176,215 +179,11 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 $Form->end_form();
 
 
-/**
- * Recursive helper function to display a field of the plugin's settings.
- *
- * @param string Settings name (key)
- * @param array Meta data for this setting. See {@link Plugin::GetDefaultSettings()}
- * @param Plugin (by reference)
- * @param Form (by reference)
- * @param mixed Value to really use (used for recursion into array type settings)
- */
-function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Form, $use_value = NULL )
-{
-	global $debug, $plugin_help_contents, $admin_Plugins, $Request;
-
-	$params = array();
-
-	if( isset($set_meta['note']) )
-	{
-		$params['note'] = $set_meta['note'];
-	}
-
-	if( ! isset($set_meta['type']) )
-	{
-		$set_meta['type'] = 'text';
-	}
-
-	if( strpos($set_meta['type'], 'select_') === 0 )
-	{ // 'allow_none' setting for select_* types
-		if( isset($set_meta['allow_none']) )
-		{
-			$params['allow_none'] = $set_meta['allow_none'];
-		}
-	}
-
-	if( isset($set_meta['help']) )
-	{
-		if( is_string($set_meta['help']) )
-		{
-			$get_help_icon_params = array($set_meta['help']);
-		}
-		else
-		{
-			$get_help_icon_params = $set_meta['help'];
-		}
-
-		$params['note'] .= ' '.call_user_func_array( array( & $Plugin, 'get_help_icon'), $get_help_icon_params );
-	}
-	elseif( ! empty($plugin_help_contents) )
-	{ // Autolink to internal help, if a matching HTML ID is in there
-		// Generate HTML ID, removing array syntax 'foobar[0][foo][0][bar]' becomes 'foobar_foo_bar'
-		$help_anchor = $Plugin->classname.'_'.preg_replace( array('~\]?\[\d+\]\[~', '~\]$~'), array('_',''), $set_name );
-		if( strpos($plugin_help_contents, 'id="'.$help_anchor.'"') )
-		{ // there's an ID for this setting in the help file
-			$params['note'] .= ' '.call_user_func_array( array( & $Plugin, 'get_help_icon'), array($set_name) );
-		}
-	}
-
-	$set_label = isset($set_meta['label']) ? $set_meta['label'] : '';
-
-
-	// "Layout" settings:
-	if( isset($set_meta['layout']) )
-	{
-		switch( $set_meta['layout'] )
-		{
-			case 'begin_fieldset':
-				$fieldset_title = $set_label;
-				if( $debug )
-				{
-					$fieldset_title .= ' [debug: '.$set_name.']';
-				}
-				$Form->begin_fieldset( $fieldset_title );
-				break;
-
-			case 'end_fieldset':
-				$Form->end_fieldset();
-				break;
-
-			case 'separator':
-				echo '<hr />';
-				break;
-		}
-		return;
-	}
-
-
-	if( isset($use_value) )
-	{
-		$set_value = $use_value;
-	}
-	else
-	{
-		$set_value = $Plugin->Settings->get( $set_name );
-
-		if( $error_value = $admin_Plugins->call_method( $Plugin->ID, 'PluginSettingsValidateSet', $tmp_params = array( 'name' => $set_name, 'value' => & $set_value, 'meta' => $set_meta ) ) );
-		{ // add error
-			$Request->param_error( 'edited_plugin_set_'.$set_name, NULL, $error_value ); // only add the error to the field
-		}
-
-	}
-
-	// Display input element:
-	switch( $set_meta['type'] )
-	{
-		case 'checkbox':
-			$Form->checkbox_input( 'edited_plugin_set_'.$set_name, $set_value, $set_label, $params );
-			break;
-
-		case 'textarea':
-			$textarea_rows = isset($set_meta['rows']) ? $set_meta['rows'] : 3;
-			$Form->textarea_input( 'edited_plugin_set_'.$set_name, $set_value, $textarea_rows, $set_label, $params );
-			break;
-
-		case 'select':
-			$params['value'] = $set_value;
-			$Form->select_input_array( 'edited_plugin_set_'.$set_name, $set_meta['options'], $set_label, $params );
-			break;
-
-		case 'select_group':
-			global $GroupCache;
-			$Form->select_input_object( 'edited_plugin_set_'.$set_name, $set_value, $GroupCache, $set_label, $params );
-			break;
-
-		case 'select_user':
-			global $UserCache;
-			$UserCache->load_all();
-			if( ! isset($params['loop_object_method']) )
-			{
-				$params['loop_object_method'] = 'get_preferred_name';
-			}
-			$Form->select_input_object( 'edited_plugin_set_'.$set_name, $set_value, $UserCache, $set_label, $params );
-			break;
-
-		case 'array':
-			$fieldset_title = $set_label;
-			if( $debug )
-			{
-				$fieldset_title .= ' [debug: '.$set_name.']';
-			}
-			$Form->begin_fieldset( $fieldset_title );
-
-			if( ! empty($params['note']) )
-			{
-				echo '<p class="notes">'.$params['note'].'</p>';
-			}
-
-			$insert_new_set_as = 0;
-			if( is_array( $set_value ) )
-			{
-				foreach( $set_value as $k => $v )
-				{
-					$fieldset_icons = array();
-					if( ! isset($set_meta['min_count']) || count($set_value) > $set_meta['min_count'] )
-					{ // provide icon to remove this set
-						$fieldset_icons[] = action_icon( T_('Delete set!'), 'delete', regenerate_url( 'action', array('action=delete_settings_set', 'set_path='.$set_name.'['.$insert_new_set_as.']', 'plugin_ID='.$Plugin->ID) ) );
-					}
-					$Form->begin_fieldset( '#'.$k, array(), $fieldset_icons );
-
-					foreach( $set_meta['entries'] as $l_set_name => $l_set_entry )
-					{
-						$l_value = isset($set_value[$k][$l_set_name]) ? $set_value[$k][$l_set_name] : NULL;
-
-						display_settings_fieldset_field( $set_name.'['.$k.']['.$l_set_name.']', $l_set_entry, $Plugin, $Form, $l_value );
-					}
-					$insert_new_set_as = $k+1;
-					$Form->end_fieldset();
-				}
-			}
-			if( ! isset( $set_meta['max_number'] ) || $set_meta['max_number'] > count($set_value) )
-			{ // no max_number defined or not reached: display link to add a new set
-				echo action_icon( sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label), 'new', regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_name.'['.$insert_new_set_as.']', 'plugin_ID='.$Plugin->ID) ), T_('New set') );
-			}
-			$Form->end_fieldset();
-
-			break;
-
-		case 'password':
-			$params['type'] = 'password'; // same as text input, but type=password
-
-		case 'integer':
-		case 'text':
-			// Default: "text input"
-			if( isset($set_meta['size']) )
-			{
-				$size = (int)$set_meta['size'];
-			}
-			else
-			{ // Default size:
-				$size = 15;
-			}
-			if( isset($set_meta['maxlength']) )
-			{
-				$params['maxlength'] = (int)$set_meta['maxlength'];
-			}
-			else
-			{ // do not use size as maxlength, if not given!
-				$params['maxlength'] = '';
-			}
-
-			$Form->text_input( 'edited_plugin_set_'.$set_name, $set_value, $size, $set_label, $params );
-			break;
-
-		default:
-			debug_die( 'Unsupported type ['.$set_meta['type'].'] from GetDefaultSettings()!' );
-	}
-}
-
-
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.3  2006/02/27 16:57:12  blueyed
+ * PluginUserSettings - allows a plugin to store user related settings
+ *
  * Revision 1.2  2006/02/24 23:38:55  blueyed
  * fixes
  *

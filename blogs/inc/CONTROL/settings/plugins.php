@@ -590,50 +590,8 @@ switch( $action )
 		// Settings:
 		if( $edit_Plugin->Settings )
 		{
-			foreach( $edit_Plugin->GetDefaultSettings() as $l_name => $l_meta )
-			{
-				if( isset($l_meta['layout']) )
-				{ // a layout "setting"
-					continue;
-				}
-				if( isset($l_meta['type']) && $l_meta['type'] == 'array' )
-				{ // this settings has a type
-					$l_param_type = $l_meta['type'];
-				}
-				else
-				{
-					$l_param_type = NULL;
-				}
-				$l_value = param( 'edited_plugin_set_'.$l_name, $l_param_type );
-
-				if( isset($l_meta['type']) && $l_meta['type'] == 'integer' && ! preg_match( '~^\d+$~', $l_value ) )
-				{
-					$Request->param_error( 'edited_plugin_set_'.$l_name, sprintf( T_('The value for %s must be numeric.'), $l_name ), T_('The value must be numeric.') );
-					$action = 'edit_settings';
-					continue;
-				}
-
-				if( isset($l_meta['valid_pattern']) )
-				{
-					$param_pattern = is_array($l_meta['valid_pattern']) ? $l_meta['valid_pattern']['pattern'] : $l_meta['valid_pattern'];
-					if( ! preg_match( $param_pattern, $l_value ) )
-					{
-						$param_error = is_array($l_meta['valid_pattern']) ? $l_meta['valid_pattern']['error'] : sprintf(T_('The value is invalid. It must match the regular expression &laquo;%s&raquo;.'), $param_pattern);
-						$Request->param_error( 'edited_plugin_set_'.$l_name, $param_error );
-						$action = 'edit_settings';
-						continue;
-					}
-				}
-
-				// Ask the plugin if it's ok:
-				if( $error = $admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsValidateSet', $params = array( 'name' => $l_name, 'value' => & $l_value, 'meta' => $l_meta ) ) )
-				{ // skip this
-					$Request->param_error( 'edited_plugin_set_'.$l_name, $error );
-					$action = 'edit_settings';
-					continue;
-				}
-				$edit_Plugin->Settings->set( $l_name, $l_value );
-			}
+			require_once $inc_path.'_misc/_plugin.funcs.php';
+			set_Settings_for_Plugin_from_params( $edit_Plugin, $admin_Plugins, 'Settings' );
 
 			if( $edit_Plugin->Settings->dbupdate() )
 			{

@@ -252,8 +252,9 @@ class Plugin
 	 *
 	 * You probably don't need to set or change values (other than the
 	 * defaultvalues), but if you know what you're doing, see
-	 * {@link PluginSettings()}, where {@link $Settings} gets derived from.
+	 * {@link PluginSettings}, where {@link $Settings} gets derived from.
 	 *
+	 * @return array
 	 * The array to be returned should define the names of the settings as keys
 	 * and assign an array with the following keys to them (only 'label' is required):
 	 *
@@ -312,11 +313,28 @@ class Plugin
 	 *   ) );
 	 * </code>
 	 *
-	 * @return array
 	 */
 	function GetDefaultSettings()
 	{
 		return array();
+	}
+
+
+	/**
+	 * Define here default user settings that are then available in the backoffice.
+	 *
+	 * You can access them in the plugin through the member object
+	 * {@link $UserSettings}, e.g.:
+	 * <code>$this->UserSettings->get( 'my_param' );</code>
+	 *
+	 * You probably don't need to set or change values (other than the
+	 * defaultvalues), but if you know what you're doing, see
+	 * {@link PluginUserSettings}, where {@link $UserSettings} gets derived from.
+	 *
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function GetDefaultUserSettings()
+	{
 	}
 
 
@@ -889,6 +907,7 @@ class Plugin
 	/**
 	 * Event handler: Called before displaying or setting a plugin's setting in the backoffice.
 	 *
+	 * @see GetDefaultSettings()
 	 * @param array Associative array of parameters
 	 *   - 'name': name of the setting
 	 *   - 'value': value of the setting (by reference)
@@ -896,6 +915,21 @@ class Plugin
 	 *                     and/or a message added to the settings field.
 	 */
 	function PluginSettingsValidateSet( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called before displaying or setting a plugin's user setting in the backoffice.
+	 *
+	 * @see GetDefaultUserSettings()
+	 * @param array Associative array of parameters
+	 *   - 'name': name of the setting
+	 *   - 'value': value of the setting (by reference)
+	 * @return string|NULL Return a string with an error to prevent the setting from being set
+	 *                     and/or a message added to the settings field.
+	 */
+	function PluginUserSettingsValidateSet( & $params )
 	{
 	}
 
@@ -1416,6 +1450,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.4  2006/02/27 16:57:12  blueyed
+ * PluginUserSettings - allows a plugin to store user related settings
+ *
  * Revision 1.3  2006/02/24 22:22:57  blueyed
  * Fix URL for internal help.
  *

@@ -43,33 +43,37 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @var User
+ * @global User
  */
 global $current_User;
 /**
- * @var AdminUI_general
+ * @global AdminUI_general
  */
 global $AdminUI;
 /**
- * @var User
+ * @global User
  */
 global $edited_User;
 /**
- * @var GroupCache
+ * @global GroupCache
  */
 global $GroupCache;
 /**
- * @var GeneralSettings
+ * @global GeneralSettings
  */
 global $Settings;
 /**
- * @var UserSettings
+ * @global UserSettings
  */
 global $UserSettings;
 /**
- * @var Request
+ * @global Request
  */
 global $Request;
+/**
+ * @global Plugins
+ */
+global $Plugins;
 
 global $action, $user_profile_only;
 
@@ -78,6 +82,8 @@ $this->disp_payload_begin();
 
 
 $Form = & new Form( NULL, 'user_checkchanges' );
+$Form->hidden_ctrl();
+
 
 if( !$user_profile_only )
 {
@@ -218,6 +224,33 @@ $Form->begin_fieldset( T_('Features') );
 $Form->end_fieldset();
 
 
+// PluginUserSettings
+foreach( $Plugins->get_list_by_event( 'GetDefaultUserSettings' ) as $loop_Plugin )
+{
+	$pluginusersettings = $loop_Plugin->GetDefaultUserSettings();
+
+	if( empty($pluginusersettings) )
+	{
+		$Debuglog->add( 'No PluginUserSettings for plugin #'.$loop_plug_ID.'!', array( 'plugins', 'error' ) );
+		continue;
+	}
+
+	global $inc_path;
+	require_once $inc_path.'_misc/_plugin.funcs.php';
+
+	$Form->begin_fieldset( $loop_Plugin->name );
+
+	foreach( $pluginusersettings as $l_name => $l_meta )
+	{
+		display_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings' );
+	}
+
+	#$admin_Plugins->call_method_if_active( $edit_Plugin->ID, 'PluginSettingsEditDisplayAfter', $params = array() );
+
+	$Form->end_fieldset();
+}
+
+
 if( $action != 'view_user' )
 { // Edit buttons
 	$Form->buttons( array(
@@ -249,6 +282,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/27 16:57:12  blueyed
+ * PluginUserSettings - allows a plugin to store user related settings
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

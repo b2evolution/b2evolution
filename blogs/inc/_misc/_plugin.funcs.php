@@ -1,0 +1,336 @@
+<?php
+/**
+ * Functions for Plugin handling.
+ *
+ * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://thequod.de/}.
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal
+ * b2evolution is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * b2evolution is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with b2evolution; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * In addition, as a special exception, the copyright holders give permission to link
+ * the code of this program with the PHP/SWF Charts library by maani.us (or with
+ * modified versions of this library that use the same license as PHP/SWF Charts library
+ * by maani.us), and distribute linked combinations including the two. You must obey the
+ * GNU General Public License in all respects for all of the code used other than the
+ * PHP/SWF Charts library by maani.us. If you modify this file, you may extend this
+ * exception to your version of the file, but you are not obligated to do so. If you do
+ * not wish to do so, delete this exception statement from your version.
+ * }}
+ *
+ * {@internal
+ * Daniel HAHLER grants Francois PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
+ * @package evocore
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: Francois PLANQUE
+ * @author blueyed: Daniel HAHLER
+ *
+ * @version $Id$
+ */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+/**
+ * Recursive helper function to display a field of the plugin's settings.
+ *
+ * This gets used for PluginSettings ("Edit plugin") and PluginUserSettings ("Edit user settings").
+ *
+ * @param string Settings name (key)
+ * @param array Meta data for this setting. See {@link Plugin::GetDefaultSettings()}
+ * @param Plugin (by reference)
+ * @param Form (by reference)
+ * @param string Settings type ('Settings' or 'UserSettings')
+ * @param mixed Value to really use (used for recursion into array type settings)
+ */
+function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Form, $set_type = 'Settings', $use_value = NULL )
+{
+	global $debug, $plugin_help_contents, $Request;
+
+	$params = array();
+
+	if( isset($set_meta['note']) )
+	{
+		$params['note'] = $set_meta['note'];
+	}
+
+	if( ! isset($set_meta['type']) )
+	{
+		$set_meta['type'] = 'text';
+	}
+
+	if( strpos($set_meta['type'], 'select_') === 0 )
+	{ // 'allow_none' setting for select_* types
+		if( isset($set_meta['allow_none']) )
+		{
+			$params['allow_none'] = $set_meta['allow_none'];
+		}
+	}
+
+	if( isset($set_meta['help']) )
+	{
+		if( is_string($set_meta['help']) )
+		{
+			$get_help_icon_params = array($set_meta['help']);
+		}
+		else
+		{
+			$get_help_icon_params = $set_meta['help'];
+		}
+
+		$params['note'] .= ' '.call_user_func_array( array( & $Plugin, 'get_help_icon'), $get_help_icon_params );
+	}
+	elseif( ! empty($plugin_help_contents) )
+	{ // Autolink to internal help, if a matching HTML ID is in there
+		// Generate HTML ID, removing array syntax 'foobar[0][foo][0][bar]' becomes 'foobar_foo_bar'
+		$help_anchor = $Plugin->classname.'_'.preg_replace( array('~\]?\[\d+\]\[~', '~\]$~'), array('_',''), $set_name );
+		if( strpos($plugin_help_contents, 'id="'.$help_anchor.'"') )
+		{ // there's an ID for this setting in the help file
+			$params['note'] .= ' '.call_user_func_array( array( & $Plugin, 'get_help_icon'), array($set_name) );
+		}
+	}
+
+	$set_label = isset($set_meta['label']) ? $set_meta['label'] : '';
+
+
+	// "Layout" settings:
+	if( isset($set_meta['layout']) )
+	{
+		switch( $set_meta['layout'] )
+		{
+			case 'begin_fieldset':
+				$fieldset_title = $set_label;
+				if( $debug )
+				{
+					$fieldset_title .= ' [debug: '.$set_name.']';
+				}
+				$Form->begin_fieldset( $fieldset_title );
+				break;
+
+			case 'end_fieldset':
+				$Form->end_fieldset();
+				break;
+
+			case 'separator':
+				echo '<hr />';
+				break;
+		}
+		return;
+	}
+
+
+	if( isset($use_value) )
+	{
+		$set_value = $use_value;
+	}
+	else
+	{
+		$set_value = $Plugin->$set_type->get( $set_name );
+
+		$val_method = 'Plugin'.$set_type.'ValidateSet';
+		if( $error_value = $Plugin->$val_method( $tmp_params = array( 'name' => $set_name, 'value' => & $set_value, 'meta' => $set_meta ) ) )
+		{ // add error
+			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, NULL, $error_value ); // only add the error to the field
+		}
+
+	}
+
+	// Display input element:
+	switch( $set_meta['type'] )
+	{
+		case 'checkbox':
+			$Form->checkbox_input( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $set_label, $params );
+			break;
+
+		case 'textarea':
+			$textarea_rows = isset($set_meta['rows']) ? $set_meta['rows'] : 3;
+			$Form->textarea_input( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $textarea_rows, $set_label, $params );
+			break;
+
+		case 'select':
+			$params['value'] = $set_value;
+			$Form->select_input_array( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_meta['options'], $set_label, $params );
+			break;
+
+		case 'select_group':
+			global $GroupCache;
+			$Form->select_input_object( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $GroupCache, $set_label, $params );
+			break;
+
+		case 'select_user':
+			global $UserCache;
+			$UserCache->load_all();
+			if( ! isset($params['loop_object_method']) )
+			{
+				$params['loop_object_method'] = 'get_preferred_name';
+			}
+			$Form->select_input_object( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $UserCache, $set_label, $params );
+			break;
+
+		case 'array':
+			$fieldset_title = $set_label;
+			if( $debug )
+			{
+				$fieldset_title .= ' [debug: '.$set_name.']';
+			}
+			$Form->begin_fieldset( $fieldset_title );
+
+			if( ! empty($params['note']) )
+			{
+				echo '<p class="notes">'.$params['note'].'</p>';
+			}
+
+			$insert_new_set_as = 0;
+			if( is_array( $set_value ) )
+			{
+				foreach( $set_value as $k => $v )
+				{
+					$fieldset_icons = array();
+					if( ! isset($set_meta['min_count']) || count($set_value) > $set_meta['min_count'] )
+					{ // provide icon to remove this set
+						$fieldset_icons[] = action_icon( T_('Delete set!'), 'delete', regenerate_url( 'action', array('action=delete_settings_set', 'set_path='.$set_name.'['.$insert_new_set_as.']', 'plugin_ID='.$Plugin->ID) ) );
+					}
+					$Form->begin_fieldset( '#'.$k, array(), $fieldset_icons );
+
+					foreach( $set_meta['entries'] as $l_set_name => $l_set_entry )
+					{
+						$l_value = isset($set_value[$k][$l_set_name]) ? $set_value[$k][$l_set_name] : NULL;
+
+						display_settings_fieldset_field( $set_name.'['.$k.']['.$l_set_name.']', $l_set_entry, $Plugin, $Form, $set_type, $l_value );
+					}
+					$insert_new_set_as = $k+1;
+					$Form->end_fieldset();
+				}
+			}
+			if( ! isset( $set_meta['max_number'] ) || $set_meta['max_number'] > count($set_value) )
+			{ // no max_number defined or not reached: display link to add a new set
+				echo action_icon( sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label), 'new', regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_name.'['.$insert_new_set_as.']', 'plugin_ID='.$Plugin->ID) ), T_('New set') );
+			}
+			$Form->end_fieldset();
+
+			break;
+
+		case 'password':
+			$params['type'] = 'password'; // same as text input, but type=password
+
+		case 'integer':
+		case 'text':
+			// Default: "text input"
+			if( isset($set_meta['size']) )
+			{
+				$size = (int)$set_meta['size'];
+			}
+			else
+			{ // Default size:
+				$size = 15;
+			}
+			if( isset($set_meta['maxlength']) )
+			{
+				$params['maxlength'] = (int)$set_meta['maxlength'];
+			}
+			else
+			{ // do not use size as maxlength, if not given!
+				$params['maxlength'] = '';
+			}
+
+			$Form->text_input( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, $set_value, $size, $set_label, $params );
+			break;
+
+		default:
+			debug_die( 'Unsupported type ['.$set_meta['type'].'] from GetDefaultSettings()!' );
+	}
+}
+
+
+
+/**
+ * Set Plugin settings from params.
+ *
+ * This gets used when saving a user profile (PluginUserSettings) or plugin settings (PluginSettings).
+ *
+ * @param Plugin
+ * @param Plugins An object derived from Plugins, probably either {@link $Plugins} or {@link $Plugins_admin}.
+ * @param string Type of Settings (either 'Settings' or 'UserSettings').
+ */
+function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_type )
+{
+	global $Request, $Messages;
+
+	$method = 'GetDefault'.$set_type;
+
+	foreach( $Plugin->$method() as $l_name => $l_meta )
+	{
+		if( isset($l_meta['layout']) )
+		{ // a layout "setting"
+			continue;
+		}
+		if( isset($l_meta['type']) && $l_meta['type'] == 'array' )
+		{ // this settings has a type
+			$l_param_type = $l_meta['type'];
+		}
+		else
+		{
+			$l_param_type = NULL;
+		}
+		$l_value = param( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $l_param_type );
+
+		if( isset($l_meta['type']) && $l_meta['type'] == 'integer' && ! preg_match( '~^\d+$~', $l_value ) )
+		{
+			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, sprintf( T_('The value for %s must be numeric.'), $l_name ), T_('The value must be numeric.') );
+			$action = 'edit_settings';
+			continue;
+		}
+
+		if( isset($l_meta['valid_pattern']) )
+		{
+			$param_pattern = is_array($l_meta['valid_pattern']) ? $l_meta['valid_pattern']['pattern'] : $l_meta['valid_pattern'];
+			if( ! preg_match( $param_pattern, $l_value ) )
+			{
+				$param_error = is_array($l_meta['valid_pattern']) ? $l_meta['valid_pattern']['error'] : sprintf(T_('The value is invalid. It must match the regular expression &laquo;%s&raquo;.'), $param_pattern);
+				$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $param_error );
+				$action = 'edit_settings';
+				continue;
+			}
+		}
+
+		// Ask the plugin if it's ok:
+		if( $error = $use_Plugins->call_method( $Plugin->ID, 'PluginSettingsValidateSet', $params = array( 'name' => $l_name, 'value' => & $l_value, 'meta' => $l_meta ) ) )
+		{ // skip this
+			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $error );
+			$action = 'edit_settings';
+			continue;
+		}
+		$Plugin->$set_type->set( $l_name, $l_value );
+	}
+
+}
+
+
+/* {{{ Revision log:
+ * $Log$
+ * Revision 1.1  2006/02/27 16:57:12  blueyed
+ * PluginUserSettings - allows a plugin to store user related settings
+ *
+ * }}}
+ */
+?>

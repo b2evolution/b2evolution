@@ -97,6 +97,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @see PluginSettings
+	 * @see Plugin::PluginSettingsValidateSet()
 	 * @return array
 	 */
 	function GetDefaultSettings()
@@ -123,8 +124,29 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * User settings.
+	 *
+	 * @see Plugin::GetDefaultUserSettings()
+	 * @see PluginUserSettings
+	 * @see Plugin::PluginUserSettingsValidateSet()
+	 * @return array
+	 */
+	function GetDefaultUserSettings()
+	{
+		return array(
+				'echo_random' => array(
+					'label' => 'Echo a random number in AdminBeginPayload event',
+					'type' => 'checkbox',
+					'defaultvalue' => '0',
+				),
+			);
+	}
+
+
+	/**
 	 * Define some dependencies.
 	 *
+	 * @see Plugin::GetDependencies()
 	 * @return array
 	 */
 	function GetDependencies()
@@ -258,6 +280,8 @@ class test_plugin extends Plugin
 
 	/**
 	 * Event handler: Gets invoked when our tab is selected and should get displayed.
+	 *
+	 * @see Plugin::AdminTabPayload()
 	 */
 	function AdminTabPayload()
 	{
@@ -276,7 +300,10 @@ class test_plugin extends Plugin
 	{
 		echo '<div class="panelblock center">TEST plugin: AdminBeginPayload event.</div>';
 
-		parent::AdminBeginPayload();
+		if( $this->UserSettings->get('echo_random') )
+		{
+			echo '<div class="panelblock center">TEST plugin: A random number requested by user setting: '.rand(0, 1000).'</div>';
+		}
 	}
 
 

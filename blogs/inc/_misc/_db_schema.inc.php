@@ -411,6 +411,16 @@ $schema_queries = array(
 			PRIMARY KEY ( pset_plug_ID, pset_name )
 		)' ),
 
+	'T_pluginusersettings' => array(
+		'Creating plugin user settings table',
+		'CREATE TABLE T_pluginusersettings (
+			pset_plug_ID INT(11) UNSIGNED NOT NULL,
+			pset_user_ID INT(11) UNSIGNED NOT NULL,
+			pset_name VARCHAR( 30 ) NOT NULL,
+			pset_value TEXT NULL,
+			PRIMARY KEY ( pset_plug_ID, pset_name )
+		)' ),
+
 	'T_pluginevents' => array(
 		'Creating plugin events table',
 		'CREATE TABLE T_pluginevents(

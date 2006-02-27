@@ -313,6 +313,34 @@ if( !$Messages->count('error') )
 			$Request->param( 'edited_user_legend', 'integer', 0 );
 			$Request->param( 'edited_user_bozo', 'integer', 0 );
 
+			// PluginUserSettings
+			$any_plugin_settings_updated = false;
+			foreach( $Plugins->get_list_by_event( 'GetDefaultUserSettings' ) as $loop_Plugin )
+			{
+				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings();
+
+				if( empty($pluginusersettings) )
+				{
+					$Debuglog->add( 'No PluginUserSettings for plugin #'.$loop_plug_ID.'!', array( 'plugins', 'error' ) );
+					continue;
+				}
+
+				global $inc_path;
+				require_once $inc_path.'_misc/_plugin.funcs.php';
+
+				set_Settings_for_Plugin_from_params( $loop_Plugin, $Plugins, 'UserSettings' );
+
+				if( $loop_Plugin->UserSettings->dbupdate() )
+				{
+					$any_plugin_settings_updated = true;
+				}
+			}
+			if( $any_plugin_settings_updated )
+			{
+				$Messages->add( T_('Usersettings of Plugins have been updated.'), 'success' );
+			}
+
+
 			if( $Messages->count( 'error' ) )
 			{	// We have found validation errors:
 				$action = 'edit_user';
@@ -609,6 +637,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2006/02/27 16:57:12  blueyed
+ * PluginUserSettings - allows a plugin to store user related settings
+ *
  * Revision 1.1  2006/02/23 21:11:56  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

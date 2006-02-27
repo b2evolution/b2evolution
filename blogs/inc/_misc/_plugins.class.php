@@ -52,7 +52,6 @@ require_once dirname(__FILE__).'/_plugin.class.php';
  *
  * This is where you can plug-in some {@link Plugin plugins} :D
  *
- * @todo Handle dependencies on other plugins or events. The {@link dnsbl_antispam_plugin} does this itself now.
  * @todo A plugin might want to register allowed events (that it triggers itself) on installation..
  * @package evocore
  */
@@ -150,7 +149,7 @@ class Plugins
 	 * A list of events that should not be allowed to be disabled in the backoffice.
 	 * @var array
 	 */
-	var $_supported_private_events = array( 'GetDefaultSettings', 'PluginSettingsInstantiated', 'AfterInstall', 'BeforeInstall', 'BeforeUninstall' );
+	var $_supported_private_events = array( 'PluginSettingsInstantiated', 'AfterInstall', 'BeforeInstall', 'BeforeUninstall' );
 
 	/**#@-*/
 
@@ -260,6 +259,7 @@ class Plugins
 
 				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
 				'GetDefaultSettings' => '',  /* private / needs not description */ // used to instantiate $Settings.
+				'GetDefaultUserSettings' => '',
 				'AfterInstall' => '', /* private / needs not description */
 				'AfterUninstall' => '', /* private / needs not description */
 				'BeforeInstall' => '', /* private / needs not description */
@@ -497,8 +497,9 @@ class Plugins
 
 		$DB->commit();
 
-		// "GetDefaultSettings" was just discovered by save_events()
-		$this->instantiate_Settings( $Plugin );
+		// "GetDefaultSettings" and "GetDefaultUserSettings" was just discovered by save_events()
+		$this->instantiate_Settings( $Plugin, 'Settings' );
+		$this->instantiate_Settings( $Plugin, 'UserSettings' );
 
 		$Debuglog->add( 'Installed plugin: '.$Plugin->name.' ID: '.$Plugin->ID, 'plugins' );
 
@@ -932,9 +933,15 @@ class Plugins
 		}
 
 		// Instantiate the Plugins Settings class
-		if( $this->instantiate_Settings( $Plugin ) === false )
+		if( $this->instantiate_Settings( $Plugin, 'Settings' ) === false )
 		{
 			$Debuglog->add( 'Unregistered plugin, because instantiating its Settings returned false.', 'plugins' );
+			$this->unregister( $Plugin );
+			$Plugin = '';
+		}
+		if( $this->instantiate_Settings( $Plugin, 'UserSettings' ) === false )
+		{
+			$Debuglog->add( 'Unregistered plugin, because instantiating its UserSettings returned false.', 'plugins' );
 			$this->unregister( $Plugin );
 			$Plugin = '';
 		}
@@ -1190,7 +1197,7 @@ class Plugins
 	 * @return NULL|boolean NULL, if no Settings;
 	 *    False, if the plugin's method {@link PluginSettingsInstantiated()} returned false.
 	 */
-	function instantiate_Settings( & $Plugin )
+	function instantiate_Settings( & $Plugin, $set_type )
 	{
 		global $Debuglog, $Timer, $model_path;
 
@@ -1198,7 +1205,7 @@ class Plugins
 
 		$r = true;
 
-		$defaults = $this->call_method_if_active( $Plugin->ID, 'GetDefaultSettings', $params = array() );
+		$defaults = $this->call_method( $Plugin->ID, 'GetDefault'.$set_type, $params = array() );
 
 		if( empty($defaults) )
 		{
@@ -1207,12 +1214,14 @@ class Plugins
 
 		if( ! is_array($defaults) )
 		{
-			$Debuglog->add( $Plugin->classname.'::GetDefaultSettings() did not return array!', array('plugins', 'error') );
+			$Debuglog->add( $Plugin->classname.'::GetDefault'.$set_type.'() did not return array!', array('plugins', 'error') );
 		}
 		else
 		{
 			require_once $model_path.'settings/_pluginsettings.class.php';
-			$Plugin->Settings = & new PluginSettings( $Plugin->ID );
+			require_once $model_path.'settings/_pluginusersettings.class.php';
+			$constructor = 'Plugin'.$set_type;
+			$Plugin->$set_type = & new $constructor( $Plugin->ID );
 
 			foreach( $defaults as $l_name => $l_meta )
 			{
@@ -1223,20 +1232,20 @@ class Plugins
 
 				if( isset($l_meta['defaultvalue']) )
 				{
-					$Plugin->Settings->_defaults[$l_name] = $l_meta['defaultvalue'];
+					$Plugin->$set_type->_defaults[$l_name] = $l_meta['defaultvalue'];
 				}
 				elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'array' )
 				{
-					$Plugin->Settings->_defaults[$l_name] = array();
-					$Plugin->Settings->_defaults_to_be_serialized[] = $l_name;
+					$Plugin->$set_type->_defaults[$l_name] = array();
+					$Plugin->$set_type->_defaults_to_be_serialized[] = $l_name;
 				}
 				else
 				{
-					$Plugin->Settings->_defaults[$l_name] = '';
+					$Plugin->$set_type->_defaults[$l_name] = '';
 				}
 			}
 
-			$event_r = $this->call_method( $Plugin->ID, 'PluginSettingsInstantiated', $params = array() );
+			$event_r = $this->call_method( $Plugin->ID, 'Plugin'.$set_type.'Instantiated', $params = array() );
 			if( $event_r === false )
 			{
 				$r = false;
@@ -2339,6 +2348,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.4  2006/02/27 16:57:12  blueyed
+ * PluginUserSettings - allows a plugin to store user related settings
+ *
  * Revision 1.3  2006/02/24 22:08:59  blueyed
  * Plugin enhancements
  *
