@@ -2039,12 +2039,15 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  */
 function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array() )
 {
+	/*
+	// Fails when the same icon gets re-used (Results class)..
 	static $count_generated = 0;
 
 	if( ! isset($link_attribs['id']) )
 	{
 		$link_attribs['id'] = 'action_icon_'.$count_generated++;
 	}
+	*/
 
 	$link_attribs['href'] = $url;
 	$link_attribs['title'] = $url;
@@ -2074,7 +2077,8 @@ function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array()
 		}
 	}
 
-	$r = '<a'.get_field_attribs_as_string($link_attribs).'>'.get_icon( $icon, 'imgtag', array( 'title'=>$title ), true );
+	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
+	$r = '<a '.get_field_attribs_as_string( $link_attribs, false ).'>'.get_icon( $icon, 'imgtag', array( 'title'=>$title ), true );
 	if( !empty($word) )
 	{
 		$r .= $word;
@@ -2584,9 +2588,10 @@ function get_web_help_link( $topic )
  * prefixed by a space character.
  *
  * @param array Array of field attributes.
+ * @param boolean Use format_to_output() for the attributes?
  * @return string
  */
-function get_field_attribs_as_string( $field_attribs )
+function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 {
 	$r = '';
 
@@ -2597,13 +2602,20 @@ function get_field_attribs_as_string( $field_attribs )
 			continue;
 		}
 
-		if( $l_attr == 'value' )
+		if( $format_to_output )
 		{
-			$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
+			if( $l_attr == 'value' )
+			{
+				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
+			}
+			else
+			{
+				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
+			}
 		}
 		else
 		{
-			$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
+			$r .= ' '.$l_attr.'="'.$l_value.'"';
 		}
 	}
 
@@ -2662,8 +2674,8 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
- * Revision 1.2  2006/02/24 19:36:04  blueyed
- * *** empty log message ***
+ * Revision 1.3  2006/02/27 17:46:42  blueyed
+ * fixes
  *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
