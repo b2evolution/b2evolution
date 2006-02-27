@@ -1598,9 +1598,9 @@ class Item extends DataObject
 			echo '</label>';
 
 			// internal help link:
-			echo ' '.$loop_RendererPlugin->get_help_icon( NULL, NULL, false, NULL, NULL, array('use_js_popup'=>true, 'action'=>'disp_help_plain') );
+			echo ' '.$loop_RendererPlugin->get_help_icon( NULL, NULL, false, NULL, NULL, array('use_js_popup'=>true, 'id'=>'renderer_help_'.$loop_RendererPlugin->ID, 'action'=>'disp_help_plain') );
 			// external help link:
-			echo ' '.$loop_RendererPlugin->get_help_icon( NULL, NULL, true, NULL, NULL, array('use_js_popup'=>true) ); // external
+			echo ' '.$loop_RendererPlugin->get_help_icon( NULL, NULL, true, NULL, NULL, array('use_js_popup'=>true, 'id'=>'renderer_help_'.$loop_RendererPlugin->ID) ); // external
 
 			echo "</div>\n";
 		}
@@ -2385,8 +2385,8 @@ class Item extends DataObject
 
 /*
  * $Log$
- * Revision 1.3  2006/02/27 16:59:52  blueyed
- * Help link(s) fixed.
+ * Revision 1.4  2006/02/27 20:55:50  blueyed
+ * JS help links fixed
  *
  * Revision 1.2  2006/02/24 19:17:52  blueyed
  * Only increment view count if current User is not the Author.

@@ -2034,7 +2034,7 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  * @param string icon code for {@link get_icon()}
  * @param string word to be displayed after icon
  * @param array Additional attributes to the A tag. It may also contain these params:
- *              'use_js_popup': if true, the link gets opened as JS popup.
+ *              'use_js_popup': if true, the link gets opened as JS popup. You must also pass an "id" attribute for this!
  * @return string The generated action icon link.
  */
 function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array() )
@@ -2066,7 +2066,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array()
 
 	if( isset($link_attribs['use_js_popup']) )
 	{
-		$popup_js = 'var win = new PopupWindow(); win.autoHide(); win.setUrl( "'.$link_attribs['href'].'" ); win.setSize( 500, 400 ); win.showPopup("'.$link_attribs['id'].'"); return false;';
+		$popup_js = 'var win = new PopupWindow(); win.autoHide(); win.setUrl( \''.$link_attribs['href'].'\' ); win.setSize( 500, 400 ); win.showPopup(\''.$link_attribs['id'].'\'); return false;';
 		if( empty( $link_attribs['onclick'] ) )
 		{
 			$link_attribs['onclick'] = $popup_js;
@@ -2674,8 +2674,8 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
- * Revision 1.3  2006/02/27 17:46:42  blueyed
- * fixes
+ * Revision 1.4  2006/02/27 20:55:50  blueyed
+ * JS help links fixed
  *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
