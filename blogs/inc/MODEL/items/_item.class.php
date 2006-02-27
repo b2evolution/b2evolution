@@ -1595,9 +1595,13 @@ class Item extends DataObject
 			$loop_RendererPlugin->short_desc();
 			echo '">';
 			$loop_RendererPlugin->name();
-			$loop_RendererPlugin->help_link();
-
 			echo '</label>';
+
+			// internal help link:
+			echo ' '.$loop_RendererPlugin->get_help_icon( NULL, NULL, false, NULL, NULL, array('use_js_popup'=>true, 'action'=>'disp_help_plain') );
+			// external help link:
+			echo ' '.$loop_RendererPlugin->get_help_icon( NULL, NULL, true, NULL, NULL, array('use_js_popup'=>true) ); // external
+
 			echo "</div>\n";
 		}
 
@@ -2381,6 +2385,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2006/02/27 16:59:52  blueyed
+ * Help link(s) fixed.
+ *
  * Revision 1.2  2006/02/24 19:17:52  blueyed
  * Only increment view count if current User is not the Author.
  *
