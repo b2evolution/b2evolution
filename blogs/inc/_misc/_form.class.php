@@ -444,7 +444,7 @@ class Form extends Widget
 	 * @param integer Size of the input field
 	 * @param string Label displayed with the field (in front by default, see {@link $label_to_the_left}).
 	 * @param array Extended attributes/params.
-	 *                 - 'maxlength': if not given or === 0 $field_size gets used
+	 *                 - 'maxlength': if not set, $field_size gets used (use '' to disable it)
 	 *                 - 'class': the CSS class to use for the <input> element
 	 *                 - 'type': 'text', 'password' (defaults to 'text')
 	 *                 - 'force_to': 'UpperCase' (JS onchange handler)
@@ -632,7 +632,6 @@ class Form extends Widget
 		{ // Get size out of $date_format if not explicitly set
 			$field_params['size'] = strlen( $date_format );
 		}
-
 
 		if( !isset($field_params['maxlength']) )
 		{
@@ -2506,6 +2505,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.3  2006/02/28 18:21:37  blueyed
+ * maxlength fixed
+ *
  * Revision 1.2  2006/02/24 19:34:02  blueyed
  * doc, temporary style
  *

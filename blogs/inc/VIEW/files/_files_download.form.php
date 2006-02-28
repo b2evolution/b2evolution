@@ -64,7 +64,7 @@ $Form->begin_form( 'fform', T_('Download files in archive') );
 	$Form->hidden( 'action', 'download' );
 	$Form->hidden( 'action_invoked', 1 );
 
-	$Form->text_input( 'zipname', $zipname, 30, T_('Archive filename'), array( 'note' => T_('This is the name of the file which will get sent to you.'), 'maxlength' => NULL ) );
+	$Form->text_input( 'zipname', $zipname, 30, T_('Archive filename'), array( 'note' => T_('This is the name of the file which will get sent to you.'), 'maxlength' => '' ) );
 
 	if( $selected_Filelist->count_dirs() )
 	{ // Allow to exclude dirs:
@@ -84,6 +84,9 @@ $Form->end_form( array(
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.2  2006/02/28 18:21:38  blueyed
+ * maxlength fixed
+ *
  * Revision 1.1  2006/02/23 21:12:17  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
