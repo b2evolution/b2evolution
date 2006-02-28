@@ -2064,6 +2064,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array()
 		}
 	}
 
+	// "use_js_popup": open link in a JS popup
 	if( isset($link_attribs['use_js_popup']) )
 	{
 		$popup_js = 'var win = new PopupWindow(); win.autoHide(); win.setUrl( \''.$link_attribs['href'].'\' ); win.setSize( 500, 400 ); win.showPopup(\''.$link_attribs['id'].'\'); return false;';
@@ -2075,6 +2076,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array()
 		{
 			$link_attribs['onclick'] .= $popup_js;
 		}
+		unset($link_attribs['use_js_popup']);
 	}
 
 	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
@@ -2674,6 +2676,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.5  2006/02/28 20:52:54  blueyed
+ * fix
+ *
  * Revision 1.4  2006/02/27 20:55:50  blueyed
  * JS help links fixed
  *
