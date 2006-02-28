@@ -70,14 +70,16 @@ class Widget
 	 * @param string TITLE text (IMG and A link)
 	 * @param string icon code, see {@link $map_iconfiles}
 	 * @param string icon code for {@link get_icon()}
+	 * @param array Additional attributes to the A tag. See {@link action_icon()}.
 	 */
-	function global_icon( $title, $icon, $url, $word = '' )
+	function global_icon( $title, $icon, $url, $word = '', $link_attribs = array() )
 	{
 		$this->global_icons[] = array(
 			'title' => $title,
 			'icon'  => $icon,
 			'url'   => $url,
-			'word'  => $word );
+			'word'  => $word,
+			'link_attribs' => $link_attribs );
 	}
 
 
@@ -162,7 +164,7 @@ class Widget
 
 		foreach( $this->global_icons as $icon_params )
 		{
-			$r .= action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'], $icon_params['word'] );
+			$r .= action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'], $icon_params['word'], $icon_params['link_attribs'] );
 		}
 
 		return $r;
