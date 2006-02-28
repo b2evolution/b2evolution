@@ -15,9 +15,10 @@ $output_debugging_info = 0;		# =1 if you want to output debugging info
 /**
  * Initialize:
  */
-require_once( dirname(__FILE__).'/../conf/_config.php' );
-require_once( dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.inc.php' );
-require_once( dirname(__FILE__).'/'.$htsrv_dirout.$lib_subdir.'_pop3.class.php' );
+require_once dirname(__FILE__).'/../conf/_config.php';
+
+require_once $inc_path.'_main.inc.php';
+require_once $inc_path.'_misc/ext/_pop3.class.php';
 
 if( !$Settings->get('eblog_enabled') )
 {

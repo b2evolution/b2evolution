@@ -55,8 +55,8 @@
  * Initialize:
  * TODO: Don't do a full init!
  */
-require_once( dirname(__FILE__).'/../conf/_config.php' );
-require_once( dirname(__FILE__).'/'.$htsrv_dirout.$core_subdir.'_main.inc.php' );
+require_once dirname(__FILE__).'/../conf/_config.php';
+require_once $inc_path.'_main.inc.php';
 
 
 param( 'plugin_ID', 'integer', true );
@@ -75,9 +75,13 @@ if( $plugin_ID )
 		debug_die( 'Invalid Plugin!' );
 	}
 
-	if( ! in_array( $method, $Plugin->get_htsrv_methods() ) || ! method_exists( $Plugin, 'htsrv_'.$method ) )
+	if( ! in_array( $method, $Plugin->get_htsrv_methods() ) )
 	{
 		debug_die( 'Call to non-htsrv Plugin method!' );
+	}
+	elseif( ! method_exists( $Plugin, 'htsrv_'.$method ) )
+	{
+		debug_die( 'htsrv method does not exist!' );
 	}
 
 	// Call the method:
@@ -92,6 +96,9 @@ if( $plugin_ID )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.2  2006/02/28 18:07:55  blueyed
+ * Path fixes
+ *
  * Revision 1.1  2006/01/28 23:43:35  blueyed
  * htsrv method for plugins. See Plugin::get_htsrv_url().
  *
