@@ -841,7 +841,7 @@ switch( $AdminUI->get_path(1) )
 				  AND agnt_type = 'browser'"
 				  .( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
 
-			$Results->title = T_('Last referers');
+			$Results->title = T_('Last direct accesses');
 
 			// datetime:
 			$Results->cols[] = array(
@@ -946,6 +946,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/01 22:17:00  blueyed
+ * Fixed table title
+ *
  * Revision 1.1  2006/02/23 21:11:56  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
