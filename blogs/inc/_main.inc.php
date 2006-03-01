@@ -219,7 +219,7 @@ $Session = & new Session();
 
 
 /**
- * Plug-ins init.
+ * Plugins init.
  * This is done quite early here to give an early hook ("SessionLoaded") to plugins (though it might also be moved just after $DB init when there is reason for a hook there).
  * The {@link dnsbl_antispam_plugin} is an example that uses this to check the user's IP against a list of DNS blacklists.
  */
@@ -537,6 +537,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/01 01:07:43  blueyed
+ * Plugin(s) polishing
+ *
  * Revision 1.1  2006/02/23 21:11:55  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

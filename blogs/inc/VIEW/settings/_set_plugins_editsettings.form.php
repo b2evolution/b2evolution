@@ -65,6 +65,7 @@ global $edited_plugin_priority, $edited_plugin_code, $edited_plugin_apply_render
 /**
  * @global string Contents of the Plugin's help file, if any. We search there for matching IDs/anchors to display links to them.
  */
+global $plugin_help_contents;
 $plugin_help_contents = '';
 
 if( $help_file = $edit_Plugin->get_help_file() )
@@ -83,7 +84,7 @@ if( ! empty( $edit_Plugin->help_url ) )
 }
 if( $edit_Plugin->get_help_file() )
 {
-	$Form->global_icon( T_('Local documentation of the plugin'), 'help', url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help&amp;plugin_ID='.$edit_Plugin->ID ) );
+	$Form->global_icon( T_('Local documentation of the plugin'), 'help', url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$edit_Plugin->ID.'#'.$edit_Plugin->classname.'_settings' ), '', array('use_js_popup'=>true, 'id'=>'local_help_popup_'.$edit_Plugin->ID) );
 }
 
 $Form->global_icon( T_('Cancel edit!'), 'close', regenerate_url() );
@@ -104,7 +105,7 @@ if( $edit_Plugin->Settings )
 		display_settings_fieldset_field( $l_name, $l_meta, $edit_Plugin, $Form, 'Settings' );
 	}
 
-	$admin_Plugins->call_method_if_active( $edit_Plugin->ID, 'PluginSettingsEditDisplayAfter', $params = array() );
+	$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditDisplayAfter', $tmp_params = array( 'Form' => & $Form ) );
 
 	$Form->end_fieldset();
 }
@@ -137,10 +138,6 @@ $count = 0;
 foreach( array_keys($supported_events) as $l_event )
 {
 	if( ! in_array( $l_event, $registered_events ) )
-	{
-		continue;
-	}
-	if( in_array( $l_event, $admin_Plugins->_supported_private_events ) )
 	{
 		continue;
 	}
@@ -181,6 +178,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.4  2006/03/01 01:07:43  blueyed
+ * Plugin(s) polishing
+ *
  * Revision 1.3  2006/02/27 16:57:12  blueyed
  * PluginUserSettings - allows a plugin to store user related settings
  *

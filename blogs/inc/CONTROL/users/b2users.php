@@ -315,13 +315,14 @@ if( !$Messages->count('error') )
 
 			// PluginUserSettings
 			$any_plugin_settings_updated = false;
-			foreach( $Plugins->get_list_by_event( 'GetDefaultUserSettings' ) as $loop_Plugin )
+			$Plugins->restart();
+
+			while( $loop_Plugin = & $Plugins->get_next() )
 			{
 				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings();
 
 				if( empty($pluginusersettings) )
 				{
-					$Debuglog->add( 'No PluginUserSettings for plugin #'.$loop_plug_ID.'!', array( 'plugins', 'error' ) );
 					continue;
 				}
 
@@ -329,6 +330,9 @@ if( !$Messages->count('error') )
 				require_once $inc_path.'_misc/_plugin.funcs.php';
 
 				set_Settings_for_Plugin_from_params( $loop_Plugin, $Plugins, 'UserSettings' );
+
+				// Let the plugin handle custom fields:
+				$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array() );
 
 				if( $loop_Plugin->UserSettings->dbupdate() )
 				{
@@ -339,7 +343,6 @@ if( !$Messages->count('error') )
 			{
 				$Messages->add( T_('Usersettings of Plugins have been updated.'), 'success' );
 			}
-
 
 			if( $Messages->count( 'error' ) )
 			{	// We have found validation errors:
@@ -637,6 +640,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/01 01:07:43  blueyed
+ * Plugin(s) polishing
+ *
  * Revision 1.2  2006/02/27 16:57:12  blueyed
  * PluginUserSettings - allows a plugin to store user related settings
  *

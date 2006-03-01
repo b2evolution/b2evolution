@@ -258,7 +258,7 @@ $AdminUI->add_menu_entries(
 						'title' => T_('Post types management'),
 						'href' => 'admin.php?ctrl=itemtypes'),
 					'plugins' => array(
-						'text' => T_('Plug-ins'),
+						'text' => T_('Plugins'),
 						'href' => 'admin.php?ctrl=plugins'),
 				)
 			),

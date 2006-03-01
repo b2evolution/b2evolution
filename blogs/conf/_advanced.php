@@ -479,7 +479,7 @@ $locales_subdir = 'locales/';            // Subdirectory relative to base
 $locales_path = $basepath.$locales_subdir;  // You should not need to change this
 
 /**
- * Location of the plug-ins.
+ * Location of the plugins.
  *
  * Note: This folder NEEDS to by accessible by PHP AND MAY NEED to be accessible through HTTP.
  * Exact requirements depend on installed plugins.

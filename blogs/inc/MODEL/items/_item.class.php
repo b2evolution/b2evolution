@@ -1598,9 +1598,9 @@ class Item extends DataObject
 			echo '</label>';
 
 			// internal help link:
-			echo ' '.$loop_RendererPlugin->get_help_icon( NULL, NULL, false, NULL, NULL, array('use_js_popup'=>true, 'id'=>'renderer_help_'.$loop_RendererPlugin->ID, 'action'=>'disp_help_plain') );
+			echo ' '.$loop_RendererPlugin->get_help_icon();
 			// external help link:
-			echo ' '.$loop_RendererPlugin->get_help_icon( NULL, NULL, true, NULL, NULL, array('use_js_popup'=>true, 'id'=>'renderer_help_'.$loop_RendererPlugin->ID) ); // external
+			echo ' '.$loop_RendererPlugin->get_help_icon( NULL, NULL, true ); // external
 
 			echo "</div>\n";
 		}
@@ -2385,6 +2385,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/01 01:07:43  blueyed
+ * Plugin(s) polishing
+ *
  * Revision 1.4  2006/02/27 20:55:50  blueyed
  * JS help links fixed
  *

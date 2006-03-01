@@ -88,20 +88,20 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 	}
 
 	if( isset($set_meta['help']) )
-	{
+	{ // explicit help linked/provided
 		if( is_string($set_meta['help']) )
 		{
 			$get_help_icon_params = array($set_meta['help']);
 		}
 		else
-		{
+		{ // array
 			$get_help_icon_params = $set_meta['help'];
 		}
 
 		$params['note'] .= ' '.call_user_func_array( array( & $Plugin, 'get_help_icon'), $get_help_icon_params );
 	}
 	elseif( ! empty($plugin_help_contents) )
-	{ // Autolink to internal help, if a matching HTML ID is in there
+	{ // Autolink to internal help, if a matching HTML ID is in there ([plug_classname]_[set_name])
 		// Generate HTML ID, removing array syntax 'foobar[0][foo][0][bar]' becomes 'foobar_foo_bar'
 		$help_anchor = $Plugin->classname.'_'.preg_replace( array('~\]?\[\d+\]\[~', '~\]$~'), array('_',''), $set_name );
 		if( strpos($plugin_help_contents, 'id="'.$help_anchor.'"') )
@@ -313,8 +313,14 @@ function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_ty
 			}
 		}
 
-		// Ask the plugin if it's ok:
-		if( $error = $use_Plugins->call_method( $Plugin->ID, 'PluginSettingsValidateSet', $params = array( 'name' => $l_name, 'value' => & $l_value, 'meta' => $l_meta ) ) )
+		// Ask the plugin if it's ok (through PluginSettingsValidateSet() / PluginUserSettingsValidateSet()):
+		$tmp_params = array( 'name' => $l_name, 'value' => & $l_value, 'meta' => $l_meta );
+		if( $set_type == 'UserSettings' )
+		{
+			global $current_User;
+			$tmp_params['User'] = $current_User;
+		}
+		if( $error = $use_Plugins->call_method( $Plugin->ID, 'Plugin'.$set_type.'ValidateSet', $tmp_params ) )
 		{ // skip this
 			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $error );
 			$action = 'edit_settings';
@@ -328,6 +334,9 @@ function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_ty
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.2  2006/03/01 01:07:43  blueyed
+ * Plugin(s) polishing
+ *
  * Revision 1.1  2006/02/27 16:57:12  blueyed
  * PluginUserSettings - allows a plugin to store user related settings
  *

@@ -65,7 +65,7 @@ class Plugin
 	 *
 	 * @var string
 	 */
-	var $name = 'Unnamed plug-in';
+	var $name = '__Unnamed plugin__';
 
 
 	/**
@@ -131,7 +131,7 @@ class Plugin
 	 *
 	 * @var string
 	 */
-	var $short_desc = 'No desc available';
+	var $short_desc = '__No desc available__';
 
 	/**#@-*/
 
@@ -147,7 +147,7 @@ class Plugin
 	 *
 	 * @var string
 	 */
-	var $long_desc = 'No description available';
+	var $long_desc = 'No long description available';
 
 
 	/**
@@ -215,6 +215,17 @@ class Plugin
 	 * @var NULL|PluginSettings
 	 */
 	var $Settings;
+
+
+	/**
+	 * If the plugin provides user settings, this will become the object to access them.
+	 *
+	 * This gets instantianted in {@link Plugins::instantiate_Settings()}.
+	 *
+	 * @see GetDefaultUserSettings()
+	 * @var NULL|PluginUserSettings
+	 */
+	var $UserSettings;
 
 
 	/**
@@ -553,11 +564,14 @@ class Plugin
 	 *
 	 * This is the hook to create any DB tables or the like.
 	 *
-	 * @return boolean true on success, false on failure (the plugin won't get installed then).
+	 * If you just want to add a note, use {@link Plugin::msg()} (and return true).
+	 *
+	 * @return true|string True, if the plugin can be enabled/activated,
+	 *                     a string with an error/note otherwise.
 	 */
 	function BeforeInstall()
 	{
-		return true;
+		return true;  // default is to allow Installation
 	}
 
 
@@ -583,7 +597,7 @@ class Plugin
 	 *              'handles_display': Setting it to true avoids a generic "Uninstall failed" message.
 	 *              'unattended': true if Uninstall is unattended (Install action "deletedb"). Removes tables without confirmation.
 	 * @return boolean|NULL true on success, false on failure (the plugin won't get uninstalled then).
-	 *         NULL requests to execute th {@link BeforeUninstallPayload()} method.
+	 *         NULL requests to execute the {@link BeforeUninstallPayload()} method.
 	 */
 	function BeforeUninstall( & $params )
 	{
@@ -666,8 +680,8 @@ class Plugin
 	 *
 	 * If you want to disable your Plugin yourself, use {@link Plugin::disable()}.
 	 *
-	 * @return boolean|string True, if the plugin can be enabled/activated,
-	 *                        a string with an error/note otherwise.
+	 * @return true|string True, if the plugin can be enabled/activated,
+	 *                     a string with an error/note otherwise.
 	 */
 	function BeforeEnable()
 	{
@@ -904,6 +918,7 @@ class Plugin
 	}
 
 
+	// PluginSettings {{{
 	/**
 	 * Event handler: Called before displaying or setting a plugin's setting in the backoffice.
 	 *
@@ -911,6 +926,7 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'name': name of the setting
 	 *   - 'value': value of the setting (by reference)
+	 *   - 'meta': meta data of the setting (as given in {@link GetDefaultSettings()})
 	 * @return string|NULL Return a string with an error to prevent the setting from being set
 	 *                     and/or a message added to the settings field.
 	 */
@@ -920,12 +936,58 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called as action just before updating the {@link Plugin::Settings plugin's settings}.
+	 *
+	 * The "regular" settings from {@link GetDefaultSettings()} have been set into
+	 * {@link Plugin::Settings}, but get saved into DB after this method has been called.
+	 *
+	 * Use this to catch custom input fields from {@link PluginSettingsEditDisplayAfter()} or
+	 * add notes/errors through {@link Plugin::msg()}.
+	 */
+	function PluginSettingsUpdateAction()
+	{
+	}
+
+
+	/**
+	 * Event handler: Called after the form to edit the {@link Plugin::Settings} has been
+	 * displayed.
+	 *
+	 * Use this to add custom input fields (and catch them in {@link PluginSettingsUpdateAction()})
+	 * or display custom output (e.g. a test link).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form}, where an fieldset has been opened already (by reference)
+	 */
+	function PluginSettingsEditDisplayAfter( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called after the {@link Plugin::Settings Settings object of the Plugin}
+	 * has been instantiated.
+	 *
+	 * Use this to validate Settings and/or cache them into class properties.
+	 *
+	 * @return boolean If false gets returned the Plugin gets unregistered (for the current request only).
+	 */
+	function PluginSettingsInstantiated()
+	{
+	}
+	// }}}
+
+
+	// PluginUserSettings {{{
+	/**
 	 * Event handler: Called before displaying or setting a plugin's user setting in the backoffice.
 	 *
 	 * @see GetDefaultUserSettings()
 	 * @param array Associative array of parameters
 	 *   - 'name': name of the setting
 	 *   - 'value': value of the setting (by reference)
+	 *   - 'meta': meta data of the setting (as given in {@link GetDefaultUserSettings()})
+	 *   - 'User': the {@link User} for which the setting is
 	 * @return string|NULL Return a string with an error to prevent the setting from being set
 	 *                     and/or a message added to the settings field.
 	 */
@@ -935,25 +997,46 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called as action before displaying the payload
-	 * to edit the plugin's settings.
+	 * Event handler: Called as action just before updating the {@link Plugin::UserSettings plugin's user settings}.
+	 *
+	 * The "regular" settings from {@link GetDefaultUserSettings()} have been set into
+	 * {@link Plugin::UserSettings}, but get saved into DB after this method has been called.
+	 *
+	 * Use this to catch custom input fields from {@link PluginUserSettingsEditDisplayAfter()} or
+	 * add notes/errors through {@link Plugin::msg()}.
 	 */
-	function PluginSettingsEditAction( & $params )
+	function PluginUserSettingsUpdateAction()
 	{
 	}
 
 
 	/**
-	 * Event handler: Called after the {@link Plugin::Settings Settings object of the Plugin}
+	 * Event handler: Called after the form to edit the {@link Plugin::UserSettings} has been
+	 * displayed.
+	 *
+	 * Use this to add custom input fields (and catch them in {@link PluginUserSettingsUpdateAction()})
+	 * or display custom output (e.g. a test link).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form}, where an fieldset has been opened already (by reference)
+	 */
+	function PluginUserSettingsEditDisplayAfter( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called after the {@link Plugin::UserSettings UserSettings object of the Plugin}
 	 * has been instantiated.
 	 *
-	 * Use this to validate Settings or cache them into class properties.
+	 * Use this to validate user Settings and/or cache them into class properties.
 	 *
 	 * @return boolean If false gets returned the Plugin gets unregistered (for the current request only).
 	 */
-	function PluginSettingsInstantiated( & $params )
+	function PluginUserSettingsInstantiated()
 	{
 	}
+	// }}}
 
 
 	/**
@@ -1135,7 +1218,7 @@ class Plugin
 			return false;
 		}
 
-		$Plugins->set_status( $this->ID, $status );
+		$Plugins->set_Plugin_status( $this, $status );
 	}
 
 
@@ -1348,6 +1431,7 @@ class Plugin
 	 * @param boolean Use external help? See {@link $help_url}.
 	 * @param string Word to use after the icon.
 	 * @param string Icon to use. Default for 'internal' is 'help', and for 'external' it is 'www'. See {@link $map_iconfiles}.
+	 * @param array Additional link attributes. See {@link action_link()}
 	 * @return string|false The html A tag, linking to the help.
 	 *         False if internal help requested, but not available (see {@link Plugins::get_help_file()}).
 	 */
@@ -1386,7 +1470,17 @@ class Plugin
 			}
 			else
 			{
-				$action = 'disp_help';
+				$action = 'disp_help_plain';
+
+				if( ! isset($link_attribs['use_js_popup']) )
+				{
+					$link_attribs['use_js_popup'] = true;
+
+					if( ! isset($link_attribs['id']) )
+					{
+						$link_attribs['id'] = 'plugin_'.$this->ID.'_help_'.$anchor.rand(0, 10000);
+					}
+				}
 			}
 
 			$url = url_add_param( $admin_url, 'ctrl=plugins&amp;action='.$action.'&amp;plugin_ID='.$this->ID );
@@ -1450,6 +1544,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.5  2006/03/01 01:07:43  blueyed
+ * Plugin(s) polishing
+ *
  * Revision 1.4  2006/02/27 16:57:12  blueyed
  * PluginUserSettings - allows a plugin to store user related settings
  *

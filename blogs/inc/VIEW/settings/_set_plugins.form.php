@@ -31,12 +31,12 @@ global $UserSettings;
 
 ?>
 <fieldset class="clear"><!-- "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509) -->
-	<legend><?php echo T_('Installed plug-ins') ?></legend>
+	<legend><?php echo T_('Installed plugins') ?></legend>
 	<table class="grouped" cellspacing="0">
 		<thead>
 		<tr>
 			<th class="firstcol"></th>
-			<th class="firstcol"><?php echo T_('Plug-in') ?></th>
+			<th class="firstcol"><?php echo T_('Plugin') ?></th>
 			<th><?php echo T_('Priority') ?></th>
 			<th title="<?php echo T_('When should rendering apply?') ?>"><?php echo T_('Apply') ?></th>
 			<th class="advanced_info" title="<?php echo T_('The code to call the plugin by code (SkinTag) or as Renderer.') ?>"><?php echo /* TRANS: Code of a plugin */ T_('Code') ?></th>
@@ -68,6 +68,7 @@ global $UserSettings;
 			}
 			else
 			{
+				// TODO: we might want an extra item for status == 'broken' here..
 				echo get_icon('disabled', 'imgtag', array('title'=>T_('The plugin is disabled.')) );
 			}
 			?>
@@ -120,8 +121,7 @@ global $UserSettings;
 		</tbody>
 	</table>
 	<p class="center">
-		<a href="admin.php?ctrl=plugins&amp;action=reload_plugins"><?php echo T_('Reload events and codes for installed plug-ins.')
-		/* TODO: explain why we need this and find a better name. ONE THING SEEMS SURE THOUGH: this does NOT "reload" the plugins. */ ?></a>
+		<a href="admin.php?ctrl=plugins&amp;action=reload_plugins"><?php echo T_('Reload events and codes for installed plugins.') ?></a>
 	</p>
 </fieldset>
 
@@ -144,7 +144,7 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 ?>
 
 <fieldset>
-	<legend><?php echo T_('Available plug-ins') ?></legend>
+	<legend><?php echo T_('Available plugins') ?></legend>
 	<div class="right_icons" style="text-align:right"><?php // TODO: remove "style" attrib if "right_icons" is defined
 	// Hide available plugins:
 	echo action_icon( T_('Hide available plugins'), 'close', regenerate_url( 'plugins_disp_avail', 'plugins_disp_avail=0' ) )
@@ -153,7 +153,7 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 	<table class="grouped" cellspacing="0">
 		<tbody>
 		<tr>
-			<th class="firstcol"><?php echo T_('Plug-in') ?></th>
+			<th class="firstcol"><?php echo T_('Plugin') ?></th>
 			<th><?php echo T_('Description') ?></th>
 			<th><?php echo T_('Help') ?></th>
 			<th class="lastcol"><?php echo T_('Actions') ?></th>

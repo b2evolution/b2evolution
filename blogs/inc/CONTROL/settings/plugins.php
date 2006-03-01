@@ -344,7 +344,10 @@ switch( $action )
 		}
 
 		// Update plugin version in DB:
-		$DB->query( 'UPDATE T_plugins SET plug_version = "'.$DB->quote($edit_Plugin->version).'"' );
+		$DB->query( '
+				UPDATE T_plugins
+				   SET plug_version = '.$DB->quote($edit_Plugin->version).'
+				 WHERE plug_ID = '.$edit_Plugin->ID );
 
 		// Try to enable plugin:
 		$enable_return = $edit_Plugin->BeforeEnable();
@@ -426,7 +429,7 @@ switch( $action )
 		}
 
 
-	case 'install_db_schema': // we come here from the first step
+	case 'install_db_schema': // we come here from the first step ("install")
 		$Request->param( 'plugin_ID', 'integer', 0 );
 
 		if( $plugin_ID )
@@ -593,6 +596,9 @@ switch( $action )
 			require_once $inc_path.'_misc/_plugin.funcs.php';
 			set_Settings_for_Plugin_from_params( $edit_Plugin, $admin_Plugins, 'Settings' );
 
+			// Let the plugin handle custom fields:
+			$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
+
 			if( $edit_Plugin->Settings->dbupdate() )
 			{
 				$Messages->add( T_('Plugin settings have been updated.'), 'success' );
@@ -648,8 +654,6 @@ switch( $action )
 			$action = 'list';
 			break;
 		}
-
-		$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $params = array() );
 
 		// Params for form:
 		$edited_plugin_code = $edit_Plugin->code;

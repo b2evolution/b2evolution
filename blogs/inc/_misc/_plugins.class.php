@@ -2,7 +2,7 @@
 /**
  * This file implements the PluginS class.
  *
- * This is where you can plug-in some {@link Plugin plugins} :D
+ * This is where you can plugin some {@link Plugin plugins} :D
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
@@ -50,7 +50,7 @@ require_once dirname(__FILE__).'/_plugin.class.php';
 /**
  * Plugins Class
  *
- * This is where you can plug-in some {@link Plugin plugins} :D
+ * This is where you can plugin some {@link Plugin plugins} :D
  *
  * @todo A plugin might want to register allowed events (that it triggers itself) on installation..
  * @package evocore
@@ -67,7 +67,7 @@ class Plugins
 	var $api_version = array( 1, 0 );
 
 	/**
-	 * Array of loaded plug-ins.
+	 * Array of loaded plugins.
 	 */
 	var $Plugins = array();
 
@@ -107,7 +107,11 @@ class Plugins
 	var $index_apply_rendering_codes = array();
 
 	/**
-	 * Path to plug-ins.
+	 * Path to plugins.
+	 *
+	 * The preferred method is to have a sub-directory for each plugin (named
+	 * after the plugin's classname), but they can be supplied just in this
+	 * directory.
 	 */
 	var $plugins_path;
 
@@ -144,12 +148,6 @@ class Plugins
 	 * @var array
 	 */
 	var $_supported_events;
-
-	/**
-	 * A list of events that should not be allowed to be disabled in the backoffice.
-	 * @var array
-	 */
-	var $_supported_private_events = array( 'PluginSettingsInstantiated', 'AfterInstall', 'BeforeInstall', 'BeforeUninstall' );
 
 	/**#@-*/
 
@@ -190,10 +188,26 @@ class Plugins
 	/**
 	 * Get the list of supported/available events/hooks.
 	 *
-	 * Those listed in {@link $_supported_private_events} are supported, but
-	 * cannot be disabled in backoffice.
-	 *
 	 * @todo Finish descriptions
+	 *
+	 * {@internal
+	 * Additional to the returned event methods (which can be disabled), there are internal
+	 * ones which just get called on the plugin (and get not remembered in T_pluginevents), e.g.:
+	 *  - AfterInstall
+	 *  - BeforeInstall
+	 *  - BeforeUninstall
+	 *  - BeforeUninstallPayload
+	 *  - GetDefaultSettings
+	 *  - GetDefaultUserSettings
+	 *  - PluginSettingsUpdateAction (Called as action before editing the plugin's settings)
+	 *  - PluginSettingsEditDisplayAfter (Called after standard plugin settings are displayed for editing)
+	 *  - PluginSettingsInstantiated
+	 *  - PluginSettingsValidateSet (Called before setting a plugin's setting in the backoffice)
+	 *  - PluginUserSettingsUpdateAction (Called as action before editing the plugin's user settings)
+	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
+	 *  - PluginUserSettingsInstantiated
+	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
+	 * }}
 	 *
 	 * @return array Name of event (key) => description (value)
 	 */
@@ -225,11 +239,6 @@ class Plugins
 				'AfterItemInsert' => '',
 				'AfterItemUpdate' => '',
 
-				'PluginSettingsInstantiated' => '', /* private / needs no description */
-				'PluginSettingsValidateSet' => T_("Called before setting a plugin's setting in the backoffice."),
-				'PluginSettingsEditAction' => T_("Called as action before editing the plugin's settings."),
-				'PluginSettingsEditDisplayAfter' => T_('Called after standard plugin settings are displayed for editing.'),
-
 				'RenderItemAsHtml' => T_('Renders content when generated as HTML.'),
 				'RenderItemAsXml' => T_('Renders content when generated as XML.'),
 				'RenderItem' => T_('Renders content when not generated as HTML or XML.'),
@@ -258,11 +267,6 @@ class Plugins
 				'CaptchaPayload' => T_('Provide a turing test to detect humans.'),
 
 				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
-				'GetDefaultSettings' => '',  /* private / needs not description */ // used to instantiate $Settings.
-				'GetDefaultUserSettings' => '',
-				'AfterInstall' => '', /* private / needs not description */
-				'AfterUninstall' => '', /* private / needs not description */
-				'BeforeInstall' => '', /* private / needs not description */
 				'LoginAttempt' => '',
 				'SessionLoaded' => '', // gets called after $Session is initialized, quite early.
 			);
@@ -397,7 +401,7 @@ class Plugins
 	 */
 	function set_Plugin_status( & $Plugin, $status )
 	{
-		global $DB;
+		global $DB, $Debuglog;
 
 		$DB->query( 'UPDATE T_plugins SET plug_status = "'.$status.'" WHERE plug_ID = "'.$Plugin->ID.'"' );
 
@@ -411,7 +415,10 @@ class Plugins
 		{
 			$this->unregister( $Plugin );
 		}
+
 		$Plugin->status = $status;
+
+		$Debuglog->add( 'Set status for plugin #'.$Plugin->ID.' to "'.$status.'"!', 'plugins' );
 	}
 
 
@@ -445,10 +452,15 @@ class Plugins
 			return $r;
 		}
 
-		if( ! $Plugin->BeforeInstall() )
+		$install_return = $Plugin->BeforeInstall();
+		if( $install_return !== true )
 		{
 			$this->unregister( $Plugin );
 			$r = T_('The installation of the plugin failed.');
+			if( is_string($install_return) )
+			{
+				$r .= '<br />'.$install_return;
+			}
 			return $r;
 		}
 
@@ -825,10 +837,13 @@ class Plugins
 
 		if( empty($classfile_path) )
 		{
-			$classfile_path = $this->plugins_path.'_'.str_replace( '_plugin', '.plugin', $classname ).'.php';
+			$plugin_filename = '_'.str_replace( '_plugin', '.plugin', $classname ).'.php';
+			// Try <plug_classname>/<plug_classname>.php (subfolder) first
+			$classfile_path = $this->plugins_path.$classname.'/'.$plugin_filename;
+
 			if( ! is_readable( $classfile_path ) )
-			{ // Try <plug_classname>/<plug_classname>.php (subfolder)
-				$classfile_path = $this->plugins_path.$classname.'/_'.str_replace( '_plugin', '.plugin', $classname ).'.php';
+			{ // Look directly in $plugins_path
+				$classfile_path = $this->plugins_path.$plugin_filename;
 			}
 		}
 
@@ -1195,13 +1210,13 @@ class Plugins
 	 *
 	 * @param Plugin
 	 * @return NULL|boolean NULL, if no Settings;
-	 *    False, if the plugin's method {@link PluginSettingsInstantiated()} returned false.
+	 *    False, if the plugin's method {@link PluginSettingsInstantiated()} or {@link PluginUserSettingsInstantiated()} returned false.
 	 */
 	function instantiate_Settings( & $Plugin, $set_type )
 	{
 		global $Debuglog, $Timer, $model_path;
 
-		$Timer->resume( 'plugins_settings' );
+		$Timer->resume( 'plugins_inst_'.$set_type );
 
 		$r = true;
 
@@ -1209,6 +1224,7 @@ class Plugins
 
 		if( empty($defaults) )
 		{
+			$Timer->pause( 'plugins_inst_'.$set_type );
 			return NULL;
 		}
 
@@ -1245,6 +1261,7 @@ class Plugins
 				}
 			}
 
+			// Call PluginSettingsInstantiated() / PluginUserSettingsInstantiated() on the plugin
 			$event_r = $this->call_method( $Plugin->ID, 'Plugin'.$set_type.'Instantiated', $params = array() );
 			if( $event_r === false )
 			{
@@ -1252,7 +1269,7 @@ class Plugins
 			}
 		}
 
-		$Timer->pause( 'plugins_settings' );
+		$Timer->pause( 'plugins_inst_'.$set_type );
 
 		return $r;
 	}
@@ -2348,6 +2365,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/01 01:07:43  blueyed
+ * Plugin(s) polishing
+ *
  * Revision 1.4  2006/02/27 16:57:12  blueyed
  * PluginUserSettings - allows a plugin to store user related settings
  *
