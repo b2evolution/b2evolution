@@ -32,10 +32,10 @@ function db_delete()
 	echo "Dropping Categories-to-Posts relationships...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_postcats' );
 
- 	echo "Dropping Links...<br />\n";
+	echo "Dropping Links...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_links' );
 
- 	echo "Dropping Files...<br />\n";
+	echo "Dropping Files...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_files' );
 
 	echo "Dropping Posts...<br />\n";
@@ -53,7 +53,7 @@ function db_delete()
 	echo "Dropping User Settings...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_usersettings' );
 
- 	echo "Dropping User sessions...<br />\n";
+	echo "Dropping User sessions...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_sessions' );
 
 	echo "Dropping User permissions on Blogs...<br />\n";
@@ -89,6 +89,9 @@ function db_delete()
 	echo "Dropping Plugin Settings...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_pluginsettings' );
 
+	echo "Dropping Plugin User Settings...<br />\n";
+	$DB->query( 'DROP TABLE IF EXISTS T_pluginusersettings' );
+
 	echo "Dropping Plugins registrations...<br />\n";
 	$DB->query( 'DROP TABLE IF EXISTS T_plugins' );
 
@@ -101,6 +104,9 @@ function db_delete()
 
 /*
  * $Log$
+ * Revision 1.28  2006/03/01 23:43:30  blueyed
+ * T_pluginusersettings
+ *
  * Revision 1.27  2006/02/13 20:20:10  fplanque
  * minor / cleanup
  *
