@@ -62,6 +62,14 @@ if(!$Settings->get('newusers_canregister'))
 switch( $action )
 {
 	case 'register':
+		// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
+		$Plugins->trigger_event( 'RegisterFormSent' );
+
+		if( $Messages->count( 'error' ) )
+		{ // a Plugin has added an error
+			break;
+		}
+
 		/*
 		 * Do the registration:
 		 */
@@ -69,11 +77,8 @@ switch( $action )
 		param( 'pass1', 'string', '' );
 		param( 'pass2', 'string', '' );
 
-		profile_check_params( array( 'login' => $login,
-																	'pass1' => $pass1,
-																	'pass2' => $pass2,
-																	'email' => $email,
-																	'pass_required' => true ) );
+		// Check profile params:
+		profile_check_params( array( 'login' => $login, 'pass1' => $pass1, 'pass2' => $pass2, 'email' => $email, 'pass_required' => true ) );
 
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
 		$login = strtolower( $login );
@@ -84,7 +89,7 @@ switch( $action )
 			break;
 		}
 
-		if( !$Messages->count( 'error' ) )
+		if( ! $Messages->count( 'error' ) )
 		{
 			// TODO: START TRANSACTION !!
 
@@ -132,7 +137,7 @@ switch( $action )
 			locale_restore_previous();
 
 			// Display confirmation screen:
-			require( dirname(__FILE__).'/_reg_complete.php' );
+			require $view_path.'login/_reg_complete.php';
 
 			exit();
 		}
@@ -143,7 +148,7 @@ switch( $action )
 		/*
 		 * Registration disabled:
 		 */
-		require( dirname(__FILE__).'/_reg_disabled.php' );
+		require $view_path.'login/_reg_disabled.php';
 
 		exit();
 }
@@ -154,6 +159,6 @@ switch( $action )
  */
 param( 'redirect_to', 'string', $admin_url );
 // Display reg form:
-require( dirname(__FILE__).'/_reg_form.php' );
+require $view_path.'login/_reg_form.php';
 
 ?>

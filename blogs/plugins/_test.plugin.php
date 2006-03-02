@@ -408,5 +408,26 @@ class test_plugin extends Plugin
 		$this->msg( 'The TEST plugin welcomes the new user '.$params['User']->dget('login').'!' );
 	}
 
+
+	/**
+	 * Event handler: Called at the end of the "Login" form.
+	 * @see Plugin::DisplayLoginFormFieldset()
+	 */
+	function DisplayLoginFormFieldset( & $params )
+	{
+		$params['Form']->info_field( 'TEST plugin', 'This is added by the TEST plugin.' );
+	}
+
+
+	/**
+	 * Event handler: Called when a user tries to login.
+	 * @see Plugin::LoginAttempt()
+	 */
+	function LoginAttempt()
+	{
+		// $this->msg( 'NO LOGIN!', 'login_error' );
+		$this->msg( 'The TEST plugin welcomes you..', 'note' );
+	}
+
 }
 ?>

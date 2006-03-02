@@ -77,6 +77,9 @@ $Form->begin_form( 'fform' );
 
 	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'maxlength' => 50, 'class' => 'input_text' ) );
 
+	// Allow a plugin to add fields/payload
+	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
+
 	echo $Form->fieldstart;
 	echo $Form->inputstart;
 	$Form->submit( array( 'login_action[login]', T_('Log in!'), 'search' ) );

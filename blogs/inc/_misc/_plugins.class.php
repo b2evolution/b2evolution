@@ -259,8 +259,12 @@ class Plugins
 
 				'DisplayCommentFormButton' => '',
 				'DisplayCommentFormFieldset' => '',
+				'DisplayLoginFormFieldset' => T_('Called when displaying the "Login" form.'),
+				'DisplayRegisterFormFieldset' => T_('Called when displaying the "Register" form.'),
 
 				'CommentFormSent' => T_('Called when a comment form has been submitted.'),
+				'LoginAttempt' => T_('Called when a user tries to login.'),
+				'RegisterFormSent' => T_('Called when the "Register" form has been submitted.'),
 
 				'GetKarmaForComment' => '',
 
@@ -269,7 +273,6 @@ class Plugins
 				'CaptchaPayload' => T_('Provide a turing test to detect humans.'),
 
 				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
-				'LoginAttempt' => '',
 				'SessionLoaded' => '', // gets called after $Session is initialized, quite early.
 			);
 		}
@@ -2354,6 +2357,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.7  2006/03/02 22:18:24  blueyed
+ * New events
+ *
  * Revision 1.6  2006/03/02 19:57:53  blueyed
  * Added DisplayIpAddress() and fixed/finished DisplayItemAllFormats()
  *

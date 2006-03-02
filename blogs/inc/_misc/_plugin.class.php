@@ -701,24 +701,11 @@ class Plugin
 
 
 	/**
-	 * Event handler: called when a user attemps to login.
-	 *
-	 * @param array Associative array of parameters
-	 *              'login': user's login
-	 *              'pass': user's password
-	 *              'pass_md5': user's md5 password
-	 */
-	function LoginAttempt( $params )
-	{
-	}
-
-
-	/**
 	 * Event handler: Called when a new user has registered, at the end of the
 	 *                DB transaction that creates this user.
 	 *
 	 * @param array Associative array of parameters
-	 *              'User': the user object (as reference), see {@link User}.
+	 *   - 'User': the user object (as reference), see {@link User}.
 	 * @return boolean True, if the user should be created, false if not.
 	 */
 	function AppendUserRegistrTransact( & $params )
@@ -1118,6 +1105,64 @@ class Plugin
 	 *   - 'Item': the Item for which the comment is meant
 	 */
 	function CommentFormSent( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the "Register as new user" form.
+	 *
+	 * You might want to use this to inject antispam payload to use
+	 * in {@link RegisterFormSent()}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the comment form generating object
+	 */
+	function DisplayRegisterFormFieldset( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called when a "Register as new user" form got submitted.
+	 *
+	 * You can cancel the registration process by {@link Plugin::msg() adding a message}
+	 * of type "error".
+	 */
+	function RegisterFormSent( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the "Login" form.
+	 *
+	 * You might want to use this to inject payload to use
+	 * in {@link LoginAttempt()}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the comment form generating object
+	 */
+	function DisplayLoginFormFieldset( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called when a user attemps to login.
+	 *
+	 * You can prevent the user from logging in by {@link Plugin::msg() adding a message}
+	 * of type "login_error".
+	 *
+	 * Otherwise, this hook is meant to authenticate a user against some
+	 * external database (e.g. LDAP) and generate a new user.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'login': user's login
+	 *   - 'pass': user's password
+	 *   - 'pass_md5': user's md5 password
+	 */
+	function LoginAttempt( $params )
 	{
 	}
 
@@ -1576,6 +1621,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.7  2006/03/02 22:18:24  blueyed
+ * New events
+ *
  * Revision 1.6  2006/03/02 19:57:52  blueyed
  * Added DisplayIpAddress() and fixed/finished DisplayItemAllFormats()
  *
