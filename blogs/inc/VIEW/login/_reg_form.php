@@ -40,11 +40,13 @@ $Form->text( 'login', format_to_output($login, 'formvalue'), 16,  T_('Login'), '
 		</div>
 	</fieldset>
 
-<?php
-$Form->text( 'email', format_to_output($email, 'formvalue'), 16,  T_('Email'), '', 100, 'input_text' );
+	<?php
+	$Form->text( 'email', format_to_output($email, 'formvalue'), 16,  T_('Email'), '', 100, 'input_text' );
 
-$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
-?>
+	$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
+
+	$Plugins->trigger_event( 'DisplayRegisterFormFieldset', array( 'Form' => & $Form ) );
+	?>
 
 	<fieldset>
 		<div class="input">
