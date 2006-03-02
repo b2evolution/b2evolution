@@ -729,12 +729,12 @@ class Plugin
 	/**
 	 * Event handler: Called when rendering item/post contents as HTML.
 	 *
-	 * Note: You have to change $params['content'] (which gets passed by reference).
+	 * Note: You have to change $params['data'] (which gets passed by reference).
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
-	 * @return boolean Did we do something?
+	 * @return boolean Have we changed something?
 	 */
 	function RenderItemAsHtml( & $params )
 	{
@@ -755,12 +755,12 @@ class Plugin
 	 * - it removes some dirty markup when generating the tags (which will get stripped afterwards)
 	 * Note: htmlentityencoded is not considered as XML here.
 	 *
-	 * Note: You have to change $params['content'] (which gets passed by reference).
+	 * Note: You have to change $params['data'] (which gets passed by reference).
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'xml' will arrive here.
-	 * @return boolean Did we do something?
+	 * @return boolean Have we changed something?
 	 */
 	function RenderItemAsXml( & $params )
 	{
@@ -771,17 +771,49 @@ class Plugin
 	/**
 	 * Event handler: Called when rendering item/post contents other than XML or HTML.
 	 *
-	 * blueyed>> Still wondering if this is useful at all..
-	 *
-	 * Note: return value is ignored. You have to change $params['content'].
+	 * Note: return value is ignored. You have to change $params['data'].
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}.
 	 *               Only formats other than 'htmlbody', 'entityencoded' and 'xml' will arrive here.
-	 * @return boolean Did we do something?
+	 * @return boolean Have we changed something?
 	 */
 	function RenderItem()
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called when rendering item/post contents other than XML or HTML.
+	 *
+	 * This is different from {@link RenderItem()}, {@link RenderItemAsHtml()} and {@link RenderItemAsXml()}:
+	 *  - It applies on every display (rendering will get cached later)
+	 *  - It calls all Plugins that register this event, not just associated ones.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}.
+	 *   - 'Item': The {@link Item} that gets displayed (by reference).
+	 * @return boolean Have we changed something?
+	 */
+	function DisplayItemAllFormats( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called when an IP address gets displayed, typically in a protected
+	 * area or for a privileged user, e.g. in the backoffice statistics menu.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}.
+	 * @return boolean Have we changed something?
+	 */
+	function DisplayIpAddress( & $params )
 	{
 		return false;		// Do nothing by default.
 	}
@@ -1544,6 +1576,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.6  2006/03/02 19:57:52  blueyed
+ * Added DisplayIpAddress() and fixed/finished DisplayItemAllFormats()
+ *
  * Revision 1.5  2006/03/01 01:07:43  blueyed
  * Plugin(s) polishing
  *

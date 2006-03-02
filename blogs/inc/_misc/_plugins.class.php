@@ -251,6 +251,8 @@ class Plugins
 				*/
 				'DisplayItemAllFormats' => T_('Called on an item when it gets displayed.'),
 
+				'DisplayIpAddress' => T_('Called when displaying an IP address.'),
+
 				'ItemViewed' => T_('Called when the view counter of an item got increased.'),
 
 				'SkinTag' => '',
@@ -1357,55 +1359,6 @@ class Plugins
 
 
 	/**
-	 * Trigger appropriate events before displaying content.
-	 *
-	 * This is different from {@link render()}:
-	 *  - It applies on every display (rendering will get cached later)
-	 *  - It calls all Plugins that register these events, not just associated ones.
-	 *
-	 * @param string Content to render
-	 * @param mixed The affected object
-	 * @param string Output format, see {@link format_to_output()}
-	 * @param string Type of data to display ('ItemContent').
-	 * @return string rendered content
-	 */
-	function trigger_display( & $content, & $Object, $format, $type = 'ItemContent' )
-	{
-		$params = array(
-				'data'   => & $content,
-				'format' => $format,
-			);
-
-		if( $type == 'ItemContent' )
-		{
-			$params['Item'] = & $Object;
-		}
-
-		/*
-		Not used yet:
-		// TODO: support $type different than 'ItemContent'
-		if( $format == 'htmlbody' || $format == 'entityencoded' )
-		{
-			$event = 'DisplayItemAsHtml';
-		}
-		elseif( $format == 'xml' )
-		{
-			$event = 'DisplayItemAsXml';
-		}
-		else
-		{
-			$event = 'DisplayItem';
-		}
-		$this->trigger_event( $event, $params );
-		*/
-
-		$this->trigger_event( 'DisplayItemAllFormats', $params );
-
-		return $content;
-	}
-
-
-	/**
 	 * Call all plugins for a given event.
 	 *
 	 * @param string event name, see {@link Plugin}
@@ -1468,6 +1421,42 @@ class Plugins
 			}
 		}
 		return array();
+	}
+
+
+	/**
+	 * Trigger an $event and return an index of $params.
+	 *
+	 * @param string Event name, see {@link Plugins::get_supported_events()}
+	 * @param array Associative array of parameters for the Plugin
+	 * @param string Index of $params that should get returned
+	 * @return mixed The requested index of $params
+	 */
+	function get_trigger_event( $event, $params = NULL, $get = 'data' )
+	{
+		$params[$get] = & $params[$get]; // make it a reference, so it can get changed
+
+		$this->trigger_event( $event, $params );
+
+		return $params[$get];
+	}
+
+
+	/**
+	 * The same as {@link get_trigger_event()}, but stop when the first Plugin returns true.
+	 *
+	 * @param string Event name, see {@link Plugins::get_supported_events()}
+	 * @param array Associative array of parameters for the Plugin
+	 * @param string Index of $params that should get returned
+	 * @return mixed The requested index of $params
+	 */
+	function get_trigger_event_first_true( $event, $params = NULL, $get = 'data' )
+	{
+		$params[$get] = & $params[$get]; // make it a reference, so it can get changed
+
+		$this->trigger_event_first_true( $event, $params );
+
+		return $params[$get];
 	}
 
 
@@ -2365,6 +2354,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/02 19:57:53  blueyed
+ * Added DisplayIpAddress() and fixed/finished DisplayItemAllFormats()
+ *
  * Revision 1.5  2006/03/01 01:07:43  blueyed
  * Plugin(s) polishing
  *

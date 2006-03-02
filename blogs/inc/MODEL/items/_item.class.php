@@ -894,7 +894,7 @@ class Item extends DataObject
 		$output = $Plugins->render( $output, $post_renderers, $format );
 
 		// Apply Display plugins
-		$output = $Plugins->trigger_display( $output, $this, $format );
+		$output = $Plugins->get_trigger_event( 'DisplayItemAllFormats', array( 'data' => & $output, 'format' => $format, 'Item' => & $this ) );
 
 		// Character conversions
 		$output = format_to_output( $output, $format );
@@ -2385,6 +2385,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/02 19:57:53  blueyed
+ * Added DisplayIpAddress() and fixed/finished DisplayItemAllFormats()
+ *
  * Revision 1.5  2006/03/01 01:07:43  blueyed
  * Plugin(s) polishing
  *
