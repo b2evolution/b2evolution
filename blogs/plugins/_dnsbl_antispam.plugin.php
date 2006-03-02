@@ -113,6 +113,12 @@ class dnsbl_antispam_plugin extends Plugin
 				'note' => T_('Enable statistics. This generates a small overhead, but will show you how effective it is.'),
 				'type' => 'checkbox',
 			),
+			'url_ext_query' => array(
+				'label' => T_('Query URL'),
+				'defaultvalue' => 'http://openrbl.org/query?%IP%',
+				'note' => T_('URL to query an IP address in the browser ("%IP%" gets replaced by the IP address).'),
+				'size' => 30,
+			),
 			'tooslow_tries' => array(
 				'label' => T_('Retry slow lists'),
 				'defaultvalue' => '5',
@@ -261,12 +267,12 @@ class dnsbl_antispam_plugin extends Plugin
 		$Form->buttons( array(
 				array(
 					'name' => 'dnsblaction[checklist]',
-					'value' => T_('Check list'),
+					'value' => T_('Check my lists'),
 				),
 				array(
 					'name' => 'dnsblaction[checkopenrbl]',
 					'value' => T_('Check at openrbl.org'),
-					'onclick' => 'return pop_up_window( "http://openrbl.org/query?"+document.getElementById("check_for").value, "dnsbl_check" );',
+					'onclick' => 'return pop_up_window( "'.str_replace( '%IP%', '"+document.getElementById("check_for").value+"', $this->Settings->get('url_ext_query') ).'", "dnsbl_check" );',
 				)
 			) );
 		$Form->end_fieldset();
@@ -371,17 +377,6 @@ class dnsbl_antispam_plugin extends Plugin
 
 
 	/**
-	 * Handle display of the necessary {@link Uninstall()} payload.
-	 *
-	 * @return boolean
-	 */
-	function AdminBeginPayload()
-	{
-		return parent::AdminBeginPayload();
-	}
-
-
-	/**
 	 * Check dependency on Captcha plugin, add note in case it's missing and disable the setting.
 	 */
 	function AfterInstall()
@@ -463,6 +458,22 @@ class dnsbl_antispam_plugin extends Plugin
 
 		// IP not blocked
 		$this->update_stats( 'not_blocked' );
+	}
+
+
+	/**
+	 * We wrap IP addresses with a link that points to the IP (with "http://" prefixed) and
+	 * provide an onclick event to query the address through the browser.
+	 */
+	function DisplayIpAddress( & $params )
+	{
+		if( $params['format'] == 'htmlbody' )
+		{
+			$ip = & $params['data'];
+			$params['data'] = '<a href="http://'.$ip.'" onclick="return pop_up_window( \''.str_replace( '%IP%', $ip, $this->Settings->get('url_ext_query') ).'\', \'dnsbl_check\' );">'.$ip.'</a>';
+
+			$this->stop_propagation(); // don't let other plugins touch this..
+		}
 	}
 
 
@@ -671,6 +682,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.12  2006/03/02 20:03:39  blueyed
+ * Added DisplayIpAddress() and fixed/finished DisplayItemAllFormats()
+ *
  * Revision 1.11  2006/02/24 22:09:00  blueyed
  * Plugin enhancements
  *

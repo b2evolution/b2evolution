@@ -358,6 +358,15 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * Wrap a to be displayed IP address.
+	 */
+	function DisplayIpAddress( & $params )
+	{
+		$params['data'] = '[[IP:'.$params['data'].' (TEST plugin)]]';
+	}
+
+
+	/**
 	 * Event handler: Called before the plugin is installed.
 	 * @see Plugin::BeforeInstall()
 	 */
