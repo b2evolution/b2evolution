@@ -118,7 +118,10 @@ $search_engines = array(
  *
  * The following substrings will be looked up in the user_agent http header
  *
- * @todo move to admin interface (T_useragents), but use for upgrading to 0.9.2
+ * @todo move to admin interface (T_useragents)
+ *
+ * 'type' aggregator currently gets only used to "translate" user agent strings.
+ * An aggregator hit gets detected by accessing the feed.
  *
  * @global array $user_agents
  */

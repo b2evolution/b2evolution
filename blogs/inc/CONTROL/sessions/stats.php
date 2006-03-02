@@ -107,7 +107,7 @@ switch( $action )
 
 		if( Hitlist::delete( $hit_ID ) )
 		{
-			$Messages->add( sprintf( T_('Deleted hit #%d.'), $hit_ID ), 'note' );
+			$Messages->add( sprintf( T_('Deleted hit #%d.'), $hit_ID ), 'success' );
 		}
 		else
 		{
@@ -123,7 +123,7 @@ switch( $action )
 		param( 'date', 'integer', true ); // Required!
 		if( $r = Hitlist::prune( $date ) )
 		{
-			$Messages->add( sprintf( /* TRANS: %s is a date */ T_('Deleted %d hits for %s.'), $r, date( locale_datefmt(), $date) ), 'note' );
+			$Messages->add( sprintf( /* TRANS: %s is a date */ T_('Deleted %d hits for %s.'), $r, date( locale_datefmt(), $date) ), 'success' );
 		}
 		else
 		{
@@ -356,9 +356,8 @@ switch( $AdminUI->get_path(1) )
 						?>
 						<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
 							<td class="firstcol"><?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-								{ ?>
-									<a href="?ctrl=stats&amp;action=prune&amp;date=<?php echo $last_date ?>&amp;show=summary&amp;blog=<?php echo $blog ?>" title="<?php echo T_('Prune this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Prune hits for this date!') ?>" /></a>
-								<?php
+								{
+									echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog ) );
 								}
 								echo date( locale_datefmt(), $last_date ) ?>
 							</td>
@@ -386,9 +385,8 @@ switch( $AdminUI->get_path(1) )
 					?>
 					<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
 						<td class="firstcol"><?php if( $current_User->check_perm( 'stats', 'edit' ) )
-							{ ?>
-							<a href="?ctrl=stats&amp;action=prune&amp;date=<?php echo $this_date ?>&amp;show=summary&amp;blog=<?php echo $blog ?>" title="<?php echo T_('Prune hits for this date!') ?>"><img src="img/xross.gif" width="13" height="13" class="middle" alt="<?php echo /* TRANS: Abbrev. for Prune (stats) */ T_('Prune') ?>"  title="<?php echo T_('Prune hits for this date!') ?>" /></a>
-							<?php
+							{
+								echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog ) );
 							}
 							echo date( locale_datefmt(), $this_date ) ?>
 						</td>
@@ -414,42 +412,41 @@ switch( $AdminUI->get_path(1) )
 			<p><?php echo T_('These are hits from external web pages refering to this blog') ?>.</p>
 			<?php
 			// Create result set:
-			$Results = & new Results( "SELECT hit_ID, hit_datetime, hit_referer,
-																			dom_name, hit_blog_ID, hit_uri, blog_shortname
-																FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
-																			LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
-																WHERE hit_referer_type = 'referer' "
-																	.( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
+			$Results = & new Results( "
+					SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
+					  FROM T_hitlog INNER JOIN T_basedomains
+					    ON dom_ID = hit_referer_dom_ID INNER JOIN T_sessions
+					    ON hit_sess_ID = sess_ID LEFT JOIN T_blogs
+					    ON hit_blog_ID = blog_ID
+					 WHERE hit_referer_type = 'referer' "
+					 .( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
 
 			$Results->title = T_('Last referers');
 
 			// datetime:
 			$Results->cols[0] = array(
-									'th' => T_('Date Time'),
-									'order' => 'hit_datetime',
-									'td' => '%mysql2localedatetime( \'$hit_datetime$\' )%',
-								);
+					'th' => T_('Date Time'),
+					'order' => 'hit_datetime',
+					'td' => '%mysql2localedatetime( \'$hit_datetime$\' )%',
+				);
 
 			// Referer:
 			$Results->cols[1] = array(
-									'th' => T_('Referer'),
-									'order' => 'dom_name',
-								);
+					'th' => T_('Referer'),
+					'order' => 'dom_name',
+				);
 			if( $current_User->check_perm( 'stats', 'edit' ) )
 			{
-				$Results->cols[1]['td'] = '<a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$hit_ID$\')%" title="'.
-																	T_('Delete this hit!').
-																	'"><img src="img/xross.gif" width="13" height="13" class="middle" alt="'.
-																	/* TRANS: Abbrev. for Delete (stats) */ T_('Del').
-																	'" title="'.T_('Delete this hit!').'" /></a> '.
+				$Results->cols[1]['td'] = '<a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$hit_ID$\')%" title="'
+						.T_('Delete this hit!').'">'.get_icon( 'delete' ).'</a> '
 
-																	'<a href="%regenerate_url( \'action\', \'action=changetype&amp;new_hit_type=search&amp;hit_ID=$hit_ID$\')%" title="'.
-																	T_('Log as a search instead').
-																	'"><img src="img/magnifier.png" width="14" height="13" class="middle" alt="'.
-																	/* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S').
-																	'" title="'.T_('Log as a search instead').'" /></a> '.
+						.'<a href="%regenerate_url( \'action\', \'action=changetype&amp;new_hit_type=search&amp;hit_ID=$hit_ID$\')%" title="'
+						.T_('Log as a search instead')
+						.'"><img src="'.$rsc_url.'icons/magnifier.png" width="14" height="13" class="middle" alt="'
+						./* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S')
+						.'" title="'.T_('Log as a search instead').'" /></a> '
 
-																	'<a href="$hit_referer$">$dom_name$</a>';
+						.'<a href="$hit_referer$">$dom_name$</a>';
 			}
 			else
 			{
@@ -460,29 +457,35 @@ switch( $AdminUI->get_path(1) )
 			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{
 				$Results->cols[] = array(
-										'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
-										'td' => '<a href="?ctrl=antispam&amp;action=ban&amp;keyword=%rawurlencode( \'$dom_name$\' )%" title="'
-											.T_('Ban this domain!').'"><img src="img/noicon.gif" class="middle" alt="'
-											./* TRANS: Abbrev. */ T_('Ban').'" title="'.T_('Ban this domain!').'" /></a>',
-									);
+						'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
+						'td' => '<a href="?ctrl=antispam&amp;action=ban&amp;keyword=%rawurlencode( \'$dom_name$\' )%" title="'
+							.T_('Ban this domain!').'">'.get_icon('ban').'</a>',
+					);
 			}
 
 			// Target Blog:
 			if( empty($blog) )
 			{
 				$Results->cols[] = array(
-										'th' => T_('Target Blog'),
-										'order' => 'hit_blog_ID',
-										'td' => '$blog_shortname$',
-									);
+						'th' => T_('Target Blog'),
+						'order' => 'hit_blog_ID',
+						'td' => '$blog_shortname$',
+					);
 			}
 
 			// Requested URI:
 			$Results->cols[] = array(
-									'th' => T_('Requested URI'),
-									'order' => 'hit_uri',
-									'td' => '<a href="$hit_uri$">$hit_uri$</a>',
-								);
+					'th' => T_('Requested URI'),
+					'order' => 'hit_uri',
+					'td' => '<a href="$hit_uri$">$hit_uri$</a>',
+				);
+
+			// Remote address (IP):
+			$Results->cols[] = array(
+					'th' => '<span title="'.T_('Remote address').'">'.T_('IP').'</span>',
+					'order' => 'hit_remote_addr',
+					'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'DisplayIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
+				);
 
 
 			// Display results:
@@ -513,67 +516,75 @@ switch( $AdminUI->get_path(1) )
 					$chart [ 'chart_data' ][ 1 ][ $count ] = stats_hit_count( false );
 				} // End stat loop
 
-				$chart[ 'canvas_bg' ] = array (		'width'  => 780,
-																					'height' => 350,
-																					'color'  => 'efede0'
-																			);
+				$chart[ 'canvas_bg' ] = array (
+						'width'  => 780,
+						'height' => 350,
+						'color'  => 'efede0'
+					);
 
-				$chart[ 'chart_rect' ] = array (	'x'      => 60,
-																					'y'      => 50,
-																					'width'  => 250,
-																					'height' => 250
-																			);
+				$chart[ 'chart_rect' ] = array (
+						'x'      => 60,
+						'y'      => 50,
+						'width'  => 250,
+						'height' => 250
+					);
 
-				$chart[ 'legend_rect' ] = array ( 'x'      => 400,
-																					'y'      => 70,
-																					'width'  => 340,
-																					'height' => 230,
-																					'margin' => 6
-																			);
+				$chart[ 'legend_rect' ] = array (
+						'x'      => 400,
+						'y'      => 70,
+						'width'  => 340,
+						'height' => 230,
+						'margin' => 6
+					);
 
 				$chart[ 'draw_text' ] = array (
-																				array ( 'color'    => '9e9286',
-																								'alpha'    => 75,
-																								'font'     => "arial",
-																								'rotation' => 0,
-																								'bold'     => true,
-																								'size'     => 42,
-																								'x'        => 50,
-																								'y'        => 6,
-																								'width'    => 700,
-																								'height'   => 50,
-																								'text'     => 'Top referers',
-																								'h_align'  => "right",
-																								'v_align'  => "bottom" )
-																				);
+							array (
+								'color'    => '9e9286',
+								'alpha'    => 75,
+								'font'     => "arial",
+								'rotation' => 0,
+								'bold'     => true,
+								'size'     => 42,
+								'x'        => 50,
+								'y'        => 6,
+								'width'    => 700,
+								'height'   => 50,
+								'text'     => 'Top referers',
+								'h_align'  => "right",
+								'v_align'  => "bottom" ),
+						);
 
-				$chart[ 'chart_bg' ] = array (		'positive_color' => "ffffff",
-																					// 'negative_color'  =>  string,
-																					'positive_alpha' => 20,
-																					// 'negative_alpha'  =>  int
-																			);
+				$chart[ 'chart_bg' ] = array (
+						'positive_color' => "ffffff",
+						// 'negative_color'  =>  string,
+						'positive_alpha' => 20,
+						// 'negative_alpha'  =>  int
+					);
 
-				$chart [ 'legend_bg' ] = array (  'bg_color'          =>  "ffffff",
-																					'bg_alpha'          =>  20,
-																					// 'border_color'      =>  "000000",
-																					// 'border_alpha'      =>  100,
-																					// 'border_thickness'  =>  1
-																			);
+				$chart [ 'legend_bg' ] = array (
+						'bg_color'          =>  "ffffff",
+						'bg_alpha'          =>  20,
+						// 'border_color'      =>  "000000",
+						// 'border_alpha'      =>  100,
+						// 'border_thickness'  =>  1
+					);
 
-				$chart [ 'legend_label' ] = array(// 'layout'  =>  "horizontal",
-																					// 'font'    =>  string,
-																					// 'bold'    =>  boolean,
-																					'size'    =>  15,
-																					// 'color'   =>  string,
-																					// 'alpha'   =>  int
-																			 );
+				$chart [ 'legend_label' ] = array(
+						// 'layout'  =>  "horizontal",
+						// 'font'    =>  string,
+						// 'bold'    =>  boolean,
+						'size'    =>  15,
+						// 'color'   =>  string,
+						// 'alpha'   =>  int
+					);
 
-				/*$chart[ 'chart_border' ] = array ('color'=>"000000",
-																					'top_thickness'=>1,
-																					'bottom_thickness'=>1,
-																					'left_thickness'=>1,
-																					'right_thickness'=>1
-																			);*/
+				/*$chart[ 'chart_border' ] = array (
+							'color'=>"000000",
+							'top_thickness'=>1,
+							'bottom_thickness'=>1,
+							'left_thickness'=>1,
+							'right_thickness'=>1
+					);*/
 
 				$chart[ 'chart_type' ] = 'pie';
 
@@ -582,41 +593,41 @@ switch( $AdminUI->get_path(1) )
 				$chart [ 'series_explode' ] =  array ( 15 );
 
 				/*$chart[ 'axis_category' ] = array (
-																					'font'  =>"arial",
-																					'bold'  =>true,
-																					'size'  =>11,
-																					'color' =>'000000',
-																					'alpha' =>75,
-																					'orientation' => 'diagonal_up',
-																					// 'skip'=>2
-																				 );*/
+						'font'  =>"arial",
+						'bold'  =>true,
+						'size'  =>11,
+						'color' =>'000000',
+						'alpha' =>75,
+						'orientation' => 'diagonal_up',
+						// 'skip'=>2
+					 );*/
 
 				/* $chart[ 'axis_value' ] = array (	// 'font'   =>"arial",
-																					// 'bold'   =>true,
-																					'size'   => 11,
-																					'color'  => '000000',
-																					'alpha'  => 75,
-																					'steps'  => 4,
-																					'prefix' => "",
-																					'suffix' => "",
-																					'decimals'=> 0,
-																					'separator'=> "",
-																					'show_min'=> false ); */
+						// 'bold'   =>true,
+						'size'   => 11,
+						'color'  => '000000',
+						'alpha'  => 75,
+						'steps'  => 4,
+						'prefix' => "",
+						'suffix' => "",
+						'decimals'=> 0,
+						'separator'=> "",
+						'show_min'=> false ); */
 
 				$chart [ 'chart_value' ] = array (
-																					// 'prefix'         =>  string,
-																					// 'suffix'         =>  " views",
-																					// 'decimals'       =>  int,
-																					// 'separator'      =>  string,
-																					'position'       =>  "outside",
-																					'hide_zero'      =>  true,
-																					'as_percentage'  =>  true,
-																					'font'           =>  "arial",
-																					'bold'           =>  true,
-																					'size'           =>  20,
-																					'color'          =>  "000000",
-																					'alpha'          =>  75
-																				);
+						// 'prefix'         =>  string,
+						// 'suffix'         =>  " views",
+						// 'decimals'       =>  int,
+						// 'separator'      =>  string,
+						'position'       =>  "outside",
+						'hide_zero'      =>  true,
+						'as_percentage'  =>  true,
+						'font'           =>  "arial",
+						'bold'           =>  true,
+						'size'           =>  20,
+						'color'          =>  "000000",
+						'alpha'          =>  75
+					);
 
 				echo '<div class="center">';
 				DrawChart( $chart );
@@ -631,10 +642,12 @@ switch( $AdminUI->get_path(1) )
 					?>
 					<tr <?php if( $count%2 == 1 ) echo 'class="odd"'; ?>>
 						<td class="firstcol"><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
-						<?php if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-						{ ?>
-						<td><a href="?ctrl=antispam&amp;action=ban&amp;keyword=<?php echo rawurlencode( stats_basedomain(false) ) ?>" title="<?php echo T_('Ban this domain!') ?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a></td>
-						<?php } ?>
+						<?php
+						if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+						{ // user can ban:
+							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'action,keyword', 'action=ban&amp;keyword='.rawurlencode( stats_basedomain(false) ) ) ).'</td>';
+						}
+						?>
 						<td class="right"><?php stats_hit_count() ?></td>
 						<td class="right"><?php stats_hit_percent() ?></td>
 					</tr>
@@ -656,36 +669,33 @@ switch( $AdminUI->get_path(1) )
 			<p><?php echo T_('These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)') ?></p>
 			<?php
 			// Create result set:
-			$Results = & new Results( "SELECT hit_ID, hit_datetime, hit_referer,
-																			dom_name, hit_blog_ID, hit_uri, blog_shortname
-																FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
-																			LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
-																WHERE hit_referer_type = 'search' "
-																	.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 'lstsrch', 'D' );
+			$Results = & new Results( "
+					SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
+					  FROM T_hitlog INNER JOIN T_basedomains
+					    ON dom_ID = hit_referer_dom_ID LEFT JOIN T_blogs
+					    ON hit_blog_ID = blog_ID
+					 WHERE hit_referer_type = 'search' "
+					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 'lstsrch', 'D' );
 
 			$Results->title = T_('Last refering searches');
 
 			// datetime:
 			$Results->cols[0] = array(
-									'th' => T_('Date Time'),
-									'order' => 'hit_datetime',
-									'td' => '%mysql2localedatetime( \'$hit_datetime$\' )%',
-								);
+					'th' => T_('Date Time'),
+					'order' => 'hit_datetime',
+					'td' => '%mysql2localedatetime( \'$hit_datetime$\' )%',
+				);
 
 			// Referer:
 			$Results->cols[1] = array(
-									'th' => T_('Referer'),
-									'order' => 'dom_name',
-								);
+					'th' => T_('Referer'),
+					'order' => 'dom_name',
+				);
 			if( $current_User->check_perm( 'stats', 'edit' ) )
 			{
-				$Results->cols[1]['td'] = '<a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$hit_ID$\')%" title="'.
-																	T_('Delete this hit!').
-																	'"><img src="img/xross.gif" width="13" height="13" class="middle" alt="'.
-																	/* TRANS: Abbrev. for Delete (stats) */ T_('Del').
-																	'" title="'.T_('Delete this hit!').'" /></a> '.
-
-																	'<a href="$hit_referer$">$dom_name$</a>';
+				$Results->cols[1]['td'] = '<a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$hit_ID$\')%" title="'
+						.T_('Delete this hit!').'">'.get_icon('delete').'</a> '
+						.'<a href="$hit_referer$">$dom_name$</a>';
 			}
 			else
 			{
@@ -694,34 +704,43 @@ switch( $AdminUI->get_path(1) )
 
 			// Keywords:
 			$Results->cols[] = array(
-									'th' => T_('Search keywords'),
-									'td' => '%stats_search_keywords( #hit_referer# )%',
-								);
+					'th' => T_('Search keywords'),
+					'td' => '%stats_search_keywords( #hit_referer# )%',
+				);
 
 			// Target Blog:
 			if( empty($blog) )
 			{
 				$Results->cols[] = array(
-										'th' => T_('Target Blog'),
-										'order' => 'hit_blog_ID',
-										'td' => '$blog_shortname$',
-									);
+						'th' => T_('Target Blog'),
+						'order' => 'hit_blog_ID',
+						'td' => '$blog_shortname$',
+					);
 			}
 
 			// Requested URI:
 			$Results->cols[] = array(
-									'th' => T_('Requested URI'),
-									'order' => 'hit_uri',
-									'td' => '<a href="$hit_uri$">$hit_uri$</a>',
-								);
+					'th' => T_('Requested URI'),
+					'order' => 'hit_uri',
+					'td' => '<a href="$hit_uri$">$hit_uri$</a>',
+				);
 
+			// Remote address (IP):
+			$Results->cols[] = array(
+					'th' => '<span title="'.T_('Remote address').'">'.T_('IP').'</span>',
+					'order' => 'hit_remote_addr',
+					'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'DisplayIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
+				);
 
 			// Display results:
 			$Results->display();
+
+
+			// TOP REFERING SEARCH ENGINES
 			?>
 
-
 			<h3><?php echo T_('Top refering search engines') ?>:</h3>
+
 			<?php
 			refererList(20,'global',0,0,"'search'",'dom_name',$blog,true);
 			if( count( $res_stats ) )
@@ -743,47 +762,106 @@ switch( $AdminUI->get_path(1) )
 					}
 					?>
 				</table>
-			<?php } ?>
+			<?php
+			}
 
+
+			// TOP INDEXING ROBOTS
+			?>
 			<h3><?php echo T_('Top Indexing Robots') ?>:</h3>
 			<p><?php echo T_('These are hits from automated robots like search engines\' indexing robots. (Robots must be listed in /conf/_stats.php)') ?></p>
 			<?php
-			refererList(20,'global',0,0,"'robot'",'agnt_signature',$blog,true,true);
-			if( count( $res_stats ) )
+			// Create result set:
+			$Results = & new Results( "
+					SELECT COUNT(*) AS hit_count, hit_referer, agnt_signature, hit_blog_ID, blog_shortname
+					  FROM T_hitlog INNER JOIN T_useragents
+					    ON hit_agnt_ID = agnt_ID LEFT JOIN T_blogs
+					    ON hit_blog_ID = blog_ID
+					 WHERE agnt_type = 'robot' "
+					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
+					 GROUP BY agnt_signature', 'topidx', 'D', 20 );
+					 #'SELECT COUNT(*) FROM T_hitlog );
+
+			$total_hit_count = $DB->get_var( "
+					SELECT COUNT(*) as hit_count
+					  FROM T_hitlog INNER JOIN T_useragents
+					    ON hit_agnt_ID = agnt_ID LEFT JOIN T_blogs
+					    ON hit_blog_ID = blog_ID
+					 WHERE agnt_type = 'robot' "
+					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ) );
+
+			$Results->title = T_('Top Indexing Robots');
+
+			/**
+			 * Helper function to translate agnt_signature to a "human-friendly" version from {@link $user_agents}.
+			 * @return string
+			 */
+			function translate_user_agent( $agnt_signature )
 			{
-				?>
-				<table class="grouped" cellspacing="0">
-					<?php
-					$count = 0;
-					foreach( $res_stats as $row_stats )
+				global $user_agents;
+
+				foreach ($user_agents as $curr_user_agent)
+				{
+					if (stristr($agnt_signature, $curr_user_agent[1]))
 					{
-						?>
-						<tr>
-							<td class="firstcol"><?php stats_referer('<a href="', '">') ?><?php stats_user_agent( true ) ?><?php stats_referer('', '</a>', false) ?></td>
-							<td class="right"><?php stats_hit_count() ?></td>
-							<td class="right"><?php stats_hit_percent() ?></td>
-						</tr>
-						<?php
-						$count++;
+						return '<span title="'.htmlspecialchars($agnt_signature).'">'.htmlspecialchars($curr_user_agent[2]).'</span>';
 					}
-					?>
-				</table>
-			<?php
+				}
+
+				return htmlspecialchars($agnt_signature);
 			}
+
+			// User agent:
+			$Results->cols[] = array(
+					'th' => T_('Robot'),
+					'order' => 'hit_referer',
+					'td' =>
+						// If hit_referer is not empty, start a link
+						'¤( strlen(trim(\'$hit_referer$\')) ? \'<a href="$hit_referer$">\' : \'\' )¤'
+						.'%translate_user_agent(\'$agnt_signature$\')%'
+						.'¤( strlen(trim(\'$hit_referer$\')) ? \'</a>\' : \'\' )¤',
+				);
+
+			// Hit count:
+			$Results->cols[] = array(
+					'th' => T_('Hit count'),
+					'order' => 'hit_count',
+					'td' => '$hit_count$',
+				);
+
+			// Hit %
+			$Results->cols[] = array(
+					'th' => T_('Hit %'),
+					'order' => 'hit_count',
+					'td' => '%percentage( #hit_count#, '.$total_hit_count.' )%',
+				);
+
+			// Target Blog:
+			if( empty($blog) )
+			{
+				$Results->cols[] = array(
+						'th' => T_('Target Blog'),
+						'order' => 'hit_blog_ID',
+						'td' => '$blog_shortname$',
+					);
+			}
+
+			// Display results:
+			$Results->display();
+
 			break;
 
 
 		case 'syndication':
 			?>
 			<h2><?php echo T_('Top Aggregators') ?>:</h2>
-			<p><?php echo T_('These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)') ?></p>
+			<p><?php echo T_('These are hits from RSS news aggregators. (Aggregators get detected by accessing the feeds)') ?></p>
 			<?php
 			$total_hit_count = $DB->get_var( "
 				SELECT COUNT(*) AS hit_count
-				FROM T_useragents INNER JOIN T_sessions
-					ON sess_agnt_ID = agnt_ID INNER JOIN T_hitlog
-					ON sess_ID = hit_sess_ID
-				WHERE agnt_type = 'rss' "
+				  FROM T_useragents INNER JOIN T_hitlog
+				    ON agnt_ID = hit_agnt_ID
+				 WHERE agnt_type = 'rss' "
 					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
 
 
@@ -792,32 +870,31 @@ switch( $AdminUI->get_path(1) )
 			// Create result set:
 			$Results = & new Results( "
 				SELECT agnt_signature, COUNT(*) AS hit_count
-				FROM T_useragents INNER JOIN T_sessions
-					ON sess_agnt_ID = agnt_ID INNER JOIN T_hitlog
-					ON sess_ID = hit_sess_ID
-				WHERE agnt_type = 'rss' "
+				  FROM T_useragents INNER JOIN T_hitlog
+				    ON agnt_ID = hit_agnt_ID
+				 WHERE agnt_type = 'rss' "
 					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
-				GROUP BY agnt_ID ', 'topagg_', '--D' );
+				 GROUP BY agnt_ID ', 'topagg_', '--D' );
 
 			$Results->title = T_('Top Aggregators');
 
 			$Results->cols[] = array(
-									'th' => T_('Agent signature'),
-									'order' => 'agnt_signature',
-									'td' => '²agnt_signature²',
-								);
+					'th' => T_('Agent signature'),
+					'order' => 'agnt_signature',
+					'td' => '²agnt_signature²',
+				);
 
 			$Results->cols[] = array(
-									'th' => T_('Hit count'),
-									'order' => 'hit_count',
-									'td' => '$hit_count$',
-								);
+					'th' => T_('Hit count'),
+					'order' => 'hit_count',
+					'td' => '$hit_count$',
+				);
 
 			$Results->cols[] = array(
-									'th' => T_('Hit %'),
-									'order' => 'hit_count',
-									'td' => '%percentage( #hit_count#, '.$total_hit_count.' )%',
-								);
+					'th' => T_('Hit %'),
+					'order' => 'hit_count',
+					'td' => '%percentage( #hit_count#, '.$total_hit_count.' )%',
+				);
 
 			// Display results:
 			$Results->display();
@@ -832,54 +909,56 @@ switch( $AdminUI->get_path(1) )
 			<?php
 			// Create result set:
 			$Results = & new Results( "
-				SELECT hit_ID, hit_datetime, hit_blog_ID, hit_uri, blog_shortname
-				FROM T_hitlog INNER JOIN T_sessions
-					ON sess_ID = hit_sess_ID INNER JOIN T_useragents
-					ON sess_agnt_ID = agnt_ID
-				LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
-				WHERE hit_referer_type = 'direct'
-				  AND agnt_type = 'browser'"
+				SELECT hit_ID, hit_datetime, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
+				  FROM T_hitlog INNER JOIN T_useragents
+				    ON hit_agnt_ID = agnt_ID
+				  LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
+				 WHERE hit_referer_type = 'direct'
+				   AND agnt_type = 'browser'"
 				  .( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
 
 			$Results->title = T_('Last direct accesses');
 
 			// datetime:
 			$Results->cols[] = array(
-									'th' => T_('Date Time'),
-									'order' => 'hit_datetime',
-									'td' => '%mysql2localedatetime( \'$hit_datetime$\' )%',
-								);
+					'th' => T_('Date Time'),
+					'order' => 'hit_datetime',
+					'td' => '%mysql2localedatetime( \'$hit_datetime$\' )%',
+				);
 
 			// Referer:
 			if( $current_User->check_perm( 'stats', 'edit' ) )
 			{
 				$Results->cols[] = array(
-									'th' => /* TRANS: Abbrev. for Delete (stats) */ T_('Del'),
-									'td'=>' <a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$hit_ID$\')%" title="'.
-																	T_('Delete this hit!').
-																	'"><img src="img/xross.gif" width="13" height="13" class="middle" alt="'.
-																	/* TRANS: Abbrev. for Delete (stats) */ T_('Del').
-																	'" title="'.T_('Delete this hit!').'" /></a>',
-													);
+						'th' => /* TRANS: Abbrev. for Delete (stats) */ T_('Del'),
+						'td' => ' <a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$hit_ID$\')%" title="'
+						       .T_('Delete this hit!').'">'.get_icon('delete').'</a>',
+					);
 			}
 
 			// Target Blog:
 			if( empty($blog) )
 			{
 				$Results->cols[] = array(
-										'th' => T_('Target Blog'),
-										'order' => 'hit_blog_ID',
-										'td' => '$blog_shortname$',
-									);
+						'th' => T_('Target Blog'),
+						'order' => 'hit_blog_ID',
+						'td' => '$blog_shortname$',
+					);
 			}
 
 			// Requested URI:
 			$Results->cols[] = array(
-									'th' => T_('Requested URI'),
-									'order' => 'hit_uri',
-									'td' => '<a href="$hit_uri$">$hit_uri$</a>',
-								);
+					'th' => T_('Requested URI'),
+					'order' => 'hit_uri',
+					'td' => '<a href="$hit_uri$">$hit_uri$</a>',
+				);
 
+			// Remote address (IP):
+			$Results->cols[] = array(
+					'th' => '<span title="'.T_('Remote address').'">'.T_('IP').'</span>',
+					'order' => 'hit_remote_addr',
+					'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'DisplayIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
+				);
 
 			// Display results:
 			$Results->display();
@@ -893,11 +972,10 @@ switch( $AdminUI->get_path(1) )
 			<?php
 			$total_hit_count = $DB->get_var( "
 				SELECT COUNT(*) AS hit_count
-				FROM T_useragents INNER JOIN T_sessions
-					ON sess_agnt_ID = agnt_ID INNER JOIN T_hitlog
-					ON sess_ID = hit_sess_ID
-				WHERE agnt_type <> 'rss' "
-					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
+				  FROM T_useragents INNER JOIN T_hitlog
+				    ON agnt_ID = hit_agnt_ID
+				 WHERE agnt_type <> 'rss' "
+				  .( empty($blog) ? '' : "AND hit_blog_ID = $blog " ), 0, 0, 'Get total hit count' );
 
 
 			echo '<p>'.T_('Total hits').': '.$total_hit_count.'</p>';
@@ -905,12 +983,11 @@ switch( $AdminUI->get_path(1) )
 			// Create result set:
 			$Results = & new Results( "
 				SELECT agnt_signature, COUNT(*) AS hit_count
-				FROM T_useragents INNER JOIN T_sessions
-					ON sess_agnt_ID = agnt_ID INNER JOIN T_hitlog
-					ON sess_ID = hit_sess_ID
-				WHERE agnt_type <> 'rss' "
-					.( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
-				GROUP BY agnt_ID ', 'topua_', '--D' );
+				  FROM T_useragents INNER JOIN T_hitlog
+				    ON agnt_ID = hit_agnt_ID
+				 WHERE agnt_type <> 'rss' "
+				  .( empty($blog) ? '' : "AND hit_blog_ID = $blog " ).'
+				 GROUP BY agnt_ID ', 'topua_', '--D' );
 
 			$Results->title = T_('Top User Agents');
 
@@ -946,6 +1023,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/02 20:05:29  blueyed
+ * Fixed/polished stats (linking T_useragents to T_hitlog, not T_sessions again). I've done this the other way around before, but it wasn't my idea.. :p
+ *
  * Revision 1.2  2006/03/01 22:17:00  blueyed
  * Fixed table title
  *

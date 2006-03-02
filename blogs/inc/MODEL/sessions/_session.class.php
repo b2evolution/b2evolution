@@ -186,12 +186,11 @@ class Session
 
 			// We need to INSERT now because we need an ID now! (for the cookie)
 			$DB->query( '
-				INSERT INTO T_sessions( sess_key, sess_lastseen, sess_ipaddress, sess_agnt_ID )
+				INSERT INTO T_sessions( sess_key, sess_lastseen, sess_ipaddress )
 				VALUES (
 					"'.$this->key.'",
 					"'.date( 'Y-m-d H:i:s', $localtimenow ).'",
-					"'.$Hit->IP.'",
-					"'.$Hit->agent_ID.'"
+					"'.$Hit->IP.'"
 				)' );
 
 			$this->ID = $DB->insert_id;
@@ -383,7 +382,6 @@ class Session
 		$sess_data = empty($this->_data) ? NULL : serialize($this->_data);
 		$DB->query( '
 			UPDATE T_sessions SET
-				sess_agnt_ID = "'.$Hit->agent_ID.'",
 				sess_data = '.$DB->quote( $sess_data ).',
 				sess_ipaddress = "'.$Hit->IP.'",
 				sess_key = '.$DB->quote( $this->key ).',
@@ -433,13 +431,13 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/02 20:05:29  blueyed
+ * Fixed/polished stats (linking T_useragents to T_hitlog, not T_sessions again). I've done this the other way around before, but it wasn't my idea.. :p
+ *
  * Revision 1.1  2006/02/23 21:11:58  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.46  2006/02/03 20:47:11  blueyed
- * *** empty log message ***
  *
  * Revision 1.45  2006/01/29 15:07:01  blueyed
  * Added reload_data()

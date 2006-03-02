@@ -241,7 +241,6 @@ $schema_queries = array(
 			sess_lastseen  DATETIME NOT NULL,
 			sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
 			sess_user_ID   INT(10) DEFAULT NULL,
-			sess_agnt_ID   INT UNSIGNED NULL,
 			sess_data      TEXT DEFAULT NULL,
 			PRIMARY KEY( sess_ID )
 		)" ),
@@ -317,6 +316,7 @@ $schema_queries = array(
 			hit_referer_dom_ID INT UNSIGNED DEFAULT NULL,
 			hit_blog_ID        int(11) UNSIGNED NULL DEFAULT NULL,
 			hit_remote_addr    VARCHAR(40) DEFAULT NULL,
+			hit_agnt_ID        INT UNSIGNED NULL,
 			PRIMARY KEY (hit_ID),
 			INDEX hit_datetime ( hit_datetime ),
 			INDEX hit_blog_ID (hit_blog_ID)

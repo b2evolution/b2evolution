@@ -721,7 +721,7 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 9100 )
-	{	// Phoenix BETA (only column renames):
+	{	// Phoenix BETA (only column renames/drops):
 
 		echo 'Altering Links table... ';
 		$DB->query( 'ALTER TABLE T_links
@@ -729,6 +729,13 @@ function upgrade_b2evo_tables()
 		             CHANGE link_dest_item_ID link_dest_itm_ID INT( 11 ) UNSIGNED NULL' );
 		echo "OK.<br />\n";
 
+
+		echo 'Altering hitlog table... ';
+		$query = "
+				ALTER TABLE T_hitlog
+				 DROP COLUMN sess_agnt_ID";
+		$DB->query( $query );
+		echo "OK.<br />\n";
 	}
 
 
@@ -796,6 +803,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.128  2006/03/02 20:05:29  blueyed
+ * Fixed/polished stats (linking T_useragents to T_hitlog, not T_sessions again). I've done this the other way around before, but it wasn't my idea.. :p
+ *
  * Revision 1.127  2006/02/24 19:59:29  blueyed
  * New install/upgrade, which makes use of db_delta()
  *

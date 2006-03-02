@@ -127,10 +127,11 @@ function refererList(
 		$sql .= ", agnt_signature";
 	}
 
-	$sql_from_where = ' FROM T_hitlog '
-											.( $get_user_agent ? 'INNER JOIN T_sessions ON hit_sess_ID = sess_ID INNER JOIN T_useragents ON sess_agnt_ID = agnt_ID' : '' )
-											.' LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
-											WHERE hit_referer_type IN ('.$type.')';
+	$sql_from_where = '
+			  FROM T_hitlog '
+			.( $get_user_agent ? 'INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID ' : '' )
+			.'LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
+			 WHERE hit_referer_type IN ('.$type.')';
 	if( !empty($blog_ID) )
 	{
 		$sql_from_where .= " AND hit_blog_ID = '$blog_ID'";
@@ -372,6 +373,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/02 20:05:29  blueyed
+ * Fixed/polished stats (linking T_useragents to T_hitlog, not T_sessions again). I've done this the other way around before, but it wasn't my idea.. :p
+ *
  * Revision 1.1  2006/02/23 21:11:58  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

@@ -453,11 +453,11 @@ class Hit
 
 		// insert hit into DB table:
 		$sql = '
-			INSERT INTO T_hitlog( hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
-				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr )
-			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'",
-				"'.$this->referer_type.'", "'.$DB->escape($this->referer).'",
-				"'.$this->referer_domain_ID.'", '.$DB->quote($Blog->ID).', "'.$DB->escape( $this->IP ).'"
+			INSERT INTO T_hitlog(
+				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
+				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
+			VALUES( "'.$Session->ID.'", FROM_UNIXTIME('.$localtimenow.'), "'.$DB->escape($ReqURI).'", "'.$this->referer_type
+				.'", "'.$DB->escape($this->referer).'", "'.$this->referer_domain_ID.'", '.$DB->quote($Blog->ID).', "'.$DB->escape( $this->IP ).'", '.$this->agent_ID.'
 			)';
 
 		$DB->query( $sql, 'Record the hit' );
@@ -657,13 +657,15 @@ class Hit
 			}
 			else
 			{ // select by remote_addr/agnt_signature:
-				$sql = 'SELECT hit_ID FROM T_hitlog INNER JOIN T_sessions ON hit_sess_ID = sess_ID
-							 INNER JOIN T_useragents ON sess_agnt_ID = agnt_ID
-				 WHERE hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
-					 AND hit_remote_addr = '.$DB->quote( $this->IP ).'
-					 AND hit_uri = "'.$DB->escape( $ReqURI ).'"
-					 AND agnt_signature = '.$DB->quote($this->user_agent).'
-				 LIMIT 1';
+				$sql = '
+					SELECT hit_ID
+					  FROM T_hitlog INNER JOIN T_useragents
+					    ON hit_agnt_ID = agnt_ID
+					 WHERE hit_datetime > "'.date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') ).'"
+					   AND hit_remote_addr = '.$DB->quote( $this->IP ).'
+					   AND hit_uri = "'.$DB->escape( $ReqURI ).'"
+					   AND agnt_signature = '.$DB->quote($this->user_agent).'
+					 LIMIT 1';
 			}
 			if( $DB->get_var( $sql, 0, 0, 'Hit: Check for reload' ) )
 			{
