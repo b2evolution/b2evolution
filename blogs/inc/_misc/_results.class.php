@@ -60,7 +60,7 @@ class Results extends Widget
 	var $sql;
 
 	/**
-	 * Total number of rows (if > $limit, it will result in multiple pages)
+	 * Total number of rows (if > {@link $limit}, it will result in multiple pages)
 	 */
 	var $total_rows;
 
@@ -101,22 +101,22 @@ class Results extends Widget
 	 */
 	var $page_ID_array;
 
- 	/**
+	/**
 	 * Current object idx in $rows array:
 	 */
 	var $current_idx = 0;
 
- 	/**
+	/**
 	 * idx relative to whole list (range: 0 to total_rows-1)
 	 */
 	var $global_idx;
 
- 	/**
+	/**
 	 * Is this gobally the 1st item in the list? (NOT just the 1st in current page)
 	 */
 	var $global_is_first;
 
- 	/**
+	/**
 	 * Is this gobally the last item in the list? (NOT just the last in current page)
 	 */
 	var $global_is_last;
@@ -145,6 +145,10 @@ class Results extends Widget
 	 *   - $this->params['col_start_first'];
 	 *   - $this->params['col_start_last'];
 	 *   - $this->params['col_start'];
+	 *
+	 * @todo It would be nice to be able to add attributes to the field(s) like
+	 *       'th_attribs'=>array('title' => '...'). Currently you have to use <span> for this..?!
+	 *
 	 */
 	var $cols;
 
@@ -225,7 +229,7 @@ class Results extends Widget
 	 *
 	 * @param string SQL query
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
-	 * @param string default ordering of columns (special syntax) if not URL specified
+	 * @param string default ordering of columns (special syntax [WHICH?]) if not URL specified
 	 * @param integer number of lines displayed on one page
 	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
 	 */
@@ -964,7 +968,7 @@ class Results extends Widget
 				$output .= $this->params['col_end'];
 
 				$output = $this->parse_col_content($output);
-				// echo '{'.$output.'}';
+				#pre_dump( '{'.$output.'}' );
 				eval( "echo '$output';" );
 
 				$col_count++;
@@ -1500,6 +1504,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/02 19:49:20  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
