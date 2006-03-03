@@ -91,10 +91,9 @@ elseif( $tab_Plugin )
 { // Plugin tab
 
 	// Icons:
-	// TODO: remove "style" attrib if "right_icons" is defined
 	?>
 
-	<div class="right_icons" style="text-align:right">
+	<div class="right_icons">
 
 	<?php
 	echo action_icon( T_('Edit plugin settings!'), 'edit', '?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$tab_Plugin->ID )

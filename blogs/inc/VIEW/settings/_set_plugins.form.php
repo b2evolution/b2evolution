@@ -145,8 +145,8 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 
 <fieldset>
 	<legend><?php echo T_('Available plugins') ?></legend>
-	<div class="right_icons" style="text-align:right"><?php // TODO: remove "style" attrib if "right_icons" is defined
-	// Hide available plugins:
+	<div class="right_icons"><?php
+	// "Hide available plugins":
 	echo action_icon( T_('Hide available plugins'), 'close', regenerate_url( 'plugins_disp_avail', 'plugins_disp_avail=0' ) )
 	?></div>
 

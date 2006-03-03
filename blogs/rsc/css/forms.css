@@ -38,6 +38,15 @@ fieldset div.notes {
 }
 
 
+/* Used for action icons */
+div.right_icons {
+	text-align: right;
+}
+span.right_icons {
+	float:right;
+}
+
+
 span.field_error {
 	color: #f00;
 }
