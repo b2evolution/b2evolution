@@ -32,7 +32,7 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * @package evocore
+ * @package libs
  * @subpackage pop3
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
@@ -738,6 +738,9 @@ class POP3 {
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/03 20:10:21  blueyed
+ * doc
+ *
  * Revision 1.1  2006/02/23 21:12:33  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

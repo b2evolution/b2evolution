@@ -1,6 +1,7 @@
 <?php
 /**
  * Tests for upgrading from older b2evo versions to the current version (this one).
+ * @package tests
  */
 
 /**
@@ -11,6 +12,7 @@ require_once dirname(__FILE__).'/../config.simpletest.php';
 
 /**
  * Test upgrading to current scheme
+ * @package tests
  */
 class UpgradeToCurrentTestCase extends InstallUnitTestCase
 {

@@ -1,6 +1,7 @@
 <?php
 /**
  * Config file for SimpleTest tests
+ * @package tests
  */
 
 /**

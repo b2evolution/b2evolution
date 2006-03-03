@@ -332,7 +332,7 @@ if( !$Messages->count('error') )
 				set_Settings_for_Plugin_from_params( $loop_Plugin, $Plugins, 'UserSettings' );
 
 				// Let the plugin handle custom fields:
-				$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array() );
+				$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array( 'User' => & $edited_User ) );
 
 				if( $loop_Plugin->UserSettings->dbupdate() )
 				{
@@ -582,6 +582,12 @@ if( !$Messages->count('error') )
 }
 
 
+if( $action == 'edit_user' )
+{
+	$Plugins->trigger_event( 'PluginUserSettingsEditAction', $tmp_params = array( 'User' => & $edited_User ) );
+}
+
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -640,6 +646,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/03 20:10:21  blueyed
+ * doc
+ *
  * Revision 1.3  2006/03/01 01:07:43  blueyed
  * Plugin(s) polishing
  *

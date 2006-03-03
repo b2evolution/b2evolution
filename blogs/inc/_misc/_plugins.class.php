@@ -199,11 +199,13 @@ class Plugins
 	 *  - BeforeUninstallPayload
 	 *  - GetDefaultSettings
 	 *  - GetDefaultUserSettings
-	 *  - PluginSettingsUpdateAction (Called as action before editing the plugin's settings)
+	 *  - PluginSettingsUpdateAction (Called as action before updating the plugin's settings)
+	 *  - PluginSettingsEditAction (Called as action before editing the plugin's settings)
 	 *  - PluginSettingsEditDisplayAfter (Called after standard plugin settings are displayed for editing)
 	 *  - PluginSettingsInstantiated
 	 *  - PluginSettingsValidateSet (Called before setting a plugin's setting in the backoffice)
-	 *  - PluginUserSettingsUpdateAction (Called as action before editing the plugin's user settings)
+	 *  - PluginUserSettingsUpdateAction (Called as action before updating the plugin's user settings)
+	 *  - PluginSettingsEditAction (Called as action before editing the plugin's settings)
 	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
 	 *  - PluginUserSettingsInstantiated
 	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
@@ -2357,6 +2359,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.8  2006/03/03 20:10:21  blueyed
+ * doc
+ *
  * Revision 1.7  2006/03/02 22:18:24  blueyed
  * New events
  *

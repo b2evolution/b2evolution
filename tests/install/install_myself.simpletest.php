@@ -1,6 +1,7 @@
 <?php
 /**
  * Tests for installing the current version itself.
+ * @package tests
  */
 
 /**
@@ -10,7 +11,9 @@ require_once dirname(__FILE__).'/../config.simpletest.php';
 
 
 /**
+ * Test if we can install ourself.
  *
+ * @package tests
  */
 class InstallSelfTestCase extends InstallUnitTestCase
 {

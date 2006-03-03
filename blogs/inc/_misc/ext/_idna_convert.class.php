@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package libs
+ */
 /* ------------------------------------------------------------------------- */
 /* idna_convert.class.php - Encode / Decode Internationalized Domain Names   */
 /* (c) 2004-2005 phlyLabs, Berlin (http://phlylabs.de)                       */

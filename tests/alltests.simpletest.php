@@ -1,6 +1,7 @@
 <?php
 /**
  * This is the file to do all evo tests.
+ * @package tests
  */
 
 /**

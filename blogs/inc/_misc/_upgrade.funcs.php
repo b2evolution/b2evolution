@@ -82,7 +82,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param array The list of queries for which the DB should be adjusted
  * @param boolean Execute generated queries?
  * @param array Exclude query types (see list above). Defaults to drop_column.
- * @param array The generated queries.
+ * @return array The generated queries.
  *        table_name => array of arrays (queries with keys 'query', 'note' and 'type')
  */
 function db_delta( $queries, $execute = false, $exclude_types = NULL )
@@ -508,7 +508,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 
 
 /**
- * Alter the DB schema to match the current expected one ($schema_queries)
+ * Alter the DB schema to match the current expected one ({@link $schema_queries}).
  *
  * @param boolean Display what we've done?
  */
@@ -563,6 +563,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.2  2006/03/03 20:10:21  blueyed
+ * doc
+ *
  * Revision 1.1  2006/02/24 19:13:09  blueyed
  * Welcome the magic of db_delta()..
  *

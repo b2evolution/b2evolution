@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package libs
+ */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // charts.php v1.6

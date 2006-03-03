@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the abstract Plugin class.
+ * This file implements the abstract {@link Plugin} class.
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
@@ -969,6 +969,18 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called as action before displaying the "Edit plugin" form,
+	 * which includes the display of the {@link Plugin::Settings plugin's settings}.
+	 *
+	 * You may want to use this to check existing settings or display notes about
+	 * something.
+	 */
+	function PluginSettingsEditAction()
+	{
+	}
+
+
+	/**
 	 * Event handler: Called after the form to edit the {@link Plugin::Settings} has been
 	 * displayed.
 	 *
@@ -1023,8 +1035,26 @@ class Plugin
 	 *
 	 * Use this to catch custom input fields from {@link PluginUserSettingsEditDisplayAfter()} or
 	 * add notes/errors through {@link Plugin::msg()}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'User': the {@link User} for which the settings get updated
 	 */
-	function PluginUserSettingsUpdateAction()
+	function PluginUserSettingsUpdateAction( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called as action before displaying the "Edit user" form,
+	 * which includes the display of the {@link Plugin::UserSettings plugin's user settings}.
+	 *
+	 * You may want to use this to check existing settings or display notes about
+	 * something.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'User': the {@link User} for which the settings are being displayed/edited
+	 */
+	function PluginUserSettingsEditAction( & $params )
 	{
 	}
 
@@ -1621,6 +1651,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.8  2006/03/03 20:10:21  blueyed
+ * doc
+ *
  * Revision 1.7  2006/03/02 22:18:24  blueyed
  * New events
  *

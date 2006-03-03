@@ -655,6 +655,8 @@ switch( $action )
 			break;
 		}
 
+		$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $tmp_params = array() );
+
 		// Params for form:
 		$edited_plugin_code = $edit_Plugin->code;
 		$edited_plugin_priority = $edit_Plugin->priority;
