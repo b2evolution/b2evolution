@@ -730,12 +730,15 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 
-		echo 'Altering hitlog table... ';
-		$query = "
-				ALTER TABLE T_hitlog
-				 DROP COLUMN sess_agnt_ID";
-		$DB->query( $query );
-		echo "OK.<br />\n";
+		if( $old_db_version >= 9000 )
+		{ // sess_agnt_ID used in Phoenix-Alpha
+			echo 'Altering sessions table... ';
+			$query = "
+					ALTER TABLE T_sessions
+					 DROP COLUMN sess_agnt_ID";
+			$DB->query( $query );
+			echo "OK.<br />\n";
+		}
 	}
 
 
@@ -803,6 +806,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.129  2006/03/04 20:43:29  blueyed
+ * Fixed dropping sess_agnt_ID
+ *
  * Revision 1.128  2006/03/02 20:05:29  blueyed
  * Fixed/polished stats (linking T_useragents to T_hitlog, not T_sessions again). I've done this the other way around before, but it wasn't my idea.. :p
  *
