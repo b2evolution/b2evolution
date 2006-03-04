@@ -137,7 +137,8 @@ class GeneralSettings extends AbstractSettings
 					.'<p>You have schema version &laquo;'.(integer)$this->get( 'db_version' ).'&raquo;, '
 					.'but we would need &laquo;'.(integer)$new_db_version.'&raquo;.</p>';
 			}
-			require dirname(__FILE__).'/_conf_error.inc.php'; // error & exit
+			global $inc_path;
+			require $inc_path.'_conf_error.inc.php'; // error & exit
 		}
 
 		$DB->halt_on_error = $save_DB_halt_on_error;
@@ -148,6 +149,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/04 19:51:58  blueyed
+ * Fixed path to _conf_error.inc.php
+ *
  * Revision 1.1  2006/02/23 21:11:58  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
