@@ -4,7 +4,14 @@
  */
 
 /**
- * @global array The b2evo database scheme
+ * The b2evo database scheme.
+ *
+ * This gets updated through {@link db_delta()} which generates the queries needed to get
+ * to this scheme.
+ *
+ * Please see {@link db_delta()} for things to take care of.
+ *
+ * @global array
  */
 global $schema_queries;
 
@@ -560,11 +567,6 @@ function install_insert_default_data( $old_db_version )
 		             WHERE bloggroup_group_ID = 1' );
 		echo "OK.<br />\n";
 
-	}
-
-
-	if( $old_db_version < 9100 )
-	{	// Phoenix BETA:
 
 		if( $old_db_version >= 9000 )
 		{ // Uninstall all ALPHA (potentially incompatible) plugins
