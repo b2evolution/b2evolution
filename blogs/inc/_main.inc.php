@@ -423,6 +423,11 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	$Plugins->trigger_event( 'LoginAttempt', array( 'login' => $login, 'pass' => $pass, 'pass_md5' => $pass_md5 ) );
 
+	if( $Messages->count('login_error') )
+	{ // A plugin has thrown a login error..
+		// Do nothing, the error will get displayed in the login form..
+	}
+	else
 	// Check login and password
 	if( !user_pass_ok( $login, $pass_md5, true ) )
 	{ // Login failed
@@ -537,6 +542,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/05 23:53:54  blueyed
+ * If we have login_error Messages, do not login the user.
+ *
  * Revision 1.2  2006/03/01 01:07:43  blueyed
  * Plugin(s) polishing
  *
