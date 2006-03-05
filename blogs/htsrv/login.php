@@ -42,8 +42,6 @@
  * @author fplanque: Francois PLANQUE
  * @author mfollett: Matt FOLLETT.
  *
- * @todo Actions 'retrievepassword' / 'changepwd': bind this to {@link $Session} rather than to a single IP! (blueyed)
- *
  * @version $Id$
  */
 
@@ -77,7 +75,7 @@ switch( $action )
 		param( 'redirect_to', 'string', $admin_url );
 
 		// Display retrieval form:
-		require dirname(__FILE__).'/_lostpass_form.php';
+		require $view_path.'login/_lostpass_form.php';
 
 		exit();
 
@@ -111,7 +109,7 @@ switch( $action )
 			}
 			else
 			{
-				$requestId = generate_random_key(22);
+				$request_id = generate_random_key(22);
 
 				$message = T_( 'Somebody (presumably you) has requested a password change for your account.' )
 					."\n\n"
@@ -120,33 +118,26 @@ switch( $action )
 					."\n"
 					.$htsrv_url.'login.php?action=changepwd'
 						.'&login='.rawurlencode( $ForgetfulUser->login )
-						.'&reqId='.$requestId
+						.'&reqID='.$request_id
+						.'&sessID='.$Session->ID  // used to detect cookie problems
 					."\n\n"
 					.T_('Please note:')
-					.' '.sprintf( T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 )
+					.' '.T_('For security reasons the link is only valid for the same session (stored in a cookie).')
 					."\n\n"
 					.T_('If it was not you that requested this password change, simply ignore this mail.');
 
-				if( !send_mail( $ForgetfulUser->email, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
+				if( ! send_mail( $ForgetfulUser->email, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
 				{
 					$Messages->add( T_('The email could not be sent.')
 						.'<br />'.T_('Possible reason: your host may have disabled the mail() function...'), 'error' );
 				}
 				else
 				{
-					$UserSettings->set(
-							'password_change_request',
-							serialize( array(
-								'requestId' => $requestId,
-								'IP' => md5(serialize(get_ip_list())),
-								'time' => $servertimenow ) ),
-							$ForgetfulUser->ID );
-
-					$UserSettings->dbupdate();
+					$Session->set( 'core.changepwd.request_id', $request_id, 86400 * 2 ); // expires in two days (or when clicked)
+					$Session->dbsave(); // save immediately
 
 					$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
 				}
-				#pre_dump( $message );
 			}
 
 			locale_restore_previous();
@@ -158,32 +149,29 @@ switch( $action )
 		break;
 
 
-	case 'changepwd': // Clicked "Change password request" link from a mail or submit changed pwd
+	case 'changepwd': // Clicked "Change password request" link from a mail
 		param( 'redirect_to', 'string', $admin_url );
-		param( 'reqId', 'string', '' );
+		param( 'reqID', 'string', '' );
+		param( 'sessID', 'integer', '' );
 
 		$ForgetfulUser = & $UserCache->get_by_login($login);
 
-		if( !$ForgetfulUser || empty($reqId) )
+		if( ! $ForgetfulUser || empty($reqID) )
 		{ // This was not requested
 			$Messages->add( T_('Invalid password change request!'), 'error' );
 			break;
 		}
 
-		$verifyData = $UserSettings->get( 'password_change_request', $ForgetfulUser->ID );
-		$UserSettings->delete( 'password_change_request', $ForgetfulUser->ID );
+		if( $sessID != $Session->ID )
+		{ // Another session ID than for requesting password change link used!
+			$Messages->add( sprintf( T_('You will have to accept cookies in order to log in.') ), 'error' );
+			break;
+		}
 
-		$UserSettings->dbupdate();
-
-		if( !$verifyData
-				|| !($verifyData = unserialize($verifyData))
-				|| !is_array($verifyData)
-				|| !isset($verifyData['IP']) || $verifyData['IP'] != md5(serialize(get_ip_list()))
-				|| !isset($verifyData['time']) || $verifyData['time'] < ( $servertimenow - 7200 ) )
+		// Validate provided reqID against the one stored in the user's session
+		if( $Session->get( 'core.changepwd.request_id' ) != $reqID )
 		{
-			$Messages->add(
-				sprintf( T_('Invalid password change request!')
-				.' '.T_('For security reasons the link is only valid once for %d hours with the same IP address.'), 2 ), 'error' );
+			$Messages->add( T_('Invalid password change request!'), 'error' );
 			$Messages->add(
 				sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
 				$htsrv_url.'login.php?action=retrievepassword&amp;login='.$login.'&amp;redirect_to='.rawurlencode( $redirect_to ) ), 'note' );
@@ -192,30 +180,19 @@ switch( $action )
 			break;
 		}
 
-		header_nocache();
-
-		// Log the user in:
+		// Link User to Session:
 		$Session->set_user_ID( $ForgetfulUser->ID );
 
-		$Messages->add( T_( 'Please change your password to something you remember now.' ), 'note' );
+		// Add Message to change the password:
+		$Messages = new Log();
+		$Messages->add( T_( 'Please change your password to something you remember now.' ), 'success' );
+		$Session->set( 'Messages', $Messages );
+		$Session->dbsave();
 
-		$action = 'list'; // So that the user will see his profile
-		$current_User = & $ForgetfulUser;
-		$user_ID = $current_User->ID; // the selected user in the user admin
+		// Redirect to the user's profile in the "users" controller:
+		header_nocache();
+		header_redirect( url_add_param( $admin_url, 'ctrl=users&user_ID='.$ForgetfulUser->ID, '&' ) ); // display user's profile
 
-die( 'this feature doesn\'t work right now :(' );
-
-// TODO: we have a working redirect function and we can pass Messages now, we gotta do that!
-
-		/**
-		 * Init the backoffice.
-		 */
-		require_once dirname(__FILE__).'/../_header.php';
-
-		$AdminUI->add_headline( '<base href="'.$htsrv_url.'" />' );
-		require 'b2users.php';
-
-		#header( 'Location: '.$baseurl.$admin_subdir.'b2users.php' ); // does not allow to leave a Message and IIS is known to cause problems with setcookie() and redirect.
 		exit();
 
 		break;

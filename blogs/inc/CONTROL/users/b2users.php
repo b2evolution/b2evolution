@@ -582,9 +582,12 @@ if( !$Messages->count('error') )
 }
 
 
+// We might delegate to this action from above:
 if( $action == 'edit_user' )
 {
 	$Plugins->trigger_event( 'PluginUserSettingsEditAction', $tmp_params = array( 'User' => & $edited_User ) );
+
+	$Session->delete( 'core.changepwd.request_id' ); // delete the request_id for password change request (from /htsrv/login.php)
 }
 
 
@@ -646,6 +649,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/05 23:53:10  blueyed
+ * Fixed Password-Change-Request (bound to $Session now)
+ *
  * Revision 1.4  2006/03/03 20:10:21  blueyed
  * doc
  *
