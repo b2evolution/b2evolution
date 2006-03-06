@@ -38,6 +38,7 @@ class DbUnitTestCase extends EvoUnitTestCase
 		}
 
 		$this->test_DB = new DB( $testDB_conf );
+		$this->test_DB->halt_on_error = false;
 	}
 
 
@@ -92,7 +93,7 @@ class DbUnitTestCase extends EvoUnitTestCase
 
 		$testDbTables = array_keys($EvoConfig->DB['aliases']);
 
-		if( $test_tables = $this->test_DB->get_col( 'SHOW TABLES LIKE "test_%"' ) )
+		if( $test_tables = $this->test_DB->get_col( 'SHOW TABLES LIKE "test%"' ) )
 		{
 			$testDbTables = array_merge( $testDbTables, $test_tables );
 		}
