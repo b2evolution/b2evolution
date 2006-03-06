@@ -31,7 +31,7 @@
  * }}
  *
  * @package plugins
- * @tutorial plugins.pkg
+ * @todo Add links to pages on manual.b2evolution.net, once they are "clean"/tiny
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
@@ -83,7 +83,7 @@ class Plugin
 	 * Default priority.
 	 *
 	 * Priority determines in which order the plugins get called.
-	 * Range: 1 to 100
+	 * Range: 1 to 100 (the lower the number, the earlier it gets called)
 	 *
 	 * @var int
 	 */
@@ -127,7 +127,7 @@ class Plugin
 	/**
 	 * Plugin short description.
 	 *
-	 * This shoulb be no longer than a line.
+	 * This should be no longer than a line.
 	 *
 	 * @var string
 	 */
@@ -253,6 +253,8 @@ class Plugin
 		$this->long_desc = T_('No description available');
 	}
 
+
+	// Plugin information (settings, DB layout, ..): {{{
 
 	/**
 	 * Define here default settings that are then available in the backoffice.
@@ -429,10 +431,14 @@ class Plugin
 		return array();
 	}
 
+	// }}}
+
 
 	/*
 	 * Event handlers. These are meant to be implemented by your plugin. {{{
 	 */
+
+	// Admin/backoffice events (without events specific to Items or Comments): {{{
 
 	/**
 	 * Event handler: Gets invoked in /admin/_header.php for every backoffice page after
@@ -558,6 +564,10 @@ class Plugin
 	{
 	}
 
+	// }}}
+
+
+	// (Un)Install / (De)Activate events: {{{
 
 	/**
 	 * Event handler: Called before the plugin is going to be installed.
@@ -699,19 +709,10 @@ class Plugin
 	{
 	}
 
+	// }}}
 
-	/**
-	 * Event handler: Called when a new user has registered, at the end of the
-	 *                DB transaction that creates this user.
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'User': the user object (as reference), see {@link User}.
-	 * @return boolean True, if the user should be created, false if not.
-	 */
-	function AppendUserRegistrTransact( & $params )
-	{
-	}
 
+	// Item events: {{{
 
 	/**
 	 * Event handler: Called when rendering item/post contents as HTML.
@@ -792,29 +793,108 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called when an IP address gets displayed, typically in a protected
-	 * area or for a privileged user, e.g. in the backoffice statistics menu.
+	 * Event handler: called at the end of {@link Item::dbupdate() updating
+	 * an item/post in the database}, which means that it has changed.
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'data': the data (by reference). You probably want to modify this.
-	 *   - 'format': see {@link format_to_output()}.
-	 * @return boolean Have we changed something?
+	 *   - 'Item': the related Item (by reference)
 	 */
-	function DisplayIpAddress( & $params )
+	function AfterItemUpdate( & $params )
 	{
-		return false;		// Do nothing by default.
 	}
 
 
 	/**
-	 * Event handler: Called after initializing plugins, DB, Settings, Hit, .. but
-	 * quite early.
+	 * Event handler: called at the end of {@link Item::dbinsert() inserting
+	 * a item/post into the database}, which means it has been created.
 	 *
-	 * This is meant to be a good point for Antispam plugins to cancel the request.
-	 *
-	 * @see dnsbl_antispam_plugin
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
 	 */
-	function SessionLoaded()
+	function AfterItemInsert( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link Item::dbdelete() deleting
+	 * an item/post from the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
+	 */
+	function AfterItemDelete( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called when the view counter of an item got increased.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the Item object (by reference)
+	 */
+	function ItemViewed( & $params )
+	{
+	}
+
+	// }}}
+
+
+	// Comment events: {{{
+
+	/**
+	 * Event handler: Called at the end of the frontend comment form.
+	 *
+	 * You might want to use this to inject antispam payload to use in
+	 * in {@link GetKarmaForComment()} or modify the Comment according
+	 * to it in {@link CommentFormSent()}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the comment form generating object
+	 *   - 'Item': the Item for which the comment is meant
+	 */
+	function DisplayCommentFormFieldset( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called in the submit button section of the
+	 * frontend comment form.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the comment form generating object
+	 *   - 'Item': the Item for which the comment is meant
+	 */
+	function DisplayCommentFormButton( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called when a comment form got submitted.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the Item for which the comment is meant (by reference)
+	 */
+	function CommentFormSent( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called to ask the plugin for the karma of a comment.
+	 *
+	 * This gets called just before the comment gets stored.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the {@link Comment} object (by reference)
+	 *   - 'karma_absolute': Absolute karma (by reference)
+	 *   - 'karma_max': Maximum karma (by reference)
+	 * @return
+	 */
+	function GetKarmaForComment( & $params )
 	{
 	}
 
@@ -854,42 +934,10 @@ class Plugin
 	{
 	}
 
-
-	/**
-	 * Event handler: called at the end of {@link Item::dbupdate() updating
-	 * an item/post in the database}, which means that it has changed.
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Item': the related Item (by reference)
-	 */
-	function AfterItemUpdate( & $params )
-	{
-	}
+	// }}}
 
 
-	/**
-	 * Event handler: called at the end of {@link Item::dbinsert() inserting
-	 * a item/post into the database}, which means it has been created.
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Item': the related Item (by reference)
-	 */
-	function AfterItemInsert( & $params )
-	{
-	}
-
-
-	/**
-	 * Event handler: called at the end of {@link Item::dbdelete() deleting
-	 * an item/post from the database}.
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Item': the related Item (by reference)
-	 */
-	function AfterItemDelete( & $params )
-	{
-	}
-
+	// Caching events: {{{
 
 	/**
 	 * Event handler: called to cache object data.
@@ -935,6 +983,8 @@ class Plugin
 	function CacheIsCollectingContent()
 	{
 	}
+
+	// }}}
 
 
 	// PluginSettings {{{
@@ -1088,53 +1138,17 @@ class Plugin
 	// }}}
 
 
-	/**
-	 * Event handler: Called when the view counter of an item got increased.
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Item': the Item object (by reference)
-	 */
-	function ItemViewed( & $params )
-	{
-	}
-
+	// User related events (including registration and login): {{{
 
 	/**
-	 * Event handler: Called at the end of the frontend comment form.
-	 *
-	 * You might want to use this to inject antispam payload to use in
-	 * in {@link GetKarmaForComment()} or modify the Comment according
-	 * to it in {@link CommentFormSent()}.
+	 * Event handler: Called when a new user has registered, at the end of the
+	 *                DB transaction that creates this user.
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'Form': the comment form generating object
-	 *   - 'Item': the Item for which the comment is meant
+	 *   - 'User': the user object (as reference), see {@link User}.
+	 * @return boolean True, if the user should be created, false if not.
 	 */
-	function DisplayCommentFormFieldset( & $params )
-	{
-	}
-
-
-	/**
-	 * Event handler: Called in the submit button section of the
-	 * frontend comment form.
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Form': the comment form generating object
-	 *   - 'Item': the Item for which the comment is meant
-	 */
-	function DisplayCommentFormButton( & $params )
-	{
-	}
-
-
-	/**
-	 * Event handler: Called when a comment form got submitted.
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Item': the Item for which the comment is meant
-	 */
-	function CommentFormSent( & $params )
+	function AppendUserRegistrTransact( & $params )
 	{
 	}
 
@@ -1146,7 +1160,7 @@ class Plugin
 	 * in {@link RegisterFormSent()}.
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'Form': the comment form generating object
+	 *   - 'Form': the comment form generating object (by reference)
 	 */
 	function DisplayRegisterFormFieldset( & $params )
 	{
@@ -1196,6 +1210,35 @@ class Plugin
 	{
 	}
 
+	// }}}
+
+
+	/**
+	 * Event handler: Called when an IP address gets displayed, typically in a protected
+	 * area or for a privileged user, e.g. in the backoffice statistics menu.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}.
+	 * @return boolean Have we changed something?
+	 */
+	function DisplayIpAddress( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called after initializing plugins, DB, Settings, Hit, .. but
+	 * quite early.
+	 *
+	 * This is meant to be a good point for Antispam plugins to cancel the request.
+	 *
+	 * @see dnsbl_antispam_plugin
+	 */
+	function SessionLoaded()
+	{
+	}
 
 	/*
 	 * Event handlers }}}
@@ -1651,6 +1694,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.10  2006/03/06 22:07:32  blueyed
+ * doc, organized events into subsections
+ *
  * Revision 1.9  2006/03/06 20:03:40  fplanque
  * comments
  *
