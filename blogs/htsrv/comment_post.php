@@ -117,9 +117,11 @@ if( !$ok )
 if( $Messages->display( T_('Cannot post comment, please correct these errors:'),
 	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' ) )
 {
+	debug_info();  // output debug info, useful to see what a plugin might have done
 	exit(); // TODO: nicer displaying here (but do NOT die() or debug_die() because this is not a BUG/user hack, it's a plain user input error (any bozo can produce it)
 		// blueyed>> Why NOT debug_die()? You NEED the Debuglog output if you want to see why your Plugin prevented the comment from being posted!!
 		// Forgetting to provide an email is NOT a die condition!!! If you want the debug log (useful for antispam debugging I guess), add it explicitely.
+		// Erm.. "not DIE(), but EXIT()"?? - the whole point of debug_die() (or debug_exit(), as a synonym), was to have debug_info(). Only the additional backtrace makes it different..
 }
 
 
@@ -204,11 +206,8 @@ header_redirect();
 
 /*
  * $Log$
- * Revision 1.56  2006/03/06 20:03:40  fplanque
- * comments
- *
- * Revision 1.54  2006/02/24 14:06:49  fplanque
- * no message
+ * Revision 1.57  2006/03/06 20:40:13  blueyed
+ * debug_info() added in case of errors.
  *
  * Revision 1.52  2006/02/23 21:11:47  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
