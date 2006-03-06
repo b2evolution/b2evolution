@@ -892,7 +892,6 @@ class Plugin
 	 *   - 'Comment': the {@link Comment} object (by reference)
 	 *   - 'karma_absolute': Absolute karma (by reference)
 	 *   - 'karma_max': Maximum karma (by reference)
-	 * @return
 	 */
 	function GetKarmaForComment( & $params )
 	{
@@ -1511,7 +1510,7 @@ class Plugin
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 * @param boolean shall we display?
-	 * @return displayable plugin name.
+	 * @return string displayable plugin name.
 	 */
 	function name( $format = 'htmlbody', $disp = true )
 	{
@@ -1531,7 +1530,7 @@ class Plugin
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 * @param boolean shall we display?
-	 * @return displayable short desc
+	 * @return string displayable short desc
 	 */
 	function short_desc( $format = 'htmlbody', $disp = true )
 	{
@@ -1551,7 +1550,7 @@ class Plugin
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 * @param boolean shall we display?
-	 * @return displayable long desc
+	 * @return string displayable long desc
 	 */
 	function long_desc( $format = 'htmlbody', $disp = true )
 	{
@@ -1694,6 +1693,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.11  2006/03/06 22:42:20  blueyed
+ * doc fixes
+ *
  * Revision 1.10  2006/03/06 22:07:32  blueyed
  * doc, organized events into subsections
  *
