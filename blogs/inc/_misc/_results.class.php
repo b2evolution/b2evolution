@@ -148,7 +148,7 @@ class Results extends Widget
 	 *
 	 * @todo It would be nice to be able to add attributes to the field(s) like
 	 *       'th_attribs'=>array('title' => '...'). Currently you have to use <span> for this..?!
-	 *
+	 * fp>> use 'th_title' and stop adding unnecessary indirections everywhere just because you can. thx.
 	 */
 	var $cols;
 
@@ -229,7 +229,9 @@ class Results extends Widget
 	 *
 	 * @param string SQL query
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
-	 * @param string default ordering of columns (special syntax [WHICH?]) if not URL specified
+	 * @param string default ordering of columns (special syntax) if not specified in the URL params
+	 *               example: -A-- will sort in ascending order on 2nd column
+	 *               example: ---D will sort in descending order on 4th column
 	 * @param integer number of lines displayed on one page
 	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
 	 */
@@ -1504,6 +1506,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/06 20:03:40  fplanque
+ * comments
+ *
  * Revision 1.2  2006/03/02 19:49:20  blueyed
  * *** empty log message ***
  *

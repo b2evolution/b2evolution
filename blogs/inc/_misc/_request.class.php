@@ -733,6 +733,10 @@ class Request
 	 * Get a param, in co-operation with {@link $UserSettings}.
 	 * If the param is given, it will get updated in {@link $UserSettings}, otherwise the user's setting gets used as default.
 	 *
+
+TODO: Do NOT use hidden arguments. It's UNEREADABLE and you get no IDE help either. For what purpose?
+TODO: Move this to the usersettigs class. I think it makes a lot more sense other there.
+
 	 *
 	 * @param string Param and {@link $UserSettings} name. Make sure this is unique.
 	 * @param mixed,... The same params as to {@link Request::param()}.
@@ -901,6 +905,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/06 20:03:40  fplanque
+ * comments
+ *
  * Revision 1.2  2006/02/24 19:49:00  blueyed
  * Enhancements
  *

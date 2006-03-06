@@ -812,7 +812,7 @@ class Item extends DataObject
 		if( $dispmore && ! $preview && $Hit->is_new_view() )
 		{ // Increment view counter (only if current User is not the item's author)
 			if( is_a( $current_User, 'User' ) )
-			{
+			{ // fp>> WHY isn't this test included in inc_viewcount()? WHY don't we increase on anonymous views? WHY don't we check on IDs??
 				if( $this->Author->get( 'login') != $current_User->get( 'login' ) )
 				{
 					$this->inc_viewcount();
@@ -2385,6 +2385,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2006/03/06 20:03:40  fplanque
+ * comments
+ *
  * Revision 1.6  2006/03/02 19:57:53  blueyed
  * Added DisplayIpAddress() and fixed/finished DisplayItemAllFormats()
  *

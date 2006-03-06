@@ -62,8 +62,8 @@ $map_iconfiles = array(
 	'file_delete' => array(   // delete a file/folder
 		'file' => $rsc_subdir.'icons/filedelete.png',
 		'alt'  => T_('Del'),
-		'size' => array( 16, 16 ),
 		'legend'=>T_('Delete'),
+		'size' => array( 16, 16 ),
 	),
 	'file_perms' => array(    // edit permissions of a file
 		'file' => $rsc_subdir.'icons/fileperms.gif',
@@ -265,27 +265,27 @@ $map_iconfiles = array(
 	'delete' => array(
 		'file' => $rsc_subdir.'icons/delete.gif',
 		'alt'  => T_('Del'),
-		'size' => array( 15, 15 ),
 		'legend' => T_('Delete'),
+		'size' => array( 15, 15 ),
 	),
 	'close' => array(
 		'file' => $rsc_subdir.'icons/close.gif',
-		'alt'  => T_('Close'),
 		'rollover' => true,
+		'alt' => T_('Close'),
 		'size' => array( 14, 14 ),
 	),
 
 
-	'increase' => array(
+ 	'increase' => array(
 		'file' => $rsc_subdir.'icons/increase.gif',
-		'alt'  => T_('+'),
 		'rollover' => true,
+		'alt' => T_('+'),
 		'size' => array( 15, 15 ),
 	),
 	'decrease' => array(
 		'file' => $rsc_subdir.'icons/decrease.gif',
-		'alt'  => T_('-'),
 		'rollover' => true,
+		'alt' => T_('-'),
 		'size' => array( 15, 15 ),
 	),
 
@@ -305,13 +305,13 @@ $map_iconfiles = array(
 		'size' => array( 9, 9 ),
 	),
 
-	'enable' => array(
+	'enable' => array( // TODO: this should stay called "activate"
 		'file' => $rsc_subdir.'icons/bullet_activate.png',
 		'alt'  => /* TRANS: Short for "Activate(d)" */ T_('Act.'),
 		'legend' => T_('Activate'),
 		'size' => array( 17, 17 ),
 	),
-	'disable' => array(
+	'disable' => array( // TODO: deactivate
 		'file' => $rsc_subdir.'icons/bullet_deactivate.png',
 		'alt'  => /* TRANS: Short for "Deactivate(d)" */ T_('Deact.'),
 		'legend' => T_('Deactivate'),
@@ -398,15 +398,15 @@ $map_iconfiles = array(
 
 	'move_up' => array(
 		'file' => $rsc_subdir.'icons/move_up.gif',
+		'rollover' => true,
 		'alt'  => T_( 'Up' ),
 		'size' => array( 12, 13 ),
-		'rollover' => true,
 	),
 	'move_down' => array(
 		'file' => $rsc_subdir.'icons/move_down.gif',
+		'rollover' => true,
 		'alt'  => T_( 'Down'),
 		'size' => array( 12, 13 ),
-		'rollover' => true,
 	),
 	'nomove_up' => array(
 		'file' => $rsc_subdir.'icons/nomove_up.gif',

@@ -8,6 +8,11 @@
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://thequod.de/}.
  *
+
+WHO wrote this initially??
+
+ *
+ *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  * {@internal
  * b2evolution is free software; you can redistribute it and/or modify
@@ -80,7 +85,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @see http://dev.mysql.com/doc/refman/4.1/en/create-table.html
  *
  * @param array The list of queries for which the DB should be adjusted
- * @param boolean Execute generated queries?
+ * @param boolean Execute generated queries?  TODO: get this outta here!!!! (sooooo bloated!)
  * @param array Exclude query types (see list above). Defaults to drop_column.
  * @return array The generated queries.
  *        table_name => array of arrays (queries with keys 'query', 'note' and 'type')
@@ -510,6 +515,8 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 /**
  * Alter the DB schema to match the current expected one ({@link $schema_queries}).
  *
+ * @todo if used by install only, then put it into the install folde!!!
+ *
  * @param boolean Display what we've done?
  */
 function install_make_db_schema_current( $display = true )
@@ -563,6 +570,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.3  2006/03/06 20:03:40  fplanque
+ * comments
+ *
  * Revision 1.2  2006/03/03 20:10:21  blueyed
  * doc
  *

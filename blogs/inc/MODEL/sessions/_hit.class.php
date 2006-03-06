@@ -601,12 +601,10 @@ class Hit
 			}
 			elseif( $allow_nslookup )
 			{ // We allowed reverse DNS lookup:
-				/*
-				This can be terribly time consuming (4/5 seconds!) when there is no reverse dns available!
-				This is the case on many intranets and many users' first time installs!!!
-				Some people end up considering evocore is very slow just because of this line!
-				This cannot be enabled by default.
-				*/
+        // This can be terribly time consuming (4/5 seconds!) when there is no reverse dns available!
+        // This is the case on many intranets and many users' first time installs!!!
+        // Some people end up considering evocore is very slow just because of this line!
+        // This cannot be enabled by default.
 				$this->_remoteHost = @gethostbyaddr($this->IP);
 			}
 			else

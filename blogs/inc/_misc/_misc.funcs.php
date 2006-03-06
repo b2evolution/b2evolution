@@ -1334,6 +1334,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 	// NOTE: this causes the most problems with this function!
 	// fp>> we should probably go back to a very laxist scheme here... :(
 	// blueyed>> yes, seems so.
+		// fp>>I won't validate those new UNDOCUMENTED changes
 	/* Remaining problems with this one are:
 	 *  - no spaces in URL allowed (must be written as %20)
 	 *  - umlauts in domains/url
@@ -2676,6 +2677,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.7  2006/03/06 20:03:40  fplanque
+ * comments
+ *
  * Revision 1.6  2006/03/06 11:01:55  blueyed
  * doc
  *

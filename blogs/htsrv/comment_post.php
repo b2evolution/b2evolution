@@ -119,6 +119,7 @@ if( $Messages->display( T_('Cannot post comment, please correct these errors:'),
 {
 	exit(); // TODO: nicer displaying here (but do NOT die() or debug_die() because this is not a BUG/user hack, it's a plain user input error (any bozo can produce it)
 		// blueyed>> Why NOT debug_die()? You NEED the Debuglog output if you want to see why your Plugin prevented the comment from being posted!!
+		// Forgetting to provide an email is NOT a die condition!!! If you want the debug log (useful for antispam debugging I guess), add it explicitely.
 }
 
 
@@ -203,8 +204,8 @@ header_redirect();
 
 /*
  * $Log$
- * Revision 1.55  2006/02/24 20:03:13  blueyed
- * F2
+ * Revision 1.56  2006/03/06 20:03:40  fplanque
+ * comments
  *
  * Revision 1.54  2006/02/24 14:06:49  fplanque
  * no message

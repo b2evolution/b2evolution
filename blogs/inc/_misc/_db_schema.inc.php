@@ -1,6 +1,8 @@
 <?php
 /**
  * This file holds the b2evo database scheme.
+ *
+ * @todo This looks like install only stuff, move it to install folder.
  */
 
 /**
@@ -356,12 +358,6 @@ $schema_queries = array(
 			PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID)
 		)" ),
 
-	/*
-			evo_linktypes tables:
-			-ltype_ID    INT     PK
-			-ltype_desc    VARCHAR(50)
-	 */
-
 	'T_links' => array(
 		'Creating table for Post Links',
 		"CREATE TABLE T_links (
@@ -444,9 +440,10 @@ $schema_queries = array(
  *
  * This function should only be used for creating default data of a table.
  *
- * It gets called on upgrades and new installs alike. $old_db_version is 0 for new installs.
+ * It gets called on upgrades and new installs alike.
+ * $old_db_version is 0 for new installs.
  *
- * @param integer Old database version
+ * @param integer Old database version number (0 for new installs)
  */
 function install_insert_default_data( $old_db_version )
 {

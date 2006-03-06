@@ -657,14 +657,13 @@ class Comment extends DataObject
 	 */
 	function dbinsert()
 	{
+		/**
+		 * @var Plugins
+		 */
 		global $Plugins;
 
+		// Get karma percentage (interval 0-100)
 		$spam_karma = $Plugins->trigger_karma_collect( 'GetKarmaForComment', array( 'Comment' => & $this ) );
-
-		if( $spam_karma > 250 )
-		{ // "spam_karma" is a TINYINT field, max it to 250. For displaying we could still max it to 100.
-			$spam_karma = 250;
-		}
 
 		$this->set( 'spam_karma', $spam_karma );
 
@@ -704,8 +703,8 @@ class Comment extends DataObject
 
 /*
  * $Log$
- * Revision 1.2  2006/02/24 21:50:14  blueyed
- * Max spam_karma to 250
+ * Revision 1.3  2006/03/06 20:03:40  fplanque
+ * comments
  *
  * Revision 1.1  2006/02/23 21:11:57  fplanque
  * File reorganization to MVC (Model View Controller) architecture.

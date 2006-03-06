@@ -13,19 +13,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * @global User
+ * @var User
  */
 global $current_User;
 /**
- * @global Plugins_admin
+ * @var Plugins
  */
 global $admin_Plugins;
 /**
- * @global Plugins_no_DB
+ * @var Plugins_no_DB
  */
 global $AvailablePlugins;
 /**
- * @global UserSettings
+ * @var UserSettings
  */
 global $UserSettings;
 
@@ -36,7 +36,7 @@ global $UserSettings;
 		<thead>
 		<tr>
 			<th class="firstcol"></th>
-			<th class="firstcol"><?php echo T_('Plugin') ?></th>
+			<th><?php echo T_('Plugin') ?></th>
 			<th><?php echo T_('Priority') ?></th>
 			<th title="<?php echo T_('When should rendering apply?') ?>"><?php echo T_('Apply') ?></th>
 			<th class="advanced_info" title="<?php echo T_('The code to call the plugin by code (SkinTag) or as Renderer.') ?>"><?php echo /* TRANS: Code of a plugin */ T_('Code') ?></th>

@@ -2,7 +2,7 @@
 /**
  * This file implements the PluginS class.
  *
- * This is where you can plugin some {@link Plugin plugins} :D
+ * This is where you can plug in some {@link Plugin plugins} :D
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
@@ -50,7 +50,7 @@ require_once dirname(__FILE__).'/_plugin.class.php';
 /**
  * Plugins Class
  *
- * This is where you can plugin some {@link Plugin plugins} :D
+ * This is where you can plug in some {@link Plugin plugins} :D
  *
  * @todo A plugin might want to register allowed events (that it triggers itself) on installation..
  * @package evocore
@@ -1466,13 +1466,13 @@ class Plugins
 
 
 	/**
-	 * Trigger a karma collecting event.
+	 * Trigger a karma collecting event in order to get Karma percentage.
 	 *
 	 * @param string Event
 	 * @param array Params to the event
 	 * @param integer Maximum karma to start with
 	 * @param integer Absolute karma to start with
-	 * @return integer Karma percentage (rounded)
+	 * @return integer Karma percentage (rounded 0-100)
 	 */
 	function trigger_karma_collect( $event, $params, $karma_max = 1, $karma_absolute = 1 )
 	{
@@ -1483,7 +1483,7 @@ class Plugins
 
 		$percentage = $karma_max ? ( $karma_absolute * 100 ) / $karma_max : 0;
 
-		return round($percentage);
+		return max( 100, min( 0, round($percentage) ) );
 	}
 
 
@@ -2359,6 +2359,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.9  2006/03/06 20:03:40  fplanque
+ * comments
+ *
  * Revision 1.8  2006/03/03 20:10:21  blueyed
  * doc
  *

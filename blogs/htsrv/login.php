@@ -122,7 +122,7 @@ switch( $action )
 						.'&sessID='.$Session->ID  // used to detect cookie problems
 					."\n\n"
 					.T_('Please note:')
-					.' '.T_('For security reasons the link is only valid for the same session (stored in a cookie).')
+					.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')
 					."\n\n"
 					.T_('If it was not you that requested this password change, simply ignore this mail.');
 

@@ -41,37 +41,34 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @global User
+ * @var User
  */
 global $current_User;
 /**
- * @global Item
+ * @var Item
  */
 global $edited_Item;
 /**
- * @global Blog
+ * @var Blog
  */
 global $Blog;
 /**
- * @global DataObjectCache
+ * @var DataObjectCache
  */
 global $ItemTypeCache;
 /**
- * @global DataObjectCache
+ * @var DataObjectCache
  */
 global $ItemStatusCache;
 /**
- * @global Plugins
+ * @var Plugins
  */
 global $Plugins;
 /**
- * @global GeneralSettings
+ * @var GeneralSettings
  */
 global $Settings;
 
-/**
- * @global string Used for JS edit_reload()
- */
 global $pagenow;
 
 
@@ -436,6 +433,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/06 20:03:40  fplanque
+ * comments
+ *
  * Revision 1.2  2006/02/24 23:02:43  blueyed
  * Added missing global $pagenow
  *

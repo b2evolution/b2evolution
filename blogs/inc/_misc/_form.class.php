@@ -364,7 +364,7 @@ class Form extends Widget
 				{ // there is a title to display
 					if( !empty( $icons ) )
 					{
-						$r .= '<span class="fieldset_icons" style="float:right">';
+						$r .= '<span class="fieldset_icons">';
 						foreach( $icons as $icon )
 						{
 							$r .= $icon;
@@ -390,7 +390,7 @@ class Form extends Widget
 				{ // there is a legend tag (or explicit params for it) to display
 					if( !empty( $icons ) )
 					{
-						$r .= '<div class="fieldset_icons" style="text-align:right">';
+						$r .= '<div class="fieldset_icons">';
 						foreach( $icons as $icon )
 						{
 							$r .= $icon;
@@ -2505,6 +2505,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/06 20:03:40  fplanque
+ * comments
+ *
  * Revision 1.3  2006/02/28 18:21:37  blueyed
  * maxlength fixed
  *

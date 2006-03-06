@@ -43,35 +43,35 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @global User
+ * @var User
  */
 global $current_User;
 /**
- * @global AdminUI_general
+ * @var AdminUI_general
  */
 global $AdminUI;
 /**
- * @global User
+ * @var User
  */
 global $edited_User;
 /**
- * @global GroupCache
+ * @var GroupCache
  */
 global $GroupCache;
 /**
- * @global GeneralSettings
+ * @var GeneralSettings
  */
 global $Settings;
 /**
- * @global UserSettings
+ * @var UserSettings
  */
 global $UserSettings;
 /**
- * @global Request
+ * @var Request
  */
 global $Request;
 /**
- * @global Plugins
+ * @var Plugins
  */
 global $Plugins;
 
@@ -82,8 +82,6 @@ $this->disp_payload_begin();
 
 
 $Form = & new Form( NULL, 'user_checkchanges' );
-$Form->hidden_ctrl();
-
 
 if( !$user_profile_only )
 {
@@ -282,6 +280,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/06 20:03:40  fplanque
+ * comments
+ *
  * Revision 1.3  2006/03/01 01:07:43  blueyed
  * Plugin(s) polishing
  *

@@ -155,6 +155,9 @@ function upgrade_b2evo_tables()
 			printf( '<p>'.T_('Now you can <a %s>log in</a> with your usual %s username and password.').'</p>', 'href="'.$admin_url.'"', 'b2evolution' );
 			return false;
 		}
+// ELSE there is something wrong. Why be silent about it?? Why let processing go on to unexpected results?
+die( "fix this" );
+
 	}
 
 
@@ -535,6 +538,9 @@ function upgrade_b2evo_tables()
 		$DB->query( 'DROP TABLE IF EXISTS T_hitlog' );
 		echo "OK.<br />\n";
 
+		// New tables:
+		// removed by blueyed:create_b2evo_tables_phoenix();
+
 		echo 'Creating plugins table... ';
 		$DB->query( "CREATE TABLE T_plugins (
 										plug_ID        INT(11) UNSIGNED NOT NULL auto_increment,
@@ -646,7 +652,7 @@ function upgrade_b2evo_tables()
 
 
 		if( !isset( $tableblogusers_isuptodate ) )
-		{
+		{ // WTF is this condition?
 			echo 'Altering table for Blog-User permissions... ';
 			$DB->query( 'ALTER TABLE T_coll_user_perms
 										MODIFY COLUMN bloguser_blog_ID int(11) unsigned NOT NULL default 0,
@@ -686,7 +692,7 @@ function upgrade_b2evo_tables()
 
 
 		if( !isset( $tablegroups_isuptodate ) )
-		{
+		{// WTF???
 			echo 'Altering Groups table... ';
 			$DB->query( "ALTER TABLE T_groups
 										ADD COLUMN grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible' AFTER grp_name,
@@ -806,6 +812,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.130  2006/03/06 20:03:41  fplanque
+ * comments
+ *
  * Revision 1.129  2006/03/04 20:43:29  blueyed
  * Fixed dropping sess_agnt_ID
  *

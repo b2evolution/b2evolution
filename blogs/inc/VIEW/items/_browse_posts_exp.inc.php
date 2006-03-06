@@ -35,22 +35,19 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @global Blog
+ * @var Blog
  */
 global $Blog;
 /**
- * @global ItemList2
+ * @var ItemList2
  */
 global $ItemList;
 /**
  * Note: definition only (does not need to be a global)
- * @global Item
+ * @var Item
  */
 global $Item;
 
-/**
- * @global string
- */
 global $add_item_url;
 
 
@@ -330,6 +327,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.3  2006/03/06 20:03:40  fplanque
+ * comments
+ *
  * Revision 1.2  2006/02/25 22:53:11  blueyed
  * fix
  *

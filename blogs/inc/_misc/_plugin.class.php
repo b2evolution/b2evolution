@@ -99,7 +99,7 @@ class Plugin
 	 * through {@link Plugin::GetDependencies()}.
 	 *
 	 * By increasing it you can request a call of {@link GetDbLayout()} upon instantiating.
-	 * If there are DB layout changes to make, the plugin gets changed to status "needs_config".
+	 * If there are DB layout changes to be made, the plugin gets changed to status "needs_config".
 	 *
 	 * @var string
 	 */
@@ -1651,6 +1651,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.9  2006/03/06 20:03:40  fplanque
+ * comments
+ *
  * Revision 1.8  2006/03/03 20:10:21  blueyed
  * doc
  *
