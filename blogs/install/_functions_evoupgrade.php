@@ -155,9 +155,9 @@ function upgrade_b2evo_tables()
 			printf( '<p>'.T_('Now you can <a %s>log in</a> with your usual %s username and password.').'</p>', 'href="'.$admin_url.'"', 'b2evolution' );
 			return false;
 		}
-// ELSE there is something wrong. Why be silent about it?? Why let processing go on to unexpected results?
-die( "fix this" );
 
+		// We come here, if $old_db_version and $new_db_version are the same, but the schema needs upgrade (_db_schema.inc.php has changed)..
+		// We'll upgrade to the new schema below (at the end)..
 	}
 
 
@@ -693,6 +693,7 @@ die( "fix this" );
 
 		if( !isset( $tablegroups_isuptodate ) )
 		{// WTF???
+			// blueyed>> indeed.. but from you. It's set if the groups have been created (and are uptodate therefor) above.
 			echo 'Altering Groups table... ';
 			$DB->query( "ALTER TABLE T_groups
 										ADD COLUMN grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible' AFTER grp_name,
@@ -812,8 +813,8 @@ die( "fix this" );
 
 /*
  * $Log$
- * Revision 1.130  2006/03/06 20:03:41  fplanque
- * comments
+ * Revision 1.131  2006/03/06 21:21:59  blueyed
+ * doc
  *
  * Revision 1.129  2006/03/04 20:43:29  blueyed
  * Fixed dropping sess_agnt_ID
