@@ -811,17 +811,7 @@ class Item extends DataObject
 		#pre_dump( 'incViews', $dispmore, !$preview, $Hit->is_new_view() );
 		if( $dispmore && ! $preview && $Hit->is_new_view() )
 		{ // Increment view counter (only if current User is not the item's author)
-			if( is_a( $current_User, 'User' ) )
-			{ // fp>> WHY isn't this test included in inc_viewcount()? WHY don't we increase on anonymous views? WHY don't we check on IDs??
-				if( $this->Author->get( 'login') != $current_User->get( 'login' ) )
-				{
-					$this->inc_viewcount();
-				}
-				else
-				{
-					$Debuglog->add( 'Not incrementing view count, because viewing user is Author.', 'items' );
-				}
-			}
+			$this->inc_viewcount(); // won't increment if current_User == Author
 		}
 
 		$content = $this->content;
@@ -2184,22 +2174,33 @@ class Item extends DataObject
 
 
 	/**
-	 * Increment the view count of the item directly in DB.
+	 * Increment the view count of the item directly in DB (if the item's Author is not $current_User).
 	 *
 	 * This method serves TWO purposes (that would break if we used dbupdate() ) :
 	 *  - Increment the viewcount WITHOUT affecting the lastmodified date and user.
-	 *  - Incirement the viewcount in an ATOMIC manner (even if several hits on the same Item occur simultaneously).
+	 *  - Increment the viewcount in an ATOMIC manner (even if several hits on the same Item occur simultaneously).
 	 *
 	 * This also triggers the plugin event 'ItemViewed'.
+	 *
+	 * @return boolean Did we increase view count?
 	 */
 	function inc_viewcount()
 	{
-		global $Plugins, $DB;
+		global $Plugins, $DB, $current_User, $Debuglog;
+
+		if( is_a( $current_User, 'User' ) && $current_User->ID == $this->Author->ID )
+		{
+			$Debuglog->add( 'Not incrementing view count, because viewing user is Author.', 'items' );
+
+			return false;
+		}
 
 		$DB->query( 'UPDATE T_posts SET post_views = post_views + 1' );
 
 		// Trigger event that the item has been viewed (which is != displayed) and useful for cache handling plugins
 		$Plugins->trigger_event( 'ItemViewed', array( 'Item' => & $this ) );
+
+		return true;
 	}
 
 
@@ -2385,6 +2386,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2006/03/06 21:14:49  blueyed
+ * Fixed incrementing view.
+ *
  * Revision 1.7  2006/03/06 20:03:40  fplanque
  * comments
  *
