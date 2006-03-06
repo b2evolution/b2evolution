@@ -102,11 +102,11 @@ global $UserSettings;
 
 					if( $loop_Plugin->status == 'enabled' )
 					{
-						echo action_icon( T_('Disable the plugin!'), 'disable', 'admin.php?ctrl=plugins&amp;action=disable_plugin&amp;plugin_ID='.$loop_Plugin->ID );
+						echo action_icon( T_('Disable the plugin!'), 'deactivate', 'admin.php?ctrl=plugins&amp;action=disable_plugin&amp;plugin_ID='.$loop_Plugin->ID );
 					}
 					elseif( $loop_Plugin->status != 'broken' )
 					{
-						echo action_icon( T_('Enable the plugin!'), 'enable', 'admin.php?ctrl=plugins&amp;action=enable_plugin&amp;plugin_ID='.$loop_Plugin->ID );
+						echo action_icon( T_('Enable the plugin!'), 'activate', 'admin.php?ctrl=plugins&amp;action=enable_plugin&amp;plugin_ID='.$loop_Plugin->ID );
 					}
 
 					echo action_icon( T_('Un-install this plugin!'), 'delete', 'admin.php?ctrl=plugins&amp;action=uninstall&amp;plugin_ID='.$loop_Plugin->ID );
