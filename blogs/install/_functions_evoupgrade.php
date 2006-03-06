@@ -130,7 +130,7 @@ function upgrade_b2evo_tables()
 	// new DB-delta functionality
 	global $schema_queries, $inc_path;
 
-	require_once $inc_path.'_misc/_db_schema.inc.php';
+	require_once dirname(__FILE__).'/_db_schema.inc.php';
 	require_once $inc_path.'_misc/_upgrade.funcs.php';
 
 
@@ -780,10 +780,10 @@ function upgrade_b2evo_tables()
 	 * scheme here. (Except for renaming table column names - see above).
 	 *
 	 * It is easy:
-	 * - To change DB table layout, alter $schema_queries in /inc/_misc/_db_schema.inc.php.
+	 * - To change DB table layout, alter $schema_queries in /install/_db_schema.inc.php.
 	 *
 	 * - To insert default data, add it to the corresponding block in
-	 *   install_insert_default_data() (/inc/_misc/_db_schema.inc.php).
+	 *   install_insert_default_data() (/install/_db_schema.inc.php).
 	 */
 
 	// Alter DB to match DB schema:
@@ -813,6 +813,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.132  2006/03/06 23:14:23  blueyed
+ * Moved _db_schema.inc.php to /install/ folder
+ *
  * Revision 1.131  2006/03/06 21:21:59  blueyed
  * doc
  *

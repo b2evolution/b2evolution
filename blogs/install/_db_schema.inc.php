@@ -1,8 +1,6 @@
 <?php
 /**
  * This file holds the b2evo database scheme.
- *
- * @todo This looks like install only stuff, move it to install folder.
  */
 
 /**

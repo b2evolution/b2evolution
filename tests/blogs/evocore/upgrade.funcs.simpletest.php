@@ -188,9 +188,9 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 	 */
 	function test_db_delta_currentscheme()
 	{
-		global $schema_queries, $inc_path;
+		global $schema_queries, $basepath;
 
-		require_once $inc_path.'/_misc/_db_schema.inc.php';
+		require_once $basepath.'install/_db_schema.inc.php';
 
 		foreach( $schema_queries as $query_info )
 		{
@@ -206,6 +206,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		}
 	}
 }
+
 
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone

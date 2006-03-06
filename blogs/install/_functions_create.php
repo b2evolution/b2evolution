@@ -65,7 +65,7 @@ function create_b2evo_tables()
 {
 	global $inc_path;
 
-	require_once $inc_path.'_misc/_db_schema.inc.php';
+	require_once dirname(__FILE__).'/_db_schema.inc.php';
 	require_once $inc_path.'_misc/_upgrade.funcs.php';
 
 	// Alter DB to match DB schema:
@@ -917,6 +917,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.178  2006/03/06 23:14:23  blueyed
+ * Moved _db_schema.inc.php to /install/ folder
+ *
  * Revision 1.177  2006/02/24 19:59:29  blueyed
  * New install/upgrade, which makes use of db_delta()
  *
