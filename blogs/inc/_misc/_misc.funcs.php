@@ -2206,7 +2206,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				$r .= $params['class'];
 			}
 			elseif( isset($map_iconfiles[$iconKey]['class']) )
-			{	// This icon has a rollover (blueyed>> rollovers seem to be rather defined by 'rollover' = true in map_iconfiles?!)
+			{	// This icon has a class
 				$r .= $map_iconfiles[$iconKey]['class'];
 			}
 			else
@@ -2676,6 +2676,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/06 11:01:55  blueyed
+ * doc
+ *
  * Revision 1.5  2006/02/28 20:52:54  blueyed
  * fix
  *
