@@ -39,10 +39,12 @@ fieldset div.notes {
 
 
 /* Used for action icons */
-div.right_icons {
+div.right_icons,
+div.fieldset_icons {
 	text-align: right;
 }
-span.right_icons {
+span.right_icons,
+span.fieldset_icons {
 	float:right;
 }
 
