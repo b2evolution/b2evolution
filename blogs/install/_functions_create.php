@@ -118,6 +118,7 @@ function create_antispam()
 /**
  * Create user permissions
  *
+ * WARNING: changing this may break the upgrade path
  * Used when creating full install and upgrading from earlier versions
  */
 function create_groups()
@@ -917,6 +918,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.179  2006/03/07 19:30:22  fplanque
+ * comments
+ *
  * Revision 1.178  2006/03/06 23:14:23  blueyed
  * Moved _db_schema.inc.php to /install/ folder
  *

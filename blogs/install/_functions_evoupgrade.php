@@ -158,6 +158,7 @@ function upgrade_b2evo_tables()
 
 		// We come here, if $old_db_version and $new_db_version are the same, but the schema needs upgrade (_db_schema.inc.php has changed)..
 		// We'll upgrade to the new schema below (at the end)..
+// When is this right? When upgrading from a CVS version to another?
 	}
 
 
@@ -510,17 +511,17 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 8062 )
-	{{{ // upgrade to 0.9.0.4
+	{ // upgrade to 0.9.0.4
 		cleanup_post_quotes();
 
 		set_upgrade_checkpoint( '8062' );
-	}}}
+	}
 
 
 	if( $old_db_version < 8064 )
-	{{{ // upgrade to 0.9.0.6
+	{ // upgrade to 0.9.0.6
 		cleanup_comment_quotes();
-	}}}
+	}
 
 
 	if( $old_db_version < 8066 )
@@ -652,7 +653,7 @@ function upgrade_b2evo_tables()
 
 
 		if( !isset( $tableblogusers_isuptodate ) )
-		{ // WTF is this condition?
+		{	// We have created the blogusers table before and it's already clean!
 			echo 'Altering table for Blog-User permissions... ';
 			$DB->query( 'ALTER TABLE T_coll_user_perms
 										MODIFY COLUMN bloguser_blog_ID int(11) unsigned NOT NULL default 0,
@@ -692,8 +693,7 @@ function upgrade_b2evo_tables()
 
 
 		if( !isset( $tablegroups_isuptodate ) )
-		{// WTF???
-			// blueyed>> indeed.. but from you. It's set if the groups have been created (and are uptodate therefor) above.
+		{	// We have created the groups table before and it's already clean!
 			echo 'Altering Groups table... ';
 			$DB->query( "ALTER TABLE T_groups
 										ADD COLUMN grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible' AFTER grp_name,
@@ -813,6 +813,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.133  2006/03/07 19:30:23  fplanque
+ * comments
+ *
  * Revision 1.132  2006/03/06 23:14:23  blueyed
  * Moved _db_schema.inc.php to /install/ folder
  *
