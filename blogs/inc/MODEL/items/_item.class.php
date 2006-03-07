@@ -2188,7 +2188,7 @@ class Item extends DataObject
 	{
 		global $Plugins, $DB, $current_User, $Debuglog;
 
-		if( is_a( $current_User, 'User' ) && $current_User->ID == $this->Author->ID )
+		if( isset( $current_User ) && $current_User->ID == $this->Author->ID )
 		{
 			$Debuglog->add( 'Not incrementing view count, because viewing user is Author.', 'items' );
 
@@ -2386,6 +2386,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2006/03/07 19:13:31  fplanque
+ * isset() is more compact and more readable
+ *
  * Revision 1.8  2006/03/06 21:14:49  blueyed
  * Fixed incrementing view.
  *
