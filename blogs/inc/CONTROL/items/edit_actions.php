@@ -481,8 +481,7 @@ switch($action)
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-	 	$comment_post_ID = $edited_Comment->Item->ID;
-		$location = url_add_param( $admin_url, 'ctrl=browse&blog='.$blog.'&p=$comment_post_ID&c=1#comments', '&' );
+		$location = url_add_param( $admin_url, 'ctrl=browse&blog='.$blog.'&p='.$edited_Comment->Item->ID.'&c=1#comments', '&' );
 		header ("Location: $location");
 		exit();
 
@@ -546,6 +545,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/08 19:53:16  fplanque
+ * fixed quite a few broken things...
+ *
  * Revision 1.2  2006/02/24 00:27:14  blueyed
  * fix
  *

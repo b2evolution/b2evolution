@@ -199,6 +199,7 @@ class Hit
 		global $Debuglog;
 		global $comments_allowed_uri_scheme; // used to validate the Referer
 		global $blackList, $search_engines;  // used to detect $referer_type
+		global $view_path;
 
 		if( isset( $HTTP_REFERER ) )
 		{ // Referer provided by PHP:
@@ -227,7 +228,7 @@ class Hit
 
 			// This is most probably referer spam,
 			// In order to preserve server resources, we're going to stop processing immediatly!!
-			require dirname(__FILE__).'/_referer_spam.page.php';	// error & exit
+			require $view_path.'errors/_referer_spam.page.php';	// error & exit
 			// THIS IS THE END!!
 		}
 

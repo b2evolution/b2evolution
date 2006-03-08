@@ -59,8 +59,8 @@ else
 			 * Do it all the OLD way:
 			 */
 			// Show the posts:
-			$edit_item_url = '?ctrl=edit&amp;action=edit&amp;post=';
-			$delete_item_url = '?ctrl=editactions&amp;action=delete&amp;post=';
+			$edit_item_url = $dispatcher.'?ctrl=edit&amp;action=edit&amp;post=';
+			$delete_item_url = $dispatcher.'?ctrl=editactions&amp;action=delete&amp;post=';
 			$objType = 'Item';
 			$dbtable = 'T_posts';
 			$dbprefix = 'post_';
@@ -251,7 +251,7 @@ if( $blog )
 	{
 		case 'comments':
 			// Display VIEW:
-			$AdminUI->disp_view( 'items/_browse_comments.inc' );
+			$AdminUI->disp_view( 'comments/_browse_comments.inc' );
 			break;
 
 		default:

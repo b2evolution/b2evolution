@@ -34,6 +34,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $ItemList;
+
+global $add_item_url, $edit_item_url, $delete_item_url;
+
 
 // Display title depending on selection params:
 echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
@@ -84,10 +88,6 @@ echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 
 
 $ItemList->title = T_('Task list');
-
-
-// We'll instantiate and cache each Post/Item:
-$ItemList->Cache = & $ItemCache;
 
 
 $ItemList->cols[] = array(
@@ -281,6 +281,9 @@ if( $restrict_to_open )
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/08 19:53:16  fplanque
+ * fixed quite a few broken things...
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

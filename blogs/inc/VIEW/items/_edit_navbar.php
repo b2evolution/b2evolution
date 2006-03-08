@@ -12,6 +12,11 @@
  * TODO: links to result's pages, not only stoopid 'forward'/'backward'
  * ...FP: change buttons into parameter-links
  */
+
+global $MainList;
+
+global $tab, $order;
+
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 ?>
 <table cellpadding="0" cellspacing="0" border="0">
@@ -47,8 +52,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		<td>&nbsp;</td>
 		<td align="right">
 			<?php
-				$Form = & new Form( $pagenow, 'showXfirstlastposts', 'get', 'none' );
+				$Form = & new Form( NULL, 'showXfirstlastposts', 'get', 'none' );
 				$Form->begin_form( '' );
+				$Form->hidden_ctrl();
 				$Form->hidden( 'tab', $tab );
 				$Form->hidden( 'blog', $blog );
 				if( $MainList->unit == 'days' )

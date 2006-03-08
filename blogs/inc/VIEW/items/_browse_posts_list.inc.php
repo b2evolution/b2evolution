@@ -38,7 +38,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Includes:
  */
-require_once( dirname(__FILE__).'/'.$admin_dirout.$core_subdir.'_itemlist.class.php' );
+require_once $model_path.'items/_itemlist.class.php';
+
+/**
+ * @var Blog
+ */
+global $Blog;
+
+global $dispatcher, $blog, $posts, $posts_per_page, $poststart, $postend, $c, $show_statuses, $ReqURI;
+global $edit_item_url, $delete_item_url, $htsrv_url;
+global $comment_allowed_tags, $comments_use_autobr;
 
 echo '<div class="NavBar">';
 
@@ -216,6 +225,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/08 19:53:16  fplanque
+ * fixed quite a few broken things...
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

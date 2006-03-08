@@ -33,17 +33,31 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @var Blog
+ */
+global $Blog;
+/**
+ * @var Comment
+ */
+global $edited_Comment;
+/**
+ *
+ */
+global $Plugins;
+
+global $comments_use_autobr, $mode, $month;
+
 $Form = & new Form( NULL, 'post', 'post', 'linespan' );
 
 $Form->begin_form( 'eform' );
-$Form->hidden_ctrl();
+$Form->hidden( 'ctrl', 'editactions' );
+$Form->hidden( 'action', 'editedcomment' );
+$Form->hidden( 'blog', $Blog->ID );
+$Form->hidden( 'comment_ID', $edited_Comment->ID );
 ?>
 
 <div class="left_col">
-
-	<input type="hidden" id="blog" name="blog" value="<?php echo $blog ?>" />
-	<input type="hidden" id="action" name="action" value="editedcomment" />
-	<input type="hidden" name="comment_ID" value="<?php echo $comment ?>" />
 
 	<fieldset>
 		<legend><?php echo T_('Comment contents') ?></legend>
@@ -182,6 +196,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/08 19:53:16  fplanque
+ * fixed quite a few broken things...
+ *
  * Revision 1.1  2006/02/23 21:12:17  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

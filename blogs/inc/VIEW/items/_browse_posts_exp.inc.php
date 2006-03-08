@@ -48,7 +48,9 @@ global $ItemList;
  */
 global $Item;
 
-global $add_item_url;
+global $dispatcher, $blog, $posts, $posts_per_page, $poststart, $postend, $c, $show_statuses, $ReqURI;
+global $add_item_url, $edit_item_url, $delete_item_url, $htsrv_url;
+global $comment_allowed_tags, $comments_use_autobr;
 
 
 // Display title depending on selection params:
@@ -327,6 +329,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.4  2006/03/08 19:53:16  fplanque
+ * fixed quite a few broken things...
+ *
  * Revision 1.3  2006/03/06 20:03:40  fplanque
  * comments
  *
