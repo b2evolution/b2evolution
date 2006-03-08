@@ -2094,7 +2094,9 @@ class Plugins
 		$in_class_name = false;
 		$in_plugin_class = false;
 		$in_function_name = false;
-		foreach( token_get_all($classfile_contents) as $l_token )
+
+		$tokens = token_get_all($classfile_contents);
+		while( list($k, $l_token) = each( $tokens ) ) // needs less memory than foreach()
 		{
 			if( $l_token[0] == T_COMMENT || $l_token[0] == T_WHITESPACE )
 			{
@@ -2359,6 +2361,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.10  2006/03/08 18:49:38  blueyed
+ * Memory usage decreased
+ *
  * Revision 1.9  2006/03/06 20:03:40  fplanque
  * comments
  *
