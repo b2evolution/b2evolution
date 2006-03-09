@@ -27,9 +27,9 @@ define( 'EVO_MAIN_INIT', true );
 /**#@+
  * Load required functions
  */
-require( '../blogs/evocore/_log.class.php' );
-require( '../blogs/evocore/_misc.funcs.php' );
-require( '../blogs/evocore/_form.funcs.php' );
+require $misc_inc_path.'_log.class.php';
+require $misc_inc_path.'_misc.funcs.php';
+require $misc_inc_path.'_form.funcs.php';
 /**#@-*/
 
 $Debuglog = new Log();
@@ -92,7 +92,7 @@ if( !isset($argv) )
 	<body>
 	<div class="center" style="margin:auto;width:75%">
 
-	<img src="<?php echo $img_url ?>b2evolution_logo_360.gif" /><br />
+	<img src="<?php echo $rsc_url ?>img/b2evolution_logo_360.gif" /><br />
 <?php
 }
 
