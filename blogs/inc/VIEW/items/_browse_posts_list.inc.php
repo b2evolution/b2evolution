@@ -125,9 +125,8 @@ while( $Item = $MainList->get_item() )
 	// We don't switch locales in the backoffice, since we use the user pref anyway
 
 	echo '<td class="nowrap">';
-	echo '<a href="';
-	$Item->permalink();
-	echo '" title="'.T_('Permanent link to full entry').'">'.get_icon( 'permalink' ).'</a> ';
+	$Item->permanent_link( get_icon('permalink') );
+	echo ' ';
 	echo '<span class="date">';
 	$Item->issue_date();
 	echo "</span></td>\n";
@@ -225,6 +224,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/09 21:58:53  fplanque
+ * cleaned up permalinks
+ *
  * Revision 1.2  2006/03/08 19:53:16  fplanque
  * fixed quite a few broken things...
  *

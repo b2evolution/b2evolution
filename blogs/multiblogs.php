@@ -123,7 +123,7 @@ require_once $inc_path.'_blog_main.inc.php';
 	<div class="bPost" lang="<?php $Item->lang() ?>">
 		<?php $Item->anchor(); ?>
 		<div class="bSmallHead">
-		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
+		<?php $Item->permanent_link( get_icon('permalink') ); ?>
 		<?php $Item->issue_time();	echo ', ', T_('Categories'), ': ';	$Item->categories() ?>
 		</div>
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
@@ -138,7 +138,7 @@ require_once $inc_path.'_blog_main.inc.php';
 
 			<?php $Item->trackback_rdf() /* trackback autodiscovery information */ ?>
 
-			<a href="<?php $Item->permalink() ?>" title="Permanent link to full entry"><?php echo T_('Permalink') ?></a>
+			<?php	$Item->permanent_link(); ?>
 		</div>
 
 		<?php
@@ -212,8 +212,10 @@ require_once $inc_path.'_blog_main.inc.php';
 			?>
 			<div class="bPostSide" lang="<?php $Item->lang() ?>">
 				<?php $Item->anchor(); ?>
-
-				<h3 class="bTitle"><a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php $Item->title(); ?></h3>
+				<h3 class="bTitle">
+					<?php $Item->permanent_link( get_icon('permalink') ); ?>
+					<?php $Item->title(); ?>
+				</h3>
 				<div class="bText">
 					<?php $Item->content( 1, false ); ?>
 					<?php link_pages() ?>
@@ -249,8 +251,10 @@ require_once $inc_path.'_blog_main.inc.php';
 			?>
 			<div class="bPostSide" lang="<?php $Item->lang() ?>">
 				<?php $Item->anchor(); ?>
-
-				<h3 class="bTitle"><a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a><?php $Item->title(); ?></h3>
+				<h3 class="bTitle">
+					<?php $Item->permanent_link( get_icon('permalink') ); ?>
+					<?php $Item->title(); ?>
+				</h3>
 				<div class="bText">
 					<?php $Item->content( 1, false ); ?>
 					<?php link_pages() ?>

@@ -42,7 +42,7 @@ while( $Comment = & $CommentList->get_next() )
 			<?php $Comment->content() ?>
 		</div>
 		<div class="bCommentSmallPrint">
-			<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment') ?>" class="permalink_right"><img src="<?php echo $rsc_url ?>icons/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
+			<?php	$Comment->permanent_link( '#', '#', 'permalink_right' ); ?>
 			<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
 			<?php $Comment->edit_link( ' &middot; ' ) // Link to backoffice for editing ?>
 		</div>

@@ -72,9 +72,8 @@
 			$Item->title();
 			echo ' ';
 			$Item->content( 1, 0, T_('more'), '[', ']' );	// Description + more link
-			?>
-			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
-			<?php
+			echo ' ';
+     	$Item->permanent_link( '#icon#' );
 			echo $linkblog_item_after;
 		}
 

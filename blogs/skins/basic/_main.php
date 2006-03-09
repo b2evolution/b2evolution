@@ -131,14 +131,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			</div>
 
 			<small>
-
-			<?php $Item->feedback_link( 'feedbacks', '', ' &bull; ' ) // Link to comments, trackback... ?>
-
-			<?php $Item->edit_link( '', ' &bull; ' ) // Link to backoffice for editing ?>
-
-			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
-
-			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php echo T_('Permalink') ?></a>
+				<?php $Item->feedback_link( 'feedbacks', '', ' &bull; ' ) // Link to comments, trackback... ?>
+				<?php $Item->edit_link( '', ' &bull; ' ) // Link to backoffice for editing ?>
+				<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
+				<?php $Item->permanent_link(); ?>
 			</small>
 
 		</blockquote>

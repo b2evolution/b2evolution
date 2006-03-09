@@ -419,6 +419,8 @@ class Comment extends DataObject
 	/**
 	 * Generate permalink to this comment.
 	 *
+	 * Note: This actually only returns the URL, to get a real link, use Comment::get_permanent_link()
+	 *
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
@@ -445,12 +447,70 @@ class Comment extends DataObject
 	/**
 	 * Template function: display permalink to this comment
 	 *
+	 * Note: This actually only returns the URL, to get a real link, use Comment::permanent_link()
+	 *
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
 	function permalink( $mode = '', $blogurl='' )
 	{
 		echo $this->get_permalink( $mode, $blogurl );
+	}
+
+
+  /**
+   * Returns a permalink link to the Comment
+	 *
+	 * Note: If you only want to permalink URL, use Comment::get_permalink()
+   *
+	 * @param string link text or special value: '#', '#icon#', '#text#'
+	 * @param string link title
+	 * @param string class name
+   */
+	function get_permanent_link( $text = '#', $title = '#', $class = '' )
+	{
+		global $current_User, $baseurl;
+
+		switch( $text )
+		{
+			case '#':
+				$text = get_icon( 'permalink' ).T_('Permalink');
+				break;
+
+			case '#icon#':
+				$text = get_icon( 'permalink' );
+				break;
+
+			case '#text#':
+				$text = T_('Permalink');
+				break;
+		}
+
+		if( $title == '#' ) $title = T_('Permanent link to this comment');
+
+		$url = $this->get_permalink();
+
+		// Display as link
+		$r = '<a href="'.$url.'" title="'.$title.'"';
+		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+		$r .= '>'.$text.'</a>';
+
+		return $r;
+	}
+
+
+  /**
+   * Displays a permalink link to the Comment
+   *
+	 * Note: If you only want to permalink URL, use Comment::permalink()
+	 *
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+   */
+  function permanent_link( $text = '#', $title = '#', $class = '' )
+	{
+		echo $this->get_permanent_link( $text, $title, $class );
 	}
 
 
@@ -704,6 +764,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/09 21:58:52  fplanque
+ * cleaned up permalinks
+ *
  * Revision 1.4  2006/03/09 15:23:26  fplanque
  * fixed broken images
  *

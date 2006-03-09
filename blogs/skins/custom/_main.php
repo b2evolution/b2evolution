@@ -115,8 +115,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			$Item->anchor(); // Anchor for permalinks to refer to
 		?>
 		<div class="bSmallHead">
-		<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="<?php echo T_('Permalink') ?>" width="12" height="9" class="middle" /></a>
 		<?php
+			$Item->permanent_link( '#icon#' );
+			echo ' ';
 			$Item->issue_time();
 			echo ', by ';
 			$Item->Author->preferred_name();
@@ -138,14 +139,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			<?php link_pages() ?>
 		</div>
 		<div class="bSmallPrint">
-			<span class="bIcons">
-				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="<?php echo $rsc_url ?>icons/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" class="middle" /></a>
-			</span>
+			<?php $Item->permanent_link( '#', '#', 'permalink_right' ); ?>
 
 			<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
 			<?php $Item->feedback_link( 'trackbacks', ' &bull; ' ) // Link to trackbacks ?>
 			<?php $Item->feedback_link( 'pingbacks', ' &bull; ' ) // Link to trackbacks ?>
-
 			<?php $Item->edit_link( ' &bull; ' ) // Link to backoffice for editing ?>
 
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>

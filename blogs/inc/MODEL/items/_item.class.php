@@ -368,7 +368,9 @@ class Item extends DataObject
 	/**
 	 * Generate the permalink for the item.
 	 *
-	 * @todo archives modes in clean mode
+	 * Note: This actually only returns the URL, to get a real link, use Item::get_permanent_link()
+	 *
+ 	 * @todo archives modes in clean mode
 	 *
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
@@ -1139,12 +1141,70 @@ class Item extends DataObject
 	/**
 	 * Template function: display permalink for item
 	 *
+	 * Note: This actually only returns the URL, to get a real link, use Item::permanent_link()
+	 *
 	 * @param string 'post', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
 	function permalink( $mode = '', $blogurl='' )
 	{
 		echo $this->get_permalink( $mode, $blogurl );
+	}
+
+
+  /**
+   * Returns a permalink link to the Item
+	 *
+	 * Note: If you only want to permalink URL, use Item::get_permalink()
+   *
+	 * @param string link text or special value: '#', '#icon#', '#text#'
+	 * @param string link title
+	 * @param string class name
+   */
+	function get_permanent_link( $text = '#', $title = '#', $class = '' )
+	{
+		global $current_User, $baseurl;
+
+		switch( $text )
+		{
+			case '#':
+				$text = get_icon( 'permalink' ).T_('Permalink');
+				break;
+
+			case '#icon#':
+				$text = get_icon( 'permalink' );
+				break;
+
+			case '#text#':
+				$text = T_('Permalink');
+				break;
+		}
+
+		if( $title == '#' ) $title = T_('Permanent link to full entry');
+
+		$url = $this->get_permalink();
+
+		// Display as link
+		$r = '<a href="'.$url.'" title="'.$title.'"';
+		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+		$r .= '>'.$text.'</a>';
+
+		return $r;
+	}
+
+
+  /**
+   * Displays a permalink link to the Item
+   *
+	 * Note: If you only want to permalink URL, use Item::permalink()
+	 *
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+   */
+  function permanent_link( $text = '#', $title = '#', $class = '' )
+	{
+		echo $this->get_permanent_link( $text, $title, $class );
 	}
 
 
@@ -1324,7 +1384,10 @@ class Item extends DataObject
 	}
 
 
-	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
+  /**
+   *
+   */
+ 	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
 												$button = false, $actionurl = 'admin.php?ctrl=editactions&amp;action=delete&amp;post=' )
 	{
 		echo $this->get_delete_link( $before, $after, $text, $title, $class, $button, $actionurl );
@@ -2386,6 +2449,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2006/03/09 21:58:52  fplanque
+ * cleaned up permalinks
+ *
  * Revision 1.10  2006/03/09 15:23:27  fplanque
  * fixed broken images
  *

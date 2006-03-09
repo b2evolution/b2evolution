@@ -114,8 +114,9 @@ while( $Comment = & $CommentList->get_next() )
 		</div>
 		</div>
 		<div class="CommentActionsArea">
-		<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment')	?>" class="permalink_right"><img src="img/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 		<?php
+			$Comment->permanent_link( '#', '#', 'permalink_right' );
+
 		 	// Display edit button if current user has the rights:
 			$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton');
 
@@ -134,6 +135,9 @@ while( $Comment = & $CommentList->get_next() )
 <?php
 /*
  * $Log$
+ * Revision 1.3  2006/03/09 21:58:52  fplanque
+ * cleaned up permalinks
+ *
  * Revision 1.2  2006/03/08 19:53:16  fplanque
  * fixed quite a few broken things...
  *

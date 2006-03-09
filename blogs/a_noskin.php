@@ -103,7 +103,7 @@ require $inc_path.'_blog_main.inc.php';
 	# This is the class of for the other blog links:
 	$blog_other_link_class = 'NavButton2';
 	# This is additionnal markup before and after the selected blog name
-	$blog_selected_name_before = '<span class="small"><img src="'. $img_url.'down_small.gif" width="14" height="12" alt="['.T_('Selected').']" title="" class="top" />';
+	$blog_selected_name_before = '<span class="small"><img src="'.$rsc_url.'img/down_small.gif" width="14" height="12" alt="['.T_('Selected').']" title="" class="top" />';
 	$blog_selected_name_after = '</span>';
 	# This is additionnal markup before and after the other blog names
 	$blog_other_name_before = '<span class="small">';
@@ -114,7 +114,6 @@ require $inc_path.'_blog_main.inc.php';
 <!-- InstanceEndEditable -->
 
 <div class="NavBar">
-<div id="Logo">&nbsp;</div>
 <div class="pageTitle">
 <h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php $Blog->disp( 'name', 'htmlbody' ) ?><!-- InstanceEndEditable --></h1>
 </div>
@@ -145,7 +144,7 @@ require $inc_path.'_blog_main.inc.php';
 	<div class="bPost" lang="<?php $Item->lang() ?>">
 		<?php $Item->anchor(); ?>
 		<div class="bSmallHead">
-		<a href="<?php $Item->permalink() ?>" title="Permanent link to full entry"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" class="middle" /></a>
+		<?php $Item->permanent_link( '#icon#' ); ?>
 		<?php $Item->issue_time();	echo ', ', T_('Categories'), ': ';	$Item->categories() ?>
 		</div>
 		<h3 class="bTitle"><?php $Item->title(); ?></h3>
@@ -160,7 +159,7 @@ require $inc_path.'_blog_main.inc.php';
 
 			<?php $Item->trackback_rdf() // trackback autodiscovery information ?>
 
-			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php echo T_('Permalink') ?></a>
+			<?php	$Item->permanent_link(); ?>
 		</div>
 		<?php // ---------------- START OF INCLUDE FOR COMMENTS, TRACKBACK, PINGBACK, ETC. ----------------
 		$disp_comments = 1;         // Display the comments if requested
