@@ -2103,7 +2103,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array()
  * @param array additional params ( 'class' => class name when getting 'imgtag',
 																		'size' => param for 'size',
 																		'title' => title attribute for imgtag)
- * @param boolean true to include this icon into the legend at the bottom of the page
+ * @param boolean true to include this icon into the legend at the bottom of the page (works for 'imgtag' only)
  */
 function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legend = false )
 {
@@ -2114,14 +2114,6 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 		$iconfile = $map_iconfiles[$iconKey]['file'];
 	}
 	else
-	{
-		$iconfile = false;
-	}
-
-	/**
-	 * debug quite time consuming
-	 */
-	if( $iconfile === false )
 	{
 		return '[no image defined for '.var_export( $iconKey, true ).'!]';
 	}
@@ -2134,9 +2126,11 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				return $map_iconfiles[$iconKey]['rollover'];
 			}
 			return false;
+			/* BREAK */
 
 		case 'file':
 			return $basepath.$iconfile;
+			/* BREAK */
 
 		case 'alt':
 			if( isset( $map_iconfiles[$iconKey]['alt'] ) )
@@ -2147,6 +2141,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			{ // $iconKey as alt-tag
 				return $iconKey;
 			}
+			/* BREAK */
 
 		case 'class':
 			if( isset($map_iconfiles[$iconKey]['class']) )
@@ -2157,9 +2152,12 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			{
 				return 'middle';
 			}
+			/* BREAK */
 
-		case 'imgtag':
-			$params['size'] = 'string';
+		case 'url':
+			return $baseurl.$iconfile;
+			/* BREAK */
+
 		case 'size':
 			if( !isset( $map_iconfiles[$iconKey]['size'] ) )
 			{
@@ -2171,37 +2169,33 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			switch( $params['size'] )
 			{
 				case 'width':
-					$size = $map_iconfiles[$iconKey]['size'][0];
-					break;
+					return $map_iconfiles[$iconKey]['size'][0];
+
 				case 'height':
-					$size = $map_iconfiles[$iconKey]['size'][1];
-					break;
+					return $map_iconfiles[$iconKey]['size'][1];
+
 				case 'widthxheight':
-					$size = $map_iconfiles[$iconKey]['size'][0].'x'.$map_iconfiles[$iconKey]['size'][1];
-					break;
+					return $map_iconfiles[$iconKey]['size'][0].'x'.$map_iconfiles[$iconKey]['size'][1];
+
 				case 'width':
-					$size = $map_iconfiles[$iconKey]['size'][0];
-					break;
+					return $map_iconfiles[$iconKey]['size'][0];
+
 				case 'string':
-					$size = 'width="'.$map_iconfiles[$iconKey]['size'][0].'" height="'.$map_iconfiles[$iconKey]['size'][1].'"';
-					break;
+					return 'width="'.$map_iconfiles[$iconKey]['size'][0].'" height="'.$map_iconfiles[$iconKey]['size'][1].'"';
+
 				default:
-					$size = $map_iconfiles[$iconKey]['size'];
+					return $map_iconfiles[$iconKey]['size'];
 			}
+			/* BREAK */
 
-			if( $what == 'size' )
-			{
-				return $size;
-			}
+		case 'imgtag':
+			$r = '<img src="'.$baseurl.$iconfile.'" ';
 
-		case 'url':
-			$iconurl = $baseurl.$iconfile;
-			if( $what == 'url' )
-			{
-				return $iconurl;
-			}
+			// Include non CSS fallbacks:
+			$r .= 'border="0" align="top"';
 
-			$r = '<img class="';
+			// Include class (will default to "middle"):
+			$r .= 'class="';
 			if( isset( $params['class'] ) )
 			{
 				$r .= $params['class'];
@@ -2214,11 +2208,19 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			{
 				$r .= 'middle';
 			}
-			$r .= '" src="'.$iconurl.'" '
-				.$size
-				.( isset( $params['title'] ) ? ' title="'.$params['title'].'"' : '' )
-				.' alt="';
+			$r .= '" ';
 
+			// Include size (optional):
+			if( isset( $map_iconfiles[$iconKey]['size'] ) )
+			{
+				$r .= 'width="'.$map_iconfiles[$iconKey]['size'][0].'" height="'.$map_iconfiles[$iconKey]['size'][1].'" ';
+			}
+
+			// Include title (optional):
+			$r .= ( isset( $params['title'] ) ? 'title="'.$params['title'].'" ' : '' );
+
+			// Include alt (XHTML mandatory):
+			$r .= 'alt="';
 			if( isset( $params['alt'] ) )
 			{
 				$r .= $params['alt'];
@@ -2231,17 +2233,19 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			{ // $iconKey as alt-tag
 				$r .= $iconKey;
 			}
+			$r .= '" ';
 
-			$r .= '" />';
-			break;
+			// Close tag:
+			$r .= '/>';
+
+			if( $include_in_legend && isset( $IconLegend ) )
+			{ // This icon should be included into the legend:
+				$IconLegend->add_icon( $iconKey );
+			}
+
+			return $r;
+			/* BREAK */
 	}
-
-	if( $include_in_legend && isset( $IconLegend ) )
-	{ // This icon should be included into the legend:
-		$IconLegend->add_icon( $iconKey );
-	}
-
-	return $r;
 }
 
 
@@ -2677,6 +2681,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.8  2006/03/09 15:17:47  fplanque
+ * cleaned up get_img() which was one of these insane 'kabelsalat'
+ *
  * Revision 1.7  2006/03/06 20:03:40  fplanque
  * comments
  *
