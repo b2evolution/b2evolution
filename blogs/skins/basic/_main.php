@@ -90,7 +90,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		<p><?php $Blog->disp( 'tagline', 'htmlbody' ) ?></p>
 	</div>
 	<hr>
-
   <small><?php $Blog->disp( 'longdesc', 'htmlbody' ); ?></small>
 
 	<hr>
@@ -200,7 +199,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 	<hr>
 
-	<div align="center">Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" align="middle" /></a> <!-- Please help us promote b2evolution and leave this link on your blog. --></div>
+	<div align="center">Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url; ?>img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" align="middle" /></a> <!-- Please help us promote b2evolution and leave this link on your blog. --></div>
 	<?php
 		$Hit->log();  // log the hit on this page
 		debug_info();	// output debug info if requested

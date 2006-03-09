@@ -139,7 +139,7 @@
 			</div>
 			<div class="bCommentSmallPrint">
 				<span class="bIcons">
-					<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment') ?>"><img src="<?php imgbase() ?>chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
+					<a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment') ?>"><img src="<?php echo $rsc_url ?>icons/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" border="0" class="middle" /></a>
 				</span>
 				<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
 			</div>

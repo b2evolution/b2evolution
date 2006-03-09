@@ -1354,7 +1354,7 @@ class Item extends DataObject
 			return false;
 		}
 
-		if( $text == '#' ) $text = get_icon( 'edit', 'imgtag' ).' '.T_('Edit...');
+		if( $text == '#' ) $text = get_icon( 'edit' ).' '.T_('Edit...');
 		if( $title == '#' ) $title = T_('Edit this post...');
 
 		$r = $before;
@@ -2386,6 +2386,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2006/03/09 15:23:27  fplanque
+ * fixed broken images
+ *
  * Revision 1.9  2006/03/07 19:13:31  fplanque
  * isset() is more compact and more readable
  *

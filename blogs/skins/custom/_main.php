@@ -139,7 +139,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		</div>
 		<div class="bSmallPrint">
 			<span class="bIcons">
-				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="<?php imgbase(); ?>chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" class="middle" /></a>
+				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="<?php echo $rsc_url ?>icons/chain_link.gif" alt="<?php echo T_('Permalink') ?>" width="14" height="14" class="middle" /></a>
 			</span>
 
 			<?php $Item->feedback_link( 'comments' ) // Link to comments ?>
@@ -307,7 +307,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 	<div class="bSideItem">
-		<h3><?php echo T_('Syndicate this blog') ?> <img src="../../img/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
+		<h3><img src="<?php echo $rsc_url ?>icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> <?php echo T_('XML Feeds') ?></h3>
 			<ul>
 				<li>
 					RSS 0.92:
@@ -349,7 +349,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 	<p class="center">powered by<br />
-	<a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" class="middle" /></a></p>
+	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url; ?>img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" class="middle" /></a></p>
 
 </div>
 <div id="pageFooter">

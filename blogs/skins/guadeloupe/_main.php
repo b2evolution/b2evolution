@@ -246,7 +246,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 </li>
 </ul>
 
-Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="logo" /></a>
+Powered by <a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url; ?>img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="logo" /></a>
 
 </div>
 

@@ -359,7 +359,7 @@ div.pageTitle {
 	border: 1px solid #FFFFFF;
 	margin-top: 3px;
 	float: left;
-	width: 75ex;
+	width: 100%;
 }
 h1#pageTitle {
 	color: #FFFFFF;
@@ -367,24 +367,6 @@ h1#pageTitle {
 	font-weight: bold;
 	padding: 0px;
 	margin: 0px;
-}
-div#Logo {
-	color: #FFFFFF;
-	font-size: 270%;
-	font-weight: bold;
-	vertical-align: bottom;
-	border: 1px solid #FFFFFF;
-	margin-top: 3px;
-	margin-right: 3px;
-	padding-left: .6ex;
-	padding-top: 8px;
-	padding-right: .6ex;
-	padding-bottom: 8px;
-	float: left;
-	background-image:  url(../../img/right.gif);
-	background-repeat: no-repeat;
-	background-position: center center;
-	width: 32px;
 }
 
 div.NavBar {

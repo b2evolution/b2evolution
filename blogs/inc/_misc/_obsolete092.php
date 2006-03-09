@@ -1266,6 +1266,16 @@ function timer_stop($display=0,$precision=3) { //if called like timer_stop(1), w
 
 
 /**
+ * Template function: output base URL to b2evo's image folder
+ */
+function imgbase()
+{
+	global $rsc_url;
+	echo $rsc_url.'img/';
+}
+
+
+/**
  * single_month_title(-)
  *
  * fplanque: 0.8.3: changed defaults
@@ -1646,6 +1656,9 @@ $b2_version = $app_version;
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/09 15:23:27  fplanque
+ * fixed broken images
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

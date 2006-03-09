@@ -195,8 +195,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 </div>
 <p class="center">
 	powered by<br />
-	<a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_button.png" width="80" height="15" alt="b2evolution" /></a>
-</p>
+<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url; ?>img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" class="middle" /></a></p>
 
 
 <div id="menu">
@@ -251,12 +250,12 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	user_register_link( '', '<br />' );
 	user_admin_link( '', '<br />' );
 	user_profile_link( '', '<br />' );
-	user_subs_link( '<li>', '</li>' );
+	user_subs_link( '', '<br />' );
 	user_logout_link( '', '<br />' );
 ?>
 <br />
 
-<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../../img/xml.gif" alt="view this weblog as RSS !" width="36" height="14" /></a>
+<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>"><img src="../../rsc/icons/feed-icon-12x12.gif" alt="view this weblog as RSS !" width="12" height="12" class="middle" /> RSS Feed</a>
 </div>
 <?php
 	$Hit->log();	// log the hit on this page

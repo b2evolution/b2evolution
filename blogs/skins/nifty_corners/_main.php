@@ -241,8 +241,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		</ul>
 	</div>
 
-	<div class="bSideItem">
-		<h3><?php echo T_('Syndicate this blog') ?></h3>
+<div class="bSideItem">
+		<h3><img src="<?php echo $rsc_url ?>icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> <?php echo T_('XML Feeds') ?></h3>
 			<ul>
 				<li>
 					RSS 0.92:
@@ -265,13 +265,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					<a href="<?php $Blog->disp( 'comments_atom_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
 				</li>
 			</ul>
-			<img src="../../img/xml.gif" alt="XML" width="36" height="14" class="top" />
-			<a href="http://fplanque.net/Blog/itTrends/2004/01/10/rss_rdf_and_atom_in_a_nutshell" title="External - English">What is this?</a>
+			
+		<a href="http://fplanque.net/Blog/itTrends/2004/01/10/rss_rdf_and_atom_in_a_nutshell" title="External - English">What is this?</a>
 
-	</div>
+</div>
 
 <p class="center">powered by<br />
-<a href="http://b2evolution.net/" title="b2evolution home"><img src="../../img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" class="middle" /></a></p>
+<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url; ?>img/b2evolution_logo_80.gif" alt="b2evolution" width="80" height="17" border="0" class="middle" /></a></p>
 
 </div>
 </div>

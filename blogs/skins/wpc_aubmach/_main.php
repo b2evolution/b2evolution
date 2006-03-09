@@ -237,7 +237,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 </div>
 
-<p class="credit"><cite>powered by &nbsp;<a href="http://b2evolution.net/" title="<?php echo T_('Powered by b2evolution; multilingual multiuser multi-blog engine.'); ?>"><img src="../../img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></cite><br />
+<p class="credit"><cite>powered by &nbsp;<a href="http://b2evolution.net/" title="<?php echo T_('Powered by b2evolution; multilingual multiuser multi-blog engine.'); ?>"><img src="<?php echo $rsc_url; ?>img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></cite><br />
 <?php echo T_('This skin features a CSS file originally designed for WordPress (See design credits in style.css).') ?><br />
 <?php echo T_('Original design credits for this skin:') ?> <a href="http://www.stijlstek.nl/">Ben de Groot</a><br />
 <?php echo T_('In order to ensure maximum compatibility with WP CSS files, most b2evolution features that do not exist in WP are hidden from this generic wpc_* skin.') ?>

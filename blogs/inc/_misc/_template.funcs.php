@@ -44,18 +44,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Template function: output base URL to b2evo's image folder
- *
- * {@internal imgbase(-)}}
- */
-function imgbase()
-{
-	global $img_url;
-	echo $img_url;
-}
-
-
-/**
  * Display a global title matching filter params
  *
  * Outputs the title of the category when you load the page with <code>?cat=</code>
@@ -318,6 +306,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/09 15:23:27  fplanque
+ * fixed broken images
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

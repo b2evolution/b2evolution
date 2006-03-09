@@ -289,6 +289,7 @@ class Comment extends DataObject
 	 * @param string link text
 	 * @param string link title
 	 * @param string class name
+	 * @return boolean
 	 */
 	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
@@ -301,7 +302,7 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( $text == '#' ) $text = T_('Edit');
+		if( $text == '#' ) $text = get_icon( 'edit' ).' '.T_('Edit');
 		if( $title == '#' ) $title = T_('Edit this comment');
 
 		echo $before;
@@ -703,6 +704,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/09 15:23:26  fplanque
+ * fixed broken images
+ *
  * Revision 1.3  2006/03/06 20:03:40  fplanque
  * comments
  *

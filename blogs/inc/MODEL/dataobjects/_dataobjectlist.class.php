@@ -105,6 +105,8 @@ class DataObjectList extends Results
 
 	/**
 	 * Get next object in list
+	 *
+	 * @return DataObject
 	 */
 	function & get_next()
 	{
@@ -120,6 +122,9 @@ class DataObjectList extends Results
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/09 15:23:26  fplanque
+ * fixed broken images
+ *
  * Revision 1.1  2006/02/23 21:11:57  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
