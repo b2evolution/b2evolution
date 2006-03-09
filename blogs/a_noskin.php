@@ -55,6 +55,8 @@ $timestamp_max = 'now';
 /**
  * Let b2evolution handle the query string and load the blog data:
  */
+require_once dirname(__FILE__).'/conf/_config.php';
+
 require $inc_path.'_blog_main.inc.php';
 
 

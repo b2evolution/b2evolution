@@ -92,6 +92,8 @@ if( $Blog_all->get( 'stub' ) != '' )
 <p><?php echo T_('Please note: the above list (as well as the menu) is automatically generated and includes only the blogs that have a &quot;stub url name&quot;. You can set this in the blog configuration in the back-office.') ?></p>
 <h2><?php echo T_('More demos') ?>:</h2>
 <ul>
+	<li><strong><?php echo T_('Stub file') ?>: <a href="a_stub.php"><?php echo T_('Blog #2 called through a stub file') ?></a></strong> &nbsp; (a_stub.php)</li>
+	<li><strong><?php echo T_('Custom template') ?>: <a href="a_noskin.php"><?php echo T_('Blog #2 called through a custom template (not a skin)') ?></a></strong> &nbsp; (a_noskin.php)</li>
 	<li><strong><?php echo T_('Custom template') ?>: <a href="multiblogs.php"><?php echo T_('Multiple blogs displayed on the same page') ?></a></strong> &nbsp; (multiblogs.php)</li>
 	<li><strong><?php echo T_('Custom template') ?>: <a href="summary.php"><?php echo T_('Summary of last posts in all blogs') ?></a></strong> &nbsp; (summary.php)</li>
 	<li><strong><?php echo T_('Custom template') ?>: <a href="default.php"><?php echo T_('The page you\'re looking at') ?></a></strong> &nbsp; (default.php)</li>
