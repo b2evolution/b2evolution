@@ -402,8 +402,10 @@ $cookie_expired = time() - 86400;
  */
 $conf_subdir = 'conf/';                  // Subdirectory relative to base
 $conf_path = str_replace( '\\', '/', dirname(__FILE__) ).'/';
+// echo ' conf_path='.$conf_path;
 
 $basepath = preg_replace( '#/'.$conf_subdir.'$#', '', $conf_path ).'/'; // Remove this file's subpath
+// echo ' basepath='.$basepath;
 
 /**
  * Location of the include folder.
@@ -435,7 +437,6 @@ $htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
  * @global string $xmlsrv_subdir
  */
 $xmlsrv_subdir = 'xmlsrv/';              // Subdirectory relative to base
-$xmlsrv_dirout = '../';                  // Relative path to go back to base
 $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
 
 /**
@@ -454,7 +455,6 @@ $rsc_url = $baseurl.$rsc_subdir;         // You should not need to change this
  * @global string $skins_subdir
  */
 $skins_subdir = 'skins/';                // Subdirectory relative to base
-$skins_dirout = '../';                   // Relative path to go back to base
 $skins_url = $baseurl.$skins_subdir;     // You should not need to change this
 
 /**
@@ -496,7 +496,6 @@ $plugins_url = $baseurl.$plugins_subdir; // You should not need to change this
  * @global string $install_subdir
  */
 $install_subdir = 'install/';            // Subdirectory relative to base
-$install_dirout = '../';                 // Relative path to go back to base
 
 /**
  * Location of the root media folder.

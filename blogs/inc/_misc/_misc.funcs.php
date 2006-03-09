@@ -2040,15 +2040,6 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  */
 function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array() )
 {
-	/*
-	// Fails when the same icon gets re-used (Results class)..
-	static $count_generated = 0;
-
-	if( ! isset($link_attribs['id']) )
-	{
-		$link_attribs['id'] = 'action_icon_'.$count_generated++;
-	}
-	*/
 
 	$link_attribs['href'] = $url;
 	$link_attribs['title'] = $url;
@@ -2681,6 +2672,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.9  2006/03/09 20:40:40  fplanque
+ * cleanup
+ *
  * Revision 1.8  2006/03/09 15:17:47  fplanque
  * cleaned up get_img() which was one of these insane 'kabelsalat'
  *

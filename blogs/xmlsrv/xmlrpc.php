@@ -21,11 +21,11 @@
 /**
  * Initialize everything:
  */
-require_once(dirname(__FILE__).'/../conf/_config.php' );
-require_once(dirname(__FILE__).'/../conf/_admin.php' ); // TO get extended definitions Tor Oct 2005
+require_once dirname(__FILE__).'/../conf/_config.php';
+require_once $conf_path.'_admin.php'; // TO get extended definitions Tor Oct 2005
 // fplanque>>WHAT IS UPGRADE USED FOR????
-require_once(dirname(__FILE__).'/../conf/_upgrade.php' ); // TO get extended definitions Tor Oct 2005
-require_once(dirname(__FILE__).'/'.$xmlsrv_dirout.$core_subdir.'_main.inc.php' );
+require_once $conf_path.'_upgrade.php'; // TO get extended definitions Tor Oct 2005
+require_once $inc_path.'_main.inc.php';
 
 if( true !== CANUSEXMLRPC )
 { // We cannot use XML-RPC: send a error response ( "1 Unknown method" ).
@@ -2514,6 +2514,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.88  2006/03/09 20:40:41  fplanque
+ * cleanup
+ *
  * Revision 1.87  2006/02/23 21:12:54  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

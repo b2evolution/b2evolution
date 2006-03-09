@@ -158,7 +158,7 @@ function upgrade_b2evo_tables()
 
 		// We come here, if $old_db_version and $new_db_version are the same, but the schema needs upgrade (_db_schema.inc.php has changed)..
 		// We'll upgrade to the new schema below (at the end)..
-// When is this right? When upgrading from a CVS version to another?
+		echo '<p>'.T_('The version number is correct, but we have detected changes in the database schema. This can happen with CVS versions...').'</p>';
 	}
 
 
@@ -813,6 +813,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.134  2006/03/09 20:40:41  fplanque
+ * cleanup
+ *
  * Revision 1.133  2006/03/07 19:30:23  fplanque
  * comments
  *
