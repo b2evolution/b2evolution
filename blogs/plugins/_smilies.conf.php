@@ -11,10 +11,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $img_url;
+global $rsc_url;
 
 # the directory where your smilies are (no trailing slash)
-$this->smilies_path = $img_url.'smilies';
+$this->smilies_path = $rsc_url.'smilies';
 
 # here's the conversion table, you can modify it if you know what you're doing
 # smilies will be displayed in their order of appearance

@@ -70,6 +70,23 @@ class smilies_plugin extends Plugin
 
 
 	/**
+	 * Allowing the user to deactivate the toolbar..
+	 *
+	 * @return array
+	 */
+	function GetDefaultUserSettings()
+	{
+		return array(
+				'use_toolbar' => array(
+					'label' => T_( 'Use smilies toolbar' ),
+					'defaultvalue' => '1',
+					'type' => 'checkbox',
+				),
+			);
+	}
+
+
+	/**
 	 * Display a toolbar
 	 *
 	 * @param array Associative array of parameters
@@ -77,6 +94,11 @@ class smilies_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
+		if( ! $this->UserSettings->get('use_toolbar') )
+		{
+			return false;
+		}
+
 		$grins = '';
 		$smiled = array();
 		foreach( $this->smilies as $smiley => $grin )
