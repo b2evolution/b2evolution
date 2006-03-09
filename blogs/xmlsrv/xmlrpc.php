@@ -317,7 +317,7 @@ function b2_getPostURL($m)
 						'This post ID ('.$post_ID.') does not correspond to any post here.' );
 	}
 
-	return new xmlrpcresp( new xmlrpcval( $Item->get_permalink() ) );
+	return new xmlrpcresp( new xmlrpcval( $Item->get_permanent_url() ) );
 }
 
 
@@ -2514,6 +2514,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.89  2006/03/09 22:30:02  fplanque
+ * cleaned up permanent urls
+ *
  * Revision 1.88  2006/03/09 20:40:41  fplanque
  * cleanup
  *

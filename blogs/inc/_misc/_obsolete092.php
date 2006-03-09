@@ -856,7 +856,7 @@ function permalink_anchor( $mode = 'id' )
  *
  * Permalink forced to a single post
  *
- * @deprecated deprecated by {@link Item::permalink()}
+ * @deprecated deprecated by {@link Item::permanent_url()}
  */
 function permalink_single($file='')
 {
@@ -874,7 +874,7 @@ function permalink_single($file='')
 function the_permalink()
 {
 	global $Item;
-	$Item->permalink();
+	$Item->permanent_url();
 }
 
 
@@ -1656,6 +1656,9 @@ $b2_version = $app_version;
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/09 22:29:59  fplanque
+ * cleaned up permanent urls
+ *
  * Revision 1.2  2006/03/09 15:23:27  fplanque
  * fixed broken images
  *

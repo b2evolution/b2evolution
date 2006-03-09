@@ -128,7 +128,7 @@
 					}
 				?>
 				&#8212;
-				<?php $Comment->date() ?> @ <a href="<?php $Comment->permalink() ?>" title="<?php echo T_('Permanent link to this comment') ?>"><?php $Comment->time( 'H:i' ) ?></a>
+				<?php $Comment->date() ?> @ <a href="<?php $Comment->permanent_url() ?>" title="<?php echo T_('Permanent link to this comment') ?>"><?php $Comment->time( 'H:i' ) ?></a>
 				<?php $Comment->edit_link( ' | ', '', T_('Edit This') ) // Link to backoffice for editing ?>
 				</cite></p>
 			</li>

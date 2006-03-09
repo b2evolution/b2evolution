@@ -69,7 +69,7 @@ switch( $disp )
 			<items>
 				<rdf:Seq>
 				<?php while( $Item = $MainList->get_item() ) { ?>
-					<rdf:li rdf:resource="<?php $Item->permalink( 'single' ) ?>"/>
+					<rdf:li rdf:resource="<?php $Item->permanent_url( 'single' ) ?>"/>
 				<?php } ?>
 				</rdf:Seq>
 			</items>
@@ -78,9 +78,9 @@ switch( $disp )
 		$MainList->restart();
 		while( $Item = $MainList->get_item() )
 		{ ?>
-		<item rdf:about="<?php $Item->permalink( 'single' ) ?>">
+		<item rdf:about="<?php $Item->permanent_url( 'single' ) ?>">
 			<title><?php $Item->title( '', '', false, 'xml' ) ?></title>
-			<link><?php $Item->permalink( 'single' ) ?></link>
+			<link><?php $Item->permanent_url( 'single' ) ?></link>
 			<dc:date><?php $Item->issue_date( 'isoZ', true ) ?></dc:date>
 			<dc:creator><?php $Item->Author->preferred_name( 'xml' ) ?></dc:creator>
 			<dc:subject><?php $Item->main_category( 'xml' ) ?></dc:subject>

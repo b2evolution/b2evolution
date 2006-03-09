@@ -51,6 +51,6 @@ $CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'D
 		<item>
 			<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
 			<description><?php $Comment->content( 'entityencoded' ) ?></description>
-			<link><?php $Comment->permalink() ?></link>
+			<link><?php $Comment->permanent_url() ?></link>
 		</item>
 		<?php } // End of comment loop. ?>

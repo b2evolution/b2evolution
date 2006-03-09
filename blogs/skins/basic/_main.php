@@ -107,7 +107,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		?>
 		<h3>
 			<?php $Item->issue_time(); ?>
-			<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="middle" /></a>
+			<a href="<?php $Item->permanent_url() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><img src="img/icon_minipost.gif" alt="Permalink" width="12" height="9" border="0" align="middle" /></a>
 			<?php $Item->title(); ?>
 			&nbsp;
 			<?php locale_flag( $Item->locale, 'h10px', '', 'middle' ); // Display flag for post locale ?>

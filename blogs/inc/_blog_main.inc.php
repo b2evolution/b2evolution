@@ -270,7 +270,7 @@ if( ($disp == 'posts') || ($disp == 'single') )
 
 		if( ($Item !== false) && ($Item->blog_ID != $blog) )
 		{ // We're on the wrong blog (probably an old permalink) let's redirect
-			$new_permalink = $Item->get_permalink( '', '', false, '&' );
+			$new_permalink = $Item->get_permanent_url( '', '', false, '&' );
 
 			header ("Location: $new_permalink");
 			exit();
@@ -413,6 +413,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/09 22:29:59  fplanque
+ * cleaned up permanent urls
+ *
  * Revision 1.1  2006/02/23 21:11:55  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

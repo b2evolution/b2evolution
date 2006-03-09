@@ -67,12 +67,12 @@ echo '<?xml version="1.0" encoding="utf-8"?'.'>';
 			<?php while( $Item = $MainList->get_item() ) {	?>
 			<entry>
 				<title type="text"><?php $Item->title( '', '', false, 'xml' ) ?></title>
-				<link rel="alternate" type="text/html" href="<?php $Item->permalink( 'single' ) ?>" />
+				<link rel="alternate" type="text/html" href="<?php $Item->permanent_url( 'single' ) ?>" />
 				<author>
 					<name><?php $Item->Author->preferred_name( 'xml' ) ?></name>
 					<?php $Item->Author->url( '<uri>', "</uri>\n", 'xml' ) ?>
 				</author>
-				<id><?php $Item->permalink( 'single' ) ?></id>
+				<id><?php $Item->permanent_url( 'single' ) ?></id>
 				<published><?php $Item->issue_date( 'isoZ', true ) ?></published>
 				<updated><?php $Item->mod_date( 'isoZ', true ) ?></updated>
 				<content type="html"><![CDATA[<?php

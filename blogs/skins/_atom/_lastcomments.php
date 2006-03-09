@@ -51,12 +51,12 @@ $CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'D
 	{ // Loop through comments: ?>
 	<entry>
 		<title type="text"><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
-		<link rel="alternate" type="text/html" href="<?php $Comment->permalink() ?>" />
+		<link rel="alternate" type="text/html" href="<?php $Comment->permanent_url() ?>" />
 		<author>
 			<name><?php $Comment->author( '', '#', '', '#', 'xml' ) ?></name>
 			<?php $Comment->author_url( '', '<uri>', "</uri>\n", false ) ?>
 		</author>
-		<id><?php $Comment->permalink() ?></id>
+		<id><?php $Comment->permanent_url() ?></id>
     <published><?php $Comment->date( 'isoZ', true ); ?></published>
 		<updated><?php $Comment->date( 'isoZ', true ); ?></updated>
 		<content type="html"><![CDATA[<?php $Comment->content() ?>]]></content>

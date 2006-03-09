@@ -70,7 +70,7 @@ echo "<?xml version=\"1.0\"?".">";
 			      $Item->url_link( '', ' ', '%s', array(), 'entityencoded' );
 			      $Item->content( 1, false, T_('[...] Read more!'), '', '', '', 'entityencoded' );
 			    ?></description>
-			    <link><?php $Item->permalink( 'single' ) ?></link>
+			    <link><?php $Item->permanent_url( 'single' ) ?></link>
 			  </item>
 			  <?php }
 		}

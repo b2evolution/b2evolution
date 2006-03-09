@@ -99,7 +99,7 @@ function trackback(
 	$excerpt = rawurlencode($excerpt);
 	$blog_name = rawurlencode(get_bloginfo('name'));
 	$Item = & $ItemCache->get_by_ID( $ID );
-	$url = rawurlencode( $Item->get_permalink('', '', false, '&') );
+	$url = rawurlencode( $Item->get_permanent_url('', '', false, '&') );
 	// dis is the trackback stuff to be sent:
 	$query_string = "title=$title&url=$url&blog_name=$blog_name&excerpt=$excerpt";
 	// echo "url:$trackback_url<br>$sending:$query_string<br />";
@@ -237,6 +237,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/09 22:29:59  fplanque
+ * cleaned up permanent urls
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

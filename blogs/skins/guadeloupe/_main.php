@@ -102,7 +102,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <?php $Item->anchor(); ?>
 <h2><?php $Item->title(); ?></h2>
 <div class="infos">
-<h3><a href="<?php $Item->permalink() ?>" title="Permalink"><?php $Item->issue_date() ?> <?php $Item->issue_time() ?></a></h3>
+<h3><a href="<?php $Item->permanent_url() ?>" title="Permalink"><?php $Item->issue_date() ?> <?php $Item->issue_time() ?></a></h3>
 &nbsp;
 <h4><?php $Item->categories() ?></h4>
 </div>

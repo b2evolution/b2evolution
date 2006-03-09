@@ -77,7 +77,7 @@ echo '<?xml version="1.0"?'.'>';
 				<?php while( $Item = $MainList->get_item() ) {	?>
 				<item>
 					<title><?php $Item->title( '', '', false, 'xml' ) ?></title>
-					<link><?php $Item->permalink( 'single' ) ?></link>
+					<link><?php $Item->permanent_url( 'single' ) ?></link>
 					<pubDate><?php $Item->issue_date( 'r', true ) ?></pubDate>
 					<?php /* Disabled because of spambots: <author><php $Item->Author->email( 'xml' ) ></author> */ ?>
 					<?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml' ) ?>

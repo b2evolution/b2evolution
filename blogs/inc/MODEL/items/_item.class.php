@@ -377,7 +377,7 @@ class Item extends DataObject
 	 * @param boolean true to force single post on destination page
 	 * @param string glue between url params
 	 */
-	function get_permalink( $mode = '', $blogurl = '', $force_single = false, $glue = '&amp;' )
+	function get_permanent_url( $mode = '', $blogurl = '', $force_single = false, $glue = '&amp;' )
 	{
 		global $DB, $BlogCache, $cacheweekly, $Settings;
 
@@ -871,7 +871,7 @@ class Item extends DataObject
 			{ // We are offering to read more
 				$output = $content_parts[0];
 				$output .= $before_more .
-										'<a href="'.$this->get_permalink( 'pid', $more_file ).'#more'.$this->ID.'">'.
+										'<a href="'.$this->get_permanent_url( 'pid', $more_file ).'#more'.$this->ID.'">'.
 										$more_link_text.'</a>' .
 										$after_more;
 			}
@@ -1146,18 +1146,18 @@ class Item extends DataObject
 	 * @param string 'post', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
-	function permalink( $mode = '', $blogurl='' )
+	function permanent_url( $mode = '', $blogurl='' )
 	{
-		echo $this->get_permalink( $mode, $blogurl );
+		echo $this->get_permanent_url( $mode, $blogurl );
 	}
 
 
   /**
    * Returns a permalink link to the Item
 	 *
-	 * Note: If you only want to permalink URL, use Item::get_permalink()
+	 * Note: If you only want to permalink URL, use Item::get_permanent_url()
    *
-	 * @param string link text or special value: '#', '#icon#', '#text#'
+	 * @param string link text or special value: '#', '#icon#', '#text#', '#title#'
 	 * @param string link title
 	 * @param string class name
    */
@@ -1178,11 +1178,15 @@ class Item extends DataObject
 			case '#text#':
 				$text = T_('Permalink');
 				break;
+
+			case '#title#':
+				$text = format_to_output( $this->title );
+				break;
 		}
 
 		if( $title == '#' ) $title = T_('Permanent link to full entry');
 
-		$url = $this->get_permalink();
+		$url = $this->get_permanent_url();
 
 		// Display as link
 		$r = '<a href="'.$url.'" title="'.$title.'"';
@@ -1196,9 +1200,9 @@ class Item extends DataObject
   /**
    * Displays a permalink link to the Item
    *
-	 * Note: If you only want to permalink URL, use Item::permalink()
+	 * Note: If you only want to permalink URL, use Item::permanent_url()
 	 *
-	 * @param string link text
+	 * @param string link text or special value: '#', '#icon#', '#text#', '#title#'
 	 * @param string link title
 	 * @param string class name
    */
@@ -1295,7 +1299,7 @@ class Item extends DataObject
 		if( ($number == 0) && $hideifnone )
 			return false;
 
-		$url = $this->get_permalink( $mode, $blogurl, true );
+		$url = $this->get_permanent_url( $mode, $blogurl, true );
 		if( $use_popup )
 		{ // We need to tell b2evo to use the popup template
 			$url = url_add_param( $url, 'template=popup' );
@@ -1797,10 +1801,10 @@ class Item extends DataObject
 		echo '  xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">'."\n";
 		echo '<rdf:Description'."\n";
 		echo '  rdf:about="';
-		$this->permalink( 'single' );
+		$this->permanent_url( 'single' );
 		echo '"'."\n";
 		echo '  dc:identifier="';
-		$this->permalink( 'single' );
+		$this->permanent_url( 'single' );
 		echo '"'."\n";
 		$this->title( '  dc:title="', '"'."\n", false, 'xmlattr' );
 		echo '  trackback:ping="';
@@ -2344,7 +2348,7 @@ class Item extends DataObject
 
 			$notify_message .= T_('Url').': '.str_replace('&amp;', '&', $this->get('url'))."\n";
 
-			$notify_message .= T_('Content').': '.str_replace('&amp;', '&', $this->get_permalink( 'pid' ))."\n";
+			$notify_message .= T_('Content').': '.str_replace('&amp;', '&', $this->get_permanent_url( 'pid' ))."\n";
 												// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
 			$notify_message .= $this->get('content')."\n\n";
@@ -2449,6 +2453,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2006/03/09 22:29:59  fplanque
+ * cleaned up permanent urls
+ *
  * Revision 1.11  2006/03/09 21:58:52  fplanque
  * cleaned up permalinks
  *

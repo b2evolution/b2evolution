@@ -558,7 +558,7 @@ function the_weekday_date($before='',$after='')
  *
  * TODO: archives modes in clean mode
  *
- * @deprecated deprecated by {@link Item::get_permalink(-)}
+ * @deprecated deprecated by {@link Item::get_permanent_url()}
  */
 function get_permalink(
 	$file,                  // base URL of the blog
@@ -940,6 +940,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/09 22:29:59  fplanque
+ * cleaned up permanent urls
+ *
  * Revision 1.1  2006/02/23 21:11:58  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

@@ -424,7 +424,7 @@ class Comment extends DataObject
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
-	function get_permalink( $mode = '', $blogurl='' )
+	function get_permanent_url( $mode = '', $blogurl='' )
 	{
 		global $Settings;
 
@@ -439,7 +439,7 @@ class Comment extends DataObject
 				$mode = 'pid';
 		}
 
-		$post_permalink = $this->Item->get_permalink( $mode, $blogurl );
+		$post_permalink = $this->Item->get_permanent_url( $mode, $blogurl );
 		return $post_permalink.'#c'.$this->ID;
 	}
 
@@ -452,16 +452,16 @@ class Comment extends DataObject
 	 * @param string 'urltitle', 'pid', 'archive#id' or 'archive#title'
 	 * @param string url to use
 	 */
-	function permalink( $mode = '', $blogurl='' )
+	function permanent_url( $mode = '', $blogurl='' )
 	{
-		echo $this->get_permalink( $mode, $blogurl );
+		echo $this->get_permanent_url( $mode, $blogurl );
 	}
 
 
   /**
    * Returns a permalink link to the Comment
 	 *
-	 * Note: If you only want to permalink URL, use Comment::get_permalink()
+	 * Note: If you only want to permalink URL, use Comment::get_permanent_url()
    *
 	 * @param string link text or special value: '#', '#icon#', '#text#'
 	 * @param string link title
@@ -488,7 +488,7 @@ class Comment extends DataObject
 
 		if( $title == '#' ) $title = T_('Permanent link to this comment');
 
-		$url = $this->get_permalink();
+		$url = $this->get_permanent_url();
 
 		// Display as link
 		$r = '<a href="'.$url.'" title="'.$title.'"';
@@ -502,7 +502,7 @@ class Comment extends DataObject
   /**
    * Displays a permalink link to the Comment
    *
-	 * Note: If you only want to permalink URL, use Comment::permalink()
+	 * Note: If you only want to permalink URL, use Comment::permanent_url()
 	 *
 	 * @param string link text
 	 * @param string link title
@@ -644,7 +644,7 @@ class Comment extends DataObject
 			$notify_message = T_('Blog').': '.$Blog->get('shortname')
 				.' ( '.str_replace('&amp;', '&', $Blog->get('blogurl'))." )\n"
 				.T_('Post').': '.$this->Item->get('title')
-				.' ( '.str_replace('&amp;', '&', $this->Item->get_permalink( 'pid' ))." )\n";
+				.' ( '.str_replace('&amp;', '&', $this->Item->get_permanent_url( 'pid' ))." )\n";
 				// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
 			switch( $this->type )
@@ -670,7 +670,7 @@ class Comment extends DataObject
 			}
 
 			$notify_message .=
-				T_('Comment').': '.str_replace('&amp;', '&', $this->get_permalink( 'pid' ))."\n" // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+				T_('Comment').': '.str_replace('&amp;', '&', $this->get_permanent_url( 'pid' ))."\n" // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 				.$this->get('content')."\n\n"
 				.T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&amp;blog='.$this->Item->blog_ID.'&p='.$this->Item->ID."&c=1\n\n"
 				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
@@ -764,6 +764,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/09 22:29:59  fplanque
+ * cleaned up permanent urls
+ *
  * Revision 1.5  2006/03/09 21:58:52  fplanque
  * cleaned up permalinks
  *

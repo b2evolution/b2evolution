@@ -32,7 +32,7 @@ while( $Comment = & $CommentList->get_next() )
 	<div class="bComment">
 		<h3 class="bTitle">
 			<?php echo T_('In response to:') ?>
-			<a href="<?php $Comment->Item->permalink() ?>"><?php $Comment->Item->title( '', '', false ) ?></a>
+			<?php $Comment->Item->permanent_link( '#title#' ) ?>
 		</h3>
 		<div class="bCommentTitle">
 			<?php $Comment->author() ?>

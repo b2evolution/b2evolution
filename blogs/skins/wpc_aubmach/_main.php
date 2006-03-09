@@ -100,7 +100,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 			$Item->anchor(); // Anchor for permalinks to refer to
 		?>
-	 <h3 class="storytitle"><a href="<?php $Item->permalink() ?>" rel="bookmark" title="<?php echo T_('Permanent link to full entry') ?>"><?php $Item->title(); ?></a></h3>
+	 <h3 class="storytitle"><?php $Item->permanent_link( '#title#' ) ?></h3>
 	<div class="meta"><?php echo T_('Filed under:'); ?> <?php $Item->categories(); ?> &#8212; <?php $Item->Author->preferred_name() ?> @ <?php $Item->issue_time() ?>
 		<?php $Item->edit_link( '', '', T_('Edit This') ) // Link to backoffice for editing ?>
 	</div>

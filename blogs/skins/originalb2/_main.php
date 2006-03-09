@@ -110,7 +110,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	Categories: <?php $Item->categories() ?>
 	&nbsp;-&nbsp;
 	<span class="storyAuthor"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>?author=<?php $Item->Author->ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php $Item->Author->preferred_name() ?></a></span>
-	@ <a href="<?php $Item->permalink() ?>"><?php $Item->issue_time() ?></a>
+	@ <a href="<?php $Item->permanent_url() ?>"><?php $Item->issue_time() ?></a>
 </div>
 
 <div class="storyContent">

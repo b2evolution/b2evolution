@@ -68,7 +68,7 @@ require_once $inc_path.'_main.inc.php';
 </div>
 
 <div class="pageHeaderEnd"></div>
-	  
+
 </div>
 </div>
 
@@ -98,7 +98,7 @@ require_once $inc_path.'_main.inc.php';
 			?>
 			<li lang="<?php $Item->lang() ?>">
 				<?php $Item->issue_date() ?>:
-				<a href="<?php $Item->permalink() ?>" title="<?php echo T_('Permanent link to full entry') ?>"><?php $Item->title( '', '', false ); ?></a>
+				<?php $Item->permanent_link( '#title#' ) ?>
 				<span class="small">[<?php $Item->lang() ?>]</span>
 			</li>
 			<?php

@@ -63,6 +63,6 @@ $CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'D
 			<guid isPermaLink="false">c<?php $Comment->ID() ?>@<?php echo $baseurl ?></guid>
 			<description><?php $Comment->content( 'xml' ) ?></description>
 			<content:encoded><![CDATA[<?php $Comment->content() ?>]]></content:encoded>
-			<link><?php $Comment->permalink() ?></link>
+			<link><?php $Comment->permanent_url() ?></link>
 		</item>
 		<?php } // End of comment loop. ?>

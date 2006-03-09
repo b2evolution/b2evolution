@@ -88,7 +88,7 @@ function pingback(
 		$pingback_href_original_pos = 27;
 
 		$Item = & $ItemCache->get_by_ID( $post_ID );
-		$pagelinkedfrom = $Item->get_permalink();
+		$pagelinkedfrom = $Item->get_permanent_url();
 
 		if( !empty($post_url) )
 		{
@@ -368,6 +368,9 @@ function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/09 22:29:59  fplanque
+ * cleaned up permanent urls
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
