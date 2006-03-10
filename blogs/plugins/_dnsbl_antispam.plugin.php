@@ -157,7 +157,7 @@ class dnsbl_antispam_plugin extends Plugin
 	function GetDbLayout()
 	{
 		return array(
-			"CREATE TABLE {$this->get_sql_table('log')} (
+			'CREATE TABLE '.$this->get_sql_table('log')." (
 				log_type ENUM( 'blocked', 'not_blocked', 'whitelisted' ) NOT NULL,
 				log_hit_ID INT UNSIGNED NULL,
 				log_data VARCHAR(255) NULL )",
@@ -682,6 +682,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.13  2006/03/10 18:22:56  blueyed
+ * Fixed PHP5 syntax
+ *
  * Revision 1.12  2006/03/02 20:03:39  blueyed
  * Added DisplayIpAddress() and fixed/finished DisplayItemAllFormats()
  *
