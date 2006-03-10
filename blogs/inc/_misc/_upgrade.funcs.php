@@ -214,6 +214,11 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 			 */
 			$cfields = array();
 
+			/**
+			 * @global boolean Do we have any variable-length fields? (see http://dev.mysql.com/doc/refman/4.1/en/silent-column-changes.html)
+			 */
+			$has_variable_length_field = false;
+
 
 			// Get all of the field names in the query from between the parens
 			preg_match( '|\((.*)\)|s', $items[$table_lowered][0]['query'], $match );
@@ -251,12 +256,17 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					$fields_with_keys = array_merge( $fields_with_keys, $index_fields );
 				}
 				else
-				{ // valid field, add it to the field array
+				{ // "normal" field, add it to the field array
 					$cfields[ strtolower($fieldname_lowered) ] = array(
 							'field' => $fld,
 							'where' => ( empty($prev_fld) ? 'FIRST' : 'AFTER '.$prev_fld ),
 						);
 					$prev_fld = $fieldname;
+
+					if( preg_match( '~^\S+\s+(VARCHAR|TEXT|BLOB)~i', $fld ) )
+					{
+						$has_variable_length_field = true;
+					}
 				}
 			}
 
@@ -436,12 +446,26 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 				}
 				elseif( preg_match( '~^'.$tablefield->Field.'\s+ (CHAR|VARCHAR|BINARY|VARBINARY) \s* \( ([\d\s]+) \) (\s+ (BINARY|ASCII|UNICODE) )? (.*)$~ix', $column_definition, $match ) )
 				{
-					$fieldtype = $match[1].'('.trim($match[2]).')';
+					$len = trim($match[2]);
+
+					$fieldtype = $match[1].'('.$len.')';
 					if( ! empty($match[3]) )
 					{ // "binary", "ascii", "unicode"
 						$fieldtype .= ' '.$match[3];
 					}
 					$field_to_parse = $match[5];
+
+					if( strtoupper($match[1]) == 'VARCHAR' )
+					{
+						if( $len < 4 )
+						{ // VARCHAR shorter than 4 get converted to CHAR (but reported as VARCHAR in MySQL 5.0)
+							$type_matches = preg_match( '~^(VAR)?CHAR\('.$len.'\)'.( $match[3] ? ' '.$match[3] : '' ).'$~i', $tablefield->Type );
+						}
+					}
+					elseif( $has_variable_length_field && strtoupper($match[1]) == 'CHAR' )
+					{ // CHARs in a row with variable length fields get silently converted to VARCHAR (but reported as CHAR in MySQL 5.0)
+						$type_matches = preg_match( '~^(VAR)?'.preg_quote( $fieldtype, '~' ).'$~i', $tablefield->Type );
+					}
 				}
 				elseif( preg_match( '~^'.$tablefield->Field.'\s+ (ENUM|SET) \s* \( (.*) \) (.*)$~ix', $column_definition, $match ) )
 				{
@@ -598,7 +622,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 				}
 
 				#pre_dump( 'change_null ($change_null, $tablefield, $want_null)', $change_null, $tablefield, $want_null );
-				#pre_dump( 'type_matches', $type_matches );
+				#pre_dump( 'type_matches', $type_matches, strtolower($tablefield->Type), strtolower($fieldtype) );
 
 				// Is actual field type different from the field type in query?
 				if( ! $type_matches || $change_null )
@@ -646,12 +670,15 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 								'type' => 'change_default' );
 						}
 					}
-					elseif( ! empty($tablefield->Default) && $tablefield->Type != 'timestamp' )
+					elseif( ! empty($tablefield->Default) )
 					{ // No DEFAULT given, but it exists one, so drop it
-						$items[$table_lowered][] = array(
-							'query' => 'ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' DROP DEFAULT',
-							'note' => "Dropped default value of {$table}.{$tablefield->Field}",
-							'type' => 'change_default' ); // might be also 'drop_default'
+						if( $tablefield->Type != 'timestamp' && $tablefield->Type != 'datetime' && ! preg_match( '~^enum|set\s*\(~', $tablefield->Type ) )
+						{
+							$items[$table_lowered][] = array(
+								'query' => 'ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' DROP DEFAULT',
+								'note' => "Dropped default value of {$table}.{$tablefield->Field}",
+								'type' => 'change_default' ); // might be also 'drop_default'
+						}
 					}
 				}
 
@@ -860,6 +887,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.6  2006/03/10 17:20:24  blueyed
+ * Support silent column specification changes (part of)
+ *
  * Revision 1.5  2006/03/10 06:13:13  blueyed
  * Split fields for Mac..?!
  *

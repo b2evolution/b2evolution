@@ -530,32 +530,62 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 
 	/**
-	 *
+	 * VARCHAR shorter then 4 characters get silently converted to CHAR by MySQL.
 	 */
-	function test_foobar()
+	function test_db_delta_varchar_shorter_than_4()
 	{
-		$this->test_DB->query( "
-			CREATE  TABLE  test_1 (
-				`sess_time` int( 10  ) unsigned NOT  NULL default  '0',
-				`sess_ipaddress` varchar( 15  )  collate latin1_german1_ci NOT  NULL default  '',
-				`sess_user_ID` mediumint( 8  ) unsigned default NULL ,
-				KEY  `start_time` (  `sess_time`  ) ,
-				KEY  `remote_ip` (  `sess_ipaddress`  )  )" );
-
-		$r = $this->db_delta_wrapper( "
+		$this->test_DB->query( '
 			CREATE TABLE test_1 (
-				sess_ID        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-				sess_key       CHAR(32) NULL,
-				sess_lastseen  DATETIME NOT NULL,
-				sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
-				sess_user_ID   INT(10) DEFAULT NULL,
-				sess_data      TEXT DEFAULT NULL,
-				PRIMARY KEY( sess_ID )
-			)", NULL );
+				v VARCHAR(2)
+			)' );
+
+		$r = $this->db_delta_wrapper( '
+			CREATE TABLE test_1 (
+				v VARCHAR(2)
+			)' );
+
+		$this->assertEqual( $r, array() );
 	}
 
 
-	// TODO: VARCHAR(3) <=> CHAR(3)
+	/**
+	 * If a row contains any variable length column, all CHAR fields become VARCHAR fields.
+	 */
+	function test_db_delta_varchar_to_char_if_any_varlength_field()
+	{
+		$this->test_DB->query( '
+			CREATE TABLE test_1 (
+				v VARCHAR(22),
+				c VARCHAR(22),
+				c2 CHAR(2)
+			)' );
+
+		$r = $this->db_delta_wrapper( '
+			CREATE TABLE test_1 (
+				v VARCHAR(22),
+				c CHAR(22),
+				c2 VARCHAR(2)
+			)' );
+
+		$this->assertEqual( $r, array() );
+	}
+
+
+	function test_db_delta_varchar_to_char_change_length()
+	{
+		$this->test_DB->query( '
+			CREATE TABLE test_1 (
+				v VARCHAR(20)
+			)' );
+
+		$r = $this->db_delta_wrapper( '
+			CREATE TABLE test_1 (
+				v CHAR(20)
+			)' );
+
+		$this->assertEqual( $r['test_1'][0]['query'], 'ALTER TABLE test_1 CHANGE COLUMN v v CHAR(20)' );
+	}
+
 }
 
 
