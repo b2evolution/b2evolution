@@ -1349,7 +1349,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 		return T_('Invalid URL');
 	}
 
-	$scheme = empty( $matches[1] ) ? strtolower($matches[2]) : strtolower($matches[1]);
+	$scheme = strtolower($matches[1]);
 	if( !in_array( $scheme, $allowed_uri_scheme ) )
 	{ // Scheme not allowed
 		$Debuglog->add( 'URL scheme &laquo;'.$scheme.'&raquo; not allowed!', 'error' );
@@ -2668,6 +2668,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.11  2006/03/10 21:12:33  fplanque
+ * no message
+ *
  * Revision 1.10  2006/03/10 21:05:52  fplanque
  * not validating undocumented changes with geeky syntax
  *
