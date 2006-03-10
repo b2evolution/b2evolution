@@ -220,7 +220,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 			$qryline = trim($match[1]);
 
 			// Separate field lines into an array
-			$flds = preg_split( '~,\r?\n~', $qryline, -1, PREG_SPLIT_NO_EMPTY );
+			$flds = preg_split( '~,(\r?\n|\r)~', $qryline, -1, PREG_SPLIT_NO_EMPTY );
 
 			//echo "<hr/><pre>\n".print_r(strtolower($table), true).":\n".print_r($items, true)."</pre><hr/>";
 
@@ -860,6 +860,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.5  2006/03/10 06:13:13  blueyed
+ * Split fields for Mac..?!
+ *
  * Revision 1.4  2006/03/10 06:03:40  blueyed
  * db_delta fixes
  *
