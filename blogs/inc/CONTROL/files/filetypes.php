@@ -60,12 +60,17 @@ switch( $action )
 {
 	
 	case 'new':
-		// New contact form...:
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
 		$edited_Filetype = & new Filetype();
 		$AdminUI->append_to_titlearea( T_('Add a file type...') );
 		break;
-		
+
 	case 'copy':
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
 		// Duplicate a file type by prefilling create form:
 		param( 'ftyp_ID', 'integer', true );
 		$new_Filetype = $edited_Filetype;	// COPY
@@ -76,6 +81,10 @@ switch( $action )
 	
 	case 'edit':
 		// Edit file type form...:
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
 		// Make sure we got an ftyp_ID:
 		param( 'ftyp_ID', 'integer', true );
  		break;
@@ -83,6 +92,9 @@ switch( $action )
 	case 'create':
 		// Insert new file type...:
 		$edited_Filetype = & new Filetype();
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
 
 		// load data from request
 		if( $edited_Filetype->load_from_Request() )
@@ -111,9 +123,13 @@ switch( $action )
 
 	case 'update':
 		// Edit file type form...:
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
 		// Make sure we got an ftyp_ID:
 		param( 'ftyp_ID', 'integer', true );
-		
+
 		// load data from request
 		if( $edited_Filetype->load_from_Request() )
 		{	// We could load data from form without errors:
@@ -123,9 +139,13 @@ switch( $action )
 			$action = 'list';
 		}
 		break;
-		
+
 	case 'delete':
 		// Delete file type:
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
 		// Make sure we got an ftyp_ID:
 		param( 'ftyp_ID', 'integer', true );
 

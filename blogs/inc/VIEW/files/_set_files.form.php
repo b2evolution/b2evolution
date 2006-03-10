@@ -69,10 +69,17 @@ if( empty( $force_regexp_filename ) || empty( $force_regexp_dirname ) )
 	$Form->end_fieldset();
 }
 
-$Form->end_form( array(
-		array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
-		array( 'reset', '', T_('Reset'), 'ResetButton' ),
-		array( 'submit', 'submit[restore_defaults]', T_('Restore defaults'), 'ResetButton' ),
-	) );
+
+if( $current_User->check_perm( 'options', 'edit', false ) )
+{ // We have permission to modify:
+	$Form->buttons( array(
+			array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
+			array( 'reset', '', T_('Reset'), 'ResetButton' ),
+			array( 'submit', 'submit[restore_defaults]', T_('Restore defaults'), 'ResetButton' ),
+		) );
+}
+
+
+$Form->end_form();
 
 ?>

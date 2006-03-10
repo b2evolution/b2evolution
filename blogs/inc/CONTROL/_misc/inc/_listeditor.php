@@ -68,9 +68,13 @@ if( !empty( $locked_IDs )
  */
 switch( $action )
 {
-
 	case 'copy':
 	case 'edit':
+		if( isset( $perm_name ) )
+		{	// We need to Check permission:
+			$current_User->check_perm( $perm_name, $perm_level, true );
+		}
+
 		$name = $DB->get_var( "
 				SELECT $edited_table_namecol
 				  FROM $edited_table
@@ -87,6 +91,12 @@ switch( $action )
 
 	case 'create':
 		// Insert into database...:
+
+		if( isset( $perm_name ) )
+		{	// We need to Check permission:
+			$current_User->check_perm( $perm_name, $perm_level, true );
+		}
+
 		$Request->param( 'name', 'string', true );
 		if( $Request->param_check_not_empty( 'name', T_('Please enter a string.') ) )
 		{
@@ -126,6 +136,12 @@ switch( $action )
 
 	case 'update':
 		// Update in database...:
+
+		if( isset( $perm_name ) )
+		{	// We need to Check permission:
+			$current_User->check_perm( $perm_name, $perm_level, true );
+		}
+
 		$Request->param( 'ID', 'integer', true );
 		if( $Request->param_string_not_empty( 'name', T_('Please enter a string.') ) )
 		{	// Update in database
@@ -149,6 +165,12 @@ switch( $action )
 
 	case 'delete':
 		// Delete entry:
+
+		if( isset( $perm_name ) )
+		{	// We need to Check permission:
+			$current_User->check_perm( $perm_name, $perm_level, true );
+		}
+
 		param( 'ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
@@ -212,6 +234,12 @@ switch( $action )
 		
 	case 'move_up':
 		// Move up
+
+		if( isset( $perm_name ) )
+		{	// We need to Check permission:
+			$current_User->check_perm( $perm_name, $perm_level, true );
+		}
+
 		$ID = param( $edited_table_prefix.'ID', 'integer', true );
 
 		$DB->begin();
@@ -274,7 +302,13 @@ switch( $action )
 
 		
 	case 'move_down':
-		// Move up
+		// Move down
+
+		if( isset( $perm_name ) )
+		{	// We need to Check permission:
+			$current_User->check_perm( $perm_name, $perm_level, true );
+		}
+
 		$ID = param( $edited_table_prefix.'ID', 'integer', true );
 
 		$DB->begin();
@@ -334,14 +368,16 @@ switch( $action )
 		$DB->commit();
 			
 		$name = '';	
-		break;		
-		
+		break;
+
+
 	case 'sort_by_order':
 		// The list is sorted by the order column now.
 		$Request->set_param( 'results_'.$edited_table_prefix.'order', '--A');
 		$name = '';
 		$action = 'list';
 		break;
+
 
 	default:
 		$name = '';
@@ -383,6 +419,7 @@ if( ($action == 'delete') && !$confirm && $checked_delete )
 		$Form = & new Form( '', 'form_cancel', 'get', '' );
 				
 		$Form->begin_form( 'inline' );
+		$Form->hiddens_by_key( get_memorized( 'action,ID') );
 		$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 		$Form->end_form()
 		?>
@@ -395,11 +432,13 @@ if( ($action == 'delete') && !$confirm && $checked_delete )
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
+
 // EXPERIMENTAL
 if ( !isset( $default_col_order ) )
 { // The default order column is not set, so the default is the name column
 	$default_col_order = '-A-';
 }
+
 
 // Create result set:
 $sql = "SELECT $edited_table_IDcol, $edited_table_namecol
@@ -416,99 +455,121 @@ if( isset( $list_title ) )
 $Results->cols[] = array(
 		'th' => T_('ID'),
 		'order' => $edited_table_IDcol,
-		'th_start' => '<tr><th class="firstcol shrinkwrap">',
+		'th_start' => '<th class="firstcol shrinkwrap">',
 		'td_start' => '<td class="firstcol shrinkwrap">',
 		'td' => "\$$edited_table_IDcol\$",
 	);
 
-function link_name( $title , $ID )	
-{
-	return '<strong><a href="'.regenerate_url( 'action,ID', 'ID='.$ID.'&amp;action=edit' ).'">'.$title.'</a></strong>';
+if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, false ) )
+{	// We have permission permission to edit:
+	function link_name( $title , $ID )
+	{
+		return '<strong><a href="'.regenerate_url( 'action,ID', 'ID='.$ID.'&amp;action=edit' ).'">'.$title.'</a></strong>';
+	}
 }
-
+else
+{
+	function link_name( $title , $ID )
+	{
+		return '<strong>'.$title.'</strong>';
+	}
+}
 $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => $edited_table_namecol,
  		'td' => '%link_name( #'.$edited_table_namecol.'#, #'.$edited_table_IDcol.'# )%',
 	);
-	
-if( !empty( $edited_table_ordercol ) )
-{
-	$Results->cols[] = array(
-			'th' => T_('Move'),
-			'th_start' => '<th class="shrinkwrap">',
-			'order' => $edited_table_ordercol,
-			'td_start' => '<td class="shrinkwrap">',
-			'td' => '{move}',
-		);
-}
-	
-function edit_actions( $ID )
-{
-	global $locked_IDs;
 
-	$r = action_icon( T_('Duplicate...'), 'copy', regenerate_url( 'action', 'ID='.$ID.'&amp;action=copy' ) );
 
-	if( empty( $locked_IDs ) || !in_array( $ID, $locked_IDs ) )
-	{ // This element is NOT locked:
-		$r = action_icon( T_('Edit...'), 'edit', regenerate_url( 'action', 'ID='.$ID.'&amp;action=edit' ) )
-					.$r
-					.action_icon( T_('Delete!'), 'delete', regenerate_url( 'action', 'ID='.$ID.'&amp;action=delete' ) );
+if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, false ) )
+{	// We have permission permission to edit:
 
+	if( !empty( $edited_table_ordercol ) )
+	{
+		$Results->cols[] = array(
+				'th' => T_('Move'),
+				'th_start' => '<th class="shrinkwrap">',
+				'order' => $edited_table_ordercol,
+				'td_start' => '<td class="shrinkwrap">',
+				'td' => '{move}',
+			);
 	}
 
-	return $r;
+	function edit_actions( $ID )
+	{
+		global $locked_IDs;
+
+		$r = action_icon( T_('Duplicate...'), 'copy', regenerate_url( 'action', 'ID='.$ID.'&amp;action=copy' ) );
+
+		if( empty( $locked_IDs ) || !in_array( $ID, $locked_IDs ) )
+		{ // This element is NOT locked:
+			$r = action_icon( T_('Edit...'), 'edit', regenerate_url( 'action', 'ID='.$ID.'&amp;action=edit' ) )
+						.$r
+						.action_icon( T_('Delete!'), 'delete', regenerate_url( 'action', 'ID='.$ID.'&amp;action=delete' ) );
+
+		}
+
+		return $r;
+	}
+
+	$Results->cols[] = array(
+			'th' => T_('Actions'),
+			'td_start' => '<td class="shrinkwrap lastcol">',
+			'td' => '%edit_actions( #'.$edited_table_IDcol.'# )%',
+		);
+
 }
 
-$Results->cols[] = array(
-		'th' => T_('Actions'),
-		'td_start' => '<td class="shrinkwrap lastcol">',
-		'td' => '%edit_actions( #'.$edited_table_IDcol.'# )%',
-	);
 
-// EXPERIMENTAL 
+// EXPERIMENTAL
 // $Results->display();
 $Results->display( NULL, $result_fadeout );
 
 
-// FORM:
-switch( $action )
-{
-	case 'edit':
-	case 'delete':
-		$creating = false;
-		break;
+// NEW ENTRY / EDIT FORM:
+if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, false ) )
+{	// We have permission permission to edit:
 
-	default:
-		$creating = true;
+	switch( $action )
+	{
+		case 'edit':
+		case 'delete':
+			$creating = false;
+			break;
+
+		default:
+			$creating = true;
+	}
+
+	$Form = & new form( '', 'leditor_checkchanges' );
+
+	$Form->begin_form( 'fform', $creating ? T_('New entry') : T_('Edit entry') );
+
+	$Form->hidden( 'action', $creating ? 'create' : 'update' );
+
+	if( $action == 'edit' )
+	{
+		$Form->hidden( 'ID', $ID );
+		$Form->info( T_('ID'), $ID );
+	}
+
+	$Form->text_input( 'name', $name, min(40,$edited_name_maxlen), T_('Name'), array( 'maxlength'=>$edited_name_maxlen, 'required'=>true ) );
+
+	if( $creating )
+	{
+		$Form->end_form( array(
+			array( '', '', T_('Record'), 'SaveButton' ),
+			array( 'reset', 'reset', T_('Reset'), 'SaveButton' ) ) );
+	}
+	else
+	{
+		$Form->end_form( array(
+			array( '', '', T_('Update'), 'SaveButton' ),
+			array( 'reset', 'reset', T_('Reset'), 'SaveButton' ) ) );
+	}
+
 }
 
-$Form = & new form( '', 'leditor_checkchanges' );
-
-$Form->begin_form( 'fform', $creating ? T_('New entry') : T_('Edit entry') );
-
-$Form->hidden( 'action', $creating ? 'create' : 'update' );
-
-if( $action == 'edit' )
-{
-	$Form->hidden( 'div_firm_ID', $ID );
-	$Form->info( T_('ID'), $ID );
-}
-
-$Form->text_input( 'name', $name, min(40,$edited_name_maxlen), T_('Name'), array( 'maxlength'=>$edited_name_maxlen, 'required'=>true ) );
-
-if( $creating )
-{
-	$Form->end_form( array(
-		array( '', '', T_('Record'), 'SaveButton' ),
-		array( 'reset', 'reset', T_('Reset'), 'SaveButton' ) ) );
-}
-else
-{
-	$Form->end_form( array(
-		array( '', '', T_('Update'), 'SaveButton' ),
-		array( 'reset', 'reset', T_('Reset'), 'SaveButton' ) ) );
-}
 
 // End payload block:
 $AdminUI->disp_payload_end();

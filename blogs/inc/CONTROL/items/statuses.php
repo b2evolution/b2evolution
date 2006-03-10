@@ -10,13 +10,18 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+// Check minimum permission:
+$current_User->check_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'options', 'statuses' );
+
 $edited_table = 'T_itemstatuses';
 $edited_table_IDcol = 'pst_ID';
 $edited_table_namecol = 'pst_name';
 $default_col_order = 'A';
 $edited_name_maxlen = 40;
+$perm_name = 'options';
+$perm_level = 'edit';
 
 /**
  * Delete restrictions

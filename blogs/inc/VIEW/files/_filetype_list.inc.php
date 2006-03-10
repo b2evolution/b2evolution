@@ -46,12 +46,24 @@ $Results->cols[] = array(
 						'td' => '<img src="'.$rsc_url.'icons/fileicons/$ftyp_icon$" alt="$ftyp_icon$">',
 					);
 
-$Results->cols[] = array(
-						'th' => T_('Extensions'),
-						'order' => 'ftyp_extensions',
-						'td' => '<a href="admin.php?ctrl=filetypes&amp;ftyp_ID=$ftyp_ID$&amp;action=edit" title="'.
-										T_('Edit this file type...').'">$ftyp_extensions$</a>',
-					);
+if( $current_User->check_perm( 'options', 'edit', false ) )
+{ // We have permission to modify:
+	$Results->cols[] = array(
+							'th' => T_('Extensions'),
+							'order' => 'ftyp_extensions',
+							'td' => '<strong><a href="admin.php?ctrl=filetypes&amp;ftyp_ID=$ftyp_ID$&amp;action=edit" title="'.
+											T_('Edit this file type...').'">$ftyp_extensions$</a></strong>',
+						);
+}
+else
+{	// View only:
+	$Results->cols[] = array(
+							'th' => T_('Extensions'),
+							'order' => 'ftyp_extensions',
+							'td' => '<strong>$ftyp_extensions$</strong>',
+						);
+
+}
 
 $Results->cols[] = array(
 						'th' => T_('Name'),
@@ -94,19 +106,24 @@ $Results->cols[] = array(
 						'td' => '%display_perm( #ftyp_allowed# )%',
 					);
 
-$Results->cols[] = array(
-						'th' => T_('Actions'),
-						'th_start' => '<th class="lastcol shrinkwrap">',
-						'td_start' => '<td class="lastcol shrinkwrap">',
-						'td' => action_icon( T_('Edit this file type...'), 'edit',
-                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=edit\')%' )
-                    .action_icon( T_('Duplicate this file type...'), 'copy',
-                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=copy\')%' )
-                    .action_icon( T_('Delete this file type!'), 'delete',
-                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=delete\')%' ),
-					);
+if( $current_User->check_perm( 'options', 'edit', false ) )
+{ // We have permission to modify:
 
-$Results->global_icon( T_('Add a file type...'), 'new', regenerate_url( 'action', 'action=new'), T_('Add file type') );
+	$Results->cols[] = array(
+							'th' => T_('Actions'),
+							'th_start' => '<th class="lastcol shrinkwrap">',
+							'td_start' => '<td class="lastcol shrinkwrap">',
+							'td' => action_icon( T_('Edit this file type...'), 'edit',
+	                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=edit\')%' )
+	                    .action_icon( T_('Duplicate this file type...'), 'copy',
+	                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=copy\')%' )
+	                    .action_icon( T_('Delete this file type!'), 'delete',
+	                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=delete\')%' ),
+						);
+
+  $Results->global_icon( T_('Add a file type...'), 'new', regenerate_url( 'action', 'action=new'), T_('Add file type') );
+}
+
 
 $Results->display();
 
