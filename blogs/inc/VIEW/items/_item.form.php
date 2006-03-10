@@ -313,6 +313,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 		if( $Blog->get('allowpingbacks') )
 		{ // --------------------------- PINGBACK --------------------------------------
+			global $post_pingback;
 		?>
 		<div id="itemform_pingbacks">
 			<input type="checkbox" class="checkbox" name="post_pingback" value="1" id="post_pingback"
@@ -433,6 +434,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/10 19:04:58  fplanque
+ * minor
+ *
  * Revision 1.3  2006/03/06 20:03:40  fplanque
  * comments
  *

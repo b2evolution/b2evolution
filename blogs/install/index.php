@@ -75,7 +75,7 @@ $timestamp = time() - 120; // We start dates 2 minutes ago because their dates i
 		<a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Install menu') ?></a> &middot;
 		<a href="phpinfo.php"><?php echo T_('PHP info') ?></a> &middot;
 		<a href="../index.php"><?php echo T_('Go to Blogs') ?></a> &middot;
-		<a href="../admin/"><?php echo T_('Go to Admin') ?></a> &middot;
+		<a href="../admin.php"><?php echo T_('Go to Admin') ?></a> &middot;
 		<?php echo T_('Online') ?>:
 		<a href="http://b2evolution.net/man/"><?php echo T_('Manual') ?></a> &middot;
 		<a href="http://b2evolution.net/man/supportfaq.html"><?php echo T_('Support') ?></a>
@@ -370,12 +370,6 @@ switch( $action )
 			<p><input type="radio" name="action" id="cafelogupgrade" value="cafelogupgrade" />
 				<label for="cafelogupgrade"><?php echo T_('<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them.')?></label></p>
 
-			<p><input type="radio" name="action" id="upfrom_miniblog" value="upfrom_miniblog" />
-				<label for="upfrom_miniblog"><?php echo T_('<strong>Upgrade from Manywhere Miniblog</strong>: Install b2evolution database tables and copy your existing Miniblog data into them.')?></label></p>
-
-			<!-- <p><input type="radio" name="action" id="upfrom_wordpress" value="upfrom_wordpress" />
-				<label for="upfrom_wordpress">EXPERIMENTAL: <?php echo T_('<strong>Upgrade from WordPress v 1.2</strong>: Install b2evolution database tables and copy your existing WordPress data into them.')?></label></p> -->
-
 			<?php
 				if( $allow_evodb_reset == 1 )
 				{
@@ -513,47 +507,6 @@ to
 		break;
 
 
-	case 'upfrom_miniblog':
-		/*
-		 * -----------------------------------------------------------------------------------
-		 * UPGRADE FROM MINIBLOG : Create a new db structure + copy content from miniblog
-		 * -----------------------------------------------------------------------------------
-		 */
-		require_once( dirname(__FILE__). '/_functions_miniblog.php' );
-		?>
-		<h2><?php printf( T_('Installing b2evolution tables and copying existing %s data'), 'Miniblog' ) ?></h2>
-		<?php
-			create_b2evo_tables();
-			upgrade_miniblog_tables();
-			install_basic_plugins();
-		?>
-		<p><?php echo T_('Upgrade completed successfully!')?></p>
-		<?php printf( T_('<p>Now you can <a %s>log in</a> with your usual Miniblog email login cropped at 20 chars. All passwords have been reset to "%s".</p>
-<p>Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.</p>'), 'href="'.$admin_url.'"', $random_password )?>
-		<?php
-		break;
-
-
-	case 'upfrom_wordpress':
-		/*
-		 * -----------------------------------------------------------------------------------
-		 * UPGRADE FROM WORDPRESS : Create a new db structure + copy content from wordpress
-		 * -----------------------------------------------------------------------------------
-		 */
-		require_once( dirname(__FILE__). '/_functions_wordpress.php' );
-		?>
-		<h2><?php printf( T_('Installing b2evolution tables and copying existing %s data'), 'WordPress' ) ?></h2>
-		<?php
-			create_b2evo_tables();
-			upgrade_cafelog_tables();
-			install_basic_plugins();
-		?>
-		<p><?php echo T_('Upgrade completed successfully!')?></p>
-		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'WordPress')?></p>
-		<?php
-		break;
-
-
 	case 'deletedb':
 		/*
 		 * -----------------------------------------------------------------------------------
@@ -628,6 +581,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.93  2006/03/10 19:04:58  fplanque
+ * minor
+ *
  * Revision 1.92  2006/02/23 22:17:31  blueyed
  * fix path
  *
