@@ -28,6 +28,7 @@ class UpgradeToCurrentTestCase extends InstallUnitTestCase
 
 		$this->dropTestDbTables();
 
+		// We test with lax sql mode
 		$this->old_sql_mode = $this->test_DB->get_var( 'SELECT @@sql_mode' );
 		$this->test_DB->query( 'SET sql_mode = ""' );
 	}

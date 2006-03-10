@@ -51,6 +51,9 @@ class DbUnitTestCase extends EvoUnitTestCase
 
 		$this->old_DB = & $GLOBALS['DB'];
 		$GLOBALS['DB'] = & $this->test_DB;
+
+		// reset any error (and catch it in tearDown())
+		$this->test_DB->error = NULL;
 	}
 
 
@@ -60,6 +63,11 @@ class DbUnitTestCase extends EvoUnitTestCase
 	function tearDown()
 	{
 		parent::tearDown();
+
+		if( $this->test_DB->error )
+		{
+			$this->fail( 'There was a DB error.' );
+		}
 
 		$GLOBALS['DB'] = & $this->old_DB;
 	}

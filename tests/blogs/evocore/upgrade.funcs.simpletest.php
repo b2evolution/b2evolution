@@ -42,14 +42,18 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 	 */
 	function db_delta_wrapper( $queries, $exclude = array() )
 	{
+		$old_error = $this->test_DB->error;
+
 		$this->test_DB->error = false; // reset any error
 
 		$r = db_delta( $queries, true, $exclude );
 
 		if( $this->test_DB->error )
 		{
-			pre_dump( $r );
+			pre_dump( 'db_delta failed!', $queries, $r );
 		}
+
+		$this->test_DB->error = $old_error;
 
 		return $r;
 	}
