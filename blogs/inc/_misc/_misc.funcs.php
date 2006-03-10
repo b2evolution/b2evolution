@@ -1334,17 +1334,13 @@ function validate_url( $url, & $allowed_uri_scheme )
 	// NOTE: this causes the most problems with this function!
 	// fp>> we should probably go back to a very laxist scheme here... :(
 	// blueyed>> yes, seems so.
-		// fp>>I won't validate those new UNDOCUMENTED changes
 	/* Remaining problems with this one are:
 	 *  - no spaces in URL allowed (must be written as %20)
 	 *  - umlauts in domains/url
 	 */
 	if( ! preg_match('~^                # start
-		(?:
-			(?: ([a-z][a-z0-9+.\-]*):[0-9]*       # scheme
-				//                                # authority absolute URLs only
-			)|(mailto):
-		)
+		([a-z][a-z0-9+.\-]*):[0-9]*       # scheme
+		//                                # authority absolute URLs only
 		[a-z0-9]([a-z0-9\~+.\-_,:;/\\\\*=@]|(%\d+))* # Don t allow anything too funky like entities
 		([?#][a-z0-9\~+.\-_,:;/\\\\%&=!?#*\ \[\]]*)?
 		$~ix', $url, $matches) )
@@ -2672,6 +2668,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.10  2006/03/10 21:05:52  fplanque
+ * not validating undocumented changes with geeky syntax
+ *
  * Revision 1.9  2006/03/09 20:40:40  fplanque
  * cleanup
  *
