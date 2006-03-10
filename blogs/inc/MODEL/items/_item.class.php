@@ -368,7 +368,7 @@ class Item extends DataObject
 	/**
 	 * Generate the permalink for the item.
 	 *
-	 * Note: This actually only returns the URL, to get a real link, use Item::get_permanent_link()
+	 * Note: This actually only returns the URL, to get a real link, use {@link Item::get_permanent_link()}
 	 *
  	 * @todo archives modes in clean mode
 	 *
@@ -1141,7 +1141,7 @@ class Item extends DataObject
 	/**
 	 * Template function: display permalink for item
 	 *
-	 * Note: This actually only returns the URL, to get a real link, use Item::permanent_link()
+	 * Note: This actually only outputs the URL, to display a real link, use {@link Item::permanent_link()}
 	 *
 	 * @param string 'post', 'archive#id' or 'archive#title'
 	 * @param string url to use
@@ -1155,7 +1155,7 @@ class Item extends DataObject
   /**
    * Returns a permalink link to the Item
 	 *
-	 * Note: If you only want to permalink URL, use Item::get_permanent_url()
+	 * Note: If you only want the permalink URL, use {@link Item::get_permanent_url()}
    *
 	 * @param string link text or special value: '#', '#icon#', '#text#', '#title#'
 	 * @param string link title
@@ -1200,7 +1200,7 @@ class Item extends DataObject
   /**
    * Displays a permalink link to the Item
    *
-	 * Note: If you only want to permalink URL, use Item::permanent_url()
+	 * Note: If you only want the permalink URL, use {@link Item::permanent_url()}
 	 *
 	 * @param string link text or special value: '#', '#icon#', '#text#', '#title#'
 	 * @param string link title
@@ -2453,6 +2453,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2006/03/10 17:18:59  blueyed
+ * doc
+ *
  * Revision 1.12  2006/03/09 22:29:59  fplanque
  * cleaned up permanent urls
  *
