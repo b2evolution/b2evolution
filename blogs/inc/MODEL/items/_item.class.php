@@ -951,6 +951,21 @@ class Item extends DataObject
 
 
 	/**
+	 * returns issue date (datetime) of Item
+	 *
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_issue_date( $format = '', $useGM = false )
+	{
+		if( empty($format) )
+			$format = locale_datefmt();
+
+		return mysql2date( $format, $this->issue_date, $useGM);
+	}
+
+
+	/**
 	 * Template function: display issue date (datetime) of Item
 	 *
 	 * @param string date/time format: leave empty to use locale default date format
@@ -958,10 +973,7 @@ class Item extends DataObject
 	 */
 	function issue_date( $format = '', $useGM = false )
 	{
-		if( empty($format) )
-			echo mysql2date( locale_datefmt(), $this->issue_date, $useGM);
-		else
-			echo mysql2date( $format, $this->issue_date, $useGM);
+		echo $this->get_issue_date( $format, $useGM );
 	}
 
 
@@ -2271,6 +2283,16 @@ class Item extends DataObject
 	}
 
 
+	function load_Blog()
+	{
+		if( is_null($this->Blog) )
+		{
+			global $BlogCache;
+			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
+		}
+	}
+
+
 	/**
 	 * Get the Blog object for the Item.
 	 *
@@ -2278,12 +2300,7 @@ class Item extends DataObject
 	 */
 	function & get_Blog()
 	{
-		if( is_null($this->Blog) )
-		{
-			global $BlogCache;
-			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
-		}
-
+		$this->load_Blog();
 		return $this->Blog;
 	}
 
@@ -2453,6 +2470,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2006/03/10 21:08:26  fplanque
+ * Cleaned up post browsing a little bit..
+ *
  * Revision 1.13  2006/03/10 17:18:59  blueyed
  * doc
  *

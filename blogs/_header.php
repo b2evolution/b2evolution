@@ -116,28 +116,27 @@ $AdminUI->add_menu_entries(
 					// they will be overridden in the browse controller
 						'postlist' => array(
 							'text' => T_('Post list'),
-							'href' => 'admin.php?ctrl=chapters&amp;tab=postlist&amp;blog='.$blog,
+							'href' => 'admin.php?ctrl=browse&amp;tab=postlist&amp;blog='.$blog,
 							),
-						'posts' => array(
-							'text' => T_('Full posts'),
-							'href' => 'admin.php?ctrl=chapters&amp;tab=posts&amp;blog='.$blog,
-							),
-						// EXPERIMENTAL:
-						'exp' => array(
-							'text' => T_('Experimental'),
-							'href' => 'admin.php?ctrl=chapters&amp;tab=exp&amp;blog='.$blog,
+						'postlist2' => array(
+							'text' => T_('Post list 2'),
+							'href' => 'admin.php?ctrl=browse&amp;tab=postlist2&amp;blog='.$blog,
 							),
 						'tracker' => array(
 							'text' => T_('Tracker'),
-							'href' => 'admin.php?ctrl=chapters&amp;tab=tracker&amp;blog='.$blog,
+							'href' => 'admin.php?ctrl=browse&amp;tab=tracker&amp;blog='.$blog,
+							),
+						'posts' => array(
+							'text' => T_('Full posts'),
+							'href' => 'admin.php?ctrl=browse&amp;tab=posts&amp;blog='.$blog,
 							),
 					/*	'commentlist' => array(
 							'text' => T_('Comment list'),
-							'href' => 'admin.php?ctrl=chapters&amp;tab=commentlist&amp;blog='.$blog,
+							'href' => 'admin.php?ctrl=browse&amp;tab=commentlist&amp;blog='.$blog,
 							*/
 						'comments' => array(
 							'text' => T_('Comments'),
-							'href' => 'admin.php?ctrl=chapters&amp;tab=comments&amp;blog='.$blog,
+							'href' => 'admin.php?ctrl=browse&amp;tab=comments&amp;blog='.$blog,
 							),
 					)
 			),

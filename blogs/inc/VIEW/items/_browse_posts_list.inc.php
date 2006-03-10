@@ -27,6 +27,8 @@
  *
  * @package admin
  *
+ * @deprecated by postlist2
+ *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
@@ -224,6 +226,9 @@ if( $MainList->get_total_num_posts() )
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/10 21:08:26  fplanque
+ * Cleaned up post browsing a little bit..
+ *
  * Revision 1.3  2006/03/09 21:58:53  fplanque
  * cleaned up permalinks
  *

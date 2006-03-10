@@ -67,14 +67,36 @@ echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 
 $ItemList->title = T_('Task list');
 
-
+// Issue date:
 $ItemList->cols[] = array(
-						'th' => /* TRANS: abbrev for Priority */ T_('P'),
-						'order' => 'post_priority',
-						'th_start' => '<th class="shrinkwrap">',
-						'td_start' => '<td class="center tskst_$post_pst_ID$">',
-						'td' => '$post_priority$',
-					);
+		'th' => T_('Issue date'),
+		'order' => 'post_datestart',
+		'th_start' => '<th class="firstcol nowrap">',
+		'td_start' => '<td class="firstcol nowrap">',
+		'td' => '@get_permanent_link( get_icon(\'permalink\') )@ <span class="date">@get_issue_date()@</span>',
+	);
+
+
+// Blog name:
+if( $Blog->ID == 1 )
+{ // "All blogs": display name of blog
+	$ItemList->cols[] = array(
+			'th' => T_('Blog'),
+			'th_start' => '<th class="nowrap">',
+			'td_start' => '<td class="nowrap">',
+			'td' => '@load_Blog()@<a href="¤regenerate_url( \'blog,results_order\', \'blog=@blog_ID@\' )¤">@Blog->dget(\'shortname\')@</a>',
+		);
+}
+
+
+// Author:
+$ItemList->cols[] = array(
+		'th' => T_('Author'),
+		'th_start' => '<th class="nowrap">',
+		'td_start' => '<td class="nowrap">',
+		'order' => 'post_creator_user_ID',
+		'td' => '@get(\'t_author\')@',
+	);
 
 
 /**
@@ -84,9 +106,8 @@ function task_title_link( $Item )
 {
 	global $current_User;
 
-	$col = '';
+	$col = locale_flag( $Item->locale, 'w16px', 'flag', '', false ).' ';
 
-	$Item->load_Blog();
   if( $Item->Blog->allowcomments != 'never' )
 	{	// The current blog can have comments:
 		$nb_comments = generic_ctp_number($Item->ID, 'feedback');
@@ -138,67 +159,6 @@ $ItemList->cols[] = array(
 						'td' => '%item_visibility( {Obj} )%',
 				);
 
-$ItemList->cols[] = array(
-						'th' => T_('Status'),
-						'order' => 'post_pst_ID',
-						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
-						'td' => '@get(\'t_extra_status\')@',
-					);
-
-$ItemList->cols[] = array(
-						'th' => T_('Type'),
-						'order' => 'post_ptyp_ID',
-						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
-						'td' => '@get(\'t_type\')@',
-					);
-
-$ItemList->cols[] = array(
-						'th' => T_('ID'),
-						'order' => 'post_ID',
-						'th_start' => '<th class="shrinkwrap">',
-						'td_start' => '<td class="tskst_$post_pst_ID$ shrinkwrap">',
-						'td_start' => '<td class="center">',
-						'td' => '$post_ID$',
-					);
-
-$ItemList->cols[] = array(
-						'th' => T_('Assigned'),
-						'order' => 'post_assigned_user_ID',
-						'td' => '@get(\'t_assigned_to\')@',
-					);
-
-
-/**
- * Deadline
- */
-/*
-function deadline( $date )
-{
-	global $localtimenow;
-
-	$timestamp = mysql2timestamp( $date );
-
- 	if( $timestamp <= 0 )
-	{
-		return '&nbsp;';	// IE needs that crap in order to display cell border :/
-	}
-
-	$output = mysql2localedate( $date );
-
-	if( $timestamp < $localtimenow )
-	{
-		$output =  '<span class="past_deadline">! '.$output.'</span>';
-	}
-
-	return $output;
-}
-$ItemList->cols[] = array(
-						'th' => T_('Deadline'),
-						'order' => 'post_datedeadline',
-						'td_start' => '<td class="center tskst_$post_pst_ID$">',
-						'td' => '%deadline( #post_datedeadline# )%',
-					);
-*/
 
 $ItemList->cols[] = array(
 	'th' => /* TRANS: abbrev for info */ T_('i'),
@@ -243,9 +203,10 @@ if( $current_User->check_perm( 'tasks', 'add', false, NULL ) )
 }
 
 
+
 if( $current_User->check_perm( 'blog_post_statuses', 'any', false, $Blog->ID ) )
 {	// We have permission to add a post with at least one status:
-	$ItemList->global_icon( T_('Add a task...'), 'new', $add_item_url, T_('Add task') );
+	$ItemList->global_icon( T_('Add a post...'), 'new', $add_item_url, T_('Add post') );
 }
 
 
@@ -263,7 +224,7 @@ $ItemList->display();
 
 /*
  * $Log$
- * Revision 1.3  2006/03/10 21:08:26  fplanque
+ * Revision 1.1  2006/03/10 21:08:26  fplanque
  * Cleaned up post browsing a little bit..
  *
  * Revision 1.2  2006/03/08 19:53:16  fplanque

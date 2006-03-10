@@ -54,7 +54,6 @@ else
 	switch( $tab )
 	{
 		case 'postlist':
-		case 'posts':
 			/*
 			 * Do it all the OLD way:
 			 */
@@ -130,7 +129,10 @@ else
 			break;
 
 
-		case 'exp':
+		case 'postlist2':
+			// TEMP HACK to sort by descending date by default:
+			$Request->param( 'results_order', 'string', 'D' );
+		case 'posts':
 		case 'tracker':
 			/*
 			 * Let's go the clean new way...
@@ -151,13 +153,18 @@ else
 			if( $ItemList->single_post )
 			{	// We have requested a specific post
 				// hack this over to the exp tab
-				$tab = 'exp';
+				$tab = 'posts';
 			}
 
 
 			switch( $tab )
 			{
-				case 'exp':
+				case 'postlist2':
+				case 'tracker':
+					// DO **NOT** Run the query yet! (we want column definitions to be loaded and act as ORDER BY fields)
+					break;
+
+				case 'posts':
 					// Run the query:
 					$ItemList->query();
 
@@ -168,10 +175,6 @@ else
 					$Request->param( 'c', 'string' );
 					$Request->param( 'tb', 'integer', 0 );
 					$Request->param( 'pb', 'integer', 0 );
-					break;
-
-				case 'tracker':
-					// DO **NOT** Run the query yet! (we want column definitions to be loaded and act as ORDER BY fields)
 					break;
 			}
 			break;
@@ -206,18 +209,17 @@ $AdminUI->add_menu_entries(
 					'text' => T_('Post list'),
 					'href' => regenerate_url( 'tab', 'tab=postlist' ),
 					),
-				'posts' => array(
-					'text' => T_('Full posts'),
-					'href' => regenerate_url( 'tab', 'tab=posts' ),
-					),
-				// EXPERIMENTAL:
-				'exp' => array(
-					'text' => T_('Experimental'),
-					'href' => regenerate_url( 'tab', 'tab=exp&amp;filter=restore' ),
+				'postlist2' => array(
+					'text' => T_('Post list 2'),
+					'href' => regenerate_url( 'tab', 'tab=postlist2' ),
 					),
 				'tracker' => array(
 					'text' => T_('Tracker'),
 					'href' => regenerate_url( 'tab', 'tab=tracker&amp;filter=restore' ),
+					),
+				'posts' => array(
+					'text' => T_('Full posts'),
+					'href' => regenerate_url( 'tab', 'tab=posts&amp;filter=restore' ),
 					),
 			/*	'commentlist' => array(
 					'text' => T_('Comment list'),
@@ -267,12 +269,12 @@ if( $blog )
 						$AdminUI->disp_view( 'items/_browse_posts_list.inc' );
 						break;
 
-					case 'posts':
+					case 'postlist2':
 						// Display VIEW:
-						$AdminUI->disp_view( 'items/_edit_showposts' );
+						$AdminUI->disp_view( 'items/_browse_posts_list2.view' );
 						break;
 
-					case 'exp':
+					case 'posts':
 						// Display VIEW:
 						$AdminUI->disp_view( 'items/_browse_posts_exp.inc' );
 						break;

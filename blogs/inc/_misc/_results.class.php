@@ -513,6 +513,7 @@ class Results extends Widget
 	 */
 	function display( $display_params = NULL, $fadeout = array() )
 	{
+
 		// Initialize displaying:
 		$this->display_init( $display_params );
 
@@ -1102,12 +1103,12 @@ class Results extends Widget
 		$content = str_replace( '{global_is_last}', "\$this->global_is_last", $content );
 		// Make callback function substitution:
 		$content = preg_replace( '#% (.+?) %#ix', "'.$1.'", $content );
-		// Sometimes we need embedded function call, so we provide a second sign:
-		$content = preg_replace( '#¤ (.+?) ¤#ix', "'.$1.'", $content );
 		// Make variable substitution for intanciated Object:
 		$content = str_replace( '{Obj}', "\$this->current_Obj", $content );
 		// Make callback for Object method substitution:
 		$content = preg_replace( '#@ (.+?) @#ix', "'.\$this->current_Obj->$1.'", $content );
+		// Sometimes we need embedded function call, so we provide a second sign:
+		$content = preg_replace( '#¤ (.+?) ¤#ix', "'.$1.'", $content );
 
 		// Make callback function move_icons
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
@@ -1506,6 +1507,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/10 21:08:26  fplanque
+ * Cleaned up post browsing a little bit..
+ *
  * Revision 1.3  2006/03/06 20:03:40  fplanque
  * comments
  *
