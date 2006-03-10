@@ -47,6 +47,10 @@ global $Settings;
  * @var BlogCache
  */
 global $BlogCache;
+/**
+ * @var Log
+ */
+global $Debuglog;
 
 // Prepare last part of blog URL preview:
 switch( $edited_Blog->get( 'access_type' ) )
