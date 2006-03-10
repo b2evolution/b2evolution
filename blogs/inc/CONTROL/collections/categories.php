@@ -62,8 +62,8 @@ switch( $action )
 				$new_cat_ID = cat_create( $cat_name, 'NULL', $cat_blog_ID );
 			}
 
-	 		$Messages->add( T_('New category created.'), 'success' );
-	 		$action = 'list';
+			$Messages->add( T_('New category created.'), 'success' );
+			$action = 'list';
 		}
 
 		if( !empty($parent_cat_ID) )
@@ -162,7 +162,7 @@ switch( $action )
 
 
 	case 'list':
-	  $blog = autoselect_blog( $blog, 'blog_cats', '' );
+		$blog = autoselect_blog( $blog, 'blog_cats', '' );
 		// echo 'selected blog='.$blog;
 }
 
@@ -215,7 +215,7 @@ switch($action)
 		$Form->hidden_ctrl();
 		$Form->hidden( 'action', 'create' );
 
-    $Form->text( 'cat_name', '', 40, T_('New category name'), '', 80 );
+		$Form->text( 'cat_name', '', 40, T_('New category name'), '', 80 );
 
 		$Form->end_form( array( array( 'submit', 'submit', T_('Create category'), 'SaveButton' ),
 														array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -362,6 +362,14 @@ switch($action)
 			break;
 		}
 
+		// TODO: move this up, when used by other payload blocks
+		$Blog = $BlogCache->get_by_ID( $blog );
+
+		if( ! $Blog )
+		{
+			debug_die( 'Failed to initialize blog #'.$blog.'!' ); // should not happen, as we make sure there's access to $blog
+		}
+
 		// List the cats:
 		// Display VIEW:
 		$AdminUI->disp_view( 'collections/_cats_list' );
@@ -372,6 +380,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/10 18:19:24  blueyed
+ * Provide global $Blogs used in catlist.
+ *
  * Revision 1.1  2006/02/23 21:11:56  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
