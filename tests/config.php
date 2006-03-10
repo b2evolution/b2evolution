@@ -48,7 +48,7 @@ require_once $model_path.'files/_file.funcs.php';
 $includes = get_filenames( $inc_path, true, false );
 foreach( $includes as $include_file )
 {
-	if( ! preg_match( '~\.(funcs|class)\.php~', $include_file ) )
+	if( ! preg_match( '~\.(funcs|class)\.php$~', $include_file ) )
 	{
 		continue;
 	}
