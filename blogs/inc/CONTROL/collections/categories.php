@@ -362,15 +362,8 @@ switch($action)
 			break;
 		}
 
-		// TODO: move this up, when used by other payload blocks
-		$Blog = $BlogCache->get_by_ID( $blog );
-
-		if( ! $Blog )
-		{
-			debug_die( 'Failed to initialize blog #'.$blog.'!' ); // should not happen, as we make sure there's access to $blog
-		}
-
 		// List the cats:
+		$Blog = $BlogCache->get_by_ID( $blog );
 		// Display VIEW:
 		$AdminUI->disp_view( 'collections/_cats_list' );
 }
@@ -380,6 +373,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/10 21:20:20  fplanque
+ * removed overkill
+ *
  * Revision 1.2  2006/03/10 18:19:24  blueyed
  * Provide global $Blogs used in catlist.
  *
