@@ -1704,7 +1704,7 @@ function debug_info( $force = false )
 
 		// DEBUGLOG (with list of categories at top):
 		$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
-		$log_cats = array_keys($Debuglog->getMessages( $log_categories )); // the real list (with all replaced and only existing ones)
+		$log_cats = array_keys($Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
 		$log_container_head = '<h3>Debug messages</h3>';
 		$log_head_links = array();
 		foreach( $log_cats as $l_cat )
@@ -2668,11 +2668,8 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
- * Revision 1.11  2006/03/10 21:12:33  fplanque
- * no message
- *
- * Revision 1.10  2006/03/10 21:05:52  fplanque
- * not validating undocumented changes with geeky syntax
+ * Revision 1.12  2006/03/11 14:45:37  blueyed
+ * *** empty log message ***
  *
  * Revision 1.9  2006/03/09 20:40:40  fplanque
  * cleanup

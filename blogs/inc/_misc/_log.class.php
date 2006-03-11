@@ -333,7 +333,7 @@ class Log
 		}
 		else
 		{
-			$messages = $this->getMessages( $category );
+			$messages = $this->get_messages( $category );
 		}
 
 		if( !is_array($cssclass) )
@@ -488,7 +488,7 @@ class Log
 		{
 			$r .= $head.' ';
 		}
-		$r .= implode( $implodeBy, $this->getMessages( $category, true ) );
+		$r .= implode( $implodeBy, $this->get_messages( $category, true ) );
 		if( '' != $foot )
 		{
 			$r .= ' '.$foot;
@@ -515,7 +515,7 @@ class Log
 		{
 			if( empty( $this->_count[$category] ) )
 			{
-				$this->_count[$category] = count( $this->getMessages( $category, true ) );
+				$this->_count[$category] = count( $this->get_messages( $category, true ) );
 			}
 			if( $category != 'all' )
 			{
@@ -524,7 +524,7 @@ class Log
 			return $this->_count[$category];
 		}
 
-		return count( $this->getMessages( $category, true ) );
+		return count( $this->get_messages( $category, true ) );
 	}
 
 
@@ -533,14 +533,14 @@ class Log
 	 *
 	 * If the category is an array, those categories will be used (where 'all' will
 	 * be translated with the not already processed categories).
-	 * <code>getMessages( array('error', 'note', 'all') )</code> would return
+	 * <code>get_messages( array('error', 'note', 'all') )</code> would return
 	 * 'errors', 'notes' and the remaining messages, in that order.
 	 *
 	 * @param string the category
 	 * @param boolean if true will use subarrays for each category
 	 * @return array the messages, one or two dimensions (depends on second param)
 	 */
-	function getMessages( $category = NULL, $singleDimension = false )
+	function get_messages( $category = NULL, $singleDimension = false )
 	{
 		$messages = array();
 
@@ -622,6 +622,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/11 14:45:37  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
@@ -667,13 +670,13 @@ class Log_noop {
  * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
  *
  * Revision 1.12  2005/02/22 02:27:51  blueyed
- * refactoring, optimized, fix for getMessages( plain )
+ * refactoring, optimized, fix for get_messages( plain )
  *
  * Revision 1.11  2005/02/21 00:34:34  blueyed
  * check for defined DB_USER!
  *
  * Revision 1.10  2005/02/19 23:02:45  blueyed
- * getMessages(): sort by category for 'all'
+ * get_messages(): sort by category for 'all'
  *
  * Revision 1.9  2005/02/17 19:36:24  fplanque
  * no message
