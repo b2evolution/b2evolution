@@ -409,17 +409,19 @@ $schema_queries = array(
 			pset_plug_ID INT(11) UNSIGNED NOT NULL,
 			pset_name VARCHAR( 30 ) NOT NULL,
 			pset_value TEXT NULL,
-			PRIMARY KEY ( pset_plug_ID, pset_name )
+			PRIMARY KEY ( pset_plug_ID, pset_name ),
+			INDEX pset_plug_ID( pset_plug_ID )
 		)' ),
 
 	'T_pluginusersettings' => array(
 		'Creating plugin user settings table',
 		'CREATE TABLE T_pluginusersettings (
-			pset_plug_ID INT(11) UNSIGNED NOT NULL,
-			pset_user_ID INT(11) UNSIGNED NOT NULL,
-			pset_name VARCHAR( 30 ) NOT NULL,
-			pset_value TEXT NULL,
-			PRIMARY KEY ( pset_plug_ID, pset_name )
+			puset_plug_ID INT(11) UNSIGNED NOT NULL,
+			puset_user_ID INT(11) UNSIGNED NOT NULL,
+			puset_name VARCHAR( 30 ) NOT NULL,
+			puset_value TEXT NULL,
+			PRIMARY KEY ( puset_plug_ID, puset_user_ID, puset_name ),
+			INDEX puset_plug_ID( puset_plug_ID, puset_user_ID )
 		)' ),
 
 	'T_pluginevents' => array(

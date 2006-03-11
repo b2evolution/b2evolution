@@ -60,7 +60,7 @@ class PluginUserSettings extends AbstractSettings
 	 */
 	function PluginUserSettings( $plugin_ID )
 	{ // constructor
-		parent::AbstractSettings( 'T_pluginusersettings', array( 'pset_plug_ID', 'pset_user_ID', 'pset_name' ), 'pset_value', 1 );
+		parent::AbstractSettings( 'T_pluginusersettings', array( 'puset_plug_ID', 'puset_user_ID', 'puset_name' ), 'puset_value', 1 );
 
 		$this->plugin_ID = $plugin_ID;
 	}
@@ -125,6 +125,9 @@ class PluginUserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/11 02:02:00  blueyed
+ * Normalized t_pluginusersettings
+ *
  * Revision 1.1  2006/02/27 16:57:12  blueyed
  * PluginUserSettings - allows a plugin to store user related settings
  *

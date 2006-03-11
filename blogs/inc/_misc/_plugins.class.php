@@ -558,6 +558,10 @@ class Plugins
 		$DB->query( "DELETE FROM T_pluginsettings
 		              WHERE pset_plug_ID = $plugin_ID" );
 
+		// Delete Plugin user settings (constraints)
+		$DB->query( "DELETE FROM T_pluginusersettings
+		              WHERE puset_plug_ID = $plugin_ID" );
+
 		// Delete Plugin events (constraints)
 		$DB->query( "DELETE FROM T_pluginevents
 		              WHERE pevt_plug_ID = $plugin_ID" );
@@ -2383,6 +2387,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.13  2006/03/11 02:02:00  blueyed
+ * Normalized t_pluginusersettings
+ *
  * Revision 1.12  2006/03/11 01:59:00  blueyed
  * Added Plugin::forget_events()
  *

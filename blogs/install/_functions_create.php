@@ -853,6 +853,13 @@ function create_b2evo_relations()
 	                    on delete restrict
 	                    on update restrict' );
 
+	$DB->query( 'alter table T_pluginusersettings
+	              add constraint FK_puset_plug_ID
+	                    foreign key (puset_plug_ID)
+	                    references T_plugins (plug_ID)
+	                    on delete restrict
+	                    on update restrict' );
+
 	$DB->query( 'alter table T_pluginevents
 	              add constraint FK_pevt_plug_ID
 	                    foreign key (pevt_plug_ID)
@@ -918,6 +925,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.180  2006/03/11 02:02:01  blueyed
+ * Normalized t_pluginusersettings
+ *
  * Revision 1.179  2006/03/07 19:30:22  fplanque
  * comments
  *
