@@ -54,7 +54,7 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
 class Comment extends DataObject
 {
 	/**
-	 * @access protected
+	 * @access protected blueyed>> Really? Just $Item? (where are the getters?)
 	 */
 	var $Item;
 	var $author_User;
@@ -150,8 +150,6 @@ class Comment extends DataObject
 
 	/**
 	 * Template function: display anchor for permalinks to refer to
-	 *
-	 * {@internal Comment::anchor(-) }}
 	 */
 	function anchor()
 	{
@@ -161,8 +159,6 @@ class Comment extends DataObject
 
 	/**
 	 * Template function: display author of comment
-	 *
-	 * {@internal Comment::author(-) }}
 	 *
 	 * @param string String to display before author name if not a user
 	 * @param string String to display after author name if not a user
@@ -214,8 +210,6 @@ class Comment extends DataObject
 	/**
 	 * Template function: display link to comment author's provided email
 	 *
-	 * {@internal Comment::author_email(-) }}
-	 *
 	 * @param string String to display for link: leave empty to display email
 	 * @param string String to display before email, if email exists
 	 * @param string String to display after email, if email exists
@@ -245,8 +239,6 @@ class Comment extends DataObject
 
 	/**
 	 * Template function: display link to comment author's provided URL
-	 *
-	 * {@internal Comment::author_url(-) }}
 	 *
 	 * @param string String to display for link: leave empty to display URL
 	 * @param string String to display before link, if link exists
@@ -281,8 +273,6 @@ class Comment extends DataObject
 
 	/**
 	 * Provide link to edit a comment if user has edit rights
-	 *
-	 * {@internal Comment::edit_link(-)}}
 	 *
 	 * @param string to display before link
 	 * @param string to display after link
@@ -319,8 +309,6 @@ class Comment extends DataObject
 	/**
 	 * Displays button for deleeing the Comment if user has proper rights
 	 *
-	 * {@internal Comment::delete_link(-)}}
-	 *
 	 * @param string to display before link
 	 * @param string to display after link
 	 * @param string link text
@@ -332,9 +320,9 @@ class Comment extends DataObject
 	{
 		global $current_User, $admin_url;
 
- 		if( ! is_logged_in() ) return false;
+		if( ! is_logged_in() ) return false;
 
-	 	if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
+		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
 		{ // If User has permission to edit comments:
 			return false;
 		}
@@ -370,8 +358,6 @@ class Comment extends DataObject
 
 	/**
 	 * Provide link to message form for this comment's author
-	 *
-	 * {@internal Comment::msgform_link(-)}}
 	 *
 	 * @param string url of the message form
 	 * @param string to display before link
@@ -458,15 +444,15 @@ class Comment extends DataObject
 	}
 
 
-  /**
-   * Returns a permalink link to the Comment
+	/**
+	 * Returns a permalink link to the Comment
 	 *
 	 * Note: If you only want to permalink URL, use Comment::get_permanent_url()
-   *
+	 *
 	 * @param string link text or special value: '#', '#icon#', '#text#'
 	 * @param string link title
 	 * @param string class name
-   */
+	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '' )
 	{
 		global $current_User, $baseurl;
@@ -499,16 +485,16 @@ class Comment extends DataObject
 	}
 
 
-  /**
-   * Displays a permalink link to the Comment
-   *
+	/**
+	 * Displays a permalink link to the Comment
+	 *
 	 * Note: If you only want to permalink URL, use Comment::permanent_url()
 	 *
 	 * @param string link text
 	 * @param string link title
 	 * @param string class name
-   */
-  function permanent_link( $text = '#', $title = '#', $class = '' )
+	 */
+	function permanent_link( $text = '#', $title = '#', $class = '' )
 	{
 		echo $this->get_permanent_link( $text, $title, $class );
 	}
@@ -516,8 +502,6 @@ class Comment extends DataObject
 
 	/**
 	 * Template function: display content of comment
-	 *
-	 * {@internal Comment::content(-) }}
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
@@ -530,10 +514,9 @@ class Comment extends DataObject
 		echo $comment;
 	}
 
+
 	/**
 	 * Template function: display date (datetime) of comment
-	 *
-	 * {@internal Comment::date(-) }}
 	 *
 	 * @param string date/time format: leave empty to use locale default date format
 	 * @param boolean true if you want GMT
@@ -546,10 +529,9 @@ class Comment extends DataObject
 			echo mysql2date( $format, $this->date, $useGM);
 	}
 
+
 	/**
 	 * Template function: display time (datetime) of comment
-	 *
-	 * {@internal Comment::time(-) }}
 	 *
 	 * @param string date/time format: leave empty to use locale default time format
 	 * @param boolean true if you want GMT
@@ -762,8 +744,12 @@ class Comment extends DataObject
 
 }
 
+
 /*
  * $Log$
+ * Revision 1.7  2006/03/11 12:30:37  blueyed
+ * doc
+ *
  * Revision 1.6  2006/03/09 22:29:59  fplanque
  * cleaned up permanent urls
  *
