@@ -597,9 +597,13 @@ switch( $action )
 			set_Settings_for_Plugin_from_params( $edit_Plugin, $admin_Plugins, 'Settings' );
 
 			// Let the plugin handle custom fields:
-			$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
+			$ok_to_update = $admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
 
-			if( $edit_Plugin->Settings->dbupdate() )
+			if( $ok_to_update === false )
+			{
+				$edit_Plugin->Settings->reset();
+			}
+			elseif( $edit_Plugin->Settings->dbupdate() )
 			{
 				$Messages->add( T_('Plugin settings have been updated.'), 'success' );
 			}
@@ -787,7 +791,7 @@ switch( $action )
 /*
 if( 1 || $Settings->get( 'plugins_disp_log_in_admin' ) )
 {
-	$Messages->add_messages( $Debuglog->getmessages('plugins') );
+	$Messages->add_messages( $Debuglog->get_messages('plugins') );
 }
 */
 

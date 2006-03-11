@@ -657,10 +657,26 @@ class AbstractSettings
 		return $r;
 	}
 
+
+	/**
+	 * Reset cache (includes settings to be written to DB).
+	 *
+	 * This is useful, to rollback settings that have been made, e.g. when a Plugin
+	 * decides that his settings should not get updated.
+	 */
+	function reset()
+	{
+		$this->cache = NULL;
+		$this->allLoaded = false;
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/11 15:49:48  blueyed
+ * Allow a plugin to not update his settings at all.
+ *
  * Revision 1.2  2006/02/24 15:09:31  blueyed
  * Decent support for serialized settings through get() and dbupdate().
  *

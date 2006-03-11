@@ -332,9 +332,13 @@ if( !$Messages->count('error') )
 				set_Settings_for_Plugin_from_params( $loop_Plugin, $Plugins, 'UserSettings' );
 
 				// Let the plugin handle custom fields:
-				$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array( 'User' => & $edited_User ) );
+				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array( 'User' => & $edited_User ) );
 
-				if( $loop_Plugin->UserSettings->dbupdate() )
+				if( $ok_to_update === false )
+				{
+					$loop_Plugin->UserSettings->reset();
+				}
+				elseif( $loop_Plugin->UserSettings->dbupdate() )
 				{
 					$any_plugin_settings_updated = true;
 				}
@@ -649,6 +653,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/11 15:49:48  blueyed
+ * Allow a plugin to not update his settings at all.
+ *
  * Revision 1.5  2006/03/05 23:53:10  blueyed
  * Fixed Password-Change-Request (bound to $Session now)
  *

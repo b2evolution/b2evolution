@@ -1011,6 +1011,8 @@ class Plugin
 	 *
 	 * Use this to catch custom input fields from {@link PluginSettingsEditDisplayAfter()} or
 	 * add notes/errors through {@link Plugin::msg()}.
+	 *
+	 * @return false|NULL Return false to prevent the settings from being updated to DB.
 	 */
 	function PluginSettingsUpdateAction()
 	{
@@ -1087,6 +1089,8 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'User': the {@link User} for which the settings get updated
+	 *
+	 * @return false|NULL Return false to prevent the settings from being updated to DB.
 	 */
 	function PluginUserSettingsUpdateAction( & $params )
 	{
@@ -1249,8 +1253,14 @@ class Plugin
 	 */
 
 	/**
-	 * Log a message. This gets added to {@link $Debuglog the global Debuglog} with
+	 * Log a debug message.
+	 *
+	 * This gets added to {@link $Debuglog the global Debuglog} with
 	 * the category '[plugin_classname]_[plugin_ID]'.
+	 *
+	 * NOTE: if debugging is not enabled (see {@link $debug}), {@link $Debuglog}
+	 * is of class {@link Log_noop}, which means it does not accept nor display
+	 * messages.
 	 *
 	 * @param string Message to log.
 	 * @param array Optional list of additional categories.
@@ -1690,6 +1700,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.13  2006/03/11 15:49:48  blueyed
+ * Allow a plugin to not update his settings at all.
+ *
  * Revision 1.12  2006/03/11 01:59:00  blueyed
  * Added Plugin::forget_events()
  *
