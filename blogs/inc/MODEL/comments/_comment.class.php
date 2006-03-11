@@ -63,13 +63,14 @@ class Comment extends DataObject
 	var $author;
 	var $author_email;
 	var $author_url;
+	/**
+	 * @var string IP address of the comment's author (while posting).
+	 */
 	var $author_IP;
 	var $date;
 	var $content;
 
 	/**
-	 * Comment::Comment(-)
-	 *
 	 * Constructor
 	 */
 	function Comment( $db_row = NULL )
@@ -102,7 +103,7 @@ class Comment extends DataObject
 			$this->author = $db_row['comment_author'];
 			$this->author_email = $db_row['comment_author_email'];
 			$url = trim( $db_row['comment_author_url'] );
-			$url = preg_replace('#&([^amp\;])#is', '&amp;$1', $url);	// Escape &
+			$url = preg_replace('#&(?!amp;)#is', '&amp;', $url); // Escape &
 			$this->author_url = (!stristr($url, '://')) ? 'http://'.$url : $url;
 			$this->author_IP = $db_row['comment_author_IP'];
 			$this->date = $db_row['comment_date'];
@@ -747,8 +748,8 @@ class Comment extends DataObject
 
 /*
  * $Log$
- * Revision 1.7  2006/03/11 12:30:37  blueyed
- * doc
+ * Revision 1.8  2006/03/11 12:45:54  blueyed
+ * fixed stupid regexp
  *
  * Revision 1.6  2006/03/09 22:29:59  fplanque
  * cleaned up permanent urls
