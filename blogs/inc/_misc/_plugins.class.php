@@ -1515,6 +1515,10 @@ class Plugins
 		{
 			$percentage = 0;
 		}
+		else
+		{
+			$percentage = round($percentage);
+		}
 
 		return $percentage;
 	}
@@ -2396,8 +2400,8 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
- * Revision 1.14  2006/03/11 18:22:26  blueyed
- * Fixed geeky/BUGGY code
+ * Revision 1.15  2006/03/11 18:25:22  blueyed
+ * Karma round()ed again.
  *
  * Revision 1.13  2006/03/11 02:02:00  blueyed
  * Normalized t_pluginusersettings
