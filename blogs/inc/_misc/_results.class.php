@@ -146,9 +146,6 @@ class Results extends Widget
 	 *   - $this->params['col_start_last'];
 	 *   - $this->params['col_start'];
 	 *
-	 * @todo It would be nice to be able to add attributes to the field(s) like
-	 *       'th_attribs'=>array('title' => '...'). Currently you have to use <span> for this..?!
-	 * fp>> use 'th_title' and stop adding unnecessary indirections everywhere just because you can. thx.
 	 */
 	var $cols;
 
@@ -513,7 +510,6 @@ class Results extends Widget
 	 */
 	function display( $display_params = NULL, $fadeout = array() )
 	{
-
 		// Initialize displaying:
 		$this->display_init( $display_params );
 
@@ -1507,14 +1503,14 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/11 00:09:08  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.4  2006/03/10 21:08:26  fplanque
  * Cleaned up post browsing a little bit..
  *
  * Revision 1.3  2006/03/06 20:03:40  fplanque
  * comments
- *
- * Revision 1.2  2006/03/02 19:49:20  blueyed
- * *** empty log message ***
  *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
