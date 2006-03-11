@@ -82,6 +82,8 @@ while( $Comment = & $CommentList->get_next() )
 			}
 			$Comment->author_email( '', ' &middot; Email: ' );
 			$Comment->author_ip( ' &middot; IP: ' );
+			echo ' &middot; ';
+			$Comment->spam_karma( T_('Karma').': %s%', T_('No karma') );
 		 ?>
 		</div>
 		<div class="bCommentContent">
@@ -135,6 +137,9 @@ while( $Comment = & $CommentList->get_next() )
 <?php
 /*
  * $Log$
+ * Revision 1.4  2006/03/11 21:50:16  blueyed
+ * Display spam_karma with comments
+ *
  * Revision 1.3  2006/03/09 21:58:52  fplanque
  * cleaned up permalinks
  *

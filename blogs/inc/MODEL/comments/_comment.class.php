@@ -69,6 +69,10 @@ class Comment extends DataObject
 	var $author_IP;
 	var $date;
 	var $content;
+	/**
+	 * @var integer Spam karma of the comment (0-100), 100 being "probably no spam at all"
+	 */
+	var $spam_karma;
 
 	/**
 	 * Constructor
@@ -108,6 +112,7 @@ class Comment extends DataObject
 			$this->author_IP = $db_row['comment_author_IP'];
 			$this->date = $db_row['comment_date'];
 			$this->content = $db_row['comment_content'];
+			$this->spam_karma = $db_row['comment_spam_karma'];
 		}
 	}
 
@@ -269,6 +274,27 @@ class Comment extends DataObject
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * Template function: display spam karma of the comment (in percent)
+	 *
+	 * "%s" gets replaced by the karma value
+	 *
+	 * @param string Template string to display, if we have a karma value
+	 * @param string Template string to display, if we have no karma value (pre-Phoenix)
+	 */
+	function spam_karma( $template = '%s%', $template_unknown = '%s' )
+	{
+		if( isset($this->spam_karma) )
+		{
+			echo str_replace( '%s', $this->spam_karma, $template );
+		}
+		else
+		{
+			echo str_replace( '%s', $this->spam_karma, $template_unknown );
+		}
 	}
 
 
@@ -748,6 +774,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2006/03/11 21:50:16  blueyed
+ * Display spam_karma with comments
+ *
  * Revision 1.8  2006/03/11 12:45:54  blueyed
  * fixed stupid regexp
  *

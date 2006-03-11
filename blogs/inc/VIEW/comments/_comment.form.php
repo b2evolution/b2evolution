@@ -185,6 +185,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
 		<p><strong><?php echo T_('Status') ?>:</strong> <?php echo $edited_Comment->status; ?></p>
 		<p><strong><?php echo T_('IP address') ?>:</strong> <?php echo $edited_Comment->author_IP; ?></p>
+		<p><strong><?php echo T_('Karma') ?>:</strong> <?php echo $edited_Comment->spam_karma; ?>%</p>
 	</fieldset>
 
 </div>
@@ -196,6 +197,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/11 21:50:16  blueyed
+ * Display spam_karma with comments
+ *
  * Revision 1.2  2006/03/08 19:53:16  fplanque
  * fixed quite a few broken things...
  *
