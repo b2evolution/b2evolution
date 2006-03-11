@@ -135,11 +135,28 @@ class test_plugin extends Plugin
 	{
 		return array(
 				'echo_random' => array(
-					'label' => 'Echo a random number in AdminBeginPayload event',
+					'label' => T_('Echo a random number in AdminBeginPayload event'),
+					'type' => 'checkbox',
+					'defaultvalue' => '0',
+				),
+				'deactivate' => array(
+					'label' => T_('Deactivate'),
 					'type' => 'checkbox',
 					'defaultvalue' => '0',
 				),
 			);
+	}
+
+
+	/**
+	 * Deactive the plugin for the current request if the user wants it so.
+	 */
+	function PluginUserSettingsInstantiated()
+	{
+		if( $this->UserSettings->get('deactivate') )
+		{
+			return false;
+		}
 	}
 
 

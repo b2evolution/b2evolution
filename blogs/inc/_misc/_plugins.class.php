@@ -205,7 +205,7 @@ class Plugins
 	 *  - PluginSettingsInstantiated
 	 *  - PluginSettingsValidateSet (Called before setting a plugin's setting in the backoffice)
 	 *  - PluginUserSettingsUpdateAction (Called as action before updating the plugin's user settings)
-	 *  - PluginSettingsEditAction (Called as action before editing the plugin's settings)
+	 *  - PluginUserSettingsEditAction (Called as action before editing the plugin's settings)
 	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
 	 *  - PluginUserSettingsInstantiated
 	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
@@ -970,6 +970,7 @@ class Plugins
 
 		// Version check:
 		if( $must_exists
+		    && $Plugin
 		    && isset($this->index_ID_rows[$Plugin->ID])
 		    && $Plugin->version != $this->index_ID_rows[$Plugin->ID]['plug_version'] )
 		{ // Version has changed since installation or last update
@@ -2361,6 +2362,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.11  2006/03/11 01:21:15  blueyed
+ * Allow user to deactivate test plugin.
+ *
  * Revision 1.10  2006/03/08 18:49:38  blueyed
  * Memory usage decreased
  *
