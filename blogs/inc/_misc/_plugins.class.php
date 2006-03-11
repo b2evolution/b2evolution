@@ -1507,7 +1507,16 @@ class Plugins
 
 		$percentage = $karma_max ? ( $karma_absolute * 100 ) / $karma_max : 0;
 
-		return max( 100, min( 0, round($percentage) ) );
+		if( $percentage > 100 )
+		{
+			$percentage = 100;
+		}
+		elseif( $percentage < 0 )
+		{
+			$percentage = 0;
+		}
+
+		return $percentage;
 	}
 
 
@@ -2387,6 +2396,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.14  2006/03/11 18:22:26  blueyed
+ * Fixed geeky/BUGGY code
+ *
  * Revision 1.13  2006/03/11 02:02:00  blueyed
  * Normalized t_pluginusersettings
  *
