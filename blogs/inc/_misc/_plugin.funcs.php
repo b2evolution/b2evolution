@@ -284,15 +284,22 @@ function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_ty
 		{ // a layout "setting"
 			continue;
 		}
+
+		$l_param_default = '';
 		if( isset($l_meta['type']) && $l_meta['type'] == 'array' )
 		{ // this settings has a type
 			$l_param_type = $l_meta['type'];
 		}
+		elseif( isset($l_meta['type']) && $l_meta['type'] == 'checkbox' )
+		{
+			$l_param_type = 'integer';
+			$l_param_default = 0;
+		}
 		else
 		{
-			$l_param_type = NULL;
+			$l_param_type = 'string';
 		}
-		$l_value = param( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $l_param_type );
+		$l_value = param( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $l_param_type, $l_param_default );
 
 		if( isset($l_meta['type']) && $l_meta['type'] == 'integer' && ! preg_match( '~^\d+$~', $l_value ) )
 		{
@@ -334,6 +341,9 @@ function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_ty
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.3  2006/03/11 01:59:00  blueyed
+ * Added Plugin::forget_events()
+ *
  * Revision 1.2  2006/03/01 01:07:43  blueyed
  * Plugin(s) polishing
  *

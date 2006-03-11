@@ -163,6 +163,12 @@ class Plugins
 			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version FROM T_plugins
 			 WHERE plug_status = "enabled"
 			 ORDER BY plug_priority';
+
+	/**
+	 * @var boolean Used in class {@link Plugins} when it comes to removing plugins from the list, what we don't want
+	 *                when administering plugins (see {@link $Plugins_admin}).
+	 */
+	var $is_admin_class = false;
 	/**#@-*/
 
 
@@ -418,7 +424,7 @@ class Plugins
 			$this->load_plugins_table();
 			$this->load_events();
 		}
-		elseif( strtolower( get_class($this) ) != 'plugins_admin' )
+		elseif( $this->is_admin_class )
 		{
 			$this->unregister( $Plugin );
 		}
@@ -472,7 +478,7 @@ class Plugins
 		}
 
 		// Dependencies:
-		if( strtolower( get_class($this) ) == 'plugins_admin' )
+		if( $this->is_admin_class )
 		{ // We must check dependencies against installed Plugins ($Plugins)
 			global $Plugins;
 			$dep_msgs = $Plugins->validate_dependencies( $Plugin, 'enable' );
@@ -955,13 +961,13 @@ class Plugins
 		}
 
 		// Instantiate the Plugins Settings class
-		if( $this->instantiate_Settings( $Plugin, 'Settings' ) === false )
+		if( $this->instantiate_Settings( $Plugin, 'Settings' ) === false && ! $this->is_admin_class )
 		{
 			$Debuglog->add( 'Unregistered plugin, because instantiating its Settings returned false.', 'plugins' );
 			$this->unregister( $Plugin );
 			$Plugin = '';
 		}
-		if( $this->instantiate_Settings( $Plugin, 'UserSettings' ) === false )
+		if( $this->instantiate_Settings( $Plugin, 'UserSettings' ) === false && ! $this->is_admin_class )
 		{
 			$Debuglog->add( 'Unregistered plugin, because instantiating its UserSettings returned false.', 'plugins' );
 			$this->unregister( $Plugin );
@@ -1016,14 +1022,7 @@ class Plugins
 	{
 		global $Debuglog;
 
-		// Forget events:
-		foreach( array_keys($this->index_event_IDs) as $l_event )
-		{
-			while( ($key = array_search( $Plugin->ID, $this->index_event_IDs[$l_event] )) !== false )
-			{
-				unset( $this->index_event_IDs[$l_event][$key] );
-			}
-		}
+		$this->forget_events( $Plugin->ID );
 
 		// Unset apply-rendering index:
 		if( isset( $this->index_apply_rendering_codes[ $Plugin->apply_rendering ] ) )
@@ -1065,6 +1064,26 @@ class Plugins
 		if( $this->current_idx >= $sort_key )
 		{ // We have removed a file before or at the $sort_key'th position
 			$this->current_idx--;
+		}
+	}
+
+
+	/**
+	 * Forget the events a Plugin has registered.
+	 *
+	 * This gets used when {@link unregister() unregistering} a Plugin or if either
+	 * {@link Plugin::PluginSettingsInstantiated()} or {@link Plugin::PluginUserSettingsInstantiated()}
+	 * returned false (which means do not use it for subsequent events in the request).
+	 */
+	function forget_events( $plugin_ID )
+	{
+		// Forget events:
+		foreach( array_keys($this->index_event_IDs) as $l_event )
+		{
+			while( ($key = array_search( $plugin_ID, $this->index_event_IDs[$l_event] )) !== false )
+			{
+				unset( $this->index_event_IDs[$l_event][$key] );
+			}
 		}
 	}
 
@@ -2357,11 +2376,16 @@ class Plugins_admin extends Plugins
 	var $sql_load_plugins_table = '
 			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version FROM T_plugins
 			 ORDER BY plug_priority';
+
+	var $is_admin_class = true;
 }
 
 
 /*
  * $Log$
+ * Revision 1.12  2006/03/11 01:59:00  blueyed
+ * Added Plugin::forget_events()
+ *
  * Revision 1.11  2006/03/11 01:21:15  blueyed
  * Allow user to deactivate test plugin.
  *

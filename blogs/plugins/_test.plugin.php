@@ -155,7 +155,7 @@ class test_plugin extends Plugin
 	{
 		if( $this->UserSettings->get('deactivate') )
 		{
-			return false;
+			$this->forget_events();
 		}
 	}
 

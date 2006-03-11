@@ -1372,19 +1372,6 @@ class Plugin
 
 
 	/**
-	 * @deprecated Please use {@link get_sql_table()} instead! Will be removed shortly!
-	 */
-	function get_table_prefix()
-	{
-		global $tableprefix, $Debuglog;
-
-		$Debuglog->add( 'Call to deprecated function: '.debug_get_backtrace(), 'deprecated' );
-
-		return $tableprefix.'plugin_ID'.$this->ID.'_';
-	}
-
-
-	/**
 	 * Get canonical name for database tables a plugin uses, by adding an unique
 	 * prefix for your plugin instance ("plugin_ID[ID]_").
 	 *
@@ -1483,6 +1470,16 @@ class Plugin
 		global $Session;
 
 		return $Session->delete( 'plugID'.$this->ID.'_'.$name );
+	}
+
+
+	/**
+	 * Call this to unregister all your events for the current request.
+	 */
+	function forget_events()
+	{
+		global $Plugins;
+		$Plugins->forget_events( $this->ID );
 	}
 
 	/*
@@ -1693,6 +1690,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.12  2006/03/11 01:59:00  blueyed
+ * Added Plugin::forget_events()
+ *
  * Revision 1.11  2006/03/06 22:42:20  blueyed
  * doc fixes
  *
