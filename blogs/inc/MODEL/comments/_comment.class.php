@@ -53,9 +53,6 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
  */
 class Comment extends DataObject
 {
-	/**
-	 * @access protected blueyed>> Really? Just $Item? (where are the getters?)
-	 */
 	var $Item;
 	var $author_User;
 	var $type;
@@ -71,6 +68,7 @@ class Comment extends DataObject
 	var $content;
 	/**
 	 * @var integer Spam karma of the comment (0-100), 100 being "probably no spam at all"
+WHAT??? if it's called spam_karma, I think that 100 should mean "we're 100% sure it IS spam". I guess that's how people will understand it. And the last example we had on the ML was going that way.  ' .biz => 90% probability it's spam '
 	 */
 	var $spam_karma;
 
@@ -774,6 +772,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2006/03/12 20:17:12  fplanque
+ * no message
+ *
  * Revision 1.9  2006/03/11 21:50:16  blueyed
  * Display spam_karma with comments
  *
