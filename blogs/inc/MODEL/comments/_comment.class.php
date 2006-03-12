@@ -67,8 +67,7 @@ class Comment extends DataObject
 	var $date;
 	var $content;
 	/**
-	 * @var integer Spam karma of the comment (0-100), 100 being "probably no spam at all"
-WHAT??? if it's called spam_karma, I think that 100 should mean "we're 100% sure it IS spam". I guess that's how people will understand it. And the last example we had on the ML was going that way.  ' .biz => 90% probability it's spam '
+	 * @var integer Spam karma of the comment (0-100), 0 being "probably no spam at all"
 	 */
 	var $spam_karma;
 
@@ -772,8 +771,8 @@ WHAT??? if it's called spam_karma, I think that 100 should mean "we're 100% sure
 
 /*
  * $Log$
- * Revision 1.10  2006/03/12 20:17:12  fplanque
- * no message
+ * Revision 1.11  2006/03/12 20:58:59  blueyed
+ * doc
  *
  * Revision 1.9  2006/03/11 21:50:16  blueyed
  * Display spam_karma with comments
