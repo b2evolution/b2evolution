@@ -1170,9 +1170,9 @@ class Plugins
 	{
 		global $DB;
 
-		if( ! is_numeric($priority) )
+		if( ! preg_match( '~^1?\d?\d$~', $priority ) ) // using preg_match() to catch floating numbers
 		{
-			debug_die( 'Plugin priority must be numeric.' );
+			debug_die( 'Plugin priority must be numeric (0-100).' );
 		}
 
 		$Plugin = & $this->get_by_ID($plugin_ID);
@@ -2400,6 +2400,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.16  2006/03/12 19:58:29  blueyed
+ * T_plugin fields changed (according to fplanque)
+ *
  * Revision 1.15  2006/03/11 18:25:22  blueyed
  * Karma round()ed again.
  *

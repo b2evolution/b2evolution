@@ -380,13 +380,14 @@ $schema_queries = array(
 		'Creating plugins table',
 		"CREATE TABLE T_plugins (
 			plug_ID              INT(11) UNSIGNED NOT NULL auto_increment,
-			plug_priority        INT(11) NOT NULL default 50,
+			plug_priority        TINYINT NOT NULL default 50,
 			plug_classname       VARCHAR(40) NOT NULL default '',
 			plug_code            VARCHAR(32) NULL,
 			plug_apply_rendering ENUM( 'stealth', 'always', 'opt-out', 'opt-in', 'lazy', 'never' ) NOT NULL DEFAULT 'never',
 			plug_version         VARCHAR(42) NOT NULL default '0',
 			plug_status          ENUM( 'enabled', 'disabled', 'needs_config', 'broken' ) NOT NULL,
 			PRIMARY KEY ( plug_ID ),
+			UNIQUE plug_code( plug_code ),
 			INDEX plug_status( plug_status )
 		)" ),
 

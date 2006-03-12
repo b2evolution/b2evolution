@@ -571,7 +571,7 @@ switch( $action )
 			$Messages->add( T_('Plugin code updated.'), 'success' );
 		}
 
-		if( $Request->param_check_number( 'edited_plugin_priority', T_('Plugin priority must be numeric.'), true ) )
+		if( $Request->param_check_range( 'edited_plugin_priority', 0, 100, T_('Plugin priority must be numeric (0-100).'), true ) )
 		{
 			$updated = $admin_Plugins->set_priority( $edit_Plugin->ID, $edited_plugin_priority );
 			if( $updated === 1 )
@@ -703,9 +703,9 @@ switch( $action )
 		}
 
 		// Priority:
-		if( !is_numeric( $edited_plugin_priority ) )
+		if( ! preg_match( '~^1?\d?\d$~', $edited_plugin_priority ) )
 		{
-			$Request->param_error( 'edited_plugin_priority', T_('Plugin priority must be numeric.') );
+			$Request->param_error( 'edited_plugin_priority', T_('Plugin priority must be numeric (0-100).') );
 		}
 		else
 		{
