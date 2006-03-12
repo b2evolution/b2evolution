@@ -14,7 +14,9 @@
 /**
  * Load config, init and get the {@link $mode mode param}.
  */
-require_once dirname(__FILE__).'/../admin/_header.php';
+require_once dirname(__FILE__).'/../conf/_config.php';
+require_once $inc_path.'/_main.inc.php';
+
 
 // Check permission:
 $current_User->check_perm( 'files', 'view', true );

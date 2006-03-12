@@ -552,8 +552,147 @@ function rel_path_to_base( $path )
 }
 
 
+/**
+ * Get an array of available Fileroots.
+ *
+ * @return array of FileRoots (key being the FileRoot's ID)
+ */
+function get_available_FileRoots()
+{
+	global $FileRootCache, $BlogCache, $current_User;
+
+	$r = array();
+
+	// The user's blog (if available) is the default/first one:
+	$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $current_User->ID );
+	if( $user_FileRoot )
+	{ // We got a user media dir:
+		$r[ $user_FileRoot->ID ] = & $user_FileRoot;
+	}
+
+	$bloglist = $BlogCache->load_user_blogs( 'browse', $current_User->ID );
+
+	// blog media dirs:
+	foreach( $bloglist as $blog_ID )
+	{
+		if( $Root = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_ID ) )
+		{
+			$r[ $Root->ID ] = & $Root;
+		}
+	}
+
+	return $r;
+}
+
+
+/**
+ * Get the directories of the supplied path as a radio button tree.
+ *
+ * @param NULL|FileRoot A single root or NULL for all available.
+ * @param string the root path to use
+ * @return string
+ */
+function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = NULL, $name = NULL )
+{
+	global $fm_FileRoot, $fm_Filelist;
+	static $js_closeClickIDs; // clickopen IDs that should get closed
+
+	if( $Root === NULL )
+	{ // This is the top level call:
+		$js_closeClickIDs = array();
+
+		$_roots = get_available_FileRoots();
+
+		$r = '<ul class="clicktree">';
+		foreach( $_roots as $l_Root )
+		{
+			$subR = get_directory_tree_radio( $l_Root, $l_Root->ads_path, '' );
+			if( !empty( $subR['string'] ) )
+			{
+				$r .= '<li>'.$subR['string'].'</li>';
+			}
+		}
+
+		$r .= '</ul>';
+
+		if( ! empty($js_closeClickIDs) )
+		{ // there are IDs of checkboxes that we want to close
+			$r .= "\n".'<script type="text/javascript">toggle_clickopen( \''
+						.implode( "' );\ntoggle_clickopen( '", $js_closeClickIDs )
+						."' );\n</script>";
+		}
+
+		return $r;
+	}
+
+	// We'll go through files in current dir:
+	$Nodelist = new Filelist( trailing_slash($path), $Root );
+	$Nodelist->load();
+	$has_sub_dirs = $Nodelist->count_dirs();
+
+	$root_and_path = format_to_output( serialize( array( 'root' => $Root->ID, 'path' => $rootSubpath ) ), 'formvalue' );
+	$id_path = md5( $path );
+
+	// the radio input to select this path
+	$r['string'] = '<input'
+		.' type="radio"'
+		.' name="root_and_path"'
+		.' value="'.$root_and_path.'"'
+		.' id="radio_'.$id_path.'"'
+		.( $Root->ID == $fm_FileRoot->ID && $rootSubpath == $fm_Filelist->get_rds_list_path() ? ' checked="checked"' : '' )
+		//.( ! $has_sub_dirs ? ' style="margin-right:'.get_icon( 'collapse', 'size', array( 'size' => 'width' ) ).'px"' : '' )
+		.' /> ';
+
+	$label = '<label for="radio_'.$id_path.'">'
+		.'<a href="'.regenerate_url( 'root,path,fm_disp_browser', 'root='.$Root->ID.'&amp;path='.$rootSubpath.'&amp;fm_disp_browser=1' ).'"
+		title="'.T_('Open this directory in the Filemanager').'">'
+		.( empty($rootSubpath) ? $Root->name : basename( $path ) )
+		.'</a>'
+		.'</label>';
+
+	$r['opened'] = ( $Root->ID == $fm_FileRoot->ID && $rootSubpath == $fm_Filelist->get_rds_list_path() ) ? true : NULL;
+
+	if( ! $has_sub_dirs )
+	{
+		$r['string'] .= $label;
+		return $r;
+	}
+	else
+	{ // Process subdirs
+		$r['string'] .= $label
+			.' <img src="'.get_icon( 'collapse', 'url' ).'"'
+				.' onclick="toggle_clickopen(\''.$id_path.'\');"'
+				.' id="clickimg_'.$id_path.'" alt="+ / -" />'
+			.'<ul class="clicktree" id="clickdiv_'.$id_path.'">'."\n";
+
+		while( $l_File = & $Nodelist->get_next( 'dir' ) )
+		{
+			$rSub = get_directory_tree_radio( $Root, $l_File->get_full_path(), $l_File->get_rdfs_rel_path() );
+
+			if( $rSub['opened'] )
+			{ // pass opened status on, if given
+				$r['opened'] = $rSub['opened'];
+			}
+
+			$r['string'] .= '<li>'.$rSub['string'].'</li>';
+		}
+
+		if( !$r['opened'] )
+		{
+			$js_closeClickIDs[] = $id_path;
+		}
+		$r['string'] .= '</ul>';
+	}
+
+	return $r;
+}
+
+
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 03:03:32  blueyed
+ * Fixed and cleaned up "filemanager".
+ *
  * Revision 1.1  2006/02/23 21:11:57  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

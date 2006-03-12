@@ -33,37 +33,40 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @global File
+ */
+global $edit_File;
+
 // Begin payload block:
 $this->disp_payload_begin();
 
 $Form = & new Form( NULL, 'fm_properties_checkchanges' );
 
-$Form->global_icon( T_('Close properties!'), 'close', $Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
+$Form->global_icon( T_('Close properties!'), 'close', regenerate_url('fm_mode') );
 
 $Form->begin_form( 'fform', T_('File properties') );
-
 	$Form->hidden_ctrl();
-	echo $Fileman->getFormHiddenInputs();
-	echo $Fileman->getFormHiddenSelectedFiles();
 	$Form->hidden( 'action', 'update_properties' );
+	$Form->hiddens_by_key( get_memorized() );
 
 	$Form->begin_fieldset( T_('Properties') );
-		$Form->info( T_('Filename'), $selectedFile->get_name(), T_('This is the name of the file on the server hard drive.') );
-		$Form->info( T_('Type'), $selectedFile->get_icon().' '.$selectedFile->get_type() );
+		$Form->info( T_('Filename'), $edit_File->get_name(), T_('This is the name of the file on the server hard drive.') );
+		$Form->info( T_('Type'), $edit_File->get_icon().' '.$edit_File->get_type() );
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Meta data') );
 		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
-			$Form->text( 'title', $selectedFile->title, 50, T_('Long title'), T_('This is a longer descriptive title'), 255 );
-			$Form->text( 'alt', $selectedFile->alt, 50, T_('Alternative text'), T_('This is useful for images'), 255 );
-			$Form->textarea( 'desc', $selectedFile->desc, 10, T_('Caption/Description') );
+			$Form->text( 'title', $edit_File->title, 50, T_('Long title'), T_('This is a longer descriptive title'), 255 );
+			$Form->text( 'alt', $edit_File->alt, 50, T_('Alternative text'), T_('This is useful for images'), 255 );
+			$Form->textarea( 'desc', $edit_File->desc, 10, T_('Caption/Description') );
 		}
 		else
 		{ // User can view only:
-			$Form->info( T_('Long title'), $selectedFile->dget('title'), T_('This is a longer descriptive title') );
-			$Form->info( T_('Alternative text'), $selectedFile->dget('alt'), T_('This is useful for images') );
-			$Form->info( T_('Caption/Description'), $selectedFile->dget('desc') );
+			$Form->info( T_('Long title'), $edit_File->dget('title'), T_('This is a longer descriptive title') );
+			$Form->info( T_('Alternative text'), $edit_File->dget('alt'), T_('This is useful for images') );
+			$Form->info( T_('Caption/Description'), $edit_File->dget('desc') );
 		}
 	$Form->end_fieldset();
 
@@ -82,6 +85,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 03:03:33  blueyed
+ * Fixed and cleaned up "filemanager".
+ *
  * Revision 1.1  2006/02/23 21:12:17  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

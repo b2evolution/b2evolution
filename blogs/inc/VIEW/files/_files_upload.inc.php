@@ -41,6 +41,15 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @var Settings
+ */
+global $Settings;
+
+global $upload_quickmode, $failedFiles;
+
+?>
+
 <script type="text/javascript">
 	<!--
 	/**
@@ -161,15 +170,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 	$Form = & new Form( NULL, 'fm_upload_checkchanges', 'post', 'fieldset', 'multipart/form-data' );
 
-	$Form->global_icon( T_('Quit upload mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
+	$Form->global_icon( T_('Quit upload mode!'), 'close', regenerate_url( 'fm_mode' ) );
 
 	$Form->begin_form( 'fform', T_('File upload') );
 
 		$Form->hidden_ctrl();
-		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
+		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); // Just a hint for the browser.
 		$Form->hidden( 'upload_quickmode', $upload_quickmode );
-
-		echo $Fileman->getFormHiddenInputs();
+		$Form->hiddens_by_key( get_memorized() );
 
 		if( count( $failedFiles ) )
 		{
@@ -268,7 +276,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		<fieldset class="upload_into">
 			<legend><?php echo T_('Upload files into:'); ?></legend>
 			<?php
-				echo $Fileman->get_directory_tree_radio();
+				echo get_directory_tree_radio();
 			?>
 		</fieldset>
 		</div>
@@ -285,6 +293,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 03:03:33  blueyed
+ * Fixed and cleaned up "filemanager".
+ *
  * Revision 1.1  2006/02/23 21:12:17  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

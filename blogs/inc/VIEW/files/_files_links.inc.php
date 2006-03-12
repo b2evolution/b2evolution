@@ -35,7 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $Form = & new Form( NULL, 'fm_links', 'post', 'fieldset' );
 
-$Form->global_icon( T_('Quit link mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
+$Form->global_icon( T_('Quit link mode!'), 'close', regenerate_url( 'fm_mode' ) );
 
 $Form->begin_form( 'fform', sprintf( T_('Link files to &laquo;%s&raquo;...'), $edited_Item->dget('title') ) );
 
@@ -124,6 +124,9 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 03:03:33  blueyed
+ * Fixed and cleaned up "filemanager".
+ *
  * Revision 1.1  2006/02/23 21:12:17  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

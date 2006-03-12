@@ -501,7 +501,7 @@ $install_subdir = 'install/';            // Subdirectory relative to base
  * Location of the root media folder.
  *
  * Note: This folder MAY or MAY NOT NEED to be accessible by PHP AND/OR through HTTP.
- * Exact requirements depend on $public_acces_to_media .
+ * Exact requirements depend on $public_access_to_media .
  *
  * @global string $media_subdir
  */
@@ -512,13 +512,15 @@ $media_url = $baseurl.$media_subdir;     // You should not need to change this
 /**
  * Do you want to allow public access to the media dir?
  *
- * WARNING: If you set this to true, evocore will use /htsrv/getfile.php as a stub
+ * WARNING: If you set this to false, evocore will use /htsrv/getfile.php as a stub
  * to access files and getfile.php will check the User permisssion to view files.
  * HOWEVER this will not prevent users from hitting directly into the media folder
  * with their web browser. You still need to restrict access to the media folder
  * from your webserver.
+ *
+ * @global boolean
  */
-$public_acces_to_media = true;
+$public_access_to_media = true;
 
 /**
  * File extensions that the admin will not be able to enable in the Settings

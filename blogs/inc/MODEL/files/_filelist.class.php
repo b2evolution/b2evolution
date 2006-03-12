@@ -65,6 +65,12 @@ require_once dirname(__FILE__).'/_file.class.php';
 class Filelist
 {
 	/**
+	 * Flat mode? (all files recursive without dirs)
+	 * @param boolean
+	 */
+	var $flatmode;
+
+	/**
 	 * The root of the file list.
 	 *
 	 * All files in this list MUST have that same FileRoot. Adding will fail otherwise.
@@ -222,7 +228,7 @@ class Filelist
 	 *
 	 * @var boolean
 	 */
-	var $_show_hidden_files = true;
+	var $_show_hidden_files = false;
 
 	/**
 	 * User preference: recursive size of dirs?
@@ -236,6 +242,14 @@ class Filelist
 
 
 	/**
+	 * Display template cache
+	 * @param array
+	 * @access protected
+	 */
+	var $_result_params;
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param boolean|string Default path for the files, false if you want to create an arbitrary list
@@ -244,19 +258,14 @@ class Filelist
 	 */
 	function Filelist( $path, $FileRoot )
 	{
-		global $FileRootCache;
+		global $FileRootCache, $AdminUI;
 
-		if( !is_null($path) )
-		{
-			$this->_ads_list_path = $path;
-		}
+		$this->_ads_list_path = $path;
+		$this->_FileRoot = & $FileRoot;
 
-		if( !is_null($FileRoot) )
-		{	// We want to set a root different from default:
-			$this->_FileRoot = & $FileRoot;
-		}
+		$this->_result_params = $AdminUI->get_menu_template('Results');
 
-		if( !empty($this->_ads_list_path) )
+		if( ! empty($this->_ads_list_path) )
 		{
 			// Get the subpath relative to root
 			$this->_rds_list_path = $this->rdfs_relto_root_from_adfs( $this->_ads_list_path );
@@ -269,9 +278,9 @@ class Filelist
 	 *
 	 * NOTE: this does not work for arbitrary lists!
 	 *
-	 * @param boolean use flat mode (all files recursive without directories)
+	 * @uses $flatmode
 	 */
-	function load( $flatmode = false )
+	function load()
 	{
 		global $Messages;
 
@@ -292,7 +301,7 @@ class Filelist
 		$this->_order_index = array();
 
 		// Attempt list files for requested directory: (recursively if flat mode):
-		if( ($filepath_array = get_filenames( $this->_ads_list_path, true, true, true, $flatmode )) === false )
+		if( ($filepath_array = get_filenames( $this->_ads_list_path, true, true, true, $this->flatmode )) === false )
 		{
 			$Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->_ads_list_path ), 'fl_error' );
 			return false;
@@ -379,6 +388,7 @@ class Filelist
 			$this->_total_dirs++;
 
 			// fplanque>> TODO: get this outta here??
+			// blueyed>> Where does it belong instead?
 			if( $this->_use_recursive_dirsize )
 			{ // We want to use recursive directory sizes
 				// won't be done in the File constructor
@@ -446,19 +456,29 @@ class Filelist
 	 */
 	function sort( $order = NULL, $orderasc = NULL, $dirsattop = NULL )
 	{
-		if( !$this->_total_entries )
+		if( ! $this->_total_entries )
 		{
 			return false;
 		}
 
 		if( $order !== NULL )
-		{
+		{ // New order
 			$this->_order = $order;
 		}
+		elseif( $this->_order === NULL )
+		{ // Init
+			$this->_order = 'name';
+		}
+
 		if( $orderasc !== NULL )
-		{
+		{ // New ascending/descending setting
 			$this->_order_asc = $orderasc;
 		}
+		elseif( $this->_order_asc === NULL )
+		{ // Init: ascending for 'name' and 'path', else descending
+			$this->_order_asc = ( ( $this->_order == 'name' || $this->_order == 'path' ) ? 1 : 0 );
+		}
+
 		if( $dirsattop !== NULL )
 		{
 			$this->_dirs_not_at_top = ! $dirsattop;
@@ -556,6 +576,53 @@ class Filelist
 
 
 	/**
+	 * Get the used order.
+	 *
+	 * @return string
+	 */
+	function get_sort_order()
+	{
+		return $this->translate_order( $this->_order );
+	}
+
+
+	/**
+	 * Get the link to sort by a column. Handle current order and appends an
+	 * icon to reflect the current state (ascending/descending), if the column
+	 * is the same we're sorting by.
+	 *
+	 * @param string The type (name, path, size, ..)
+	 * @param string The text for the anchor.
+	 * @return string
+	 */
+	function get_sort_link( $type, $atext )
+	{
+		$newAsc = $this->_order == $type ? (1 - $this->is_sorting_asc()) :  1;
+
+		$r = '<a href="'.regenerate_url( 'fm_order,fm_orderasc', 'fm_order='.$type.'&amp;fm_orderasc='.$newAsc ).'" title="'.T_('Change Order').'"';
+
+		// Sorting icon:
+		if( $this->_order != $type )
+		{ // Not sorted on this column:
+			$r .= ' class="basic_sort_link">'.$this->_result_params['basic_sort_off'];
+		}
+		elseif( $this->is_sorting_asc($type) )
+		{ // We are sorting on this column , in ascneding order:
+			$r .=	' class="basic_current">'.$this->_result_params['basic_sort_asc'];
+		}
+		else
+		{ // Descending order:
+			$r .=	' class="basic_current">'.$this->_result_params['basic_sort_desc'];
+		}
+
+		$r .= ' '.$atext;
+
+
+		return $r.'</a>';
+	}
+
+
+	/**
 	 * Reset the iterator
 	 */
 	function restart()
@@ -588,6 +655,28 @@ class Filelist
 
 
 	/**
+	 * Set the filter.
+	 *
+	 * @param string Filter string
+	 * @param boolean Is the filter a regular expression?
+	 */
+	function set_filter( $filterString, $filterIsRegexp = true )
+	{
+		global $Messages;
+
+		$this->_filter_is_regexp = $filterIsRegexp;
+
+		if( $this->_filter_is_regexp && !isRegexp( $filterString ) )
+		{
+			$Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $filterString ), 'error' );
+			$filterString = '.*';
+		}
+
+		$this->_filter = empty($filterString) ? NULL : $filterString;
+	}
+
+
+	/**
 	 * Is a filter active?
 	 *
 	 * @return boolean
@@ -607,17 +696,6 @@ class Filelist
 	function contains( & $File )
 	{
 		return isset( $this->_md5_ID_index[ $File->get_md5_ID() ] );
-	}
-
-
-	/**
-	 * Get the order the list is sorted by.
-	 *
-	 * @return NULL|string
-	 */
-	function get_sort_order()
-	{
-		return $this->_order;
 	}
 
 
@@ -1012,10 +1090,56 @@ class Filelist
 
 		return true;
 	}
+
+
+	/**
+	 * Returns cwd, where the accessible directories (below root) are clickable
+	 *
+	 * @return string cwd as clickable html
+	 */
+	function get_cwd_clickable( $clickableOnly = true )
+	{
+		if( empty($this->_ads_list_path) )
+		{
+			return ' -- '.T_('No directory.').' -- ';
+		}
+
+		// Get the part of the path which is not clickable:
+		$r = substr( $this->_FileRoot->ads_path, 0, strrpos( substr($this->_FileRoot->ads_path, 0, -1), '/' )+1 );
+
+		// get the part that is clickable
+		$clickabledirs = explode( '/', substr( $this->_ads_list_path, strlen($r) ) );
+
+		if( $clickableOnly )
+		{
+			$r = '';
+		}
+
+		$cd = '';
+		foreach( $clickabledirs as $nr => $dir )
+		{
+			if( empty($dir) )
+			{
+				break;
+			}
+			if( $nr )
+			{
+				$cd .= $dir.'/';
+			}
+			$r .= '<a href="'.regenerate_url( 'path', 'path='.$cd )
+					.'" title="'.T_('Change to this directory').'">'.$dir.'</a>/';
+		}
+
+		return $r;
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 03:03:32  blueyed
+ * Fixed and cleaned up "filemanager".
+ *
  * Revision 1.1  2006/02/23 21:11:57  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

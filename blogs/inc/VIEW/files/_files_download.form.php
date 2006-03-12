@@ -50,19 +50,17 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $zipname, $exclude_sd, $selected_Filelist;
 
 $Form = & new Form( NULL, 'fm_download_checkchanges' );
 
-$Form->global_icon( T_('Cancel download!'), 'close',	$Fileman->getCurUrl( ) );
+$Form->global_icon( T_('Cancel download!'), 'close', regenerate_url() );
 
 $Form->begin_form( 'fform', T_('Download files in archive') );
-
 	$Form->hidden_ctrl();
-
-	echo $Fileman->getFormHiddenInputs();
-	echo $Fileman->getFormHiddenSelectedFiles();
 	$Form->hidden( 'action', 'download' );
 	$Form->hidden( 'action_invoked', 1 );
+	$Form->hiddens_by_key( get_memorized() );
 
 	$Form->text_input( 'zipname', $zipname, 30, T_('Archive filename'), array( 'note' => T_('This is the name of the file which will get sent to you.'), 'maxlength' => '' ) );
 
@@ -84,6 +82,9 @@ $Form->end_form( array(
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.3  2006/03/12 03:03:33  blueyed
+ * Fixed and cleaned up "filemanager".
+ *
  * Revision 1.2  2006/02/28 18:21:38  blueyed
  * maxlength fixed
  *

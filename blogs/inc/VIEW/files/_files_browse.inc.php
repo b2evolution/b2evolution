@@ -42,10 +42,17 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * Dirty!
- * @var FileManager
+ * @var Filelist
  */
-global $Fileman;
+global $fm_Filelist;
+/**
+ * @var string
+ */
+global $fm_mode;
+/**
+ * @var string
+ */
+global $fm_flatmode;
 /**
  * @var User
  */
@@ -62,12 +69,23 @@ global $UserSettings;
  * @var Log
  */
 global $Messages;
+/**
+ * @var Filelist
+ */
+global $selected_Filelist;
+
+global $disp_fm_browser_toggle, $fm_forceFM;
+
 
 // Begin payload block:
 $this->disp_payload_begin();
 
 echo '<div id="filemanmain">';
 
+if( $disp_fm_browser_toggle )
+{ // File browser interface can be toggled, link to hide
+	echo '<span class="toolbaritem">'.action_icon( T_('Hide Filemanager'), 'close', regenerate_url( 'fm_disp_browser', 'fm_disp_browser=0' ) ).'</span>';
+}
 ?>
 
 <!-- FLAT MODE: -->
@@ -76,22 +94,14 @@ echo '<div id="filemanmain">';
 $Form = & new Form( NULL, 'fmbar_flatmode', 'post', 'none' );
 $Form->begin_form( 'toolbaritem' );
 	$Form->hidden_ctrl();
-	echo $Fileman->getFormHiddenInputs();
-	echo $Fileman->getFormHiddenSelectedFiles();
-	?>
-	<input name="actionArray[<?php echo $Fileman->flatmode ? 'noflatmode' : 'flatmode' ?>]"
-		class="ActionButton"
-		type="submit"
-		title="<?php
-			echo format_to_output( $Fileman->flatmode ?
-															T_('Normal mode') :
-															T_('All files and folders, including subdirectories'), 'formvalue' );
-			?>"
-		value="<?php
-			echo format_to_output( $Fileman->flatmode ?
-															T_('Normal mode') :
-															T_('Flat mode'), 'formvalue' ); ?>" />
-<?php
+	$Form->hiddens_by_key( get_memorized('fm_flatmode') );
+	if( ! $fm_flatmode )
+	{
+		$Form->hidden( 'fm_flatmode', 1 );
+	}
+	$Form->button( array( 'class' => 'ActionButton',
+			'title' => ( $fm_flatmode ? T_('Normal mode') : T_('All files and folders, including subdirectories') ),
+			'value' => ( $fm_flatmode ? T_('Normal mode') : T_('Flat mode') ) ) );
 $Form->end_form();
 ?>
 
@@ -105,24 +115,23 @@ $titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalu
 $Form = & new Form( NULL, 'fmbar_filter_checkchanges', 'post', 'none' );
 $Form->begin_form( 'toolbaritem' );
 	$Form->hidden_ctrl();
-	echo $Fileman->getFormHiddenInputs( array( 'filterString'=>'', 'filterIsRegexp'=>'' ) );
-	echo $Fileman->getFormHiddenSelectedFiles();
+	$Form->hiddens_by_key( get_memorized(), array('fm_filter', 'fm_filter_regex') );
 	?>
-	<label for="filterString" class="tooltitle"><?php echo T_('Filter') ?>:</label>
-	<input type="text" name="filterString" id="filterString"
-		value="<?php echo format_to_output( $Fileman->get_filter( false ), 'formvalue' ) ?>"
+	<label for="fm_filter" class="tooltitle"><?php echo T_('Filter') ?>:</label>
+	<input type="text" name="fm_filter" id="fm_filter"
+		value="<?php echo format_to_output( $fm_Filelist->get_filter( false ), 'formvalue' ) ?>"
 		size="7" accesskey="f" />
 
-	<input type="checkbox" class="checkbox" name="filterIsRegexp" id="filterIsRegexp" title="<?php echo $titleRegExp; ?>"
-		value="1"<?php if( $Fileman->is_filter_regexp() ) echo ' checked="checked"' ?> />
-	<label for="filterIsRegexp" title="<?php echo $titleRegExp; ?>"><?php
+	<input type="checkbox" class="checkbox" name="fm_filter_regex" id="fm_filter_regex" title="<?php echo $titleRegExp; ?>"
+		value="1"<?php if( $fm_Filelist->is_filter_regexp() ) echo ' checked="checked"' ?> />
+	<label for="fm_filter_regex" title="<?php echo $titleRegExp; ?>"><?php
 		echo /* TRANS: short for "is regular expression" */ T_('RegExp'); ?></label>
 
 	<input type="submit" name="actionArray[filter]" class="ActionButton"
 		value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
 
 	<?php
-	if( $Fileman->is_filtering() )
+	if( $fm_Filelist->is_filtering() )
 	{ // "reset filter" form
 		?>
 		<input type="image" name="actionArray[filter_unset]" value="<?php echo T_('Unset filter'); ?>"
@@ -153,12 +162,12 @@ $Form->end_form();
 	$Form = & new Form( NULL, 'FilesForm', 'post', 'none' );
 	$Form->begin_form();
 		$Form->hidden_ctrl();
-?>
 
-<input type="hidden" name="confirmed" value="0" />
-<input type="hidden" name="md5_filelist" value="<?php echo $Fileman->md5_checksum() ?>" />
-<input type="hidden" name="md5_cwd" value="<?php echo md5($Fileman->get_ads_list_path()) ?>" />
-<?php echo $Fileman->getFormHiddenInputs(); ?>
+		$Form->hidden( 'confirmed', '0' );
+		$Form->hidden( 'md5_filelist', $fm_Filelist->md5_checksum() );
+		$Form->hidden( 'md5_cwd', md5($fm_Filelist->get_ads_list_path()) );
+		$Form->hiddens_by_key( get_memorized('fm_selected') ); // 'fm_selected' gets provided by the form itself
+?>
 
 
 <table class="grouped clear" cellspacing="0">
@@ -168,7 +177,7 @@ $Form->end_form();
  * @global integer Number of cols for the files table, 6 is minimum.
  */
 $filetable_cols = 6
-	+ (int)$Fileman->flatmode
+	+ (int)$fm_flatmode
 	+ (int)$UserSettings->get('fm_showtypes')
 	+ (int)$UserSettings->get('fm_showfsperms')
 	+ (int)$UserSettings->get('fm_showfsowner')
@@ -185,7 +194,7 @@ $filetable_cols = 6
 		 * Display ROOTs list:
 		 * -----------------------------------------------
 		 */
-		$rootlist = $Fileman->get_available_FileRoots();
+		$rootlist = get_available_FileRoots();
 		if( count($rootlist) > 1 )
 		{ // provide list of roots to choose from
 			?>
@@ -197,7 +206,7 @@ $filetable_cols = 6
 			{
 				echo '<option value="'.$l_FileRoot->ID.'"';
 
-				if( $Fileman->_FileRoot && $Fileman->_FileRoot->ID == $l_FileRoot->ID )
+				if( $fm_Filelist->_FileRoot && $fm_Filelist->_FileRoot->ID == $l_FileRoot->ID )
 				{
 					echo ' selected="selected"';
 				}
@@ -229,13 +238,13 @@ $filetable_cols = 6
 			// -----------------------------------------------
 
 			// Display current dir:
-			echo T_('Current dir').': <strong class="currentdir">'.$Fileman->getCwdClickable().'</strong>';
+			echo T_('Current dir').': <strong class="currentdir">'.$fm_Filelist->get_cwd_clickable().'</strong>';
 
 
 			// Display current filter:
-			if( $Fileman->is_filtering() )
+			if( $fm_Filelist->is_filtering() )
 			{
-				echo '[<em class="filter">'.$Fileman->get_filter().'</em>]';
+				echo '[<em class="filter">'.$fm_Filelist->get_filter().'</em>]';
 				// TODO: maybe clicking on the filter should open a JS popup saying "Remove filter [...]? Yes|No"
 			}
 
@@ -243,7 +252,7 @@ $filetable_cols = 6
 			// The hidden reload button
 			?>
 			<span style="display:none;" id="fm_reloadhint">
-				<a href="<?php echo $Fileman->getCurUrl() ?>"
+				<a href="<?php echo regenerate_url() ?>"
 					title="<?php echo T_('A popup has discovered that the displayed content of this window is not up to date. Click to reload.'); ?>">
 					<?php echo get_icon( 'reload' ) ?>
 				</a>
@@ -253,11 +262,11 @@ $filetable_cols = 6
 			// Display filecounts:
 			?>
 
-			<span class="fm_filecounts" title="<?php printf( T_('%s bytes'), number_format($Fileman->count_bytes()) ); ?>"> (<?php
-			disp_cond( $Fileman->count_dirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
+			<span class="fm_filecounts" title="<?php printf( T_('%s bytes'), number_format($fm_Filelist->count_bytes()) ); ?>"> (<?php
+			disp_cond( $fm_Filelist->count_dirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
 			echo ', ';
-			disp_cond( $Fileman->count_files(), T_('One file'), T_('%d files'), T_('No files' ) );
-			echo ', '.bytesreadable( $Fileman->count_bytes() );
+			disp_cond( $fm_Filelist->count_files(), T_('One file'), T_('%d files'), T_('No files' ) );
+			echo ', '.bytesreadable( $fm_Filelist->count_bytes() );
 			?>
 			)</span>
 		</div>
@@ -269,37 +278,47 @@ $filetable_cols = 6
 	/*****************  Col headers  ****************/
 
 	echo '<tr>';
+
+	// "Go to parent" icon
 	echo '<th class="firstcol">';
-	$Fileman->dispButtonParent();
-	echo '</th>';
-	echo '<th>'.$Fileman->getLinkSort( 'type', '' ).'</th>';
-	if( $Fileman->flatmode )
-	{
-		echo '<th>'.$Fileman->getLinkSort( 'path', /* TRANS: file/directory path */ T_('Path') ).'</th>';
+	if( empty($fm_Filelist->_rds_list_path) )
+	{ // cannot go higher
+		echo '&nbsp;';	// for IE
 	}
-	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'name', /* TRANS: file name */ T_('Name') ).'</th>';
+	else
+	{
+		echo action_icon( T_('Go to parent folder'), 'folder_parent', regenerate_url( 'path', 'path='.$fm_Filelist->_rds_list_path.'..' ) );
+	}
+	echo '</th>';
+
+	echo '<th>'.$fm_Filelist->get_sort_link( 'type', '' ).'</th>';
+	if( $fm_flatmode )
+	{
+		echo '<th>'.$fm_Filelist->get_sort_link( 'path', /* TRANS: file/directory path */ T_('Path') ).'</th>';
+	}
+	echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'name', /* TRANS: file name */ T_('Name') ).'</th>';
 
 	if( $UserSettings->get('fm_showtypes') ) // MB UPDATE-------------
 	{ // Show file types column
-		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
+		echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
 	}
 
-	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'size', /* TRANS: file size */ T_('Size') ).'</th>';
-	echo '<th class="nowrap">'.$Fileman->getLinkSort( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ).'</th>';
+	echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'size', /* TRANS: file size */ T_('Size') ).'</th>';
+	echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'lastmod', /* TRANS: file's last change / timestamp */ T_('Last change') ).'</th>';
 
 	if( $UserSettings->get('fm_showfsperms') ) // MB UPDATE-------------
 	{ // Show file perms column
-		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'perms', /* TRANS: file's permissions (short) */ T_('Perms') ).'</th>';
+		echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'perms', /* TRANS: file's permissions (short) */ T_('Perms') ).'</th>';
 	}
 
 	if( $UserSettings->get('fm_showfsowner') )
 	{ // Show file owner column
-		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'fsowner', /* TRANS: file owner */ T_('Owner') ).'</th>';
+		echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'fsowner', /* TRANS: file owner */ T_('Owner') ).'</th>';
 	}
 
 	if( $UserSettings->get('fm_showfsgroup') )
 	{ // Show file group column
-		echo '<th class="nowrap">'.$Fileman->getLinkSort( 'fsgroup', /* TRANS: file group */ T_('Group') ).'</th>';
+		echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'fsgroup', /* TRANS: file group */ T_('Group') ).'</th>';
 	}
 
 	echo '<th class="lastcol nowrap">'. /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions').'</th>';
@@ -317,9 +336,8 @@ param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 /***********************************************************/
 /*                    MAIN FILE LIST:                      */
 /***********************************************************/
-$Fileman->sort();
 $countFiles = 0;
-while( $lFile = & $Fileman->get_next() )
+while( $lFile = & $fm_Filelist->get_next() )
 { // Loop through all Files:
 	echo '<tr class="'.( $countFiles%2 ? 'odd' : 'even' ).'">';
 
@@ -328,9 +346,9 @@ while( $lFile = & $Fileman->get_next() )
 	echo '<td class="checkbox firstcol">';
 	echo '<span name="surround_check" class="checkbox_surround_init">';
 	echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
-				name="fm_selected[]" value="'.$lFile->get_md5_ID().'" id="cb_filename_'.$countFiles.'"';
+				name="fm_selected[]" value="'.rawurlencode($lFile->get_rdfp_rel_path()).'" id="cb_filename_'.$countFiles.'"';
 	global $checkall;
-	if( $checkall || $Fileman->isSelected( $lFile ) )
+	if( $checkall || $selected_Filelist->contains( $lFile ) )
 	{
 		echo ' checked="checked"';
 	}
@@ -371,10 +389,10 @@ while( $lFile = & $Fileman->get_next() )
 
 	/*******************  Path (flatmode): ******************/
 
-	if( $Fileman->flatmode )
+	if( $fm_flatmode )
 	{
 		echo '<td class="filepath">';
-		echo $lFile->get_rdfs_rel_path();
+		echo dirname($lFile->get_rdfs_rel_path()).'/';
 		echo '</td>';
 	}
 
@@ -414,11 +432,11 @@ while( $lFile = & $Fileman->get_next() )
 
 	/***************  Link ("chain") icon:  **************/
 
-	if( $Fileman->fm_mode == 'link_item'
+	if( $fm_mode == 'link_item'
 			// Plug extensions here!
 		)
 	{	// Offer option to link the file to an Item:
-		$Fileman->dispButtonFileLink();
+		echo action_icon( T_('Link this file!'), 'link', regenerate_url( 'fm_selected', 'fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
 		echo ' ';
 	}
 
@@ -447,8 +465,11 @@ while( $lFile = & $Fileman->get_next() )
 	/***************  File meta data:  **************/
 
 	echo '<span class="filemeta">';
-	// Optionnaly display IMAGE pixel size:
-	disp_cond( $Fileman->getFileImageSize(), ' (%s)' );
+	// Optionally display IMAGE pixel size:
+	if( $UserSettings->get( 'fm_getimagesizes' ) )
+	{
+		echo ' ('.$lFile->get_image_size( 'widthxheight' ).')';
+	}
 	// Optionnaly display meta data title:
 	if( $lFile->meta == 'loaded' )
 	{	// We have loaded meta data for this file:
@@ -459,7 +480,7 @@ while( $lFile = & $Fileman->get_next() )
 	/*
 	 * Directory in flat mode:
 	 *
-	if( $Fileman->flatmode && $Fileman->get_sort_order() == 'name' )
+	if( $fm_flatmode && $fm_Filelist->get_sort_order() == 'name' )
 	{
 		?>
 		<div class="path" title="<?php echo T_('The directory of the file') ?>"><?php
@@ -499,7 +520,17 @@ while( $lFile = & $Fileman->get_next() )
 	if( $UserSettings->get('fm_showfsperms') ) // MB UPDATE-------------
 	{ // Show file perms
 		echo '<td class="perms">';
-		$Fileman->dispButtonFileEditPerms();
+		$fm_permlikelsl = $Request->param_UserSettings( 'fm_permlikelsl', 'integer', NULL );
+
+		if( $current_User->check_perm( 'files', 'edit' ) )
+		{ // User can edit:
+			echo '<a title="'.T_('Edit permissions').'" href="'.regenerate_url( 'fm_selected,action', 'action=edit_perms&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ).'">'
+						.$lFile->get_perms( $fm_permlikelsl ? 'lsl' : '' ).'</a>';
+		}
+		else
+		{
+			echo $lFile->get_perms( $fm_permlikelsl ? 'lsl' : '' );
+		}
 		echo '</td>';
 	}
 
@@ -524,18 +555,16 @@ while( $lFile = & $Fileman->get_next() )
 	/*****************  Action icons  ****************/
 
 	echo '<td class="actions lastcol">';
-	// Not implemented yet: $Fileman->dispButtonFileEdit();
-	$Fileman->dispButtonFileProperties();
+	// Not implemented yet: "Edit file.."
+
+	echo action_icon( T_('Edit properties...'), 'properties', regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
 
 	if( $current_User->check_perm( 'files', 'edit' ) )
 	{ // User can edit:
-
-		// Rename (NEW):
-		echo '<a title="'.T_('Rename').'" href="'.$Fileman->getLinkFile( $Fileman->curFile, 'rename' ).'">'.get_icon( 'file_rename' ).'</a>';
-
-		$Fileman->dispButtonFileMove();
-		$Fileman->dispButtonFileCopy();
-		$Fileman->dispButtonFileDelete();
+		echo action_icon( T_('Rename'), 'file_rename', regenerate_url( 'fm_selected', 'action=rename&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
+		echo action_icon( T_('Move'), 'file_move', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_move&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
+		echo action_icon( T_('Copy'), 'file_copy', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_copy&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
+		echo action_icon( T_('Delete'), 'file_delete', regenerate_url( 'fm_selected', 'action=delete&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ) ) );
 	}
 	echo '</td>';
 
@@ -555,7 +584,7 @@ if( $countFiles == 0 )
 				if( !$Messages->count( 'fl_error' ) )
 				{ // no Filelist errors, the directory must be empty
 					$Messages->add( T_('No files found.')
-						.( $Fileman->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$Fileman->get_filter().'&raquo;' : '' ), 'fl_error' );
+						.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'fl_error' );
 				}
 				$Messages->display( '', '', true, 'fl_error', 'log_error' );
 			?>
@@ -733,33 +762,36 @@ if( $countFiles )
 if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ))
 			&& $current_User->check_perm( 'files', 'add' ) )
 { // dir or file creation is enabled and we're allowed to add files:
+	global $create_type;
+
 	$Form = & new Form( NULL, 'fmbar_create_checkchanges', 'post', 'none' );
 	$Form->begin_form( 'toolbaritem' );
+		$Form->hidden( 'action', 'createnew' );
 		$Form->hidden_ctrl();
-		echo $Fileman->getFormHiddenInputs();
+		$Form->hiddens_by_key( get_memorized() );
 		if( ! $Settings->get( 'fm_enable_create_dir' ) )
 		{	// We can create files only:
 			echo '<label for="fm_createname" class="tooltitle">'.T_('New file:').'</label>';
-			echo '<input type="hidden" name="createnew" value="file" />';
+			echo '<input type="hidden" name="create_type" value="file" />';
 		}
 		elseif( ! $Settings->get( 'fm_enable_create_file' ) )
 		{	// We can create directories only:
 			echo '<label for="fm_createname" class="tooltitle">'.T_('New folder:').'</label>';
-			echo '<input type="hidden" name="createnew" value="dir" />';
+			echo '<input type="hidden" name="create_type" value="dir" />';
 		}
 		else
 		{	// We can create both files and directories:
 			echo T_('New');
-			echo '<select name="createnew">';
+			echo '<select name="create_type">';
 			echo '<option value="dir"';
-			if( isset($createnew) &&  $createnew == 'dir' )
+			if( isset($create_type) &&  $create_type == 'dir' )
 			{
 				echo ' selected="selected"';
 			}
 			echo '>'.T_('folder').'</option>';
 
 			echo '<option value="file"';
-			if( isset($createnew) && $createnew == 'file' )
+			if( isset($create_type) && $create_type == 'file' )
 			{
 				echo ' selected="selected"';
 			}
@@ -767,13 +799,12 @@ if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_crea
 			echo '</select>:';
 		}
 	?>
-	<input type="text" name="createname" id="fm_createname" value="<?php
+	<input type="text" name="create_name" id="fm_createname" value="<?php
 		if( isset( $createname ) )
 		{
 			echo $createname;
 		} ?>" size="15" />
 	<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
-	<input type="hidden" name="action" value="createnew" />
 	<?php
 	$Form->end_form();
 }
@@ -789,7 +820,8 @@ if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add
 	$Form->begin_form( 'toolbaritem' );
 		$Form->hidden_ctrl();
 		echo '<div>';
-		echo $Fileman->getFormHiddenInputs( array( 'fm_mode' => 'file_upload' ) );
+		$Form->hiddens_by_key( get_memorized('fm_mode') );
+		$Form->hidden( 'fm_mode', 'file_upload' );
 		echo '<input class="ActionButton" type="submit" value="'.T_('Advanced upload...').'" />';
 		echo '</div>';
 	$Form->end_form();
@@ -800,7 +832,8 @@ if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add
 		$Form->hidden( 'upload_quickmode', 1 );
 		// The following is mainly a hint to the browser.
 		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
-		echo $Fileman->getFormHiddenInputs( array( 'fm_mode' => 'file_upload' ) );
+		$Form->hiddens_by_key( get_memorized('fm_mode') );
+		$Form->hidden( 'fm_mode', 'file_upload' );
 		echo '<div>';
 		echo '<input name="uploadfile[]" type="file" size="10" />';
 		echo '<input class="ActionButton" type="submit" value="'.T_('Quick Upload!').'" />';
@@ -829,7 +862,7 @@ $Form = & new Form( NULL, 'fm_options_checkchanges', 'get', 'none' );
 	$Form->begin_form( 'fform' );
 		$Form->hidden_ctrl();
 		$Form->hidden( 'options_show', 1 );
-		echo $Fileman->getFormHiddenInputs();
+		$Form->hiddens_by_key( get_memorized() );
 
 		// Link to toggle the display of the form
 		global $options_show;
@@ -866,6 +899,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 03:03:33  blueyed
+ * Fixed and cleaned up "filemanager".
+ *
  * Revision 1.1  2006/02/23 21:12:17  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

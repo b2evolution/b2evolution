@@ -51,16 +51,20 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+/**
+ * @global Filelist
+ */
+global $selected_Filelist;
+
+
 $Form = & new Form( NULL );
 
-$Form->global_icon( T_('Cancel delete!'), 'close',	$Fileman->getCurUrl( ) );
+$Form->global_icon( T_('Cancel delete!'), 'close', regenerate_url() );
 
 $Form->begin_form( 'fform', T_('Delete') );
 
 	$Form->hidden_ctrl();
-
-	echo $Fileman->getFormHiddenInputs();
-	echo $Fileman->getFormHiddenSelectedFiles();
+	$Form->hiddens_by_key( get_memorized() );
 	$Form->hidden( 'action', 'delete' );
 	$Form->hidden( 'confirmed', 1 );
 
@@ -82,6 +86,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 03:03:33  blueyed
+ * Fixed and cleaned up "filemanager".
+ *
  * Revision 1.1  2006/02/23 21:12:17  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

@@ -509,11 +509,11 @@ class File extends DataObject
 	 */
 	function get_url()
 	{
-		global $public_acces_to_media, $htsrv_url;
+		global $public_access_to_media, $htsrv_url;
 
 		if( $this->is_dir() )
 		{ // Directory
-			if( $public_acces_to_media )
+			if( $public_access_to_media )
 			{ // Public access: full path
 				$url = $this->get_rdfs_rel_path();
 			}
@@ -524,7 +524,7 @@ class File extends DataObject
 		}
 		else
 		{ // File
-			if( $public_acces_to_media )
+			if( $public_access_to_media )
 			{ // Public Access : full path
 				$url = $this->_FileRoot->ads_url.$this->_rdfp_rel_path;
 			}
@@ -1339,8 +1339,8 @@ class File extends DataObject
 
 /*
  * $Log$
- * Revision 1.3  2006/03/11 00:58:31  blueyed
- * *** empty log message ***
+ * Revision 1.4  2006/03/12 03:03:32  blueyed
+ * Fixed and cleaned up "filemanager".
  *
  * Revision 1.2  2006/02/27 23:58:01  blueyed
  * todo

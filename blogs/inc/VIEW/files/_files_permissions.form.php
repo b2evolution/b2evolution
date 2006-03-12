@@ -51,14 +51,24 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+/**
+ * @global Filelist
+ */
+global $selected_Filelist;
+
+/**
+ * @global
+ */
+global $more_than_one_selected_file, $perms_read_readonly, $field_options_read_readonly;
+
+
 $Form = & new Form( NULL, 'fm_perms_checkchanges' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close',	$Fileman->getCurUrl( ) );
+$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url() );
 
 $Form->begin_form( 'fform', T_('Change permissions') );
 	$Form->hidden_ctrl();
-	echo $Fileman->getFormHiddenInputs();
-	echo $Fileman->getFormHiddenSelectedFiles();
+	$Form->hiddens_by_key( get_memorized() );
 	$Form->hidden( 'action', 'edit_perms' );
 
 	if( $more_than_one_selected_file )
@@ -135,6 +145,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 03:03:33  blueyed
+ * Fixed and cleaned up "filemanager".
+ *
  * Revision 1.1  2006/02/23 21:12:17  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

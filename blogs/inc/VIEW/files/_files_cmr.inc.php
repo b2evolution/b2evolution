@@ -49,22 +49,36 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @global string
+ */
+global $fm_mode;
+
+/**
+ * @global Filelist
+ */
+global $fm_source_Filelist;
+
+/**
+ * @global array
+ */
+global $new_names;
+
 // Begin payload block:
 $this->disp_payload_begin();
 
 $Form = & new Form( NULL, 'fm_copymove_checkchanges' );
 
-$Form->global_icon( T_('Quit copy/move mode!'), 'close',	$Fileman->getCurUrl( array( 'fm_mode' => false ) ) );
+$Form->global_icon( T_('Quit copy/move mode!'), 'close', regenerate_url('fm_sources,fm_mode') );
 
-$Form->begin_form( 'fform', $Fileman->fm_mode == 'file_copy' ? T_('Copy') : T_('Move') );
+$Form->begin_form( 'fform', $fm_mode == 'file_copy' ? T_('Copy') : T_('Move') );
 
 	$Form->hidden_ctrl();
-
-	echo $Fileman->getFormHiddenInputs();
+	$Form->hiddens_by_key( get_memorized() );
 	$Form->hidden( 'confirm', 1 );
 
-	$Fileman->SourceList->restart();
-	while( $loop_src_File = & $Fileman->SourceList->get_next() )
+	$fm_source_Filelist->restart();
+	while( $loop_src_File = & $fm_source_Filelist->get_next() )
 	{
 		$Form->begin_fieldset( T_('Source').': '.$loop_src_File->get_rdfp_rel_path() );
 
@@ -79,7 +93,7 @@ $Form->begin_form( 'fform', $Fileman->fm_mode == 'file_copy' ? T_('Copy') : T_('
 		$Form->end_fieldset();
 	}
 
-$Form->end_form( array( array( 'submit', 'submit', $Fileman->fm_mode == 'file_copy' ? T_('Copy') : T_('Move'), 'SaveButton' ),
+$Form->end_form( array( array( 'submit', 'submit', $fm_mode == 'file_copy' ? T_('Copy') : T_('Move'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 echo '<p class="notes"><strong>'.T_('You are in copy/move mode.')
@@ -90,6 +104,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 03:03:33  blueyed
+ * Fixed and cleaned up "filemanager".
+ *
  * Revision 1.1  2006/02/23 21:12:17  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

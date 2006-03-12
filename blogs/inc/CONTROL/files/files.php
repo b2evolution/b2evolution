@@ -2,14 +2,11 @@
 /**
  * This file implements the UI controller for file management.
  *
- * NOTE: $Fileman->fm_mode gets used for modes, that allow browsing to some other place or
+ * NOTE: $fm_mode gets used for modes, that allow browsing to some other place or
  *       take other actions. A good example is "upload" - you can delete other files while
  *       in upload mode.
  *       "edit_perms" for example is not a mode, but a action.
  *
- * fplanque>> NOTES:
- * 1) There should be no $Fileman object!
- * 2) The mode as well as other context params should be handled by param() / memorize() / regenerate_url()
  * 3) There should be no modes. Only geeks can understand them. And not all geeks might actually ever find an opportunity to want to use them. All we need is a dir selection tree inside of upload and move.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
@@ -65,21 +62,15 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-/**
- * Load FileManager class
- */
-require_once $model_path.'files/_filemanager.class.php';
-
 $AdminUI->set_path( 'files' );
 
 
-/**
- * Check global access permissions:
- */
-if( !$Settings->get( 'fm_enabled' ) )
+// Check global access permissions:
+if( ! $Settings->get( 'fm_enabled' ) )
 {
 	die( 'The filemanager is disabled.' );
 }
+
 // Check permission:
 if( ! $current_User->check_perm( 'files', 'view' ) )
 {
@@ -98,11 +89,14 @@ if( ! $current_User->check_perm( 'files', 'view' ) )
 
 
 // INIT params:
-if( param( 'root_and_path', 'string', '', true ) )
-{ // root and path together: decode and override (overriding is especially used in root switch select)
+if( param( 'root_and_path' ) )
+{ // root and path together: decode and override (used in root switch select and "click tree")
 	$root_and_path = unserialize( $root_and_path );
 	$root = $root_and_path['root'];
 	$path = $root_and_path['path'];
+	// Memorize new root:
+	memorize_param( 'root', 'string', NULL );
+	memorize_param( 'path', 'string', NULL );
 }
 else
 {
@@ -116,12 +110,157 @@ else
 	}
 }
 
-param( 'order', 'string', NULL, true );
-param( 'orderasc', '', NULL, true );
-param( 'filterString', '', NULL, true );
-param( 'filterIsRegexp', 'integer', NULL, true );
-param( 'flatmode', '', NULL, true );
+/**
+ * @global string The Filemanager mode we're in ('fm_upload', 'fm_cmr')
+ */
+$fm_mode = param( 'fm_mode', 'string', NULL, true );
+
 $action = $Request->param_action();
+
+
+// Get root:
+$ads_list_path = false; // false by default, gets set if we have a valid root
+$fm_FileRoot = NULL;
+
+$available_Roots = get_available_FileRoots();
+
+if( ! empty($root) )
+{ // We have requested a root folder by string:
+	$fm_FileRoot = & $FileRootCache->get_by_ID($root);
+
+	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) )
+	{ // Root not found or not in list of available ones
+		$Messages->add( T_('You don\'t have access to the requested root directory.'), 'error' );
+		$fm_FileRoot = false;
+	}
+}
+
+if( ! $fm_FileRoot )
+{ // No root requested (or the requested is invalid), get the first one available:
+	if( $available_Roots
+	    && ( $tmp_keys = array_keys( $available_Roots ) )
+	    && $first_Root = & $available_Roots[ $tmp_keys[0] ] )
+	{ // get the first one
+		$fm_FileRoot = & $first_Root;
+	}
+	else
+	{
+		$Messages->add( T_('You don\'t have access to any root directory.'), 'error' );
+	}
+}
+
+if( $fm_FileRoot )
+{ // We have access to the root:
+	list( $_ads_real_root_path, $real_root_path_exists ) = check_canonical_path( $fm_FileRoot->ads_path );
+	$Debuglog->add( 'FM: real_root_dir: '.var_export( $_ads_real_root_path, true ), 'files' );
+
+	if( ! $real_root_path_exists )
+	{
+		$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $fm_FileRoot->ads_path ), 'error' );
+	}
+	else
+	{ // Root exists
+		// Let's get into requested list dir...
+		$ads_list_path = trailing_slash( $fm_FileRoot->ads_path.$path );
+
+		// get real cwd
+		list( $ads_real_list_path, $realpath_exists ) = check_canonical_path( $ads_list_path );
+
+		if( ! preg_match( '#^'.preg_quote($fm_FileRoot->ads_path, '#').'#', $ads_real_list_path ) )
+		{ // cwd is not below root!
+			$Messages->add( T_( 'You are not allowed to go outside your root directory!' ), 'error' );
+			$ads_list_path = $fm_FileRoot->ads_path;
+		}
+		else
+		{ // allowed
+			if( ! $realpath_exists )
+			{ // does not exist
+				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $ads_list_path ), 'error' );
+				$ads_list_path = false;
+			}
+			else
+			{ // Okay we can list this directory...
+				$ads_list_path = $ads_real_list_path;
+			}
+		}
+	}
+}
+
+
+require_once $model_path.'files/_filelist.class.php';
+
+/**
+ * @global Filelist
+ */
+$fm_Filelist = new Filelist( $ads_list_path, $fm_FileRoot );
+
+if( $Request->param_UserSettings( 'fm_dirsnotattop', 'integer', NULL ) )
+{
+	$fm_Filelist->_dirs_not_at_top = true;
+}
+if( $Request->param_UserSettings( 'fm_recursivedirsize', 'integer', NULL ) ) // TODO: check for permission? (Server load)
+{
+	$fm_Filelist->_use_recursive_dirsize = true;
+}
+if( $Request->param_UserSettings( 'fm_showhidden', 'integer', NULL ) )
+{
+	$fm_Filelist->_show_hidden_files = true;
+}
+if( param( 'fm_flatmode', '', NULL, true ) )
+{
+	$fm_Filelist->flatmode = true;
+}
+
+param( 'fm_filter', '', NULL, true );
+param( 'fm_filter_regex', 'integer', 0, true );
+
+if( ! empty($fm_filter) )
+{
+	$fm_Filelist->set_filter( $fm_filter, $fm_filter_regex );
+}
+
+$Debuglog->add( 'FM root: '.var_export( $fm_FileRoot, true ), 'files' );
+$Debuglog->add( 'FM _ads_list_path: '.var_export( $ads_list_path, true ), 'files' );
+$Debuglog->add( 'FM _rds_list_path: '.var_export( $fm_Filelist->_rds_list_path, true ), 'files' );
+
+
+// For modes build $fm_source_Filelist
+if( $fm_mode && $fm_sources = param( 'fm_sources', 'array', array(), true ) )
+{
+	$fm_sources_root = param( 'fm_sources_root', 'string', '', true );
+
+	$sources_Root = & $FileRootCache->get_by_ID( $fm_sources_root );
+
+	if( $sources_Root )
+	{ // instantiate the source list for the selected sources
+		$fm_source_Filelist = & new Filelist( $sources_Root->ads_path, $sources_Root );
+	}
+	else
+	{ // Fallback: source files are considered to be in the current root
+		$fm_source_Filelist = & new Filelist( $fm_Filelist->_FileRoot->ads_path, $fm_Filelist->get_FileRoot() );
+		$Debuglog->add( 'SourceList without explicit root!', 'error' );
+	}
+
+	if( $fm_source_Filelist )
+	{
+		// TODO: should fail for non-existant sources, or sources where no read-perm
+		foreach( $fm_sources as $l_source_path )
+		{
+			// echo '<br>'.$lSourcePath;
+			$fm_source_Filelist->add_by_subpath( urldecode($l_source_path), true );
+		}
+	}
+	else
+	{ // Without SourceList there's no mode
+		$fm_mode = false;
+	}
+}
+else
+{
+	$fm_source_Filelist = false;
+	$fm_sources = NULL;
+	$fm_sources_root = NULL;
+}
 
 
 if( $action == 'update_settings' )
@@ -145,6 +284,13 @@ if( $action == 'update_settings' )
 	$action = '';
 }
 
+/**
+ * @global integer We set this to 1 to force displaying of the FM (without toggle option)
+ */
+$fm_forceFM = NULL;
+
+
+param( 'fm_disp_browser', 'integer', 0 );
 
 /*
  * Load editable objects:
@@ -176,47 +322,57 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 }
 
 
-/**
- * Filemanager object to work with
- */
-$Fileman = new FileManager( $current_User, 'admin.php?ctrl=files', $root, $path, $order, $orderasc, $filterString, $filterIsRegexp, $flatmode );
-
-if( ! $Fileman->_ads_list_path )
+if( ! $ads_list_path )
 { // We have no Root / list path, there was an error. Unset any action or mode.
 	$action = '';
-	$Fileman->fm_mode = '';
+	$fm_mode = NULL;
 }
 
 // Check actions that toggle Filelist properties:
-if( !empty($action) )
+if( ! empty($action) )
 {
 	switch( $action )
 	{
 		case 'filter_unset':
-			$Fileman->setFilter( false, false );
-			$action = '';
-			break;
-
-		case 'noflatmode':
-			$Fileman->flatmode = false;
-			$action = '';
-			break;
-
-		case 'flatmode':
-			$Fileman->flatmode = true;
+			forget_param( 'fm_filter' );
+			$fm_filter = '';
 			$action = '';
 			break;
 	}
 }
 
+$fm_Filelist->set_Filter( $fm_filter, $fm_filter_regex );
+
 // Load Filelist (with meta data):
-$Fileman->load();
+$fm_Filelist->load();
+
+// Sort Filelist
+param( 'fm_order', 'string', NULL, true );
+if( ! in_array( $fm_order, array( 'name', 'path', 'type', 'size', 'lastmod', 'perms', 'fsowner', 'fsgroup' ) ) )
+{
+	$fm_order = NULL;
+}
+param( 'fm_orderasc', '', NULL, true );
+$fm_Filelist->sort( $fm_order, $fm_orderasc );
 
 
 /**
- * @var Filelist the selected files
+ * @var Filelist The selected files
  */
-$selected_Filelist = & $Fileman->getFilelistSelected();
+$selected_Filelist = new Filelist( false, $fm_Filelist->get_FileRoot() );
+
+/**
+ * @global array A list of files which are selected in the FM list.
+ */
+$fm_selected = param( 'fm_selected', 'array', array(), true );
+
+$Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
+
+foreach( $fm_selected as $l_source_path )
+{
+	// echo '<br>'.$l_source_path;
+	$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
+}
 
 
 switch( $action )
@@ -232,10 +388,86 @@ switch( $action )
 		$current_User->check_perm( 'files', 'add', true );
 
 		// create new file/dir
-		param( 'createnew', 'string', '' ); // 'file', 'dir'
-		param( 'createname', 'string', '' );
+		param( 'create_type', 'string', '' ); // 'file', 'dir'
+		param( 'create_name', 'string', '' );
 
-		$Fileman->createDirOrFile( $createnew, $createname ); // handles messages
+		if( $create_type == 'dir' )
+		{
+			if( ! $Settings->get( 'fm_enable_create_dir' ) )
+			{ // Directory creation is gloablly disabled:
+				$Messages->add( T_('Directory creation is disabled.'), 'error' );
+				break;
+			}
+		}
+		elseif( $create_type == 'file' )
+		{
+			if( ! $Settings->get( 'fm_enable_create_file' ) )
+			{ // File creation is gloablly disabled:
+				$Messages->add( T_('File creation is disabled.'), 'error' );
+				break;
+			}
+		}
+		else
+		{
+			break;
+		}
+
+		if( empty($create_name) )
+		{ // No name was supplied:
+			$Messages->add( ($create_type == 'dir'
+					? T_('Cannot create a directory without name.')
+					: T_('Cannot create a file without name.') ), 'error' );
+			break;
+		}
+
+		if( $create_type == 'file' )
+		{
+			if( $error_filename = validate_filename( $create_name ) )
+			{ // Not valid filename or extension
+				$Messages->add( $error_filename, 'error' );
+				break;
+			}
+		}
+		elseif( $error_dirname = validate_dirname( $create_name ) )
+		{ // Not valid dirname
+			$Messages->add( $error_dirname, 'error' );
+			break;
+		}
+
+		// Try to get File object:
+		$newFile = & $FileCache->get_by_root_and_path( $fm_Filelist->_FileRoot->type, $fm_Filelist->_FileRoot->in_type_ID, $fm_Filelist->_rds_list_path.$create_name );
+
+		if( $newFile->exists() )
+		{
+			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $create_name ), 'error' );
+			break;
+		}
+
+		if( $newFile->create( $create_type ) )
+		{
+			if( $create_type == 'file' )
+			{
+				$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
+			}
+			else
+			{
+				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
+			}
+
+			$fm_Filelist->add( $newFile );
+		}
+		else
+		{
+			if( $create_type == 'file' )
+			{
+				$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $fm_Filelist->_rds_list_path ), 'error' );
+			}
+			else
+			{
+				$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $fm_Filelist->_rds_list_path ), 'error' );
+			}
+		}
+
 		break;
 
 
@@ -278,14 +510,14 @@ switch( $action )
 		}
 
 		// Downloading
-		require dirname(__FILE__).'/'.$admin_dirout.$lib_subdir.'_zip_archives.php';
+		require_once $inc_path.'_misc/ext/_zip_archives.php';
 
-		$arraylist = $selected_Filelist->get_array( 'get_name' );
+		$arraylist = $selected_Filelist->get_array( 'get_rdfs_rel_path' );
 
 		$options = array (
-			'basedir' => $Fileman->get_ads_list_path(),
+			'basedir' => $fm_Filelist->get_ads_list_path(),
 			'inmemory' => 1,
-			'recurse' => 1-$exclude_sd,
+			'recurse' => (1 - $exclude_sd),
 		);
 
 		$zipfile = & new zip_file( $zipname );
@@ -361,12 +593,21 @@ switch( $action )
 					continue;
 				}
 				// Perform rename:
-				if( ! $Fileman->rename_File( $loop_src_File, $new_name ) )
+				if( ! $loop_src_File->rename_to( $new_name ) )
 				{
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
 						$old_name, $new_name ), 'error' );
 					continue;
 				}
+
+				// We have moved in same dir, update caches:
+				$fm_Filelist->update_caches();
+
+				if( $fm_Filelist->contains( $loop_src_File ) === false )
+				{ // File not in filelist (expected if not same dir)
+					$fm_Filelist->add( $File );
+				}
+
 
 				$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
 						$old_name, $new_name ), 'success' );
@@ -402,7 +643,15 @@ switch( $action )
 		{ // Unlink files:
 			while( $l_File = & $selected_Filelist->get_next() )
 			{
-				$Fileman->unlink( $l_File ); // handles $Messages
+				if( $l_File->unlink() )
+				{
+					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.') : T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->get_name() ), 'success' );
+					$fm_Filelist->remove( $l_File );
+				}
+				else
+				{
+					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') : T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->get_name() ), 'error' );
+				}
 			}
 			$action = 'list';
 		}
@@ -438,19 +687,13 @@ switch( $action )
 
 
 	case 'edit_properties':
-		// Edit File properties (Meta Data); this starts the File_properties mode: {{{
-
-		$selectedFile = & $selected_Filelist->getFileByIndex(0);
-		// Load meta data:
-		$selectedFile->load_meta();
-
-		$Fileman->fm_mode = 'File_properties';
-		// }}}
+		// Edit File properties (Meta Data); this starts the file_properties mode:
+		$fm_mode = 'file_properties';
 		break;
 
 
 	case 'update_properties':
-		// Update File properties (Meta Data); on success this ends the File_properties mode: {{{
+		// Update File properties (Meta Data); on success this ends the file_properties mode: {{{
 
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
@@ -459,26 +702,26 @@ switch( $action )
 			break;
 		}
 
-		$selectedFile = & $selected_Filelist->getFileByIndex(0);
+		$edit_File = & $selected_Filelist->getFileByIndex(0);
 		// Load meta data:
-		$selectedFile->load_meta();
+		$edit_File->load_meta();
 
-		$selectedFile->set( 'title', param( 'title', 'string', '' ) );
-		$selectedFile->set( 'alt', param( 'alt', 'string', '' ) );
-		$selectedFile->set( 'desc', param( 'desc', 'string', '' ) );
+		$edit_File->set( 'title', param( 'title', 'string', '' ) );
+		$edit_File->set( 'alt', param( 'alt', 'string', '' ) );
+		$edit_File->set( 'desc', param( 'desc', 'string', '' ) );
 
 		// Store File object into DB:
-		if( $selectedFile->dbsave() )
+		if( $edit_File->dbsave() )
 		{
-			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have been updated.' ), $selectedFile->get_name() ), 'success' );
+			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have been updated.' ), $edit_File->get_name() ), 'success' );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $selectedFile->get_name() ), 'note' );
+			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edit_File->get_name() ), 'note' );
 		}
 
 		// Leave special display mode:
-		$Fileman->fm_mode = NULL;
+		$fm_mode = NULL;
 		// }}}
 		break;
 
@@ -495,7 +738,7 @@ switch( $action )
 			break;
 		}
 
-		$selectedFile = & $selected_Filelist->getFileByIndex(0);
+		$edit_File = & $selected_Filelist->getFileByIndex(0);
 
 		if( isset($edited_Item) )
 		{
@@ -503,12 +746,12 @@ switch( $action )
 			$DB->begin();
 
 			// Load meta data AND MAKE SURE IT IS CREATED IN DB:
-			$selectedFile->load_meta( true );
+			$edit_File->load_meta( true );
 
 			// Let's make the link!
 			$edited_Link = & new Link();
 			$edited_Link->set( 'itm_ID', $edited_Item->ID );
-			$edited_Link->set( 'file_ID', $selectedFile->ID );
+			$edited_Link->set( 'file_ID', $edit_File->ID );
 			$edited_Link->dbinsert();
 
 			$DB->commit();
@@ -518,7 +761,7 @@ switch( $action )
 		// Plug extensions/hacks here!
 		else
 		{	// No Item to link to - end link_item mode.
-			$Fileman->fm_mode = NULL;
+			$fm_mode = NULL;
 		}
 		break;
 
@@ -631,20 +874,20 @@ switch( $action )
 		}
 		// }}}
 		break;
-
-
-	case 'leaveMode':
-		// leave mode (upload, ..)
-		$Fileman->fm_mode = NULL;
-		header( 'Location: '.$Fileman->getCurUrl() );
-		break;
 }
 
 
-// echo 'fm mode:'.$Fileman->fm_mode;
+// pre_dump( 'fm mode:'.$fm_mode );
 
-switch( $Fileman->fm_mode )
+switch( $fm_mode )
 { // handle modes {{{
+
+	case 'file_properties':
+		$edit_File = & $selected_Filelist->getFileByIndex(0);
+		// Load meta data:
+		$edit_File->load_meta();
+		break;
+
 
 	case 'file_upload':
 		// {{{
@@ -655,14 +898,14 @@ switch( $Fileman->fm_mode )
 		if( ! $Settings->get('upload_enabled') )
 		{ // Upload is globally disabled
 			$Messages->add( T_('Upload is disabled.'), 'error' );
-			$Fileman->fm_mode = NULL;
+			$fm_mode = NULL;
 			break;
 		}
 
 		if( ! $current_User->check_perm( 'files', 'add' ) )
 		{ // We do not have permission to add files
 			$Messages->add( T_('You have no permission to add/upload files.'), 'error' );
-			$Fileman->fm_mode = NULL;
+			$fm_mode = NULL;
 			break;
 		}
 
@@ -702,10 +945,13 @@ switch( $Fileman->fm_mode )
 					continue;
 				}
 
-				if( $Settings->get( 'upload_maxkb' ) && ( $_FILES['uploadfile']['size'][$lKey] > $Settings->get( 'upload_maxkb' )*1024 ) )
+				if( $Settings->get( 'upload_maxkb' )
+				    && $_FILES['uploadfile']['size'][$lKey] > $Settings->get( 'upload_maxkb' )*1024 )
 				{ // bigger than defined by blog
-					$failedFiles[$lKey] = sprintf( /* TRANS: %s will be replaced by the difference */ T_('The file is %s too large.'),
-															 bytesreadable( $_FILES['uploadfile']['size'][$lKey] - $Settings->get( 'upload_maxkb' ) ) );
+					$failedFiles[$lKey] = sprintf(
+							/* TRANS: %s will be replaced by the difference */ T_('The file is %s too large. Maximum allowed is: %s.'),
+							bytesreadable( $_FILES['uploadfile']['size'][$lKey] - $Settings->get( 'upload_maxkb' ) ),
+							bytesreadable($Settings->get( 'upload_maxkb' )*1024) );
 					// Abort upload for this file:
 					continue;
 				}
@@ -716,34 +962,38 @@ switch( $Fileman->fm_mode )
 					{
 						case UPLOAD_ERR_FORM_SIZE:
 							// The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
-							$failedFiles[$lKey] = sprintf( T_('The file is too large. Maximum allowed is: %s.'),
-																		bytesreadable( $Settings->get( 'upload_maxkb' )*1024 ) );
+
+							// This can easily be changed, so we do not use it.. file size gets checked for real just above.
 							break;
 
 						case UPLOAD_ERR_INI_SIZE: // bigger than allowed in php.ini
 							$failedFiles[$lKey] = T_('The file exceeds the upload_max_filesize directive in php.ini.');
-							break;
+							// Abort upload for this file:
+							continue;
 
 						case UPLOAD_ERR_PARTIAL:
 							$failedFiles[$lKey] = T_('The file was only partially uploaded.');
-							break;
+							// Abort upload for this file:
+							continue;
 
 						case UPLOAD_ERR_NO_FILE:
 							// Is probably the same as empty($lName) before.
 							$failedFiles[$lKey] = T_('No file was uploaded.');
-							break;
+							// Abort upload for this file:
+							continue;
 
 						case 6: // numerical value of UPLOAD_ERR_NO_TMP_DIR
 						# (min_php: 4.3.10, 5.0.3) case UPLOAD_ERR_NO_TMP_DIR:
 							// Missing a temporary folder.
 							$failedFiles[$lKey] = T_('Missing a temporary folder (upload_tmp_dir in php.ini).');
-							break;
+							// Abort upload for this file:
+							continue;
 
 						default:
 							$failedFiles[$lKey] = T_('Unknown error.').' #'.$_FILES['uploadfile']['error'][$lKey];
+							// Abort upload for this file:
+							continue;
 					}
-					// Abort upload for this file:
-					continue;
 				}
 
 				if( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
@@ -764,7 +1014,7 @@ switch( $Fileman->fm_mode )
 				}
 
 				// Get File object for requested target location:
-				$newFile = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(), $Fileman->get_rds_list_path().$newName, true );
+				$newFile = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$newName, true );
 
 				if( $newFile->exists() )
 				{ // The file already exists in the target location!
@@ -823,12 +1073,12 @@ switch( $Fileman->fm_mode )
 				$newFile->dbsave();
 
 				// Tell the filamanager about the new file:
-				$Fileman->add( $newFile );
+				$fm_Filelist->add( $newFile );
 			}
 
 			if( $upload_quickmode && !$failedFiles )
 			{ // we're quick uploading and have no failed files, leave the mode
-				$Fileman->fm_mode = NULL;
+				$fm_mode = NULL;
 			}
 		}
 
@@ -836,10 +1086,10 @@ switch( $Fileman->fm_mode )
 		break;
 
 
-	case 'File_properties':			// TODO: make all lowercase
-		if( empty($selectedFile) )
+	case 'file_properties':
+		if( empty($edit_File) )
 		{
-			$Fileman->fm_mode = NULL;
+			$fm_mode = NULL;
 		}
 		break;
 
@@ -866,7 +1116,7 @@ switch( $Fileman->fm_mode )
 
 		/*
 		TODO: On error notes use prefixed names, if the roots differ.
-		      Something like $Fileman->get_names_realtive_to( $a_File, $b_File, $root_type, $root_ID, $rel_path )
+		      Something like $fm_Filelist->get_names_realtive_to( $a_File, $b_File, $root_type, $root_ID, $rel_path )
 		      that returns an array containing the name of $a_File and $b_File relative to the Root path given as
 		      param 3, 4, 5.
 		      This would allow to say "Copied «users/admin/test_me.jpg» to «test_me.jpg»." rather than just
@@ -880,14 +1130,14 @@ switch( $Fileman->fm_mode )
 		if( ! $current_User->check_perm( 'files', 'edit' ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
-			$Fileman->fm_mode = NULL;
+			$fm_mode = NULL;
 			break;
 		}
 
-		if( !isset($Fileman->SourceList) || !$Fileman->SourceList->count() )
+		if( ! $fm_source_Filelist || ! $fm_source_Filelist->count() )
 		{
 			$Messages->add( T_('No source files!'), 'error' );
-			$Fileman->fm_mode = NULL;
+			$fm_mode = NULL;
 			break;
 		}
 
@@ -896,11 +1146,11 @@ switch( $Fileman->fm_mode )
 		param( 'overwrite', 'array', array() );
 
 		// Check params for each file to rename:
-		while( $loop_src_File = & $Fileman->SourceList->get_next() )
+		while( $loop_src_File = & $fm_source_Filelist->get_next() )
 		{
 			if( ! $loop_src_File->exists() )
 			{ // this can happen on reloading the page
-				$Fileman->SourceList->remove($loop_src_File);
+				$fm_source_Filelist->remove($loop_src_File);
 				continue;
 			}
 			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
@@ -930,7 +1180,7 @@ switch( $Fileman->fm_mode )
 			}
 
 			// Check if destination file exists:
-			if( ($dest_File = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(), $Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] ))
+			if( ($dest_File = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] ))
 							&& $dest_File->exists() )
 			{ // Target exists
 				if( $dest_File === $loop_src_File )
@@ -949,7 +1199,7 @@ switch( $Fileman->fm_mode )
 				}
 
 				// We have asked to overwite...
-				if( $Fileman->fm_mode == 'file_copy' )
+				if( $fm_mode == 'file_copy' )
 				{ // We are making a copy: no problem, we'll recycle the file ID anyway.
 					continue;
 				}
@@ -969,25 +1219,29 @@ switch( $Fileman->fm_mode )
 			}
 		}
 
-		if( $confirm && $Fileman->SourceList->count() )
+		if( $confirm && $fm_source_Filelist->count() )
 		{ // Copy/move is confirmed (and we still have files to copy/move), let's proceed:
 
 			// Loop through files:
-			$Fileman->SourceList->restart();
-			while( $loop_src_File = & $Fileman->SourceList->get_next() )
+			$fm_source_Filelist->restart();
+			while( $loop_src_File = & $fm_source_Filelist->get_next() )
 			{
 				// Get a pointer on dest file
-				$dest_File = & $FileCache->get_by_root_and_path( $Fileman->get_root_type(), $Fileman->get_root_ID(), $Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
+				$dest_File = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
 
-				if( $Fileman->fm_mode == 'file_copy' )
+				if( $fm_mode == 'file_copy' )
 				{ // COPY
 
 					// Do the copy
-					if( $Fileman->copy_File( $loop_src_File, $dest_File ) )
+					if( $loop_src_File->copy_to( $dest_File ) )
 					{ // Success:
 						$Messages->add( sprintf( T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ), 'success' );
-						$Fileman->SourceList->remove( $loop_src_File );
+
+						if( $fm_Filelist->contains( $dest_File ) === false )
+						{
+							$fm_Filelist->add( $dest_File );
+						}
 					}
 					else
 					{ // Failure:
@@ -995,7 +1249,7 @@ switch( $Fileman->fm_mode )
 																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ) );
 					}
 				}
-				elseif( $Fileman->fm_mode == 'file_move' )
+				elseif( $fm_mode == 'file_move' )
 				{ // MOVE
 					// NOTE: DB integrity is handled by the File object itself
 					$DB->begin();
@@ -1003,9 +1257,12 @@ switch( $Fileman->fm_mode )
 					if( isset( $overwrite[$loop_src_File->get_md5_ID()] )
 							&& $overwrite[$loop_src_File->get_md5_ID()] )
 					{ // We want to overwrite, let's unlink the old file:
-						if( ! $Fileman->unlink( $dest_File, false ) )	// Will NOT delete recursively
+						if( ! $dest_File->unlink() )
 						{ // Unlink failed:
 							$DB->rollback();
+
+							$Messages->add( sprintf( ( $dest_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') : T_('Could not delete the file &laquo;%s&raquo;.') ), $dest_File->get_name() ), 'error' );
+
 							// Move on to next file:
 							continue;
 						}
@@ -1013,15 +1270,22 @@ switch( $Fileman->fm_mode )
 
 					// Do the move:
 					$rdfp_oldpath = $loop_src_File->get_rdfp_rel_path();
-					$rdfp_newpath = $Fileman->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
+					$rdfp_newpath = $fm_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
 
-					if( $Fileman->move_File( $loop_src_File, $Fileman->get_root_type(), $Fileman->get_root_ID(), $rdfp_newpath ) )
+					if( $loop_src_File->move_to( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $rdfp_newpath ) )
 					{ // successfully moved
 						$Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ), 'success' );
 
+						// We may have moved in same dir, update caches:
+						$fm_Filelist->update_caches();
 						// We remove the file from the source list, after refreshing the cache
-						$Fileman->SourceList->update_caches();
-						$Fileman->SourceList->remove( $loop_src_File );
+						$fm_source_Filelist->update_caches();
+						$fm_source_Filelist->remove( $loop_src_File );
+
+						if( $fm_Filelist->contains( $loop_src_File ) === false )
+						{ // File not in filelist (expected if not same dir)
+							$fm_Filelist->add( $loop_src_File );
+						}
 					}
 					else
 					{ // move failed
@@ -1035,14 +1299,14 @@ switch( $Fileman->fm_mode )
 			}
 		}
 
-		if( $Fileman->SourceList->count() )
+		if( $fm_source_Filelist->count() )
 		{ // There are still uncopied/unmoved files, we want the file manager in this mode:
-			$Fileman->forceFM = 1;
+			$fm_forceFM = 1;
 		}
 		else
 		{
 			// Leave mode:
-			$Fileman->fm_mode = NULL;
+			$fm_mode = NULL;
 		}
 		break;
 
@@ -1050,18 +1314,18 @@ switch( $Fileman->fm_mode )
 	case 'link_item':
 		// We want to link file(s) to an item:
 
-		// TODO: maybe this should not be a mode and maybe we shouldhandle linking as soon as we have an $edited_Item ...
+		// TODO: maybe this should not be a mode and maybe we should handle linking as soon as we have an $edited_Item ...
 
 		if( !isset($edited_Item) )
 		{ // No Item to link to...
-			$Fileman->fm_mode = NULL;
+			$fm_mode = NULL;
 			break;
 		}
 
 		// TODO: check EDIT permissions!
 
 		// we want to display the file manager in this mode:
-		$Fileman->forceFM = 1;
+		$fm_forceFM = 1;
 		break;
 
 } // }}}
@@ -1084,11 +1348,11 @@ $AdminUI->disp_body_top();
 			&& opener.document.FilesForm
 			&& typeof(opener.document.FilesForm.md5_filelist.value) != 'undefined'
 			&& typeof(opener.document.FilesForm.md5_cwd.value) != 'undefined'
-			&& opener.document.FilesForm.md5_cwd.value == '<?php echo md5($Fileman->get_ads_list_path()); ?>'
+			&& opener.document.FilesForm.md5_cwd.value == '<?php echo md5($fm_Filelist->get_ads_list_path()); ?>'
 		)
 	{
 		opener.document.getElementById( 'fm_reloadhint' ).style.display =
-			opener.document.FilesForm.md5_filelist.value == '<?php echo $Fileman->md5_checksum(); ?>'
+			opener.document.FilesForm.md5_filelist.value == '<?php echo $fm_Filelist->md5_checksum(); ?>'
 			? 'none'
 			: 'inline';
 	}
@@ -1105,21 +1369,21 @@ switch( $action )
 	case 'rename':
 		// Rename files dialog:
 		$AdminUI->disp_payload_begin();
-		require dirname(__FILE__).'/_files_rename.form.php';
+		$AdminUI->disp_view( 'files/_files_rename.form' );
 		$AdminUI->disp_payload_end();
 		break;
 
 	case 'delete':
 		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
 		$AdminUI->disp_payload_begin();
-		require dirname(__FILE__).'/_files_delete.form.php';
+		$AdminUI->disp_view( 'files/_files_delete.form' );
 		$AdminUI->disp_payload_end();
 		break;
 
 	case 'download':
 		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
 		$AdminUI->disp_payload_begin();
-		require dirname(__FILE__).'/_files_download.form.php';
+		$AdminUI->disp_view( 'files/_files_download.form' );
 		$AdminUI->disp_payload_end();
 		break;
 
@@ -1127,7 +1391,7 @@ switch( $action )
 	case 'edit_perms':
 		// Filesystem permissions for specific files
 		$AdminUI->disp_payload_begin();
-		require dirname(__FILE__).'/_files_permissions.form.php';
+		$AdminUI->disp_view( 'files/_files_permissions.form' );
 		$AdminUI->disp_payload_end();
 		break;
 
@@ -1156,7 +1420,7 @@ switch( $action )
 
 
 // FM modes displays:
-switch( $Fileman->fm_mode )
+switch( $fm_mode )
 {
 	case 'file_copy':
 	case 'file_move':
@@ -1169,7 +1433,7 @@ switch( $Fileman->fm_mode )
 		$AdminUI->disp_view( 'files/_files_upload.inc' );
 		break;
 
-	case 'File_properties':
+	case 'file_properties':
 		// File properties (Meta data) dialog:
 		$AdminUI->disp_view( 'files/_file_properties.inc' );
 		break;
@@ -1183,26 +1447,29 @@ switch( $Fileman->fm_mode )
 }
 
 
-// "Display/hide Filemanager"
-// TODO: do not display this after a successful rename...
-$showFilemanager = !$Fileman->fm_mode || $UserSettings->get('fm_forceFM') || $Fileman->forceFM ;
+// "Display Filemanager" link, if appropriate
+$disp_fm_browser = true;
+$disp_fm_browser_toggle = false;
 
-$toggleButtons = array();
-
-if( $Fileman->fm_mode )
+if( isset($fm_forceFM) )
 {
-	if( ! $Fileman->forceFM )
-	{ // FM is not forced (by user or by special function) - link to hide/display
-		echo '<div class="panelinfo" id="FM_anchor">';
-		echo '[<a '
-				.' href="'.$Fileman->getCurUrl( array( 'forceFM' => 1-$Fileman->forceFM ) ).'">'
-				.( $showFilemanager ? T_('Hide Filemanager') : T_('Display Filemanager') ).'</a>]';
-		echo '</div>';
-	}
+	$disp_fm_browser = $fm_forceFM;
+}
+elseif( $fm_mode && ! $UserSettings->get('fm_forceFM') )
+{
+	$disp_fm_browser = $fm_disp_browser;
+	$disp_fm_browser_toggle = true;
+}
+
+if( $disp_fm_browser_toggle && ! $disp_fm_browser )
+{ // FM browser can be toggled - link to display (link to hide it gets displayed in _files_browse view)
+	echo '<div class="panelinfo" id="FM_anchor">';
+	echo '[<a href="'.regenerate_url( 'fm_disp_browser', 'fm_disp_browser=1' ).'">'.T_('Display Filemanager').'</a>]';
+	echo '</div>';
 }
 
 
-if( $showFilemanager )
+if( $disp_fm_browser )
 { // We're NOT in a mode where we want to hide the FM
 	// -------------------
 	// Browsing interface:
@@ -1219,16 +1486,13 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.2  2006/03/12 03:03:32  blueyed
+ * Fixed and cleaned up "filemanager".
+ *
  * Revision 1.1  2006/02/23 21:11:56  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.164  2006/02/18 23:36:57  fplanque
- * no message
- *
- * Revision 1.163  2006/02/14 20:12:29  blueyed
- * *** empty log message ***
  *
  * Revision 1.162  2006/02/13 20:20:09  fplanque
  * minor / cleanup

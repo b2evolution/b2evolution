@@ -45,7 +45,9 @@
 /**
  * Load config, init and get the {@link $mode mode param}.
  */
-require_once dirname(__FILE__).'/../admin/_header.php';
+require_once dirname(__FILE__).'/../conf/_config.php';
+require_once $inc_path.'/_main.inc.php';
+
 
 // Check permission:
 $current_User->check_perm( 'files', 'view', true );
@@ -59,14 +61,14 @@ param( 'path', 'string', true );
 $FileRoot = & $FileRootCache->get_by_ID( $root );
 
 // Create file object
-$selectedFile = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path );
+$selected_File = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path );
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
-	<title><?php echo $selectedFile->get_name().' ('.T_('Preview').')'; ?></title>
+	<title><?php echo $selected_File->get_name().' ('.T_('Preview').')'; ?></title>
 	<script type="text/javascript" src="../rsc/js/styleswitcher.js"></script>
 	<link href="../rsc/css/viewfile.css" rel="stylesheet" type="text/css" />
 </head>
@@ -80,26 +82,26 @@ switch( $viewtype )
 		{{{ // Display image file:
 			echo '<div class="center">';
 
-			if( $imgSize = $selectedFile->get_image_size( 'widthheight' ) )
+			if( $imgSize = $selected_File->get_image_size( 'widthheight' ) )
 			{
 				echo '<img ';
-				if( $alt = $selectedFile->dget( 'alt', 'htmlattr' ) )
+				if( $alt = $selected_File->dget( 'alt', 'htmlattr' ) )
 				{
 					echo 'alt="'.$alt.'" ';
 				}
-				if( $title = $selectedFile->dget( 'title', 'htmlattr' ) )
+				if( $title = $selected_File->dget( 'title', 'htmlattr' ) )
 				{
 					echo 'title="'.$title.'" ';
 				}
-				echo 'class="framed" src="'.$selectedFile->get_url().'"'
+				echo 'class="framed" src="'.$selected_File->get_url().'"'
 							.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />';
 
 				echo '<div class="subline">';
-				echo '<p><strong>'.$selectedFile->dget( 'title' ).'</strong></p>';
-				echo '<p>'.$selectedFile->dget( 'desc' ).'</p>';
-				echo '<p>'.$selectedFile->get_name().' &middot; ';
-				echo $selectedFile->get_image_size().' &middot; ';
-				echo $selectedFile->get_size_formatted().'</p>';
+				echo '<p><strong>'.$selected_File->dget( 'title' ).'</strong></p>';
+				echo '<p>'.$selected_File->dget( 'desc' ).'</p>';
+				echo '<p>'.$selected_File->get_name().' &middot; ';
+				echo $selected_File->get_image_size().' &middot; ';
+				echo $selected_File->get_size_formatted().'</p>';
 				echo '</div>';
 
 			}
@@ -110,22 +112,22 @@ switch( $viewtype )
 
 	case 'text':
 
-		if( ($buffer = @file( $selectedFile->get_full_path() )) !== false )
+		if( ($buffer = @file( $selected_File->get_full_path() )) !== false )
 		{{{ // Display raw file
 			param( 'showlinenrs', 'integer', 0 );
 
 			$buffer_lines = count( $buffer );
-	
+
 			echo '<div class="fileheader">';
 
 			echo '<p>';
-			echo T_('File').': <strong>'.$selectedFile->get_name().'</strong>';
+			echo T_('File').': <strong>'.$selected_File->get_name().'</strong>';
 			echo ' &middot; ';
-			echo T_('Title').': <strong>'.$selectedFile->dget( 'title' ).'</strong>';
+			echo T_('Title').': <strong>'.$selected_File->dget( 'title' ).'</strong>';
 			echo '</p>';
 
 	 		echo '<p>';
-			echo T_('Description').': '.$selectedFile->dget( 'desc' );
+			echo T_('Description').': '.$selected_File->dget( 'desc' );
 			echo '</p>';
 
 
@@ -143,7 +145,7 @@ switch( $viewtype )
 				echo ' [';
 				?>
 				<noscript type="text/javascript">
-					<a href="<?php echo $selectedFile->get_url().'&amp;showlinenrs='.(1-$showlinenrs); ?>">
+					<a href="<?php echo $selected_File->get_url().'&amp;showlinenrs='.(1-$showlinenrs); ?>">
 
 					<?php echo $showlinenrs ? T_('Hide line numbers') : T_('Show line numbers');
 					?></a>
@@ -217,14 +219,12 @@ switch( $viewtype )
 		}}}
 		else
 		{
-			Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'),
-																			$Fileman->get_rdfs_path_relto_root( $selectedFile ) ), 'error' );
+			Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->get_rdfs_rel_path( $selected_File ) ), 'error' );
 		}
 		break;
 
 	default:
-			Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'),
-																			$selectedFile->get_name() ), 'error' );
+			Log::display( '', '', sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->get_name() ), 'error' );
 		break;
 }
 
@@ -237,6 +237,9 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.4  2006/03/12 03:03:32  blueyed
+ * Fixed and cleaned up "filemanager".
+ *
  * Revision 1.3  2006/02/23 21:11:47  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
