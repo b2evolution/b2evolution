@@ -7,7 +7,7 @@
  *       in upload mode.
  *       "edit_perms" for example is not a mode, but a action.
  *
- * 3) There should be no modes. Only geeks can understand them. And not all geeks might actually ever find an opportunity to want to use them. All we need is a dir selection tree inside of upload and move.
+ * fp>> There should actually be no modes. Only geeks can understand & use them. And not all geeks might actually ever find an opportunity to want to use them. All we need is a dir selection tree inside of upload and move.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -61,6 +61,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+require_once $model_path.'files/_filelist.class.php';
+
 
 $AdminUI->set_path( 'files' );
 
@@ -89,9 +91,9 @@ if( ! $current_User->check_perm( 'files', 'view' ) )
 
 
 // INIT params:
-if( param( 'root_and_path' ) )
+if( param( 'root_and_path', '', '', false ) )	// not memorized, fp>> TODO: I really HATE to have un-typed params!! Best way to NOT KNOW what you're doing!
 { // root and path together: decode and override (used in root switch select and "click tree")
-	$root_and_path = unserialize( $root_and_path );
+	$root_and_path = unserialize( $root_and_path ); // fp>> TODO: this sucks. Do not pass serialized vars through URL.
 	$root = $root_and_path['root'];
 	$path = $root_and_path['path'];
 	// Memorize new root:
@@ -111,7 +113,7 @@ else
 }
 
 /**
- * @global string The Filemanager mode we're in ('fm_upload', 'fm_cmr')
+ * @global string The file manager mode we're in ('fm_upload', 'fm_cmr')
  */
 $fm_mode = param( 'fm_mode', 'string', NULL, true );
 
@@ -187,10 +189,10 @@ if( $fm_FileRoot )
 }
 
 
-require_once $model_path.'files/_filelist.class.php';
-
 /**
- * @global Filelist
+ * Filelist
+ * fp>> TODO: When the user is viewing details for a file he should (by default) not be presented with the filelist in addition to the file properties
+ * In cases like that, we should try to avoid instanciating a Filelist.
  */
 $fm_Filelist = new Filelist( $ads_list_path, $fm_FileRoot );
 
@@ -286,6 +288,7 @@ if( $action == 'update_settings' )
 
 /**
  * @global integer We set this to 1 to force displaying of the FM (without toggle option)
+ * TODO: should be a boolean... really!  Furthermore it's probably useless complexity, we can probably just set fm_disp_browser to true when we want to ""force"".
  */
 $fm_forceFM = NULL;
 
@@ -322,7 +325,7 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 }
 
 
-if( ! $ads_list_path )
+if( empty($ads_list_path) )
 { // We have no Root / list path, there was an error. Unset any action or mode.
 	$action = '';
 	$fm_mode = NULL;
@@ -359,7 +362,7 @@ $fm_Filelist->sort( $fm_order, $fm_orderasc );
 /**
  * @var Filelist The selected files
  */
-$selected_Filelist = new Filelist( false, $fm_Filelist->get_FileRoot() );
+$selected_Filelist = & new Filelist( false, $fm_Filelist->get_FileRoot() );
 
 /**
  * @global array A list of files which are selected in the FM list.
@@ -384,6 +387,7 @@ switch( $action )
 
 
 	case 'createnew':
+		// fp>> TODO: WAAAAAAY TO MANY 'if/else' blocks! refactor...
 		// Check permission:
 		$current_User->check_perm( 'files', 'add', true );
 
@@ -1486,6 +1490,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.3  2006/03/12 20:11:31  fplanque
+ * no message
+ *
  * Revision 1.2  2006/03/12 03:03:32  blueyed
  * Fixed and cleaned up "filemanager".
  *
