@@ -56,9 +56,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $selected_Filelist;
 
-/**
- * @global
- */
 global $more_than_one_selected_file, $perms_read_readonly, $field_options_read_readonly;
 
 
@@ -145,6 +142,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/12 03:25:44  blueyed
+ * doc fixed
+ *
  * Revision 1.2  2006/03/12 03:03:33  blueyed
  * Fixed and cleaned up "filemanager".
  *
