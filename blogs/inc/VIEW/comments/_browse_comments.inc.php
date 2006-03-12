@@ -47,6 +47,9 @@ global $Blog;
  */
 global $CommentList;
 
+global $dispatcher;
+
+
 /*
  * Display comments:
  */
@@ -74,11 +77,8 @@ while( $Comment = & $CommentList->get_next() )
 					&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{ // There is an URL and we have permission to ban...
 				// TODO: really ban the base domain! - not by keyword
-				?>
-				<a href="?ctrl=antispam&amp;action=ban&amp;keyword=<?php
-					echo rawurlencode(getBaseDomain($Comment->author_url))
-					?>"><img src="img/noicon.gif" class="middle" alt="<?php echo /* TRANS: Abbrev. */ T_('Ban') ?>" title="<?php echo T_('Ban this domain!') ?>" /></a>&nbsp;
-				<?php
+				echo '<a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(getBaseDomain($Comment->author_url))
+					.'">'.get_icon( 'ban' ).'</a> ';
 			}
 			$Comment->author_email( '', ' &middot; Email: ' );
 			$Comment->author_ip( ' &middot; IP: ' );
@@ -137,6 +137,9 @@ while( $Comment = & $CommentList->get_next() )
 <?php
 /*
  * $Log$
+ * Revision 1.5  2006/03/12 03:18:01  blueyed
+ * Fixed "ban" icon.
+ *
  * Revision 1.4  2006/03/11 21:50:16  blueyed
  * Display spam_karma with comments
  *

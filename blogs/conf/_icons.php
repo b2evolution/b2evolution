@@ -201,7 +201,7 @@ $map_iconfiles = array(
 	'ban' => array(
 		'file' => $rsc_subdir.'icons/noicon.gif', // TODO: make this transparent
 		'alt'  => /* TRANS: Abbrev. */ T_('Ban'),
-		'size' => array( 16, 16 ),
+		'size' => array( 13, 13 ),
 	),
 
 	'warning' => array(
