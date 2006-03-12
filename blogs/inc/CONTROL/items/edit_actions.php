@@ -494,7 +494,7 @@ switch($action)
 		param( 'comment_ID', 'integer', true );
 		// echo $comment_ID;
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
-    $comment_post_ID = $edited_Comment->Item->ID;
+		$comment_post_ID = $edited_Comment->Item->ID;
 		$blog = $edited_Comment->Item->get( 'blog_ID' );
 
 		// Check permission:
@@ -503,7 +503,7 @@ switch($action)
 		// Delete from Db:
 		$edited_Comment->dbdelete();
 
-		$location = url_add_param( $admin_url, 'ctrl=browse&blog='.$blog.'&p=$comment_post_ID&c=1#comments', '&' );
+		$location = url_add_param( $admin_url, 'ctrl=browse&blog='.$blog.'&p='.$comment_post_ID.'&c=1#comments', '&' );
 		header ("Location: $location");
 		exit();
 
@@ -545,6 +545,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/12 03:44:17  blueyed
+ * bugfix
+ *
  * Revision 1.3  2006/03/08 19:53:16  fplanque
  * fixed quite a few broken things...
  *
