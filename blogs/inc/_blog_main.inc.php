@@ -44,6 +44,7 @@
  * Initialize everything:
  */
 require_once dirname(__FILE__).'/_main.inc.php';
+require_once $model_path.'items/_itemlist2.class.php';
 
 $Timer->resume( 'blog_main.inc' );
 
@@ -268,15 +269,28 @@ if( ($disp == 'posts') || ($disp == 'single') )
 		$blog, $show_statuses, $p, $m, $w, $cat, $catsel, $author, $order,
 		$orderby, $posts, $paged, $poststart, $postend, $s, $sentence, $exact,
 		$preview, $unit, $timestamp_min, $timestamp_max, $title, $dstart );
+	$MainList->get_max_paged();
 
-	// DO we still use those old style globals? :
-	$result_num_rows = $MainList->get_num_rows();
+	// Old style globals for category.funcs:
 	$postIDlist = & $MainList->postIDlist;
 	$postIDarray = & $MainList->postIDarray;
-}
-else
-{ // we are not trying to display posts:
-	$result_num_rows = 0;
+
+
+/*
+	// This is the shape of things to come:
+
+	$MainList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max );
+	// Run the query:
+	$MainList->query();
+
+	// Old style globals for category.funcs:
+	$postIDlist = $MainList->get_page_ID_list();
+	$postIDarray = $MainList->get_page_ID_array();
+
+	//$Request->param( 'c', 'string' );
+	//$Request->param( 'tb', 'integer', 0 );
+	//$Request->param( 'pb', 'integer', 0 );
+*/
 }
 
 // Default display params:
@@ -398,6 +412,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/12 23:46:13  fplanque
+ * experimental
+ *
  * Revision 1.4  2006/03/12 23:08:53  fplanque
  * doc cleanup
  *

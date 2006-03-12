@@ -122,8 +122,8 @@ else
 
 			// DO we still use those old style globals? :
 			$posts_per_page = $MainList->posts_per_page;
-			$result_num_rows = $MainList->get_num_rows();
 
+			// Old style globals for category.funcs:
 			$postIDlist = & $MainList->postIDlist;
 			$postIDarray = & $MainList->postIDarray;
 			break;
@@ -168,7 +168,7 @@ else
 					// Run the query:
 					$ItemList->query();
 
-					// Temporary inits:
+					// Old style globals for category.funcs:
 		      $postIDlist = $ItemList->get_page_ID_list();
 		      $postIDarray = $ItemList->get_page_ID_array();
 

@@ -489,7 +489,7 @@ function posts_nav_link($sep=' :: ', $prelabel='#', $nxtlabel='#', $page='')
 
 	if( !empty( $MainList->sql ) && empty($p) )
 	{
-		$max_paged = $MainList->get_max_paged();
+		$max_paged = $MainList->total_pages;
 		if( $max_paged > 1 )
 		{
 			previous_posts_link( $prelabel, $page );
@@ -921,6 +921,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/12 23:46:13  fplanque
+ * experimental
+ *
  * Revision 1.3  2006/03/12 23:08:59  fplanque
  * doc cleanup
  *
