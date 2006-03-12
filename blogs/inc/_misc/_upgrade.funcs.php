@@ -200,7 +200,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 			$primary_key_fields = array();
 
 			/**
-			 * @global array of col_names that have KEYs (lowercased). We use this for AUTO_INCREMENT magic.
+			 * @global array of col_names that have KEYs (including PRIMARY; lowercased). We use this for AUTO_INCREMENT magic.
 			 */
 			$fields_with_keys = array();
 
@@ -384,6 +384,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					if( empty($match[1]) )
 					{
 						$primary_key_fields = array($fieldname_lowered);
+						unset( $obsolete_indices['PRIMARY'] );
 					}
 					$fields_with_keys[] = $fieldname_lowered;
 				}
@@ -413,18 +414,29 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 				$fieldtype = '';
 
 				// Get the field type from the query
-				if( preg_match( '~^'.$tablefield->Field.'\s+ (TINYINT|SMALLINT|MEDIUMINT|INTEGER|INT|BIGINT|REAL|DOUBLE|FLOAT|DECIMAL|NUMERIC) ( \s* \([\d\s,]+\) )? (\s+ UNSIGNED)? (\s+ ZEROFILL)? (.*)$~ix', $column_definition, $match ) )
+				if( preg_match( '~^'.$tablefield->Field.'\s+ (TINYINT|SMALLINT|MEDIUMINT|INTEGER|INT|BIGINT|REAL|DOUBLE|FLOAT|DECIMAL|DEC|NUMERIC) ( \s* \([\d\s,]+\) )? (\s+ UNSIGNED)? (\s+ ZEROFILL)? (.*)$~ix', $column_definition, $match ) )
 				{
 					$fieldtype = $match[1];
+
+					if( strtoupper($fieldtype) == 'INTEGER' )
+					{ // synonym
+						$fieldtype = 'INT';
+					}
+					elseif( strtoupper($fieldtype) == 'DECIMAL' )
+					{ // synonym
+						$fieldtype = 'DEC';
+					}
+
+
 					if( isset($match[2]) )
 					{
 						$fieldtype .= preg_replace( '~\s+~', '', $match[2] );
 					}
-					if( isset($match[3]) )
+					if( ! empty($match[3]) )
 					{ // "unsigned"
 						$fieldtype .= ' '.trim($match[3]);
 					}
-					if( isset($match[4]) )
+					if( ! empty($match[4]) )
 					{ // "zerofill"
 						$fieldtype .= ' '.trim($match[4]);
 					}
@@ -432,7 +444,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					$field_to_parse = $match[5];
 
 					// The length param is optional:
-					$matches_pattern = '~'.preg_replace( '~\((\d+)\)~', '(\($1\))?', $tablefield->Type ).'~i';
+					$matches_pattern = '~^'.preg_replace( '~\((\d+)\)~', '(\($1\))?', $tablefield->Type ).'$~i';
 					$type_matches = preg_match( $matches_pattern, $fieldtype );
 				}
 				elseif( preg_match( '~^'.$tablefield->Field.'\s+(DATETIME|DATE|TIMESTAMP|TIME|YEAR|TINYBLOB|BLOB|MEDIUMBLOB|LONGBLOB|TINYTEXT|TEXT|MEDIUMTEXT|LONGTEXT) ( \s+ BINARY )? (.*)$~ix', $column_definition, $match ) )
@@ -493,14 +505,8 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 
 				// KEY
 				if( preg_match( '~^(.*) (?: \b (UNIQUE) (?:\s+ KEY)? | (?:PRIMARY \s+)? KEY \b ) (.*)$~ix', $field_to_parse, $match ) )
-				{
+				{ // fields got added to primary_key_fields and fields_with_keys before
 					$field_to_parse = $match[1].$match[3];
-					if( empty($match[2]) )
-					{ // PRIMARY
-						unset( $obsolete_indices['PRIMARY'] );
-					}
-
-					// TODO: obsolete/unfinished?
 				}
 
 
@@ -635,6 +641,13 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					pre_dump( strtolower($tablefield->Type), strtolower($fieldtype), $column_definition );
 					*/
 
+					if( in_array($fieldname_lowered, $existing_primary_fields) && ! $is_auto_increment )
+					{ // the column is part of the PRIMARY KEY, which needs to get dropped before (we already handle that for AUTO_INCREMENT fields)
+						$column_definition .= ', DROP PRIMARY KEY';
+						$existing_primary_fields = array(); // we expect no existing primary key anymore
+						unset( $obsolete_indices['PRIMARY'] );
+					}
+
 					// Add a query to change the column type
 					$items[$table_lowered][] = array(
 						'query' => 'ALTER TABLE '.$table.' CHANGE COLUMN '.$tablefield->Field.' '.$column_definition,
@@ -686,9 +699,9 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 				unset($cfields[$fieldname_lowered]);
 			}
 
-			// For every remaining field specified for the table
+
 			foreach($cfields as $fieldname_lowered => $fielddef)
-			{
+			{ // For every remaining field specified for the table
 				$column_definition = $fielddef['field'].' '.$fielddef['where'];
 
 				// AUTO_INCREMENT (with special index handling: AUTO_INCREMENT fields need to be PRIMARY or UNIQUE)
@@ -887,6 +900,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.7  2006/03/12 19:38:29  blueyed
+ * fixes
+ *
  * Revision 1.6  2006/03/10 17:20:24  blueyed
  * Support silent column specification changes (part of)
  *

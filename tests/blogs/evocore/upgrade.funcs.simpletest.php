@@ -375,9 +375,9 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertTrue( isset($r['test_1']) );
 		$this->assertEqual( count($r['test_1']), 3 );
-		$this->assertPattern( '~^ALTER TABLE test_1 CHANGE COLUMN auto_inc auto_inc INTEGER AUTO_INCREMENT$~', $r['test_1'][0]['query'] );
-		$this->assertPattern( '~^ALTER TABLE test_1 ADD KEY\( auto_inc, i \)$~', $r['test_1'][1]['query'] );
-		$this->assertPattern( '~^ALTER TABLE test_1 DROP PRIMARY KEY$~', $r['test_1'][2]['query'] );
+		$this->assertEqual( 'ALTER TABLE test_1 CHANGE COLUMN auto_inc auto_inc INTEGER AUTO_INCREMENT', $r['test_1'][0]['query'] );
+		$this->assertEqual( 'ALTER TABLE test_1 ADD KEY( auto_inc, i )', $r['test_1'][1]['query'] );
+		$this->assertEqual( 'ALTER TABLE test_1 DROP PRIMARY KEY', $r['test_1'][2]['query'] );
 	}
 
 
@@ -587,7 +587,26 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 				v CHAR(20)
 			)' );
 
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 1 );
 		$this->assertEqual( $r['test_1'][0]['query'], 'ALTER TABLE test_1 CHANGE COLUMN v v CHAR(20)' );
+	}
+
+
+	function test_db_delta_change_field_and_primary()
+	{
+		$this->test_DB->query("
+			CREATE TABLE test_1 (
+				i INTEGER,
+				PRIMARY KEY( i )
+			)" );
+		$r = $this->db_delta_wrapper("
+			CREATE TABLE test_1 (
+				i SMALLINT KEY,
+			)" );
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 1 );
+		$this->assertEqual( $r['test_1'][0]['query'], 'ALTER TABLE test_1 CHANGE COLUMN i i SMALLINT KEY, DROP PRIMARY KEY' );
 	}
 
 }
