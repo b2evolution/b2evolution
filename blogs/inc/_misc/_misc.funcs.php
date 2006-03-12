@@ -149,7 +149,7 @@ function format_to_output( $content, $format = 'htmlbody' )
  * @param string The content to format
  * @param integer Create automated <br /> tags? (Deprecated??!)
  * @param integer Is this a comment? (Used for balanceTags(), SafeHtmlChecker()'s URI scheme, styling restrictions)
- * @param string Encoding (used for SafeHtmlChecker())
+ * @param string Encoding (used for SafeHtmlChecker() only!)
  * @return string
  */
 function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'ISO-8859-1' )
@@ -177,12 +177,12 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 		if( ! $is_comment )
 		{
 			$checker = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes,
-																			$uri_attrs, $allowed_uri_scheme, $encoding );
+					$uri_attrs, $allowed_uri_scheme, $encoding );
 		}
 		else
 		{
 			$checker = & new SafeHtmlChecker( $comments_allowed_tags, $comments_allowed_attributes,
-																			$uri_attrs, $comments_allowed_uri_scheme, $encoding );
+					$uri_attrs, $comments_allowed_uri_scheme, $encoding );
 		}
 
 		$checker->check( $content ); // TODO: see if we need to use convert_chars( $content, 'html' )
@@ -1892,7 +1892,7 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 	}
 
 	// Specify charset and content-type of email
-	$headers['Content-Type'] = 'text/plain; charset='.$locales[ $current_locale ]['charset'];
+	$headers['Content-Type'] = 'text/plain; charset='.locale_charset(false);
 	$headers['X-Mailer'] = $app_name.' '.$app_version.' - PHP/'.phpversion();
 	$headers['X-Remote-Addr'] = implode( ',', get_ip_list() );
 
@@ -2668,8 +2668,8 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
- * Revision 1.12  2006/03/11 14:45:37  blueyed
- * *** empty log message ***
+ * Revision 1.13  2006/03/12 17:28:53  blueyed
+ * charset cleanup
  *
  * Revision 1.9  2006/03/09 20:40:40  fplanque
  * cleanup
