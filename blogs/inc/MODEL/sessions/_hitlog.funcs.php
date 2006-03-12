@@ -11,29 +11,14 @@
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- * {@internal
- * b2evolution is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * b2evolution is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with b2evolution; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * }}
- *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * {@internal
+ * {@internal Origin:
  * This file was inspired by N C Young's Referer Script released in
  * the public domain on 07/19/2002. {@link http://ncyoung.com/entry/57}.
  * See also {@link http://ncyoung.com/demo/referer/}.
@@ -69,9 +54,6 @@ if ($topRefererList)
 
 
 /**
- *
- * {@internal refererList(-) }}
- *
  * @todo Transform to make this a stub for {@link $Hitlist}
  *
  * Extract stats
@@ -373,6 +355,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/12 23:08:59  fplanque
+ * doc cleanup
+ *
  * Revision 1.2  2006/03/02 20:05:29  blueyed
  * Fixed/polished stats (linking T_useragents to T_hitlog, not T_sessions again). I've done this the other way around before, but it wasn't my idea.. :p
  *

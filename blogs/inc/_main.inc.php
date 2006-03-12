@@ -10,43 +10,13 @@
  *
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
- * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
- * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- * {@internal
- * b2evolution is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * b2evolution is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with b2evolution; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * In addition, as a special exception, the copyright holders give permission to link
- * the code of this program with the PHP/SWF Charts library by maani.us (or with
- * modified versions of this library that use the same license as PHP/SWF Charts library
- * by maani.us), and distribute linked combinations including the two. You must obey the
- * GNU General Public License in all respects for all of the code used other than the
- * PHP/SWF Charts library by maani.us. If you modify this file, you may extend this
- * exception to your version of the file, but you are not obligated to do so. If you do
- * not wish to do so, delete this exception statement from your version.
- * }}
- *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
- * Jason EDGECOMBE's contributions to this file and the b2evolution project
- * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
- * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  *
  * Matt FOLLETT grants Francois PLANQUE the right to license
  * Matt FOLLETT's contributions to this file and the b2evolution project
@@ -542,6 +512,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/12 23:08:53  fplanque
+ * doc cleanup
+ *
  * Revision 1.3  2006/03/05 23:53:54  blueyed
  * If we have login_error Messages, do not login the user.
  *

@@ -8,7 +8,7 @@
  * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
@@ -555,6 +555,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 23:08:54  fplanque
+ * doc cleanup
+ *
  * Revision 1.1  2006/02/23 21:11:56  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

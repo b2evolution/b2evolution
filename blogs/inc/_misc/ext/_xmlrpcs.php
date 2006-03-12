@@ -78,8 +78,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	$_xmlrpcs_methodSignature_sig=array(array($xmlrpcArray, $xmlrpcString));
 	$_xmlrpcs_methodSignature_doc='Returns an array of known signatures (an array of arrays) for the method name passed. If no signatures are known, returns a none-array (test for type != array to detect missing signature)';
 	/**
-	 * {@internal _xmlrpcs_methodSignature(-)}}
-	 */
+ 	 *
+ 	 */
 	function _xmlrpcs_methodSignature($server, $m)
 	{
 		global $xmlrpcerr, $xmlrpcstr, $_xmlrpcs_dmap;
@@ -391,8 +391,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 		/**
 		 *
-		 *
-		 * {@internal parseRequest(-) }}
 		 */
 		function parseRequest($data='')
 		{

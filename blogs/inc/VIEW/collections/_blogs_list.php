@@ -7,7 +7,7 @@
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)

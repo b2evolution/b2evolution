@@ -265,8 +265,6 @@
 	 * into their equivalent 'charset entity'. Charset entities enumerated this way
 	 * are independent of the charset encoding used to transmit them, and all XML
 	 * parsers are bound to understand them.
-	 *
-	 * {@internal xmlrpc_entity_decode(-)}}
 	 */
 	function xmlrpc_entity_decode($string)
 	{

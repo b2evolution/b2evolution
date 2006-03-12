@@ -9,23 +9,8 @@
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- * {@internal
- * b2evolution is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * b2evolution is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with b2evolution; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * }}
- *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -129,7 +114,6 @@ function form_infoend()
  *
  * @deprecated Deprecated by (@link Form::text_input())
  *
- * {@internal form_text(-)}}
  * @param string the name of the input field
  * @param string initial value
  * @param integer size of the input field
@@ -211,7 +195,6 @@ function form_text_tr( $field_name, $field_value, $field_size, $field_label, $fi
  *
  * @deprecated Deprecated by (@link Form::button_input())
  *
- * {@internal form_hidden(-)}}
  * @param string name
  * @param string value
  * @return string
@@ -341,7 +324,6 @@ function form_select_object(
  *
  * @deprecated Deprecated by (@link Form::radio_input())
  *
- * {@internal form_radio(-)}}
  * @param string the name of the radio options
  * @param string the checked option
  * @param array of arrays the radio options (0: value, 1: label, 2: notes, 3: additional HTML [input field, ..], 4: attribs for <input tag> )
@@ -498,8 +480,6 @@ function form_info_tr( $field_label, $field_info, $field_note = '' )
  * Builds a form header and puts GET params of $action into hidden form inputs
  *
  * @deprecated Deprecated by (@link Form::begin_form())
- *
- * {@internal form_formstart(-)}}
  */
 function form_formstart( $action, $class = '', $name = '', $method = 'get', $id = '' )
 {
@@ -557,6 +537,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 23:09:01  fplanque
+ * doc cleanup
+ *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

@@ -9,7 +9,7 @@
  * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)

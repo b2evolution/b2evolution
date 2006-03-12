@@ -9,23 +9,8 @@
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- * {@internal
- * b2evolution is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * b2evolution is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with b2evolution; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * }}
- *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -55,8 +40,6 @@ class BlogCache extends DataObjectCache
 {
 	/**
 	 * Constructor
-	 *
-	 * {@internal BlogCache::BlogCache(-) }}
 	 */
 	function BlogCache()
 	{
@@ -206,8 +189,6 @@ class BlogCache extends DataObjectCache
 	 *
 	 * Loads the whole cache!!!
 	 *
-	 * {@internal BlogCache::option_list(-) }}
-	 *
 	 * @todo is it good to load all entries here? check usage! (Default blog/linkblog selecrtion, MT plugin...)
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID 0
@@ -226,8 +207,6 @@ class BlogCache extends DataObjectCache
 	 *
 	 * Load the cache if necessary
 	 *
-	 * {@internal DataObjectCache::option_list_return(-) }}
-	 *
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID 0
 	 */
@@ -242,6 +221,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 23:08:58  fplanque
+ * doc cleanup
+ *
  * Revision 1.1  2006/02/23 21:11:57  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

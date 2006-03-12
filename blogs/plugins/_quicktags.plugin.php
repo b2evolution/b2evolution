@@ -25,8 +25,6 @@ class quicktags_plugin extends Plugin
 
 	/**
 	 * Constructor
-	 *
-	 * {@internal quicktags_plugin::quicktags_plugin(-)}}
 	 */
 	function quicktags_plugin()
 	{
@@ -420,6 +418,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.13  2006/03/12 23:09:28  fplanque
+ * doc cleanup
+ *
  * Revision 1.12  2005/12/22 23:13:40  blueyed
  * Plugins' API changed and handling optimized
  *

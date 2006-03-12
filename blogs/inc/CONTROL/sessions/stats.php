@@ -8,32 +8,8 @@
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- * {@internal
- * b2evolution is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * b2evolution is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with b2evolution; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * In addition, as a special exception, the copyright holders gives permission to link
- * the code of this program with the PHP/SWF Charts library by maani.us (or with
- * modified versions of this library that use the same license as PHP/SWF Charts library
- * by maani.us), and distribute linked combinations including the two. You must obey the
- * GNU General Public License in all respects for all of the code used other than the
- * PHP/SWF Charts library by maani.us. If you modify this file, you may extend this
- * exception to your version of the file, but you are not obligated to do so. If you do
- * not wish to do so, delete this exception statement from your version.
- * }}
- *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * Vegar BERG GULDAL grants Francois PLANQUE the right to license
  * Vegar BERG GULDAL's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -1023,6 +999,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/12 23:08:56  fplanque
+ * doc cleanup
+ *
  * Revision 1.3  2006/03/02 20:05:29  blueyed
  * Fixed/polished stats (linking T_useragents to T_hitlog, not T_sessions again). I've done this the other way around before, but it wasn't my idea.. :p
  *

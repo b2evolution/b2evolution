@@ -87,8 +87,6 @@ $b2newpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrp
  *
  * b2 API
  *
- * {@internal b2newpost(-) }}
- *
  * @param xmlrpcmsg XML-RPC Message
  *					0 ?
  *					1 ?
@@ -205,8 +203,6 @@ $b2getcategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, 
  *
  * B2 API
  *
- * {@internal b2getcategories(-) }}
- *
  * @param xmlrpcmsg XML-RPC Message
  *					0 blogid (string): Unique identifier of the blog to query
  *					1 username (string): Login for a Blogger user who is member of the blog.
@@ -267,8 +263,6 @@ $b2_getPostURL_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $x
  * b2.getPostURL
  *
  * B2 API
- *
- * {@internal b2_getPostURL(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 blogid (string): Unique identifier of the blog to query
@@ -337,8 +331,6 @@ $bloggernewpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
  * On error, it will return some error message.
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_newPost.html}
- *
- * {@internal bloggernewpost(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -470,8 +462,6 @@ $bloggereditpost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $x
  * On error, it will return a fault with an error message.
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_editPost.html}
- *
- * {@internal bloggereditpost(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -640,8 +630,6 @@ $bloggerdeletepost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString
  * This API call is not documented on
  * {@link http://www.blogger.com/developers/api/1_docs/}
  *
- * {@internal bloggerdeletepost(-) }}
- *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
  *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .)
@@ -713,8 +701,6 @@ $bloggergetusersblogs_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  * (isAdmin).
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_getUsersBlogs.html}
- *
- * {@internal bloggergetusersblogs(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -797,8 +783,6 @@ $bloggergetuserinfo_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString,
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_getUserInfo.html}
  *
- * {@internal bloggergetuserinfo(-) }}
- *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
  *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .)
@@ -855,8 +839,6 @@ $bloggergetpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
  *
  * This API call is not documented on
  * {@link http://www.blogger.com/developers/api/1_docs/}
- *
- * {@internal bloggergetpost(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -925,8 +907,6 @@ $bloggergetrecentposts_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcSt
  *
  * This API call is not documented on
  * {@link http://www.blogger.com/developers/api/1_docs/}
- *
- * {@internal bloggergetrecentposts(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -1031,8 +1011,6 @@ $bloggergettemplate_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_getTemplate.html}
  *
- * {@internal bloggergettemplate(-) }}
- *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
  *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .)
@@ -1109,8 +1087,6 @@ $bloggersettemplate_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  * Currently, in b2evo, this will change the templates of the 'custom' skin.
  *
  * see {@link http://www.blogger.com/developers/api/1_docs/xmlrpc_getTemplate.html}
- *
- * {@internal bloggersettemplate(-) }}
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -1975,7 +1951,6 @@ $mweditpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpc
  *
  * mw API
  *
- * {@internal mweditpost(-) }}
  * Tor - TODO - set published flag correctly
  *		- Sort out sql select with blog ID
  *		- screws up posts with multiple categories
@@ -2255,8 +2230,6 @@ $mwgetpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrp
  * This API call is not documented on
  * {@link http://www.blogger.com/developers/api/1_docs/}
  *
- * {@internal mwgetpost(-) }}
- *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
  *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .)
@@ -2514,6 +2487,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.90  2006/03/12 23:09:31  fplanque
+ * doc cleanup
+ *
  * Revision 1.89  2006/03/09 22:30:02  fplanque
  * cleaned up permanent urls
  *

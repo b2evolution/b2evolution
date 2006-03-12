@@ -11,7 +11,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * {@internal upgrade_cafelog_tables(-)}}
  */
 function upgrade_cafelog_tables()
 {
@@ -157,6 +156,9 @@ function upgrade_cafelog_tables()
 
 /*
  * $Log$
+ * Revision 1.39  2006/03/12 23:09:26  fplanque
+ * doc cleanup
+ *
  * Revision 1.38  2005/12/30 18:08:24  fplanque
  * no message
  *

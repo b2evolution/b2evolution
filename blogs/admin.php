@@ -9,7 +9,7 @@
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).

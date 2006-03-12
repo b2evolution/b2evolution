@@ -11,23 +11,8 @@
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- * {@internal
- * b2evolution is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * b2evolution is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with b2evolution; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * }}
- *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -579,7 +564,6 @@ class ItemList extends DataObjectList
 
 
 	/**
-	 * {@internal ItemList::get_lastpostdate(-)}}
 	 */
 	function get_lastpostdate()
 	{
@@ -640,8 +624,6 @@ class ItemList extends DataObjectList
 	/**
 	 * Template function: display last mod date (datetime) of Item
 	 *
-	 * {@internal ItemList::mod_date(-) }}
-	 *
 	 * @param string date/time format: leave empty to use locale default date format
 	 * @param boolean true if you want GMT
 	 */
@@ -701,7 +683,6 @@ class ItemList extends DataObjectList
 
 
 	/**
-	 * {@internal ItemList::get_category_group()}}
 	 */
 	function get_category_group()
 	{
@@ -735,7 +716,6 @@ class ItemList extends DataObjectList
 
 
 	/**
-	 * {@internal ItemList::get_item()}}
 	 */
 	function get_item( )
 	{
@@ -765,8 +745,6 @@ class ItemList extends DataObjectList
 
 	/**
 	 * Init postdata
-	 *
-	 * {@internal ItemList::get_postdata(-)}}
 	 *
 	 * @todo we might want to move object instanciation upward rigth after the request is executed
 	 *
@@ -827,8 +805,6 @@ class ItemList extends DataObjectList
 	/**
 	 * Template function: Display the date if it has changed since last call
 	 *
-	 * {@internal ItemList::date_if_changed(-) }}
-	 *
 	 * @param string string to display before the date (if changed)
 	 * @param string string to display after the date (if changed)
 	 * @param string date/time format: leave empty to use locale default time format
@@ -858,8 +834,6 @@ class ItemList extends DataObjectList
 	/**
 	 * Template function: display message if list is empty
 	 *
-	 * {@internal ItemList::display_if_empty(-) }}
-	 *
 	 * @param string String to display if list is empty
    * @return true if empty
 	 */
@@ -876,6 +850,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 23:08:59  fplanque
+ * doc cleanup
+ *
  * Revision 1.1  2006/02/23 21:11:58  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

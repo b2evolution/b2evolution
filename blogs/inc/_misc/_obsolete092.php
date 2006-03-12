@@ -16,23 +16,8 @@
  * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- * {@internal
- * b2evolution is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * b2evolution is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with b2evolution; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * }}
- *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -461,7 +446,6 @@ function the_link( $before='', $after='', $format = 'htmlbody' )
 
 
 /**
- * {@internal preview_title(-)}}
  * @deprecated Not used in the core
  */
 function preview_title( $string = '#', $before = ' ', $after = '' )
@@ -867,8 +851,6 @@ function permalink_single($file='')
 
 
 /**
- * {@internal the_permalink(-) }}
- *
  * @deprecated deprecated by {@link $Item::permalink()}
  */
 function the_permalink()
@@ -1163,8 +1145,6 @@ function log_hit()
 /**
  * Report MySQL errors in detail.
  *
- * {@internal mysql_oops(-) }}
- *
  * @deprecated use class DB instead - not used in core anymore
  *
  * @param string The query which led to the error
@@ -1327,8 +1307,6 @@ function single_month_title( $prefix = '#', $display = 'htmlbody', $linktoyearar
 /**
  * Display "Archive Directory" title if it has been requested
  *
- * {@internal arcdir_title(-) }}
- *
  * @deprecated Deprecated by {@link request_title()}
  * @param string Prefix to be displayed if something is going to be displayed
  * @param mixed Output format, see {@link format_to_output()} or false to
@@ -1354,8 +1332,6 @@ function arcdir_title( $prefix = ' ', $display = 'htmlbody' )
 // _item_funcs.php {{{
 
 /**
- * {@internal single_post_title(-)}}
- *
  * @deprecated Deprecated by {@link request_title()}
  * @todo posts do no get proper checking (wether they are in the requested blog or wether their permissions match user rights,
  * thus the title sometimes gets displayed even when it should not. We need to pre-query the ItemList instead!!
@@ -1430,8 +1406,6 @@ function permalink_link($file='', $mode = 'id', $post_ID = '' )		// id or title
  *
  * fplanque: multiple category support (so it's not really 'single' anymore!)
  *
- * {@internal single_cat_title(-) }}
- *
  * @deprecated Deprecated by {@link request_title()}
  * @param string Prefix to be displayed if something is going to be displayed
  * @param mixed Output format, see {@link format_to_output()} or false to
@@ -1476,8 +1450,6 @@ function single_cat_title( $prefix = '#', $display = 'htmlbody' )
 /**
  * Display "Last comments" title if these have been requested
  *
- * {@internal last_comments_title(-) }}
- *
  * @deprecated Deprecated by {@link request_title()}
  * @param string Prefix to be displayed if something is going to be displayed
  * @param mixed Output format, see {@link format_to_output()} or false to
@@ -1500,8 +1472,6 @@ function last_comments_title( $prefix = ' ', $display = 'htmlbody' )
 /**
  * Display "Statistics" title if these have been requested
  *
- * {@internal stats_title(-) }}
- *
  * @deprecated Deprecated by {@link request_title()}
  * @param string Prefix to be displayed if something is going to be displayed
  * @param mixed Output format, see {@link format_to_output()} or false to
@@ -1515,8 +1485,6 @@ function stats_title( $prefix = ' ', $display = 'htmlbody' )
 
 /**
  * Display "User profile" title if it has been requested
- *
- * {@internal profile_title(-) }}
  *
  * @deprecated Deprecated by {@link request_title()}
  * @param string Prefix to be displayed if something is going to be displayed
@@ -1540,8 +1508,6 @@ function profile_title( $prefix = ' ', $display = 'htmlbody' )
 
 /**
  * Display "Message User" title if it has been requested
- *
- * {@internal msg_title(-) }}
  *
  * @todo move to {@link Request} class (fplanque)
  *
@@ -1656,6 +1622,9 @@ $b2_version = $app_version;
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/12 23:09:01  fplanque
+ * doc cleanup
+ *
  * Revision 1.3  2006/03/09 22:29:59  fplanque
  * cleaned up permanent urls
  *

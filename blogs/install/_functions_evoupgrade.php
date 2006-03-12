@@ -6,7 +6,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -813,6 +813,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.135  2006/03/12 23:09:26  fplanque
+ * doc cleanup
+ *
  * Revision 1.134  2006/03/09 20:40:41  fplanque
  * cleanup
  *

@@ -9,23 +9,8 @@
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- * {@internal
- * b2evolution is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * b2evolution is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with b2evolution; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * }}
- *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -49,8 +34,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Validate URL title
  *
  * Using title as a source if url title is empty
- *
- * {@internal urltitle_validate(-) }}
  *
  * @param string url title to validate
  * @param string real title to use as a source if $urltitle is empty
@@ -658,8 +641,6 @@ function get_permalink(
 /**
  * Returns the number of the words in a string, sans HTML
  *
- * {@internal bpost_count_words(-)}}
- *
  * @param string
  * @return integer
  */
@@ -940,6 +921,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/12 23:08:59  fplanque
+ * doc cleanup
+ *
  * Revision 1.2  2006/03/09 22:29:59  fplanque
  * cleaned up permanent urls
  *

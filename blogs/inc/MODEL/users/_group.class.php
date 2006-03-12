@@ -8,21 +8,6 @@
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- * {@internal
- * b2evolution is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * b2evolution is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with b2evolution; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * }}
  *
  * @package evocore
  *
@@ -65,8 +50,6 @@ class Group extends DataObject
 
 	/**
 	 * Constructor
-	 *
-	 * {@internal Group::Group(-) }}
 	 *
 	 * @param object DB row
 	 */
@@ -114,8 +97,6 @@ class Group extends DataObject
 
 	/**
 	 * Set param value
-	 *
-	 * {@internal Group::set(-) }}
 	 *
 	 * @param string Parameter name
 	 * @param mixed Parameter value
@@ -269,8 +250,6 @@ class Group extends DataObject
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()} instead
 	 *
-	 * {@internal User::check_perm_catsgroups(-) }}
-	 *
 	 * @see User::check_perm()
 	 * @param string Permission name, can be one of the following:
 	 *                  - cat_post_statuses
@@ -317,8 +296,6 @@ class Group extends DataObject
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()} instead
 	 * user is checked for privileges first, group lookup only performed on a false result
-	 *
-	 * {@internal Group::check_perm_bloggroups(-) }}
 	 *
 	 * @see User::check_perm()
 	 * @param string Permission name, can be one of the following:
@@ -433,6 +410,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2006/03/12 23:09:00  fplanque
+ * doc cleanup
+ *
  * Revision 1.1  2006/02/23 21:11:58  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.

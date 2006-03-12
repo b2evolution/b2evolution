@@ -9,23 +9,8 @@
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- * {@internal
- * b2evolution is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * b2evolution is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with b2evolution; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * }}
- *
- * {@internal
+ * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
@@ -137,12 +122,12 @@ class UserSettings extends AbstractSettings
 
 
 	/**
-	 * Get a param, in co-operation with {@link $Request}.
+	 * Get a param from Request and save it to UserSettings, or default to previously saved user setting.
 	 *
-	 * If the param is given (through {@link $Request}), it will get updated in
-	 * here, otherwise the user's setting gets used.
+	 * fp> note: what happens if the user settings was NOT set before? Shouldn't we use $default then?
 	 *
 	 * @param string Param and user setting name. Make sure this is unique.
+TODO: update @params
 	 * @param mixed,... The same params as to {@link Request::param()}.
 	 *        You probably want to provide the third (absolutely) one ($default) as NULL, so it falls back
 	 *        to {@link $UserSettings} and not the default you give.
@@ -153,6 +138,7 @@ class UserSettings extends AbstractSettings
 	{
 		global $Request;
 
+		// fp>> shoudn't we pass NULL instead of $default and resuse $default later if the param could not be found in user settings either?
 		$value = $Request->param( $var, $type, $default, $memorize, $override, $forceset );
 
 		if( isset($value) )
@@ -174,6 +160,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/12 23:09:00  fplanque
+ * doc cleanup
+ *
  * Revision 1.3  2006/03/12 20:51:53  blueyed
  * Moved Request::param_UserSettings() to UserSettings::param_Request()
  *
