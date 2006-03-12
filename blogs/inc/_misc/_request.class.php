@@ -736,50 +736,6 @@ class Request
 
 
 	/**
-	 * Get a param, in co-operation with {@link $UserSettings}.
-	 * If the param is given, it will get updated in {@link $UserSettings}, otherwise the user's setting gets used as default.
-	 *
-
-TODO: Do NOT use hidden arguments. It's UNEREADABLE and you get no IDE help either. For what purpose?
-TODO: Move this to the usersettigs class. I think it makes a lot more sense other there.
-
-	 *
-	 * @param string Param and {@link $UserSettings} name. Make sure this is unique.
-	 * @param mixed,... The same params as to {@link Request::param()}.
-	 *        You probably want to give the third (absolutely) one ($default) as NULL, so it falls back
-	 *        to {@link $UserSettings} and not the default you give. If it's not given, NULL is used as default (and not '').
-	 * @return NULL|mixed NULL, if neither a param was given nor {@link $UserSettings} knows about it.
-	 */
-	function param_UserSettings(  )
-	{
-		global $UserSettings;
-
-		$args = func_get_args();
-
-		if( ! isset( $args[2] ) )
-		{ // $default is not given, so we assume NULL because of functionality
-			$args[2] = NULL;
-		}
-
-		$value = call_user_func_array( array(&$this, 'param'), $args );
-
-		if( isset($value) )
-		{
-			$UserSettings->set( $args[0], $value );
-			$UserSettings->dbupdate();
-
-			return $value;
-		}
-		else
-		{
-			$this->set_param( $args[0], $UserSettings->get($args[0]) );
-
-			return $this->params[ $args[0] ];
-		}
-	}
-
-
-	/**
 	 * Check if there have been validation errors
 	 *
 	 * We play it safe here and check for all kind of errors, not just those from this particlar class.
@@ -911,6 +867,9 @@ TODO: Move this to the usersettigs class. I think it makes a lot more sense othe
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/12 20:51:53  blueyed
+ * Moved Request::param_UserSettings() to UserSettings::param_Request()
+ *
  * Revision 1.4  2006/03/12 19:52:18  blueyed
  * param_check_range(): check for numeric (no float!)
  *

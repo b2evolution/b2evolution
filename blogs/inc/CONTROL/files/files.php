@@ -196,15 +196,15 @@ if( $fm_FileRoot )
  */
 $fm_Filelist = new Filelist( $ads_list_path, $fm_FileRoot );
 
-if( $Request->param_UserSettings( 'fm_dirsnotattop', 'integer', NULL ) )
+if( $UserSettings->param_Request( 'fm_dirsnotattop', 'integer', NULL ) )
 {
 	$fm_Filelist->_dirs_not_at_top = true;
 }
-if( $Request->param_UserSettings( 'fm_recursivedirsize', 'integer', NULL ) ) // TODO: check for permission? (Server load)
+if( $UserSettings->param_Request( 'fm_recursivedirsize', 'integer', NULL ) ) // TODO: check for permission? (Server load)
 {
 	$fm_Filelist->_use_recursive_dirsize = true;
 }
-if( $Request->param_UserSettings( 'fm_showhidden', 'integer', NULL ) )
+if( $UserSettings->param_Request( 'fm_showhidden', 'integer', NULL ) )
 {
 	$fm_Filelist->_show_hidden_files = true;
 }
@@ -1490,6 +1490,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.4  2006/03/12 20:51:53  blueyed
+ * Moved Request::param_UserSettings() to UserSettings::param_Request()
+ *
  * Revision 1.3  2006/03/12 20:11:31  fplanque
  * no message
  *

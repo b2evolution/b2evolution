@@ -134,10 +134,49 @@ class UserSettings extends AbstractSettings
 
 		return parent::delete( $user_ID, $setting );
 	}
+
+
+	/**
+	 * Get a param, in co-operation with {@link $Request}.
+	 *
+	 * If the param is given (through {@link $Request}), it will get updated in
+	 * here, otherwise the user's setting gets used.
+	 *
+	 * @param string Param and user setting name. Make sure this is unique.
+	 * @param mixed,... The same params as to {@link Request::param()}.
+	 *        You probably want to provide the third (absolutely) one ($default) as NULL, so it falls back
+	 *        to {@link $UserSettings} and not the default you give.
+	 *        Note: we use NULL as $default here, because of functionality.
+	 * @return NULL|mixed NULL, if neither a param was given nor {@link $UserSettings} knows about it.
+	 */
+	function param_Request( $var, $type = '', $default = NULL, $memorize = false, $override = false, $forceset = true )
+	{
+		global $Request;
+
+		$value = $Request->param( $var, $type, $default, $memorize, $override, $forceset );
+
+		if( isset($value) )
+		{
+			$this->set( $var, $value );
+			$this->dbupdate();
+
+			return $value;
+		}
+		else
+		{
+			$Request->set_param( $var, $this->get($var) );
+
+			return $Request->get($var);
+		}
+	}
 }
+
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/12 20:51:53  blueyed
+ * Moved Request::param_UserSettings() to UserSettings::param_Request()
+ *
  * Revision 1.2  2006/02/27 16:43:09  blueyed
  * Normalized
  *
