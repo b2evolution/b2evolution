@@ -1213,6 +1213,7 @@ class File extends DataObject
 		{ // Directory
 			// Note: we make sure that the mode is fileman and not upload (we cannot insert IMG tags from a sub-popup)
 			// fp>>removed by blueyed, not matching comment above, why? return regenerate_url( 'root,path,mode', 'mode=fileman&amp;root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
+			// blueyed>> From Rev.1.3: TODO: "mode=fileman" kills the header/footer while browsing "normally" (files.php). Just empty it??
 			return regenerate_url( 'root,path,mode', 'root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
 		}
 		else
@@ -1340,8 +1341,8 @@ class File extends DataObject
 
 /*
  * $Log$
- * Revision 1.5  2006/03/12 19:09:00  fplanque
- * question
+ * Revision 1.6  2006/03/12 20:07:00  blueyed
+ * re-adding re-moved todo
  *
  * Revision 1.4  2006/03/12 03:03:32  blueyed
  * Fixed and cleaned up "filemanager".
