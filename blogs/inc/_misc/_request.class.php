@@ -381,6 +381,8 @@ class Request
 
 
 	/**
+	 * Checks if the param is a decimal number (no float, e.g. 3.14).
+	 *
 	 * @param string param name
 	 * @param string error message
 	 * @return boolean true if OK
@@ -402,6 +404,8 @@ class Request
 
 
 	/**
+	 * Gets a param and makes sure it's a decimal number (no float, e.g. 3.14) in a given range.
+	 *
 	 * @param string param name
 	 * @param integer min value
 	 * @param integer max value
@@ -416,6 +420,8 @@ class Request
 
 
 	/**
+	 * Checks if the param is a decimal number (no float, e.g. 3.14) in a given range.
+	 *
 	 * @param string param name
 	 * @param integer min value
 	 * @param integer max value
@@ -429,7 +435,7 @@ class Request
 			return true;
 		}
 
-		if( !is_numeric($this->params[$var]) || $this->params[$var] < $min || $this->params[$var] > $max )
+		if( ! preg_match( '~^\d+$~', $this->params[$var] ) || $this->params[$var] < $min || $this->params[$var] > $max )
 		{
 			$this->param_error( $var, sprintf( $err_msg, $min, $max ) );
 			return false;
@@ -905,6 +911,9 @@ TODO: Move this to the usersettigs class. I think it makes a lot more sense othe
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/12 19:52:18  blueyed
+ * param_check_range(): check for numeric (no float!)
+ *
  * Revision 1.3  2006/03/06 20:03:40  fplanque
  * comments
  *
