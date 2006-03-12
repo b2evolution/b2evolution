@@ -243,6 +243,12 @@ class Filelist
 
 	/**
 	 * Display template cache
+	 * 
+	 * @todo get this outta here. This is NOT a displayable object.
+	 * We might want to have a "FileListResults" object that derives from Widget/Results/FilteredResults (the more the better)
+	 * This object is what the SQL or the ItemQuery object is to Results or to ItemList2. The model and the display should not be mixed.
+	 * IF NOT doing the clean objects, move this at least to file.funcs.
+	 *
 	 * @param array
 	 * @access protected
 	 */
@@ -263,6 +269,12 @@ class Filelist
 		$this->_ads_list_path = $path;
 		$this->_FileRoot = & $FileRoot;
 
+		/**
+		 * @todo get this outta here. This is NOT a displayable object.
+		 * We might want to have a "FileListResults" object that derives from Widget/Results/FilteredResults (the more the better)
+		 * This object is what the SQL or the ItemQuery object is to Results or to ItemList2. The model and the display should not be mixed.
+		 * IF NOT doing the clean objects, move this at least to file.funcs.
+		 */
 		$this->_result_params = $AdminUI->get_menu_template('Results');
 
 		if( ! empty($this->_ads_list_path) )
@@ -590,6 +602,11 @@ class Filelist
 	 * Get the link to sort by a column. Handle current order and appends an
 	 * icon to reflect the current state (ascending/descending), if the column
 	 * is the same we're sorting by.
+	 *
+	 * @todo get this outta here. This is NOT a displayable object.
+	 * We might want to have a "FileListResults" object that derives from Widget/Results/FilteredResults (the more the better)
+	 * This object is what the SQL or the ItemQuery object is to Results or to ItemList2. The model and the display should not be mixed.
+	 * IF NOT doing the clean objects, move this at least to file.funcs.
 	 *
 	 * @param string The type (name, path, size, ..)
 	 * @param string The text for the anchor.
@@ -1137,6 +1154,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/12 19:34:34  fplanque
+ * no message
+ *
  * Revision 1.2  2006/03/12 03:03:32  blueyed
  * Fixed and cleaned up "filemanager".
  *
