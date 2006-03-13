@@ -93,7 +93,9 @@ function task_title_link( $Item )
 
 	$col = locale_flag( $Item->locale, 'w16px', 'flag', '', false ).' ';
 
-  if( $Item->Blog->allowcomments != 'never' )
+	$Item->load_Blog();
+
+	if( $Item->Blog->allowcomments != 'never' )
 	{	// The current blog can have comments:
 		$nb_comments = generic_ctp_number($Item->ID, 'feedback');
 		$col .= '<a href="?ctrl=browse&amp;tab=posts&amp;blog='.$Item->blog_ID.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1"
@@ -209,6 +211,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/13 20:57:40  blueyed
+ * fix
+ *
  * Revision 1.2  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
