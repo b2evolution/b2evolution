@@ -124,22 +124,32 @@ class UserSettings extends AbstractSettings
 	/**
 	 * Get a param from Request and save it to UserSettings, or default to previously saved user setting.
 	 *
-	 * fp> note: what happens if the user settings was NOT set before? Shouldn't we use $default then?
+	 * If the user setting was not set before (and there's no default given that gets returned), $default gets used.
 	 *
 	 * @param string Param and user setting name. Make sure this is unique.
-TODO: update @params
-	 * @param mixed,... The same params as to {@link Request::param()}.
-	 *        You probably want to provide the third (absolutely) one ($default) as NULL, so it falls back
-	 *        to {@link $UserSettings} and not the default you give.
-	 *        Note: we use NULL as $default here, because of functionality.
+	 * @param string Force value type to one of:
+	 * - integer
+	 * - float
+	 * - string (strips (HTML-)Tags, trims whitespace)
+	 * - array
+	 * - object
+	 * - null
+	 * - html (does nothing)
+	 * - '' (does nothing)
+	 * - '/^...$/' check regexp pattern match (string)
+	 * - boolean (will force type to boolean, but you can't use 'true' as a default since it has special meaning. There is no real reason to pass booleans on a URL though. Passing 0 and 1 as integers seems to be best practice).
+	 * Value type will be forced only if resulting value (probably from default then) is !== NULL
+	 * @param mixed Default value or TRUE if user input required
+	 * @param boolean Do we need to memorize this to regenerate the URL for this page?
+	 * @param boolean Override if variable already set
 	 * @return NULL|mixed NULL, if neither a param was given nor {@link $UserSettings} knows about it.
 	 */
-	function param_Request( $var, $type = '', $default = NULL, $memorize = false, $override = false, $forceset = true )
+	function param_Request( $var, $type = '', $default = '', $memorize = false, $override = false ) // we do not force setting it..
 	{
 		global $Request;
 
 		// fp>> shoudn't we pass NULL instead of $default and resuse $default later if the param could not be found in user settings either?
-		$value = $Request->param( $var, $type, $default, $memorize, $override, $forceset );
+		$value = $Request->param( $var, $type, NULL, $memorize, $override, false ); // we pass NULL here, to see if it got set at all
 
 		if( isset($value) )
 		{
@@ -149,8 +159,14 @@ TODO: update @params
 			return $value;
 		}
 		else
-		{
-			$Request->set_param( $var, $this->get($var) );
+		{ // get the value from user settings
+			$value = $this->get($var);
+
+			if( is_null($value) )
+			{ // it's not saved yet and there's not default defined ($_defaults)
+				$value = $default;
+			}
+			$Request->set_param( $var, $value );
 
 			return $Request->get($var);
 		}
@@ -160,6 +176,9 @@ TODO: update @params
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/13 21:20:53  blueyed
+ * fixed UserSettings::param_Request()
+ *
  * Revision 1.4  2006/03/12 23:09:00  fplanque
  * doc cleanup
  *
