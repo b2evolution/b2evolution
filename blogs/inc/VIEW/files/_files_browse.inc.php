@@ -505,7 +505,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 	if( $UserSettings->get('fm_showfsperms') ) // MB UPDATE-------------
 	{ // Show file perms
 		echo '<td class="perms">';
-		$fm_permlikelsl = $Request->param_UserSettings( 'fm_permlikelsl', 'integer', NULL );
+		$fm_permlikelsl = $UserSettings->param_Request( 'fm_permlikelsl', 'integer', NULL );
 
 		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
@@ -884,6 +884,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/13 20:55:26  blueyed
+ * Moved Request::param_UserSettings() to UserSettings::param_Request()
+ *
  * Revision 1.3  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
