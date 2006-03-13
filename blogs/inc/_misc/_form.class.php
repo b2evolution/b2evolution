@@ -750,14 +750,12 @@ class Form extends Widget
 	 * Builds a time select input field
 	 *
 	 * @param string field name
-	 * @param string initial value (ISO datetime)
+	 * @param string initial value (ISO datetime or time only)
 	 * @param string precison xmn or xsec (x:integer) for the options minutes or secondes
 	 * @param string field label to be display before the field
 	 * @param string note to be displayed after the field
 	 * @param string CSS class for select
 	 * @param string Javascript to add for onchange event (trailing ";").
-
-	 *
 	 */
 	function time_select( $field_name, $field_value = NULL, $precision = '5mn', $field_label, $field_note = NULL, $field_class = NULL, $field_onchange = NULL )
 	{
@@ -786,6 +784,12 @@ class Form extends Widget
 		{
 			$precision_mn = 1;
 			$precision_s = $matches[1];
+		}
+		
+		// Check if field value is only a time 
+		if( strlen( $field_value ) <= 8 )
+		{	// Add date part:
+			$field_value = '2000-01-01 '.$field_value;
 		}
 
 		/***  set round time with the precision  ***/
@@ -2491,6 +2495,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/13 19:44:35  fplanque
+ * no message
+ *
  * Revision 1.5  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

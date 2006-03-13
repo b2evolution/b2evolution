@@ -1064,6 +1064,11 @@ function param( $var, $type = '', $default = '', $memorize = false,
 
 /**
  * Memorize a parameter for automatic future use in regenerate_url()
+ *
+ * @param string Variable to memorize
+ * @param string Type of the variable
+ * @param mixed Default value to compare to when regenerating url
+ * @param mixed Value to set
  */
 function memorize_param( $var, $type, $default, $value = NULL )
 {
@@ -2497,22 +2502,52 @@ function decompact_date( $date )
  *
  * @param string phone number
  */
-function format_phone( $phone )
+function format_phone( $phone, $hide_country_dialing_code_if_same_as_locale = true )
 {
+	global $CountryCache;
+	
+	$dialing_code = NULL;
 
-	if( ( $indic = substr( $phone, 0, 3 ) ) == '+33'  && strlen( $phone ) == 12 )
-	{ // French number (+33x.xx.xx.xx.xx), so we can format it (xx.xx.xx.xx.xx):
-		$phone_formated = format_french_phone( '0'.substr( $phone, 3, strlen( $phone)-3 ) );
-	}
-	elseif ( substr( $phone, 0 , 1 ) != '+' && strlen( $phone ) == 10  )
-	{ // French number, so we can format it (xx.xx.xx.xx.xx):
-		$phone_formated = format_french_phone( $phone );
-	}
-	else
-	{ // unknown format, so don't change it:
-		$phone_formated = $phone;
+	if( substr( $phone, 0, 1 ) == '+' )
+	{	// We have a dialing code in the phone, so we extract it:
+		$dialing_code = $CountryCache->extract_country_dialing_code( substr( $phone, 1 ) );
 	}
 
+	if( ( locale_dialing_code() == $dialing_code ) && $hide_country_dialing_code_if_same_as_locale )
+	{	// The phone dialing code is same as locale and we want to hide it in this case
+		if( ( strlen( $phone ) - strlen( $dialing_code ) ) == 10 )
+		{	// We can format it like a french phone number ( 0x.xx.xx.xx.xx )
+			$phone_formated = format_french_phone( '0'.substr( $phone, strlen( $dialing_code )+1 ) ); 
+		}
+		else 
+		{ // ( 0xxxxxxxxxxxxxx )
+			$phone_formated = '0'.substr( $phone, strlen( $dialing_code )+1 ); 
+		}
+		
+	}
+	elseif( !is_null( $dialing_code ) )
+	{	// Phone has a dialing code
+		if( ( strlen( $phone ) - strlen( $dialing_code ) ) == 10 )
+		{ // We can format it like a french phone number with the dialing code ( +dialing x.xx.xx.xx.xx )
+			$phone_formated = '+'.$dialing_code.format_french_phone( ' '.substr( $phone, strlen( $dialing_code )+1 ) ); 
+		}
+		else
+		{ // ( +dialing  xxxxxxxxxxx )
+			$phone_formated = '+'.$dialing_code.' '.substr( $phone, strlen( $dialing_code )+1 ); 
+		}
+	}
+	else 
+	{	
+		if( strlen( $phone ) == 10 )
+		{ //  We can format it like a french phone number ( xx.xx.xx.xx.xx )
+			$phone_formated = format_french_phone( $phone );
+		}
+		else 
+		{	// We don't format phone: TODO generic format phone ( xxxxxxxxxxxxxxxx )
+			$phone_formated = $phone;
+		}
+	}
+	
 	return $phone_formated;
 }
 
@@ -2653,6 +2688,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.15  2006/03/13 19:44:35  fplanque
+ * no message
+ *
  * Revision 1.14  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

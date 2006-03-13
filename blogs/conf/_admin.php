@@ -61,6 +61,7 @@ $ctrl_mappings = array(
  * Cross posting
  *
  * Possible values:
+ *   - -1 if you don't want to use categories at all
  *   - 0 if you want users to post to a single category only
  *   - 1 if you want to be able to cross-post among multiple categories
  *   - 2 if you want to be able to cross-post among multiple blogs/categories

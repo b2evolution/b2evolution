@@ -71,7 +71,7 @@ elseif( $use_l10n == 2 )
 		 */
 		static $trans = array();
 
-		global $current_locale, $locales, $Debuglog;
+		global $current_locale, $locales, $Debuglog, $locales_path;
 
 
 		if( empty($req_locale) )
@@ -101,7 +101,7 @@ elseif( $use_l10n == 2 )
 		if( !isset($trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
 			// echo 'LOADING', dirname(__FILE__).'/../locales/'. $messages. '/_global.php';
-			@include_once dirname(__FILE__).'/../locales/'.$messages.'/_global.php';
+			@include_once $locales_path.$messages.'/_global.php';
 			if( !isset($trans[ $messages ] ) )
 			{ // Still not loaded... file doesn't exist, memorize that no translations are available
 				// echo 'file not found!';
@@ -156,7 +156,6 @@ function TS_( $string, $req_locale = '' )
 {
 	return str_replace( "'", "\'", T_( $string, $req_locale ) );
 }
-
 
 
 /**
@@ -361,6 +360,24 @@ function locale_country( $locale = '' )
 	if( empty($locale) ) $locale = $current_locale;
 
 	return substr( $locale, 3, 2 );
+}
+
+
+/**
+ *	Get the locale country dialing code 
+ */
+function locale_dialing_code( $locale = '' )
+{
+		global $current_locale, $CountryCache;
+
+		if( empty($locale) ) 
+		{
+			$locale = locale_country();
+		}
+		
+		$edited_Country = $CountryCache->get_by_ID( $locale);
+		
+		return $edited_Country->dialing_code;
 }
 
 
@@ -686,6 +703,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/13 19:44:35  fplanque
+ * no message
+ *
  * Revision 1.2  2006/03/12 23:08:59  fplanque
  * doc cleanup
  *

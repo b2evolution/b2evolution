@@ -489,7 +489,7 @@ $locales_path = $basepath.$locales_subdir;  // You should not need to change thi
  */
 $plugins_subdir = 'plugins/';            // Subdirectory relative to base
 $plugins_path = $basepath.$plugins_subdir;  // You should not need to change this
-$plugins_url = $baseurl.$plugins_subdir; // You should not need to change this
+$plugins_url = $baseurl.$plugins_subdir;    // You should not need to change this
 
 /**
  * Location of the install folder.

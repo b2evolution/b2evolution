@@ -92,10 +92,6 @@ class DB
 	var $rows_affected = 0;
 	var $last_result;
 	/**
-	 * Log of queries:
-	 */
-	var $queries = array();
-	/**
 	 * Aliases that will be replaced in queries:
 	 */
 	var $dbaliases = array();
@@ -163,9 +159,21 @@ class DB
 
 	// DEBUG:
 
+  /**
+   * Do we want to log queries?
+   * @var boolean
+   */
+	var $log_queries = true;
+
+	/**
+	 * Log of queries:
+	 * @var array
+	 */
+	var $queries = array();
+
 	/**
 	 * Do we want to explain joins?
-	 * @var bool (Default: false)
+	 * @var boolean (Default: false)
 	 */
 	var $debug_explain_joins = false;
 
@@ -478,7 +486,7 @@ class DB
 	 *
 	 * @param string SQL query
 	 * @param string title for debugging
-	 * @return int|false number of rows, number of rows affected (INSERT, DELETE, UPDATE, REPLACE) or false if error
+	 * @return mixed # of rows affected or false if error
 	 */
 	function query( $query, $title = '' )
 	{
@@ -509,12 +517,16 @@ class DB
 
 		// Perform the query via std mysql_query function..
 		$this->num_queries++;
-		$this->queries[ $this->num_queries - 1 ] = array(
-			'title' => $title,
-			'sql' => $query,
-			'rows' => -1,
-			'time' => 'unknown',
-			'results' => 'unknown' );
+
+		if( $this->log_queries )
+		{	// We want to log queries:
+			$this->queries[ $this->num_queries - 1 ] = array(
+				'title' => $title,
+				'sql' => $query,
+				'rows' => -1,
+				'time' => 'unknown',
+				'results' => 'unknown' );
+		}
 
 		if( is_object($Timer) )
 		{
@@ -525,8 +537,13 @@ class DB
 
 			// Run query:
 			$this->result = @mysql_query( $query, $this->dbhandle );
-			// Get duration for last query:
-			$this->queries[ $this->num_queries - 1 ]['time'] = $Timer->get_duration( 'sql_query', 10 );
+
+			if( $this->log_queries )
+			{	// We want to log queries:
+				// Get duration for last query:
+				$this->queries[ $this->num_queries - 1 ]['time'] = $Timer->get_duration( 'sql_query', 10 );
+			}
+
 			// Pause global query timer:
 			$Timer->pause( 'sql_queries' );
 		}
@@ -547,7 +564,10 @@ class DB
 		{ // Query was an insert, delete, update, replace:
 
 			$this->rows_affected = mysql_affected_rows($this->dbhandle);
-			$this->queries[ $this->num_queries - 1 ]['rows'] = $this->rows_affected;
+			if( $this->log_queries )
+			{	// We want to log queries:
+				$this->queries[ $this->num_queries - 1 ]['rows'] = $this->rows_affected;
+			}
 
 			// Take note of the insert_id
 			if ( preg_match("/^\\s*(insert|replace) /i",$query) )
@@ -582,18 +602,23 @@ class DB
 
 			// Log number of rows the query returned
 			$this->num_rows = $num_rows;
-			$this->queries[ $this->num_queries - 1 ]['rows'] = $this->num_rows;
+			if( $this->log_queries )
+			{	// We want to log queries:
+				$this->queries[ $this->num_queries - 1 ]['rows'] = $this->num_rows;
+			}
 
 			// Return number of rows selected
 			$return_val = $this->num_rows;
 		}
 
 
-		if( $this->debug_dump_function_trace_for_queries )
-		{
-			$this->queries[ $this->num_queries - 1 ]['function_trace'] = debug_get_backtrace( $this->debug_dump_function_trace_for_queries, array( array( 'class' => 'DB' ) ), 1 ); // including first stack entry from class DB
+		if( $this->log_queries )
+		{	// We want to log queries:
+			if( $this->debug_dump_function_trace_for_queries )
+			{
+				$this->queries[ $this->num_queries - 1 ]['function_trace'] = debug_get_backtrace( $this->debug_dump_function_trace_for_queries, array( array( 'class' => 'DB' ) ), 1 ); // including first stack entry from class DB
+			}
 		}
-
 
 		// EXPLAIN JOINS ??
 		if( $this->debug_explain_joins && preg_match( '#^ \s* select \s #ix', $query) )
@@ -631,7 +656,10 @@ class DB
 			// Log number of rows the query returned
 			$this->num_rows = $num_rows;
 
-			$this->queries[ $this->num_queries - 1 ]['explain'] = $this->debug_get_rows_table( 100, true );
+			if( $this->log_queries )
+			{	// We want to log queries:
+				$this->queries[ $this->num_queries - 1 ]['explain'] = $this->debug_get_rows_table( 100, true );
+			}
 
 			// Restore:
 			$this->last_result = $saved_last_result;
@@ -640,10 +668,12 @@ class DB
 		}
 
 
-		// If debug ALL queries
-		if( $this->debug_dump_rows )
-		{
-			$this->queries[ $this->num_queries - 1 ]['results'] = $this->debug_get_rows_table( $this->debug_dump_rows );
+		if( $this->log_queries )
+		{	// We want to log queries:
+			if( $this->debug_dump_rows )
+			{
+				$this->queries[ $this->num_queries - 1 ]['results'] = $this->debug_get_rows_table( $this->debug_dump_rows );
+			}
 		}
 
 		return $return_val;
@@ -1159,6 +1189,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/13 19:44:35  fplanque
+ * no message
+ *
  * Revision 1.3  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

@@ -138,9 +138,6 @@ class ItemList2 extends DataObjectList2
 				'posts' => $this->limit,
 				'page' => 1,
 				'item_type' => NULL,
-				'contact_link' => NULL,
-				'establishment_link' => NULL,
-				'firm_link' => NULL,
 			) );
 	}
 
@@ -191,64 +188,64 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * Restrict to selected authors:
 		 */
-		$Request->memorize_param( 'author', 'string', $this->default_filters['authors'], $this->filters['authors'] );  // List of authors to restrict to
+		$Request->memorize_param( $this->param_prefix.'author', 'string', $this->default_filters['authors'], $this->filters['authors'] );  // List of authors to restrict to
 
 		/*
 		 * Restrict to selected assignees:
 		 */
-		$Request->memorize_param( 'assgn', 'string', $this->default_filters['assignees'], $this->filters['assignees'] );  // List of assignees to restrict to
+		$Request->memorize_param( $this->param_prefix.'assgn', 'string', $this->default_filters['assignees'], $this->filters['assignees'] );  // List of assignees to restrict to
 
 		/*
 		 * Restrict to selected statuses:
 		 */
-		$Request->memorize_param( 'status', 'string', $this->default_filters['statuses'], $this->filters['statuses'] );  // List of statuses to restrict to
+		$Request->memorize_param( $this->param_prefix.'status', 'string', $this->default_filters['statuses'], $this->filters['statuses'] );  // List of statuses to restrict to
 
 		/*
 		 * Restrict by keywords
 		 */
-		$Request->memorize_param( 's', 'string', $this->default_filters['keywords'], $this->filters['keywords'] );			 // Search string
-		$Request->memorize_param( 'sentence', 'string', $this->default_filters['phrase'], $this->filters['phrase'] ); // Search for sentence or for words
-		$Request->memorize_param( 'exact', 'integer', $this->default_filters['exact'], $this->filters['exact'] );     // Require exact match of title or contents
+		$Request->memorize_param( $this->param_prefix.'s', 'string', $this->default_filters['keywords'], $this->filters['keywords'] );			 // Search string
+		$Request->memorize_param( $this->param_prefix.'sentence', 'string', $this->default_filters['phrase'], $this->filters['phrase'] ); // Search for sentence or for words
+		$Request->memorize_param( $this->param_prefix.'exact', 'integer', $this->default_filters['exact'], $this->filters['exact'] );     // Require exact match of title or contents
 
 		/*
 		 * Specific Item selection?
 		 */
-		$Request->memorize_param( 'm', 'integer', $this->default_filters['ymdhms'], $this->filters['ymdhms'] );          // YearMonth(Day) to display
-		$Request->memorize_param( 'w', 'integer', $this->default_filters['week'], $this->filters['week'] );            // Week number
-		$Request->memorize_param( 'dstart', 'integer', $this->default_filters['ymdhms_min'], $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
-		$Request->memorize_param( 'dstop', 'integer', $this->default_filters['ymdhms_max'], $this->filters['ymdhms_max'] ); // YearMonth(Day) to start at
+		$Request->memorize_param( $this->param_prefix.'m', 'integer', $this->default_filters['ymdhms'], $this->filters['ymdhms'] );          // YearMonth(Day) to display
+		$Request->memorize_param( $this->param_prefix.'w', 'integer', $this->default_filters['week'], $this->filters['week'] );            // Week number
+		$Request->memorize_param( $this->param_prefix.'dstart', 'integer', $this->default_filters['ymdhms_min'], $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
+		$Request->memorize_param( $this->param_prefix.'dstop', 'integer', $this->default_filters['ymdhms_max'], $this->filters['ymdhms_max'] ); // YearMonth(Day) to start at
 
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
 		if( is_null($this->default_filters['ts_min'])
 			&& is_null($this->default_filters['ts_max'] ) )
 		{	// We have not set a strict default -> we allow overridding:
-    	$Request->memorize_param( 'show_past', 'integer', 0, ($this->filters['ts_min'] == 'now') ? 0 : 1 );
-			$Request->memorize_param( 'show_future', 'integer', 0, ($this->filters['ts_max'] == 'now') ? 0 : 1 );
+    	$Request->memorize_param( $this->param_prefix.'show_past', 'integer', 0, ($this->filters['ts_min'] == 'now') ? 0 : 1 );
+			$Request->memorize_param( $this->param_prefix.'show_future', 'integer', 0, ($this->filters['ts_max'] == 'now') ? 0 : 1 );
 		}
 
     /*
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
-		$Request->memorize_param( 'show_status', 'array', $this->default_filters['visibility_array'], $this->filters['visibility_array'] );	// Array of sharings to restrict to
+		$Request->memorize_param( $this->param_prefix.'show_status', 'array', $this->default_filters['visibility_array'], $this->filters['visibility_array'] );	// Array of sharings to restrict to
 
 		/*
 		 * OLD STYLE orders:
 		 */
-		$Request->memorize_param( 'order', 'string', $this->default_filters['order'], $this->filters['order'] );   		// ASC or DESC
-		$Request->memorize_param( 'orderby', 'string', $this->default_filters['orderby'], $this->filters['orderby'] );  // list of fields to order by (TODO: change that crap)
+		$Request->memorize_param( $this->param_prefix.'order', 'string', $this->default_filters['order'], $this->filters['order'] );   		// ASC or DESC
+		$Request->memorize_param( $this->param_prefix.'orderby', 'string', $this->default_filters['orderby'], $this->filters['orderby'] );  // list of fields to order by (TODO: change that crap)
 
 		/*
 		 * Paging limits:
 		 */
- 		$Request->memorize_param( 'unit', 'string', $this->default_filters['unit'], $this->filters['unit'] );    		// list unit: 'posts' or 'days'
+ 		$Request->memorize_param( $this->param_prefix.'unit', 'string', $this->default_filters['unit'], $this->filters['unit'] );    		// list unit: 'posts' or 'days'
 		$this->unit = $this->filters['unit'];	// TEMPORARY
 
-		$Request->memorize_param( 'posts', 'integer', $this->default_filters['posts'], $this->filters['posts'] ); 			// # of units to display on the page
+		$Request->memorize_param( $this->param_prefix.'posts', 'integer', $this->default_filters['posts'], $this->filters['posts'] ); 			// # of units to display on the page
 		$this->limit = $this->filters['posts']; // for compatibility with parent class
 
 		// 'paged'
-		$Request->memorize_param( $this->page_param, 'integer', 1, $this->filters['page'] );      // List page number in paged display
+		$Request->memorize_param( $this->param_prefix.$this->page_param, 'integer', 1, $this->filters['page'] );      // List page number in paged display
 		$this->page = $this->filters['page'];
 	}
 
@@ -267,7 +264,7 @@ class ItemList2 extends DataObjectList2
 
 
 		// Do we want to restore filters or do we want to create a new filterset
-		$filter_action = $Request->param( 'filter', 'string', 'save' );
+		$filter_action = $Request->param( $this->param_prefix.'filter', 'string', 'save' );
 		// echo ' filter action: ['.$filter_action.'] ';
 		switch( $filter_action )
 		{
@@ -297,34 +294,34 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * Restrict to selected authors:
 		 */
-		$this->filters['authors'] = $Request->param( 'author', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['authors'], true );      // List of authors to restrict to
+		$this->filters['authors'] = $Request->param( $this->param_prefix.'author', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['authors'], true );      // List of authors to restrict to
 
 
 		/*
 		 * Restrict to selected assignees:
 		 */
-		$this->filters['assignees'] = $Request->param( 'assgn', '/^(-|-[0-9]|[0-9])(,[0-9]+)*$/', $this->default_filters['assignees'], true );      // List of assignees to restrict to
+		$this->filters['assignees'] = $Request->param( $this->param_prefix.'assgn', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', $this->default_filters['assignees'], true );      // List of assignees to restrict to
 
 
 		/*
 		 * Restrict to selected statuses:
 		 */
-		$this->filters['statuses'] = $Request->param( 'status', '/^(-|-[0-9]|[0-9])(,[0-9]+)*$/', $this->default_filters['statuses'], true );      // List of statuses to restrict to
+		$this->filters['statuses'] = $Request->param( $this->param_prefix.'status', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', $this->default_filters['statuses'], true );      // List of statuses to restrict to
 
 
 		/*
 		 * Restrict by keywords
 		 */
-		$this->filters['keywords'] = $Request->param( 's', 'string', $this->default_filters['keywords'], true );         // Search string
-		$this->filters['phrase'] = $Request->param( 'sentence', 'string', $this->default_filters['phrase'], true ); // Search for sentence or for words
-		$this->filters['exact'] = $Request->param( 'exact', 'integer', $this->default_filters['exact'], true );        // Require exact match of title or contents
+		$this->filters['keywords'] = $Request->param( $this->param_prefix.'s', 'string', $this->default_filters['keywords'], true );         // Search string
+		$this->filters['phrase'] = $Request->param( $this->param_prefix.'sentence', 'string', $this->default_filters['phrase'], true ); // Search for sentence or for words
+		$this->filters['exact'] = $Request->param( $this->param_prefix.'exact', 'integer', $this->default_filters['exact'], true );        // Require exact match of title or contents
 
 
 		/*
 		 * Specific Item selection?
 		 */
-    $this->filters['post_ID'] = $Request->param( 'p', 'integer', $this->default_filters['post_ID'] );          // Specific post number to display
-		$this->filters['post_title'] = $Request->param( 'title', 'string', $this->default_filters['post_title'] );	  // urtitle of post to display
+    $this->filters['post_ID'] = $Request->param( $this->param_prefix.'p', 'integer', $this->default_filters['post_ID'] );          // Specific post number to display
+		$this->filters['post_title'] = $Request->param( $this->param_prefix.'title', 'string', $this->default_filters['post_title'] );	  // urtitle of post to display
 
 		$this->single_post = !empty($this->filters['post_ID']) || !empty($this->filters['post_title']);
 
@@ -332,11 +329,11 @@ class ItemList2 extends DataObjectList2
 		/*
 		 * If a timeframe is specified in the querystring, restrict to that timeframe:
 		 */
-		$this->filters['ymdhms'] = $Request->param( 'm', 'integer', $this->default_filters['ymdhms'], true );          // YearMonth(Day) to display
-		$this->filters['week'] = $Request->param( 'w', 'integer', $this->default_filters['week'], true );            // Week number
+		$this->filters['ymdhms'] = $Request->param( $this->param_prefix.'m', 'integer', $this->default_filters['ymdhms'], true );          // YearMonth(Day) to display
+		$this->filters['week'] = $Request->param( $this->param_prefix.'w', 'integer', $this->default_filters['week'], true );            // Week number
 
-		$this->filters['ymdhms_min'] = $Request->param_compact_date( 'dstart', $this->default_filters['ymdhms_min'], T_( 'Invalid date' ) ); // YearMonth(Day) to start at
-		$this->filters['ymdhms_max'] = $Request->param_compact_date( 'dstop', $this->default_filters['ymdhms_max'], T_( 'Invalid date' ) ); // YearMonth(Day) to stop at
+		$this->filters['ymdhms_min'] = $Request->param_compact_date( $this->param_prefix.'dstart', $this->default_filters['ymdhms_min'], T_( 'Invalid date' ) ); // YearMonth(Day) to start at
+		$this->filters['ymdhms_max'] = $Request->param_compact_date( $this->param_prefix.'dstop', $this->default_filters['ymdhms_max'], T_( 'Invalid date' ) ); // YearMonth(Day) to stop at
 
 
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
@@ -346,8 +343,8 @@ class ItemList2 extends DataObjectList2
 		if( is_null($this->default_filters['ts_min'])
 			&& is_null($this->default_filters['ts_max'] ) )
 		{	// We have not set a strict default -> we allow overridding:
-    	$show_past = $Request->param( 'show_past', 'integer', 0, true );
-			$show_future = $Request->param( 'show_future', 'integer', 0, true );
+    	$show_past = $Request->param( $this->param_prefix.'show_past', 'integer', 0, true );
+			$show_future = $Request->param( $this->param_prefix.'show_future', 'integer', 0, true );
 			if( $show_past != $show_future )
 			{	// There is a point in overridding:
 				$this->filters['ts_min'] = ( $show_past == 0 ) ? 'now' : '';
@@ -360,28 +357,28 @@ class ItemList2 extends DataObjectList2
 		 * Restrict to the statuses we want to show:
 		 */
 		// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
-		$this->filters['visibility_array'] = $Request->param( 'show_status', 'array', $this->default_filters['visibility_array'], true );	// Array of sharings to restrict to
+		$this->filters['visibility_array'] = $Request->param( $this->param_prefix.'show_status', 'array', $this->default_filters['visibility_array'], true );	// Array of sharings to restrict to
 
 
 		/*
 		 * Ordering:
 		 */
-		$this->filters['order'] = $Request->param( 'order', '/^(ASC|asc|DESC|desc)$/', $this->default_filters['order'], true );		// ASC or DESC
-		$this->filters['orderby'] = $Request->param( 'orderby', '/^([A-Za-z0-9]+([ ,][A-Za-z0-9]+)*)?$/', $this->default_filters['orderby'], true );   // list of fields to order by (TODO: change that crap)
+		$this->filters['order'] = $Request->param( $this->param_prefix.'order', '/^(ASC|asc|DESC|desc)$/', $this->default_filters['order'], true );		// ASC or DESC
+		$this->filters['orderby'] = $Request->param( $this->param_prefix.'orderby', '/^([A-Za-z0-9]+([ ,][A-Za-z0-9]+)*)?$/', $this->default_filters['orderby'], true );   // list of fields to order by (TODO: change that crap)
 
 
 		/*
 		 * Paging limits:
 		 */
- 		$this->filters['unit'] = $Request->param( 'unit', 'string', $this->default_filters['unit'], true );    		// list unit: 'posts' or 'days'
+ 		$this->filters['unit'] = $Request->param( $this->param_prefix.'unit', 'string', $this->default_filters['unit'], true );    		// list unit: 'posts' or 'days'
 		$this->unit = $this->filters['unit'];	// TEMPORARY
 		// echo '<br />unit='.$this->filters['unit'];
 
-		$this->filters['posts'] = $Request->param( 'posts', 'integer', $this->default_filters['posts'], true ); 			// # of units to display on the page
+		$this->filters['posts'] = $Request->param( $this->param_prefix.'posts', 'integer', $this->default_filters['posts'], true ); 			// # of units to display on the page
 		$this->limit = $this->filters['posts']; // for compatibility with parent class
 
 		// 'paged'
-		$this->filters['page'] = $Request->param( $this->page_param, 'integer', 1, true );      // List page number in paged display
+		$this->filters['page'] = $Request->param( $this->param_prefix.$this->page_param, 'integer', 1, true );      // List page number in paged display
 		$this->page = $this->filters['page'];
 
 		// Item type
@@ -1195,6 +1192,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/13 19:44:35  fplanque
+ * no message
+ *
  * Revision 1.2  2006/03/12 23:08:59  fplanque
  * doc cleanup
  *
