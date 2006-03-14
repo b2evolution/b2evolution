@@ -8,14 +8,14 @@
  * @package admin
  */
 
-@import url(../../../../../rsc/css/basic.css);            /* Import basic styles */
-@import url(../../../../../rsc/css/img.css);              /* Import standard image styles */
-@import url(../../../../../rsc/css/results.css);          /* Import results/tables styles */
-@import url(../../../../../rsc/css/blog_elements.css);    /* Import standard blog elements styles */
-@import url(../../../../../rsc/css/forms.css);            /* Import default form styles */
-@import url(../../../../../rsc/css/comments.css);         /* Import default comment styles */
-@import url(../../../../../rsc/css/fileman.css);          /* Import filemanager styles */
-@import url(../../../../../rsc/css/admin.global.css);     /* Import basic admin styles */
+@import url(../../../../rsc/css/basic.css);            /* Import basic styles */
+@import url(../../../../rsc/css/img.css);              /* Import standard image styles */
+@import url(../../../../rsc/css/results.css);          /* Import results/tables styles */
+@import url(../../../../rsc/css/blog_elements.css);    /* Import standard blog elements styles */
+@import url(../../../../rsc/css/forms.css);            /* Import default form styles */
+@import url(../../../../rsc/css/comments.css);         /* Import default comment styles */
+@import url(../../../../rsc/css/fileman.css);          /* Import filemanager styles */
+@import url(../../../../rsc/css/admin.global.css);     /* Import basic admin styles */
 
 body {
 	margin: 0;
@@ -23,7 +23,7 @@ body {
 	color: #000;
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 	font-size: 84%;
-	background-image: url(../leftfade.png);
+	background-image: url(../img/leftfade.png);
 	background-repeat: repeat-y;
 }
 
@@ -114,7 +114,7 @@ a.DeleteButton {
 }
 a.CurrentBlog {
 	font-weight: bold;
-	background-image: url(../../../../img/desert-button-2.gif);
+	background-image: url(../../../legacy/rsc/img/desert-button-2.gif);
 	background-color: #fff;
 }
 a.CurrentBlog:hover {
@@ -125,7 +125,7 @@ a.CurrentBlog:hover {
 a.OtherBlog,
 a.ActionButton,
 a.DeleteButton {
-	background-image: url(../../../../img/desert-button.gif);
+	background-image: url(../../../legacy/rsc/img/desert-button.gif);
 	background-color: #e1ddce;
 }
 a.OtherBlog {
@@ -136,14 +136,14 @@ a.ActionButton:hover {
 	color: #00b;
 	text-decoration: underline;
 	background-color: #fff;
-	background-image: url(../../../../img/desert-button-2.gif);
+	background-image: url(../../../legacy/rsc/img/desert-button-2.gif);
 	border: 1px solid #00b;
 }
 a.DeleteButton:hover {
 	color: #c00;
 	text-decoration: underline;
 	background-color: #fff;
-	background-image: url(../../../../img/desert-button-2.gif);
+	background-image: url(../../../legacy/rsc/img/desert-button-2.gif);
 	border: 1px solid #c00;
 }
 a.PublishButton {
@@ -152,7 +152,7 @@ a.PublishButton {
 	text-decoration: none;
 	font-weight: bold;
 	padding: 2px 1ex;
-	background-image: url(../../../../img/desert-button.gif);
+	background-image: url(../../../legacy/rsc/img/desert-button.gif);
 	background-color: #e1ddce;
 	border: 1px solid #ccc5aa;
 }
@@ -160,7 +160,7 @@ a.PublishButton:hover {
 	color: #c00;
 	text-decoration: underline;
 	background-color: #fff;
-	background-image: url(../../../../img/desert-button-2.gif);
+	background-image: url(../../../legacy/rsc/img/desert-button-2.gif);
 	border: 1px solid #c00;
 }
 
@@ -175,7 +175,7 @@ div.PostActionsArea input {
 	padding: 2px;
 	margin: .5ex 1px;
 	color:#333;
-	background-image: url(../../../../img/desert-button.gif);
+	background-image: url(../../../legacy/rsc/img/desert-button.gif);
 	background-color: #e1ddce;
 	border: 1px solid #ccc5aa;
 }
@@ -192,7 +192,7 @@ div.PostActionsArea input:hover {
 	color: #00b;
 	text-decoration: underline;
 	background-color: #fff;
-	background-image: url(../../../../img/desert-button-2.gif);
+	background-image: url(../../../legacy/rsc/img/desert-button-2.gif);
 	border: 1px solid #00b;
 }
 
@@ -268,7 +268,7 @@ table.grouped th a.basic_sort_link:hover {
  */
 #header {
 	font-size:85%;
-	background: #fff url(../../../../img/bg_grey.gif) repeat-x bottom;
+	background: #fff url(../../../legacy/rsc/img/bg_grey.gif) repeat-x bottom;
 	/* border: 1px solid #00f; */
 	margin: 0;
 }
@@ -418,7 +418,7 @@ ul.tabs {
 }
 ul.tabs li {
 	float:left;
-	background:url(../../../../img/tabs_left_grey.gif) no-repeat left top;
+	background:url(../../../legacy/rsc/img/tabs_left_grey.gif) no-repeat left top;
 	margin:0;
 	padding:0 0 0 9px;
 	border-bottom:1px solid #9e9286;
@@ -427,7 +427,7 @@ ul.tabs li a {
 	float:left;
 	display:block;
 	white-space:nowrap;
-	background: url(../../../../img/tabs_right_grey.gif) no-repeat right top;
+	background: url(../../../legacy/rsc/img/tabs_right_grey.gif) no-repeat right top;
 	padding:4px 11px 3px 2px;
 	text-decoration:none;
 	color:#765;
@@ -482,7 +482,7 @@ div.panelblocktabs
 	margin-top: 1ex;
 	float:left;
 	width:100%;
-	background: url(../../../../img/tabs_bg.gif) repeat-x bottom;
+	background: url(../../../legacy/rsc/img/tabs_bg.gif) repeat-x bottom;
 	font-size:85%;
 	line-height:normal;
 }
@@ -768,7 +768,7 @@ div.edit_toolbar {
 div.edit_toolbar input {
 	color:#333;
 	background-color: #fff;
-	background-image: url(../../../../img/desert-button-2.gif);
+	background-image: url(../../../legacy/rsc/img/desert-button-2.gif);
 	border: 1px solid #ccc5aa;
 	margin: 0 1px;
 }
