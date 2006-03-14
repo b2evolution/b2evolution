@@ -46,7 +46,7 @@ param( 'ctrl', '/^[a-z0-9]+$/', $default_ctrl, true );
 
 
 // Redirect old-style URLs (e.g. /admin/plugins.php), if they come here because the webserver maps "/admin/" to "/admin.php"
-if( ! empty( $_SERVER['PATH_INFO'] ) )
+if( ! empty( $_SERVER['PATH_INFO'] ) && $_SERVER['PATH_INFO'] != $_SERVER['PHP_SELF'] ) // the "!= PHP_SELF" check seems needed by IIS..
 {
 	// Try to find the appropriate controller (ctrl) setting
 	foreach( $ctrl_mappings as $k => $v )
