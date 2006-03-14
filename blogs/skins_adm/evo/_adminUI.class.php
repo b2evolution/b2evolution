@@ -30,7 +30,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Includes
  */
-require_once dirname(__FILE__).'/../'.$adminskins_dirout.'_adminUI_general.class.php';
+require_once dirname(__FILE__).'/../_adminUI_general.class.php';
 
 
 /**
