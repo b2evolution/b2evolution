@@ -375,7 +375,7 @@ if( !$Messages->count('error') )
 				if( $reload_page )
 				{ // save Messages and reload the current page through header redirection
 					$Session->set( 'Messages', $Messages );
-					header_redirect( $ReqURI ); // TODO: this _should_ be full URL, but we have no HTTP_HOST wrapper yet??
+					header_redirect( regenerate_url( 'action' ) ); // TODO: this _should_ be full URL, but we have no HTTP_HOST wrapper yet??
 				}
 
 				if( $user_profile_only )
@@ -638,6 +638,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/03/14 22:56:28  blueyed
+ * Fix the URL we're redirecting to..
+ *
  * Revision 1.7  2006/03/12 23:08:57  fplanque
  * doc cleanup
  *
