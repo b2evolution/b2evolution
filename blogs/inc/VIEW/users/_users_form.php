@@ -116,7 +116,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('User') );
 
-$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Send an email').'" class="middle" /></a>';
+$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'">'.get_icon( 'play', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 
 if( ($url = $edited_User->get('url')) != '' )
 {
@@ -124,18 +124,18 @@ if( ($url = $edited_User->get('url')) != '' )
 	{
 		$url = 'http://'.$url;
 	}
-	$url_fieldnote = '<a href="'.$url.'" target="_blank"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Visit the site').'" class="middle" /></a>';
+	$url_fieldnote = '<a href="'.$url.'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
 }
 else
 	$url_fieldnote = '';
 
 if( $edited_User->get('icq') != 0 )
-	$icq_fieldnote = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$edited_User->get('icq').'" target="_blank"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Search on ICQ.com').'" class="middle" /></a>';
+	$icq_fieldnote = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$edited_User->get('icq').'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Search on ICQ.com')) ).'</a>';
 else
 	$icq_fieldnote = '';
 
 if( $edited_User->get('aim') != '' )
-	$aim_fieldnote = '<a href="aim:goim?screenname='.$edited_User->get('aim').'&amp;message=Hello"><img src="img/play.png" height="14" width="14" alt="&gt;" title="'.T_('Instant Message to user').'" class="middle" /></a>';
+	$aim_fieldnote = '<a href="aim:goim?screenname='.$edited_User->get('aim').'&amp;message=Hello">'.get_icon( 'play', 'imgtag', array('title'=>T_('Instant Message to user')) ).'</a>';
 else
 	$aim_fieldnote = '';
 
@@ -203,7 +203,7 @@ $Form->begin_fieldset( T_('Features') );
 	$Form->checkbox( 'edited_user_legend', $UserSettings->get('legend'), T_('Display icon legend'), T_('Display a legend at the bottom of every page including all action icons used on that page.') );
 	// To activate or deactivate bozo validator
 	$Form->checkbox( 'edited_user_bozo', $UserSettings->get('bozo'), T_('Use anti-bozo form validator'), T_('This will alert you if you fill in data into a form and try to leave the form before submitting the data.') );
-	
+
 $Form->end_fieldset();
 
 
@@ -265,6 +265,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/14 23:35:41  blueyed
+ * Fixed "play" icon
+ *
  * Revision 1.5  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

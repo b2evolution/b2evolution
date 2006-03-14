@@ -439,15 +439,20 @@ $map_iconfiles = array(
 		'size' => array( 16, 16 ),
 	),
 
+	'allowback' => array(
+		'file' => $rsc_subdir.'icons/tick.gif',
+		'alt'	 => T_('Allow back'),
+		'size' => array( 13, 13 ),
+	),
 	'ban' => array(
 		'file' => $rsc_subdir.'icons/noicon.gif', // TODO: make this transparent
 		'alt'  => /* TRANS: Abbrev. */ T_('Ban'),
 		'size' => array( 13, 13 ),
 	),
-	'allowback' => array(
-		'file' => $rsc_subdir.'icons/tick.gif',
-		'alt'	 => T_('Allow back'),
-		'size' => array( 13, 13 ),
+	'play' => array(
+		'file' => $rsc_subdir.'icons/play.png',
+		'alt'  => '&gt;',  // used to write an e-mail, visit site or contact through IM
+		'size' => array( 14, 14 ),
 	),
 );
 
