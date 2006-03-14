@@ -51,11 +51,11 @@ class AdminUI extends AdminUI_general
 	{
 		global $mode;
 
-		$this->headlines[] = '<link href="skins/evo/rsc/css/style.css" rel="stylesheet" type="text/css" title="Blue" />';
+		$this->headlines[] = '<link href="skins_adm/evo/rsc/css/style.css" rel="stylesheet" type="text/css" title="Blue" />';
 
 		if( $mode == 'sidebar' )
 		{ // Include CSS overrides for sidebar:
-			$this->headlines[] = '<link href="skins/evo/rsc/css/sidebar.css" rel="stylesheet" type="text/css" />';
+			$this->headlines[] = '<link href="skins_adm/evo/rsc/css/sidebar.css" rel="stylesheet" type="text/css" />';
 		}
 
 		return parent::get_headlines();
