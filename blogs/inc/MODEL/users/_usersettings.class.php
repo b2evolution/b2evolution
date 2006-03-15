@@ -148,15 +148,12 @@ class UserSettings extends AbstractSettings
 	{
 		global $Request;
 
-		// fp>> shoudn't we pass NULL instead of $default and resuse $default later if the param could not be found in user settings either?
 		$value = $Request->param( $var, $type, NULL, $memorize, $override, false ); // we pass NULL here, to see if it got set at all
 
-		if( isset($value) )
-		{
+		if( $value !== false )
+		{ // we got a value
 			$this->set( $var, $value );
 			$this->dbupdate();
-
-			return $value;
 		}
 		else
 		{ // get the value from user settings
@@ -166,17 +163,17 @@ class UserSettings extends AbstractSettings
 			{ // it's not saved yet and there's not default defined ($_defaults)
 				$value = $default;
 			}
-			$Request->set_param( $var, $value );
-
-			return $Request->get($var);
 		}
+
+		$Request->set_param( $var, $value );
+		return $Request->get($var);
 	}
 }
 
 
 /*
  * $Log$
- * Revision 1.5  2006/03/13 21:20:53  blueyed
+ * Revision 1.6  2006/03/15 00:24:59  blueyed
  * fixed UserSettings::param_Request()
  *
  * Revision 1.4  2006/03/12 23:09:00  fplanque
