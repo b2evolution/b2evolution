@@ -66,9 +66,12 @@ global $UserSettings;
 			{
 				echo get_icon('enabled', 'imgtag', array('title'=>T_('The plugin is enabled.')) );
 			}
+			elseif( $loop_Plugin->status == 'broken' )
+			{
+				echo get_icon('warning', 'imgtag', array('title'=>T_('The plugin is broken.')) );
+			}
 			else
 			{
-				// TODO: we might want an extra item for status == 'broken' here..
 				echo get_icon('disabled', 'imgtag', array('title'=>T_('The plugin is disabled.')) );
 			}
 			?>

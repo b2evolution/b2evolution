@@ -38,6 +38,16 @@ $current_User->check_perm( 'options', 'view', true );
 
 
 $admin_Plugins = new Plugins_admin();
+$admin_Plugins->restart();
+
+// Pre-walk list of plugins
+while( $loop_Plugin = & $admin_Plugins->get_next() )
+{
+	if( $loop_Plugin->status == 'broken' && ! isset( $admin_Plugins->plugin_errors[$loop_Plugin->ID] ) )
+	{ // The plugin is not "broken" anymore
+		$Plugins->set_Plugin_status( $loop_Plugin, 'disabled' );
+	}
+}
 
 
 /**
@@ -809,6 +819,23 @@ switch( $action )
 {
 	case 'edit_settings':
 		$AdminUI->append_to_titlearea( sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ) );
+
+		// Display load error from Plugins::register() (if any):
+		if( isset( $admin_Plugins->plugin_errors[$edit_Plugin->ID] )
+		    && ! empty($admin_Plugins->plugin_errors[$edit_Plugin->ID]['register']) )
+		{
+			$Messages->add( $admin_Plugins->plugin_errors[$edit_Plugin->ID]['register'], 'error' );
+		}
+
+		/**
+		 * @global string Contents of the Plugin's help file, if any. We search there for matching IDs/anchors to display links to them.
+		 */
+		$plugin_help_contents = '';
+
+		if( $help_file = $edit_Plugin->get_help_file() )
+		{
+			$plugin_help_contents = implode( '', file($help_file) );
+		}
 		break;
 
 	case 'disp_help':

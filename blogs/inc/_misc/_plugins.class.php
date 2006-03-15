@@ -159,6 +159,15 @@ class Plugins
 
 
 	/**
+	 * Errors associated to plugins (during loading), indexed by plugin_ID and
+	 * error class ("register").
+	 *
+	 * @var array
+	 */
+	var $plugin_errors = array();
+
+
+	/**
 	 * Constructor. Sets {@link $plugins_path} and load events.
 	 */
 	function Plugins()
@@ -820,8 +829,6 @@ class Plugins
 	 * This handles the indexes, dynamically unregisters a Plugin that does not exist (anymore)
 	 * and instantiates the Plugin's Settings.
 	 *
-	 * @todo When a Plugin does not exist anymore we might want to provide a link in
-	 *       "Tools / Plugins" to un-install it completely or handle it otherwise.. (deactivate)
 	 * @access private
 	 * @param string name of plugin class to instantiate and register
 	 * @param int ID in database (0 if not installed)
@@ -864,8 +871,18 @@ class Plugins
 				$r = 'Plugin class file ['.rel_path_to_base($classfile_path).'] not readable!'; // no translation, should not happen!
 				$Debuglog->add( $r, array( 'plugins', 'error' ) );
 
+				// Get the Plugin object (must not exist)
+				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, $classfile_path, false );
+				$this->plugin_errors[$ID]['register'] = $r;
+				$this->set_Plugin_status( $Plugin, 'broken' );
+
+				if( $this->is_admin_class )
+				{
+					$Timer->pause( 'plugins_register' );
+					return $Plugin;
+				}
+
 				// unregister:
-				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, $classfile_path, false ); // must not exist
 				$this->unregister( $Plugin );
 				$Debuglog->add( 'Unregistered plugin ['.$classname.']!', array( 'plugins', 'error' ) );
 
@@ -886,8 +903,18 @@ class Plugins
 				$r = sprintf( /* TRANS: First %s is the (class)name */ T_('Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined - it must match the filename.'), $classname, rel_path_to_base($classfile_path) );
 				$Debuglog->add( $r, array( 'plugins', 'error' ) );
 
+				// Get the Plugin object (must not exist)
+				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, $classfile_path, false );
+				$this->plugin_errors[$ID]['register'] = $r;
+				$this->set_Plugin_status( $Plugin, 'broken' );
+
+				if( $this->is_admin_class )
+				{
+					$Timer->pause( 'plugins_register' );
+					return $Plugin;
+				}
+
 				// unregister:
-				$Plugin = & $this->register( $classname, $ID, $priority, $apply_rendering, $classfile_path, false ); // must not exist
 				$this->unregister( $Plugin );
 				$Debuglog->add( 'Unregistered plugin ['.$classname.']!', array( 'plugins', 'error' ) );
 
@@ -896,7 +923,7 @@ class Plugins
 			}
 			else
 			{
-				$Plugin = new stdClass;	// COPY !
+				$Plugin = new Plugin;	// COPY !
 				$Plugin->code = NULL;
 				$Plugin->apply_rendering = 'never';
 			}
@@ -989,7 +1016,7 @@ class Plugins
 			}
 
 			if( empty($db_deltas) )
-			{ // No DB changes needed, bump the version
+			{ // No DB changes needed, update (bump or decrease) the version
 				global $DB;
 				$DB->query( '
 						UPDATE T_plugins
@@ -2391,6 +2418,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.20  2006/03/15 23:35:35  blueyed
+ * "broken" state support for Plugins: set/unset state, allowing to un-install and display error in "edit_settings" action
+ *
  * Revision 1.19  2006/03/15 21:02:04  blueyed
  * Display event status for all plugins with $admin_Plugins
  *

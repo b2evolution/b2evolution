@@ -37,17 +37,7 @@ global $edit_Plugin;
 global $admin_Plugins;
 
 global $edited_plugin_priority, $edited_plugin_code, $edited_plugin_apply_rendering, $admin_url;
-
-/**
- * @global string Contents of the Plugin's help file, if any. We search there for matching IDs/anchors to display links to them.
- */
 global $plugin_help_contents;
-$plugin_help_contents = '';
-
-if( $help_file = $edit_Plugin->get_help_file() )
-{
-	$plugin_help_contents = implode( '', file($help_file) );
-}
 
 
 $Form = & new Form( NULL, 'pluginsettings_checkchanges' );
@@ -160,6 +150,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.7  2006/03/15 23:35:38  blueyed
+ * "broken" state support for Plugins: set/unset state, allowing to un-install and display error in "edit_settings" action
+ *
  * Revision 1.6  2006/03/15 21:02:07  blueyed
  * Display event status for all plugins with $admin_Plugins
  *
