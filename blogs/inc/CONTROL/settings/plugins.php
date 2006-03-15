@@ -447,7 +447,7 @@ switch( $action )
 		else
 		{
 			$Messages->add( T_('The plugin has not been enabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
-			$admin_Plugins->set_Plugin_status( $edit_Plugin, 'disabled' ); // also unregisters it
+			$admin_Plugins->set_Plugin_status( $edit_Plugin, 'disabled' ); // does not unregister it
 		}
 
 		if( ! empty( $edit_Plugin->install_dep_notes ) )

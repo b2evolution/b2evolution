@@ -409,7 +409,7 @@ class Plugins
 			$this->load_plugins_table();
 			$this->load_events();
 		}
-		elseif( $this->is_admin_class )
+		elseif( ! $this->is_admin_class )
 		{
 			$this->unregister( $Plugin );
 		}
@@ -2385,6 +2385,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.18  2006/03/15 20:19:56  blueyed
+ * Do not unregister Plugin from $admin_Plugins if it does not get enabled on install.
+ *
  * Revision 1.17  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
