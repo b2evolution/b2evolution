@@ -1149,15 +1149,15 @@ class Item extends DataObject
 	}
 
 
-  /**
-   * Returns a permalink link to the Item
+	/**
+	 * Returns a permalink link to the Item
 	 *
 	 * Note: If you only want the permalink URL, use {@link Item::get_permanent_url()}
-   *
+	 *
 	 * @param string link text or special value: '#', '#icon#', '#text#', '#title#'
 	 * @param string link title
 	 * @param string class name
-   */
+	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '' )
 	{
 		global $current_User, $baseurl;
@@ -1194,16 +1194,16 @@ class Item extends DataObject
 	}
 
 
-  /**
-   * Displays a permalink link to the Item
-   *
+	/**
+	 * Displays a permalink link to the Item
+	 *
 	 * Note: If you only want the permalink URL, use {@link Item::permanent_url()}
 	 *
 	 * @param string link text or special value: '#', '#icon#', '#text#', '#title#'
 	 * @param string link title
 	 * @param string class name
-   */
-  function permanent_link( $text = '#', $title = '#', $class = '' )
+	 */
+	function permanent_link( $text = '#', $title = '#', $class = '' )
 	{
 		echo $this->get_permanent_link( $text, $title, $class );
 	}
@@ -2455,6 +2455,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2006/03/15 19:31:26  blueyed
+ * whitespace
+ *
  * Revision 1.15  2006/03/12 23:08:59  fplanque
  * doc cleanup
  *

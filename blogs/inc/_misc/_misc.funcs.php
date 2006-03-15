@@ -2077,9 +2077,10 @@ function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array()
  * @uses $map_iconfiles
  * @param string icon for what? (key)
  * @param string what to return for that icon ('imgtag', 'alt', 'file', 'url', 'size' {@link imgsize()})
- * @param array additional params ( 'class' => class name when getting 'imgtag',
-																		'size' => param for 'size',
-																		'title' => title attribute for imgtag)
+ * @param array additional params (
+ *              'class' => class name when getting 'imgtag',
+ *              'size' => param for 'size',
+ *              'title' => title attribute for 'imgtag')
  * @param boolean true to include this icon into the legend at the bottom of the page (works for 'imgtag' only)
  */
 function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legend = false )
@@ -2169,7 +2170,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			$r = '<img src="'.$baseurl.$iconfile.'" ';
 
 			// Include non CSS fallbacks:
-			$r .= 'border="0" align="top"';
+			$r .= 'border="0" align="top" ';
 
 			// Include class (will default to "middle"):
 			$r .= 'class="';
@@ -2505,7 +2506,7 @@ function decompact_date( $date )
 function format_phone( $phone, $hide_country_dialing_code_if_same_as_locale = true )
 {
 	global $CountryCache;
-	
+
 	$dialing_code = NULL;
 
 	if( substr( $phone, 0, 1 ) == '+' )
@@ -2517,37 +2518,37 @@ function format_phone( $phone, $hide_country_dialing_code_if_same_as_locale = tr
 	{	// The phone dialing code is same as locale and we want to hide it in this case
 		if( ( strlen( $phone ) - strlen( $dialing_code ) ) == 10 )
 		{	// We can format it like a french phone number ( 0x.xx.xx.xx.xx )
-			$phone_formated = format_french_phone( '0'.substr( $phone, strlen( $dialing_code )+1 ) ); 
+			$phone_formated = format_french_phone( '0'.substr( $phone, strlen( $dialing_code )+1 ) );
 		}
-		else 
+		else
 		{ // ( 0xxxxxxxxxxxxxx )
-			$phone_formated = '0'.substr( $phone, strlen( $dialing_code )+1 ); 
+			$phone_formated = '0'.substr( $phone, strlen( $dialing_code )+1 );
 		}
-		
+
 	}
 	elseif( !is_null( $dialing_code ) )
 	{	// Phone has a dialing code
 		if( ( strlen( $phone ) - strlen( $dialing_code ) ) == 10 )
 		{ // We can format it like a french phone number with the dialing code ( +dialing x.xx.xx.xx.xx )
-			$phone_formated = '+'.$dialing_code.format_french_phone( ' '.substr( $phone, strlen( $dialing_code )+1 ) ); 
+			$phone_formated = '+'.$dialing_code.format_french_phone( ' '.substr( $phone, strlen( $dialing_code )+1 ) );
 		}
 		else
 		{ // ( +dialing  xxxxxxxxxxx )
-			$phone_formated = '+'.$dialing_code.' '.substr( $phone, strlen( $dialing_code )+1 ); 
+			$phone_formated = '+'.$dialing_code.' '.substr( $phone, strlen( $dialing_code )+1 );
 		}
 	}
-	else 
-	{	
+	else
+	{
 		if( strlen( $phone ) == 10 )
 		{ //  We can format it like a french phone number ( xx.xx.xx.xx.xx )
 			$phone_formated = format_french_phone( $phone );
 		}
-		else 
+		else
 		{	// We don't format phone: TODO generic format phone ( xxxxxxxxxxxxxxxx )
 			$phone_formated = $phone;
 		}
 	}
-	
+
 	return $phone_formated;
 }
 
@@ -2688,8 +2689,8 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
- * Revision 1.15  2006/03/13 19:44:35  fplanque
- * no message
+ * Revision 1.16  2006/03/15 19:31:27  blueyed
+ * whitespace
  *
  * Revision 1.14  2006/03/12 23:09:01  fplanque
  * doc cleanup
