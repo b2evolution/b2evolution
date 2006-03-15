@@ -668,8 +668,8 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called when the admin tries to enable the plugin and also
-	 * after installation.
+	 * Event handler: Called when the admin tries to enable the plugin, changes
+	 * its configuration and after installation.
 	 *
 	 * Use this, if your plugin needs configuration before it can be used.
 	 *
@@ -1685,6 +1685,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.15  2006/03/15 21:04:36  blueyed
+ * Call Plugin::BeforeEnable also on configuration changes and disable the plugin, if it does not say "ok"
+ *
  * Revision 1.14  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

@@ -442,12 +442,12 @@ switch( $action )
 		$enable_return = $edit_Plugin->BeforeEnable();
 		if( $enable_return === true )
 		{
-			$admin_Plugins->set_Plugin_status( $edit_Plugin, 'enabled' );
+			$Plugins->set_Plugin_status( $edit_Plugin, 'enabled' );
 		}
 		else
 		{
 			$Messages->add( T_('The plugin has not been enabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
-			$admin_Plugins->set_Plugin_status( $edit_Plugin, 'disabled' ); // does not unregister it
+			$Plugins->set_Plugin_status( $edit_Plugin, 'disabled' ); // does not unregister it
 		}
 
 		if( ! empty( $edit_Plugin->install_dep_notes ) )
@@ -625,6 +625,17 @@ switch( $action )
 			$Messages->add( T_('Plugin events have been updated.'), 'success' );
 		}
 
+		// Check if it can stay enabled, if it is
+		if( $edit_Plugin->status == 'enabled' )
+		{
+			$enable_return = $edit_Plugin->BeforeEnable();
+			if( $enable_return !== true )
+			{
+				$Plugins->set_Plugin_status( $edit_Plugin, 'needs_config' );
+				$Messages->add( T_('The plugin has been disabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
+			}
+		}
+
 		break;
 
 
@@ -724,6 +735,17 @@ switch( $action )
 		if( $admin_Plugins->save_events( $edit_Plugin ) )
 		{
 			$Messages->add( T_('Plugin events have been updated.'), 'success' );
+		}
+
+		// Check if it can stay enabled, if it is
+		if( $edit_Plugin->status == 'enabled' )
+		{
+			$enable_return = $edit_Plugin->BeforeEnable();
+			if( $enable_return !== true )
+			{
+				$Plugins->set_Plugin_status( $edit_Plugin, 'needs_config' );
+				$Messages->add( T_('The plugin has been disabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
+			}
 		}
 
 		// blueyed>> IMHO it's good to see the new settings again. Perhaps we could use $action = 'list' for "Settings have not changed"?
