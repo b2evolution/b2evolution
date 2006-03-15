@@ -62,13 +62,13 @@ while( $Comment = & $CommentList->get_next() )
 					&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{ // There is an URL and we have permission to ban...
 				// TODO: really ban the base domain! - not by keyword
-				echo '<a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(getBaseDomain($Comment->author_url))
+				echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(getBaseDomain($Comment->author_url))
 					.'">'.get_icon( 'ban' ).'</a> ';
 			}
 			$Comment->author_email( '', ' &middot; Email: ' );
 			$Comment->author_ip( ' &middot; IP: ' );
 			echo ' &middot; ';
-			$Comment->spam_karma( T_('Karma').': %s%', T_('No karma') );
+			$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No spam karma available') );
 		 ?>
 		</div>
 		<div class="bCommentContent">
@@ -122,6 +122,9 @@ while( $Comment = & $CommentList->get_next() )
 <?php
 /*
  * $Log$
+ * Revision 1.7  2006/03/15 00:58:55  blueyed
+ * cosmetics
+ *
  * Revision 1.6  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
