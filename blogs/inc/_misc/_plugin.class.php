@@ -168,7 +168,7 @@ class Plugin
 
 
 	/**#@+
-	 * Variables below MUST NOT be overriden.
+	 * Variables below MUST NOT be overriden or changed by you!
 	 * @access private
 	 */
 
@@ -215,6 +215,8 @@ class Plugin
 
 	/**
 	 * The status of the plugin.
+	 *
+	 * Use {@link set_status()} to change it, if you need to.
 	 *
 	 * @var string Either 'enabled', 'disabled', 'needs_config' or 'broken'.
 	 */
@@ -1368,9 +1370,12 @@ class Plugin
 
 	/**
 	 * Get canonical name for database tables a plugin uses, by adding an unique
-	 * prefix for your plugin instance ("plugin_ID[ID]_").
+	 * prefix for your plugin instance.
 	 *
 	 * You should use this when refering to your SQL table names.
+	 *
+	 * E.g., for the "test_plugin" with ID 7 and the default {@link $tableprefix} of "evo_" it
+	 * would generate: "evo_plugin_test_7_log" for a requested name "log".
 	 *
 	 * @see Plugin::sql_delta()
 	 * @param string Your name, which gets returned with the unique prefix.
@@ -1380,7 +1385,8 @@ class Plugin
 	{
 		global $tableprefix;
 
-		return $tableprefix.'plugin_ID'.$this->ID.'_'.$name;
+		// NOTE: table name length seems limited to 64 chars (MySQL 5) - classname is limited to 40 (in T_plugins)
+		return $tableprefix.'plugin_'.preg_replace( '#_plugin$#', '', $this->classname ).'_'.$this->ID.'_'.$name;
 	}
 
 
@@ -1685,6 +1691,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.16  2006/03/15 23:30:20  blueyed
+ * Use plugin classname in SQL table name.
+ *
  * Revision 1.15  2006/03/15 21:04:36  blueyed
  * Call Plugin::BeforeEnable also on configuration changes and disable the plugin, if it does not say "ok"
  *
