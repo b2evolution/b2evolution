@@ -530,7 +530,7 @@ function rel_path_to_base( $path )
 
 	if( $debug )
 	{
-		$r .= ' [DEBUG: '.$path;
+		$r .= ' [DEBUG: '.$path.']';
 	}
 
 	return $r;
@@ -675,6 +675,9 @@ function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = N
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/15 22:53:31  blueyed
+ * cosmetic
+ *
  * Revision 1.3  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *
