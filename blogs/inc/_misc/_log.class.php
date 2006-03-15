@@ -603,10 +603,21 @@ class Log_noop {
 	function display()
 	{
 	}
+
+
+	/**
+	 * This is a no-operation method.
+	 */
+	function add_messages()
+	{
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/15 00:53:54  blueyed
+ * Added Log_noop::add_messages()
+ *
  * Revision 1.3  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
