@@ -107,6 +107,12 @@ $Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced')
 <div id="clickdiv_pluginevents">
 
 <?php
+
+if( $edit_Plugin->status != 'enabled' )
+{
+	echo '<p class="notes">'.T_('Note: the plugin is not enabled.').'</p>';
+}
+
 $enabled_events = $admin_Plugins->get_enabled_events( $edit_Plugin->ID );
 $supported_events = $admin_Plugins->get_supported_events();
 $registered_events = $admin_Plugins->get_registered_events( $edit_Plugin );
@@ -154,6 +160,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.6  2006/03/15 21:02:07  blueyed
+ * Display event status for all plugins with $admin_Plugins
+ *
  * Revision 1.5  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

@@ -142,7 +142,8 @@ class Plugins
 	 */
 
 	/**
-	 * @var string SQL to use in {@link load_plugins_table()}. Gets overwritten by {@link Plugins_admin}.
+	 * @var string SQL to use in {@link load_plugins_table()}. Gets overwritten for {@link Plugins_admin}.
+	 * @static
 	 */
 	var $sql_load_plugins_table = '
 			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version FROM T_plugins
@@ -393,6 +394,11 @@ class Plugins
 	 * Sets the status of a Plugin in DB and registers it into the internal indices when "enabled".
 	 * Otherwise it gets unregisters, but only when we're not in {@link Plugins_admin}, because we
 	 * want to keep it in then in our indices.
+	 *
+	 * {@internal
+	 * Note: this should probably always get called on the {@link $Plugins} object,
+	 *       not {@link $admin_Plugins}.
+	 * }}
 	 *
 	 * @param Plugin
 	 * @param string New status ("enabled", "disabled", "needs_config", "broken")
@@ -2069,7 +2075,7 @@ class Plugins
 
 
 	/**
-	 * (Re)load Plugin Events for enabled plugins.
+	 * (Re)load Plugin Events for enabled (normal use) or all (admin use) plugins.
 	 */
 	function load_events()
 	{
@@ -2082,7 +2088,7 @@ class Plugins
 				SELECT pevt_plug_ID, pevt_event
 					FROM T_pluginevents INNER JOIN T_plugins ON pevt_plug_ID = plug_ID
 				 WHERE pevt_enabled > 0
-				   AND plug_status = "enabled"
+				 '.( $this->is_admin_class ? '' : 'AND plug_status = "enabled"' ).'
 				 ORDER BY plug_priority', OBJECT, 'Loading plugin events' ) as $l_row )
 		{
 			$this->index_event_IDs[$l_row->pevt_event][] = $l_row->pevt_plug_ID;
@@ -2385,6 +2391,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.19  2006/03/15 21:02:04  blueyed
+ * Display event status for all plugins with $admin_Plugins
+ *
  * Revision 1.18  2006/03/15 20:19:56  blueyed
  * Do not unregister Plugin from $admin_Plugins if it does not get enabled on install.
  *
