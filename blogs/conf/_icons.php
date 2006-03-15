@@ -199,7 +199,7 @@ $map_iconfiles = array(
 
 
 	'warning' => array(
-		'file' => $rsc_subdir.'icons/warning.png',
+		'file' => $rsc_subdir.'icons/warning.png', // TODO: not really transparent at its borders
 		'alt'  => T_('Warning'),
 		'size' => array( 16, 16 ),
 	),
