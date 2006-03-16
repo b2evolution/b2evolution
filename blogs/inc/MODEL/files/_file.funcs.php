@@ -361,8 +361,42 @@ function no_trailing_slash( $path )
 
 
 /**
+ * Returns canonicalized absolute pathname of a directory as with realpath() + ending slash
+ *
+ * (a)bsolute
+ * (d)irectory
+ * (s)lash termintaed
+ *
+ * @param string absolute path to be reduced ending with slash
+ * @return string|NULL absolute reduced path, slaah terminated or NULL if the path doesn't exist
+ */
+function get_ads_canonical_path( $ads_path )
+{
+	// Remove windows backslashes:
+	$ads_path = str_replace( '\\', '/', $ads_path );
+
+	$ads_realpath = realpath( $ads_path );
+
+	// pre_dump( 'realpath()', $ads_path, $ads_realpath );
+
+	if( empty( $ads_realpath ) )
+	{	// Path doesn't exist:
+		return NULL;
+	}
+
+	// Remove windows backslashes:
+	$ads_realpath = str_replace( '\\', '/', $ads_realpath );
+
+	return trailing_slash($ads_realpath);
+}
+
+
+/**
  * Returns canonicalized absolute pathname as with realpath(), except it will
  * also translate paths that don't exist on the system.
+ *
+ * @deprecated overly complex
+ * @todo remove
  *
  * @param string the path to be translated
  * @return array [0] = the translated path (with trailing slash); [1] = TRUE|FALSE (path exists?)
@@ -675,6 +709,9 @@ function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = N
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/16 19:26:04  fplanque
+ * Fixed & simplified media dirs out of web root.
+ *
  * Revision 1.4  2006/03/15 22:53:31  blueyed
  * cosmetic
  *

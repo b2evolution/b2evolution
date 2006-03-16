@@ -92,8 +92,8 @@ class FileRoot
 			case 'collection':
 				$Blog = & $BlogCache->get_by_ID( $root_in_type_ID );
 				$this->name = $Blog->get( 'shortname' );
-				$this->ads_path = $Blog->get( 'mediadir' );
-				$this->ads_url = $Blog->get( 'mediaurl' );
+				$this->ads_path = $Blog->getMediaDir();
+				$this->ads_url = $Blog->getMediaUrl();
 				return;
 		}
 
@@ -120,6 +120,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/16 19:26:04  fplanque
+ * Fixed & simplified media dirs out of web root.
+ *
  * Revision 1.2  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *

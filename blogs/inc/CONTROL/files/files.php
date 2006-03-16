@@ -48,13 +48,22 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 require_once $model_path.'files/_filelist.class.php';
 
+/**
+ * @var User
+ */
+global $current_User;
 
-$AdminUI->set_path( 'files' );
-
+// Check global access permissions:
+if( ! $Settings->get( 'fm_enabled' ) )
+{
+	die( 'The filemanager is disabled.' );
+}
 
 // Check permission:
-// $AdminUI checks for "$Settings->get( 'fm_enabled' ) && $current_User->check_perm( 'files', 'view' )"
+$current_User->check_perm( 'files', 'view', true );
 
+
+$AdminUI->set_path( 'files' );
 
 
 // INIT params:
@@ -119,12 +128,9 @@ if( ! $fm_FileRoot )
 }
 
 if( $fm_FileRoot )
-{ // We have access to the root:
-	list( $_ads_real_root_path, $real_root_path_exists ) = check_canonical_path( $fm_FileRoot->ads_path );
-	$Debuglog->add( 'FM: real_root_dir: '.var_export( $_ads_real_root_path, true ), 'files' );
-
-	if( ! $real_root_path_exists )
-	{
+{ // We have access to a file root:
+	if( empty($fm_FileRoot->ads_path) )
+	{	// Not sure it's possible to get this far, but just in case...
 		$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $fm_FileRoot->ads_path ), 'error' );
 	}
 	else
@@ -132,25 +138,17 @@ if( $fm_FileRoot )
 		// Let's get into requested list dir...
 		$ads_list_path = trailing_slash( $fm_FileRoot->ads_path.$path );
 
-		// get real cwd
-		list( $ads_real_list_path, $realpath_exists ) = check_canonical_path( $ads_list_path );
+		// Dereference any /../ just to make sure, and CHECK if directory exists:
+		$ads_list_path = get_ads_canonical_path( $ads_list_path );
 
-		if( ! preg_match( '#^'.preg_quote($fm_FileRoot->ads_path, '#').'#', $ads_real_list_path ) )
-		{ // cwd is not below root!
+		if( empty( $ads_list_path ) )
+		{ // does not exist
+			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
+		}
+		elseif( ! preg_match( '#^'.preg_quote($fm_FileRoot->ads_path, '#').'#', $ads_list_path ) )
+		{ // cwd is OUTSIDE OF root!
 			$Messages->add( T_( 'You are not allowed to go outside your root directory!' ), 'error' );
 			$ads_list_path = $fm_FileRoot->ads_path;
-		}
-		else
-		{ // allowed
-			if( ! $realpath_exists )
-			{ // does not exist
-				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $ads_list_path ), 'error' );
-				$ads_list_path = false;
-			}
-			else
-			{ // Okay we can list this directory...
-				$ads_list_path = $ads_real_list_path;
-			}
 		}
 	}
 }
@@ -1457,6 +1455,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.8  2006/03/16 19:26:04  fplanque
+ * Fixed & simplified media dirs out of web root.
+ *
  * Revision 1.7  2006/03/16 18:44:39  blueyed
  * Removed redundant (never reached) permission check.
  *

@@ -321,15 +321,15 @@ class Blog extends DataObject
 		switch( $this->media_location )
 		{
 			case 'default':
-				$mediadir = $basepath.$media_subdir.'blogs/'.$this->urlname.'/';
+				$mediadir = get_ads_canonical_path( $basepath.$media_subdir.'blogs/'.$this->urlname.'/' );
 				break;
 
 			case 'subdir':
-				$mediadir = $basepath.$media_subdir.$this->media_subdir;
+				$mediadir = get_ads_canonical_path( $basepath.$media_subdir.$this->media_subdir );
 				break;
 
 			case 'custom':
-				$mediadir = $this->media_fullpath;
+				$mediadir = get_ads_canonical_path( $this->media_fullpath );
 				break;
 
 			case 'none':
@@ -368,6 +368,41 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get the URL to the media folder
+	 *
+	 * @return string the URL
+	 */
+	function getMediaUrl()
+	{
+		global $media_url, $Settings, $Debuglog;
+
+		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
+		{ // User directories are disabled:
+			$Debuglog->add( 'Attempt to access blog media URL, but this feature is disabled', 'files' );
+			return false;
+		}
+
+		switch( $this->media_location )
+		{
+			case 'default':
+				return $media_url.'blogs/'.$this->urlname.'/';
+
+			case 'subdir':
+				return $media_url.$this->media_subdir;
+				break;
+
+			case 'custom':
+				return $this->media_url;
+
+			case 'none':
+			default:
+				$Debuglog->add( 'Attempt to access blog media url, but this feature is disabled for this blog', 'files' );
+				return false;
+		}
+	}
+
+
+	/**
 	 * Get a param.
 	 *
 	 * @return false|string The value as string or false in case of error (e.g. media dir is disabled).
@@ -378,36 +413,6 @@ class Blog extends DataObject
 
 		switch( $parname )
 		{
-			case 'mediadir':
-				// the path to the blog's media directory:
-				return $this->getMediaDir(); // this takes care of the 'fm_enable_roots_blog' setting
-
-			case 'mediaurl':
-				// the URL to the blog's media directory:
-				if( ! $Settings->get( 'fm_enable_roots_blog' ) )
-				{ // User directories are disabled:
-					$Debuglog->add( 'Attempt to access blog media URL, but this feature is disabled', 'files' );
-					return false;
-				}
-
-				switch( $this->media_location )
-				{
-					case 'default':
-						return $media_url.'blogs/'.$this->urlname.'/';
-
-					case 'subdir':
-						return $media_url.$this->media_subdir;
-						break;
-
-					case 'custom':
-						return $this->media_url;
-
-					case 'none':
-					default:
-						$Debuglog->add( 'Attempt to access blog media url, but this feature is disabled for this blog', 'files' );
-						return false;
-				}
-
 			case 'suburl':
 				return $this->gen_blogurl( 'default', false );
 
@@ -536,9 +541,9 @@ class Blog extends DataObject
 			 */
 			case 'blog_css':
 				if( $this->allowblogcss
-					&& file_exists( $this->get('mediadir').'style.css' ) )
+					&& file_exists( $this->getMediaDir().'style.css' ) )
 				{
-					return '<link rel="stylesheet" href="'.$this->get( 'mediaurl' ).'style.css" type="text/css" />';
+					return '<link rel="stylesheet" href="'.$this->getMediaUrl().'style.css" type="text/css" />';
 				}
 				else
 				{
@@ -746,6 +751,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/16 19:26:04  fplanque
+ * Fixed & simplified media dirs out of web root.
+ *
  * Revision 1.2  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *

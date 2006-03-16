@@ -255,7 +255,8 @@ class User extends DataObject
 			return false;
 		}
 
-		$userdir = $basepath.$media_subdir.'users/'.$this->login.'/';
+		$userdir = get_ads_canonical_path( $basepath.$media_subdir.'users/'.$this->login.'/' );
+
 		if( !is_dir( $userdir ) )
 		{
 			if( !is_writable( dirname($userdir) ) )
@@ -913,6 +914,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/16 19:26:04  fplanque
+ * Fixed & simplified media dirs out of web root.
+ *
  * Revision 1.2  2006/03/12 23:09:00  fplanque
  * doc cleanup
  *
