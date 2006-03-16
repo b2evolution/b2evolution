@@ -220,13 +220,16 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	if( $Settings->get( 'fm_enabled' ) )
 	{ // ---------- UPLOAD ----------
-		echo '<input id="itemform_button_files" type="button" value="Files" class="ActionButton"
-						onclick="pop_up_window( \'admin.php?ctrl=files&amp;mode=upload\', \'fileman_upload\' );" /> ';
+		if( $current_User->check_perm( 'files', 'view' ) )
+		{
+			echo '<input id="itemform_button_files" type="button" value="Files" class="ActionButton"
+			       onclick="pop_up_window( \'admin.php?ctrl=files&amp;mode=upload\', \'fileman_upload\' );" /> ';
+		}
 
 		if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
 		{
 			echo '<input id="itemform_button_upload" type="button" value="Upload" class="ActionButton"
-							onclick="pop_up_window( \'admin.php?ctrl=files&amp;mode=upload&amp;fm_mode=file_upload\', \'fileman_upload\' );" /> ';
+			       onclick="pop_up_window( \'admin.php?ctrl=files&amp;mode=upload&amp;fm_mode=file_upload\', \'fileman_upload\' );" /> ';
 		}
 	}
 
@@ -419,6 +422,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/16 18:41:45  blueyed
+ * Do not display "Files" button if no permission.
+ *
  * Revision 1.5  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
