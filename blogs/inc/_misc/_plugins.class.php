@@ -1825,6 +1825,8 @@ class Plugins
 
 		if( ! $Plugin )
 		{
+			global $Debuglog;
+			$Debuglog->add( 'No plugin available for code ['.$code.']!', array('plugins', 'error') );
 			return false;
 		}
 
@@ -2418,6 +2420,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.21  2006/03/16 19:58:18  blueyed
+ * Debug-output if call_by_code() finds no plugin
+ *
  * Revision 1.20  2006/03/15 23:35:35  blueyed
  * "broken" state support for Plugins: set/unset state, allowing to un-install and display error in "edit_settings" action
  *
