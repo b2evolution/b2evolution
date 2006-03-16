@@ -252,7 +252,7 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 	}
 	else
 	{
-		$link .= '/';
+		$link = trailing_slash( $link ); // there can already be a slash from a siteurl like 'http://example.com/'
 		$separator = '/';
 	}
 
@@ -289,6 +289,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/16 23:22:45  blueyed
+ * Fix extra slash in archive_link() for only "siteurl"
+ *
  * Revision 1.3  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
