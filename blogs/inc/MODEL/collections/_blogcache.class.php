@@ -53,10 +53,9 @@ class BlogCache extends DataObjectCache
 	 *
 	 * Load the cache if necessary
 	 *
-	 * @todo use cache
-	 * @todo check/enhance for other domains than $baseurl
+	 * This gets used in /index.php to detect blogs according to the requested HostWithPath
 	 *
-	 * @param string URL of object to load
+	 * @param string URL of object to load (this should the whole requested URL/path, e.g. "http://mr.example.com/permalink")
 	 * @param boolean false if you want to return false on error
 	 * @return Blog|false A Blog object on success, false on failure (may also halt!)
 	 */
@@ -68,9 +67,9 @@ class BlogCache extends DataObjectCache
 		$Debuglog->add( "Loading <strong>$this->objtype($req_url)</strong> into cache", 'dataobjects' );
 
 		$sql = "SELECT *
-						FROM $this->dbtablename
-						WHERE
-							( blog_siteurl = ".$DB->quote($req_url);
+		          FROM $this->dbtablename
+		         WHERE
+		         ( blog_siteurl != '' AND ".$DB->quote($req_url)." LIKE CONCAT( blog_siteurl, '%' ) ";
 
 		$parsedUrl = parse_url( $req_url );
 
@@ -221,6 +220,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/16 23:25:50  blueyed
+ * Fixed BlogCache::get_by_url(), so "siteurl" type blogs can finally get used.
+ *
  * Revision 1.2  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *
