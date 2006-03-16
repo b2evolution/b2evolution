@@ -978,7 +978,7 @@ class AdminUI_general
 	 */
 	function get_headlines()
 	{
-		$r = implode( "\n\t", $this->headlines );
+		$r = implode( "\n\t", $this->headlines )."\n\t";
 
 		return $r;
 	}
@@ -1283,6 +1283,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/16 18:54:53  fplanque
+ * no message
+ *
  * Revision 1.2  2006/03/12 23:09:30  fplanque
  * doc cleanup
  *
