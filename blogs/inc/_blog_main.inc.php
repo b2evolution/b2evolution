@@ -228,7 +228,7 @@ if( $resolve_extra_path )
 
 		if( $path_error == 404 )
 		{	// The request points to something we won't be able to resolve:
-			require dirname(__FILE__).'/_404_not_found.page.php'; // error & exit
+			require $view_path.'errors/_404_not_found.page.php'; // error & exit
 		}
 	}
 }
@@ -412,6 +412,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/16 23:33:53  blueyed
+ * Fixed path to 404-error-page
+ *
  * Revision 1.5  2006/03/12 23:46:13  fplanque
  * experimental
  *
