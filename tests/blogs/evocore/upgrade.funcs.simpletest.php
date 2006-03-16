@@ -602,11 +602,34 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 			)" );
 		$r = $this->db_delta_wrapper("
 			CREATE TABLE test_1 (
-				i SMALLINT KEY,
+				i SMALLINT KEY
 			)" );
+
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
-		$this->assertEqual( $r['test_1'][0]['query'], 'ALTER TABLE test_1 CHANGE COLUMN i i SMALLINT KEY, DROP PRIMARY KEY' );
+		$this->assertEqual( 'ALTER TABLE test_1 DROP PRIMARY KEY, CHANGE COLUMN i i SMALLINT KEY', $r['test_1'][0]['query'] );
+	}
+
+
+	function test_db_delta_no_drop_primary_if_not_changed()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				i INT( 10 ) NOT NULL DEFAULT '0',
+				v VARCHAR( 30 ) COLLATE latin1_german1_ci NOT NULL DEFAULT '',
+				PRIMARY KEY ( i, v )
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				i INT(11) UNSIGNED NOT NULL,
+				v VARCHAR( 30 ) NOT NULL,
+				PRIMARY KEY ( i, v )
+			)" );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 1 );
+		$this->assertEqual( 'ALTER TABLE test_1 CHANGE COLUMN i i INT(11) UNSIGNED NOT NULL', $r['test_1'][0]['query'] );
 	}
 
 }

@@ -480,9 +480,14 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 
 
 				// KEY
+				$has_inline_primary_key = false;
 				if( preg_match( '~^(.*) (?: \b (UNIQUE) (?:\s+ KEY)? | (?:PRIMARY \s+)? KEY \b ) (.*)$~ix', $field_to_parse, $match ) )
 				{ // fields got added to primary_key_fields and fields_with_keys before
 					$field_to_parse = $match[1].$match[3];
+					if( empty($match[2]) )
+					{
+						$has_inline_primary_key = true; // we need to DROP the PK if this column definition does not match
+					}
 				}
 
 
@@ -617,16 +622,23 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					pre_dump( strtolower($tablefield->Type), strtolower($fieldtype), $column_definition );
 					*/
 
-					if( in_array($fieldname_lowered, $existing_primary_fields) && ! $is_auto_increment )
+					$query = 'ALTER TABLE '.$table;
+
+					// Handle inline PRIMARY KEY definition:
+					if( in_array($fieldname_lowered, $existing_primary_fields)
+					    && $has_inline_primary_key // only DROP if PRIMARY KEY changes with this column definition
+					    && ! $is_auto_increment )
 					{ // the column is part of the PRIMARY KEY, which needs to get dropped before (we already handle that for AUTO_INCREMENT fields)
-						$column_definition .= ', DROP PRIMARY KEY';
+						$query .= ' DROP PRIMARY KEY,';
 						$existing_primary_fields = array(); // we expect no existing primary key anymore
 						unset( $obsolete_indices['PRIMARY'] );
 					}
 
+					$query .= ' CHANGE COLUMN '.$tablefield->Field.' '.$column_definition;
+
 					// Add a query to change the column type
 					$items[$table_lowered][] = array(
-						'query' => 'ALTER TABLE '.$table.' CHANGE COLUMN '.$tablefield->Field.' '.$column_definition,
+						'query' => $query,
 						'note' => 'Changed type of '.$table.'.'.$tablefield->Field.' from '.$tablefield->Type.' to '.$column_definition,
 						'type' => 'change_column' );
 				}
@@ -876,6 +888,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.9  2006/03/16 00:32:16  blueyed
+ * Fixed PK handling for inline definitions
+ *
  * Revision 1.8  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
