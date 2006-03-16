@@ -1,6 +1,8 @@
 <?php
 	/**
-	 * This is the template that displays (recursive) list of (sub)categories
+	 * This is the template that displays (recursive) list of (sub)categories.
+	 *
+	 * It calls a plugin by the 'evo_Cats' code, which you may do also directly in your skin.
 	 *
 	 * This file is not meant to be called directly.
 	 * It is meant to be called by an include in the _main.php template.
@@ -16,8 +18,8 @@
 	# You can customize the following as you wish:
 	if(!isset($cat_all)) $cat_all = /* TRANS: All categories, skin's categories list */ T_('All');	// Set to empty to hide
 	# global category list delimiters:
-	if(!isset($cat_main_start)) $cat_main_start = '';
-	if(!isset($cat_main_end)) $cat_main_end = '';
+	if(!isset($cat_main_start)) $cat_main_start = '<ul>';
+	if(!isset($cat_main_end)) $cat_main_end = '</ul>';
 	# Category delimiters:
 	if(!isset($cat_line_start)) $cat_line_start = '<li>';
 	if(!isset($cat_line_end)) $cat_line_end = '</li>';
@@ -32,7 +34,9 @@
 	// -------------------------- CATEGORIES INCLUDED HERE -----------------------------
 	// Call the Categories plugin:
 	$Plugins->call_by_code( 'evo_Cats', array(	// Add parameters below:
-			'title'=>'',
+			'block_start'=>'<div class="bSideItem">',
+			'block_end'=>'</div>',
+			'title'=>'', // e.g.: '<h3>'.T_('Categories').'</h3>'
 			'list_start'=>$cat_main_start,
 			'list_end'=>$cat_main_end,
 			'line_start'=>$cat_line_start,
