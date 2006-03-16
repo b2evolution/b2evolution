@@ -52,31 +52,13 @@ require_once $model_path.'files/_filelist.class.php';
 $AdminUI->set_path( 'files' );
 
 
-// Check global access permissions:
-if( ! $Settings->get( 'fm_enabled' ) )
-{
-	die( 'The filemanager is disabled.' );
-}
-
 // Check permission:
-if( ! $current_User->check_perm( 'files', 'view' ) )
-{
-	$Messages->add( T_('You have no permission to view files.') );
+// $AdminUI checks for "$Settings->get( 'fm_enabled' ) && $current_User->check_perm( 'files', 'view' )"
 
-	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-	$AdminUI->disp_html_head();
-
-	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-	$AdminUI->disp_body_top();
-
-	// Display body bottom, debug info and close </html>:
-	$AdminUI->disp_global_footer();
-	return;
-}
 
 
 // INIT params:
-if( param( 'root_and_path', '', '', false ) )	// not memorized, fp>> TODO: I really HATE to have un-typed params!! Best way to NOT KNOW what you're doing!
+if( param( 'root_and_path', 'string', '', false ) )	// not memorized (default)
 { // root and path together: decode and override (used in root switch select and "click tree")
 	$root_and_path = unserialize( $root_and_path ); // fp>> TODO: this sucks. Do not pass serialized vars through URL.
 	$root = $root_and_path['root'];
@@ -1475,6 +1457,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.7  2006/03/16 18:44:39  blueyed
+ * Removed redundant (never reached) permission check.
+ *
  * Revision 1.6  2006/03/13 21:20:53  blueyed
  * fixed UserSettings::param_Request()
  *
