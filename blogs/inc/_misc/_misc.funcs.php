@@ -405,9 +405,7 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 		#echo $dateformatstring, '<br />';
 
 		// protect special symbols, that date() would need proper locale set for
-		$protected_dateformatstring = preg_replace( '/(?<!\\\)([blDeFM])/',
-																								'@@@\\\$1@@@',
-																								$dateformatstring );
+		$protected_dateformatstring = preg_replace( '/(?<!\\\)([blDeFM])/', '@@@\\\$1@@@', $dateformatstring );
 
 		#echo $protected_dateformatstring, '<br />';
 
@@ -422,20 +420,20 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 
 			// replace special symbols
 			$r = str_replace( array(
-																'@@@b@@@',
-																'@@@l@@@',
-																'@@@D@@@',
-																'@@@e@@@',
-																'@@@F@@@',
-																'@@@M@@@',
-															),
-												array(  $istoday,
-																T_($weekday[$dateweekday]),
-																T_($weekday_abbrev[$dateweekday]),
-																T_($weekday_letter[$dateweekday]),
-																T_($month[$datemonth]),
-																T_($month_abbrev[$datemonth]) ),
-												$r );
+						'@@@b@@@',
+						'@@@l@@@',
+						'@@@D@@@',
+						'@@@e@@@',
+						'@@@F@@@',
+						'@@@M@@@',
+						),
+					array(  $istoday,
+						T_($weekday[$dateweekday]),
+						T_($weekday_abbrev[$dateweekday]),
+						T_($weekday_letter[$dateweekday]),
+						T_($month[$datemonth]),
+						T_($month_abbrev[$datemonth]) ),
+					$r );
 		}
 	}
 
@@ -517,26 +515,6 @@ function get_weekstartend( $date, $startOfWeek )
 	// pre_dump( 'weekstartend: ', date( 'Y-m-d', $week['start'] ), date( 'Y-m-d', $week['end'] ) );
 
 	return( $week );
-}
-
-
-// fp>> WHAT IS THAT???
-function antispambot($emailaddy, $mailto = 0)
-{
-	$emailNOSPAMaddy = '';
-	srand ((float) microtime() * 1000000);
-	for ($i = 0; $i < strlen($emailaddy); $i = $i + 1) {
-		$j = floor(rand(0, 1 + $mailto));
-		if ($j == 0) {
-			$emailNOSPAMaddy .= '&#' . ord( substr( $emailaddy, $i, 1 ) ). ';';
-		} elseif ($j == 1) {
-			$emailNOSPAMaddy .= substr($emailaddy, $i, 1);
-		} elseif ($j == 2) {
-			$emailNOSPAMaddy .= '%' . zeroise( dechex( ord( substr( $emailaddy, $i, 1 ) ) ), 2 );
-		}
-	}
-	$emailNOSPAMaddy = str_replace('@', '&#64;', $emailNOSPAMaddy);
-	return $emailNOSPAMaddy;
 }
 
 
@@ -641,6 +619,7 @@ function xmlrpc_getposttitle($content)
 	return($post_title);
 }
 
+
 /**
  * Also used by post by mail
  */
@@ -653,6 +632,7 @@ function xmlrpc_getpostcategory($content)
 
 	return false;
 }
+
 
 /*
  * xmlrpc_removepostdata(-)
@@ -1278,6 +1258,7 @@ function get_path( $which = '' )
 	return $basepath;
 }
 
+
 /*
  * autoquote(-)
  */
@@ -1314,6 +1295,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 
 	// minimum length: http://az.fr/
 	// TODO: fails on "http://blogs" (without trailing slash)  fp>> yes, "blogs" is not a valid domain name, allowing this could cause all sorts of unexpected problems
+	//                                                    blueyed>> So, "http://az.fr" isn't also?!
 	if( strlen($url) < 13 )
 	{ // URL too short!
 		$Debuglog->add( 'URL &laquo;'.$url.';&raquo; is too short!', 'error' );
@@ -1360,8 +1342,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 /**
  * Wrap pre tag around var_dump() for better debugging
  *
- * @param mixed variable to dump
- * @param string title to display
+ * @param, ... mixed variable(s) to dump
  */
 function pre_dump( $vars )
 {
@@ -1614,6 +1595,7 @@ function debug_info( $force = false )
 
 	if( $debug || $force )
 	{
+		$ReqHostPathQuery = $ReqHostPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
 		echo '<div class="debug"><h2>Debug info</h2>';
 
 		$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
@@ -1673,7 +1655,7 @@ function debug_info( $force = false )
 
 			if( isset($DB) )
 			{
-				echo '<a href="'.regenerate_url().'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br />';
+				echo '<a href="'.$ReqHostPathQuery.'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br />';
 			}
 
 			foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
@@ -1699,7 +1681,7 @@ function debug_info( $force = false )
 		$log_head_links = array();
 		foreach( $log_cats as $l_cat )
 		{
-			$log_head_links[] .= '<a href="'.$ReqHostPath.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+			$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
 		}
 		$log_container_head .= implode( ' | ', $log_head_links );
 		echo format_to_output(
@@ -1728,9 +1710,9 @@ function debug_info( $force = false )
 /**
  * Output Buffer handler.
  *
- * It will be set in /blogs/evocore/_main.inc.php and handle the output.
- * It strips every line and generates a md5-ETag, which is checked against the one eventually
- * being sent by the browser.
+ * It will be set in /inc/_main.inc.php and handle the output (if enabled).
+ * It generates a md5-ETag, which is checked against the one eventually
+ * being sent by the browser, allowing us to just send a "304 Not modified" response.
  *
  * @param string output given by PHP
 */
@@ -1745,14 +1727,6 @@ function obhandler( $output )
 	if( !isset( $lastmodified ) )
 	{ // default of lastmodified is now
 		$lastmodified = $localtimenow;
-	}
-
-	// trim each line
-	$output = explode("\n", $output);
-	$out = '';
-	foreach ($output as $v)
-	{
-		$out .= trim($v)."\n";
 	}
 
 	if( $use_etags )
@@ -1788,10 +1762,8 @@ function obhandler( $output )
 
 
 	// GZIP encoding
-	if( $use_gzipcompression
-			&& isset($_SERVER['HTTP_ACCEPT_ENCODING'])
-			&& strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') )
-	{
+	if( $use_gzipcompression && isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') )
+	{ // requested/accepted by browser:
 		$out = gzencode($out);
 		header( 'Content-Encoding: gzip' );
 	}
@@ -1803,9 +1775,7 @@ function obhandler( $output )
 
 
 /**
- * Add param(s) at the end of an URL, using either ? or &amp; depending on exiting url
- *
- * url_add_param(-)
+ * Add param(s) at the end of an URL, using either "?" or "&amp;" depending on existing url
  *
  * @param string existing url
  * @param string params to add
@@ -1829,9 +1799,7 @@ function url_add_param( $url, $param, $moredelim = '&amp;' )
 
 
 /**
- * Add a tail (starting with /) at the end of an URL before any params (starting with ?)
- *
- * url_add_tail(-)
+ * Add a tail (starting with "/") at the end of an URL before any params (starting with "?")
  *
  * @param string existing url
  * @param string tail to add
@@ -1962,7 +1930,7 @@ function isRegexp( $RegExp )
 
 
 /**
- * Meant to replace error handler.
+ * Meant to replace error handler temporarily.
  *
  * @return integer number of errors
  */
@@ -1984,7 +1952,7 @@ function _trapError( $reset = 1 )
 
 
 /**
- * if first parameter evaluates to true printf() gets called using the first parameter
+ * If first parameter evaluates to true printf() gets called using the first parameter
  * as args and the second parameter as print-pattern
  *
  * @param mixed variable to test and print eventually
@@ -2285,6 +2253,7 @@ function bullet( $bool )
 	return get_icon( 'bullet_empty', 'imgtag' );
 }
 
+
 /**
  * Get list of client IP addresses from REMOTE_ADDR and HTTP_X_FORWARDED_FOR,
  * in this order. '' is used when no IP could be found.
@@ -2564,6 +2533,7 @@ function format_french_phone( $phone )
 					.'.'.substr($phone, 6, 2).'.'.substr($phone, 8, 2);
 }
 
+
 /**
  * Generate a link to a online help resource.
  * testing the concept of online help (aka webhelp).
@@ -2686,6 +2656,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.18  2006/03/17 17:36:27  blueyed
+ * Fixed debug_info() anchors one more time; general review
+ *
  * Revision 1.17  2006/03/17 00:07:51  blueyed
  * Fixes for blog-siteurl support
  *
