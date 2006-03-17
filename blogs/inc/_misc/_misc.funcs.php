@@ -1295,7 +1295,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 
 	// minimum length: http://az.fr/
 	// TODO: fails on "http://blogs" (without trailing slash)  fp>> yes, "blogs" is not a valid domain name, allowing this could cause all sorts of unexpected problems
-	//                                                    blueyed>> So, "http://az.fr" isn't also?!
+	//                                                    blueyed>> So, "http://az.fr" isn't also?!   fp>> Yeah right, let's waste our time discussing this... change it to 12.
 	if( strlen($url) < 13 )
 	{ // URL too short!
 		$Debuglog->add( 'URL &laquo;'.$url.';&raquo; is too short!', 'error' );
@@ -1344,7 +1344,7 @@ function validate_url( $url, & $allowed_uri_scheme )
  *
  * @param, ... mixed variable(s) to dump
  */
-function pre_dump( $vars )
+function pre_dump( $var__var__var__var__ )
 {
 	echo '<pre style="padding:1ex;border:1px solid #00f;">';
 	foreach( func_get_args() as $lvar )
@@ -2656,6 +2656,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.20  2006/03/17 21:28:40  fplanque
+ * no message
+ *
  * Revision 1.19  2006/03/17 18:49:00  blueyed
  * Log hits to the backoffice always as referer_type "blacklist"
  *

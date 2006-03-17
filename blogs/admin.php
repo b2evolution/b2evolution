@@ -22,15 +22,16 @@
 
 
 /**
+ * Do the MAIN initializations:
+ */
+require_once dirname(__FILE__).'/conf/_config.php';
+
+
+/**
  * @global boolean Is this an admin page? Use {@link is_admin_page()} to query it, because it may change.
  */
 $is_admin_page = true;
 
-
-/**
- * Do the MAIN initializations:
- */
-require_once dirname(__FILE__).'/conf/_config.php';
 
 $login_required = true;
 require_once $inc_path.'_main.inc.php';

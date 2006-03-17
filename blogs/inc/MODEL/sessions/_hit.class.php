@@ -226,8 +226,8 @@ class Hit
 			// This is most probably referer spam,
 			// In order to preserve server resources, we're going to stop processing immediatly!!
 			require $view_path.'errors/_referer_spam.page.php';	// error & exit
+			exit(); // just in case.
 			// THIS IS THE END!!
-			return; // just for completeness and if someone should modify the error page to not exit.
 		}
 
 
@@ -700,4 +700,11 @@ class Hit
 	}
 
 }
+
+/*
+ * $Log$
+ * Revision 1.9  2006/03/17 21:28:40  fplanque
+ * no message
+ *
+ */
 ?>

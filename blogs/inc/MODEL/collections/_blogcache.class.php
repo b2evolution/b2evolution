@@ -237,7 +237,7 @@ class BlogCache extends DataObjectCache
 		// We force a full load!
 		$this->load_all();
 
-		return parent::option_list( $default, $allow_none, 'name' );
+		parent::option_list( $default, $allow_none, 'name' );
 	}
 
 
@@ -260,6 +260,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/17 21:28:40  fplanque
+ * no message
+ *
  * Revision 1.4  2006/03/17 21:13:13  blueyed
  * Improved caching
  *
