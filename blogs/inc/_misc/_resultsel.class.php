@@ -267,7 +267,7 @@ function selection_checkbox( $item_ID, $param_prefix )
 
 	if( $current_User->check_perm( 'selections', 'edit' ) )
 	{	// User is allowed to edit
-		$r .= '<span name="surround_check" class="checkbox_surround_init"><input type="checkbox" class="checkbox" name="'.$param_prefix.'items[]" value='.$item_ID;
+		$r .= '<span name="surround_check" class="checkbox_surround_init"><input type="checkbox" class="checkbox" name="'.$param_prefix.'items[]" value="'.$item_ID.'"';
 		if( in_array( $item_ID, $cols_check ) )
 		{	// already in selection:
 			$r .= ' checked="checked" ';
@@ -592,6 +592,9 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/17 18:05:44  fplanque
+ * bugfixes
+ *
  * Revision 1.2  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

@@ -30,7 +30,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		<h1><?php echo T_('Access denied') ?></h1>
 		<p><?php echo T_('Sorry, you have no permission to access this section.') ?></p>
 	</div>
-	<p style="text-align:center;"><?php echo$app_exit_links ?></p>
+	<p style="text-align:center;"><?php echo $app_exit_links ?></p>
 
 	<?php debug_info(); ?>
 </body>

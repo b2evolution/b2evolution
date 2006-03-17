@@ -361,7 +361,7 @@ function no_trailing_slash( $path )
 
 
 /**
- * Returns canonicalized absolute pathname of a directory as with realpath() + ending slash
+ * Returns canonicalized absolute pathname of a directory + ending slash
  *
  * (a)bsolute
  * (d)irectory
@@ -375,9 +375,15 @@ function get_ads_canonical_path( $ads_path )
 	// Remove windows backslashes:
 	$ads_path = str_replace( '\\', '/', $ads_path );
 
-	$ads_realpath = realpath( $ads_path );
+	$ads_path = str_replace( '//', '/', $ads_path );
+	$ads_path = str_replace( '/./', '/', $ads_path );
+	while( ($ads_realpath = preg_replace( '#/([^/]+)/../#', '/', $ads_path )) != $ads_path )
+	{
+		// echo '*';
+		$ads_path = $ads_realpath;
+	}
 
-	// pre_dump( 'realpath()', $ads_path, $ads_realpath );
+	// pre_dump( 'get_ads_canonical_path()', $ads_path, $ads_realpath );
 
 	if( empty( $ads_realpath ) )
 	{	// Path doesn't exist:
@@ -709,6 +715,9 @@ function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = N
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/17 18:05:44  fplanque
+ * bugfixes
+ *
  * Revision 1.5  2006/03/16 19:26:04  fplanque
  * Fixed & simplified media dirs out of web root.
  *
