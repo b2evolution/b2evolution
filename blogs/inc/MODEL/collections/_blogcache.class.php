@@ -39,6 +39,16 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobjectcache.class.php';
 class BlogCache extends DataObjectCache
 {
 	/**
+	 * @var array Cache by absolute siteurl
+	 */
+	var $cache_siteurl_abs = array();
+
+	/**
+	 * @var array Cache by urlname
+	 */
+	var $cache_urlname = array();
+
+	/**
 	 * Constructor
 	 */
 	function BlogCache()
@@ -46,6 +56,24 @@ class BlogCache extends DataObjectCache
 		parent::DataObjectCache( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID' );
 	}
 
+
+	/**
+	 * Add object to cache, handling our own indices.
+	 *
+	 * @param Blog
+	 * @return boolean True on add, false if already existing.
+	 */
+	function add( & $Blog )
+	{
+		if( ! empty($Blog->siteurl) && preg_match( '~^https?://~', $Blog->siteurl ) )
+		{ // absolute siteurl
+			$this->cache_siteurl_abs[ $Blog->siteurl ] = & $Blog;
+		}
+
+		$this->cache_urlname[ $Blog->urlname ] = & $Blog;
+
+		return parent::add( $Blog );
+	}
 
 
 	/**
@@ -63,17 +91,24 @@ class BlogCache extends DataObjectCache
 	{
 		global $DB, $Debuglog, $baseurl;
 
+		foreach( array_keys($this->cache_siteurl_abs) as $siteurl_abs )
+		{
+			if( strpos( $req_url, $siteurl ) === 0 )
+			{ // found in cache
+				return $this->cache_siteurl_abs[$siteurl_abs];
+			}
+		}
+
 		// Load just the requested object:
 		$Debuglog->add( "Loading <strong>$this->objtype($req_url)</strong> into cache", 'dataobjects' );
 
-		$sql = "SELECT *
-		          FROM $this->dbtablename
-		         WHERE
-		         ( blog_siteurl != '' AND ".$DB->quote($req_url)." LIKE CONCAT( blog_siteurl, '%' ) ";
+		$sql = "
+				SELECT *
+				  FROM $this->dbtablename
+				 WHERE (
+					( blog_siteurl REGEXP '^https?://' AND ".$DB->quote($req_url)." LIKE CONCAT( blog_siteurl, '%' ) ) ";
 
-		$parsedUrl = parse_url( $req_url );
-
-		// Match stubs like "http://base/url/STUB?param=1"
+		// Match stubs like "http://base/url/STUB?param=1" on $baseurl
 		if( preg_match( "#^$baseurl([^/?]+)#", $req_url, $match ) )
 		{
 			$sql .= "\n OR ( blog_access_type = 'stub' AND blog_stub = '".$match[1]."' )";
@@ -85,7 +120,7 @@ class BlogCache extends DataObjectCache
 
 		if( empty( $row ) )
 		{ // Requested object does not exist
-			if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
+			if( $halt_on_error ) debug_die( "Requested $this->objtype does not exist!" );
 
 			$r = false;
 			return $r; // we return by reference!
@@ -99,11 +134,9 @@ class BlogCache extends DataObjectCache
 
 
 	/**
-	 * Get an object from cache by its URL name
+	 * Get an object from cache by its URL name.
 	 *
-	 * Load the cache if necessary
-	 *
-	 * @todo use cache
+	 * Load the object into cache, if necessary.
 	 *
 	 * @param string URL name of object to load
 	 * @param boolean false if you want to return false on error
@@ -113,15 +146,22 @@ class BlogCache extends DataObjectCache
 	{
 		global $DB, $Debuglog;
 
+		if( isset($this->cache_urlname[$req_urlname]) )
+		{
+			return $this->cache_urlname[$req_urlname];
+		}
+
 		// Load just the requested object:
 		$Debuglog->add( "Loading <strong>$this->objtype($req_urlname)</strong> into cache", 'dataobjects' );
-		$sql = "SELECT *
-						FROM $this->dbtablename
-						WHERE blog_urlname = ".$DB->quote($req_urlname);
+		$sql = "
+				SELECT *
+				  FROM $this->dbtablename
+				 WHERE blog_urlname = ".$DB->quote($req_urlname);
 		$row = $DB->get_row( $sql );
+
 		if( empty( $row ) )
 		{ // Requested object does not exist
-			if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
+			if( $halt_on_error ) debug_die( "Requested $this->objtype does not exist!" );
 			$r = false;
 			return $r;
 		}
@@ -186,7 +226,7 @@ class BlogCache extends DataObjectCache
 	/**
 	 * Display form option list with cache contents
 	 *
-	 * Loads the whole cache!!!
+	 * Loads the whole cache!
 	 *
 	 * @todo is it good to load all entries here? check usage! (Default blog/linkblog selecrtion, MT plugin...)
 	 * @param integer selected ID
@@ -197,14 +237,14 @@ class BlogCache extends DataObjectCache
 		// We force a full load!
 		$this->load_all();
 
-		parent::option_list( $default, $allow_none, 'name' );
+		return parent::option_list( $default, $allow_none, 'name' );
 	}
 
 
 	/**
 	 * Returns form option list with cache contents
 	 *
-	 * Load the cache if necessary
+	 * Loads the whole cache!
 	 *
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID 0
@@ -220,6 +260,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/17 21:13:13  blueyed
+ * Improved caching
+ *
  * Revision 1.3  2006/03/16 23:25:50  blueyed
  * Fixed BlogCache::get_by_url(), so "siteurl" type blogs can finally get used.
  *
