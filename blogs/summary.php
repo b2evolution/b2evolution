@@ -27,9 +27,9 @@ require_once $inc_path.'_main.inc.php';
 <!-- InstanceBeginEditable name="doctitle" -->
 <meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 <title><?php echo T_('Summary Demo'); ?></title>
-<!-- InstanceEndEditable --> 
+<!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
- <!-- InstanceEndEditable --> 
+ <!-- InstanceEndEditable -->
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 </head>
 <body>
@@ -82,9 +82,9 @@ require_once $inc_path.'_main.inc.php';
 
 
 <?php // --------------------------- BLOG LIST -----------------------------
-	for( $blog=blog_list_start('stub');
+	for( $blog=blog_list_start();
 				$blog!=false;
-				 $blog=blog_list_next('stub') )
+				 $blog=blog_list_next() )
 	{ # by uncommenting the following lines you can hide some blogs
 		// if( $blog == 1 ) continue; // Hide blog 1...
 		?>
@@ -111,9 +111,9 @@ require_once $inc_path.'_main.inc.php';
 	// ---------------------------------- END OF BLOG LIST --------------------------------- ?>
 <!-- InstanceEndEditable --></div>
 <table cellspacing="3" class="wide">
-  <tr> 
+  <tr>
   <td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
-    
+
 	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="rsc/img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
   </tr>
 </table>

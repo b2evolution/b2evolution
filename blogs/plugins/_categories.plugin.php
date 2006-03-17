@@ -169,9 +169,9 @@ class categories_plugin extends Plugin
 		{ // We want to display cats for all blogs
 			echo $params['collist_start'];
 
-			for( $curr_blog_ID=blog_list_start('stub');
+			for( $curr_blog_ID=blog_list_start();
 						$curr_blog_ID!=false;
-						 $curr_blog_ID=blog_list_next('stub') )
+						 $curr_blog_ID=blog_list_next() )
 			{
 				if( ! blog_list_iteminfo('disp_bloglist', false) )
 				{ // Skip Blogs that should not get displayed in public blog list

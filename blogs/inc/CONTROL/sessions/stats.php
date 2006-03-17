@@ -49,9 +49,9 @@ param( 'action', 'string' );
 param( 'blog', 'integer', 0 );
 
 $blogListButtons = '<a href="'.regenerate_url( array('blog','page'), "blog=0" ).'" class="'.(( 0 == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.T_('None').'</a> ';
-for( $curr_blog_ID = blog_list_start('stub');
+for( $curr_blog_ID = blog_list_start();
 			$curr_blog_ID != false;
-			$curr_blog_ID = blog_list_next('stub') )
+			$curr_blog_ID = blog_list_next() )
 {
 	$blogListButtons .= '<a href="'.regenerate_url( array('blog','page'), "blog=$curr_blog_ID" ).'" class="'.(( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.blog_list_iteminfo('shortname',false).'</a> ';
 }
@@ -999,6 +999,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/17 20:48:16  blueyed
+ * Do not restrict to "stub" type blogs
+ *
  * Revision 1.4  2006/03/12 23:08:56  fplanque
  * doc cleanup
  *
