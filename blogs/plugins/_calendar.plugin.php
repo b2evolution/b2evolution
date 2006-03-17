@@ -824,6 +824,7 @@ class Calendar
 	 *
 	 * @todo fplanque>> I think there's a query-waste-fest going on inside here!
 	 * @todo fplanque>> Poor factorization.
+	 * @todo Include "protected"/"private" posts for current user
 	 *
 	 * @param string 'prev' / 'next'
 	 * @return array
@@ -978,6 +979,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.14  2006/03/17 17:55:32  blueyed
+ * todo
+ *
  * Revision 1.13  2006/03/12 23:09:27  fplanque
  * doc cleanup
  *
