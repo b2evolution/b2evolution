@@ -141,9 +141,10 @@ if( $fm_FileRoot )
 		// Dereference any /../ just to make sure, and CHECK if directory exists:
 		$ads_list_path = get_ads_canonical_path( $ads_list_path );
 
-		if( empty( $ads_list_path ) )
-		{ // does not exist
+		if( !is_dir( $ads_list_path ) )
+		{ // This should never happen, but just in case the diretcoty does not exist:
 			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
+			$ads_list_path = NULL;
 		}
 		elseif( ! preg_match( '#^'.preg_quote($fm_FileRoot->ads_path, '#').'#', $ads_list_path ) )
 		{ // cwd is OUTSIDE OF root!
@@ -1455,6 +1456,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.9  2006/03/17 20:57:26  fplanque
+ * just in case... (being a little paranoid with file management may save your day someday :P)
+ *
  * Revision 1.8  2006/03/16 19:26:04  fplanque
  * Fixed & simplified media dirs out of web root.
  *
