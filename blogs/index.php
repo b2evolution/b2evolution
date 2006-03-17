@@ -28,11 +28,6 @@ if( empty($blog) )
 { // No blog requested by URL param, let's try to match something in the URL
 	$Debuglog->add( 'No blog param received, checking extra path...', 'detectblog' );
 
-	// Construct full requested Host + Path:
-	// Note: on IIS you can receive 'off' in the HTTPS field!! :[
-	$ReqHostPath = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'].$ReqPath;
-	$Debuglog->add( 'Full requested Host + Path: '.$ReqHostPath, 'detectblog' );
-
 	if( preg_match( '#^(.+?)index.php/([^/]+)#', $ReqHostPath, $matches ) )
 	{ // We have an URL blog name:
 		$Debuglog->add( 'Found a potential URL blog name: '.$matches[2], 'detectblog' );

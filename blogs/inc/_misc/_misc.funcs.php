@@ -1124,11 +1124,11 @@ function forget_param( $var )
  *
  * @param mixed string (delimited by commas) or array of params to ignore (can be regexps in /.../)
  * @param mixed string or array of param(s) to set
- * @param mixed string Alternative URL we want to point to if not the current $ReqPath
+ * @param mixed string Alternative URL we want to point to if not the current $ReqHostPath (absolute URL)
  */
 function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 {
-	global $Debuglog, $global_param_list, $ReqPath, $basehost;
+	global $Debuglog, $global_param_list, $ReqHostPath, $basehost;
 
 	// Transform ignore param into an array:
 	if( empty($ignore) )
@@ -1214,7 +1214,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 	}
 
 	// Construct URL:
-	$url = empty($pagefileurl) ? $ReqPath : $pagefileurl;
+	$url = empty($pagefileurl) ? $ReqHostPath : $pagefileurl;
 	if( !empty( $params ) )
 	{
 		$url = url_add_param( $url, implode( '&amp;', $params ) );
@@ -1609,7 +1609,7 @@ function debug_die( $last_words = '', $force = NULL, $very_last = '</body></html
  */
 function debug_info( $force = false )
 {
-	global $debug, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqURI;
+	global $debug, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHostPath;
 	global $cache_imgsize, $cache_File;
 
 	if( $debug || $force )
@@ -1673,7 +1673,7 @@ function debug_info( $force = false )
 
 			if( isset($DB) )
 			{
-				echo '<a href="'.format_to_output($ReqURI).'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br />';
+				echo '<a href="'.regenerate_url().'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br />';
 			}
 
 			foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
@@ -1699,7 +1699,7 @@ function debug_info( $force = false )
 		$log_head_links = array();
 		foreach( $log_cats as $l_cat )
 		{
-			$log_head_links[] .= '<a href="'.$ReqURI.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+			$log_head_links[] .= '<a href="'.$ReqHostPath.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
 		}
 		$log_container_head .= implode( ' | ', $log_head_links );
 		echo format_to_output(
@@ -2645,10 +2645,7 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
  */
 function is_admin_page()
 {
-	global $admin_url, $ReqPath;
-
-	// Note: on IIS you can receive 'off' in the HTTPS field!! :[
-	$ReqHostPath = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'].$ReqPath;
+	global $admin_url, $ReqHostPath;
 
 	return ( strpos( $ReqHostPath, $admin_url ) === 0 );
 }
@@ -2689,6 +2686,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.17  2006/03/17 00:07:51  blueyed
+ * Fixes for blog-siteurl support
+ *
  * Revision 1.16  2006/03/15 19:31:27  blueyed
  * whitespace
  *
@@ -2842,9 +2842,6 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
  *
  * Revision 1.137  2005/11/09 02:54:42  blueyed
  * Moved inclusion of _file.funcs.php to _misc.funcs.php, because at least bytesreable() gets used in debug_info()
- *
- * Revision 1.136  2005/11/08 19:22:21  blueyed
- * Fixed link to #evo_debug_queries (using $ReqURI)
  *
  * Revision 1.135  2005/11/07 02:13:22  blueyed
  * Cleaned up Sessions and extended Widget etc

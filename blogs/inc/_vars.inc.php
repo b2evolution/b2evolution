@@ -124,6 +124,14 @@ else
 	<?php
 }
 
+/**
+ * @global string Full requested Host + Path. This is our absolute URL.
+ *
+ * {@internal Note: on IIS you can receive 'off' in the HTTPS field!! :[ }}
+ */
+$ReqHostPath = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'].$ReqPath;
+
+$Debuglog->add( 'Full requested Host + Path: '.$ReqHostPath, 'vars' );
 $Debuglog->add( 'HTTP_HOST: '.$_SERVER['HTTP_HOST'], 'vars' );
 $Debuglog->add( '$ReqURI: '.$ReqURI, 'vars' );
 $Debuglog->add( '$ReqPath: '.$ReqPath, 'vars' );
@@ -237,6 +245,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/17 00:07:50  blueyed
+ * Fixes for blog-siteurl support
+ *
  * Revision 1.2  2006/03/12 23:08:53  fplanque
  * doc cleanup
  *
