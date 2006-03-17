@@ -2615,9 +2615,9 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
  */
 function is_admin_page()
 {
-	global $admin_url, $ReqHostPath;
+	global $is_admin_page;
 
-	return ( strpos( $ReqHostPath, $admin_url ) === 0 );
+	return isset($is_admin_page) && $is_admin_page === true; // check for type also, because of register_globals!
 }
 
 
@@ -2656,6 +2656,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.19  2006/03/17 18:49:00  blueyed
+ * Log hits to the backoffice always as referer_type "blacklist"
+ *
  * Revision 1.18  2006/03/17 17:36:27  blueyed
  * Fixed debug_info() anchors one more time; general review
  *

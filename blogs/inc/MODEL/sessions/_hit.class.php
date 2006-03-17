@@ -202,6 +202,18 @@ class Hit
 			}
 		}
 
+		if( empty($this->referer) )
+		{
+			$this->referer_type = 'direct';
+			return;
+		}
+
+		if( is_admin_page() )
+		{
+			$Debuglog->add( 'Referer is admin page.', 'hit' );
+			$this->referer_type = 'blacklist';
+			return;
+		}
 
 		// Check if the referer is valid and is not blacklisted:
 		if( $error = validate_url( $this->referer, $comments_allowed_uri_scheme ) )
@@ -215,6 +227,7 @@ class Hit
 			// In order to preserve server resources, we're going to stop processing immediatly!!
 			require $view_path.'errors/_referer_spam.page.php';	// error & exit
 			// THIS IS THE END!!
+			return; // just for completeness and if someone should modify the error page to not exit.
 		}
 
 
@@ -244,14 +257,7 @@ class Hit
 			}
 		}
 
-		if( !empty($this->referer) )
-		{
-			$this->referer_type = 'referer';
-		}
-		else
-		{
-			$this->referer_type = 'direct';
-		}
+		$this->referer_type = 'referer';
 	}
 
 
