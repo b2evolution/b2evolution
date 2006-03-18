@@ -60,6 +60,9 @@ else
 }
 
 
+/**
+ * TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
+ */
 function set_edited_Blog_from_params( $for )
 {
 	global $edited_Blog, $default_locale;
@@ -100,6 +103,7 @@ function set_edited_Blog_from_params( $for )
 
 
 			// abstract settings (determines blog_siteurl)
+			// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
 			param( 'blog_siteurl_type',     'string', $req ? true : 'relative' );
 			param( 'blog_siteurl_relative', 'string', $req ? true : '' );
 			param( 'blog_siteurl_absolute', 'string', $req ? true : '' );
@@ -555,6 +559,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/18 14:35:46  blueyed
+ * todo
+ *
  * Revision 1.2  2006/03/12 23:08:54  fplanque
  * doc cleanup
  *

@@ -102,6 +102,7 @@ class BlogCache extends DataObjectCache
 		// Load just the requested object:
 		$Debuglog->add( "Loading <strong>$this->objtype($req_url)</strong> into cache", 'dataobjects' );
 
+		// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
 		$sql = "
 				SELECT *
 				  FROM $this->dbtablename
@@ -260,6 +261,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/18 14:35:47  blueyed
+ * todo
+ *
  * Revision 1.5  2006/03/17 21:28:40  fplanque
  * no message
  *
