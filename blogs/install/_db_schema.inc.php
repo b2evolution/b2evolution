@@ -208,6 +208,7 @@ $schema_queries = array(
 			comment_content text NOT NULL,
 			comment_karma int(11) NOT NULL default '0',
 			comment_spam_karma TINYINT UNSIGNED NULL,
+			comment_allow_msgform TINYINT NOT NULL DEFAULT '0',
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_post_ID (comment_post_ID),
 			KEY comment_date (comment_date),
