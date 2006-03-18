@@ -55,6 +55,10 @@ class Comment extends DataObject
 	 * @var integer Spam karma of the comment (0-100), 0 being "probably no spam at all"
 	 */
 	var $spam_karma;
+	/**
+	 * @var boolean Does an anonymous user allow to send messages through a message form?
+	 */
+	var $allow_msgform;
 
 	/**
 	 * Constructor
@@ -95,6 +99,7 @@ class Comment extends DataObject
 			$this->date = $db_row['comment_date'];
 			$this->content = $db_row['comment_content'];
 			$this->spam_karma = $db_row['comment_spam_karma'];
+			$this->allow_msgform = $db_row['comment_allow_msgform'];
 		}
 	}
 
@@ -142,6 +147,60 @@ class Comment extends DataObject
 	function anchor()
 	{
 		echo '<a name="c'.$this->ID.'"></a>';
+	}
+
+
+	/**
+	 * Get the comment author's name.
+	 *
+	 * @return string
+	 */
+	function get_author_name()
+	{
+		if( isset($this->author_User) )
+		{
+			return $this->author_User->preferred_name( 'raw', false );
+		}
+		else
+		{
+			return $this->author;
+		}
+	}
+
+
+	/**
+	 * Get the EMail of the comment's author.
+	 *
+	 * @return string
+	 */
+	function get_author_email()
+	{
+		if( $this->author_User !== NULL )
+		{ // Author is a user
+			return $this->author_User->get('email');
+		}
+		else
+		{
+			return $this->author_email;
+		}
+	}
+
+
+	/**
+	 * Get the URL of the comment's author.
+	 *
+	 * @return string
+	 */
+	function get_author_url()
+	{
+		if( $this->author_User !== NULL )
+		{ // Author is a user
+			return $this->author_User->get('url');
+		}
+		else
+		{
+			return $this->author_url;
+		}
 	}
 
 
@@ -205,14 +264,7 @@ class Comment extends DataObject
 	 */
 	function author_email( $linktext='', $before='', $after='', $makelink = true )
 	{
-		if( $this->author_User !== NULL )
-		{ // Author is a user
-			$email = $this->author_User->get('email');
-		}
-		else
-		{
-			$email = $this->author_email;
-		}
+		$email = $this->get_author_email();
 
 		if( strlen( $email ) > 5 )
 		{ // If email exists:
@@ -236,14 +288,7 @@ class Comment extends DataObject
 	 */
 	function author_url( $linktext='', $before='', $after='', $makelink = true )
 	{
-		if( $this->author_User !== NULL )
-		{ // Author is a user
-			$url = $this->author_User->get('url');
-		}
-		else
-		{
-			$url = $this->author_url;
-		}
+		$url = $this->get_author_url();
 
 		if( strlen( $url ) > 10 )
 		{ // If URL exists:
@@ -389,6 +434,10 @@ class Comment extends DataObject
 		{ // This comment is from a visitor:
 			if( empty($this->author_email) )
 			{ // We have no email for this comment :(
+				return false;
+			}
+			elseif( empty($this->allow_msgform) )
+			{
 				return false;
 			}
 		}
@@ -754,6 +803,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2006/03/18 23:38:44  blueyed
+ * Decent getters; allow_msgform added
+ *
  * Revision 1.13  2006/03/18 19:17:53  blueyed
  * Removed remaining use of $img_url
  *
