@@ -63,6 +63,7 @@ foreach( $catsel as $k => $v )
 { // make sure this are all integers, to prevent SQL injection!
 	$catsel[$k] = (int)$v;
 }
+$Request->set_param( 'catsel', $catsel );
 // Let's compile those values right away (we use them in several different places):
 $cat_array = array();
 $cat_modifier = '';
@@ -416,7 +417,7 @@ else
 
 /*
  * $Log$
- * Revision 1.7  2006/03/18 14:21:41  blueyed
+ * Revision 1.8  2006/03/18 14:38:36  blueyed
  * fix
  *
  * Revision 1.6  2006/03/16 23:33:53  blueyed
