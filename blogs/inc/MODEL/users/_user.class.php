@@ -731,8 +731,6 @@ class User extends DataObject
 	 */
 	function get_msgform_link( $form_url = NULL, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
-		global $img_url;
-
 		if( empty($this->email) )
 		{ // We have no email for this User :(
 			return false;
@@ -914,6 +912,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/18 19:17:54  blueyed
+ * Removed remaining use of $img_url
+ *
  * Revision 1.3  2006/03/16 19:26:04  fplanque
  * Fixed & simplified media dirs out of web root.
  *

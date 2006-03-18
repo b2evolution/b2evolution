@@ -785,8 +785,8 @@ class Form extends Widget
 			$precision_mn = 1;
 			$precision_s = $matches[1];
 		}
-		
-		// Check if field value is only a time 
+
+		// Check if field value is only a time
 		if( strlen( $field_value ) <= 8 )
 		{	// Add date part:
 			$field_value = '2000-01-01 '.$field_value;
@@ -1645,7 +1645,7 @@ class Form extends Widget
 	 */
 	function textarea_input( $field_name, $field_value, $field_rows, $field_label, $field_params = array() )
 	{
-		global $img_url;
+		global $rsc_url;
 
 		if( !isset($field_params['cols']) )
 		{
@@ -1662,14 +1662,14 @@ class Form extends Widget
 		$r = $this->begin_field()
 			// NOTE: The following pixel is needed to avoid the dity IE textarea expansion bug
 			// see http://fplanque.net/2003/Articles/iecsstextarea/index.html
-			.'<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />'
+			.'<img src="'.$rsc_url.'img/blank.gif" width="1" height="1" alt="" />'
 			.'<textarea'
 			.get_field_attribs_as_string( $field_params )
 			.' rows="'.$field_rows.'">'
 			.format_to_output( $field_value, 'formvalue' )
 			.'</textarea>'
 			// NOTE: this one is for compensating the previous pixel in case of center aligns.
-			.'<img src="'.$img_url.'blank.gif" width="1" height="1" alt="" />'
+			.'<img src="'.$rsc_url.'img/blank.gif" width="1" height="1" alt="" />'
 			.$this->end_field();
 
 		return $this->display_or_return( $r );
@@ -2495,6 +2495,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.7  2006/03/18 19:17:54  blueyed
+ * Removed remaining use of $img_url
+ *
  * Revision 1.6  2006/03/13 19:44:35  fplanque
  * no message
  *

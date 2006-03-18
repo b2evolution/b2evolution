@@ -377,8 +377,6 @@ class Comment extends DataObject
 	 */
 	function msgform_link( $form_url, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
-		global $img_url;
-
 		if( $this->author_User !== NULL )
 		{ // This comment is from a registered user:
 			if( empty($this->author_User->email) )
@@ -756,6 +754,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2006/03/18 19:17:53  blueyed
+ * Removed remaining use of $img_url
+ *
  * Revision 1.12  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *

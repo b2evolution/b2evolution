@@ -281,7 +281,7 @@ require $inc_path.'_blog_main.inc.php';
 	</div>
 
 	<div class="bSideItem">
-		<h3><?php echo T_('Syndicate this blog') ?> <img src="<?php echo $img_url ?>xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
+		<h3><?php echo T_('Syndicate this blog') ?> <img src="<?php echo $rsc_url ?>img/xml.gif" alt="XML" width="36" height="14" class="middle" /></h3>
 
 
 			<ul>
@@ -295,7 +295,7 @@ require $inc_path.'_blog_main.inc.php';
 	</div>
 
 	<p class="center">powered by<br />
-	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $img_url ?>b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
+	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url ?>img/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
 
 </div>
 <!-- InstanceEndEditable --></div>

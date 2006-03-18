@@ -1459,7 +1459,7 @@ function pingback_ping( $m )
 function mwnewMediaObj($m) {
 		global $xmlrpcerruser,$tablecategories; // import user errcode value
 		global $blog_ID;
-		global $Settings, $img_url, $img_subdir, $baseurl,$fileupload_realpath,$fileupload_allowedtypes;
+		global $Settings, $baseurl,$fileupload_realpath,$fileupload_allowedtypes;
 		global $use_fileupload;
 		logIO("O","start of _newmediaobject...");
 		$blogid = $m->getParam(0);
@@ -2487,6 +2487,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.91  2006/03/18 19:17:54  blueyed
+ * Removed remaining use of $img_url
+ *
  * Revision 1.90  2006/03/12 23:09:31  fplanque
  * doc cleanup
  *

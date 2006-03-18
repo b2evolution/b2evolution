@@ -46,7 +46,7 @@ require_once $inc_path.'_blog_main.inc.php';
 <!-- InstanceBeginEditable name="doctitle" -->
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<title>Multiblog demo<?php request_title( ' - ', '', ' - ', 'htmlhead' ) ?></title>
-	<!-- InstanceEndEditable --> 
+	<!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->
 	<base href="<?php skinbase(); /* You're not using any skin here but this won't hurt. However it will be very helpful to have this here when you make the switch to a skin! */ ?>" />
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
@@ -57,7 +57,7 @@ require_once $inc_path.'_blog_main.inc.php';
 	<link rel="alternate" type="text/xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<link rel="pingback" href="<?php $Blog->disp( 'pingback_url', 'raw' ) ?>" />
-	<!-- InstanceEndEditable --> 
+	<!-- InstanceEndEditable -->
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 </head>
 <body>
@@ -96,7 +96,7 @@ require_once $inc_path.'_blog_main.inc.php';
 </div>
 
 <div class="pageHeaderEnd"></div>
-	  
+
 </div>
 </div>
 
@@ -286,14 +286,14 @@ require_once $inc_path.'_blog_main.inc.php';
 	</div>
 
 	<p class="center">powered by<br />
-	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $img_url ?>b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
+	<a href="http://b2evolution.net/" title="b2evolution home"><img src="<?php echo $rsc_url ?>img/b2evolution_button.png" alt="b2evolution" width="80" height="15" border="0" class="middle" /></a></p>
 
 </div>
 <!-- InstanceEndEditable --></div>
 <table cellspacing="3" class="wide">
-  <tr> 
+  <tr>
   <td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
-    
+
 	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="rsc/img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
   </tr>
 </table>

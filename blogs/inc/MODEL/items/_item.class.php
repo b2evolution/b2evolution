@@ -1046,8 +1046,6 @@ class Item extends DataObject
 	 */
 	function msgform_link( $form_url, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
-		global $img_url;
-
 		if( empty($this->Author->email) )
 		{ // We have no email for this Author :(
 			return false;
@@ -1082,8 +1080,6 @@ class Item extends DataObject
 	 */
 	function msgform_link_assigned( $form_url, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
-		global $img_url;
-
 		if( empty($this->assigned_User) || empty($this->assigned_User->email) )
 		{ // We have no email for this Author :(
 			return false;
@@ -2455,6 +2451,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2006/03/18 19:17:53  blueyed
+ * Removed remaining use of $img_url
+ *
  * Revision 1.16  2006/03/15 19:31:26  blueyed
  * whitespace
  *

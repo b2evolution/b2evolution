@@ -229,11 +229,11 @@ function form_hidden( $field_name, $field_value, $display = true )
 function form_textarea( $field_name, $field_value, $field_rows, $field_label,
 												$field_note = '', $field_cols = 50 , $field_class = '' )
 {
-	global $img_url;
+	global $rsc_url;
 
 	echo '<fieldset>';
 	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
-	echo '  <div class="input"><fieldset class="input"><img src="'.$img_url.'blank.gif" width="1" height="1" alt="" /><textarea name="', $field_name, '" id="', $field_name, '" rows="', $field_rows, '"  cols="', $field_cols, '"';
+	echo '  <div class="input"><fieldset class="input"><img src="'.$rsc_url.'img/blank.gif" width="1" height="1" alt="" /><textarea name="', $field_name, '" id="', $field_name, '" rows="', $field_rows, '"  cols="', $field_cols, '"';
 	if( !empty($field_class) )
 	{
 		echo ' class="', $field_class,'"';
@@ -537,6 +537,9 @@ function form_submit( $submit_attribs = '' )
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/18 19:17:54  blueyed
+ * Removed remaining use of $img_url
+ *
  * Revision 1.2  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
