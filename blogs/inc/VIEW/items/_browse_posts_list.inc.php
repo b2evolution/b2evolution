@@ -33,7 +33,7 @@ require_once $model_path.'items/_itemlist.class.php';
 global $Blog;
 
 global $dispatcher, $blog, $posts, $posts_per_page, $poststart, $postend, $c, $show_statuses, $ReqURI;
-global $edit_item_url, $delete_item_url, $htsrv_url;
+global $add_item_url, $edit_item_url, $delete_item_url, $htsrv_url;
 global $comment_allowed_tags, $comments_use_autobr;
 
 echo '<div class="NavBar">';
@@ -209,6 +209,9 @@ if( $MainList->get_total_num_posts() )
 <?php
 /*
  * $Log$
+ * Revision 1.7  2006/03/18 19:43:57  blueyed
+ * Missing globals
+ *
  * Revision 1.6  2006/03/18 18:31:53  blueyed
  * Fixed "new" icon
  *
