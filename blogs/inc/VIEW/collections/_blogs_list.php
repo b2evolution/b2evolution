@@ -38,6 +38,7 @@ global $current_User;
  */
 global $Settings;
 
+global $dispatcher;
 
 $count = 0;
 for( $curr_blog_ID = blog_list_start(); $curr_blog_ID != false; $curr_blog_ID = blog_list_next() )
@@ -143,8 +144,8 @@ else
 }
 
 if( $current_User->check_perm( 'blogs', 'create' ) )
-{ ?>
-	<p class="center"><a href="?ctrl=collections&amp;action=new"><img src="img/new.gif" width="13" height="13" class="middle" alt="" /> <?php echo T_('New blog...') ?></a></p>
-	<?php
-} ?>
+{
+	echo '<p class="center">'.action_icon( T_('New blog...'), 'new', url_add_param( $dispatcher, 'ctrl=collections&amp;action=new' ), T_('New blog...') ).'</p>';
+}
+?>
 </div>

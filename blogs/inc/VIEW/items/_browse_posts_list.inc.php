@@ -200,17 +200,18 @@ if( $MainList->get_total_num_posts() )
 ?>
 
 <p class="center">
-	<a href="<?php echo $add_item_url ?>"><img src="img/new.gif" width="13" height="13" class="middle" alt="" />
-		<?php echo T_('New post...') ?></a>
+	<?php
+	echo action_icon( T_('New post...'), 'new', $add_item_url, T_('New post...') );
+	?>
 </p>
+
 
 <?php
 /*
- * @movedTo _browse_posts_sidebar.inc.php
- */
-
-/*
  * $Log$
+ * Revision 1.6  2006/03/18 18:31:53  blueyed
+ * Fixed "new" icon
+ *
  * Revision 1.5  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

@@ -303,13 +303,18 @@ $ItemList->display_nav( 'footer' );
 ?>
 
 <p class="center">
-  <a href="<?php echo $add_item_url ?>"><img src="img/new.gif" width="13" height="13" class="middle" alt="" />
-    <?php echo T_('New post...') ?></a>
+	<?php
+	echo action_icon( T_('New post...'), 'new', $add_item_url, T_('New post...') );
+	?>
 </p>
+
 
 <?php
 /*
  * $Log$
+ * Revision 1.8  2006/03/18 18:31:53  blueyed
+ * Fixed "new" icon
+ *
  * Revision 1.7  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
