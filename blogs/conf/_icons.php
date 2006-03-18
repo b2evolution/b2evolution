@@ -9,6 +9,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Map of filenames for icons and their respective alt tag.
  *
+ * @todo For performance reasons this should probably be a function, so we do not call T_() for all icons always
+ *
  * @global array icon name => array( 'file', 'alt', 'size', 'class', 'rollover' )
  */
 $map_iconfiles = array(
