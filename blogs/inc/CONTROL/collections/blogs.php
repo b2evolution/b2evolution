@@ -306,7 +306,7 @@ switch($action)
 		echo '<h2>'.T_('New blog').':</h2>';
 
 		$next_action = 'create';
-		require dirname(__FILE__).'/_blogs_general.form.php';
+		$AdminUI->disp_view( 'collections/_blogs_general.form' );
 
 		echo '</div>';
 		break;
@@ -355,7 +355,7 @@ switch($action)
 			echo '</div>';
 
 			// List the blogs:
-			require dirname(__FILE__).'/_blogs_list.php';
+			$AdminUI->disp_view( 'collections/_blogs_list' );
 
 			break;
 		}
@@ -559,8 +559,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.3  2006/03/18 14:35:46  blueyed
- * todo
+ * Revision 1.4  2006/03/18 18:35:24  blueyed
+ * Fixed paths
  *
  * Revision 1.2  2006/03/12 23:08:54  fplanque
  * doc cleanup
