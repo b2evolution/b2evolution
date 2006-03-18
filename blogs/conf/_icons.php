@@ -350,7 +350,7 @@ $map_iconfiles = array(
 	),
 
 	'help' => array(
-		'file' => $rsc_subdir.'icons/icon_question.gif',
+		'file' => $rsc_subdir.'smilies/icon_question.gif', // TODO: should not be in "smilies" really
 		'alt'  => T_('Help'),
 		'size' => array( 15, 15 ),
 	),
