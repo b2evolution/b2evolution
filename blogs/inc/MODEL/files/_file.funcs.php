@@ -378,7 +378,7 @@ function get_ads_canonical_path( $ads_path )
 	$ads_path = str_replace( '//', '/', $ads_path );
 	$ads_path = str_replace( '/./', '/', $ads_path );
 	while( ($ads_realpath = preg_replace( '#/([^/]+)/../#', '/', $ads_path )) != $ads_path )
-	{
+	{ // comment?
 		// echo '*';
 		$ads_path = $ads_realpath;
 	}
@@ -715,6 +715,9 @@ function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = N
 
 /*
  * $Log$
+ * Revision 1.7  2006/03/18 14:21:16  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.6  2006/03/17 18:05:44  fplanque
  * bugfixes
  *
