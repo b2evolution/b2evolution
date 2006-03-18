@@ -59,6 +59,10 @@ $Request->param( 'unit', 'string', '', true );            // list unit: 'posts' 
 
 $Request->param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', '', true ); // List of cats to restrict to
 $Request->param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
+foreach( $catsel as $k => $v )
+{ // make sure this are all integers, to prevent SQL injection!
+	$catsel[$k] = (int)$v;
+}
 // Let's compile those values right away (we use them in several different places):
 $cat_array = array();
 $cat_modifier = '';
@@ -412,6 +416,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.7  2006/03/18 14:21:41  blueyed
+ * fix
+ *
  * Revision 1.6  2006/03/16 23:33:53  blueyed
  * Fixed path to 404-error-page
  *
