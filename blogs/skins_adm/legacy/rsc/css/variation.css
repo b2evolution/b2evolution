@@ -40,7 +40,7 @@ div.edit_actions input.SaveButton:hover,
 div.edit_actions input.DeleteButton:hover {
 	color:#333;
 	background-color: #fff;
-	background-image: url(../../../../img/desert-button-2.gif);
+	background-image: url(../img/desert-button-2.gif);
 	border: 1px solid #ccc5aa;
 }
 fieldset.submit input.SaveButton:hover,
@@ -53,7 +53,7 @@ input.CancelButton:hover
 {
 	color:#333;
 	background-color: #e1ddce;
-	background-image: url(../../../../img/desert-button.gif);
+	background-image: url(../img/desert-button.gif);
 	border: 1px solid #ccc5aa;
 }
 input.SaveButton:hover {

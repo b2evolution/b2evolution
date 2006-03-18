@@ -76,7 +76,7 @@ a.OtherBlog
 }
 a.ActionButton,
 a.DeleteButton {
-	background-image: url(../../../../img/legacy-button.gif);
+	background-image: url(../img/legacy-button.gif);
 	background-color: #fec;
 }
 a.OtherBlog:hover,
@@ -88,22 +88,22 @@ a.CurrentBlog:hover
 }
 a.ActionButton:hover {
 	background-color: #fff;
-	background-image: url(../../../../img/legacy-button.gif);
+	background-image: url(../img/legacy-button.gif);
 	border: 1px solid #fec;
 }
 a.DeleteButton:hover {
 	background-color: #fff;
-	background-image: url(../../../../img/legacy-button.gif);
+	background-image: url(../img/legacy-button.gif);
 	border: 1px solid #fec;
 }
 a.PublishButton {
-	background-image: url(../../../../img/legacy-button.gif);
+	background-image: url(../img/legacy-button.gif);
 	background-color: #fec;
 	border: 1px solid #ccc;
 }
 a.PublishButton:hover {
 	background-color: #fff;
-	background-image: url(../../../../img/legacy-button.gif);
+	background-image: url(../img/legacy-button.gif);
 	border: 1px solid #fec;
 }
 
@@ -115,7 +115,7 @@ input.DeleteButton,
 input.CancelButton,
 div.edit_actions input,
 div.PostActionsArea input {
-	background-image: url(../../../../img/legacy-button.gif);
+	background-image: url(../img/legacy-button.gif);
 	background-color: #fec;
 	border: 1px solid #ccc;
 
@@ -126,14 +126,14 @@ input.CancelButton:hover,
 div.edit_actions input:hover,
 div.PostActionsArea input:hover {
 	background-color: #fec;
-	background-image: url(../../../../img/legacy-button.gif);
+	background-image: url(../img/legacy-button.gif);
 	border: 1px solid #00b;
 
 }
 
 input.DeleteButton:hover {
 	background-color: #fec;
-	background-image: url(../../../../img/legacy-button.gif);
+	background-image: url(../img/legacy-button.gif);
 }
 
 /* Tables: */
@@ -174,7 +174,7 @@ tr.group td {
 
 /* Page layout: */
 #header {
-	background: url(../../../../img/bg_grey.gif) repeat-x bottom;
+	background: url(../img/bg_grey.gif) repeat-x bottom;
 }
 div.panelinfo {
 	clear: both;
@@ -185,16 +185,16 @@ div.panelinfo {
 }
 /* Main tabs: */
 ul.tabs li {
-	background:url(../../../../img/tabs_left_grey.gif) no-repeat left top;
+	background:url(../img/tabs_left_grey.gif) no-repeat left top;
 	border-bottom:1px solid #949494;
 }
 ul.tabs li a {
-	background: url(../../../../img/tabs_right_grey.gif) no-repeat right top;
+	background: url(../img/tabs_right_grey.gif) no-repeat right top;
 }
 /* Sub-tabs */
 div.panelblocktabs
 {
-	background: url(../../../../img/tabs_bg_grey.gif) repeat-x bottom;
+	background: url(../img/tabs_bg_grey.gif) repeat-x bottom;
 }
 div.tabbedpanelblock {
 	border: 1px solid #939393;
@@ -287,7 +287,7 @@ div.edit_toolbar {
 }
 div.edit_toolbar input {
 	background-color: #eee;
-	background-image: url(../../../../img/legacy-button-2.gif);
+	background-image: url(../img/legacy-button-2.gif);
 	border: 1px solid #ccc;
 
 }
