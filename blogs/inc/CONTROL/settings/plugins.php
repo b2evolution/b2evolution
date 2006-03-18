@@ -181,17 +181,17 @@ function _set_setting_by_path( & $Plugin, $path, $init_value = array(), $setting
 			unset($setting[$set_index]);
 		}
 		else
-		{
+		{ // Init entries:
 			$setting[$set_index] = $init_value;
 			foreach( $meta['entries'] as $k => $v )
 			{
-				if( isset( $meta['defaultvalue'] ) )
+				if( isset( $v['defaultvalue'] ) )
 				{ // set to defaultvalue
-					$setting[$set_index][$k] = $meta['defaultvalue'];
+					$setting[$set_index][$k] = $v['defaultvalue'];
 				}
 				else
 				{
-					if( isset($v['type']) && $v['type'] = 'array' )
+					if( isset($v['type']) && $v['type'] == 'array' )
 					{
 						$setting[$set_index][$k] = array();
 					}
@@ -646,6 +646,10 @@ switch( $action )
 			}
 		}
 
+		if( $Messages->count('error') )
+		{ // there were errors
+			$action = 'edit_settings';
+		}
 		break;
 
 

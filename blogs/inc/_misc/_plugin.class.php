@@ -274,7 +274,10 @@ class Plugin
 	 *     - 'select_group': a drop down field, providing all existing groups
 	 *     - 'select_user': a drop down field, providing all existing groups
 	 *     - 'array': a subset of settings. The following keys apply to this type:
-	 *       - 'entries': an array with the sub-settings (which can be everything from the top-level)
+	 *       - 'entries': an array with the sub-settings (which can be everything from the top-level, except:
+	 *                    "valid_pattern", "valid_range"). Note: currently there's no type forcing or checking
+	 *                    for sub-entries involved (e.g., if you have an entry of type "integer", you could get
+	 *                    a non-numeric string there).
 	 *       - 'max_count': maximum count of sets (optional, default is no restriction)
 	 *       - 'min_count': minimum count of sets (optional, default is no restriction)
 	 *   - 'note' (gets displayed as a note to the param field),
@@ -282,9 +285,11 @@ class Plugin
 	 *   - 'maxlength': maxlength attribute for the input field (See 'size' above; defaults to no limit)
 	 *   - 'allow_none': set this to true to have "None" in the options list for types
 	 *                   'select_group' and 'select_user'.
-	 *   - 'valid_pattern' (a regular expression pattern that the value must match).
-	 *                     This is either just a regexp pattern as string or an array
-	 *                     with the keys 'pattern' and 'error' to define a custom error message.
+	 *   - 'valid_pattern': A regular expression pattern that the value must match.
+	 *                      This is either just a regexp pattern as string or an array
+	 *                      with the keys 'pattern' and 'error' to define a custom error message.
+	 *   - 'valid_range': An array with keys 'min', 'max' and (optionally) 'error' to define
+	 *                    a custom error message. At least "min" or "max" must be given.
 	 *   - 'help': either the anchor in the internal help (first param to {@link get_help_icon()})
 	 *             or an array with all params to this method.
 	 *             E.g., 'param_explained' would link to the internal help's #classname_plugin_param_explained.
@@ -1691,6 +1696,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.17  2006/03/18 19:39:19  blueyed
+ * Fixes for pluginsettings; added "valid_range"
+ *
  * Revision 1.16  2006/03/15 23:30:20  blueyed
  * Use plugin classname in SQL table name.
  *

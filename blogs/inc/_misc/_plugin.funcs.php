@@ -74,7 +74,16 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 			$get_help_icon_params = $set_meta['help'];
 		}
 
-		$params['note'] .= ' '.call_user_func_array( array( & $Plugin, 'get_help_icon'), $get_help_icon_params );
+		// Add help icon to field's note:
+		$help_icon = call_user_func_array( array( & $Plugin, 'get_help_icon'), $get_help_icon_params );
+		if( isset($params['note']) )
+		{
+			$params['note'] .= ' '.$help_icon;
+		}
+		else
+		{
+			$params['note'] = $help_icon;
+		}
 	}
 	elseif( ! empty($plugin_help_contents) )
 	{ // Autolink to internal help, if a matching HTML ID is in there ([plug_classname]_[set_name])
@@ -115,7 +124,10 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 	}
 
 
-	if( isset($use_value) )
+	if( ( $set_value = $Request->get('edit_plugin_'.$Plugin->ID.'_set_'.$set_name) ) !== NULL )
+	{ // use value provided with Request!
+	}
+	elseif( isset($use_value) )
 	{
 		$set_value = $use_value;
 	}
@@ -128,7 +140,6 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 		{ // add error
 			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, NULL, $error_value ); // only add the error to the field
 		}
-
 	}
 
 	// Display input element:
@@ -191,7 +202,6 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 					foreach( $set_meta['entries'] as $l_set_name => $l_set_entry )
 					{
 						$l_value = isset($set_value[$k][$l_set_name]) ? $set_value[$k][$l_set_name] : NULL;
-
 						display_settings_fieldset_field( $set_name.'['.$k.']['.$l_set_name.']', $l_set_entry, $Plugin, $Form, $set_type, $l_value );
 					}
 					$insert_new_set_as = $k+1;
@@ -275,15 +285,15 @@ function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_ty
 		{
 			$l_param_type = 'string';
 		}
-		$l_value = param( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $l_param_type, $l_param_default );
+		$l_value = $Request->param( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $l_param_type, $l_param_default );
 
 		if( isset($l_meta['type']) && $l_meta['type'] == 'integer' && ! preg_match( '~^\d+$~', $l_value ) )
 		{
 			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, sprintf( T_('The value for %s must be numeric.'), $l_name ), T_('The value must be numeric.') );
-			$action = 'edit_settings';
 			continue;
 		}
 
+		// Check valid pattern:
 		if( isset($l_meta['valid_pattern']) )
 		{
 			$param_pattern = is_array($l_meta['valid_pattern']) ? $l_meta['valid_pattern']['pattern'] : $l_meta['valid_pattern'];
@@ -291,7 +301,37 @@ function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_ty
 			{
 				$param_error = is_array($l_meta['valid_pattern']) ? $l_meta['valid_pattern']['error'] : sprintf(T_('The value is invalid. It must match the regular expression &laquo;%s&raquo;.'), $param_pattern);
 				$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $param_error );
-				$action = 'edit_settings';
+				continue;
+			}
+		}
+
+		// Check valid range:
+		if( isset($l_meta['valid_range']) )
+		{
+			if( (isset($l_meta['valid_range']['min']) && $l_value < $l_meta['valid_range']['min'])
+			    || (isset($l_meta['valid_range']['max']) && $l_value > $l_meta['valid_range']['max']) )
+			{
+				if( isset($l_meta['valid_range']['error']) )
+				{
+					$param_error = $l_meta['valid_range']['error'];
+				}
+				else
+				{
+					if( isset($l_meta['valid_range']['min']) && isset($l_meta['valid_range']['max']) )
+					{
+						$param_error = sprintf(T_('The value is invalid. It must be in the range from %s to %s.'), $l_meta['valid_range']['min'], $l_meta['valid_range']['max']);
+					}
+					elseif( isset($l_meta['valid_range']['max']) )
+					{
+						$param_error = sprintf(T_('The value is invalid. It must be smaller than %s.'), $l_meta['valid_range']['max']);
+					}
+					else
+					{
+						$param_error = sprintf(T_('The value is invalid. It must be greater than %s.'), $l_meta['valid_range']['min']);
+					}
+				}
+
+				$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $param_error );
 				continue;
 			}
 		}
@@ -306,7 +346,6 @@ function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_ty
 		if( $error = $use_Plugins->call_method( $Plugin->ID, 'Plugin'.$set_type.'ValidateSet', $tmp_params ) )
 		{ // skip this
 			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $error );
-			$action = 'edit_settings';
 			continue;
 		}
 		$Plugin->$set_type->set( $l_name, $l_value );
@@ -317,6 +356,9 @@ function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_ty
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.5  2006/03/18 19:39:19  blueyed
+ * Fixes for pluginsettings; added "valid_range"
+ *
  * Revision 1.4  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
