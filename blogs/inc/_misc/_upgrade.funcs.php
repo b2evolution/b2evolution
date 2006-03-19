@@ -626,16 +626,19 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 
 				// See what DEFAULT we would get or want
 				$update_default = NULL;
+				$update_default_set = NULL;
 
 				if( $want_default !== false )
 				{
-					$update_default = $want_default_set;
+					$update_default = $want_default;
+					$update_default_set = $want_default_set;
 				}
 				else
 				{ // implicit default, see http://dev.mysql.com/doc/refman/4.1/en/data-type-defaults.html
 					if( preg_match( '~^(TINYINT|SMALLINT|MEDIUMINT|INTEGER|INT|BIGINT|REAL|DOUBLE|FLOAT|DECIMAL|DEC|NUMERIC)$~i', $fieldtype ) )
 					{ // numeric
-						$update_default = 0;
+						$update_default = '0';
+						$update_default_set = '0';
 					}
 					elseif( strtoupper($fieldtype) == 'TIMESTAMP' )
 					{ // TODO: the default should be current date and time for the first field - but AFAICS we won't have NULL fields anyway
@@ -643,14 +646,17 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					elseif( preg_match( '~^(DATETIME|DATE|TIME|YEAR)$~i', $fieldtype ) )
 					{
 						$update_default = '0'; // short form for various special "zero" values
+						$update_default_set = '0';
 					}
 					elseif( preg_match( '~^ENUM\(~i', $fieldtype ) )
 					{
-						$update_default = trim(substr( $fieldtype, 5, strpos($fieldtype, ',')-5 )); // first value
+						$update_default_set = trim(substr( $fieldtype, 5, strpos($fieldtype, ',')-5 )); // first value
+						$update_default = preg_replace( '~^(["\'])(.*)\1$~', '$2', $update_default_set ); // without quotes
 					}
 					else
 					{
-						$update_default = "''"; // empty string for string types
+						$update_default_set = "''"; // empty string for string types
+						$update_default = '';
 					}
 				}
 
@@ -681,13 +687,19 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					$queries[0] .= ' CHANGE COLUMN '.$tablefield->Field.' '.$column_definition;
 
 					// Handle changes from "NULL" to "NOT NULL"
-					if( $change_null && ! $want_null && isset($update_default) )
+					if( $change_null && ! $want_null && isset($update_default_set) )
 					{ // Prepend query to update NULL fields to default
-						array_unshift( $queries, 'UPDATE '.$table.' SET '.$fieldname.' = '.$update_default.' WHERE '.$fieldname.' IS NULL' );
+						array_unshift( $queries, 'UPDATE '.$table.' SET '.$fieldname.' = '.$update_default_set.' WHERE '.$fieldname.' IS NULL' );
 
 						if( substr( $tablefield->Type, 0, 5 ) == 'enum(' )
 						{
 							$existing_enum_field_values = preg_split( '~\s*,\s*~', substr( $tablefield->Type, 5, -1 ), -1, PREG_SPLIT_NO_EMPTY );
+
+							foreach( $existing_enum_field_values as $k => $v )
+							{
+								$existing_enum_field_values[$k] = preg_replace( '~^(["\'])(.*)\1$~', '$2', $v ); // strip quotes
+							}
+							
 							if( ! in_array( $update_default, $existing_enum_field_values ) )
 							{ // we cannot update straight to the new default, because it does not exist yet!
 
@@ -717,7 +729,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 								'type' => 'change_default' );
 						}
 					}
-					elseif( ! empty($tablefield->Default) )
+					elseif( ! empty($tablefield->Default) && $tablefield->Default != $update_default )
 					{ // No DEFAULT given, but it exists one, so drop it (IF not a TIMESTAMP or DATETIME field)
 						if( $tablefield->Type != 'timestamp' && $tablefield->Type != 'datetime' )
 						{
@@ -951,6 +963,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.12  2006/03/19 18:16:15  blueyed
+ * Fix for default updates
+ *
  * Revision 1.11  2006/03/19 17:58:12  blueyed
  * fix for DATETIME
  *
