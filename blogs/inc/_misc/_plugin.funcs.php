@@ -63,6 +63,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 		}
 	}
 
+	$help_icon = NULL;
 	if( isset($set_meta['help']) )
 	{ // explicit help linked/provided
 		if( is_string($set_meta['help']) )
@@ -76,14 +77,6 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 
 		// Add help icon to field's note:
 		$help_icon = call_user_func_array( array( & $Plugin, 'get_help_icon'), $get_help_icon_params );
-		if( isset($params['note']) )
-		{
-			$params['note'] .= ' '.$help_icon;
-		}
-		else
-		{
-			$params['note'] = $help_icon;
-		}
 	}
 	elseif( ! empty($plugin_help_contents) )
 	{ // Autolink to internal help, if a matching HTML ID is in there ([plug_classname]_[set_name])
@@ -91,7 +84,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 		$help_anchor = $Plugin->classname.'_'.preg_replace( array('~\]?\[\d+\]\[~', '~\]$~'), array('_',''), $set_name );
 		if( strpos($plugin_help_contents, 'id="'.$help_anchor.'"') )
 		{ // there's an ID for this setting in the help file
-			$params['note'] .= ' '.call_user_func_array( array( & $Plugin, 'get_help_icon'), array($set_name) );
+			$help_icon = call_user_func_array( array( & $Plugin, 'get_help_icon'), array($set_name) );
 		}
 	}
 
@@ -105,11 +98,14 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 		{
 			case 'begin_fieldset':
 				$fieldset_title = $set_label;
-				if( $debug )
+				if( isset($help_icon) )
 				{
-					$fieldset_title .= ' [debug: '.$set_name.']';
+					$Form->begin_fieldset( $fieldset_title, array(), array($help_icon) );
 				}
-				$Form->begin_fieldset( $fieldset_title );
+				else
+				{
+					$Form->begin_fieldset( $fieldset_title );
+				}
 				break;
 
 			case 'end_fieldset':
@@ -121,6 +117,16 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 				break;
 		}
 		return;
+	}
+
+	// Append help icon to note:
+	if( isset($params['note']) )
+	{
+		$params['note'] .= ' '.$help_icon;
+	}
+	else
+	{
+		$params['note'] = $help_icon;
 	}
 
 
@@ -356,6 +362,9 @@ function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_ty
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.6  2006/03/19 00:11:57  blueyed
+ * help icon for fieldsets
+ *
  * Revision 1.5  2006/03/18 19:39:19  blueyed
  * Fixes for pluginsettings; added "valid_range"
  *
