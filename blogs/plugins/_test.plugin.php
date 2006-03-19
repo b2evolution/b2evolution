@@ -275,8 +275,13 @@ class test_plugin extends Plugin
 	 */
 	function AdminTabAction()
 	{
-		$this->param_text = '<p>This is text from AdminTabAction for the TEST plugin.</p>'
+		$this->text_from_AdminTabAction = '<p>This is text from AdminTabAction for the TEST plugin.</p>'
 			.'<p>Here is a random number: '.rand( 0, 10000 ).'</p>';
+
+		if( $this->param_text = param( $this->get_class_id('text') ) )
+		{
+			$this->text_from_AdminTabAction .= '<p>You have said: '.$this->param_text.'</p>';
+		}
 	}
 
 
@@ -289,7 +294,19 @@ class test_plugin extends Plugin
 	{
 		echo 'Hello, this is the AdminTabPayload for the TEST plugin.';
 
-		echo $this->param_text;
+		echo $this->text_from_AdminTabAction;
+
+		// TODO: this is tedious.. should either be a global function (get_admin_Form()) or a plugin helper..
+		$Form = new Form();
+		$Form->begin_form();
+		$Form->hidden_ctrl(); // needed to pass the "ctrl=tools" param
+		$Form->hiddens_by_key( get_memorized() ); // needed to pass all other memorized params, especially "tab"
+
+		$Form->text_input( $this->get_class_id().'_text', $this->param_text, '20', 'Text' );
+
+		$Form->button_input(); // default "submit" button
+
+		$Form->end_form();
 	}
 
 
