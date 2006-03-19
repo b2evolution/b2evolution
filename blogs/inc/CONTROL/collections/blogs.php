@@ -97,9 +97,9 @@ function set_edited_Blog_from_params( $for )
 			$edited_Blog->set( 'keywords',      param( 'blog_keywords',      'string', $req ? true : '' ) );
 
 			// format html
-			$edited_Blog->set( 'tagline',       format_to_post( param( 'blog_tagline',  'html', $req ? true : '' ), 0, 0, $locales[ $edited_Blog->get('locale') ][ 'charset' ] ) );
-			$edited_Blog->set( 'longdesc',      format_to_post( param( 'blog_longdesc', 'html', $req ? true : '' ), 0, 0, $locales[ $edited_Blog->get('locale') ][ 'charset' ] ) );
-			$edited_Blog->set( 'notes',         format_to_post( param( 'blog_notes',    'html', $req ? true : '' ), 0, 0, $locales[ $edited_Blog->get('locale') ][ 'charset' ] ) );
+			$edited_Blog->set( 'tagline',       format_to_post( param( 'blog_tagline',  'html', $req ? true : '' ), 0, 0 ) );
+			$edited_Blog->set( 'longdesc',      format_to_post( param( 'blog_longdesc', 'html', $req ? true : '' ), 0, 0 ) );
+			$edited_Blog->set( 'notes',         format_to_post( param( 'blog_notes',    'html', $req ? true : '' ), 0, 0 ) );
 
 
 			// abstract settings (determines blog_siteurl)
@@ -559,6 +559,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/19 00:48:50  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.4  2006/03/18 18:35:24  blueyed
  * Fixed paths
  *
