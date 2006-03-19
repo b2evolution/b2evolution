@@ -125,7 +125,13 @@ else
 }
 
 /**
- * @global string Full requested Host + Path. This is our absolute URL.
+ * Full requested Host + Path. This is our absolute URL.
+ *
+ * Normally, you should use {@link regenerate_url()} to get the full URL, including query string.
+ *
+ * If not, append <code>( empty($_SERVER['QUERY_STRING']) ? '' : '?'.$_SERVER['QUERY_STRING'] )</code> to it.
+ *
+ * @global string
  *
  * {@internal Note: on IIS you can receive 'off' in the HTTPS field!! :[ }}
  */
@@ -245,6 +251,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/19 17:53:46  blueyed
+ * doc
+ *
  * Revision 1.3  2006/03/17 00:07:50  blueyed
  * Fixes for blog-siteurl support
  *
