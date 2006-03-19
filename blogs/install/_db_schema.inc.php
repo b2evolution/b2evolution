@@ -79,6 +79,7 @@ $schema_queries = array(
 			user_yim varchar(50) NULL,
 			user_locale varchar(20) DEFAULT 'en-EU' NOT NULL,
 			user_idmode varchar(20) NOT NULL DEFAULT 'login',
+			user_allow_msgform TINYINT NOT NULL DEFAULT '1',
 			user_notify tinyint(1) NOT NULL default 1,
 			user_showonline tinyint(1) NOT NULL default 1,
 			user_grp_ID int(4) NOT NULL default 1,

@@ -56,9 +56,10 @@ class Comment extends DataObject
 	 */
 	var $spam_karma;
 	/**
-	 * @var boolean Does an anonymous user allow to send messages through a message form?
+	 * @var boolean Does an anonymous commentator allow to send messages through a message form?
 	 */
 	var $allow_msgform;
+
 
 	/**
 	 * Constructor
@@ -428,6 +429,10 @@ class Comment extends DataObject
 			{ // We have no email for this Author :(
 				return false;
 			}
+			elseif( empty($this->author_User->allow_msgform) )
+			{ // User does not allow message form
+				return false;
+			}
 			$form_url = url_add_param( $form_url, 'recipient_id='.$this->author_User->ID );
 		}
 		else
@@ -437,13 +442,12 @@ class Comment extends DataObject
 				return false;
 			}
 			elseif( empty($this->allow_msgform) )
-			{
+			{ // Anonymous commentator does not allow message form (for this comment)
 				return false;
 			}
 		}
 
-		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID );
-		$form_url = url_add_param( $form_url, 'post_id='.$this->Item->ID );
+		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID.'&amp;post_id='.$this->Item->ID.'&amp;redirect_to='.regenerate_url() );
 
 		if( $title == '#' ) $title = T_('Send email to comment author');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
@@ -766,6 +770,8 @@ class Comment extends DataObject
 
 		$this->set( 'spam_karma', $spam_karma );
 
+		// TODO: use karma threshold and apply it (to status)!
+
 		$r = parent::dbinsert();
 
 		$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this ) );
@@ -803,6 +809,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2006/03/19 17:54:26  blueyed
+ * Opt-out for email through message form.
+ *
  * Revision 1.14  2006/03/18 23:38:44  blueyed
  * Decent getters; allow_msgform added
  *

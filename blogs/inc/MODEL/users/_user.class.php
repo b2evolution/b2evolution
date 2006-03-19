@@ -58,6 +58,10 @@ class User extends DataObject
 	var $level;
 	var $notify;
 	var $showonline;
+	/**
+	 * @var boolean Does the user accept emails through a message form?
+	 */
+	var $allow_msgform;
 
 	/**
 	 * Number of posts by this user. Use get_num_posts() to access this (lazy filled).
@@ -127,6 +131,7 @@ class User extends DataObject
 			$this->domain = '';
 			$this->browser = '';
 			$this->set( 'level', isset( $Settings ) ? $Settings->get('newusers_level') : 0 );
+			$this->set( 'allow_msgform', 1 );
 			$this->set( 'notify', 1  );
 			$this->set( 'showonline', 1 );
 			if( isset($localtimenow) )
@@ -165,6 +170,7 @@ class User extends DataObject
 			$this->browser = $db_row->user_browser;
 			$this->datecreated = $db_row->dateYMDhour;
 			$this->level = $db_row->user_level;
+			$this->allow_msgform = $db_row->user_allow_msgform;
 			$this->notify = $db_row->user_notify;
 			$this->showonline = $db_row->user_showonline;
 
@@ -735,6 +741,10 @@ class User extends DataObject
 		{ // We have no email for this User :(
 			return false;
 		}
+		if( empty($this->allow_msgform) )
+		{
+			return false;
+		}
 
 		if( is_null($form_url) )
 		{
@@ -742,7 +752,7 @@ class User extends DataObject
 			$form_url = isset($Blog) ? $Blog->get('msgformurl') : '';
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID );
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.regenerate_url() );
 
 		if( $title == '#' ) $title = T_('Send email to user');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
@@ -912,6 +922,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/19 17:54:26  blueyed
+ * Opt-out for email through message form.
+ *
  * Revision 1.4  2006/03/18 19:17:54  blueyed
  * Removed remaining use of $img_url
  *

@@ -93,7 +93,14 @@ if( count($values) )
 								VALUES '.implode( ', ', $values ) );
 }
 
-// TODO: Redirect is confusing, as it gives no feedback to the user..
+
+// Set Messages into user's session, so they get restored on the next page (after redirect):
+$action_Log = new Log();
+$action_Log->add( T_('Your profile has been updated.'), 'success' );
+
+$Session->set( 'Messages', $action_Log );
+
+
 header_nocache();
 header_redirect();
 ?>

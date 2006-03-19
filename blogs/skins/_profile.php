@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the template that displays the user profile form
+ * This is the template that displays the user profile form. It gets POSTed to /htsrv/profile_update.php.
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the _main.php template.
@@ -39,11 +39,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 if( ! is_logged_in() )
 { // must be logged in!
-	echo '<p>', T_( 'You are not logged in.' ), '</p>';
+	echo '<p class="error">'.T_( 'You are not logged in.' ).'</p>';
 	return;
 }
 // --- //
-param( 'redirect_to', 'string', '');
+param( 'redirect_to', 'string', '' );
 
 
 /**
@@ -69,6 +69,7 @@ $ProfileForm->select( 'newuser_idmode', $current_User->get('idmode'), array( &$c
 $ProfileForm->checkbox( 'newuser_showonline', $current_User->get( 'showonline' ), T_('Online'), T_('Check this to be displayed as online when visiting the site.') );
 $ProfileForm->select( 'newuser_locale', $current_User->get( 'locale' ), 'locale_options_return', T_('Locale'), '', 'bComment' );
 $ProfileForm->text_input( 'newuser_email', $current_User->get( 'email' ), 40, T_('Email'), array( 'maxlength' => 100, 'class' => 'bComment' ) );
+$ProfileForm->checkbox( 'newuser_allow_msgform', $current_User->get('allow_msgform'), T_('Message form'), T_('Check this to allow receiving emails through a message form.') );
 $ProfileForm->checkbox( 'newuser_notify', $current_User->get( 'notify' ), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
 $ProfileForm->text_input( 'newuser_url', $current_User->get( 'url' ), 40, T_('URL'), array( 'maxlength' => 100, 'class' => 'bComment' ) );
 $ProfileForm->text_input( 'newuser_icq', $current_User->get( 'icq' ), 40, T_('ICQ'), array( 'maxlength' => 10, 'class' => 'bComment' ) );

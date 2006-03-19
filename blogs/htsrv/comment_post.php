@@ -44,6 +44,7 @@ if( ! is_logged_in() )
 	param( 'email', 'string' );
 	param( 'url', 'string' );
 	param( 'comment_cookies', 'integer', 0 );
+	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
 
 	if ($require_name_email)
 	{ // Blog wants Name and EMail with comments
@@ -139,6 +140,7 @@ else
 	$Comment->set( 'author', $author );
 	$Comment->set( 'author_email', $email );
 	$Comment->set( 'author_url', $url );
+	$Comment->set( 'allow_msgform', $comment_allow_msgform );
 }
 $Comment->set( 'author_IP', $Hit->IP );
 $Comment->set( 'date', $now );
@@ -198,13 +200,22 @@ if( !is_logged_in() )
  */
 $Comment->send_email_notifications();
 
+
+// Set Messages into user's session, so they get restored on the next page (after redirect):
+// TODO: look at $Comment->status and use different messages
+$action_Log = new Log();
+$action_Log->add( T_('Your comment has been submitted.'), 'success' );
+$Session->set( 'Messages', $action_Log );
+
+
 header_nocache();
 header_redirect();
 
+
 /*
  * $Log$
- * Revision 1.59  2006/03/10 17:19:25  blueyed
- * *** empty log message ***
+ * Revision 1.60  2006/03/19 17:54:25  blueyed
+ * Opt-out for email through message form.
  *
  * Revision 1.58  2006/03/07 19:30:22  fplanque
  * comments

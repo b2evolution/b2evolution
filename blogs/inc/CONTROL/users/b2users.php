@@ -264,6 +264,7 @@ if( !$Messages->count('error') )
 			$Request->param_check_email( 'edited_user_msn', false );
 
 			param( 'edited_user_yim', 'string', true );
+			param( 'edited_user_allow_msgform', 'integer', 0 );
 			param( 'edited_user_notify', 'integer', 0 );
 			param( 'edited_user_showonline', 'integer', 0 );
 
@@ -290,6 +291,7 @@ if( !$Messages->count('error') )
 			$edited_User->set( 'aim', $edited_user_aim );
 			$edited_User->set( 'msn', $edited_user_msn );
 			$edited_User->set( 'yim', $edited_user_yim );
+			$edited_User->set( 'allow_msgform', $edited_user_allow_msgform );
 			$edited_User->set( 'notify', $edited_user_notify );
 			$edited_User->set( 'showonline', $edited_user_showonline );
 
@@ -375,7 +377,7 @@ if( !$Messages->count('error') )
 				if( $reload_page )
 				{ // save Messages and reload the current page through header redirection
 					$Session->set( 'Messages', $Messages );
-					header_redirect( regenerate_url( 'action' ) ); // TODO: this _should_ be full URL, but we have no HTTP_HOST wrapper yet??
+					header_redirect( regenerate_url( 'action' ) );
 				}
 
 				if( $user_profile_only )
@@ -638,6 +640,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/03/19 17:54:26  blueyed
+ * Opt-out for email through message form.
+ *
  * Revision 1.8  2006/03/14 22:56:28  blueyed
  * Fix the URL we're redirecting to..
  *

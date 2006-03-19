@@ -150,6 +150,7 @@ if( $action != 'view_user' )
 	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when visiting the site.') );
 	$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
 	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), array( 'note' => $email_fieldnote, 'maxlength' => 100, 'required' => true ) );
+	$Form->checkbox( 'edited_user_allow_msgform', $edited_User->get('allow_msgform'), T_('Message form'), T_('Check this to allow receiving emails through a message form.') );
 	$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
 	$Form->text_input( 'edited_user_url', $edited_User->url, 30, T_('URL'), array( 'note' => $url_fieldnote, 'maxlength' => 100 ) );
 	$Form->text_input( 'edited_user_icq', $edited_User->icq, 30, T_('ICQ'), array( 'note' => $icq_fieldnote, 'maxlength' => 10 ) );
@@ -170,7 +171,8 @@ else
 	$Form->info( T_('Show Online'), ($edited_User->dget('showonline')) ? T_('yes') : T_('no') );
 	$Form->info( T_('Locale'), $edited_User->dget('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
 	$Form->info( T_('Email'), $edited_User->dget('email'), $email_fieldnote );
-	$Form->info( T_('Notifications'), ($edited_User->dget('notify')) ? T_('yes') : T_('no') );
+	$Form->info( T_('Message form'), ($edited_User->dget('allow_msgform') ? T_('yes') : T_('no')) );
+	$Form->info( T_('Notifications'), ($edited_User->dget('notify') ? T_('yes') : T_('no')) );
 	$Form->info( T_('URL'), $edited_User->dget('url'), $url_fieldnote );
 	$Form->info( T_('ICQ'), $edited_User->dget('icq', 'formvalue'), $icq_fieldnote );
 	$Form->info( T_('AIM'), $edited_User->dget('aim'), $aim_fieldnote );
@@ -265,6 +267,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.7  2006/03/19 17:54:26  blueyed
+ * Opt-out for email through message form.
+ *
  * Revision 1.6  2006/03/14 23:35:41  blueyed
  * Fixed "play" icon
  *

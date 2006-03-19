@@ -192,7 +192,7 @@
 											T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), 40, 'bComment' );
 
 
-			$comment_options = '';
+			$comment_options = array();
 			$Form->output = false;
 			$Form->label_to_the_left = false;
 			$old_label_suffix = $Form->label_suffix;
@@ -200,13 +200,15 @@
 			$Form->switch_layout('inline');
 			if( substr($comments_use_autobr,0,4) == 'opt-')
 			{
-				$comment_options .= $Form->checkbox_input( 'comment_autobr', ($comments_use_autobr == 'opt-out'), T_('Auto-BR'), array(
-					'note' => '('.T_('Line breaks become &lt;br /&gt;').')', 'tabindex' => 6 ) ).'<br />';
+				$comment_options[] = $Form->checkbox_input( 'comment_autobr', ($comments_use_autobr == 'opt-out'), T_('Auto-BR'), array(
+					'note' => '('.T_('Line breaks become &lt;br /&gt;').')', 'tabindex' => 6 ) );
 			}
 			if( ! is_logged_in() )
 			{ // User is not logged in:
-				$comment_options .= $Form->checkbox_input( 'comment_cookies', true, T_('Remember me'), array(
+				$comment_options[] = $Form->checkbox_input( 'comment_cookies', true, T_('Remember me'), array(
 					'note' => '('.T_('Set cookies for name, email and url').')', 'tabindex' => 7 ) );
+				$comment_options[] = $Form->checkbox_input( 'comment_allow_msgform', true, T_('Allow message form'), array(
+					'note' => '('.T_('Allow users to contact you through a message form by email').')', 'tabindex' => 8 ) );
 			}
 			$Form->output = true;
 			$Form->label_to_the_left = true;
@@ -217,7 +219,7 @@
 			{
 				$Form->begin_fieldset();
 					echo $Form->begin_field( NULL, T_('Options'), true );
-					echo $comment_options;
+					echo implode( '<br />', $comment_options );
 					echo $Form->end_field();
 				$Form->end_fieldset();
 			}
@@ -228,7 +230,7 @@
 				?>
 				<div class="input">
 				<?php
-				$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID, 'class' => 'submit', 'value' => T_('Send comment'), 'tabindex' => 8 ) );
+				$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID, 'class' => 'submit', 'value' => T_('Send comment'), 'tabindex' => 9 ) );
 
 				$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );
 				?>

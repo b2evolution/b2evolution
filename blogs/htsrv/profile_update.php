@@ -48,8 +48,9 @@ param( 'newuser_msn', 'string', '' );
 param( 'newuser_yim', 'string', '' );
 param( 'newuser_url', 'string', '' );
 param( 'newuser_email', 'string', '' );
-param( 'newuser_notify', 'integer', 0 );
-param( 'newuser_showonline', 'integer', 0 );
+param( 'newuser_allow_msgform', 'integer', 0 ); // checkbox
+param( 'newuser_notify', 'integer', 0 );        // checkbox
+param( 'newuser_showonline', 'integer', 0 );    // checkbox
 param( 'pass1', 'string', '' );
 param( 'pass2', 'string', '' );
 
@@ -113,12 +114,24 @@ $current_User->set( 'msn', $newuser_msn );
 $current_User->set( 'yim', $newuser_yim );
 $current_User->set( 'idmode', $newuser_idmode );
 $current_User->set( 'locale', $newuser_locale );
+$current_User->set( 'allow_msgform', $newuser_allow_msgform );
 $current_User->set( 'notify', $newuser_notify );
 $current_User->set( 'showonline', $newuser_showonline );
-$current_User->dbupdate();
 
 
-// TODO: Redirect is confusing, as it gives no feedback to the user..
+// Set Messages into user's session, so they get restored on the next page (after redirect):
+$action_Log = new Log();
+if( $current_User->dbupdate() )
+{
+	$action_Log->add( T_('Your profile has been updated.'), 'success' );
+}
+else
+{
+	$action_Log->add( T_('Your profile has not been changed.'), 'note' );
+}
+
+$Session->set( 'Messages', $action_Log );
+
 header_nocache();
 header_redirect();
 ?>
