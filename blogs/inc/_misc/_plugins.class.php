@@ -262,17 +262,22 @@ class Plugins
 
 				'DisplayCommentFormButton' => '',
 				'DisplayCommentFormFieldset' => '',
+				'DisplayMessageFormButton' => '',
+				'DisplayMessageFormFieldset' => '',
 				'DisplayLoginFormFieldset' => T_('Called when displaying the "Login" form.'),
 				'DisplayRegisterFormFieldset' => T_('Called when displaying the "Register" form.'),
 
 				'CommentFormSent' => T_('Called when a comment form has been submitted.'),
 				'LoginAttempt' => T_('Called when a user tries to login.'),
 				'RegisterFormSent' => T_('Called when the "Register" form has been submitted.'),
+				'MessageFormSent' => T_('Called when the "Message to user" form has been submitted.'),
+				'MessageFormSentCleanup' => T_('Called after a email message has been sent through public form.'),
 
 				'GetKarmaForComment' => '',
 
 				// Other Plugins can use this:
 				'CaptchaValidated' => T_('Validate the test from CaptchaPayload to detect humans.'),
+				'CaptchaValidatedCleanup' => T_('Cleanup data used for CaptchaValidated.'),
 				'CaptchaPayload' => T_('Provide a turing test to detect humans.'),
 
 				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
@@ -2420,6 +2425,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.22  2006/03/19 19:02:51  blueyed
+ * New events for captcha plugins
+ *
  * Revision 1.21  2006/03/16 19:58:18  blueyed
  * Debug-output if call_by_code() finds no plugin
  *

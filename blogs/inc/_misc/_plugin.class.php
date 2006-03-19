@@ -928,6 +928,70 @@ class Plugin
 	// }}}
 
 
+	// Message form events: {{{
+
+	/**
+	 * Event handler: Called at the end of the frontend message form, which
+	 * allows to send an email to a user/commentator.
+	 *
+	 * You might want to use this to inject antispam payload to use in
+	 * in {@link MessageFormSent()}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the comment form generating object
+	 *   - 'recipient_ID': ID of the user (if any)
+	 *   - 'item_ID': ID of the item where the user clicked the msgform icon (if any)
+	 *   - 'comment_ID': ID of the comment where the user clicked the msgform icon (if any)
+	 */
+	function DisplayMessageFormFieldset( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called in the submit button section of the
+	 * frontend message form.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the comment form generating object
+	 *   - 'recipient_ID': ID of the user (if any)
+	 *   - 'item_ID': ID of the item where the user clicked the msgform icon (if any)
+	 *   - 'comment_ID': ID of the comment where the user clicked the msgform icon (if any)
+	 */
+	function DisplayMessageFormButton( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called when a message form got submitted.
+	 *
+	 * Add messages of category "error" to prevent the message from being sent.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'recipient_ID': ID of the user (if any)
+	 *   - 'item_ID': ID of the item where the user clicked the msgform icon (if any)
+	 *   - 'comment_ID': ID of the comment where the user clicked the msgform icon (if any)
+	 *   - 'message': The message to be sent (by reference)
+	 *   - 'message_footer': The footer of the message (by reference)
+	 */
+	function MessageFormSent( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called after a message has been sent through the public form.
+	 *
+	 * This is meant to cleanup generated data.
+	 */
+	function MessageFormSentCleanup()
+	{
+	}
+
+	// }}}
+
+
 	// Caching events: {{{
 
 	/**
@@ -1202,6 +1266,58 @@ class Plugin
 	 *   - 'pass_md5': user's md5 password
 	 */
 	function LoginAttempt( $params )
+	{
+	}
+
+	// }}}
+
+
+	// General events: {{{
+
+	/**
+	 * Event handler: general event to inject payload for a captcha test.
+	 *
+	 * This does not get called by b2evolution itself, but provides an interface
+	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
+	 * uses this event optionally to whitelist a user.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the form where payload should get added (by reference, OPTIONALLY!)
+	 *     If it's not given as param, you have to create an own form, if you need one.
+	 *   - 'key': A key that is associated to the caller of the event (string, OPTIONALLY!)
+	 * @return boolean True, if you have provided payload for a captcha test
+	 */
+	function CaptchaPayload()
+	{
+	}
+
+
+	/**
+	 * Event handler: general event to validate a captcha which payload was added
+	 * through {@link CaptchaPayload()}.
+	 *
+	 * This does not get called by b2evolution itself, but provides an interface
+	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
+	 * uses this event optionally to whitelist a user.
+	 *
+	 * @return boolean true if the catcha could be validated
+	 */
+	function CaptchaValidated()
+	{
+	}
+
+
+	/**
+	 * Event handler: general event to be called after an action has been taken, which
+	 * involved {@link CaptchaPayload()} and {@link CaptchaValidated()}.
+	 *
+	 * This is meant to cleanup generated data for the Captcha test.
+	 *
+	 * This does not get called by b2evolution itself, but provides an interface
+	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
+	 * uses this event optionally to whitelist a user.
+	 */
+	function CaptchaValidatedCleanup()
 	{
 	}
 
@@ -1696,6 +1812,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.18  2006/03/19 19:02:51  blueyed
+ * New events for captcha plugins
+ *
  * Revision 1.17  2006/03/18 19:39:19  blueyed
  * Fixes for pluginsettings; added "valid_range"
  *
