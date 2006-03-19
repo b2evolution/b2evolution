@@ -115,7 +115,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertTrue( isset( $r['test_1'] ) );
 		$this->assertEqual( count($r['test_1']), 1 );
-		$this->assertPattern( '~^ALTER TABLE test_1 CHANGE COLUMN set_enum set_enum ENUM\( \'Foo\', \'bar\' \)$~', $r['test_1'][0]['query'] );
+		$this->assertPattern( '~^ALTER TABLE test_1 CHANGE COLUMN set_enum set_enum ENUM\( \'Foo\', \'bar\' \)$~', $r['test_1'][0]['queries'][0] );
 	}
 
 
@@ -137,8 +137,8 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertTrue( isset( $r['test_1'] ) );
 		$this->assertEqual( count($r['test_1']), 2 );
-		$this->assertPattern( '~^ALTER TABLE test_1 CHANGE COLUMN set_set set_set SET\( \'Foo\', \'bar\' \)$~', $r['test_1'][0]['query'] );
-		$this->assertPattern( '~^ALTER TABLE test_1 ALTER COLUMN set_varchar SET DEFAULT \'foObar\'$~', $r['test_1'][1]['query'] );
+		$this->assertPattern( '~^ALTER TABLE test_1 CHANGE COLUMN set_set set_set SET\( \'Foo\', \'bar\' \)$~', $r['test_1'][0]['queries'][0] );
+		$this->assertPattern( '~^ALTER TABLE test_1 ALTER COLUMN set_varchar SET DEFAULT \'foObar\'$~', $r['test_1'][1]['queries'][0] );
 	}
 
 
@@ -300,8 +300,8 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertTrue( isset($r['test_1']) );
 		$this->assertEqual( count($r['test_1']), 2 );
-		$this->assertPattern( '~^ALTER TABLE test_1 ADD UNIQUE i\( i \)$~', $r['test_1'][0]['query'] );
-		$this->assertPattern( '~^ALTER TABLE test_1 DROP PRIMARY KEY$~', $r['test_1'][1]['query'] );
+		$this->assertPattern( '~^ALTER TABLE test_1 ADD UNIQUE i\( i \)$~', $r['test_1'][0]['queries'][0] );
+		$this->assertPattern( '~^ALTER TABLE test_1 DROP PRIMARY KEY$~', $r['test_1'][1]['queries'][0] );
 	}
 
 
@@ -325,7 +325,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertTrue( isset($r['test_1']) );
 		$this->assertEqual( count($r['test_1']), 1 );
-		$this->assertPattern( '~^ALTER TABLE test_1 CHANGE COLUMN auto_inc auto_inc INTEGER AUTO_INCREMENT, ADD PRIMARY KEY\( auto_inc, i \)$~', $r['test_1'][0]['query'] );
+		$this->assertPattern( '~^ALTER TABLE test_1 CHANGE COLUMN auto_inc auto_inc INTEGER AUTO_INCREMENT, ADD PRIMARY KEY\( auto_inc, i \)$~', $r['test_1'][0]['queries'][0] );
 	}
 
 
@@ -350,7 +350,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertTrue( isset($r['test_1']) );
 		$this->assertEqual( count($r['test_1']), 1 );
-		$this->assertPattern( '~^ALTER TABLE test_1 CHANGE COLUMN auto_inc auto_inc INTEGER AUTO_INCREMENT$$~', $r['test_1'][0]['query'] );
+		$this->assertPattern( '~^ALTER TABLE test_1 CHANGE COLUMN auto_inc auto_inc INTEGER AUTO_INCREMENT$$~', $r['test_1'][0]['queries'][0] );
 	}
 
 
@@ -375,9 +375,9 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertTrue( isset($r['test_1']) );
 		$this->assertEqual( count($r['test_1']), 3 );
-		$this->assertEqual( 'ALTER TABLE test_1 CHANGE COLUMN auto_inc auto_inc INTEGER AUTO_INCREMENT', $r['test_1'][0]['query'] );
-		$this->assertEqual( 'ALTER TABLE test_1 ADD KEY( auto_inc, i )', $r['test_1'][1]['query'] );
-		$this->assertEqual( 'ALTER TABLE test_1 DROP PRIMARY KEY', $r['test_1'][2]['query'] );
+		$this->assertEqual( 'ALTER TABLE test_1 CHANGE COLUMN auto_inc auto_inc INTEGER AUTO_INCREMENT', $r['test_1'][0]['queries'][0] );
+		$this->assertEqual( 'ALTER TABLE test_1 ADD KEY( auto_inc, i )', $r['test_1'][1]['queries'][0] );
+		$this->assertEqual( 'ALTER TABLE test_1 DROP PRIMARY KEY', $r['test_1'][2]['queries'][0] );
 	}
 
 
@@ -403,8 +403,8 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertTrue( isset($r['test_1']) );
 		$this->assertEqual( count($r['test_1']), 2 );
-		$this->assertPattern( '~ALTER TABLE test_1 ADD KEY auto_new \( i, auto_inc \)$~', $r['test_1'][0]['query'] );
-		$this->assertPattern( '~ALTER TABLE test_1 DROP INDEX auto~', $r['test_1'][1]['query'] );
+		$this->assertPattern( '~ALTER TABLE test_1 ADD KEY auto_new \( i, auto_inc \)$~', $r['test_1'][0]['queries'][0] );
+		$this->assertPattern( '~ALTER TABLE test_1 DROP INDEX auto~', $r['test_1'][1]['queries'][0] );
 	}
 
 
@@ -448,8 +448,8 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertTrue( isset($r['test_1']) );
 		$this->assertEqual( count($r['test_1']), 2 );
-		$this->assertPattern( '~^ALTER TABLE test_1 ADD COLUMN auto_inc INTEGER AUTO_INCREMENT FIRST, ADD PRIMARY KEY\( auto_inc, i \)$~', $r['test_1'][0]['query'] );
-		$this->assertPattern( '~^ALTER TABLE test_1 ADD UNIQUE i\( i \)$~', $r['test_1'][1]['query'] );
+		$this->assertPattern( '~^ALTER TABLE test_1 ADD COLUMN auto_inc INTEGER AUTO_INCREMENT FIRST, ADD PRIMARY KEY\( auto_inc, i \)$~', $r['test_1'][0]['queries'][0] );
+		$this->assertPattern( '~^ALTER TABLE test_1 ADD UNIQUE i\( i \)$~', $r['test_1'][1]['queries'][0] );
 	}
 
 
@@ -506,7 +506,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertTrue( isset($r['test_3']) );
 		$this->assertEqual( count($r['test_3']), 1 );
-		$this->assertPattern( '~^ALTER TABLE test_3 DROP PRIMARY KEY, ADD PRIMARY KEY\( i, i2 \)$~', $r['test_3'][0]['query'] );
+		$this->assertPattern( '~^ALTER TABLE test_3 DROP PRIMARY KEY, ADD PRIMARY KEY\( i, i2 \)$~', $r['test_3'][0]['queries'][0] );
 	}
 
 
@@ -528,8 +528,8 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 			)' );
 
 		$this->assertTrue( isset($r['test_1']) );
-		$this->assertPattern( '~^ALTER TABLE test_1 ADD KEY \( auto_inc \)$~', $r['test_1'][0]['query'] );
-		$this->assertPattern( '~^ALTER TABLE test_1 DROP PRIMARY KEY$~', $r['test_1'][1]['query'] );
+		$this->assertPattern( '~^ALTER TABLE test_1 ADD KEY \( auto_inc \)$~', $r['test_1'][0]['queries'][0] );
+		$this->assertPattern( '~^ALTER TABLE test_1 DROP PRIMARY KEY$~', $r['test_1'][1]['queries'][0] );
 	}
 
 
@@ -589,7 +589,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
-		$this->assertEqual( $r['test_1'][0]['query'], 'ALTER TABLE test_1 CHANGE COLUMN v v CHAR(20)' );
+		$this->assertEqual( $r['test_1'][0]['queries'][0], 'ALTER TABLE test_1 CHANGE COLUMN v v CHAR(20)' );
 	}
 
 
@@ -607,7 +607,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
-		$this->assertEqual( 'ALTER TABLE test_1 DROP PRIMARY KEY, CHANGE COLUMN i i SMALLINT KEY', $r['test_1'][0]['query'] );
+		$this->assertEqual( 'ALTER TABLE test_1 DROP PRIMARY KEY, CHANGE COLUMN i i SMALLINT KEY', $r['test_1'][0]['queries'][0] );
 	}
 
 
@@ -629,7 +629,100 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
-		$this->assertEqual( 'ALTER TABLE test_1 CHANGE COLUMN i i INT(11) UNSIGNED NOT NULL', $r['test_1'][0]['query'] );
+		$this->assertEqual( 'ALTER TABLE test_1 CHANGE COLUMN i i INT(11) UNSIGNED NOT NULL', $r['test_1'][0]['queries'][0] );
+	}
+
+
+	function test_db_delta_handle_not_null_change_add_default()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				v VARCHAR(255) NULL DEFAULT '0'
+			)" );
+		$this->test_DB->query( "
+			INSERT INTO test_1 VALUES (NULL);
+			" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				v VARCHAR(255) NOT NULL DEFAULT '0'
+			)" );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 1 );
+		$this->assertEqual( $r['test_1'][0]['queries'],
+			array( 'UPDATE test_1 SET v = \'0\' WHERE v IS NULL',
+				'ALTER TABLE test_1 CHANGE COLUMN v v VARCHAR(255) NOT NULL DEFAULT \'0\'' ) );
+	}
+
+
+	function test_db_delta_handle_not_null_change_add_implicit_default()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				i INT NULL DEFAULT '0'
+			)" );
+		$this->test_DB->query( "
+			INSERT INTO test_1 VALUES (NULL);
+			" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				i INT NOT NULL
+			)" );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 1 );
+		$this->assertEqual( $r['test_1'][0]['queries'],
+			array( 'UPDATE test_1 SET i = 0 WHERE i IS NULL',
+				'ALTER TABLE test_1 CHANGE COLUMN i i INT NOT NULL' ) );
+	}
+
+
+	function test_db_delta_handle_not_null_change_add_implicit_default_enum()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				e ENUM('a','b') NULL DEFAULT 'b'
+			)" );
+		$this->test_DB->query( "
+			INSERT INTO test_1 VALUES (NULL);
+			" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				e ENUM( 'a', 'b' ) NOT NULL
+			)" );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 1 );
+		$this->assertEqual( $r['test_1'][0]['queries'],
+			array( 'UPDATE test_1 SET e = \'a\' WHERE e IS NULL',
+				'ALTER TABLE test_1 CHANGE COLUMN e e ENUM( \'a\', \'b\' ) NOT NULL' ) );
+	}
+
+
+	function test_db_delta_handle_not_null_change_add_implicit_default_enum_change()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				e ENUM('a','b') NULL DEFAULT 'b'
+			)" );
+		$this->test_DB->query( "
+			INSERT INTO test_1 VALUES (NULL);
+			" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				e ENUM( 'a_new', 'b' ) NOT NULL
+			)" );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 1 );
+		$this->assertEqual( $r['test_1'][0]['queries'],
+			array( 'ALTER TABLE test_1 CHANGE COLUMN e e ENUM( \'a_new\', \'b\' )',
+				'UPDATE test_1 SET e = \'a_new\' WHERE e IS NULL',
+				'ALTER TABLE test_1 CHANGE COLUMN e e ENUM( \'a_new\', \'b\' ) NOT NULL' ) );
 	}
 
 }

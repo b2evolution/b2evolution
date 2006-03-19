@@ -43,6 +43,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *     required for ENUM and SET fields).
  *   - KEYs for AUTO_INCREMENT fields should be defined in column_definition, otherwise
  *     we had to detect the key type from the INDEX query and add it to the ALTER/ADD query.
+ *   - If a column changes from "NULL" to "NOT NULL" we generate an extra UPDATE query
+ *     to prevent "Data truncated for column 'X' at row Y" errors.
  *
  * The following query types are generated/marked and can be excluded:
  *  - 'create_table'
@@ -68,7 +70,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param boolean Execute generated queries?  TODO: get this outta here!!!! (sooooo bloated!)
  * @param array Exclude query types (see list above). Defaults to drop_column.
  * @return array The generated queries.
- *        table_name => array of arrays (queries with keys 'query', 'note' and 'type')
+ *        table_name => array of arrays (queries with keys 'queries' (array), 'note' (string) and 'type' (string))
  */
 function db_delta( $queries, $execute = false, $exclude_types = NULL )
 {
@@ -99,14 +101,14 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 			$qry = $match[1].( empty($match[2]) ? '' : $match[2] ).$tablename.$match[4];
 
 			$items[strtolower($tablename)][] = array(
-				'query' => $qry,
+				'queries' => array($qry),
 				'note' => sprintf( 'Created table &laquo;%s&raquo;', $tablename ),
 				'type' => 'create_table' );
 		}
 		elseif( preg_match( '|^\s*CREATE DATABASE\s([\S]+)|i', $qry, $match) )
 		{ // add to the beginning
 			array_unshift( $items, array(
-				'query' => $qry,
+				'queries' => array($qry),
 				'note' => sprintf( 'Created database &laquo;%s&raquo;', $match[1] ),
 				'type' => 'create_database' ) );
 		}
@@ -114,7 +116,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 		{
 			$tablename = preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[2] );
 			$items[strtolower($tablename)][] = array(
-				'query' => $match[1].$tablename.$match[3],
+				'queries' => array($match[1].$tablename.$match[3]),
 				'note' => '',
 				'type' => 'insert' );
 		}
@@ -122,7 +124,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 		{
 			$tablename = preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[2] );
 			$items[strtolower($tablename)][] = array(
-				'query' => $match[1].$tablename.$match[3],
+				'queries' => array($match[1].$tablename.$match[3]),
 				'note' => '',
 				'type' => 'update' );
 		}
@@ -197,7 +199,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 
 
 			// Get all of the field names in the query from between the parens
-			preg_match( '|\((.*)\)|s', $items[$table_lowered][0]['query'], $match );
+			preg_match( '|\((.*)\)|s', $items[$table_lowered][0]['queries'][0], $match ); // we have only one query here
 			$qryline = trim($match[1]);
 
 			// Separate field lines into an array
@@ -378,7 +380,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 				if( ! isset($cfields[ $fieldname_lowered ]) )
 				{ // This field exists in the table, but not in the creation queries?
 					$items[$table_lowered][] = array(
-						'query' => 'ALTER TABLE '.$table.' DROP COLUMN '.$tablefield->Field,
+						'queries' => array('ALTER TABLE '.$table.' DROP COLUMN '.$tablefield->Field),
 						'note' => 'Dropped '.$table.'.'.$tablefield->Field,
 						'type' => 'drop_column' );
 					continue;
@@ -471,11 +473,21 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 
 
 				// DEFAULT
-				$has_default = false;
-				if( preg_match( '~(.*?) \b DEFAULT ( (?: (["\']?) .*? $3 ) | \w+ ) \b (.*)$~ix', $field_to_parse, $match ) )
+				$want_default = false;
+				if( preg_match( '~^(.*?) \s DEFAULT \s+ (?: (?: (["\']) (.*?) \2 ) | (\w+) ) (\s .*)?$~ix', $field_to_parse, $match ) )
 				{
-					$has_default = $match[2];
-					$field_to_parse = $match[1].$match[4];
+					if( isset($match[4]) && $match[4] !== '' )
+					{
+						$want_default = $match[4];
+						$want_default_set = $match[4];
+					}
+					else
+					{
+						$want_default = $match[3];
+						$want_default_set = $match[2].$match[3].$match[2];  // encapsulate in quotes again
+					}
+
+					$field_to_parse = $match[1].( isset($match[5]) ? $match[5] : '' );
 				}
 
 
@@ -611,6 +623,38 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 				#pre_dump( 'change_null ($change_null, $tablefield, $want_null)', $change_null, $tablefield, $want_null );
 				#pre_dump( 'type_matches', $type_matches, strtolower($tablefield->Type), strtolower($fieldtype) );
 
+
+				// See what DEFAULT we would get or want
+				$update_default = NULL;
+
+				if( $want_default !== false )
+				{
+					$update_default = $want_default_set;
+				}
+				else
+				{ // implicit default, see http://dev.mysql.com/doc/refman/4.1/en/data-type-defaults.html
+					if( preg_match( '~^(TINYINT|SMALLINT|MEDIUMINT|INTEGER|INT|BIGINT|REAL|DOUBLE|FLOAT|DECIMAL|DEC|NUMERIC)$~i', $fieldtype ) )
+					{ // numeric
+						$update_default = 0;
+					}
+					elseif( strtoupper($fieldtype) == 'TIMESTAMP' )
+					{ // TODO: the default should be current date and time for the first field - but AFAICS we won't have NULL fields anyway
+					}
+					elseif( preg_match( '~^(DATETIME|DATE|TIME|YEAR)$~i', $fieldtype ) )
+					{
+						$update_default = '0'; // short form for various special "zero" values
+					}
+					elseif( preg_match( '~^ENUM\(~i', $fieldtype ) )
+					{
+						$update_default = trim(substr( $fieldtype, 5, strpos($fieldtype, ',')-5 )); // first value
+					}
+					else
+					{
+						$update_default = "''"; // empty string for string types
+					}
+				}
+
+
 				// Is actual field type different from the field type in query?
 				if( ! $type_matches || $change_null )
 				{ // Change the whole column to $column_definition:
@@ -622,61 +666,63 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					pre_dump( strtolower($tablefield->Type), strtolower($fieldtype), $column_definition );
 					*/
 
-					$query = 'ALTER TABLE '.$table;
+					$queries = array( 'ALTER TABLE '.$table );
 
 					// Handle inline PRIMARY KEY definition:
 					if( in_array($fieldname_lowered, $existing_primary_fields)
 					    && $has_inline_primary_key // only DROP if PRIMARY KEY changes with this column definition
 					    && ! $is_auto_increment )
 					{ // the column is part of the PRIMARY KEY, which needs to get dropped before (we already handle that for AUTO_INCREMENT fields)
-						$query .= ' DROP PRIMARY KEY,';
+						$queries[0] .= ' DROP PRIMARY KEY,';
 						$existing_primary_fields = array(); // we expect no existing primary key anymore
 						unset( $obsolete_indices['PRIMARY'] );
 					}
 
-					$query .= ' CHANGE COLUMN '.$tablefield->Field.' '.$column_definition;
+					$queries[0] .= ' CHANGE COLUMN '.$tablefield->Field.' '.$column_definition;
+
+					// Handle changes from "NULL" to "NOT NULL"
+					if( $change_null && ! $want_null && isset($update_default) )
+					{ // Prepend query to update NULL fields to default
+						array_unshift( $queries, 'UPDATE '.$table.' SET '.$fieldname.' = '.$update_default.' WHERE '.$fieldname.' IS NULL' );
+
+						if( substr( $tablefield->Type, 0, 5 ) == 'enum(' )
+						{
+							$existing_enum_field_values = preg_split( '~\s*,\s*~', substr( $tablefield->Type, 5, -1 ), -1, PREG_SPLIT_NO_EMPTY );
+							if( ! in_array( $update_default, $existing_enum_field_values ) )
+							{ // we cannot update straight to the new default, because it does not exist yet!
+
+								// Update the column first, without the NULL change
+								array_unshift( $queries, 'ALTER TABLE '.$table.' CHANGE COLUMN '.$tablefield->Field.' '.preg_replace( '~\sNOT\s+NULL~i', '', $column_definition ) );
+							}
+						}
+					}
 
 					// Add a query to change the column type
 					$items[$table_lowered][] = array(
-						'query' => $query,
+						'queries' => $queries,
 						'note' => 'Changed type of '.$table.'.'.$tablefield->Field.' from '.$tablefield->Type.' to '.$column_definition,
 						'type' => 'change_column' );
 				}
 				else
 				{
-					unset( $set_default );
-					if( preg_match( '~^ \s+ DEFAULT \s+ (?:(?:([\'"])(.*?)\1 ) | (\d+) )~isx', $field_to_parse, $match) )
+					if( $want_default !== false )
 					{ // DEFAULT given
-						if( isset($match[3]) )
-						{ // integer
-							$default_value = $match[3];
-						}
-						else
-						{ // string
-							$default_value = $match[2];
-							$set_default = $match[1].$match[2].$match[1]; // encapsulate in quotes again
-						}
-
 						$existing_default = $tablefield->Default === NULL ? 'NULL' : $tablefield->Default;
 
-						if( $existing_default != $default_value ) // DEFAULT is case-sensitive
+						if( $existing_default != $want_default ) // DEFAULT is case-sensitive
 						{ // Add a query to change the column's default value
-							if( ! isset($set_default) )
-							{
-								$set_default = $default_value;
-							}
 							$items[$table_lowered][] = array(
-								'query' => 'ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' SET DEFAULT '.$set_default,
-								'note' => "Changed default value of {$table}.{$tablefield->Field} from $existing_default to $set_default",
+								'queries' => array('ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' SET DEFAULT '.$want_default_set),
+								'note' => "Changed default value of {$table}.{$tablefield->Field} from $existing_default to $want_default_set",
 								'type' => 'change_default' );
 						}
 					}
 					elseif( ! empty($tablefield->Default) )
-					{ // No DEFAULT given, but it exists one, so drop it
-						if( $tablefield->Type != 'timestamp' && $tablefield->Type != 'datetime' && ! preg_match( '~^enum|set\s*\(~', $tablefield->Type ) )
+					{ // No DEFAULT given, but it exists one, so drop it (IF not a TIMESTAMP field)
+						if( $tablefield->Type != 'timestamp' )
 						{
 							$items[$table_lowered][] = array(
-								'query' => 'ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' DROP DEFAULT',
+								'queries' => array('ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' DROP DEFAULT'),
 								'note' => "Dropped default value of {$table}.{$tablefield->Field}",
 								'type' => 'change_default' ); // might be also 'drop_default'
 						}
@@ -750,7 +796,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 
 				// Push a query line into $items that adds the field to that table
 				$items[$table_lowered][] = array(
-					'query' => 'ALTER TABLE '.$table.' ADD COLUMN '.$column_definition,
+					'queries' => array('ALTER TABLE '.$table.' ADD COLUMN '.$column_definition),
 					'note' => 'Added column '.$table.'.'.$fielddef['field'],
 					'type' => 'add_column' );
 			}
@@ -771,7 +817,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 				}
 				// Push a query line into $items that adds the index to that table
 				$items[$table_lowered][] = array(
-					'query' => $query.' ADD '.$index,
+					'queries' => array($query.' ADD '.$index),
 					'note' => 'Added index '.$index,
 					'type' => 'add_index' );
 			}
@@ -781,7 +827,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 			{
 				// Push a query line into $items that drops the index from the table
 				$items[$table_lowered][] = array(
-					'query' => "ALTER TABLE {$table} DROP ".( $index_info['name'] == 'PRIMARY' ? 'PRIMARY KEY' : 'INDEX '.$index_info['name'] ),
+					'queries' => array("ALTER TABLE {$table} DROP ".( $index_info['name'] == 'PRIMARY' ? 'PRIMARY KEY' : 'INDEX '.$index_info['name'] )),
 					'note' => 'Dropped index '.$index_info['name'],
 					'type' => 'drop_index' );
 			}
@@ -820,8 +866,11 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 		{
 			foreach( $itemlist as $item )
 			{
-				#pre_dump( $item['query'] );
-				$DB->query( $item['query'] );
+				foreach( $item['queries'] as $query )
+				{
+					#pre_dump( $query );
+					$DB->query( $query );
+				}
 			}
 		}
 	}
@@ -839,7 +888,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
  */
 function install_make_db_schema_current( $display = true )
 {
-	global $schema_queries, $DB;
+	global $schema_queries, $DB, $debug;
 
 	foreach( $schema_queries as $table => $query_info )
 	{
@@ -856,7 +905,10 @@ function install_make_db_schema_current( $display = true )
 			{
 				foreach( $itemlist as $item )
 				{
-					$DB->query( $item['query'] );
+					foreach( $item['queries'] as $query )
+					{
+						$DB->query( $query );
+					}
 				}
 			}
 		}
@@ -866,8 +918,11 @@ function install_make_db_schema_current( $display = true )
 			{
 				if( count($itemlist) == 1 && $itemlist[0]['type'] == 'create_table' )
 				{
-					$DB->query($itemlist[0]['query']);
 					echo $itemlist[0]['note'].'<br />';
+					foreach( $itemlist[0]['queries'] as $query )
+					{ // should be just one, but just in case
+						$DB->query( $query );
+					}
 				}
 				else
 				{
@@ -875,8 +930,16 @@ function install_make_db_schema_current( $display = true )
 					echo '<ul>';
 					foreach( $itemlist as $item )
 					{
-						$DB->query( $item['query'] );
-						echo '<li>'.$item['note'].'</li>';
+						echo '<li>'.$item['note'];
+						if( $debug )
+						{
+							pre_dump( $item['queries'] );
+						}
+						echo '</li>';
+						foreach( $item['queries'] as $query )
+						{
+							$DB->query( $query );
+						}
 					}
 					echo "</ul>";
 				}
@@ -888,6 +951,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.10  2006/03/19 15:59:10  blueyed
+ * More magic: UPDATE on change to NOT NULL (ENUM)
+ *
  * Revision 1.9  2006/03/16 00:32:16  blueyed
  * Fixed PK handling for inline definitions
  *
