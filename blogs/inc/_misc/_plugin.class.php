@@ -1361,6 +1361,18 @@ class Plugin
 	 */
 
 	/**
+	 * Get a string, unqiue for the plugin, usable in HTML form elements.
+	 *
+	 * @param string Optional text to append (gets prefixed with "_").
+	 * @return string
+	 */
+	function get_class_id( $append = '' )
+	{
+		return $this->classname.'_id'.$this->ID.( $append ? '_'.$append : '' );
+	}
+
+
+	/**
 	 * Log a debug message.
 	 *
 	 * This gets added to {@link $Debuglog the global Debuglog} with
@@ -1812,6 +1824,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.19  2006/03/19 22:38:29  blueyed
+ * added get_class_id()
+ *
  * Revision 1.18  2006/03/19 19:02:51  blueyed
  * New events for captcha plugins
  *
