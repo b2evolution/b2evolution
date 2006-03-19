@@ -61,8 +61,8 @@ class Session
 	var $key;
 
 	/**
-	 * The user of the session.
-	 * @var integer
+	 * The user ID for the user of the session (NULL for anonymous (not logged in) user).
+	 * @var integer|NULL
 	 */
 	var $user_ID;
 
@@ -209,11 +209,11 @@ class Session
 	 *
 	 * @param integer The ID of the user to attach
 	 */
-	function set_user_ID( $ID )
+	function set_user_ID( $user_ID )
 	{
-		if( $ID != $this->user_ID )
+		if( $user_ID != $this->user_ID )
 		{
-			$this->user_ID = $ID;
+			$this->user_ID = $user_ID;
 			$this->_session_needs_save = true;
 		}
 	}
@@ -239,10 +239,10 @@ class Session
 		$this->_session_needs_save = true;
 		$this->dbsave();
 
-		$this->user_ID = NULL; // Unset user_ID after invalidating/saving the session above, to keep the user info attached to the old session.
-
 		// clean up the session cookie:
 		setcookie( $cookie_session, '', 272851261, $cookie_path, $cookie_domain ); // 272851261 being the birthday of a lovely person
+
+		$this->user_ID = NULL; // Unset user_ID after invalidating/saving the session above, to keep the user info attached to the old session.
 	}
 
 
@@ -416,6 +416,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/19 19:53:53  blueyed
+ * minor
+ *
  * Revision 1.3  2006/03/12 23:08:59  fplanque
  * doc cleanup
  *
