@@ -2369,37 +2369,53 @@ function header_nocache()
  * is taken from {@link Hit::referer} or {@link $baseurl}).
  *
  * NOTE: This function {@link exit() exits} the php script execution.
+ *
+ * @param string Override detection of where we redirect to.
  */
-function header_redirect( $redirectTo = NULL )
+function header_redirect( $redirect_to = NULL )
 {
-	global $Hit, $baseurl;
+	global $Hit, $baseurl, $Blog;
 
-	if( is_null($redirectTo) )
+	if( is_null($redirect_to) )
 	{
-		$redirectTo = param( 'redirect_to', 'string', $Hit->referer );
+		$redirect_to = param( 'redirect_to', 'string', '' );
 	}
 
-	$location = empty($redirectTo) ? $baseurl : $redirectTo;
+	if( empty($redirect_to) )
+	{
+		if( ! empty($Hit->referer) )
+		{
+			$redirect_to = $Hit->referer;
+		}
+		elseif( isset($Blog) && is_object($Blog) )
+		{
+			$redirect_to = $Blog->get('url');
+		}
+		else
+		{
+			$redirect_to = $baseurl;
+		}
+	}
 
-	$location = str_replace('&amp;', '&', $location);
+	$redirect_to = str_replace('&amp;', '&', $redirect_to);
 
-	if( strpos($location, $baseurl) === 0 /* we're somewhere on $baseurl */ )
+	if( strpos($redirect_to, $baseurl) === 0 /* we're somewhere on $baseurl */ )
 	{
 		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
 		// Also remove "action" get param to avoid unwanted actions
-		$location = preg_replace( '~(?<=\?|&amp;|&) (login|pwd|action) = [^&]+ (&(amp;)?|\?)?~x', '', $location );
+		$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd|action) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
 	}
 
-	#header('Refresh:0;url='.$location);
+	#header('Refresh:0;url='.$redirect_to);
 	#exit();
-	// fplanque> Note: I am not sure using this is cacheing safe: header('Location: '.$location);
+	// fplanque> Note: I am not sure using this is cacheing safe: header('Location: '.$redirect_to);
 	// Current "Refresh" version works fine.
 	// Please provide link to relevant material before changing it.
 	// blueyed>> The above method fails when you redirect after a POST to the same URL.
 	//   Regarding http://de3.php.net/manual/en/function.header.php#50588 and the other comments
 	//   around, I'd suggest:
 	header( 'HTTP/1.1 303 See Other' ); // see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-	header( 'Location: '.$location );
+	header( 'Location: '.$redirect_to );
 	exit();
 }
 
@@ -2662,6 +2678,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.22  2006/03/19 16:56:04  blueyed
+ * Better defaults for header_redirect()
+ *
  * Revision 1.21  2006/03/19 00:08:21  blueyed
  * Default to $notify_from for send_mail()
  *
