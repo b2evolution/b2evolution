@@ -390,10 +390,15 @@ class dnsbl_antispam_plugin extends Plugin
 	 */
 	function SessionLoaded()
 	{
-		global $Hit, $Plugins;
+		global $Hit, $Plugins, $ReqPath;
 
 		if( is_admin_page() )
 		{
+			return false;
+		}
+
+		if( $ReqPath == '/htsrv/call_plugin.php' )
+		{ // Do not block subcalls to Plugins that provide CaptchaPayload!
 			return false;
 		}
 
@@ -420,6 +425,10 @@ class dnsbl_antispam_plugin extends Plugin
 					$Plugins->trigger_event( 'CaptchaValidatedCleanup' );
 
 					return true;
+				}
+				else
+				{
+					$this->debug_log( 'No plugin said "true" to CaptchaValidated.' );
 				}
 			}
 			else
@@ -661,6 +670,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.16  2006/03/19 19:02:29  blueyed
+ * Fixes
+ *
  * Revision 1.15  2006/03/19 18:27:28  blueyed
  * fixed path, added call to CatchaValidatedCleanup
  *
