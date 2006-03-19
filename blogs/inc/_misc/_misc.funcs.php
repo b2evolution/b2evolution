@@ -1293,10 +1293,8 @@ function validate_url( $url, & $allowed_uri_scheme )
 		return false;
 	}
 
-	// minimum length: http://az.fr/
-	// TODO: fails on "http://blogs" (without trailing slash)  fp>> yes, "blogs" is not a valid domain name, allowing this could cause all sorts of unexpected problems
-	//                                                    blueyed>> So, "http://az.fr" isn't also?!   fp>> Yeah right, let's waste our time discussing this... change it to 12.
-	if( strlen($url) < 13 )
+	// minimum length: http://az.fr
+	if( strlen($url) < 12 )
 	{ // URL too short!
 		$Debuglog->add( 'URL &laquo;'.$url.';&raquo; is too short!', 'error' );
 		return T_('Invalid URL');
@@ -1836,11 +1834,12 @@ function url_add_tail( $url, $tail )
  * @param string From address, being added to headers (we'll prevent injections);
  *               see {@link http://securephp.damonkohler.com/index.php/Email_Injection}.
  *               Might be just an email address or of the same form as {@link $to}.
+ *               {@link $notify_from} gets used as default (if NULL).
  * @param array Additional headers ( headername => value ). Take care of injection!
  */
-function send_mail( $to, $subject, $message, $from = '', $headers = array() )
+function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 {
-	global $debug, $app_name, $app_version, $current_locale, $locales, $Debuglog;
+	global $debug, $app_name, $app_version, $current_locale, $locales, $Debuglog, $notify_from;
 
 	$NL = "\n";
 
@@ -1855,8 +1854,15 @@ function send_mail( $to, $subject, $message, $from = '', $headers = array() )
 	$headers['X-Remote-Addr'] = implode( ',', get_ip_list() );
 
 	// -- Build headers ----
-	$from = trim($from);
-	if( !empty($from) )
+	if( $from === NULL )
+	{
+		$from = $notify_from;
+	}
+	else
+	{
+		$from = trim($from);
+	}
+	if( ! empty($from) )
 	{ // From has to go into headers
 		$from_save = preg_replace( '~(\r|\n).*$~s', '', $from ); // Prevent injection! (remove everything after (and including) \n or \r)
 
@@ -2656,6 +2662,9 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 
 /*
  * $Log$
+ * Revision 1.21  2006/03/19 00:08:21  blueyed
+ * Default to $notify_from for send_mail()
+ *
  * Revision 1.20  2006/03/17 21:28:40  fplanque
  * no message
  *
