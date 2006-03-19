@@ -718,8 +718,8 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 						}
 					}
 					elseif( ! empty($tablefield->Default) )
-					{ // No DEFAULT given, but it exists one, so drop it (IF not a TIMESTAMP field)
-						if( $tablefield->Type != 'timestamp' )
+					{ // No DEFAULT given, but it exists one, so drop it (IF not a TIMESTAMP or DATETIME field)
+						if( $tablefield->Type != 'timestamp' && $tablefield->Type != 'datetime' )
 						{
 							$items[$table_lowered][] = array(
 								'queries' => array('ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' DROP DEFAULT'),
@@ -951,6 +951,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.11  2006/03/19 17:58:12  blueyed
+ * fix for DATETIME
+ *
  * Revision 1.10  2006/03/19 15:59:10  blueyed
  * More magic: UPDATE on change to NOT NULL (ENUM)
  *
