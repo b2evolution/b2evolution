@@ -51,6 +51,9 @@ switch( $action )
 {
 	case 'logout':
 		logout();          // logout $Session and set $current_User = false
+
+		// TODO: to give the user feedback through Messages, we would need to start a new $Session here and append $Messages to it.
+
 		header_nocache();  // defaults to redirect_to param
 		header_redirect(); // exits
 		/* exited */
@@ -169,9 +172,9 @@ switch( $action )
 		$Session->set_user_ID( $ForgetfulUser->ID );
 
 		// Add Message to change the password:
-		$Messages = new Log();
-		$Messages->add( T_( 'Please change your password to something you remember now.' ), 'success' );
-		$Session->set( 'Messages', $Messages );
+		$action_Log = new Log();
+		$action_Log->add( T_( 'Please change your password to something you remember now.' ), 'success' );
+		$Session->set( 'Messages', $action_Log );
 		$Session->dbsave();
 
 		// Redirect to the user's profile in the "users" controller:
