@@ -416,6 +416,9 @@ class dnsbl_antispam_plugin extends Plugin
 					#echo 'WHITE';
 					$this->session_set( 'whitelisted', 1, $this->Settings->get('timeout_whitelisted') );
 					$this->update_stats( 'whitelisted' );
+
+					$Plugins->trigger_event( 'CaptchaValidatedCleanup' );
+
 					return true;
 				}
 			}
@@ -569,9 +572,9 @@ class dnsbl_antispam_plugin extends Plugin
 	 */
 	function display_error_page( $error_ip_blocked )
 	{
-		global $Plugins, $plugins_dirout, $core_subdir;
+		global $Plugins, $misc_inc_path;
 
-		require_once dirname(__FILE__).'/'.$plugins_dirout.$core_subdir.'_form.class.php';
+		require_once $misc_inc_path.'_form.class.php';
 
 		header('HTTP/1.0 403 Forbidden');
 		?>
@@ -658,6 +661,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.15  2006/03/19 18:27:28  blueyed
+ * fixed path, added call to CatchaValidatedCleanup
+ *
  * Revision 1.14  2006/03/12 23:09:28  fplanque
  * doc cleanup
  *
