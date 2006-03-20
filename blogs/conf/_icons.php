@@ -9,7 +9,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Map of filenames for icons and their respective alt tag.
  *
- * @todo For performance reasons this should probably be a function, so we do not call T_() for all icons always
+ * @todo For performance reasons get_icon() shoudld handle the T_() and this array should only contain NT_() declarations
  *
  * @global array icon name => array( 'file', 'alt', 'size', 'class', 'rollover' )
  */
@@ -350,7 +350,7 @@ $map_iconfiles = array(
 	),
 
 	'help' => array(
-		'file' => $rsc_subdir.'smilies/icon_question.gif', // TODO: should not be in "smilies" really
+		'file' => $rsc_subdir.'icons/icon_question.gif',
 		'alt'  => T_('Help'),
 		'size' => array( 15, 15 ),
 	),

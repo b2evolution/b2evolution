@@ -239,10 +239,10 @@ class Session
 		$this->_session_needs_save = true;
 		$this->dbsave();
 
+		$this->user_ID = NULL; // Unset user_ID after invalidating/saving the session above, to keep the user info attached to the old session.
+
 		// clean up the session cookie:
 		setcookie( $cookie_session, '', 272851261, $cookie_path, $cookie_domain ); // 272851261 being the birthday of a lovely person
-
-		$this->user_ID = NULL; // Unset user_ID after invalidating/saving the session above, to keep the user info attached to the old session.
 	}
 
 
@@ -416,6 +416,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/20 18:49:44  fplanque
+ * no message
+ *
  * Revision 1.4  2006/03/19 19:53:53  blueyed
  * minor
  *

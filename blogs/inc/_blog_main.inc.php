@@ -60,7 +60,7 @@ $Request->param( 'unit', 'string', '', true );            // list unit: 'posts' 
 $Request->param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', '', true ); // List of cats to restrict to
 $Request->param( 'catsel', 'array', array(), true );  // Array of cats to restrict to
 foreach( $catsel as $k => $v )
-{ // make sure this are all integers, to prevent SQL injection!
+{ // make sure this are all integers, to prevent SQL injection! TODO: use param( , 'array[integer]' )
 	$catsel[$k] = (int)$v;
 }
 $Request->set_param( 'catsel', $catsel );
@@ -417,6 +417,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2006/03/20 18:49:44  fplanque
+ * no message
+ *
  * Revision 1.8  2006/03/18 14:38:36  blueyed
  * fix
  *

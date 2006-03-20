@@ -2,7 +2,7 @@
 /**
  * This file sends an email to the user!
  *
- * It's the form action of {@link _msgform.php}.
+ * It's the form action for {@link _msgform.php}.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
@@ -38,13 +38,13 @@ if( param( 'optout_cmt_email', 'string', '' ) )
 				   SET comment_allow_msgform = 0
 				 WHERE comment_author_email = '.$DB->quote($optout_cmt_email) );
 
-			$Messages->add( T_('All your comments have been marked to not allow emailing you through a message form.'), 'success' );
+			$Messages->add( T_('All your comments have been marked not to allow emailing you through a message form.'), 'success' );
 
 			$Session->delete('core.msgform.optout_cmt_email');
 		}
 		else
 		{
-			$Messages->add( T_('The request to not receive emails through a message form for your comments failed.'), 'error' );
+			$Messages->add( T_('The request not to receive emails through a message form for your comments failed.'), 'error' );
 		}
 
 		$Messages->display( '', '', true, 'all' );
@@ -68,7 +68,7 @@ if( param( 'optout_cmt_email', 'string', '' ) )
 
 	send_mail( $optout_cmt_email, T_('Confirm opt-out for emails through message form'), $message );
 
-	echo T_('An email has been sent to you, with a link to confirm your request to not receive emails through the comments you have made on this blog.');
+	echo T_('An email has been sent to you, with a link to confirm your request not to receive emails through the comments you have made on this blog.');
 
 	debug_info();
 	exit;
@@ -190,6 +190,7 @@ if( isset($recipient_User) )
 
 
 // Set Messages into user's session, so they get restored on the next page (after redirect):
+// fp>> TODO: this was better called $Messages !
 $action_Log = new Log();
 $action_Log->add( T_('Your message has been sent as email to the user.'), 'success' );
 $Session->set( 'Messages', $action_Log );
