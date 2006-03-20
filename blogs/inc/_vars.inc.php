@@ -128,8 +128,8 @@ else
  * Full requested Host + Path. This is our absolute URL.
  *
  * Normally, you should use {@link regenerate_url()} to get the full URL, including query string.
- * fp>> what?? this comment doesn't make sense here!
- * If not, append <code>( empty($_SERVER['QUERY_STRING']) ? '' : '?'.$_SERVER['QUERY_STRING'] )</code> to it.
+ *
+ * If not (because you need the exact! query string), append <code>( empty($_SERVER['QUERY_STRING']) ? '' : '?'.$_SERVER['QUERY_STRING'] )</code> to it.
  *
  * @global string
  *
@@ -251,8 +251,8 @@ $post_statuses = array (
 
 /*
  * $Log$
- * Revision 1.5  2006/03/20 18:49:44  fplanque
- * no message
+ * Revision 1.6  2006/03/20 21:38:56  blueyed
+ * doc
  *
  * Revision 1.4  2006/03/19 17:53:46  blueyed
  * doc
