@@ -81,8 +81,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 <div class="bPosts">
 <?php
+	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
+	$Messages->display();
+	// --------------------------------- END OF MESSAGES ---------------------------------
+?>
+
+<?php
 	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-	request_title( '<h2>', '</h2>' )
+	request_title( '<h2>', '</h2>' );
 	// ------------------------------ END OF REQUEST TITLE -----------------------------
 ?>
 

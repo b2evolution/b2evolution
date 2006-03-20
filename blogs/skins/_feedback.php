@@ -210,7 +210,7 @@
 				// TODO: If we got info from cookies, Add a link called "Forget me now!" (without posting a comment).
 
 				$comment_options[] = $Form->checkbox_input( 'comment_allow_msgform', true, T_('Allow message form'), array(
-					'note' => '('.T_('Allow users to contact you through a message form (you email will NOT be displayed.)').')', 'tabindex' => 8 ) );
+					'note' => '('.T_('Allow users to contact you through a message form (your email will NOT be displayed.)').')', 'tabindex' => 8 ) );
 				// TODO: If we have an email in a cookie, Add links called "Add a contact icon to all my previous comments" and "Remove contact icon from all my previous comments".
 			}
 			$Form->output = true;

@@ -233,25 +233,13 @@ class Log
 
 
 	/**
-	 * Display all messages of a single or all categories.
-	 *
-	 * @param string the category to use (defaults to 'all')
-	 * @return void
-	 */
-	function dump_all( $category = 'all' )
-	{
-		$this->display( '', '', true, $category );
-	}
-
-
-	/**
 	 * Wrapper to display messages as simple paragraphs.
 	 *
-	 * @param mixed the category of messages, see {@link display()}
+	 * @param mixed the category of messages, see {@link display()}. NULL for default category.
 	 * @param mixed the outer div, see {@link display()}
 	 * @param mixed the css class for inner paragraphs
 	 */
-	function display_paragraphs( $category = NULL, $outerdivclass = 'panelinfo', $cssclass = NULL )
+	function display_paragraphs( $category = 'all', $outerdivclass = 'panelinfo', $cssclass = NULL )
 	{
 		if( is_null($cssclass) )
 		{
@@ -264,8 +252,8 @@ class Log
 	/**
 	 * Display messages of the Log object.
 	 *
-	 * - You can either output/get the logs of a category (string),
-	 *   all categories ('all') or category groups (array of strings).
+	 * - You can either output/get the messages of a category (string),
+	 *   all categories ('all') or category groups (array of strings) (defaults to 'all').
 	 * - Head/Foot will be displayed on top/bottom of the messages. You can pass
 	 *   an array as head/foot with the category as key and this will be displayed
 	 *   on top of the category's messages.
@@ -281,20 +269,20 @@ class Log
 	 *   Please note: when called static, it will always display, because $display
 	 *                equals true.
 	 *
-	 * @param string header/title (default: empty), might be array ( category => msg ),
-	 *               'container' is then top
-	 * @param string footer (default: empty), might be array ( category => msg ),
-	 *               'container' is then bottom
+	 * @param string|NULL Header/title, might be array ( category => msg ),
+	 *                    'container' is then top. NULL for object's default ({@link Log::head}.
+	 * @param string|NULL Footer, might be array ( category => msg ), 'container' is then bottom.
+	 *                    NULL for object's default ({@link Log::foot}.
 	 * @param boolean to display or return (default: display)
-	 * @param mixed the category of messages to use (category, 'all', or list of categories (array))
+	 * @param mixed the category of messages to use (category, 'all', list of categories (array)
+	 *              or NULL for {@link $defaultcategory}).
 	 * @param string the CSS class of the messages div tag (default: 'log_'.$category)
 	 * @param string the style to use, 'ul', 'p', 'br'
 	 *               (default: 'br' for single message, 'ul' for more)
 	 * @param mixed the outer div, may be false
 	 * @return boolean false, if no messages; else true (and outputs if $display)
 	 */
-	function display( $head = NULL, $foot = NULL, $display = true, $category = NULL,
-										$cssclass = NULL, $style = NULL, $outerdivclass = 'log_container' )
+	function display( $head = NULL, $foot = NULL, $display = true, $category = 'all', $cssclass = NULL, $style = NULL, $outerdivclass = 'log_container' )
 	{
 		if( is_null( $head ) )
 		{ // Use object default:
@@ -418,7 +406,7 @@ class Log
 	 *               ( category => msg ), 'container' is then bottom
 	 * @param string|NULL footer (if more than one message) - NULL means "use $foot1"
 	 * @param boolean to display or return (default: true)
-	 * @param mixed the category of messages to use (category, 'all', or list of categories (array))
+	 * @param mixed the category of messages to use (category, 'all', or list of categories (array); NULL for default category)
 	 * @param string the CSS class of the messages div tag (default: 'log_'.$category)
 	 * @param string the style to use, 'ul', 'p', 'br'
 	 *               (default: 'br' for single message, 'ul' for more)
@@ -426,7 +414,7 @@ class Log
 	 * @return boolean false, if no messages; else true (and outputs if $display)
 	 */
 	function display_cond( $head1 = '', $head_more = '', $foot1 = '', $foot_more = '',
-													$display = true, $category = NULL, $cssclass = NULL,
+													$display = true, $category = 'all', $cssclass = NULL,
 													$style = NULL, $outerdivclass = 'log_container' )
 	{
 		if( is_null( $head_more ) )
@@ -615,14 +603,14 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/20 22:28:35  blueyed
+ * Changed defaults for Log's display methods to "all" categories.
+ *
  * Revision 1.4  2006/03/15 00:53:54  blueyed
  * Added Log_noop::add_messages()
  *
  * Revision 1.3  2006/03/12 23:09:01  fplanque
  * doc cleanup
- *
- * Revision 1.2  2006/03/11 14:45:37  blueyed
- * *** empty log message ***
  *
  * Revision 1.1  2006/02/23 21:12:18  fplanque
  * File reorganization to MVC (Model View Controller) architecture.
@@ -657,9 +645,6 @@ class Log_noop {
  * Revision 1.16  2005/09/06 17:13:55  fplanque
  * stop processing early if referer spam has been detected
  *
- * Revision 1.15  2005/05/26 19:11:11  fplanque
- * no message
- *
  * Revision 1.14  2005/04/19 16:23:03  fplanque
  * cleanup
  * added FileCache
@@ -676,9 +661,6 @@ class Log_noop {
  *
  * Revision 1.10  2005/02/19 23:02:45  blueyed
  * get_messages(): sort by category for 'all'
- *
- * Revision 1.9  2005/02/17 19:36:24  fplanque
- * no message
  *
  * Revision 1.8  2005/02/10 22:59:56  blueyed
  * added NULL handling for 2nd parameters for display_cond()

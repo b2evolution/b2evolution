@@ -324,7 +324,7 @@ switch($action)
 
 		set_edited_Blog_from_params( 'general' );
 
-		if( !$Messages->display_cond( T_('Cannot create, please correct this error:' ), T_('Cannot create, please correct these errors:' )) )
+		if( !$Messages->display_cond( T_('Cannot create, please correct this error:' ), T_('Cannot create, please correct these errors:' ), '', '', true, 'error' ) )
 		{
 			// DB INSERT
 			$edited_Blog->dbinsert();
@@ -395,7 +395,7 @@ switch($action)
 		// Commit changes in cache: (so that changes are not lost in the form)
 		$BlogCache->add( $edited_Blog );
 
-		if( !$Messages->display_cond( T_('Cannot update, please correct this error:' ), T_('Cannot update, please correct these errors:' )) )
+		if( !$Messages->display_cond( T_('Cannot update, please correct this error:' ), T_('Cannot update, please correct these errors:' ), '', '', true, 'error' ) )
 		{ // Commit update to the DB:
 			$edited_Blog->dbupdate();
 		}
@@ -559,8 +559,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.5  2006/03/19 00:48:50  blueyed
- * *** empty log message ***
+ * Revision 1.6  2006/03/20 22:28:34  blueyed
+ * Changed defaults for Log's display methods to "all" categories.
  *
  * Revision 1.4  2006/03/18 18:35:24  blueyed
  * Fixed paths

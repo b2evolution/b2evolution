@@ -323,7 +323,7 @@ switch ( $Settings->get('eblog_method') )
 				$post_title = format_to_post( trim($post_title), 0, 0 );
 				$content = format_to_post( trim($content), $Settings->get('AutoBR'), 0);
 
-				if( $Messages->display( T_('Cannot post, please correct these errors:'), '' ) )
+				if( $Messages->display( T_('Cannot post, please correct these errors:'), '', true, 'error' ) )
 				{
 					$Messages->reset();
 					echo '</div>';
@@ -588,7 +588,7 @@ switch ( $Settings->get('eblog_method') )
 				$post_title = format_to_post( trim($post_title), 0, 0 );
 				$content = format_to_post( trim($content), $Settings->get('AutoBR'), 0);
 
-				if( $Messages->display( T_('Cannot post, please correct these errors:'), '' ) )
+				if( $Messages->display( T_('Cannot post, please correct these errors:'), '', true, 'error' ) )
 				{
 					$Messages->reset();
 					continue;

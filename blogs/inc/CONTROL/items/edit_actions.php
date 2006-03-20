@@ -72,7 +72,7 @@ switch($action)
 		$AdminUI->title = T_('Adding new post...');
 
 
-    // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+		// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 		$AdminUI->disp_html_head();
 
 		// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
@@ -100,7 +100,7 @@ switch($action)
 		{
 			echo '<div class="panelinfo">';
 			$Messages->display( T_('Cannot post, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' );
+				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]', '', '', true, 'error' );
 			echo '</div>';
 			break;
 		}
@@ -194,7 +194,7 @@ switch($action)
 		{
 			echo '<div class="panelinfo">';
 			$Messages->display( T_('Cannot update, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' );
+				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]', true, 'error' );
 			echo '</div>';
 			break;
 		}
@@ -459,7 +459,7 @@ switch($action)
 		$content = format_to_post( $content, $post_autobr, 0); // We are faking this NOT to be a comment
 
 		if( $Messages->display( T_('Cannot update comment, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' ) )
+				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]', true, 'error' ) )
 		{
 			break;
 		}
@@ -545,6 +545,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/20 22:28:35  blueyed
+ * Changed defaults for Log's display methods to "all" categories.
+ *
  * Revision 1.4  2006/03/12 03:44:17  blueyed
  * bugfix
  *

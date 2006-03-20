@@ -47,7 +47,7 @@ if( param( 'optout_cmt_email', 'string', '' ) )
 			$Messages->add( T_('The request not to receive emails through a message form for your comments failed.'), 'error' );
 		}
 
-		$Messages->display( '', '', true, 'all' );
+		$Messages->display();
 
 		debug_info();
 		exit;
@@ -164,7 +164,7 @@ $Plugins->trigger_event( 'MessageFormSent', array(
 	) );
 
 
-$Messages->display( '', '', true, 'all' );
+$Messages->display();
 
 if( $Messages->count( 'error' ) )
 {

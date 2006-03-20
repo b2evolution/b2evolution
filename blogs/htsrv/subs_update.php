@@ -60,7 +60,7 @@ profile_check_params( array( 'email' => $newuser_email ) );
 if( $Messages->count( 'error' ) )
 {
 	$Messages->display( T_('Cannot update profile. Please correct the following errors:'),
-			'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
+			'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]', true, 'error' );
 	die();
 }
 

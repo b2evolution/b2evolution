@@ -523,7 +523,7 @@ class ItemList extends DataObjectList
 		$post_date = date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $dd, $yyyy ) );
 
 
-		if( $errcontent = $Messages->display( T_('Invalid post, please correct these errors:'), '', false ) )
+		if( $errcontent = $Messages->display( T_('Invalid post, please correct these errors:'), '', false, 'error' ) )
 		{
 			$content = $errcontent;
 		}
@@ -850,6 +850,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/20 22:28:35  blueyed
+ * Changed defaults for Log's display methods to "all" categories.
+ *
  * Revision 1.2  2006/03/12 23:08:59  fplanque
  * doc cleanup
  *
