@@ -1196,10 +1196,8 @@ class File extends DataObject
 
 		if( $this->is_dir() )
 		{ // Directory
-			// Note: we make sure that the mode is fileman and not upload (we cannot insert IMG tags from a sub-popup)
-			// fp>>removed by blueyed, not matching comment above, why? return regenerate_url( 'root,path,mode', 'mode=fileman&amp;root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
-			// blueyed>> From Rev.1.3: TODO: "mode=fileman" kills the header/footer while browsing "normally" (files.php). Just empty it??
-			return regenerate_url( 'root,path,mode', 'root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
+			// fp>> Note: we MUST NOT clear mode, especially when mode=upload, or else the IMG button disappears when entering a subdir
+			return regenerate_url( 'root,path', 'root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
 		}
 		else
 		{ // File
@@ -1326,6 +1324,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2006/03/20 20:06:02  fplanque
+ * fixed IMG button, again :(
+ *
  * Revision 1.7  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *
