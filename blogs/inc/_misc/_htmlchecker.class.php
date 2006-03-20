@@ -66,11 +66,12 @@ class SafeHtmlChecker
 		$this->tagattrs = & $allowed_attributes;
 		$this->uri_attrs = & $uri_attrs;
 		$this->allowed_uri_scheme = & $allowed_uri_scheme;
+		$encoding = strtoupper($encoding); // we might get 'iso-8859-1' for example and IMHO it's better to convert it for the whole class than in the check below
 		if( ! in_array( $encoding, array( 'ISO-8859-1', 'UTF-8', 'US-ASCII' ) ) )
 		{ // passed encoding not supported by xml_parser_create()
 			$encoding = 'UTF-8';
 		}
-		$this->encoding = $encoding;
+		$this->encoding = $encoding; // this gets used in the xml header we create also
 		$this->parser = xml_parser_create( $this->encoding );
 		$this->last_checked_pos = 0;
 		$this->error = false;
@@ -247,6 +248,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/20 00:25:45  blueyed
+ * fix
+ *
  * Revision 1.2  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
