@@ -46,8 +46,8 @@ if( isset($filter['off']) )
 	forget_param( 'filteron' );
 }
 
-param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kill navigation/sorting) use memorize() if needed
-param( 'grp_ID', 'integer', NULL );		// Note: should NOT be memorized
+param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kill navigation/sorting) use memorize_param() if needed
+param( 'grp_ID', 'integer', NULL );		// Note: should NOT be memorized:    -- " --
 
 /**
  * @global boolean true, if user is only allowed to edit his profile
@@ -449,6 +449,7 @@ if( !$Messages->count('error') )
 			}
 			else
 			{	// not confirmed, Check for restrictions:
+				memorize_param( 'user_ID', 'integer', true );
 				if( ! $edited_User->check_delete( sprintf( T_('Cannot delete User &laquo;%s&raquo; [%s]'), $edited_User->dget( 'fullname' ), $edited_User->dget( 'login' ) ) ) )
 				{	// There are restrictions:
 					$action = 'view_user';
@@ -563,6 +564,7 @@ if( !$Messages->count('error') )
 			}
 			else
 			{	// not confirmed, Check for restrictions:
+				memorize_param( 'grp_ID', 'integer', true );
 				if( ! $edited_Group->check_delete( sprintf( T_('Cannot delete Group &laquo;%s&raquo;'), $edited_Group->dget( 'name' ) ) ) )
 				{	// There are restrictions:
 					$action = 'view_group';
@@ -640,6 +642,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2006/03/20 22:36:05  blueyed
+ * Fixed deleting of users and groups.
+ *
  * Revision 1.9  2006/03/19 17:54:26  blueyed
  * Opt-out for email through message form.
  *
