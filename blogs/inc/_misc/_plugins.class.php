@@ -1270,6 +1270,15 @@ class Plugins
 	{
 		global $Debuglog, $Timer, $model_path;
 
+		if( $set_type == 'UserSettings' )
+		{
+			global $current_User;
+			if( ! is_object($current_User) )
+			{ // do not instantiate UserSettings, if we have no user!
+				return false;
+			}
+		}
+
 		$Timer->resume( 'plugins_inst_'.$set_type );
 
 		$r = true;
@@ -2425,6 +2434,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.23  2006/03/20 00:14:37  blueyed
+ * Do not instantiate UserSettings, if we have no user!
+ *
  * Revision 1.22  2006/03/19 19:02:51  blueyed
  * New events for captcha plugins
  *
