@@ -2471,8 +2471,8 @@ $s = new xmlrpc_server(
 		"mt.getCategoryList" =>
 			array(
 				"function" => "mt_getCategorylist",
-				"signature" => $getCategoryList_sig,
-				"docstring" => $getCategoryList_doc),
+				"signature" => $mt_getCategoryList_sig,
+				"docstring" => $mt_getCategoryList_doc),
 
 		"mt.setPostCategories" =>
 			array(
@@ -2487,6 +2487,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.92  2006/03/21 00:35:03  blueyed
+ * Trivial fix(?)
+ *
  * Revision 1.91  2006/03/18 19:17:54  blueyed
  * Removed remaining use of $img_url
  *
