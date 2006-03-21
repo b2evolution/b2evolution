@@ -1050,9 +1050,12 @@ class Item extends DataObject
 		{ // We have no email for this Author :(
 			return false;
 		}
+		if( empty($this->Author->allow_msgform) )
+		{
+			return false;
+		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id='.$this->Author->ID );
-		$form_url = url_add_param( $form_url, 'post_id='.$this->ID );
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->Author->ID.'&amp;post_id='.$this->ID.'&amp;redirect_to='.regenerate_url() );
 
 		if( $title == '#' ) $title = T_('Send email to post author');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
@@ -1156,7 +1159,7 @@ class Item extends DataObject
 	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '' )
 	{
-		global $current_User, $baseurl;
+		global $current_User;
 
 		switch( $text )
 		{
@@ -2290,11 +2293,11 @@ class Item extends DataObject
 	 * Send email notifications to subscribed users
 	 *
 	 * @todo shall we notify suscribers of blog were this is in extra-cat?
-	 * @todo cache message by locale
+	 *       blueyed>> IMHO yes.
 	 */
 	function send_email_notifications( $display = true )
 	{
-		global $DB, $admin_url, $debug;
+		global $DB, $admin_url, $debug, $Debuglog;
 
 		// Get list of users who want to be notfied:
 		// TODO: also use extra cats/blogs??
@@ -2312,7 +2315,7 @@ class Item extends DataObject
 			$notify_array[$notification->user_email] = $notification->user_locale;
 		}
 
-		if( ! count($notify_array) )
+		if( empty($notify_array) )
 		{ // No-one to notify:
 			return false;
 		}
@@ -2331,39 +2334,52 @@ class Item extends DataObject
 		$Blog = & $this->get_Blog();
 
 		// Send emails:
+		$cache_by_locale = array();
 		foreach( $notify_array as $notify_email => $notify_locale )
 		{
-			locale_temp_switch($notify_locale);
+			if( ! isset($cache_by_locale[$notify_locale]) )
+			{ // No message for this locale generated yet:
+				locale_temp_switch($notify_locale);
 
-			$subject = sprintf( T_('[%s] New post: "%s"'), $Blog->get('shortname'), $this->get('title') );
+				// Calculate length for str_pad to align labels:
+				$pad_len = max( strlen(T_('Blog')), strlen(T_('Author')), strlen(T_('Title')), strlen(T_('Url')), strlen(T_('Content')) );
 
-			$notify_message  = T_('Blog').': '.$Blog->get('shortname')
-												.' ( '.str_replace('&amp;', '&', $Blog->get('blogurl'))." )\n";
+				$cache_by_locale[$notify_locale]['subject'] = sprintf( T_('[%s] New post: "%s"'), $Blog->get('shortname'), $this->get('title') );
 
-			$notify_message .= T_('Author').': '.$this->Author->get('preferredname').' ('.$this->Author->get('login').")\n";
+				$cache_by_locale[$notify_locale]['message'] =
+					str_pad( T_('Blog'), $pad_len ).': '.$Blog->get('shortname')
+					.' ( '.str_replace('&amp;', '&', $Blog->get('blogurl'))." )\n"
 
-			$notify_message .= T_('Title').': '.$this->get('title')."\n";
+					.str_pad( T_('Author'), $pad_len ).': '.$this->Author->get('preferredname').' ('.$this->Author->get('login').")\n"
 
-			$notify_message .= T_('Url').': '.str_replace('&amp;', '&', $this->get('url'))."\n";
+					.str_pad( T_('Title'), $pad_len ).': '.$this->get('title')."\n"
 
-			$notify_message .= T_('Content').': '.str_replace('&amp;', '&', $this->get_permanent_url( 'pid' ))."\n";
-												// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+					// linked URL or "-" if empty:
+					.str_pad( T_('Url'), $pad_len ).': '.( empty( $this->url ) ? '-' : str_replace('&amp;', '&', $this->get('url')) )."\n"
 
-			$notify_message .= $this->get('content')."\n\n";
+					.str_pad( T_('Content'), $pad_len ).': '
+						// We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
+						// TODO: might get moved onto a single line, at the end of the content..
+						.str_replace('&amp;', '&', $this->get_permanent_url( 'pid' ))."\n\n"
 
-			$notify_message .= T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&amp;blog='.$this->blog_ID.'&p='.$this->ID."\n\n";
+					.$this->get('content')."\n"
 
-			$notify_message .= T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
+					// Footer:
+					."\n-- \n"
+					.T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&amp;blog='.$this->blog_ID.'&p='.$this->ID."\n\n"
+
+					.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
+
+				locale_restore_previous();
+			}
 
 			if( $display ) echo T_('Notifying:').$notify_email."<br />\n";
 			if( $debug >= 2 )
 			{
-				echo "<p>Sending notification to $notify_email:<pre>$notify_message</pre>";
+				echo "<p>Sending notification to $notify_email:<pre>$cache_by_locale[$notify_locale]['message']</pre>";
 			}
 
-			send_mail( $notify_email, $subject, $notify_message, $mail_from );
-
-			locale_restore_previous();
+			send_mail( $notify_email, $cache_by_locale[$notify_locale]['subject'], $cache_by_locale[$notify_locale]['message'], $mail_from );
 		}
 
 		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
@@ -2451,6 +2467,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2006/03/21 19:55:05  blueyed
+ * notifications: cache by locale/nicer (padded) formatting; respect $allow_msgform in msgform_link()
+ *
  * Revision 1.17  2006/03/18 19:17:53  blueyed
  * Removed remaining use of $img_url
  *
