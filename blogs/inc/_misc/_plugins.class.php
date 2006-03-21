@@ -988,13 +988,13 @@ class Plugins
 		}
 
 		// Instantiate the Plugins Settings class
-		if( $this->instantiate_Settings( $Plugin, 'Settings' ) === false && ! $this->is_admin_class )
+		if( $this->instantiate_Settings( $Plugin, 'Settings' ) === false && ! $this->is_admin_class && $ID != 0 )
 		{
 			$Debuglog->add( 'Unregistered plugin, because instantiating its Settings returned false.', 'plugins' );
 			$this->unregister( $Plugin );
 			$Plugin = '';
 		}
-		if( $this->instantiate_Settings( $Plugin, 'UserSettings' ) === false && ! $this->is_admin_class )
+		if( $this->instantiate_Settings( $Plugin, 'UserSettings' ) === false && ! $this->is_admin_class && $ID != 0 )
 		{
 			$Debuglog->add( 'Unregistered plugin, because instantiating its UserSettings returned false.', 'plugins' );
 			$this->unregister( $Plugin );
@@ -1275,7 +1275,7 @@ class Plugins
 			global $current_User;
 			if( ! is_object($current_User) )
 			{ // do not instantiate UserSettings, if we have no user!
-				return false;
+				return NULL;
 			}
 		}
 
@@ -2434,6 +2434,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.24  2006/03/21 23:03:47  blueyed
+ * Fixes for instantiating settings (Plugins without UserSettings failed to install since last commit)
+ *
  * Revision 1.23  2006/03/20 00:14:37  blueyed
  * Do not instantiate UserSettings, if we have no user!
  *
