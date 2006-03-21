@@ -66,7 +66,7 @@ function install_plugin_db_schema_action( & $Plugin )
 	$install_db_deltas_confirm_md5 = $Request->param( 'install_db_deltas_confirm_md5' );
 
 	$db_layout = $Plugin->GetDbLayout();
-	$install_db_deltas = array(); // This eventually holds changes to make
+	$install_db_deltas = array(); // This eventually holds changes to make (just all queries)
 
 	if( ! empty($db_layout) )
 	{ // The plugin has a DB layout attached
@@ -77,7 +77,10 @@ function install_plugin_db_schema_action( & $Plugin )
 		{
 			foreach( $queries as $query_info )
 			{
-				$install_db_deltas[] = $query_info['query'];
+				foreach( $query_info['queries'] as $query )
+				{ // subqueries for this query (usually one, but may include required other queries)
+					$install_db_deltas[] = $query;
+				}
 			}
 		}
 
