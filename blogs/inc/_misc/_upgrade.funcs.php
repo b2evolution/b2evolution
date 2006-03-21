@@ -71,6 +71,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param array Exclude query types (see list above). Defaults to drop_column.
  * @return array The generated queries.
  *        table_name => array of arrays (queries with keys 'queries' (array), 'note' (string) and 'type' (string))
+ *        There's usually just a single query in "queries", but in some cases additional queries
+ *        are needed (e.g., 'UPDATE' before we can change "NULL" setting).
  */
 function db_delta( $queries, $execute = false, $exclude_types = NULL )
 {
@@ -699,7 +701,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 							{
 								$existing_enum_field_values[$k] = preg_replace( '~^(["\'])(.*)\1$~', '$2', $v ); // strip quotes
 							}
-							
+
 							if( ! in_array( $update_default, $existing_enum_field_values ) )
 							{ // we cannot update straight to the new default, because it does not exist yet!
 
@@ -963,6 +965,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.13  2006/03/21 23:17:17  blueyed
+ * doc/cleanup
+ *
  * Revision 1.12  2006/03/19 18:16:15  blueyed
  * Fix for default updates
  *

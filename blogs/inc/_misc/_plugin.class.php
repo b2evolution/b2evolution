@@ -392,7 +392,7 @@ class Plugin
 	 * adjust the queries here and increase {@link Plugin::version}, because this will
 	 * request to check the current DB layout against the one you require.
 	 *
-	 * @see db_delta()
+	 * For restrictions see {@link db_delta()}.
 	 */
 	function GetDbLayout()
 	{
@@ -1510,7 +1510,6 @@ class Plugin
 	 * E.g., for the "test_plugin" with ID 7 and the default {@link $tableprefix} of "evo_" it
 	 * would generate: "evo_plugin_test_7_log" for a requested name "log".
 	 *
-	 * @see Plugin::sql_delta()
 	 * @param string Your name, which gets returned with the unique prefix.
 	 * @return string
 	 */
@@ -1520,27 +1519,6 @@ class Plugin
 
 		// NOTE: table name length seems limited to 64 chars (MySQL 5) - classname is limited to 40 (in T_plugins)
 		return $tableprefix.'plugin_'.preg_replace( '#_plugin$#', '', $this->classname ).'_'.$this->ID.'_'.$name;
-	}
-
-
-	/**
-	 * This is a magic method you should use to create your custom database tables
-	 * (if you want to create and use any): You give a list of queries to it and
-	 * it will alter the DB to fit your table schema..
-	 *
-	 * @see Plugin::get_sql_table()
-	 * @uses db_delta()
-	 *
-	 * @param string|array A single query as string or a list of queries as array
-	 * @param boolean Execute the generated SQL right away?
-	 * @return array An empty array, if no alterations were needed, otherwise a quite complex
-	 *               list of what was generated. Please see {@link db_delta()} for details.
-	 */
-	function sql_delta( $queries, $execute = true )
-	{
-		require_once( dirname(__FILE__).'/_upgrade.funcs.php' );
-
-		return db_delta( $queries, $execute );
 	}
 
 
@@ -1824,6 +1802,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.20  2006/03/21 23:17:17  blueyed
+ * doc/cleanup
+ *
  * Revision 1.19  2006/03/19 22:38:29  blueyed
  * added get_class_id()
  *
