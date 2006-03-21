@@ -352,8 +352,23 @@ if( !$Messages->count('error') )
 
 				if( $edited_User->ID != 0 )
 				{ // Commit update to the DB:
-					$edited_User->dbupdate();
-					$Messages->add( T_('User updated.'), 'success' );
+					$update_r = $edited_User->dbupdate();
+
+					if( $edited_User->ID == $current_User->ID )
+					{ // User updates his profile:
+						if( $update_r )
+						{
+							$Messages->add( T_('Your profile has been updated.'), 'success' );
+						}
+						else
+						{
+							$Messages->add( T_('Your profile has not been changed.'), 'note' );
+						}
+					}
+					else
+					{
+						$Messages->add( T_('User updated.'), 'success' );
+					}
 				}
 				else
 				{ // Insert user into DB
@@ -642,6 +657,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/03/21 16:51:24  blueyed
+ * More personal message, when updating own profile.
+ *
  * Revision 1.10  2006/03/20 22:36:05  blueyed
  * Fixed deleting of users and groups.
  *
