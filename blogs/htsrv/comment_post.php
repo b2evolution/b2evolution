@@ -116,7 +116,7 @@ if( !$ok )
  * Error messages:
  */
 if( $Messages->display( T_('Cannot post comment, please correct these errors:'),
-	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' ), true, 'error' )
+	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]', true, 'error' ) )
 {
 	debug_info();  // output debug info, useful to see what a plugin might have done
 	exit(); // TODO: nicer displaying here (but do NOT die() or debug_die() because this is not a BUG/user hack, it's a plain user input error (any bozo can produce it)
@@ -214,6 +214,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.62  2006/03/22 01:07:05  blueyed
+ * bad brackets
+ *
  * Revision 1.61  2006/03/20 22:28:34  blueyed
  * Changed defaults for Log's display methods to "all" categories.
  *
