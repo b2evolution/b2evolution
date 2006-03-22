@@ -11,16 +11,26 @@
 
 	<h2>&quot;Phoenix Beta&quot; - CVS </h2>
 <ul>
-<li>Extended plugin architecture</li>
+<li>Extended plugin architecture:</li>
+	<ul>
+	<li>Event-driven instantiation of Plugins</li>
+	<li>Interface for Settings and UserSettings</li>
+	<li>Easy setup for a database schema a plugin wants</li>
+	</ul>
 <li>Last comments appear in backoffice for easier moderation</li>
+<li>Users and anonymous visitors can opt-out to receive emails through message form (blueyed)</li>
 <li>ItemList2 class which will replace ItemList. Better performance, security, stability and new features:
 <ul>
 <li>Filtering of posts on assignees with assgn=1 or assgn=1,2 or assgn=-1,2 or assgn=-</li>
 <li>Filtering of posts on extra statuses with status=1 or status=1,2 or status=-1,2 or status=-</li>
 </ul>
 </li>
+<li>db_delta() functionality that allows easier upgrading (blueyed)</li>
+<li>MySQL 5 strict mode compatibility (blueyed)</li>
 <li>Removed no longer supported Geeklog and Miniblog upgraders. (It is still possible to upgrade from those by upgrading to b2evo 0.9 and then to b2evo 1.x</li>
 </ul>
+
+
 <h2>&quot;Phoenix Alpha&quot; </h2>
 <p>The main focus of this new version was to remove the b2 legacy code from the evoCore framework in order to move to a more stable, reliable and scalable architecture (with Objects and all the rest...). This was mostly behind the scenes work without immediate features to show off for gratification. However, the new evoCore now allows to add functionnality more quickly and more efficiently.</p>
 <p>Anyway, there are already quite a few new features available: </p>
