@@ -900,6 +900,7 @@ function install_basic_plugins()
 	$Plugins->install( 'quicktags_plugin' );
 	// Renderers:
 	$Plugins->install( 'auto_p_plugin' );
+	$Plugins->install( 'autolinks_plugin' );
 	$Plugins->install( 'texturize_plugin' );
 	// SkinTags:
 	$Plugins->install( 'calendar_plugin' );
@@ -908,8 +909,12 @@ function install_basic_plugins()
 	echo "OK.<br />\n";
 }
 
+
 /*
  * $Log$
+ * Revision 1.182  2006/03/22 20:31:41  blueyed
+ * Install autolinks_plugin as basic plugin.
+ *
  * Revision 1.181  2006/03/12 23:09:26  fplanque
  * doc cleanup
  *
@@ -929,9 +934,6 @@ function install_basic_plugins()
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.175  2006/02/13 20:20:10  fplanque
- * minor / cleanup
  *
  * Revision 1.174  2006/02/11 01:08:19  blueyed
  * Oh what fun it is to drop some "e".
@@ -954,20 +956,11 @@ function install_basic_plugins()
  * Revision 1.168  2006/01/06 00:11:47  blueyed
  * Fix potential SQL error when upgrading from < 0.9 to Phoenix
  *
- * Revision 1.167  2005/12/30 18:54:59  fplanque
- * minor
- *
- * Revision 1.166  2005/12/30 18:08:24  fplanque
- * no message
- *
  * Revision 1.165  2005/12/29 20:20:01  blueyed
  * Renamed T_plugin_settings to T_pluginsettings
  *
  * Revision 1.164  2005/12/22 23:13:40  blueyed
  * Plugins' API changed and handling optimized
- *
- * Revision 1.163  2005/12/20 18:11:40  fplanque
- * no message
  *
  * Revision 1.162  2005/12/14 22:30:06  blueyed
  * Fix inserting default filetypes for MySQL 3
@@ -975,17 +968,11 @@ function install_basic_plugins()
  * Revision 1.161  2005/12/14 19:36:16  fplanque
  * Enhanced file management
  *
- * Revision 1.160  2005/12/12 20:32:58  fplanque
- * no message
- *
  * Revision 1.159  2005/12/12 19:22:03  fplanque
  * big merge; lots of small mods; hope I didn't make to many mistakes :]
  *
  * Revision 1.158  2005/12/11 00:22:53  blueyed
  * MySQL strict mode fixes. (SET sql_mode = "TRADITIONAL";)
- *
- * Revision 1.157  2005/11/22 20:51:38  fplanque
- * no message
  *
  * Revision 1.153  2005/11/16 17:20:23  fplanque
  * hit_ID moved back to INT for performance reasons.
@@ -994,17 +981,11 @@ function install_basic_plugins()
  * Linked useragent to a session rather than a hit;
  * SQL: moved T_hitlog.hit_agnt_ID to T_sessions.sess_agnt_ID
  *
- * Revision 1.151  2005/10/31 23:20:45  fplanque
- * keeping things straight...
- *
  * Revision 1.150  2005/10/31 08:19:07  blueyed
  * Refactored getRandomPassword() and Session::generate_key() into generate_random_key()
  *
  * Revision 1.149  2005/10/31 01:38:45  blueyed
  * create_default_settings(): rely on defaults from $Settings
- *
- * Revision 1.148  2005/10/29 21:00:01  blueyed
- * Moved $db_use_fkeys to $EvoConfig->DB['use_fkeys'].
  *
  * Revision 1.147  2005/10/27 00:11:12  mfollett
  * fixed my own error which would disallow installation because of an extra comma in the create table for the sessions table
