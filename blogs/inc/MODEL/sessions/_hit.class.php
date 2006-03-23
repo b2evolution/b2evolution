@@ -49,6 +49,13 @@ class Hit
 	var $logged = false;
 
 	/**
+	 * The referer/referrer.
+	 *
+	 * @var string
+	 */
+	var $referer;
+
+	/**
 	 * The type of referer.
 	 *
 	 * @var string 'search'|'blacklist'|'referer'|'direct'|'spam'
@@ -703,6 +710,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.10  2006/03/23 22:13:50  blueyed
+ * doc
+ *
  * Revision 1.9  2006/03/17 21:28:40  fplanque
  * no message
  *

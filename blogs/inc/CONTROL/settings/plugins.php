@@ -44,7 +44,7 @@ $admin_Plugins->restart();
 while( $loop_Plugin = & $admin_Plugins->get_next() )
 {
 	if( $loop_Plugin->status == 'broken' && ! isset( $admin_Plugins->plugin_errors[$loop_Plugin->ID] ) )
-	{ // The plugin is not "broken" anymore
+	{ // The plugin is not "broken" anymore (either the problem got fixed or it was "broken" from a canceled "install_db_schema" action)
 		$Plugins->set_Plugin_status( $loop_Plugin, 'disabled' );
 	}
 }

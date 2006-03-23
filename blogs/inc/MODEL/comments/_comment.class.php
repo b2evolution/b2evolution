@@ -38,18 +38,42 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
  */
 class Comment extends DataObject
 {
+	/**
+	 * @var Item The item (parent) of this Comment
+	 */
 	var $Item;
+	/**
+	 * @var User The comment's user, this is NULL for (anonymous) visitors
+	 */
 	var $author_User;
+	/**
+	 * @var string Comment type: 'comment', 'linkback', 'trackback' or 'pingback'
+	 */
 	var $type;
 	var $status;
+	/**
+	 * @var string Name of the (anonymous) visitor (if any).
+	 */
 	var $author;
+	/**
+	 * @var string Email address of the (anonymous) visitor (if any).
+	 */
 	var $author_email;
+	/**
+	 * @var string URL/Homepage of the (anonymous) visitor (if any).
+	 */
 	var $author_url;
 	/**
 	 * @var string IP address of the comment's author (while posting).
 	 */
 	var $author_IP;
+	/**
+	 * @var string Date of the comment (MySQL DATETIME)
+	 */
 	var $date;
+	/**
+	 * @var string
+	 */
 	var $content;
 	/**
 	 * @var integer Spam karma of the comment (0-100), 0 being "probably no spam at all"
@@ -809,6 +833,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2006/03/23 22:13:50  blueyed
+ * doc
+ *
  * Revision 1.15  2006/03/19 17:54:26  blueyed
  * Opt-out for email through message form.
  *
