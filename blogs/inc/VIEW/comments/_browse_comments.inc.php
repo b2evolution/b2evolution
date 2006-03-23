@@ -73,9 +73,7 @@ while( $Comment = & $CommentList->get_next() )
 		</div>
 		<div class="bCommentContent">
 		<div class="bTitle">
-			<?php
-			// TODO: blueyed>> this link is broken (tab) and the title seems wrong - I'm not sure how to fix it.
-			echo T_('In response to:').' <a href=?ctrl=browse&amp;blog='.$Blog->ID.'&amp;tab=exp&amp;p='.$Comment->Item->ID
+			<?php echo T_('In response to:').' <a href=?ctrl=browse&amp;blog='.$Blog->ID.'&amp;tab=posts&amp;p='.$Comment->Item->ID
 								.'&amp;c=1&amp;tb=1&amp;pb=1" class="" title="'.T_('Edit this task...').'">'.$Comment->Item->dget('title').'</a>';
 				?>
 		</div>
@@ -124,8 +122,8 @@ while( $Comment = & $CommentList->get_next() )
 <?php
 /*
  * $Log$
- * Revision 1.8  2006/03/23 19:06:46  blueyed
- * todo
+ * Revision 1.9  2006/03/23 21:02:12  fplanque
+ * cleanup
  *
  * Revision 1.7  2006/03/15 00:58:55  blueyed
  * cosmetics

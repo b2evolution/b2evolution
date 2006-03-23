@@ -21,7 +21,7 @@ if( ! $display_blog_list )
 # this is what will start and end your blog links
 if(!isset($blog_list_start)) $blog_list_start = '<ul>';
 if(!isset($blog_list_end)) $blog_list_end = '</ul>';
-# This is what each item will get imploded by
+# This is what will separate items in the list TODO: rename the insanely nerdy "log_list_implode_all" to a more humane "blog_list_separator"
 if(!isset($blog_list_implode_all)) $blog_list_implode_all = '';
 # this is what will separate your blog links
 if(!isset($blog_item_start)) $blog_item_start = '<li>';

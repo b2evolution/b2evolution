@@ -80,9 +80,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 </div>
 
 <div class="bPosts">
+
+<!-- =================================== START OF MAIN AREA =================================== -->
+
 <?php
 	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-	$Messages->display();
+	$Messages->disp( );
 	// --------------------------------- END OF MESSAGES ---------------------------------
 ?>
 
@@ -91,8 +94,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	request_title( '<h2>', '</h2>' );
 	// ------------------------------ END OF REQUEST TITLE -----------------------------
 ?>
-
-<!-- =================================== START OF MAIN AREA =================================== -->
 
 <?php
 	// ------------------------------------ START OF POSTS ----------------------------------------

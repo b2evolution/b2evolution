@@ -2293,7 +2293,7 @@ class Item extends DataObject
 	 * Send email notifications to subscribed users
 	 *
 	 * @todo shall we notify suscribers of blog were this is in extra-cat?
-	 *       blueyed>> IMHO yes.
+	 *       blueyed>> IMHO yes.   fp>>why not but is this important?
 	 */
 	function send_email_notifications( $display = true )
 	{
@@ -2467,6 +2467,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2006/03/23 21:02:19  fplanque
+ * cleanup
+ *
  * Revision 1.18  2006/03/21 19:55:05  blueyed
  * notifications: cache by locale/nicer (padded) formatting; respect $allow_msgform in msgform_link()
  *

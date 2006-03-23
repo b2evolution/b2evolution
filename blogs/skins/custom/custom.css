@@ -165,6 +165,9 @@ h2 {
 	overflow: hidden;
 	/* background: #090;*/
 }
+div.action_messages {
+	margin: 0 2ex;
+}
 .bPost, .bPostpublished
 {
 	clear: both;

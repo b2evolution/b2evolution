@@ -912,6 +912,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.183  2006/03/23 21:02:15  fplanque
+ * cleanup
+ *
  * Revision 1.182  2006/03/22 20:31:41  blueyed
  * Install autolinks_plugin as basic plugin.
  *
@@ -935,6 +938,9 @@ function install_basic_plugins()
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
  *
+ * Revision 1.175  2006/02/13 20:20:10  fplanque
+ * minor / cleanup
+ *
  * Revision 1.174  2006/02/11 01:08:19  blueyed
  * Oh what fun it is to drop some "e".
  *
@@ -955,6 +961,12 @@ function install_basic_plugins()
  *
  * Revision 1.168  2006/01/06 00:11:47  blueyed
  * Fix potential SQL error when upgrading from < 0.9 to Phoenix
+ *
+ * Revision 1.167  2005/12/30 18:54:59  fplanque
+ * minor
+ *
+ * Revision 1.166  2005/12/30 18:08:24  fplanque
+ * no message
  *
  * Revision 1.165  2005/12/29 20:20:01  blueyed
  * Renamed T_plugin_settings to T_pluginsettings
@@ -981,11 +993,17 @@ function install_basic_plugins()
  * Linked useragent to a session rather than a hit;
  * SQL: moved T_hitlog.hit_agnt_ID to T_sessions.sess_agnt_ID
  *
+ * Revision 1.151  2005/10/31 23:20:45  fplanque
+ * keeping things straight...
+ *
  * Revision 1.150  2005/10/31 08:19:07  blueyed
  * Refactored getRandomPassword() and Session::generate_key() into generate_random_key()
  *
  * Revision 1.149  2005/10/31 01:38:45  blueyed
  * create_default_settings(): rely on defaults from $Settings
+ *
+ * Revision 1.148  2005/10/29 21:00:01  blueyed
+ * Moved $db_use_fkeys to $EvoConfig->DB['use_fkeys'].
  *
  * Revision 1.147  2005/10/27 00:11:12  mfollett
  * fixed my own error which would disallow installation because of an extra comma in the create table for the sessions table

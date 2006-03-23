@@ -249,6 +249,30 @@ class Log
 	}
 
 
+  /**
+   * TEMPLATE TAG
+   *
+   * The purpose here is to have a tag which is simple yet flexible.
+   * the display function is WAAAY too bloated.
+   *
+   * @todo optimize
+   *
+   * @param string HTML to display before the log when there is something to display
+   * @param string HTML to display after the log when there is something to display
+   */
+	function disp( $before = '<div class="action_messages">', $after = '</div>' )
+	{
+		if( count($this->messages) )
+		{
+			echo $before;
+
+			$this->display( NULL, NULL, true, 'all', NULL, NULL, NULL );
+
+			echo $after;
+		}
+	}
+
+
 	/**
 	 * Display messages of the Log object.
 	 *
@@ -268,6 +292,10 @@ class Log
 	 *   </code>
 	 *   Please note: when called static, it will always display, because $display
 	 *                equals true.
+	 *
+	 * @todo Make this simple!
+	 * start by getting rid of the $category selection and the special cases for 'all'. If you don't want to display ALL messages,
+	 * then you should not log them in the same Log ovject and you should instanciate separate logs instead.
 	 *
 	 * @param string|NULL Header/title, might be array ( category => msg ),
 	 *                    'container' is then top. NULL for object's default ({@link Log::head}.
@@ -603,6 +631,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/23 21:02:22  fplanque
+ * cleanup
+ *
  * Revision 1.5  2006/03/20 22:28:35  blueyed
  * Changed defaults for Log's display methods to "all" categories.
  *
