@@ -21,6 +21,8 @@ if( ! $display_blog_list )
 # this is what will start and end your blog links
 if(!isset($blog_list_start)) $blog_list_start = '<ul>';
 if(!isset($blog_list_end)) $blog_list_end = '</ul>';
+# This is what each item will get imploded by
+if(!isset($blog_list_implode_all)) $blog_list_implode_all = '';
 # this is what will separate your blog links
 if(!isset($blog_item_start)) $blog_item_start = '<li>';
 if(!isset($blog_item_end)) $blog_item_end = '</li>';
@@ -40,7 +42,8 @@ if(!isset($blog_name_param)) $blog_name_param = 'shortname';
 if(!isset($blog_title_param)) $blog_title_param = 'name';
 
 
-echo $blog_list_start;
+$blog_links = array(); // we collect all links first, to easily implode them
+
 for( $curr_blog_ID = blog_list_start();
 			$curr_blog_ID != false;
 			 $curr_blog_ID = blog_list_next() )
@@ -49,33 +52,39 @@ for( $curr_blog_ID = blog_list_start();
 	{ // don't show
 		continue;
 	}
-	echo $blog_item_start;
+	$blog_link = $blog_item_start;
 	if( $curr_blog_ID == $blog )
 	{ // This is the blog being displayed on this page:
-		echo '<a href="';
-		blog_list_iteminfo('blogurl', 'raw');
-		echo '" class="', $blog_selected_link_class, '" title="';
-		blog_list_iteminfo($blog_title_param, 'htmlattr');
-		echo '">';
-		echo $blog_selected_name_before;
-		blog_list_iteminfo($blog_name_param, 'htmlbody');
-		echo $blog_selected_name_after;
-		echo '</a>';
+		$blog_link .= '<a href="';
+		$blog_link .= blog_list_iteminfo('blogurl', false);
+		$blog_link .= '" class="'.$blog_selected_link_class.'" title="';
+		$blog_link .= format_to_output( blog_list_iteminfo($blog_title_param, false), 'htmlattr' );
+		$blog_link .= '">';
+		$blog_link .= $blog_selected_name_before;
+		$blog_link .= format_to_output( blog_list_iteminfo($blog_name_param, false ), 'htmlbody' );
+		$blog_link .= $blog_selected_name_after;
+		$blog_link .= '</a>';
 	}
 	else
 	{ // This is another blog:
-		echo '<a href="';
-		blog_list_iteminfo('blogurl', 'raw');
-		echo '" class="', $blog_other_link_class, '" title="';
-		blog_list_iteminfo($blog_title_param, 'htmlattr');
-		echo '">';
-		echo $blog_other_name_before;
-		blog_list_iteminfo($blog_name_param, 'htmlbody');
-		echo $blog_other_name_after;
-		echo '</a>';
+		$blog_link .= '<a href="';
+		$blog_link .= blog_list_iteminfo('blogurl', false);
+		$blog_link .= '" class="'.$blog_other_link_class.'" title="';
+		$blog_link .= format_to_output( blog_list_iteminfo($blog_title_param, false), 'htmlattr' );
+		$blog_link .= '">';
+		$blog_link .= $blog_other_name_before;
+		$blog_link .= format_to_output( blog_list_iteminfo($blog_name_param, false), 'htmlbody' );
+		$blog_link .= $blog_other_name_after;
+		$blog_link .= '</a>';
 	} // End of testing which blog is being displayed
-	echo $blog_item_end;
+	$blog_link .= $blog_item_end;
+
+	$blog_links[] = $blog_link;
 }
+
+// Output:
+echo $blog_list_start;
+echo implode( $blog_list_implode_all, $blog_links );
 echo $blog_list_end;
 
 ?>
