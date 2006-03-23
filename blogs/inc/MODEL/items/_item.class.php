@@ -364,7 +364,7 @@ class Item extends DataObject
 	 */
 	function get_permanent_url( $mode = '', $blogurl = '', $force_single = false, $glue = '&amp;' )
 	{
-		global $DB, $BlogCache, $cacheweekly, $Settings;
+		global $DB, $cacheweekly, $Settings;
 
 		if( empty( $mode ) )
 			$mode = $Settings->get( 'permalink_type' );
@@ -376,8 +376,8 @@ class Item extends DataObject
 
 		if( empty( $blogurl ) )
 		{
-			$current_Blog = & $BlogCache->get_by_ID( $this->blog_ID );
-			$blogurl = $current_Blog->gen_blogurl();
+			$this->load_Blog();
+			$blogurl = $this->Blog->gen_blogurl();
 		}
 
 		$post_date = $this->issue_date;
@@ -726,9 +726,8 @@ class Item extends DataObject
 			return false;
 		}
 
-		global $BlogCache;
-		$current_Blog = & $BlogCache->get_by_ID( $this->blog_ID );
-		if ($current_Blog->allowcomments == 'never')
+		$this->get_Blog();
+		if( $this->Blog->allowcomments == 'never')
 			return false;
 
 		return true; // OK, user can comment!
@@ -1227,7 +1226,7 @@ class Item extends DataObject
 													$zero='#', $one='#', $more='#', $title='#',
 													$use_popup = '#',	$hideifnone = '#', $mode = '', $blogurl='' )
 	{
-		global $b2commentsjavascript, $BlogCache;
+		global $b2commentsjavascript;
 
 		switch( $type )
 		{
@@ -1256,8 +1255,8 @@ class Item extends DataObject
 				break;
 
 			case 'trackbacks':
-				$current_Blog = & $BlogCache->get_by_ID( $this->blog_ID );
-				if( ! $current_Blog->get( 'allowtrackbacks' ) )
+				$this->load_Blog();
+				if( ! $this->Blog->get( 'allowtrackbacks' ) )
 				{ // Trackbacks not allowed on this blog:
 					return;
 				}
@@ -1269,8 +1268,8 @@ class Item extends DataObject
 				break;
 
 			case 'pingbacks':
-				$current_Blog = & $BlogCache->get_by_ID( $this->blog_ID );
-				if( ! $current_Blog->get( 'allowpingbacks' ) )
+				$this->load_Blog();
+				if( ! $this->Blog->get( 'allowpingbacks' ) )
 				{ // Pingbacks not allowed on this blog:
 					return;
 				}
@@ -2468,6 +2467,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2006/03/23 23:34:13  blueyed
+ * cleanup
+ *
  * Revision 1.20  2006/03/23 22:01:17  blueyed
  * todo
  *
