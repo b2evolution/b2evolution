@@ -21,8 +21,8 @@ if( ! $display_blog_list )
 # this is what will start and end your blog links
 if(!isset($blog_list_start)) $blog_list_start = '<ul>';
 if(!isset($blog_list_end)) $blog_list_end = '</ul>';
-# This is what will separate items in the list TODO: rename the insanely nerdy "log_list_implode_all" to a more humane "blog_list_separator"
-if(!isset($blog_list_implode_all)) $blog_list_implode_all = '';
+# This is what will separate items in the list
+if(!isset($blog_list_separator)) $blog_list_separator = '';
 # this is what will separate your blog links
 if(!isset($blog_item_start)) $blog_item_start = '<li>';
 if(!isset($blog_item_end)) $blog_item_end = '</li>';
@@ -84,7 +84,7 @@ for( $curr_blog_ID = blog_list_start();
 
 // Output:
 echo $blog_list_start;
-echo implode( $blog_list_implode_all, $blog_links );
+echo implode( $blog_list_separator, $blog_links );
 echo $blog_list_end;
 
 ?>
