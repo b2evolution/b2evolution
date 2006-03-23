@@ -1513,6 +1513,7 @@ class Item extends DataObject
 		if( $title == '#' ) $title = T_('Deprecate this post now!');
 
 		$r = $before;
+		// TODO: this link is broken, but I'm not sure how to fix it.
 		$r .= '<a href="'.$baseurl.'ctrl=edit&amp;action=deprecate'.$glue.'post_ID='.$this->ID;
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
@@ -2293,7 +2294,7 @@ class Item extends DataObject
 	 * Send email notifications to subscribed users
 	 *
 	 * @todo shall we notify suscribers of blog were this is in extra-cat?
-	 *       blueyed>> IMHO yes.   fp>>why not but is this important?
+	 *       blueyed>> IMHO yes.   fp>>why not but is this important?    blueyed>> Not really, just have answered.. :)
 	 */
 	function send_email_notifications( $display = true )
 	{
@@ -2467,6 +2468,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2006/03/23 22:01:17  blueyed
+ * todo
+ *
  * Revision 1.19  2006/03/23 21:02:19  fplanque
  * cleanup
  *
