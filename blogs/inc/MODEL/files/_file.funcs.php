@@ -376,7 +376,7 @@ function get_ads_canonical_path( $ads_path )
 	$ads_path = str_replace( '\\', '/', $ads_path );
 
 	$ads_path = str_replace( '//', '/', $ads_path );
-	$ads_path = str_replace( '/\./', '/', $ads_path );
+	$ads_path = str_replace( '/./', '/', $ads_path );
 	while( ($ads_realpath = preg_replace( '#/([^/]+)/\.\./#', '/', $ads_path )) != $ads_path )
 	{ // comment?
 		// echo '*';
@@ -715,6 +715,9 @@ function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = N
 
 /*
  * $Log$
+ * Revision 1.9  2006/03/24 19:53:35  blueyed
+ * str_replace() is not regexp..
+ *
  * Revision 1.8  2006/03/24 19:38:21  fplanque
  * fixed nasty regexp
  *
