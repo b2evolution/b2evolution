@@ -1270,15 +1270,6 @@ class Plugins
 	{
 		global $Debuglog, $Timer, $model_path;
 
-		if( $set_type == 'UserSettings' )
-		{
-			global $current_User;
-			if( ! is_object($current_User) )
-			{ // do not instantiate UserSettings, if we have no user!
-				return NULL;
-			}
-		}
-
 		$Timer->resume( 'plugins_inst_'.$set_type );
 
 		$r = true;
@@ -2434,6 +2425,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.25  2006/03/24 01:06:55  blueyed
+ * Also instantiate UserSettings if $current_User not (yet) set (of course!)
+ *
  * Revision 1.24  2006/03/21 23:03:47  blueyed
  * Fixes for instantiating settings (Plugins without UserSettings failed to install since last commit)
  *
