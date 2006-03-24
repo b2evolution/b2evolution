@@ -203,6 +203,8 @@ $b2getcategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, 
  *
  * B2 API
  *
+ * Gets also used for mt.getCategoryList. Is this correct?
+ *
  * @param xmlrpcmsg XML-RPC Message
  *					0 blogid (string): Unique identifier of the blog to query
  *					1 username (string): Login for a Blogger user who is member of the blog.
@@ -2386,7 +2388,7 @@ $s = new xmlrpc_server(
 
 		"b2.newPost" =>
 			array(
-		 		"function" => "b2newpost",
+				"function" => "b2newpost",
 				"signature" => $b2newpost_sig,
 				"docstring" => $b2newpost_doc),
 
@@ -2422,7 +2424,7 @@ $s = new xmlrpc_server(
 
 		"blogger.getUsersBlogs" =>
 			array(
-		 		"function" => "bloggergetusersblogs",
+				"function" => "bloggergetusersblogs",
 				"signature" => $bloggergetusersblogs_sig,
 				"docstring" => $bloggergetusersblogs_doc),
 
@@ -2465,20 +2467,23 @@ $s = new xmlrpc_server(
 		"mt.getPostCategories" =>
 			array(
 				"function" => "mt_getPostCategories",
-	 			"signature" => $mt_getPostCategories_sig,
-	 			"docstring" => $mt_getPostCategories_doc),
+				"signature" => $mt_getPostCategories_sig,
+				"docstring" => $mt_getPostCategories_doc),
 
+		/*
+		blueyed>> defined above already and $mt_getCategoryList_* not defined..
 		"mt.getCategoryList" =>
 			array(
 				"function" => "mt_getCategorylist",
 				"signature" => $mt_getCategoryList_sig,
 				"docstring" => $mt_getCategoryList_doc),
+		*/
 
 		"mt.setPostCategories" =>
 			array(
 				"function" => "mt_setPostCategories",
-	 			"signature" => $mt_setPostCategories_sig,
-	 			"docstring" => $mt_setPostCategories_doc),
+				"signature" => $mt_setPostCategories_sig,
+				"docstring" => $mt_setPostCategories_doc),
 	)
 );
 
@@ -2487,8 +2492,8 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
- * Revision 1.92  2006/03/21 00:35:03  blueyed
- * Trivial fix(?)
+ * Revision 1.93  2006/03/24 01:04:33  blueyed
+ * Fix for mt.getCategoryList? At least E_NOTICE fixed.
  *
  * Revision 1.91  2006/03/18 19:17:54  blueyed
  * Removed remaining use of $img_url
