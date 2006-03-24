@@ -376,8 +376,8 @@ function get_ads_canonical_path( $ads_path )
 	$ads_path = str_replace( '\\', '/', $ads_path );
 
 	$ads_path = str_replace( '//', '/', $ads_path );
-	$ads_path = str_replace( '/./', '/', $ads_path );
-	while( ($ads_realpath = preg_replace( '#/([^/]+)/../#', '/', $ads_path )) != $ads_path )
+	$ads_path = str_replace( '/\./', '/', $ads_path );
+	while( ($ads_realpath = preg_replace( '#/([^/]+)/\.\./#', '/', $ads_path )) != $ads_path )
 	{ // comment?
 		// echo '*';
 		$ads_path = $ads_realpath;
@@ -493,7 +493,7 @@ function validate_filename( $filename )
 			}
 			else
 			{	// Filename hasn't an allowed extension
-				return sprintf( T_('&laquo;%s&raquo; has not an allowed extension.'), $filename );
+				return sprintf( T_('&laquo;%s&raquo; has an unallowed extension.'), $filename );
 			}
 		}
 		else
@@ -715,6 +715,9 @@ function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = N
 
 /*
  * $Log$
+ * Revision 1.8  2006/03/24 19:38:21  fplanque
+ * fixed nasty regexp
+ *
  * Revision 1.7  2006/03/18 14:21:16  blueyed
  * *** empty log message ***
  *
