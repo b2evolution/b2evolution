@@ -1512,8 +1512,7 @@ class Item extends DataObject
 		if( $title == '#' ) $title = T_('Deprecate this post now!');
 
 		$r = $before;
-		// TODO: this link is broken, but I'm not sure how to fix it.
-		$r .= '<a href="'.$baseurl.'ctrl=edit&amp;action=deprecate'.$glue.'post_ID='.$this->ID;
+		$r .= '<a href="'.$baseurl.'admin.php?ctrl=editactions&amp;action=deprecate'.$glue.'post_ID='.$this->ID;
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .= '>'.$text.'</a>';
@@ -2467,6 +2466,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2006/03/24 19:37:53  fplanque
+ * no message
+ *
  * Revision 1.21  2006/03/23 23:34:13  blueyed
  * cleanup
  *

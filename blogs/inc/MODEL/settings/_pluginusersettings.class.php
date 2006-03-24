@@ -63,7 +63,7 @@ class PluginUserSettings extends AbstractSettings
 		if( ! isset($user_ID) )
 		{
 			global $current_User;
-			if( ! is_object($current_User) )
+			if( ! isset($current_User) )
 			{
 				global $Debuglog;
 				$Debuglog->add( 'No $current_User available in PluginUserSettings::get()/[ID'.$this->plugin_ID.']!', array('errors', 'plugins') );
@@ -88,7 +88,7 @@ class PluginUserSettings extends AbstractSettings
 		if( ! isset($user_ID) )
 		{
 			global $current_User;
-			if( ! is_object($current_User) )
+			if( ! isset($current_User) )
 			{
 				global $Debuglog;
 				$Debuglog->add( 'No $current_User available in PluginUserSettings::set()/[ID'.$this->plugin_ID.']!', array('errors', 'plugins') );
@@ -113,7 +113,7 @@ class PluginUserSettings extends AbstractSettings
 		if( ! isset($user_ID) )
 		{
 			global $current_User;
-			if( ! is_object($current_User) )
+			if( ! isset($current_User) )
 			{
 				global $Debuglog;
 				$Debuglog->add( 'No $current_User available in PluginUserSettings::delete()/[ID'.$this->plugin_ID.']!', array('errors', 'plugins') );
@@ -128,6 +128,9 @@ class PluginUserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/24 19:37:53  fplanque
+ * no message
+ *
  * Revision 1.4  2006/03/24 01:12:26  blueyed
  * Catch cases where $current_User is not set (yet) and no user_ID is given and add debuglog entries.
  *
