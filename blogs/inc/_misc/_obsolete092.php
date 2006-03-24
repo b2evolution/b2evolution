@@ -1566,6 +1566,37 @@ function isImage( $filename )
 }
 
 
+/**
+ * Template function: output base URL to current skin
+ * @deprecated by skin_base_tag()
+ */
+function skinbase()
+{
+	global $baseurl, $skins_subdir, $skin, $blog;
+
+	if( !empty( $skin ) )
+	{
+		echo $baseurl.$skins_subdir.$skin.'/';
+	}
+	else
+	{ // No skin used:
+		if( !empty( $blog ) )
+		{
+			bloginfo( 'baseurl', 'raw' );
+		}
+		else
+		{
+			echo $baseurl;
+		}
+	}
+
+	// we assume that it gets used in a <base /> html tag
+	global $base_tag_set;
+	$base_tag_set = true;
+}
+
+
+
 // globals {{{
 
 /**
@@ -1641,6 +1672,9 @@ $b2_version = $app_version;
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/24 19:40:49  blueyed
+ * Only use absolute URLs if necessary because of used <base/> tag. Added base_tag()/skin_base_tag(); deprecated skinbase()
+ *
  * Revision 1.5  2006/03/17 17:36:27  blueyed
  * Fixed debug_info() anchors one more time; general review
  *

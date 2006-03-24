@@ -45,7 +45,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 <head xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 	<title><?php $Blog->disp( 'name', 'htmlbody' ) ?><?php request_title( ' :: ', '', ' :: ', 'htmlhead' ) ?></title>
-	<base href="<?php skinbase(); /* Base URL for this skin. You need this to fix relative links! */ ?>" />
+	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
 	<meta http-equiv="imagetoolbar" content="no" />
 	<meta content="TRUE" name="MSSmartTagsPreventParsing" />

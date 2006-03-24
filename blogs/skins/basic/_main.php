@@ -44,7 +44,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		request_title( ' - ', '', ' - ', 'htmlhead' );
 	?>
 	</title>
-	<base href="<?php skinbase(); /* Base URL for this skin. You need this to fix relative links! */ ?>" />
+	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
 	<?php
 		$Blog->disp( 'blog_css', 'raw');

@@ -28,30 +28,32 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Template function: output base URL to current skin
+ * Template function: output HTML base tag to current skin
  */
-function skinbase()
+function skin_base_tag()
 {
-	global $baseurl, $skins_subdir, $skin, $blog;
+	global $skins_url, $skin, $Blog;
 
-	if( !empty( $skin ) )
-	{
-		echo $baseurl.$skins_subdir.$skin.'/';
+	if( ! empty( $skin ) )
+	{	
+		$base_href = $skins_url.$skin.'/';
 	}
 	else
 	{ // No skin used:
-		if( !empty( $blog ) )
+		if( ! empty( $Blog ) )
 		{
-			bloginfo( 'baseurl', 'raw' );
+			$base_href = $Blog->get( 'baseurl' );
 		}
 		else
 		{
-			echo $baseurl;
+			$base_href = $baseurl;
 		}
 	}
+
+	base_tag( $base_href );
 }
 
-
+ 
 /**
  * checks if a skin exists
  *
@@ -189,6 +191,9 @@ function skin_change_url( $display = true )
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/24 19:40:49  blueyed
+ * Only use absolute URLs if necessary because of used <base/> tag. Added base_tag()/skin_base_tag(); deprecated skinbase()
+ *
  * Revision 1.2  2006/03/12 23:08:59  fplanque
  * doc cleanup
  *

@@ -125,20 +125,15 @@ else
 }
 
 /**
- * Full requested Host + Path. This is our absolute URL.
- *
- * Normally, you should use {@link regenerate_url()} to get the full URL, including query string.
- *
- * If not (because you need the exact! query string), append <code>( empty($_SERVER['QUERY_STRING']) ? '' : '?'.$_SERVER['QUERY_STRING'] )</code> to it.
- *
- * @global string
+ * Full requested Host (including protocol).
  *
  * {@internal Note: on IIS you can receive 'off' in the HTTPS field!! :[ }}
+ *
+ * @global string
  */
-$ReqHostPath = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'].$ReqPath;
+$ReqHost = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'];
 
-$Debuglog->add( 'Full requested Host + Path: '.$ReqHostPath, 'vars' );
-$Debuglog->add( 'HTTP_HOST: '.$_SERVER['HTTP_HOST'], 'vars' );
+$Debuglog->add( '$ReqHost: '.$ReqHost, 'vars' );
 $Debuglog->add( '$ReqURI: '.$ReqURI, 'vars' );
 $Debuglog->add( '$ReqPath: '.$ReqPath, 'vars' );
 
@@ -251,6 +246,9 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.7  2006/03/24 19:40:49  blueyed
+ * Only use absolute URLs if necessary because of used <base/> tag. Added base_tag()/skin_base_tag(); deprecated skinbase()
+ *
  * Revision 1.6  2006/03/20 21:38:56  blueyed
  * doc
  *

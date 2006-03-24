@@ -1096,8 +1096,6 @@ function forget_param( $var )
 
 
 /**
- * regenerate_url(-)
- *
  * Regenerate current URL from parameters
  * This may clean it up
  * But it is also useful when generating static pages: you cannot rely on $_REQUEST[]
@@ -1108,7 +1106,8 @@ function forget_param( $var )
  */
 function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 {
-	global $Debuglog, $global_param_list, $ReqHostPath, $basehost;
+	global $Debuglog, $global_param_list, $ReqHost, $ReqPath;
+	global $base_tag_set;
 
 	// Transform ignore param into an array:
 	if( empty($ignore) )
@@ -1194,7 +1193,22 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 	}
 
 	// Construct URL:
-	$url = empty($pagefileurl) ? $ReqHostPath : $pagefileurl;
+	if( empty($pagefileurl) )
+	{
+		if( ! empty($base_tag_set) )
+		{
+			$Debuglog->add( 'regenerate_url(): Using full URL because of $base_tag_set.', 'params' );
+			$url = $ReqHost.$ReqPath;
+		}
+		else
+		{	// Use just absolute path, because there's no <base> tag used
+			$url = $ReqPath;
+		}
+	}
+	else
+	{
+		$url = $pagefileurl;
+	}
 	if( !empty( $params ) )
 	{
 		$url = url_add_param( $url, implode( '&amp;', $params ) );
@@ -2676,8 +2690,26 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = NULL )
 }
 
 
+/**
+ * Returns a "<base />" tag and remembers that we've used it ({@link regenerate_url()} needs this).
+ *
+ * @param string URL to use (this gets used as base URL for all relative links on the HTML page)
+ * @return string
+ */
+function base_tag( $url )
+{
+	global $base_tag_set;
+
+	$base_tag_set = true;
+	echo '<base href="'.$url.'" />';
+}
+
+
 /*
  * $Log$
+ * Revision 1.23  2006/03/24 19:40:49  blueyed
+ * Only use absolute URLs if necessary because of used <base/> tag. Added base_tag()/skin_base_tag(); deprecated skinbase()
+ *
  * Revision 1.22  2006/03/19 16:56:04  blueyed
  * Better defaults for header_redirect()
  *

@@ -28,7 +28,7 @@ if( empty($blog) )
 { // No blog requested by URL param, let's try to match something in the URL
 	$Debuglog->add( 'No blog param received, checking extra path...', 'detectblog' );
 
-	if( preg_match( '#^(.+?)index.php/([^/]+)#', $ReqHostPath, $matches ) )
+	if( preg_match( '#^(.+?)index.php/([^/]+)#', $ReqHost.$ReqPath, $matches ) )
 	{ // We have an URL blog name:
 		$Debuglog->add( 'Found a potential URL blog name: '.$matches[2], 'detectblog' );
 		if( (($Blog = & $BlogCache->get_by_urlname( $matches[2], false )) !== false) )
@@ -39,13 +39,13 @@ if( empty($blog) )
 
 	if( empty($blog) )
 	{ // No blog identified by URL name, let's try to match the absolute URL
-		if( preg_match( '#^(.+?)index.php#', $ReqHostPath, $matches ) )
+		if( preg_match( '#^(.+?)index.php#', $ReqHost.$ReqPath, $matches ) )
 		{ // Remove what's not part of the absolute URL
 			$ReqAbsUrl = $matches[1];
 		}
 		else
 		{
-			$ReqAbsUrl = $ReqHostPath;
+			$ReqAbsUrl = $ReqHost.$ReqPath;
 		}
 		$Debuglog->add( 'Looking up absolute url : '.$ReqAbsUrl, 'detectblog' );
 
