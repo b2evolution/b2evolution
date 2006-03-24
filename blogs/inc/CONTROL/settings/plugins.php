@@ -418,7 +418,7 @@ switch( $action )
 		// First step:
 		param( 'plugin', 'string', true );
 
-		$edit_Plugin = $admin_Plugins->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
+		$edit_Plugin = & $admin_Plugins->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
 
 		if( is_string($edit_Plugin) )
 		{
@@ -431,7 +431,7 @@ switch( $action )
 		$Request->param( 'plugin_ID', 'integer', 0 );
 
 		if( $plugin_ID )
-		{
+		{ // second step:
 			$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
 
 			if( ! is_a($edit_Plugin, 'Plugin') )
