@@ -1333,9 +1333,9 @@ class Item extends DataObject
 	 * @param string page url for the delete action
 	 */
 	function get_delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
-														$button = false, $actionurl = 'admin.php?ctrl=edit&amp;action=delete&amp;post=' )
+														$button = false, $actionurl = '#' )
 	{
-		global $current_User, $baseurl;
+		global $current_User, $admin_url;
 
 		if( ! is_logged_in() ) return false;
 
@@ -1355,9 +1355,14 @@ class Item extends DataObject
 				$text = T_('Delete!');
 			}
 		}
+
 		if( $title == '#' ) $title = T_('Delete this post');
 
-		$url = $baseurl.$actionurl.$this->ID;
+		if( $actionurl == '#' )
+		{
+			$actionurl = $admin_url.'?ctrl=edit&amp;action=delete&amp;post=';
+		}
+		$url = $actionurl.$this->ID;
 
 		$r = $before;
 		if( $button )
@@ -1387,7 +1392,7 @@ class Item extends DataObject
    *
    */
  	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
-												$button = false, $actionurl = 'admin.php?ctrl=editactions&amp;action=delete&amp;post=' )
+												$button = false, $actionurl = '#' )
 	{
 		echo $this->get_delete_link( $before, $after, $text, $title, $class, $button, $actionurl );
 	}
@@ -1403,10 +1408,9 @@ class Item extends DataObject
 	 * @param string class name
 	 * @param string page url for the delete action
 	 */
-	function get_edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
-											$actionurl = 'admin.php?ctrl=edit&amp;action=edit&amp;post=' )
+	function get_edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $actionurl = '#' )
 	{
-		global $current_User, $baseurl;
+		global $current_User, $admin_url;
 
 		if( ! is_logged_in() ) return false;
 
@@ -1417,10 +1421,16 @@ class Item extends DataObject
 		}
 
 		if( $text == '#' ) $text = get_icon( 'edit' ).' '.T_('Edit...');
+
 		if( $title == '#' ) $title = T_('Edit this post...');
 
+		if( $actionurl == '#' )
+		{
+			$actionurl = $admin_url.'?ctrl=edit&amp;action=edit&amp;post=';
+		}
+
 		$r = $before;
-		$r .= '<a href="'.$baseurl.$actionurl.$this->ID;
+		$r .= '<a href="'.$actionurl.$this->ID;
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .=  '>'.$text.'</a>';
@@ -1434,7 +1444,7 @@ class Item extends DataObject
 	 * @see Item::get_edit_link()
 	 */
 	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
-											$actionurl = 'admin.php?ctrl=edit&amp;action=edit&amp;post=' )
+											$actionurl = '#' )
 
 	{
 		echo $this->get_edit_link( $before, $after, $text, $title, $class, $actionurl );
@@ -1455,7 +1465,7 @@ class Item extends DataObject
 	 */
 	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
 	{
-		global $current_User, $baseurl;
+		global $current_User, $admin_url;
 
 		if( ! is_logged_in() ) return false;
 
@@ -1470,7 +1480,7 @@ class Item extends DataObject
 		if( $title == '#' ) $title = T_('Publish now using current date and time.');
 
 		$r = $before;
-		$r .= '<a href="'.$baseurl.'admin.php?ctrl=edit&amp;action=publish'.$glue.'post_ID='.$this->ID;
+		$r .= '<a href="'.$admin_url.'?ctrl=edit'.$glue.'action=publish'.$glue.'post_ID='.$this->ID;
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .= '>'.$text.'</a>';
@@ -1498,7 +1508,7 @@ class Item extends DataObject
 	 */
 	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
 	{
-		global $current_User, $baseurl;
+		global $current_User, $admin_url;
 
 		if( ! is_logged_in() ) return false;
 
@@ -1512,7 +1522,7 @@ class Item extends DataObject
 		if( $title == '#' ) $title = T_('Deprecate this post now!');
 
 		$r = $before;
-		$r .= '<a href="'.$baseurl.'admin.php?ctrl=editactions&amp;action=deprecate'.$glue.'post_ID='.$this->ID;
+		$r .= '<a href="'.$admin_url.'?ctrl=editactions'.$glue.'action=deprecate'.$glue.'post_ID='.$this->ID;
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .= '>'.$text.'</a>';
@@ -2466,8 +2476,8 @@ class Item extends DataObject
 
 /*
  * $Log$
- * Revision 1.22  2006/03/24 19:37:53  fplanque
- * no message
+ * Revision 1.23  2006/03/24 20:24:37  fplanque
+ * fixed admin links
  *
  * Revision 1.21  2006/03/23 23:34:13  blueyed
  * cleanup

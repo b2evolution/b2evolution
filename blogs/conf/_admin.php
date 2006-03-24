@@ -8,8 +8,6 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
-$dispatcher = 'admin.php';
-$admin_url = $baseurl.$dispatcher;
 
 /**
  * Default controller to use.

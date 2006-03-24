@@ -457,6 +457,14 @@ $rsc_url = $baseurl.$rsc_subdir;         // You should not need to change this
 $skins_subdir = 'skins/';                // Subdirectory relative to base
 $skins_url = $baseurl.$skins_subdir;     // You should not need to change this
 
+
+/**
+ * Location of the admin interface dispatcher
+ */
+$dispatcher = 'admin.php';
+$admin_url = $baseurl.''.$dispatcher;
+
+
 /**
  * Location of the admin skins folder.
  *
@@ -507,7 +515,6 @@ $install_subdir = 'install/';            // Subdirectory relative to base
  */
 $media_subdir = 'media/';                // Subdirectory relative to base
 $media_url = $baseurl.$media_subdir;     // You should not need to change this
-
 
 /**
  * Do you want to allow public access to the media dir?
