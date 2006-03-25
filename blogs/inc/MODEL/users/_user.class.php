@@ -93,6 +93,8 @@ class User extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_users', 'user_', 'user_ID' );
 
+		// TODO: this will never get translated for the current User if he has another locale/lang set than default, because it gets adjusted AFTER instantiating him/her..
+		//       Use a callback (get_delete_restrictions/get_delete_cascades) instead? Should be also better for performance!
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_posts', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
 				array( 'table'=>'T_posts', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
@@ -922,6 +924,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/25 00:29:35  blueyed
+ * todo
+ *
  * Revision 1.5  2006/03/19 17:54:26  blueyed
  * Opt-out for email through message form.
  *
