@@ -18,11 +18,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Parameters
-param( 'redirect_to', 'string', '' ); // pass-through (hidden field)
-param( 'recipient_id', 'integer', '' );
-param( 'post_id', 'integer', '' );
-param( 'comment_id', 'integer', '' );
-param( 'subject', 'string', '' );
+$redirect_to = param( 'redirect_to', 'string', '' ); // pass-through (hidden field)
+$recipient_id = param( 'recipient_id', 'integer', '' );
+$post_id = param( 'post_id', 'integer', '' );
+$comment_id = param( 'comment_id', 'integer', '' );
+$subject = param( 'subject', 'string', '' );
 
 
 // If the user has the cookies set from commenting use those as a default from.

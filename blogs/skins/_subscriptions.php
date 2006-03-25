@@ -31,7 +31,7 @@ if( ! is_logged_in() )
 	return;
 }
 // --- //
-param( 'redirect_to', 'string', '');
+$redirect_to = param( 'redirect_to', 'string', '');
 
 
 /**
