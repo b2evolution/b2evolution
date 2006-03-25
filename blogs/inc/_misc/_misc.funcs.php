@@ -1102,7 +1102,7 @@ function forget_param( $var )
  *
  * @param mixed string (delimited by commas) or array of params to ignore (can be regexps in /.../)
  * @param mixed string or array of param(s) to set
- * @param mixed string Alternative URL we want to point to if not the current $ReqHostPath (absolute URL)
+ * @param mixed string Alternative URL we want to point to if not the current URL (may be absolute if BASE tag gets used)
  */
 function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 {
@@ -1602,12 +1602,12 @@ function debug_die( $last_words = '', $force = NULL, $very_last = '</body></html
  */
 function debug_info( $force = false )
 {
-	global $debug, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHostPath;
+	global $debug, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHost, $ReqPath;
 	global $cache_imgsize, $cache_File;
 
 	if( $debug || $force )
 	{
-		$ReqHostPathQuery = $ReqHostPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
+		$ReqHostPathQuery = $ReqHost.$ReqPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
 		echo '<div class="debug"><h2>Debug info</h2>';
 
 		$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
@@ -2707,6 +2707,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.24  2006/03/25 00:02:00  blueyed
+ * Do not use reqhostpath, but reqhost and reqpath
+ *
  * Revision 1.23  2006/03/24 19:40:49  blueyed
  * Only use absolute URLs if necessary because of used <base/> tag. Added base_tag()/skin_base_tag(); deprecated skinbase()
  *
