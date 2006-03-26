@@ -130,7 +130,7 @@ function get_user_login_link( $before = '', $after = '', $link_text = '', $link_
 		$redirect = '';
 	}
 
-	$r .= $before;
+	$r = $before;
 	$r .= '<a href="'.$htsrv_url.'login.php'.$redirect.'" title="'.$link_title.'">';
 	$r .= $link_text;
 	$r .= '</a>';
@@ -465,6 +465,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/26 03:34:12  blueyed
+ * Fixed E_NOTICE
+ *
  * Revision 1.4  2006/03/26 03:25:21  blueyed
  * Added more getters
  *
