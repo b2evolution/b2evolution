@@ -259,6 +259,8 @@ $fm_forceFM = NULL;
 
 
 param( 'fm_disp_browser', 'integer', 0, true );
+param( 'disp_fm_dirtree', 'integer', 0, true ); // Do we want to display the directory tree next to the files list?
+
 
 /*
  * Load editable objects:
@@ -1444,8 +1446,6 @@ if( $disp_fm_browser )
 	// Browsing interface:
 	// -------------------
 
-	param( 'disp_fm_dirtree', 'integer', 0, true ); // Do we want to display the directory tree next to the files list?
-
 	// Display VIEW:
 	$AdminUI->disp_view( 'files/_files_browse.inc' );
 }
@@ -1458,6 +1458,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.11  2006/03/26 02:57:24  blueyed
+ * Get param for dirtree early.
+ *
  * Revision 1.10  2006/03/26 02:37:57  blueyed
  * Directory tree next to files list.
  *
