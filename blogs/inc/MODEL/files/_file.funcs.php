@@ -73,6 +73,7 @@ function bytesreadable( $bytes )
  * @param boolean include files (not only directories)
  * @param boolean include directories (not the directory itself!)
  * @param boolean flat (return an one-dimension-array)
+ * @param boolean Recurse into subdirectories?
  * @param boolean Get the basename only.
  * @return false|array false if the first directory could not be accessed,
  *                     array of entries otherwise
@@ -728,6 +729,9 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.12  2006/03/26 20:24:19  blueyed
+ * doc
+ *
  * Revision 1.11  2006/03/26 14:00:49  blueyed
  * Made Filelist constructor more decent
  *
