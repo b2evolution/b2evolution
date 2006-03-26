@@ -97,9 +97,18 @@ function user_pass_ok( $login, $pass, $pass_is_md5 = false )
 
 
 /**
- * Template tag: Provide a link to login
+ * Template tag: Output link to login
  */
 function user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+{
+	echo get_user_login_link( $before, $after, $link_text, $link_title );
+}
+
+
+/**
+ * Template tag: Get link to login
+ */
+function get_user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
 	global $htsrv_url, $edited_Blog, $generating_static;
 
@@ -121,18 +130,29 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
 		$redirect = '';
 	}
 
-	echo $before;
-	echo '<a href="'.$htsrv_url.'login.php'.$redirect.'" title="'.$link_title.'">';
-	echo $link_text;
-	echo '</a>';
-	echo $after;
+	$r .= $before;
+	$r .= '<a href="'.$htsrv_url.'login.php'.$redirect.'" title="'.$link_title.'">';
+	$r .= $link_text;
+	$r .= '</a>';
+	$r .= $after;
+	return $r;
 }
 
 
 /**
- * Template tag: Provide a link to new user registration
+ * Template tag: Output a link to new user registration
  */
 function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+{
+	echo get_user_register_link( $before, $after, $link_text, $link_title );
+}
+
+
+/**
+ * Template tag: Get a link to new user registration
+ * @return string
+ */
+function get_user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
 	global $htsrv_url, $Settings, $edited_Blog, $generating_static;
 
@@ -157,18 +177,30 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
 		$redirect = '';
 	}
 
-	echo $before;
-	echo '<a href="'.$htsrv_url.'register.php'.$redirect.'" title="'.$link_title.'">';
-	echo $link_text;
-	echo '</a>';
-	echo $after;
+	$r = $before;
+	$r .= '<a href="'.$htsrv_url.'register.php'.$redirect.'" title="'.$link_title.'">';
+	$r .= $link_text;
+	$r .= '</a>';
+	$r .= $after;
+	return $r;
 }
 
 
 /**
- * Template tag: Provide a link to logout
+ * Template tag: Output a link to logout
  */
 function user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+{
+	echo get_user_logout_link( $before, $after, $link_text, $link_title );
+}
+
+
+/**
+ * Template tag: Get a link to logout
+ *
+ * @return string
+ */
+function get_user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
 	global $htsrv_url, $current_User, $blog;
 
@@ -180,16 +212,17 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
 	if( $link_text == '' ) $link_text = T_('Logout (%s)');
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
 
-	echo $before;
-	echo '<a href="'.$htsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode( regenerate_url() ).'" title="'.$link_title.'">';
-	printf( $link_text, $current_User->login );
-	echo '</a>';
-	echo $after;
+	$r = $before;
+	$r .= '<a href="'.$htsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode( regenerate_url() ).'" title="'.$link_title.'">';
+	$r .= sprintf( $link_text, $current_User->login );
+	$r .= '</a>';
+	$r .= $after;
+	return $r;
 }
 
 
 /**
- * Template tag: Provide a link to the backoffice.
+ * Template tag: Output a link to the backoffice.
  *
  * Usually provided in skins in order for newbies to find the admin interface more easily...
  *
@@ -200,6 +233,24 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
  * @param string Title for the link.
  */
 function user_admin_link( $before = '', $after = '', $page = '', $link_text = '', $link_title = '#' )
+{
+	echo get_user_admin_link( $before, $after, $page, $link_text, $link_title );
+}
+
+
+/**
+ * Template tag: Get a link to the backoffice.
+ *
+ * Usually provided in skins in order for newbies to find the admin interface more easily...
+ *
+ * @param string To be displayed before the link.
+ * @param string To be displayed after the link.
+ * @param string The page/controller to link to inside of {@link $admin_url}
+ * @param string Text for the link.
+ * @param string Title for the link.
+ * @return string
+ */
+function get_user_admin_link( $before = '', $after = '', $page = '', $link_text = '', $link_title = '#' )
 {
 	global $admin_url, $blog, $current_User;
 
@@ -215,11 +266,12 @@ function user_admin_link( $before = '', $after = '', $page = '', $link_text = ''
 	// add the blog param to $page if it is not already in there
 	if( !preg_match('/(&|&amp;|\?)blog=/', $page) ) $page = url_add_param( $page, 'blog='.$blog );
 
-	echo $before;
-	echo '<a href="'.$admin_url.$page.'" title="'.$link_title.'">';
-	echo $link_text;
-	echo '</a>';
-	echo $after;
+	$r = $before;
+	$r .= '<a href="'.$admin_url.$page.'" title="'.$link_title.'">';
+	$r .= $link_text;
+	$r .= '</a>';
+	$r .= $after;
+	return $r;
 }
 
 
@@ -413,6 +465,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/26 03:25:21  blueyed
+ * Added more getters
+ *
  * Revision 1.3  2006/03/12 23:09:00  fplanque
  * doc cleanup
  *
