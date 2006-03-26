@@ -682,7 +682,7 @@ switch( $action )
 			break;
 		}
 
-		$edit_File = & $selected_Filelist->getFileByIndex(0);
+		$edit_File = & $selected_Filelist->get_by_idx(0);
 		// Load meta data:
 		$edit_File->load_meta();
 
@@ -718,7 +718,7 @@ switch( $action )
 			break;
 		}
 
-		$edit_File = & $selected_Filelist->getFileByIndex(0);
+		$edit_File = & $selected_Filelist->get_by_idx(0);
 
 		if( isset($edited_Item) )
 		{
@@ -863,7 +863,7 @@ switch( $fm_mode )
 { // handle modes {{{
 
 	case 'file_properties':
-		$edit_File = & $selected_Filelist->getFileByIndex(0);
+		$edit_File = & $selected_Filelist->get_by_idx(0);
 		// Load meta data:
 		$edit_File->load_meta();
 		break;
@@ -1467,6 +1467,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.15  2006/03/26 19:44:43  blueyed
+ * Filelist::include_files/include_dirs added; normalization
+ *
  * Revision 1.14  2006/03/26 14:00:49  blueyed
  * Made Filelist constructor more decent
  *

@@ -56,6 +56,16 @@ class Filelist
 	var $flatmode;
 
 	/**
+	 * @var boolean Do we want to include directories? (This gets used by {@link load()}).
+	 */
+	var $include_dirs = true;
+
+	/**
+	 * @var boolean Do we want to include files? (This gets used by {@link load()}).
+	 */
+	var $include_files = true;
+
+	/**
 	 * The root of the file list.
 	 *
 	 * All files in this list MUST have that same FileRoot. Adding will fail otherwise.
@@ -288,7 +298,7 @@ class Filelist
 		$this->_order_index = array();
 
 		// Attempt list files for requested directory: (recursively if flat mode):
-		if( ($filepath_array = get_filenames( $this->_ads_list_path, true, true, true, $this->flatmode )) === false )
+		if( ($filepath_array = get_filenames( $this->_ads_list_path, $this->include_files, $this->include_dirs, true, $this->flatmode )) === false )
 		{
 			$Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->_ads_list_path ), 'fl_error' );
 			return false;
@@ -663,7 +673,7 @@ class Filelist
 	 * Set the filter.
 	 *
 	 * @param string Filter string
-	 * @param boolean Is the filter a regular expression?
+	 * @param boolean Is the filter a regular expression? (it's a glob pattern otherwise)
 	 */
 	function set_filter( $filterString, $filterIsRegexp = true )
 	{
@@ -894,7 +904,7 @@ class Filelist
 	 * @param integer Index of the entries (starting with 0)
 	 * @return false|File
 	 */
-	function & getFileByIndex( $index )
+	function & get_by_idx( $index )
 	{
 		if( isset( $this->_order_index[ $index ] ) )
 		{
@@ -973,7 +983,7 @@ class Filelist
 		}
 
 		// Return only the relative part:
- 		return substr( $adfs_path, strlen($this->_FileRoot->ads_path) );
+		return substr( $adfs_path, strlen($this->_FileRoot->ads_path) );
 	}
 
 
@@ -1165,6 +1175,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.8  2006/03/26 19:44:43  blueyed
+ * Filelist::include_files/include_dirs added; normalization
+ *
  * Revision 1.7  2006/03/26 19:15:59  blueyed
  * Moved result_params to where they only get used. Not sure how to implement FileListResults and what parts it would replace in files.php
  *
