@@ -253,13 +253,12 @@ if( $action == 'update_settings' )
 }
 
 /**
- * @global integer We set this to 1 to force displaying of the FM (without toggle option)
- * TODO: should be a boolean... really!  Furthermore it's probably useless complexity, we can probably just set fm_disp_browser to true when we want to ""force"".
+ * @global boolean We set this to true to force displaying of the FM (without toggle option!)
  */
 $fm_forceFM = NULL;
 
 
-param( 'fm_disp_browser', 'integer', 0 );
+param( 'fm_disp_browser', 'integer', 0, true );
 
 /*
  * Load editable objects:
@@ -1271,7 +1270,7 @@ switch( $fm_mode )
 
 		if( $fm_source_Filelist->count() )
 		{ // There are still uncopied/unmoved files, we want the file manager in this mode:
-			$fm_forceFM = 1;
+			$fm_forceFM = true;
 		}
 		else
 		{
@@ -1295,7 +1294,7 @@ switch( $fm_mode )
 		// TODO: check EDIT permissions!
 
 		// we want to display the file manager in this mode:
-		$fm_forceFM = 1;
+		$fm_forceFM = true;
 		break;
 
 } // }}}
@@ -1422,7 +1421,7 @@ $disp_fm_browser = true;
 $disp_fm_browser_toggle = false;
 
 if( isset($fm_forceFM) )
-{
+{ // display FM, but no "close" icon
 	$disp_fm_browser = $fm_forceFM;
 }
 elseif( $fm_mode && ! $UserSettings->get('fm_forceFM') )
@@ -1444,6 +1443,9 @@ if( $disp_fm_browser )
 	// -------------------
 	// Browsing interface:
 	// -------------------
+
+	param( 'disp_fm_dirtree', 'integer', 0, true ); // Do we want to display the directory tree next to the files list?
+
 	// Display VIEW:
 	$AdminUI->disp_view( 'files/_files_browse.inc' );
 }
@@ -1456,6 +1458,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.10  2006/03/26 02:37:57  blueyed
+ * Directory tree next to files list.
+ *
  * Revision 1.9  2006/03/17 20:57:26  fplanque
  * just in case... (being a little paranoid with file management may save your day someday :P)
  *

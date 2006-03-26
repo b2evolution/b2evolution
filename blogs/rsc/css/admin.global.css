@@ -40,8 +40,8 @@ table.catselect tr:hover td {
  * Special list formattings
  */
 ul.clicktree {
-	margin:0 0 0 2ex;
-	padding:0ex;
+	margin:0;
+	padding:0;
 	list-style:none;
 }
 ul.clicktree ul.clicktree {

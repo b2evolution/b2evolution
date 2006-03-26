@@ -14,6 +14,11 @@
 	margin-bottom:1em;
 }
 
+#fileman_dirtree {
+	float:left;
+	padding:1ex 1em;
+}
+
 #FilesForm div.panelinfo {
 	margin:1ex 0;
 }
@@ -22,7 +27,7 @@
  * Files table {{{
  */
 #filemanmain table.grouped {
-	width:100%;
+	clear:right;
 }
 #filemanmain table.grouped td.error {
 	padding:2ex;
@@ -34,9 +39,10 @@
 #filemanmain table.grouped td.type {
 	white-space:nowrap;
 }
+#filemanmain table.grouped td#fileman_error, /* used when an error (e.g. "no files") gets displayed */
 #filemanmain table.grouped td.fm_filename {
-	width:100%;
 	text-align: left;
+	width:100%; /* the glory hack: makes the table as width as it should be */
 }
 #filemanmain table.grouped td.fm_filename div.path {
 	clear:right;
@@ -82,14 +88,17 @@
 	background-color:#efede0; /* Temp color, needs overriding */
 }
 
-.fm_filecounts {
+#fmbar_filecounts {
 	font-size:84%;
 }
 
-#fmbar_roots { /* The toolbar that eventually holds the file roots (if more than one) */
+#fmbar_filecounts,
+#fmbar_display_dirtree,
+#fmbar_cwd {
 	float:left;
 	margin-right:1ex;
 }
+
 
 div.fm_query {
 	padding-top: 2ex;

@@ -261,7 +261,7 @@ global $upload_quickmode, $failedFiles;
 		<fieldset class="upload_into">
 			<legend><?php echo T_('Upload files into:'); ?></legend>
 			<?php
-				echo get_directory_tree_radio();
+				echo get_directory_tree( NULL, NULL, array('disp_radios'=>true) );
 			?>
 		</fieldset>
 		</div>
@@ -278,6 +278,9 @@ global $upload_quickmode, $failedFiles;
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/26 02:37:57  blueyed
+ * Directory tree next to files list.
+ *
  * Revision 1.3  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

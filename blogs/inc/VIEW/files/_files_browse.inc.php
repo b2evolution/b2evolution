@@ -59,13 +59,14 @@ global $Messages;
  */
 global $selected_Filelist;
 
-global $disp_fm_browser_toggle, $fm_forceFM;
+global $disp_fm_browser_toggle, $disp_fm_dirtree;
 
 
 // Begin payload block:
 $this->disp_payload_begin();
 
 echo '<div id="filemanmain">';
+
 
 if( $disp_fm_browser_toggle )
 { // File browser interface can be toggled, link to hide
@@ -140,6 +141,17 @@ $Form->end_form();
 
 */ ?>
 
+<?php
+if( $disp_fm_dirtree )
+{
+	echo '<div id="fileman_dirtree">';
+	#echo action_icon( T_('Close'), 'close', regenerate_url('disp_fm_dirtree'), '', array('style'=>'margin-left:10em; float:right;') );
+	echo get_directory_tree();
+	echo '<br /><a href="'.regenerate_url('disp_fm_dirtree', 'disp_fm_dirtree=0').'">'.T_('Hide directory tree').'</a>';
+	echo '</div>';
+}
+?>
+
 
 <!-- THE MAIN FORM -->
 
@@ -155,7 +167,7 @@ $Form->end_form();
 ?>
 
 
-<table class="grouped clear" cellspacing="0">
+<table class="grouped" cellspacing="0">
 
 <?php
 /**
@@ -174,87 +186,64 @@ $filetable_cols = 6
 	<td colspan="<?php echo $filetable_cols ?>" class="firstcol lastcol">
 
 		<?php
-		/*
-		 * -----------------------------------------------
-		 * Display ROOTs list:
-		 * -----------------------------------------------
-		 */
-		$rootlist = get_available_FileRoots();
-		if( count($rootlist) > 1 )
-		{ // provide list of roots to choose from
-			?>
-			<div id="fmbar_roots">
-			<select name="new_root" onchange="this.form.submit();">
-
-			<?php
-			foreach( $rootlist as $l_FileRoot )
-			{
-				echo '<option value="'.$l_FileRoot->ID.'"';
-
-				if( $fm_Filelist->_FileRoot && $fm_Filelist->_FileRoot->ID == $l_FileRoot->ID )
-				{
-					echo ' selected="selected"';
-				}
-
-				echo '>'.format_to_output( $l_FileRoot->name )."</option>\n";
-			}
-			?>
-
-			</select>
-			<script type="text/javascript">
-				<!--
-				// Just to have noscript tag below (which has to know what type it is not for).
-				// -->
-			</script>
-			<noscript>
-				<input class="ActionButton" type="submit" value="'.T_('Change root').'" />
-			</noscript>
-			</div>
-
-			<?php
-		}
+		// -----------------------------------------------
+		// Display table header: directory location info:
+		// -----------------------------------------------
 		?>
-
-
 		<div id="fmbar_cwd">
 			<?php
-			// -----------------------------------------------
-			// Display table header: directory location info:
-			// -----------------------------------------------
-
 			// Display current dir:
 			echo T_('Current dir').': <strong class="currentdir">'.$fm_Filelist->get_cwd_clickable().'</strong>';
-
-
-			// Display current filter:
-			if( $fm_Filelist->is_filtering() )
-			{
-				echo '[<em class="filter">'.$fm_Filelist->get_filter().'</em>]';
-				// TODO: maybe clicking on the filter should open a JS popup saying "Remove filter [...]? Yes|No"
-			}
-
-
-			// The hidden reload button
 			?>
-			<span style="display:none;" id="fm_reloadhint">
-				<a href="<?php echo regenerate_url() ?>"
-					title="<?php echo T_('A popup has discovered that the displayed content of this window is not up to date. Click to reload.'); ?>">
-					<?php echo get_icon( 'reload' ) ?>
-				</a>
-			</span>
+		</div>
 
-			<?php
-			// Display filecounts:
-			?>
+		<?php
+		// Display current filter:
+		if( $fm_Filelist->is_filtering() )
+		{
+			echo '<div id="fmbar_filter">';
+			echo '[<em class="filter">'.$fm_Filelist->get_filter().'</em>]';
+			// TODO: maybe clicking on the filter should open a JS popup saying "Remove filter [...]? Yes|No"
+			echo '</div>';
+		}
 
-			<span class="fm_filecounts" title="<?php printf( T_('%s bytes'), number_format($fm_Filelist->count_bytes()) ); ?>"> (<?php
+
+		// The hidden reload button, which gets displayed if a popup detects that the displayed files have changed
+		?>
+		<span style="display:none;" id="fm_reloadhint">
+			<a href="<?php echo regenerate_url() ?>"
+				title="<?php echo T_('A popup has discovered that the displayed content of this window is not up to date. Click to reload.'); ?>">
+				<?php echo get_icon( 'reload' ) ?>
+			</a>
+		</span>
+
+		<?php
+		// Display filecounts:
+		?>
+
+		<div id="fmbar_filecounts" title="<?php printf( T_('%s bytes'), number_format($fm_Filelist->count_bytes()) ); ?>"> (<?php
 			disp_cond( $fm_Filelist->count_dirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
 			echo ', ';
 			disp_cond( $fm_Filelist->count_files(), T_('One file'), T_('%d files'), T_('No files' ) );
 			echo ', '.bytesreadable( $fm_Filelist->count_bytes() );
 			?>
-			)</span>
+			)
 		</div>
+
+		<?php
+		/*
+		 * Display link to display directory tree:
+		 */
+		?>
+		<div id="fmbar_display_dirtree">
+			<?php
+			if( ! $disp_fm_dirtree )
+			{
+				echo '<a href="'.regenerate_url('', 'disp_fm_dirtree=1').'">'.T_('Display directory tree').'</a>';
+			}
+			?>
+		</div>
+
 	</td>
 
 </tr>
@@ -564,9 +553,10 @@ if( $countFiles == 0 )
 	?>
 
 	<tr>
-		<td colspan="<?php echo $filetable_cols ?>">
+		<td>&nbsp;</td> <?php /* This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
+		<td colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
 			<?php
-				if( !$Messages->count( 'fl_error' ) )
+				if( ! $Messages->count( 'fl_error' ) )
 				{ // no Filelist errors, the directory must be empty
 					$Messages->add( T_('No files found.')
 						.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'fl_error' );
@@ -668,6 +658,8 @@ else
 <?php $Form->end_form() ?>
 
 
+<div id="fileman_toolbars_bottom">
+
 <?php
 if( $countFiles )
 {{{ // include JS
@@ -766,7 +758,7 @@ if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_crea
 		}
 		else
 		{	// We can create both files and directories:
-			echo T_('New');
+			echo T_('New').': ';
 			echo '<select name="create_type">';
 			echo '<option value="dir"';
 			if( isset($create_type) &&  $create_type == 'dir' )
@@ -798,7 +790,7 @@ if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_crea
 /*
  * UPLOAD:
  */
-if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) )
+if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add' ) && $fm_mode != 'file_upload' )
 {	// Upload is enabled and we have permission to use it...
 	echo "<!-- UPLOAD: -->\n";
 	$Form = & new Form( NULL, 'fmbar_adv_upload', 'post', 'none' );
@@ -826,6 +818,8 @@ if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add
 	$Form->end_form();
 }
 ?>
+
+</div>
 
 <div class="clear"></div>
 
@@ -883,7 +877,11 @@ $Form = & new Form( NULL, 'fm_options_checkchanges', 'get', 'none' );
 $this->disp_payload_end();
 
 /*
+ * {{{ Revision log:
  * $Log$
+ * Revision 1.6  2006/03/26 02:37:57  blueyed
+ * Directory tree next to files list.
+ *
  * Revision 1.5  2006/03/13 21:20:53  blueyed
  * fixed UserSettings::param_Request()
  *
@@ -1118,6 +1116,6 @@ $this->disp_payload_end();
  *
  * Revision 1.1  2005/01/12 17:55:51  fplanque
  * extracted browsing interface into separate file to make code more readable
- *
+ * }}}
  */
 ?>

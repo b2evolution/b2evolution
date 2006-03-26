@@ -615,15 +615,20 @@ function get_available_FileRoots()
  *
  * @param NULL|FileRoot A single root or NULL for all available.
  * @param string the root path to use
+ * @param array Parameters
+ *      - 'disp_radios': display a radio with each directory that's meant to select it in a form
  * @return string
  */
-function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = NULL, $name = NULL )
+function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $rootSubpath = NULL, $name = NULL )
 {
 	global $fm_FileRoot, $fm_Filelist;
 	static $js_closeClickIDs; // clickopen IDs that should get closed
+	static $instance_ID = 0;
+
 
 	if( $Root === NULL )
 	{ // This is the top level call:
+		$instance_ID++;
 		$js_closeClickIDs = array();
 
 		$_roots = get_available_FileRoots();
@@ -631,7 +636,7 @@ function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = N
 		$r = '<ul class="clicktree">';
 		foreach( $_roots as $l_Root )
 		{
-			$subR = get_directory_tree_radio( $l_Root, $l_Root->ads_path, '' );
+			$subR = get_directory_tree( $l_Root, $l_Root->ads_path, $params, '' );
 			if( !empty( $subR['string'] ) )
 			{
 				$r .= '<li>'.$subR['string'].'</li>';
@@ -656,17 +661,24 @@ function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = N
 	$has_sub_dirs = $Nodelist->count_dirs();
 
 	$root_and_path = format_to_output( serialize( array( 'root' => $Root->ID, 'path' => $rootSubpath ) ), 'formvalue' );
-	$id_path = md5( $path );
+	$id_path = 'id_path_'.$instance_ID.md5( $path );
 
 	// the radio input to select this path
-	$r['string'] = '<input'
-		.' type="radio"'
-		.' name="root_and_path"'
-		.' value="'.$root_and_path.'"'
-		.' id="radio_'.$id_path.'"'
-		.( $Root->ID == $fm_FileRoot->ID && $rootSubpath == $fm_Filelist->get_rds_list_path() ? ' checked="checked"' : '' )
-		//.( ! $has_sub_dirs ? ' style="margin-right:'.get_icon( 'collapse', 'size', array( 'size' => 'width' ) ).'px"' : '' )
-		.' /> ';
+	if( ! empty($params['disp_radios']) )
+	{
+		$r['string'] = '<input'
+			.' type="radio"'
+			.' name="root_and_path"'
+			.' value="'.$root_and_path.'"'
+			.' id="radio_'.$id_path.'"'
+			.( $Root->ID == $fm_FileRoot->ID && $rootSubpath == $fm_Filelist->get_rds_list_path() ? ' checked="checked"' : '' )
+			//.( ! $has_sub_dirs ? ' style="margin-right:'.get_icon( 'collapse', 'size', array( 'size' => 'width' ) ).'px"' : '' )
+			.' /> ';
+	}
+	else
+	{
+		$r['string'] = '';
+	}
 
 	$label = '<label for="radio_'.$id_path.'">'
 		.'<a href="'.regenerate_url( 'root,path,fm_disp_browser', 'root='.$Root->ID.'&amp;path='.$rootSubpath.'&amp;fm_disp_browser=1' ).'"
@@ -692,7 +704,7 @@ function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = N
 
 		while( $l_File = & $Nodelist->get_next( 'dir' ) )
 		{
-			$rSub = get_directory_tree_radio( $Root, $l_File->get_full_path(), $l_File->get_rdfs_rel_path() );
+			$rSub = get_directory_tree( $Root, $l_File->get_full_path(), $params, $l_File->get_rdfs_rel_path() );
 
 			if( $rSub['opened'] )
 			{ // pass opened status on, if given
@@ -714,7 +726,11 @@ function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = N
 
 
 /*
+ * {{{ Revision log:
  * $Log$
+ * Revision 1.10  2006/03/26 02:37:57  blueyed
+ * Directory tree next to files list.
+ *
  * Revision 1.9  2006/03/24 19:53:35  blueyed
  * str_replace() is not regexp..
  *
@@ -865,5 +881,6 @@ function get_directory_tree_radio( $Root = NULL , $path = NULL, $rootSubpath = N
  *
  * Revision 1.9  2004/10/12 17:22:30  fplanque
  * Edited code documentation.
+ * }}}
  */
 ?>
