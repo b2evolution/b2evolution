@@ -477,6 +477,14 @@ switch( $action )
 			{ // Action was invoked, add "hint"
 				$Request->param_error( 'zipname', T_('Please provide the name of the archive.') );
 			}
+			if( $selected_Filelist->count() == 1 )
+			{
+				$only_File = $selected_Filelist->get_array();
+				$only_File = $only_File[0];
+
+				// TODO: once we support additional formats, use the default extendion here:
+				$zipname = $only_File->get_name().'.zip';
+			}
 			break;
 		}
 
@@ -1458,6 +1466,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.12  2006/03/26 03:06:24  blueyed
+ * When there's only one selected file for download, use its filename as base for archive.
+ *
  * Revision 1.11  2006/03/26 02:57:24  blueyed
  * Get param for dirtree early.
  *
