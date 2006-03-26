@@ -298,7 +298,7 @@ if( empty($ads_list_path) )
 	$fm_mode = NULL;
 }
 
-// Check actions that toggle Filelist properties:
+// Check actions that toggle Filelist properties or delegate to other actions:
 if( ! empty($action) )
 {
 	switch( $action )
@@ -307,6 +307,17 @@ if( ! empty($action) )
 			forget_param( 'fm_filter' );
 			$fm_filter = '';
 			$action = '';
+			break;
+
+		case 'createnew':
+			// Check permission:
+			$current_User->check_perm( 'files', 'add', true );
+
+			// create new file/dir
+			param( 'create_type', 'string', '' ); // 'file', 'dir'
+			param( 'create_name', 'string', '' );
+
+			$action = ( $create_type == 'file' ? 'createnew_file' : 'createnew_dir'  );
 			break;
 	}
 }
@@ -352,54 +363,18 @@ switch( $action )
 		$Messages->add( T_('You have to enable JavaScript to use this feature.'), 'error' );
 		break;
 
-
-	case 'createnew':
-		// fp>> TODO: WAAAAAAY TO MANY 'if/else' blocks! refactor...
-		// Check permission:
-		$current_User->check_perm( 'files', 'add', true );
-
-		// create new file/dir
-		param( 'create_type', 'string', '' ); // 'file', 'dir'
-		param( 'create_name', 'string', '' );
-
-		if( $create_type == 'dir' )
-		{
-			if( ! $Settings->get( 'fm_enable_create_dir' ) )
-			{ // Directory creation is gloablly disabled:
-				$Messages->add( T_('Directory creation is disabled.'), 'error' );
-				break;
-			}
-		}
-		elseif( $create_type == 'file' )
-		{
-			if( ! $Settings->get( 'fm_enable_create_file' ) )
-			{ // File creation is gloablly disabled:
-				$Messages->add( T_('File creation is disabled.'), 'error' );
-				break;
-			}
-		}
-		else
-		{
+	case 'createnew_dir':
+		if( ! $Settings->get( 'fm_enable_create_dir' ) )
+		{ // Directory creation is gloablly disabled:
+			$Messages->add( T_('Directory creation is disabled.'), 'error' );
 			break;
 		}
-
 		if( empty($create_name) )
 		{ // No name was supplied:
-			$Messages->add( ($create_type == 'dir'
-					? T_('Cannot create a directory without name.')
-					: T_('Cannot create a file without name.') ), 'error' );
+			$Messages->add( T_('Cannot create a directory without name.'), 'error' );
 			break;
 		}
-
-		if( $create_type == 'file' )
-		{
-			if( $error_filename = validate_filename( $create_name ) )
-			{ // Not valid filename or extension
-				$Messages->add( $error_filename, 'error' );
-				break;
-			}
-		}
-		elseif( $error_dirname = validate_dirname( $create_name ) )
+		if( $error_dirname = validate_dirname( $create_name ) )
 		{ // Not valid dirname
 			$Messages->add( $error_dirname, 'error' );
 			break;
@@ -416,29 +391,55 @@ switch( $action )
 
 		if( $newFile->create( $create_type ) )
 		{
-			if( $create_type == 'file' )
-			{
-				$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
-			}
-			else
-			{
-				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
-			}
+			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
 
 			$fm_Filelist->add( $newFile );
+			$fm_Filelist->sort();
 		}
 		else
 		{
-			if( $create_type == 'file' )
-			{
-				$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $fm_Filelist->_rds_list_path ), 'error' );
-			}
-			else
-			{
-				$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $fm_Filelist->_rds_list_path ), 'error' );
-			}
+			$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $fm_Filelist->_rds_list_path ), 'error' );
+		}
+		break;
+
+
+	case 'createnew_file':
+		if( ! $Settings->get( 'fm_enable_create_file' ) )
+		{ // File creation is gloablly disabled:
+			$Messages->add( T_('File creation is disabled.'), 'error' );
+			break;
+		}
+		if( empty($create_name) )
+		{ // No name was supplied:
+			$Messages->add( T_('Cannot create a file without name.'), 'error' );
+			break;
+		}
+		if( $error_filename = validate_filename( $create_name ) )
+		{ // Not valid filename or extension
+			$Messages->add( $error_filename, 'error' );
+			break;
 		}
 
+		// Try to get File object:
+		$newFile = & $FileCache->get_by_root_and_path( $fm_Filelist->_FileRoot->type, $fm_Filelist->_FileRoot->in_type_ID, $fm_Filelist->_rds_list_path.$create_name );
+
+		if( $newFile->exists() )
+		{
+			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $create_name ), 'error' );
+			break;
+		}
+
+		if( $newFile->create( $create_type ) )
+		{
+			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
+
+			$fm_Filelist->add( $newFile );
+			$fm_Filelist->sort();
+		}
+		else
+		{
+			$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $fm_Filelist->_rds_list_path ), 'error' );
+		}
 		break;
 
 
@@ -1466,6 +1467,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.13  2006/03/26 13:44:51  blueyed
+ * Sort filelist after creating files/dirs; display $create_name in input box again;
+ *
  * Revision 1.12  2006/03/26 03:06:24  blueyed
  * When there's only one selected file for download, use its filename as base for archive.
  *

@@ -59,7 +59,7 @@ global $Messages;
  */
 global $selected_Filelist;
 
-global $disp_fm_browser_toggle, $disp_fm_dirtree;
+global $disp_fm_browser_toggle, $disp_fm_dirtree, $create_name;
 
 
 // Begin payload block:
@@ -777,9 +777,9 @@ if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_crea
 		}
 	?>
 	<input type="text" name="create_name" id="fm_createname" value="<?php
-		if( isset( $createname ) )
+		if( isset( $create_name ) )
 		{
-			echo $createname;
+			echo $create_name;
 		} ?>" size="15" />
 	<input class="ActionButton" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
 	<?php
@@ -879,6 +879,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.7  2006/03/26 13:44:51  blueyed
+ * Sort filelist after creating files/dirs; display $create_name in input box again;
+ *
  * Revision 1.6  2006/03/26 02:37:57  blueyed
  * Directory tree next to files list.
  *
