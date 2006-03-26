@@ -133,6 +133,14 @@ class Filelist
 	var $_full_path_index = array();
 
 	/**
+	 * Index on full paths (path => {@link $_entries} key).
+	 * @todo make these direct links to &File objects
+	 * @var array
+	 * @access protected
+	 */
+	var $_rdfp_rel_path_index = array();
+
+	/**
 	 * Index on sort order (order # => {@link $_entries} key).
 	 * @todo make these direct links to &File objects
 	 * @var array
@@ -299,6 +307,7 @@ class Filelist
 		$this->_entries = array();
 		$this->_md5_ID_index = array();
 		$this->_full_path_index = array();
+		$this->_rdfp_rel_path_index = array();
 		$this->_order_index = array();
 
 		// Attempt list files for requested directory: (recursively if flat mode):
@@ -378,6 +387,7 @@ class Filelist
 		$this->_entries[$this->_total_entries] = & $File;
 		$this->_md5_ID_index[$File->get_md5_ID()] = $this->_total_entries;
 		$this->_full_path_index[$File->get_full_path()] = $this->_total_entries;
+		$this->_rdfp_rel_path_index[$File->get_rdfs_rel_path()] = $this->_total_entries;
 		// add file to the end of current list:
 		$this->_order_index[$this->_total_entries] = $this->_total_entries;
 
@@ -417,12 +427,14 @@ class Filelist
 	{
 		$this->_md5_ID_index = array();
 		$this->_full_path_index = array();
+		$this->_rdfp_rel_path_index = array();
 
 		$count = 0;
 		foreach( $this->_entries as $loop_File )
 		{
 			$this->_md5_ID_index[$loop_File->get_md5_ID()] = $count;
 			$this->_full_path_index[$loop_File->get_full_path()] = $count;
+			$this->_rdfp_rel_path_index[$loop_File->get_rdfs_rel_path()] = $count;
 			$count++;
 		}
 	}
@@ -826,12 +838,34 @@ class Filelist
 
 
 	/**
-	 * Get a file by its full path.
+	 * Get a file by its relative (to root) path.
 	 *
-	 * @param string the full path
+	 * @param string the full path (with ending slash for directories)
 	 * @return mixed File object (by reference) on success, false on failure.
 	 */
-	function & get_by_path( $path )
+	function & get_by_rdfs_path( $path )
+	{
+		$path = str_replace( '\\', '/', $path );
+
+		if( isset( $this->_rdfp_rel_path_index[ $path ] ) )
+		{
+			return $this->_entries[ $this->_rdfp_rel_path_index[ $path ] ];
+		}
+		else
+		{
+			$r = false;
+			return $r;
+		}
+	}
+
+
+	/**
+	 * Get a file by its full path.
+	 *
+	 * @param string the full path (with ending slash for directories)
+	 * @return mixed File object (by reference) on success, false on failure.
+	 */
+	function & get_by_full_path( $path )
 	{
 		$path = str_replace( '\\', '/', $path );
 
@@ -984,6 +1018,7 @@ class Filelist
 			unset( $this->_entries[ $this->_md5_ID_index[ $File->get_md5_ID() ] ] );
 			unset( $this->_md5_ID_index[ $File->get_md5_ID() ] );
 			unset( $this->_full_path_index[ $File->get_full_path() ] );
+			unset( $this->_rdfp_rel_path_index[ $File->get_rdfs_rel_path() ] );
 
 			// get the ordered index right: move all next files downwards
 			$order_key = array_search( $index, $this->_order_index );
@@ -1143,6 +1178,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/26 14:14:21  blueyed
+ * Added get_by_rdfs_path
+ *
  * Revision 1.5  2006/03/26 14:00:49  blueyed
  * Made Filelist constructor more decent
  *
