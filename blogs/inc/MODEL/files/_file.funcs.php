@@ -656,7 +656,7 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 	}
 
 	// We'll go through files in current dir:
-	$Nodelist = new Filelist( trailing_slash($path), $Root );
+	$Nodelist = new Filelist( $Root, trailing_slash($path) );
 	$Nodelist->load();
 	$has_sub_dirs = $Nodelist->count_dirs();
 
@@ -728,6 +728,9 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.11  2006/03/26 14:00:49  blueyed
+ * Made Filelist constructor more decent
+ *
  * Revision 1.10  2006/03/26 02:37:57  blueyed
  * Directory tree next to files list.
  *

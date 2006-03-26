@@ -160,7 +160,7 @@ if( $fm_FileRoot )
  * fp>> TODO: When the user is viewing details for a file he should (by default) not be presented with the filelist in addition to the file properties
  * In cases like that, we should try to avoid instanciating a Filelist.
  */
-$fm_Filelist = new Filelist( $ads_list_path, $fm_FileRoot );
+$fm_Filelist = new Filelist( $fm_FileRoot, $ads_list_path );
 
 if( $UserSettings->param_Request( 'fm_dirsnotattop', 'integer', 0 ) )
 {
@@ -201,11 +201,11 @@ if( $fm_mode && $fm_sources = param( 'fm_sources', 'array', array(), true ) )
 
 	if( $sources_Root )
 	{ // instantiate the source list for the selected sources
-		$fm_source_Filelist = & new Filelist( $sources_Root->ads_path, $sources_Root );
+		$fm_source_Filelist = & new Filelist( $sources_Root );
 	}
 	else
 	{ // Fallback: source files are considered to be in the current root
-		$fm_source_Filelist = & new Filelist( $fm_Filelist->_FileRoot->ads_path, $fm_Filelist->get_FileRoot() );
+		$fm_source_Filelist = & new Filelist( $fm_Filelist->get_FileRoot() );
 		$Debuglog->add( 'SourceList without explicit root!', 'error' );
 	}
 
@@ -340,7 +340,7 @@ $fm_Filelist->sort( $fm_order, $fm_orderasc );
 /**
  * @var Filelist The selected files
  */
-$selected_Filelist = & new Filelist( false, $fm_Filelist->get_FileRoot() );
+$selected_Filelist = & new Filelist( $fm_Filelist->get_FileRoot(), false );
 
 /**
  * @global array A list of files which are selected in the FM list.
@@ -1467,6 +1467,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.14  2006/03/26 14:00:49  blueyed
+ * Made Filelist constructor more decent
+ *
  * Revision 1.13  2006/03/26 13:44:51  blueyed
  * Sort filelist after creating files/dirs; display $create_name in input box again;
  *

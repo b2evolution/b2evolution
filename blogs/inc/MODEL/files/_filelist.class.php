@@ -228,7 +228,7 @@ class Filelist
 
 	/**
 	 * Display template cache
-	 * 
+	 *
 	 * @todo get this outta here. This is NOT a displayable object.
 	 * We might want to have a "FileListResults" object that derives from Widget/Results/FilteredResults (the more the better)
 	 * This object is what the SQL or the ItemQuery object is to Results or to ItemList2. The model and the display should not be mixed.
@@ -243,14 +243,18 @@ class Filelist
 	/**
 	 * Constructor
 	 *
-	 * @param boolean|string Default path for the files, false if you want to create an arbitrary list
 	 * @param FileRoot See FileRootCache::get_by_type_and_ID()
+	 * @param boolean|string Default path for the files, false if you want to create an arbitrary list; NULL for the Fileroot's ads_path.
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 */
-	function Filelist( $path, $FileRoot )
+	function Filelist( $FileRoot, $path = NULL )
 	{
 		global $FileRootCache, $AdminUI;
 
+		if( is_null($path) )
+		{
+			$path = $FileRoot->ads_path;
+		}
 		$this->_ads_list_path = $path;
 		$this->_FileRoot = & $FileRoot;
 
@@ -1139,6 +1143,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.5  2006/03/26 14:00:49  blueyed
+ * Made Filelist constructor more decent
+ *
  * Revision 1.4  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *
