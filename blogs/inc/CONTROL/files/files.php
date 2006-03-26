@@ -259,7 +259,7 @@ $fm_forceFM = NULL;
 
 
 param( 'fm_disp_browser', 'integer', 0, true );
-param( 'disp_fm_dirtree', 'integer', 0, true ); // Do we want to display the directory tree next to the files list?
+$UserSettings->param_Request( 'fm_hide_dirtree', 'integer', 0, true ); // The directory tree next to the files table
 
 
 /*
@@ -1467,6 +1467,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.16  2006/03/26 20:42:48  blueyed
+ * Show Filelist dirtree by default and save it into UserSettings
+ *
  * Revision 1.15  2006/03/26 19:44:43  blueyed
  * Filelist::include_files/include_dirs added; normalization
  *

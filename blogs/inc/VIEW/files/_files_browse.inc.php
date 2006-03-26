@@ -59,7 +59,7 @@ global $Messages;
  */
 global $selected_Filelist;
 
-global $disp_fm_browser_toggle, $disp_fm_dirtree, $create_name;
+global $disp_fm_browser_toggle, $fm_hide_dirtree, $create_name;
 
 
 // Begin payload block:
@@ -142,12 +142,11 @@ $Form->end_form();
 */ ?>
 
 <?php
-if( $disp_fm_dirtree )
+if( ! $fm_hide_dirtree )
 {
 	echo '<div id="fileman_dirtree">';
-	#echo action_icon( T_('Close'), 'close', regenerate_url('disp_fm_dirtree'), '', array('style'=>'margin-left:10em; float:right;') );
 	echo get_directory_tree();
-	echo '<br /><a href="'.regenerate_url('disp_fm_dirtree', 'disp_fm_dirtree=0').'">'.T_('Hide directory tree').'</a>';
+	echo '<br /><a href="'.regenerate_url('fm_hide_dirtree', 'fm_hide_dirtree=1').'">'.T_('Hide directory tree').'</a>';
 	echo '</div>';
 }
 ?>
@@ -237,9 +236,9 @@ $filetable_cols = 6
 		?>
 		<div id="fmbar_display_dirtree">
 			<?php
-			if( ! $disp_fm_dirtree )
+			if( $fm_hide_dirtree )
 			{
-				echo '<a href="'.regenerate_url('', 'disp_fm_dirtree=1').'">'.T_('Display directory tree').'</a>';
+				echo '<a href="'.regenerate_url('fm_hide_dirtree', 'fm_hide_dirtree=0').'">'.T_('Display directory tree').'</a>';
 			}
 			?>
 		</div>
@@ -879,6 +878,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.8  2006/03/26 20:42:48  blueyed
+ * Show Filelist dirtree by default and save it into UserSettings
+ *
  * Revision 1.7  2006/03/26 13:44:51  blueyed
  * Sort filelist after creating files/dirs; display $create_name in input box again;
  *
