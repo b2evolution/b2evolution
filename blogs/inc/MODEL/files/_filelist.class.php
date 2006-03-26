@@ -275,6 +275,7 @@ class Filelist
 	 * NOTE: this does not work for arbitrary lists!
 	 *
 	 * @uses $flatmode
+	 * @return boolean True on sucess, false on failure (not accessible)
 	 */
 	function load()
 	{
@@ -342,6 +343,8 @@ class Filelist
 			// Add the file into current list:
 			$this->add_by_subpath( $rdfp_path_relto_root, true );
 		}
+
+		return true;
 	}
 
 
@@ -1175,6 +1178,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.9  2006/03/26 19:53:14  blueyed
+ * Filelist::load return value on success
+ *
  * Revision 1.8  2006/03/26 19:44:43  blueyed
  * Filelist::include_files/include_dirs added; normalization
  *
