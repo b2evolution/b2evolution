@@ -150,7 +150,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 		if( $Item->can_comment() )
 		{ // User can leave a comment
 			?>
-			<h4><?php echo T_('Leave a comment') ?>:</h4>
+			<h4 class="bCommentHead"><?php echo T_('Leave a comment') ?>:</h4>
 
 			<?php
 			$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
