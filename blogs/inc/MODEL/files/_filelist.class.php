@@ -197,12 +197,11 @@ class Filelist
 	var $_order = NULL;
 
 	/**
-	 * Are we sorting ascending (or descending).
+	 * Are we sorting ascending (or descending)?
 	 *
 	 * NULL is default and means ascending for 'name', descending for the rest
 	 *
-	 * @todo fplanque>> document possible values!!
-	 * @var mixed
+	 * @var boolean|NULL
 	 * @access protected
 	 */
 	var $_order_asc = NULL;
@@ -235,20 +234,6 @@ class Filelist
 
 
 	/**
-	 * Display template cache
-	 *
-	 * @todo get this outta here. This is NOT a displayable object.
-	 * We might want to have a "FileListResults" object that derives from Widget/Results/FilteredResults (the more the better)
-	 * This object is what the SQL or the ItemQuery object is to Results or to ItemList2. The model and the display should not be mixed.
-	 * IF NOT doing the clean objects, move this at least to file.funcs.
-	 *
-	 * @param array
-	 * @access protected
-	 */
-	var $_result_params;
-
-
-	/**
 	 * Constructor
 	 *
 	 * @param FileRoot See FileRootCache::get_by_type_and_ID()
@@ -265,14 +250,6 @@ class Filelist
 		}
 		$this->_ads_list_path = $path;
 		$this->_FileRoot = & $FileRoot;
-
-		/**
-		 * @todo get this outta here. This is NOT a displayable object.
-		 * We might want to have a "FileListResults" object that derives from Widget/Results/FilteredResults (the more the better)
-		 * This object is what the SQL or the ItemQuery object is to Results or to ItemList2. The model and the display should not be mixed.
-		 * IF NOT doing the clean objects, move this at least to file.funcs.
-		 */
-		$this->_result_params = $AdminUI->get_menu_template('Results');
 
 		if( ! empty($this->_ads_list_path) )
 		{
@@ -566,7 +543,6 @@ class Filelist
 				break;
 		}
 
-
 		if( ! $this->_order_asc )
 		{ // We want descending order: switch order
 			$r = - $r;
@@ -615,22 +591,33 @@ class Filelist
 	 */
 	function get_sort_link( $type, $atext )
 	{
+		global $AdminUI;
+
 		$newAsc = $this->_order == $type ? (1 - $this->is_sorting_asc()) :  1;
 
 		$r = '<a href="'.regenerate_url( 'fm_order,fm_orderasc', 'fm_order='.$type.'&amp;fm_orderasc='.$newAsc ).'" title="'.T_('Change Order').'"';
 
+		/**
+		 * @todo get this outta here. This is NOT a displayable object.
+		 * We might want to have a "FileListResults" object that derives from Widget/Results/FilteredResults (the more the better)
+		 * This object is what the SQL or the ItemQuery object is to Results or to ItemList2. The model and the display should not be mixed.
+		 * IF NOT doing the clean objects, move this at least to file.funcs.
+		 */
+		$result_params = $AdminUI->get_menu_template('Results');
+
+
 		// Sorting icon:
 		if( $this->_order != $type )
 		{ // Not sorted on this column:
-			$r .= ' class="basic_sort_link">'.$this->_result_params['basic_sort_off'];
+			$r .= ' class="basic_sort_link">'.$result_params['basic_sort_off'];
 		}
 		elseif( $this->is_sorting_asc($type) )
 		{ // We are sorting on this column , in ascneding order:
-			$r .=	' class="basic_current">'.$this->_result_params['basic_sort_asc'];
+			$r .=	' class="basic_current">'.$result_params['basic_sort_asc'];
 		}
 		else
 		{ // Descending order:
-			$r .=	' class="basic_current">'.$this->_result_params['basic_sort_desc'];
+			$r .=	' class="basic_current">'.$result_params['basic_sort_desc'];
 		}
 
 		$r .= ' '.$atext;
@@ -1178,6 +1165,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.7  2006/03/26 19:15:59  blueyed
+ * Moved result_params to where they only get used. Not sure how to implement FileListResults and what parts it would replace in files.php
+ *
  * Revision 1.6  2006/03/26 14:14:21  blueyed
  * Added get_by_rdfs_path
  *
