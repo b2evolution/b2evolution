@@ -606,7 +606,7 @@ class Request
 	 */
 	function param_check_regexp( $var, $err_msg, $field_err_msg = NULL )
 	{
-		if( ! isRegexp( $this->params[$var] ) )
+		if( ! is_regexp( $this->params[$var] ) )
 		{
 			$this->param_error( $var, $field_err_msg );
 			return false;
@@ -852,6 +852,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.7  2006/03/26 20:25:39  blueyed
+ * is_regexp: allow check with modifiers, which the Filelist now uses internally
+ *
  * Revision 1.6  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

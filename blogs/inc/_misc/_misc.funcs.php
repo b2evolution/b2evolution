@@ -1937,12 +1937,17 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
  *
  * @author plenque at hotmail dot com {@link http://php.net/manual/en/function.preg-match.php}
  * @param string the regular expression to test
+ * @param boolean does the regular expression includes delimiters (and optionally modifiers)?
  * @return boolean
  */
-function isRegexp( $RegExp )
+function is_regexp( $reg_exp, $includes_delim = false )
 {
 	$sPREVIOUSHANDLER = set_error_handler( '_trapError' );
-	preg_match( '#'.str_replace( '#', '\#', $RegExp ).'#', '' );
+	if( ! $includes_delim )
+	{
+		$reg_exp = '#'.str_replace( '#', '\#', $reg_exp ).'#';
+	}
+	preg_match( $reg_exp, '' );
 	restore_error_handler( $sPREVIOUSHANDLER );
 
 	return !_traperror();
@@ -2707,6 +2712,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.25  2006/03/26 20:25:39  blueyed
+ * is_regexp: allow check with modifiers, which the Filelist now uses internally
+ *
  * Revision 1.24  2006/03/25 00:02:00  blueyed
  * Do not use reqhostpath, but reqhost and reqpath
  *

@@ -100,6 +100,10 @@ class Filelist
 	 * Will be matched against the filename part (not the path)
 	 * NULL if disabled
 	 *
+	 * Can be a regular expression (see {@link Filelist::_filter_is_regexp}), internally with delimiters/modifiers!
+	 *
+	 * Use {@link set_filter()} to set it.
+	 *
 	 * @var NULL|string
 	 * @access protected
 	 */
@@ -108,7 +112,7 @@ class Filelist
 	/**
 	 * Is the filter a regular expression?
 	 *
-	 *  NULL if disabled
+	 * Use {@link set_filter()} to set it.
 	 *
 	 * @see Filelist::_filter
 	 * @var NULL|boolean
@@ -312,7 +316,7 @@ class Filelist
 			$name = basename( $adfp_path );
 
 			// Check for hidden status...
-			if( (! $this->_show_hidden_files) && (substr($name, 0, 1) == '.') )
+			if( ( ! $this->_show_hidden_files) && (substr($name, 0, 1) == '.') )
 			{ // Do not load & show hidden files (prefixed with .)
 				continue;
 			}
@@ -322,7 +326,7 @@ class Filelist
 			{ // Filter: must match filename
 				if( $this->_filter_is_regexp )
 				{ // Filter is a reg exp:
-					if( !preg_match( '#'.str_replace( '#', '\#', $this->_filter ).'#', $name ) )
+					if( ! preg_match( $this->_filter, $name ) )
 					{ // does not match the regexp filter
 						continue;
 					}
@@ -675,22 +679,34 @@ class Filelist
 	/**
 	 * Set the filter.
 	 *
-	 * @param string Filter string
+	 * @param string Filter string (for regular expressions, if no delimiter/modifiers are included, we try magically adding them)
 	 * @param boolean Is the filter a regular expression? (it's a glob pattern otherwise)
 	 */
-	function set_filter( $filterString, $filterIsRegexp = true )
+	function set_filter( $filter_string, $filter_is_regexp )
 	{
 		global $Messages;
 
-		$this->_filter_is_regexp = $filterIsRegexp;
+		$this->_filter_is_regexp = $filter_is_regexp;
 
-		if( $this->_filter_is_regexp && !isRegexp( $filterString ) )
+		if( $this->_filter_is_regexp && ! empty($filter_string) )
 		{
-			$Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $filterString ), 'error' );
-			$filterString = '.*';
+			if( ! is_regexp( $filter_string, true ) )
+			{
+				// Try with adding delimiters:
+				$filter_string_delim = '~'.str_replace( '~', '\~', $filter_string ).'~';
+				if( is_regexp( $filter_string_delim, true ) )
+				{
+					$filter_string = $filter_string_delim;
+				}
+				else
+				{
+					$Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $filter_string ), 'error' );
+					$filter_string = '~.*~';
+				}
+			}
 		}
 
-		$this->_filter = empty($filterString) ? NULL : $filterString;
+		$this->_filter = empty($filter_string) ? NULL : $filter_string;
 	}
 
 
@@ -1178,6 +1194,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.10  2006/03/26 20:25:39  blueyed
+ * is_regexp: allow check with modifiers, which the Filelist now uses internally
+ *
  * Revision 1.9  2006/03/26 19:53:14  blueyed
  * Filelist::load return value on success
  *
