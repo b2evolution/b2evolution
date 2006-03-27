@@ -2167,8 +2167,6 @@ class Form extends Widget
 
 			if( $field_lines ) $r .= "</div>\n";
 		}
-		// do not display note after all radio options
-		$this->_common_params['note'] = NULL;
 
 		$r .= $this->end_field();
 
@@ -2225,7 +2223,7 @@ class Form extends Widget
 				'params' => $l_params );
 		}
 
-		$field_params = array( 'lines' => $field_lines );
+		$field_params = array( 'lines' => $field_lines, 'note' => $field_note );
 
 		return $this->radio_input( $field_name, $field_value, $new_field_options, $field_label, $field_params );
 	}
@@ -2495,6 +2493,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.8  2006/03/27 21:04:51  blueyed
+ * Fixed "note" for radio inputs.
+ *
  * Revision 1.7  2006/03/18 19:17:54  blueyed
  * Removed remaining use of $img_url
  *
