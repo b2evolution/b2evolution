@@ -1360,7 +1360,7 @@ class Item extends DataObject
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $admin_url.'?ctrl=edit&amp;action=delete&amp;post=';
+			$actionurl = $admin_url.'?ctrl=editactions&amp;action=delete&amp;post=';
 		}
 		$url = $actionurl.$this->ID;
 
@@ -1480,7 +1480,7 @@ class Item extends DataObject
 		if( $title == '#' ) $title = T_('Publish now using current date and time.');
 
 		$r = $before;
-		$r .= '<a href="'.$admin_url.'?ctrl=edit'.$glue.'action=publish'.$glue.'post_ID='.$this->ID;
+		$r .= '<a href="'.$admin_url.'?ctrl=editactions'.$glue.'action=publish'.$glue.'post_ID='.$this->ID;
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .= '>'.$text.'</a>';
@@ -2476,6 +2476,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2006/03/27 21:22:11  fplanque
+ * more admin link fixes
+ *
  * Revision 1.23  2006/03/24 20:24:37  fplanque
  * fixed admin links
  *
