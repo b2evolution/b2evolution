@@ -112,7 +112,7 @@ $Form->begin_fieldset( T_('Permissions for members of this group') );
 							$perm_view_option,
 							array( 'add', T_('Add/Upload') ),
 							$perm_edit_option
-						), T_('Files') );
+						), T_('Files'), false, T_('This overrides any specific settings for the media permissions of blogs!') );
 	if( $edited_Group->get('ID') != 1 )
 	{	// Groups others than #1 can be prevented from editing users
 		$Form->radio( 'edited_grp_perm_users', $edited_Group->get('perm_users'),
@@ -147,6 +147,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.3  2006/03/27 21:08:13  blueyed
+ * Added note to media perms, not sure if it's meant to be like this; but documents current behaviour
+ *
  * Revision 1.2  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
