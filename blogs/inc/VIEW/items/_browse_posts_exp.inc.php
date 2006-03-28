@@ -81,9 +81,9 @@ while( $Item = & $ItemList->get_item() )
 
 				echo '<strong>';
 				$Item->issue_date();
- 				echo '</strong> @ <strong>';
- 				$Item->issue_time( 'H:i' );
- 				echo '</strong>';
+				echo '</strong> @ <strong>';
+				$Item->issue_time( 'H:i' );
+				echo '</strong>';
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' <acronym title="';
 				$Item->Author->login();
@@ -143,7 +143,7 @@ while( $Item = & $ItemList->get_item() )
 
 			if( $Blog->allowcomments != 'never' )
 			{
- 				echo '<a href="?ctrl=browse&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'&amp;c=1" class="ActionButton">';
+				echo '<a href="?ctrl=browse&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'&amp;c=1" class="ActionButton">';
 				// TRANS: Link to comments for current post
 				comments_number(T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
 				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'), $Item->ID);
@@ -158,7 +158,7 @@ while( $Item = & $ItemList->get_item() )
 		if( $c )
 		{ // We have request display of comments
 			?>
- 			<div class="bFeedback">
+			<div class="bFeedback">
 			<a name="comments"></a>
 			<h4><?php echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks') ?>:</h4>
 			<?php
@@ -189,7 +189,9 @@ while( $Item = & $ItemList->get_item() )
 						}
 						$Comment->author_email( '', ' &middot; Email: ' );
 						$Comment->author_ip( ' &middot; IP: ' );
-					 ?>
+						echo ' &middot; ';
+						$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No spam karma available') );
+						?>
 					</div>
 					<div class="bCommentContent">
 					<div class="bCommentTitle">
@@ -312,6 +314,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.9  2006/03/28 22:23:16  blueyed
+ * Display spam karma for comments in posts list
+ *
  * Revision 1.8  2006/03/18 18:31:53  blueyed
  * Fixed "new" icon
  *
