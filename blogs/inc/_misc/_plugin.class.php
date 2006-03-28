@@ -676,7 +676,7 @@ class Plugin
 
 	/**
 	 * Event handler: Called when the admin tries to enable the plugin, changes
-	 * its configuration and after installation.
+	 * its configuration/settings and after installation.
 	 *
 	 * Use this, if your plugin needs configuration before it can be used.
 	 *
@@ -839,7 +839,7 @@ class Plugin
 	 * Event handler: Called at the end of the frontend comment form.
 	 *
 	 * You might want to use this to inject antispam payload to use in
-	 * in {@link GetKarmaForComment()} or modify the Comment according
+	 * in {@link GetSpamKarmaForComment()} or modify the Comment according
 	 * to it in {@link CommentFormSent()}.
 	 *
 	 * @param array Associative array of parameters
@@ -876,7 +876,9 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called to ask the plugin for the karma of a comment.
+	 * Event handler: Called to ask the plugin for the spam karma of a comment.
+	 *
+	 * Note: low karma (karma_absolute+=0 and karma_max+=10 means: no spam!)
 	 *
 	 * This gets called just before the comment gets stored.
 	 *
@@ -885,7 +887,7 @@ class Plugin
 	 *   - 'karma_absolute': Absolute karma (by reference)
 	 *   - 'karma_max': Maximum karma (by reference)
 	 */
-	function GetKarmaForComment( & $params )
+	function GetSpamKarmaForComment( & $params )
 	{
 	}
 
@@ -1802,6 +1804,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.21  2006/03/28 22:24:46  blueyed
+ * Fixed logical spam karma issues
+ *
  * Revision 1.20  2006/03/21 23:17:17  blueyed
  * doc/cleanup
  *

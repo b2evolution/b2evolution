@@ -167,6 +167,17 @@ class Comment extends DataObject
 
 
 	/**
+	 * Set the spam karma, as a number.
+	 * @param integer Spam karma (0-100)
+	 * @access protected
+	 */
+	function set_spam_karma( $spam_karma )
+	{
+		return parent::set_param( 'spam_karma', 'number', $spam_karma );
+	}
+
+
+	/**
 	 * Template function: display anchor for permalinks to refer to
 	 */
 	function anchor()
@@ -790,9 +801,9 @@ class Comment extends DataObject
 		global $Plugins;
 
 		// Get karma percentage (interval 0-100)
-		$spam_karma = $Plugins->trigger_karma_collect( 'GetKarmaForComment', array( 'Comment' => & $this ) );
+		$spam_karma = $Plugins->trigger_karma_collect( 'GetSpamKarmaForComment', array( 'Comment' => & $this ), 0, 0 ); /* start with 0/0 */
 
-		$this->set( 'spam_karma', $spam_karma );
+		$this->set_spam_karma( $spam_karma );
 
 		// TODO: use karma threshold and apply it (to status)!
 
@@ -833,6 +844,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2006/03/28 22:24:46  blueyed
+ * Fixed logical spam karma issues
+ *
  * Revision 1.17  2006/03/28 14:12:19  fplanque
  * minor fix
  *

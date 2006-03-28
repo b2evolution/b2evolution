@@ -273,7 +273,7 @@ class Plugins
 				'MessageFormSent' => T_('Called when the "Message to user" form has been submitted.'),
 				'MessageFormSentCleanup' => T_('Called after a email message has been sent through public form.'),
 
-				'GetKarmaForComment' => '',
+				'GetSpamKarmaForComment' => T_('Asks plugin for the spam karma of a comment/trackback.'),
 
 				// Other Plugins can use this:
 				'CaptchaValidated' => T_('Validate the test from CaptchaPayload to detect humans.'),
@@ -1517,11 +1517,11 @@ class Plugins
 	 *
 	 * @param string Event
 	 * @param array Params to the event
-	 * @param integer Maximum karma to start with
 	 * @param integer Absolute karma to start with
+	 * @param integer Maximum karma to start with
 	 * @return integer Karma percentage (rounded 0-100)
 	 */
-	function trigger_karma_collect( $event, $params, $karma_max = 1, $karma_absolute = 1 )
+	function trigger_karma_collect( $event, $params, $karma_absolute = 1, $karma_max = 1 )
 	{
 		$params['karma_max'] = & $karma_max;
 		$params['karma_absolute'] = & $karma_absolute;
@@ -2425,6 +2425,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.26  2006/03/28 22:24:46  blueyed
+ * Fixed logical spam karma issues
+ *
  * Revision 1.25  2006/03/24 01:06:55  blueyed
  * Also instantiate UserSettings if $current_User not (yet) set (of course!)
  *
