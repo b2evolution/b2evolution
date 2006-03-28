@@ -738,7 +738,7 @@ class Comment extends DataObject
 			$notify_message .=
 				T_('Comment').': '.str_replace('&amp;', '&', $this->get_permanent_url( 'pid' ))."\n" // We use pid to get a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 				.$this->get('content')."\n\n"
-				.T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&amp;blog='.$this->Item->blog_ID.'&p='.$this->Item->ID."&c=1\n\n"
+				.T_('Edit/Delete').': '.$admin_url.'?ctrl=browse&tab=posts&blog='.$this->Item->blog_ID.'&p='.$this->Item->ID."&c=1\n\n"
 				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $Blog->get( 'blogurl' ), 'disp=subs' ) )."\n";
 
 			if( $debug )
@@ -833,6 +833,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2006/03/28 14:12:19  fplanque
+ * minor fix
+ *
  * Revision 1.16  2006/03/23 22:13:50  blueyed
  * doc
  *
