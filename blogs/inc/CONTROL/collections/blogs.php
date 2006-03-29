@@ -247,6 +247,7 @@ switch( $action )
 			case 'stub':
 				// Access through stub file
 				// TODO: stub file might be empty or handled by webserver (mod_rewrite)! We cannot require this!
+				// TODO: It actually also allows to include ".php" files here!!
 				require $edited_Blog->get('dynfilepath');
 		}
 		$page = ob_get_contents();
@@ -559,6 +560,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2006/03/29 23:24:40  blueyed
+ * todo!
+ *
  * Revision 1.6  2006/03/20 22:28:34  blueyed
  * Changed defaults for Log's display methods to "all" categories.
  *
