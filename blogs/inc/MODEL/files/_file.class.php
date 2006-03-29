@@ -1251,7 +1251,7 @@ class File extends DataObject
 			return $no_access_text;
 		}
 
-		if( in_array( $this->Filetype->viewtype, array( 'external', 'download' ) ) )
+		if( isset($this->Filetype) && in_array( $this->Filetype->viewtype, array( 'external', 'download' ) ) )
 		{ // Link to open in the curent window
 			return '<a href="'.$url.'" title="'.$title.'">'.$text.'</a>';
 		}
@@ -1324,6 +1324,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2006/03/29 23:24:01  blueyed
+ * Fixed linking of files.
+ *
  * Revision 1.8  2006/03/20 20:06:02  fplanque
  * fixed IMG button, again :(
  *

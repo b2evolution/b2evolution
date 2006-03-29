@@ -18,6 +18,13 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+/**
+ * @var Item
+ */
+global $edited_Item;
+
+
 $Form = & new Form( NULL, 'fm_links', 'post', 'fieldset' );
 
 $Form->global_icon( T_('Quit link mode!'), 'close', regenerate_url( 'fm_mode' ) );
@@ -109,6 +116,9 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.4  2006/03/29 23:24:01  blueyed
+ * Fixed linking of files.
+ *
  * Revision 1.3  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

@@ -409,7 +409,7 @@ while( $lFile = & $fm_Filelist->get_next() )
 			// Plug extensions here!
 		)
 	{	// Offer option to link the file to an Item:
-		echo action_icon( T_('Link this file!'), 'link', regenerate_url( 'fm_selected', 'fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
+		echo action_icon( T_('Link this file!'), 'link', regenerate_url( 'fm_selected', 'action=link&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
 		echo ' ';
 	}
 
@@ -878,6 +878,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.9  2006/03/29 23:24:01  blueyed
+ * Fixed linking of files.
+ *
  * Revision 1.8  2006/03/26 20:42:48  blueyed
  * Show Filelist dirtree by default and save it into UserSettings
  *
