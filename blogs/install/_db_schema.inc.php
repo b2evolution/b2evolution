@@ -67,8 +67,8 @@ $schema_queries = array(
 			user_lastname varchar(50) NULL,
 			user_nickname varchar(50) NULL,
 			user_icq int(11) unsigned NULL,
-			user_email varchar(100) NOT NULL,
-			user_url varchar(100) NULL,
+			user_email varchar(255) NOT NULL,
+			user_url varchar(255) NULL,
 			user_ip varchar(15) NULL,
 			user_domain varchar(200) NULL,
 			user_browser varchar(200) NULL,
@@ -163,7 +163,7 @@ $schema_queries = array(
 			post_content          text NULL,
 			post_title            text NOT NULL,
 			post_urltitle         VARCHAR(50) NULL DEFAULT NULL,
-			post_url              VARCHAR(250) NULL DEFAULT NULL,
+			post_url              VARCHAR(255) NULL DEFAULT NULL,
 			post_main_cat_ID      int(11) unsigned NOT NULL,
 			post_flags            SET( 'pingsdone', 'imported'),
 			post_views            INT(11) UNSIGNED NOT NULL DEFAULT 0,
@@ -202,8 +202,8 @@ $schema_queries = array(
 			comment_status ENUM('published', 'deprecated', 'protected', 'private', 'draft') DEFAULT 'published' NOT NULL,
 			comment_author_ID int unsigned NULL default NULL,
 			comment_author varchar(100) NULL,
-			comment_author_email varchar(100) NULL,
-			comment_author_url varchar(100) NULL,
+			comment_author_email varchar(255) NULL,
+			comment_author_url varchar(255) NULL,
 			comment_author_IP varchar(23) NOT NULL default '',
 			comment_date datetime NOT NULL,
 			comment_content text NOT NULL,
@@ -578,47 +578,6 @@ function install_insert_default_data( $old_db_version )
 
 			install_basic_plugins();
 		}
-
-		/*
-		Should be also handled by db_delta()..
-		// Fixes for MySQL strict mode (MySQL 5): {{{
-		echo 'Altering Users table... ';
-		$DB->query( 'ALTER TABLE T_users
-		             MODIFY COLUMN user_firstname varchar(50) NULL,
-		             MODIFY COLUMN user_lastname varchar(50) NULL,
-		             MODIFY COLUMN user_nickname varchar(50) NULL,
-		             MODIFY COLUMN user_icq int(11) unsigned NULL,
-		             MODIFY COLUMN user_url varchar(100) NULL,
-		             MODIFY COLUMN user_ip varchar(15) NULL,
-		             MODIFY COLUMN user_domain varchar(200) NULL,
-		             MODIFY COLUMN user_browser varchar(200) NULL,
-		             MODIFY COLUMN dateYMDhour datetime NOT NULL,
-		             MODIFY COLUMN user_aim varchar(50) NULL,
-		             MODIFY COLUMN user_msn varchar(100) NULL,
-		             MODIFY COLUMN user_yim varchar(50) NULL' );
-		echo "OK.<br />\n";
-
-		echo 'Altering Blogs table... ';
-		$DB->query( 'ALTER TABLE T_blogs
-		             MODIFY COLUMN blog_media_subdir VARCHAR( 255 ) NULL,
-		             MODIFY COLUMN blog_media_fullpath VARCHAR( 255 ) NULL,
-		             MODIFY COLUMN blog_media_url VARCHAR( 255 ) NULL' );
-		echo "OK.<br />\n";
-
-		echo 'Altering Comments table... ';
-		$DB->query( 'ALTER TABLE T_comments
-		             MODIFY COLUMN comment_date datetime NOT NULL' );
-		echo "OK.<br />\n";
-
-		echo 'Altering Links table... ';
-		$DB->query( 'ALTER TABLE T_links
-		             MODIFY COLUMN link_datecreated      datetime          not null,
-		             MODIFY COLUMN link_datemodified     datetime          not null,
-		             CHANGE link_item_ID link_itm_ID INT( 11 ) UNSIGNED NOT NULL,
-								 CHANGE link_dest_item_ID link_dest_itm_ID INT( 11 ) UNSIGNED NULL' );
-		echo "OK.<br />\n";
-		// }}}
-		*/
 
 	}
 
