@@ -49,7 +49,7 @@ class test_plugin extends Plugin
 	var $priority = 50;
 	var $version = 'CVS $Revision$';
 	var $author = 'The b2evo Group';
-	var $help_url = 'http://b2evolution.net/';
+	var $help_url = 'http://manual.b2evolution.net/Plugins/test_plugin';
 
 	/*
 	 * These variables MAY be overriden.
