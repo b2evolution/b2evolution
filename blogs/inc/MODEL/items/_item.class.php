@@ -90,6 +90,10 @@ class Item extends DataObject
 	var $assigned_User;
 	var $issue_date;
 	var $mod_date;
+	/**
+	 * The visibility status of the item.
+	 * @var string 'published', 'deprecated', 'protected', 'private' or 'draft'
+	 */
 	var $status;
 	/**
 	 * Locale code for the Item content.
@@ -109,7 +113,11 @@ class Item extends DataObject
 	 * @var string The list of renderers, imploded by '.'.
 	 */
 	var $renderers;
-	var $comments;     // Comments status
+	/**
+	 * Comments status
+	 * @var string "open", "disabled" or "closed
+	 */
+	var $comments;
 	var $url;          // Should move
 	var $typ_ID;
 	var $st_ID;
@@ -2476,6 +2484,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2006/04/04 21:49:02  blueyed
+ * doc
+ *
  * Revision 1.24  2006/03/27 21:22:11  fplanque
  * more admin link fixes
  *
