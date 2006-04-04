@@ -438,22 +438,22 @@ class AdminUI_general
 	}
 
 
-  /**
-   * Display doctype + <head>...</head> section
-   */
-  function disp_html_head()
-  {
+	/**
+	 * Display doctype + <head>...</head> section
+	 */
+	function disp_html_head()
+	{
 		global $view_path;
 
-    require $view_path.'_menutop.php';
+		require $view_path.'_menutop.php';
 	}
 
 
-  /**
+	/**
 	 * Dsiplay the top of the HTML <body>...
-   *
+	 *
 	 * Typically includes title, menu, messages, etc.
-   */
+	 */
 	function disp_body_top()
 	{
 		echo "<body>\n";
@@ -461,14 +461,14 @@ class AdminUI_general
 		echo $this->get_body_top();
 	}
 
-  /**
+	/**
 	 * Display body bottom, debug info and close </html>
-   */
+	 */
 	function disp_global_footer()
 	{
 		global $view_path;
 
-    require $view_path.'_footer.php';
+		require $view_path.'_footer.php';
 	}
 
 
@@ -476,7 +476,7 @@ class AdminUI_general
 	 * Display the start of a payload block
 	 *
 	 * Note: it should be possible to display several payload blocks on a single page
-	 * @todo check id the event is appropriate. Maybe it should rather go as 'AdminAfterBodyTop' or sth like this.
+	 * @todo check if the plugin event is appropriate. Maybe it should rather go as 'AdminAfterBodyTop' or sth like this.
 	 */
 	function disp_payload_begin()
 	{
@@ -500,17 +500,17 @@ class AdminUI_general
 	}
 
 
-  /**
-   * Display a view (from the inc/VIEWS/ hierarchy )
-   *
-   * Note: doing the require inside of a function has the side effect of forcing the view
-   * to declare any global object it wants to use. This can be a little tedious but on the
-   * other hand it has the advantage of clearly showing what objects are used and makes it
-   * easier to audit the views in order to determine if they include more business logic
-   * than they ought to.
-   *
-   * @param string
-   */
+	/**
+	 * Display a view (from the inc/VIEWS/ hierarchy )
+	 *
+	 * Note: doing the require inside of a function has the side effect of forcing the view
+	 * to declare any global object it wants to use. This can be a little tedious but on the
+	 * other hand it has the advantage of clearly showing what objects are used and makes it
+	 * easier to audit the views in order to determine if they include more business logic
+	 * than they ought to.
+	 *
+	 * @param string
+	 */
 	function disp_view( $view_name )
 	{
 		global $view_path;
@@ -521,14 +521,14 @@ class AdminUI_general
 
 		global $DB;	// Note: not sure it's agood idea to let the views hit on the db...
 
- 		global $model_path;		// TEMP (for object inclusion)
- 		global $misc_inc_path;
+		global $model_path;		// TEMP (for object inclusion)
+		global $misc_inc_path;
 
 		global $current_User;
 		global $Request;
 
 
-    require $view_path.$view_name.'.php';
+		require $view_path.$view_name.'.php';
 	}
 
 
@@ -745,19 +745,19 @@ class AdminUI_general
 		{ // root element
 			$path = array();
 		}
-		elseif( !is_array($path) )
+		elseif( ! is_array($path) )
 		{
 			$path = array($path);
 		}
 
-		$nodes = & $this->_menus;
+		$node = & $this->_menus;
 		foreach( $path as $lStep )
 		{
-			if( !isset($nodes['entries'][$lStep]) )
+			if( ! isset($node['entries'][$lStep]) )
 			{
 				if( $createIfNotExisting )
 				{
-					$nodes['entries'][$lStep] = array();
+					$node['entries'][$lStep] = array();
 				}
 				else
 				{
@@ -765,10 +765,10 @@ class AdminUI_general
 					return $r;
 				}
 			}
-			$nodes = & $nodes['entries'][$lStep];
+			$node = & $node['entries'][$lStep];
 		}
 
-		return $nodes;
+		return $node;
 	}
 
 
@@ -871,7 +871,7 @@ class AdminUI_general
 			case 'Results':
 				// Results list:
 				return array(
-				'before' => '<div class="results">',
+					'before' => '<div class="results">',
 					'header_start' => '<div class="results_nav">',
 						'header_text' => '<strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
 						'header_text_single' => '',
@@ -1283,8 +1283,8 @@ class AdminUI_general
 
 /*
  * $Log$
- * Revision 1.3  2006/03/16 18:54:53  fplanque
- * no message
+ * Revision 1.4  2006/04/04 21:54:23  blueyed
+ * cleanup/whitespace
  *
  * Revision 1.2  2006/03/12 23:09:30  fplanque
  * doc cleanup
@@ -1293,9 +1293,6 @@ class AdminUI_general
  * File reorganization to MVC (Model View Controller) architecture.
  * See index.hml files in folders.
  * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.53  2006/02/10 20:29:34  blueyed
- * *** empty log message ***
  *
  * Revision 1.52  2006/02/03 21:58:04  fplanque
  * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
