@@ -35,6 +35,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * Using title as a source if url title is empty
  *
+ * @todo Use dashes "-" as seperator (at least do not replace them with "_"); replace umlauts
+ *
  * @param string url title to validate
  * @param string real title to use as a source if $urltitle is empty
  * @param integer ID of post
@@ -50,14 +52,15 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	if( empty( $urltitle ) ) $urltitle = $title;
 	if( empty( $urltitle ) ) $urltitle = 'title';
 
-	// echo 'staring with: ', $urltitle, '<br />';
+	// echo 'starting with: ', $urltitle, '<br />';
 
 	// Replace HTML entities
 	$urltitle = htmlentities( $urltitle, ENT_NOQUOTES );
-	// Keep only one char in emtities!
+	// Keep only one char in entities!
 	$urltitle = preg_replace( '/&(.).+?;/', '$1', $urltitle );
 	// Remove non acceptable chars
 	$urltitle = preg_replace( '/[^A-Za-z0-9]+/', '_', $urltitle );
+	// Remove '_' at start and end:
 	$urltitle = preg_replace( '/^_+/', '', $urltitle );
 	$urltitle = preg_replace( '/_+$/', '', $urltitle );
 	// Uppercase the first character of each word in a string
@@ -67,7 +70,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	$urlbase = substr( $matches[1], 0, 40 );
 	$urltitle = $urlbase;
-	if( isset( $matches[2] ) )
+	if( ! empty( $matches[2] ) )
 	{
 		$urltitle = $urlbase . $matches[2];
 	}
@@ -93,7 +96,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 		{ // This one has a number, we extract it:
 			$existing_number = (integer) $matches[1];
 			if( $existing_number > $highest_number )
-			{ // This is th enew high
+			{ // This is the new high
 				$highest_number = $existing_number;
 			}
 		}
@@ -921,6 +924,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/04 21:46:48  blueyed
+ * doc, todo
+ *
  * Revision 1.4  2006/03/12 23:46:13  fplanque
  * experimental
  *
