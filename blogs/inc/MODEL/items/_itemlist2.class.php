@@ -1156,7 +1156,7 @@ class ItemList2 extends DataObjectList2
 	 * @param string|NULL string to display before any empty dates. Set to NULL in order not to display empty dates.
 	 * @param string|NULL string to display after any empty dates.
 	 */
-	function date_if_changed( $before = '<h2>', $after = '</h2>', $format = '',
+	function date_if_changed( $before = '<h2 class="bItemListDate">', $after = '</h2>', $format = '',
 														$before_empty_day = NULL, $after_empty_day = NULL )
 	{
 		if( empty($format) )
@@ -1192,6 +1192,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/04 21:48:36  blueyed
+ * Add "bItemListDate" class to default, to allow styling
+ *
  * Revision 1.3  2006/03/13 19:44:35  fplanque
  * no message
  *
