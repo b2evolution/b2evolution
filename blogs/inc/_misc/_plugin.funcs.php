@@ -381,8 +381,12 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 }
 
 
+/**
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.8  2006/04/04 22:15:34  blueyed
+ * Merge error.. :/
+ *
  * Revision 1.7  2006/04/04 22:12:34  blueyed
  * Fixed setting usersettings for other users
  *
