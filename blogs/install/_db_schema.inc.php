@@ -378,6 +378,19 @@ $schema_queries = array(
 			INDEX link_file_ID (link_file_ID)
 		)" ),
 
+	'T_filetypes' => array(
+		'Creating table for file types',
+		'CREATE TABLE T_filetypes (
+			ftyp_ID int(11) unsigned NOT NULL auto_increment,
+			ftyp_extensions varchar(30) NOT NULL,
+			ftyp_name varchar(30) NOT NULL,
+			ftyp_mimetype varchar(50) NOT NULL,
+			ftyp_icon varchar(20) default NULL,
+			ftyp_viewtype varchar(10) NOT NULL,
+			ftyp_allowed tinyint(1) NOT NULL default 0,
+			PRIMARY KEY (ftyp_ID)
+		)' ),
+
 	'T_plugins' => array(
 		'Creating plugins table',
 		"CREATE TABLE T_plugins (
@@ -393,27 +406,13 @@ $schema_queries = array(
 			INDEX plug_status( plug_status )
 		)" ),
 
-	'T_filetypes' => array(
-		'Creating table for file types',
-		'CREATE TABLE T_filetypes (
-			ftyp_ID int(11) unsigned NOT NULL auto_increment,
-			ftyp_extensions varchar(30) NOT NULL,
-			ftyp_name varchar(30) NOT NULL,
-			ftyp_mimetype varchar(50) NOT NULL,
-			ftyp_icon varchar(20) default NULL,
-			ftyp_viewtype varchar(10) NOT NULL,
-			ftyp_allowed tinyint(1) NOT NULL default 0,
-			PRIMARY KEY (ftyp_ID)
-		)' ),
-
 	'T_pluginsettings' => array(
 		'Creating plugin settings table',
 		'CREATE TABLE T_pluginsettings (
 			pset_plug_ID INT(11) UNSIGNED NOT NULL,
 			pset_name VARCHAR( 30 ) NOT NULL,
 			pset_value TEXT NULL,
-			PRIMARY KEY ( pset_plug_ID, pset_name ),
-			INDEX pset_plug_ID( pset_plug_ID )
+			PRIMARY KEY ( pset_plug_ID, pset_name )
 		)' ),
 
 	'T_pluginusersettings' => array(
@@ -423,8 +422,7 @@ $schema_queries = array(
 			puset_user_ID INT(11) UNSIGNED NOT NULL,
 			puset_name VARCHAR( 30 ) NOT NULL,
 			puset_value TEXT NULL,
-			PRIMARY KEY ( puset_plug_ID, puset_user_ID, puset_name ),
-			INDEX puset_plug_ID( puset_plug_ID, puset_user_ID )
+			PRIMARY KEY ( puset_plug_ID, puset_user_ID, puset_name )
 		)' ),
 
 	'T_pluginevents' => array(
