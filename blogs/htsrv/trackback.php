@@ -65,6 +65,11 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 		trackback_response( 1, 'Sorry, this weblog does not allow you to trackback its posts.' );
 	}
 
+	if( ! $commented_Item->comments != 'open' )
+	{
+		trackback_response( 1, 'Sorry, this item does not accept comments.' );
+	}
+
 	$title = strip_tags($title);
 	$title = (strlen($title) > 255) ? substr($title, 0, 252).'...' : $title;
 	$excerpt = strip_tags($excerpt);
