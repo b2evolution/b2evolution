@@ -53,24 +53,28 @@ param( 'grp_ID', 'integer', NULL );		// Note: should NOT be memorized:    -- " -
  * @global boolean true, if user is only allowed to edit his profile
  */
 $user_profile_only = ! $current_User->check_perm( 'users', 'view' );
+
 if( $user_profile_only )
 { // User has no permissions to view: he can only edit his profile
 
-	if( (isset($user_ID) && $user_ID != $current_User->ID)
-	 || isset($grp_ID) )
-	{ // User tis trying to edit something he should not: add error message (Should be prevented by UI)
+	if( (isset($user_ID) && $user_ID != $current_User->ID) || isset($grp_ID) )
+	{ // User is trying to edit something he should not: add error message (Should be prevented by UI)
 		$Messages->add( 'You have no permission to view other users or groups!', 'error' );
 	}
 
 	// Make sure the user only edits himself:
-	$action = 'edit_user';
-	$edited_User = & $current_User;
+	$user_ID = $current_User->ID;
+	$grp_ID = NULL;
+	if( ! in_array( $action, array( 'userupdate', 'edit_user' ) ) )
+	{
+		$action = 'edit_user';
+	}
 }
 
 /*
  * Load editable objects and set $action (while checking permissions)
  */
-if( !is_null($user_ID) )
+if( ! is_null($user_ID) )
 { // User selected
 	if( $action == 'userupdate' && $user_ID == 0 )
 	{ // we create a new user
@@ -98,7 +102,7 @@ if( !is_null($user_ID) )
 
 	if( $action != 'view_user' )
 	{ // check edit permissions
-		if( !$current_User->check_perm( 'users', 'edit' )
+		if( ! $current_User->check_perm( 'users', 'edit' )
 		    && $edited_User->ID != $current_User->ID )
 		{ // user is only allowed to _view_ other user's profiles
 			$Messages->add( 'You have no permission to edit other users!', 'error' );
@@ -657,6 +661,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2006/04/04 21:40:21  blueyed
+ * Fix profile-editing for users that have no "view-users" permission.
+ *
  * Revision 1.11  2006/03/21 16:51:24  blueyed
  * More personal message, when updating own profile.
  *
