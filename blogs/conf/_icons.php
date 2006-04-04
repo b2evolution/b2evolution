@@ -350,9 +350,9 @@ $map_iconfiles = array(
 	),
 
 	'help' => array(
-		'file' => $rsc_subdir.'icons/icon_question.gif',
+		'file' => $rsc_subdir.'icons/help-browser.png',
 		'alt'  => T_('Help'),
-		'size' => array( 15, 15 ),
+		'size' => array( 16, 16 ),
 	),
 	'webhelp' => array(
 		'file' => $rsc_subdir.'icons/icon_help.gif',
