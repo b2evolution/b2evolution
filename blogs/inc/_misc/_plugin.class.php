@@ -207,6 +207,9 @@ class Plugin
 	 *
 	 * This gets instantianted in {@link Plugins::instantiate_Settings()}.
 	 *
+	 * NOTE: its methods use {@link $current_User::ID} by default, but you may call it
+	 *       if there's no {@link $current_User} instantiated (yet).
+	 *
 	 * @see GetDefaultUserSettings()
 	 * @var NULL|PluginUserSettings
 	 */
@@ -588,38 +591,27 @@ class Plugin
 	/**
 	 * Event handler: Called before the plugin is going to be un-installed.
 	 *
-	 * This is the hook to remove any DB tables or the like.
+	 * This is the hook to remove any files or the like - tables with canonical names
+	 * (see {@link Plugin::get_sql_table()}, are handled internally.
 	 *
-	 * You might want to call "parent::BeforeUninstall()" in your plugin to handle canonical
-	 * database tables, which is done here.
+	 * See {@link BeforeUninstallPayload()} for the corresponding payload handler, which you
+	 * can request to invoke by returning NULL here.
 	 *
-	 * See {@link UninstallPayload()} for the corresponding payload handler.
+	 * Note: this method gets called again, if the uninstallation has to be confirmed,
+	 *       either because you've requested a call to {@link BeforeUninstallPayload()}
+	 *       or there are tables to be dropped (what the admin user has to confirm).
 	 *
 	 * @param array Associative array of parameters.
-	 *              'handles_display': Setting it to true avoids a generic "Uninstall failed" message.
-	 *              'unattended': true if Uninstall is unattended (Install action "deletedb"). Removes tables without confirmation.
-	 * @return boolean|NULL true on success, false on failure (the plugin won't get uninstalled then).
+	 *              'unattended': true if Uninstall is unattended (e.g., the /install action "deletedb" uses it).
+	 *                            This should cleanup everything without confirmation!
+	 * @return boolean|NULL
+	 *         true when it's ok to uninstall,
+	 *         false on failure (the plugin won't get uninstalled then).
+	 *               You should add the reason for it through {@link Plugin::msg()}.
 	 *         NULL requests to execute the {@link BeforeUninstallPayload()} method.
 	 */
 	function BeforeUninstall( & $params )
 	{
-		global $DB;
-		if( $this->tables_to_delete_on_uninstall = $DB->get_col( 'SHOW TABLES LIKE "'.$this->get_sql_table('%').'"' ) )
-		{
-			if( empty($params['unattended']) && ! param( 'plugin_'.$this->ID.'_confirm_drop', 'integer', 0 ) )
-			{ // not confirmed and not silently requested: request call to BeforeUninstallPayload()
-				return NULL;
-			}
-
-			// Drop tables:
-			$sql = 'DROP TABLE IF EXISTS '.implode( ', ', $this->tables_to_delete_on_uninstall );
-			$DB->query( $sql );
-			if( empty($params['unattended']) )
-			{
-				$this->msg( T_('Dropped plugin tables.'), 'success' );
-			}
-		}
-
 		return true;
 	}
 
@@ -627,50 +619,17 @@ class Plugin
 	/**
 	 * Event handler: Gets invoked to display the payload before uninstalling the plugin.
 	 *
-	 * By default, this method asks the admin for confirmation if he wants to delete
-	 * the plugin's tables (detected through table prefix).
+	 * You have to request a call to this during the plugin uninstall procedure by
+	 * returning NULL in {@link BeforeUninstall()}.
 	 *
-	 * You can override or extend this method to display your own payload that has to be
-	 * confirmed.
-	 *
-	 * See {@link BeforeUninstall()} for the corresponding action handler.
+	 * @param array Associative array of parameters.
+	 *              'Form': The {@link Form} that asks the user for confirmation (by reference).
+	 *                      If your plugin uses canonical table names (see {@link Plugin::get_sql_table()}),
+	 *                      there will be already a list of those tables included in it.
+	 *                      Do not end the form, just add own inputs or hidden keys to it.
 	 */
-	function BeforeUninstallPayload()
+	function BeforeUninstallPayload( & $params )
 	{
-		?>
-
-		<div class="panelinfo">
-
-			<?php
-			$Form = & new Form( '', 'uninstall_plugin', 'get' );
-			$Form->global_icon( T_('Cancel delete!'), 'close', regenerate_url() );
-
-			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Uninstall plugin #%d (%s)'), $this->ID, $this->name ) );
-
-			echo '<p>'.T_('Uninstalling this plugin will also delete its database tables:')
-				.'<ul>'
-				.'<li>'
-				.implode( '</li><li>', $this->tables_to_delete_on_uninstall )
-				.'</li>'
-				.'</ul>'
-				.'</p>';
-
-			echo '<p>'.T_('THIS CANNOT BE UNDONE!').'</p>';
-
-			$Form->hidden( 'action', 'uninstall' );
-			$Form->hidden( 'plugin_ID', $this->ID );
-			$Form->hidden( 'plugin_'.$this->ID.'_confirm_drop', 1 );
-
-			// We may need to use memorized params in the next page
-			$Form->hiddens_by_key( get_memorized( 'action,plugin_ID') );
-
-			$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
-			$Form->end_form();
-			?>
-
-		</div>
-
-		<?php
 	}
 
 
@@ -699,6 +658,23 @@ class Plugin
 	 */
 	function BeforeDisable()
 	{
+	}
+
+
+	/**
+	 * Event handler: Called at the event of registering/instantiating the Plugin
+	 * (in {@link Plugins::register()}).
+	 *
+	 * Use this to validate Settings/requirements and/or cache them into class properties.
+	 *
+	 * @param array Associative array of parameters.
+	 *              'db_row': an array with the columns of the plugin DB entry (in T_plugins).
+	 *                        E.g., 'plug_version' might be interesting to compare again "$this->version".
+	 * @return boolean If this method returns false, the Plugin gets unregistered (for the current request only).
+	 */
+	function AppendPluginRegister()
+	{
+		return true;
 	}
 
 	// }}}
@@ -1103,18 +1079,6 @@ class Plugin
 	{
 	}
 
-
-	/**
-	 * Event handler: Called after the {@link Plugin::Settings Settings object of the Plugin}
-	 * has been instantiated.
-	 *
-	 * Use this to validate Settings and/or cache them into class properties.
-	 *
-	 * @return boolean If false gets returned the Plugin gets unregistered (for the current request only).
-	 */
-	function PluginSettingsInstantiated()
-	{
-	}
 	// }}}
 
 
@@ -1184,18 +1148,6 @@ class Plugin
 	{
 	}
 
-
-	/**
-	 * Event handler: Called after the {@link Plugin::UserSettings UserSettings object of the Plugin}
-	 * has been instantiated.
-	 *
-	 * Use this to validate user Settings and/or cache them into class properties.
-	 *
-	 * @return boolean If false gets returned the Plugin gets unregistered (for the current request only).
-	 */
-	function PluginUserSettingsInstantiated()
-	{
-	}
 	// }}}
 
 
@@ -1804,6 +1756,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.22  2006/04/04 22:56:12  blueyed
+ * Simplified/refactored uninstalling/registering of a plugin (especially the hooking process)
+ *
  * Revision 1.21  2006/03/28 22:24:46  blueyed
  * Fixed logical spam karma issues
  *

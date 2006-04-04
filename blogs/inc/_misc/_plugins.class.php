@@ -195,6 +195,7 @@ class Plugins
 	 * Additional to the returned event methods (which can be disabled), there are internal
 	 * ones which just get called on the plugin (and get not remembered in T_pluginevents), e.g.:
 	 *  - AfterInstall
+	 *  - AppendPluginRegister
 	 *  - BeforeInstall
 	 *  - BeforeUninstall
 	 *  - BeforeUninstallPayload
@@ -203,12 +204,10 @@ class Plugins
 	 *  - PluginSettingsUpdateAction (Called as action before updating the plugin's settings)
 	 *  - PluginSettingsEditAction (Called as action before editing the plugin's settings)
 	 *  - PluginSettingsEditDisplayAfter (Called after standard plugin settings are displayed for editing)
-	 *  - PluginSettingsInstantiated
 	 *  - PluginSettingsValidateSet (Called before setting a plugin's setting in the backoffice)
 	 *  - PluginUserSettingsUpdateAction (Called as action before updating the plugin's user settings)
 	 *  - PluginUserSettingsEditAction (Called as action before editing the plugin's settings)
 	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
-	 *  - PluginUserSettingsInstantiated
 	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
 	 * }}
 	 *
@@ -521,21 +520,41 @@ class Plugins
 		// New ID:
 		$Plugin->ID = $DB->insert_id;
 		$this->index_ID_Plugins[ $Plugin->ID ] = & $Plugin;
+		$this->index_ID_rows[ $Plugin->ID ] = array(
+				'plug_ID' => $Plugin->ID,
+				'plug_priority' => $Plugin->priority,
+				'plug_classname' => $Plugin->classname,
+				'plug_code' => $Plugin->code,
+				'plug_apply_rendering' => $Plugin->apply_rendering,
+				'plug_status' => $Plugin->status,
+				'plug_version' => $Plugin->version,
+			);
 		$this->sorted_IDs[$key] = $Plugin->ID;
 
 		$this->save_events( $Plugin );
 
 		$DB->commit();
 
-		// "GetDefaultSettings" and "GetDefaultUserSettings" was just discovered by save_events()
-		$this->instantiate_Settings( $Plugin, 'Settings' );
-		$this->instantiate_Settings( $Plugin, 'UserSettings' );
-
 		$Debuglog->add( 'Installed plugin: '.$Plugin->name.' ID: '.$Plugin->ID, 'plugins' );
 
 		if( ! empty($dep_msgs['note']) )
 		{ // Add dependency notes
 			$Plugin->install_dep_notes = $dep_msgs['note'];
+		}
+
+		// Do the stuff that we've skipped in register method at the beginning:
+
+		// Instantiate the Plugins (User)Settings members:
+		$this->instantiate_Settings( $Plugin, 'Settings' );
+		$this->instantiate_Settings( $Plugin, 'UserSettings' );
+
+		$tmp_params = array('db_row' => $this->index_ID_rows[$Plugin->ID]);
+
+		if( $Plugin->AppendPluginRegister( $tmp_params ) === false )
+		{
+			$Debuglog->add( 'Unregistered plugin, because AppendPluginRegister returned false.', 'plugins' );
+			$this->unregister( $Plugin );
+			$Plugin = '';
 		}
 
 		return $Plugin;
@@ -948,20 +967,19 @@ class Plugins
 		else
 		{
 			$Plugin->ID = $ID;
+
+			if( $ID > 0 )
+			{ // Properties from T_plugins
+				// Code
+				$Plugin->code = $this->index_ID_rows[$Plugin->ID]['plug_code'];
+				// Status
+				$Plugin->status = $this->index_ID_rows[$Plugin->ID]['plug_status'];
+			}
 		}
 		// Tell him his name :)
 		$Plugin->classname = $classname;
 		// Tell him his priority:
 		if( $priority > -1 ) { $Plugin->priority = $priority; }
-
-		// Properties from T_plugins
-		if( isset( $this->index_ID_rows[$Plugin->ID] ) )
-		{
-			// Code
-			$Plugin->code = $this->index_ID_rows[$Plugin->ID]['plug_code'];
-			// Status
-			$Plugin->status = $this->index_ID_rows[$Plugin->ID]['plug_status'];
-		}
 
 		if( isset($apply_rendering) )
 		{
@@ -982,55 +1000,56 @@ class Plugins
 		}
 		$this->index_ID_Plugins[ $Plugin->ID ] = & $Plugin;
 
-		if( ! in_array( $Plugin->ID, $this->sorted_IDs ) )
+		if( ! in_array( $Plugin->ID, $this->sorted_IDs ) ) // TODO: check if this extra check is required..
 		{ // not in our sort index yet
 			$this->sorted_IDs[] = & $Plugin->ID;
 		}
 
-		// Instantiate the Plugins Settings class
-		if( $this->instantiate_Settings( $Plugin, 'Settings' ) === false && ! $this->is_admin_class && $ID != 0 )
+		// Stuff only for real/existing Plugins:
+		if( $Plugin->ID > 0 )
 		{
-			$Debuglog->add( 'Unregistered plugin, because instantiating its Settings returned false.', 'plugins' );
-			$this->unregister( $Plugin );
-			$Plugin = '';
-		}
-		if( $this->instantiate_Settings( $Plugin, 'UserSettings' ) === false && ! $this->is_admin_class && $ID != 0 )
-		{
-			$Debuglog->add( 'Unregistered plugin, because instantiating its UserSettings returned false.', 'plugins' );
-			$this->unregister( $Plugin );
-			$Plugin = '';
-		}
+			// Instantiate the Plugins (User)Settings members:
+			$this->instantiate_Settings( $Plugin, 'Settings' );
+			$this->instantiate_Settings( $Plugin, 'UserSettings' );
 
-		// Version check:
-		if( $must_exists
-		    && $Plugin
-		    && isset($this->index_ID_rows[$Plugin->ID])
-		    && $Plugin->version != $this->index_ID_rows[$Plugin->ID]['plug_version'] )
-		{ // Version has changed since installation or last update
-			$db_deltas = array();
-
-			// Extended check with cleaned up versions, if currently stored version is less or equal (because it was just different above!):
-			// NOTE: we do not want to compare DB schema (and set status to "needs_config") in case of downgrades..
-			list( $old_version, $new_version ) = preg_replace( array( '~^(CVS\s+)?\$'.'Revision:\s*~i', '~\s*\$$~' ), '', array( $this->index_ID_rows[$Plugin->ID]['plug_version'], $Plugin->version ) );
-			if( version_compare( $new_version, $old_version, '>=' ) )
+			$tmp_params = array('db_row'=>$this->index_ID_rows[$Plugin->ID]);
+			if( $Plugin->AppendPluginRegister( $tmp_params ) === false )
 			{
-				$Debuglog->add( 'Version for '.$Plugin->classname.' changed from '.$this->index_ID_rows[$Plugin->ID]['plug_version'].' to '.$Plugin->version, 'plugins' );
-
-				require_once( dirname(__FILE__).'/_upgrade.funcs.php' );
-				$db_deltas = db_delta($Plugin->GetDbLayout());
+				$Debuglog->add( 'Unregistered plugin, because AppendPluginRegister returned false.', 'plugins' );
+				$this->unregister( $Plugin );
+				$Plugin = '';
 			}
+			// Version check:
+			elseif( $Plugin->version != $this->index_ID_rows[$Plugin->ID]['plug_version'] && $must_exists )
+			{ // Version has changed since installation or last update
+				$db_deltas = array();
 
-			if( empty($db_deltas) )
-			{ // No DB changes needed, update (bump or decrease) the version
-				global $DB;
-				$DB->query( '
-						UPDATE T_plugins
-							 SET plug_version = '.$DB->quote($Plugin->version).'
-						 WHERE plug_ID = '.$Plugin->ID );
-			}
-			else
-			{ // If there are DB schema changes needed, set the Plugin status to "needs_config"
-				$this->set_Plugin_status( $Plugin, 'needs_config' );
+				// Extended check with cleaned up versions, if currently stored version is less or equal (because it was just different above!):
+				// NOTE: we do not want to compare DB schema (and set status to "needs_config") in case of downgrades..
+				list( $old_version, $new_version ) = preg_replace( array( '~^(CVS\s+)?\$'.'Revision:\s*~i', '~\s*\$$~' ), '', array( $this->index_ID_rows[$Plugin->ID]['plug_version'], $Plugin->version ) );
+				if( version_compare( $new_version, $old_version, '>=' ) )
+				{
+					$Debuglog->add( 'Version for '.$Plugin->classname.' changed from '.$this->index_ID_rows[$Plugin->ID]['plug_version'].' to '.$Plugin->version, 'plugins' );
+
+					require_once( dirname(__FILE__).'/_upgrade.funcs.php' );
+					$db_deltas = db_delta($Plugin->GetDbLayout());
+				}
+
+				if( empty($db_deltas) )
+				{ // No DB changes needed, update (bump or decrease) the version
+					global $DB;
+					$DB->query( '
+							UPDATE T_plugins
+								 SET plug_version = '.$DB->quote($Plugin->version).'
+							 WHERE plug_ID = '.$Plugin->ID );
+				}
+				else
+				{ // If there are DB schema changes needed, set the Plugin status to "needs_config"
+					$this->set_Plugin_status( $Plugin, 'needs_config' );
+					$Debuglog->add( 'Unregistered plugin, because version DB schema needs upgrade.', 'plugins' );
+					$this->unregister( $Plugin );
+					$Plugin = '';
+				}
 			}
 		}
 
@@ -1098,9 +1117,9 @@ class Plugins
 	/**
 	 * Forget the events a Plugin has registered.
 	 *
-	 * This gets used when {@link unregister() unregistering} a Plugin or if either
-	 * {@link Plugin::PluginSettingsInstantiated()} or {@link Plugin::PluginUserSettingsInstantiated()}
-	 * returned false (which means do not use it for subsequent events in the request).
+	 * This gets used when {@link unregister() unregistering} a Plugin or if
+	 * {@link Plugin::AppendPluginRegister()} returned false, which means
+	 * "do not use it for subsequent events in the request".
 	 */
 	function forget_events( $plugin_ID )
 	{
@@ -1260,19 +1279,16 @@ class Plugins
 
 	/**
 	 * Instantiate Settings member of class {@link PluginSettings} for the given
-	 * plugin, if it provides default settings.
+	 * plugin, if it provides default settings (through {@link Plugin::GetDefaultSettings()}).
 	 *
 	 * @param Plugin
-	 * @return NULL|boolean NULL, if no Settings;
-	 *    False, if the plugin's method {@link PluginSettingsInstantiated()} or {@link PluginUserSettingsInstantiated()} returned false.
+	 * @return NULL|boolean NULL, if no Settings
 	 */
 	function instantiate_Settings( & $Plugin, $set_type )
 	{
 		global $Debuglog, $Timer, $model_path;
 
 		$Timer->resume( 'plugins_inst_'.$set_type );
-
-		$r = true;
 
 		$defaults = $this->call_method( $Plugin->ID, 'GetDefault'.$set_type, $params = array() );
 
@@ -1286,46 +1302,49 @@ class Plugins
 		{
 			$Debuglog->add( $Plugin->classname.'::GetDefault'.$set_type.'() did not return array!', array('plugins', 'error') );
 		}
+		elseif( $set_type == 'UserSettings' )
+		{
+			require_once $model_path.'settings/_pluginusersettings.class.php';
+
+			$Plugin->UserSettings = new PluginUserSettings( $Plugin->ID );
+
+			$set_Obj = & $Plugin->UserSettings;
+		}
 		else
 		{
 			require_once $model_path.'settings/_pluginsettings.class.php';
-			require_once $model_path.'settings/_pluginusersettings.class.php';
-			$constructor = 'Plugin'.$set_type;
-			$Plugin->$set_type = & new $constructor( $Plugin->ID );
 
-			foreach( $defaults as $l_name => $l_meta )
-			{
-				if( isset($l_meta['layout']) )
-				{ // Skip non-value entries
-					continue;
-				}
+			$Plugin->Settings = new PluginSettings( $Plugin->ID );
 
-				if( isset($l_meta['defaultvalue']) )
-				{
-					$Plugin->$set_type->_defaults[$l_name] = $l_meta['defaultvalue'];
-				}
-				elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'array' )
-				{
-					$Plugin->$set_type->_defaults[$l_name] = array();
-					$Plugin->$set_type->_defaults_to_be_serialized[] = $l_name;
-				}
-				else
-				{
-					$Plugin->$set_type->_defaults[$l_name] = '';
-				}
+			$set_Obj = & $Plugin->Settings;
+		}
+
+		foreach( $defaults as $l_name => $l_meta )
+		{
+			if( isset($l_meta['layout']) )
+			{ // Skip non-value entries
+				continue;
 			}
 
-			// Call PluginSettingsInstantiated() / PluginUserSettingsInstantiated() on the plugin
-			$event_r = $this->call_method( $Plugin->ID, 'Plugin'.$set_type.'Instantiated', $params = array() );
-			if( $event_r === false )
+			// Register settings as _defaults into Settings:
+			if( isset($l_meta['defaultvalue']) )
 			{
-				$r = false;
+				$set_Obj->_defaults[$l_name] = $l_meta['defaultvalue'];
+			}
+			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'array' )
+			{
+				$set_Obj->_defaults[$l_name] = array();
+				$set_Obj->_defaults_to_be_serialized[] = $l_name;
+			}
+			else
+			{
+				$set_Obj->_defaults[$l_name] = '';
 			}
 		}
 
 		$Timer->pause( 'plugins_inst_'.$set_type );
 
-		return $r;
+		return true;
 	}
 
 
@@ -2425,6 +2444,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.27  2006/04/04 22:56:12  blueyed
+ * Simplified/refactored uninstalling/registering of a plugin (especially the hooking process)
+ *
  * Revision 1.26  2006/03/28 22:24:46  blueyed
  * Fixed logical spam karma issues
  *

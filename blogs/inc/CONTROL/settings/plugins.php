@@ -476,7 +476,8 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 		// Uninstall plugin:
-		param( 'plugin_ID', 'int', true );
+		param( 'plugin_ID', 'integer', true );
+		param( 'uninstall_confirmed_drop', 'integer', 0 );
 
 		$action = 'list'; // leave 'uninstall' by default
 
@@ -501,27 +502,46 @@ switch( $action )
 		}
 
 		// Ask plugin:
-		$success = $admin_Plugins->call_method( $plugin_ID, 'BeforeUninstall', $params = array( 'unattended' => false ) );
+		$uninstall_ok = $admin_Plugins->call_method( $plugin_ID, 'BeforeUninstall', $params = array( 'unattended' => false ) );
 
-		if( $success === false )
-		{ // failed
-			if( empty($params['handles_display']) )
-			{ // The plugin does not handle display
-				$Messages->add( sprintf( T_('Could not uninstall plugin #%d.'), $plugin_ID ), 'error' );
+		if( $uninstall_ok === false )
+		{ // Plugin said "NO":
+			$Messages->add( sprintf( T_('Could not uninstall plugin #%d.'), $plugin_ID ), 'error' );
+			break;
+		}
+
+		// See if we have (canonical) tables to drop:
+		$uninstall_tables_to_drop = $DB->get_col( 'SHOW TABLES LIKE "'.$edit_Plugin->get_sql_table('%').'"' );
+
+		if( $uninstall_ok === true )
+		{ // Plugin said "YES":
+
+			if( $uninstall_tables_to_drop )
+			{ // There are tables with the prefix for this plugin:
+				if( $uninstall_confirmed_drop )
+				{ // Drop tables:
+					$sql = 'DROP TABLE IF EXISTS '.implode( ', ', $uninstall_tables_to_drop );
+					$DB->query( $sql );
+					$Messages->add( T_('Dropped the table(s) of the plugin.'), 'success' );
+				}
+				else
+				{
+					$uninstall_ok = false;
+				}
 			}
-			break;
+
+			if( $uninstall_ok )
+			{ // We either have no tables to drop or it has been confirmed:
+				$Plugins->uninstall( $plugin_ID );
+				$admin_Plugins->unregister( $edit_Plugin );
+
+				$Messages->add( sprintf( T_('Uninstalled plugin #%d.'), $plugin_ID ), 'success' );
+				break;
+			}
 		}
 
-		if( $success === true )
-		{ // success
-			$Plugins->uninstall( $plugin_ID );
-			$admin_Plugins->unregister( $edit_Plugin );
-
-			$Messages->add( sprintf( T_('Uninstalled plugin #%d.'), $plugin_ID ), 'success' );
-			break;
-		}
-
-		// $success === NULL (or other): execute plugin event BeforeUninstallPayload() below
+		// $ok === NULL (or other): execute plugin event BeforeUninstallPayload() below
+		// $ok === false: let the admin confirm DB table dropping below
 		$action = 'uninstall';
 
 		break;
@@ -917,8 +937,46 @@ switch( $action )
 		break;
 
 
-	case 'uninstall':
-		$admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstallPayload', $params = array() );
+	case 'uninstall': // We come here either if the plugin requested a call to BeforeUninstallPayload() or if there are tables to be dropped {{{
+		?>
+
+		<div class="panelinfo">
+
+			<?php
+			$Form = & new Form( '', 'uninstall_plugin', 'post' );
+			// We may need to use memorized params in the next page
+			$Form->hiddens_by_key( get_memorized( 'action,plugin_ID') );
+			$Form->hidden( 'action', 'uninstall' );
+			$Form->hidden( 'plugin_ID', $edit_Plugin->ID );
+			$Form->hidden( 'uninstall_confirmed_drop', 1 );
+			$Form->global_icon( T_('Cancel uninstall!'), 'close', regenerate_url() );
+
+			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Uninstall plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
+
+			if( $uninstall_tables_to_drop )
+			{
+				echo '<p>'.T_('Uninstalling this plugin will also delete its database tables:').'</p>'
+					.'<ul>'
+					.'<li>'
+					.implode( '</li><li>', $uninstall_tables_to_drop )
+					.'</li>'
+					.'</ul>';
+			}
+
+			if( $uninstall_ok === NULL )
+			{ // Plugin requested this:
+				$admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstallPayload', $params = array( 'Form' => & $Form ) );
+			}
+
+			echo '<p>'.T_('THIS CANNOT BE UNDONE!').'</p>';
+
+			$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
+			$Form->end_form();
+			?>
+
+		</div>
+
+		<?php
 		break;
 
 

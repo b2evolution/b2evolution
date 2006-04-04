@@ -31,7 +31,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * This plugin provides the event {@link SessionLoaded()} and checks
  * the remote IP against a list of DNS Blacklists.
  *
- * It allows the user to whitelist her/himself through the plugin interface itself, by requiring a
+ * It allows the user to whitelist her/himself through the plugin interface itself, by optionally using a
  * plugin that provides {@link Plugin::CaptchaValidated()} and {@link Plugin::CaptchaPayload()} events.
  * See {@link validate_my_deps()}.
  */
@@ -155,7 +155,7 @@ class dnsbl_antispam_plugin extends Plugin
 	 */
 	function AdminAfterMenuInit()
 	{
-		$this->register_menu_entry( T_('DNSBL') );
+		$this->register_menu_entry( T_('DNSBL'), 'tools', array( 'perm_name'=>'options', 'perm_level'=>'edit' ) );
 	}
 
 
@@ -340,19 +340,6 @@ class dnsbl_antispam_plugin extends Plugin
 
 
 	/**
-	 * Pass Uninstall event to parent class, which asks eventually to drop
-	 * our tables.
-	 *
-	 * @return boolean
-	 */
-	function BeforeUninstall( & $params )
-	{
-		$params['handles_display'] = true; // we handle display in AdminBeginPayload
-		return parent::BeforeUninstall( $params );
-	}
-
-
-	/**
 	 * Check dependency on Captcha plugin, add note in case it's missing and disable the setting.
 	 */
 	function AfterInstall()
@@ -370,12 +357,13 @@ class dnsbl_antispam_plugin extends Plugin
 	/**
 	 * Get $use_whitelisting property, if not set before (e.g. in {@link Install()}).
 	 */
-	function PluginSettingsInstantiated()
+	function AppendPluginRegister()
 	{
 		if( ! isset($this->use_whitelisting) )
 		{
 			$this->use_whitelisting = $this->Settings->get('use_whitelisting');
 		}
+		return true;
 	}
 
 
@@ -670,6 +658,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.18  2006/04/04 22:56:13  blueyed
+ * Simplified/refactored uninstalling/registering of a plugin (especially the hooking process)
+ *
  * Revision 1.17  2006/03/24 19:40:49  blueyed
  * Only use absolute URLs if necessary because of used <base/> tag. Added base_tag()/skin_base_tag(); deprecated skinbase()
  *

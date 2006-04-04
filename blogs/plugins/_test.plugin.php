@@ -136,7 +136,7 @@ class test_plugin extends Plugin
 	/**
 	 * Deactive the plugin for the current request if the user wants it so.
 	 */
-	function PluginUserSettingsInstantiated()
+	function AppendLoginRegisteredUser()
 	{
 		if( $this->UserSettings->get('deactivate') )
 		{
