@@ -35,6 +35,10 @@ require_once $inc_path.'/_main.inc.php';
 
 
 // Check permission:
+if( ! isset($current_User) )
+{
+	debug_die( 'No permissions to view file (not logged in)!' );
+}
 $current_User->check_perm( 'files', 'view', true );
 
 // Load params
@@ -222,6 +226,9 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.6  2006/04/04 22:20:29  blueyed
+ * "Gracefully" die, if no $current_User set
+ *
  * Revision 1.5  2006/03/12 23:08:53  fplanque
  * doc cleanup
  *
