@@ -106,6 +106,7 @@ a.DeleteButton {
 	text-decoration: none;
 	padding: 2px 1ex;
 	border: 1px solid #ccc5aa;
+	white-space:nowrap;
 }
 a.CurrentBlog {
 	font-weight: bold;
@@ -150,6 +151,7 @@ a.PublishButton {
 	background-image: url(../img/desert-button.gif);
 	background-color: #e1ddce;
 	border: 1px solid #ccc5aa;
+	white-space:nowrap;
 }
 a.PublishButton:hover {
 	color: #c00;
@@ -259,7 +261,7 @@ table.grouped th a.basic_sort_link:hover {
 
 
 /*
- * Page layout: 
+ * Page layout:
  */
 #header {
 	float:left;
