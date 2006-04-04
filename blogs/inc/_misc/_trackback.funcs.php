@@ -117,36 +117,39 @@ function trackback(
 	{
 		echo '[post]';
 		$trackback_url = parse_url($trackback_url);
-		$port = isset($trackback_url['port']) ? $trackback_url['port'] : 80;
-		$http_request  = 'POST '.$trackback_url['path']." HTTP/1.0\r\n";
-		$http_request .= 'Host: '.$trackback_url['host']."\r\n";
-		$http_request .= 'Content-Type: application/x-www-form-urlencoded'."\r\n";
-		$http_request .= 'Content-Length: '.strlen($query_string)."\r\n";
-		$http_request .= "User-Agent: $app_name/$app_version\r\n";
-		$http_request .= "\r\n";
-		$http_request .= $query_string;
-		flush();
-		if( $fs = fsockopen($trackback_url['host'], $port) )
-		{
-			fputs($fs, $http_request);
-			$result = '';
-			while(!feof($fs))
+		if( ! empty($trackback_url['host']) && ! empty($trackback_url['path']) )
+		{ // Only try trackback if we have host and path:
+			$port = isset($trackback_url['port']) ? $trackback_url['port'] : 80;
+			$http_request  = 'POST '.$trackback_url['path']." HTTP/1.0\r\n";
+			$http_request .= 'Host: '.$trackback_url['host']."\r\n";
+			$http_request .= 'Content-Type: application/x-www-form-urlencoded'."\r\n";
+			$http_request .= 'Content-Length: '.strlen($query_string)."\r\n";
+			$http_request .= "User-Agent: $app_name/$app_version\r\n";
+			$http_request .= "\r\n";
+			$http_request .= $query_string;
+			flush();
+			if( $fs = fsockopen($trackback_url['host'], $port) )
 			{
-				$result .= fgets($fs, 4096);
-			}
+				fputs($fs, $http_request);
+				$result = '';
+				while(!feof($fs))
+				{
+					$result .= fgets($fs, 4096);
+				}
 
-			/* debug code
-			$debug_file = 'trackback.log';
-			$fp = fopen($debug_file, 'a');
-			fwrite($fp, "\n*****\nRequest:\n\n$http_request\n\nResponse:\n\n$result");
-			while(!@feof($fs)) {
-				fwrite($fp, @fgets($fs, 4096));
-			}
-			fwrite($fp, "\n\n");
-			fclose($fp);
-			*/
+				/* debug code
+				$debug_file = 'trackback.log';
+				$fp = fopen($debug_file, 'a');
+				fwrite($fp, "\n*****\nRequest:\n\n$http_request\n\nResponse:\n\n$result");
+				while(!@feof($fs)) {
+					fwrite($fp, @fgets($fs, 4096));
+				}
+				fwrite($fp, "\n\n");
+				fclose($fp);
+				*/
 
-			fclose($fs);
+				fclose($fs);
+			}
 		}
 	}
 	// extract the error code and message, then make the error code readable
@@ -222,6 +225,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/04 22:25:02  blueyed
+ * Only try POST trackback, if host and path could get parsed out of URL.
+ *
  * Revision 1.3  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
