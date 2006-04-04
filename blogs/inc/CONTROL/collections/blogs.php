@@ -330,13 +330,15 @@ switch($action)
 			// DB INSERT
 			$edited_Blog->dbinsert();
 
-			// Set default user permissions for this blog
+			// Set default user permissions for this blog (All permissions for the current user)
 			// Proceed insertions:
-			$DB->query( "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
-															bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
-															bloguser_perm_cats, bloguser_perm_properties )
-										VALUES ( $edited_Blog->ID, $current_User->ID, 1,
-														 'published,protected,private,draft,deprecated', 1, 1, 1, 1 )" );
+			$DB->query( "
+					INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
+							bloguser_perm_cats, bloguser_perm_properties,
+							bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
+					VALUES ( $edited_Blog->ID, $current_User->ID, 1,
+							'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1 )" );
 
 			// Commit changes in cache:
 			$BlogCache->add( $edited_Blog );
@@ -385,9 +387,11 @@ switch($action)
 			case 'perm':
 				blog_update_user_perms( $blog );
 				break;
+
 			case 'permgroup':
 				blog_update_group_perms( $blog );
 				break;
+
 			case 'advanced':
 				set_edited_Blog_from_params( 'advanced' );
 				break;
@@ -560,6 +564,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/04 21:37:42  blueyed
+ * Add bloguser_perm_media_*=1 for the created blog and current user.
+ *
  * Revision 1.7  2006/03/29 23:24:40  blueyed
  * todo!
  *
