@@ -592,7 +592,7 @@ switch( $action )
 		if( $edit_Plugin->Settings )
 		{
 			require_once $inc_path.'_misc/_plugin.funcs.php';
-			set_Settings_for_Plugin_from_params( $edit_Plugin, $admin_Plugins, 'Settings' );
+			set_Settings_for_Plugin_from_Request( $edit_Plugin, $admin_Plugins, 'Settings' );
 
 			// Let the plugin handle custom fields:
 			$ok_to_update = $admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
@@ -890,15 +890,14 @@ switch( $action )
 			<?php
 			$Form = & new Form( NULL, 'install_db_deltas', 'get' );
 			$Form->hidden_ctrl();
+			$Form->hidden( 'action', $next_action );
+			$Form->hidden( 'plugin_ID', $edit_Plugin->ID );
+
 			$Form->global_icon( T_('Cancel installation!'), 'close', regenerate_url() );
 
 			$Form->begin_form( 'fform', sprintf( /* %d is ID, %d name */ T_('Setup database for plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
 
 			echo '<p>'.T_('The plugin needs the following database changes.').'</p>';
-
-			$Form->hidden( 'action', $next_action );
-			$Form->hidden( 'plugin_ID', $edit_Plugin->ID );
-
 
 			if( ! empty($install_db_deltas) )
 			{

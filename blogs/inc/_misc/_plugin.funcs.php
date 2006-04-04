@@ -37,9 +37,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param Plugin (by reference)
  * @param Form (by reference)
  * @param string Settings type ('Settings' or 'UserSettings')
+ * @param mixed Target (User object for 'UserSettings')
  * @param mixed Value to really use (used for recursion into array type settings)
  */
-function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Form, $set_type = 'Settings', $use_value = NULL )
+function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Form, $set_type = 'Settings', $set_target = NULL, $use_value = NULL )
 {
 	global $debug, $plugin_help_contents, $Request;
 
@@ -139,10 +140,20 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 	}
 	else
 	{
-		$set_value = $Plugin->$set_type->get( $set_name );
+		if( $set_type == 'UserSettings' )
+		{
+			$set_value = $Plugin->UserSettings->get( $set_name, $set_target->ID );
+			$error_value = $Plugin->PluginUserSettingsValidateSet( $tmp_params = array(
+				'name' => $set_name, 'value' => & $set_value, 'meta' => $set_meta, 'User' => $set_target ) );
+		}
+		else
+		{
+			$val_method = 'Plugin'.$set_type.'ValidateSet';
+			$set_value = $Plugin->$set_type->get( $set_name );
+			$error_value = $Plugin->$val_method( $tmp_params = array( 'name' => $set_name, 'value' => & $set_value, 'meta' => $set_meta ) );
+		}
 
-		$val_method = 'Plugin'.$set_type.'ValidateSet';
-		if( $error_value = $Plugin->$val_method( $tmp_params = array( 'name' => $set_name, 'value' => & $set_value, 'meta' => $set_meta ) ) )
+		if( $error_value )
 		{ // add error
 			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$set_name, NULL, $error_value ); // only add the error to the field
 		}
@@ -208,7 +219,7 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 					foreach( $set_meta['entries'] as $l_set_name => $l_set_entry )
 					{
 						$l_value = isset($set_value[$k][$l_set_name]) ? $set_value[$k][$l_set_name] : NULL;
-						display_settings_fieldset_field( $set_name.'['.$k.']['.$l_set_name.']', $l_set_entry, $Plugin, $Form, $set_type, $l_value );
+						display_settings_fieldset_field( $set_name.'['.$k.']['.$l_set_name.']', $l_set_entry, $Plugin, $Form, $set_type, $set_target, $l_value );
 					}
 					$insert_new_set_as = $k+1;
 					$Form->end_fieldset();
@@ -263,8 +274,9 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
  * @param Plugin
  * @param Plugins An object derived from Plugins, probably either {@link $Plugins} or {@link $Plugins_admin}.
  * @param string Type of Settings (either 'Settings' or 'UserSettings').
+ * @param mixed Target (User object for 'UserSettings')
  */
-function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_type )
+function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_type, $set_target = NULL )
 {
 	global $Request, $Messages;
 
@@ -347,14 +359,23 @@ function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_ty
 		if( $set_type == 'UserSettings' )
 		{
 			global $current_User;
-			$tmp_params['User'] = $current_User;
+			$tmp_params['User'] = $set_target;
 		}
 		if( $error = $use_Plugins->call_method( $Plugin->ID, 'Plugin'.$set_type.'ValidateSet', $tmp_params ) )
 		{ // skip this
 			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $error );
 			continue;
 		}
-		$Plugin->$set_type->set( $l_name, $l_value );
+
+		// Set the setting:
+		if( $set_type == 'UserSettings' )
+		{
+			$Plugin->UserSettings->set( $l_name, $l_value, $set_target->ID );
+		}
+		else
+		{
+			$Plugin->Settings->set( $l_name, $l_value );
+		}
 	}
 
 }
@@ -362,6 +383,9 @@ function set_Settings_for_Plugin_from_params( & $Plugin, & $use_Plugins, $set_ty
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.7  2006/04/04 22:12:34  blueyed
+ * Fixed setting usersettings for other users
+ *
  * Revision 1.6  2006/03/19 00:11:57  blueyed
  * help icon for fieldsets
  *

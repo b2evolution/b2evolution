@@ -320,7 +320,7 @@ if( !$Messages->count('error') )
 				global $inc_path;
 				require_once $inc_path.'_misc/_plugin.funcs.php';
 
-				set_Settings_for_Plugin_from_params( $loop_Plugin, $Plugins, 'UserSettings' );
+				set_Settings_for_Plugin_from_Request( $loop_Plugin, $Plugins, 'UserSettings', $edited_User );
 
 				// Let the plugin handle custom fields:
 				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array( 'User' => & $edited_User ) );
@@ -661,6 +661,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2006/04/04 22:12:33  blueyed
+ * Fixed setting usersettings for other users
+ *
  * Revision 1.12  2006/04/04 21:40:21  blueyed
  * Fix profile-editing for users that have no "view-users" permission.
  *

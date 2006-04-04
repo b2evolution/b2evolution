@@ -202,9 +202,9 @@ $Form->begin_fieldset( T_('Features') );
 		$Form->info_field( T_('Admin skin'), $value_admin_skin, array( 'note' => T_('The skin defines how the backoffice appears to you.') ) );
 	}
 	// To display or hide icon legend
-	$Form->checkbox( 'edited_user_legend', $UserSettings->get('legend'), T_('Display icon legend'), T_('Display a legend at the bottom of every page including all action icons used on that page.') );
+	$Form->checkbox( 'edited_user_legend', $UserSettings->get('legend', $edited_User->ID), T_('Display icon legend'), T_('Display a legend at the bottom of every page including all action icons used on that page.') );
 	// To activate or deactivate bozo validator
-	$Form->checkbox( 'edited_user_bozo', $UserSettings->get('bozo'), T_('Use anti-bozo form validator'), T_('This will alert you if you fill in data into a form and try to leave the form before submitting the data.') );
+	$Form->checkbox( 'edited_user_bozo', $UserSettings->get('bozo', $edited_User->ID), T_('Use anti-bozo form validator'), T_('This will alert you if you fill in data into a form and try to leave the form before submitting the data.') );
 
 $Form->end_fieldset();
 
@@ -227,7 +227,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 
 	foreach( $pluginusersettings as $l_name => $l_meta )
 	{
-		display_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings' );
+		display_settings_fieldset_field( $l_name, $l_meta, $loop_Plugin, $Form, 'UserSettings', $edited_User );
 	}
 
 	$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter', $tmp_params = array( 'Form' => & $Form ) );
@@ -267,6 +267,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/04 22:12:33  blueyed
+ * Fixed setting usersettings for other users
+ *
  * Revision 1.7  2006/03/19 17:54:26  blueyed
  * Opt-out for email through message form.
  *
