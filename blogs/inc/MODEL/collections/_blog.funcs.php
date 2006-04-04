@@ -60,7 +60,7 @@ function blog_create(
 	$blog_allowpingbacks = 0,
 	$blog_pingb2evonet = 0,
 	$blog_pingtechnorati = 0,
-	$blog_pingweblogs = 1,
+	$blog_pingweblogs = 0,
 	$blog_pingblodotgs = 0,
 	$blog_disp_bloglist	= 1,
 	$blog_in_bloglist = 1 )
@@ -627,6 +627,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/04 21:57:35  blueyed
+ * Do not ping weblogs.com by default (for default/demo blogs)
+ *
  * Revision 1.2  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *
