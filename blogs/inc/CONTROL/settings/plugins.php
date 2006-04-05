@@ -828,7 +828,8 @@ switch( $action )
 		}
 
 		readfile($help_file);
-		debug_die();
+		debug_info();
+		exit();
 
 		break;
 

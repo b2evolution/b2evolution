@@ -439,7 +439,13 @@ function get_plugin_README_link( $Plugin, $word = '' )
  */
 function get_plugin_help_file( $Plugin )
 {
-	global $default_locale, $plugins_path;
+	global $default_locale, $plugins_path, $current_User;
+
+	if( ! $current_User->check_perm( 'options', 'view', false ) )
+	{ // README gets displayed through plugins controller, which requires these perms
+		// TODO: Catch "disp_help" and "disp_help_plain" messages in plugins.php before general perms check!?
+		return false;
+	}
 
 	// Get the language. We use $default_locale because it does not have to be activated ($current_locale)
 	$lang = substr( $default_locale, 0, 2 );
@@ -465,6 +471,9 @@ function get_plugin_help_file( $Plugin )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.11  2006/04/05 19:44:00  blueyed
+ * Do not display README-link, if user has no "view-options" perms.
+ *
  * Revision 1.10  2006/04/05 19:16:35  blueyed
  * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
  *
