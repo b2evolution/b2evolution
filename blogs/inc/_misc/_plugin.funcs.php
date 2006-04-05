@@ -42,7 +42,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Form, $set_type = 'Settings', $set_target = NULL, $use_value = NULL )
 {
-	global $debug, $plugin_help_contents, $Request;
+	global $debug, $Request;
 
 	$params = array();
 
@@ -66,27 +66,16 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 
 	$help_icon = NULL;
 	if( isset($set_meta['help']) )
-	{ // explicit help linked/provided
-		if( is_string($set_meta['help']) )
-		{
-			$get_help_icon_params = array($set_meta['help']);
+	{
+		if( $set_meta['help'] === true )
+		{ // link to $set_name-target:
+			$help_target = '#'.preg_replace( array('~\]?\[\d+\]\[~', '~\]$~'), array('_',''), $set_name );
 		}
 		else
-		{ // array
-			$get_help_icon_params = $set_meta['help'];
+		{
+			$help_target = $set_meta['help'];
 		}
-
-		// Add help icon to field's note:
-		$help_icon = call_user_func_array( array( & $Plugin, 'get_help_icon'), $get_help_icon_params );
-	}
-	elseif( ! empty($plugin_help_contents) )
-	{ // Autolink to internal help, if a matching HTML ID is in there ([plug_classname]_[set_name])
-		// Generate HTML ID, removing array syntax 'foobar[0][foo][0][bar]' becomes 'foobar_foo_bar'
-		$help_anchor = $Plugin->classname.'_'.preg_replace( array('~\]?\[\d+\]\[~', '~\]$~'), array('_',''), $set_name );
-		if( strpos($plugin_help_contents, 'id="'.$help_anchor.'"') )
-		{ // there's an ID for this setting in the help file
-			$help_icon = call_user_func_array( array( & $Plugin, 'get_help_icon'), array($set_name) );
-		}
+		$help_icon = get_plugin_help_link( $Plugin, $help_target );
 	}
 
 	$set_label = isset($set_meta['label']) ? $set_meta['label'] : '';
@@ -381,10 +370,103 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 }
 
 
+/**
+ * Get a link to a help page (with icon).
+ *
+ * @param Plugin
+ * @param string Target; one of the following:
+ *         - anchor to {@link $help_url} ("#anchor")
+ *         - absolute link to some URL, e.g. "http://example.com/example.php"
+ *         - empty for {@link $help_url}, then also the "www" icon gets used
+ * @return string The html A tag, linking to the help.
+ */
+function get_plugin_help_link( $Plugin, $target = '' )
+{
+	$title = '';
+	$icon = 'help';
+	$word = '';
+	$link_attribs = array( 'target' => 'help_plugin_'.$Plugin->ID ); // TODO: use JS popup instead?
+
+	if( empty($target) )
+	{
+		$url = ! empty( $Plugin->help_url ) ? $Plugin->help_url : 'http://manual.b2evolution.net/Plugins/'.$Plugin->classname;
+		$title = T_('Homepage of the plugin');
+		$icon = 'www';
+	}
+	elseif( substr($target, 0, 1) == '#' )
+	{ // anchor
+		$help_url = ! empty( $Plugin->help_url ) ? $Plugin->help_url : 'http://manual.b2evolution.net/Plugins/'.$Plugin->classname;
+		$url = $help_url.$target;
+	}
+	elseif( preg_match( '~^https?://~', $target ) )
+	{ // absolute URL (strict match to allow other formats eventually later)
+		$url = $target;
+	}
+
+	return action_icon( $title, $icon, $url, $word, $link_attribs );
+}
+
+
+/**
+* Display a link to open the Plugin's README.html file in a JS popup, if available.
+ *
+ * @param Plugin
+ * @param string Word to be used after action icon
+ * @return string Either the HTML A-tag or empty, if no README.html available
+ */
+function get_plugin_README_link( $Plugin, $word = '' )
+{
+	if( ! get_plugin_help_file($Plugin) )
+	{
+		return '';
+	}
+
+	global $admin_url;
+
+	return action_icon( T_('Local documentation of the plugin'), 'help',
+			url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$Plugin->ID ),
+			$word, array( 'use_js_popup'=>true, 'id'=>'anchor_help_plugin_'.$Plugin->ID ) );
+}
+
+
+/**
+ * Get the help file for a Plugin ID. README.LOCALE.html will take
+ * precedence above the general (english) README.html.
+ *
+ * @todo Handle encoding of files (to $io_charset)
+ *
+ * @return false|string
+ */
+function get_plugin_help_file( $Plugin )
+{
+	global $default_locale, $plugins_path;
+
+	// Get the language. We use $default_locale because it does not have to be activated ($current_locale)
+	$lang = substr( $default_locale, 0, 2 );
+
+	$help_dir = $plugins_path.$Plugin->classname.'/';
+
+	// Try help for the user's locale:
+	$help_file = $help_dir.'README.'.$lang.'.html';
+
+	if( ! file_exists($help_file) )
+	{ // Fallback: README.html
+		$help_file = $help_dir.'README.html';
+
+		if( ! file_exists($help_file) )
+		{
+			return false;
+		}
+	}
+
+	return $help_file;
+}
+
+
 /* {{{ Revision log:
  * $Log$
- * Revision 1.9  2006/04/04 22:29:07  blueyed
- * false panic..
+ * Revision 1.10  2006/04/05 19:16:35  blueyed
+ * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
  *
  * Revision 1.7  2006/04/04 22:12:34  blueyed
  * Fixed setting usersettings for other users

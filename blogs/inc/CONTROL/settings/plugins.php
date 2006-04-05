@@ -814,7 +814,10 @@ switch( $action )
 		param( 'plugin_ID', 'integer', 0 );
 		$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 
-		if( ! $edit_Plugin || ! ($help_file = $edit_Plugin->get_help_file( $plugin_ID )) )
+		global $inc_path;
+		require_once $inc_path.'_misc/_plugin.funcs.php';
+
+		if( ! $edit_Plugin || ! ($help_file = get_plugin_help_file( $edit_Plugin )) )
 		{
 			$action = 'list';
 		}
@@ -852,16 +855,6 @@ switch( $action )
 		    && ! empty($admin_Plugins->plugin_errors[$edit_Plugin->ID]['register']) )
 		{
 			$Messages->add( $admin_Plugins->plugin_errors[$edit_Plugin->ID]['register'], 'error' );
-		}
-
-		/**
-		 * @global string Contents of the Plugin's help file, if any. We search there for matching IDs/anchors to display links to them.
-		 */
-		$plugin_help_contents = '';
-
-		if( $help_file = $edit_Plugin->get_help_file() )
-		{
-			$plugin_help_contents = implode( '', file($help_file) );
 		}
 		break;
 
@@ -1003,15 +996,15 @@ switch( $action )
 			$Form->info_field( T_('ID'), $edit_Plugin->ID );
 		}
 
-		// Help icons, if available:
+		// Help icons (to homepage and README.html), if available:
 		$help_icons = array();
-		if( $help_internal = $edit_Plugin->get_help_icon() )
+		if( $help_www = get_plugin_help_link($edit_Plugin) )
 		{
-			$help_icons[] = $help_internal;
+			$help_icons[] = $help_www;
 		}
-		if( $help_external = $edit_Plugin->get_help_icon( NULL, NULL, true ) )
+		if( $help_README = get_plugin_README_link($edit_Plugin, 'README') )
 		{
-			$help_icons[] = $help_external;
+			$help_icons[] = $help_README;
 		}
 		if( ! empty($help_icons) )
 		{

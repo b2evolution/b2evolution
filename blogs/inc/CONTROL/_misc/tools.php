@@ -12,6 +12,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+require_once $inc_path.'_misc/_plugin.funcs.php';
+
+
 $AdminUI->set_path( 'tools' );
 
 if( $AdminUI->get_menu_entries('tools') )
@@ -97,8 +100,8 @@ elseif( $tab_Plugin )
 
 	<?php
 	echo action_icon( T_('Edit plugin settings!'), 'edit', '?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$tab_Plugin->ID )
-		.' '.$tab_Plugin->get_help_icon( NULL, NULL, true )
-		.' '.$tab_Plugin->get_help_icon();
+		.' '.get_plugin_help_link($tab_Plugin)
+		.' '.get_plugin_README_link($tab_Plugin);
 	?>
 
 	</div>

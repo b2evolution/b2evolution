@@ -2036,7 +2036,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array()
 	}
 
 	// "use_js_popup": open link in a JS popup
-	if( isset($link_attribs['use_js_popup']) )
+	if( ! empty($link_attribs['use_js_popup']) )
 	{
 		$popup_js = 'var win = new PopupWindow(); win.autoHide(); win.setUrl( \''.$link_attribs['href'].'\' ); win.setSize( 500, 400 ); win.showPopup(\''.$link_attribs['id'].'\'); return false;';
 		if( empty( $link_attribs['onclick'] ) )
@@ -2712,6 +2712,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.26  2006/04/05 19:16:35  blueyed
+ * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
+ *
  * Revision 1.25  2006/03/26 20:25:39  blueyed
  * is_regexp: allow check with modifiers, which the Filelist now uses internally
  *

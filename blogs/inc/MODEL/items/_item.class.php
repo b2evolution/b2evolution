@@ -1593,7 +1593,9 @@ class Item extends DataObject
 	 */
 	function renderer_checkboxes()
 	{
-		global $Plugins;
+		global $Plugins, $inc_path, $admin_url;
+
+		require_once $inc_path.'_misc/_plugin.funcs.php';
 
 		$Plugins->restart(); // make sure iterator is at start position
 
@@ -1667,10 +1669,10 @@ class Item extends DataObject
 			$loop_RendererPlugin->name();
 			echo '</label>';
 
-			// internal help link:
-			echo ' '.$loop_RendererPlugin->get_help_icon();
+			// internal README.html link:
+			echo ' '.get_plugin_README_link( $loop_RendererPlugin );
 			// external help link:
-			echo ' '.$loop_RendererPlugin->get_help_icon( NULL, NULL, true ); // external
+			echo ' '.get_plugin_help_link( $loop_RendererPlugin );
 
 			echo "</div>\n";
 		}
@@ -2484,6 +2486,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2006/04/05 19:16:34  blueyed
+ * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
+ *
  * Revision 1.25  2006/04/04 21:49:02  blueyed
  * doc
  *

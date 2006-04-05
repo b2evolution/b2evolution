@@ -100,10 +100,12 @@ class Plugin
 	var $author = 'Unknown author';
 
 	/**
-	 * URL for more info about plugin, author and new versions.
+	 * URL for more info about the plugin, author and new versions.
 	 *
 	 * This is for user info only.
-	 * If there is no website available, a mailto: URL can be provided.
+	 *
+	 * If empty, it defaults to 'http://manual.b2evolution.net/Plugins/[plugin_classname]',
+	 * where '[plugin_classname]' is the plugin's PHP class name.
 	 *
 	 * @var string
 	 */
@@ -293,9 +295,10 @@ class Plugin
 	 *                      with the keys 'pattern' and 'error' to define a custom error message.
 	 *   - 'valid_range': An array with keys 'min', 'max' and (optionally) 'error' to define
 	 *                    a custom error message. At least "min" or "max" must be given.
-	 *   - 'help': either the anchor in the internal help (first param to {@link get_help_icon()})
-	 *             or an array with all params to this method.
-	 *             E.g., 'param_explained' would link to the internal help's #classname_plugin_param_explained.
+	 *   - 'help': can be:
+	 *          - '#anchor': anchor that gets appended to {@link $help_url}
+	 *          - true: the settings name/key gets transformed to an html ID and gets used as anchor to {@link $help_url}.
+	 *          - 'http://example.com/uri': a full URL (starting with http:// or https://)
 	 *   - 'layout': Use this to visually group your settings.
 	 *               Either 'begin_fieldset', 'end_fieldset' or 'separator'. You can use 'label' for 'begin_fieldset'.
 	 * e.g.:
@@ -1627,126 +1630,6 @@ class Plugin
 		}
 	}
 
-
-	/**
-	 * Display a help link.
-	 *
-	 * The anchor (if given) should be defined (as HTML id attribute for a headline) in either
-	 *  - the README.html file (prefixed with the plugin's classname, e.g.
-	 *    'test_plugin_anchor' when 'anchor' gets passed here)
-	 *  - or the page that {@link $help_url} links to.
-	 *  (depending on the $external param).
-	 *
-	 * @param string HTML anchor for a specific help topic (empty to not use it).
-	 *               When linking to the internal help, it gets prefixed with "[plugin_classname]_".
-	 * @param string Title for the icon/legend
-	 * @param boolean Use external help? See {@link $help_url}.
-	 * @param string Word to use after the icon.
-	 * @param string Icon to use. Default for 'internal' is 'help', and for 'external' it is 'www'. See {@link $map_iconfiles}.
-	 * @param array Additional link attributes. See {@link action_link()}
-	 * @return string|false The html A tag, linking to the help.
-	 *         False if internal help requested, but not available (see {@link Plugins::get_help_file()}).
-	 */
-	function get_help_icon( $anchor = NULL, $title = NULL, $external = false, $word = NULL, $icon = NULL, $link_attribs = array() )
-	{
-		global $admin_url;
-
-		if( $external )
-		{
-			if( empty($this->help_url) )
-			{
-				return false;
-			}
-			$url = $this->help_url;
-			if( ! empty($anchor) )
-			{
-				$url .= '#'.$anchor;
-			}
-
-			if( ! isset($link_attribs['target']) )
-			{ // open in a new window
-				$link_attribs['target'] = '_blank';
-			}
-		}
-		else
-		{ // internal help:
-			if( ! $this->get_help_file() )
-			{
-				return false;
-			}
-
-			if( isset( $link_attribs['action'] ) )
-			{
-				$action = $link_attribs['action'];
-				unset($link_attribs['action']);
-			}
-			else
-			{
-				$action = 'disp_help_plain';
-
-				if( ! isset($link_attribs['use_js_popup']) )
-				{
-					$link_attribs['use_js_popup'] = true;
-
-					if( ! isset($link_attribs['id']) )
-					{
-						$link_attribs['id'] = 'plugin_'.$this->ID.'_help_'.$anchor.rand(0, 10000);
-					}
-				}
-			}
-
-			$url = url_add_param( $admin_url, 'ctrl=plugins&amp;action='.$action.'&amp;plugin_ID='.$this->ID );
-			if( ! empty($anchor) )
-			{
-				$url .= '#'.$this->classname.'_'.$anchor;
-			}
-		}
-
-		if( is_null($icon) )
-		{
-			$icon = $external ? 'www' : 'help';
-		}
-
-		if( is_null($title) )
-		{
-			$title = $external ? T_('Homepage of the plugin') : T_('Local documentation of the plugin');
-		}
-
-		return action_icon( $title, $icon, $url, $word, $link_attribs );
-	}
-
-
-	/**
-	 * Get the help file for a Plugin ID. README.LOCALE.html will take
-	 * precedence above the general (english) README.html.
-	 *
-	 * @return false|string
-	 */
-	function get_help_file()
-	{
-		global $default_locale, $plugins_path;
-
-		// Get the language. We use $default_locale because it does not have to be activated ($current_locale)
-		$lang = substr( $default_locale, 0, 2 );
-
-		$help_dir = $plugins_path.$this->classname.'/';
-
-		// Try help for the user's locale:
-		$help_file = $help_dir.'README.'.$lang.'.html';
-
-		if( ! file_exists($help_file) )
-		{ // Fallback: README.html
-			$help_file = $help_dir.'README.html';
-
-			if( ! file_exists($help_file) )
-			{
-				return false;
-			}
-		}
-
-		return $help_file;
-	}
-
 	/*
 	 * Interface methods }}}
 	 */
@@ -1756,6 +1639,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.23  2006/04/05 19:16:35  blueyed
+ * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
+ *
  * Revision 1.22  2006/04/04 22:56:12  blueyed
  * Simplified/refactored uninstalling/registering of a plugin (especially the hooking process)
  *

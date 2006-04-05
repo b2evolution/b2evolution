@@ -29,6 +29,9 @@ global $AvailablePlugins;
  */
 global $UserSettings;
 
+global $inc_path;
+require_once $inc_path.'_misc/_plugin.funcs.php';
+
 ?>
 <fieldset class="clear"><!-- "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509) -->
 	<legend><?php echo T_('Installed plugins') ?></legend>
@@ -93,7 +96,8 @@ global $UserSettings;
 				<?php
 				echo action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID ) );
 				// Help icons, if available:
-				echo $loop_Plugin->get_help_icon( NULL, NULL, true ).' '.$loop_Plugin->get_help_icon();
+				echo get_plugin_help_link($loop_Plugin)
+					.' '.get_plugin_README_link($loop_Plugin);
 				?>
 			</td>
 			<?php
@@ -190,17 +194,17 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 				echo action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID ) );
 				// Help icons, if available:
 				$help_icons = array();
-				if( $help_external = $loop_Plugin->get_help_icon( NULL, NULL, true ) )
+				if( $help_external = get_plugin_help_link($loop_Plugin) )
 				{
 					$help_icons[] = $help_external;
 				}
-				if( $help_internal = $loop_Plugin->get_help_icon() )
+				if( $help_internal = get_plugin_README_link($loop_Plugin) )
 				{
 					$help_icons[] = $help_internal;
 				}
 				if( ! empty($help_icons) )
 				{
-					echo implode( ' ', $help_icons );
+					echo ' '.implode( ' ', $help_icons );
 				}
 				?>
 			</td>

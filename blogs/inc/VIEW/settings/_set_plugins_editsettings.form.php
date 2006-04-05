@@ -37,20 +37,23 @@ global $edit_Plugin;
 global $admin_Plugins;
 
 global $edited_plugin_priority, $edited_plugin_code, $edited_plugin_apply_rendering, $admin_url;
-global $plugin_help_contents;
+
+global $inc_path;
+require_once $inc_path.'_misc/_plugin.funcs.php';
 
 
 $Form = & new Form( NULL, 'pluginsettings_checkchanges' );
 $Form->hidden_ctrl();
 
 // Help icons, if available:
+if( get_plugin_help_file($edit_Plugin) )
+{ // README in JS popup:
+	$Form->global_icon( T_('Local documentation of the plugin'), 'help',
+		url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$edit_Plugin->ID.'#'.$edit_Plugin->classname.'_settings' ), '', array('use_js_popup'=>true, 'id'=>'anchor_help_popup_'.$edit_Plugin->ID) );
+}
 if( ! empty( $edit_Plugin->help_url ) )
 {
 	$Form->global_icon( T_('Homepage of the plugin'), 'www', $edit_Plugin->help_url );
-}
-if( $edit_Plugin->get_help_file() )
-{
-	$Form->global_icon( T_('Local documentation of the plugin'), 'help', url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$edit_Plugin->ID.'#'.$edit_Plugin->classname.'_settings' ), '', array('use_js_popup'=>true, 'id'=>'local_help_popup_'.$edit_Plugin->ID) );
 }
 
 $Form->global_icon( T_('Cancel edit!'), 'close', regenerate_url() );
@@ -150,6 +153,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.8  2006/04/05 19:16:34  blueyed
+ * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
+ *
  * Revision 1.7  2006/03/15 23:35:38  blueyed
  * "broken" state support for Plugins: set/unset state, allowing to un-install and display error in "edit_settings" action
  *
