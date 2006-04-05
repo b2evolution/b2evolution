@@ -17,6 +17,8 @@
 #fileman_dirtree {
 	float:left;
 	padding:1ex 1em;
+	max-width:50%;
+	overflow:hidden;
 }
 
 #FilesForm div.panelinfo {
