@@ -21,7 +21,7 @@ header('HTTP/1.0 404 Not Found');
 	</head>
 	<body>
 		<h1>404 Not Found</h1>
-		<p><?php echo $app_name ?> cannot resolve the requested URL.</p>
+		<p><a href="<?php echo $baseurl ?>"><?php echo $app_name ?></a> cannot resolve the requested URL.</p>
 		<?php
 			debug_info();
 		?>
