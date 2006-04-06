@@ -77,7 +77,7 @@ class smilies_plugin extends Plugin
 	function GetDefaultSettings()
 	{
 		return array(
-				'use_toolbar' => array(
+				'use_toolbar_default' => array(
 					'label' => T_( 'Use smilies toolbar' ),
 					'defaultvalue' => '1',
 					'type' => 'checkbox',
@@ -97,7 +97,7 @@ class smilies_plugin extends Plugin
 		return array(
 				'use_toolbar' => array(
 					'label' => T_( 'Use smilies toolbar' ),
-					'defaultvalue' => $this->Settings->get('use_toolbar'),
+					'defaultvalue' => $this->Settings->get('use_toolbar_default'),
 					'type' => 'checkbox',
 				),
 			);
