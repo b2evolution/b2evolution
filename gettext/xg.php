@@ -66,13 +66,13 @@ chdir( $dir_blogs.'locales' );
 
 echo 'Extracting T_() and NT_() strings from all .php files below "blogs" into ."blogs/locales/messages.pot".. ';
 system( 'find ../ -iname "*.php"'
-				.' | xargs xgettext  -o '.escapeshellarg($file_pot).' --no-wrap --add-comments=TRANS --copyright-holder="Francois PLANQUE" --msgid-bugs-address=http://fplanque.net/ --keyword=T_ --keyword=NT_ -F' );
+				.' | xargs xgettext -o '.escapeshellarg($file_pot).' --no-wrap --add-comments=TRANS --copyright-holder="Francois PLANQUE" --msgid-bugs-address=http://fplanque.net/ --keyword=T_ --keyword=NT_ -F' );
 echo "[ok]\n";
 
 
 // Replace various things (see comments)
 echo 'Automagically search&replace in messages.pot.. ';
-system( 'sed -i "'
+system( 'sed -i -r "'
 				# remove \r:
 				.'s!\\\\\\\\r!!g;'
 				# make paths relative to the .po files:
