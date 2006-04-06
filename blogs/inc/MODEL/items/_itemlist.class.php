@@ -809,7 +809,7 @@ class ItemList extends DataObjectList
 	 * @param string string to display after the date (if changed)
 	 * @param string date/time format: leave empty to use locale default time format
 	 */
-	function date_if_changed( $before='<h2 class="bItemListDate">', $after='</h2>', $format='' )
+	function date_if_changed( $before='<h2>', $after='</h2>', $format='' )
 	{
 		$current_item_date = $this->last_Item->get( 'issue_date' );
 		if($format=='')
@@ -850,6 +850,14 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/06 21:11:53  fplanque
+ * Fixed deadlock issue.
+ * --
+ * Styles: there are default markups in the template functions in order to allow for easy understanding
+ * of how they work. Adding skin CSS styles into there is beyond the purpose.
+ * The params are MEANT to be USED in skins. Please do.
+ * (This may apply to other functions in the app which have too much default styling).
+ *
  * Revision 1.4  2006/04/04 21:48:03  blueyed
  * Add "bItemListDate" class to default, to allow styling
  *

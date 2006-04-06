@@ -67,6 +67,12 @@ class ItemList2 extends DataObjectList2
    */
   var $advertised_start_date;
   var $advertised_stop_date;
+	/**
+ 	 * Anti infinite loops:
+	 */
+	var $getting_adv_start_date = false;
+	var $getting_adv_stop_date = false;
+
 
 	/**
 	 * Constructor
@@ -253,7 +259,7 @@ class ItemList2 extends DataObjectList2
 	/**
 	 * Init filter params from Request params
 	 *
-	 * @return boolean true if we could apply a filterset based on Request params (either explciit or reloaded)
+	 * @return boolean true if we could apply a filterset based on Request params (either explicit or reloaded)
 	 */
 	function load_from_Request()
 	{
@@ -270,6 +276,7 @@ class ItemList2 extends DataObjectList2
 		{
 			case 'restore':
 				return $this->restore_filterset();
+				/* BREAK */
 
 			case 'reset':
 				// We want to reset the memorized filterset:
@@ -277,6 +284,7 @@ class ItemList2 extends DataObjectList2
 				$Session->delete( $this->filterset_name );
 				// We have applied no filterset:
 				return false;
+				/* BREAK */
 		}
 
 
@@ -1009,6 +1017,21 @@ class ItemList2 extends DataObjectList2
    */
 	function get_advertised_start_date()
 	{
+		if( $this->getting_adv_start_date )
+		{	// We would be entering an infinite loop, stop now:
+			// We cannot determine a start date, save an empty string (to differentiate from NULL)
+			$this->advertised_start_date = '';
+
+			// Reset anti infinite loop:
+			$this->getting_adv_start_date = false;
+
+			return $this->advertised_start_date;
+		}
+
+		// Anti infinite loop:
+		$this->getting_adv_start_date = true;
+
+
 		if( is_null( $this->advertised_start_date ) )
 		{	// We haven't determined the start date yet:
 
@@ -1039,6 +1062,9 @@ class ItemList2 extends DataObjectList2
 
 		}
 
+		// Reset anti infinite loop:
+		$this->getting_adv_start_date = false;
+
 		return $this->advertised_start_date;
 	}
 
@@ -1054,6 +1080,21 @@ class ItemList2 extends DataObjectList2
    */
 	function get_advertised_stop_date()
 	{
+		if( $this->getting_adv_stop_date )
+		{	// We would be entering an infinite loop, stop now:
+			// We cannot determine a stop date, save an empty string (to differentiate from NULL)
+			$this->advertised_stop_date = '';
+
+			// Reset anti infinite loop:
+			$this->getting_adv_stop_date = false;
+
+			return $this->advertised_stop_date;
+		}
+
+		// Anti infinite loop:
+		$this->getting_adv_stop_date = true;
+
+
 		if( is_null( $this->advertised_stop_date ) )
 		{	// We haven't determined the stop date yet:
 
@@ -1097,6 +1138,9 @@ class ItemList2 extends DataObjectList2
 			}
 
 		}
+
+		// Reset anti infinite loop:
+		$this->getting_adv_stop_date = false;
 
 		return $this->advertised_stop_date;
 	}
@@ -1156,7 +1200,7 @@ class ItemList2 extends DataObjectList2
 	 * @param string|NULL string to display before any empty dates. Set to NULL in order not to display empty dates.
 	 * @param string|NULL string to display after any empty dates.
 	 */
-	function date_if_changed( $before = '<h2 class="bItemListDate">', $after = '</h2>', $format = '',
+	function date_if_changed( $before = '<h2>', $after = '</h2>', $format = '',
 														$before_empty_day = NULL, $after_empty_day = NULL )
 	{
 		if( empty($format) )
@@ -1192,6 +1236,14 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/06 21:11:53  fplanque
+ * Fixed deadlock issue.
+ * --
+ * Styles: there are default markups in the template functions in order to allow for easy understanding
+ * of how they work. Adding skin CSS styles into there is beyond the purpose.
+ * The params are MEANT to be USED in skins. Please do.
+ * (This may apply to other functions in the app which have too much default styling).
+ *
  * Revision 1.4  2006/04/04 21:48:36  blueyed
  * Add "bItemListDate" class to default, to allow styling
  *
