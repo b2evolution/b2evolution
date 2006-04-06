@@ -1770,13 +1770,13 @@ class Item extends DataObject
 	 *
 	 * @param string String to display before the title if there is something to display
 	 * @param string String to display after the title if there is something to display
-	 * @param boolean false if you don't want to link to URL
+	 * @param boolean false if you don't want to link to related URL (if applicable)
 	 * @param string Output format, see {@link format_to_output()}
 	 */
 	function title(
-		$before='',						// HTML/text to be displayed before title
-		$after='', 						// HTML/text to be displayed after title
-		$add_link = true, 		// Add link to this title?
+		$before = '',        // HTML/text to be displayed before title
+		$after = '',         // HTML/text to be displayed after title
+		$add_link = true,    // Add li  nk to this title?
 		$format = 'htmlbody' )
 	{
 		if( empty($this->title) && $add_link )
@@ -2486,6 +2486,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2006/04/06 09:39:10  blueyed
+ * doc
+ *
  * Revision 1.26  2006/04/05 19:16:34  blueyed
  * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
  *
