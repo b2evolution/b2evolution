@@ -11,6 +11,15 @@
  * @package evocore
  */
 
+// First check, if it's an old-style backoffice-Path (from a redirect-everything non-existing to index.php mod_rewrite rule):
+if( strpos( $ReqPath, '/admin/' ) === 0 )
+{
+	// Redirect to admin url and pass request_uri as path_info, so it can be resolved by admin.php to the right menu entry:
+	header( 'Location: '.$admin_url.'/'.substr($ReqURI, 7) );
+	exit;
+}
+		
+
 header('HTTP/1.0 404 Not Found');
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
