@@ -526,64 +526,102 @@ function postcats_get_byID( $post_ID )
 
 /**
  * Taking a recursive walk in the category park...
+ *
+ * @param array PHP requires this stupid cloning of the cache_categories array in order to be able to perform foreach on it
+ * @param integer
+ * @param integer
+ * @param string|array Callback for first category
+ * @param string|array Callback before each category
+ * @param string|array Callback after each category
+ * @param string|array Callback after last category
+ * @param integer Caller nesting level, just to keep track of how far we go :)
+ * @param integer Total category count (used internally and gets passed to callbacks)
+ * @return string
  */
-function cat_children( $ccats, 	// PHP requires this stupid cloning of the cache_categories array in order to be able to perform foreach on it
-	$blog_ID, $parent_ID,
-	$callback_before_first, $callback_before_each, $callback_after_each, $callback_after_last, // Callback functions
-	$level = 0 )	// Caller nesting level, just to keep track of how far we go :)
+function cat_children( $ccats, $blog_ID, $parent_ID, $callback_before_first, $callback_before_each, $callback_after_each, $callback_after_last, $level = 0, $root_call = true )
 {
+	static $total_count = 0;
+
 	$r = '';
 
 	// echo 'Number of cats=', count($ccats);
-	if( ! empty( $ccats ) ) // this can happen if there are no cats at all!
+	if( empty( $ccats ) )
+	{ // this can happen if there are no cats at all!
+		return '';
+	}
+
+	if( $root_call )
+	{ // Init:
+		$total_count = 0;
+	}
+
+	$child_count = 0;
+	foreach( $ccats as $icat_ID => $i_cat )
 	{
-		$child_count = 0;
-		foreach( $ccats as $icat_ID => $i_cat )
-		{
-			if( $icat_ID && (($blog_ID == 0) || ($i_cat['cat_blog_ID'] == $blog_ID)) && ($i_cat['cat_parent_ID'] == $parent_ID) )
-			{ // this cat is in the blog and is a child of the parent
-				if( $child_count++ == 0 )
-				{ // this is the first child
-					if( is_array( $callback_before_first ) )
-  					$r .= $callback_before_first[0]->{$callback_before_first[1]}( $parent_ID, $level );
-					else
-						$r .= $callback_before_first( $parent_ID, $level );
+		if( ! $icat_ID
+			|| ! (($blog_ID == 0) || ($i_cat['cat_blog_ID'] == $blog_ID))
+			|| ! ($i_cat['cat_parent_ID'] == $parent_ID) )
+		{ // this cat is not in the blog and or is not a child of the parent
+			continue;
+		}
+
+		$total_count++;
+
+		if( $icat_ID && (($blog_ID == 0) || ($i_cat['cat_blog_ID'] == $blog_ID)) && ($i_cat['cat_parent_ID'] == $parent_ID) )
+		{ // this cat is in the blog and is a child of the parent
+
+			// "before first":
+			if( $child_count++ == 0 )
+			{ // this is the first child
+				if( is_array( $callback_before_first ) )
+				{ // object callback:
+					$r .= $callback_before_first[0]->{$callback_before_first[1]}( $parent_ID, $level, $total_count, 1 );
 				}
-
-				if( is_array( $callback_before_each ) )
-					$r2 = $callback_before_each[0]->{$callback_before_each[1]}( $icat_ID, $level );
 				else
-					$r2 = $callback_before_each( $icat_ID, $level );
-				if( $r2 === true )
-				{	// callback function has requested that we stop recursing for this branch
-					continue;
-				}
-				$r .= $r2;
-
-				$r .= cat_children( $ccats, $blog_ID, $icat_ID, $callback_before_first, $callback_before_each,
-														$callback_after_each, $callback_after_last, $level+1 );
-
-  			if( is_array( $callback_after_each ) )
-					$r .= $callback_after_each[0]->{$callback_after_each[1]}( $icat_ID, $level );
-				else
-					$r .= $callback_after_each( $icat_ID, $level );
+					$r .= $callback_before_first( $parent_ID, $level, $total_count, 1 );
 			}
-		}
-		if( $child_count )
-		{ // There have been children
-			if( is_array( $callback_after_last ) )
-				$r .= $callback_after_last[0]->{$callback_after_last[1]}( $parent_ID, $level );
+
+			// "before each":
+			if( is_array( $callback_before_each ) )
+			{ // object callback:
+				$r2 = $callback_before_each[0]->{$callback_before_each[1]}( $icat_ID, $level, $total_count, $child_count );
+			}
 			else
-				$r .= $callback_after_last( $parent_ID, $level );
+				$r2 = $callback_before_each( $icat_ID, $level, $total_count, $child_count );
+			if( $r2 === true )
+			{	// callback function has requested that we stop recursing for this branch
+				continue;
+			}
+			$r .= $r2;
+
+			// Recursion:
+			$r .= cat_children( $ccats, $blog_ID, $icat_ID, $callback_before_first, $callback_before_each, $callback_after_each, $callback_after_last, $level+1, false );
+
+			// "after each":
+			if( is_array( $callback_after_each ) )
+			{ // object callback:
+				$r .= $callback_after_each[0]->{$callback_after_each[1]}( $icat_ID, $level, $total_count, $child_count );
+			}
+			else
+				$r .= $callback_after_each( $icat_ID, $level, $total_count, $child_count );
 		}
+	}
+	if( $child_count )
+	{ // There have been children
+		if( is_array( $callback_after_last ) )
+			$r .= $callback_after_last[0]->{$callback_after_last[1]}( $parent_ID, $level, $total_count, $child_count );
+		else
+			$r .= $callback_after_last( $parent_ID, $level, $total_count, $child_count );
 	}
 
 	return $r;
 }
 
 
-/*
+/**
  * Does a given bog have categories?
+ * @param integer Blog ID
+ * @return boolean
  */
 function blog_has_cats( $blog_ID )
 {
@@ -607,15 +645,8 @@ function blog_has_cats( $blog_ID )
  * Functions to be called from the template
  */
 
-
-
-
-
-/*
- * cat_query(-)
- *
+/**
  * Query for the cats
- *
  *
  * @param string 'none'|'context'|'canonic'
  */
@@ -627,13 +658,6 @@ function cat_query( $load_postcounts = 'none', $dbtable_items = 'T_posts', $dbpr
 	if( $blog != 0 ) blog_load_cache();
 	cat_load_cache( $load_postcounts, $dbtable_items, $dbprefix_items, $dbIDname_items );
 }
-
-
-/*
- * single_cat_title(-)
- *
- * @movedTo _obsolete092.php
- */
 
 
 /**
@@ -734,11 +758,9 @@ function the_categories( $link_title = '#',				// false if you want no links
 }
 
 
-
-/*
- * the_category_ID(-)
+/**
+ * Echoes the main category ID for current post
  *
- * echoes the main category ID for current post
  * The ID (number) of the category the post belongs to.
  * This is static data that you can use, for example to associate a category to an image, or a css style.
  */
@@ -748,9 +770,8 @@ function the_category_ID()
 	echo $postdata['Category'];
 }
 
-/*
- * the_categories_IDs(-)
- *
+
+/**
  * lists the category IDs for current post
  *
  * fplanque: created
@@ -789,9 +810,10 @@ function the_category_head( $before='', $after='' )
 	}
 }
 
+
 /**
  * Copy the catagory structure from one blog to another
- * The four cat_copy_* functions after blog_copy_cats are required by blog_copy_cats
+ * The four cat_copy_* functions after blog_copy_cats are required by blog_copy_cats()
  */
 function blog_copy_cats($srcblog, $destblog)
  {
@@ -936,6 +958,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/06 13:49:49  blueyed
+ * Background "striping" for "Categories" fieldset
+ *
  * Revision 1.2  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *

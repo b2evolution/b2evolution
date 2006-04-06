@@ -31,8 +31,13 @@ table.catselect td.selector {
 	text-align:center;
 	border-right: 1px solid #bbb;
 }
-table.catselect tr:hover td {
+table.catselect tr:hover td,
+table.catselect tr.even:hover td {
 	background-color:#ccc;
+}
+table.catselect tr.even td,
+table.catselect tr.even input {
+	background-color:#ddd;
 }
 
 

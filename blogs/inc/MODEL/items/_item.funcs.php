@@ -837,12 +837,12 @@ function cat_select_before_first( $parent_cat_ID, $level )
 /**
  * callback to display sublist element
  */
-function cat_select_before_each( $cat_ID, $level )
+function cat_select_before_each( $cat_ID, $level, $total_count )
 { // callback to display sublist element
 	global $current_blog_ID, $blog, $cat, $post_extracats, $default_main_cat, $next_action;
 	global $creating, $allow_cross_posting, $cat_select_level, $cat_select_form_fields;
 	$this_cat = get_the_category_by_ID( $cat_ID );
-	$r = "\n<tr>";
+	$r = "\n".'<tr class="'.( $total_count%2 ? 'odd' : 'even' ).'">';
 
 	// RADIO for main cat:
 	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
@@ -924,6 +924,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/06 13:49:50  blueyed
+ * Background "striping" for "Categories" fieldset
+ *
  * Revision 1.5  2006/04/04 21:46:48  blueyed
  * doc, todo
  *
