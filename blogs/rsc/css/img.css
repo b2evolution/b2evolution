@@ -44,7 +44,8 @@ div.multi_image_zone {
 }
 
 div.image_block {
-	/* WARNING: this will screw out backoffice layout (fulltext edit screen) in firefox! 
+	/* WARNING: this will screw out backoffice layout (fulltext edit screen) in firefox!
+		blueyed>> Are you sure? At least not with single image_block divs and the legacy skin
 		overflow: hidden; */
 	text-align: center;
 	background-color: #fff;
