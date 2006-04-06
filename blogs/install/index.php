@@ -82,7 +82,9 @@ $timestamp = time() - 120; // We start dates 2 minutes ago because their dates i
 	</div>
 </div>
 
+
 <?php
+// Locales selector:
 if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($action == 'menu') )
 {
 	?>
@@ -111,6 +113,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 	</div>
 	<?php
 }
+
 
 if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
 { // Connect to DB:
@@ -151,6 +154,18 @@ if( ($version_main * 100 + $version_minor) < 401 )
 {
 	die( '<div class="error"><p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!'), 'PHP', '4.1.0', phpversion() ).'</strong></p></div>');
 }
+
+// Check other dependencies:
+// TODO: Non-install/upgrade-actions should be allowed (e.g. "deletedb")
+if( $req_errors = install_validate_requirements() )
+{
+	echo '<div class="error">';
+	echo '<p class="error"><strong>'.'b2evolution cannot be installed, because of the following errors:'.'</strong></p>';
+	echo '<ul class="error"><li>'.implode( '</li><li>', $req_errors ).'</li></ul>';
+	echo '</div>';
+	die;
+}
+
 
 switch( $action )
 {
@@ -578,9 +593,14 @@ to
 <!-- b2evo-install-end -->
 </body>
 </html>
+
+
 <?php
 /*
  * $Log$
+ * Revision 1.94  2006/04/06 08:52:27  blueyed
+ * Validate install "misc" requirements ("tokenizer" support for now)
+ *
  * Revision 1.93  2006/03/10 19:04:58  fplanque
  * minor
  *

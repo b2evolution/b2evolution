@@ -112,8 +112,30 @@ function cleanup_comment_quotes()
 }
 
 
+/**
+ * Validate install requirements.
+ *
+ * @return array List of errors, empty array if ok.
+ */
+function install_validate_requirements()
+{
+	$errors = array();
+
+	if( ! function_exists( 'token_get_all' ) )
+	{
+		// TODO: Use T_() ?
+		$errors[] = 'We need the PHP Tokenizer functions to get the list of Plugin events (Enabled by default since PHP 4.3.0 and available since PHP 4.2.0).'; // String copied from _plugins.class.php
+	}
+
+	return $errors;
+}
+
+
 /*
  * $Log$
+ * Revision 1.11  2006/04/06 08:52:27  blueyed
+ * Validate install "misc" requirements ("tokenizer" support for now)
+ *
  * Revision 1.10  2005/12/30 18:08:24  fplanque
  * no message
  *
