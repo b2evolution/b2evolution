@@ -378,7 +378,7 @@ $Debuglog->add( 'login: '.var_export($login, true), 'login' );
 $Debuglog->add( 'pass: '.( empty($pass) ? '' : 'not' ).' empty', 'login' );
 
 // either 'login' (normal) or 'redirect_to_backoffice' may be set here. This also helps to display the login form again, if either login or pass were empty.
-$login_action = param( 'login_action', 'array', array() );
+$login_action = $Request->param_arrayindex( 'login_action' );
 
 if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 { // User is trying to login right now
@@ -421,9 +421,16 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		setcookie( 'cookie'.$instance_name.'user', '', 272851261, $cookie_path, $cookie_domain );
 		setcookie( 'cookie'.$instance_name.'pass', '', 272851261, $cookie_path, $cookie_domain );
 
-		if( isset($login_action['redirect_to_backoffice']) )
-		{ // user pressed the "Log into backoffice!" button
-			header_redirect( $admin_url );
+		if( ! empty($login_action) )
+		{ // We're coming from the Login form and need to redirect to the requested page:
+			param( 'redirect_to', 'string', $baseurl );
+
+			if( $login_action == 'redirect_to_backoffice' )
+			{ // user pressed the "Log into backoffice!" button
+				$redirect_to = $admin_url;
+			}
+			
+			header_redirect( $redirect_to );
 			exit();
 		}
 	}
@@ -512,6 +519,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/06 17:21:34  blueyed
+ * Fixed login procedure for https-admin_url: the login form now POSTs to itself and we redirect to the target url after successful login
+ *
  * Revision 1.5  2006/03/24 19:40:49  blueyed
  * Only use absolute URLs if necessary because of used <base/> tag. Added base_tag()/skin_base_tag(); deprecated skinbase()
  *

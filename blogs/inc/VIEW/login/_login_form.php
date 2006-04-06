@@ -14,21 +14,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 param( 'redirect_to', 'string', str_replace( '&', '&amp;', $ReqURI ) ); // Note: if $redirect_to is already set, param() will not touch it.
 param( 'login', 'string', '' ); // last typed login
 
-$location = $redirect_to;
 
-
-if( preg_match( '#login.php([&?].*)?$#', $location ) )
+if( preg_match( '#login.php([&?].*)?$#', $redirect_to ) )
 { // avoid "endless loops"
-	$location = str_replace( '&', '&amp;', $admin_url );
+	$redirect_to = str_replace( '&', '&amp;', $admin_url );
 }
 // Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
-$location = preg_replace( '~(?<=\?|&amp;|&) (login|pwd) = [^&]+ (&(amp;)?|\?)?~x', '', $location );
+$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
 
 if( $Session->has_User() )
 { // The user is already logged in...
 	$tmp_User = & $Session->get_User();
 	$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
-		.' <a href="'.$location.'">'.T_('Continue...').'</a>', 'note' );
+		.' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>', 'note' );
 }
 
 
@@ -40,19 +38,21 @@ $page_icon = 'icon_login.gif';
 require dirname(__FILE__).'/_header.php';
 
 
-if( strpos( $location, $admin_url ) === 0 )
+if( strpos( $redirect_to, str_replace('&', '&amp;', $admin_url) ) === 0 )
 { // don't provide link to bypass
 	$login_required = true;
 }
 
 
-$Debuglog->add( 'location: '.$location );
+$Debuglog->add( 'redirect_to: '.$redirect_to );
 
-$Form = & new Form( $location, '', 'post', 'fieldset' );
+// The login form has to point back to itself, in case $htsrv_url is a "https" link and $redirect_to is not!
+$Form = & new Form( $htsrv_url.'login.php', '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
-	$Form->hiddens_by_key( $_POST, array('login_action', 'login') ); // passthrough POSTed data (when login is required after having POSTed something)
+	$Form->hiddens_by_key( $_POST, /* exclude: */ array('login_action', 'login') ); // passthrough POSTed data (when login is required after having POSTed something)
+	$Form->hidden( 'redirect_to', $redirect_to );
 
 	if( !empty($mode) )
 	{ // We're in the process of bookmarkletting something, we don't want to loose it:
@@ -84,7 +84,7 @@ $Form->begin_form( 'fform' );
 	echo $Form->inputstart;
 	$Form->submit( array( 'login_action[login]', T_('Log in!'), 'search' ) );
 
-	if( $location != str_replace( '&', '&amp;', $admin_url ) && ! is_admin_page() )
+	if( strpos( $redirect_to, str_replace( '&', '&amp;', $admin_url ) ) !== 0 && ! is_admin_page() )
 	{ // provide button to log straight into backoffice, if we would not go there anyway
 		$Form->submit( array( 'login_action[redirect_to_backoffice]', T_('Log into backoffice!'), 'search' ) );
 	}
@@ -106,7 +106,7 @@ $Form->end_form();
 <div class="login_actions" style="text-align:right">
 	<?php user_register_link( '', ' &middot; ' )?>
 	<a href="<?php echo $htsrv_url ?>login.php?action=lostpassword&amp;redirect_to=<?php
-		echo rawurlencode( $location );
+		echo rawurlencode( $redirect_to );
 		if( !empty($login) )
 		{
 			echo '&amp;login='.rawurlencode($login);
@@ -116,7 +116,7 @@ $Form->end_form();
 	<?php
 	if( empty($login_required) )
 	{ // No login required, allow to pass through
-		echo '<a href="'.$location.'">'./* Gets displayed as link to the location on the login form if no login is required */ T_('Bypass login...').'</a>';
+		echo '<a href="'.$redirect_to.'">'./* Gets displayed as link to the location on the login form if no login is required */ T_('Bypass login...').'</a>';
 	}
 	?>
 </div>
