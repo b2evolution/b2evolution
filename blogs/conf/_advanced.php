@@ -84,7 +84,7 @@ $timeout_online_user = 300; // Default: 5 minutes (300s).
 
 // Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
-if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $baseurl, $matches ) )
+if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $baseurl, $matches ) )
 {
 	$baseurlroot = $matches[1];
 	// echo "baseurlroot=$baseurlroot <br />";
@@ -343,9 +343,9 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  * example for having no dot in the host name is 'localhost', but it's the case for
  * host names in an intranet also.
  *
- * @global string Default: ( strpos($basehost, '.') === false ) ? '' : '.'. $basehost;
+ * @global string Default: ( strpos($basehost, '.') ) ? '.'. $basehost : '';
  */
-$cookie_domain = ( strpos($basehost, '.') === false ) ? '' : '.'. $basehost;
+$cookie_domain = ( strpos($basehost, '.') ? '.'. $basehost : '' );
 //echo 'cookie_domain='. $cookie_domain. ' cookie_path='. $cookie_path;
 
 /**#@+
@@ -515,6 +515,7 @@ $install_subdir = 'install/';            // Subdirectory relative to base
  */
 $media_subdir = 'media/';                // Subdirectory relative to base
 $media_url = $baseurl.$media_subdir;     // You should not need to change this
+
 
 /**
  * Do you want to allow public access to the media dir?
