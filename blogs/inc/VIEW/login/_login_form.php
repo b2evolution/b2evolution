@@ -40,7 +40,7 @@ $page_icon = 'icon_login.gif';
 require dirname(__FILE__).'/_header.php';
 
 
-if( strpos( $location, $admin_url ) !== false )
+if( strpos( $location, $admin_url ) === 0 )
 { // don't provide link to bypass
 	$login_required = true;
 }
