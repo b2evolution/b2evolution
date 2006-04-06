@@ -170,7 +170,10 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
 		<p><strong><?php echo T_('Status') ?>:</strong> <?php echo $edited_Comment->status; ?></p>
 		<p><strong><?php echo T_('IP address') ?>:</strong> <?php echo $edited_Comment->author_IP; ?></p>
-		<p><strong><?php echo T_('Spam Karma') ?>:</strong> <?php echo $edited_Comment->spam_karma; ?>%</p>
+		<p><strong><?php echo T_('Spam Karma') ?>:</strong> <?php
+		// TODO: the cast to "int" can be removed once the dataobjects actually set a param to "0" if it's NULL before..
+		echo (int)$edited_Comment->spam_karma;
+		?>%</p>
 	</fieldset>
 
 </div>
@@ -182,6 +185,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/06 19:48:28  blueyed
+ * temporary fix
+ *
  * Revision 1.5  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *
