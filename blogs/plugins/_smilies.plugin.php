@@ -70,6 +70,24 @@ class smilies_plugin extends Plugin
 
 
 	/**
+	* Defaults for user specific settings: "Display toolbar"
+	 *
+	 * @return array
+	 */
+	function GetDefaultSettings()
+	{
+		return array(
+				'use_toolbar' => array(
+					'label' => T_( 'Use smilies toolbar' ),
+					'defaultvalue' => '1',
+					'type' => 'checkbox',
+					'note' => T_( 'This is the default setting. Users can override it in their profile.' ),
+				),
+			);
+	}
+
+
+	/**
 	 * Allowing the user to deactivate the toolbar..
 	 *
 	 * @return array
@@ -79,7 +97,7 @@ class smilies_plugin extends Plugin
 		return array(
 				'use_toolbar' => array(
 					'label' => T_( 'Use smilies toolbar' ),
-					'defaultvalue' => '1',
+					'defaultvalue' => $this->Settings->get('use_toolbar'),
 					'type' => 'checkbox',
 				),
 			);
