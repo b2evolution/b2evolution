@@ -29,7 +29,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /**
  * @todo Move to a "who's online" plugin, maybe...
- */ 
+ */
 class Sessions extends Widget
 {
 	/**
@@ -199,7 +199,8 @@ class Sessions extends Widget
 	{
 		$this->display_online_users();
 
-		$this->display_online_guests();
+		// Wrap in the same <ul> class as the online users:
+		$this->display_online_guests( '<ul class="onlineUsers"><li>'.T_('Guest Users:').' ', '</li></ul>' );
 	}
 
 
@@ -240,8 +241,12 @@ class Sessions extends Widget
 
 }
 
+
 /*
  * $Log$
+ * Revision 1.3  2006/04/06 09:46:37  blueyed
+ * display_onliners(): Wrap "online guests" in same "<ul>" as "online users" (because of left padding/margin)
+ *
  * Revision 1.2  2006/03/12 23:08:59  fplanque
  * doc cleanup
  *
