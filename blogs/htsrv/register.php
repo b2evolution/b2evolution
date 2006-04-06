@@ -111,11 +111,11 @@ switch( $action )
 			locale_temp_switch( $AdminUser->get( 'locale' ) );
 
 			$message  = T_('New user registration on your blog').":\n"
-									."\n"
-									.T_('Login:')." $login\n"
-									.T_('Email').": $email\n"
-									."\n"
-									.T_('Manage users').': '.$admin_url."?ctrl=users\n";
+			          ."\n"
+			          .T_('Login:')." $login\n"
+			          .T_('Email').": $email\n"
+			          ."\n"
+			          .T_('Manage users').': '.$admin_url.'?ctrl=users&user_ID='.$new_User->ID."\n";
 
 			send_mail( $admin_email, T_('New user registration on your blog'), $message, $notify_from );
 
