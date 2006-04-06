@@ -2324,16 +2324,18 @@ function get_ip_list( $firstOnly = false )
 
 
 /**
- * Get the base domain (without "www.") of an URL.
+ * Get the base domain (without protocol and "www.") of an URL.
+ *
+ * We only strip "www." here (and not any/all subdomain(s))!
  *
  * @param string URL
  * @return string the base domain
  */
 function getBaseDomain( $url )
 {
-	$baseDomain = preg_replace("/http:\/\//i", "", $url);
-	$baseDomain = preg_replace("/^www\./i", "", $baseDomain);
-	$baseDomain = preg_replace("/\/.*/i", "", $baseDomain);
+	$baseDomain = preg_replace( '~^[a-z]+://~i', '', $url );
+	$baseDomain = preg_replace( '/^www\./i', '', $baseDomain );
+	$baseDomain = preg_replace( '~/.*~i', '', $baseDomain );
 
 	return $baseDomain;
 }
@@ -2712,6 +2714,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.27  2006/04/06 18:02:07  blueyed
+ * Fixed getBaseDomain() for links with protocol != "http" (esp. https)
+ *
  * Revision 1.26  2006/04/05 19:16:35  blueyed
  * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
  *
