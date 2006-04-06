@@ -2,7 +2,9 @@
 /**
  * This file implements the LDAP authentification plugin.
  *
- * This file is part of the b2evolution project - {@link http://b2evolution.net/}
+ * This file is part of the b2evolution project - {@link http://b2evolution.net/}.
+ *
+ * Documentation can be found at {@link http://manual.b2evolution.net/Plugins/ldap_plugin}.
  *
  * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
@@ -42,8 +44,8 @@ class ldap_plugin extends Plugin
 	var $code = 'evo_ldap_auth';
 	var $priority = 50;
 	var $version = 'CVS $Revision$';
-	var $author = 'The b2evo Group';
-	var $help_url = 'http://b2evolution.net/'; // TODO: create /man page
+	var $author = 'dAniel hAhler';
+	var $help_url = 'http://manual.b2evolution.net/Plugins/ldap_plugin';
 
 
 	/**
@@ -70,24 +72,28 @@ class ldap_plugin extends Plugin
 				'entries' => array(
 					'server' => array(
 						'label' => T_('Server'),
-						'note' => T_('The LDAP server.'),
-						'size' => 25,
+						'note' => T_('The LDAP server (hostname with or without port).').' '.sprintf( T_('E.g. &laquo;%s&raquo;'), 'hostname:389' ),
+						'size' => 30,
 					),
 					'rdn' => array(
 						'label' => T_('RDN'),
-						'note' => T_('The LDAP RDN, used to bind to the server (%s gets replaced by the user login).'),
+						'note' => T_('The LDAP RDN, used to bind to the server (%s gets replaced by the user login).').' '.sprintf( T_('E.g. &laquo;%s&raquo;'), 'cn=%s,ou=organization unit,o=Organisation' ),
+						'size' => 40,
 					),
 					'base_dn' => array(
 						'label' => T_('Base DN'),
-						'note' => T_('The LDAP base DN, used as base dn for search.'),
+						'note' => T_('The LDAP base DN, used as base dn for search.').' '.sprintf( T_('E.g. &laquo;%s&raquo;'), 'cn=Recipients,ou=organization unit,o=Organisation' ),
+						'size' => 40,
 					),
 					'search_filter' => array(
 						'label' => T_('Search filter'),
-						'note' => T_('The search filter used to get information about the user (%s gets replaced by the user login).'),
+						'note' => T_('The search filter used to get information about the user (%s gets replaced by the user login).').' '.sprintf( T_('E.g. &laquo;%s&raquo;'), 'rdn=%s' ),
+						'size' => 40,
 					),
 					'assign_user_to_group_by' => array(
 						'label' => T_('Assign group by'),
-						'note' => T_('LDAP search result key to assign the group by.'),
+						'note' => T_('LDAP search result key to assign the group by.').' '.sprintf( T_('E.g. &laquo;%s&raquo;'), 'department' ),
+						'size' => 30,
 					),
 					'tpl_new_grp_ID' => array(
 						'label' => T_('Template Group for new'),
@@ -149,12 +155,17 @@ class ldap_plugin extends Plugin
 		// Loop through list of search sets
 		foreach( $search_sets as $l_set )
 		{
-			if( !($ldap_conn = @ldap_connect( $l_set['server'] )) )
+
+			$server_port = explode(':', $l_set['server']);
+			$server = $server_port[0];
+			$port = isset($server_port[1]) ? $server_port[1] : 389;
+
+			if( !($ldap_conn = @ldap_connect( $server, $port )) )
 			{
-				$this->debug_log( 'Could not connect to LDAP server &laquo;'.$l_set['server'].'&raquo;!' );
+				$this->debug_log( 'Could not connect to LDAP server &laquo;'.$server.':'.$port.'&raquo;!' );
 				continue;
 			}
-			$this->debug_log( 'Connected to server &laquo;'.$l_set['server'].'&raquo;..' );
+			$this->debug_log( 'Connected to server &laquo;'.$server.':'.$port.'&raquo;..' );
 
 			$ldap_rdn = str_replace( '%s', $params['login'], $l_set['rdn'] );
 			$this->debug_log( 'Using rdn &laquo;'.$ldap_rdn.'&raquo;..' );
