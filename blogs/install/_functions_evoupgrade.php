@@ -746,6 +746,9 @@ function upgrade_b2evo_tables()
 			$DB->query( $query );
 			echo "OK.<br />\n";
 		}
+
+
+		set_upgrade_checkpoint( '9100' );
 	}
 
 
@@ -813,6 +816,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.136  2006/04/06 08:51:34  blueyed
+ * Set upgrade checkpoint
+ *
  * Revision 1.135  2006/03/12 23:09:26  fplanque
  * doc cleanup
  *
