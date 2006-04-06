@@ -43,10 +43,7 @@ global $dispatcher;
 <h2><?php echo T_('Feedback (Comments, Trackbacks...)') ?></h2>
 <?php
 
-$CommentList->display_if_empty(
-							'<div class="bComment"><p>' .
-							T_('No feedback yet...') .
-							'</p></div>' );
+$CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No feedback yet...').'</p></div>' );
 
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:
@@ -74,8 +71,8 @@ while( $Comment = & $CommentList->get_next() )
 		<div class="bCommentContent">
 		<div class="bTitle">
 			<?php echo T_('In response to:').' <a href=?ctrl=browse&amp;blog='.$Blog->ID.'&amp;tab=posts&amp;p='.$Comment->Item->ID
-								.'&amp;c=1&amp;tb=1&amp;pb=1" class="" title="'.T_('Edit this task...').'">'.$Comment->Item->dget('title').'</a>';
-				?>
+			           .'&amp;c=1&amp;tb=1&amp;pb=1" class="" title="'.T_('Edit this task...').'">'.$Comment->Item->dget('title').'</a>';
+			?>
 		</div>
 		<div class="bCommentTitle">
 		<?php
@@ -122,6 +119,9 @@ while( $Comment = & $CommentList->get_next() )
 <?php
 /*
  * $Log$
+ * Revision 1.10  2006/04/06 19:45:12  blueyed
+ * whitespace
+ *
  * Revision 1.9  2006/03/23 21:02:12  fplanque
  * cleanup
  *
