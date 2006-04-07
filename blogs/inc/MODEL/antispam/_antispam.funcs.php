@@ -109,7 +109,6 @@ function antispam_check( $haystack )
 	global $DB, $Debuglog, $Timer;
 
 	// TODO: 'SELECT COUNT(*) FROM T_antispam WHERE aspm_string LIKE "%'.$url.'%" ?
-	// TODO: Check basedomain against T_basedomains (dom_status = 'blacklist')
 
 	$Timer->start( 'antispam_url' );
 	$block = $DB->get_var(
@@ -274,6 +273,9 @@ function antispam_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/07 22:43:20  blueyed
+ * removed wrong todo
+ *
  * Revision 1.2  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *
