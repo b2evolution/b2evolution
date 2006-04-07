@@ -85,7 +85,7 @@ switch( $action )
 												WHERE hit_referer LIKE '.$DB->quote('%'.$keyword.'%'),
 												'Delete all banned hit-log entries' );
 
-			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'note' );
+			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'success' );
 		}
 
 		if( $delcomments )
@@ -94,14 +94,14 @@ switch( $action )
 			                  WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
 			                     OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
 			                     OR comment_content LIKE '.$DB->quote('%'.$keyword.'%') );
-			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'note' );
+			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'success' );
 		}
 
 		if( $blacklist_locally )
 		{ // Local blacklist:
 			if( antispam_create( $keyword ) )
 			{
-				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars($keyword) ), 'note' );
+				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars($keyword) ), 'success' );
 			}
 			else
 			{ // TODO: message?
