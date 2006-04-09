@@ -981,6 +981,8 @@ switch( $action )
 
 	case 'info':
 		// Display plugin info:
+		require_once $inc_path.'_misc/_plugin.funcs.php';
+
 		$Form = & new Form( $pagenow );
 		$Form->begin_form('fform');
 		$Form->hidden( 'ctrl', 'plugins' );
