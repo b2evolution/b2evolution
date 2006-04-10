@@ -2093,8 +2093,7 @@ class Item extends DataObject
 		}
 
 		// validate url title
-		$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, 0,
-															false, $this->dbprefix, $this->dbIDname, $this->dbtablename) );
+		$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, 0, false, $this->dbprefix, $this->dbIDname, $this->dbtablename) );
 
 		if( $result = parent::dbinsert() )
 		{ // We could insert the main object..
@@ -2277,7 +2276,7 @@ class Item extends DataObject
 			return false;
 		}
 
-		$DB->query( 'UPDATE T_posts SET post_views = post_views + 1' );
+		$DB->query( 'UPDATE T_posts SET post_views = post_views + 1 WHERE '.$this->dbIDname.' = '.$this->ID );
 
 		// Trigger event that the item has been viewed (which is != displayed) and useful for cache handling plugins
 		$Plugins->trigger_event( 'ItemViewed', array( 'Item' => & $this ) );
@@ -2486,6 +2485,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2006/04/10 23:11:40  blueyed
+ * Fixed incrementing view count on ALL items altogether! :/
+ *
  * Revision 1.27  2006/04/06 09:39:10  blueyed
  * doc
  *
