@@ -1320,12 +1320,13 @@ function validate_url( $url, & $allowed_uri_scheme )
 	// blueyed>> yes, seems so.
 	/* Remaining problems with this one are:
 	 *  - no spaces in URL allowed (must be written as %20)
+	 *    TODO: should we just replace " " with %20 (or just call urlencode on it, before validating it?)
 	 *  - umlauts in domains/url
 	 */
 	if( ! preg_match('~^                # start
 		([a-z][a-z0-9+.\-]*):[0-9]*       # scheme
 		//                                # authority absolute URLs only
-		[a-z0-9]([a-z0-9\~+.\-_,:;/\\\\*=@]|(%\d+))* # Don t allow anything too funky like entities
+		[a-z0-9]([a-z0-9\~+.\-_,:;/\\\\*=@%])* # Don t allow anything too funky like entities
 		([?#][a-z0-9\~+.\-_,:;/\\\\%&=!?#*\ \[\]]*)?
 		$~ix', $url, $matches) )
 	{ // Cannot validate URL structure
@@ -2714,6 +2715,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.28  2006/04/10 09:41:14  blueyed
+ * validate_url: todo; allow "%" in general
+ *
  * Revision 1.27  2006/04/06 18:02:07  blueyed
  * Fixed getBaseDomain() for links with protocol != "http" (esp. https)
  *
