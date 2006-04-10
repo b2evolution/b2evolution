@@ -607,4 +607,3 @@ function install_insert_default_data( $old_db_version )
 }
 
 ?>
-
