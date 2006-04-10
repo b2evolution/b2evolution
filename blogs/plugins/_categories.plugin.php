@@ -279,7 +279,7 @@ class categories_plugin extends Plugin
 			$r .= url_add_param( get_bloginfo('blogurl'), 'cat='.$cat_ID );
 		}
 
-		$r .= '">'.$cat['cat_name'].'</a> <span class="notes">('.$cat['cat_postcount'].')</span>';
+		$r .= '">'.format_to_output($cat['cat_name'], 'htmlbody').'</a> <span class="notes">('.$cat['cat_postcount'].')</span>';
 
 		if( in_array( $cat_ID, $cat_array ) )
 		{ // This category is in the current selection
