@@ -460,7 +460,6 @@ to
 		<?php
 		create_b2evo_tables();
 		populate_main_tables();
-		install_basic_plugins();
 		?>
 		<h2><?php echo T_('Installation successful!')?></h2>
 
@@ -514,7 +513,6 @@ to
 		<?php
 			create_b2evo_tables();
 			upgrade_cafelog_tables();
-			install_basic_plugins();
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
 		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'b2')?></p>
@@ -598,6 +596,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.95  2006/04/10 09:27:04  blueyed
+ * Fix adding default itemtypes when upgrading from 0.9.x; cleaned up plugins install
+ *
  * Revision 1.94  2006/04/06 08:52:27  blueyed
  * Validate install "misc" requirements ("tokenizer" support for now)
  *

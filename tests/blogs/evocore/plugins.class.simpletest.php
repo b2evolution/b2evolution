@@ -26,7 +26,6 @@ class PluginsTestCase extends DbUnitTestCase
 
 		ob_start();
 		$this->create_current_tables( true ); // we need current tables for Plugins to work
-		install_basic_plugins();
 		ob_end_clean();
 
 		$this->Plugins = new Plugins();

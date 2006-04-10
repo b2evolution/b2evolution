@@ -796,8 +796,8 @@ function upgrade_b2evo_tables()
 
 	// Insert default values, but only those since Phoenix-Alpha:
 	// TODO: cleanup/move previous upgrade instructions (data inserts) from above to install_insert_default_data()?!
-	$db_version_ge_9000 = ( $old_db_version >= 9000 ? $old_db_version : 9000 );
-	install_insert_default_data( $db_version_ge_9000 );
+	$db_version_ge_8999 = ( $old_db_version >= 8999 ? $old_db_version : 8999 );
+	install_insert_default_data( $db_version_ge_8999 );
 
 
 	// Update DB schema version to $new_db_version
@@ -816,6 +816,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.137  2006/04/10 09:27:04  blueyed
+ * Fix adding default itemtypes when upgrading from 0.9.x; cleaned up plugins install
+ *
  * Revision 1.136  2006/04/06 08:51:34  blueyed
  * Set upgrade checkpoint
  *
