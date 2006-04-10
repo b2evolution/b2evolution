@@ -64,8 +64,8 @@ class categories_plugin extends Plugin
 	 *                - 'link_type' : 'canonic'|'context' (default: canonic)
 	 *                - 'context_isolation' : what params need override when changing date/range (Default: 'm,w,p,title,unit,dstart' )
 	 *                - 'form' : true|false (default: false)
-	 *                - 'list_start' : (Default '<ul>')
-	 *                - 'list_end' : (Default '</ul>')
+	 *                - 'list_start' : (Default '<ul>'), does not get displayed for empty lists
+	 *                - 'list_end' : (Default '</ul>'), does not get displayed for empty lists
 	 *                - 'line_start' : (Default '<li>')
 	 *                - 'line_end' : (Default '</li>')
 	 *                - 'group_start' : (Default '<ul>') - (for BLOG 1 Categories)
@@ -143,27 +143,31 @@ class categories_plugin extends Plugin
 
 		if( $blog > 1 )
 		{ // We want to display cats for one blog
-			echo $params['list_start'];
+			$tmp_disp = '';
 
 			if( $params['option_all'] )
 			{	// We want to display a link to all cats:
-				echo $this->params['line_start'].'<a href="';
+				$tmp_disp .= $this->params['line_start'].'<a href="';
 				if( $this->params['link_type'] == 'context' )
 				{	// We want to preserve current browsing context:
-					echo regenerate_url( 'cats,catsel' );
+					$tmp_disp .= regenerate_url( 'cats,catsel' );
 				}
 				else
 				{
-					echo get_bloginfo('blogurl');
+					$tmp_disp .= get_bloginfo('blogurl');
 				}
-				echo '">'.$params['option_all'].'</a>';
-				echo $this->params['line_end'];
+				$tmp_disp .= '">'.$params['option_all'].'</a>';
+				$tmp_disp .= $this->params['line_end'];
 			}
-
-			echo cat_children( $cache_categories, $blog, NULL,
-							array( $this, 'callback_before_first' ), array( $this, 'callback_before_each' ),
-							array( $this, 'callback_after_each' ), array( $this, 'callback_after_last' ), 0 );
-			echo $params['list_end'];
+			$tmp_disp .= cat_children( $cache_categories, $blog, NULL,
+			                           array( $this, 'callback_before_first' ), array( $this, 'callback_before_each' ),
+			                           array( $this, 'callback_after_each' ), array( $this, 'callback_after_last' ), 0 );
+			if( ! empty($tmp_disp) )
+			{
+				echo $params['list_start'];
+				echo $tmp_disp;
+				echo $params['list_end'];
+			}
 		}
 		else
 		{ // We want to display cats for all blogs
@@ -205,9 +209,12 @@ class categories_plugin extends Plugin
 				echo '</a>';
 				echo $params['coll_end'];
 
-				echo $params['list_start'];
-				echo $cat_list;
-				echo $params['list_end'];
+				if( ! empty($cat_list) )
+				{
+					echo $params['list_start'];
+					echo $cat_list;
+					echo $params['list_end'];
+				}
 			}
 
 			echo $params['collist_end'];
