@@ -123,7 +123,7 @@ if( empty($disp) )
 
 if( $disp == 'stats' )
 {
-	require dirname(__FILE__).'/_410_stats_gone.page.php'; // error & exit
+	require $view_path.'errors/_410_stats_gone.page.php'; // error & exit
 }
 
 // Getting current blog info:
@@ -417,6 +417,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/10 22:05:26  blueyed
+ * Fixed path to stats gone page
+ *
  * Revision 1.9  2006/03/20 18:49:44  fplanque
  * no message
  *
