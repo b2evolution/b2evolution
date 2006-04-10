@@ -28,18 +28,26 @@ param( 'a', 'string' );
 switch($action)
 {
 	case 'update':
-		// Determine the edit folder:
-		$edit_folder = get_path('skins').'custom/';
+		if( $demo_mode )
+		{
+			$Messages->add( 'Sorry, you cannot update the custom skin in demo mode!', 'error' );
+			// no break
+		}
+		else
+		{
+			// Determine the edit folder:
+			$edit_folder = get_path('skins').'custom/';
 
-		param( 'newcontent', 'html' );
-		$f = fopen( $edit_folder.$file, "w+" );
-		fwrite($f,$newcontent);
-		fclose($f);
+			param( 'newcontent', 'html' );
+			$f = fopen( $edit_folder.$file, "w+" );
+			fwrite($f,$newcontent);
+			fclose($f);
 
-		header("Location: admin.php?ctrl=templates&file=$file&a=te");
-		exit();
+			header("Location: admin.php?ctrl=templates&file=$file&a=te");
+			exit();
 
-		break;
+			break;
+		}
 
 
 	default:
