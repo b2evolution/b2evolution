@@ -460,7 +460,7 @@ to
 		<?php
 		create_b2evo_tables();
 		populate_main_tables();
-// fp> PUT THIS BACK!!  install_basic_plugins();
+		install_basic_plugins();
 		?>
 		<h2><?php echo T_('Installation successful!')?></h2>
 
@@ -514,7 +514,7 @@ to
 		<?php
 			create_b2evo_tables();
 			upgrade_cafelog_tables();
-// fp> PUT THIS BACK!!  install_basic_plugins();
+			install_basic_plugins();
 		?>
 		<p><?php echo T_('Upgrade completed successfully!')?></p>
 		<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'b2')?></p>
@@ -598,6 +598,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.97  2006/04/11 22:28:58  blueyed
+ * cleanup
+ *
  * Revision 1.96  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

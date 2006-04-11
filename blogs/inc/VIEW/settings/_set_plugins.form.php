@@ -237,12 +237,15 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 	</table>
 </fieldset>
 
+
 <?php
 /*
  * $Log$
+ * Revision 1.10  2006/04/11 22:28:58  blueyed
+ * cleanup
+ *
  * Revision 1.9  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *
  */
-?>
 ?>

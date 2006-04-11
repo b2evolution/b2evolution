@@ -20,15 +20,18 @@ if( $disp == 'arcdir' )
 
 	// Call the Archives plugin WITH NO LIMIT & NO MORE LINK:
 	$Plugins->call_by_code( 'evo_Arch', array( 'title'=>'',
-																							'block_start'=>'',
-																							'block_end'=>'',
-																							'limit'=>'',
-																							'more_link'=>'' ) );
+	                                            'block_start'=>'',
+	                                            'block_end'=>'',
+	                                            'limit'=>'',
+	                                            'more_link'=>'' ) );
 }
 
 
 /*
  * $Log$
+ * Revision 1.9  2006/04/11 22:28:58  blueyed
+ * cleanup
+ *
  * Revision 1.8  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

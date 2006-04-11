@@ -2278,8 +2278,8 @@ class Item extends DataObject
 		}
 
 		$DB->query( 'UPDATE T_posts
-										SET post_views = post_views + 1
-									WHERE '.$this->dbIDname.' = '.$this->ID );
+		                SET post_views = post_views + 1
+		              WHERE '.$this->dbIDname.' = '.$this->ID );
 
 		// Trigger event that the item has been viewed (which is != displayed) and useful for cache handling plugins
 		$Plugins->trigger_event( 'ItemViewed', array( 'Item' => & $this ) );
@@ -2488,6 +2488,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2006/04/11 22:28:58  blueyed
+ * cleanup
+ *
  * Revision 1.29  2006/04/11 21:22:25  fplanque
  * partial cleanup
  *
