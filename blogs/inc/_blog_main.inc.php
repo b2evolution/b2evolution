@@ -227,6 +227,17 @@ if( $resolve_extra_path )
 			}
 			else
 			{	// We did not get a number/year...
+
+				/* fp> untested, this was in the 404 VIEW (nonsense!) If needed, it should be (approx.) here!
+				// First check, if it's an old-style backoffice-Path (from a redirect-everything non-existing to index.php mod_rewrite rule):
+				if( strpos( $ReqPath, '/admin/' ) === 0 )
+				{
+					// Redirect to admin url and pass request_uri as path_info, so it can be resolved by admin.php to the right menu entry:
+					header( 'Location: '.$admin_url.'/'.substr($ReqURI, 7) );
+					exit;
+				}
+				*/
+
 				$path_error = 404;
 			}
 		}
@@ -417,6 +428,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.11  2006/04/11 17:10:22  fplanque
+ * The view is not a place for redirects!
+ *
  * Revision 1.10  2006/04/10 22:05:26  blueyed
  * Fixed path to stats gone page
  *
