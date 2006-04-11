@@ -1193,7 +1193,11 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 	}
 
 	// Construct URL:
-	if( empty($pagefileurl) )
+	if( ! empty($pagefileurl) )
+	{
+		$url = $pagefileurl;
+	}
+	else
 	{
 		if( ! empty($base_tag_set) )
 		{
@@ -1205,10 +1209,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '' )
 			$url = $ReqPath;
 		}
 	}
-	else
-	{
-		$url = $pagefileurl;
-	}
+
 	if( !empty( $params ) )
 	{
 		$url = url_add_param( $url, implode( '&amp;', $params ) );
@@ -1315,20 +1316,15 @@ function validate_url( $url, & $allowed_uri_scheme )
 	}
 
 	// Validate URL structure
-	// NOTE: this causes the most problems with this function!
-	// fp>> we should probably go back to a very laxist scheme here... :(
-	// blueyed>> yes, seems so.
-	/* Remaining problems with this one are:
-	 *  - no spaces in URL allowed (must be written as %20)
-	 *    TODO: should we just replace " " with %20 (or just call urlencode on it, before validating it?)
-	 *  - umlauts in domains/url
-	 */
-	if( ! preg_match('~^                # start
-		([a-z][a-z0-9+.\-]*):[0-9]*       # scheme
-		//                                # authority absolute URLs only
-		[a-z0-9]([a-z0-9\~+.\-_,:;/\\\\*=@%])* # Don t allow anything too funky like entities
-		([?#][a-z0-9\~+.\-_,:;/\\\\%&=!?#*\ \[\]]*)?
-		$~ix', $url, $matches) )
+	// fp> NOTE: I made this much more laxist than it used to be.
+	// fp> If it turns out I blocked something that was previously allowed, it's a mistake.
+	// blueyed> ? - umlauts in domains/url
+	if( ! preg_match('~^               # start
+		([a-z][a-z0-9+.\-]*)             # scheme
+		://                              # authority absolute URLs only
+		[a-z0-9]([a-z0-9.\-])*           # Don t allow anything too funky like entities
+		(:[0-9]+)?                       # optional port specification
+		/~ix', $url, $matches) )
 	{ // Cannot validate URL structure
 		$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
 		return T_('Invalid URL');
@@ -2715,6 +2711,10 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.29  2006/04/11 15:58:59  fplanque
+ * made validate_url() more laxist because there's always a legitimate use for a funky char in a query string
+ * (might need to be even more laxist...) but I'd like to make sure people don't type in just anything
+ *
  * Revision 1.28  2006/04/10 09:41:14  blueyed
  * validate_url: todo; allow "%" in general
  *
