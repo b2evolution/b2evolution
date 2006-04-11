@@ -575,24 +575,7 @@ function install_insert_default_data( $old_db_version )
 			echo "OK.<br />\n";
 		}
 
-		/*
-		 * Installing default plugins:
-		 * NOTE: this won't call the "AfterInstall" method on the plugin nor install its DB schema.
-		 *       This get done in the plugins controller currently and would need to be changed/added here, if needed later.
-		 */
-		echo 'Installing default plugins... ';
-		$Plugins = & new Plugins();
-		// Toolbars:
-		$Plugins->install( 'quicktags_plugin' );
-		// Renderers:
-		$Plugins->install( 'auto_p_plugin' );
-		$Plugins->install( 'autolinks_plugin' );
-		$Plugins->install( 'texturize_plugin' );
-		// SkinTags:
-		$Plugins->install( 'calendar_plugin' );
-		$Plugins->install( 'archives_plugin' );
-		$Plugins->install( 'categories_plugin' );
-		echo "OK.<br />\n";
+		// NOTE: basic plugins get installed separatly for upgrade and install..
 	}
 
 
@@ -608,6 +591,9 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.12  2006/04/11 22:39:50  blueyed
+ * Fixed installation of basic plugins, though again more complicated (IMHO)
+ *
  * Revision 1.11  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

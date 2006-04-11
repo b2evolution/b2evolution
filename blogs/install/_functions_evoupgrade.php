@@ -808,6 +808,8 @@ function upgrade_b2evo_tables()
 	{ // Create (EXPERIMENTAL) relations, only if upgrading to Phoenix-Beta:
 		// TODO: this should/could get handled by db_delta(), by adding it to the "normal" DB schema, if requested.
 		create_b2evo_relations(); // EXPERIMENTAL!
+
+		install_basic_plugins();
 	}
 
 	return true;
@@ -816,6 +818,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.139  2006/04/11 22:39:50  blueyed
+ * Fixed installation of basic plugins, though again more complicated (IMHO)
+ *
  * Revision 1.138  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *
