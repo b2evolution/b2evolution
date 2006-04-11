@@ -46,8 +46,10 @@ class InstallSelfTestCase extends InstallUnitTestCase
 	 */
 	function testInstall()
 	{
+		// NOTE: this is the same as with install action "newdb":
 		create_b2evo_tables();
 		populate_main_tables();
+		install_basic_plugins();
 
 		$this->assertEqual( $this->test_DB->get_var( 'SELECT COUNT(*) FROM T_plugins' ), $this->nr_of_basic_plugins );
 	}
