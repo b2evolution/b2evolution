@@ -628,66 +628,67 @@ class AdminUI_general
 
 			$selected = $this->get_selected($path);
 
-			foreach( $menuEntries as $loop_tab => $loop_details )
+			foreach( $menuEntries as $loop_key => $loop_details )
 			{
 				$perm = true; // By default
 
-				if( ($perm = $this->check_perm( $loop_details ))
-				    || isset($loop_details['text_noperm']) )
-				{ // If no permission requested or if perm granted or if we have an alt text, display tab:
-					$anchor = '<a href="';
-					if( isset( $loop_details['href'] ) )
-					{
-						$anchor .= $loop_details['href'];
-					}
-					elseif( !empty($loop_details['href_eval']) )
-					{
-						$anchor .= eval( $loop_details['href_eval'] );
-					}
-					else
-					{
-						$anchor .= regenerate_url( 'tab', 'tab='.$loop_tab );
-					}
-					$anchor .= '"';
-					if( isset($loop_details['style']) )
-					{
-						$anchor .= ' style="'.$loop_details['style'].'"';
-					}
+				if( ! ($perm = $this->check_perm( $loop_details )) && ! isset($loop_details['text_noperm']) )
+				{ // If permission requested and not granted, and we have no alt text, display no tab:
+					continue;
+				}
 
-					$anchor .= '>'.format_to_output( $perm ? $loop_details['text'] : $loop_details['text_noperm'], 'htmlbody' )
-					            ."</a>";
+				$anchor = '<a href="';
 
+				if( isset( $loop_details['href'] ) )
+				{
+					$anchor .= $loop_details['href'];
+				}
+				elseif( !empty($loop_details['href_eval']) )
+				{ // TODO: I will remove this, if you don't use it, fplanque.. (blueyed)
+					$anchor .= eval( $loop_details['href_eval'] );
+				}
+				else
+				{
+					$anchor .= regenerate_url( 'tab', 'tab='.$loop_tab );
+				}
+				$anchor .= '"';
+				if( isset($loop_details['style']) )
+				{
+					$anchor .= ' style="'.$loop_details['style'].'"';
+				}
 
-					if( $loop_tab == $selected )
-					{ // Highlight selected entry
-						if( !empty( $templateForLevel['_props']['recurseSelected'] )
-								&& ( $recursePath = array_merge( $path, $loop_tab ) )
-								&& ($this->get_menu_entries($recursePath) ) )
-						{
-							$r .= isset($templateForLevel['beforeEachSelWithSub'])
-								? $templateForLevel['beforeEachSelWithSub']
-								: $templateForLevel['beforeEachSel'];
-							$r .= $anchor;
+				$anchor .= '>'.format_to_output( $perm ? $loop_details['text'] : $loop_details['text_noperm'], 'htmlbody' )
+				              ."</a>";
 
-							$r .= $this->get_html_menu_entries( $recursePath, $template, $depth+1 );
-
-							$r .= isset($templateForLevel['afterEachSelWithSub'])
-								? $templateForLevel['afterEachSelWithSub']
-								: $templateForLevel['afterEachSel'];
-						}
-						else
-						{
-							$r .= $templateForLevel['beforeEachSel'];
-							$r .= $anchor;
-							$r .= $templateForLevel['afterEachSel'];
-						}
-					}
-					else
+				if( $loop_key == $selected )
+				{ // Highlight selected entry
+					if( !empty( $templateForLevel['_props']['recurseSelected'] )
+							&& ( $recursePath = array_merge( $path, $loop_key ) )
+							&& ($this->get_menu_entries($recursePath) ) )
 					{
-						$r .= $templateForLevel['beforeEach'];
+						$r .= isset($templateForLevel['beforeEachSelWithSub'])
+							? $templateForLevel['beforeEachSelWithSub']
+							: $templateForLevel['beforeEachSel'];
 						$r .= $anchor;
-						$r .= $templateForLevel['afterEach'];
+
+						$r .= $this->get_html_menu_entries( $recursePath, $template, $depth+1 );
+
+						$r .= isset($templateForLevel['afterEachSelWithSub'])
+							? $templateForLevel['afterEachSelWithSub']
+							: $templateForLevel['afterEachSel'];
 					}
+					else
+					{
+						$r .= $templateForLevel['beforeEachSel'];
+						$r .= $anchor;
+						$r .= $templateForLevel['afterEachSel'];
+					}
+				}
+				else
+				{
+					$r .= $templateForLevel['beforeEach'];
+					$r .= $anchor;
+					$r .= $templateForLevel['afterEach'];
 				}
 			}
 			$r .= $templateForLevel['after'];
@@ -1283,6 +1284,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/11 21:56:27  blueyed
+ * cleanup
+ *
  * Revision 1.4  2006/04/04 21:54:23  blueyed
  * cleanup/whitespace
  *
