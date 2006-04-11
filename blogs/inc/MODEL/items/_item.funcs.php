@@ -35,7 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * Using title as a source if url title is empty
  *
- * @todo Use dashes "-" as seperator (at least do not replace them with "_"); replace umlauts
+ * @todo Use configurable char as seperator (see tracker); replace umlauts
  *
  * @param string url title to validate
  * @param string real title to use as a source if $urltitle is empty
@@ -924,6 +924,9 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
  * Revision 1.6  2006/04/06 13:49:50  blueyed
  * Background "striping" for "Categories" fieldset
  *

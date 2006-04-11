@@ -533,7 +533,7 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 9000 )
-	{ // ---------------------------------- upgrade to 0.9.2 a.k.a 1.6 "phoenix"
+	{ // ---------------------------------- upgrade to 0.9.2 a.k.a 1.6 "phoenix ALPHA"
 
 		echo 'Dropping old Hitlog table... ';
 		$DB->query( 'DROP TABLE IF EXISTS T_hitlog' );
@@ -728,7 +728,7 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 9100 )
-	{	// Phoenix BETA (only column renames/drops):
+	{	// 1.8 ALPHA (only column renames/drops):
 
 		echo 'Altering Links table... ';
 		$DB->query( 'ALTER TABLE T_links
@@ -816,6 +816,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.138  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
  * Revision 1.137  2006/04/10 09:27:04  blueyed
  * Fix adding default itemtypes when upgrading from 0.9.x; cleaned up plugins install
  *

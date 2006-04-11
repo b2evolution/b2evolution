@@ -95,4 +95,11 @@ if( !isset($ctrl_mappings[$ctrl]) )
 // Call the requested controller:
 require $control_path.$ctrl_mappings[$ctrl];
 
+
+/*
+ * $Log$
+ * Revision 1.9  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
+ */
 ?>

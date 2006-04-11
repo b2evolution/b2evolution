@@ -449,4 +449,12 @@ class test_plugin extends Plugin
 	}
 
 }
+
+
+/*
+ * $Log$
+ * Revision 1.28  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

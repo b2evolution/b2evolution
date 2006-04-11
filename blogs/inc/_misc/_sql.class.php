@@ -50,13 +50,41 @@ class SQL
 	function get()
 	{
 		$sql = '';
-		if( !empty($this->select) ) $sql .= ' SELECT '.$this->select;
+		$sql .= $this->get_select();
 		$sql .= $this->get_from();
 		$sql .= $this->get_where();
 		$sql .= $this->get_group_by();
 		$sql .= $this->get_order_by();
 		$sql .= $this->get_limit();
 		return $sql;
+	}
+
+
+  /**
+	 * Get whole query
+	 */
+	function display()
+	{
+		echo $this->get_select( '<br />SELECT ' );
+		echo $this->get_from( '<br />FROM ' );
+		echo $this->get_where( '<br />WHERE ' );
+		echo $this->get_group_by( '<br />GROUP BY ' );
+		echo $this->get_order_by( '<br />ORDER BY ' );
+		echo $this->get_limit( '<br />LIMIT ' );
+	}
+
+
+  /**
+	 * Get SELECT clause if there is something inside
+	 */
+	function get_select( $prefix = ' SELECT ' )
+	{
+		if( !empty($this->select) )
+		{
+			return $prefix.$this->select;
+		}
+
+		return '';
 	}
 
 
@@ -340,6 +368,9 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
  * Revision 1.2  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

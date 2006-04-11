@@ -154,4 +154,12 @@ $Form = new Form( $htsrv_url.'message_send.php' );
 
 <?php
 $Form->end_form();
+
+
+/*
+ * $Log$
+ * Revision 1.21  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

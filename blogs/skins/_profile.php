@@ -83,4 +83,12 @@ $ProfileForm->buttons( array( array( '', '', T_('Update'), 'SaveButton' ),
 															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 $ProfileForm->end_form();
+
+
+/*
+ * $Log$
+ * Revision 1.28  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

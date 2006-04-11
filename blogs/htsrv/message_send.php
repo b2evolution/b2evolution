@@ -203,4 +203,10 @@ header_redirect();
 // Plugins should cleanup their temporary data here:
 $Plugins->trigger_event( 'MessageFormSentCleanup' );
 
+/*
+ * $Log$
+ * Revision 1.25  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
+ */
 ?>

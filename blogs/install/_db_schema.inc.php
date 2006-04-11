@@ -298,7 +298,7 @@ $schema_queries = array(
 		"CREATE TABLE T_basedomains (
 			dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			dom_name   VARCHAR(250) NOT NULL DEFAULT '',
-			dom_status ENUM('unknown','blacklist') NOT NULL DEFAULT 'unknown',
+			dom_status ENUM('unknown','whitelist','blacklist') NOT NULL DEFAULT 'unknown',
 			dom_type   ENUM('unknown','normal','searcheng','aggregator') NOT NULL DEFAULT 'unknown',
 			PRIMARY KEY (dom_ID),
 			UNIQUE (dom_name)
@@ -606,4 +606,10 @@ function install_insert_default_data( $old_db_version )
 	}
 }
 
+/*
+ * $Log$
+ * Revision 1.11  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

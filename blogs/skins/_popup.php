@@ -17,6 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // TODO: blueyed>> What's that?? A HTML-page-block for every item?! Shouldn't that just use $Item perhaps??
+// it's cafelog/b2 legacy. Idf $Item is already available, then fine ;)
 while( $Item = $MainList->get_item() )
 {
 ?>
@@ -54,4 +55,12 @@ while( $Item = $MainList->get_item() )
 </html>
 <?php
 }
+
+
+/*
+ * $Log$
+ * Revision 1.11  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

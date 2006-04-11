@@ -115,6 +115,7 @@ class Item extends DataObject
 	var $renderers;
 	/**
 	 * Comments status
+	 * @todo rename to comment_status
 	 * @var string "open", "disabled" or "closed
 	 */
 	var $comments;
@@ -2276,7 +2277,9 @@ class Item extends DataObject
 			return false;
 		}
 
-		$DB->query( 'UPDATE T_posts SET post_views = post_views + 1 WHERE '.$this->dbIDname.' = '.$this->ID );
+		$DB->query( 'UPDATE T_posts
+										SET post_views = post_views + 1
+									WHERE '.$this->dbIDname.' = '.$this->ID );
 
 		// Trigger event that the item has been viewed (which is != displayed) and useful for cache handling plugins
 		$Plugins->trigger_event( 'ItemViewed', array( 'Item' => & $this ) );
@@ -2485,6 +2488,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
  * Revision 1.28  2006/04/10 23:11:40  blueyed
  * Fixed incrementing view count on ALL items altogether! :/
  *

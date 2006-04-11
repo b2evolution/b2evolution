@@ -134,4 +134,11 @@ $Session->set( 'Messages', $action_Log );
 
 header_nocache();
 header_redirect();
+
+/*
+ * $Log$
+ * Revision 1.40  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
+ */
 ?>

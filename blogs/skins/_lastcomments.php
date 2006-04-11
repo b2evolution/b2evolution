@@ -50,4 +50,12 @@ while( $Comment = & $CommentList->get_next() )
 	<!-- ========== END of a COMMENT ========== -->
 	<?php
 }	// End of comment loop.
+
+
+/*
+ * $Log$
+ * Revision 1.23  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

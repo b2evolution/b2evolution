@@ -250,5 +250,13 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 		}
 	}
 
-} // if you delete this the sky will fall on your head
+}
+
+
+/*
+ * $Log$
+ * Revision 1.53  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

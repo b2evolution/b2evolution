@@ -51,4 +51,12 @@ class autolinks_plugin extends Plugin
 		return true;
 	}
 }
+
+
+/*
+ * $Log$
+ * Revision 1.8  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

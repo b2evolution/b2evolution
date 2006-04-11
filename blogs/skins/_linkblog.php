@@ -85,4 +85,12 @@ echo $linkblog_main_end;
 
 // Restore after dirty trick:
 $blog = $saved_blog;
+
+
+/*
+ * $Log$
+ * Revision 1.13  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

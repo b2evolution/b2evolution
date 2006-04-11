@@ -26,4 +26,12 @@ $Plugins->call_by_code( 'evo_Calr', array(	// Params follow:
 		'block_end'=>'',
 		'title'=>'',			// No title.
 	) );
+
+
+/*
+ * $Log$
+ * Revision 1.17  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

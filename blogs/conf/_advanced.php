@@ -121,7 +121,7 @@ $instance_name = 'b2evo'; // MUST BE A SINGLE WORD! NO SPACES!!
  * Alternatively you can use this automated address generation:
  * <code>$notify_from = $instance_name.'@'.$basehost;</code>
  *
- * @todo For a $baseurl of "http://www.example.com/" you'll get "b2evo@www.example.com" here! - Should we strip "www." at the beginning (what getBaseDomain() does also)?
+ * @todo For a $baseurl of "http://www.example.com/" you'll get "b2evo@www.example.com" here! - Should we strip "www." at the beginning (what getBaseDomain() does also)? fp>> ok
  *
  * @global string Default: $instance_name.'@'.$basehost;
  */

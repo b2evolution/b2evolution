@@ -126,6 +126,8 @@ class Sessions extends Widget
 	/**
 	 * Template function: Display the registered users who are online
 	 *
+	 * @todo get class="" out of here (put it into skins)
+	 *
 	 * @param string To be displayed before all users
 	 * @param string To be displayed after all users
 	 * @param string Template to display for each user, see {@link replace_callback()}
@@ -194,6 +196,8 @@ class Sessions extends Widget
 
 	/**
 	 * Template function: Display onliners, both registered users and guests.
+	 *
+	 * @todo get class="" out of here (put it into skins)
 	 */
 	function display_onliners()
 	{
@@ -244,6 +248,9 @@ class Sessions extends Widget
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
  * Revision 1.3  2006/04/06 09:46:37  blueyed
  * display_onliners(): Wrap "online guests" in same "<ul>" as "online users" (because of left padding/margin)
  *

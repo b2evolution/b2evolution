@@ -52,4 +52,11 @@ $Plugins->call_by_code( 'evo_Arch', array(
 		'day_date_format'=>($archive_date_format_over_ride ? $archive_day_date_format : ''),
 	) );
 
+
+/*
+ * $Log$
+ * Revision 1.16  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

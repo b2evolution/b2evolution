@@ -172,7 +172,7 @@ switch( $action )
 		$Session->set_user_ID( $ForgetfulUser->ID );
 
 		// Add Message to change the password:
-		$action_Log = new Log();
+		$action_Log = & new Log();
 		$action_Log->add( T_( 'Please change your password to something you remember now.' ), 'success' );
 		$Session->set( 'Messages', $action_Log );
 		$Session->dbsave();
@@ -192,4 +192,10 @@ switch( $action )
 require $view_path.'login/_login_form.php';
 exit();
 
+/*
+ * $Log$
+ * Revision 1.52  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
+ */
 ?>

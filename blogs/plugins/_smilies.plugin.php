@@ -264,4 +264,12 @@ function smiliescmp($a, $b)
 	}
 	return $diff;
 }
+
+
+/*
+ * $Log$
+ * Revision 1.18  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

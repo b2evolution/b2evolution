@@ -535,7 +535,6 @@ function postcats_get_byID( $post_ID )
  * @param string|array Callback after each category
  * @param string|array Callback after last category
  * @param integer Caller nesting level, just to keep track of how far we go :)
- * @param integer Total category count (used internally and gets passed to callbacks)
  * @return string
  */
 function cat_children( $ccats, $blog_ID, $parent_ID, $callback_before_first, $callback_before_each, $callback_after_each, $callback_after_last, $level = 0, $root_call = true )
@@ -558,52 +557,52 @@ function cat_children( $ccats, $blog_ID, $parent_ID, $callback_before_first, $ca
 	$child_count = 0;
 	foreach( $ccats as $icat_ID => $i_cat )
 	{
-		if( ! $icat_ID
+		if( empty( $icat_ID )
 			|| ! (($blog_ID == 0) || ($i_cat['cat_blog_ID'] == $blog_ID))
 			|| ! ($i_cat['cat_parent_ID'] == $parent_ID) )
 		{ // this cat is not in the blog and or is not a child of the parent
 			continue;
 		}
 
+		// this cat is in the blog and is a child of the parent...
 		$total_count++;
 
-		if( $icat_ID && (($blog_ID == 0) || ($i_cat['cat_blog_ID'] == $blog_ID)) && ($i_cat['cat_parent_ID'] == $parent_ID) )
-		{ // this cat is in the blog and is a child of the parent
 
-			// "before first":
-			if( $child_count++ == 0 )
-			{ // this is the first child
-				if( is_array( $callback_before_first ) )
-				{ // object callback:
-					$r .= $callback_before_first[0]->{$callback_before_first[1]}( $parent_ID, $level, $total_count, 1 );
-				}
-				else
-					$r .= $callback_before_first( $parent_ID, $level, $total_count, 1 );
-			}
-
-			// "before each":
-			if( is_array( $callback_before_each ) )
+		// "before first":
+		if( $child_count++ == 0 )
+		{ // this is the first child
+			if( is_array( $callback_before_first ) )
 			{ // object callback:
-				$r2 = $callback_before_each[0]->{$callback_before_each[1]}( $icat_ID, $level, $total_count, $child_count );
+				$r .= $callback_before_first[0]->{$callback_before_first[1]}( $parent_ID, $level, $total_count, 1 );
 			}
 			else
-				$r2 = $callback_before_each( $icat_ID, $level, $total_count, $child_count );
-			if( $r2 === true )
-			{	// callback function has requested that we stop recursing for this branch
-				continue;
-			}
-			$r .= $r2;
+				$r .= $callback_before_first( $parent_ID, $level, $total_count, 1 );
+		}
 
-			// Recursion:
-			$r .= cat_children( $ccats, $blog_ID, $icat_ID, $callback_before_first, $callback_before_each, $callback_after_each, $callback_after_last, $level+1, false );
+		// "before each":
+		if( is_array( $callback_before_each ) )
+		{ // object callback:
+			$r2 = $callback_before_each[0]->{$callback_before_each[1]}( $icat_ID, $level, $total_count, $child_count );
+		}
+		else
+			$r2 = $callback_before_each( $icat_ID, $level, $total_count, $child_count );
+		if( $r2 === true )
+		{	// callback function has requested that we stop recursing for this branch
+			continue;
+		}
+		$r .= $r2;
 
-			// "after each":
-			if( is_array( $callback_after_each ) )
-			{ // object callback:
-				$r .= $callback_after_each[0]->{$callback_after_each[1]}( $icat_ID, $level, $total_count, $child_count );
-			}
-			else
-				$r .= $callback_after_each( $icat_ID, $level, $total_count, $child_count );
+		// Recursion:
+		$r .= cat_children( $ccats, $blog_ID, $icat_ID, $callback_before_first, $callback_before_each, $callback_after_each, $callback_after_last, $level+1, false );
+
+		// "after each":
+		if( is_array( $callback_after_each ) )
+		{ // object callback:
+			$r .= $callback_after_each[0]->{$callback_after_each[1]}( $icat_ID, $level, $total_count, $child_count );
+		}
+		else
+		{
+			$r .= $callback_after_each( $icat_ID, $level, $total_count, $child_count );
 		}
 	}
 	if( $child_count )
@@ -958,6 +957,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
  * Revision 1.3  2006/04/06 13:49:49  blueyed
  * Background "striping" for "Categories" fieldset
  *

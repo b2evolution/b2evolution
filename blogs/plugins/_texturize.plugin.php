@@ -103,4 +103,12 @@ class texturize_plugin extends Plugin
 	}
 }
 
+
+
+/*
+ * $Log$
+ * Revision 1.9  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

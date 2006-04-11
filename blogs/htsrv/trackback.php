@@ -67,7 +67,7 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 
 	if( ! $commented_Item->comments != 'open' )
 	{
-		trackback_response( 1, 'Sorry, this item does not accept comments.' );
+		trackback_response( 1, 'Sorry, this item does not accept trackbacks.' );
 	}
 
 	$title = strip_tags($title);
@@ -140,4 +140,10 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 
 }
 
+/*
+ * $Log$
+ * Revision 1.40  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
+ */
 ?>

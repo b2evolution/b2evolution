@@ -115,7 +115,7 @@ switch( $action )
 			          .T_('Login:')." $login\n"
 			          .T_('Email').": $email\n"
 			          ."\n"
-			          .T_('Manage users').': '.$admin_url.'?ctrl=users&user_ID='.$new_User->ID."\n";
+			          .T_('Edit user').': '.$admin_url.'?ctrl=users&user_ID='.$new_User->ID."\n";
 
 			send_mail( $admin_email, T_('New user registration on your blog'), $message, $notify_from );
 
@@ -146,4 +146,10 @@ param( 'redirect_to', 'string', $admin_url );
 // Display reg form:
 require $view_path.'login/_reg_form.php';
 
+/*
+ * $Log$
+ * Revision 1.59  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
+ */
 ?>

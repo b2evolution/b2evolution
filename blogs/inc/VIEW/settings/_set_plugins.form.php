@@ -38,7 +38,7 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 	<table class="grouped" cellspacing="0">
 		<thead>
 		<tr>
-			<th class="firstcol"></th>
+			<th class="firstcol"><?php echo T_('Enabled') ?></th>
 			<th><?php echo T_('Plugin') ?></th>
 			<th><?php echo T_('Priority') ?></th>
 			<th title="<?php echo T_('When should rendering apply?') ?>"><?php echo T_('Apply') ?></th>
@@ -63,7 +63,7 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 		{
 		?>
 		<tr class="<?php echo (($count++ % 2) ? 'odd' : 'even') ?>">
-			<td class="firstcol">
+			<td class="firstcol shrinkwrap">
 			<?php
 			if( $loop_Plugin->status == 'enabled' )
 			{
@@ -105,8 +105,6 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 			{ ?>
 				<td class="lastcol shrinkwrap">
 					<?php
-					echo action_icon( T_('Edit plugin settings!'), 'edit', 'admin.php?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$loop_Plugin->ID );
-
 					if( $loop_Plugin->status == 'enabled' )
 					{
 						echo action_icon( T_('Disable the plugin!'), 'deactivate', 'admin.php?ctrl=plugins&amp;action=disable_plugin&amp;plugin_ID='.$loop_Plugin->ID );
@@ -115,6 +113,8 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 					{
 						echo action_icon( T_('Enable the plugin!'), 'activate', 'admin.php?ctrl=plugins&amp;action=enable_plugin&amp;plugin_ID='.$loop_Plugin->ID );
 					}
+
+					echo action_icon( T_('Edit plugin settings!'), 'edit', 'admin.php?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$loop_Plugin->ID );
 
 					echo action_icon( T_('Un-install this plugin!'), 'delete', 'admin.php?ctrl=plugins&amp;action=uninstall&amp;plugin_ID='.$loop_Plugin->ID );
 					?>
@@ -236,3 +236,13 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 		</tbody>
 	</table>
 </fieldset>
+
+<?php
+/*
+ * $Log$
+ * Revision 1.9  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
+?>
+?>

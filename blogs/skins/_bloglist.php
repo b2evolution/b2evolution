@@ -87,4 +87,11 @@ echo $blog_list_start;
 echo implode( $blog_list_separator, $blog_links );
 echo $blog_list_end;
 
+
+/*
+ * $Log$
+ * Revision 1.12  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

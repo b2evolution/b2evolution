@@ -884,8 +884,37 @@ function create_b2evo_relations()
 }
 
 
+/**
+ * Install basic plugins.
+ *
+ * This gets called separately on fresh installs.
+ *
+ * NOTE: this won't call the "AfterInstall" method on the plugin nor install its DB schema.
+ *       This get done in the plugins controller currently and would need to be changed/added here, if needed later.
+ */
+function install_basic_plugins()
+{
+	echo 'Installing default plugins... ';
+	$Plugins = & new Plugins();
+	// Toolbars:
+	$Plugins->install( 'quicktags_plugin' );
+	// Renderers:
+	$Plugins->install( 'auto_p_plugin' );
+	$Plugins->install( 'autolinks_plugin' );
+	$Plugins->install( 'texturize_plugin' );
+	// SkinTags:
+	$Plugins->install( 'calendar_plugin' );
+	$Plugins->install( 'archives_plugin' );
+	$Plugins->install( 'categories_plugin' );
+	echo "OK.<br />\n";
+}
+
+
 /*
  * $Log$
+ * Revision 1.185  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
  * Revision 1.184  2006/04/10 09:27:04  blueyed
  * Fix adding default itemtypes when upgrading from 0.9.x; cleaned up plugins install
  *

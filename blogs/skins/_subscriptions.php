@@ -77,4 +77,12 @@ $Form->begin_form( 'bComment' );
 
 $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
                         array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+
+
+/*
+ * $Log$
+ * Revision 1.8  2006/04/11 21:22:26  fplanque
+ * partial cleanup
+ *
+ */
 ?>

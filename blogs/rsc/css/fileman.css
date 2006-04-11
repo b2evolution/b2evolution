@@ -44,7 +44,7 @@
 #filemanmain table.grouped td#fileman_error, /* used when an error (e.g. "no files") gets displayed */
 #filemanmain table.grouped td.fm_filename {
 	text-align: left;
-	width:100%; /* the glory hack: makes the table as width as it should be */
+	width:100%; /* the glory hack: makes the table as wide as it should be */
 }
 #filemanmain table.grouped td.fm_filename div.path {
 	clear:right;

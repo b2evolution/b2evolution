@@ -21,7 +21,7 @@ require_once $inc_path.'/_main.inc.php';
 // Check permission:
 if( ! isset($current_User) )
 {
-	debug_die( 'No permissions to get file (not logged in)!' );
+	debug_die( 'No permission to get file (not logged in)!' );
 }
 $current_User->check_perm( 'files', 'view', true );
 
@@ -47,4 +47,10 @@ if( $File->Filetype->viewtype == 'download' )
 // Display the content of the file
 readfile( $File->get_full_path() );
 
+/*
+ * $Log$
+ * Revision 1.6  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
+ */
 ?>

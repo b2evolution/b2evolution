@@ -57,7 +57,8 @@ $user_profile_only = ! $current_User->check_perm( 'users', 'view' );
 if( $user_profile_only )
 { // User has no permissions to view: he can only edit his profile
 
-	if( (isset($user_ID) && $user_ID != $current_User->ID) || isset($grp_ID) )
+	if( (isset($user_ID) && $user_ID != $current_User->ID)
+	 || isset($grp_ID) )
 	{ // User is trying to edit something he should not: add error message (Should be prevented by UI)
 		$Messages->add( 'You have no permission to view other users or groups!', 'error' );
 	}
@@ -661,6 +662,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
  * Revision 1.13  2006/04/04 22:12:33  blueyed
  * Fixed setting usersettings for other users
  *

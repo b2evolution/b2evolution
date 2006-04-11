@@ -272,4 +272,11 @@ $AdminUI->add_menu_entries(
 
 $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
+
+/*
+ * $Log$
+ * Revision 1.5  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
+ */
 ?>
