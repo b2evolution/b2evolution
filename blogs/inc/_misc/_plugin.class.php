@@ -270,7 +270,8 @@ class Plugin
 	 *     - 'text' (default): a simple string
 	 *     - 'password': like text, but hidden during input
 	 *     - 'checkbox': either 0 or 1
-	 *     - 'integer': a number (like 'text' for input, but gets validated when submitting)
+	 *     - 'integer': a number (no float, can have leading "+" or "-")
+	 *                  (like 'text' for input, but gets validated when submitting)
 	 *     - 'textarea': several lines of input. The following can be set for this type:
 	 *       - 'rows': number of rows
 	 *       - 'cols': number of columns
@@ -1257,6 +1258,10 @@ class Plugin
 	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
 	 * uses this event optionally to whitelist a user.
 	 *
+	 * NOTE: if the action is verified/completed in total, you HAVE to call
+	 *       {@link CaptchaValidatedCleanup()}, so that the plugin can cleanup its data
+	 *       and is not vulnerable against multiple usage of the same captcha!
+	 *
 	 * @return boolean true if the catcha could be validated
 	 */
 	function CaptchaValidated()
@@ -1639,6 +1644,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.24  2006/04/11 22:09:08  blueyed
+ * Fixed validation of negative integers (and also allowed "+" at the beginning)
+ *
  * Revision 1.23  2006/04/05 19:16:35  blueyed
  * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
  *

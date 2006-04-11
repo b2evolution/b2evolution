@@ -294,7 +294,7 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 		}
 		$l_value = $Request->param( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, $l_param_type, $l_param_default );
 
-		if( isset($l_meta['type']) && $l_meta['type'] == 'integer' && ! preg_match( '~^\d+$~', $l_value ) )
+		if( isset($l_meta['type']) && $l_meta['type'] == 'integer' && ! preg_match( '~^[-+]?\d+$~', $l_value ) )
 		{
 			$Request->param_error( 'edit_plugin_'.$Plugin->ID.'_set_'.$l_name, sprintf( T_('The value for %s must be numeric.'), $l_name ), T_('The value must be numeric.') );
 			continue;
@@ -471,6 +471,9 @@ function get_plugin_help_file( $Plugin )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.12  2006/04/11 22:09:08  blueyed
+ * Fixed validation of negative integers (and also allowed "+" at the beginning)
+ *
  * Revision 1.11  2006/04/05 19:44:00  blueyed
  * Do not display README-link, if user has no "view-options" perms.
  *

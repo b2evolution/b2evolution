@@ -420,7 +420,7 @@ class Request
 			return true;
 		}
 
-		if( ! preg_match( '~^\d+$~', $this->params[$var] ) || $this->params[$var] < $min || $this->params[$var] > $max )
+		if( ! preg_match( '~^[-+]?\d+$~', $this->params[$var] ) || $this->params[$var] < $min || $this->params[$var] > $max )
 		{
 			$this->param_error( $var, sprintf( $err_msg, $min, $max ) );
 			return false;
@@ -852,6 +852,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/11 22:09:08  blueyed
+ * Fixed validation of negative integers (and also allowed "+" at the beginning)
+ *
  * Revision 1.7  2006/03/26 20:25:39  blueyed
  * is_regexp: allow check with modifiers, which the Filelist now uses internally
  *
