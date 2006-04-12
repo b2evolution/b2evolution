@@ -147,12 +147,14 @@ class Filelist
 	var $_full_path_index = array();
 
 	/**
-	 * Index on full paths (path => {@link $_entries} key).
+	 * Index on (r)elative (s)lash terminated (f)ile/(d)irectory paths (rdfs_path => key into {@link $_entries}).
+	 *
 	 * @todo make these direct links to &File objects
+	 *
 	 * @var array
 	 * @access protected
 	 */
-	var $_rdfp_rel_path_index = array();
+	var $_rdfs_rel_path_index = array();
 
 	/**
 	 * Index on sort order (order # => {@link $_entries} key).
@@ -299,7 +301,7 @@ class Filelist
 		$this->_entries = array();
 		$this->_md5_ID_index = array();
 		$this->_full_path_index = array();
-		$this->_rdfp_rel_path_index = array();
+		$this->_rdfs_rel_path_index = array();
 		$this->_order_index = array();
 
 		// Attempt list files for requested directory: (recursively if flat mode):
@@ -381,7 +383,7 @@ class Filelist
 		$this->_entries[$this->_total_entries] = & $File;
 		$this->_md5_ID_index[$File->get_md5_ID()] = $this->_total_entries;
 		$this->_full_path_index[$File->get_full_path()] = $this->_total_entries;
-		$this->_rdfp_rel_path_index[$File->get_rdfs_rel_path()] = $this->_total_entries;
+		$this->_rdfs_rel_path_index[$File->get_rdfs_rel_path()] = $this->_total_entries;
 		// add file to the end of current list:
 		$this->_order_index[$this->_total_entries] = $this->_total_entries;
 
@@ -421,14 +423,14 @@ class Filelist
 	{
 		$this->_md5_ID_index = array();
 		$this->_full_path_index = array();
-		$this->_rdfp_rel_path_index = array();
+		$this->_rdfs_rel_path_index = array();
 
 		$count = 0;
 		foreach( $this->_entries as $loop_File )
 		{
 			$this->_md5_ID_index[$loop_File->get_md5_ID()] = $count;
 			$this->_full_path_index[$loop_File->get_full_path()] = $count;
-			$this->_rdfp_rel_path_index[$loop_File->get_rdfs_rel_path()] = $count;
+			$this->_rdfs_rel_path_index[$loop_File->get_rdfs_rel_path()] = $count;
 			$count++;
 		}
 	}
@@ -856,16 +858,16 @@ class Filelist
 	/**
 	 * Get a file by its relative (to root) path.
 	 *
-	 * @param string the full path (with ending slash for directories)
+	 * @param string the RELATIVE path (with ending slash for directories)
 	 * @return mixed File object (by reference) on success, false on failure.
 	 */
-	function & get_by_rdfs_path( $path )
+	function & get_by_rdfs_path( $rdfs_path )
 	{
-		$path = str_replace( '\\', '/', $path );
+		$path = str_replace( '\\', '/', $rdfs_path );
 
-		if( isset( $this->_rdfp_rel_path_index[ $path ] ) )
+		if( isset( $this->_rdfs_rel_path_index[ $rdfs_path ] ) )
 		{
-			return $this->_entries[ $this->_rdfp_rel_path_index[ $path ] ];
+			return $this->_entries[ $this->_rdfs_rel_path_index[ $rdfs_path ] ];
 		}
 		else
 		{
@@ -878,16 +880,16 @@ class Filelist
 	/**
 	 * Get a file by its full path.
 	 *
-	 * @param string the full path (with ending slash for directories)
+	 * @param string the full/absolute path (with ending slash for directories)
 	 * @return mixed File object (by reference) on success, false on failure.
 	 */
-	function & get_by_full_path( $path )
+	function & get_by_full_path( $adfs_path )
 	{
-		$path = str_replace( '\\', '/', $path );
+		$path = str_replace( '\\', '/', $adfs_path );
 
-		if( isset( $this->_full_path_index[ $path ] ) )
+		if( isset( $this->_full_path_index[ $adfs_path ] ) )
 		{
-			return $this->_entries[ $this->_full_path_index[ $path ] ];
+			return $this->_entries[ $this->_full_path_index[ $adfs_path ] ];
 		}
 		else
 		{
@@ -1034,7 +1036,7 @@ class Filelist
 			unset( $this->_entries[ $this->_md5_ID_index[ $File->get_md5_ID() ] ] );
 			unset( $this->_md5_ID_index[ $File->get_md5_ID() ] );
 			unset( $this->_full_path_index[ $File->get_full_path() ] );
-			unset( $this->_rdfp_rel_path_index[ $File->get_rdfs_rel_path() ] );
+			unset( $this->_rdfs_rel_path_index[ $File->get_rdfs_rel_path() ] );
 
 			// get the ordered index right: move all next files downwards
 			$order_key = array_search( $index, $this->_order_index );
@@ -1194,6 +1196,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.11  2006/04/12 19:12:58  fplanque
+ * partial cleanup
+ *
  * Revision 1.10  2006/03/26 20:25:39  blueyed
  * is_regexp: allow check with modifiers, which the Filelist now uses internally
  *

@@ -379,7 +379,7 @@ function get_ads_canonical_path( $ads_path )
 	$ads_path = str_replace( '//', '/', $ads_path );
 	$ads_path = str_replace( '/./', '/', $ads_path );
 	while( ($ads_realpath = preg_replace( '#/([^/]+)/\.\./#', '/', $ads_path )) != $ads_path )
-	{ // comment?
+	{ // While we find /../ back references to dereference...
 		// echo '*';
 		$ads_path = $ads_realpath;
 	}
@@ -729,6 +729,9 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.13  2006/04/12 19:12:58  fplanque
+ * partial cleanup
+ *
  * Revision 1.12  2006/03/26 20:24:19  blueyed
  * doc
  *

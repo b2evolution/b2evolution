@@ -483,7 +483,7 @@ switch( $action )
 				$only_File = $selected_Filelist->get_array();
 				$only_File = $only_File[0];
 
-				// TODO: once we support additional formats, use the default extendion here:
+				// TODO: once we support additional formats, use the default extension here:
 				$zipname = $only_File->get_name().'.zip';
 			}
 			break;
@@ -1467,6 +1467,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.17  2006/04/12 19:12:58  fplanque
+ * partial cleanup
+ *
  * Revision 1.16  2006/03/26 20:42:48  blueyed
  * Show Filelist dirtree by default and save it into UserSettings
  *

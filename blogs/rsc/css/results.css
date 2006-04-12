@@ -54,7 +54,6 @@ table.grouped tr.odd input.checkbox {
 table.grouped tr.even:hover,
 table.grouped tr.odd:hover {
 	background-color:#ccc;
-	cursor: default;
 }
 
 /* Table headers/footers: */
