@@ -217,6 +217,16 @@ div.edit_actions input.DeleteButton:hover {
 	border-right: 1px solid #9e9286;
 	background-color: #efede0;
 }
+#fm_dirtree {
+	border: 1px solid #9e9286;
+}
+#fm_files {
+	border: 1px solid #9e9286;
+	background-color: #efede0;
+}
+table.filelist {
+	border-bottom: 1px solid #9e9286;
+}
 
 
 /*

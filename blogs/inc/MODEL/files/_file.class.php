@@ -728,7 +728,9 @@ class File extends DataObject
 		if( ! isset( $this->_fsgroup_name ) )
 		{
 			$gid = @filegroup( $this->_adfp_full_path ); // might spit a warning for a dangling symlink
-			if( $gid !== false )
+
+			if( $gid !== false
+					&& function_exists( 'posix_getgrgid' ) ) // func does not exist on windows
 			{
 				$posix_group = posix_getgrgid( $gid );
 				if( is_array($posix_group) )
@@ -752,7 +754,8 @@ class File extends DataObject
 		if( ! isset( $this->_fsowner_name ) )
 		{
 			$uid = @fileowner( $this->_adfp_full_path ); // might spit a warning for a dangling symlink
-			if( $uid !== false )
+			if( $uid !== false
+					&& function_exists( 'posix_getpwuid' ) ) // func does not exist on windows
 			{
 				$posix_user = posix_getpwuid( $uid );
 				if( is_array($posix_user) )
@@ -1324,6 +1327,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/12 19:40:37  fplanque
+ * minor fixes
+ *
  * Revision 1.9  2006/03/29 23:24:01  blueyed
  * Fixed linking of files.
  *
