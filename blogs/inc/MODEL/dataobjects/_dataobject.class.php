@@ -529,7 +529,7 @@ class DataObject
 		}
 
 
-		/*
+		/* blueyed>
 		TODO: there's a bug here: you cannot use set_param('foo', 'number', 0), if the $parname member
 		      has not been set before or is null!!
 		      What about just:
@@ -537,6 +537,7 @@ class DataObject
 		      This would also eliminate the isset() check from above.
 		      IIRC you've once said here that '===' would be too expensive and I would misuse the DataObjects,
 		      but IMHO what we have now is not much faster and buggy anyway..
+			fp> okay let's give it a try...
 		*/
 		if( (!is_null($new_value) && $this->$parname == $new_value)
 			|| (is_null($this->$parname) && is_null($new_value)) )
@@ -647,6 +648,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/12 15:16:54  fplanque
+ * partial cleanup
+ *
  * Revision 1.3  2006/03/28 22:22:10  blueyed
  * todo for bug
  *

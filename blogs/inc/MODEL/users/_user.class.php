@@ -93,8 +93,9 @@ class User extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_users', 'user_', 'user_ID' );
 
-		// TODO: this will never get translated for the current User if he has another locale/lang set than default, because it gets adjusted AFTER instantiating him/her..
+		// blueyed> TODO: this will never get translated for the current User if he has another locale/lang set than default, because it gets adjusted AFTER instantiating him/her..
 		//       Use a callback (get_delete_restrictions/get_delete_cascades) instead? Should be also better for performance!
+		// fp> These settings should probably be merged with the global database description used by the installer/upgrader. However I'm not sure about how compelx plugins would be able to integrate then...
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_posts', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
 				array( 'table'=>'T_posts', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
@@ -924,6 +925,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/12 15:16:54  fplanque
+ * partial cleanup
+ *
  * Revision 1.6  2006/03/25 00:29:35  blueyed
  * todo
  *

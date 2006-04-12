@@ -201,6 +201,7 @@ $Form->begin_fieldset( T_('Features') );
 	{
 		$Form->info_field( T_('Admin skin'), $value_admin_skin, array( 'note' => T_('The skin defines how the backoffice appears to you.') ) );
 	}
+  // fp> TODO: We gotta have something like $edited_User->UserSettings->get('legend');
 	// To display or hide icon legend
 	$Form->checkbox( 'edited_user_legend', $UserSettings->get('legend', $edited_User->ID), T_('Display icon legend'), T_('Display a legend at the bottom of every page including all action icons used on that page.') );
 	// To activate or deactivate bozo validator
@@ -267,6 +268,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.9  2006/04/12 15:16:54  fplanque
+ * partial cleanup
+ *
  * Revision 1.8  2006/04/04 22:12:33  blueyed
  * Fixed setting usersettings for other users
  *

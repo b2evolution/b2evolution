@@ -633,7 +633,7 @@ class AdminUI_general
 				$perm = true; // By default
 
 				if( ! ($perm = $this->check_perm( $loop_details )) && ! isset($loop_details['text_noperm']) )
-				{ // If permission requested and not granted, and we have no alt text, display no tab:
+				{ // If permission requested but not granted, and we have no alt text, display no tab:
 					continue;
 				}
 
@@ -644,7 +644,7 @@ class AdminUI_general
 					$anchor .= $loop_details['href'];
 				}
 				elseif( !empty($loop_details['href_eval']) )
-				{ // TODO: I will remove this, if you don't use it, fplanque.. (blueyed)
+				{ // Useful for passing dynamic context vars (fp>> I AM using it)
 					$anchor .= eval( $loop_details['href_eval'] );
 				}
 				else
@@ -1284,6 +1284,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/12 15:16:54  fplanque
+ * partial cleanup
+ *
  * Revision 1.5  2006/04/11 21:56:27  blueyed
  * cleanup
  *
