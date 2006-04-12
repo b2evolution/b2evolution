@@ -39,7 +39,6 @@
 	border-left: 1px solid #bbb;
 	border-right: 1px solid #bbb;
 	background-color: #ddd; /* Temp color, needs overriding */
-
 }
 
 #fmbar_cwd {
@@ -82,7 +81,7 @@ table.filelist tr {
 table.filelist tr.odd {
 	background-color: #ddd;
 }
-table.filelist tr.even:hover,
+table.filelist tr:hover,
 table.filelist tr.odd:hover {
 	background-color:#ccc;
 }
@@ -167,7 +166,6 @@ table.filelist td.actions img {
 }
 table.filelist tr.listfooter td {
 	/* Temporary colors, needs overriding */
-	background-color: #efede0;
 	border-top: 1px solid #bbb;
 	background-color: #ddd;
 }

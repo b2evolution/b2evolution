@@ -209,6 +209,16 @@ div.edit_actions input.DeleteButton:hover {
 }
 
 
+/* Filemanager */
+
+#fm_bar {
+	border-top: 1px solid #9e9286;
+	border-left: 1px solid #9e9286;
+	border-right: 1px solid #9e9286;
+	background-color: #efede0;
+}
+
+
 /*
  * Results tables OVERRIDES:
  */
@@ -217,10 +227,12 @@ div.edit_actions input.DeleteButton:hover {
 table.grouped {
 	border: 1px solid #9e9286;
 }
-table.grouped tr {
+table.grouped tr,
+table.filelist tr {
 	background-color: #f5f3ef;
 }
-table.grouped tr.odd {
+table.grouped tr.odd,
+table.filelist tr.odd {
 	background-color: #efede0;
 }
 table.grouped tr.group td {
@@ -229,16 +241,20 @@ table.grouped tr.group td {
 	border-top: 1px solid #9e9286;
 	border-bottom: 1px solid #9e9286;
 }
-table.grouped td {
+table.grouped td,
+table.filelist td {
 	border-left: 1px solid #9e9286;
 }
 table.grouped tr:hover,
-table.grouped tr.odd:hover {
+table.grouped tr.odd:hover,
+table.filelist tr:hover,
+table.filelist tr.odd:hover {
 	background-color:#e3dfd0;
 }
 
 /* Table headers/footers: */
 table.grouped th,
+table.filelist th,
 table.grouped thead td,
 table.grouped tfoot td {
 	border-bottom: 1px solid #9e9286;
@@ -250,11 +266,18 @@ table.grouped th {
 }
 
 /* Table BASIC sort buttons/headers: */
-table.grouped th a.basic_current {
+table.grouped th a.basic_current,
+table.filelist th a.basic_current {
 	background-color:#e3dfd0;
 }
-table.grouped th a.basic_sort_link:hover {
+table.grouped th a.basic_sort_link:hover,
+table.filelist th a.basic_sort_link:hover {
 	background-color:#e3dfd0;
+}
+
+table.filelist tr.listfooter td {
+	border-top: 1px solid #9e9286;
+	background-color: #efede0;
 }
 
 /* / Results tables */
