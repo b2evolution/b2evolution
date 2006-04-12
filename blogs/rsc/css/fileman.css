@@ -14,73 +14,9 @@
 	margin-bottom:1em;
 }
 
-#fileman_dirtree {
-	float:left;
-	padding:1ex 1em;
-	max-width:50%;
-	overflow:hidden;
-}
-
 #FilesForm div.panelinfo {
 	margin:1ex 0;
 }
-
-/**
- * Files table {{{
- */
-#filemanmain table.grouped {
-	clear:right;
-}
-#filemanmain table.grouped td.error {
-	padding:2ex;
-	color:red;
-}
-#filemanmain table.grouped td.icon,
-#filemanmain table.grouped td.checkbox{
-}
-#filemanmain table.grouped td.type {
-	white-space:nowrap;
-}
-#filemanmain table.grouped td#fileman_error, /* used when an error (e.g. "no files") gets displayed */
-#filemanmain table.grouped td.fm_filename {
-	text-align: left;
-	width:100%; /* the glory hack: makes the table as wide as it should be */
-}
-#filemanmain table.grouped td.fm_filename div.path {
-	clear:right;
-	float:right;
-}
-.filemeta /* meta data after filename */
-{
-	color: #999;
-	font-size: 84%;
-}
-#filemanmain table.grouped td.timestamp {
-	white-space: nowrap;
-}
-#filemanmain table.grouped td.timestamp span.time {
-	font-size:84%;
-}
-#filemanmain table.grouped td.size,
-#filemanmain table.grouped td.actions {
-	white-space: nowrap;
-}
-#filemanmain table.grouped td.size {
-	text-align: right;
-}
-#filemanmain table.grouped td.perms {
-	text-align: center;
-}
-#filemanmain table.grouped td.actions img {
-	margin:0 2px;
-}
-#filemanmain table.grouped tr.listfooter td {
-	/* Temporary colors, needs overriding */
-	background-color: #efede0;
-	border: 1px solid #9e9286;
-}
-
-/* }}} / Files table */
 
 .toolbaritem {
 	margin:.5ex 0 .5ex 1ex;
@@ -90,16 +26,154 @@
 	background-color:#efede0; /* Temp color, needs overriding */
 }
 
-#fmbar_filecounts {
-	font-size:84%;
+
+#fm_browser {
+	clear: both;
+	width: 100%;
+	margin: 1ex auto;
 }
 
-#fmbar_filecounts,
-#fmbar_display_dirtree,
-#fmbar_cwd {
-	float:left;
-	margin-right:1ex;
+#fm_bar {
+	padding: .5ex;
+	border-top: 1px solid #bbb;
+	border-left: 1px solid #bbb;
+	border-right: 1px solid #bbb;
+	background-color: #ddd; /* Temp color, needs overriding */
+
 }
+
+#fmbar_cwd {
+	display: inline;
+}
+
+#fmbar_filecounts {
+	display: inline;
+	white-space: nowrap;
+	margin-left:1ex;
+	font-size: 84%;
+}
+
+#fm_dirtree {
+	vertical-align: top;
+	width: 15%;
+	padding: .5ex;
+	border: 1px solid #bbb;
+}
+#fm_files {
+	vertical-align: top;
+	padding: 0;
+	border: 1px solid #bbb;
+	background-color: #ddd;
+}
+
+
+
+/**
+ * Files table {{{
+ */
+table.filelist {
+	border-collapse: collapse;
+	width: 100%;
+	border-bottom: 1px solid #bbb;
+}
+table.filelist tr {
+	background-color: #eee;
+}
+table.filelist tr.odd {
+	background-color: #ddd;
+}
+table.filelist tr.even:hover,
+table.filelist tr.odd:hover {
+	background-color:#ccc;
+}
+table.filelist td {
+	border-left: 1px solid #bbb;
+	padding: .3ex 1ex;
+}
+table.filelist input.checkbox {
+	border:none;
+	background-color: #eee;
+}
+table.filelist tr.odd input.checkbox {
+	border:none;
+	background-color: #ddd;
+}
+
+
+/* Table headers/footers: */
+table.filelist th {
+	padding: .3ex 1ex;
+	border-bottom: 1px solid #bbb;
+	border-left: 1px solid #bbb;
+	background-color: #ddd;
+}
+table.filelist th img {
+	vertical-align: bottom;
+}
+
+/* Table BASIC sort buttons/headers: */
+table.filelist th a.basic_current,
+table.filelist th a.basic_sort_link {
+	padding: 0 1ex;
+	display: block;
+	height: 100%;
+}
+table.filelist th a.basic_current {
+	background-color:#ccc;
+}
+table.filelist th a.basic_sort_link:hover {
+	background-color:#ccc;
+}
+
+table.filelist td.error {
+	padding:2ex;
+	color:red;
+}
+table.filelist td.type {
+	white-space:nowrap;
+}
+table.filelist td#fileman_error, /* used when an error (e.g. "no files") gets displayed */
+table.filelist td.fm_filename {
+	text-align: left;
+	width:100%; /* the glory hack: makes the table as wide as it can be */
+}
+table.filelist td.fm_filename div.path {
+	clear:right;
+	float:right;
+}
+.filemeta /* meta data after filename */
+{
+	color: #999;
+	font-size: 84%;
+}
+table.filelist td.timestamp {
+	white-space: nowrap;
+}
+table.filelist td.timestamp span.time {
+	font-size:84%;
+}
+table.filelist td.size,
+table.filelist td.actions {
+	white-space: nowrap;
+}
+table.filelist td.size {
+	text-align: right;
+}
+table.filelist td.perms {
+	text-align: center;
+}
+table.filelist td.actions img {
+	margin:0;
+}
+table.filelist tr.listfooter td {
+	/* Temporary colors, needs overriding */
+	background-color: #efede0;
+	border-top: 1px solid #bbb;
+	background-color: #ddd;
+}
+
+/* }}} / Files table */
+
 
 
 div.fm_query {

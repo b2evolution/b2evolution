@@ -141,16 +141,6 @@ $Form->end_form();
 
 */ ?>
 
-<?php
-if( ! $fm_hide_dirtree )
-{
-	echo '<div id="fileman_dirtree">';
-	echo get_directory_tree();
-	echo '<br /><a href="'.regenerate_url('fm_hide_dirtree', 'fm_hide_dirtree=1').'">'.T_('Hide directory tree').'</a>';
-	echo '</div>';
-}
-?>
-
 
 <!-- THE MAIN FORM -->
 
@@ -166,44 +156,80 @@ if( ! $fm_hide_dirtree )
 ?>
 
 
-<table class="grouped" cellspacing="0">
-
-<?php
-/**
- * @global integer Number of cols for the files table, 6 is minimum.
- */
-$filetable_cols = 6
-	+ (int)$fm_flatmode
-	+ (int)$UserSettings->get('fm_showtypes')
-	+ (int)$UserSettings->get('fm_showfsperms')
-	+ (int)$UserSettings->get('fm_showfsowner')
-	+ (int)$UserSettings->get('fm_showfsgroup');
-?>
-
-<thead>
-<tr>
-	<td colspan="<?php echo $filetable_cols ?>" class="firstcol lastcol">
-
+<table id="fm_browser" cellspacing="0" cellpadding="0">
+	<thead>
+		<tr>
+			<td colspan="2" id="fm_bar">
 		<?php
+		echo '<div id="fmbar_roots">';
+
+		/*
+		 * -----------------------------------------------
+		 * Display ROOTs list:
+		 * -----------------------------------------------
+		 */
+		$rootlist = get_available_FileRoots();
+		if( count($rootlist) > 1 )
+		{ // provide list of roots to choose from
+			?>
+			<select name="new_root" onchange="this.form.submit();">
+
+			<?php
+			foreach( $rootlist as $l_FileRoot )
+			{
+				echo '<option value="'.$l_FileRoot->ID.'"';
+
+				if( $fm_Filelist->_FileRoot && $fm_Filelist->_FileRoot->ID == $l_FileRoot->ID )
+				{
+					echo ' selected="selected"';
+				}
+
+				echo '>'.format_to_output( $l_FileRoot->name )."</option>\n";
+			}
+			?>
+
+			</select>
+			<script type="text/javascript">
+				<!--
+				// Just to have noscript tag below (which has to know what type it is not for).
+				// -->
+			</script>
+			<noscript>
+				<input class="ActionButton" type="submit" value="'.T_('Change root').'" />
+			</noscript>
+
+      <?php
+		}
+
+ 		/*
+		 * Display link to display directory tree:
+		 */
+		if( $fm_hide_dirtree )
+		{
+			echo ' <a href="'.regenerate_url('fm_hide_dirtree', 'fm_hide_dirtree=0').'">'.T_('Display directory tree').'</a>';
+		}
+		else
+		{
+			echo ' <a href="'.regenerate_url('fm_hide_dirtree', 'fm_hide_dirtree=1').'">'.T_('Hide directory tree').'</a>';
+		}
+
+		echo '</div> ';
+
 		// -----------------------------------------------
 		// Display table header: directory location info:
 		// -----------------------------------------------
-		?>
-		<div id="fmbar_cwd">
-			<?php
-			// Display current dir:
-			echo T_('Current dir').': <strong class="currentdir">'.$fm_Filelist->get_cwd_clickable().'</strong>';
-			?>
-		</div>
+		echo '<div id="fmbar_cwd">';
+		// Display current dir:
+		echo T_('Current dir').': <strong class="currentdir">'.$fm_Filelist->get_cwd_clickable().'</strong>';
+		echo '</div> ';
 
-		<?php
 		// Display current filter:
 		if( $fm_Filelist->is_filtering() )
 		{
 			echo '<div id="fmbar_filter">';
 			echo '[<em class="filter">'.$fm_Filelist->get_filter().'</em>]';
 			// TODO: maybe clicking on the filter should open a JS popup saying "Remove filter [...]? Yes|No"
-			echo '</div>';
+			echo '</div> ';
 		}
 
 
@@ -229,24 +255,30 @@ $filetable_cols = 6
 			)
 		</div>
 
-		<?php
-		/*
-		 * Display link to display directory tree:
-		 */
-		?>
-		<div id="fmbar_display_dirtree">
-			<?php
-			if( $fm_hide_dirtree )
-			{
-				echo '<a href="'.regenerate_url('fm_hide_dirtree', 'fm_hide_dirtree=0').'">'.T_('Display directory tree').'</a>';
-			}
-			?>
-		</div>
+			</td>
+		</tr>
+	</thead>
 
-	</td>
+	<tbody>
+		<tr>
+<?php
 
-</tr>
+	// ______________________________ Directory tree ______________________________
+ 	if( ! $fm_hide_dirtree )
+	{
+		echo '<td id="fm_dirtree">';
 
+		echo get_directory_tree();
+
+		echo '</td>';
+	}
+
+
+	// ______________________________ Files ______________________________
+?>
+	<td id="fm_files">
+		<table class="filelist">
+			<thead>
 <?php
 	/*****************  Col headers  ****************/
 
@@ -297,12 +329,9 @@ $filetable_cols = 6
 	echo '<th class="lastcol nowrap">'. /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions').'</th>';
 	echo '</tr>';
 ?>
+			</thead>
 
-</thead>
-
-
-<tbody>
-
+			<tbody>
 <?php
 param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 
@@ -547,12 +576,24 @@ while( $lFile = & $fm_Filelist->get_next() )
 }
 // / End of file list..
 
+
+/**
+ * @global integer Number of cols for the files table, 6 is minimum.
+ */
+$filetable_cols = 6
+	+ (int)$fm_flatmode
+	+ (int)$UserSettings->get('fm_showtypes')
+	+ (int)$UserSettings->get('fm_showfsperms')
+	+ (int)$UserSettings->get('fm_showfsowner')
+	+ (int)$UserSettings->get('fm_showfsgroup');
+
+
 if( $countFiles == 0 )
 { // Filelist errors or "directory is empty"
 	?>
 
 	<tr>
-		<td>&nbsp;</td> <?php /* This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
+		<td>&nbsp;</td> <?php /* blueyed> This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
 		<td colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
 			<?php
 				if( ! $Messages->count( 'fl_error' ) )
@@ -650,8 +691,13 @@ else
 	<?php
 }
 ?>
-</tbody>
+					<tbody>
+				</table>
+				<!-- End of detailed file list -->
 
+			</td>
+		</tr>
+	</tbody>
 </table>
 
 <?php $Form->end_form() ?>
@@ -878,6 +924,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.10  2006/04/12 19:16:52  fplanque
+ * Integrated dirtree in filemanager
+ *
  * Revision 1.9  2006/03/29 23:24:01  blueyed
  * Fixed linking of files.
  *
