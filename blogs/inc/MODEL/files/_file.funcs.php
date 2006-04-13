@@ -661,12 +661,13 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 	$Nodelist->load();
 	$has_sub_dirs = $Nodelist->count_dirs();
 
-	$root_and_path = format_to_output( serialize( array( 'root' => $Root->ID, 'path' => $rootSubpath ) ), 'formvalue' );
 	$id_path = 'id_path_'.$instance_ID.md5( $path );
 
 	// the radio input to select this path
 	if( ! empty($params['disp_radios']) )
 	{
+		$root_and_path = format_to_output( implode( '::', array($Root->ID, $rootSubpath) ), 'formvalue' );
+
 		$r['string'] = '<input'
 			.' type="radio"'
 			.' name="root_and_path"'
@@ -729,6 +730,9 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.14  2006/04/13 00:10:52  blueyed
+ * cleanup
+ *
  * Revision 1.13  2006/04/12 19:12:58  fplanque
  * partial cleanup
  *

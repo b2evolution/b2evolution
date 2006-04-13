@@ -67,11 +67,9 @@ $AdminUI->set_path( 'files' );
 
 
 // INIT params:
-if( param( 'root_and_path', 'string', '', false ) )	// not memorized (default)
-{ // root and path together: decode and override (used in root switch select and "click tree")
-	$root_and_path = unserialize( $root_and_path ); // fp>> TODO: this sucks. Do not pass serialized vars through URL.
-	$root = $root_and_path['root'];
-	$path = $root_and_path['path'];
+if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
+{ // root and path together: decode and override (used by "radio-click-dirtree")
+	list( $root, $path ) = explode( '::', $root_and_path, 2 );
 	// Memorize new root:
 	memorize_param( 'root', 'string', NULL );
 	memorize_param( 'path', 'string', NULL );
@@ -1467,6 +1465,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.18  2006/04/13 00:10:52  blueyed
+ * cleanup
+ *
  * Revision 1.17  2006/04/12 19:12:58  fplanque
  * partial cleanup
  *
