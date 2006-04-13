@@ -292,7 +292,7 @@ class Blog extends DataObject
 					$blogurl .= $this->stub;
 				}
 				if( ($type == 'dynamic') && !( preg_match( '#.php$#', $blogurl ) ) )
-				{ // We want to force the dynamic page but the URL is not explicitely dynamic
+				{ // We want to force the dynamic page but the URL is not explicitly dynamic
 					$blogurl .= '.php';
 				}
 				return $blogurl;
@@ -308,7 +308,7 @@ class Blog extends DataObject
 	 *
 	 * @return mixed the path as string on success, false if the dir could not be created
 	 */
-	function getMediaDir()
+	function get_media_dir()
 	{
 		global $basepath, $media_subdir, $Messages, $Settings, $Debuglog;
 
@@ -372,7 +372,7 @@ class Blog extends DataObject
 	 *
 	 * @return string the URL
 	 */
-	function getMediaUrl()
+	function get_media_url()
 	{
 		global $media_url, $Settings, $Debuglog;
 
@@ -455,29 +455,20 @@ class Blog extends DataObject
 				}
 
 			case 'baseurlroot':
-				$blog_baseurl = $this->get('baseurl');
-
-				if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $blog_baseurl, $matches ) )
+				if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $this->get('baseurl'), $matches ) )
 				{
 					return $matches[1];
 				}
 
-				debug_die( 'Blog::get(baseurl) - assertion failed.' );
+				debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed.' );
 
 			case 'basehost':
-				$baseurl = $this->get('baseurl');
-				if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $baseurl, $matches ) )
+				if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $this->get('baseurl'), $matches ) )
 				{
-					$baseurlroot = $matches[1];
-					// echo "baseurlroot=$baseurlroot <br />";
-					$basehost = $matches[2];
-					// echo "basehost=$basehost <br />";
+					return $matches[2];
 				}
-				else
-				{
-					die( 'Your baseurl ('.$baseurl.') set in _config.php seems invalid. You probably missed the "http://" prefix or the trailing slash. Please correct that.' );
-				}
-				return $basehost;
+
+				debug_die( 'Blog::get(baseurl)/basehost - assertion failed.' );
 
 			case 'cookie_domain':
 				$basehost = $this->get('basehost');
@@ -541,9 +532,9 @@ class Blog extends DataObject
 			 */
 			case 'blog_css':
 				if( $this->allowblogcss
-					&& file_exists( $this->getMediaDir().'style.css' ) )
+					&& file_exists( $this->get_media_dir().'style.css' ) )
 				{
-					return '<link rel="stylesheet" href="'.$this->getMediaUrl().'style.css" type="text/css" />';
+					return '<link rel="stylesheet" href="'.$this->get_media_url().'style.css" type="text/css" />';
 				}
 				else
 				{
@@ -559,9 +550,9 @@ class Blog extends DataObject
 			case 'user_css':
 				if( $this->allowusercss
 					&& isset( $current_User )
-					&& file_exists( $current_User->getMediaDir().'style.css' ) )
+					&& file_exists( $current_User->get_media_dir().'style.css' ) )
 				{
-					return '<link rel="stylesheet" href="'.$current_User->getMediaUrl().'style.css" type="text/css" />';
+					return '<link rel="stylesheet" href="'.$current_User->get_media_url().'style.css" type="text/css" />';
 				}
 				else
 				{
@@ -751,6 +742,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/13 00:29:32  blueyed
+ * cleanup
+ *
  * Revision 1.3  2006/03/16 19:26:04  fplanque
  * Fixed & simplified media dirs out of web root.
  *

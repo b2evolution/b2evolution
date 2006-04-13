@@ -252,9 +252,11 @@ class User extends DataObject
 	/**
 	 * Get the path to the media directory. If it does not exist, it will be created.
 	 *
+	 * @todo Messages should get added to syslog, if we had one: it should not get displayed to a regular user (errors and success)!
+	 *
 	 * @return mixed the path as string on success, false if the dir could not be created
 	 */
-	function getMediaDir()
+	function get_media_dir()
 	{
 		global $basepath, $media_subdir, $Messages, $Settings, $Debuglog;
 
@@ -297,11 +299,11 @@ class User extends DataObject
 	 *
 	 * @return string the URL
 	 */
-	function getMediaUrl()
+	function get_media_url()
 	{
 		global $baseurl, $media_subdir, $Settings, $Debuglog;
 
- 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
+		if( ! $Settings->get( 'fm_enable_roots_user' ) )
 		{	// User directories are disabled:
 			$Debuglog->add( 'Attempt to access user media URL, but this feature is disabled', 'files' );
 			return false;
@@ -925,6 +927,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/13 00:29:32  blueyed
+ * cleanup
+ *
  * Revision 1.7  2006/04/12 15:16:54  fplanque
  * partial cleanup
  *

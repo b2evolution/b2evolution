@@ -85,15 +85,15 @@ class FileRoot
 			case 'user':
 				$User = & $UserCache->get_by_ID( $root_in_type_ID );
 				$this->name = $User->get( 'preferredname' );
-				$this->ads_path = $User->getMediaDir();
-				$this->ads_url = $User->getMediaUrl();
+				$this->ads_path = $User->get_media_dir();
+				$this->ads_url = $User->get_media_url();
 				return;
 
 			case 'collection':
 				$Blog = & $BlogCache->get_by_ID( $root_in_type_ID );
 				$this->name = $Blog->get( 'shortname' );
-				$this->ads_path = $Blog->getMediaDir();
-				$this->ads_url = $Blog->getMediaUrl();
+				$this->ads_path = $Blog->get_media_dir();
+				$this->ads_url = $Blog->get_media_url();
 				return;
 		}
 
@@ -120,6 +120,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/13 00:29:32  blueyed
+ * cleanup
+ *
  * Revision 1.3  2006/03/16 19:26:04  fplanque
  * Fixed & simplified media dirs out of web root.
  *
