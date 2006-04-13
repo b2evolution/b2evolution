@@ -1732,6 +1732,24 @@ class Plugin
 		return $help_file;
 	}
 
+
+	/**
+	 * Get a link to edit the Plugin's settings (if the user has permission).
+	 *
+	 * @return false|string
+	 */
+	function get_edit_settings_link()
+	{
+		global $current_User, $admin_url;
+
+		if( ! $current_User->check_perm( 'options', 'view', false ) )
+		{
+			return false;
+		}
+
+		return action_icon( T_('Edit plugin settings!'), 'edit', $admin_url.'?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$this->ID );
+	}
+
 	/*
 	 * Interface methods }}}
 	 */
@@ -1741,6 +1759,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.26  2006/04/13 01:36:27  blueyed
+ * Added interface method to edit Plugin settings (gets already used by YouTube Plugin)
+ *
  * Revision 1.25  2006/04/13 01:23:19  blueyed
  * Moved help related functions back to Plugin class
  *

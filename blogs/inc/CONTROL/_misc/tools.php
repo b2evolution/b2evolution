@@ -99,7 +99,7 @@ elseif( $tab_Plugin )
 	<div class="right_icons">
 
 	<?php
-	echo action_icon( T_('Edit plugin settings!'), 'edit', '?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$tab_Plugin->ID )
+	echo $tab_Plugin->get_edit_settings_link()
 		.' '.$tab_Plugin->get_help_link()
 		.' '.$tab_Plugin->get_README_link();
 	?>

@@ -114,7 +114,7 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 						echo action_icon( T_('Enable the plugin!'), 'activate', 'admin.php?ctrl=plugins&amp;action=enable_plugin&amp;plugin_ID='.$loop_Plugin->ID );
 					}
 
-					echo action_icon( T_('Edit plugin settings!'), 'edit', 'admin.php?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$loop_Plugin->ID );
+					echo $loop_Plugin->get_edit_settings_link();
 
 					echo action_icon( T_('Un-install this plugin!'), 'delete', 'admin.php?ctrl=plugins&amp;action=uninstall&amp;plugin_ID='.$loop_Plugin->ID );
 					?>
@@ -241,6 +241,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.12  2006/04/13 01:36:27  blueyed
+ * Added interface method to edit Plugin settings (gets already used by YouTube Plugin)
+ *
  * Revision 1.11  2006/04/13 01:23:19  blueyed
  * Moved help related functions back to Plugin class
  *
