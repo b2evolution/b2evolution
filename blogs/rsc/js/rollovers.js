@@ -28,7 +28,6 @@ function setupRollovers()
 		if(link.className && (' ' + link.className + ' ').indexOf(' rollover ') != -1)
 		{ // The link has the rollover class (among potentially other classes):
 			if( link.childNodes &&
-					link.childNodes.length == 1 &&
 					link.childNodes[0].nodeName.toLowerCase() == 'img')
 			{ // There is an image within the link,
 				// Set up event handlers:
