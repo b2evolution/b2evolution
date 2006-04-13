@@ -817,7 +817,7 @@ switch( $action )
 		global $inc_path;
 		require_once $inc_path.'_misc/_plugin.funcs.php';
 
-		if( ! $edit_Plugin || ! ($help_file = get_plugin_help_file( $edit_Plugin )) )
+		if( ! $edit_Plugin || ! ($help_file = $edit_Plugin->get_help_file()) )
 		{
 			$action = 'list';
 		}
@@ -1001,11 +1001,11 @@ switch( $action )
 
 		// Help icons (to homepage and README.html), if available:
 		$help_icons = array();
-		if( $help_www = get_plugin_help_link($edit_Plugin) )
+		if( $help_www = $edit_Plugin->get_help_link() )
 		{
 			$help_icons[] = $help_www;
 		}
-		if( $help_README = get_plugin_README_link($edit_Plugin, 'README') )
+		if( $help_README = $edit_Plugin->get_README_link() )
 		{
 			$help_icons[] = $help_README;
 		}

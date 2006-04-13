@@ -1635,6 +1635,103 @@ class Plugin
 		}
 	}
 
+
+	/**
+	 * Get a link to a help page (with icon).
+	 *
+	 * @param string Target; one of the following:
+	 *         - anchor to {@link $help_url} ("#anchor")
+	 *         - absolute link to some URL, e.g. "http://example.com/example.php"
+	 *         - empty for {@link $help_url}, then also the "www" icon gets used
+	 * @return string The html A tag, linking to the help.
+	 */
+	function get_help_link( $target = '' )
+	{
+		$title = '';
+		$icon = 'help';
+		$word = '';
+		$link_attribs = array( 'target' => 'help_plugin_'.$this->ID ); // TODO: use JS popup instead?
+
+		if( empty($target) )
+		{
+			$url = ! empty( $this->help_url ) ? $this->help_url : 'http://manual.b2evolution.net/Plugins/'.$this->classname;
+			$title = T_('Homepage of the plugin');
+			$icon = 'www';
+		}
+		elseif( substr($target, 0, 1) == '#' )
+		{ // anchor
+			$help_url = ! empty( $this->help_url ) ? $this->help_url : 'http://manual.b2evolution.net/Plugins/'.$this->classname;
+			$url = $help_url.$target;
+		}
+		elseif( preg_match( '~^https?://~', $target ) )
+		{ // absolute URL (strict match to allow other formats eventually later)
+			$url = $target;
+		}
+
+		return action_icon( $title, $icon, $url, $word, $link_attribs );
+	}
+
+
+	/**
+	 * Display a link to open the Plugin's README.html file in a JS popup, if available.
+	 *
+	 * @param string Word to be used after action icon
+	 * @return string Either the HTML A-tag or empty, if no README.html available
+	 */
+	function get_README_link( $word = '' )
+	{
+		if( ! $this->get_help_file() )
+		{
+			return '';
+		}
+
+		global $admin_url;
+
+		return action_icon( T_('Local documentation of the plugin'), 'help',
+				url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$this->ID ),
+				$word, array( 'use_js_popup'=>true, 'id'=>'anchor_help_plugin_'.$this->ID ) );
+	}
+
+
+	/**
+	 * Get the help file for a Plugin ID. README.LOCALE.html will take
+	 * precedence above the general (english) README.html.
+	 *
+	 * @todo Handle encoding of files (to $io_charset)
+	 *
+	 * @return false|string
+	 */
+	function get_help_file()
+	{
+		global $default_locale, $plugins_path, $current_User;
+
+		if( ! $current_User->check_perm( 'options', 'view', false ) )
+		{ // README gets displayed through plugins controller, which requires these perms
+			// TODO: Catch "disp_help" and "disp_help_plain" messages in plugins.php before general perms check!?
+			return false;
+		}
+
+		// Get the language. We use $default_locale because it does not have to be activated ($current_locale)
+		$lang = substr( $default_locale, 0, 2 );
+
+		$help_dir = $plugins_path.$this->classname.'/';
+
+		// Try help for the user's locale:
+		$help_file = $help_dir.'README.'.$lang.'.html';
+
+		if( ! file_exists($help_file) )
+		{ // Fallback: README.html
+			$help_file = $help_dir.'README.html';
+
+			if( ! file_exists($help_file) )
+			{
+				return false;
+			}
+		}
+
+		return $help_file;
+	}
+
 	/*
 	 * Interface methods }}}
 	 */
@@ -1644,6 +1741,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.25  2006/04/13 01:23:19  blueyed
+ * Moved help related functions back to Plugin class
+ *
  * Revision 1.24  2006/04/11 22:09:08  blueyed
  * Fixed validation of negative integers (and also allowed "+" at the beginning)
  *

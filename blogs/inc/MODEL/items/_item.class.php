@@ -1671,9 +1671,9 @@ class Item extends DataObject
 			echo '</label>';
 
 			// internal README.html link:
-			echo ' '.get_plugin_README_link( $loop_RendererPlugin );
+			echo ' '.$loop_RendererPlugin->get_README_link();
 			// external help link:
-			echo ' '.get_plugin_help_link( $loop_RendererPlugin );
+			echo ' '.$loop_RendererPlugin->get_help_link();
 
 			echo "</div>\n";
 		}
@@ -2488,6 +2488,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2006/04/13 01:23:19  blueyed
+ * Moved help related functions back to Plugin class
+ *
  * Revision 1.30  2006/04/11 22:28:58  blueyed
  * cleanup
  *

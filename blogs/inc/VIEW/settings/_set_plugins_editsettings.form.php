@@ -46,7 +46,7 @@ $Form = & new Form( NULL, 'pluginsettings_checkchanges' );
 $Form->hidden_ctrl();
 
 // Help icons, if available:
-if( get_plugin_help_file($edit_Plugin) )
+if( $edit_Plugin->get_help_file() )
 { // README in JS popup:
 	$Form->global_icon( T_('Local documentation of the plugin'), 'help',
 		url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$edit_Plugin->ID.'#'.$edit_Plugin->classname.'_settings' ), '', array('use_js_popup'=>true, 'id'=>'anchor_help_popup_'.$edit_Plugin->ID) );
@@ -153,6 +153,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.9  2006/04/13 01:23:19  blueyed
+ * Moved help related functions back to Plugin class
+ *
  * Revision 1.8  2006/04/05 19:16:34  blueyed
  * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
  *

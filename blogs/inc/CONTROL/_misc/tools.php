@@ -100,8 +100,8 @@ elseif( $tab_Plugin )
 
 	<?php
 	echo action_icon( T_('Edit plugin settings!'), 'edit', '?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$tab_Plugin->ID )
-		.' '.get_plugin_help_link($tab_Plugin)
-		.' '.get_plugin_README_link($tab_Plugin);
+		.' '.$tab_Plugin->get_help_link()
+		.' '.$tab_Plugin->get_README_link();
 	?>
 
 	</div>

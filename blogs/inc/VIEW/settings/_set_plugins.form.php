@@ -96,8 +96,8 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 				<?php
 				echo action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID ) );
 				// Help icons, if available:
-				echo get_plugin_help_link($loop_Plugin)
-					.' '.get_plugin_README_link($loop_Plugin);
+				echo $loop_Plugin->get_help_link()
+					.' '.$loop_Plugin->get_README_link();
 				?>
 			</td>
 			<?php
@@ -194,11 +194,11 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 				echo action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID ) );
 				// Help icons, if available:
 				$help_icons = array();
-				if( $help_external = get_plugin_help_link($loop_Plugin) )
+				if( $help_external = $loop_Plugin->get_help_link() )
 				{
 					$help_icons[] = $help_external;
 				}
-				if( $help_internal = get_plugin_README_link($loop_Plugin) )
+				if( $help_internal = $loop_Plugin->get_README_link() )
 				{
 					$help_icons[] = $help_internal;
 				}
@@ -241,6 +241,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.11  2006/04/13 01:23:19  blueyed
+ * Moved help related functions back to Plugin class
+ *
  * Revision 1.10  2006/04/11 22:28:58  blueyed
  * cleanup
  *
