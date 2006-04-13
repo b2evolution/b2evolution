@@ -269,7 +269,7 @@ function stats_basedomain( $disp = true )
 /**
  * Displays keywords used for search leading to this page
  *
- * @todo link keyword param tio search engine
+ * @todo link keyword param to search engine ()
  */
 function stats_search_keywords( $ref )
 {
@@ -291,6 +291,7 @@ function stats_search_keywords( $ref )
 				or $param_parts[0] == 'qs'
 				or $param_parts[0] == 'r'
 				or $param_parts[0] == 'rdata'				// search.ke.voila.fr
+				or $param_parts[0] == 'su'				// suche.web.de
 			)
 		{ // found "q" query parameter
 			$q = urldecode($param_parts[1]);
@@ -355,6 +356,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/13 13:43:10  blueyed
+ * Use "://suche." generally as search referer; added "su" search param part
+ *
  * Revision 1.3  2006/03/12 23:08:59  fplanque
  * doc cleanup
  *

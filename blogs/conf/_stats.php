@@ -58,7 +58,7 @@ $blackList = array(
  * The following substrings will be looked up in the referer http header
  * in order to identify search engines
  *
- * @todo move to admin interface?
+ * @todo move to admin interface, include query params
  *
  * @global array $search_engines
  */
@@ -69,6 +69,7 @@ $search_engines = array(
 	'.excite.',
 	'.voila.fr/',
 	'http://search',
+	'://suche.',
 	'search.',
 	'search2.',
 	'http://recherche',
@@ -107,8 +108,6 @@ $search_engines = array(
 	'reacteur.com/',
 	'http://www.lmi.fr/',
 	'kartoo.com/',
-	'suche.t-online.de/',
-	'suche.freenet.de/',
 	'icq.com/search',
 );
 
