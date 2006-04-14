@@ -78,6 +78,11 @@ input.radio {
 	padding: 0;
 	margin: 0;
 }
+input.field_required,
+select.field_required,
+textarea.field_required {
+	background-image:  url("../icons/mandatory_star_desert.gif");
+}
 form.fform fieldset {
 	border-color: #eee7e0;
 }

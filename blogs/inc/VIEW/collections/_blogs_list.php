@@ -145,7 +145,7 @@ else
 
 if( $current_User->check_perm( 'blogs', 'create' ) )
 {
-	echo '<p class="center">'.action_icon( T_('New blog...'), 'new', url_add_param( $dispatcher, 'ctrl=collections&amp;action=new' ), T_('New blog...') ).'</p>';
+	echo '<p class="center">'.action_icon( T_('New blog...'), 'new', url_add_param( $dispatcher, 'ctrl=collections&amp;action=new' ), T_('New blog...'), 3, 4 ).'</p>';
 }
 ?>
 </div>

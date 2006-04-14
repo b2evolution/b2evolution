@@ -2010,15 +2010,18 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  * @param string icon code, see {@link $map_iconfiles}
  * @param string icon code for {@link get_icon()}
  * @param string word to be displayed after icon
+ * @param integer 1-5: weight of the icon. the icon will be displayed only if its weight is >= than the user setting threshold
+ * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
  * @param array Additional attributes to the A tag. It may also contain these params:
  *              'use_js_popup': if true, the link gets opened as JS popup. You must also pass an "id" attribute for this!
  * @return string The generated action icon link.
  */
-function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array() )
+function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word_weight = 1, $link_attribs = array( 'class'=>'action_icon' ) )
 {
+	global $UserSettings;
 
 	$link_attribs['href'] = $url;
-	$link_attribs['title'] = $url;
+	$link_attribs['title'] = $title;
 
 	if( get_icon( $icon, 'rollover' ) )
 	{
@@ -2033,7 +2036,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array()
 	}
 
 	// "use_js_popup": open link in a JS popup
-	if( ! empty($link_attribs['use_js_popup']) )
+	if( isset($link_attribs['use_js_popup']) )
 	{
 		$popup_js = 'var win = new PopupWindow(); win.autoHide(); win.setUrl( \''.$link_attribs['href'].'\' ); win.setSize( 500, 400 ); win.showPopup(\''.$link_attribs['id'].'\'); return false;';
 		if( empty( $link_attribs['onclick'] ) )
@@ -2048,12 +2051,39 @@ function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array()
 	}
 
 	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
-	$r = '<a '.get_field_attribs_as_string( $link_attribs, false ).'>'.get_icon( $icon, 'imgtag', array( 'title'=>$title ), true );
-	if( !empty($word) )
-	{
-		$r .= $word;
+	$r = '<a '.get_field_attribs_as_string( $link_attribs, false ).'>';
+
+	$display_icon = ($icon_weight >= $UserSettings->get('action_icon_threshold'));
+	$display_word = ($word_weight >= $UserSettings->get('action_word_threshold'));
+
+	if( $display_icon || ! $display_word )
+	{	// We MUST display an action icon in order to make the user happy:
+		// OR we default to icon because the user doesn't want the word either!!
+
+		$r .= get_icon( $icon, 'imgtag', array( 'title'=>$title ), true );
 	}
-	$r .= '</a> ';
+
+	if( $display_word )
+	{	// We MUST display an action word in order to make the user happy:
+
+		if( $display_icon )
+		{ // We already have an icon, display a SHORT word:
+			if( !empty($word) )
+			{	// We have provided a short word:
+				$r .= $word;
+			}
+			else
+			{	// We fall back to alt:
+				$r .= get_icon( $icon, 'legend' );
+			}
+		}
+		else
+		{	// No icon display, let's display a LONG word/text:
+			$r .= trim( $title, ' .!' );
+		}
+	}
+
+	$r .= '</a>';
 
 	return $r;
 }
@@ -2066,7 +2096,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $link_attribs = array()
  *
  * @uses $map_iconfiles
  * @param string icon for what? (key)
- * @param string what to return for that icon ('imgtag', 'alt', 'file', 'url', 'size' {@link imgsize()})
+ * @param string what to return for that icon ('imgtag', 'alt', 'legend', 'file', 'url', 'size' {@link imgsize()})
  * @param array additional params (
  *              'class' => class name when getting 'imgtag',
  *              'size' => param for 'size',
@@ -2096,20 +2126,40 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			return false;
 			/* BREAK */
 
+
 		case 'file':
 			return $basepath.$iconfile;
 			/* BREAK */
 
+
 		case 'alt':
 			if( isset( $map_iconfiles[$iconKey]['alt'] ) )
-			{ // alt-tag from $map_iconfiles
+			{ // alt tag from $map_iconfiles
 				return $map_iconfiles[$iconKey]['alt'];
 			}
 			else
-			{ // $iconKey as alt-tag
+			{ // fallback to $iconKey as alt-tag
 				return $iconKey;
 			}
 			/* BREAK */
+
+
+		case 'legend':
+			if( isset( $map_iconfiles[$iconKey]['legend'] ) )
+			{ // legend tag from $map_iconfiles
+				return $map_iconfiles[$iconKey]['legend'];
+			}
+			else
+			if( isset( $map_iconfiles[$iconKey]['alt'] ) )
+			{ // alt tag from $map_iconfiles
+				return $map_iconfiles[$iconKey]['alt'];
+			}
+			else
+			{ // fallback to $iconKey as alt-tag
+				return $iconKey;
+			}
+			/* BREAK */
+
 
 		case 'class':
 			if( isset($map_iconfiles[$iconKey]['class']) )
@@ -2156,6 +2206,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			}
 			/* BREAK */
 
+
 		case 'imgtag':
 			$r = '<img src="'.$baseurl.$iconfile.'" ';
 
@@ -2163,20 +2214,17 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			$r .= 'border="0" align="top" ';
 
 			// Include class (will default to "middle"):
-			$r .= 'class="';
-			if( isset( $params['class'] ) )
+			if( ! isset( $params['class'] ) )
 			{
-				$r .= $params['class'];
+				if( isset($map_iconfiles[$iconKey]['class']) )
+				{	// This icon has a class
+					$params['class'] = $map_iconfiles[$iconKey]['class'];
+				}
+				else
+				{
+					$params['class'] = 'middle';
+				}
 			}
-			elseif( isset($map_iconfiles[$iconKey]['class']) )
-			{	// This icon has a class
-				$r .= $map_iconfiles[$iconKey]['class'];
-			}
-			else
-			{
-				$r .= 'middle';
-			}
-			$r .= '" ';
 
 			// Include size (optional):
 			if( isset( $map_iconfiles[$iconKey]['size'] ) )
@@ -2184,27 +2232,25 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				$r .= 'width="'.$map_iconfiles[$iconKey]['size'][0].'" height="'.$map_iconfiles[$iconKey]['size'][1].'" ';
 			}
 
-			// Include title (optional):
-			$r .= ( isset( $params['title'] ) ? 'title="'.$params['title'].'" ' : '' );
-
 			// Include alt (XHTML mandatory):
-			$r .= 'alt="';
-			if( isset( $params['alt'] ) )
+			if( ! isset( $params['alt'] ) )
 			{
-				$r .= $params['alt'];
+				if( isset( $map_iconfiles[$iconKey]['alt'] ) )
+				{ // alt-tag from $map_iconfiles
+					$params['alt'] = $map_iconfiles[$iconKey]['alt'];
+				}
+				else
+				{ // $iconKey as alt-tag
+					$params['alt'] = $iconKey;
+				}
 			}
-			elseif( isset( $map_iconfiles[$iconKey]['alt'] ) )
-			{ // alt-tag from $map_iconfiles
-				$r .= $map_iconfiles[$iconKey]['alt'];
-			}
-			else
-			{ // $iconKey as alt-tag
-				$r .= $iconKey;
-			}
-			$r .= '" ';
+
+			// Add all the attributes:
+			$r .= get_field_attribs_as_string( $params, false );
 
 			// Close tag:
 			$r .= '/>';
+
 
 			if( $include_in_legend && isset( $IconLegend ) )
 			{ // This icon should be included into the legend:
@@ -2523,7 +2569,8 @@ function format_phone( $phone, $hide_country_dialing_code_if_same_as_locale = tr
 		$dialing_code = $CountryCache->extract_country_dialing_code( substr( $phone, 1 ) );
 	}
 
-	if( ( locale_dialing_code() == $dialing_code ) && $hide_country_dialing_code_if_same_as_locale )
+	if( !is_null( $dialing_code ) && ( locale_dialing_code() == $dialing_code ) 
+			&& $hide_country_dialing_code_if_same_as_locale )
 	{	// The phone dialing code is same as locale and we want to hide it in this case
 		if( ( strlen( $phone ) - strlen( $dialing_code ) ) == 10 )
 		{	// We can format it like a french phone number ( 0x.xx.xx.xx.xx )
@@ -2620,27 +2667,30 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 {
 	$r = '';
 
-	foreach( $field_attribs as $l_attr => $l_value )
+	if( ! empty( $field_attribs ) )
 	{
-		if( $l_value === '' || $l_value === NULL )
-		{ // don't generate empty attributes (it may be NULL if we pass 'value' => NULL as field_param for example, because isset() does not match it!)
-			continue;
-		}
-
-		if( $format_to_output )
+		foreach( $field_attribs as $l_attr => $l_value )
 		{
-			if( $l_attr == 'value' )
+			if( $l_value === '' || $l_value === NULL )
+			{ // don't generate empty attributes (it may be NULL if we pass 'value' => NULL as field_param for example, because isset() does not match it!)
+				continue;
+			}
+
+			if( $format_to_output )
 			{
-				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
+				if( $l_attr == 'value' )
+				{
+					$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
+				}
+				else
+				{
+					$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
+				}
 			}
 			else
 			{
-				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
+				$r .= ' '.$l_attr.'="'.$l_value.'"';
 			}
-		}
-		else
-		{
-			$r .= ' '.$l_attr.'="'.$l_value.'"';
 		}
 	}
 
@@ -2711,6 +2761,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.30  2006/04/14 19:16:07  fplanque
+ * icon cleanup
+ *
  * Revision 1.29  2006/04/11 15:58:59  fplanque
  * made validate_url() more laxist because there's always a legitimate use for a funky char in a query string
  * (might need to be even more laxist...) but I'd like to make sure people don't type in just anything

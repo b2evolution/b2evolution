@@ -106,7 +106,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=delete\')%' ),
 						);
 
-  $Results->global_icon( T_('Add a file type...'), 'new', regenerate_url( 'action', 'action=new'), T_('Add file type') );
+  $Results->global_icon( T_('Add a file type...'), 'new', regenerate_url( 'action', 'action=new'), T_('Add file type'), 3, 4  );
 }
 
 

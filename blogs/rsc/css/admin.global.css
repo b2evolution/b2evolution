@@ -58,3 +58,25 @@ ul.plain {
 	margin:0;
 	padding:0;
 }
+
+
+.action_icon {
+	margin: 0 2px;
+	font-size: 84%;
+}
+
+
+
+/*
+ * Icon legend
+ */
+#icon_legend {
+	border: 1px solid #666;
+	background-color: #ddd;
+	margin : 1em;
+	padding: 5px;
+}
+span.legend_element {
+	white-space: nowrap;
+}
+

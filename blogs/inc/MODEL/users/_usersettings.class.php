@@ -47,6 +47,9 @@ class UserSettings extends AbstractSettings
 	 * @var array
 	 */
 	var $_defaults = array(
+		'action_icon_threshold' => 3,
+		'action_word_threshold' => 3,
+		'control_form_abortions' => 1,
 		'pref_browse_tab' => 'posts',
 	);
 
@@ -173,6 +176,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/14 19:20:19  fplanque
+ * icon cleanup
+ *
  * Revision 1.6  2006/03/15 00:24:59  blueyed
  * fixed UserSettings::param_Request()
  *

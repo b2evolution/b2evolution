@@ -55,15 +55,19 @@ class Widget
 	 * @param string TITLE text (IMG and A link)
 	 * @param string icon code, see {@link $map_iconfiles}
 	 * @param string icon code for {@link get_icon()}
+	 * @param integer 1-5: weight of the icon. the icon will be displayed only if its weight is >= than the user setting threshold
+	 * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
 	 * @param array Additional attributes to the A tag. See {@link action_icon()}.
 	 */
-	function global_icon( $title, $icon, $url, $word = '', $link_attribs = array() )
+	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array( 'class'=>'action_icon' ) )
 	{
 		$this->global_icons[] = array(
 			'title' => $title,
 			'icon'  => $icon,
 			'url'   => $url,
 			'word'  => $word,
+			'icon_weight'  => $icon_weight,
+			'word_weight'  => $word_weight,
 			'link_attribs' => $link_attribs );
 	}
 
@@ -149,7 +153,8 @@ class Widget
 
 		foreach( $this->global_icons as $icon_params )
 		{
-			$r .= action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'], $icon_params['word'], $icon_params['link_attribs'] );
+			$r .= action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'], $icon_params['word'],
+						$icon_params['icon_weight'], $icon_params['word_weight'], $icon_params['link_attribs'] );
 		}
 
 		return $r;

@@ -81,7 +81,7 @@ span.checkbox_surround_init {
 input.field_required,
 select.field_required,
 textarea.field_required {
-	background-image:  url("../icons/mandatory_star_desert.gif");
+	background-image:  url("../icons/mandatory_star_small.gif");
 	background-position: right center;
 	background-repeat: no-repeat;
 }

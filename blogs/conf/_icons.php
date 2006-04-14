@@ -178,16 +178,24 @@ $map_iconfiles = array(
 	),
 
 
-	'collapse' => array(
-		'file' => $rsc_subdir.'icons/collapse.gif',
-		'alt'  => T_('Close'),
-		'size' => array( 16, 16 ),
-	),
 	'expand' => array(
 		'file' => $rsc_subdir.'icons/expand.gif',
-		'alt'  => T_('Open'),
-		'size' => array( 16, 16 ),
+		'alt'  => '+',
+		'legend' => T_('Expand'),
+		'size' => array( 15, 15 ),
 	),
+	'collapse' => array(
+		'file' => $rsc_subdir.'icons/collapse.gif',
+		'alt'  => '-',
+		'legend' => T_('Collapse'),
+		'size' => array( 15, 15 ),
+	),
+	'noexpand' => array(
+		'file' => $rsc_subdir.'icons/blank.gif',
+		'alt'  => '&nbsp;',
+		'size' => array( 15, 15 ),
+	),
+
 	'reload' => array(
 		'file' => $rsc_subdir.'icons/reload.png',
 		'alt'  => T_('Reload'),
@@ -225,6 +233,7 @@ $map_iconfiles = array(
 
 	'new' => array(
 		'file' => $rsc_subdir.'icons/new.gif',
+		'rollover' => true,
 		'alt'  => T_('New'),
 		'size' => array( 16, 15 ),
 	),
