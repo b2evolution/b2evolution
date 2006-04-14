@@ -66,6 +66,10 @@
 }
 
 
+/* Directory tree: */
+.folder_in_tree {
+	white-space:nowrap;
+}
 
 /**
  * Files table {{{

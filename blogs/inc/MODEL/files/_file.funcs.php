@@ -626,7 +626,7 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 	static $js_closeClickIDs; // clickopen IDs that should get closed
 	static $instance_ID = 0;
 
-
+	// ________________________ Handle Roots ______________________
 	if( $Root === NULL )
 	{ // This is the top level call:
 		$instance_ID++;
@@ -655,6 +655,8 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 
 		return $r;
 	}
+	// _______________________________________________________________________
+
 
 	// We'll go through files in current dir:
 	$Nodelist = new Filelist( $Root, trailing_slash($path) );
@@ -663,45 +665,48 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 
 	$id_path = 'id_path_'.$instance_ID.md5( $path );
 
-	// the radio input to select this path
+	$r['string'] = '<span class="folder_in_tree">';
+
+	// Optional radio input to select this path:
 	if( ! empty($params['disp_radios']) )
 	{
 		$root_and_path = format_to_output( implode( '::', array($Root->ID, $rootSubpath) ), 'formvalue' );
 
-		$r['string'] = '<input'
+		$r['string'] .= '<input'
 			.' type="radio"'
 			.' name="root_and_path"'
 			.' value="'.$root_and_path.'"'
 			.' id="radio_'.$id_path.'"'
 			.( $Root->ID == $fm_FileRoot->ID && $rootSubpath == $fm_Filelist->get_rds_list_path() ? ' checked="checked"' : '' )
 			//.( ! $has_sub_dirs ? ' style="margin-right:'.get_icon( 'collapse', 'size', array( 'size' => 'width' ) ).'px"' : '' )
-			.' /> ';
-	}
-	else
-	{
-		$r['string'] = '';
+			.' /> &nbsp; &nbsp;';
 	}
 
+ 	$r['opened'] = ( $Root->ID == $fm_FileRoot->ID && $rootSubpath == $fm_Filelist->get_rds_list_path() ) ? true : NULL;
+
+	// Folder Icon + Name:
 	$label = '<label for="radio_'.$id_path.'">'
+		.action_icon( T_('Open this directory in the file manager'), 'folder',
+						regenerate_url( 'root,path,fm_disp_browser', 'root='.$Root->ID.'&amp;path='.$rootSubpath.'&amp;fm_disp_browser=1' ) )
 		.'<a href="'.regenerate_url( 'root,path,fm_disp_browser', 'root='.$Root->ID.'&amp;path='.$rootSubpath.'&amp;fm_disp_browser=1' ).'"
-		title="'.T_('Open this directory in the Filemanager').'">'
+		title="'.T_('Open this directory in the file manager').'">'
 		.( empty($rootSubpath) ? $Root->name : basename( $path ) )
 		.'</a>'
 		.'</label>';
 
-	$r['opened'] = ( $Root->ID == $fm_FileRoot->ID && $rootSubpath == $fm_Filelist->get_rds_list_path() ) ? true : NULL;
-
+	// Handle potential subdir:
 	if( ! $has_sub_dirs )
-	{
-		$r['string'] .= $label;
+	{	// No subirs
+		$r['string'] .= get_icon( 'noexpand' ).'&nbsp;'.$label.'</span>';
 		return $r;
 	}
 	else
 	{ // Process subdirs
-		$r['string'] .= $label
-			.' <img src="'.get_icon( 'collapse', 'url' ).'"'
-				.' onclick="toggle_clickopen(\''.$id_path.'\');"'
-				.' id="clickimg_'.$id_path.'" alt="+ / -" />'
+		$r['string'] .= get_icon( 'collapse', 'imgtag', array(
+					'onclick' => 'toggle_clickopen(\''.$id_path.'\');',
+					'id' => 'clickimg_'.$id_path
+				) )
+			.'&nbsp;'.$label.'</span>'
 			.'<ul class="clicktree" id="clickdiv_'.$id_path.'">'."\n";
 
 		while( $l_File = & $Nodelist->get_next( 'dir' ) )
@@ -730,6 +735,9 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.15  2006/04/14 19:34:40  fplanque
+ * folder tree reorganization
+ *
  * Revision 1.14  2006/04/13 00:10:52  blueyed
  * cleanup
  *
@@ -895,6 +903,5 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
  *
  * Revision 1.9  2004/10/12 17:22:30  fplanque
  * Edited code documentation.
- * }}}
  */
 ?>

@@ -593,8 +593,8 @@ if( $countFiles == 0 )
 	?>
 
 	<tr>
-		<td>&nbsp;</td> <?php /* blueyed> This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
-		<td colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
+		<td class="firstcol">&nbsp;</td> <?php /* blueyed> This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
+		<td class="lastcol" colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
 			<?php
 				if( ! $Messages->count( 'fl_error' ) )
 				{ // no Filelist errors, the directory must be empty
@@ -614,7 +614,7 @@ else
 	// Footer with "check all", "with selected: ..":
 	// --------------
 	?>
-	<tr class="listfooter">
+	<tr class="listfooter firstcol lastcol">
 		<td colspan="<?php echo $filetable_cols ?>">
 
 		<?php	echo $Form->check_all(); ?>
@@ -924,6 +924,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.11  2006/04/14 19:34:40  fplanque
+ * folder tree reorganization
+ *
  * Revision 1.10  2006/04/12 19:16:52  fplanque
  * Integrated dirtree in filemanager
  *
