@@ -176,24 +176,9 @@ $ItemList->cols[] = array(
 		'td' => '%item_edit_actions( {Obj} )%',
 	);
 
-if( $current_User->check_perm( 'tasks', 'add', false, NULL ) )
-{	// User can add a task:
-	if( isset( $edited_Contact ) )
-	{
-		$ItemList->global_icon( T_('Add a linked task...'), 'new',
-			regenerate_url( 'action,cont_ID', 'action=new&amp;cont_ID='.$edited_Contact->ID, 'tasks.php' ), T_('Add linked task') );
-	}
-	else
-	{
-		$ItemList->global_icon( T_('Add a task...'), 'new', regenerate_url( 'action', 'action=new', 'tasks.php' ), T_('Add task') );
-	}
-}
-
-
-
 if( $current_User->check_perm( 'blog_post_statuses', 'any', false, $Blog->ID ) )
 {	// We have permission to add a post with at least one status:
-	$ItemList->global_icon( T_('Add a post...'), 'new', $add_item_url, T_('Add post') );
+	$ItemList->global_icon( T_('Add a post...'), 'new', $add_item_url, T_('Add post'), 3, 4 );
 }
 
 
@@ -211,6 +196,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/14 19:21:55  fplanque
+ * icon cleanup + fixes
+ *
  * Revision 1.3  2006/03/13 20:57:40  blueyed
  * fix
  *

@@ -106,7 +106,7 @@
 	if( $current_User->check_perm( 'files', 'view' ) )
 	{
 		$Results->global_icon( T_('Link a file...'), 'link',
-														'admin.php?ctrl=files&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('File') );
+														'admin.php?ctrl=files&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID, T_('Link file'), 3, 4 );
 	}
 
 	$Results->display();

@@ -306,7 +306,7 @@ $ItemList->display_nav( 'footer' );
 
 <p class="center">
 	<?php
-	echo action_icon( T_('New post...'), 'new', $add_item_url, T_('New post...') );
+	echo action_icon( T_('New post...'), 'new', $add_item_url, T_('New post...'), 3, 4 );
 	?>
 </p>
 
@@ -314,6 +314,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.10  2006/04/14 19:21:55  fplanque
+ * icon cleanup + fixes
+ *
  * Revision 1.9  2006/03/28 22:23:16  blueyed
  * Display spam karma for comments in posts list
  *

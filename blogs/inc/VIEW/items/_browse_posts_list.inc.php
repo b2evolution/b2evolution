@@ -201,7 +201,7 @@ if( $MainList->get_total_num_posts() )
 
 <p class="center">
 	<?php
-	echo action_icon( T_('New post...'), 'new', $add_item_url, T_('New post...') );
+	echo action_icon( T_('New post...'), 'new', $add_item_url, T_('New post...'), 3, 4 );
 	?>
 </p>
 
@@ -209,6 +209,9 @@ if( $MainList->get_total_num_posts() )
 <?php
 /*
  * $Log$
+ * Revision 1.8  2006/04/14 19:21:55  fplanque
+ * icon cleanup + fixes
+ *
  * Revision 1.7  2006/03/18 19:43:57  blueyed
  * Missing globals
  *
