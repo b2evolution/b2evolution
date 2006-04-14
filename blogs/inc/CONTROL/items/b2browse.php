@@ -253,7 +253,7 @@ if( $blog )
 	{
 		case 'comments':
 			// Display VIEW:
-			$AdminUI->disp_view( 'comments/_browse_comments.inc' );
+			$AdminUI->disp_view( 'comments/_browse_comments.inc.php' );
 			break;
 
 		default:
@@ -266,29 +266,29 @@ if( $blog )
 				{
 					case 'postlist':
 						// Display VIEW:
-						$AdminUI->disp_view( 'items/_browse_posts_list.inc' );
+						$AdminUI->disp_view( 'items/_browse_posts_list.inc.php' );
 						break;
 
 					case 'postlist2':
 						// Display VIEW:
-						$AdminUI->disp_view( 'items/_browse_posts_list2.view' );
+						$AdminUI->disp_view( 'items/_browse_posts_list2.view.php' );
 						break;
 
 					case 'posts':
 						// Display VIEW:
-						$AdminUI->disp_view( 'items/_browse_posts_exp.inc' );
+						$AdminUI->disp_view( 'items/_browse_posts_exp.inc.php' );
 						break;
 
 					case 'tracker':
 						// Display VIEW:
-						$AdminUI->disp_view( 'items/_browse_tracker.inc' );
+						$AdminUI->disp_view( 'items/_browse_tracker.inc.php' );
 						break;
 				}
 			echo '</td>';
 
 			echo '<td class="browse_right_col">';
 				// Display VIEW:
-				$AdminUI->disp_view( 'items/_browse_posts_sidebar.inc' );
+				$AdminUI->disp_view( 'items/_browse_posts_sidebar.inc.php' );
 			echo '</td>';
 
 			echo '</tr></table>';

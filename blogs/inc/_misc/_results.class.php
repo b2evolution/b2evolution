@@ -134,7 +134,6 @@ class Results extends Widget
 	 */
 	var $cols;
 
-
 	/**
 	 * Lazy filled.
 	 */
@@ -668,120 +667,215 @@ class Results extends Widget
 
 
 		// DISPLAY COLUMN HEADERS:
-		$col_count = 0;
-		$col_names = array();
-		if( isset( $this->cols) ) foreach( $this->cols as $col )
-		{ // For each column:
+		if( isset( $this->cols ) )
+		{
 
-			if( isset( $col['th_start'] ) )
-			{ // We have a customized column start for this one:
-				echo $col['th_start'];
-			}
-			elseif( ($col_count==0) && isset($this->params['colhead_start_first']) )
-			{ // First column can get special formatting:
-				echo $this->params['colhead_start_first'];
-			}
-			elseif( ($col_count==count($this->cols)-1) && isset($this->params['colhead_start_last']) )
-			{ // Last column can get special formatting:
-				echo $this->params['colhead_start_last'];
-			}
-			else
-			{ // Regular columns:
-				echo $this->params['colhead_start'];
+			if( !isset($this->nb_cols) )
+			{	// Needed for sort strings:
+				$this->nb_cols = count($this->cols);
 			}
 
-			if( isset( $col['order'] ) )
-			{ //the column can be ordered
-
-				$order_asc = '';
-				$order_desc = '';
-				$color_asc = '';
-				$color_desc = '';
-
-				for( $i = 0, $icount = count($this->cols); $i < $icount; $i++)
-				{ // construction of the values which can be taken by $order
-					if( !empty( $this->default_col ) && !strcasecmp( $col['order'], $this->default_col ) )
-					{ // there is a default order
-						$order_asc.='A';
-						$order_desc.='D';
+			//
+			$current_colspan = 1;
+			$th_group_activated = false; 
+			
+			// Loop on all columns to define headers cells array we have to display and set all colspans:
+			foreach( $this->cols as $key=>$col )
+			{
+				if( isset( $col['th_group'] ) )
+				{ // The column is grouped with anoter column:
+					if( $current_colspan == 1 )
+					{	//It's the first column of the colspan, so initialize in the first header cell its colspan to 1:
+						$header_cells[0][$key]['colspan'] = 1;
 					}
-					elseif(	$i == $col_count )
-					{ //link ordering the current column
-						$order_asc.='A';
-						$order_desc.='D';
+					else 
+					{ // It's not the first column of the colspan, so set its colspan to 0 to not display it in the first header cell 
+						// and increase the first colspan column
+						$header_cells[0][$key]['colspan'] = 0;
+						$header_cells[0][$key-($current_colspan-1)]['colspan']++;
 					}
-					else
-					{
-						$order_asc.='-';
-						$order_desc.='-';
+					
+					$current_colspan++;
+					
+					if( isset( $col['th'] ) )
+					{ // The column has a th defined, so set the second header cell column colspan to 1 to display it:
+						$header_cells[1][$key]['colspan'] = 1;
 					}
+					else 
+					{ // The column has not a th defined, so set the second header cell column colspan to 0 to not display it:
+						$header_cells[1][$key]['colspan'] = 0;
+					}
+					// We have grouped columns:
+					$th_group_activated = true; 
 				}
-
-				$style = $this->params['sort_type'];
-
-				$asc_status = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? 'on' : 'off' ;
-				$desc_status = ( strstr( $this->order, 'D' ) && $col_count == strpos( $this->order, 'D') ) ? 'on' : 'off' ;
-				$sort_type = ( strstr( $this->order, 'A' ) && $col_count == strpos( $this->order, 'A') ) ? $order_desc : $order_asc;
-				$title = strstr( $sort_type, 'A' ) ? T_('Ascending order') : T_('Descending order');
-				$title = ' title="'.$title.'" ';
-
-				$pos =  strpos( $this->order, 'D');
-
-				if( strstr( $this->order, 'A' ) )
+				else 
+				{	// The column is not grouped, so set its colspan(0) to 1 to display it in the first header cell 
+					// and set its colspan(1) to 0 to not display it in the second header cell 
+					$header_cells[0][$key]['colspan'] = 1;
+					$header_cells[1][$key]['colspan'] = 0;
+					
+					$current_colspan = 1;
+				}
+			}
+			
+			if( !$th_group_activated )
+			{	// No grouped columns, so need not the second header cell array
+				unset( $header_cells[1] );
+			}
+			
+			// Loop on all header cells (<tr>)
+			foreach( $header_cells as $key_cell=>$header_cell )
+			{ 
+				echo $this->params['line_start_head'];
+			
+				$col_count = 0;
+				foreach( $this->cols as $col_idx => $col )
 				{
-					$pos = strpos( $this->order, 'A' );
-				}
+					if( $header_cell[$col_idx]['colspan'] )
+					{ // Colspan != 0, so display column:
+						if( isset( $col['th_start'] ) )
+						{ // We have a customized column start for this one:
+							$output = $col['th_start'];
+						}
+						elseif( $col_idx == 0 && isset($this->params['colhead_start_first']) )
+						{ // First column can get special formatting:
+							$output = $this->params['colhead_start_first'];
+						}
+						elseif( $col_idx == (count( $this->cols)-1) && isset($this->params['colhead_start_last']) )
+						{ // Last column can get special formatting:
+							$output = $this->params['colhead_start_last'];
+						}
+						else
+						{ // Regular columns:
+							$output = $this->params['colhead_start'];
+						}
+						
+						// Get rowspan column:
+						$rowspan = 1;
+						// Loop on all superiors header cells until colspan = 0:
+						for( $i = $key_cell; $i < count( $header_cells ); $i++ )
+						{
+							if( isset( $header_cells[$i+1] ) &&  $header_cells[$i+1][$col_idx]['colspan'] == 0 )
+							{	// Superior header cells column will be not displayed (colspan=0), so increase rowspan value:
+								$rowspan++;
+							}
+							else 
+							{	// No superior header cells any longer column or it will be displayed (colspan!=0) so break;
+								break;
+							}
+						}
+						if( $rowspan > 1 )
+						{	// We need to define a rowspan for this column:
+							$output = preg_replace( '#(<)([^>]*)>$#', '$1$2 rowspan="'.$rowspan.'">' , $output );
+						}
+						
+						if( ( $colspan = $header_cell[$col_idx]['colspan'] ) > 1 )
+						{ // We need to define a colspan for this column and a th_group class:
+							// EXPERIMENTAL
+							if( preg_match( '#class="(.*)"#', $output ) )
+							{	// The column start already has a class, so add first th_group to it:  
+								$output = preg_replace( '#(.*)class="([^"]*)"(.*)#', '$1 class="$2 th_group"$3', $output );
+								// Add colspan
+								$output = preg_replace( '#(<)([^>]*)>$#', '$1$2 colspan="'.$colspan.'">' , $output );
+							}
+							else 
+							{	// The column start already has not a class, so add colspan and th_group class to it:
+								$output = preg_replace( '#(<)([^>]*)>$#', '$1$2 colspan="'.$colspan.'" class="th_group">' , $output );
+							}
+						}
+						
+						// Display column start:			
+						echo $output;
+						
+						//_________________________ Display column title: ______________________________________
+						if( $header_cell[$col_idx]['colspan'] > 1 )
+						{	// This column is grouped with other(s) column(s), so it will be diplayed the group title
+							// and the order will be the group order( BUG POSITION COLONNE)
+							$th_title = isset( $col['th_group'] ) ? $col['th_group'] : '';
+							$col_order = isset( $col['order_group'] ) ? $col['order_group'] : '';
+						}
+						else 
+						{	// th title, order:
+							$th_title = isset( $col['th'] ) ? $col['th'] : '';
+							$col_order = isset( $col['order'] ) ? $col['order'] : '';
+						}
 
-				if( $col_count == $pos )
-				{ //the column header must be displayed in bold
-					$class = ' class="'.$style.'_current" ';
-				}
-				else
-				{
-					$class = ' class="'.$style.'_sort_link" ';
-				}
+						if( $col_order )
+						{ // The column can be ordered:
 
-				if( $this->params['sort_type'] == 'single' )
-				{ // single sort mode:
 
-					echo '<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$sort_type )
-								.'" '.$title.$class.' >'
-								.$col['th'].'</a>'
-								.'<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$order_asc )
-								.'" title="'.T_('Ascending order')
-								.'" '.$class.' >'.$this->params['sort_asc_'.$asc_status].'</a>'
-								.'<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$order_desc )
-								.'" title="'.T_('Descending order')
-								.'" '.$class.' >'.$this->params['sort_desc_'.$desc_status].'</a> ';
-				}
-				elseif( $this->params['sort_type'] == 'basic' )
-				{ // basic sort mode:
-					if( $asc_status == 'off' && $desc_status == 'off' )
-					{ // the sorting is not made on the current column
-						$sort_item = $this->params['basic_sort_off'];
+							$col_sort_values = $this->get_col_sort_values( $col_idx );
+
+
+							// Detrmine CLASS SUFFIX depending on wether the current column is currently sorted or not:
+							if( !empty($col_sort_values['current_order']) )
+							{ // We are currently sorting on the current column:
+								$class_suffix = '_current';
+							}
+							else
+							{	// We are not sorting on the current column:
+								$class_suffix = '_sort_link';
+							}
+
+							// Display title depending on sort type/mode:
+							if( $this->params['sort_type'] == 'single' )
+							{ // single column sort type:
+
+								// Title with toggle:
+								echo '<a href="'.$col_sort_values['order_toggle'].'"'
+											.' title="'.T_('Change Order').'"'
+											.' class="single'.$class_suffix.'"'
+											.'>'.$th_title.'</a>';
+
+								// Icon for ascending sort:
+								echo '<a href="'.$col_sort_values['order_asc'].'"'
+											.' title="'.T_('Ascending order').'"'
+											.'>'.$this->params['sort_asc_'.($col_sort_values['current_order'] == 'ASC' ? 'on' : 'off')].'</a>';
+
+								// Icon for descending sort:
+								echo '<a href="'.$col_sort_values['order_desc'].'"'
+											.' title="'.T_('Descending order').'"'
+											.'>'.$this->params['sort_desc_'.($col_sort_values['current_order'] == 'DESC' ? 'on' : 'off')].'</a>';
+
+							}
+							else
+							{ // basic sort type (toggle single column):
+
+								if( $col_sort_values['current_order'] == 'ASC' )
+								{ // the sorting is ascending and made on the current column
+									$sort_icon = $this->params['basic_sort_asc'];
+								}
+								elseif(  $col_sort_values['current_order'] == 'DESC' )
+								{ // the sorting is descending and made on the current column
+									$sort_icon = $this->params['basic_sort_desc'];
+								}
+								else
+								{ // the sorting is not made on the current column
+									$sort_icon = $this->params['basic_sort_off'];
+								}
+
+								// Toggle Icon + Title
+								echo '<a href="'.$col_sort_values['order_toggle'].'"'
+											.' title="'.T_('Change Order').'"'
+											.' class="basic'.$class_suffix.'"'
+											.'>'.$sort_icon.' '.$th_title.'</a>';
+
+							}
+
+						}
+						elseif( $th_title )
+						{ // the column can't be ordered, but we still have a header defined:
+							echo $th_title;
+						}
+
+						//________________________________________________________________________________________________
+						
+						echo $this->params['colhead_end'];
 					}
-					elseif( $asc_status == 'on' )
-					{ // the sorting is ascending and made on the current column
-						$sort_item = $this->params['basic_sort_asc'];
-					}
-					elseif( $desc_status == 'on' )
-					{ // the sorting is descending and made on the current column
-						$sort_item = $this->params['basic_sort_desc'];
-					}
-
-					echo '<a href="'.regenerate_url( $this->order_param, $this->order_param.'='.$sort_type ).'" title="'.T_('Change Order')
-								.'" '.$class.' >'.$sort_item.' '.$col['th'].'</a>';
 				}
+				echo $this->params['line_end'];
 			}
-			elseif( isset($col['th']) )
-			{ // the column can't be ordered, but we still have a header defined:
-				echo $col['th'];
-			}
-			$col_count++;
-
-			echo $this->params['colhead_end'];
-
-		}
+		} // this->cols not set
 
 		echo $this->params['head_end'];
 
@@ -985,6 +1079,70 @@ class Results extends Widget
 		}
 
 		echo $this->params[$template.'_end'];
+	}
+
+
+  /**
+   * Returns values needed to make sort links for a given column
+   *
+   * Returns an array containing the following values:
+   *  - current_order : 'ASC', 'DESC' or ''
+   *  - order_asc : url to order in ascending order
+   *  - order_desc
+   *  - order_toggle : url to toggle sort order
+   *
+   * @param integer column to sort
+   * @return array
+   */
+	function get_col_sort_values( $col_idx )
+	{
+
+		// Current order:
+		$order_char = substr( $this->order, $col_idx, 1 );
+		if( $order_char == 'A' )
+		{
+			$col_sort_values['current_order'] = 'ASC';
+		}
+		elseif( $order_char == 'D' )
+		{
+			$col_sort_values['current_order'] = 'DESC';
+		}
+		else
+		{
+			$col_sort_values['current_order'] = '';
+		}
+
+
+		// Generate sort values to use for sorting on the current column:
+		$order_asc = '';
+		$order_desc = '';
+		for( $i = 0; $i < $this->nb_cols; $i++ )
+		{
+			if(	$i == $col_idx )
+			{ // Link ordering the current column
+				$order_asc .= 'A';
+				$order_desc .= 'D';
+			}
+			else
+			{
+				$order_asc .= '-';
+				$order_desc .= '-';
+			}
+		}
+
+		$col_sort_values['order_asc'] = regenerate_url( $this->order_param, $this->order_param.'='.$order_asc );
+		$col_sort_values['order_desc'] = regenerate_url( $this->order_param, $this->order_param.'='.$order_desc );
+
+		if( $col_sort_values['current_order'] == 'ASC' )
+		{
+			$col_sort_values['order_toggle'] = $col_sort_values['order_desc'];
+		}
+		else
+		{
+			$col_sort_values['order_toggle'] = $col_sort_values['order_asc'];
+		}
+
+		return $col_sort_values;
 	}
 
 
@@ -1482,6 +1640,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/14 19:25:32  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.6  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

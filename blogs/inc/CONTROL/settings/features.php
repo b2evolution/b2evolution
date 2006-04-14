@@ -180,7 +180,7 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 
 // Display VIEW:
-$AdminUI->disp_view( 'settings/_set_features.form' );
+$AdminUI->disp_view( 'settings/_set_features.form.php' );
 
 // End payload block:
 $AdminUI->disp_payload_end();

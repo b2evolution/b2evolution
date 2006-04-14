@@ -49,7 +49,7 @@ require_once dirname(__FILE__).'/_header.php';
 
 
 // Get requested controller and memorize it:
-param( 'ctrl', '/^[a-z0-9]+$/', $default_ctrl, true );
+param( 'ctrl', '/^[a-z0-9_]+$/', $default_ctrl, true );
 
 
 // Redirect old-style URLs (e.g. /admin/plugins.php), if they come here because the webserver maps "/admin/" to "/admin.php"
@@ -98,6 +98,9 @@ require $control_path.$ctrl_mappings[$ctrl];
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/14 19:25:31  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.9  2006/04/11 21:22:25  fplanque
  * partial cleanup
  *

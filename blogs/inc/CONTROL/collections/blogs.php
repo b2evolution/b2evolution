@@ -307,7 +307,7 @@ switch($action)
 		echo '<h2>'.T_('New blog').':</h2>';
 
 		$next_action = 'create';
-		$AdminUI->disp_view( 'collections/_blogs_general.form' );
+		$AdminUI->disp_view( 'collections/_blogs_general.form.php' );
 
 		echo '</div>';
 		break;
@@ -358,7 +358,7 @@ switch($action)
 			echo '</div>';
 
 			// List the blogs:
-			$AdminUI->disp_view( 'collections/_blogs_list' );
+			$AdminUI->disp_view( 'collections/_blogs_list.php' );
 
 			break;
 		}
@@ -447,17 +447,17 @@ switch($action)
 
 				$next_action = 'update';
 				// Display VIEW:
-				$AdminUI->disp_view( 'collections/_blogs_general.form' );
+				$AdminUI->disp_view( 'collections/_blogs_general.form.php' );
 				break;
 
 			case 'perm':
-				$AdminUI->disp_view( 'collections/_blogs_permissions.form' );
+				$AdminUI->disp_view( 'collections/_blogs_permissions.form.php' );
 				break;
 			case 'permgroup':
-				$AdminUI->disp_view( 'collections/_blogs_permissions_group.form' );
+				$AdminUI->disp_view( 'collections/_blogs_permissions_group.form.php' );
 				break;
 			case 'advanced':
-				$AdminUI->disp_view( 'collections/_blogs_advanced.form' );
+				$AdminUI->disp_view( 'collections/_blogs_advanced.form.php' );
 				break;
 		}
 
@@ -553,7 +553,7 @@ switch($action)
 	default:
 		// List the blogs:
 		// Display VIEW:
-		$AdminUI->disp_view( 'collections/_blogs_list' );
+		$AdminUI->disp_view( 'collections/_blogs_list.php' );
 
 }
 
@@ -564,6 +564,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/04/14 19:25:31  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.8  2006/04/04 21:37:42  blueyed
  * Add bloguser_perm_media_*=1 for the created blog and current user.
  *

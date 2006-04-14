@@ -528,7 +528,7 @@ class AdminUI_general
 		global $Request;
 
 
-		require $view_path.$view_name.'.php';
+    require $view_path.$view_name;
 	}
 
 
@@ -883,6 +883,7 @@ class AdminUI_general
 							                ."\n\n<tr>\n",
 							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
 							'filters_end' => '</td></tr>',
+							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre à jour admin_UI_general; utiliser colspan="$headspan$"
 							'colhead_start' => '<th>',
 							'colhead_start_first' => '<th class="firstcol">',
 							'colhead_start_last' => '<th class="lastcol">',
@@ -1284,6 +1285,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/14 19:25:32  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.6  2006/04/12 15:16:54  fplanque
  * partial cleanup
  *

@@ -130,7 +130,7 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 
 // Display VIEW:
-$AdminUI->disp_view( 'files/_set_files.form' );
+$AdminUI->disp_view( 'files/_set_files.form.php' );
 
 // End payload block:
 $AdminUI->disp_payload_end();

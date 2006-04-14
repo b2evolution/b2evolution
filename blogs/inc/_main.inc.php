@@ -240,9 +240,27 @@ if( !isset( $use_html_checker ) ) { $use_html_checker = 1; }
 /**
  * Includes:
  */
+require_once $model_path.'dataobjects/_dataobjectcache.class.php';
+require_once $model_path.'generic/_genericelement.class.php';
+require_once $model_path.'generic/_genericcache.class.php';
+require_once $model_path.'collections/_blog.class.php';
 require_once $model_path.'collections/_blog.funcs.php';
-require_once $model_path.'items/_item.funcs.php';
 require_once $model_path.'collections/_category.funcs.php';
+require_once $model_path.'items/_item.funcs.php';
+require_once $model_path.'users/_user.funcs.php';
+require_once $inc_path.'_misc/_resultsel.class.php';
+require_once $inc_path.'_misc/_template.funcs.php';    // function to be called from templates
+require_once $model_path.'files/_filecache.class.php';
+require_once $model_path.'files/_file.class.php';
+require_once $model_path.'files/_filerootcache.class.php';
+require_once $model_path.'files/_filetype.class.php';
+require_once $model_path.'files/_filetypecache.class.php';
+require_once $model_path.'items/_itemcache.class.php';
+require_once $model_path.'items/_itemtype.class.php';
+require_once $model_path.'items/_itemtypecache.class.php';
+require_once $model_path.'items/_link.class.php';
+require_once $model_path.'items/_linkcache.class.php';
+require_once $model_path.'users/_usercache.class.php';
 require_once $model_path.'comments/_comment.funcs.php';
 if( $use_html_checker ) { require_once $inc_path.'_misc/_htmlchecker.class.php'; }
 require_once $model_path.'items/_item.funcs.php';
@@ -250,7 +268,11 @@ require_once $inc_path.'_misc/_pingback.funcs.php';
 require_once $inc_path.'_misc/_ping.funcs.php';
 require_once $model_path.'skins/_skin.funcs.php';
 require_once $inc_path.'_misc/_trackback.funcs.php';
-require_once $model_path.'users/_user.funcs.php';
+require_once $inc_path.'_misc/ext/_xmlrpc.php';
+require_once $inc_path.'_misc/ext/_xmlrpcs.php';
+require_once $model_path.'comments/_commentlist.class.php';
+require_once $model_path.'items/_itemlist.class.php';
+
 
 /**
  * Optionnaly include obsolete functions
@@ -258,38 +280,12 @@ require_once $model_path.'users/_user.funcs.php';
 @include_once $inc_path.'_misc/_obsolete092.php';
 
 
-require_once dirname(__FILE__).'/_misc/_resultsel.class.php';
-
-
-/**
- * Includes:
- */
-require_once $inc_path.'_misc/_template.funcs.php';    // function to be called from templates
-require_once $inc_path.'_misc/ext/_xmlrpc.php';
-require_once $inc_path.'_misc/ext/_xmlrpcs.php';
-require_once $model_path.'collections/_blog.class.php';
-require_once $model_path.'comments/_commentlist.class.php';
-require_once $model_path.'dataobjects/_dataobjectcache.class.php';
-require_once $model_path.'_misc/_element.class.php';
-require_once $model_path.'files/_filecache.class.php';
-require_once $model_path.'files/_file.class.php';
-require_once $model_path.'files/_filerootcache.class.php';
-require_once $model_path.'files/_filetype.class.php';
-require_once $model_path.'files/_filetypecache.class.php';
-require_once $model_path.'items/_itemlist.class.php';
-require_once $model_path.'items/_itemcache.class.php';
-require_once $model_path.'items/_itemtype.class.php';
-require_once $model_path.'items/_itemtypecache.class.php';
-require_once $model_path.'items/_link.class.php';
-require_once $model_path.'items/_linkcache.class.php';
-require_once $model_path.'users/_usercache.class.php';
-
 // Object caches init (we're asking plugins that provide the "CacheObjects" event here first):
 $Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
 $Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
 $Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', '& new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\' )' );
 $Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', '& new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
-$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', '& new DataObjectCache( \'Element\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\' )' );
+$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', '& new GenericCache( \'GenericElement\', true, \'T_itemstatuses\', \'pst_\', \'pst_ID\' )' );
 
 // Caches that are not meant to be loaded in total:
 $BlogCache = & new BlogCache();
@@ -519,6 +515,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/14 19:25:31  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.6  2006/04/06 17:21:34  blueyed
  * Fixed login procedure for https-admin_url: the login form now POSTs to itself and we redirect to the target url after successful login
  *

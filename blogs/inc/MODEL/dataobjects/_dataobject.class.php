@@ -113,7 +113,7 @@ class DataObject
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
-	 * @return boolean true on success
+	 * @return boolean true on success, false on failure to update, NULL if no update necessary
 	 */
 	function dbupdate()
 	{
@@ -123,7 +123,7 @@ class DataObject
 
 		if( count( $this->dbchanges ) == 0 )
 		{
-			return;	// No changes!
+			return NULL;	// No changes!
 		}
 
 		if( !empty($this->datemodified_field) )
@@ -338,10 +338,6 @@ class DataObject
 
 		foreach( $this->$what as $restriction )
 		{
-			if( !isset( $EvoConfig->DB['aliases'][$restriction['table']] ) )
-			{	// We have no declaration for this table, we consider we don't deal with this table in this app:
-				continue;
-			}
 			if( !in_array( $restriction['fk'], $ignore ) )
 			{
 				$count = $DB->get_var(
@@ -640,7 +636,7 @@ class DataObject
 			$history[1] = sprintf( T_('Last mod on %s'), mysql2localedate( $this->{$this->datemodified_field} ) );
 		}
 
-		return get_icon( 'history', $what = 'imgtag', array( 'title'=>implode( ' - ', $history ) ) );
+		return get_icon( 'history', $what = 'imgtag', array( 'title'=>implode( ' - ', $history ) ), true );
 	}
 }
 
@@ -648,6 +644,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/14 19:25:32  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.4  2006/04/12 15:16:54  fplanque
  * partial cleanup
  *

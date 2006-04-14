@@ -340,8 +340,8 @@ class ItemList2 extends DataObjectList2
 		$this->filters['ymdhms'] = $Request->param( $this->param_prefix.'m', 'integer', $this->default_filters['ymdhms'], true );          // YearMonth(Day) to display
 		$this->filters['week'] = $Request->param( $this->param_prefix.'w', 'integer', $this->default_filters['week'], true );            // Week number
 
-		$this->filters['ymdhms_min'] = $Request->param_compact_date( $this->param_prefix.'dstart', $this->default_filters['ymdhms_min'], T_( 'Invalid date' ) ); // YearMonth(Day) to start at
-		$this->filters['ymdhms_max'] = $Request->param_compact_date( $this->param_prefix.'dstop', $this->default_filters['ymdhms_max'], T_( 'Invalid date' ) ); // YearMonth(Day) to stop at
+		$this->filters['ymdhms_min'] = $Request->param_compact_date( $this->param_prefix.'dstart', $this->default_filters['ymdhms_min'], true, T_( 'Invalid date' ) ); // YearMonth(Day) to start at
+		$this->filters['ymdhms_max'] = $Request->param_compact_date( $this->param_prefix.'dstop', $this->default_filters['ymdhms_max'], true, T_( 'Invalid date' ) ); // YearMonth(Day) to stop at
 
 
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
@@ -372,7 +372,7 @@ class ItemList2 extends DataObjectList2
 		 * Ordering:
 		 */
 		$this->filters['order'] = $Request->param( $this->param_prefix.'order', '/^(ASC|asc|DESC|desc)$/', $this->default_filters['order'], true );		// ASC or DESC
-		$this->filters['orderby'] = $Request->param( $this->param_prefix.'orderby', '/^([A-Za-z0-9]+([ ,][A-Za-z0-9]+)*)?$/', $this->default_filters['orderby'], true );   // list of fields to order by (TODO: change that crap)
+		$this->filters['orderby'] = $Request->param( $this->param_prefix.'orderby', '/^([A-Za-z0-9_]+([ ,][A-Za-z0-9_]+)*)?$/', $this->default_filters['orderby'], true );   // list of fields to order by (TODO: change that crap)
 
 
 		/*
@@ -518,7 +518,7 @@ class ItemList2 extends DataObjectList2
 		 */
 		if( !empty( $this->filters['item_type'] ) )
 		{
-			$this->ItemQuery->where_and( 'itm_ityp_ID = '.$this->filters['item_type'] );
+			$this->ItemQuery->where_and( 'post_ptyp_ID = '.$this->filters['item_type'] );
 		}
 
 		/*
@@ -616,8 +616,8 @@ class ItemList2 extends DataObjectList2
 		// GET DATA ROWS:
 
 
-  	// New style orders:
-		$this->ItemQuery->ORDER_BY_prepend( $this->get_order_field_list() );
+  	// Results style orders:
+		// $this->ItemQuery->ORDER_BY_prepend( $this->get_order_field_list() );
 
 
 		// We are going to proceed in two steps (we simulate a subquery)
@@ -704,7 +704,7 @@ class ItemList2 extends DataObjectList2
 		 */
 		if( !empty( $this->filters['item_type'] ) )
 		{
-			$lastpost_ItemQuery->where_and( 'itm_ityp_ID = '.$this->filters['item_type'] );
+			$lastpost_ItemQuery->where_and( 'post_ptyp_ID = '.$this->filters['item_type'] );
 		}
 
 
@@ -1006,6 +1006,52 @@ class ItemList2 extends DataObjectList2
 
 
   /**
+   * Returns values needed to make sort links for a given column
+   *
+   * Returns an array containing the following values:
+   *  - current_order : 'ASC', 'DESC' or ''
+   *  - order_asc : url needed to order in ascending order
+   *  - order_desc
+   *  - order_toggle : url needed to toggle sort order
+   *
+   * @param integer column to sort
+   * @return array
+   */
+	function get_col_sort_values( $col_idx )
+	{
+		$col_order_fields = $this->cols[$col_idx]['order'];
+
+		// Current order:
+		if( $this->filters['orderby'] == $col_order_fields )
+		{
+			$col_sort_values['current_order'] = $this->filters['order'];
+		}
+		else
+		{
+			$col_sort_values['current_order'] = '';
+		}
+
+
+		// Generate sort values to use for sorting on the current column:
+		$col_sort_values['order_asc'] = regenerate_url( array($this->param_prefix.'order',$this->param_prefix.'orderby'),
+																			$this->param_prefix.'order=ASC&amp;'.$this->param_prefix.'orderby='.$col_order_fields );
+		$col_sort_values['order_desc'] = regenerate_url(  array($this->param_prefix.'order',$this->param_prefix.'orderby'),
+																			$this->param_prefix.'order=DESC&amp;'.$this->param_prefix.'orderby='.$col_order_fields );
+
+		if( $col_sort_values['current_order'] == 'ASC' )
+		{
+			$col_sort_values['order_toggle'] = $col_sort_values['order_desc'];
+		}
+		else
+		{
+			$col_sort_values['order_toggle'] = $col_sort_values['order_asc'];
+		}
+
+		return $col_sort_values;
+	}
+
+
+  /**
    * Get the adverstised start date (does not include timestamp_min)
    *
    * Note: there is a priority order in the params to determine the start date:
@@ -1236,6 +1282,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/14 19:25:32  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.5  2006/04/06 21:11:53  fplanque
  * Fixed deadlock issue.
  * --

@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Icon Legend
  */
 global $UserSettings, $IconLegend;
-if( $UserSettings->get('legend') <> 0 )
+if( $UserSettings->get('display_icon_legend') <> 0 )
 {	// Display icons legend
 	$IconLegend->display_legend();
 }

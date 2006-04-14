@@ -202,11 +202,20 @@ $Form->begin_fieldset( T_('Features') );
 		$Form->info_field( T_('Admin skin'), $value_admin_skin, array( 'note' => T_('The skin defines how the backoffice appears to you.') ) );
 	}
   // fp> TODO: We gotta have something like $edited_User->UserSettings->get('legend');
-	// To display or hide icon legend
-	$Form->checkbox( 'edited_user_legend', $UserSettings->get('legend', $edited_User->ID), T_('Display icon legend'), T_('Display a legend at the bottom of every page including all action icons used on that page.') );
-	// To activate or deactivate bozo validator
-	$Form->checkbox( 'edited_user_bozo', $UserSettings->get('bozo', $edited_User->ID), T_('Use anti-bozo form validator'), T_('This will alert you if you fill in data into a form and try to leave the form before submitting the data.') );
+	// Icon/text thresholds:
+	$Form->text( 'edited_user_action_icon_threshold', $UserSettings->get('action_icon_threshold'), 1, T_('Action icon display threshold'), T_('1:more icons ... 5:less icons') );
+	$Form->text( 'edited_user_action_word_threshold', $UserSettings->get('action_word_threshold'), 1, T_('Action word display threshold'), T_('1:more action words ... 5:less action words') );
 
+	// To display or hide icon legend:
+	$Form->checkbox( 'edited_user_legend', $UserSettings->get('display_icon_legend'), T_('Display icon legend'), T_('Display a legend at the bottom of every page including all action icons used on that page.') );
+
+	// To activate or deactivate bozo validator:
+	$Form->checkbox( 'edited_user_bozo', $UserSettings->get('control_form_abortions'), T_('Use anti-bozo form validator'), T_('This will alert you if you fill in data into a form and try to leave the form before submitting the data.') );
+
+	// To activate focus on first form input text
+	$Form->checkbox( 'edited_user_focusonfirst', $UserSettings->get('focus_on_first_input'), T_('Focus on first input text field'), T_('The focus will be on the first input text field of the form.') );
+
+	
 $Form->end_fieldset();
 
 
@@ -268,6 +277,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/14 19:25:32  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.9  2006/04/12 15:16:54  fplanque
  * partial cleanup
  *

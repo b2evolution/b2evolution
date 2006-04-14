@@ -180,7 +180,7 @@ class DataObjectList2 extends FilteredResults
 		if( count( $rows ) )
 		{
 			// instantiate the inferior element
-			$obj_inf = & $this->Cache->get_by_ID( $rows[0]->act_ID );
+			$obj_inf = & $this->Cache->get_by_ID( $rows[0]->{$this->Cache->dbIDname} );
 			
 			//  Update element order
 			$obj->set( 'order', $obj_inf->order );
@@ -233,7 +233,7 @@ class DataObjectList2 extends FilteredResults
 		if( count( $rows ) )
 		{
 			// instantiate the inferior element
-			$obj_sup = & $this->Cache->get_by_ID( $rows[0]->act_ID );
+			$obj_sup = & $this->Cache->get_by_ID( $rows[0]->{$this->Cache->dbIDname} );
 			
 			//  Update element order
 			$obj->set( 'order', $obj_sup->order );
@@ -257,6 +257,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/14 19:25:32  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.2  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *

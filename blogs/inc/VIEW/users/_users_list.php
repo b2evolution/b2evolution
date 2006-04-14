@@ -47,7 +47,7 @@ if( !empty( $filteron ) )
 	$swhere = '';
 	foreach ($afilter as $sfilter)
 	{
-		$swhere .= 'concat(user_login, \' \', user_firstname, \' \', user_lastname, \' \', user_nickname, \' \', user_email) like "%' . $DB->escape($sfilter) . '%" and ';
+		$swhere .= 'concat( user_login, \' \', user_firstname, \' \', user_lastname, \' \', user_nickname, \' \', user_email) like "%' . $DB->escape($sfilter) . '%" and ';
 	}
 	$sql = "SELECT T_users.*, grp_ID, grp_name
 					FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
@@ -143,11 +143,18 @@ $Results->cols[] = array(
 						'td' => '$user_firstname$ $user_lastname$',
 					);
 
+function user_mailto( $email )
+{
+	if( empty( $email ) )
+	{
+		return '&nbsp;';
+	}
+	return action_icon( T_('Email').': '.$email, 'email', 'mailto:'.$email, T_('Email') );
+}
 $Results->cols[] = array(
 						'th' => T_('Email'),
 						'td_start' => '<td class="shrinkwrap">',
-						'td' => '¤conditional( !empty(#user_email#), \'<a href="mailto:$user_email$" title="e-mail: $user_email$">'
-								.get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => 'Email: $user_email$' ) ).'</a>\', \'&nbsp;\' )¤',
+						'td' => '%user_mailto( #user_email# )%',
 					);
 
 $Results->cols[] = array(
@@ -196,8 +203,8 @@ else
 
 if( $current_User->check_perm( 'users', 'edit', false ) )
 { // create new user link
-	$Results->global_icon( T_('Add a user...'), 'new', '?ctrl=users&amp;action=new_user', T_('Add user') );
-	$Results->global_icon( T_('Add a group...'), 'new', '?ctrl=users&amp;action=new_group', T_('Add group') );
+	$Results->global_icon( T_('Add a user...'), 'new', '?ctrl=users&amp;action=new_user', T_('Add user'), 3, 4  );
+	$Results->global_icon( T_('Add a group...'), 'new', '?ctrl=users&amp;action=new_group', T_('Add group'), 3, 4  );
 }
 
 // Display filter/search block
@@ -217,6 +224,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/14 19:25:32  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.2  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

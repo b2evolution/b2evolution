@@ -365,7 +365,7 @@ switch($action)
 		// List the cats:
 		$Blog = $BlogCache->get_by_ID( $blog );
 		// Display VIEW:
-		$AdminUI->disp_view( 'collections/_cats_list' );
+		$AdminUI->disp_view( 'collections/_cats_list.php' );
 }
 
 // Display body bottom, debug info and close </html>:
@@ -373,6 +373,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/14 19:25:31  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.3  2006/03/10 21:20:20  fplanque
  * removed overkill
  *

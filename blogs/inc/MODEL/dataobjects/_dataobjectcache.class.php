@@ -48,9 +48,16 @@ class DataObjectCache
 	 */
 	var $cache = array();
 
+	/**
+	 * Copy of previous object array
+	 * @see DataObjectCache::clear()
+	 */
+	var $shadow_cache = NULL;
+
 	var $load_add = false;
 	var $all_loaded = false;
 	var $name_field;
+	var $order_by;
 
 
 	/**
@@ -62,7 +69,7 @@ class DataObjectCache
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL )
+	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname, $name_field = NULL, $order_by = '' )
 	{
 		$this->objtype = $objtype;
 		$this->load_all = $load_all;
@@ -70,9 +77,39 @@ class DataObjectCache
 		$this->dbprefix = $prefix;
 		$this->dbIDname = $dbIDname;
 		$this->name_field = $name_field;
+		
+		if( empty( $order_by ) )
+		{
+			if( empty( $name_field ) )
+			{	
+				$this->order_by = $dbIDname;
+			}
+			else 
+			{
+				$this->order_by = $name_field;
+			}
+		}
+		else 
+		{ 
+			$this->order_by = $order_by;
+		}
 	}
 
-
+	
+	/**
+	 *  TODO
+	 */
+	function & new_obj( $row = NULL )
+	{
+		$objtype = $this->objtype;
+			
+		// Instantiate a custom object
+		$obj = new $objtype( $row ); // COPY !!
+		
+		return $obj;
+	}
+	
+	
 	/**
 	 * Load the cache **extensively**
 	 */
@@ -84,23 +121,20 @@ class DataObjectCache
 		{ // Already loaded
 			return false;
 		}
+		
+		$this->clear( true );
 
 		$Debuglog->add( get_class($this).' - Loading <strong>'.$this->objtype.'(ALL)</strong> into cache', 'dataobjects' );
-		$sql = "SELECT * FROM $this->dbtablename";
+		$sql = 'SELECT * 
+							FROM '.$this->dbtablename.' 
+						 ORDER BY '.$this->order_by;
+							
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
 		foreach( $DB->get_results( $sql ) as $row )
 		{
-			if( $objtype == 'Element' )
-			{ // Instanciate a dataobject with its params:
-				$this->add( new Element( $this->dbtablename, $this->dbprefix, $this->dbIDname, $row ) );
-			}
-			else
-			{ // Instantiate a custom object
-				$this->add( new $objtype( $row ) );
-			}
-			// $obj = $this->cache[ $row->$dbIDname ];
-			// $obj->disp( 'name' );
+			 // Instantiate a custom object
+				$this->instantiate( $row );
 		}
 
 		$this->all_loaded = true;
@@ -199,27 +233,37 @@ class DataObjectCache
 			return $Obj;
 		}
 
-		if( !isset($this->cache[$obj_ID]) )
-		{	// If the object ID is valid and not already cached:
-			if( $this->objtype == 'Element' )
-			{ // Instanciate a dataobject with its params:
-				$this->add( new Element( $this->dbtablename, $this->dbprefix, $this->dbIDname, $db_row ) );
-			}
-			else
-			{ // Instantiate a custom object
-				$this->add( new $this->objtype( $db_row ) );
-			}
+		if( isset( $this->cache[$obj_ID] ) )
+		{ // Already in cache, do nothing!
 		}
-
+		elseif( isset( $this->shadow_cache[$obj_ID] ) )
+		{	// Already in shadow, recycle object:
+			$this->add( $this->shadow_cache[$obj_ID] );
+		}
+		else 
+		{ // Not already cached, add new object:
+			$this->add( $this->new_obj( $db_row ) );
+		}
+		
 		return $this->cache[$obj_ID];
 	}
 
 
 	/**
 	 * Clear the cache **extensively**
+	 * 
 	 */
-	function clear()
+	function clear( $keep_shadow = false )
 	{
+		if( $keep_shadow )
+		{	// Keep copy of cache in case we try to re instantiate previous object:
+			$this->shadow_cache = $this->cache;
+		}
+		else 
+		{
+			$this->shadow_cache = NULL;
+		}
+		
 		$this->cache = array();
 		$this->all_loaded = false;
 	}
@@ -333,8 +377,9 @@ class DataObjectCache
 			if( ! isset( $this->cache[$resolved_ID] ) )
 			{	// Object is not already in cache:
 				$Debuglog->add( 'Adding to cache...', 'dataobjects' );
-				$Obj = new $this->objtype( $row ); // COPY !!
-				if( ! $this->add( $Obj ) )
+				//$Obj = new $this->objtype( $row ); // COPY !!
+				//if( ! $this->add( $this->new_obj( $db_row ) ) )
+				if( ! $this->add( $this->new_obj( $db_row ) ) )
 				{	// could not add
 					$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
 				}
@@ -350,6 +395,43 @@ class DataObjectCache
 			}
 			$r = NULL;
 			return $r;
+		}
+	}
+	
+	
+	/**
+	 * Remove an object from cache by ID
+	 *
+	 * @param integer ID of object to remove
+	 */
+	function remove_by_ID( $req_ID )
+	{
+		unset( $this->cache[$req_ID] );
+		unset( $marcus );
+	}
+	
+	
+	/**
+	 * Delete an object from DB by ID.
+	 * 
+	 * @param integer ID of object to delete
+	 * @return boolean
+	 */
+	function dbdelete_by_ID( $req_ID )
+	{
+		if( isset( $this->cache[$req_ID] ) )
+		{
+			// Delete from db
+			$this->cache[$req_ID]->dbdelete();
+			 
+			// Remove from cache 
+			$this->remove_by_ID( $req_ID );
+			
+			return true;
+		}
+		else 
+		{
+			return false;
 		}
 	}
 
@@ -428,6 +510,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/14 19:25:32  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.2  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *

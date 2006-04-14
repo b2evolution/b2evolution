@@ -528,7 +528,7 @@ if( empty( $mode ) )
 	echo '</div>';
 	// List the blogs:
 	// Display VIEW:
-	$AdminUI->disp_view( 'collections/_blogs_list' );
+	$AdminUI->disp_view( 'collections/_blogs_list.php' );
 }
 else
 { // Special mode:
@@ -545,6 +545,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/14 19:25:32  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.5  2006/03/20 22:28:35  blueyed
  * Changed defaults for Log's display methods to "all" categories.
  *

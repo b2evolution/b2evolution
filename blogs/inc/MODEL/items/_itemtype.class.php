@@ -42,7 +42,7 @@ class ItemType extends DataObject
 
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_ityp_col', 'fk'=>'itco_ityp_ID', 'msg'=>T_('%d related collections') ), // "Lignes de missions"
-				array( 'table'=>'T_items', 'fk'=>'itm_ityp_ID', 'msg'=>T_('%d related items') ), // "Lignes de visit reports"
+				array( 'table'=>'T_posts', 'fk'=>'post_ptyp_ID', 'msg'=>T_('%d related items') ), // "Lignes de visit reports"
 			);
 
  		if( $db_row != NULL )

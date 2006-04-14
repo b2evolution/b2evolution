@@ -43,6 +43,12 @@ table.grouped td.shrinkwrap
 	white-space:nowrap;
 	text-align:center;
 }
+/* For prices */
+table.grouped td.monetary
+{
+	text-align:right;
+}
+
 table.grouped input.checkbox {
 	border:none;
 	background-color: #eee;

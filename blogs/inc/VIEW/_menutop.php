@@ -45,11 +45,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/dynamic_select.js"></script>
 	<?php
 	global $UserSettings;
-	if( $UserSettings->get('bozo') <> 0 )
+	if( $UserSettings->get('control_form_abortions') <> 0 )
 	{	// Activate bozo validator
 		echo '<script type="text/javascript" src="'.$rsc_url.'js/bozo_validator.js"></script>';
 	}
-
+	
+	if( $UserSettings->get('focus_on_first_input') <> 0 )
+	{	// Activate focus on first form <input type="text">:
+		echo '<script type="text/javascript">addEvent( window, "load", focus_on_first_input, false );</script>';
+	}
+	
 	global $Debuglog;
 	$Debuglog->add( 'Admin-Path: '.var_export($this->path, true) );
 

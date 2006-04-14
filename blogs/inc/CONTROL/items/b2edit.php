@@ -216,7 +216,7 @@ switch( $action )
 		$form_action = '?ctrl=editactions';
 		$next_action = 'update';
 		// Display VIEW:
-		$AdminUI->disp_view( 'items/_item.form' );
+		$AdminUI->disp_view( 'items/_item.form.php' );
 
 		break;
 
@@ -226,7 +226,7 @@ switch( $action )
 		 * Display comment in edit form
 		 */
 		// Display VIEW:
-		$AdminUI->disp_view( 'comments/_comment.form' );
+		$AdminUI->disp_view( 'comments/_comment.form.php' );
 
 		break;
 
@@ -239,7 +239,7 @@ switch( $action )
 		$form_action = '?ctrl=editactions';
 		$next_action = 'create';
 		// Display VIEW:
-		$AdminUI->disp_view( 'items/_item.form' );
+		$AdminUI->disp_view( 'items/_item.form.php' );
 }
 
 // Display body bottom, debug info and close </html>:

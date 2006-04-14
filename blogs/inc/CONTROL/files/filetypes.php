@@ -184,7 +184,7 @@ switch( $action )
 	case 'edit':
 	case 'update':	// we return in this state after a validation error
 		$AdminUI->disp_payload_begin();
-		$AdminUI->disp_view( 'files/_filetype.form' );
+		$AdminUI->disp_view( 'files/_filetype.form.php' );
 		$AdminUI->disp_payload_end();
 		break;
 
@@ -195,7 +195,7 @@ switch( $action )
 			forget_param( 'ftype_ID' );
 			// Display file types list:
 			$AdminUI->disp_payload_begin();
-			$AdminUI->disp_view( 'files/_filetype_list.inc' );
+			$AdminUI->disp_view( 'files/_filetype_list.inc.php' );
 			$AdminUI->disp_payload_end();
 	
 }

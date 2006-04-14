@@ -575,16 +575,17 @@ class Request
 	 *
 	 * @param string Variable to set
 	 * @param mixed Default value or TRUE if user input required
+	 * @param boolean memorize ( @see param() )
 	 * @param string error message
 	 * @param boolean 'required': Is non-empty date required? Default: true.
 	 *
 	 * @return string the compact date value ( yyyymmdd )
 	 */
-	function param_compact_date( $var, $default = '', $err_msg, $required = false )
+	function param_compact_date( $var, $default = '', $memorize = false, $err_msg, $required = false )
 	{
 		global $$var;
 
-		$this->params[$var] = param( $var, 'string', $default );
+		$this->params[$var] = param( $var, 'string', $default, $memorize );
 
 		if( $this->param_check_date_format( $var, $err_msg, array( 'required' => $required ) ) )
 		{	// Valid DATE input format!
@@ -689,15 +690,16 @@ class Request
 	 * Display an error if the new value is selected that the input text has a value
 	 *
 	 * @param string Variable to set
+ 	 * @param mixed Default value or TRUE if user input required
 	 * @param boolean true: allows to select new without entring a value in the input combo text
 	 * @param string error message
 	 *
 	 * @return string position status ID or 'new' or '' if new is seleted but not input text value
 	 *
 	 */
-	function param_combo( $var, $allow_none, $err_msg = ''  )
+	function param_combo( $var, $default, $allow_none, $err_msg = ''  )
 	{
-		$this->params[$var] = param( $var, 'string', true );
+		$this->params[$var] = param( $var, 'string', $default );
 
 		if( $this->params[$var] == 'new' )
 		{	// The new option is selected in the combo select, so we need to check if we have a value in the combo input text:
@@ -852,6 +854,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.9  2006/04/14 19:25:32  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.8  2006/04/11 22:09:08  blueyed
  * Fixed validation of negative integers (and also allowed "+" at the beginning)
  *

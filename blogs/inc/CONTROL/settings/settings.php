@@ -105,7 +105,7 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 
 // Display VIEW:
-$AdminUI->disp_view( 'settings/_set_general.form' );
+$AdminUI->disp_view( 'settings/_set_general.form.php' );
 
 // End payload block:
 $AdminUI->disp_payload_end();
@@ -115,6 +115,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/14 19:25:32  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.2  2006/03/12 23:08:57  fplanque
  * doc cleanup
  *

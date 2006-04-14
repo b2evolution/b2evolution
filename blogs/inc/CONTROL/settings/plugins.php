@@ -975,7 +975,7 @@ switch( $action )
 
 
 	case 'edit_settings':
-		$AdminUI->disp_view( 'settings/_set_plugins_editsettings.form' );
+		$AdminUI->disp_view( 'settings/_set_plugins_editsettings.form.php' );
 		// Go on to displaying info - might be handy to not edit a wrong Plugin and provides help links:
 
 
@@ -1030,7 +1030,7 @@ if( $action == 'list' )
 	$AvailablePlugins->sort('name');
 
 	// Display VIEW:
-	$AdminUI->disp_view( 'settings/_set_plugins.form' );
+	$AdminUI->disp_view( 'settings/_set_plugins.form.php' );
 }
 
 // End payload block:

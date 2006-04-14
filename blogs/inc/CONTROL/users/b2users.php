@@ -31,7 +31,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @var AdminUI_general
  */
 global $AdminUI;
-
+/**
+ * @var Request
+ */
+global $Request;
 
 $AdminUI->set_path( 'users' );
 
@@ -244,14 +247,14 @@ if( !$Messages->count('error') )
 						'href="?ctrl=users&amp;user_ID='.$q.'"' ) );
 			}
 
-			param( 'edited_user_firstname', 'string', true );
-			param( 'edited_user_lastname', 'string', true );
+			$Request->param( 'edited_user_firstname', 'string', true );
+			$Request->param( 'edited_user_lastname', 'string', true );
 
 			$Request->param( 'edited_user_nickname', 'string', true );
 			$Request->param_check_not_empty( 'edited_user_nickname', T_('Please enter a nickname (can be the same as your login).') );
 
-			param( 'edited_user_idmode', 'string', true );
-			param( 'edited_user_locale', 'string', true );
+			$Request->param( 'edited_user_idmode', 'string', true );
+			$Request->param( 'edited_user_locale', 'string', true );
 
 			$Request->param( 'edited_user_email', 'string', true );
 			$Request->param_check_not_empty( 'edited_user_email', T_('Please enter an e-mail address.') );
@@ -263,15 +266,15 @@ if( !$Messages->count('error') )
 			$Request->param( 'edited_user_icq', 'string', true );
 			$Request->param_check_number( 'edited_user_icq', T_('The ICQ UIN can only be a number, no letters allowed.') );
 
-			param( 'edited_user_aim', 'string', true );
+			$Request->param( 'edited_user_aim', 'string', true );
 
 			$Request->param( 'edited_user_msn', 'string', true );
 			$Request->param_check_email( 'edited_user_msn', false );
 
-			param( 'edited_user_yim', 'string', true );
-			param( 'edited_user_allow_msgform', 'integer', 0 );
-			param( 'edited_user_notify', 'integer', 0 );
-			param( 'edited_user_showonline', 'integer', 0 );
+			$Request->param( 'edited_user_yim', 'string', true );
+			$Request->param( 'edited_user_allow_msgform', 'integer', 0 );
+			$Request->param( 'edited_user_notify', 'integer', 0 );
+			$Request->param( 'edited_user_showonline', 'integer', 0 );
 
 			$Request->param( 'edited_user_pass1', 'string', true );
 			$Request->param( 'edited_user_pass2', 'string', true );
@@ -302,8 +305,22 @@ if( !$Messages->count('error') )
 
 			// Features
 			$Request->param( 'edited_user_admin_skin', 'string', true );
+			$Request->param_integer_range( 'edited_user_action_icon_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
+			$Request->param_integer_range( 'edited_user_action_word_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
 			$Request->param( 'edited_user_legend', 'integer', 0 );
 			$Request->param( 'edited_user_bozo', 'integer', 0 );
+			$Request->param( 'edited_user_focusonfirst', 'integer', 0 );
+			
+      // Action icon params:
+			$UserSettings->set( 'action_icon_threshold', $edited_user_action_icon_threshold, $edited_User->ID );
+			$UserSettings->set( 'action_word_threshold', $edited_user_action_word_threshold, $edited_User->ID );
+			$UserSettings->set( 'display_icon_legend', $edited_user_legend, $edited_User->ID );
+
+			// Set bozo validador activation
+			$UserSettings->set( 'control_form_abortions', $edited_user_bozo, $edited_User->ID );
+
+			// Focus on first
+			$UserSettings->set( 'focus_on_first_input', $edited_user_focusonfirst, $edited_User->ID );
 
 			// PluginUserSettings
 			$any_plugin_settings_updated = false;
@@ -386,11 +403,6 @@ if( !$Messages->count('error') )
 				{ // admin_skin has changed or was set the first time for the current user
 					$reload_page = true;
 				}
-				// Set icons legend displayed
-				$UserSettings->set( 'legend', $edited_user_legend, $edited_User->ID );
-
-				// Set bozo validador activation
-				$UserSettings->set( 'bozo', $edited_user_bozo, $edited_User->ID );
 
 				$UserSettings->dbupdate();
 
@@ -630,7 +642,7 @@ switch( $action )
 		case 'view_user':
 		case 'edit_user':
 			// Display user form:
-			$AdminUI->disp_view( 'users/_users_form' );
+			$AdminUI->disp_view( 'users/_users_form.php' );
 			break;
 
 
@@ -643,7 +655,7 @@ switch( $action )
 		case 'edit_group':
 		case 'view_group':
 			// Display group form:
-			$AdminUI->disp_view( 'users/_users_groupform' );
+			$AdminUI->disp_view( 'users/_users_groupform.php' );
 			break;
 
 
@@ -652,7 +664,7 @@ switch( $action )
 		// Display user list:
 		// NOTE: we don't want this (potentially very long) list to be displayed again and again)
 		$AdminUI->disp_payload_begin();
-		$AdminUI->disp_view( 'users/_users_list' );
+		$AdminUI->disp_view( 'users/_users_list.php' );
 		$AdminUI->disp_payload_end();
 }
 
@@ -662,6 +674,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2006/04/14 19:25:32  fplanque
+ * evocore merge with work app
+ *
  * Revision 1.14  2006/04/11 21:22:25  fplanque
  * partial cleanup
  *

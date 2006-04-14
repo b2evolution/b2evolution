@@ -237,7 +237,8 @@ function focus_on_first_input()
 		}
 	}
 }
-addEvent( window, 'load', focus_on_first_input, false );
+// This will be conditionnaly enabled by PHP:
+//addEvent( window, 'load', focus_on_first_input, false );
 
 /**
  * Handle Combo Boxes
