@@ -464,7 +464,7 @@ $skins_url = $baseurl.$skins_subdir;     // You should not need to change this
  * Location of the admin interface dispatcher
  */
 $dispatcher = 'admin.php';
-$admin_url = $baseurl.''.$dispatcher;
+$admin_url = $baseurl.$dispatcher;
 
 
 /**
