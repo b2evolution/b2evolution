@@ -1347,21 +1347,21 @@ switch( $action )
 	case 'rename':
 		// Rename files dialog:
 		$AdminUI->disp_payload_begin();
-		$AdminUI->disp_view( 'files/_files_rename.form' );
+		$AdminUI->disp_view( 'files/_files_rename.form.php' );
 		$AdminUI->disp_payload_end();
 		break;
 
 	case 'delete':
 		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
 		$AdminUI->disp_payload_begin();
-		$AdminUI->disp_view( 'files/_files_delete.form' );
+		$AdminUI->disp_view( 'files/_files_delete.form.php' );
 		$AdminUI->disp_payload_end();
 		break;
 
 	case 'download':
 		// Delete file(s). We arrive here either if not confirmed or in case of error(s).
 		$AdminUI->disp_payload_begin();
-		$AdminUI->disp_view( 'files/_files_download.form' );
+		$AdminUI->disp_view( 'files/_files_download.form.php' );
 		$AdminUI->disp_payload_end();
 		break;
 
@@ -1369,7 +1369,7 @@ switch( $action )
 	case 'edit_perms':
 		// Filesystem permissions for specific files
 		$AdminUI->disp_payload_begin();
-		$AdminUI->disp_view( 'files/_files_permissions.form' );
+		$AdminUI->disp_view( 'files/_files_permissions.form.php' );
 		$AdminUI->disp_payload_end();
 		break;
 
@@ -1403,29 +1403,30 @@ switch( $fm_mode )
 	case 'file_copy':
 	case 'file_move':
 		// CMR dialog:
-		$AdminUI->disp_view( 'files/_files_cmr.inc' );
+		$AdminUI->disp_view( 'files/_files_cmr.inc.php' );
 		break;
 
 	case 'file_upload':
 		// Upload dialog:
-		$AdminUI->disp_view( 'files/_files_upload.inc' );
+		$AdminUI->disp_view( 'files/_files_upload.inc.php' );
 		break;
 
 	case 'file_properties':
 		// File properties (Meta data) dialog:
-		$AdminUI->disp_view( 'files/_file_properties.inc' );
+		$AdminUI->disp_view( 'files/_file_properties.inc.php' );
 		break;
 
 	case 'link_item':
 		// Links dialog:
 		$AdminUI->disp_payload_begin();
-		$AdminUI->disp_view( 'files/_files_links.inc' );
+		$AdminUI->disp_view( 'files/_files_links.inc.php' );
 		$AdminUI->disp_payload_end();
 		break;
 }
 
 
 // "Display Filemanager" link, if appropriate
+// fp>> This needs SERIOUS documentation !
 $disp_fm_browser = true;
 $disp_fm_browser_toggle = false;
 
@@ -1454,7 +1455,7 @@ if( $disp_fm_browser )
 	// -------------------
 
 	// Display VIEW:
-	$AdminUI->disp_view( 'files/_files_browse.inc' );
+	$AdminUI->disp_view( 'files/_files_browse.inc.php' );
 }
 
 
@@ -1465,6 +1466,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.19  2006/04/14 19:33:29  fplanque
+ * evocore sync
+ *
  * Revision 1.18  2006/04/13 00:10:52  blueyed
  * cleanup
  *
