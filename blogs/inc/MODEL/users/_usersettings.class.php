@@ -129,6 +129,8 @@ class UserSettings extends AbstractSettings
 	 *
 	 * If the user setting was not set before (and there's no default given that gets returned), $default gets used.
 	 *
+	 * @todo Move this to _abstractsettings.class.php - the other Settings object can also make use of it!
+	 *
 	 * @param string Param and user setting name. Make sure this is unique.
 	 * @param string Force value type to one of:
 	 * - integer
@@ -176,6 +178,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/17 23:58:29  blueyed
+ * todo
+ *
  * Revision 1.7  2006/04/14 19:20:19  fplanque
  * icon cleanup
  *
