@@ -575,7 +575,7 @@ class Request
 	 *
 	 * @param string Variable to set
 	 * @param mixed Default value or TRUE if user input required
-	 * @param boolean memorize ( @see param() )
+	 * @param boolean memorize ( see {@link param()} )
 	 * @param string error message
 	 * @param boolean 'required': Is non-empty date required? Default: true.
 	 *
@@ -854,6 +854,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/17 23:44:19  blueyed
+ * doc fix
+ *
  * Revision 1.9  2006/04/14 19:25:32  fplanque
  * evocore merge with work app
  *
