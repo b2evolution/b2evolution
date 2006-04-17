@@ -2036,7 +2036,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
 	}
 
 	// "use_js_popup": open link in a JS popup
-	if( isset($link_attribs['use_js_popup']) )
+	if( ! empty($link_attribs['use_js_popup']) )
 	{
 		$popup_js = 'var win = new PopupWindow(); win.autoHide(); win.setUrl( \''.$link_attribs['href'].'\' ); win.setSize( 500, 400 ); win.showPopup(\''.$link_attribs['id'].'\'); return false;';
 		if( empty( $link_attribs['onclick'] ) )
@@ -2667,30 +2667,32 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 {
 	$r = '';
 
-	if( ! empty( $field_attribs ) )
-	{
-		foreach( $field_attribs as $l_attr => $l_value )
-		{
-			if( $l_value === '' || $l_value === NULL )
-			{ // don't generate empty attributes (it may be NULL if we pass 'value' => NULL as field_param for example, because isset() does not match it!)
-				continue;
-			}
+	if( empty( $field_attribs ) )
+	{ // TODO: This extra check should not be needed, if $field_attribs is an array! (blueyed)
+		return $r;
+	}
 
-			if( $format_to_output )
+	foreach( $field_attribs as $l_attr => $l_value )
+	{
+		if( $l_value === '' || $l_value === NULL )
+		{ // don't generate empty attributes (it may be NULL if we pass 'value' => NULL as field_param for example, because isset() does not match it!)
+			continue;
+		}
+
+		if( $format_to_output )
+		{
+			if( $l_attr == 'value' )
 			{
-				if( $l_attr == 'value' )
-				{
-					$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
-				}
-				else
-				{
-					$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
-				}
+				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
 			}
 			else
 			{
-				$r .= ' '.$l_attr.'="'.$l_value.'"';
+				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
 			}
+		}
+		else
+		{
+			$r .= ' '.$l_attr.'="'.$l_value.'"';
 		}
 	}
 
@@ -2761,6 +2763,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.31  2006/04/17 23:59:04  blueyed
+ * re-fix, cleanup
+ *
  * Revision 1.30  2006/04/14 19:16:07  fplanque
  * icon cleanup
  *
