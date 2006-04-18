@@ -113,7 +113,7 @@ class DataObject
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
-	 * @return boolean true on success, false on failure to update, NULL if no update necessary
+	 * @return boolean|NULL true on success, false on failure to update, NULL if no update necessary
 	 */
 	function dbupdate()
 	{
@@ -644,6 +644,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/18 00:02:47  blueyed
+ * doc
+ *
  * Revision 1.5  2006/04/14 19:25:32  fplanque
  * evocore merge with work app
  *
