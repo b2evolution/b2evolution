@@ -735,6 +735,9 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.16  2006/04/18 00:00:59  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.15  2006/04/14 19:34:40  fplanque
  * folder tree reorganization
  *
@@ -903,5 +906,6 @@ function get_directory_tree( $Root = NULL , $path = NULL, $params = array(), $ro
  *
  * Revision 1.9  2004/10/12 17:22:30  fplanque
  * Edited code documentation.
+ * }}}
  */
 ?>
