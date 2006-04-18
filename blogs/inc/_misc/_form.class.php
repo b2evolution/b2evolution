@@ -1134,7 +1134,6 @@ class Form extends Widget
 						</script>';
 
 		// TODO: check if bozo validator is activated in PHP
-		// TODO: does this make sense to add it to every form??
 		if( preg_match( '#^(.*)_checkchanges#', $this->form_name ) && !empty( $this->title ) )
 		{ // This form will trigger the bozo validator and has a title, preset a localized bozo confirm message:
 			$r .= '<script type="text/javascript">
@@ -2495,6 +2494,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/18 19:37:37  fplanque
+ * minor
+ *
  * Revision 1.9  2006/04/18 15:43:00  blueyed
  * todo
  *

@@ -39,8 +39,7 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 		<thead>
 		<tr>
 			<th class="firstcol"><?php
-				// TODO: blueyed>> This eats up a lot of horizontal space, especially if translated to "Eingeschaltet" (german)..
-				echo T_('Enabled'); ?></th>
+				echo /* TRANS: shortcut for enabled */ T_('En'); ?></th>
 			<th><?php echo T_('Plugin') ?></th>
 			<th><?php echo T_('Priority') ?></th>
 			<th title="<?php echo T_('When should rendering apply?') ?>"><?php echo T_('Apply') ?></th>
@@ -243,6 +242,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.14  2006/04/18 19:37:37  fplanque
+ * minor
+ *
  * Revision 1.13  2006/04/18 15:16:37  blueyed
  * todo
  *
