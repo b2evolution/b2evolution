@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 0.9\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2006-04-18 18:57+0200\n"
-"PO-Revision-Date: 2006-04-18 19:00+0100\n"
+"PO-Revision-Date: 2006-04-18 19:22+0100\n"
 "Last-Translator: Francois PLANQUE <http://fplanque.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -1677,7 +1677,7 @@ msgstr "Publié"
 #: ..\..\..\inc\VIEW\collections\_blogs_permissions_group.form.php:242
 #: ..\..\..\inc\VIEW\items\_browse_posts_sidebar.inc.php:107
 msgid "Deprecated"
-msgstr "Périmé"
+msgstr "Déprécié"
 
 #: ..\..\..\inc\_vars.inc.php:242
 #: ..\..\..\inc\VIEW\collections\_blogs_permissions.form.php:233
@@ -5154,7 +5154,7 @@ msgstr "Permission de poster dans ce blog avec le statut brouillon"
 #: ..\..\..\inc\VIEW\collections\_blogs_permissions.form.php:90
 #: ..\..\..\inc\VIEW\collections\_blogs_permissions_group.form.php:90
 msgid "Permission to post into this blog with deprecated status"
-msgstr "Permission de poster dans ce blog avec le statut périmé"
+msgstr "Permission de poster dans ce blog avec le statut déprécié"
 
 #: ..\..\..\inc\VIEW\collections\_blogs_permissions.form.php:96
 #: ..\..\..\inc\VIEW\collections\_blogs_permissions_group.form.php:96
@@ -6513,7 +6513,7 @@ msgstr "Brouillon (Non publié!)"
 
 #: ..\..\..\inc\VIEW\items\_item.form.php:355
 msgid "Deprecated (Not published!)"
-msgstr "Périmé (Non publié!)"
+msgstr "Déprécié (Non publié!)"
 
 #: ..\..\..\inc\VIEW\items\_item.form.php:369
 msgid "Visitors can leave comments on this post."
@@ -9311,7 +9311,7 @@ msgstr ""
 "\n"
 "Ces articles sont là pour vous aider alors, comme dirait EdB: \"<em>lisez les tous avant de commencer à bidouiller!</em>\" ;)\n"
 "\n"
-"Si vous le souhaitez, vous pouvez supprimer ces articles un par un au fur et à mesure que vous les lisez. Vous pouvez également changer leur statut un 'perimé' de manière à garder une trace visuelle de ce que vous avez déjà lu."
+"Si vous le souhaitez, vous pouvez supprimer ces articles un par un au fur et à mesure que vous les lisez. Vous pouvez également changer leur statut en 'déprécié' de manière à garder une trace visuelle de ce que vous avez déjà lu."
 
 #: ..\..\..\install\_functions_create.php:625
 msgid "First Post"

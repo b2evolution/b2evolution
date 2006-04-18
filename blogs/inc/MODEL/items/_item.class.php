@@ -1528,7 +1528,7 @@ class Item extends DataObject
 		}
 
 		if( $text == '#' ) $text = get_icon( 'deprecate', 'imgtag' ).' '.T_('Deprecate!');
-		if( $title == '#' ) $title = T_('Deprecate this post now!');
+		if( $title == '#' ) $title = T_('Deprecate this post!');
 
 		$r = $before;
 		$r .= '<a href="'.$admin_url.'?ctrl=editactions'.$glue.'action=deprecate'.$glue.'post_ID='.$this->ID;
@@ -1541,6 +1541,16 @@ class Item extends DataObject
 	}
 
 
+	/**
+	 * Display link to deprecate a post if user has edit rights
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param string glue between url params
+	 */
 	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;' )
 	{
 		echo $this->get_deprecate_link( $before, $after, $text, $title, $class, $glue );
@@ -2488,6 +2498,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2006/04/18 20:16:54  fplanque
+ * minor
+ *
  * Revision 1.31  2006/04/13 01:23:19  blueyed
  * Moved help related functions back to Plugin class
  *
