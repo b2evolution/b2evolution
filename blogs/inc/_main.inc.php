@@ -53,6 +53,24 @@ define( 'EVO_MAIN_INIT', true );
 
 
 /**
+ * Security check for older PHP versions
+ * Contributed by counterpoint / MAMBO team
+ */
+$protects = array( '_REQUEST', '_GET', '_POST', '_COOKIE', '_FILES', '_SERVER', '_ENV', 'GLOBALS', '_SESSION' );
+foreach( $protects as $protect )
+{
+	if(  in_array( $protect, array_keys($_REQUEST) )
+		|| in_array( $protect, array_keys($_GET) )
+		|| in_array( $protect, array_keys($_POST) )
+		|| in_array( $protect, array_keys($_COOKIE) )
+		|| in_array( $protect, array_keys($_FILES) ) )
+	{
+		die("Invalid Request.");
+	}
+}
+
+
+/**
  * Load logging class
  */
 require_once dirname(__FILE__).'/_misc/_log.class.php';
@@ -515,6 +533,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/18 14:18:03  fplanque
+ * security fix
+ *
  * Revision 1.7  2006/04/14 19:25:31  fplanque
  * evocore merge with work app
  *
