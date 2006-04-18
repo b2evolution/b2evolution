@@ -1127,12 +1127,14 @@ class Form extends Widget
 		}
 
 		// Initialization of javascript vars used to create parent_child select lists
+		// TODO: does this make sense to add it to every form??
 		$r .= '<script type="text/javascript">
 							var nb_dynamicSelects = 0;
 							var tab_dynamicSelects = Array();
 						</script>';
 
 		// TODO: check if bozo validator is activated in PHP
+		// TODO: does this make sense to add it to every form??
 		if( preg_match( '#^(.*)_checkchanges#', $this->form_name ) && !empty( $this->title ) )
 		{ // This form will trigger the bozo validator and has a title, preset a localized bozo confirm message:
 			$r .= '<script type="text/javascript">
@@ -1140,7 +1142,7 @@ class Form extends Widget
 								{	// If Bozo validator is active:
 									bozo.confirm_mess = "'.sprintf(T_( 'You have modified the form \"%s\"\nbut you haven\'t submitted it yet.\nYou are about to loose your edits.\nAre you sure?' ), $this->title ).'";
 								}
-		 				</script>';
+						</script>';
 		}
 
 		return $this->display_or_return( $r );
@@ -2493,6 +2495,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.9  2006/04/18 15:43:00  blueyed
+ * todo
+ *
  * Revision 1.8  2006/03/27 21:04:51  blueyed
  * Fixed "note" for radio inputs.
  *
