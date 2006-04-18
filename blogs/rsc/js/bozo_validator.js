@@ -11,7 +11,7 @@ var bozo_confirm_mess;
 
 var bozo = {
 
-	'tab_changes' : Array(), 	// array of changes numbers for each form we need to verify
+	'tab_changes' : Object(), 	// array of changes numbers for each form we need to verify
 	'nb_changes' : 0, 			// Total changes number
 
 	// If no translated message has been provided, use this default:
@@ -196,10 +196,6 @@ var bozo = {
 		// Loop on the forms changes array
 		for( i in bozo.tab_changes )
 		{
-			if( ! bozo.tab_changes.propertyIsEnumerable(i) )
-			{ // this fix is needed if the tab_changes has been extended through "prototype" (e.g. Scriptaculous uses it)
-				continue;
-			}
 			if ( ( i != get_form( target ).id ) && bozo.tab_changes[i] )
 			{	// Another form contains input changes
 				changes++;
