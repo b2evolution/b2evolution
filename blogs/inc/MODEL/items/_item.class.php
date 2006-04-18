@@ -875,7 +875,7 @@ class Item extends DataObject
 		}
 
 		// Apply rendering
-		$post_renderers = $Plugins->validate_list( explode( '.', $this->renderers ) );
+		$post_renderers = $Plugins->validate_list( $this->get_renderers() );
 		$output = $Plugins->render( $output, $post_renderers, $format );
 
 		// Apply Display plugins
@@ -1331,7 +1331,7 @@ class Item extends DataObject
 
 
 	/**
-	 * Displays button for deleting the Item if user has proper rights
+	 * Get button for deleting the Item if user has proper rights
 	 *
 	 * @param string to display before link
 	 * @param string to display after link
@@ -1341,8 +1341,7 @@ class Item extends DataObject
 	 * @param boolean true to make this a button instead of a link
 	 * @param string page url for the delete action
 	 */
-	function get_delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
-														$button = false, $actionurl = '#' )
+	function get_delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $actionurl = '#' )
 	{
 		global $current_User, $admin_url;
 
@@ -1397,11 +1396,10 @@ class Item extends DataObject
 	}
 
 
-  /**
-   *
-   */
- 	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '',
-												$button = false, $actionurl = '#' )
+	/**
+	 * Displays button for deleting the Item if user has proper rights
+	 */
+	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $actionurl = '#' )
 	{
 		echo $this->get_delete_link( $before, $after, $text, $title, $class, $button, $actionurl );
 	}
@@ -1636,7 +1634,7 @@ class Item extends DataObject
 			$loop_RendererPlugin->code();
 			echo '"';
 
-			$item_renderers = explode( '.', $this->renderers );
+			$item_renderers = $this->get_renderers();
 
 			switch( $loop_RendererPlugin->apply_rendering )
 			{
@@ -2004,12 +2002,23 @@ class Item extends DataObject
 			case 'pingsdone':
 				return $this->set_param( 'flags', 'string', $parvalue ? 'pingsdone' : '' );
 
-			case 'renderers':
-				return $this->set_param( 'renderers', 'string', implode( '.', $parvalue ) );
+			case 'renderers': // deprecated
+				return $this->set_renderers( $parvalue );
 
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
+	}
+
+
+	/**
+	 * Set the renderers of the Item.
+	 * @param array List of renderer codes.
+	 * @return
+	 */
+	function set_renderers( $renderers )
+	{
+		return $this->set_param( 'renderers', 'string', implode( '.', $renderers ) );
 	}
 
 
@@ -2074,7 +2083,7 @@ class Item extends DataObject
 		$this->set( 'url', $post_url );
 		$this->set( 'flags', $pingsdone ? 'pingsdone' : '' );
 		$this->set( 'comments', $post_comments );
-		$this->set( 'renderers', $post_renderers );
+		$this->set_renderers( $post_renderers );
 		$this->set( 'typ_ID', $item_typ_ID );
 		$this->set( 'st_ID', $item_st_ID );
 
@@ -2124,7 +2133,7 @@ class Item extends DataObject
 	/**
 	 * Update a post and save to DB
 	 *
-	 * This funtion has to handle all needed DB dependencies!
+	 * This function has to handle all needed DB dependencies!
 	 */
 	function update(
 		$post_title,
@@ -2156,7 +2165,7 @@ class Item extends DataObject
 		$this->set( 'status', $post_status );
 		$this->set( 'flags', $pingsdone ? 'pingsdone' : '' );
 		$this->set( 'comments', $post_comments );
-		$this->set( 'renderers', $post_renderers );
+		$this->set_renderers( $post_renderers );
 		$this->set( 'typ_ID', $item_typ_ID );
 		$this->set( 'st_ID', $item_st_ID );
 		if( $post_locale != '#' )
@@ -2494,12 +2503,57 @@ class Item extends DataObject
 		// Set to the item the first category we got
 		$this->set( 'main_cat_ID', $cat_ID );
 	}
+
+
+	/**
+	 * Get the list of renderers for this Item.
+	 * @return array
+	 */
+	function get_renderers()
+	{
+		return explode( '.', $this->renderers );
+	}
+
+
+	/**
+	 * Add a renderer (by code) to the Item.
+	 * @param string Renderer code to add for this item
+	 */
+	function add_renderer( $renderer_code )
+	{
+		$renderers = $this->get_renderers();
+		if( ! in_array( $renderer_code, $renderers ) )
+		{
+			$renderers[] = $renderer_code;
+			$this->set_renderers( $renderers );
+
+			echo 'Added renderer '.$renderer_code;
+		}
+	}
+
+
+	/**
+	 * Remove a renderer (by code) from the Item.
+	 * @param string Renderer code to remove for this item
+	 */
+	function remove_renderer( $renderer_code )
+	{
+		$renderers = $this->get_renderers();
+		if( ( $key = array_search( $renderer_code, $renderers ) ) !== false )
+		{
+			unset($renderers[$key]);
+			$this->set_renderers( $renderers );
+
+			echo 'Removed renderer '.$renderer_code;
+		}
+	}
 }
+
 
 /*
  * $Log$
- * Revision 1.32  2006/04/18 20:16:54  fplanque
- * minor
+ * Revision 1.33  2006/04/18 20:41:00  blueyed
+ * Decent getters/setters for renderers.
  *
  * Revision 1.31  2006/04/13 01:23:19  blueyed
  * Moved help related functions back to Plugin class
