@@ -468,6 +468,128 @@ class Comment extends DataObject
 
 
 	/**
+	 * Provide link to deprecate a comment if user has edit rights
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param string glue between url params
+	 * @param boolean save context?
+	 */
+	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = false )
+	{
+		global $current_User, $admin_url;
+
+		if( ! is_logged_in() ) return false;
+
+		if( ($this->status == 'deprecated') // Already deprecateded!
+			|| ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
+		{ // If User has permission to edit comments:
+			return false;
+		}
+
+		if( $text == '#' ) $text = get_icon( 'deprecate', 'imgtag' ).' '.T_('Deprecate!');
+		if( $title == '#' ) $title = T_('Deprecate this comment!');
+
+		$r = $before;
+		$r .= '<a href="';
+		//if( $save_context )
+		{
+		}
+		//else
+		{
+			$r .= $admin_url.'?ctrl=editactions'.$glue.'action=deprecate_comment'.$glue.'comment_ID='.$this->ID;
+		}
+		$r .= '" title="'.$title.'"';
+		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+		$r .= '>'.$text.'</a>';
+		$r .= $after;
+
+		return $r;
+	}
+
+
+	/**
+	 * Display link to deprecate a comment if user has edit rights
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param string glue between url params
+	 * @param boolean save context?
+	 */
+	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = false )
+	{
+		echo $this->get_deprecate_link( $before, $after, $text, $title, $class, $glue, $save_context );
+	}
+
+
+	/**
+	 * Provide link to publish a comment if user has edit rights
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param string glue between url params
+	 * @param boolean save context?
+	 */
+	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = false )
+	{
+		global $current_User, $admin_url;
+
+		if( ! is_logged_in() ) return false;
+
+		if( ($this->status == 'published') // Already published!
+			|| ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
+		{ // If User has permission to edit comments:
+			return false;
+		}
+
+		if( $text == '#' ) $text = get_icon( 'publish', 'imgtag' ).' '.T_('Publish!');
+		if( $title == '#' ) $title = T_('Publish this comment!');
+
+		$r = $before;
+		$r .= '<a href="';
+		//if( $save_context )
+		{
+		}
+		//else
+		{
+			$r .= $admin_url.'?ctrl=editactions'.$glue.'action=publish_comment'.$glue.'comment_ID='.$this->ID;
+		}
+		$r .= '" title="'.$title.'"';
+		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+		$r .= '>'.$text.'</a>';
+		$r .= $after;
+
+		return $r;
+	}
+
+
+	/**
+	 * Display link to publish a comment if user has edit rights
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param string glue between url params
+	 * @param boolean save context?
+	 */
+	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = false )
+	{
+		echo $this->get_publish_link( $before, $after, $text, $title, $class, $glue, $save_context );
+	}
+
+
+	/**
 	 * Provide link to message form for this comment's author
 	 *
 	 * @param string url of the message form
@@ -892,6 +1014,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2006/04/18 20:17:25  fplanque
+ * fast comment status switching
+ *
  * Revision 1.19  2006/04/18 19:29:51  fplanque
  * basic comment status implementation
  *

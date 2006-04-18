@@ -130,7 +130,11 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 						<?php break;
 				}
 
-				$Comment->edit_link( ' &middot; ' ) // Link to backoffice for editing
+				// Link to backoffice for editing:
+				$Comment->edit_link( ' &middot; ' );
+
+				// Link to backoffice for deleting:
+				$Comment->delete_link( ' &middot; ' );
 			?>
 			</div>
 			<div class="bCommentText">
@@ -255,6 +259,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.55  2006/04/18 20:17:26  fplanque
+ * fast comment status switching
+ *
  * Revision 1.54  2006/04/18 19:29:52  fplanque
  * basic comment status implementation
  *

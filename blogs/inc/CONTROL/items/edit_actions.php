@@ -483,7 +483,38 @@ switch($action)
 		$edited_Comment->set_from_Request( 'status', 'comment_status' );
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		$location = url_add_param( $admin_url, 'ctrl=browse&blog='.$blog.'&p='.$edited_Comment->Item->ID.'&c=1#comments', '&' );
+		$location = url_add_param( $admin_url, 'ctrl=browse&tab=posts&blog='.$blog.'&p='.$edited_Comment->Item->ID.'&c=1#comments', '&' );
+		header ("Location: $location");
+		exit();
+
+
+	case 'publish_comment':
+	case 'deprecate_comment':
+		/*
+		 * --------------------------------------------------------------------
+		 * UPDATE comment status in db:
+		 */
+		$Request->param( 'comment_ID', 'integer', true );
+		$edited_Comment = Comment_get_by_ID( $comment_ID );
+		$blog = $edited_Comment->Item->get( 'blog_ID' );
+
+		// Check permission:
+		$current_User->check_perm( 'blog_comments', '', true, $blog );
+
+		switch( $action )
+		{
+			case 'publish_comment':
+				$edited_Comment->set('status', 'published' );
+				break;
+
+			case 'deprecate_comment':
+				$edited_Comment->set('status', 'deprecated' );
+				break;
+		}
+
+		$edited_Comment->dbupdate();	// Commit update to the DB
+
+		$location = url_add_param( $admin_url, 'ctrl=browse&tab=posts&blog='.$blog.'&p='.$edited_Comment->Item->ID.'&c=1#comments', '&' );
 		header ("Location: $location");
 		exit();
 
@@ -505,7 +536,7 @@ switch($action)
 		// Delete from Db:
 		$edited_Comment->dbdelete();
 
-		$location = url_add_param( $admin_url, 'ctrl=browse&blog='.$blog.'&p='.$comment_post_ID.'&c=1#comments', '&' );
+		$location = url_add_param( $admin_url, 'ctrl=browse&tab=posts&blog='.$blog.'&p='.$comment_post_ID.'&c=1#comments', '&' );
 		header ("Location: $location");
 		exit();
 
@@ -547,6 +578,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/18 20:17:25  fplanque
+ * fast comment status switching
+ *
  * Revision 1.7  2006/04/18 19:29:51  fplanque
  * basic comment status implementation
  *

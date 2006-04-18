@@ -102,6 +102,12 @@ while( $Comment = & $CommentList->get_next() )
 			// Display edit button if current user has the rights:
 			$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton');
 
+			// Display publish NOW button if current user has the rights:
+			$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', true );
+
+			// Display deprecate button if current user has the rights:
+			$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton', '&amp;', true );
+
 			// Display delete button if current user has the rights:
 			$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
 		?>
@@ -114,6 +120,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.2  2006/04/18 20:17:26  fplanque
+ * fast comment status switching
+ *
  * Revision 1.1  2006/04/18 19:35:58  fplanque
  * basic comment status implementation
  *
