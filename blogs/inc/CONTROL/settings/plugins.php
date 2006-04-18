@@ -287,7 +287,7 @@ switch( $action )
 		$msgs = $Plugins->validate_dependencies( $edit_Plugin, 'disable' );
 		if( ! empty( $msgs['error'] ) )
 		{
-			$Messages->add( T_( 'The plugin cannot get disabled because of dependency problems:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>', 'error' );
+			$Messages->add( T_( 'The plugin cannot be disabled because of the following dependencies:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>', 'error' );
 			break;
 		}
 
@@ -331,7 +331,7 @@ switch( $action )
 		$msgs = $Plugins->validate_dependencies( $edit_Plugin, 'enable' );
 		if( ! empty( $msgs['error'] ) )
 		{
-			$Messages->add( T_( 'The plugin cannot get enabled because of dependency problems:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>' );
+			$Messages->add( T_( 'The plugin cannot be enabled because of the followin dependencies:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>' );
 			break;
 		}
 
@@ -493,7 +493,7 @@ switch( $action )
 		$msgs = $Plugins->validate_dependencies( $edit_Plugin, 'disable' );
 		if( ! empty( $msgs['error'] ) )
 		{
-			$Messages->add( T_( 'The plugin cannot get uninstalled because of dependency problems:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>', 'error' );
+			$Messages->add( T_( 'The plugin cannot be uninstalled because of the following dependencies:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>', 'error' );
 			break;
 		}
 		if( ! empty( $msgs['note'] ) )
