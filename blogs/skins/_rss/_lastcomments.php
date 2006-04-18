@@ -24,7 +24,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$CommentList = & new CommentList( $blog, "'comment'", $show_statuses, '',	'',	'DESC',	'',	20 );
+$CommentList = & new CommentList( $blog, "'comment'", array('published'), '',	'',	'DESC',	'',	20 );
 
 ?>
 		<link><?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?></link>

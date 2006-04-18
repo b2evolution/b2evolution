@@ -168,7 +168,6 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		<legend><?php echo T_('Comment info') ?></legend>
 		<p><strong><?php echo T_('Author') ?>:</strong> <?php echo $edited_Comment->author() ?></p>
 		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
-		<p><strong><?php echo T_('Status') ?>:</strong> <?php echo $edited_Comment->status; ?></p>
 		<p><strong><?php echo T_('IP address') ?>:</strong> <?php echo $edited_Comment->author_IP; ?></p>
 		<p><strong><?php echo T_('Spam Karma') ?>:</strong> <?php
 		// TODO: the cast to "int" can be removed once the dataobjects actually set a param to "0" if it's NULL before..
@@ -176,6 +175,16 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		?>%</p>
 	</fieldset>
 
+	<?php
+		$Form->begin_fieldset( T_('Visibility'), array( 'id' => 'commentform_visibility' ) );
+
+		$sharing_options[] = array( 'published', T_('Published (Public)') );
+		$sharing_options[] = array( 'draft', T_('Draft (Not published!)') );
+		$sharing_options[] = array( 'deprecated', T_('Deprecated (Not published!)') );
+		$Form->radio( 'comment_status', $edited_Comment->status, $sharing_options, '', true );
+
+		$Form->end_fieldset();
+	?>
 </div>
 
 <div class="clear"></div>
@@ -185,6 +194,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/18 19:29:52  fplanque
+ * basic comment status implementation
+ *
  * Revision 1.6  2006/04/06 19:48:28  blueyed
  * temporary fix
  *

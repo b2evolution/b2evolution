@@ -184,7 +184,7 @@ else
 			/*
 			 * Latest comments:
 			 */
-			$Request->param( 'show_status', 'array', array( 'published', 'protected', 'private', 'draft', 'deprecated' ), true );	// Array of cats to restrict to
+			$Request->param( 'show_status', 'array', array(), true );	// Array of cats to restrict to
 			$show_statuses = $show_status;
 
 			$CommentList = & new CommentList( $blog, "'comment','trackback','pingback'", $show_statuses, '',	'',	'DESC',	'',	20 );

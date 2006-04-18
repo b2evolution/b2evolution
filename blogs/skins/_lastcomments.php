@@ -21,7 +21,7 @@ if( $disp != 'comments' )
 	return false;		// Nothing to do here!
 }
 
-$CommentList = & new CommentList( $blog, "'comment','trackback','pingback'", $show_statuses, '',	'',	'DESC',	'',	20 );
+$CommentList = & new CommentList( $blog, "'comment','trackback','pingback'", array('published'), '',	'',	'DESC',	'',	20 );
 
 $CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No comment yet...').'</p></div>' );
 
@@ -54,6 +54,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.24  2006/04/18 19:29:52  fplanque
+ * basic comment status implementation
+ *
  * Revision 1.23  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

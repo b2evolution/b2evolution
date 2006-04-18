@@ -79,39 +79,40 @@ while( $Item = & $ItemList->get_item() )
 				locale_flag( $Item->locale, 'h10px' );
 				echo '</div>';
 
-				echo '<strong>';
+				echo '<span class="bDate">';
 				$Item->issue_date();
-				echo '</strong> @ <strong>';
+				echo '</span> @ <span class="bTime">';
 				$Item->issue_time( 'H:i' );
-				echo '</strong>';
+				echo '</span>';
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' <acronym title="';
 				$Item->Author->login();
 				echo ', '.T_('level:');
 				$Item->Author->level();
-				echo '"><strong>';
+				echo '"><span class="bAuthor">';
 				$Item->Author->preferred_name();
-				echo '</strong></acronym>';
+				echo '</span></acronym>';
 
 				echo '<div class="bSmallHeadRight">';
 				echo T_('Visibility').': ';
-				echo '<span class="Status">';
+				echo '<span class="bStatus">';
 				$Item->status();
 				echo '</span>';
 				echo '</div>';
 
 				echo '<br />';
-				$Item->type( T_('Type').': <strong>', '</strong> &nbsp; ' );
-				$Item->priority( T_('Priority').': <strong>', '</strong> &nbsp; ' );
+				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
+				$Item->priority( T_('Priority').': <span class="bPriority">', '</span> &nbsp; ' );
 				$Item->assigned_to( T_('Assigned to:').' <strong>', '</strong> &nbsp; ' );
 				$Item->extra_status( T_('Task Status').': <strong>', '</strong>' );
 
-				echo '<div class="bSmallHeadRight">';
+				echo '<div class="bSmallHeadRight"><span class="bViews">';
 				$Item->views();
-				echo '</div>';
+				echo '</span></div>';
 
-				echo '<br />'.T_('Categories').': ';
+				echo '<br />'.T_('Categories').': <span class="bCategories">';
 				$Item->categories( false );
+				echo '</span>';
 			?>
 		</div>
 
@@ -143,7 +144,7 @@ while( $Item = & $ItemList->get_item() )
 
 			if( $Blog->allowcomments != 'never' )
 			{
-				echo '<a href="?ctrl=browse&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'&amp;c=1" class="ActionButton">';
+				echo '<a href="?ctrl=browse&amp;tab=posts&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'&amp;c=1" class="ActionButton">';
 				// TRANS: Link to comments for current post
 				comments_number(T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
 				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'), $Item->ID);
@@ -162,77 +163,17 @@ while( $Item = & $ItemList->get_item() )
 			<a name="comments"></a>
 			<h4><?php echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks') ?>:</h4>
 			<?php
+			global $CommentList;
 
-			$CommentList = & new CommentList( 0, "'comment','trackback','pingback'", $show_statuses, $Item->ID, '', 'ASC' );
+			$CommentList = new CommentList( 0, "'comment','trackback','pingback'", array(), $Item->ID, '', 'ASC' );
 
 			$CommentList->display_if_empty(
 										'<div class="bComment"><p>' .
 										T_('No feedback for this post yet...') .
 										'</p></div>' );
 
-			while( $Comment = & $CommentList->get_next() )
-			{ // Loop through comments:
-				?>
-				<!-- ========== START of a COMMENT/TB/PB ========== -->
-				<div class="bComment">
-					<div class="bSmallHead">
-						<?php
-						$Comment->date();
-						echo ' @ ';
-						$Comment->time( 'H:i' );
-						if( $Comment->author_url( '', ' &middot; Url: ', '' )
-								&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
-						{ // There is an URL and we have permission to ban...
-							// TODO: really ban the base domain! - not by keyword
-							echo '<a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(getBaseDomain($Comment->author_url))
-								.'">'.get_icon( 'ban' ).'</a> ';
-						}
-						$Comment->author_email( '', ' &middot; Email: ' );
-						$Comment->author_ip( ' &middot; IP: ' );
-						echo ' &middot; ';
-						$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No spam karma available') );
-						?>
-					</div>
-					<div class="bCommentContent">
-					<div class="bCommentTitle">
-					<?php
-						switch( $Comment->get( 'type' ) )
-						{
-							case 'comment': // Display a comment:
-								echo T_('Comment from:') ?>
-								<?php break;
-
-							case 'trackback': // Display a trackback:
-								echo T_('Trackback from:') ?>
-								<?php break;
-
-							case 'pingback': // Display a pingback:
-								echo T_('Pingback from:') ?>
-								<?php break;
-						}
-					?>
-					<?php $Comment->author() ?>
-					</div>
-					<div class="bCommentText">
-						<?php $Comment->content() ?>
-					</div>
-					</div>
-					<div class="CommentActionsArea">
-					<?php
-						$Comment->permanent_link( '#', '#', 'permalink_right' );
-
-		 				// Display edit button if current user has the rights:
-						$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton');
-
-						// Display delete button if current user has the rights:
-						$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
-					?>
-					</div>
-
-				</div>
-				<!-- ========== END of a COMMENT/TB/PB ========== -->
-				<?php //end of the loop, don't delete
-			}
+			// Display list of comments:
+			require dirname(__FILE__).'/../comments/inc/_comment_list.inc.php';
 
 			if( $Item->can_comment() )
 			{ // User can leave a comment
@@ -314,6 +255,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.11  2006/04/18 19:29:52  fplanque
+ * basic comment status implementation
+ *
  * Revision 1.10  2006/04/14 19:21:55  fplanque
  * icon cleanup + fixes
  *

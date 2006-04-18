@@ -441,9 +441,9 @@ switch($action)
 
 		if( $edited_Comment->author_User === NULL )
 		{ // If this is not a member comment
-			param( 'newcomment_author', 'string', true );
-			param( 'newcomment_author_email', 'string' );
-			param( 'newcomment_author_url', 'string' );
+			$Request->param( 'newcomment_author', 'string', true );
+			$Request->param( 'newcomment_author_email', 'string' );
+			$Request->param( 'newcomment_author_url', 'string' );
 
 			// CHECK url
 			if( $error = validate_url( $newcomment_author_url, $allowed_uri_scheme ) )
@@ -451,8 +451,8 @@ switch($action)
 				$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 			}
 		}
-		param( 'content', 'html' );
-		param( 'post_autobr', 'integer', ($comments_use_autobr == 'always')?1:0 );
+		$Request->param( 'content', 'html' );
+		$Request->param( 'post_autobr', 'integer', ($comments_use_autobr == 'always')?1:0 );
 
 
 		// CHECK and FORMAT content
@@ -479,6 +479,8 @@ switch($action)
 			$edited_Comment->set( 'date', date('Y-m-d H:i:s', mktime( $hh, $mn, $ss, $mm, $jj, $aa ) ) );
 		}
 
+		$Request->param( 'comment_status', 'string', 'published' );
+		$edited_Comment->set_from_Request( 'status', 'comment_status' );
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
 		$location = url_add_param( $admin_url, 'ctrl=browse&blog='.$blog.'&p='.$edited_Comment->Item->ID.'&c=1#comments', '&' );
@@ -545,6 +547,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/18 19:29:51  fplanque
+ * basic comment status implementation
+ *
  * Revision 1.6  2006/04/14 19:25:32  fplanque
  * evocore merge with work app
  *

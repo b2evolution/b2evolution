@@ -46,7 +46,7 @@ class CommentList extends DataObjectList
 	function CommentList(
 		$blog = 1,
 		$comment_types = "'comment'",
-		$show_statuses = array(),							// Not used yet
+		$show_statuses = array( 'published' ),	// Restrict to these statuses
 		$p = '',															// Restrict to specific post
 		$author = '',													// Not used yet
 		$order = 'DESC',											// ASC or DESC
@@ -87,7 +87,14 @@ class CommentList extends DataObjectList
 		 *  Restrict to the statuses we want to show:
 		 * ----------------------------------------------------
 		 */
-		$this->sql .= ' AND '.statuses_where_clause( $show_statuses );
+		if( ! empty( $show_statuses ) )
+		{
+			$this->sql .= ' AND comment_status IN (\''.implode( "', '", $show_statuses ).'\')';
+		}
+
+		// This one restricts to post statuses, but it doesn't work completely right:
+		// TODO: handle status dependencies with post
+		$this->sql .= ' AND '.statuses_where_clause();
 
 
 		// order by stuff
@@ -163,6 +170,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/18 19:29:51  fplanque
+ * basic comment status implementation
+ *
  * Revision 1.2  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *

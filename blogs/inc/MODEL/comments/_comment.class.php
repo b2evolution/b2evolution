@@ -130,6 +130,27 @@ class Comment extends DataObject
 
 
 	/**
+	 * Get a member param by its name
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		global $post_statuses;
+
+		switch( $parname )
+		{
+			case 't_status':
+				// Text status:
+				return T_( $post_statuses[$this->status] );
+		}
+
+		return parent::get( $parname );
+	}
+
+
+	/**
 	 * Set param value
 	 *
 	 * @param string parameter name
@@ -641,6 +662,33 @@ class Comment extends DataObject
 
 
 	/**
+	 * Template function: display status of comment
+	 *
+	 * Statuses:
+	 * - published
+	 * - deprecated
+	 * - protected
+	 * - private
+	 * - draft
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function status( $format = 'htmlbody' )
+	{
+		global $post_statuses;
+
+		if( $format == 'raw' )
+		{
+			$this->disp( 'status', 'raw' );
+		}
+		else
+		{
+			echo format_to_output( $this->get('t_status'), $format );
+		}
+	}
+
+
+	/**
 	 * Send email notifications to subscribed users:
 	 *
 	 * @todo shall we notify suscribers of blog were this is in extra-cat?
@@ -844,6 +892,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2006/04/18 19:29:51  fplanque
+ * basic comment status implementation
+ *
  * Revision 1.18  2006/03/28 22:24:46  blueyed
  * Fixed logical spam karma issues
  *

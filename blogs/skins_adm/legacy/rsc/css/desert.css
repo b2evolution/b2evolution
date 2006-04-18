@@ -557,7 +557,34 @@ div.bSideItem {
 	text-align: right;
 }
 
+div.bComment, /* Entire comment block */
+form.bComment /* New comment form */
+{
+	border: 1px solid #eee7e0;
+	padding: 0;
+	margin: 1ex;
+}
+
+
 /* Post colors on browse page */
+.bDate,
+.bTime,
+.bAuthor,
+.bStatus,
+.bType,
+.bViews,
+.bPriority
+{
+	color: #6e6256;
+	font-weight:bold;
+}
+.bCategories,
+.bEmail,
+.bIP,
+.bURL,
+.bKarma {
+	color:#6e6256;
+}
 div.bPost {
 	clear: both;
 	padding: 0;
@@ -567,7 +594,8 @@ div.bPostpublished {
 	border: 1px solid #e1ddce;
 	background-color: #fff;
 }
-.bPostpublished span.Status {
+.bPostpublished span.bStatus,
+div.bCommentpublished span.bStatus {
 	color: #0b0;
 }
 .bPostprotected {
@@ -575,7 +603,7 @@ div.bPostpublished {
 	background-color: #fff;
 	/* background-color: #fff7e7; */
 }
-.bPostprotected span.Status {
+.bPostprotected span.bStatus, {
 	color: #ea0;
 }
 .bPostprotected > div.bSmallHead /* Direct child only */
@@ -587,33 +615,39 @@ div.bPostpublished {
 	background-color: #fff;
 	/* background-color: #fee; */
 }
-.bPostprivate span.Status {
+.bPostprivate span.bStatus {
 	color: #e00;
 }
 .bPostprivate > div.bSmallHead /* Direct child only */
 {
 	border-bottom: 1px solid #f99;
 }
-.bPostdraft {
+.bPostdraft,
+div.bCommentdraft {
 	border: 1px dashed #ccc;
 	background-color: #f4f4f4;
 }
-.bPostdraft span.Status {
+.bPostdraft span.bStatus,
+div.bCommentdraft span.bStatus {
 	color: #666;
 }
-.bPostdraft > div.bSmallHead /* Direct child only */
+.bPostdraft > div.bSmallHead, /* Direct child only */
+div.bCommentdraft > div.bSmallHead /* Direct child only */
 {
 	border-bottom: 1px dashed #ccc;
 }
-.bPostdeprecated {
+.bPostdeprecated,
+div.bCommentdeprecated {
 	border: 1px dashed #000;
 	background-color: #d8d8d8;
 	color: #888;
 }
-.bPostdeprecated span.Status {
+.bPostdeprecated span.bStatus,
+div.bCommentdeprecated span.bStatus {
 	color: #000;
 }
-.bPostdeprecated > div.bSmallHead /* Direct child only */
+.bPostdeprecated > div.bSmallHead, /* Direct child only */
+div.bCommentdeprecated > div.bSmallHead /* Direct child only */
 {
 	border-bottom: 1px dashed #000;
 }
@@ -634,14 +668,6 @@ div.bPostpublished {
 }
 a.permalink_right {
 	margin: .3ex .3ex 0 0;
-}
-
-div.bComment, /* Entire comment block */
-form.bComment /* New comment form */
-{
-	border: 1px solid #eee7e0;
-	padding: 0;
-	margin: 1ex;
 }
 
 .bSideItem ul,

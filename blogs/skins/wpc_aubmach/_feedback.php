@@ -89,7 +89,7 @@
 
 	if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 	{
-	$CommentList = & new CommentList( 0, implode(',', $type_list), array(), $Item->ID, '', 'ASC' );
+	$CommentList = & new CommentList( 0, implode(',', $type_list), array('published'), $Item->ID, '', 'ASC' );
 
 	if( ! $CommentList->display_if_empty(
 								'<div class="bComment"><p>' .

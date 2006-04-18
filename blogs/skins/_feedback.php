@@ -94,7 +94,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 	<h4><?php echo implode( ", ", $disp_title) ?>:</h4>
 
 	<?php
-	$CommentList = & new CommentList( 0, implode(',', $type_list), array(), $Item->ID, '', 'ASC' );
+	$CommentList = & new CommentList( 0, implode(',', $type_list), array('published'), $Item->ID, '', 'ASC' );
 
 	$CommentList->display_if_empty(
 								'<div class="bComment"><p>' .
@@ -255,6 +255,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.54  2006/04/18 19:29:52  fplanque
+ * basic comment status implementation
+ *
  * Revision 1.53  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *
