@@ -104,6 +104,12 @@ class test_plugin extends Plugin
 				'type' => 'select',
 				'options' => array( 'sun' => T_('Sunday'), 'mon' => T_('Monday') ),
 				),
+			'a_disabled_one' => array(
+				'label' => 'This one is disabled',
+				'type' => 'checkbox',
+				'defaultvalue' => '1',
+				'disabled' => true, // this can be useful if you detect that something cannot be changed. You probably want to add a 'note' then, too.
+				),
 			);
 	}
 
@@ -453,6 +459,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.29  2006/04/18 17:06:14  blueyed
+ * Added "disabled" to plugin (user) settings (Thanks to balupton)
+ *
  * Revision 1.28  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

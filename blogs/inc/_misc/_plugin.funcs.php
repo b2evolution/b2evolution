@@ -80,6 +80,11 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 
 	$set_label = isset($set_meta['label']) ? $set_meta['label'] : '';
 
+	if( ! empty($set_meta['disabled']) )
+	{
+		$params['disabled'] = 'disabled';
+	}
+
 
 	// "Layout" settings:
 	if( isset($set_meta['layout']) )
@@ -109,14 +114,16 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 		return;
 	}
 
-	// Append help icon to note:
-	if( isset($params['note']) )
-	{
-		$params['note'] .= ' '.$help_icon;
-	}
-	else
-	{
-		$params['note'] = $help_icon;
+	if( ! empty($help_icon) )
+	{ // Append help icon to note:
+		if( empty($params['note']) )
+		{
+			$params['note'] = $help_icon;
+		}
+		else
+		{
+			$params['note'] .= ' '.$help_icon;
+		}
 	}
 
 
@@ -278,6 +285,11 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 			continue;
 		}
 
+		if( ! empty($l_meta['disabled']) )
+		{ // the setting is disabled
+			continue;
+		}
+
 		$l_param_default = '';
 		if( isset($l_meta['type']) && $l_meta['type'] == 'array' )
 		{ // this settings has a type
@@ -372,6 +384,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.14  2006/04/18 17:06:14  blueyed
+ * Added "disabled" to plugin (user) settings (Thanks to balupton)
+ *
  * Revision 1.13  2006/04/13 01:23:19  blueyed
  * Moved help related functions back to Plugin class
  *

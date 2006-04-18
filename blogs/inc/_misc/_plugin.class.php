@@ -289,6 +289,7 @@ class Plugin
 	 *   - 'note' (gets displayed as a note to the param field),
 	 *   - 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
 	 *   - 'maxlength': maxlength attribute for the input field (See 'size' above; defaults to no limit)
+	 *   - 'disabled': if true, it adds a 'disabled="disabled"' html attribute to the element and the value cannot be changed
 	 *   - 'allow_none': set this to true to have "None" in the options list for types
 	 *                   'select_group' and 'select_user'.
 	 *   - 'valid_pattern': A regular expression pattern that the value must match.
@@ -1759,6 +1760,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.27  2006/04/18 17:06:14  blueyed
+ * Added "disabled" to plugin (user) settings (Thanks to balupton)
+ *
  * Revision 1.26  2006/04/13 01:36:27  blueyed
  * Added interface method to edit Plugin settings (gets already used by YouTube Plugin)
  *
