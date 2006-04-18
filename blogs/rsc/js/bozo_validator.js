@@ -2,23 +2,23 @@
  * "BOZO VALIDATOR" : Check if a form has been changed but not submitted when a bozo clicks
  * on a link which will result in potential data input loss
  *
- * Used for bozos, ask for confirmation to change the current page when he clicks on a link after having done changes on inputs forms 
+ * Used for bozos, ask for confirmation to change the current page when he clicks on a link after having done changes on inputs forms
  *	without saving them
- * 
+ *
  * Tested on Firefox (XP & Mac osx) , Ie (XP), Safari (Mac osx)
  */
 var bozo_confirm_mess;
 
 var bozo = {
-	
+
 	'tab_changes' : Array(), 	// array of changes numbers for each form we need to verify
-	'nb_changes' : 0, 			// Total changes number 
+	'nb_changes' : 0, 			// Total changes number
 
 	// If no translated message has been provided, use this default:
 	'confirm_mess' : bozo_confirm_mess ? bozo_confirm_mess : 'You have modified this form but you haven\'t submitted it yet.\nYou are about to loose your edits.\nAre you sure?',
 
 	/**
-	 *	BOZO VALIDATOR INITIALIZATION 
+	 *	BOZO VALIDATOR INITIALIZATION
 	 *	Add change event on all inputs if the form parent ID is like *_checkchanges
 	 *	Add click event on all submit inputs
 	 *  Add click event on all links ( <a> )
@@ -31,7 +31,7 @@ var bozo = {
 		for( var i = 0; i < document.forms.length ; i++ )
 		{ // Get the next form element:
 			var el_form = document.forms[i];
-			
+
 			// Get all inputs for this form:
 			all_inputs = el_form.getElementsByTagName( 'input' );
 
@@ -47,14 +47,14 @@ var bozo = {
 					}
 					// TODO: handle IMAGE type
 				}
-        continue;
-      }
+				continue;
+			}
 
-      // Initialize this form as having no changes yet:
-      bozo.tab_changes[el_form.id] = 0;
+			// Initialize this form as having no changes yet:
+			bozo.tab_changes[el_form.id] = 0;
 
 			// Loop through all form inputs:
-			for( var j = 0; j < all_inputs.length; j++ ) 
+			for( var j = 0; j < all_inputs.length; j++ )
 			{	// Get the next input element:
 				var field = all_inputs[j];
 				if( field.className.indexOf( 'no_checkchanges' ) == -1  )
@@ -74,27 +74,27 @@ var bozo = {
 					}
 				}
 			}
-			
+
 			all_textareas = el_form.getElementsByTagName( 'textarea' );
 			// Loop on all form textareas
-			for( var j = 0; j < all_textareas.length; j++ ) 
+			for( var j = 0; j < all_textareas.length; j++ )
 			{
 					var field = all_textareas[j];
 					addEvent( field , 'change', bozo.change, false );
 			}
-			
+
 			all_selects = el_form.getElementsByTagName( 'select' );
 			// Loop on all form selects
-			for( var j = 0; j < all_selects.length; j++ ) 
+			for( var j = 0; j < all_selects.length; j++ )
 			{
 					var field = all_selects[j];
 					addEvent( field , 'change', bozo.change, false );
 			}
 		}
-		
+
 		// Add click event on all links (<a>)
 		all_links = document.getElementsByTagName( 'a' );
-		for( var j = 0; j < all_links.length; j++ ) 
+		for( var j = 0; j < all_links.length; j++ )
 		{	// Get the link element:
 			var link = all_links[j];
 			// Add a click event for the element
@@ -107,9 +107,9 @@ var bozo = {
 				addEvent( link, 'click', bozo.validate_href, false);
 			}
 		}
-		
+
 		var date_fin = new Date();
-		var tps = date_fin.getTime() - date_deb.getTime();; 
+		var tps = date_fin.getTime() - date_deb.getTime();;
 		//alert( tps );
 	},
 
@@ -121,14 +121,16 @@ var bozo = {
 	{
 		var target;
 		if (window.event && window.event.srcElement)
-		   target = window.event.srcElement;
+			target = window.event.srcElement;
 		else if (e && e.target)
-		   target = e.target;
+			target = e.target;
+
 		if (!target)
-		   return null;
-		 return target;
+			return null;
+
+		return target;
 	},
-	
+
 
 	/*
 	 * called when there is a change event on an element
@@ -143,30 +145,30 @@ var bozo = {
 	},
 
 
-	/*	
+	/*
 	 * Call when there a click on a reset input
 	 * Reset changes
 	 */
 	reset_changes: function ( e )
 	{
 		// Loop on the forms changes array
-		for( i in bozo.tab_changes)
+		for( i in bozo.tab_changes )
 		{	// Reset changes number to 0
-			bozo.tab_changes[i]= 0;
+			bozo.tab_changes[i] = 0;
 		}
 		// Total changes number
 		bozo.nb_changes = 0;
 	},
-	
+
 
 	/*
 	 *	Called when there is a click event on a link
 	 *	Ask confirmation to change page without saving changes if there have been changes on all form inputs
 	 */
- 	validate_href: function( e )
+	validate_href: function( e )
 	{	// Get the target element
 		var target = bozo.findTarget(e);
-		
+
 		if ( bozo.nb_changes )
 		{	// there are input changes
 			if( !confirm( bozo.confirm_mess ) )
@@ -178,22 +180,26 @@ var bozo = {
 			}
 		}
 	},
-	
+
 
 	/*
 	 *	Called when there is a click event on a submit button
 	 *	Ask confirmation to change page without saving changes if there have been changes on all others form inputs
 	 *	( don't test the parent form of the submit button (target event) )
 	 */
- 	validate_submit: function( e )
+	validate_submit: function( e )
 	{	// Get the target element
 		var target = bozo.findTarget(e);
-		
+
 		var changes = 0;
-		
+
 		// Loop on the forms changes array
-		for( i in bozo.tab_changes)
-		{ 
+		for( i in bozo.tab_changes )
+		{
+			if( ! bozo.tab_changes.propertyIsEnumerable(i) )
+			{ // this fix is needed if the tab_changes has been extended through "prototype" (e.g. Scriptaculous uses it)
+				continue;
+			}
 			if ( ( i != get_form( target ).id ) && bozo.tab_changes[i] )
 			{	// Another form contains input changes
 				changes++;
@@ -225,7 +231,7 @@ var bozo = {
 		{
 			e.preventDefault();
 		}
-		return false;	
+		return false;
 	}
 }
 // Init Bozo validator when the window is loaded
