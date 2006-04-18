@@ -38,7 +38,9 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 	<table class="grouped" cellspacing="0">
 		<thead>
 		<tr>
-			<th class="firstcol"><?php echo T_('Enabled') ?></th>
+			<th class="firstcol"><?php
+				// TODO: blueyed>> This eats up a lot of horizontal space, especially if translated to "Eingeschaltet" (german)..
+				echo T_('Enabled'); ?></th>
 			<th><?php echo T_('Plugin') ?></th>
 			<th><?php echo T_('Priority') ?></th>
 			<th title="<?php echo T_('When should rendering apply?') ?>"><?php echo T_('Apply') ?></th>
@@ -241,6 +243,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.13  2006/04/18 15:16:37  blueyed
+ * todo
+ *
  * Revision 1.12  2006/04/13 01:36:27  blueyed
  * Added interface method to edit Plugin settings (gets already used by YouTube Plugin)
  *
