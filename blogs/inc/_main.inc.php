@@ -68,7 +68,23 @@ foreach( $protects as $protect )
 		die("Invalid Request.");
 	}
 }
-
+/*
+ * fp> Alternatively we might want to kill all auto registered globals this way:
+ * TODO: testing
+ *
+$superglobals = array($_SERVER, $_ENV, $_FILES, $_COOKIE, $_POST, $_GET);
+if (isset( $_SESSION )) array_unshift ( $superglobals , $_SESSION );
+if (ini_get('register_globals') && !$this->mosConfig_register_globals)
+{
+	foreach ( $superglobals as $superglobal )
+	{
+		foreach ( $superglobal as $key => $value)
+		{
+			unset( $GLOBALS[$key]);
+		}
+	}
+}
+*/
 
 /**
  * Load logging class
@@ -533,6 +549,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.9  2006/04/18 19:28:34  fplanque
+ * mambo idea
+ *
  * Revision 1.8  2006/04/18 14:18:03  fplanque
  * security fix
  *
