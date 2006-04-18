@@ -52,7 +52,6 @@ class Plugin
 	 */
 	var $name = '__Unnamed plugin__';
 
-
 	/**
 	 * Globally unique code for this plugin functionality. 32 chars. MUST BE SET.
 	 *
@@ -146,12 +145,14 @@ class Plugin
 	 * {@internal The actual value for the plugin gets stored in T_plugins.plug_apply_rendering.}}
 	 *
 	 * Possible values:
-	 * - 'stealth'
-	 * - 'always'
-	 * - 'opt-out'
-	 * - 'opt-in'
-	 * - 'lazy'
-	 * - 'never'
+	 * - 'stealth': gets always used, but not displayed as option
+	 * - 'always': gets always used, and displayed as disabled checkbox
+	 * - 'opt-out': enabled by default
+	 * - 'opt-in': disabled by default
+	 * - 'lazy': checkbox gets displayed, but is disabled
+	 * - 'never': cannot get used as a renderer
+	 *
+	 * @todo blueyed>> IMHO we would need another value, which is the same as "lazy", but does not display a checkbox, which is useful for Plugins that add themselves as renderers on Item update
 	 *
 	 * @var string
 	 */
@@ -226,6 +227,15 @@ class Plugin
 	 * @var string Either 'enabled', 'disabled', 'needs_config' or 'broken'.
 	 */
 	var $status;
+
+	/**
+	 * The "mother" object, where this Plugin got instantiated from.
+	 *
+	 * This is needed, if you have to call a method on it (e.g. {@link Plugins::set_apply_rendering()}.
+	 *
+	 * @var Plugins|Plugins_admin
+	 */
+	var $Plugins;
 
 	/**#@-*/
 
@@ -682,6 +692,24 @@ class Plugin
 		return true;
 	}
 
+
+	/**
+	 * Event handler: Called when we detect a version change (in {@link Plugins::register()}).
+	 *
+	 * Use this for your upgrade needs.
+	 *
+	 * @param array Associative array of parameters.
+	 *              'old_version': The old version of your plugin as stored in DB.
+	 *              'db_row': an array with the columns of the plugin DB entry (in T_plugins).
+	 *                        The key 'plug_version' is the same as the 'old_version' key.
+	 * @return boolean If this method returns false, the Plugin's status gets changed to "needs_config" and
+	 *                 it gets unregistered for the current request.
+	 */
+	function PluginVersionChanged( & $params )
+	{
+		return true;
+	}
+
 	// }}}
 
 
@@ -766,13 +794,43 @@ class Plugin
 
 
 	/**
+	 * Event handler: called at the beginning of {@link Item::dbupdate() updating
+	 * an item/post in the database}.
+	 *
+	 * Use this to manipulate the {@link Item}, e.g. adding a renderer code
+	 * through {@link Item::add_renderer()}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
+	 */
+	function PrependItemUpdateTransact( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: called at the end of {@link Item::dbupdate() updating
-	 * an item/post in the database}, which means that it has changed.
+	 * an item/post in the database}, which means that it has been changed.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Item': the related Item (by reference)
 	 */
 	function AfterItemUpdate( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link Item::dbinsert() inserting
+	 * an item/post in the database}.
+	 *
+	 * Use this to manipulate the {@link Item}, e.g. adding a renderer code
+	 * through {@link Item::add_renderer()}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
+	 */
+	function PrependItemInsertTransact( & $params )
 	{
 	}
 
@@ -797,6 +855,17 @@ class Plugin
 	 *   - 'Item': the related Item (by reference)
 	 */
 	function AfterItemDelete( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called when instantiating an Item for preview.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
+	 */
+	function AppendItemPreviewTransact()
 	{
 	}
 
@@ -1760,6 +1829,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.28  2006/04/18 21:09:20  blueyed
+ * Added hooks to manipulate Items before insert/update/preview; fixes; cleanup
+ *
  * Revision 1.27  2006/04/18 17:06:14  blueyed
  * Added "disabled" to plugin (user) settings (Thanks to balupton)
  *

@@ -2115,6 +2115,8 @@ class Item extends DataObject
 		// validate url title
 		$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, 0, false, $this->dbprefix, $this->dbIDname, $this->dbtablename) );
 
+		$Plugins->trigger_event( 'PrependItemInsertTransact', $params = array( 'Item' => & $this ) );
+
 		if( $result = parent::dbinsert() )
 		{ // We could insert the main object..
 
@@ -2200,6 +2202,8 @@ class Item extends DataObject
 			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID,
 																false, $this->dbprefix, $this->dbIDname, $this->dbtablename ) );
 		}
+
+		$Plugins->trigger_event( 'PrependItemUpdateTransact', $params = array( 'Item' => & $this ) );
 
 		if( $result = parent::dbupdate() )
 		{ // We could update the main object..
@@ -2552,6 +2556,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2006/04/18 21:09:20  blueyed
+ * Added hooks to manipulate Items before insert/update/preview; fixes; cleanup
+ *
  * Revision 1.33  2006/04/18 20:41:00  blueyed
  * Decent getters/setters for renderers.
  *

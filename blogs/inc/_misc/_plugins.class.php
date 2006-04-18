@@ -86,7 +86,7 @@ class Plugins
 	var $index_code_ID = array();
 
 	/**
-	 * Cache Plugin IDs by apply_rendering setting.
+	 * Cache Plugin codes by apply_rendering setting.
 	 * @var array
 	 */
 	var $index_apply_rendering_codes = array();
@@ -209,6 +209,7 @@ class Plugins
 	 *  - PluginUserSettingsEditAction (Called as action before editing the plugin's settings)
 	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
 	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
+	 *  - PluginVersionChanged (Called when we detect a version change)
 	 * }}
 	 *
 	 * @return array Name of event (key) => description (value)
@@ -238,8 +239,11 @@ class Plugins
 				'AfterCommentInsert' => '',
 				'AfterCommentUpdate' => '',
 				'AfterItemDelete' => '',
+				'PrependItemInsertTransact' => '',
 				'AfterItemInsert' => '',
+				'PrependItemUpdateTransact' => '',
 				'AfterItemUpdate' => '',
+				'AppendItemPreviewTransact' => '',
 
 				'RenderItemAsHtml' => T_('Renders content when generated as HTML.'),
 				'RenderItemAsXml' => T_('Renders content when generated as XML.'),
@@ -550,7 +554,7 @@ class Plugins
 
 		$tmp_params = array('db_row' => $this->index_ID_rows[$Plugin->ID]);
 
-		if( $Plugin->AppendPluginRegister( $tmp_params ) === false )
+		if( ! $Plugin->AppendPluginRegister( $tmp_params ) && ! $this->is_admin_class )
 		{
 			$Debuglog->add( 'Unregistered plugin, because AppendPluginRegister returned false.', 'plugins' );
 			$this->unregister( $Plugin );
@@ -851,7 +855,7 @@ class Plugins
 	 * Register a plugin.
 	 *
 	 * This handles the indexes, dynamically unregisters a Plugin that does not exist (anymore)
-	 * and instantiates the Plugin's Settings.
+	 * and instantiates the Plugin's (User)Settings.
 	 *
 	 * @access private
 	 * @param string name of plugin class to instantiate and register
@@ -986,6 +990,8 @@ class Plugins
 			$Plugin->apply_rendering = $apply_rendering;
 		}
 
+		$Plugin->Plugins = & $this;
+
 		// Memorizes Plugin in sequential array:
 		$this->Plugins[] = & $Plugin;
 		// Memorizes Plugin in code hash array:
@@ -1013,7 +1019,7 @@ class Plugins
 			$this->instantiate_Settings( $Plugin, 'UserSettings' );
 
 			$tmp_params = array('db_row'=>$this->index_ID_rows[$Plugin->ID]);
-			if( $Plugin->AppendPluginRegister( $tmp_params ) === false )
+			if( ! $Plugin->AppendPluginRegister( $tmp_params ) && ! $this->is_admin_class )
 			{
 				$Debuglog->add( 'Unregistered plugin, because AppendPluginRegister returned false.', 'plugins' );
 				$this->unregister( $Plugin );
@@ -1024,31 +1030,54 @@ class Plugins
 			{ // Version has changed since installation or last update
 				$db_deltas = array();
 
-				// Extended check with cleaned up versions, if currently stored version is less or equal (because it was just different above!):
-				// NOTE: we do not want to compare DB schema (and set status to "needs_config") in case of downgrades..
-				list( $old_version, $new_version ) = preg_replace( array( '~^(CVS\s+)?\$'.'Revision:\s*~i', '~\s*\$$~' ), '', array( $this->index_ID_rows[$Plugin->ID]['plug_version'], $Plugin->version ) );
-				if( version_compare( $new_version, $old_version, '>=' ) )
+				// Tell the Plugin that we've detected a version change:
+				$tmp_params = array( 'old_version'=>$this->index_ID_rows[$Plugin->ID]['plug_version'], 'db_row'=>$this->index_ID_rows[$Plugin->ID] );
+
+				if( ! $this->call_method( $Plugin->ID, 'PluginVersionChanged', $tmp_params ) )
 				{
-					$Debuglog->add( 'Version for '.$Plugin->classname.' changed from '.$this->index_ID_rows[$Plugin->ID]['plug_version'].' to '.$Plugin->version, 'plugins' );
-
-					require_once( dirname(__FILE__).'/_upgrade.funcs.php' );
-					$db_deltas = db_delta($Plugin->GetDbLayout());
-				}
-
-				if( empty($db_deltas) )
-				{ // No DB changes needed, update (bump or decrease) the version
-					global $DB;
-					$DB->query( '
-							UPDATE T_plugins
-								 SET plug_version = '.$DB->quote($Plugin->version).'
-							 WHERE plug_ID = '.$Plugin->ID );
+					$Debuglog->add( 'Set plugin status to "needs_config", because PluginVersionChanged returned false.', 'plugins' );
+					$this->set_Plugin_status( $Plugin, 'needs_config' );
+					if( ! $this->is_admin_class )
+					{ // only unregister the Plugin, if it's not the admin list's class:
+						$this->unregister( $Plugin );
+						$Plugin = '';
+					}
 				}
 				else
-				{ // If there are DB schema changes needed, set the Plugin status to "needs_config"
-					$this->set_Plugin_status( $Plugin, 'needs_config' );
-					$Debuglog->add( 'Unregistered plugin, because version DB schema needs upgrade.', 'plugins' );
-					$this->unregister( $Plugin );
-					$Plugin = '';
+				{
+					// Extended check with cleaned up versions, if currently stored version is less or equal (because it was just different above!):
+					// NOTE: we do not want to compare DB schema (and set status to "needs_config") in case of downgrades..
+					list( $old_version, $new_version ) = preg_replace( array( '~^(CVS\s+)?\$'.'Revision:\s*~i', '~\s*\$$~' ), '', array( $this->index_ID_rows[$Plugin->ID]['plug_version'], $Plugin->version ) );
+					if( version_compare( $new_version, $old_version, '>=' ) )
+					{
+						require_once( dirname(__FILE__).'/_upgrade.funcs.php' );
+						$db_deltas = db_delta($Plugin->GetDbLayout());
+					}
+
+					if( empty($db_deltas) )
+					{ // No DB changes needed, update (bump or decrease) the version
+						global $DB;
+						$DB->query( '
+								UPDATE T_plugins
+								   SET plug_version = '.$DB->quote($Plugin->version).'
+								 WHERE plug_ID = '.$Plugin->ID );
+
+						// Detect new events:
+						$this->save_events( $Plugin, array() );
+
+						$Debuglog->add( 'Version for '.$Plugin->classname.' changed from '.$this->index_ID_rows[$Plugin->ID]['plug_version'].' to '.$Plugin->version, 'plugins' );
+					}
+					else
+					{ // If there are DB schema changes needed, set the Plugin status to "needs_config"
+						$this->set_Plugin_status( $Plugin, 'needs_config' );
+						$Debuglog->add( 'Set plugin status to "needs_config", because version DB schema needs upgrade.', 'plugins' );
+
+						if( ! $this->is_admin_class )
+						{ // only unregister the Plugin, if it's not the admin list's class:
+							$this->unregister( $Plugin );
+							$Plugin = '';
+						}
+					}
 				}
 			}
 		}
@@ -1261,7 +1290,7 @@ class Plugins
 			return false;
 		}
 
-		if( $Plugin->apply_rendering == $apply_rendering )
+		if( $this->index_ID_rows[$Plugin->ID]['plug_apply_rendering'] == $apply_rendering )
 		{ // Already set to same value
 			return false;
 		}
@@ -1272,6 +1301,13 @@ class Plugins
 			WHERE plug_ID = '.$plugin_ID );
 
 		$Plugin->apply_rendering = $apply_rendering;
+
+		// Apply-rendering index:
+		if( ! isset( $this->index_apply_rendering_codes[ $Plugin->apply_rendering ] )
+		    || ! in_array( $Plugin->code, $this->index_apply_rendering_codes[ $Plugin->apply_rendering ] ) )
+		{
+			$this->index_apply_rendering_codes[ $Plugin->apply_rendering ][] = $Plugin->code;
+		}
 
 		return true;
 	}
@@ -1919,7 +1955,7 @@ class Plugins
 			if( ! isset( $this->index_ID_rows[$plugin_ID] ) || !$this->index_ID_rows[$plugin_ID] )
 			{ // no plugin rows cached
 				#debug_die( 'Cannot instantiate Plugin (ID '.$plugin_ID.') without DB information.' );
-				$Debuglog->add( 'get_by_ID(): Plugin (ID '.$plugin_ID.') not registered in DB!', array( 'plugins', 'error' ) );
+				$Debuglog->add( 'get_by_ID(): Plugin (ID '.$plugin_ID.') not registered/enabled in DB!', array( 'plugins', 'error' ) );
 				$r = false;
 				return $r;
 			}
@@ -1961,7 +1997,7 @@ class Plugins
 
 			if( ! isset($this->index_code_ID[ $plugin_code ]) )
 			{
-				$Debuglog->add( 'Requested plugin ['.$plugin_code.'] is not registered!', 'plugins' );
+				$Debuglog->add( 'Requested plugin ['.$plugin_code.'] is not registered/enabled!', 'plugins' );
 				return $r;
 			}
 
@@ -2444,6 +2480,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.28  2006/04/18 21:09:20  blueyed
+ * Added hooks to manipulate Items before insert/update/preview; fixes; cleanup
+ *
  * Revision 1.27  2006/04/04 22:56:12  blueyed
  * Simplified/refactored uninstalling/registering of a plugin (especially the hooking process)
  *

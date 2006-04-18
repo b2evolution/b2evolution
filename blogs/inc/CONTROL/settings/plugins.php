@@ -331,7 +331,7 @@ switch( $action )
 		$msgs = $Plugins->validate_dependencies( $edit_Plugin, 'enable' );
 		if( ! empty( $msgs['error'] ) )
 		{
-			$Messages->add( T_( 'The plugin cannot be enabled because of the followin dependencies:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>' );
+			$Messages->add( T_( 'The plugin cannot be enabled because of the following dependencies:' ).' <ul><li>'.implode('</li><li>', $msgs['error']).'</li></ul>' );
 			break;
 		}
 
@@ -340,12 +340,6 @@ switch( $action )
 			$next_action = 'enable_plugin';
 			break;
 		}
-
-		// Update plugin version in DB:
-		$DB->query( '
-				UPDATE T_plugins
-				   SET plug_version = '.$DB->quote($edit_Plugin->version).'
-				 WHERE plug_ID = '.$edit_Plugin->ID );
 
 		// Try to enable plugin:
 		$enable_return = $edit_Plugin->BeforeEnable();

@@ -61,8 +61,8 @@ class ItemList extends DataObjectList
 	var $p;
 
 	/**
- 	 * 'posts' or 'days'
- 	 */
+	 * 'posts' or 'days'
+	 */
 	var $unit;
 
 	/**
@@ -77,10 +77,10 @@ class ItemList extends DataObjectList
 	var $limitdate_end;       // UNIX timestamp
 
 	// Used in looping
-	var $row_num;							// Current row
-	var $row;									// Current row
-	var $main_cat;						// Current main category
-	var $previous_main_cat;		// Previous one
+	var $row_num;             // Current row
+	var $row;                 // Current row
+	var $main_cat;            // Current main category
+	var $previous_main_cat;   // Previous one
 	/**
 	 * @access private
 	 */
@@ -111,8 +111,8 @@ class ItemList extends DataObjectList
 	 * @param mixed Specific post number to display
 	 * @param mixed YearMonth(Day) to display
 	 * @param mixed Number of Week to display. Note: uses MySQL's week numbering and MySQL default if applicable.
-   * In MySQL < 4.0, WEEK() uses mode 0: Week starts on Sunday;
-   * Value range is 0 to 53; week 1 is the first week that starts in this year
+	 * In MySQL < 4.0, WEEK() uses mode 0: Week starts on Sunday;
+	 * Value range is 0 to 53; week 1 is the first week that starts in this year
 	 * @param mixed List of cats to restrict to
 	 * @param array Array of cats to restrict to
 	 * @param mixed List of authors to restrict to
@@ -440,6 +440,12 @@ class ItemList extends DataObjectList
 			$i++;
 		}
 
+		if( $this->preview )
+		{ // Allow plugins to manipulate the item for preview (like "PrependItemInsertTransact" for saving)
+			global $Plugins;
+			$Plugins->trigger_event( 'AppendItemPreviewTransact', $tmp_params = array( 'Item' => & $this->Obj[0] ) );
+		}
+
 
 		if( !empty($this->postIDarray) )
 		{
@@ -555,7 +561,7 @@ class ItemList extends DataObjectList
 			".$DB->quote($post_comments)." AS {$this->dbprefix}comments,
 			'".$DB->escape( $post_renderers )."' AS {$this->dbprefix}renderers,
 			".$DB->quote($item_assigned_user_ID)." AS {$this->dbprefix}assigned_user_ID,
- 			NULL AS {$this->dbprefix}datestart,
+			NULL AS {$this->dbprefix}datestart,
 			".$DB->quote($item_typ_ID)." AS {$this->dbprefix}ptyp_ID,
 			".$DB->quote($item_st_ID)." AS {$this->dbprefix}pst_ID,
 			".$DB->quote($item_deadline)." AS {$this->dbprefix}datedeadline,
@@ -850,6 +856,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/18 21:09:20  blueyed
+ * Added hooks to manipulate Items before insert/update/preview; fixes; cleanup
+ *
  * Revision 1.5  2006/04/06 21:11:53  fplanque
  * Fixed deadlock issue.
  * --
