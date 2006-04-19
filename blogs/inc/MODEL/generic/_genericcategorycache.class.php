@@ -4,32 +4,32 @@
  *
  * This is the object handling genreric category lists.
  *
- * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- * {@internal
- * b2evolution is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * {@internal License choice
+ * - If you have received this file as part of a package, please find the license.txt file in
+ *   the same folder or the closest folder above for complete license terms.
+ * - If you have received this file individually (e-g: from http://cvs.sourceforge.net/viewcvs.py/evocms/)
+ *   then you must choose one of the following licenses before using the file:
+ *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
+ * }}
  *
- * b2evolution is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with b2evolution; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * {@internal Open Source relicensing agreement:
+ * PROGIDISTRI S.A.S. grants Francois PLANQUE the right to license
+ * PROGIDISTRI S.A.S.'s contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author mbruneau: MArc BRUNEAU.
+ * @author fplanque: Francois PLANQUE.
+ * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -47,6 +47,8 @@ class GenericCategoryCache extends GenericCache
 	var $cats = array();
 	
 	var $parent_cats = array();
+	
+	var $revealed_children = false;
 
 	/**
 	 * Constructor
@@ -63,6 +65,12 @@ class GenericCategoryCache extends GenericCache
 	 */
 	function Reveal_children()
 	{	
+		if( $this->revealed_children )
+		{	// Children have already been revealed:
+			return;
+			/* RETURN */
+		}
+		
 		if( !$this->all_loaded )
 		{
 			$this->load_all();
@@ -84,6 +92,7 @@ class GenericCategoryCache extends GenericCache
 				}	
 			}	
 		}
+		$this->revealed_children = true;
 	}
 	
 	
@@ -98,6 +107,11 @@ class GenericCategoryCache extends GenericCache
 	 */
 	function recurse( $callbacks, $cat_array = NULL, $level = 0 )
 	{
+		if( !$this->revealed_children )
+		{
+			$this->Reveal_children();
+		}
+		
 		if( is_null( $cat_array ) )
 		{	// Get all parent categories:
 			$cat_array = $this->parent_cats;
@@ -139,6 +153,11 @@ class GenericCategoryCache extends GenericCache
 	 */
 	function recurse_select( $selected = NULL, $cat_array = NULL, $level = 0 )
 	{
+		if( !$this->revealed_children )
+		{
+			$this->Reveal_children();
+		}
+	
 		if( is_null( $cat_array ) )
 		{	// Get all parent categorie:
 			$cat_array = $this->parent_cats;
@@ -163,6 +182,48 @@ class GenericCategoryCache extends GenericCache
 			{	// Add children categories:
 				$r .= $this->recurse_select( $selected, $cat->children, $level+1 );
 			}
+		}
+
+		return $r;
+	}
+	
+	
+	/**
+	 * Returns form option list with cache contents
+	 *
+	 * Load the cache if necessary
+	 *
+	 * @param integer selected ID
+	 * @param boolean provide a choice for "none" with ID ''
+	 */
+	function parent_option_list_return( $default = 0, $allow_none = false, $method = 'name_return' )
+	{
+		if( (! $this->all_loaded) && $this->load_all )
+		{ // We have not loaded all items so far, but we're allowed to... so let's go:
+			$this->load_all();
+		}
+		
+		if( !$this->revealed_children )
+		{
+			$this->Reveal_children();
+		}
+
+		$r = '';
+
+		if( $allow_none )
+		{
+			$r .= '<option value=""';
+			if( empty($default) ) $r .= ' selected="selected"';
+			$r .= '>'.T_('None').'</option>'."\n";
+		}
+
+		foreach( $this->parent_cats as $loop_Obj )
+		{
+			$r .=  '<option value="'.$loop_Obj->ID.'"';
+			if( $loop_Obj->ID == $default ) $r .= ' selected="selected"';
+			$r .= '>';
+			$r .= $loop_Obj->$method();
+			$r .=  '</option>'."\n";
 		}
 
 		return $r;
