@@ -66,6 +66,7 @@ param( 'ctrl', '/^[a-z0-9_]+$/', $default_ctrl, true );
 
 
 // Redirect old-style URLs (e.g. /admin/plugins.php), if they come here because the webserver maps "/admin/" to "/admin.php"
+// NOTE: this is just meant as a transformation from pre-1.8 to 1.8!
 if( ! empty( $_SERVER['PATH_INFO'] ) && $_SERVER['PATH_INFO'] != $_SERVER['PHP_SELF'] ) // the "!= PHP_SELF" check seems needed by IIS..
 {
 	// Try to find the appropriate controller (ctrl) setting
@@ -111,6 +112,9 @@ require $control_path.$ctrl_mappings[$ctrl];
 
 /*
  * $Log$
+ * Revision 1.12  2006/04/19 22:26:24  blueyed
+ * cleanup/polish
+ *
  * Revision 1.11  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

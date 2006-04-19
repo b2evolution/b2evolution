@@ -742,7 +742,7 @@ function xmlrpc_logresult( $result, & $message_Log )
 		$out = $value;
 	}
 
-	$message_Log->add( T_('Response').': '.$out, 'note' );
+	$message_Log->add( T_('Response').': '.$out, 'success' );
 
 	return true;
 }
@@ -2581,7 +2581,7 @@ function format_phone( $phone, $hide_country_dialing_code_if_same_as_locale = tr
 		$dialing_code = $CountryCache->extract_country_dialing_code( substr( $phone, 1 ) );
 	}
 
-	if( !is_null( $dialing_code ) && ( locale_dialing_code() == $dialing_code ) 
+	if( !is_null( $dialing_code ) && ( locale_dialing_code() == $dialing_code )
 			&& $hide_country_dialing_code_if_same_as_locale )
 	{	// The phone dialing code is same as locale and we want to hide it in this case
 		if( ( strlen( $phone ) - strlen( $dialing_code ) ) == 10 )
@@ -2775,6 +2775,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.33  2006/04/19 22:26:25  blueyed
+ * cleanup/polish
+ *
  * Revision 1.32  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

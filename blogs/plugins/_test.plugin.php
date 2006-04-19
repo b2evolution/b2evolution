@@ -32,8 +32,6 @@
  * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  * @author blueyed: Daniel HAHLER
  *
- * @todo Replace phpdoc blocks with "@ see" tags to "Plugin :: function_name", because it would be more accurate documentation and make the source code more "straight".
- *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -149,6 +147,7 @@ class test_plugin extends Plugin
 
 	/**
 	 * Deactive the plugin for the current request if the user wants it so.
+	 * @see Plugin::AppendLoginRegisteredUser()
 	 */
 	function AppendLoginRegisteredUser()
 	{
@@ -188,6 +187,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when ending the admin html head section.
 	 *
+	 * @see Plugin::AdminEndHtmlHead()
 	 * @param array Associative array of parameters
 	 * @return boolean did we do something?
 	 */
@@ -202,6 +202,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called right after displaying the admin page footer.
 	 *
+	 * @see Plugin::AdminAfterPageFooter()
 	 * @param array Associative array of parameters
 	 * @return boolean did we do something?
 	 */
@@ -216,6 +217,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when displaying editor toolbars.
 	 *
+	 * @see Plugin::AdminDisplayToolbar()
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
@@ -230,6 +232,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when displaying editor buttons.
 	 *
+	 * @see Plugin::AdminDisplayEditorButton()
 	 * @param array Associative array of parameters
 	 * @return boolean did we display ?
 	 */
@@ -248,6 +251,8 @@ class test_plugin extends Plugin
 	 *                to modify it.
 	 *
 	 * This is the hook to register menu entries. See {@link register_menu_entry()}.
+	 *
+	 * @see Plugin::AdminAfterMenuInit()
 	 */
 	function AdminAfterMenuInit()
 	{
@@ -260,7 +265,7 @@ class test_plugin extends Plugin
 	 *
 	 * Use {@link $Messages} to add Messages for the user.
 	 *
-	 * @param array Associative array of parameters
+	 * @see Plugin::AdminToolAction()
 	 */
 	function AdminToolAction( $params )
 	{
@@ -273,7 +278,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when displaying the block in the "Tools" menu.
 	 *
-	 * @param array Associative array of parameters
+	 * @see Plugin::AdminToolPayload()
 	 */
 	function AdminToolPayload( $params )
 	{
@@ -286,6 +291,8 @@ class test_plugin extends Plugin
 	 *
 	 * You should catch params (GET/POST) here and do actions (no output!).
 	 * Use {@link $Messages} to add messages for the user.
+	 *
+	 * @see Plugin::AdminTabAction()
 	 */
 	function AdminTabAction()
 	{
@@ -345,6 +352,7 @@ class test_plugin extends Plugin
 	 *
 	 * Note: return value is ignored. You have to change $params['content'].
 	 *
+	 * @see Plugin::RenderItemAsHtml()
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
@@ -361,6 +369,7 @@ class test_plugin extends Plugin
 	 *
 	 * Note: return value is ignored. You have to change $params['content'].
 	 *
+	 * @see Plugin::RenderItemAsXml()
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'xml' will arrive here.
@@ -378,6 +387,7 @@ class test_plugin extends Plugin
 	 *
 	 * Note: return value is ignored. You have to change $params['content'].
 	 *
+	 * @see Plugin::RenderItem()
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}.
@@ -392,6 +402,7 @@ class test_plugin extends Plugin
 
 	/**
 	 * Wrap a to be displayed IP address.
+	 * @see Plugin::DisplayIpAddress()
 	 */
 	function DisplayIpAddress( & $params )
 	{
@@ -491,6 +502,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.32  2006/04/19 22:26:25  blueyed
+ * cleanup/polish
+ *
  * Revision 1.31  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

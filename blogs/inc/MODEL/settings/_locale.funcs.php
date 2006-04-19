@@ -371,19 +371,19 @@ function locale_country( $locale = '' )
 
 
 /**
- *	Get the locale country dialing code 
+ *	Get the locale country dialing code
  */
 function locale_dialing_code( $locale = '' )
 {
 		global $current_locale, $CountryCache;
 
-		if( empty($locale) ) 
+		if( empty($locale) )
 		{
 			$locale = locale_country();
 		}
-		
+
 		$edited_Country = $CountryCache->get_by_ID( $locale);
-		
+
 		return $edited_Country->dialing_code;
 }
 
@@ -710,6 +710,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/19 22:26:25  blueyed
+ * cleanup/polish
+ *
  * Revision 1.4  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

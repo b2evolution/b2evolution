@@ -140,42 +140,40 @@ function antispam_report_abuse( $abuse_string )
 	global $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
 	global $baseurl, $Messages;
 
-	if( !preg_match( '#^http://localhost[/:]#', $baseurl) || ( $evonetsrv_host == 'localhost' ) )
+	if( preg_match( '#^http://localhost[/:]#', $baseurl) && ( $evonetsrv_host != 'localhost' ) )
 	{ // Local install can only report to local test server
-		// Construct XML-RPC client:
-		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
-		$client->debug = $debug;
-
-		// Construct XML-RPC message:
-		$message = new xmlrpcmsg(
-									'b2evo.reportabuse',                        // Function to be called
-									array(
-										new xmlrpcval(0,'int'),                   // Reserved
-										new xmlrpcval('annonymous','string'),     // Reserved
-										new xmlrpcval('nopassrequired','string'), // Reserved
-										new xmlrpcval($abuse_string,'string'),    // The abusive string to report
-										new xmlrpcval($baseurl,'string'),         // The base URL of this b2evo
-									)
-								);
-		$result = $client->send($message);
-		if( $ret = xmlrpc_logresult( $result, $Messages ) )
-		{ // Remote operation successful:
-			antispam_update_source( $abuse_string, 'reported' );
-
-			$Messages->add( T_('Reported abuse to b2evolution.net.'), 'success' );
-		}
-		else
-		{
-			$Messages->add( T_('Failed to report abuse to b2evolution.net.'), 'error' );
-		}
-
-		return($ret);
-	}
-	else
-	{
 		$Messages->add( T_('Reporting abuse to b2evolution aborted (Running on localhost).'), 'error' );
 		return(false);
 	}
+
+	// Construct XML-RPC client:
+	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
+	$client->debug = $debug;
+
+	// Construct XML-RPC message:
+	$message = new xmlrpcmsg(
+								'b2evo.reportabuse',                        // Function to be called
+								array(
+									new xmlrpcval(0,'int'),                   // Reserved
+									new xmlrpcval('annonymous','string'),     // Reserved
+									new xmlrpcval('nopassrequired','string'), // Reserved
+									new xmlrpcval($abuse_string,'string'),    // The abusive string to report
+									new xmlrpcval($baseurl,'string'),         // The base URL of this b2evo
+								)
+							);
+	$result = $client->send($message);
+	if( $ret = xmlrpc_logresult( $result, $Messages ) )
+	{ // Remote operation successful:
+		antispam_update_source( $abuse_string, 'reported' );
+
+		$Messages->add( T_('Reported abuse to b2evolution.net.'), 'success' );
+	}
+	else
+	{
+		$Messages->add( T_('Failed to report abuse to b2evolution.net.'), 'error' );
+	}
+
+	return($ret);
 }
 
 
@@ -273,6 +271,9 @@ function antispam_poll_abuse( $display = true )
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/19 22:26:24  blueyed
+ * cleanup/polish
+ *
  * Revision 1.3  2006/04/07 22:43:20  blueyed
  * removed wrong todo
  *

@@ -60,7 +60,7 @@ if( ! is_logged_in() )
 	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
 
 	if ($require_name_email)
-	{ // Blog wants Name and EMail with comments
+	{ // We want Name and EMail with comments
 		if( empty($author) ) $Messages->add( T_('Please fill in the name field'), 'error' );
 		if( empty($email) ) $Messages->add( T_('Please fill in the email field'), 'error' );
 	}
@@ -227,6 +227,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.64  2006/04/19 22:26:24  blueyed
+ * cleanup/polish
+ *
  * Revision 1.63  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
