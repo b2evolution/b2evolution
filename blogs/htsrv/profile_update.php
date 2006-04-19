@@ -93,11 +93,12 @@ profile_check_params( array(
 	'pass_required' => false ), $current_User );
 
 
-if( $Messages->count( 'error' ) )
+if( $Messages->count('error') )
 {
 	$Messages->display( T_('Cannot update profile. Please correct the following errors:'),
-		'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]', true, 'error' );
-	die();
+		'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
+	debug_info();
+	exit;
 }
 
 
@@ -127,23 +128,25 @@ $current_User->set( 'showonline', $newuser_showonline );
 
 
 // Set Messages into user's session, so they get restored on the next page (after redirect):
-$action_Log = new Log();
 if( $current_User->dbupdate() )
 {
-	$action_Log->add( T_('Your profile has been updated.'), 'success' );
+	$Messages->add( T_('Your profile has been updated.'), 'success' );
 }
 else
 {
-	$action_Log->add( T_('Your profile has not been changed.'), 'note' );
+	$Messages->add( T_('Your profile has not been changed.'), 'note' );
 }
 
-$Session->set( 'Messages', $action_Log );
+$Session->set( 'Messages', $Messages );
 
 header_nocache();
 header_redirect();
 
 /*
  * $Log$
+ * Revision 1.42  2006/04/19 23:50:39  blueyed
+ * Normalized Messages handling (error displaying and transport in Session)
+ *
  * Revision 1.41  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

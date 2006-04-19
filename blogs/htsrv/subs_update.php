@@ -70,8 +70,9 @@ profile_check_params( array( 'email' => $newuser_email ) );
 if( $Messages->count( 'error' ) )
 {
 	$Messages->display( T_('Cannot update profile. Please correct the following errors:'),
-			'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]', true, 'error' );
-	die();
+			'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
+	debug_info();
+	exit;
 }
 
 
@@ -105,10 +106,9 @@ if( count($values) )
 
 
 // Set Messages into user's session, so they get restored on the next page (after redirect):
-$action_Log = new Log();
-$action_Log->add( T_('Your profile has been updated.'), 'success' );
+$Messages->add( T_('Your profile has been updated.'), 'success' );
 
-$Session->set( 'Messages', $action_Log );
+$Session->set( 'Messages', $Messages );
 
 
 header_nocache();
@@ -116,6 +116,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/19 23:50:39  blueyed
+ * Normalized Messages handling (error displaying and transport in Session)
+ *
  * Revision 1.9  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

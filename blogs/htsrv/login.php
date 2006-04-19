@@ -179,10 +179,8 @@ switch( $action )
 		$Session->set_user_ID( $ForgetfulUser->ID );
 
 		// Add Message to change the password:
-		$action_Log = & new Log();
-		$action_Log->add( T_( 'Please change your password to something you remember now.' ), 'success' );
-		$Session->set( 'Messages', $action_Log );
-		$Session->dbsave();
+		$Messages->add( T_( 'Please change your password to something you remember now.' ), 'success' );
+		$Session->set( 'Messages', $Messages );
 
 		// Redirect to the user's profile in the "users" controller:
 		header_nocache();
@@ -201,6 +199,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.54  2006/04/19 23:50:39  blueyed
+ * Normalized Messages handling (error displaying and transport in Session)
+ *
  * Revision 1.53  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

@@ -128,9 +128,11 @@ if( !$ok )
 /*
  * Error messages:
  */
-if( $Messages->display( T_('Cannot post comment, please correct these errors:'),
-	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]', true, 'error' ) )
+if( $Messages->count('error') )
 {
+	$Messages->display( T_('Cannot post comment, please correct these errors:'),
+	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' );
+
 	debug_info();  // output debug info, useful to see what a plugin might have done
 	exit(); // TODO: nicer displaying here (but do NOT die() or debug_die() because this is not a BUG/user hack, it's a plain user input error (any bozo can produce it)
 }
@@ -216,9 +218,8 @@ $Comment->send_email_notifications();
 
 // Set Messages into user's session, so they get restored on the next page (after redirect):
 // TODO: look at $Comment->status and use different messages
-$action_Log = new Log();
-$action_Log->add( T_('Your comment has been submitted.'), 'success' );
-$Session->set( 'Messages', $action_Log );
+$Messages->add( T_('Your comment has been submitted.'), 'success' );
+$Session->set( 'Messages', $Messages );
 
 
 header_nocache();
@@ -227,6 +228,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.65  2006/04/19 23:50:39  blueyed
+ * Normalized Messages handling (error displaying and transport in Session)
+ *
  * Revision 1.64  2006/04/19 22:26:24  blueyed
  * cleanup/polish
  *

@@ -182,11 +182,12 @@ $Plugins->trigger_event( 'MessageFormSent', array(
 	) );
 
 
-$Messages->display();
-
 if( $Messages->count( 'error' ) )
-{
-	return;
+{ // there were errors: display them and get out of here
+	$Messages->display( T_('Cannot send email, please correct these errors:'),
+	'[<a href="javascript:history.go(-1)">'. T_('Back to email editing') . '</a>]' );
+	debug_info();
+	exit;
 }
 
 
@@ -208,10 +209,8 @@ if( isset($recipient_User) )
 
 
 // Set Messages into user's session, so they get restored on the next page (after redirect):
-// fp>> TODO: this was better called $Messages !
-$action_Log = new Log();
-$action_Log->add( T_('Your message has been sent as email to the user.'), 'success' );
-$Session->set( 'Messages', $action_Log );
+$Messages->add( T_('Your message has been sent as email to the user.'), 'success' );
+$Session->set( 'Messages', $Messages );
 
 // Header redirection
 header_nocache();
@@ -223,6 +222,9 @@ $Plugins->trigger_event( 'MessageFormSentCleanup' );
 
 /*
  * $Log$
+ * Revision 1.27  2006/04/19 23:50:39  blueyed
+ * Normalized Messages handling (error displaying and transport in Session)
+ *
  * Revision 1.26  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
