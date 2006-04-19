@@ -1227,7 +1227,38 @@ class Plugin
 	// }}}
 
 
-	// User related events (including registration and login): {{{
+	// User related events, including registration and login (procedure): {{{
+
+	/**
+	 * Event handler: Called at the end of the login procedure, if the
+	 *                user is anonymous ({@link $current_User current User} NOT set).
+	 *
+	 * Use this for example to read some cookie and define further handling of
+	 * this visitor or force them to login, by {@link Plugin::msg() adding a message}
+	 * of class "login_error", which will trigger the login screen.
+	 */
+	function AppendLoginAnonymousUser( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the login procedure, if the
+	 *                {@link $current_User current User} is set and the
+	 *                user is therefor registered.
+	 *
+	 * Use this for example to re-act on specific {@link Plugin::UserSettings user settings},
+	 * e.g., call {@link Plugin::forget_events()} to de-activate the plugin for
+	 * the current request.
+	 *
+	 * You can also {@link Plugin::msg() add a message} of class "login_error"
+	 * to prevent the user from accessing the site and triggering
+	 * the login screen.
+	 */
+	function AppendLoginRegisteredUser( & $params )
+	{
+	}
+
 
 	/**
 	 * Event handler: Called when a new user has registered, at the end of the
@@ -1290,12 +1321,32 @@ class Plugin
 	 * Otherwise, this hook is meant to authenticate a user against some
 	 * external database (e.g. LDAP) and generate a new user.
 	 *
+	 * @see Plugin::AlternateAuthentication()
 	 * @param array Associative array of parameters
 	 *   - 'login': user's login
 	 *   - 'pass': user's password
 	 *   - 'pass_md5': user's md5 password
 	 */
 	function LoginAttempt( $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of the login process, if the user did not try to
+	 *                login (by sending "login" and "pwd"), the session has no user attached
+	 *                or only "login" is given.
+	 *
+	 * This hook is meant to automagically login/authenticate an user by his/her IP address,
+	 * special cookie, etc..
+	 *
+	 * If you can authenticate the user, you'll have to attach him to the {@link $Session},
+	 * either through {@link Session::set_user_ID()} or {@link Session::set_User()}.
+	 *
+	 * @see Plugin::LoginAttempt()
+	 * @return boolean True, if the user has been authentificated (set in $Session)
+	 */
+	function AlternateAuthentication( & $params )
 	{
 	}
 
@@ -1831,6 +1882,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.30  2006/04/19 18:55:37  blueyed
+ * Added login handling hooks: AlternateAuthentication, AppendLoginAnonymousUser and AppendLoginRegisteredUser.
+ *
  * Revision 1.29  2006/04/19 18:14:12  blueyed
  * Added "no_edit" param to GetDefault(User)Settings
  *

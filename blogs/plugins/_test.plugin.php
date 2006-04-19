@@ -454,11 +454,38 @@ class test_plugin extends Plugin
 		$this->msg( 'The TEST plugin welcomes you..', 'note' );
 	}
 
+
+	/**
+	 * Automagically login every user as "demouser" who is not logged in and does not
+	 * try to currently.
+	 *
+	 * To enable/test it, change the "if-0" check below to "if( 1 )".
+	 *
+	 * @see Plugin::AlternateAuthentication()
+	 */
+	function AlternateAuthentication()
+	{
+		if( 0 ) // you should only enable it for test purposes, because it automagically logs every user in as "demouser"!
+		{
+			global $Session, $Messages, $UserCache;
+
+			if( $demo_User = & $UserCache->get_by_login('demouser') )
+			{ // demouser exists:
+				$Session->set_User( $demo_User );
+				$Messages->add( 'Logged in as demouser.', 'success' );
+				return true;
+			}
+		}
+	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.30  2006/04/19 18:55:37  blueyed
+ * Added login handling hooks: AlternateAuthentication, AppendLoginAnonymousUser and AppendLoginRegisteredUser.
+ *
  * Revision 1.29  2006/04/18 17:06:14  blueyed
  * Added "disabled" to plugin (user) settings (Thanks to balupton)
  *

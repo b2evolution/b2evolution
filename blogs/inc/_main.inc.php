@@ -376,7 +376,7 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true ))
 locale_activate( $default_locale );
 
 
-/**
+/*
  * Login procedure: {{{
  */
 if( !isset($login_required) )
@@ -384,8 +384,6 @@ if( !isset($login_required) )
 	$login_required = false;
 }
 
-
-// TODO: prevent brute force attacks! (timeout - based on coming Session or Hit object?)
 
 $login = NULL;
 $pass = NULL;
@@ -418,8 +416,8 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	$pass = strip_tags(get_magic_quotes_gpc() ? stripslashes($pass) : $pass);
 	$pass_md5 = md5( $pass );
 
-	// echo 'Trying to log in right now...';
 	header_nocache();
+	// echo 'Trying to log in right now...';
 
 	$Plugins->trigger_event( 'LoginAttempt', array( 'login' => $login, 'pass' => $pass, 'pass_md5' => $pass_md5 ) );
 
@@ -429,7 +427,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	}
 	else
 	// Check login and password
-	if( !user_pass_ok( $login, $pass_md5, true ) )
+	if( ! user_pass_ok( $login, $pass_md5, true ) )
 	{ // Login failed
 		$Debuglog->add( 'user_pass_ok() returned false!', 'login' );
 
@@ -440,7 +438,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	{ // Login succeeded, set cookies
 		$Debuglog->add( 'User successfully logged in with username and password...', 'login');
 		// set the user from the login that succeeded
-		$current_User =& $UserCache->get_by_login($login);
+		$current_User = & $UserCache->get_by_login($login);
 		// save the user for later hits
 		$Session->set_User( $current_User );
 
@@ -459,7 +457,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			{ // user pressed the "Log into backoffice!" button
 				$redirect_to = $admin_url;
 			}
-			
+
 			header_redirect( $redirect_to );
 			exit();
 		}
@@ -474,18 +472,38 @@ elseif( empty($login) && $Session->has_User() )
 
 	$Debuglog->add( 'Was already logged in... ['.$current_User->get('login').']', 'login' );
 }
-elseif( $login_required )
-{ /*
-	 * ---------------------------------------------------------
-	 * User was not logged in at all, but login is required
-	 * ---------------------------------------------------------
-	 */
-	// echo ' NOT logged in...';
-	$Debuglog->add( 'NOT logged in... (did not try)', 'login' );
+else
+{ // The Session has no user or $login is given, allow alternate authentication through Plugin:
+	if( ($event_return = $Plugins->trigger_event_first_true( 'AlternateAuthentication' ))
+	    && $Session->has_User()  # the plugin should have attached the user to $Session
+	)
+	{
+		$Debuglog->add( 'User has been authenticated through plugin #'.$event_return['plugin_ID'].' (AlternateAuthentication)', 'login' );
+		$current_User = & $UserCache->get_by_ID( $Session->user_ID );
+	}
+	elseif( $login_required )
+	{ /*
+		 * ---------------------------------------------------------
+		 * User was not logged in at all, but login is required
+		 * ---------------------------------------------------------
+		 */
+		// echo ' NOT logged in...';
+		$Debuglog->add( 'NOT logged in... (did not try)', 'login' );
 
-	$Messages->add( T_('You must log in!'), 'login_error' );
+		$Messages->add( T_('You must log in!'), 'login_error' );
+	}
 }
 unset($pass);
+
+// Trigger plugin event that allows the plugins to re-act on this:
+if( isset($current_User) )
+{
+	$Plugins->trigger_event( 'AppendLoginRegisteredUser', array() );
+}
+else
+{
+	$Plugins->trigger_event( 'AppendLoginAnonymousUser', array() );
+}
 
 if( $Messages->count( 'login_error' ) )
 {
@@ -495,10 +513,8 @@ if( $Messages->count( 'login_error' ) )
 	exit();
 }
 
+/* Login procedure }}} */
 
-#echo $current_User->disp('login');
-
-// Login procedure }}}
 
 /**
  * The Sessions class
@@ -549,6 +565,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/19 18:55:36  blueyed
+ * Added login handling hooks: AlternateAuthentication, AppendLoginAnonymousUser and AppendLoginRegisteredUser.
+ *
  * Revision 1.9  2006/04/18 19:28:34  fplanque
  * mambo idea
  *

@@ -272,6 +272,7 @@ class Plugins
 
 				'CommentFormSent' => T_('Called when a comment form has been submitted.'),
 				'LoginAttempt' => T_('Called when a user tries to login.'),
+				'AlternateAuthentication' => '',
 				'RegisterFormSent' => T_('Called when the "Register" form has been submitted.'),
 				'MessageFormSent' => T_('Called when the "Message to user" form has been submitted.'),
 				'MessageFormSentCleanup' => T_('Called after a email message has been sent through public form.'),
@@ -285,6 +286,9 @@ class Plugins
 
 				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
 				'SessionLoaded' => '', // gets called after $Session is initialized, quite early.
+
+				'AppendLoginAnonymousUser' => T_('Gets called at the end of the login procedure for anonymous visitors.'),
+				'AppendLoginRegisteredUser' => T_('Gets called at the end of the login procedure for registered users.'),
 			);
 		}
 
@@ -2480,6 +2484,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.29  2006/04/19 18:55:37  blueyed
+ * Added login handling hooks: AlternateAuthentication, AppendLoginAnonymousUser and AppendLoginRegisteredUser.
+ *
  * Revision 1.28  2006/04/18 21:09:20  blueyed
  * Added hooks to manipulate Items before insert/update/preview; fixes; cleanup
  *
