@@ -2539,7 +2539,7 @@ class Item extends DataObject
 			$renderers[] = $renderer_code;
 			$this->set_renderers( $renderers );
 
-			echo 'Added renderer '.$renderer_code;
+			//echo 'Added renderer '.$renderer_code;
 		}
 	}
 
@@ -2556,7 +2556,7 @@ class Item extends DataObject
 			unset($renderers[$key]);
 			$this->set_renderers( $renderers );
 
-			echo 'Removed renderer '.$renderer_code;
+			//echo 'Removed renderer '.$renderer_code;
 		}
 	}
 }
@@ -2564,6 +2564,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2006/04/19 17:25:31  blueyed
+ * Commented debug output out
+ *
  * Revision 1.36  2006/04/19 15:56:02  blueyed
  * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
  * and Item::comments to Item::comment_status (Item API change)
