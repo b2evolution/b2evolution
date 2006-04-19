@@ -1062,7 +1062,7 @@ class Item extends DataObject
 			return false;
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id='.$this->Author->ID.'&amp;post_id='.$this->ID.'&amp;redirect_to='.regenerate_url() );
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->Author->ID.'&amp;post_id='.$this->ID.'&amp;redirect_to='.rawurlencode(regenerate_url()) );
 
 		if( $title == '#' ) $title = T_('Send email to post author');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
@@ -2564,6 +2564,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2006/04/19 19:52:27  blueyed
+ * url-encode redirect_to param
+ *
  * Revision 1.37  2006/04/19 17:25:31  blueyed
  * Commented debug output out
  *

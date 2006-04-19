@@ -625,7 +625,7 @@ class Comment extends DataObject
 			}
 		}
 
-		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID.'&amp;post_id='.$this->Item->ID.'&amp;redirect_to='.regenerate_url() );
+		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID.'&amp;post_id='.$this->Item->ID.'&amp;redirect_to='.rawurlencode(regenerate_url()) );
 
 		if( $title == '#' ) $title = T_('Send email to comment author');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
@@ -1014,6 +1014,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2006/04/19 19:52:27  blueyed
+ * url-encode redirect_to param
+ *
  * Revision 1.21  2006/04/19 13:05:21  fplanque
  * minor
  *

@@ -757,7 +757,7 @@ class User extends DataObject
 			$form_url = isset($Blog) ? $Blog->get('msgformurl') : '';
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.regenerate_url() );
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode(regenerate_url()) );
 
 		if( $title == '#' ) $title = T_('Send email to user');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
@@ -927,6 +927,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2006/04/19 19:52:27  blueyed
+ * url-encode redirect_to param
+ *
  * Revision 1.8  2006/04/13 00:29:32  blueyed
  * cleanup
  *
