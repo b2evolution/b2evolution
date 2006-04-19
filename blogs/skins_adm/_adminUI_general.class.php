@@ -633,7 +633,7 @@ class AdminUI_general
 				}
 				else
 				{
-					$anchor .= regenerate_url( 'tab', 'tab='.$loop_tab );
+					$anchor .= regenerate_url( 'tab', 'tab='.$loop_key );
 				}
 				$anchor .= '"';
 				if( isset($loop_details['style']) )
@@ -1273,6 +1273,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.9  2006/04/19 17:17:19  blueyed
+ * Fix
+ *
  * Revision 1.8  2006/04/19 12:54:41  fplanque
  * not using exit links any more because it won't translate
  *
