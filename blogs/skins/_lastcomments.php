@@ -45,6 +45,7 @@ while( $Comment = & $CommentList->get_next() )
 			<?php	$Comment->permanent_link( '#', '#', 'permalink_right' ); ?>
 			<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
 			<?php $Comment->edit_link( ' &middot; ' ) // Link to backoffice for editing ?>
+			<?php $Comment->delete_link( ' &middot; ' ); // Link to backoffice for deleting ?>
 		</div>
 	</div>
 	<!-- ========== END of a COMMENT ========== -->
@@ -54,6 +55,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.25  2006/04/19 13:05:22  fplanque
+ * minor
+ *
  * Revision 1.24  2006/04/18 19:29:52  fplanque
  * basic comment status implementation
  *

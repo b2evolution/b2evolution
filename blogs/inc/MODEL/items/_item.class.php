@@ -1331,7 +1331,7 @@ class Item extends DataObject
 
 
 	/**
-	 * Get button for deleting the Item if user has proper rights
+	 * Gets button for deleting the Item if user has proper rights
 	 *
 	 * @param string to display before link
 	 * @param string to display after link
@@ -1398,6 +1398,14 @@ class Item extends DataObject
 
 	/**
 	 * Displays button for deleting the Item if user has proper rights
+	 *
+	 * @param string to display before link
+	 * @param string to display after link
+	 * @param string link text
+	 * @param string link title
+	 * @param string class name
+	 * @param boolean true to make this a button instead of a link
+	 * @param string page url for the delete action
 	 */
 	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $actionurl = '#' )
 	{
@@ -2013,6 +2021,7 @@ class Item extends DataObject
 
 	/**
 	 * Set the renderers of the Item.
+	 *
 	 * @param array List of renderer codes.
 	 * @return
 	 */
@@ -2556,6 +2565,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2006/04/19 13:05:21  fplanque
+ * minor
+ *
  * Revision 1.34  2006/04/18 21:09:20  blueyed
  * Added hooks to manipulate Items before insert/update/preview; fixes; cleanup
  *

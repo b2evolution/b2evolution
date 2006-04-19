@@ -438,7 +438,7 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( $text == '#' ) $text = T_('Delete');
+		if( $text == '#' ) $text = get_icon( 'delete', 'imgtag' ).' '.T_('Delete');
 		if( $title == '#' ) $title = T_('Delete this comment');
 
 		$url = $admin_url.'?ctrl=editactions&amp;action=deletecomment&amp;comment_ID='.$this->ID;
@@ -1014,6 +1014,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2006/04/19 13:05:21  fplanque
+ * minor
+ *
  * Revision 1.20  2006/04/18 20:17:25  fplanque
  * fast comment status switching
  *

@@ -129,12 +129,6 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 						<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
 						<?php break;
 				}
-
-				// Link to backoffice for editing:
-				$Comment->edit_link( ' &middot; ' );
-
-				// Link to backoffice for deleting:
-				$Comment->delete_link( ' &middot; ' );
 			?>
 			</div>
 			<div class="bCommentText">
@@ -143,6 +137,8 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 			<div class="bCommentSmallPrint">
 				<?php	$Comment->permanent_link( '#', '#', 'permalink_right' ); ?>
 				<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
+				<?php $Comment->edit_link( ' &middot; ' ); // Link to backoffice for editing ?>
+				<?php $Comment->delete_link( ' &middot; ' ); // Link to backoffice for deleting ?>
 			</div>
 		</div>
 		<!-- ========== END of a COMMENT/TB/PB ========== -->
@@ -259,6 +255,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.56  2006/04/19 13:05:22  fplanque
+ * minor
+ *
  * Revision 1.55  2006/04/18 20:17:26  fplanque
  * fast comment status switching
  *
