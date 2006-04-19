@@ -19,7 +19,14 @@
  * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://php.justinvincent.com}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal License choice
+ * - If you have received this file as part of a package, please find the license.txt file in
+ *   the same folder or the closest folder above for complete license terms.
+ * - If you have received this file individually (e-g: from http://cvs.sourceforge.net/viewcvs.py/evocms/)
+ *   then you must choose one of the following licenses before using the file:
+ *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
+ * }}
  *
  * {@internal Origin:
  * This file is based on the following package (excerpt from ezSQL's readme.txt):
@@ -786,6 +793,32 @@ class DB
 
 
 	/**
+	 * Function to get the second column from the cached result indexed by the first column
+	 *
+	 * @return array [col_0] => col_1
+	 */
+	function get_assoc( $query = NULL, $title = '' )
+	{
+		// If there is a query then perform it if not then use cached results..
+		if( $query )
+		{
+			$this->query( $query, $title );
+		}
+
+		// Extract the column values
+		$new_array = array();
+		for( $i = 0, $count = count($this->last_result); $i < $count; $i++ )
+		{
+			$key = $this->get_var( NULL, 0, $i );
+			
+			$new_array[$key] = $this->get_var( NULL, 1, $i );
+		}
+
+		return $new_array;
+	}
+
+
+	/**
 	 * Get a column as comma-separated list.
 	 *
 	 * @param string|NULL Query to execute
@@ -1189,6 +1222,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/19 19:44:25  fplanque
+ * added get_assoc()
+ *
  * Revision 1.4  2006/03/13 19:44:35  fplanque
  * no message
  *
