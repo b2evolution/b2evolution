@@ -135,7 +135,7 @@ function get_postdata($postid)
 	// We have to load the post
 	$sql = 'SELECT post_ID, post_creator_user_ID, post_datestart, post_datemodified, post_status, post_content, post_title,
 											post_main_cat_ID, post_flags, cat_blog_ID ';
-	$sql .= ', post_locale, post_url, post_wordcount, post_comments, post_views ';
+	$sql .= ', post_locale, post_url, post_wordcount, post_comment_status, post_views ';
 	$sql .= '	FROM T_posts
 					 INNER JOIN T_categories ON post_main_cat_ID = cat_ID
 					 WHERE post_ID = '.$postid;
@@ -163,7 +163,7 @@ function get_postdata($postid)
 			'Url' => $myrow->post_url,
 			'Wordcount' => $myrow->post_wordcount,
 			'views' => $myrow->post_views,
-			'comments' => $myrow->post_comments,
+			'comment_status' => $myrow->post_comment_status,
 			'Blog' => $myrow->cat_blog_ID,
 			);
 
@@ -924,6 +924,10 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/19 15:56:02  blueyed
+ * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
+ * and Item::comments to Item::comment_status (Item API change)
+ *
  * Revision 1.7  2006/04/11 21:22:25  fplanque
  * partial cleanup
  *

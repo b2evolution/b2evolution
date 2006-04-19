@@ -126,7 +126,7 @@ if( isset($Blog) )
 $this->disp_payload_begin();
 
 global $form_action, $next_action, $mode, $post_title, $post_locale, $post_title, $use_post_url, $post_url, $content;
-global $use_preview, $post_urltitle, $post_status, $post_comments, $post_trackbacks;
+global $use_preview, $post_urltitle, $post_status, $post_comment_status, $post_trackbacks;
 
 $Form = & new Form( $form_action, 'item_checkchanges', 'post', 'none' );
 $Form->fieldstart = '<span class="line">';
@@ -366,13 +366,13 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		$Form->begin_fieldset( T_('Comments'), array( 'id' => 'itemform_comments' ) );
 
 		?>
-			<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comments" value="open" class="checkbox" <?php if( $post_comments == 'open' ) echo 'checked="checked"'; ?> />
+			<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="open" class="checkbox" <?php if( $post_comment_status == 'open' ) echo 'checked="checked"'; ?> />
 			<?php echo T_('Open') ?></label><br />
 
-			<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comments" value="closed" class="checkbox" <?php if( $post_comments == 'closed' ) echo 'checked="checked"'; ?> />
+			<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="closed" class="checkbox" <?php if( $post_comment_status == 'closed' ) echo 'checked="checked"'; ?> />
 			<?php echo T_('Closed') ?></label><br />
 
-			<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comments" value="disabled" class="checkbox" <?php if( $post_comments == 'disabled' ) echo 'checked="checked"'; ?> />
+			<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="disabled" class="checkbox" <?php if( $post_comment_status == 'disabled' ) echo 'checked="checked"'; ?> />
 			<?php echo T_('Disabled') ?></label><br />
 		<?php
 
@@ -422,6 +422,10 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/19 15:56:02  blueyed
+ * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
+ * and Item::comments to Item::comment_status (Item API change)
+ *
  * Revision 1.7  2006/04/18 19:29:52  fplanque
  * basic comment status implementation
  *

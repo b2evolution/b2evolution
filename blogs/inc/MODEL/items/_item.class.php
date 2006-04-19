@@ -55,7 +55,7 @@ $object_def['Item'] = array( // definition of the object:
 					'url'             => 'post_url',
 					'flags'           => 'post_flags',
 					'wordcount'       => 'post_wordcount',
-					'comments'        => 'post_comments',
+					'comment_status'  => 'post_comment_status',
 					'views'           => 'post_views',
 					'renderers'       => 'post_renderers',
 					'st_ID'           => 'post_pst_ID',
@@ -115,10 +115,9 @@ class Item extends DataObject
 	var $renderers;
 	/**
 	 * Comments status
-	 * @todo rename to comment_status
 	 * @var string "open", "disabled" or "closed
 	 */
-	var $comments;
+	var $comment_status;
 	var $url;          // Should move
 	var $typ_ID;
 	var $st_ID;
@@ -244,7 +243,7 @@ class Item extends DataObject
 			$this->urltitle = $db_row->$db_cols['urltitle'];
 			$this->wordcount = $db_row->$db_cols['wordcount'];
 			$this->flags = $db_row->$db_cols['flags'];
-			$this->comments = $db_row->$db_cols['comments'];			// Comments status
+			$this->comment_status = $db_row->$db_cols['comment_status'];			// Comments status
 
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = $db_row->$db_cols['renderers'];
@@ -347,8 +346,8 @@ class Item extends DataObject
 		$this->set_from_Request( 'deadline', 'item_deadline', true );
 
 		// Comment stuff:
-		$Request->param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
-		$this->set_from_Request( 'comments' );
+		$Request->param( 'post_comment_status', 'string', 'open' );		// 'open' or 'closed' or ...
+		$this->set_from_Request( 'comment_status' );
 
 		$Request->param( 'renderers', 'array', array() );
 		$renderers = $Plugins->validate_list( $Request->get('renderers') );
@@ -680,7 +679,7 @@ class Item extends DataObject
 	 */
 	function can_see_comments()
 	{
-		if( $this->comments == 'disabled'
+		if( $this->comment_status == 'disabled'
 		    || ( $this->get_Blog() && $this->Blog->allowcomments == 'never' ) )
 		{ // Comments are disabled on this post
 			return false;
@@ -706,12 +705,12 @@ class Item extends DataObject
 						$closed_msg = '#'
 						)
 	{
-		if( $this->comments == 'disabled'  )
+		if( $this->comment_status == 'disabled'  )
 		{ // Comments are disabled on this post
 			return false;
 		}
 
-		if( $this->comments == 'closed'  )
+		if( $this->comment_status == 'closed'  )
 		{ // Comments are closed on this post
 			if( $closed_msg == '#' )
 				$closed_msg = T_( 'Comments are closed for this post.' );
@@ -2059,7 +2058,7 @@ class Item extends DataObject
 		$pingsdone = true,
 		$post_urltitle = '',
 		$post_url = '',
-		$post_comments = 'open',
+		$post_comment_status = 'open',
 		$post_renderers = array('default'),
 		$item_typ_ID = 1,
 		$item_st_ID = NULL )
@@ -2091,7 +2090,7 @@ class Item extends DataObject
 		$this->set( 'locale', $post_locale );
 		$this->set( 'url', $post_url );
 		$this->set( 'flags', $pingsdone ? 'pingsdone' : '' );
-		$this->set( 'comments', $post_comments );
+		$this->set( 'comment_status', $post_comment_status );
 		$this->set_renderers( $post_renderers );
 		$this->set( 'typ_ID', $item_typ_ID );
 		$this->set( 'st_ID', $item_st_ID );
@@ -2159,7 +2158,7 @@ class Item extends DataObject
 		$pingsdone = true,
 		$post_urltitle = '',
 		$post_url = '',
-		$post_comments = 'open',
+		$post_comment_status = 'open',
 		$post_renderers = array(),
 		$item_typ_ID = 0,
 		$item_st_ID = 0 )
@@ -2175,7 +2174,7 @@ class Item extends DataObject
 		$this->set( 'extra_cat_IDs', $extra_cat_IDs );
 		$this->set( 'status', $post_status );
 		$this->set( 'flags', $pingsdone ? 'pingsdone' : '' );
-		$this->set( 'comments', $post_comments );
+		$this->set( 'comment_status', $post_comment_status );
 		$this->set_renderers( $post_renderers );
 		$this->set( 'typ_ID', $item_typ_ID );
 		$this->set( 'st_ID', $item_st_ID );
@@ -2565,6 +2564,10 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2006/04/19 15:56:02  blueyed
+ * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
+ * and Item::comments to Item::comment_status (Item API change)
+ *
  * Revision 1.35  2006/04/19 13:05:21  fplanque
  * minor
  *

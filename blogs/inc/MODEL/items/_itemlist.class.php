@@ -480,11 +480,11 @@ class ItemList extends DataObjectList
 		$comment_Blog = & $BlogCache->get_by_ID( get_catblog( $post_category ) );
 		if( $comment_Blog->allowcomments == 'post_by_post' )
 		{ // param is required
-			$post_comments = param( 'post_comments', 'string', true );
+			$post_comment_status = param( 'post_comment_status', 'string', true );
 		}
 		else
 		{
-			$post_comments = $comment_Blog->allowcomments;
+			$post_comment_status = $comment_Blog->allowcomments;
 		}
 
 		if( !empty($current_User) && $current_User->check_perm( 'edit_timestamp' ) && param( 'edit_date', 'integer', 0 ) )
@@ -558,7 +558,7 @@ class ItemList extends DataObjectList
 			$post_views AS {$this->dbprefix}views,
 			'' AS {$this->dbprefix}flags,
 			".bpost_count_words( $content )." AS {$this->dbprefix}wordcount,
-			".$DB->quote($post_comments)." AS {$this->dbprefix}comments,
+			".$DB->quote($post_comment_status)." AS {$this->dbprefix}comment_status,
 			'".$DB->escape( $post_renderers )."' AS {$this->dbprefix}renderers,
 			".$DB->quote($item_assigned_user_ID)." AS {$this->dbprefix}assigned_user_ID,
 			NULL AS {$this->dbprefix}datestart,
@@ -777,7 +777,7 @@ class ItemList extends DataObjectList
 				'Flags'      => explode( ',', $this->last_Item->flags ),
 				'Wordcount'  => $this->last_Item->wordcount,
 				'views'      => $this->last_Item->views,
-				'comments'   => $this->last_Item->comments
+				'comment_status'   => $this->last_Item->comment_status
 			);
 
 		$day = mysql2date('d.m.y',$postdata['Date']);
@@ -856,6 +856,10 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/19 15:56:02  blueyed
+ * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
+ * and Item::comments to Item::comment_status (Item API change)
+ *
  * Revision 1.6  2006/04/18 21:09:20  blueyed
  * Added hooks to manipulate Items before insert/update/preview; fixes; cleanup
  *

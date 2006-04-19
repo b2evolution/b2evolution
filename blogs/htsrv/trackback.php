@@ -65,7 +65,7 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 		trackback_response( 1, 'Sorry, this weblog does not allow you to trackback its posts.' );
 	}
 
-	if( ! $commented_Item->comments != 'open' )
+	if( ! $commented_Item->comment_status != 'open' )
 	{
 		trackback_response( 1, 'Sorry, this item does not accept trackbacks.' );
 	}
@@ -142,6 +142,10 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 
 /*
  * $Log$
+ * Revision 1.41  2006/04/19 15:56:02  blueyed
+ * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
+ * and Item::comments to Item::comment_status (Item API change)
+ *
  * Revision 1.40  2006/04/11 21:22:25  fplanque
  * partial cleanup
  *

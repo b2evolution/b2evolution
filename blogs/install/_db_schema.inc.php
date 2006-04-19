@@ -168,7 +168,7 @@ $schema_queries = array(
 			post_flags            SET( 'pingsdone', 'imported'),
 			post_views            INT(11) UNSIGNED NOT NULL DEFAULT 0,
 			post_wordcount        int(11) default NULL,
-			post_comments         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
+			post_comment_status   ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
 			post_commentsexpire   DATETIME DEFAULT NULL,
 			post_renderers        TEXT NOT NULL,
 			post_priority         int(11) unsigned null,
@@ -591,6 +591,10 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.13  2006/04/19 15:56:02  blueyed
+ * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
+ * and Item::comments to Item::comment_status (Item API change)
+ *
  * Revision 1.12  2006/04/11 22:39:50  blueyed
  * Fixed installation of basic plugins, though again more complicated (IMHO)
  *

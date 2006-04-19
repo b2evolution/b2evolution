@@ -748,8 +748,27 @@ function upgrade_b2evo_tables()
 		}
 
 
+		echo 'Altering Posts table... ';
+		$DB->query( "ALTER TABLE T_posts
+		             CHANGE post_comments post_comment_status ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open'" );
+		echo "OK.<br />\n";
+
+
 		set_upgrade_checkpoint( '9100' );
 	}
+
+	/* TODO: every change that gets done here, should bump $new_db_version, to avoid the following:
+	 *   - You go to /install/
+	 *   - the column-rename above does not get caught, because $old_db_version is the same as $new_db_version (which does not get changed)
+	 *   - Below, a new DB column gets added by db_delta(), because it's missing
+	 *   - The data from the old column does not get copied
+	 *   - The old column does not get removed
+	 * This is the last remaining problem when using CVS for "production".
+	 * IMHO, the cases were we would rename the column back are probably never happening
+	 *       and even if, it's not _that_ messy really! (blueyed)
+	 * Of course, column renames should be discussed beforehand and there should also be
+	 * a rule about how much we bump $new_db_version (10?).
+	 */
 
 
 	if( $old_db_version < 9200 )
@@ -818,6 +837,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.140  2006/04/19 15:56:02  blueyed
+ * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
+ * and Item::comments to Item::comment_status (Item API change)
+ *
  * Revision 1.139  2006/04/11 22:39:50  blueyed
  * Fixed installation of basic plugins, though again more complicated (IMHO)
  *

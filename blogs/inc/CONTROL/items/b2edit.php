@@ -173,7 +173,7 @@ switch($action)
 		param( 'post_url', 'string', $popupurl );
 		param( 'item_issue_date', 'string' );
 		param( 'item_issue_time', 'string' );
-		param( 'post_comments', 'string', 'open' );		// 'open' or 'closed' or ...
+		param( 'post_comment_status', 'string', 'open' );		// 'open' or 'closed' or ...
 		param( 'post_extracats', 'array', array() );
 		param( 'post_locale', 'string', $default_locale );
 		param( 'renderers', 'array', array( 'default' ) );
@@ -209,7 +209,7 @@ switch( $action )
 		$content = $edited_Item->get( 'content' );
 		$post_pingback = 0;
 		$post_trackbacks = '';
-		$post_comments = $edited_Item->get( 'comments' );
+		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $post );
 
 		// Display edit form:
