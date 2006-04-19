@@ -532,24 +532,8 @@ class DataObject
 		// i-e: transform 0 to ''
 		$new_value = ($make_null && ($parvalue === '')) ? NULL : $parvalue;
 
-		if( !isset($this->$parname) )
-		{	// This property has never been set before, set it to NULL now in order for tests to work:
-			$this->$parname = NULL;
-		}
-
-
-		/* blueyed>
-		TODO: there's a bug here: you cannot use set_param('foo', 'number', 0), if the $parname member
-		      has not been set before or is null!!
-		      What about just:
-		      ( isset($this->$parname) && $this->$parname === $new_value )
-		      This would also eliminate the isset() check from above.
-		      IIRC you've once said here that '===' would be too expensive and I would misuse the DataObjects,
-		      but IMHO what we have now is not much faster and buggy anyway..
-			fp> okay let's give it a try...
-		*/
-		if( (!is_null($new_value) && $this->$parname == $new_value)
-			|| (is_null($this->$parname) && is_null($new_value)) )
+		if( (isset($this->$parname) && $this->$parname === $new_value)
+			|| ( ! isset($this->$parname) && ! isset($new_value) ) )
 		{	// Value has not changed (we need 2 tests, for NULL and for NOT NULL value pairs)
 			$Debuglog->add( $this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' = '.$this->$parname, 'dataobjects' );
 			// echo '<br />'.$this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' = '.$this->$parname;
@@ -657,6 +641,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/19 22:04:59  blueyed
+ * Fixed check for if value has changed
+ *
  * Revision 1.7  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
