@@ -619,6 +619,37 @@ class Log_noop {
 	{
 	}
 
+	/**
+	 * This is a no-operation method.
+	 */
+	function add_messages()
+	{
+	}
+
+
+	/**
+	 * This is a no-operation method.
+	 */
+	function clear()
+	{
+	}
+
+
+	/**
+	 * This is a no-operation method.
+	 */
+	function count()
+	{
+	}
+
+
+	/**
+	 * This is a no-operation method.
+	 */
+	function disp()
+	{
+	}
+
 
 	/**
 	 * This is a no-operation method.
@@ -631,13 +662,40 @@ class Log_noop {
 	/**
 	 * This is a no-operation method.
 	 */
-	function add_messages()
+	function display_cond()
+	{
+	}
+
+
+	/**
+	 * This is a no-operation method.
+	 */
+	function display_paragraphs()
+	{
+	}
+
+
+	/**
+	 * This is a no-operation method.
+	 */
+	function get_messages()
+	{
+	}
+
+
+	/**
+	 * This is a no-operation method.
+	 */
+	function get_string()
 	{
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/19 23:08:58  blueyed
+ * Added all public methods from Log to Log_noop.
+ *
  * Revision 1.7  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
