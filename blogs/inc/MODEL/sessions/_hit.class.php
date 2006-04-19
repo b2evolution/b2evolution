@@ -232,6 +232,7 @@ class Hit
 
 			// This is most probably referer spam,
 			// In order to preserve server resources, we're going to stop processing immediatly!!
+			// TODO: We won't ever have hit_referer_type=="spam" in the hitlog! So, either log it here, or remove it from stats.php.
 			require $view_path.'errors/_referer_spam.page.php';	// error & exit
 			exit(); // just in case.
 			// THIS IS THE END!!
@@ -710,6 +711,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.11  2006/04/19 17:29:37  blueyed
+ * todo
+ *
  * Revision 1.10  2006/03/23 22:13:50  blueyed
  * doc
  *
