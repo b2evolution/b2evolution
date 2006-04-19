@@ -169,10 +169,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		<p><strong><?php echo T_('Author') ?>:</strong> <?php echo $edited_Comment->author() ?></p>
 		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
 		<p><strong><?php echo T_('IP address') ?>:</strong> <?php echo $edited_Comment->author_IP; ?></p>
-		<p><strong><?php echo T_('Spam Karma') ?>:</strong> <?php
-		// TODO: the cast to "int" can be removed once the dataobjects actually set a param to "0" if it's NULL before..
-		echo (int)$edited_Comment->spam_karma;
-		?>%</p>
+		<p><strong><?php echo T_('Spam Karma') ?>:</strong> <?php $edited_Comment->spam_karma(); ?></p>
 	</fieldset>
 
 	<?php
@@ -194,6 +191,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/19 22:08:56  blueyed
+ * Fixed spam_karma
+ *
  * Revision 1.7  2006/04/18 19:29:52  fplanque
  * basic comment status implementation
  *
