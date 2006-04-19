@@ -313,6 +313,9 @@ class Blog extends DataObject
 	/**
 	 * Get the blog's media directory (and create it if necessary).
 	 *
+	 * If we're {@link is_admin_page() on an admin page}, it adds status messages.
+	 * @todo These status messages should rather go to a "syslog" and not be displayed to a normal user
+	 *
 	 * @return mixed the path as string on success, false if the dir could not be created
 	 */
 	function get_media_dir()
@@ -351,12 +354,18 @@ class Blog extends DataObject
 			// TODO: Link to some help page(s) with errors!
 			if( !is_writable( dirname($mediadir) ) )
 			{ // add error
-				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($mediadir) ), 'error' );
+				if( is_admin_page() )
+				{
+					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($mediadir) ), 'error' );
+				}
 				return false;
 			}
 			elseif( !@mkdir( $mediadir ) )
 			{ // add error
-				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($mediadir) ), 'error' );
+				if( is_admin_page() )
+				{
+					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($mediadir) ), 'error' );
+				}
 				return false;
 			}
 			else
@@ -366,7 +375,10 @@ class Blog extends DataObject
 				{
 					@chmod( $mediadir, octdec($chmod) );
 				}
-				$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), rel_path_to_base($mediadir), substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
+				if( is_admin_page() )
+				{
+					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), rel_path_to_base($mediadir), substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
+				}
 			}
 		}
 
@@ -749,6 +761,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/19 22:39:08  blueyed
+ * Only add status messages about media_dir creation if on an admin page.
+ *
  * Revision 1.5  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

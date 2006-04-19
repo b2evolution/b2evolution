@@ -259,7 +259,8 @@ class User extends DataObject
 	/**
 	 * Get the path to the media directory. If it does not exist, it will be created.
 	 *
-	 * @todo Messages should get added to syslog, if we had one: it should not get displayed to a regular user (errors and success)!
+	 * If we're {@link is_admin_page() on an admin page}, it adds status messages.
+	 * @todo These status messages should rather go to a "syslog" and not be displayed to a normal user
 	 *
 	 * @return mixed the path as string on success, false if the dir could not be created
 	 */
@@ -279,12 +280,18 @@ class User extends DataObject
 		{
 			if( !is_writable( dirname($userdir) ) )
 			{ // add error
-				$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($userdir) ), 'error' );
+				if( is_admin_page() )
+				{
+					$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($userdir) ), 'error' );
+				}
 				return false;
 			}
 			elseif( !@mkdir( $userdir ) )
 			{ // add error
-				$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($userdir) ), 'error' );
+				if( is_admin_page() )
+				{
+					$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($userdir) ), 'error' );
+				}
 				return false;
 			}
 			else
@@ -294,7 +301,10 @@ class User extends DataObject
 				{
 					@chmod( $userdir, octdec($chmod) );
 				}
-				$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; has been created with permissions %s."), rel_path_to_base($userdir), substr( sprintf('%o', fileperms($userdir)), -3 ) ), 'success' );
+				if( is_admin_page() )
+				{
+					$Messages->add( sprintf( T_("The user's directory &laquo;%s&raquo; has been created with permissions %s."), rel_path_to_base($userdir), substr( sprintf('%o', fileperms($userdir)), -3 ) ), 'success' );
+				}
 			}
 		}
 		return $userdir;
@@ -934,6 +944,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2006/04/19 22:39:08  blueyed
+ * Only add status messages about media_dir creation if on an admin page.
+ *
  * Revision 1.10  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
