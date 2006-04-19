@@ -82,6 +82,11 @@ class Filelist
 	var $_FileRoot;
 
 	/**
+	 * @var Log Holds (error) messages (if any)
+	 */
+	var $Messages;
+
+	/**
 	 * Path to list with trailing slash.
 	 *
 	 * false if we are constructing an arbitrary list (i-e not tied to a single directory)
@@ -279,6 +284,8 @@ class Filelist
 			// Get the subpath relative to root
 			$this->_rds_list_path = $this->rdfs_relto_root_from_adfs( $this->_ads_list_path );
 		}
+
+		$this->Messages = new Log('error');
 	}
 
 
@@ -292,8 +299,6 @@ class Filelist
 	 */
 	function load()
 	{
-		global $Messages;
-
 		if( !$this->_ads_list_path )
 		{	// We have no path to load from: (happens when FM finds no available root OR we have an arbitrary)
 			// echo 'Cannot load a filelist with no list path' ;
@@ -314,7 +319,7 @@ class Filelist
 		// Attempt list files for requested directory: (recursively if flat mode):
 		if( ($filepath_array = get_filenames( $this->_ads_list_path, $this->include_files, $this->include_dirs, true, $this->flatmode )) === false )
 		{
-			$Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->_ads_list_path ), 'fl_error' );
+			$this->Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->_ads_list_path ), 'error' );
 			return false;
 		}
 
@@ -709,7 +714,7 @@ class Filelist
 				}
 				else
 				{
-					$Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $filter_string ), 'error' );
+					$this->Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $filter_string ), 'error' );
 					$filter_string = '~.*~';
 				}
 			}
@@ -1203,6 +1208,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.13  2006/04/19 22:54:48  blueyed
+ * Use own Log object for Filelist
+ *
  * Revision 1.12  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

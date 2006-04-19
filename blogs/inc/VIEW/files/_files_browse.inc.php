@@ -58,10 +58,6 @@ global $Settings;
  */
 global $UserSettings;
 /**
- * @var Log
- */
-global $Messages;
-/**
  * @var Filelist
  */
 global $selected_Filelist;
@@ -603,12 +599,12 @@ if( $countFiles == 0 )
 		<td class="firstcol">&nbsp;</td> <?php /* blueyed> This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
 		<td class="lastcol" colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
 			<?php
-				if( ! $Messages->count( 'fl_error' ) )
+				if( ! $fm_Filelist->Messages->count() )
 				{ // no Filelist errors, the directory must be empty
-					$Messages->add( T_('No files found.')
-						.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'fl_error' );
+					$fm_Filelist->Messages->add( T_('No files found.')
+						.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'error' );
 				}
-				$Messages->display( '', '', true, 'fl_error', 'log_error' );
+				$fm_Filelist->Messages->display();
 			?>
 		</td>
 	</tr>
@@ -931,6 +927,9 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.13  2006/04/19 22:54:48  blueyed
+ * Use own Log object for Filelist
+ *
  * Revision 1.12  2006/04/19 20:13:51  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
