@@ -447,7 +447,7 @@ switch( $AdminUI->get_path(1) )
 			{
 				$Results->cols[] = array(
 						'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
-						'td' => '<a href="?ctrl=antispam&amp;action=ban&amp;keyword=%rawurlencode( \'://$dom_name$\' )%" title="'
+						'td' => '<a href="?ctrl=antispam&amp;action=ban&amp;keyword=%rawurlencode( \'$dom_name$\' )%" title="'
 							.T_('Ban this domain!').'">'.get_icon('ban').'</a>',
 					);
 			}
@@ -635,7 +635,7 @@ switch( $AdminUI->get_path(1) )
 						<?php
 						if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ // user can ban:
-							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'action,keyword', 'action=ban&amp;keyword='.rawurlencode( '://'.stats_basedomain(false) ) ) ).'</td>';
+							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'action,keyword', 'action=ban&amp;keyword='.rawurlencode( stats_basedomain(false) ) ) ).'</td>';
 						}
 						?>
 						<td class="right"><?php stats_hit_count() ?></td>
@@ -1013,6 +1013,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/19 20:03:04  fplanque
+ * do not restrict to :// (does not catch subdomains, not even www.)
+ *
  * Revision 1.6  2006/04/19 17:20:07  blueyed
  * Prefix "ban" domains with "://"; do only count browser type hits as referer (not "rss"!); Whitespace!
  *
