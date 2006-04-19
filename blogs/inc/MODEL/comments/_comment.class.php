@@ -369,7 +369,7 @@ class Comment extends DataObject
 	 * @param string Template string to display, if we have a karma value
 	 * @param string Template string to display, if we have no karma value (pre-Phoenix)
 	 */
-	function spam_karma( $template = '%s%', $template_unknown = '%s' )
+	function spam_karma( $template = '%s%', $template_unknown = NULL )
 	{
 		if( isset($this->spam_karma) )
 		{
@@ -377,7 +377,14 @@ class Comment extends DataObject
 		}
 		else
 		{
-			echo str_replace( '%s', $this->spam_karma, $template_unknown );
+			if( ! isset($template_unknown) )
+			{
+				echo /* TRANS: "not available" */ T_('N/A');
+			}
+			else
+			{
+				echo $template_unknown;
+			}
 		}
 	}
 
@@ -1014,6 +1021,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2006/04/19 22:08:16  blueyed
+ * Fixed spam_karma()
+ *
  * Revision 1.22  2006/04/19 19:52:27  blueyed
  * url-encode redirect_to param
  *
