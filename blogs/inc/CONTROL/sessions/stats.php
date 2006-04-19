@@ -149,12 +149,12 @@ switch( $AdminUI->get_path(1) )
 			$last_date = 0;
 
 			$col_mapping = array(
-														'direct' => 1,
-														'referer' => 2,
-														'search' => 3,
-														'blacklist' => 4,
-														'spam' => 5,
-													);
+					'direct' => 1,
+					'referer' => 2,
+					'search' => 3,
+					'blacklist' => 4,
+					'spam' => 5,
+				);
 
 			$chart[ 'chart_data' ][ 0 ] = array();
 			$chart[ 'chart_data' ][ 1 ] = array();
@@ -189,67 +189,75 @@ switch( $AdminUI->get_path(1) )
 			array_unshift( $chart[ 'chart_data' ][ 4 ], 'Blacklisted' );
 			array_unshift( $chart[ 'chart_data' ][ 5 ], 'Spam' );
 
-			$chart[ 'canvas_bg' ] = array (		'width'  => 780,
-																				'height' => 400,
-																				'color'  => 'efede0'
-																		);
+			$chart[ 'canvas_bg' ] = array (
+					'width'  => 780,
+					'height' => 400,
+					'color'  => 'efede0'
+				);
 
-			$chart[ 'chart_rect' ] = array (	'x'      => 50,
-																				'y'      => 50,
-																				'width'  => 700,
-																				'height' => 250
-																		);
+			$chart[ 'chart_rect' ] = array (
+					'x'      => 50,
+					'y'      => 50,
+					'width'  => 700,
+					'height' => 250
+				);
 
-			$chart[ 'legend_rect' ] = array ( 'x'      => 50,
-																				'y'      => 365,
-																				'width'  => 700,
-																				'height' => 8,
-																				'margin' => 6
-																		);
+			$chart[ 'legend_rect' ] = array (
+					'x'      => 50,
+					'y'      => 365,
+					'width'  => 700,
+					'height' => 8,
+					'margin' => 6
+				);
 
 			$chart[ 'draw_text' ] = array (
-																			array ( 'color'    => '9e9286',
-																							'alpha'    => 75,
-																							'font'     => "arial",
-																							'rotation' => 0,
-																							'bold'     => true,
-																							'size'     => 42,
-																							'x'        => 50,
-																							'y'        => 6,
-																							'width'    => 700,
-																							'height'   => 50,
-																							'text'     => 'Access summary', // Needs UTF-8
-																							'h_align'  => "right",
-																							'v_align'  => "bottom" )
-																			);
+					array (
+							'color'    => '9e9286',
+							'alpha'    => 75,
+							'font'     => "arial",
+							'rotation' => 0,
+							'bold'     => true,
+							'size'     => 42,
+							'x'        => 50,
+							'y'        => 6,
+							'width'    => 700,
+							'height'   => 50,
+							'text'     => 'Access summary', // Needs UTF-8
+							'h_align'  => "right",
+							'v_align'  => "bottom" ),
+					);
 
-			$chart[ 'chart_bg' ] = array (		'positive_color' => "ffffff",
-																				// 'negative_color'  =>  string,
-																				'positive_alpha' => 20,
-																				// 'negative_alpha'  =>  int
-																		);
+			$chart[ 'chart_bg' ] = array (
+					'positive_color' => "ffffff",
+					// 'negative_color'  =>  string,
+					'positive_alpha' => 20,
+					// 'negative_alpha'  =>  int
+				);
 
-			$chart [ 'legend_bg' ] = array (  'bg_color'          =>  "ffffff",
-																				'bg_alpha'          =>  20,
-																				// 'border_color'      =>  "000000",
-																				// 'border_alpha'      =>  100,
-																				// 'border_thickness'  =>  1
-																			);
+			$chart [ 'legend_bg' ] = array (
+					'bg_color'          =>  "ffffff",
+					'bg_alpha'          =>  20,
+					// 'border_color'      =>  "000000",
+					// 'border_alpha'      =>  100,
+					// 'border_thickness'  =>  1
+				);
 
-			$chart [ 'legend_label' ] = array(// 'layout'  =>  "horizontal",
-																				// 'font'    =>  string,
-																				// 'bold'    =>  boolean,
-																				'size'    =>  10,
-																				// 'color'   =>  string,
-																				// 'alpha'   =>  int
-																				);
+			$chart [ 'legend_label' ] = array(
+					// 'layout'  =>  "horizontal",
+					// 'font'    =>  string,
+					// 'bold'    =>  boolean,
+					'size'    =>  10,
+					// 'color'   =>  string,
+					// 'alpha'   =>  int
+				);
 
-			$chart[ 'chart_border' ] = array ('color'=>"000000",
-																				'top_thickness'=>1,
-																				'bottom_thickness'=>1,
-																				'left_thickness'=>1,
-																				'right_thickness'=>1
-																		);
+			$chart[ 'chart_border' ] = array (
+					'color'=>"000000",
+					'top_thickness'=>1,
+					'bottom_thickness'=>1,
+					'left_thickness'=>1,
+					'right_thickness'=>1
+				);
 
 			$chart[ 'chart_type' ] = 'stacked column';
 
@@ -259,41 +267,42 @@ switch( $AdminUI->get_path(1) )
 
 
 			$chart[ 'axis_category' ] = array (
-																				'font'  =>"arial",
-																				'bold'  =>true,
-																				'size'  =>11,
-																				'color' =>'000000',
-																				'alpha' =>75,
-																				'orientation' => 'diagonal_up',
-																				// 'skip'=>2
-																			 );
+					'font'  =>"arial",
+					'bold'  =>true,
+					'size'  =>11,
+					'color' =>'000000',
+					'alpha' =>75,
+					'orientation' => 'diagonal_up',
+					// 'skip'=>2
+				);
 
-			$chart[ 'axis_value' ] = array (	// 'font'   =>"arial",
-																				// 'bold'   =>true,
-																				'size'   => 11,
-																				'color'  => '000000',
-																				'alpha'  => 75,
-																				'steps'  => 4,
-																				'prefix' => "",
-																				'suffix' => "",
-																				'decimals'=> 0,
-																				'separator'=> "",
-																				'show_min'=> false );
+			$chart[ 'axis_value' ] = array (
+					// 'font'   =>"arial",
+					// 'bold'   =>true,
+					'size'   => 11,
+					'color'  => '000000',
+					'alpha'  => 75,
+					'steps'  => 4,
+					'prefix' => "",
+					'suffix' => "",
+					'decimals'=> 0,
+					'separator'=> "",
+					'show_min'=> false );
 
 			$chart [ 'chart_value' ] = array (
-																				// 'prefix'         =>  string,
-																				// 'suffix'         =>  " views",
-																				// 'decimals'       =>  int,
-																				// 'separator'      =>  string,
-																				'position'       =>  "cursor",
-																				'hide_zero'      =>  true,
-																				// 'as_percentage'  =>  boolean,
-																				'font'           =>  "arial",
-																				'bold'           =>  true,
-																				'size'           =>  20,
-																				'color'          =>  "ffffff",
-																				'alpha'          =>  75
-																			);
+					// 'prefix'         =>  string,
+					// 'suffix'         =>  " views",
+					// 'decimals'       =>  int,
+					// 'separator'      =>  string,
+					'position'       =>  "cursor",
+					'hide_zero'      =>  true,
+					// 'as_percentage'  =>  boolean,
+					'font'           =>  "arial",
+					'bold'           =>  true,
+					'size'           =>  20,
+					'color'          =>  "ffffff",
+					'alpha'          =>  75
+				);
 
 			echo '<div class="center">';
 			DrawChart( $chart );
@@ -353,6 +362,8 @@ switch( $AdminUI->get_path(1) )
 							$last_date = $this_date;	// that'll be the next one
 							$count ++;
 					}
+
+					// Increment hitcounter:
 					$hits[$row_stats['referer_type']] = $row_stats['hits'];
 				}
 
@@ -393,8 +404,10 @@ switch( $AdminUI->get_path(1) )
 					  FROM T_hitlog INNER JOIN T_basedomains
 					    ON dom_ID = hit_referer_dom_ID INNER JOIN T_sessions
 					    ON hit_sess_ID = sess_ID LEFT JOIN T_blogs
-					    ON hit_blog_ID = blog_ID
-					 WHERE hit_referer_type = 'referer' "
+					    ON hit_blog_ID = blog_ID LEFT JOIN T_useragents
+					    ON hit_agnt_ID = agnt_ID
+					 WHERE hit_referer_type = 'referer'
+					   AND agnt_type = 'browser'"
 					 .( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
 
 			$Results->title = T_('Last referers');
@@ -434,7 +447,7 @@ switch( $AdminUI->get_path(1) )
 			{
 				$Results->cols[] = array(
 						'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
-						'td' => '<a href="?ctrl=antispam&amp;action=ban&amp;keyword=%rawurlencode( \'$dom_name$\' )%" title="'
+						'td' => '<a href="?ctrl=antispam&amp;action=ban&amp;keyword=%rawurlencode( \'://$dom_name$\' )%" title="'
 							.T_('Ban this domain!').'">'.get_icon('ban').'</a>',
 					);
 			}
@@ -471,7 +484,8 @@ switch( $AdminUI->get_path(1) )
 			<h3><?php echo T_('Top referers') ?>:</h3>
 
 			<?php
-			refererList( 30, 'global', 0, 0, "'no'", 'dom_name', $blog, true );
+			// TODO: re-use $Results from above
+			refererList( 30, 'global', 0, 0, "'referer'", 'dom_name', $blog, true );
 			if( count( $res_stats ) )
 			{
 				$chart [ 'chart_data' ][ 0 ][ 0 ] = "";
@@ -621,7 +635,7 @@ switch( $AdminUI->get_path(1) )
 						<?php
 						if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ // user can ban:
-							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'action,keyword', 'action=ban&amp;keyword='.rawurlencode( stats_basedomain(false) ) ) ).'</td>';
+							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'action,keyword', 'action=ban&amp;keyword='.rawurlencode( '://'.stats_basedomain(false) ) ) ).'</td>';
 						}
 						?>
 						<td class="right"><?php stats_hit_count() ?></td>
@@ -999,6 +1013,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/19 17:20:07  blueyed
+ * Prefix "ban" domains with "://"; do only count browser type hits as referer (not "rss"!); Whitespace!
+ *
  * Revision 1.5  2006/03/17 20:48:16  blueyed
  * Do not restrict to "stub" type blogs
  *

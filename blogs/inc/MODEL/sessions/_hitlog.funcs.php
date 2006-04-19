@@ -2,8 +2,6 @@
 /**
  * This file implements functions for logging of hits and extracting stats.
  *
- * NOTE: the refererList() and stats_* functions are not fully functional ATM. I'll transform them into the Hitlog object during the next days. blueyed.
- *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
@@ -74,8 +72,6 @@ function refererList(
 
 	autoquote( $type );		// In case quotes are missing
 
-	$type = preg_replace( "#'no'#", "'referer'", $type );
-
 	//if no visitURL, will show links to current page.
 	//if url given, will show links to that page.
 	//if url="global" will show links to all pages
@@ -110,10 +106,11 @@ function refererList(
 	}
 
 	$sql_from_where = '
-			  FROM T_hitlog '
-			.( $get_user_agent ? 'INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID ' : '' )
-			.'LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
-			 WHERE hit_referer_type IN ('.$type.')';
+			  FROM T_hitlog
+			 INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
+			  LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
+			 WHERE hit_referer_type IN ('.$type.')
+			   AND agnt_type = "browser"';
 	if( !empty($blog_ID) )
 	{
 		$sql_from_where .= " AND hit_blog_ID = '$blog_ID'";
@@ -356,6 +353,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/19 17:20:07  blueyed
+ * Prefix "ban" domains with "://"; do only count browser type hits as referer (not "rss"!); Whitespace!
+ *
  * Revision 1.4  2006/04/13 13:43:10  blueyed
  * Use "://suche." generally as search referer; added "su" search param part
  *
