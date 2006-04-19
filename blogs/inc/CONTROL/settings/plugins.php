@@ -999,6 +999,7 @@ switch( $action )
 		{ // do not display ID for not registered Plugins
 			$Form->info_field( T_('ID'), $edit_Plugin->ID );
 		}
+		$Form->info_field( T_('Version'), $edit_Plugin->version );
 
 		// Help icons (to homepage and README.html), if available:
 		$help_icons = array();
