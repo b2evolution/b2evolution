@@ -109,6 +109,10 @@ class dnsbl_antispam_plugin extends Plugin
 				'size' => '5',
 				'valid_pattern' => '~\d+(\.\d+)?~',
 			),
+			'tooslow_dnsbls' => array(
+				'type' => 'array',
+				'no_edit' => true,
+			),
 
 		);
 	}
@@ -236,6 +240,7 @@ class dnsbl_antispam_plugin extends Plugin
 		global $DB;
 
 		$Form = new Form();
+		$Form->hiddens_by_key( get_memorized() );
 		$Form->begin_form( 'fform', T_('Lookup address in DNS blacklists') );
 
 		$Form->begin_fieldset();
@@ -469,7 +474,7 @@ class dnsbl_antispam_plugin extends Plugin
 
 		$dnsbls = preg_split( '~\s+~', $this->Settings->get( 'dnsbls' ), -1, PREG_SPLIT_NO_EMPTY );
 
-		if( !$dnsbls )
+		if( ! $dnsbls )
 		{
 			$this->debug_log( 'No DNS blacklists given!' );
 		}
@@ -491,6 +496,10 @@ class dnsbl_antispam_plugin extends Plugin
 		{
 			if( isset($tooslow_dnsbls[$blacklist]) && $tooslow_dnsbls[$blacklist] > $tooslow_tries )
 			{
+				if( $check_all )
+				{
+					$r[] = 'Skipping '.$blacklist.', because it is marked as too slow.';
+				}
 				$this->debug_log( 'Skipping '.$blacklist.', because it is marked as too slow.' );
 				continue;
 			}
@@ -529,7 +538,7 @@ class dnsbl_antispam_plugin extends Plugin
 
 		if( $tooslow_needs_update )
 		{ // might have changed
-			$this->Settings->set( 'tooslow_dnsbls', serialize($tooslow_dnsbls) );
+			$this->Settings->set( 'tooslow_dnsbls', $tooslow_dnsbls );
 			$this->Settings->dbupdate();
 		}
 
@@ -658,6 +667,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.19  2006/04/19 17:21:06  blueyed
+ * Quick fixes
+ *
  * Revision 1.18  2006/04/04 22:56:13  blueyed
  * Simplified/refactored uninstalling/registering of a plugin (especially the hooking process)
  *
