@@ -289,7 +289,8 @@ class Plugin
 	 *       - 'options': an array of options ('value' => 'description'), see {@link Form::select_input_array()}.
 	 *     - 'select_group': a drop down field, providing all existing groups
 	 *     - 'select_user': a drop down field, providing all existing groups
-	 *     - 'array': a subset of settings. The following keys apply to this type:
+	 *     - 'array': a subset of settings. The value gets automagically (un)serialized through get() and set().
+	 *       The following keys apply to this type:
 	 *       - 'entries': an array with the sub-settings (which can be everything from the top-level, except:
 	 *                    "valid_pattern", "valid_range"). Note: currently there's no type forcing or checking
 	 *                    for sub-entries involved (e.g., if you have an entry of type "integer", you could get
@@ -300,6 +301,7 @@ class Plugin
 	 *   - 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
 	 *   - 'maxlength': maxlength attribute for the input field (See 'size' above; defaults to no limit)
 	 *   - 'disabled': if true, it adds a 'disabled="disabled"' html attribute to the element and the value cannot be changed
+	 *   - 'no_edit': if true, the setting is not editable. This is useful for internal settings.
 	 *   - 'allow_none': set this to true to have "None" in the options list for types
 	 *                   'select_group' and 'select_user'.
 	 *   - 'valid_pattern': A regular expression pattern that the value must match.
@@ -1829,6 +1831,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.29  2006/04/19 18:14:12  blueyed
+ * Added "no_edit" param to GetDefault(User)Settings
+ *
  * Revision 1.28  2006/04/18 21:09:20  blueyed
  * Added hooks to manipulate Items before insert/update/preview; fixes; cleanup
  *

@@ -44,6 +44,11 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 {
 	global $debug, $Request;
 
+	if( ! empty($set_meta['no_edit']) )
+	{ // this setting is not editable
+		return;
+	}
+
 	$params = array();
 
 	if( isset($set_meta['note']) )
@@ -285,7 +290,7 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 			continue;
 		}
 
-		if( ! empty($l_meta['disabled']) )
+		if( ! empty($l_meta['disabled']) || ! empty($l_meta['no_edit']) )
 		{ // the setting is disabled
 			continue;
 		}
@@ -384,6 +389,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.15  2006/04/19 18:14:12  blueyed
+ * Added "no_edit" param to GetDefault(User)Settings
+ *
  * Revision 1.14  2006/04/18 17:06:14  blueyed
  * Added "disabled" to plugin (user) settings (Thanks to balupton)
  *
