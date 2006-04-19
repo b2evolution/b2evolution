@@ -16,10 +16,6 @@
  * Contributors: you should override this file by creating a file named _config_TEST.php
  * (see end of this file)
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
- *
  * @package conf
  */
 

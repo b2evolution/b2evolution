@@ -2,19 +2,7 @@
 /**
  * This page displays an error message if the user is denied access to the admin section
  *
- * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
- * See also {@link http://sourceforge.net/projects/evocms/}.
- *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
- *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- *
  * @package evocore
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE
- *
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

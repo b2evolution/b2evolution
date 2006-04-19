@@ -5,10 +5,6 @@
  * This file sets how b2evolution will parse and format texts (posts, comments, etc.)
  * Last significant changes to this file: version 1.6
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
- *
  * @todo Move as much as possible to $Settings / $UserSettings
  * @package conf
  */

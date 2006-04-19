@@ -16,13 +16,14 @@
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ *
  * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
  * and the Mozilla Public License (http://www.opensource.org/licenses/mozilla1.1.php).
  * }}
  *
- * @package evocore
+ * @package main
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
@@ -426,6 +427,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.13  2006/04/19 20:13:48  fplanque
+ * do not restrict to :// (does not catch subdomains, not even www.)
+ *
  * Revision 1.12  2006/04/11 20:37:57  blueyed
  * Re-activated /admin/-redirect
  *

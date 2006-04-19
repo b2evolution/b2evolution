@@ -2,12 +2,20 @@
 /**
  * This file implements the UI controller for settings management.
  *
- * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal License choice
+ * - If you have received this file as part of a package, please find the license.txt file in
+ *   the same folder or the closest folder above for complete license terms.
+ * - If you have received this file individually (e-g: from http://cvs.sourceforge.net/viewcvs.py/evocms/)
+ *   then you must choose one of the following licenses before using the file:
+ *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
+ * }}
  *
  * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
@@ -674,6 +682,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2006/04/19 20:13:49  fplanque
+ * do not restrict to :// (does not catch subdomains, not even www.)
+ *
  * Revision 1.15  2006/04/14 19:25:32  fplanque
  * evocore merge with work app
  *
@@ -805,65 +816,5 @@ $AdminUI->disp_global_footer();
  * Revision 1.102  2005/10/03 17:26:43  fplanque
  * synched upgrade with fresh DB;
  * renamed user_ID field
- *
- * Revision 1.101  2005/08/24 10:51:24  blueyed
- * Rollback stupid last commit.
- *
- * Revision 1.99  2005/08/22 01:26:54  blueyed
- * Removed "init" of $edited_User - it was meant to for security with register_global, would probably cause only a notice now.
- *
- * Revision 1.98  2005/08/11 19:41:10  fplanque
- * no message
- *
- * Revision 1.97  2005/08/10 21:14:34  blueyed
- * Enhanced $demo_mode (user editing); layout fixes; some function names normalized
- *
- * Revision 1.96  2005/08/01 14:51:46  fplanque
- * Fixed: updating an user was not displaying changes right away (there's still an issue with locale changing though)
- *
- * Revision 1.95  2005/06/06 17:59:38  fplanque
- * user dialog enhancements
- *
- * Revision 1.94  2005/06/03 20:14:38  fplanque
- * started input validation framework
- *
- * Revision 1.93  2005/06/03 15:12:31  fplanque
- * error/info message cleanup
- *
- * Revision 1.92  2005/06/02 18:50:52  fplanque
- * no message
- *
- * Revision 1.91  2005/05/26 19:11:09  fplanque
- * no message
- *
- * Revision 1.90  2005/05/10 18:40:07  fplanque
- * normalizing
- *
- * Revision 1.89  2005/05/09 19:06:54  fplanque
- * bugfixes + global access permission
- *
- * Revision 1.88  2005/05/09 16:09:38  fplanque
- * implemented file manager permissions through Groups
- *
- * Revision 1.87  2005/05/04 18:16:55  fplanque
- * Normalizing
- *
- * Revision 1.86  2005/04/06 13:33:29  fplanque
- * minor changes
- *
- * Revision 1.85  2005/03/22 19:17:31  fplanque
- * cleaned up some nonsense...
- *
- * Revision 1.84  2005/03/22 16:36:01  fplanque
- * refactoring, standardization
- * fixed group creation bug
- *
- * Revision 1.83  2005/03/22 15:08:03  fplanque
- * "standardized" to switch($action)
- *
- * Revision 1.82  2005/03/21 18:57:24  fplanque
- * user management refactoring (towards new evocore coding guidelines)
- * WARNING: some pre-existing bugs have not been fixed here
- *
  */
 ?>

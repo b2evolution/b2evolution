@@ -2,26 +2,7 @@
 /**
  * This file implements the generic list editor
  *
- * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
- * See also {@link http://sourceforge.net/projects/evocms/}.
- *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
- *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- *
- * {@internal Open Source relicensing agreement:
- * Daniel HAHLER grants Francois PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
- *
- * @package admin
- *
- * NOTE: It uses <code>$AdminUI->get_path(1).'.php'</code> to link back to the ID of the entry.
- *       If that causes problems later, we'd probably need to set a global like $listeditor_url.
- *
- * @author fplanque: Francois PLANQUE.
- * @author blueyed: Daniel HAHLER
+ * @deprecated use genreic listeditor instead
  *
  * @version $Id$
  */

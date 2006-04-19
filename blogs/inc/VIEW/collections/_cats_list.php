@@ -2,9 +2,22 @@
 /**
  * This file implements the UI view for the recursive categories list.
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ * This file is part of the evoCore framework - {@link http://evocore.net/}
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * {@internal License choice
+ * - If you have received this file as part of a package, please find the license.txt file in
+ *   the same folder or the closest folder above for complete license terms.
+ * - If you have received this file individually (e-g: from http://cvs.sourceforge.net/viewcvs.py/evocms/)
+ *   then you must choose one of the following licenses before using the file:
+ *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
+ * }}
+ *
+ * {@internal Open Source relicensing agreement:
+ * }}
  *
  * @package admin
  */
@@ -90,4 +103,11 @@ Log::display( '', '', T_('<strong>Note:</strong> Deleting a category does not de
 
 // End payload block:
 $this->disp_payload_end();
+
+/*
+ * $Log$
+ * Revision 1.4  2006/04/19 20:13:50  fplanque
+ * do not restrict to :// (does not catch subdomains, not even www.)
+ *
+ */
 ?>

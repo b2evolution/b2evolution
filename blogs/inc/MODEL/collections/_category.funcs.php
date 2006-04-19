@@ -2,20 +2,28 @@
 /**
  * This file implements Category handling functions.
  *
- * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
+ * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as
  * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
  *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * {@internal License choice
+ * - If you have received this file as part of a package, please find the license.txt file in
+ *   the same folder or the closest folder above for complete license terms.
+ * - If you have received this file individually (e-g: from http://cvs.sourceforge.net/viewcvs.py/evocms/)
+ *   then you must choose one of the following licenses before using the file:
+ *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
+ * }}
  *
  * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ *
  * The University of North Carolina at Charlotte grants Francois PLANQUE the right to license
  * Jason EDGECOMBE's contributions to this file and the b2evolution project
  * under the GNU General Public License (http://www.opensource.org/licenses/gpl-license.php)
@@ -24,13 +32,13 @@
  *
  * @package evocore
  *
- * @todo implement CategoryCache based on LinkCache
- *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
  * @author edgester: Jason EDGECOMBE (personal contributions, not for hire)
+ *
+ * @todo implement CategoryCache based on LinkCache
  *
  * @version $Id$
  */
@@ -957,6 +965,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/19 20:13:50  fplanque
+ * do not restrict to :// (does not catch subdomains, not even www.)
+ *
  * Revision 1.4  2006/04/11 21:22:25  fplanque
  * partial cleanup
  *

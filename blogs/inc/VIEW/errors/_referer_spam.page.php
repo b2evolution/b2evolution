@@ -2,19 +2,7 @@
 /**
  * This page displays an error message when we have detected referer spam.
  *
- * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
- * See also {@link http://sourceforge.net/projects/evocms/}.
- *
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
- *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- *
  * @package evocore
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE
- *
- * @version $Id$
  */
 header('HTTP/1.0 403 Forbidden');
 ?>

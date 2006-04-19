@@ -7,10 +7,6 @@
  * be saved to the database. The database settings superseede settings in this file.
  * Last significant changes to this file: version 1.6
  *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
- *
  * @package conf
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
