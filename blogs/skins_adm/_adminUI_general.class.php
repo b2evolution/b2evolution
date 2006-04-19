@@ -66,16 +66,6 @@ class AdminUI_general
 	 */
 	var $admin_logo;
 
-	/**
-	 * The Logout/Exit-to-blogs links.
-	 *
-	 * Defaults to {@link $app_exit_links} if not set.
-	 *
-	 * @var string
-	 */
-	var $exit_links;
-
-
 	/*-------------------------------------------------------------------*/
 	/*- The members below should not get overridden in a derived class. -*/
 
@@ -140,12 +130,6 @@ class AdminUI_general
 		{
 			global $app_admin_logo;
 			$this->admin_logo = $app_admin_logo;
-		}
-
-		if( is_null($this->exit_links) )
-		{
-			global $app_exit_links;
-			$this->exit_links = $app_exit_links;
 		}
 
 		if( is_null($this->pathSeperator) )
@@ -1203,7 +1187,7 @@ class AdminUI_general
 	 */
 	function get_page_head()
 	{
-		global $app_shortname, $app_version, $current_User;
+		global $app_shortname, $app_version, $current_User, $htsrv_url, $baseurl, $rsc_url;
 
 		$r = '
 		<div id="header">
@@ -1211,7 +1195,11 @@ class AdminUI_general
 
 			<div id="headinfo">
 				<span id="headfunctions">
-					'.$this->exit_links.'
+          <a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
+					&bull;
+					<a href="'.$baseurl.'">'.T_('Exit to blogs').'
+						<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
+						.T_('Exit to blogs').'" /></a>
 				</span>
 
 				'.$app_shortname.' v <strong>'.$app_version.'</strong>
@@ -1285,6 +1273,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/19 12:54:41  fplanque
+ * not using exit links any more because it won't translate
+ *
  * Revision 1.7  2006/04/14 19:25:32  fplanque
  * evocore merge with work app
  *
