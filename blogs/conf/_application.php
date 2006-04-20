@@ -26,9 +26,15 @@ $app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evo
 /**
  * This is used to check if the database is up to date.
  *
- * This will be incrememented by 100 with each normal release in order to leave space for maintenance releases.
+ * This will be incrememented by 100 with each change in {@link upgrade_b2evo_tables()}
+ * in order to leave space for maintenance releases.
+ *
+ * NOTE: This does not need to get bumped, if "just" the DB schema changes, without
+ *       a block in {@link upgrade_b2evo_tables()}!
+ *
+ * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 9100;
+$new_db_version = 9200;
 
 
 $admin_path_seprator = ' :: ';
