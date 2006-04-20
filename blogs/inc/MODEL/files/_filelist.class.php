@@ -272,6 +272,11 @@ class Filelist
 	{
 		global $FileRootCache, $AdminUI;
 
+		if( ! is_object($FileRoot) )
+		{
+			debug_die( 'Fatal: $FileRoot is no object!' );
+		}
+
 		if( is_null($path) )
 		{
 			$path = $FileRoot->ads_path;
@@ -698,8 +703,6 @@ class Filelist
 	 */
 	function set_filter( $filter_string, $filter_is_regexp )
 	{
-		global $Messages;
-
 		$this->_filter_is_regexp = $filter_is_regexp;
 
 		if( $this->_filter_is_regexp && ! empty($filter_string) )
@@ -1208,6 +1211,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.14  2006/04/20 14:32:23  blueyed
+ * cleanup
+ *
  * Revision 1.13  2006/04/19 22:54:48  blueyed
  * Use own Log object for Filelist
  *

@@ -111,7 +111,8 @@ class GeneralSettings extends AbstractSettings
 
 		$save_DB_show_errors = $DB->show_errors;
 		$save_DB_halt_on_error = $DB->halt_on_error;
-		$DB->halt_on_error = $DB->show_errors = false;
+		$DB->halt_on_error = false;
+		$DB->show_errors = false;
 
 		// Init through the abstract constructor. This should be the first DB connection.
 		parent::AbstractSettings( 'T_settings', array( 'set_name' ), 'set_value' );
@@ -142,6 +143,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/20 14:32:46  blueyed
+ * cleanup
+ *
  * Revision 1.4  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
