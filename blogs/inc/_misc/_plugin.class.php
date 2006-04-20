@@ -903,6 +903,7 @@ class Plugin
 	 * in {@link GetSpamKarmaForComment()} or modify the Comment according
 	 * to it in {@link CommentFormSent()}.
 	 *
+	 * @see Plugin::CommentFormSent(), Plugin::AfterCommentFormInsert()
 	 * @param array Associative array of parameters
 	 *   - 'Form': the comment form generating object
 	 *   - 'Item': the Item for which the comment is meant
@@ -928,10 +929,26 @@ class Plugin
 	/**
 	 * Event handler: Called when a comment form got submitted.
 	 *
+	 * Use this, to validate a comment: you could {@link Plugin::msg() add a message} of
+	 * category "error" here, to prevent the comment from being inserted.
+	 *
+	 * @see Plugin::DisplayCommentFormFieldset()
 	 * @param array Associative array of parameters
 	 *   - 'Item': the Item for which the comment is meant (by reference)
 	 */
 	function CommentFormSent( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called when a comment form has been processed and the comment
+	 *                got inserted into DB.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the Comment (by reference)
+	 */
+	function AfterCommentFormInsert( & $params )
 	{
 	}
 
@@ -1031,6 +1048,8 @@ class Plugin
 	 *
 	 * Add messages of category "error" to prevent the message from being sent.
 	 *
+	 * You can also alter the "message" or "message_footer" that gets sent here.
+	 *
 	 * @param array Associative array of parameters
 	 *   - 'recipient_ID': ID of the user (if any)
 	 *   - 'item_ID': ID of the item where the user clicked the msgform icon (if any)
@@ -1044,7 +1063,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called after a message has been sent through the public form.
+	 * Event handler: Called after a message has been sent through the public email form.
 	 *
 	 * This is meant to cleanup generated data.
 	 */
@@ -1246,7 +1265,7 @@ class Plugin
 	 * this visitor or force them to login, by {@link Plugin::msg() adding a message}
 	 * of class "login_error", which will trigger the login screen.
 	 */
-	function AppendLoginAnonymousUser( & $params )
+	function AfterLoginAnonymousUser( & $params )
 	{
 	}
 
@@ -1264,20 +1283,42 @@ class Plugin
 	 * to prevent the user from accessing the site and triggering
 	 * the login screen.
 	 */
-	function AppendLoginRegisteredUser( & $params )
+	function AfterLoginRegisteredUser( & $params )
 	{
 	}
 
 
 	/**
 	 * Event handler: Called when a new user has registered, at the end of the
-	 *                DB transaction that creates this user.
+	 *                DB transaction that created this user.
+	 *
+	 * If you want to modify the about-to-be-created user (if the transaction gets
+	 * committed), you'll have to call {@link User::dbupdate()} on it, because he
+	 * got already inserted (but the transaction is not yet committed).
+	 *
+	 * Note: if you want to re-act on a new user,
+	 * use {@link Plugin::AfterUserRegistration()} instead!
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'User': the user object (as reference), see {@link User}.
-	 * @return boolean True, if the user should be created, false if not.
+	 *   - 'User': the {@link User user object} (as reference).
+	 * @return boolean false if the whole transaction should get rolled back (the user does not get created).
 	 */
 	function AppendUserRegistrTransact( & $params )
+	{
+		return true;
+	}
+
+
+	/**
+	 * Event handler: Called when a new user has registered and got created.
+	 *
+	 * Note: if you want to modify a new user,
+	 * use {@link Plugin::AppendUserRegistrTransact()} instead!
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'User': the {@link User user object} (as reference).
+	 */
+	function AfterUserRegistration( & $params )
 	{
 	}
 
@@ -1286,7 +1327,7 @@ class Plugin
 	 * Event handler: Called at the end of the "Register as new user" form.
 	 *
 	 * You might want to use this to inject antispam payload to use
-	 * in {@link RegisterFormSent()}.
+	 * in {@link Plugin::RegisterFormSent()}.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the comment form generating object (by reference)
@@ -1891,11 +1932,11 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.32  2006/04/20 22:24:08  blueyed
+ * plugin hooks cleanup
+ *
  * Revision 1.31  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.30  2006/04/19 18:55:37  blueyed
- * Added login handling hooks: AlternateAuthentication, AppendLoginAnonymousUser and AppendLoginRegisteredUser.
  *
  * Revision 1.29  2006/04/19 18:14:12  blueyed
  * Added "no_edit" param to GetDefault(User)Settings

@@ -83,7 +83,7 @@ switch( $action )
 
 		if( ! $Messages->count( 'error' ) )
 		{
-			// TODO: START TRANSACTION !!
+			$DB->begin();
 
 			$new_User = & new User();
 			$new_User->set( 'login', $login );
@@ -109,24 +109,32 @@ switch( $action )
 			// TODO: Optionally auto assign rights
 
 			// Actions to be appended to the user registration transaction:
-			$Plugins->trigger_event( 'AppendUserRegistrTransact', array( 'User' => & $new_User ) );
+			if( $Plugins->trigger_event_first_false( 'AppendUserRegistrTransact', array( 'User' => & $new_User ) ) )
+			{
+				$DB->rollback();
+				// TODO: what about MySQL versions that do not support transactions? Should we try to delete the user, if he's still there?
+			}
+			else
+			{ // User created:
+				$DB->commit();
 
-			// TODO: END TRANSACTION !!
+				// Send email to admin (using his locale):
+				$AdminUser = & $UserCache->get_by_ID( 1 );
+				locale_temp_switch( $AdminUser->get( 'locale' ) );
 
-			// switch to admins locale
-			$AdminUser = & $UserCache->get_by_ID( 1 );
-			locale_temp_switch( $AdminUser->get( 'locale' ) );
+				$message  = T_('New user registration on your blog').":\n"
+									."\n"
+									.T_('Login:')." $login\n"
+									.T_('Email').": $email\n"
+									."\n"
+									.T_('Edit user').': '.$admin_url.'?ctrl=users&user_ID='.$new_User->ID."\n";
 
-			$message  = T_('New user registration on your blog').":\n"
-			          ."\n"
-			          .T_('Login:')." $login\n"
-			          .T_('Email').": $email\n"
-			          ."\n"
-			          .T_('Edit user').': '.$admin_url.'?ctrl=users&user_ID='.$new_User->ID."\n";
+				send_mail( $admin_email, T_('New user registration on your blog'), $message, $notify_from );
 
-			send_mail( $admin_email, T_('New user registration on your blog'), $message, $notify_from );
+				locale_restore_previous();
 
-			locale_restore_previous();
+				$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
+			}
 
 			// Display confirmation screen:
 			require $view_path.'login/_reg_complete.php';
@@ -155,6 +163,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.61  2006/04/20 22:24:07  blueyed
+ * plugin hooks cleanup
+ *
  * Revision 1.60  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

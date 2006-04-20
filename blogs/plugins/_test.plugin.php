@@ -445,9 +445,9 @@ class test_plugin extends Plugin
 
 	/**
 	 * Event handler: called when a new user has registered.
-	 * @see Plugin::AppendUserRegistrTransact()
+	 * @see Plugin::AfterUserRegistration()
 	 */
-	function AppendUserRegistrTransact( $params )
+	function AfterUserRegistration( $params )
 	{
 		$this->msg( 'The TEST plugin welcomes the new user '.$params['User']->dget('login').'!' );
 	}
@@ -502,6 +502,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.33  2006/04/20 22:24:08  blueyed
+ * plugin hooks cleanup
+ *
  * Revision 1.32  2006/04/19 22:26:25  blueyed
  * cleanup/polish
  *
@@ -509,7 +512,7 @@ class test_plugin extends Plugin
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
  * Revision 1.30  2006/04/19 18:55:37  blueyed
- * Added login handling hooks: AlternateAuthentication, AppendLoginAnonymousUser and AppendLoginRegisteredUser.
+ * Added login handling hook: AlternateAuthentication
  *
  * Revision 1.29  2006/04/18 17:06:14  blueyed
  * Added "disabled" to plugin (user) settings (Thanks to balupton)

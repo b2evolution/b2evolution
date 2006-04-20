@@ -510,11 +510,11 @@ unset($pass);
 // Trigger plugin event that allows the plugins to re-act on this:
 if( isset($current_User) )
 {
-	$Plugins->trigger_event( 'AppendLoginRegisteredUser', array() );
+	$Plugins->trigger_event( 'AfterLoginRegisteredUser', array() );
 }
 else
 {
-	$Plugins->trigger_event( 'AppendLoginAnonymousUser', array() );
+	$Plugins->trigger_event( 'AfterLoginAnonymousUser', array() );
 }
 
 if( $Messages->count( 'login_error' ) )
@@ -577,11 +577,11 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.12  2006/04/20 22:24:07  blueyed
+ * plugin hooks cleanup
+ *
  * Revision 1.11  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.10  2006/04/19 18:55:36  blueyed
- * Added login handling hooks: AlternateAuthentication, AppendLoginAnonymousUser and AppendLoginRegisteredUser.
  *
  * Revision 1.9  2006/04/18 19:28:34  fplanque
  * mambo idea

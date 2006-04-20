@@ -243,9 +243,10 @@ class Plugins
 				'CachePageContent' => T_('Cache page content.'),
 				'CacheIsCollectingContent' => T_('Gets asked for if we are generating cached content.'),
 
-				'AfterCommentDelete' => '',
-				'AfterCommentInsert' => '',
-				'AfterCommentUpdate' => '',
+				'AfterCommentDelete' => T_('Gets called after a comment has been deleted from the database.'),
+				'AfterCommentInsert' => T_('Gets called after a comment has been inserted into the database.'),
+				'AfterCommentUpdate' => T_('Gets called after a comment has been updated in the database.'),
+
 				'AfterItemDelete' => '',
 				'PrependItemInsertTransact' => '',
 				'AfterItemInsert' => '',
@@ -278,10 +279,10 @@ class Plugins
 				'DisplayLoginFormFieldset' => T_('Called when displaying the "Login" form.'),
 				'DisplayRegisterFormFieldset' => T_('Called when displaying the "Register" form.'),
 
-				'CommentFormSent' => T_('Called when a comment form has been submitted.'),
+				'CommentFormSent' => T_('Called when a public comment form has been submitted.'),
+				'AfterCommentFormInsert' => T_('Called after a comment has been added through public form.'),
 				'LoginAttempt' => T_('Called when a user tries to login.'),
 				'AlternateAuthentication' => '',
-				'RegisterFormSent' => T_('Called when the "Register" form has been submitted.'),
 				'MessageFormSent' => T_('Called when the "Message to user" form has been submitted.'),
 				'MessageFormSentCleanup' => T_('Called after a email message has been sent through public form.'),
 
@@ -292,11 +293,14 @@ class Plugins
 				'CaptchaValidatedCleanup' => T_('Cleanup data used for CaptchaValidated.'),
 				'CaptchaPayload' => T_('Provide a turing test to detect humans.'),
 
+				'RegisterFormSent' => T_('Called when the "Register" form has been submitted.'),
 				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
+				'AfterUserRegistration' => T_('Gets called after a new user has registered.'),
+
 				'SessionLoaded' => '', // gets called after $Session is initialized, quite early.
 
-				'AppendLoginAnonymousUser' => T_('Gets called at the end of the login procedure for anonymous visitors.'),
-				'AppendLoginRegisteredUser' => T_('Gets called at the end of the login procedure for registered users.'),
+				'AfterLoginAnonymousUser' => T_('Gets called at the end of the login procedure for anonymous visitors.'),
+				'AfterLoginRegisteredUser' => T_('Gets called at the end of the login procedure for registered users.'),
 			);
 		}
 
@@ -1544,6 +1548,41 @@ class Plugins
 
 
 	/**
+	 * Call all plugins for a given event, until the first one returns false.
+	 *
+	 * @param string event name, see {@link Plugin}
+	 * @param array Associative array of parameters for the Plugin
+	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin;
+	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
+	 */
+	function trigger_event_first_false( $event, $params = NULL )
+	{
+		global $Debuglog;
+
+		$Debuglog->add( 'Trigger event '.$event.' (first false)', 'plugins' );
+
+		if( empty($this->index_event_IDs[$event]) )
+		{ // No events registered
+			$Debuglog->add( 'No registered plugins.', 'plugins' );
+			return array();
+		}
+
+		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
+		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
+		{
+			$r = $this->call_method( $l_plugin_ID, $event, $params );
+			if( $r === false )
+			{
+				$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned false!', 'plugins' );
+				$params['plugin_ID'] = & $l_plugin_ID;
+				return $params;
+			}
+		}
+		return array();
+	}
+
+
+	/**
 	 * Trigger an $event and return an index of $params.
 	 *
 	 * @param string Event name, see {@link Plugins::get_supported_events()}
@@ -2492,11 +2531,11 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.31  2006/04/20 22:24:08  blueyed
+ * plugin hooks cleanup
+ *
  * Revision 1.30  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
- *
- * Revision 1.29  2006/04/19 18:55:37  blueyed
- * Added login handling hooks: AlternateAuthentication, AppendLoginAnonymousUser and AppendLoginRegisteredUser.
  *
  * Revision 1.28  2006/04/18 21:09:20  blueyed
  * Added hooks to manipulate Items before insert/update/preview; fixes; cleanup

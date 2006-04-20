@@ -203,6 +203,11 @@ $message = $message
 // Send mail
 send_mail( $recipient_address, $subject, $message, "$sender_name <$sender_address>");
 
+
+// Plugins should cleanup their temporary data here:
+$Plugins->trigger_event( 'MessageFormSentCleanup' );
+
+
 if( isset($recipient_User) )
 {
 	// restore the locale to the readers language
@@ -217,14 +222,14 @@ $Session->dbsave(); // If we don't save now, we run the risk that the redirect g
 
 // Header redirection
 header_nocache();
-header_redirect();
+header_redirect(); // exits!
 
-
-// Plugins should cleanup their temporary data here:
-$Plugins->trigger_event( 'MessageFormSentCleanup' );
 
 /*
  * $Log$
+ * Revision 1.30  2006/04/20 22:24:07  blueyed
+ * plugin hooks cleanup
+ *
  * Revision 1.29  2006/04/20 16:31:29  fplanque
  * comment moderation (finished for 1.8)
  *

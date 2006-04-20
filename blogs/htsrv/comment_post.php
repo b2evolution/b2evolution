@@ -168,6 +168,10 @@ $Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status
 
 $Comment->dbinsert();
 
+// Trigger event: a Plugin should cleanup any temporary data here..
+$Plugins->trigger_event( 'AfterCommentFormInsert', array( 'Comment' => & $Comment ) );
+
+
 /*
  * ---------------
  * Handle cookies:
@@ -233,6 +237,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.67  2006/04/20 22:24:07  blueyed
+ * plugin hooks cleanup
+ *
  * Revision 1.66  2006/04/20 16:31:29  fplanque
  * comment moderation (finished for 1.8)
  *
