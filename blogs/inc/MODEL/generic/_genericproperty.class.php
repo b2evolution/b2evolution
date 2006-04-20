@@ -36,7 +36,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Includes:
  */
-require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
+require_once $inc_path.'MODEL/generic/_genericelement.class.php';
+
 
 /**
  * User property;
@@ -45,7 +46,7 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
  *
  * @package evocore
  */
-class GenericProperty extends GenericElement 
+class GenericProperty extends GenericElement
 {
 	// External ID
 	var $ext_ID;
@@ -75,7 +76,7 @@ class GenericProperty extends GenericElement
 		$Debuglog->add( "Created property <strong>$this->name</strong>", 'dataobjects' );
 	}
 
-	
+
 	/**
 	 * Load data from Request form fields.
 	 *
@@ -86,14 +87,14 @@ class GenericProperty extends GenericElement
 		global $Request;
 
 		parent::load_from_Request();
-		
+
 		$Request->param( $this->dbprefix.'ext_ID', 'string', '' );
 		$this->set_from_Request( 'ext_ID' );
-		
+
 		return ! $Request->validation_errors();
 	}
-	
-	
+
+
 	/**
 	 * Set param value
 	 *
@@ -117,8 +118,8 @@ class GenericProperty extends GenericElement
 				$this->set_param( $parname, 'string', $parvalue );
 		}
 	}
-	
-	
+
+
 	/**
 	 * TODO
 	 *
@@ -126,28 +127,28 @@ class GenericProperty extends GenericElement
 	function disp_form()
 	{
 		global $ctrl, $action, $edited_name_maxlen;
-		
+
 		// Determine if we are creating or updating...
-		$creating = is_create_action( $action );	
-	
+		$creating = is_create_action( $action );
+
 		$Form = & new Form( NULL, 'form' );
-		
+
 		$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
-		
+
 		$Form->begin_form( 'fform', $creating ?  T_('New element') : T_('Element') );
-		
+
 		$Form->hidden( 'action', $creating ? 'create' : 'update' );
-		
+
 		$Form->hidden( 'ctrl', $ctrl );
-		
+
 		$Form->hiddens_by_key( get_memorized( 'action, ctrl' ) );
-		
+
 		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, T_('name') );
-		
+
 		$Form->text_input( $this->dbprefix.'ext_ID', $this->ext_ID, 25, T_('External ID') );
-		
+
 		if( ! $creating ) $Form->hidden( $this->dbIDname, $this->ID );
-		
+
 		if( $creating )
 		{
 			$Form->end_form( array( array( 'submit', 'submit', T_('Record'), 'SaveButton' ),
@@ -159,8 +160,8 @@ class GenericProperty extends GenericElement
 															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 		}
 	}
-	
-	
+
+
 	/**
 	 * Update the DB based on previously recorded changes
 	 */
@@ -169,15 +170,15 @@ class GenericProperty extends GenericElement
 		global $DB, $Request;
 
 		$DB->begin();
-		
-		if( $this->ext_ID ) 
+
+		if( $this->ext_ID )
 		{ // Check if ext_ID is unique:
-			$sql = "SELECT $this->dbIDname 
-							  FROM $this->dbtablename 
+			$sql = "SELECT $this->dbIDname
+							  FROM $this->dbtablename
 							 WHERE {$this->dbprefix}ext_ID = ".$DB->quote( $this->ext_ID )."
 								 AND $this->dbIDname != $this->ID";
-		 
- 			
+
+
 			if( $q = $DB->get_var( $sql ) )
 			{
 				$Request->param_error( $this->dbprefix.'ext_ID', 'The external ID is already used!' );
@@ -189,11 +190,11 @@ class GenericProperty extends GenericElement
 		$r = parent::dbupdate();
 
 		$DB->commit();
-		
+
 		return $r;
 	}
-			
-			
+
+
 	/**
 	 * Insert object into DB based on previously recorded changes
 	 */
@@ -202,13 +203,13 @@ class GenericProperty extends GenericElement
 		global $DB, $Request;
 
 		$DB->begin();
-		
-		if( $this->ext_ID ) 
+
+		if( $this->ext_ID )
 		{ // Check if ext_ID is unique:
-			$sql = "SELECT $this->dbIDname 
-							  FROM $this->dbtablename 
-							 WHERE {$this->dbprefix}ext_ID = ".$DB->quote( $this->ext_ID ); 
- 			
+			$sql = "SELECT $this->dbIDname
+							  FROM $this->dbtablename
+							 WHERE {$this->dbprefix}ext_ID = ".$DB->quote( $this->ext_ID );
+
 			if( $q = $DB->get_var( $sql ) )
 			{
 				$Request->param_error( $this->dbprefix.'ext_ID', 'The external ID is already used!' );
@@ -220,10 +221,10 @@ class GenericProperty extends GenericElement
 		$r = parent::dbinsert();
 
 		$DB->commit();
-		
+
 		return $r;
-	}	
-		
+	}
+
 }
 
 ?>

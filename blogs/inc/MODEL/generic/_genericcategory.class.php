@@ -36,7 +36,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Includes:
  */
-require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
+require_once $inc_path.'MODEL/generic/_genericproperty.class.php';
+
 
 /**
  * Generic Category Class
@@ -51,7 +52,7 @@ class GenericCategory extends GenericProperty
 
 	// Category chidrens list
 	var $chidren = array();
-	
+
 	/**
 	 * Constructor
 	 *
@@ -70,8 +71,8 @@ class GenericCategory extends GenericProperty
 			$this->parent_ID = $db_row->$parentIDfield;
 		}
 	}
-	
-		
+
+
 	/**
 	 * Load data from Request form fields.
 	 *
@@ -80,7 +81,7 @@ class GenericCategory extends GenericProperty
 	function load_from_request()
 	{
 		global $Request;
-	
+
 		parent::load_from_Request();
 
 		if( $Request->param( $this->dbprefix.'parent_ID', 'integer', NULL ) )
@@ -88,11 +89,11 @@ class GenericCategory extends GenericProperty
 			$Request->param_check_number( $this->dbprefix.'parent_ID', T_('Parent ID must be a number') );
 			$this->set_from_Request( 'parent_ID' );
 		}
-		
+
 		return ! $Request->validation_errors();
 	}
-	
-	
+
+
 	/**
 	 * Set param value
 	 *
@@ -117,17 +118,17 @@ class GenericCategory extends GenericProperty
 				$this->set_param( $parname, 'string', $parvalue );
 		}
 	}
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 */
 	function add_children( & $GenericCategory )
 	{
 		$this->children[] = & $GenericCategory;
 	}
-	
-	
+
+
 	/**
 	 * Enter description here...
 	 *
@@ -135,22 +136,22 @@ class GenericCategory extends GenericProperty
 	function disp_form()
 	{
 		global $ctrl, $action, $edited_name_maxlen;
-		
+
 		// Determine if we are creating or updating...
-		$creating = is_create_action( $action );	
-	
+		$creating = is_create_action( $action );
+
 		$Form = & new Form( NULL, 'form' );
-		
+
 		$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
-		
+
 		$Form->begin_form( 'fform', $creating ?  T_('New element') : T_('Element') );
-		
+
 		$Form->hidden( 'action', $creating ? 'create' : 'update' );
-		
+
 		$Form->hidden( 'ctrl', $ctrl );
-		
+
 		$Form->hiddens_by_key( get_memorized( 'action, ctrl' ) );
-		
+
 		if( $action == 'new' )
 		{	// Display parent generic category name for the new generic category
 			$Form->info( T_('Add to'), $this->parent_name );
@@ -160,13 +161,13 @@ class GenericCategory extends GenericProperty
 		{
 			$Form->info( T_('Add to'), T_('Root') );
 		}
-		
+
 		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, T_('name') );
-		
+
 		$Form->text_input( $this->dbprefix.'ext_ID', $this->ext_ID, 25, T_('External ID') );
-		
+
 		if( ! $creating ) $Form->hidden( $this->dbIDname, $this->ID );
-		
+
 		if( $creating )
 		{
 			$Form->end_form( array( array( 'submit', 'submit', T_('Record'), 'SaveButton' ),
@@ -178,6 +179,6 @@ class GenericCategory extends GenericProperty
 															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 		}
 	}
-	
+
 }
 ?>
