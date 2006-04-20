@@ -390,21 +390,41 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 			CREATE TABLE test_1 (
 				auto_inc INTEGER AUTO_INCREMENT,
 				i INTEGER,
-				KEY( i ),
 				KEY auto ( auto_inc, i )
 			)" );
 		$r = $this->db_delta_wrapper("
 			CREATE TABLE test_1 (
 				auto_inc INTEGER AUTO_INCREMENT,
 				i INTEGER,
-				KEY auto_new ( i, auto_inc ),
-				PRIMARY KEY( i )
+				KEY auto_new ( auto_inc )
 			)" );
 
 		$this->assertTrue( isset($r['test_1']) );
 		$this->assertEqual( count($r['test_1']), 2 );
-		$this->assertPattern( '~ALTER TABLE test_1 ADD KEY auto_new \( i, auto_inc \)$~', $r['test_1'][0]['queries'][0] );
-		$this->assertPattern( '~ALTER TABLE test_1 DROP INDEX auto~', $r['test_1'][1]['queries'][0] );
+		$this->assertEqual( 'ALTER TABLE test_1 ADD KEY auto_new ( auto_inc )', $r['test_1'][0]['queries'][0] );
+		$this->assertEqual( 'ALTER TABLE test_1 DROP INDEX auto', $r['test_1'][1]['queries'][0] );
+	}
+
+	/**
+	 * Test if a (non-primary) KEY gets transfered to a PRIMARY KEY.
+	 */
+	function test_db_delta_move_KEY_to_PK()
+	{
+		$this->test_DB->query("
+			CREATE TABLE test_1 (
+				i INTEGER,
+				KEY i ( i )
+			)" );
+		$r = $this->db_delta_wrapper("
+			CREATE TABLE test_1 (
+				i INTEGER,
+				PRIMARY KEY i ( i )
+			)" );
+
+		$this->assertTrue( isset($r['test_1']) );
+		$this->assertEqual( count($r['test_1']), 2 );
+		$this->assertEqual( 'ALTER TABLE test_1 ADD PRIMARY KEY i ( i )', $r['test_1'][0]['queries'][0] );
+		$this->assertEqual( 'ALTER TABLE test_1 DROP INDEX i', $r['test_1'][1]['queries'][0] );
 	}
 
 

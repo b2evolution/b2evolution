@@ -273,12 +273,13 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					$index_ary[$keyname]['unique'] = ($tableindex->Non_unique == 0) ? true : false;
 				}
 
+				// Let's see which indices are present already for the table:
 				$obsolete_indices = $index_ary; // will get unset as found
 				// For each actual index in the index array
 				foreach( $index_ary as $index_name => $index_data )
 				{
 					// Build a create string to compare to the query
-					$index_pattern = '';
+					$index_pattern = '^';
 					if( $index_name == 'PRIMARY' )
 					{
 						$index_pattern .= 'PRIMARY(\s+KEY)?';
@@ -965,6 +966,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.14  2006/04/20 14:59:52  blueyed
+ * Fixed moving KEY to PK
+ *
  * Revision 1.13  2006/03/21 23:17:17  blueyed
  * doc/cleanup
  *
