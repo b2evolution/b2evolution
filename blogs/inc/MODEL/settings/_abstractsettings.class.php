@@ -39,7 +39,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @package evocore
  * @abstract
  * @todo For performance reasons this should get split up into AbstractSettings_X where X is the number of $colKeyNames
- * @see UserSettings, GeneralSettings, PluginSettings
+ * @see UserSettings, GeneralSettings, PluginSettings, CollectionSettings
  */
 class AbstractSettings
 {
@@ -121,7 +121,7 @@ class AbstractSettings
 	 * @param string The name of the DB table with the settings stored.
 	 * @param array List of names for the DB columns keys that reference a value.
 	 * @param string The name of the DB column that holds the value.
-	 * @param ?? please document!!
+	 * @param integer The number of column keys to cache by. This are the first x keys of {@link $colKeyNames}. 0 means 'load all'.
 	 */
 	function AbstractSettings( $dbTableName, $colKeyNames, $colValueName, $cacheByColKeys = 0 )
 	{
@@ -666,6 +666,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/20 17:30:53  blueyed
+ * doc
+ *
  * Revision 1.6  2006/04/20 16:31:30  fplanque
  * comment moderation (finished for 1.8)
  *
