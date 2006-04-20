@@ -1332,7 +1332,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 	// fp> If it turns out I blocked something that was previously allowed, it's a mistake.
 	//
 	// Things still not validated correctly:
-	//   - umlauts in domains/url, e.g. http://läu.de/
+	//   - umlauts in domains/url, e.g. http://lï¿½.de/
 	if( ! preg_match('~^               # start
 		([a-z][a-z0-9+.\-]*)             # scheme
 		://                              # authority absolute URLs only
@@ -2701,6 +2701,7 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 			}
 			else
 			{
+				// TODO: this uses strip_tags et al! Shouldn't we just use "formvalue" always? (E.g. it kills "for( var i=0; i<a; i++ )..." (in an onclick attr) from "<a" on. The workaround is to use spaces ("i < a"), but I was confused first)
 				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
 			}
 		}
@@ -2777,6 +2778,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.36  2006/04/20 22:12:49  blueyed
+ * todo
+ *
  * Revision 1.35  2006/04/20 16:26:16  fplanque
  * minor
  *
