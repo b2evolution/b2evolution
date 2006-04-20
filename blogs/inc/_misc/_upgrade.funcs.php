@@ -855,12 +855,18 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 	{
 		foreach( $items as $table => $itemlist )
 		{
+			$removed_one = false;
 			foreach( $itemlist as $k => $item )
 			{
 				if( in_array($item['type'], $exclude_types) )
 				{
 					unset( $items[$table][$k] );
+					$removed_one = true;
 				}
+			}
+			if( $removed_one )
+			{ // Re-order (0, 1, 2, ..)
+				$items[$table] = array_values($items[$table]);
 			}
 		}
 	}
@@ -966,6 +972,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.15  2006/04/20 15:42:56  blueyed
+ * Make sure itemlist returned by db_delta() is ordered.
+ *
  * Revision 1.14  2006/04/20 14:59:52  blueyed
  * Fixed moving KEY to PK
  *

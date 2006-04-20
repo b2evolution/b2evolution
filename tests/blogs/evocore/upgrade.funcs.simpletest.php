@@ -745,6 +745,29 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 				'ALTER TABLE test_1 CHANGE COLUMN e e ENUM( \'a_new\', \'b\' ) NOT NULL' ) );
 	}
 
+
+	/**
+	 * Test if the itemlist returned by db_delta() is ordered (0, 1, 2, ..)
+	 */
+	function test_db_delta_ordered_itemlist()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				i INTEGER
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				i VARCHAR(32),
+				i2 INT,
+				PRIMARY KEY( i )
+			)", /* exclude type: */ array('add_column') );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 2 );
+		$this->assertTrue( isset( $r['test_1'][1] ) );
+	}
+
 }
 
 
