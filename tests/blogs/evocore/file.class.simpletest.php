@@ -29,6 +29,8 @@ class FileTestCase extends FilemanUnitTestCase
 		$this->old_Settings = & $GLOBALS['Settings'];
 		$GLOBALS['Settings'] = new MockGeneralSettings();
 		$GLOBALS['Settings']->setReturnValue( 'get', 1, array( 'fm_enable_roots_user' ) );
+		$GLOBALS['Settings']->setReturnValue( 'get', '775', array( 'fm_default_chmod_dir' ) );
+		$GLOBALS['Settings']->setReturnValue( 'get', '664', array( 'fm_default_chmod_file' ) );
 	}
 
 
@@ -65,7 +67,7 @@ class FileTestCase extends FilemanUnitTestCase
 
 		// create a temporary file and just delete it again:
 		$temp_path = $this->createUserFile();
-		@unlink( $temp_path );
+		unlink( $temp_path );
 		$temp_name = basename($temp_path);
 
 		$File = new File( 'user', 1, $temp_name );

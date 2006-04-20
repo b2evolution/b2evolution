@@ -24,7 +24,7 @@ class FilelistTestCase extends FilemanUnitTestCase
 	{
 		parent::setUp();
 
-		$this->Filelist = new Filelist( false, new FileRoot( 'user', 1 ) );
+		$this->Filelist = new Filelist( new FileRoot( 'user', 1 ) );
 	}
 
 
@@ -170,15 +170,15 @@ class FilelistTestCase extends FilemanUnitTestCase
 		$r = $this->Filelist->add( $FileA );
 		$r = $this->Filelist->add( $FileB );
 
-		$this->assertReference( $this->Filelist->getFileByIndex(0), $FileA, 'First file ok.' );
-		$this->assertReference( $this->Filelist->getFileByIndex(1), $FileB, 'Second file ok.' );
+		$this->assertReference( $this->Filelist->get_by_idx(0), $FileA, 'First file ok.' );
+		$this->assertReference( $this->Filelist->get_by_idx(1), $FileB, 'Second file ok.' );
 
 		$r = $this->Filelist->remove( $FileA );
 		$this->assertTrue( $r, true, 'Remove ok.' );
 		$this->assertTrue( $this->Filelist->count(), 1, 'Count after remove ok.' );
 
-		$this->assertReference( $this->Filelist->getFileByIndex(0), $FileB, 'First file ok.' );
-		$this->assertFalse( $this->Filelist->getFileByIndex(1), 'Second file ok (not existing).' );
+		$this->assertReference( $this->Filelist->get_by_idx(0), $FileB, 'First file ok.' );
+		$this->assertFalse( $this->Filelist->get_by_idx(1), 'Second file ok (not existing).' );
 	}
 
 
@@ -198,17 +198,17 @@ class FilelistTestCase extends FilemanUnitTestCase
 		// ascending, dirs not at top:
 		$this->Filelist->sort( 'name', true, false );
 
-		$this->assertReference( $this->Filelist->getFileByIndex(0), $FileA, 'First file sorted ok.' );
-		$this->assertReference( $this->Filelist->getFileByIndex(1), $FileB, 'Second file sorted ok.' );
-		$this->assertReference( $this->Filelist->getFileByIndex(2), $FileC, 'Third file sorted ok.' );
+		$this->assertReference( $this->Filelist->get_by_idx(0), $FileA, 'First file sorted ok.' );
+		$this->assertReference( $this->Filelist->get_by_idx(1), $FileB, 'Second file sorted ok.' );
+		$this->assertReference( $this->Filelist->get_by_idx(2), $FileC, 'Third file sorted ok.' );
 
 
 		// descending, dirs not at top:
 		$this->Filelist->sort( 'name', false, false );
 
-		$this->assertReference( $this->Filelist->getFileByIndex(0), $FileC, 'First file sorted ok.' );
-		$this->assertReference( $this->Filelist->getFileByIndex(1), $FileB, 'Second file sorted ok.' );
-		$this->assertReference( $this->Filelist->getFileByIndex(2), $FileA, 'Third file sorted ok.' );
+		$this->assertReference( $this->Filelist->get_by_idx(0), $FileC, 'First file sorted ok.' );
+		$this->assertReference( $this->Filelist->get_by_idx(1), $FileB, 'Second file sorted ok.' );
+		$this->assertReference( $this->Filelist->get_by_idx(2), $FileA, 'Third file sorted ok.' );
 
 
 		// Make $FileA a directory
@@ -217,17 +217,17 @@ class FilelistTestCase extends FilemanUnitTestCase
 		// descending, dirs at top:
 		$this->Filelist->sort( 'name', false, true );
 
-		$this->assertReference( $this->Filelist->getFileByIndex(0), $FileA, 'Directory at top.' );
-		$this->assertReference( $this->Filelist->getFileByIndex(1), $FileC, 'First File below directory.' );
-		$this->assertReference( $this->Filelist->getFileByIndex(2), $FileB, 'Second File below directory.' );
+		$this->assertReference( $this->Filelist->get_by_idx(0), $FileA, 'Directory at top.' );
+		$this->assertReference( $this->Filelist->get_by_idx(1), $FileC, 'First File below directory.' );
+		$this->assertReference( $this->Filelist->get_by_idx(2), $FileB, 'Second File below directory.' );
 
 
 		// ascending, dirs not at top:
 		$this->Filelist->sort( 'name', true, false );
 
-		$this->assertReference( $this->Filelist->getFileByIndex(0), $FileA, 'First file sorted ok.' );
-		$this->assertReference( $this->Filelist->getFileByIndex(1), $FileB, 'Second file sorted ok.' );
-		$this->assertReference( $this->Filelist->getFileByIndex(2), $FileC, 'Third file sorted ok.' );
+		$this->assertReference( $this->Filelist->get_by_idx(0), $FileA, 'First file sorted ok.' );
+		$this->assertReference( $this->Filelist->get_by_idx(1), $FileB, 'Second file sorted ok.' );
+		$this->assertReference( $this->Filelist->get_by_idx(2), $FileC, 'Third file sorted ok.' );
 	}
 
 }
