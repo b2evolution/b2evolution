@@ -13,10 +13,9 @@ $app_shortname = 'b2evo';
 /**
  * The version of the application.
  * Note: This has to be compatible to {@link http://us2.php.net/en/version-compare}.
- * @todo blueyed> As long as it's not released it should be called "*-dev"
  * @global string
  */
-$app_version = '1.8-alpha';
+$app_version = '1.8-dev';
 
 /**
  * Is displayed on the login screen:

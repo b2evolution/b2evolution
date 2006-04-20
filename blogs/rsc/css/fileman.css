@@ -45,6 +45,11 @@
 	display: inline;
 }
 
+#fmbar_filter,
+#fmbar_reloadhint {
+	display: inline;
+	white-space: nowrap;
+}
 #fmbar_filecounts {
 	display: inline;
 	white-space: nowrap;

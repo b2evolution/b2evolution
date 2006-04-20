@@ -1333,13 +1333,12 @@ function validate_url( $url, & $allowed_uri_scheme )
 	//
 	// Things still not validated correctly:
 	//   - umlauts in domains/url, e.g. http://läu.de/
-	//   - domain-only URLs without a trailing slash, e.g. http://example.com (this was valid before!)
 	if( ! preg_match('~^               # start
 		([a-z][a-z0-9+.\-]*)             # scheme
 		://                              # authority absolute URLs only
 		[a-z0-9]([a-z0-9.\-])*           # Don t allow anything too funky like entities
 		(:[0-9]+)?                       # optional port specification
-		/~ix', $url, $matches) )
+		~ix', $url, $matches) )
 	{ // Cannot validate URL structure
 		$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
 		return T_('Invalid URL');
@@ -2778,6 +2777,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.35  2006/04/20 16:26:16  fplanque
+ * minor
+ *
  * Revision 1.34  2006/04/20 14:33:46  blueyed
  * todo
  *
