@@ -53,7 +53,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 			pre_dump( 'db_delta failed!', $queries, $r );
 		}
 
-		$this->test_DB->error = $old_error;
+		$this->test_DB->error = ( $old_error || $this->test_DB->error );
 
 		return $r;
 	}
