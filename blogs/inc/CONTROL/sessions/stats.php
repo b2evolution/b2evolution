@@ -42,6 +42,19 @@ function percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '.' )
 }
 
 
+/**
+ * Helper function for "Requested URI" column
+ * @param integer Blog ID
+ * @return string
+ */
+function stats_get_blog_baseurlroot( $hit_blog_ID )
+{
+	global $BlogCache;
+	$tmp_Blog = & $BlogCache->get_by_ID( $hit_blog_ID );
+	return $tmp_Blog->get('baseurlroot');
+}
+
+
 $AdminUI->set_path( 'stats', param( 'tab', 'string', 'summary', true ) );
 $AdminUI->title = T_('View Stats for Blog:');
 
@@ -453,11 +466,11 @@ switch( $AdminUI->get_path(1) )
 					);
 			}
 
-			// Requested URI:
+			// Requested URI (linked to blog's baseurlroot+URI):
 			$Results->cols[] = array(
 					'th' => T_('Requested URI'),
 					'order' => 'hit_uri',
-					'td' => '<a href="$hit_uri$">$hit_uri$</a>',
+					'td' => '<a href="%stats_get_blog_baseurlroot(#hit_blog_ID#)%$hit_uri$">$hit_uri$</a>',
 				);
 
 			// Remote address (IP):
@@ -699,11 +712,11 @@ switch( $AdminUI->get_path(1) )
 					);
 			}
 
-			// Requested URI:
+			// Requested URI (linked to blog's baseurlroot+URI):
 			$Results->cols[] = array(
 					'th' => T_('Requested URI'),
 					'order' => 'hit_uri',
-					'td' => '<a href="$hit_uri$">$hit_uri$</a>',
+					'td' => '<a href="%stats_get_blog_baseurlroot(#hit_blog_ID#)%$hit_uri$">$hit_uri$</a>',
 				);
 
 			// Remote address (IP):
@@ -927,11 +940,11 @@ switch( $AdminUI->get_path(1) )
 					);
 			}
 
-			// Requested URI:
+			// Requested URI (linked to blog's baseurlroot+URI):
 			$Results->cols[] = array(
 					'th' => T_('Requested URI'),
 					'order' => 'hit_uri',
-					'td' => '<a href="$hit_uri$">$hit_uri$</a>',
+					'td' => '<a href="%stats_get_blog_baseurlroot(#hit_blog_ID#)%$hit_uri$">$hit_uri$</a>',
 				);
 
 			// Remote address (IP):
@@ -1004,6 +1017,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/04/20 19:14:03  blueyed
+ * Link "Requested URI" columns to blog's baseurlroot+URI
+ *
  * Revision 1.8  2006/04/20 17:59:01  blueyed
  * Removed "spam" from hit_referer_type (DB) and summary stats
  *
