@@ -181,6 +181,7 @@ $EvoConfig->DB['aliases'] = array(
 		'T_categories'         => $tableprefix.'categories',
 		'T_coll_group_perms'   => $tableprefix.'bloggroups',
 		'T_coll_user_perms'    => $tableprefix.'blogusers',
+		'T_coll_settings'      => $tableprefix.'coll_settings',
 		'T_comments'           => $tableprefix.'comments',
 		'T_files'              => $tableprefix.'files',
 		'T_filetypes'          => $tableprefix.'filetypes',

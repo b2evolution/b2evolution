@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the AbstractSettings class designed to handle all kinds of settings.
+ * This file implements the AbstractSettings class designed to handle any kind of settings.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -121,6 +121,7 @@ class AbstractSettings
 	 * @param string The name of the DB table with the settings stored.
 	 * @param array List of names for the DB columns keys that reference a value.
 	 * @param string The name of the DB column that holds the value.
+	 * @param ?? please document!!
 	 */
 	function AbstractSettings( $dbTableName, $colKeyNames, $colValueName, $cacheByColKeys = 0 )
 	{
@@ -267,8 +268,7 @@ class AbstractSettings
 	 * @uses get_default()
 	 * @param string $args,... the values for the column keys (depends on
 	 *                         $this->colKeyNames and must match its count and order)
-	 * @return string|false|NULL value as string on success;
-	 *                           NULL if not found; false in case of error
+	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
 	 */
 	function get()
 	{
@@ -666,6 +666,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/20 16:31:30  fplanque
+ * comment moderation (finished for 1.8)
+ *
  * Revision 1.5  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

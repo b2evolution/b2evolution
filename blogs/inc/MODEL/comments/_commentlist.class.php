@@ -139,7 +139,7 @@ class CommentList extends DataObjectList
 			foreach( $this->rows as $row )
 			{
 				// Prebuild object:
-				$this->Obj[$i] = new Comment( $row ); // COPY !!??
+				$this->Obj[$i] = new Comment( $row ); // COPY (function)
 
 				// To avoid potential future waste, cache this object:
 				// $this->DataObjectCache->add( $this->Obj[$i] );
@@ -170,6 +170,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/20 16:31:30  fplanque
+ * comment moderation (finished for 1.8)
+ *
  * Revision 1.3  2006/04/18 19:29:51  fplanque
  * basic comment status implementation
  *

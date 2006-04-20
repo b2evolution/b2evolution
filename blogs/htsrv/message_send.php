@@ -126,11 +126,13 @@ if( ! empty( $recipient_id ) )
 }
 elseif( ! empty( $comment_id ) )
 { // Get the email address for the recipient if a visiting commenter.
+
+	// Load comment from DB:
 	$row = $DB->get_row(
 		'SELECT *
 		   FROM T_comments
 		  WHERE comment_ID = '.$comment_id, ARRAY_A );
-	$Comment = new Comment( $row );
+	$Comment = & new Comment( $row );
 
 	if( empty($Comment->allow_msgform) )
 	{ // should be prevented by UI
@@ -223,6 +225,9 @@ $Plugins->trigger_event( 'MessageFormSentCleanup' );
 
 /*
  * $Log$
+ * Revision 1.29  2006/04/20 16:31:29  fplanque
+ * comment moderation (finished for 1.8)
+ *
  * Revision 1.28  2006/04/20 12:15:32  fplanque
  * no message
  *

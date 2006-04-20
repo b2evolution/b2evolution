@@ -126,6 +126,8 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 	$Comment->set( 'author_IP', $Hit->IP );
 	$Comment->set( 'date', $now );
 	$Comment->set( 'content', $comment );
+	// Assign default status for new comments:
+	$Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status') );
 
 	if( ! $Comment->dbinsert() )
 	{
@@ -149,6 +151,9 @@ if( (strlen(''.$tb_id)) && (empty($_GET['__mode'])) && (strlen(''.$url)) )
 
 /*
  * $Log$
+ * Revision 1.43  2006/04/20 16:31:29  fplanque
+ * comment moderation (finished for 1.8)
+ *
  * Revision 1.42  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

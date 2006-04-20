@@ -162,11 +162,12 @@ function set_edited_Blog_from_params( $for )
 
 		case 'advanced':
 			$edited_Blog->set( 'staticfilename',  param( 'blog_staticfilename',  'string', '' ) );
+			$edited_Blog->set( 'allowcomments',   param( 'blog_allowcomments',   'string', 'always' ) );
+			$edited_Blog->set_setting( 'new_feedback_status',  param( 'new_feedback_status', 'string', 'draft' ) );
 			$edited_Blog->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
 			$edited_Blog->set( 'allowpingbacks',  param( 'blog_allowpingbacks',  'integer', 0 ) );
 			$edited_Blog->set( 'pingb2evonet',    param( 'blog_pingb2evonet',    'integer', 0 ) );
 			$edited_Blog->set( 'pingtechnorati',  param( 'blog_pingtechnorati',  'integer', 0 ) );
-			$edited_Blog->set( 'allowcomments',   param( 'blog_allowcomments',   'string', 'always' ) );
 			$edited_Blog->set( 'pingweblogs',     param( 'blog_pingweblogs',     'integer', 0 ) );
 			$edited_Blog->set( 'pingblodotgs',    param( 'blog_pingblodotgs',    'integer', 0 ) );
 			$edited_Blog->set( 'media_location',  param( 'blog_media_location',  'string', 'default' ) );
@@ -389,10 +390,8 @@ switch($action)
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
-		?>
-		<div class="panelinfo">
-			<h3><?php printf( T_('Updating Blog [%s]...'), $edited_Blog->dget( 'name' ) )?></h3>
-		<?php
+		echo '<div class="panelinfo">';
+		printf( '<h3>'.T_('Updating Blog [%s]...').'</h3>', $edited_Blog->dget( 'name' ) );
 
 		switch( $AdminUI->get_path(1) )
 		{
@@ -424,9 +423,7 @@ switch($action)
 		// display notes
 		$Messages->display( '', '', true, 'note' );
 
-		?>
-		</div>
-		<?php
+		echo '</div>';
 		// NOTE: no break here, we go on to edit!
 
 
@@ -580,6 +577,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/04/20 16:31:29  fplanque
+ * comment moderation (finished for 1.8)
+ *
  * Revision 1.10  2006/04/19 20:13:49  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

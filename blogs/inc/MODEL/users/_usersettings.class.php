@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UserSettings class, to handle user/name/value triplets.
+ * This file implements the UserSettings class which handle user_ID/name/value triplets.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -186,6 +186,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/20 16:31:30  fplanque
+ * comment moderation (finished for 1.8)
+ *
  * Revision 1.9  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

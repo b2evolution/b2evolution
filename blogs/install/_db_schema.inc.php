@@ -129,6 +129,15 @@ $schema_queries = array(
 			UNIQUE KEY blog_urlname (blog_urlname)
 		)" ),
 
+	'T_coll_settings' => array(
+		'Creating collection settings table',
+		"CREATE TABLE T_coll_settings (
+			cset_coll_ID INT(11) UNSIGNED NOT NULL,
+			cset_name    VARCHAR( 30 ) NOT NULL,
+			cset_value   VARCHAR( 255 ) NULL,
+			PRIMARY KEY ( cset_coll_ID, cset_name )
+		)" ),
+
 	'T_categories' => array(
 		'Creating table for Categories',
 		"CREATE TABLE T_categories (
@@ -591,6 +600,9 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.14  2006/04/20 16:31:30  fplanque
+ * comment moderation (finished for 1.8)
+ *
  * Revision 1.13  2006/04/19 15:56:02  blueyed
  * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
  * and Item::comments to Item::comment_status (Item API change)

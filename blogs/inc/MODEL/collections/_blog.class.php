@@ -60,16 +60,19 @@ class Blog extends DataObject
 	 * @var string Short name for use in navigation menus
 	 */
 	var $shortname;
+
 	/**
 	 * Complete name
 	 * @var string Complete name
 	 */
 	var $name;
+
 	/**
 	 * Tagline to be displayed on template
 	 * @var string Tagline to be displayed on template
 	 */
 	var $tagline;
+
 	var $shortdesc; // description
 	var $longdesc;
 	var $locale;
@@ -99,6 +102,16 @@ class Blog extends DataObject
 	var $media_subdir = '';
 	var $media_fullpath = '';
 	var $media_url = '';
+
+	/**
+	 * Additional settings for the collection
+	 *
+	 * Any non vital params should go into there (this includes many of the above).
+	 *
+	 * @var CollectionSettings lazy filled
+	 */
+	var $CollectionSettings;
+
 
 	/**
 	 * Constructor
@@ -585,6 +598,60 @@ class Blog extends DataObject
 		}
 	}
 
+ 	/**
+	 * Get a setting.
+	 *
+	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
+	 */
+	function get_setting( $parname )
+	{
+		$this->load_CollectionSettings();
+
+		return $this->CollectionSettings->get( $this->ID, $parname );
+	}
+
+ 	/**
+	 * Set a setting.
+	 *
+	 * @return boolean true, if the value has been set, false if it has not changed.
+	 */
+	function set_setting( $parname, $value )
+	{
+		$this->load_CollectionSettings();
+
+		return $this->CollectionSettings->set( $this->ID, $parname, $value );
+	}
+
+
+	function load_CollectionSettings()
+	{
+		if( ! isset( $this->CollectionSettings ) )
+		{
+			require_once dirname(__FILE__).'/_collsettings.class.php';
+			$this->CollectionSettings = new CollectionSettings(); // COPY (function)
+		}
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 */
+	function dbupdate()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		parent::dbupdate();
+
+		if( isset( $this->CollectionSettings ) )
+		{
+			$this->CollectionSettings->dbupdate();
+		}
+
+		$DB->commit();
+	}
+
 
 	/**
 	 * Delete a blog and dependencies from database
@@ -761,6 +828,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/20 16:31:30  fplanque
+ * comment moderation (finished for 1.8)
+ *
  * Revision 1.6  2006/04/19 22:39:08  blueyed
  * Only add status messages about media_dir creation if on an admin page.
  *

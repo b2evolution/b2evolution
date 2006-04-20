@@ -75,17 +75,28 @@ $Form->checkbox( 'blog_pingweblogs', $edited_Blog->get( 'pingweblogs' ), T_('Pin
 $Form->checkbox( 'blog_pingblodotgs', $edited_Blog->get( 'pingblodotgs' ), T_('Ping blo.gs'), T_('to give notice of new post.') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Advanced options') );
+$Form->begin_fieldset( T_('Feedback options') );
 $Form->radio( 'blog_allowcomments', $edited_Blog->get( 'allowcomments' ),
 					array(  array( 'always', T_('Always on all posts'), T_('Always allow comments on every posts') ),
 					array( 'post_by_post', T_('Can be disabled on a per post basis'),  T_('Comments can be disabled on each post separatly') ),
 					array( 'never', T_('No comments are allowed in this blog'), T_('Never allow any comments in this blog') ),
 				), T_('Allow comments'), true );
 
+$status_options = array(
+		'draft'      => T_('Draft'),
+		'published'  => T_('Published'),
+		'deprecated' => T_('Deprecated')
+	);
+$Form->select_input_array( 'new_feedback_status', $status_options, T_('New feedback status'), array(
+			'value' => $edited_Blog->get_setting('new_feedback_status'),
+			'note' => T_('This status will be assigned to any new comment/trackback (unless overriden by plugins).')
+		) );
+
 $Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Allow trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
-$Form->checkbox( 'blog_allowpingbacks', $edited_Blog->get( 'allowpingbacks' ), T_('Allow pingbacks'), T_("Allow other bloggers to send pingbacks to this blog, letting you know when they refer to it. This will also let you send pingbacks to other blogs.") );
+$Form->checkbox( 'blog_allowpingbacks', $edited_Blog->get( 'allowpingbacks' ), T_('Allow pingbacks'), T_('Deprecated') );
+
 $Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
-													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 ?>

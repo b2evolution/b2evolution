@@ -71,13 +71,15 @@ if( ! empty($recipient_id) )
 }
 elseif( ! empty($comment_id) )
 { // If the email is to a non user comment poster get the email address from the comments table
+
+	// Load comment from DB:
 	$row = $DB->get_row( '
 		SELECT *
 		  FROM T_comments
 		 WHERE comment_ID = '.$comment_id, ARRAY_A );
 	if( $row )
 	{
-		$Comment = new Comment( $row );
+		$Comment = & new Comment( $row );
 
 		if( ! $Comment->allow_msgform )
 		{ // should be prevented by UI
@@ -158,6 +160,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.22  2006/04/20 16:31:30  fplanque
+ * comment moderation (finished for 1.8)
+ *
  * Revision 1.21  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

@@ -147,7 +147,7 @@ $Comment = & new Comment();
 $Comment->set( 'type', 'comment' );
 $Comment->set_Item( $commented_Item );
 if( is_logged_in() )
-{ // User is loggued in, we'll use his ID
+{ // User is logged in, we'll use his ID
 	$Comment->set_author_User( $current_User );
 }
 else
@@ -160,6 +160,11 @@ else
 $Comment->set( 'author_IP', $Hit->IP );
 $Comment->set( 'date', $now );
 $Comment->set( 'content', $comment );
+
+$commented_Item->get_Blog(); // Make sure Blog is loaded
+
+// Assign default status for new comments:
+$Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status') );
 
 $Comment->dbinsert();
 
@@ -228,6 +233,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.66  2006/04/20 16:31:29  fplanque
+ * comment moderation (finished for 1.8)
+ *
  * Revision 1.65  2006/04/19 23:50:39  blueyed
  * Normalized Messages handling (error displaying and transport in Session)
  *
