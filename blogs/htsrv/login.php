@@ -181,6 +181,7 @@ switch( $action )
 		// Add Message to change the password:
 		$Messages->add( T_( 'Please change your password to something you remember now.' ), 'success' );
 		$Session->set( 'Messages', $Messages );
+		$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 
 		// Redirect to the user's profile in the "users" controller:
 		header_nocache();
@@ -199,6 +200,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.55  2006/04/20 12:15:32  fplanque
+ * no message
+ *
  * Revision 1.54  2006/04/19 23:50:39  blueyed
  * Normalized Messages handling (error displaying and transport in Session)
  *

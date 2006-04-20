@@ -107,8 +107,8 @@ if( count($values) )
 
 // Set Messages into user's session, so they get restored on the next page (after redirect):
 $Messages->add( T_('Your profile has been updated.'), 'success' );
-
 $Session->set( 'Messages', $Messages );
+$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 
 
 header_nocache();
@@ -116,6 +116,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.11  2006/04/20 12:15:32  fplanque
+ * no message
+ *
  * Revision 1.10  2006/04/19 23:50:39  blueyed
  * Normalized Messages handling (error displaying and transport in Session)
  *

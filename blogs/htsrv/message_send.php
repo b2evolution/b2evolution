@@ -211,6 +211,7 @@ if( isset($recipient_User) )
 // Set Messages into user's session, so they get restored on the next page (after redirect):
 $Messages->add( T_('Your message has been sent as email to the user.'), 'success' );
 $Session->set( 'Messages', $Messages );
+$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 
 // Header redirection
 header_nocache();
@@ -222,6 +223,9 @@ $Plugins->trigger_event( 'MessageFormSentCleanup' );
 
 /*
  * $Log$
+ * Revision 1.28  2006/04/20 12:15:32  fplanque
+ * no message
+ *
  * Revision 1.27  2006/04/19 23:50:39  blueyed
  * Normalized Messages handling (error displaying and transport in Session)
  *

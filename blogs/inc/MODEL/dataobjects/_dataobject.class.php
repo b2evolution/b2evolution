@@ -532,6 +532,25 @@ class DataObject
 		// i-e: transform 0 to ''
 		$new_value = ($make_null && ($parvalue === '')) ? NULL : $parvalue;
 
+/* >old
+		if( !isset($this->$parname) )
+		{	// This property has never been set before, set it to NULL now in order for tests to work:
+			$this->$parname = NULL;
+		}
+
+
+		/* blueyed>
+		TODO: there's a bug here: you cannot use set_param('foo', 'number', 0), if the $parname member
+		      has not been set before or is null!!
+		      What about just:
+		      ( isset($this->$parname) && $this->$parname === $new_value )
+		      This would also eliminate the isset() check from above.
+		      IIRC you've once said here that '===' would be too expensive and I would misuse the DataObjects,
+		      but IMHO what we have now is not much faster and buggy anyway..
+			fp> okay let's give it a try...
+		if( (!is_null($new_value) && $this->$parname == $new_value)
+			|| (is_null($this->$parname) && is_null($new_value)) )
+<old */
 		if( (isset($this->$parname) && $this->$parname === $new_value)
 			|| ( ! isset($this->$parname) && ! isset($new_value) ) )
 		{	// Value has not changed (we need 2 tests, for NULL and for NOT NULL value pairs)
@@ -641,6 +660,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/20 12:15:32  fplanque
+ * no message
+ *
  * Revision 1.9  2006/04/20 00:07:21  blueyed
  * Fixed E_NOTICE
  *

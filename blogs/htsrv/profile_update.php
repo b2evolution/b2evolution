@@ -138,12 +138,16 @@ else
 }
 
 $Session->set( 'Messages', $Messages );
+$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 
 header_nocache();
 header_redirect();
 
 /*
  * $Log$
+ * Revision 1.43  2006/04/20 12:15:32  fplanque
+ * no message
+ *
  * Revision 1.42  2006/04/19 23:50:39  blueyed
  * Normalized Messages handling (error displaying and transport in Session)
  *

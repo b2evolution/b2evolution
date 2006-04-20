@@ -239,7 +239,7 @@ class Hit
 
 			// This is most probably referer spam,
 			// In order to preserve server resources, we're going to stop processing immediatly!!
-			// TODO: We won't ever have hit_referer_type=="spam" in the hitlog! So, either log it here, or remove it from stats.php. fp> Yes it should be removed from the stats dh> Also from DB?
+			// TODO: We won't ever have hit_referer_type=="spam" in the hitlog! So, either log it here, or remove it from stats.php. fp> Yes it should be removed from the stats & DB
 			require $view_path.'errors/_referer_spam.page.php';	// error & exit
 			exit(); // just in case.
 			// THIS IS THE END!!
@@ -718,6 +718,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.14  2006/04/20 12:15:33  fplanque
+ * no message
+ *
  * Revision 1.13  2006/04/19 22:26:24  blueyed
  * cleanup/polish
  *
