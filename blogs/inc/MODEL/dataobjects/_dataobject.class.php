@@ -535,7 +535,7 @@ class DataObject
 		if( (isset($this->$parname) && $this->$parname === $new_value)
 			|| ( ! isset($this->$parname) && ! isset($new_value) ) )
 		{	// Value has not changed (we need 2 tests, for NULL and for NOT NULL value pairs)
-			$Debuglog->add( $this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' = '.$this->$parname, 'dataobjects' );
+			$Debuglog->add( $this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' = '.var_export( @$this->$parname, true ), 'dataobjects' );
 			// echo '<br />'.$this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' = '.$this->$parname;
 
 			return false;
@@ -641,6 +641,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2006/04/20 00:07:21  blueyed
+ * Fixed E_NOTICE
+ *
  * Revision 1.8  2006/04/19 22:04:59  blueyed
  * Fixed check for if value has changed
  *
