@@ -120,7 +120,8 @@ $Form->end_form();
 
 
 <div class="login_actions" style="text-align:right">
-	<?php user_register_link( '', ' &middot; ' )?>
+	<?php user_register_link( '', ' &middot; ', '', '#', true /*disp_when_logged_in*/ )?>
+
 	<a href="<?php echo $htsrv_url ?>login.php?action=lostpassword&amp;redirect_to=<?php
 		echo rawurlencode( $redirect_to );
 		if( !empty($login) )
@@ -129,6 +130,7 @@ $Form->end_form();
 		}
 		?>"><?php echo T_('Lost your password ?')
 		?></a>
+
 	<?php
 	if( empty($login_required) )
 	{ // No login required, allow to pass through
@@ -143,6 +145,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/20 22:13:48  blueyed
+ * Display "Register..." link in login form also if user is logged in already.
+ *
  * Revision 1.5  2006/04/19 20:13:51  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

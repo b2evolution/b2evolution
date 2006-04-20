@@ -148,23 +148,36 @@ function get_user_login_link( $before = '', $after = '', $link_text = '', $link_
 
 /**
  * Template tag: Output a link to new user registration
+ * @param string
+ * @param string
+ * @param string
+ * @param boolean Display the link, if the user is already logged in? (this is used by the login form)
  */
-function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false )
 {
-	echo get_user_register_link( $before, $after, $link_text, $link_title );
+	echo get_user_register_link( $before, $after, $link_text, $link_title, $disp_when_logged_in );
 }
 
 
 /**
  * Template tag: Get a link to new user registration
+ * @param string
+ * @param string
+ * @param string
+ * @param boolean Display the link, if the user is already logged in? (this is used by the login form)
  * @return string
  */
-function get_user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
+function get_user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false )
 {
 	global $htsrv_url, $Settings, $edited_Blog, $generating_static;
 
-	if( is_logged_in() || !$Settings->get('newusers_canregister'))
-	{ // There's no need to provide this link if already logged in or if we won't let him register
+	if( is_logged_in() && ! $disp_when_logged_in )
+	{ // Do not display, when already logged in:
+		return false;
+	}
+
+	if( ! $Settings->get('newusers_canregister'))
+	{ // We won't let him register
 		return false;
 	}
 
@@ -472,6 +485,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/20 22:13:48  blueyed
+ * Display "Register..." link in login form also if user is logged in already.
+ *
  * Revision 1.6  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
