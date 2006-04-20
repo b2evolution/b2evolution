@@ -91,10 +91,11 @@ class Hitlist
 	{
 		global $DB;
 
-		$sql = "UPDATE T_hitlog
-						SET hit_referer_type = '$type',
-								hit_datetime = hit_datetime " // prevent mySQL from updating timestamp
-						." WHERE hit_ID = $hit_ID";
+		$sql = '
+				UPDATE T_hitlog
+				   SET hit_referer_type = '.$DB->quote($type).",
+				       hit_datetime = hit_datetime " /* prevent mySQL from updating timestamp */ ."
+				 WHERE hit_ID = $hit_ID";
 		return $DB->query( $sql, 'Change type for a specific hit' );
 	}
 

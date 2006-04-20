@@ -65,6 +65,8 @@ class Hit
 	/**
 	 * The type of referer.
 	 *
+	 * Note: "spam" referers do not get logged.
+	 *
 	 * @var string 'search'|'blacklist'|'referer'|'direct'|'spam'
 	 */
 	var $referer_type;
@@ -190,7 +192,7 @@ class Hit
 	 * Detect Referer (sic!).
 	 * Due to potential non-thread safety with getenv() (fallback), we'd better do this early.
 	 *
-	 * referer_type: enum('search', 'blacklist', 'referer', 'direct', 'spam')
+	 * referer_type: enum('search', 'blacklist', 'referer', 'direct'); 'spam' gets used internally
 	 */
 	function detect_referer()
 	{
@@ -231,15 +233,14 @@ class Hit
 
 		// Check if the referer is valid and is not blacklisted:
 		if( $error = validate_url( $this->referer, $comments_allowed_uri_scheme ) )
-		{
-			$Debuglog->add( 'detect_referer(): '.$error, 'hit');
+		{ // SPAM:
+			$Debuglog->add( 'detect_referer(): '.$error.' (SPAM)', 'hit');
 			$this->referer_type = 'spam'; // Hazardous
 			$this->referer = false;
 			// QUESTION: add domain to T_basedomains, type 'blacklist' ?
 
 			// This is most probably referer spam,
-			// In order to preserve server resources, we're going to stop processing immediatly!!
-			// TODO: We won't ever have hit_referer_type=="spam" in the hitlog! So, either log it here, or remove it from stats.php. fp> Yes it should be removed from the stats & DB
+			// In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
 			require $view_path.'errors/_referer_spam.page.php';	// error & exit
 			exit(); // just in case.
 			// THIS IS THE END!!
@@ -572,7 +573,10 @@ class Hit
 			}
 		}
 
-		$this->_record_the_hit();
+		if( $this->referer_type != 'spam' )
+		{
+			$this->_record_the_hit();
+		}
 
 		return true;
 	}
@@ -718,6 +722,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.15  2006/04/20 17:59:02  blueyed
+ * Removed "spam" from hit_referer_type (DB) and summary stats
+ *
  * Revision 1.14  2006/04/20 12:15:33  fplanque
  * no message
  *

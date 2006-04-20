@@ -329,7 +329,7 @@ $schema_queries = array(
 			hit_sess_ID        INT UNSIGNED,
 			hit_datetime       DATETIME NOT NULL,
 			hit_uri            VARCHAR(250) DEFAULT NULL,
-			hit_referer_type   ENUM('search','blacklist','referer','direct','spam') NOT NULL,
+			hit_referer_type   ENUM('search','blacklist','referer','direct') NOT NULL,
 			hit_referer        VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID INT UNSIGNED DEFAULT NULL,
 			hit_blog_ID        int(11) UNSIGNED NULL DEFAULT NULL,
@@ -600,6 +600,9 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.15  2006/04/20 17:59:02  blueyed
+ * Removed "spam" from hit_referer_type (DB) and summary stats
+ *
  * Revision 1.14  2006/04/20 16:31:30  fplanque
  * comment moderation (finished for 1.8)
  *

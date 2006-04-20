@@ -153,7 +153,6 @@ switch( $AdminUI->get_path(1) )
 					'referer' => 2,
 					'search' => 3,
 					'blacklist' => 4,
-					'spam' => 5,
 				);
 
 			$chart[ 'chart_data' ][ 0 ] = array();
@@ -161,7 +160,6 @@ switch( $AdminUI->get_path(1) )
 			$chart[ 'chart_data' ][ 2 ] = array();
 			$chart[ 'chart_data' ][ 3 ] = array();
 			$chart[ 'chart_data' ][ 4 ] = array();
-			$chart[ 'chart_data' ][ 5 ] = array();
 
 			$count = 0;
 			foreach( $res_hits as $row_stats )
@@ -176,7 +174,6 @@ switch( $AdminUI->get_path(1) )
 						array_unshift( $chart[ 'chart_data' ][ 2 ], 0 );
 						array_unshift( $chart[ 'chart_data' ][ 3 ], 0 );
 						array_unshift( $chart[ 'chart_data' ][ 4 ], 0 );
-						array_unshift( $chart[ 'chart_data' ][ 5 ], 0 );
 				}
 				$col = $col_mapping[$row_stats['referer_type']];
 				$chart [ 'chart_data' ][$col][0] = $row_stats['hits'];
@@ -187,7 +184,6 @@ switch( $AdminUI->get_path(1) )
 			array_unshift( $chart[ 'chart_data' ][ 2 ], 'Referers' );
 			array_unshift( $chart[ 'chart_data' ][ 3 ], 'Refering Searches' );
 			array_unshift( $chart[ 'chart_data' ][ 4 ], 'Blacklisted' );
-			array_unshift( $chart[ 'chart_data' ][ 5 ], 'Spam' );
 
 			$chart[ 'canvas_bg' ] = array (
 					'width'  => 780,
@@ -317,7 +313,6 @@ switch( $AdminUI->get_path(1) )
 			$hits['referer'] = 0;
 			$hits['search'] = 0;
 			$hits['blacklist'] = 0;
-			$hits['spam'] = 0;
 			$last_date = 0;
 			?>
 			<table class="grouped" cellspacing="0">
@@ -327,7 +322,6 @@ switch( $AdminUI->get_path(1) )
 					<th><?php echo T_('Referers') ?></th>
 					<th><?php echo T_('Refering Searches') ?></th>
 					<th><?php echo T_('Blacklisted') ?></th>
-					<th><?php echo T_('Spam') ?></th>
 					<th><?php echo T_('Total') ?></th>
 				</tr>
 				<?php
@@ -350,7 +344,6 @@ switch( $AdminUI->get_path(1) )
 							<td class="right"><?php echo $hits['referer'] ?></td>
 							<td class="right"><?php echo $hits['search'] ?></td>
 							<td class="right"><?php echo $hits['blacklist'] ?></td>
-							<td class="right"><?php echo $hits['spam'] ?></td>
 							<td class="right"><?php echo array_sum($hits) ?></td>
 						</tr>
 						<?php
@@ -358,7 +351,6 @@ switch( $AdminUI->get_path(1) )
 							$hits['referer'] = 0;
 							$hits['search'] = 0;
 							$hits['blacklist'] = 0;
-							$hits['spam'] = 0;
 							$last_date = $this_date;	// that'll be the next one
 							$count ++;
 					}
@@ -381,7 +373,6 @@ switch( $AdminUI->get_path(1) )
 						<td class="right"><?php echo $hits['referer'] ?></td>
 						<td class="right"><?php echo $hits['search'] ?></td>
 						<td class="right"><?php echo $hits['blacklist'] ?></td>
-						<td class="right"><?php echo $hits['spam'] ?></td>
 						<td class="right"><?php echo array_sum($hits) ?></td>
 					</tr>
 					<?php
@@ -1013,6 +1004,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/20 17:59:01  blueyed
+ * Removed "spam" from hit_referer_type (DB) and summary stats
+ *
  * Revision 1.7  2006/04/19 20:03:04  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
