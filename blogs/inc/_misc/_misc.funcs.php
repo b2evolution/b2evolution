@@ -1330,7 +1330,10 @@ function validate_url( $url, & $allowed_uri_scheme )
 	// Validate URL structure
 	// fp> NOTE: I made this much more laxist than it used to be.
 	// fp> If it turns out I blocked something that was previously allowed, it's a mistake.
-	// blueyed> ? - umlauts in domains/url
+	//
+	// Things still not validated correctly:
+	//   - umlauts in domains/url, e.g. http://läu.de/
+	//   - domain-only URLs without a trailing slash, e.g. http://example.com (this was valid before!)
 	if( ! preg_match('~^               # start
 		([a-z][a-z0-9+.\-]*)             # scheme
 		://                              # authority absolute URLs only
@@ -2775,6 +2778,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.34  2006/04/20 14:33:46  blueyed
+ * todo
+ *
  * Revision 1.33  2006/04/19 22:26:25  blueyed
  * cleanup/polish
  *
