@@ -445,7 +445,17 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( $text == '#' ) $text = get_icon( 'delete', 'imgtag' ).' '.T_('Delete');
+		if( $text == '#' )
+		{ // Use icon+text as default, if not displayed as button (otherwise just the text)
+			if( ! $button )
+			{
+				$text = get_icon( 'delete', 'imgtag' ).' '.T_('Delete!');
+			}
+			else
+			{
+				$text = T_('Delete!');
+			}
+		}
 		if( $title == '#' ) $title = T_('Delete this comment');
 
 		$url = $admin_url.'?ctrl=editactions&amp;action=deletecomment&amp;comment_ID='.$this->ID;
@@ -1021,6 +1031,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2006/04/20 00:00:21  blueyed
+ * Fixed delete-link-button
+ *
  * Revision 1.23  2006/04/19 22:08:16  blueyed
  * Fixed spam_karma()
  *
