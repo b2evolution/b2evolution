@@ -1861,6 +1861,7 @@ function url_add_tail( $url, $tail )
  *               Might be just an email address or of the same form as {@link $to}.
  *               {@link $notify_from} gets used as default (if NULL).
  * @param array Additional headers ( headername => value ). Take care of injection!
+ * @return boolean True if mail could be sent (not necessarily delivered!), false if not - (return value of {@link mail()})
  */
 function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 {
@@ -2452,11 +2453,11 @@ function header_nocache()
  */
 function header_redirect( $redirect_to = NULL )
 {
-	global $Hit, $baseurl, $Blog;
+	global $Hit, $baseurl, $Blog, $htsrv_url, $Request;
 
-	if( is_null($redirect_to) )
+	if( empty($redirect_to) )
 	{
-		$redirect_to = param( 'redirect_to', 'string', '' );
+		$redirect_to = $Request->param( 'redirect_to', 'string', '' );
 	}
 
 	if( empty($redirect_to) )
@@ -2477,7 +2478,8 @@ function header_redirect( $redirect_to = NULL )
 
 	$redirect_to = str_replace('&amp;', '&', $redirect_to);
 
-	if( strpos($redirect_to, $baseurl) === 0 /* we're somewhere on $baseurl */ )
+	if( strpos($redirect_to, $htsrv_url) === 0 /* we're going somewhere on $htsrv_url */
+	 || strpos($redirect_to, $baseurl) === 0   /* we're going somewhere on $baseurl */ )
 	{
 		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
 		// Also remove "action" get param to avoid unwanted actions
@@ -2778,6 +2780,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.38  2006/04/21 16:55:29  blueyed
+ * doc, polished header_redirect()
+ *
  * Revision 1.37  2006/04/20 22:24:08  blueyed
  * plugin hooks cleanup
  *
