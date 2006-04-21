@@ -34,7 +34,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 $AdminUI->set_path( 'cats' );
-$AdminUI->title = $AdminUI->title_titlearea = T_('Categories for blog:');
+$AdminUI->title = T_('Categories for blog:');
+$AdminUI->title_titlearea = $AdminUI->title;
 param( 'action', 'string', 'list' );
 param( 'blog', 'integer', 0, true );
 
@@ -395,6 +396,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/21 16:59:29  blueyed
+ * cleanup
+ *
  * Revision 1.5  2006/04/19 20:13:49  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
