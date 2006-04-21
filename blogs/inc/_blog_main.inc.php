@@ -130,6 +130,12 @@ if( $disp == 'stats' )
 // Getting current blog info:
 $Blog = Blog_get_by_ID( $blog ); /* TODO: TMP: */ $blogparams = get_blogparams_by_ID( $blog );
 
+
+/*
+	TODO: blueyed>> This should get moved as default to the locale detection in _main.inc.php,
+	        as we only want to activate the I/O charset, which is probably the user's..
+	        It prevents using a locale/charset in the front office, apart from the one given as default for the blog!!
+*/
 // Activate matching locale:
 $Debuglog->add( 'Activating blog locale: '.$Blog->get('locale'), 'locale' );
 locale_activate( $Blog->get('locale') );
@@ -427,6 +433,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.14  2006/04/21 17:05:08  blueyed
+ * cleanup
+ *
  * Revision 1.13  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

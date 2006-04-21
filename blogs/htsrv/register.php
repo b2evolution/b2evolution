@@ -113,6 +113,9 @@ switch( $action )
 			{
 				$DB->rollback();
 				// TODO: what about MySQL versions that do not support transactions? Should we try to delete the user, if he's still there?
+
+				$Messages->add( T_('No user account has been created!'), 'error' );
+				break; // break out to _reg_form.php
 			}
 			else
 			{ // User created:
@@ -163,6 +166,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.62  2006/04/21 17:05:08  blueyed
+ * cleanup
+ *
  * Revision 1.61  2006/04/20 22:24:07  blueyed
  * plugin hooks cleanup
  *

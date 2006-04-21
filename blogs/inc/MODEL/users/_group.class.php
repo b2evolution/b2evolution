@@ -135,6 +135,7 @@ class Group extends DataObject
 	 *                - options
 	 *                - users
 	 *                - blogs
+	 *                - admin (levels "visible", "hidden")
 	 * @param string Requested permission level
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
 	 * @return boolean True on success (permission is granted), false if permission is not granted
@@ -420,6 +421,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/21 17:05:08  blueyed
+ * cleanup
+ *
  * Revision 1.3  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

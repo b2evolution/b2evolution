@@ -457,9 +457,9 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		// Remove deprecated cookies:
 		// We do not use $cookie_user / $cookie_pass (would be set in _obsolete092.php), because it
 		//  does not harm really (cookies time out) and would allow to set arbitrary cookies through
-		//  register_globals! (272851261 is the birthday of a lovely person ;)
-		setcookie( 'cookie'.$instance_name.'user', '', 272851261, $cookie_path, $cookie_domain );
-		setcookie( 'cookie'.$instance_name.'pass', '', 272851261, $cookie_path, $cookie_domain );
+		//  register_globals!
+		setcookie( 'cookie'.$instance_name.'user', '', 200000000, $cookie_path, $cookie_domain );
+		setcookie( 'cookie'.$instance_name.'pass', '', 200000000, $cookie_path, $cookie_domain );
 
 		if( ! empty($login_action) )
 		{ // We're coming from the Login form and need to redirect to the requested page:
@@ -577,6 +577,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.13  2006/04/21 17:05:08  blueyed
+ * cleanup
+ *
  * Revision 1.12  2006/04/20 22:24:07  blueyed
  * plugin hooks cleanup
  *

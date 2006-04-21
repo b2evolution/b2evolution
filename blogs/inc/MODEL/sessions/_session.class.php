@@ -249,7 +249,7 @@ class Session
 		$this->user_ID = NULL; // Unset user_ID after invalidating/saving the session above, to keep the user info attached to the old session.
 
 		// clean up the session cookie:
-		setcookie( $cookie_session, '', 272851261, $cookie_path, $cookie_domain ); // 272851261 being the birthday of a lovely person
+		setcookie( $cookie_session, '', 200000000, $cookie_path, $cookie_domain );
 	}
 
 
@@ -423,6 +423,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/21 17:05:08  blueyed
+ * cleanup
+ *
  * Revision 1.6  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
