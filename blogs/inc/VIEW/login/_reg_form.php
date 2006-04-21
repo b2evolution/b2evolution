@@ -44,20 +44,20 @@ $Form->hidden( 'redirect_to', $redirect_to );
 
 echo $Form->fieldstart;
 
-$Form->text( 'login', format_to_output($login, 'formvalue'), 16,  T_('Login'), '', 20, 'input_text' );
+$Form->text_input( 'login', $login, 16,  T_('Login'), array( 'maxlength'=>20, 'class'=>'input_text', 'required'=>true ) );
 ?>
 
 	<fieldset>
 		<div class="label"><label for="pass1"><?php echo T_('Password') ?><br /><?php echo T_('(twice)').'<br />' ?></label></div>
 		<div class="input">
-		<input type="password" name="pass1" id="pass1" size="16" maxlength="50" value="" class="input_text" />
-		<input type="password" name="pass2" id="pass2" size="16" maxlength="50" value="" class="input_text" />
+		<input type="password" name="pass1" id="pass1" size="16" maxlength="50" value="" class="input_text field_required" />
+		<input type="password" name="pass2" id="pass2" size="16" maxlength="50" value="" class="input_text field_required" />
 		<span class="notes"><?php printf( T_('Minimum %d characters, please.'), $Settings->get('user_minpwdlen') ) ?></span>
 		</div>
 	</fieldset>
 
 	<?php
-	$Form->text( 'email', format_to_output($email, 'formvalue'), 16,  T_('Email'), '', 100, 'input_text' );
+	$Form->text_input( 'email', $email, 16, T_('Email'), array( 'maxlength'=>100, 'class'=>'input_text', 'required'=>true ) );
 
 	$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
 
@@ -83,6 +83,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/21 16:56:36  blueyed
+ * Mark fields as required; small fix (double-encoding)
+ *
  * Revision 1.3  2006/04/19 20:13:52  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
