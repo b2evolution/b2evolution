@@ -41,6 +41,8 @@ require_once $inc_path.'_main.inc.php';
 
 <h1><?php echo T_('Welcome to b2evolution') ?></h1>
 
+<?php $Messages->disp(); ?>
+
 <p>
 	<?php echo T_('This is the default homepage for b2evolution. It will be displayed as long as you don\'t select a default blog in the general settings.');
 	?>
