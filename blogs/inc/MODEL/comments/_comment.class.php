@@ -50,6 +50,9 @@ class Comment extends DataObject
 	 * @var string Comment type: 'comment', 'linkback', 'trackback' or 'pingback'
 	 */
 	var $type;
+	/**
+	 * @var string Comment visibility status: 'published', 'deprecated', 'protected', 'private' or 'draft'
+	 */
 	var $status;
 	/**
 	 * @var string Name of the (anonymous) visitor (if any).
@@ -1034,6 +1037,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2006/04/21 23:14:16  blueyed
+ * Add Messages according to Comment's status.
+ *
  * Revision 1.25  2006/04/21 18:10:53  blueyed
  * todos
  *

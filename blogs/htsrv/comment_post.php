@@ -225,10 +225,20 @@ if( !is_logged_in() )
 $Comment->send_email_notifications();
 
 
+// Add a message, according to the comment's status:
+if( $Comment->status == 'published' )
+{
+	$Messages->add( T_('Your comment has been published.'), 'success' );
+}
+elseif( $Comment->status == 'draft' )
+{
+	$Messages->add( T_('Your comment has been added into the moderation queue.'), 'note' );
+}
+else
+{
+	$Messages->add( T_('Your comment has been deprecated.'), 'error' );
+}
 // Set Messages into user's session, so they get restored on the next page (after redirect):
-
-// TODO: look at $Comment->status and use different messages..
-$Messages->add( T_('Your comment has been submitted.'), 'success' );
 $Session->set( 'Messages', $Messages );
 
 
@@ -238,6 +248,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.69  2006/04/21 23:14:16  blueyed
+ * Add Messages according to Comment's status.
+ *
  * Revision 1.68  2006/04/21 18:10:53  blueyed
  * todos
  *

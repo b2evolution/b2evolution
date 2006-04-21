@@ -47,7 +47,7 @@ class CollectionSettings extends AbstractSettings
 	 * @access protected
 	 */
 	var $_defaults = array(
-			'new_feedback_status' => 'draft',
+			'new_feedback_status' => 'draft',  // 'draft', 'published' or 'deprecated'
 		);
 
 
@@ -63,6 +63,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.2  2006/04/21 23:14:16  blueyed
+ * Add Messages according to Comment's status.
+ *
  * Revision 1.1  2006/04/20 16:31:30  fplanque
  * comment moderation (finished for 1.8)
  *
