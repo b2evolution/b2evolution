@@ -113,6 +113,8 @@ if( $edit_Plugin->status != 'enabled' )
 	echo '<p class="notes">'.T_('Note: the plugin is not enabled.').'</p>';
 }
 
+echo '<p>'.T_('Warning: by disabling plugin events you change the behaviour of the plugin! Only change this, if you know what you are doing.').'</p>';
+
 $enabled_events = $admin_Plugins->get_enabled_events( $edit_Plugin->ID );
 $supported_events = $admin_Plugins->get_supported_events();
 $registered_events = $admin_Plugins->get_registered_events( $edit_Plugin );
@@ -160,6 +162,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.11  2006/04/21 16:58:11  blueyed
+ * Add warning to "disable plugin events".
+ *
  * Revision 1.10  2006/04/19 20:13:52  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
