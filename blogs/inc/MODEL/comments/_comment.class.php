@@ -833,6 +833,8 @@ class Comment extends DataObject
 	 * @todo shall we notify suscribers of blog were this is in extra-cat?
 	 * @todo cache message by locale
 	 * @todo Indicator in url to see where the user came from (&from=subnote ["subscription notification") - Problem: too long urls.
+	 * @todo "Beautify" like Item::send_email_notifications() ?
+	 * @todo Should include "visibility status" in the mail to the Item's Author
 	 */
 	function send_email_notifications()
 	{
@@ -840,6 +842,7 @@ class Comment extends DataObject
 
 		// Get list of users who want to be notfied:
 		// TODO: also use extra cats/blogs??
+		// TODO: this query looks like it does not respect visibilty status of the comment (and item)! (it should only get ignored for the Item's Author)
 		$sql = 'SELECT DISTINCT user_email, user_locale
 							FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
 						 WHERE sub_coll_ID = '.$this->Item->blog_ID.'
@@ -1031,6 +1034,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2006/04/21 18:10:53  blueyed
+ * todos
+ *
  * Revision 1.24  2006/04/20 00:00:21  blueyed
  * Fixed delete-link-button
  *

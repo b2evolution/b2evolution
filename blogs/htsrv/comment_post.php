@@ -226,7 +226,8 @@ $Comment->send_email_notifications();
 
 
 // Set Messages into user's session, so they get restored on the next page (after redirect):
-// TODO: look at $Comment->status and use different messages
+
+// TODO: look at $Comment->status and use different messages..
 $Messages->add( T_('Your comment has been submitted.'), 'success' );
 $Session->set( 'Messages', $Messages );
 
@@ -237,6 +238,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.68  2006/04/21 18:10:53  blueyed
+ * todos
+ *
  * Revision 1.67  2006/04/20 22:24:07  blueyed
  * plugin hooks cleanup
  *
