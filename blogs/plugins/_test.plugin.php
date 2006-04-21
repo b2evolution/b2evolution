@@ -318,6 +318,7 @@ class test_plugin extends Plugin
 		echo $this->text_from_AdminTabAction;
 
 		// TODO: this is tedious.. should either be a global function (get_admin_Form()) or a plugin helper..
+		// blueyed>> if noone speaks against it, I'll create get_admin_Form(), which generates the 4 lines below:
 		$Form = new Form();
 		$Form->begin_form();
 		$Form->hidden_ctrl(); // needed to pass the "ctrl=tools" param
@@ -470,7 +471,7 @@ class test_plugin extends Plugin
 	function LoginAttempt()
 	{
 		// $this->msg( 'NO LOGIN!', 'login_error' );
-		$this->msg( 'The TEST plugin welcomes you..', 'note' );
+		$this->msg( 'This the TEST plugin responding to the LoginAttempt event.', 'note' );
 	}
 
 
@@ -502,6 +503,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.34  2006/04/21 16:53:27  blueyed
+ * Bumping TODO, please comment.
+ *
  * Revision 1.33  2006/04/20 22:24:08  blueyed
  * plugin hooks cleanup
  *
