@@ -36,12 +36,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Includes:
  */
-require_once dirname(__FILE__).'/../dataobjects/_dataobjectcache.class.php';
+require_once $inc_path.'MODEL/generic/_genericcache.class.php';
 
 /**
  * GenericOrderedCache Class
  */
-class GenericOrderedCache extends GenericCache 
+class GenericOrderedCache extends GenericCache
 {
 	/**
 	 * Constructor
@@ -51,7 +51,7 @@ class GenericOrderedCache extends GenericCache
 		parent::GenericCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field );
 	}
 
-	
+
 	/**
 	 * Move up the element order in database
 	 *
@@ -61,9 +61,9 @@ class GenericOrderedCache extends GenericCache
 	function move_up_by_ID( $id )
 	{
 		global $DB, $Messages, $result_fadeout;
-		
+
 		$DB->begin();
-		
+
 		if( ($obj_sup = & $this->get_by_ID( $id )) === false )
 		{
 			$Messages->head = T_('Cannot edit entry!');
@@ -72,39 +72,39 @@ class GenericOrderedCache extends GenericCache
 			return false;
 		}
 		$order = $obj_sup->order;
-		
-		// Get the ID of the inferior element which his order is the nearest   	
+
+		// Get the ID of the inferior element which his order is the nearest
 		$rows = $DB->get_results( 'SELECT '.$this->dbIDname
 														 	.' FROM '.$this->dbtablename
-														 .' WHERE '.$this->dbprefix.'order < '.$order  
-													.' ORDER BY '.$this->dbprefix.'order DESC 
+														 .' WHERE '.$this->dbprefix.'order < '.$order
+													.' ORDER BY '.$this->dbprefix.'order DESC
 														 		LIMIT 0,1' );
-		
+
 		if( count( $rows ) )
 		{
 			// instantiate the inferior element
 			$obj_inf = & $this->get_by_ID( $rows[0]->{$this->dbIDname} );
-			
+
 			// Update element order
 			$obj_sup->set( 'order', $obj_inf->order );
 			$obj_sup->dbupdate();
-			
+
 			// Update inferior element order
 			$obj_inf->set( 'order', $order );
 			$obj_inf->dbupdate();
-			
+
 			// EXPERIMENTAL FOR FADEOUT RESULT
 			$result_fadeout[$this->dbIDname][] = $id;
 			$result_fadeout[$this->dbIDname][] = $obj_inf->ID;
 		}
-		else 
+		else
 		{
-			$Messages->add( T_('This element is already at the top.'), 'error' ); 
-		}	
+			$Messages->add( T_('This element is already at the top.'), 'error' );
+		}
 		$DB->commit();
 	}
-	
-	
+
+
 	/**
 	 * Move down the element order in database
 	 *
@@ -114,9 +114,9 @@ class GenericOrderedCache extends GenericCache
 	function move_down_by_ID( $id )
 	{
 		global $DB, $Messages, $result_fadeout;
-		
+
 		$DB->begin();
-		
+
 		if( ($obj_inf = & $this->get_by_ID( $id )) === false )
 		{
 			$Messages->head = T_('Cannot edit entry!');
@@ -125,37 +125,37 @@ class GenericOrderedCache extends GenericCache
 			return false;
 		}
 		$order = $obj_inf->order;
-		
-		// Get the ID of the inferior element which his order is the nearest   	
+
+		// Get the ID of the inferior element which his order is the nearest
 		$rows = $DB->get_results( 'SELECT '.$this->dbIDname
 														 	.' FROM '.$this->dbtablename
-														 .' WHERE '.$this->dbprefix.'order > '.$order  
-													.' ORDER BY '.$this->dbprefix.'order ASC 
+														 .' WHERE '.$this->dbprefix.'order > '.$order
+													.' ORDER BY '.$this->dbprefix.'order ASC
 														 		LIMIT 0,1' );
-		
+
 		if( count( $rows ) )
 		{
 			// instantiate the inferior element
 			$obj_sup = & $this->get_by_ID( $rows[0]->{$this->dbIDname} );
-			
+
 			//  Update element order
 			$obj_inf->set( 'order', $obj_sup->order );
 			$obj_inf->dbupdate();
-			
+
 			// Update inferior element order
 			$obj_sup->set( 'order', $order );
 			$obj_sup->dbupdate();
-			
+
 			// EXPERIMENTAL FOR FADEOUT RESULT
 			$result_fadeout[$this->dbIDname][] = $id;
 			$result_fadeout[$this->dbIDname][] = $obj_sup->ID;
 		}
-		else 
+		else
 		{
-			$Messages->add( T_('This element is already at the bottom.'), 'error' ); 
-		}	
+			$Messages->add( T_('This element is already at the bottom.'), 'error' );
+		}
 		$DB->commit();
 	}
-	
+
 }
 ?>
