@@ -237,12 +237,13 @@ switch( $action )
 				$Messages->add( T_('Sorry, the email with the link to validate and activate your password could not be sent.')
 							.'<br />'.T_('Possible reason: the mail() function is disabled.'), 'error' );
 			}
-			break;
 		}
-
-		if( empty($current_User->email) )
-		{ // add (error) note to be displayed in the form (where we'll add an extra )
-			$Messages->add( T_('You have no email address with your profile, therefore we cannot validate it. Please give your email address below.'), 'error' );
+		else
+		{ // Form not yet submitted:
+			if( empty($current_User->email) )
+			{ // add (error) note to be displayed in the form
+				$Messages->add( T_('You have no email address with your profile, therefore we cannot validate it. Please give your email address below.'), 'error' );
+			}
 		}
 
 		// Display retrieval form:
@@ -289,7 +290,7 @@ switch( $action )
 		$current_User->set( 'validated', 1 );
 		$current_User->dbupdate();
 
-		#$Session->delete( 'core.validatemail.request_id' );
+		$Session->delete( 'core.validatemail.request_id' );
 
 		$Messages->add( T_( 'Your email address has been validated.' ), 'success' );
 
@@ -348,6 +349,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.57  2006/04/22 02:54:37  blueyed
+ * Fixes: Always go to validatemail form; delete used request ID
+ *
  * Revision 1.56  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *
