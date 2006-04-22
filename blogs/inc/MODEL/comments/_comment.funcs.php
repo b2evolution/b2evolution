@@ -302,15 +302,18 @@ function comment_author_url_basedomain( $disp = true )
 {
 	global $commentdata;
 	$url = comment_author_url(false);
-	$baseDomain = getBaseDomain( $url );
+	$base_domain = get_base_domain( $url );
 	if( $disp )
-		echo $baseDomain;
+		echo $base_domain;
 	else
-		return $baseDomain;
+		return $base_domain;
 }
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/22 16:30:00  blueyed
+ * cleanup
+ *
  * Revision 1.2  2006/03/12 23:08:58  fplanque
  * doc cleanup
  *

@@ -56,7 +56,7 @@ while( $Comment = & $CommentList->get_next() )
 					&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{ // There is an URL and we have permission to ban...
 				// TODO: really ban the base domain! - not by keyword
-				echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(getBaseDomain($Comment->author_url))
+				echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_base_domain($Comment->author_url))
 					.'">'.get_icon( 'ban' ).'</a> ';
 			}
 			$Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
@@ -120,6 +120,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/22 16:30:02  blueyed
+ * cleanup
+ *
  * Revision 1.4  2006/04/19 20:06:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

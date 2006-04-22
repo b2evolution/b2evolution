@@ -153,7 +153,7 @@ class Hit
 
 		// Check the referer:
 		$this->detect_referer();
-		$this->referer_basedomain = getBaseDomain($this->referer);
+		$this->referer_basedomain = get_base_domain($this->referer);
 
 		if( $this->referer_basedomain )
 		{
@@ -455,7 +455,7 @@ class Hit
 	{
 		global $DB, $Session, $ReqURI, $Blog, $localtimenow, $Debuglog;
 
-		$referer_basedomain = getBaseDomain( $this->referer );
+		$referer_basedomain = get_base_domain( $this->referer );
 
 		$Debuglog->add( 'log(): Recording the hit.', 'hit' );
 
@@ -722,6 +722,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.16  2006/04/22 16:30:01  blueyed
+ * cleanup
+ *
  * Revision 1.15  2006/04/20 17:59:02  blueyed
  * Removed "spam" from hit_referer_type (DB) and summary stats
  *

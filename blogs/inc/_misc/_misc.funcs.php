@@ -2392,13 +2392,13 @@ function get_ip_list( $firstOnly = false )
  * @param string URL
  * @return string the base domain
  */
-function getBaseDomain( $url )
+function get_base_domain( $url )
 {
-	$baseDomain = preg_replace( '~^[a-z]+://~i', '', $url );
-	$baseDomain = preg_replace( '/^www\./i', '', $baseDomain );
-	$baseDomain = preg_replace( '~/.*~i', '', $baseDomain );
+	$base_domain = preg_replace( '~^[a-z]+://~i', '', $url );
+	$base_domain = preg_replace( '/^www\./i', '', $base_domain );
+	$base_domain = preg_replace( '~/.*~i', '', $base_domain );
 
-	return $baseDomain;
+	return $base_domain;
 }
 
 
@@ -2783,6 +2783,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.40  2006/04/22 16:30:02  blueyed
+ * cleanup
+ *
  * Revision 1.39  2006/04/22 02:29:26  blueyed
  * minor
  *
@@ -2821,7 +2824,7 @@ function base_tag( $url )
  * validate_url: todo; allow "%" in general
  *
  * Revision 1.27  2006/04/06 18:02:07  blueyed
- * Fixed getBaseDomain() for links with protocol != "http" (esp. https)
+ * Fixed get_base_domain() for links with protocol != "http" (esp. https)
  *
  * Revision 1.26  2006/04/05 19:16:35  blueyed
  * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
