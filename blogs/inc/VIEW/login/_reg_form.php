@@ -17,11 +17,15 @@
  * }}
  *
  * {@internal Open Source relicensing agreement:
+ * Daniel HAHLER grants Francois PLANQUE the right to license
+ * Daniel HAHLER's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package htsrv
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -57,7 +61,7 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), array( 'maxlength'=>20, 'c
 	</fieldset>
 
 	<?php
-	$Form->text_input( 'email', $email, 16, T_('Email'), array( 'maxlength'=>100, 'class'=>'input_text', 'required'=>true ) );
+	$Form->text_input( 'email', $email, 16, T_('Email'), array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
 
 	$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
 
@@ -83,6 +87,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/22 01:57:36  blueyed
+ * adjusted maxlength for email
+ *
  * Revision 1.4  2006/04/21 16:56:36  blueyed
  * Mark fields as required; small fix (double-encoding)
  *
