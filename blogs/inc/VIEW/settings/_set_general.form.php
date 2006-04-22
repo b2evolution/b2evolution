@@ -60,7 +60,6 @@ $Form->hidden( 'tab', 'general' );
 $Form->begin_fieldset( T_('Default user rights') );
 
 	$fieldgroup_disabled = (int)( ! $Settings->get('newusers_canregister') );
-	pre_dump( $fieldgroup_disabled );
 	$Form->checkbox_input( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), array(
 		'note' => T_('Check to allow new users to register themselves.' ),
 		'onclick' => 'var a = new Array( "newusers_mustvalidate", "newusers_grp_ID", "newusers_level" ); for( var i=0; i < a.length; i++ ) { document.getElementById(a[i]).disabled = ! this.checked; };' ) );
@@ -146,6 +145,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/22 03:12:35  blueyed
+ * cleanup
+ *
  * Revision 1.3  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *
