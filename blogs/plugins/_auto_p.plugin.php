@@ -92,7 +92,7 @@ class auto_p_plugin extends Plugin
 		$pee = preg_replace('|<br />\s*<br />|', "\n\n", $pee);	// Change double BRs to double newlines
 
 		// List of block elements (we want a paragraph before and after):
-		$this->block_tags = $block_tags = 'table|thead|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|blockquote|p|h[1-6]';
+		$this->block_tags = $block_tags = 'table|thead|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|blockquote|p|code|hr|fieldset|h[1-6]';
 
 		// Space things out a little (by two lines to force a <p> before/after):
 		$pee = preg_replace('!(<(?:'.$block_tags.')[^>]*>)!', "\n\n$1", $pee);
@@ -147,6 +147,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/22 01:30:26  blueyed
+ * Fix for HR, CODE and FIELDSET by balupton (http://forums.b2evolution.net/viewtopic.php?p=35709#35709)
+ *
  * Revision 1.9  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *
