@@ -32,7 +32,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 	}
 
 
-	function testMake_clickable()
+	function test_make_clickable()
 	{
 		foreach( array(
 				'http://b2evolution.net' => '<a href="http://b2evolution.net">http://b2evolution.net</a>',
@@ -46,6 +46,12 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 				'www. ' => 'www. ',
 				'www.example.org' => '<a href="http://www.example.org">www.example.org</a>',
 
+				'http://user@somewhere.com' => '<a href="http://user@somewhere.com">http://user@somewhere.com</a>',
+				'<a href="http://setiathome.berkeley.edu">SETI@Home</a>' => '<a href="http://setiathome.berkeley.edu">SETI@Home</a>',
+
+				'<a href="mailto:test@example.org">test@example.org</a>' => '<a href="mailto:test@example.org">test@example.org</a>',
+				'<a href="mailto:test@example.org">test@example.org</a>test2@example.org' => '<a href="mailto:test@example.org">test@example.org</a><a href="mailto:test2@example.org">test2@example.org</a>',
+				'mailto://postmaster' => '<a href="mailto://postmaster">mailto://postmaster</a>',
 				// aim:
 
 				// icq:

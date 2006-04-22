@@ -292,28 +292,96 @@ function convert_chars( $content, $flag='html' )
 
 
 /**
+ * Split $text into blocks by using $pattern and call $callback on the non-matching blocks.
+ *
+ * The non-matching block's text is the first param to $callback and additionally $params gets passed.
+ *
+ * @param string Text to handle
+ * @param string Regular expression pattern that defines blocks to exclude.
+ * @param string Function name to use as callback.
+ *               Each non-matching block gets passed as first param, additional params may be
+ *               passed with $params.
+ * @param array Of additional ("static") params to $callback.
+ * @return string
+ */
+function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = array() )
+{
+	if( preg_match_all( $pattern, $text, $matches, PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER ) )
+	{ // $pattern matches, call the callback method on each non-matching block
+		$pos = 0;
+		$new_r = '';
+
+		foreach( $matches[0] as $l_matching )
+		{
+			$pos_match = $l_matching[1];
+			$non_match = substr( $text, $pos, ($pos_match - $pos) );
+
+			// Callback:
+			$callback_params = $params;
+			array_unshift( $callback_params, $non_match );
+			$new_r .= call_user_func_array( $callback, $callback_params );
+
+			$new_r .= $l_matching[0];
+			$pos += strlen($non_match)+strlen($l_matching[0]);
+		}
+
+		// Callback:
+		$callback_params = $params;
+		array_unshift( $callback_params, substr( $text, $pos ) );
+		#pre_dump( $matches, $callback_params );
+		$new_r .= call_user_func_array( $callback, $callback_params );
+
+		return $new_r;
+	}
+
+	$callback_params = $params;
+	array_unshift( $callback_params, $text );
+	return call_user_func_array( $callback, $callback_params );
+}
+
+
+/**
  * Make links clickable in a given text.
  *
- * {@internal NOTE: its tested in the misc.funcs.simpletest.php test case }}
+ * It replaces only text which is not between <a> tags already.
+ *
+ * {@internal This function gets tested in misc.funcs.simpletest.php.}}
+ *
+ * @return string
+ */
+function make_clickable( $text, $moredelim = '&amp;' )
+{
+	$text = callback_on_non_matching_blocks( $text, '~<a[^>]*("[^"]"|\'[^\']\')?[^>]*>.*?</a>~is', 'make_clickable_callback', array( $moredelim ) );
+
+	return $text;
+}
+
+
+/**
+ * Callback function for {@link make_clickable()}.
  *
  * @todo IMHO it would be better to use "\b" (word boundary) to match the beginning of links..
  *
  * original function: phpBB, extended here for AIM & ICQ
  * fplanque restricted :// to http:// and mailto://
+ * Fixed to not include trailing dot and comma.
+ *
+ * @return string The clickable text.
  */
-function make_clickable( $text, $moredelim = '&amp;' )
+function make_clickable_callback( & $text, $moredelim = '&amp;' )
 {
+	$pattern_domain = '([a-z0-9\-]+\.[a-z0-9\-.\~]+)'; // a domain name (not very strict)
 	$text = preg_replace(
 		array( '#(^|[\s>])(https?|mailto)://([^<>{}\s]+[^.,<>{}\s])#i',
 			'#(^|[\s>])aim:([^,<\s]+)#i',
 			'#(^|[\s>])icq:(\d+)#i',
-			'#(^|[\s>])www\.([a-z0-9\-]+)\.([a-z0-9\-.\~]+)((?:/[^<\s]*)?[^.,\s])#i',
-			'#(^|[\s>])([a-z0-9\-_.]+?)@([^,<\s]+)#i', ),
+			'#(^|[\s>])www\.'.$pattern_domain.'((?:/[^<\s]*)?[^.,\s])#i',
+			'#(^|[\s>])([a-z0-9\-_.]+?)@'.$pattern_domain.'([^.,<\s]+)#i', ),
 		array( '$1<a href="$2://$3">$2://$3</a>',
 			'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.rawurlencode(T_('Hello')).'">$2$3</a>',
 			'$1<a href="http://wwp.icq.com/scripts/search.dll?to=$2">$2</a>',
-			'$1<a href="http://www.$2.$3$4">www.$2.$3$4</a>',
-			'$1<a href="mailto:$2@$3">$2@$3</a>', ),
+			'$1<a href="http://www.$2$3$4">www.$2$3$4</a>',
+			'$1<a href="mailto:$2@$3$4">$2@$3$4</a>', ),
 		$text );
 
 	return $text;
@@ -2783,6 +2851,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.41  2006/04/22 16:42:12  blueyed
+ * Fixes for make_clickable
+ *
  * Revision 1.40  2006/04/22 16:30:02  blueyed
  * cleanup
  *
