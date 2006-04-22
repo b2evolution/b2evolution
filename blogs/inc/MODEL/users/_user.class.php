@@ -71,6 +71,11 @@ class User extends DataObject
 	var $allow_msgform;
 
 	/**
+	 * @var boolean Has the user been validated (by email)?
+	 */
+	var $validated;
+
+	/**
 	 * Number of posts by this user. Use get_num_posts() to access this (lazy filled).
 	 * @var integer|NULL
 	 * @access protected
@@ -142,6 +147,7 @@ class User extends DataObject
 			$this->browser = '';
 			$this->set( 'level', isset( $Settings ) ? $Settings->get('newusers_level') : 0 );
 			$this->set( 'allow_msgform', 1 );
+			$this->set( 'validated', 0 );
 			$this->set( 'notify', 1  );
 			$this->set( 'showonline', 1 );
 			if( isset($localtimenow) )
@@ -181,6 +187,7 @@ class User extends DataObject
 			$this->datecreated = $db_row->dateYMDhour;
 			$this->level = $db_row->user_level;
 			$this->allow_msgform = $db_row->user_allow_msgform;
+			$this->validated = $db_row->user_validated;
 			$this->notify = $db_row->user_notify;
 			$this->showonline = $db_row->user_showonline;
 
@@ -347,6 +354,7 @@ class User extends DataObject
 			case 'level':
 			case 'notify':
 			case 'showonline':
+			case 'validated':
 				return parent::set_param( $parname, 'number', $parvalue );
 
 			default:
@@ -370,6 +378,37 @@ class User extends DataObject
 		$this->datecreated = $datecreated;
 		// Remmeber change for later db update:
 		$this->dbchange( 'dateYMDhour', 'string', 'datecreated' );
+	}
+
+
+	/**
+	 * Set email address of the user.
+	 *
+	 * @todo Do we want this? This would make sure, that the email address is always valid.
+	 *       If the email address has changed, the user's account gets invalidated.
+	 *
+	 * @param string email address to set for the User
+	 * @return boolean true, if a value has been set; false if it has not changed
+	 */
+	function set_email( $email )
+	{
+		$r1 = parent::set_param( 'email', 'string', $email );
+
+		return $r1;
+
+		/*
+		TODO: to be discussed/decided:
+		if( $r1 )
+		{ // In-validate account, because (changed) email has not been verified yet:
+			$r2 = parent::set_param( 'validated', 'number', 0 );
+		}
+		else
+		{
+			$r2 = NULL;
+		}
+
+		return ($r1 || $r2);
+		*/
 	}
 
 
@@ -725,6 +764,43 @@ class User extends DataObject
 	}
 
 
+	/**
+	 * Send an email to the user with a link to validate/confirm his email address.
+	 *
+	 * If the email could get sent, it saves the used "request_id" into the user's Session.
+	 *
+	 * @return boolean True, if the email could get sent; false if not
+	 */
+	function send_validate_email()
+	{
+		global $app_name, $htsrv_url, $Session;
+
+		$request_id = generate_random_key(22);
+
+		$message = T_('You need to validate your email address by clicking on the following link.')
+			."\n\n"
+			.T_('Login:')." $this->login\n"
+			.sprintf( /* TRANS: %s gets replaced by $app_name (normally "b2evolution") */ T_('Link to validate your %s account:'), $app_name )
+			."\n"
+			.$htsrv_url.'login.php?action=validatemail'
+				.'&reqID='.$request_id
+				.'&sessID='.$Session->ID  // used to detect cookie problems
+			."\n\n"
+			.T_('Please note:')
+			.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).');
+
+		$r = send_mail( $this->email, sprintf( T_('Validate your account email address for %s'), $this->login ), $message );
+
+		if( $r )
+		{ // save request_id into Session
+			$Session->set( 'core.validatemail.request_id', $request_id, 86400 * 2 ); // expires in two days (or when clicked)
+			$Session->dbsave(); // save immediately
+		}
+
+		return $r;
+	}
+
+
 	// Template functions {{{
 
 	/**
@@ -944,6 +1020,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.11  2006/04/19 22:39:08  blueyed
  * Only add status messages about media_dir creation if on an admin page.
  *

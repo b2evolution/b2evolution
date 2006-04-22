@@ -55,7 +55,7 @@ class test_plugin extends Plugin
 	var $priority = 50;
 	var $version = 'CVS $Revision$';
 	var $author = 'The b2evo Group';
-	var $help_url = 'http://manual.b2evolution.net/Plugins/test_plugin';
+	var $help_url = '';  // empty URL defaults to manual wiki, in this case: http://manual.b2evolution.net/Plugins/test_plugin';
 
 	/*
 	 * These variables MAY be overriden.
@@ -498,11 +498,23 @@ class test_plugin extends Plugin
 		}
 	}
 
+
+	/**
+	 * @see Plugin::DisplayValidateAccountFormFieldset()
+	 */
+	function DisplayValidateAccountFormFieldset( & $params )
+	{
+		$params['Form']->info( 'TEST plugin', 'This is the TEST plugin responding to the ValidateAccountFormSent event.' );
+	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.35  2006/04/22 02:36:39  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.34  2006/04/21 16:53:27  blueyed
  * Bumping TODO, please comment.
  *

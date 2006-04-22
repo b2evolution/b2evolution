@@ -89,7 +89,7 @@ switch( $action )
 			$new_User->set( 'login', $login );
 			$new_User->set( 'pass', md5($pass1) ); // encrypted
 			$new_User->set( 'nickname', $login );
-			$new_User->set( 'email', $email );
+			$new_User->set_email( $email );
 			$new_User->set( 'ip', $Hit->IP );
 			$new_User->set( 'domain', $Hit->get_remote_host( true ) );
 			$new_User->set( 'browser', $Hit->user_agent );
@@ -139,6 +139,19 @@ switch( $action )
 				$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
 			}
 
+			if( $Settings->get('newusers_mustvalidate') )
+			{ // We want that the user validates his email address:
+				if( $new_User->send_validate_email() )
+				{
+					$Messages->add( T_('An email has been sent to your email address. Please click the link therein to validate your account.'), 'success' );
+				}
+				else
+				{
+					$Messages->add( T_('Sorry, the email with the link to validate and activate your password could not be sent.')
+						.'<br />'.T_('Possible reason: the mail() function is disabled.'), 'error' );
+				}
+			}
+
 			// Display confirmation screen:
 			require $view_path.'login/_reg_complete.php';
 
@@ -166,6 +179,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.63  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.62  2006/04/21 17:05:08  blueyed
  * cleanup
  *

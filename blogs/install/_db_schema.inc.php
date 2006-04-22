@@ -83,6 +83,7 @@ $schema_queries = array(
 			user_notify tinyint(1) NOT NULL default 1,
 			user_showonline tinyint(1) NOT NULL default 1,
 			user_grp_ID int(4) NOT NULL default 1,
+			user_validated TINYINT(1) NOT NULL DEFAULT 0,
 			PRIMARY KEY user_ID (user_ID),
 			UNIQUE user_login (user_login),
 			KEY user_grp_ID (user_grp_ID)
@@ -600,6 +601,9 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.16  2006/04/22 02:36:39  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.15  2006/04/20 17:59:02  blueyed
  * Removed "spam" from hit_referer_type (DB) and summary stats
  *

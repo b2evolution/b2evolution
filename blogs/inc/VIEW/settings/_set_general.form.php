@@ -47,7 +47,9 @@ global $BlogCache;
 
 $Form = & new Form( NULL, 'settings_checkchanges' );
 
-$Form->begin_form( 'fform', T_('General Settings') );
+$Form->begin_form( 'fform', T_('General Settings'),
+	// enable all form elements on submit (so values get sent):
+	array( 'onsubmit'=>'var es=this.elements; for( var i=0; i < es.length; i++ ) { es[i].disabled=false; };' ) );
 
 $Form->hidden( 'ctrl', 'settings' );
 $Form->hidden( 'action', 'update' );
@@ -57,12 +59,24 @@ $Form->hidden( 'tab', 'general' );
 
 $Form->begin_fieldset( T_('Default user rights') );
 
-	$Form->checkbox( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), T_('Check to allow new users to register themselves.' ) );
+	$fieldgroup_disabled = (int)( ! $Settings->get('newusers_canregister') );
+	pre_dump( $fieldgroup_disabled );
+	$Form->checkbox_input( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), array(
+		'note' => T_('Check to allow new users to register themselves.' ),
+		'onclick' => 'var a = new Array( "newusers_mustvalidate", "newusers_grp_ID", "newusers_level" ); for( var i=0; i < a.length; i++ ) { document.getElementById(a[i]).disabled = ! this.checked; };' ) );
+
+	$Form->checkbox( 'newusers_mustvalidate', $Settings->get('newusers_mustvalidate'), T_('Validate new users'), T_('Check to have new users validate themselves through clicking a link in an email.' ) );
 
 	$Form->select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
 
 	$Form->text_input( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), array( 'note'=>T_('Levels determine hierarchy of users in blogs.' ), 'maxlength'=>1, 'required'=>true ) );
 
+	// Disable fieldgroup if first option not checked:
+	?>
+	<script type="text/javascript">
+		var a = new Array( "newusers_mustvalidate", "newusers_grp_ID", "newusers_level" ); for( var i=0; i < a.length; i++ ) { var d = ! document.getElementById("newusers_canregister").checked; document.getElementById(a[i]).disabled = d; };
+	</script>
+	<?php
 $Form->end_fieldset();
 
 
@@ -132,6 +146,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.2  2006/04/19 20:13:52  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

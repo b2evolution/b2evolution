@@ -218,6 +218,8 @@ class Plugins
 	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
 	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
 	 *  - PluginVersionChanged (Called when we detect a version change)
+	 *
+	 *  The max length of event names is 40 chars (T_pluginevents.pevt_event).
 	 * }}
 	 *
 	 * @return array Name of event (key) => description (value)
@@ -278,6 +280,7 @@ class Plugins
 				'DisplayMessageFormFieldset' => '',
 				'DisplayLoginFormFieldset' => T_('Called when displaying the "Login" form.'),
 				'DisplayRegisterFormFieldset' => T_('Called when displaying the "Register" form.'),
+				'DisplayValidateAccountFormFieldset' => T_('Called when displaying the "Validate account" form.'),
 
 				'CommentFormSent' => T_('Called when a public comment form has been submitted.'),
 				'AfterCommentFormInsert' => T_('Called after a comment has been added through public form.'),
@@ -294,6 +297,7 @@ class Plugins
 				'CaptchaPayload' => T_('Provide a turing test to detect humans.'),
 
 				'RegisterFormSent' => T_('Called when the "Register" form has been submitted.'),
+				'ValidateAccountFormSent' => T_('Called when the "Validate account" form has been submitted.'),
 				'AppendUserRegistrTransact' => T_('Gets appended to the transaction that creates a new user on registration.'),
 				'AfterUserRegistration' => T_('Gets called after a new user has registered.'),
 
@@ -1027,7 +1031,7 @@ class Plugins
 			$this->sorted_IDs[] = & $Plugin->ID;
 		}
 
-		// Stuff only for real/existing Plugins:
+		// Stuff only for real/existing Plugins (which exist in DB):
 		if( $Plugin->ID > 0 )
 		{
 			// Instantiate the Plugins (User)Settings members:
@@ -2531,6 +2535,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.32  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.31  2006/04/20 22:24:08  blueyed
  * plugin hooks cleanup
  *

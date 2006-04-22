@@ -77,7 +77,7 @@ if( $Messages->count( 'error' ) )
 
 
 // Do the profile update:
-$current_User->set( 'email', $newuser_email );
+$current_User->set_email( $newuser_email );
 $current_User->set( 'notify', $newuser_notify );
 
 $current_User->dbupdate();
@@ -116,6 +116,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.12  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.11  2006/04/20 12:15:32  fplanque
  * no message
  *

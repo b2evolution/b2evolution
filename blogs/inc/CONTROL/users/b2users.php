@@ -301,7 +301,7 @@ if( !$Messages->count('error') )
 			{ // locale value has changed for the current user
 				$reload_page = true;
 			}
-			$edited_User->set( 'email', $edited_user_email );
+			$edited_User->set_email( $edited_user_email );
 			$edited_User->set( 'url', $edited_user_url );
 			$edited_User->set( 'icq', $edited_user_icq );
 			$edited_User->set( 'aim', $edited_user_aim );
@@ -318,7 +318,7 @@ if( !$Messages->count('error') )
 			$Request->param( 'edited_user_legend', 'integer', 0 );
 			$Request->param( 'edited_user_bozo', 'integer', 0 );
 			$Request->param( 'edited_user_focusonfirst', 'integer', 0 );
-			
+
       // Action icon params:
 			$UserSettings->set( 'action_icon_threshold', $edited_user_action_icon_threshold, $edited_User->ID );
 			$UserSettings->set( 'action_word_threshold', $edited_user_action_word_threshold, $edited_User->ID );
@@ -682,6 +682,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.16  2006/04/19 20:13:49  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

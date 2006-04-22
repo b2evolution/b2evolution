@@ -27,25 +27,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-param( 'redirect_to', 'string', str_replace( '&', '&amp;', $ReqURI ) ); // Note: if $redirect_to is already set, param() will not touch it.
-param( 'login', 'string', '' ); // last typed login
-
-
-if( preg_match( '#login.php([&?].*)?$#', $redirect_to ) )
-{ // avoid "endless loops"
-	$redirect_to = str_replace( '&', '&amp;', $admin_url );
-}
-// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
-$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
-
-if( $Session->has_User() )
-{ // The user is already logged in...
-	$tmp_User = & $Session->get_User();
-	$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
-		.' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>', 'note' );
-}
-
-
 /**
  * Include page header (also displays Messages):
  */
@@ -53,14 +34,6 @@ $page_title = T_('Login form');
 $page_icon = 'icon_login.gif';
 require dirname(__FILE__).'/_header.php';
 
-
-if( strpos( $redirect_to, str_replace('&', '&amp;', $admin_url) ) === 0 )
-{ // don't provide link to bypass
-	$login_required = true;
-}
-
-
-$Debuglog->add( 'redirect_to: '.$redirect_to );
 
 // The login form has to point back to itself, in case $htsrv_url is a "https" link and $redirect_to is not!
 $Form = & new Form( $htsrv_url.'login.php', '', 'post', 'fieldset' );
@@ -145,6 +118,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.6  2006/04/20 22:13:48  blueyed
  * Display "Register..." link in login form also if user is logged in already.
  *

@@ -460,22 +460,11 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		//  register_globals!
 		setcookie( 'cookie'.$instance_name.'user', '', 200000000, $cookie_path, $cookie_domain );
 		setcookie( 'cookie'.$instance_name.'pass', '', 200000000, $cookie_path, $cookie_domain );
-
-		if( ! empty($login_action) )
-		{ // We're coming from the Login form and need to redirect to the requested page:
-			param( 'redirect_to', 'string', $baseurl );
-
-			if( $login_action == 'redirect_to_backoffice' )
-			{ // user pressed the "Log into backoffice!" button
-				$redirect_to = $admin_url;
-			}
-
-			header_redirect( $redirect_to );
-			exit();
-		}
 	}
 }
-elseif( empty($login) && $Session->has_User() )
+elseif( $Session->has_User() /* logged in */
+	&& /* No login param given or the same as current user: */
+	( empty($login) || ( ( $tmp_User = & $UserCache->get_by_ID($Session->user_ID) ) && $login == $tmp_User->login ) ) )
 { /* if the session has a user assigned to it:
 	 * User was not trying to log in, but he was already logged in:
 	 */
@@ -485,7 +474,7 @@ elseif( empty($login) && $Session->has_User() )
 	$Debuglog->add( 'Was already logged in... ['.$current_User->get('login').']', 'login' );
 }
 else
-{ // The Session has no user or $login is given, allow alternate authentication through Plugin:
+{ // The Session has no user or $login is given (and differs from current user), allow alternate authentication through Plugin:
 	if( ($event_return = $Plugins->trigger_event_first_true( 'AlternateAuthentication' ))
 	    && $Session->has_User()  # the plugin should have attached the user to $Session
 	)
@@ -507,14 +496,39 @@ else
 }
 unset($pass);
 
-// Trigger plugin event that allows the plugins to re-act on this:
-if( isset($current_User) )
+
+// Check if the user needs to be validated, but is not yet:
+if( ! empty($current_User) && ! $current_User->validated && $Settings->get('newusers_mustvalidate') && $Request->param('action', 'string', '') != 'logout' )
 {
-	$Plugins->trigger_event( 'AfterLoginRegisteredUser', array() );
+	if( $action != 'req_validatemail' && $action != 'validatemail' )
+	{ // we're not in that action already:
+		$action = 'req_validatemail'; // for login.php
+		$Messages->add( sprintf( /* TRANS: %s gets replaced by the user's email address */ T_('You have not validated your email address (%s) yet.'), $current_User->dget('email') ), 'login_error' );
+	}
 }
 else
-{
-	$Plugins->trigger_event( 'AfterLoginAnonymousUser', array() );
+{ // Trigger plugin event that allows the plugins to re-act on the login event:
+	if( empty($current_User) )
+	{
+		$Plugins->trigger_event( 'AfterLoginAnonymousUser', array() );
+	}
+	else
+	{
+		$Plugins->trigger_event( 'AfterLoginRegisteredUser', array() );
+
+		if( ! empty($login_action) )
+		{ // We're coming from the Login form and need to redirect to the requested page:
+			param( 'redirect_to', 'string', $baseurl );
+
+			if( $login_action == 'redirect_to_backoffice' )
+			{ // user pressed the "Log into backoffice!" button
+				$redirect_to = $admin_url;
+			}
+
+			header_redirect( $redirect_to );
+			exit();
+		}
+	}
 }
 
 if( $Messages->count( 'login_error' ) )
@@ -577,6 +591,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.14  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.13  2006/04/21 17:05:08  blueyed
  * cleanup
  *

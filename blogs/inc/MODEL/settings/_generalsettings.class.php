@@ -77,8 +77,11 @@ class GeneralSettings extends AbstractSettings
 
 		'hit_doublecheck_referer' => '0',
 		'links_extrapath' => '0',
+
 		'newusers_canregister' => '0',
+		'newusers_mustvalidate' => '1',
 		'newusers_level' => '1',
+
 		'permalink_type' => 'urltitle',
 		'posts_per_page' => '5',
 		'regexp_filename' => '^[a-zA-Z0-9\-_.]+$', // TODO: accept spaces and special chars / do full testing on this
@@ -143,6 +146,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.5  2006/04/20 14:32:46  blueyed
  * cleanup
  *

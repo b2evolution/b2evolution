@@ -215,6 +215,7 @@ class ldap_plugin extends Plugin
 				$NewUser->set( 'login', $params['login'] );
 				$NewUser->set( 'nickname', $params['login'] );
 				$NewUser->set( 'pass', $params['pass_md5'] );
+				$NewUser->set( 'validated', 1 ); // assume the user to be validated (through email link)
 
 				if( isset($search_info[0]['givenname'][0]) )
 				{
@@ -226,7 +227,7 @@ class ldap_plugin extends Plugin
 				}
 				if( isset($search_info[0]['mail'][0]) )
 				{
-					$NewUser->set( 'email', $search_info[0]['mail'][0] );
+					$NewUser->set_email( $search_info[0]['mail'][0] );
 				}
 				$NewUser->set( 'idmode', 'namefl' );
 				$NewUser->set( 'locale', locale_from_httpaccept() ); // use the browser's locale
@@ -333,6 +334,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.22  2006/04/22 02:36:39  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.21  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

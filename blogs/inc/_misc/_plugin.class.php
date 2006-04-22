@@ -927,7 +927,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called when a comment form got submitted.
+	 * Event handler: Called when a comment form has been submitted.
 	 *
 	 * Use this, to validate a comment: you could {@link Plugin::msg() add a message} of
 	 * category "error" here, to prevent the comment from being inserted.
@@ -1044,7 +1044,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called when a message form got submitted.
+	 * Event handler: Called when a message form has been submitted.
 	 *
 	 * Add messages of category "error" to prevent the message from being sent.
 	 *
@@ -1338,7 +1338,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called when a "Register as new user" form got submitted.
+	 * Event handler: Called when a "Register as new user" form has been submitted.
 	 *
 	 * You can cancel the registration process by {@link Plugin::msg() adding a message}
 	 * of type "error".
@@ -1355,7 +1355,7 @@ class Plugin
 	 * in {@link LoginAttempt()}.
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'Form': the comment form generating object
+	 *   - 'Form': the comment form generating object (by reference)
 	 */
 	function DisplayLoginFormFieldset( & $params )
 	{
@@ -1378,6 +1378,32 @@ class Plugin
 	 *   - 'pass_md5': user's md5 password
 	 */
 	function LoginAttempt( $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the "Validate user account" form, which gets
+	 *                invoked if newusers_mustvalidate is enabled and the user has not
+	 *                been validated yet.
+	 *
+	 * The corresponding action event is {@link Plugin::ValidateAccountFormSent()}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the comment form generating object (by reference)
+	 */
+	function DisplayValidateAccountFormFieldset( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called when a "Validate user account" form has been submitted.
+	 *
+	 * You can cancel the registration process by {@link Plugin::msg() adding a message}
+	 * of type "error".
+	 */
+	function ValidateAccountFormSent( & $params )
 	{
 	}
 
@@ -1932,6 +1958,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.33  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.32  2006/04/20 22:24:08  blueyed
  * plugin hooks cleanup
  *

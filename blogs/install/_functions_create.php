@@ -591,7 +591,8 @@ function populate_main_tables()
 	}
 	$User_Admin->set( 'pass', md5($random_password) );	// random
 	$User_Admin->set( 'nickname', 'admin' );
-	$User_Admin->set( 'email', $admin_email );
+	$User_Admin->set_email( $admin_email );
+	$User_Admin->set( 'validated', 1 ); // assume it's validated
 	$User_Admin->set( 'ip', '127.0.0.1' );
 	$User_Admin->set( 'domain', 'localhost' );
 	$User_Admin->set( 'level', 10 );
@@ -605,7 +606,8 @@ function populate_main_tables()
 	$User_Demo->set( 'login', 'demouser' );
 	$User_Demo->set( 'pass', md5($random_password) ); // random
 	$User_Demo->set( 'nickname', 'Mr. Demo' );
-	$User_Demo->set( 'email', $admin_email );
+	$User_Demo->set_email( $admin_email );
+	$User_Demo->set( 'validated', 1 ); // assume it's validated
 	$User_Demo->set( 'ip', '127.0.0.1' );
 	$User_Demo->set( 'domain', 'localhost' );
 	$User_Demo->set( 'level', 0 );
@@ -912,6 +914,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.186  2006/04/22 02:36:39  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.185  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

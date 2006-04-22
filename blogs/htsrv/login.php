@@ -43,15 +43,17 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
-param( 'action', 'string', '' );
-param( 'mode', 'string', '' );
+$Request->param( 'action', 'string', '' );
+$Request->param( 'mode', 'string', '' );
 // bookmarklet stuff:
-param( 'text', 'html', '' );
-param( 'popupurl', 'string', '' );
-param( 'popuptitle', 'string', '' );
+$Request->param( 'text', 'html', '' );
+$Request->param( 'popupurl', 'string', '' );
+$Request->param( 'popuptitle', 'string', '' );
 
-param( 'login', 'string', '', false, true ); // override
+$Request->param( 'login', 'string', '' );
 // echo 'login: ', $login;
+
+$Request->param( 'redirect_to', 'string', '' ); // gets used by header_redirect(); if appropriate (perms) we let it default to $admin_url
 
 
 switch( $action )
@@ -61,14 +63,12 @@ switch( $action )
 
 		// TODO: to give the user feedback through Messages, we would need to start a new $Session here and append $Messages to it.
 
-		header_nocache();  // defaults to redirect_to param
-		header_redirect(); // exits
+		header_nocache();
+		header_redirect(); // defaults to redirect_to param and exits
 		/* exited */
 
 
 	case 'lostpassword': // Lost password:
-		param( 'redirect_to', 'string', $admin_url );
-
 		// Display retrieval form:
 		require $view_path.'login/_lostpass_form.php';
 
@@ -77,75 +77,74 @@ switch( $action )
 
 	case 'retrievepassword': // Send passwort change request by mail
 		$login_required = true; // Do not display "Without login.." link on the form
-		param( 'redirect_to', 'string', $admin_url );
 
 		$ForgetfulUser = & $UserCache->get_by_login( $login );
 
-		if( $ForgetfulUser )
-		{ // User exists
-			// echo 'email: ', $ForgetfulUser->email;
-			// echo 'locale: '.$ForgetfulUser->locale;
+		if( ! $ForgetfulUser )
+		{ // User does not exist
+			// pretend that the email is sent for avoiding guessing user_login
+			$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
+			break;
+		}
 
-			if( $demo_mode && ($ForgetfulUser->login == 'demouser' || $ForgetfulUser->ID == 1) )
+		// echo 'email: ', $ForgetfulUser->email;
+		// echo 'locale: '.$ForgetfulUser->locale;
+
+		if( $demo_mode && ($ForgetfulUser->login == 'demouser' || $ForgetfulUser->ID == 1) )
+		{
+			$Messages->add( T_('You cannot reset this account in demo mode.'), 'error' );
+			break;
+		}
+
+		locale_temp_switch( $ForgetfulUser->locale );
+
+		// DEBUG!
+		// echo $message.' (password not set yet, only when sending email does not fail);
+
+		if( empty( $ForgetfulUser->email ) )
+		{
+			$Messages->add( T_('You have no email address with your profile, therefore we cannot reset your password.')
+				.' '.T_('Please try contacting the admin.'), 'error' );
+		}
+		else
+		{
+			$request_id = generate_random_key(22);
+
+			$message = T_( 'Somebody (presumably you) has requested a password change for your account.' )
+				."\n\n"
+				.T_('Login:')." $login\n"
+				.T_('Link to change your password:')
+				."\n"
+				.$htsrv_url.'login.php?action=changepwd'
+					.'&login='.rawurlencode( $ForgetfulUser->login )
+					.'&reqID='.$request_id
+					.'&sessID='.$Session->ID  // used to detect cookie problems
+				."\n\n"
+				.T_('Please note:')
+				.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')
+				."\n\n"
+				.T_('If it was not you that requested this password change, simply ignore this mail.');
+
+			if( ! send_mail( $ForgetfulUser->email, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
 			{
-				$Messages->add( T_('You cannot reset this account in demo mode.'), 'error' );
-				break;
-			}
-
-			locale_temp_switch( $ForgetfulUser->locale );
-
-			// DEBUG!
-			// echo $message.' (password not set yet, only when sending email does not fail);
-
-			if( empty( $ForgetfulUser->email ) )
-			{
-				$Messages->add( T_('You have no email address with your profile, therefore we cannot reset your password.')
-					.' '.T_('Please try contacting the admin.'), 'error' );
+				$Messages->add( T_('Sorry, the email with the link to reset your password could not be sent.')
+					.'<br />'.T_('Possible reason: the mail() function is disabled.'), 'error' );
 			}
 			else
 			{
-				$request_id = generate_random_key(22);
+				$Session->set( 'core.changepwd.request_id', $request_id, 86400 * 2 ); // expires in two days (or when clicked)
+				$Session->dbsave(); // save immediately
 
-				$message = T_( 'Somebody (presumably you) has requested a password change for your account.' )
-					."\n\n"
-					.T_('Login:')." $login\n"
-					.T_('Link to change your password:')
-					."\n"
-					.$htsrv_url.'login.php?action=changepwd'
-						.'&login='.rawurlencode( $ForgetfulUser->login )
-						.'&reqID='.$request_id
-						.'&sessID='.$Session->ID  // used to detect cookie problems
-					."\n\n"
-					.T_('Please note:')
-					.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')
-					."\n\n"
-					.T_('If it was not you that requested this password change, simply ignore this mail.');
-
-				if( ! send_mail( $ForgetfulUser->email, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
-				{
-					$Messages->add( T_('The email could not be sent.')
-						.'<br />'.T_('Possible reason: your host may have disabled the mail() function...'), 'error' );
-				}
-				else
-				{
-					$Session->set( 'core.changepwd.request_id', $request_id, 86400 * 2 ); // expires in two days (or when clicked)
-					$Session->dbsave(); // save immediately
-
-					$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
-				}
+				$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
 			}
+		}
 
-			locale_restore_previous();
-		}
-		else
-		{ // pretend that the email is sent for avoiding guessing user_login
-			$Messages->add( T_('A link to change your password has been sent to your email address.' ), 'success' );
-		}
+		locale_restore_previous();
+
 		break;
 
 
 	case 'changepwd': // Clicked "Change password request" link from a mail
-		param( 'redirect_to', 'string', $admin_url );
 		param( 'reqID', 'string', '' );
 		param( 'sessID', 'integer', '' );
 
@@ -159,7 +158,7 @@ switch( $action )
 
 		if( $sessID != $Session->ID )
 		{ // Another session ID than for requesting password change link used!
-			$Messages->add( sprintf( T_('You will have to accept cookies in order to log in.') ), 'error' );
+			$Messages->add( T_('You have to use the same session (by means of your session cookie) as when you have requested the action.'), 'error' );
 			break;
 		}
 
@@ -169,7 +168,7 @@ switch( $action )
 			$Messages->add( T_('Invalid password change request!'), 'error' );
 			$Messages->add(
 				sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
-				$htsrv_url.'login.php?action=retrievepassword&amp;login='.$login.'&amp;redirect_to='.rawurlencode( $redirect_to ) ), 'note' );
+				$htsrv_url.'login.php?action=retrievepassword&amp;login='.rawurlencode($login) ), 'note' );
 
 			$login_required = true; // Do not display "Without login.." link on the form
 			break;
@@ -183,7 +182,10 @@ switch( $action )
 		$Session->set( 'Messages', $Messages );
 		$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 
+		// Note: the 'core.changepwd.request_id' Session setting gets removed in b2users.php
+
 		// Redirect to the user's profile in the "users" controller:
+		// TODO: This will probably fail if the user has no admin-access permission! Redirect to profile page in blog instead!?
 		header_nocache();
 		header_redirect( url_add_param( $admin_url, 'ctrl=users&user_ID='.$ForgetfulUser->ID, '&' ) ); // display user's profile
 
@@ -191,7 +193,153 @@ switch( $action )
 
 		break;
 
+
+	case 'req_validatemail': // Send email validation link by mail (initial form and action)
+		if( ! $Settings->get('newusers_mustvalidate') )
+		{ // validating emails is not activated/necessary
+			break;
+		}
+
+		if( ! is_logged_in() )
+		{
+			$Messages->add( T_('You have to be logged in to request an account validation link.'), 'error' );
+			break;
+		}
+
+		$Request->param( 'req_validatemail_submit', 'integer', 0 ); // has the form been submitted
+		$Request->param( 'email', 'string', $current_User->email ); // the email address is editable
+
+		if( $req_validatemail_submit )
+		{ // Form has been submitted
+			$Request->param_check_email( 'email', true );
+
+			// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
+			$Plugins->trigger_event( 'ValidateAccountFormSent' );
+
+			if( $Messages->count('error') )
+			{
+				break;
+			}
+
+			// Update user's email:
+			$current_User->set_email( $email );
+			if( $current_User->dbupdate() )
+			{
+				$Messages->add( T_('Your profile has been updated.'), 'note' );
+			}
+
+			if( $current_User->send_validate_email() )
+			{
+				$Messages->add( sprintf( /* TRANS: %s gets replaced by the user's email address */ T_('An email has been sent to your email address (%s). Please click the link therein to validate your account.'), $current_User->dget('email') ), 'success' );
+			}
+			else
+			{
+				$Messages->add( T_('Sorry, the email with the link to validate and activate your password could not be sent.')
+							.'<br />'.T_('Possible reason: the mail() function is disabled.'), 'error' );
+			}
+			break;
+		}
+
+		if( empty($current_User->email) )
+		{ // add (error) note to be displayed in the form (where we'll add an extra )
+			$Messages->add( T_('You have no email address with your profile, therefore we cannot validate it. Please give your email address below.'), 'error' );
+		}
+
+		// Display retrieval form:
+		require $view_path.'login/_validate_form.php';
+
+		exit();
+		break;
+
+
+	case 'validatemail': // Clicked "Validate email" link from a mail
+		param( 'reqID', 'string', '' );
+		param( 'sessID', 'integer', '' );
+
+		if( ! is_logged_in() )
+		{
+			$Messages->add( T_('You have to be logged in to validate your account.'), 'error' );
+			break;
+		}
+
+		if( empty($reqID) )
+		{ // This was not requested
+			$Messages->add( T_('Invalid email address validation request!'), 'error' );
+			break;
+		}
+
+		if( $sessID != $Session->ID )
+		{ // Another session ID than for requesting account validation link used!
+			$Messages->add( T_('You have to use the same session (by means of your session cookie) as when you have requested the action.'), 'error' );
+			break;
+		}
+
+		// Validate provided reqID against the one stored in the user's session
+		if( $Session->get( 'core.validatemail.request_id' ) != $reqID )
+		{
+			$Messages->add( T_('Invalid email address validation request!'), 'error' );
+			$Messages->add(
+				sprintf( T_('You can <a href="%s">send yourself a new link</a>.'),
+				$htsrv_url.'login.php?action=req_validatemail' ), 'note' );
+
+			$login_required = true; // Do not display "Without login.." link on the form
+			break;
+		}
+
+		$current_User->set( 'validated', 1 );
+		$current_User->dbupdate();
+
+		#$Session->delete( 'core.validatemail.request_id' );
+
+		$Messages->add( T_( 'Your email address has been validated.' ), 'success' );
+
+		if( empty($redirect_to) && $current_User->check_perm('admin') )
+		{ // User can access backoffice
+			$redirect_to = $admin_url;
+		}
+
+		$Session->set( 'Messages', $Messages );
+		$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
+
+		header_nocache();
+		header_redirect();
+		exit();
+
+		break;
+
 } // switch
+
+
+if( empty($redirect_to) )
+{ // Use requested URI if nothing provided
+	$redirect_to = str_replace( '&', '&amp;', $ReqURI );
+}
+
+if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) )
+{ // avoid "endless loops"
+	$redirect_to = str_replace( '&', '&amp;', $admin_url );
+}
+
+// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
+$redirect_to = preg_replace( '~(?<=\?|&amp;|&) (login|pwd) = [^&]+ (&(amp;)?|\?)?~x', '', $redirect_to );
+
+if( $Session->has_User() )
+{ // The user is already logged in...
+	$tmp_User = & $Session->get_User();
+	if( $tmp_User->validated || ! $Settings->get('newusers_mustvalidate') )
+	{
+		$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
+			.' <a href="'.$redirect_to.'">'.T_('Continue...').'</a>', 'note' );
+	}
+	unset($tmp_User);
+}
+
+if( strpos( $redirect_to, str_replace('&amp;', '&', $admin_url) ) === 0 )
+{ // don't provide link to bypass
+	$login_required = true;
+}
+
+$Debuglog->add( 'redirect_to: '.$redirect_to );
 
 
 // Default: login form
@@ -200,6 +348,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.56  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.55  2006/04/20 12:15:32  fplanque
  * no message
  *

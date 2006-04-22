@@ -115,7 +115,7 @@ $current_User->set( 'firstname', $newuser_firstname );
 $current_User->set( 'lastname', $newuser_lastname );
 $current_User->set( 'nickname', $newuser_nickname );
 $current_User->set( 'icq', $newuser_icq );
-$current_User->set( 'email', $newuser_email );
+$current_User->set_email( $newuser_email );
 $current_User->set( 'url', $newuser_url );
 $current_User->set( 'aim', $newuser_aim );
 $current_User->set( 'msn', $newuser_msn );
@@ -145,6 +145,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.44  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.43  2006/04/20 12:15:32  fplanque
  * no message
  *

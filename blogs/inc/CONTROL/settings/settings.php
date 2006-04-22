@@ -57,6 +57,9 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param( 'newusers_canregister', 'integer', 0 );
 	$Settings->set( 'newusers_canregister', $newusers_canregister );
 
+	param( 'newusers_mustvalidate', 'integer', 0 );
+	$Settings->set( 'newusers_mustvalidate', $newusers_mustvalidate );
+
 	param( 'newusers_grp_ID', 'integer', true );
 	$Settings->set( 'newusers_grp_ID', $newusers_grp_ID );
 
@@ -122,6 +125,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
  * Revision 1.4  2006/04/19 20:13:49  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
