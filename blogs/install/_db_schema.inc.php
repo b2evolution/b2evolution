@@ -1,6 +1,8 @@
 <?php
 /**
  * This file holds the b2evo database scheme.
+ *
+ * @version $Id$
  */
 
 /**
@@ -601,6 +603,9 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.17  2006/04/22 02:58:05  blueyed
+ * Added Id keyword
+ *
  * Revision 1.16  2006/04/22 02:36:39  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *
