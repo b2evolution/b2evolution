@@ -1307,6 +1307,8 @@ function autoquote( & $string )
  * Note: We have a problem when trying to "antispam" a keyword which is already blacklisted
  * If that keyword appears in the URL... then the next page has a bad referer! :/
  *
+ * {@internal This function gets tested in misc.funcs.simpletest.php.}}
+ *
  * @param string Url to validate
  * @param array Allowed URI schemes (see /conf/_formatting.php)
  * @return mixed false (which means OK) or error message
@@ -1333,6 +1335,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 	//
 	// Things still not validated correctly:
 	//   - umlauts in domains/url, e.g. http://läu.de/
+	//   - "mailto:" links
 	if( ! preg_match('~^               # start
 		([a-z][a-z0-9+.\-]*)             # scheme
 		://                              # authority absolute URLs only
@@ -1369,13 +1372,13 @@ function validate_url( $url, & $allowed_uri_scheme )
  */
 function pre_dump( $var__var__var__var__ )
 {
+	#echo 'pre_dump(): '.debug_get_backtrace();
 	echo '<pre style="padding:1ex;border:1px solid #00f;">';
 	foreach( func_get_args() as $lvar )
 	{
 		echo htmlspecialchars( var_export( $lvar, true ) ).'<br />';
 	}
 	echo '</pre>';
-	#echo debug_get_backtrace();
 }
 
 
@@ -2780,6 +2783,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.39  2006/04/22 02:29:26  blueyed
+ * minor
+ *
  * Revision 1.38  2006/04/21 16:55:29  blueyed
  * doc, polished header_redirect()
  *

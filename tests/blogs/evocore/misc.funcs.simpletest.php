@@ -165,10 +165,10 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 			) as $url )
 		{
 			$r = validate_url( $url, $GLOBALS['comments_allowed_uri_scheme'] );
-			$this->assertFalse( $r );
+			$this->assertFalse( $r, $url.' allowed in comments' );
 
 			$r = validate_url( $url, $GLOBALS['allowed_uri_scheme'] );
-			$this->assertFalse( $r );
+			$this->assertFalse( $r, $url.' allowed in general' );
 		}
 	}
 
