@@ -396,8 +396,8 @@ class User extends DataObject
 
 		$r = parent::set_param( 'email', 'string', $email );
 
-		// Change "validated" status to false (if email has changed):
-		if( $r && $Settings->get('newusers_revalidate_emailchg') )
+		// Change "validated" status to false (if email has changed and Settings are available, which they are not during install):
+		if( $r && isset($Settings) && $Settings->get('newusers_revalidate_emailchg') )
 		{ // In-validate account, because (changed) email has not been verified yet:
 			parent::set_param( 'validated', 'number', 0 );
 		}
@@ -1014,6 +1014,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2006/04/24 18:28:54  blueyed
+ * Fix for install
+ *
  * Revision 1.14  2006/04/24 18:12:54  blueyed
  * Added Setting to invalidate a user account on email address change.
  *
