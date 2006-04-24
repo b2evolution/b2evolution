@@ -296,6 +296,11 @@ function convert_chars( $content, $flag='html' )
  *
  * The non-matching block's text is the first param to $callback and additionally $params gets passed.
  *
+ * This gets used to make links clickable or replace smilies.
+ *
+ * E.g., to replace only in non-HTML tags, call it like:
+ * <code>callback_on_non_matching_blocks( $text, '~<[^>]*>~s', 'your_callback' );</code>
+ *
  * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
  * @param string Text to handle
@@ -2855,6 +2860,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.44  2006/04/24 20:14:00  blueyed
+ * doc
+ *
  * Revision 1.43  2006/04/24 19:14:19  blueyed
  * Added test for callback_on_non_matching_blocks()
  *
