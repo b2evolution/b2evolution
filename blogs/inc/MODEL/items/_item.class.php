@@ -272,18 +272,24 @@ class Item extends DataObject
 		global $UserCache;
 
 		// echo 'assigning user #'.$user_ID;
-		if( $user_ID )
+		if( !empty($user_ID) )
 		{
-			$this->assigned_User = & $UserCache->get_by_ID( $user_ID );
+			$this->assigned_User =& $UserCache->get_by_ID( $user_ID );
 		}
 		else
 		{
+			// fp>> DO NOT set (to null) immediately OR it will KILL the current User object (big problem if it's the Current User)
+			unset( $this->assigned_User );
 			$this->assigned_User = NULL;
 		}
 
 		if( $dbupdate )
 		{ // Record ID for DB:
 			$this->set_param( 'assigned_user_ID', 'number', $this->get_assigned_user_ID(), true );
+		}
+		else
+		{	// Needed to detect future changes:
+			$this->assigned_user_ID = $this->get_assigned_user_ID();
 		}
 	}
 
@@ -2576,6 +2582,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2006/04/24 20:35:32  fplanque
+ * really nasty bugs!
+ *
  * Revision 1.40  2006/04/24 20:31:15  blueyed
  * doc fixes
  *
