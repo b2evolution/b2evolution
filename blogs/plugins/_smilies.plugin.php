@@ -185,7 +185,7 @@ class smilies_plugin extends Plugin
 
 
 			$tmpsmilies = $this->smilies;
-			uksort($tmpsmilies, 'smiliescmp');
+			uksort($tmpsmilies, array(&$this, 'smiliescmp'));
 
 			foreach($tmpsmilies as $smiley => $img)
 			{
@@ -204,70 +204,67 @@ class smilies_plugin extends Plugin
 		}
 
 
-		// REPLACE:  But not in code blocks.
-		// TODO: Also exclude <pre> blocks.
+		// REPLACE:  But only in non-HTML blocks, totally excluding <CODE>..</CODE> and <PRE>..</PRE>
 
 		$content = & $params['data'];
 
-		if( strpos( $content , '<code>' ) !== false )
-		{ // If there are code tags run this substitution
-			$content_parts = preg_split("/<\/?code>/", $content);
-			$content = '';
-			for ( $x = 0 ; $x < count( $content_parts ) ; $x++ )
-			{
-				if ( ( $x % 2 ) == 0 )
-				{ // If x is even then it's not code and replace any smiles
-					$content .= $this->ReplaceTagSafe($content_parts[$x]);
-				}
-				else
-				{ // If x is odd don't replace smiles. and put code tags back in.
-					$content .= '<code>' . $content_parts[$x] . '</code>';
-				}
-			}
+		// Lazy-check first, using stristr() (stripos() is only available since PHP5):
+		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
+		{ // Call ReplaceTagSafe() on everything outside <pre></pre> and <code></code>:
+			$content = callback_on_non_matching_blocks( $content,
+					'~<(code|pre)[^>]*>.*?</\1>~is',
+					array( & $this, 'ReplaceTagSafe' ) );
 		}
 		else
-		{ // No code blocks, replace on the whole thing
+		{ // No CODE or PRE blocks, replace on the whole thing
 			$content = $this->ReplaceTagSafe($content);
 		}
 
 		return true;
 	}
 
+
 	/**
 	 * This callback gets called once after every tags+text chunk
+	 * @return string Text with replaced smilies
 	 */
-	function preg_insert_smilies_callback($s)
+	function preg_insert_smilies_callback( $text )
 	{
-		return  $s[1] // Unmodified tags
-						.str_replace( $this->search, $this->replace, $s[3]); // Text with replaced smilies
+		return str_replace( $this->search, $this->replace, $text );
 	}
 
+
+	/**
+	 * Replace smilies in non-HTML-tag portions of the text.
+	 * @uses callback_on_non_matching_blocks()
+	 */
 	function ReplaceTagSafe($text)
 	{
-		// The pattern catches as many optional tags as possible, then catches as much text as possible without hitting a new tag
-		$search = "/((<[^>]+>)*)([^<]*)/si";
-
-		return preg_replace_callback($search, array($this, 'preg_insert_smilies_callback'), $text);
+		return callback_on_non_matching_blocks( $text, '~<[^>]*>~', array(&$this, 'preg_insert_smilies_callback') );
 	}
-}
 
 
-/**
- * sorts the smilies' array by length
- * this is important if you want :)) to superseede :) for example
- */
-function smiliescmp($a, $b)
-{
-	if(($diff = strlen($b) - strlen($a)) == 0)
+	/**
+	 * sorts the smilies' array by length
+	 * this is important if you want :)) to superseede :) for example
+	 */
+	function smiliescmp($a, $b)
 	{
-		return strcmp($a, $b);
+		if(($diff = strlen($b) - strlen($a)) == 0)
+		{
+			return strcmp($a, $b);
+		}
+		return $diff;
 	}
-	return $diff;
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.19  2006/04/24 20:16:08  blueyed
+ * Use callback_on_non_matching_blocks(); excluding PRE and CODE blocks
+ *
  * Revision 1.18  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *
