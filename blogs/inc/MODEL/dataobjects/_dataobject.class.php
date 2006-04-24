@@ -398,9 +398,9 @@ class DataObject
 	/**
 	 * Displays form to confirm deletion of this object
 	 *
-	 * @param
-	 * @param
-	 * @param
+	 * @param string Title for confirmation
+	 * @param string "action" param value to use (hidden field)
+	 * @param array Hidden keys (apart from "action")
 	 * @param string most of the time we don't need a cancel action since we'll want to return to the default display
 	 */
 	function confirm_delete( $confirm_title, $delete_action, $hiddens, $cancel_action = NULL )
@@ -660,6 +660,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2006/04/24 20:31:15  blueyed
+ * doc fixes
+ *
  * Revision 1.10  2006/04/20 12:15:32  fplanque
  * no message
  *

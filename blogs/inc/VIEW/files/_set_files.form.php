@@ -29,8 +29,6 @@
  * @author fplanque: Francois PLANQUE.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
- *
- * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -76,7 +74,7 @@ if( empty( $force_regexp_filename ) || empty( $force_regexp_dirname ) )
 											T_('Regular expression'),
 											255 );
 		}
-		// Do not display regexp for dirname if the force_regexp_dirname var is set	
+		// Do not display regexp for dirname if the force_regexp_dirname var is set
 		if( empty( $force_regexp_dirname ) )
 		{
 			$Form->text( 'regexp_dirname',

@@ -2029,7 +2029,7 @@ class Item extends DataObject
 	 * Set the renderers of the Item.
 	 *
 	 * @param array List of renderer codes.
-	 * @return
+	 * @return boolean true, if it has been set; false if it has not changed
 	 */
 	function set_renderers( $renderers )
 	{
@@ -2037,17 +2037,23 @@ class Item extends DataObject
 	}
 
 
+	/**
+	 * Set the Author of the Item.
+	 *
+	 * @param User
+	 * @return boolean true, if it has been set; false if it has not changed
+	 */
 	function set_author_User( & $author_User )
 	{
 		$this->Author = & $author_User;
-		$this->set( $this->creator_field, $author_User->ID );
+		return $this->set( $this->creator_field, $author_User->ID );
 	}
 
 
 	/**
 	 * Create a new Item/Post and insert it into the DB
 	 *
-	 * This funtion has to handle all needed DB dependencies!
+	 * This function has to handle all needed DB dependencies!
 	 *
 	 * @todo cleanup the set() calls
 	 */
@@ -2104,7 +2110,6 @@ class Item extends DataObject
 
 		// INSERT INTO DB:
 		$this->dbinsert();
-
 
 		return $this->ID;
 	}
@@ -2571,6 +2576,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2006/04/24 20:31:15  blueyed
+ * doc fixes
+ *
  * Revision 1.39  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
