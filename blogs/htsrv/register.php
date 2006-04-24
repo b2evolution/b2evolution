@@ -102,7 +102,7 @@ switch( $action )
 			$new_User->setGroup( $new_user_Group );
 			$new_User->dbinsert();
 
-			$UserCache->add( $new_User );
+			$new_user_ID = $new_User->ID; // we need this to "rollback" user creation if there's no DB transaction support
 
 			// TODO: Optionally auto create a blog (handle this together with the LDAP plugin)
 
@@ -112,14 +112,21 @@ switch( $action )
 			if( $Plugins->trigger_event_first_false( 'AppendUserRegistrTransact', array( 'User' => & $new_User ) ) )
 			{
 				$DB->rollback();
-				// TODO: what about MySQL versions that do not support transactions? Should we try to delete the user, if he's still there?
-// fp> definitely, you can't say no account has been created if it's still there! :(
+
+				if( $DB->get_var( 'SELECT COUNT(*) FROM T_users WHERE user_ID = '.$new_user_ID ) )
+				{ // the "new" user is still there (no transaction support), remove it manually
+					$Debuglog->add( 'Manually deleting user, because there seems to be no transaction support.' );
+					$new_User->dbdelete( $Debuglog );
+				}
+
 				$Messages->add( T_('No user account has been created!'), 'error' );
 				break; // break out to _reg_form.php
 			}
 			else
 			{ // User created:
 				$DB->commit();
+
+				$UserCache->add( $new_User );
 
 				// Send email to admin (using his locale):
 				$AdminUser = & $UserCache->get_by_ID( 1 );
@@ -179,6 +186,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.65  2006/04/24 17:52:24  blueyed
+ * Manually delete user if no transaction-support
+ *
  * Revision 1.64  2006/04/24 15:43:35  fplanque
  * no message
  *
