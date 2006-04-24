@@ -1187,7 +1187,7 @@ class AdminUI_general
 	 */
 	function get_page_head()
 	{
-		global $app_shortname, $app_version, $current_User, $htsrv_url, $baseurl, $rsc_url;
+		global $app_shortname, $app_version, $current_User, $htsrv_url, $baseurl, $rsc_url, $Blog;
 
 		$r = '
 		<div id="header">
@@ -1195,9 +1195,9 @@ class AdminUI_general
 
 			<div id="headinfo">
 				<span id="headfunctions">
-          <a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
+					<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
 					&bull;
-					<a href="'.$baseurl.'">'.T_('Exit to blogs').'
+					<a href="'.( isset($Blog) ? $Blog->get('url') : $baseurl ).'">'.T_('Exit to blogs').'
 						<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
 						.T_('Exit to blogs').'" /></a>
 				</span>
@@ -1273,6 +1273,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/24 20:43:43  blueyed
+ * Exit to selected blog, if any
+ *
  * Revision 1.9  2006/04/19 17:17:19  blueyed
  * Fix
  *
