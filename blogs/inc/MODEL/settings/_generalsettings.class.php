@@ -80,6 +80,7 @@ class GeneralSettings extends AbstractSettings
 
 		'newusers_canregister' => '0',
 		'newusers_mustvalidate' => '1',
+		'newusers_revalidate_emailchg' => '0',
 		'newusers_level' => '1',
 
 		'permalink_type' => 'urltitle',
@@ -146,6 +147,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.7  2006/04/24 18:12:54  blueyed
+ * Added Setting to invalidate a user account on email address change.
+ *
  * Revision 1.6  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *

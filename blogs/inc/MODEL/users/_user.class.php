@@ -384,32 +384,25 @@ class User extends DataObject
 	/**
 	 * Set email address of the user.
 	 *
-	 * @todo Do we want this? This would make sure, that the email address is always valid.
-	 *       If the email address has changed, the user's account gets invalidated.
-	 * fp>> There should be a setting like "new users must validate".. sth like "Users must re-validate on email change". I'd put it to off by default.
+	 * If the email address has changed and we're configured to invalidate the user in this case,
+	 * the user's account gets invalidated here.
 	 *
 	 * @param string email address to set for the User
-	 * @return boolean true, if a value has been set; false if it has not changed
+	 * @return boolean true, if set; false if not changed
 	 */
 	function set_email( $email )
 	{
-		$r1 = parent::set_param( 'email', 'string', $email );
+		global $Settings;
 
-		return $r1;
+		$r = parent::set_param( 'email', 'string', $email );
 
-		/*
-		TODO: to be discussed/decided:
-		if( $r1 )
+		// Change "validated" status to false (if email has changed):
+		if( $r && $Settings->get('newusers_revalidate_emailchg') )
 		{ // In-validate account, because (changed) email has not been verified yet:
-			$r2 = parent::set_param( 'validated', 'number', 0 );
-		}
-		else
-		{
-			$r2 = NULL;
+			parent::set_param( 'validated', 'number', 0 );
 		}
 
-		return ($r1 || $r2);
-		*/
+		return $r;
 	}
 
 
@@ -1021,6 +1014,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2006/04/24 18:12:54  blueyed
+ * Added Setting to invalidate a user account on email address change.
+ *
  * Revision 1.13  2006/04/24 15:43:36  fplanque
  * no message
  *

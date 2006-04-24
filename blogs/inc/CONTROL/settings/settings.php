@@ -60,6 +60,9 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param( 'newusers_mustvalidate', 'integer', 0 );
 	$Settings->set( 'newusers_mustvalidate', $newusers_mustvalidate );
 
+	param( 'newusers_revalidate_emailchg', 'integer', 0 );
+	$Settings->set( 'newusers_revalidate_emailchg', $newusers_revalidate_emailchg );
+
 	param( 'newusers_grp_ID', 'integer', true );
 	$Settings->set( 'newusers_grp_ID', $newusers_grp_ID );
 
@@ -125,6 +128,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/24 18:12:54  blueyed
+ * Added Setting to invalidate a user account on email address change.
+ *
  * Revision 1.5  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *
