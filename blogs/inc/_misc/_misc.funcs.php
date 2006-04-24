@@ -294,13 +294,13 @@ function convert_chars( $content, $flag='html' )
 /**
  * Split $text into blocks by using $pattern and call $callback on the non-matching blocks.
  *
- * What do we need this for?
- *
  * The non-matching block's text is the first param to $callback and additionally $params gets passed.
+ *
+ * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
  * @param string Text to handle
  * @param string Regular expression pattern that defines blocks to exclude.
- * @param string Function name to use as callback.
+ * @param callback Function name or object/method array to use as callback.
  *               Each non-matching block gets passed as first param, additional params may be
  *               passed with $params.
  * @param array Of additional ("static") params to $callback.
@@ -346,6 +346,8 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
  * Make links clickable in a given text.
  *
  * It replaces only text which is not between <a> tags already.
+ *
+ * @uses callback_on_non_matching_blocks()
  *
  * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
@@ -2853,6 +2855,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.43  2006/04/24 19:14:19  blueyed
+ * Added test for callback_on_non_matching_blocks()
+ *
  * Revision 1.42  2006/04/24 15:43:36  fplanque
  * no message
  *

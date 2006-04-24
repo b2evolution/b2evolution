@@ -178,6 +178,32 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		}
 	}
 
+
+	/**
+	 * Tests {@link callback_on_non_matching_blocks()}.
+	 */
+	function test_callback_on_non_matching_blocks()
+	{
+		$this->assertEqual(
+			callback_on_non_matching_blocks( 'foo bar', '~\s~', array(&$this, 'helper_test_callback_on_non_matching_blocks') ),
+			'[[FOO]] [[BAR]]' );
+
+		$this->assertEqual(
+			callback_on_non_matching_blocks( ' foo bar ', '~\s~', array(&$this, 'helper_test_callback_on_non_matching_blocks') ),
+			'[[]] [[FOO]] [[BAR]] [[]]' );
+	}
+
+
+	/**
+	 * Helper method for {@link test_callback_on_non_matching_blocks()}.
+	 *
+	 * @return string
+	 */
+	function helper_test_callback_on_non_matching_blocks( $text )
+	{
+		return '[['.strtoupper($text).']]';
+	}
+
 }
 
 
