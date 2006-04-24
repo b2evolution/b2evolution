@@ -573,7 +573,9 @@ form.bComment /* New comment form */
 .bStatus,
 .bType,
 .bViews,
-.bPriority
+.bPriority,
+.bAssignee,
+.bExtStatus
 {
 	color: #6e6256;
 	font-weight:bold;

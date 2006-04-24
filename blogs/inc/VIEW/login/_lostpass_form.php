@@ -49,7 +49,7 @@ $Form->begin_fieldset();
 $Form->text( 'login', $login, 16, T_('Login'), '', 20 , 'input_text' );
 
 echo $Form->fieldstart.$Form->inputstart;
-$Form->submit_input( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Request email!'), 'class' => 'ActionButton' ) );
+$Form->submit_input( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Request email to change my password!'), 'class' => 'ActionButton' ) );
 echo $Form->inputend.$Form->fieldend;
 
 $Form->end_fieldset();;
@@ -60,6 +60,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/24 20:52:31  fplanque
+ * no message
+ *
  * Revision 1.2  2006/04/19 20:13:52  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

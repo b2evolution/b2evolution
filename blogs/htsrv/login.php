@@ -230,12 +230,12 @@ switch( $action )
 
 			if( $current_User->send_validate_email() )
 			{
-				$Messages->add( sprintf( /* TRANS: %s gets replaced by the user's email address */ T_('An email has been sent to your email address (%s). Please click the link therein to validate your account.'), $current_User->dget('email') ), 'success' );
+				$Messages->add( sprintf( /* TRANS: %s gets replaced by the user's email address */ T_('An email has been sent to your email address (%s). Please click on the link therein to validate your account.'), $current_User->dget('email') ), 'success' );
 			}
 			else
 			{
 				$Messages->add( T_('Sorry, the email with the link to validate and activate your password could not be sent.')
-							.'<br />'.T_('Possible reason: the mail() function is disabled.'), 'error' );
+							.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled by your host.'), 'error' );
 			}
 		}
 		else
@@ -349,6 +349,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.58  2006/04/24 20:52:30  fplanque
+ * no message
+ *
  * Revision 1.57  2006/04/22 02:54:37  blueyed
  * Fixes: Always go to validatemail form; delete used request ID
  *

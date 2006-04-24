@@ -53,7 +53,7 @@ $Form->begin_fieldset();
 
 	$Plugins->trigger_event( 'DisplayValidateAccountFormFieldset', array( 'Form' => & $Form ) );
 
-$Form->end_form( array(array( 'name'=>'form_validatemail_submit', 'value'=>T_('Request email!'), 'class'=>'ActionButton' )) ); // display hidden fields etc
+$Form->end_form( array(array( 'name'=>'form_validatemail_submit', 'value'=>T_('Request email to activate my account!'), 'class'=>'ActionButton' )) ); // display hidden fields etc
 ?>
 
 <div style="text-align:right">
@@ -68,6 +68,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.2  2006/04/24 20:52:31  fplanque
+ * no message
+ *
  * Revision 1.1  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *

@@ -503,7 +503,7 @@ if( ! empty($current_User) && ! $current_User->validated && $Settings->get('newu
 	if( $action != 'req_validatemail' && $action != 'validatemail' )
 	{ // we're not in that action already:
 		$action = 'req_validatemail'; // for login.php
-		$Messages->add( sprintf( /* TRANS: %s gets replaced by the user's email address */ T_('You have not validated your email address (%s) yet.'), $current_User->dget('email') ), 'login_error' );
+		$Messages->add( sprintf( /* TRANS: %s gets replaced by the user's email address */ T_('You must validate your email address (%s) before you can log in.'), $current_User->dget('email') ), 'login_error' );
 	}
 }
 else
@@ -591,6 +591,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.15  2006/04/24 20:52:30  fplanque
+ * no message
+ *
  * Revision 1.14  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *

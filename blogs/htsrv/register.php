@@ -115,6 +115,7 @@ switch( $action )
 
 				if( $DB->get_var( 'SELECT COUNT(*) FROM T_users WHERE user_ID = '.$new_user_ID ) )
 				{ // the "new" user is still there (no transaction support), remove it manually
+// fp>> can't we *just* delete instead of firing an extra SELECT request? Won't use more resources if there is transaction support.
 					$Debuglog->add( 'Manually deleting user, because there seems to be no transaction support.' );
 					$new_User->dbdelete( $Debuglog );
 				}
@@ -150,7 +151,7 @@ switch( $action )
 			{ // We want that the user validates his email address:
 				if( $new_User->send_validate_email() )
 				{
-					$Messages->add( T_('An email has been sent to your email address. Please click the link therein to validate your account.'), 'success' );
+					$Messages->add( T_('An email has been sent to your email address. Please click on the link therein to validate your account.'), 'success' );
 				}
 				else
 				{
@@ -186,6 +187,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.66  2006/04/24 20:52:30  fplanque
+ * no message
+ *
  * Revision 1.65  2006/04/24 17:52:24  blueyed
  * Manually delete user if no transaction-support
  *
