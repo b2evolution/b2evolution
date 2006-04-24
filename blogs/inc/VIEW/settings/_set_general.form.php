@@ -48,7 +48,6 @@ global $BlogCache;
 $Form = & new Form( NULL, 'settings_checkchanges' );
 $Form->begin_form( 'fform', T_('General Settings'),
 	// enable all form elements on submit (so values get sent):
-	// fp>> does the form still work properly when JS is disabled?
 	array( 'onsubmit'=>'var es=this.elements; for( var i=0; i < es.length; i++ ) { es[i].disabled=false; };' ) );
 
 $Form->hidden( 'ctrl', 'settings' );
@@ -59,11 +58,8 @@ $Form->hidden( 'tab', 'general' );
 
 $Form->begin_fieldset( T_('Default user rights') );
 
-fp>> Why can't we request validation for new accounts (created by admin in the admin) when users cannot register themselves?
-	$fieldgroup_disabled = (int)( ! $Settings->get('newusers_canregister') );
-	$Form->checkbox_input( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), array(
-		'note' => T_('Check to allow new users to register themselves.' ),
-		'onclick' => 'var a = new Array( "newusers_mustvalidate", "newusers_grp_ID", "newusers_level" ); for( var i=0; i < a.length; i++ ) { document.getElementById(a[i]).disabled = ! this.checked; };' ) );
+	$Form->checkbox( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), T_('Check to allow new users to register themselves.' ) );
+	// Note: the options below also make sense, if newusers_canregister is disabled (especially newusers_mustvalidate)
 
 	$Form->checkbox( 'newusers_mustvalidate', $Settings->get('newusers_mustvalidate'), T_('Validate new users'), T_('Check to have new users validate themselves through clicking a link in an email.' ) );
 
@@ -71,12 +67,6 @@ fp>> Why can't we request validation for new accounts (created by admin in the a
 
 	$Form->text_input( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), array( 'note'=>T_('Levels determine hierarchy of users in blogs.' ), 'maxlength'=>1, 'required'=>true ) );
 
-	// Disable fieldgroup if first option not checked:
-	?>
-	<script type="text/javascript">
-		var a = new Array( "newusers_mustvalidate", "newusers_grp_ID", "newusers_level" ); for( var i=0; i < a.length; i++ ) { var d = ! document.getElementById("newusers_canregister").checked; document.getElementById(a[i]).disabled = d; };
-	</script>
-	<?php
 $Form->end_fieldset();
 
 
@@ -146,6 +136,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/24 17:22:50  blueyed
+ * Do not JS-disable options according to "newusers_canregister"
+ *
  * Revision 1.5  2006/04/24 15:43:36  fplanque
  * no message
  *
