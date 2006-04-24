@@ -113,12 +113,8 @@ switch( $action )
 			{
 				$DB->rollback();
 
-				if( $DB->get_var( 'SELECT COUNT(*) FROM T_users WHERE user_ID = '.$new_user_ID ) )
-				{ // the "new" user is still there (no transaction support), remove it manually
-// fp>> can't we *just* delete instead of firing an extra SELECT request? Won't use more resources if there is transaction support.
-					$Debuglog->add( 'Manually deleting user, because there seems to be no transaction support.' );
-					$new_User->dbdelete( $Debuglog );
-				}
+				// Delete, in case there's no transaction support:
+				$new_User->dbdelete( $Debuglog );
 
 				$Messages->add( T_('No user account has been created!'), 'error' );
 				break; // break out to _reg_form.php
@@ -187,6 +183,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.67  2006/04/24 21:01:07  blueyed
+ * just delete
+ *
  * Revision 1.66  2006/04/24 20:52:30  fplanque
  * no message
  *
