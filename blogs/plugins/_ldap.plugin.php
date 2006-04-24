@@ -215,7 +215,7 @@ class ldap_plugin extends Plugin
 				$NewUser->set( 'login', $params['login'] );
 				$NewUser->set( 'nickname', $params['login'] );
 				$NewUser->set( 'pass', $params['pass_md5'] );
-				$NewUser->set( 'validated', 1 ); // assume the user to be validated (through email link)
+				$NewUser->set( 'validated', 1 ); // assume the user has been validated (through email link)
 
 				if( isset($search_info[0]['givenname'][0]) )
 				{
@@ -334,6 +334,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.23  2006/04/24 15:43:37  fplanque
+ * no message
+ *
  * Revision 1.22  2006/04/22 02:36:39  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *

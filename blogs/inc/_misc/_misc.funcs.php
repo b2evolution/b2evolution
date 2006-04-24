@@ -294,6 +294,8 @@ function convert_chars( $content, $flag='html' )
 /**
  * Split $text into blocks by using $pattern and call $callback on the non-matching blocks.
  *
+ * What do we need this for?
+ *
  * The non-matching block's text is the first param to $callback and additionally $params gets passed.
  *
  * @param string Text to handle
@@ -2851,6 +2853,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.42  2006/04/24 15:43:36  fplanque
+ * no message
+ *
  * Revision 1.41  2006/04/22 16:42:12  blueyed
  * Fixes for make_clickable
  *

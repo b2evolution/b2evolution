@@ -386,6 +386,7 @@ class User extends DataObject
 	 *
 	 * @todo Do we want this? This would make sure, that the email address is always valid.
 	 *       If the email address has changed, the user's account gets invalidated.
+	 * fp>> There should be a setting like "new users must validate".. sth like "Users must re-validate on email change". I'd put it to off by default.
 	 *
 	 * @param string email address to set for the User
 	 * @return boolean true, if a value has been set; false if it has not changed
@@ -1020,6 +1021,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2006/04/24 15:43:36  fplanque
+ * no message
+ *
  * Revision 1.12  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *

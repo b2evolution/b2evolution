@@ -318,8 +318,7 @@ class test_plugin extends Plugin
 		echo $this->text_from_AdminTabAction;
 
 		// TODO: this is tedious.. should either be a global function (get_admin_Form()) or a plugin helper..
-		// blueyed>> if noone speaks against it, I'll create get_admin_Form(), which generates the 4 lines below:
-		$Form = new Form();
+		$Form = & new Form();
 		$Form->begin_form();
 		$Form->hidden_ctrl(); // needed to pass the "ctrl=tools" param
 		$Form->hiddens_by_key( get_memorized() ); // needed to pass all other memorized params, especially "tab"
@@ -512,6 +511,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.36  2006/04/24 15:43:37  fplanque
+ * no message
+ *
  * Revision 1.35  2006/04/22 02:36:39  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *

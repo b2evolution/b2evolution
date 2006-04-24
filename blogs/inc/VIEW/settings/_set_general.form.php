@@ -46,9 +46,9 @@ global $BlogCache;
 
 
 $Form = & new Form( NULL, 'settings_checkchanges' );
-
 $Form->begin_form( 'fform', T_('General Settings'),
 	// enable all form elements on submit (so values get sent):
+	// fp>> does the form still work properly when JS is disabled?
 	array( 'onsubmit'=>'var es=this.elements; for( var i=0; i < es.length; i++ ) { es[i].disabled=false; };' ) );
 
 $Form->hidden( 'ctrl', 'settings' );
@@ -59,6 +59,7 @@ $Form->hidden( 'tab', 'general' );
 
 $Form->begin_fieldset( T_('Default user rights') );
 
+fp>> Why can't we request validation for new accounts (created by admin in the admin) when users cannot register themselves?
 	$fieldgroup_disabled = (int)( ! $Settings->get('newusers_canregister') );
 	$Form->checkbox_input( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), array(
 		'note' => T_('Check to allow new users to register themselves.' ),
@@ -145,6 +146,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/24 15:43:36  fplanque
+ * no message
+ *
  * Revision 1.4  2006/04/22 03:12:35  blueyed
  * cleanup
  *

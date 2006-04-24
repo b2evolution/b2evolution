@@ -845,7 +845,8 @@ class Comment extends DataObject
 
 		// Get list of users who want to be notfied:
 		// TODO: also use extra cats/blogs??
-		// TODO: this query looks like it does not respect visibilty status of the comment (and item)! (it should only get ignored for the Item's Author)
+		// So far you get notifications for everything. We'll need a setting to decide if you want to received unmoderated (aka unpublished) comments or not.
+	// Note: users receive comments on their own posts. This is done on purpose. Otherwise they think it's broken when they test the app.
 		$sql = 'SELECT DISTINCT user_email, user_locale
 							FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
 						 WHERE sub_coll_ID = '.$this->Item->blog_ID.'
@@ -1037,6 +1038,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2006/04/24 15:43:35  fplanque
+ * no message
+ *
  * Revision 1.26  2006/04/21 23:14:16  blueyed
  * Add Messages according to Comment's status.
  *

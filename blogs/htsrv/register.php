@@ -113,7 +113,7 @@ switch( $action )
 			{
 				$DB->rollback();
 				// TODO: what about MySQL versions that do not support transactions? Should we try to delete the user, if he's still there?
-
+// fp> definitely, you can't say no account has been created if it's still there! :(
 				$Messages->add( T_('No user account has been created!'), 'error' );
 				break; // break out to _reg_form.php
 			}
@@ -179,6 +179,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.64  2006/04/24 15:43:35  fplanque
+ * no message
+ *
  * Revision 1.63  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *
