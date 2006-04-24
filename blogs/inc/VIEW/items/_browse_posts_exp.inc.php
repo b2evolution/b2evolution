@@ -103,8 +103,8 @@ while( $Item = & $ItemList->get_item() )
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
 				$Item->priority( T_('Priority').': <span class="bPriority">', '</span> &nbsp; ' );
-				$Item->assigned_to( T_('Assigned to:').' <strong>', '</strong> &nbsp; ' );
-				$Item->extra_status( T_('Task Status').': <strong>', '</strong>' );
+				$Item->assigned_to( T_('Assigned to:').' <span class="bAssignee">', '</span> &nbsp; ' );
+				$Item->extra_status( T_('Task Status').': <span class="bExtStatus">', '</span>' );
 
 				echo '<div class="bSmallHeadRight"><span class="bViews">';
 				$Item->views();
@@ -255,6 +255,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.12  2006/04/24 20:36:45  fplanque
+ * fixes
+ *
  * Revision 1.11  2006/04/18 19:29:52  fplanque
  * basic comment status implementation
  *

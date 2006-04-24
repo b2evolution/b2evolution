@@ -55,7 +55,7 @@ $ItemList->title = T_('Task list');
 // Issue date:
 $ItemList->cols[] = array(
 		'th' => T_('Issue date'),
-		'order' => 'post_datestart',
+		'order' => 'datestart',
 		'th_start' => '<th class="firstcol nowrap">',
 		'td_start' => '<td class="firstcol nowrap">',
 		'td' => '@get_permanent_link( get_icon(\'permalink\') )@ <span class="date">@get_issue_date()@</span>',
@@ -79,7 +79,7 @@ $ItemList->cols[] = array(
 		'th' => T_('Author'),
 		'th_start' => '<th class="nowrap">',
 		'td_start' => '<td class="nowrap">',
-		'order' => 'post_creator_user_ID',
+		'order' => 'creator_user_ID',
 		'td' => '@get(\'t_author\')@',
 	);
 
@@ -118,7 +118,7 @@ function task_title_link( $Item )
 }
 $ItemList->cols[] = array(
 						'th' => T_('Task'),
-						'order' => 'post_title',
+						'order' => 'title',
 						'td_start' => '<td class="tskst_$post_pst_ID$">',
 						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj} )%</strong>',
 					);
@@ -141,7 +141,7 @@ function item_visibility( $Item )
 }
 $ItemList->cols[] = array(
 						'th' => T_('Visibility'),
-						'order' => 'post_status',
+						'order' => 'status',
 						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
 						'td' => '%item_visibility( {Obj} )%',
 				);
@@ -149,7 +149,7 @@ $ItemList->cols[] = array(
 
 $ItemList->cols[] = array(
 	'th' => /* TRANS: abbrev for info */ T_('i'),
-	'order' => 'post_datemodified',
+	'order' => 'datemodified',
 	'th_start' => '<th class="shrinkwrap">',
 	'td_start' => '<td class="shrinkwrap">',
 	'td' => '@history_info_icon()@',
@@ -196,6 +196,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/24 20:36:45  fplanque
+ * fixes
+ *
  * Revision 1.4  2006/04/14 19:21:55  fplanque
  * icon cleanup + fixes
  *

@@ -34,7 +34,6 @@ global $add_item_url, $edit_item_url, $delete_item_url;
 // Display title depending on selection params:
 echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 
-
 /*
 	**
 	 * Callback to add filters on top of the result set
@@ -55,7 +54,7 @@ $ItemList->title = T_('Task list');
 
 $ItemList->cols[] = array(
 						'th' => /* TRANS: abbrev for Priority */ T_('P'),
-						'order' => 'post_priority',
+						'order' => 'priority',
 						'th_start' => '<th class="shrinkwrap">',
 						'td_start' => '<td class="center tskst_$post_pst_ID$">',
 						'td' => '$post_priority$',
@@ -95,7 +94,7 @@ function task_title_link( $Item )
 }
 $ItemList->cols[] = array(
 						'th' => T_('Task'),
-						'order' => 'post_title',
+						'order' => 'title',
 						'td_start' => '<td class="tskst_$post_pst_ID$">',
 						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj} )%</strong>',
 					);
@@ -118,28 +117,28 @@ function item_visibility( $Item )
 }
 $ItemList->cols[] = array(
 						'th' => T_('Visibility'),
-						'order' => 'post_status',
+						'order' => 'status',
 						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
 						'td' => '%item_visibility( {Obj} )%',
 				);
 
 $ItemList->cols[] = array(
 						'th' => T_('Status'),
-						'order' => 'post_pst_ID',
+						'order' => 'pst_ID',
 						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
 						'td' => '@get(\'t_extra_status\')@',
 					);
 
 $ItemList->cols[] = array(
 						'th' => T_('Type'),
-						'order' => 'post_ptyp_ID',
+						'order' => 'ptyp_ID',
 						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
 						'td' => '@get(\'t_type\')@',
 					);
 
 $ItemList->cols[] = array(
 						'th' => T_('ID'),
-						'order' => 'post_ID',
+						'order' => 'ID',
 						'th_start' => '<th class="shrinkwrap">',
 						'td_start' => '<td class="tskst_$post_pst_ID$ shrinkwrap">',
 						'td_start' => '<td class="center">',
@@ -148,7 +147,7 @@ $ItemList->cols[] = array(
 
 $ItemList->cols[] = array(
 						'th' => T_('Assigned'),
-						'order' => 'post_assigned_user_ID',
+						'order' => 'assigned_user_ID',
 						'td' => '@get(\'t_assigned_to\')@',
 					);
 
@@ -187,7 +186,7 @@ $ItemList->cols[] = array(
 
 $ItemList->cols[] = array(
 	'th' => /* TRANS: abbrev for info */ T_('i'),
-	'order' => 'post_datemodified',
+	'order' => 'datemodified',
 	'th_start' => '<th class="shrinkwrap">',
 	'td_start' => '<td class="shrinkwrap">',
 	'td' => '@history_info_icon()@',
@@ -234,6 +233,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/24 20:36:45  fplanque
+ * fixes
+ *
  * Revision 1.5  2006/04/14 19:21:55  fplanque
  * icon cleanup + fixes
  *
