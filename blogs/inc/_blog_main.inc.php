@@ -136,6 +136,7 @@ $Blog = Blog_get_by_ID( $blog ); /* TODO: TMP: */ $blogparams = get_blogparams_b
 	        as we only want to activate the I/O charset, which is probably the user's..
 	        It prevents using a locale/charset in the front office, apart from the one given as default for the blog!!
 fp>there is no blog defined in _main and there should not be any
+blueyed> Sure, but that means we should either split it, or use the locale here only, if there's no-one given with higher priority.
 */
 // Activate matching locale:
 $Debuglog->add( 'Activating blog locale: '.$Blog->get('locale'), 'locale' );
@@ -434,6 +435,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.16  2006/04/24 17:54:18  blueyed
+ * todo
+ *
  * Revision 1.15  2006/04/24 15:43:35  fplanque
  * no message
  *
