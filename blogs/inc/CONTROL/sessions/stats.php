@@ -142,12 +142,16 @@ switch( $AdminUI->get_path(1) )
 		// fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
 		// Bug report: http://lists.mysql.com/bugs/36
 		// Solution : CAST to string
-		$sql = 'SELECT COUNT(*) AS hits, CONCAT(hit_referer_type) AS referer_type, YEAR(hit_datetime) AS year,
-										MONTH(hit_datetime) AS month, DAYOFMONTH(hit_datetime) AS day
-							FROM T_hitlog ';
+		// TODO: I've also limited this to agnt_type "browser" here, according to the change for "referers" (Rev 1.6)
+		//       -> an RSS service that sends a referer is not a real referer (though he should be listed in the robots list)! (blueyed)
+		$sql = '
+			SELECT COUNT(*) AS hits, CONCAT(hit_referer_type) AS referer_type, YEAR(hit_datetime) AS year,
+			       MONTH(hit_datetime) AS month, DAYOFMONTH(hit_datetime) AS day
+			  FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
+			 WHERE agnt_type = "browser"';
 		if( $blog > 0 )
 		{
-			$sql .= ' WHERE hit_blog_ID = '.$blog;
+			$sql .= ' AND hit_blog_ID = '.$blog;
 		}
 		$sql .= ' GROUP BY year, month, day, referer_type
 							ORDER BY year DESC, month DESC, day DESC, referer_type';
@@ -321,11 +325,19 @@ switch( $AdminUI->get_path(1) )
 			/*
 			 * Table:
 			 */
-			$hits = array();
-			$hits['direct'] = 0;
-			$hits['referer'] = 0;
-			$hits['search'] = 0;
-			$hits['blacklist'] = 0;
+			$hits = array(
+				'direct' => 0,
+				'referer' => 0,
+				'search' => 0,
+				'blacklist' => 0,
+			);
+			$hits_total = array(
+				'direct' => 0,
+				'referer' => 0,
+				'search' => 0,
+				'blacklist' => 0,
+			);
+
 			$last_date = 0;
 			?>
 			<table class="grouped" cellspacing="0">
@@ -334,7 +346,9 @@ switch( $AdminUI->get_path(1) )
 					<th><?php echo T_('Direct Accesses') ?></th>
 					<th><?php echo T_('Referers') ?></th>
 					<th><?php echo T_('Refering Searches') ?></th>
-					<th><?php echo T_('Blacklisted') ?></th>
+					<th><?php
+					// TODO: should be renamed for more clarity (because this is not Spam)
+					echo T_('Blacklisted') ?></th>
 					<th><?php echo T_('Total') ?></th>
 				</tr>
 				<?php
@@ -360,16 +374,19 @@ switch( $AdminUI->get_path(1) )
 							<td class="right"><?php echo array_sum($hits) ?></td>
 						</tr>
 						<?php
-							$hits['direct'] = 0;
-							$hits['referer'] = 0;
-							$hits['search'] = 0;
-							$hits['blacklist'] = 0;
+							$hits = array(
+								'direct' => 0,
+								'referer' => 0,
+								'search' => 0,
+								'blacklist' => 0,
+							);
 							$last_date = $this_date;	// that'll be the next one
 							$count ++;
 					}
 
 					// Increment hitcounter:
 					$hits[$row_stats['referer_type']] = $row_stats['hits'];
+					$hits_total[$row_stats['referer_type']] += $row_stats['hits'];
 				}
 
 				if( $last_date != 0 )
@@ -390,7 +407,19 @@ switch( $AdminUI->get_path(1) )
 					</tr>
 					<?php
 				}
+
+				// Total numbers:
 				?>
+
+				<tr class="totals">
+				<td class="firstcol"></td>
+				<td class="right"><?php echo $hits_total['direct'] ?></td>
+				<td class="right"><?php echo $hits_total['referer'] ?></td>
+				<td class="right"><?php echo $hits_total['search'] ?></td>
+				<td class="right"><?php echo $hits_total['blacklist'] ?></td>
+				<td class="right"><?php echo array_sum($hits_total) ?></td>
+				</tr>
+
 			</table>
 			<?php
 		}
@@ -1017,6 +1046,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2006/04/25 00:19:25  blueyed
+ * Also only count "browser" hits as referers in summary; added row with total numbers
+ *
  * Revision 1.9  2006/04/20 19:14:03  blueyed
  * Link "Requested URI" columns to blog's baseurlroot+URI
  *
