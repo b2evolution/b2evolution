@@ -136,6 +136,7 @@ $user_agents = array(
 	array('robot', 'NITLE Blog Spider/', 'NITLE' ),
 	array('robot', 'The World as a Blog ', 'The World as a Blog' ),
 	array('robot', 'daypopbot/ ', 'DayPop' ),
+	array('robot', 'Bitacle bot/', 'Bitacle' ),
 	// Aggregators:
 	array('aggregator', 'Feedreader', 'Feedreader' ),
 	array('aggregator', 'Syndirella/',	'Syndirella' ),
