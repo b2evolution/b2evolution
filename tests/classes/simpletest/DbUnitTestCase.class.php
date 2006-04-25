@@ -54,6 +54,8 @@ class DbUnitTestCase extends EvoUnitTestCase
 
 		// reset any error (and catch it in tearDown())
 		$this->test_DB->error = false;
+
+		$this->test_DB->begin();
 	}
 
 
@@ -62,6 +64,8 @@ class DbUnitTestCase extends EvoUnitTestCase
 	 */
 	function tearDown()
 	{
+		$this->test_DB->commit();
+
 		parent::tearDown();
 
 		if( $this->test_DB->error )
