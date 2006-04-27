@@ -1757,6 +1757,32 @@ class Plugin
 		$Plugins->forget_events( $this->ID );
 	}
 
+
+	/**
+	 * Disable an event.
+	 *
+	 * This removes it from the events table.
+	 *
+	 * @return boolean True, if status has changed; false if it was disabled already
+	 */
+	function disable_event( $event )
+	{
+		return $this->Plugins->set_event_status( $this->ID, $event, 0 );
+	}
+
+
+	/**
+	 * Enable an event.
+	 *
+	 * This adds it to the events table.
+	 *
+	 * @return boolean True, if status has changed; false if it was enabled already
+	 */
+	function enable_event( $event )
+	{
+		return $this->Plugins->set_event_status( $this->ID, $event, 1 );
+	}
+
 	/*
 	 * Helper methods }}}
 	 */
@@ -1960,6 +1986,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.35  2006/04/27 19:44:33  blueyed
+ * A plugin can disable events (e.g. after install)
+ *
  * Revision 1.34  2006/04/27 19:11:12  blueyed
  * Cleanup; handle broken plugins more decent
  *

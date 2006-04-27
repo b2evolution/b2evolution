@@ -2453,6 +2453,34 @@ class Plugins
 
 
 	/**
+	 * Set the status of an event for a given Plugin.
+	 *
+	 * @return boolean True, if status has changed; false if not
+	 */
+	function set_event_status( $plugin_ID, $plugin_event, $enabled )
+	{
+		global $DB;
+
+		$enabled = $enabled ? 1 : 0;
+
+		$DB->query( '
+			UPDATE T_pluginevents
+			   SET pevt_enabled = '.$enabled.'
+			 WHERE pevt_plug_ID = '.$plugin_ID.'
+			   AND pevt_event = "'.$plugin_event.'"' );
+
+		if( $DB->rows_affected )
+		{
+			$this->load_events();
+
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
 	 * Load an object from a Cache plugin or create a new one if we have a
 	 * cache miss or no caching plugins.
 	 *
@@ -2551,6 +2579,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.34  2006/04/27 19:44:33  blueyed
+ * A plugin can disable events (e.g. after install)
+ *
  * Revision 1.33  2006/04/27 19:11:12  blueyed
  * Cleanup; handle broken plugins more decent
  *
