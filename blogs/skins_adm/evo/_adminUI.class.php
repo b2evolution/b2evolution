@@ -116,6 +116,40 @@ class AdminUI extends AdminUI_general
 
 		return $r."</div>\n";
 	}
+
+
+	/**
+	 * GLOBAL HEADER - APP TITLE, LOGOUT, ETC.
+	 *
+	 * @return string
+	 */
+	function get_page_head()
+	{
+		global $app_shortname, $app_version, $current_User, $htsrv_url, $baseurl, $rsc_url, $Blog;
+
+		$r = '
+		<div id="header">
+			'.$this->admin_logo.'
+
+			<div id="headinfo">
+				<span id="headfunctions">
+					<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
+					&bull;
+					<a href="'.( isset($Blog) ? $Blog->get('url') : $baseurl ).'">'.T_('Exit to blogs').'
+						<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
+						.T_('Exit to blogs').'" /></a>
+				</span>
+
+				'.$app_shortname.' v <strong>'.$app_version.'</strong>
+				&middot; '.$this->get_head_info().'
+			</div>
+
+			<h1>'.$this->get_title_for_titlearea().'</h1>
+		</div>
+		';
+
+		return $r;
+	}
 }
 
 ?>
