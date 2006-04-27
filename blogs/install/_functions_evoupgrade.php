@@ -761,6 +761,9 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9200' );
 	}
 
+	// TODO: convert time_difference! See http://dev.b2evolution.net/admin/b2browse.php?tab=posts&blog=7&p=87654&c=1&tb=1&pb=1
+
+
 	if( $old_db_version < 9300 )
 	{
 		/*
@@ -838,6 +841,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.142  2006/04/27 19:08:15  blueyed
+ * todo
+ *
  * Revision 1.141  2006/04/20 15:57:44  blueyed
  * Bumped $db_version to 9200
  *
