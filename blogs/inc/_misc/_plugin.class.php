@@ -57,9 +57,11 @@ class Plugin
 	 * To make it available for translations set it in the constructor by
 	 * using the {@link T_()} function.
 	 *
+	 * This should be not more than 50 characters.
+	 *
 	 * @var string
 	 */
-	var $name = '__Unnamed plugin__';
+	var $name = '';
 
 	/**
 	 * Globally unique code for this plugin functionality. 32 chars. MUST BE SET.
@@ -122,7 +124,7 @@ class Plugin
 	/**
 	 * Plugin short description.
 	 *
-	 * This should be no longer than a line.
+	 * This should be no longer than a line and is limited to 255 chars.
 	 *
 	 * @var string
 	 */
@@ -1958,6 +1960,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.34  2006/04/27 19:11:12  blueyed
+ * Cleanup; handle broken plugins more decent
+ *
  * Revision 1.33  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *

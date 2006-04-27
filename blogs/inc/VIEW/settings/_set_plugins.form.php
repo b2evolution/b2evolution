@@ -94,7 +94,14 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 			}
 			elseif( $loop_Plugin->status == 'broken' )
 			{
-				echo get_icon('warning', 'imgtag', array('title'=>T_('The plugin is broken.')) );
+				echo get_icon('warning', 'imgtag', array(
+					'title' => T_('The plugin is broken.')
+						.// Display load error from Plugins::register() (if any):
+						( isset( $admin_Plugins->plugin_errors[$loop_Plugin->ID] )
+							&& ! empty($admin_Plugins->plugin_errors[$loop_Plugin->ID]['register'])
+							? ' '.$admin_Plugins->plugin_errors[$loop_Plugin->ID]['register']
+							: '' )
+					) );
 			}
 			else
 			{
@@ -264,6 +271,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.16  2006/04/27 19:11:12  blueyed
+ * Cleanup; handle broken plugins more decent
+ *
  * Revision 1.15  2006/04/19 20:13:52  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

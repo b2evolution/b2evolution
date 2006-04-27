@@ -156,7 +156,7 @@ class Plugins
 	var $sql_load_plugins_table = '
 			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version FROM T_plugins
 			 WHERE plug_status = "enabled"
-			 ORDER BY plug_priority';
+			 ORDER BY plug_priority, plug_classname';
 
 	/**
 	 * @var boolean Used in class {@link Plugins} when it comes to removing plugins from the list, what we don't want
@@ -403,14 +403,21 @@ class Plugins
 	}
 
 	/**
-	 * Callback function to sort plugins by priority.
+	 * Callback function to sort plugins by priority (and classname, if they have same priority).
 	 */
 	function sort_Plugin_priority( & $a_ID, & $b_ID )
 	{
 		$a_Plugin = & $this->get_by_ID( $a_ID );
 		$b_Plugin = & $this->get_by_ID( $b_ID );
 
-		return $a_Plugin->priority - $b_Plugin->priority;
+		$r = $a_Plugin->priority - $b_Plugin->priority;
+
+		if( $r == 0 )
+		{
+			$r = strcasecmp( $a_Plugin->classname, $b_Plugin->classname );
+		}
+
+		return $r;
 	}
 
 	/**
@@ -580,6 +587,8 @@ class Plugins
 			$this->unregister( $Plugin );
 			$Plugin = '';
 		}
+
+		$this->sort();
 
 		return $Plugin;
 	}
@@ -916,7 +925,7 @@ class Plugins
 		{ // Plugin file not found!
 			if( $must_exists )
 			{
-				$r = 'Plugin class file ['.rel_path_to_base($classfile_path).'] not readable!'; // no translation, should not happen!
+				$r = 'Plugin class file ['.rel_path_to_base($classfile_path).'] is not readable!';
 				$Debuglog->add( $r, array( 'plugins', 'error' ) );
 
 				// Get the Plugin object (must not exist)
@@ -926,6 +935,7 @@ class Plugins
 
 				if( $this->is_admin_class )
 				{
+					$Plugin->name = $Plugin->classname; // use the classname instead of "unnamed plugin"
 					$Timer->pause( 'plugins_register' );
 					return $Plugin;
 				}
@@ -958,6 +968,7 @@ class Plugins
 
 				if( $this->is_admin_class )
 				{
+					$Plugin->name = $Plugin->classname; // use the classname instead of "unnamed plugin"
 					$Timer->pause( 'plugins_register' );
 					return $Plugin;
 				}
@@ -1008,6 +1019,11 @@ class Plugins
 		if( isset($apply_rendering) )
 		{
 			$Plugin->apply_rendering = $apply_rendering;
+		}
+
+		if( empty($Plugin->name) )
+		{
+			$Plugin->name = $Plugin->classname;
 		}
 
 		$Plugin->Plugins = & $this;
@@ -1488,7 +1504,7 @@ class Plugins
 	/**
 	 * Call all plugins for a given event.
 	 *
-	 * @param string event name, see {@link Plugin}
+	 * @param string event name, see {@link Plugin::get_supported_events()}
 	 * @param array Associative array of parameters for the Plugin
 	 */
 	function trigger_event( $event, $params = NULL )
@@ -1519,7 +1535,7 @@ class Plugins
 	/**
 	 * Call all plugins for a given event, until the first one returns true.
 	 *
-	 * @param string event name, see {@link Plugin}
+	 * @param string event name, see {@link Plugin::get_supported_events()}
 	 * @param array Associative array of parameters for the Plugin
 	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin;
 	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
@@ -1554,7 +1570,7 @@ class Plugins
 	/**
 	 * Call all plugins for a given event, until the first one returns false.
 	 *
-	 * @param string event name, see {@link Plugin}
+	 * @param string event name, see {@link Plugin::get_supported_events()}
 	 * @param array Associative array of parameters for the Plugin
 	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin;
 	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
@@ -2233,7 +2249,7 @@ class Plugins
 					FROM T_pluginevents INNER JOIN T_plugins ON pevt_plug_ID = plug_ID
 				 WHERE pevt_enabled > 0
 				 '.( $this->is_admin_class ? '' : 'AND plug_status = "enabled"' ).'
-				 ORDER BY plug_priority', OBJECT, 'Loading plugin events' ) as $l_row )
+				 ORDER BY plug_priority, plug_classname', OBJECT, 'Loading plugin events' ) as $l_row )
 		{
 			$this->index_event_IDs[$l_row->pevt_event][] = $l_row->pevt_plug_ID;
 		}
@@ -2527,7 +2543,7 @@ class Plugins_admin extends Plugins
 	 */
 	var $sql_load_plugins_table = '
 			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version FROM T_plugins
-			 ORDER BY plug_priority';
+			 ORDER BY plug_priority, plug_classname';
 
 	var $is_admin_class = true;
 }
@@ -2535,6 +2551,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.33  2006/04/27 19:11:12  blueyed
+ * Cleanup; handle broken plugins more decent
+ *
  * Revision 1.32  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *

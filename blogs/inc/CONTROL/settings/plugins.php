@@ -503,11 +503,11 @@ switch( $action )
 		}
 
 		// Ask plugin:
-		$uninstall_ok = $admin_Plugins->call_method( $plugin_ID, 'BeforeUninstall', $params = array( 'unattended' => false ) );
+		$uninstall_ok = $admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstall', $params = array( 'unattended' => false ) );
 
 		if( $uninstall_ok === false )
 		{ // Plugin said "NO":
-			$Messages->add( sprintf( T_('Could not uninstall plugin #%d.'), $plugin_ID ), 'error' );
+			$Messages->add( sprintf( T_('Could not uninstall plugin #%d.'), $edit_Plugin->ID ), 'error' );
 			break;
 		}
 
@@ -533,10 +533,11 @@ switch( $action )
 
 			if( $uninstall_ok )
 			{ // We either have no tables to drop or it has been confirmed:
-				$Plugins->uninstall( $plugin_ID );
+				$Plugins->uninstall( $edit_Plugin->ID );
 				$admin_Plugins->unregister( $edit_Plugin );
 
-				$Messages->add( sprintf( T_('Uninstalled plugin #%d.'), $plugin_ID ), 'success' );
+				$Messages->add( /* %s = plugin's classname, %d = plugin's ID */
+					sprintf( T_('Uninstalled plugin %s (#%d).'), $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
 				break;
 			}
 		}
