@@ -209,6 +209,7 @@ class Plugins
 	 *  - BeforeUninstallPayload
 	 *  - GetDefaultSettings
 	 *  - GetDefaultUserSettings
+	 *  - GetHtsrvMethods
 	 *  - PluginSettingsUpdateAction (Called as action before updating the plugin's settings)
 	 *  - PluginSettingsEditAction (Called as action before editing the plugin's settings)
 	 *  - PluginSettingsEditDisplayAfter (Called after standard plugin settings are displayed for editing)
@@ -2579,6 +2580,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.35  2006/04/27 20:07:19  blueyed
+ * Renamed Plugin::get_htsrv_methods() to GetHtsvMethods() (normalization)
+ *
  * Revision 1.34  2006/04/27 19:44:33  blueyed
  * A plugin can disable events (e.g. after install)
  *

@@ -449,7 +449,7 @@ class Plugin
 	 * @see get_htsrv_url()
 	 * @return array
 	 */
-	function get_htsrv_methods()
+	function GetHtsrvMethods()
 	{
 		return array();
 	}
@@ -1563,7 +1563,7 @@ class Plugin
 	 *
 	 * @todo we might want to provide whitelisting of methods through {@link $Session} here and check for it in the htsrv handler.
 	 *
-	 * @param string Method to call. This must be listed in {@link get_htsrv_methods()}.
+	 * @param string Method to call. This must be listed in {@link GetHtsrvMethods()}.
 	 * @param array Array of optional parameters passed to the method.
 	 * @param string Glue for additional GET params used internally.
 	 * @return string The URL
@@ -1986,6 +1986,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.36  2006/04/27 20:07:19  blueyed
+ * Renamed Plugin::get_htsrv_methods() to GetHtsvMethods() (normalization)
+ *
  * Revision 1.35  2006/04/27 19:44:33  blueyed
  * A plugin can disable events (e.g. after install)
  *

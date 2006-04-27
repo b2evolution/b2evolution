@@ -1,7 +1,7 @@
 <?php
 /**
  * This file gets used to access {@link Plugin} methods that are marked to be accessible this
- * way. See {@link Plugin::get_htsrv_methods()}.
+ * way. See {@link Plugin::GetHtsrvMethods()}.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -58,7 +58,16 @@ if( $plugin_ID )
 		debug_die( 'Invalid Plugin!' );
 	}
 
-	if( ! in_array( $method, $Plugin->get_htsrv_methods() ) )
+
+	if( method_exists( $Plugin, 'get_htsrv_methods' ) )
+	{ // TODO: get_htsrv_methods is deprecated, but should stay here for transformation! (blueyed, 2006-04-27)
+		if( ! in_array( $method, $Plugin->get_htsrv_methods() ) )
+		{
+			debug_die( 'Call to non-htsrv Plugin method!' );
+		}
+	}
+	else
+	if( ! in_array( $method, $Plugin->GetHtsrvMethods() ) )
 	{
 		debug_die( 'Call to non-htsrv Plugin method!' );
 	}
@@ -79,6 +88,9 @@ if( $plugin_ID )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.5  2006/04/27 20:07:19  blueyed
+ * Renamed Plugin::get_htsrv_methods() to GetHtsvMethods() (normalization)
+ *
  * Revision 1.4  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
