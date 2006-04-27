@@ -49,6 +49,7 @@ $Form->begin_fieldset();
 $Form->text( 'login', $login, 16, T_('Login'), '', 20 , 'input_text' );
 
 echo $Form->fieldstart.$Form->inputstart;
+// TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
 $Form->submit_input( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Request email to change my password!'), 'class' => 'ActionButton' ) );
 echo $Form->inputend.$Form->fieldend;
 
@@ -60,6 +61,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.4  2006/04/27 21:49:55  blueyed
+ * todo
+ *
  * Revision 1.3  2006/04/24 20:52:31  fplanque
  * no message
  *

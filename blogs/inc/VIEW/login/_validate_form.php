@@ -53,6 +53,7 @@ $Form->begin_fieldset();
 
 	$Plugins->trigger_event( 'DisplayValidateAccountFormFieldset', array( 'Form' => & $Form ) );
 
+// TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
 $Form->end_form( array(array( 'name'=>'form_validatemail_submit', 'value'=>T_('Request email to activate my account!'), 'class'=>'ActionButton' )) ); // display hidden fields etc
 ?>
 
@@ -68,6 +69,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.3  2006/04/27 21:49:55  blueyed
+ * todo
+ *
  * Revision 1.2  2006/04/24 20:52:31  fplanque
  * no message
  *
