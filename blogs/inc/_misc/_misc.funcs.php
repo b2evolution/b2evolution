@@ -2473,7 +2473,7 @@ function get_base_domain( $url )
 {
 	$base_domain = preg_replace( '~^[a-z]+://~i', '', $url );
 	$base_domain = preg_replace( '/^www\./i', '', $base_domain );
-	$base_domain = preg_replace( '~/.*~i', '', $base_domain );
+	$base_domain = preg_replace( '~(:[1-9]+)?/.*~i', '', $base_domain );
 
 	return $base_domain;
 }
@@ -2860,6 +2860,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.45  2006/04/27 20:10:34  fplanque
+ * changed banning of domains. Suggest a prefix by default.
+ *
  * Revision 1.44  2006/04/24 20:14:00  blueyed
  * doc
  *

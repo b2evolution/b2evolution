@@ -478,10 +478,14 @@ switch( $AdminUI->get_path(1) )
 			// Antispam:
 			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{
+				function referer_ban_link( $dom_name )
+				{
+					return '<a href="?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain( $dom_name ) )
+							.'" title="'.T_('Ban this domain!').'">'.get_icon('ban').'</a>';
+				}
 				$Results->cols[] = array(
 						'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
-						'td' => '<a href="?ctrl=antispam&amp;action=ban&amp;keyword=%rawurlencode( \'$dom_name$\' )%" title="'
-							.T_('Ban this domain!').'">'.get_icon('ban').'</a>',
+						'td' => '%referer_ban_link( #dom_name# )%',
 					);
 			}
 
@@ -668,7 +672,7 @@ switch( $AdminUI->get_path(1) )
 						<?php
 						if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ // user can ban:
-							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'action,keyword', 'action=ban&amp;keyword='.rawurlencode( stats_basedomain(false) ) ) ).'</td>';
+							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'action,keyword', 'action=ban&amp;keyword='.rawurlencode( get_ban_domain(stats_basedomain(false)) ) ) ).'</td>';
 						}
 						?>
 						<td class="right"><?php stats_hit_count() ?></td>
@@ -1046,6 +1050,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/04/27 20:10:34  fplanque
+ * changed banning of domains. Suggest a prefix by default.
+ *
  * Revision 1.10  2006/04/25 00:19:25  blueyed
  * Also only count "browser" hits as referers in summary; added row with total numbers
  *

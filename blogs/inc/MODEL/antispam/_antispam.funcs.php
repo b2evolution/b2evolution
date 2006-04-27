@@ -269,8 +269,37 @@ function antispam_poll_abuse( $display = true )
 	return($ret);
 }
 
+
+/**
+ * Get the base domain that could be blacklisted from an URL.
+ *
+ * We want to concentrate on the main domain and we want to prefix it with either . or // in order not
+ * to blacklist too large.
+ *
+ * @param string URL
+ * @return string the base domain
+ */
+function get_ban_domain( $url )
+{
+	// Remove
+	$domain = preg_replace( '~^[a-z]+://~i', '', $url );
+	$domain = preg_replace( '~(:[1-9]+)?/.*~i', '', $domain );
+
+	$base_domain = preg_replace( '~(.*\.)([^.]+\.[^.]+)~', '\\2', $domain );
+
+	if( strlen( $base_domain ) < strlen( $domain ) )
+	{	// The guy is spamming with subdomains (or www):
+		return '.'.$base_domain;
+	}
+
+	// The guy is spamming with teh base domain :
+	return '//'.$base_domain;
+}
 /*
  * $Log$
+ * Revision 1.5  2006/04/27 20:10:34  fplanque
+ * changed banning of domains. Suggest a prefix by default.
+ *
  * Revision 1.4  2006/04/19 22:26:24  blueyed
  * cleanup/polish
  *
