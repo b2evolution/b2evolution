@@ -235,6 +235,9 @@ if( !$Messages->count('error') )
 				$Request->param_integer_range( 'edited_user_level', 0, 10, T_('User level must be between %d and %d.') );
 				$edited_User->set( 'level', $edited_user_level );
 
+				$Request->param( 'edited_user_validated', 'integer', 0 );
+				$edited_User->set( 'validated', $edited_user_validated );
+
 				param( 'edited_user_grp_ID', 'integer', true );
 				$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
 				$edited_User->setGroup( $edited_user_Group );
@@ -319,7 +322,7 @@ if( !$Messages->count('error') )
 			$Request->param( 'edited_user_bozo', 'integer', 0 );
 			$Request->param( 'edited_user_focusonfirst', 'integer', 0 );
 
-      // Action icon params:
+			// Action icon params:
 			$UserSettings->set( 'action_icon_threshold', $edited_user_action_icon_threshold, $edited_User->ID );
 			$UserSettings->set( 'action_word_threshold', $edited_user_action_word_threshold, $edited_User->ID );
 			$UserSettings->set( 'display_icon_legend', $edited_user_legend, $edited_User->ID );
@@ -682,6 +685,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2006/04/27 21:50:40  blueyed
+ * Allow editing/viewing of "validated" property
+ *
  * Revision 1.17  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *

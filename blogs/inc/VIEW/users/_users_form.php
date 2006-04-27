@@ -158,6 +158,7 @@ if( $action != 'view_user' )
 	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show Online'), T_('Check this to be displayed as online when visiting the site.') );
 	$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
 	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), array( 'note' => $email_fieldnote, 'maxlength' => 100, 'required' => true ) );
+	$Form->checkbox( 'edited_user_validated', $edited_User->get('validated'), T_('Validated'), T_('Has the user been validated (through email)?') );
 	$Form->checkbox( 'edited_user_allow_msgform', $edited_User->get('allow_msgform'), T_('Message form'), T_('Check this to allow receiving emails through a message form.') );
 	$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever one of <strong>your</strong> posts receives comments, trackbacks, etc.') );
 	$Form->text_input( 'edited_user_url', $edited_User->url, 30, T_('URL'), array( 'note' => $url_fieldnote, 'maxlength' => 100 ) );
@@ -171,21 +172,22 @@ if( $action != 'view_user' )
 }
 else
 { // display only
-	$Form->info( T_('Login'), $edited_User->dget('login') );
-	$Form->info( T_('First name'), $edited_User->dget('firstname') );
-	$Form->info( T_('Last name'), $edited_User->dget('lastname') );
-	$Form->info( T_('Nickname'), $edited_User->dget('nickname') );
-	$Form->info( T_('Identity shown'), $edited_User->dget('preferredname') );
-	$Form->info( T_('Show Online'), ($edited_User->dget('showonline')) ? T_('yes') : T_('no') );
-	$Form->info( T_('Locale'), $edited_User->dget('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
-	$Form->info( T_('Email'), $edited_User->dget('email'), $email_fieldnote );
-	$Form->info( T_('Message form'), ($edited_User->dget('allow_msgform') ? T_('yes') : T_('no')) );
-	$Form->info( T_('Notifications'), ($edited_User->dget('notify') ? T_('yes') : T_('no')) );
-	$Form->info( T_('URL'), $edited_User->dget('url'), $url_fieldnote );
-	$Form->info( T_('ICQ'), $edited_User->dget('icq', 'formvalue'), $icq_fieldnote );
-	$Form->info( T_('AIM'), $edited_User->dget('aim'), $aim_fieldnote );
-	$Form->info( T_('MSN IM'), $edited_User->dget('msn') );
-	$Form->info( T_('YahooIM'), $edited_User->dget('yim') );
+	$Form->info( T_('Login'), $edited_User->get('login') );
+	$Form->info( T_('First name'), $edited_User->get('firstname') );
+	$Form->info( T_('Last name'), $edited_User->get('lastname') );
+	$Form->info( T_('Nickname'), $edited_User->get('nickname') );
+	$Form->info( T_('Identity shown'), $edited_User->get('preferredname') );
+	$Form->info( T_('Show Online'), ($edited_User->get('showonline')) ? T_('yes') : T_('no') );
+	$Form->info( T_('Locale'), $edited_User->get('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
+	$Form->info( T_('Email'), $edited_User->get('email'), $email_fieldnote );
+	$Form->info( T_('Validated'), $edited_User->get('validated'), T_('Validated'), T_('Has the user been validated (through email)?') );
+	$Form->info( T_('Message form'), ($edited_User->get('allow_msgform') ? T_('yes') : T_('no')) );
+	$Form->info( T_('Notifications'), ($edited_User->get('notify') ? T_('yes') : T_('no')) );
+	$Form->info( T_('URL'), $edited_User->get('url'), $url_fieldnote );
+	$Form->info( T_('ICQ'), $edited_User->get('icq', 'formvalue'), $icq_fieldnote );
+	$Form->info( T_('AIM'), $edited_User->get('aim'), $aim_fieldnote );
+	$Form->info( T_('MSN IM'), $edited_User->get('msn') );
+	$Form->info( T_('YahooIM'), $edited_User->get('yim') );
 }
 
 $Form->end_fieldset();
@@ -285,6 +287,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.13  2006/04/27 21:50:40  blueyed
+ * Allow editing/viewing of "validated" property
+ *
  * Revision 1.12  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
