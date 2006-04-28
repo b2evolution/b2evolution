@@ -149,7 +149,7 @@ function format_to_output( $content, $format = 'htmlbody' )
  * @param string Encoding (used for SafeHtmlChecker() only!)
  * @return string
  */
-function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'ISO-8859-1' )
+function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NULL )
 {
 	global $use_balanceTags, $use_html_checker, $use_security_checker;
 	global $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme;
@@ -171,6 +171,11 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = 'IS
 
 	if( $use_html_checker )
 	{ // Check the code:
+		if( empty($encoding) )
+		{
+			// TODO: use $io_charset
+			$encoding = locale_charset(false);
+		}
 		if( ! $is_comment )
 		{
 			$checker = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes,
@@ -2860,6 +2865,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.46  2006/04/28 16:06:05  blueyed
+ * Fixed encoding for format_to_post
+ *
  * Revision 1.45  2006/04/27 20:10:34  fplanque
  * changed banning of domains. Suggest a prefix by default.
  *
