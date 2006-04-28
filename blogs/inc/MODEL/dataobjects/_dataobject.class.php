@@ -297,6 +297,8 @@ class DataObject
 
 	/**
 	 * Delete object from DB.
+	 *
+	 * @return boolean true on success
 	 */
 	function dbdelete()
 	{
@@ -339,6 +341,8 @@ class DataObject
 
 		// Just in case... remember this object has been deleted from DB!
 		$this->ID = 0;
+
+		return true;
 	}
 
 
@@ -660,6 +664,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2006/04/28 16:08:25  blueyed
+ * Normalization
+ *
  * Revision 1.11  2006/04/24 20:31:15  blueyed
  * doc fixes
  *
