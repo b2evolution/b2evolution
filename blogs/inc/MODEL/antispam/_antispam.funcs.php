@@ -276,8 +276,10 @@ function antispam_poll_abuse( $display = true )
  * We want to concentrate on the main domain and we want to prefix it with either . or // in order not
  * to blacklist too large.
  *
+ * {@internal This function gets tested in _misc.funcs.simpletest.php}}
+ *
  * @param string URL
- * @return string the base domain
+ * @return string the pattern to match this domain in the blacklist
  */
 function get_ban_domain( $url )
 {
@@ -285,6 +287,7 @@ function get_ban_domain( $url )
 	$domain = preg_replace( '~^[a-z]+://~i', '', $url );
 	$domain = preg_replace( '~(:[1-9]+)?/.*~i', '', $domain );
 
+	// Get the base domain (without any subdomains):
 	$base_domain = preg_replace( '~(.*\.)([^.]+\.[^.]+)~', '\\2', $domain );
 
 	if( strlen( $base_domain ) < strlen( $domain ) )
@@ -292,11 +295,16 @@ function get_ban_domain( $url )
 		return '.'.$base_domain;
 	}
 
-	// The guy is spamming with teh base domain :
+	// The guy is spamming with the base domain:
 	return '//'.$base_domain;
 }
+
+
 /*
  * $Log$
+ * Revision 1.6  2006/04/28 11:16:17  blueyed
+ * test, doc
+ *
  * Revision 1.5  2006/04/27 20:10:34  fplanque
  * changed banning of domains. Suggest a prefix by default.
  *

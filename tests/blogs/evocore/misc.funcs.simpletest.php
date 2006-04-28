@@ -9,6 +9,10 @@
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
 
+require_once( $inc_path.'MODEL/antispam/_antispam.funcs.php' );
+require_once( $inc_path.'_misc/_misc.funcs.php' );
+
+
 /**
  * @package tests
  */
@@ -210,6 +214,26 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 	function helper_test_callback_on_non_matching_blocks( $text )
 	{
 		return '[['.$text.']]';
+	}
+
+
+	/**
+	 * Test {@link get_ban_domain()}
+	 */
+	function test_get_ban_domain()
+	{
+		$this->assertEqual( get_ban_domain('www.example.com'), '.example.com' );
+		$this->assertEqual( get_ban_domain('www2.example.com'), '.example.com' );
+		$this->assertEqual( get_ban_domain('http://www.example.com'), '.example.com' );
+		$this->assertEqual( get_ban_domain('http://www2.example.com'), '.example.com' );
+		$this->assertEqual( get_ban_domain('http://www.example.com/path/'), '.example.com' );
+		$this->assertEqual( get_ban_domain('http://www2.example.com/path/?query=1'), '.example.com' );
+		$this->assertEqual( get_ban_domain('https://www.example.com'), '.example.com' );
+		$this->assertEqual( get_ban_domain('https://www2.example.com'), '.example.com' );
+		$this->assertEqual( get_ban_domain('http://sub2.sub1.example.com'), '.example.com' );
+		$this->assertEqual( get_ban_domain('http://sub3.sub2.sub1.example.com'), '.example.com' );
+		$this->assertEqual( get_ban_domain('http://hostname'), '//hostname' );
+		$this->assertEqual( get_ban_domain('http://hostname.tld'), '//hostname.tld' );
 	}
 
 }
