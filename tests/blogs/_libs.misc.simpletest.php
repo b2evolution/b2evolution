@@ -9,6 +9,8 @@
 require_once( dirname(__FILE__).'/../config.simpletest.php' );
 
 
+global $inc_path;
+
 /**
  * Includes
  */
