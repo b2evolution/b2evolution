@@ -58,21 +58,36 @@ class SafeHtmlChecker
 	var $error;
 
 	/**
-	 * SafeHtmlChecker(-)
+	 * Constructor
+	 *
+	 * {@internal This gets tested in _libs.misc.simpletest.php}}
+	 *
+	 * @param array
+	 * @param array
+	 * @param array
+	 * @param array
+	 * @param string Input encoding to use ('ISO-8859-1', 'UTF-8', 'US-ASCII' or '' for auto-detect)
 	 */
-	function SafeHtmlChecker( & $allowed_tags, & $allowed_attributes, & $uri_attrs, & $allowed_uri_scheme, $encoding = 'ISO-8859-1' )
+	function SafeHtmlChecker( & $allowed_tags, & $allowed_attributes, & $uri_attrs, & $allowed_uri_scheme, $encoding = '' )
 	{
 		$this->tags = & $allowed_tags;
 		$this->tagattrs = & $allowed_attributes;
 		$this->uri_attrs = & $uri_attrs;
 		$this->allowed_uri_scheme = & $allowed_uri_scheme;
-		$encoding = strtoupper($encoding); // we might get 'iso-8859-1' for example and IMHO it's better to convert it for the whole class than in the check below
+
+
+		$encoding = strtoupper($encoding); // we might get 'iso-8859-1' for example
+		$this->encoding = $encoding;
 		if( ! in_array( $encoding, array( 'ISO-8859-1', 'UTF-8', 'US-ASCII' ) ) )
 		{ // passed encoding not supported by xml_parser_create()
-			$encoding = 'UTF-8';
+			$this->xml_parser_encoding = ''; // auto-detect (in PHP4, in PHP5 anyway)
 		}
-		$this->encoding = $encoding; // this gets used in the xml header we create also
-		$this->parser = xml_parser_create( $this->encoding );
+		else
+		{
+			$this->xml_parser_encoding = $this->encoding;
+		}
+		$this->parser = xml_parser_create( $this->xml_parser_encoding );
+
 		$this->last_checked_pos = 0;
 		$this->error = false;
 
@@ -113,14 +128,39 @@ class SafeHtmlChecker
 	 */
 	function check($xhtml)
 	{
+		// Convert encoding:
+		if( empty($this->xml_parser_encoding) || $this->encoding != $this->xml_parser_encoding )
+		{ // we need to convert encoding:
+			if( function_exists( 'mb_convert_encoding' ) )
+			{ // we can convert encoding
+				$supported_encodings = mb_list_encodings();
+				foreach( $supported_encodings as $k => $v )
+				{
+					$supported_encodings[$k] = strtoupper($v);
+				}
+
+				if( in_array( 'UTF-8', $supported_encodings ) )
+				{
+					$xhtml = mb_convert_encoding( $xhtml, 'UTF-8' );
+					$this->encoding = 'UTF-8';
+				}
+			}
+		}
+
 		// Open comments or '<![CDATA[' are dangerous
 		$xhtml = str_replace('<!', '', $xhtml);
 
 		// Convert isolated & chars
 		$xhtml = preg_replace( '#(\s)&(\s)#', '\\1&amp;\\2', $xhtml );
 
-		$xhtml = '<?xml version="1.0" encoding="'.$this->encoding.'"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
-				.'<body>'.$xhtml.'</body>';
+		$xhtml_head = '<?xml version="1.0"';
+		if( ! empty($this->encoding) )
+		{
+			$xhtml_head .= ' encoding="'.$this->encoding.'"';
+		}
+		$xhtml_head .= '?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
+
+		$xhtml = $xhtml_head.'<body>'.$xhtml.'</body>';
 
 		if (!xml_parse($this->parser, $xhtml))
 		{
@@ -246,8 +286,12 @@ class SafeHtmlChecker
 
 }
 
+
 /*
  * $Log$
+ * Revision 1.4  2006/04/28 16:04:27  blueyed
+ * Fixed encoding for SafeHtmlChecker; added tests
+ *
  * Revision 1.3  2006/03/20 00:25:45  blueyed
  * fix
  *
