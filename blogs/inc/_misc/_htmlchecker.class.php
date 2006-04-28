@@ -132,18 +132,11 @@ class SafeHtmlChecker
 		if( empty($this->xml_parser_encoding) || $this->encoding != $this->xml_parser_encoding )
 		{ // we need to convert encoding:
 			if( function_exists( 'mb_convert_encoding' ) )
-			{ // we can convert encoding
-				$supported_encodings = mb_list_encodings();
-				foreach( $supported_encodings as $k => $v )
-				{
-					$supported_encodings[$k] = strtoupper($v);
-				}
+			{ // we can convert encoding to UTF-8
+				$this->encoding = 'UTF-8';
 
-				if( in_array( 'UTF-8', $supported_encodings ) )
-				{
-					$xhtml = mb_convert_encoding( $xhtml, 'UTF-8' );
-					$this->encoding = 'UTF-8';
-				}
+				// Convert XHTML:
+				$xhtml = mb_convert_encoding( $xhtml, 'UTF-8' );
 			}
 		}
 
@@ -289,6 +282,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/28 18:07:20  blueyed
+ * Simplified, removed PHP5 dependency
+ *
  * Revision 1.4  2006/04/28 16:04:27  blueyed
  * Fixed encoding for SafeHtmlChecker; added tests
  *
