@@ -393,8 +393,7 @@ class Hit
 	 */
 	function log()
 	{
-		global $Debuglog, $DB, $blog, $debug_no_register_shutdown;
-		global $Settings;
+		global $Plugins, $Debuglog;
 
 		if( $this->logged )
 		{
@@ -412,27 +411,11 @@ class Hit
 			return false;
 		}
 
-		if( $this->referer_type == 'referer' && $Settings->get('hit_doublecheck_referer') )
-		{
-			if( empty($debug_no_register_shutdown) && function_exists( 'register_shutdown_function' ) )
-			{ // register it as a shutdown function, because it will be slow!
-				$Debuglog->add( 'log(): double-check: loading referering page.. (register_shutdown_function())', 'hit' );
-				register_shutdown_function( array( &$this, 'double_check_referer' ) ); // this will also call _record_the_hit()
-			}
-			else
-			{
-				// flush now, so that the meat of the page will get shown before it tries to check
-				// back against the refering URL.
-				flush();
-
-				$Debuglog->add( 'log(): double-check: loading referering page..', 'hit' );
-
-				$this->double_check_referer(); // this will also call _record_the_hit()
-			}
-		}
-		else
-		{
-			$this->_record_the_hit();
+		if( ! $Plugins->trigger_event_first_true('AppendHitLog', array( 'Hit' => &$this ) ) // No plugin wants to handle recording
+			&& $this->is_good_hit() // A plugin might have changed the referer_type
+		)
+		{ // Record it here:
+			$this->record_the_hit();
 		}
 
 		// Remember we have logged already:
@@ -443,15 +426,14 @@ class Hit
 
 
 	/**
-	 * This records the hit. You should not call this directly, but {@link log()}!
+	 * This records the hit. You should not call this directly, but {@link Hit::log()} instead!
 	 *
-	 * It gets called either by {@link log()} or by {@link double_check_referer()} when this is used.
+	 * However, if a Plugin registers the {@link Plugin::AppendHitLog() AppendHitLog event}, it
+	 * could be necessary to call this as a shutdown function.
 	 *
-	 * It will call Hitlist::dbprune() to do the automatic pruning of old hits.
-	 *
-	 * @access protected
+	 * It will call {@link Hitlist::dbprune()} to do the automatic pruning of old hits.
 	 */
-	function _record_the_hit()
+	function record_the_hit()
 	{
 		global $DB, $Session, $ReqURI, $Blog, $localtimenow, $Debuglog;
 
@@ -473,112 +455,6 @@ class Hit
 
 		require_once( dirname(__FILE__).'/_hitlist.class.php' );
 		Hitlist::dbprune(); // will prune once per day, according to Settings
-	}
-
-
-	/**
-	 * This function gets called (as a {@link register_shutdown_function() shutdown function}, if possible) and checks
-	 * if the referering URL's content includes the current URL - if not it is probably spam!
-	 *
-	 * On success, this methods records the hit.
-	 *
-	 * TODO: use DB cache to avoid checking the same page again and again!
-	 * TODO: transform into plugin (blueyed)
-	 *
-	 * @uses _record_the_hit()
-	 */
-	function double_check_referer()
-	{
-		global $ReqURI, $Debuglog;
-		global $misc_inc_path, $lib_subdir;
-
-		if( !empty($this->referer) )
-		{
-			if( ($fp = @fopen( $this->referer, 'r' )) )
-			{
-				socket_set_timeout($fp, 5); // timeout after 5 seconds
-				// Get the refering page's content
-				$content_ref_page = '';
-				$bytes_read = 0;
-				while( ($l_byte = fgetc($fp)) !== false )
-				{
-					$content_ref_page .= $l_byte;
-					if( ++$bytes_read > 512000 )
-					{ // do not pull more than 500kb of data!
-						break;
-					}
-				}
-
-				/**
-				 * IDNA converter class
-				 */
-				require_once $misc_inc_path.'ext/_idna_convert.class.php';
-				$IDNA = new Net_IDNA_php4();
-
-				// Build the search pattern.
-				// We match for basically for 'href="[SERVER]|[REQ_URI]', where [SERVER]
-				$search_pattern = '~\shref=["\']?https?://(';
-				$possible_hosts = array( $_SERVER['HTTP_HOST'] );
-				if( $_SERVER['SERVER_NAME'] != $_SERVER['HTTP_HOST'] )
-				{
-					$possible_hosts[] = $_SERVER['SERVER_NAME'];
-				}
-				$search_pattern_hosts = array();
-				foreach( $possible_hosts as $l_host )
-				{
-					if( preg_match( '~^([^.]+\.)(.*?)([^.]+\.[^.]+)$~', $l_host, $match ) )
-					{ // we have subdomains in this hostname
-						if( stristr( $match[1], 'www' ) )
-						{ // search also for hostname without 'www.'
-							$search_pattern_hosts[] = $match[2].$match[3];
-						}
-					}
-					$search_pattern_hosts[] = $l_host;
-				}
-				$search_pattern_hosts = array_unique($search_pattern_hosts);
-				foreach( $search_pattern_hosts as $l_host )
-				{ // add IDN, because this is probably linked
-					$l_idn_host = $IDNA->decode( $l_host ); // the decoded puny-code ("xn--..") name (utf8)
-
-					if( $l_idn_host != $l_host )
-					{
-						$search_pattern_hosts[] = $l_idn_host;
-					}
-				}
-
-				// add hosts to pattern, preg_quoted
-				for( $i = 0, $n = count($search_pattern_hosts); $i < $n; $i++ )
-				{
-					$search_pattern_hosts[$i] = preg_quote( $search_pattern_hosts[$i], '~' );
-				}
-				$search_pattern .= implode( '|', $search_pattern_hosts ).')'.$ReqURI.'~i';
-
-
-				// TODO: handle encoding of the refering page (iconv/recode), if we have decoded base name, $content_ref_page must be utf8
-				if( preg_match( $search_pattern, $content_ref_page ) )
-				{
-					$Debuglog->add( 'double_check_referer(): found current url in page ('.bytesreadable($bytes_read).' read)', 'hit' );
-				}
-				else
-				{
-					$Debuglog->add( 'double_check_referer(): '.sprintf('did not find &laquo;%s&raquo; in &laquo;%s&raquo; (%s bytes read). -> referer_type=spam!', $search_pattern, $this->referer, bytesreadable($bytes_read) ), 'hit' );
-					$this->referer_type = 'spam';
-				}
-				unset( $content_ref_page );
-			}
-			else
-			{ // This was probably spam!
-				$Debuglog->add( 'double_check_referer(): could not access &laquo;'.$this->referer.'&raquo;', 'hit' );
-				$this->referer_type = 'spam';
-			}
-		}
-
-		if( $this->referer_type != 'spam' )
-		{
-			$this->_record_the_hit();
-		}
-
-		return true;
 	}
 
 
@@ -612,10 +488,10 @@ class Hit
 			}
 			elseif( $allow_nslookup )
 			{ // We allowed reverse DNS lookup:
-        // This can be terribly time consuming (4/5 seconds!) when there is no reverse dns available!
-        // This is the case on many intranets and many users' first time installs!!!
-        // Some people end up considering evocore is very slow just because of this line!
-        // This cannot be enabled by default.
+				// This can be terribly time consuming (4/5 seconds!) when there is no reverse dns available!
+				// This is the case on many intranets and many users' first time installs!!!
+				// Some people end up considering evocore is very slow just because of this line!
+				// This cannot be enabled by default.
 				$this->_remoteHost = @gethostbyaddr($this->IP);
 			}
 			else
@@ -722,6 +598,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.17  2006/04/29 17:37:48  blueyed
+ * Added basic_antispam_plugin; Moved double-check-referers there; added check, if trackback links to us
+ *
  * Revision 1.16  2006/04/22 16:30:01  blueyed
  * cleanup
  *

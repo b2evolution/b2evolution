@@ -75,7 +75,6 @@ class GeneralSettings extends AbstractSettings
 		'fm_default_chmod_file' => '664',   // Needs UI
 		'fm_default_chmod_dir' => '775',    // Needs UI
 
-		'hit_doublecheck_referer' => '0',
 		'links_extrapath' => '0',
 
 		'newusers_canregister' => '0',
@@ -147,6 +146,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.8  2006/04/29 17:37:48  blueyed
+ * Added basic_antispam_plugin; Moved double-check-referers there; added check, if trackback links to us
+ *
  * Revision 1.7  2006/04/24 18:12:54  blueyed
  * Added Setting to invalidate a user account on email address change.
  *

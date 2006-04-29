@@ -83,7 +83,7 @@ switch( $action )
 
 			$Settings->delete_array( array(
 				'eblog_enabled', 'eblog_method', 'eblog_server_host', 'eblog_server_port', 'eblog_username', 'eblog_password', 'eblog_default_category', 'eblog_subject_prefix',
-				'hit_doublecheck_referer', 'auto_prune_stats',
+				'auto_prune_stats',
 				'timeout_sessions',
 				'webhelp_enabled' ) );
 
@@ -142,9 +142,6 @@ switch( $action )
 
 
 			// Statistics
-			$Request->param( 'hit_doublecheck_referer', 'integer', 0 );
-			$Settings->set( 'hit_doublecheck_referer', $hit_doublecheck_referer );
-
 			$Request->param( 'auto_prune_stats', 'integer', $Settings->get_default('auto_prune_stats') );
 			$Settings->set( 'auto_prune_stats', $Request->get('auto_prune_stats') );
 

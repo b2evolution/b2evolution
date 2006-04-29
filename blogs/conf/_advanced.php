@@ -551,13 +551,13 @@ $force_regexp_dirname = '';
 
 
 /**
- * Set this to 1 to disable using PHP's register_shutdown_function(),
+ * Set this to 1 to disable using PHP's {@link register_shutdown_function()},
  * but not everywhere.
  *
  * This is NOT recommened, because it affects things that should be done after delivering the page.
  *
- * Currently, it disables using register_shutdown_function() for hit_doublecheck_referer
- * ({@link Hit::log()}), but not for {@link Session::dbsave()}.
+ * Currently, it disables using register_shutdown_function() for double checking referers
+ * ({@link basic_antispam_plugin::AppendHitLog()}), but not for {@link Session::dbsave()}.
  *
  * It's probably only useful for debugging to disable this feature.
  * @global int $debug_no_register_shutdown

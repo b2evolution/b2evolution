@@ -275,6 +275,7 @@ class Plugins
 
 				'SkinTag' => '',
 
+				'AppendHitLog' => T_('Called when a hit gets logged, but before it gets recorded.'),
 				'TrackbackReceived' => T_('Gets called after a trackback has been received.'),
 
 				'DisplayCommentFormButton' => '',
@@ -2582,6 +2583,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.37  2006/04/29 17:37:48  blueyed
+ * Added basic_antispam_plugin; Moved double-check-referers there; added check, if trackback links to us
+ *
  * Revision 1.36  2006/04/29 01:04:23  blueyed
  * *** empty log message ***
  *

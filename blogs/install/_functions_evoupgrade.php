@@ -640,8 +640,7 @@ function upgrade_b2evo_tables()
 								( "reloadpage_timeout", "300" ),
 								( "upload_enabled", "'.(isset($use_fileupload) ? (int)$use_fileupload : '1').'" ),
 								( "upload_allowedext", "'.(isset($fileupload_allowedtypes) ? $fileupload_allowedtypes : 'jpg gif png').'" ),
-								( "upload_maxkb", "'.(isset($fileupload_maxk) ? (int)$fileupload_maxk : '96').'" ),
-								( "hit_doublecheck_referer", "'.(isset($doubleCheckReferers) ? (int)$doubleCheckReferers : '0').'" )
+								( "upload_maxkb", "'.(isset($fileupload_maxk) ? (int)$fileupload_maxk : '96').'" )
 							';
 		$DB->query( $query );
 		// Replace "paged" mode with "posts"
@@ -841,6 +840,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.143  2006/04/29 17:37:48  blueyed
+ * Added basic_antispam_plugin; Moved double-check-referers there; added check, if trackback links to us
+ *
  * Revision 1.142  2006/04/27 19:08:15  blueyed
  * todo
  *

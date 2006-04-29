@@ -116,7 +116,6 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Hit logging') . get_web_help_link('Hit logging') );
-	$Form->checkbox_input( 'hit_doublecheck_referer', $Settings->get('hit_doublecheck_referer'), T_('Double-check Referer'), array( 'note' => T_('Activating this will search the requested (your) URL in the content of the referring page. This is against referer spam, but creates additional webserver traffic.') ) );
 	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Autoprune stats after'),
 		array( 'note' => T_('days. (0 to disable) How many days of stats do you want to keep in the database?'), 'required'=>true ) );
 $Form->end_fieldset();
@@ -140,6 +139,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/29 17:37:48  blueyed
+ * Added basic_antispam_plugin; Moved double-check-referers there; added check, if trackback links to us
+ *
  * Revision 1.4  2006/04/19 20:13:52  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
