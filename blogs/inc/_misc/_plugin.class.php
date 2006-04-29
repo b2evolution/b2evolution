@@ -896,7 +896,7 @@ class Plugin
 	// }}}
 
 
-	// Comment events: {{{
+	// Feedback (Comment/Trackback) events: {{{
 
 	/**
 	 * Event handler: Called at the end of the frontend comment form.
@@ -1004,6 +1004,25 @@ class Plugin
 	 *   - 'Comment': the related Comment (by reference)
 	 */
 	function AfterCommentDelete( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called when a trackback has been received.
+	 *
+	 * Use this, to validate a trackback: you could {@link Plugin::msg() add a message} of
+	 * category "error" here, to prevent the trackback from being accepted.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item, for which the trackback is meant
+	 *   - 'url': Referring URL, to where the trackback should link (by reference)
+	 *   - 'title': Title of the trackback (by reference)
+	 *   - 'excerpt': Excerpt/Text of the trackback (by reference)
+	 *   - 'blog_name': Name of the referring blog (by reference)
+	 *
+	 */
+	function TrackbackReceived( & $params )
 	{
 	}
 
@@ -1552,6 +1571,11 @@ class Plugin
 	{
 		global $Debuglog;
 
+		if( ! is_array($add_cats) )
+		{
+			$add_cats = array($add_cats);
+		}
+
 		$add_cats[] = $this->classname.'_'.$this->ID;
 		$Debuglog->add( $msg, $add_cats );
 	}
@@ -1986,6 +2010,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.37  2006/04/29 01:04:23  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.36  2006/04/27 20:07:19  blueyed
  * Renamed Plugin::get_htsrv_methods() to GetHtsvMethods() (normalization)
  *

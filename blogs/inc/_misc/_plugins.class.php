@@ -275,6 +275,8 @@ class Plugins
 
 				'SkinTag' => '',
 
+				'TrackbackReceived' => T_('Gets called after a trackback has been received.'),
+
 				'DisplayCommentFormButton' => '',
 				'DisplayCommentFormFieldset' => '',
 				'DisplayMessageFormButton' => '',
@@ -2580,6 +2582,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.36  2006/04/29 01:04:23  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.35  2006/04/27 20:07:19  blueyed
  * Renamed Plugin::get_htsrv_methods() to GetHtsvMethods() (normalization)
  *
