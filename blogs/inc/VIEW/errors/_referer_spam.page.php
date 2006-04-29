@@ -4,13 +4,16 @@
  *
  * @package evocore
  */
+
 header('HTTP/1.0 403 Forbidden');
+header('Content-Type: text/html; charset=iso-8859-1'); // no translation
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
- 		<title>403 Forbidden - Please stop referer spam.</title>
+		<title>403 Forbidden - Please stop referer spam.</title>
 	</head>
 	<body>
 		<h1>403 Forbidden</h1>
@@ -22,9 +25,9 @@ header('HTTP/1.0 403 Forbidden');
 		While we understand it was fun for you guys while it lasted, please understand our servers cannot take the load of
 		all this cumulated spam any longer... Thank you.</p>
 		<p>Also, please note that comment/trackback submitted URLs will be tagged with rel="nofollow" in order to be ignored by search engines.</p>
-  </body>
+	</body>
 </html>
 <?php
 	debug_info();
- 	exit;
+	exit;
 ?>

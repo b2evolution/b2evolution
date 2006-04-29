@@ -63,7 +63,7 @@ $selected_File = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path );
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<title><?php echo $selected_File->get_name().' ('.T_('Preview').')'; ?></title>
 	<script type="text/javascript" src="../rsc/js/styleswitcher.js"></script>
 	<link href="../rsc/css/viewfile.css" rel="stylesheet" type="text/css" />
@@ -233,6 +233,12 @@ debug_info();
 <?php
 /*
  * $Log$
+ * Revision 1.8  2006/04/29 01:24:04  blueyed
+ * More decent charset support;
+ * unresolved issues include:
+ *  - front office still forces the blog's locale/charset!
+ *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
+ *
  * Revision 1.7  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

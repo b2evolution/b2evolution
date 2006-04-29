@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<title><?php
 		$Blog->disp('name', 'htmlhead');
 		request_title( ' - ', '', ' - ', 'htmlhead' );
@@ -56,7 +56,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <div class="outerwrap">
 <div class="innerwrap">
 
-<?php 
+<?php
 	/**
 	 * --------------------------- BLOG LIST INCLUDED HERE -----------------------------
 	 */
@@ -134,7 +134,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 	<p class="center"><strong>
 		<?php posts_nav_link(); ?>
-		<?php 
+		<?php
 			// previous_post( '<p class="center">%</p>' );
 			// next_post( '<p class="center">%</p>' );
 		?>
@@ -226,7 +226,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			</ul>
 		</div>
 	<?php } ?>
-	
+
 	<div class="bSideItem">
 		<h3><?php echo T_('Misc') ?></h3>
 		<ul>
@@ -265,7 +265,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					<a href="<?php $Blog->disp( 'comments_atom_url', 'raw' ) ?>"><?php echo T_('Comments') ?></a>
 				</li>
 			</ul>
-			
+
 		<a href="http://fplanque.net/Blog/itTrends/2004/01/10/rss_rdf_and_atom_in_a_nutshell" title="External - English">What is this?</a>
 
 </div>

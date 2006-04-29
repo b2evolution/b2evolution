@@ -28,23 +28,23 @@
  * @author blueyed
  * @author fplanque
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
- * 
+ *
  * @todo Let the {@link AdminUI_general AdminUI} object handle this. NEEDS MASSIVE CLEANUP!!!!
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins;
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<title><?php echo $this->get_html_title(); ?></title>
 
 	<?php
 	// Include head lines, links (to CSS...), sets <base>, ..
 	echo $this->get_headlines();
-
-	global $rsc_url;
 	?>
 	<script type="text/javascript">
 		imgpath_expand = '<?php echo get_icon( 'expand', 'url' ); ?>';
@@ -62,18 +62,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/extracats.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/dynamic_select.js"></script>
 	<?php
-	global $UserSettings;
 	if( $UserSettings->get('control_form_abortions') <> 0 )
 	{	// Activate bozo validator
 		echo '<script type="text/javascript" src="'.$rsc_url.'js/bozo_validator.js"></script>';
 	}
-	
+
 	if( $UserSettings->get('focus_on_first_input') <> 0 )
 	{	// Activate focus on first form <input type="text">:
 		echo '<script type="text/javascript">addEvent( window, "load", focus_on_first_input, false );</script>';
 	}
-	
-	global $Debuglog;
+
 	$Debuglog->add( 'Admin-Path: '.var_export($this->path, true) );
 
 	if( $this->get_path(0) == 'files'
@@ -378,7 +376,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	}}}
 
 	// CALL PLUGINS NOW:
-	global $Plugins;
 	$Plugins->trigger_event( 'AdminEndHtmlHead', array() );
 	?>
 </head>

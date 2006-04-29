@@ -146,7 +146,7 @@ function format_to_output( $content, $format = 'htmlbody' )
  * @param string The content to format
  * @param integer Create automated <br /> tags? (Deprecated??!)
  * @param integer Is this a comment? (Used for balanceTags(), SafeHtmlChecker()'s URI scheme, styling restrictions)
- * @param string Encoding (used for SafeHtmlChecker() only!)
+ * @param string Encoding (used for SafeHtmlChecker() only!); defaults to $io_charset
  * @return string
  */
 function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NULL )
@@ -154,6 +154,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
 	global $use_balanceTags, $use_html_checker, $use_security_checker;
 	global $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme;
 	global $comments_allowed_tags, $comments_allowed_attributes, $comments_allowed_uri_scheme;
+	global $io_charset;
 
 	// Replace any & that is not a character or entity reference with &amp;
 	$content = preg_replace( '/&(?!#[0-9]+;|#x[0-9a-fA-F]+;|[a-zA-Z_:][a-zA-Z0-9._:-]*;)/', '&amp;', $content );
@@ -173,8 +174,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
 	{ // Check the code:
 		if( empty($encoding) )
 		{
-			// TODO: use $io_charset
-			$encoding = locale_charset(false);
+			$encoding = $io_charset;
 		}
 		if( ! $is_comment )
 		{
@@ -253,7 +253,7 @@ function zeroise($number, $threshold)
 
 
 /*
- * Convert all non ASCII chars (except if UTF-8) to &#nnnn; unicode references.
+ * Convert all non ASCII chars (except if UTF-8 or GB2312) to &#nnnn; unicode references.
  * Also convert entities to &#nnnn; unicode references if output is not HTML (eg XML)
  *
  * Preserves < > and quotes.
@@ -263,10 +263,10 @@ function zeroise($number, $threshold)
  */
 function convert_chars( $content, $flag='html' )
 {
-	global $b2_htmltrans, $b2_htmltranswinuni;
+	global $b2_htmltrans, $b2_htmltranswinuni, $evo_charset;
 
 	// Convert highbyte non ASCII/UTF-8 chars to urefs:
-	if( (locale_charset(false) != 'utf-8') && (locale_charset(false) != 'gb2312') )
+	if( $evo_charset != 'utf-8' && $evo_charset != 'gb2312' )
 	{ // This is a single byte charset
 		$content = preg_replace_callback(
 			'/[\x80-\xff]/',
@@ -1033,7 +1033,7 @@ function remove_magic_quotes( $mixed )
 function param( $var, $type = '', $default = '', $memorize = false,
 								$override = false, $forceset = true )
 {
-	global $global_param_list, $Debuglog, $debug;
+	global $global_param_list, $Debuglog, $debug, $evo_charset;
 	// NOTE: we use $GLOBALS[$var] instead of $$var, because otherwise it would conflict with param names which are used as function params ("var", "type", "default", ..)!
 
 	// Check if already set
@@ -1076,6 +1076,11 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		$GLOBALS[$var] = remove_magic_quotes($GLOBALS[$var]);
 
 		// $Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($GLOBALS[$var], true).']!', 'params' );
+	}
+
+	if( isset($current_charset) && $current_charset != $evo_charset )
+	{ // the INPUT/OUTPUT charset differs from the internal one (this also means mb_convert_encoding is available)
+		mb_convert_variables( $evo_charset, $current_charset, $GLOBALS[$var] );
 	}
 
 	// type will be forced even if it was set before and not overriden
@@ -2865,6 +2870,12 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.47  2006/04/29 01:24:05  blueyed
+ * More decent charset support;
+ * unresolved issues include:
+ *  - front office still forces the blog's locale/charset!
+ *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
+ *
  * Revision 1.46  2006/04/28 16:06:05  blueyed
  * Fixed encoding for format_to_post
  *

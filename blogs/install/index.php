@@ -58,10 +58,12 @@ locale_activate( $default_locale );
 
 $timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
 
+header('Content-Type: text/html; charset='.$io_charset);
+
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<title><?php echo T_('b2evo installer') ?></title>
 	<link href="../rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
 </head>
@@ -598,6 +600,12 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.98  2006/04/29 01:24:05  blueyed
+ * More decent charset support;
+ * unresolved issues include:
+ *  - front office still forces the blog's locale/charset!
+ *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
+ *
  * Revision 1.97  2006/04/11 22:28:58  blueyed
  * cleanup
  *

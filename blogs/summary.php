@@ -25,7 +25,7 @@ require_once $inc_path.'_main.inc.php';
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
-<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 <title><?php echo T_('Summary Demo'); ?></title>
 <!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->

@@ -41,7 +41,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<title><?php
 		$Blog->disp('name', 'htmlhead');
 		request_title( ' - ', '', ' - ', 'htmlhead' );
@@ -158,7 +158,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	</form>
  </li>
 
- 
+
 	<?php // -------------------------- ARCHIVES INCLUDED HERE -----------------------------
 		// Call the Archives plugin:
 		$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:

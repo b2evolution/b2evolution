@@ -124,7 +124,7 @@ if( empty($disp) )
 
 if( $disp == 'stats' )
 {
-	require $view_path.'errors/_410_stats_gone.page.php'; // error & exit
+	require $view_path.'errors/_410_stats_gone.page.php'; // error (& exit, if return not uncommented there)
 }
 
 // Getting current blog info:
@@ -141,6 +141,67 @@ blueyed> Sure, but that means we should either split it, or use the locale here 
 // Activate matching locale:
 $Debuglog->add( 'Activating blog locale: '.$Blog->get('locale'), 'locale' );
 locale_activate( $Blog->get('locale') );
+
+// Check and eventually adjust $evo_charset:
+// NOTE: this is quite the same as with _main.inc.php, because of the (overriding) blog's locale above
+if( $io_charset != locale_charset(false) )
+{ // io_charset changed from the initial setting in _main.inc.php
+
+	$io_charset = locale_charset(false);
+
+	if( ! empty($mb_output_handler_started) || $evo_charset != $io_charset )
+	{ // we have to convert for I/O, which requires mbstrings extension
+		if( ! function_exists('mb_convert_encoding') )
+		{
+			$Debuglog->add( '$evo_charset differs from $io_charset, but mbstrings does not seem to be installed.', array('errors','locale') );
+			$evo_charset = $io_charset; // we cannot convert I/O to internal charset
+		}
+		else
+		{ // check if the encodings are supported:
+			if( function_exists('mb_list_encodings') ) // PHP5
+			{
+				$mb_encodings = mb_list_encodings();
+			}
+			else
+			{
+				$mb_encodings = NULL;
+			}
+
+			if( isset($mb_encodings) && ! in_array( strtoupper($io_charset), $mb_encodings ) )
+			{
+				$Debuglog->add( 'Cannot I/O convert because I/O charset ['.$io_charset.'] is not in mb_list_encodings()!', array('errors','locale') );
+				$evo_charset = $io_charset;
+			}
+			elseif( isset($mb_encodings) && ! in_array( strtoupper($evo_charset), $mb_encodings ) )
+			{
+				$Debuglog->add( 'Cannot I/O convert because $evo_charset='.$evo_charset.' is not in mb_list_encodings()!', array('errors','locale') );
+				$evo_charset = $io_charset;
+			}
+			else
+			{
+				mb_internal_encoding( $evo_charset );
+				mb_http_output( $io_charset );
+				if( empty($mb_output_handler_started) )
+				{ // has not been started in _main.inc.php already:
+					ob_start( 'mb_output_handler' );
+				}
+			}
+			unset($mb_encodings);
+		}
+	}
+
+	$Debuglog->add( 'Adjusted I/O charset for blog', 'locale' );
+
+	// Set encoding for MySQL connection, if connection_charset differs from evo_charset:
+	if( isset($mysql_charset_map[$evo_charset]) && $mysql_charset_map[$evo_charset] != $EvoConfig->DB['connection_charset'] )
+	{
+		$DB->query( 'SET NAMES '.$mysql_charset_map[$evo_charset] );
+	}
+
+	$Debuglog->add( 'evo_charset: '.$evo_charset, 'locale' );
+	$Debuglog->add( 'io_charset: '.$io_charset, 'locale' );
+}
+
 
 // -------------------------
 // Extra path info decoding:
@@ -435,6 +496,12 @@ else
 
 /*
  * $Log$
+ * Revision 1.17  2006/04/29 01:24:04  blueyed
+ * More decent charset support;
+ * unresolved issues include:
+ *  - front office still forces the blog's locale/charset!
+ *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
+ *
  * Revision 1.16  2006/04/24 17:54:18  blueyed
  * todo
  *

@@ -26,11 +26,18 @@ $use_l10n = 2;
 
 
 /**
- * To be used for m17n support. Not used yet.
+ * The internal charset. It's used to convert user INPUT/OUTPUT and database data into for
+ * internal use.
+ *
+ * Setting it to an empty string means "follow the user's charset", which gets
+ * taken off his locale (INPUT/OUTPUT charset; {@link $io_charset}).
  *
  * If you don't know, don't change this setting.
+ *
+ * This should be supported by {@link mb_list_encodings()}.
  */
-$dbcharset = 'iso-8859-1';
+$evo_charset = '';
+
 
 /**
  * Request a specific charset for the client connection.
@@ -382,6 +389,43 @@ $locales = array(
 										'messages' => 'zh_TW',
 										'enabled' => 1,
 									),
+);
+
+
+/**
+ * MySQL charsets map
+ *
+ * This maps "regular" charset names (used for $evo_charset and in $locales) to
+ * the MySQL names.
+ *
+ * This is taken from phpMyAdmin (libraries/select_lang.lib.php).
+ *
+ * @var array
+ */
+$mysql_charset_map = array(
+	'big5'         => 'big5',
+	'cp-866'       => 'cp866',
+	'euc-jp'       => 'ujis',
+	'euc-kr'       => 'euckr',
+	'gb2312'       => 'gb2312',
+	'gbk'          => 'gbk',
+	'iso-8859-1'   => 'latin1',
+	'iso-8859-2'   => 'latin2',
+	'iso-8859-7'   => 'greek',
+	'iso-8859-8'   => 'hebrew',
+	'iso-8859-8-i' => 'hebrew',
+	'iso-8859-9'   => 'latin5',
+	'iso-8859-13'  => 'latin7',
+	'iso-8859-15'  => 'latin1',
+	'koi8-r'       => 'koi8r',
+	'shift_jis'    => 'sjis',
+	'tis-620'      => 'tis620',
+	'utf-8'        => 'utf8',
+	'windows-1250' => 'cp1250',
+	'windows-1251' => 'cp1251',
+	'windows-1252' => 'latin1',
+	'windows-1256' => 'cp1256',
+	'windows-1257' => 'cp1257',
 );
 
 

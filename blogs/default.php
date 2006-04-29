@@ -29,7 +29,7 @@ require_once $inc_path.'_main.inc.php';
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<base href="<?php echo $baseurl ?>" />
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<title><?php echo T_('Default page for b2evolution') ?></title>
 	<link href="rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
 </head>

@@ -23,8 +23,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-header("Content-type: application/xml");
-echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?".">";
+header( 'Content-type: application/xml; charset='.$io_charset );
+echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 ?>
 <!-- generator="<?php echo $app_name; ?>/<?php echo $app_version ?>" -->
 <rdf:RDF xmlns="http://purl.org/rss/1.0/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"					xmlns:admin="http://webns.net/mvcb/" xmlns:content="http://purl.org/rss/1.0/modules/content/">

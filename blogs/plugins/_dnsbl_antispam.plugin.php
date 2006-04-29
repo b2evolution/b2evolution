@@ -34,6 +34,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * It allows the user to whitelist her/himself through the plugin interface itself, by optionally using a
  * plugin that provides {@link Plugin::CaptchaValidated()} and {@link Plugin::CaptchaPayload()} events.
  * See {@link validate_my_deps()}.
+ *
+ * @todo Option to only block Feedback-posting events
  */
 class dnsbl_antispam_plugin extends Plugin
 {
@@ -583,6 +585,8 @@ class dnsbl_antispam_plugin extends Plugin
 		require_once $misc_inc_path.'_form.class.php';
 
 		header('HTTP/1.0 403 Forbidden');
+		header('Content-Type: text/html; charset=iso-8859-1');
+
 		?>
 		<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 		<html xmlns="http://www.w3.org/1999/xhtml">
@@ -667,6 +671,12 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.20  2006/04/29 01:24:05  blueyed
+ * More decent charset support;
+ * unresolved issues include:
+ *  - front office still forces the blog's locale/charset!
+ *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
+ *
  * Revision 1.19  2006/04/19 17:21:06  blueyed
  * Quick fixes
  *

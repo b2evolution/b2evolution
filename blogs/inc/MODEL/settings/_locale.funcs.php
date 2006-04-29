@@ -52,14 +52,27 @@ if( ($use_l10n == 1) && function_exists('_') )
 
 	function T_( $string, $req_locale = '' )
 	{
-		global $current_messages;
+		global $current_messages, $locales;
 
 		if( empty( $req_locale ) || $req_locale == $current_messages )
 		{ // We have not asked for a different locale than the currently active one:
-			return _($string);
+			$r = _($string);
+			$messages_charset = $locales[$req_locale]['charset'];
 		}
-		// We have asked for a funky locale... we'll get english instead:
-		return $string;
+		else
+		{ // We have asked for a funky locale... we'll get english instead:
+			$r = $string;
+			$messages_charset = 'iso-8859-1'; // charset of our .php files
+		}
+
+		if( $messages_charset != $evo_charset
+			  && ! empty($evo_charset) // this extra check is needed, because $evo_charset may not yet be determined.. :/
+			)
+		{ // the INPUT/OUTPUT charset differs from the internal one (this also means mb_convert_encoding is available)
+			mb_convert_variables( $evo_charset, $messages_charset, $r );
+		}
+
+		return $r;
 	}
 
 }
@@ -78,7 +91,7 @@ elseif( $use_l10n == 2 )
 		 */
 		static $trans = array();
 
-		global $current_locale, $locales, $Debuglog, $locales_path;
+		global $current_locale, $locales, $Debuglog, $locales_path, $evo_charset;
 
 
 		if( empty($req_locale) )
@@ -125,13 +138,25 @@ elseif( $use_l10n == 2 )
 
 		if( isset( $trans[ $messages ][ $search ] ) )
 		{ // If the string has been translated:
-			return $trans[ $messages ][ $search ];
+			$r = $trans[ $messages ][ $search ];
+			$messages_charset = $locales[$req_locale]['charset'];
+		}
+		else
+		{
+			// echo "Not found!";
+			// Return the English string:
+			$r = $string;
+			$messages_charset = 'iso-8859-1'; // our .php file encoding
 		}
 
-		// echo "Not found!";
+		if( $messages_charset != $evo_charset
+			  && ! empty($evo_charset) // this extra check is needed, because $evo_charset may not yet be determined.. :/
+			)
+		{ // the INPUT/OUTPUT charset differs from the internal one (this also means mb_convert_encoding is available)
+			mb_convert_variables( $evo_charset, $messages_charset, $r );
+		}
 
-		// Return the English string:
-		return $string;
+		return $r;
 	}
 
 }
@@ -210,7 +235,7 @@ function locale_restore_previous()
  * returns true if locale has been changed
  *
  * @param string locale to activate
- * @param mixed locale string on success, false on failure
+ * @param boolean True on success/change, false on failure (if already set or not existant)
  */
 function locale_activate( $locale )
 {
@@ -710,6 +735,12 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.6  2006/04/29 01:24:04  blueyed
+ * More decent charset support;
+ * unresolved issues include:
+ *  - front office still forces the blog's locale/charset!
+ *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
+ *
  * Revision 1.5  2006/04/19 22:26:25  blueyed
  * cleanup/polish
  *

@@ -18,13 +18,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // TODO: blueyed>> What's that?? A HTML-page-block for every item?! Shouldn't that just use $Item perhaps??
 // it's cafelog/b2 legacy. Idf $Item is already available, then fine ;)
+// blueyed> I'm not sure, it just does not seem to make sense to have a loop here!
 while( $Item = $MainList->get_item() )
 {
+header('Content-Type: text/html; charset='.$io_charset);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php locale_charset() ?>" />
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<title><?php	$Blog->disp('name', 'htmlhead') ?> - feedback on '<?php $Item->title( '', '', false, 'htmlhead' ) ?>'</title>
 	<?php skin_base_tag(); /* Base URL for this DIR. You need this to fix relative links! */ ?> />
 	<style type="text/css" media="screen">
@@ -59,6 +61,12 @@ while( $Item = $MainList->get_item() )
 
 /*
  * $Log$
+ * Revision 1.12  2006/04/29 01:24:05  blueyed
+ * More decent charset support;
+ * unresolved issues include:
+ *  - front office still forces the blog's locale/charset!
+ *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
+ *
  * Revision 1.11  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *
