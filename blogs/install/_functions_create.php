@@ -891,8 +891,13 @@ function create_b2evo_relations()
  *
  * This gets called separately on fresh installs.
  *
+ * {@internal
  * NOTE: this won't call the "AfterInstall" method on the plugin nor install its DB schema.
- *       This get done in the plugins controller currently and would need to be changed/added here, if needed later.
+ *       This get done in the plugins controller, on manually installing a plugin.
+ *
+ * If you change the number of plugins here, please also adjust {@link InstallUnitTestCase::nr_of_basic_plugins}.
+ * }}
+ *
  */
 function install_basic_plugins()
 {
@@ -914,6 +919,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.187  2006/04/29 17:24:09  blueyed
+ * doc
+ *
  * Revision 1.186  2006/04/22 02:36:39  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *
