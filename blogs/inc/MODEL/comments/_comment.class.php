@@ -974,9 +974,10 @@ class Comment extends DataObject
 	{
 		global $Plugins;
 
-		$r = parent::dbupdate();
-
-		$Plugins->trigger_event( 'AfterCommentUpdate', $params = array( 'Comment' => & $this ) );
+		if( $r = parent::dbupdate() )
+		{
+			$Plugins->trigger_event( 'AfterCommentUpdate', $params = array( 'Comment' => & $this ) );
+		}
 
 		return $r;
 	}
@@ -1001,9 +1002,10 @@ class Comment extends DataObject
 
 		// TODO: use karma threshold and apply it (to status)!
 
-		$r = parent::dbinsert();
-
-		$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this ) );
+		if( $r = parent::dbinsert() )
+		{
+			$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this ) );
+		}
 
 		return $r;
 	}
@@ -1021,14 +1023,15 @@ class Comment extends DataObject
 		// remember ID, because parent method resets it to 0
 		$old_ID = $this->ID;
 
-		$r = parent::dbdelete();
+		if( $r = parent::dbdelete() )
+		{
+			// re-set the ID for the Plugin event
+			$this->ID = $old_ID;
 
-		// set the ID for the Plugin event
-		$this->ID = $old_ID;
+			$Plugins->trigger_event( 'AfterCommentDelete', $params = array( 'Comment' => & $this ) );
 
-		$Plugins->trigger_event( 'AfterCommentDelete', $params = array( 'Comment' => & $this ) );
-
-		$this->ID = 0;
+			$this->ID = 0;
+		}
 
 		return $r;
 	}
@@ -1038,6 +1041,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2006/04/29 23:27:10  blueyed
+ * Only trigger update/insert/delete events if parent returns true
+ *
  * Revision 1.27  2006/04/24 15:43:35  fplanque
  * no message
  *

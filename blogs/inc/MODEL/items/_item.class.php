@@ -2141,6 +2141,7 @@ class Item extends DataObject
 		// validate url title
 		$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, 0, false, $this->dbprefix, $this->dbIDname, $this->dbtablename) );
 
+		// TODO: allow a plugin to cancel update here (by returning false)?
 		$Plugins->trigger_event( 'PrependItemInsertTransact', $params = array( 'Item' => & $this ) );
 
 		if( $result = parent::dbinsert() )
@@ -2148,11 +2149,15 @@ class Item extends DataObject
 
 			// Let's handle the extracats:
 			$this->insert_update_extracats( 'insert' );
+
+			$DB->commit();
+
+			$Plugins->trigger_event( 'AfterItemInsert', $params = array( 'Item' => & $this ) );
 		}
-
-		$DB->commit();
-
-		$Plugins->trigger_event( 'AfterItemInsert', $params = array( 'Item' => & $this ) );
+		else
+		{
+			$DB->rollback();
+		}
 
 		return $result;
 	}
@@ -2229,6 +2234,7 @@ class Item extends DataObject
 																false, $this->dbprefix, $this->dbIDname, $this->dbtablename ) );
 		}
 
+		// TODO: allow a plugin to cancel update here (by returning false)? ()
 		$Plugins->trigger_event( 'PrependItemUpdateTransact', $params = array( 'Item' => & $this ) );
 
 		if( $result = parent::dbupdate() )
@@ -2236,11 +2242,15 @@ class Item extends DataObject
 
 			// Let's handle the extracats:
 			$this->insert_update_extracats( 'update' );
+
+			$DB->commit();
+
+			$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this ) );
 		}
-
-		$DB->commit();
-
-		$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this ) );
+		else
+		{
+			$DB->commit();
+		}
 
 		return $result;
 	}
@@ -2258,14 +2268,15 @@ class Item extends DataObject
 		// remember ID, because parent method resets it to 0
 		$old_ID = $this->ID;
 
-		$r = parent::dbdelete();
+		if( $r = parent::dbdelete() )
+		{
+			// re-set the ID for the Plugin event
+			$this->ID = $old_ID;
 
-		// set the ID for the Plugin event
-		$this->ID = $old_ID;
+			$Plugins->trigger_event( 'AfterItemDelete', $params = array( 'Item' => & $this ) );
 
-		$Plugins->trigger_event( 'AfterItemDelete', $params = array( 'Item' => & $this ) );
-
-		$this->ID = 0;
+			$this->ID = 0;
+		}
 
 		return $r;
 	}
@@ -2582,6 +2593,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.42  2006/04/29 23:27:10  blueyed
+ * Only trigger update/insert/delete events if parent returns true
+ *
  * Revision 1.41  2006/04/24 20:35:32  fplanque
  * really nasty bugs!
  *
