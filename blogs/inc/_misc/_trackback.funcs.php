@@ -190,7 +190,7 @@ function trackback_response( $error = 0, $error_message = '' )
 	echo "<error>$error</error>\n";
 	echo "<message>$error_message</message>\n";
 	echo "</response>";
-	die();
+	exit();
 }
 
 
@@ -225,6 +225,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.5  2006/04/29 17:36:00  blueyed
+ * Normalization
+ *
  * Revision 1.4  2006/04/04 22:25:02  blueyed
  * Only try POST trackback, if host and path could get parsed out of URL.
  *
