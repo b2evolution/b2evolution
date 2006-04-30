@@ -170,10 +170,13 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 
 	function test_validate_url()
 	{
+		// valid:
 		foreach( array(
 			'mailto:example@example.org',
 			'http://b2evolution.net',
 			'https://www.b2evolution.net',
+			'http://user@example.com/path',
+			'http://user:pass@example.com/path',
 			) as $url )
 		{
 			$r = validate_url( $url, $GLOBALS['comments_allowed_uri_scheme'] );
@@ -181,6 +184,20 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 
 			$r = validate_url( $url, $GLOBALS['allowed_uri_scheme'] );
 			$this->assertFalse( $r, $url.' allowed in general' );
+		}
+
+		// invalid:
+		foreach( array(
+			'http://',
+			'http://&amp;',
+			'http://<script>...</script>',
+			) as $url )
+		{
+			$r = validate_url( $url, $GLOBALS['comments_allowed_uri_scheme'] );
+			$this->assertTrue( $r, $url.' allowed in comments' );
+
+			$r = validate_url( $url, $GLOBALS['allowed_uri_scheme'] );
+			$this->assertTrue( $r, $url.' allowed in general' );
 		}
 	}
 

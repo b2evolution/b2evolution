@@ -1426,9 +1426,10 @@ function validate_url( $url, & $allowed_uri_scheme )
 	if( ! preg_match('~^               # start
 		([a-z][a-z0-9+.\-]*)             # scheme
 		://                              # authority absolute URLs only
+		(\w+(:\w+)?@)?                   # username or username and password (optional)
 		[a-z0-9]([a-z0-9.\-])*           # Don t allow anything too funky like entities
 		(:[0-9]+)?                       # optional port specification
-		~ix', $url, $matches) )
+		(/|$)~ix', $url, $matches) )     # match either '/' or end of string
 	{ // Cannot validate URL structure
 		$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
 		return T_('Invalid URL');
@@ -2870,6 +2871,9 @@ function base_tag( $url )
 
 /*
  * $Log$
+ * Revision 1.48  2006/04/30 18:29:33  blueyed
+ * Fixed validate_url() for user/pass; more explicit match
+ *
  * Revision 1.47  2006/04/29 01:24:05  blueyed
  * More decent charset support;
  * unresolved issues include:
