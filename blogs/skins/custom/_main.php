@@ -103,7 +103,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	{
 		$MainList->date_if_changed();
 	?>
-	<div class="bPost" lang="<?php $Item->lang() ?>">
+	<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
 		<?php
 			locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 			$Item->anchor(); // Anchor for permalinks to refer to
