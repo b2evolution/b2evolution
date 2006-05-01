@@ -111,6 +111,7 @@ switch( $action )
 			// Actions to be appended to the user registration transaction:
 			if( $Plugins->trigger_event_first_false( 'AppendUserRegistrTransact', array( 'User' => & $new_User ) ) )
 			{
+				// TODO: notify the plugins that have been called before about canceling of the event?!
 				$DB->rollback();
 
 				// Delete, in case there's no transaction support:
@@ -183,6 +184,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.68  2006/05/01 04:21:50  blueyed
+ * todo
+ *
  * Revision 1.67  2006/04/24 21:01:07  blueyed
  * just delete
  *
