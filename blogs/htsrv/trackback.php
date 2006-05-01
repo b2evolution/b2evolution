@@ -133,16 +133,9 @@ elseif( antispam_check( strip_tags($comment) ) )
 	$Messages->add( T_('Supplied comment is invalid'), 'error' );
 }
 
-if( $errstring = $Messages->get_string( 'Cannot insert trackback, please correct these errors:', '' ) )
-{
-	trackback_response(2, $errstring);	// TODO: check that error code 2 is ok; blueyed> Why should we use 2?
-}
 
-
-/*
- * ----------------------------
- * Create and record trackback:
- * ----------------------------
+/**
+ * @global Comment Trackback object
  */
 $Comment = & new Comment();
 $Comment->set( 'type', 'trackback' );
@@ -160,6 +153,14 @@ $Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status
 $Plugins->trigger_event( 'BeforeTrackbackInsert', array( 'Comment' => & $Comment ) );
 
 
+// Display errors:
+if( $errstring = $Messages->get_string( 'Cannot insert trackback, please correct these errors:', '' ) )
+{
+	trackback_response(2, $errstring);	// TODO: check that error code 2 is ok; blueyed> Why should we use 2?
+}
+
+
+// Record trackback into DB:
 if( ! $Comment->dbinsert() )
 {
 	trackback_response(2, "There is an error with the database, it can't store your comment...<br />Contact the <a href=\"mailto:$admin_email\">webmaster</a>");	// TODO: check that error code 2 is ok; blueyed> why should we use "2"?
@@ -183,6 +184,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.46  2006/05/01 05:20:38  blueyed
+ * Check for duplicate content in comments/trackback.
+ *
  * Revision 1.45  2006/05/01 04:25:04  blueyed
  * Normalization
  *

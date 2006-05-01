@@ -65,14 +65,46 @@ class basic_antispam_plugin extends Plugin
 	}
 
 
+	function GetDefaultSettings()
+	{
+		return array(
+				'check_dupes' => array(
+					'type' => 'checkbox',
+					'label' => T_('Check for duplicate feedback'),
+					'note' => T_('Check this to check comments and trackback for duplicate content.'),
+					'defaultvalue' => '1',
+				),
+			);
+	}
+
+
 	/**
-	 * Check if our hostname is linked in the URL of the trackback.
+	 * - Check if our hostname is linked in the URL of the trackback.
+	 * - Check for duplicate trackbacks.
 	 */
 	function BeforeTrackbackInsert( & $params )
 	{
-		if( ! $this->is_referer_linking_us( $params['url'], '' ) )
+		if( $this->is_duplicate_comment( $params['Comment'] ) )
+		{
+			$this->msg( T_('The trackback seems to be a duplicate.'), 'error' );
+			return;
+		}
+
+		if( ! $this->is_referer_linking_us( $params['Comment']->author_url, '' ) )
 		{ // Our hostname is not linked by the permanent url of the refering entry:
 			$this->msg( T_('Could not find link to us in your URL!'), 'error' );
+		}
+	}
+
+
+	/**
+	 * Check for duplicate comments.
+	 */
+	function BeforeCommentFormInsert( & $params )
+	{
+		if( $this->is_duplicate_comment( $params['Comment'] ) )
+		{
+			$this->msg( T_('The comment seems to be a duplicate.'), 'error' );
 		}
 	}
 
@@ -259,7 +291,57 @@ class basic_antispam_plugin extends Plugin
 
 			return false;
 		}
+	}
 
+
+	/**
+	 * Simple check for duplicate comment/content from same author
+	 *
+	 * @param Comment
+	 */
+	function is_duplicate_comment( $Comment )
+	{
+		global $DB;
+
+		if( ! $this->Settings->get('check_dupes') )
+		{
+			return false;
+		}
+
+		$sql = '
+				SELECT comment_ID
+				  FROM T_comments
+				 WHERE comment_post_ID = '.$Comment->Item->ID.'
+				   AND ';
+		if( isset($Comment->author_User) )
+		{ // registered user:
+			$sql .= 'comment_author_ID = '.$Comment->author_User->ID;
+		}
+		else
+		{ // visitor (also trackback):
+			$sql_ors = array();
+			if( ! empty($Comment->author) )
+			{
+				$sql_ors[] = 'comment_author = '.$DB->quote($Comment->author);
+			}
+			if( ! empty($Comment->author_email) )
+			{
+				$sql_ors[] = 'comment_author_email = '.$DB->quote($Comment->author_email);
+			}
+			if( ! empty($Comment->author_url) )
+			{
+				$sql_ors[] = 'comment_author_url = '.$DB->quote($Comment->author_url);
+			}
+
+			if( ! empty($sql_ors) )
+			{
+				$sql .= '( '.implode( ' OR ', $sql_ors ).' )';
+			}
+		}
+
+		$sql .= ' AND comment_content = '.$DB->quote($Comment->content).' LIMIT 1';
+
+		return $DB->get_var( $sql, 0, 0, 'Checking for duplicate feedback content.' );
 	}
 
 }
@@ -267,6 +349,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.3  2006/05/01 05:20:38  blueyed
+ * Check for duplicate content in comments/trackback.
+ *
  * Revision 1.2  2006/05/01 04:25:07  blueyed
  * Normalization
  *
