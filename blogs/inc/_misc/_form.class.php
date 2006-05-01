@@ -54,6 +54,7 @@ require_once dirname(__FILE__).'/_widget.class.php';
 
 /**
  * Form class
+ *
  * @package evocore
  */
 class Form extends Widget
@@ -1974,6 +1975,10 @@ class Form extends Widget
 		$this->hiddens[] = $this->get_input_element( $field_params );
 	}
 
+
+	/**
+	 * Add the "ctrl" param, used in the backoffice, as a hidden field.
+	 */
 	function hidden_ctrl()
 	{
 		global $ctrl;
@@ -1982,6 +1987,7 @@ class Form extends Widget
 			$this->hidden( 'ctrl', $ctrl );
 		}
 	}
+
 
 	/**
 	 * Builds a list of hidden inputs.
@@ -2501,6 +2507,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.12  2006/05/01 04:22:35  blueyed
+ * doc
+ *
  * Revision 1.11  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
