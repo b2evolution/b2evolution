@@ -279,9 +279,12 @@ class Comment extends DataObject
 	{
 		if( $this->author_User !== NULL )
 		{ // Author is a user
+			if( strlen( $this->author_User->url ) <= 10 ) $makelink = false;
 			if( $after_user == '#' ) $after_user = ' ['.T_('Member').']';
 			echo $before_user;
+			if( $makelink ) echo '<a href="'.$this->author_User->url.'">';
 			$this->author_User->preferred_name( $format );
+			if( $makelink ) echo '</a>';
 			echo $after_user;
 		}
 		else
@@ -289,7 +292,18 @@ class Comment extends DataObject
 			if( strlen( $this->author_url ) <= 10 ) $makelink = false;
 			if( $after == '#' ) $after = ' ['.T_('Visitor').']';
 			echo $before;
-			if( $makelink ) echo '<a href="'.$this->author_url.'">';
+
+			if( $makelink )
+			{
+				global $Settings;
+
+				echo '<a href="'.$this->author_url.'"';
+				if( $Settings->get('antispam_comments_nofollow') )
+				{
+					echo ' rel="nofollow"';
+				}
+				echo '>';
+			}
 			$this->disp( 'author', $format );
 			if( $makelink ) echo '</a>';
 			echo $after;
@@ -353,7 +367,17 @@ class Comment extends DataObject
 		if( strlen( $url ) > 10 )
 		{ // If URL exists:
 			echo $before;
-			if( $makelink ) echo '<a href="'.$url.'" rel="nofollow">';
+			if( $makelink )
+			{
+				global $Settings;
+
+				echo '<a href="'.$url.'"';
+				if( $Settings->get('antispam_comments_nofollow') )
+				{
+					echo ' rel="nofollow"';
+				}
+				echo '>';
+			}
 			echo ($linktext != '') ? $linktext : $url;
 			if( $makelink ) echo '</a>';
 			echo $after;
@@ -1041,6 +1065,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2006/05/01 22:20:20  blueyed
+ * Made rel="nofollow" optional (enabled); added Antispam settings page
+ *
  * Revision 1.28  2006/04/29 23:27:10  blueyed
  * Only trigger update/insert/delete events if parent returns true
  *

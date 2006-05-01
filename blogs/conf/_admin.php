@@ -48,6 +48,7 @@ $ctrl_mappings = array(
 		'mtimport'     => 'imports/import-mt.php',
 		'plugins'      => 'settings/plugins.php', // todo
 		'settings'     => 'settings/settings.php',
+		'set_antispam' => 'settings/antispam.php',
 		'stats'        => 'sessions/stats.php',
 		'templates'    => 'skins/b2template.php',
 		'tools'        => '_misc/tools.php',
