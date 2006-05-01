@@ -68,7 +68,7 @@ class basic_antispam_plugin extends Plugin
 	/**
 	 * Check if our hostname is linked in the URL of the trackback.
 	 */
-	function TrackbackReceived( & $params )
+	function BeforeTrackbackInsert( & $params )
 	{
 		if( ! $this->is_referer_linking_us( $params['url'], '' ) )
 		{ // Our hostname is not linked by the permanent url of the refering entry:
@@ -267,6 +267,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.2  2006/05/01 04:25:07  blueyed
+ * Normalization
+ *
  * Revision 1.1  2006/04/29 23:11:23  blueyed
  * Added basic_antispam_plugin; Moved double-check-referers there; added check, if trackback links to us
  *

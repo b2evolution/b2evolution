@@ -92,11 +92,6 @@ if( $commented_Item->comment_status != 'open' )
 }
 
 
-// Trigger Plugin event, which may add a message of category "error":
-$Plugins->trigger_event( 'TrackbackReceived', array(
-	'url' => & $url, 'title' => & $title, 'excerpt' => & $excerpt, 'blog_name' => & $blog_name, 'Item' => $commented_Item) );
-
-
 // CHECK content
 if( $error = validate_url( $url, $comments_allowed_uri_scheme ) )
 {
@@ -160,6 +155,11 @@ $Comment->set( 'content', $comment );
 // Assign default status for new comments:
 $Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status') );
 
+
+// Trigger event, which may add a message of category "error":
+$Plugins->trigger_event( 'BeforeTrackbackInsert', array( 'Comment' => & $Comment ) );
+
+
 if( ! $Comment->dbinsert() )
 {
 	trackback_response(2, "There is an error with the database, it can't store your comment...<br />Contact the <a href=\"mailto:$admin_email\">webmaster</a>");	// TODO: check that error code 2 is ok; blueyed> why should we use "2"?
@@ -174,11 +174,18 @@ if( ! $Comment->dbinsert() )
 $Comment->send_email_notifications();
 
 
+// Trigger event: a Plugin should cleanup any temporary data here..
+$Plugins->trigger_event( 'AfterTrackbackReceived', array( 'Comment' => & $Comment ) );
+
+
 trackback_response( 0, 'ok' );
 
 
 /*
  * $Log$
+ * Revision 1.45  2006/05/01 04:25:04  blueyed
+ * Normalization
+ *
  * Revision 1.44  2006/04/27 21:03:51  blueyed
  * Cleanup, fix and add Plugin hook
  *

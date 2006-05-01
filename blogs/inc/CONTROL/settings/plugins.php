@@ -352,6 +352,9 @@ switch( $action )
 		$enable_return = $edit_Plugin->BeforeEnable();
 		if( $enable_return === true )
 		{
+			// Detect new events:
+			$admin_Plugins->save_events( $edit_Plugin, array() );
+
 			// we call $Plugins(!) here: the Plugin gets active on the current page already and it should not get (un)registered on $Plugins_admin!
 			$Plugins->set_Plugin_status( $edit_Plugin, 'enabled' ); // sets $edit_Plugin->status
 
@@ -694,6 +697,10 @@ switch( $action )
 			break;
 		}
 
+		// Detect new events, so they get displayed correctly in the "Edit events" fieldset:
+		$admin_Plugins->save_events( $edit_Plugin, array() );
+
+		// Inform Plugin that it gets edited:
 		$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $tmp_params = array() );
 
 		// Params for form:

@@ -903,9 +903,9 @@ class Plugin
 	 *
 	 * You might want to use this to inject antispam payload to use in
 	 * in {@link GetSpamKarmaForComment()} or modify the Comment according
-	 * to it in {@link CommentFormSent()}.
+	 * to it in {@link BeforeCommentFormInsert()}.
 	 *
-	 * @see Plugin::CommentFormSent(), Plugin::AfterCommentFormInsert()
+	 * @see Plugin::BeforeCommentFormInsert(), Plugin::AfterCommentFormInsert()
 	 * @param array Associative array of parameters
 	 *   - 'Form': the comment form generating object
 	 *   - 'Item': the Item for which the comment is meant
@@ -929,16 +929,17 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called when a comment form has been submitted.
+	 * Event handler: Called before a comment gets inserted through the public comment
+	 *                form.
 	 *
 	 * Use this, to validate a comment: you could {@link Plugin::msg() add a message} of
 	 * category "error" here, to prevent the comment from being inserted.
 	 *
 	 * @see Plugin::DisplayCommentFormFieldset()
 	 * @param array Associative array of parameters
-	 *   - 'Item': the Item for which the comment is meant (by reference)
+	 *   - 'Comment': the Comment (by reference)
 	 */
-	function CommentFormSent( & $params )
+	function BeforeCommentFormInsert( & $params )
 	{
 	}
 
@@ -1009,20 +1010,20 @@ class Plugin
 
 
 	/**
-	 * Event handler: called when a trackback has been received.
+	 * Event handler: called before a trackback gets recorded.
 	 *
 	 * Use this, to validate a trackback: you could {@link Plugin::msg() add a message} of
 	 * category "error" here, to prevent the trackback from being accepted.
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'Item': the related Item, for which the trackback is meant
-	 *   - 'url': Referring URL, to where the trackback should link (by reference)
-	 *   - 'title': Title of the trackback (by reference)
-	 *   - 'excerpt': Excerpt/Text of the trackback (by reference)
-	 *   - 'blog_name': Name of the referring blog (by reference)
+	 *   - 'Comment': the trackback (which is a {@link Comment} object with "trackback" type) (by reference)
+	 *        The trackback-params get mapped like this:
+	 *        - "blog_name" => "author"
+	 *        - "url" => "author_url"
+	 *        - "title"/"excerpt" => "comment"
 	 *
 	 */
-	function TrackbackReceived( & $params )
+	function BeforeTrackbackInsert( & $params )
 	{
 	}
 
@@ -2010,6 +2011,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.38  2006/05/01 04:25:05  blueyed
+ * Normalization
+ *
  * Revision 1.37  2006/04/29 01:04:23  blueyed
  * *** empty log message ***
  *

@@ -276,7 +276,6 @@ class Plugins
 				'SkinTag' => '',
 
 				'AppendHitLog' => T_('Called when a hit gets logged, but before it gets recorded.'),
-				'TrackbackReceived' => T_('Gets called after a trackback has been received.'),
 
 				'DisplayCommentFormButton' => '',
 				'DisplayCommentFormFieldset' => '',
@@ -286,8 +285,12 @@ class Plugins
 				'DisplayRegisterFormFieldset' => T_('Called when displaying the "Register" form.'),
 				'DisplayValidateAccountFormFieldset' => T_('Called when displaying the "Validate account" form.'),
 
-				'CommentFormSent' => T_('Called when a public comment form has been submitted.'),
+				'BeforeCommentFormInsert' => T_('Called before a comment gets recorded through the public comment form.'),
 				'AfterCommentFormInsert' => T_('Called after a comment has been added through public form.'),
+
+				'BeforeTrackbackInsert' => T_('Gets called before a trackback gets recorded.'),
+				'AfterTrackbackReceived' => T_('Gets called after a trackback has been recorded.'),
+
 				'LoginAttempt' => T_('Called when a user tries to login.'),
 				'AlternateAuthentication' => '',
 				'MessageFormSent' => T_('Called when the "Message to user" form has been submitted.'),
@@ -1102,13 +1105,19 @@ class Plugins
 								   SET plug_version = '.$DB->quote($Plugin->version).'
 								 WHERE plug_ID = '.$Plugin->ID );
 
-						// Detect new events:
-						$this->save_events( $Plugin, array() );
+						// Detect new events (and delete obsolete ones - in case of downgrade):
+						if( $this->save_events( $Plugin, array() ) )
+						{
+							$this->load_events(); // re-load for the current request
+						}
 
 						$Debuglog->add( 'Version for '.$Plugin->classname.' changed from '.$this->index_ID_rows[$Plugin->ID]['plug_version'].' to '.$Plugin->version, 'plugins' );
 					}
 					else
 					{ // If there are DB schema changes needed, set the Plugin status to "needs_config"
+
+						// TODO: automatic upgrade in some cases (e.g. according to query types)?
+
 						$this->set_Plugin_status( $Plugin, 'needs_config' );
 						$Debuglog->add( 'Set plugin status to "needs_config", because version DB schema needs upgrade.', 'plugins' );
 
@@ -2583,6 +2592,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.38  2006/05/01 04:25:07  blueyed
+ * Normalization
+ *
  * Revision 1.37  2006/04/29 17:37:48  blueyed
  * Added basic_antispam_plugin; Moved double-check-referers there; added check, if trackback links to us
  *

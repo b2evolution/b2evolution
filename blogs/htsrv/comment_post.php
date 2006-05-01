@@ -45,8 +45,6 @@ if( ! $commented_Item->can_comment( '', '', '', '' ) )
 	$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
 }
 
-// Trigger event: a Plugin could add a $category="error" message here..
-$Plugins->trigger_event( 'CommentFormSent', array( 'Item' => & $commented_Item ) );
 
 param( 'comment', 'html' );
 param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
@@ -104,44 +102,8 @@ elseif( antispam_check( strip_tags($comment) ) )
 }
 
 
-/*
- * Flood-protection
- */
-$query = 'SELECT MAX(comment_date)
-            FROM T_comments
-           WHERE comment_author_IP = '.$DB->quote($Hit->IP);
-$ok = 1;
-if( $then = $DB->get_var( $query ) )
-{
-	$time_lastcomment = mysql2date("U",$then);
-	$time_newcomment = mysql2date("U",$now);
-	if( ($time_newcomment - $time_lastcomment) < $minimum_comment_interval )
-		$ok = 0;
-}
-if( !$ok )
-{
-	$Messages->add( sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ), 'error' );
-}
-/* end flood-protection */
-
-
-/*
- * Error messages:
- */
-if( $Messages->count('error') )
-{
-	$Messages->display( T_('Cannot post comment, please correct these errors:'),
-	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' );
-
-	debug_info();  // output debug info, useful to see what a plugin might have done
-	exit(); // TODO: nicer displaying here (but do NOT die() or debug_die() because this is not a BUG/user hack, it's a plain user input error (any bozo can produce it)
-}
-
-
-/*
- * --------------------------
- * Create and record comment:
- * --------------------------
+/**
+ * Create comment object. Gets validated, before recording it into DB:
  */
 $Comment = & new Comment();
 $Comment->set( 'type', 'comment' );
@@ -165,6 +127,49 @@ $commented_Item->get_Blog(); // Make sure Blog is loaded
 
 // Assign default status for new comments:
 $Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status') );
+
+
+/*
+ * Flood-protection
+ * TODO: Put time check into query?
+ */
+$query = 'SELECT MAX(comment_date)
+            FROM T_comments
+           WHERE comment_author_IP = '.$DB->quote($Hit->IP).'
+              OR comment_author_email = '.$DB->quote($Comment->get_author_email());
+$ok = 1;
+if( $then = $DB->get_var( $query ) )
+{
+	$time_lastcomment = mysql2date("U",$then);
+	$time_newcomment = mysql2date("U",$now);
+	if( ($time_newcomment - $time_lastcomment) < $minimum_comment_interval )
+		$ok = 0;
+}
+if( !$ok )
+{
+	$Messages->add( sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ), 'error' );
+}
+/* end flood-protection */
+
+
+// Trigger event: a Plugin could add a $category="error" message here..
+$Plugins->trigger_event('BeforeCommentFormInsert', array( 'Comment' => & $Comment ) );
+
+
+/*
+ * Error messages:
+ */
+if( $Messages->count('error') )
+{
+	$Messages->display( T_('Cannot post comment, please correct these errors:'),
+	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' );
+
+	debug_info();  // output debug info, useful to see what a plugin might have done
+	exit(); // TODO: nicer displaying here (but do NOT die() or debug_die() because this is not a BUG/user hack, it's a plain user input error (any bozo can produce it)
+}
+
+
+// RECORD comment:
 
 $Comment->dbinsert();
 
@@ -244,6 +249,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.71  2006/05/01 04:25:04  blueyed
+ * Normalization
+ *
  * Revision 1.70  2006/04/24 15:43:35  fplanque
  * no message
  *
