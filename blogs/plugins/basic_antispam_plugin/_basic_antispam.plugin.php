@@ -84,7 +84,7 @@ class basic_antispam_plugin extends Plugin
 				'block_spam_referers' => array(
 					'type' => 'checkbox',
 					'label' => T_('Block spam referers'),
-					'note' => T_('If a referrer has been detected as spam, should be block the request with a "403 Forbidden" page?'),
+					'note' => T_('If a referrer has been detected as spam, should we block the request with a "403 Forbidden" page?'),
 					'defaultvalue' => '1',
 				),
 			);
@@ -466,6 +466,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.7  2006/05/02 22:43:39  blueyed
+ * typo
+ *
  * Revision 1.6  2006/05/02 15:32:01  blueyed
  * Moved blocking of "spam referers" into basic antispam plugin: does not block backoffice requests in general and can be easily get disabled.
  *
