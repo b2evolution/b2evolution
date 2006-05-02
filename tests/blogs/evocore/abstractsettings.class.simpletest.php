@@ -12,11 +12,11 @@ require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 /**
  * @package tests
  */
-class AbstractSettingsTestCase extends FilemanUnitTestCase
+class AbstractSettingsTestCase extends EvoUnitTestCase
 {
 	function AbstractSettingsTestCase()
 	{
-		$this->FilemanUnitTestCase( 'AbstractSettings class test' );
+		$this->EvoUnitTestCase( 'AbstractSettings class test' );
 	}
 
 
@@ -25,8 +25,8 @@ class AbstractSettingsTestCase extends FilemanUnitTestCase
 		parent::setup();
 
 		$this->MockDB =& new MockDB($this);
+		$GLOBALS['DB'] = $this->MockDB;
 		$this->TestSettings =& new AbstractSettings( 'testtable', array( 'test_name' ), 'test_value' );
-		$this->TestSettings->DB =& $this->MockDB;
 	}
 
 
