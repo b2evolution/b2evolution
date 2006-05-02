@@ -178,7 +178,7 @@ $Form->begin_fieldset( T_('Access parameters') );
 			),
 		), T_('Preferred access type'), true );
 
-	$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL blog name'), T_('Used to uniquely identify this blog. Appears in URLs when using extra-path info.'), $maxlength_urlname_stub );
+	$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL blog name'), T_('Used to uniquely identify this blog. Appears in URLs when using extra-path info and gets used as default for the media location (see the advanced tab).'), $maxlength_urlname_stub );
 
 	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$edited_Blog->dget( 'baseurl', 'entityencoded' ).$blog_urlappend.'</span>' );
 $Form->end_fieldset();
