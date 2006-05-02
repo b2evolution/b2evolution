@@ -413,7 +413,7 @@ $schema_queries = array(
 			plug_apply_rendering ENUM( 'stealth', 'always', 'opt-out', 'opt-in', 'lazy', 'never' ) NOT NULL DEFAULT 'never',
 			plug_version         VARCHAR(42) NOT NULL default '0',
 			plug_status          ENUM( 'enabled', 'disabled', 'needs_config', 'broken' ) NOT NULL,
-			plug_spam_weight     TINYINT NOT NULL DEFAULT 1,
+			plug_spam_weight     TINYINT UNSIGNED NOT NULL DEFAULT 1,
 			PRIMARY KEY ( plug_ID ),
 			UNIQUE plug_code( plug_code ),
 			INDEX plug_status( plug_status )
@@ -604,6 +604,9 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.19  2006/05/02 23:46:07  blueyed
+ * Validate/fixed plugin spam weight handling.
+ *
  * Revision 1.18  2006/05/02 04:36:25  blueyed
  * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
  *

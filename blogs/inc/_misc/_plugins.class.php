@@ -1684,6 +1684,14 @@ class Plugins
 		$count_plugins = 0;
 		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
 		{
+			$plugin_weight = $this->index_ID_rows[$l_plugin_ID]['plug_spam_weight'];
+
+			if( $plugin_weight < 1 )
+			{
+				$Debuglog->add( 'Skipping plugin #'.$l_plugin_ID.', because is has weight '.$plugin_weight.'.', 'plugins' );
+				continue;
+			}
+
 			$params['cur_karma'] = ( $karma_divider ? round($karma_abs / $karma_divider) : NULL );
 			$params['cur_karma_abs'] = $karma_abs;
 			$params['cur_karma_divider'] = $karma_divider;
@@ -1698,8 +1706,6 @@ class Plugins
 			}
 
 			$count_plugins++;
-
-			$plugin_weight = $this->index_ID_rows[$l_plugin_ID]['plug_spam_weight'];
 
 			if( $plugin_karma > 100 )
 			{
@@ -2642,6 +2648,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.43  2006/05/02 23:46:07  blueyed
+ * Validate/fixed plugin spam weight handling.
+ *
  * Revision 1.42  2006/05/02 23:35:22  blueyed
  * Extended karma collecting event(s)
  *

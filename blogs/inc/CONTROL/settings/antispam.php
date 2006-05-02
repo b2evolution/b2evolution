@@ -82,6 +82,11 @@ switch( $action )
 				{
 					continue;
 				}
+				if( $l_weight < 0 || $l_weight > 100 )
+				{
+					$Request->param_error( 'antispam_plugin_spam_weight['.$l_plugin_ID.']', T_('Spam weight has to be in the range of 0-100.') );
+					continue;
+				}
 				if( $DB->query( '
 						UPDATE T_plugins
 						   SET plug_spam_weight = '.$DB->quote($l_weight).'
