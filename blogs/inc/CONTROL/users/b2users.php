@@ -112,7 +112,7 @@ if( ! is_null($user_ID) )
 		}
 	}
 
-	if( $action != 'view_user' )
+	if( $action != 'view_user' && $action != 'list' )
 	{ // check edit permissions
 		if( ! $current_User->check_perm( 'users', 'edit' )
 		    && $edited_User->ID != $current_User->ID )
@@ -163,7 +163,7 @@ elseif( $grp_ID !== NULL )
 		}
 	}
 
-	if( $action != 'view_group' )
+	if( $action != 'view_group' && $action != 'list' )
 	{ // check edit permissions
 		if( !$current_User->check_perm( 'users', 'edit' ) )
 		{
@@ -685,6 +685,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2006/05/02 05:58:40  blueyed
+ * fix
+ *
  * Revision 1.18  2006/04/27 21:50:40  blueyed
  * Allow editing/viewing of "validated" property
  *
