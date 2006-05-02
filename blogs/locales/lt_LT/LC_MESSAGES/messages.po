@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Soldier's World\n"
-"POT-Creation-Date: 2004-04-26 03:00+0200\n"
+"Report-Msgid-Bugs-To: http://fplanque.net/\n"
+"POT-Creation-Date: 2005-09-13 15:48+0200\n"
 "PO-Revision-Date: 2004-06-25 10:12+0200\n"
 "Last-Translator: Marius Gricius <marius@gricius.net>\n"
 "Language-Team: Marius Gricius <http://marius.gricius.net>\n"
@@ -14,193 +15,141 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ..\..\..\a_noskin.php:110
+#: ..\..\..\a_noskin.php:109
 msgid "Selected"
 msgstr "Pasirinkta"
 
 #. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
-#: ..\..\..\a_noskin.php:161
-#: ..\..\..\a_noskin.php:252
-#: ..\..\..\multiblogs.php:140
-#: ..\..\..\admin\_edit_form.php:350
+#: ..\..\..\a_noskin.php:159 ..\..\..\a_noskin.php:244
+#: ..\..\..\multiblogs.php:138 ..\..\..\admin\_edit_form.php:355
 #: ..\..\..\admin\_edit_showposts.php:143
-#: ..\..\..\admin\_edit_showposts.php:480
-#: ..\..\..\admin\_menutop.php:200
-#: ..\..\..\b2evocore\_functions_cats.php:567
-#: ..\..\..\skins\basic\_main.php:94
-#: ..\..\..\skins\custom\_main.php:89
-#: ..\..\..\skins\custom\_main.php:197
-#: ..\..\..\skins\wpc_aubmach\_main.php:118
-#: ..\..\..\skins\wpc_default\_main.php:121
+#: ..\..\..\admin\_edit_showposts.php:478 ..\..\..\admin\_menutop.php:207
+#: ..\..\..\b2evocore\_functions_cats.php:569
+#: ..\..\..\skins\basic\_main.php:94 ..\..\..\skins\custom\_main.php:89
+#: ..\..\..\skins\custom\_main.php:190
+#: ..\..\..\skins\natural_pink\_main.php:89
+#: ..\..\..\skins\natural_pink\_main.php:186
+#: ..\..\..\skins\wpc_aubmach\_main.php:117
+#: ..\..\..\skins\wpc_default\_main.php:120
 msgid "Categories"
 msgstr "Kategorijos"
 
-#: ..\..\..\a_noskin.php:175
-#: ..\..\..\multiblogs.php:139
-#: ..\..\..\multiblogs.php:222
-#: ..\..\..\multiblogs.php:258
-#: ..\..\..\summary.php:100
-#: ..\..\..\admin\_edit_showposts.php:158
-#: ..\..\..\skins\_linkblog.php:73
-#: ..\..\..\skins\basic\_main.php:84
-#: ..\..\..\skins\basic\_main.php:115
-#: ..\..\..\skins\custom\_main.php:86
+#: ..\..\..\a_noskin.php:173 ..\..\..\multiblogs.php:137
+#: ..\..\..\multiblogs.php:215 ..\..\..\multiblogs.php:251
+#: ..\..\..\summary.php:100 ..\..\..\admin\_edit_showposts.php:159
+#: ..\..\..\skins\_linkblog.php:73 ..\..\..\skins\basic\_main.php:84
+#: ..\..\..\skins\basic\_main.php:115 ..\..\..\skins\custom\_main.php:86
 #: ..\..\..\skins\custom\_main.php:103
-#: ..\..\..\skins\wpc_aubmach\_main.php:71
-#: ..\..\..\skins\wpc_default\_main.php:71
+#: ..\..\..\skins\natural_pink\_main.php:86
+#: ..\..\..\skins\natural_pink\_main.php:100
+#: ..\..\..\skins\wpc_aubmach\_main.php:70
+#: ..\..\..\skins\wpc_default\_main.php:70
 msgid "Permanent link to full entry"
 msgstr "Nekintanti (permanent) nuoroda į visą temą"
 
-#: ..\..\..\a_noskin.php:175
-#: ..\..\..\multiblogs.php:139
-#: ..\..\..\multiblogs.php:154
-#: ..\..\..\multiblogs.php:222
-#: ..\..\..\multiblogs.php:258
-#: ..\..\..\admin\_edit_showposts.php:158
-#: ..\..\..\admin\_edit_showposts.php:259
-#: ..\..\..\skins\_feedback.php:132
-#: ..\..\..\skins\_lastcomments.php:44
-#: ..\..\..\skins\_linkblog.php:73
-#: ..\..\..\skins\basic\_main.php:115
-#: ..\..\..\skins\custom\_main.php:103
+#: ..\..\..\a_noskin.php:173 ..\..\..\multiblogs.php:137
+#: ..\..\..\multiblogs.php:152 ..\..\..\multiblogs.php:215
+#: ..\..\..\multiblogs.php:251 ..\..\..\admin\_edit_showposts.php:159
+#: ..\..\..\admin\_edit_showposts.php:245 ..\..\..\skins\_feedback.php:132
+#: ..\..\..\skins\_lastcomments.php:44 ..\..\..\skins\_linkblog.php:73
+#: ..\..\..\skins\basic\_main.php:115 ..\..\..\skins\custom\_main.php:103
+#: ..\..\..\skins\natural_pink\_main.php:100
 msgid "Permalink"
 msgstr "Arch. nuoroda"
 
-#: ..\..\..\a_noskin.php:227
-#: ..\..\..\a_noskin.php:228
-#: ..\..\..\skins\bluesky\_main.php:144
-#: ..\..\..\skins\bluesky\_main.php:145
-#: ..\..\..\skins\custom\_main.php:172
-#: ..\..\..\skins\custom\_main.php:173
-#: ..\..\..\skins\guadeloupe\_main.php:145
-#: ..\..\..\skins\guadeloupe\_main.php:146
+#: ..\..\..\a_noskin.php:220 ..\..\..\a_noskin.php:221
+#: ..\..\..\skins\bluesky\_main.php:137 ..\..\..\skins\bluesky\_main.php:138
+#: ..\..\..\skins\custom\_main.php:167 ..\..\..\skins\custom\_main.php:168
+#: ..\..\..\skins\guadeloupe\_main.php:138
+#: ..\..\..\skins\guadeloupe\_main.php:139
+#: ..\..\..\skins\natural_pink\_main.php:168
 msgid "Recently"
 msgstr "Dabar"
 
-#: ..\..\..\a_noskin.php:227
-#: ..\..\..\skins\bluesky\_main.php:144
-#: ..\..\..\skins\custom\_main.php:172
-#: ..\..\..\skins\guadeloupe\_main.php:145
+#: ..\..\..\a_noskin.php:220 ..\..\..\skins\bluesky\_main.php:137
+#: ..\..\..\skins\custom\_main.php:167 ..\..\..\skins\guadeloupe\_main.php:138
 msgid "(cached)"
 msgstr "(kešuota)"
 
-#: ..\..\..\a_noskin.php:228
-#: ..\..\..\skins\bluesky\_main.php:145
-#: ..\..\..\skins\custom\_main.php:173
-#: ..\..\..\skins\guadeloupe\_main.php:146
+#: ..\..\..\a_noskin.php:221 ..\..\..\skins\bluesky\_main.php:138
+#: ..\..\..\skins\custom\_main.php:168 ..\..\..\skins\guadeloupe\_main.php:139
 msgid "(no cache)"
 msgstr "(nekešuota)"
 
-#: ..\..\..\a_noskin.php:234
-#: ..\..\..\b2evocore\_functions_comments.php:189
-#: ..\..\..\skins\bluesky\_main.php:148
-#: ..\..\..\skins\custom\_main.php:179
-#: ..\..\..\skins\guadeloupe\_main.php:149
+#: ..\..\..\a_noskin.php:227 ..\..\..\b2evocore\_functions_comments.php:189
+#: ..\..\..\skins\bluesky\_main.php:141 ..\..\..\skins\custom\_main.php:174
+#: ..\..\..\skins\guadeloupe\_main.php:142
+#: ..\..\..\skins\natural_pink\_main.php:170
 msgid "Last comments"
 msgstr "Naujausi komentarai"
 
-# attention ? la longueur
-#: ..\..\..\a_noskin.php:235
-#: ..\..\..\skins\custom\_main.php:180
-msgid "Some viewing statistics"
-msgstr "Statistika"
-
-#: ..\..\..\a_noskin.php:240
-#: ..\..\..\a_noskin.php:246
-#: ..\..\..\admin\_edit_showposts.php:355
-#: ..\..\..\admin\_edit_showposts.php:555
+#: ..\..\..\a_noskin.php:232 ..\..\..\a_noskin.php:238
+#: ..\..\..\admin\_edit_showposts.php:343
+#: ..\..\..\admin\_edit_showposts.php:344
+#: ..\..\..\admin\_edit_showposts.php:553 ..\..\..\skins\custom\_main.php:179
 #: ..\..\..\skins\custom\_main.php:185
-#: ..\..\..\skins\custom\_main.php:191
-#: ..\..\..\skins\originalb2\_main.php:178
-#: ..\..\..\skins\wpc_aubmach\_main.php:125
-#: ..\..\..\skins\wpc_aubmach\_main.php:129
-#: ..\..\..\skins\wpc_default\_main.php:128
-#: ..\..\..\skins\wpc_default\_main.php:132
+#: ..\..\..\skins\natural_pink\_main.php:175
+#: ..\..\..\skins\natural_pink\_main.php:181
+#: ..\..\..\skins\originalb2\_main.php:173
+#: ..\..\..\skins\wpc_aubmach\_main.php:124
+#: ..\..\..\skins\wpc_aubmach\_main.php:128
+#: ..\..\..\skins\wpc_default\_main.php:127
+#: ..\..\..\skins\wpc_default\_main.php:131
 msgid "Search"
 msgstr "Paieška"
 
-#: ..\..\..\a_noskin.php:243
-#: ..\..\..\skins\custom\_main.php:188
+#: ..\..\..\a_noskin.php:235 ..\..\..\skins\custom\_main.php:182
+#: ..\..\..\skins\natural_pink\_main.php:178
 msgid "All Words"
 msgstr "ir"
 
-#: ..\..\..\a_noskin.php:244
-#: ..\..\..\skins\custom\_main.php:189
+#: ..\..\..\a_noskin.php:236 ..\..\..\skins\custom\_main.php:183
+#: ..\..\..\skins\natural_pink\_main.php:179
 msgid "Some Word"
 msgstr "arba"
 
-#: ..\..\..\a_noskin.php:245
-#: ..\..\..\admin\_edit_showposts.php:400
-#: ..\..\..\skins\custom\_main.php:190
+#: ..\..\..\a_noskin.php:237 ..\..\..\admin\_edit_showposts.php:397
+#: ..\..\..\skins\custom\_main.php:184
+#: ..\..\..\skins\natural_pink\_main.php:180
 msgid "Entire phrase"
 msgstr "frazė"
 
-#: ..\..\..\a_noskin.php:247
-#: ..\..\..\a_noskin.php:259
-#: ..\..\..\skins\bluesky\_main.php:163
-#: ..\..\..\skins\custom\_main.php:192
-#: ..\..\..\skins\custom\_main.php:204
-#: ..\..\..\skins\guadeloupe\_main.php:165
+#: ..\..\..\a_noskin.php:239 ..\..\..\a_noskin.php:251
+#: ..\..\..\skins\bluesky\_main.php:155
+#: ..\..\..\skins\guadeloupe\_main.php:157
 msgid "Reset form"
 msgstr "Išvalyti"
 
-#: ..\..\..\a_noskin.php:258
-#: ..\..\..\skins\bluesky\_main.php:162
-#: ..\..\..\skins\custom\_main.php:203
-#: ..\..\..\skins\guadeloupe\_main.php:164
-#: ..\..\..\skins\originalb2\_main.php:170
+#: ..\..\..\a_noskin.php:250 ..\..\..\skins\bluesky\_main.php:154
+#: ..\..\..\skins\custom\_main.php:196 ..\..\..\skins\guadeloupe\_main.php:156
+#: ..\..\..\skins\originalb2\_main.php:165
 msgid "Get selection"
 msgstr "Pasirinkti"
 
-#: ..\..\..\a_noskin.php:264
-#: ..\..\..\admin\_edit_showposts.php:404
-#: ..\..\..\skins\basic\_main.php:155
-#: ..\..\..\skins\bluesky\_main.php:195
-#: ..\..\..\skins\custom\_main.php:209
-#: ..\..\..\skins\guadeloupe\_main.php:197
-#: ..\..\..\skins\wpc_aubmach\_main.php:134
-#: ..\..\..\skins\wpc_default\_main.php:137
+#: ..\..\..\a_noskin.php:256 ..\..\..\admin\_edit_showposts.php:406
+#: ..\..\..\skins\basic\_main.php:155 ..\..\..\skins\bluesky\_main.php:187
+#: ..\..\..\skins\custom\_main.php:201 ..\..\..\skins\guadeloupe\_main.php:189
+#: ..\..\..\skins\natural_pink\_main.php:169
+#: ..\..\..\skins\natural_pink\_main.php:193
+#: ..\..\..\skins\wpc_aubmach\_main.php:133
+#: ..\..\..\skins\wpc_default\_main.php:136
 msgid "Archives"
 msgstr "Archyvai"
 
-#: ..\..\..\a_noskin.php:269
-#: ..\..\..\a_noskin.php:282
-#: ..\..\..\a_noskin.php:291
-#: ..\..\..\skins\bluesky\_main.php:208
-#: ..\..\..\skins\bluesky\_main.php:217
-#: ..\..\..\skins\custom\_main.php:214
-#: ..\..\..\skins\custom\_main.php:240
-#: ..\..\..\skins\custom\_main.php:249
-#: ..\..\..\skins\guadeloupe\_main.php:210
-#: ..\..\..\skins\guadeloupe\_main.php:219
+#: ..\..\..\a_noskin.php:261 ..\..\..\skins\custom\_main.php:206
+#: ..\..\..\skins\natural_pink\_main.php:198
 msgid "more..."
 msgstr "daugiau..."
 
-#: ..\..\..\a_noskin.php:276
-#: ..\..\..\skins\bluesky\_main.php:202
-#: ..\..\..\skins\custom\_main.php:234
-#: ..\..\..\skins\guadeloupe\_main.php:204
-msgid "Recent Referers"
-msgstr "Naujausi Referalai"
-
-#: ..\..\..\a_noskin.php:285
-#: ..\..\..\skins\bluesky\_main.php:211
-#: ..\..\..\skins\custom\_main.php:243
-#: ..\..\..\skins\guadeloupe\_main.php:213
-msgid "Top Referers"
-msgstr "Top Referalai"
-
-#: ..\..\..\a_noskin.php:304
-#: ..\..\..\multiblogs.php:276
-#: ..\..\..\skins\babyblues\_main.php:127
-#: ..\..\..\skins\bluesky\_main.php:222
-#: ..\..\..\skins\custom\_main.php:262
-#: ..\..\..\skins\guadeloupe\_main.php:224
+#: ..\..\..\a_noskin.php:272 ..\..\..\multiblogs.php:269
+#: ..\..\..\skins\bluesky\_main.php:193 ..\..\..\skins\custom\_main.php:230
+#: ..\..\..\skins\guadeloupe\_main.php:195
+#: ..\..\..\skins\natural_pink\_main.php:216
 msgid "Misc"
 msgstr "Ivairūs"
 
-#: ..\..\..\a_noskin.php:318
-#: ..\..\..\skins\custom\_main.php:275
+#: ..\..\..\a_noskin.php:286 ..\..\..\skins\custom\_main.php:243
+#: ..\..\..\skins\natural_pink\_main.php:229
 msgid "Syndicate this blog"
 msgstr "Agreguoti šį blogą"
 
@@ -208,8 +157,7 @@ msgstr "Agreguoti šį blogą"
 msgid "Default page for b2evolution"
 msgstr "b2evolution pagrindinis puslapis"
 
-#: ..\..\..\default.php:34
-#: ..\..\..\install\index.php:53
+#: ..\..\..\default.php:34 ..\..\..\install\index.php:58
 msgid "Multilingual multiuser multi-blog engine."
 msgstr "Daugiakalbis daugiavartotojiškas multiblogas!"
 
@@ -248,9 +196,7 @@ msgstr "Atsiminkite: Aukščiau esantis sąrašas (kaip ir meniu) yra generuojam
 msgid "More demos"
 msgstr "Daugiau demonstracijų"
 
-#: ..\..\..\default.php:82
-#: ..\..\..\default.php:83
-#: ..\..\..\default.php:84
+#: ..\..\..\default.php:82 ..\..\..\default.php:83 ..\..\..\default.php:84
 msgid "Custom template"
 msgstr "Specialus šablonas"
 
@@ -284,16 +230,15 @@ msgstr "Eiti į administracinę dalį!"
 msgid "Official website"
 msgstr "Oficiali svetainė"
 
-#: ..\..\..\default.php:95
-#: ..\..\..\install\index.php:516
+#: ..\..\..\default.php:95 ..\..\..\install\index.php:523
 msgid "GNU GPL license"
 msgstr "GNU GPL licencija"
 
-#: ..\..\..\multiblogs.php:99
+#: ..\..\..\multiblogs.php:98
 msgid "Multiblog demo"
 msgstr "Multibloginimo galimybių demonstracija"
 
-#: ..\..\..\multiblogs.php:109
+#: ..\..\..\multiblogs.php:108
 msgid "This demo template displays 3 blogs at once (1 on the left, 2 on the right)"
 msgstr "Šis šablonas demonstruoja 3 blogus iš karto (vieną kairėje, 2 dešinėje)"
 
@@ -309,8 +254,7 @@ msgstr "Ši demonstracija rodo paskutinių temų iš visų blogų santrauką"
 msgid "More posts..."
 msgstr "Daugiau įrašų..."
 
-#: ..\..\..\admin\b2antispam.php:19
-#: ..\..\..\admin\_menutop.php:223
+#: ..\..\..\admin\b2antispam.php:19 ..\..\..\admin\_menutop.php:230
 #: ..\..\..\admin\_users_groupform.php:97
 msgid "Antispam"
 msgstr "Antispam"
@@ -330,46 +274,93 @@ msgstr "Trinamas apsilankymai atitinkantys [%s]..."
 msgid "Deleting comments matching [%s]..."
 msgstr "Trinamas komentarai atitinkantys [%s]..."
 
-#: ..\..\..\admin\b2antispam.php:78
+#: ..\..\..\admin\b2antispam.php:80
 #, php-format
 msgid "Blacklisting the keyword [%s]..."
 msgstr "Blokuojamas raktažodis [%s]..."
 
-#: ..\..\..\admin\b2antispam.php:97
+#: ..\..\..\admin\b2antispam.php:99
 msgid "Confirm ban &amp; delete"
 msgstr "Patvirtinti blokavimą ir ištrinti"
 
-#: ..\..\..\admin\b2antispam.php:111
+#: ..\..\..\admin\b2antispam.php:113
 #, php-format
 msgid "No log-hits match the keyword [%s]."
 msgstr "Nerasta raktažodžių atitinkančių [%s]."
 
-#: ..\..\..\admin\b2antispam.php:117
+#: ..\..\..\admin\b2antispam.php:119
 #, php-format
 msgid "Delete the following %d referer hits:"
 msgstr "Ištrinti šiuos %d referalus:"
 
-#: ..\..\..\admin\b2antispam.php:141
+#: ..\..\..\admin\b2antispam.php:124 ..\..\..\admin\b2antispam.php:173
+#: ..\..\..\admin\b2stats.php:174
+msgid "Date"
+msgstr "Data"
+
+#: ..\..\..\admin\b2antispam.php:125
+#, fuzzy
+msgid "Referer"
+msgstr "Referalai"
+
+# D:\www\b2evo091\blogs\admin\b2antispam.php:126
+#: ..\..\..\admin\b2antispam.php:126
+msgid "Ref. IP"
+msgstr ""
+
+# D:\www\b2evo091\blogs\admin\b2antispam.php:127
+#: ..\..\..\admin\b2antispam.php:127
+msgid "Target Blog"
+msgstr ""
+
+# C:\www\b2evolution\blogs\install\index.php:268
+# C:\www\b2evolution\blogs\install\index.php:354
+#: ..\..\..\admin\b2antispam.php:128
+#, fuzzy
+msgid "Target URL"
+msgstr "Pagrindinis URL"
+
+#: ..\..\..\admin\b2antispam.php:162
 #, php-format
 msgid "No comments match the keyword [%s]."
 msgstr "Nerasta komentarų atitinkančių raktažodį [%s]."
 
-#: ..\..\..\admin\b2antispam.php:147
+#: ..\..\..\admin\b2antispam.php:168
 #, php-format
 msgid "Delete the following %d comments:"
 msgstr "Ištrinti šiuos %d komentarus:"
 
-#: ..\..\..\admin\b2antispam.php:178
+#: ..\..\..\admin\b2antispam.php:174 ..\..\..\admin\_edit_form.php:543
+#: ..\..\..\htsrv\comment_post.php:147 ..\..\..\htsrv\comment_post.php:153
+msgid "Author"
+msgstr "Autorius"
+
+# D:\www\b2evo091\blogs\admin\b2antispam.php:175
+#: ..\..\..\admin\b2antispam.php:175
+msgid "Auth. URL"
+msgstr ""
+
+# D:\www\b2evo091\blogs\admin\b2antispam.php:176
+#: ..\..\..\admin\b2antispam.php:176
+msgid "Auth. IP"
+msgstr ""
+
+# D:\www\b2evo091\blogs\admin\b2antispam.php:177
+#: ..\..\..\admin\b2antispam.php:177
+msgid "Content starts with..."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:215
 #, php-format
 msgid "The keyword [%s] is already handled by the blacklist."
 msgstr "Raktažodis [%s] jau įtrauktas į juodąjį sąrašą."
 
-#: ..\..\..\admin\b2antispam.php:184
+#: ..\..\..\admin\b2antispam.php:221
 #, php-format
 msgid "Blacklist the keyword [%s] locally."
 msgstr "Blokuojamas raktažodis [%s] lokaliai."
 
-#: ..\..\..\admin\b2antispam.php:191
+#: ..\..\..\admin\b2antispam.php:228
 #, php-format
 msgid "Report the keyword [%s] as abuse to b2evolution.net."
 msgstr "Perduoti raktažodį [%s] kaip šiukšlę į b2evolution.net."
@@ -377,80 +368,82 @@ msgstr "Perduoti raktažodį [%s] kaip šiukšlę į b2evolution.net."
 # C:\www\b2evolution\blogs\admin\b2antispam.php:188
 # C:\www\b2evolution\blogs\admin\b2antispam.php:271
 # C:\www\b2evolution\blogs\admin\_blogs_advanced.form.php:27
-#: ..\..\..\admin\b2antispam.php:193
-#: ..\..\..\admin\b2antispam.php:276
+#: ..\..\..\admin\b2antispam.php:230 ..\..\..\admin\b2antispam.php:315
 #: ..\..\..\admin\_blogs_advanced.form.php:28
 msgid "Terms of service"
 msgstr "Naudojimosi sąlygos"
 
-#: ..\..\..\admin\b2antispam.php:200
+#: ..\..\..\admin\b2antispam.php:237
 msgid "Perform selected operations"
 msgstr "Vykdyti pasirinktas operacijas"
 
-#: ..\..\..\admin\b2antispam.php:217
+#: ..\..\..\admin\b2antispam.php:254
 #, php-format
 msgid "Removing entry #%d from the ban list..."
 msgstr "Trinamas įrašas #%d iš blokuojamų sąrašo..."
 
-#: ..\..\..\admin\b2antispam.php:254
+#: ..\..\..\admin\b2antispam.php:292
 msgid "Add a banned keyword"
 msgstr "Įtraukti naują raktažodį"
 
-#: ..\..\..\admin\b2antispam.php:256
+#: ..\..\..\admin\b2antispam.php:294
 msgid "Check &amp; ban..."
 msgstr "Patikrinti ir blokuoti..."
 
-#: ..\..\..\admin\b2antispam.php:264
+#: ..\..\..\admin\b2antispam.php:303
 msgid "Banned domains blacklist"
 msgstr "Juodasis sąrašas"
 
-#: ..\..\..\admin\b2antispam.php:265
+#: ..\..\..\admin\b2antispam.php:304
 msgid "Any URL containing one of the following keywords will be banned from posts, comments and logs."
 msgstr "Bet koks URL, turintis vieną iš šių raktažodžių bus blokuojamas temose, komentaruose ir statistikoje. "
 
-#: ..\..\..\admin\b2antispam.php:268
+#: ..\..\..\admin\b2antispam.php:307
 msgid "If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword."
 msgstr "Jei raktažodis susijęs su patikimu domenu, paspauskite ant žalios varnelės ir domenas su šiuo raktažodžiu bus atblokuotas."
 
-#: ..\..\..\admin\b2antispam.php:275
+#: ..\..\..\admin\b2antispam.php:314
 msgid "Request abuse update from centralized blacklist!"
 msgstr "Atnaujinti iš centralizuoto juodojo sąrašo!"
 
-#: ..\..\..\admin\b2antispam.php:286
+# D:\www\b2evo091\blogs\admin\b2antispam.php:322
+#: ..\..\..\admin\b2antispam.php:322
+#, php-format
+msgid "The blacklist contains more than 100 items. [<a %s>Click here to display</a>]."
+msgstr ""
+
+#: ..\..\..\admin\b2antispam.php:342
 msgid "Allow keyword back (Remove it from the blacklist)"
 msgstr "Gražinti raktažodį (Pašalinti iš juodojo sąrašo)"
 
-#: ..\..\..\admin\b2antispam.php:286
+#: ..\..\..\admin\b2antispam.php:342
 msgid "Allow Back"
 msgstr "Grąžinti"
 
-#: ..\..\..\admin\b2antispam.php:297
+#: ..\..\..\admin\b2antispam.php:353
 msgid "Report abuse to centralized ban blacklist!"
 msgstr "Praneškite apie pažeidimus į centralizuotą blokavimų sąrašą!"
 
-#: ..\..\..\admin\b2antispam.php:297
+#: ..\..\..\admin\b2antispam.php:353
 msgid "Report"
 msgstr "Pranešti"
 
-#: ..\..\..\admin\b2antispam.php:299
+#: ..\..\..\admin\b2antispam.php:355
 msgid "Check hit-logs and comments for this keyword!"
 msgstr "Patikrinti ar apsilankymuose ir komentaruose nėra šio raktažodžio!"
 
-#: ..\..\..\admin\b2antispam.php:299
+#: ..\..\..\admin\b2antispam.php:355
 msgid "Re-check"
 msgstr "Pertikrinti"
 
-#: ..\..\..\admin\b2blogs.php:17
-#: ..\..\..\admin\_blogs_list.php:25
-#: ..\..\..\admin\_menutop.php:206
-#: ..\..\..\admin\_users_groupform.php:87
+#: ..\..\..\admin\b2blogs.php:17 ..\..\..\admin\_blogs_list.php:26
+#: ..\..\..\admin\_menutop.php:213 ..\..\..\admin\_users_groupform.php:87
 #: ..\..\..\skins\bluesky\_bloglist.php:23
 #: ..\..\..\skins\guadeloupe\_bloglist.php:23
 msgid "Blogs"
 msgstr "Blogai"
 
-#: ..\..\..\admin\b2blogs.php:25
-#: ..\..\..\admin\b2blogs.php:128
+#: ..\..\..\admin\b2blogs.php:25 ..\..\..\admin\b2blogs.php:128
 msgid "New"
 msgstr "Nauja"
 
@@ -459,13 +452,11 @@ msgid "Creating blog..."
 msgstr "Kuriamas blogas"
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:53
-#: ..\..\..\admin\b2blogs.php:62
-#: ..\..\..\admin\b2blogs.php:221
+#: ..\..\..\admin\b2blogs.php:62 ..\..\..\admin\b2blogs.php:221
 msgid "You must provide an URL blog name / Stub name!"
 msgstr "Privalote pateikti URL blogo pavadinimą / Stub pavadinimą!"
 
-#: ..\..\..\admin\b2blogs.php:68
-#: ..\..\..\admin\b2blogs.php:228
+#: ..\..\..\admin\b2blogs.php:68 ..\..\..\admin\b2blogs.php:228
 msgid "This URL blog name / Stub name is already in use by another blog. Choose another name."
 msgstr "Šis URL blogo pavadinimas / Stub pavadinimas jau naudojamas kitame bloge. Pasirinkite kitą pavadinimą."
 
@@ -478,34 +469,27 @@ msgstr "Negalima sukurti, prašome ištaisyti šias klaidas:"
 msgid "You should <a %s>create categories</a> for this blog now!"
 msgstr "Jūs turite <a %s>sukurti kategorijas</a> šiam blogui!"
 
-#: ..\..\..\admin\b2blogs.php:135
-#: ..\..\..\b2evocore\_class_blog.php:80
+#: ..\..\..\admin\b2blogs.php:135 ..\..\..\b2evocore\_class_blog.php:80
 msgid "New weblog"
 msgstr "Naujas weblogas"
 
-#: ..\..\..\admin\b2blogs.php:136
-#: ..\..\..\admin\b2blogs.php:155
+#: ..\..\..\admin\b2blogs.php:136 ..\..\..\admin\b2blogs.php:155
 #: ..\..\..\b2evocore\_class_blog.php:79
 msgid "New blog"
 msgstr "Naujas blogas"
 
-#: ..\..\..\admin\b2blogs.php:172
-#: ..\..\..\admin\b2blogs.php:309
-#: ..\..\..\admin\b2blogs.php:336
-#: ..\..\..\admin\b2options.php:29
-#: ..\..\..\admin\b2options.php:410
-#: ..\..\..\admin\_users_groupform.php:73
+#: ..\..\..\admin\b2blogs.php:172 ..\..\..\admin\b2blogs.php:309
+#: ..\..\..\admin\b2blogs.php:336 ..\..\..\admin\b2options.php:29
+#: ..\..\..\admin\b2options.php:411 ..\..\..\admin\_users_groupform.php:73
 msgid "General"
 msgstr "Bendras"
 
-#: ..\..\..\admin\b2blogs.php:175
-#: ..\..\..\admin\b2blogs.php:312
+#: ..\..\..\admin\b2blogs.php:175 ..\..\..\admin\b2blogs.php:312
 #: ..\..\..\admin\b2blogs.php:342
 msgid "Permissions"
 msgstr "Teisės"
 
-#: ..\..\..\admin\b2blogs.php:178
-#: ..\..\..\admin\b2blogs.php:315
+#: ..\..\..\admin\b2blogs.php:178 ..\..\..\admin\b2blogs.php:315
 #: ..\..\..\admin\b2blogs.php:348
 msgid "Advanced"
 msgstr "Išplėstiniai nustatymai"
@@ -515,8 +499,7 @@ msgstr "Išplėstiniai nustatymai"
 msgid "Updating Blog [%s]..."
 msgstr "Atnaujinu Blogą [%s]..."
 
-#: ..\..\..\admin\b2blogs.php:231
-#: ..\..\..\admin\edit_actions.php:217
+#: ..\..\..\admin\b2blogs.php:231 ..\..\..\admin\edit_actions.php:227
 msgid "Cannot update, please correct these errors:"
 msgstr "Negalima atnaujinti, prašome ištaisyti šias klaidas:"
 
@@ -529,8 +512,7 @@ msgstr "Ištrinti blogą [%s]?"
 msgid "Deleting this blog will also delete all its categories, posts and comments!"
 msgstr "Ištrynus šį blogą bus ištrintos visos jo kategorijos, įrašai ir komentarai!"
 
-#: ..\..\..\admin\b2blogs.php:428
-#: ..\..\..\admin\b2users.php:328
+#: ..\..\..\admin\b2blogs.php:428 ..\..\..\admin\b2users.php:328
 #: ..\..\..\admin\b2users.php:385
 msgid "THIS CANNOT BE UNDONE!"
 msgstr "TAI NEBEATSTATOMA!"
@@ -545,14 +527,12 @@ msgstr "Taip pat bandykite ištrinti stub failą [<strong><a %s>%s</a></strong>]
 msgid "Also try to delete static file [<strong><a %s>%s</a></strong>]"
 msgstr "Taip pat bandykite ištrinti statinį failą [<strong><a %s>%s</a></strong>]"
 
-#: ..\..\..\admin\b2blogs.php:455
-#: ..\..\..\admin\b2users.php:336
+#: ..\..\..\admin\b2blogs.php:455 ..\..\..\admin\b2users.php:336
 #: ..\..\..\admin\b2users.php:393
 msgid "I am sure!"
 msgstr "Aš tikras!"
 
-#: ..\..\..\admin\b2blogs.php:458
-#: ..\..\..\admin\b2users.php:339
+#: ..\..\..\admin\b2blogs.php:458 ..\..\..\admin\b2users.php:339
 #: ..\..\..\admin\b2users.php:396
 msgid "CANCEL"
 msgstr "ATŠAUKTI"
@@ -582,12 +562,10 @@ msgstr "Patikrinkite [%s] leidimus (permissions). Informacijos apie leidimus ras
 msgid "Writing to file [%s]..."
 msgstr "Rašau į failą [%s]..."
 
-#: ..\..\..\admin\b2blogs.php:557
-#: ..\..\..\admin\edit_actions.php:135
-#: ..\..\..\admin\edit_actions.php:252
-#: ..\..\..\admin\edit_actions.php:342
-#: ..\..\..\b2evocore\_functions_antispam.php:201
-#: ..\..\..\b2evocore\_functions_antispam.php:303
+#: ..\..\..\admin\b2blogs.php:557 ..\..\..\admin\edit_actions.php:140
+#: ..\..\..\admin\edit_actions.php:262 ..\..\..\admin\edit_actions.php:352
+#: ..\..\..\b2evocore\_functions_antispam.php:197
+#: ..\..\..\b2evocore\_functions_antispam.php:299
 #: ..\..\..\b2evocore\_functions_pings.php:51
 #: ..\..\..\b2evocore\_functions_pings.php:87
 #: ..\..\..\b2evocore\_functions_pings.php:164
@@ -599,106 +577,103 @@ msgstr "Padaryta."
 msgid "Browse blog:"
 msgstr "Naršyti blogą:"
 
-#: ..\..\..\admin\b2browse.php:57
-#: ..\..\..\admin\b2edit.php:167
+#: ..\..\..\admin\b2browse.php:57 ..\..\..\admin\b2edit.php:166
 #, php-format
 msgid "Since you're a newcomer, you'll have to wait for an admin to authorize you to post. You can also <a %s>e-mail the admin</a> to ask for a promotion. When you're promoted, just reload this page and you'll be able to blog. :)"
 msgstr "Kadangi jūs esate čia naujas asmuo, todėl palaukite kol administratorius pakeis jūsų lygį  į 1.\tKai tai bus padaryta, galėsite kurti naujas temas. Jūs taip pat galite <a %s>susisiekti su administratoriumi</a>, prašydami paaukštinimo. ;) Kai jūsų lygis bus pakeltas, paprasčiausiai perkraukite puslapį ir galėsite rašyti."
 
-#: ..\..\..\admin\b2categories.php:17
-#: ..\..\..\admin\_cats_list.php:14
+#: ..\..\..\admin\b2categories.php:17 ..\..\..\admin\_cats_list.php:14
 msgid "Categories for blog:"
 msgstr "Kategorijos:"
 
-#: ..\..\..\admin\b2categories.php:81
+#: ..\..\..\admin\b2categories.php:71
 #, php-format
 msgid "New sub-category in category: %s"
 msgstr "Nauja sub-kategorija kategorijoje: %s"
 
-#: ..\..\..\admin\b2categories.php:90
+#: ..\..\..\admin\b2categories.php:80
 #, php-format
 msgid "New category in blog: %s"
 msgstr "Nauja kategorija bloge: %s"
 
-#: ..\..\..\admin\b2categories.php:97
+#: ..\..\..\admin\b2categories.php:87
 msgid "New category name"
 msgstr "Naujos kategorijos pavadinimas"
 
-#: ..\..\..\admin\b2categories.php:98
+#: ..\..\..\admin\b2categories.php:88
 msgid "Create category"
 msgstr "Sukurti kategoriją"
 
-#: ..\..\..\admin\b2categories.php:154
+#: ..\..\..\admin\b2categories.php:144
 #, php-format
 msgid "Deleting category #%d : %s ..."
 msgstr "Trinama kategorija #%d : %s ..."
 
-#: ..\..\..\admin\b2categories.php:160
+#: ..\..\..\admin\b2categories.php:150
 #: ..\..\..\b2evocore\_functions_users.php:76
 #: ..\..\..\b2evocore\_functions_users.php:107
-#: ..\..\..\htsrv\profile_update.php:53
-#: ..\..\..\htsrv\profile_update.php:63
-#: ..\..\..\htsrv\profile_update.php:72
-#: ..\..\..\htsrv\profile_update.php:78
-#: ..\..\..\htsrv\profile_update.php:87
-#: ..\..\..\htsrv\profile_update.php:95
-#: ..\..\..\htsrv\profile_update.php:100
-#: ..\..\..\htsrv\register.php:43
-#: ..\..\..\htsrv\register.php:50
-#: ..\..\..\htsrv\register.php:57
-#: ..\..\..\htsrv\register.php:73
-#: ..\..\..\htsrv\register.php:78
-#: ..\..\..\htsrv\register.php:89
+#: ..\..\..\htsrv\profile_update.php:53 ..\..\..\htsrv\profile_update.php:63
+#: ..\..\..\htsrv\profile_update.php:72 ..\..\..\htsrv\profile_update.php:78
+#: ..\..\..\htsrv\profile_update.php:85 ..\..\..\htsrv\profile_update.php:93
+#: ..\..\..\htsrv\profile_update.php:101 ..\..\..\htsrv\profile_update.php:106
+#: ..\..\..\htsrv\register.php:43 ..\..\..\htsrv\register.php:50
+#: ..\..\..\htsrv\register.php:57 ..\..\..\htsrv\register.php:73
+#: ..\..\..\htsrv\register.php:78 ..\..\..\htsrv\register.php:89
 msgid "ERROR"
 msgstr "KLAIDA"
 
-#: ..\..\..\admin\b2categories.php:164
+#: ..\..\..\admin\b2categories.php:154
 msgid "Category deleted."
 msgstr "Kategorija ištrinta."
 
-#: ..\..\..\admin\b2categories.php:189
+#: ..\..\..\admin\b2categories.php:179
 msgid "Properties for category:"
 msgstr "Kategorijos ypatybės:"
 
-#: ..\..\..\admin\b2categories.php:192
-#: ..\..\..\admin\b2upload.php:167
-#: ..\..\..\admin\_edit_form.php:131
-#: ..\..\..\admin\_set_regional.form.php:49
+#: ..\..\..\admin\b2categories.php:181 ..\..\..\admin\b2upload.php:190
+#: ..\..\..\admin\_edit_form.php:131 ..\..\..\admin\_set_regional.form.php:49
 #: ..\..\..\admin\_set_regional.form.php:160
-#: ..\..\..\admin\_users_groupform.php:76
-#: ..\..\..\admin\_users_list.php:20
-#: ..\..\..\skins\_feedback.php:176
-#: ..\..\..\skins\basic\_feedback.php:173
-#: ..\..\..\skins\wpc_aubmach\_feedback.php:181
-#: ..\..\..\skins\wpc_default\_feedback.php:181
+#: ..\..\..\admin\_users_groupform.php:76 ..\..\..\admin\_users_list.php:20
+#: ..\..\..\skins\_feedback.php:174 ..\..\..\skins\basic\_feedback.php:173
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:180
+#: ..\..\..\skins\wpc_default\_feedback.php:180
 msgid "Name"
 msgstr "Vardas"
 
-#: ..\..\..\admin\b2categories.php:196
+#: ..\..\..\admin\b2categories.php:185
 msgid "New parent category"
 msgstr "Nauja \"tėvo\" kategorija"
 
-#: ..\..\..\admin\b2categories.php:222
-#: ..\..\..\admin\b2categories.php:241
+#: ..\..\..\admin\b2categories.php:213 ..\..\..\admin\b2categories.php:244
+#: ..\..\..\admin\b2categories.php:262
 msgid "Old Parent"
 msgstr "Senas \"tėvas\""
 
-#: ..\..\..\admin\b2categories.php:239
+#: ..\..\..\admin\b2categories.php:240 ..\..\..\admin\b2categories.php:260
 msgid "Root (No parent)"
 msgstr "Root (Nėra tėvo)"
 
+# D:\www\b2evo091\blogs\admin\b2categories.php:250
 #: ..\..\..\admin\b2categories.php:250
+msgid "Note: Moving categories across blogs is enabled. Use with caution."
+msgstr ""
+
+#: ..\..\..\admin\b2categories.php:266
+#, fuzzy
+msgid "Note: Moving categories across blogs is disabled."
+msgstr "Pastaba: Rašymas keliuose bloguose iškart įjungtas."
+
+#: ..\..\..\admin\b2categories.php:271
 msgid "Edit category!"
 msgstr "Redaguoti kategoriją"
 
 # C:\www\b2evolution\blogs\admin\b2categories.php:291
-#: ..\..\..\admin\b2categories.php:295
+#: ..\..\..\admin\b2categories.php:335
 msgid "Sorry, you have no permission to edit/view any category's properties."
 msgstr "Atsiprašome, jūs neturite teisės redaguoti/žiūrėti kategorijų nustatymus."
 
-#: ..\..\..\admin\b2edit.php:30
-#: ..\..\..\admin\edit_actions.php:196
-#: ..\..\..\admin\edit_actions.php:295
+#: ..\..\..\admin\b2edit.php:30 ..\..\..\admin\edit_actions.php:201
+#: ..\..\..\admin\edit_actions.php:305
 msgid "Oops, no post with this ID."
 msgstr "Uuups, su šiuo ID temų nerasta."
 
@@ -719,27 +694,24 @@ msgstr "Uuups, su šiuo ID komentarų nėra!"
 msgid "Editing comment"
 msgstr "Redaguojamas komentaras"
 
-#: ..\..\..\admin\b2edit.php:118
+#: ..\..\..\admin\b2edit.php:117
 msgid "New post in blog:"
 msgstr "Nauja tema bloge:"
 
-#: ..\..\..\admin\b2edit.php:145
-#: ..\..\..\admin\b2edit.php:179
+#: ..\..\..\admin\b2edit.php:144 ..\..\..\admin\b2edit.php:178
 msgid "Since this blog has no categories, you cannot post to it. You must create categories first."
 msgstr "Kadangi šis blogas neturi kategorijų, jūs nagalite rašyti į jį. Pirma sukurkite kategoriją."
 
-#: ..\..\..\admin\b2edit.php:149
+#: ..\..\..\admin\b2edit.php:148
 msgid "Switch to this blog (keeping your input if Javascript is active)"
 msgstr "Persijungti į šį blogą (parašytas tekstas išliks, jei JavaSkript palaikymas Jūsų naršyklėje įjungtas)"
 
-#: ..\..\..\admin\b2login.php:23
-#: ..\..\..\admin\b2upload.php:24
+#: ..\..\..\admin\b2login.php:23 ..\..\..\admin\b2upload.php:24
 #: ..\..\..\htsrv\_header.php:15
 msgid "b2evo"
 msgstr "b2evo"
 
-#: ..\..\..\admin\b2login.php:23
-#: ..\..\..\b2evocore\_functions_users.php:348
+#: ..\..\..\admin\b2login.php:23 ..\..\..\b2evocore\_functions_users.php:348
 msgid "Login..."
 msgstr "Prisijungti..."
 
@@ -752,18 +724,15 @@ msgstr "Norint prisijungti b2evolution sistemoje, jums nereikia nurodyti b2login
 msgid "Simply point directly to the backoffice page you need, for example: %s or %s. b2evo will prompt you to log in if needed."
 msgstr "Paprasčiausiai nurodykite norimą Adminstracinės dalies puslapį, pvz.: %s arba %s. b2evo paprašys prisijungti, jei reikia."
 
-#: ..\..\..\admin\b2options.php:17
-#: ..\..\..\admin\_menutop.php:256
+#: ..\..\..\admin\b2options.php:17 ..\..\..\admin\_menutop.php:263
 msgid "Settings"
 msgstr "Nustatymai"
 
-#: ..\..\..\admin\b2options.php:32
-#: ..\..\..\admin\b2options.php:418
+#: ..\..\..\admin\b2options.php:32 ..\..\..\admin\b2options.php:419
 msgid "Regional"
 msgstr "Regioniniai"
 
-#: ..\..\..\admin\b2options.php:35
-#: ..\..\..\admin\b2options.php:424
+#: ..\..\..\admin\b2options.php:35 ..\..\..\admin\b2options.php:425
 msgid "Plug-ins"
 msgstr "Įskiepiai"
 
@@ -803,12 +772,12 @@ msgstr "Lokalių lentelė ištrinta, užkraunami pradiniai įrašai iš <code>/c
 msgid "File <code>%s</code> not found."
 msgstr "Failas <code>%s</code> nerastas."
 
-#: ..\..\..\admin\b2options.php:330
+#: ..\..\..\admin\b2options.php:331
 #, php-format
 msgid "Deleted locale '%s' from database."
 msgstr "'%s' kalba ištrinta iš duomenų bazės."
 
-#: ..\..\..\admin\b2options.php:370
+#: ..\..\..\admin\b2options.php:371
 msgid "Switched priorities."
 msgstr "Perjungti prioritetai."
 
@@ -824,86 +793,73 @@ msgstr "Kraunamas Gramatikos Tikrinimas. Prašome palaukti"
 msgid "View Stats for Blog:"
 msgstr "Peržiūrėti Statistiką blogui:"
 
-#: ..\..\..\admin\b2stats.php:25
-#: ..\..\..\admin\b2stats.php:29
+#: ..\..\..\admin\b2stats.php:24
 #: ..\..\..\b2evocore\_class_dataobjectcache.php:206
 msgid "None"
 msgstr "Nieko"
 
-#: ..\..\..\admin\b2stats.php:59
+#: ..\..\..\admin\b2stats.php:51
 #, php-format
 msgid "Changing hit #%d type to: %s"
 msgstr "Keičiamas apsilankymo #%d tipas į: %s"
 
-#: ..\..\..\admin\b2stats.php:76
+#: ..\..\..\admin\b2stats.php:68
 #, php-format
 msgid "Deleting hit #%d..."
 msgstr "Trinamas apsilankymas #%d..."
 
-#: ..\..\..\admin\b2stats.php:93
+#: ..\..\..\admin\b2stats.php:85
 #, php-format
 msgid "Pruning hits for %s..."
 msgstr "Apkarpom apsilankymus %s..."
 
-#: ..\..\..\admin\b2stats.php:114
-#: ..\..\..\admin\b2stats.php:156
+#: ..\..\..\admin\b2stats.php:106 ..\..\..\admin\b2stats.php:148
 msgid "Summary"
 msgstr "Santrauka"
 
-#: ..\..\..\admin\b2stats.php:120
-#: ..\..\..\admin\b2stats.php:178
+#: ..\..\..\admin\b2stats.php:112 ..\..\..\admin\b2stats.php:175
 msgid "Referers"
 msgstr "Referalai"
 
-#: ..\..\..\admin\b2stats.php:126
-#: ..\..\..\admin\b2stats.php:179
+#: ..\..\..\admin\b2stats.php:118 ..\..\..\admin\b2stats.php:176
 msgid "Refering Searches"
 msgstr "Paieškų Referalai"
 
-#: ..\..\..\admin\b2stats.php:132
-#: ..\..\..\admin\b2stats.php:181
+#: ..\..\..\admin\b2stats.php:124 ..\..\..\admin\b2stats.php:178
 msgid "Syndication"
 msgstr "RSS/XML"
 
-#: ..\..\..\admin\b2stats.php:138
+#: ..\..\..\admin\b2stats.php:130
 msgid "User Agents"
 msgstr "User Agents"
 
-#: ..\..\..\admin\b2stats.php:144
-#: ..\..\..\admin\b2stats.php:182
+#: ..\..\..\admin\b2stats.php:136 ..\..\..\admin\b2stats.php:179
 msgid "Direct Accesses"
 msgstr "Tiesioginiai Apsilankymai"
 
 #: ..\..\..\admin\b2stats.php:177
-msgid "Date"
-msgstr "Data"
-
-#: ..\..\..\admin\b2stats.php:180
 msgid "Indexing Robots"
 msgstr "Robotai"
 
-#: ..\..\..\admin\b2stats.php:183
+#: ..\..\..\admin\b2stats.php:180
 msgid "Total"
 msgstr "Viso"
 
-#: ..\..\..\admin\b2stats.php:195
+#: ..\..\..\admin\b2stats.php:194
 msgid "Prune this date!"
 msgstr "Apkarpyti iki šios datos!"
 
 #  TRANS: Abbrev. for Prune (stats)
 #. TRANS: Abbrev. for Prune (stats)
-#: ..\..\..\admin\b2stats.php:195
-#: ..\..\..\admin\b2stats.php:224
+#: ..\..\..\admin\b2stats.php:194 ..\..\..\admin\b2stats.php:224
 msgid "Prune"
 msgstr "Apkarpyti"
 
-#: ..\..\..\admin\b2stats.php:195
-#: ..\..\..\admin\b2stats.php:224
+#: ..\..\..\admin\b2stats.php:194 ..\..\..\admin\b2stats.php:224
 msgid "Prune hits for this date!"
 msgstr "Apkarpyti apsilankymus iki šios datos!"
 
 #: ..\..\..\admin\b2stats.php:244
-#: ..\..\..\skins\_stats.php:21
 msgid "Last referers"
 msgstr "Naujausi referalai"
 
@@ -911,102 +867,92 @@ msgstr "Naujausi referalai"
 msgid "These are hits from external web pages refering to this blog"
 msgstr "Apsilankymai iš svetainių, kuriose yra nuorodų į šį blogą"
 
-#: ..\..\..\admin\b2stats.php:254
-#: ..\..\..\admin\b2stats.php:301
-#: ..\..\..\admin\b2stats.php:371
+#: ..\..\..\admin\b2stats.php:258 ..\..\..\admin\b2stats.php:319
+#: ..\..\..\admin\b2stats.php:416
 msgid "Delete this hit!"
 msgstr "Trinti šį apsilankymą!"
 
 #  TRANS: Verimas skirtas Delete (stats)
 #. TRANS: Abbrev. for Delete (stats)
-#: ..\..\..\admin\b2stats.php:254
-#: ..\..\..\admin\b2stats.php:301
-#: ..\..\..\admin\b2stats.php:371
-#: ..\..\..\admin\_blogs_list.php:33
-#: ..\..\..\admin\_blogs_list.php:90
-#: ..\..\..\admin\_cats_list.php:39
-#: ..\..\..\admin\_users_list.php:78
-#: ..\..\..\admin\_users_list.php:147
+#. TRANS: Abbrev. for Delete
+#: ..\..\..\admin\b2stats.php:258 ..\..\..\admin\b2stats.php:319
+#: ..\..\..\admin\b2stats.php:416 ..\..\..\admin\_blogs_list.php:34
+#: ..\..\..\admin\_blogs_list.php:91 ..\..\..\admin\_cats_list.php:39
+#: ..\..\..\admin\_users_list.php:79 ..\..\..\admin\_users_list.php:151
 msgid "Del"
 msgstr "Trinti"
 
-#: ..\..\..\admin\b2stats.php:255
+#: ..\..\..\admin\b2stats.php:259
 msgid "Log as a search instead"
 msgstr "Loginti kaip paiešką"
 
 #  TRANS: vertimas skirtas "move to searches" (stats)
 #. TRANS: Abbrev. for "move to searches" (stats)
-#: ..\..\..\admin\b2stats.php:255
+#: ..\..\..\admin\b2stats.php:259
 msgid "-&gt;S"
 msgstr "-&gt;S"
 
-#: ..\..\..\admin\b2stats.php:261
-#: ..\..\..\admin\b2stats.php:277
-#: ..\..\..\admin\_edit_showposts.php:229
+#: ..\..\..\admin\b2stats.php:265 ..\..\..\admin\b2stats.php:288
+#: ..\..\..\admin\_edit_showposts.php:213
 msgid "Ban this domain!"
 msgstr "Blokuoti šį domeną!"
 
 #  TRANS: Abbrev.
 #. TRANS: Abbrev.
-#: ..\..\..\admin\b2stats.php:261
-#: ..\..\..\admin\b2stats.php:277
-#: ..\..\..\admin\_edit_showposts.php:229
+#: ..\..\..\admin\b2stats.php:265 ..\..\..\admin\b2stats.php:288
+#: ..\..\..\admin\_edit_showposts.php:213
 msgid "Ban"
 msgstr "Blokuoti"
 
-#: ..\..\..\admin\b2stats.php:269
-#: ..\..\..\skins\_stats.php:33
+#: ..\..\..\admin\b2stats.php:276
 msgid "Top referers"
 msgstr "Top referalai"
 
-#: ..\..\..\admin\b2stats.php:284
+#: ..\..\..\admin\b2stats.php:298
 msgid "Total referers"
 msgstr "Viso referalų"
 
-#: ..\..\..\admin\b2stats.php:291
-#: ..\..\..\skins\_stats.php:45
+#: ..\..\..\admin\b2stats.php:305
 msgid "Last refering searches"
 msgstr "Naujausi paieškų referalai"
 
-#: ..\..\..\admin\b2stats.php:292
+#: ..\..\..\admin\b2stats.php:306
 msgid "These are hits from people who came to this blog system through a search engine. (Search engines must be listed in /conf/_stats.php)"
 msgstr "Šie žmonės atėjo per paieškos sistemas. (Paieškos sistemos turi būti /conf/_stats.php faile esančiame sąraše)."
 
-#: ..\..\..\admin\b2stats.php:312
+#: ..\..\..\admin\b2stats.php:333
 msgid "Top refering search engines"
 msgstr "paieškos sistemos"
 
-#: ..\..\..\admin\b2stats.php:324
-#: ..\..\..\skins\_stats.php:73
+#: ..\..\..\admin\b2stats.php:352
 msgid "Top Indexing Robots"
 msgstr "Robotai"
 
-#: ..\..\..\admin\b2stats.php:325
+#: ..\..\..\admin\b2stats.php:353
 msgid "These are hits from automated robots like search engines' indexing robots. (Robots must be listed in /conf/_stats.php)"
 msgstr "Šie vizitai priklauso robotams, panašiems į indeksuojančius robotus. (Robotai turi buti /conf/_stats.php faile esančiame sąraše)."
 
-#: ..\..\..\admin\b2stats.php:342
-#: ..\..\..\skins\_stats.php:90
+#: ..\..\..\admin\b2stats.php:376
 msgid "Top Aggregators"
 msgstr "Top Agregatoriai"
 
-#: ..\..\..\admin\b2stats.php:343
+#: ..\..\..\admin\b2stats.php:377
 msgid "These are hits from RSS news aggregators. (Aggregators must be listed in /conf/_stats.php)"
 msgstr "Šie vizitai iš RSS naujienų agregatorių.  (Agregatoriai turi būti /conf/_stats.php faile esančiame sąraše)."
 
-#: ..\..\..\admin\b2stats.php:354
+#: ..\..\..\admin\b2stats.php:395
 msgid "Total RSS hits"
 msgstr "Viso RSS vizitų"
 
-#: ..\..\..\admin\b2stats.php:361
+#: ..\..\..\admin\b2stats.php:402
 msgid "Last direct accesses"
 msgstr "Paskutiniai tiesioginiai apsilankymai"
 
-#: ..\..\..\admin\b2stats.php:362
+#: ..\..\..\admin\b2stats.php:403
 msgid "These are hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)"
 msgstr "Šie žmonės į blogą atėjo tiesiogiai. (arba įrašydami URL, arba pasinaudodami žymekliu (bookmark). Blogi (pernelyg trumpi) referalai taip pat parodyti )."
 
-#: ..\..\..\admin\b2stats.php:385
+#: ..\..\..\admin\b2stats.php:432
 msgid "Top User Agents"
 msgstr "Top User Agent'ai"
 
@@ -1034,9 +980,11 @@ msgstr "Failas sėkmingai redaguotas."
 msgid "Be careful what you do, editing this file could break your template! Do not edit what's between <code>&lt;?php</code> and <code>?&gt;</code> if you don't know what you're doing!"
 msgstr "Atsargiai redaguokite šį failą, nes galite sugadinti šabloną! Neredaguokite nieko tarp <code>&lt;?php</code> ir <code>?&gt;</code> jei nežinote ką darote!"
 
-#: ..\..\..\admin\b2template.php:90
-msgid "update template !"
-msgstr "atnaujinti šabloną !"
+#  TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp;
+#. TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp;
+#: ..\..\..\admin\b2template.php:90 ..\..\..\admin\_edit_form.php:173
+msgid "&nbsp; Save ! &nbsp;"
+msgstr "&nbsp; Išsaugoti ! &nbsp;"
 
 #: ..\..\..\admin\b2template.php:94
 msgid "(you cannot update that file/template: must make it writable, e.g. CHMOD 766)"
@@ -1076,22 +1024,18 @@ msgid "This is the main template. It displays the blog."
 msgstr "Tai pagrindinis blogo šablonas."
 
 #: ..\..\..\admin\b2template.php:145
-msgid "This is the template that displays stats for a blog"
-msgstr "Tai šablonas, kuris rodo blogo statistiką"
-
-#: ..\..\..\admin\b2template.php:148
 msgid "This is the page displayed in the comment popup"
 msgstr "Tai iššokantis puslapis, rodantis komentarus"
 
-#: ..\..\..\admin\b2template.php:151
+#: ..\..\..\admin\b2template.php:148
 msgid "This is the page displayed in the pingback popup"
 msgstr "Tai iššokantis puslapis, rodantis \"pingbakus\""
 
-#: ..\..\..\admin\b2template.php:154
+#: ..\..\..\admin\b2template.php:151
 msgid "This is the page displayed in the trackback popup"
 msgstr "Tai iššokantis puslapis, rodantis \"trakbakus\""
 
-#: ..\..\..\admin\b2template.php:165
+#: ..\..\..\admin\b2template.php:162
 msgid "Note: of course, you can also edit the files/templates in your text editor and upload them. This online editor is only meant to be used when you don't have access to a text editor..."
 msgstr "Atminkite: jūs galite redaguoti failus/šablonus savo tekstų redaktoriuje ir nusiųsti juos į serverį. Šis redagavimo būdas paprastai naudojamas kai jūs neturite priėjmo prie tekstų redaktoriaus savo kompiuteryje..."
 
@@ -1099,99 +1043,96 @@ msgstr "Atminkite: jūs galite redaguoti failus/šablonus savo tekstų redaktori
 msgid "upload images/files"
 msgstr "atsiųsti nuotraukas/failus"
 
-#: ..\..\..\admin\b2upload.php:47
+#: ..\..\..\admin\b2upload.php:53
 msgid "File upload"
 msgstr "Failų siuntimas"
 
-#: ..\..\..\admin\b2upload.php:48
+#: ..\..\..\admin\b2upload.php:54
 msgid "Allowed file types:"
 msgstr "Leidžiami failų tipai:"
 
-#: ..\..\..\admin\b2upload.php:49
+#: ..\..\..\admin\b2upload.php:55
 #, php-format
 msgid "Maximum allowed file size: %d KB"
 msgstr "Maksimalus failų dydis: %d Kb."
 
-#: ..\..\..\admin\b2upload.php:54
-#: ..\..\..\admin\b2upload.php:128
-#: ..\..\..\admin\_blogs_general.form.php:74
+#: ..\..\..\admin\b2upload.php:60 ..\..\..\admin\b2upload.php:138
+#: ..\..\..\admin\_blogs_general.form.php:76
 #: ..\..\..\admin\_set_plugins.form.php:24
 #: ..\..\..\admin\_set_plugins.form.php:47
 msgid "Description"
 msgstr "Apibūdinimas"
 
-#: ..\..\..\admin\b2upload.php:57
+#: ..\..\..\admin\b2upload.php:63
 msgid "Upload !"
 msgstr "Atsiųsti !"
 
-#: ..\..\..\admin\b2upload.php:83
+#: ..\..\..\admin\b2upload.php:88
 #, php-format
 msgid "File %s: type %s is not allowed."
 msgstr "Failas %s: %s tipas neleidžiamas."
 
-#: ..\..\..\admin\b2upload.php:112
-#: ..\..\..\admin\b2upload.php:140
-#: ..\..\..\admin\b2upload.php:143
+#: ..\..\..\admin\b2upload.php:117 ..\..\..\admin\b2upload.php:150
+#: ..\..\..\admin\b2upload.php:153
 msgid "Couldn't upload your file to:"
 msgstr "negalima atsiųsti jūsų failo į:"
 
-#: ..\..\..\admin\b2upload.php:116
+#: ..\..\..\admin\b2upload.php:126
 msgid "Duplicate File?"
 msgstr "Dubliuoti Failą?"
 
-#: ..\..\..\admin\b2upload.php:117
+#: ..\..\..\admin\b2upload.php:127
 #, php-format
 msgid "The filename \"%s\" already exists!"
 msgstr "Failas su  pavadinimu \"%s\" egzistuoja!"
 
-#: ..\..\..\admin\b2upload.php:118
+#: ..\..\..\admin\b2upload.php:128
 #, php-format
 msgid "Filename \"%s\" moved to \"%s\""
 msgstr "Failas \"%s\" perkeltas į \"%s\""
 
-#: ..\..\..\admin\b2upload.php:119
+#: ..\..\..\admin\b2upload.php:129
 msgid "Confirm or rename:"
 msgstr "Patvirtinti arba pervadinti:"
 
-#: ..\..\..\admin\b2upload.php:126
+#: ..\..\..\admin\b2upload.php:136
 msgid "Alternate name"
 msgstr "Alternatyvus pavadinimas"
 
-#: ..\..\..\admin\b2upload.php:130
+#: ..\..\..\admin\b2upload.php:140
 msgid "Confirm !"
 msgstr "Patvirtinti !"
 
-#: ..\..\..\admin\b2upload.php:157
+#: ..\..\..\admin\b2upload.php:180
 msgid "File uploaded !"
 msgstr "Failas nusiųstas !"
 
-#: ..\..\..\admin\b2upload.php:158
+#: ..\..\..\admin\b2upload.php:181
 #, php-format
 msgid "Your file <strong>\"%s\"</strong> was uploaded successfully !"
 msgstr "Jūsų failas <strong>\"%s\"</strong> sėkmingai nusiųstas !"
 
-#: ..\..\..\admin\b2upload.php:159
+#: ..\..\..\admin\b2upload.php:182
 msgid "Here's the code to display it:"
 msgstr "Nuotraukos įterpimo XHTML kodas:"
 
-#: ..\..\..\admin\b2upload.php:163
+#: ..\..\..\admin\b2upload.php:186
 msgid "Add the code to your post !"
 msgstr "Įterpti kodą į temą !"
 
-#: ..\..\..\admin\b2upload.php:166
+#: ..\..\..\admin\b2upload.php:189
 msgid "Image Details"
 msgstr "Nuotraukos Detalės"
 
-#: ..\..\..\admin\b2upload.php:170
+#: ..\..\..\admin\b2upload.php:193
 msgid "Size"
 msgstr "Dydis"
 
-#: ..\..\..\admin\b2upload.php:173
-#: ..\..\..\admin\_edit_form.php:537
+#: ..\..\..\admin\b2upload.php:196 ..\..\..\admin\_edit_form.php:544
 msgid "Type"
 msgstr "Tipas"
 
-#: ..\..\..\admin\b2upload.php:178
+#: ..\..\..\admin\b2upload.php:201
 msgid "Close this window"
 msgstr "Užverti šį langą"
 
@@ -1231,8 +1172,7 @@ msgstr "Jūs įrašėte du skirtingus slaptažodžius."
 # C:\www\b2evolution\blogs\admin\b2users.php:193
 # C:\www\b2evolution\blogs\htsrv\profile_update.php:103
 # C:\www\b2evolution\blogs\htsrv\register.php:62
-#: ..\..\..\admin\b2users.php:198
-#: ..\..\..\htsrv\profile_update.php:106
+#: ..\..\..\admin\b2users.php:198 ..\..\..\htsrv\profile_update.php:112
 #: ..\..\..\htsrv\register.php:64
 #, php-format
 msgid "The mimimum password length is %d characters."
@@ -1340,81 +1280,74 @@ msgstr "Jūs neturite teisės matyti kitų vartotojų."
 msgid "Adding new post..."
 msgstr "Įrašomas naujas strapsnis..."
 
-#: ..\..\..\admin\edit_actions.php:104
-#: ..\..\..\admin\edit_actions.php:210
-#: ..\..\..\admin\edit_actions.php:450
-#: ..\..\..\htsrv\comment_post.php:66
-#: ..\..\..\htsrv\trackback.php:63
-#: ..\..\..\xmlsrv\xmlrpc.php:1371
+#: ..\..\..\admin\edit_actions.php:104 ..\..\..\admin\edit_actions.php:215
+#: ..\..\..\admin\edit_actions.php:460 ..\..\..\htsrv\comment_post.php:75
+#: ..\..\..\htsrv\profile_update.php:85 ..\..\..\htsrv\trackback.php:63
+#: ..\..\..\xmlsrv\xmlrpc.php:1374
 msgid "Supplied URL is invalid: "
 msgstr "Pateiktas URL neteisingas:"
 
-#: ..\..\..\admin\edit_actions.php:111
-#: ..\..\..\htsrv\getmail.php:248
+#: ..\..\..\admin\edit_actions.php:110 ..\..\..\admin\edit_actions.php:221
+#, fuzzy
+msgid "Supplied content is invalid"
+msgstr "Pateiktas URL neteisingas:"
+
+#: ..\..\..\admin\edit_actions.php:116 ..\..\..\htsrv\getmail.php:248
 msgid "Cannot post, please correct these errors:"
 msgstr "Negalima įrašyti, prašome ištaisyti šias klaidas:"
 
-#: ..\..\..\admin\edit_actions.php:112
-#: ..\..\..\admin\edit_actions.php:218
-#: ..\..\..\admin\edit_actions.php:455
+#: ..\..\..\admin\edit_actions.php:117 ..\..\..\admin\edit_actions.php:228
+#: ..\..\..\admin\edit_actions.php:465
 msgid "Back to post editing"
 msgstr "Atgal į temos redagavimą"
 
-#: ..\..\..\admin\edit_actions.php:118
+#: ..\..\..\admin\edit_actions.php:123
 msgid "Recording post..."
 msgstr "Daromas įrašas..."
 
-#: ..\..\..\admin\edit_actions.php:131
-#: ..\..\..\admin\edit_actions.php:248
-#: ..\..\..\admin\edit_actions.php:407
+#: ..\..\..\admin\edit_actions.php:136 ..\..\..\admin\edit_actions.php:258
+#: ..\..\..\admin\edit_actions.php:417
 msgid "Sleeping..."
 msgstr "Miegu..."
 
-#: ..\..\..\admin\edit_actions.php:141
-#: ..\..\..\admin\edit_actions.php:257
-#: ..\..\..\admin\edit_actions.php:348
+#: ..\..\..\admin\edit_actions.php:146 ..\..\..\admin\edit_actions.php:267
+#: ..\..\..\admin\edit_actions.php:358
 msgid "Post not publicly published: skipping trackback, pingback and blog pings..."
 msgstr "Įrašas neskelbiamas viešai: atšaukiamas \"trakbakas\", \"pingbakas\" ir blogų pinginimas..."
 
-#: ..\..\..\admin\edit_actions.php:156
+#: ..\..\..\admin\edit_actions.php:161
 msgid "Posting Done..."
 msgstr "Įrašas Padarytas..."
 
-#: ..\..\..\admin\edit_actions.php:170
-#: ..\..\..\admin\edit_actions.php:224
+#: ..\..\..\admin\edit_actions.php:175 ..\..\..\admin\edit_actions.php:234
 msgid "Updating post..."
 msgstr "Atnaujinami įrašai..."
 
-#: ..\..\..\admin\edit_actions.php:273
-#: ..\..\..\admin\edit_actions.php:359
+#: ..\..\..\admin\edit_actions.php:283 ..\..\..\admin\edit_actions.php:369
 msgid "Post had already pinged: skipping blog pings..."
 msgstr "Įrašas jau nusiuntė pingą: atšaukiamas blogų pinginimas..."
 
-#: ..\..\..\admin\edit_actions.php:285
-#: ..\..\..\admin\edit_actions.php:371
+#: ..\..\..\admin\edit_actions.php:295 ..\..\..\admin\edit_actions.php:381
 msgid "Updating done..."
 msgstr "Atnaujinimas padarytas..."
 
-#: ..\..\..\admin\edit_actions.php:301
-#: ..\..\..\admin\edit_actions.php:316
+#: ..\..\..\admin\edit_actions.php:311 ..\..\..\admin\edit_actions.php:326
 msgid "Updating post status..."
 msgstr "Atnaujinamo įrašo būsena..."
 
-#: ..\..\..\admin\edit_actions.php:381
-#: ..\..\..\admin\edit_actions.php:400
+#: ..\..\..\admin\edit_actions.php:391 ..\..\..\admin\edit_actions.php:410
 msgid "Deleting post..."
 msgstr "Trinami įrašai..."
 
-#: ..\..\..\admin\edit_actions.php:389
+#: ..\..\..\admin\edit_actions.php:399
 msgid "Oops, no post with this ID!"
 msgstr "Uuups, nerasta įrašų su šiuo ID!"
 
-#: ..\..\..\admin\edit_actions.php:412
+#: ..\..\..\admin\edit_actions.php:422
 msgid "Deleting Done..."
 msgstr "Trynimas Baigtas..."
 
-#: ..\..\..\admin\edit_actions.php:416
-#: ..\..\..\b2evocore\_class_pop3.php:113
+#: ..\..\..\admin\edit_actions.php:426 ..\..\..\b2evocore\_class_pop3.php:113
 #: ..\..\..\b2evocore\_class_pop3.php:125
 #: ..\..\..\b2evocore\_class_pop3.php:168
 #: ..\..\..\b2evocore\_class_pop3.php:303
@@ -1428,66 +1361,56 @@ msgstr "Trynimas Baigtas..."
 msgid "Error"
 msgstr "Klaida"
 
-#: ..\..\..\admin\edit_actions.php:454
+#: ..\..\..\admin\edit_actions.php:464
 msgid "Cannot update comment, please correct these errors:"
 msgstr "Negaliu atnaujinti komentarų, prašome ištaisyti šias klaidas:"
 
-#: ..\..\..\admin\edit_actions.php:512
+#: ..\..\..\admin\edit_actions.php:525
 msgid "Back to posts!"
 msgstr "Atgal į temas!"
 
-#: ..\..\..\admin\edit_actions.php:517
+#: ..\..\..\admin\edit_actions.php:527
 msgid "You may also want to generate static pages or view your blogs..."
 msgstr "Jūs galbūt norėsite sugeneruoti statinius puslapius ar peržiūrėti savo blogus..."
 
-#: ..\..\..\admin\edit_actions.php:525
+#: ..\..\..\admin\edit_actions.php:535
 msgid "New post"
 msgstr "Nauja tema"
 
-#: ..\..\..\admin\import-mt.php:330
-#: ..\..\..\admin\_users_form.php:195
-#: ..\..\..\admin\_users_form.php:200
+#: ..\..\..\admin\import-mt.php:391 ..\..\..\admin\_users_form.php:96
+#: ..\..\..\admin\_users_form.php:101
 msgid "User group"
 msgstr "Vartotojų grupė"
 
 # C:\www\b2evolution\blogs\admin\_users_form.php:182
-#: ..\..\..\admin\import-mt.php:331
-#: ..\..\..\admin\_users_form.php:183
+#: ..\..\..\admin\import-mt.php:392 ..\..\..\admin\_users_form.php:84
 #, php-format
 msgid "See <a %s>online manual</a> for details."
 msgstr "Smulkesnei informacijai gauti žiūrėkite <a %s>online žinyną</a>."
 
-#: ..\..\..\admin\import-mt.php:332
-#: ..\..\..\admin\_users_form.php:186
-#: ..\..\..\admin\_users_form.php:190
-#: ..\..\..\admin\_users_list.php:28
-#: ..\..\..\skins\_profile.php:44
-#: ..\..\..\skins\basic\_profile.php:45
+#: ..\..\..\admin\import-mt.php:393 ..\..\..\admin\_users_form.php:87
+#: ..\..\..\admin\_users_form.php:91 ..\..\..\admin\_users_list.php:28
+#: ..\..\..\skins\_profile.php:36 ..\..\..\skins\basic\_profile.php:45
 msgid "Level"
 msgstr "Lygis"
 
-#: ..\..\..\admin\import-mt.php:371
-#: ..\..\..\admin\_set_regional.form.php:135
+#: ..\..\..\admin\import-mt.php:432 ..\..\..\admin\_set_regional.form.php:135
 msgid "Default locale"
 msgstr "Pagrindinė kalba"
 
-#: ..\..\..\admin\import-mt.php:1133
-#: ..\..\..\admin\_edit_form.php:354
+#: ..\..\..\admin\import-mt.php:1257 ..\..\..\admin\_edit_form.php:359
 msgid "Select main category in target blog and optionally check additional categories"
 msgstr "Pasirinkite pagrindinę kategoriją aktyviame bloge. Papildomai galite pasirinkti kitas kategorijas"
 
-#: ..\..\..\admin\import-mt.php:1155
-#: ..\..\..\admin\_edit_form.php:381
+#: ..\..\..\admin\import-mt.php:1286 ..\..\..\admin\_edit_form.php:386
 msgid "Select as an additionnal category"
 msgstr "Pasirinkite kaip papildomą kategoriją"
 
-#: ..\..\..\admin\import-mt.php:1166
-#: ..\..\..\admin\_edit_form.php:394
+#: ..\..\..\admin\import-mt.php:1297 ..\..\..\admin\_edit_form.php:399
 msgid "Select as MAIN category"
 msgstr "Pasirinkti kaip PAGRINDINĘ kategoriją"
 
-#: ..\..\..\admin\tools.php:18
-#: ..\..\..\admin\_menutop.php:263
+#: ..\..\..\admin\tools.php:18 ..\..\..\admin\_menutop.php:270
 msgid "Tools"
 msgstr "Įrankiai"
 
@@ -1495,59 +1418,54 @@ msgstr "Įrankiai"
 msgid "Bookmarklet"
 msgstr "Bookmarklet"
 
-#: ..\..\..\admin\tools.php:30
-#: ..\..\..\admin\tools.php:37
-#: ..\..\..\admin\tools.php:45
-#: ..\..\..\admin\tools.php:52
+#: ..\..\..\admin\tools.php:30 ..\..\..\admin\tools.php:37
+#: ..\..\..\admin\tools.php:45 ..\..\..\admin\tools.php:52
 msgid "Add this link to your Favorites/Bookmarks:"
 msgstr "Įtraukti šią nuorodą į Favorites/Bookmarkus:"
 
-#: ..\..\..\admin\tools.php:31
-#: ..\..\..\admin\tools.php:38
-#: ..\..\..\admin\tools.php:46
-#: ..\..\..\admin\tools.php:53
+#: ..\..\..\admin\tools.php:31 ..\..\..\admin\tools.php:38
+#: ..\..\..\admin\tools.php:46 ..\..\..\admin\tools.php:53
 msgid "b2evo bookmarklet"
 msgstr "b2evo bookmarklet"
 
-#: ..\..\..\admin\tools.php:69
+#: ..\..\..\admin\tools.php:70
 msgid "Post to b2evolution"
 msgstr "Skelbti į b2evoltution"
 
-#: ..\..\..\admin\tools.php:71
+#: ..\..\..\admin\tools.php:72
 msgid "No Sidebar found! You must use Mozilla 0.9.4 or later!"
 msgstr "Nerastas Sidebar'as! Jūs turite naudoti Mozilla 0.9.4 ar naujesnę naršyklę!"
 
-#: ..\..\..\admin\tools.php:74
-#: ..\..\..\admin\tools.php:83
+#: ..\..\..\admin\tools.php:76 ..\..\..\admin\tools.php:85
 msgid "SideBar"
 msgstr "SideBar"
 
-#: ..\..\..\admin\tools.php:75
+#: ..\..\..\admin\tools.php:77
 #, php-format
 msgid "Add the <a %s>b2evo sidebar</a> !"
 msgstr "Pridėti <a %s>b2evo sidebar'ą</a> !"
 
-#: ..\..\..\admin\tools.php:84
+#: ..\..\..\admin\tools.php:86
 msgid "Add this link to your favorites:"
 msgstr "Itraukti šią nuorodą į Favorites:"
 
-#: ..\..\..\admin\tools.php:85
+#: ..\..\..\admin\tools.php:87
 msgid "b2evo sidebar"
 msgstr "b2evo sidebar'as"
 
-#: ..\..\..\admin\tools.php:92
+#: ..\..\..\admin\tools.php:94
 msgid "Movable Type Import"
 msgstr "Movable Type Importavimas"
 
-#: ..\..\..\admin\tools.php:94
+#: ..\..\..\admin\tools.php:96
 msgid "Use MT's export functionnality to create a .TXT file containing your posts;"
 msgstr "Pasinaudokite MT's exportavimo funkcija ir sukurkite .TXT failą, kuriame bus jūsų temos;"
 
-#: ..\..\..\admin\tools.php:95
+#: ..\..\..\admin\tools.php:97
 msgid "Place that file into the /admin folder on your server;"
 msgstr "Padėkite šį failą į /admin katalogą savo serveryje;"
 
-#: ..\..\..\admin\tools.php:96
+#: ..\..\..\admin\tools.php:98
 #, php-format
 msgid "Follow the insctructions in the <a %s>MT migration utility</a>."
 msgstr "Vadovaukitės <a %s>MT migracijos instrukcijomis</a>."
@@ -1615,34 +1533,11 @@ msgstr "Leisti pingbakus"
 msgid "Allow other bloggers to send pingbacks to this blog, letting you know when they refer to it. This will also let you send pingbacks to other blogs."
 msgstr "Leisti kitiems blogeriams siųsti pingbakus į šį blogą, suteikiant jums galimybę sužinoti kai jie rašo apie jus. Tai taip pat suteiks jums galimybę siųsti pingbakus į kitus blogus."
 
-#: ..\..\..\admin\_blogs_advanced.form.php:46
-#: ..\..\..\admin\_blogs_general.form.php:103
-#: ..\..\..\admin\_blogs_permissions.form.php:216
-msgid "Update blog!"
-msgstr "Atnaujinti blogą!"
-
-#: ..\..\..\admin\_blogs_advanced.form.php:47
-#: ..\..\..\admin\_blogs_general.form.php:104
-#: ..\..\..\admin\_blogs_permissions.form.php:222
-#: ..\..\..\admin\_edit_showposts.php:556
-#: ..\..\..\admin\_set_general.form.php:80
-#: ..\..\..\admin\_set_plugins.form.php:70
-#: ..\..\..\admin\_set_regional.form.php:68
-#: ..\..\..\admin\_set_regional.form.php:246
-#: ..\..\..\admin\_set_regional.form.php:361
-#: ..\..\..\admin\_users_form.php:212
-#: ..\..\..\admin\_users_groupform.php:127
-#: ..\..\..\install\index.php:294
-#: ..\..\..\skins\_profile.php:99
-msgid "Reset"
-msgstr "Išvalyti"
-
 #: ..\..\..\admin\_blogs_general.form.php:18
 msgid "General parameters"
 msgstr "Bendri nustatymai"
 
-#: ..\..\..\admin\_blogs_general.form.php:20
-#: ..\..\..\admin\_blogs_list.php:29
+#: ..\..\..\admin\_blogs_general.form.php:20 ..\..\..\admin\_blogs_list.php:30
 msgid "Full Name"
 msgstr "Pilnas Pavadinimas"
 
@@ -1674,109 +1569,108 @@ msgstr "Priėjimo parametrai"
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:35
 # C:\www\b2evolution\blogs\admin\_blogs_list.php:57
-#: ..\..\..\admin\_blogs_general.form.php:36
-#: ..\..\..\admin\_blogs_list.php:57
+#: ..\..\..\admin\_blogs_general.form.php:38 ..\..\..\admin\_blogs_list.php:58
 msgid "Default blog on index.php"
 msgstr "Pagrindinis blogas index.php puslapyje"
 
 #  TRANS: current default blog
 #. TRANS: current default blog
-#: ..\..\..\admin\_blogs_general.form.php:38
+#: ..\..\..\admin\_blogs_general.form.php:40
 msgid "Current default is:"
 msgstr "Dabar pagrindinis:"
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:38
-#: ..\..\..\admin\_blogs_general.form.php:39
+#: ..\..\..\admin\_blogs_general.form.php:41
 msgid "Other blog through index.php"
 msgstr "Kitas blogas per index.php"
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:41
-#: ..\..\..\admin\_blogs_general.form.php:42
+#: ..\..\..\admin\_blogs_general.form.php:44
 msgid "Other blog through stub file (Advanced)"
 msgstr "Kitas blogas per stub failą (Sudėtinga)"
 
-#: ..\..\..\admin\_blogs_general.form.php:42
+#: ..\..\..\admin\_blogs_general.form.php:44
 msgid "You MUST create a stub file for this to work."
 msgstr "Jūs PRIVALOTE sukurti stub failą, kad tai veiktų."
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:42
-#: ..\..\..\admin\_blogs_general.form.php:43
+#: ..\..\..\admin\_blogs_general.form.php:45
 msgid "Preferred access type"
 msgstr "Pasirinktas pasiekimo metodas"
 
-#: ..\..\..\admin\_blogs_general.form.php:47
+#: ..\..\..\admin\_blogs_general.form.php:49
 msgid "Blog Folder URL"
 msgstr "Blog Katalogo URL"
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:48
-#: ..\..\..\admin\_blogs_general.form.php:49
+#: ..\..\..\admin\_blogs_general.form.php:51
 msgid "No trailing slash. (If you don't know, leave this field empty.)"
 msgstr "Neneaudoti atbulinio slešo (jei nežinote, palikite tuščią.)"
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:53
-#: ..\..\..\admin\_blogs_general.form.php:54
+#: ..\..\..\admin\_blogs_general.form.php:56
 msgid "URL blog name / Stub name"
 msgstr "URL blogo pavadinimas / Stub pavadinimas"
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:53
-#: ..\..\..\admin\_blogs_general.form.php:54
+#: ..\..\..\admin\_blogs_general.form.php:56
 msgid "Used in URLs to identify this blog. This should be the stub filename if you use stub file access."
 msgstr "Naudojama URLse šiam blogui atpažinti. tai turėtų būti stub failo pavadinimas, jei naudojate šį pasiekimo metodą."
 
-#: ..\..\..\admin\_blogs_general.form.php:59
+#: ..\..\..\admin\_blogs_general.form.php:61
 msgid "Default display options"
 msgstr "Standartiniai atvaizdavimo nustatymai"
 
-#: ..\..\..\admin\_blogs_general.form.php:61
+#: ..\..\..\admin\_blogs_general.form.php:63
 msgid "Default skin"
 msgstr "Pagrindinė oda"
 
-#: ..\..\..\admin\_blogs_general.form.php:61
+#: ..\..\..\admin\_blogs_general.form.php:63
 msgid "This is the default skin that will be used to display this blog."
 msgstr "Tai pagrindinė blogo oda, kuri bus naudojama šio blogo rodymui."
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:62
-#: ..\..\..\admin\_blogs_general.form.php:63
+#: ..\..\..\admin\_blogs_general.form.php:65
 msgid "Allow skin switching"
 msgstr "Leisti odų keitimą"
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:62
-#: ..\..\..\admin\_blogs_general.form.php:63
+#: ..\..\..\admin\_blogs_general.form.php:65
 msgid "Users will be able to select another skin to view the blog (and their prefered skin will be saved in a cookie)."
 msgstr "Vartotojai galės pasirinkti kitą blogo odą (ir jųs nustatymai bus išsaugoti į \"sausainiuką\")."
 
-#: ..\..\..\admin\_blogs_general.form.php:65
+#: ..\..\..\admin\_blogs_general.form.php:67
 msgid "Display public blog list"
 msgstr "Rodyti blogų sąrašą viešai"
 
-#: ..\..\..\admin\_blogs_general.form.php:65
+#: ..\..\..\admin\_blogs_general.form.php:67
 msgid "Check this if you want to display the list of all blogs on your blog page (if your skin supports this)."
 msgstr "Pažymėkite tai, norėdami rodyti visų sistemos blogų sąrašą puslapyje (jeigu jūsų šablono nustatymai tai palaiko)."
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:66
-#: ..\..\..\admin\_blogs_general.form.php:67
+#: ..\..\..\admin\_blogs_general.form.php:69
 msgid "Include in public blog list"
 msgstr "Įtraukti į viešą blogų sąrašą"
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:66
-#: ..\..\..\admin\_blogs_general.form.php:67
+#: ..\..\..\admin\_blogs_general.form.php:69
 msgid "Check this if you want to this blog to be displayed in the list of all public blogs."
 msgstr "Pasirinkti, jei norite, kad šis blogas būtų rodomas blogų sąraše viešai."
 
-#: ..\..\..\admin\_blogs_general.form.php:69
+#: ..\..\..\admin\_blogs_general.form.php:71
 msgid "Default linkblog"
 msgstr "Pagrindinis nuorodų blogas"
 
 # C:\www\b2evolution\blogs\admin\_blogs_general.form.php:68
-#: ..\..\..\admin\_blogs_general.form.php:69
+#: ..\..\..\admin\_blogs_general.form.php:71
 msgid "Will be displayed next to this blog (if your skin supports this)."
 msgstr "Bus rodomas šalia šio blogo (jei jūsų oda tai palaiko)."
 
-#: ..\..\..\admin\_blogs_general.form.php:76
+#: ..\..\..\admin\_blogs_general.form.php:78
 msgid "Tagline"
 msgstr "Sloganas"
 
-#: ..\..\..\admin\_blogs_general.form.php:76
+#: ..\..\..\admin\_blogs_general.form.php:78
 msgid "This is diplayed under the blog name on the blog template."
 msgstr "Tekstas bus roromas žemiau blogo pavadinimo, blogo odoje."
 
@@ -1784,104 +1678,84 @@ msgstr "Tekstas bus roromas žemiau blogo pavadinimo, blogo odoje."
 msgid "Long Description"
 msgstr "Pilnas Apibūdinimas"
 
-#: ..\..\..\admin\_blogs_general.form.php:82
+#: ..\..\..\admin\_blogs_general.form.php:80
 msgid "This is displayed on the blog template."
 msgstr "Tai rodoma blogo šablone."
 
-#: ..\..\..\admin\_blogs_general.form.php:86
+#: ..\..\..\admin\_blogs_general.form.php:82
 msgid "Short Description"
 msgstr "Trumpas Apibūdinimas"
 
-#: ..\..\..\admin\_blogs_general.form.php:86
+#: ..\..\..\admin\_blogs_general.form.php:82
 msgid "This is is used in meta tag description and RSS feeds. NO HTML!"
 msgstr "Tai naudojama <meta> apibūdinime ir RSS'e. HTML NEPALAIKOMAS!"
 
-#: ..\..\..\admin\_blogs_general.form.php:88
+#: ..\..\..\admin\_blogs_general.form.php:84
 msgid "Keywords"
 msgstr "Raktiniai žodžiai"
 
-#: ..\..\..\admin\_blogs_general.form.php:88
+#: ..\..\..\admin\_blogs_general.form.php:84
 msgid "This is is used in meta tag keywords. NO HTML!"
 msgstr "Tai naudojama <meta> raktiniuose žodžiuose. HTML NEPALAIKOMAS!"
 
-#: ..\..\..\admin\_blogs_general.form.php:93
+#: ..\..\..\admin\_blogs_general.form.php:86
+#: ..\..\..\admin\_edit_showposts.php:337
 msgid "Notes"
 msgstr "Pastabos"
 
-#: ..\..\..\admin\_blogs_general.form.php:95
+#: ..\..\..\admin\_blogs_general.form.php:86
 msgid "Additional info."
 msgstr "Papildoma info."
 
-#: ..\..\..\admin\_blogs_general.form.php:103
-msgid "Create new blog!"
-msgstr "Sukurti naują blogą!"
-
-#: ..\..\..\admin\_blogs_list.php:28
+#: ..\..\..\admin\_blogs_list.php:29
 msgid "Blog"
 msgstr "Blogas"
 
-#: ..\..\..\admin\_blogs_list.php:30
+#: ..\..\..\admin\_blogs_list.php:31
 msgid "Blog URL"
 msgstr "Blogo URL"
 
-#: ..\..\..\admin\_blogs_list.php:31
+#: ..\..\..\admin\_blogs_list.php:32
 msgid "Static File"
 msgstr "Statinis Failas"
 
-#: ..\..\..\admin\_blogs_list.php:32
-#: ..\..\..\admin\_set_regional.form.php:47
+#: ..\..\..\admin\_blogs_list.php:33 ..\..\..\admin\_set_regional.form.php:47
 #: ..\..\..\admin\_set_regional.form.php:158
-#: ..\..\..\admin\_users_form.php:119
-#: ..\..\..\htsrv\_reg_form.php:46
-#: ..\..\..\skins\_profile.php:75
+#: ..\..\..\admin\_users_form.php:145 ..\..\..\htsrv\_reg_form.php:46
+#: ..\..\..\skins\_profile.php:61
 msgid "Locale"
 msgstr "Kalba"
 
 # Posto statusas (administracinėje dalyje)
-#: ..\..\..\admin\_blogs_list.php:46
-#: ..\..\..\admin\_cats_list.php:35
-#: ..\..\..\admin\_users_list.php:57
-#: ..\..\..\admin\_users_list.php:70
-#: ..\..\..\admin\_users_list.php:97
-#: ..\..\..\admin\_users_list.php:139
+#: ..\..\..\admin\_blogs_list.php:47 ..\..\..\admin\_cats_list.php:35
+#: ..\..\..\admin\_users_list.php:58 ..\..\..\admin\_users_list.php:71
+#: ..\..\..\admin\_users_list.php:101 ..\..\..\admin\_users_list.php:143
 msgid "Properties"
 msgstr "Ypatybės"
 
-#: ..\..\..\admin\_blogs_list.php:57
+#: ..\..\..\admin\_blogs_list.php:58
 msgid "Default"
 msgstr "Pagrindinis"
 
 #  TRANS: "generate !" vertimas
 #. TRANS: abbrev. for "generate !"
-#: ..\..\..\admin\_blogs_list.php:74
+#: ..\..\..\admin\_blogs_list.php:75
 msgid "Gen!"
 msgstr "Gen!"
 
 #  TRANS: Warning this is a javascript string
 #  TRANS: Warning this is a javascript string
 #. TRANS: Warning this is a javascript string
-#: ..\..\..\admin\_blogs_list.php:90
+#: ..\..\..\admin\_blogs_list.php:91
 #, php-format
-msgid ""
-"Are you sure you want to delete blog #%d ?\\n"
-"\\n"
-"WARNING: This will delete ALL POST, COMMENTS,\\n"
-"CATEGORIES and other data related to that Blog!\\n"
-"\\n"
-"This CANNOT be undone!"
-msgstr ""
-"Ar tikrai norite ištrinti blogą #%d ?\\n"
-"\\n"
-"PERSPĖJIMAS: Tai sunaikins VISUS ĮRAŠUS, KOMENTARUS,\\n"
-"KATEGORIJAS ir visą su šiuo blogu susijusia info!\\n"
-"\\n"
-"Tai NEATSTATOMA!"
+msgid "Are you sure you want to delete blog #%d ?\\n\\nWARNING: This will delete ALL POST, COMMENTS,\\nCATEGORIES and other data related to that Blog!\\n\\nThis CANNOT be undone!"
+msgstr "Ar tikrai norite ištrinti blogą #%d ?\\n\\nPERSPĖJIMAS: Tai sunaikins VISUS ĮRAŠUS, KOMENTARUS,\\nKATEGORIJAS ir visą su šiuo blogu susijusia info!\\n\\nTai NEATSTATOMA!"
 
-#: ..\..\..\admin\_blogs_list.php:90
+#: ..\..\..\admin\_blogs_list.php:91
 msgid "Delete this blog!"
 msgstr "Trinti šį blogą!"
 
-#: ..\..\..\admin\_blogs_list.php:91
+#: ..\..\..\admin\_blogs_list.php:92
 msgid "Copy this blog!"
 msgstr "Kopijuoti šį blogą"
 
@@ -1891,18 +1765,16 @@ msgstr "Kopijuoti šį blogą"
 # C:\www\b2evolution\blogs\admin\_users_list.php:137
 #  TRANS: Abbrev. for Copy
 #. TRANS: Abbrev. for Copy
-#: ..\..\..\admin\_blogs_list.php:91
-#: ..\..\..\admin\_set_regional.form.php:239
-#: ..\..\..\admin\_users_list.php:72
-#: ..\..\..\admin\_users_list.php:142
+#: ..\..\..\admin\_blogs_list.php:92 ..\..\..\admin\_set_regional.form.php:239
+#: ..\..\..\admin\_users_list.php:73 ..\..\..\admin\_users_list.php:146
 msgid "Copy"
 msgstr "Kopijuoti"
 
-#: ..\..\..\admin\_blogs_list.php:102
+#: ..\..\..\admin\_blogs_list.php:104
 msgid "Sorry, you have no permission to edit/view any blog's properties."
 msgstr "Atsiprašome, bet neturite teisės redaguoti/matyti jokių blogo nustatymų."
 
-#: ..\..\..\admin\_blogs_list.php:113
+#: ..\..\..\admin\_blogs_list.php:115
 msgid "New blog..."
 msgstr "Naujas blogas..."
 
@@ -2042,13 +1914,9 @@ msgstr "Ne nariai"
 # C:\www\b2evolution\blogs\admin\_blogs_permissions.form.php:202
 #  TRANS: Warning this is a javascript string
 #. TRANS: Warning this is a javascript string
-#: ..\..\..\admin\_blogs_permissions.form.php:219
-msgid ""
-"Warning! You are about to remove your own permission to edit this blog!\\n"
-"You won\\'t have access to its properties any longer if you do that!"
-msgstr ""
-"Dėmesio! Jūs ruošiatės pašalinti galimybę jums patiems redaguoti šį blogą!\\n"
-" Jūs vėliau neturėsite galimybės pasiekti blogo savybių, jei tai padarysite!"
+#: ..\..\..\admin\_blogs_permissions.form.php:215
+msgid "Warning! You are about to remove your own permission to edit this blog!\\nYou won\\'t have access to its properties any longer if you do that!"
+msgstr "Dėmesio! Jūs ruošiatės pašalinti galimybę jums patiems redaguoti šį blogą!\\n Jūs vėliau neturėsite galimybės pasiekti blogo savybių, jei tai padarysite!"
 
 #: ..\..\..\admin\_cats_list.php:34
 msgid "Edit category properties"
@@ -2089,29 +1957,20 @@ msgstr "Kalba"
 msgid "Link to url"
 msgstr "URL"
 
-#: ..\..\..\admin\_edit_form.php:135
-#: ..\..\..\admin\_users_form.php:125
-#: ..\..\..\admin\_users_form.php:127
-#: ..\..\..\admin\_users_list.php:21
-#: ..\..\..\htsrv\comment_post.php:141
-#: ..\..\..\htsrv\register.php:120
-#: ..\..\..\htsrv\_reg_complete.php:20
-#: ..\..\..\htsrv\_reg_form.php:41
-#: ..\..\..\skins\_feedback.php:183
-#: ..\..\..\skins\_profile.php:76
-#: ..\..\..\skins\basic\_feedback.php:178
-#: ..\..\..\skins\basic\_profile.php:77
+#: ..\..\..\admin\_edit_form.php:135 ..\..\..\admin\_users_form.php:151
+#: ..\..\..\admin\_users_form.php:153 ..\..\..\admin\_users_list.php:21
+#: ..\..\..\htsrv\comment_post.php:154 ..\..\..\htsrv\register.php:120
+#: ..\..\..\htsrv\_reg_complete.php:20 ..\..\..\htsrv\_reg_form.php:41
+#: ..\..\..\skins\_feedback.php:176 ..\..\..\skins\_profile.php:62
+#: ..\..\..\skins\basic\_feedback.php:178 ..\..\..\skins\basic\_profile.php:77
 msgid "Email"
 msgstr "El. Paštas"
 
-#: ..\..\..\admin\_edit_form.php:139
-#: ..\..\..\admin\_users_form.php:139
-#: ..\..\..\admin\_users_form.php:141
-#: ..\..\..\admin\_users_list.php:22
+#: ..\..\..\admin\_edit_form.php:139 ..\..\..\admin\_users_form.php:165
+#: ..\..\..\admin\_users_form.php:167 ..\..\..\admin\_users_list.php:22
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:366
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:378
-#: ..\..\..\skins\_profile.php:77
-#: ..\..\..\skins\basic\_profile.php:78
+#: ..\..\..\skins\_profile.php:63 ..\..\..\skins\basic\_profile.php:78
 msgid "URL"
 msgstr "URL"
 
@@ -2119,182 +1978,166 @@ msgstr "URL"
 msgid "Preview"
 msgstr "Peržiūra"
 
-#  TRANS: the &nbsp; are just here to make the button larger. If your translation is a longer word, don't keep the &nbsp;
-#: ..\..\..\admin\_edit_form.php:173
-msgid "&nbsp; Save ! &nbsp;"
-msgstr "&nbsp; Išsaugoti ! &nbsp;"
-
-#: ..\..\..\admin\_edit_form.php:178
+#: ..\..\..\admin\_edit_form.php:191
 msgid "Spellcheck"
 msgstr "Tikrinti klaidas"
 
-#: ..\..\..\admin\_edit_form.php:184
+#: ..\..\..\admin\_edit_form.php:197
 msgid "Upload a file/image"
 msgstr "Atsiųsti failą/nuotrauką"
 
-#: ..\..\..\admin\_edit_form.php:202
+#: ..\..\..\admin\_edit_form.php:207
 msgid "Advanced properties"
 msgstr "Išplėstinės ypatybės"
 
-#: ..\..\..\admin\_edit_form.php:211
+#: ..\..\..\admin\_edit_form.php:216
 msgid "Edit timestamp"
 msgstr "Redaguoti laiką ir datą"
 
-#: ..\..\..\admin\_edit_form.php:247
+#: ..\..\..\admin\_edit_form.php:253
 msgid "URL Title"
 msgstr "URL Pavadinimas"
 
-#: ..\..\..\admin\_edit_form.php:249
+#: ..\..\..\admin\_edit_form.php:255
 msgid "(to be used in permalinks)"
 msgstr "(bus naudojama arch. nuorodose)"
 
-#: ..\..\..\admin\_edit_form.php:258
-#: ..\..\..\admin\_edit_showposts.php:306
-#: ..\..\..\admin\_set_general.form.php:49
-#: ..\..\..\skins\_feedback.php:213
-#: ..\..\..\skins\basic\_feedback.php:207
-#: ..\..\..\skins\wpc_aubmach\_feedback.php:208
-#: ..\..\..\skins\wpc_default\_feedback.php:208
+#: ..\..\..\admin\_edit_form.php:265 ..\..\..\admin\_edit_showposts.php:287
+#: ..\..\..\admin\_set_general.form.php:49 ..\..\..\skins\_feedback.php:195
+#: ..\..\..\skins\basic\_feedback.php:206
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:207
+#: ..\..\..\skins\wpc_default\_feedback.php:207
 msgid "Auto-BR"
 msgstr "Auto-BR"
 
-#: ..\..\..\admin\_edit_form.php:258
-#: ..\..\..\admin\_set_general.form.php:49
+#: ..\..\..\admin\_edit_form.php:265 ..\..\..\admin\_set_general.form.php:49
 msgid "This option is deprecated, you should avoid using it."
 msgstr "Ši opcija nebereikalinga, galite jos nebenaudoti."
 
-#: ..\..\..\admin\_edit_form.php:267
+#: ..\..\..\admin\_edit_form.php:274
 msgid "Additional actions"
 msgstr "Papildomi veiksmai"
 
-#: ..\..\..\admin\_edit_form.php:275
+#: ..\..\..\admin\_edit_form.php:282
 msgid "Pingback"
 msgstr "Pingbakai"
 
-#: ..\..\..\admin\_edit_form.php:275
+#: ..\..\..\admin\_edit_form.php:282
 msgid "(Send a pingback to all URLs in this post)"
 msgstr "(Siųsti Pingbakus į visus šioje temoje nurodytus URL)"
 
-#: ..\..\..\admin\_edit_form.php:284
+#: ..\..\..\admin\_edit_form.php:291
 msgid "Trackback URLs"
 msgstr "Trakbako URL"
 
-#: ..\..\..\admin\_edit_form.php:284
+#: ..\..\..\admin\_edit_form.php:291
 msgid "(Separate by space)"
 msgstr "(Atskirti tarpu)"
 
-#: ..\..\..\admin\_edit_form.php:305
-#: ..\..\..\admin\_edit_form.php:538
+#: ..\..\..\admin\_edit_form.php:310 ..\..\..\admin\_edit_form.php:545
 #: ..\..\..\admin\_edit_showposts.php:124
 msgid "Status"
 msgstr "Statusas"
 
-#: ..\..\..\admin\_edit_form.php:311
+#: ..\..\..\admin\_edit_form.php:316
 msgid "The post will be publicly published"
 msgstr "Įrašas bus viešai paskelbtas"
 
-#: ..\..\..\admin\_edit_form.php:312
-#: ..\..\..\admin\_edit_showposts.php:371
+#: ..\..\..\admin\_edit_form.php:317 ..\..\..\admin\_edit_showposts.php:360
 msgid "Published (Public)"
 msgstr "Paskelbtas (Viešas)"
 
-#: ..\..\..\admin\_edit_form.php:318
+#: ..\..\..\admin\_edit_form.php:323
 msgid "The post will be published but visible only by logged-in blog members"
 msgstr "Tema bus paskelbta, bet matoma tik prisijungusiems blogo nariams."
 
-#: ..\..\..\admin\_edit_form.php:319
-#: ..\..\..\admin\_edit_showposts.php:374
+#: ..\..\..\admin\_edit_form.php:324 ..\..\..\admin\_edit_showposts.php:363
 msgid "Protected (Members only)"
 msgstr "Ribota (Tik nariams)"
 
-#: ..\..\..\admin\_edit_form.php:325
+#: ..\..\..\admin\_edit_form.php:330
 msgid "The post will be published but visible only by yourself"
 msgstr "Tema bus paskelbta, bet matysite tik jūs"
 
-#: ..\..\..\admin\_edit_form.php:326
-#: ..\..\..\admin\_edit_showposts.php:377
+#: ..\..\..\admin\_edit_form.php:331 ..\..\..\admin\_edit_showposts.php:366
 msgid "Private (You only)"
 msgstr "Privatu (Tik jūs)"
 
-#: ..\..\..\admin\_edit_form.php:332
-#: ..\..\..\admin\_edit_form.php:339
+#: ..\..\..\admin\_edit_form.php:337 ..\..\..\admin\_edit_form.php:344
 msgid "The post will appear only in the backoffice"
 msgstr "Tema atsiras tik administracinėje dalyje"
 
-#: ..\..\..\admin\_edit_form.php:333
-#: ..\..\..\admin\_edit_showposts.php:380
+#: ..\..\..\admin\_edit_form.php:338 ..\..\..\admin\_edit_showposts.php:369
 msgid "Draft (Not published!)"
 msgstr "Juodraštis (Neskelbtas!)"
 
-#: ..\..\..\admin\_edit_form.php:340
-#: ..\..\..\admin\_edit_showposts.php:383
+#: ..\..\..\admin\_edit_form.php:345 ..\..\..\admin\_edit_showposts.php:372
 msgid "Deprecated (Not published!)"
 msgstr "Atšauktas (Neskelbtas!)"
 
-#: ..\..\..\admin\_edit_form.php:428
+# D:\www\b2evo091\blogs\admin\_edit_form.php:435
+#: ..\..\..\admin\_edit_form.php:435
+msgid "Note: Moving posts across blogs is enabled. Use with caution."
+msgstr ""
+
+#: ..\..\..\admin\_edit_form.php:437
 msgid "Note: Cross posting among multiple blogs is enabled."
 msgstr "Pastaba: Rašymas keliuose bloguose iškart įjungtas."
 
-#: ..\..\..\admin\_edit_form.php:439
+#: ..\..\..\admin\_edit_form.php:447
 msgid "Note: Cross posting among multiple blogs is currently disabled."
 msgstr "Pastaba: Rašymas keliuose bloguose iškart išjungtas."
 
-#: ..\..\..\admin\_edit_form.php:441
+#: ..\..\..\admin\_edit_form.php:449
 msgid "Note: Cross posting among multiple categories is currently disabled."
 msgstr "Pastaba: Rašymas keliose kategorijose iškart išjungtas."
 
-#: ..\..\..\admin\_edit_form.php:451
-#: ..\..\..\admin\_edit_showposts.php:202
-#: ..\..\..\skins\_feedback.php:55
-#: ..\..\..\skins\basic\_feedback.php:56
-#: ..\..\..\skins\custom\_main.php:280
-#: ..\..\..\skins\custom\_main.php:285
-#: ..\..\..\skins\custom\_main.php:290
-#: ..\..\..\skins\custom\_main.php:295
+#: ..\..\..\admin\_edit_form.php:459 ..\..\..\admin\_edit_showposts.php:186
+#: ..\..\..\skins\_feedback.php:55 ..\..\..\skins\basic\_feedback.php:56
+#: ..\..\..\skins\custom\_main.php:248 ..\..\..\skins\custom\_main.php:253
+#: ..\..\..\skins\custom\_main.php:258 ..\..\..\skins\custom\_main.php:263
+#: ..\..\..\skins\natural_pink\_main.php:234
+#: ..\..\..\skins\natural_pink\_main.php:239
+#: ..\..\..\skins\natural_pink\_main.php:244
+#: ..\..\..\skins\natural_pink\_main.php:249
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:56
 #: ..\..\..\skins\wpc_default\_feedback.php:56
 msgid "Comments"
 msgstr "Komentarai"
 
-#: ..\..\..\admin\_edit_form.php:453
+#: ..\..\..\admin\_edit_form.php:461
 msgid "Visitors can leave comments on this post."
 msgstr "Lankytojai gali komentuoti šioje temoje."
 
-#: ..\..\..\admin\_edit_form.php:454
+#: ..\..\..\admin\_edit_form.php:462
 msgid "Open"
 msgstr "Įjungta"
 
-#: ..\..\..\admin\_edit_form.php:456
+#: ..\..\..\admin\_edit_form.php:464
 msgid "Visitors can NOT leave comments on this post."
 msgstr "Lankytojai NEGALI komentuoti šioje temoje."
 
-#: ..\..\..\admin\_edit_form.php:457
+#: ..\..\..\admin\_edit_form.php:465
 msgid "Closed"
 msgstr "Išjungta"
 
-#: ..\..\..\admin\_edit_form.php:459
+#: ..\..\..\admin\_edit_form.php:467
 msgid "Visitors cannot see nor leave comments on this post."
 msgstr "Lankytojai negali nei matyti, nei komentuoti šioje temoje."
 
-#: ..\..\..\admin\_edit_form.php:460
+#: ..\..\..\admin\_edit_form.php:468
 msgid "Disabled"
 msgstr "Uždrausta"
 
-#: ..\..\..\admin\_edit_form.php:465
+#: ..\..\..\admin\_edit_form.php:473
 msgid "Renderers"
 msgstr "Atvaizdavimas"
 
-#: ..\..\..\admin\_edit_form.php:535
+#: ..\..\..\admin\_edit_form.php:542
 msgid "Comment info"
 msgstr "Komentaro informacija"
 
-#: ..\..\..\admin\_edit_form.php:536
-#: ..\..\..\htsrv\comment_post.php:134
-#: ..\..\..\htsrv\comment_post.php:140
-msgid "Author"
-msgstr "Autorius"
-
-#: ..\..\..\admin\_edit_form.php:539
+#: ..\..\..\admin\_edit_form.php:546
 msgid "IP address"
 msgstr "IP adresas"
 
@@ -2321,26 +2164,25 @@ msgstr "Sekantys %d"
 #  TRANS: x nuo y iš z
 #  TRANS: x TO y OF z
 #. TRANS: x TO y OF z
-#: ..\..\..\admin\_edit_navbar.php:55
-#: ..\..\..\admin\_edit_navbar.php:61
+#: ..\..\..\admin\_edit_navbar.php:56 ..\..\..\admin\_edit_navbar.php:62
 msgid " to "
 msgstr "-"
 
 #  TRANS: x nuo y iš z
 #. TRANS: x TO y OF z
-#: ..\..\..\admin\_edit_navbar.php:63
+#: ..\..\..\admin\_edit_navbar.php:64
 msgid " of "
 msgstr "iš"
 
-#: ..\..\..\admin\_edit_navbar.php:71
+#: ..\..\..\admin\_edit_navbar.php:72
 msgid "from the end"
 msgstr "nuo galo"
 
-#: ..\..\..\admin\_edit_navbar.php:75
+#: ..\..\..\admin\_edit_navbar.php:76
 msgid "from the start"
 msgstr "nuo pradžios"
 
-#: ..\..\..\admin\_edit_navbar.php:77
+#: ..\..\..\admin\_edit_navbar.php:78
 msgid "OK"
 msgstr "OK"
 
@@ -2358,89 +2200,54 @@ msgid "level:"
 msgstr "lygis:"
 
 #: ..\..\..\admin\_edit_showposts.php:153
-#: ..\..\..\b2evocore\_functions_bposts.php:826
+#: ..\..\..\b2evocore\_functions_bposts.php:830
 msgid "Pages:"
 msgstr "Puslapiai:"
 
-#. TRANS: Edit button text (&nbsp; for extra space)
-#: ..\..\..\admin\_edit_showposts.php:164
-#: ..\..\..\admin\_edit_showposts.php:265
-msgid "&nbsp; Edit &nbsp;"
-msgstr "&nbsp; Redaguoti &nbsp;"
-
-#: ..\..\..\admin\_edit_showposts.php:172
-#: ..\..\..\admin\_edit_showposts.php:266
-#: ..\..\..\b2evocore\_class_comment.php:288
-#: ..\..\..\b2evocore\_class_item.php:817
-msgid "Delete"
-msgstr "Trinti"
-
-#  TRANS: Warning this is a javascript string
-#. TRANS: Warning this is a javascript string
-#: ..\..\..\admin\_edit_showposts.php:172
-#: ..\..\..\b2evocore\_class_item.php:817
-msgid ""
-"You are about to delete this post!\\n"
-"\\'Cancel\\' to stop, \\'OK\\' to delete."
-msgstr ""
-"Jūs norite ištrinti šįą temą!\\n"
-"\\'Cancel\\' jei persigalvojote, \\'OK\\' norint ištrinti."
-
-# Posto statusas (administracinėje dalyje)
-#: ..\..\..\admin\_edit_showposts.php:183
-msgid "Publish NOW!"
-msgstr "Paskelbti!"
-
-#: ..\..\..\admin\_edit_showposts.php:183
-msgid "Publish now using current date and time."
-msgstr "Paskelbti naudojant dabartinę datą ir laiką."
-
 #. TRANS: Link to comments for current post
-#: ..\..\..\admin\_edit_showposts.php:189
+#: ..\..\..\admin\_edit_showposts.php:173
 msgid "no comment"
 msgstr "komentarų nėra"
 
-#: ..\..\..\admin\_edit_showposts.php:189
-#: ..\..\..\b2evocore\_class_item.php:730
+#: ..\..\..\admin\_edit_showposts.php:173
+#: ..\..\..\b2evocore\_class_item.php:732
 #: ..\..\..\b2evocore\_functions_comments.php:211
 msgid "1 comment"
 msgstr "1 komentaras"
 
-#: ..\..\..\admin\_edit_showposts.php:189
-#: ..\..\..\b2evocore\_class_item.php:731
+#: ..\..\..\admin\_edit_showposts.php:173
+#: ..\..\..\b2evocore\_class_item.php:733
 #: ..\..\..\b2evocore\_functions_comments.php:212
 #, php-format
 msgid "%d comments"
 msgstr "komentarų: %d"
 
-#: ..\..\..\admin\_edit_showposts.php:190
+#: ..\..\..\admin\_edit_showposts.php:174
 msgid "1 Trackback"
 msgstr "1 Trakbakas"
 
-#: ..\..\..\admin\_edit_showposts.php:190
+#: ..\..\..\admin\_edit_showposts.php:174
 #, php-format
 msgid "%d Trackbacks"
 msgstr "Trakbakų: %d"
 
-#: ..\..\..\admin\_edit_showposts.php:191
+#: ..\..\..\admin\_edit_showposts.php:175
 msgid "1 Pingback"
 msgstr "1 Pingbakas"
 
-#: ..\..\..\admin\_edit_showposts.php:191
+#: ..\..\..\admin\_edit_showposts.php:175
 #, php-format
 msgid "%d Pingbacks"
 msgstr "Pingbakų: %d"
 
-#: ..\..\..\admin\_edit_showposts.php:202
-#: ..\..\..\skins\_feedback.php:66
+#: ..\..\..\admin\_edit_showposts.php:186 ..\..\..\skins\_feedback.php:66
 #: ..\..\..\skins\basic\_feedback.php:67
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:67
 #: ..\..\..\skins\wpc_default\_feedback.php:67
 msgid "Trackbacks"
 msgstr "Trakbakai"
 
-#: ..\..\..\admin\_edit_showposts.php:202
-#: ..\..\..\skins\_feedback.php:71
+#: ..\..\..\admin\_edit_showposts.php:186 ..\..\..\skins\_feedback.php:71
 #: ..\..\..\skins\basic\_feedback.php:72
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:72
 #: ..\..\..\skins\wpc_default\_feedback.php:72
@@ -2448,210 +2255,201 @@ msgid "Pingbacks"
 msgstr "Pingbakai"
 
 #  TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
-#: ..\..\..\admin\_edit_showposts.php:209
+#: ..\..\..\admin\_edit_showposts.php:193
 msgid "No feedback for this post yet..."
 msgstr "Atsiliepimų šije temoje kol kas nėra..."
 
-#: ..\..\..\admin\_edit_showposts.php:241
-#: ..\..\..\skins\_feedback.php:109
+#: ..\..\..\admin\_edit_showposts.php:226 ..\..\..\skins\_feedback.php:109
 #: ..\..\..\skins\basic\_feedback.php:109
 msgid "Comment from:"
 msgstr "Komentaro autorius"
 
-#: ..\..\..\admin\_edit_showposts.php:245
-#: ..\..\..\skins\_feedback.php:115
+#: ..\..\..\admin\_edit_showposts.php:230 ..\..\..\skins\_feedback.php:115
 #: ..\..\..\skins\basic\_feedback.php:115
 msgid "Trackback from:"
 msgstr "Trakbakas iš:"
 
-#: ..\..\..\admin\_edit_showposts.php:249
-#: ..\..\..\skins\_feedback.php:120
+#: ..\..\..\admin\_edit_showposts.php:234 ..\..\..\skins\_feedback.php:120
 #: ..\..\..\skins\basic\_feedback.php:120
 msgid "Pingback from:"
 msgstr "Pingbakas iš:"
 
-#: ..\..\..\admin\_edit_showposts.php:259
-#: ..\..\..\skins\_feedback.php:132
+#: ..\..\..\admin\_edit_showposts.php:245 ..\..\..\skins\_feedback.php:132
 #: ..\..\..\skins\_lastcomments.php:44
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:131
 #: ..\..\..\skins\wpc_default\_feedback.php:131
 msgid "Permanent link to this comment"
 msgstr "Arch. šio komentaro nuoroda"
 
-#  TRANS: Warning this is a javascript string
-#. TRANS: Warning this is a javascript string
-#: ..\..\..\admin\_edit_showposts.php:266
-#: ..\..\..\b2evocore\_class_comment.php:288
-msgid ""
-"You are about to delete this comment!\\n"
-"\\'Cancel\\' to stop, \\'OK\\' to delete."
-msgstr ""
-"Jūs ruošiatės ištrinti šį komentarą!\\n"
-"\\'Cancel\\' jei persigalvojote, \\'OK\\' norint ištrinti."
-
-#: ..\..\..\admin\_edit_showposts.php:281
-#: ..\..\..\b2evocore\_class_item.php:729
+#: ..\..\..\admin\_edit_showposts.php:264
+#: ..\..\..\b2evocore\_class_item.php:731
 #: ..\..\..\b2evocore\_functions_comments.php:210
-#: ..\..\..\skins\_feedback.php:145
-#: ..\..\..\skins\basic\_feedback.php:141
+#: ..\..\..\skins\_feedback.php:145 ..\..\..\skins\basic\_feedback.php:141
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:146
 #: ..\..\..\skins\wpc_default\_feedback.php:146
 msgid "Leave a comment"
 msgstr "Komentuoti"
 
-#: ..\..\..\admin\_edit_showposts.php:289
-#: ..\..\..\admin\_users_form.php:81
-#: ..\..\..\skins\_feedback.php:164
-#: ..\..\..\skins\basic\_feedback.php:161
-#: ..\..\..\skins\wpc_aubmach\_feedback.php:170
-#: ..\..\..\skins\wpc_default\_feedback.php:170
+#: ..\..\..\admin\_edit_showposts.php:272 ..\..\..\admin\_users_form.php:107
+#: ..\..\..\skins\_feedback.php:164 ..\..\..\skins\basic\_feedback.php:161
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:169
+#: ..\..\..\skins\wpc_default\_feedback.php:169
 msgid "User"
 msgstr "Vartotojas"
 
-#: ..\..\..\admin\_edit_showposts.php:292
-#: ..\..\..\skins\_feedback.php:167
+#: ..\..\..\admin\_edit_showposts.php:275 ..\..\..\skins\_feedback.php:167
 #: ..\..\..\skins\basic\_feedback.php:164
-#: ..\..\..\skins\wpc_aubmach\_feedback.php:172
-#: ..\..\..\skins\wpc_default\_feedback.php:172
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:171
+#: ..\..\..\skins\wpc_default\_feedback.php:171
 msgid "Edit profile"
 msgstr "Redaguoti profilį"
 
-#: ..\..\..\admin\_edit_showposts.php:297
-#: ..\..\..\skins\_feedback.php:201
+#: ..\..\..\admin\_edit_showposts.php:280 ..\..\..\skins\_feedback.php:181
 #: ..\..\..\skins\basic\_feedback.php:195
 msgid "Comment text"
 msgstr "Komentaras"
 
-#: ..\..\..\admin\_edit_showposts.php:299
-#: ..\..\..\skins\_feedback.php:203
+#: ..\..\..\admin\_edit_showposts.php:281 ..\..\..\skins\_feedback.php:182
 #: ..\..\..\skins\basic\_feedback.php:197
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:148
 #: ..\..\..\skins\wpc_default\_feedback.php:148
 msgid "Allowed XHTML tags"
 msgstr "Leidžiama XHTML sintaksė"
 
-#: ..\..\..\admin\_edit_showposts.php:299
-#: ..\..\..\skins\_feedback.php:204
-#: ..\..\..\skins\basic\_feedback.php:198
-#: ..\..\..\skins\wpc_aubmach\_feedback.php:149
-#: ..\..\..\skins\wpc_default\_feedback.php:149
-msgid "URLs, email, AIM and ICQs will be converted automatically."
-msgstr "URL, el. pašto adresai, AIM ir ICQ bus konvertuoti automatiškai."
-
-#: ..\..\..\admin\_edit_showposts.php:305
-#: ..\..\..\skins\_feedback.php:209
-#: ..\..\..\skins\basic\_feedback.php:203
-#: ..\..\..\skins\wpc_aubmach\_feedback.php:205
-#: ..\..\..\skins\wpc_default\_feedback.php:205
+#: ..\..\..\admin\_edit_showposts.php:286 ..\..\..\skins\_feedback.php:186
+#: ..\..\..\skins\basic\_feedback.php:202
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:204
+#: ..\..\..\skins\wpc_default\_feedback.php:204
 msgid "Options"
 msgstr "Nustatymai"
 
-#: ..\..\..\admin\_edit_showposts.php:306
+#: ..\..\..\admin\_edit_showposts.php:287
 msgid "(Line breaks become &lt;br&gt;)"
 msgstr "(Eilučių perkėlimai taps  &lt;br /&gt;)"
 
-#: ..\..\..\admin\_edit_showposts.php:313
-#: ..\..\..\skins\_feedback.php:226
-#: ..\..\..\skins\basic\_feedback.php:220
+#: ..\..\..\admin\_edit_showposts.php:294 ..\..\..\skins\_feedback.php:208
+#: ..\..\..\skins\basic\_feedback.php:219
 msgid "Send comment"
 msgstr "Komentuoti"
 
-#: ..\..\..\admin\_edit_showposts.php:360
+#: ..\..\..\admin\_edit_showposts.php:349
 msgid "Posts to show"
 msgstr "Parodyti įrašus"
 
-#: ..\..\..\admin\_edit_showposts.php:363
+#: ..\..\..\admin\_edit_showposts.php:352
 msgid "Past"
 msgstr "Praeitis"
 
-#: ..\..\..\admin\_edit_showposts.php:366
+#: ..\..\..\admin\_edit_showposts.php:355
 msgid "Future"
 msgstr "Ateitis"
 
-#: ..\..\..\admin\_edit_showposts.php:391
+#: ..\..\..\admin\_edit_showposts.php:380
 msgid "Title / Text contains"
 msgstr "Pavadinime/Tekste yra"
 
-#: ..\..\..\admin\_edit_showposts.php:395
+#: ..\..\..\admin\_edit_showposts.php:385
 msgid "Words"
 msgstr "Žodžiai"
 
-#: ..\..\..\admin\_edit_showposts.php:396
+#: ..\..\..\admin\_edit_showposts.php:389
 msgid "AND"
 msgstr "IR"
 
-#: ..\..\..\admin\_edit_showposts.php:398
+#: ..\..\..\admin\_edit_showposts.php:393
 msgid "OR"
 msgstr "AR"
+
+# D:\www\b2evo091\blogs\admin\_edit_showposts.php:401
+#: ..\..\..\admin\_edit_showposts.php:401
+msgid "Exact match"
+msgstr ""
+
+#: ..\..\..\admin\_edit_showposts.php:454 ..\..\..\skins\_archives.php:74
+#, fuzzy
+msgid "week"
+msgstr "kas savaitę"
+
+#: ..\..\..\admin\_edit_showposts.php:554
+#: ..\..\..\admin\_set_regional.form.php:68
+#: ..\..\..\admin\_set_regional.form.php:246
+#: ..\..\..\b2evocore\_functions_forms.php:312 ..\..\..\install\index.php:299
+#: ..\..\..\skins\_profile.php:85
+msgid "Reset"
+msgstr "Išvalyti"
 
 #: ..\..\..\admin\_footer.php:18
 msgid "GPL License"
 msgstr "GPL licencija"
 
 #  TRANS: Warning this is a javascript string
-#: ..\..\..\admin\_menutop.php:106
+#. TRANS: Warning this is a javascript string
+#: ..\..\..\admin\_menutop.php:113
 msgid "uncheck all"
 msgstr "atšaukti žymėjimą"
 
 #  TRANS: Warning this is a javascript string
-#: ..\..\..\admin\_menutop.php:108
+#. TRANS: Warning this is a javascript string
+#: ..\..\..\admin\_menutop.php:115
 msgid "check all"
 msgstr "pažymėti viską"
 
-#: ..\..\..\admin\_menutop.php:162
+#: ..\..\..\admin\_menutop.php:166
 msgid "visit b2evolution's website"
 msgstr "Aplankyti b2evoltution svetainę"
 
-#: ..\..\..\admin\_menutop.php:165
+# D:\www\b2evo091\blogs\admin\_menutop.php:169
+#: ..\..\..\admin\_menutop.php:169
+msgid "Style:"
+msgstr ""
+
+#: ..\..\..\admin\_menutop.php:172
 msgid "Logout"
 msgstr "Atsijungti"
 
-#: ..\..\..\admin\_menutop.php:167
+#: ..\..\..\admin\_menutop.php:174
 msgid "Exit to blogs"
 msgstr "Eiti į blogus"
 
-#: ..\..\..\admin\_menutop.php:176
+#: ..\..\..\admin\_menutop.php:183
 msgid "Blog time:"
 msgstr "Dienoraščio laikas:"
 
-#: ..\..\..\admin\_menutop.php:177
+#: ..\..\..\admin\_menutop.php:184
 msgid "GMT:"
 msgstr "GMT:"
 
-#: ..\..\..\admin\_menutop.php:178
+#: ..\..\..\admin\_menutop.php:185
 msgid "Logged in as:"
 msgstr "Prisijungęs kaip:"
 
-#: ..\..\..\admin\_menutop.php:188
+#: ..\..\..\admin\_menutop.php:195
 msgid "Write"
 msgstr "Rašyti"
 
 # C:\www\b2evolution\blogs\admin\_set_regional.form.php:123
 # C:\www\b2evolution\blogs\admin\_set_regional.form.php:197
 # C:\www\b2evolution\blogs\admin\_users_list.php:31
-#: ..\..\..\admin\_menutop.php:194
-#: ..\..\..\admin\_set_regional.form.php:165
-#: ..\..\..\admin\_set_regional.form.php:241
-#: ..\..\..\admin\_users_list.php:32
-#: ..\..\..\b2evocore\_class_comment.php:261
-#: ..\..\..\b2evocore\_class_item.php:844
+#: ..\..\..\admin\_menutop.php:201 ..\..\..\admin\_set_regional.form.php:165
+#: ..\..\..\admin\_set_regional.form.php:241 ..\..\..\admin\_users_list.php:32
+#: ..\..\..\b2evocore\_class_comment.php:262
+#: ..\..\..\b2evocore\_class_item.php:883
 msgid "Edit"
 msgstr "Redaguoti"
 
-#: ..\..\..\admin\_menutop.php:214
+#: ..\..\..\admin\_menutop.php:221
 msgid "Stats"
 msgstr "Statistika"
 
-#: ..\..\..\admin\_menutop.php:232
-#: ..\..\..\admin\_users_groupform.php:103
+#: ..\..\..\admin\_menutop.php:239 ..\..\..\admin\_users_groupform.php:103
 msgid "Templates"
 msgstr "Šablonai"
 
-#: ..\..\..\admin\_menutop.php:242
+#: ..\..\..\admin\_menutop.php:249
 msgid "Users"
 msgstr "Vartotojai"
 
-#: ..\..\..\admin\_menutop.php:246
+#: ..\..\..\admin\_menutop.php:253
 msgid "User Profile"
 msgstr "Vartotojo Profilis"
 
@@ -2745,7 +2543,8 @@ msgid "Use extra-path info"
 msgstr "Naudoti extra-path info"
 
 #: ..\..\..\admin\_set_general.form.php:56
-msgid "Recommended if your webserver supports it. Links will look like 'stub/2003/05/20/post_title' instead of 'stub?title=post_title&c=1&tb=1&pb=1&more=1'."
+#, fuzzy
+msgid "Recommended if your webserver supports it. Links will look like 'stub/2003/05/20/post_title' instead of 'stub?title=post_title&amp;c=1&amp;tb=1&amp;pb=1&amp;more=1'."
 msgstr "Rekomenduojama, jei jūsų serveris tai palaiko. Nuorodos atrodys stub/2003/05/20/post_title , o ne stub?title=post_title&c=1&tb=1&pb=1&more=1."
 
 #: ..\..\..\admin\_set_general.form.php:59
@@ -2784,17 +2583,6 @@ msgstr "Minimalus slaptažodžio ilgis"
 #: ..\..\..\admin\_set_general.form.php:70
 msgid "for users."
 msgstr "vartotojams."
-
-#: ..\..\..\admin\_set_general.form.php:79
-#: ..\..\..\admin\_set_plugins.form.php:69
-#: ..\..\..\admin\_set_regional.form.php:67
-#: ..\..\..\admin\_set_regional.form.php:360
-#: ..\..\..\admin\_users_form.php:211
-#: ..\..\..\admin\_users_groupform.php:126
-#: ..\..\..\skins\_profile.php:98
-#: ..\..\..\skins\basic\_profile.php:99
-msgid "Update"
-msgstr "Atnaujinti"
 
 #: ..\..\..\admin\_set_plugins.form.php:19
 msgid "Rendering plug-ins"
@@ -2889,10 +2677,13 @@ msgid "1 is highest. Priority is important when selecting a locale from a langua
 msgstr "1 atitinka aukščiausią. Pirmenybė renkantis kalbos lokalę yra svarbi, nes keletas lokalių atitinka tą pačią kalbą. Pirmenybė taip pat įtakoja kokia tvarka lokalės išdėstomos pasirinkimo meniu ir t.t."
 
 #: ..\..\..\admin\_set_regional.form.php:67
-#: ..\..\..\admin\_users_form.php:211
-#: ..\..\..\admin\_users_groupform.php:126
 msgid "Create"
 msgstr "Sukurti"
+
+#: ..\..\..\admin\_set_regional.form.php:67 ..\..\..\skins\_profile.php:84
+#: ..\..\..\skins\basic\_profile.php:99
+msgid "Update"
+msgstr "Atnaujinti"
 
 #. TRANS: Warning this is a javascript string
 #: ..\..\..\admin\_set_regional.form.php:67
@@ -3192,185 +2983,157 @@ msgstr "Sukurti naują vartotojo profilį"
 msgid "Profile for:"
 msgstr "Profilis:"
 
-#: ..\..\..\admin\_users_form.php:85
-#: ..\..\..\admin\_users_form.php:99
-#: ..\..\..\admin\_users_form.php:114
-#: ..\..\..\skins\_profile.php:65
+#: ..\..\..\admin\_users_form.php:82
+msgid "User rights"
+msgstr "Vartotojų teisės"
+
+#: ..\..\..\admin\_users_form.php:111 ..\..\..\admin\_users_form.php:125
+#: ..\..\..\admin\_users_form.php:140 ..\..\..\skins\_profile.php:34
+#: ..\..\..\skins\_profile.php:51
 msgid "Login"
 msgstr "Prisijungimo vardas"
 
-#: ..\..\..\admin\_users_form.php:86
-#: ..\..\..\admin\_users_form.php:100
-#: ..\..\..\admin\_users_form.php:102
-#: ..\..\..\admin\_users_form.php:103
-#: ..\..\..\admin\_users_form.php:115
-#: ..\..\..\skins\_profile.php:54
-#: ..\..\..\skins\_profile.php:66
-#: ..\..\..\skins\_profile.php:68
-#: ..\..\..\skins\_profile.php:69
-#: ..\..\..\skins\basic\_profile.php:55
+#: ..\..\..\admin\_users_form.php:112 ..\..\..\admin\_users_form.php:126
+#: ..\..\..\admin\_users_form.php:128 ..\..\..\admin\_users_form.php:129
+#: ..\..\..\admin\_users_form.php:141 ..\..\..\skins\_profile.php:40
+#: ..\..\..\skins\_profile.php:52 ..\..\..\skins\_profile.php:54
+#: ..\..\..\skins\_profile.php:55 ..\..\..\skins\basic\_profile.php:55
 msgid "First name"
 msgstr "Vardas"
 
-#: ..\..\..\admin\_users_form.php:87
-#: ..\..\..\admin\_users_form.php:101
-#: ..\..\..\admin\_users_form.php:102
-#: ..\..\..\admin\_users_form.php:103
-#: ..\..\..\admin\_users_form.php:116
-#: ..\..\..\skins\_profile.php:55
-#: ..\..\..\skins\_profile.php:67
-#: ..\..\..\skins\_profile.php:68
-#: ..\..\..\skins\_profile.php:69
-#: ..\..\..\skins\basic\_profile.php:56
+#: ..\..\..\admin\_users_form.php:113 ..\..\..\admin\_users_form.php:127
+#: ..\..\..\admin\_users_form.php:128 ..\..\..\admin\_users_form.php:129
+#: ..\..\..\admin\_users_form.php:142 ..\..\..\skins\_profile.php:41
+#: ..\..\..\skins\_profile.php:53 ..\..\..\skins\_profile.php:54
+#: ..\..\..\skins\_profile.php:55 ..\..\..\skins\basic\_profile.php:56
 msgid "Last name"
 msgstr "Pavardė"
 
-#: ..\..\..\admin\_users_form.php:88
-#: ..\..\..\admin\_users_form.php:98
-#: ..\..\..\admin\_users_form.php:117
-#: ..\..\..\admin\_users_list.php:19
-#: ..\..\..\skins\_profile.php:56
-#: ..\..\..\skins\_profile.php:64
+#: ..\..\..\admin\_users_form.php:114 ..\..\..\admin\_users_form.php:124
+#: ..\..\..\admin\_users_form.php:143 ..\..\..\admin\_users_list.php:19
+#: ..\..\..\skins\_profile.php:42 ..\..\..\skins\_profile.php:50
 #: ..\..\..\skins\basic\_profile.php:57
 msgid "Nickname"
 msgstr "Slapyvardis"
 
-#: ..\..\..\admin\_users_form.php:93
-#: ..\..\..\admin\_users_form.php:118
-#: ..\..\..\skins\_profile.php:60
-#: ..\..\..\skins\basic\_profile.php:61
+#: ..\..\..\admin\_users_form.php:119 ..\..\..\admin\_users_form.php:144
+#: ..\..\..\skins\_profile.php:46 ..\..\..\skins\basic\_profile.php:61
 msgid "Identity shown"
 msgstr "Rodomas ID"
 
-#: ..\..\..\admin\_users_form.php:109
+#: ..\..\..\admin\_users_form.php:135
 msgid "Preferred locale"
 msgstr "Pageidaujama lokalė"
 
 # C:\www\b2evolution\blogs\admin\_users_form.php:108
 # C:\www\b2evolution\blogs\admin\_users_form.php:118
-#: ..\..\..\admin\_users_form.php:109
-#: ..\..\..\admin\_users_form.php:119
+#: ..\..\..\admin\_users_form.php:135 ..\..\..\admin\_users_form.php:145
 msgid "Preferred locale for admin interface, notifications, etc."
 msgstr "Pageidaujama administracinės dalies, pranešimų ir t.t.lokalė"
 
 # C:\www\b2evolution\blogs\admin\_users_form.php:121
-#: ..\..\..\admin\_users_form.php:122
+#: ..\..\..\admin\_users_form.php:148
 msgid "Send an email"
 msgstr "Siųsti el. laišką"
 
-#: ..\..\..\admin\_users_form.php:135
+#: ..\..\..\admin\_users_form.php:161
 msgid "Visit the site"
 msgstr "Aplankyti svetainę"
 
-#: ..\..\..\admin\_users_form.php:145
+#: ..\..\..\admin\_users_form.php:171
 msgid "Search on ICQ.com"
 msgstr "Ieškoti ICQ.com svetainėje"
 
-#: ..\..\..\admin\_users_form.php:149
-#: ..\..\..\admin\_users_form.php:151
-#: ..\..\..\skins\_profile.php:78
-#: ..\..\..\skins\basic\_profile.php:79
+#: ..\..\..\admin\_users_form.php:175 ..\..\..\admin\_users_form.php:177
+#: ..\..\..\skins\_profile.php:64 ..\..\..\skins\basic\_profile.php:79
 msgid "ICQ"
 msgstr "ICQ"
 
-#: ..\..\..\admin\_users_form.php:155
+#: ..\..\..\admin\_users_form.php:181
 msgid "Instant Message to user"
 msgstr "Susisiekite su vartotoju per IM"
 
-#: ..\..\..\admin\_users_form.php:160
-#: ..\..\..\admin\_users_form.php:172
+#: ..\..\..\admin\_users_form.php:186 ..\..\..\admin\_users_form.php:198
 msgid "AIM"
 msgstr "AIM"
 
-#: ..\..\..\admin\_users_form.php:161
-#: ..\..\..\admin\_users_form.php:173
+#: ..\..\..\admin\_users_form.php:187 ..\..\..\admin\_users_form.php:199
 msgid "MSN IM"
 msgstr "MSN IM"
 
-#: ..\..\..\admin\_users_form.php:162
-#: ..\..\..\admin\_users_form.php:174
+#: ..\..\..\admin\_users_form.php:188 ..\..\..\admin\_users_form.php:200
 msgid "YahooIM"
 msgstr "YahooIM"
 
-#: ..\..\..\admin\_users_form.php:164
-#: ..\..\..\admin\_users_form.php:175
-#: ..\..\..\skins\_profile.php:83
-#: ..\..\..\skins\basic\_profile.php:84
+#: ..\..\..\admin\_users_form.php:190 ..\..\..\admin\_users_form.php:201
+#: ..\..\..\skins\_profile.php:69 ..\..\..\skins\basic\_profile.php:84
 msgid "Notifications"
 msgstr "Pranešimai"
 
-#: ..\..\..\admin\_users_form.php:164
-#: ..\..\..\skins\_profile.php:83
+#: ..\..\..\admin\_users_form.php:190 ..\..\..\skins\_profile.php:69
 #: ..\..\..\skins\basic\_profile.php:84
 msgid "Check this to receive notification whenever one of your posts receives comments, trackbacks, etc."
 msgstr "Pasirinkite ar norite gauti pranešimus apie naujus komentarus, trakbakus ir kt. jūsų temose. "
 
-#: ..\..\..\admin\_users_form.php:166
-#: ..\..\..\skins\_profile.php:87
+#: ..\..\..\admin\_users_form.php:192 ..\..\..\skins\_profile.php:73
 #: ..\..\..\skins\basic\_profile.php:88
 msgid "New password"
 msgstr "Naujas slaptažodis"
 
 # C:\www\b2evolution\blogs\admin\_users_form.php:165
-#: ..\..\..\admin\_users_form.php:166
+#: ..\..\..\admin\_users_form.php:192
 msgid "Leave empty if you don't want to change the password."
 msgstr "Jei nenorite keisti slaptažodžio, palikite tuščią."
 
-#: ..\..\..\admin\_users_form.php:167
-#: ..\..\..\skins\_profile.php:92
+#: ..\..\..\admin\_users_form.php:193 ..\..\..\skins\_profile.php:78
 #: ..\..\..\skins\basic\_profile.php:93
 msgid "Confirm new password"
 msgstr "Patvirtiniti naują slaptažodį"
 
 # C:\www\b2evolution\blogs\admin\_users_form.php:174
-#: ..\..\..\admin\_users_form.php:175
+#: ..\..\..\admin\_users_form.php:201
 msgid "yes"
 msgstr "taip"
 
 # C:\www\b2evolution\blogs\admin\_users_form.php:174
-#: ..\..\..\admin\_users_form.php:175
+#: ..\..\..\admin\_users_form.php:201
 msgid "no"
 msgstr "ne"
 
-#: ..\..\..\admin\_users_form.php:181
-msgid "User rights"
-msgstr "Vartotojų teisės"
-
-#: ..\..\..\admin\_users_form.php:221
+#: ..\..\..\admin\_users_form.php:213
 msgid "User information"
 msgstr "Vartotojo informacija"
 
-#: ..\..\..\admin\_users_form.php:223
-#: ..\..\..\admin\_users_groupform.php:64
-#: ..\..\..\admin\_users_list.php:17
-#: ..\..\..\skins\_profile.php:38
+#: ..\..\..\admin\_users_form.php:215 ..\..\..\admin\_users_groupform.php:64
+#: ..\..\..\admin\_users_list.php:17 ..\..\..\skins\_profile.php:34
 #: ..\..\..\skins\basic\_profile.php:39
 msgid "ID"
 msgstr "ID"
 
-#: ..\..\..\admin\_users_form.php:224
-#: ..\..\..\skins\_profile.php:49
-#: ..\..\..\skins\basic\_profile.php:50
-#: ..\..\..\skins\custom\_main.php:279
-#: ..\..\..\skins\custom\_main.php:284
-#: ..\..\..\skins\custom\_main.php:289
-#: ..\..\..\skins\custom\_main.php:294
+#: ..\..\..\admin\_users_form.php:216 ..\..\..\skins\_profile.php:38
+#: ..\..\..\skins\basic\_profile.php:50 ..\..\..\skins\custom\_main.php:247
+#: ..\..\..\skins\custom\_main.php:252 ..\..\..\skins\custom\_main.php:257
+#: ..\..\..\skins\custom\_main.php:262
+#: ..\..\..\skins\natural_pink\_main.php:233
+#: ..\..\..\skins\natural_pink\_main.php:238
+#: ..\..\..\skins\natural_pink\_main.php:243
+#: ..\..\..\skins\natural_pink\_main.php:248
 msgid "Posts"
 msgstr "Temos"
 
-#: ..\..\..\admin\_users_form.php:225
+#: ..\..\..\admin\_users_form.php:217
 msgid "Created on"
 msgstr "Sukurta"
 
-#: ..\..\..\admin\_users_form.php:226
+#: ..\..\..\admin\_users_form.php:218
 msgid "From IP"
 msgstr "Iš IP"
 
-#: ..\..\..\admin\_users_form.php:227
+#: ..\..\..\admin\_users_form.php:219
 msgid "From Domain"
 msgstr "Iš Domeno"
 
-#: ..\..\..\admin\_users_form.php:228
+#: ..\..\..\admin\_users_form.php:220
 msgid "With Browser"
 msgstr "Su Naršykle"
 
@@ -3438,7 +3201,6 @@ msgid "View only"
 msgstr "Tik žiūrėti"
 
 #: ..\..\..\admin\_users_groupform.php:92
-#: ..\..\..\b2evocore\_functions_hitlogs.php:528
 msgid "Statistics"
 msgstr "Statistika"
 
@@ -3459,51 +3221,47 @@ msgstr "Vartotojų/Grupės Valdymas"
 msgid "Groups &amp; Users"
 msgstr "Grupės ir Vartotojai"
 
-#: ..\..\..\admin\_users_list.php:61
+#: ..\..\..\admin\_users_list.php:62
 msgid "default group for new users"
 msgstr "Pagrindinė naujų vartotojų grupė"
 
-#: ..\..\..\admin\_users_list.php:72
+#: ..\..\..\admin\_users_list.php:73
 msgid "Copy group"
 msgstr "Kopijuoti grupę"
 
-#: ..\..\..\admin\_users_list.php:78
+#: ..\..\..\admin\_users_list.php:79
 msgid "Delete group"
 msgstr "Trinti grupę"
 
 # C:\www\b2evolution\blogs\admin\_users_list.php:126
-#: ..\..\..\admin\_users_list.php:128
+#: ..\..\..\admin\_users_list.php:132
 msgid "decrease user level"
 msgstr "sumažinti vartotojo lygį"
 
 # C:\www\b2evolution\blogs\admin\_users_list.php:131
-#: ..\..\..\admin\_users_list.php:133
+#: ..\..\..\admin\_users_list.php:137
 msgid "increase user level"
 msgstr "pakelti vartotojo lygį"
 
-#: ..\..\..\admin\_users_list.php:147
+#: ..\..\..\admin\_users_list.php:151
 msgid "Delete user"
 msgstr "Trinti vartotoją"
 
 #  TRANS: Warning this is a javascript string
 #. TRANS: Warning this is a javascript string
-#: ..\..\..\admin\_users_list.php:147
-msgid ""
-"Are you sure you want to delete this user?\\n"
-"Warning: all his posts will be deleted too!"
-msgstr ""
-"Ar tikrai norite ištrinti šį vartotoją?\\n"
-"Perspėjimas: Visos jo temos bus ištrintos taip pat!"
+#: ..\..\..\admin\_users_list.php:151
+msgid "Are you sure you want to delete this user?\\nWarning: all his posts will be deleted too!"
+msgstr "Ar tikrai norite ištrinti šį vartotoją?\\nPerspėjimas: Visos jo temos bus ištrintos taip pat!"
 
-#: ..\..\..\admin\_users_list.php:163
+#: ..\..\..\admin\_users_list.php:168
 msgid "New user..."
 msgstr "Naujas vartotojas..."
 
-#: ..\..\..\admin\_users_list.php:165
+#: ..\..\..\admin\_users_list.php:170
 msgid "New group..."
 msgstr "Nauja grupė..."
 
-#: ..\..\..\b2evocore\_blog_main.php:204
+#: ..\..\..\b2evocore\_blog_main.php:205
 #, php-format
 msgid "The default skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file. Contact the <a %s>webmaster</a>..."
 msgstr "Standartinė oda [%s] naudojama bloge [%s] neegzistuoja. Ji turi būti tinkamai nustatyta <a %s>blogo parametruose</a> ar tinkamai parodyta stub faile. Susisiekite su <a %s>administratoriumi</a>..."
@@ -3514,36 +3272,36 @@ msgstr "Standartinė oda [%s] naudojama bloge [%s] neegzistuoja. Ji turi būti t
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
 msgstr "KLAIDA! Negalima ištrinti! Jūs turėsite ištrinti failą [%s] rankiniu būdu."
 
-#: ..\..\..\b2evocore\_class_calendar.php:192
 #: ..\..\..\b2evocore\_class_calendar.php:197
+#: ..\..\..\b2evocore\_class_calendar.php:202
 #, php-format
 msgid "%d posts"
 msgstr "įrašų: %d"
 
-#: ..\..\..\b2evocore\_class_calendar.php:193
 #: ..\..\..\b2evocore\_class_calendar.php:198
+#: ..\..\..\b2evocore\_class_calendar.php:203
 msgid "1 post"
 msgstr "1 įrašas"
 
-#: ..\..\..\b2evocore\_class_calendar.php:301
+#: ..\..\..\b2evocore\_class_calendar.php:306
 msgid "previous month"
 msgstr "ankstesnis mėnuo"
 
-#: ..\..\..\b2evocore\_class_calendar.php:305
+#: ..\..\..\b2evocore\_class_calendar.php:310
 msgid "next month"
 msgstr "kitas mėnuo"
 
-#: ..\..\..\b2evocore\_class_calendar.php:332
+#: ..\..\..\b2evocore\_class_calendar.php:337
 msgid "previous year"
 msgstr "ankstesni metai"
 
 # C:\www\b2evolution\blogs\b2evocore\_class_calendar.php:317
-#: ..\..\..\b2evocore\_class_calendar.php:335
+#: ..\..\..\b2evocore\_class_calendar.php:340
 msgid "next year"
 msgstr "kiti metai"
 
 # C:\www\b2evolution\blogs\b2evocore\_class_calendar.php:337
-#: ..\..\..\b2evocore\_class_calendar.php:364
+#: ..\..\..\b2evocore\_class_calendar.php:369
 msgid "go to month's archive"
 msgstr "eiti į mėneio archyvą"
 
@@ -3555,171 +3313,199 @@ msgstr "Narys"
 msgid "Visitor"
 msgstr "Lankytojas"
 
-#: ..\..\..\b2evocore\_class_comment.php:262
+#: ..\..\..\b2evocore\_class_comment.php:263
 msgid "Edit this comment"
 msgstr "Redaguoti šį komentarą"
 
-#: ..\..\..\b2evocore\_class_commentlist.php:143
+#: ..\..\..\b2evocore\_class_comment.php:299
+#: ..\..\..\b2evocore\_class_item.php:828
+msgid "Delete"
+msgstr "Trinti"
+
+#: ..\..\..\b2evocore\_class_comment.php:300
+#, fuzzy
+msgid "Delete this comment"
+msgstr "Redaguoti šį komentarą"
+
+#  TRANS: Warning this is a javascript string
+#. TRANS: Warning this is a javascript string
+#: ..\..\..\b2evocore\_class_comment.php:310
+#: ..\..\..\b2evocore\_class_comment.php:319
+msgid "You are about to delete this comment!\\n\\'Cancel\\' to stop, \\'OK\\' to delete."
+msgstr "Jūs ruošiatės ištrinti šį komentarą!\\n\\'Cancel\\' jei persigalvojote, \\'OK\\' norint ištrinti."
+
+#: ..\..\..\b2evocore\_class_commentlist.php:144
 #: ..\..\..\skins\_lastcomments.php:25
 msgid "No comment yet..."
 msgstr "Komentarų nėra..."
 
 # C:\www\b2evolution\blogs\b2evocore\_class_dataobjectlist.php:117
-#: ..\..\..\b2evocore\_class_dataobjectlist.php:119
+#: ..\..\..\b2evocore\_class_dataobjectlist.php:120
 msgid "Sorry, there is nothing to display..."
 msgstr "Atsiprašome, nieko nėra..."
-
-# C:\www\b2evolution\blogs\b2evocore\_class_db.php:86
-#: ..\..\..\b2evocore\_class_db.php:93
-#, php-format
-msgid "Error selecting database [%s]!"
-msgstr "Duomenų bazės pasirinkimo klaida [%s]!"
-
-#: ..\..\..\b2evocore\_class_db.php:150
-msgid "MySQL error!"
-msgstr "MySQL klaida!"
 
 #: ..\..\..\b2evocore\_class_group.php:70
 msgid "New group"
 msgstr "Nauja grupė"
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:107
+#: ..\..\..\b2evocore\_class_htmlchecker.php:109
 msgid "Parser error: "
 msgstr "Parserio klaida:"
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:124
+#: ..\..\..\b2evocore\_class_htmlchecker.php:127
 msgid "Tag <code>body</code> can only be used once!"
 msgstr "Plėtinys<code>body</code> gali būti naudojamas tik kartą!"
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:137
+#: ..\..\..\b2evocore\_class_htmlchecker.php:140
 msgid "Illegal tag"
 msgstr "Nelegalus plėtinys"
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:144
+#: ..\..\..\b2evocore\_class_htmlchecker.php:147
 #, php-format
 msgid "Tag %s must occur inside another tag"
 msgstr "Plėtinys %s turi būti naudojamas kito plėtinio viduje"
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:146
+#: ..\..\..\b2evocore\_class_htmlchecker.php:149
 #, php-format
 msgid "Tag %s is not allowed within tag %s"
 msgstr "Plėtinys %s negali būti naudojamas %s plėtinio viduje"
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:154
+#: ..\..\..\b2evocore\_class_htmlchecker.php:157
 #, php-format
 msgid "Tag %s may not have attribute %s"
 msgstr "Plėtinys %s neturėtų turėti %s atributo"
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:162
+#: ..\..\..\b2evocore\_class_htmlchecker.php:165
 msgid "Found invalid URL: "
 msgstr "Surasti neteisingi URL:"
 
-#: ..\..\..\b2evocore\_class_htmlchecker.php:185
+#: ..\..\..\b2evocore\_class_htmlchecker.php:188
 #, php-format
 msgid "Tag %s may not contain raw character data"
 msgstr "Plėtinyje %s nereikėtu naudoti kodavimo simbolių"
 
 #. TRANS: When the categories for a specific post are displayed, the user can click
 #. on these cats to browse them, this is the default href title displayed there
-#: ..\..\..\b2evocore\_class_item.php:300
-#: ..\..\..\b2evocore\_functions_cats.php:637
+#: ..\..\..\b2evocore\_class_item.php:302
+#: ..\..\..\b2evocore\_functions_cats.php:639
 msgid "Browse category"
 msgstr "Naršyti kategoriją"
 
-#: ..\..\..\b2evocore\_class_item.php:403
+#: ..\..\..\b2evocore\_class_item.php:405
 msgid "Comments are closed for this post."
 msgstr "Komentavimas šioje temoje išjungtas."
 
-#: ..\..\..\b2evocore\_class_item.php:415
+#: ..\..\..\b2evocore\_class_item.php:417
 msgid "This post is not published. You cannot leave comments."
 msgstr "Šis įrašas nepaskelbtas. Negalite jo komentuoti."
 
 #  TRANS: this is the default text for the extended post "more" link
 #  
 #. TRANS: this is the default text for the extended post "more" link
-#: ..\..\..\b2evocore\_class_item.php:465
-#: ..\..\..\b2evocore\_functions_bposts.php:732
+#: ..\..\..\b2evocore\_class_item.php:467
+#: ..\..\..\b2evocore\_functions_bposts.php:736
 msgid "Read more!"
 msgstr "Daugiau !"
 
 #  TRANS: this is the default text displayed once the more link has been activated
 #. TRANS: this is the default text displayed once the more link has been activated
-#: ..\..\..\b2evocore\_class_item.php:470
-#: ..\..\..\b2evocore\_functions_bposts.php:737
+#: ..\..\..\b2evocore\_class_item.php:472
+#: ..\..\..\b2evocore\_functions_bposts.php:741
 msgid "More:"
 msgstr "Daugiau:"
 
-#: ..\..\..\b2evocore\_class_item.php:712
+#: ..\..\..\b2evocore\_class_item.php:714
 msgid "Display feedback / Leave a comment"
 msgstr "Rodyti atsiliepimus / Komentuoti"
 
-#: ..\..\..\b2evocore\_class_item.php:713
+#: ..\..\..\b2evocore\_class_item.php:715
 msgid "Send feedback"
 msgstr "Komentuoti"
 
-#: ..\..\..\b2evocore\_class_item.php:714
+#: ..\..\..\b2evocore\_class_item.php:716
 msgid "1 feedback"
 msgstr "1 atsiliepimas"
 
-#: ..\..\..\b2evocore\_class_item.php:715
+#: ..\..\..\b2evocore\_class_item.php:717
 #, php-format
 msgid "%d feedbacks"
 msgstr "atsiliepimų: %d"
 
-#: ..\..\..\b2evocore\_class_item.php:728
+#: ..\..\..\b2evocore\_class_item.php:730
 msgid "Display comments / Leave a comment"
 msgstr "Rodyti komentarus / Komentuoti"
 
-#: ..\..\..\b2evocore\_class_item.php:741
+#: ..\..\..\b2evocore\_class_item.php:743
 msgid "Display trackbacks / Get trackback address for this post"
 msgstr "Parodyti trakbakus / Šio įrašo trakbako adresas"
 
-#: ..\..\..\b2evocore\_class_item.php:742
+#: ..\..\..\b2evocore\_class_item.php:744
 #: ..\..\..\b2evocore\_functions_trackback.php:172
 msgid "Trackback (0)"
 msgstr "Trakbakų (0)"
 
-#: ..\..\..\b2evocore\_class_item.php:743
+#: ..\..\..\b2evocore\_class_item.php:745
 #: ..\..\..\b2evocore\_functions_trackback.php:173
 msgid "Trackback (1)"
 msgstr "Trakbakas (1)"
 
-#: ..\..\..\b2evocore\_class_item.php:744
+#: ..\..\..\b2evocore\_class_item.php:746
 #: ..\..\..\b2evocore\_functions_trackback.php:174
 #, php-format
 msgid "Trackbacks (%d)"
 msgstr "Trakbakų (%d)"
 
-#: ..\..\..\b2evocore\_class_item.php:754
+#: ..\..\..\b2evocore\_class_item.php:756
 msgid "Display pingbacks"
 msgstr "Pingbakai"
 
-#: ..\..\..\b2evocore\_class_item.php:755
+#: ..\..\..\b2evocore\_class_item.php:757
 #: ..\..\..\b2evocore\_functions_pingback.php:267
 msgid "Pingback (0)"
 msgstr "Pingbakų (0)"
 
-#: ..\..\..\b2evocore\_class_item.php:756
+#: ..\..\..\b2evocore\_class_item.php:758
 #: ..\..\..\b2evocore\_functions_pingback.php:268
 msgid "Pingback (1)"
 msgstr "Pingbakas (1)"
 
-#: ..\..\..\b2evocore\_class_item.php:757
+#: ..\..\..\b2evocore\_class_item.php:759
 #: ..\..\..\b2evocore\_functions_pingback.php:269
 #, php-format
 msgid "Pingbacks (%d)"
 msgstr "Pingbakai (%d)"
 
-#: ..\..\..\b2evocore\_class_item.php:845
+#: ..\..\..\b2evocore\_class_item.php:829
+#, fuzzy
+msgid "Delete this post"
+msgstr "Trinti šį apsilankymą!"
+
+#  TRANS: Warning this is a javascript string
+#. TRANS: Warning this is a javascript string
+#: ..\..\..\b2evocore\_class_item.php:839
+#: ..\..\..\b2evocore\_class_item.php:848
+msgid "You are about to delete this post!\\n\\'Cancel\\' to stop, \\'OK\\' to delete."
+msgstr "Jūs norite ištrinti šįą temą!\\n\\'Cancel\\' jei persigalvojote, \\'OK\\' norint ištrinti."
+
+#: ..\..\..\b2evocore\_class_item.php:884
 msgid "Edit this post"
 msgstr "Redaguoti šį įrašą"
 
-#: ..\..\..\b2evocore\_class_itemlist.php:563
+# Posto statusas (administracinėje dalyje)
+#: ..\..\..\b2evocore\_class_item.php:924
+msgid "Publish NOW!"
+msgstr "Paskelbti!"
+
+#: ..\..\..\b2evocore\_class_item.php:925
+msgid "Publish now using current date and time."
+msgstr "Paskelbti naudojant dabartinę datą ir laiką."
+
+#: ..\..\..\b2evocore\_class_itemlist.php:598
 msgid "Invalid post, please correct these errors:"
 msgstr "Negalima įrašyti, prašome ištaisyti šias klaidas:"
 
 # C:\www\b2evolution\blogs\b2evocore\_class_itemlist.php:817
-#: ..\..\..\b2evocore\_class_itemlist.php:862
+#: ..\..\..\b2evocore\_class_itemlist.php:889
 msgid "Sorry, there is no post to display..."
 msgstr "Atsiprašome, nėra rodomų naujienų..."
 
@@ -3886,66 +3672,65 @@ msgstr "Nenusiųstas pranešimo numeris"
 msgid "Command failed"
 msgstr "Komanda nepavyko"
 
-#: ..\..\..\b2evocore\_class_user.php:68
+#: ..\..\..\b2evocore\_class_user.php:70
 msgid "New user"
 msgstr "Naujas vartotojas"
 
-#: ..\..\..\b2evocore\_class_user.php:262
+#: ..\..\..\b2evocore\_class_user.php:267
 msgid "Permission denied!"
 msgstr "Uždrausta!"
 
-#: ..\..\..\b2evocore\_functions.php:47
+#: ..\..\..\b2evocore\_functions.php:48
 msgid "Oops, MySQL error!"
 msgstr "Uups, MySQL klaida!"
 
-#: ..\..\..\b2evocore\_functions.php:479
+#: ..\..\..\b2evocore\_functions.php:486
 msgid "go back"
 msgstr "atgal"
 
-#: ..\..\..\b2evocore\_functions.php:511
+#: ..\..\..\b2evocore\_functions.php:518
 msgid "Redirecting you to:"
 msgstr "Vyksta nukreipimas į:"
 
-#: ..\..\..\b2evocore\_functions.php:513
+#: ..\..\..\b2evocore\_functions.php:520
 #, php-format
 msgid "If nothing happens, click <a %s>here</a>."
 msgstr "jei nieko nevyksta, paspauskite <a %s>čia</a>."
 
-#: ..\..\..\b2evocore\_functions.php:592
+#: ..\..\..\b2evocore\_functions.php:599
 msgid "No response!"
 msgstr "Nėra atsakymo!"
 
-#: ..\..\..\b2evocore\_functions.php:597
+#: ..\..\..\b2evocore\_functions.php:604
 msgid "Remote error"
 msgstr "Nutolusi klaida"
 
-#: ..\..\..\b2evocore\_functions.php:612
-#: ..\..\..\b2evocore\_functions.php:617
+#: ..\..\..\b2evocore\_functions.php:619 ..\..\..\b2evocore\_functions.php:624
 msgid "Response"
 msgstr "Atsakymas:"
 
-#: ..\..\..\b2evocore\_functions.php:854
+#: ..\..\..\b2evocore\_functions.php:861
 #, php-format
 msgid "Parameter %s is required!"
 msgstr "Parametras %s būtinas!"
 
-#: ..\..\..\b2evocore\_functions.php:1065
+#: ..\..\..\b2evocore\_functions.php:1068
 msgid "Invalid URL"
 msgstr "Blogas URL"
 
-#: ..\..\..\b2evocore\_functions.php:1071
+#: ..\..\..\b2evocore\_functions.php:1074
 msgid "URI scheme not allowed"
 msgstr "URI schema neleidžiama"
 
-#: ..\..\..\b2evocore\_functions.php:1078
+#: ..\..\..\b2evocore\_functions.php:1081
 msgid "URL not allowed"
 msgstr "URL neleidžiamas"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:176
+#: ..\..\..\b2evocore\_functions_antispam.php:172
 msgid "Reporting abuse to b2evolution.net..."
 msgstr "Siunčiam pažeidimą į b2evolution.net..."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:206
+#: ..\..\..\b2evocore\_functions_antispam.php:202
 #: ..\..\..\b2evocore\_functions_pings.php:56
 #: ..\..\..\b2evocore\_functions_pings.php:92
 #: ..\..\..\b2evocore\_functions_pings.php:169
@@ -3953,44 +3738,44 @@ msgstr "Siunčiam pažeidimą į b2evolution.net..."
 msgid "Aborted (Running on localhost)."
 msgstr "Atšaukta ( veikiam localhost'e)."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:224
+#: ..\..\..\b2evocore\_functions_antispam.php:220
 msgid "Requesting abuse list from b2evolution.net..."
 msgstr "Prašome pažeidėjų sąrašo iš b2evolution.net..."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:234
+#: ..\..\..\b2evocore\_functions_antispam.php:230
 msgid "Latest update timestamp"
 msgstr "Paskutinio atnaujinimo laikas ir data"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:259
+#: ..\..\..\b2evocore\_functions_antispam.php:255
 msgid "Incomplete reponse."
 msgstr "Neužbaigtas atsakymas."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:267
+#: ..\..\..\b2evocore\_functions_antispam.php:263
 msgid "No new blacklisted strings are available."
 msgstr "Naujų blokuojamų įrašų nėra."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:271
+#: ..\..\..\b2evocore\_functions_antispam.php:267
 msgid "Adding strings to local blacklist"
 msgstr "Papildomi įrašai vietiniame juodajame sąraše"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:274
+#: ..\..\..\b2evocore\_functions_antispam.php:270
 msgid "Adding:"
 msgstr "Pridedam:"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:277
+#: ..\..\..\b2evocore\_functions_antispam.php:273
 #: ..\..\..\htsrv\getmail.php:295
 msgid "OK."
 msgstr "OK."
 
-#: ..\..\..\b2evocore\_functions_antispam.php:281
+#: ..\..\..\b2evocore\_functions_antispam.php:277
 msgid "Not necessary! (Already handled)"
 msgstr "Nereikalinga! (Jau pasirūpinta)"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:289
+#: ..\..\..\b2evocore\_functions_antispam.php:285
 msgid "New latest update timestamp"
 msgstr "Naujas vėliausio atnaujinimo laikas ir data"
 
-#: ..\..\..\b2evocore\_functions_antispam.php:298
+#: ..\..\..\b2evocore\_functions_antispam.php:294
 msgid "Invalid reponse."
 msgstr "Blogas atsakymas."
 
@@ -4004,98 +3789,101 @@ msgid "Post details"
 msgstr "Visas įrašas"
 
 #: ..\..\..\b2evocore\_functions_bposts.php:666
-#: ..\..\..\b2evocore\_functions_bposts.php:702
+#: ..\..\..\b2evocore\_functions_bposts.php:706
 msgid "PREVIEW"
 msgstr "PERŽIŪRA"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:828
+#: ..\..\..\b2evocore\_functions_bposts.php:832
 msgid "Next page"
 msgstr "Kitas puslapis"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:829
+#: ..\..\..\b2evocore\_functions_bposts.php:833
 msgid "Previous page"
 msgstr "Ankstesnis puslapis"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:874
+#: ..\..\..\b2evocore\_functions_bposts.php:878
 msgid "Previous post"
 msgstr "Ankstesnės temos"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:931
+#: ..\..\..\b2evocore\_functions_bposts.php:935
 msgid "Next post"
 msgstr "Kita tema"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:1043
+#: ..\..\..\b2evocore\_functions_bposts.php:1047
 msgid "Next Page"
 msgstr "Kitas Puslapis"
 
-#: ..\..\..\b2evocore\_functions_bposts.php:1071
+#: ..\..\..\b2evocore\_functions_bposts.php:1075
 msgid "Previous Page"
 msgstr "Ankstesnis Puslapis"
 
-#: ..\..\..\b2evocore\_functions_cats.php:88
+#: ..\..\..\b2evocore\_functions_cats.php:90
 msgid "Cannot delete if there are sub-categories!"
 msgstr "Negaliu ištrinti jei egzistuoja sub-kategorijos!"
 
-#: ..\..\..\b2evocore\_functions_cats.php:120
+#: ..\..\..\b2evocore\_functions_cats.php:122
 msgid "Cannot delete last category if there are posts inside!"
 msgstr "Negaliu ištrinti paskutinės kategorijos jei joje yra temų!"
 
-#: ..\..\..\b2evocore\_functions_cats.php:215
+#: ..\..\..\b2evocore\_functions_cats.php:217
 #, php-format
 msgid "Requested category %s does not exist!"
 msgstr "Nurodyta %s kategorija neegzistuoja!"
 
-#: ..\..\..\b2evocore\_functions_cats.php:568
+#: ..\..\..\b2evocore\_functions_cats.php:570
 msgid "Category"
 msgstr "Kategorija"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:58
-#: ..\..\..\b2evocore\_vars.php:134
-#: ..\..\..\b2evocore\_vars.php:135
+#: ..\..\..\b2evocore\_functions_forms.php:311
+#, fuzzy
+msgid "Save !"
+msgstr "Sakyti!"
+
+#: ..\..\..\b2evocore\_functions_hitlogs.php:59
+#: ..\..\..\b2evocore\_vars.php:134 ..\..\..\b2evocore\_vars.php:135
 msgid "bad char in User Agent"
 msgstr "neleistinas simbolis User Agent'e"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:86
-#: ..\..\..\b2evocore\_functions_hitlogs.php:105
-#: ..\..\..\b2evocore\_functions_hitlogs.php:116
-#: ..\..\..\b2evocore\_functions_hitlogs.php:128
+#: ..\..\..\b2evocore\_functions_hitlogs.php:87
+#: ..\..\..\b2evocore\_functions_hitlogs.php:106
+#: ..\..\..\b2evocore\_functions_hitlogs.php:117
+#: ..\..\..\b2evocore\_functions_hitlogs.php:129
 msgid "referer ignored"
 msgstr "referalas ignoruotas"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:86
+#: ..\..\..\b2evocore\_functions_hitlogs.php:87
 msgid "BlackList"
 msgstr "BlackList'as"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:105
+#: ..\..\..\b2evocore\_functions_hitlogs.php:106
 msgid "robot"
 msgstr "robotas"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:116
+#: ..\..\..\b2evocore\_functions_hitlogs.php:117
 msgid "invalid"
 msgstr "blogas"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:128
+#: ..\..\..\b2evocore\_functions_hitlogs.php:129
 msgid "search engine"
 msgstr "paieškos sistema"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:136
+#: ..\..\..\b2evocore\_functions_hitlogs.php:137
 msgid "loading referering page"
 msgstr "kraunamas nurodantis puslapis"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:157
+#: ..\..\..\b2evocore\_functions_hitlogs.php:158
 msgid "found current url in page"
 msgstr "URL rastas puslapyje"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:450
+#: ..\..\..\b2evocore\_functions_hitlogs.php:471
 msgid "not a query - no params!"
 msgstr "ne užklausa - nenurodyti parametrai!"
 
-#: ..\..\..\b2evocore\_functions_hitlogs.php:475
+#: ..\..\..\b2evocore\_functions_hitlogs.php:496
 msgid "no query string found"
 msgstr "nerasta užklausos duomenų"
 
-#: ..\..\..\b2evocore\_functions_locale.php:354
-#: ..\..\..\install\index.php:85
+#: ..\..\..\b2evocore\_functions_locale.php:354 ..\..\..\install\index.php:90
 msgid "name"
 msgstr "pavadinimas"
 
@@ -4235,7 +4023,7 @@ msgstr "prisijungimo vardas/slaptažodis neteisingas."
 
 #: ..\..\..\b2evocore\_functions_users.php:82
 #: ..\..\..\b2evocore\_functions_users.php:84
-#: ..\..\..\htsrv\profile_update.php:114
+#: ..\..\..\htsrv\profile_update.php:120
 #, php-format
 msgid "setcookie %s failed!"
 msgstr "sausainiukas %s neišsaugotas!"
@@ -4517,141 +4305,225 @@ msgstr "Praneštas"
 msgid "Central"
 msgstr "Centrinis"
 
-#: ..\..\..\conf\_locales.php:50
+#: ..\..\..\conf\_locales.php:49
 msgid "Czech (CZ)"
 msgstr "Čekų (CZ)"
 
-#: ..\..\..\conf\_locales.php:57
+#: ..\..\..\conf\_locales.php:56
+#, fuzzy
+msgid "Danish (DK)"
+msgstr "Anglų (UK)"
+
+#: ..\..\..\conf\_locales.php:63
 msgid "German (DE)"
 msgstr "Vokiečių (DE)"
 
-#: ..\..\..\conf\_locales.php:64
+#: ..\..\..\conf\_locales.php:70
 msgid "English (EU)"
 msgstr "Anglų (EU)"
 
-#: ..\..\..\conf\_locales.php:71
+#: ..\..\..\conf\_locales.php:77
 msgid "English (UK)"
 msgstr "Anglų (UK)"
 
-#: ..\..\..\conf\_locales.php:78
+#: ..\..\..\conf\_locales.php:84
 msgid "English (US)"
 msgstr "Anglų (US)"
 
-#: ..\..\..\conf\_locales.php:85
+#: ..\..\..\conf\_locales.php:91
 msgid "English (CA)"
 msgstr "Anglų (CA)"
 
-#: ..\..\..\conf\_locales.php:92
+#: ..\..\..\conf\_locales.php:98
 msgid "English (AU)"
 msgstr "Anglų (AU)"
 
-#: ..\..\..\conf\_locales.php:99
+#: ..\..\..\conf\_locales.php:105
+#, fuzzy
+msgid "English (IL)"
+msgstr "Anglų (EU)"
+
+#: ..\..\..\conf\_locales.php:112
+#, fuzzy
+msgid "English (NZ)"
+msgstr "Anglų (EU)"
+
+#: ..\..\..\conf\_locales.php:119
+#, fuzzy
+msgid "English (SG)"
+msgstr "Anglų (US)"
+
+#: ..\..\..\conf\_locales.php:126
 msgid "Spanish (ES)"
 msgstr "Ispanų (ES)"
 
-#: ..\..\..\conf\_locales.php:106
+#: ..\..\..\conf\_locales.php:133
+#, fuzzy
+msgid "Spanish (MX)"
+msgstr "Ispanų (ES)"
+
+#: ..\..\..\conf\_locales.php:140
+#, fuzzy
+msgid "Spanish (VE)"
+msgstr "Ispanų (ES)"
+
+#: ..\..\..\conf\_locales.php:147
+#, fuzzy
+msgid "Finnish (FI)"
+msgstr "Prancūzų (FR)"
+
+#: ..\..\..\conf\_locales.php:154
 msgid "French (FR)"
 msgstr "Prancūzų (FR)"
 
-#: ..\..\..\conf\_locales.php:113
+#: ..\..\..\conf\_locales.php:161
 msgid "French (CA)"
 msgstr "Prancūzų (CA)"
 
-#: ..\..\..\conf\_locales.php:120
+#: ..\..\..\conf\_locales.php:168
 msgid "French (BE)"
 msgstr "Prancūzų (BE)"
 
-#: ..\..\..\conf\_locales.php:127
+#: ..\..\..\conf\_locales.php:175
+#, fuzzy
+msgid "Galician (ES)"
+msgstr "Italų (IT)"
+
+# D:\www\b2evo091\blogs\conf\_locales.php:182
+#: ..\..\..\conf\_locales.php:182
+msgid "Hungarian (HU)"
+msgstr ""
+
+#: ..\..\..\conf\_locales.php:189
 msgid "Italian (IT)"
 msgstr "Italų (IT)"
 
-#: ..\..\..\conf\_locales.php:134
+#: ..\..\..\conf\_locales.php:196
 msgid "Japanese (JP)"
 msgstr "Japonų (JP)"
 
-#: ..\..\..\conf\_locales.php:141
+#: ..\..\..\conf\_locales.php:203
 msgid "Lithuanian (LT)"
 msgstr "Lietuvių (LT)"
 
-#: ..\..\..\conf\_locales.php:148
+#: ..\..\..\conf\_locales.php:210
 msgid "Bokm&aring;l (NO)"
 msgstr "Norvegų (NO)"
 
-#: ..\..\..\conf\_locales.php:155
+#: ..\..\..\conf\_locales.php:217
 msgid "Dutch (NL)"
 msgstr "Olandų (NL)"
 
-#: ..\..\..\conf\_locales.php:162
+#: ..\..\..\conf\_locales.php:224
 msgid "Dutch (BE)"
 msgstr "Olandų (BE)"
 
-#: ..\..\..\conf\_locales.php:169
+#: ..\..\..\conf\_locales.php:231
 msgid "Portuguese (BR)"
 msgstr "Portugalų (BR)"
 
-#: ..\..\..\conf\_locales.php:176
+#: ..\..\..\conf\_locales.php:238
+#, fuzzy
+msgid "Portuguese (PT)"
+msgstr "Portugalų (BR)"
+
+# D:\www\b2evo091\blogs\conf\_locales.php:245
+#: ..\..\..\conf\_locales.php:245
+msgid "Slovak (SK)"
+msgstr ""
+
+#: ..\..\..\conf\_locales.php:252
 msgid "Swedish (SE)"
 msgstr "Švedų (SE)"
 
-#: ..\..\..\conf\_locales.php:183
-msgid "Simpl. Chinese (CN)"
-msgstr "Supaprastinta Kinų (CN)"
+# D:\www\b2evo091\blogs\conf\_locales.php:259
+#: ..\..\..\conf\_locales.php:259
+msgid "Thai (TH)"
+msgstr ""
 
-#: ..\..\..\conf\_locales.php:190
+# D:\www\b2evo091\blogs\conf\_locales.php:266
+#: ..\..\..\conf\_locales.php:266
+msgid "Turkish (TR)"
+msgstr ""
+
+# D:\www\b2evo091\blogs\conf\_locales.php:273
+#: ..\..\..\conf\_locales.php:273
+msgid "Turkish utf-8 (TR)"
+msgstr ""
+
+# D:\www\b2evo091\blogs\conf\_locales.php:280
+#: ..\..\..\conf\_locales.php:280
+msgid "Chinese(S) gb2312 (CN)"
+msgstr ""
+
+# D:\www\b2evo091\blogs\conf\_locales.php:287
+#: ..\..\..\conf\_locales.php:287
+msgid "Chinese(S) utf-8 (CN)"
+msgstr ""
+
+#: ..\..\..\conf\_locales.php:303
 msgid "Trad. Chinese (TW)"
 msgstr "Trad. Kinų (TW)"
 
-#: ..\..\..\htsrv\comment_post.php:27
+#: ..\..\..\htsrv\comment_post.php:30
 msgid "You cannot leave comments on this post!"
 msgstr "Jūs negalite komentuoti šioje temoje!"
 
-#: ..\..\..\htsrv\comment_post.php:50
+#: ..\..\..\htsrv\comment_post.php:53
 msgid "Please fill in the name field"
 msgstr "Prašome įrašyti Vardą"
 
-#: ..\..\..\htsrv\comment_post.php:51
+#: ..\..\..\htsrv\comment_post.php:54
 msgid "Please fill in the email field"
 msgstr "Prašome įrašyti el. pašto adresą"
 
-#: ..\..\..\htsrv\comment_post.php:56
+#: ..\..\..\htsrv\comment_post.php:59
+#, fuzzy
+msgid "Supplied name is invalid"
+msgstr "Pateiktas URL neteisingas:"
+
+#: ..\..\..\htsrv\comment_post.php:65
 msgid "Supplied email address is invalid"
 msgstr "Pateiktas elektroninio pašto adresas neteisingas"
 
-#: ..\..\..\htsrv\comment_post.php:80
+#: ..\..\..\htsrv\comment_post.php:89 ..\..\..\htsrv\trackback.php:69
 msgid "Please do not send empty comment"
 msgstr "Prašome nesiųsti tuščių komentarų"
 
-#: ..\..\..\htsrv\comment_post.php:97
-msgid "You can only post a new comment every 30 seconds."
+#: ..\..\..\htsrv\comment_post.php:93 ..\..\..\htsrv\trackback.php:73
+#, fuzzy
+msgid "Supplied comment is invalid"
+msgstr "Pateiktas URL neteisingas:"
+
+#: ..\..\..\htsrv\comment_post.php:110
+#, fuzzy, php-format
+msgid "You can only post a new comment every %d seconds."
 msgstr "Jūs galite komentuoti pakartotinai ne anksčiau kaip po 30 s."
 
-#: ..\..\..\htsrv\comment_post.php:101
+#: ..\..\..\htsrv\comment_post.php:114
 msgid "Cannot post comment, please correct these errors:"
 msgstr "Negaliu įrašyti komentaro, nes reikia ištaisyti šias klaidas:"
 
-#: ..\..\..\htsrv\comment_post.php:102
+#: ..\..\..\htsrv\comment_post.php:115
 msgid "Back to comment editing"
 msgstr "Atgal į komentarų redagavimą"
 
-#: ..\..\..\htsrv\comment_post.php:127
-#: ..\..\..\htsrv\comment_post.php:130
+#: ..\..\..\htsrv\comment_post.php:140 ..\..\..\htsrv\comment_post.php:143
 #, php-format
 msgid "New comment on your post #%d \"%s\""
 msgstr "Naujas komentaras tema #%d \"%s\""
 
-#: ..\..\..\htsrv\comment_post.php:142
-#: ..\..\..\htsrv\trackback.php:106
-#: ..\..\..\xmlsrv\xmlrpc.php:1408
+#: ..\..\..\htsrv\comment_post.php:155 ..\..\..\htsrv\trackback.php:115
+#: ..\..\..\xmlsrv\xmlrpc.php:1411
 msgid "Url"
 msgstr "Url"
 
-#: ..\..\..\htsrv\comment_post.php:144
+#: ..\..\..\htsrv\comment_post.php:157
 msgid "Comment"
 msgstr "Komentaras"
 
-#: ..\..\..\htsrv\comment_post.php:145
-#: ..\..\..\htsrv\trackback.php:108
-#: ..\..\..\xmlsrv\xmlrpc.php:1410
+#: ..\..\..\htsrv\comment_post.php:158 ..\..\..\htsrv\trackback.php:117
+#: ..\..\..\xmlsrv\xmlrpc.php:1413
 msgid "Edit/Delete"
 msgstr "Redaguoti/Trinti"
 
@@ -4692,15 +4564,10 @@ msgstr "Temos priešdėlis neatitinka"
 msgid "Raw content:"
 msgstr "Neapdorotas turinys:"
 
-#: ..\..\..\htsrv\getmail.php:206
-#: ..\..\..\htsrv\login.php:81
-#: ..\..\..\htsrv\register.php:120
-#: ..\..\..\htsrv\_login_form.php:47
-#: ..\..\..\htsrv\_lostpass_form.php:27
-#: ..\..\..\htsrv\_reg_complete.php:19
-#: ..\..\..\htsrv\_reg_form.php:27
-#: ..\..\..\skins\_profile.php:35
-#: ..\..\..\skins\basic\_profile.php:36
+#: ..\..\..\htsrv\getmail.php:206 ..\..\..\htsrv\login.php:88
+#: ..\..\..\htsrv\register.php:120 ..\..\..\htsrv\_login_form.php:48
+#: ..\..\..\htsrv\_lostpass_form.php:27 ..\..\..\htsrv\_reg_complete.php:19
+#: ..\..\..\htsrv\_reg_form.php:27 ..\..\..\skins\basic\_profile.php:36
 msgid "Login:"
 msgstr "Vartotojas:"
 
@@ -4736,42 +4603,46 @@ msgstr "Paskelbtas turinys"
 msgid "Mission complete, message deleted."
 msgstr "Užduotis įvykdyta; įrašas ištrintas."
 
-#: ..\..\..\htsrv\login.php:75
-#: ..\..\..\htsrv\login.php:98
+# C:\www\b2evolution\blogs\admin\b2users.php:45
+#: ..\..\..\htsrv\login.php:68
+#, fuzzy
+msgid "You cannot reset this account in demo mode."
+msgstr "Jūs negalite pakeisti demovartotojo profilį demonstracijos metu!"
+
+#: ..\..\..\htsrv\login.php:82 ..\..\..\htsrv\login.php:105
 msgid "An email with the new password was sent successfully to your email address."
 msgstr "Laiškas su nauju slaptažodžiu sėkmingai nusiųstas jūsų nurodytu adresu."
 
-#: ..\..\..\htsrv\login.php:82
+#: ..\..\..\htsrv\login.php:89
 msgid "New Password:"
 msgstr "Naujas Slaptažodis:"
 
 # C:\www\b2evolution\blogs\htsrv\login.php:81
-#: ..\..\..\htsrv\login.php:83
+#: ..\..\..\htsrv\login.php:90
 msgid "You can login here:"
 msgstr "Galite prisijungti čia:"
 
-#: ..\..\..\htsrv\login.php:88
+#: ..\..\..\htsrv\login.php:95
 msgid "your weblog's login/password"
 msgstr "jūsų weblogo id/slaptažodis"
 
-#: ..\..\..\htsrv\login.php:90
+#: ..\..\..\htsrv\login.php:97
 msgid "The email could not be sent."
 msgstr "Slaptažodis negali būti išsųstas."
 
-#: ..\..\..\htsrv\login.php:91
+#: ..\..\..\htsrv\login.php:98
 msgid "Possible reason: your host may have disabled the mail() function..."
 msgstr "Galima priežastis: jūsų serveryje išjungta PHP mail() funkcija..."
 
-#: ..\..\..\htsrv\login.php:112
+#: ..\..\..\htsrv\login.php:122
 msgid "Note: You are already logged in!"
 msgstr "Pastaba: Jūs jau prisijungę!"
 
-#: ..\..\..\htsrv\login.php:119
+#: ..\..\..\htsrv\login.php:130
 msgid "Continue..."
 msgstr "Tęsti..."
 
-#: ..\..\..\htsrv\profile_update.php:36
-#: ..\..\..\skins\_profile.php:21
+#: ..\..\..\htsrv\profile_update.php:36 ..\..\..\skins\_profile.php:21
 #: ..\..\..\skins\basic\_profile.php:22
 msgid "You are not logged in."
 msgstr "Jūs neprisijungę!"
@@ -4780,14 +4651,10 @@ msgstr "Jūs neprisijungę!"
 msgid "You are not logged in under the same account you are trying to modify."
 msgstr "Jūs bandote redaguoti ne savo paskyrą ."
 
-#: ..\..\..\htsrv\profile_update.php:47
-#: ..\..\..\htsrv\profile_update.php:54
-#: ..\..\..\htsrv\profile_update.php:64
-#: ..\..\..\htsrv\profile_update.php:73
-#: ..\..\..\htsrv\profile_update.php:79
-#: ..\..\..\htsrv\profile_update.php:96
-#: ..\..\..\htsrv\profile_update.php:101
-#: ..\..\..\htsrv\profile_update.php:107
+#: ..\..\..\htsrv\profile_update.php:47 ..\..\..\htsrv\profile_update.php:54
+#: ..\..\..\htsrv\profile_update.php:64 ..\..\..\htsrv\profile_update.php:73
+#: ..\..\..\htsrv\profile_update.php:79 ..\..\..\htsrv\profile_update.php:102
+#: ..\..\..\htsrv\profile_update.php:107 ..\..\..\htsrv\profile_update.php:113
 msgid "Back to profile"
 msgstr "Atgal į profilį"
 
@@ -4799,22 +4666,19 @@ msgstr "prašome įrašyti savo slapyvardį (gali būti toks pat kaip ir login)"
 msgid "your ICQ UIN can only be a number, no letters allowed"
 msgstr "Jūsų ICQ UIN gali būti tik skaičiai, raidės neleidžiamos."
 
-#: ..\..\..\htsrv\profile_update.php:72
-#: ..\..\..\htsrv\register.php:73
+#: ..\..\..\htsrv\profile_update.php:72 ..\..\..\htsrv\register.php:73
 msgid "please type your e-mail address"
 msgstr "Prašome įrašyti savo emailą"
 
-#: ..\..\..\htsrv\profile_update.php:78
-#: ..\..\..\htsrv\register.php:78
+#: ..\..\..\htsrv\profile_update.php:78 ..\..\..\htsrv\register.php:78
 msgid "the email address is invalid"
 msgstr "Elektroninis pašto adresas neteisingas"
 
-#: ..\..\..\htsrv\profile_update.php:87
-#: ..\..\..\htsrv\profile_update.php:95
+#: ..\..\..\htsrv\profile_update.php:93 ..\..\..\htsrv\profile_update.php:101
 msgid "you typed your new password only once. Go back to type it twice."
 msgstr "savo naują slaptažodį jūs įrašėte tik kartą. Grižkite ir įrašykite jį dukart."
 
-#: ..\..\..\htsrv\profile_update.php:100
+#: ..\..\..\htsrv\profile_update.php:106
 msgid "you typed two different passwords. Go back to correct that."
 msgstr "jūs įrašėte du skirtingus slaptažodžius. Grįžkite ir ištaisykite tai."
 
@@ -4834,8 +4698,7 @@ msgstr "Prašome įrašyti tą patį slaptažodį į abu slaptažodžių laukeli
 msgid "this login is already registered, please choose another one"
 msgstr "Prisijungimo vardas jau užimtas, pasirinkite kitą."
 
-#: ..\..\..\htsrv\register.php:119
-#: ..\..\..\htsrv\register.php:123
+#: ..\..\..\htsrv\register.php:119 ..\..\..\htsrv\register.php:123
 msgid "new user registration on your blog"
 msgstr "Jūsų bloge užsiregistravo naujas vartotojas"
 
@@ -4843,19 +4706,16 @@ msgstr "Jūsų bloge užsiregistravo naujas vartotojas"
 msgid "Manage users"
 msgstr "Redaguoti vartotojus"
 
-#: ..\..\..\htsrv\trackback.php:98
-#: ..\..\..\htsrv\trackback.php:103
+#: ..\..\..\htsrv\trackback.php:107 ..\..\..\htsrv\trackback.php:112
 #, php-format
 msgid "New trackback on your post #%d \"%s\""
 msgstr "Naujas trakbakas temoje #%d \"%s\""
 
-#: ..\..\..\htsrv\trackback.php:105
-#: ..\..\..\xmlsrv\xmlrpc.php:1407
+#: ..\..\..\htsrv\trackback.php:114 ..\..\..\xmlsrv\xmlrpc.php:1410
 msgid "Website"
 msgstr "Svetainė"
 
-#: ..\..\..\htsrv\trackback.php:107
-#: ..\..\..\xmlsrv\xmlrpc.php:1409
+#: ..\..\..\htsrv\trackback.php:116 ..\..\..\xmlsrv\xmlrpc.php:1412
 msgid "Excerpt"
 msgstr "Ištrauka"
 
@@ -4864,26 +4724,23 @@ msgid "Login form"
 msgstr "Prisijungimo forma"
 
 # C:\www\b2evolution\blogs\htsrv\_login_form.php:39
-#: ..\..\..\htsrv\_login_form.php:44
+#: ..\..\..\htsrv\_login_form.php:45
 msgid "You will have to accept cookies in order to log in."
 msgstr "Norėdami prisijungti, jūs turėsite išsaugoti \"sausainiukus\"."
 
-#: ..\..\..\htsrv\_login_form.php:52
-#: ..\..\..\htsrv\_reg_form.php:32
+#: ..\..\..\htsrv\_login_form.php:53 ..\..\..\htsrv\_reg_form.php:32
 msgid "Password:"
 msgstr "Slaptažodis:"
 
-#: ..\..\..\htsrv\_login_form.php:58
-#: ..\..\..\htsrv\_reg_complete.php:25
+#: ..\..\..\htsrv\_login_form.php:59 ..\..\..\htsrv\_reg_complete.php:25
 msgid "Log in!"
 msgstr "Prisijungti!"
 
-#: ..\..\..\htsrv\_login_form.php:66
-#: ..\..\..\install\index.php:59
+#: ..\..\..\htsrv\_login_form.php:67 ..\..\..\install\index.php:64
 msgid "Go to Blogs"
 msgstr "Į blogus"
 
-#: ..\..\..\htsrv\_login_form.php:68
+#: ..\..\..\htsrv\_login_form.php:69
 msgid "Lost your password ?"
 msgstr "Pamiršote savo slaptažodį ?"
 
@@ -4942,344 +4799,338 @@ msgstr "Registruotis!"
 msgid "Log into existing account..."
 msgstr "Prisijunkite jei esate užsiregistravęs..."
 
-#: ..\..\..\install\index.php:47
+#: ..\..\..\install\index.php:52
 msgid "b2evo installer"
 msgstr "b2evo diegiklis"
 
 # C:\www\b2evolution\blogs\install\index.php:52
-#: ..\..\..\install\index.php:54
+#: ..\..\..\install\index.php:59
 msgid "Installer for version "
 msgstr "Instaliavimo programa versijai"
 
 # C:\www\b2evolution\blogs\install\index.php:54
-#: ..\..\..\install\index.php:56
+#: ..\..\..\install\index.php:61
 msgid "Current installation"
 msgstr "Dabartinė instaliacija"
 
 # C:\www\b2evolution\blogs\install\index.php:55
-#: ..\..\..\install\index.php:57
+#: ..\..\..\install\index.php:62
 msgid "Install menu"
 msgstr "Instaliavimo meniu"
 
 # C:\www\b2evolution\blogs\install\index.php:56
-#: ..\..\..\install\index.php:58
+#: ..\..\..\install\index.php:63
 msgid "PHP info"
 msgstr "PHP info"
 
-#: ..\..\..\install\index.php:60
+#: ..\..\..\install\index.php:65
 msgid "Go to Admin"
 msgstr "Į Administracija"
 
-#: ..\..\..\install\index.php:61
+#: ..\..\..\install\index.php:66
 msgid "Online"
 msgstr "Online"
 
-#: ..\..\..\install\index.php:62
+#: ..\..\..\install\index.php:67
 msgid "Manual"
 msgstr "Žinynas"
 
-#: ..\..\..\install\index.php:63
+#: ..\..\..\install\index.php:68
 msgid "Support"
 msgstr "Pagalba"
 
-#: ..\..\..\install\index.php:72
+#: ..\..\..\install\index.php:77
 msgid "Language / Locale"
 msgstr "Kalba/Lokalė"
 
 # C:\www\b2evolution\blogs\install\index.php:71
-#: ..\..\..\install\index.php:73
+#: ..\..\..\install\index.php:78
 msgid "Choose a default language/locale for your b2evo installation."
 msgstr "Pasirinkite pagrindinę kalbą/lokalę b2evolution instaliavimui."
 
 # C:\www\b2evolution\blogs\install\index.php:99
-#: ..\..\..\install\index.php:101
+#: ..\..\..\install\index.php:106
 msgid "Check your database config settings below and update them if necessary..."
 msgstr "Patikrinkite žemiau prisijungimo prie duomenų bazės konfigūraciją ir parinkite atitinkamą..."
 
 # C:\www\b2evolution\blogs\install\index.php:109
-#: ..\..\..\install\index.php:113
-#: ..\..\..\install\index.php:122
+#: ..\..\..\install\index.php:118 ..\..\..\install\index.php:127
 #, php-format
 msgid "The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!"
 msgstr "Minimalūs reikalavimai šiai b2evolution versijai yra %s versija %s, bet jūs bandote naudoti %s versiją!"
 
 # C:\www\b2evolution\blogs\install\index.php:132
-#: ..\..\..\install\index.php:145
+#: ..\..\..\install\index.php:150
 msgid "It seems that the database config settings you entered don't work. Please check them carefully and try again..."
 msgstr "Atrodo, kad jūsų pateikti prisijungimo prie duomenų bazės duomenys netinka. Prašome patikrinti dar kartą..."
 
 # C:\www\b2evolution\blogs\install\index.php:172
-#: ..\..\..\install\index.php:185
+#: ..\..\..\install\index.php:190
 msgid "Config file update"
 msgstr "Konfigūravimo failo atnaujinimas"
 
 # C:\www\b2evolution\blogs\install\index.php:173
-#: ..\..\..\install\index.php:186
+#: ..\..\..\install\index.php:191
 #, php-format
 msgid "We cannot automatically update your config file [%s]!"
 msgstr "Mes negalime automatiškai atnaujinti jūsų konfigūravimo failą [%s]!"
 
 # C:\www\b2evolution\blogs\install\index.php:174
-#: ..\..\..\install\index.php:187
+#: ..\..\..\install\index.php:192
 msgid "There are two ways to deal with this:"
 msgstr "Yra dvi galimos išeitys:"
 
 # C:\www\b2evolution\blogs\install\index.php:176
-#: ..\..\..\install\index.php:189
+#: ..\..\..\install\index.php:194
 msgid "You can allow the installer to update the config file by changing its permissions:"
 msgstr "Jūs galite leisti instaliavimo programai atnaujinti konfigūracinį failą. Tam reikia pakeisti failo leidimą:"
 
 # C:\www\b2evolution\blogs\install\index.php:178
-#: ..\..\..\install\index.php:191
+#: ..\..\..\install\index.php:196
 #, php-format
 msgid "<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>."
 msgstr "<code>chmod 666 %s</code>. Jei reikia, paskaitykite <a %s>online žinyną apie leidimus</a>."
 
 # C:\www\b2evolution\blogs\install\index.php:179
-#: ..\..\..\install\index.php:192
+#: ..\..\..\install\index.php:197
 msgid "Come back to this page and refresh/reload."
 msgstr "Grįžkite į šį puslapį ir atnaujinkite jį (refresh)."
 
 # C:\www\b2evolution\blogs\install\index.php:183
-#: ..\..\..\install\index.php:196
+#: ..\..\..\install\index.php:201
 msgid "Alternatively, you can update the config file manually:"
 msgstr "Kitas būdas, - pakeiskite konfigūravimo failą rankiniu būdu:"
 
 # C:\www\b2evolution\blogs\install\index.php:185
-#: ..\..\..\install\index.php:198
+#: ..\..\..\install\index.php:203
 msgid "Open the _config.php file locally with a text editor."
 msgstr "Atverkite _config.php failą tekstų redaktoriumi."
 
-#: ..\..\..\install\index.php:199
+#: ..\..\..\install\index.php:204
 msgid "Delete all contents!"
 msgstr "Ištrinti visą turinį!"
 
 # C:\www\b2evolution\blogs\install\index.php:187
-#: ..\..\..\install\index.php:200
+#: ..\..\..\install\index.php:205
 msgid "Copy the contents from the box below."
 msgstr "Nukopijuokite žemiau pateiktus duomenis."
 
 # C:\www\b2evolution\blogs\install\index.php:188
-#: ..\..\..\install\index.php:201
+#: ..\..\..\install\index.php:206
 msgid "Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later."
 msgstr "Įterpkite juos į savo tekstų redaktorių. <strong>DĖMESIO: įsitikinkite, kad NEATSIRADO PAPILDOMŲ TARPŲ po galutinio įterpimo <code>?&gt;</code> į failą.</strong> Bet koks papildomas tarpas, nauja eilutė, ar tarpas konfigūravimo failo pradžioje ar pabaigoje neleis išsaugoti \"sausainiuką\" kai bandysite prisijungti prie sistemos vėliau."
 
 # C:\www\b2evolution\blogs\install\index.php:189
-#: ..\..\..\install\index.php:202
+#: ..\..\..\install\index.php:207
 msgid "Save the new _config.php file locally."
 msgstr "Išsaugokite naują _config.php failą į kompiuterį."
 
 # C:\www\b2evolution\blogs\install\index.php:190
-#: ..\..\..\install\index.php:203
+#: ..\..\..\install\index.php:208
 msgid "Upload the file to your server, into the /_conf folder."
 msgstr "Nusiųskite failą į savo serverį, /conf katalogą."
 
 # C:\www\b2evolution\blogs\install\index.php:191
-#: ..\..\..\install\index.php:204
+#: ..\..\..\install\index.php:209
 #, php-format
 msgid "<a %s>Call the installer from scratch</a>."
 msgstr "<a %s>Pradėkite instaliavimą iš pradžių</a>."
 
 # C:\www\b2evolution\blogs\install\index.php:195
-#: ..\..\..\install\index.php:208
+#: ..\..\..\install\index.php:213
 msgid "This is how your _config.php should look like:"
 msgstr "Štai kaip turi atrodyti _config.php failas:"
 
 # C:\www\b2evolution\blogs\install\index.php:215
-#: ..\..\..\install\index.php:228
+#: ..\..\..\install\index.php:233
 #, php-format
 msgid "Your configuration file [%s] has been successfully updated."
 msgstr "Jūsų konfigūravimo failas [%s] sėkmingai atnaujintas."
 
-#: ..\..\..\install\index.php:261
+#: ..\..\..\install\index.php:266
 msgid "Base configuration"
 msgstr "Pagrindiniai nustatymai"
 
 # C:\www\b2evolution\blogs\install\index.php:247
-#: ..\..\..\install\index.php:263
+#: ..\..\..\install\index.php:268
 msgid "Your base config file has not been edited yet. You can do this by filling in the form below."
 msgstr "Jūsų pagrindinis konfigūravimo failas dar neredaguotas. Jūs galite tai padaryti užpildydami formą žemiau."
 
 # C:\www\b2evolution\blogs\install\index.php:249
-#: ..\..\..\install\index.php:265
+#: ..\..\..\install\index.php:270
 msgid "This is the minimum info we need to set up b2evolution on this server:"
 msgstr "Tai minimali informacija, reikalinga b2evolution šiame serveryje:"
 
 # C:\www\b2evolution\blogs\install\index.php:256
-#: ..\..\..\install\index.php:272
+#: ..\..\..\install\index.php:277
 msgid "Database you want to install into"
 msgstr "Duomenų bazės informacija"
 
-#: ..\..\..\install\index.php:274
-#: ..\..\..\install\index.php:378
+#: ..\..\..\install\index.php:279 ..\..\..\install\index.php:384
 msgid "mySQL Username"
 msgstr "mySQL Vartotojas"
 
 # C:\www\b2evolution\blogs\install\index.php:258
-#: ..\..\..\install\index.php:274
+#: ..\..\..\install\index.php:279
 msgid "Your username to access the database"
 msgstr "Duomenų bazės vartotojo vardas"
 
-#: ..\..\..\install\index.php:275
-#: ..\..\..\install\index.php:379
+#: ..\..\..\install\index.php:280 ..\..\..\install\index.php:385
 msgid "mySQL Password"
 msgstr "mySQL Slaptažodis:"
 
 # C:\www\b2evolution\blogs\install\index.php:259
-#: ..\..\..\install\index.php:275
+#: ..\..\..\install\index.php:280
 msgid "Your password to access the database"
 msgstr "Duomenų bazės vartotojo slaptažodis"
 
 # C:\www\b2evolution\blogs\install\index.php:260
 # C:\www\b2evolution\blogs\install\index.php:352
-#: ..\..\..\install\index.php:276
-#: ..\..\..\install\index.php:380
+#: ..\..\..\install\index.php:281 ..\..\..\install\index.php:386
 msgid "mySQL Database"
 msgstr "mySQL Duomenų bazė"
 
-#: ..\..\..\install\index.php:276
+#: ..\..\..\install\index.php:281
 msgid "Name of the database you want to use"
 msgstr "Duomenų bazės pavadinimas (kurią norite naudoti)"
 
 # C:\www\b2evolution\blogs\install\index.php:261
 # C:\www\b2evolution\blogs\install\index.php:353
-#: ..\..\..\install\index.php:277
-#: ..\..\..\install\index.php:381
+#: ..\..\..\install\index.php:282 ..\..\..\install\index.php:387
 msgid "mySQL Host"
 msgstr "mySQL Hostas"
 
 # C:\www\b2evolution\blogs\install\index.php:261
-#: ..\..\..\install\index.php:277
+#: ..\..\..\install\index.php:282
 msgid "You probably won't have to change this"
 msgstr "Greičiausiai jums nereikės to keisti"
 
-#: ..\..\..\install\index.php:282
+#: ..\..\..\install\index.php:287
 msgid "Additional settings"
 msgstr "Papildomi nustatymai"
 
 # C:\www\b2evolution\blogs\install\index.php:268
 # C:\www\b2evolution\blogs\install\index.php:354
-#: ..\..\..\install\index.php:284
-#: ..\..\..\install\index.php:382
+#: ..\..\..\install\index.php:289 ..\..\..\install\index.php:388
 msgid "Base URL"
 msgstr "Pagrindinis URL"
 
 # C:\www\b2evolution\blogs\install\index.php:268
-#: ..\..\..\install\index.php:284
+#: ..\..\..\install\index.php:289
 msgid "This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine's name!"
 msgstr "Tai vieta, kur jūsų b2evo blogai bus pagal standartą. PATIKRINKITE TAI LABAI ATIDŽIAI, kitaip nelabai kas veiks. Jei norite testuoti b2evolution lokaliame kompiuteryje, tam, kad galėtumėte išsaugoti prisijungimo \"sausainiukus\", jūs PRIVALOTE naudoti http://<strong>localhost</strong>/katalogas...Nenaudokite kompiuterio pavadinimo!"
 
 # C:\www\b2evolution\blogs\install\index.php:270
-#: ..\..\..\install\index.php:286
+#: ..\..\..\install\index.php:291
 msgid "Your email"
 msgstr "Jūsų el. paštas"
 
 # C:\www\b2evolution\blogs\install\index.php:270
-#: ..\..\..\install\index.php:286
+#: ..\..\..\install\index.php:291
 msgid "Will be used in severe error messages so that users can contact you. You will also receive notifications for new user registrations."
 msgstr "Bus naudojamas susisiekti su jumis, kai vartotojai pastebės klaidų. Jūs taip pat gausite pranešimus apie naujų vartotojų registraciją."
 
 # C:\www\b2evolution\blogs\install\index.php:277
-#: ..\..\..\install\index.php:293
+#: ..\..\..\install\index.php:298
 msgid "Update config file"
 msgstr "Atnaujinti konfigūravimo failą"
 
 # C:\www\b2evolution\blogs\install\index.php:297
-#: ..\..\..\install\index.php:313
+#: ..\..\..\install\index.php:318
 msgid "How do you want to install b2evolution?"
 msgstr "Kaip norite instaliuoti b2evolution?"
 
 # C:\www\b2evolution\blogs\install\index.php:301
-#: ..\..\..\install\index.php:317
+#: ..\..\..\install\index.php:322
 msgid "The installation can be done in different ways. Choose one:"
 msgstr "Instaliavimas gali būti vykdomas keliais būdais. Pasirinkite vieną:"
 
 # C:\www\b2evolution\blogs\install\index.php:304
-#: ..\..\..\install\index.php:320
+#: ..\..\..\install\index.php:325
 msgid "<strong>New Install</strong>: Install b2evolution database tables with sample data."
 msgstr "<strong>Nauja Instaliacija</strong>:Instaliuoti b2evolution duomenų lenteles su demonstracijomis."
 
 # C:\www\b2evolution\blogs\install\index.php:307
-#: ..\..\..\install\index.php:323
+#: ..\..\..\install\index.php:328
 msgid "<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version!"
 msgstr "<strong>Atnaujinti iš ankstesnės b2evolution versijos</strong>: Atnaujinti jūsų b2evolution duomenų lenteles, kad atitiktų naują versiją!"
 
 # C:\www\b2evolution\blogs\install\index.php:310
-#: ..\..\..\install\index.php:326
+#: ..\..\..\install\index.php:331
 msgid "<strong>Upgrade from Cafelog/b2 v 0.6.x</strong>: Install b2evolution database tables and copy your existing Cafelog/b2 data into them."
 msgstr "<strong>Atnaujinti iš Cafelog/b2 v 0.6.x</strong>: Instaliuoti b2evolution duomenų lenteles ir nukopijuoti jūsų Cafelog/b2 duomenis į jas."
 
 # C:\www\b2evolution\blogs\install\index.php:310
-#: ..\..\..\install\index.php:329
+#: ..\..\..\install\index.php:334
 msgid "<strong>Upgrade from Manywhere Miniblog</strong>: Install b2evolution database tables and copy your existing Miniblog data into them."
 msgstr "<strong>Atnaujinti iš Manywhere Miniblog</strong>: Instaliuokite b2evolution duomenų lenteles ir nukopijuokite jūsų Miniblog duomenis į jas."
 
 # C:\www\b2evolution\blogs\install\index.php:310
-#: ..\..\..\install\index.php:332
+#: ..\..\..\install\index.php:337
 msgid "<strong>Upgrade from WordPress v 1.2</strong>: Install b2evolution database tables and copy your existing WordPress data into them."
 msgstr "<strong>Atnaujinti iš WordPress 1.2</strong>: Instaliuokite b2evolution duomenų lenteles ir nukopijuokite jūsų wordPress duomenis į jas."
 
-#: ..\..\..\install\index.php:339
+#: ..\..\..\install\index.php:344
 msgid "Delete b2evolution tables"
 msgstr "Ištrinti b2evoltution lenteles"
 
 # C:\www\b2evolution\blogs\install\index.php:318
-#: ..\..\..\install\index.php:340
+#: ..\..\..\install\index.php:345
 msgid "If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Your Cafelog/b2 or any other tables though, if you have some, will not be touched in any way."
 msgstr "Jeigu jau buvote instaliavę b2evolution lenteles anksčiau ir norite pradėti nuo nulio, jūs privalote ištrinti egzistuojančias b2evolution lenteles prieš pradėdami instaliavimą. <strong>DĖMESIO: Visos jūsų b2evolution lentelės ir duomenys bus prarastit!!!</strong> Jūsų Cafelog/b2 ar kitos lentelės jei tokių buvo nebus paliestos."
 
 # C:\www\b2evolution\blogs\install\index.php:324
-#: ..\..\..\install\index.php:346
+#: ..\..\..\install\index.php:348
 msgid "<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location..."
 msgstr "<strong>Pakeisti pagrindinę konfigūraciją</strong> (žiūrėti žemiau): Jūs galbūt tai norėsite padaryti perkėlę failus ar duomenų bazę į kitą vietą..."
 
 # C:\www\b2evolution\blogs\install\index.php:326
-#: ..\..\..\install\index.php:348
+#: ..\..\..\install\index.php:353
 msgid "GO!"
 msgstr "Tinka!"
 
 # C:\www\b2evolution\blogs\install\index.php:333
-#: ..\..\..\install\index.php:355
+#: ..\..\..\install\index.php:360
 msgid "Need to start anew?"
 msgstr "Norite pradėti iš naujo?"
 
 # C:\www\b2evolution\blogs\install\index.php:334
-#: ..\..\..\install\index.php:356
+#: ..\..\..\install\index.php:361
 msgid "If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default."
 msgstr "Jei instaliavote b2evolution lenteles anksčiau ir norite pradėti naujai, jūs privalote ištrinti visas b2evolution lenteles prieš pradėdami naują instaliaciją. b2evolution gali ištrinti savo lenteles ir taip, bet dėl elementarių saugumo sumetimų ši funkcija išjungta."
 
 # C:\www\b2evolution\blogs\install\index.php:345
-#: ..\..\..\install\index.php:367
+#: ..\..\..\install\index.php:373
 msgid "Base config recap..."
 msgstr "Pagrindinių duomenų atnaujinimas..."
 
 # C:\www\b2evolution\blogs\install\index.php:347
-#: ..\..\..\install\index.php:369
+#: ..\..\..\install\index.php:375
 #, php-format
 msgid "If you don't see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>."
 msgstr "Jei čia nematote teisingų nustatymų, SUSTOKITE prieš judėdami pirmyn ir <a %s>atnaujinkite savo pagrindinę konfigūraciją</a>."
 
 # C:\www\b2evolution\blogs\install\index.php:351
-#: ..\..\..\install\index.php:379
+#: ..\..\..\install\index.php:385
 msgid "(Set, but not shown for security reasons)"
 msgstr "(Įvestas, bet nerodomas saugumo sumetimais)"
 
-#: ..\..\..\install\index.php:383
+#: ..\..\..\install\index.php:389
 msgid "Admin email"
 msgstr "Administratoriaus el.paštas"
 
 # C:\www\b2evolution\blogs\install\index.php:367
-#: ..\..\..\install\index.php:395
+#: ..\..\..\install\index.php:401
 msgid "Installing b2evolution tables with sample data"
 msgstr "Instaliuojamos b2evolution lentelės su demonstracijomis"
 
 # C:\www\b2evolution\blogs\install\index.php:372
-#: ..\..\..\install\index.php:400
+#: ..\..\..\install\index.php:406
 msgid "Installation successful!"
 msgstr "Instaliacija sėkmonga!"
 
 # C:\www\b2evolution\blogs\install\index.php:374
-#: ..\..\..\install\index.php:402
+#: ..\..\..\install\index.php:408
 #, php-format
 msgid ""
 "<p>Now you can <a %s>log in</a> with the login \"admin\" and password \"%s\".</p>\n"
@@ -5289,40 +5140,36 @@ msgstr ""
 "\t<p>LAikykite šį slaptažodį saugiai! Tai <em>atsitiktinis</em> slaptažodis, suteikiamas jums b2evolution instaliacijos metu. Jei jį prarasite, privalėsite ištrinti visas DB lenteles ir pradėti iš naujo.</p>"
 
 # C:\www\b2evolution\blogs\install\index.php:387
-#: ..\..\..\install\index.php:415
+#: ..\..\..\install\index.php:421
 msgid "Upgrading data in existing b2evolution database"
 msgstr "Atnaujinami egzistuojantys duomenys b2evolution duomenų bazėje"
 
 # C:\www\b2evolution\blogs\install\index.php:392
 # C:\www\b2evolution\blogs\install\index.php:412
-#: ..\..\..\install\index.php:420
-#: ..\..\..\install\index.php:440
-#: ..\..\..\install\index.php:459
-#: ..\..\..\install\index.php:479
+#: ..\..\..\install\index.php:426 ..\..\..\install\index.php:446
+#: ..\..\..\install\index.php:465 ..\..\..\install\index.php:485
 msgid "Upgrade completed successfully!"
 msgstr "Atnaujinimas baigtas sėkmingai!"
 
 # C:\www\b2evolution\blogs\install\index.php:393
 # C:\www\b2evolution\blogs\install\index.php:413
 # C:\www\b2evolution\blogs\install\_functions_evoupgrade.php:34
-#: ..\..\..\install\index.php:421
-#: ..\..\..\install\index.php:441
-#: ..\..\..\install\index.php:480
-#: ..\..\..\install\_functions_evoupgrade.php:31
+#: ..\..\..\install\index.php:427 ..\..\..\install\index.php:447
+#: ..\..\..\install\index.php:486
+#: ..\..\..\install\_functions_evoupgrade.php:128
 #, php-format
 msgid "Now you can <a %s>log in</a> with your usual %s username and password."
 msgstr "Dabar galite <a %s>prisijungti</a> naudodami savo standartinį %s vartotojo vardą ir slaptažodį."
 
 # C:\www\b2evolution\blogs\install\index.php:407
-#: ..\..\..\install\index.php:435
-#: ..\..\..\install\index.php:454
-#: ..\..\..\install\index.php:474
+#: ..\..\..\install\index.php:441 ..\..\..\install\index.php:460
+#: ..\..\..\install\index.php:480
 #, php-format
 msgid "Installing b2evolution tables and copying existing %s data"
 msgstr "Instaliuojamos b2evolution lentelės ir kopijuojami %s duomenys"
 
 # C:\www\b2evolution\blogs\install\index.php:374
-#: ..\..\..\install\index.php:460
+#: ..\..\..\install\index.php:466
 #, php-format
 msgid ""
 "<p>Now you can <a %s>log in</a> with your usual Miniblog email login cropped at 20 chars. All passwords have been reset to \"%s\".</p>\n"
@@ -5331,29 +5178,29 @@ msgstr ""
 "<p>Dabar galite <a %s>prisijungti</a> naudodami įprastą Miniblogo el.pašto prisijungimą, sutrumpintą iki 20 simbolių. Visi slaptažodžiai pakeisti į \"%s\".</p>\n"
 "<p>Įsidėmėkite šį slaptažodį! Tai <em>atsitiktinis</em> slaptažodis, suteikiamas jums b2evolution instaliacijos metu. Jei jį prarasite, privalėsite ištrinti visas DB lenteles ir pradėti iš naujo.</p>"
 
-#: ..\..\..\install\index.php:493
+#: ..\..\..\install\index.php:499
 msgid "Deleting b2evolution tables from the datatase"
 msgstr "Trinamos b2evolution lentelės iš duomenų bazės"
 
 # C:\www\b2evolution\blogs\install\index.php:430
-#: ..\..\..\install\index.php:497
+#: ..\..\..\install\index.php:503
 msgid "For security reasons, the reset feature is disabled by default."
 msgstr "Saugumo sumetimais atstatymų funkcija pagal nutylėjimą išjungta."
 
-#: ..\..\..\install\index.php:507
+#: ..\..\..\install\index.php:513
 msgid "Reset done!"
 msgstr "Atstatymas baigtas!"
 
-#: ..\..\..\install\index.php:508
+#: ..\..\..\install\index.php:514
 msgid "Back to menu"
 msgstr "Atgal į meniu"
 
-#: ..\..\..\install\index.php:515
+#: ..\..\..\install\index.php:522
 msgid "official website"
 msgstr "oficiali svetainė"
 
 # C:\www\b2evolution\blogs\install\index.php:450
-#: ..\..\..\install\index.php:517
+#: ..\..\..\install\index.php:524
 msgid "contact"
 msgstr "susisiekti"
 
@@ -5362,44 +5209,44 @@ msgstr "susisiekti"
 msgid "This blog holds all your posts upgraded from Cafelog. This blog is named '%s'. %s"
 msgstr "Šiame bloge yra visi atnaujinti įrašai iš jūsų Cafelog. Šio blogo pavadinimas - '%s'. %s"
 
-#: ..\..\..\install\_functions_create.php:404
+#: ..\..\..\install\_functions_create.php:412
 msgid "This is a sample linkblog entry"
 msgstr "Tai demonstracinis nuorodų blogo įrašas"
 
-#: ..\..\..\install\_functions_create.php:404
+#: ..\..\..\install\_functions_create.php:412
 msgid "This is sample text describing the linkblog entry. In most cases however, you'll want to leave this blank, providing just a Title and an Url for your linkblog entries (favorite/related sites)."
 msgstr "Tai demonstracinis tekstas, apibūdinantis blogrolo įrašą. Dažniausiai, jūs paliksite jį tuščią, įrašydami tik nuorodų blogo Pavadinimą ir URL (mėgstamų/susijusių svetainių). "
 
 # C:\www\b2evolution\blogs\install\_functions_create.php:425
-#: ..\..\..\install\_functions_create.php:424
+#: ..\..\..\install\_functions_create.php:432
 #, php-format
 msgid "This is the long description for the blog named '%s'. %s"
 msgstr "Tai ilgas blogo '%s' apibūdinimas. %s"
 
-#: ..\..\..\install\_functions_create.php:432
+#: ..\..\..\install\_functions_create.php:440
 msgid "This blog (blog #1) is actually a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by unchecking 'Include in public blog list' in the blogs admin."
 msgstr "Atminkite: Blog #1 yra specifinis blogas! Jis agreguoja visus įrašus iš visų sistemos blogų. Tai suteikia jums galimybę lengvai sekti šios sistemos įrašus ir straipsnius. Norėdami paslėpti šį blogą, nuimkite žymę nuo \" Įtraukti į viešą blogų sąrašą\" administracinėje blogo dalyje."
 
-#: ..\..\..\install\_functions_create.php:434
-#: ..\..\..\install\_functions_create.php:448
-#: ..\..\..\install\_functions_create.php:468
-#: ..\..\..\install\_functions_create.php:487
+#: ..\..\..\install\_functions_create.php:442
+#: ..\..\..\install\_functions_create.php:456
+#: ..\..\..\install\_functions_create.php:476
+#: ..\..\..\install\_functions_create.php:495
 #, php-format
 msgid "%s Title"
 msgstr "%s Pavadinimas"
 
-#: ..\..\..\install\_functions_create.php:439
-#: ..\..\..\install\_functions_create.php:456
-#: ..\..\..\install\_functions_create.php:473
-#: ..\..\..\install\_functions_create.php:492
+#: ..\..\..\install\_functions_create.php:447
+#: ..\..\..\install\_functions_create.php:464
+#: ..\..\..\install\_functions_create.php:481
+#: ..\..\..\install\_functions_create.php:500
 #, php-format
 msgid "Tagline for %s"
 msgstr "%s Sloganas"
 
-#: ..\..\..\install\_functions_create.php:440
-#: ..\..\..\install\_functions_create.php:457
-#: ..\..\..\install\_functions_create.php:474
-#: ..\..\..\install\_functions_create.php:493
+#: ..\..\..\install\_functions_create.php:448
+#: ..\..\..\install\_functions_create.php:465
+#: ..\..\..\install\_functions_create.php:482
+#: ..\..\..\install\_functions_create.php:501
 #, php-format
 msgid "Short description for %s"
 msgstr "%s Trumpas apibūdinimas"
@@ -5408,31 +5255,31 @@ msgstr "%s Trumpas apibūdinimas"
 # C:\www\b2evolution\blogs\install\_functions_create.php:462
 # C:\www\b2evolution\blogs\install\_functions_create.php:478
 # C:\www\b2evolution\blogs\install\_functions_create.php:497
-#: ..\..\..\install\_functions_create.php:443
-#: ..\..\..\install\_functions_create.php:461
-#: ..\..\..\install\_functions_create.php:477
-#: ..\..\..\install\_functions_create.php:496
+#: ..\..\..\install\_functions_create.php:451
+#: ..\..\..\install\_functions_create.php:469
+#: ..\..\..\install\_functions_create.php:485
+#: ..\..\..\install\_functions_create.php:504
 #, php-format
 msgid "Notes for %s"
 msgstr "Pastabos %s"
 
-#: ..\..\..\install\_functions_create.php:444
-#: ..\..\..\install\_functions_create.php:462
-#: ..\..\..\install\_functions_create.php:478
-#: ..\..\..\install\_functions_create.php:497
+#: ..\..\..\install\_functions_create.php:452
+#: ..\..\..\install\_functions_create.php:470
+#: ..\..\..\install\_functions_create.php:486
+#: ..\..\..\install\_functions_create.php:505
 #, php-format
 msgid "Keywords for %s"
 msgstr "%s Raktažodžiai"
 
-#: ..\..\..\install\_functions_create.php:485
+#: ..\..\..\install\_functions_create.php:493
 msgid "The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links."
 msgstr "Pagrindinė šio blogo paskirtis - rodyti šoniniame meniu jūsų mėgstamas/susijusias nuorodas."
 
-#: ..\..\..\install\_functions_create.php:563
+#: ..\..\..\install\_functions_create.php:571
 msgid "Clean Permalinks!"
 msgstr "Clean Permalinks!"
 
-#: ..\..\..\install\_functions_create.php:563
+#: ..\..\..\install\_functions_create.php:571
 msgid ""
 "b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.\n"
 "\n"
@@ -5442,11 +5289,11 @@ msgstr ""
 "\n"
 "Visdėlto, kai jūs būsite gerai susipažinęs su b2evolution, turėtumėte pamėginti aktyvuoti \"clean permalinks\" \"Nustatymų\" meniu... (parinkite \"Naudoti extra-path info\")"
 
-#: ..\..\..\install\_functions_create.php:569
+#: ..\..\..\install\_functions_create.php:577
 msgid "Apache optimization..."
 msgstr "Apache optimizacija..."
 
-#: ..\..\..\install\_functions_create.php:569
+#: ..\..\..\install\_functions_create.php:577
 msgid ""
 "In the <code>/blogs</code> folder as well as in <code>/blogs/admin</code> there are two files called [<code>sample.htaccess</code>]. You should try renaming those to [<code>.htaccess</code>].\n"
 "\n"
@@ -5456,11 +5303,11 @@ msgstr ""
 "\n"
 "Tai optimizuos b2evolution darbą serveryje (aišku jei jūs naudojate Apache). Šie failai nėra aktyvųs pagal nutylėjimą, kadangi kai kurie serveriai nepalaiko šių failų naudojimo ir iškart rodo klaidą. Jeigu pabandžius pervardinti šį failą ir panaudojus serveris praneša apie klaidą, pervardinkite šiuos failus kitaip arba ištrinkite juos visai."
 
-#: ..\..\..\install\_functions_create.php:575
+#: ..\..\..\install\_functions_create.php:583
 msgid "About evoSkins..."
 msgstr "Apie evoSkins..."
 
-#: ..\..\..\install\_functions_create.php:575
+#: ..\..\..\install\_functions_create.php:583
 msgid ""
 "By default, b2evolution blogs are displayed using a default skin.\n"
 "\n"
@@ -5482,12 +5329,12 @@ msgstr ""
 "\n"
 "Norėdami pradėti redaguoti odą, atidarykite jos <code>_main.php</code> failą tekstų redaktoriuje ir skaitykite komentarus. Savaime suprantama, nepamirškite perskaityti evoSkins žinyno!"
 
-#: ..\..\..\install\_functions_create.php:587
+#: ..\..\..\install\_functions_create.php:595
 msgid "Skins, Stubs and Templates..."
 msgstr "Odos, Stubai ir Šablonai..."
 
 # C:\www\b2evolution\blogs\install\_functions_create.php:588
-#: ..\..\..\install\_functions_create.php:587
+#: ..\..\..\install\_functions_create.php:595
 msgid ""
 "By default, all pre-installed blogs are displayed using a skin. (More on skins in another post.)\n"
 "\n"
@@ -5513,11 +5360,11 @@ msgstr ""
 "\n"
 "Kitas metodas, nueiti į administracinę dalį ir pateikti teisingus blogų pasiekimo parametrus. Kai naudojate stub ar šabloną, privalote įrašyti jo pavadinimą  'Stub pavadinimas' laukelyje. Kitaip arch. nuorodos neveiks."
 
-#: ..\..\..\install\_functions_create.php:601
+#: ..\..\..\install\_functions_create.php:609
 msgid "Multiple Blogs, new blogs, old blogs..."
 msgstr "Daug Blogų, nauji blogai, seni blogai..."
 
-#: ..\..\..\install\_functions_create.php:602
+#: ..\..\..\install\_functions_create.php:610
 msgid ""
 "By default, b2evolution comes with 4 blogs, named 'Blog All', 'Blog A', 'Blog B' and 'Linkblog'.\n"
 "\n"
@@ -5532,12 +5379,12 @@ msgstr ""
 "Blogų administracinėje dalyje jūs galite sukurti papildomus blogus."
 
 # C:\www\b2evolution\blogs\install\_functions_create.php:612
-#: ..\..\..\install\_functions_create.php:611
+#: ..\..\..\install\_functions_create.php:619
 msgid "This is a multipage post"
 msgstr "Tįrašas iš daugėlio puslapių."
 
 # C:\www\b2evolution\blogs\install\_functions_create.php:612
-#: ..\..\..\install\_functions_create.php:611
+#: ..\..\..\install\_functions_create.php:619
 msgid ""
 "This is page 1 of a multipage post.\n"
 "\n"
@@ -5576,12 +5423,12 @@ msgstr ""
 "Tai paskutinis puslapis."
 
 # C:\www\b2evolution\blogs\install\_functions_create.php:632
-#: ..\..\..\install\_functions_create.php:631
+#: ..\..\..\install\_functions_create.php:639
 msgid "Extended post with no teaser"
 msgstr "Išplėstinis įrašas be teaserio"
 
 # C:\www\b2evolution\blogs\install\_functions_create.php:632
-#: ..\..\..\install\_functions_create.php:631
+#: ..\..\..\install\_functions_create.php:639
 msgid ""
 "This is an extended post with no teaser. This means that you won't see this teaser any more when you click the \"more\" link.\n"
 "\n"
@@ -5595,12 +5442,12 @@ msgstr ""
 "\n"
 "Tai išplėstinis tekstas (teaseris). Jūs matysite jį jeipaspaudėte \"daugiau\" nuorodą."
 
-#: ..\..\..\install\_functions_create.php:639
+#: ..\..\..\install\_functions_create.php:647
 msgid "Extended post"
 msgstr "Visas įrašas"
 
 # C:\www\b2evolution\blogs\install\_functions_create.php:640
-#: ..\..\..\install\_functions_create.php:639
+#: ..\..\..\install\_functions_create.php:647
 msgid ""
 "This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.\n"
 "\n"
@@ -5614,11 +5461,11 @@ msgstr ""
 "\n"
 "Tai išplėstinis tekstas. Jūs matote jį, nes pasinaudojote \"daugiau\" nuoroda."
 
-#: ..\..\..\install\_functions_create.php:647
+#: ..\..\..\install\_functions_create.php:655
 msgid "Important information"
 msgstr "Svarbi informacija"
 
-#: ..\..\..\install\_functions_create.php:647
+#: ..\..\..\install\_functions_create.php:655
 msgid ""
 "Blog B contains a few posts in the 'b2evolution Tips' category.\n"
 "\n"
@@ -5632,11 +5479,11 @@ msgstr ""
 "\n"
 "Ištrinkite šiuos straipsnius vieną po kito (aišku pirma perskaitykit ;) ). Jūs taip pat galite pakeisti jųs statusą į \"Atmestas\". Tai padės vizualiai sekti, kurie straipsniai jau skaityti."
 
-#: ..\..\..\install\_functions_create.php:685
+#: ..\..\..\install\_functions_create.php:693
 msgid "First Post"
 msgstr "Pirmas Straipsnis"
 
-#: ..\..\..\install\_functions_create.php:685
+#: ..\..\..\install\_functions_create.php:693
 msgid ""
 "<p>This is the first post.</p>\n"
 "\n"
@@ -5646,11 +5493,11 @@ msgstr ""
 "\n"
 "<p>Jis yra ir bloge A, ir bloge B.</p>"
 
-#: ..\..\..\install\_functions_create.php:691
+#: ..\..\..\install\_functions_create.php:699
 msgid "Second post"
 msgstr "Antras įrašas"
 
-#: ..\..\..\install\_functions_create.php:691
+#: ..\..\..\install\_functions_create.php:699
 msgid ""
 "<p>This is the second post.</p>\n"
 "\n"
@@ -5660,11 +5507,11 @@ msgstr ""
 "\n"
 "<p>Jis yra tik bloge A, bet priskirtas daugeliui kategorijų.</p>"
 
-#: ..\..\..\install\_functions_create.php:697
+#: ..\..\..\install\_functions_create.php:705
 msgid "Third post"
 msgstr "Trečias straipsnis"
 
-#: ..\..\..\install\_functions_create.php:697
+#: ..\..\..\install\_functions_create.php:705
 msgid ""
 "<p>This is the third post.</p>\n"
 "\n"
@@ -5674,21 +5521,21 @@ msgstr ""
 "\n"
 "<p>Jis yra tik bloge B ir tik vienoje kategorijoje.</p>"
 
-#: ..\..\..\install\_functions_create.php:719
+#: ..\..\..\install\_functions_create.php:727
 msgid "Hi, this is a comment.<br />To delete a comment, just log in, and view the posts' comments, there you will have the option to edit or delete them."
 msgstr "Sveiki, čia yra komentaras.<br />Norėdami jį ištrinti, prisijunkite ir peržiūrėkite įrašo komentarus. Ten atsiras galimybė juos redaguoti arba ištrinti."
 
 # C:\www\b2evolution\blogs\install\_functions_evoupgrade.php:33
-#: ..\..\..\install\_functions_evoupgrade.php:30
+#: ..\..\..\install\_functions_evoupgrade.php:127
 msgid "The database schema is already up to date. There is nothing to do."
 msgstr "Duoemnų bazės schema yra naujausias. Nėra ką čia veikti."
 
-#: ..\..\..\install\_functions_evoupgrade.php:229
+#: ..\..\..\install\_functions_evoupgrade.php:327
 #, php-format
 msgid "It appears that the following blog stub names are used more than once: ['%s']"
 msgstr "Panašu, kad šie blogų stub pavadinimai naudojami daugiau nei kaartą: ['%s']"
 
-#: ..\..\..\install\_functions_evoupgrade.php:231
+#: ..\..\..\install\_functions_evoupgrade.php:329
 #, php-format
 msgid "I can't upgrade until you make them unique. DB field: [%s]"
 msgstr "Negaliu atnaujinti, kol nepasirinksite unikalių pavadinimų. DB lentelė: [%s]"
@@ -5717,11 +5564,6 @@ msgstr "Ši versija pernelyg nauja! Mes negalime pažeminti jos!"
 #, php-format
 msgid "This blog holds all your posts upgraded from Miniblog. This blog is named '%s'. %s"
 msgstr "Šiame bloge yra visi atnaujinti įrašai iš jūsų Miniblogo. Šio blogo pavadinimas - '%s'. %s"
-
-#: ..\..\..\install\_functions_wordpress.php:30
-#, php-format
-msgid "This blog holds all your posts upgraded from WordPress. This blog is named '%s'. %s"
-msgstr "Šiame bloge yra visi atnaujinti įrašai iš jūsų WordPress. Šio blogo pavadinimas - '%s'. %s"
 
 # C:\www\b2evolution\blogs\plugins\plugin.class.php:39
 #: ..\..\..\plugins\plugin.class.php:44
@@ -5782,6 +5624,32 @@ msgstr "Konvertuoti tekstines šypsenėles į ikonas"
 #: ..\..\..\plugins\renderers\_textile.renderer.php:237
 msgid "Humane Web Text Generator 2.0 beta"
 msgstr "Humane Web Text Generatorius 2.0 beta"
+
+# C:\www\b2evolution\blogs\plugins\renderers\_gmcode.renderer.php:58
+#: ..\..\..\plugins\renderers\_wacko.renderer.php:79
+#, fuzzy
+msgid "Wacko style formatting"
+msgstr "GreyMatter stiliaus formatavimas"
+
+# D:\www\b2evo091\blogs\plugins\renderers\_wacko.renderer.php:80
+#: ..\..\..\plugins\renderers\_wacko.renderer.php:80
+msgid ""
+"== h2 ==\n"
+"=== h3 ===\n"
+"==== h4 ====\n"
+"===== h5 =====\n"
+"====== h6 ======"
+msgstr ""
+
+# D:\www\b2evo091\blogs\plugins\renderers\_wikilinks.renderer.php:42
+#: ..\..\..\plugins\renderers\_wikilinks.renderer.php:42
+msgid "Wiki Links converter"
+msgstr ""
+
+# D:\www\b2evo091\blogs\plugins\renderers\_wikilinks.renderer.php:43
+#: ..\..\..\plugins\renderers\_wikilinks.renderer.php:43
+msgid "WikiWord links ((link)) [[link ]]"
+msgstr ""
 
 # C:\www\b2evolution\blogs\plugins\toolbars\_quicktags.toolbar.php:33
 #: ..\..\..\plugins\toolbars\_quicktags.toolbar.php:46
@@ -5858,111 +5726,80 @@ msgid "One click smilies inserting"
 msgstr "Šypsenėlių įterpimas vienu paspaudimu"
 
 #  TRANS: All categories, skin's categories list
+#. TRANS: All categories, skin's categories list
 #: ..\..\..\skins\_categories.php:17
 msgid "All"
 msgstr "Visi"
 
-#: ..\..\..\skins\_feedback.php:77
-#: ..\..\..\skins\basic\_feedback.php:77
+#: ..\..\..\skins\_feedback.php:77 ..\..\..\skins\basic\_feedback.php:77
 msgid "Trackback address for this post:"
 msgstr "Šios temos trakbako URL:"
 
 #  TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
 #. TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
-#: ..\..\..\skins\_feedback.php:95
-#: ..\..\..\skins\basic\_feedback.php:96
+#: ..\..\..\skins\_feedback.php:95 ..\..\..\skins\basic\_feedback.php:96
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:97
 #: ..\..\..\skins\wpc_default\_feedback.php:97
 #, php-format
 msgid "No %s for this post yet..."
 msgstr "%s šiai temai nėra..."
 
-#: ..\..\..\skins\_feedback.php:185
-#: ..\..\..\skins\basic\_feedback.php:180
+#: ..\..\..\skins\_feedback.php:176 ..\..\..\skins\basic\_feedback.php:180
 msgid "Your email address will <strong>not</strong> be displayed on this site."
 msgstr "Jūsų elektroninio pašto adresas <strong>nebus</strong> paviešintas."
 
-#: ..\..\..\skins\_feedback.php:190
-#: ..\..\..\skins\basic\_feedback.php:185
+#: ..\..\..\skins\_feedback.php:178 ..\..\..\skins\basic\_feedback.php:185
 msgid "Site/Url"
 msgstr "Svetainė/Url"
 
-#: ..\..\..\skins\_feedback.php:192
-#: ..\..\..\skins\basic\_feedback.php:187
+#: ..\..\..\skins\_feedback.php:178 ..\..\..\skins\basic\_feedback.php:187
 msgid "Your URL will be displayed."
 msgstr "Jūsų URL bus parodytas."
 
-#: ..\..\..\skins\_feedback.php:213
-#: ..\..\..\skins\basic\_feedback.php:207
-#: ..\..\..\skins\wpc_aubmach\_feedback.php:208
-#: ..\..\..\skins\wpc_default\_feedback.php:208
+#: ..\..\..\skins\_feedback.php:195 ..\..\..\skins\basic\_feedback.php:206
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:207
+#: ..\..\..\skins\wpc_default\_feedback.php:207
 msgid "Line breaks become &lt;br /&gt;"
 msgstr "Eilutės perkėlimai tampa &lt;br /&gt;"
 
-#: ..\..\..\skins\_feedback.php:218
-#: ..\..\..\skins\basic\_feedback.php:212
-#: ..\..\..\skins\wpc_aubmach\_feedback.php:213
-#: ..\..\..\skins\wpc_default\_feedback.php:213
+#: ..\..\..\skins\_feedback.php:200 ..\..\..\skins\basic\_feedback.php:211
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:212
+#: ..\..\..\skins\wpc_default\_feedback.php:212
 msgid "Remember me"
 msgstr "Prisiminti mane"
 
-#: ..\..\..\skins\_feedback.php:218
-#: ..\..\..\skins\basic\_feedback.php:212
-#: ..\..\..\skins\wpc_aubmach\_feedback.php:213
-#: ..\..\..\skins\wpc_default\_feedback.php:213
+#: ..\..\..\skins\_feedback.php:200 ..\..\..\skins\basic\_feedback.php:211
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:212
+#: ..\..\..\skins\wpc_default\_feedback.php:212
 msgid "(Set cookies for name, email &amp; url)"
 msgstr "(Išsaugoti sausainiuką vardui, emailui ir url)"
 
-#: ..\..\..\skins\_lastcomments.php:33
-#: ..\..\..\xmlsrv\atom.comments.php:38
-#: ..\..\..\xmlsrv\rdf.comments.php:54
-#: ..\..\..\xmlsrv\rss.comments.php:41
+#: ..\..\..\skins\_lastcomments.php:33 ..\..\..\xmlsrv\atom.comments.php:38
+#: ..\..\..\xmlsrv\rdf.comments.php:54 ..\..\..\xmlsrv\rss.comments.php:41
 #: ..\..\..\xmlsrv\rss2.comments.php:43
 msgid "In response to:"
 msgstr "Komentaras:"
 
-#: ..\..\..\skins\_linkblog.php:31
-#: ..\..\..\skins\custom\_linkblog.php:21
+#: ..\..\..\skins\_linkblog.php:31 ..\..\..\skins\custom\_linkblog.php:21
 msgid "Linkblog"
 msgstr "Nuorodos"
 
-#: ..\..\..\skins\_linkblog.php:71
-#: ..\..\..\skins\wpc_aubmach\_linkblog.php:70
+#: ..\..\..\skins\_linkblog.php:71 ..\..\..\skins\wpc_aubmach\_linkblog.php:70
 #: ..\..\..\skins\wpc_default\_linkblog.php:70
 msgid "more"
 msgstr "daugiau"
 
-#: ..\..\..\skins\_profile.php:79
-#: ..\..\..\skins\basic\_profile.php:80
+#: ..\..\..\skins\_profile.php:65 ..\..\..\skins\basic\_profile.php:80
 msgid "AOL I.M."
 msgstr "AOL I.M."
 
-#: ..\..\..\skins\_profile.php:80
-#: ..\..\..\skins\basic\_profile.php:81
+#: ..\..\..\skins\_profile.php:66 ..\..\..\skins\basic\_profile.php:81
 msgid "MSN I.M."
 msgstr "MSN I.M."
 
-#: ..\..\..\skins\_profile.php:81
-#: ..\..\..\skins\basic\_profile.php:82
+#: ..\..\..\skins\_profile.php:67 ..\..\..\skins\basic\_profile.php:82
 msgid "Yahoo I.M."
 msgstr "Yahoo I.M."
-
-#: ..\..\..\skins\_stats.php:57
-msgid "Top refering engines"
-msgstr "Daugiausiai nuorodų iš"
-
-#: ..\..\..\skins\babyblues\_bloglist.php:23
-msgid "blogs"
-msgstr "blogai"
-
-#: ..\..\..\skins\babyblues\_main.php:111
-msgid "skin the site"
-msgstr "Pasirinkite šabloną"
-
-#: ..\..\..\skins\babyblues\_main.php:120
-#: ..\..\..\skins\originalb2\_main.php:181
-msgid "archives"
-msgstr "archyvai"
 
 #: ..\..\..\skins\basic\_bloglist.php:23
 msgid "Select blog:"
@@ -5972,8 +5809,7 @@ msgstr "Pasirinkite blogą:"
 msgid "Select skin:"
 msgstr "Pasirinkite odą:"
 
-#: ..\..\..\skins\basic\_main.php:98
-#: ..\..\..\skins\custom\_main.php:93
+#: ..\..\..\skins\basic\_main.php:98 ..\..\..\skins\custom\_main.php:93
 msgid "words"
 msgstr "žodžių:"
 
@@ -5983,20 +5819,35 @@ msgstr "žodžių:"
 msgid "Read more..."
 msgstr "Daugiau..."
 
-#: ..\..\..\skins\bluesky\_main.php:176
-#: ..\..\..\skins\guadeloupe\_main.php:178
+#: ..\..\..\skins\bluesky\_main.php:168
+#: ..\..\..\skins\guadeloupe\_main.php:170
 msgid "Choose a skin"
 msgstr "Pasirinkite šabloną"
 
-#: ..\..\..\skins\custom\_main.php:221
-#: ..\..\..\skins\wpc_aubmach\_main.php:151
-#: ..\..\..\skins\wpc_default\_main.php:154
+#: ..\..\..\skins\custom\_main.php:163
+#, fuzzy
+msgid "Previous"
+msgstr "Ankstesni %d"
+
+#: ..\..\..\skins\custom\_main.php:163
+#, fuzzy
+msgid "Next"
+msgstr "Sekantys %d"
+
+#: ..\..\..\skins\custom\_main.php:213
+#: ..\..\..\skins\natural_pink\_main.php:205
+#: ..\..\..\skins\wpc_aubmach\_main.php:150
+#: ..\..\..\skins\wpc_default\_main.php:153
 msgid "Choose skin"
 msgstr "Pasirinkite šabloną"
 
 #: ..\..\..\skins\originalb2\_main.php:73
 msgid "Browse all posts by this author"
 msgstr "Peržiūrėti visus šio autoriaus įrašus"
+
+#: ..\..\..\skins\originalb2\_main.php:176
+msgid "archives"
+msgstr "archyvai"
 
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:86
 #: ..\..\..\skins\wpc_default\_feedback.php:86
@@ -6019,103 +5870,150 @@ msgid "Pingback from"
 msgstr "Pingbakas iš:"
 
 #: ..\..\..\skins\wpc_aubmach\_feedback.php:132
-#: ..\..\..\skins\wpc_aubmach\_main.php:73
+#: ..\..\..\skins\wpc_aubmach\_main.php:72
 #: ..\..\..\skins\wpc_default\_feedback.php:132
-#: ..\..\..\skins\wpc_default\_main.php:73
+#: ..\..\..\skins\wpc_default\_main.php:72
 msgid "Edit This"
 msgstr "Redaguoti"
 
-#: ..\..\..\skins\wpc_aubmach\_feedback.php:186
-#: ..\..\..\skins\wpc_default\_feedback.php:186
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:185
+#: ..\..\..\skins\wpc_default\_feedback.php:185
 msgid "E-mail"
 msgstr "El. paštas"
 
-#: ..\..\..\skins\wpc_aubmach\_feedback.php:199
-#: ..\..\..\skins\wpc_default\_feedback.php:199
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:198
+#: ..\..\..\skins\wpc_default\_feedback.php:198
 msgid "Your Comment"
 msgstr "Jūsų Komentaras"
 
-#: ..\..\..\skins\wpc_aubmach\_feedback.php:219
-#: ..\..\..\skins\wpc_default\_feedback.php:219
+#: ..\..\..\skins\wpc_aubmach\_feedback.php:218
+#: ..\..\..\skins\wpc_default\_feedback.php:218
 msgid "Say It!"
 msgstr "Sakyti!"
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:72
-#: ..\..\..\skins\wpc_default\_main.php:72
+#: ..\..\..\skins\wpc_aubmach\_main.php:71
+#: ..\..\..\skins\wpc_default\_main.php:71
 msgid "Filed under:"
 msgstr "Parašytas::"
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:161
-#: ..\..\..\skins\wpc_default\_main.php:164
+#: ..\..\..\skins\wpc_aubmach\_main.php:160
+#: ..\..\..\skins\wpc_default\_main.php:163
 msgid "Other"
 msgstr "Kita"
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:173
-#: ..\..\..\skins\wpc_default\_main.php:176
+#: ..\..\..\skins\wpc_aubmach\_main.php:172
+#: ..\..\..\skins\wpc_default\_main.php:175
 msgid "Meta"
 msgstr "Meta"
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:175
-#: ..\..\..\skins\wpc_default\_main.php:178
+#: ..\..\..\skins\wpc_aubmach\_main.php:174
+#: ..\..\..\skins\wpc_default\_main.php:177
 msgid "Syndicate this site using RSS"
 msgstr "Agreguoti šio blogo RSS"
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:175
-#: ..\..\..\skins\wpc_default\_main.php:178
+#: ..\..\..\skins\wpc_aubmach\_main.php:174
+#: ..\..\..\skins\wpc_default\_main.php:177
 msgid "<abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
 msgstr "<abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:176
-#: ..\..\..\skins\wpc_default\_main.php:179
+#: ..\..\..\skins\wpc_aubmach\_main.php:175
+#: ..\..\..\skins\wpc_default\_main.php:178
 msgid "The latest comments to all posts in RSS"
 msgstr "Naujausi visų temų komentarai RSS"
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:176
-#: ..\..\..\skins\wpc_default\_main.php:179
+#: ..\..\..\skins\wpc_aubmach\_main.php:175
+#: ..\..\..\skins\wpc_default\_main.php:178
 msgid "Comments <abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
 msgstr "Komentarų <abbr title=\"Really Simple Syndication\">RSS</abbr> 2.0"
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:177
-#: ..\..\..\skins\wpc_default\_main.php:180
+#: ..\..\..\skins\wpc_aubmach\_main.php:176
+#: ..\..\..\skins\wpc_default\_main.php:179
 msgid "This page validates as XHTML 1.0 Transitional"
 msgstr "Šis puslapis atitinka XHTML 1.0 Transitional standartą"
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:177
-#: ..\..\..\skins\wpc_default\_main.php:180
+#: ..\..\..\skins\wpc_aubmach\_main.php:176
+#: ..\..\..\skins\wpc_default\_main.php:179
 msgid "Valid <abbr title=\"eXtensible HyperText Markup Language\">XHTML</abbr>"
 msgstr "Taisyklingas <abbr title=\"eXtensible HyperText Markup Language\">XHTML</abbr>"
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:178
-#: ..\..\..\skins\wpc_aubmach\_main.php:188
-#: ..\..\..\skins\wpc_default\_main.php:181
-#: ..\..\..\skins\wpc_default\_main.php:191
+#: ..\..\..\skins\wpc_aubmach\_main.php:177
+#: ..\..\..\skins\wpc_aubmach\_main.php:187
+#: ..\..\..\skins\wpc_default\_main.php:180
+#: ..\..\..\skins\wpc_default\_main.php:190
 msgid "Powered by b2evolution; multilingual multiuser multi-blog engine."
 msgstr "Sukasi ant b2evolution; daugiakalbis daugiavartotojiškas multiblogas!"
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:189
-#: ..\..\..\skins\wpc_default\_main.php:192
+#: ..\..\..\skins\wpc_aubmach\_main.php:188
+#: ..\..\..\skins\wpc_default\_main.php:191
 msgid "This skin features a CSS file originally designed for WordPress (See design credits in style.css)."
 msgstr "Šioje odoje naudojamas CSS failas pirmiausia buvo sukurtas WordPress'ui (Dizaino autoriai style.css faile)."
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:190
-#: ..\..\..\skins\wpc_default\_main.php:193
+#: ..\..\..\skins\wpc_aubmach\_main.php:189
+#: ..\..\..\skins\wpc_default\_main.php:192
 msgid "Original design credits for this skin:"
 msgstr "Originalus dizainas:"
 
-#: ..\..\..\skins\wpc_aubmach\_main.php:191
-#: ..\..\..\skins\wpc_default\_main.php:194
+#: ..\..\..\skins\wpc_aubmach\_main.php:190
+#: ..\..\..\skins\wpc_default\_main.php:193
 msgid "In order to ensure maximum compatibility with WP CSS files, most b2evolution features that do not exist in WP are hidden from this generic wpc_* skin."
 msgstr "Norint užtikrinti maksimalų suderinamumą su WP CSS failais, dauguma b2evolution funkcijų, kurios neegzistuoja WP'se, yra paslėptos šioje standartinėje wpc_* odoje."
 
-#: ..\..\..\xmlsrv\rdf.php:59
-#: ..\..\..\xmlsrv\rss.php:42
+#: ..\..\..\xmlsrv\rdf.php:60 ..\..\..\xmlsrv\rss.php:42
 #: ..\..\..\xmlsrv\rss2.php:49
 msgid "[...] Read more!"
 msgstr "[...] Daugiau!"
 
-#: ..\..\..\xmlsrv\xmlrpc.php:1401
-#: ..\..\..\xmlsrv\xmlrpc.php:1405
+#: ..\..\..\xmlsrv\xmlrpc.php:1404 ..\..\..\xmlsrv\xmlrpc.php:1408
 #, php-format
 msgid "New pingback on your post #%d \"%s\""
 msgstr "Naujas pingbakas temoje #%d \"%s\""
 
+# attention ? la longueur
+#~ msgid "Some viewing statistics"
+#~ msgstr "Statistika"
+
+#~ msgid "Recent Referers"
+#~ msgstr "Naujausi Referalai"
+
+#~ msgid "Top Referers"
+#~ msgstr "Top Referalai"
+
+#~ msgid "update template !"
+#~ msgstr "atnaujinti šabloną !"
+
+#~ msgid "This is the template that displays stats for a blog"
+#~ msgstr "Tai šablonas, kuris rodo blogo statistiką"
+
+#~ msgid "Update blog!"
+#~ msgstr "Atnaujinti blogą!"
+
+#~ msgid "Create new blog!"
+#~ msgstr "Sukurti naują blogą!"
+
+#~ msgid "&nbsp; Edit &nbsp;"
+#~ msgstr "&nbsp; Redaguoti &nbsp;"
+
+#~ msgid "URLs, email, AIM and ICQs will be converted automatically."
+#~ msgstr "URL, el. pašto adresai, AIM ir ICQ bus konvertuoti automatiškai."
+
+# C:\www\b2evolution\blogs\b2evocore\_class_db.php:86
+#~ msgid "Error selecting database [%s]!"
+#~ msgstr "Duomenų bazės pasirinkimo klaida [%s]!"
+
+#~ msgid "MySQL error!"
+#~ msgstr "MySQL klaida!"
+
+#~ msgid "Simpl. Chinese (CN)"
+#~ msgstr "Supaprastinta Kinų (CN)"
+
+#~ msgid "This blog holds all your posts upgraded from WordPress. This blog is named '%s'. %s"
+#~ msgstr "Šiame bloge yra visi atnaujinti įrašai iš jūsų WordPress. Šio blogo pavadinimas - '%s'. %s"
+
+#~ msgid "Top refering engines"
+#~ msgstr "Daugiausiai nuorodų iš"
+
+#~ msgid "blogs"
+#~ msgstr "blogai"
+
+#~ msgid "skin the site"
+#~ msgstr "Pasirinkite šabloną"
