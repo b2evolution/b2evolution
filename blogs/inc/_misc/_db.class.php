@@ -511,13 +511,28 @@ class DB
 
 		// Replace aliases:
 		// TODO: this should only replace the table name part(s), not the whole query!
-		$query = preg_replace( $this->dbaliases, $this->dbreplaces, $query );
-		// echo '<p>'.$query.'</p>';
+		// blueyed> I've changed it to replace in table name parts for UPDATE, INSERT and REPLACE, because
+		//          it corrupted serialized data..
+		//          IMHO, a cleaner solution would be to use {T_xxx} in the queries and replace it here. In object properties (e.g. DataObject::dbtablename), only "T_xxx" would get used and surrounded by "{..}" in the queries it creates.
 
-		if( preg_match( '#^ \s* create \s* table \s #ix', $query) )
-		{ // Query is a table creation, we add table options:
-			$query .= $this->table_options;
+		if( preg_match( '~^\s*(UPDATE\s+)(.*?)(\sSET\s.*)$~is', $query, $match ) )
+		{ // replace only between UPDATE and SET:
+			$query = $match[1].preg_replace( $this->dbaliases, $this->dbreplaces, $match[2] ).$match[3];
 		}
+		elseif( preg_match( '~^\s*(INSERT|REPLACE\s+)(.*?)(\s(VALUES|SET)\s.*)$~is', $query, $match ) )
+		{ // replace only between INSERT|REPLACE and VALUES|SET:
+			$query = $match[1].preg_replace( $this->dbaliases, $this->dbreplaces, $match[2] ).$match[3];
+		}
+		else
+		{ // replace in whole query:
+			$query = preg_replace( $this->dbaliases, $this->dbreplaces, $query );
+
+			if( preg_match( '#^ \s* create \s* table \s #ix', $query) )
+			{ // Query is a table creation, we add table options:
+				$query .= $this->table_options;
+			}
+		}
+		// echo '<p>'.$query.'</p>';
 
 		// Keep track of the last query for debug..
 		$this->last_query = $query;
@@ -810,7 +825,7 @@ class DB
 		for( $i = 0, $count = count($this->last_result); $i < $count; $i++ )
 		{
 			$key = $this->get_var( NULL, 0, $i );
-			
+
 			$new_array[$key] = $this->get_var( NULL, 1, $i );
 		}
 
@@ -1222,6 +1237,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.6  2006/05/02 22:18:26  blueyed
+ * replace aliases not in with values
+ *
  * Revision 1.5  2006/04/19 19:44:25  fplanque
  * added get_assoc()
  *
