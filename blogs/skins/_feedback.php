@@ -155,12 +155,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 		if( $preview_Comment )
 		{
-			if( $preview_Comment->Item->ID != $Item->ID )
-			{ // preview has been for another item, delete it:
-				$Session->delete('core.preview_Comment');
-				$preview_Comment = NULL;
-			}
-			else
+			if( $preview_Comment->Item->ID == $Item->ID )
 			{ // display PREVIEW:
 				?>
 				<div class="bComment" id="comment_preview">
@@ -192,6 +187,10 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 				$comment_author_email = $preview_Comment->author_email;
 				$comment_author_url = $preview_Comment->author_url;
 			}
+
+			// delete any preview comment from session data:
+			$Session->delete( 'core.preview_Comment' );
+			$preview_Comment = NULL;
 		}
 		else
 		{
@@ -300,6 +299,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.58  2006/05/02 22:39:29  blueyed
+ * Delete preview Comment if it has been displayed.
+ *
  * Revision 1.57  2006/05/02 22:25:28  blueyed
  * Comment preview for frontoffice.
  *
