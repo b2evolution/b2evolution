@@ -173,9 +173,6 @@ if( $Messages->count('error') )
 
 $Comment->dbinsert();
 
-// Trigger event: a Plugin should cleanup any temporary data here..
-$Plugins->trigger_event( 'AfterCommentFormInsert', array( 'Comment' => & $Comment ) );
-
 
 /*
  * ---------------
@@ -222,22 +219,33 @@ if( !is_logged_in() )
 	}
 }
 
-/*
- * --------------------------
- * New comment notifications:
- * --------------------------
- */
-$Comment->send_email_notifications();
 
-
-// Add a message, according to the comment's status:
-if( $Comment->status == 'published' )
-{
-	$Messages->add( T_('Your comment has been submitted.'), 'success' );
+if( $Comment->ID == 0 )
+{ // comment has not been inserted ("deleted")
+	$Messages->add( T_('Sorry, your comment has been deleted, because it has been detected as spam.'), 'error' );
 }
 else
 {
-	$Messages->add( T_('Your comment has been submitted. It will appear once it has been approved.'), 'success' );
+	// Trigger event: a Plugin should cleanup any temporary data here..
+	$Plugins->trigger_event( 'AfterCommentFormInsert', array( 'Comment' => & $Comment ) );
+
+	/*
+	 * --------------------------
+	 * New comment notifications:
+	 * --------------------------
+	 */
+	$Comment->send_email_notifications();
+
+
+	// Add a message, according to the comment's status:
+	if( $Comment->status == 'published' )
+	{
+		$Messages->add( T_('Your comment has been submitted.'), 'success' );
+	}
+	else
+	{
+		$Messages->add( T_('Your comment has been submitted. It will appear once it has been approved.'), 'success' );
+	}
 }
 // Set Messages into user's session, so they get restored on the next page (after redirect):
 $Session->set( 'Messages', $Messages );
@@ -249,6 +257,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.72  2006/05/02 04:36:24  blueyed
+ * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
+ *
  * Revision 1.71  2006/05/01 04:25:04  blueyed
  * Normalization
  *

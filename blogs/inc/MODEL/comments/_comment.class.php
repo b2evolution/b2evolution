@@ -192,7 +192,7 @@ class Comment extends DataObject
 
 	/**
 	 * Set the spam karma, as a number.
-	 * @param integer Spam karma (0-100)
+	 * @param integer Spam karma (-100 - 100)
 	 * @access protected
 	 */
 	function set_spam_karma( $spam_karma )
@@ -1024,21 +1024,29 @@ class Comment extends DataObject
 	/**
 	 * Get karma and set it before adding the Comment to DB.
 	 *
-	 * @return boolean true on success
+	 * @return boolean true on success, false if it did not get inserted
 	 */
 	function dbinsert()
 	{
-		/**
-		 * @var Plugins
-		 */
-		global $Plugins;
+		global $Plugins, $Settings;
 
-		// Get karma percentage (interval 0-100)
-		$spam_karma = $Plugins->trigger_karma_collect( 'GetSpamKarmaForComment', array( 'Comment' => & $this ), 0, 0 ); /* start with 0/0 */
+		// Get karma percentage (interval -100 - 100)
+		$spam_karma = $Plugins->trigger_karma_collect( 'GetSpamKarmaForComment', array( 'Comment' => & $this ) );
 
 		$this->set_spam_karma( $spam_karma );
 
-		// TODO: use karma threshold and apply it (to status)!
+		// Change status accordingly:
+		if( ! is_null($spam_karma) )
+		{
+			if( $spam_karma < $Settings->get('antispam_threshold_publish') )
+			{ // Publish:
+				$this->set( 'status', 'published' );
+			}
+			elseif( $spam_karma > $Settings->get('antispam_threshold_delete') )
+			{ // Delete/No insert:
+				return false;
+			}
+		}
 
 		if( $r = parent::dbinsert() )
 		{
@@ -1079,6 +1087,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2006/05/02 04:36:24  blueyed
+ * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
+ *
  * Revision 1.30  2006/05/02 01:27:55  blueyed
  * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
  *

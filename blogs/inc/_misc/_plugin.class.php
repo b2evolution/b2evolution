@@ -965,11 +965,13 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Comment': the {@link Comment} object (by reference)
-	 *   - 'karma_absolute': Absolute karma (by reference)
-	 *   - 'karma_max': Maximum karma (by reference)
+	 * @return integer|NULL Spam probability (-100 - 100).
+	 *                -100 means "absolutely no spam", 100 means "absolutely spam".
+	 *                Only if you return an integer, it gets considered (e.g., "50" or false gets ignored, but 50 gets).
 	 */
 	function GetSpamKarmaForComment( & $params )
 	{
+		return;
 	}
 
 
@@ -2051,6 +2053,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.41  2006/05/02 04:36:25  blueyed
+ * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
+ *
  * Revision 1.40  2006/05/02 01:47:58  blueyed
  * Normalization
  *

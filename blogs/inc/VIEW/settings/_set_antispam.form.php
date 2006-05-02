@@ -36,6 +36,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $Settings;
 
+global $Plugins;
+
 
 $Form = & new Form( NULL, 'antispam_checkchanges' );
 
@@ -44,12 +46,30 @@ $Form->hiddens_by_key( get_memorized() );
 
 $Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_('General') );
-	#$Form->checkbox_input( 'antispam_comments_nofollow', $Settings->get('antispam_comments_nofollow'), T_('rel="nofollow"'), array( 'note'=>T_('Use rel="nofollow" with URLs in comments. This is meant to generate no PageRank for this links.') ) );
+$Form->begin_fieldset( T_('Comments/Feedback') );
+	$Form->text( 'antispam_threshold_publish', $Settings->get('antispam_threshold_publish'), 3, T_('Publishing threshold'), T_("(-100 - 100). Automatically publish feedbacks with a spam karma below this value.") );
+	$Form->text( 'antispam_threshold_delete', $Settings->get('antispam_threshold_delete'), 3, T_('Deletion threshold'), T_("(-100 - 100). Automatically delete feedbacks with a spam karma over this value.") );
+
+	$Form->info( '', sprintf( /* TRANS: %s gets replaced by the translation for this setting */ T_('Feedbacks with a spam karma between these two thresholds will get the default status of the blog ("%s").'), T_('New feedback status') ) );
 $Form->end_fieldset();
 
 
-// TODO: comment_status threshold
+$Form->begin_fieldset( T_('Spam detection relevance weight') );
+
+echo '<p>'.T_('This defines the weight of the plugin, in relation to the others.').'</p>';
+
+$karma_plugins = $Plugins->get_list_by_events( array('GetSpamKarmaForComment') );
+
+if( empty($karma_plugins) )
+{
+	echo '<p>'.T_('There are no spam karma plugins enabled.').'</p>';
+}
+else foreach( $karma_plugins as $loop_Plugin )
+{
+	$Form->text( 'antispam_plugin_spam_weight['.$loop_Plugin->ID.']', $Plugins->index_ID_rows[$loop_Plugin->ID]['plug_spam_weight'], 2, $loop_Plugin->name );
+}
+
+$Form->end_fieldset();
 
 
 if( $current_User->check_perm( 'options', 'edit' ) )
@@ -64,6 +84,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.3  2006/05/02 04:36:25  blueyed
+ * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
+ *
  * Revision 1.2  2006/05/02 01:27:55  blueyed
  * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
  *

@@ -220,7 +220,7 @@ $schema_queries = array(
 			comment_date datetime NOT NULL,
 			comment_content text NOT NULL,
 			comment_karma int(11) NOT NULL default '0',
-			comment_spam_karma TINYINT UNSIGNED NULL,
+			comment_spam_karma TINYINT NULL,
 			comment_allow_msgform TINYINT NOT NULL DEFAULT '0',
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_post_ID (comment_post_ID),
@@ -413,6 +413,7 @@ $schema_queries = array(
 			plug_apply_rendering ENUM( 'stealth', 'always', 'opt-out', 'opt-in', 'lazy', 'never' ) NOT NULL DEFAULT 'never',
 			plug_version         VARCHAR(42) NOT NULL default '0',
 			plug_status          ENUM( 'enabled', 'disabled', 'needs_config', 'broken' ) NOT NULL,
+			plug_spam_weight     TINYINT NOT NULL DEFAULT 1,
 			PRIMARY KEY ( plug_ID ),
 			UNIQUE plug_code( plug_code ),
 			INDEX plug_status( plug_status )
@@ -603,6 +604,9 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.18  2006/05/02 04:36:25  blueyed
+ * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
+ *
  * Revision 1.17  2006/04/22 02:58:05  blueyed
  * Added Id keyword
  *

@@ -87,7 +87,7 @@ $status_options = array(
 		'published'  => T_('Published'),
 		'deprecated' => T_('Deprecated')
 	);
-$Form->select_input_array( 'new_feedback_status', $status_options, T_('New feedback status'), array(
+$Form->select_input_array( 'new_feedback_status', $status_options, T_('New feedback status') /* gets referred to in antispam settings form */, array(
 			'value' => $edited_Blog->get_setting('new_feedback_status'),
 			'note' => T_('This status will be assigned to any new comment/trackback (unless overriden by plugins).')
 		) );

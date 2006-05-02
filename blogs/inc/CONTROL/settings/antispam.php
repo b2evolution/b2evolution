@@ -52,9 +52,12 @@ switch( $action )
 		if( isset($submit['restore_defaults']) )
 		{ // RESTORE DEFAULTS:
 			$Settings->delete_array( array(
-				 ) );
+				'antispam_threshold_publish', 'antispam_threshold_delete' ) );
 
-			if( $Settings->dbupdate() )
+			// Set "spam detection relevance weight" back to 1 for all plugins:
+			$changed = $DB->query( 'UPDATE T_plugins SET plug_spam_weight = 1' );
+
+			if( $Settings->dbupdate() || $changed )
 			{
 				$Messages->add( T_('Restored default values.'), 'success' );
 			}
@@ -65,13 +68,38 @@ switch( $action )
 		}
 		else
 		{ // UPDATE:
-			#$Request->param( 'antispam_comments_nofollow', 'integer', 0 );
-			#$Settings->set( 'antispam_comments_nofollow', $antispam_comments_nofollow );
+			$Request->param_integer_range( 'antispam_threshold_publish', -100, 100, T_('The threshold must be between -100 and 100.') );
+			$Settings->set( 'antispam_threshold_publish', $antispam_threshold_publish );
+
+			$Request->param_integer_range( 'antispam_threshold_delete', -100, 100, T_('The threshold must be between -100 and 100.') );
+			$Settings->set( 'antispam_threshold_delete', $antispam_threshold_delete );
+
+			$changed_weight = false;
+			$Request->param( 'antispam_plugin_spam_weight', 'array', array() );
+			foreach( $antispam_plugin_spam_weight as $l_plugin_ID => $l_weight )
+			{
+				if( ! is_numeric($l_weight) )
+				{
+					continue;
+				}
+				if( $DB->query( '
+						UPDATE T_plugins
+						   SET plug_spam_weight = '.$DB->quote($l_weight).'
+						 WHERE plug_ID = '.(int)$l_plugin_ID ) )
+				{
+					$changed_weight = true;
+				}
+			}
+			if( $changed_weight )
+			{ // Reload plugins table (for display):
+				$Plugins->loaded_plugins_table = false;
+				$Plugins->load_plugins_table();
+			}
 
 
 			if( ! $Messages->count('error') )
 			{
-				if( $Settings->dbupdate() )
+				if( $Settings->dbupdate() || $changed_weight )
 				{
 					$Messages->add( T_('Settings updated.'), 'success' );
 				}

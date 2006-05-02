@@ -161,9 +161,12 @@ if( $errstring = $Messages->get_string( 'Cannot insert trackback, please correct
 
 
 // Record trackback into DB:
-if( ! $Comment->dbinsert() )
+$Comment->dbinsert();
+
+
+if( $Comment->ID == 0 )
 {
-	trackback_response(2, "There is an error with the database, it can't store your comment...<br />Contact the <a href=\"mailto:$admin_email\">webmaster</a>");	// TODO: check that error code 2 is ok; blueyed> why should we use "2"?
+	trackback_response( 1, T_('Sorry, your trackback has been deleted, because it has been detected as spam.') );
 }
 
 
@@ -176,7 +179,7 @@ $Comment->send_email_notifications();
 
 
 // Trigger event: a Plugin should cleanup any temporary data here..
-$Plugins->trigger_event( 'AfterTrackbackReceived', array( 'Comment' => & $Comment ) );
+$Plugins->trigger_event( 'AfterTrackbackInsert', array( 'Comment' => & $Comment ) );
 
 
 trackback_response( 0, 'ok' );
@@ -184,6 +187,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.47  2006/05/02 04:36:24  blueyed
+ * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
+ *
  * Revision 1.46  2006/05/01 05:20:38  blueyed
  * Check for duplicate content in comments/trackback.
  *

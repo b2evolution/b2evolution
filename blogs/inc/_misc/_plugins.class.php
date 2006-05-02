@@ -154,7 +154,8 @@ class Plugins
 	 * @static
 	 */
 	var $sql_load_plugins_table = '
-			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version FROM T_plugins
+			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version, plug_spam_weight
+			  FROM T_plugins
 			 WHERE plug_status = "enabled"
 			 ORDER BY plug_priority, plug_classname';
 
@@ -293,7 +294,7 @@ class Plugins
 				'AfterCommentFormInsert' => T_('Called after a comment has been added through public form.'),
 
 				'BeforeTrackbackInsert' => T_('Gets called before a trackback gets recorded.'),
-				'AfterTrackbackReceived' => T_('Gets called after a trackback has been recorded.'),
+				'AfterTrackbackInsert' => T_('Gets called after a trackback has been recorded.'),
 
 				'LoginAttempt' => T_('Called when a user tries to login.'),
 				'AlternateAuthentication' => '',
@@ -1660,33 +1661,67 @@ class Plugins
 	 *
 	 * @param string Event
 	 * @param array Params to the event
-	 * @param integer Absolute karma to start with
-	 * @param integer Maximum karma to start with
-	 * @return integer Karma percentage (rounded 0-100)
+	 * @return integer|NULL Spam Karma (-100 - 100); "100" means "absolutely spam"; NULL if no plugin gave us a karma value
 	 */
-	function trigger_karma_collect( $event, $params, $karma_absolute = 1, $karma_max = 1 )
+	function trigger_karma_collect( $event, $params )
 	{
-		$params['karma_max'] = & $karma_max;
-		$params['karma_absolute'] = & $karma_absolute;
+		global $Debuglog;
 
-		$this->trigger_event( $event, $params );
+		$spam_karma = NULL;
+		$spam_karma_divider = 0; // total of the "spam detection relevance weight"
 
-		$percentage = $karma_max ? ( $karma_absolute * 100 ) / $karma_max : 0;
+		$Debuglog->add( 'Trigger karma collect event '.$event, 'plugins' );
 
-		if( $percentage > 100 )
-		{
-			$percentage = 100;
-		}
-		elseif( $percentage < 0 )
-		{
-			$percentage = 0;
-		}
-		else
-		{
-			$percentage = round($percentage);
+		if( empty($this->index_event_IDs[$event]) )
+		{ // No events registered
+			$Debuglog->add( 'No registered plugins.', 'plugins' );
+			return $spam_karma;
 		}
 
-		return $percentage;
+
+		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
+		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
+		{
+			$karma = $this->call_method( $l_plugin_ID, $event, $params );
+
+			if( ! is_integer( $karma ) )
+			{
+				continue;
+			}
+
+			$weight = $this->index_ID_rows[$l_plugin_ID]['plug_spam_weight'];
+
+			if( $karma > 100 )
+			{
+				$karma = 100;
+			}
+			elseif( $karma < -100 )
+			{
+				$karma = -100;
+			}
+
+			$spam_karma += ( $karma * $weight );
+			$spam_karma_divider += $weight;
+
+			if( ! empty($this->_stop_propagation) )
+			{
+				$this->_stop_propagation = false;
+				break;
+			}
+		}
+
+		$spam_karma = round($spam_karma / $spam_karma_divider);
+
+		if( $spam_karma > 100 )
+		{
+			$spam_karma = 100;
+		}
+		elseif( $spam_karma < -100 )
+		{
+			$spam_karma = -100;
+		}
+
+		return $spam_karma;
 	}
 
 
@@ -2587,7 +2622,8 @@ class Plugins_admin extends Plugins
 	 * Load all plugins (not just enabled ones).
 	 */
 	var $sql_load_plugins_table = '
-			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version FROM T_plugins
+			SELECT plug_ID, plug_priority, plug_classname, plug_code, plug_apply_rendering, plug_status, plug_version, plug_spam_weight
+			  FROM T_plugins
 			 ORDER BY plug_priority, plug_classname';
 
 	var $is_admin_class = true;
@@ -2596,6 +2632,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.41  2006/05/02 04:36:25  blueyed
+ * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
+ *
  * Revision 1.40  2006/05/02 01:47:58  blueyed
  * Normalization
  *

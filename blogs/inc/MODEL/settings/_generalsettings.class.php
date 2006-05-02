@@ -57,6 +57,8 @@ class GeneralSettings extends AbstractSettings
 		'admin_skin' => 'legacy',
 
 		'antispam_last_update' => '2000-01-01 00:00:00',
+		'antispam_threshold_publish' => '-90',
+		'antispam_threshold_delete' => '90',
 
 		'archive_mode' => 'monthly',
 		'AutoBR' => '0',
@@ -146,6 +148,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.11  2006/05/02 04:36:24  blueyed
+ * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
+ *
  * Revision 1.10  2006/05/02 01:27:55  blueyed
  * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
  *

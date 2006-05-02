@@ -170,7 +170,6 @@ class basic_antispam_plugin extends Plugin
 			return;
 		}
 
-		pre_dump( date( 'H:i:s', mysql2timestamp( $Comment->date ) ), date( 'H:i:s', ( $localtimenow - $hours*3600 ) ) );
 		if( $hours > 0 // -1 is "always"
 			&& mysql2timestamp( $Comment->date ) <= ( $localtimenow - $hours*3600 ) )
 		{
@@ -198,8 +197,6 @@ class basic_antispam_plugin extends Plugin
 				{
 					return $m[1].$m[2].\' rel="nofollow">\';
 				}' ), $data );
-		pre_dump( $data );
-		#$data = preg_replace( '~<a~', '<a rel="nofollow"', $data );
 	}
 
 
@@ -443,6 +440,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.5  2006/05/02 04:36:25  blueyed
+ * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
+ *
  * Revision 1.4  2006/05/02 01:27:55  blueyed
  * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
  *
