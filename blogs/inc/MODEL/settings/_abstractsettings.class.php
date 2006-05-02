@@ -125,9 +125,6 @@ class AbstractSettings
 	 */
 	function AbstractSettings( $dbTableName, $colKeyNames, $colValueName, $cacheByColKeys = 0 )
 	{
-		global $DB;
-		$this->DB = & $DB;
-
 		$this->dbTableName = $dbTableName;
 		$this->colKeyNames = $colKeyNames;
 		$this->colValueName = $colValueName;
@@ -171,6 +168,7 @@ class AbstractSettings
 		{ // already all loaded
 			return true;
 		}
+		global $DB;
 
 		if( is_array($getArgs) && count($getArgs) != $this->count_colKeyNames )
 		{
@@ -209,7 +207,7 @@ class AbstractSettings
 		}
 
 
-		$result = $this->DB->get_results( '
+		$result = $DB->get_results( '
 			SELECT '.implode( ', ', $this->colKeyNames ).', '.$this->colValueName.'
 			FROM '.$this->dbTableName.(
 				isset( $whereList[0] )
@@ -535,6 +533,7 @@ class AbstractSettings
 		{
 			return false;
 		}
+		global $DB;
 
 		$query_insert = array();
 		$query_where_delete = array();
@@ -560,7 +559,7 @@ class AbstractSettings
 						{
 							$value = serialize($value);
 						}
-						$query_insert[] = "('$key', '".$this->DB->escape( $value )."')";
+						$query_insert[] = "('$key', '".$DB->escape( $value )."')";
 						$this->cache[$key]->dbUptodate = true;
 					}
 				}
@@ -587,7 +586,7 @@ class AbstractSettings
 							{
 								$value = serialize($value);
 							}
-							$query_insert[] = "('$key', '$key2', '".$this->DB->escape( $value )."')";
+							$query_insert[] = "('$key', '$key2', '".$DB->escape( $value )."')";
 							$this->cache[$key][$key2]->dbUptodate = true;
 						}
 					}
@@ -617,7 +616,7 @@ class AbstractSettings
 								{
 									$value = serialize($value);
 								}
-								$query_insert[] = "('$key', '$key2', '$key3', '".$this->DB->escape( $value )."')";
+								$query_insert[] = "('$key', '$key2', '$key3', '".$DB->escape( $value )."')";
 								$this->cache[$key][$key2][$key3]->dbUptodate = true;
 							}
 						}
@@ -635,7 +634,7 @@ class AbstractSettings
 		if( isset($query_where_delete[0]) )
 		{
 			$query = 'DELETE FROM '.$this->dbTableName." WHERE\n(".implode( ")\nOR (", $query_where_delete ).')';
-			$r = (boolean)$this->DB->query( $query );
+			$r = (boolean)$DB->query( $query );
 		}
 
 
@@ -643,7 +642,7 @@ class AbstractSettings
 		{
 			$query = 'REPLACE INTO '.$this->dbTableName.' ('.implode( ', ', $this->colKeyNames ).', '.$this->colValueName
 								.') VALUES '.implode(', ', $query_insert);
-			$r = $this->DB->query( $query ) || $r;
+			$r = $DB->query( $query ) || $r;
 		}
 
 		return $r;
@@ -666,6 +665,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.8  2006/05/02 22:17:10  blueyed
+ * use global DB object instead of property, so it does not get serialized with the object
+ *
  * Revision 1.7  2006/04/20 17:30:53  blueyed
  * doc
  *
