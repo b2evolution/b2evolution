@@ -959,12 +959,15 @@ class Plugin
 	/**
 	 * Event handler: Called to ask the plugin for the spam karma of a comment.
 	 *
-	 * Note: low karma (karma_absolute+=0 and karma_max+=10 means: no spam!)
-	 *
 	 * This gets called just before the comment gets stored.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Comment': the {@link Comment} object (by reference)
+	 *   - The following values are interesting if you want to provide skipping of a test:
+	 *     - 'cur_karma': current karma value (cur_karma_abs/cur_karma_divider)
+	 *     - 'cur_karma_abs': current karma absolute value
+	 *     - 'cur_karma_divider': current divider (sum of weights)
+	 *     - 'cur_count_plugins': number of Plugins that have already been asked
 	 * @return integer|NULL Spam probability (-100 - 100).
 	 *                -100 means "absolutely no spam", 100 means "absolutely spam".
 	 *                Only if you return an integer, it gets considered (e.g., "50" or false gets ignored, but 50 gets).
@@ -2053,6 +2056,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.42  2006/05/02 23:35:22  blueyed
+ * Extended karma collecting event(s)
+ *
  * Revision 1.41  2006/05/02 04:36:25  blueyed
  * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
  *

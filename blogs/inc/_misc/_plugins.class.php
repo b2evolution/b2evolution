@@ -1667,41 +1667,51 @@ class Plugins
 	{
 		global $Debuglog;
 
-		$spam_karma = NULL;
-		$spam_karma_divider = 0; // total of the "spam detection relevance weight"
+		$karma_abs = NULL;
+		$karma_divider = 0; // total of the "spam detection relevance weight"
 
 		$Debuglog->add( 'Trigger karma collect event '.$event, 'plugins' );
 
 		if( empty($this->index_event_IDs[$event]) )
 		{ // No events registered
 			$Debuglog->add( 'No registered plugins.', 'plugins' );
-			return $spam_karma;
+			return NULL;
 		}
 
 
 		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
+
+		$count_plugins = 0;
 		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
 		{
-			$karma = $this->call_method( $l_plugin_ID, $event, $params );
+			$params['cur_karma'] = ( $karma_divider ? round($karma_abs / $karma_divider) : NULL );
+			$params['cur_karma_abs'] = $karma_abs;
+			$params['cur_karma_divider'] = $karma_divider;
+			$params['cur_count_plugins'] = $count_plugins;
 
-			if( ! is_integer( $karma ) )
+			// Call the plugin:
+			$plugin_karma = $this->call_method( $l_plugin_ID, $event, $params );
+
+			if( ! is_integer( $plugin_karma ) )
 			{
 				continue;
 			}
 
-			$weight = $this->index_ID_rows[$l_plugin_ID]['plug_spam_weight'];
+			$count_plugins++;
 
-			if( $karma > 100 )
+			$plugin_weight = $this->index_ID_rows[$l_plugin_ID]['plug_spam_weight'];
+
+			if( $plugin_karma > 100 )
 			{
-				$karma = 100;
+				$plugin_karma = 100;
 			}
-			elseif( $karma < -100 )
+			elseif( $plugin_karma < -100 )
 			{
-				$karma = -100;
+				$plugin_karma = -100;
 			}
 
-			$spam_karma += ( $karma * $weight );
-			$spam_karma_divider += $weight;
+			$karma_abs += ( $plugin_karma * $plugin_weight );
+			$karma_divider += $plugin_weight;
 
 			if( ! empty($this->_stop_propagation) )
 			{
@@ -1710,18 +1720,18 @@ class Plugins
 			}
 		}
 
-		$spam_karma = round($spam_karma / $spam_karma_divider);
+		$karma = $karma_divider ? round($karma_abs / $karma_divider) : NULL;
 
-		if( $spam_karma > 100 )
+		if( $karma > 100 )
 		{
-			$spam_karma = 100;
+			$karma = 100;
 		}
-		elseif( $spam_karma < -100 )
+		elseif( $karma < -100 )
 		{
-			$spam_karma = -100;
+			$karma = -100;
 		}
 
-		return $spam_karma;
+		return $karma;
 	}
 
 
@@ -2632,6 +2642,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.42  2006/05/02 23:35:22  blueyed
+ * Extended karma collecting event(s)
+ *
  * Revision 1.41  2006/05/02 04:36:25  blueyed
  * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
  *
