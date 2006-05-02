@@ -55,6 +55,7 @@ else
 }
 // Activate default locale:
 locale_activate( $default_locale );
+$io_charset = $default_locale;
 
 $timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
 
@@ -600,6 +601,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.99  2006/05/02 03:01:15  blueyed
+ * fix
+ *
  * Revision 1.98  2006/04/29 01:24:05  blueyed
  * More decent charset support;
  * unresolved issues include:
