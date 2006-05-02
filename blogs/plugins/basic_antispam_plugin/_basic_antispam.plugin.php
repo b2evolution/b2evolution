@@ -81,6 +81,12 @@ class basic_antispam_plugin extends Plugin
 					'defaultvalue' => '48', // use "nofollow" for 2 days
 					'size' => 5,
 				),
+				'block_spam_referers' => array(
+					'type' => 'checkbox',
+					'label' => T_('Block spam referers'),
+					'note' => T_('If a referrer has been detected as spam, should be block the request with a "403 Forbidden" page?'),
+					'defaultvalue' => '1',
+				),
 			);
 	}
 
@@ -197,6 +203,26 @@ class basic_antispam_plugin extends Plugin
 				{
 					return $m[1].$m[2].\' rel="nofollow">\';
 				}' ), $data );
+	}
+
+
+	/**
+	 * Block spam referers (if activated in Settings and not on an admin page)
+	 */
+	function SessionLoaded( & $params )
+	{
+		if( $this->Settings->get( 'block_spam_referers' ) && ! is_admin_page() )
+		{
+			global $Hit, $view_path;
+			if( $Hit->referer_type == 'spam' )
+			{
+				// This is most probably referer spam,
+				// In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
+				require $view_path.'errors/_referer_spam.page.php';	// error & exit
+				exit(); // just in case.
+				// THIS IS THE END!!
+			}
+		}
 	}
 
 
@@ -440,6 +466,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.6  2006/05/02 15:32:01  blueyed
+ * Moved blocking of "spam referers" into basic antispam plugin: does not block backoffice requests in general and can be easily get disabled.
+ *
  * Revision 1.5  2006/05/02 04:36:25  blueyed
  * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
  *

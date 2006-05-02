@@ -239,11 +239,9 @@ class Hit
 			$this->referer = false;
 			// QUESTION: add domain to T_basedomains, type 'blacklist' ?
 
-			// This is most probably referer spam,
-			// In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
-			require $view_path.'errors/_referer_spam.page.php';	// error & exit
-			exit(); // just in case.
-			// THIS IS THE END!!
+			// Note: the basic_antispam_plugin will cancel the request, if it's spam
+
+			return;
 		}
 
 
@@ -598,6 +596,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.18  2006/05/02 15:32:01  blueyed
+ * Moved blocking of "spam referers" into basic antispam plugin: does not block backoffice requests in general and can be easily get disabled.
+ *
  * Revision 1.17  2006/04/29 17:37:48  blueyed
  * Added basic_antispam_plugin; Moved double-check-referers there; added check, if trackback links to us
  *
