@@ -190,6 +190,11 @@ switch( $action )
 }
 
 
+if( $blog )
+{ // for "Exit to blogs.." links
+	$Blog = & $BlogCache->get_by_ID($blog);
+}
+
 /**
  * Display page header, menus & messages:
  */
@@ -396,6 +401,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2006/05/02 18:07:13  blueyed
+ * Set blog to be used for exit to blogs link
+ *
  * Revision 1.6  2006/04/21 16:59:29  blueyed
  * cleanup
  *

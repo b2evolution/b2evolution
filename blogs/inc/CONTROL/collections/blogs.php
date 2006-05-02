@@ -35,7 +35,7 @@
  * }}
  *
  * @package admin
- * 
+ *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  * @author jwedgeco: Jason EDGECOMBE (for hire by UNC-Charlotte)
@@ -65,6 +65,8 @@ if( $action == 'edit' || $action == 'update' || $action == 'delete' || $action =
 { // we need the blog param
 	param( 'blog', 'integer', true );
 	$edited_Blog = & $BlogCache->get_by_ID( $blog );
+
+	$Blog = & $edited_Blog; // used for "Exit to blogs.." link
 }
 elseif( $action == 'new' && $blogtemplate != -1 )
 {
@@ -577,6 +579,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2006/05/02 18:07:12  blueyed
+ * Set blog to be used for exit to blogs link
+ *
  * Revision 1.11  2006/04/20 16:31:29  fplanque
  * comment moderation (finished for 1.8)
  *
