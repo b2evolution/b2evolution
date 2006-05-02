@@ -862,12 +862,13 @@ class AdminUI_general
 						'header_text_single' => '',
 					'header_end' => '</div>',
 					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
-						'head_start' => "<thead><tr>\n",
-							'head_title' => '<th colspan="$nb_cols$"><span style="float:right">$global_icons$</span>$title$</th></tr>'
-							                ."\n\n<tr>\n",
+						'head_start' => "<thead>\n",
+							'head_title' => '<tr><th colspan="$nb_cols$"><span style="float:right">$global_icons$</span>$title$</th></tr>'
+							                ."\n\n",
 							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
 							'filters_end' => '</td></tr>',
-							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre à jour admin_UI_general; utiliser colspan="$headspan$"
+							'line_start_head' => '<tr>',
+							'line_end_head' => "</tr>\n\n",
 							'colhead_start' => '<th>',
 							'colhead_start_first' => '<th class="firstcol">',
 							'colhead_start_last' => '<th class="lastcol">',
@@ -883,7 +884,7 @@ class AdminUI_general
 							'basic_sort_off' => '',
 							'basic_sort_asc' => get_icon( 'ascending' ),
 							'basic_sort_desc' => get_icon( 'descending' ),
-						'head_end' => "</tr></thead>\n\n",
+						'head_end' => "</thead>\n\n",
 						'tfoot_start' => "<tfoot>\n",
 						'tfoot_end' => "</tfoot>\n\n",
 						'body_start' => "<tbody>\n",
@@ -1271,6 +1272,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.12  2006/05/02 18:15:20  fplanque
+ * invalid xhtml fix
+ *
  * Revision 1.11  2006/04/27 18:28:33  fplanque
  * moved Blog specific stuff out of evocore
  *

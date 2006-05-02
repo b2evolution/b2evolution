@@ -687,7 +687,8 @@ class Results extends Widget
 			$th_group_activated = false; 
 			
 			// Loop on all columns to define headers cells array we have to display and set all colspans:
-			foreach( $this->cols as $key=>$col )
+			// Create a 2 dimensional array of header cells:
+			foreach( $this->cols as $key => $col )
 			{
 				if( isset( $col['th_group'] ) )
 				{ // The column is grouped with anoter column:
@@ -726,13 +727,14 @@ class Results extends Widget
 			}
 			
 			if( !$th_group_activated )
-			{	// No grouped columns, so need not the second header cell array
+			{	// No grouped columns, we keep only one line of header cells
+				// echo 'no grouped columns';
 				unset( $header_cells[1] );
 			}
 			
 			// Loop on all header cells (<tr>)
-			foreach( $header_cells as $key_cell=>$header_cell )
-			{ 
+			foreach( $header_cells as $key_cell => $header_cell )
+			{
 				echo $this->params['line_start_head'];
 			
 				$col_count = 0;
@@ -880,7 +882,7 @@ class Results extends Widget
 						echo $this->params['colhead_end'];
 					}
 				}
-				echo $this->params['line_end'];
+				echo $this->params['line_end_head'];
 			}
 		} // this->cols not set
 
@@ -1647,6 +1649,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.9  2006/05/02 18:15:20  fplanque
+ * invalid xhtml fix
+ *
  * Revision 1.8  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
