@@ -531,13 +531,7 @@ else
 	}
 }
 
-if( $Messages->count( 'login_error' ) )
-{
-	header_nocache();
-
-	require $htsrv_path.'login.php';
-	exit();
-}
+// If there are "login_error" messages, they trigger the login form at the end of this file.
 
 /* Login procedure }}} */
 
@@ -651,7 +645,18 @@ $Debuglog->add( 'io_charset (_main.inc.php): '.$io_charset, 'locale' );
  */
 require_once $conf_path.'_icons.php';
 
-//
+
+// Display login errors (and form). This uses $io_charset, so it's at the end.
+
+if( $Messages->count( 'login_error' ) )
+{
+	header_nocache();
+
+	require $htsrv_path.'login.php';
+	exit();
+}
+
+
 $Timer->pause( 'main.inc');
 
 
@@ -662,8 +667,12 @@ $Timer->resume( 'hacks.php' );
 @include_once $conf_path.'hacks.php';
 $Timer->pause( 'hacks.php' );
 
+
 /*
  * $Log$
+ * Revision 1.17  2006/05/02 05:46:08  blueyed
+ * fix
+ *
  * Revision 1.16  2006/04/29 01:24:04  blueyed
  * More decent charset support;
  * unresolved issues include:
