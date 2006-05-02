@@ -12,10 +12,10 @@
 
 	<h2>1.8 &quot;Phoenix Alpha 2 &quot; - CVS </h2>
 <ul>
-	<li>Comment moderation (enabled for each blog by default) (fplanque)</li>
 	<li>Validation of email address to activate user's account on registration (enabled by default) (blueyed)</li>
 
 	<li>Users and anonymous visitors can opt-out to receive emails through message form (blueyed)</li>
+
 	<li>Extended plugin architecture:
 		<ul>
 			<li>Event-driven instantiation of Plugins</li>
@@ -23,20 +23,27 @@
 			<li>Easy setup for a database schema a plugin wants</li>
 		</ul>
 	</li>
+
 	<li>
 		Antispam:
 		<ul>
-			<li>Double-checking referers moved to new "Basic Antispam Plugin" (blueyed)</li>
-			<li>Option to check content in trackbacks about link to your blog (blueyed)</li>
-			<li><a href="http://en.wikipedia.org/wiki/Nofollow">rel="nofollow"</a> is now optional (Settings/Antispam) (blueyed)</li>
+			<li>Comment moderation (enabled for each blog by default) (fplanque)</li>
+			<li>
+				"Basic Antispam Plugin":
+				<ul>
+					<li>Double-checking referers moved there (blueyed)</li>
+					<li>Option to check content in trackbacks about link to your blog; enabled by default (blueyed)</li>
+					<li><a href="http://en.wikipedia.org/wiki/Nofollow">rel="nofollow"</a> is now optional and used for 48 hours by default (blueyed)</li>
+				</ul>
+			</li>
 			<li>DNS Blacklist antispam plugin (blueyed)</li>
 		</ul>
 	</li>
 	<li>ItemList2 class which will replace ItemList. Better performance, security, stability and new features:
-	<ul>
-	<li>Filtering of posts on assignees with assgn=1 or assgn=1,2 or assgn=-1,2 or assgn=-</li>
-	<li>Filtering of posts on extra statuses with status=1 or status=1,2 or status=-1,2 or status=-</li>
-	</ul>
+		<ul>
+		<li>Filtering of posts on assignees with assgn=1 or assgn=1,2 or assgn=-1,2 or assgn=-</li>
+		<li>Filtering of posts on extra statuses with status=1 or status=1,2 or status=-1,2 or status=-</li>
+		</ul>
 	</li>
 	<li>db_delta() functionality that allows easier upgrading (blueyed)</li>
 

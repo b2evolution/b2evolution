@@ -261,6 +261,10 @@ class Plugins
 				'RenderItemAsXml' => T_('Renders content when generated as XML.'),
 				'RenderItem' => T_('Renders content when not generated as HTML or XML.'),
 
+				'FilterCommentAuthor' => T_('Filters the comment author.'),
+				'FilterCommentAuthorUrl' => T_('Filters the URL of the comment author.'),
+				'FilterCommentContent' => T_('Filters the content of a comment.'),
+
 				/*
 				not used yet..
 				'DisplayItemAsHtml' => T_('Called on an item when it gets displayed as HTML.'),
@@ -2592,6 +2596,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.39  2006/05/02 01:27:55  blueyed
+ * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
+ *
  * Revision 1.38  2006/05/01 04:25:07  blueyed
  * Normalization
  *

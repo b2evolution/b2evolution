@@ -57,7 +57,6 @@ class GeneralSettings extends AbstractSettings
 		'admin_skin' => 'legacy',
 
 		'antispam_last_update' => '2000-01-01 00:00:00',
-		'antispam_comments_nofollow' => '1',
 
 		'archive_mode' => 'monthly',
 		'AutoBR' => '0',
@@ -147,6 +146,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.10  2006/05/02 01:27:55  blueyed
+ * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
+ *
  * Revision 1.9  2006/05/01 22:20:20  blueyed
  * Made rel="nofollow" optional (enabled); added Antispam settings page
  *

@@ -45,7 +45,7 @@ $Form->hiddens_by_key( get_memorized() );
 $Form->hidden( 'action', 'update' );
 
 $Form->begin_fieldset( T_('General') );
-	$Form->checkbox_input( 'antispam_comments_nofollow', $Settings->get('antispam_comments_nofollow'), T_('rel="nofollow"'), array( 'note'=>T_('Use rel="nofollow" with URLs in comments. This is meant to generate no PageRank for this links.') ) );
+	#$Form->checkbox_input( 'antispam_comments_nofollow', $Settings->get('antispam_comments_nofollow'), T_('rel="nofollow"'), array( 'note'=>T_('Use rel="nofollow" with URLs in comments. This is meant to generate no PageRank for this links.') ) );
 $Form->end_fieldset();
 
 
@@ -64,6 +64,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.2  2006/05/02 01:27:55  blueyed
+ * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
+ *
  * Revision 1.1  2006/05/01 22:20:21  blueyed
  * Made rel="nofollow" optional (enabled); added Antispam settings page
  *

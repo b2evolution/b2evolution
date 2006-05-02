@@ -8,8 +8,6 @@
 header('HTTP/1.0 403 Forbidden');
 header('Content-Type: text/html; charset=iso-8859-1'); // no translation
 
-global $Settings;
-
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -26,9 +24,7 @@ global $Settings;
 		<p>If you are actually doing referer spam, please note that this website/<?php global $app_name; echo $app_name; ?> no longer records and publishes referers. Not even legitimate ones!
 		While we understand it was fun for you guys while it lasted, please understand our servers cannot take the load of
 		all this cumulated spam any longer... Thank you.</p>
-		<?php if( $Settings->get('antispam_comments_nofollow') ) { ?>
-			<p>Also, please note that comment/trackback submitted URLs will be tagged with rel="nofollow" in order to be ignored by search engines.</p>
-		<?php } ?>
+		<p>Also, please note that comment/trackback submitted URLs will be tagged with rel="nofollow" in order to be ignored by search engines.</p>
 	</body>
 </html>
 <?php

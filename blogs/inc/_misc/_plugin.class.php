@@ -1027,6 +1027,46 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: called to filter the comment's author name (blog name for trackbacks)
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the name of the author/blog (by reference)
+	 *   - 'makelink': true, if the "data" contains a link
+	 *   - 'Comment': the {@link Comment} object
+	 */
+	function FilterCommentAuthor( & $params )
+	{
+	}
+
+
+
+	/**
+	 * Event handler: called to filter the comment's author URL
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the URL of the author/blog (by reference)
+	 *   - 'makelink': true, if the "data" contains a link
+	 *   - 'Comment': the {@link Comment} object
+	 */
+	function FilterCommentAuthorUrl( & $params )
+	{
+	}
+
+
+
+	/**
+	 * Event handler: called to filter the comment's content
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the name of the author/blog (by reference)
+	 *   - 'Comment': the {@link Comment} object
+	 */
+	function FilterCommentContent( & $params )
+	{
+	}
+
 	// }}}
 
 
@@ -2011,6 +2051,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.39  2006/05/02 01:27:55  blueyed
+ * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
+ *
  * Revision 1.38  2006/05/01 04:25:05  blueyed
  * Normalization
  *

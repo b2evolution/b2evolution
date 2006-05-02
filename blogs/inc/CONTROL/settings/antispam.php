@@ -52,7 +52,7 @@ switch( $action )
 		if( isset($submit['restore_defaults']) )
 		{ // RESTORE DEFAULTS:
 			$Settings->delete_array( array(
-				'antispam_comments_nofollow', ) );
+				 ) );
 
 			if( $Settings->dbupdate() )
 			{
@@ -65,9 +65,8 @@ switch( $action )
 		}
 		else
 		{ // UPDATE:
-			// Online help
-			$Request->param( 'antispam_comments_nofollow', 'integer', 0 );
-			$Settings->set( 'antispam_comments_nofollow', $antispam_comments_nofollow );
+			#$Request->param( 'antispam_comments_nofollow', 'integer', 0 );
+			#$Settings->set( 'antispam_comments_nofollow', $antispam_comments_nofollow );
 
 
 			if( ! $Messages->count('error') )

@@ -74,6 +74,13 @@ class basic_antispam_plugin extends Plugin
 					'note' => T_('Check this to check comments and trackback for duplicate content.'),
 					'defaultvalue' => '1',
 				),
+				'nofollow_for_hours' => array(
+					'type' => 'integer',
+					'label' => T_('Apply rel="nofollow"'),
+					'note'=>T_('hours. For how long should rel="nofollow" be applied to comment links? (0 means never, -1 means always)'),
+					'defaultvalue' => '48', // use "nofollow" for 2 days
+					'size' => 5,
+				),
 			);
 	}
 
@@ -106,6 +113,93 @@ class basic_antispam_plugin extends Plugin
 		{
 			$this->msg( T_('The comment seems to be a duplicate.'), 'error' );
 		}
+	}
+
+
+	/**
+	 * If we use "makelink", handle nofollow rel attrib.
+	 *
+	 * @uses basic_antispam_plugin::apply_nofollow()
+	 */
+	function FilterCommentAuthor( & $params )
+	{
+		if( ! $params['makelink'] )
+		{
+			return false;
+		}
+
+		$this->apply_nofollow( $params['data'], $params['Comment'] );
+	}
+
+
+	/**
+	 * Handle nofollow in author URL (if it's made clickable)
+	 *
+	 * @uses basic_antispam_plugin::FilterCommentAuthor()
+	 */
+	function FilterCommentAuthorUrl( & $params )
+	{
+		$this->FilterCommentAuthor( $params );
+	}
+
+
+	/**
+	 * Handle nofollow rel attrib in comment content.
+	 *
+	 * @uses basic_antispam_plugin::FilterCommentAuthor()
+	 */
+	function FilterCommentContent( & $params )
+	{
+		$this->apply_nofollow( $params['data'], $params['Comment'] );
+	}
+
+
+	/**
+	 * Do we want to apply rel="nofollow" tag?
+	 *
+	 * @return boolean
+	 */
+	function apply_nofollow( & $data, $Comment )
+	{
+		global $localtimenow;
+
+		$hours = $this->Settings->get('nofollow_for_hours'); // 0=never, -1 always, otherwise for x hours
+
+		if( $hours == 0 )
+		{ // "never"
+			return;
+		}
+
+		pre_dump( date( 'H:i:s', mysql2timestamp( $Comment->date ) ), date( 'H:i:s', ( $localtimenow - $hours*3600 ) ) );
+		if( $hours > 0 // -1 is "always"
+			&& mysql2timestamp( $Comment->date ) <= ( $localtimenow - $hours*3600 ) )
+		{
+			return;
+		}
+
+		$data = preg_replace_callback( '~(<a\s)([^>]+)>~i', create_function( '$m', '
+				if( preg_match( \'~\brel=([\\\'"])(.*?)\1~\', $m[2], $match ) )
+				{ // there is already a rel attrib:
+					$rel_values = explode( " ", $match[2] );
+
+					if( ! in_array( \'nofollow\', $rel_values ) )
+					{
+						$rel_values[] = \'nofollow\';
+					}
+
+					return $m[1]
+						.preg_replace(
+							\'~\brel=([\\\'"]).*?\1~\',
+							\'rel=$1\'.implode( " ", $rel_values ).\'$1\',
+							$m[2] )
+						.">";
+				}
+				else
+				{
+					return $m[1].$m[2].\' rel="nofollow">\';
+				}' ), $data );
+		pre_dump( $data );
+		#$data = preg_replace( '~<a~', '<a rel="nofollow"', $data );
 	}
 
 
@@ -349,6 +443,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.4  2006/05/02 01:27:55  blueyed
+ * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
+ *
  * Revision 1.3  2006/05/01 05:20:38  blueyed
  * Check for duplicate content in comments/trackback.
  *

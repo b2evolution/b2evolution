@@ -71,7 +71,7 @@ class Comment extends DataObject
 	 */
 	var $author_IP;
 	/**
-	 * @var string Date of the comment (MySQL DATETIME)
+	 * @var string Date of the comment (MySQL DATETIME - use e.g. {@link mysql2timestamp()}); local time ({@link $localtimenow})
 	 */
 	var $date;
 	/**
@@ -277,37 +277,35 @@ class Comment extends DataObject
 	function author( $before = '', $after = '#', $before_user = '', $after_user = '#',
 										$format = 'htmlbody', $makelink = false )
 	{
+		global $Plugins;
+
+		$r = '';
+
 		if( $this->author_User !== NULL )
 		{ // Author is a user
 			if( strlen( $this->author_User->url ) <= 10 ) $makelink = false;
 			if( $after_user == '#' ) $after_user = ' ['.T_('Member').']';
-			echo $before_user;
-			if( $makelink ) echo '<a href="'.$this->author_User->url.'">';
-			$this->author_User->preferred_name( $format );
-			if( $makelink ) echo '</a>';
-			echo $after_user;
+			$r .= $before_user;
+			if( $makelink ) $r .= '<a href="'.$this->author_User->url.'">';
+			$r .= $this->author_User->preferred_name( $format, false );
+			if( $makelink ) $r .= '</a>';
+			$r .= $after_user;
 		}
 		else
 		{ // Display info recorded at edit time:
 			if( strlen( $this->author_url ) <= 10 ) $makelink = false;
 			if( $after == '#' ) $after = ' ['.T_('Visitor').']';
-			echo $before;
+			$r .= $before;
 
-			if( $makelink )
-			{
-				global $Settings;
-
-				echo '<a href="'.$this->author_url.'"';
-				if( $Settings->get('antispam_comments_nofollow') )
-				{
-					echo ' rel="nofollow"';
-				}
-				echo '>';
-			}
-			$this->disp( 'author', $format );
-			if( $makelink ) echo '</a>';
-			echo $after;
+			if( $makelink ) $r .= '<a href="'.$this->author_url.'">';
+			$r .= $this->dget( 'author', $format );
+			if( $makelink ) $r .= '</a>';
+			$r .= $after;
 		}
+
+		$Plugins->trigger_event( 'FilterCommentAuthor', array( 'data' => & $r, 'makelink' => $makelink, 'Comment' => $this ) );
+
+		echo $r;
 	}
 
 
@@ -362,29 +360,29 @@ class Comment extends DataObject
 	 */
 	function author_url( $linktext='', $before='', $after='', $makelink = true )
 	{
+		global $Plugins;
+
 		$url = $this->get_author_url();
 
-		if( strlen( $url ) > 10 )
-		{ // If URL exists:
-			echo $before;
-			if( $makelink )
-			{
-				global $Settings;
-
-				echo '<a href="'.$url.'"';
-				if( $Settings->get('antispam_comments_nofollow') )
-				{
-					echo ' rel="nofollow"';
-				}
-				echo '>';
-			}
-			echo ($linktext != '') ? $linktext : $url;
-			if( $makelink ) echo '</a>';
-			echo $after;
-			return true;
+		if( strlen( $url ) < 10 )
+		{
+			return false;
 		}
 
-		return false;
+		// If URL exists:
+		$r = $before;
+		if( $makelink )
+		{
+			$r .= '<a href="'.$url.'">';
+		}
+		$r .= ( empty($linktext) ? $url : $linktext );
+		if( $makelink ) $r .= '</a>';
+		$r .= $after;
+
+		$Plugins->trigger_event( 'FilterCommentAuthorUrl', array( 'data' => & $r, 'makelink' => $makelink, 'Comment' => $this ) );
+
+		echo $r;
+		return true;
 	}
 
 
@@ -783,17 +781,33 @@ class Comment extends DataObject
 
 
 	/**
+	 * Template function: get content of comment
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 * @return string
+	 */
+	function get_content( $format = 'htmlbody' )
+	{
+		global $Plugins;
+
+		$comment = $this->content;
+		$comment = str_replace('<trackback />', '', $comment);
+		$comment = str_replace('<pingback />', '', $comment);
+		$Plugins->trigger_event( 'FilterCommentContent', array( 'data' => & $comment, 'Comment' => $this ) );
+		$comment = format_to_output( $comment, $format );
+
+		return $comment;
+	}
+
+
+	/**
 	 * Template function: display content of comment
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 */
 	function content( $format = 'htmlbody' )
 	{
-		$comment = $this->content;
-		$comment = str_replace('<trackback />', '', $comment);
-		$comment = str_replace('<pingback />', '', $comment);
-		$comment = format_to_output( $comment, $format );
-		echo $comment;
+		echo $this->get_content( $format );
 	}
 
 
@@ -1065,6 +1079,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2006/05/02 01:27:55  blueyed
+ * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
+ *
  * Revision 1.29  2006/05/01 22:20:20  blueyed
  * Made rel="nofollow" optional (enabled); added Antispam settings page
  *
