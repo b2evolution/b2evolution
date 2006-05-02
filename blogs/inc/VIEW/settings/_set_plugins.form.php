@@ -243,8 +243,8 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 				$registrations = $admin_Plugins->count_regs($loop_Plugin->classname);
 
 				if( $current_User->check_perm( 'options', 'edit', false )
-				    && ( ! isset( $loop_Plugin->nr_of_installs )
-				         || $registrations < $loop_Plugin->nr_of_installs ) )
+				    && ( ! isset( $loop_Plugin->number_of_installs )
+				         || $registrations < $loop_Plugin->number_of_installs ) )
 				{ // number of installations are not limited or not reached yet and user has "edit options" perms
 					?>
 					[<a href="admin.php?ctrl=plugins&amp;action=install&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname) ?>"><?php
@@ -271,6 +271,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.17  2006/05/02 01:47:58  blueyed
+ * Normalization
+ *
  * Revision 1.16  2006/04/27 19:11:12  blueyed
  * Cleanup; handle broken plugins more decent
  *

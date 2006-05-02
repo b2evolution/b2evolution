@@ -273,7 +273,7 @@ class Plugins
 				*/
 				'DisplayItemAllFormats' => T_('Called on an item when it gets displayed.'),
 
-				'DisplayIpAddress' => T_('Called when displaying an IP address.'),
+				'FilterIpAddress' => T_('Called when displaying an IP address.'),
 
 				'ItemViewed' => T_('Called when the view counter of an item got increased.'),
 
@@ -503,8 +503,8 @@ class Plugins
 			return $Plugin;
 		}
 
-		if( isset($Plugin->nr_of_installs)
-		    && ( $this->count_regs( $Plugin->classname ) >= $Plugin->nr_of_installs ) )
+		if( isset($Plugin->number_of_installs)
+		    && ( $this->count_regs( $Plugin->classname ) >= $Plugin->number_of_installs ) )
 		{
 			$this->unregister( $Plugin );
 			$r = T_('The plugin cannot be installed again.');
@@ -2596,6 +2596,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.40  2006/05/02 01:47:58  blueyed
+ * Normalization
+ *
  * Revision 1.39  2006/05/02 01:27:55  blueyed
  * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
  *

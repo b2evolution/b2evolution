@@ -176,7 +176,7 @@ class Plugin
 	 * When installing the plugin it gets checked if the plugin is already installed this
 	 * many times. If so, the installation gets aborted.
 	 */
-	var $nr_of_installs;
+	var $number_of_installs;
 
 	/**#@-*/
 
@@ -1556,7 +1556,7 @@ class Plugin
 	 *   - 'format': see {@link format_to_output()}.
 	 * @return boolean Have we changed something?
 	 */
-	function DisplayIpAddress( & $params )
+	function FilterIpAddress( & $params )
 	{
 		return false;		// Do nothing by default.
 	}
@@ -2051,6 +2051,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.40  2006/05/02 01:47:58  blueyed
+ * Normalization
+ *
  * Revision 1.39  2006/05/02 01:27:55  blueyed
  * Moved nofollow handling to basic antispam plugin; added Filter events to Comment class
  *

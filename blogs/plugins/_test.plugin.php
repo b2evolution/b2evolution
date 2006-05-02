@@ -61,7 +61,7 @@ class test_plugin extends Plugin
 	 * These variables MAY be overriden.
 	 */
 	var $apply_rendering = 'opt-out';
-	var $nr_of_installs = 1;
+	var $number_of_installs = 1;
 
 
 	/**
@@ -402,9 +402,9 @@ class test_plugin extends Plugin
 
 	/**
 	 * Wrap a to be displayed IP address.
-	 * @see Plugin::DisplayIpAddress()
+	 * @see Plugin::FilterIpAddress()
 	 */
-	function DisplayIpAddress( & $params )
+	function FilterIpAddress( & $params )
 	{
 		$params['data'] = '[[IP:'.$params['data'].' (TEST plugin)]]';
 	}
@@ -511,6 +511,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.37  2006/05/02 01:47:58  blueyed
+ * Normalization
+ *
  * Revision 1.36  2006/04/24 15:43:37  fplanque
  * no message
  *

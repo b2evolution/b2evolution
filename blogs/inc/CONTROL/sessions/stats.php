@@ -510,7 +510,7 @@ switch( $AdminUI->get_path(1) )
 			$Results->cols[] = array(
 					'th' => '<span title="'.T_('Remote address').'">'.T_('IP').'</span>',
 					'order' => 'hit_remote_addr',
-					'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'DisplayIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
+					'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'FilterIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
 				);
 
 
@@ -756,7 +756,7 @@ switch( $AdminUI->get_path(1) )
 			$Results->cols[] = array(
 					'th' => '<span title="'.T_('Remote address').'">'.T_('IP').'</span>',
 					'order' => 'hit_remote_addr',
-					'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'DisplayIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
+					'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'FilterIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
 				);
 
 			// Display results:
@@ -984,7 +984,7 @@ switch( $AdminUI->get_path(1) )
 			$Results->cols[] = array(
 					'th' => '<span title="'.T_('Remote address').'">'.T_('IP').'</span>',
 					'order' => 'hit_remote_addr',
-					'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'DisplayIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
+					'td' => '% $GLOBALS[\'Plugins\']->get_trigger_event( \'FilterIpAddress\', $tmp_params = array(\'format\'=>\'htmlbody\', \'data\'=>\'$hit_remote_addr$\') ) %',
 				);
 
 			// Display results:
@@ -1050,6 +1050,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2006/05/02 01:47:58  blueyed
+ * Normalization
+ *
  * Revision 1.11  2006/04/27 20:10:34  fplanque
  * changed banning of domains. Suggest a prefix by default.
  *

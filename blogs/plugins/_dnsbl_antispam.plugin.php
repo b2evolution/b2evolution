@@ -448,7 +448,7 @@ class dnsbl_antispam_plugin extends Plugin
 	 * We wrap IP addresses with a link that points to the IP (with "http://" prefixed) and
 	 * provide an onclick event to query the address through the browser.
 	 */
-	function DisplayIpAddress( & $params )
+	function FilterIpAddress( & $params )
 	{
 		if( $params['format'] == 'htmlbody' )
 		{
@@ -671,6 +671,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.21  2006/05/02 01:47:58  blueyed
+ * Normalization
+ *
  * Revision 1.20  2006/04/29 01:24:05  blueyed
  * More decent charset support;
  * unresolved issues include:
