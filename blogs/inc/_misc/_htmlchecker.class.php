@@ -155,20 +155,20 @@ class SafeHtmlChecker
 
 		$xhtml = $xhtml_head.'<body>'.$xhtml.'</body>';
 
-		if (!xml_parse($this->parser, $xhtml))
+		if( !xml_parse($this->parser, $xhtml) )
 		{
-		$xml_error_code = xml_get_error_code( $this->parser );
-		$xml_error_string = xml_error_string( $xml_error_code );
-		switch( $xml_error_code )
-		{
-			case XML_ERROR_TAG_MISMATCH:
-			$xml_error_string .= ': <code>'.$this->stack[count($this->stack)-1].'</code>';
-			break;
-		}
-		$pos = xml_get_current_byte_index($this->parser);
-		$xml_error_string .= ' near <code>'.htmlspecialchars( substr( $xhtml, $this->last_checked_pos, $pos-$this->last_checked_pos+20 ) ).'</code>';
+			$xml_error_code = xml_get_error_code( $this->parser );
+			$xml_error_string = xml_error_string( $xml_error_code );
+			switch( $xml_error_code )
+			{
+				case XML_ERROR_TAG_MISMATCH:
+					$xml_error_string .= ': <code>'.$this->stack[count($this->stack)-1].'</code>';
+					break;
+			}
+			$pos = xml_get_current_byte_index($this->parser);
+			$xml_error_string .= ' near <code>'.htmlspecialchars( substr( $xhtml, $this->last_checked_pos, $pos-$this->last_checked_pos+20 ) ).'</code>';
 
-		$this->html_error( T_('Parser error: ').$xml_error_string );
+			$this->html_error( T_('Parser error: ').$xml_error_string );
 		}
 	}
 
@@ -282,6 +282,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.6  2006/05/02 22:19:27  blueyed
+ * whitespace
+ *
  * Revision 1.5  2006/04/28 18:07:20  blueyed
  * Simplified, removed PHP5 dependency
  *
