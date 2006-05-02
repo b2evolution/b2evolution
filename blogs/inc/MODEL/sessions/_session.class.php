@@ -143,7 +143,11 @@ class Session
 					else
 					{ // Some session data has been previsouly stored:
 
+						// Unserialize session data (using an own callback that should provide class definitions):
+						$old_callback = ini_get( 'unserialize_callback_func' );
+						ini_set( 'unserialize_callback_func', 'unserialize_callback' );
 						$this->_data = @unserialize($row->sess_data);
+						ini_set( 'unserialize_callback_func', $old_callback );
 
 						if( $this->_data === false )
 						{
@@ -423,6 +427,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.8  2006/05/02 22:25:27  blueyed
+ * Comment preview for frontoffice.
+ *
  * Revision 1.7  2006/04/21 17:05:08  blueyed
  * cleanup
  *

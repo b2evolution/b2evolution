@@ -129,27 +129,33 @@ $commented_Item->get_Blog(); // Make sure Blog is loaded
 $Comment->set( 'status', $commented_Item->Blog->get_setting('new_feedback_status') );
 
 
-/*
- * Flood-protection
- * TODO: Put time check into query?
- */
-$query = 'SELECT MAX(comment_date)
-            FROM T_comments
-           WHERE comment_author_IP = '.$DB->quote($Hit->IP).'
-              OR comment_author_email = '.$DB->quote($Comment->get_author_email());
-$ok = 1;
-if( $then = $DB->get_var( $query ) )
+// Check if we want to PREVIEW:
+$action = $Request->param_arrayindex( 'submit_comment_post_'.$commented_Item->ID, 'save' );
+
+if( $action != 'preview' )
 {
-	$time_lastcomment = mysql2date("U",$then);
-	$time_newcomment = mysql2date("U",$now);
-	if( ($time_newcomment - $time_lastcomment) < $minimum_comment_interval )
-		$ok = 0;
+	/*
+	 * Flood-protection
+	 * TODO: Put time check into query?
+	 */
+	$query = 'SELECT MAX(comment_date)
+							FROM T_comments
+						 WHERE comment_author_IP = '.$DB->quote($Hit->IP).'
+								OR comment_author_email = '.$DB->quote($Comment->get_author_email());
+	$ok = 1;
+	if( $then = $DB->get_var( $query ) )
+	{
+		$time_lastcomment = mysql2date("U",$then);
+		$time_newcomment = mysql2date("U",$now);
+		if( ($time_newcomment - $time_lastcomment) < $minimum_comment_interval )
+			$ok = 0;
+	}
+	if( !$ok )
+	{
+		$Messages->add( sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ), 'error' );
+	}
+	/* end flood-protection */
 }
-if( !$ok )
-{
-	$Messages->add( sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ), 'error' );
-}
-/* end flood-protection */
 
 
 // Trigger event: a Plugin could add a $category="error" message here..
@@ -166,6 +172,23 @@ if( $Messages->count('error') )
 
 	debug_info();  // output debug info, useful to see what a plugin might have done
 	exit(); // TODO: nicer displaying here (but do NOT die() or debug_die() because this is not a BUG/user hack, it's a plain user input error (any bozo can produce it)
+}
+
+if( $action == 'preview' )
+{ // set the Comment into user's session and redirect. _feeback.php of the skin should display it.
+	$Session->set( 'core.preview_Comment', $Comment );
+	$Session->dbsave();
+
+	$Request->param( 'redirect_to', 'string', '' );
+	$redirect_to .= '#comment_preview';
+
+	header_nocache();
+	header_redirect();
+	exit();
+}
+else
+{ // delete any preview comment from session data:
+	$Session->delete( 'core.preview_Comment' );
 }
 
 
@@ -257,6 +280,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.73  2006/05/02 22:25:27  blueyed
+ * Comment preview for frontoffice.
+ *
  * Revision 1.72  2006/05/02 04:36:24  blueyed
  * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
  *

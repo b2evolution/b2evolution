@@ -2869,8 +2869,56 @@ function base_tag( $url )
 }
 
 
+/**
+ * This gets used as a {@link unserialize()} callback function, which is
+ * responsible to load the requested class.
+ *
+ * @todo Once we require PHP5, we should think about using this as __autoload function.
+ *
+ * Currently, this just gets used by the {@link Session} class and includes the
+ * {@link Comment} class and its dependencies.
+ *
+ * @return
+ */
+function unserialize_callback( $classname )
+{
+	global $model_path, $object_def;
+
+	switch( $classname )
+	{
+		case 'Blog':
+			require_once $model_path.'collections/_blog.class.php';
+			break;
+
+		case 'CollectionSettings':
+			require_once $model_path.'collections/_collsettings.class.php';
+			break;
+
+		case 'Comment':
+			require_once $model_path.'comments/_comment.class.php';
+			break;
+
+		case 'Item':
+			require_once $model_path.'items/_item.class.php';
+			break;
+
+		case 'Group':
+			require_once $model_path.'users/_group.class.php';
+			break;
+
+		case 'User':
+			require_once $model_path.'users/_user.class.php';
+			break;
+	}
+}
+
+
+
 /*
  * $Log$
+ * Revision 1.49  2006/05/02 22:25:28  blueyed
+ * Comment preview for frontoffice.
+ *
  * Revision 1.48  2006/04/30 18:29:33  blueyed
  * Fixed validate_url() for user/pass; more explicit match
  *
