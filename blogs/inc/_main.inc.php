@@ -619,13 +619,18 @@ elseif( $evo_charset != $io_charset )
 		}
 		else
 		{
-			mb_internal_encoding( $evo_charset );
 			mb_http_output( $io_charset );
 			ob_start( 'mb_output_handler' );
 			$mb_output_handler_started = true; // remember it for _blog_main.inc.php
 		}
 		unset($mb_encodings);
 	}
+}
+
+// Tell mbstrings what the internal encoding is:
+if( function_exists('mb_internal_encoding') )
+{
+	mb_internal_encoding( $evo_charset );
 }
 
 // Set encoding for MySQL connection, if connection_charset differs from evo_charset:
@@ -670,6 +675,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.18  2006/05/03 01:53:42  blueyed
+ * Encode subject in mails correctly (if mbstrings is available)
+ *
  * Revision 1.17  2006/05/02 05:46:08  blueyed
  * fix
  *

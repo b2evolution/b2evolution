@@ -179,7 +179,6 @@ if( $io_charset != locale_charset(false) )
 			}
 			else
 			{
-				mb_internal_encoding( $evo_charset );
 				mb_http_output( $io_charset );
 				if( empty($mb_output_handler_started) )
 				{ // has not been started in _main.inc.php already:
@@ -188,6 +187,12 @@ if( $io_charset != locale_charset(false) )
 			}
 			unset($mb_encodings);
 		}
+	}
+
+	// Tell mbstrings what the internal encoding is:
+	if( function_exists('mb_internal_encoding') )
+	{
+		mb_internal_encoding( $evo_charset );
 	}
 
 	$Debuglog->add( 'Adjusted I/O charset for blog', 'locale' );
@@ -496,6 +501,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.18  2006/05/03 01:53:42  blueyed
+ * Encode subject in mails correctly (if mbstrings is available)
+ *
  * Revision 1.17  2006/04/29 01:24:04  blueyed
  * More decent charset support;
  * unresolved issues include:

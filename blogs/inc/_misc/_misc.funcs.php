@@ -1979,6 +1979,7 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 	{
 		$from = trim($from);
 	}
+
 	if( ! empty($from) )
 	{ // From has to go into headers
 		$from_save = preg_replace( '~(\r|\n).*$~s', '', $from ); // Prevent injection! (remove everything after (and including) \n or \r)
@@ -1997,24 +1998,26 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 			$from = $from_save;
 		}
 
-		$headerstring = "From: $from$NL";
-	}
-	else
-	{
-		$headerstring = '';
+		$headers['From'] = $from;
 	}
 
+	$headerstring = '';
 	reset( $headers );
 	while( list( $lKey, $lValue ) = each( $headers ) )
 	{ // Add additional headers
 		$headerstring .= $lKey.': '.$lValue.$NL;
 	}
 
+	if( function_exists('mb_encode_mimeheader') )
+	{ // encode subject
+		$subject = mb_encode_mimeheader( $subject, mb_internal_encoding(), 'B', $NL );
+	}
+
 	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
 
 	if( $debug > 1 )
 	{	// We agree to die for debugging...
-		if( ! mail( $to, $subject, $message, $headerstring ) )
+		if( ! @mail( $to, $subject, $message, $headerstring ) )
 		{
 			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
 		}
@@ -2916,6 +2919,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.50  2006/05/03 01:53:43  blueyed
+ * Encode subject in mails correctly (if mbstrings is available)
+ *
  * Revision 1.49  2006/05/02 22:25:28  blueyed
  * Comment preview for frontoffice.
  *
