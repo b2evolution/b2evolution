@@ -151,7 +151,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 	{ // We want to display the comments form and the item can be commented on:
 
 		// PREVIEW:
-		$preview_Comment = & $Session->get('core.preview_Comment');
+		$preview_Comment = $Session->get('core.preview_Comment');
 
 		if( $preview_Comment )
 		{
@@ -299,6 +299,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.59  2006/05/04 00:56:48  blueyed
+ * fix
+ *
  * Revision 1.58  2006/05/02 22:39:29  blueyed
  * Delete preview Comment if it has been displayed.
  *
