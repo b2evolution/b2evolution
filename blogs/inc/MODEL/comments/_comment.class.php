@@ -208,7 +208,7 @@ class Comment extends DataObject
 	 */
 	function get_anchor()
 	{
-		return 'comment-'.$this->ID;
+		return 'c'.$this->ID;
 	}
 
 
@@ -717,7 +717,7 @@ class Comment extends DataObject
 		}
 
 		$post_permalink = $this->Item->get_permanent_url( $mode, $blogurl );
-		return $post_permalink.'#c'.$this->ID;
+		return $post_permalink.'#'.$this->get_anchor();
 	}
 
 
@@ -1098,6 +1098,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2006/05/04 10:05:39  blueyed
+ * Fixed anchor in notification mails and shortened again, because of length.. probably it does not make sense to have get_anchor() anyway.. dunno..
+ *
  * Revision 1.32  2006/05/04 04:07:24  blueyed
  * After posting a comment, add the anchor to the redirect param; also use more distinctive anchor name for comments
  *
