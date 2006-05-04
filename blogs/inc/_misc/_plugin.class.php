@@ -1146,7 +1146,6 @@ class Plugin
 	/**
 	 * Event handler: called to cache object data.
 	 *
-	 * @see memcache_plugin::CacheObjects()
 	 * @param array Associative array of parameters
 	 *   - 'action': 'delete', 'set', 'get'
 	 *   - 'key': The key to refer to 'data'
@@ -1164,8 +1163,12 @@ class Plugin
 	 * This method must build a unique key for the requested page (including cookie/session info) and
 	 * start an output buffer, to get the content to cache.
 	 *
+	 * Note, that there are special occassions when this event does not get called, because we want
+	 * really fresh content always:
+	 *  - we're generating static pages
+	 *  - there gets a "dynamic object", such as "Messages" or "core.preview_Comment" transported in the session
+	 *
 	 * @see Plugin::CacheIsCollectingContent()
-	 * @see memcache_plugin::CachePageContent()
 	 * @param array Associative array of parameters
 	 *   - 'data': this must get set to the page content on cache hit
 	 * @return boolean True if we handled the request (either returned caching data or started buffering),
@@ -2056,6 +2059,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.43  2006/05/04 10:18:41  blueyed
+ * Added Session property to skip page content caching event.
+ *
  * Revision 1.42  2006/05/02 23:35:22  blueyed
  * Extended karma collecting event(s)
  *

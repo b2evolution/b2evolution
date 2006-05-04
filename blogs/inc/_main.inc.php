@@ -251,12 +251,20 @@ $Plugins->trigger_event( 'SessionLoaded' );
 
 
 // Trigger a page content caching plugin. This would either return the cached content here or start output buffering
-if( empty($generating_static)
-    && ( $get_return = $Plugins->trigger_event_first_true( 'CachePageContent' ) )
-    && ( isset($get_return['data']) ) ) // cached content returned
+if( empty($generating_static) )
 {
-	echo $get_return['data'];
-	die;
+	if( $Session->get( 'core.no_CachePageContent' ) )
+	{ // The event is disabled for this request:
+		$Session->delete('core.no_CachePageContent');
+		$Debuglog->add( 'Skipping CachePageContent event, because of core.no_CachePageContent setting.', 'plugins' );
+	}
+	elseif( ( $get_return = $Plugins->trigger_event_first_true( 'CachePageContent' ) ) // Plugin responded to the event
+			&& ( isset($get_return['data']) ) ) // cached content returned
+	{
+		echo $get_return['data'];
+		// Note: we should not use debug_info() here, because the plugin has probably sent a Content-Length header.
+		exit;
+	}
 }
 
 
@@ -675,6 +683,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.19  2006/05/04 10:18:41  blueyed
+ * Added Session property to skip page content caching event.
+ *
  * Revision 1.18  2006/05/03 01:53:42  blueyed
  * Encode subject in mails correctly (if mbstrings is available)
  *

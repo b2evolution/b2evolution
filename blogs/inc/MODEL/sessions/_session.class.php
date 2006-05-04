@@ -334,6 +334,11 @@ class Session
 		{	// There is something to update:
 			$this->_data[$param] = array( ( $expire ? ($localtimenow + $expire) : NULL ), $value );
 
+			if( in_array( $param, array( 'Messages', 'core.preview_Comment' ) ) )
+			{ // also set boolean to not call CachePageContent plugin event on next request:
+				$this->set( 'core.no_CachePageContent', 1 );
+			}
+
 			$Debuglog->add( 'Session data['.$param.'] updated. Expire in: '.( $expire ? $expire.'s' : '-' ).'.', 'session' );
 
 			$this->_session_needs_save = true;
@@ -427,6 +432,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.10  2006/05/04 10:18:41  blueyed
+ * Added Session property to skip page content caching event.
+ *
  * Revision 1.9  2006/05/04 01:06:05  blueyed
  * debuglog
  *
