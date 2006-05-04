@@ -2887,29 +2887,29 @@ function unserialize_callback( $classname )
 {
 	global $model_path, $object_def;
 
-	switch( $classname )
+	switch( strtolower($classname) )
 	{
-		case 'Blog':
+		case 'blog':
 			require_once $model_path.'collections/_blog.class.php';
 			break;
 
-		case 'CollectionSettings':
+		case 'collectionsettings':
 			require_once $model_path.'collections/_collsettings.class.php';
 			break;
 
-		case 'Comment':
+		case 'comment':
 			require_once $model_path.'comments/_comment.class.php';
 			break;
 
-		case 'Item':
+		case 'item':
 			require_once $model_path.'items/_item.class.php';
 			break;
 
-		case 'Group':
+		case 'group':
 			require_once $model_path.'users/_group.class.php';
 			break;
 
-		case 'User':
+		case 'user':
 			require_once $model_path.'users/_user.class.php';
 			break;
 	}
@@ -2919,6 +2919,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.51  2006/05/04 01:05:37  blueyed
+ * Fix for PHP4
+ *
  * Revision 1.50  2006/05/03 01:53:43  blueyed
  * Encode subject in mails correctly (if mbstrings is available)
  *
