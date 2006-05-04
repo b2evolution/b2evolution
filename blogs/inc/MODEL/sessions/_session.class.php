@@ -151,7 +151,7 @@ class Session
 
 						if( $this->_data === false )
 						{
-							$Debuglog->add( 'Session data corrupted!', 'session' );
+							$Debuglog->add( 'Session data corrupted!', array('session','error') );
 							$this->_data = array();
 						}
 						else
@@ -427,6 +427,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.9  2006/05/04 01:06:05  blueyed
+ * debuglog
+ *
  * Revision 1.8  2006/05/02 22:25:27  blueyed
  * Comment preview for frontoffice.
  *
