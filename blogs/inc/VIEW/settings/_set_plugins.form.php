@@ -192,6 +192,7 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 		<tr>
 			<th class="firstcol"><?php echo T_('Plugin') ?></th>
 			<th><?php echo T_('Description') ?></th>
+			<th><?php echo T_('Version') ?></th>
 			<th><?php echo T_('Help') ?></th>
 			<th class="lastcol"><?php echo T_('Actions') ?></th>
 		</tr>
@@ -217,6 +218,13 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 				}
 				echo '<span class="advanced_info notes"><br />'.T_('Registered events:').' '.$registered_events.'</span>';
 				*/
+				?>
+			</td>
+			<td>
+				<?php
+				$clean_version = preg_replace( array('~^(CVS\s+)?\$'.'Revision:\s*~i', '~\s*\$$~'), '', $loop_Plugin->version );
+
+				echo format_to_output($clean_version);
 				?>
 			</td>
 			<td>
@@ -271,6 +279,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.18  2006/05/04 06:44:45  blueyed
+ * Display version with available plugins.
+ *
  * Revision 1.17  2006/05/02 01:47:58  blueyed
  * Normalization
  *
