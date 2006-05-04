@@ -38,6 +38,7 @@ require_once dirname(__FILE__).'/_comment.class.php';
  * Generic comments/trackbacks/pingbacks counting
  *
  * @todo check this in a multiblog page...
+ * @todo This should support visibility: at least in the default front office (_feedback.php), there should only the number of visible comments/trackbacks get used ({@link Item::feedback_link()}).
  *
  * @param integer
  * @param string what to count
@@ -45,6 +46,7 @@ require_once dirname(__FILE__).'/_comment.class.php';
 function generic_ctp_number( $post_id, $mode = 'comments' )
 {
 	global $DB, $debug, $postdata, $cache_ctp_number, $preview;
+
 	if( $preview )
 	{ // we are in preview mode, no comments yet!
 		return 0;
@@ -60,8 +62,8 @@ function generic_ctp_number( $post_id, $mode = 'comments' )
 		// if( $debug ) echo "LOADING generic_ctp_number CACHE for posts: $postIDlist<br />";
 
 		foreach( $postIDarray as $tmp_post_id)
-		{		// Initializes each post to nocount!
-				$cache_ctp_number[$tmp_post_id] = array( 'comments' => 0, 'trackbacks' => 0, 'pingbacks' => 0, 'ctp' => 0);
+		{	// Initializes each post to nocount!
+			$cache_ctp_number[$tmp_post_id] = array( 'comments' => 0, 'trackbacks' => 0, 'pingbacks' => 0, 'ctp' => 0);
 		}
 		$query = "SELECT comment_post_ID, comment_type, COUNT(*) AS type_count
 							FROM T_comments
@@ -311,6 +313,9 @@ function comment_author_url_basedomain( $disp = true )
 
 /*
  * $Log$
+ * Revision 1.4  2006/05/04 03:08:12  blueyed
+ * todo
+ *
  * Revision 1.3  2006/04/22 16:30:00  blueyed
  * cleanup
  *
