@@ -2881,7 +2881,7 @@ function base_tag( $url )
  * Currently, this just gets used by the {@link Session} class and includes the
  * {@link Comment} class and its dependencies.
  *
- * @return
+ * @return boolean True, if the required class could be loaded; false, if not
  */
 function unserialize_callback( $classname )
 {
@@ -2891,34 +2891,39 @@ function unserialize_callback( $classname )
 	{
 		case 'blog':
 			require_once $model_path.'collections/_blog.class.php';
-			break;
+			return true;
 
 		case 'collectionsettings':
 			require_once $model_path.'collections/_collsettings.class.php';
-			break;
+			return true;
 
 		case 'comment':
 			require_once $model_path.'comments/_comment.class.php';
-			break;
+			return true;
 
 		case 'item':
 			require_once $model_path.'items/_item.class.php';
-			break;
+			return true;
 
 		case 'group':
 			require_once $model_path.'users/_group.class.php';
-			break;
+			return true;
 
 		case 'user':
 			require_once $model_path.'users/_user.class.php';
-			break;
+			return true;
 	}
+
+	return false;
 }
 
 
 
 /*
  * $Log$
+ * Revision 1.52  2006/05/04 01:08:20  blueyed
+ * Normalization/doc fix
+ *
  * Revision 1.51  2006/05/04 01:05:37  blueyed
  * Fix for PHP4
  *
