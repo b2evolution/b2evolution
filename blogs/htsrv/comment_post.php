@@ -90,6 +90,7 @@ $now = date( 'Y-m-d H:i:s', $localtimenow );
 // CHECK and FORMAT content
 //echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
 $original_comment = strip_tags($comment, $comment_allowed_tags);
+// TODO: AutoBR should really be a "comment renderer" (like with Items)
 $comment = format_to_post($original_comment, $comment_autobr, 1);
 
 if( empty($comment) )
@@ -176,6 +177,7 @@ if( $Messages->count('error') )
 
 if( $action == 'preview' )
 { // set the Comment into user's session and redirect. _feeback.php of the skin should display it.
+	$Comment->set( 'original_content', $original_comment );
 	$Session->set( 'core.preview_Comment', $Comment );
 	$Session->dbsave();
 
@@ -284,6 +286,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.75  2006/05/04 10:32:41  blueyed
+ * Use original comment content in preview's form.
+ *
  * Revision 1.74  2006/05/04 04:07:24  blueyed
  * After posting a comment, add the anchor to the redirect param; also use more distinctive anchor name for comments
  *

@@ -187,7 +187,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 				<?php
 				// Form fields:
-				$comment_content = $preview_Comment->content;
+				$comment_content = $preview_Comment->original_content;
 				// for visitors:
 				$comment_author = $preview_Comment->author;
 				$comment_author_email = $preview_Comment->author_email;
@@ -298,6 +298,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.61  2006/05/04 10:32:41  blueyed
+ * Use original comment content in preview's form.
+ *
  * Revision 1.60  2006/05/04 00:59:48  blueyed
  * fix
  *
