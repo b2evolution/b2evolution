@@ -57,33 +57,47 @@ $Comment = NULL;
 
 
 // Get the name of the recipient and check if he wants to receive mails through the message form
+
+
 if( ! empty($recipient_id) )
-{ // If the email is to a registerd user get the email address from the users table
+{ // If the email is to a registered user get the email address from the users table
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
 
-	if( empty($recipient_User->allow_msgform) )
-	{ // should be prevented by UI
-		echo '<p class="error">The user does not want to receive emails through the message form.</p>';
-		return;
+	if( $recipient_User )
+	{
+		if( empty($recipient_User->allow_msgform) )
+		{ // should be prevented by UI
+			echo '<p class="error">The user does not want to receive emails through the message form.</p>';
+			return;
+		}
+		$recipient_name = $recipient_User->get('preferredname');
+		$recipient_address = $recipient_User->get('email');
 	}
-	$recipient_name = $recipient_User->get('preferredname');
-	$recipient_address = $recipient_User->get('email');
 }
 elseif( ! empty($comment_id) )
-{ // If the email is to a non user comment poster get the email address from the comments table
+{ // If the email is through a comment, get the email address from the comments table (or the linked member therein):
 
 	// Load comment from DB:
 	$row = $DB->get_row( '
 		SELECT *
 		  FROM T_comments
 		 WHERE comment_ID = '.$comment_id, ARRAY_A );
+
 	if( $row )
 	{
 		$Comment = & new Comment( $row );
 
-		if( ! $Comment->allow_msgform )
-		{ // should be prevented by UI
-			echo '<p class="error">This commentator does not want to get contacted through message form.</p>';
+		if( isset($Comment->author_User) )
+		{ // Comment is from a registered user:
+			if( ! $Comment->author_User->allow_msgform )
+			{
+				echo '<p class="error">The user does not want to get contacted through the message form.</p>'; // should be prevented by UI
+				return;
+			}
+		}
+		elseif( ! $Comment->allow_msgform )
+		{
+			echo '<p class="error">This commentator does not want to get contacted through the message form.</p>'; // should be prevented by UI
 			return;
 		}
 
@@ -99,14 +113,34 @@ if( empty($recipient_address) )
 	return;
 }
 
-// Get the subject of the email
-if( !empty($comment_id) || !empty($post_id) )
-{
-	$sql = 'SELECT post_title
-					FROM T_posts
-					WHERE post_ID = '.$post_id;
-	$row = $DB->get_row( $sql );
-	$subject = T_('Re:').' '.$row->post_title;
+// Get the suggested subject for the email:
+if( empty($subject) )
+{ // no subject provided by param:
+	if( ! empty($comment_id) )
+	{
+		$row = $DB->get_row( '
+			SELECT post_title
+			  FROM T_posts, T_comments
+			 WHERE comment_ID = '.$DB->quote($comment_id).'
+			   AND post_ID = comment_post_ID' );
+
+		if( $row )
+		{
+			$subject = T_('Re:').' '.sprintf( /* Used as mail subject; %s gets replaced by an item's title */ T_( 'Comment on %s' ), $row->post_title );
+		}
+	}
+
+	if( empty($subject) && ! empty($post_id) )
+	{
+		$row = $DB->get_row( '
+				SELECT post_title
+				  FROM T_posts
+				 WHERE post_ID = '.$post_id );
+		if( $row )
+		{
+			$subject = T_('Re:').' '.$row->post_title;
+		}
+	}
 }
 ?>
 
@@ -160,6 +194,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.23  2006/05/04 14:28:15  blueyed
+ * Fix/enhanced
+ *
  * Revision 1.22  2006/04/20 16:31:30  fplanque
  * comment moderation (finished for 1.8)
  *

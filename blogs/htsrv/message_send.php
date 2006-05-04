@@ -134,7 +134,15 @@ elseif( ! empty( $comment_id ) )
 		  WHERE comment_ID = '.$comment_id, ARRAY_A );
 	$Comment = & new Comment( $row );
 
-	if( empty($Comment->allow_msgform) )
+	if( isset($Comment->author_User) )
+	{ // Comment is from a registered user:
+		if( ! $Comment->author_User->allow_msgform )
+		{ // should be prevented by UI
+			debug_die( 'Invalid recipient!' );
+		}
+		$recipient_User = & $Comment->author_User;
+	}
+	elseif( empty($Comment->allow_msgform) )
 	{ // should be prevented by UI
 		debug_die( 'Invalid recipient!' );
 	}
@@ -165,12 +173,12 @@ elseif( !empty( $post_id ) )
 
 // opt-out links:
 if( $recipient_User )
-{
+{ // Member:
 	$message_footer .= T_("You can edit your profile to not reveive mails through a form:")
 		."\n".url_add_param( str_replace( '&amp;', '&', $Blog->get('url') ), 'disp=profile', '&' );
 }
 elseif( $Comment )
-{
+{ // Visitor:
 	$message_footer .= T_("Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:")
 		."\n".$htsrv_url.'message_send.php?optout_cmt_email='.rawurlencode($Comment->author_email);
 }
@@ -227,6 +235,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.31  2006/05/04 14:28:15  blueyed
+ * Fix/enhanced
+ *
  * Revision 1.30  2006/04/20 22:24:07  blueyed
  * plugin hooks cleanup
  *
