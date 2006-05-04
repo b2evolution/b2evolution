@@ -153,6 +153,12 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 		// PREVIEW:
 		$preview_Comment = $Session->get('core.preview_Comment');
 
+		// Default form params:
+		$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
+		$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
+		$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
+		$comment_content = '';
+
 		if( $preview_Comment )
 		{
 			if( $preview_Comment->Item->ID == $Item->ID )
@@ -191,13 +197,6 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 			// delete any preview comment from session data:
 			$Session->delete( 'core.preview_Comment' );
 			$preview_Comment = NULL;
-		}
-		else
-		{
-			$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
-			$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
-			$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
-			$comment_content = '';
 		}
 
 		?>
@@ -299,6 +298,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.60  2006/05/04 00:59:48  blueyed
+ * fix
+ *
  * Revision 1.59  2006/05/04 00:56:48  blueyed
  * fix
  *
