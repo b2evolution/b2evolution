@@ -264,6 +264,10 @@ else
 	if( $Comment->status == 'published' )
 	{
 		$Messages->add( T_('Your comment has been submitted.'), 'success' );
+
+		// Append anchor to the redirect_to param, so the user sees his comment:
+		$Request->param( 'redirect_to', 'string', '' );
+		$redirect_to .= '#'.$Comment->get_anchor();
 	}
 	else
 	{
@@ -280,6 +284,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.74  2006/05/04 04:07:24  blueyed
+ * After posting a comment, add the anchor to the redirect param; also use more distinctive anchor name for comments
+ *
  * Revision 1.73  2006/05/02 22:25:27  blueyed
  * Comment preview for frontoffice.
  *

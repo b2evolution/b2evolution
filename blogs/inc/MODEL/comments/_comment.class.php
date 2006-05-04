@@ -202,11 +202,22 @@ class Comment extends DataObject
 
 
 	/**
+	 * Get the anchor-ID of the comment
+	 *
+	 * @return string
+	 */
+	function get_anchor()
+	{
+		return 'comment-'.$this->ID;
+	}
+
+
+	/**
 	 * Template function: display anchor for permalinks to refer to
 	 */
 	function anchor()
 	{
-		echo '<a name="c'.$this->ID.'"></a>';
+		echo '<a name="'.$this->get_anchor().'"></a>';
 	}
 
 
@@ -1087,6 +1098,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2006/05/04 04:07:24  blueyed
+ * After posting a comment, add the anchor to the redirect param; also use more distinctive anchor name for comments
+ *
  * Revision 1.31  2006/05/02 04:36:24  blueyed
  * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
  *
