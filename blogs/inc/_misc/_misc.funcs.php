@@ -1698,7 +1698,7 @@ function debug_die( $last_words = '', $force = NULL, $very_last = '</body></html
 
 
 /**
- * Outputs debug info. (Typically at the end of the page)
+ * Outputs debug info, according to {@link $debug} or $force param. This gets called typically at the end of the page.
  *
  * @param boolean true to force output
  */
@@ -1707,117 +1707,119 @@ function debug_info( $force = false )
 	global $debug, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHost, $ReqPath;
 	global $cache_imgsize, $cache_File;
 
-	if( $debug || $force )
-	{
-		$ReqHostPathQuery = $ReqHost.$ReqPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
-		echo '<div class="debug"><h2>Debug info</h2>';
+	if( ! $debug && ! $force )
+	{ // No debug output:
+		return;
+	}
 
-		$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
-		$Debuglog->add( 'Len of serialized $cache_File: '.strlen(serialize($cache_File)), 'memory' );
+	$ReqHostPathQuery = $ReqHost.$ReqPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
+	echo '<div class="debug"><h2>Debug info</h2>';
 
-		if( !$obhandler_debug )
-		{ // don't display changing items when we want to test obhandler
+	$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
+	$Debuglog->add( 'Len of serialized $cache_File: '.strlen(serialize($cache_File)), 'memory' );
 
-			// Timer table:
-			$time_page = $Timer->get_duration( 'total' );
-			$timer_rows = array();
-			foreach( $Timer->get_categories() as $l_cat )
+	if( !$obhandler_debug )
+	{ // don't display changing items when we want to test obhandler
+
+		// Timer table:
+		$time_page = $Timer->get_duration( 'total' );
+		$timer_rows = array();
+		foreach( $Timer->get_categories() as $l_cat )
+		{
+			if( $l_cat == 'sql_query' )
 			{
-				if( $l_cat == 'sql_query' )
-				{
-					continue;
-				}
-				$timer_rows[ $l_cat ] = $Timer->get_duration( $l_cat );
+				continue;
 			}
-			arsort( $timer_rows );
-			echo '<table><thead>'
-				.'<tr><th colspan="4" class="center">Timers</th></tr>'
-				.'<tr><th>Category</th><th>Time</th><th>%</th><th>Count</th></tr>'
-				.'</thead><tbody>';
+			$timer_rows[ $l_cat ] = $Timer->get_duration( $l_cat );
+		}
+		arsort( $timer_rows );
+		echo '<table><thead>'
+			.'<tr><th colspan="4" class="center">Timers</th></tr>'
+			.'<tr><th>Category</th><th>Time</th><th>%</th><th>Count</th></tr>'
+			.'</thead><tbody>';
 
-			$table_rows_ignore_perhaps = array();
-			foreach( $timer_rows as $l_cat => $l_time )
+		$table_rows_ignore_perhaps = array();
+		foreach( $timer_rows as $l_cat => $l_time )
+		{
+			$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : 0;
+
+			$row = "\n<tr>"
+				.'<td>'.$l_cat.'</td>'
+				.'<td class="right">'.$l_time.'</td>'
+				.'<td class="right">'.$percent_l_cat.'%</td>'
+				.'<td class="right">'.$Timer->get_count( $l_cat ).'</td></tr>';
+
+			if( $l_time < 0.005 )
 			{
-				$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : 0;
-
-				$row = "\n<tr>"
-					.'<td>'.$l_cat.'</td>'
-					.'<td class="right">'.$l_time.'</td>'
-					.'<td class="right">'.$percent_l_cat.'%</td>'
-					.'<td class="right">'.$Timer->get_count( $l_cat ).'</td></tr>';
-
-				if( $l_time < 0.005 )
-				{
-					$table_rows_ignore_perhaps[] = $row;
-				}
-				else
-				{
-					echo $row;
-				}
-			}
-			$count_ignored = count($table_rows_ignore_perhaps);
-			if( $count_ignored > 5 )
-			{
-				echo '<tr><td colspan="4" class="center"> + '.$count_ignored.' &lt; 0.005s </td></tr>';
+				$table_rows_ignore_perhaps[] = $row;
 			}
 			else
 			{
-				echo implode( "\n", $table_rows_ignore_perhaps );
-			}
-			echo '</tbody>';
-			echo '</table>';
-
-			if( isset($DB) )
-			{
-				echo '<a href="'.$ReqHostPathQuery.'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br />';
-			}
-
-			foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
-				'memory_get_usage' => array( 'display' => 'Memory usage', 'high' => 8000000 ),
-				'xdebug_peak_memory_usage' => array( 'display' => 'Memory peak usage', 'high' => 8000000 ) ) as $l_func => $l_var )
-			{
-				if( function_exists( $l_func ) )
-				{
-					$_usage = $l_func();
-					if( $_usage > $l_var['high'] ) echo '<span style="color:red; font-weight:bold">';
-					echo $l_var['display'].': '.bytesreadable( $_usage );
-					if( $_usage > $l_var['high'] ) echo '</span>';
-					echo '<br />';
-				}
+				echo $row;
 			}
 		}
-
-
-		// DEBUGLOG (with list of categories at top):
-		$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
-		$log_cats = array_keys($Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
-		$log_container_head = '<h3>Debug messages</h3>';
-		$log_head_links = array();
-		foreach( $log_cats as $l_cat )
+		$count_ignored = count($table_rows_ignore_perhaps);
+		if( $count_ignored > 5 )
 		{
-			$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
-		}
-		$log_container_head .= implode( ' | ', $log_head_links );
-		echo format_to_output(
-			$Debuglog->display( array(
-					'container' => array( 'string' => $log_container_head, 'template' => false ),
-					'all' => array( 'string' => '<h4 id="debug_info_cat_%s">%s:</h4>', 'template' => false ) ),
-				'', false, $log_categories ),
-			'htmlbody' );
-
-
-		echo '<h3 id="evo_debug_queries">DB</h3>';
-
-		if( !isset($DB) )
-		{
-			echo 'No DB object.';
+			echo '<tr><td colspan="4" class="center"> + '.$count_ignored.' &lt; 0.005s </td></tr>';
 		}
 		else
 		{
-			$DB->dump_queries();
+			echo implode( "\n", $table_rows_ignore_perhaps );
 		}
-		echo '</div>';
+		echo '</tbody>';
+		echo '</table>';
+
+		if( isset($DB) )
+		{
+			echo '<a href="'.$ReqHostPathQuery.'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br />';
+		}
+
+		foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
+			'memory_get_usage' => array( 'display' => 'Memory usage', 'high' => 8000000 ),
+			'xdebug_peak_memory_usage' => array( 'display' => 'Memory peak usage', 'high' => 8000000 ) ) as $l_func => $l_var )
+		{
+			if( function_exists( $l_func ) )
+			{
+				$_usage = $l_func();
+				if( $_usage > $l_var['high'] ) echo '<span style="color:red; font-weight:bold">';
+				echo $l_var['display'].': '.bytesreadable( $_usage );
+				if( $_usage > $l_var['high'] ) echo '</span>';
+				echo '<br />';
+			}
+		}
 	}
+
+
+	// DEBUGLOG (with list of categories at top):
+	$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
+	$log_cats = array_keys($Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
+	$log_container_head = '<h3>Debug messages</h3>';
+	$log_head_links = array();
+	foreach( $log_cats as $l_cat )
+	{
+		$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+	}
+	$log_container_head .= implode( ' | ', $log_head_links );
+	echo format_to_output(
+		$Debuglog->display( array(
+				'container' => array( 'string' => $log_container_head, 'template' => false ),
+				'all' => array( 'string' => '<h4 id="debug_info_cat_%s">%s:</h4>', 'template' => false ) ),
+			'', false, $log_categories ),
+		'htmlbody' );
+
+
+	echo '<h3 id="evo_debug_queries">DB</h3>';
+
+	if( !isset($DB) )
+	{
+		echo 'No DB object.';
+	}
+	else
+	{
+		$DB->dump_queries();
+	}
+	echo '</div>';
 }
 
 
@@ -2921,6 +2923,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.53  2006/05/04 10:12:20  blueyed
+ * Normalization/doc
+ *
  * Revision 1.52  2006/05/04 01:08:20  blueyed
  * Normalization/doc fix
  *
