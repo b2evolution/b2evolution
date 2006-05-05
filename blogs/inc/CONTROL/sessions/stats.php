@@ -69,7 +69,10 @@ for( $curr_blog_ID = blog_list_start();
 	$blogListButtons .= '<a href="'.regenerate_url( array('blog','page'), "blog=$curr_blog_ID" ).'" class="'.(( $curr_blog_ID == $blog ) ? 'CurrentBlog' : 'OtherBlog').'">'.blog_list_iteminfo('shortname',false).'</a> ';
 }
 
-$Blog = & $BlogCache->get_by_ID($blog); // "Exit to blogs.." link
+if( $blog )
+{
+	$Blog = & $BlogCache->get_by_ID($blog); // "Exit to blogs.." link
+}
 
 
 // Check permission:
@@ -1052,6 +1055,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2006/05/05 20:10:40  blueyed
+ * Fix
+ *
  * Revision 1.14  2006/05/05 19:52:46  blueyed
  * minor
  *
