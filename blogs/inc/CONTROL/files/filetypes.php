@@ -52,17 +52,17 @@ if( param( 'ftyp_ID', 'integer', '', true) )
 		$Messages->add( T_('Requested file type does not exist any longer.'), 'error' );
 		$action = 'nil';
 	}
-}	
+}
 
 if( isset($edited_Filetype) && ($edited_Filetype !== false) )
 {	// We are editing a division:
 	$AdminUI->append_to_titlearea( '&laquo;<a href="'.regenerate_url('action','action=edit').
 																	'">'.$edited_Filetype->dget('name').'</a>&raquo;' );
 }
-	
+
 switch( $action )
 {
-	
+
 	case 'new':
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -82,7 +82,7 @@ switch( $action )
 		$edited_Filetype = & $new_Filetype;
 		$AdminUI->append_to_titlearea( T_('Copy file type...') );
 		break;
-	
+
 	case 'edit':
 		// Edit file type form...:
 
@@ -92,7 +92,7 @@ switch( $action )
 		// Make sure we got an ftyp_ID:
 		param( 'ftyp_ID', 'integer', true );
  		break;
-		
+
 	case 'create':
 		// Insert new file type...:
 		$edited_Filetype = & new Filetype();
@@ -105,8 +105,8 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Insert in DB:
 			$edited_Filetype->dbinsert();
-			$Messages->add( T_('New file type created.'), 'success' );
-			
+			$Messages->add( T_('New file type has been created.'), 'success' );
+
 			// What next?
 	 		param( 'submit', 'string', true );
 			if( $submit == T_('Record, then Create Similar') )
@@ -119,7 +119,7 @@ switch( $action )
 				$edited_Filetype = & new Filetype();
 			}
 			else
-			{			
+			{
 				$action = 'list';
 			}
 		}
@@ -170,7 +170,7 @@ switch( $action )
 			}
 		}
 		break;
-		
+
 }
 
 
@@ -190,7 +190,7 @@ switch( $action )
 		// Do nothing
 		break;
 
-	
+
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Filetype->confirm_delete(
@@ -216,9 +216,9 @@ switch( $action )
 			$AdminUI->disp_payload_begin();
 			$AdminUI->disp_view( 'files/_filetype_list.inc.php' );
 			$AdminUI->disp_payload_end();
-	
+
 }
-		
+
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 ?>
