@@ -347,7 +347,7 @@ switch ( $Settings->get('eblog_method') )
 			}
 			echo "\n<p><strong>", T_('Posted title'), ':</strong> ', $post_title, '<br />';
 			echo "\n<strong>", T_('Posted content'), ':</strong><br /><xmp>', $content, '</xmp></p>';
-		/*
+
 			if(!$pop3->delete($iCount))
 			{
 				echo '<p>', $pop3->ERROR, '</p></div>';
@@ -358,7 +358,7 @@ switch ( $Settings->get('eblog_method') )
 			{
 				echo '<p>', T_('Mission complete, message deleted.'), '</p>';
 			}
-		*/
+
 			echo '</div>';
 			if ($output_debugging_info)
 			{
