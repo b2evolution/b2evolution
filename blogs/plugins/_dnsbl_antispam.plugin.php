@@ -202,6 +202,10 @@ class dnsbl_antispam_plugin extends Plugin
 				$deactivate = param( 'tooslow_deactivate', 'array', array() );
 
 				$tooslow_dnsbls = $this->Settings->get( 'tooslow_dnsbls' );
+				if( ! is_array($tooslow_dnsbls) )
+				{
+					$tooslow_dnsbls = array();
+				}
 
 				foreach( $shown as $k => $blacklist )
 				{
@@ -220,7 +224,7 @@ class dnsbl_antispam_plugin extends Plugin
 						}
 					}
 				}
-				if( $this->Settings->set( 'tooslow_dnsbls', serialize($tooslow_dnsbls) ) )
+				if( $this->Settings->set( 'tooslow_dnsbls', $tooslow_dnsbls ) )
 				{
 					$this->Settings->dbupdate();
 				}
@@ -273,6 +277,10 @@ class dnsbl_antispam_plugin extends Plugin
 			echo '<p>'.T_('If DNS blacklists are detected as being too slow they get deactivated here.').'</p>';
 
 			$tooslow_dnsbls = $this->Settings->get( 'tooslow_dnsbls' );
+			if( ! is_array($tooslow_dnsbls) )
+			{
+				$tooslow_dnsbls = array();
+			}
 
 			foreach( $dnsbls as $blacklist )
 			{
@@ -673,6 +681,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.23  2006/05/05 19:49:16  blueyed
+ * Fixes
+ *
  * Revision 1.22  2006/05/05 19:41:43  blueyed
  * Fixes
  *
