@@ -414,7 +414,7 @@ switch( $AdminUI->get_path(1) )
 				?>
 
 				<tr class="totals">
-				<td class="firstcol"></td>
+				<td class="firstcol"><?php echo T_('Total') ?></td>
 				<td class="right"><?php echo $hits_total['direct'] ?></td>
 				<td class="right"><?php echo $hits_total['referer'] ?></td>
 				<td class="right"><?php echo $hits_total['search'] ?></td>
@@ -1052,6 +1052,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2006/05/05 19:52:46  blueyed
+ * minor
+ *
  * Revision 1.13  2006/05/02 18:07:13  blueyed
  * Set blog to be used for exit to blogs link
  *
