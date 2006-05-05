@@ -96,11 +96,11 @@ switch($action)
 		$post_trackbacks = & $trackback_url;
 
 
-		if( $Messages->count() )
+		if( $Messages->count('error') )
 		{
 			echo '<div class="panelinfo">';
 			$Messages->display( T_('Cannot post, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]', '', '', true, 'error' );
+				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' );
 			echo '</div>';
 			break;
 		}
@@ -190,11 +190,11 @@ switch($action)
 		$post_trackbacks = $trackback_url;
 
 
-		if( $Messages->count() )
+		if( $Messages->count('error') )
 		{
 			echo '<div class="panelinfo">';
 			$Messages->display( T_('Cannot update, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]', true, 'error' );
+				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' );
 			echo '</div>';
 			break;
 		}
@@ -396,7 +396,7 @@ switch($action)
 		 */
 		$AdminUI->title = T_('Deleting post...');
 
-    // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+		// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 		$AdminUI->disp_html_head();
 
 		// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
@@ -578,6 +578,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2006/05/05 19:19:23  blueyed
+ * Fixes
+ *
  * Revision 1.8  2006/04/18 20:17:25  fplanque
  * fast comment status switching
  *
