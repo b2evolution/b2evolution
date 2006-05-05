@@ -58,8 +58,8 @@ if ( !is_null( param( $GenericElementCache->dbprefix.'parent_ID', 'integer', NUL
 	if( ( $edited_parent_GenericElement = & $GenericElementCache->get_by_ID( ${$GenericElementCache->dbprefix.'parent_ID'}, false ) ) === false )
 	{ // Parent generic category doesn't exist any longer.
 		unset( $GenericElementCache->dbIDname );
-		$Messages->head = T_('Cannot edit xxx!');
-		$Messages->add( T_('Requested xxx does not exist any longer.'), 'error' );
+		$Messages->head = T_('Cannot edit xxx!'); // TODO: wtf?
+		$Messages->add( T_('Requested xxx does not exist any longer.'), 'error' ); // TODO: wtf?
 		$action = 'nil';
 	}
 }
@@ -86,51 +86,51 @@ switch( $action )
 {
 	case 'new':
 		// New action
-		
+
 		if( isset( $perm_name ) )
 		{	// We need to Check permission:
 			$current_User->check_perm( $perm_name, $perm_level, true );
 		}
-		
+
 		$edited_GenericElement = & $GenericElementCache->new_obj();
-		
+
 		if( isset( $edited_parent_GenericElement ) )
 		{
 			$edited_GenericElement->parent_ID = $edited_parent_GenericElement->ID;
 			$edited_GenericElement->parent_name = $edited_parent_GenericElement->name;
 		}
-		else 
+		else
 		{
 			$edited_GenericElement->parent_name = T_('Root');
 		}
-		
+
 		break;
-		
-		
+
+
 	case 'edit':
 		// Edit element form...:
 		// Make sure we got an ID:
 		param( $GenericElementCache->dbIDname, 'integer', true );
-		
+
 		if( isset( $perm_name ) )
 		{	// We need to Check permission:
 			$current_User->check_perm( $perm_name, $perm_level, true );
 		}
-		
+
 		// Get the page number we come from:
 		$previous_page = param( 'results'.$GenericElementCache->dbprefix.'page', 'integer', 1, true );
 
 		break;
-		
-		
+
+
 	case 'create':
 		// Insert new element...:
-		
+
 		if( isset( $perm_name ) )
 		{	// We need to Check permission:
 			$current_User->check_perm( $perm_name, $perm_level, true );
 		}
-		
+
 		$edited_GenericElement = & $GenericElementCache->new_obj();
 
 		// load data from request
@@ -146,17 +146,17 @@ switch( $action )
 			}
 		}
 		break;
-		
-	
+
+
 	case 'update':
 		// Make sure we got an ID:
 		param( $GenericElementCache->dbIDname, 'integer', true );
-		
+
 		if( isset( $perm_name ) )
 		{	// We need to Check permission:
 			$current_User->check_perm( $perm_name, $perm_level, true );
 		}
-		
+
 		// LOAD FORM DATA:
 		if( $edited_GenericElement->load_from_Request() )
 		{	// We could load data from form without errors:
@@ -164,31 +164,31 @@ switch( $action )
 			if( $edited_GenericElement->dbupdate() !== false )
 			{
 				$Messages->add( T_('Element updated.'), 'success' ); //ToDO change htis
-				// Add the ID of the updated element to the result fadeout 
+				// Add the ID of the updated element to the result fadeout
 				$result_fadeout[] = $edited_GenericElement->ID;
 				$action = 'list';
 			}
 		}
-		else 
+		else
 		{
 			// Get the page number we come from:
 			$previous_page = param( 'results'.$GenericElementCache->dbprefix.'page', 'integer', 1, true );
 		}
 		break;
-		
-		
+
+
 	case 'delete':
 		// Delete entry:
 		param( $GenericElementCache->dbIDname, 'integer', true );
-		
+
 		if( isset( $perm_name ) )
 		{	// We need to Check permission:
 			$current_User->check_perm( $perm_name, $perm_level, true );
 		}
-		
+
 		// Set restrictions for element
 		$edited_GenericElement->delete_restrictions = $delete_restrictions;
-		
+
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Element &laquo;%s&raquo; deleted.'), $edited_GenericElement->dget( 'name' ) );
@@ -208,7 +208,7 @@ switch( $action )
 			}
 		}
 		break;
-		
+
 }
 
 
@@ -236,32 +236,32 @@ switch( $action )
 	case 'delete':
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
-		
+
 		if( $action == 'delete' )
 		{	// We need to ask for confirmation:
 			$edited_GenericElement->confirm_delete(
 					sprintf( T_('Delete element &laquo;%s&raquo;?'),  $edited_GenericElement->dget( 'name' ) ),
 					$action, get_memorized( 'action' ) );
 		}
-		
+
 		if( $form_below_list )
 		{
 			// Display list VIEW before form view:
 			$AdminUI->disp_view( 'generic/_generic_recursive_list.inc.php' );
 		}
-		
+
 		// Display form form the element object:
 		$edited_GenericElement->disp_form();
-		
+
 		// End payload block:
 		$AdminUI->disp_payload_end();
 		break;
-	
+
 	case 'list':
 	default:
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
-		
+
 		// Display VIEW:
 		$AdminUI->disp_view( 'generic/_generic_recursive_list.inc.php' );
 
@@ -269,7 +269,7 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 		break;
 }
-	
+
 
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
