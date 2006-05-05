@@ -113,7 +113,7 @@ switch( $action )
 			$Request->param( 'eblog_server_host', 'string', true );
 			$Settings->set( 'eblog_server_host', strtolower(trim($eblog_server_host)));
 
-			$Request->param( 'eblog_server_port', 'integer', 0 );
+			$Request->param( 'eblog_server_port', '/\d*/', '' );
 			$Settings->set( 'eblog_server_port', $eblog_server_port );
 
 			$Request->param( 'eblog_username', 'string', true );

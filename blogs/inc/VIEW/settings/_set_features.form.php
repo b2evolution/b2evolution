@@ -45,7 +45,7 @@ global $current_User;
  */
 global $Settings;
 
-global $htsrv_url;
+global $baseurl;
 
 
 $Form = & new Form( NULL, 'feats_checkchanges' );
@@ -67,12 +67,12 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 		array( 'note' => T_('Check to enable the Blog by email feature.' ), 'onclick' => 'this.checked==true?document.getElementById("eblog_section").style.display="":document.getElementById("eblog_section").style.display="none";' ) );
 
 	echo '<div id="eblog_section" style="'.( $Settings->get('eblog_enabled') ? '' : 'display:none' ).'">';
-		$Form->select_input_array( 'eblog_method', array( 'pop3'=>T_('POP3'), 'pop3a'=>T_('POP3 (experimental)') ), // TRANS: E-Mail retrieval method
+		$Form->select_input_array( 'eblog_method', array( 'pop3'=>T_('POP3'), 'pop3a'=>T_('POP3 through IMAP extension (experimental)') ), // TRANS: E-Mail retrieval method
 			T_('Retrieval method'), array('value' => $Settings->get('eblog_method'), 'note' => T_('Choose a method to retrieve the emails.') ) );
 
 		$Form->text_input( 'eblog_server_host', $Settings->get('eblog_server_host'), 40, T_('Mail Server'), array( 'maxlength' => 255, 'note' => T_('Hostname or IP address of your incoming mail server.')  )  );
 
-		$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'),5,T_('Port Number'), array( 'maxlength' => 6, 'note' => T_('Port number of your incoming mail server (Defaults: pop3:110 imap:143).')  )  );
+		$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'),5,T_('Port Number'), array( 'maxlength' => 6, 'note' => T_('Port number of your incoming mail server (Defaults: pop3:110 imap:143).') ) );
 
 		$Form->text_input( 'eblog_username', $Settings->get('eblog_username'),15,T_('Account Name'), array( 'maxlength' => 255, 'note' => T_('User name for authenticating to your mail server.')  )  );
 
@@ -85,11 +85,12 @@ $Form->begin_fieldset( T_('Blog by email') . get_web_help_link('blog by email') 
 
 		// eblog test links
 		// TODO: provide Non-JS functionality (open in a new window).
+		// TODO: "cron/" is supposed to not reside in the server's DocumentRoot, therefor is not necessarily accessible
 		$Form->info_field(
 			T_('Perform Server Test'),
-			' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "' . $htsrv_url . 'getmail.php?test=1", "getmail" );\'>[ ' . T_('connection') . ' ]</a>'
-			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "' . $htsrv_url . 'getmail.php?test=2", "getmail" );\'>[ ' . T_('messages') . ' ]</a>'
-			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "' . $htsrv_url . 'getmail.php?test=3", "getmail" );\'>[ ' . T_('verbose') . ' ]</a>',
+			' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "' . $baseurl . 'cron/getmail.php?test=1", "getmail" );\'>[ ' . T_('connection') . ' ]</a>'
+			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "' . $baseurl . 'cron/getmail.php?test=2", "getmail" );\'>[ ' . T_('messages') . ' ]</a>'
+			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "' . $baseurl . 'cron/getmail.php?test=3", "getmail" );\'>[ ' . T_('verbose') . ' ]</a>',
 			array() );
 
 //		$Form->info_field ('','<a id="eblog_test_email" href="#" onclick=\'return pop_up_window( "' . $htsrv_url . 'getmail.php?test=email", "getmail" );\'>' . T_('Test email') . '</a>',array());
@@ -139,6 +140,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.6  2006/05/05 17:53:29  blueyed
+ * Fixes for blog by email: made tests work and use default port, if not given
+ *
  * Revision 1.5  2006/04/29 17:37:48  blueyed
  * Added basic_antispam_plugin; Moved double-check-referers there; added check, if trackback links to us
  *
