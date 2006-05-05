@@ -266,6 +266,7 @@ class dnsbl_antispam_plugin extends Plugin
 		    && ( $dnsbls = preg_split( '~\s+~', $this->Settings->get( 'dnsbls' ), -1, PREG_SPLIT_NO_EMPTY ) ) )
 		{
 			$Form = new Form();
+			$Form->hiddens_by_key( get_memorized() );
 			$Form->begin_form( 'fform', T_('Too slow lists') );
 			$Form->begin_fieldset();
 
@@ -305,6 +306,7 @@ class dnsbl_antispam_plugin extends Plugin
 				 WHERE log_type = "whitelisted"' );
 
 			$Form = new Form();
+			$Form->hiddens_by_key( get_memorized() );
 			$Form->begin_form( 'fform', T_('Statistics') );
 			$Form->begin_fieldset();
 
@@ -671,6 +673,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.22  2006/05/05 19:41:43  blueyed
+ * Fixes
+ *
  * Revision 1.21  2006/05/02 01:47:58  blueyed
  * Normalization
  *
