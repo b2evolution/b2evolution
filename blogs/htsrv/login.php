@@ -128,7 +128,7 @@ switch( $action )
 			if( ! send_mail( $ForgetfulUser->email, sprintf( T_('Password change request for %s'), $ForgetfulUser->login ), $message, $notify_from ) )
 			{
 				$Messages->add( T_('Sorry, the email with the link to reset your password could not be sent.')
-					.'<br />'.T_('Possible reason: the mail() function is disabled.'), 'error' );
+					.'<br />'.T_('Possible reason: the PHP mail() function is disabled.'), 'error' );
 			}
 			else
 			{
@@ -235,7 +235,7 @@ switch( $action )
 			else
 			{
 				$Messages->add( T_('Sorry, the email with the link to validate and activate your password could not be sent.')
-							.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled by your host.'), 'error' );
+							.'<br />'.T_('Possible reason: the PHP mail() function is disabled.'), 'error' );
 			}
 		}
 		else
@@ -349,6 +349,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.59  2006/05/05 21:47:42  blueyed
+ * consistency
+ *
  * Revision 1.58  2006/04/24 20:52:30  fplanque
  * no message
  *
