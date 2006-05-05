@@ -322,6 +322,11 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 		$Form->end_fieldset();
 	}
+
+
+	// ####################### PLUGIN FIELDSETS #########################
+
+	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item ) );
 	?>
 
 </div>
@@ -422,6 +427,9 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.9  2006/05/05 19:36:23  blueyed
+ * New events
+ *
  * Revision 1.8  2006/04/19 15:56:02  blueyed
  * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
  * and Item::comments to Item::comment_status (Item API change)

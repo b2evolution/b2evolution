@@ -234,12 +234,16 @@ class Plugins
 				'AdminAfterPageFooter' => '',
 				'AdminDisplayEditorButton' => '',
 				'AdminDisplayToolbar' => '',
+				'AdminDisplayItemFormFieldset' => '',
 				'AdminEndHtmlHead' => '',
 				'AdminAfterMenuInit' => '',
 				'AdminTabAction' => '',
 				'AdminTabPayload' => '',
 				'AdminToolAction' => '',
 				'AdminToolPayload' => '',
+
+				'AdminBeforeItemEditCreate' => T_('This gets called before a new item gets created.'),
+				'AdminBeforeItemEditUpdate' => T_('This gets called before an existing item gets updated.'),
 
 				'AdminBeginPayload' => '',
 
@@ -2648,6 +2652,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.44  2006/05/05 19:36:23  blueyed
+ * New events
+ *
  * Revision 1.43  2006/05/02 23:46:07  blueyed
  * Validate/fixed plugin spam weight handling.
  *

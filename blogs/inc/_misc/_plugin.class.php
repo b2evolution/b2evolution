@@ -511,7 +511,7 @@ class Plugin
 	 * You should provide an unique html ID with your button.
 	 *
 	 * @param array Associative array of parameters.
-	 *              'target_type': either 'Comment' or 'Item.
+	 *              'target_type': either 'Comment' or 'Item'.
 	 * @return boolean did we display a button?
 	 */
 	function AdminDisplayEditorButton( $params )
@@ -524,7 +524,7 @@ class Plugin
 	 * Event handler: Called when displaying editor toolbars.
 	 *
 	 * @param array Associative array of parameters
-	 *              'target_type': either 'Comment' or 'Item.
+	 *              'target_type': either 'Comment' or 'Item'.
 	 * @return boolean did we display a toolbar?
 	 */
 	function AdminDisplayToolbar( & $params )
@@ -890,6 +890,48 @@ class Plugin
 	 *   - 'Item': the Item object (by reference)
 	 */
 	function ItemViewed( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the "Edit item" form:
+	 *
+	 * @param array Associative array of parameters
+	 *              'Form': the {@link Form} object (by reference)
+	 *              'Item': the Item which gets edited (by reference)
+	 * @return boolean did we display something?
+	 */
+	function AdminDisplayItemFormFieldset( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called before a new item gets created (in the backoffice).
+	 *
+	 * You could {@link Plugin::msg() add a message} of
+	 * category "error" here, to prevent the comment from being inserted.
+	 *
+	 * @param array Associative array of parameters
+	 *              'Item': the Item which gets created (by reference)
+	 */
+	function AdminBeforeItemEditCreate( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called before an existing item gets updated (in the backoffice).
+	 *
+	 * You could {@link Plugin::msg() add a message} of
+	 * category "error" here, to prevent the comment from being inserted.
+	 *
+	 * @param array Associative array of parameters
+	 *              'Item': the Item which gets updated (by reference)
+	 */
+	function AdminBeforeItemEditUpdate( & $params )
 	{
 	}
 
@@ -2059,6 +2101,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.44  2006/05/05 19:36:23  blueyed
+ * New events
+ *
  * Revision 1.43  2006/05/04 10:18:41  blueyed
  * Added Session property to skip page content caching event.
  *

@@ -95,6 +95,7 @@ switch($action)
 		param( 'trackback_url', 'string' );
 		$post_trackbacks = & $trackback_url;
 
+		$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $edited_Item ) );
 
 		if( $Messages->count('error') )
 		{
@@ -104,6 +105,9 @@ switch($action)
 			echo '</div>';
 			break;
 		}
+
+		// Display Messages (other than "error"):
+		$Messages->display();
 
 
 		// Are we going to do the pings or not?
@@ -190,6 +194,8 @@ switch($action)
 		$post_trackbacks = $trackback_url;
 
 
+		$Plugins->trigger_event( 'AdminBeforeItemEditUpdate', array( 'Item' => & $edited_Item ) );
+
 		if( $Messages->count('error') )
 		{
 			echo '<div class="panelinfo">';
@@ -198,6 +204,9 @@ switch($action)
 			echo '</div>';
 			break;
 		}
+
+		// Display Messages (other than "error"):
+		$Messages->display();
 
 
 		// Check the previous ping state...
@@ -578,6 +587,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2006/05/05 19:36:23  blueyed
+ * New events
+ *
  * Revision 1.9  2006/05/05 19:19:23  blueyed
  * Fixes
  *

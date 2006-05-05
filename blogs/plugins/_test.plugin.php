@@ -246,6 +246,35 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * @see Plugin::AdminDisplayItemFormFieldset()
+	 */
+	function AdminDisplayItemFormFieldset( & $params )
+	{
+		$params['Form']->begin_fieldset( 'TEST plugin' );
+		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the AdminDisplayItemFormFieldset event.' );
+		$params['Form']->end_fieldset( 'Foo' );
+	}
+
+
+	/**
+	 * @see Plugin::AdminBeforeItemEditCreate()
+	 */
+	function AdminBeforeItemEditCreate( & $params )
+	{
+		$this->msg( 'This is the TEST plugin responding to the AdminBeforeItemEditCreate event.' );
+	}
+
+
+	/**
+	 * @see Plugin::AdminBeforeItemEditUpdate()
+	 */
+	function AdminBeforeItemEditUpdate( & $params )
+	{
+		$this->msg( 'This is the TEST plugin responding to the AdminBeforeItemEditUpdate event.' );
+	}
+
+
+	/**
 	 * Event handler: Gets invoked in /admin/_header.php for every backoffice page after
 	 *                the menu structure is build. You can use the {@link $AdminUI} object
 	 *                to modify it.
@@ -511,6 +540,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.38  2006/05/05 19:36:24  blueyed
+ * New events
+ *
  * Revision 1.37  2006/05/02 01:47:58  blueyed
  * Normalization
  *
