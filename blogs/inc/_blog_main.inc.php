@@ -435,7 +435,7 @@ if( !isset( $skin ) )
 	}
 	else
 	{ // Get the saved skin in cookie or default:
-		$Request->param( $cookie_state, 'string', $default_skin );
+		$Request->param( $cookie_state, 'string', $default_skin, false, true ); // override (in case there has been "param($cookie_state)" before, which set it already to '')
 		$Debuglog->add( 'Skin after looking at cookie: '.$$cookie_state, 'skin' );
 		// Get skin by params or default to cookie
 		// (if cookie was not set, the $$cookie_state contains default skin!)
@@ -501,6 +501,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.19  2006/05/05 15:46:03  blueyed
+ * Nasty bug that produces empty pages..
+ *
  * Revision 1.18  2006/05/03 01:53:42  blueyed
  * Encode subject in mails correctly (if mbstrings is available)
  *
