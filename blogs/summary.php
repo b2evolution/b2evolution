@@ -63,7 +63,7 @@ require_once $inc_path.'_main.inc.php';
 
 <div class="NavBar">
 <div class="pageTitle">
-<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php echo T_('Summary demo') ?><!-- InstanceEndEditable --></h1>
+<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php echo T_('Summary Demo') ?><!-- InstanceEndEditable --></h1>
 </div>
 </div>
 
