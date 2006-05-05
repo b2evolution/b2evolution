@@ -41,7 +41,7 @@ global $current_User;
  */
 global $Settings;
 
-global $rsc_subdir, $pagenow, $locales_path, $locales, $action, $edit_locale, $loc_transinfo, $template, $allow_po_extraction, $servertimenow;
+global $rsc_subdir, $pagenow, $locales_path, $locales, $action, $edit_locale, $loc_transinfo, $template, $allow_po_extraction, $servertimenow, $allow_po_extraction;
 
 
 if( $action == 'edit' )
@@ -410,6 +410,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.3  2006/05/05 23:25:52  blueyed
+ * fix
+ *
  * Revision 1.2  2006/04/19 20:13:52  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
