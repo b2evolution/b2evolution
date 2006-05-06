@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: messages\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2006-05-05 23:21+0200\n"
-"PO-Revision-Date: 2006-05-06 01:20+0200\n"
+"PO-Revision-Date: 2006-05-06 23:47+0200\n"
 "Last-Translator: dAniel hAhler <daniel@thequod.de>\n"
 "Language-Team:  <en@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -2416,12 +2416,12 @@ msgstr "Neuer Dateityp wurde erstellt."
 #: ../../../inc/CONTROL/files/filetypes.php:112
 #: ../../../inc/VIEW/files/_filetype.form.php:100
 msgid "Record, then Create Similar"
-msgstr ""
+msgstr "Aufzeichen, dann ähnlichen erstellen"
 
 #: ../../../inc/CONTROL/files/filetypes.php:116
 #: ../../../inc/VIEW/files/_filetype.form.php:99
 msgid "Record, then Create New"
-msgstr ""
+msgstr "Aufzeichen, dann neuen erstellen"
 
 #: ../../../inc/CONTROL/files/filetypes.php:142
 msgid "File type updated."
@@ -3442,9 +3442,9 @@ msgid "%d subscriptions"
 msgstr "%d Subskriptionen"
 
 #: ../../../inc/MODEL/collections/_blog.class.php:372
-#, fuzzy, php-format
+#, php-format
 msgid "The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."
-msgstr "Das Blogverzeichnis &laquo;%s&raquo; kann nicht erstellt werden, weil das übergeordnete Verzeichnis &laquo;%s&raquo; nicht schreibbar ist."
+msgstr "Das Blog-Medienverzeichnis &laquo;%s&raquo; konnte nicht erstellt werden, weil das übergeordnete Verzeichnis nicht beschreibbar ist oder nicht existiert."
 
 #: ../../../inc/MODEL/collections/_blog.class.php:380
 #, php-format
@@ -3501,7 +3501,7 @@ msgstr "Besucher"
 # TRANS: "not available"
 #: ../../../inc/MODEL/comments/_comment.class.php:418
 msgid "N/A"
-msgstr ""
+msgstr "N/V"
 
 #: ../../../inc/MODEL/comments/_comment.class.php:450
 msgid "Edit this comment"
@@ -3517,19 +3517,16 @@ msgid "Deprecate!"
 msgstr "Missbilligen!"
 
 #: ../../../inc/MODEL/comments/_comment.class.php:547
-#, fuzzy
 msgid "Deprecate this comment!"
-msgstr "Lösche diesen Kommentar"
+msgstr "Missbillige diesen Kommentar!"
 
 #: ../../../inc/MODEL/comments/_comment.class.php:607
-#, fuzzy
 msgid "Publish!"
-msgstr "Veröffentlichen"
+msgstr "Veröffentlichen!"
 
 #: ../../../inc/MODEL/comments/_comment.class.php:608
-#, fuzzy
 msgid "Publish this comment!"
-msgstr "Diesen Kommentar editieren"
+msgstr "Veröffentliche diesen Kommentar!"
 
 #: ../../../inc/MODEL/comments/_comment.class.php:683
 msgid "Send email to comment author"
@@ -3620,34 +3617,34 @@ msgid "WARNING: Deleting this object will also delete:"
 msgstr "WARNUNG: Das Löschen dieses Objektes wird auch folgendes löschen:"
 
 #: ../../../inc/MODEL/dataobjects/_dataobject.class.php:626
-#, fuzzy, php-format
+#, php-format
 msgid "Created on %s by %s"
-msgstr "Zuletzt geändert am %s von %s"
+msgstr "Erstellt am %s von %s"
 
 #: ../../../inc/MODEL/dataobjects/_dataobject.class.php:631
-#, fuzzy, php-format
+#, php-format
 msgid "Created by %s"
-msgstr "Erstellt am"
+msgstr "Erstellt von %s"
 
 #: ../../../inc/MODEL/dataobjects/_dataobject.class.php:636
-#, fuzzy, php-format
+#, php-format
 msgid "Created on %s"
-msgstr "Erstellt am"
+msgstr "Erstellt am %s"
 
 #: ../../../inc/MODEL/dataobjects/_dataobject.class.php:646
-#, fuzzy, php-format
+#, php-format
 msgid "Last mod on %s by %s"
-msgstr "Zuletzt geändert am %s von %s"
+msgstr "Letzte Änderung am %s von %s"
 
 #: ../../../inc/MODEL/dataobjects/_dataobject.class.php:651
-#, fuzzy, php-format
+#, php-format
 msgid "Last mod by %s"
-msgstr "Zuletzt geändert am %s von %s"
+msgstr "Letzte Änderung von %s"
 
 #: ../../../inc/MODEL/dataobjects/_dataobject.class.php:656
-#, fuzzy, php-format
+#, php-format
 msgid "Last mod on %s"
-msgstr "Zuletzt geändert am %s von %s"
+msgstr "Letzte Änderung am %s"
 
 #: ../../../inc/MODEL/files/_file.class.php:215
 #, php-format
@@ -3734,29 +3731,28 @@ msgid "&laquo;%s&raquo; is not a valid filename."
 msgstr "&laquo;%s&raquo; ist kein gültiger Dateiname."
 
 #: ../../../inc/MODEL/files/_file.funcs.php:504
-#, fuzzy, php-format
+#, php-format
 msgid "&laquo;%s&raquo; has an unallowed extension."
-msgstr "&laquo;%s&raquo; wurde nicht umbenannt."
+msgstr "&laquo;%s&raquo; hat eine ungültige Erweiterung."
 
 #: ../../../inc/MODEL/files/_file.funcs.php:509
-#, fuzzy, php-format
+#, php-format
 msgid "&laquo;%s&raquo; has an unrecognized extension."
-msgstr "&laquo;%s&raquo; wurde nicht umbenannt."
+msgstr "&laquo;%s&raquo; hat eine nicht erkannte Erweiterung."
 
 #: ../../../inc/MODEL/files/_file.funcs.php:514
-#, fuzzy, php-format
+#, php-format
 msgid "&laquo;%s&raquo; has not a valid extension."
-msgstr "&laquo;%s&raquo; ist kein gültiges Verzeichnis."
+msgstr "&laquo;%s&raquo; hat keine gültige Erweiterung."
 
 #: ../../../inc/MODEL/files/_file.funcs.php:538
 #: ../../../inc/MODEL/files/_file.funcs.php:549
-#, fuzzy, php-format
+#, php-format
 msgid "&laquo;%s&raquo; is not a valid directory name."
-msgstr "&laquo;%s&raquo; ist kein gültiges Verzeichnis."
+msgstr "&laquo;%s&raquo; ist kein gültiger Verzeichnisname."
 
 #: ../../../inc/MODEL/files/_file.funcs.php:696
 #: ../../../inc/MODEL/files/_file.funcs.php:699
-#, fuzzy
 msgid "Open this directory in the file manager"
 msgstr "Öffne dieses Verzeichnis im Dateimanager"
 
@@ -3794,39 +3790,34 @@ msgstr "Wechsele in dieses Verzeichnis"
 
 #: ../../../inc/MODEL/files/_filetype.class.php:99
 msgid "Please enter file extensions separated by space."
-msgstr ""
+msgstr "Bitte gib Dateierweiterungen durch Leerzeichen getrennt an."
 
 #: ../../../inc/MODEL/files/_filetype.class.php:105
-#, fuzzy
 msgid "Invalid file extensions format."
-msgstr "Erlaubte Dateierweiterungen"
+msgstr "Ungültiges Dateierweiterungs-Format."
 
 #: ../../../inc/MODEL/files/_filetype.class.php:111
 #: ../../../inc/MODEL/generic/_genericelement.class.php:94
-#, fuzzy
 msgid "Please enter a name."
-msgstr "Bitte gib ein Login ein."
+msgstr "Bitte gib einen Namen ein."
 
 #: ../../../inc/MODEL/files/_filetype.class.php:115
-#, fuzzy
 msgid "Please enter a mime type."
-msgstr "Bitte gib ein Login ein."
+msgstr "Bitte gib einen Mime-Typ ein."
 
 #: ../../../inc/MODEL/files/_filetype.class.php:121
-#, fuzzy
 msgid "Please enter a file name."
-msgstr "Bitte gib einen Kategorienamen an."
+msgstr "Bitte gib einen Dateinamen ein."
 
 #: ../../../inc/MODEL/generic/_genericcategory.class.php:89
 msgid "Parent ID must be a number"
-msgstr ""
+msgstr "Eltern-ID muss eine Nummer sein"
 
 #: ../../../inc/MODEL/generic/_genericcategory.class.php:147
 #: ../../../inc/MODEL/generic/_genericelement.class.php:119
 #: ../../../inc/MODEL/generic/_genericproperty.class.php:138
-#, fuzzy
 msgid "Element"
-msgstr "Neues Element"
+msgstr "Element"
 
 #: ../../../inc/MODEL/generic/_genericcategory.class.php:147
 #: ../../../inc/MODEL/generic/_genericelement.class.php:119
@@ -3836,9 +3827,8 @@ msgstr "Neues Element"
 
 #: ../../../inc/MODEL/generic/_genericcategory.class.php:157
 #: ../../../inc/MODEL/generic/_genericcategory.class.php:162
-#, fuzzy
 msgid "Add to"
-msgstr "Gruppe hinzufügen"
+msgstr "Hinzufügen"
 
 #: ../../../inc/MODEL/generic/_genericcategory.class.php:165
 #: ../../../inc/MODEL/generic/_genericelement.class.php:127
@@ -3849,9 +3839,8 @@ msgstr "Name"
 
 #: ../../../inc/MODEL/generic/_genericcategory.class.php:167
 #: ../../../inc/MODEL/generic/_genericproperty.class.php:148
-#, fuzzy
 msgid "External ID"
-msgstr "Extra"
+msgstr "Externe IDExtra"
 
 # TRANS: Priority name
 #: ../../../inc/MODEL/items/_item.class.php:186
@@ -3931,9 +3920,8 @@ msgid "Send email to post author"
 msgstr "Sende eine E-Mail an den Beitrags-Autor"
 
 #: ../../../inc/MODEL/items/_item.class.php:1114
-#, fuzzy
 msgid "Send email to assigned user"
-msgstr "Schicke eine E-Mail an den Benutzer"
+msgstr "Schicke eine E-Mail an den zugeordneten Benutzer"
 
 #: ../../../inc/MODEL/items/_item.class.php:1203 ../skins/basic/_main.php:97
 msgid "Permanent link to full entry"
@@ -4020,9 +4008,8 @@ msgid "Publish now using current date and time."
 msgstr "Veröffentliche jetzt mit aktuellem Datum und Zeit."
 
 #: ../../../inc/MODEL/items/_item.class.php:1549
-#, fuzzy
 msgid "Deprecate this post!"
-msgstr "Missbillige diesen Eintrag jetzt!"
+msgstr "Missbillige diesen Eintrag!"
 
 #: ../../../inc/MODEL/items/_item.class.php:1712
 msgid "Configure plugins"
@@ -4033,19 +4020,17 @@ msgid "No renderer plugins are installed."
 msgstr "Es sind keine Render-Plugins installiert."
 
 #: ../../../inc/MODEL/items/_item.class.php:1937
-#, fuzzy
 msgid "No views"
-msgstr "Ansichten"
+msgstr "Keine Ansichten"
 
 #: ../../../inc/MODEL/items/_item.class.php:1941
-#, fuzzy
 msgid "1 view"
-msgstr "Ansichten"
+msgstr "1 Ansicht"
 
 #: ../../../inc/MODEL/items/_item.class.php:1945
-#, fuzzy, php-format
+#, php-format
 msgid "%d views"
-msgstr "Ansichten"
+msgstr "%d Ansichten"
 
 #: ../../../inc/MODEL/items/_item.class.php:2410
 msgid "Notifying subscribed users..."
@@ -4140,14 +4125,12 @@ msgstr "Sorry, es gibt keinen Beitrag anzuzeigen..."
 
 #: ../../../inc/MODEL/items/_itemlist2.class.php:353
 #: ../../../inc/MODEL/items/_itemlist2.class.php:354
-#, fuzzy
 msgid "Invalid date"
-msgstr "Ungültiger URL"
+msgstr "Ungültiges Datum"
 
 #: ../../../inc/MODEL/items/_itemlist2.class.php:783
-#, fuzzy
 msgid "Invalid request"
-msgstr "Ungültige Antwort."
+msgstr "Ungültige Anforderung"
 
 #: ../../../inc/MODEL/items/_itemlist2.class.php:787
 #: ../../../inc/_misc/_obsolete092.php:1364
@@ -4193,7 +4176,6 @@ msgid "Without status"
 msgstr "Ohne Status"
 
 #: ../../../inc/MODEL/items/_itemlist2.class.php:901
-#, fuzzy
 msgid "Status(es)"
 msgstr "Status"
 
@@ -5734,64 +5716,57 @@ msgstr "Öffnen mit Bildbetrachter (Popup)"
 
 #: ../../../inc/VIEW/files/_filetype.form.php:73
 msgid "Use the online image viewer (recommended for .gif .png .jpg)"
-msgstr ""
+msgstr "Benutze den Online-Bildbetrachter (empfohlen für .gif .png .jpg)"
 
 #: ../../../inc/VIEW/files/_filetype.form.php:74
 msgid "Let the browser handle the file in a popup. Note: if you do not want Word to open inside of IE, you must uncheck \"browse in same window\" in Windows' file types."
-msgstr ""
+msgstr "Lass den Browser die Datei in einem Popup behandeln. Beachte: wenn Du nicht möchtest, dass sich Word im IE öffnet, musst Du \"im selben Fenster anzeigen\" für den Windows-Dateityp demarkieren."
 
 #: ../../../inc/VIEW/files/_filetype.form.php:74
 msgid "Open with external app (no popup)"
-msgstr ""
+msgstr "Öffne mit externer Anwendung (kein Popup)"
 
 #: ../../../inc/VIEW/files/_filetype.form.php:75
 msgid "Download to disk (no popup)"
-msgstr ""
+msgstr "Download (kein Popup)"
 
 #: ../../../inc/VIEW/files/_filetype.form.php:75
 msgid "Tell the browser to save the file to disk instead of displaying it."
-msgstr ""
+msgstr "Fordere den Browser auf, die Datei zu speichern, anstatt sie anzuzeigen."
 
 #: ../../../inc/VIEW/files/_filetype.form.php:77
 #: ../../../inc/VIEW/files/_filetype_list.inc.php:85
-#, fuzzy
 msgid "View type"
-msgstr "Nur Anzeige"
+msgstr "Ansichtstyp"
 
 #: ../../../inc/VIEW/files/_filetype.form.php:93
-#, fuzzy
 msgid "Allow upload"
-msgstr "Datei hochladen"
+msgstr "Erlaube HochladenDatei hochladen"
 
 #: ../../../inc/VIEW/files/_filetype.form.php:94
-#, fuzzy
 msgid "Check to allow uploading and renaming of this file type"
-msgstr "Auswählen, um allgemein das Hochladen zu erlauben."
+msgstr "Auswählen, um Hochladen und Umbenennen für diesen Dateityp zu erlauben"
 
 #: ../../../inc/VIEW/files/_filetype_list.inc.php:43
-#, fuzzy
 msgid "File types list"
-msgstr "Filtere Liste"
+msgstr "Dateitypenliste"
 
 #: ../../../inc/VIEW/files/_filetype_list.inc.php:59
 #: ../../../inc/VIEW/files/_filetype_list.inc.php:120
-#, fuzzy
 msgid "Edit this file type..."
-msgstr "Diesen Eintrag ändern..."
+msgstr "Ändere diesen Dateityp..."
 
 #: ../../../inc/VIEW/files/_filetype_list.inc.php:122
-#, fuzzy
 msgid "Duplicate this file type..."
-msgstr "Diesen Benutzer duplizieren..."
+msgstr "Duplizieren diesen Dateityp..."
 
 #: ../../../inc/VIEW/files/_filetype_list.inc.php:124
-#, fuzzy
 msgid "Delete this file type!"
-msgstr "Lösche diesen Hit!"
+msgstr "Lösche diesen Dateityp!"
 
 #: ../../../inc/VIEW/files/_filetype_list.inc.php:128
 msgid "Add file type"
-msgstr ""
+msgstr "Dateityp hinzufügen"
 
 #: ../../../inc/VIEW/files/_set_files.form.php:44
 msgid "File Settings"
@@ -5875,9 +5850,8 @@ msgid "Regular expression"
 msgstr "Regulärer Ausdruck"
 
 #: ../../../inc/VIEW/files/_set_files.form.php:83
-#, fuzzy
 msgid "Valid dirname"
-msgstr "Gültiger Dateiname"
+msgstr "Gültiger Verzeichnisname"
 
 #: ../../../inc/VIEW/files/_set_files.form.php:96
 #: ../../../inc/VIEW/settings/_set_antispam.form.php:80
@@ -5889,26 +5863,22 @@ msgstr "Standardeinstellungen"
 #: ../../../inc/VIEW/generic/_generic_list.inc.php:126
 #: ../../../inc/VIEW/generic/_generic_ordered_list.inc.php:131
 #: ../../../inc/VIEW/generic/_generic_recursive_list.inc.php:125
-#, fuzzy
 msgid "Add an element..."
-msgstr "Einen Benutzer hinzufügen..."
+msgstr "Ein Element hinzufügen..."
 
 #: ../../../inc/VIEW/generic/_generic_list.inc.php:126
 #: ../../../inc/VIEW/generic/_generic_ordered_list.inc.php:131
 #: ../../../inc/VIEW/generic/_generic_recursive_list.inc.php:125
-#, fuzzy
 msgid "Add element"
-msgstr "Neues Element"
+msgstr "Element hinzufügen"
 
 #: ../../../inc/VIEW/generic/_generic_recursive_list.inc.php:73
-#, fuzzy
 msgid "New..."
-msgstr "Neues Blog..."
+msgstr "Neu..."
 
 #: ../../../inc/VIEW/generic/_generic_recursive_list.inc.php:75
-#, fuzzy
 msgid "Delete..."
-msgstr "Löschen"
+msgstr "Löschen..."
 
 #: ../../../inc/VIEW/items/_browse_posts_exp.inc.php:48
 #: ../../../skins_adm/_adminUI_general.class.php:916
@@ -5959,7 +5929,6 @@ msgid "Assigned to:"
 msgstr "Zugeordnet zu:"
 
 #: ../../../inc/VIEW/items/_browse_posts_exp.inc.php:107
-#, fuzzy
 msgid "Task Status"
 msgstr "Aufgabenstatus"
 
@@ -6053,9 +6022,8 @@ msgstr "Ausgabedatum"
 
 #: ../../../inc/VIEW/items/_browse_posts_list2.view.php:53
 #: ../../../inc/VIEW/items/_browse_tracker.inc.php:52
-#, fuzzy
 msgid "Task list"
-msgstr "Aufgabenstatus"
+msgstr "Aufgabenliste"
 
 #: ../../../inc/VIEW/items/_browse_posts_list2.view.php:120
 #: ../../../inc/VIEW/items/_browse_tracker.inc.php:96
@@ -6066,29 +6034,25 @@ msgstr "Aufgabe"
 #: ../../../inc/VIEW/items/_browse_posts_list2.view.php:151
 #: ../../../inc/VIEW/items/_browse_tracker.inc.php:188
 msgid "i"
-msgstr ""
+msgstr "i"
 
 #: ../../../inc/VIEW/items/_browse_posts_list2.view.php:181
-#, fuzzy
 msgid "Add a post..."
-msgstr "Neuen Eintrag hinzufügen..."
+msgstr "Einen Eintrag hinzufügen..."
 
 #: ../../../inc/VIEW/items/_browse_posts_list2.view.php:181
-#, fuzzy
 msgid "Add post"
-msgstr "%d Einträge"
+msgstr "Eintrag hinzufügen"
 
 #: ../../../inc/VIEW/items/_browse_posts_sidebar.inc.php:72
 #: ../../../inc/_misc/_results.class.php:632
-#, fuzzy
 msgid "Filters"
 msgstr "Filter"
 
 #: ../../../inc/VIEW/items/_browse_posts_sidebar.inc.php:75
 #: ../../../inc/VIEW/items/_browse_posts_sidebar.inc.php:258
-#, fuzzy
 msgid "Reset all filters!"
-msgstr "Filter zurücksetzen"
+msgstr "Alle Filter zurücksetzen!"
 
 #: ../../../inc/VIEW/items/_browse_posts_sidebar.inc.php:80
 msgid "Posts to show"
@@ -6142,36 +6106,32 @@ msgstr "Autoren"
 #: ../../../inc/VIEW/items/_browse_posts_sidebar.inc.php:174
 #, fuzzy
 msgid "Assignees"
-msgstr "Zugeordnet zu"
+msgstr "Zugeordnete"
 
 #: ../../../inc/VIEW/items/_browse_posts_sidebar.inc.php:206
-#, fuzzy
 msgid "Statuses"
 msgstr "Status"
 
 # TRANS: abbrev for Priority
 #: ../../../inc/VIEW/items/_browse_tracker.inc.php:56
 msgid "P"
-msgstr ""
+msgstr "P"
 
 #: ../../../inc/VIEW/items/_browse_tracker.inc.php:126
 msgid "Status"
 msgstr "Status"
 
 #: ../../../inc/VIEW/items/_browse_tracker.inc.php:149
-#, fuzzy
 msgid "Assigned"
-msgstr "Zugeordnet zu"
+msgstr "Zugeordnet"
 
 #: ../../../inc/VIEW/items/_browse_tracker.inc.php:218
-#, fuzzy
 msgid "Add a task..."
-msgstr "Einen Benutzer hinzufügen..."
+msgstr "Eine Aufgabe hinzufügen..."
 
 #: ../../../inc/VIEW/items/_browse_tracker.inc.php:218
-#, fuzzy
 msgid "Add task"
-msgstr "Benutzer hinzufügen"
+msgstr "Aufgabe hinzufügen"
 
 #: ../../../inc/VIEW/items/_edit_navbar.php:32
 #, php-format
@@ -6326,9 +6286,8 @@ msgid "Link a file..."
 msgstr "Verknüpfe eine Datei..."
 
 #: ../../../inc/VIEW/items/_item_links.inc.php:136
-#, fuzzy
 msgid "Link file"
-msgstr "Verknüpfe eine Datei..."
+msgstr "Verknüpfe Datei"
 
 #: ../../../inc/VIEW/login/_login_form.php:33
 msgid "Login form"
@@ -6350,7 +6309,6 @@ msgid "Log in!"
 msgstr "Einloggen!"
 
 #: ../../../inc/VIEW/login/_login_form.php:78
-#, fuzzy
 msgid "Log into backoffice!"
 msgstr "Gehe zum Adminbereich!"
 
@@ -6372,9 +6330,8 @@ msgstr "Ein Link, mit dem Du ein neues Passwort angeben kannst wird Dir per E-Ma
 
 # TRANS: Text for submit button to request an activation link by email
 #: ../../../inc/VIEW/login/_lostpass_form.php:53
-#, fuzzy
 msgid "Request email to change my password!"
-msgstr "Link, um Dein Passwort zu ändern:"
+msgstr "Fordere E-Mail an, um Dein Passwort zu ändern!"
 
 #: ../../../inc/VIEW/login/_reg_complete.php:33
 msgid "Registration complete"
@@ -6419,45 +6376,41 @@ msgstr "In vorhandenen Account einloggen..."
 
 #: ../../../inc/VIEW/login/_validate_form.php:37
 msgid "Account validation form"
-msgstr ""
+msgstr "Accountvalidierungsformular"
 
 #: ../../../inc/VIEW/login/_validate_form.php:57
 msgid "Request email to activate my account!"
-msgstr ""
+msgstr "Fordere E-Mail an, um meinen Account zu aktivieren!"
 
 #: ../../../inc/VIEW/settings/_set_antispam.form.php:44
-#, fuzzy
 msgid "Antispam Settings"
-msgstr "Weitere Einstellungen"
+msgstr "Antispam Einstellungen"
 
 #: ../../../inc/VIEW/settings/_set_antispam.form.php:49
-#, fuzzy
 msgid "Comments/Feedback"
-msgstr "Kommentare"
+msgstr "Kommentare/Feedback"
 
 #: ../../../inc/VIEW/settings/_set_antispam.form.php:50
 msgid "(-100 - 100). Automatically publish feedbacks with a spam karma below this value."
-msgstr ""
+msgstr "(-100 - 100). Veröffentliche Feedback mit Spam Karma unterhalb dieses Wertes."
 
 #: ../../../inc/VIEW/settings/_set_antispam.form.php:50
-#, fuzzy
 msgid "Publishing threshold"
-msgstr "Veröffentlicht"
+msgstr "Veröffentlichungsschwellwert"
 
 #: ../../../inc/VIEW/settings/_set_antispam.form.php:51
 msgid "(-100 - 100). Automatically delete feedbacks with a spam karma over this value."
 msgstr "(-100 - 100) Lösche Feedbacks mit einem Spam Karma überhalb dieses Wertes automatisch."
 
 #: ../../../inc/VIEW/settings/_set_antispam.form.php:51
-#, fuzzy
 msgid "Deletion threshold"
-msgstr "Auswahl erstellt."
+msgstr "Löschungsschwellwert"
 
 # TRANS: %s gets replaced by the translation for this setting
 #: ../../../inc/VIEW/settings/_set_antispam.form.php:53
 #, php-format
 msgid "Feedbacks with a spam karma between these two thresholds will get the default status of the blog (\"%s\")."
-msgstr ""
+msgstr "Feedback mit einem Spam Karma zwischen diesen beiden Schwellwerten bekommt den Standardstatus des Blogs (\"%s\")."
 
 #: ../../../inc/VIEW/settings/_set_antispam.form.php:57
 msgid "Spam detection relevance weight"
@@ -6500,9 +6453,8 @@ msgid "POP3"
 msgstr "POP3"
 
 #: ../../../inc/VIEW/settings/_set_features.form.php:70
-#, fuzzy
 msgid "POP3 through IMAP extension (experimental)"
-msgstr "POP3 (experimentell)"
+msgstr "POP3 über IMAP-Erweiterung (experimentell)"
 
 #: ../../../inc/VIEW/settings/_set_features.form.php:71
 msgid "Choose a method to retrieve the emails."
@@ -6526,7 +6478,6 @@ msgid "Port Number"
 msgstr "Portnummer"
 
 #: ../../../inc/VIEW/settings/_set_features.form.php:75
-#, fuzzy
 msgid "Port number of your incoming mail server (Defaults: pop3:110 imap:143)."
 msgstr "Portnummer des eingehenden Mailservers (Standard: pop3:110 imap:143)."
 
@@ -6647,9 +6598,8 @@ msgid "Check to have new users validate themselves through clicking a link in an
 msgstr ""
 
 #: ../../../inc/VIEW/settings/_set_general.form.php:64
-#, fuzzy
 msgid "Validate new users"
-msgstr "Verstecke Zeilennummern"
+msgstr "Validiere neue Benutzer"
 
 #: ../../../inc/VIEW/settings/_set_general.form.php:66
 msgid "Check to have new users re-validate themselves through clicking a link in an email, if their email address gets changed."
@@ -6793,18 +6743,16 @@ msgid "Time (in seconds) that must pass before a request to the same URI from th
 msgstr "Zeit (in Sekunden), die vergehen muss, bevor eine Anfrage an den selben URI von der selben IP und dem selben Benutzeragenten als ein neuer Treffer betrachtet wird."
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:59
-#, fuzzy
 msgid "Installed plugins"
 msgstr "Installierte Plugins"
 
 # TRANS: shortcut for enabled
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:64
 msgid "En"
-msgstr ""
+msgstr "An"
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:65
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:193
-#, fuzzy
 msgid "Plugin"
 msgstr "Plugin"
 
@@ -6817,40 +6765,34 @@ msgid "The code to call the plugin by code (SkinTag) or as Renderer."
 msgstr ""
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:93
-#, fuzzy
 msgid "The plugin is enabled."
-msgstr "Es sind keine Render-Plugins installiert."
+msgstr "Das Plugin ist aktiviert."
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:98
 msgid "The plugin is broken."
-msgstr ""
+msgstr "Das Plugin ist kaputt."
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:108
-#, fuzzy
 msgid "The plugin is disabled."
-msgstr "Upload ist deaktiviert."
+msgstr "Das Plugin ist deaktiviert."
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:113
 #: ../../../inc/_misc/_plugin.class.php:2092
-#, fuzzy
 msgid "Edit plugin settings!"
-msgstr "Weitere Einstellungen"
+msgstr "Editiere Plugin-Einstellungen"
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:127
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:232
-#, fuzzy
 msgid "Display info"
-msgstr "Anzeigeeinheit"
+msgstr "Zeige Info"
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:140
-#, fuzzy
 msgid "Disable the plugin!"
-msgstr "Deinstalliere dieses Plugin!"
+msgstr "Deaktiviere das Plugin!"
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:144
-#, fuzzy
 msgid "Enable the plugin!"
-msgstr "Deinstalliere dieses Plugin!"
+msgstr "Aktiviere das Plugin!"
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:149
 msgid "Un-install this plugin!"
@@ -6861,19 +6803,16 @@ msgid "Reload events and codes for installed plugins."
 msgstr ""
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:170
-#, fuzzy
 msgid "Display available plugins."
-msgstr "Verfügbare Plugins"
+msgstr "Zeige verfügbare Plugins."
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:184
-#, fuzzy
 msgid "Available plugins"
 msgstr "Verfügbare Plugins"
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:187
-#, fuzzy
 msgid "Hide available plugins"
-msgstr "Verfügbare Plugins"
+msgstr "Verstecke verfügbare Plugins"
 
 #: ../../../inc/VIEW/settings/_set_plugins.form.php:259
 msgid "Install"
@@ -6890,14 +6829,12 @@ msgid "Homepage of the plugin"
 msgstr ""
 
 #: ../../../inc/VIEW/settings/_set_plugins_editsettings.form.php:66
-#, fuzzy
 msgid "Cancel edit!"
 msgstr "Editieren abbrechen!"
 
 #: ../../../inc/VIEW/settings/_set_plugins_editsettings.form.php:77
-#, fuzzy
 msgid "Plugin settings"
-msgstr "Regionale Einstellungen"
+msgstr "Plugin-Einstellungen"
 
 #: ../../../inc/VIEW/settings/_set_plugins_editsettings.form.php:90
 msgid "Plugin variables"
@@ -6912,14 +6849,12 @@ msgid "Note: The plugin code is empty, so this plugin will not work as an \"opt-
 msgstr ""
 
 #: ../../../inc/VIEW/settings/_set_plugins_editsettings.form.php:103
-#, fuzzy
 msgid "Plugin events"
-msgstr "Plugins"
+msgstr ""
 
 #: ../../../inc/VIEW/settings/_set_plugins_editsettings.form.php:113
-#, fuzzy
 msgid "Note: the plugin is not enabled."
-msgstr "Anmerkung: Standard-Locale ist nicht eingeschaltet."
+msgstr ""
 
 #: ../../../inc/VIEW/settings/_set_plugins_editsettings.form.php:116
 msgid "Warning: by disabling plugin events you change the behaviour of the plugin! Only change this, if you know what you are doing."
@@ -7328,9 +7263,8 @@ msgstr ""
 
 #: ../../../inc/VIEW/users/_users_form.php:161
 #: ../inc/VIEW/users/_users_form.php:183
-#, fuzzy
 msgid "Validated"
-msgstr "Übersetzt"
+msgstr "Validiert"
 
 #: ../../../inc/VIEW/users/_users_form.php:162 ../skins/_profile.php:72
 msgid "Check this to allow receiving emails through a message form."
@@ -7338,9 +7272,8 @@ msgstr ""
 
 #: ../../../inc/VIEW/users/_users_form.php:162 ../../../skins/_profile.php:72
 #: ../inc/VIEW/users/_users_form.php:184
-#, fuzzy
 msgid "Message form"
-msgstr "Nachricht"
+msgstr "Nachrichtenformular"
 
 #: ../../../inc/VIEW/users/_users_form.php:163
 #: ../../../skins/_subscriptions.php:52 ../skins/_profile.php:73
@@ -7429,9 +7362,8 @@ msgid "Display a legend at the bottom of every page including all action icons u
 msgstr ""
 
 #: ../../../inc/VIEW/users/_users_form.php:220
-#, fuzzy
 msgid "Display icon legend"
-msgstr "Dateimanager anzeigen"
+msgstr "Zeige Iconlegende"
 
 #: ../../../inc/VIEW/users/_users_form.php:223
 msgid "This will alert you if you fill in data into a form and try to leave the form before submitting the data."
@@ -7954,24 +7886,21 @@ msgid "No description available"
 msgstr "Keine Beschreibung verfügbar"
 
 #: ../../../inc/_misc/_plugin.class.php:476
-#, fuzzy
 msgid "My Tab"
-msgstr "Mai"
+msgstr ""
 
 #: ../../../inc/_misc/_plugin.funcs.php:223
-#, fuzzy
 msgid "Delete set!"
-msgstr "Löschen!"
+msgstr ""
 
 #: ../../../inc/_misc/_plugin.funcs.php:238
-#, fuzzy, php-format
+#, php-format
 msgid "Add a new set of &laquo;%s&raquo;"
-msgstr "Lösche Gruppe &laquo;%s&raquo;?"
+msgstr ""
 
 #: ../../../inc/_misc/_plugin.funcs.php:238
-#, fuzzy
 msgid "New set"
-msgstr "Neuer Eintrag"
+msgstr ""
 
 #: ../../../inc/_misc/_plugin.funcs.php:323
 #, php-format
@@ -8047,14 +7976,12 @@ msgid "Renders content when not generated as HTML or XML."
 msgstr ""
 
 #: ../../../inc/_misc/_plugins.class.php:269
-#, fuzzy
 msgid "Filters the comment author."
-msgstr "Sende eine E-Mail an den Autor des Kommentars"
+msgstr ""
 
 #: ../../../inc/_misc/_plugins.class.php:270
-#, fuzzy
 msgid "Filters the URL of the comment author."
-msgstr "Sende eine E-Mail an den Autor des Kommentars"
+msgstr ""
 
 #: ../../../inc/_misc/_plugins.class.php:271
 msgid "Filters the content of a comment."
@@ -8157,9 +8084,8 @@ msgid "Gets called at the end of the login procedure for registered users."
 msgstr ""
 
 #: ../../../inc/_misc/_plugins.class.php:515
-#, fuzzy
 msgid "The plugin cannot be installed again."
-msgstr "Es sind keine Render-Plugins installiert."
+msgstr ""
 
 #: ../../../inc/_misc/_plugins.class.php:523
 msgid "The installation of the plugin failed."
@@ -8215,9 +8141,9 @@ msgid "The plugin requires the plugins: %s."
 msgstr ""
 
 #: ../../../inc/_misc/_plugins.class.php:867
-#, fuzzy, php-format
+#, php-format
 msgid "The plugin recommends to install the plugins: %s."
-msgstr "Dieses Plugin reagiert auf so ziemlich alle möglichen Plugin-Ereignisse :P"
+msgstr ""
 
 #: ../../../inc/_misc/_plugins.class.php:883
 #, php-format
@@ -8236,18 +8162,16 @@ msgid "Plugin class for &laquo;%s&raquo; in file &laquo;%s&raquo; not defined - 
 msgstr ""
 
 #: ../../../inc/_misc/_plugins.class.php:1243
-#, fuzzy
 msgid "The maximum length of a plugin code is 32 characters."
-msgstr "Das Passwort muss mindestens %d Zeichen lang sein."
+msgstr ""
 
 #: ../../../inc/_misc/_plugins.class.php:1249
 msgid "The plugin code cannot include a dot!"
 msgstr ""
 
 #: ../../../inc/_misc/_plugins.class.php:1260
-#, fuzzy
 msgid "The plugin code is already in use by another plugin."
-msgstr "Dieser URL Blogname wird schon von einem anderen Blog benutzt. Bitte wähle einen anderen Namen."
+msgstr "Der Plugincode wird schon von einem anderen Plugin genutzt."
 
 #: ../../../inc/_misc/_request.class.php:486
 msgid "The phone number is invalid."
@@ -8275,18 +8199,16 @@ msgid "Descending order"
 msgstr "Absteigende Sortierung"
 
 #: ../../../inc/_misc/_results.class.php:1291
-#, fuzzy
 msgid "Move up!"
-msgstr "Verschieben"
+msgstr ""
 
 #: ../../../inc/_misc/_results.class.php:1296
 msgid "Move down! (reverse sort)"
 msgstr ""
 
 #: ../../../inc/_misc/_results.class.php:1311
-#, fuzzy
 msgid "Move down!"
-msgstr "Verringere Priorität"
+msgstr ""
 
 #: ../../../inc/_misc/_results.class.php:1316
 msgid "Move up! (reverse sort)"
@@ -8311,9 +8233,8 @@ msgid "Sel"
 msgstr "Sel"
 
 #: ../../../inc/_misc/_resultsel.class.php:197
-#, fuzzy
 msgid "Selection name"
-msgstr "Neuer Auswahlname"
+msgstr "Auswahlname"
 
 #: ../../../inc/_misc/_resultsel.class.php:203
 msgid "Update selection"
@@ -8328,9 +8249,8 @@ msgid "New selection"
 msgstr "Neue Auswahl"
 
 #: ../../../inc/_misc/_resultsel.class.php:433
-#, fuzzy
 msgid "Cannot create a selection with an empty name"
-msgstr "Kann kein Verzeichnis ohne Namen erstellen."
+msgstr "Kann keine Auswahl mit leerem Namen erstellen"
 
 #: ../../../inc/_misc/_resultsel.class.php:465
 msgid "Selection created."
@@ -9487,9 +9407,8 @@ msgid "Automatic &lt;P&gt; and &lt;BR&gt; tags"
 msgstr "Automatische &lt;P&gt; und &lt;BR&gt; Tags"
 
 #: ../../../plugins/_auto_p.plugin.php:45
-#, fuzzy
 msgid "Line breaks"
-msgstr "Pingbacks"
+msgstr "Zeilenumbrüche"
 
 #: ../../../plugins/_auto_p.plugin.php:45
 msgid "Make line breaks (&lt;br /&gt;) for single newlines."
@@ -9614,27 +9533,24 @@ msgid "If the IP address is blacklisted, the request is canceled early and the u
 msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:69
-#, fuzzy
 msgid "DNS Blacklists"
-msgstr "Auf der schwarzen Liste (Blacklisted)"
+msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:73
 msgid "The list of DNS blacklists to check, separated by whitespace."
 msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:76
-#, fuzzy
 msgid "Whitelisting"
-msgstr "Filtere Liste"
+msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:78
 msgid "Allow the user to whitelist his session through a Captcha plugin."
 msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:82
-#, fuzzy
 msgid "Whitelist timeout"
-msgstr "Session-Timeout"
+msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:84
 msgid "in seconds. How long should a session be whitelisted?"
@@ -9642,9 +9558,8 @@ msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:89
 #: ../../../plugins/_dnsbl_antispam.plugin.php:318
-#, fuzzy
 msgid "Statistics"
-msgstr "Stats"
+msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:91
 msgid "Enable statistics. This generates a small overhead, but will show you how effective it is."
@@ -9667,9 +9582,8 @@ msgid "How often should a slow list be retried? (0 to deactivate slow list handl
 msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:108
-#, fuzzy
 msgid "Timeout"
-msgstr "Zeitformat"
+msgstr "Timeout"
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:110
 msgid "in seconds. When is a DNSBL considered to be too slow?"
@@ -9684,9 +9598,9 @@ msgid "No DNS blacklists given!"
 msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:192
-#, fuzzy, php-format
+#, php-format
 msgid "Checking for &laquo;%s&raquo; in DNS blacklists."
-msgstr "Das Schlüsselwort &laquo;%s&raquo; wurde auf die lokale schwarze Liste gesetzt."
+msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:235
 msgid "Cleared statitics."
@@ -9697,23 +9611,20 @@ msgid "Lookup address in DNS blacklists"
 msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:253
-#, fuzzy
 msgid "Check"
-msgstr "Markiere alle"
+msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:257
-#, fuzzy
 msgid "Check my lists"
-msgstr "Markiere alle"
+msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:261
 msgid "Check at openrbl.org"
 msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:274
-#, fuzzy
 msgid "Too slow lists"
-msgstr "Eintragsliste"
+msgstr ""
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:277
 msgid "If DNS blacklists are detected as being too slow they get deactivated here."
@@ -9747,9 +9658,9 @@ msgstr ""
 
 # TRANS: %s is the name of a DNS blacklist
 #: ../../../plugins/_dnsbl_antispam.plugin.php:446
-#, fuzzy, php-format
+#, php-format
 msgid "Your IP address is blocked in &laquo;%s&raquo;."
-msgstr "Die Sprache &laquo;%s&raquo; wurde gespeichert."
+msgstr "Deine IP-Adresse ist geblockt in &laquo;%s&raquo;."
 
 #: ../../../plugins/_dnsbl_antispam.plugin.php:609
 msgid "Your IP address is blocked."
@@ -9789,9 +9700,8 @@ msgid "LDAP server sets to search."
 msgstr ""
 
 #: ../../../plugins/_ldap.plugin.php:74
-#, fuzzy
 msgid "Server"
-msgstr "Mailserver"
+msgstr "Server"
 
 #: ../../../plugins/_ldap.plugin.php:75 ../../../plugins/_ldap.plugin.php:85
 #: ../../../plugins/_ldap.plugin.php:95 ../plugins/_ldap.plugin.php:80
@@ -9814,18 +9724,16 @@ msgid "The LDAP RDN, used to bind to the server (%s gets replaced by the user lo
 msgstr ""
 
 #: ../../../plugins/_ldap.plugin.php:84
-#, fuzzy
 msgid "Base DN"
-msgstr "Basis-URL"
+msgstr ""
 
 #: ../../../plugins/_ldap.plugin.php:85
 msgid "The LDAP base DN, used as base dn for search."
 msgstr ""
 
 #: ../../../plugins/_ldap.plugin.php:89
-#, fuzzy
 msgid "Search filter"
-msgstr "Kopfzeilendatei"
+msgstr ""
 
 #: ../../../plugins/_ldap.plugin.php:90
 #, php-format
@@ -9833,27 +9741,24 @@ msgid "The search filter used to get information about the user (%s gets replace
 msgstr ""
 
 #: ../../../plugins/_ldap.plugin.php:94
-#, fuzzy
 msgid "Assign group by"
-msgstr "Zugeordnet zu"
+msgstr ""
 
 #: ../../../plugins/_ldap.plugin.php:95
 msgid "LDAP search result key to assign the group by."
 msgstr ""
 
 #: ../../../plugins/_ldap.plugin.php:99
-#, fuzzy
 msgid "Template Group for new"
-msgstr "Standard-Gruppe für neue Benutzer"
+msgstr "Vorlagen-Gruppe für neue"
 
 #: ../../../plugins/_ldap.plugin.php:101
 msgid "The group to use as template, if we create a new group. Set this to \"None\" to not create new groups."
 msgstr ""
 
 #: ../../../plugins/_ldap.plugin.php:108
-#, fuzzy
 msgid "Default group"
-msgstr "Standard"
+msgstr "Standardgruppe"
 
 #: ../../../plugins/_ldap.plugin.php:110
 msgid "The group to use as fallback, if we do not want to create a new group. \"None\" to not a create a new user in that case."
@@ -9969,9 +9874,8 @@ msgid "Use smilies toolbar"
 msgstr ""
 
 #: ../../../plugins/_smilies.plugin.php:84
-#, fuzzy
 msgid "This is the default setting. Users can override it in their profile."
-msgstr "Das ist das Default-Skin, das benutzt wird um das Blog anzuzeigen."
+msgstr ""
 
 #: ../../../plugins/_spellcheck.plugin.php:33
 msgid "Simple Spellchecker (English only)"
@@ -10002,9 +9906,8 @@ msgid "How are you?"
 msgstr ""
 
 #: ../../../plugins/_test.plugin.php:108
-#, fuzzy
 msgid "Selector"
-msgstr "Auswahl"
+msgstr ""
 
 #: ../../../plugins/_test.plugin.php:135
 msgid "Echo a random number in AdminBeginPayload event"
@@ -10065,27 +9968,24 @@ msgid "hours. For how long should rel=\"nofollow\" be applied to comment links? 
 msgstr ""
 
 #: ../../../plugins/basic_antispam_plugin/_basic_antispam.plugin.php:86
-#, fuzzy
 msgid "Block spam referers"
-msgstr "Top Referer"
+msgstr ""
 
 #: ../../../plugins/basic_antispam_plugin/_basic_antispam.plugin.php:87
 msgid "If a referrer has been detected as spam, should we block the request with a \"403 Forbidden\" page?"
 msgstr ""
 
 #: ../../../plugins/basic_antispam_plugin/_basic_antispam.plugin.php:102
-#, fuzzy
 msgid "The trackback seems to be a duplicate."
-msgstr "Kein Trackback zu senden."
+msgstr ""
 
 #: ../../../plugins/basic_antispam_plugin/_basic_antispam.plugin.php:108
 msgid "Could not find link to us in your URL!"
 msgstr ""
 
 #: ../../../plugins/basic_antispam_plugin/_basic_antispam.plugin.php:120
-#, fuzzy
 msgid "The comment seems to be a duplicate."
-msgstr "Die Datei scheint kein gültiger Upload zu sein!"
+msgstr "Der Kommentar scheint ein Duplikat zu sein."
 
 #: ../../../skins/_feedback.php:83 ../skins/basic/_feedback.php:77
 msgid "Trackback address for this post:"
@@ -10126,9 +10026,8 @@ msgid "Remember me"
 msgstr "Erinner mich"
 
 #: ../../../skins/_feedback.php:251
-#, fuzzy
 msgid "Set cookies for name, email and url"
-msgstr "(Setze Cookies für Name, E-Mail &amp; URL)"
+msgstr "Setze Cookies für Name, E-Mail und URL"
 
 #: ../../../skins/_feedback.php:254
 msgid "Allow message form"
@@ -10148,9 +10047,9 @@ msgid "more"
 msgstr "mehr"
 
 #: ../../../skins/_msgform.php:129
-#, fuzzy, php-format
+#, php-format
 msgid "Comment on %s"
-msgstr "Kommentare"
+msgstr "Kommentare zu %s"
 
 #: ../../../skins/_msgform.php:129 ../skins/_msgform.php:141
 msgid "Re:"

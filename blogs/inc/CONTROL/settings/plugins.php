@@ -330,7 +330,7 @@ switch( $action )
 		}
 		if( $edit_Plugin->status == 'broken' )
 		{
-			$Messages->add( sprintf( T_( 'The plugin status is in a broken state. It cannot get enabled.' ), $plugin_ID ), 'error' );
+			$Messages->add( sprintf( T_( 'The plugin is in a broken state. It cannot get enabled.' ), $plugin_ID ), 'error' );
 			break;
 		}
 

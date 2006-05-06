@@ -126,7 +126,7 @@ if( empty($subject) )
 
 		if( $row )
 		{
-			$subject = T_('Re:').' '.sprintf( /* Used as mail subject; %s gets replaced by an item's title */ T_( 'Comment on %s' ), $row->post_title );
+			$subject = T_('Re:').' '.sprintf( /* TRANS: Used as mail subject; %s gets replaced by an item's title */ T_( 'Comment on %s' ), $row->post_title );
 		}
 	}
 
@@ -194,6 +194,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.24  2006/05/06 21:52:50  blueyed
+ * trans
+ *
  * Revision 1.23  2006/05/04 14:28:15  blueyed
  * Fix/enhanced
  *

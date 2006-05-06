@@ -43,7 +43,6 @@ global $Settings;
 
 global $rsc_subdir, $pagenow, $locales_path, $locales, $action, $edit_locale, $loc_transinfo, $template, $allow_po_extraction, $servertimenow, $allow_po_extraction;
 
-
 if( $action == 'edit' )
 {
 	param( 'template', 'string', ($edit_locale == '_new_') ? T_('Create new locale') : T_('Edit locale'), 'createnew' );
@@ -410,6 +409,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.4  2006/05/06 21:52:44  blueyed
+ * trans
+ *
  * Revision 1.3  2006/05/05 23:25:52  blueyed
  * fix
  *
