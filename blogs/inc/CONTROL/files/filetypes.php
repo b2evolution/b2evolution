@@ -108,12 +108,12 @@ switch( $action )
 			$Messages->add( T_('New file type has been created.'), 'success' );
 
 			// What next?
-	 		param( 'submit', 'string', true );
-			if( $submit == T_('Record, then Create Similar') )
+			param( 'submit', 'string', true );
+			if( $submit == T_('Record, then Create Similar') ) // TODO: do not use submit value for this!
 			{
 				$action = 'new';
 			}
-			elseif( $submit == T_('Record, then Create New') )
+			elseif( $submit == T_('Record, then Create New') ) // TODO: do not use submit value for this!
 			{
 				$action = 'new';
 				$edited_Filetype = & new Filetype();

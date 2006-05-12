@@ -592,7 +592,7 @@ $io_charset = locale_charset(false);
 header( 'Content-Type: text/html; charset='.$io_charset );
 
 
-// Check and eventually adjust $evo_charset:
+// Check and possibly adjust $evo_charset:
 if( empty($evo_charset) )
 { // Internal encoding follows INPUT/OUTPUT encoding:
 	$evo_charset = $io_charset;
@@ -628,7 +628,7 @@ elseif( $evo_charset != $io_charset )
 		else
 		{
 			mb_http_output( $io_charset );
-			ob_start( 'mb_output_handler' );
+			ob_start( 'mb_output_handler' ); // NOTE: this will send a Content-Type header by itself for "text/..."
 			$mb_output_handler_started = true; // remember it for _blog_main.inc.php
 		}
 		unset($mb_encodings);
@@ -683,6 +683,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.20  2006/05/12 21:53:37  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.19  2006/05/04 10:18:41  blueyed
  * Added Session property to skip page content caching event.
  *

@@ -142,7 +142,7 @@ blueyed> Sure, but that means we should either split it, or use the locale here 
 $Debuglog->add( 'Activating blog locale: '.$Blog->get('locale'), 'locale' );
 locale_activate( $Blog->get('locale') );
 
-// Check and eventually adjust $evo_charset:
+// Check and possibly adjust $evo_charset:
 // NOTE: this is quite the same as with _main.inc.php, because of the (overriding) blog's locale above
 if( $io_charset != locale_charset(false) )
 { // io_charset changed from the initial setting in _main.inc.php
@@ -501,6 +501,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.20  2006/05/12 21:53:37  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.19  2006/05/05 15:46:03  blueyed
  * Nasty bug that produces empty pages..
  *

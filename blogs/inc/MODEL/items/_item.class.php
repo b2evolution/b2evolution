@@ -765,7 +765,7 @@ class Item extends DataObject
 	 *
 	 * @todo Param order and cleanup
 	 * @param mixed page number to display specific page, # for url parameter
-	 * @param mixed true to display 'more' text, false not to display, # for url parameter
+	 * @param mixed true to display 'more' text (which means "full post"), false not to display, # for url parameter
 	 * @param string text to display as the more link
 	 * @param string text to display as the more anchor (once the more link has been clicked)
 	 * @param string string to display before more link/anchor
@@ -817,7 +817,7 @@ class Item extends DataObject
 		 */
 		#pre_dump( 'incViews', $dispmore, !$preview, $Hit->is_new_view() );
 		if( $dispmore && ! $preview && $Hit->is_new_view() )
-		{ // Increment view counter (only if current User is not the item's author)
+		{ // Increment view counter
 			$this->inc_viewcount(); // won't increment if current_User == Author
 		}
 
@@ -890,8 +890,13 @@ class Item extends DataObject
 		$post_renderers = $Plugins->validate_list( $this->get_renderers() );
 		$output = $Plugins->render( $output, $post_renderers, $format );
 
-		// Apply Display plugins
-		$output = $Plugins->get_trigger_event( 'DisplayItemAllFormats', array( 'data' => & $output, 'format' => $format, 'Item' => & $this ) );
+		// Trigger Display plugins:
+		$output = $Plugins->get_trigger_event( 'DisplayItemAllFormats', array(
+				'data' => & $output,
+				'format' => $format,
+				'Item' => & $this,
+				'preview' => $preview,
+				'dispmore' => $dispmore ) );
 
 		// Character conversions
 		$output = format_to_output( $output, $format );
@@ -2322,7 +2327,7 @@ class Item extends DataObject
 	 *  - Increment the viewcount WITHOUT affecting the lastmodified date and user.
 	 *  - Increment the viewcount in an ATOMIC manner (even if several hits on the same Item occur simultaneously).
 	 *
-	 * This also triggers the plugin event 'ItemViewed'.
+	 * This also triggers the plugin event 'ItemViewsIncreased' if the view count has been increased.
 	 *
 	 * @return boolean Did we increase view count?
 	 */
@@ -2341,8 +2346,8 @@ class Item extends DataObject
 		                SET post_views = post_views + 1
 		              WHERE '.$this->dbIDname.' = '.$this->ID );
 
-		// Trigger event that the item has been viewed (which is != displayed) and useful for cache handling plugins
-		$Plugins->trigger_event( 'ItemViewed', array( 'Item' => & $this ) );
+		// Trigger event that the item's view has been increased
+		$Plugins->trigger_event( 'ItemViewsIncreased', array( 'Item' => & $this ) );
 
 		return true;
 	}
@@ -2593,6 +2598,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2006/05/12 21:53:37  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.42  2006/04/29 23:27:10  blueyed
  * Only trigger update/insert/delete events if parent returns true
  *

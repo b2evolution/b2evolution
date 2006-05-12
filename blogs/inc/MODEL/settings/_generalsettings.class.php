@@ -58,7 +58,7 @@ class GeneralSettings extends AbstractSettings
 
 		'antispam_last_update' => '2000-01-01 00:00:00',
 		'antispam_threshold_publish' => '-90',
-		'antispam_threshold_delete' => '90',
+		'antispam_threshold_delete' => '100', // do not delete by default!
 
 		'archive_mode' => 'monthly',
 		'AutoBR' => '0',
@@ -148,6 +148,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.12  2006/05/12 21:53:38  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.11  2006/05/02 04:36:24  blueyed
  * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
  *

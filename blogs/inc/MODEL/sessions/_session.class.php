@@ -151,7 +151,7 @@ class Session
 
 						if( $this->_data === false )
 						{
-							$Debuglog->add( 'Session data corrupted!', array('session','error') );
+							$Debuglog->add( 'Session data corrupted! Unserialized data was: ['.var_export($row->sess_data, true).']', array('session','error') );
 							$this->_data = array();
 						}
 						else
@@ -432,6 +432,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.11  2006/05/12 21:53:37  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.10  2006/05/04 10:18:41  blueyed
  * Added Session property to skip page content caching event.
  *

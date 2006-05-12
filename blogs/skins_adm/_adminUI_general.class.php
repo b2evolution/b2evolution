@@ -363,11 +363,11 @@ class AdminUI_general
 	 * @param array A list of properties to check, ordered by priority.
 	 * @return mixed|false The first found property or false if it does not exist
 	 */
-	function get_prop_for_path( $nr, $prop_by_ref )
+	function get_prop_for_path( $nr, $prop_by_pref )
 	{
 		if( $pathWithProps = $this->get_path( $nr, true ) )
 		{
-			foreach( $prop_by_ref as $lProp )
+			foreach( $prop_by_pref as $lProp )
 			{
 				if( isset($pathWithProps['props'][$lProp]) )
 				{
@@ -1076,10 +1076,14 @@ class AdminUI_general
 		{ // parent node is the trunk from root to previous level
 			$parentNode = & $this->get_node_by_path($this->get_path_range( 0, $level-1 ));
 		}
+		if( ! $parentNode )
+		{ // parent node does not exist:
+			return false;
+		}
 		$parentNode['selected'] = $pathKey;
 
 		$this->path[$level] = $pathKey;
-		$this->pathProps[$level] = $pathProps;
+		$this->pathProps[$level] = array_merge( $parentNode, $pathProps );
 
 		#pre_dump( 'set_path_level: ', $level, $pathKey, $pathProps );
 
@@ -1105,11 +1109,11 @@ class AdminUI_general
 		// auto-detect path props from menu entries
 		if( $node = & $this->get_node_by_path( $search_path ) )
 		{
-			$pathProps = array_merge( $pathProps, $node );
+			$pathProps = array_merge( $node, $pathProps );
 		}
 
 		// Set the path level right after the last existing one:
-		$this->set_path_level( count($this->path), $path, $pathProps );
+		return $this->set_path_level( count($this->path), $path, $pathProps );
 	}
 
 
@@ -1152,10 +1156,15 @@ class AdminUI_general
 				$pathProps = array_merge( $node, $pathProps );
 			}
 
-			$this->set_path_level( $i++, $pathName, $pathProps );
+			if( ! $this->set_path_level( $i++, $pathName, $pathProps ) )
+			{
+				return false;
+			}
 
 			$prevPath[] = $pathName;
 		}
+
+		return true;
 	}
 
 
@@ -1272,6 +1281,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.13  2006/05/12 21:53:38  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.12  2006/05/02 18:15:20  fplanque
  * invalid xhtml fix
  *

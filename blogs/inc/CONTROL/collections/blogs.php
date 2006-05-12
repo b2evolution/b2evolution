@@ -47,7 +47,7 @@
  *    2 - perform actions
  *    3 - display error messages
  *    4 - display payload
- *    Actually if you change the name of a blog it gets not reflected in the blog list buttons!
+ *    Currently if you change the name of a blog it gets not reflected in the blog list buttons!
  *
  * @version $Id$
  */
@@ -266,7 +266,7 @@ switch( $action )
 			case 'stub':
 				// Access through stub file
 				// TODO: stub file might be empty or handled by webserver (mod_rewrite)! We cannot require this!
-				// TODO: It actually also allows to include ".php" files here!!
+				// TODO: It presently also allows to include ".php" files here!!
 				require $edited_Blog->get('dynfilepath');
 		}
 		$page = ob_get_contents();
@@ -579,6 +579,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2006/05/12 21:53:37  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.12  2006/05/02 18:07:12  blueyed
  * Set blog to be used for exit to blogs link
  *

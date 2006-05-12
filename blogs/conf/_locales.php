@@ -18,6 +18,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * Set to 0 to disable localization.
  * Set to 1 to enable gettext localization if supported (not recommended).
  *    Note: you will have to compile the .po files with msgfmt before this will work.
+ *          Also, the locale information has to be available on the system ("locale -a" with Unix)
  * Set to 2 to enable b2evo advanced localization (recommended).
  *
  * @global integer
@@ -80,6 +81,18 @@ require_once $model_path.'settings/_locale.funcs.php';
  * They are also used as fallback, if we have no access to the DB yet.
  * Flag source: http://www.crwflags.com/fotw/flags/iso3166.html
  * IMPORTANT: Try to keep the locale names short, they take away valuable space on the screen!
+ *
+ * Keys:
+ *  - 'set_locales':
+ *    This gets used for {@link setlocale()} (currently only when using gettext support [$use_l10n=1]).
+ *    This is a list of locales that get tried. One of them must be available on the system ("locale -a").
+ *    If not given, the value of 'messages' gets used.
+ *  - 'messages':
+ *    The directory where the locale's files are.
+ *  - 'charset':
+ *    Character set of the locale's files.
+ *
+ * @todo Locale message dirs should be named LOCALE.CHARSET and not LOCALE_CHARSET, e.g. "zh_CN.utf8" instead of "zh_CN_utf-8" (according to gettext)
  */
 $locales = array(
 	'cs-CZ' => array( 'name' => NT_('Czech (CZ)'),
@@ -106,7 +119,7 @@ $locales = array(
 										'messages' => 'de_DE',
 										'enabled' => 1,
 									),
-  'ee-ET' => array(	'name' => NT_('Estonia (ET)'),
+	'ee-ET' => array( 'name' => NT_('Estonia (ET)'),
 										'charset' => 'utf-8',
 										'datefmt' => 'd/m/Y',
 										'timefmt' => 'H.i:s',

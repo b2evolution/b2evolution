@@ -165,6 +165,22 @@ if( $fm_FileRoot )
 }
 
 
+// If there were errors, display them and exit:
+if( $Messages->count('error') )
+{
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
+
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
+	$AdminUI->disp_payload_begin();
+	$AdminUI->disp_payload_end();
+
+	$AdminUI->disp_global_footer();
+	exit();
+}
+
+
 /**
  * Filelist
  * fp>> TODO: When the user is viewing details for a file he should (by default) not be presented with the filelist in addition to the file properties
@@ -1062,7 +1078,7 @@ switch( $fm_mode )
 				// Store File object into DB:
 				$newFile->dbsave();
 
-				// Tell the filamanager about the new file:
+				// Tell the filemanager about the new file:
 				$fm_Filelist->add( $newFile );
 			}
 
@@ -1478,6 +1494,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.21  2006/05/12 21:53:37  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.20  2006/04/19 20:13:49  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

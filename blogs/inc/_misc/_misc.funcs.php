@@ -1033,7 +1033,7 @@ function remove_magic_quotes( $mixed )
 function param( $var, $type = '', $default = '', $memorize = false,
 								$override = false, $forceset = true )
 {
-	global $global_param_list, $Debuglog, $debug, $evo_charset;
+	global $global_param_list, $Debuglog, $debug, $evo_charset, $io_charset;
 	// NOTE: we use $GLOBALS[$var] instead of $$var, because otherwise it would conflict with param names which are used as function params ("var", "type", "default", ..)!
 
 	// Check if already set
@@ -1078,9 +1078,9 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		// $Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($GLOBALS[$var], true).']!', 'params' );
 	}
 
-	if( isset($current_charset) && $current_charset != $evo_charset )
+	if( isset($io_charset) && $io_charset != $evo_charset )
 	{ // the INPUT/OUTPUT charset differs from the internal one (this also means mb_convert_encoding is available)
-		mb_convert_variables( $evo_charset, $current_charset, $GLOBALS[$var] );
+		mb_convert_variables( $evo_charset, $io_charset, $GLOBALS[$var] );
 	}
 
 	// type will be forced even if it was set before and not overriden
@@ -1827,8 +1827,8 @@ function debug_info( $force = false )
  * Output Buffer handler.
  *
  * It will be set in /inc/_main.inc.php and handle the output (if enabled).
- * It generates a md5-ETag, which is checked against the one eventually
- * being sent by the browser, allowing us to just send a "304 Not modified" response.
+ * It generates a md5-ETag, which is checked against the one that may have
+ * been sent by the browser, allowing us to just send a "304 Not modified" response.
  *
  * @param string output given by PHP
 */
@@ -1958,7 +1958,7 @@ function url_add_tail( $url, $tail )
  */
 function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 {
-	global $debug, $app_name, $app_version, $current_locale, $locales, $Debuglog, $notify_from;
+	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $notify_from;
 
 	$NL = "\n";
 
@@ -1968,7 +1968,7 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 	}
 
 	// Specify charset and content-type of email
-	$headers['Content-Type'] = 'text/plain; charset='.locale_charset(false);
+	$headers['Content-Type'] = 'text/plain; charset='.$current_charset;
 	$headers['X-Mailer'] = $app_name.' '.$app_version.' - PHP/'.phpversion();
 	$headers['X-Remote-Addr'] = implode( ',', get_ip_list() );
 
@@ -2016,6 +2016,12 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 	}
 
 	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
+
+	// Convert encoding of message (from internal encoding to the one of the message):
+	if( $evo_charset != $current_charset && ! empty($evo_charset) && function_exists('mb_convert_encoding') )
+	{
+		mb_convert_variables( $current_charset, $evo_charset, $message );
+	}
 
 	if( $debug > 1 )
 	{	// We agree to die for debugging...
@@ -2088,8 +2094,10 @@ function _trapError( $reset = 1 )
  * If first parameter evaluates to true printf() gets called using the first parameter
  * as args and the second parameter as print-pattern
  *
- * @param mixed variable to test and print eventually
- * @param string printf-pattern to use (including %s etc to refer to the first param
+ * @param mixed variable to test and output if it's true or $disp_none is given
+ * @param string printf-pattern to use (%s gets replaced by $var)
+ * @param string printf-pattern to use, if $var is numeric and > 1 (%s gets replaced by $var)
+ * @param string printf-pattern to use if $var evaluates to false (%s gets replaced by $var)
  */
 function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
 {
@@ -2923,6 +2931,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.54  2006/05/12 21:53:38  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.53  2006/05/04 10:12:20  blueyed
  * Normalization/doc
  *

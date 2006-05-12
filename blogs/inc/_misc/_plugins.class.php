@@ -280,7 +280,7 @@ class Plugins
 
 				'FilterIpAddress' => T_('Called when displaying an IP address.'),
 
-				'ItemViewed' => T_('Called when the view counter of an item got increased.'),
+				'ItemViewsIncreased' => T_('Called when the view counter of an item got increased.'),
 
 				'SkinTag' => '',
 
@@ -492,7 +492,7 @@ class Plugins
 	 * @param string Classname of the plugin to install
 	 * @param string Initial DB Status of the plugin ("enbaled", "disabled", "needs_config", "broken")
 	 * @param string|NULL Optional classfile path, if not default (used for tests).
-	 * @return string|Plugin The installed Plugin (eventually with $install_dep_notes set) or a string in case of error.
+	 * @return string|Plugin The installed Plugin (perhaps with $install_dep_notes set) or a string in case of error.
 	 */
 	function & install( $classname, $plug_status = 'enabled', $classfile_path = NULL )
 	{
@@ -1671,9 +1671,6 @@ class Plugins
 	{
 		global $Debuglog;
 
-		$karma_abs = NULL;
-		$karma_divider = 0; // total of the "spam detection relevance weight"
-
 		$Debuglog->add( 'Trigger karma collect event '.$event, 'plugins' );
 
 		if( empty($this->index_event_IDs[$event]) )
@@ -1685,7 +1682,10 @@ class Plugins
 
 		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
 
+		$karma_abs = NULL;
+		$karma_divider = 0; // total of the "spam detection relevance weight"
 		$count_plugins = 0;
+
 		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
 		{
 			$plugin_weight = $this->index_ID_rows[$l_plugin_ID]['plug_spam_weight'];
@@ -1730,7 +1730,12 @@ class Plugins
 			}
 		}
 
-		$karma = $karma_divider ? round($karma_abs / $karma_divider) : NULL;
+		if( ! $karma_divider )
+		{
+			return NULL;
+		}
+
+		$karma = round($karma_abs / $karma_divider);
 
 		if( $karma > 100 )
 		{
@@ -2652,6 +2657,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.45  2006/05/12 21:53:38  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.44  2006/05/05 19:36:23  blueyed
  * New events
  *

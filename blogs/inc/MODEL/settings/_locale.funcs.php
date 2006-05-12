@@ -52,17 +52,37 @@ if( ($use_l10n == 1) && function_exists('_') )
 
 	function T_( $string, $req_locale = '' )
 	{
-		global $current_messages, $locales;
+		global $current_locale, $locales, $evo_charset;
 
-		if( empty( $req_locale ) || $req_locale == $current_messages )
+		if( empty( $req_locale ) )
+		{
+			if( empty( $current_locale ) )
+			{ // don't translate if we have no locale
+				return $string;
+			}
+
+			$req_locale = $current_locale;
+		}
+
+		if( $req_locale == $current_locale )
 		{ // We have not asked for a different locale than the currently active one:
 			$r = _($string);
+
 			$messages_charset = $locales[$req_locale]['charset'];
 		}
 		else
-		{ // We have asked for a funky locale... we'll get english instead:
-			$r = $string;
-			$messages_charset = 'iso-8859-1'; // charset of our .php files
+		{ // We have asked for another locale...
+			if( locale_temp_switch( $req_locale ) )
+			{
+				$r = _($string);
+				$messages_charset = $current_charset;
+				locale_restore_previous();
+			}
+			else
+			{ // Locale could not be activated:
+				$r = $string;
+				$messages_charset = 'iso-8859-1'; // charset of our .php files
+			}
 		}
 
 		if( $messages_charset != $evo_charset
@@ -118,11 +138,11 @@ elseif( $use_l10n == 2 )
 
 		// echo "Translating ", $search, " to $messages<br />";
 
-		if( !isset($trans[ $messages ] ) )
+		if( ! isset($trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
 			// echo 'LOADING', dirname(__FILE__).'/../locales/'. $messages. '/_global.php';
 			@include_once $locales_path.$messages.'/_global.php';
-			if( !isset($trans[ $messages ] ) )
+			if( ! isset($trans[ $messages ] ) )
 			{ // Still not loaded... file doesn't exist, memorize that no translations are available
 				// echo 'file not found!';
 				$trans[ $messages ] = array();
@@ -196,17 +216,24 @@ function TS_( $string, $req_locale = '' )
  * Calls can be nested, see {@link locale_restore_previous}.
  *
  * @param string locale to activate
+ * @return boolean true on success, false on failure
  */
 function locale_temp_switch( $locale )
 {
 	global $saved_locales, $current_locale;
-	if( !isset( $saved_locales ) || !is_array( $saved_locales ) )
+	if( !isset( $saved_locales ) || ! is_array( $saved_locales ) )
 	{
 		$saved_locales = array();
 	}
 
-	array_push( $saved_locales, $current_locale );
-	locale_activate( $locale );
+	$prev_locale = $current_locale;
+	if( locale_activate( $locale ) )
+	{
+		array_push( $saved_locales, $prev_locale );
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -220,7 +247,7 @@ function locale_restore_previous()
 {
 	global $saved_locales;
 
-	if( !empty( $saved_locales ) && is_array( $saved_locales ) )
+	if( ! empty( $saved_locales ) && is_array( $saved_locales ) )
 	{
 		locale_activate( array_pop( $saved_locales ) );
 		return true;
@@ -230,8 +257,6 @@ function locale_restore_previous()
 
 
 /**
- * locale_activate(-)
- *
  * returns true if locale has been changed
  *
  * @param string locale to activate
@@ -239,12 +264,11 @@ function locale_restore_previous()
  */
 function locale_activate( $locale )
 {
-	global $use_l10n, $locales, $current_locale, $current_messages, $current_charset, $weekday, $month;
-
+	global $use_l10n, $locales, $current_locale, $current_charset, $weekday, $month;
 
 	if( $locale == $current_locale
 			|| empty( $locale )
-			|| !isset( $locales[$locale] ) )
+			|| ! isset( $locales[$locale] ) )
 	{
 		return false;
 	}
@@ -253,26 +277,37 @@ function locale_activate( $locale )
 	$current_locale = $locale;
 	// Memorize new charset:
 	$current_charset = $locales[ $locale ][ 'charset' ];
-	$current_messages = $locales[ $locale ][ 'messages' ];
 
 	// Activate translations in gettext:
 	if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )
 	{ // Only if we are using GETTEXT ( if not, look into T_(-) ...)
+		global $locales_path;
 		# Activate the locale->language in gettext:
 
-		// Note: default of safe_mode_allowed_env_vars is "PHP_ ",
-		// so you need to add "LC_" by editing php.ini.
-		putenv('LC_ALL='.$current_messages);
+		// Set locale: either to locale's definition
+		if( isset( $locales[$locale]['set_locales'] ) )
+		{
+			$set_locale = explode( ' ', $locales[$locale]['set_locales'] );
+		}
+		else
+		{
+			$set_locale = $locales[ $locale ][ 'messages' ];
+		}
+		setlocale( LC_MESSAGES, $set_locale );
 
 		// Specify location of translation tables and bind to domain
-		bindtextdomain( 'messages', dirname(__FILE__).'/../locales' );
-		textdomain('messages');
+		bindtextdomain( 'messages', $locales_path );
+		textdomain( 'messages' );
 
 		# Activate the charset for conversions in gettext:
+		/*
+		TODO: this does not work, as $evo_charset gets set/adjusted, AFTER activating the locale.
+		TODO: If this gets activated we won't need the mb_convert_variables() call in T_() for $use_l10n=1
 		if( function_exists( 'bind_textdomain_codeset' ) )
 		{ // Only if this gettext supports code conversions
-			bind_textdomain_codeset( 'messages', $current_charset );
+			$r = bind_textdomain_codeset( 'messages', $evo_charset );
 		}
+		*/
 	}
 
 	# Set locale for default language:
@@ -281,7 +316,7 @@ function locale_activate( $locale )
 	// setlocale( LC_ALL, $locale );
 
 	# Use this to check locale: (not relevant)
-	// echo setlocale( LC_ALL, 0 );
+	// echo setlocale( LC_MESSAGES, 0 );
 
 	return true;
 }
@@ -618,16 +653,16 @@ function locale_overwritefromDB()
 		$usedprios[] = $priocounter;
 
 		$locales[ $row['loc_locale'] ] = array(
-																			'charset'     => $row[ 'loc_charset' ],
-																			'datefmt'     => $row[ 'loc_datefmt' ],
-																			'timefmt'     => $row[ 'loc_timefmt' ],
-																			'startofweek' => $row[ 'loc_startofweek' ],
-																			'name'        => $row[ 'loc_name' ],
-																			'messages'    => $row[ 'loc_messages' ],
-																			'priority'    => $priocounter,
-																			'enabled'     => $row[ 'loc_enabled' ],
-																			'fromdb'      => 1
-																		);
+				'charset'     => $row[ 'loc_charset' ],
+				'datefmt'     => $row[ 'loc_datefmt' ],
+				'timefmt'     => $row[ 'loc_timefmt' ],
+				'startofweek' => $row[ 'loc_startofweek' ],
+				'name'        => $row[ 'loc_name' ],
+				'messages'    => $row[ 'loc_messages' ],
+				'priority'    => $priocounter,
+				'enabled'     => $row[ 'loc_enabled' ],
+				'fromdb'      => 1
+			);
 	}
 
 	// set default priorities, if nothing was set in DB.
@@ -735,6 +770,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.7  2006/05/12 21:53:38  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.6  2006/04/29 01:24:04  blueyed
  * More decent charset support;
  * unresolved issues include:

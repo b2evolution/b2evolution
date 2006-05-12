@@ -55,7 +55,7 @@ class Plugin
 	 * Default plugin name as it will appear in lists.
 	 *
 	 * To make it available for translations set it in the constructor by
-	 * using the {@link T_()} function.
+	 * using the {@link Plugin::T_()} function.
 	 *
 	 * This should be not more than 50 characters.
 	 *
@@ -262,8 +262,8 @@ class Plugin
 	 */
 	function Plugin()
 	{
-		$this->short_desc = T_('No desc available');
-		$this->long_desc = T_('No description available');
+		$this->short_desc = $this->T_('No desc available');
+		$this->long_desc = $this->T_('No description available');
 	}
 
 
@@ -273,15 +273,15 @@ class Plugin
 	 * Define here default settings that are then available in the backoffice.
 	 *
 	 * You can access them in the plugin through the member object
-	 * {@link $Settings}, e.g.:
+	 * {@link Plugin::Settings}, e.g.:
 	 * <code>$this->Settings->get( 'my_param' );</code>
 	 *
 	 * You probably don't need to set or change values (other than the
 	 * defaultvalues), but if you know what you're doing, see
-	 * {@link PluginSettings}, where {@link $Settings} gets derived from.
+	 * {@link PluginSettings}, where {@link Plugin::Settings} gets derived from.
 	 *
 	 * @return array
-	 * The array to be returned should define the names of the settings as keys
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
 	 * and assign an array with the following keys to them (only 'label' is required):
 	 *
 	 *   - 'label': Name/Title of the param, gets displayed as label for the input field, or
@@ -330,22 +330,22 @@ class Plugin
 	 * <code>
 	 * return array(
 	 *   'my_param' => array(
-	 *     'label' => T_('My Param'),
+	 *     'label' => $this->T_('My Param'),
 	 *     'defaultvalue' => '10',
-	 *     'note' => T_('Quite cool, eh?'),
-	 *     'valid_pattern' => array( 'pattern' => '[1-9]\d+', T_('The value must be >= 10.') ),
+	 *     'note' => $this->T_('Quite cool, eh?'),
+	 *     'valid_pattern' => array( 'pattern' => '[1-9]\d+', $this->T_('The value must be >= 10.') ),
 	 *   ),
 	 *   'another_param' => array( // this one has no 'note'
-	 *     'label' => T_('My checkbox'),
+	 *     'label' => $this->T_('My checkbox'),
 	 *     'defaultvalue' => '1',
 	 *     'type' => 'checkbox',
 	 *   ),
 	 *   array( 'layout' => 'separator' ),
 	 *   'my_select' => array(
-	 *     'label' => T_('Selector'),
+	 *     'label' => $this->T_('Selector'),
 	 *     'defaultvalue' => 'one',
 	 *     'type' => 'select',
-	 *     'options' => array( 'sun' => T_('Sunday'), 'mon' => T_('Monday') ),
+	 *     'options' => array( 'sun' => $this->T_('Sunday'), 'mon' => $this->T_('Monday') ),
 	 *   ) );
 	 * </code>
 	 *
@@ -473,7 +473,7 @@ class Plugin
 	function AdminAfterMenuInit()
 	{
 		// Example:
-		$this->register_menu_entry( T_('My Tab') );
+		$this->register_menu_entry( $this->T_('My Tab') );
 	}
 
 
@@ -788,16 +788,18 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called when rendering item/post contents other than XML or HTML.
+	 * Event handler: Called when displaying an item/post's content.
 	 *
 	 * This is different from {@link RenderItem()}, {@link RenderItemAsHtml()} and {@link RenderItemAsXml()}:
-	 *  - It applies on every display (rendering will get cached later)
+	 *  - It applies on every display (rendering might get cached later)
 	 *  - It calls all Plugins that register this event, not just associated ones.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}.
 	 *   - 'Item': The {@link Item} that gets displayed (by reference).
+	 *   - 'preview': Is this only a preview?
+	 *   - 'dispmore': Does this include the "more" text (if available), which means "full post"?
 	 * @return boolean Have we changed something?
 	 */
 	function DisplayItemAllFormats( & $params )
@@ -889,7 +891,7 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'Item': the Item object (by reference)
 	 */
-	function ItemViewed( & $params )
+	function ItemViewsIncreased( & $params )
 	{
 	}
 
@@ -980,6 +982,8 @@ class Plugin
 	 * @see Plugin::DisplayCommentFormFieldset()
 	 * @param array Associative array of parameters
 	 *   - 'Comment': the Comment (by reference)
+	 *   - 'original_comment': this is the unstripped and unformated posted comment, use with care! (by reference)
+	 *   - 'is_preview': is this a request for previewing the comment? (boolean)
 	 */
 	function BeforeCommentFormInsert( & $params )
 	{
@@ -992,6 +996,7 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Comment': the Comment (by reference)
+	 *   - 'original_comment': this is the unstripped and unformated posted comment, use with care!
 	 */
 	function AfterCommentFormInsert( & $params )
 	{
@@ -1646,6 +1651,94 @@ class Plugin
 
 
 	/**
+	 * Translate a given string, in the Plugin's context.
+	 *
+	 * This means, that the translation is taken out of the Plugin's "locales" folder.
+	 * @see http://manual.b2evolution.net/Localization#Plugins
+	 *
+	 * It uses the global/regular {@link T_()} function as fallback.
+	 *
+	 * {@internal This is mainly a copy of {@link T_()}, for the $use_l10n==2 case.}}
+	 *
+	 * @param string The string (english), that should be translated
+	 * @param string Requested locale ({@link $current_locale} gets used by default)
+	 * @return string
+	 */
+	function T_( $string, $req_locale = '' )
+	{
+		/**
+		 * The translations keyed by locale. They get loaded through include() of _global.php
+		 * @var array
+		 * @static
+		 */
+		static $trans = array();
+
+		global $current_locale, $locales, $Debuglog, $plugins_path, $evo_charset;
+
+
+		if( empty($req_locale) )
+		{ // By default we use the current locale
+			if( empty( $current_locale ) )
+			{ // don't translate if we have no locale
+				return $string;
+			}
+
+			$req_locale = $current_locale;
+		}
+
+		if( !isset( $locales[$req_locale]['messages'] ) )
+		{
+			$this->debug_log( 'No messages file path for locale. $locales["'
+											.$req_locale.'"] is '.var_export( @$locales[$req_locale], true ), 'locale' );
+			$locales[$req_locale]['messages'] = false;
+		}
+
+		$messages = $locales[$req_locale]['messages'];
+
+		// replace special characters to msgid-equivalents
+		$search = str_replace( array("\n", "\r", "\t"), array('\n', '', '\t'), $string );
+
+		// echo "Translating ", $search, " to $messages<br />";
+
+		if( ! isset($trans[ $messages ] ) )
+		{ // Translations for current locale have not yet been loaded:
+			// echo 'LOADING', $plugins_path.strtolower( get_class($this) ).'/locales/'.$messages.'/_global.php';
+			@include_once $plugins_path.strtolower( get_class($this) ).'/locales/'.$messages.'/_global.php';
+			if( ! isset($trans[ $messages ] ) )
+			{ // Still not loaded... file doesn't exist, memorize that no translations are available
+				// echo 'file not found!';
+				$trans[ $messages ] = array();
+
+				/*
+				May be an english locale without translation.
+				TODO: when refactoring locales, assign a key for 'original english'.
+				$Debuglog->add( 'No messages found for locale ['.$req_locale.'],
+												message file [/locales/'.$messages.'/_global.php]', 'locale' );*/
+			}
+		}
+
+		if( isset( $trans[ $messages ][ $search ] ) )
+		{ // If the string has been translated:
+			$r = $trans[ $messages ][ $search ];
+			$messages_charset = $locales[$req_locale]['charset'];
+		}
+		else
+		{ // Fallback to global T_() function:
+			return T_( $string, $req_locale );
+		}
+
+		if( $messages_charset != $evo_charset
+			  && ! empty($evo_charset) // this extra check is needed, because $evo_charset may not yet be determined.. :/
+			)
+		{ // the INPUT/OUTPUT charset differs from the internal one (this also means mb_convert_encoding is available)
+			mb_convert_variables( $evo_charset, $messages_charset, $r );
+		}
+
+		return $r;
+	}
+
+
+	/**
 	 * Log a debug message.
 	 *
 	 * This gets added to {@link $Debuglog the global Debuglog} with
@@ -1816,6 +1909,9 @@ class Plugin
 
 	/**
 	 * Set a data value for the session.
+	 *
+	 * NOTE: the session data is limited to about 64kb, so do not use it for huge data!
+	 *       Please consider using an own database table (see {@link Plugin::GetDbLayout()}).
 	 *
 	 * @param string Name of the data's key (gets prefixed with 'plugIDX_' internally).
 	 * @param mixed The value
@@ -2006,7 +2102,7 @@ class Plugin
 			$url = $help_url.$target;
 		}
 		elseif( preg_match( '~^https?://~', $target ) )
-		{ // absolute URL (strict match to allow other formats eventually later)
+		{ // absolute URL (strict match to allow other formats later if needed)
 			$url = $target;
 		}
 
@@ -2101,6 +2197,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.45  2006/05/12 21:53:38  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.44  2006/05/05 19:36:23  blueyed
  * New events
  *

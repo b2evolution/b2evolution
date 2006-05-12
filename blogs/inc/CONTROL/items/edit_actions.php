@@ -251,7 +251,7 @@ switch($action)
 				// Send email notifications now!
 				$edited_Item->send_email_notifications();
 
-				pingb2evonet( $blogparams, $edited_Item->post_ID, $edited_Item->title );
+				pingb2evonet( $blogparams, $edited_Item->ID, $edited_Item->title );
 				pingWeblogs( $blogparams );
 				pingBlogs( $blogparams );
 				pingTechnorati( $blogparams );
@@ -587,6 +587,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2006/05/12 21:53:37  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.10  2006/05/05 19:36:23  blueyed
  * New events
  *

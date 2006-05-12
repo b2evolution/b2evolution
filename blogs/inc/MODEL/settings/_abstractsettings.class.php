@@ -364,7 +364,7 @@ class AbstractSettings
 	 * Only set the first variable (passed by reference) if we could retrieve a
 	 * setting.
 	 *
-	 * @param mixed variable to eventually set (by reference)
+	 * @param mixed variable to set maybe (by reference)
 	 * @param string the values for the column keys (depends on $this->colKeyNames
 	 *               and must match its count and order)
 	 * @return boolean true on success (variable was set), false if not
@@ -665,6 +665,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.9  2006/05/12 21:53:38  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.8  2006/05/02 22:17:10  blueyed
  * use global DB object instead of property, so it does not get serialized with the object
  *

@@ -279,7 +279,7 @@ function antispam_poll_abuse( $display = true )
  * {@internal This function gets tested in _misc.funcs.simpletest.php}}
  *
  * @param string URL
- * @return string the pattern to match this domain in the blacklist
+ * @return string|false the pattern to match this domain in the blacklist; false if we could not extract the base domain
  */
 function get_ban_domain( $url )
 {
@@ -289,6 +289,11 @@ function get_ban_domain( $url )
 
 	// Get the base domain (without any subdomains):
 	$base_domain = preg_replace( '~(.*\.)([^.]+\.[^.]+)~', '\\2', $domain );
+
+	if( empty($base_domain) )
+	{
+		return false;
+	}
 
 	if( strlen( $base_domain ) < strlen( $domain ) )
 	{	// The guy is spamming with subdomains (or www):
@@ -302,6 +307,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.7  2006/05/12 21:53:37  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.6  2006/04/28 11:16:17  blueyed
  * test, doc
  *

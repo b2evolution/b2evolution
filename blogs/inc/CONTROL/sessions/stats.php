@@ -483,14 +483,14 @@ switch( $AdminUI->get_path(1) )
 			// Antispam:
 			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{
-				function referer_ban_link( $dom_name )
+				function referer_ban_link( $uri )
 				{
-					return '<a href="?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain( $dom_name ) )
+					return '<a href="?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain( $uri ) )
 							.'" title="'.T_('Ban this domain!').'">'.get_icon('ban').'</a>';
 				}
 				$Results->cols[] = array(
 						'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
-						'td' => '%referer_ban_link( #dom_name# )%',
+						'td' => '%referer_ban_link( #hit_referer# )%',
 					);
 			}
 
@@ -677,7 +677,8 @@ switch( $AdminUI->get_path(1) )
 						<?php
 						if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ // user can ban:
-							echo '<td>'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'action,keyword', 'action=ban&amp;keyword='.rawurlencode( get_ban_domain(stats_basedomain(false)) ) ) ).'</td>';
+							echo '<td><a href="?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain( trim($row_stats['hit_referer']) ) )
+								.'" title="'.T_('Ban this domain!').'">'.get_icon('ban').'</a></td>';
 						}
 						?>
 						<td class="right"><?php stats_hit_count() ?></td>
@@ -1055,6 +1056,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2006/05/12 21:53:37  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.15  2006/05/05 20:10:40  blueyed
  * Fix
  *

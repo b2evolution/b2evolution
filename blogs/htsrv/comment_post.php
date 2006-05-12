@@ -22,6 +22,7 @@
  * @package htsrv
  */
 
+
 /**
  * Initialize everything:
  */
@@ -88,8 +89,9 @@ if( ! is_logged_in() )
 $now = date( 'Y-m-d H:i:s', $localtimenow );
 
 // CHECK and FORMAT content
+$original_comment = $comment;
 //echo 'allowed tags:',htmlspecialchars($comment_allowed_tags);
-$original_comment = strip_tags($comment, $comment_allowed_tags);
+$comment = strip_tags($comment, $comment_allowed_tags);
 // TODO: AutoBR should really be a "comment renderer" (like with Items)
 $comment = format_to_post($original_comment, $comment_autobr, 1);
 
@@ -140,9 +142,9 @@ if( $action != 'preview' )
 	 * TODO: Put time check into query?
 	 */
 	$query = 'SELECT MAX(comment_date)
-							FROM T_comments
+						  FROM T_comments
 						 WHERE comment_author_IP = '.$DB->quote($Hit->IP).'
-								OR comment_author_email = '.$DB->quote($Comment->get_author_email());
+						    OR comment_author_email = '.$DB->quote($Comment->get_author_email());
 	$ok = 1;
 	if( $then = $DB->get_var( $query ) )
 	{
@@ -160,7 +162,10 @@ if( $action != 'preview' )
 
 
 // Trigger event: a Plugin could add a $category="error" message here..
-$Plugins->trigger_event('BeforeCommentFormInsert', array( 'Comment' => & $Comment ) );
+$Plugins->trigger_event('BeforeCommentFormInsert', array(
+	'Comment' => & $Comment,
+	'original_comment' => & $original_comment,
+	'is_preview' => ($action == 'preview') ) );
 
 
 /*
@@ -177,7 +182,7 @@ if( $Messages->count('error') )
 
 if( $action == 'preview' )
 { // set the Comment into user's session and redirect. _feeback.php of the skin should display it.
-	$Comment->set( 'original_content', $original_comment );
+	$Comment->set( 'original_content', $original_comment ); // used in the textarea input field again
 	$Session->set( 'core.preview_Comment', $Comment );
 	$Session->dbsave();
 
@@ -252,7 +257,7 @@ if( $Comment->ID == 0 )
 else
 {
 	// Trigger event: a Plugin should cleanup any temporary data here..
-	$Plugins->trigger_event( 'AfterCommentFormInsert', array( 'Comment' => & $Comment ) );
+	$Plugins->trigger_event( 'AfterCommentFormInsert', array( 'Comment' => & $Comment, 'original_comment' => $original_comment ) );
 
 	/*
 	 * --------------------------
@@ -286,6 +291,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.76  2006/05/12 21:53:37  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
  * Revision 1.75  2006/05/04 10:32:41  blueyed
  * Use original comment content in preview's form.
  *

@@ -73,7 +73,7 @@ function install_plugin_db_schema_action( & $Plugin )
 	$install_db_deltas_confirm_md5 = $Request->param( 'install_db_deltas_confirm_md5' );
 
 	$db_layout = $Plugin->GetDbLayout();
-	$install_db_deltas = array(); // This eventually holds changes to make (just all queries)
+	$install_db_deltas = array(); // This holds changes to make, if any (just all queries)
 
 	if( ! empty($db_layout) )
 	{ // The plugin has a DB layout attached
@@ -924,7 +924,7 @@ switch( $action )
 
 			if( ! empty($install_db_deltas) )
 			{
-				echo '<p>'.T_('The following queries will be executed. If you are not sure what this means, it will probably be alright.').'</p>';
+				echo '<p>'.T_('The following database queries will be executed. If you are not sure what this means, it will probably be alright.').'</p>';
 				echo '<ul><li><pre>'.implode( '</pre></li><li><pre>', $install_db_deltas ).'</pre></li></ul>';
 
 				$Form->hidden( 'install_db_deltas_confirm_md5', md5(implode( '', $install_db_deltas )) );
