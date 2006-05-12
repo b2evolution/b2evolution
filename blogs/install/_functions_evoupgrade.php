@@ -761,6 +761,8 @@ function upgrade_b2evo_tables()
 	}
 
 	// TODO: convert time_difference! See http://dev.b2evolution.net/admin/b2browse.php?tab=posts&blog=7&p=87654&c=1&tb=1&pb=1
+	// TODO: mark all members of "Administrators" group as validated
+	// TODO: "If a user has permission to edit a blog, he should be able to put files in the media folder for that blog." - see http://forums.b2evolution.net/viewtopic.php?p=36417#36417
 
 
 	if( $old_db_version < 9300 )
@@ -840,6 +842,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.144  2006/05/12 21:34:16  blueyed
+ * todo (last commit was lost)
+ *
  * Revision 1.143  2006/04/29 17:37:48  blueyed
  * Added basic_antispam_plugin; Moved double-check-referers there; added check, if trackback links to us
  *
