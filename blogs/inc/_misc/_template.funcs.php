@@ -69,7 +69,7 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			// We are requesting the archive directory:
 			$r[] = T_('Archive Directory');
 			break;
-			
+
 		case 'comments':
 			// We are requesting the last comments:
 			$r[] = T_('Last comments');
@@ -79,17 +79,17 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 			// We are requesting the user profile:
 			$r[] = T_('User profile');
 			break;
-			
+
 		case 'subs':
 			// We are requesting the subscriptions screen:
 			$r[] = T_('Subscriptions');
 			break;
-			
+
 		case 'msgform':
 			// We are requesting the message form:
 			$r[] = T_('Send an email message');
 			break;
-		
+
 		default:
 			// We are displaying (a) message(s)...
 			if( $preview )
@@ -155,7 +155,7 @@ function request_title( $prefix = ' ', $suffix = '', $glue = ' - ', $format = 'h
 				{	// We have asked for a specific timeframe:
 
 					$my_year = substr($m,0,4);
-					if( strlen($m) > 4 )
+					if( strlen($m) > 4 && isset($month[substr($m,4,2)]) )
 					{ // We have requested a month too:
 						$my_month = T_($month[substr($m,4,2)]);
 					}
@@ -296,6 +296,9 @@ function archive_link( $year, $month, $day = '', $week = '', $show = true, $file
 
 /*
  * $Log$
+ * Revision 1.6  2006/05/12 21:36:00  blueyed
+ * Fixed E_NOTICE
+ *
  * Revision 1.5  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
