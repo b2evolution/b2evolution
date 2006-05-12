@@ -588,10 +588,6 @@ locale_activate( $default_locale );
 $io_charset = locale_charset(false);
 
 
-// Send the INPUT/OUTPUT charset (gets also added as http-equiv in general) and overridden, if needed (e.g. with text/xml)
-header( 'Content-Type: text/html; charset='.$io_charset );
-
-
 // Check and possibly adjust $evo_charset:
 if( empty($evo_charset) )
 { // Internal encoding follows INPUT/OUTPUT encoding:
@@ -683,6 +679,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.21  2006/05/12 22:46:23  blueyed
+ * Do not send Content-type by default, because mb_output_handler/mb_http_output is likely to fsck up with it.
+ *
  * Revision 1.20  2006/05/12 21:53:37  blueyed
  * Fixes, cleanup, translation for plugins
  *
