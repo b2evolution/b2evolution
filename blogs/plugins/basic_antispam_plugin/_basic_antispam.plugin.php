@@ -87,7 +87,44 @@ class basic_antispam_plugin extends Plugin
 					'note' => T_('If a referrer has been detected as spam, should we block the request with a "403 Forbidden" page?'),
 					'defaultvalue' => '1',
 				),
+
+				array( 'layout' => 'begin_fieldset', 'label' => T_('Links') ),
+					'max_number_of_links_feedback' => array(
+						'type' => 'integer',
+						'label' => T_('Number of links'),
+						'note' => T_('If a comment has more than this number of links in it, it will get 100% spam karma. -1 to disable it.'),
+						'help' => '#set_max_number_of_links',
+						'defaultvalue' => '2',
+						'size' => 3,
+					),
+				array( 'layout' => 'end_fieldset' ),
+
 			);
+	}
+
+
+	/**
+	 * Handle max_number_of_links_feedback setting.
+	 */
+	function GetSpamKarmaForComment( & $params )
+	{
+		$max_comments = $this->Settings->get('max_number_of_links_feedback');
+		if( $max_comments != -1 )
+		{ // not deactivated:
+			$count = preg_match_all( '~<a\s*[^>]href\s*=~i', $params['Comment']->content, $matches );
+
+			if( $count > $max_comments )
+			{
+				return 100;
+			}
+
+			if( $count == 0 )
+			{
+				return 0;
+			}
+
+			return (100/$max_comments) * $count;
+		}
 	}
 
 
@@ -466,6 +503,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.8  2006/05/12 21:35:24  blueyed
+ * Apply karma by number of links in a comment. Note: currently the default is to not allow A tags in comments!
+ *
  * Revision 1.7  2006/05/02 22:43:39  blueyed
  * typo
  *
