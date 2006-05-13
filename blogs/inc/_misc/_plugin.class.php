@@ -1654,7 +1654,7 @@ class Plugin
 	 * Translate a given string, in the Plugin's context.
 	 *
 	 * This means, that the translation is taken out of the Plugin's "locales" folder.
-	 * @see http://manual.b2evolution.net/Localization#Plugins
+	 * @link http://manual.b2evolution.net/Localization#Plugins
 	 *
 	 * It uses the global/regular {@link T_()} function as fallback.
 	 *
@@ -2197,6 +2197,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.46  2006/05/13 15:46:40  blueyed
+ * doc fix
+ *
  * Revision 1.45  2006/05/12 21:53:38  blueyed
  * Fixes, cleanup, translation for plugins
  *
