@@ -1,19 +1,24 @@
 <?php
 /**
+ * charts.php v1.6
+ * ------------------------------------------------------------------------
+ * Copyright (c) 2004, maani.us
+ * ------------------------------------------------------------------------
+ * This file is part of "PHP/SWF Charts"
+ *
+ * PHP/SWF Charts is a shareware. See http://www.maani.us/charts/ for
+ * more information.
+ * ------------------------------------------------------------------------
  * @package libs
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// charts.php v1.6
-// ------------------------------------------------------------------------
-// Copyright (c) 2004, maani.us
-// ------------------------------------------------------------------------
-// This file is part of "PHP/SWF Charts"
-//
-// PHP/SWF Charts is a shareware. See http://www.maani.us/charts/ for
-// more information.
-// ------------------------------------------------------------------------
 
+/**
+ * This function draws the SWF chart.
+ *
+ * @param array
+ */
 function DrawChart($chart)
 {
 	// fplanque:
