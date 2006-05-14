@@ -465,11 +465,11 @@ class basic_antispam_plugin extends Plugin
 		$sql = '
 				SELECT comment_ID
 				  FROM T_comments
-				 WHERE comment_post_ID = '.$Comment->Item->ID.'
-				   AND ';
+				 WHERE comment_post_ID = '.$Comment->Item->ID;
+
 		if( isset($Comment->author_User) )
 		{ // registered user:
-			$sql .= 'comment_author_ID = '.$Comment->author_User->ID;
+			$sql .= ' AND comment_author_ID = '.$Comment->author_User->ID;
 		}
 		else
 		{ // visitor (also trackback):
@@ -489,7 +489,7 @@ class basic_antispam_plugin extends Plugin
 
 			if( ! empty($sql_ors) )
 			{
-				$sql .= '( '.implode( ' OR ', $sql_ors ).' )';
+				$sql .= ' AND ( '.implode( ' OR ', $sql_ors ).' )';
 			}
 		}
 
@@ -503,6 +503,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.9  2006/05/14 16:30:37  blueyed
+ * SQL error fixed with empty visitor comments
+ *
  * Revision 1.8  2006/05/12 21:35:24  blueyed
  * Apply karma by number of links in a comment. Note: currently the default is to not allow A tags in comments!
  *
