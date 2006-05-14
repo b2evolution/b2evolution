@@ -640,7 +640,16 @@ if( function_exists('mb_internal_encoding') )
 // Set encoding for MySQL connection, if connection_charset differs from evo_charset:
 if( isset($mysql_charset_map[$evo_charset]) && $mysql_charset_map[$evo_charset] != $EvoConfig->DB['connection_charset'] )
 {
-	$DB->query( 'SET NAMES '.$mysql_charset_map[$evo_charset] );
+	$save_show_errors = $DB->show_errors;
+	$save_halt_on_error = $DB->halt_on_error;
+	$DB->show_errors = false;
+	$DB->halt_on_error = false;
+	if( $DB->query( 'SET NAMES '.$mysql_charset_map[$evo_charset] ) === false )
+	{
+		$Debuglog->add( 'Could not "SET NAMES '.$mysql_charset_map[$evo_charset].'"!', 'error' );
+	}
+	$DB->show_errors = $save_show_errors;
+	$DB->halt_on_error = $save_halt_on_error;
 }
 
 $Debuglog->add( 'evo_charset (_main.inc.php): '.$evo_charset, 'locale' );
@@ -679,6 +688,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.22  2006/05/14 17:59:59  blueyed
+ * "try/catch" SET NAMES (Thanks, bodo)
+ *
  * Revision 1.21  2006/05/12 22:46:23  blueyed
  * Do not send Content-type by default, because mb_output_handler/mb_http_output is likely to fsck up with it.
  *
