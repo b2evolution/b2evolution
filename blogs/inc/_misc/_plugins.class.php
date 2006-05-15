@@ -321,6 +321,9 @@ class Plugins
 
 				'AfterLoginAnonymousUser' => T_('Gets called at the end of the login procedure for anonymous visitors.'),
 				'AfterLoginRegisteredUser' => T_('Gets called at the end of the login procedure for registered users.'),
+
+				'BeforeBlogDisplay' => T_('Gets called before a (part of the blog) gets displayed.'),
+				'SkinBeginHtmlHead' => T_('Gets called at the top of the HTML HEAD section in a skin.'),
 			);
 		}
 
@@ -2657,6 +2660,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.46  2006/05/15 22:26:48  blueyed
+ * Event hooks for skin plugins.
+ *
  * Revision 1.45  2006/05/12 21:53:38  blueyed
  * Fixes, cleanup, translation for plugins
  *

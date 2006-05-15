@@ -590,6 +590,29 @@ class Plugin
 	// }}}
 
 
+	// Skin/Blog events: {{{
+
+	/**
+	 * Event handler: Called before a blog gets displayed (in _blog_main.inc.php).
+	 */
+	function BeforeBlogDisplay( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource
+	 * files (CSS, JavaScript, ..)).
+	 */
+	function SkinBeginHtmlHead( & $params )
+	{
+	}
+
+	// }}}
+
+
 	// (Un)Install / (De)Activate events: {{{
 
 	/**
@@ -1196,7 +1219,7 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'action': 'delete', 'set', 'get'
 	 *   - 'key': The key to refer to 'data'
-	 *   - 'data': The actual data.
+	 *   - 'data': The actual data. This must be set by the plugin.
 	 * @return boolean True if action was successful, false otherwise.
 	 */
 	function CacheObjects( & $params )
@@ -2197,6 +2220,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.47  2006/05/15 22:26:48  blueyed
+ * Event hooks for skin plugins.
+ *
  * Revision 1.46  2006/05/13 15:46:40  blueyed
  * doc fix
  *

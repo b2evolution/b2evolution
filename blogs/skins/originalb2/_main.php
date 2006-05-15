@@ -44,9 +44,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <!-- layout credits goto http://bluerobot.com/web/layouts/layout2.html -->
 
 <head xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
+	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 	<title><?php $Blog->disp( 'name', 'htmlbody' ) ?><?php request_title( ' :: ', '', ' :: ', 'htmlhead' ) ?></title>
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<meta http-equiv="imagetoolbar" content="no" />
 	<meta content="TRUE" name="MSSmartTagsPreventParsing" />
 	<meta name="description" content="<?php $Blog->disp( 'shortdesc', 'htmlattr' ); ?>" />
