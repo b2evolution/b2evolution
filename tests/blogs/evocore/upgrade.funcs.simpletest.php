@@ -768,6 +768,50 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$this->assertTrue( isset( $r['test_1'][1] ) );
 	}
 
+
+	/**
+	 * Test if with "inline PK" it also gets dropped correctly.
+	 */
+	function test_db_delta_change_PK_inline()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				i INTEGER PRIMARY KEY
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				i2 INTEGER PRIMARY KEY
+			)", /* exclude defaults: */ NULL );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 1 );
+		$this->assertEqual( $r['test_1'][0]['queries'][0], 'ALTER TABLE test_1 ADD COLUMN i2 INTEGER PRIMARY KEY FIRST, DROP PRIMARY KEY' );
+	}
+
+
+	/**
+	 * Test if with "inline PK" it also gets dropped correctly.
+	 */
+	function test_db_delta_change_PK_inline_two()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				i INTEGER,
+				i2 INTEGER,
+				PRIMARY KEY test( i, i2 )
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				i3 INTEGER PRIMARY KEY
+			)", /* exclude defaults: */ NULL );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 1 );
+		$this->assertEqual( $r['test_1'][0]['queries'][0], 'ALTER TABLE test_1 ADD COLUMN i3 INTEGER PRIMARY KEY FIRST, DROP PRIMARY KEY' );
+	}
+
 }
 
 

@@ -62,6 +62,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @author Originally taken from Wordpress, heavily enhanced and modified by blueyed
  *
+ * @todo "You can't delete all columns with ALTER TABLE; use DROP TABLE instead(Errno=1090)"
  * @todo Handle COMMENT for tables?!
  *
  * @see http://dev.mysql.com/doc/refman/4.1/en/create-table.html
@@ -753,6 +754,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 			{ // For every remaining field specified for the table
 				$column_definition = $fielddef['field'].' '.$fielddef['where'];
 
+				$is_auto_increment = false;
 				// AUTO_INCREMENT (with special index handling: AUTO_INCREMENT fields need to be PRIMARY or UNIQUE)
 				if( preg_match( '~(.*?) \b AUTO_INCREMENT \b (.*)$~ix', $fielddef['field'], $match ) )
 				{
@@ -760,6 +762,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					{ // no KEY defined (but required for AUTO_INCREMENT fields)
 						debug_die('No KEY/INDEX defined for AUTO_INCREMENT column!');
 					}
+					$is_auto_increment = true;
 
 					foreach( $indices as $k_index => $l_index )
 					{ // go through the indexes we want to have
@@ -809,9 +812,22 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					}
 				}
 
+
 				// Push a query line into $items that adds the field to that table
+				$query = 'ALTER TABLE '.$table.' ADD COLUMN '.$column_definition;
+
+				// Handle inline PRIMARY KEY definition:
+				if( ! $is_auto_increment
+						&& preg_match( '~^(.*) (?: \b (UNIQUE) (?:\s+ KEY)? | (?:PRIMARY \s+)? KEY \b ) (.*)$~ix', $column_definition, $match ) // "has_inline_primary_key"
+						&& ! in_array($fieldname_lowered, $existing_primary_fields) )
+				{ // the column is part of the PRIMARY KEY, which needs to get dropped before (we already handle that for AUTO_INCREMENT fields)
+					$query .= ', DROP PRIMARY KEY';
+					$existing_primary_fields = array(); // we expect no existing primary key anymore
+					unset( $obsolete_indices['PRIMARY'] );
+				}
+
 				$items[$table_lowered][] = array(
-					'queries' => array('ALTER TABLE '.$table.' ADD COLUMN '.$column_definition),
+					'queries' => array($query),
 					'note' => 'Added column '.$table.'.'.$fielddef['field'],
 					'type' => 'add_column' );
 			}
@@ -972,6 +988,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.16  2006/05/15 23:40:55  blueyed
+ * bugfix for (changing) inline PK
+ *
  * Revision 1.15  2006/04/20 15:42:56  blueyed
  * Make sure itemlist returned by db_delta() is ordered.
  *
