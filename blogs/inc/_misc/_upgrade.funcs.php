@@ -139,7 +139,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 
 
 	/**
-	 * @global array Hold the indices we want to create/have
+	 * @global array Hold the indices we want to create/have, with meta data keys.
 	 */
 	$indices = array();
 
@@ -185,6 +185,11 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 			 */
 			$fields_with_keys = array();
 
+			/**
+			 * @global string Holds the fielddef of an obsolete ("drop_column") AUTO_INCREMENT field. We must alter this with a PK "ADD COLUMN" query.
+			 */
+			$obsolete_autoincrement = NULL;
+
 
 			/**
 			 * @global array List of fields (and definition from query)
@@ -193,7 +198,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 			 *         'where' => "[FIRST|AFTER xxx]" )
 			 *   </code>
 			 */
-			$cfields = array();
+			$wanted_fields = array();
 
 			/**
 			 * @global boolean Do we have any variable-length fields? (see http://dev.mysql.com/doc/refman/4.1/en/silent-column-changes.html)
@@ -211,40 +216,56 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 			//echo "<hr/><pre>\n".print_r(strtolower($table), true).":\n".print_r($items, true)."</pre><hr/>";
 
 			$prev_fld = '';
-			foreach( $flds as $fld )
+			foreach( $flds as $create_definition )
 			{ // For every field line specified in the query
 				// Extract the field name
-				preg_match( '|^([^\s(]+)|', trim($fld), $match );
+				preg_match( '|^([^\s(]+)|', trim($create_definition), $match );
 				$fieldname = $match[1];
 				$fieldname_lowered = strtolower($match[1]);
 
-				$fld = trim($fld, ", \r\n\t");
-				if( in_array( $fieldname_lowered, array( '', 'primary', 'index', 'fulltext', 'unique', 'key' ) ) )
-				{ // index (not in column_definition - this gets added later)
-					$indices[] = $fld;
+				$create_definition = trim($create_definition, ", \r\n\t");
 
-					preg_match( '~\((.*?)\)$~', $fld, $match );
-					$index_fields = explode( ',', $match[1] );
-					foreach( $index_fields as $k => $v )
+				if( in_array( $fieldname_lowered, array( '', 'primary', 'index', 'fulltext', 'unique', 'key' ) ) )
+				{ // INDEX (but not in column_definition - this gets added later)
+					$add_index = array(
+						'create_definition' => $create_definition,
+					);
+
+					if( ! preg_match( '~^(PRIMARY(?:\s+KEY)|UNIQUE(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+(\w+))? (\s+USING \w+)? \s* \((.*)\)$~ix', $create_definition, $match ) )
+					{ // invalid type, should not happen
+						debug_die( 'Invalid type in $indices: '.$create_definition );
+					}
+					$add_index['keyword'] = $match[1];
+					$add_index['name'] = strtoupper($match[2]);
+					$add_index['type'] = $match[3]; // "USING [type_name]"
+					$add_index['col_names'] = explode( ',', $match[4] );
+					foreach( $add_index['col_names'] as $k => $v )
 					{
-						$index_fields[$k] = strtolower(trim($v));
+						$add_index['col_names'][$k] = strtolower(trim($v));
 					}
 
 					if( $fieldname_lowered == 'primary' )
 					{ // Remember PRIMARY KEY fields to be indexed (used for NULL check)
-						$primary_key_fields = $index_fields;
+						$primary_key_fields = $add_index['col_names'];
+						$add_index['is_PK'] = true;
 					}
-					$fields_with_keys = array_merge( $fields_with_keys, $index_fields );
+					else
+					{
+						$add_index['is_PK'] = false;
+					}
+					$fields_with_keys = array_unique( array_merge( $fields_with_keys, $add_index['col_names'] ) );
+
+					$indices[] = $add_index;
 				}
 				else
 				{ // "normal" field, add it to the field array
-					$cfields[ strtolower($fieldname_lowered) ] = array(
-							'field' => $fld,
+					$wanted_fields[ strtolower($fieldname_lowered) ] = array(
+							'field' => $create_definition,
 							'where' => ( empty($prev_fld) ? 'FIRST' : 'AFTER '.$prev_fld ),
 						);
 					$prev_fld = $fieldname;
 
-					if( preg_match( '~^\S+\s+(VARCHAR|TEXT|BLOB)~i', $fld ) )
+					if( preg_match( '~^\S+\s+(VARCHAR|TEXT|BLOB)~i', $create_definition ) )
 					{
 						$has_variable_length_field = true;
 					}
@@ -256,7 +277,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 			/**
 			 * @global array Holds the existing indices (with array's key UPPERcased)
 			 */
-			$index_ary = array();
+			$existing_indices = array();
 
 			// Fetch the table index structure from the database
 			$tableindices = $DB->get_results( 'SHOW INDEX FROM '.$table );
@@ -269,15 +290,18 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					// Add the index to the index data array
 					$keyname = strtoupper($tableindex->Key_name);
 
-					$index_ary[$keyname]['name'] = $tableindex->Key_name; // original case
-					$index_ary[$keyname]['columns'][] = array('fieldname' => $tableindex->Column_name, 'subpart' => $tableindex->Sub_part);
-					$index_ary[$keyname]['unique'] = ($tableindex->Non_unique == 0) ? true : false;
+					$existing_indices[$keyname]['name'] = $tableindex->Key_name; // original case
+					$existing_indices[$keyname]['columns'][] = array('fieldname' => $tableindex->Column_name, 'subpart' => $tableindex->Sub_part);
+					$existing_indices[$keyname]['unique'] = ($tableindex->Non_unique == 0) ? true : false;
 				}
+				unset($tableindices);
+
 
 				// Let's see which indices are present already for the table:
-				$obsolete_indices = $index_ary; // will get unset as found
-				// For each actual index in the index array
-				foreach( $index_ary as $index_name => $index_data )
+				// TODO: use meta data available now in $indices, instead of building a regular expression!?
+				$obsolete_indices = $existing_indices; // will get unset as found
+
+				foreach( $existing_indices as $index_name => $index_data )
 				{
 					// Build a create string to compare to the query
 					$index_pattern = '^';
@@ -287,7 +311,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					}
 					elseif( $index_data['unique'] )
 					{
-						$index_pattern .= 'UNIQUE(\s+KEY)?';
+						$index_pattern .= 'UNIQUE(\s+(?:INDEX|KEY))?';
 					}
 					else
 					{
@@ -322,7 +346,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 
 					foreach( $indices as $k => $index )
 					{
-						if( preg_match( '~'.$index_pattern.'~i', trim($index) ) )
+						if( preg_match( '~'.$index_pattern.'~i', trim($index['create_definition']) ) )
 						{ // This index already exists: remove the index from our indices to create
 							unset($indices[$k]);
 							unset($obsolete_indices[$index_name]);
@@ -333,12 +357,12 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					}
 					if( isset($obsolete_indices[$index_name]) )
 					{
-						#pre_dump( 'TABLEINDICES', $tableindices );
-						#echo "<pre style=\"border:1px solid #ccc;margin-top:5px;\">{$table}:<br/><b>Did not find index:</b>".$index_pattern."<br/>".print_r($indices, true)."</pre>\n";
+						#echo "<pre style=\"border:1px solid #ccc;margin-top:5px;\">{$table}:<br/><b>Did not find index:</b>".$index_name.'/'.$index_pattern."<br/>".print_r($indices, true)."</pre>\n";
 					}
 				}
 
-				foreach( $index_ary as $l_key_name => $l_key_info )
+				// Set $existing_primary_fields and $existing_key_fields
+				foreach( $existing_indices as $l_key_name => $l_key_info )
 				{
 					$l_key_fields = array();
 					foreach( $l_key_info['columns'] as $l_col )
@@ -352,25 +376,42 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 
 					$existing_key_fields = array_merge( $existing_key_fields, $l_key_fields );
 				}
+				$existing_key_fields = array_unique($existing_key_fields);
 				#pre_dump( 'existing_primary_fields', $existing_primary_fields );
 				#pre_dump( 'existing_key_fields', $existing_key_fields );
 			}
 
 
-			// Pre-run KEYs defined in "column_definition" for AUTO_INCREMENT handling
-			foreach( $cfields as $fieldname_lowered => $field_info )
+			// Pre-run KEYs defined in "column_definition" (e.g. used for AUTO_INCREMENT handling)
+			foreach( $wanted_fields as $fieldname_lowered => $field_info )
 			{
 				$fld = $field_info['field'];
-				if( preg_match( '~ \b (?: (UNIQUE) (\s+ KEY)? | (PRIMARY \s+)? KEY ) \b ~ix', $fld, $match ) )
-				{
+				if( preg_match( '~ \b (?: (UNIQUE) (\s+ (?:INDEX|KEY))? | (PRIMARY \s+)? KEY ) \b ~ix', $fld, $match ) )
+				{ // This has an "inline" INDEX/KEY:
+					$add_index = array(
+							'create_definition' => NULL, // "inline"
+							'col_names' => array($fld),
+							'name' => $fld,
+							'keyword' => NULL,
+							#'type' => $match[3], // "USING [type_name]"
+						);
+
 					if( empty($match[1]) )
 					{
 						$primary_key_fields = array($fieldname_lowered);
 						unset( $obsolete_indices['PRIMARY'] );
+						$add_index['is_PK'] = true;
+					}
+					else
+					{
+						$add_index['is_PK'] = false;
 					}
 					$fields_with_keys[] = $fieldname_lowered;
+
+					$indices[] = $add_index;
 				}
 			}
+			$fields_with_keys = array_unique($fields_with_keys);
 
 
 			// Fetch the table column structure from the database
@@ -381,16 +422,38 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 			{
 				$fieldname_lowered = strtolower($tablefield->Field);
 
-				if( ! isset($cfields[ $fieldname_lowered ]) )
-				{ // This field exists in the table, but not in the creation queries?
-					$items[$table_lowered][] = array(
-						'queries' => array('ALTER TABLE '.$table.' DROP COLUMN '.$tablefield->Field),
-						'note' => 'Dropped '.$table.'.'.$tablefield->Field,
-						'type' => 'drop_column' );
+				if( ! isset($wanted_fields[ $fieldname_lowered ]) )
+				{ // This field exists in the table, but not in the creation queries
+
+					if( in_array('drop_column', $exclude_types) )
+					{
+						if( preg_match('~\bAUTO_INCREMENT\b~i', $tablefield->Extra) )
+						{ // must be modified with a ADD COLUMN which drops a PK
+							$obsolete_autoincrement = $tablefield;
+						}
+					}
+					else
+					{
+						$items[$table_lowered][] = array(
+							'queries' => array('ALTER TABLE '.$table.' DROP COLUMN '.$tablefield->Field),
+							'note' => 'Dropped '.$table.'.'.$tablefield->Field,
+							'type' => 'drop_column' );
+
+						// Unset in key indices:
+						if( ($k = array_search($fieldname_lowered, $existing_key_fields)) !== false )
+						{
+							unset($existing_key_fields[$k]);
+						}
+						if( ($k = array_search($fieldname_lowered, $existing_primary_fields)) !== false )
+						{
+							unset($existing_primary_fields[$k]);
+						}
+					}
+
 					continue;
 				}
 
-				$column_definition = trim( $cfields[$fieldname_lowered]['field'] );
+				$column_definition = trim( $wanted_fields[$fieldname_lowered]['field'] );
 
 				unset($type_matches); // have we detected the type as matching (for optional length param)
 				$fieldtype = '';
@@ -497,7 +560,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 
 				// KEY
 				$has_inline_primary_key = false;
-				if( preg_match( '~^(.*) (?: \b (UNIQUE) (?:\s+ KEY)? | (?:PRIMARY \s+)? KEY \b ) (.*)$~ix', $field_to_parse, $match ) )
+				if( preg_match( '~^(.*) (?: \b (UNIQUE) (?:\s+ (?:INDEX|KEY))? | (?:PRIMARY \s+)? KEY \b ) (.*)$~ix', $field_to_parse, $match ) )
 				{ // fields got added to primary_key_fields and fields_with_keys before
 					$field_to_parse = $match[1].$match[3];
 					if( empty($match[2]) )
@@ -524,24 +587,19 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 						debug_die('No KEY/INDEX defined for AUTO_INCREMENT column!');
 					}
 
-					if( ! in_array( $fieldname_lowered, $existing_key_fields ) )
+					if( in_array( $fieldname_lowered, $existing_key_fields ) )
+					{
+						if( ! empty( $primary_key_fields ) )
+						{
+							$column_definition .= ', DROP PRIMARY KEY';
+						}
+					}
+					else
 					{ // a key for this AUTO_INCREMENT field does not exist yet, we search it in $indices
 						foreach( $indices as $k_index => $l_index )
 						{ // go through the indexes we want to have
-							if( ! preg_match( '~^(PRIMARY(?:\s+KEY)|UNIQUE(?:\s+INDEX)?|KEY|INDEX) (?:\s+(\w+))? (\s+USING \w+)? \s* \((.*)\)$~ix', $l_index, $match ) )
-							{ // invalid type, should not happen
-								debug_die( 'Invalid type in $indices: '.$l_index );
-							}
-							$index_keyword = $match[1];
-							$index_name = strtoupper($match[2]);
-							$index_type = $match[3]; // "USING [type_name]"
-							$index_col_names = explode( ',', $match[4] );
-							foreach( $index_col_names as $k => $v )
-							{
-								$index_col_names[$k] = strtolower(trim($v));
-							}
 
-							if( array_search( $fieldname_lowered, $index_col_names ) === false )
+							if( array_search( $fieldname_lowered, $l_index['col_names'] ) === false )
 							{ // this is not an index for our column
 								continue;
 							}
@@ -549,19 +607,19 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 							// this index definition affects us, we have to add it to our ALTER statement..
 
 							// See if we need to drop it, before adding it:
-							if( preg_match( '~PRIMARY(\s+KEY)~i', $index_keyword ) )
+							if( $l_index['is_PK'] )
 							{ // Part of a PRIMARY key..
 								if( ! empty( $existing_primary_fields ) )
 								{ // and a PRIMARY key exists already
 									$column_definition .= ', DROP PRIMARY KEY';
 								}
 								$existing_primary_fields = array(); // we expect no existing primary key anymore
-								$primary_key_fields = $index_col_names; // this becomes our primary key
+								$primary_key_fields = $l_index['col_names']; // this becomes our primary key
 							}
-							elseif( isset( $index_ary[$index_name] ) )
+							elseif( isset( $existing_indices[$l_index['name']] ) )
 							{ // this index already exists, drop it:
-								$column_definition .= ', DROP INDEX '.$index_ary[$index_name]; // original case
-								unset( $index_ary[$index_name] ); // we expect that it does not exist anymore
+								$column_definition .= ', DROP INDEX '.$existing_indices[$l_index['name']]; // original case
+								unset( $existing_indices[$l_index['name']] ); // we expect that it does not exist anymore
 								if( ! in_array( $fieldname_lowered, $fields_with_keys ) )
 								{ // add te field to the list of keys we want/expect to have:
 									$fields_with_keys[] = $fieldname_lowered;
@@ -569,7 +627,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 							}
 
 							// Merge the INDEX creation into our ALTER query:
-							$column_definition .= ', ADD '.$l_index;
+							$column_definition .= ', ADD '.$l_index['create_definition'];
 							unset( $indices[$k_index] );
 						}
 					}
@@ -672,16 +730,14 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					echo '<h2>No_Match</h2>';
 					pre_dump( $tablefield, $column_definition );
 					pre_dump( 'flds', $flds );
-					pre_dump( 'cfields', $cfields );
+					pre_dump( 'wanted_fields', $wanted_fields );
 					pre_dump( strtolower($tablefield->Type), strtolower($fieldtype), $column_definition );
 					*/
 
 					$queries = array( 'ALTER TABLE '.$table );
 
 					// Handle inline PRIMARY KEY definition:
-					if( in_array($fieldname_lowered, $existing_primary_fields)
-					    && $has_inline_primary_key // only DROP if PRIMARY KEY changes with this column definition
-					    && ! $is_auto_increment )
+					if( $has_inline_primary_key && ! empty($existing_primary_fields) ) // there's a PK that needs to get removed
 					{ // the column is part of the PRIMARY KEY, which needs to get dropped before (we already handle that for AUTO_INCREMENT fields)
 						$queries[0] .= ' DROP PRIMARY KEY,';
 						$existing_primary_fields = array(); // we expect no existing primary key anymore
@@ -720,7 +776,7 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 						'type' => 'change_column' );
 				}
 				else
-				{
+				{ // perhaps alter or drop DEFAULT:
 					if( $want_default !== false )
 					{ // DEFAULT given
 						$existing_default = $tablefield->Default === NULL ? 'NULL' : $tablefield->Default;
@@ -746,11 +802,11 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 				}
 
 				// Remove the field from the array (so it's not added)
-				unset($cfields[$fieldname_lowered]);
+				unset($wanted_fields[$fieldname_lowered]);
 			}
 
 
-			foreach($cfields as $fieldname_lowered => $fielddef)
+			foreach($wanted_fields as $fieldname_lowered => $fielddef)
 			{ // For every remaining field specified for the table
 				$column_definition = $fielddef['field'].' '.$fielddef['where'];
 
@@ -764,22 +820,11 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 					}
 					$is_auto_increment = true;
 
+
 					foreach( $indices as $k_index => $l_index )
 					{ // go through the indexes we want to have
-						if( ! preg_match( '~^(PRIMARY(?:\s+KEY)|UNIQUE(?:\s+INDEX)?|KEY|INDEX) (?:\s+(\w+))? (\s+USING \w+)? \s* \((.*)\)$~ix', $l_index, $match ) )
-						{ // invalid type, should not happen
-							debug_die( 'Invalid type in $indices: '.$l_index );
-						}
-						$index_keyword = $match[1];
-						$index_name = strtoupper($match[2]);
-						$index_type = $match[3]; // "USING [type_name]"
-						$index_col_names = explode( ',', $match[4] );
-						foreach( $index_col_names as $k => $v )
-						{
-							$index_col_names[$k] = strtolower(trim($v));
-						}
 
-						if( array_search( $fieldname_lowered, $index_col_names ) === false )
+						if( array_search( $fieldname_lowered, $l_index['col_names'] ) === false )
 						{ // this is not an index for our column
 							continue;
 						}
@@ -787,19 +832,19 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 						// this index definition affects us, we have to add it to our ALTER statement..
 
 						// See if we need to drop it, before adding it:
-						if( preg_match( '~PRIMARY(\s+KEY)~i', $index_keyword ) )
+						if( $l_index['is_PK'] )
 						{ // Part of a PRIMARY key..
 							if( ! empty( $existing_primary_fields ) )
 							{ // and a PRIMARY key exists already
 								$column_definition .= ', DROP PRIMARY KEY';
 							}
 							$existing_primary_fields = array(); // we expect no existing primary key anymore
-							$primary_key_fields = $index_col_names; // this becomes our primary key
+							$primary_key_fields = $l_index['col_names']; // this becomes our primary key
 						}
-						elseif( isset( $index_ary[$index_name] ) )
+						elseif( isset( $existing_indices[$l_index['name']] ) )
 						{ // this index already exists, drop it:
-							$column_definition .= ', DROP INDEX '.$index_ary[$index_name]; // original case
-							unset( $index_ary[$index_name] ); // we expect that it does not exist anymore
+							$column_definition .= ', DROP INDEX '.$existing_indices[$l_index['name']]; // original case
+							unset( $existing_indices[$l_index['name']] ); // we expect that it does not exist anymore
 							if( ! in_array( $fieldname_lowered, $fields_with_keys ) )
 							{ // add te field to the list of keys we want/expect to have:
 								$fields_with_keys[] = $fieldname_lowered;
@@ -807,23 +852,27 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 						}
 
 						// Merge the INDEX creation into our ALTER query:
-						$column_definition .= ', ADD '.$l_index;
+						$column_definition .= ', ADD '.$l_index['create_definition'];
 						unset( $indices[$k_index] );
 					}
 				}
-
 
 				// Push a query line into $items that adds the field to that table
 				$query = 'ALTER TABLE '.$table.' ADD COLUMN '.$column_definition;
 
 				// Handle inline PRIMARY KEY definition:
-				if( ! $is_auto_increment
-						&& preg_match( '~^(.*) (?: \b (UNIQUE) (?:\s+ KEY)? | (?:PRIMARY \s+)? KEY \b ) (.*)$~ix', $column_definition, $match ) // "has_inline_primary_key"
+				if( preg_match( '~^(.*) (?: \b (UNIQUE) (?:\s+ (?:INDEX|KEY))? | (?:PRIMARY \s+)? KEY \b ) (.*)$~ix', $column_definition, $match ) // "has_inline_primary_key"
+						&& count($existing_primary_fields)
 						&& ! in_array($fieldname_lowered, $existing_primary_fields) )
 				{ // the column is part of the PRIMARY KEY, which needs to get dropped before (we already handle that for AUTO_INCREMENT fields)
 					$query .= ', DROP PRIMARY KEY';
 					$existing_primary_fields = array(); // we expect no existing primary key anymore
 					unset( $obsolete_indices['PRIMARY'] );
+
+					if( isset($obsolete_autoincrement) )
+					{
+						$query .= ', MODIFY COLUMN '.$obsolete_autoincrement->Field.' '.$obsolete_autoincrement->Type.' '.( $obsolete_autoincrement->Field == 'YES' ? 'NULL' : 'NOT NULL' );
+					}
 				}
 
 				$items[$table_lowered][] = array(
@@ -837,19 +886,23 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 			array_shift( $items[$table_lowered] );
 
 
-			// For every remaining index specified for the table
+			// Add the remaining indeces (which are not "inline" with a column definition and therefor already handled):
 			foreach( $indices as $index )
 			{
+				if( empty($index['create_definition']) )
+				{ // skip "inline"
+					continue;
+				}
 				$query = 'ALTER TABLE '.$table;
-				if( preg_match( '~^(PRIMARY(\s+KEY)?)~i', $index, $match ) && $existing_primary_fields )
+				if( $index['is_PK'] && $existing_primary_fields )
 				{
-					$query .= ' DROP '.$match[1].',';
+					$query .= ' DROP PRIMARY KEY,';
 					unset( $obsolete_indices['PRIMARY'] );
 				}
 				// Push a query line into $items that adds the index to that table
 				$items[$table_lowered][] = array(
-					'queries' => array($query.' ADD '.$index),
-					'note' => 'Added index '.$index,
+					'queries' => array($query.' ADD '.$index['create_definition']),
+					'note' => 'Added index '.$index['create_definition'],
 					'type' => 'add_index' );
 			}
 
@@ -988,6 +1041,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.17  2006/05/16 23:22:47  blueyed
+ * db_delta: more fixes for inline keys and some cleanup
+ *
  * Revision 1.16  2006/05/15 23:40:55  blueyed
  * bugfix for (changing) inline PK
  *

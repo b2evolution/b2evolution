@@ -325,7 +325,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertTrue( isset($r['test_1']) );
 		$this->assertEqual( count($r['test_1']), 1 );
-		$this->assertPattern( '~^ALTER TABLE test_1 CHANGE COLUMN auto_inc auto_inc INTEGER AUTO_INCREMENT, ADD PRIMARY KEY\( auto_inc, i \)$~', $r['test_1'][0]['queries'][0] );
+		$this->assertEqual( 'ALTER TABLE test_1 CHANGE COLUMN auto_inc auto_inc INTEGER AUTO_INCREMENT, ADD PRIMARY KEY( auto_inc, i )', $r['test_1'][0]['queries'][0] );
 	}
 
 
@@ -350,7 +350,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->assertTrue( isset($r['test_1']) );
 		$this->assertEqual( count($r['test_1']), 1 );
-		$this->assertPattern( '~^ALTER TABLE test_1 CHANGE COLUMN auto_inc auto_inc INTEGER AUTO_INCREMENT$$~', $r['test_1'][0]['queries'][0] );
+		$this->assertEqual( 'ALTER TABLE test_1 CHANGE COLUMN auto_inc auto_inc INTEGER AUTO_INCREMENT', $r['test_1'][0]['queries'][0] );
 	}
 
 
@@ -811,6 +811,64 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$this->assertEqual( count($r['test_1']), 1 );
 		$this->assertEqual( $r['test_1'][0]['queries'][0], 'ALTER TABLE test_1 ADD COLUMN i3 INTEGER PRIMARY KEY FIRST, DROP PRIMARY KEY' );
 	}
+
+
+	/**
+	 * Test if with "inline PK" it also gets dropped correctly.
+	 */
+	function test_db_delta_change_PK_inline_auto()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				i INTEGER PRIMARY KEY AUTO_INCREMENT,
+				dummy INT
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				i2 INTEGER PRIMARY KEY,
+				dummy INT
+			)", /* exclude defaults: */ NULL );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 1 );
+		$this->assertEqual( $r['test_1'][0]['queries'][0], 'ALTER TABLE test_1 ADD COLUMN i2 INTEGER PRIMARY KEY FIRST, DROP PRIMARY KEY, MODIFY COLUMN i int(11) NOT NULL' );
+
+		$this->test_DB->query( "
+			CREATE TABLE test_2 (
+				i INTEGER PRIMARY KEY AUTO_INCREMENT,
+				dummy INT
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_2 (
+				i2 INTEGER PRIMARY KEY,
+				dummy INT
+			)", /* no exclude: */ array() );
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_2']), 2 );
+		$this->assertEqual( $r['test_2'][0]['queries'][0], 'ALTER TABLE test_2 DROP COLUMN i' );
+		$this->assertEqual( $r['test_2'][1]['queries'][0], 'ALTER TABLE test_2 ADD COLUMN i2 INTEGER PRIMARY KEY FIRST' );
+	}
+
+
+	function test_db_delta_handle_PK_with_col_change()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				v VARCHAR(32) PRIMARY KEY
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				v VARCHAR(33) PRIMARY KEY
+			)", /* exclude defaults: */ NULL );
+
+		$this->assertEqual( count($r), 1 );
+		$this->assertEqual( count($r['test_1']), 1 );
+		$this->assertEqual( 'ALTER TABLE test_1 DROP PRIMARY KEY, CHANGE COLUMN v v VARCHAR(33) PRIMARY KEY', $r['test_1'][0]['queries'][0] );
+	}
+
 
 }
 
