@@ -128,8 +128,17 @@ function trackback(
 			$http_request .= "\r\n";
 			$http_request .= $query_string;
 			flush();
-			if( $fs = fsockopen($trackback_url['host'], $port) )
+			if( $fs = @fsockopen($trackback_url['host'], $port, $errno, $errst, 20) ) // this timeout is just for setting up the socket
 			{
+				// Set timeout for data:
+				if( function_exists('stream_set_timeout') )
+				{
+					stream_set_timeout( $fs, 20 ); // PHP 4.3.0
+				}
+				else
+				{
+					socket_set_timeout( $fs, 20 ); // PHP 4
+				}
 				fputs($fs, $http_request);
 				$result = '';
 				while(!feof($fs))
@@ -225,6 +234,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.6  2006/05/16 21:45:52  blueyed
+ * Use stream/socket timeout for data!
+ *
  * Revision 1.5  2006/04/29 17:36:00  blueyed
  * Normalization
  *

@@ -123,7 +123,7 @@ class POP3 {
 			return false;
 		}
 
-		$fp = fsockopen($server, $port, $errno, $errstr);
+		$fp = @fsockopen($server, $port, $errno, $errstr, 20); // this timeout is just for setting up the socket
 
 		if( !$fp )
 		{
@@ -132,7 +132,18 @@ class POP3 {
 			return false;
 		}
 
-		socket_set_blocking($fp,-1);
+		// Set timeout for data:
+		if( function_exists('stream_set_timeout') )
+		{
+			// TODO: "-1" is not defined!: stream_set_blocking($fp,-1);   // PHP 4.3.0
+			stream_set_timeout( $fp, 20 ); // PHP 4.3.0
+		}
+		else
+		{
+			// TODO: "-1" is not defined!: socket_set_blocking($fp,-1);   // PHP 4
+			socket_set_timeout( $fp, 20 ); // PHP 4
+		}
+
 		$this->update_timer();
 		$reply = fgets($fp,$this->BUFFER);
 		$reply = $this->strip_clf($reply);
@@ -723,6 +734,9 @@ class POP3 {
 
 /*
  * $Log$
+ * Revision 1.4  2006/05/16 21:45:52  blueyed
+ * Use stream/socket timeout for data!
+ *
  * Revision 1.3  2006/03/12 23:09:26  fplanque
  * doc cleanup
  *

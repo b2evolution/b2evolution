@@ -141,7 +141,7 @@ function pingback(
 
 			// Try to connect to the server at $host
 			if( $display ) echo T_('Connect to server at:'), ' ',$host;
-			$fp = fsockopen($host, $port, $errno, $errstr, 30);
+			$fp = fsockopen($host, $port, $errno, $errstr, 20); // this timeout is just for setting up the socket
 			if (!$fp)
 			{
 				if( $display ) echo T_('Couldn\'t open a connection to:'), ' ', $pagelinkedto, "<br />\n";
@@ -149,6 +149,16 @@ function pingback(
 				continue;
 			}
 			echo "<br />\n";
+
+			// Set timeout for data:
+			if( function_exists('stream_set_timeout') )
+			{
+				stream_set_timeout( $fp, 20 ); // PHP 4.3.0
+			}
+			else
+			{
+				socket_set_timeout( $fp, 20 ); // PHP 4
+			}
 
 			// Send the GET request
 			$request = "GET $path HTTP/1.1\r\nHost: $host\r\nUser-Agent: $app_name/$app_version PHP/" . phpversion() . "\r\n\r\n";
@@ -351,6 +361,9 @@ function pingback_popup_link($zero='#', $one='#', $more='#', $CSSclass='')
 
 /*
  * $Log$
+ * Revision 1.4  2006/05/16 21:45:52  blueyed
+ * Use stream/socket timeout for data!
+ *
  * Revision 1.3  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

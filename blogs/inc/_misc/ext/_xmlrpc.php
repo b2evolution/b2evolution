@@ -1111,8 +1111,17 @@
 			}
 			if ($fp)
 			{
-				if ($timeout>0 && function_exists('stream_set_timeout'))
-					stream_set_timeout($fp, $timeout);
+				if( $timeout>0 )
+				{
+					if( function_exists('stream_set_timeout') )
+					{ // PHP 4.3.0:
+						stream_set_timeout($fp, $timeout);
+					}
+					elseif( function_exists('socket_set_timeout') )
+					{ // PHP 4:
+						socket_set_timeout($fp, $timeout);
+					}
+				}
 			}
 			else
 			{
