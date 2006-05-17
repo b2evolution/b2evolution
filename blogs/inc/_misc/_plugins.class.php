@@ -2578,33 +2578,37 @@ class Plugins
 
 		if( isset( $get_return['plugin_ID'] ) )
 		{
-			$GLOBALS[$objectName] = & $get_return['data'];
-
-			$Plugin = & $this->get_by_ID( $get_return['plugin_ID'] );
-			register_shutdown_function( array(&$Plugin, 'CacheObjects'),
-				array( 'action' => 'set', 'key' => 'object_'.$objectName, 'data' => & $GLOBALS[$objectName] ) );
-		}
-		else
-		{ // Cache miss, create it:
-			if( empty($eval_create_object) )
+			if( is_object($get_return['data']) )
 			{
-				$GLOBALS[$objectName] = & new $objectName();
-			}
-			else
-			{
-				eval( '$GLOBALS[\''.$objectName.'\'] = '.$eval_create_object.';' );
-			}
+				$GLOBALS[$objectName] = & $get_return['data'];
 
-			// Try to set in cache:
-			$set_return = $this->trigger_event_first_true( 'CacheObjects',
-				array( 'action' => 'set', 'key' => 'object_'.$objectName, 'data' => & $GLOBALS[$objectName] ) );
-
-			if( isset( $set_return['plugin_ID'] ) )
-			{ // success, register a shutdown function to save this data on shutdown
-				$Plugin = & $this->get_by_ID( $set_return['plugin_ID'] );
+				$Plugin = & $this->get_by_ID( $get_return['plugin_ID'] );
 				register_shutdown_function( array(&$Plugin, 'CacheObjects'),
 					array( 'action' => 'set', 'key' => 'object_'.$objectName, 'data' => & $GLOBALS[$objectName] ) );
+
+				return;
 			}
+		}
+	
+		// Cache miss, create it:
+		if( empty($eval_create_object) )
+		{
+			$GLOBALS[$objectName] = & new $objectName();
+		}
+		else
+		{
+			eval( '$GLOBALS[\''.$objectName.'\'] = '.$eval_create_object.';' );
+		}
+
+		// Try to set in cache:
+		$set_return = $this->trigger_event_first_true( 'CacheObjects',
+			array( 'action' => 'set', 'key' => 'object_'.$objectName, 'data' => & $GLOBALS[$objectName] ) );
+
+		if( isset( $set_return['plugin_ID'] ) )
+		{ // success, register a shutdown function to save this data on shutdown
+			$Plugin = & $this->get_by_ID( $set_return['plugin_ID'] );
+			register_shutdown_function( array(&$Plugin, 'CacheObjects'),
+				array( 'action' => 'set', 'key' => 'object_'.$objectName, 'data' => & $GLOBALS[$objectName] ) );
 		}
 	}
 
@@ -2660,6 +2664,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.47  2006/05/17 09:57:17  blueyed
+ * safety check
+ *
  * Revision 1.46  2006/05/15 22:26:48  blueyed
  * Event hooks for skin plugins.
  *
