@@ -138,6 +138,12 @@ class SafeHtmlChecker
 				// Convert XHTML:
 				$xhtml = mb_convert_encoding( $xhtml, 'UTF-8' );
 			}
+			elseif( ($this->encoding == 'ISO-8859-1' || empty($this->encoding)) && function_exists('utf8_encode') )
+			{
+				$this->encoding = 'UTF-8';
+
+				$xhtml = utf8_encode( $xhtml );
+			}
 		}
 
 		// Open comments or '<![CDATA[' are dangerous
@@ -282,6 +288,9 @@ class SafeHtmlChecker
 
 /*
  * $Log$
+ * Revision 1.7  2006/05/17 09:56:56  blueyed
+ * Handle default (empty) "encoding" better
+ *
  * Revision 1.6  2006/05/02 22:19:27  blueyed
  * whitespace
  *

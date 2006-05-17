@@ -110,7 +110,21 @@ class ExtLibsTestCase extends EvoUnitTestCase
 			'ISO-8859-15' );
 		$SHC->check( utf8_encode('foo ä bar') );
 		$this->assertTrue( $SHC->isOK() );
-		$this->assertEqual( $SHC->encoding, 'UTF-8' ); // should have been converted to UTF-8
+
+		if( function_exists('mb_convert_encoding') )
+		{
+			$this->assertEqual( $SHC->encoding, 'UTF-8' ); // should have been converted to UTF-8
+		}
+		else
+		{
+			$this->assertEqual( $SHC->encoding, 'ISO-8859-15' );
+		}
+
+		$SHC = new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
+			'ISO-8859-1' );
+		$SHC->check( utf8_encode('foo ä bar') );
+		$this->assertTrue( $SHC->isOK() );
+		$this->assertEqual( $SHC->encoding, 'ISO-8859-1' );
 	}
 
 }
