@@ -142,7 +142,7 @@ function upgrade_b2evo_tables()
 		$db_schema_needs_update = false;
 		foreach( $schema_queries as $table => $query_info )
 		{
-			if( db_delta( $query_info[1], false ) )
+			if( db_delta( $query_info[1], array('drop_column', 'drop_index') ) )
 			{
 				$db_schema_needs_update = true;
 				break;
@@ -842,6 +842,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.145  2006/05/17 23:35:42  blueyed
+ * cleanup
+ *
  * Revision 1.144  2006/05/12 21:34:16  blueyed
  * todo (last commit was lost)
  *

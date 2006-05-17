@@ -43,9 +43,9 @@ function echo_usage()
 	global $argv;
 
 	echo "Usage: \n";
-	echo basename($argv[0])." <CORE|CWD>\n";
+	echo basename($argv[0])." <CORE|CWD> [extract]";
 	echo basename($argv[0])." <CORE|CWD> merge <locale> [locale..]\n";
-	echo basename($argv[0])." <CORE|CWD> extract <locale> [locale..]\n";
+	echo basename($argv[0])." <CORE|CWD> convert <locale> [locale..]\n";
 	echo "CORE: work on the core application\n";
 	echo "CWD: work on current working directory\n";
 	echo "\n";
@@ -99,7 +99,11 @@ else
 	exit(1);
 }
 
-if( isset($argv[2]) && strtoupper($argv[2]) == 'MERGE' )
+if( ! isset($argv[2]) || strtoupper($argv[2]) == 'EXTRACT' )
+{
+	$action = 'extract';
+}
+elseif( isset($argv[2]) && strtoupper($argv[2]) == 'MERGE' )
 {
 	$action = 'merge';
 
@@ -125,7 +129,8 @@ elseif( isset($argv[2]) && strtoupper($argv[2]) == 'CONVERT' )
 }
 else
 {
-	$action = 'extract';
+	echo_usage();
+	die;
 }
 
 

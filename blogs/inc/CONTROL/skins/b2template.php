@@ -93,7 +93,7 @@ switch($action)
 					$Form->begin_form();
 						$Form->hidden_ctrl();
 						?>
-						<fieldset class="input"><img src="img/blank.gif" alt="" width="1" height="1" /><textarea cols="80" rows="20" class="large" name="newcontent" tabindex="1"><?php echo $content ?></textarea></fieldset>
+						<fieldset class="input"><img src="<?php echo $rsc_url; ?>img/blank.gif" alt="" width="1" height="1" /><textarea cols="80" rows="20" class="large" name="newcontent" tabindex="1"><?php echo $content ?></textarea></fieldset>
 						<input type="hidden" name="action" value="update" />
 						<input type="hidden" name="file" value="<?php echo $file ?>" />
 						<br />

@@ -1100,14 +1100,9 @@ class Plugins
 				}
 				else
 				{
-					// Extended check with cleaned up versions, if currently stored version is less or equal (because it was just different above!):
-					// NOTE: we do not want to compare DB schema (and set status to "needs_config") in case of downgrades..
-					list( $old_version, $new_version ) = preg_replace( array( '~^(CVS\s+)?\$'.'Revision:\s*~i', '~\s*\$$~' ), '', array( $this->index_ID_rows[$Plugin->ID]['plug_version'], $Plugin->version ) );
-					if( version_compare( $new_version, $old_version, '>=' ) )
-					{
-						require_once( dirname(__FILE__).'/_upgrade.funcs.php' );
-						$db_deltas = db_delta($Plugin->GetDbLayout());
-					}
+					// Check if there are DB deltas required (also when downgrading!), without excluding any query type:
+					require_once( dirname(__FILE__).'/_upgrade.funcs.php' );
+					$db_deltas = db_delta( $Plugin->GetDbLayout() );
 
 					if( empty($db_deltas) )
 					{ // No DB changes needed, update (bump or decrease) the version
@@ -2664,6 +2659,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.48  2006/05/17 23:35:42  blueyed
+ * cleanup
+ *
  * Revision 1.47  2006/05/17 09:57:17  blueyed
  * safety check
  *

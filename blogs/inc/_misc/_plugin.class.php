@@ -1584,7 +1584,7 @@ class Plugin
 	 *   - 'key': A key that is associated to the caller of the event (string, OPTIONALLY!)
 	 * @return boolean True, if you have provided payload for a captcha test
 	 */
-	function CaptchaPayload()
+	function CaptchaPayload( & $params )
 	{
 	}
 
@@ -1601,9 +1601,13 @@ class Plugin
 	 *       {@link CaptchaValidatedCleanup()}, so that the plugin can cleanup its data
 	 *       and is not vulnerable against multiple usage of the same captcha!
 	 *
+	 * @param array Associative array of parameters
+	 *   - 'validate_error': you can optionally set this, if you want to give a reason
+	 *     of the failure. This is optionally and meant to be used by other plugins
+	 *     that trigger this event.
 	 * @return boolean true if the catcha could be validated
 	 */
-	function CaptchaValidated()
+	function CaptchaValidated( & $params )
 	{
 	}
 
@@ -1618,7 +1622,7 @@ class Plugin
 	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
 	 * uses this event optionally to whitelist a user.
 	 */
-	function CaptchaValidatedCleanup()
+	function CaptchaValidatedCleanup( & $params )
 	{
 	}
 
@@ -2220,6 +2224,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.48  2006/05/17 23:35:42  blueyed
+ * cleanup
+ *
  * Revision 1.47  2006/05/15 22:26:48  blueyed
  * Event hooks for skin plugins.
  *

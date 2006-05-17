@@ -68,14 +68,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @see http://dev.mysql.com/doc/refman/4.1/en/create-table.html
  *
  * @param array The list of queries for which the DB should be adjusted
+ * @param array Exclude query types (see list above).
  * @param boolean Execute generated queries?  TODO: get this outta here!!!! (sooooo bloated!)
- * @param array Exclude query types (see list above). Defaults to drop_column.
  * @return array The generated queries.
  *        table_name => array of arrays (queries with keys 'queries' (array), 'note' (string) and 'type' (string))
  *        There's usually just a single query in "queries", but in some cases additional queries
  *        are needed (e.g., 'UPDATE' before we can change "NULL" setting).
  */
-function db_delta( $queries, $execute = false, $exclude_types = NULL )
+function db_delta( $queries, $exclude_types = array(), $execute = false )
 {
 	global $Debuglog, $DB;
 
@@ -84,9 +84,9 @@ function db_delta( $queries, $execute = false, $exclude_types = NULL )
 		$queries = array( $queries );
 	}
 
-	if( ! isset($exclude_types) )
+	if( ! is_array($exclude_types) )
 	{
-		$exclude_types = array('drop_column', 'drop_index');
+		$exclude_types = empty($exclude_types) ? array() : array($exclude_types);
 	}
 
 	/**
@@ -982,7 +982,7 @@ function install_make_db_schema_current( $display = true )
 
 	foreach( $schema_queries as $table => $query_info )
 	{
-		$items_need_update = db_delta( $query_info[1], false );
+		$items_need_update = db_delta( $query_info[1], array('drop_column', 'drop_index') );
 
 		if( empty($items_need_update) )
 		{
@@ -1041,6 +1041,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.18  2006/05/17 23:35:42  blueyed
+ * cleanup
+ *
  * Revision 1.17  2006/05/16 23:22:47  blueyed
  * db_delta: more fixes for inline keys and some cleanup
  *

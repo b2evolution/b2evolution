@@ -4351,7 +4351,7 @@ msgstr "Link, um Deinen %s Account zu validieren:"
 #: ../../../inc/MODEL/users/_user.class.php:786
 #, php-format
 msgid "Validate your account email address for %s"
-msgstr "Validieren Deine E-Mail-Adresse für %s"
+msgstr "Validiere Deine E-Mail-Adresse für %s"
 
 #: ../../../inc/MODEL/users/_user.class.php:849
 msgid "Send email to user"

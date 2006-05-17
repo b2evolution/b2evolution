@@ -80,7 +80,7 @@ function install_plugin_db_schema_action( & $Plugin )
 		require_once $inc_path.'_misc/_upgrade.funcs.php';
 
 		// Get the queries to make:
-		foreach( db_delta($db_layout, false) as $table => $queries )
+		foreach( db_delta($db_layout) as $table => $queries )
 		{
 			foreach( $queries as $query_info )
 			{
@@ -925,7 +925,14 @@ switch( $action )
 			if( ! empty($install_db_deltas) )
 			{
 				echo '<p>'.T_('The following database queries will be executed. If you are not sure what this means, it will probably be alright.').'</p>';
-				echo '<ul><li><pre>'.implode( '</pre></li><li><pre>', $install_db_deltas ).'</pre></li></ul>';
+
+				echo '<ul>';
+				foreach( $install_db_deltas as $l_delta )
+				{
+					#echo '<li><code>'.nl2br($l_delta).'</code></li>';
+					echo '<li><pre>'.str_replace( "\t", '  ', $l_delta ).'</pre></li>';
+				}
+				echo '</ul>';
 
 				$Form->hidden( 'install_db_deltas_confirm_md5', md5(implode( '', $install_db_deltas )) );
 			}

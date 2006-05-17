@@ -277,7 +277,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 </div>
 </div>
 
-<div class="clear"><img src="../../img/blank.gif" width="1" height="1" alt="" /></div>
+<div class="clear"><img src="<?php echo $rsc_url; ?>img/blank.gif" width="1" height="1" alt="" /></div>
 
 <div id="pageFooter">
 	<p class="baseline">

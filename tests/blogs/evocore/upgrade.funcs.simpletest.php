@@ -46,7 +46,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 
 		$this->test_DB->error = false; // reset any error
 
-		$r = db_delta( $queries, true, $exclude );
+		$r = db_delta( $queries, $exclude, true );
 
 		if( $this->test_DB->error )
 		{
@@ -83,7 +83,10 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 	}
 
 
-	function test_db_delta_no_drop_by_default()
+	/**
+	 * Test, if all query types (including DROPs get returned)
+	 */
+	function test_db_delta_drop_by_default()
 	{
 		$this->test_DB->query( "
 			CREATE TABLE IF NOT EXISTS test_1 (
@@ -95,7 +98,8 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 			CREATE TABLE IF NOT EXISTS test_1 (
 				set_name VARCHAR(30) NOT  NULL )" );
 
-		$this->assertIdentical( $r, array() );
+		$this->assertIdentical( 'ALTER TABLE test_1 DROP COLUMN set_value', $r['test_1'][0]['queries'][0] );
+		$this->assertIdentical( 'ALTER TABLE test_1 DROP PRIMARY KEY', $r['test_1'][1]['queries'][0] );
 	}
 
 
@@ -782,7 +786,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$r = $this->db_delta_wrapper( "
 			CREATE TABLE test_1 (
 				i2 INTEGER PRIMARY KEY
-			)", /* exclude defaults: */ NULL );
+			)", /* exclude defaults: */ array('drop_column', 'drop_index') );
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
@@ -805,7 +809,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$r = $this->db_delta_wrapper( "
 			CREATE TABLE test_1 (
 				i3 INTEGER PRIMARY KEY
-			)", /* exclude defaults: */ NULL );
+			)", /* exclude defaults: */ array('drop_column', 'drop_index') );
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
@@ -828,7 +832,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 			CREATE TABLE test_1 (
 				i2 INTEGER PRIMARY KEY,
 				dummy INT
-			)", /* exclude defaults: */ NULL );
+			)", /* exclude defaults: */ array('drop_column', 'drop_index') );
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
@@ -862,7 +866,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$r = $this->db_delta_wrapper( "
 			CREATE TABLE test_1 (
 				v VARCHAR(33) PRIMARY KEY
-			)", /* exclude defaults: */ NULL );
+			)", /* exclude defaults: */ array('drop_column', 'drop_index') );
 
 		$this->assertEqual( count($r), 1 );
 		$this->assertEqual( count($r['test_1']), 1 );
