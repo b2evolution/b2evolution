@@ -562,7 +562,7 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale
 { // change locale to users preference
 	/*
 	 * User locale selection:
-	 * TODO: this should already get done, before instantiating $current_User, because there we already use T_()..
+	 * TODO: this should get done before instantiating $current_User, because we already use T_() there...
 	 */
 	locale_activate( $current_User->get('locale') );
 	if( $current_locale == $current_User->get('locale') )
@@ -578,17 +578,12 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale
 
 
 /**
- * Activate default locale:
- */
-locale_activate( $default_locale );
-
-/**
  * @global string The INPUT/OUTPUT charset. Either the user's or blog's (see _blog_main.inc.php) MESSAGES charset.
  */
 $io_charset = locale_charset(false);
 
 
-// Check and possibly adjust $evo_charset:
+// Check and adjust $evo_charset if needed:
 if( empty($evo_charset) )
 { // Internal encoding follows INPUT/OUTPUT encoding:
 	$evo_charset = $io_charset;
@@ -637,20 +632,8 @@ if( function_exists('mb_internal_encoding') )
 	mb_internal_encoding( $evo_charset );
 }
 
-// Set encoding for MySQL connection, if connection_charset differs from evo_charset:
-if( isset($mysql_charset_map[$evo_charset]) && $mysql_charset_map[$evo_charset] != $EvoConfig->DB['connection_charset'] )
-{
-	$save_show_errors = $DB->show_errors;
-	$save_halt_on_error = $DB->halt_on_error;
-	$DB->show_errors = false;
-	$DB->halt_on_error = false;
-	if( $DB->query( 'SET NAMES '.$mysql_charset_map[$evo_charset] ) === false )
-	{
-		$Debuglog->add( 'Could not "SET NAMES '.$mysql_charset_map[$evo_charset].'"!', 'error' );
-	}
-	$DB->show_errors = $save_show_errors;
-	$DB->halt_on_error = $save_halt_on_error;
-}
+// Set encoding for MySQL connection:
+$DB->set_connection_charset( $evo_charset, true );
 
 $Debuglog->add( 'evo_charset (_main.inc.php): '.$evo_charset, 'locale' );
 $Debuglog->add( 'io_charset (_main.inc.php): '.$io_charset, 'locale' );
@@ -688,6 +671,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.23  2006/05/19 17:03:58  blueyed
+ * locale activation fix from v-1-8, abstraction of setting DB connection charset
+ *
  * Revision 1.22  2006/05/14 17:59:59  blueyed
  * "try/catch" SET NAMES (Thanks, bodo)
  *

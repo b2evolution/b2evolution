@@ -163,6 +163,12 @@ class DB
 	 */
 	var $dbhost = 'localhost';
 
+	/**
+	 * @var string Current connection charset
+	 * @see DB::set_connection_charset()
+	 */
+	var $connection_charset;
+
 
 	// DEBUG:
 
@@ -297,7 +303,7 @@ class DB
 
 		if( !empty($params['connection_charset']) )
 		{	// Specify which charset we are using on the client:
-			$this->query( 'SET NAMES '.$params['connection_charset'] );
+			$this->set_connection_charset($params['connection_charset']);
 		}
 
 		/*
@@ -1233,10 +1239,63 @@ class DB
 		}
 	}
 
+
+	/**
+	 * Set the charset of the connection.
+	 *
+	 * @param string Charset
+	 * @param boolean Use the "regular charset <-> mysql charset map" ($mysql_charset_map)?
+	 * @return boolean true on success, false on failure
+	 */
+	function set_connection_charset( $charset, $use_map = false )
+	{
+		global $mysql_charset_map, $Debuglog;
+
+		$charset = strtolower($charset);
+
+		if( $use_map )
+		{
+			if( ! isset($mysql_charset_map[$charset]) )
+			{
+				return false;
+			}
+
+			$charset = $mysql_charset_map[$charset];
+		}
+
+		$r = true;
+		if( $charset != $this->connection_charset )
+		{
+			$save_show_errors = $this->show_errors;
+			$save_halt_on_error = $this->halt_on_error;
+			$this->show_errors = false;
+			$this->halt_on_error = false;
+			if( $this->query( 'SET NAMES '.$charset ) === false )
+			{
+				$Debuglog->add( 'Could not "SET NAMES '.$charset.'"!', array('error', 'locale') );
+
+				$r = false;
+			}
+			else
+			{
+				$Debuglog->add( 'Set DB connection charset: '.$charset, 'locale' );
+			}
+			$this->show_errors = $save_show_errors;
+			$this->halt_on_error = $save_halt_on_error;
+
+			$this->connection_charset = $charset;
+		}
+
+		return $r;
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.7  2006/05/19 17:03:59  blueyed
+ * locale activation fix from v-1-8, abstraction of setting DB connection charset
+ *
  * Revision 1.6  2006/05/02 22:18:26  blueyed
  * replace aliases not in with values
  *

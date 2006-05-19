@@ -197,20 +197,8 @@ if( $io_charset != locale_charset(false) )
 
 	$Debuglog->add( 'Adjusted I/O charset for blog', 'locale' );
 
-	// Set encoding for MySQL connection, if connection_charset differs from evo_charset:
-	if( isset($mysql_charset_map[$evo_charset]) && $mysql_charset_map[$evo_charset] != $EvoConfig->DB['connection_charset'] )
-	{
-		$save_show_errors = $DB->show_errors;
-		$save_halt_on_error = $DB->halt_on_error;
-		$DB->show_errors = false;
-		$DB->halt_on_error = false;
-		if( $DB->query( 'SET NAMES '.$mysql_charset_map[$evo_charset] ) === false )
-		{
-			$Debuglog->add( 'Could not "SET NAMES '.$mysql_charset_map[$evo_charset].'"!', 'error' );
-		}
-		$DB->show_errors = $save_show_errors;
-		$DB->halt_on_error = $save_halt_on_error;
-	}
+	// Set encoding for MySQL connection:
+	$DB->set_connection_charset( $evo_charset, true );
 
 	$Debuglog->add( 'evo_charset: '.$evo_charset, 'locale' );
 	$Debuglog->add( 'io_charset: '.$io_charset, 'locale' );
@@ -404,6 +392,9 @@ if( !isset($display_blog_list) )
  * Now, we'll jump to displaying!
  */
 
+// Trigger plugin event:
+$Plugins->trigger_event( 'BeforeBlogDisplay' );
+
 // Check if a temporary skin has been requested (used for RSS syndication for example):
 if( !empty($tempskin) )
 {
@@ -510,6 +501,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.22  2006/05/19 17:03:58  blueyed
+ * locale activation fix from v-1-8, abstraction of setting DB connection charset
+ *
  * Revision 1.21  2006/05/14 17:59:59  blueyed
  * "try/catch" SET NAMES (Thanks, bodo)
  *
