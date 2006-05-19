@@ -259,6 +259,9 @@ $AdminUI->add_menu_entries(
 					'plugins' => array(
 						'text' => T_('Plugins'),
 						'href' => 'admin.php?ctrl=plugins'),
+					'antispam' => array(
+						'text' => T_('Antispam'),
+						'href' => 'admin.php?ctrl=set_antispam'),
 				)
 			),
 
@@ -275,6 +278,12 @@ $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 /*
  * $Log$
+ * Revision 1.6  2006/05/19 18:15:04  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.5.2.1  2006/05/19 15:06:22  fplanque
+ * dirty sync
+ *
  * Revision 1.5  2006/04/11 21:22:25  fplanque
  * partial cleanup
  *

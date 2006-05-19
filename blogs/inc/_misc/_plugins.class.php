@@ -1669,6 +1669,9 @@ class Plugins
 	{
 		global $Debuglog;
 
+		$karma_abs = NULL;
+		$karma_divider = 0; // total of the "spam detection relevance weight"
+
 		$Debuglog->add( 'Trigger karma collect event '.$event, 'plugins' );
 
 		if( empty($this->index_event_IDs[$event]) )
@@ -1680,10 +1683,7 @@ class Plugins
 
 		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
 
-		$karma_abs = NULL;
-		$karma_divider = 0; // total of the "spam detection relevance weight"
 		$count_plugins = 0;
-
 		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
 		{
 			$plugin_weight = $this->index_ID_rows[$l_plugin_ID]['plug_spam_weight'];
@@ -2659,6 +2659,12 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.49  2006/05/19 18:15:06  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.48.2.1  2006/05/19 15:06:25  fplanque
+ * dirty sync
+ *
  * Revision 1.48  2006/05/17 23:35:42  blueyed
  * cleanup
  *

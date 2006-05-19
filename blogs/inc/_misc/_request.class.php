@@ -208,6 +208,26 @@ class Request
 	}
 
 
+  /**
+   * Sets a date parameter by converting locale date (if valid) to ISO date.
+   *
+   * If the date is not valid, it is set to the param unchanged (unconverted).
+   */
+	function param_date( $var, $err_msg, $required )
+	{
+		$this->param( $var, 'string', '' );
+
+		$iso_date = $this->param_check_date( $var, $err_msg, $required );
+
+		if( $iso_date )
+		{
+			$this->set_param( $var, $iso_date );
+		}
+
+		return $this->params[$var];
+	}
+
+
 	/**
  	 * Sets a time parameter with the value from the request of the var argument or of the concat of the var argument_h: var argument_mn: var argument_s ,
 	 * except if param is already set!
@@ -223,20 +243,43 @@ class Request
 	{
 		global $$var;
 
-		if( $this->param( $var, '', $default, $memorize, $override, $forceset ) )
-		{
-			return $this->params[$var];
+		$got_time = false;
+
+		if( $this->param( $var, 'string', $default, $memorize, $override, $forceset ) )
+		{ // Got a time from text field:
+			if( preg_match( '¤^(\d\d):(\d\d)(:(\d\d))?$¤', $$var, $matches ) )
+			{
+				$time_h = $matches[1];
+				$time_mn = $matches[2];
+				$time_s = empty( $matches[4] ) ? 0 : $matches[4];
+				$got_time = true;
+			}
 		}
-		elseif ( ( $time_h = param( $var.'_h' ) ) && ( $time_mn = param( $var.'_mn' ) ) && ( $time_s = param ( $var.'_s', '', '00' ) ) )
-		{
+		elseif( ( $time_h = param( $var.'_h', 'integer', '' ) )
+					&& ( $time_mn = param( $var.'_mn', 'integer', '' ) )
+					&& ( $time_s = param( $var.'_s', 'integer', '00' ) ) )
+		{	// Got a time from selects:
 			$$var = $time_h.':'.$time_mn.':'.$time_s;
 			$this->params[$var] = $$var;
-			return $$var;
+			$got_time = true;
 		}
-		else
-		{
-			return false;
+
+		if( $got_time )
+		{ // We got a time...
+			// Check if ranges are correct:
+			if( $time_h >= 0 && $time_h <= 23
+				&& $time_mn >= 0 && $time_mn <= 59
+				&& $time_s >= 0 && $time_s <= 59 )
+			{
+				// Time is correct
+				return $$var;
+			}
 		}
+
+
+		$this->param_error( $var, T_('Please enter a valid time.') );
+
+		return false;
 	}
 
 
@@ -514,20 +557,97 @@ class Request
 	/**
 	 * Check if param is an ISO date
 	 *
-	 * @deprecated by param_check_date_format()
 	 * @param string param name
 	 * @param string error message
 	 * @param boolean Is a non-empty date required?
-	 * @return boolean true if OK
+	 * @param string date format (php format)
+	 * @return boolean|string false if not OK, ISO date if OK
 	 */
-	function param_check_date( $var, $err_msg, $required = false )
+	function param_check_date( $var, $err_msg, $required = false, $date_format = NULL )
 	{
-		return (bool)$this->param_check_date_format( $var, $err_msg, array( 'required' => $required ) );
+
+		if( empty( $this->params[$var] ) )
+		{ // empty is OK if not required:
+			if( $required )
+			{
+				$this->param_error( $var, $err_msg );
+				return false;
+			}
+
+			return '';
+		}
+
+		if( empty( $date_format ) )
+		{	// Use locale date format:
+			$date_format = locale_datefmt();
+		}
+
+		// Convert PHP date format to regexp pattern:
+		// WARNING: this is very incomplete!! Please expand as needed.
+		$date_regexp = '¤^'.preg_replace(
+			array( '/\\./', '/d/', '/m/', '/y/', '/Y/' ),
+			array( '\\.', '(\\d\\d)', '(\\d\\d)', '(\\d\\d)', '(\\d\\d\\d\\d)' ),
+			$date_format ).'$¤';
+		// echo $date_format.'...'.$date_regexp;
+
+		// Check that the number match the date pattern:
+		if( preg_match( $date_regexp, $this->params[$var], $numbers ) )
+		{	// Date does match pattern:
+			//pre_dump( $numbers );
+
+			// Get all date pattern parts (we should get 3 parts!:
+			preg_match_all( '/[A-Za-z]/', $date_format, $parts );
+			//pre_dump( $parts );
+
+			foreach( $parts[0] as $position => $part )
+			{
+				switch( $part )
+				{
+					case 'd':
+						$day = $numbers[$position+1];
+						break;
+
+					case 'm':
+						$month = $numbers[$position+1];
+						break;
+
+					case 'y':
+					case 'Y':
+						$year = $numbers[$position+1];
+						if( $year < 50 )
+						{
+							$year = 2000 + $year;
+						}
+						elseif( $year < 100 )
+						{
+							$year = 1900 + $year;
+						}
+						break;
+				}
+			}
+
+			if( checkdate( $month, $day, $year ) )
+			{ // all clean! :)
+
+				// We convert the value to ISO:
+				$iso_date = substr( '0'.$year, -4 ).'-'.substr( '0'.$month, -2 ).'-'.substr( '0'.$day, -2 );
+
+				return $iso_date;
+			}
+		}
+
+		// Date did not pass all tests:
+
+		$this->param_error( $var, $err_msg );
+
+		return false;
 	}
 
 
 	/**
 	 * Check if param is a valid date (format wise).
+	 *
+	 * @deprecated won't handle locale date formats on PHP < 4.3.3
 	 *
 	 * @param string param name
 	 * @param string error message
@@ -873,6 +993,12 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.12  2006/05/19 18:15:06  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.11.2.1  2006/05/19 15:06:25  fplanque
+ * dirty sync
+ *
  * Revision 1.11  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

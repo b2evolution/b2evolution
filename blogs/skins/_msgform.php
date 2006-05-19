@@ -88,7 +88,7 @@ elseif( ! empty($comment_id) )
 		$Comment = & new Comment( $row );
 
 		if( isset($Comment->author_User) )
-		{ // Comment is from a registered user:
+		{ // Source comment is from a registered user:
 			if( ! $Comment->author_User->allow_msgform )
 			{
 				echo '<p class="error">The user does not want to get contacted through the message form.</p>'; // should be prevented by UI
@@ -96,7 +96,7 @@ elseif( ! empty($comment_id) )
 			}
 		}
 		elseif( ! $Comment->allow_msgform )
-		{
+		{ // Source comment is from an anonymou suser:
 			echo '<p class="error">This commentator does not want to get contacted through the message form.</p>'; // should be prevented by UI
 			return;
 		}
@@ -194,6 +194,12 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.25  2006/05/19 18:15:06  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.24.2.1  2006/05/19 15:06:26  fplanque
+ * dirty sync
+ *
  * Revision 1.24  2006/05/06 21:52:50  blueyed
  * trans
  *

@@ -150,14 +150,14 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 	if( $disp_comment_form && $Item->can_comment() )
 	{ // We want to display the comments form and the item can be commented on:
 
-		// PREVIEW:
-		$preview_Comment = $Session->get('core.preview_Comment');
-
 		// Default form params:
 		$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
 		$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
 		$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
 		$comment_content = '';
+
+		// PREVIEW:
+		$preview_Comment = $Session->get('core.preview_Comment');
 
 		if( $preview_Comment )
 		{
@@ -276,7 +276,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 			<div class="input">
 			<?php
 			$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit', 'value' => T_('Send comment'), 'tabindex' => 10 ) );
-			$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'ActionButton', 'value' => T_('Preview'), 'tabindex' => 9 ) );
+			$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview', 'value' => T_('Preview'), 'tabindex' => 9 ) );
 
 			$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );
 			?>
@@ -298,6 +298,12 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.62  2006/05/19 18:15:06  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.61.2.1  2006/05/19 15:06:26  fplanque
+ * dirty sync
+ *
  * Revision 1.61  2006/05/04 10:32:41  blueyed
  * Use original comment content in preview's form.
  *

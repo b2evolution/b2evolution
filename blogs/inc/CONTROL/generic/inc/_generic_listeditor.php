@@ -140,6 +140,7 @@ switch( $action )
 				// Add the ID of the updated element to the result fadeout 
 				$result_fadeout[$GenericElementCache->dbIDname][] = $edited_GenericElement->ID;
 				unset( $edited_GenericElement );
+				unset( $GenericElementCache->dbIDname );
 				$action = 'list';
 			}
 		}

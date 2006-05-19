@@ -140,11 +140,15 @@ if( $action != 'preview' )
 	/*
 	 * Flood-protection
 	 * TODO: Put time check into query?
+	 * TODO: move that as far !!UP!! as possible! We want to waste minimum resources on Floods
+	 * TODO: have several thresholds. For example:
+	 * 1 comment max every 30 sec + 5 comments max every 10 minutes + 15 comments max every 24 hours
+	 * TODO: factorize with trackback
 	 */
 	$query = 'SELECT MAX(comment_date)
-						  FROM T_comments
+							FROM T_comments
 						 WHERE comment_author_IP = '.$DB->quote($Hit->IP).'
-						    OR comment_author_email = '.$DB->quote($Comment->get_author_email());
+								OR comment_author_email = '.$DB->quote($Comment->get_author_email());
 	$ok = 1;
 	if( $then = $DB->get_var( $query ) )
 	{
@@ -249,13 +253,10 @@ if( !is_logged_in() )
 	}
 }
 
+// Note: we don't give any clue that we have automatically deleted a comment. Il would only give spammers the perfect tool to find out how to pass the filter.
 
-if( $Comment->ID == 0 )
-{ // comment has not been inserted ("deleted")
-	$Messages->add( T_('Sorry, your comment has been deleted, because it has been detected as spam.'), 'error' );
-}
-else
-{
+if( $Comment->ID )
+{ // comment has not been deleted
 	// Trigger event: a Plugin should cleanup any temporary data here..
 	$Plugins->trigger_event( 'AfterCommentFormInsert', array( 'Comment' => & $Comment, 'original_comment' => $original_comment ) );
 
@@ -291,6 +292,12 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.77  2006/05/19 18:15:04  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.76.2.1  2006/05/19 15:06:23  fplanque
+ * dirty sync
+ *
  * Revision 1.76  2006/05/12 21:53:37  blueyed
  * Fixes, cleanup, translation for plugins
  *

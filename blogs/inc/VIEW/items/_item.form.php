@@ -282,9 +282,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	echo ' '; // allow wrapping!
 
-	$Form->select_options( 'item_st_ID',
-												$ItemStatusCache->option_list_return( $edited_Item->st_ID, ! $edited_Item->st_required ),
-												 T_('Task status') );
+	$Form->select_options( 'item_st_ID', $ItemStatusCache->option_list_return( $edited_Item->st_ID, true ), 	T_('Task status') );
 
 	echo ' '; // allow wrapping!
 
@@ -427,6 +425,12 @@ if( $next_action == 'update' )
 
 /*
  * $Log$
+ * Revision 1.10  2006/05/19 18:15:05  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.9.2.1  2006/05/19 15:06:24  fplanque
+ * dirty sync
+ *
  * Revision 1.9  2006/05/05 19:36:23  blueyed
  * New events
  *

@@ -26,10 +26,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+header( 'Content-type: text/html; charset='.$io_charset );
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset ?>" />
 	<title><?php echo $app_shortname.$admin_path_seprator.$page_title ?></title>
 	<link href="<?php echo $rsc_url ?>css/login.css" rel="stylesheet" type="text/css" />
 </head>
@@ -56,6 +57,12 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.5  2006/05/19 18:15:05  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.4.2.1  2006/05/19 15:06:24  fplanque
+ * dirty sync
+ *
  * Revision 1.4  2006/05/02 05:46:08  blueyed
  * fix
  *

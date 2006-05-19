@@ -71,7 +71,6 @@ if( empty($url) )
 	trackback_response( 1, 'No url to your permanent entry given.' ); // exits
 }
 
-
 @header('Content-Type: text/xml');
 
 $comment_post_ID = $tb_id;
@@ -156,7 +155,7 @@ $Plugins->trigger_event( 'BeforeTrackbackInsert', array( 'Comment' => & $Comment
 // Display errors:
 if( $errstring = $Messages->get_string( 'Cannot insert trackback, please correct these errors:', '' ) )
 {
-	trackback_response(2, $errstring);	// TODO: check that error code 2 is ok; blueyed> Why should we use 2?
+	trackback_response(2, $errstring);	// TODO: check TRACKBACK SPEC that error code 2 is ok; blueyed> Why should we use 2?
 }
 
 
@@ -166,6 +165,7 @@ $Comment->dbinsert();
 
 if( $Comment->ID == 0 )
 {
+	// fp>TODO: exit silently! You don't want to give an easy tool to try and pass the filters
 	trackback_response( 1, T_('Sorry, your trackback has been deleted, because it has been detected as spam.') );
 }
 
@@ -179,14 +179,22 @@ $Comment->send_email_notifications();
 
 
 // Trigger event: a Plugin should cleanup any temporary data here..
+// fp>> WARNING: won't be called if trackback gets deleted by antispam
 $Plugins->trigger_event( 'AfterTrackbackInsert', array( 'Comment' => & $Comment ) );
 
 
+// fp>TODO: warn about moderation
 trackback_response( 0, 'ok' );
 
 
 /*
  * $Log$
+ * Revision 1.48  2006/05/19 18:15:04  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.47.2.1  2006/05/19 15:06:23  fplanque
+ * dirty sync
+ *
  * Revision 1.47  2006/05/02 04:36:24  blueyed
  * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
  *

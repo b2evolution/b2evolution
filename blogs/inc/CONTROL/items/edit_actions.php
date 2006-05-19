@@ -101,7 +101,7 @@ switch($action)
 		{
 			echo '<div class="panelinfo">';
 			$Messages->display( T_('Cannot post, please correct these errors:'),
-				'[<a href="javascript:history.go(-1)">' . T_('Back to post editing') . '</a>]' );
+				'[<a href="javascript:history.go(-1)">'.T_('Back to post editing').'</a>]' );
 			echo '</div>';
 			break;
 		}
@@ -587,6 +587,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2006/05/19 18:15:05  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.11.2.1  2006/05/19 15:06:23  fplanque
+ * dirty sync
+ *
  * Revision 1.11  2006/05/12 21:53:37  blueyed
  * Fixes, cleanup, translation for plugins
  *

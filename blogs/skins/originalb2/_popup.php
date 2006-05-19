@@ -1,29 +1,29 @@
 <?php
-	/**
-	 * This is the template that displays the contents of the feedback popup
-	 *
-	 * This file is not meant to be called directly.
-	 * It is meant to be called by an include in the _main.php template.
-	 * To display the stats, you should call a stub AND pass the right parameters
-	 * For example: /blogs/index.php?disp=stats
-	 *
-	 * b2evolution - {@link http://b2evolution.net/}
-	 * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
-	 * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
-	 *
-	 * @package evoskins
-	 * @subpackage originalb2
-	 */
-	if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+/**
+ * This is the template that displays the contents of the feedback popup
+ *
+ * This file is not meant to be called directly.
+ * It is meant to be called by an include in the _main.php template.
+ * To display the stats, you should call a stub AND pass the right parameters
+ * For example: /blogs/index.php?disp=stats
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2003-2005 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package evoskins
+ * @subpackage originalb2
+ */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-	while( $Item = $MainList->get_item() )
-	{
+while( $Item = $MainList->get_item() )
+{
+header( 'Content-type: text/html; charset='.$io_charset );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<title><?php	$Blog->disp('name', 'htmlhead') ?> - feedback on '<?php $Item->title( '', '', false, 'htmlhead' ) ?>'</title>
 	<base href="<?php skinbase(); // Base URL for this skin. You need this to fix relative links! ?>" />
 	<style type="text/css" media="screen">

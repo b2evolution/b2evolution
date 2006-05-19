@@ -137,17 +137,17 @@ function antispam_check( $haystack )
  */
 function antispam_report_abuse( $abuse_string )
 {
-	global $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
+	global $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
 	global $baseurl, $Messages;
 
-	if( preg_match( '#^http://localhost[/:]#', $baseurl) && ( $evonetsrv_host != 'localhost' ) )
+	if( preg_match( '#^http://localhost[/:]#', $baseurl) && ( $antispamsrv_host != 'localhost' ) )
 	{ // Local install can only report to local test server
 		$Messages->add( T_('Reporting abuse to b2evolution aborted (Running on localhost).'), 'error' );
 		return(false);
 	}
 
 	// Construct XML-RPC client:
-	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
+	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port);
 	$client->debug = $debug;
 
 	// Construct XML-RPC message:
@@ -166,7 +166,7 @@ function antispam_report_abuse( $abuse_string )
 	{ // Remote operation successful:
 		antispam_update_source( $abuse_string, 'reported' );
 
-		$Messages->add( T_('Reported abuse to b2evolution.net.'), 'success' );
+		$Messages->add( T_('Reporting abuse to').' '.$antispamsrv_host.'...', 'success' );
 	}
 	else
 	{
@@ -184,10 +184,10 @@ function antispam_report_abuse( $abuse_string )
  */
 function antispam_poll_abuse( $display = true )
 {
-	global $Messages, $Settings, $baseurl, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
+	global $Settings, $baseurl, $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
 
 	// Construct XML-RPC client:
-	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
+	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port);
 	$client->debug = $debug;
 
 	// Get datetime from last update, because we only want newer stuff...
@@ -210,7 +210,7 @@ function antispam_poll_abuse( $display = true )
 							);
 
 
-	$Messages->add( T_('Requesting abuse list from b2evolution.net...'), 'note' );
+	$Messages->add( T_('Requesting abuse list from').' '.$antispamsrv_host.'...', 'note' );
 
 	$result = $client->send($message);
 
@@ -307,6 +307,12 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.8  2006/05/19 18:15:05  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.7.2.1  2006/05/19 15:06:24  fplanque
+ * dirty sync
+ *
  * Revision 1.7  2006/05/12 21:53:37  blueyed
  * Fixes, cleanup, translation for plugins
  *

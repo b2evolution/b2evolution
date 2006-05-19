@@ -1039,7 +1039,11 @@ class Comment extends DataObject
 	 */
 	function dbinsert()
 	{
-		global $Plugins, $Settings;
+		/**
+		 * @var Plugins
+		 */
+		global $Plugins;
+		global $Settings;
 
 		// Get karma percentage (interval -100 - 100)
 		$spam_karma = $Plugins->trigger_karma_collect( 'GetSpamKarmaForComment', array( 'Comment' => & $this ) );
@@ -1098,6 +1102,12 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2006/05/19 18:15:05  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.33.2.1  2006/05/19 15:06:24  fplanque
+ * dirty sync
+ *
  * Revision 1.33  2006/05/04 10:05:39  blueyed
  * Fixed anchor in notification mails and shortened again, because of length.. probably it does not make sense to have get_anchor() anyway.. dunno..
  *

@@ -12,18 +12,19 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-header('Content-Type: text/html; charset=iso-8859-1');
+global $app_name;
+global $app_version;
 
+header('Content-Type: text/html; charset=iso-8859-1');
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-		<title>b2evolution is not configured yet</title>
+		<title><?php echo $app_name ?> is not configured yet</title>
 	</head>
 <body>
 	<div style="background-color:#fee; border: 1px solid red; text-align:center; ">
-		<p>This is <?php global $app_name; echo $app_name ?> version <?php global $app_version; echo $app_version ?>.</p>
+		<p>This is <?php echo $app_name ?> version <?php echo $app_version ?>.</p>
 		<p><strong>You cannot use the application before you finish configuration and installation.</strong></p>
 		<div style="font-weight:bold; color:red;"><?php echo $error_message; ?></div>
 		<p>Please use the installer to finish your configuration/installation now.</p>

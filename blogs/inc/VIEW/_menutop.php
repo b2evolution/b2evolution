@@ -35,11 +35,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins;
 
+header( 'Content-type: text/html; charset='.$io_charset );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<title><?php echo $this->get_html_title(); ?></title>
 
 	<?php

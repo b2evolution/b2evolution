@@ -570,4 +570,7 @@ $evonetsrv_host = 'b2evolution.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 
+$antispamsrv_host = 'antispam.b2evolution.net';
+$antispamsrv_port = 80;
+$antispamsrv_uri = '/evonetsrv/xmlrpc.php';
 ?>

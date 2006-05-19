@@ -2383,47 +2383,12 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 
 /**
- * Validate ISO date
- *
  * @param string date
  * @param string time
- * @param boolean is date required ?
- * @param boolean is time required ?
  */
-function make_valid_date( $date, $time = '', $req_date = true, $req_time = true )
+function form_date( $date, $time = '' )
 {
-	global $Messages;
-
-	if( ! empty($date) )
-	{	// A date is provided:
-		if( ! preg_match( '#^\d\d\d\d-\d\d-\d\d$#', $date ) )
-		{
-			$Messages->add( T_('Date is invalid'), 'error' );
-			$date = '2000-01-01';
-		}
-	}
-	elseif( $req_date )
-	{	// No date but it was required!
-		$Messages->add( T_('Date is required'), 'error' );
-		$date = '2000-01-01';
-	}
-
-	if( ! empty($time) )
-	{	// A time is provided:
-		if( ! preg_match( '#^\d\d:\d\d:\d\d$#', $time ) )
-		{
-			$Messages->add( T_('Time is invalid'), 'error' );
-			$time = '00:00:00';
-		}
-	}
-	elseif( $req_time )
-	{	// No time but it was required!
-		$Messages->add( T_('Time is required'), 'error' );
-		$time = '00:00:00';
-	}
-
-
-	return $date.(empty($time) ? '' : ' '.$time );
+	return substr( $date.'          ', 0, 10 ).' '.$time;
 }
 
 
@@ -2931,6 +2896,12 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.55  2006/05/19 18:15:05  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.54.2.1  2006/05/19 15:06:25  fplanque
+ * dirty sync
+ *
  * Revision 1.54  2006/05/12 21:53:38  blueyed
  * Fixes, cleanup, translation for plugins
  *

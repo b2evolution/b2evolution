@@ -35,10 +35,11 @@
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+header( 'Content-type: text/html; charset='.$io_charset );
 ?>
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 	<title><?php
 		$Blog->disp('name', 'htmlhead');

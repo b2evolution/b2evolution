@@ -179,6 +179,5 @@ form.bComment fieldset div.info
 	/* border: 1px solid #f00;*/
 }
 div.bComment#comment_preview {
-	border-style:solid;
-	border-width:2px;
+	background-color: #ccc;
 }

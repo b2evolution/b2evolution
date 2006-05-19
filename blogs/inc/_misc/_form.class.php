@@ -591,40 +591,66 @@ class Form extends Widget
 	 * @param string label displayed in front of the field
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - date_format: Format of the date (string, default 'yyyy-MM-dd')
-	 *              - no_date_format_note: If true, no date format note gets appended to the field's note
+	 *              - add_date_format_note: If true, date format note gets prepended to the field's note
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function date_input( $field_name, $field_value, $field_label, $field_params = array() )
 	{
-		global $month, $weekday_letter;
+		global $month, $weekday_letter, $Request;
 
-		// The date value may be compact, in this case we have to decompact it
-		if( preg_match( '/^[0-9]+$/', $field_value ) )
-		{	// The date is compact, so we decompact it
-			$field_value = decompact_date( $field_value );
-		}
-
-		if( !isset($field_params['date_format']) )
-		{
-			$date_format = 'yyyy-MM-dd';
+		if( empty($field_params['date_format']) )
+		{	// Use locale date format:
+			$date_format = locale_datefmt();
 		}
 		else
-		{ // no attrib:
+		{
 			$date_format = $field_params['date_format'];
-			unset( $field_params['date_format'] );
+		}
+		// Don't keep that attrib in the list:
+		unset( $field_params['date_format'] );
+
+		// Convert PHP date format to JS library date format:
+		// WARNING: this is very incomplete!! Please expand as needed.
+		$js_date_format = preg_replace(
+			array( '/d/', '/m/', '/y/', '/Y/' ),
+			array( 'dd', 'MM', 'yy', 'yyyy' ),
+			$date_format );
+
+
+		if( isset($Request) && isset($Request->err_messages[$field_name]) )
+		{ // There is an error message for this field:
+
+			// We do not try to format the date, we keep the erroneous date.
+			//echo 'error on '.$field_name.' keep erroneous entry intact ';
+
+			$field_params['value'] = substr( $field_value, 0, 10 );
+		}
+		else
+		{ // Make the date value clean for display:
+
+			// The date value may be compact, in this case we have to decompact it
+			if( preg_match( '/^[0-9]+$/', $field_value ) )
+			{	// The date is compact, so we decompact it
+				$field_value = decompact_date( $field_value );
+			}
+
+			// Get DATE part of datetime and format it to locale format:
+			$field_params['value'] = mysql2date( $date_format, $field_value );
 		}
 
-		if( !isset($field_params['no_date_format_note']) || !$field_params['no_date_format_note'] )
+
+		if( !empty($field_params['add_date_format_note']) )
 		{ // Prepend $date_format to note
 			$field_params['note'] = empty($field_params['note'])
 				? '('.$date_format.')'
 				: '('.$date_format.') '.$field_params['note'];
 		}
-		unset( $field_params['no_date_format_note'] );
+		unset( $field_params['add_date_format_note'] );
+
 
 		if( !isset($field_params['size']) )
 		{ // Get size out of $date_format if not explicitly set
-			$field_params['size'] = strlen( $date_format );
+			$field_params['size'] = strlen( $js_date_format );
 		}
 
 		if( !isset($field_params['maxlength']) )
@@ -632,8 +658,6 @@ class Form extends Widget
 			$field_params['maxlength'] = $field_params['size'];
 		}
 
-		// Get date part of datetime:
-		$field_params['value'] = substr( $field_value, 0, 10 );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -670,7 +694,7 @@ class Form extends Widget
 						// -->
 					</script>\n"
 				.$this->get_input_element($field_params, false)
-				.'<a href="#" onclick="cal_'.$field_name.'.select('.$this->form_name.'.'.$field_name.",'anchor_".$field_name."', '".$date_format."');"
+				.'<a href="#" onclick="cal_'.$field_name.'.select('.$this->form_name.'.'.$field_name.",'anchor_".$field_name."', '".$js_date_format."');"
 				.' return false;" name="anchor_'.$field_name.'" id="anchor_'.$this->get_valid_id($field_name).'" title="'.T_('Select date').'">'
 				.get_icon( 'calendar', 'imgtag', array( 'title'=>T_('Select date') ) ).'</a>';
 
@@ -686,10 +710,10 @@ class Form extends Widget
 	 * @param string the name of the input field
 	 * @param string initial value (ISO datetime)
 	 * @param string label displayed in front of the field
-	 * @param string date format
+	 * @param string date format (php format)
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function date( $field_name, $field_value, $field_label, $date_format = 'yyyy-MM-dd' )
+	function date( $field_name, $field_value, $field_label, $date_format = NULL )
 	{
 		$field_params = array( 'date_format' => $date_format, 'type' => 'text' );
 
@@ -2507,6 +2531,12 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.13  2006/05/19 18:15:05  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.12.2.1  2006/05/19 15:06:25  fplanque
+ * dirty sync
+ *
  * Revision 1.12  2006/05/01 04:22:35  blueyed
  * doc
  *

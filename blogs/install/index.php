@@ -55,16 +55,15 @@ else
 }
 // Activate default locale:
 locale_activate( $default_locale );
-$io_charset = $default_locale;
+$io_charset = locale_charset(false);
 
 $timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
 
 header('Content-Type: text/html; charset='.$io_charset);
-
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<title><?php echo T_('b2evo installer') ?></title>
 	<link href="../rsc/css/evo_distrib.css" rel="stylesheet" type="text/css" />
 </head>
@@ -601,6 +600,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.100  2006/05/19 18:15:06  blueyed
+ * Merged from v-1-8 branch
+ *
  * Revision 1.99  2006/05/02 03:01:15  blueyed
  * fix
  *

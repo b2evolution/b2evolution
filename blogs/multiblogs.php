@@ -39,12 +39,13 @@ require_once dirname(__FILE__).'/conf/_config.php';
 require_once $inc_path.'_blog_main.inc.php';
 
 # Now, below you'll find the magic template...
+
+header( 'Content-type: text/html; charset='.$io_charset );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
 	<title>Multiblog demo<?php request_title( ' - ', '', ' - ', 'htmlhead' ) ?></title>
 	<!-- InstanceEndEditable -->
 <!-- InstanceBeginEditable name="head" -->

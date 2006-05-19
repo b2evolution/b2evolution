@@ -209,8 +209,6 @@ class Item extends DataObject
 			);
 
 		$this->objtype = $objtype;
-		$this->typ_required = false;	// type NOT required
-		$this->st_required = false;	// extra status NOT required
 
 		if( $db_row == NULL )
 		{ // New item:
@@ -335,10 +333,9 @@ class Item extends DataObject
 		if( ( $force_edit_date || $Request->param( 'edit_date', 'integer', 0 ) )
 				&& $current_User->check_perm( 'edit_timestamp' ) )
 		{ // We can use user date:
-			$Request->param( 'item_issue_date', 'string', true );
-			$Request->param_check_date( 'item_issue_date', T_('Please enter a valid issue date.'), true );
-			$Request->param( 'item_issue_time', 'string', true );
-			$this->set( 'issue_date', make_valid_date( $Request->get('item_issue_date'), $Request->get('item_issue_time') ) );
+			$Request->param_date( 'item_issue_date', T_('Please enter a valid issue date.'), true );
+			$Request->param_time( 'item_issue_time' );
+			$this->set( 'issue_date', form_date( $Request->get( 'item_issue_date' ), $Request->get( 'item_issue_time' ) ) ); // TODO: cleanup...
 		}
 
 		$Request->param( 'post_urltitle', 'string', '' );
@@ -354,8 +351,7 @@ class Item extends DataObject
 		$Request->param( 'item_priority', 'integer', true );
 		$this->set_from_Request( 'priority', 'item_priority', true );
 
-		$Request->param( 'item_deadline', 'string', true );
-		$Request->param_check_date( 'item_deadline', T_('Please enter a valid deadline.'), false );
+		$Request->param_date( 'item_deadline', T_('Please enter a valid deadline.'), false );
 		$this->set_from_Request( 'deadline', 'item_deadline', true );
 
 		// Comment stuff:
@@ -2501,8 +2497,7 @@ class Item extends DataObject
 				return T_( $post_statuses[$this->status] );
 
 			case 't_extra_status':
-				if( ! ($Element = & $ItemStatusCache->get_by_ID( $this->st_ID, true,
-							/* Do we allow NULL statuses for this object?: */ !$object_def[$this->objtype]['allow_null']['st_ID'] ) ) )
+				if( ! ($Element = & $ItemStatusCache->get_by_ID( $this->st_ID, true, false ) ) )
 				{ // No status:
 					return '';
 				}
@@ -2598,6 +2593,12 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2006/05/19 18:15:05  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.43.2.1  2006/05/19 15:06:24  fplanque
+ * dirty sync
+ *
  * Revision 1.43  2006/05/12 21:53:37  blueyed
  * Fixes, cleanup, translation for plugins
  *

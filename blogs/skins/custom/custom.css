@@ -235,6 +235,7 @@ div.statbloc h3
 }
 
 input.submit,
+input.preview,
 input.reset {
 	background-color: #ddd;
 	color: #78a;
@@ -243,9 +244,9 @@ input.reset {
 	padding: 1px;
 }
 
-input.submit:hover {
+input.submit:hover,
+input.preview:hover {
 	color: #000;
-	text-decoration: underline;
 }
 
 /* Styles for sidebar (right) */

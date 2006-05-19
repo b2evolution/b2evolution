@@ -665,6 +665,12 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.10  2006/05/19 18:15:05  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.9.2.1  2006/05/19 15:06:24  fplanque
+ * dirty sync
+ *
  * Revision 1.9  2006/05/12 21:53:38  blueyed
  * Fixes, cleanup, translation for plugins
  *

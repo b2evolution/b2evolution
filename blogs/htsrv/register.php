@@ -153,7 +153,7 @@ switch( $action )
 				else
 				{
 					$Messages->add( T_('Sorry, the email with the link to validate and activate your password could not be sent.')
-						.'<br />'.T_('Possible reason: the mail() function is disabled.'), 'error' );
+						.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
 				}
 			}
 
@@ -182,8 +182,12 @@ param( 'redirect_to', 'string', $admin_url );
 // Display reg form:
 require $view_path.'login/_reg_form.php';
 
+
 /*
  * $Log$
+ * Revision 1.69  2006/05/19 18:15:04  blueyed
+ * Merged from v-1-8 branch
+ *
  * Revision 1.68  2006/05/01 04:21:50  blueyed
  * todo
  *
