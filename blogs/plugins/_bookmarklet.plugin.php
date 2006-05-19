@@ -47,6 +47,8 @@ class bookmarklet_plugin extends Plugin
 	/**
 	 * We are displaying the tool menu.
 	 *
+	 * @todo Do not create links/javascript code based on browser detection! But: test for functionality!
+	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a tool menu block?
 	 */
@@ -58,7 +60,7 @@ class bookmarklet_plugin extends Plugin
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-			<a href="javascript:Q=document.selection?document.selection.createRange().text:document.getSelection();void(window.open('<?php echo $admin_url ?>b2bookmarklet.php?text='+escape(Q)+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
+			<a href="javascript:Q=document.selection?document.selection.createRange().text:document.getSelection();void(window.open('<?php echo $admin_url ?>?ctrl=edit&amp;mode=bookmarklet&amp;text='+escape(Q)+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
 			<?php
 			return true;
 		}
@@ -66,7 +68,7 @@ class bookmarklet_plugin extends Plugin
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-			<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(btw=window.open('<?php echo $admin_url ?>b2bookmarklet.php?text='+escape(Q)+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));btw.focus();"><?php echo T_('b2evo bookmarklet') ?></a>
+			<a href="javascript:Q='';if(top.frames.length==0)Q=document.selection.createRange().text;void(btw=window.open('<?php echo $admin_url ?>?ctrl=edit&amp;mode=bookmarklet&amp;text='+escape(Q)+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));btw.focus();"><?php echo T_('b2evo bookmarklet') ?></a>
 			</p>
 			<?php
 			return true;
@@ -75,7 +77,7 @@ class bookmarklet_plugin extends Plugin
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-			<a href="javascript:void(window.open('<?php echo $admin_url ?>b2bookmarklet.php?popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
+			<a href="javascript:void(window.open('<?php echo $admin_url ?>?ctrl=edit&amp;mode=bookmarklet&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));"><?php echo T_('b2evo bookmarklet') ?></a></p>
 			<?php
 			return true;
 		}
@@ -83,7 +85,7 @@ class bookmarklet_plugin extends Plugin
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
-			<a href="javascript:Q='';if(top.frames.length==0);void(btw=window.open('<?php echo $admin_url ?>b2bookmarklet.php?text='+escape(document.getSelection())+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));btw.focus();"><?php echo T_('b2evo bookmarklet') ?></a></p>
+			<a href="javascript:Q='';if(top.frames.length==0);void(btw=window.open('<?php echo $admin_url ?>?ctrl=edit&amp;mode=bookmarklet&amp;text='+escape(document.getSelection())+'&amp;popupurl='+escape(location.href)+'&amp;popuptitle='+escape(document.title),'b2evobookmarklet','scrollbars=yes,resizable=yes,width=750,height=550,left=25,top=15,status=yes'));btw.focus();"><?php echo T_('b2evo bookmarklet') ?></a></p>
 			<?php
 			return true;
 		}
@@ -95,6 +97,9 @@ class bookmarklet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.10  2006/05/19 15:59:52  blueyed
+ * Fixed bookmarklet plugin. Thanks to personman for pointing it out.
+ *
  * Revision 1.9  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *
