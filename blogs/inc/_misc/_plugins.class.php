@@ -281,6 +281,7 @@ class Plugins
 				'FilterIpAddress' => T_('Called when displaying an IP address.'),
 
 				'ItemViewsIncreased' => T_('Called when the view counter of an item got increased.'),
+				'ItemCanComment' => T_('Asks the plugin if an item can receive comments/feedback.'),
 
 				'SkinTag' => '',
 
@@ -1623,6 +1624,44 @@ class Plugins
 
 
 	/**
+	 * Call all plugins for a given event, until the first one returns a value
+	 * (not NULL).
+	 *
+	 * @param string event name, see {@link Plugin::get_supported_events()}
+	 * @param array Associative array of parameters for the Plugin
+	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin
+	 *               and 'plugin_return' set to the return value;
+	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
+	 */
+	function trigger_event_first_return( $event, $params = NULL )
+	{
+		global $Debuglog;
+
+		$Debuglog->add( 'Trigger event '.$event.' (first bool)', 'plugins' );
+
+		if( empty($this->index_event_IDs[$event]) )
+		{ // No events registered
+			$Debuglog->add( 'No registered plugins.', 'plugins' );
+			return array();
+		}
+
+		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
+		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
+		{
+			$r = $this->call_method( $l_plugin_ID, $event, $params );
+			if( isset($r) )
+			{
+				$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned '.( $r ? 'true' : 'false' ).'!', 'plugins' );
+				$params['plugin_return'] = $r;
+				$params['plugin_ID'] = & $l_plugin_ID;
+				return $params;
+			}
+		}
+		return array();
+	}
+
+
+	/**
 	 * Trigger an $event and return an index of $params.
 	 *
 	 * @param string Event name, see {@link Plugins::get_supported_events()}
@@ -2584,7 +2623,7 @@ class Plugins
 				return;
 			}
 		}
-	
+
 		// Cache miss, create it:
 		if( empty($eval_create_object) )
 		{
@@ -2659,6 +2698,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.50  2006/05/20 01:56:07  blueyed
+ * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
+ *
  * Revision 1.49  2006/05/19 18:15:06  blueyed
  * Merged from v-1-8 branch
  *

@@ -85,9 +85,9 @@ if( ! $Blog->get('allowtrackbacks') )
 	trackback_response( 1, 'Sorry, this weblog does not allow you to trackback its posts.' ); // exits
 }
 
-if( $commented_Item->comment_status != 'open' )
+if( ! $commented_Item->can_comment( false ) )
 {
-	trackback_response( 1, 'Sorry, this item does not accept trackbacks.' ); // exits
+	trackback_response( 1, 'You cannot leave trackbacks on this post!' ); // exits
 }
 
 
@@ -189,6 +189,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.49  2006/05/20 01:56:07  blueyed
+ * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
+ *
  * Revision 1.48  2006/05/19 18:15:04  blueyed
  * Merged from v-1-8 branch
  *

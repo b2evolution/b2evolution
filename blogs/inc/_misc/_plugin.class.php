@@ -960,6 +960,21 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: the plugin gets asked if an item can receive feedback/comments.
+	 *
+	 * @param array Associative array of parameters
+	 *              'Item': the Item
+	 * @return boolean|string
+	 *   true, if the Item can receive feedback
+	 *   false/string, if the Item cannot receive feedback. If you return a string
+	 *                 this gets displayed as an error/explanation.
+	 */
+	function ItemCanComment( & $params )
+	{
+	}
+
 	// }}}
 
 
@@ -2224,6 +2239,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.49  2006/05/20 01:56:07  blueyed
+ * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
+ *
  * Revision 1.48  2006/05/17 23:35:42  blueyed
  * cleanup
  *

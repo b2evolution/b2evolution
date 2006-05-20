@@ -41,7 +41,7 @@ param( 'comment_post_ID', 'integer', true ); // required
 
 $commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
 
-if( ! $commented_Item->can_comment( '', '', '', '' ) )
+if( ! $commented_Item->can_comment( false ) )
 {
 	$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
 }
@@ -292,6 +292,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.78  2006/05/20 01:56:07  blueyed
+ * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
+ *
  * Revision 1.77  2006/05/19 18:15:04  blueyed
  * Merged from v-1-8 branch
  *

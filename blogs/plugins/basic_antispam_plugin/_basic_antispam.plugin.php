@@ -68,6 +68,12 @@ class basic_antispam_plugin extends Plugin
 	function GetDefaultSettings()
 	{
 		return array(
+				'disable_feedback_anon' => array(
+					'type' => 'checkbox',
+					'label' => T_('Disable anonymous feedback'),
+					'note' => T_('Prevent anonymous visitors from giving feedback/comments.'),
+					'defaultvalue' => '0',
+				),
 				'check_dupes' => array(
 					'type' => 'checkbox',
 					'label' => T_('Check for duplicate feedback'),
@@ -100,6 +106,21 @@ class basic_antispam_plugin extends Plugin
 				array( 'layout' => 'end_fieldset' ),
 
 			);
+	}
+
+
+	/**
+	 * We check if this is an anonymous visitor and do not allow comments, if we're setup
+	 * to do so.
+	 */
+	function ItemCanComment( & $params )
+	{
+		if( /* ! is_logged_in() */ 1 && $this->Settings->get('disable_feedback_anon') )
+		{
+			return T_('Comments are not allowed from anonymous visitors.');
+		}
+
+		// return NULL
 	}
 
 
@@ -503,6 +524,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.10  2006/05/20 01:56:07  blueyed
+ * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
+ *
  * Revision 1.9  2006/05/14 16:30:37  blueyed
  * SQL error fixed with empty visitor comments
  *
