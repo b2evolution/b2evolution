@@ -2,7 +2,7 @@
 /**
  * This file implements the Auto P plugin for b2evolution
  *
- * @author WordPress team - http://sourceforge.net/project/memberlist.php?group_id=51422
+ * @author blueyed: Daniel HAHLER - {@link http://daniel.hahler.de/}
  *
  * @package plugins
  */
@@ -10,10 +10,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * @package plugins
+ * The Auto-P Plugin.
  *
- * @todo This is buggy, because it does not create newlines/paragraphs in tag blocks only.
- *       blueyed>> I've started working on it.
+ * It wraps text blocks, which are devided by newline(s) into HTML P tags (paragraphs)
+ * and optionally replaces single newlines with BR tags (line breaks).
+ *
+ * @package plugins
  */
 class auto_p_plugin extends Plugin
 {
@@ -24,6 +26,11 @@ class auto_p_plugin extends Plugin
 	var $apply_rendering = 'opt-out';
 	var $short_desc;
 	var $long_desc;
+
+	/**
+	 * @var string List of block elements (we want a paragraph before and after)
+	 */
+	var $block_tags = 'table|thead|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|blockquote|p|code|hr|fieldset|h[1-6]';
 
 
 	/**
@@ -42,111 +49,147 @@ class auto_p_plugin extends Plugin
 	function GetDefaultSettings()
 	{
 		return array(
-				'br' => array( 'label' => T_('Line breaks'), 'type' => 'checkbox', 'defaultvalue' => 1, 'note' => T_('Make line breaks (&lt;br /&gt;) for single newlines.') ),
+				'br' => array(
+					'label' => T_('Line breaks'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					'note' => T_('Make line breaks (&lt;br /&gt;) for single newlines.'),
+				),
 			);
 	}
 
 
 	/**
 	 * Perform rendering
-	 *
-	 * @param array Associative array of parameters
-	 * 							(Output format, see {@link format_to_output()})
-	 * @return boolean true if we can render something for the required output format
 	 */
 	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
 
-		// REPLACE:  But not in pre blocks.
-		// TODO: handle pre tags with attributes (e.g. class)
-		// TODO: also handle code blocks!
-		if( strpos( $content , '<pre>' ) !== false )
-		{ // If there are code tags run this substitution
-			$content_parts = preg_split("/<\/?pre>/", $content);
-			$content = '';
-			for ( $x = 0 ; $x < count( $content_parts ) ; $x++ )
-			{
-				if ( ( $x % 2 ) == 0 )
-				{ // If x is even then it's not code and replace any smiles
-					$content .= $this->autop( $content_parts[$x] );
-				}
-				else
-				{ // If x is odd don't replace smiles. and put code tags back in.
-					$content .= '<pre>' . $content_parts[$x] . '</pre>';
-				}
-			}
-		}
-		else
-		{ // No code blocks, replace on the whole thing
-			$content = $this->autop( $content );
-		}
+		$content = preg_replace( "~(\r\n|\r)~", "\n", $content ); // cross-platform newlines
+
+		$content = callback_on_non_matching_blocks( $content, '~<\s*(pre)[^>]*>.*?<\s*/\s*pre\s*>~is', array( &$this, 'autop' ) );
+
 		return true;
 	}
 
 
-	function autop( $pee )
+	/**
+	 * This creates the P and BR tags. Used as callback and recurses.
+	 *
+	 * @return string
+	 */
+	function autop( $text, $recurse_info = array() )
 	{
-		$pee = $pee. "\n"; // just to make things a little easier, pad the end
+		$new_text = '';
 
-		$pee = preg_replace('|<br />\s*<br />|', "\n\n", $pee);	// Change double BRs to double newlines
+		if( preg_match( '~^([^<]*)(<\s*('.$this->block_tags.')\b[^>]*>)~i', $text, $match ) )
+		{
+			$before_tag = $match[1];
+			$tag = $match[3];
 
-		// List of block elements (we want a paragraph before and after):
-		$this->block_tags = $block_tags = 'table|thead|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|blockquote|p|code|hr|fieldset|h[1-6]';
+			if( ! empty($before_tag) )
+			{
+				$new_text .= $this->autop_text( $before_tag, $recurse_info );
+			}
 
-		// Space things out a little (by two lines to force a <p> before/after):
-		$pee = preg_replace('!(<(?:'.$block_tags.')[^>]*>)!', "\n\n$1", $pee);
-		$pee = preg_replace('!(</(?:'.$block_tags.')>)!', "$1\n\n", $pee);
+			// Opening tag:
+			$new_text .= $match[2];
 
-		$pee = preg_replace("/(\r\n|\r)/", "\n", $pee); // cross-platform newlines
+			$text_after_tag = substr( $text, strlen($match[0]) );
 
-		$pee = preg_replace("/\n\n+/", "\n\n", $pee); // take care of duplicates
+			// Find closing tag:
+			if( preg_match( '~^(.*?)(<\s*/\s*'.$tag.'\s*>)~is', $text_after_tag, $after_match ) )
+			{
+				$text_in_tag = $after_match[1];
+				$closing_tag = $after_match[2];
 
+				$new_text .= $this->autop( $text_in_tag, array( 'tag' => $tag ) );
 
-		// make paragraphs, including one at the end :
-		$pee = preg_replace('/\n?(.+?)(?:\n\s*\n|\z)/s', "\t<p>$1</p>\n", $pee);
+				$new_text .= $closing_tag;
 
-		// TODO: Parse html (not strict) and create paragraphs in between tags only. This should also avaoid most of the "fix all the extra Ps" below. (blueyed)
-		/*
-		// make paragraphs, including one at the end :
-		$pee = $this->newlines_in_tags( $pee );
-		*/
-		#pre_dump( 'made_pees', $pee );
+				$text_after_tag = substr( $text_after_tag, strlen($text_in_tag)+strlen($closing_tag) );
+			}
 
-
-		// Now fix all the extra Ps...
-
-		$pee = preg_replace('|\t<p>\s*?</p>\n|', '', $pee); // under certain strange conditions it could create a P of entirely whitespace # dh: fixed creation of unnecessary <br />
-
-		$pee = preg_replace('!<p>\s*(</?(?:'.$block_tags.')[^>]*>)\s*</p>!', "$1", $pee); // don't pee all over a tag
-
-		$pee = preg_replace("|<p>(<li.+?)</p>|", "$1", $pee); // problem with nested lists
-
-		// Move outer <p> for <blockquote> inside (needed to validate!):
-		$pee = preg_replace( '~<p>\s*<blockquote([^>]*)>(.*?)</blockquote></p>~is', '<blockquote$1><p>$2</p></blockquote>', $pee );
-
-		$pee = preg_replace('!<p>\s*(</?(?:'.$block_tags.')[^>]*>)!', "$1", $pee);
-		$pee = preg_replace('!(</?(?:'.$block_tags.')[^>]*>)\s*</p>!', "$1", $pee);
-
-		if( $this->Settings->get('br') )
-		{ // optionally make line breaks
-			$pee = preg_replace('|(?<!<br />)\s*\n|', "<br />\n", $pee);
+			if( trim($text_after_tag) != '' )
+			{
+				$new_text = $new_text.$this->autop( $text_after_tag );
+			}
+		}
+		else
+		{
+			// make paragraphs in parts, splitted by opening or closing tags (messed up markup)
+			$new_text = callback_on_non_matching_blocks( $text, '~<\s*/?\s*('.$this->block_tags.')\s*>~', array(&$this, 'autop_text'), array($recurse_info) );
 		}
 
-		$pee = preg_replace('!(</?(?:table|thead|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|blockquote|p|h[1-6])[^>]*>)\s*<br />!', "$1", $pee);
-		$pee = preg_replace('!<br />(\s*</?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)>)!', '$1', $pee);
-
-		// $content = preg_replace('!(<pre.*? >)(.*?)</pre>!ise', "'$1'.clean_pre('$2').'</pre>' ", $pee);
-
-		// $content = preg_replace('/&([^#])(?![a-z]{1,8};)/', '&#038;$1', $pee);
-
-		return $pee;
+		return $new_text;
 	}
+
+
+	/**
+	 * Callback that adds P tags to blocks around $text (exploded by \n\n) and lets
+	 * {@link auto_p_plugin::autobr()} handle the text before.
+	 *
+	 * @return string
+	 */
+	function autop_text( $text, $recurse_info )
+	{
+		if( isset($recurse_info['tag']) && strtoupper($recurse_info['tag']) == 'P' )
+		{ // Do not create P tags when we are already in a P tag
+			return $text;
+		}
+
+		$text_lines = preg_split( '~\n\n+~', $text, -1, PREG_SPLIT_NO_EMPTY );
+
+		if( count($text_lines) == 1 && ! preg_match( '~\n\s*\n$~', $text ) )
+		{ // single block (without two or more newlines at the end): peeify, if it's in a blockquote or on the outer level:
+			if( ! isset($recurse_info['tag']) || strtoupper($recurse_info['tag']) == 'BLOCKQUOTE' )
+			{
+				return '<p>'.$this->autobr( $text ).'</p>';
+			}
+
+			return $text;
+		}
+
+		// More than one line:
+		$new_text = '';
+		foreach( $text_lines as $k => $text_line )
+		{
+			if( ! empty($text_line) )
+			{
+				$new_text .= '<p>'.$this->autobr( $text_line ).'</p>';
+			}
+		}
+
+		return $new_text;
+	}
+
+
+	/**
+	 * Add "<br />" to the end of newlines, which do not end with "<br />" already and which aren't
+	 * the last line, if the "Auto-BR" setting is enabled.
+	 *
+	 * @return string
+	 */
+	function autobr( $text )
+	{
+		if( ! $this->Settings->get('br') )
+		{ // don't make <br />'s
+			return $text;
+		}
+
+		return preg_replace( '~(?<!<br />)\s*\n(?!\z)~i', "<br />\n", $text );
+	}
+
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.11  2006/05/21 01:42:39  blueyed
+ * Fixed Auto-P Plugin
+ *
  * Revision 1.10  2006/04/22 01:30:26  blueyed
  * Fix for HR, CODE and FIELDSET by balupton (http://forums.b2evolution.net/viewtopic.php?p=35709#35709)
  *
