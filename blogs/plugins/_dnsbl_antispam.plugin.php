@@ -395,14 +395,14 @@ class dnsbl_antispam_plugin extends Plugin
 	 */
 	function SessionLoaded()
 	{
-		global $Hit, $Plugins, $ReqPath;
+		global $Hit, $Plugins, $htsrv_url, $ReqHost, $ReqPath;
 
 		if( is_admin_page() )
 		{
 			return false;
 		}
 
-		if( $ReqPath == '/htsrv/call_plugin.php' )
+		if( $ReqHost.$ReqPath == $htsrv_url.'call_plugin.php' ) // TODO: better check?!
 		{ // Do not block subcalls to Plugins that provide CaptchaPayload!
 			return false;
 		}
@@ -420,7 +420,6 @@ class dnsbl_antispam_plugin extends Plugin
 
 			if( $this->use_whitelisting )
 			{ // check if he wants to whitelist now
-				// TODO: should be trigger_event_no_false() ..
 				if( $Plugins->trigger_event_first_true( 'CaptchaValidated', array( 'key' => 'dnsbl_'.$this->ID ) ) )
 				{
 					#echo 'WHITE';
@@ -590,18 +589,24 @@ class dnsbl_antispam_plugin extends Plugin
 	 */
 	function display_error_page( $error_ip_blocked )
 	{
-		global $Plugins, $misc_inc_path;
+		global $Plugins, $misc_inc_path, $io_charset;
 
 		require_once $misc_inc_path.'_form.class.php';
 
 		header('HTTP/1.0 403 Forbidden');
-		header('Content-Type: text/html; charset=iso-8859-1');
 
+		if( isset($io_charset) )
+		{
+			header('Content-Type: text/html; charset='.$io_charset);
+		}
+		else
+		{ // It's probably not set!
+			header('Content-Type: text/html');
+		}
 		?>
 		<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 		<html xmlns="http://www.w3.org/1999/xhtml">
 			<head>
-				<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 				<title>403 Forbidden (IP blocked)</title>
 			</head>
 
@@ -681,6 +686,12 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.25  2006/05/21 20:27:47  blueyed
+ * charset fixed for error page - as good as we can
+ *
+ * Revision 1.24.2.1  2006/05/19 15:06:25  fplanque
+ * dirty sync
+ *
  * Revision 1.24  2006/05/06 21:52:50  blueyed
  * trans
  *
