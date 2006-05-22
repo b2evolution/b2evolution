@@ -76,9 +76,11 @@ class AutoPPluginTestCase extends UnitTestCase
 
 		#echo '<hr margin="2ex 0" />';
 
+		#$before = $params['data'];
+
 		$this->Plugin->RenderItemAsHtml( $params );
 
-
+		#pre_dump( $before, $params['data'] );
 
 		return $params['data'];
 	}
@@ -150,7 +152,7 @@ class AutoPPluginTestCase extends UnitTestCase
 			$this->render( "one paragraph<pre>first line\n\nsecond line</pre>2nd para" ) );
 
 		// multiple paragraphs in one block:
-		$this->assertEqual( "<div><p>one paragraph</p><p>2nd para</p></div>",
+		$this->assertEqual( "<div><p>one paragraph</p>\n\n<p>2nd para</p></div>",
 			$this->render( "<div>one paragraph\n\n2nd para</div>" ) );
 
 		// HR:
@@ -160,6 +162,21 @@ class AutoPPluginTestCase extends UnitTestCase
 		// P in P:
 		$this->assertEqual( "<p>one\n\ntwo</p><p>three</p>",
 			$this->render( "<p>one\n\ntwo</p><p>three</p>" ) );
+
+		$this->assertEqual( "<p>para</p>\n\n\n\n<div><p><img /></p>\n\n\n<p>para2a<br />\npara2b</p>\n\n</div><div><img /></div>",
+			$this->render( "para\n\n\n\n<div><img />\n\n\npara2a\npara2b\n\n</div><div><img /></div>" ) );
+
+		$this->assertEqual( "<p>para1</p>\n\n<p>para2 <a href=x>X</a>!</p>\n\n<div class=x><img ... /></div>",
+			$this->render( "para1\n\npara2 <a href=x>X</a>!\n\n<div class=x><img ... /></div>" ) );
+
+		$this->assertEqual( "<div>\npara1\n</div>",
+			$this->render( "<div>\npara1\n</div>" ) );
+
+		$this->assertEqual( "<div>\n<p>para1</p>\n\n</div>",
+			$this->render( "<div>\npara1\n\n</div>" ) );
+
+		$this->assertEqual( "<div><img /></div>\n\n<p>Text</p>",
+			$this->render( "<div><img /></div>\n\nText" ) );
 
 	}
 

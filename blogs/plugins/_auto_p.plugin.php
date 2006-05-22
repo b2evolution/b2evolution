@@ -83,7 +83,7 @@ class auto_p_plugin extends Plugin
 	{
 		$new_text = '';
 
-		if( preg_match( '~^([^<]*)(<\s*('.$this->block_tags.')\b[^>]*>)~i', $text, $match ) )
+		if( preg_match( '~^(.*?)(<\s*('.$this->block_tags.')\b[^>]*>)~is', $text, $match ) )
 		{
 			$before_tag = $match[1];
 			$tag = $match[3];
@@ -139,25 +139,28 @@ class auto_p_plugin extends Plugin
 			return $text;
 		}
 
-		$text_lines = preg_split( '~\n\n+~', $text, -1, PREG_SPLIT_NO_EMPTY );
+		if( trim($text) == '' )
+		{ // If the text is only whitespace or empty at all, do nothing:
+			return $text;
+		}
 
-		if( count($text_lines) == 1 && ! preg_match( '~\n\s*\n$~', $text ) )
+		// "Split" lines into leading whitespace, text and 2+ newlines (or end):
+		preg_match_all( '~(\s*)(.+?)(\n\s*\n+|\z)~s', $text, $text_lines, PREG_SET_ORDER );
+
+		if( count($text_lines) == 1 && empty($text_lines[0][3]) /* eof */
+				&& ! ( ! isset($recurse_info['tag']) || strtoupper($recurse_info['tag']) == 'BLOCKQUOTE' ) )
 		{ // single block (without two or more newlines at the end): peeify, if it's in a blockquote or on the outer level:
-			if( ! isset($recurse_info['tag']) || strtoupper($recurse_info['tag']) == 'BLOCKQUOTE' )
-			{
-				return '<p>'.$this->autobr( $text ).'</p>';
-			}
-
 			return $text;
 		}
 
 		// More than one line:
 		$new_text = '';
+
 		foreach( $text_lines as $k => $text_line )
 		{
-			if( ! empty($text_line) )
+			if( trim($text_line[2]) != '' )
 			{
-				$new_text .= '<p>'.$this->autobr( $text_line ).'</p>';
+				$new_text .= $text_line[1].'<p>'.$this->autobr( $text_line[2] ).'</p>'.$text_line[3];
 			}
 		}
 
@@ -187,6 +190,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.12  2006/05/22 18:14:16  blueyed
+ * Fixed the fixed auto-p-plugin
+ *
  * Revision 1.11  2006/05/21 01:42:39  blueyed
  * Fixed Auto-P Plugin
  *
