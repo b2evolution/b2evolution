@@ -241,7 +241,7 @@ function populate_linkblog( & $now, $cat_linkblog_b2evo, $cat_linkblog_contrib)
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'dAniel', 'Development', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://thequod.de/', 'disabled', array() );
+	$edited_Item->insert( 1, 'dAniel', 'Development', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 0, true, '', 'http://daniel.hahler.de/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -919,6 +919,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.188  2006/05/22 22:58:19  blueyed
+ * Changed my URL
+ *
  * Revision 1.187  2006/04/29 17:24:09  blueyed
  * doc
  *
