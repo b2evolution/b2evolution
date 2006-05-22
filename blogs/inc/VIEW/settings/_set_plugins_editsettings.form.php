@@ -65,7 +65,10 @@ if( ! empty( $edit_Plugin->help_url ) )
 
 $Form->global_icon( T_('Cancel edit!'), 'close', regenerate_url() );
 
-$Form->begin_form( 'fform' );
+$Form->begin_form( 'fform', '',
+	// enable all form elements on submit (so values get sent):
+	array( 'onsubmit'=>'var es=this.elements; for( var i=0; i < es.length; i++ ) { es[i].disabled=false; };' ) );
+
 $Form->hidden( 'plugin_ID', $edit_Plugin->ID );
 
 // PluginSettings
@@ -162,6 +165,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.12  2006/05/22 20:35:36  blueyed
+ * Passthrough some attribute of plugin settings, allowing to use JS handlers. Also fixed submitting of disabled form elements.
+ *
  * Revision 1.11  2006/04/21 16:58:11  blueyed
  * Add warning to "disable plugin events".
  *

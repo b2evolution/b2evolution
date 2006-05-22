@@ -326,6 +326,8 @@ class Plugin
 	 *          - 'http://example.com/uri': a full URL (starting with http:// or https://)
 	 *   - 'layout': Use this to visually group your settings.
 	 *               Either 'begin_fieldset', 'end_fieldset' or 'separator'. You can use 'label' for 'begin_fieldset'.
+	 *   - 'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect': get passed
+	 *           through as attributes to the form/input element.
 	 * e.g.:
 	 * <code>
 	 * return array(
@@ -2239,6 +2241,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.50  2006/05/22 20:35:37  blueyed
+ * Passthrough some attribute of plugin settings, allowing to use JS handlers. Also fixed submitting of disabled form elements.
+ *
  * Revision 1.49  2006/05/20 01:56:07  blueyed
  * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
  *

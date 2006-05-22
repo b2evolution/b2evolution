@@ -58,6 +58,15 @@ function display_settings_fieldset_field( $set_name, $set_meta, & $Plugin, & $Fo
 
 	$params = array();
 
+	// Passthrough some attributes to elements:
+	foreach( $set_meta as $k => $v )
+	{
+		if( in_array( $k, array( 'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect' ) ) )
+		{
+			$params[$k] = $v;
+		}
+	}
+
 	if( isset($set_meta['note']) )
 	{
 		$params['note'] = $set_meta['note'];
@@ -396,6 +405,9 @@ function set_Settings_for_Plugin_from_Request( & $Plugin, & $use_Plugins, $set_t
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.17  2006/05/22 20:35:37  blueyed
+ * Passthrough some attribute of plugin settings, allowing to use JS handlers. Also fixed submitting of disabled form elements.
+ *
  * Revision 1.16  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

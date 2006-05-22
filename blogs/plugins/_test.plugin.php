@@ -93,30 +93,44 @@ class test_plugin extends Plugin
 	 */
 	function GetDefaultSettings()
 	{
-		return array(
+		$r = array(
 			'click_me' => array(
-				'label' => T_('Click me!'),
-				'defaultvalue' => '1',
-				'type' => 'checkbox',
+					'label' => T_('Click me!'),
+					'defaultvalue' => '1',
+					'type' => 'checkbox',
 				),
 			'input_me' => array(
-				'label' => T_('How are you?'),
-				'defaultvalue' => '',
-				'note' => T_('Welcome to b2evolution'),
+					'label' => T_('How are you?'),
+					'defaultvalue' => '',
+					'note' => T_('Welcome to b2evolution'),
 				),
 			'my_select' => array(
-				'label' => T_('Selector'),
-				'defaultvalue' => 'one',
-				'type' => 'select',
-				'options' => array( 'sun' => T_('Sunday'), 'mon' => T_('Monday') ),
+					'label' => T_('Selector'),
+					'id' => $this->classname.'_my_select',
+					'onchange' => 'document.getElementById("'.$this->classname.'_a_disabled_one").disabled = ( this.value == "sun" );',
+					'defaultvalue' => 'one',
+					'type' => 'select',
+					'options' => array( 'sun' => T_('Sunday'), 'mon' => T_('Monday') ),
 				),
 			'a_disabled_one' => array(
-				'label' => 'This one is disabled',
-				'type' => 'checkbox',
-				'defaultvalue' => '1',
-				'disabled' => true, // this can be useful if you detect that something cannot be changed. You probably want to add a 'note' then, too.
+					'label' => 'This one is disabled',
+					'id' => $this->classname.'_a_disabled_one',
+					'type' => 'checkbox',
+					'defaultvalue' => '1',
+					'disabled' => true, // this can be useful if you detect that something cannot be changed. You probably want to add a 'note' then, too.
+					'note' => 'Change the above select input to "'.T_('Monday').'" to enable it.',
 				),
 			);
+
+		if( isset($this->Settings) )
+		{ // we're asked for the settings for editing:
+			if( $this->Settings->get('my_select') == 'mon' )
+			{
+				$r['a_disabled_one']['disabled'] = false;
+			}
+		}
+
+		return $r;
 	}
 
 
@@ -540,6 +554,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.39  2006/05/22 20:35:37  blueyed
+ * Passthrough some attribute of plugin settings, allowing to use JS handlers. Also fixed submitting of disabled form elements.
+ *
  * Revision 1.38  2006/05/05 19:36:24  blueyed
  * New events
  *
