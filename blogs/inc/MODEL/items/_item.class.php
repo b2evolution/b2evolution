@@ -703,19 +703,39 @@ class Item extends DataObject
 	/**
 	 * Template function: Check if user can leave comment on this post or display error
 	 *
-	 * @param string string to display before any error message
+	 * @param string|false string to display before any error message; false to not display anything, but just return boolean
 	 * @param string string to display after any error message
 	 * @param string error message for non published posts, '#' for default
 	 * @param string error message for closed comments posts, '#' for default
-	 * @return boolean true if user can post
+	 * @return boolean true if user can post, false if s/he cannot
 	 */
-	function can_comment(
-						$before_error = '<p><em>',
-						$after_error = '</em></p>',
-						$non_published_msg = '#',
-						$closed_msg = '#'
-						)
+	function can_comment( $before_error = '<p><em>', $after_error = '</em></p>', $non_published_msg = '#', $closed_msg = '#' )
 	{
+		global $Plugins;
+
+		$display = ( $before_error !== false );
+
+		// Ask Plugins:
+		if( $plugin_return = $Plugins->trigger_event_first_return( 'ItemCanComment' ) )
+		{
+			$plugin_return = $plugin_return['plugin_return'];
+			if( $plugin_return === true )
+			{
+				return true; // OK, user can comment!
+			}
+
+			if( $display && is_string($plugin_return) )
+			{
+				echo $before_error;
+				echo $plugin_return;
+				echo $after_error;
+
+				return false;
+			}
+
+			return false;
+		}
+
 		if( $this->comment_status == 'disabled'  )
 		{ // Comments are disabled on this post
 			return false;
@@ -723,31 +743,41 @@ class Item extends DataObject
 
 		if( $this->comment_status == 'closed'  )
 		{ // Comments are closed on this post
-			if( $closed_msg == '#' )
-				$closed_msg = T_( 'Comments are closed for this post.' );
 
-			echo $before_error;
-			echo $closed_msg;
-			echo $after_error;
+			if( $display)
+			{
+				if( $closed_msg == '#' )
+					$closed_msg = T_( 'Comments are closed for this post.' );
+
+				echo $before_error;
+				echo $closed_msg;
+				echo $after_error;
+			}
 
 			return false;
 		}
 
 		if( ($this->status == 'draft') || ($this->status == 'deprecated' ) )
 		{ // Post is not published
-			if( $non_published_msg == '#' )
-				$non_published_msg = T_( 'This post is not published. You cannot leave comments.' );
 
-			echo $before_error;
-			echo $non_published_msg;
-			echo $after_error;
+			if( $display )
+			{
+				if( $non_published_msg == '#' )
+					$non_published_msg = T_( 'This post is not published. You cannot leave comments.' );
+
+				echo $before_error;
+				echo $non_published_msg;
+				echo $after_error;
+			}
 
 			return false;
 		}
 
 		$this->get_Blog();
 		if( $this->Blog->allowcomments == 'never')
+		{
 			return false;
+		}
 
 		return true; // OK, user can comment!
 	}
@@ -2595,8 +2625,8 @@ class Item extends DataObject
 
 /*
  * $Log$
- * Revision 1.45  2006/05/24 20:44:58  blueyed
- * Pass "Item" as param to Render* event methods.
+ * Revision 1.46  2006/05/24 20:46:05  blueyed
+ * Forgot to commit changes needed for the "ItemCanComment" event.
  *
  * Revision 1.44  2006/05/19 18:15:05  blueyed
  * Merged from v-1-8 branch
