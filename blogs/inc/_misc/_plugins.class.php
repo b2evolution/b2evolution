@@ -1929,24 +1929,22 @@ class Plugins
 
 
 	/**
-	 * Render the content
+	 * Render the content of an item.
 	 *
-	 * @param string content to render
-	 * @param array renderer codes to use for opt-out, opt-in and lazy.
+	 * @param string content to render (by reference)
+	 * @param array renderer codes to use for opt-out, opt-in and lazy  (by reference)
 	 * @param string Output format, see {@link format_to_output()}
-	 * @param string Type of data to render ('ItemContent').
+	 * @param array Additional params to the Render* methods (e.g. "Item" for items).
+	 *              Do not use "data" or "format" here, because it gets used internally.
 	 * @return string rendered content
 	 */
-	function render( & $content, & $renderers, $format, $type = 'ItemContent' )
+	function render( & $content, & $renderers, $format, $params )
 	{
 		// echo implode(',',$renderers);
 
-		$params = array(
-				'data'   => & $content,
-				'format' => $format
-			);
+		$params['data'] = & $content;
+		$params['format'] = $format;
 
-		// TODO: support $type different than 'ItemContent'
 		if( $format == 'htmlbody' || $format == 'entityencoded' )
 		{
 			$event = 'RenderItemAsHtml';
@@ -2698,6 +2696,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.51  2006/05/24 20:43:19  blueyed
+ * Pass "Item" as param to Render* event methods.
+ *
  * Revision 1.50  2006/05/20 01:56:07  blueyed
  * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
  *

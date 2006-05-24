@@ -104,6 +104,7 @@ elseif( antispam_check( strip_tags($comment) ) )
 	$Messages->add( T_('Supplied comment is invalid'), 'error' );
 }
 
+// Flood protection was here and SHOULD NOT have moved down!
 
 /**
  * Create comment object. Gets validated, before recording it into DB:
@@ -292,6 +293,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.79  2006/05/24 20:43:19  blueyed
+ * Pass "Item" as param to Render* event methods.
+ *
  * Revision 1.78  2006/05/20 01:56:07  blueyed
  * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
  *

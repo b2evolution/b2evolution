@@ -761,6 +761,7 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Item': the {@link Item} object which gets rendered.
 	 * @return boolean Have we changed something?
 	 */
 	function RenderItemAsHtml( & $params )
@@ -787,6 +788,7 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'xml' will arrive here.
+	 *   - 'Item': the {@link Item} object which gets rendered.
 	 * @return boolean Have we changed something?
 	 */
 	function RenderItemAsXml( & $params )
@@ -804,6 +806,7 @@ class Plugin
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}.
 	 *               Only formats other than 'htmlbody', 'entityencoded' and 'xml' will arrive here.
+	 *   - 'Item': the {@link Item} object which gets rendered.
 	 * @return boolean Have we changed something?
 	 */
 	function RenderItem()
@@ -2241,6 +2244,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.51  2006/05/24 20:43:19  blueyed
+ * Pass "Item" as param to Render* event methods.
+ *
  * Revision 1.50  2006/05/22 20:35:37  blueyed
  * Passthrough some attribute of plugin settings, allowing to use JS handlers. Also fixed submitting of disabled form elements.
  *

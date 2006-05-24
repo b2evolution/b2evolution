@@ -86,11 +86,13 @@ class Item extends DataObject
 {
 	/**
 	 * @var User
+	 * @todo Lazy-fill it? (provide getter method)
 	 * @access public
 	 */
 	var $Author;
 	/**
 	 * The assigned {@link User} to the item.
+	 * @todo Lazy-fill it? (provide getter method)
 	 * @var User|NULL
 	 * @access public
 	 */
@@ -884,7 +886,7 @@ class Item extends DataObject
 
 		// Apply rendering
 		$post_renderers = $Plugins->validate_list( $this->get_renderers() );
-		$output = $Plugins->render( $output, $post_renderers, $format );
+		$output = $Plugins->render( $output, $post_renderers, $format, array( 'Item' => $this ) );
 
 		// Trigger Display plugins:
 		$output = $Plugins->get_trigger_event( 'DisplayItemAllFormats', array(
@@ -2593,6 +2595,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2006/05/24 20:44:58  blueyed
+ * Pass "Item" as param to Render* event methods.
+ *
  * Revision 1.44  2006/05/19 18:15:05  blueyed
  * Merged from v-1-8 branch
  *

@@ -396,10 +396,6 @@ class test_plugin extends Plugin
 	 * Note: return value is ignored. You have to change $params['content'].
 	 *
 	 * @see Plugin::RenderItemAsHtml()
-	 * @param array Associative array of parameters
-	 *   - 'data': the data (by reference). You probably want to modify this.
-	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
-	 * @return boolean true if we can render something for the required output format
 	 */
 	function RenderItemAsHtml( & $params )
 	{
@@ -413,10 +409,6 @@ class test_plugin extends Plugin
 	 * Note: return value is ignored. You have to change $params['content'].
 	 *
 	 * @see Plugin::RenderItemAsXml()
-	 * @param array Associative array of parameters
-	 *   - 'data': the data (by reference). You probably want to modify this.
-	 *   - 'format': see {@link format_to_output()}. Only 'xml' will arrive here.
-	 * @return boolean true if we can render something for the required output format
 	 */
 	function RenderItemAsXml( & $params )
 	{
@@ -431,11 +423,6 @@ class test_plugin extends Plugin
 	 * Note: return value is ignored. You have to change $params['content'].
 	 *
 	 * @see Plugin::RenderItem()
-	 * @param array Associative array of parameters
-	 *   - 'data': the data (by reference). You probably want to modify this.
-	 *   - 'format': see {@link format_to_output()}.
-	 *               Only formats other than 'htmlbody', 'entityencoded' and 'xml' will arrive here.
-	 * @return boolean true if we can render something for the required output format
 	 */
 	function RenderItem()
 	{
@@ -554,6 +541,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.40  2006/05/24 20:43:19  blueyed
+ * Pass "Item" as param to Render* event methods.
+ *
  * Revision 1.39  2006/05/22 20:35:37  blueyed
  * Passthrough some attribute of plugin settings, allowing to use JS handlers. Also fixed submitting of disabled form elements.
  *
