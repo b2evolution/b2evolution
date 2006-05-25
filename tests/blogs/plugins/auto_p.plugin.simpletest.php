@@ -9,7 +9,7 @@
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
 
-require_once $plugins_path.'_auto_p.plugin.php';
+require_once $GLOBALS['plugins_path'].'_auto_p.plugin.php';
 
 
 /**
