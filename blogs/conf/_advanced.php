@@ -93,7 +93,7 @@ if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $baseurl, $matches ) )
 }
 else
 {
-	die( 'Your baseurl ('.$baseurl.') set in _config.php seems invalid. You probably missed the "http://" prefix or the trailing slash. Please correct that.' );
+	die( 'Your baseurl ('.$baseurl.') set in _basic_config.php seems invalid. You probably missed the "http://" prefix or the trailing slash. Please correct that.' );
 }
 
 /**
@@ -171,7 +171,7 @@ $EvoConfig->DB['halt_on_error'] = true;
  *
  * (You should not need to change them.
  *  If you want to have multiple b2evo installations in a single database you should
- *  change {@link $tableprefix} in _config.php)
+ *  change {@link $tableprefix} in _basic_config.php)
  */
 $EvoConfig->DB['aliases'] = array(
 		'T_antispam'           => $tableprefix.'antispam',
@@ -386,8 +386,8 @@ $cookie_expired = time() - 86400;
 /*
 	- You should only move these around if you really need to.
 	- You should keep everything as subdirectories of the base folder
-		($baseurl which is set in _config.php, default is the /blogs/ folder)
-	- Remember you can set the baseurl to your website root (-> _config.php).
+		($baseurl which is set in _basic_config.php, default is the /blogs/ folder)
+	- Remember you can set the baseurl to your website root (-> _basic_config.php).
 
 	NOTE: All paths must have a trailing slash!
 

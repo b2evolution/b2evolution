@@ -205,7 +205,7 @@ switch( $action )
 		}
 		else
 		{
-			$conf_filepath = $conf_path.'_config.php';
+			$conf_filepath = $conf_path.'_basic_config.php';
 			// Read original:
 			$conf = implode( '', file( $conf_filepath ) );
 
@@ -259,17 +259,17 @@ switch( $action )
 					</li>
 					<li><strong><?php echo T_('Alternatively, you can update the config file manually:') ?></strong>
 						<ol>
-							<li><?php echo T_('Open the _config.php file locally with a text editor.') ?></li>
+							<li><?php echo T_('Open the _basic_config.php file locally with a text editor.') ?></li>
 							<li><?php echo T_('Delete all contents!') ?></li>
 							<li><?php echo T_('Copy the contents from the box below.') ?></li>
 							<li><?php echo T_('Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later.') ?></li>
-							<li><?php echo T_('Save the new _config.php file locally.') ?></li>
+							<li><?php echo T_('Save the new _basic_config.php file locally.') ?></li>
 							<li><?php echo T_('Upload the file to your server, into the /_conf folder.') ?></li>
 							<li><?php printf( T_('<a %s>Call the installer from scratch</a>.'), 'href="index.php?locale='.$default_locale.'"') ?></li>
 						</ol>
 					</li>
 				</ul>
-				<p><?php echo T_('This is how your _config.php should look like:') ?></p>
+				<p><?php echo T_('This is how your _basic_config.php should look like:') ?></p>
 				<blockquote>
 				<pre><?php
 					echo htmlspecialchars( $conf );
@@ -416,7 +416,7 @@ switch( $action )
 			<h2><?php echo T_('Need to start anew?') ?></h2>
 			<p><?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.');
 			echo '</p>';
-			echo( '<p>To enable it, please go to the /conf/_config.php file and change:</p>
+			echo( '<p>To enable it, please go to the /conf/_basic_config.php file and change:</p>
 <pre>$allow_evodb_reset = 0;</pre>
 to
 <pre>$allow_evodb_reset = 1;</pre>
@@ -537,7 +537,7 @@ to
 		if( $allow_evodb_reset != 1 )
 		{
 			echo '<p>'.T_('For security reasons, the reset feature is disabled by default.' ).'</p>';
-			echo( '<p>To enable it, please go to the /conf/_config.php file and change:</p>
+			echo( '<p>To enable it, please go to the /conf/_basic_config.php file and change:</p>
 <pre>$allow_evodb_reset = 0;</pre>
 to
 <pre>$allow_evodb_reset = 1;</pre>
@@ -600,6 +600,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.101  2006/05/28 22:27:13  blueyed
+ * Basic config file
+ *
  * Revision 1.100  2006/05/19 18:15:06  blueyed
  * Merged from v-1-8 branch
  *
