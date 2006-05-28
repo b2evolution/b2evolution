@@ -10,7 +10,6 @@
 
 
 require_once  dirname(__FILE__).'/_basic_config.php';   // basic settings
-@include_once dirname(__FILE__).'/_config_TEST.php';    // Put testing conf in there (For testing, you can also set $install_password here)
 require_once  dirname(__FILE__).'/_advanced.php';       // advanced settings
 require_once  dirname(__FILE__).'/_locales.php';        // locale settings
 require_once  dirname(__FILE__).'/_formatting.php';     // formatting settings

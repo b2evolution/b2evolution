@@ -14,7 +14,7 @@
  * "unexpected T_STRING" parse errors!
  *
  * Contributors: you should override this file by creating a file named _config_TEST.php
- * (see _config.php in this directory)
+ * (see end of this file).
  *
  * @package conf
  */
@@ -105,11 +105,4 @@ $config_is_done = 0;
 define( 'EVO_CONFIG_LOADED', true );
 
 @include_once dirname(__FILE__).'/_config_TEST.php';    // Put testing conf in there (For testing, you can also set $install_password here)
-require_once  dirname(__FILE__).'/_advanced.php';       // advanced settings
-require_once  dirname(__FILE__).'/_locales.php';        // locale settings
-require_once  dirname(__FILE__).'/_formatting.php';     // formatting settings
-require_once  dirname(__FILE__).'/_admin.php';          // admin settings
-require_once  dirname(__FILE__).'/_stats.php';          // stats/hitlogging settings
-require_once  dirname(__FILE__).'/_application.php';    // application settings
-@include_once dirname(__FILE__).'/_overrides_TEST.php'; // Override for testing in there
 ?>
