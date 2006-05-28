@@ -452,6 +452,8 @@ $locales = array(
  *
  * This is taken from phpMyAdmin (libraries/select_lang.lib.php).
  *
+ * @todo Move to DB class?
+ *
  * @var array
  */
 $mysql_charset_map = array(
