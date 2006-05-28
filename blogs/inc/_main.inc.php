@@ -143,7 +143,7 @@ require_once dirname(__FILE__).'/_vars.inc.php';
 
 if( !$config_is_done )
 { // base config is not done!
-	$error_message = 'Base configuration is not done! (see /conf/_config.php)';
+	$error_message = 'Base configuration is not done! (see /conf/_basic_config.php)';
 }
 elseif( !isset( $locales[$default_locale] ) )
 {
@@ -167,15 +167,9 @@ require_once dirname(__FILE__).'/_misc/_misc.funcs.php';
 
 
 /**
- * Load DB class
+ * Connect to DB
  */
-require_once dirname(__FILE__).'/_misc/_db.class.php';
-/**
- * Database connection (connection opened here)
- *
- * @global DB $DB
- */
-$DB = & new DB( $EvoConfig->DB );
+require_once dirname(__FILE__).'/_connect_db.inc.php';
 
 
 /**
@@ -671,6 +665,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.24  2006/05/28 22:36:47  blueyed
+ * Abstracted DB connect into single file.
+ *
  * Revision 1.23  2006/05/19 17:03:58  blueyed
  * locale activation fix from v-1-8, abstraction of setting DB connection charset
  *
