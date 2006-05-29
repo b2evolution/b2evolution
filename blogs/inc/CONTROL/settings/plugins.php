@@ -1000,6 +1000,7 @@ switch( $action )
 		require_once $inc_path.'_misc/_plugin.funcs.php';
 
 		$Form = & new Form( $pagenow );
+		$Form->global_icon( T_('Close info!'), 'close', regenerate_url() );
 		$Form->begin_form('fform');
 		$Form->hidden( 'ctrl', 'plugins' );
 		$Form->begin_fieldset('Plugin info', array('class' => 'fieldset clear')); // "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509)
