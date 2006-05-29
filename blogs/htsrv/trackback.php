@@ -87,6 +87,8 @@ if( ! $Blog->get('allowtrackbacks') )
 
 if( ! $commented_Item->can_comment( NULL ) )
 {
+	// TODO: we do not get the real error here (from a plugin maybe)!
+	// TODO: Rather use a seperate method can_trackback(), with a different plugin hook!?
 	trackback_response( 1, 'Sorry, this item does not accept trackbacks.' ); // exits
 }
 
@@ -189,6 +191,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.52  2006/05/29 23:57:13  blueyed
+ * todo
+ *
  * Revision 1.51  2006/05/29 22:27:46  blueyed
  * Use NULL instead of false for "no display".
  *
