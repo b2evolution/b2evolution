@@ -86,13 +86,13 @@ class Item extends DataObject
 {
 	/**
 	 * @var User
-	 * @todo Lazy-fill it? (provide getter method)
+	 * @todo Lazy-fill it? (provide getter method) fp: yes
 	 * @access public
 	 */
 	var $Author;
 	/**
 	 * The assigned {@link User} to the item.
-	 * @todo Lazy-fill it? (provide getter method)
+	 * @todo Lazy-fill it? (provide getter method) fp: yes
 	 * @var User|NULL
 	 * @access public
 	 */
@@ -703,6 +703,7 @@ class Item extends DataObject
 	/**
 	 * Template function: Check if user can leave comment on this post or display error
 	 *
+fp>> TODO: use NULL, not false to indicate we want no display.	
 	 * @param string|false string to display before any error message; false to not display anything, but just return boolean
 	 * @param string string to display after any error message
 	 * @param string error message for non published posts, '#' for default
@@ -2625,6 +2626,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.47  2006/05/29 19:28:44  fplanque
+ * no message
+ *
  * Revision 1.46  2006/05/24 20:46:05  blueyed
  * Forgot to commit changes needed for the "ItemCanComment" event.
  *

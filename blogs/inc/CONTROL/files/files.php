@@ -166,6 +166,7 @@ if( $fm_FileRoot )
 
 
 // If there were errors, display them and exit:
+// fp> why do we need this here?
 if( $Messages->count('error') )
 {
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -1494,6 +1495,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.22  2006/05/29 19:30:13  fplanque
+ * no message
+ *
  * Revision 1.21  2006/05/12 21:53:37  blueyed
  * Fixes, cleanup, translation for plugins
  *

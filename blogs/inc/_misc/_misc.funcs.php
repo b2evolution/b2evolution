@@ -1429,7 +1429,7 @@ function validate_url( $url, & $allowed_uri_scheme )
 		(\w+(:\w+)?@)?                   # username or username and password (optional)
 		[a-z0-9]([a-z0-9.\-])*           # Don t allow anything too funky like entities
 		(:[0-9]+)?                       # optional port specification
-		(/|$)~ix', $url, $matches) )     # match either '/' or end of string
+		~ix', $url, $matches) )
 	{ // Cannot validate URL structure
 		$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
 		return T_('Invalid URL');
@@ -2025,7 +2025,7 @@ function send_mail( $to, $subject, $message, $from = NULL, $headers = array() )
 
 	if( $debug > 1 )
 	{	// We agree to die for debugging...
-		if( ! @mail( $to, $subject, $message, $headerstring ) )
+		if( ! mail( $to, $subject, $message, $headerstring ) )
 		{
 			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
 		}
@@ -2896,6 +2896,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.56  2006/05/29 19:28:44  fplanque
+ * no message
+ *
  * Revision 1.55  2006/05/19 18:15:05  blueyed
  * Merged from v-1-8 branch
  *

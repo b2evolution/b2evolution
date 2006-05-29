@@ -82,7 +82,7 @@ require_once $model_path.'settings/_locale.funcs.php';
  * Flag source: http://www.crwflags.com/fotw/flags/iso3166.html
  * IMPORTANT: Try to keep the locale names short, they take away valuable space on the screen!
  *
- * Keys:
+ * Keys:  (fp>> what the hell is that??)
  *  - 'set_locales':
  *    This gets used for {@link setlocale()} (currently only when using gettext support [$use_l10n=1]).
  *    This is a list of locales that get tried. One of them must be available on the system ("locale -a").
@@ -452,7 +452,7 @@ $locales = array(
  *
  * This is taken from phpMyAdmin (libraries/select_lang.lib.php).
  *
- * @todo Move to DB class?
+ * @todo Move to DB class? (fp: makes sense)
  *
  * @var array
  */
