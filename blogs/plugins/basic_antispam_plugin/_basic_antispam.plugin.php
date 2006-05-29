@@ -125,6 +125,8 @@ class basic_antispam_plugin extends Plugin
 
 	/**
 	 * Handle max_number_of_links_feedback setting.
+	 *
+	 * Try to detect as many links as possible
 	 */
 	function GetSpamKarmaForComment( & $params )
 	{
@@ -523,6 +525,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.12  2006/05/29 21:13:19  fplanque
+ * no message
+ *
  * Revision 1.11  2006/05/29 21:03:07  fplanque
  * Also count links if < tags have been filtered before!
  *

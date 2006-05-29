@@ -293,14 +293,14 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.80  2006/05/29 21:13:18  fplanque
+ * no message
+ *
  * Revision 1.79  2006/05/24 20:43:19  blueyed
  * Pass "Item" as param to Render* event methods.
  *
  * Revision 1.78  2006/05/20 01:56:07  blueyed
  * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
- *
- * Revision 1.77  2006/05/19 18:15:04  blueyed
- * Merged from v-1-8 branch
  *
  * Revision 1.76.2.1  2006/05/19 15:06:23  fplanque
  * dirty sync
