@@ -703,8 +703,7 @@ class Item extends DataObject
 	/**
 	 * Template function: Check if user can leave comment on this post or display error
 	 *
-fp>> TODO: use NULL, not false to indicate we want no display.	
-	 * @param string|false string to display before any error message; false to not display anything, but just return boolean
+	 * @param string|NULL string to display before any error message; NULL to not display anything, but just return boolean
 	 * @param string string to display after any error message
 	 * @param string error message for non published posts, '#' for default
 	 * @param string error message for closed comments posts, '#' for default
@@ -714,7 +713,7 @@ fp>> TODO: use NULL, not false to indicate we want no display.
 	{
 		global $Plugins;
 
-		$display = ( $before_error !== false );
+		$display = ( isset($before_error) );
 
 		// Ask Plugins:
 		if( $plugin_return = $Plugins->trigger_event_first_return( 'ItemCanComment' ) )
@@ -2626,6 +2625,9 @@ fp>> TODO: use NULL, not false to indicate we want no display.
 
 /*
  * $Log$
+ * Revision 1.48  2006/05/29 22:27:46  blueyed
+ * Use NULL instead of false for "no display".
+ *
  * Revision 1.47  2006/05/29 19:28:44  fplanque
  * no message
  *

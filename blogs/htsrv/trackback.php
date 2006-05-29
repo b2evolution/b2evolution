@@ -85,7 +85,7 @@ if( ! $Blog->get('allowtrackbacks') )
 	trackback_response( 1, 'Sorry, this weblog does not allow you to trackback its posts.' ); // exits
 }
 
-if( ! $commented_Item->can_comment( false ) )
+if( ! $commented_Item->can_comment( NULL ) )
 {
 	trackback_response( 1, 'Sorry, this item does not accept trackbacks.' ); // exits
 }
@@ -189,6 +189,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.51  2006/05/29 22:27:46  blueyed
+ * Use NULL instead of false for "no display".
+ *
  * Revision 1.50  2006/05/29 19:54:45  fplanque
  * no message
  *

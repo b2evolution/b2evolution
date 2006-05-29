@@ -41,7 +41,7 @@ param( 'comment_post_ID', 'integer', true ); // required
 
 $commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
 
-if( ! $commented_Item->can_comment( false ) )
+if( ! $commented_Item->can_comment( NULL ) )
 {
 	$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
 }
@@ -293,6 +293,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.81  2006/05/29 22:27:46  blueyed
+ * Use NULL instead of false for "no display".
+ *
  * Revision 1.80  2006/05/29 21:13:18  fplanque
  * no message
  *
