@@ -1297,7 +1297,7 @@ class Item extends DataObject
 					return false;
 				if( $hideifnone == '#' )
 				{
-					if( $this->can_comment( '', '', '', '' ) )
+					if( $this->can_comment( NULL ) ) // NULL, because we do not want to display errors here!
 						$hideifnone = false;
 					else
 						$hideifnone = true;
@@ -2625,6 +2625,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.49  2006/05/29 23:40:34  blueyed
+ * Do not display errors with "comment" feedback link.
+ *
  * Revision 1.48  2006/05/29 22:27:46  blueyed
  * Use NULL instead of false for "no display".
  *
