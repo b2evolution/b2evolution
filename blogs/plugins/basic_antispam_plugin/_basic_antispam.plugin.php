@@ -68,6 +68,7 @@ class basic_antispam_plugin extends Plugin
 	function GetDefaultSettings()
 	{
 		return array(
+			// fp>> negations are harder to understand, "Allow anonymous feedback" would be better!
 				'disable_feedback_anon' => array(
 					'type' => 'checkbox',
 					'label' => T_('Disable anonymous feedback'),
@@ -76,15 +77,23 @@ class basic_antispam_plugin extends Plugin
 				),
 				'check_dupes' => array(
 					'type' => 'checkbox',
-					'label' => T_('Check for duplicate feedback'),
+					'label' => T_('Detect feedback duplicates'),
 					'note' => T_('Check this to check comments and trackback for duplicate content.'),
 					'defaultvalue' => '1',
+				),
+				'max_number_of_links_feedback' => array(
+					'type' => 'integer',
+					'label' => T_('Feedback sensitivity to links'),
+					'note' => T_('If a comment has more than this number of links in it, it will get 100% spam karma. -1 to disable it.'),
+					'help' => '#set_max_number_of_links',
+					'defaultvalue' => '4',
+					'size' => 3,
 				),
 				'nofollow_for_hours' => array(
 					'type' => 'integer',
 					'label' => T_('Apply rel="nofollow"'),
 					'note'=>T_('hours. For how long should rel="nofollow" be applied to comment links? (0 means never, -1 means always)'),
-					'defaultvalue' => '48', // use "nofollow" for 2 days
+					'defaultvalue' => '-1', // use "nofollow" infinitely by default so lazy admins won't promote spam
 					'size' => 5,
 				),
 				'block_spam_referers' => array(
@@ -93,16 +102,6 @@ class basic_antispam_plugin extends Plugin
 					'note' => T_('If a referrer has been detected as spam, should we block the request with a "403 Forbidden" page?'),
 					'defaultvalue' => '1',
 				),
-
-				array( 'layout' => 'begin_fieldset', 'label' => T_('Links') ),
-					'max_number_of_links_feedback' => array(
-						'type' => 'integer',
-						'label' => T_('Number of links'),
-						'note' => T_('If a comment has more than this number of links in it, it will get 100% spam karma. -1 to disable it.'),
-						'help' => '#set_max_number_of_links',
-						'defaultvalue' => '2',
-						'size' => 3,
-					),
 				array( 'layout' => 'end_fieldset' ),
 
 			);
@@ -132,7 +131,7 @@ class basic_antispam_plugin extends Plugin
 		$max_comments = $this->Settings->get('max_number_of_links_feedback');
 		if( $max_comments != -1 )
 		{ // not deactivated:
-			$count = preg_match_all( '~<a\s*[^>]href\s*=~i', $params['Comment']->content, $matches );
+			$count = preg_match_all( '~(https?|ftp)://~i', $params['Comment']->content, $matches );
 
 			if( $count > $max_comments )
 			{
@@ -524,6 +523,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.11  2006/05/29 21:03:07  fplanque
+ * Also count links if < tags have been filtered before!
+ *
  * Revision 1.10  2006/05/20 01:56:07  blueyed
  * ItemCanComment hook; "disable anonymous feedback" through basic antispam plugin
  *
