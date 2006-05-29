@@ -124,7 +124,7 @@ if( empty($disp) )
 
 if( $disp == 'stats' )
 {
-	require $view_path.'errors/_410_stats_gone.page.php'; // error (& exit, if return not uncommented there)
+	require $view_path.'errors/_410_stats_gone.page.php'; // error & exit
 }
 
 // Getting current blog info:
@@ -141,6 +141,9 @@ blueyed> Sure, but that means we should either split it, or use the locale here 
 // Activate matching locale:
 $Debuglog->add( 'Activating blog locale: '.$Blog->get('locale'), 'locale' );
 locale_activate( $Blog->get('locale') );
+
+
+// TODO: factorize the code below with the one in main.inc
 
 // Check and possibly adjust $evo_charset:
 // NOTE: this is quite the same as with _main.inc.php, because of the (overriding) blog's locale above
@@ -501,6 +504,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.23  2006/05/29 19:54:45  fplanque
+ * no message
+ *
  * Revision 1.22  2006/05/19 17:03:58  blueyed
  * locale activation fix from v-1-8, abstraction of setting DB connection charset
  *

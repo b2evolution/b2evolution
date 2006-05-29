@@ -64,7 +64,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 
 <div class="NavBar">
 <div class="pageTitle">
-<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php echo T_('Summary Demo') ?><!-- InstanceEndEditable --></h1>
+<h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php echo T_('Summary demo') ?><!-- InstanceEndEditable --></h1>
 </div>
 </div>
 

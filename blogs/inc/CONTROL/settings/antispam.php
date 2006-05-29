@@ -7,7 +7,6 @@
  *
  * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
- * Parts of this file are copyright (c)2005 by Halton STEWART - {@link http://hstewart.net/}.
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in

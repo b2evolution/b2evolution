@@ -144,6 +144,7 @@ class Session
 					{ // Some session data has been previsouly stored:
 
 						// Unserialize session data (using an own callback that should provide class definitions):
+						// fp> TODO: that function should probably be over here; plus we'll have a php 4 class loader anyway 
 						$old_callback = ini_get( 'unserialize_callback_func' );
 						ini_set( 'unserialize_callback_func', 'unserialize_callback' );
 						$this->_data = @unserialize($row->sess_data);
@@ -334,6 +335,7 @@ class Session
 		{	// There is something to update:
 			$this->_data[$param] = array( ( $expire ? ($localtimenow + $expire) : NULL ), $value );
 
+			// fp> TODO: This is dirty! The session class should not CARE about preview comments. This should be set by the Preview caller!
 			if( in_array( $param, array( 'Messages', 'core.preview_Comment' ) ) )
 			{ // also set boolean to not call CachePageContent plugin event on next request:
 				$this->set( 'core.no_CachePageContent', 1 );
@@ -432,6 +434,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.12  2006/05/29 19:54:45  fplanque
+ * no message
+ *
  * Revision 1.11  2006/05/12 21:53:37  blueyed
  * Fixes, cleanup, translation for plugins
  *

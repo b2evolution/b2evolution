@@ -105,8 +105,8 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Insert in DB:
 			$edited_Filetype->dbinsert();
-			$Messages->add( T_('New file type has been created.'), 'success' );
-
+			$Messages->add( T_('New file type created.'), 'success' );
+			
 			// What next?
 			param( 'submit', 'string', true );
 			if( $submit == T_('Record, then Create Similar') ) // TODO: do not use submit value for this!
