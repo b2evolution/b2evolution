@@ -31,6 +31,8 @@ class AutoPPluginTestCase extends UnitTestCase
 
 		$GLOBALS['DB'] = new MockDB( $this );
 
+		$real_Plugin = new auto_p_plugin();
+
 		// Fake DB entry:
 		$this->Plugins->index_ID_rows[1] = array(
 			'plug_ID' => 1,
@@ -39,7 +41,7 @@ class AutoPPluginTestCase extends UnitTestCase
 			'plug_code' => 'fake',
 			'plug_apply_rendering' => 'always',
 			'plug_status' => 'enabled',
-			'plug_version' => '0' /* TODO: should be the same as from classfile */ );
+			'plug_version' => $real_Plugin->version );
 		$this->Plugins->register( 'auto_p_plugin', /* fake DB entry: */ 1 );
 		$this->Plugin = & $this->Plugins->get_next();
 	}
