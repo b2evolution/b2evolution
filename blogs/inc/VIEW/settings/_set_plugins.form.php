@@ -204,7 +204,7 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 		?>
 		<tr class="<?php echo (($count++ % 2) ? 'odd' : 'even') ?>">
 			<td class="firstcol">
-				<strong><?php $loop_Plugin->name(); ?></strong>
+				<strong><a title="<?php echo T_('Display info') ?>" href="<?php echo regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID ) ?>"><?php $loop_Plugin->name(); ?></a></strong>
 			</td>
 			<td>
 				<?php
@@ -236,12 +236,10 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 				{
 					$help_icons[] = $help_external;
 				}
-				/* broken:
 				if( $help_internal = $loop_Plugin->get_README_link() )
 				{
 					$help_icons[] = $help_internal;
 				}
-				*/
 				if( ! empty($help_icons) )
 				{
 					echo ' '.implode( ' ', $help_icons );
@@ -281,6 +279,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.20  2006/05/30 23:14:54  blueyed
+ * Re-enabled internal help, because it has been fixed; link name of available Plugins also to "info" action, because easier to click
+ *
  * Revision 1.19  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *
