@@ -91,7 +91,8 @@ switch($action)
 
 		$AdminUI->title = T_('Editing comment').' #'.$edited_Comment->ID;
 
-		$blog = $edited_Comment->Item->blog_ID;
+		$edited_Comment_Item = & $edited_Comment->get_Item();
+		$blog = $edited_Comment_Item->blog_ID;
 		$Blog = Blog_get_by_ID( $blog );
 
 		// Check permission:

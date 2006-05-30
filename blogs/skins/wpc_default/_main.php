@@ -82,6 +82,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	{
 		$MainList->date_if_changed();
+		// Load Item's creator User:
+		$Item->get_creator_User();
 	?>
 
 <div class="post" lang="<?php $Item->lang() ?>">
@@ -90,7 +92,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 			$Item->anchor(); // Anchor for permalinks to refer to
 		?>
 	 <h3 class="storytitle"><?php $Item->permanent_link( '#title#' ) ?></h3>
-	<div class="meta"><?php echo T_('Filed under:'); ?> <?php $Item->categories(); ?> &#8212; <?php $Item->Author->preferred_name() ?> @ <?php $Item->issue_time() ?>
+	<div class="meta"><?php echo T_('Filed under:'); ?> <?php $Item->categories(); ?> &#8212; <?php $Item->creator_User->preferred_name() ?> @ <?php $Item->issue_time() ?>
 		<?php $Item->edit_link( '', '', T_('Edit This') ) // Link to backoffice for editing ?>
 	</div>
 

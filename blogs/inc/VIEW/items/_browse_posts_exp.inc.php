@@ -72,6 +72,8 @@ while( $Item = & $ItemList->get_item() )
 	<div class="bPost bPost<?php $Item->status( 'raw' ) ?>" lang="<?php $Item->lang() ?>">
 		<?php
 		// We don't switch locales in the backoffice, since we use the user pref anyway
+		// Load item's creator user:
+		$Item->get_creator_User();
 		$Item->anchor(); ?>
 		<div class="bSmallHead">
 			<?php
@@ -86,11 +88,11 @@ while( $Item = & $ItemList->get_item() )
 				echo '</span>';
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' <acronym title="';
-				$Item->Author->login();
+				$Item->creator_User->login();
 				echo ', '.T_('level:');
-				$Item->Author->level();
+				$Item->creator_User->level();
 				echo '"><span class="bAuthor">';
-				$Item->Author->preferred_name();
+				$Item->creator_User->preferred_name();
 				echo '</span></acronym>';
 
 				echo '<div class="bSmallHeadRight">';
@@ -255,6 +257,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.13  2006/05/30 20:32:57  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.12  2006/04/24 20:36:45  fplanque
  * fixes
  *

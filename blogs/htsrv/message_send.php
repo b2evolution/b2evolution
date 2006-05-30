@@ -134,13 +134,13 @@ elseif( ! empty( $comment_id ) )
 		  WHERE comment_ID = '.$comment_id, ARRAY_A );
 	$Comment = & new Comment( $row );
 
-	if( isset($Comment->author_User) )
+	if( $comment_author_User = & $Comment->get_author_User() )
 	{ // Comment is from a registered user:
-		if( ! $Comment->author_User->allow_msgform )
+		if( ! $comment_author_User->allow_msgform )
 		{ // should be prevented by UI
 			debug_die( 'Invalid recipient!' );
 		}
-		$recipient_User = & $Comment->author_User;
+		$recipient_User = & $comment_author_User;
 	}
 	elseif( empty($Comment->allow_msgform) )
 	{ // should be prevented by UI
@@ -235,8 +235,8 @@ header_redirect(); // exits!
 
 /*
  * $Log$
- * Revision 1.32  2006/05/30 20:07:42  blueyed
- * Fix recipient address
+ * Revision 1.33  2006/05/30 20:32:56  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
  *
  * Revision 1.31  2006/05/04 14:28:15  blueyed
  * Fix/enhanced

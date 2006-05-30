@@ -68,8 +68,11 @@ while( $Comment = & $CommentList->get_next() )
 		</div>
 		<div class="bCommentContent">
 		<div class="bTitle">
-			<?php echo T_('In response to:').' <a href=?ctrl=browse&amp;blog='.$Blog->ID.'&amp;tab=posts&amp;p='.$Comment->Item->ID
-			           .'&amp;c=1&amp;tb=1&amp;pb=1" class="" title="'.T_('Edit this task...').'">'.$Comment->Item->dget('title').'</a>';
+			<?php
+			$comment_Item = & $Comment->get_Item();
+			echo T_('In response to:')
+				.' <a href=?ctrl=browse&amp;blog='.$Blog->ID.'&amp;tab=posts&amp;p='.$comment_Item->ID
+				.'&amp;c=1&amp;tb=1&amp;pb=1" class="" title="'.T_('Edit this task...').'">'.$comment_Item->dget('title').'</a>';
 			?>
 		</div>
 		<div class="bCommentTitle">
@@ -120,6 +123,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.7  2006/05/30 20:32:57  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.6  2006/04/27 20:10:34  fplanque
  * changed banning of domains. Suggest a prefix by default.
  *

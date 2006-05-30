@@ -48,7 +48,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		<legend><?php echo T_('Comment contents') ?></legend>
 
 		<?php
-		if( $edited_Comment->author_User === NULL )
+		if( ! $edited_Comment->get_author_User() )
 		{ // This is not a member comment
 			$Form->text( 'newcomment_author', $edited_Comment->author, 20, T_('Name'), '', 100 );
 			$Form->text( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), '', 100 );
@@ -191,6 +191,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.9  2006/05/30 20:32:57  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.8  2006/04/19 22:08:56  blueyed
  * Fixed spam_karma
  *

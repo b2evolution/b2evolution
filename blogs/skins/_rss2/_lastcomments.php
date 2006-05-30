@@ -41,7 +41,10 @@ $CommentList = & new CommentList( $blog, "'comment'", array('published'), '',	''
 		<admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $app_version ?>"/>
 		<ttl>60</ttl>
 		<?php while( $Comment = & $CommentList->get_next() )
-		{ // Loop through comments: ?>
+		{ // Loop through comments:
+			// Load comment's Item:
+			$Comment->get_Item();
+			?>
 		<item>
 			<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
 			<pubDate><?php $Comment->time( 'r', true ); ?></pubDate>

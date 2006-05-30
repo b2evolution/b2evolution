@@ -51,7 +51,10 @@ $CommentList = & new CommentList( $blog, "'comment'", array('published'), '',	''
 <?php
 $CommentList->restart();
 while( $Comment = & $CommentList->get_next() )
-{ // Loop through comments: ?>
+{ // Loop through comments:
+	// Load comment's Item:
+	$Comment->get_Item();
+	?>
 <item rdf:about="<?php $Comment->permanent_url() ?>">
 	<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
 	<link><?php $Comment->permanent_url() ?></link>

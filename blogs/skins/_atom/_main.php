@@ -55,13 +55,19 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			<subtitle><?php $Blog->disp( 'shortdesc', 'xml' ) ?></subtitle>
 			<generator uri="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
 			<updated><?php $MainList->mod_date( 'isoZ', true ) ?></updated>
-			<?php while( $Item = $MainList->get_item() ) {	?>
+			<?php
+			while( $Item = $MainList->get_item() )
+			{
+				// Load Item's creator User:
+				$Item->get_creator_User();
+				?>
+
 			<entry>
 				<title type="text"><?php $Item->title( '', '', false, 'xml' ) ?></title>
 				<link rel="alternate" type="text/html" href="<?php $Item->permanent_url( 'single' ) ?>" />
 				<author>
-					<name><?php $Item->Author->preferred_name( 'xml' ) ?></name>
-					<?php $Item->Author->url( '<uri>', "</uri>\n", 'xml' ) ?>
+					<name><?php $Item->creator_User->preferred_name( 'xml' ) ?></name>
+					<?php $Item->creator_User->url( '<uri>', "</uri>\n", 'xml' ) ?>
 				</author>
 				<id><?php $Item->permanent_url( 'single' ) ?></id>
 				<published><?php $Item->issue_date( 'isoZ', true ) ?></published>
@@ -71,7 +77,9 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 					$Item->content()
 				?>]]></content>
 			</entry>
-			<?php }
+
+			<?php
+			}
 	}
 	?>
 </feed>

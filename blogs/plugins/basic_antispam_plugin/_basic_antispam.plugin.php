@@ -509,11 +509,11 @@ class basic_antispam_plugin extends Plugin
 		$sql = '
 				SELECT comment_ID
 				  FROM T_comments
-				 WHERE comment_post_ID = '.$Comment->Item->ID;
+				 WHERE comment_post_ID = '.$Comment->item_ID;
 
-		if( isset($Comment->author_User) )
+		if( isset($Comment->author_user_ID) )
 		{ // registered user:
-			$sql .= ' AND comment_author_ID = '.$Comment->author_User->ID;
+			$sql .= ' AND comment_author_ID = '.$Comment->author_user_ID;
 		}
 		else
 		{ // visitor (also trackback):
@@ -547,6 +547,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.15  2006/05/30 20:32:57  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.14  2006/05/30 19:39:56  fplanque
  * plugin cleanup
  *

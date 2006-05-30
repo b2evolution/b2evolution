@@ -119,7 +119,8 @@ while( $Item = $MainList->get_item() )
 	echo "</span></td>\n";
 
 	echo '<td>';
-	$Item->Author->preferred_name();
+	$Item->get_creator_User();
+	$Item->creator_User->preferred_name();
 	echo "</td>\n";
 
 	echo '<td class="shrinkwrap">';
@@ -209,6 +210,9 @@ if( $MainList->get_total_num_posts() )
 <?php
 /*
  * $Log$
+ * Revision 1.9  2006/05/30 20:32:57  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.8  2006/04/14 19:21:55  fplanque
  * icon cleanup + fixes
  *

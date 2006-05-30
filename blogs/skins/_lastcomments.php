@@ -26,9 +26,12 @@ $CommentList = & new CommentList( $blog, "'comment','trackback','pingback'", arr
 $CommentList->display_if_empty( '<div class="bComment"><p>'.T_('No comment yet...').'</p></div>' );
 
 while( $Comment = & $CommentList->get_next() )
-{	// Loop through comments:	?>
+{ // Loop through comments:
+	// Load comment's Item object:
+	$Comment->get_Item();
+	?>
 	<!-- ========== START of a COMMENT ========== -->
-	<a name="c<?php $Comment->ID() ?>"></a>
+	<?php $Comment->anchor() ?>
 	<div class="bComment">
 		<h3 class="bTitle">
 			<?php echo T_('In response to:') ?>
@@ -55,6 +58,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.26  2006/05/30 20:32:57  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.25  2006/04/19 13:05:22  fplanque
  * minor
  *

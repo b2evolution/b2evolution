@@ -773,7 +773,7 @@ class ItemList extends DataObjectList
 		// echo 'starting ',$current_Item->title;
 		$postdata = array (
 				'ID'         => $this->last_Item->ID,
-				'Author_ID'  => $this->last_Item->Author->ID,
+				'Author_ID'  => $this->last_Item->creator_user_ID,
 				'Date'       => $this->last_Item->issue_date,
 				'Status'     => $this->last_Item->status,
 				'Content'    => $this->last_Item->content,
@@ -863,6 +863,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.9  2006/05/30 20:32:57  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.8  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

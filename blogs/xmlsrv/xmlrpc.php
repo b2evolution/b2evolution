@@ -983,11 +983,13 @@ function bloggergetrecentposts( $m )
 		$content .= '<category>'.$Item->main_cat_ID.'</category>';
 		$content .= $Item->content;
 
-		$authorname = $Item->Author->get('preferredname');
+		// Load Item's creator User:
+		$Item->get_creator_User();
+		$authorname = $Item->creator_User->get('preferredname');
 
 		$data[] = new xmlrpcval(array(
 									"authorName" => new xmlrpcval($authorname),
-									"userid" => new xmlrpcval($Item->Author->ID),
+									"userid" => new xmlrpcval($Item->creator_user_ID),
 									"dateCreated" => new xmlrpcval($post_date,"dateTime.iso8601"),
 									"content" => new xmlrpcval($content),
 									"postid" => new xmlrpcval($Item->ID)
@@ -2192,8 +2194,10 @@ function metawebloggetrecentposts( $m )
 		$post_date = mysql2date("U", $Item->issue_date);
 		$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
 		$content = $Item->content;
-        $content = str_replace("\n",'',$content); // Tor - kludge to fix bug in xmlrpc libraries
-		$authorname = $Item->Author->get('preferredname');
+		$content = str_replace("\n",'',$content); // Tor - kludge to fix bug in xmlrpc libraries
+		// Load Item's creator User:
+		$Item->get_creator_User();
+		$authorname = $Item->creator_User->get('preferredname');
 		// need a loop here to extract all categoy names
 		// $extra_cat_IDs is the variable for the rest of the IDs
 		$hope_cat_name = get_the_category_by_ID($Item->main_cat_ID);
@@ -2202,7 +2206,7 @@ function metawebloggetrecentposts( $m )
 		xmlrpc_debugmsg( 'test:'.$test);
 		$data[] = new xmlrpcval(array(
 									"dateCreated" => new xmlrpcval($post_date,"dateTime.iso8601"),
-									"userid" => new xmlrpcval($Item->Author->ID),
+									"userid" => new xmlrpcval($Item->creator_user_ID),
 									"postid" => new xmlrpcval($Item->ID),
 				"categories" => new xmlrpcval(array(new xmlrpcval($hope_cat_name["cat_name"])),'array'),
 				"title" => new xmlrpcval($Item->title),
@@ -2492,6 +2496,9 @@ $s = new xmlrpc_server(
 
 /*
  * $Log$
+ * Revision 1.94  2006/05/30 20:32:57  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.93  2006/03/24 01:04:33  blueyed
  * Fix for mt.getCategoryList? At least E_NOTICE fixed.
  *

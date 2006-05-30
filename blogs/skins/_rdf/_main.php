@@ -61,12 +61,16 @@ switch( $disp )
 		<?php
 		$MainList->restart();
 		while( $Item = $MainList->get_item() )
-		{ ?>
+		{
+			// Load Item's creator User:
+			$Item->get_creator_User();
+			?>
+
 		<item rdf:about="<?php $Item->permanent_url( 'single' ) ?>">
 			<title><?php $Item->title( '', '', false, 'xml' ) ?></title>
 			<link><?php $Item->permanent_url( 'single' ) ?></link>
 			<dc:date><?php $Item->issue_date( 'isoZ', true ) ?></dc:date>
-			<dc:creator><?php $Item->Author->preferred_name( 'xml' ) ?></dc:creator>
+			<dc:creator><?php $Item->creator_User->preferred_name( 'xml' ) ?></dc:creator>
 			<dc:subject><?php $Item->main_category( 'xml' ) ?></dc:subject>
 			<description><?php
 				$Item->url_link( '', ' ', '%s', array(), 'xml' );
@@ -77,7 +81,9 @@ switch( $disp )
 				$Item->content()
 			?>]]></content:encoded>
 		</item>
-		<?php }
+
+		<?php
+		}
 }
 ?>
 </rdf:RDF>

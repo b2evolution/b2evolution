@@ -39,13 +39,29 @@ require_once dirname(__FILE__).'/../dataobjects/_dataobject.class.php';
 class Comment extends DataObject
 {
 	/**
-	 * @var Item The item (parent) of this Comment
+	 * The item (parent) of this Comment (lazy-filled).
+	 * @see Comment::get_Item()
+	 * @see Comment::set_Item()
+	 * @access protected
+	 * @var Item
 	 */
 	var $Item;
 	/**
-	 * @var User The comment's user, this is NULL for (anonymous) visitors
+	 * @var integer The ID of the comment's Item.
+	 */
+	var $item_ID;
+	/**
+	 * The comment's user, this is NULL for (anonymous) visitors (lazy-filled).
+	 * @see Comment::get_author_User()
+	 * @see Comment::set_author_User()
+	 * @access protected
+	 * @var User
 	 */
 	var $author_User;
+	/**
+	 * @var integer|NULL The ID of the author's user. NULL for anonymous visitors.
+	 */
+	var $author_ID;
 	/**
 	 * @var string Comment type: 'comment', 'linkback', 'trackback' or 'pingback'
 	 */
@@ -105,17 +121,11 @@ class Comment extends DataObject
 		else
 		{
 			$this->ID = $db_row['comment_ID'];
-
-			// Get parent Item
-			$this->Item = & $ItemCache->get_by_ID(  $db_row['comment_post_ID'] );
-
-			// Get Author User
-			$author_ID = $db_row['comment_author_ID'];
-			if( !empty($author_ID) )
+			$this->item_ID = $db_row['comment_post_ID'];
+			if( ! empty($db_row['comment_author_ID']) )
 			{
-				$this->author_User = & $UserCache->get_by_ID( $author_ID ); // NO COPY...(?)
+				$this->author_user_ID = $db_row['comment_author_ID'];
 			}
-
 			$this->type = $db_row['comment_type'];
 			$this->status = $db_row['comment_status'];
 			$this->author = $db_row['comment_author'];
@@ -129,6 +139,41 @@ class Comment extends DataObject
 			$this->spam_karma = $db_row['comment_spam_karma'];
 			$this->allow_msgform = $db_row['comment_allow_msgform'];
 		}
+	}
+
+
+	/**
+	 * Get the author User of the comment. This is NULL for anonymous visitors.
+	 *
+	 * @return User
+	 */
+	function & get_author_User()
+	{
+		if( isset($this->author_user_ID) && ! isset($this->author_User) )
+		{
+			global $UserCache;
+			$this->author_User = & $UserCache->get_by_ID( $this->author_user_ID );
+		}
+
+		return $this->author_User;
+	}
+
+
+	/**
+	 * Get the Item this comment relates to
+	 *
+	 * @return Item
+	 */
+	function & get_Item()
+	{
+		if( ! isset($this->Item) )
+		{
+			global $ItemCache;
+
+			$this->Item = & $ItemCache->get_by_ID( $this->item_ID );
+		}
+
+		return $this->Item;
 	}
 
 
@@ -172,10 +217,12 @@ class Comment extends DataObject
 
 	/**
 	 * Set Item this comment relates to
+	 * @param Item
 	 */
 	function set_Item( & $Item )
 	{
 		$this->Item = & $Item;
+		$this->item_ID = $Item->ID;
 		parent::set_param( 'post_ID', 'number', $Item->ID );
 	}
 
@@ -228,7 +275,7 @@ class Comment extends DataObject
 	 */
 	function get_author_name()
 	{
-		if( isset($this->author_User) )
+		if( $this->get_author_User() )
 		{
 			return $this->author_User->preferred_name( 'raw', false );
 		}
@@ -246,7 +293,7 @@ class Comment extends DataObject
 	 */
 	function get_author_email()
 	{
-		if( $this->author_User !== NULL )
+		if( $this->get_author_User() )
 		{ // Author is a user
 			return $this->author_User->get('email');
 		}
@@ -264,7 +311,7 @@ class Comment extends DataObject
 	 */
 	function get_author_url()
 	{
-		if( $this->author_User !== NULL )
+		if( $this->get_author_User() )
 		{ // Author is a user
 			return $this->author_User->get('url');
 		}
@@ -292,7 +339,7 @@ class Comment extends DataObject
 
 		$r = '';
 
-		if( $this->author_User !== NULL )
+		if( $this->get_author_User() )
 		{ // Author is a user
 			if( strlen( $this->author_User->url ) <= 10 ) $makelink = false;
 			if( $after_user == '#' ) $after_user = ' ['.T_('Member').']';
@@ -441,6 +488,8 @@ class Comment extends DataObject
 
 		if( ! is_logged_in() ) return false;
 
+		$this->get_Item();
+
 		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
 		{ // If User has no permission to edit comments:
 			return false;
@@ -475,6 +524,8 @@ class Comment extends DataObject
 		global $current_User, $admin_url;
 
 		if( ! is_logged_in() ) return false;
+
+		$this->get_Item();
 
 		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
 		{ // If User has permission to edit comments:
@@ -537,6 +588,8 @@ class Comment extends DataObject
 
 		if( ! is_logged_in() ) return false;
 
+		$this->get_Item();
+
 		if( ($this->status == 'deprecated') // Already deprecateded!
 			|| ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
 		{ // If User has permission to edit comments:
@@ -598,6 +651,8 @@ class Comment extends DataObject
 
 		if( ! is_logged_in() ) return false;
 
+		$this->get_Item();
+
 		if( ($this->status == 'published') // Already published!
 			|| ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
 		{ // If User has permission to edit comments:
@@ -654,7 +709,7 @@ class Comment extends DataObject
 	 */
 	function msgform_link( $form_url, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
-		if( $this->author_User !== NULL )
+		if( $this->get_author_User() )
 		{ // This comment is from a registered user:
 			if( empty($this->author_User->email) )
 			{ // We have no email for this Author :(
@@ -678,7 +733,7 @@ class Comment extends DataObject
 			}
 		}
 
-		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID.'&amp;post_id='.$this->Item->ID.'&amp;redirect_to='.rawurlencode(regenerate_url()) );
+		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID.'&amp;post_id='.$this->item_ID.'&amp;redirect_to='.rawurlencode(regenerate_url()) );
 
 		if( $title == '#' ) $title = T_('Send email to comment author');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
@@ -716,6 +771,7 @@ class Comment extends DataObject
 				$mode = 'pid';
 		}
 
+		$this->get_Item();
 		$post_permalink = $this->Item->get_permanent_url( $mode, $blogurl );
 		return $post_permalink.'#'.$this->get_anchor();
 	}
@@ -892,6 +948,8 @@ class Comment extends DataObject
 	{
 		global $DB, $admin_url, $debug, $Debuglog;
 
+		$this->get_Item();
+
 		// Get list of users who want to be notfied:
 		// TODO: also use extra cats/blogs??
 		// So far you get notifications for everything. We'll need a setting to decide if you want to received unmoderated (aka unpublished) comments or not.
@@ -911,7 +969,7 @@ class Comment extends DataObject
 		}
 
 		// Check if we need to add the author:
-		$item_author_User = & $this->Item->Author;
+		$item_author_User = & $this->Item->get_creator_User();
 		if( $item_author_User->notify
 				&& ( ! empty( $item_author_User->email ) ) )
 		{ // Author wants to be notified:
@@ -926,7 +984,7 @@ class Comment extends DataObject
 		/*
 		 * We have a list of email addresses to notify:
 		 */
-		if( !is_null( $this->author_User ) )
+		if( $this->get_author_User() )
 		{ // Comment from a registered user:
 			$mail_from = '"'.$this->author_User->get('preferredname').'" <'.$this->author_User->get('email').'>';
 		}
@@ -976,7 +1034,7 @@ class Comment extends DataObject
 					break;
 
 				default:
-					if( !is_null( $this->author_User ) )
+					if( $this->get_author_User() )
 					{ // Comment from a registered user:
 						$notify_message .= T_('Author').': '.$this->author_User->get('preferredname').' ('.$this->author_User->get('login').")\n";
 					}
@@ -1102,6 +1160,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2006/05/30 20:32:56  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.34  2006/05/19 18:15:05  blueyed
  * Merged from v-1-8 branch
  *

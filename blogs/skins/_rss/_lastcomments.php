@@ -32,7 +32,10 @@ $CommentList = & new CommentList( $blog, "'comment'", array('published'), '',	''
 		<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
 		<docs>http://backend.userland.com/rss092</docs>
 		<?php while( $Comment = & $CommentList->get_next() )
-		{ // Loop through comments: ?>
+		{ // Loop through comments:
+			// Load comment's Item:
+			$Comment->get_Item();
+			?>
 		<item>
 			<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
 			<description><?php $Comment->content( 'entityencoded' ) ?></description>

@@ -85,18 +85,30 @@ $object_def['Item'] = array( // definition of the object:
 class Item extends DataObject
 {
 	/**
+	 * The User who has created the Item (lazy-filled).
+	 * @see Item::get_creator_User()
+	 * @see Item::set_creator_User()
 	 * @var User
-	 * @todo Lazy-fill it? (provide getter method) fp: yes
-	 * @access public
+	 * @access protected
 	 */
-	var $Author;
+	var $creator_User;
 	/**
-	 * The assigned {@link User} to the item.
-	 * @todo Lazy-fill it? (provide getter method) fp: yes
+	 * @var integer ID of the user that created the item
+	 */
+	var $creator_user_ID;
+	/**
+	 * The assigned User to the item.
+	 * @see Item::get_assigned_User()
+	 * @see Item::assign_to()
 	 * @var User|NULL
-	 * @access public
+	 * @access protected
 	 */
 	var $assigned_User;
+	/**
+	 * @var integer|NULL ID of the user that created the item
+	 */
+	var $assigned_user_ID;
+
 	var $issue_date;
 	var $mod_date;
 	/**
@@ -164,6 +176,12 @@ class Item extends DataObject
 
 	var $priorities;
 
+	/**
+	 * @deprecated
+	 * @var User
+	 */
+	var $Author;
+
 
 	/**
 	 * Constructor
@@ -217,7 +235,7 @@ class Item extends DataObject
 			$this->ID = 0;
 			if( isset($current_User) )
 			{ // use current user as default, if available (which won't be the case during install)
-				$this->set_author_User( $current_User );
+				$this->set_creator_User( $current_User );
 			}
 			$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
 			$this->set( 'flags', '' );
@@ -234,8 +252,7 @@ class Item extends DataObject
 			$this->datemodified = $db_row->$db_cols['datemodified']; // Needed for history display
 			$this->creator_user_ID = $db_row->$db_cols['creator_user_ID']; // Needed for history display
 			$this->lastedit_user_ID = $db_row->$db_cols['lastedit_user_ID']; // Needed for history display
-			$this->Author = & $UserCache->get_by_ID( $this->creator_user_ID );
-			$this->assign_to( $db_row->$db_cols['assigned_user_ID'], false );
+			$this->assigned_user_ID = $db_row->$db_cols['assigned_user_ID'];
 			$this->issue_date = $db_row->$db_cols['datestart'];
 			$this->mod_date = $db_row->$db_cols['datemodified'];
 			$this->status = $db_row->$db_cols['status'];
@@ -266,44 +283,31 @@ class Item extends DataObject
 
 	/**
 	 * @todo use extended dbchange instead of set_param...
+	 * @todo Normalize to set_assigned_User!?
 	 */
-	function assign_to( $user_ID, $dbupdate = true )
+	function assign_to( $user_ID, $dbupdate = true /* BLOAT!? */ )
 	{
 		global $UserCache;
 
 		// echo 'assigning user #'.$user_ID;
-		if( !empty($user_ID) )
+		if( ! empty($user_ID) )
 		{
-			$this->assigned_User =& $UserCache->get_by_ID( $user_ID );
+			$this->assigned_user_ID = $user_ID;
+			$this->assigned_User = & $UserCache->get_by_ID( $user_ID );
 		}
 		else
 		{
 			// fp>> DO NOT set (to null) immediately OR it will KILL the current User object (big problem if it's the Current User)
 			unset( $this->assigned_User );
 			$this->assigned_User = NULL;
+			$this->assigned_user_ID = NULL;
 		}
 
 		if( $dbupdate )
 		{ // Record ID for DB:
-			$this->set_param( 'assigned_user_ID', 'number', $this->get_assigned_user_ID(), true );
-		}
-		else
-		{	// Needed to detect future changes:
-			$this->assigned_user_ID = $this->get_assigned_user_ID();
+			$this->set_param( 'assigned_user_ID', 'number', $this->assigned_user_ID, true );
 		}
 	}
-
-
-	/**
-	 * Get the ID of the assigned user.
-	 *
-	 * @return NULL|integer
-	 */
-	function get_assigned_user_ID()
-	{
-		return empty($this->assigned_User) ? NULL : $this->assigned_User->ID;
-	}
-
 
 
 	/**
@@ -395,7 +399,7 @@ class Item extends DataObject
 
 		if( empty( $blogurl ) )
 		{
-			$this->load_Blog();
+			$this->get_Blog();
 			$blogurl = $this->Blog->gen_blogurl();
 		}
 
@@ -535,7 +539,7 @@ class Item extends DataObject
 
 
 	/**
-	 * Template function: display asignee of item
+	 * Template function: display assignee of item
 	 *
 	 * @param string
 	 * @param string
@@ -543,7 +547,7 @@ class Item extends DataObject
 	 */
 	function assigned_to( $before = '', $after = '', $format = 'htmlbody' )
 	{
-		if( isset($this->assigned_User) )
+		if( $this->get_assigned_User() )
 		{
 			echo $before;
 			$this->assigned_User->preferred_name( $format );
@@ -559,7 +563,7 @@ class Item extends DataObject
 	{
 		global $UserCache, $object_def;
 
-		$UserCache->blog_member_list( $this->blog_ID, $this->get_assigned_user_ID(),
+		$UserCache->blog_member_list( $this->blog_ID, $this->assigned_user_ID,
 						$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
 						($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
 						true );
@@ -573,7 +577,7 @@ class Item extends DataObject
 	{
 		global $UserCache, $object_def;
 
-		return $UserCache->blog_member_list( $this->blog_ID, $this->get_assigned_user_ID(),
+		return $UserCache->blog_member_list( $this->blog_ID, $this->assigned_user_ID,
 							$object_def[$this->objtype]['allow_null']['assigned_user_ID'],
 							($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */,
 							false );
@@ -716,7 +720,7 @@ class Item extends DataObject
 		$display = ( isset($before_error) );
 
 		// Ask Plugins:
-		if( $plugin_return = $Plugins->trigger_event_first_return( 'ItemCanComment' ) )
+		if( $plugin_return = $Plugins->trigger_event_first_return( 'ItemCanComment', array( 'Item' => $this ) ) )
 		{
 			$plugin_return = $plugin_return['plugin_return'];
 			if( $plugin_return === true )
@@ -1099,16 +1103,18 @@ class Item extends DataObject
 	 */
 	function msgform_link( $form_url, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
-		if( empty($this->Author->email) )
+		$this->get_creator_User();
+
+		if( empty($this->creator_User->email) )
 		{ // We have no email for this Author :(
 			return false;
 		}
-		if( empty($this->Author->allow_msgform) )
+		if( empty($this->creator_User->allow_msgform) )
 		{
 			return false;
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id='.$this->Author->ID.'&amp;post_id='.$this->ID.'&amp;redirect_to='.rawurlencode(regenerate_url()) );
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->creator_User->ID.'&amp;post_id='.$this->ID.'&amp;redirect_to='.rawurlencode(regenerate_url()) );
 
 		if( $title == '#' ) $title = T_('Send email to post author');
 		if( $text == '#' ) $text = get_icon( 'email', 'imgtag', array( 'class' => 'middle', 'title' => $title ) );
@@ -1136,7 +1142,7 @@ class Item extends DataObject
 	 */
 	function msgform_link_assigned( $form_url, $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
-		if( empty($this->assigned_User) || empty($this->assigned_User->email) )
+		if( ! $this->get_assigned_User() || empty($this->assigned_User->email) )
 		{ // We have no email for this Author :(
 			return false;
 		}
@@ -1309,7 +1315,7 @@ class Item extends DataObject
 				break;
 
 			case 'trackbacks':
-				$this->load_Blog();
+				$this->get_Blog();
 				if( ! $this->Blog->get( 'allowtrackbacks' ) )
 				{ // Trackbacks not allowed on this blog:
 					return;
@@ -1322,7 +1328,7 @@ class Item extends DataObject
 				break;
 
 			case 'pingbacks':
-				$this->load_Blog();
+				$this->get_Blog();
 				if( ! $this->Blog->get( 'allowpingbacks' ) )
 				{ // Pingbacks not allowed on this blog:
 					return;
@@ -2085,10 +2091,11 @@ class Item extends DataObject
 	 * @param User
 	 * @return boolean true, if it has been set; false if it has not changed
 	 */
-	function set_author_User( & $author_User )
+	function set_creator_User( & $creator_User )
 	{
-		$this->Author = & $author_User;
-		return $this->set( $this->creator_field, $author_User->ID );
+		$this->creator_User = & $creator_User;
+		$this->Author = & $this->creator_User; // deprecated
+		return $this->set( $this->creator_field, $creator_User->ID );
 	}
 
 
@@ -2127,7 +2134,7 @@ class Item extends DataObject
 
 		if( isset( $UserCache ) )
 		{ // If not in install procedure...
-			$this->set_author_User( $UserCache->get_by_ID( $author_user_ID ) );
+			$this->set_creator_User( $UserCache->get_by_ID( $author_user_ID ) );
 		}
 		else
 		{
@@ -2170,8 +2177,7 @@ class Item extends DataObject
 
 		if( empty($this->creator_user_ID) )
 		{ // No creator assigned yet, use current user:
-			$this->Author = & $current_User;
-			$this->creator_user_ID = $current_User->ID;
+			$this->set_creator_User( $current_User );
 		}
 
 		// validate url title
@@ -2366,9 +2372,9 @@ class Item extends DataObject
 	{
 		global $Plugins, $DB, $current_User, $Debuglog;
 
-		if( isset( $current_User ) && $current_User->ID == $this->Author->ID )
+		if( isset( $current_User ) && ( $current_User->ID == $this->creator_user_ID ) )
 		{
-			$Debuglog->add( 'Not incrementing view count, because viewing user is Author.', 'items' );
+			$Debuglog->add( 'Not incrementing view count, because viewing user is creator of the item.', 'items' );
 
 			return false;
 		}
@@ -2384,13 +2390,38 @@ class Item extends DataObject
 	}
 
 
-	function load_Blog()
+	/**
+	 * Get the User who is assigned to the Item.
+	 *
+	 * @return User|NULL NULL if no user is assigned.
+	 */
+	function get_assigned_User()
 	{
-		if( is_null($this->Blog) )
+		if( ! isset($this->assigned_User) && isset($this->assigned_user_ID) )
 		{
-			global $BlogCache;
-			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
+			global $UserCache;
+			$this->assigned_User = & $UserCache->get_by_ID( $this->assigned_user_ID );
 		}
+
+		return $this->assigned_User;
+	}
+
+
+	/**
+	 * Get the User who created the Item.
+	 *
+	 * @return User
+	 */
+	function & get_creator_User()
+	{
+		if( is_null($this->creator_User) )
+		{
+			global $UserCache;
+			$this->creator_User = & $UserCache->get_by_ID( $this->creator_user_ID );
+			$this->Author = & $this->creator_User;  // deprecated
+		}
+
+		return $this->creator_User;
 	}
 
 
@@ -2401,7 +2432,12 @@ class Item extends DataObject
 	 */
 	function & get_Blog()
 	{
-		$this->load_Blog();
+		if( is_null($this->Blog) )
+		{
+			global $BlogCache;
+			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
+		}
+
 		return $this->Blog;
 	}
 
@@ -2446,7 +2482,8 @@ class Item extends DataObject
 			echo '<h3>', T_('Notifying subscribed users...'), "</h3>\n";
 		}
 
-		$mail_from = '"'.$this->Author->get('preferredname').'" <'.$this->Author->get('email').'>';
+		$this->get_creator_User();
+		$mail_from = '"'.$this->creator_User->get('preferredname').'" <'.$this->creator_User->get('email').'>';
 
 		$Blog = & $this->get_Blog();
 
@@ -2467,7 +2504,7 @@ class Item extends DataObject
 					str_pad( T_('Blog'), $pad_len ).': '.$Blog->get('shortname')
 					.' ( '.str_replace('&amp;', '&', $Blog->get('blogurl'))." )\n"
 
-					.str_pad( T_('Author'), $pad_len ).': '.$this->Author->get('preferredname').' ('.$this->Author->get('login').")\n"
+					.str_pad( T_('Author'), $pad_len ).': '.$this->creator_User->get('preferredname').' ('.$this->creator_User->get('login').")\n"
 
 					.str_pad( T_('Title'), $pad_len ).': '.$this->get('title')."\n"
 
@@ -2517,11 +2554,12 @@ class Item extends DataObject
 		{
 			case 't_author':
 				// Text: author
-				return $this->Author->get( 'preferredname' );
+				$this->get_creator_User();
+				return $this->creator_User->get( 'preferredname' );
 
 			case 't_assigned_to':
 				// Text: assignee
-				if( empty($this->assigned_User) )
+				if( ! $this->get_assigned_User() )
 				{
 					return '';
 				}
@@ -2628,6 +2666,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2006/05/30 20:32:57  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.50  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *

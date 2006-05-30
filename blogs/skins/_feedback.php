@@ -161,7 +161,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 		if( $preview_Comment )
 		{
-			if( $preview_Comment->Item->ID == $Item->ID )
+			if( $preview_Comment->item_ID == $Item->ID )
 			{ // display PREVIEW:
 				?>
 				<div class="bComment" id="comment_preview">
@@ -298,6 +298,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.63  2006/05/30 20:32:57  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.62  2006/05/19 18:15:06  blueyed
  * Merged from v-1-8 branch
  *

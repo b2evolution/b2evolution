@@ -33,17 +33,22 @@ $CommentList = & new CommentList( $blog, "'comment'", array('published'), '',	''
 	<generator uri="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
 	<updated><?php echo gmdate('Y-m-d\TH:i:s\Z'); ?></updated>
 	<?php while( $Comment = & $CommentList->get_next() )
-	{ // Loop through comments: ?>
+	{ /* Loop through comments: */ ?>
 	<entry>
-		<title type="text"><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( '', '', false, 'xml' ) ?></title>
+		<title type="text"><?php
+			echo format_to_output( T_('In response to:'), 'xml' ).' ';
+			$Comment->get_Item();
+			$Comment->Item->title( '', '', false, 'xml' ) ?></title>
 		<link rel="alternate" type="text/html" href="<?php $Comment->permanent_url() ?>" />
 		<author>
 			<name><?php $Comment->author( '', '#', '', '#', 'xml' ) ?></name>
 			<?php $Comment->author_url( '', '<uri>', "</uri>\n", false ) ?>
 		</author>
 		<id><?php $Comment->permanent_url() ?></id>
-    <published><?php $Comment->date( 'isoZ', true ); ?></published>
+		<published><?php $Comment->date( 'isoZ', true ); ?></published>
 		<updated><?php $Comment->date( 'isoZ', true ); ?></updated>
 		<content type="html"><![CDATA[<?php $Comment->content() ?>]]></content>
 	</entry>
-	<?php } // End of comment loop. ?>
+	<?php
+	} // End of comment loop.
+	?>

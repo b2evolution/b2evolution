@@ -93,7 +93,7 @@ function task_title_link( $Item )
 
 	$col = locale_flag( $Item->locale, 'w16px', 'flag', '', false ).' ';
 
-	$Item->load_Blog();
+	$Item->get_Blog();
 
 	if( $Item->Blog->allowcomments != 'never' )
 	{	// The current blog can have comments:
@@ -196,6 +196,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.6  2006/05/30 20:32:57  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.5  2006/04/24 20:36:45  fplanque
  * fixes
  *

@@ -443,12 +443,13 @@ switch($action)
 		param( 'comment_ID', 'integer', true );
 		// echo $comment_ID;
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
-		$blog = $edited_Comment->Item->get( 'blog_ID' );
+		$edited_comment_Item = & $edited_Comment->get_Item();
+		$blog = $edited_comment_Item->get( 'blog_ID' );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_comments', '', true, $blog );
 
-		if( $edited_Comment->author_User === NULL )
+		if( ! $edited_Comment->get_author_User() )
 		{ // If this is not a member comment
 			$Request->param( 'newcomment_author', 'string', true );
 			$Request->param( 'newcomment_author_email', 'string' );
@@ -475,7 +476,7 @@ switch($action)
 
 		$edited_Comment->set( 'content', $content );
 
-		if( $edited_Comment->author_User === NULL )
+		if( ! $edited_Comment->get_author_User() )
 		{ // If this is not a member comment
 			$edited_Comment->set( 'author', $newcomment_author );
 			$edited_Comment->set( 'author_email', $newcomment_author_email );
@@ -492,7 +493,7 @@ switch($action)
 		$edited_Comment->set_from_Request( 'status', 'comment_status' );
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		$location = url_add_param( $admin_url, 'ctrl=browse&tab=posts&blog='.$blog.'&p='.$edited_Comment->Item->ID.'&c=1#comments', '&' );
+		$location = url_add_param( $admin_url, 'ctrl=browse&tab=posts&blog='.$blog.'&p='.$edited_Comment->item_ID.'&c=1#comments', '&' );
 		header ("Location: $location");
 		exit();
 
@@ -505,7 +506,8 @@ switch($action)
 		 */
 		$Request->param( 'comment_ID', 'integer', true );
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
-		$blog = $edited_Comment->Item->get( 'blog_ID' );
+		$edited_comment_Item = & $edited_Comment->get_Item();
+		$blog = $edited_comment_Item->get( 'blog_ID' );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_comments', '', true, $blog );
@@ -523,7 +525,7 @@ switch($action)
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		$location = url_add_param( $admin_url, 'ctrl=browse&tab=posts&blog='.$blog.'&p='.$edited_Comment->Item->ID.'&c=1#comments', '&' );
+		$location = url_add_param( $admin_url, 'ctrl=browse&tab=posts&blog='.$blog.'&p='.$edited_Comment->item_ID.'&c=1#comments', '&' );
 		header ("Location: $location");
 		exit();
 
@@ -536,8 +538,9 @@ switch($action)
 		param( 'comment_ID', 'integer', true );
 		// echo $comment_ID;
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
-		$comment_post_ID = $edited_Comment->Item->ID;
-		$blog = $edited_Comment->Item->get( 'blog_ID' );
+		$comment_post_ID = $edited_Comment->item_ID;
+		$edited_comment_Item = & $edited_Comment->get_Item();
+		$blog = $edited_comment_Item->get( 'blog_ID' );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_comments', '', true, $blog );
@@ -587,6 +590,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2006/05/30 20:32:56  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.12  2006/05/19 18:15:05  blueyed
  * Merged from v-1-8 branch
  *

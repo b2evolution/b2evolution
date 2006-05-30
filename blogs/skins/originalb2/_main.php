@@ -86,6 +86,8 @@ header( 'Content-type: text/html; charset='.$io_charset );
 if( isset($MainList) ) while( $Item = $MainList->get_item() )
 {
 	$MainList->date_if_changed();
+	// Load Item's creator User:
+	$Item->get_creator_User();
 	locale_temp_switch( $Item->locale ); // Temporarily switch to post locale
 ?>
 <div class="storyTitle">
@@ -96,7 +98,7 @@ if( isset($MainList) ) while( $Item = $MainList->get_item() )
 	&nbsp;-&nbsp;
 	Categories: <?php $Item->categories() ?>
 	&nbsp;-&nbsp;
-	<span class="storyAuthor"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>?author=<?php $Item->Author->ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php $Item->Author->preferred_name() ?></a></span>
+	<span class="storyAuthor"><a href="<?php $Blog->disp( 'blogurl', 'raw' ) ?>?author=<?php $Item->creator_User->ID() ?>" title="<?php echo T_('Browse all posts by this author') ?>"><?php $Item->creator_User->preferred_name() ?></a></span>
 	@ <a href="<?php $Item->permanent_url() ?>"><?php $Item->issue_time() ?></a>
 </div>
 
