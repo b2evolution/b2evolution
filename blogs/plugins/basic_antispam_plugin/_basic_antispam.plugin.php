@@ -169,6 +169,7 @@ class basic_antispam_plugin extends Plugin
 		if( ! $this->Settings->get('check_url_trackbacks') )
 		{ // disabled by Settings:
 			// TODO: disable event automatically at setting time
+			// dh> what do you mean? If the event gets disabled automagically, it becomes "geeky" again. Not?
 			return;
 		}
 
@@ -547,6 +548,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.16  2006/05/30 21:25:27  blueyed
+ * todo-question
+ *
  * Revision 1.15  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *
