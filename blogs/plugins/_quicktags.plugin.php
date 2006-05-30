@@ -30,7 +30,7 @@ class quicktags_plugin extends Plugin
 	function quicktags_plugin()
 	{
 		$this->short_desc = T_('Easy HTML tags inserting');
-		$this->long_desc = T_('This plugin will display a toolbar with buttons to quicly insert HTML tags around selected text in a post.');
+		$this->long_desc = T_('This plugin will display a toolbar with buttons to quickly insert HTML tags around selected text in a post.');
 	}
 
 
@@ -419,6 +419,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.15  2006/05/30 20:31:18  blueyed
+ * typo
+ *
  * Revision 1.14  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *
