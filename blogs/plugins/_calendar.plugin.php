@@ -464,7 +464,7 @@ class Calendar
 				{
 					$daysinmonthwithposts[ $arc_row['myday'] ] = 0;
 				}
-				// The '+' soituation actually only happens when we have a complex GROUP BY above
+				// The '+' situation actually only happens when we have a complex GROUP BY above
 				// (multiple categories wcombined with "ALL")
 				$daysinmonthwithposts[ $arc_row['myday'] ] += $arc_row['item_count'];
 			}
@@ -984,6 +984,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.18  2006/05/30 20:25:35  blueyed
+ * typo
+ *
  * Revision 1.17  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *

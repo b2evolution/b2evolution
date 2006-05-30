@@ -60,7 +60,7 @@ class smilies_plugin extends Plugin
 	function smilies_plugin()
 	{
 		$this->short_desc = T_('Graphical smileys');
-		$this->long_desc = T_('This renverer will convert text smilies like :) to graphical icons.<br />
+		$this->long_desc = T_('This renderer will convert text smilies like :) to graphical icons.<br />
 			Optionally, it will also display a toolbar for quick insertion of smilies into a post.');
 
 		/**
@@ -264,6 +264,9 @@ class smilies_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.21  2006/05/30 20:26:59  blueyed
+ * typo
+ *
  * Revision 1.20  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *

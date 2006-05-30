@@ -33,7 +33,7 @@ class wikilinks_plugin extends Plugin
 	function wikilinks_plugin()
 	{
 		$this->short_desc = T_('Wiki Links converter');
-		$this->long_desc = T_('WikiWord links are created with a CamelCased WiiWord, a ((link)), or a [[link ]].<br />
+		$this->long_desc = T_('WikiWord links are created with a CamelCased WikiWord, a ((link)), or a [[link ]].<br />
 		 CamelCased words will be exploded to camel_case which should then match a post url title.');
 	}
 
@@ -257,6 +257,9 @@ class wikilinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.16  2006/05/30 20:28:56  blueyed
+ * typo
+ *
  * Revision 1.15  2006/05/30 19:39:56  fplanque
  * plugin cleanup
  *
