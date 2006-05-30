@@ -821,14 +821,19 @@ switch( $action )
 	case 'disp_help_plain': // just the help, without any payload
 	case 'disp_help':
 		param( 'plugin_ID', 'integer', 0 );
-		$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 
-		global $inc_path;
-		require_once $inc_path.'_misc/_plugin.funcs.php';
+		// Discover available plugins:
+		$AvailablePlugins = & new Plugins_no_DB(); // do not load registered plugins/events from DB
+		$AvailablePlugins->discover();
 
+		if( ! ($edit_Plugin = & $AvailablePlugins->get_by_ID( $plugin_ID )) )
+		{
+			$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
+		}
 		if( ! $edit_Plugin || ! ($help_file = $edit_Plugin->get_help_file()) )
 		{
 			$action = 'list';
+			break;
 		}
 
 		if( $action == 'disp_help' )
@@ -1001,8 +1006,7 @@ switch( $action )
 		$Form = & new Form( $pagenow );
 
 		if( $edit_Plugin->ID > 0 )
-		{ // do not display ID for non registered Plugins
-			// Edit settings button:
+		{ // Edit settings button (if installed):
 			$Form->global_icon( T_('Edit plugin settings!'), 'edit', $admin_url.'?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID );
 		}
 
@@ -1042,7 +1046,21 @@ switch( $action )
 
 		$Form->end_fieldset();
 
-		// TODO: add "Install NOW" button (if not already installed)
+		if( $edit_Plugin->ID < 1 )
+		{ // add "Install NOW" submit button (if not already installed)
+			$registrations = $admin_Plugins->count_regs($edit_Plugin->classname);
+
+			if( ! isset( $edit_Plugin->number_of_installs )
+					|| ( $admin_Plugins->count_regs($edit_Plugin->classname) < $edit_Plugin->number_of_installs ) )
+			{ // number of installations are not limited or not reached yet
+				$Form->hidden( 'action', 'install' );
+				$Form->hidden( 'plugin', $edit_Plugin->classname );
+
+				$Form->begin_fieldset( '', array( 'class'=>'fieldset center' ) );
+				$Form->submit( array( '', T_('Install NOW!'), 'ActionButton' ) );
+				$Form->end_fieldset();
+			}
+		}
 
 		$Form->end_form();
 		$action = '';
