@@ -198,7 +198,7 @@ class Plugin
 	/**
 	 * Internal (DB) ID. (AUTOMATIC)
 	 *
-	 * 0 means 'NOT installed'
+	 * ID < 1 means 'NOT installed'
 	 *
 	 * @var int
 	 */
@@ -2246,6 +2246,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.53  2006/05/30 23:08:59  blueyed
+ * doc
+ *
  * Revision 1.52  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *
