@@ -322,17 +322,6 @@ if( !$Messages->count('error') )
 			$Request->param( 'edited_user_bozo', 'integer', 0 );
 			$Request->param( 'edited_user_focusonfirst', 'integer', 0 );
 
-			// Action icon params:
-			$UserSettings->set( 'action_icon_threshold', $edited_user_action_icon_threshold, $edited_User->ID );
-			$UserSettings->set( 'action_word_threshold', $edited_user_action_word_threshold, $edited_User->ID );
-			$UserSettings->set( 'display_icon_legend', $edited_user_legend, $edited_User->ID );
-
-			// Set bozo validador activation
-			$UserSettings->set( 'control_form_abortions', $edited_user_bozo, $edited_User->ID );
-
-			// Focus on first
-			$UserSettings->set( 'focus_on_first_input', $edited_user_focusonfirst, $edited_User->ID );
-
 			// PluginUserSettings
 			$any_plugin_settings_updated = false;
 			$Plugins->restart();
@@ -409,11 +398,24 @@ if( !$Messages->count('error') )
 					$Messages->add( T_('New user created.'), 'success' );
 				}
 
+				// User Settings (a new User needs to be inserted here already!)
+
 				if( $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID )
 						&& ($edited_User->ID == $current_User->ID) )
 				{ // admin_skin has changed or was set the first time for the current user
 					$reload_page = true;
 				}
+
+				// Action icon params:
+				$UserSettings->set( 'action_icon_threshold', $edited_user_action_icon_threshold, $edited_User->ID );
+				$UserSettings->set( 'action_word_threshold', $edited_user_action_word_threshold, $edited_User->ID );
+				$UserSettings->set( 'display_icon_legend', $edited_user_legend, $edited_User->ID );
+
+				// Set bozo validador activation
+				$UserSettings->set( 'control_form_abortions', $edited_user_bozo, $edited_User->ID );
+
+				// Focus on first
+				$UserSettings->set( 'focus_on_first_input', $edited_user_focusonfirst, $edited_User->ID );
 
 				$UserSettings->dbupdate();
 
@@ -685,6 +687,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2006/05/30 19:57:03  blueyed
+ * Fixed saving of User Settings for new users.
+ *
  * Revision 1.19  2006/05/02 05:58:40  blueyed
  * fix
  *
