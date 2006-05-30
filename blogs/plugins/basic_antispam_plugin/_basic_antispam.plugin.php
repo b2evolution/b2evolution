@@ -68,12 +68,11 @@ class basic_antispam_plugin extends Plugin
 	function GetDefaultSettings()
 	{
 		return array(
-			// fp>> negations are harder to understand, "Allow anonymous feedback" would be better!
-				'disable_feedback_anon' => array(
+				'allow_anon_comments' => array(
 					'type' => 'checkbox',
-					'label' => T_('Disable anonymous feedback'),
-					'note' => T_('Prevent anonymous visitors from giving feedback/comments.'),
-					'defaultvalue' => '0',
+					'label' => T_('Allow anonymous comments'),
+					'note' => T_('Allow non-registered visitors to leave comments.'),
+					'defaultvalue' => '1',
 				),
 				'check_dupes' => array(
 					'type' => 'checkbox',
@@ -102,7 +101,19 @@ class basic_antispam_plugin extends Plugin
 					'note' => T_('If a referrer has been detected as spam, should we block the request with a "403 Forbidden" page?'),
 					'defaultvalue' => '1',
 				),
-				array( 'layout' => 'end_fieldset' ),
+
+				'check_url_referers' => array(
+					'type' => 'checkbox',
+					'label' => T_('Check referers for URL'),
+					'note' => T_('Check refering pages, if they contain our URL. This may generate a lot of additional traffic!'),
+					'defaultvalue' => '0',
+				),
+				'check_url_trackbacks' => array(
+					'type' => 'checkbox',
+					'label' => T_('Check trackbacks for URL'),
+					'note' => T_('Check trackback pages, if they contain our URL. This may generate a lot of additional traffic!'),
+					'defaultvalue' => '1',
+				),
 
 			);
 	}
@@ -114,7 +125,7 @@ class basic_antispam_plugin extends Plugin
 	 */
 	function ItemCanComment( & $params )
 	{
-		if( /* ! is_logged_in() */ 1 && $this->Settings->get('disable_feedback_anon') )
+		if( ! is_logged_in() && ! $this->Settings->get('allow_anon_comments') )
 		{
 			return T_('Comments are not allowed from anonymous visitors.');
 		}
@@ -156,6 +167,11 @@ class basic_antispam_plugin extends Plugin
 	 */
 	function BeforeTrackbackInsert( & $params )
 	{
+		if( ! $this->Settings->get('check_url_trackbacks') )
+		{ // disabled by Settings:
+			return;
+		}
+
 		if( $this->is_duplicate_comment( $params['Comment'] ) )
 		{
 			$this->msg( T_('The trackback seems to be a duplicate.'), 'error' );
@@ -293,9 +309,10 @@ class basic_antispam_plugin extends Plugin
 	{
 		global $Settings;
 
-		if( ! $Settings->get('hit_doublecheck_referer') )
+		if( $Settings->get('hit_doublecheck_referer') )
 		{ // old general settings, "transform it"
-			$this->disable_event( 'AppendHitLog' );
+			$this->Settings->set( 'check_url_referers', '1' );
+			$this->Settings->dbupdate();
 		}
 
 		$Settings->delete('hit_doublecheck_referer');
@@ -311,6 +328,11 @@ class basic_antispam_plugin extends Plugin
 	 */
 	function AppendHitLog( & $params )
 	{
+		if( ! $this->Settings->get('check_url_referers') )
+		{ // disabled by Settings:
+			return false;
+		}
+
 		global $debug_no_register_shutdown;
 
 		$Hit = & $params['Hit'];
@@ -525,6 +547,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.13  2006/05/30 00:18:29  blueyed
+ * http://dev.b2evolution.net/todo.php?p=87686
+ *
  * Revision 1.12  2006/05/29 21:13:19  fplanque
  * no message
  *
