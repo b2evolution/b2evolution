@@ -147,7 +147,7 @@ elseif( ! empty( $comment_id ) )
 		debug_die( 'Invalid recipient!' );
 	}
 
-	$recipient_address = trim($Comment->author) . ' <' . $Comment->author_email . '>';
+	$recipient_address = trim($Comment->get_author_name()) . ' <' . $Comment->get_author_email() . '>';
 }
 
 if( empty($recipient_address) )
@@ -235,6 +235,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.32  2006/05/30 20:07:42  blueyed
+ * Fix recipient address
+ *
  * Revision 1.31  2006/05/04 14:28:15  blueyed
  * Fix/enhanced
  *
