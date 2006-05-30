@@ -85,10 +85,10 @@ if( ! $Blog->get('allowtrackbacks') )
 	trackback_response( 1, 'Sorry, this weblog does not allow you to trackback its posts.' ); // exits
 }
 
-if( ! $commented_Item->can_comment( NULL ) )
+// Commented out again, because it's comment specific: if( ! $commented_Item->can_comment( NULL ) )
+// "BeforeTrackbackInsert" should be hooked instead!
+if( $commented_Item->comment_status != 'open' )
 {
-	// TODO: we do not get the real error here (from a plugin maybe)!
-	// TODO: Rather use a seperate method can_trackback(), with a different plugin hook!?
 	trackback_response( 1, 'Sorry, this item does not accept trackbacks.' ); // exits
 }
 
@@ -191,6 +191,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.53  2006/05/30 00:15:11  blueyed
+ * Do not use Item::can_comment here.
+ *
  * Revision 1.52  2006/05/29 23:57:13  blueyed
  * todo
  *
