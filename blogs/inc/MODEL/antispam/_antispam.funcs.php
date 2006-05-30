@@ -182,9 +182,9 @@ function antispam_report_abuse( $abuse_string )
  *
  * @param boolean Display while fetching it?
  */
-function antispam_poll_abuse( $display = true )
+function antispam_poll_abuse()
 {
-	global $Settings, $baseurl, $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
+	global $Messages, $Settings, $baseurl, $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
 
 	// Construct XML-RPC client:
 	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port);
@@ -208,7 +208,6 @@ function antispam_poll_abuse( $display = true )
 									new xmlrpcval(0,'int')                      // Reserved
 								)
 							);
-
 
 	$Messages->add( T_('Requesting abuse list from').' '.$antispamsrv_host.'...', 'note' );
 
@@ -307,6 +306,9 @@ function get_ban_domain( $url )
 
 /*
  * $Log$
+ * Revision 1.9  2006/05/30 21:59:46  blueyed
+ * Fixed E_FATAL with polling of blacklist..
+ *
  * Revision 1.8  2006/05/19 18:15:05  blueyed
  * Merged from v-1-8 branch
  *
