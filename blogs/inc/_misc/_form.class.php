@@ -2039,14 +2039,17 @@ class Form extends Widget
 	 *
 	 * It supports array values (one-dimensional) and generates appropriate key-value pairs.
 	 *
+	 * @uses Form::hidden()
 	 * @param array associative array ( name => value ) of hidden fields.
 	 * @param array|NULL A list of keys to ignore.
-	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function hiddens_by_key( $hiddens, $exclude = NULL )
 	{
-		$save_output = $this->output;
-		$this->output = false;
+		if( $this->output )
+		{ // only save output once, if necessary (recursion!)
+			$save_output = $this->output;
+			$this->output = false;
+		}
 		foreach( $hiddens as $l_name => $l_value )
 		{
 			if( isset($exclude) && in_array( $l_name, $exclude ) )
@@ -2057,7 +2060,8 @@ class Form extends Widget
 			{ // this happens for example when we've POSTed an array (for PHP it's an array then)
 				foreach( $l_value as $ll_key => $ll_value )
 				{
-					$this->hidden( $l_name.'['.$ll_key.']', $ll_value );
+					// Recursion:
+					$this->hiddens_by_key( array( $l_name.'['.$ll_key.']' => $ll_value ), $exclude );
 				}
 			}
 			else
@@ -2065,7 +2069,11 @@ class Form extends Widget
 				$this->hidden( $l_name, $l_value );
 			}
 		}
-		$this->output = $save_output;
+
+		if( isset($save_output) )
+		{
+			$this->output = $save_output;
+		}
 	}
 
 
@@ -2531,6 +2539,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.14  2006/05/30 16:18:17  blueyed
+ * Fix for hiddens_by_key and test.
+ *
  * Revision 1.13  2006/05/19 18:15:05  blueyed
  * Merged from v-1-8 branch
  *
