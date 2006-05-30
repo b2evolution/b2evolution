@@ -92,11 +92,6 @@ switch ( $Settings->get('eblog_method') )
 		// eblog_method = POP3 (original)
 		//--------------------------------------------------------------------
 
-		if( $Settings->get('eblog_phonemail') )
-		{ // if you're using phone email, the email will already be in your timezone
-			$Settings->set('time_difference', 0);
-		}
-
 		// error_reporting( E_ALL );
 
 		require_once $inc_path.'_misc/ext/_pop3.class.php';
@@ -205,7 +200,6 @@ switch ( $Settings->get('eblog_method') )
 							}
 						}
 						$ddate_U = mktime($ddate_H, $ddate_i, $ddate_s, $ddate_m, $ddate_d, $ddate_Y);
-						$ddate_U = $ddate_U + ($Settings->get('time_difference') * 3600);
 						$post_date = date('Y-m-d H:i:s', $ddate_U);
 					}
 				}
@@ -469,7 +463,6 @@ switch ( $Settings->get('eblog_method') )
 				}
 			}
 			$ddate_U = mktime($ddate_H, $ddate_i, $ddate_s, $ddate_m, $ddate_d, $ddate_Y);
-			$ddate_U = $ddate_U + ($Settings->get('time_difference') * 3600);
 			$post_date = date('Y-m-d H:i:s', $ddate_U);
 
 
