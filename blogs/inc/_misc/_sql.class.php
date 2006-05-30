@@ -219,8 +219,9 @@ class SQL
 		$this->where = $where;
 	}
 
-	/*
-	 * Extends the WHERE cakuse with AND
+	/**
+	 * Extends the WHERE clause with AND
+	 * @param string
 	 */
 	function WHERE_and( $where_and )
 	{
@@ -236,6 +237,26 @@ class SQL
 
 		// Append payload:
 		$this->where .= '('.$where_and.')';
+	}
+
+	/**
+	 * Extends the WHERE clause with OR
+	 * @param string
+	 */
+	function WHERE_or( $where_or )
+	{
+		if( empty($where_or) )
+		{	// Nothing to append:
+			return false;
+		}
+
+		if( ! empty($this->where) )
+		{ // We already have something in the WHERE clause:
+			$this->where .= ' OR ';
+		}
+
+		// Append payload:
+		$this->where .= '('.$where_or.')';
 	}
 
 	function GROUP_BY( $group_by )
@@ -279,81 +300,81 @@ class SQL
 	function add_search_field( $field,  $reg_exp = '' )
 	{
 		$this->search_field[] = $field;
-		
+
 		if( !empty( $reg_exp ) )
-		{	// We want to use a regular expression on the search for this field, so add to the search field regexp array 
+		{	// We want to use a regular expression on the search for this field, so add to the search field regexp array
 			$this->search_field_regexp[$field] = $reg_exp;
 		}
 	}
-	
+
 	/**
 	 * create the filter whith the search field array
-	 * @param string search 
+	 * @param string search
 	 * @param string operator( AND , OR , PHRASE ) for the filter
 	 */
 	function WHERE_keyword( $search, $search_kw_combine )
 	{
-		// Concat the list of search fields ( concat(' ',field1,field2,field3...) ) 
+		// Concat the list of search fields ( concat(' ',field1,field2,field3...) )
 		if (count( $this->search_field ) > 1)
-		{	
+		{
 			$search_field = 'CONCAT_WS(\' \',' . implode( ',', $this->search_field).')';
 		}
-		else 
+		else
 		{
 			$search_field = $this->search_field[0];
 		}
-		
+
 		switch( $search_kw_combine )
 		{
 			case 'AND':
 			case 'OR':
 				// Create array of key words of the search string
 				$keyword_array = explode( ' ', $search );
-				$keyword_array = array_filter( $keyword_array, 'filter_empty' ); 
-				
+				$keyword_array = array_filter( $keyword_array, 'filter_empty' );
+
 				$twhere = array();
 				// Loop on all keywords
 				foreach($keyword_array as $keyword)
 				{
 					$twhere[] = '( '.$search_field.' like \'%'.$keyword.'%\''.$this->WHERE_regexp( $keyword, $search_kw_combine ).' )';
 				}
-				$where = implode( ' '.$search_kw_combine.' ', $twhere);				
+				$where = implode( ' '.$search_kw_combine.' ', $twhere);
 				break;
-						
+
 			case 'PHRASE':
 					$where = $search_field.' like "%'.$search.'%"'.$this->WHERE_regexp( $search, $search_kw_combine );
 					break;
-						
+
 			case 'BEGINWITH':
 				$twhere = array();
 				foreach( $this->search_field as $field )
 				{
 					$twhere[] = $field." LIKE '".$search."%'";
 				}
-				$where = implode( ' OR ', $twhere ).$this->WHERE_regexp( $search, $search_kw_combine); 
+				$where = implode( ' OR ', $twhere ).$this->WHERE_regexp( $search, $search_kw_combine);
 				break;
-						
+
 		}
 		$this->WHERE_and( $where );
 	}
-	
+
 	/**
 	 * create the filter whith the search field regexp array
 	 *
-	 * @param string search 
+	 * @param string search
 	 * @param string operator( AND , OR , PHRASE ) for the filter
 	 *
 	 */
 	function WHERE_regexp( $search, $search_kw_combine )
 	{
 		$where = '';
-		
+
 		// Loop on all fields we have to use a replace regular expression on search:
 		foreach( $this->search_field_regexp as $field=>$reg_exp )
 		{
 				// Use reg exp replace on search
 				$search_reg_exp = preg_replace( $reg_exp, '', $search );
-				
+
 				if( !empty( $search_reg_exp ) )
 				{	// The reg exp search is not empty, so we add it to the request with an 'OR' operator:
 					switch( $search_kw_combine )
@@ -361,23 +382,26 @@ class SQL
 						case 'AND':
 						case 'OR':
 						case 'PHRASE':
-							$where .= ' OR '.$field.' like \'%'.$search_reg_exp.'%\''; 			
+							$where .= ' OR '.$field.' like \'%'.$search_reg_exp.'%\'';
 							break;
-							
+
 						case 'BEGINWITH':
-							$where .= ' OR '.$field.' like \''.$search_reg_exp.'%\''; 			
-							break;			
+							$where .= ' OR '.$field.' like \''.$search_reg_exp.'%\'';
+							break;
 					}
 				}
 		}
 		return $where;
 	}
-	
-	
+
+
 }
 
 /*
  * $Log$
+ * Revision 1.5  2006/05/30 23:12:17  blueyed
+ * added WHERE_or()
+ *
  * Revision 1.4  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
