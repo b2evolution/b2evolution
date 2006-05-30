@@ -63,7 +63,7 @@ foreach( $includes as $include_file )
  *          dropped during the tests.
  *          BE SURE to use a test DB here.
  *
- * These settings override the defaults from {@link $EvoConfig->DB}
+ * These settings override the defaults from {@link $db_config}
  *
  * This is used to create {@link DbUnitTestCase::test_DB the test DB object}
  * in the class {@link DbUnitTestCase}, which gets used for tests that
@@ -93,5 +93,5 @@ $testDB_conf = array_merge( array(
 	$testDB_conf );
 
 // Use default aliases, if not set
-$testDB_conf['aliases'] = array_merge( $EvoConfig->DB['aliases'], isset($testDB_conf['aliases']) ? $testDB_conf['aliases'] : array() );
+$testDB_conf['aliases'] = array_merge( $db_config['aliases'], isset($testDB_conf['aliases']) ? $testDB_conf['aliases'] : array() );
 ?>

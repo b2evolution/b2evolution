@@ -122,7 +122,7 @@ class DB
 	/**
 	 * Use transactions in DB?
 	 *
-	 * You need to use InnoDB in order to enable this.  See the {@link $EvoConfig->DB "table_options" key}.
+	 * You need to use InnoDB in order to enable this.  See the {@link $db_config "table_options" key}.
 	 */
 	var $use_transactions = false;
 
@@ -1293,6 +1293,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.8  2006/05/30 21:53:06  blueyed
+ * Replaced $EvoConfig->DB with $db_config
+ *
  * Revision 1.7  2006/05/19 17:03:59  blueyed
  * locale activation fix from v-1-8, abstraction of setting DB connection charset
  *

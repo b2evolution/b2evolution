@@ -207,7 +207,7 @@ param( 'mode', 'string', 'normal' );
 
 		<p>This file contains <?php echo count( $posts ) ?> post(s) from <?php echo count( $authors ) ?> author(s) in <?php echo count( $categories ) ?> category(ies).</p>
 
-		<p>We'll import into b2evolution's database &quot;<?php echo $EvoConfig->DB['name'] ?>&quot;.</p>
+		<p>We'll import into b2evolution's database &quot;<?php echo $db_config['name'] ?>&quot;.</p>
 		</div>
 		<div class="panelinfo">
 			<p>Before importing, you should check the URLs of any &lt;img&gt; tags you may have in <?php echo $exportedfile ?>. Will these URLs still be valid after the migration? If not, we advise you do a search and replace on <?php echo $exportedfile ?> before continuing.</p>

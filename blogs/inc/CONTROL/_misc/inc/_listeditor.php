@@ -70,12 +70,12 @@ switch( $action )
 
 			if( !empty( $edited_table_ordercol ) )
 			{ // The element has an order field in database
-				if( $max_order = $DB->get_var( "SELECT MAX($edited_table_ordercol) FROM $edited_table" ) ) 
+				if( $max_order = $DB->get_var( "SELECT MAX($edited_table_ordercol) FROM $edited_table" ) )
 				{	// The new element order must be the lastest
 					$max_order++;
 				}
-				else 
-				{ // There are no elements in the database yet, so his order is set to 1. 
+				else
+				{ // There are no elements in the database yet, so his order is set to 1.
 					$max_order = 1;
 				}
 			}
@@ -88,12 +88,12 @@ switch( $action )
 				(isset( $edited_table_ordercol ) ? ', '.$max_order : '')
 				.(isset( $edited_table_filtercol ) ? ', '.$val_filtercol : '')
 				.' )' );
-			
+
 			$DB->commit();
-					
+
 			// Add the ID of the new object to the result fadeout
 			$result_fadeout[$edited_table_IDcol][] = $DB->insert_id;
-				
+
 			$Messages->add( T_('Entry created.'), 'success' );
 			$name = '';
 		}
@@ -122,7 +122,7 @@ switch( $action )
 			unset( $ID );
 			$name = '';
 		}
-		else 
+		else
 		{
 			$action = 'edit';
 		}
@@ -162,7 +162,7 @@ switch( $action )
 		{  // Not confirmed, delete restrictions set, so check for restrictions:
 			foreach( $delete_restrictions as $restriction )
 			{
-				if( !isset( $EvoConfig->DB['aliases'][$restriction['table']] ) )
+				if( !isset( $db_config['aliases'][$restriction['table']] ) )
 				{	// We have no declaration for this table, we consider we don't deal with this table in this app:
 					continue;
 				}
@@ -184,20 +184,20 @@ switch( $action )
 					);
 				$Messages->foot =	T_('Please delete related objects before you proceed.');
 			}
-			else 
-			{ // There are no restrictions, so we can display delete dialog 
+			else
+			{ // There are no restrictions, so we can display delete dialog
 				$checked_delete = true;
 			}
 		}
-		else 
-		{	// No delete restrictions to check, so we can display delete dialog 
+		else
+		{	// No delete restrictions to check, so we can display delete dialog
 			$checked_delete = true;
 		}
-			
+
 		$name = '';
 		break;
-		
-		
+
+
 	case 'move_up':
 		// Move up
 
@@ -209,12 +209,12 @@ switch( $action )
 		$ID = param( $edited_table_prefix.'ID', 'integer', true );
 
 		$DB->begin();
-		
+
 		// Test if the ID exist and set his order
 		$order = $DB->get_var( "SELECT $edited_table_ordercol
 														  FROM $edited_table
 														 WHERE $edited_table_IDcol = $ID" );
-		
+
 		if( $DB->num_rows != 1 )
 		{
 			$Messages->head = T_('Cannot edit entry!');
@@ -225,48 +225,48 @@ switch( $action )
 			break;
 			/* break */
 		}
-		
-		// Get the ID and the order of the inferior element which his order is the nearest   	
-		$rows = $DB->get_results( "SELECT $edited_table_IDcol, $edited_table_ordercol 
+
+		// Get the ID and the order of the inferior element which his order is the nearest
+		$rows = $DB->get_results( "SELECT $edited_table_IDcol, $edited_table_ordercol
 														 	 	 FROM $edited_table
 																WHERE $edited_table_ordercol < $order"
 														.(isset( $edited_table_filtercol ) ? ' AND '.$edited_table_filtercol.' = '.$val_filtercol : 0)
-													." ORDER BY $edited_table_ordercol DESC 
+													." ORDER BY $edited_table_ordercol DESC
 														 		LIMIT 0,1" );
 
 		if( count( $rows ) )
 		{
 			$name_ID = $edited_table_prefix.'ID';
 			$ID_inf = $rows[0]->$name_ID;
-			
+
 			$name_order = $edited_table_prefix.'order';
 			$order_inf = $rows[0]->$name_order;
-			
+
 			// Update the order of the ID
-			$DB->query( "UPDATE $edited_table 
+			$DB->query( "UPDATE $edited_table
 											SET $edited_table_ordercol = $order_inf
 										WHERE $edited_table_IDcol = $ID" );
-			
+
 			// Update the order of the inferior element
-			$DB->query( "UPDATE $edited_table 
+			$DB->query( "UPDATE $edited_table
 											SET $edited_table_ordercol = $order
 										WHERE $edited_table_IDcol = $ID_inf" );
-				
+
 		// EXPERIMENTAL FOR FADEOUT RESULT
 			$result_fadeout[$edited_table_IDcol][] = $ID;
 			$result_fadeout[$edited_table_IDcol][] = $ID_inf;
 		}
-		else 
+		else
 		{
-			$Messages->add( T_('This element is already at the top.'), 'error' ); 
-		}	
-		
+			$Messages->add( T_('This element is already at the top.'), 'error' );
+		}
+
 		$DB->commit();
-		
-		$name = '';	
+
+		$name = '';
 		break;
 
-		
+
 	case 'move_down':
 		// Move down
 
@@ -278,12 +278,12 @@ switch( $action )
 		$ID = param( $edited_table_prefix.'ID', 'integer', true );
 
 		$DB->begin();
-		
+
 		// Test if the ID exist and set his order
 		$order = $DB->get_var( "SELECT $edited_table_ordercol
 														  FROM $edited_table
 														 WHERE $edited_table_IDcol = $ID" );
-		
+
 		if( $DB->num_rows != 1 )
 		{
 			$Messages->head = T_('Cannot edit entry!');
@@ -294,46 +294,46 @@ switch( $action )
 			break;
 			/* break */
 		}
-		
-		// Get the ID and the order of the inferior element which his order is the nearest   	
-		$rows = $DB->get_results( "SELECT $edited_table_IDcol, $edited_table_ordercol 
+
+		// Get the ID and the order of the inferior element which his order is the nearest
+		$rows = $DB->get_results( "SELECT $edited_table_IDcol, $edited_table_ordercol
 														 	 	 FROM $edited_table
 																WHERE $edited_table_ordercol > $order"
 														.(isset( $edited_table_filtercol ) ? ' AND '.$edited_table_filtercol.' = '.$val_filtercol : 0)
-													." ORDER BY $edited_table_ordercol ASC 
+													." ORDER BY $edited_table_ordercol ASC
 														 		LIMIT 0,1" );
-		
+
 		if( count( $rows ) )
 		{
 			$name_ID = $edited_table_prefix.'ID';
 			$ID_sup = $rows[0]->$name_ID;
-			
+
 			$name_order = $edited_table_prefix.'order';
 			$order_sup = $rows[0]->$name_order;
-			
+
 			// Update the order of the ID
-			$DB->query( "UPDATE $edited_table 
+			$DB->query( "UPDATE $edited_table
 											SET $edited_table_ordercol = $order_sup
 										WHERE $edited_table_IDcol = $ID" );
-			
+
 			// Update the order of the superior element
-			$DB->query( "UPDATE $edited_table 
+			$DB->query( "UPDATE $edited_table
 											SET $edited_table_ordercol = $order
 										WHERE $edited_table_IDcol = $ID_sup" );
-			
+
 			// EXPERIMENTAL FOR FADEOUT RESULT
 			$result_fadeout[$edited_table_IDcol][] = $ID;
 			$result_fadeout[$edited_table_IDcol][] = $ID_sup;
-		}	
-		else 
+		}
+		else
 		{
-			$Messages->add( T_('This element is already at the bottom.'), 'error' ); 
-		}	
-			
-			
+			$Messages->add( T_('This element is already at the bottom.'), 'error' );
+		}
+
+
 		$DB->commit();
-			
-		$name = '';	
+
+		$name = '';
 		break;
 
 
@@ -375,15 +375,15 @@ if( ($action == 'delete') && !$confirm && $checked_delete )
 		$Form->hidden( 'action', 'delete' );
 		$Form->hidden( 'ID', $ID );
 		$Form->hidden( 'confirm', 1 );
-		
+
 		// We may need to use memorized params in the next page
 		$Form->hiddens_by_key( get_memorized( 'action,ID') );
-		
+
 		$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
 
 		$Form = & new Form( '', 'form_cancel', 'get', '' );
-				
+
 		$Form->begin_form( 'inline' );
 		$Form->hiddens_by_key( get_memorized( 'action,ID') );
 		$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
@@ -409,7 +409,7 @@ if ( !isset( $default_col_order ) )
 // Create result set:
 $sql = "SELECT $edited_table_IDcol, $edited_table_namecol
   			 	FROM $edited_table"
-				. ( !empty( $edited_table_filtercol ) ? ' WHERE '.$edited_table_filtercol.' = '.$val_filtercol : '' ) ; 
+				. ( !empty( $edited_table_filtercol ) ? ' WHERE '.$edited_table_filtercol.' = '.$val_filtercol : '' ) ;
 
 $Results = & new Results(	$sql, isset( $edited_table_prefix ) ? $edited_table_prefix : '',  $default_col_order );
 

@@ -119,7 +119,7 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 
 if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
 { // Connect to DB:
-	$tmp_evoconf_db = $EvoConfig->DB;
+	$tmp_evoconf_db = $db_config;
 	// We want a friendly message if we can't connect:
 	$tmp_evoconf_db['halt_on_error'] = false;
 	$tmp_evoconf_db['show_errors'] = false;
@@ -192,10 +192,10 @@ switch( $action )
 			'password' => $conf_db_password,
 			'name' => $conf_db_name,
 			'host' => $conf_db_host,
-			'aliases' => $EvoConfig->DB['aliases'],
-			'use_transactions' => $EvoConfig->DB['use_transactions'],
-			'table_options' => $EvoConfig->DB['table_options'],
-			'connection_charset' => $EvoConfig->DB['connection_charset'],
+			'aliases' => $db_config['aliases'],
+			'use_transactions' => $db_config['use_transactions'],
+			'table_options' => $db_config['table_options'],
+			'connection_charset' => $db_config['connection_charset'],
 			'halt_on_error' => false,
 			'debug_dump_function_trace_for_errors' => false ) );
 		if( $DB->error )
@@ -219,7 +219,7 @@ switch( $action )
 			// Update conf:
 			$conf = preg_replace(
 				array(
-					'#\$EvoConfig->DB\s*=\s*array\(
+					'#\$db_config\s*=\s*array\(
 						\s*[\'"]user[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
 						\s*[\'"]password[\'"]\s*=>\s*[\'"].*?[\'"], ([^\n\r]*\r?\n)
 						\s*[\'"]name[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
@@ -231,7 +231,7 @@ switch( $action )
 					"#config_is_done\s*=.*?;#",
 				),
 				array(
-					"\$EvoConfig->DB = array(\n"
+					"\$db_config = array(\n"
 						."\t'user'     => '$conf_db_user',\$1"
 						."\t'password' => '$conf_db_password',\$2"
 						."\t'name'     => '$conf_db_name',\$3"
@@ -304,10 +304,10 @@ switch( $action )
 		if( (($action == 'start') && ($allow_evodb_reset == 1)) || (!$config_is_done) )
 		{
 			// Set default params if not provided otherwise:
-			param( 'conf_db_user', 'string', $EvoConfig->DB['user'] );
-			param( 'conf_db_password', 'string', $EvoConfig->DB['password'] );
-			param( 'conf_db_name', 'string', $EvoConfig->DB['name'] );
-			param( 'conf_db_host', 'string', $EvoConfig->DB['host'] );
+			param( 'conf_db_user', 'string', $db_config['user'] );
+			param( 'conf_db_password', 'string', $db_config['password'] );
+			param( 'conf_db_name', 'string', $db_config['name'] );
+			param( 'conf_db_host', 'string', $db_config['host'] );
 			param( 'conf_db_tableprefix', 'string', $tableprefix );
 			// Guess baseurl:
 			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
@@ -431,10 +431,10 @@ to
 		<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
 
 		<?php
-		if( !isset($conf_db_user) ) $conf_db_user = $EvoConfig->DB['user'];
-		if( !isset($conf_db_password) ) $conf_db_password = $EvoConfig->DB['password'];
-		if( !isset($conf_db_name) ) $conf_db_name = $EvoConfig->DB['name'];
-		if( !isset($conf_db_host) ) $conf_db_host = $EvoConfig->DB['host'];
+		if( !isset($conf_db_user) ) $conf_db_user = $db_config['user'];
+		if( !isset($conf_db_password) ) $conf_db_password = $db_config['password'];
+		if( !isset($conf_db_name) ) $conf_db_name = $db_config['name'];
+		if( !isset($conf_db_host) ) $conf_db_host = $db_config['host'];
 
 		echo '<pre>',
 		T_('MySQL Username').': '.$conf_db_user."\n".
@@ -600,6 +600,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.102  2006/05/30 21:53:06  blueyed
+ * Replaced $EvoConfig->DB with $db_config
+ *
  * Revision 1.101  2006/05/28 22:27:13  blueyed
  * Basic config file
  *

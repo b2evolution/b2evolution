@@ -155,7 +155,7 @@ $redirect_to_postblog = false;
  *
  * This is recommended on production environments.
  */
-$EvoConfig->DB['show_errors'] = true;
+$db_config['show_errors'] = true;
 
 
 /**
@@ -163,7 +163,7 @@ $EvoConfig->DB['show_errors'] = true;
  *
  * Setting this to false is not recommended,
  */
-$EvoConfig->DB['halt_on_error'] = true;
+$db_config['halt_on_error'] = true;
 
 
 /**
@@ -173,7 +173,7 @@ $EvoConfig->DB['halt_on_error'] = true;
  *  If you want to have multiple b2evo installations in a single database you should
  *  change {@link $tableprefix} in _basic_config.php)
  */
-$EvoConfig->DB['aliases'] = array(
+$db_config['aliases'] = array(
 		'T_antispam'           => $tableprefix.'antispam',
 		'T_basedomains'        => $tableprefix.'basedomains',
 		'T_blogs'              => $tableprefix.'blogs',
@@ -211,21 +211,21 @@ $EvoConfig->DB['aliases'] = array(
  * Edit those if you have control over you MySQL server and want a more professional
  * database than what is commonly offered by popular hosting providers.
  */
-$EvoConfig->DB['table_options'] = ''; 	// Low ranking MySQL hosting compatibility Default
+$db_config['table_options'] = ''; 	// Low ranking MySQL hosting compatibility Default
 // Recommended settings:
-# $EvoConfig->DB['table_options'] = ' ENGINE=InnoDB ';
+# $db_config['table_options'] = ' ENGINE=InnoDB ';
 // Development settings:
-# $EvoConfig->DB['table_options'] = ' ENGINE=InnoDB DEFAULT CHARSET=utf8 ';
+# $db_config['table_options'] = ' ENGINE=InnoDB DEFAULT CHARSET=utf8 ';
 
 
 /**
  * Use transactions in DB?
  *
- * You need to use InnoDB in order to enable this. See the {@link $EvoConfig->DB "table_options" key}.
+ * You need to use InnoDB in order to enable this. See the {@link $db_config "table_options" key}.
  */
-$EvoConfig->DB['use_transactions'] = false;
+$db_config['use_transactions'] = false;
 // Recommended settings:
-# $EvoConfig->DB['use_transactions'] = true;
+# $db_config['use_transactions'] = true;
 
 
 /**
@@ -235,7 +235,7 @@ $EvoConfig->DB['use_transactions'] = false;
  * Recommended for professional use and DEVELOPMENT only.
  * As of today, upgrading is not guaranteed when foreign keys are enabled.
  *
- * Typically requires InnoDB to be set in $EvoConfig->DB['table_options'].
+ * Typically requires InnoDB to be set in $db_config['table_options'].
  *
  * This is used during table CREATION only.
  *

@@ -302,7 +302,7 @@ class DataObject
 	 */
 	function dbdelete()
 	{
-		global $DB, $Messages, $EvoConfig;
+		global $DB, $Messages, $db_config;
 
 		if( $this->ID == 0 ) { debug_die( 'Non persistant object cannot be deleted!' ); }
 
@@ -314,7 +314,7 @@ class DataObject
 
 			foreach( $this->delete_cascades as $restriction )
 			{
-				if( !isset( $EvoConfig->DB['aliases'][$restriction['table']] ) )
+				if( !isset( $db_config['aliases'][$restriction['table']] ) )
 				{	// We have no declaration for this table, we consider we don't deal with this table in this app:
 					continue;
 				}
@@ -351,7 +351,7 @@ class DataObject
 	 */
 	function check_relations( $what, $ignore = array() )
 	{
-		global $DB, $Messages, $EvoConfig;
+		global $DB, $Messages;
 
 		foreach( $this->$what as $restriction )
 		{
@@ -664,6 +664,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2006/05/30 21:53:06  blueyed
+ * Replaced $EvoConfig->DB with $db_config
+ *
  * Revision 1.12  2006/04/28 16:08:25  blueyed
  * Normalization
  *

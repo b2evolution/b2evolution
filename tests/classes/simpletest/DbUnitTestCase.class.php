@@ -101,9 +101,9 @@ class DbUnitTestCase extends EvoUnitTestCase
 	 */
 	function dropTestDbTables()
 	{
-		global $EvoConfig;
+		global $db_config;
 
-		$testDbTables = array_keys($EvoConfig->DB['aliases']);
+		$testDbTables = array_keys($db_config['aliases']);
 
 		if( $test_tables = $this->test_DB->get_col( 'SHOW TABLES LIKE "test%"' ) )
 		{

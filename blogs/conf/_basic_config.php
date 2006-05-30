@@ -26,15 +26,10 @@ die( 'The site is temporarily down for maintenance.' );
 */
 
 /**
- * @var object Holds settings.
- */
-$EvoConfig = & new stdClass;
-
-/**
  * MySQL DB settings.
  * Fill in your database details (check carefully or nothing will work!)
  */
-$EvoConfig->DB = array(
+$db_config = array(
 	'user'          => 'demouser',     // your MySQL username
 	'password'      => 'demopass',     // ...and password
 	'name'          => 'b2evolution',  // the name of the database

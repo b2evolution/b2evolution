@@ -52,7 +52,7 @@ $evo_charset = '';
  * This allows b2evo to work internally in a different charset from the database charset.
  * Example: b2evo will use latin1 whereas the database uses utf8.
  */
-$EvoConfig->DB['connection_charset'] = '';
+$db_config['connection_charset'] = '';
 
 
 /**

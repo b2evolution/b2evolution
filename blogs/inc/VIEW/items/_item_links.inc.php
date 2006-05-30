@@ -26,7 +26,7 @@
  *
  * @version $Id$
  */
-	global $EvoConfig, $edited_Item, $edit_allowed;
+	global $edited_Item, $edit_allowed;
 
 
 	$SQL = & new SQL();
@@ -140,6 +140,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2006/05/30 21:53:06  blueyed
+ * Replaced $EvoConfig->DB with $db_config
+ *
  * Revision 1.4  2006/04/19 20:13:51  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

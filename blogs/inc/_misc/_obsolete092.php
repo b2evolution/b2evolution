@@ -1614,7 +1614,7 @@ $start_of_week = 1;
 /**#@+
  * database tables' names
  *
- * @deprecated by {@link $EvoConfig}, see /conf/_advanced.php.
+ * @deprecated by {@link $db_config}, see /conf/_advanced.php.
  */
 $tableposts        = $tableprefix.'posts';
 $tableusers        = $tableprefix.'users';
@@ -1672,6 +1672,9 @@ $b2_version = $app_version;
 
 /*
  * $Log$
+ * Revision 1.7  2006/05/30 21:53:06  blueyed
+ * Replaced $EvoConfig->DB with $db_config
+ *
  * Revision 1.6  2006/03/24 19:40:49  blueyed
  * Only use absolute URLs if necessary because of used <base/> tag. Added base_tag()/skin_base_tag(); deprecated skinbase()
  *

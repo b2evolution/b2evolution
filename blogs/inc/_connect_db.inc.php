@@ -18,6 +18,6 @@ require_once dirname(__FILE__).'/_misc/_db.class.php';
  *
  * @global DB $DB
  */
-$DB = & new DB( $EvoConfig->DB );
+$DB = & new DB( $db_config );
 
 ?>

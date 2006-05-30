@@ -16,7 +16,7 @@ class EvoUnitTestCase extends UnitTestCase
 	 */
 	function setUp()
 	{
-		global $FileRootCache, $FiletypeCache, $FileCache, $GroupCache, $DB, $EvoConfig, $Debuglog, $Messages, $UserCache, $Timer, $Plugins;
+		global $FileRootCache, $FiletypeCache, $FileCache, $GroupCache, $DB, $db_config, $Debuglog, $Messages, $UserCache, $Timer, $Plugins;
 
 		$Debuglog = new Log('note');
 		$Messages = new Log('error');
@@ -29,7 +29,7 @@ class EvoUnitTestCase extends UnitTestCase
 		$Timer = new Timer();
 		$Plugins = new Plugins_no_DB();
 
-		$db_params = $EvoConfig->DB;
+		$db_params = $db_config;
 		$db_params['new_link'] = true; // needed to not interfere with the DB connection to the test DB (setup in DbUnitTestCase).
 		$DB = new DB( $db_params );
 	}
