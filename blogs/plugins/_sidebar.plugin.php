@@ -31,7 +31,6 @@ class sidebar_plugin extends Plugin
 	var $priority = 95;
 	var $version = 'CVS $Revision$';
 	var $author = 'Cafelog team';
-	var $help_url = 'http://b2evolution.net/';
 
 
 	/**
@@ -89,6 +88,9 @@ class sidebar_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.10  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.9  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

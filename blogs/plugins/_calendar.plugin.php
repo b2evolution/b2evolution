@@ -52,7 +52,6 @@ class calendar_plugin extends Plugin
 	var $priority = 20;
 	var $version = 'CVS $Revision$';
 	var $author = 'The b2evo Group';
-	var $help_url = 'http://b2evolution.net/';
 
 
 
@@ -985,6 +984,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.17  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.16  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

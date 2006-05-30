@@ -541,6 +541,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.41  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.40  2006/05/24 20:43:19  blueyed
  * Pass "Item" as param to Render* event methods.
  *

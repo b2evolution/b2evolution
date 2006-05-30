@@ -111,7 +111,7 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 			</td>
 			<td>
 				<a href="admin.php?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>" title="<?php echo T_('Edit plugin settings!') ?>">
-				<?php	$loop_Plugin->name(); ?>
+				<strong><?php	$loop_Plugin->name(); ?></strong>
 				</a>
 			</td>
 			<td class="right"><?php echo $loop_Plugin->priority; ?></td>
@@ -204,7 +204,7 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 		?>
 		<tr class="<?php echo (($count++ % 2) ? 'odd' : 'even') ?>">
 			<td class="firstcol">
-				<?php $loop_Plugin->name(); ?>
+				<strong><?php $loop_Plugin->name(); ?></strong>
 			</td>
 			<td>
 				<?php
@@ -236,10 +236,12 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 				{
 					$help_icons[] = $help_external;
 				}
+				/* broken:
 				if( $help_internal = $loop_Plugin->get_README_link() )
 				{
 					$help_icons[] = $help_internal;
 				}
+				*/
 				if( ! empty($help_icons) )
 				{
 					echo ' '.implode( ' ', $help_icons );
@@ -279,6 +281,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.19  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.18  2006/05/04 06:44:45  blueyed
  * Display version with available plugins.
  *

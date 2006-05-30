@@ -992,15 +992,23 @@ switch( $action )
 
 	case 'edit_settings':
 		$AdminUI->disp_view( 'settings/_set_plugins_editsettings.form.php' );
-		// Go on to displaying info - might be handy to not edit a wrong Plugin and provides help links:
-
+		break;
 
 	case 'info':
 		// Display plugin info:
 		require_once $inc_path.'_misc/_plugin.funcs.php';
 
 		$Form = & new Form( $pagenow );
+
+		if( $edit_Plugin->ID > 0 )
+		{ // do not display ID for non registered Plugins
+			// Edit settings button:
+			$Form->global_icon( T_('Edit plugin settings!'), 'edit', $admin_url.'?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID );
+		}
+
+		// Close button:
 		$Form->global_icon( T_('Close info!'), 'close', regenerate_url() );
+
 		$Form->begin_form('fform');
 		$Form->hidden( 'ctrl', 'plugins' );
 		$Form->begin_fieldset('Plugin info', array('class' => 'fieldset clear')); // "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509)
@@ -1012,7 +1020,7 @@ switch( $action )
 		$Form->info_field( T_('Short desc'), $edit_Plugin->short_desc( 'raw', false ) );
 		$Form->info_field( T_('Long desc'), $edit_Plugin->long_desc( 'raw', false ) );
 		if( $edit_Plugin->ID > 0 )
-		{ // do not display ID for not registered Plugins
+		{ // do not display ID for non registered Plugins
 			$Form->info_field( T_('ID'), $edit_Plugin->ID );
 		}
 		$Form->info_field( T_('Version'), $edit_Plugin->version );
@@ -1033,6 +1041,9 @@ switch( $action )
 		}
 
 		$Form->end_fieldset();
+
+		// TODO: add "Install NOW" button (if not already installed)
+
 		$Form->end_form();
 		$action = '';
 		break;

@@ -57,7 +57,7 @@ class Plugin
 	 * To make it available for translations set it in the constructor by
 	 * using the {@link Plugin::T_()} function.
 	 *
-	 * This should be not more than 50 characters.
+	 * This should be no longer than 50 characters.
 	 *
 	 * @var string
 	 */
@@ -2135,9 +2135,9 @@ class Plugin
 		$title = '';
 		$icon = 'help';
 		$word = '';
-		$link_attribs = array( 'target' => 'help_plugin_'.$this->ID ); // TODO: use JS popup instead?
+		$link_attribs = array( 'target' => '_blank' ); // TODO: use JS popup instead? fp>> YES! (and make sure it gets to front)
 
-		if( empty($target) )
+		if( empty($target) ) // TODO  $target == '$help_url'
 		{
 			$url = ! empty( $this->help_url ) ? $this->help_url : 'http://manual.b2evolution.net/Plugins/'.$this->classname;
 			$title = T_('Homepage of the plugin');
@@ -2153,12 +2153,14 @@ class Plugin
 			$url = $target;
 		}
 
-		return action_icon( $title, $icon, $url, $word, $link_attribs );
+		return action_icon( $title, $icon, $url, $word, 4, 1, $link_attribs );
 	}
 
 
 	/**
 	 * Display a link to open the Plugin's README.html file in a JS popup, if available.
+	 *
+	 * @todo merge with get_help_link( '$readme' )
 	 *
 	 * @param string Word to be used after action icon
 	 * @return string Either the HTML A-tag or empty, if no README.html available
@@ -2174,7 +2176,7 @@ class Plugin
 
 		return action_icon( T_('Local documentation of the plugin'), 'help',
 				url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$this->ID ),
-				$word, array( 'use_js_popup'=>true, 'id'=>'anchor_help_plugin_'.$this->ID ) );
+				$word, 4, 1, array( 'use_js_popup'=>true, 'id'=>'anchor_help_plugin_'.$this->ID ) );
 	}
 
 
@@ -2244,6 +2246,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.52  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.51  2006/05/24 20:43:19  blueyed
  * Pass "Item" as param to Render* event methods.
  *

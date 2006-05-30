@@ -208,6 +208,7 @@ class textile_plugin extends Plugin
 	var $code = 'b2DATxtl';
 	var $name = 'Textile (beta)';
 	var $priority = 20;
+	var $version = '2.0 beta';
 	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
@@ -1002,6 +1003,9 @@ function refs($m)
 
 /*
  * $Log$
+ * Revision 1.10  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.9  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

@@ -21,6 +21,7 @@ class bbcode_plugin extends Plugin
 	var $code = 'b2evBBco';
 	var $name = 'BB code';
 	var $priority = 50;
+	var $version = 'CVS $Revision$';
 	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
@@ -40,7 +41,6 @@ class bbcode_plugin extends Plugin
 			'#\[size=([0-9]+?)](.+?)\[/size]#is',
 			'#\[font=([A-Za-z0-9 ;\-]+?)](.+?)\[/font]#is',
 			// Following lines added by Georges (iznogoudmc)
-			// (Remove comment if modification validated)
 			'#\[code](.+?)\[/code]#is',
 			'#\[quote](.+?)\[/quote]#is',
 			'#\[list=1](.+?)\[/list]#is',
@@ -71,7 +71,6 @@ class bbcode_plugin extends Plugin
 			'<span style="font-size:$1px">$2</span>',
 			'<span style="font-family:$1">$2</span>',
 			// Following lines added by Georges (iznogoudmc)
-			// (Remove comment if modification validated)
 			'<pre>$1</pre>',
 			'&laquo;&nbsp;$1&nbsp;&raquo;',
 			'<ol type="1">$1</ol>',
@@ -94,7 +93,7 @@ class bbcode_plugin extends Plugin
 	function bbcode_plugin()
 	{
 		$this->short_desc = T_('BB formatting e-g [b]bold[/b]');
-		$this->long_desc = T_('No description available');
+		$this->long_desc = T_('Available tags are: [b] [i] [u] [s] [color=...] [size=...] [font=...] [code] [quote] [list=1] [list=a] [list] [*]');
 	}
 
 
@@ -128,6 +127,9 @@ class bbcode_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.11  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.10  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

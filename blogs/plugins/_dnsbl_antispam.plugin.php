@@ -44,7 +44,6 @@ class dnsbl_antispam_plugin extends Plugin
 	var $priority = 40;
 	var $version = '$Revision$';
 	var $author = 'The b2evo Group';
-	var $help_url = 'http://b2evolution.net/';
 
 
 	/**
@@ -686,6 +685,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.26  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.25  2006/05/21 20:27:47  blueyed
  * charset fixed for error page - as good as we can
  *

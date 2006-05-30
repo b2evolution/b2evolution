@@ -22,6 +22,7 @@ class smilies_plugin extends Plugin
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
 	var $priority = 80;
+	var $version = 'CVS $Revision$';
 	var $apply_rendering = 'opt-out';
 
 	/**
@@ -59,7 +60,8 @@ class smilies_plugin extends Plugin
 	function smilies_plugin()
 	{
 		$this->short_desc = T_('Graphical smileys');
-		$this->long_desc = T_('One click smilies inserting + Convert text smilies to icons');
+		$this->long_desc = T_('This renverer will convert text smilies like :) to graphical icons.<br />
+			Optionally, it will also display a toolbar for quick insertion of smilies into a post.');
 
 		/**
 		 * Smilies configuration.
@@ -262,6 +264,9 @@ class smilies_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.20  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.19  2006/04/24 20:16:08  blueyed
  * Use callback_on_non_matching_blocks(); excluding PRE and CODE blocks
  *

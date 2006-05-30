@@ -19,7 +19,7 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 60;
-
+	var $version = 'CVS $Revision$';
 	var $apply_rendering = 'opt-out';
 	var $short_desc;
 	var $long_desc;
@@ -31,7 +31,7 @@ class autolinks_plugin extends Plugin
 	function autolinks_plugin()
 	{
 		$this->short_desc = T_('Make URLs clickable');
-		$this->long_desc = T_('No description available');
+		$this->long_desc = T_('This renderer will detect URLs in the text and automatically transform them into clickable links.');
 	}
 
 
@@ -55,6 +55,9 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.9  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.8  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

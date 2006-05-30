@@ -52,7 +52,6 @@ class basic_antispam_plugin extends Plugin
 	var $priority = 60;
 	var $version = 'CVS $Revision$';
 	var $author = 'The b2evo Group';
-	var $help_url = '';
 
 
 	/**
@@ -61,7 +60,7 @@ class basic_antispam_plugin extends Plugin
 	function basic_antispam_plugin()
 	{
 		$this->short_desc = T_('Basic antispam methods');
-		$this->long_desc = T_('This plugin provides basic methods to reduce spam.');
+		$this->long_desc = T_('This plugin provides basic methods to detect & block spam on referers, comments & trackbacks.');
 	}
 
 
@@ -169,6 +168,7 @@ class basic_antispam_plugin extends Plugin
 	{
 		if( ! $this->Settings->get('check_url_trackbacks') )
 		{ // disabled by Settings:
+			// TODO: disable event automatically at setting time
 			return;
 		}
 
@@ -547,6 +547,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.14  2006/05/30 19:39:56  fplanque
+ * plugin cleanup
+ *
  * Revision 1.13  2006/05/30 00:18:29  blueyed
  * http://dev.b2evolution.net/todo.php?p=87686
  *

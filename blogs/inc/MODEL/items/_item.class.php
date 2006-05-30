@@ -1731,6 +1731,9 @@ class Item extends DataObject
 			$loop_RendererPlugin->name();
 			echo '</label>';
 
+			// fp> TODO: the first thing we want here is a TINY javascript popup with the LONG desc. The links to readme and external help should be inside of the tiny popup.
+			// fp> a javascript DHTML onhover help would be evenb better than the JS popup
+
 			// internal README.html link:
 			echo ' '.$loop_RendererPlugin->get_README_link();
 			// external help link:
@@ -2625,6 +2628,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.50  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.49  2006/05/29 23:40:34  blueyed
  * Do not display errors with "comment" feedback link.
  *

@@ -17,6 +17,7 @@ class texturize_plugin extends Plugin
 	var $code = 'b2WPTxrz';
 	var $name = 'Texturize';
 	var $priority = 90;
+	var $version = 'CVS $Revision$';
 	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
@@ -27,8 +28,14 @@ class texturize_plugin extends Plugin
 	 */
 	function texturize_plugin()
 	{
-		$this->short_desc = 'Smart quotes and more';
-		$this->long_desc = 'No description available';
+		$this->short_desc = T_('Smart quotes + additional typographic replacements.');
+		$this->long_desc = T_('This renderer will replace standard and double quotes with typographic quotes were appropriate.<br />
+		 It will also perform the following replacements:
+		 <ul>
+		 	<li>--- to &#8212;</li>
+			<li>-- to &#8211;</li>
+			<li>... to &#8230;</li>
+		</ul>' );
 	}
 
 
@@ -107,6 +114,9 @@ class texturize_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.10  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.9  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

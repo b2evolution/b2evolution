@@ -45,7 +45,6 @@ class categories_plugin extends Plugin
 	var $priority = 60;
 	var $version = 'CVS $Revision$';
 	var $author = 'The b2evo Group';
-	var $help_url = 'http://b2evolution.net/';
 
 
 	/**
@@ -320,6 +319,9 @@ class categories_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.21  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.20  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

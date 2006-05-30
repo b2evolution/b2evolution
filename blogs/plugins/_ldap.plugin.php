@@ -45,7 +45,6 @@ class ldap_plugin extends Plugin
 	var $priority = 50;
 	var $version = 'CVS $Revision$';
 	var $author = 'dAniel hAhler';
-	var $help_url = 'http://manual.b2evolution.net/Plugins/ldap_plugin';
 
 
 	/**
@@ -334,6 +333,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.24  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.23  2006/04/24 15:43:37  fplanque
  * no message
  *

@@ -22,6 +22,7 @@ class wacko_plugin extends Plugin
 	var $code = 'b2evWcko';
 	var $name = 'Wacko formatting';
 	var $priority = 30;
+	var $version = '$Revision$';
 	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
@@ -69,11 +70,14 @@ class wacko_plugin extends Plugin
 	function wacko_plugin()
 	{
 		$this->short_desc = T_('Wacko style formatting');
-		$this->long_desc = T_('== h2 ==
-=== h3 ===
-==== h4 ====
-===== h5 =====
-====== h6 ======');
+		$this->long_desc = T_('Formats possibles:<br />
+			== h2 ==<br />
+			=== h3 ===<br />
+			==== h4 ====<br />
+			===== h5 =====<br />
+			====== h6 ======<br />
+			--- (horinzal rule)<br />
+			%%%codeblock%%%<br />');
 	}
 
 
@@ -168,6 +172,9 @@ class wacko_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.9  2006/05/30 19:39:56  fplanque
+ * plugin cleanup
+ *
  * Revision 1.8  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

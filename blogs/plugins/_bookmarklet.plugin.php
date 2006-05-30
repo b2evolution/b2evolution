@@ -27,11 +27,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class bookmarklet_plugin extends Plugin
 {
 	var $name = 'Bookmarklet';
-	var $code = 'cafeSidB';
+	var $code = 'cafeBkmk';
 	var $priority = 94;
 	var $version = 'CVS $Revision$';
 	var $author = 'Cafelog team';
-	var $help_url = 'http://b2evolution.net/';
 
 
 	/**
@@ -97,6 +96,9 @@ class bookmarklet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.11  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.10  2006/05/19 15:59:52  blueyed
  * Fixed bookmarklet plugin. Thanks to personman for pointing it out.
  *

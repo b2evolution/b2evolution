@@ -22,6 +22,7 @@ class wikilinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Wiki Links';
 	var $priority = 35;
+	var $version = '$Revision$';
 	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
@@ -32,7 +33,8 @@ class wikilinks_plugin extends Plugin
 	function wikilinks_plugin()
 	{
 		$this->short_desc = T_('Wiki Links converter');
-		$this->long_desc = T_('WikiWord links ((link)) [[link ]]');
+		$this->long_desc = T_('WikiWord links are created with a CamelCased WiiWord, a ((link)), or a [[link ]].<br />
+		 CamelCased words will be exploded to camel_case which should then match a post url title.');
 	}
 
 
@@ -255,6 +257,9 @@ class wikilinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.15  2006/05/30 19:39:56  fplanque
+ * plugin cleanup
+ *
  * Revision 1.14  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

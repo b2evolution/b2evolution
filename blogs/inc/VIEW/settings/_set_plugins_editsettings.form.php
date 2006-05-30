@@ -58,11 +58,11 @@ if( $edit_Plugin->get_help_file() )
 	$Form->global_icon( T_('Local documentation of the plugin'), 'help',
 		url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$edit_Plugin->ID.'#'.$edit_Plugin->classname.'_settings' ), '', array('use_js_popup'=>true, 'id'=>'anchor_help_popup_'.$edit_Plugin->ID) );
 }
-if( ! empty( $edit_Plugin->help_url ) )
-{
-	$Form->global_icon( T_('Homepage of the plugin'), 'www', $edit_Plugin->help_url );
-}
 
+// Info button:
+$Form->global_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$edit_Plugin->ID ) );
+
+// Close button:
 $Form->global_icon( T_('Cancel edit!'), 'close', regenerate_url() );
 
 $Form->begin_form( 'fform', '',
@@ -70,6 +70,11 @@ $Form->begin_form( 'fform', '',
 	array( 'onsubmit'=>'var es=this.elements; for( var i=0; i < es.length; i++ ) { es[i].disabled=false; };' ) );
 
 $Form->hidden( 'plugin_ID', $edit_Plugin->ID );
+
+$Form->begin_fieldset( T_('Plugin info'), array( 'class' => 'clear' ) );
+	$Form->info_field( T_('Name'), $edit_Plugin->name( 'raw', false ) );
+	$Form->info_field( T_('Short desc'), $edit_Plugin->short_desc( 'raw', false ) );
+$Form->end_fieldset();
 
 // PluginSettings
 if( $edit_Plugin->Settings )
@@ -165,6 +170,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.13  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
  * Revision 1.12  2006/05/22 20:35:36  blueyed
  * Passthrough some attribute of plugin settings, allowing to use JS handlers. Also fixed submitting of disabled form elements.
  *
