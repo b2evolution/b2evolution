@@ -87,9 +87,9 @@ elseif( ! empty($comment_id) )
 	{
 		$Comment = & new Comment( $row );
 
-		if( isset($Comment->author_User) )
+		if( $comment_author_User = & $Comment->get_author_User() )
 		{ // Source comment is from a registered user:
-			if( ! $Comment->author_User->allow_msgform )
+			if( ! $comment_author_User->allow_msgform )
 			{
 				echo '<p class="error">The user does not want to get contacted through the message form.</p>'; // should be prevented by UI
 				return;
@@ -194,6 +194,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.26  2006/05/30 21:51:03  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
  * Revision 1.25  2006/05/19 18:15:06  blueyed
  * Merged from v-1-8 branch
  *
