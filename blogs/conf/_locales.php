@@ -82,15 +82,15 @@ require_once $model_path.'settings/_locale.funcs.php';
  * Flag source: http://www.crwflags.com/fotw/flags/iso3166.html
  * IMPORTANT: Try to keep the locale names short, they take away valuable space on the screen!
  *
- * Keys:  (fp>> what the hell is that??)
- *  - 'set_locales':
- *    This gets used for {@link setlocale()} (currently only when using gettext support [$use_l10n=1]).
- *    This is a list of locales that get tried. One of them must be available on the system ("locale -a").
- *    If not given, the value of 'messages' gets used.
+ * Documentation of the keys:
  *  - 'messages':
  *    The directory where the locale's files are.
  *  - 'charset':
  *    Character set of the locale's files.
+ *  - 'set_locales':
+ *    This gets used for {@link setlocale()} (currently only when using gettext support [$use_l10n=1]).
+ *    This is a list of locales that get tried. One of them must be available on the system ("locale -a").
+ *    If not given, the value of 'messages' gets used.
  *
  * @todo Locale message dirs should be named LOCALE.CHARSET and not LOCALE_CHARSET, e.g. "zh_CN.utf8" instead of "zh_CN_utf-8" (according to gettext)
  */
@@ -441,45 +441,6 @@ $locales = array(
 										'messages' => 'zh_TW',
 										'enabled' => 1,
 									),
-);
-
-
-/**
- * MySQL charsets map
- *
- * This maps "regular" charset names (used for $evo_charset and in $locales) to
- * the MySQL names.
- *
- * This is taken from phpMyAdmin (libraries/select_lang.lib.php).
- *
- * @todo Move to DB class? (fp: makes sense)
- *
- * @var array
- */
-$mysql_charset_map = array(
-	'big5'         => 'big5',
-	'cp-866'       => 'cp866',
-	'euc-jp'       => 'ujis',
-	'euc-kr'       => 'euckr',
-	'gb2312'       => 'gb2312',
-	'gbk'          => 'gbk',
-	'iso-8859-1'   => 'latin1',
-	'iso-8859-2'   => 'latin2',
-	'iso-8859-7'   => 'greek',
-	'iso-8859-8'   => 'hebrew',
-	'iso-8859-8-i' => 'hebrew',
-	'iso-8859-9'   => 'latin5',
-	'iso-8859-13'  => 'latin7',
-	'iso-8859-15'  => 'latin1',
-	'koi8-r'       => 'koi8r',
-	'shift_jis'    => 'sjis',
-	'tis-620'      => 'tis620',
-	'utf-8'        => 'utf8',
-	'windows-1250' => 'cp1250',
-	'windows-1251' => 'cp1251',
-	'windows-1252' => 'latin1',
-	'windows-1256' => 'cp1256',
-	'windows-1257' => 'cp1257',
 );
 
 
