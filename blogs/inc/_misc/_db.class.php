@@ -233,8 +233,10 @@ class DB
 	 *   Manadatory:
 	 *    - 'user': username to connect with
 	 *    - 'password': password to connect with
-	 *    - 'name': the name of the default database, see {@link select()}
+	 *    OR
+	 *    - 'handle': a MySQL Database handle (from a previous {@link mysql_connect()})
 	 *   Optional:
+	 *    - 'name': the name of the default database, see {@link DB::select()}
 	 *    - 'host': host of the database; Default: 'localhost'
 	 *    - 'show_errors': Display SQL errors? (true/false); Default: don't change member default ({@link $show_errors})
 	 *    - 'halt_on_error': Halt on error? (true/false); Default: don't change member default ({@link $halt_on_error})
@@ -250,11 +252,18 @@ class DB
 		//pre_dump( $params );
 
 		// Mandatory parameters:
-		$this->dbuser = $params['user'];
-		$this->dbpassword = $params['password'];
-		$this->dbname = $params['name'];
+		if( isset( $params['handle'] ) )
+		{ // DB-Link provided:
+			$this->dbhandle = $params['handle'];
+		}
+		else
+		{
+			$this->dbuser = $params['user'];
+			$this->dbpassword = $params['password'];
+		}
 
 		// Optional parameters (Allow overriding through $params, because we cannot hack the $DB object after creation without using a "@include"):
+		if( isset($params['name']) ) $this->dbname = $params['name'];
 		if( isset($params['host']) ) $this->dbhost = $params['host'];
 		if( isset($params['show_errors']) ) $this->show_errors = $params['show_errors'];
 		if( isset($params['halt_on_error']) ) $this->halt_on_error = $params['halt_on_error'];
@@ -282,8 +291,10 @@ class DB
 		$new_link = isset( $params['new_link'] ) ? $params['new_link'] : false;
 		$client_flags = isset( $params['client_flags'] ) ? $params['client_flags'] : 0;
 
-		// Connect to the Database:
-		$this->dbhandle = @mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags );
+		if( ! isset($params['handle']) )
+		{ // Connect to the Database:
+			$this->dbhandle = @mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags );
+		}
 
 		if( ! $this->dbhandle )
 		{
@@ -295,7 +306,7 @@ class DB
 					<li>Are you sure that the database server is running?</li>
 				</ol>' );
 		}
-		else
+		elseif( isset($this->dbname) )
 		{
 			$this->select($this->dbname);
 		}
@@ -1293,6 +1304,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.9  2006/05/31 13:43:06  blueyed
+ * "handle"-param to provide an existing connection-link/-resource from a previous mysql_connect(). This is useful when integrating DB class based functions in another framework, e.g. Typo3.
+ *
  * Revision 1.8  2006/05/30 21:53:06  blueyed
  * Replaced $EvoConfig->DB with $db_config
  *
