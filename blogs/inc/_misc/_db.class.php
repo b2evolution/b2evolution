@@ -527,23 +527,33 @@ class DB
 		// echo $this->func_call, '<br />';
 
 		// Replace aliases:
-		// TODO: this should only replace the table name part(s), not the whole query!
-		// blueyed> I've changed it to replace in table name parts for UPDATE, INSERT and REPLACE, because
-		//          it corrupted serialized data..
-		//          IMHO, a cleaner solution would be to use {T_xxx} in the queries and replace it here. In object properties (e.g. DataObject::dbtablename), only "T_xxx" would get used and surrounded by "{..}" in the queries it creates.
+		if( ! empty($this->dbaliases) )
+		{
+			// TODO: this should only replace the table name part(s), not the whole query!
+			// blueyed> I've changed it to replace in table name parts for UPDATE, INSERT and REPLACE, because
+			//          it corrupted serialized data..
+			//          IMHO, a cleaner solution would be to use {T_xxx} in the queries and replace it here. In object properties (e.g. DataObject::dbtablename), only "T_xxx" would get used and surrounded by "{..}" in the queries it creates.
 
-		if( preg_match( '~^\s*(UPDATE\s+)(.*?)(\sSET\s.*)$~is', $query, $match ) )
-		{ // replace only between UPDATE and SET:
-			$query = $match[1].preg_replace( $this->dbaliases, $this->dbreplaces, $match[2] ).$match[3];
-		}
-		elseif( preg_match( '~^\s*(INSERT|REPLACE\s+)(.*?)(\s(VALUES|SET)\s.*)$~is', $query, $match ) )
-		{ // replace only between INSERT|REPLACE and VALUES|SET:
-			$query = $match[1].preg_replace( $this->dbaliases, $this->dbreplaces, $match[2] ).$match[3];
-		}
-		else
-		{ // replace in whole query:
-			$query = preg_replace( $this->dbaliases, $this->dbreplaces, $query );
+			if( preg_match( '~^\s*(UPDATE\s+)(.*?)(\sSET\s.*)$~is', $query, $match ) )
+			{ // replace only between UPDATE and SET:
+				$query = $match[1].preg_replace( $this->dbaliases, $this->dbreplaces, $match[2] ).$match[3];
+			}
+			elseif( preg_match( '~^\s*(INSERT|REPLACE\s+)(.*?)(\s(VALUES|SET)\s.*)$~is', $query, $match ) )
+			{ // replace only between INSERT|REPLACE and VALUES|SET:
+				$query = $match[1].preg_replace( $this->dbaliases, $this->dbreplaces, $match[2] ).$match[3];
+			}
+			else
+			{ // replace in whole query:
+				$query = preg_replace( $this->dbaliases, $this->dbreplaces, $query );
 
+				if( preg_match( '#^ \s* create \s* table \s #ix', $query) )
+				{ // Query is a table creation, we add table options:
+					$query .= $this->table_options;
+				}
+			}
+		}
+		elseif( ! empty($this->table_options) )
+		{ // No aliases, but table_options:
 			if( preg_match( '#^ \s* create \s* table \s #ix', $query) )
 			{ // Query is a table creation, we add table options:
 				$query .= $this->table_options;
@@ -1304,6 +1314,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.10  2006/05/31 14:23:38  blueyed
+ * Optimize, if no aliases.
+ *
  * Revision 1.9  2006/05/31 13:43:06  blueyed
  * "handle"-param to provide an existing connection-link/-resource from a previous mysql_connect(). This is useful when integrating DB class based functions in another framework, e.g. Typo3.
  *
