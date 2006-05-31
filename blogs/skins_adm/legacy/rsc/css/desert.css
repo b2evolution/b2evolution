@@ -605,7 +605,7 @@ div.bCommentpublished span.bStatus {
 	background-color: #fff;
 	/* background-color: #fff7e7; */
 }
-.bPostprotected span.bStatus, {
+.bPostprotected span.bStatus {
 	color: #ea0;
 }
 .bPostprotected > div.bSmallHead /* Direct child only */
