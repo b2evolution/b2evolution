@@ -344,8 +344,6 @@ class DB
 	 */
 	function select($db)
 	{
-		global $Timer;
-
 		if( !@mysql_select_db($db, $this->dbhandle) )
 		{
 			$this->print_error( '<p><strong>Error selecting database ['.$db.']!</strong></p>
@@ -1314,6 +1312,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.11  2006/05/31 15:04:35  blueyed
+ * cleanup
+ *
  * Revision 1.10  2006/05/31 14:23:38  blueyed
  * Optimize, if no aliases.
  *
