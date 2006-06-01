@@ -118,15 +118,6 @@ function toggle_display_by_id( text_id, target_id, text_when_displayed, text_whe
  */
 function toggle_clickopen( id, hide, displayVisible )
 {
-	if( typeof(hide) == 'undefined' )
-	{
-		hide = document.getElementById( 'clickdiv_'+id ).style.display != 'none';
-	}
-	if( typeof(displayVisible) == 'undefined' )
-	{
-		displayVisible = 'block';
-	}
-
 	if( !( clickdiv = document.getElementById( 'clickdiv_'+id ) )
 			|| !( clickimg = document.getElementById( 'clickimg_'+id ) ) )
 	{
@@ -134,6 +125,17 @@ function toggle_clickopen( id, hide, displayVisible )
 		return false;
 	}
 
+	if( typeof(hide) == 'undefined' )
+	{
+		hide = document.getElementById( 'clickdiv_'+id ).style.display != 'none';
+	}
+
+	if( typeof(displayVisible) == 'undefined' )
+	{
+		displayVisible = 'block';
+	}
+
+	// fp> why do we need this line: ?
 	clickimg.style.display = 'inline';
 
 	if( hide )
@@ -201,5 +203,105 @@ function textarea_replace_selection( myField, snippet, target_document )
 	{ // Default browser support:
 		myField.value += snippet;
 		myField.focus();
+	}
+}
+
+
+/**
+ * Open or close a filter area (by use of CSS style).
+ *
+ * You have to define a div with id clickdiv_<ID> and a img with clickimg_<ID>,
+ * where <ID> is the first param to the function.
+ *
+ * @param string html id of the element to toggle
+ * @return false
+ */
+function toggle_filter_area( filter_name )
+{
+	// Find objects to toggle:
+	if( !( clickdiv = document.getElementById( 'clickdiv_'+filter_name ) )
+			|| !( clickimg = document.getElementById( 'clickimg_'+filter_name ) ) )
+	{
+		alert( 'ID '+filter_name+' not found!' );
+		return false;
+	}
+
+	// Determine if we want to show or to hide (based on current state).
+	hide = document.getElementById( 'clickdiv_'+filter_name ).style.display != 'none';
+
+	if( hide )
+	{	// Hide/collapse filters:
+		clickdiv.style.display = 'none';
+		clickimg.src = imgpath_expand;
+		asyncRequest( htsrv_url+'async.php?collapse='+filter_name );
+	}
+	else
+	{	// Show/expand filters
+		clickdiv.style.display = 'block';
+		clickimg.src = imgpath_collapse;
+		asyncRequest( htsrv_url+'async.php?expand='+filter_name );
+	}
+
+	return false;
+}
+
+
+/**
+ * "AJAX" wrapper
+ *
+ * What this really is actually, is just a function to perform an asynchronous Request to the server.
+ * There is no need to have any XML involved.
+ *
+ * @param string url urlencoded
+ */
+function asyncRequest( url )
+{
+	if (window.XMLHttpRequest)
+	{ // browser has native support for XMLHttpRequest object
+		req = new XMLHttpRequest();
+	}
+	else if (window.ActiveXObject)
+	{ // try XMLHTTP ActiveX (Internet Explorer) version
+		req = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+
+	if(req)
+	{
+		swapSection( '...' );
+		//req.onreadystatechange = responseHandler;
+    req.onreadystatechange = asyncResponseHandler;
+		req.open( 'GET', url, true );
+		req.setRequestHeader("content-type","application/x-www-form-urlencoded");
+		req.send('dummy');
+	}
+	else
+	{
+		swapSection('Your browser does not seem to support XMLHttpRequest.');
+	}
+
+	return false;
+}
+
+function asyncResponseHandler()
+{
+	if( req.readyState == 4 )
+	{	// Request has been loaded (readyState = 4)
+		if( req.status == 200 )
+		{	// Status is 200 OK:
+			swapSection( req.responseText );
+		}
+		else
+		{
+			swapSection("There was a problem retrieving the XML data:\n" + req.statusText);
+		}
+	}
+}
+
+function swapSection( data )
+{
+	var swappableSection = document.getElementById('asyncResponse');
+	if( swappableSection )
+	{
+		swappableSection.innerHTML = data;
 	}
 }
