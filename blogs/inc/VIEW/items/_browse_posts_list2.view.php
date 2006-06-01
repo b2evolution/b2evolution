@@ -69,7 +69,7 @@ if( $Blog->ID == 1 )
 			'th' => T_('Blog'),
 			'th_start' => '<th class="nowrap">',
 			'td_start' => '<td class="nowrap">',
-			'td' => '@load_Blog()@<a href="¤regenerate_url( \'blog,results_order\', \'blog=@blog_ID@\' )¤">@Blog->dget(\'shortname\')@</a>',
+			'td' => '@get_Blog()@<a href="¤regenerate_url( \'blog,results_order\', \'blog=@blog_ID@\' )¤">@Blog->dget(\'shortname\')@</a>',
 		);
 }
 
@@ -196,6 +196,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.7  2006/06/01 19:00:08  fplanque
+ * no message
+ *
  * Revision 1.6  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *

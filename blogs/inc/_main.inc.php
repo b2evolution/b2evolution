@@ -572,7 +572,7 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale
 
 
 /**
- * @global string The INPUT/OUTPUT charset. Either the user's or blog's (see _blog_main.inc.php) MESSAGES charset.
+ * @global string The INPUT/OUTPUT charset (from the locale MESSAGES). MAY be overriden in _blog_main.inc.php.
  */
 $io_charset = locale_charset(false);
 
@@ -665,6 +665,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.25  2006/06/01 19:00:07  fplanque
+ * no message
+ *
  * Revision 1.24  2006/05/28 22:36:47  blueyed
  * Abstracted DB connect into single file.
  *

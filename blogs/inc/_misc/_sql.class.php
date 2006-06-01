@@ -241,6 +241,9 @@ class SQL
 
 	/**
 	 * Extends the WHERE clause with OR
+	 *
+	 * NOTE: there is almost NEVER a good reason to use this! Think again!
+	 *
 	 * @param string
 	 */
 	function WHERE_or( $where_or )
@@ -399,6 +402,9 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.6  2006/06/01 19:00:09  fplanque
+ * no message
+ *
  * Revision 1.5  2006/05/30 23:12:17  blueyed
  * added WHERE_or()
  *
