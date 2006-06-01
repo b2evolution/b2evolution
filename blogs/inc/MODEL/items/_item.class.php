@@ -92,6 +92,15 @@ class Item extends DataObject
 	 * @access protected
 	 */
 	var $creator_User;
+
+
+	/**
+	 * @deprecated
+	 * @var User
+	 */
+	var $Author;
+
+
 	/**
 	 * @var integer ID of the user that created the item
 	 */
@@ -175,12 +184,6 @@ class Item extends DataObject
 
 
 	var $priorities;
-
-	/**
-	 * @deprecated
-	 * @var User
-	 */
-	var $Author;
 
 
 	/**
@@ -717,28 +720,7 @@ class Item extends DataObject
 	{
 		global $Plugins;
 
-		$display = ( isset($before_error) );
-
-		// Ask Plugins:
-		if( $plugin_return = $Plugins->trigger_event_first_return( 'ItemCanComment', array( 'Item' => $this ) ) )
-		{
-			$plugin_return = $plugin_return['plugin_return'];
-			if( $plugin_return === true )
-			{
-				return true; // OK, user can comment!
-			}
-
-			if( $display && is_string($plugin_return) )
-			{
-				echo $before_error;
-				echo $plugin_return;
-				echo $after_error;
-
-				return false;
-			}
-
-			return false;
-		}
+		$display = ( ! is_null($before_error) );
 
 		if( $this->comment_status == 'disabled'  )
 		{ // Comments are disabled on this post
@@ -780,6 +762,30 @@ class Item extends DataObject
 		$this->get_Blog();
 		if( $this->Blog->allowcomments == 'never')
 		{
+			return false;
+		}
+
+		// Ask Plugins:
+		// is there a damn solid reason to invoke plugins before performing basic checks?
+		// every plugin hook SHOULD be commented with an example of a plugin which may want to use it
+		// Example: A plugin might want to restrict comments on posts older than 20 days.
+		if( $plugin_return = $Plugins->trigger_event_first_return( 'ItemCanComment', array( 'Item' => $this ) ) )
+		{
+			$plugin_return = $plugin_return['plugin_return'];
+			if( $plugin_return === true )
+			{
+				return true; // OK, user can comment!
+			}
+
+			if( $display && is_string($plugin_return) )
+			{
+				echo $before_error;
+				echo $plugin_return;
+				echo $after_error;
+
+				return false;
+			}
+
 			return false;
 		}
 
@@ -849,7 +855,7 @@ class Item extends DataObject
 		 */
 		#pre_dump( 'incViews', $dispmore, !$preview, $Hit->is_new_view() );
 		if( $dispmore && ! $preview && $Hit->is_new_view() )
-		{ // Increment view counter
+		{ // Increment view counter (only if current User is not the item's author)
 			$this->inc_viewcount(); // won't increment if current_User == Author
 		}
 
@@ -2094,7 +2100,7 @@ class Item extends DataObject
 	function set_creator_User( & $creator_User )
 	{
 		$this->creator_User = & $creator_User;
-		$this->Author = & $this->creator_User; // deprecated
+		$this->Author = & $this->creator_User; // deprecated  fp> TODO: Test and see if this line can be put once and for all in the constructor
 		return $this->set( $this->creator_field, $creator_User->ID );
 	}
 
@@ -2666,6 +2672,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.52  2006/06/01 18:36:09  fplanque
+ * no message
+ *
  * Revision 1.51  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *

@@ -247,7 +247,7 @@ function locale_restore_previous()
 {
 	global $saved_locales;
 
-	if( ! empty( $saved_locales ) && is_array( $saved_locales ) )
+	if( !empty( $saved_locales ) && is_array( $saved_locales ) )
 	{
 		locale_activate( array_pop( $saved_locales ) );
 		return true;
@@ -770,6 +770,9 @@ function locale_updateDB()
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/01 18:36:10  fplanque
+ * no message
+ *
  * Revision 1.7  2006/05/12 21:53:38  blueyed
  * Fixes, cleanup, translation for plugins
  *

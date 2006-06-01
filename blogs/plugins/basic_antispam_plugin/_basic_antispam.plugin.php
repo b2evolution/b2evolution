@@ -170,6 +170,7 @@ class basic_antispam_plugin extends Plugin
 		{ // disabled by Settings:
 			// TODO: disable event automatically at setting time
 			// dh> what do you mean? If the event gets disabled automagically, it becomes "geeky" again. Not?
+			// fp> no it doesn't become geeky, becuase the basic user never sees that the checkbox actually enables/disables an event. It works like a setting with a friendly name, but it is optimized like an event disabling with a geeky name.
 			return;
 		}
 
@@ -548,6 +549,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.17  2006/06/01 18:36:10  fplanque
+ * no message
+ *
  * Revision 1.16  2006/05/30 21:25:27  blueyed
  * todo-question
  *

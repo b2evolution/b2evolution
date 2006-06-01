@@ -929,7 +929,7 @@ switch( $action )
 
 			if( ! empty($install_db_deltas) )
 			{
-				echo '<p>'.T_('The following database queries will be executed. If you are not sure what this means, it will probably be alright.').'</p>';
+				echo '<p>'.T_('The following database changes will be carried out. If you are not sure what this means, it will probably be alright.').'</p>';
 
 				echo '<ul>';
 				foreach( $install_db_deltas as $l_delta )
