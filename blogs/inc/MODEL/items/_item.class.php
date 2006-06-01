@@ -720,7 +720,29 @@ class Item extends DataObject
 	{
 		global $Plugins;
 
-		$display = ( ! is_null($before_error) );
+		$display = ( ! is_null($before_error) ); // isn't that negotiation and "harder to understand"? (was: isset())
+
+		// Ask Plugins:
+		// Examples:
+		//  - A plugin might want to restrict comments on posts older than 20 days.
+		//  - A plugin might want to allow comments always for certain users (admin).
+		if( $plugin_return = $Plugins->trigger_event_first_return( 'ItemCanComment', array( 'Item' => $this ) ) )
+		{
+			$plugin_return = $plugin_return['plugin_return'];
+			if( $plugin_return === true )
+			{
+				return true; // OK, user can comment!
+			}
+
+			if( $display && is_string($plugin_return) )
+			{
+				echo $before_error;
+				echo $plugin_return;
+				echo $after_error;
+			}
+
+			return false;
+		}
 
 		if( $this->comment_status == 'disabled'  )
 		{ // Comments are disabled on this post
@@ -762,30 +784,6 @@ class Item extends DataObject
 		$this->get_Blog();
 		if( $this->Blog->allowcomments == 'never')
 		{
-			return false;
-		}
-
-		// Ask Plugins:
-		// is there a damn solid reason to invoke plugins before performing basic checks?
-		// every plugin hook SHOULD be commented with an example of a plugin which may want to use it
-		// Example: A plugin might want to restrict comments on posts older than 20 days.
-		if( $plugin_return = $Plugins->trigger_event_first_return( 'ItemCanComment', array( 'Item' => $this ) ) )
-		{
-			$plugin_return = $plugin_return['plugin_return'];
-			if( $plugin_return === true )
-			{
-				return true; // OK, user can comment!
-			}
-
-			if( $display && is_string($plugin_return) )
-			{
-				echo $before_error;
-				echo $plugin_return;
-				echo $after_error;
-
-				return false;
-			}
-
 			return false;
 		}
 
@@ -2672,6 +2670,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.53  2006/06/01 21:07:33  blueyed
+ * Moved ItemCanComment back.
+ *
  * Revision 1.52  2006/06/01 18:36:09  fplanque
  * no message
  *
