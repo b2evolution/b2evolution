@@ -178,6 +178,12 @@ form.bComment fieldset div.info
 	padding-top: .5ex;
 	/* border: 1px solid #f00;*/
 }
+
 div.bComment#comment_preview {
 	background-color: #ccc;
+}
+
+/* hide checkbox in order to indent exactly the same size */
+input.invisible{
+	visibility: hidden;
 }

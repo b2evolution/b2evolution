@@ -57,7 +57,7 @@ $ItemList->cols[] = array(
 		'th' => T_('Issue date'),
 		'order' => 'datestart',
 		'th_start' => '<th class="firstcol nowrap">',
-		'td_start' => '<td class="firstcol nowrap">',
+		'td_class' => 'nowrap',
 		'td' => '@get_permanent_link( get_icon(\'permalink\') )@ <span class="date">@get_issue_date()@</span>',
 	);
 
@@ -68,7 +68,7 @@ if( $Blog->ID == 1 )
 	$ItemList->cols[] = array(
 			'th' => T_('Blog'),
 			'th_start' => '<th class="nowrap">',
-			'td_start' => '<td class="nowrap">',
+			'td_class' => 'nowrap',
 			'td' => '@get_Blog()@<a href="¤regenerate_url( \'blog,results_order\', \'blog=@blog_ID@\' )¤">@Blog->dget(\'shortname\')@</a>',
 		);
 }
@@ -78,7 +78,7 @@ if( $Blog->ID == 1 )
 $ItemList->cols[] = array(
 		'th' => T_('Author'),
 		'th_start' => '<th class="nowrap">',
-		'td_start' => '<td class="nowrap">',
+		'td_class' => 'nowrap',
 		'order' => 'creator_user_ID',
 		'td' => '@get(\'t_author\')@',
 	);
@@ -119,7 +119,7 @@ function task_title_link( $Item )
 $ItemList->cols[] = array(
 						'th' => T_('Task'),
 						'order' => 'title',
-						'td_start' => '<td class="tskst_$post_pst_ID$">',
+						'td_class' => 'tskst_$post_pst_ID$',
 						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj} )%</strong>',
 					);
 
@@ -129,10 +129,8 @@ $ItemList->cols[] = array(
  */
 function item_visibility( $Item )
 {
-	$r = $Item->get( 't_status' );
-
 	// Display publish NOW button if current user has the rights:
-	$r .= $Item->get_publish_link( ' ', ' ', get_icon( 'publish' ), '#', '' );
+	$r = $Item->get_publish_link( ' ', ' ', get_icon( 'publish' ), '#', '' );
 
 	// Display deprecate if current user has the rights:
 	$r .= $Item->get_deprecate_link( ' ', ' ', get_icon( 'deprecate' ), '#', '' );
@@ -142,8 +140,14 @@ function item_visibility( $Item )
 $ItemList->cols[] = array(
 						'th' => T_('Visibility'),
 						'order' => 'status',
-						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
+						'td_class' => 'center',
 						'td' => '%item_visibility( {Obj} )%',
+				);
+$ItemList->cols[] = array(
+						'th' => T_('Visibility'),
+						'order' => 'status',
+						'td_class' => 'tskst_$post_pst_ID$ nowrap',
+						'td' => '@get( \'t_status\' )@',
 				);
 
 
@@ -151,7 +155,7 @@ $ItemList->cols[] = array(
 	'th' => /* TRANS: abbrev for info */ T_('i'),
 	'order' => 'datemodified',
 	'th_start' => '<th class="shrinkwrap">',
-	'td_start' => '<td class="shrinkwrap">',
+	'td_class' => 'shrinkwrap',
 	'td' => '@history_info_icon()@',
 );
 
@@ -172,7 +176,7 @@ function item_edit_actions( $Item )
 }
 $ItemList->cols[] = array(
 		'th' => T_('Act.'),
-		'td_start' => '<td class="shrinkwrap">',
+		'td_class' => 'shrinkwrap',
 		'td' => '%item_edit_actions( {Obj} )%',
 	);
 
@@ -196,8 +200,8 @@ $ItemList->display();
 
 /*
  * $Log$
- * Revision 1.7  2006/06/01 19:00:08  fplanque
- * no message
+ * Revision 1.8  2006/06/01 19:39:13  fplanque
+ * cleaned up Results tables
  *
  * Revision 1.6  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.

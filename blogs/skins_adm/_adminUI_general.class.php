@@ -495,7 +495,7 @@ class AdminUI_general
 	 *
 	 * @param string
 	 */
-	function disp_view( $view_name )
+	function disp_view( $view_name, $view_params = array() )
 	{
 		global $view_path;
 
@@ -862,13 +862,12 @@ class AdminUI_general
 						'header_text_single' => '',
 					'header_end' => '</div>',
 					'list_start' => '<table class="grouped" cellspacing="0">'."\n\n",
-						'head_start' => "<thead>\n",
-							'head_title' => '<tr><th colspan="$nb_cols$"><span style="float:right">$global_icons$</span>$title$</th></tr>'
-							                ."\n\n",
+						'head_start' => "<thead><tr>\n",
+							'head_title' => '<th colspan="$nb_cols$"><span style="float:right">$global_icons$</span>$title$</th></tr>'
+							                ."\n\n<tr>\n",
 							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
 							'filters_end' => '</td></tr>',
-							'line_start_head' => '<tr>',
-							'line_end_head' => "</tr>\n\n",
+							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre à jour admin_UI_general; utiliser colspan="$headspan$"
 							'colhead_start' => '<th>',
 							'colhead_start_first' => '<th class="firstcol">',
 							'colhead_start_last' => '<th class="lastcol">',
@@ -884,7 +883,7 @@ class AdminUI_general
 							'basic_sort_off' => '',
 							'basic_sort_asc' => get_icon( 'ascending' ),
 							'basic_sort_desc' => get_icon( 'descending' ),
-						'head_end' => "</thead>\n\n",
+						'head_end' => "</tr></thead>\n\n",
 						'tfoot_start' => "<tfoot>\n",
 						'tfoot_end' => "</tfoot>\n\n",
 						'body_start' => "<tbody>\n",
@@ -892,21 +891,27 @@ class AdminUI_general
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td>',
-								'col_start_first' => '<td class="firstcol">',
-								'col_start_last' => '<td class="lastcol">',
+								'col_start' => '<td $class_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$">',
+								'col_start_last' => '<td class="lastcol $class$">',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
 							'grp_line_start_odd' => '<tr class="odd">'."\n",
 							'grp_line_start_last' => '<tr class="lastline">'."\n",
 							'grp_line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'grp_col_start' => '<td>',
-								'grp_col_start_first' => '<td class="firstcol">',
-								'grp_col_start_last' => '<td class="lastcol">',
+										'grp_col_start' => '<td $class_attrib$ $colspan_attrib$>',
+										'grp_col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+										'grp_col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'grp_col_end' => "</td>\n",
 							'grp_line_end' => "</tr>\n\n",
 						'body_end' => "</tbody>\n\n",
+						'total_line_start' => '<tr class="total">'."\n",
+							'total_col_start' => '<td $class_attrib$>',
+							'total_col_start_first' => '<td class="firstcol $class$">',
+							'total_col_start_last' => '<td class="lastcol $class$">',
+							'total_col_end' => "</td>\n",
+						'total_line_end' => "</tr>\n\n",
 					'list_end' => "</table>\n\n",
 					'footer_start' => '<div class="results_nav">',
 					'footer_text' => '<strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$'
@@ -1281,6 +1286,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.14  2006/06/01 19:39:13  fplanque
+ * cleaned up Results tables
+ *
  * Revision 1.13  2006/05/12 21:53:38  blueyed
  * Fixes, cleanup, translation for plugins
  *

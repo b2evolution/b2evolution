@@ -386,6 +386,8 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 	// Create result set:
 	$Results = & new Results( $sql );
 
+	$Results->title = T_('Banned domains blacklist');
+
 	$Results->cols[] = array(
 							'th' => T_('Keyword'),
 							'order' => 'aspm_string',

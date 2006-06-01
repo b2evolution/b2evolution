@@ -100,7 +100,7 @@ class ResultSel extends Results
 		// Presets a selection checkbox:
 		$this->cols[] = array(
 						'th' => /* TRANS: abbr. for "Selection" */ T_('Sel'),
-						'td_start' => '<td class="firstcol shrinkwrap">',
+						'td_class' => 'shrinkwrap',
 						'td' => '%selection_checkbox( #'.$field_ID.'#, \''.$param_prefix.'\' )%',
 					);
 	}
@@ -144,22 +144,6 @@ class ResultSel extends Results
 	}
 
 
-  /**
-   * Display the filtering form WITHOUT starting a new form!
-   *
-   * We must NOT create a new form since we already have one for the selection!!
-   */
-	function display_filters()
-	{
-		global $current_User;
-
-		// If the user can do selections, there is already a form surrounding the results, so we don't need a new one:
-		$need_new_form = ! $current_User->check_perm( 'selections', 'view' );
-
-		parent::display_filters( $need_new_form );
-	}
-
-
 	/**
 	 * Display list/table end followed by </form> closing.
 	 *
@@ -167,7 +151,7 @@ class ResultSel extends Results
 	 */
 	function display_list_end()
 	{
-		global $item_ID_array, $current_User;
+		global $current_User;
 
 		if( ! $current_User->check_perm( 'selections', 'view' ) )
 		{	// User is NOT allowed to view selections
@@ -176,46 +160,52 @@ class ResultSel extends Results
 			return;
 		}
 
-
-		if( $this->total_pages > 0 )
-		{	// We have rows to display, we want the selection stuff:
-
-			echo $this->replace_vars( $this->params['functions_start'] );
-
-			$can_edit = $current_User->check_perm( 'selections', 'edit' );
-
-			if( $can_edit )
-			{ // links to check all and uncheck all
-				echo $this->Form->check_all();
-			}
-
-			// construction of the select menu :
-			$selection_name = selection_select_tag( $this->param_prefix, $this->table_selections, $this->field_sel_name, $this->field_sel_ID, $this->current_selection_ID );
-
-			if( $can_edit )
-			{
-				$this->Form->text( 'selection_'.$this->param_prefix.'name', $selection_name, 25, T_('Selection name') );
-
-				// List of IDs displayed on this page (needed for deletes):
-				$this->Form->hidden( 'item_ID_list', implode( $item_ID_array, ',' ) );
-
-				// actionArray[update_selection] is experimental
-				$this->Form->submit( array( 'actionArray[update_'.$this->param_prefix.'selection]', T_('Update selection'), 'SaveButton' ) );
-			}
-
-			echo $this->replace_vars( $this->params['functions_end'] );
-
-		}
-
-		
 		// list/table end:
 		parent::display_list_end();
 
-
 		$this->Form->end_form();
-
 	}
 
+	
+	/**
+	 * Display functions
+	 */
+	function display_functions()
+	{
+		$this->functions_area = array( 'callback' => array( 'this', 'selection_menu' ) );
+		
+		parent::display_functions();
+	}
+		
+		
+	/**
+	 * Callback for selection menu
+	 */
+	function selection_menu()
+	{
+		global $item_ID_array, $current_User;
+	
+		$can_edit = $current_User->check_perm( 'selections', 'edit' );
+	
+		if( $can_edit )
+		{ // links to check all and uncheck all
+			echo $this->Form->check_all();
+		}
+	
+		// construction of the select menu :
+		$selection_name = selection_select_tag( $this->param_prefix, $this->table_selections, $this->field_sel_name, $this->field_sel_ID, $this->current_selection_ID );
+	
+		if( $can_edit )
+		{
+			$this->Form->text( 'selection_'.$this->param_prefix.'name', $selection_name, 25, T_('Selection name') );
+	
+			// List of IDs displayed on this page (needed for deletes):
+			$this->Form->hidden( 'item_ID_list', implode( $item_ID_array, ',' ) );
+	
+			// actionArray[update_selection] is experimental
+			$this->Form->submit( array( 'actionArray[update_'.$this->param_prefix.'selection]', T_('Update selection'), 'SaveButton' ) );
+		}
+	}
 
 }
 
@@ -367,7 +357,8 @@ function selection_select_tag(
  */
 function handle_selection_actions( $selection_ID, $prefix, $prefix_sel )
 {
-	$previous_sel_ID = param( $prefix.'previous_sel_ID', 'integer', 0, true );// previous selection ID, need it to check for updating sel
+	// previous selection ID, need it to check for updating sel (no javascript possibility)
+	$previous_sel_ID = param( $prefix.'previous_sel_ID', 'integer', 0, true );
 	
 	if( $selection_ID == $previous_sel_ID ) // the databse has to be updated
 	{	// The selected ID is the same than the edited one in the previous page 	
@@ -600,6 +591,9 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 
 /*
  * $Log$
+ * Revision 1.5  2006/06/01 19:39:13  fplanque
+ * cleaned up Results tables
+ *
  * Revision 1.4  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

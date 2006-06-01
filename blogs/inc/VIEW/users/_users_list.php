@@ -97,7 +97,7 @@ $Results->ID_col = 'user_ID';
  * Group columns:
  */
 $Results->grp_cols[] = array(
-						'td_start' => '<td colspan="'
+						'td_class' => '<td colspan="'
 														.($current_User->check_perm( 'users', 'edit', false ) ? 7 : 6)
 														.'" class="firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ).'">',
 						'td' => '<a href="?ctrl=users&amp;grp_ID=$grp_ID$">$grp_name$</a>'
@@ -120,7 +120,7 @@ function grp_actions( & $row )
 	return $r;
 }
 $Results->grp_cols[] = array(
-						'td_start' => '<td class="lastcol shrinkwrap">',
+						'td_class' => 'shrinkwrap',
 						'td' => '%grp_actions( {row} )%',
 					);
 
@@ -130,7 +130,7 @@ $Results->grp_cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('ID'),
 						'th_start' => '<th class="firstcol shrinkwrap">',
-						'td_start' => '<td class="firstcol shrinkwrap">',
+						'td_class' => 'shrinkwrap',
 						'order' => 'user_ID',
 						'td' => '$user_ID$',
 					);
@@ -163,13 +163,13 @@ function user_mailto( $email )
 }
 $Results->cols[] = array(
 						'th' => T_('Email'),
-						'td_start' => '<td class="shrinkwrap">',
+						'td_class' => 'shrinkwrap',
 						'td' => '%user_mailto( #user_email# )%',
 					);
 
 $Results->cols[] = array(
 						'th' => T_('URL'),
-						'td_start' => '<td class="shrinkwrap">',
+						'td_class' => 'shrinkwrap',
 						'td' => '¤conditional( (#user_url# != \'http://\') && (#user_url# != \'\'), \'<a href="$user_url$" title="Website: $user_url$">'
 								.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: $user_url$' ) ).'</a>\', \'&nbsp;\' )¤',
 					);
@@ -178,7 +178,7 @@ if( ! $current_User->check_perm( 'users', 'edit', false ) )
 {
  	$Results->cols[] = array(
 						'th' => T_('Level'),
-						'td_start' => '<td class="right">',
+						'td_class' => 'right',
 						'order' => 'user_level',
 						'td' => '$user_level$',
 					);
@@ -187,7 +187,7 @@ else
 {
 	$Results->cols[] = array(
 						'th' => T_('Level'),
-						'td_start' => '<td class="right">',
+						'td_class' => 'right',
 						'order' => 'user_level',
 						'td' => '¤conditional( (#user_level# > 0), \''
 											.action_icon( TS_('Decrease user level'), 'decrease',
@@ -201,7 +201,7 @@ else
 
 	$Results->cols[] = array(
 						'th' => T_('Actions'),
-						'td_start' => '<td class="lastcol shrinkwrap">',
+						'td_class' => 'shrinkwrap',
 						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'action\', \'user_ID=$user_ID$\' )%' )
 										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'action\', \'action=new_user&amp;user_ID=$user_ID$\' )%' )
 										.'¤conditional( (#user_ID# != 1) && (#user_ID# != '.$current_User->ID.'), \''
@@ -234,6 +234,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2006/06/01 19:39:13  fplanque
+ * cleaned up Results tables
+ *
  * Revision 1.4  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

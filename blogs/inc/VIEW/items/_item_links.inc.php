@@ -57,7 +57,7 @@
 							'th' => T_('Type'),
 							'th_start' => '<th class="firstcol shrinkwrap">',
 							'order' => implode( ', ', $order_fields ),
-							'td_start' => '<td class="firstcol shrinkwrap">',
+							'td_class' => 'shrinkwrap',
 							'td' => '%display_type( {row} )%',
 						);
 
@@ -81,7 +81,7 @@
 	}
 	$Results->cols[] = array(
 							'th' => T_('Sub-Type'),
-							'td_start' => '<td class="shrinkwrap">',
+							'td_class' => 'shrinkwrap',
 							'td' => '%display_subtype( {row} )%',
 						);
 
@@ -125,7 +125,7 @@
 		}
 		$Results->cols[] = array(
 								'th' => T_('Actions'),
-								'td_start' => '<td class="lastcol shrinkwrap">',
+								'td_class' => 'shrinkwrap',
 								'td' => '%file_actions( #link_ID# )%',
 							);
 	}
@@ -140,6 +140,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2006/06/01 19:39:13  fplanque
+ * cleaned up Results tables
+ *
  * Revision 1.5  2006/05/30 21:53:06  blueyed
  * Replaced $EvoConfig->DB with $db_config
  *

@@ -68,7 +68,7 @@ function file_type( & $row )
 }
 $Results->cols[] = array(
 						'th' => T_('Type'),
-						'td_start' => '<td class="firstcol left">',
+						'td_class' => 'left',
 						'td' => '%file_type( {row} )%',
 					);
 
@@ -88,14 +88,14 @@ function file_path()
 $Results->cols[] = array(
 						'th' => T_('Path'),
 						'order' => 'file_path',
-						'td_start' => '<td class="left">',
+						'td_class' => 'left',
 						'td' => '%file_path()%',
 					);
 
 $Results->cols[] = array(
 						'th' => T_('Title'),
 						'order' => 'file_title',
-						'td_start' => '<td class="left">',
+						'td_class' => 'left',
 						'td' => '$file_title$',
 					);
 
@@ -113,7 +113,7 @@ function file_actions( $link_ID )
 }
 $Results->cols[] = array(
 						'th' => T_('Actions'),
-						'td_start' => '<td class="lastcol center">',
+						'td_class' => 'center',
 						'td' => '%file_actions( #link_ID# )%',
 					);
 
@@ -126,6 +126,9 @@ $Form->end_form( );
 
 /*
  * $Log$
+ * Revision 1.6  2006/06/01 19:39:13  fplanque
+ * cleaned up Results tables
+ *
  * Revision 1.5  2006/04/19 20:13:51  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

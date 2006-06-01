@@ -56,7 +56,7 @@ $ItemList->cols[] = array(
 						'th' => /* TRANS: abbrev for Priority */ T_('P'),
 						'order' => 'priority',
 						'th_start' => '<th class="shrinkwrap">',
-						'td_start' => '<td class="center tskst_$post_pst_ID$">',
+						'td_class' => 'center tskst_$post_pst_ID$',
 						'td' => '$post_priority$',
 					);
 
@@ -71,7 +71,7 @@ function task_title_link( $Item )
 	$col = '';
 
 	$Item->get_Blog();
-	if( $Item->Blog->allowcomments != 'never' )
+  if( $Item->Blog->allowcomments != 'never' )
 	{	// The current blog can have comments:
 		$nb_comments = generic_ctp_number($Item->ID, 'feedback');
 		$col .= '<a href="?ctrl=browse&amp;tab=posts&amp;blog='.$Item->blog_ID.'&amp;p='.$Item->ID.'&amp;c=1&amp;tb=1&amp;pb=1"
@@ -95,7 +95,7 @@ function task_title_link( $Item )
 $ItemList->cols[] = array(
 						'th' => T_('Task'),
 						'order' => 'title',
-						'td_start' => '<td class="tskst_$post_pst_ID$">',
+						'td_class' => 'tskst_$post_pst_ID$',
 						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj} )%</strong>',
 					);
 
@@ -105,10 +105,8 @@ $ItemList->cols[] = array(
  */
 function item_visibility( $Item )
 {
-	$r = $Item->get( 't_status' );
-
 	// Display publish NOW button if current user has the rights:
-	$r .= $Item->get_publish_link( ' ', ' ', get_icon( 'publish' ), '#', '' );
+	$r = $Item->get_publish_link( ' ', ' ', get_icon( 'publish' ), '#', '' );
 
 	// Display deprecate if current user has the rights:
 	$r .= $Item->get_deprecate_link( ' ', ' ', get_icon( 'deprecate' ), '#', '' );
@@ -118,21 +116,28 @@ function item_visibility( $Item )
 $ItemList->cols[] = array(
 						'th' => T_('Visibility'),
 						'order' => 'status',
-						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
+						'td_class' => 'center',
 						'td' => '%item_visibility( {Obj} )%',
 				);
+$ItemList->cols[] = array(
+						'th' => T_('Visibility'),
+						'order' => 'status',
+						'td_class' => 'tskst_$post_pst_ID$ nowrap',
+						'td' => '@get( \'t_status\' )@',
+				);
 
+				
 $ItemList->cols[] = array(
 						'th' => T_('Status'),
 						'order' => 'pst_ID',
-						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
+						'td_class' => 'tskst_$post_pst_ID$ nowrap',
 						'td' => '@get(\'t_extra_status\')@',
 					);
 
 $ItemList->cols[] = array(
 						'th' => T_('Type'),
 						'order' => 'ptyp_ID',
-						'td_start' => '<td class="tskst_$post_pst_ID$ nowrap">',
+						'td_class' => 'tskst_$post_pst_ID$ nowrap',
 						'td' => '@get(\'t_type\')@',
 					);
 
@@ -140,8 +145,8 @@ $ItemList->cols[] = array(
 						'th' => T_('ID'),
 						'order' => 'ID',
 						'th_start' => '<th class="shrinkwrap">',
-						'td_start' => '<td class="tskst_$post_pst_ID$ shrinkwrap">',
-						'td_start' => '<td class="center">',
+						'td_class' => 'tskst_$post_pst_ID$ shrinkwrap',
+						'td_class' => 'center',
 						'td' => '$post_ID$',
 					);
 
@@ -179,7 +184,7 @@ function deadline( $date )
 $ItemList->cols[] = array(
 						'th' => T_('Deadline'),
 						'order' => 'post_datedeadline',
-						'td_start' => '<td class="center tskst_$post_pst_ID$">',
+						'td_class' => 'center tskst_$post_pst_ID$',
 						'td' => '%deadline( #post_datedeadline# )%',
 					);
 */
@@ -188,7 +193,7 @@ $ItemList->cols[] = array(
 	'th' => /* TRANS: abbrev for info */ T_('i'),
 	'order' => 'datemodified',
 	'th_start' => '<th class="shrinkwrap">',
-	'td_start' => '<td class="shrinkwrap">',
+	'td_class' => 'shrinkwrap',
 	'td' => '@history_info_icon()@',
 );
 
@@ -209,7 +214,7 @@ function item_edit_actions( $Item )
 }
 $ItemList->cols[] = array(
 		'th' => T_('Act.'),
-		'td_start' => '<td class="shrinkwrap">',
+		'td_class' => 'shrinkwrap',
 		'td' => '%item_edit_actions( {Obj} )%',
 	);
 
@@ -233,6 +238,9 @@ $ItemList->display();
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/01 19:39:13  fplanque
+ * cleaned up Results tables
+ *
  * Revision 1.7  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *

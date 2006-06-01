@@ -422,7 +422,7 @@ $Results->cols[] = array(
 		'th' => T_('ID'),
 		'order' => $edited_table_IDcol,
 		'th_start' => '<th class="firstcol shrinkwrap">',
-		'td_start' => '<td class="firstcol shrinkwrap">',
+		'td_class' => 'shrinkwrap',
 		'td' => "\$$edited_table_IDcol\$",
 	);
 
@@ -456,7 +456,7 @@ if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, 
 				'th' => T_('Move'),
 				'th_start' => '<th class="shrinkwrap">',
 				'order' => $edited_table_ordercol,
-				'td_start' => '<td class="shrinkwrap">',
+				'td_class' => 'shrinkwrap',
 				'td' => '{move}',
 			);
 	}
@@ -480,7 +480,7 @@ if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, 
 
 	$Results->cols[] = array(
 			'th' => T_('Actions'),
-			'td_start' => '<td class="shrinkwrap lastcol">',
+			'td_class' => 'shrinkwrap',
 			'td' => '%edit_actions( #'.$edited_table_IDcol.'# )%',
 		);
 

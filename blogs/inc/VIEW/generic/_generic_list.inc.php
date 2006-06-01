@@ -63,7 +63,7 @@ $Results->cols[] = array(
 		'th' => T_('ID'),
 		'order' => $GenericElementCache->dbIDname,
 		'th_start' => '<th class="firstcol shrinkwrap">',
-		'td_start' => '<td class="firstcol shrinkwrap">',
+		'td_class' => 'shrinkwrap',
 		'td' => "\$$GenericElementCache->dbIDname\$",
 	);
 
@@ -113,7 +113,7 @@ if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, 
 
 	$Results->cols[] = array(
 			'th' => T_('Actions'),
-			'td_start' => '<td class="shrinkwrap lastcol">',
+			'td_class' => 'lastcol',
 			'td' => '%edit_actions( #'.$GenericElementCache->dbIDname.'# )%',
 		);
 

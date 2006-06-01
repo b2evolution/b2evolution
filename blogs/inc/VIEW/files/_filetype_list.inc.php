@@ -46,7 +46,7 @@ $Results->cols[] = array(
 						'th' => T_('Icon'),
 						//'order' => 'ftyp_icon',
 						'th_start' => '<th class="firstcol shrinkwrap">',
-						'td_start' => '<td class="firstcol shrinkwrap">',
+						'td_class' => 'shrinkwrap',
 						'td' => '<img src="'.$rsc_url.'icons/fileicons/$ftyp_icon$" alt="$ftyp_icon$">',
 					);
 
@@ -106,7 +106,7 @@ $Results->cols[] = array(
 						'th' => T_('Upload'),
 						'order' => 'ftyp_allowed',
 						'th_start' => '<th class="shrinkwrap">',
-						'td_start' => '<td class="shrinkwrap">',
+						'td_class' => 'shrinkwrap',
 						'td' => '%display_perm( #ftyp_allowed# )%',
 					);
 
@@ -116,7 +116,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
 							'th_start' => '<th class="lastcol shrinkwrap">',
-							'td_start' => '<td class="lastcol shrinkwrap">',
+							'td_class' => 'shrinkwrap',
 							'td' => action_icon( T_('Edit this file type...'), 'edit',
 	                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=edit\')%' )
 	                    .action_icon( T_('Duplicate this file type...'), 'copy',

@@ -63,6 +63,11 @@ code {
 	font-size:larger;
 }
 
+.block {
+	margin: 1ex;
+	white-space: nowrap;
+}
+
 /*
 {{{ Messages
 */

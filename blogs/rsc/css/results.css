@@ -47,6 +47,7 @@ table.grouped td.shrinkwrap
 table.grouped td.monetary
 {
 	text-align:right;
+	white-space:nowrap;
 }
 
 table.grouped input.checkbox {
@@ -60,11 +61,6 @@ table.grouped tr.odd input.checkbox {
 table.grouped tr.even:hover,
 table.grouped tr.odd:hover {
 	background-color:#ccc;
-}
-
-/* Total numbers: */
-table.grouped tr.totals td {
-	border-top: 1px solid #bbb;
 }
 
 /* Table headers/footers: */
