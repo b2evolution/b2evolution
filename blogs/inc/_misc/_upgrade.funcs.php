@@ -105,14 +105,14 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 			$items[strtolower($tablename)][] = array(
 				'queries' => array($qry),
-				'note' => sprintf( 'Created table &laquo;%s&raquo;', $tablename ),
+				'note' => sprintf( 'Created table &laquo;<strong>%s</strong>&raquo;', $tablename ),
 				'type' => 'create_table' );
 		}
 		elseif( preg_match( '|^\s*CREATE DATABASE\s([\S]+)|i', $qry, $match) )
 		{ // add to the beginning
 			array_unshift( $items, array(
 				'queries' => array($qry),
-				'note' => sprintf( 'Created database &laquo;%s&raquo;', $match[1] ),
+				'note' => sprintf( 'Created database &laquo;<strong>%s</strong>&raquo;', $match[1] ),
 				'type' => 'create_database' ) );
 		}
 		elseif( preg_match( '|^\s*(INSERT INTO\s+)([\S]+)(.*)$|is', $qry, $match) )
@@ -436,7 +436,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					{
 						$items[$table_lowered][] = array(
 							'queries' => array('ALTER TABLE '.$table.' DROP COLUMN '.$tablefield->Field),
-							'note' => 'Dropped '.$table.'.'.$tablefield->Field,
+						'note' => 'Dropped '.$table.'.<strong>'.$tablefield->Field.'</strong>',
 							'type' => 'drop_column' );
 
 						// Unset in key indices:
@@ -772,7 +772,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					// Add a query to change the column type
 					$items[$table_lowered][] = array(
 						'queries' => $queries,
-						'note' => 'Changed type of '.$table.'.'.$tablefield->Field.' from '.$tablefield->Type.' to '.$column_definition,
+						'note' => 'Changed type of '.$table.'.<strong>'.$tablefield->Field.'</strong> from '.$tablefield->Type.' to '.$column_definition,
 						'type' => 'change_column' );
 				}
 				else
@@ -785,7 +785,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 						{ // Add a query to change the column's default value
 							$items[$table_lowered][] = array(
 								'queries' => array('ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' SET DEFAULT '.$want_default_set),
-								'note' => "Changed default value of {$table}.{$tablefield->Field} from $existing_default to $want_default_set",
+								'note' => "Changed default value of {$table}.<strong>{$tablefield->Field}</strong> from $existing_default to $want_default_set",
 								'type' => 'change_default' );
 						}
 					}
@@ -795,7 +795,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 						{
 							$items[$table_lowered][] = array(
 								'queries' => array('ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' DROP DEFAULT'),
-								'note' => "Dropped default value of {$table}.{$tablefield->Field}",
+								'note' => "Dropped default value of {$table}.<strong>{$tablefield->Field}</strong>",
 								'type' => 'change_default' ); // might be also 'drop_default'
 						}
 					}
@@ -877,7 +877,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 				$items[$table_lowered][] = array(
 					'queries' => array($query),
-					'note' => 'Added column '.$table.'.'.$fielddef['field'],
+					'note' => 'Added column '.$table.'.<strong>'.$fielddef['field'].'</strong>',
 					'type' => 'add_column' );
 			}
 
@@ -902,7 +902,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				// Push a query line into $items that adds the index to that table
 				$items[$table_lowered][] = array(
 					'queries' => array($query.' ADD '.$index['create_definition']),
-					'note' => 'Added index '.$index['create_definition'],
+					'note' => 'Added index <strong>'.$index['create_definition'].'</strong>',
 					'type' => 'add_index' );
 			}
 
@@ -912,7 +912,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				// Push a query line into $items that drops the index from the table
 				$items[$table_lowered][] = array(
 					'queries' => array("ALTER TABLE {$table} DROP ".( $index_info['name'] == 'PRIMARY' ? 'PRIMARY KEY' : 'INDEX '.$index_info['name'] )),
-					'note' => 'Dropped index '.$index_info['name'],
+					'note' => 'Dropped index <strong>'.$index_info['name'].'</strong>',
 					'type' => 'drop_index' );
 			}
 		}
@@ -1041,6 +1041,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.19  2006/06/01 17:46:45  fplanque
+ * higlight output with strong
+ *
  * Revision 1.18  2006/05/17 23:35:42  blueyed
  * cleanup
  *
