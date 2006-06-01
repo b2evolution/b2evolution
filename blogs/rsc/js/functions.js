@@ -132,11 +132,8 @@ function toggle_clickopen( id, hide, displayVisible )
 
 	if( typeof(displayVisible) == 'undefined' )
 	{
-		displayVisible = 'block';
+		displayVisible = ''; // setting it to "empty" is the default for an element's display CSS attribute
 	}
-
-	// fp> why do we need this line: ?
-	clickimg.style.display = 'inline';
 
 	if( hide )
 	{
