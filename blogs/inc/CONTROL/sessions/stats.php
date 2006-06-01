@@ -490,6 +490,7 @@ switch( $AdminUI->get_path(1) )
 				}
 				$Results->cols[] = array(
 						'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
+// fp> please explain what was wrong with #dom_name#
 						'td' => '%referer_ban_link( #hit_referer# )%',
 					);
 			}
@@ -1056,6 +1057,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2006/06/01 17:52:15  fplanque
+ * no message
+ *
  * Revision 1.16  2006/05/12 21:53:37  blueyed
  * Fixes, cleanup, translation for plugins
  *
