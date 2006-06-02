@@ -63,7 +63,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 					<title><?php $Item->title( '', '', false, 'xml' ) ?></title>
 					<link><?php $Item->permanent_url( 'single' ) ?></link>
 					<pubDate><?php $Item->issue_date( 'r', true ) ?></pubDate>
-					<?php /* Disabled because of spambots: <author><php $Item->get_creator_User(); $Item->creator_User->email( 'xml' ) ></author> */ ?>
+					<author><?php $Item->get_creator_User(); $Item->creator_User->preferred_name('xml') ?></author>
 					<?php $Item->categories( false, '<category domain="main">', '</category>', '<category domain="alt">', '</category>', '<category domain="external">', '</category>', "\n", 'xml' ) ?>
 					<guid isPermaLink="false"><?php $Item->ID() ?>@<?php echo $baseurl ?></guid>
 					<description><?php
