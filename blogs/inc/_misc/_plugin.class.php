@@ -1310,6 +1310,10 @@ class Plugin
 	 * Use this to catch custom input fields from {@link PluginSettingsEditDisplayAfter()} or
 	 * add notes/errors through {@link Plugin::msg()}.
 	 *
+	 * If you want to modify plugin events (see {@link Plugin::enable_event()} and
+	 * {@link Plugin::disable_event()}), you should use {@link Plugin::BeforeEnable()}, because Plugin
+	 * events get saved (according to the edit settings screen) after this event.
+	 *
 	 * @return false|NULL Return false to prevent the settings from being updated to DB.
 	 */
 	function PluginSettingsUpdateAction()
@@ -2286,6 +2290,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.59  2006/06/05 17:44:38  blueyed
+ * doc
+ *
  * Revision 1.58  2006/06/05 15:48:52  blueyed
  * Fix
  *
