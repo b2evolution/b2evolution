@@ -1786,6 +1786,32 @@ class Plugin
 
 
 	/**
+	 * Get the absolute URL to the plugin's directory.
+	 *
+	 * This is either below {@link $plugins_url}, if no Blog is set or we're in the
+	 * backoffice, or the "plugins" directory below the Blog's URL root otherwise.
+	 *
+	 * @return string
+	 */
+	function get_plugin_url()
+	{
+		global $ReqHost, $Blog, $plugins_url;
+
+		if( isset($Blog) && ! is_admin_page() )
+		{
+			$base = $Blog->get('baseurlroot').'/' // TODO: should include slash!
+				.'plugins/';
+		}
+		else
+		{
+			$base = $plugins_url;
+		}
+
+		return $base.$this->classname.'/';
+	}
+
+
+	/**
 	 * Log a debug message.
 	 *
 	 * This gets added to {@link $Debuglog the global Debuglog} with
@@ -2246,6 +2272,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.55  2006/06/05 14:34:31  blueyed
+ * Added get_plugin_url()
+ *
  * Revision 1.54  2006/06/05 14:26:42  blueyed
  * doc
  *
