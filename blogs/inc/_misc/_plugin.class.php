@@ -1054,8 +1054,8 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'Comment': the {@link Comment} object (by reference)
 	 *   - The following values are interesting if you want to provide skipping of a test:
-	 *     - 'cur_karma': current karma value (cur_karma_abs/cur_karma_divider)
-	 *     - 'cur_karma_abs': current karma absolute value
+	 *     - 'cur_karma': current karma value (cur_karma_abs/cur_karma_divider or NULL)
+	 *     - 'cur_karma_abs': current karma absolute value or NULL (if no Plugin returned karma before)
 	 *     - 'cur_karma_divider': current divider (sum of weights)
 	 *     - 'cur_count_plugins': number of Plugins that have already been asked
 	 * @return integer|NULL Spam probability (-100 - 100).
@@ -2246,6 +2246,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.54  2006/06/05 14:26:42  blueyed
+ * doc
+ *
  * Revision 1.53  2006/05/30 23:08:59  blueyed
  * doc
  *
