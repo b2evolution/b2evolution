@@ -1806,7 +1806,7 @@ class Plugin
 			$base = $plugins_url;
 		}
 
-		if( ! strpos( $base, $ReqHost ) === 0 )
+		if( strpos( $base, $ReqHost ) !== 0 )
 		{ // the base url does not begin with the requested host:
 
 			// Fix "http:" to "https:":
@@ -2286,6 +2286,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.58  2006/06/05 15:48:52  blueyed
+ * Fix
+ *
  * Revision 1.57  2006/06/05 15:38:29  blueyed
  * Fix
  *
