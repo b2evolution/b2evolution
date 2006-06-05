@@ -489,6 +489,7 @@ class Blog extends DataObject
 			case 'baseurlroot':
 				if( preg_match( '#(https?://(.+?)(:.+?)?)/#', $this->get('baseurl'), $matches ) )
 				{
+					// TODO: shouldn't that include a trailing slash?:
 					return $matches[1];
 				}
 
@@ -828,6 +829,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/05 13:43:53  blueyed
+ * todo questions
+ *
  * Revision 1.7  2006/04/20 16:31:30  fplanque
  * comment moderation (finished for 1.8)
  *
