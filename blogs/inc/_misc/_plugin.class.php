@@ -1807,6 +1807,21 @@ class Plugin
 			$base = $plugins_url;
 		}
 
+		if( ! strpos( $base, $ReqHost ) === 0 )
+		{ // the base url does not begin with the requested host:
+
+			// Fix "http:" to "https:":
+			if( strpos( $ReqHost, 'https:' ) === 0 && strpos( $base, 'http:' ) === 0 )
+			{
+				$base_fixed = 'https:'.substr( $base, 5 );
+
+				if( strpos( $base_fixed, $ReqHost ) === 0 )
+				{
+					$base = $base_fixed;
+				}
+			}
+		}
+
 		return $base.$this->classname.'/';
 	}
 
@@ -2272,6 +2287,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.56  2006/06/05 15:00:29  blueyed
+ * Fix get_plugin_url to use https if ReqHost uses https.
+ *
  * Revision 1.55  2006/06/05 14:34:31  blueyed
  * Added get_plugin_url()
  *
