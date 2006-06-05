@@ -720,26 +720,24 @@ class Item extends DataObject
 	{
 		global $Plugins;
 
-		$display = ( ! is_null($before_error) ); // isn't that negotiation and "harder to understand"? (was: isset()) fp>> isset() feels totally weird when there is a DEFAULT 2 lines above. How could it be NOT SET?
+		$display = ( ! is_null($before_error) );
 
-		// Ask Plugins:
+		// Ask Plugins (it can say NULL and would get skipped in Plugin::trigger_event_first_return()):
 		// Examples:
 		//  - A plugin might want to restrict comments on posts older than 20 days.
 		//  - A plugin might want to allow comments always for certain users (admin).
-// fp>> Can a plugin respond with NULL (or sth alike) if it doesn't want to force to yes or no?
-// Please comment this completely and do not use the same var name ($plugin_return) for TWO different things
-		if( $plugin_return = $Plugins->trigger_event_first_return( 'ItemCanComment', array( 'Item' => $this ) ) )
+		if( $event_return = $Plugins->trigger_event_first_return( 'ItemCanComment', array( 'Item' => $this ) ) )
 		{
-			$plugin_return = $plugin_return['plugin_return'];
-			if( $plugin_return === true )
+			$plugin_return_value = $event_return['plugin_return'];
+			if( $plugin_return_value === true )
 			{
 				return true; // OK, user can comment!
 			}
 
-			if( $display && is_string($plugin_return) )
+			if( $display && is_string($plugin_return_value) )
 			{
 				echo $before_error;
-				echo $plugin_return;
+				echo $plugin_return_value;
 				echo $after_error;
 			}
 
@@ -2672,6 +2670,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.55  2006/06/05 18:03:46  blueyed
+ * *** empty log message ***
+ *
  * Revision 1.54  2006/06/02 20:12:37  fplanque
  * I don't like that fuzzy code.
  *
