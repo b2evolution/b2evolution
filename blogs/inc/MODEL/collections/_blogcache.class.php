@@ -109,12 +109,16 @@ class BlogCache extends DataObjectCache
 		// Load just the requested object:
 		$Debuglog->add( "Loading <strong>$this->objtype($req_url)</strong> into cache", 'dataobjects' );
 
+		$req_url_wo_proto = substr( $req_url, strpos( $req_url, '://' ) ); // req_url without protocol, so it matches http and https below
+
 		// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
 		$sql = "
 				SELECT *
 				  FROM $this->dbtablename
 				 WHERE (
-					( blog_siteurl REGEXP '^https?://' AND ".$DB->quote($req_url)." LIKE CONCAT( blog_siteurl, '%' ) ) ";
+				  ( blog_siteurl REGEXP '^https?://'
+				    AND ( ".$DB->quote('http'.$req_url_wo_proto)." LIKE CONCAT( blog_siteurl, '%' )
+				          OR ".$DB->quote('https'.$req_url_wo_proto)." LIKE CONCAT( blog_siteurl, '%' ) ) ) ";
 
 		// Match stubs like "http://base/url/STUB?param=1" on $baseurl
 		if( preg_match( "#^$baseurl([^/?]+)#", $req_url, $match ) )
@@ -268,6 +272,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/05 15:26:12  blueyed
+ * get_by_url: detect regardless of protocol (http or https)
+ *
  * Revision 1.7  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *
