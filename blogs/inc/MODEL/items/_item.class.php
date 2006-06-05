@@ -1745,9 +1745,9 @@ class Item extends DataObject
 			// fp> a javascript DHTML onhover help would be evenb better than the JS popup
 
 			// internal README.html link:
-			echo ' '.$loop_RendererPlugin->get_README_link();
+			echo ' '.$loop_RendererPlugin->get_help_link('$readme');
 			// external help link:
-			echo ' '.$loop_RendererPlugin->get_help_link();
+			echo ' '.$loop_RendererPlugin->get_help_link('$help_url');
 
 			echo "</div>\n";
 		}
@@ -2670,6 +2670,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.56  2006/06/05 23:15:00  blueyed
+ * cleaned up plugin help links
+ *
  * Revision 1.55  2006/06/05 18:03:46  blueyed
  * *** empty log message ***
  *

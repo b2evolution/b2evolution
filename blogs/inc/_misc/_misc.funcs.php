@@ -2133,6 +2133,7 @@ function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
  * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
  * @param array Additional attributes to the A tag. It may also contain these params:
  *              'use_js_popup': if true, the link gets opened as JS popup. You must also pass an "id" attribute for this!
+ *              'use_js_size': use this to override the default popup size ("500, 400")
  * @return string The generated action icon link.
  */
 function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word_weight = 1, $link_attribs = array( 'class'=>'action_icon' ) )
@@ -2157,7 +2158,25 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
 	// "use_js_popup": open link in a JS popup
 	if( ! empty($link_attribs['use_js_popup']) )
 	{
-		$popup_js = 'var win = new PopupWindow(); win.autoHide(); win.setUrl( \''.$link_attribs['href'].'\' ); win.setSize( 500, 400 ); win.showPopup(\''.$link_attribs['id'].'\'); return false;';
+		$popup_js = 'var win = new PopupWindow(); win.autoHide(); win.setUrl( \''.$link_attribs['href'].'\' ); win.setSize(  ); ';
+
+		if( isset($link_attribs['use_js_size']) )
+		{
+			if( ! empty($link_attribs['use_js_size']) )
+			{
+				$popup_size = $link_attribs['use_js_size'];
+			}
+		}
+		else
+		{
+			$popup_size = '500, 400';
+		}
+		if( isset($popup_size) )
+		{
+			$popup_js .= 'win.setSize( '.$link_attribs['use_js_size'].' ); ';
+		}
+		$popup_js .= 'win.showPopup(\''.$link_attribs['id'].'\'); return false;';
+
 		if( empty( $link_attribs['onclick'] ) )
 		{
 			$link_attribs['onclick'] = $popup_js;
@@ -2167,6 +2186,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = 4, $word
 			$link_attribs['onclick'] .= $popup_js;
 		}
 		unset($link_attribs['use_js_popup']);
+		unset($link_attribs['use_js_size']);
 	}
 
 	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
@@ -2896,6 +2916,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.57  2006/06/05 23:15:00  blueyed
+ * cleaned up plugin help links
+ *
  * Revision 1.56  2006/05/29 19:28:44  fplanque
  * no message
  *

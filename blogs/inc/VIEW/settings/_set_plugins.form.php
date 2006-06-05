@@ -126,8 +126,8 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 				<?php
 				echo action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID ) );
 				// Help icons, if available:
-				echo $loop_Plugin->get_help_link()
-					.' '.$loop_Plugin->get_README_link();
+				echo $loop_Plugin->get_help_link('$help_url')
+					.' '.$loop_Plugin->get_help_link('$readme');
 				?>
 			</td>
 			<?php
@@ -236,7 +236,7 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 				{
 					$help_icons[] = $help_external;
 				}
-				if( $help_internal = $loop_Plugin->get_README_link() )
+				if( $help_internal = $loop_Plugin->get_help_link('$readme') )
 				{
 					$help_icons[] = $help_internal;
 				}
@@ -279,6 +279,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.21  2006/06/05 23:15:00  blueyed
+ * cleaned up plugin help links
+ *
  * Revision 1.20  2006/05/30 23:14:54  blueyed
  * Re-enabled internal help, because it has been fixed; link name of available Plugins also to "info" action, because easier to click
  *

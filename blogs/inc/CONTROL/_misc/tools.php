@@ -100,8 +100,8 @@ elseif( $tab_Plugin )
 
 	<?php
 	echo $tab_Plugin->get_edit_settings_link()
-		.' '.$tab_Plugin->get_help_link()
-		.' '.$tab_Plugin->get_README_link();
+		.' '.$tab_Plugin->get_help_link('$help_url')
+		.' '.$tab_Plugin->get_help_link('$readme');
 	?>
 
 	</div>

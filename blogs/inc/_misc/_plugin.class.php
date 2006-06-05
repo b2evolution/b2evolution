@@ -2172,21 +2172,37 @@ class Plugin
 	 * @param string Target; one of the following:
 	 *         - anchor to {@link $help_url} ("#anchor")
 	 *         - absolute link to some URL, e.g. "http://example.com/example.php"
-	 *         - empty for {@link $help_url}, then also the "www" icon gets used
-	 * @return string The html A tag, linking to the help.
+	 *         - '$help_url' or empty for {@link $help_url}, then also the "www" icon gets used
+	 *         - '$readme' to link to the plugin's README.html file (if available)
+	 * @return string The html A tag, linking to the help (or empty in case of $readme, if there is none).
 	 */
 	function get_help_link( $target = '' )
 	{
+		static $target_counter = 0;
 		$title = '';
 		$icon = 'help';
 		$word = '';
-		$link_attribs = array( 'target' => '_blank' ); // TODO: use JS popup instead? fp>> YES! (and make sure it gets to front)
+		$link_attribs = array( 'use_js_popup'=>true, 'use_js_size' => '', 'id'=>'anchor_help_plugin_'.$this->ID.'_'.$target_counter++ );
 
-		if( empty($target) ) // TODO  $target == '$help_url'
+		if( $target == '$help_url' || empty($target) )
 		{
 			$url = ! empty( $this->help_url ) ? $this->help_url : 'http://manual.b2evolution.net/Plugins/'.$this->classname;
 			$title = T_('Homepage of the plugin');
 			$icon = 'www';
+		}
+		elseif( $target == '$readme' )
+		{ // README
+			if( ! $this->get_help_file() )
+			{
+				return '';
+			}
+
+			global $admin_url;
+
+			$link_attribs['use_js_size'] = '500, 400';
+			$title = T_('Local documentation of the plugin');
+			$url = url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$this->ID );
+			$icon = 'help';
 		}
 		elseif( substr($target, 0, 1) == '#' )
 		{ // anchor
@@ -2197,31 +2213,12 @@ class Plugin
 		{ // absolute URL (strict match to allow other formats later if needed)
 			$url = $target;
 		}
-
-		return action_icon( $title, $icon, $url, $word, 4, 1, $link_attribs );
-	}
-
-
-	/**
-	 * Display a link to open the Plugin's README.html file in a JS popup, if available.
-	 *
-	 * @todo merge with get_help_link( '$readme' )
-	 *
-	 * @param string Word to be used after action icon
-	 * @return string Either the HTML A-tag or empty, if no README.html available
-	 */
-	function get_README_link( $word = '' )
-	{
-		if( ! $this->get_help_file() )
+		else
 		{
-			return '';
+			debug_die( 'Invalid get_help_link() target: '.$target );
 		}
 
-		global $admin_url;
-
-		return action_icon( T_('Local documentation of the plugin'), 'help',
-				url_add_param( $admin_url, 'ctrl=plugins&amp;action=disp_help_plain&amp;plugin_ID='.$this->ID ),
-				$word, 4, 1, array( 'use_js_popup'=>true, 'id'=>'anchor_help_plugin_'.$this->ID ) );
+		return action_icon( $title, $icon, $url, $word, 4, 1, $link_attribs );
 	}
 
 
@@ -2291,6 +2288,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.61  2006/06/05 23:15:00  blueyed
+ * cleaned up plugin help links
+ *
  * Revision 1.60  2006/06/05 18:02:59  blueyed
  * doc
  *

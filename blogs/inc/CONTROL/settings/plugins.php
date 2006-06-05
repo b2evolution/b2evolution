@@ -1031,11 +1031,11 @@ switch( $action )
 
 		// Help icons (to homepage and README.html), if available:
 		$help_icons = array();
-		if( $help_www = $edit_Plugin->get_help_link() )
+		if( $help_www = $edit_Plugin->get_help_link('$help_url') )
 		{
 			$help_icons[] = $help_www;
 		}
-		if( $help_README = $edit_Plugin->get_README_link() )
+		if( $help_README = $edit_Plugin->get_help_link('$readme') )
 		{
 			$help_icons[] = $help_README;
 		}
