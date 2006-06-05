@@ -975,6 +975,7 @@ class Plugin
 	 *   true, if the Item can receive feedback
 	 *   false/string, if the Item cannot receive feedback. If you return a string
 	 *                 this gets displayed as an error/explanation.
+	 *   NULL, if you do not want to say "yes" or "no".
 	 */
 	function ItemCanComment( & $params )
 	{
@@ -2290,6 +2291,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.60  2006/06/05 18:02:59  blueyed
+ * doc
+ *
  * Revision 1.59  2006/06/05 17:44:38  blueyed
  * doc
  *
