@@ -1799,8 +1799,7 @@ class Plugin
 
 		if( isset($Blog) && ! is_admin_page() )
 		{
-			$base = $Blog->get('baseurlroot').'/' // TODO: should include slash!
-				.'plugins/';
+			$base = $Blog->get('baseurl').'plugins/';
 		}
 		else
 		{
@@ -2287,6 +2286,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.57  2006/06/05 15:38:29  blueyed
+ * Fix
+ *
  * Revision 1.56  2006/06/05 15:00:29  blueyed
  * Fix get_plugin_url to use https if ReqHost uses https.
  *
