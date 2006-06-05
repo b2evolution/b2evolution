@@ -1719,6 +1719,7 @@ class Plugins
 			return NULL;
 		}
 
+		$this->load_plugins_table(); // We need index_ID_rows below
 
 		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
 
@@ -2696,6 +2697,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.52  2006/06/05 14:27:58  blueyed
+ * Karma collect: Load plugins table, as it's needed for weight (Thanks to Tor)
+ *
  * Revision 1.51  2006/05/24 20:43:19  blueyed
  * Pass "Item" as param to Render* event methods.
  *
@@ -2903,7 +2907,7 @@ class Plugins_admin extends Plugins
  * Fixes
  *
  * Revision 1.22  2006/01/09 18:17:42  blueyed
- * validate_list() need to call load_plugin_tables(); also fixed it for opt-in and lazy renderers.
+ * validate_list() need to call load_plugins_table(); also fixed it for opt-in and lazy renderers.
  * Fixes http://dev.b2evolution.net/todo.php/2006/01/09/wacko_formatting_plugin_does_not_work_an
  *
  * Revision 1.21  2006/01/06 18:58:08  blueyed
