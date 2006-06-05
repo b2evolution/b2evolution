@@ -161,26 +161,48 @@ class basic_antispam_plugin extends Plugin
 
 
 	/**
+	 * Disable/Enable events according to settings.
+	 *
+	 * "AppendHitLog" gets enabled according to check_url_referers setting.
+	 * "BeforeTrackbackInsert" gets disabled, if we do not check for duplicate content and do not check for our URL.
+	 */
+	function BeforeEnable()
+	{
+		if( $this->Settings->get('check_url_referers') )
+		{
+			$this->enable_event( 'AppendHitLog' );
+		}
+		else
+		{
+			$this->disable_event( 'AppendHitLog' );
+		}
+
+		if( ! $this->Settings->get('check_dupes') && ! $this->Settings->get('check_url_trackbacks') )
+		{
+			$this->disable_event( 'BeforeTrackbackInsert' );
+		}
+		else
+		{
+			$this->enable_event( 'BeforeTrackbackInsert' );
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * - Check if our hostname is linked in the URL of the trackback.
 	 * - Check for duplicate trackbacks.
 	 */
 	function BeforeTrackbackInsert( & $params )
 	{
-		if( ! $this->Settings->get('check_url_trackbacks') )
-		{ // disabled by Settings:
-			// TODO: disable event automatically at setting time
-			// dh> what do you mean? If the event gets disabled automagically, it becomes "geeky" again. Not?
-			// fp> no it doesn't become geeky, becuase the basic user never sees that the checkbox actually enables/disables an event. It works like a setting with a friendly name, but it is optimized like an event disabling with a geeky name.
-			return;
-		}
-
 		if( $this->is_duplicate_comment( $params['Comment'] ) )
 		{
 			$this->msg( T_('The trackback seems to be a duplicate.'), 'error' );
 			return;
 		}
 
-		if( ! $this->is_referer_linking_us( $params['Comment']->author_url, '' ) )
+		if( $this->Settings->get('check_url_trackbacks') && ! $this->is_referer_linking_us( $params['Comment']->author_url, '' ) )
 		{ // Our hostname is not linked by the permanent url of the refering entry:
 			$this->msg( T_('Could not find link to us in your URL!'), 'error' );
 		}
@@ -330,11 +352,6 @@ class basic_antispam_plugin extends Plugin
 	 */
 	function AppendHitLog( & $params )
 	{
-		if( ! $this->Settings->get('check_url_referers') )
-		{ // disabled by Settings:
-			return false;
-		}
-
 		global $debug_no_register_shutdown;
 
 		$Hit = & $params['Hit'];
@@ -549,6 +566,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.18  2006/06/05 17:45:06  blueyed
+ * Disable events at settings time, according to Settings checkboxes.
+ *
  * Revision 1.17  2006/06/01 18:36:10  fplanque
  * no message
  *
