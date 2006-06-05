@@ -483,6 +483,11 @@ switch( $AdminUI->get_path(1) )
 			// Antispam:
 			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{
+				/**
+				 * @uses get_ban_domain()
+				 * @param string URL
+				 * @return string Link to ban the URL
+				 */
 				function referer_ban_link( $uri )
 				{
 					return '<a href="?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain( $uri ) )
@@ -490,8 +495,7 @@ switch( $AdminUI->get_path(1) )
 				}
 				$Results->cols[] = array(
 						'th' => /* TRANS: Abbrev. for Spam */ T_('S'),
-// fp> please explain what was wrong with #dom_name#
-						'td' => '%referer_ban_link( #hit_referer# )%',
+						'td' => '%referer_ban_link( #hit_referer# )%', // we use hit_referer, because unlike dom_name it includes more info (especially any subdomain)
 					);
 			}
 
@@ -678,7 +682,7 @@ switch( $AdminUI->get_path(1) )
 						<?php
 						if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 						{ // user can ban:
-							echo '<td><a href="?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain( trim($row_stats['hit_referer']) ) )
+							echo '<td><a href="?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain( trim($row_stats['hit_referer']) ) ) // we use hit_referer, because unlike dom_name it includes more info (especially any subdomain)
 								.'" title="'.T_('Ban this domain!').'">'.get_icon('ban').'</a></td>';
 						}
 						?>
@@ -1057,6 +1061,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2006/06/05 17:10:17  blueyed
+ * doc
+ *
  * Revision 1.17  2006/06/01 17:52:15  fplanque
  * no message
  *
