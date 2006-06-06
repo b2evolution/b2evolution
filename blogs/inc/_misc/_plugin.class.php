@@ -434,6 +434,27 @@ class Plugin
 
 
 	/**
+	 * This method gets asked when plugins get installed and allows you to return a list
+	 * of extra events, which your plugin triggers itself (e.g. through
+	 * {@link $Plugins->trigger_event()}).
+	 *
+	 * NOTE: PLEASE use a distinct prefix for the event name, e.g. "$this->classname".
+	 *
+	 * NOTE: The length of event names is limited to 40 chars.
+	 *
+	 * NOTE: Please comment the params and the return value here with the list
+	 *       that you return. Only informal as comment, but makes it easier for
+	 *       others.
+	 *
+	 * @see test_plugin::GetExtraEvents()
+	 * @return NULL|array "event_name" => "description"
+	 */
+	function GetExtraEvents()
+	{
+	}
+
+
+	/**
 	 * Override this method to define methods/functions that you want to make accessible
 	 * through /htsrv/call_plugin.php, which allows you to call those methods by HTTP request.
 	 *
@@ -2288,6 +2309,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.62  2006/06/06 20:35:50  blueyed
+ * Plugins can define extra events that they trigger themselves.
+ *
  * Revision 1.61  2006/06/05 23:15:00  blueyed
  * cleaned up plugin help links
  *

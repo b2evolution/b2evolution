@@ -326,6 +326,23 @@ class Plugins
 				'BeforeBlogDisplay' => T_('Gets called before a (part of the blog) gets displayed.'),
 				'SkinBeginHtmlHead' => T_('Gets called at the top of the HTML HEAD section in a skin.'),
 			);
+
+
+			// Let Plugins add additional events (if they trigger those events themselves):
+			$this->load_plugins_table();
+
+			$rev_sorted_IDs = array_reverse( $this->sorted_IDs ); // so higher priority overwrites lower (just for desc)
+
+			foreach( $rev_sorted_IDs as $plugin_ID )
+			{
+				$Plugin = & $this->get_by_ID( $plugin_ID );
+
+				$extra_events = $Plugin->GetExtraEvents();
+				if( is_array($extra_events) )
+				{
+					$this->_supported_events = array_merge( $this->_supported_events, $extra_events );
+				}
+			}
 		}
 
 		return $this->_supported_events;
@@ -1637,7 +1654,7 @@ class Plugins
 	{
 		global $Debuglog;
 
-		$Debuglog->add( 'Trigger event '.$event.' (first bool)', 'plugins' );
+		$Debuglog->add( 'Trigger event '.$event.' (first return)', 'plugins' );
 
 		if( empty($this->index_event_IDs[$event]) )
 		{ // No events registered
@@ -1694,6 +1711,26 @@ class Plugins
 		$this->trigger_event_first_true( $event, $params );
 
 		return $params[$get];
+	}
+
+
+	/**
+	 * Trigger an event and return the first return value of a plugin.
+	 *
+	 * @param string Event name, see {@link Plugins::get_supported_events()}
+	 * @param array Associative array of parameters for the Plugin
+	 * @return mixed NULL if no Plugin returned something or the return value of the first Plugin
+	 */
+	function get_trigger_event_first_return( $event, $params = NULL )
+	{
+		$r = $this->trigger_event_first_return( $event, $params );
+
+		if( ! isset($r['plugin_return']) )
+		{
+			return NULL;
+		}
+
+		return $r['plugin_return'];
 	}
 
 
@@ -2697,6 +2734,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.54  2006/06/06 20:35:50  blueyed
+ * Plugins can define extra events that they trigger themselves.
+ *
  * Revision 1.53  2006/06/06 18:20:54  blueyed
  * fix undefinded var in msg
  *

@@ -135,6 +135,20 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * We trigger an extra event ourself (which we also provide ourself).
+	 *
+	 * @return array
+	 */
+	function GetExtraEvents()
+	{
+		return array(
+				// Gets "min" and "max" as params and should return a random number in between:
+				'test_plugin_get_random' => T_('TEST event that returns a random number.'),
+			);
+	}
+
+
+	/**
 	 * User settings.
 	 *
 	 * @see Plugin::GetDefaultUserSettings()
@@ -339,8 +353,11 @@ class test_plugin extends Plugin
 	 */
 	function AdminTabAction()
 	{
+		global $Plugins;
+
 		$this->text_from_AdminTabAction = '<p>This is text from AdminTabAction for the TEST plugin.</p>'
-			.'<p>Here is a random number: '.rand( 0, 10000 ).'</p>';
+			.'<p>Here is a random number: '
+			.$Plugins->get_trigger_event_first_return('test_plugin_get_random', array( 'min'=>-1000, 'max'=>1000 )).'</p>';
 
 		if( $this->param_text = param( $this->get_class_id('text') ) )
 		{
@@ -381,11 +398,14 @@ class test_plugin extends Plugin
 	 */
 	function AdminBeginPayload()
 	{
+		global $Plugins;
+
 		echo '<div class="panelblock center">TEST plugin: AdminBeginPayload event.</div>';
 
 		if( $this->UserSettings->get('echo_random') )
 		{
-			echo '<div class="panelblock center">TEST plugin: A random number requested by user setting: '.rand(0, 1000).'</div>';
+			echo '<div class="panelblock center">TEST plugin: A random number requested by user setting: '
+					.$Plugins->get_trigger_event_first_return('test_plugin_get_random', array( 'min'=>0, 'max'=>1000 ) ).'</div>';
 		}
 	}
 
@@ -536,11 +556,28 @@ class test_plugin extends Plugin
 		$params['Form']->info( 'TEST plugin', 'This is the TEST plugin responding to the ValidateAccountFormSent event.' );
 	}
 
+
+	/**
+	 * Gets provided as plugin event (and gets also used internally for demonstration).
+	 *
+	 * @param array Associative array of parameters
+	 *              'min': mininum number
+	 *              'max': maxinum number
+	 * @return integer
+	 */
+	function test_plugin_get_random( & $params )
+	{
+		return rand( $params['min'], $params['max'] );
+	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.42  2006/06/06 20:35:50  blueyed
+ * Plugins can define extra events that they trigger themselves.
+ *
  * Revision 1.41  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *
