@@ -845,7 +845,7 @@ class Plugins
 
 								if( version_compare( $clean_oldest_enabled, $clean_req_ver, '<' ) )
 								{ // at least one instance of the installed plugins is not the current version
-									$msgs['error'][] = sprintf( T_( 'The plugin requires at least version %s of the plugin %s, but you have %s.' ), $plugin_req[1], $plugin_req[0], $oldest );
+									$msgs['error'][] = sprintf( T_( 'The plugin requires at least version %s of the plugin %s, but you have %s.' ), $plugin_req[1], $plugin_req[0], $clean_oldest_enabled );
 								}
 							}
 							else
@@ -2697,6 +2697,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.53  2006/06/06 18:20:54  blueyed
+ * fix undefinded var in msg
+ *
  * Revision 1.52  2006/06/05 14:27:58  blueyed
  * Karma collect: Load plugins table, as it's needed for weight (Thanks to Tor)
  *
