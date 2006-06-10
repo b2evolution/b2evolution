@@ -170,6 +170,10 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
 		<p><strong><?php echo T_('IP address') ?>:</strong> <?php echo $edited_Comment->author_IP; ?></p>
 		<p><strong><?php echo T_('Spam Karma') ?>:</strong> <?php $edited_Comment->spam_karma(); ?></p>
+		<p><strong><?php echo T_('Item') ?>:</strong> <?php
+			$comment_Item = & $edited_Comment->get_Item();
+			$comment_Item->permanent_link();
+			$comment_Item->edit_link(); ?></p>
 	</fieldset>
 
 	<?php
@@ -191,6 +195,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.10  2006/06/10 16:26:19  blueyed
+ * Provide permalink and edit link of the comment's Item.
+ *
  * Revision 1.9  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *
