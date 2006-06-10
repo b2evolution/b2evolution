@@ -560,7 +560,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 				// KEY
 				$has_inline_primary_key = false;
-				if( preg_match( '~^(.*) (?: \b (UNIQUE) (?:\s+ (?:INDEX|KEY))? | (?:PRIMARY \s+)? KEY \b ) (.*)$~ix', $field_to_parse, $match ) )
+				if( preg_match( '~^(.*) \b (?: (UNIQUE) (?:\s+ (?:INDEX|KEY))? | (?:PRIMARY \s+)? KEY ) \b (.*)$~ix', $field_to_parse, $match ) )
 				{ // fields got added to primary_key_fields and fields_with_keys before
 					$field_to_parse = $match[1].$match[3];
 					if( empty($match[2]) )
@@ -861,7 +861,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				$query = 'ALTER TABLE '.$table.' ADD COLUMN '.$column_definition;
 
 				// Handle inline PRIMARY KEY definition:
-				if( preg_match( '~^(.*) (?: \b (UNIQUE) (?:\s+ (?:INDEX|KEY))? | (?:PRIMARY \s+)? KEY \b ) (.*)$~ix', $column_definition, $match ) // "has_inline_primary_key"
+				if( preg_match( '~^(.*) \b (?: (UNIQUE) (?:\s+ (?:INDEX|KEY))? | (?:PRIMARY \s+)? KEY ) \b (.*)$~ix', $column_definition, $match ) // "has_inline_primary_key"
 						&& count($existing_primary_fields)
 						&& ! in_array($fieldname_lowered, $existing_primary_fields) )
 				{ // the column is part of the PRIMARY KEY, which needs to get dropped before (we already handle that for AUTO_INCREMENT fields)
@@ -1041,6 +1041,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.20  2006/06/10 00:39:36  blueyed
+ * Fixed pattern for matching inline keys
+ *
  * Revision 1.19  2006/06/01 17:46:45  fplanque
  * higlight output with strong
  *
