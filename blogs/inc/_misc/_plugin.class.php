@@ -1002,6 +1002,19 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: called to display the URL that accepts trackbacks for
+	 *                an item.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the {@link Item} object (by reference)
+	 *   - 'template': the template to display the URL (%url%)
+	 */
+	function DisplayTrackbackAddr( & $params )
+	{
+	}
+
 	// }}}
 
 
@@ -1170,7 +1183,6 @@ class Plugin
 	function FilterCommentAuthorUrl( & $params )
 	{
 	}
-
 
 
 	/**
@@ -1625,8 +1637,10 @@ class Plugin
 	 * uses this event optionally to whitelist a user.
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'Form': the form where payload should get added (by reference, OPTIONALLY!)
+	 *   - 'Form': the {@link form} where payload should get added (by reference, OPTIONALLY!)
 	 *     If it's not given as param, you have to create an own form, if you need one.
+	 *   - 'form_use_fieldset': if a "Form" param is given and we use it, should we add
+	 *                          an own fieldset? (boolean, default "true", OPTIONALLY!)
 	 *   - 'key': A key that is associated to the caller of the event (string, OPTIONALLY!)
 	 * @return boolean True, if you have provided payload for a captcha test
 	 */
@@ -2309,6 +2323,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.63  2006/06/10 19:16:17  blueyed
+ * DisplayTrackbackAddr event
+ *
  * Revision 1.62  2006/06/06 20:35:50  blueyed
  * Plugins can define extra events that they trigger themselves.
  *

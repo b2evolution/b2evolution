@@ -325,6 +325,7 @@ class Plugins
 
 				'BeforeBlogDisplay' => T_('Gets called before a (part of the blog) gets displayed.'),
 				'SkinBeginHtmlHead' => T_('Gets called at the top of the HTML HEAD section in a skin.'),
+				'DisplayTrackbackAddr' => '',
 			);
 
 
@@ -2734,6 +2735,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.55  2006/06/10 19:16:17  blueyed
+ * DisplayTrackbackAddr event
+ *
  * Revision 1.54  2006/06/06 20:35:50  blueyed
  * Plugins can define extra events that they trigger themselves.
  *
