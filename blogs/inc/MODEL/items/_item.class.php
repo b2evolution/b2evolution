@@ -1911,15 +1911,25 @@ class Item extends DataObject
 	 */
 	function trackback_url()
 	{
+		echo $this->get_trackback_url();
+	}
+
+
+	/**
+	 * Template function: get url to use to trackback this item
+	 * @return string
+	 */
+	function get_trackback_url()
+	{
 		global $htsrv_url, $Settings;
 
 		if( $Settings->get('links_extrapath') )
 		{
-			echo $htsrv_url.'trackback.php/'.$this->ID;
+			return $htsrv_url.'trackback.php/'.$this->ID;
 		}
 		else
 		{
-			echo $htsrv_url.'trackback.php?tb_id='.$this->ID;
+			return $htsrv_url.'trackback.php?tb_id='.$this->ID;
 		}
 	}
 
@@ -2670,6 +2680,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.57  2006/06/12 00:42:21  blueyed
+ * Item::get_trackback_url() added
+ *
  * Revision 1.56  2006/06/05 23:15:00  blueyed
  * cleaned up plugin help links
  *
