@@ -71,7 +71,7 @@ if( $user_profile_only )
 	if( (isset($user_ID) && $user_ID != $current_User->ID)
 	 || isset($grp_ID) )
 	{ // User is trying to edit something he should not: add error message (Should be prevented by UI)
-		$Messages->add( 'You have no permission to view other users or groups!', 'error' );
+		$Messages->add( T_('You have no permission to view other users or groups!'), 'error' );
 	}
 
 	// Make sure the user only edits himself:
@@ -96,6 +96,7 @@ if( ! is_null($user_ID) )
 	elseif( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
 	{	// We could not find the User to edit:
 		unset( $edited_User );
+		forget_param( 'user_ID' );
 		$Messages->head = T_('Cannot edit user!');
 		$Messages->add( T_('Requested user does not exist any longer.'), 'error' );
 		$action = 'list';
@@ -117,7 +118,7 @@ if( ! is_null($user_ID) )
 		if( ! $current_User->check_perm( 'users', 'edit' )
 		    && $edited_User->ID != $current_User->ID )
 		{ // user is only allowed to _view_ other user's profiles
-			$Messages->add( 'You have no permission to edit other users!', 'error' );
+			$Messages->add( T_('You have no permission to edit other users!'), 'error' );
 			$action = 'view_user';
 		}
 		elseif( $demo_mode )
@@ -147,6 +148,7 @@ elseif( $grp_ID !== NULL )
 	elseif( ($edited_Group = & $GroupCache->get_by_ID( $grp_ID, false )) === false )
 	{ // We could not find the Group to edit:
 		unset( $edited_Group );
+		forget_param( 'grp_ID' );
 		$Messages->head = T_('Cannot edit group!');
 		$Messages->add( T_('Requested group does not exist any longer.'), 'error' );
 		$action = 'list';
@@ -167,7 +169,7 @@ elseif( $grp_ID !== NULL )
 	{ // check edit permissions
 		if( !$current_User->check_perm( 'users', 'edit' ) )
 		{
-			$Messages->add( 'You have no permission to edit groups!', 'error' );
+			$Messages->add( T_('You have no permission to edit groups!'), 'error' );
 			$action = 'view_group';
 		}
 		elseif( $demo_mode  )
@@ -304,7 +306,7 @@ if( !$Messages->count('error') )
 			{ // locale value has changed for the current user
 				$reload_page = true;
 			}
-			$edited_User->set_email( $edited_user_email );
+			$edited_User->set( 'email', $edited_user_email );
 			$edited_User->set( 'url', $edited_user_url );
 			$edited_User->set( 'icq', $edited_user_icq );
 			$edited_User->set( 'aim', $edited_user_aim );
@@ -322,10 +324,73 @@ if( !$Messages->count('error') )
 			$Request->param( 'edited_user_bozo', 'integer', 0 );
 			$Request->param( 'edited_user_focusonfirst', 'integer', 0 );
 
+			if( $Messages->count( 'error' ) )
+			{	// We have found validation errors:
+				$action = 'edit_user';
+				break;
+			}
+
+			// OK, no error.
+			$new_pass = '';
+
+			if( !empty($edited_user_pass2) )
+			{ // Password provided, we must encode it
+				$new_pass = md5( $edited_user_pass2 );
+
+				$edited_User->set( 'pass', $new_pass ); // set password
+			}
+
+			if( $edited_User->ID != 0 )
+			{ // Commit update to the DB:
+				$update_r = $edited_User->dbupdate();
+
+				if( $edited_User->ID == $current_User->ID )
+				{ // User updates his profile:
+					if( $update_r )
+					{
+						$Messages->add( T_('Your profile has been updated.'), 'success' );
+					}
+					else
+					{
+						$Messages->add( T_('Your profile has not been changed.'), 'note' );
+					}
+				}
+				else
+				{
+					$Messages->add( T_('User updated.'), 'success' );
+				}
+			}
+			else
+			{ // Insert user into DB
+				$edited_User->dbinsert();
+				$Messages->add( T_('New user created.'), 'success' );
+			}
+
+			// Now that the User exists in the DB and has an ID, update the settings:
+
+			if( $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID )
+					&& ($edited_User->ID == $current_User->ID) )
+			{ // admin_skin has changed or was set the first time for the current user
+				$reload_page = true;
+			}
+
+			// Action icon params:
+			$UserSettings->set( 'action_icon_threshold', $edited_user_action_icon_threshold, $edited_User->ID );
+			$UserSettings->set( 'action_word_threshold', $edited_user_action_word_threshold, $edited_User->ID );
+			$UserSettings->set( 'display_icon_legend', $edited_user_legend, $edited_User->ID );
+
+			// Set bozo validador activation
+			$UserSettings->set( 'control_form_abortions', $edited_user_bozo, $edited_User->ID );
+
+			// Focus on first
+			$UserSettings->set( 'focus_on_first_input', $edited_user_focusonfirst, $edited_User->ID );
+
+			// Update user settings:
+			$UserSettings->dbupdate();
+
 			// PluginUserSettings
 			$any_plugin_settings_updated = false;
 			$Plugins->restart();
-
 			while( $loop_Plugin = & $Plugins->get_next() )
 			{
 				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings();
@@ -357,78 +422,15 @@ if( !$Messages->count('error') )
 				$Messages->add( T_('Usersettings of Plugins have been updated.'), 'success' );
 			}
 
-			if( $Messages->count( 'error' ) )
-			{	// We have found validation errors:
-				$action = 'edit_user';
+			if( $reload_page )
+			{ // save Messages and reload the current page through header redirection
+				$Session->set( 'Messages', $Messages );
+				header_redirect( regenerate_url( 'action' ) );
 			}
-			else
-			{ // OK, no error.
-				$new_pass = '';
 
-				if( !empty($edited_user_pass2) )
-				{ // Password provided, we must encode it
-					$new_pass = md5( $edited_user_pass2 );
-
-					$edited_User->set( 'pass', $new_pass ); // set password
-				}
-
-				if( $edited_User->ID != 0 )
-				{ // Commit update to the DB:
-					$update_r = $edited_User->dbupdate();
-
-					if( $edited_User->ID == $current_User->ID )
-					{ // User updates his profile:
-						if( $update_r )
-						{
-							$Messages->add( T_('Your profile has been updated.'), 'success' );
-						}
-						else
-						{
-							$Messages->add( T_('Your profile has not been changed.'), 'note' );
-						}
-					}
-					else
-					{
-						$Messages->add( T_('User updated.'), 'success' );
-					}
-				}
-				else
-				{ // Insert user into DB
-					$edited_User->dbinsert();
-					$Messages->add( T_('New user created.'), 'success' );
-				}
-
-				// User Settings (a new User needs to be inserted here already!)
-
-				if( $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID )
-						&& ($edited_User->ID == $current_User->ID) )
-				{ // admin_skin has changed or was set the first time for the current user
-					$reload_page = true;
-				}
-
-				// Action icon params:
-				$UserSettings->set( 'action_icon_threshold', $edited_user_action_icon_threshold, $edited_User->ID );
-				$UserSettings->set( 'action_word_threshold', $edited_user_action_word_threshold, $edited_User->ID );
-				$UserSettings->set( 'display_icon_legend', $edited_user_legend, $edited_User->ID );
-
-				// Set bozo validador activation
-				$UserSettings->set( 'control_form_abortions', $edited_user_bozo, $edited_User->ID );
-
-				// Focus on first
-				$UserSettings->set( 'focus_on_first_input', $edited_user_focusonfirst, $edited_User->ID );
-
-				$UserSettings->dbupdate();
-
-				if( $reload_page )
-				{ // save Messages and reload the current page through header redirection
-					$Session->set( 'Messages', $Messages );
-					header_redirect( regenerate_url( 'action' ) );
-				}
-
-				if( $user_profile_only )
-				{
-					$action = 'edit_user';
-				}
+			if( $user_profile_only )
+			{
+				$action = 'edit_user';
 			}
 			break;
 
@@ -687,6 +689,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2006/06/13 21:30:00  blueyed
+ * MFB; fixed PluginUserSettings for new users
+ *
+ * Revision 1.19.2.1  2006/06/12 20:00:34  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.20  2006/05/30 19:57:03  blueyed
  * Fixed saving of User Settings for new users.
  *
