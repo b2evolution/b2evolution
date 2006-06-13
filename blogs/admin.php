@@ -57,9 +57,21 @@ if( ! $current_User->check_perm( 'admin', 'any' ) )
 }
 
 
-// Note: The header file will me merged into admin.php:
+/*
+ * Asynchronous processing options that may be required on any page
+ */
+require_once $inc_path.'_async.inc.php';
+
+
+/*
+ * Note: The header file will me merged into admin.php:
+ */
 require_once dirname(__FILE__).'/_header.php';
 
+
+/*
+ * Pass over to controller...
+ */
 
 // Get requested controller and memorize it:
 param( 'ctrl', '/^[a-z0-9_]+$/', $default_ctrl, true );
@@ -112,6 +124,12 @@ require $control_path.$ctrl_mappings[$ctrl];
 
 /*
  * $Log$
+ * Revision 1.13  2006/06/13 21:49:14  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.12.2.1  2006/06/12 20:00:29  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.12  2006/04/19 22:26:24  blueyed
  * cleanup/polish
  *

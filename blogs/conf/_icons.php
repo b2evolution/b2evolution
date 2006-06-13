@@ -14,6 +14,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * @global array icon name => array( 'file', 'alt', 'size', 'class', 'rollover' )
  */
 $map_iconfiles = array(
+	'pixel' => array(
+		'file' => $rsc_subdir.'icons/blank.gif',
+		'alt'  => '',
+		'size' => array( 1, 1 ),
+	),
+
 	'folder' => array(        // icon for folders
 		'file' => $rsc_subdir.'icons/fileicons/folder.gif',
 		'alt'  => T_('Folder'),

@@ -162,7 +162,7 @@ class GenericCategory extends GenericProperty
 			$Form->info( T_('Add to'), T_('Root') );
 		}
 
-		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, T_('name') );
+		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, T_('name'), array( 'required' => true ) );
 
 		$Form->text_input( $this->dbprefix.'ext_ID', $this->ext_ID, 25, T_('External ID') );
 

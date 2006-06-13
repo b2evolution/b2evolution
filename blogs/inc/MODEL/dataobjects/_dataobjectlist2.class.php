@@ -55,6 +55,11 @@ class FilteredResults extends Results
 	 */
 	function is_filtered()
 	{
+		if( empty( $this->filters ) )
+		{
+			return false;
+		}
+
 		return ( $this->filters != $this->default_filters );
 	}
 }
@@ -267,6 +272,12 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.5  2006/06/13 21:49:15  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.4.2.1  2006/06/12 20:00:37  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.4  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

@@ -130,8 +130,6 @@ else
 
 
 		case 'postlist2':
-			// TEMP HACK to sort by descending date by default:
-			$Request->param( 'results_order', 'string', 'D' );
 		case 'posts':
 		case 'tracker':
 			/*
@@ -141,6 +139,13 @@ else
 
 			// Create empty List:
 			$ItemList = & new ItemList2( $Blog, NULL, NULL );
+
+			if( $tab == 'tracker' )
+			{	// In tracker mode, we want a different default sort:
+				$ItemList->set_default_filters( array(
+						'orderby' => 'priority',
+						'order' => 'ASC' ) );
+			}
 
 			// Init filter params:
 			if( ! $ItemList->load_from_Request() )
@@ -201,17 +206,20 @@ else
  * Add sub menu entries.
  * We do this here instead of _header because we need to include all filter params into regenerate_url()
  * Note: this will override default tabs from _header config.
+ * TODO: check if this is still needed
  */
 $AdminUI->add_menu_entries(
 		'edit',
 		array(
+				/* Deprecated
 				'postlist' => array(
-					'text' => T_('Post list'),
+					'text' => T_('Post list (Old)'),
 					'href' => regenerate_url( 'tab', 'tab=postlist' ),
 					),
+				*/
 				'postlist2' => array(
-					'text' => T_('Post list 2'),
-					'href' => regenerate_url( 'tab', 'tab=postlist2' ),
+					'text' => T_('Post list'),
+					'href' => regenerate_url( 'tab', 'tab=postlist2&amp;filter=restore' ),
 					),
 				'tracker' => array(
 					'text' => T_('Tracker'),

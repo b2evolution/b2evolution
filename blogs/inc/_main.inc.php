@@ -200,11 +200,14 @@ $UserSettings = & new UserSettings();
  * @global int $servertimenow
  */
 $servertimenow = time();
+
+$time_difference = $Settings->get('time_difference') * 3600;
+
 /**
  * Corrected Unix timestamp to match server timezone
  * @global int $localtimenow
  */
-$localtimenow = $servertimenow + ($Settings->get('time_difference') * 3600);
+$localtimenow = $servertimenow + $time_difference;
 
 
 /**
@@ -217,15 +220,18 @@ require_once $model_path.'sessions/_hit.class.php';
 $Hit = & new Hit();
 
 
-/**
- * The Session class.
- * It has to be instantiated before the "SessionLoaded" hook.
- */
-require_once $model_path.'sessions/_session.class.php';
-/**
- * @global Session The Session object
- */
-$Session = & new Session();
+if( $is_web )
+{
+	/**
+	 * The Session class.
+	 * It has to be instantiated before the "SessionLoaded" hook.
+	 */
+	require_once $model_path.'sessions/_session.class.php';
+	/**
+	 * @global Session The Session object
+	 */
+	$Session = & new Session();
+}
 
 
 /**
@@ -665,6 +671,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.26  2006/06/13 21:49:14  blueyed
+ * Merged from 1.8 branch
+ *
  * Revision 1.25  2006/06/01 19:00:07  fplanque
  * no message
  *

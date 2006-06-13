@@ -698,6 +698,8 @@ class Filelist
 	 */
 	function set_filter( $filter_string, $filter_is_regexp )
 	{
+		global $Messages;
+
 		$this->_filter_is_regexp = $filter_is_regexp;
 
 		if( $this->_filter_is_regexp && ! empty($filter_string) )
@@ -1206,6 +1208,12 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.16  2006/06/13 21:49:15  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.15.2.1  2006/06/12 20:00:37  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.15  2006/04/27 21:25:42  blueyed
  * Do not use own Log object for Filelist (revert)
  *

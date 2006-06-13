@@ -298,6 +298,7 @@ if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 		$Messages->head = T_('Cannot edit link!');
 		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
 		unset( $edited_Link );
+		forget_param( 'link_ID' );
 		unset( $link_ID );
 	}
 }
@@ -313,6 +314,7 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 		$Messages->head = T_('Cannot link Item!');
 		$Messages->add( T_('Requested item does not exist any longer.'), 'error' );
 		unset( $edited_Item );
+		forget_param( 'item_ID' );
 		unset( $item_ID );
 	}
 }
@@ -793,6 +795,7 @@ switch( $action )
 		$msg = sprintf( T_('Link from &laquo;%s&raquo; deleted.'), $edited_Link->Item->dget('title') );
 		$edited_Link->dbdelete( true );
 		unset( $edited_Link );
+		forget_param( 'link_ID' );
 		$Messages->add( $msg, 'success' );
 		break;
 
@@ -1494,6 +1497,12 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.24  2006/06/13 21:49:15  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.21.2.3  2006/06/12 20:00:33  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.23  2006/05/30 22:36:05  blueyed
  * doc
  *

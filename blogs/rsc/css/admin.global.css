@@ -80,3 +80,18 @@ span.legend_element {
 	white-space: nowrap;
 }
 
+
+/*
+ * Cron statuses
+ */
+.cron_started {
+	font-weight: bold;
+}
+.cron_finished {
+	color: #009900;
+}
+.cron_error,
+.cron_timeout {
+	font-weight: bold;
+	color: #FF0000;
+}

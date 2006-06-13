@@ -56,7 +56,8 @@ $ItemList->title = T_('Task list');
 $ItemList->cols[] = array(
 		'th' => T_('Issue date'),
 		'order' => 'datestart',
-		'th_start' => '<th class="firstcol nowrap">',
+		'default_dir' => 'D',
+		'th_class' => 'nowrap',
 		'td_class' => 'nowrap',
 		'td' => '@get_permanent_link( get_icon(\'permalink\') )@ <span class="date">@get_issue_date()@</span>',
 	);
@@ -67,7 +68,7 @@ if( $Blog->ID == 1 )
 { // "All blogs": display name of blog
 	$ItemList->cols[] = array(
 			'th' => T_('Blog'),
-			'th_start' => '<th class="nowrap">',
+			'th_class' => 'nowrap',
 			'td_class' => 'nowrap',
 			'td' => '@get_Blog()@<a href="¤regenerate_url( \'blog,results_order\', \'blog=@blog_ID@\' )¤">@Blog->dget(\'shortname\')@</a>',
 		);
@@ -77,7 +78,7 @@ if( $Blog->ID == 1 )
 // Author:
 $ItemList->cols[] = array(
 		'th' => T_('Author'),
-		'th_start' => '<th class="nowrap">',
+		'th_class' => 'nowrap',
 		'td_class' => 'nowrap',
 		'order' => 'creator_user_ID',
 		'td' => '@get(\'t_author\')@',
@@ -154,7 +155,8 @@ $ItemList->cols[] = array(
 $ItemList->cols[] = array(
 	'th' => /* TRANS: abbrev for info */ T_('i'),
 	'order' => 'datemodified',
-	'th_start' => '<th class="shrinkwrap">',
+	'default_dir' => 'D',
+	'th_class' => 'shrinkwrap',
 	'td_class' => 'shrinkwrap',
 	'td' => '@history_info_icon()@',
 );
@@ -200,8 +202,11 @@ $ItemList->display();
 
 /*
  * $Log$
- * Revision 1.8  2006/06/01 19:39:13  fplanque
- * cleaned up Results tables
+ * Revision 1.9  2006/06/13 21:49:15  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.5.2.2  2006/06/13 18:27:51  fplanque
+ * fixes
  *
  * Revision 1.6  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.

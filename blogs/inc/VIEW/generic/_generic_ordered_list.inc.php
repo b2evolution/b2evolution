@@ -62,7 +62,7 @@ if( isset( $list_title ) )
 $Results->cols[] = array(
 		'th' => T_('ID'),
 		'order' => $GenericElementCache->dbIDname,
-		'th_start' => '<th class="firstcol shrinkwrap">',
+		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 		'td' => "\$$GenericElementCache->dbIDname\$",
 	);
@@ -95,7 +95,7 @@ if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, 
 
 	$Results->cols[] = array(
 			'th' => T_('Move'),
-			'th_start' => '<th class="shrinkwrap">',
+			'th_class' => 'shrinkwrap',
 			'order' => $GenericElementCache->dbprefix.'order',
 			'td_class' => 'shrinkwrap',
 			'td' => '{move}',

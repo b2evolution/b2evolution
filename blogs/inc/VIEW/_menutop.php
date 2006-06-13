@@ -45,10 +45,14 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<?php
 	// Include head lines, links (to CSS...), sets <base>, ..
 	echo $this->get_headlines();
+
+	global $rsc_url, $htsrv_url;
 	?>
 	<script type="text/javascript">
+		// Paths used by JS fucntions:
 		imgpath_expand = '<?php echo get_icon( 'expand', 'url' ); ?>';
 		imgpath_collapse = '<?php echo get_icon( 'collapse', 'url' ); ?>';
+		htsrv_url = '<?php echo $htsrv_url ?>';
 	</script>
 
 	<!-- script allowing to check and uncheck all boxes in forms -->
@@ -62,6 +66,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/extracats.js"></script>
 	<script type="text/javascript" src="<?php echo $rsc_url; ?>js/dynamic_select.js"></script>
 	<?php
+	global $UserSettings;
 	if( $UserSettings->get('control_form_abortions') <> 0 )
 	{	// Activate bozo validator
 		echo '<script type="text/javascript" src="'.$rsc_url.'js/bozo_validator.js"></script>';
@@ -72,6 +77,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		echo '<script type="text/javascript">addEvent( window, "load", focus_on_first_input, false );</script>';
 	}
 
+	global $Debuglog;
 	$Debuglog->add( 'Admin-Path: '.var_export($this->path, true) );
 
 	if( $this->get_path(0) == 'files'
@@ -376,6 +382,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 	}}}
 
 	// CALL PLUGINS NOW:
+	global $Plugins;
 	$Plugins->trigger_event( 'AdminEndHtmlHead', array() );
 	?>
 </head>

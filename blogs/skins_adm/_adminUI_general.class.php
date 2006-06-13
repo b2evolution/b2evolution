@@ -868,9 +868,9 @@ class AdminUI_general
 							'filters_start' => '<tr class="filters"><td colspan="$nb_cols$">',
 							'filters_end' => '</td></tr>',
 							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre à jour admin_UI_general; utiliser colspan="$headspan$"
-							'colhead_start' => '<th>',
-							'colhead_start_first' => '<th class="firstcol">',
-							'colhead_start_last' => '<th class="lastcol">',
+							'colhead_start' => '<th $class_attrib$>',
+							'colhead_start_first' => '<th class="firstcol $class$">',
+							'colhead_start_last' => '<th class="lastcol $class$">',
 							'colhead_end' => "</th>\n",
 							'sort_asc_off' => '<img src="../admin/img/grey_arrow_up.gif" alt="A" title="'.T_('Ascending order')
 							                    .'" height="12" width="11" />',
@@ -1286,8 +1286,11 @@ class AdminUI_general
 
 /*
  * $Log$
- * Revision 1.14  2006/06/01 19:39:13  fplanque
- * cleaned up Results tables
+ * Revision 1.15  2006/06/13 21:49:16  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.13.2.3  2006/06/12 20:00:57  fplanque
+ * one too many massive syncs...
  *
  * Revision 1.13  2006/05/12 21:53:38  blueyed
  * Fixes, cleanup, translation for plugins

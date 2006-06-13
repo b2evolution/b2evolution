@@ -441,10 +441,8 @@ while( $lFile = & $fm_Filelist->get_next() )
 
 	/***************  Link ("chain") icon:  **************/
 
-	if( $fm_mode == 'link_item'
-			// Plug extensions here!
-		)
-	{	// Offer option to link the file to an Item:
+	if( strpos( $fm_mode, 'link_' ) === 0 )
+	{	// Offer option to link the file to an Item (or anything else):
 		echo action_icon( T_('Link this file!'), 'link', regenerate_url( 'fm_selected', 'action=link&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
 		echo ' ';
 	}
@@ -453,14 +451,11 @@ while( $lFile = & $fm_Filelist->get_next() )
 
 	if( $lFile->is_dir() )
 	{ // Directory
-
 		// Link to open the directory in the curent window
-		echo '<a href="'.$browse_dir_url.'">'		// Removed funky onclick behaviour
-			           .$lFile->get_name().'</a>';
+		echo '<a href="'.$browse_dir_url.'">'.$lFile->get_name().'</a>';
 	}
 	else
 	{ // File
-
 		if( $view_link = $lFile->get_view_link( $lFile->get_name(), NULL, NULL ) )
 		{
 			echo $view_link;
@@ -931,6 +926,12 @@ $this->disp_payload_end();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.15  2006/06/13 21:49:15  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.14.2.1  2006/06/12 20:00:39  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.14  2006/04/27 21:25:43  blueyed
  * Do not use own Log object for Filelist (revert)
  *

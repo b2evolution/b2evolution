@@ -345,7 +345,8 @@ class ItemQuery extends SQL
 			$dstart_mysql = substr($dstart0,0,4).'-'.substr($dstart0,4,2).'-'.substr($dstart0,6,2).' '
 											.substr($dstart0,8,2).':'.substr($dstart0,10,2).':'.substr($dstart0,12,2);
 
-			$this->WHERE_and( $this->dbprefix.'datestart >= \''.$dstart_mysql.'\'' );
+			$this->WHERE_and( $this->dbprefix.'datestart >= \''.$dstart_mysql.'\'
+													OR ( '.$this->dbprefix.'datedeadline IS NULL AND '.$this->dbprefix.'datestart >= \''.$dstart_mysql.'\' )' );
 
 			$start_is_set = true;
 		}
@@ -532,6 +533,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.4  2006/06/13 21:49:15  blueyed
+ * Merged from 1.8 branch
+ *
  * Revision 1.3  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

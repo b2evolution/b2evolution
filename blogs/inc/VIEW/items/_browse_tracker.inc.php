@@ -55,7 +55,7 @@ $ItemList->title = T_('Task list');
 $ItemList->cols[] = array(
 						'th' => /* TRANS: abbrev for Priority */ T_('P'),
 						'order' => 'priority',
-						'th_start' => '<th class="shrinkwrap">',
+						'th_class' => 'shrinkwrap',
 						'td_class' => 'center tskst_$post_pst_ID$',
 						'td' => '$post_priority$',
 					);
@@ -117,19 +117,22 @@ $ItemList->cols[] = array(
 						'th' => T_('Visibility'),
 						'order' => 'status',
 						'td_class' => 'center',
+						'th_class' => 'shrinkwrap',
 						'td' => '%item_visibility( {Obj} )%',
 				);
 $ItemList->cols[] = array(
 						'th' => T_('Visibility'),
 						'order' => 'status',
+						'th_class' => 'shrinkwrap',
 						'td_class' => 'tskst_$post_pst_ID$ nowrap',
 						'td' => '@get( \'t_status\' )@',
 				);
 
-				
+
 $ItemList->cols[] = array(
 						'th' => T_('Status'),
 						'order' => 'pst_ID',
+						'th_class' => 'shrinkwrap',
 						'td_class' => 'tskst_$post_pst_ID$ nowrap',
 						'td' => '@get(\'t_extra_status\')@',
 					);
@@ -137,6 +140,7 @@ $ItemList->cols[] = array(
 $ItemList->cols[] = array(
 						'th' => T_('Type'),
 						'order' => 'ptyp_ID',
+						'th_class' => 'shrinkwrap',
 						'td_class' => 'tskst_$post_pst_ID$ nowrap',
 						'td' => '@get(\'t_type\')@',
 					);
@@ -144,7 +148,7 @@ $ItemList->cols[] = array(
 $ItemList->cols[] = array(
 						'th' => T_('ID'),
 						'order' => 'ID',
-						'th_start' => '<th class="shrinkwrap">',
+						'th_class' => 'shrinkwrap',
 						'td_class' => 'tskst_$post_pst_ID$ shrinkwrap',
 						'td_class' => 'center',
 						'td' => '$post_ID$',
@@ -153,6 +157,7 @@ $ItemList->cols[] = array(
 $ItemList->cols[] = array(
 						'th' => T_('Assigned'),
 						'order' => 'assigned_user_ID',
+						'th_class' => 'shrinkwrap',
 						'td' => '@get(\'t_assigned_to\')@',
 					);
 
@@ -192,7 +197,8 @@ $ItemList->cols[] = array(
 $ItemList->cols[] = array(
 	'th' => /* TRANS: abbrev for info */ T_('i'),
 	'order' => 'datemodified',
-	'th_start' => '<th class="shrinkwrap">',
+	'default_dir' => 'D',
+	'th_class' => 'shrinkwrap',
 	'td_class' => 'shrinkwrap',
 	'td' => '@history_info_icon()@',
 );
@@ -238,8 +244,11 @@ $ItemList->display();
 
 /*
  * $Log$
- * Revision 1.8  2006/06/01 19:39:13  fplanque
- * cleaned up Results tables
+ * Revision 1.9  2006/06/13 21:49:15  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.6.2.2  2006/06/13 18:27:51  fplanque
+ * fixes
  *
  * Revision 1.7  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.

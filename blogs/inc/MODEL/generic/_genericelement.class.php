@@ -124,7 +124,7 @@ class GenericElement extends DataObject
 		
 		$Form->hiddens_by_key( get_memorized( 'action, ctrl' ) );
 		
-		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, T_('name') );
+		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, T_('name'), array( 'required' => true ) );
 		
 		if( ! $creating ) $Form->hidden( $this->dbIDname, $this->ID );
 		
@@ -173,6 +173,12 @@ class GenericElement extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2006/06/13 21:49:15  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.2.2.1  2006/06/12 20:00:37  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.2  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

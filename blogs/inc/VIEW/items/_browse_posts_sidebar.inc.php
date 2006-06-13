@@ -143,30 +143,6 @@ echo '<div class="browse_side_item">';
 
 
 		/*
-		 * Authors:
-		 * TODO: allow multiple selection
-		 */
-		echo '<fieldset>';
-		echo '<legend>'.T_('Authors').'</legend>';
-		// Load current blog members into cache:
-		$UserCache->load_blogmembers( $Blog->ID );
-		if( count($UserCache->cache) )
-		{
-			echo '<ul>';
-			foreach( $UserCache->cache as $loop_Obj )
-			{
-				echo '<li><input type="radio" name="author" value="'.$loop_Obj->ID.'" class="radio"';
-				if( $loop_Obj->ID == $author ) echo ' checked="checked"';
-				echo ' /> <a href="'.regenerate_url( 'author', 'author='.$loop_Obj->ID ).'">';
-				$loop_Obj->preferred_name();
-				echo '</a></li>';
-			}
-			echo '</ul>';
-		}
-		echo '</fieldset>';
-
-
-		/*
 		 * Assignees:
  		 * TODO: allow multiple selection
 		 */
@@ -187,6 +163,30 @@ echo '<div class="browse_side_item">';
 				echo '<li><input type="radio" name="assgn" value="'.$loop_Obj->ID.'" class="radio"';
 				if( $loop_Obj->ID == $assgn ) echo ' checked="checked"';
 				echo ' /> <a href="'.regenerate_url( 'assgn', 'assgn='.$loop_Obj->ID ).'">';
+				$loop_Obj->preferred_name();
+				echo '</a></li>';
+			}
+			echo '</ul>';
+		}
+		echo '</fieldset>';
+
+
+		/*
+		 * Authors:
+		 * TODO: allow multiple selection
+		 */
+		echo '<fieldset>';
+		echo '<legend>'.T_('Authors').'</legend>';
+		// Load current blog members into cache:
+		$UserCache->load_blogmembers( $Blog->ID );
+		if( count($UserCache->cache) )
+		{
+			echo '<ul>';
+			foreach( $UserCache->cache as $loop_Obj )
+			{
+				echo '<li><input type="radio" name="author" value="'.$loop_Obj->ID.'" class="radio"';
+				if( $loop_Obj->ID == $author ) echo ' checked="checked"';
+				echo ' /> <a href="'.regenerate_url( 'author', 'author='.$loop_Obj->ID ).'">';
 				$loop_Obj->preferred_name();
 				echo '</a></li>';
 			}
@@ -263,6 +263,12 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.3  2006/06/13 21:49:15  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.2.2.1  2006/06/13 18:27:51  fplanque
+ * fixes
+ *
  * Revision 1.2  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

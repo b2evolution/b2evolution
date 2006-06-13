@@ -48,6 +48,7 @@ class GenericCategoryCache extends GenericCache
 	
 	var $parent_cats = array();
 	
+	// TO DO
 	var $revealed_children = false;
 
 	/**

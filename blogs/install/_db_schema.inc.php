@@ -446,6 +446,30 @@ $schema_queries = array(
 			pevt_enabled TINYINT NOT NULL DEFAULT 1,
 			PRIMARY KEY( pevt_plug_ID, pevt_event )
 		)' ),
+
+	'T_cron__task' => array(
+		'Creating cron tasks table',
+		'CREATE TABLE T_cron__task(
+		   ctsk_ID              int(10) unsigned      not null AUTO_INCREMENT,
+		   ctsk_start_datetime  datetime              not null,
+		   ctsk_repeat_after    int(10) unsigned,
+		   ctsk_name            varchar(50)           not null,
+		   ctsk_controller      varchar(50)           not null,
+		   ctsk_params          text,
+		   primary key (ctsk_ID)
+		)' ),
+
+	'T_cron__log' => array(
+		'Creating cron tasks table',
+		'CREATE TABLE T_cron__log(
+			 clog_ctsk_ID              int(10) unsigned   not null,
+			 clog_realstart_datetime   datetime           not null,
+			 clog_realstop_datetime    datetime,
+			 clog_status               enum(\'started\',\'finished\',\'error\',\'timeout\') not null default \'started\',
+			 clog_messages             text,
+			 primary key (clog_ctsk_ID)
+		)' ),
+
 );
 
 
@@ -604,6 +628,12 @@ function install_insert_default_data( $old_db_version )
 
 /*
  * $Log$
+ * Revision 1.20  2006/06/13 21:49:16  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.19.2.1  2006/06/13 18:27:51  fplanque
+ * fixes
+ *
  * Revision 1.19  2006/05/02 23:46:07  blueyed
  * Validate/fixed plugin spam weight handling.
  *

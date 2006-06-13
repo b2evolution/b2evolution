@@ -48,6 +48,7 @@ if( param( 'ftyp_ID', 'integer', '', true) )
 	if( ($edited_Filetype = & $FiletypeCache->get_by_ID( $ftyp_ID, false )) === false )
 	{	// We could not find the file type to edit:
 		unset( $edited_Filetype );
+		forget_param( 'ftyp_ID' );
 		$Messages->head = T_('Cannot edit file type!');
 		$Messages->add( T_('Requested file type does not exist any longer.'), 'error' );
 		$action = 'nil';
@@ -157,7 +158,7 @@ switch( $action )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('File type &laquo;%s&raquo; deleted.'), $edited_Filetype->dget('name') );
 			$edited_Filetype->dbdelete( true );
-			unset($edited_Filetype);
+			unset( $edited_Filetype );
 			forget_param( 'ftyp_ID' );
 			$Messages->add( $msg, 'success' );
 			$action = 'list';

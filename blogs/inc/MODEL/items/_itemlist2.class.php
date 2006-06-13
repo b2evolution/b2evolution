@@ -94,6 +94,7 @@ class ItemList2 extends DataObjectList2
 	 * @param mixed Default filter set: Do not show posts after this timestamp, can be 'now'
 	 * @param string name of cache to be used
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
+	 * @param array restrictions for itemlist (position, contact, firm, ...) key: restriction name, value: ID of the restriction
 	 */
 	function ItemList2(
 			& $Blog,
@@ -101,7 +102,8 @@ class ItemList2 extends DataObjectList2
 			$timestamp_max = NULL,   		 // Do not show posts after this timestamp
 			$cache_name = 'ItemCache',	 // name of cache to be used
 			$param_prefix = '',
-			$filterset_name = ''				// Name to be used when saving the filterset (leave empty to use default for collection)
+			$filterset_name = '',				// Name to be used when saving the filterset (leave empty to use default for collection)
+			$restrict_to = array()			// Restrict the item list to a position, or contact, firm.....
 		)
 	{
 		global $Settings, $$cache_name;
@@ -127,7 +129,9 @@ class ItemList2 extends DataObjectList2
 			$this->filterset_name = 'ItemList_filters_coll'.$this->Blog->ID;
 		}
 
-		$this->page_param = 'paged';
+		$this->page_param = $param_prefix.'paged';
+		
+		$this->restrict_to = $restrict_to;
 
 		// Initialize the default filter set:
 		$this->set_default_filters( array(
@@ -217,6 +221,11 @@ class ItemList2 extends DataObjectList2
 		$Request->memorize_param( $this->param_prefix.'status', 'string', $this->default_filters['statuses'], $this->filters['statuses'] );  // List of statuses to restrict to
 
 		/*
+		 * Restrict to selected item type:
+		 */
+		$Request->memorize_param( $this->param_prefix.'item_type', 'integer', $this->default_filters['item_type'], $this->filters['item_type'] );  // List of item types to restrict to);
+			
+		/*
 		 * Restrict by keywords
 		 */
 		$Request->memorize_param( $this->param_prefix.'s', 'string', $this->default_filters['keywords'], $this->filters['keywords'] );			 // Search string
@@ -261,7 +270,7 @@ class ItemList2 extends DataObjectList2
 		$this->limit = $this->filters['posts']; // for compatibility with parent class
 
 		// 'paged'
-		$Request->memorize_param( $this->param_prefix.$this->page_param, 'integer', 1, $this->filters['page'] );      // List page number in paged display
+		$Request->memorize_param( $this->page_param, 'integer', 1, $this->filters['page'] );      // List page number in paged display
 		$this->page = $this->filters['page'];
 	}
 
@@ -396,11 +405,13 @@ class ItemList2 extends DataObjectList2
 		$this->limit = $this->filters['posts']; // for compatibility with parent class
 
 		// 'paged'
-		$this->filters['page'] = $Request->param( $this->param_prefix.$this->page_param, 'integer', 1, true );      // List page number in paged display
+		$this->filters['page'] = $Request->param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 		$this->page = $this->filters['page'];
 
 		// Item type
-		$this->filters['item_type'] = $this->default_filters['item_type'];
+		$this->filters['item_type'] = $Request->param( $this->param_prefix.'item_type', 'integer', $this->default_filters['item_type'], true );  // List of item types to restrict to);
+			
+		
 
 
 		if( $Request->validation_errors() )
@@ -436,9 +447,9 @@ class ItemList2 extends DataObjectList2
     /**
   	 * @var Session
   	 */
-		global $Session;
+		global $Session, $Debuglog;
 
-		// echo 'saving filterset';
+		$Debuglog->add( 'Saving filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
 
 		$Session->set( $this->filterset_name, $this->filters );
 	}
@@ -460,6 +471,8 @@ class ItemList2 extends DataObjectList2
 	   */
 		global $Request;
 
+		global $Debuglog;
+
 		$filters = $Session->get( $this->filterset_name );
 
 		if( empty($filters) )
@@ -467,7 +480,7 @@ class ItemList2 extends DataObjectList2
 			return false;
 		}
 
-		// echo ' restoring filterset ';
+		$Debuglog->add( 'Restoring filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
 
 		// Restore filters:
 		$this->set_filters( $filters );
@@ -539,10 +552,63 @@ class ItemList2 extends DataObjectList2
 		$orderby = str_replace( ' ', ',', $this->filters['orderby'] );
 		$orderby_array = explode( ',', $orderby );
 
-		$order_by = $this->Cache->dbprefix.implode( ' '.$order.', '.$this->Cache->dbprefix, $orderby_array ).' '.$order;
+		// Format each order param with default colum names:
+		$orderby_array = preg_replace( '#^(.+)$#', $this->Cache->dbprefix.'$1 '.$order, $orderby_array );
+
+ 		// Add a parameter to make sure there is no ambiguity in ordering on similar items:
+		$orderby_array[] = $this->Cache->dbIDname.' '.$order;
+
+		$order_by = implode( ', ', $orderby_array );
+
 
 		$this->ItemQuery->order_by( $order_by );
 
+
+
+		/*
+		 * GET TOTAL ROW COUNT:
+		 */
+		if( $this->single_post )   // p or title
+		{ // Single post: no paging required!
+			$this->total_rows = 1;
+			$this->total_pages = 1;
+			$this->page = 1;
+		}
+		elseif( !empty($this->filters['ymdhms']) )
+		{ // no restriction if we request a month... some permalinks may point to the archive!
+			// echo 'ARCHIVE - no limits';
+			// $this->total_rows = 1; // TODO: unknown, check...
+			$this->total_pages = 1;
+			$this->page = 1;
+		}
+		elseif( $this->filters['unit'] == 'posts' )
+		{
+			/*
+			 * TODO: The result is incorrect when using AND on categories
+			 * We would need to use a HAVING close and thyen COUNT, which would be a subquery
+			 * This is nto compatible with mysql 3.23
+			 * We need fallback code.
+			 */
+			$sql_count = '
+				SELECT COUNT( DISTINCT '.$this->Cache->dbIDname.') '
+					.$this->ItemQuery->get_from()
+					.$this->ItemQuery->get_where();
+
+			//echo $DB->format_query( $sql_count );
+
+			parent::count_total_rows( $sql_count );
+			//echo '<br />'.$this->total_rows;
+		}
+		elseif( $this->unit == 'days' )
+		{ // We are going to limit to x days:
+			// $this->total_rows = 1; // TODO: unknown, check...
+			$this->total_pages = 1;
+			$this->page = 1;
+		}
+		else
+			die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
+
+			
 
 		/*
 		 * Paging limits:
@@ -603,24 +669,6 @@ class ItemList2 extends DataObjectList2
 		}
 		else
 			die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
-
-
-		// GET TOTAL ROW COUNT:
-		/*
-		 * TODO: The result is incorrect when using AND on categories
-		 * We would need to use a HAVING close and thyen COUNT, which would be a subquery
-		 * This is nto compatible with mysql 3.23
-		 * We need fallback code.
-		 */
-		$sql_count = '
-			SELECT COUNT( DISTINCT '.$this->Cache->dbIDname.') '
-				.$this->ItemQuery->get_from()
-				.$this->ItemQuery->get_where();
-
-		//echo $DB->format_query( $sql_count );
-
-		parent::count_total_rows( $sql_count );
-		//echo '<br />'.$this->total_rows;
 
 
 		// GET DATA ROWS:
@@ -1031,6 +1079,8 @@ class ItemList2 extends DataObjectList2
 	{
 		$col_order_fields = $this->cols[$col_idx]['order'];
 
+		// pre_dump( $col_order_fields, $this->filters['orderby'], $this->filters['order'] );
+
 		// Current order:
 		if( $this->filters['orderby'] == $col_order_fields )
 		{
@@ -1048,14 +1098,29 @@ class ItemList2 extends DataObjectList2
 		$col_sort_values['order_desc'] = regenerate_url(  array($this->param_prefix.'order',$this->param_prefix.'orderby'),
 																			$this->param_prefix.'order=DESC&amp;'.$this->param_prefix.'orderby='.$col_order_fields );
 
-		if( $col_sort_values['current_order'] == 'ASC' )
-		{
+		if( !$col_sort_values['current_order'] && isset( $this->cols[$col_idx]['default_dir'] ) )
+		{	// There is no current order on this column and a default order direction is set for it
+			// So set a default order direction for it
+
+			if( $this->cols[$col_idx]['default_dir'] == 'A' )
+			{	// The default order direction is A, so set its toogle  order to the order_asc
+				$col_sort_values['order_toggle'] = $col_sort_values['order_asc'];
+			}
+			else
+			{ // The default order direction is A, so set its toogle order to the order_desc
+				$col_sort_values['order_toggle'] = $col_sort_values['order_desc'];
+			}
+		}
+		elseif( $col_sort_values['current_order'] == 'ASC' )
+		{	// There is an ASC current order on this column, so set its toogle order to the order_desc
 			$col_sort_values['order_toggle'] = $col_sort_values['order_desc'];
 		}
 		else
-		{
+		{ // There is a DESC or NO current order on this column,  so set its toogle order to the order_asc
 			$col_sort_values['order_toggle'] = $col_sort_values['order_asc'];
 		}
+
+		// pre_dump( $col_sort_values );
 
 		return $col_sort_values;
 	}
@@ -1292,6 +1357,15 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/13 21:49:15  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.7.2.2  2006/06/13 18:27:50  fplanque
+ * fixes
+ *
+ * Revision 1.7.2.1  2006/06/12 20:00:38  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.7  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

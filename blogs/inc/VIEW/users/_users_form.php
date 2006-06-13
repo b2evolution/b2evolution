@@ -213,17 +213,17 @@ $Form->begin_fieldset( T_('Features') );
 	}
   // fp> TODO: We gotta have something like $edited_User->UserSettings->get('legend');
 	// Icon/text thresholds:
-	$Form->text( 'edited_user_action_icon_threshold', $UserSettings->get('action_icon_threshold'), 1, T_('Action icon display'), T_('1:more icons ... 5:less icons') );
-	$Form->text( 'edited_user_action_word_threshold', $UserSettings->get('action_word_threshold'), 1, T_('Action word display'), T_('1:more action words ... 5:less action words') );
+	$Form->text( 'edited_user_action_icon_threshold', $UserSettings->get( 'action_icon_threshold', $edited_User->ID), 1, T_('Action icon display'), T_('1:more icons ... 5:less icons') );
+	$Form->text( 'edited_user_action_word_threshold', $UserSettings->get( 'action_word_threshold', $edited_User->ID), 1, T_('Action word display'), T_('1:more action words ... 5:less action words') );
 
 	// To display or hide icon legend:
-	$Form->checkbox( 'edited_user_legend', $UserSettings->get('display_icon_legend'), T_('Display icon legend'), T_('Display a legend at the bottom of every page including all action icons used on that page.') );
+	$Form->checkbox( 'edited_user_legend', $UserSettings->get( 'display_icon_legend', $edited_User->ID ), T_('Display icon legend'), T_('Display a legend at the bottom of every page including all action icons used on that page.') );
 
 	// To activate or deactivate bozo validator:
-	$Form->checkbox( 'edited_user_bozo', $UserSettings->get('control_form_abortions'), T_('Use anti-bozo form validator'), T_('This will alert you if you fill in data into a form and try to leave the form before submitting the data.') );
+	$Form->checkbox( 'edited_user_bozo', $UserSettings->get( 'control_form_abortions', $edited_User->ID ), T_('Use anti-bozo form validator'), T_('This will alert you if you fill in data into a form and try to leave the form before submitting the data.') );
 
 	// To activate focus on first form input text
-	$Form->checkbox( 'edited_user_focusonfirst', $UserSettings->get('focus_on_first_input'), T_('Focus on first input text field'), T_('The focus will automatically go to the first input text field.') );
+	$Form->checkbox( 'edited_user_focusonfirst', $UserSettings->get( 'focus_on_first_input', $edited_User->ID ), T_('Focus on first input text field'), T_('The focus will automatically go to the first input text field.') );
 
 
 $Form->end_fieldset();
@@ -287,6 +287,12 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.14  2006/06/13 21:49:16  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.13.2.1  2006/06/12 20:00:40  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.13  2006/04/27 21:50:40  blueyed
  * Allow editing/viewing of "validated" property
  *

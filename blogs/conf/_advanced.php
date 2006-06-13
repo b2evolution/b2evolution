@@ -183,10 +183,14 @@ $db_config['aliases'] = array(
 		'T_coll_user_perms'    => $tableprefix.'blogusers',
 		'T_coll_settings'      => $tableprefix.'coll_settings',
 		'T_comments'           => $tableprefix.'comments',
+		'T_cron__log'				 => $tableprefix.'cron__log',
+		'T_cron__task'			 => $tableprefix.'cron__task',
 		'T_files'              => $tableprefix.'files',
 		'T_filetypes'          => $tableprefix.'filetypes',
 		'T_groups'             => $tableprefix.'groups',
 		'T_hitlog'             => $tableprefix.'hitlog',
+		'T_itemstatuses'       => $tableprefix.'poststatuses',
+		'T_itemtypes'          => $tableprefix.'posttypes',
 		'T_links'              => $tableprefix.'links',
 		'T_locales'            => $tableprefix.'locales',
 		'T_plugins'            => $tableprefix.'plugins',
@@ -195,8 +199,6 @@ $db_config['aliases'] = array(
 		'T_pluginusersettings' => $tableprefix.'pluginusersettings',
 		'T_postcats'           => $tableprefix.'postcats',
 		'T_posts'              => $tableprefix.'posts',
-		'T_itemstatuses'       => $tableprefix.'poststatuses',
-		'T_itemtypes'          => $tableprefix.'posttypes',
 		'T_sessions'           => $tableprefix.'sessions',
 		'T_settings'           => $tableprefix.'settings',
 		'T_subscriptions'      => $tableprefix.'subscriptions',
@@ -564,6 +566,13 @@ $force_regexp_dirname = '';
  * @global int $debug_no_register_shutdown
  */
 $debug_no_register_shutdown = 0;
+
+
+/**
+ * Seconds after which a scheduled task is considered to be timed out.
+ */
+$cron_timeout_delay = 1800; // 30 minutes
+
 
 
 // ----- CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

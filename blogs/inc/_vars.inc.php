@@ -38,6 +38,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 
+/**
+ * Are we runing on Command Line Interface instead of a web request?
+ */
+$is_cli = empty($_SERVER['SERVER_SOFTWARE']) ? true : false;
+$is_web = ! $is_cli;
+// echo ($is_cli ? 'cli' : 'web' );
+
+
+
 // Investigation for following code by Isaac - http://isaacschlueter.com/
 // $debug = true;
 if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
@@ -131,33 +140,31 @@ else
 	<?php
 }
 
-/**
- * Full requested Host (including protocol).
- *
- * {@internal Note: on IIS you can receive 'off' in the HTTPS field!! :[ }}
- *
- * @global string
- */
-$ReqHost = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'];
+if( $is_web )
+{
+	/**
+	 * Full requested Host (including protocol).
+	 *
+	 * {@internal Note: on IIS you can receive 'off' in the HTTPS field!! :[ }}
+	 *
+	 * @global string
+	 */
+	$ReqHost = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'];
 
-$Debuglog->add( '$ReqHost: '.$ReqHost, 'vars' );
-$Debuglog->add( '$ReqURI: '.$ReqURI, 'vars' );
-$Debuglog->add( '$ReqPath: '.$ReqPath, 'vars' );
+	$Debuglog->add( '$ReqHost: '.$ReqHost, 'vars' );
+	$Debuglog->add( '$ReqURI: '.$ReqURI, 'vars' );
+	$Debuglog->add( '$ReqPath: '.$ReqPath, 'vars' );
 
 
-// on which page are we ?
-$pagenow = explode( '/', $_SERVER['PHP_SELF'] );
-$pagenow = trim( $pagenow[(sizeof($pagenow) - 1)] );
-$pagenow = explode( '?', $pagenow );
-$pagenow = $pagenow[0];
+	// on which page are we ?
+	$pagenow = explode( '/', $_SERVER['PHP_SELF'] );
+	$pagenow = trim( $pagenow[(sizeof($pagenow) - 1)] );
+	$pagenow = explode( '?', $pagenow );
+	$pagenow = $pagenow[0];
+}
 
 // So far, we did not include the javascript for popupups
 $b2commentsjavascript = false;
-
-
-// server detection
-$is_Apache = strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false ? 1 : 0;
-$is_IIS    = strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false ? 1 : 0;
 
 
 // the weekdays and the months..
@@ -253,6 +260,12 @@ $post_statuses = array (
 
 /*
  * $Log$
+ * Revision 1.9  2006/06/13 21:49:14  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.8.2.2  2006/06/13 18:27:50  fplanque
+ * fixes
+ *
  * Revision 1.8  2006/04/19 20:13:48  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

@@ -46,9 +46,9 @@ class GenericCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function GenericCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL )
+	function GenericCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL, $order_by = '' )
 	{
-		parent::DataObjectCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field );
+		parent::DataObjectCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field, $order_by );
 	}
 
 	function & new_obj( $row = NULL )

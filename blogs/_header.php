@@ -114,12 +114,14 @@ $AdminUI->add_menu_entries(
 				'entries' => array(
 					// NOTE: the following entries are defaults in case of the DHTML drop down menu,
 					// they will be overridden in the browse controller
+						/* Deprecated:
 						'postlist' => array(
-							'text' => T_('Post list'),
+							'text' => T_('Post list (Old)'),
 							'href' => 'admin.php?ctrl=browse&amp;tab=postlist&amp;blog='.$blog,
 							),
+						*/
 						'postlist2' => array(
-							'text' => T_('Post list 2'),
+							'text' => T_('Post list'),
 							'href' => 'admin.php?ctrl=browse&amp;tab=postlist2&amp;blog='.$blog,
 							),
 						'tracker' => array(
@@ -219,12 +221,12 @@ $AdminUI->add_menu_entries(
 			),
 
 			'users' => array(
-				'text'=>T_('Users & Groups'),
+				'text' => T_('Users'),
 				'title'=>T_('User management'),
 				'perm_name'=>'users',
 				'perm_level'=>'view',
 				'text_noperm'=>T_('User Profile'),	// displayed if perm not granted
-				'href' => 'admin.php?ctrl=users'
+				'href' => 'admin.php?ctrl=users',
 			),
 
 			'options' => array(
@@ -273,11 +275,31 @@ $AdminUI->add_menu_entries(
 	);
 
 
+// CRON:
+$AdminUI->add_menu_entries(
+		NULL, // root
+		array(
+			'cron' => array(
+				'text' => T_('Scheduler'),
+				'perm_name' => 'options',
+				'perm_level' => 'view',
+				'href' => 'admin.php?ctrl=crontab',
+			),
+		)
+);
+
+
 $Plugins->trigger_event( 'AdminAfterMenuInit' );
 
 
 /*
  * $Log$
+ * Revision 1.7  2006/06/13 21:49:14  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.5.2.3  2006/06/13 18:27:50  fplanque
+ * fixes
+ *
  * Revision 1.6  2006/05/19 18:15:04  blueyed
  * Merged from v-1-8 branch
  *

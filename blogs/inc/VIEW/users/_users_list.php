@@ -60,17 +60,17 @@ if( !empty( $filteron ) )
 		$swhere .= 'concat( user_login, \' \', user_firstname, \' \', user_lastname, \' \', user_nickname, \' \', user_email) like "%' . $DB->escape($sfilter) . '%" and ';
 	}
 	$sql = "SELECT T_users.*, grp_ID, grp_name
-					FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
-					WHERE $swhere 1
-					ORDER BY grp_name";
+						FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
+					 WHERE $swhere 1
+					 ORDER BY grp_name, *";
 }
 else
 {
 	$filteron = '';
 	$filtered = false;
 	$sql = "SELECT T_users.*, grp_ID, grp_name
-					FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
-					ORDER BY grp_name";
+						FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
+					 ORDER BY grp_name, *";
 }
 
 function conditional( $condition, $on_true, $on_false = '' )
@@ -97,9 +97,9 @@ $Results->ID_col = 'user_ID';
  * Group columns:
  */
 $Results->grp_cols[] = array(
-						'td_class' => '<td colspan="'
-														.($current_User->check_perm( 'users', 'edit', false ) ? 7 : 6)
-														.'" class="firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ).'">',
+					
+						'td_class' => 'firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
+						'td_colpsan' => -1,  // nb_colds - 1
 						'td' => '<a href="?ctrl=users&amp;grp_ID=$grp_ID$">$grp_name$</a>'
 										.'¤conditional( (#grp_ID# == '.$Settings->get('newusers_grp_ID').'), \' <span class="notes">('.T_('default group for new users').')</span>\' )¤',
 					);
@@ -129,7 +129,7 @@ $Results->grp_cols[] = array(
  */
 $Results->cols[] = array(
 						'th' => T_('ID'),
-						'th_start' => '<th class="firstcol shrinkwrap">',
+						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
 						'order' => 'user_ID',
 						'td' => '$user_ID$',
@@ -206,7 +206,6 @@ else
 										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'action\', \'action=new_user&amp;user_ID=$user_ID$\' )%' )
 										.'¤conditional( (#user_ID# != 1) && (#user_ID# != '.$current_User->ID.'), \''
 											.action_icon( T_('Delete this user!'), 'delete', '%regenerate_url( \'action\', \'action=delete_user&amp;user_ID=$user_ID$\' )%' ).'\' )¤'
-
 					);
 }
 
@@ -234,8 +233,11 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.5  2006/06/01 19:39:13  fplanque
- * cleaned up Results tables
+ * Revision 1.6  2006/06/13 21:49:16  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.4.2.1  2006/06/12 20:00:40  fplanque
+ * one too many massive syncs...
  *
  * Revision 1.4  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
