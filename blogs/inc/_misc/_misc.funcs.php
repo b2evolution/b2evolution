@@ -571,12 +571,13 @@ function get_start_date_for_week( $year, $week, $startofweek )
 	// echo '<br> days to new week: '.$days_to_new_week;
 
 	// We now add the required number of days to find the 1st sunday/monday in the year:
-	$first_week_start_date = $new_years_date + $days_to_new_week * 86400;
-	// echo '<br> 1stweeks starts on '.date( locale_datefmt(), $first_week_start_date );
+	//$first_week_start_date = $new_years_date + $days_to_new_week * 86400;
+	//echo '<br> 1st week starts on '.date( 'Y-m-d H:i:s', $first_week_start_date );
 
 	// We add the number of requested weeks:
-	$date = $first_week_start_date + ($week-1) * 604800;
-	// echo '<br> week '.$week.' starts on '.date( locale_datefmt(), $date );
+	// This will fail when passing to Daylight Savings Time: $date = $first_week_start_date + (($week-1) * 604800);
+	$date = mktime( 0, 0, 0, 1, $days_to_new_week + 1 + ($week-1) * 7, $year );
+	// echo '<br> week '.$week.' starts on '.date( 'Y-m-d H:i:s', $date );
 
 	return $date;
 }
@@ -2916,6 +2917,12 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.58  2006/06/13 22:07:34  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.54.2.3  2006/06/12 20:00:41  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.57  2006/06/05 23:15:00  blueyed
  * cleaned up plugin help links
  *

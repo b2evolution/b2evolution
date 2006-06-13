@@ -349,6 +349,7 @@ class DB
 			$this->print_error( '<p><strong>Error selecting database ['.$db.']!</strong></p>
 				<ol>
 					<li>Are you sure the database exists?</li>
+					<li>Are you sure the DB user is allowed to use that database?</li>
 					<li>Are you sure there is a valid database connection?</li>
 				</ol>' );
 		}
@@ -1342,6 +1343,12 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.13  2006/06/13 22:07:34  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.6.2.2  2006/06/12 20:00:40  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.12  2006/05/31 20:22:34  blueyed
  * cleanup
  *

@@ -255,11 +255,11 @@ class Request
 				$got_time = true;
 			}
 		}
-		elseif( ( $time_h = param( $var.'_h', 'integer', '' ) )
-					&& ( $time_mn = param( $var.'_mn', 'integer', '' ) )
-					&& ( $time_s = param( $var.'_s', 'integer', '00' ) ) )
+		elseif( ( $time_h = param( $var.'_h', 'integer', -1 ) ) != -1
+					&& ( $time_mn = param( $var.'_mn', 'integer', -1 ) ) != -1 )
 		{	// Got a time from selects:
-			$$var = $time_h.':'.$time_mn.':'.$time_s;
+			$time_s = param( $var.'_s', 'integer', 0 );
+			$$var = substr('0'.$time_h,-2).':'.substr('0'.$time_mn,-2).':'.substr('0'.$time_s,-2);
 			$this->params[$var] = $$var;
 			$got_time = true;
 		}
@@ -726,13 +726,30 @@ class Request
 
 		$this->params[$var] = param( $var, 'string', $default, $memorize );
 
-		if( $this->param_check_date_format( $var, $err_msg, array( 'required' => $required ) ) )
-		{	// Valid DATE input format!
-			// Convert to output format:
-			$this->params[$var] = compact_date( $this->params[$var] );
-			$$var = $this->params[$var];
-			return $$var;
+		if( preg_match( '#^[0-9]{4,}$#', $this->params[$var] ) )
+		{	// We have a compact date ( used for URL filtering )
+			// TODO: check that this still works
+			if( $this->param_check_date_format( $var, $err_msg, array( 'required' => $required ) ) )
+			{	// Valid DATE input format!
+				// Convert to output format:
+				$this->set_param( $var, compact_date( $this->params[$var] ) );
+				return $this->params[$var];
+			}
+			// Invalid compact date for some reason:
+			return '';
 		}
+
+		// We do not have a compact date, try normal date matching:
+		$iso_date = $this->param_check_date( $var, $err_msg, $required );
+
+		if( $iso_date )
+		{
+			$this->set_param( $var, compact_date( $iso_date ) );
+			return $this->params[$var];
+		}
+
+		// Nothing valid found....
+		return '';
 	}
 
 
@@ -993,6 +1010,12 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.13  2006/06/13 22:07:34  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.11.2.2  2006/06/12 20:00:41  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.12  2006/05/19 18:15:06  blueyed
  * Merged from v-1-8 branch
  *

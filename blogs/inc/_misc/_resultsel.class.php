@@ -197,7 +197,7 @@ class ResultSel extends Results
 	
 		if( $can_edit )
 		{
-			$this->Form->text( 'selection_'.$this->param_prefix.'name', $selection_name, 25, T_('Selection name') );
+			$this->Form->text( 'selection_'.$this->param_prefix.'name', $selection_name, 25, T_('Selection name'), '', 60 );
 	
 			// List of IDs displayed on this page (needed for deletes):
 			$this->Form->hidden( 'item_ID_list', implode( $item_ID_array, ',' ) );
@@ -591,8 +591,11 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 
 /*
  * $Log$
- * Revision 1.5  2006/06/01 19:39:13  fplanque
- * cleaned up Results tables
+ * Revision 1.6  2006/06/13 22:07:34  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.4.2.1  2006/06/12 20:00:41  fplanque
+ * one too many massive syncs...
  *
  * Revision 1.4  2006/04/19 20:14:03  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)

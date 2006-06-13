@@ -222,6 +222,22 @@ class Form extends Widget
 				$this->formend = '';
 				break;
 
+			case 'blockspan':
+				$this->formstart = '';
+				$this->title_fmt = '$title$'."\n"; // TODO: icons
+				$this->no_title_fmt = '';          //           "
+				$this->fieldstart = '<span class="block">';
+				$this->labelstart = '';
+				$this->labelend = "\n";
+				$this->labelempty = '';
+				$this->inputstart = '';
+				$this->inputend = "\n";
+				$this->fieldend = '</span>'.get_icon( 'pixel' )."\n";
+				$this->buttonsstart = '';
+				$this->buttonsend = "\n";
+				$this->formend = '';
+				break;
+
 			default:
 				// "none" (no layout)
 				$this->formstart = '';
@@ -587,7 +603,7 @@ class Form extends Widget
 	 * Builds a date input field.
 	 *
 	 * @param string the name of the input field
-	 * @param string initial value (ISO datetime)
+	 * @param string initial value (ISO datetime or erroneous if the field is in error state)
 	 * @param string label displayed in front of the field
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - date_format: Format of the date (string, default 'yyyy-MM-dd')
@@ -623,7 +639,7 @@ class Form extends Widget
 			// We do not try to format the date, we keep the erroneous date.
 			//echo 'error on '.$field_name.' keep erroneous entry intact ';
 
-			$field_params['value'] = substr( $field_value, 0, 10 );
+			$field_params['value'] = trim(substr( $field_value, 0, 10 ));
 		}
 		else
 		{ // Make the date value clean for display:
@@ -794,8 +810,8 @@ class Form extends Widget
 		preg_match( '#([0-9]+)(mn|s)#', $precision, $matches );
 
 		if( !isset( $matches[1] ) && !isset( $matches[2] ) )
-		{//precison has a bad format
-		return;
+		{	// precison has a bad format
+			return;
 		}
 
 		$field_params = array(
@@ -1617,8 +1633,17 @@ class Form extends Widget
 		}
 		else
 		{
-			$input_class = '';
+			if( isset( $field_params['required'] ) && $field_params['required'] )
+			{	// The field is required, so update its class:
+				$input_class = ' field_required';
+			}
+			else 
+			{
+				$input_class = '';
+			}
 		}
+		
+
 
 		// Set onchange event on the select, when the select changes, we check the value to display or hide an input text after it
 		$field_params['onchange']= 'check_combo( this.id, this.options[this.selectedIndex].value, "'.$input_class.'")';
@@ -2539,6 +2564,12 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.15  2006/06/13 22:07:34  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.12.2.2  2006/06/12 20:00:41  fplanque
+ * one too many massive syncs...
+ *
  * Revision 1.14  2006/05/30 16:18:17  blueyed
  * Fix for hiddens_by_key and test.
  *

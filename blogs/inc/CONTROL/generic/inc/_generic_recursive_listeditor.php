@@ -47,7 +47,6 @@ if( param( $GenericElementCache->dbIDname, 'integer', NULL, true, false, false )
 	if( ($edited_GenericElement = & $GenericElementCache->get_by_ID( ${$GenericElementCache->dbIDname}, false )) === false )
 	{	// We could not find the element to edit:
 		unset( $edited_GenericElement );
-		unset( $GenericElementCache->dbIDname );
 		$Messages->head = T_('Cannot edit element!');
 		$Messages->add( T_('Requested element does not exist any longer.'), 'error' );
 		$action = 'nil';

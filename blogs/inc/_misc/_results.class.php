@@ -597,15 +597,24 @@ class Results extends Widget
 	 */
 	function display_init( $display_params = NULL )
 	{
-		// Make sure we have display parameters:
-		if( !is_null($display_params) )
-		{ // Use passed params:
-			$this->params = & $display_params;
-		}
-		elseif( empty( $this->params ) )
+		if( empty( $this->params ) )
 		{ // Use default params from Admin Skin:
 			global $AdminUI;
 			$this->params = $AdminUI->get_menu_template( 'Results' );
+		}
+	
+		// Make sure we have display parameters:
+		if( !is_null($display_params) )
+		{ // Use passed params:
+			//$this->params = & $display_params;
+			if( !empty( $this->params ) )
+			{
+				$this->params = array_merge( $this->params, $display_params );
+			}
+			else 
+			{
+				$this->params = & $display_params;
+			}
 		}
 
 		// Make sure query has executed and we're at the top of the resultset:
@@ -693,8 +702,8 @@ class Results extends Widget
     	$r = array();
     	// Loop on all preset filters:
     	foreach( $this->filter_area['presets'] as $key => $preset )
-    	{ 
-    		if( !$this->is_filtered() && $filter_preset == $key )
+    	{
+    		if( method_exists( $this, 'is_filtered' ) && !$this->is_filtered() && $filter_preset == $key )
     		{ // The list is not filtered and the filter preset is selected, so no link on: 
     			$r[] = '['.$preset[0].']';
     		}
@@ -726,7 +735,16 @@ class Results extends Widget
 
 			if( $create_new_form )
 			{	// We do not already have a form surrounding the whole results list:
-				$this->Form = new Form( regenerate_url(), $this->param_prefix.'form_search', 'post', 'blockspan' ); // COPY!!
+				if( !empty( $this->filter_area['url_ignore'] ) )
+				{
+					$ignore = $this->filter_area['url_ignore'];
+				}
+				else
+				{
+					$ignore = $this->page_param;
+				}
+
+				$this->Form = new Form( regenerate_url( $ignore ), $this->param_prefix.'form_search', 'post', 'blockspan' ); // COPY!!
 
 				$this->Form->begin_form( '' );
 			}
@@ -926,22 +944,38 @@ class Results extends Widget
 							$col_order = isset( $this->cols[$key]['order'] ) ? $this->cols[$key]['order'] : '';
 						}
 						
-						if( isset( $this->cols[$key]['th_start'] ) )
-						{ // We have a customized column start for this one:
-							$output = $this->cols[$key]['th_start'];
+						
+						if( isset( $this->cols[$key]['th_class'] ) )
+						{	// We have a class for the th column
+							$class = $this->cols[$key]['th_class'];
 						}
-						elseif( $key == 0 && isset($this->params['colhead_start_first']) )
-						{ // First column can get special formatting:
+						else 
+						{	// We have no class for the th column
+							$class = '';
+						}	
+												
+						if( $key == 0 && isset($this->params['colhead_start_first']) )
+						{ // Display first column start:
 							$output = $this->params['colhead_start_first'];
+							
+							// Add the total column class in the grp col start first param class: 
+							$output = str_replace( '$class$', $class, $output );
 						}
 						elseif( ( $key + $cell['colspan'] ) == (count( $this->cols) ) && isset($this->params['colhead_start_last']) )
 						{ // Last column can get special formatting:
 							$output = $this->params['colhead_start_last'];
+							
+							// Add the total column class in the grp col start end param class: 
+							$output = str_replace( '$class$', $class, $output );
 						}
 						else
-						{ // Regular columns:
+						{ // Display regular colmun start:
 							$output = $this->params['colhead_start'];
+							
+							// Replace the "class_attrib" in the grp col start param by the td column class
+							$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
 						}
+						
 						
 						// Set colspan and rowspan values for the cell:
 						$output = preg_replace( '#(<)([^>]*)>$#', '$1$2 colspan="'.$cell['colspan'].'" rowspan="'.$cell['rowspan'].'">' , $output );
@@ -991,7 +1025,7 @@ class Results extends Widget
 								{ // the sorting is ascending and made on the current column
 									$sort_icon = $this->params['basic_sort_asc'];
 								}
-								elseif(  $col_sort_values['current_order'] == 'DESC' )
+								elseif( $col_sort_values['current_order'] == 'DESC' )
 								{ // the sorting is descending and made on the current column
 									$sort_icon = $this->params['basic_sort_desc'];
 								}
@@ -1101,7 +1135,7 @@ class Results extends Widget
 							$output = $this->params['grp_col_start'];
 							
 							// Replace the "class_attrib" in the grp col start param by the td column class
-							$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );echo $class.'test<br />';
+							$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
 						}
 							
 						if( isset( $grp_col['td_colpsan'] ) )
@@ -1180,6 +1214,7 @@ class Results extends Widget
 				{
 					if( isset( $row->$key ) && in_array( $row->$key, $crit ) )
 					{ // Col is in the fadeout list
+						// TODO: CLEAN THIS UP!
 						$class .= ' fadeout-ffff00" id="fadeout-'.$fadeout_count;
 											
 						$fadeout_count++;
@@ -1432,12 +1467,26 @@ class Results extends Widget
 		$col_sort_values['order_asc'] = regenerate_url( $this->order_param, $this->order_param.'='.$order_asc );
 		$col_sort_values['order_desc'] = regenerate_url( $this->order_param, $this->order_param.'='.$order_desc );
 
-		if( $col_sort_values['current_order'] == 'ASC' )
-		{
+
+		if( !$col_sort_values['current_order'] && isset( $this->cols[$col_idx]['default_dir'] ) )
+		{	// There is no current order on this column and a default order direction is set for it
+			// So set a default order direction for it
+
+			if( $this->cols[$col_idx]['default_dir'] == 'A' )
+			{	// The default order direction is A, so set its toogle  order to the order_asc
+				$col_sort_values['order_toggle'] = $col_sort_values['order_asc'];
+			}
+			else
+			{ // The default order direction is A, so set its toogle order to the order_desc
+				$col_sort_values['order_toggle'] = $col_sort_values['order_desc'];
+			}
+		}
+		elseif( $col_sort_values['current_order'] == 'ASC' )
+		{	// There is an ASC current order on this column, so set its toogle order to the order_desc
 			$col_sort_values['order_toggle'] = $col_sort_values['order_desc'];
 		}
 		else
-		{
+		{ // There is a DESC or NO current order on this column,  so set its toogle order to the order_asc
 			$col_sort_values['order_toggle'] = $col_sort_values['order_asc'];
 		}
 
@@ -1939,11 +1988,14 @@ class Results extends Widget
 
 /*
  * $Log$
- * Revision 1.10  2006/06/01 19:10:42  fplanque
- * a taste of Ajax in the framework
- * Column header grouping
- * Totals
- * table footer
+ * Revision 1.11  2006/06/13 22:07:34  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.9.2.2  2006/06/13 18:27:51  fplanque
+ * fixes
+ *
+ * Revision 1.9.2.1  2006/06/12 20:00:41  fplanque
+ * one too many massive syncs...
  *
  * Revision 1.9  2006/05/02 18:15:20  fplanque
  * invalid xhtml fix
