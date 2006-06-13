@@ -209,6 +209,28 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * Gets asked for, if user settings get updated.
+	 *
+	 * We just add a note.
+	 *
+	 * @see Plugin::PluginUserSettingsUpdateAction()
+	 */
+	function PluginUserSettingsUpdateAction()
+	{
+		if( $this->UserSettings->get('echo_random') )
+		{
+			$this->msg( T_('TEST plugin: Random numbers have been disabled.') );
+		}
+		else
+		{
+			$this->msg( T_('TEST plugin: Random numbers have been enabled.') );
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Event handlers:
 	 */
 
@@ -575,6 +597,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.43  2006/06/13 21:33:40  blueyed
+ * Add note when updating PluginUserSettings
+ *
  * Revision 1.42  2006/06/06 20:35:50  blueyed
  * Plugins can define extra events that they trigger themselves.
  *
