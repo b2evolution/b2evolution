@@ -297,7 +297,10 @@ class DataObjectCache
 
 		if( empty($req_ID) )
 		{
-			if($halt_on_empty) { debug_die( "Requested $this->objtype from $this->dbtablename without ID!" ); }
+			if($halt_on_empty)
+			{
+				debug_die( "Requested $this->objtype from $this->dbtablename without ID!" );
+			}
 			$r = NULL;
 			return $r;
 		}
@@ -522,6 +525,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2006/06/14 17:26:13  fplanque
+ * minor
+ *
  * Revision 1.4  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

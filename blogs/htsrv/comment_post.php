@@ -182,7 +182,7 @@ if( $Messages->count('error') )
 	'[<a href="javascript:history.go(-1)">'. T_('Back to comment editing') . '</a>]' );
 
 	debug_info();  // output debug info, useful to see what a plugin might have done
-	exit(); // TODO: nicer displaying here (but do NOT die() or debug_die() because this is not a BUG/user hack, it's a plain user input error (any bozo can produce it)
+	exit(); // TODO: nicer displaying here (but do NOT die or debug_die because this is not a BUG/user hack, it's a plain user input error - any bozo can produce it)
 }
 
 if( $action == 'preview' )
@@ -293,6 +293,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.82  2006/06/14 17:26:13  fplanque
+ * minor
+ *
  * Revision 1.81  2006/05/29 22:27:46  blueyed
  * Use NULL instead of false for "no display".
  *

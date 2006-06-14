@@ -123,7 +123,6 @@ if( $config_is_done || (($action != 'start') && ($action != 'default') && ($acti
 	// We want a friendly message if we can't connect:
 	$tmp_evoconf_db['halt_on_error'] = false;
 	$tmp_evoconf_db['show_errors'] = false;
-	$tmp_evoconf_db['debug_dump_function_trace_for_errors'] = false;
 	$DB = new DB( $tmp_evoconf_db );
 	unset($tmp_evoconf_db);
 
@@ -138,7 +137,6 @@ if( $config_is_done || (($action != 'start') && ($action != 'default') && ($acti
 	{
 		$DB->halt_on_error = true;  // From now on, halt on errors.
 		$DB->show_errors = true;    // From now on, show errors (they're helpful in case of errors!).
-		$DB->debug_dump_function_trace_for_errors = true;
 
 		// Check MySQL version
 		$mysql_version = $DB->get_var( 'SELECT VERSION()' );
@@ -196,8 +194,7 @@ switch( $action )
 			'use_transactions' => $db_config['use_transactions'],
 			'table_options' => $db_config['table_options'],
 			'connection_charset' => $db_config['connection_charset'],
-			'halt_on_error' => false,
-			'debug_dump_function_trace_for_errors' => false ) );
+			'halt_on_error' => false ) );
 		if( $DB->error )
 		{ // restart conf
 			echo '<p class="error">'.T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...').'</p>';
@@ -600,6 +597,9 @@ to
 <?php
 /*
  * $Log$
+ * Revision 1.103  2006/06/14 17:26:13  fplanque
+ * minor
+ *
  * Revision 1.102  2006/05/30 21:53:06  blueyed
  * Replaced $EvoConfig->DB with $db_config
  *

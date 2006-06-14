@@ -421,7 +421,7 @@ if( isset( $list_title ) )
 $Results->cols[] = array(
 		'th' => T_('ID'),
 		'order' => $edited_table_IDcol,
-		'th_start' => '<th class="firstcol shrinkwrap">',
+		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 		'td' => "\$$edited_table_IDcol\$",
 	);
@@ -454,8 +454,8 @@ if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, 
 	{
 		$Results->cols[] = array(
 				'th' => T_('Move'),
-				'th_start' => '<th class="shrinkwrap">',
 				'order' => $edited_table_ordercol,
+				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
 				'td' => '{move}',
 			);

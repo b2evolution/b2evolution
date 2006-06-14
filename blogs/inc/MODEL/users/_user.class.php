@@ -508,7 +508,7 @@ class User extends DataObject
 
 		if( !$perm && $assert )
 		{ // We can't let this go on!
-			debug_die( "Permission denied! ($permname:$permlevel:$perm_target)" );
+			debug_die( T_('Permission denied!')." ($permname:$permlevel:$perm_target)" );
 		}
 
 		return $perm;
@@ -1014,6 +1014,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2006/06/14 17:26:13  fplanque
+ * minor
+ *
  * Revision 1.16  2006/06/13 21:49:15  blueyed
  * Merged from 1.8 branch
  *
