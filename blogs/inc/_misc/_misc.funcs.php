@@ -1058,7 +1058,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		}
 		elseif( $default === true )
 		{
-			debug_die( '<p class="error">'.sprintf( T_('Parameter &laquo;%s&raquo; is required!'), $var ).'</p>' );
+			debug_die( sprintf( T_('Parameter &laquo;%s&raquo; is required!'), $var ) );
 		}
 		elseif( $forceset )
 		{
@@ -1554,10 +1554,11 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 			$count_backtrace = $limit_to_last;
 		}
 
-		$r .= '<div style="padding:1ex; text-align:left; font-family:monospace; color:#000; background-color:#ddf"><h3>Backtrace:</h3>'."\n";
+		$r .= '<div style="padding:1ex; margin-bottom:1ex; text-align:left; color:#000; background-color:#ddf">
+						<h3>Backtrace:</h3>'."\n";
 		if( $count_backtrace )
 		{
-			$r .= '<ol>';
+			$r .= '<ol style="font-family:monospace;">';
 
 			$i = 0;
 			foreach( $backtrace as $l_trace )
@@ -1667,34 +1668,42 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 
 
 /**
- * Outputs last words. When in debug mode it also prints a backtrace.
+ * Outputs Unexpected Error message. When in debug mode it also prints a backtrace.
  *
- * After this, it prints by default '</body></html>' to keep the output
- * probably valid.
+ * This should be used instead of die() everywhere.
+ * This should NOT be used instead of exit() anywhere.
+ * Dying means the application has encontered and unexpected situation,
+ * i-e: something that should never occur during normal operation.
+ * Examples: database broken, user changed URL by hand...
  *
  * @param string Message to output
- * @param boolean|NULL If set it overrides the setting of {@link $debug} to
- *                     decide if we want a backtrace and whole debug_info.
- * @param string This gets output at the very end (after backtrace and last words)
- * @param string Include function backtrace if outputting debug_info()?
- *               (used in DB class when we already have the backtrace for the mysql error)
  */
-function debug_die( $last_words = '', $force = NULL, $very_last = '</body></html>', $include_backtrace = true )
+function debug_die( $additional_info = '' )
 {
-	global $debug;
+	global $debug, $baseurl;
 
-	echo $last_words;
+	echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
+	echo '<h3 style="color:#f00;">'.T_('An unexpected error has occured!').'</h3>';
+	echo '<p>'.T_('If this error persits, please report it to the administrator.').'</p>';
+	echo '<p><a href="'.$baseurl.'">'.T_('Go back to home page').'</a></p>';
+	echo '</div>';
 
-	if( ( isset($force) && $force ) || ( !isset($force) && $debug ) )
+	if( !empty( $additional_info ) )
 	{
-		if( $include_backtrace )
-		{
-			echo debug_get_backtrace();
-		}
+		echo '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">';
+		echo '<h3>'.T_('Additional information about this error:').'</h3>';
+		echo $additional_info;
+		echo '</div>';
+	}
+
+	if( $debug )
+	{
+		echo debug_get_backtrace();
 		debug_info();
 	}
 
-	die( $very_last );
+	// Attempt to keep the html valid (but it doesn't really matter anyway)
+	die( '</body></html>' );
 }
 
 
@@ -2917,6 +2926,10 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.59  2006/06/14 17:24:14  fplanque
+ * A little better debug_die()... useful for bozos.
+ * Removed bloated trace on error param from DB class. KISS (Keep It Simple Stupid)
+ *
  * Revision 1.58  2006/06/13 22:07:34  blueyed
  * Merged from 1.8 branch
  *

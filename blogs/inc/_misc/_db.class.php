@@ -197,13 +197,6 @@ class DB
 	var $debug_dump_function_trace_for_queries = 0;
 
 	/**
-	 * Do we want to output a function backtrace for errors?
-	 * NOTE: This is only used when {@link $show_errors} is enabled.
-	 * @var integer|boolean Number of stack entries to show (from last to first) (Default: true); true means 'all'.
-	 */
-	var $debug_dump_function_trace_for_errors = true;
-
-	/**
 	 * Number of rows we want to dump in debug output (0 disables it)
 	 * @var integer (Default: 0)
 	 */
@@ -271,7 +264,6 @@ class DB
 		if( isset($params['use_transactions']) ) $this->use_transactions = $params['use_transactions'];
 		if( isset($params['debug_dump_rows']) ) $this->debug_dump_rows = $params['debug_dump_rows'];
 		if( isset($params['debug_explain_joins']) ) $this->debug_explain_joins = $params['debug_explain_joins'];
-		if( isset($params['debug_dump_function_trace_for_errors']) ) $this->debug_dump_function_trace_for_errors = $params['debug_dump_function_trace_for_errors'];
 		if( isset($params['debug_dump_function_trace_for_queries']) ) $this->debug_dump_function_trace_for_queries = $params['debug_dump_function_trace_for_queries'];
 
 		if( ! extension_loaded('mysql') )
@@ -437,6 +429,8 @@ class DB
 
 	/**
 	 * Print SQL/DB error.
+	 *
+	 * TODO: bloated: it probably doesn't make sense to display errors if we don't stop. Any use case?
 	 */
 	function print_error( $str = '', $query_title = '' )
 	{
@@ -454,41 +448,34 @@ class DB
 			'error_str'  => $this->last_error
 		);
 
-		// Is error output turned on or not..
-		if ( $this->show_errors )
+		$err_msg = '<p class="error">MySQL error!</p>';
+		$err_msg .= '<div>'.$this->last_error.'</div>';
+		if( !empty($this->last_query) )
 		{
-			// If there is an error then take note of it
-			echo '<div class="error">';
-			echo '<p class="error">MySQL error!</p>';
-			echo '<div>'.$this->last_error.'</div>';
-			if( !empty($this->last_query) )
-			{
-				echo '<p class="error">Your query: '.$query_title.'</p>';
-				echo '<pre>';
-				echo $this->format_query( $this->last_query );
-				echo '</pre>';
-			}
-
-			if( $this->debug_dump_function_trace_for_errors )
-			{
-				echo debug_get_backtrace( $this->debug_dump_function_trace_for_errors );
-			}
-
-			echo '</div>';
+			$err_msg .= '<p class="error">Your query: '.$query_title.'</p>';
+			$err_msg .= '<pre>';
+			$err_msg .= $this->format_query( $this->last_query );
+			$err_msg .= '</pre>';
 		}
 
 		if( $this->halt_on_error )
 		{
 			if( function_exists( 'debug_die' ) )
 			{
-				$include_backtrace = ! $this->show_errors || ! $this->debug_dump_function_trace_for_errors; // no backtrace if displayed above
-				debug_die( '', NULL, '</body></html>', $include_backtrace );
+				debug_die( $err_msg );
 			}
 			else
 			{
-				die();
+				die( $err_msg );
 			}
 		}
+		elseif ( $this->show_errors )
+		{ // If there is an error then take note of it
+			echo '<div class="error">';
+			echo $err_msg;
+			echo '</div>';
+		}
+
 	}
 
 
@@ -1343,11 +1330,9 @@ class DB
 
 /*
  * $Log$
- * Revision 1.13  2006/06/13 22:07:34  blueyed
- * Merged from 1.8 branch
- *
- * Revision 1.6.2.2  2006/06/12 20:00:40  fplanque
- * one too many massive syncs...
+ * Revision 1.14  2006/06/14 17:24:14  fplanque
+ * A little better debug_die()... useful for bozos.
+ * Removed bloated trace on error param from DB class. KISS (Keep It Simple Stupid)
  *
  * Revision 1.12  2006/05/31 20:22:34  blueyed
  * cleanup
