@@ -125,15 +125,16 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_page_head()
 	{
-		global $app_shortname, $app_version, $current_User, $htsrv_url, $baseurl, $rsc_url, $Blog;
+		global $app_shortname, $app_version, $current_User, $htsrv_url, $baseurl, $admin_url, $rsc_url, $Blog;
 
 		$r = '
 		<div id="header">
 			'.$this->admin_logo.'
 
 			<div id="headinfo">
-				<span id="headfunctions">
-					<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
+				<span id="headfunctions">'
+				// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
+				.'<a href="'.$htsrv_url.'login.php?action=logout&amp;redirect_to='.$admin_url.'">'.T_('Logout').'</a>
 					&bull;
 					<a href="'.( isset($Blog) ? $Blog->get('url') : $baseurl ).'">'.T_('Exit to blogs').'
 						<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'

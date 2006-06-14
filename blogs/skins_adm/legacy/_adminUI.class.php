@@ -110,7 +110,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_page_head()
 	{
-		global $htsrv_url, $baseurl, $rsc_url, $Blog;
+		global $htsrv_url, $baseurl, $admin_url, $rsc_url, $Blog;
 
 		$r = '
 		<div id="header">
@@ -123,8 +123,9 @@ class AdminUI extends AdminUI_general
 				.'&middot;<a href="#" onclick="setActiveStyleSheet(\'Legacy\'); return false;" title="Legacy">L</a>'
 				.( is_file( dirname(__FILE__).'/rsc/css/custom.css' ) ? '&middot;<a href="#" onclick="setActiveStyleSheet(\'Custom\'); return false;" title="Custom">C</a>' : '' )
 				.'
-				&bull;
-				<a href="'.$htsrv_url.'login.php?action=logout">'.T_('Logout').'</a>
+				&bull; '
+				// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
+				.'<a href="'.$htsrv_url.'login.php?action=logout&amp;redirect_to='.$admin_url.'">'.T_('Logout').'</a>
 				&bull;
 				<a href="'.( isset($Blog) ? $Blog->get('url') : $baseurl ).'">'.T_('Exit to blogs').'
 					<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
