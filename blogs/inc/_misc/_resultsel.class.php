@@ -192,9 +192,12 @@ class ResultSel extends Results
 			echo $this->Form->check_all();
 		}
 	
-		// construction of the select menu :
-		$selection_name = selection_select_tag( $this->param_prefix, $this->table_selections, $this->field_sel_name, $this->field_sel_ID, $this->current_selection_ID );
-	
+		if( $current_User->check_perm( 'selections', 'view' ) )
+		{
+			// construction of the select menu :
+			$selection_name = selection_select_tag( $this->param_prefix, $this->table_selections, $this->field_sel_name, $this->field_sel_ID, $this->current_selection_ID );
+		}
+		
 		if( $can_edit )
 		{
 			$this->Form->text( 'selection_'.$this->param_prefix.'name', $selection_name, 25, T_('Selection name'), '', 60 );
@@ -277,6 +280,10 @@ function selection_checkbox( $item_ID, $param_prefix )
 		if( in_array( $item_ID, $cols_check ) )
 		{	// already in selection:
 			$r .= '*';
+		}
+		else 
+		{
+			$r .= '&nbsp;';
 		}
 	}
 
@@ -591,6 +598,9 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 
 /*
  * $Log$
+ * Revision 1.7  2006/06/15 17:53:38  fplanque
+ * minor
+ *
  * Revision 1.6  2006/06/13 22:07:34  blueyed
  * Merged from 1.8 branch
  *

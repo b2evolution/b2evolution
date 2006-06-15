@@ -61,9 +61,9 @@ $Form->begin_fieldset( T_('Default user rights') );
 	$Form->checkbox( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), T_('Check to allow new users to register themselves.' ) );
 	// Note: the options below also make sense, if newusers_canregister is disabled (especially newusers_mustvalidate)
 
-	$Form->checkbox( 'newusers_mustvalidate', $Settings->get('newusers_mustvalidate'), T_('Validate new users'), T_('Check to have new users validate themselves through clicking a link in an email.' ) );
+	$Form->checkbox( 'newusers_mustvalidate', $Settings->get('newusers_mustvalidate'), T_('Users must validate'), T_('Check to require users to validate their email by clicking a link sent to them.' ) );
 
-	$Form->checkbox( 'newusers_revalidate_emailchg', $Settings->get('newusers_revalidate_emailchg'), T_('Re-validate on email change'), T_('Check to have new users re-validate themselves through clicking a link in an email, if their email address gets changed.' ) );
+	$Form->checkbox( 'newusers_revalidate_emailchg', $Settings->get('newusers_revalidate_emailchg'), T_('Validate email changes'), T_('Check to require users to re-validate when they change their email address.' ) );
 
 	$Form->select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
 
@@ -138,6 +138,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.9  2006/06/15 17:53:38  fplanque
+ * minor
+ *
  * Revision 1.8  2006/04/27 18:31:06  fplanque
  * no message
  *

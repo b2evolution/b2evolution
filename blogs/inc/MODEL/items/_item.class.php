@@ -2112,7 +2112,7 @@ class Item extends DataObject
 	/**
 	 * Set the Author of the Item.
 	 *
-	 * @param User
+	 * @param User (Do NOT set to NULL or you may kill the current_User)
 	 * @return boolean true, if it has been set; false if it has not changed
 	 */
 	function set_creator_User( & $creator_User )
@@ -2690,6 +2690,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.59  2006/06/15 17:53:38  fplanque
+ * minor
+ *
  * Revision 1.58  2006/06/15 15:01:19  fplanque
  * bugfix
  *

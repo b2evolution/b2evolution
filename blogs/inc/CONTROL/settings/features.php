@@ -113,7 +113,7 @@ switch( $action )
 			$Request->param( 'eblog_server_host', 'string', true );
 			$Settings->set( 'eblog_server_host', strtolower(trim($eblog_server_host)));
 
-			$Request->param( 'eblog_server_port', '/\d*/', '' );
+			$Request->param( 'eblog_server_port', '#\d*#', '' );
 			$Settings->set( 'eblog_server_port', $eblog_server_port );
 
 			$Request->param( 'eblog_username', 'string', true );
@@ -196,6 +196,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/15 17:53:38  fplanque
+ * minor
+ *
  * Revision 1.7  2006/06/01 18:36:09  fplanque
  * no message
  *
