@@ -295,21 +295,31 @@ class Item extends DataObject
 		// echo 'assigning user #'.$user_ID;
 		if( ! empty($user_ID) )
 		{
-			$this->assigned_user_ID = $user_ID;
+			if( $dbupdate )
+			{ // Record ID for DB:
+				$this->set_param( 'assigned_user_ID', 'number', $user_ID, true );
+			}
+			else
+			{
+				$this->assigned_user_ID = $user_ID;
+			}
 			$this->assigned_User = & $UserCache->get_by_ID( $user_ID );
 		}
 		else
 		{
-			// fp>> DO NOT set (to null) immediately OR it will KILL the current User object (big problem if it's the Current User)
+			// fp>> DO NOT set (to null) immediately OR it may KILL the current User object (big problem if it's the Current User)
 			unset( $this->assigned_User );
-			$this->assigned_User = NULL;
+			if( $dbupdate )
+			{ // Record ID for DB:
+				$this->set_param( 'assigned_user_ID', 'number', NULL, true );
+			}
+			else
+			{
+				$this->assigned_User = NULL;
+			}
 			$this->assigned_user_ID = NULL;
 		}
 
-		if( $dbupdate )
-		{ // Record ID for DB:
-			$this->set_param( 'assigned_user_ID', 'number', $this->assigned_user_ID, true );
-		}
 	}
 
 
@@ -2680,6 +2690,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.58  2006/06/15 15:01:19  fplanque
+ * bugfix
+ *
  * Revision 1.57  2006/06/12 00:42:21  blueyed
  * Item::get_trackback_url() added
  *
