@@ -47,32 +47,40 @@ if( ! $commented_Item->can_comment( NULL ) )
 }
 
 
-param( 'comment', 'html' );
+// Note: we use funky field names to defeat the most basic guestbook spam bots and/or their most basic authors
+$comment = param( 'p', 'html' );
 param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
 
 if( ! is_logged_in() )
 {	// User is not logged in (registered users), we need some id info from him:
-	param( 'author', 'string' );
-	param( 'email', 'string' );
-	param( 'url', 'string' );
+	// Note: we use funky field names to defeat the most basic guestbook spam bots and/or their most basic authors
+	$author = param( 'u', 'string' );
+	$email = param( 'i', 'string' );
+	$url = param( 'o', 'string' );
 	param( 'comment_cookies', 'integer', 0 );
 	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
 
 	if ($require_name_email)
 	{ // We want Name and EMail with comments
-		if( empty($author) ) $Messages->add( T_('Please fill in the name field'), 'error' );
-		if( empty($email) ) $Messages->add( T_('Please fill in the email field'), 'error' );
+		if( empty($author) )
+		{
+			$Messages->add( T_('Please fill in your name.'), 'error' );
+		}
+		if( empty($email) )
+		{
+			$Messages->add( T_('Please fill in your email.'), 'error' );
+		}
 	}
 
 	if( !empty($author) && antispam_check( $author ) )
 	{
-		$Messages->add( T_('Supplied name is invalid'), 'error' );
+		$Messages->add( T_('Supplied name is invalid.'), 'error' );
 	}
 
 	if( !empty($email)
 		&& ( !is_email($email)|| antispam_check( $email ) ) )
 	{
-		$Messages->add( T_('Supplied email address is invalid'), 'error' );
+		$Messages->add( T_('Supplied email address is invalid.'), 'error' );
 	}
 
 	// add 'http://' if no protocol defined for URL
@@ -97,11 +105,11 @@ $comment = format_to_post($original_comment, $comment_autobr, 1);
 
 if( empty($comment) )
 { // comment should not be empty!
-	$Messages->add( T_('Please do not send empty comment'), 'error' );
+	$Messages->add( T_('Please do not send empty comments.'), 'error' );
 }
 elseif( antispam_check( strip_tags($comment) ) )
 {
-	$Messages->add( T_('Supplied comment is invalid'), 'error' );
+	$Messages->add( T_('Supplied comment is invalid.'), 'error' );
 }
 
 // Flood protection was here and SHOULD NOT have moved down!
@@ -293,6 +301,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.83  2006/06/16 20:34:19  fplanque
+ * basic spambot defeating
+ *
  * Revision 1.82  2006/06/14 17:26:13  fplanque
  * minor
  *

@@ -98,13 +98,35 @@ param( 'blog', 'integer', '' );
 param( 'recipient_id', 'integer', '' );
 param( 'post_id', 'integer', '' );
 param( 'comment_id', 'integer', '' );
-param( 'sender_name', 'string', '' );
-param( 'sender_address', 'string', '' );
-param( 'subject', 'string', '' );
-param( 'message', 'string', '' );
+// Note: we use funky field name in order to defeat the most basic guestbook spam bots:
+$sender_name = param( 'd', 'string', '' );
+$sender_address = param( 'f', 'string', '' );
+$subject = param( 'g', 'string', '' );
+$message = param( 'h', 'string', '' );
 
 // Getting current blog info:
 $Blog = Blog_get_by_ID( $blog ); /* TMP: */ $blogparams = get_blogparams_by_ID( $blog );
+
+if( empty($sender_name) )
+{
+	$Messages->add( T_('Please fill in your name.'), 'error' );
+}
+if( empty($sender_address) )
+{
+	$Messages->add( T_('Please fill in your email.'), 'error' );
+}
+elseif( !is_email($sender_address) || antispam_check( $sender_address ) )
+{
+	$Messages->add( T_('Supplied email address is invalid.'), 'error' );
+}
+if( empty($subject) )
+{
+	$Messages->add( T_('Please fill in the subject of your message.'), 'error' );
+}
+if( empty( $message ) )
+{ // message should not be empty!
+	$Messages->add( T_('Please do not send empty messages.'), 'error' );
+}
 
 // Prevent register_globals injection!
 $recipient_address = '';
@@ -235,6 +257,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.34  2006/06/16 20:34:19  fplanque
+ * basic spambot defeating
+ *
  * Revision 1.33  2006/05/30 20:32:56  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *

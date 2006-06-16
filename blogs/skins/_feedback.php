@@ -233,14 +233,17 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 		}
 		else
 		{ // User is not logged in:
-			$Form->text( 'author', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
 
-			$Form->text( 'email', $comment_author_email, 40, T_('Email'), T_('Your email address will <strong>not</strong> be displayed on this site.'), 100, 'bComment' );
+      // Note: we use funky field names to defeat the most basic guestbook spam bots
 
-			$Form->text( 'url', $comment_author_url, 40, T_('Site/Url'), T_('Your URL will be displayed.'), 100, 'bComment' );
+			$Form->text( 'u', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
+
+			$Form->text( 'i', $comment_author_email, 40, T_('Email'), T_('Your email address will <strong>not</strong> be displayed on this site.'), 100, 'bComment' );
+
+			$Form->text( 'o', $comment_author_url, 40, T_('Site/Url'), T_('Your URL will be displayed.'), 100, 'bComment' );
 		}
 
-		$Form->textarea( 'comment', $comment_content, 10, T_('Comment text'),
+		$Form->textarea( 'p', $comment_content, 10, T_('Comment text'),
 										T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), 40, 'bComment' );
 
 
@@ -308,6 +311,9 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 
 /*
  * $Log$
+ * Revision 1.65  2006/06/16 20:34:20  fplanque
+ * basic spambot defeating
+ *
  * Revision 1.64  2006/06/10 19:16:17  blueyed
  * DisplayTrackbackAddr event
  *

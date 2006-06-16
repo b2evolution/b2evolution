@@ -164,10 +164,11 @@ $Form = new Form( $htsrv_url.'message_send.php' );
 	</fieldset>
 
 	<?php
-	$Form->text( 'sender_name', $email_author, 40, T_('From'),  T_('Your name.'), 50, 'bComment' );
-	$Form->text( 'sender_address', $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'), 100, 'bComment' );
-	$Form->text( 'subject', $subject, 40, T_('Subject'), T_('Subject of email message.'), 255, 'bComment' );
-	$Form->textarea( 'message', '', 15, T_('Message'), T_('Plain text only.'), 40, 'bComment' );
+	// Note: we use funky field name in order to defeat the most basic guestbook spam bots:
+	$Form->text( 'd', $email_author, 40, T_('From'),  T_('Your name.'), 50, 'bComment' );
+	$Form->text( 'f', $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'), 100, 'bComment' );
+	$Form->text( 'g', $subject, 40, T_('Subject'), T_('Subject of email message.'), 255, 'bComment' );
+	$Form->textarea( 'h', '', 15, T_('Message'), T_('Plain text only.'), 40, 'bComment' );
 
 	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array( 'Form' => & $Form,
 		'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
@@ -194,6 +195,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.27  2006/06/16 20:34:20  fplanque
+ * basic spambot defeating
+ *
  * Revision 1.26  2006/05/30 21:51:03  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *
