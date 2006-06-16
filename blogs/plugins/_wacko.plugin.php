@@ -22,7 +22,7 @@ class wacko_plugin extends Plugin
 	var $code = 'b2evWcko';
 	var $name = 'Wacko formatting';
 	var $priority = 30;
-	var $version = '$Revision$';
+	var $version = '1.8';
 	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
@@ -172,6 +172,9 @@ class wacko_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.10  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.9  2006/05/30 19:39:56  fplanque
  * plugin cleanup
  *

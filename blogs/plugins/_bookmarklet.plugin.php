@@ -29,7 +29,7 @@ class bookmarklet_plugin extends Plugin
 	var $name = 'Bookmarklet';
 	var $code = 'cafeBkmk';
 	var $priority = 94;
-	var $version = 'CVS $Revision$';
+	var $version = '1.8';
 	var $author = 'Cafelog team';
 
 
@@ -96,6 +96,9 @@ class bookmarklet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.12  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.11  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *

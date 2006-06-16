@@ -43,7 +43,7 @@ class ldap_plugin extends Plugin
 {
 	var $code = 'evo_ldap_auth';
 	var $priority = 50;
-	var $version = 'CVS $Revision$';
+	var $version = '1.8';
 	var $author = 'dAniel hAhler';
 
 
@@ -333,6 +333,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.25  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.24  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *

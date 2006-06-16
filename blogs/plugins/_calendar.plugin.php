@@ -50,7 +50,7 @@ class calendar_plugin extends Plugin
 	var $name = 'Calendar Skin Tag';
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = 'CVS $Revision$';
+	var $version = '1.8';
 	var $author = 'The b2evo Group';
 
 
@@ -984,6 +984,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.19  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.18  2006/05/30 20:25:35  blueyed
  * typo
  *

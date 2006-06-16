@@ -25,7 +25,7 @@ class gmcode_plugin extends Plugin
 	var $apply_rendering = 'opt-out';
 	var $short_desc;
 	var $long_desc;
-	var $version = '$Revision$';
+	var $version = '1.8';
 
 
 	/**
@@ -90,6 +90,9 @@ class gmcode_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.10  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.9  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

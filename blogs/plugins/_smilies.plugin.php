@@ -22,7 +22,7 @@ class smilies_plugin extends Plugin
 	var $code = 'b2evSmil';
 	var $name = 'Smilies';
 	var $priority = 80;
-	var $version = 'CVS $Revision$';
+	var $version = '1.8';
 	var $apply_rendering = 'opt-out';
 
 	/**
@@ -264,6 +264,9 @@ class smilies_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.22  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.21  2006/05/30 20:26:59  blueyed
  * typo
  *

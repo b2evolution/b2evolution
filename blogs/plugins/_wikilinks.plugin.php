@@ -22,7 +22,7 @@ class wikilinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Wiki Links';
 	var $priority = 35;
-	var $version = '$Revision$';
+	var $version = '1.8';
 	var $apply_rendering = 'opt-in';
 	var $short_desc;
 	var $long_desc;
@@ -257,6 +257,9 @@ class wikilinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.17  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.16  2006/05/30 20:28:56  blueyed
  * typo
  *

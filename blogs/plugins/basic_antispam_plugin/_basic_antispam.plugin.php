@@ -50,7 +50,7 @@ class basic_antispam_plugin extends Plugin
 	var $name = 'Basic Antispam';
 	var $code = '';
 	var $priority = 60;
-	var $version = 'CVS $Revision$';
+	var $version = '1.8';
 	var $author = 'The b2evo Group';
 
 
@@ -566,6 +566,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.19  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.18  2006/06/05 17:45:06  blueyed
  * Disable events at settings time, according to Settings checkboxes.
  *

@@ -19,7 +19,7 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 60;
-	var $version = 'CVS $Revision$';
+	var $version = '1.8';
 	var $apply_rendering = 'opt-out';
 	var $short_desc;
 	var $long_desc;
@@ -55,6 +55,9 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.10  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.9  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *

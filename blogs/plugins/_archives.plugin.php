@@ -51,7 +51,7 @@ class archives_plugin extends Plugin
 	var $name = 'Archives Skin Tag';
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = 'CVS $Revision$';
+	var $version = '1.8';
 	var $author = 'The b2evo Group';
 
 
@@ -526,6 +526,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.22  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.21  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *

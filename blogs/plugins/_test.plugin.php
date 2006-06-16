@@ -53,7 +53,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = 'CVS $Revision$';
+	var $version = '1.8';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki, in this case: http://manual.b2evolution.net/Plugins/test_plugin';
 
@@ -597,6 +597,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.44  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.43  2006/06/13 21:33:40  blueyed
  * Add note when updating PluginUserSettings
  *

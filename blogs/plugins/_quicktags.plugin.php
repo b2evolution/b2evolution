@@ -22,7 +22,7 @@ class quicktags_plugin extends Plugin
 	var $code = 'b2evQTag';
 	var $name = 'Quick Tags';
 	var $priority = 30;
-	var $version = 'CVS $Revision$';
+	var $version = '1.8';
 
 	/**
 	 * Constructor
@@ -419,6 +419,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.16  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.15  2006/05/30 20:31:18  blueyed
  * typo
  *

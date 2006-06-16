@@ -42,7 +42,7 @@ class dnsbl_antispam_plugin extends Plugin
 	var $name = 'DNSBL Antispam';
 	var $code = 'evo_dnsbl';
 	var $priority = 40;
-	var $version = '$Revision$';
+	var $version = '1.8';
 	var $author = 'The b2evo Group';
 
 
@@ -685,6 +685,9 @@ class dnsbl_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.27  2006/06/16 21:30:57  fplanque
+ * Started clean numbering of plugin versions (feel free do add dots...)
+ *
  * Revision 1.26  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *
