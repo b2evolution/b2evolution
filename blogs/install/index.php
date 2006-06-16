@@ -21,6 +21,11 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 // Make the includes believe they are being called in the right place...
 define( 'EVO_MAIN_INIT', true );
 
+if( ! $config_is_done )
+{	// Base config is not done yet, try to guess some values needed for correct display:
+	$rsc_url = '../rsc/';
+}
+
 require_once $conf_path.'_upgrade.php';
 require_once $misc_inc_path.'_log.class.php';
 $Debuglog = new Log( 'note' );
@@ -596,68 +601,5 @@ to
 
 <?php
 /*
- * $Log$
- * Revision 1.103  2006/06/14 17:26:13  fplanque
- * minor
- *
- * Revision 1.102  2006/05/30 21:53:06  blueyed
- * Replaced $EvoConfig->DB with $db_config
- *
- * Revision 1.101  2006/05/28 22:27:13  blueyed
- * Basic config file
- *
- * Revision 1.100  2006/05/19 18:15:06  blueyed
- * Merged from v-1-8 branch
- *
- * Revision 1.99  2006/05/02 03:01:15  blueyed
- * fix
- *
- * Revision 1.98  2006/04/29 01:24:05  blueyed
- * More decent charset support;
- * unresolved issues include:
- *  - front office still forces the blog's locale/charset!
- *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
- *
- * Revision 1.97  2006/04/11 22:28:58  blueyed
- * cleanup
- *
- * Revision 1.96  2006/04/11 21:22:26  fplanque
- * partial cleanup
- *
- * Revision 1.95  2006/04/10 09:27:04  blueyed
- * Fix adding default itemtypes when upgrading from 0.9.x; cleaned up plugins install
- *
- * Revision 1.94  2006/04/06 08:52:27  blueyed
- * Validate install "misc" requirements ("tokenizer" support for now)
- *
- * Revision 1.93  2006/03/10 19:04:58  fplanque
- * minor
- *
- * Revision 1.92  2006/02/23 22:17:31  blueyed
- * fix path
- *
- * Revision 1.91  2006/02/23 21:12:33  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.89  2006/02/11 01:08:20  blueyed
- * Oh what fun it is to drop some "e".
- *
- * Revision 1.88  2006/02/03 19:36:40  fplanque
- * Log::display is insane compared to the simplicity of echo :]
- *
- * Revision 1.86  2006/02/02 00:49:33  blueyed
- * Use class Plugins_no_DB for $Plugins on "newdb" action
- *
- * Revision 1.85  2006/01/30 16:09:34  blueyed
- * doc
- *
- * Revision 1.83  2006/01/26 23:08:36  blueyed
- * Plugins enhanced.
- *
- * Revision 1.82  2006/01/14 20:45:10  blueyed
- * do not dump function trace on DB errors during install/config when not appropriate.
- *
- */
+ nolog */
 ?>
