@@ -85,7 +85,7 @@ function filter_crontab( & $Form )
 
 	$Form->checkbox( 'ctst_pending', $ctst_pending, T_('Pending') );
 	$Form->checkbox( 'ctst_started', $ctst_started, T_('Started') );
-	$Form->checkbox( 'ctst_timeout', $ctst_error, T_('Error') );
+	$Form->checkbox( 'ctst_timeout', $ctst_timeout, T_('Timeout') );
 	$Form->checkbox( 'ctst_error', $ctst_error, T_('Error') );
 	$Form->checkbox( 'ctst_finished', $ctst_finished, T_('Finished') );
 }
@@ -109,7 +109,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th' => T_('Start time'),
+						'th' => T_('Planned at'),
 						'order' => 'ctsk_start_datetime',
 						'td_class' => 'shrinkwrap',
 						'td' => '$ctsk_start_datetime$',
@@ -158,6 +158,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2006/06/16 21:32:02  fplanque
+ * no message
+ *
  * Revision 1.2  2006/06/13 21:52:44  blueyed
  * Added files from 1.8 branch
  *
