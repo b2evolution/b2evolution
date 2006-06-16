@@ -1682,6 +1682,10 @@ function debug_die( $additional_info = '' )
 {
 	global $debug, $baseurl;
 
+	// Attempt to output an error header (will not work if there is too much content already out):
+	// This should help preventing indexing robots from indexing the error :P
+	@header('HTTP/1.0 500 Internal Server Error');
+
 	echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 	echo '<h3 style="color:#f00;">'.T_('An unexpected error has occured!').'</h3>';
 	echo '<p>'.T_('If this error persits, please report it to the administrator.').'</p>';
@@ -2926,6 +2930,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.60  2006/06/16 20:40:29  fplanque
+ * operational improvements
+ *
  * Revision 1.59  2006/06/14 17:24:14  fplanque
  * A little better debug_die()... useful for bozos.
  * Removed bloated trace on error param from DB class. KISS (Keep It Simple Stupid)

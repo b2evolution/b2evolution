@@ -19,11 +19,23 @@
  * @package conf
  */
 
+/**
+ * Maintenance mode. Set this to true in order to temporarily disable access to the application.
+ *
+ * Note: il is still possible to access the install script during maintenance mode.
+ */
+$maintenance_mode = false;
+
+
+// Below is an alternative hardcore version of maintenance mode.
+// This one will bloc the install script too.
+// Remove /* and */ to activate.
 /*
 header('HTTP/1.0 503 Service Unavailable');
 echo '<h1>503 Service Unavailable</h1>';
 die( 'The site is temporarily down for maintenance.' );
 */
+
 
 /**
  * MySQL DB settings.

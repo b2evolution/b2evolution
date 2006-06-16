@@ -105,6 +105,8 @@ class Item extends DataObject
 	 * @var integer ID of the user that created the item
 	 */
 	var $creator_user_ID;
+
+
 	/**
 	 * The assigned User to the item.
 	 * @see Item::get_assigned_User()
@@ -113,6 +115,7 @@ class Item extends DataObject
 	 * @access protected
 	 */
 	var $assigned_User;
+
 	/**
 	 * @var integer|NULL ID of the user that created the item
 	 */
@@ -320,6 +323,24 @@ class Item extends DataObject
 			$this->assigned_user_ID = NULL;
 		}
 
+	}
+
+
+	/**
+	 * Template function: display author/creator of item
+	 *
+	 * @param string String to display before author name
+	 * @param string String to display after author name
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function author( $before = '', $after = '', $format = 'htmlbody' )
+	{
+		// Load User
+		$this->get_creator_User();
+
+		echo $before;
+		echo $this->creator_User->preferred_name( $format, false );
+		echo $after;
 	}
 
 
@@ -2690,6 +2711,9 @@ class Item extends DataObject
 
 /*
  * $Log$
+ * Revision 1.60  2006/06/16 20:40:29  fplanque
+ * operational improvements
+ *
  * Revision 1.59  2006/06/15 17:53:38  fplanque
  * minor
  *
