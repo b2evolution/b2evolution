@@ -514,7 +514,12 @@ unset($pass);
 
 
 // Check if the user needs to be validated, but is not yet:
-if( ! empty($current_User) && ! $current_User->validated && $Settings->get('newusers_mustvalidate') && $Request->param('action', 'string', '') != 'logout' )
+if( ! empty($current_User)
+		&& ! $current_User->validated
+		&& $Settings->get('newusers_mustvalidate')
+		&& $current_User->ID != 1       /* not admin user */
+		&& $current_User->group_ID != 1 /* not admin group */
+		&& $Request->param('action', 'string', '') != 'logout' )
 {
 	if( $action != 'req_validatemail' && $action != 'validatemail' )
 	{ // we're not in that action already:
