@@ -83,7 +83,15 @@ class User extends DataObject
 	var $_num_posts;
 
 	/**
-	* @var NULL|Group Reference to group
+	 * The ID of the (primary, currently only) group of the user.
+	 * @var integer
+	 */
+	var $group_ID;
+
+	/**
+	 * @see User::get_Group()
+	 * @var NULL|Group Reference to group
+	 * @access protected
 	 */
 	var $Group;
 
@@ -159,9 +167,9 @@ class User extends DataObject
 				$this->set_datecreated( time() );
 			}
 
-			if( isset( $GroupCache ) && isset($Settings) )
+			if( isset($Settings) )
 			{ // Group for this user:
-				$this->setGroup( $GroupCache->get_by_ID( $Settings->get('newusers_grp_ID') ) );
+				$this->group_ID = $Settings->get('newusers_grp_ID');
 			}
 		}
 		else
@@ -192,7 +200,7 @@ class User extends DataObject
 			$this->showonline = $db_row->user_showonline;
 
 			// Group for this user:
-			$this->Group = & $GroupCache->get_by_ID( $db_row->user_grp_ID );
+			$this->group_ID = $db_row->user_grp_ID;
 		}
 	}
 
@@ -412,7 +420,7 @@ class User extends DataObject
 	 * @param Group the Group object to put the user into
 	 * @return boolean true if set, false if not changed
 	 */
-	function setGroup( & $Group )
+	function set_Group( & $Group )
 	{
 		if( $Group !== $this->Group )
 		{
@@ -424,6 +432,22 @@ class User extends DataObject
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * Get the {@link Group} of the user.
+	 *
+	 * @return Group
+	 */
+	function get_Group()
+	{
+		if( ! isset($this->Group) )
+		{
+			global $GroupCache;
+			$this->Group = $GroupCache->get_by_ID($this->group_ID);
+		}
+		return $this->Group;
 	}
 
 
@@ -459,6 +483,7 @@ class User extends DataObject
 				$perm = $this->check_perm_catsusers( $permname, $permlevel, $perm_target );
 				if ( $perm == false )
 				{ // Check groups category permissions...
+					$this->get_Group();
 					$perm = $this->Group->check_perm_catsgroups( $permname, $permlevel, $perm_target );
 				}
 				break;
@@ -466,6 +491,7 @@ class User extends DataObject
 			case 'blog_properties':
 				// Blog permission to edit its properties... (depending on user AND its group)
 				// Forward request to group:
+				$this->get_Group();
 				if( $this->Group->check_perm( 'blogs', $permlevel ) )
 				{ // If group says yes
 					$perm = true;
@@ -476,6 +502,7 @@ class User extends DataObject
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 					if ( $perm == false )
 					{ // Check groups for permissions to this specific blog
+						$this->get_Group();
 						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 					}
 				}
@@ -491,6 +518,7 @@ class User extends DataObject
 				$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 				if ( $perm == false )
 				{ // Check groups blog specific perm
+					$this->get_Group();
 					$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 				}
 
@@ -500,6 +528,7 @@ class User extends DataObject
 				// Other global permissions (see if the group can handle them), includes:
 				// files
 				// Forward request to group:
+				$this->get_Group();
 				$perm = $this->Group->check_perm( $permname, $permlevel, $perm_target );
 		}
 
@@ -1014,6 +1043,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2006/06/18 01:14:03  blueyed
+ * lazy instantiate user's group; normalisation
+ *
  * Revision 1.17  2006/06/14 17:26:13  fplanque
  * minor
  *
@@ -1223,7 +1255,7 @@ class User extends DataObject
  * getPreferedName()
  *
  * Revision 1.11  2005/02/20 22:41:13  blueyed
- * use setters in constructor (dbchange()), fixed getNumPosts(), enhanced set_datecreated(), fixed setGroup()
+ * use setters in constructor (dbchange()), fixed getNumPosts(), enhanced set_datecreated(), fixed set_Group()
  *
  * Revision 1.10  2005/02/19 18:54:52  blueyed
  * doc

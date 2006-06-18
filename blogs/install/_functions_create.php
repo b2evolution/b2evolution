@@ -599,7 +599,7 @@ function populate_main_tables()
 	$User_Admin->set( 'locale', $default_locale );
 	$User_Admin->set_datecreated( $timestamp++ );
 	// Note: NEVER use database time (may be out of sync + no TZ control)
-	$User_Admin->setGroup( $Group_Admins );
+	$User_Admin->set_Group( $Group_Admins );
 	$User_Admin->dbinsert();
 
 	$User_Demo = & new User();
@@ -613,7 +613,7 @@ function populate_main_tables()
 	$User_Demo->set( 'level', 0 );
 	$User_Demo->set( 'locale', $default_locale );
 	$User_Demo->set_datecreated( $timestamp++ );
-	$User_Demo->setGroup( $Group_Users );
+	$User_Demo->set_Group( $Group_Users );
 	$User_Demo->dbinsert();
 
 	echo "OK.<br />\n";
@@ -919,6 +919,9 @@ function install_basic_plugins()
 
 /*
  * $Log$
+ * Revision 1.189  2006/06/18 01:14:03  blueyed
+ * lazy instantiate user's group; normalisation
+ *
  * Revision 1.188  2006/05/22 22:58:19  blueyed
  * Changed my URL
  *

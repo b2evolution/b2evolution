@@ -99,7 +99,7 @@ switch( $action )
 			// echo $newusers_grp_ID;
 			$new_user_Group = & $GroupCache->get_by_ID( $newusers_grp_ID );
 			// echo $new_user_Group->disp('name');
-			$new_User->setGroup( $new_user_Group );
+			$new_User->set_Group( $new_user_Group );
 			$new_User->dbinsert();
 
 			$new_user_ID = $new_User->ID; // we need this to "rollback" user creation if there's no DB transaction support
@@ -185,6 +185,9 @@ require $view_path.'login/_reg_form.php';
 
 /*
  * $Log$
+ * Revision 1.70  2006/06/18 01:14:03  blueyed
+ * lazy instantiate user's group; normalisation
+ *
  * Revision 1.69  2006/05/19 18:15:04  blueyed
  * Merged from v-1-8 branch
  *

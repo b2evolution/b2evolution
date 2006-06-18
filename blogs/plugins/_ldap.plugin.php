@@ -255,7 +255,7 @@ class ldap_plugin extends Plugin
 
 						if( $users_Group = & $GroupCache->get_by_name( $assign_by_value, false ) )
 						{ // A group with the users value returned exists.
-							$NewUser->setGroup( $users_Group );
+							$NewUser->set_Group( $users_Group );
 							$assigned_group = true;
 							$this->debug_log( 'Adding User to existing Group.' );
 						}
@@ -272,7 +272,7 @@ class ldap_plugin extends Plugin
 								$this->debug_log( 'Created Group &laquo;'.$new_Group->get('name').'&raquo;' );
 								$this->debug_log( 'Assigned User to new Group.' );
 
-								$NewUser->setGroup( $new_Group );
+								$NewUser->set_Group( $new_Group );
 								$assigned_group = true;
 							}
 							else
@@ -298,7 +298,7 @@ class ldap_plugin extends Plugin
 
 						if( $users_Group )
 						{ // either $this->default_group_name is not given or wrong
-							$NewUser->setGroup( $users_Group );
+							$NewUser->set_Group( $users_Group );
 							$assigned_group = true;
 
 							$this->debug_log( 'Using default/fallback group ('.$users_Group->get('name').').' );
@@ -333,6 +333,9 @@ class ldap_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.26  2006/06/18 01:14:03  blueyed
+ * lazy instantiate user's group; normalisation
+ *
  * Revision 1.25  2006/06/16 21:30:57  fplanque
  * Started clean numbering of plugin versions (feel free do add dots...)
  *

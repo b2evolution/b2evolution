@@ -242,7 +242,7 @@ if( !$Messages->count('error') )
 
 				param( 'edited_user_grp_ID', 'integer', true );
 				$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
-				$edited_User->setGroup( $edited_user_Group );
+				$edited_User->set_Group( $edited_user_Group );
 				// echo 'new group = ';
 				// $edited_User->Group->disp('name');
 			}
@@ -689,6 +689,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2006/06/18 01:14:03  blueyed
+ * lazy instantiate user's group; normalisation
+ *
  * Revision 1.21  2006/06/13 21:30:00  blueyed
  * MFB; fixed PluginUserSettings for new users
  *

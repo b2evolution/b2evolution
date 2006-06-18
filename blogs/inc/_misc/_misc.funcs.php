@@ -1755,7 +1755,7 @@ function debug_info( $force = false )
 		$table_rows_ignore_perhaps = array();
 		foreach( $timer_rows as $l_cat => $l_time )
 		{
-			$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : 0;
+			$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : '0';
 
 			$row = "\n<tr>"
 				.'<td>'.$l_cat.'</td>'
