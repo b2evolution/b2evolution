@@ -87,18 +87,12 @@ class Request
 	 * Also forces type.
 	 * Priority order: POST, GET, COOKIE, DEFAULT.
 	 *
-	 * @todo Respect $forceset (not setting $this->params[$var], when !$forceset
-	 * @todo A previous set global should not be used as default ($override) (because this is "Request").
-	 * @todo With register_globals on there will be no sanitizing of the param!
-	 *
 	 * @param string Variable to set
 	 * @param string Force value type to one of:
 	 * - integer
-	 * - float
-	 * - string
-	 * - array
-	 * - object
-	 * - null
+	 * - float, double
+	 * - string (strips (HTML-)Tags, trims whitespace)
+	 * - array	(TODO:  array/integer  , array/array/string )
 	 * - html (does nothing)
 	 * - '' (does nothing)
 	 * - '/^...$/' check regexp pattern match (string)
@@ -107,12 +101,14 @@ class Request
 	 * @param mixed Default value or TRUE if user input required
 	 * @param boolean Do we need to memorize this to regenerate the URL for this page?
 	 * @param boolean Override if variable already set
-	 * @param boolean Force setting of variable to default?
+	 * @param boolean Force setting of variable to default if no param is sent and var wasn't set before
+	 * @param mixed true will refuse illegal values, false will try to convert illegal to legal values, 'allow_empty' will refuse illegale values but will always accept empty values (This helps blocking dirty spambots or borked index bots. Saves a lot of processor time by killing invalid requests)
 	 * @return mixed Final value of Variable, or false if we don't force setting and did not set
 	 */
-	function param( $var, $type = '', $default = '', $memorize = false, $override = false, $forceset = true )
+	function param( $var, $type = '', $default = '', $memorize = false,
+									$override = false, $use_default = true, $strict_typing = 'allow_empty' )
 	{
-		return $this->params[$var] = param( $var, $type, $default, $memorize, $override, $forceset );
+		return $this->params[$var] = param( $var, $type, $default, $memorize, $use_default, $strict_typing );
 	}
 
 
@@ -1010,6 +1006,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.14  2006/06/19 16:58:11  fplanque
+ * minor
+ *
  * Revision 1.13  2006/06/13 22:07:34  blueyed
  * Merged from 1.8 branch
  *

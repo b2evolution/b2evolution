@@ -11,15 +11,6 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
-/**
- * WordPress table prefix used exclusively by the upgrade script
- * You can ignore this if you're not planning to upgrade from a WordPress database.
- *
- * @global string
- */
-$wp_prefix = 'wp_';
-
-
 /**#@+
  * Old b2 tables used exclusively by the cafelog upgrade mode of the install script.
  *

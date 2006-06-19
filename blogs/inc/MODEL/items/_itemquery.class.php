@@ -271,10 +271,29 @@ class ItemQuery extends SQL
 			$this->WHERE_and( $this->dbprefix.'assigned_user_ID IN ('.$assignees.')' );
 		}
 	}
+	
+	
+  /**
+	 * Restrict to specific assignee or author
+	 *
+	 * @param integer assignee or author to restrict to (must have been previously validated)
+	 */
+	function where_author_assignee( $author_assignee )
+	{
+		$this->author_assignee = $author_assignee;
 
+		if( empty( $author_assignee ) )
+		{
+			return;
+		}
+		
+		$this->WHERE_and( '( '.$this->dbprefix.'creator_user_ID = '. $author_assignee.' OR '.
+											$this->dbprefix.'assigned_user_ID = '.$author_assignee.' )' );
+	}
+	
 
   /**
-	 * Restrict to specific assignees
+	 * Restrict to specific (exetnded) statuses
 	 *
 	 * @param string List of assignees to restrict to (must have been previously validated)
 	 */
@@ -533,6 +552,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.5  2006/06/19 16:58:11  fplanque
+ * minor
+ *
  * Revision 1.4  2006/06/13 21:49:15  blueyed
  * Merged from 1.8 branch
  *

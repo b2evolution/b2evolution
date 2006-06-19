@@ -104,7 +104,7 @@ if( (!isset($config_is_done) || !$config_is_done) )
 }
 
 
-$use_obhandler = 0;  // no output buffering!
+$use_obhandler = false;  // no output buffering!
 
 // Check if user is logged in and is in group #1 (admins)
 if( !is_logged_in() || $current_User->Group->ID != 1 )

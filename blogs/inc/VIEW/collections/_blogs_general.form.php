@@ -122,7 +122,7 @@ $Form->end_fieldset();
 
 global $blog_siteurl_type, $baseurl, $blog_siteurl_relative, $blog_siteurl_absolute, $maxlength_urlname_stub;
 
-$Form->begin_fieldset( T_('Access parameters') );
+$Form->begin_fieldset( T_('Blog URL parameters') );
 
 	// TODO: we should have an extra DB column that either defines type of blog_siteurl OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
 	$Form->radio( 'blog_siteurl_type', $blog_siteurl_type,

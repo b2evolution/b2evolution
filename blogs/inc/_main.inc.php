@@ -228,18 +228,15 @@ require_once $model_path.'sessions/_hit.class.php';
 $Hit = & new Hit();
 
 
-if( $is_web )
-{
-	/**
-	 * The Session class.
-	 * It has to be instantiated before the "SessionLoaded" hook.
-	 */
-	require_once $model_path.'sessions/_session.class.php';
-	/**
-	 * @global Session The Session object
-	 */
-	$Session = & new Session();
-}
+/**
+ * The Session class.
+ * It has to be instantiated before the "SessionLoaded" hook.
+ */
+require_once $model_path.'sessions/_session.class.php';
+/**
+ * @global Session The Session object
+ */
+$Session = & new Session();
 
 
 /**
@@ -517,7 +514,7 @@ unset($pass);
 if( ! empty($current_User)
 		&& ! $current_User->validated
 		&& $Settings->get('newusers_mustvalidate')
-		&& $current_User->ID != 1       /* not admin user */
+		&& $current_User->ID != 1       /* not admin user: this is BAD: it makes it look like the validation doesn't work */
 		&& $current_User->group_ID != 1 /* not admin group */
 		&& $Request->param('action', 'string', '') != 'logout' )
 {
@@ -683,5 +680,178 @@ $Timer->pause( 'hacks.php' );
 
 
 /*
- nolog */
+ * $Log$
+ * Revision 1.29  2006/06/19 16:58:11  fplanque
+ * minor
+ *
+ * Revision 1.26  2006/06/13 21:49:14  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.25  2006/06/01 19:00:07  fplanque
+ * no message
+ *
+ * Revision 1.24  2006/05/28 22:36:47  blueyed
+ * Abstracted DB connect into single file.
+ *
+ * Revision 1.23  2006/05/19 17:03:58  blueyed
+ * locale activation fix from v-1-8, abstraction of setting DB connection charset
+ *
+ * Revision 1.22  2006/05/14 17:59:59  blueyed
+ * "try/catch" SET NAMES (Thanks, bodo)
+ *
+ * Revision 1.21  2006/05/12 22:46:23  blueyed
+ *
+ * Revision 1.19  2006/05/04 10:18:41  blueyed
+ * Added Session property to skip page content caching event.
+ *
+ * Revision 1.18  2006/05/03 01:53:42  blueyed
+ * Encode subject in mails correctly (if mbstrings is available)
+ *
+ * Revision 1.17  2006/05/02 05:46:08  blueyed
+ * fix
+ *
+ * Revision 1.16  2006/04/29 01:24:04  blueyed
+ * More decent charset support;
+ * unresolved issues include:
+ *  - front office still forces the blog's locale/charset!
+ *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
+ *
+ * Revision 1.15  2006/04/24 20:52:30  fplanque
+ * no message
+ *
+ * Revision 1.14  2006/04/22 02:36:38  blueyed
+ * Validate users on registration through email link (+cleanup around it)
+ *
+ * Revision 1.13  2006/04/21 17:05:08  blueyed
+ * cleanup
+ *
+ * Revision 1.12  2006/04/20 22:24:07  blueyed
+ * plugin hooks cleanup
+ *
+ * Revision 1.11  2006/04/19 20:13:48  fplanque
+ * do not restrict to :// (does not catch subdomains, not even www.)
+ *
+ * Revision 1.9  2006/04/18 19:28:34  fplanque
+ * mambo idea
+ *
+ * Revision 1.8  2006/04/18 14:18:03  fplanque
+ * security fix
+ *
+ * Revision 1.7  2006/04/14 19:25:31  fplanque
+ * evocore merge with work app
+ *
+ * Revision 1.6  2006/04/06 17:21:34  blueyed
+ * Fixed login procedure for https-admin_url: the login form now POSTs to itself and we redirect to the target url after successful login
+ *
+ * Revision 1.5  2006/03/24 19:40:49  blueyed
+ * Only use absolute URLs if necessary because of used <base/> tag. Added base_tag()/skin_base_tag(); deprecated skinbase()
+ *
+ * Revision 1.4  2006/03/12 23:08:53  fplanque
+ * doc cleanup
+ *
+ * Revision 1.3  2006/03/05 23:53:54  blueyed
+ * If we have login_error Messages, do not login the user.
+ *
+ * Revision 1.2  2006/03/01 01:07:43  blueyed
+ * Plugin(s) polishing
+ *
+ * Revision 1.1  2006/02/23 21:11:55  fplanque
+ * File reorganization to MVC (Model View Controller) architecture.
+ * See index.hml files in folders.
+ * (Sorry for all the remaining bugs induced by the reorg... :/)
+ *
+ * Revision 1.87  2006/02/13 20:20:09  fplanque
+ * minor / cleanup
+ *
+ * Revision 1.86  2006/02/12 14:26:37  blueyed
+ * Fixed and enhanced login form (log into backoffice)
+ *
+ * Revision 1.85  2006/02/10 22:08:07  fplanque
+ * Various small fixes
+ *
+ * Revision 1.84  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
+ * Revision 1.83  2006/02/01 21:36:51  blueyed
+ * Trigger CacheObject event
+ *
+ * Revision 1.80  2006/01/26 23:08:36  blueyed
+ * Plugins enhanced.
+ *
+ * Revision 1.79  2006/01/22 20:52:24  blueyed
+ * Documented movin $Plugins/$Session init up.
+ *
+ * Revision 1.78  2006/01/12 21:55:13  blueyed
+ * Fix
+ *
+ * Revision 1.76  2006/01/02 19:43:57  fplanque
+ * just a little new year cleanup
+ *
+ * Revision 1.75  2005/12/30 20:13:40  fplanque
+ * UI changes mostly (need to double check sync)
+ *
+ * Revision 1.73  2005/12/22 23:13:40  blueyed
+ * Plugins' API changed and handling optimized
+ *
+ * Revision 1.72  2005/12/14 19:36:16  fplanque
+ * Enhanced file management
+ *
+ * Revision 1.71  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
+ * Revision 1.70  2005/11/25 15:02:00  blueyed
+ * $GroupCache: tell him about the name field. This allows to use get_by_name().
+ *
+ * Revision 1.68  2005/11/24 00:28:18  blueyed
+ * Include _vars.inc.php before _conf_error.inc.php!
+ *
+ * Revision 1.67  2005/11/18 22:28:30  blueyed
+ * Fix case for FileCache
+ *
+ * Revision 1.66  2005/11/14 18:23:13  blueyed
+ * Remove experimental memcache support.
+ *
+ * Revision 1.65  2005/11/09 02:54:42  blueyed
+ * Moved inclusion of _file.funcs.php to _misc.funcs.php, because at least bytesreable() gets used in debug_info()
+ *
+ * Revision 1.64  2005/11/08 15:21:55  blueyed
+ * Fix $Debuglog-init when !$debug. We create it now first of class Log and after loading the config it gets re-instantiated of class Log_noop when !$debug. This allows to use $Debuglog during config loading with $debug enabled.
+ *
+ * Revision 1.63  2005/11/07 18:34:38  blueyed
+ * Added class Log_noop, a no-operation implementation of class Log, which gets used if $debug is false.
+ *
+ * Revision 1.62  2005/11/07 03:27:42  blueyed
+ * Use $Session to display a note about already logged in User (because $current_User does not get auto-set if 'login' param is given)
+ *
+ * Revision 1.61  2005/11/07 03:10:57  blueyed
+ * Allow $login to override already logged in user
+ *
+ * Revision 1.60  2005/11/03 18:23:44  fplanque
+ * minor
+ *
+ * Revision 1.59  2005/11/02 20:11:19  fplanque
+ * "containing entropy"
+ *
+ * Revision 1.58  2005/10/31 23:40:47  blueyed
+ * Remove deprecated user/pass cookies
+ *
+ * Revision 1.57  2005/10/31 06:46:08  blueyed
+ * Fix Debuglog for login procedure
+ *
+ * Revision 1.56  2005/10/31 06:13:03  blueyed
+ * Finally merged my work on $Session in.
+ *
+ * Revision 1.55  2005/10/27 15:25:03  fplanque
+ * Normalization; doc; comments.
+ *
+ * Revision 1.54  2005/10/26 22:42:38  mfollett
+ * Modified user retrieval process from using user cookie and password cookie to using session key and session ID to retrieve user information from the sessions table
+ *
+ * Revision 1.53  2005/10/13 22:17:30  blueyed
+ * Moved include of _misc.funcs.inc.php to _main.inc.php
+ *
+ * Revision 1.52  2005/10/11 19:28:57  blueyed
+ * Added decent error message if tables do not exist yet (not installed).
+ *
+ */
 ?>
