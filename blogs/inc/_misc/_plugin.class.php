@@ -746,7 +746,7 @@ class Plugin
 	 *                        E.g., 'plug_version' might be interesting to compare again "$this->version".
 	 * @return boolean If this method returns false, the Plugin gets unregistered (for the current request only).
 	 */
-	function AppendPluginRegister()
+	function AppendPluginRegister( & $params )
 	{
 		return true;
 	}
@@ -2323,6 +2323,9 @@ class Plugin
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.64  2006/06/19 20:59:14  blueyed
+ * minor
+ *
  * Revision 1.63  2006/06/10 19:16:17  blueyed
  * DisplayTrackbackAddr event
  *

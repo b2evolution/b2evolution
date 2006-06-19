@@ -205,6 +205,8 @@ class Plugins
 	 * ones which just get called on the plugin (and get not remembered in T_pluginevents), e.g.:
 	 *  - AfterInstall
 	 *  - AppendPluginRegister
+	 *  - BeforeEnable
+	 *  - BeforeDisable
 	 *  - BeforeInstall
 	 *  - BeforeUninstall
 	 *  - BeforeUninstallPayload
@@ -2735,6 +2737,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.56  2006/06/19 20:59:14  blueyed
+ * minor
+ *
  * Revision 1.55  2006/06/10 19:16:17  blueyed
  * DisplayTrackbackAddr event
  *
