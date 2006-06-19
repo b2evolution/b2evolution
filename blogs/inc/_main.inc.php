@@ -90,6 +90,7 @@ foreach( $protects as $protect )
 }
 /*
  * fp> Alternatively we might want to kill all auto registered globals this way:
+ * dh> "Alternatively"? AFAICS the above does not protect us against register_globals!
  * TODO: testing
  *
 $superglobals = array($_SERVER, $_ENV, $_FILES, $_COOKIE, $_POST, $_GET);
@@ -663,6 +664,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.32  2006/06/19 21:13:52  blueyed
+ * todo comment
+ *
  * Revision 1.31  2006/06/19 21:06:55  blueyed
  * Moved ETag- and GZip-support into transport optimizer plugin.
  *
