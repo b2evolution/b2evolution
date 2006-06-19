@@ -104,7 +104,8 @@ if( (!isset($config_is_done) || !$config_is_done) )
 }
 
 
-$use_obhandler = false;  // no output buffering!
+// TODO: this should use no output buffering (probably to display page content during import, which may take long)!
+
 
 // Check if user is logged in and is in group #1 (admins)
 if( !is_logged_in() || $current_User->Group->ID != 1 )
@@ -868,7 +869,7 @@ param( 'mode', 'string', 'normal' );
 							$new_user->set('pass', md5( $default_password ));
 							$new_user->set('level', $default_userlevel);
 							$new_user_Group = & $GroupCache->get_by_ID( $default_usergroup );
-							$new_user->setGroup( $new_user_Group );
+							$new_user->set_Group( $new_user_Group );
 
 							if( !$simulate )
 							{
