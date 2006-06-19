@@ -1844,7 +1844,7 @@ function debug_info( $force = false )
 		$table_rows_ignore_perhaps = array();
 		foreach( $timer_rows as $l_cat => $l_time )
 		{
-			$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : 0;
+			$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : '0';
 
 			$row = "\n<tr>"
 				.'<td>'.$l_cat.'</td>'
@@ -1923,73 +1923,6 @@ function debug_info( $force = false )
 		$DB->dump_queries();
 	}
 	echo '</div>';
-}
-
-
-/**
- * Output Buffer handler.
- *
- * It will be set in /inc/_main.inc.php and handle the output (if enabled).
- * It generates a md5-ETag, which is checked against the one that may have
- * been sent by the browser, allowing us to just send a "304 Not modified" response.
- *
- * @param string output given by PHP
-*/
-function obhandler( $output )
-{
-	global $lastmodified, $use_gzipcompression, $use_etags;
-	global $localtimenow;
-
-	// we're sending out by default
-	$sendout = true;
-
-	if( !isset( $lastmodified ) )
-	{ // default of lastmodified is now
-		$lastmodified = $localtimenow;
-	}
-
-	if( $use_etags )
-	{ // Generating ETAG
-
-		// prefix with PUB (public page) or AUT (private page).
-		$ETag = is_logged_in() ? '"AUT' : '"PUB';
-		$ETag .= md5( $out ).'"';
-		header( 'ETag: '.$ETag );
-
-		// decide to send out or not
-		if( isset($_SERVER['HTTP_IF_NONE_MATCH'])
-				&& stripslashes($_SERVER['HTTP_IF_NONE_MATCH']) === $ETag )
-		{ // client has this page already
-			$sendout = false;
-		}
-	}
-
-	if( !$sendout )
-	{  // send 304 and die
-		header( 'Content-Length: 0' );
-		header( $_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified' );
-		#$Hit->log();  // TODO: log this somehow?
-		exit();
-	};
-
-
-	// Send Last-Modified -----------------
-	// We should perhaps make this the central point for this.
-	// Also handle Cache-Control and Pragma here (with global vars).
-
-	// header( 'Last-Modified: ' . gmdate('D, d M Y H:i:s \G\M\T', $lastmodified) );
-
-
-	// GZIP encoding
-	if( $use_gzipcompression && isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') )
-	{ // requested/accepted by browser:
-		$out = gzencode($out);
-		header( 'Content-Encoding: gzip' );
-	}
-
-
-	header( 'Content-Length: '.strlen($out) );
-	return $out;
 }
 
 
@@ -3019,6 +2952,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.65  2006/06/19 21:06:55  blueyed
+ * Moved ETag- and GZip-support into transport optimizer plugin.
+ *
  * Revision 1.64  2006/06/19 20:59:38  fplanque
  * noone should die anonymously...
  *

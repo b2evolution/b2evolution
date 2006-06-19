@@ -284,15 +284,6 @@ require_once dirname(__FILE__).'/_misc/_request.class.php';
 $Request = & new Request( $Messages );
 
 
-/**
- * Check conf...
- */
-if( !function_exists( 'gzencode' ) )
-{ // when there is no function to gzip, we won't do it
-	$Debuglog->add( '$use_gzipcompression is true, but the function gzencode() does not exist. Disabling gzip compression.' );
-	$use_gzipcompression = false;
-}
-
 if( !isset( $use_html_checker ) ) { $use_html_checker = 1; }
 
 
@@ -364,15 +355,6 @@ require_once dirname(__FILE__).'/_misc/ext/_swfcharts.php';
  */
 require_once dirname(__FILE__).'/_misc/_iconlegend.class.php';
 $IconLegend = new IconLegend();
-
-
-/**
- * Output buffering?
- */
-if( $use_obhandler )
-{ // register output buffer handler
-	ob_start( 'obhandler' );
-}
 
 
 /**
@@ -681,6 +663,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.31  2006/06/19 21:06:55  blueyed
+ * Moved ETag- and GZip-support into transport optimizer plugin.
+ *
  * Revision 1.30  2006/06/19 20:59:37  fplanque
  * noone should die anonymously...
  *

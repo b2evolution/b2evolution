@@ -234,28 +234,6 @@ $db_config['use_transactions'] = false;
 $db_use_fkeys = false;
 
 
-// ** Saving bandwidth **
-
-/**
- * use output buffer.
- *
- * This is required for gzip and ETags (see below).
- *
- * Disabled by default.
- *
- * Even without using gzip compression or ETags this allows to send a Content-Length.
- *
- * Warning: this will prevent from sending the output progressively to the webserver.
- * If a long page takes 2 seconds to be generated completely on a loaded server, the top
- * of the page will only be sent after those 2 seconds, and the user won't see anything
- * during at least 2 seconds (generation + transmission time). Without this setting, the
- * output will be sent progressively starting at 0 seconds and the user will start seeing
- * something earlier (0 + transmission time).
- *
- * @global boolean $use_obhandler
- */
-$use_obhandler = false;
-
 /**
  * Display elements that are different on each request (Page processing time, ..)
  *
@@ -264,36 +242,6 @@ $use_obhandler = false;
  * @global boolean Default: false
  */
 $obhandler_debug = false;
-
-/**
- * GZip compression.
- *
- * Disabled by default.
- *
- * Can actually be done either by PHP or your webserver [default]
- * (for example if you use Apache with mod_gzip).
- * - Set this to 1 if you want PHP to do gzip compression
- * - Set this to 0 if you want to let Apache do the job instead of PHP (you must enable this there)
- * Letting apache do the compression will make PHP debugging easier.
- * Thus it is recommended to keep it that way.
- *
- * @global boolean $use_gzipcompression
- */
-$use_gzipcompression = false;
-
-/**
- * ETags support.
- *
- * Disabled by default.
- *
- * This will send an ETag with every page, so we can say "Not Modified." if exactly the same
- * page had been sent before.
- *
- * Etags don't work right in some versions of IE. You won't be able to force refreshment of a page.
- *
- * @global boolean $use_etags
- */
-$use_etags = false;
 
 
 // ** Cookies **
