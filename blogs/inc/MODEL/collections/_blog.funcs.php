@@ -433,13 +433,13 @@ function get_blogparams_by_ID( $blog_ID )
 {
 	global $cache_blogs;
 
-	if( $blog_ID < 1 ) die( 'No blog is selected!' );
+	if( $blog_ID < 1 ) debug_die( 'No blog is selected!' );
 
 	if( empty($cache_blogs[$blog_ID]) )
 	{
 		blog_load_cache();
 	}
-	if( !isset( $cache_blogs[$blog_ID] ) ) die( T_('Requested blog does not exist!') );
+	if( !isset( $cache_blogs[$blog_ID] ) ) debug_die( T_('Requested blog does not exist!') );
 	return $cache_blogs[ $blog_ID ];
 }
 
@@ -456,13 +456,13 @@ function Blog_get_by_ID( $blog_ID )
 {
 	global $cache_blogs;
 
-	if( $blog_ID < 1 ) die( 'No blog is selected!' );
+	if( $blog_ID < 1 ) debug_die( 'No blog is selected!' );
 
 	if( empty($cache_blogs[$blog_ID]) )
 	{
 		blog_load_cache();
 	}
-	if( !isset( $cache_blogs[$blog_ID] ) ) die( T_('Requested blog does not exist!') );
+	if( !isset( $cache_blogs[$blog_ID] ) ) debug_die( T_('Requested blog does not exist!') );
 
 	return new Blog( $cache_blogs[$blog_ID] ); // COPY !
 }
@@ -634,6 +634,9 @@ function autoselect_blog( $selectedBlog, $permname, $permlevel = 'any' )
 
 /*
  * $Log$
+ * Revision 1.6  2006/06/19 20:07:46  fplanque
+ * minor
+ *
  * Revision 1.5  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

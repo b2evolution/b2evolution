@@ -48,7 +48,7 @@ $display_params = array(
 						'header_text_single' => T_('1 page'),
 					'header_end' => '</div>',
 					'footer_start' => '',
-						'footer_text' => '<div class="NavBar center"><strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$</div>\n\n',
+						'footer_text' => '<div class="NavBar center"><strong>Pages</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$</div>',
 						'footer_text_single' => '',
 							'prev_text' => T_('Previous'),
 							'next_text' => T_('Next'),
@@ -257,6 +257,9 @@ $ItemList->display_nav( 'footer' );
 <?php
 /*
  * $Log$
+ * Revision 1.14  2006/06/19 20:07:22  fplanque
+ * minor
+ *
  * Revision 1.13  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *
