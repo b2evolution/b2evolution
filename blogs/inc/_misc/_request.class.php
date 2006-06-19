@@ -108,7 +108,7 @@ class Request
 	function param( $var, $type = '', $default = '', $memorize = false,
 									$override = false, $use_default = true, $strict_typing = 'allow_empty' )
 	{
-		return $this->params[$var] = param( $var, $type, $default, $memorize, $use_default, $strict_typing );
+		return $this->params[$var] = param( $var, $type, $default, $memorize, $override, $use_default, $strict_typing );
 	}
 
 
@@ -1006,6 +1006,9 @@ class Request
 
 /*
  * $Log$
+ * Revision 1.15  2006/06/19 20:04:48  fplanque
+ * fixed param()
+ *
  * Revision 1.14  2006/06/19 16:58:11  fplanque
  * minor
  *
