@@ -33,12 +33,12 @@ function check_db_version()
 		$old_db_version = $DB->get_var( 'SELECT db_version FROM T_settings' );
 	}
 
-	if( empty($old_db_version) ) die( T_('NOT FOUND! This is not a b2evolution database.') );
+	if( empty($old_db_version) ) debug_die( T_('NOT FOUND! This is not a b2evolution database.') );
 
 	echo $old_db_version, ' : ';
 
-	if( $old_db_version < 8000 ) die( T_('This version is too old!') );
-	if( $old_db_version > $new_db_version ) die( T_('This version is too recent! We cannot downgrade to it!') );
+	if( $old_db_version < 8000 ) debug_die( T_('This version is too old!') );
+	if( $old_db_version > $new_db_version ) debug_die( T_('This version is too recent! We cannot downgrade to it!') );
 	echo "OK.<br />\n";
 }
 
@@ -133,6 +133,9 @@ function install_validate_requirements()
 
 /*
  * $Log$
+ * Revision 1.12  2006/06/19 20:59:38  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.11  2006/04/06 08:52:27  blueyed
  * Validate install "misc" requirements ("tokenizer" support for now)
  *

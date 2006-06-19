@@ -319,7 +319,7 @@ class Results extends Widget
 
 			if( !preg_match( '#SELECT \s+ (.+?) \s+ FROM#six', $this->sql, $matches ) )
 			{
-				die( 'Results->query() : No SELECT clause!' );
+				debug_die( 'Results->query() : No SELECT clause!' );
 			}
 
 			// Split requested columns by commata
@@ -341,7 +341,7 @@ class Results extends Widget
 
 			if( !isset($this->cols[0]) )
 			{
-				die( 'No columns selected!' );
+				debug_die( 'No columns selected!' );
 			}
 		}
 
@@ -462,7 +462,7 @@ class Results extends Widget
 			 */
 			// Tentative 1:
 			// if( !preg_match( '#FROM(.*?)((WHERE|ORDER BY|GROUP BY) .*)?$#si', $sql_count, $matches ) )
-			//  die( "Can't understand query..." );
+			//  debug_die( "Can't understand query..." );
 			// if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
 			// { // there was a coma or a JOIN clause in the FROM clause of the original query,
 			// Tentative 2:
@@ -1989,6 +1989,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.13  2006/06/19 20:59:38  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.12  2006/06/19 16:53:58  fplanque
  * better filter presets
  *

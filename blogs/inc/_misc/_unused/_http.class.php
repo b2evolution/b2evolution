@@ -27,12 +27,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @author Welby McRoberts - {@link http://www.wheely-bin.co.uk/}
  **/
-if(ereg('_class', $_SERVER['SCRIPT_NAME']))
-{
-    die("You have too many shoes");
-}
-
-
 class Http {
 
   function socket_post($server, $port, $url, $vars) {
@@ -240,6 +234,9 @@ class Http {
 
 /*
  * $Log$
+ * Revision 1.3  2006/06/19 20:59:38  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.2  2006/03/12 23:09:25  fplanque
  * doc cleanup
  *

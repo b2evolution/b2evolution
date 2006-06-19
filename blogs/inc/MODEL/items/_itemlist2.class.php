@@ -666,7 +666,7 @@ class ItemList2 extends DataObjectList2
 			$this->page = 1;
 		}
 		else
-			die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
+			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
 
 			
 
@@ -728,7 +728,7 @@ class ItemList2 extends DataObjectList2
 			}
 		}
 		else
-			die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
+			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
 
 
 		// GET DATA ROWS:
@@ -1091,7 +1091,7 @@ class ItemList2 extends DataObjectList2
 			}
 		}
 		else
-			die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
+			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->unit.' (paged mode is obsolete)' );
 
 
 		return $title_array;
@@ -1417,6 +1417,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.10  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.9  2006/06/19 16:53:58  fplanque
  * better filter presets
  *

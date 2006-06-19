@@ -1969,7 +1969,7 @@ function obhandler( $output )
 		header( 'Content-Length: 0' );
 		header( $_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified' );
 		#$Hit->log();  // TODO: log this somehow?
-		die;
+		exit();
 	};
 
 
@@ -3019,6 +3019,9 @@ function unserialize_callback( $classname )
 
 /*
  * $Log$
+ * Revision 1.64  2006/06/19 20:59:38  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.63  2006/06/19 16:52:09  fplanque
  * better param() function
  *

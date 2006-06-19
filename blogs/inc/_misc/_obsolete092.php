@@ -155,7 +155,7 @@ function get_userdata( $userid )
 
 	if( ! isset( $cache_userdata[$userid] ) )
 	{
-		die('Requested user does not exist!');
+		debug_die('Requested user does not exist!');
 	}
 
 	return $cache_userdata[$userid];
@@ -1155,7 +1155,7 @@ function mysql_oops( $sql_query )
 	$error  = '<p class="error">'. T_('Oops, MySQL error!'). '</p>'
 		. '<p>Your query:<br /><code>'. $sql_query. '</code></p>'
 		. '<p>MySQL said:<br /><code>'. mysql_error(). ' (error '. mysql_errno(). ')</code></p>';
-	die( $error );
+	debug_die( $error );
 }
 
 
@@ -1672,6 +1672,9 @@ $b2_version = $app_version;
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/19 20:59:38  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.7  2006/05/30 21:53:06  blueyed
  * Replaced $EvoConfig->DB with $db_config
  *

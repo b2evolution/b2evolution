@@ -61,7 +61,7 @@ function cat_create(
 
 	if( $cat_blog_ID == NULL )
 	{
-		if( empty($cat_parent_ID) ) die ( 'cat_create(-) missing parameters!' );
+		if( empty($cat_parent_ID) ) debug_die ( 'cat_create(-) missing parameters!' );
 		$parent_cat = get_the_category_by_ID($cat_parent_ID);
 		$cat_blog_ID = $parent_cat['cat_blog_ID'];
 	}
@@ -250,7 +250,7 @@ function get_the_category_by_ID( $cat_ID, $die = true )
 	{
 		if( $die )
 		{
-			die( sprintf( T_('Requested category %s does not exist!'),  $cat_ID ) );
+			debug_die( sprintf( T_('Requested category %s does not exist!'),  $cat_ID ) );
 		}
 		else return false;
 	}
@@ -965,6 +965,9 @@ function cat_req_dummy() {}
 
 /*
  * $Log$
+ * Revision 1.6  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.5  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

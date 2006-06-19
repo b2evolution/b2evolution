@@ -1376,7 +1376,7 @@ class Item extends DataObject
 				break;
 
 			default:
-				die( "Unknown feedback type [$type]" );
+				debug_die( "Unknown feedback type [$type]" );
 		}
 
 		if( $use_popup == '#' )
@@ -2710,5 +2710,274 @@ class Item extends DataObject
 
 
 /*
- nolog */
+ * $Log$
+ * Revision 1.62  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
+ * Revision 1.58  2006/06/15 15:01:19  fplanque
+ * bugfix
+ *
+ * Revision 1.57  2006/06/12 00:42:21  blueyed
+ * Item::get_trackback_url() added
+ *
+ * Revision 1.56  2006/06/05 23:15:00  blueyed
+ * cleaned up plugin help links
+ *
+ * Revision 1.55  2006/06/05 18:03:46  blueyed
+ * *** empty log message ***
+ *
+ * Revision 1.54  2006/06/02 20:12:37  fplanque
+ * I don't like that fuzzy code.
+ *
+ * Revision 1.53  2006/06/01 21:07:33  blueyed
+ * Moved ItemCanComment back.
+ *
+ * Revision 1.52  2006/06/01 18:36:09  fplanque
+ * no message
+ *
+ * Revision 1.51  2006/05/30 20:32:57  blueyed
+ * Lazy-instantiate "expensive" properties of Comment and Item.
+ *
+ * Revision 1.50  2006/05/30 19:39:55  fplanque
+ * plugin cleanup
+ *
+ * Revision 1.49  2006/05/29 23:40:34  blueyed
+ * Do not display errors with "comment" feedback link.
+ *
+ * Revision 1.48  2006/05/29 22:27:46  blueyed
+ * Use NULL instead of false for "no display".
+ *
+ * Revision 1.47  2006/05/29 19:28:44  fplanque
+ * no message
+ *
+ * Revision 1.46  2006/05/24 20:46:05  blueyed
+ * Forgot to commit changes needed for the "ItemCanComment" event.
+ *
+ * Revision 1.44  2006/05/19 18:15:05  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.43.2.1  2006/05/19 15:06:24  fplanque
+ * dirty sync
+ *
+ * Revision 1.43  2006/05/12 21:53:37  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
+ * Revision 1.42  2006/04/29 23:27:10  blueyed
+ * Only trigger update/insert/delete events if parent returns true
+ *
+ * Revision 1.41  2006/04/24 20:35:32  fplanque
+ * really nasty bugs!
+ *
+ * Revision 1.40  2006/04/24 20:31:15  blueyed
+ * doc fixes
+ *
+ * Revision 1.39  2006/04/19 20:13:50  fplanque
+ * do not restrict to :// (does not catch subdomains, not even www.)
+ *
+ * Revision 1.38  2006/04/19 19:52:27  blueyed
+ * url-encode redirect_to param
+ *
+ * Revision 1.37  2006/04/19 17:25:31  blueyed
+ * Commented debug output out
+ *
+ * Revision 1.36  2006/04/19 15:56:02  blueyed
+ * Renamed T_posts.post_comments to T_posts.post_comment_status (DB column rename!);
+ * and Item::comments to Item::comment_status (Item API change)
+ *
+ * Revision 1.35  2006/04/19 13:05:21  fplanque
+ * minor
+ *
+ * Revision 1.34  2006/04/18 21:09:20  blueyed
+ * Added hooks to manipulate Items before insert/update/preview; fixes; cleanup
+ *
+ * Revision 1.33  2006/04/18 20:41:00  blueyed
+ * Decent getters/setters for renderers.
+ *
+ * Revision 1.31  2006/04/13 01:23:19  blueyed
+ * Moved help related functions back to Plugin class
+ *
+ * Revision 1.30  2006/04/11 22:28:58  blueyed
+ * cleanup
+ *
+ * Revision 1.29  2006/04/11 21:22:25  fplanque
+ * partial cleanup
+ *
+ * Revision 1.28  2006/04/10 23:11:40  blueyed
+ * Fixed incrementing view count on ALL items altogether! :/
+ *
+ * Revision 1.27  2006/04/06 09:39:10  blueyed
+ * doc
+ *
+ * Revision 1.26  2006/04/05 19:16:34  blueyed
+ * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
+ *
+ * Revision 1.25  2006/04/04 21:49:02  blueyed
+ * doc
+ *
+ * Revision 1.24  2006/03/27 21:22:11  fplanque
+ * more admin link fixes
+ *
+ * Revision 1.23  2006/03/24 20:24:37  fplanque
+ * fixed admin links
+ *
+ * Revision 1.21  2006/03/23 23:34:13  blueyed
+ * cleanup
+ *
+ * Revision 1.20  2006/03/23 22:01:17  blueyed
+ * todo
+ *
+ * Revision 1.19  2006/03/23 21:02:19  fplanque
+ * cleanup
+ *
+ * Revision 1.18  2006/03/21 19:55:05  blueyed
+ * notifications: cache by locale/nicer (padded) formatting; respect $allow_msgform in msgform_link()
+ *
+ * Revision 1.17  2006/03/18 19:17:53  blueyed
+ * Removed remaining use of $img_url
+ *
+ * Revision 1.16  2006/03/15 19:31:26  blueyed
+ * whitespace
+ *
+ * Revision 1.15  2006/03/12 23:08:59  fplanque
+ * doc cleanup
+ *
+ * Revision 1.14  2006/03/10 21:08:26  fplanque
+ * Cleaned up post browsing a little bit..
+ *
+ * Revision 1.13  2006/03/10 17:18:59  blueyed
+ * doc
+ *
+ * Revision 1.12  2006/03/09 22:29:59  fplanque
+ * cleaned up permanent urls
+ *
+ * Revision 1.11  2006/03/09 21:58:52  fplanque
+ * cleaned up permalinks
+ *
+ * Revision 1.10  2006/03/09 15:23:27  fplanque
+ * fixed broken images
+ *
+ * Revision 1.9  2006/03/07 19:13:31  fplanque
+ * isset() is more compact and more readable
+ *
+ * Revision 1.8  2006/03/06 21:14:49  blueyed
+ * Fixed incrementing view.
+ *
+ * Revision 1.7  2006/03/06 20:03:40  fplanque
+ * comments
+ *
+ * Revision 1.6  2006/03/02 19:57:53  blueyed
+ * Added DisplayIpAddress() and fixed/finished DisplayItemAllFormats()
+ *
+ * Revision 1.5  2006/03/01 01:07:43  blueyed
+ * Plugin(s) polishing
+ *
+ * Revision 1.4  2006/02/27 20:55:50  blueyed
+ * JS help links fixed
+ *
+ * Revision 1.2  2006/02/24 19:17:52  blueyed
+ * Only increment view count if current User is not the Author.
+ *
+ * Revision 1.1  2006/02/23 21:11:58  fplanque
+ * File reorganization to MVC (Model View Controller) architecture.
+ * See index.hml files in folders.
+ * (Sorry for all the remaining bugs induced by the reorg... :/)
+ *
+ * Revision 1.100  2006/02/11 21:50:07  fplanque
+ * doc
+ *
+ * Revision 1.99  2006/02/10 22:08:07  fplanque
+ * Various small fixes
+ *
+ * Revision 1.98  2006/02/10 22:05:07  fplanque
+ * Normalized itm links
+ *
+ * Revision 1.97  2006/02/06 20:05:30  fplanque
+ * minor
+ *
+ * Revision 1.95  2006/02/05 00:54:12  blueyed
+ * increment_viewcount(), doc
+ *
+ * Revision 1.94  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
+ * Revision 1.93  2006/02/03 17:35:17  blueyed
+ * post_renderers as TEXT
+ *
+ * Revision 1.91  2006/01/29 20:36:35  blueyed
+ * Renamed Item::getBlog() to Item::get_Blog()
+ *
+ * Revision 1.90  2006/01/26 23:08:35  blueyed
+ * Plugins enhanced.
+ *
+ * Revision 1.89  2006/01/26 20:09:58  blueyed
+ * Fix for comments visibility. Thanks to jbettis (http://forums.b2evolution.net/viewtopic.php?p=32435)
+ *
+ * Revision 1.87  2006/01/16 00:45:19  blueyed
+ * Item::content() extra check for "$disppage < 1".
+ *
+ * Revision 1.86  2006/01/15 17:59:23  blueyed
+ * API break of Item::url_link(). See http://dev.b2evolution.net/todo.php/2005/12/09/api_break_params_to_item_url_link_change
+ *
+ * Revision 1.85  2006/01/10 20:59:49  fplanque
+ * minor / fixed internal sync issues @ progidistri
+ *
+ * Revision 1.83  2006/01/06 18:58:08  blueyed
+ * Renamed Plugin::apply_when to $apply_rendering; added T_plugins.plug_apply_rendering and use it to find Plugins which should apply for rendering in Plugins::validate_list().
+ *
+ * Revision 1.81  2005/12/30 21:39:03  blueyed
+ * fix/todo
+ *
+ * Revision 1.79  2005/12/22 23:13:40  blueyed
+ * Plugins' API changed and handling optimized
+ *
+ * Revision 1.77  2005/12/12 19:44:09  fplanque
+ * Use cached objects by reference instead of copying them!!
+ *
+ * Revision 1.76  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
+ * Revision 1.75  2005/12/11 19:59:51  blueyed
+ * Renamed gen_permalink() to get_permalink()
+ *
+ * Revision 1.74  2005/12/05 20:54:05  blueyed
+ * Changed Item::views() to take $zero, $one and $more param and default to 'No views', '1 view' and '%d views' (translated). More consistent and easier on the skin.
+ *
+ * Revision 1.73  2005/12/05 18:17:19  fplanque
+ * Added new browsing features for the Tracker Use Case.
+ *
+ * Revision 1.71  2005/12/01 19:03:15  blueyed
+ * Use set() to set default priority to 3! Otherwise leaving it at the default setting would not call dbchange().
+ *
+ * Revision 1.70  2005/11/28 21:06:56  blueyed
+ * Item::msgform_link_assigned() to display link to message form of the assigned User
+ *
+ * Revision 1.65  2005/11/05 01:01:50  blueyed
+ * Fix noticed during install, when there's no $current_User. Do not assign a user in the constructor then.
+ *
+ * Revision 1.64  2005/11/04 22:40:01  fplanque
+ * fixed pesky default renderers
+ *
+ * Revision 1.63  2005/11/04 21:42:22  blueyed
+ * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
+ *
+ * Revision 1.62  2005/11/04 15:16:09  blueyed
+ * Use setter methods to set parameter values! dataobject::set_param() won't pass the parameter to dbchange() if it is already set to the same member value.
+ * This commit fixes the "foreign key constraint fails" when creating a new item during install or in edit_actions.
+ *
+ * Revision 1.61  2005/11/04 13:50:57  blueyed
+ * Dataobject::set_param() / set(): return true if a value has been set and false if it did not change. It will not get considered for dbchange() then, too.
+ *
+ * Revision 1.60  2005/10/26 22:52:30  blueyed
+ * Fix preview notices by fixing Itemlist::preview_request()
+ *
+ * Revision 1.59  2005/10/26 09:02:17  marian
+ * Fixed Notice Messages on the preview screen.
+ *
+ * Revision 1.58  2005/10/03 18:10:07  fplanque
+ * renamed post_ID field
+ *
+ * Revision 1.57  2005/10/03 17:26:44  fplanque
+ * synched upgrade with fresh DB;
+ * renamed user_ID field
+ */
 ?>

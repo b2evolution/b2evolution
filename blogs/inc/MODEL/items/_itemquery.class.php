@@ -207,7 +207,7 @@ class ItemQuery extends SQL
 
 		if( !isset( $this->blog ) )
 		{
-			die( 'Status restriction requires to work with aspecific blog first.' );
+			debug_die( 'Status restriction requires to work with aspecific blog first.' );
 		}
 
 		$this->WHERE_and( statuses_where_clause( $show_statuses, $this->dbprefix, $this->blog ) );
@@ -552,6 +552,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.6  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.5  2006/06/19 16:58:11  fplanque
  * minor
  *

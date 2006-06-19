@@ -85,7 +85,7 @@ foreach( $protects as $protect )
 		|| in_array( $protect, array_keys($_COOKIE) )
 		|| in_array( $protect, array_keys($_FILES) ) )
 	{
-		die("Invalid Request.");
+		bad_request_die( 'Unacceptable params.' );
 	}
 }
 /*
@@ -681,6 +681,9 @@ $Timer->pause( 'hacks.php' );
 
 /*
  * $Log$
+ * Revision 1.30  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.29  2006/06/19 16:58:11  fplanque
  * minor
  *

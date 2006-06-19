@@ -184,7 +184,7 @@ class SQL
 	 */
 	function SELECT_add( $select_add )
 	{
-		if( empty( $this->select ) ) die( 'Cannot extend empty SELECT clause' );
+		if( empty( $this->select ) ) debug_die( 'Cannot extend empty SELECT clause' );
 
 		$this->select .= ' '.$select_add;
 	}
@@ -205,7 +205,7 @@ class SQL
 	 */
 	function FROM_add( $from_add )
 	{
-		if( empty( $this->from ) ) die( 'Cannot extend empty FROM clause' );
+		if( empty( $this->from ) ) debug_die( 'Cannot extend empty FROM clause' );
 
 		$this->from .= ' '.$from_add;
 	}
@@ -402,6 +402,9 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.7  2006/06/19 20:59:38  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.6  2006/06/01 19:00:09  fplanque
  * no message
  *

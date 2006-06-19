@@ -82,7 +82,7 @@ class ItemCache extends DataObjectCache
 			$row = $DB->get_row( $sql );
 			if( empty( $row ) )
 			{	// Requested object does not exist
-				if( $halt_on_error ) die( "Requested $this->objtype does not exist!" );
+				if( $halt_on_error ) debug_die( "Requested $this->objtype does not exist!" );
 				// put into index:
 				$this->urltitle_index[$req_urltitle] = false;
 
@@ -146,6 +146,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.4  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

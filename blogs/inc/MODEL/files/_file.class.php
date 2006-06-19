@@ -511,7 +511,7 @@ class File extends DataObject
 			}
 			else
 			{ // No Access
-				die( 'Private directory! ');
+				debug_die( 'Private directory! ');
 			}
 		}
 		else
@@ -1334,6 +1334,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.11  2006/04/19 20:13:50  fplanque
  * do not restrict to :// (does not catch subdomains, not even www.)
  *

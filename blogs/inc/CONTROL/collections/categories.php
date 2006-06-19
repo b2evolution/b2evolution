@@ -142,7 +142,7 @@ switch( $action )
 		{ // We are moving to a different blog
 			if( ! $allow_moving_chapters )
 			{
-				die( 'Moving chapters between blogs is disabled. Cat and parent must be in the same blog!' );
+				bad_request_die( 'Moving chapters between blogs is disabled. Cat and parent must be in the same blog!' );
 			}
 			// check permissions on destination:
 			$current_User->check_perm( 'blog_cats', '', true, $parent_cat_blog_ID );
@@ -401,6 +401,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.7  2006/05/02 18:07:13  blueyed
  * Set blog to be used for exit to blogs link
  *

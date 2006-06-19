@@ -68,7 +68,7 @@ global $current_User;
 // Check global access permissions:
 if( ! $Settings->get( 'fm_enabled' ) )
 {
-	die( 'The filemanager is disabled.' );
+	bad_request_die( 'The filemanager is disabled.' );
 }
 
 // Check permission:
@@ -1497,6 +1497,9 @@ $AdminUI->disp_global_footer();
 /*
  * {{{ Revision log:
  * $Log$
+ * Revision 1.25  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.24  2006/06/13 21:49:15  blueyed
  * Merged from 1.8 branch
  *

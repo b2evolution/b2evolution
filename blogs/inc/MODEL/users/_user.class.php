@@ -694,7 +694,7 @@ class User extends DataObject
 	{
 		global $DB;
 
-		if( $this->ID == 0 ) die( 'Non persistant object cannot be deleted!' );
+		if( $this->ID == 0 ) debug_die( 'Non persistant object cannot be deleted!' );
 
 		$DB->begin();
 
@@ -1043,6 +1043,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.18  2006/06/18 01:14:03  blueyed
  * lazy instantiate user's group; normalisation
  *

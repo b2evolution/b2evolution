@@ -470,7 +470,7 @@ if( !$Messages->count('error') )
 			 * Delete user
 			 */
 			if( !isset($edited_User) )
-				die( 'no User set' );
+				debug_die( 'no User set' );
 
 			if( $edited_User->ID == $current_User->ID )
 			{
@@ -585,7 +585,7 @@ if( !$Messages->count('error') )
 			 * Delete group
 			 */
 			if( !isset($edited_Group) )
-				die( 'no Group set' );
+				debug_die( 'no Group set' );
 
 			if( $edited_Group->ID == 1 )
 			{
@@ -689,6 +689,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.22  2006/06/18 01:14:03  blueyed
  * lazy instantiate user's group; normalisation
  *

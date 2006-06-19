@@ -170,11 +170,9 @@ else
 
 	$Form->begin_fieldset( T_('Available locales') );
 
-	?>
 
-	<p class="center">
 
-	<?php
+	echo '<p class="center">';
 	if( $loc_transinfo )
 	{
 		echo '<a href="'.$pagenow.'?ctrl=locales">' . T_('Hide translation info'), '</a>';
@@ -183,11 +181,11 @@ else
 	{
 		echo '<a href="'.$pagenow.'?ctrl=locales&amp;loc_transinfo=1">' . T_('Show translation info'), '</a>';
 	}
+	echo '</p>';
+
+	echo '<table class="grouped" cellspacing="0">';
+
 	?>
-	</p>
-
-	<table class="grouped" cellspacing="0">
-
 	<tr>
 		<th class="firstcol"><?php echo T_('Locale') ?></th>
 		<th><?php echo T_('Enabled') ?></th>
@@ -297,7 +295,7 @@ else
 		}
 
 		if( $loc_transinfo )
-		{
+		{	// Show translation info:
 			// Get PO file for that locale:
 			$po_file = $locales_path.$locales[$lkey]['messages'].'/LC_MESSAGES/messages.po';
 			if( ! is_file( $po_file ) )
@@ -307,6 +305,7 @@ else
 			else
 			{	// File exists:
 				$lines = file( $po_file );
+
 				$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
 				$all = 0;
 				$fuzzy = 0;
@@ -367,11 +366,14 @@ else
 						$fuzzy++;
 					}
 				}
+
 				// $all=$translated+$fuzzy+$untranslated;
-				echo "\n\t<td class=\"center\">". $all ."</td>";
+				echo "\n\t".'<td class="center">'.$all.'</td>';
+
 				$percent_done = ($all > 0) ? round(($translated-$fuzzy/2)/$all*100) : 0;
 				$color = sprintf( '%02x%02x00', 255 - round($percent_done * 2.55), round($percent_done * 2.55) );
 				echo "\n\t<td class=\"center\" style=\"background-color:#". $color . "\">". $percent_done ." %</td>";
+
 			}
 
 			if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction  )
@@ -385,10 +387,9 @@ else
 
 		echo '</tr>';
 	}
-	?>
-	</table>
 
-	<?php
+	echo '</table>';
+
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{
 		echo '<p class="center"><a href="'.$pagenow.'?ctrl=locales&amp;action=edit'.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'&amp;edit_locale=_new_">'.get_icon( 'new' ).' '.T_('Create new locale').'</a></p>';
@@ -410,6 +411,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.6  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.5  2006/05/19 18:15:05  blueyed
  * Merged from v-1-8 branch
  *

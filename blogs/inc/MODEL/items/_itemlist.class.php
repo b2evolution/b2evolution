@@ -356,7 +356,7 @@ class ItemList extends DataObjectList
 			}
 		}
 		else
-			die( 'Unhandled LIMITING mode in ItemList (paged mode is obsolete)' );
+			debug_die( 'Unhandled LIMITING mode in ItemList (paged mode is obsolete)' );
 
 
 		// FINALIZE WHERE CLAUSE:
@@ -863,6 +863,9 @@ class ItemList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.10  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.9  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *

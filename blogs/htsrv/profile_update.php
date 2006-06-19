@@ -66,17 +66,17 @@ param( 'pass2', 'string', '' );
  */
 if( ! is_logged_in() )
 { // must be logged in!
-	die( T_('You are not logged in.') );
+	bad_request_die( T_('You are not logged in.') );
 }
 
 if( $checkuser_id != $current_User->ID )
 { // Can only edit your own profile
-	die( 'You are not logged in under the same account you are trying to modify.' );
+	bad_request_die( 'You are not logged in under the same account you are trying to modify.' );
 }
 
 if( $demo_mode && ($current_User->login == 'demouser') )
 {
-	die( 'Demo mode: you can\'t edit the demouser profile!<br />[<a href="javascript:history.go(-1)">'
+	bad_request_die( 'Demo mode: you can\'t edit the demouser profile!<br />[<a href="javascript:history.go(-1)">'
 		. T_('Back to profile') . '</a>]' );
 }
 
@@ -145,6 +145,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.45  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.44  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *

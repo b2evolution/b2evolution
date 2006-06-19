@@ -488,7 +488,7 @@ switch($action)
 
 		if( $blog == 1 )
 		{
-			die( 'You can\'t delete Blog #1!' );
+			bad_request_die( 'You can\'t delete Blog #1!' );
 		}
 
 		// Check permissions:
@@ -579,6 +579,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.13  2006/05/12 21:53:37  blueyed
  * Fixes, cleanup, translation for plugins
  *

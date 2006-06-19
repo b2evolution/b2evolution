@@ -318,7 +318,7 @@ class Blog extends DataObject
 				return $blogurl;
 
 			default:
-				die( 'Unhandled Blog access type ['.$this->access_type.']' );
+				debug_die( 'Unhandled Blog access type ['.$this->access_type.']' );
 		}
 	}
 
@@ -829,6 +829,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2006/06/19 20:59:37  fplanque
+ * noone should die anonymously...
+ *
  * Revision 1.8  2006/06/05 13:43:53  blueyed
  * todo questions
  *
