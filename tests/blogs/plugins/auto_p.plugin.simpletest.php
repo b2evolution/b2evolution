@@ -122,8 +122,8 @@ class AutoPPluginTestCase extends UnitTestCase
 			$this->render_wo_space( "foo<blockquote>asdf\ntwolines\nfollow</blockquote>" ) );
 
 		// non-block in between:
-		$this->assertWantedPattern( '~^<p>foo</p><code>asdf</code><p>bar</p>$~',
-			$this->render_wo_space( "foo\n<code>asdf</code>bar" ) );
+		$this->assertEqual( "<p>foo<br />\n<code>asdf</code>bar</p>",
+			$this->render( "foo\n<code>asdf</code>bar" ) );
 
 		// block element in between:
 		$this->assertWantedPattern( '~^<p>foo</p><div>asdf</div><p>bar</p>$~',

@@ -30,7 +30,7 @@ class auto_p_plugin extends Plugin
 	/**
 	 * @var string List of block elements (we want a paragraph before and after)
 	 */
-	var $block_tags = 'table|thead|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|blockquote|p|code|hr|fieldset|h[1-6]';
+	var $block_tags = 'table|thead|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|select|form|blockquote|p|hr|fieldset|h[1-6]';
 
 
 	/**
@@ -191,6 +191,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.15  2006/06/19 19:25:28  blueyed
+ * Fixed auto-p plugin: <code> is an inline element
+ *
  * Revision 1.14  2006/06/16 21:30:57  fplanque
  * Started clean numbering of plugin versions (feel free do add dots...)
  *
