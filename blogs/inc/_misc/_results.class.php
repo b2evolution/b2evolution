@@ -667,8 +667,8 @@ class Results extends Widget
    */
 	function display_filters()
 	{
-		global $debug, $Session, $filter_preset;
-
+		global $debug, $Session, $Request;
+		
 		if( empty( $this->filter_area ) )
 		{	// We don't want to display a filters section:
 			return;
@@ -703,7 +703,8 @@ class Results extends Widget
     	// Loop on all preset filters:
     	foreach( $this->filter_area['presets'] as $key => $preset )
     	{
-    		if( method_exists( $this, 'is_filtered' ) && !$this->is_filtered() && $filter_preset == $key )
+    		if( method_exists( $this, 'is_filtered' ) && !$this->is_filtered() 
+    					&& $Request->get( $this->param_prefix.'filter_preset' ) == $key )
     		{ // The list is not filtered and the filter preset is selected, so no link on: 
     			$r[] = '['.$preset[0].']';
     		}
@@ -1988,6 +1989,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.12  2006/06/19 16:53:58  fplanque
+ * better filter presets
+ *
  * Revision 1.11  2006/06/13 22:07:34  blueyed
  * Merged from 1.8 branch
  *

@@ -135,12 +135,14 @@ class ItemList2 extends DataObjectList2
 
 		// Initialize the default filter set:
 		$this->set_default_filters( array(
+				'filter_preset' => NULL,
 				'ts_min' => $timestamp_min,
         'ts_max' => $timestamp_max,
         'cat_array' => array(),
         'cat_modifier' => NULL,
 				'authors' => NULL,
 				'assignees' => NULL,
+				'author_assignee' => NULL,
 				'keywords' => NULL,
         'phrase' => 'AND',
         'exact' => 0,
@@ -165,11 +167,13 @@ class ItemList2 extends DataObjectList2
 	/**
 	 * Set default filter values we always want to use if not individually specified otherwise:
 	 *
-	 * @param array
+	 * @param array default filters to be merged with the class defaults
+	 * @param array default filters for each preset, to be merged with general default filters if the preset is used
 	 */
-	function set_default_filters( $default_filters )
+	function set_default_filters( $default_filters, $preset_filters = array() )
 	{
 		$this->default_filters = array_merge( $this->default_filters, $default_filters );
+		$this->preset_filters = $preset_filters;
 	}
 
 
@@ -189,10 +193,18 @@ class ItemList2 extends DataObjectList2
 
 		// Activate the filterset (fallback to default filter when a value is not set):
 		$this->filters = array_merge( $this->default_filters, $filters );
-
+		
+		// Activate preset filters if necessary:
+		$this->activate_preset_filters();
 
 		// set back the GLOBALS !!! needed for regenerate_url() :
+	
+		/*
+		 * Selected filter preset:
+		 */
+		$Request->memorize_param( $this->param_prefix.'filter_preset', 'string', $this->default_filters['filter_preset'], $this->filters['filter_preset'] );  // List of authors to restrict to
 
+		
 		/*
 		 * Blog & Chapters/categories restrictions:
 		 */
@@ -214,6 +226,12 @@ class ItemList2 extends DataObjectList2
 		 * Restrict to selected assignees:
 		 */
 		$Request->memorize_param( $this->param_prefix.'assgn', 'string', $this->default_filters['assignees'], $this->filters['assignees'] );  // List of assignees to restrict to
+		
+		
+		/*
+		 * Restrict to selected author OR assignee:
+		 */
+		$Request->memorize_param( $this->param_prefix.'author_assignee', 'string', $this->default_filters['author_assignee'], $this->filters['author_assignee'] ); 
 
 		/*
 		 * Restrict to selected statuses:
@@ -305,7 +323,16 @@ class ItemList2 extends DataObjectList2
 				return false;
 				/* BREAK */
 		}
+		
 
+		/**
+		 * Filter preset
+		 */
+		$this->filters['filter_preset'] = $Request->param( $this->param_prefix.'filter_preset', 'string', $this->default_filters['filter_preset'], true );
+
+		// Activate preset default filters if necessary:
+		$this->activate_preset_filters();
+			
 
 		/*
 		 * Blog & Chapters/categories restrictions:
@@ -328,6 +355,12 @@ class ItemList2 extends DataObjectList2
 		 * Restrict to selected assignees:
 		 */
 		$this->filters['assignees'] = $Request->param( $this->param_prefix.'assgn', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', $this->default_filters['assignees'], true );      // List of assignees to restrict to
+
+		
+		/*
+		 * Restrict to selected author or assignee:
+		 */
+		$this->filters['author_assignee'] = $Request->param( $this->param_prefix.'author_assignee', '/^[0-9]+$/', $this->default_filters['author_assignee'], true ); 
 
 
 		/*
@@ -437,7 +470,28 @@ class ItemList2 extends DataObjectList2
 
 		return true;
 	}
+	
+	
+	/**
+	 * Activate preset default filters if necessary
+	 *
+	 */
+	function activate_preset_filters()
+	{
+		$filter_preset = $this->filters['filter_preset'];
 
+		if( empty( $filter_preset ) )
+		{ // No filter preset, there are no additional defaults to use:
+			return;
+		}	
+
+		// Override general defaults with the specific defaults for the preset:
+		$this->default_filters = array_merge( $this->default_filters, $this->preset_filters[$filter_preset] );
+
+		// Save the name of the preset in order for is_filtered() to work properly:
+		$this->default_filters['filter_preset'] = $this->filters['filter_preset'];
+	}
+	
 
   /**
    * Save current filterset to session.
@@ -496,7 +550,7 @@ class ItemList2 extends DataObjectList2
 	 */
 	function query()
 	{
-		global $DB;
+		global $DB, $Request, $current_User;
 
 		if( !is_null( $this->rows ) )
 		{ // Query has already executed:
@@ -505,8 +559,12 @@ class ItemList2 extends DataObjectList2
 
 
 		if( empty( $this->filters ) )
-		{	// Filters have no been set before, we'll use the default filterset:
-			// echo ' Query:Setting default filterset ';
+		{	// Filters have not been set before, we'll use the default filterset:
+			// If there is a preset filter, we need to activate its specific defaults:
+			$this->filters['filter_preset'] = $Request->param( $this->param_prefix.'filter_preset', 'string', $this->default_filters['filter_preset'], true );
+			$this->activate_preset_filters();
+
+			// Use the default filters:
 			$this->set_filters( $this->default_filters );
 		}
 
@@ -524,6 +582,8 @@ class ItemList2 extends DataObjectList2
 
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
 
+		$this->ItemQuery->where_author_assignee( $this->filters['author_assignee'] );
+		
 		$this->ItemQuery->where_statuses( $this->filters['statuses'] );
 
 		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
@@ -1357,6 +1417,9 @@ class ItemList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.9  2006/06/19 16:53:58  fplanque
+ * better filter presets
+ *
  * Revision 1.8  2006/06/13 21:49:15  blueyed
  * Merged from 1.8 branch
  *
