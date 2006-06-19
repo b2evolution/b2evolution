@@ -1015,11 +1015,9 @@ function remove_magic_quotes( $mixed )
  * @param string Variable to set
  * @param string Force value type to one of:
  * - integer
- * - float
+ * - float, double
  * - string (strips (HTML-)Tags, trims whitespace)
- * - array
- * - object
- * - null
+ * - array	(TODO:  array/integer  , array/array/string )
  * - html (does nothing)
  * - '' (does nothing)
  * - '/^...$/' check regexp pattern match (string)
@@ -1028,17 +1026,22 @@ function remove_magic_quotes( $mixed )
  * @param mixed Default value or TRUE if user input required
  * @param boolean Do we need to memorize this to regenerate the URL for this page?
  * @param boolean Override if variable already set
- * @param boolean Force setting of variable to default?
+ * @param boolean Force setting of variable to default if no param is sent and var wasn't set before
+ * @param mixed true will refuse illegal values, false will try to convert illegal to legal values, 'allow_empty' will refuse illegale values but will always accept empty values (This helps blocking dirty spambots or borked index bots. Saves a lot of processor time by killing invalid requests)
  * @return mixed Final value of Variable, or false if we don't force setting and did not set
  */
 function param( $var, $type = '', $default = '', $memorize = false,
-								$override = false, $forceset = true )
+								$override = false, $use_default = true, $strict_typing = 'allow_empty' )
 {
 	global $global_param_list, $Debuglog, $debug, $evo_charset, $io_charset;
 	// NOTE: we use $GLOBALS[$var] instead of $$var, because otherwise it would conflict with param names which are used as function params ("var", "type", "default", ..)!
 
-	// Check if already set
-	// WARNING: when PHP register globals is ON, COOKIES get priority over GET and POST with this!!!
+	/*
+	 * STEP 1 : Set the variable
+   *
+	 * Check if already set
+	 * WARNING: when PHP register globals is ON, COOKIES get priority over GET and POST with this!!!
+	 */
 	if( !isset( $GLOBALS[$var] ) || $override )
 	{
 		if( isset($_POST[$var]) )
@@ -1058,10 +1061,10 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		}
 		elseif( $default === true )
 		{
-			debug_die( sprintf( T_('Parameter &laquo;%s&raquo; is required!'), $var ) );
+			bad_request_die( sprintf( T_('Parameter &laquo;%s&raquo; is required!'), $var ) );
 		}
-		elseif( $forceset )
-		{
+		elseif( $use_default )
+		{	// We haven't set any value yet and we really want one: use default:
 			$GLOBALS[$var] = $default;
 			// echo '<br>param(-): '.$var.'='.$GLOBALS[$var].' set by default';
 			// $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by default', 'params' );
@@ -1079,12 +1082,12 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		// $Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($GLOBALS[$var], true).']!', 'params' );
 	}
 
-	if( isset($io_charset) && $io_charset != $evo_charset )
-	{ // the INPUT/OUTPUT charset differs from the internal one (this also means mb_convert_encoding is available)
-		mb_convert_variables( $evo_charset, $io_charset, $GLOBALS[$var] );
-	}
 
-	// type will be forced even if it was set before and not overriden
+	/*
+	 * STEP 2: make sure the data fits the expected type
+	 *
+	 * type will be forced even if it was set before and not overriden
+	 */
 	if( !empty($type) && $GLOBALS[$var] !== NULL )
 	{ // Force the type
 		// echo "forcing type!";
@@ -1096,6 +1099,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 				break;
 
 			case 'string':
+				// strip out any html:
 				// echo $var, '=', $GLOBALS[$var], '<br />';
 				$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
@@ -1103,16 +1107,25 @@ function param( $var, $type = '', $default = '', $memorize = false,
 
 			default:
 				if( substr( $type, 0, 1 ) == '/' )
-				{	// We want to match against a regexp:
+				{	// We want to match against a REGEXP:
 					if( preg_match( $type, $GLOBALS[$var] ) )
 					{	// Okay, match
 						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> matched against '.$type, 'params' );
 					}
+					elseif( $strict_typing == 'allow_empty' && empty($GLOBALS[$var]) )
+					{	// No match but we accept empty value:
+						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> is empty: ok', 'params' );
+					}
+					elseif( $strict_typing )
+					{	// We cannot accept this MISMATCH:
+						bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+					}
 					else
-					{
+					{ // Fall back to default:
 						$GLOBALS[$var] = $default;
 						$Debuglog->add( 'param(-): <strong>'.$var.'</strong> DID NOT match '.$type.' set to default value='.$GLOBALS[$var], 'params' );
 					}
+
 					// From now on, consider this as a string: (we need this when memorizing)
 					$type = 'string';
 				}
@@ -1120,18 +1133,53 @@ function param( $var, $type = '', $default = '', $memorize = false,
 				{
 					// fplanque> note: there might be side effects to this, but we need
 					// this to distinguish between 0 and 'no input'
-					// Note: we do this after regexps because we may or may not want to allow empty string sin regexps
+					// Note: we do this after regexps because we may or may not want to allow empty strings in regexps
 					$GLOBALS[$var] = NULL;
 					$Debuglog->add( 'param(-): <strong>'.$var.'</strong> set to NULL', 'params' );
 				}
 				else
 				{
+					if( $strict_typing )
+					{	// We want to make sure the value is valid:
+						$regexp = '';
+						switch( $type )
+						{
+							case 'boolean':
+								$regexp = '/^(0|1|false|true)$/i';
+								break;
+
+							case 'integer':
+								$regexp = '/^(\+|-)?[0-9]+$/';
+								break;
+
+							case 'float':
+							case 'double':
+								$regexp = '/^(\+|-)?[0-9]+(.[0-9]+)?$/';
+								break;
+
+							// Note: other types are not tested here.
+						}
+						if( $strict_typing == 'allow_empty' && empty($GLOBALS[$var]) )
+						{	// We have an empty value and we accept it
+							// ok..
+						}
+						elseif( !empty( $regexp ) && !preg_match( $regexp, $GLOBALS[$var] ) )
+						{	// Value does not match!
+							bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+						}
+					}
+
+					// Change the variable type:
 					settype( $GLOBALS[$var], $type );
 					$Debuglog->add( 'param(-): <strong>'.$var.'</strong> typed to '.$type.', new value='.$GLOBALS[$var], 'params' );
 				}
 		}
 	}
 
+
+	/*
+	 * STEP 3: memorize the value for later url regeneration
+	 */
 	if( $memorize )
 	{ // Memorize this parameter
 		memorize_param( $var, $type, $default );
@@ -1712,6 +1760,47 @@ function debug_die( $additional_info = '' )
 
 
 /**
+ * Outputs Bad request Error message. When in debug mode it also prints a backtrace.
+ *
+ * This should be used when a bad user input is detected?
+ *
+ * @param string Message to output
+ */
+function bad_request_die( $additional_info = '' )
+{
+	global $debug, $baseurl;
+
+	// Attempt to output an error header (will not work if there is too much content already out):
+	// This should help preventing indexing robots from indexing the error :P
+	@header('HTTP/1.0 400 Bad Request');
+
+	echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
+	echo '<h3 style="color:#f00;">'.T_('Bad Request!').'</h3>';
+	echo '<p>'.T_('The parameters of your request are invalid.').'</p>';
+	echo '<p>'.T_('If you have obtained this error by clicking on a link INSIDE of this site, please report the bad link to the administrator.').'</p>';
+	echo '<p><a href="'.$baseurl.'">'.T_('Go back to home page').'</a></p>';
+	echo '</div>';
+
+	if( !empty( $additional_info ) )
+	{
+		echo '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">';
+		echo '<h3>'.T_('Additional information about this error:').'</h3>';
+		echo $additional_info;
+		echo '</div>';
+	}
+
+	if( $debug )
+	{
+		echo debug_get_backtrace();
+		debug_info();
+	}
+
+	// Attempt to keep the html valid (but it doesn't really matter anyway)
+	die( '</body></html>' );
+}
+
+
+/**
  * Outputs debug info, according to {@link $debug} or $force param. This gets called typically at the end of the page.
  *
  * @param boolean true to force output
@@ -1755,7 +1844,7 @@ function debug_info( $force = false )
 		$table_rows_ignore_perhaps = array();
 		foreach( $timer_rows as $l_cat => $l_time )
 		{
-			$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : '0';
+			$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : 0;
 
 			$row = "\n<tr>"
 				.'<td>'.$l_cat.'</td>'
@@ -2929,5 +3018,452 @@ function unserialize_callback( $classname )
 
 
 /*
- nolog */
+ * $Log$
+ * Revision 1.63  2006/06/19 16:52:09  fplanque
+ * better param() function
+ *
+ * Revision 1.59  2006/06/14 17:24:14  fplanque
+ * A little better debug_die()... useful for bozos.
+ * Removed bloated trace on error param from DB class. KISS (Keep It Simple Stupid)
+ *
+ * Revision 1.58  2006/06/13 22:07:34  blueyed
+ * Merged from 1.8 branch
+ *
+ * Revision 1.54.2.3  2006/06/12 20:00:41  fplanque
+ * one too many massive syncs...
+ *
+ * Revision 1.57  2006/06/05 23:15:00  blueyed
+ * cleaned up plugin help links
+ *
+ * Revision 1.56  2006/05/29 19:28:44  fplanque
+ * no message
+ *
+ * Revision 1.55  2006/05/19 18:15:05  blueyed
+ * Merged from v-1-8 branch
+ *
+ * Revision 1.54.2.1  2006/05/19 15:06:25  fplanque
+ * dirty sync
+ *
+ * Revision 1.54  2006/05/12 21:53:38  blueyed
+ * Fixes, cleanup, translation for plugins
+ *
+ * Revision 1.53  2006/05/04 10:12:20  blueyed
+ * Normalization/doc
+ *
+ * Revision 1.52  2006/05/04 01:08:20  blueyed
+ * Normalization/doc fix
+ *
+ * Revision 1.51  2006/05/04 01:05:37  blueyed
+ * Fix for PHP4
+ *
+ * Revision 1.50  2006/05/03 01:53:43  blueyed
+ * Encode subject in mails correctly (if mbstrings is available)
+ *
+ * Revision 1.49  2006/05/02 22:25:28  blueyed
+ * Comment preview for frontoffice.
+ *
+ * Revision 1.48  2006/04/30 18:29:33  blueyed
+ * Fixed validate_url() for user/pass; more explicit match
+ *
+ * Revision 1.47  2006/04/29 01:24:05  blueyed
+ * More decent charset support;
+ * unresolved issues include:
+ *  - front office still forces the blog's locale/charset!
+ *  - if there's content in utf8, it cannot get displayed with an I/O charset of latin1
+ *
+ * Revision 1.46  2006/04/28 16:06:05  blueyed
+ * Fixed encoding for format_to_post
+ *
+ * Revision 1.45  2006/04/27 20:10:34  fplanque
+ * changed banning of domains. Suggest a prefix by default.
+ *
+ * Revision 1.44  2006/04/24 20:14:00  blueyed
+ * doc
+ *
+ * Revision 1.43  2006/04/24 19:14:19  blueyed
+ * Added test for callback_on_non_matching_blocks()
+ *
+ * Revision 1.42  2006/04/24 15:43:36  fplanque
+ * no message
+ *
+ * Revision 1.41  2006/04/22 16:42:12  blueyed
+ * Fixes for make_clickable
+ *
+ * Revision 1.40  2006/04/22 16:30:02  blueyed
+ * cleanup
+ *
+ * Revision 1.39  2006/04/22 02:29:26  blueyed
+ * minor
+ *
+ * Revision 1.38  2006/04/21 16:55:29  blueyed
+ * doc, polished header_redirect()
+ *
+ * Revision 1.37  2006/04/20 22:24:08  blueyed
+ * plugin hooks cleanup
+ *
+ * Revision 1.36  2006/04/20 22:12:49  blueyed
+ * todo
+ *
+ * Revision 1.35  2006/04/20 16:26:16  fplanque
+ * minor
+ *
+ * Revision 1.34  2006/04/20 14:33:46  blueyed
+ * todo
+ *
+ * Revision 1.33  2006/04/19 22:26:25  blueyed
+ * cleanup/polish
+ *
+ * Revision 1.32  2006/04/19 20:14:03  fplanque
+ * do not restrict to :// (does not catch subdomains, not even www.)
+ *
+ * Revision 1.31  2006/04/17 23:59:04  blueyed
+ * re-fix, cleanup
+ *
+ * Revision 1.30  2006/04/14 19:16:07  fplanque
+ * icon cleanup
+ *
+ * Revision 1.29  2006/04/11 15:58:59  fplanque
+ * made validate_url() more laxist because there's always a legitimate use for a funky char in a query string
+ * (might need to be even more laxist...) but I'd like to make sure people don't type in just anything
+ *
+ * Revision 1.28  2006/04/10 09:41:14  blueyed
+ * validate_url: todo; allow "%" in general
+ *
+ * Revision 1.27  2006/04/06 18:02:07  blueyed
+ * Fixed get_base_domain() for links with protocol != "http" (esp. https)
+ *
+ * Revision 1.26  2006/04/05 19:16:35  blueyed
+ * Refactored/cleaned up help link handling: defaults to online-manual-pages now.
+ *
+ * Revision 1.25  2006/03/26 20:25:39  blueyed
+ * is_regexp: allow check with modifiers, which the Filelist now uses internally
+ *
+ * Revision 1.24  2006/03/25 00:02:00  blueyed
+ * Do not use reqhostpath, but reqhost and reqpath
+ *
+ * Revision 1.23  2006/03/24 19:40:49  blueyed
+ * Only use absolute URLs if necessary because of used <base/> tag. Added base_tag()/skin_base_tag(); deprecated skinbase()
+ *
+ * Revision 1.22  2006/03/19 16:56:04  blueyed
+ * Better defaults for header_redirect()
+ *
+ * Revision 1.21  2006/03/19 00:08:21  blueyed
+ * Default to $notify_from for send_mail()
+ *
+ * Revision 1.20  2006/03/17 21:28:40  fplanque
+ * no message
+ *
+ * Revision 1.19  2006/03/17 18:49:00  blueyed
+ * Log hits to the backoffice always as referer_type "blacklist"
+ *
+ * Revision 1.18  2006/03/17 17:36:27  blueyed
+ * Fixed debug_info() anchors one more time; general review
+ *
+ * Revision 1.17  2006/03/17 00:07:51  blueyed
+ * Fixes for blog-siteurl support
+ *
+ * Revision 1.16  2006/03/15 19:31:27  blueyed
+ * whitespace
+ *
+ * Revision 1.14  2006/03/12 23:09:01  fplanque
+ * doc cleanup
+ *
+ * Revision 1.13  2006/03/12 17:28:53  blueyed
+ * charset cleanup
+ *
+ * Revision 1.9  2006/03/09 20:40:40  fplanque
+ * cleanup
+ *
+ * Revision 1.8  2006/03/09 15:17:47  fplanque
+ * cleaned up get_img() which was one of these insane 'kabelsalat'
+ *
+ * Revision 1.7  2006/03/06 20:03:40  fplanque
+ * comments
+ *
+ * Revision 1.6  2006/03/06 11:01:55  blueyed
+ * doc
+ *
+ * Revision 1.5  2006/02/28 20:52:54  blueyed
+ * fix
+ *
+ * Revision 1.4  2006/02/27 20:55:50  blueyed
+ * JS help links fixed
+ *
+ * Revision 1.1  2006/02/23 21:12:18  fplanque
+ * File reorganization to MVC (Model View Controller) architecture.
+ * See index.hml files in folders.
+ * (Sorry for all the remaining bugs induced by the reorg... :/)
+ *
+ * Revision 1.183  2006/02/14 20:11:38  blueyed
+ * added implode_with_and()
+ *
+ * Revision 1.182  2006/02/13 15:40:37  blueyed
+ * param(): use $GLOBALS instead of $$var again, but this time with a good reason.
+ *
+ * Revision 1.180  2006/02/06 20:05:30  fplanque
+ * minor
+ *
+ * Revision 1.179  2006/02/05 19:04:48  blueyed
+ * doc fixes
+ *
+ * Revision 1.178  2006/02/05 01:58:40  blueyed
+ * is_email() re-added pattern delimiter..
+ *
+ * Revision 1.177  2006/02/03 21:58:05  fplanque
+ * Too many merges, too little time. I can hardly keep up. I'll try to check/debug/fine tune next week...
+ *
+ * Revision 1.173  2006/01/25 19:19:17  blueyed
+ * Fixes for blogurl handling. Thanks to BenFranske for pointing out the biggest issue (http://forums.b2evolution.net/viewtopic.php?t=6844)
+ *
+ * Revision 1.172  2006/01/22 14:25:05  blueyed
+ * debug_info(): enhanced, small fix
+ *
+ * Revision 1.171  2006/01/22 14:23:47  blueyed
+ * Added is_admin_page()
+ *
+ * Revision 1.170  2006/01/20 00:04:21  blueyed
+ * debug_die(): $include_backtrace param
+ *
+ * Revision 1.169  2006/01/15 18:36:26  blueyed
+ * Just another fix to validate_url()
+ *
+ * Revision 1.168  2006/01/15 17:40:55  blueyed
+ * Moved Form::get_field_params_as_string() to function get_field_attribs_as_string() and minor fixes.
+ *
+ * Revision 1.167  2006/01/11 23:39:19  blueyed
+ * Enhanced backtrace-debugging for queries
+ *
+ * Revision 1.166  2006/01/04 15:02:10  fplanque
+ * better filtering design
+ *
+ * Revision 1.165  2005/12/30 20:13:40  fplanque
+ * UI changes mostly (need to double check sync)
+ *
+ * Revision 1.164  2005/12/21 20:39:04  fplanque
+ * minor
+ *
+ * Revision 1.162  2005/12/12 19:21:22  fplanque
+ * big merge; lots of small mods; hope I didn't make to many mistakes :]
+ *
+ * Revision 1.161  2005/12/12 01:18:04  blueyed
+ * Counter for $Timer; ignore absolute times below 0.005s; Fix for Timer::resume().
+ *
+ * Revision 1.160  2005/12/11 19:32:41  blueyed
+ * Fixed make_clickable() for dots at the end of URLs.
+ *
+ * Revision 1.159  2005/12/11 19:19:53  blueyed
+ * Fixed strange Parse error.
+ *
+ * Revision 1.158  2005/12/11 12:46:41  blueyed
+ * Fix $log_head_links for front office (where we have <base>).
+ *
+ * Revision 1.157  2005/12/08 22:30:04  blueyed
+ * Added 'alt' and 'class' to get_icon(); doc
+ *
+ * Revision 1.156  2005/12/06 22:08:26  blueyed
+ * Fix validate_url() to allow "=" also before any "?" or "#". Fixes: http://forums.b2evolution.net/viewtopic.php?p=29817
+ *
+ * Revision 1.155  2005/12/05 12:15:32  fplanque
+ * bugfix
+ *
+ * Revision 1.154  2005/12/01 19:32:15  blueyed
+ * send_mail(): add X-Remote-Addr header to mails
+ *
+ * Revision 1.153  2005/12/01 19:29:50  blueyed
+ * Renamed getIpList() to get_ip_list()
+ *
+ * Revision 1.152  2005/11/30 19:53:05  blueyed
+ * Display a list of Debuglog categories with links to the categories messages html ID.
+ *
+ * Revision 1.151  2005/11/30 12:53:12  blueyed
+ * make_clickable(): handle links that follow ">"..
+ *
+ * Revision 1.150  2005/11/24 08:44:01  blueyed
+ * Debuglog
+ *
+ * Revision 1.149  2005/11/23 01:17:36  blueyed
+ * valid html
+ *
+ * Revision 1.148  2005/11/22 16:56:31  blueyed
+ * validate_url(): allow URLs that start with a digit after '//' (read: IP addresses).
+ *
+ * Revision 1.147  2005/11/21 18:17:26  blueyed
+ * debug_die(): also display debug_info() on $debug (or $force param)
+ *
+ * Revision 1.146  2005/11/19 03:43:51  blueyed
+ * html fix in debug_info()
+ *
+ * Revision 1.144  2005/11/18 18:32:42  fplanque
+ * Fixed xmlrpc logging insanity
+ * (object should have been passed by reference but you can't pass NULL by ref)
+ * And the code was geeky/unreadable anyway.
+ *
+ * Revision 1.142  2005/11/17 17:19:38  blueyed
+ * Ignore timers below 0.5% of total time
+ *
+ * Revision 1.141  2005/11/17 01:17:38  blueyed
+ * Replaced main/sql-query times with dynamic timer table in debug_info()
+ *
+ * Revision 1.140  2005/11/16 01:47:09  blueyed
+ * action_icon(): Add whitespace between icon and word.
+ *
+ * Revision 1.139  2005/11/16 00:58:03  blueyed
+ * Tightened getIpList()
+ *
+ * Revision 1.138  2005/11/10 01:09:47  blueyed
+ * header_redirect(): remove "user" and "login" params (additionally to "action") from location where we redirect to if it's on $baseurl.
+ *
+ * Revision 1.137  2005/11/09 02:54:42  blueyed
+ * Moved inclusion of _file.funcs.php to _misc.funcs.php, because at least bytesreable() gets used in debug_info()
+ *
+ * Revision 1.135  2005/11/07 02:13:22  blueyed
+ * Cleaned up Sessions and extended Widget etc
+ *
+ * Revision 1.134  2005/11/06 11:36:57  yabs
+ * correcting windows farce
+ *
+ * Revision 1.133  2005/11/06 03:19:12  blueyed
+ * Do not use third parameter for header(), as it requires PHP 4.3 and is not necessary.
+ *
+ * Revision 1.132  2005/11/05 08:11:00  blueyed
+ * debug_info(): link to query log from number of queries at the top
+ *
+ * Revision 1.131  2005/11/05 07:22:09  blueyed
+ * Display number of DB queries at the top of debug_info()
+ *
+ * Revision 1.130  2005/11/04 16:24:35  blueyed
+ * Use $localtimenow instead of $servertimenow.
+ *
+ * Revision 1.129  2005/11/03 18:23:44  fplanque
+ * minor
+ *
+ * Revision 1.128  2005/11/02 20:11:19  fplanque
+ * "containing entropy"
+ *
+ * Revision 1.127  2005/11/02 13:05:51  halton
+ * changed online help url back to /redirect.  added workaround for null $Blog object in regenerate_url
+ *
+ * Revision 1.126  2005/11/02 06:52:19  marian
+ * changed regenerate_url to support multiple domains
+ *
+ * Revision 1.125  2005/11/01 23:57:24  blueyed
+ * Changed header_redirect() to use HTTP 303 / Location, which allows to reload the same page after POSTing without being prompted for the browser's "page requires POSTed data" dialog.
+ *
+ * Revision 1.124  2005/10/31 11:50:46  halton
+ * updated online help with subtle icon
+ *
+ * Revision 1.123  2005/10/31 08:19:07  blueyed
+ * Refactored getRandomPassword() and Session::generate_key() into generate_random_key()
+ *
+ * Revision 1.122  2005/10/31 06:50:33  blueyed
+ * send_mail(): Add X-b2evo to notice about email header injection fix
+ *
+ * Revision 1.121  2005/10/31 05:51:06  blueyed
+ * Use rawurlencode() instead of urlencode()
+ *
+ * Revision 1.120  2005/10/31 02:20:49  blueyed
+ * Added memory usage info to the top of debug_info()
+ *
+ * Revision 1.119  2005/10/30 11:16:43  marian
+ * rollback of regenerate_url
+ * fixing the form-problem in skins/_feedback.php
+ *
+ * Revision 1.117  2005/10/30 05:28:30  halton
+ * updated get_web_help_link code to point to server
+ *
+ * Revision 1.116  2005/10/30 03:51:24  blueyed
+ * Refactored showhide-JS functionality.
+ * Moved showhide() from the features form to functions.js, and renamed to toggle_display_by_id();
+ * Moved web_help_link() to get_web_help_link() in _misc.funcs.php, doc
+ *
+ * Revision 1.115  2005/10/28 20:26:43  blueyed
+ * Handle failed update of antispam strings correctly.
+ *
+ * Revision 1.114  2005/10/27 15:25:03  fplanque
+ * Normalization; doc; comments.
+ *
+ * Revision 1.113  2005/10/26 22:32:58  blueyed
+ * debug_die(): added $very_last parameter that defaults to '</body></html>'
+ *
+ * Revision 1.112  2005/10/26 22:22:44  blueyed
+ * debug_die(): $last_words is optional; doc
+ *
+ * Revision 1.111  2005/10/26 11:30:42  blueyed
+ * Made $ignore_from case insensitive; slightly changed behaviour of $limit_to_last (only limit if numeric)
+ *
+ * Revision 1.110  2005/10/23 18:19:42  blueyed
+ * Indent of make_clickable()
+ *
+ * Revision 1.109  2005/10/23 14:56:32  blueyed
+ * is_email(): added $format parameter (defaults to 'single'). Formatted fixed email_pattern for rfc2822. Added test.
+ *
+ * Revision 1.108  2005/10/19 19:40:22  marian
+ * small fix for pattern matching with validate_url
+ *
+ * Revision 1.107  2005/10/18 14:03:55  marian
+ * changed pattern delimiter due to problems with PHP on Windows Machines
+ *
+ * Revision 1.106  2005/10/18 02:27:13  blueyed
+ * Fixes to debug_get_backtrace()
+ *
+ * Revision 1.105  2005/10/18 02:04:21  blueyed
+ * Tightened is_email(), allowing RFC2822 format, which includes "name <email@example.com>"; send_mail(): fix $from after injection fix, enhanced debugging
+ *
+ * Revision 1.104  2005/10/16 09:03:57  marian
+ * Changed delimiter for preg_match because the old one did not work in the Windows environment.
+ *
+ * Revision 1.103  2005/10/14 21:00:08  fplanque
+ * Stats & antispam have obviously been modified with ZERO testing.
+ * Fixed a sh**load of bugs...
+ *
+ * Revision 1.102  2005/10/13 22:30:59  blueyed
+ * Added debug_get_backtrace() and debug_die()
+ *
+ * Revision 1.101  2005/10/13 20:11:05  blueyed
+ * Fixed send_mail()! added a funky regexp to validate emails according to rfc2822 (not activated).
+ *
+ * Revision 1.100  2005/10/12 21:14:17  fplanque
+ * bugfixes
+ *
+ * Revision 1.99  2005/10/12 18:24:37  fplanque
+ * bugfixes
+ *
+ * Revision 1.98  2005/10/11 20:36:38  fplanque
+ * minor changes
+ *
+ * Revision 1.97  2005/10/11 18:29:56  fplanque
+ * It is perfectly valid to have <strong> inside of <code>.
+ * Make a plugin for [code]...[/code] if you want to escape tags arbitrarily.
+ *
+ * Revision 1.96  2005/10/09 23:22:09  blueyed
+ * format_to_post(): Use preg_replace_callback() to avoid using stripslashes() in replacement function. Also fix regexp.
+ *
+ * Revision 1.95  2005/10/09 20:21:52  blueyed
+ * format_to_output(): Automagically replace '<' and '>' in <code> and <pre> blocks.
+ *
+ * Revision 1.94  2005/10/09 19:31:15  blueyed
+ * Spelling (*allowed_attribues => *allowed_attributes)
+ *
+ * Revision 1.93  2005/10/07 19:34:06  fplanque
+ * javascript injection!!! damn it!!
+ *
+ * Revision 1.92  2005/10/06 21:04:33  blueyed
+ * Made validate_url() more verbose - thanks to stk (http://forums.b2evolution.net/viewtopic.php?p=26984#26984)
+ *
+ *
+ * Revision 1.92  2004/5/28 17:21:42  jeffbearer
+ * added function include for the who's online functions
+ *
+ * Revision : 1.27  2004/2/8 23:20:27  vegarg
+ * Bugfix in the security checker. (contrib by topolino)
+ *
+ * Revision 1.24  2004/1/16 14:15:55  vegarg
+ * Modified validate_url(), switched to MySQL antispam table.
+ *
+ * Revision 1.7  2003/8/29 18:25:51  sakichan
+ * SECURITY: XSS vulnerability fix.
+ *
+ * Revision 1.1.1.1.2.1  2003/8/31 6:23:31  sakichan
+ * Security fixes for various XSS vulnerability and SQL injection vulnerability
+ */
 ?>
