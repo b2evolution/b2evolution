@@ -149,6 +149,12 @@ function pingWeblogs( & $blogparams, $display = true )
 function pingBlogs( & $blogparams, $display = true )
 {
 	global $use_blodotgsping, $use_rss, $blogname, $baseurl, $blogfilename;
+
+
+	// When pinging http://blo.gs, use extended ping to RSS?
+	$use_rss = 1;
+
+	
 	if( !get_bloginfo('pingblodotgs', $blogparams) ) return false;
 	// echo 'ping Blo.gs';
 	if( $display )
@@ -161,7 +167,7 @@ function pingBlogs( & $blogparams, $display = true )
 		flush();
 		$url = get_bloginfo('blogurl');
 		$client = new xmlrpc_client('/', 'ping.blo.gs', 80);
-		if ($use_rss)
+		if( $use_rss )
 		{
 			$message = new xmlrpcmsg('weblogUpdates.extendedPing',
 								 array( new xmlrpcval( get_bloginfo('name', $blogparams) ),
@@ -229,6 +235,9 @@ function pingTechnorati(& $blogparams, $display = true )
 
 /*
  * $Log$
+ * Revision 1.3  2006/06/19 16:49:10  fplanque
+ * minor
+ *
  * Revision 1.2  2006/03/12 23:09:01  fplanque
  * doc cleanup
  *

@@ -32,12 +32,6 @@ function NT_( $string )
  */
 $debug = 0;
 
-/**
- * Display elements that are different on each request (Page processing time, ..)
- * @global boolean Default: false
- */
-$obhandler_debug = false;
-
 
 /**
  * Demo mode: don't allow changes to the 'demouser' and 'admin' account.
@@ -126,14 +120,6 @@ $instance_name = 'b2evo'; // MUST BE A SINGLE WORD! NO SPACES!!
  * @global string Default: $instance_name.'@'.$basehost;
  */
 $notify_from = $instance_name.'@'.preg_replace( '/^www\./i', '', $basehost );
-
-
-/**
- * When pinging http://blo.gs, use extended ping to RSS?
- *
- * @var integer Default: 1
- */
-$use_rss = 1;
 
 
 /**
@@ -268,7 +254,16 @@ $db_use_fkeys = false;
  *
  * @global boolean $use_obhandler
  */
-$use_obhandler = 0;
+$use_obhandler = false;
+
+/**
+ * Display elements that are different on each request (Page processing time, ..)
+ *
+ * Set this to true to prevent displaying minor changing elements (like time) in order not to have artificial content changes
+ *
+ * @global boolean Default: false
+ */
+$obhandler_debug = false;
 
 /**
  * GZip compression.
@@ -284,7 +279,7 @@ $use_obhandler = 0;
  *
  * @global boolean $use_gzipcompression
  */
-$use_gzipcompression = 0;
+$use_gzipcompression = false;
 
 /**
  * ETags support.
@@ -298,7 +293,7 @@ $use_gzipcompression = 0;
  *
  * @global boolean $use_etags
  */
-$use_etags = 0;
+$use_etags = false;
 
 
 // ** Cookies **

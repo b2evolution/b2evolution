@@ -47,7 +47,7 @@ $ctrl_mappings = array(
 		'itemtypes'    => 'items/types.php',
 		'locales'      => 'settings/locales.php',
 		'mtimport'     => 'imports/import-mt.php',
-		'plugins'      => 'settings/plugins.php', // todo
+		'plugins'      => 'settings/plugins.php',
 		'settings'     => 'settings/settings.php',
 		'set_antispam' => 'settings/antispam.php',
 		'stats'        => 'sessions/stats.php',
@@ -108,7 +108,7 @@ $use_post_url = 1;  // 1 to enable, 0 to disable
 
 
 /**
- * When banning, do you want to report abuse to the
+ * When banning, do you want to be able to report abuse to the
  * centralized ban list at b2evolution.net?
  *
  * @global boolean $report_abuse
@@ -120,7 +120,8 @@ $report_abuse = 1;
 /**
  * Set this to 0 to disable file upload, or 1 to enable it
  * @global boolean $use_fileupload
- * @deprecated 0.9.2: this is only used for creating the defaults when upgrading
+ * @deprecated 1.6: this is only used for creating the defaults when upgrading
+ * This is still used by MMS and XMLRPC though.
  */
 $use_fileupload = 1;
 
@@ -134,7 +135,7 @@ $use_fileupload = 1;
  * Alternatively you may want to use a path relative to $basepath.
  *
  * @global string $fileupload_realpath
- * @deprecated 0.9.2: the user uploads to his own media folder (or somewhere else with write permissions)
+ * @deprecated 1.6: the user uploads to his own media folder (or somewhere else with write permissions)
  * This is still used by MMS and XMLRPC though.
  */
 $fileupload_realpath = $basepath.'media/';	# WARNING: slashes moved!
@@ -147,7 +148,7 @@ $fileupload_realpath = $basepath.'media/';	# WARNING: slashes moved!
  * Alternatively you may want to use an URL relatibe to $baseurl
  *
  * @global string $fileupload_url
- * @deprecated 0.9.2: the user uploads to his own media folder (or somewhere else with write permissions)
+ * @deprecated 1.6: the user uploads to his own media folder (or somewhere else with write permissions)
  * This is still used by MMS and the MT importer though.
  */
 $fileupload_url = $baseurl.'media/';				# WARNING: slashes moved!
