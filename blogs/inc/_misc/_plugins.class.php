@@ -2685,6 +2685,17 @@ class Plugins
 		}
 	}
 
+
+	/**
+	 * Callback, which gets used for {@link Results}.
+	 *
+	 * @return Plugin|false
+	 */
+	function & instantiate( $row )
+	{
+		return $this->get_by_ID( $row->plug_ID );
+	}
+
 }
 
 
@@ -2737,6 +2748,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.57  2006/06/20 00:16:54  blueyed
+ * Transformed Plugins table into Results object, so some columns are sortable.
+ *
  * Revision 1.56  2006/06/19 20:59:14  blueyed
  * minor
  *

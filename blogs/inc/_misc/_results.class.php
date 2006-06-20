@@ -168,7 +168,7 @@ class Results extends Widget
 	 */
 	var $group_by = '';
 
- 	/**
+	/**
 	 * Current group identifier:
 	 * @var string
 	 */
@@ -208,17 +208,17 @@ class Results extends Widget
 	var $order_field_list;
 
 
-  /**
-   * Parameters for the filter area:
-   */
+	/**
+	 * Parameters for the filter area:
+	 */
 	var $filter_area;
 
 
 	/**
-   * Parameters for the functions area (to display functions at the end of results array):
-   */
+	 * Parameters for the functions area (to display functions at the end of results array):
+	 */
 	var $functions_area;
-	
+
 
 	/**
 	 * Constructor
@@ -232,7 +232,8 @@ class Results extends Widget
 	 * @param string default ordering of columns (special syntax) if not specified in the URL params
 	 *               example: -A-- will sort in ascending order on 2nd column
 	 *               example: ---D will sort in descending order on 4th column
-	 * @param integer number of lines displayed on one page
+	 * @param integer number of lines displayed on one page (0 to disable paging)
+	 * @param boolean
 	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
 	 */
 	function Results( $sql, $param_prefix = '', $default_order = '', $limit = 20, $count_sql = NULL,
@@ -257,7 +258,7 @@ class Results extends Widget
 
 		// attribution of an order type
 		$this->order_param = 'results_'.$param_prefix.'order';
- 		$this->order = param( $this->order_param, 'string', $default_order, true );
+		$this->order = param( $this->order_param, 'string', $default_order, true );
 	}
 
 
@@ -346,7 +347,6 @@ class Results extends Widget
 		}
 
 
-
 		// Append ORDER clause if necessary:
 		if( $orders = $this->get_order_field_list() )
 		{	// We have orders to append
@@ -376,9 +376,11 @@ class Results extends Widget
 		}
 
 
+		// TODO: dh> I've fixed it here, if using limit==0. I'm not sure, why we use $sql here for this part and not $this->sql (which will not include any LIMIT)..
+		$sql = $this->sql;
 		if( $append_limit && !empty($this->limit) )
 		{	// Limit lien range to requested page
-			$sql = $this->sql.' LIMIT '.max(0, ($this->page-1)*$this->limit).', '.$this->limit;
+			$sql .= ' LIMIT '.max(0, ($this->page-1)*$this->limit).', '.$this->limit;
 		}
 
 		// Execute query and store results
@@ -394,7 +396,7 @@ class Results extends Widget
 	/**
 	 * Get a list of IDs for current page
 	 *
- 	 * @uses Results::ID_col
+	 * @uses Results::ID_col
 	 */
 	function get_page_ID_list()
 	{
@@ -411,7 +413,7 @@ class Results extends Widget
 	/**
 	 * Get an array of IDs for current page
 	 *
- 	 * @uses Results::ID_col
+	 * @uses Results::ID_col
 	 */
 	function get_page_ID_array()
 	{
@@ -575,7 +577,7 @@ class Results extends Widget
 
 					// Functions
 					$this->display_functions();
-				
+
 				// END OF LIST/TABLE:
 				$this->display_list_end();
 
@@ -602,7 +604,7 @@ class Results extends Widget
 			global $AdminUI;
 			$this->params = $AdminUI->get_menu_template( 'Results' );
 		}
-	
+
 		// Make sure we have display parameters:
 		if( !is_null($display_params) )
 		{ // Use passed params:
@@ -611,7 +613,7 @@ class Results extends Widget
 			{
 				$this->params = array_merge( $this->params, $display_params );
 			}
-			else 
+			else
 			{
 				$this->params = & $display_params;
 			}
@@ -668,7 +670,7 @@ class Results extends Widget
 	function display_filters()
 	{
 		global $debug, $Session, $Request;
-		
+
 		if( empty( $this->filter_area ) )
 		{	// We don't want to display a filters section:
 			return;
@@ -703,20 +705,20 @@ class Results extends Widget
     	// Loop on all preset filters:
     	foreach( $this->filter_area['presets'] as $key => $preset )
     	{
-    		if( method_exists( $this, 'is_filtered' ) && !$this->is_filtered() 
+    		if( method_exists( $this, 'is_filtered' ) && !$this->is_filtered()
     					&& $Request->get( $this->param_prefix.'filter_preset' ) == $key )
-    		{ // The list is not filtered and the filter preset is selected, so no link on: 
+    		{ // The list is not filtered and the filter preset is selected, so no link on:
     			$r[] = '['.$preset[0].']';
     		}
-    		else 
+    		else
     		{	// Display preset filter link:
     	  	$r[] = '[<a href="'.$preset[1].'">'.$preset[0].'</a>]';
     		}
     	}
-    	
+
     	echo ' '.implode( ' ', $r );
     }
-    
+
   	if( $debug > 1 )
 		{
 			echo ' <span class="notes">('.$filter_name.':'.$filter_fold_state.')</span>';
@@ -803,117 +805,117 @@ class Results extends Widget
 				$this->nb_cols = count($this->cols);
 			}
 
-			
+
 			$th_group_activated = false;
-			
+
 			// Loop on all columns to see if we have th_group columns:
 			foreach( $this->cols as $col )
 			{
 				if( isset( $col['th_group'] )	)
 				{	// We have a th_group column, so break:
 					$th_group_activated = true;
-					break;				
+					break;
 				}
 			}
-			
+
 			$current_th_group_colspan = 1;
 			$current_th_colspan = 1;
 			$current_th_group_title = NULL;
 			$current_th_title = NULL;
 			$header_cells = array();
-			
-			// Loop on all columns to get an array of header cells description 
+
+			// Loop on all columns to get an array of header cells description
 			// Each header cell will have a colspan and rowspan value
 			// The line 0 is reserved for th_group
 			// The line 1 is reserved for th
 			foreach( $this->cols as $key=>$col )
 			{
 				//_______________________________ TH GROUP __________________________________
-				
+
 				if( isset( $col['th_group'] ) )
 				{	// The column has a th_group
 					if( is_null( $current_th_group_title ) || $col['th_group'] != $current_th_group_title )
 					{	// It's the begining of a th_group colspan (line0):
-						
+
 						//Initialize current th_group colpsan to 1 (line0):
 						$current_th_group_colspan = 1;
-							
+
 						// Set colspan and rowspan colum for line0 to 1:
 						$header_cells[0][$key]['colspan'] = 1;
 						$header_cells[0][$key]['rowspan'] = 1;
 					}
-					else 
+					else
 					{	// The column is part of a th group colspan
 						// Update the first th group colspan cell
 						$header_cells[0][$key-$current_th_group_colspan]['colspan']++;
-						
+
 						// Set the colspan column to 0 to not display it
 						$header_cells[0][$key]['colspan'] = 0;
 						$header_cells[0][$key]['rowspan'] = 0;
-						
+
 						//Update current th_group colpsan to 1 (line0):
 						$current_th_group_colspan++;
 					}
-					
+
 					// Update current th group title:
 					$current_th_group_title = 	$col['th_group'];
 				}
-				
+
 				//___________________________________ TH ___________________________________
-				
+
 				if( is_null( $current_th_title ) || $col['th'] != $current_th_title )
 				{	// It's the begining of a th colspan (line1)
-				
+
 					//Initialize current th colpsan to 1 (line1):
 					$current_th_colspan = 1;
-					
+
 					// Update current th title:
 					$current_th_title = $col['th'];
 
 					if( $th_group_activated  && !isset( $col['th_group'] ) )
 					{ // We have to lines and the column has no th_group, so it will be a "rowspan2"
-						
+
 						// Set the cell colspan and rowspan values for the line0:
 						$header_cells[0][$key]['colspan'] = 1;
 						$header_cells[0][$key]['rowspan'] = 2;
-						
+
 						// Set the cell colspan and rowspan values for the line1, to do not display it:
 						$header_cells[1][$key]['colspan'] = 0;
 						$header_cells[1][$key]['rowspan'] = 0;
 					}
-					else 
+					else
 					{	// The cell has no rowspan
 						$header_cells[1][$key]['colspan'] = 1;
 						$header_cells[1][$key]['rowspan'] = 1;
 					}
 				}
-				else 
-				{	// The column is part of a th colspan 
+				else
+				{	// The column is part of a th colspan
 					if( $th_group_activated && !isset( $col['th_group'] ) )
 					{	// We have to lines and the column has no th_group, the colspan is "a rowspan 2"
-						
+
 						// Update the first th cell colspan in line0
 						$header_cells[0][$key-$current_th_colspan]['colspan']++;
-						
+
 						// Set the cell colspan to 0 in line0 to not display it:
 						$header_cells[0][$key]['colspan'] = 0;
 						$header_cells[0][$key]['rowspan'] = 0;
 					}
-					else 
+					else
 					{ // Update the first th colspan cell in line1
 						$header_cells[1][$key-$current_th_colspan]['colspan']++;
 					}
-					
+
 					// Set the cell colspan to 0 in line1 to do not display it:
 					$header_cells[1][$key]['colspan'] = 0;
 					$header_cells[1][$key]['rowspan'] = 0;
-					
+
 					$current_th_colspan++;
 				}
 			}
 
 			// ________________________________________________________________________________
-			
+
 			if( !$th_group_activated )
 			{	// We have only the "th" line to display
 				$start = 1;
@@ -922,9 +924,9 @@ class Results extends Widget
 			{	// We have the "th_group" and the "th" lines to display
 				$start = 0;
 			}
-			
+
 			//__________________________________________________________________________________
-			
+
 			// Loop on all headers lines:
 			for( $i = $start; $i <2 ; $i++ )
 			{
@@ -939,56 +941,56 @@ class Results extends Widget
 							$th_title = $this->cols[$key]['th_group'];
 							$col_order = isset( $this->cols[$key]['order_group'] ) ? $this->cols[$key]['order_group'] : '';
 						}
-						else 
+						else
 						{	// The cell is a th
 							$th_title = $this->cols[$key]['th'] ;
 							$col_order = isset( $this->cols[$key]['order'] ) ? $this->cols[$key]['order'] : '';
 						}
-						
-						
+
+
 						if( isset( $this->cols[$key]['th_class'] ) )
 						{	// We have a class for the th column
 							$class = $this->cols[$key]['th_class'];
 						}
-						else 
+						else
 						{	// We have no class for the th column
 							$class = '';
-						}	
-												
+						}
+
 						if( $key == 0 && isset($this->params['colhead_start_first']) )
 						{ // Display first column start:
 							$output = $this->params['colhead_start_first'];
-							
-							// Add the total column class in the grp col start first param class: 
+
+							// Add the total column class in the grp col start first param class:
 							$output = str_replace( '$class$', $class, $output );
 						}
 						elseif( ( $key + $cell['colspan'] ) == (count( $this->cols) ) && isset($this->params['colhead_start_last']) )
 						{ // Last column can get special formatting:
 							$output = $this->params['colhead_start_last'];
-							
-							// Add the total column class in the grp col start end param class: 
+
+							// Add the total column class in the grp col start end param class:
 							$output = str_replace( '$class$', $class, $output );
 						}
 						else
 						{ // Display regular colmun start:
 							$output = $this->params['colhead_start'];
-							
+
 							// Replace the "class_attrib" in the grp col start param by the td column class
 							$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
 						}
-						
-						
+
+
 						// Set colspan and rowspan values for the cell:
 						$output = preg_replace( '#(<)([^>]*)>$#', '$1$2 colspan="'.$cell['colspan'].'" rowspan="'.$cell['rowspan'].'">' , $output );
-						
+
 						echo $output;
-						
+
 						if( $col_order )
 						{ // The column can be ordered:
 							$col_sort_values = $this->get_col_sort_values( $key );
 
 
-							// Detrmine CLASS SUFFIX depending on wether the current column is currently sorted or not:
+							// Determine CLASS SUFFIX depending on wether the current column is currently sorted or not:
 							if( !empty($col_sort_values['current_order']) )
 							{ // We are currently sorting on the current column:
 								$class_suffix = '_current';
@@ -1091,7 +1093,7 @@ class Results extends Widget
 		$fadeout_count = 0;
 		foreach( $this->rows as $row )
 		{ // For each row/line:
-		
+
 			/*
 			 * Group row stuff:
 			 */
@@ -1107,38 +1109,38 @@ class Results extends Widget
 					$col_count = 0;
 					foreach( $this->grp_cols as $grp_col )
 					{ // For each column:
-					
+
 						if( isset( $grp_col['td_class'] ) )
 						{	// We have a class for the total column
 							$class = $grp_col['td_class'];
 						}
-						else 
+						else
 						{	// We have no class for the total column
 							$class = '';
-						}	
-					
+						}
+
 						if( ($col_count==0) && isset($this->params['grp_col_start_first']) )
 						{ // Display first column column start:
 							$output = $this->params['grp_col_start_first'];
-							
-							// Add the total column class in the grp col start first param class: 
+
+							// Add the total column class in the grp col start first param class:
 							$output = str_replace( '$class$', $class, $output );
 						}
 						elseif( ($col_count==count($this->grp_cols)-1) && isset($this->params['grp_col_start_last']) )
 						{ // Last column can get special formatting:
 							$output = $this->params['grp_col_start_last'];
-							
-							// Add the total column class in the grp col start end param class: 
+
+							// Add the total column class in the grp col start end param class:
 							$output = str_replace( '$class$', $class, $output );
 						}
 						else
 						{ // Display regular colmun start:
 							$output = $this->params['grp_col_start'];
-							
+
 							// Replace the "class_attrib" in the grp col start param by the td column class
 							$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
 						}
-							
+
 						if( isset( $grp_col['td_colpsan'] ) )
 						{
 							$colspan = $grp_col['td_colpsan'];
@@ -1148,7 +1150,7 @@ class Results extends Widget
 							}
 							$output = str_replace( '$colspan_attrib$', 'colspan="'.$colspan.'"', $output );
 						}
-						
+
 						// Contents to output:
 						$output .= $this->parse_col_content( $grp_col['td'] );
 						//echo $output;
@@ -1198,16 +1200,16 @@ class Results extends Widget
 			$col_count = 0;
 			foreach( $this->cols as $col )
 			{ // For each column:
-			
+
 				if( isset( $col['td_class'] ) )
 				{	// We have a class for the total column
 					$class = $col['td_class'];
 				}
-				else 
+				else
 				{	// We have no class for the total column
 					$class = '';
-				}	
-				
+				}
+
 				/**
 				 * Update class and add a fadeout ID for fadeout list results
 				 */
@@ -1217,7 +1219,7 @@ class Results extends Widget
 					{ // Col is in the fadeout list
 						// TODO: CLEAN THIS UP!
 						$class .= ' fadeout-ffff00" id="fadeout-'.$fadeout_count;
-											
+
 						$fadeout_count++;
 						break;
 					}
@@ -1226,13 +1228,13 @@ class Results extends Widget
 				if( ($col_count==0) && isset($this->params['col_start_first']) )
 				{ // Display first column column start:
 					$output = $this->params['col_start_first'];
-					// Add the total column class in the col start first param class: 
+					// Add the total column class in the col start first param class:
 					$output = str_replace( '$class$', $class, $output );
 				}
 				elseif( ($col_count==count($this->cols)-1) && isset($this->params['col_start_last']) )
 				{ // Last column can get special formatting:
 					$output = $this->params['col_start_last'];
-					// Add the total column class in the col start end param class: 
+					// Add the total column class in the col start end param class:
 					$output = str_replace( '$class$', $class, $output );
 				}
 				else
@@ -1241,7 +1243,7 @@ class Results extends Widget
 					// Replace the "class_attrib" in the total col start param by the td column class
 					$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
 				}
-				
+
 				// Contents to output:
 				$output .= $col['td'];
 
@@ -1261,14 +1263,14 @@ class Results extends Widget
 		echo $this->params['body_end'];
 	}
 
-	
+
 	/**
 	 * Display totals line if set.
 	 */
 	function display_totals()
 	{
 		$total_enable = false;
-	
+
 		// Search if we have totals line to display:
 		foreach( $this->cols as $col )
 		{
@@ -1278,30 +1280,30 @@ class Results extends Widget
 				break;
 			}
 		}
-		
+
 		if( $total_enable )
 		{ // We have to dispaly a totals line
-		
-			// <tr>	
+
+			// <tr>
 			echo $this->params['total_line_start'];
-			
+
 			$loop = 0;
-			
+
 			foreach( $this->cols as $col )
-			{	
+			{
 				if( isset( $col['total_class'] ) )
 				{	// We have a class for the total column
 					$class = $col['total_class'];
 				}
-				else 
+				else
 				{	// We have no class for the total column
 					$class = '';
 				}
-			
+
 				if( $loop == 0)
 				{	// The column is the first
 					$output = $this->params['total_col_start_first'];
-					// Add the total column class in the total col start first param class: 
+					// Add the total column class in the total col start first param class:
 					$output = str_replace( '$class$', $class, $output );
  				}
 				elseif( $loop ==( count( $this->cols ) -1 ) )
@@ -1310,37 +1312,37 @@ class Results extends Widget
 					// Add the total column class in the total col start end param class:
 					$output = str_replace( '$class$', $class, $output );
 				}
-				else 
+				else
 				{
 					$output = $this->params['total_col_start'];
 					// Replace the "class_attrib" in the total col start param by the total column class
 					$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
 				}
-				
+
 				// <td class="....">
 				echo $output;
-				
+
 				if( isset( $col['total'] ) )
 				{	// The column has a total set, so display it:
 					$output = $col['total'];
 					$output = $this->parse_col_content( $output );
 					eval( "echo '$output';" );
 				}
-				else 
+				else
 				{	// The column has no total
 					echo '&nbsp;';
 				}
 				// </td>
 				echo  $this->params['total_col_end'];
-				
+
 				$loop++;
 			}
 			// </tr>
 			echo $this->params['total_line_end'];
 		}
 	}
-	
-	
+
+
 	/**
    * Display the functions
    */
@@ -1359,29 +1361,29 @@ class Results extends Widget
 			{	// The callback is an object function
 				$obj_name = $this->functions_area['callback'][0];
 				if( $obj_name != 'this' )
-				{	// We need the global object 
+				{	// We need the global object
 					global $$obj_name;
 				}
 				$func = $this->functions_area['callback'][1];
-				
+
 				if( isset( $this->Form ) )
 				{	// There is a created form
 					$$obj_name->$func( $this->Form );
 				}
-				else 
+				else
 				{ // There is not a created form
 					$$obj_name->$func();
 				}
 			}
-			else 
+			else
 			{	// The callback is a function
-				$func = $this->functions_area['callback'];	
-				
+				$func = $this->functions_area['callback'];
+
 				if( isset( $this->Form ) )
 				{	// There is a created form
 					$func( $this->Form );
 				}
-				else 
+				else
 				{ // There is not a created form
 					$func();
 				}
@@ -1392,19 +1394,22 @@ class Results extends Widget
 		echo $this->params['functions_end'];
 	}
 
-	
+
 	/**
 	 * Display navigation text, based on template.
 	 *
 	 * @param string template: 'header' or 'footer'
-	 *
 	 * @access protected
 	 */
 	function display_nav( $template )
 	{
 		echo $this->params[$template.'_start'];
 
-		if( ( $this->total_pages <= 1 ) )
+		if( empty($this->limit) && isset($this->params[$template.'_text_no_limit']) )
+		{	// No LIMIT (there's always only one page)
+			echo $this->params[$template.'_text_no_limit'];
+		}
+		elseif( ( $this->total_pages <= 1 ) )
 		{	// Single page (we probably don't want to show navigation in this case)
 			echo $this->params[$template.'_text_single'];
 		}
@@ -1417,18 +1422,18 @@ class Results extends Widget
 	}
 
 
-  /**
-   * Returns values needed to make sort links for a given column
-   *
-   * Returns an array containing the following values:
-   *  - current_order : 'ASC', 'DESC' or ''
-   *  - order_asc : url to order in ascending order
-   *  - order_desc
-   *  - order_toggle : url to toggle sort order
-   *
-   * @param integer column to sort
-   * @return array
-   */
+	/**
+	 * Returns values needed to make sort links for a given column
+	 *
+	 * Returns an array containing the following values:
+	 *  - current_order : 'ASC', 'DESC' or ''
+	 *  - order_asc : url to order in ascending order
+	 *  - order_desc
+	 *  - order_toggle : url to toggle sort order
+	 *
+	 * @param integer column to sort
+	 * @return array
+	 */
 	function get_col_sort_values( $col_idx )
 	{
 
@@ -1497,6 +1502,7 @@ class Results extends Widget
 
 	/**
 	 * Returns order field list add to SQL query:
+	 * @return string May be empty
 	 */
 	function get_order_field_list()
 	{
@@ -1533,8 +1539,8 @@ class Results extends Widget
 
 			$orders = array();
 
-	    for( $i = 0; $i <= strlen( $this->order ); $i++ )
-	    {	// For each position in order string:
+			for( $i = 0; $i <= strlen( $this->order ); $i++ )
+			{	// For each position in order string:
 				if( isset( $this->cols[$i]['order'] ) )
 				{	// if column is sortable:
 					switch( substr( $this->order, $i, 1 ) )
@@ -1989,6 +1995,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.14  2006/06/20 00:16:54  blueyed
+ * Transformed Plugins table into Results object, so some columns are sortable.
+ *
  * Revision 1.13  2006/06/19 20:59:38  fplanque
  * noone should die anonymously...
  *

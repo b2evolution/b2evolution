@@ -54,109 +54,165 @@ global $UserSettings;
 global $inc_path;
 require_once $inc_path.'_misc/_plugin.funcs.php';
 
+
+$Results = new Results( '
+	SELECT plug_status, plug_ID, plug_priority, plug_code, plug_apply_rendering, plug_version, plug_spam_weight FROM T_plugins',
+	'plug_', '--D', 0 );
+
+function plugin_results_td_status( $plug_status, $plug_ID )
+{
+	global $admin_Plugins;
+
+	if( $plug_status == 'enabled' )
+	{
+		return get_icon('enabled', 'imgtag', array('title'=>T_('The plugin is enabled.')) );
+	}
+	elseif( $plug_status == 'broken' )
+	{
+		return get_icon('warning', 'imgtag', array(
+			'title' => T_('The plugin is broken.')
+				.// Display load error from Plugins::register() (if any):
+				( isset( $admin_Plugins->plugin_errors[$plug_ID] )
+					&& ! empty($admin_Plugins->plugin_errors[$plug_ID]['register'])
+					? ' '.$admin_Plugins->plugin_errors[$plug_ID]['register']
+					: '' )
+			) );
+	}
+	else
+	{
+		return get_icon('disabled', 'imgtag', array('title'=>T_('The plugin is disabled.')) );
+	}
+}
+
+$Results->Cache = & $admin_Plugins;
+
+/*
+ * STATUS TD:
+ */
+$Results->cols[0] = array(
+		'th' => /* TRANS: shortcut for enabled */ T_('En'),
+		'order' => 'plug_status',
+		'td' => '%plugin_results_td_status( \'$plug_status$\', $plug_ID$ )%',
+		'td_class' => 'center',
+	);
+
+/*
+ * PLUGIN NAME TD:
+ */
+function plugin_results_td_name( $Plugin )
+{
+	global $current_User;
+	$r = '<strong>'.$Plugin->name.'</strong>';
+
+	if( $current_User->check_perm( 'options', 'edit', false ) )
+	{ // Wrap in "edit settings" link:
+		$r = '<a href="admin.php?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$Plugin->ID
+			.'" title="'.T_('Edit plugin settings!').'">'.$r.'</a>';
+	}
+	return $r;
+}
+$Results->cols[1] = array(
+		'th' => T_('Plugin'),
+		// TODO: 'order_callback'
+		'td' => '% plugin_results_td_name( {Obj} ) %',
+	);
+
+/*
+ * PRIORITY TD:
+ */
+$Results->cols[2] = array(
+		'th' => T_('Priority'),
+		'order' => 'plug_priority',
+		'td' => '$plug_priority$',
+		'td_class' => 'right',
+	);
+
+/*
+ * APPLY RENDERING TD:
+ */
+$apply_rendering_values = $admin_Plugins->get_apply_rendering_values(true); // with descs
+function plugin_results_td_apply_rendering($apply_rendering)
+{
+	global $admin_Plugins, $apply_rendering_values;
+
+	return '<span title="'.format_to_output( $apply_rendering_values[$apply_rendering], 'htmlattr' )
+			.'">'.$apply_rendering.'</span>';
+}
+$Results->cols[3] = array(
+		'th' => T_('Apply'),
+		'th_title' => T_('When should rendering apply?'),
+		'order' => 'plug_apply_rendering',
+		'td' => '%plugin_results_td_apply_rendering( \'$plug_apply_rendering$\' )%',
+	);
+
+/*
+ * PLUGIN CODE TD:
+ */
+$Results->cols[4] = array(
+		'th' => /* TRANS: Code of a plugin */ T_('Code'),
+		'th_title' => T_('The code to call the plugin by code (SkinTag) or as Renderer.'),
+		'order' => 'plug_code',
+		'td' => '% {Obj}->code %',
+	);
+
+/*
+ * PLUGIN DESCRIPTION TD:
+ */
+$Results->cols[5] = array(
+		'th' => T_('Description'),
+		'td' => '% {Obj}->short_desc %',
+	);
+
+/*
+ * HELP TD:
+ */
+function plugin_results_td_help( $Plugin )
+{
+	return action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$Plugin->ID ) )
+		// Help icons, if available:
+		.$Plugin->get_help_link('$help_url')
+		.' '.$Plugin->get_help_link('$readme');
+}
+$Results->cols[6] = array(
+		'th' => T_('Help'),
+		'td_class' => 'nowrap',
+		'td' => '% plugin_results_td_help( {Obj} ) %',
+	);
+
+/*
+ * ACTIONS TD:
+ */
+function plugin_results_td_actions($Plugin)
+{
+	$r = '';
+	if( $Plugin->status == 'enabled' )
+	{
+		$r .= action_icon( T_('Disable the plugin!'), 'deactivate', 'admin.php?ctrl=plugins&amp;action=disable_plugin&amp;plugin_ID='.$Plugin->ID );
+	}
+	elseif( $Plugin->status != 'broken' )
+	{
+		$r .= action_icon( T_('Enable the plugin!'), 'activate', 'admin.php?ctrl=plugins&amp;action=enable_plugin&amp;plugin_ID='.$Plugin->ID );
+	}
+	$r .= $Plugin->get_edit_settings_link();
+	$r .= action_icon( T_('Un-install this plugin!'), 'delete', 'admin.php?ctrl=plugins&amp;action=uninstall&amp;plugin_ID='.$Plugin->ID );
+	return $r;
+}
+if( $current_User->check_perm( 'options', 'edit', false ) )
+{
+	$Results->cols[7] = array(
+			'th' => T_('Actions'),
+			'td' => '% plugin_results_td_actions( {Obj} ) %',
+			'td_class' => 'shrinkwrap',
+		);
+}
 ?>
-<fieldset class="clear"><!-- "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509) -->
+
+
+<fieldset>
 	<legend><?php echo T_('Installed plugins') ?></legend>
-	<table class="grouped" cellspacing="0">
-		<thead>
-		<tr>
-			<th class="firstcol"><?php
-				echo /* TRANS: shortcut for enabled */ T_('En'); ?></th>
-			<th><?php echo T_('Plugin') ?></th>
-			<th><?php echo T_('Priority') ?></th>
-			<th title="<?php echo T_('When should rendering apply?') ?>"><?php echo T_('Apply') ?></th>
-			<th class="advanced_info" title="<?php echo T_('The code to call the plugin by code (SkinTag) or as Renderer.') ?>"><?php echo /* TRANS: Code of a plugin */ T_('Code') ?></th>
-			<th><?php echo T_('Description') ?></th>
-			<th><?php echo T_('Help') ?></th>
-			<?php
-			if( $current_User->check_perm( 'options', 'edit', false ) )
-			{ ?>
-				<th class="lastcol"><?php echo T_('Actions') ?></th>
-				<?php
-			} ?>
-		</tr>
-		</thead>
-		<tbody>
-		<?php
-		$apply_rendering_values = $admin_Plugins->get_apply_rendering_values(true); // with descs
-
-		$admin_Plugins->restart();	 // make sure iterator is at start position
-		$count = 0;
-		while( $loop_Plugin = & $admin_Plugins->get_next() )
-		{
-		?>
-		<tr class="<?php echo (($count++ % 2) ? 'odd' : 'even') ?>">
-			<td class="firstcol shrinkwrap">
-			<?php
-			if( $loop_Plugin->status == 'enabled' )
-			{
-				echo get_icon('enabled', 'imgtag', array('title'=>T_('The plugin is enabled.')) );
-			}
-			elseif( $loop_Plugin->status == 'broken' )
-			{
-				echo get_icon('warning', 'imgtag', array(
-					'title' => T_('The plugin is broken.')
-						.// Display load error from Plugins::register() (if any):
-						( isset( $admin_Plugins->plugin_errors[$loop_Plugin->ID] )
-							&& ! empty($admin_Plugins->plugin_errors[$loop_Plugin->ID]['register'])
-							? ' '.$admin_Plugins->plugin_errors[$loop_Plugin->ID]['register']
-							: '' )
-					) );
-			}
-			else
-			{
-				echo get_icon('disabled', 'imgtag', array('title'=>T_('The plugin is disabled.')) );
-			}
-			?>
-			</td>
-			<td>
-				<a href="admin.php?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID=<?php echo $loop_Plugin->ID ?>" title="<?php echo T_('Edit plugin settings!') ?>">
-				<strong><?php	$loop_Plugin->name(); ?></strong>
-				</a>
-			</td>
-			<td class="right"><?php echo $loop_Plugin->priority; ?></td>
-			<td><span title="<?php echo format_to_output( $apply_rendering_values[$loop_Plugin->apply_rendering], 'htmlattr' ) ?>"><?php echo $loop_Plugin->apply_rendering; ?></span></td>
-			<td>
-				<?php $loop_Plugin->code() ?>
-			</td>
-			<td>
-				<?php $loop_Plugin->short_desc(); ?>
-			</td>
-			<td class="nowrap">
-				<?php
-				echo action_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_ID', 'action=info&amp;plugin_ID='.$loop_Plugin->ID ) );
-				// Help icons, if available:
-				echo $loop_Plugin->get_help_link('$help_url')
-					.' '.$loop_Plugin->get_help_link('$readme');
-				?>
-			</td>
-			<?php
-			if( $current_User->check_perm( 'options', 'edit', false ) )
-			{ ?>
-				<td class="lastcol shrinkwrap">
-					<?php
-					if( $loop_Plugin->status == 'enabled' )
-					{
-						echo action_icon( T_('Disable the plugin!'), 'deactivate', 'admin.php?ctrl=plugins&amp;action=disable_plugin&amp;plugin_ID='.$loop_Plugin->ID );
-					}
-					elseif( $loop_Plugin->status != 'broken' )
-					{
-						echo action_icon( T_('Enable the plugin!'), 'activate', 'admin.php?ctrl=plugins&amp;action=enable_plugin&amp;plugin_ID='.$loop_Plugin->ID );
-					}
-
-					echo $loop_Plugin->get_edit_settings_link();
-
-					echo action_icon( T_('Un-install this plugin!'), 'delete', 'admin.php?ctrl=plugins&amp;action=uninstall&amp;plugin_ID='.$loop_Plugin->ID );
-					?>
-				</td>
-				<?php
-			} ?>
-		</tr>
-		<?php
-		}
-		?>
-		</tbody>
-	</table>
+	<?php
+	$Results->display();
+	?>
 	<p class="center">
 		<a href="admin.php?ctrl=plugins&amp;action=reload_plugins"><?php echo T_('Reload events and codes for installed plugins.') ?></a>
 	</p>
@@ -279,6 +335,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.22  2006/06/20 00:16:54  blueyed
+ * Transformed Plugins table into Results object, so some columns are sortable.
+ *
  * Revision 1.21  2006/06/05 23:15:00  blueyed
  * cleaned up plugin help links
  *
