@@ -56,8 +56,8 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 
 
 $Results = new Results( '
-	SELECT plug_status, plug_ID, plug_priority, plug_code, plug_apply_rendering, plug_version, plug_spam_weight FROM T_plugins',
-	'plug_', '--D', 0 );
+	SELECT plug_status, plug_ID, plug_priority, plug_code, plug_apply_rendering FROM T_plugins',
+	'plug_', '--A', 0 );
 
 function plugin_results_td_status( $plug_status, $plug_ID )
 {
@@ -111,9 +111,15 @@ function plugin_results_td_name( $Plugin )
 	}
 	return $r;
 }
+function plugin_results_name_order_callback( $a, $b, $order )
+{
+	$r = strcasecmp( $a->name, $b->name );
+	if( $order == 'DESC' ) { $r = -$r; }
+	return $r;
+}
 $Results->cols[1] = array(
 		'th' => T_('Plugin'),
-		// TODO: 'order_callback'
+		'order_callback' => 'plugin_results_name_order_callback',
 		'td' => '% plugin_results_td_name( {Obj} ) %',
 	);
 
@@ -158,9 +164,16 @@ $Results->cols[4] = array(
 /*
  * PLUGIN DESCRIPTION TD:
  */
+function plugin_results_desc_order_callback( $a, $b, $order )
+{
+	$r = strcasecmp( $a->short_desc, $b->short_desc );
+	if( $order == 'DESC' ) { $r = -$r; }
+	return $r;
+}
 $Results->cols[5] = array(
 		'th' => T_('Description'),
 		'td' => '% {Obj}->short_desc %',
+		'order_callback' => 'plugin_results_name_order_callback',
 	);
 
 /*
@@ -335,6 +348,9 @@ if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_no_DB' ) ) /
 <?php
 /*
  * $Log$
+ * Revision 1.23  2006/06/20 23:24:14  blueyed
+ * Added "order_callback" support for Results; made "name" and "desc" columns in Plugins list sortable
+ *
  * Revision 1.22  2006/06/20 00:16:54  blueyed
  * Transformed Plugins table into Results object, so some columns are sortable.
  *

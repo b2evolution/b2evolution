@@ -41,6 +41,8 @@ require_once dirname(__FILE__).'/_widget.class.php';
 
 /**
  * Results class
+ *
+ * @todo Support $cols[]['order_callback'] also if there's a LIMIT?
  */
 class Results extends Widget
 {
@@ -129,10 +131,20 @@ class Results extends Widget
 
 	/**
 	 * Definitions for each column:
-	 * -th
-	 * -td
-	 * -order
-	 * -td_start. A column with no def will de displayed using
+	 * - th
+	 * - td
+	 * - order: SQL column name(s) to sort by (delimited by comma)
+	 * - order_callback: a PHP callback function (can be array($Object, $method)).
+	 *     This gets three params: $a, $b, $desc.
+	 *     $a and $b are either DB row objects or instantiated objects
+	 *     from {@link Results::Cache} (see "order_callback_use_rows").
+	 *     $desc is either 'ASC' or 'DESC'. The function has to return -1, 0 or 1,
+	 *     according to if the $a < $b, $a == $b or $a > $b.
+	 * - order_callback_use_rows: by default, objects get instantiated and passed to "order_callback".
+	 *     By setting this to true, the rows get passed on to "order_callback" instead.
+	 * - td_start
+	 *
+	 * A column with no def will be displayed using
 	 * the default defs from Results::params, that is to say, one of these:
 	 *   - $this->params['col_start_first'];
 	 *   - $this->params['col_start_last'];
@@ -203,9 +215,14 @@ class Results extends Widget
 	var $order_param;
 
 	/**
-		* List of sortable fields
-		*/
+	 * List of sortable fields
+	 */
 	var $order_field_list;
+
+	/**
+	 * @var array List of sortable columns by callback ("order_callback")
+	 */
+	var $order_callbacks;
 
 
 	/**
@@ -389,7 +406,61 @@ class Results extends Widget
 		// Store row count
 		$this->result_num_rows = $this->DB->num_rows;
 
+
+		// Sort with callbacks:
+		if( $this->order_callbacks )
+		{
+			if( $append_limit && !empty($this->limit) )
+			{
+				debug_die( '"order_callback" is not supported with LIMIT.' );
+			}
+
+			foreach( $this->order_callbacks as $order_callback )
+			{
+				#echo 'order_callback: '; var_dump($order_callback);
+
+				$this->order_callback_wrapper_data = $order_callback; // to pass ASC/DESC param and callback itself through the wrapper to the callback
+
+				if( empty($order_callback['use_rows']) )
+				{ // default: instantiate objects for the callback:
+					usort( $this->rows, array( &$this, 'order_callback_wrapper_objects' ) );
+				}
+				else
+				{
+					usort( $this->rows, array( &$this, 'order_callback_wrapper_rows' ) );
+				}
+			}
+		}
+
 		// echo '<br />rows on page='.$this->result_num_rows;
+	}
+
+
+	/**
+	 * Wrapper method to {@link usort()}, which instantiates objects and passed them on to the
+	 * order callback.
+	 *
+	 * @return integer
+	 */
+	function order_callback_wrapper_objects( $row_a, $row_b )
+	{
+		$a = $this->Cache->instantiate($row_a);
+		$b = $this->Cache->instantiate($row_b);
+
+		return (int)call_user_func( $this->order_callback_wrapper_data['callback'],
+				$a, $b, $this->order_callback_wrapper_data['order'] );
+	}
+
+
+	/**
+	 * Wrapper method to {@link usort()}, which passes the rows to the order callback.
+	 *
+	 * @return integer
+	 */
+	function order_callback_wrapper_rows( $row_a, $row_b )
+	{
+		return (int)call_user_func( $this->order_callback_wrapper_data['callback'],
+				$row_a, $row_b, $this->order_callback_wrapper_data['order'] );
 	}
 
 
@@ -450,7 +521,7 @@ class Results extends Widget
 				return;
 			}
 
- 			$sql_count = $this->sql;
+			$sql_count = $this->sql;
 			// echo $sql_count;
 
 			/*
@@ -664,9 +735,9 @@ class Results extends Widget
 	}
 
 
-  /**
-   * Display the filtering form
-   */
+	/**
+	 * Display the filtering form
+	 */
 	function display_filters()
 	{
 		global $debug, $Session, $Request;
@@ -697,29 +768,29 @@ class Results extends Widget
 								onclick="return toggle_filter_area(\''.$filter_name.'\');" >'
 						.get_icon( 'collapse', 'imgtag', array( 'id' => 'clickimg_'.$filter_name ) );
 		}
-    echo T_('Filters').'</a>:';
+		echo T_('Filters').'</a>:';
 
-    if( !empty( $this->filter_area['presets'] ) )
-    { // We have preset filters
-    	$r = array();
-    	// Loop on all preset filters:
-    	foreach( $this->filter_area['presets'] as $key => $preset )
-    	{
-    		if( method_exists( $this, 'is_filtered' ) && !$this->is_filtered()
-    					&& $Request->get( $this->param_prefix.'filter_preset' ) == $key )
-    		{ // The list is not filtered and the filter preset is selected, so no link on:
-    			$r[] = '['.$preset[0].']';
-    		}
-    		else
-    		{	// Display preset filter link:
-    	  	$r[] = '[<a href="'.$preset[1].'">'.$preset[0].'</a>]';
-    		}
-    	}
+		if( !empty( $this->filter_area['presets'] ) )
+		{ // We have preset filters
+			$r = array();
+			// Loop on all preset filters:
+			foreach( $this->filter_area['presets'] as $key => $preset )
+			{
+				if( method_exists( $this, 'is_filtered' ) && !$this->is_filtered()
+							&& $Request->get( $this->param_prefix.'filter_preset' ) == $key )
+				{ // The list is not filtered and the filter preset is selected, so no link on:
+					$r[] = '['.$preset[0].']';
+				}
+				else
+				{	// Display preset filter link:
+					$r[] = '[<a href="'.$preset[1].'">'.$preset[0].'</a>]';
+				}
+			}
 
-    	echo ' '.implode( ' ', $r );
-    }
+			echo ' '.implode( ' ', $r );
+		}
 
-  	if( $debug > 1 )
+		if( $debug > 1 )
 		{
 			echo ' <span class="notes">('.$filter_name.':'.$filter_fold_state.')</span>';
 			echo ' <span id="asyncResponse"></span>';
@@ -939,12 +1010,12 @@ class Results extends Widget
 						if( $i == 0 && $cell['rowspan'] != 2 )
 						{	// The cell is a th_group
 							$th_title = $this->cols[$key]['th_group'];
-							$col_order = isset( $this->cols[$key]['order_group'] ) ? $this->cols[$key]['order_group'] : '';
+							$col_order = isset( $this->cols[$key]['order_group'] );
 						}
 						else
 						{	// The cell is a th
 							$th_title = $this->cols[$key]['th'] ;
-							$col_order = isset( $this->cols[$key]['order'] ) ? $this->cols[$key]['order'] : '';
+							$col_order = isset( $this->cols[$key]['order'] ) || isset( $this->cols[$key]['order_callback'] );
 						}
 
 
@@ -1518,7 +1589,7 @@ class Results extends Widget
 
 				foreach( $this->cols as $col )
 				{
-					if( isset( $col['order'] ) )
+					if( isset( $col['order'] ) || isset( $col['order_callback'] ) )
 					{ // We have found the first orderable column:
 						$this->order .= 'A';
 						break;
@@ -1538,6 +1609,7 @@ class Results extends Widget
 			// echo ' order='.$this->order.' ';
 
 			$orders = array();
+			$this->order_callbacks = array();
 
 			for( $i = 0; $i <= strlen( $this->order ); $i++ )
 			{	// For each position in order string:
@@ -1554,8 +1626,31 @@ class Results extends Widget
 							break;
 					}
 				}
+
+				if( isset( $this->cols[$i]['order_callback'] ) )
+				{	// if column is sortable by callback:
+					switch( substr( $this->order, $i, 1 ) )
+					{
+						case 'A':
+							$this->order_callbacks[] = array(
+									'callback' => $this->cols[$i]['order_callback'],
+									'use_rows' => ! empty($this->cols[$i]['order_callback_use_rows']),
+									'order'=>'ASC' );
+							break;
+
+						case 'D':
+							$this->order_callbacks[] = array(
+									'callback' => $this->cols[$i]['order_callback'],
+									'use_rows' => ! empty($this->cols[$i]['order_callback_use_rows']),
+									'order' => 'DESC' );
+							break;
+					}
+				}
 			}
 			$this->order_field_list = implode( ',', $orders );
+
+			#pre_dump( $this->order_field_list );
+			#pre_dump( $this->order_callbacks );
 		}
 		return $this->order_field_list;	// May be empty
 	}
@@ -1610,6 +1705,10 @@ class Results extends Widget
 	}
 
 
+	/**
+	 *
+	 * @todo Support {@link Results::order_callbacks}
+	 */
 	function move_icons( )
 	{
 		$r = '';
@@ -1995,6 +2094,9 @@ class Results extends Widget
 
 /*
  * $Log$
+ * Revision 1.15  2006/06/20 23:24:14  blueyed
+ * Added "order_callback" support for Results; made "name" and "desc" columns in Plugins list sortable
+ *
  * Revision 1.14  2006/06/20 00:16:54  blueyed
  * Transformed Plugins table into Results object, so some columns are sortable.
  *
