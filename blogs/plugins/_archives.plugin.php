@@ -37,6 +37,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Required class
+ */
+require_once $inc_path.'_misc/_results.class.php';
+
+
+/**
  * Archives Plugin
  *
  * This plugin displays
@@ -526,6 +532,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.23  2006/06/20 00:38:42  blueyed
+ * require results class!
+ *
  * Revision 1.22  2006/06/16 21:30:57  fplanque
  * Started clean numbering of plugin versions (feel free do add dots...)
  *
