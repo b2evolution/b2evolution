@@ -71,7 +71,7 @@ while( $Comment = & $CommentList->get_next() )
 			<?php
 			$comment_Item = & $Comment->get_Item();
 			echo T_('In response to:')
-				.' <a href=?ctrl=browse&amp;blog='.$Blog->ID.'&amp;tab=posts&amp;p='.$comment_Item->ID
+				.' <a href="?ctrl=browse&amp;blog='.$Blog->ID.'&amp;tab=posts&amp;p='.$comment_Item->ID
 				.'&amp;c=1&amp;tb=1&amp;pb=1" class="" title="'.T_('Edit this task...').'">'.$comment_Item->dget('title').'</a>';
 			?>
 		</div>
@@ -123,6 +123,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/20 23:23:25  blueyed
+ * Fixed HTML
+ *
  * Revision 1.7  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *
