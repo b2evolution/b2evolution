@@ -152,7 +152,7 @@ class Session
 
 						if( $this->_data === false )
 						{
-							$Debuglog->add( 'Session data corrupted! Unserialized data was: ['.var_export($row->sess_data, true).']', array('session','error') );
+							$Debuglog->add( 'Session data corrupted! Serialized data was: --['.var_export($row->sess_data, true).']--', array('session','error') );
 							$this->_data = array();
 						}
 						else
@@ -174,7 +174,7 @@ class Session
 
 
 		if( $this->ID )
-		{ // there was a valid session before; update data
+		{ // there was a valid session before; update data (lastseen)
 			$this->_session_needs_save = true;
 		}
 		else
@@ -434,6 +434,9 @@ class Session
 
 /*
  * $Log$
+ * Revision 1.13  2006/06/20 21:16:02  blueyed
+ * doc/debug
+ *
  * Revision 1.12  2006/05/29 19:54:45  fplanque
  * no message
  *
