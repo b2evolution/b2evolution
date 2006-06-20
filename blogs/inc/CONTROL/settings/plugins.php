@@ -450,7 +450,13 @@ switch( $action )
 			break;
 		}
 
-		$Messages->add( sprintf( T_('Installed plugin &laquo;%s&raquo;.'), $edit_Plugin->classname ), 'success' );
+		$msg = sprintf( T_('Installed plugin &laquo;%s&raquo;.'), $edit_Plugin->classname );
+		if( $edit_settings_icon = $edit_Plugin->get_edit_settings_link()
+			&& $edit_Plugin->GetDefaultSettings() /* It provides settings apart from default code and priority */ )
+		{
+			$msg .= ' '.$edit_settings_icon;
+		}
+		$Messages->add( $msg, 'success' );
 
 		// Install completed:
 		$r = $admin_Plugins->call_method( $edit_Plugin->ID, 'AfterInstall', $params = array() );
