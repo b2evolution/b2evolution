@@ -94,12 +94,6 @@ class basic_antispam_plugin extends Plugin
 					'defaultvalue' => '-1', // use "nofollow" infinitely by default so lazy admins won't promote spam
 					'size' => 5,
 				),
-				'block_spam_referers' => array(
-					'type' => 'checkbox',
-					'label' => T_('Block spam referers'),
-					'note' => T_('If a referrer has been detected as spam, should we block the request with a "403 Forbidden" page?'),
-					'defaultvalue' => '1',
-				),
 
 				'check_url_referers' => array(
 					'type' => 'checkbox',
@@ -302,26 +296,6 @@ class basic_antispam_plugin extends Plugin
 				{
 					return $m[1].$m[2].\' rel="nofollow">\';
 				}' ), $data );
-	}
-
-
-	/**
-	 * Block spam referers (if activated in Settings and not on an admin page)
-	 */
-	function SessionLoaded( & $params )
-	{
-		if( $this->Settings->get( 'block_spam_referers' ) && ! is_admin_page() )
-		{
-			global $Hit, $view_path;
-			if( $Hit->referer_type == 'spam' )
-			{
-				// This is most probably referer spam,
-				// In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
-				require $view_path.'errors/_referer_spam.page.php';	// error & exit
-				exit(); // just in case.
-				// THIS IS THE END!!
-			}
-		}
 	}
 
 
@@ -566,6 +540,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.20  2006/06/22 19:47:06  blueyed
+ * "Block spam referers" as global option
+ *
  * Revision 1.19  2006/06/16 21:30:57  fplanque
  * Started clean numbering of plugin versions (feel free do add dots...)
  *

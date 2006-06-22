@@ -59,6 +59,7 @@ class GeneralSettings extends AbstractSettings
 		'antispam_last_update' => '2000-01-01 00:00:00',
 		'antispam_threshold_publish' => '-90',
 		'antispam_threshold_delete' => '100', // do not delete by default!
+		'antispam_block_spam_referers' => '1',
 
 		'archive_mode' => 'monthly',
 		'AutoBR' => '0',
@@ -148,6 +149,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.13  2006/06/22 19:47:06  blueyed
+ * "Block spam referers" as global option
+ *
  * Revision 1.12  2006/05/12 21:53:38  blueyed
  * Fixes, cleanup, translation for plugins
  *

@@ -54,6 +54,12 @@ $Form->begin_fieldset( T_('Comments/Feedback') );
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset(); // TODO: needs legend title ("Misc"?)
+	$Form->checkbox( 'antispam_block_spam_referers', $Settings->get('antispam_block_spam_referers'),
+		T_('Block spam referers'), T_('If a referrer has been detected as spam, should we block the request with a "403 Forbidden" page?') );
+$Form->end_fieldset();
+
+
 $Form->begin_fieldset( T_('Spam detection relevance weight') );
 
 echo '<p>'.T_('This defines the weight of the plugin, in relation to the others.').'</p>';
@@ -84,6 +90,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.4  2006/06/22 19:47:06  blueyed
+ * "Block spam referers" as global option
+ *
  * Revision 1.3  2006/05/02 04:36:25  blueyed
  * Spam karma changed (-100..100 instead of abs/max); Spam weight for plugins; publish/delete threshold
  *

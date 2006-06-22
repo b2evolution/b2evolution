@@ -201,6 +201,7 @@ class Hit
 		global $comments_allowed_uri_scheme; // used to validate the Referer
 		global $blackList, $search_engines;  // used to detect $referer_type
 		global $view_path;
+		global $Settings;
 
 		if( isset( $HTTP_REFERER ) )
 		{ // Referer provided by PHP:
@@ -239,28 +240,14 @@ class Hit
 			$this->referer = false;
 			// QUESTION: add domain to T_basedomains, type 'blacklist' ?
 
-		// dh> Note: the basic_antispam_plugin will cancel the request, if it's spam
-	// fp> when does it run? I don't feel comfortable removing this.
-		// What if it's not installed?
-		//	return;
-/*
-Now what we have is:
-1) the blacklist is handled by the core
-2) the detection is handled by the core
-3) we would need to wait for an optional plugin to instanciate before we abort.
-
-Feels bloated.
-
-Unless I'm not seeing clearly here I'd say: get that referer spam "detection" (should be abortion) code out of the plugin and leave it where it was.
-
-If you want the abortion to be optional, you can put a checkbox into Settings>Antispam.
-*/
-
-			// This is most probably referer spam,
-			// In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
-			require $view_path.'errors/_referer_spam.page.php';	// error & exit
-			exit(); // just in case.
-			// THIS IS THE END!!
+			if( $Settings->get('antispam_block_spam_referers') )
+			{
+				// This is most probably referer spam,
+				// In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
+				require $view_path.'errors/_referer_spam.page.php';	// error & exit
+				exit(); // just in case.
+				// THIS IS THE END!!
+			}
 		}
 
 
@@ -615,6 +602,9 @@ If you want the abortion to be optional, you can put a checkbox into Settings>An
 
 /*
  * $Log$
+ * Revision 1.21  2006/06/22 19:47:06  blueyed
+ * "Block spam referers" as global option
+ *
  * Revision 1.20  2006/06/22 18:37:47  fplanque
  * fixes
  *

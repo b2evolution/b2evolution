@@ -51,7 +51,7 @@ switch( $action )
 		if( isset($submit['restore_defaults']) )
 		{ // RESTORE DEFAULTS:
 			$Settings->delete_array( array(
-				'antispam_threshold_publish', 'antispam_threshold_delete' ) );
+				'antispam_threshold_publish', 'antispam_threshold_delete', 'antispam_block_spam_referers' ) );
 
 			// Set "spam detection relevance weight" back to 1 for all plugins:
 			$changed = $DB->query( 'UPDATE T_plugins SET plug_spam_weight = 1' );
@@ -72,6 +72,9 @@ switch( $action )
 
 			$Request->param_integer_range( 'antispam_threshold_delete', -100, 100, T_('The threshold must be between -100 and 100.') );
 			$Settings->set( 'antispam_threshold_delete', $antispam_threshold_delete );
+
+			$Request->param( 'antispam_block_spam_referers', 'integer', 0 );
+			$Settings->set( 'antispam_block_spam_referers', $antispam_block_spam_referers );
 
 			$changed_weight = false;
 			$Request->param( 'antispam_plugin_spam_weight', 'array', array() );
