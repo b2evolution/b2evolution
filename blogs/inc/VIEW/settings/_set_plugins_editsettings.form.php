@@ -52,6 +52,33 @@ require_once $inc_path.'_misc/_plugin.funcs.php';
 $Form = & new Form( NULL, 'pluginsettings_checkchanges' );
 $Form->hidden_ctrl();
 
+if( $current_User->check_perm( 'options', 'edit' ) )
+{
+	// "Uninstall" action icon:
+	$Form->global_icon( T_('Un-install this plugin!'), 'delete', 'admin.php?ctrl=plugins&amp;action=uninstall&amp;plugin_ID='.$edit_Plugin->ID );
+
+	// "Enable", "Disable" action icons; or display broken status:
+	if( $edit_Plugin->status == 'enabled' )
+	{
+		$Form->global_icon( T_('Disable the plugin!'), 'deactivate', 'admin.php?ctrl=plugins&amp;action=disable_plugin&amp;plugin_ID='.$edit_Plugin->ID );
+	}
+	elseif( $edit_Plugin->status == 'broken' )
+	{
+		$Form->global_icon('warning', 'imgtag', array(
+			'title' => T_('The plugin is broken.')
+				.// Display load error from Plugins::register() (if any):
+				( isset( $admin_Plugins->plugin_errors[$edit_Plugin->ID] )
+					&& ! empty($admin_Plugins->plugin_errors[$edit_Plugin->ID]['register'])
+					? ' '.$admin_Plugins->plugin_errors[$edit_Plugin->ID]['register']
+					: '' )
+			) );
+	}
+	else
+	{
+		$Form->global_icon( T_('Enable the plugin!'), 'activate', 'admin.php?ctrl=plugins&amp;action=enable_plugin&amp;plugin_ID='.$edit_Plugin->ID );
+	}
+}
+
 // Help icons, if available:
 if( $edit_Plugin->get_help_file() )
 { // README in JS popup:
@@ -170,6 +197,9 @@ $Form->end_form();
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.14  2006/06/22 19:50:51  blueyed
+ * Plugin action icons (status and uninstall) with the settings form.
+ *
  * Revision 1.13  2006/05/30 19:39:55  fplanque
  * plugin cleanup
  *
