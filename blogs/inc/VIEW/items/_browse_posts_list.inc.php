@@ -33,7 +33,7 @@ require_once $model_path.'items/_itemlist.class.php';
 global $Blog;
 
 global $dispatcher, $blog, $posts, $posts_per_page, $poststart, $postend, $c, $show_statuses, $ReqURI;
-global $add_item_url, $edit_item_url, $delete_item_url, $htsrv_url;
+global $add_item_url, $edit_item_url, $delete_item_url;
 global $comment_allowed_tags, $comments_use_autobr;
 
 echo '<div class="NavBar">';
@@ -210,6 +210,9 @@ if( $MainList->get_total_num_posts() )
 <?php
 /*
  * $Log$
+ * Revision 1.10  2006/06/22 22:30:04  blueyed
+ * htsrv url for sensible scripts (login, register and profile update)
+ *
  * Revision 1.9  2006/05/30 20:32:57  blueyed
  * Lazy-instantiate "expensive" properties of Comment and Item.
  *

@@ -381,6 +381,17 @@ $htsrv_path = $basepath.$htsrv_subdir;   // You should not need to change this
 $htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
 
 /**
+ * Sensible URL to the htsrv folder.
+ *
+ * Set this separately (based on {@link $htsrv_url}), if you want to use
+ * SSL for login, registration and profile updates (where passwords are
+ * involved), but not for the whole htsrv scripts.
+ *
+ * @global string
+ */
+$htsrv_url_sensible = $htsrv_url;
+
+/**
  * Location of the XML SeRVices folder.
  * @global string $xmlsrv_subdir
  */

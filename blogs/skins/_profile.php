@@ -49,7 +49,7 @@ $redirect_to = param( 'redirect_to', 'string', '' );
 /**
  * @var Form form to update the profile
  */
-$ProfileForm = & new Form( $htsrv_url.'profile_update.php', 'ProfileForm' );
+$ProfileForm = & new Form( $htsrv_url_sensible.'profile_update.php', 'ProfileForm' );
 
 $ProfileForm->begin_form( 'bComment' );
 $ProfileForm->hidden( 'checkuser_id', $current_User->ID );
@@ -87,6 +87,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.29  2006/06/22 22:30:04  blueyed
+ * htsrv url for sensible scripts (login, register and profile update)
+ *
  * Revision 1.28  2006/04/11 21:22:26  fplanque
  * partial cleanup
  *

@@ -38,7 +38,7 @@ require dirname(__FILE__).'/_header.php';
 Log::display( '', '', T_('A link to change your password will be sent to you by email.'), 'note' );
 
 
-$Form = & new Form( $htsrv_url.'login.php', '', 'post', 'fieldset' );
+$Form = & new Form( $htsrv_url_sensible.'login.php', '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -61,6 +61,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.5  2006/06/22 22:30:04  blueyed
+ * htsrv url for sensible scripts (login, register and profile update)
+ *
  * Revision 1.4  2006/04/27 21:49:55  blueyed
  * todo
  *

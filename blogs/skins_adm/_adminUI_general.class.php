@@ -122,7 +122,6 @@ class AdminUI_general
 	function AdminUI_general()
 	{
 		global $mode; // TODO: make it a real property
-		global $htsrv_url, $baseurl;
 
 		$this->mode = $mode;
 
@@ -1203,7 +1202,7 @@ class AdminUI_general
 	 */
 	function get_page_head()
 	{
-		global $app_shortname, $app_version, $current_User, $htsrv_url, $admin_url, $baseurl, $rsc_url;
+		global $app_shortname, $app_version, $current_User, $htsrv_url_sensible, $admin_url, $baseurl, $rsc_url;
 
 		$r = '
 		<div id="header">
@@ -1212,7 +1211,7 @@ class AdminUI_general
 			<div id="headinfo">
 				<span id="headfunctions">'
 					// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
-					.'<a href="'.$htsrv_url.'login.php?action=logout&amp;redirect_to='.$admin_url.'">'.T_('Logout').'</a>
+					.'<a href="'.$htsrv_url_sensible.'login.php?action=logout&amp;redirect_to='.$admin_url.'">'.T_('Logout').'</a>
 					<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
 					.T_('Logout').'" /></a>
 				</span>
@@ -1288,6 +1287,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.19  2006/06/22 22:30:05  blueyed
+ * htsrv url for sensible scripts (login, register and profile update)
+ *
  * Revision 1.18  2006/06/22 19:23:01  blueyed
  * Text for fotter, if no LIMIT
  *

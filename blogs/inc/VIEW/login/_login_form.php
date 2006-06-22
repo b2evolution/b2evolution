@@ -35,8 +35,8 @@ $page_icon = 'icon_login.gif';
 require dirname(__FILE__).'/_header.php';
 
 
-// The login form has to point back to itself, in case $htsrv_url is a "https" link and $redirect_to is not!
-$Form = & new Form( $htsrv_url.'login.php', '', 'post', 'fieldset' );
+// The login form has to point back to itself, in case $htsrv_url_sensible is a "https" link and $redirect_to is not!
+$Form = & new Form( $htsrv_url_sensible.'login.php', '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -95,8 +95,8 @@ $Form->end_form();
 <div class="login_actions" style="text-align:right">
 	<?php user_register_link( '', ' &middot; ', '', '#', true /*disp_when_logged_in*/ )?>
 
-	<a href="<?php echo $htsrv_url ?>login.php?action=lostpassword&amp;redirect_to=<?php
-		echo rawurlencode( $redirect_to );
+	<a href="<?php echo $htsrv_url_sensible.'login.php?action=lostpassword'
+		.'&amp;redirect_to='.rawurlencode( $redirect_to );
 		if( !empty($login) )
 		{
 			echo '&amp;login='.rawurlencode($login);
@@ -118,6 +118,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/22 22:30:04  blueyed
+ * htsrv url for sensible scripts (login, register and profile update)
+ *
  * Revision 1.7  2006/04/22 02:36:38  blueyed
  * Validate users on registration through email link (+cleanup around it)
  *

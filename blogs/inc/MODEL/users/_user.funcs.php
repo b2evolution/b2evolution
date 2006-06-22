@@ -117,7 +117,7 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
  */
 function get_user_login_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $htsrv_url, $edited_Blog, $generating_static;
+	global $htsrv_url_sensible, $edited_Blog, $generating_static;
 
 	if( is_logged_in() ) return false;
 
@@ -138,7 +138,7 @@ function get_user_login_link( $before = '', $after = '', $link_text = '', $link_
 	}
 
 	$r = $before;
-	$r .= '<a href="'.$htsrv_url.'login.php'.$redirect.'" title="'.$link_title.'">';
+	$r .= '<a href="'.$htsrv_url_sensible.'login.php'.$redirect.'" title="'.$link_title.'">';
 	$r .= $link_text;
 	$r .= '</a>';
 	$r .= $after;
@@ -169,7 +169,7 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
  */
 function get_user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false )
 {
-	global $htsrv_url, $Settings, $edited_Blog, $generating_static;
+	global $htsrv_url_sensible, $Settings, $edited_Blog, $generating_static;
 
 	if( is_logged_in() && ! $disp_when_logged_in )
 	{ // Do not display, when already logged in:
@@ -198,7 +198,7 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 	}
 
 	$r = $before;
-	$r .= '<a href="'.$htsrv_url.'register.php'.$redirect.'" title="'.$link_title.'">';
+	$r .= '<a href="'.$htsrv_url_sensible.'register.php'.$redirect.'" title="'.$link_title.'">';
 	$r .= $link_text;
 	$r .= '</a>';
 	$r .= $after;
@@ -222,7 +222,7 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
  */
 function get_user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $htsrv_url, $current_User, $blog;
+	global $htsrv_url_sensible, $current_User, $blog;
 
 	if( ! is_logged_in() )
 	{
@@ -233,7 +233,7 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
 
 	$r = $before;
-	$r .= '<a href="'.$htsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode( regenerate_url() ).'" title="'.$link_title.'">';
+	$r .= '<a href="'.$htsrv_url_sensible.'login.php?action=logout&amp;redirect_to='.rawurlencode( regenerate_url() ).'" title="'.$link_title.'">';
 	$r .= sprintf( $link_text, $current_User->login );
 	$r .= '</a>';
 	$r .= $after;
@@ -485,6 +485,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.8  2006/06/22 22:30:04  blueyed
+ * htsrv url for sensible scripts (login, register and profile update)
+ *
  * Revision 1.7  2006/04/20 22:13:48  blueyed
  * Display "Register..." link in login form also if user is logged in already.
  *

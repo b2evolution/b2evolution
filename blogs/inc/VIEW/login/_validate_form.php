@@ -39,7 +39,7 @@ $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_header.php';
 
 
-$Form = & new Form( $htsrv_url.'login.php', 'form_validatemail', 'post', 'fieldset' );
+$Form = & new Form( $htsrv_url_sensible.'login.php', 'form_validatemail', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -69,6 +69,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.4  2006/06/22 22:30:04  blueyed
+ * htsrv url for sensible scripts (login, register and profile update)
+ *
  * Revision 1.3  2006/04/27 21:49:55  blueyed
  * todo
  *

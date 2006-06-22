@@ -39,7 +39,7 @@ $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_header.php';
 
 
-$Form = & new Form( $htsrv_url.'register.php', '', 'post', 'fieldset' );
+$Form = & new Form( $htsrv_url_sensible.'register.php', '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -79,7 +79,7 @@ $Form->end_form(); // display hidden fields etc
 ?>
 
 <div style="text-align:right">
-	<a href="<?php echo $htsrv_url.'login.php' ?>"><?php echo T_('Log into existing account...') ?></a>
+	<a href="<?php echo $htsrv_url_sensible.'login.php' ?>"><?php echo T_('Log into existing account...') ?></a>
 </div>
 
 <?php
@@ -87,6 +87,9 @@ require dirname(__FILE__).'/_footer.php';
 
 /*
  * $Log$
+ * Revision 1.6  2006/06/22 22:30:04  blueyed
+ * htsrv url for sensible scripts (login, register and profile update)
+ *
  * Revision 1.5  2006/04/22 01:57:36  blueyed
  * adjusted maxlength for email
  *
