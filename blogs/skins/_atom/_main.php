@@ -30,8 +30,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-header( 'Content-type: application/atom+xml; charset='.$io_charset );
-// header("Content-type: text/xml");
+if( $debug)
+	header("Content-type: text/xml");
+else
+	header( 'Content-type: application/atom+xml; charset='.$io_charset );
+
 echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 ?>
 <feed xml:lang="<?php $Blog->disp( 'locale', 'xml' ) ?>" xmlns="http://www.w3.org/2005/Atom">
