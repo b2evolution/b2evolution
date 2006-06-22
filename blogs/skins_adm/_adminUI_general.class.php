@@ -919,6 +919,7 @@ class AdminUI_general
 					                  /* '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$' */
 					                  /* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
 					'footer_text_single' => T_('1 page'),
+					'footer_text_no_limit' => '', // Text if theres no LIMIT and therefor only one page anyway
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
 						'list_prev_text' => T_('...'),
@@ -1287,6 +1288,9 @@ class AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.18  2006/06/22 19:23:01  blueyed
+ * Text for fotter, if no LIMIT
+ *
  * Revision 1.17  2006/06/22 18:37:48  fplanque
  * fixes
  *
